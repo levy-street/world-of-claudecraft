@@ -1,33 +1,130 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { ChatLogger, parseChat, type ChatLogRow } from '../server/chat_log';
+
+vi.mock('../server/db', () => ({
+  insertChatLogs: vi.fn(async () => {}),
+  saveCharacterState: vi.fn(async () => {}),
+  openPlaySession: vi.fn(async () => 1),
+  closePlaySession: vi.fn(async () => {}),
+}));
+
+import { ChatLogger, type ChatLogRow } from '../server/chat_log';
+import { GameServer } from '../server/game';
+import { Sim } from '../src/sim/sim';
 
 function row(message: string, channel = 'say'): ChatLogRow {
   return { accountId: 1, characterId: 2, characterName: 'Zyx', channel, message };
 }
 
-describe('parseChat', () => {
-  it('routes plain text to say', () => {
-    expect(parseChat('hello world')).toEqual({ channel: 'say', message: 'hello world' });
+describe('sent chat normalization', () => {
+  function makeWorld() {
+    return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+  }
+
+  it('captures plain text and /say as say', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    expect(sim.chat('hello world', a)).toEqual({ channel: 'say', message: 'hello world' });
+    expect(sim.chat('/say hello again', a)).toEqual({ channel: 'say', message: 'hello again' });
   });
 
-  it('routes /p and /party to the party channel without the prefix', () => {
-    expect(parseChat('/p inc on the left')).toEqual({ channel: 'party', message: 'inc on the left' });
-    expect(parseChat('/party pull the boss')).toEqual({ channel: 'party', message: 'pull the boss' });
+  it('captures /yell as yell', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    expect(sim.chat('/y Over here!', a)).toEqual({ channel: 'yell', message: 'Over here!' });
   });
 
-  it('discards what the sim would discard', () => {
-    expect(parseChat('')).toBeNull();
-    expect(parseChat('   ')).toBeNull();
+  it('captures /general as general', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    expect(sim.chat('/g LFG crypt', a)).toEqual({ channel: 'general', message: 'LFG crypt' });
   });
 
-  it("treats a bare '/p' like the sim does: say, not party", () => {
-    // '/p   ' trims to '/p', which Sim.chat does not recognize as a prefix
-    expect(parseChat('/p   ')).toEqual({ channel: 'say', message: '/p' });
+  it('captures /whisper as whisper only when the target is valid', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    sim.addPlayer('mage', 'Bet');
+    expect(sim.chat('/w bet psst', a)).toEqual({ channel: 'whisper', message: 'psst' });
+    expect(sim.chat('/w nobody psst', a)).toBeNull();
   });
 
-  it('caps messages at 200 characters like Sim.chat', () => {
-    const parsed = parseChat('x'.repeat(500));
-    expect(parsed?.message.length).toBe(200);
+  it('captures /party only for party members', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('mage', 'Bet');
+    expect(sim.chat('/p before party', a)).toBeNull();
+    sim.partyInvite(b, a);
+    sim.partyAccept(b);
+    expect(sim.chat('/p inc on the left', a)).toEqual({ channel: 'party', message: 'inc on the left' });
+  });
+
+  it('does not capture discarded, unknown, or throttled messages', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    expect(sim.chat('', a)).toBeNull();
+    expect(sim.chat('   ', a)).toBeNull();
+    expect(sim.chat('/dance', a)).toBeNull();
+
+    let throttled = false;
+    for (let i = 0; i < 40; i++) {
+      const sent = sim.chat('/g spam ' + i, a);
+      sim.tick();
+      if (!sent) throttled = true;
+    }
+    expect(throttled).toBe(true);
+  });
+
+  it('caps captured messages at 200 characters like Sim.chat', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const sent = sim.chat('x'.repeat(500), a);
+    expect(sent?.message.length).toBe(200);
+  });
+});
+
+describe('GameServer chat logging', () => {
+  function fakeWs() {
+    const sent: unknown[] = [];
+    return {
+      sent,
+      ws: {
+        readyState: 1,
+        send: (payload: string) => sent.push(JSON.parse(payload)),
+        on: vi.fn(),
+        once: vi.fn(),
+        close: vi.fn(),
+      } as any,
+    };
+  }
+
+  it('persists accepted chat sends with normalized channel and message only', () => {
+    const server = new GameServer();
+    const aWs = fakeWs();
+    const bWs = fakeWs();
+    const a = server.join(aWs.ws, 11, 101, 'Aleph', 'warrior', null);
+    const b = server.join(bWs.ws, 22, 202, 'Bet', 'mage', null);
+    if ('error' in a || 'error' in b) throw new Error('join failed');
+
+    const logSpy = vi.spyOn(server.chatLog, 'log').mockImplementation(() => {});
+    const sendChat = (text: string) => server.handleMessage(a, JSON.stringify({ t: 'cmd', cmd: 'chat', text }));
+
+    sendChat('hello world');
+    sendChat('/y Over here');
+    sendChat('/g LFG crypt');
+    sendChat('/w bet psst');
+    server.sim.partyInvite(b.pid, a.pid);
+    server.sim.partyAccept(b.pid);
+    sendChat('/p party only');
+    sendChat('/dance');
+    sendChat('/w nobody no leak');
+
+    expect(logSpy.mock.calls.map(([r]) => ({ channel: r.channel, message: r.message }))).toEqual([
+      { channel: 'say', message: 'hello world' },
+      { channel: 'yell', message: 'Over here' },
+      { channel: 'general', message: 'LFG crypt' },
+      { channel: 'whisper', message: 'psst' },
+      { channel: 'party', message: 'party only' },
+    ]);
+    expect(logSpy.mock.calls.every(([r]) => r.accountId === 11 && r.characterId === 101 && r.characterName === 'Aleph')).toBe(true);
   });
 });
 

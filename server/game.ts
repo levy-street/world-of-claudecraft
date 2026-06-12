@@ -4,7 +4,7 @@ import type { PlayerMeta } from '../src/sim/sim';
 import { DT, Entity, SimEvent, dist2d } from '../src/sim/types';
 import { zoneAt, DUNGEONS } from '../src/sim/data';
 import { saveCharacterState, openPlaySession, closePlaySession, insertChatLogs } from './db';
-import { ChatLogger, parseChat } from './chat_log';
+import { ChatLogger } from './chat_log';
 
 const WORLD_SEED = 20061;
 const INTEREST_RADIUS = 120;
@@ -321,17 +321,16 @@ export class GameServer {
       case 'release': sim.releaseSpirit(pid); break;
       case 'chat': {
         if (typeof msg.text !== 'string') break;
-        const parsed = parseChat(msg.text);
-        if (parsed) {
+        const sent = sim.chat(msg.text, pid);
+        if (sent) {
           this.chatLog.log({
             accountId: session.accountId,
             characterId: session.characterId,
             characterName: session.name,
-            channel: parsed.channel,
-            message: parsed.message,
+            channel: sent.channel,
+            message: sent.message,
           });
         }
-        sim.chat(msg.text, pid);
         break;
       }
       // party

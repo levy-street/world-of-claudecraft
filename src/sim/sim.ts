@@ -97,6 +97,11 @@ export interface RewardCounters {
   levelUps: number;
 }
 
+export interface SentChat {
+  channel: 'say' | 'yell' | 'whisper' | 'general' | 'party';
+  message: string;
+}
+
 // Per-player progression and bags. The entity holds combat state; this holds
 // everything that belongs to the character sheet.
 export interface PlayerMeta {
@@ -2483,14 +2488,14 @@ export class Sim {
     return true;
   }
 
-  chat(text: string, pid?: number): void {
+  chat(text: string, pid?: number): SentChat | null {
     const r = this.resolve(pid);
-    if (!r) return;
+    if (!r) return null;
     const raw = text.trim().slice(0, 200);
-    if (!raw) return;
+    if (!raw) return null;
     if (!this.chatAllowed(r.meta.entityId)) {
       this.error(r.meta.entityId, 'You are sending messages too quickly.');
-      return;
+      return null;
     }
 
     // "/w name message" — private whisper to an online player
@@ -2498,7 +2503,7 @@ export class Sim {
     if (wm) {
       const targetName = wm[1];
       const msg = wm[2].trim();
-      if (!msg) return;
+      if (!msg) return null;
       // exact case wins outright; otherwise a case-insensitive match is used
       // only when unambiguous, so 'Bet' and 'bet' can't silently intercept
       // each other's whispers
@@ -2511,32 +2516,33 @@ export class Sim {
       }
       if (!target) {
         if (ciMatches.length === 1) target = ciMatches[0];
-        else if (ciMatches.length > 1) { this.error(r.meta.entityId, `Several players match '${targetName}'. Use exact capitalization.`); return; }
+        else if (ciMatches.length > 1) { this.error(r.meta.entityId, `Several players match '${targetName}'. Use exact capitalization.`); return null; }
       }
-      if (!target) { this.error(r.meta.entityId, `There is no player named '${targetName}' online.`); return; }
-      if (target.entityId === r.meta.entityId) { this.error(r.meta.entityId, 'You mutter to yourself. Nobody hears it.'); return; }
+      if (!target) { this.error(r.meta.entityId, `There is no player named '${targetName}' online.`); return null; }
+      if (target.entityId === r.meta.entityId) { this.error(r.meta.entityId, 'You mutter to yourself. Nobody hears it.'); return null; }
       this.emit({ type: 'chat', from: r.meta.name, text: msg, channel: 'whisper', pid: target.entityId });
       this.emit({ type: 'chat', from: r.meta.name, to: target.name, text: msg, channel: 'whisper', pid: r.meta.entityId });
-      return;
+      return { channel: 'whisper', message: msg };
     }
 
     // "/p message" goes to the party channel
     if (/^\/p(arty)?\s/i.test(raw)) {
       const clean = raw.replace(/^\/p(arty)?\s+/i, '').trim();
-      if (!clean) return;
+      if (!clean) return null;
       const party = this.partyOf(r.meta.entityId);
-      if (!party) { this.error(r.meta.entityId, 'You are not in a party.'); return; }
+      if (!party) { this.error(r.meta.entityId, 'You are not in a party.'); return null; }
       for (const mPid of party.members) {
         this.emit({ type: 'chat', from: r.meta.name, text: clean, channel: 'party', pid: mPid });
       }
-      return;
+      return { channel: 'party', message: clean };
     }
 
     // "/g message" — world-wide general channel (no pid = broadcast to all)
     if (/^\/g(eneral)?\s/i.test(raw)) {
       const clean = raw.replace(/^\/g(eneral)?\s+/i, '').trim();
-      if (clean) this.emit({ type: 'chat', from: r.meta.name, text: clean, channel: 'general' });
-      return;
+      if (!clean) return null;
+      this.emit({ type: 'chat', from: r.meta.name, text: clean, channel: 'general' });
+      return { channel: 'general', message: clean };
     }
 
     // bare text and "/s" are local say; "/y" carries further — both are
@@ -2545,14 +2551,15 @@ export class Sim {
     let clean = raw;
     if (/^\/y(ell)?\s/i.test(raw)) { channel = 'yell'; clean = raw.replace(/^\/y(ell)?\s+/i, '').trim(); }
     else if (/^\/s(ay)?\s/i.test(raw)) { clean = raw.replace(/^\/s(ay)?\s+/i, '').trim(); }
-    else if (raw.startsWith('/')) { this.error(r.meta.entityId, `Unknown command: ${raw.split(' ')[0]}. Try /s /y /w /p /g.`); return; }
-    if (!clean) return;
+    else if (raw.startsWith('/')) { this.error(r.meta.entityId, `Unknown command: ${raw.split(' ')[0]}. Try /s /y /w /p /g.`); return null; }
+    if (!clean) return null;
     const range = channel === 'yell' ? YELL_RANGE : SAY_RANGE;
     for (const meta of this.players.values()) {
       const e = this.entities.get(meta.entityId);
       if (!e || dist2d(r.e.pos, e.pos) > range) continue;
       this.emit({ type: 'chat', from: r.meta.name, text: clean, channel, entityId: r.e.id, pid: meta.entityId });
     }
+    return { channel, message: clean };
   }
 
   // -------------------------------------------------------------------------

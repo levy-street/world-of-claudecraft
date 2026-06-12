@@ -63,17 +63,3 @@ export class ChatLogger {
     this.timer.unref?.();
   }
 }
-
-// Mirrors Sim.chat()'s parsing (trim → cap at 200 → '/p ' prefix routes to the
-// party channel) so logs record what was actually said and where. Returns null
-// for messages the sim would discard.
-export function parseChat(text: string): { channel: 'say' | 'party'; message: string } | null {
-  const clean = text.trim().slice(0, 200);
-  if (!clean) return null;
-  const prefix = /^\/p(arty)? /.exec(clean);
-  if (prefix) {
-    const message = clean.slice(prefix[0].length).trim();
-    return message ? { channel: 'party', message } : null;
-  }
-  return { channel: 'say', message: clean };
-}

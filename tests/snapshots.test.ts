@@ -5,6 +5,7 @@ vi.mock('../server/db', () => ({
   saveCharacterState: vi.fn(async () => {}),
   openPlaySession: vi.fn(async () => 1),
   closePlaySession: vi.fn(async () => {}),
+  insertChatLogs: vi.fn(async () => {}),
 }));
 
 import { GameServer, ClientSession } from '../server/game';
