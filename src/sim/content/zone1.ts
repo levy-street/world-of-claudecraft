@@ -186,13 +186,18 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
   },
   fisherman_brandt: {
     id: 'fisherman_brandt', name: 'Fisherman Brandt', title: 'Old Salt',
-    pos: { x: -62, z: 58 }, facing: 2.4, color: 0x2471a3,
+    // in town (west edge, glaring out at Mirror Lake) — his old spot by the
+    // dock sat inside the Mudfin spawn radius and new players got ambushed
+    // walking up to a quest giver
+    pos: { x: -16, z: 6 }, facing: -0.75, color: 0x2471a3,
     questIds: ['q_murlocs'],
     greeting: 'Grlmurlgrl— sorry, been listening to those fish-men too long.',
   },
   foreman_odell: {
     id: 'foreman_odell', name: 'Foreman Odell', title: 'Mine Foreman',
-    pos: { x: -68, z: -52 }, facing: 1.2, color: 0xa04000,
+    // in town (south edge, scowling toward his overrun dig) — his old spot
+    // sat inside the Tunnel Rat spawn radius
+    pos: { x: -4, z: -14 }, facing: -2.14, color: 0xa04000,
     questIds: ['q_mine'],
     greeting: "Whole dig's crawling with those candle-headed vermin!",
   },

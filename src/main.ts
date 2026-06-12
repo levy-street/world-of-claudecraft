@@ -148,6 +148,11 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
         if (e.templateId === 'dungeon_door' && e.dungeonId) world.enterDungeon(e.dungeonId);
         else if (e.templateId === 'dungeon_exit') world.leaveDungeon();
         else world.pickUpObject(id);
+      } else if (e.kind === 'npc') {
+        // left-click talks too — Mac trackpads make right-click a chore;
+        // out of range it just targets (no error spam while exploring)
+        const d = dist2d(world.player.pos, e.pos);
+        if (d <= INTERACT_RANGE + 2) hud.openQuestDialog(id);
       }
     }
   }
