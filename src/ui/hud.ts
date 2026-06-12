@@ -182,6 +182,17 @@ export class Hud {
     this.tooltipEl.style.display = 'none';
   }
 
+  private buffAuraDescription(ba: NonNullable<ItemDef['buffAura']>): string {
+    const min = ba.duration / 60;
+    if (ba.auraKind === 'buff_mana_regen') return `Use: ${ba.name} — Increases mana regeneration by ${Math.round(ba.value * 100)}% for ${min} min.`;
+    if (['buff_spi', 'buff_int', 'buff_sta', 'buff_str', 'buff_agi'].includes(ba.auraKind)) {
+      return `+${ba.value} ${ba.auraKind.replace('buff_', '').toUpperCase()} (${min} min)`;
+    }
+    if (ba.auraKind === 'buff_ap') return `+${ba.value} Attack Power (${min} min)`;
+    if (ba.auraKind === 'buff_armor') return `+${ba.value} Armor (${min} min)`;
+    return '';
+  }
+
   private itemTooltip(item: ItemDef): string {
     const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff';
     let html = `<div class="tt-title" style="color:${qColor}">${item.name}</div>`;
@@ -203,6 +214,11 @@ export class Hud {
     }
     if (item.foodHp) html += `<div class="tt-desc">Use: Restores ${item.foodHp} health over 18 sec. Must remain seated while eating.</div>`;
     if (item.drinkMana) html += `<div class="tt-desc">Use: Restores ${item.drinkMana} mana over 18 sec. Must remain seated while drinking.</div>`;
+    if (item.buffAura) {
+      const desc = this.buffAuraDescription(item.buffAura);
+      if (desc.startsWith('+')) html += `<div class="tt-green">${desc}</div>`;
+      else html += `<div class="tt-desc">${desc}</div>`;
+    }
     if (item.kind === 'quest') html += `<div class="tt-desc">Quest Item</div>`;
     if (item.requiredClass) html += `<div class="tt-sub">Classes: ${item.requiredClass.map((c) => CLASSES[c].name).join(', ')}</div>`;
     if (item.sellValue > 0) html += `<div class="tt-sub">Sell price: ${formatMoney(item.sellValue)}</div>`;
@@ -1290,7 +1306,7 @@ export class Hud {
         if (this.tradeOpen) extra = '<div class="tt-sub">Click to offer in trade</div>';
         else if (this.vendorOpen) extra = '<div class="tt-sub">Click to sell</div>';
         else if (item.kind === 'weapon' || item.kind === 'armor') extra = '<div class="tt-sub">Click to equip</div>';
-        else if (item.kind === 'food' || item.kind === 'drink') extra = '<div class="tt-sub">Click to consume</div>';
+        else if (item.kind === 'food' || item.kind === 'drink' || item.buffAura) extra = '<div class="tt-sub">Click to consume</div>';
         return this.itemTooltip(item) + extra;
       });
       grid.appendChild(row);

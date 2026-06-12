@@ -155,7 +155,7 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     id: 'trader_wilkes', name: 'Trader Wilkes', title: 'Provisioner',
     pos: { x: -7, z: 3 }, facing: Math.PI / 2, color: 0x1e8449,
     questIds: ['q_boars', 'q_supplies'],
-    vendorItems: ['baked_bread', 'spring_water', 'roasted_boar', 'tough_jerky'],
+    vendorItems: ['baked_bread', 'spring_water', 'roasted_boar', 'tough_jerky', 'silver_leaf_tea', 'campfire_flatbread'],
     greeting: 'Fresh bread, clean water, fair prices. What can I get you?',
   },
   apothecary_lin: {

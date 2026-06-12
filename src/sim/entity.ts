@@ -82,6 +82,9 @@ export function recalcPlayerStats(e: Entity, cls: PlayerClass, equipment: Player
     else if (a.kind === 'buff_armor') s.armor += a.value;
     else if (a.kind === 'buff_int') s.int += a.value;
     else if (a.kind === 'buff_sta') s.sta += a.value;
+    else if (a.kind === 'buff_spi') s.spi += a.value;
+    else if (a.kind === 'buff_str') s.str += a.value;
+    else if (a.kind === 'buff_agi') s.agi += a.value;
     else if (a.kind === 'buff_allstats') {
       s.str += a.value; s.agi += a.value; s.sta += a.value; s.int += a.value; s.spi += a.value;
     } else if (a.kind === 'buff_dodge') bonusDodge += a.value;

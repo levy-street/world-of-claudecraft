@@ -188,7 +188,7 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
     pos: { x: -4, z: 308 }, facing: Math.PI / 2, color: 0x1e8449,
     questIds: ['q_prowler_pelts', 'q_fen_supplies', 'q_grubjaw'],
     vendorItems: [
-      'fenbridge_rye', 'marsh_mint_tea', 'smoked_eel', 'silvermist_cordial',
+      'fenbridge_rye', 'marsh_mint_tea', 'smoked_eel', 'silvermist_cordial', 'sumpfkraut', 'fenberry_muffin',
       'bogiron_mace', 'fenreed_staff', 'mirefen_skinner', 'bogiron_hauberk',
       'marshcloth_robe', 'reedwoven_jerkin', 'fenwalker_boots', 'reedwoven_trousers',
     ],
@@ -198,6 +198,7 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
     id: 'herbalist_yara', name: 'Herbalist Yara', title: 'Herbalist',
     pos: { x: 10, z: 295 }, facing: -Math.PI / 2, color: 0x7d3c98,
     questIds: ['q_widows', 'q_broodmother'],
+    vendorItems: ['bogroot_paste'],
     greeting: 'Mind the thicket west of the road. The webs are thick as sailcloth this season.',
   },
   scout_maren: {
@@ -581,6 +582,21 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
   silvermist_cordial: {
     id: 'silvermist_cordial', name: 'Silvermist Cordial', kind: 'drink', quality: 'common',
     drinkMana: 436, sellValue: 60, buyValue: 1000,
+  },
+  sumpfkraut: {
+    id: 'sumpfkraut', name: 'Marsh Weed', kind: 'food', quality: 'common',
+    foodHp: 100, sellValue: 25, buyValue: 500,
+    buffAura: { auraKind: 'buff_mana_regen', value: 0.10, duration: 900, name: 'Marsh Weed Buzz' },
+  },
+  bogroot_paste: {
+    id: 'bogroot_paste', name: 'Bogroot Paste', kind: 'food', quality: 'common',
+    foodHp: 200, sellValue: 35, buyValue: 700,
+    buffAura: { auraKind: 'buff_ap', value: 10, duration: 900, name: 'Bogroot Kick' },
+  },
+  fenberry_muffin: {
+    id: 'fenberry_muffin', name: 'Fenberry Muffin', kind: 'food', quality: 'common',
+    foodHp: 200, sellValue: 40, buyValue: 800,
+    buffAura: { auraKind: 'buff_sta', value: 5, duration: 900, name: 'Fenberry Glow' },
   },
   // --- vendor white gear (Provisioner Hale) ---
   bogiron_mace: {

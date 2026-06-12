@@ -817,7 +817,9 @@ export class Sim {
     if (this.tickCount % 40 !== 0) return; // every 2 seconds (the classic tick)
     if (p.resourceType === 'mana') {
       if (p.fiveSecondRule >= 5) {
-        const regen = p.stats.spi / 4 + 2;
+        let regen = p.stats.spi / 4 + 2;
+        const manaBuff = p.auras.find((a) => a.kind === 'buff_mana_regen');
+        if (manaBuff) regen *= 1 + manaBuff.value;
         p.resource = Math.min(p.maxResource, p.resource + Math.round(regen));
       }
     } else if (p.resourceType === 'energy') {
@@ -842,7 +844,22 @@ export class Sim {
         p.resource = Math.min(p.maxResource, p.resource + c.manaPer2s);
       }
       c.remaining -= 2;
-      if (c.remaining <= 0) p[slot] = null;
+      if (c.remaining <= 0) {
+        if (c.pendingBuffAura) {
+          this.applyAura(p, {
+            id: c.itemId,
+            name: c.pendingBuffAura.name,
+            kind: c.pendingBuffAura.auraKind,
+            remaining: c.pendingBuffAura.duration,
+            duration: c.pendingBuffAura.duration,
+            value: c.pendingBuffAura.value,
+            sourceId: p.id,
+            school: 'nature',
+          });
+          this.emit({ type: 'log', text: `You finish eating. You feel ${c.pendingBuffAura.name}.`, color: '#8f8', pid: meta.entityId });
+        }
+        p[slot] = null;
+      }
     }
   }
 
@@ -2222,7 +2239,22 @@ export class Sim {
     const { meta, e: p } = r;
     const def = ITEMS[itemId];
     if (!def || this.countItem(itemId, meta.entityId) <= 0 || p.dead) return;
-    if (def.kind === 'food' || def.kind === 'drink') {
+    if (def.buffAura && def.kind !== 'food' && def.kind !== 'drink') {
+      if (p.inCombat) { this.error(meta.entityId, "You can't do that while in combat."); return; }
+      if (this.isSwimming(p)) { this.error(meta.entityId, "You can't do that while swimming."); return; }
+      this.removeItem(itemId, 1, meta.entityId);
+      this.applyAura(p, {
+        id: itemId,
+        name: def.buffAura.name,
+        kind: def.buffAura.auraKind,
+        remaining: def.buffAura.duration,
+        duration: def.buffAura.duration,
+        value: def.buffAura.value,
+        sourceId: p.id,
+        school: 'nature',
+      });
+      this.emit({ type: 'log', text: `You consume ${def.name}.`, color: '#999', pid: meta.entityId });
+    } else if (def.kind === 'food' || def.kind === 'drink') {
       if (p.inCombat) { this.error(meta.entityId, "You can't do that while in combat."); return; }
       if (this.isSwimming(p)) { this.error(meta.entityId, "You can't do that while swimming."); return; }
       this.removeItem(itemId, 1, meta.entityId);
@@ -2235,6 +2267,7 @@ export class Sim {
         hpPer2s: def.foodHp ? Math.round(def.foodHp / CONSUME_TICKS) : 0,
         manaPer2s: def.drinkMana ? Math.round(def.drinkMana / CONSUME_TICKS) : 0,
         remaining: CONSUME_DURATION,
+        pendingBuffAura: def.buffAura ? { ...def.buffAura } : undefined,
       };
       this.emit({ type: 'log', text: def.kind === 'food' ? 'You sit down to eat.' : 'You sit down to drink.', color: '#999', pid: meta.entityId });
     } else if (def.kind === 'weapon' || def.kind === 'armor') {
@@ -2552,6 +2585,31 @@ export class Sim {
       this.error(r.meta.entityId, 'You are sending messages too quickly.');
       return null;
     }
+    // dev commands
+    const devLevel = /^\/level\s+(\d+)$/.exec(raw);
+    if (devLevel) {
+      this.setPlayerLevel(Number(devLevel[1]), pid);
+      this.emit({ type: 'log', text: `Level set to ${devLevel[1]}.`, color: '#8f8', pid: r.meta.entityId });
+      return null;
+    }
+    const devTeleport = /^\/teleport\s+([\d.-]+)\s+([\d.-]+)$/.exec(raw);
+    if (devTeleport && pid !== undefined) {
+      const e = this.entities.get(pid);
+      if (e) {
+        const p = this.groundPos(Number(devTeleport[1]), Number(devTeleport[2]));
+        e.pos = p;
+        e.prevPos = { ...p };
+        this.emit({ type: 'log', text: `Teleported to ${devTeleport[1]}, ${devTeleport[2]}.`, color: '#8f8', pid: r.meta.entityId });
+      }
+      return null;
+    }
+    const devGive = /^\/give\s+(\S+)(?:\s+(\d+))?$/.exec(raw);
+    if (devGive) {
+      const count = Math.max(1, Math.min(20, Number(devGive[2]) || 1));
+      this.addItem(devGive[1], count, pid);
+      this.emit({ type: 'log', text: `Received ${devGive[1]} x${count}.`, color: '#8f8', pid: r.meta.entityId });
+      return null;
+    }
 
     // "/w name message" — private whisper to an online player
     const wm = /^\/(?:w|whisper|t|tell)\s+(\S+)\s+([\s\S]+)$/i.exec(raw);
@@ -2559,9 +2617,6 @@ export class Sim {
       const targetName = wm[1];
       const msg = wm[2].trim();
       if (!msg) return null;
-      // exact case wins outright; otherwise a case-insensitive match is used
-      // only when unambiguous, so 'Bet' and 'bet' can't silently intercept
-      // each other's whispers
       let target: PlayerMeta | null = null;
       const ciMatches: PlayerMeta[] = [];
       const wanted = targetName.toLowerCase();

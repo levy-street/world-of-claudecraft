@@ -31,7 +31,8 @@ export type AiState = 'idle' | 'chase' | 'attack' | 'evade' | 'dead';
 export type AuraKind =
   | 'dot' | 'slow' | 'stun' | 'root' | 'incapacitate' | 'polymorph'
   | 'attackspeed' | 'buff_ap' | 'buff_armor' | 'buff_int' | 'buff_dodge' | 'buff_speed' | 'buff_haste'
-  | 'hot' | 'absorb' | 'imbue' | 'buff_sta' | 'buff_allstats' | 'thorns' | 'form_bear';
+  | 'hot' | 'absorb' | 'imbue' | 'buff_sta' | 'buff_allstats' | 'thorns' | 'form_bear' | 'buff_mana_regen'
+  | 'buff_spi' | 'buff_str' | 'buff_agi';
 
 export interface Aura {
   id: string; // ability id that applied it
@@ -82,6 +83,12 @@ export interface ItemDef {
   drinkMana?: number;
   quality?: 'poor' | 'common' | 'uncommon' | 'rare' | 'epic'; // gray/white/green/blue/purple name colors
   requiredClass?: PlayerClass[];
+  buffAura?: {
+    auraKind: AuraKind;
+    value: number;
+    duration: number;
+    name: string;
+  };
 }
 
 export interface InvSlot {
@@ -339,6 +346,12 @@ export interface Consuming {
   hpPer2s: number;
   manaPer2s: number;
   remaining: number;
+  pendingBuffAura?: {
+    auraKind: AuraKind;
+    value: number;
+    duration: number;
+    name: string;
+  };
 }
 
 export function isConsuming(e: { eating: Consuming | null; drinking: Consuming | null }): boolean {
