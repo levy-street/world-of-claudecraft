@@ -13,9 +13,119 @@ import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { loadGltf } from '../assets/loader';
 import { registerPreload } from '../assets/preload';
 import { GFX, addRimGlow } from '../gfx';
-import { manifestUrls, VISUALS, VisualDef } from './manifest';
+import { manifestUrls, VISUALS, VisualDef, type AttachDef } from './manifest';
 
 const DEFAULT_TINT_STRENGTH = 0.4;
+
+type HandGrip = {
+  position: [number, number, number];
+  quaternion: [number, number, number, number];
+  scale: number;
+};
+
+// KayKit adventurer standalone weapon glbs ship a left-hand mesh offset on a
+// lone child node. handslot.r/l children in the character glbs carry the
+// authored grip — copy those (or this fallback table) after flattening.
+const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
+  axe_1handed: '1H_Axe',
+  axe_2handed: '2H_Axe',
+  crossbow_1handed: '1H_Crossbow',
+  crossbow_2handed: '2H_Crossbow',
+  sword_1handed: '1H_Sword',
+  sword_2handed: '2H_Sword',
+  staff: '2H_Staff',
+  dagger: 'Knife',
+  wand: '1H_Wand',
+};
+
+const KAYKIT_HAND_GRIPS: Record<string, { r: HandGrip; l?: HandGrip }> = {
+  '1H_Axe': {
+    r: { position: [0.231697, 0.382471, 0], quaternion: [0, 1, 0, 0], scale: 0.622211 },
+    l: { position: [-0.231697, 0.382471, 0], quaternion: [0, 0, 0, 1], scale: 0.622211 },
+  },
+  '2H_Axe': {
+    r: { position: [0, 0.4626, 0], quaternion: [0, 1, 0, 0], scale: 0.8623 },
+  },
+  '1H_Crossbow': {
+    r: { position: [0.2286, 0.0213, -0.0012], quaternion: [0, 0.7071068, 0, 0.7071067], scale: 0.6109 },
+  },
+  '2H_Crossbow': {
+    r: { position: [0.3381, 0.058, 0], quaternion: [0, 0.7071068, 0, 0.7071067], scale: 0.7204 },
+  },
+  '1H_Sword': {
+    r: { position: [0, 0.555174, 0], quaternion: [0, 1, 0, 0], scale: 0.8876 },
+  },
+  '2H_Sword': {
+    r: { position: [0, 0.8148, 0], quaternion: [0, 1, 0, 0], scale: 1.1829 },
+  },
+  '2H_Staff': {
+    r: { position: [-0.0427, 0.1769, 0], quaternion: [0, 1, 0, 0], scale: 1.0773 },
+  },
+  Knife: {
+    r: { position: [-0.0095, 0.378, 0], quaternion: [0, 1, 0, 0], scale: 0.6029 },
+    l: { position: [0.0095, 0.378, 0], quaternion: [0, 0, 0, 1], scale: 0.6029 },
+  },
+  '1H_Wand': {
+    r: { position: [0, 0.2174, 0], quaternion: [0, 1, 0, 0], scale: 0.4831 },
+  },
+};
+
+function isHandslotBone(name: string): boolean {
+  const n = name.replace(/[[\].:/]/g, '');
+  return n === 'handslotr' || n === 'handslotl';
+}
+
+function handSide(bone: string): 'r' | 'l' {
+  return bone.replace(/[[\].:/]/g, '').endsWith('l') ? 'l' : 'r';
+}
+
+function kaykitAccessoryFor(url: string): string | null {
+  const base = url.split('/').pop()?.replace(/\.glb$/, '') ?? '';
+  return KAYKIT_WEAPON_ACCESSORY[base] ?? null;
+}
+
+function applyHandGrip(payload: THREE.Object3D, root: THREE.Object3D, bone: string, url: string): void {
+  const accessory = kaykitAccessoryFor(url);
+  if (!accessory) return;
+  const ref = root.getObjectByName(accessory);
+  if (ref) {
+    payload.position.copy(ref.position);
+    payload.quaternion.copy(ref.quaternion);
+    payload.scale.copy(ref.scale);
+    return;
+  }
+  const grips = KAYKIT_HAND_GRIPS[accessory];
+  if (!grips) return;
+  const side = handSide(bone);
+  const grip = side === 'l' ? (grips.l ?? grips.r) : grips.r;
+  payload.position.set(...grip.position);
+  payload.quaternion.set(...grip.quaternion);
+  payload.scale.setScalar(grip.scale);
+}
+
+function flattenWeaponScene(src: THREE.Object3D): THREE.Object3D {
+  if (src.children.length !== 1) return src;
+  const holder = new THREE.Group();
+  const child = src.children[0];
+  holder.scale.copy(child.scale);
+  child.scale.set(1, 1, 1);
+  child.position.set(0, 0, 0);
+  child.rotation.set(0, 0, 0);
+  src.remove(child);
+  holder.add(child);
+  return holder;
+}
+
+function attachProp(root: THREE.Object3D, bone: THREE.Object3D, att: AttachDef): void {
+  const payload = flattenWeaponScene(cloneSkinned(resolvedGltf(att.url).scene));
+  if (att.position || att.rotationY !== undefined) {
+    if (att.position) payload.position.set(...att.position);
+    if (att.rotationY !== undefined) payload.rotation.y = att.rotationY;
+  } else if (isHandslotBone(att.bone)) {
+    applyHandGrip(payload, root, att.bone, att.url);
+  }
+  bone.add(payload);
+}
 
 // ---------------------------------------------------------------------------
 // Preload
@@ -128,10 +238,7 @@ export function assembleModel(def: VisualDef): THREE.Object3D {
     const bone = root.getObjectByName(att.bone)
       ?? root.getObjectByName(att.bone.replace(/[[\].:/]/g, ''));
     if (!bone) continue; // manifest/bone mismatch — ship without the prop
-    const prop = cloneSkinned(resolvedGltf(att.url).scene);
-    if (att.position) prop.position.set(...att.position);
-    if (att.rotationY) prop.rotation.y = att.rotationY;
-    bone.add(prop);
+    attachProp(root, bone, att);
   }
   return root;
 }
