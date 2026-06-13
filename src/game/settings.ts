@@ -11,6 +11,7 @@ export const SETTING_RANGES = {
   musicVolume: { min: 0, max: 1, def: 0.8 },
   brightness: { min: 0.6, max: 1.5, def: 1 },
   renderScale: { min: 0.5, max: 1, def: 1 },
+  uiScale: { min: 0.75, max: 1.5, def: 1 },
   fullscreen: { min: 0, max: 1, def: 1 },
   // off by default: always-on click-to-move would disrupt the precise melee
   // positioning the team wanted to preserve, so it's opt-in (#95)

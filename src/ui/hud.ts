@@ -87,6 +87,8 @@ export class Hud {
   private errorEl = $('#error-msg');
   private bannerEl = $('#banner');
   private tooltipEl = $('#tooltip');
+  private uiEl = $('#ui');
+  private uiScale = 1;
   private errorTimer: number | undefined;
   private bannerTimer: number | undefined;
   private minimapCtx: CanvasRenderingContext2D;
@@ -249,9 +251,10 @@ export class Hud {
     });
     el.addEventListener('mousemove', (e) => {
       if (mobile()) return;
+      const z = this.uiZoom();
       const tw = this.tooltipEl.offsetWidth, th = this.tooltipEl.offsetHeight;
-      this.tooltipEl.style.left = `${Math.min(window.innerWidth - tw - 8, e.clientX + 14)}px`;
-      this.tooltipEl.style.top = `${Math.max(8, e.clientY - th - 10)}px`;
+      this.tooltipEl.style.left = `${Math.min(window.innerWidth / z - tw - 8, e.clientX / z + 14)}px`;
+      this.tooltipEl.style.top = `${Math.max(8, e.clientY / z - th - 10)}px`;
     });
     el.addEventListener('mouseleave', () => { clearTouchTimer(); this.tooltipEl.style.display = 'none'; });
     el.addEventListener('pointerdown', (e) => {
@@ -266,6 +269,18 @@ export class Hud {
 
   hideTooltip(): void {
     this.tooltipEl.style.display = 'none';
+  }
+
+  // `zoom` (not transform: scale) keeps corner-anchored panels pinned to the edges.
+  setUiScale(scale: number): void {
+    this.uiScale = scale;
+    this.uiEl.style.zoom = String(scale);
+  }
+
+  // #ui's `zoom` scales descendant coords, so left/top derived from viewport/world
+  // px (clientX, innerWidth, worldToScreen) must be divided by it before being set.
+  private uiZoom(): number {
+    return this.uiScale;
   }
 
   private itemTooltip(item: ItemDef): string {
@@ -1486,8 +1501,9 @@ export class Hud {
     const el = document.createElement('div');
     el.className = 'fct' + (crit ? ' crit' : '');
     el.style.color = color;
-    el.style.left = `${v.x + (Math.random() * 30 - 15)}px`;
-    el.style.top = `${v.y}px`;
+    const z = this.uiZoom();
+    el.style.left = `${(v.x + (Math.random() * 30 - 15)) / z}px`;
+    el.style.top = `${v.y / z}px`;
     el.textContent = text;
     document.getElementById('ui')!.appendChild(el);
     setTimeout(() => el.remove(), 1250);
@@ -1650,8 +1666,9 @@ export class Hud {
     btn.addEventListener('click', () => { this.sim.lootCorpse(mobId); this.closeLoot(); });
     el.appendChild(btn);
     el.querySelector('[data-close]')?.addEventListener('click', () => this.closeLoot());
-    el.style.left = `${Math.min(window.innerWidth - 260, Math.max(10, screenX - 115))}px`;
-    el.style.top = `${Math.min(window.innerHeight - 280, Math.max(10, screenY - 30))}px`;
+    const z = this.uiZoom();
+    el.style.left = `${Math.min(window.innerWidth / z - 260, Math.max(10, screenX / z - 115))}px`;
+    el.style.top = `${Math.min(window.innerHeight / z - 280, Math.max(10, screenY / z - 30))}px`;
     el.style.display = 'block';
   }
 
@@ -2317,8 +2334,9 @@ export class Hud {
     if (isLeader && isMember && pid !== this.sim.playerId) html += `<div class="ctx-item" data-act="kick">Remove from Party</div>`;
     html += `<div class="ctx-item" data-act="close">Cancel</div>`;
     el.innerHTML = html;
-    el.style.left = `${Math.min(window.innerWidth - 170, x)}px`;
-    el.style.top = `${Math.min(window.innerHeight - 240, y)}px`;
+    const z = this.uiZoom();
+    el.style.left = `${Math.min(window.innerWidth / z - 170, x / z)}px`;
+    el.style.top = `${Math.min(window.innerHeight / z - 240, y / z)}px`;
     el.style.display = 'block';
     el.querySelectorAll('.ctx-item').forEach((item) => {
       item.addEventListener('click', () => {
@@ -2389,8 +2407,9 @@ export class Hud {
     });
     el.innerHTML = `<div class="ctx-title">${esc(name)}</div>`
       + actions.map((a) => `<div class="ctx-item" data-act="${a.id}">${esc(a.label)}</div>`).join('');
-    el.style.left = `${Math.min(window.innerWidth - 170, x)}px`;
-    el.style.top = `${Math.min(window.innerHeight - 240, y)}px`;
+    const z = this.uiZoom();
+    el.style.left = `${Math.min(window.innerWidth / z - 170, x / z)}px`;
+    el.style.top = `${Math.min(window.innerHeight / z - 240, y / z)}px`;
     el.style.display = 'block';
     el.querySelectorAll('.ctx-item').forEach((item) => {
       item.addEventListener('click', () => {
@@ -2441,8 +2460,9 @@ export class Hud {
         <button class="btn" id="report-submit">Submit Report</button>
         <button class="btn" data-close>Cancel</button>
       </div>`;
-    el.style.left = `${Math.max(12, Math.min(window.innerWidth - 340, window.innerWidth / 2 - 160))}px`;
-    el.style.top = `${Math.max(20, Math.min(window.innerHeight - 300, window.innerHeight / 2 - 150))}px`;
+    const z = this.uiZoom();
+    el.style.left = `${Math.max(12, Math.min(window.innerWidth / z - 340, window.innerWidth / z / 2 - 160))}px`;
+    el.style.top = `${Math.max(20, Math.min(window.innerHeight / z - 300, window.innerHeight / z / 2 - 150))}px`;
     el.style.display = 'block';
     el.querySelectorAll('[data-close]').forEach((btn) => btn.addEventListener('click', () => { el.style.display = 'none'; }));
     const submit = $('#report-submit') as HTMLButtonElement;
@@ -3089,10 +3109,11 @@ export class Hud {
     this.settingSlider(body, 'Camera Speed', 'cameraSpeed');
     this.settingSlider(body, 'Brightness', 'brightness');
     this.settingSlider(body, 'Render Quality', 'renderScale');
+    this.settingSlider(body, 'UI Scale', 'uiScale');
     this.settingToggle(body, 'Fullscreen', 'fullscreen');
     const note = document.createElement('div');
     note.className = 'set-note';
-    note.textContent = 'Lower Camera Speed for a calmer mouselook. Render Quality below 100% boosts FPS on weaker machines.';
+    note.textContent = 'Lower Camera Speed for a calmer mouselook. Render Quality below 100% boosts FPS on weaker machines. UI Scale resizes the HUD and menus.';
     $('#options-menu').appendChild(note);
     this.settingsViewFooter();
   }
