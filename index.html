@@ -308,6 +308,21 @@
   #map-window { left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 14px; }
   #map-canvas { border: 2px solid var(--border); outline: 1px solid #000; border-radius: 4px; }
 
+  /* ---------- options / game menu (Esc) ---------- */
+  #options-menu { left: 50%; top: 50%; transform: translate(-50%, -50%); width: 360px;
+    max-height: 80%; overflow-y: auto; z-index: 40; }
+  .opt-list { display: flex; flex-direction: column; gap: 8px; align-items: stretch; padding: 4px 0; }
+  .opt-btn { margin: 0; text-align: center; }
+  .kb-rows { display: flex; flex-direction: column; gap: 3px; margin-bottom: 8px; }
+  .kb-row { display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; padding: 3px 6px; border-radius: 4px; }
+  .kb-row:nth-child(odd) { background: #ffffff0a; }
+  .kb-name { font-size: 12.5px; color: #e8e0c8; }
+  .kb-key { margin: 0; min-width: 84px; text-align: center; padding: 4px 8px; font-size: 12px;
+    background: linear-gradient(#2c2c3a, #15151f); color: #ffd9a0; border-color: #4a3d1d; }
+  .kb-key.capturing { border-color: var(--gold); color: #fff; box-shadow: 0 0 8px #ffd100aa; }
+  .kb-note { font-size: 11px; color: #b9ac82; margin: 4px 0 2px; min-height: 14px; }
+
   /* tooltip */
   #tooltip { position: absolute; display: none; z-index: 100; pointer-events: none; max-width: 280px;
     padding: 8px 10px; font-size: 12px; line-height: 1.5; }
@@ -537,6 +552,7 @@
     <div id="quest-log-window" class="window panel"></div>
     <div id="vendor-window" class="window panel"></div>
     <div id="map-window" class="window panel"><canvas id="map-canvas" width="560" height="560"></canvas></div>
+    <div id="options-menu" class="window panel"></div>
     <div id="meters-window" class="panel">
       <div class="panel-title">
         <span class="mt-tabs">
@@ -636,7 +652,7 @@
 
     <div id="controls-hint">
       <b>WASD</b> move &middot; <b>A/D</b> turn, <b>Q/E</b> strafe &middot; <b>right-drag</b> mouselook &middot; <b>left-drag</b> orbit camera &middot; wheel zoom &middot; <b>Space</b> jump<br/>
-      <b>Tab</b> target &middot; <b>1-9,0</b> abilities &middot; <b>F</b> interact/loot &middot; <b>C</b> character &middot; <b>P</b> spellbook &middot; <b>L</b> quest log &middot; <b>M</b> map &middot; <b>B</b> bags &middot; <b>V</b> nameplates &middot; <b>R</b> autorun &middot; <b>Enter</b> chat
+      <b>Tab</b> target &middot; <b>1-9,0</b> abilities &middot; <b>F</b> interact/loot &middot; <b>C</b> character &middot; <b>P</b> spellbook &middot; <b>L</b> quest log &middot; <b>M</b> map &middot; <b>B</b> bags &middot; <b>V</b> nameplates &middot; <b>R</b> autorun &middot; <b>Enter</b> chat &middot; <b>Esc</b> menu (rebind keys)
     </div>
 
     <div id="social-links">

@@ -1,6 +1,7 @@
 import { Sim } from './sim/sim';
 import { Renderer } from './render/renderer';
 import { Input } from './game/input';
+import { Keybinds } from './game/keybinds';
 import { Hud } from './ui/hud';
 import { audio } from './game/audio';
 import { music } from './game/music';
@@ -84,11 +85,12 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
   const canvas = $('#game-canvas') as unknown as HTMLCanvasElement;
   const nameplates = $('#nameplates') as HTMLDivElement;
 
+  const keybinds = new Keybinds();
   let renderer!: Renderer;
   let hud!: Hud;
   try {
     renderer = new Renderer(world, canvas, nameplates);
-    hud = new Hud(world, renderer);
+    hud = new Hud(world, renderer, keybinds);
   } catch (err) {
     // e.g. WebGL context creation failure — surface it instead of leaving the
     // loading screen up forever
@@ -133,13 +135,21 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
         case 'meters': hud.toggleMeters(); break;
         case 'chat': openChat(); break;
         case 'escape':
-          if (!hud.closeAll()) world.targetEntity(null);
+          // close the topmost panel; if nothing was open, open the game menu
+          if (!hud.closeAll()) hud.toggleOptionsMenu();
           break;
       }
     },
     onClickPick: (x, y, button) => handlePick(x, y, button),
-  });
+  }, keybinds);
   input.camYaw = world.player.facing;
+
+  // the options menu drives logout + key-capture, both of which need refs that
+  // only exist now (input) or are page-level (reload returns to the start menu)
+  hud.attachOptions({
+    logout: () => location.reload(),
+    captureKey: (cb) => input.captureNextKey(cb),
+  });
 
   function interactKey(): void {
     const p = world.player;
@@ -209,6 +219,10 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
     let frameDt = (now - last) / 1000;
     last = now;
     if (frameDt > 0.25) frameDt = 0.25;
+
+    // freeze movement while the game menu is up so WASD doesn't walk the
+    // character behind it (other windows stay non-modal, as before)
+    input.suspendMovement = hud.isModalOpen();
 
     const mouselook = input.rightDown && !world.player.dead;
 

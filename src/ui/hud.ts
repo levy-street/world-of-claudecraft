@@ -13,6 +13,13 @@ import { Meters } from './meters';
 import { audio } from '../game/audio';
 import { music } from '../game/music';
 import { iconDataUrl, QUALITY_COLOR } from './icons';
+import { Keybinds, ACTION_SLOTS, isReservedCode, keyLabel } from '../game/keybinds';
+
+// hooks main wires after Input exists (the options menu drives both)
+export interface OptionsHooks {
+  logout(): void;
+  captureKey(cb: (code: string | null) => void): void;
+}
 
 const $ = <T extends HTMLElement = HTMLElement>(sel: string): T => document.querySelector(sel) as T;
 
@@ -31,9 +38,13 @@ const IGNORED_CHAT_NAMES_KEY = 'woc_ignored_chat_names';
 
 export class Hud {
   private static readonly BAR_ABILITY_SLOTS = 11; // bar slots 1..11; slot 0 is the fixed Attack toggle
-  private abilityButtons: { btn: HTMLButtonElement; label: HTMLSpanElement; cdOverlay: HTMLDivElement; cdText: HTMLDivElement; lastIcon: string }[] = [];
+  private abilityButtons: { btn: HTMLButtonElement; label: HTMLSpanElement; keybindEl: HTMLSpanElement; cdOverlay: HTMLDivElement; cdText: HTMLDivElement; lastIcon: string }[] = [];
   private slotMap: (string | null)[] = []; // index = barSlot-1, value = ability id
   private dragFromSlot: number | null = null;
+  private optionsHooks: OptionsHooks | null = null;
+  private optionsView: 'main' | 'keybinds' = 'main';
+  private capturingSlot: number | null = null; // action slot awaiting a key
+  private keybindNote = '';
   private chatLogEl = $('#chatlog');
   private combatLogEl = $('#combatlog');
   private errorEl = $('#error-msg');
@@ -61,12 +72,13 @@ export class Hud {
 
   private meters: Meters;
 
-  constructor(private sim: IWorld, private renderer: Renderer) {
+  constructor(private sim: IWorld, private renderer: Renderer, private keybinds: Keybinds) {
     this.ignoredChatNames = this.loadIgnoredChatNames();
     this.meters = new Meters(sim);
     this.bindLogTabs();
     this.loadSlotMap();
     this.buildActionBar();
+    this.refreshKeybindLabels();
     this.buildXpTicks();
     $('#pf-name').textContent = sim.player.name;
     this.drawPortrait($('#pf-portrait') as unknown as HTMLCanvasElement, CLASS_GLYPH[sim.cfg.playerClass], CLASSES[sim.cfg.playerClass].color);
@@ -281,7 +293,6 @@ export class Hud {
 
   private buildActionBar(): void {
     const bar = $('#actionbar');
-    const keybinds = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '='];
     for (let i = 0; i < 12; i++) {
       const btn = document.createElement('button');
       btn.className = 'action-btn empty';
@@ -289,7 +300,7 @@ export class Hud {
       label.className = 'icon-label';
       const kb = document.createElement('span');
       kb.className = 'keybind';
-      kb.textContent = keybinds[i];
+      kb.textContent = this.keybinds.label(i); // rebindable; refreshKeybindLabels keeps it current
       const cdOverlay = document.createElement('div');
       cdOverlay.className = 'cd-overlay';
       const cdText = document.createElement('div');
@@ -344,7 +355,14 @@ export class Hud {
         });
       }
       bar.appendChild(btn);
-      this.abilityButtons.push({ btn, label, cdOverlay, cdText, lastIcon: '' });
+      this.abilityButtons.push({ btn, label, keybindEl: kb, cdOverlay, cdText, lastIcon: '' });
+    }
+  }
+
+  // Repaint the keycap on every action button from the current bindings.
+  private refreshKeybindLabels(): void {
+    for (let i = 0; i < this.abilityButtons.length; i++) {
+      this.abilityButtons[i].keybindEl.textContent = this.keybinds.label(i);
     }
   }
 
@@ -1652,11 +1670,135 @@ export class Hud {
   }
 
   // -------------------------------------------------------------------------
+  // Options menu (Esc) + hotkey rebinding
+  // -------------------------------------------------------------------------
+
+  attachOptions(hooks: OptionsHooks): void {
+    this.optionsHooks = hooks;
+  }
+
+  get optionsOpen(): boolean {
+    return $('#options-menu').style.display === 'block';
+  }
+
+  // True while a menu that should pause character movement is up.
+  isModalOpen(): boolean {
+    return this.optionsOpen;
+  }
+
+  toggleOptionsMenu(): void {
+    if (this.optionsOpen) { this.closeOptions(); return; }
+    this.optionsView = 'main';
+    this.capturingSlot = null;
+    this.keybindNote = '';
+    this.renderOptions();
+    $('#options-menu').style.display = 'block';
+    audio.click();
+  }
+
+  closeOptions(): void {
+    $('#options-menu').style.display = 'none';
+    this.capturingSlot = null;
+    this.hideTooltip();
+  }
+
+  private renderOptions(): void {
+    if (this.optionsView === 'keybinds') { this.renderKeybinds(); return; }
+    const el = $('#options-menu');
+    el.innerHTML = `<div class="panel-title"><span>Game Menu</span><span class="x-btn" data-close>✕</span></div>`;
+    const list = document.createElement('div');
+    list.className = 'opt-list';
+    const add = (text: string, onClick: () => void) => {
+      const b = document.createElement('button');
+      b.className = 'btn opt-btn';
+      b.textContent = text;
+      b.addEventListener('click', () => { audio.click(); onClick(); });
+      list.appendChild(b);
+    };
+    add('Key Bindings', () => { this.optionsView = 'keybinds'; this.keybindNote = ''; this.renderOptions(); });
+    add('Logout', () => this.optionsHooks?.logout());
+    add('Return to Game', () => this.closeOptions());
+    el.appendChild(list);
+    el.querySelector('[data-close]')?.addEventListener('click', () => this.closeOptions());
+  }
+
+  // Label shown for an action slot in the rebind list: slot 0 is Attack, the
+  // rest show whatever ability currently occupies that bar slot.
+  private slotActionName(slot: number): string {
+    if (slot === 0) return 'Attack';
+    const known = this.abilityForSlot(slot);
+    return known ? known.def.name : `Slot ${slot + 1}`;
+  }
+
+  private renderKeybinds(): void {
+    const el = $('#options-menu');
+    el.innerHTML = `<div class="panel-title"><span>Key Bindings</span><span class="x-btn" data-close>✕</span></div>`;
+    const rows = document.createElement('div');
+    rows.className = 'kb-rows';
+    for (let slot = 0; slot < ACTION_SLOTS; slot++) {
+      const row = document.createElement('div');
+      row.className = 'kb-row';
+      const name = document.createElement('span');
+      name.className = 'kb-name';
+      name.textContent = this.slotActionName(slot);
+      const key = document.createElement('button');
+      key.className = 'btn kb-key' + (this.capturingSlot === slot ? ' capturing' : '');
+      key.textContent = this.capturingSlot === slot ? 'press a key…' : (this.keybinds.label(slot) || '—');
+      key.addEventListener('click', () => this.beginCapture(slot));
+      row.append(name, key);
+      rows.appendChild(row);
+    }
+    el.appendChild(rows);
+    const note = document.createElement('div');
+    note.className = 'kb-note';
+    note.textContent = this.keybindNote || 'Click a key, then press the key to bind. Esc cancels.';
+    el.appendChild(note);
+    const reset = document.createElement('button');
+    reset.className = 'btn';
+    reset.textContent = 'Reset to Defaults';
+    reset.addEventListener('click', () => {
+      audio.click();
+      this.keybinds.reset();
+      this.capturingSlot = null;
+      this.keybindNote = 'Bindings reset to defaults.';
+      this.refreshKeybindLabels();
+      this.renderKeybinds();
+    });
+    const back = document.createElement('button');
+    back.className = 'btn';
+    back.textContent = 'Back';
+    back.addEventListener('click', () => { audio.click(); this.optionsView = 'main'; this.capturingSlot = null; this.renderOptions(); });
+    el.append(reset, back);
+    el.querySelector('[data-close]')?.addEventListener('click', () => this.closeOptions());
+  }
+
+  private beginCapture(slot: number): void {
+    if (!this.optionsHooks) return;
+    this.capturingSlot = slot;
+    this.keybindNote = `Press a key for "${this.slotActionName(slot)}"…`;
+    this.renderKeybinds();
+    this.optionsHooks.captureKey((code) => {
+      this.capturingSlot = null;
+      if (code === null) {
+        this.keybindNote = 'Rebinding cancelled.';
+      } else if (isReservedCode(code)) {
+        this.keybindNote = `${keyLabel(code)} is reserved for movement and can't be bound.`;
+      } else if (this.keybinds.bind(slot, code)) {
+        this.keybindNote = `Bound "${this.slotActionName(slot)}" to ${keyLabel(code)}.`;
+        this.refreshKeybindLabels();
+      }
+      // re-render only if the menu is still open (player may have closed it)
+      if (this.optionsOpen) this.renderKeybinds();
+    });
+  }
+
+  // -------------------------------------------------------------------------
 
   // Closes the topmost UI. Returns true if something was closed.
   closeAll(): boolean {
     let closed = false;
     this.closeContextMenu();
+    if (this.optionsOpen) { this.closeOptions(); return true; }
     if (this.tradeOpen) {
       this.sim.tradeCancel();
       closed = true;

@@ -1,7 +1,10 @@
 // WoW-style input: WASD + A/D keyboard turn, Q/E strafe, space jump,
 // left-drag orbits the camera, right-drag mouselooks (turns the character),
-// both buttons run forward, wheel zooms, Tab targets, 1-9/0/-/= cast,
-// C/P/L/M/B windows, V nameplates, F interacts, R autorun.
+// both buttons run forward, wheel zooms, Tab targets, action-bar keys cast
+// (player-rebindable, see Keybinds), C/P/L/M/B windows, V nameplates,
+// F interacts, R autorun.
+
+import { Keybinds } from './keybinds';
 
 export interface InputCallbacks {
   onTab(): void;
@@ -9,11 +12,6 @@ export interface InputCallbacks {
   onUiKey(key: 'interact' | 'bags' | 'char' | 'spellbook' | 'questlog' | 'map' | 'nameplates' | 'escape' | 'chat' | 'meters'): void;
   onClickPick(x: number, y: number, button: number): void;
 }
-
-const ABILITY_KEYS: Record<string, number> = {
-  Digit1: 0, Digit2: 1, Digit3: 2, Digit4: 3, Digit5: 4, Digit6: 5,
-  Digit7: 6, Digit8: 7, Digit9: 8, Digit0: 9, Minus: 10, Equal: 11,
-};
 
 export class Input {
   keys = new Set<string>();
@@ -23,10 +21,16 @@ export class Input {
   camPitch = 0.32;
   camDist = 12;
   autorun = false;
+  // while true, readMoveInput reports neutral — set when a modal (the options
+  // menu) is open so held WASD doesn't drive the character behind it
+  suspendMovement = false;
   private dragDistance = 0;
   private downButton = -1;
+  // one-shot key capture for the rebind UI: the next keydown is delivered here
+  // (Escape cancels with null) instead of being dispatched as an action
+  private captureCb: ((code: string | null) => void) | null = null;
 
-  constructor(private canvas: HTMLCanvasElement, private cb: InputCallbacks) {
+  constructor(private canvas: HTMLCanvasElement, private cb: InputCallbacks, private keybinds: Keybinds) {
     window.addEventListener('keydown', (e) => this.onKeyDown(e));
     window.addEventListener('keyup', (e) => { this.keys.delete(e.code); });
     window.addEventListener('blur', () => { this.keys.clear(); this.leftDown = false; this.rightDown = false; });
@@ -40,12 +44,26 @@ export class Input {
     canvas.addEventListener('contextmenu', (e) => e.preventDefault());
   }
 
+  /** Capture the next keypress (for the rebind UI) instead of acting on it. */
+  captureNextKey(cb: (code: string | null) => void): void {
+    this.captureCb = cb;
+  }
+
   private onKeyDown(e: KeyboardEvent): void {
     if (e.repeat) return;
+    // rebind capture intercepts everything (incl. action/UI keys); Escape cancels
+    if (this.captureCb) {
+      e.preventDefault();
+      const cb = this.captureCb;
+      this.captureCb = null;
+      cb(e.code === 'Escape' ? null : e.code);
+      return;
+    }
     const tag = (document.activeElement?.tagName ?? '').toLowerCase();
     if (tag === 'input' || tag === 'textarea') return;
-    if (ABILITY_KEYS[e.code] !== undefined) {
-      this.cb.onAbility(ABILITY_KEYS[e.code]);
+    const slot = this.keybinds.slotForCode(e.code);
+    if (slot !== null) {
+      this.cb.onAbility(slot);
       return;
     }
     switch (e.code) {
@@ -102,6 +120,9 @@ export class Input {
     forward: boolean; back: boolean; turnLeft: boolean; turnRight: boolean;
     strafeLeft: boolean; strafeRight: boolean; jump: boolean;
   } {
+    if (this.suspendMovement) {
+      return { forward: false, back: false, turnLeft: false, turnRight: false, strafeLeft: false, strafeRight: false, jump: false };
+    }
     const k = this.keys;
     const bothButtons = this.leftDown && this.rightDown;
     const mouselook = this.rightDown;
