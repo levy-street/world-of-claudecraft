@@ -1,0 +1,247 @@
+import { describe, expect, it } from 'vitest';
+import { Sim } from '../src/sim/sim';
+import type { Entity } from '../src/sim/types';
+import { groundHeight } from '../src/sim/world';
+
+function makeWorld() {
+  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+}
+
+function merchant(sim: Sim): Entity {
+  for (const e of sim.entities.values()) if (e.templateId === 'the_merchant') return e;
+  throw new Error('the Merchant was not spawned');
+}
+
+// stand a player right on the Merchant so the proximity gate passes
+function standAtMerchant(sim: Sim, pid: number) {
+  const m = merchant(sim);
+  const e = sim.entities.get(pid)!;
+  e.pos.x = m.pos.x; e.pos.z = m.pos.z;
+  e.pos.y = groundHeight(e.pos.x, e.pos.z, sim.cfg.seed);
+  e.prevPos = { ...e.pos };
+}
+
+function teleport(sim: Sim, pid: number, x: number, z: number) {
+  const e = sim.entities.get(pid)!;
+  e.pos.x = x; e.pos.z = z;
+  e.pos.y = groundHeight(x, z, sim.cfg.seed);
+  e.prevPos = { ...e.pos };
+}
+
+function copperOf(sim: Sim, pid: number): number {
+  return sim.players.get(pid)!.copper;
+}
+
+function errorsSince(sim: Sim): string[] {
+  return sim.events.filter((e) => e.type === 'error').map((e) => (e as { text: string }).text);
+}
+
+describe('the World Market — the Merchant', () => {
+  it('spawns a single Merchant who keeps standing house stock', () => {
+    const sim = makeWorld();
+    const merchants = [...sim.entities.values()].filter((e) => e.templateId === 'the_merchant');
+    expect(merchants.length).toBe(1);
+    const house = sim.marketListings.filter((l) => l.house);
+    expect(house.length).toBeGreaterThan(0);
+    expect(house.every((l) => l.expiresAt === Infinity && l.sellerKey === '')).toBe(true);
+  });
+
+  it('lists a stack from a seller\'s bags into escrow', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    standAtMerchant(sim, seller);
+    sim.addItem('wolf_fang', 3, seller);
+    sim.events.length = 0;
+
+    sim.marketList('wolf_fang', 2, 100, seller);
+
+    expect(errorsSince(sim)).toEqual([]);
+    expect(sim.countItem('wolf_fang', seller)).toBe(1); // 2 escrowed
+    const mine = sim.marketListings.filter((l) => l.sellerKey === 'Seller');
+    expect(mine.length).toBe(1);
+    expect(mine[0]).toMatchObject({ itemId: 'wolf_fang', count: 2, price: 100, house: false });
+    expect(Number.isFinite(mine[0].expiresAt)).toBe(true);
+  });
+
+  it('completes a sale: coin and goods move, seller keeps proceeds less the cut', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    const buyer = sim.addPlayer('mage', 'Buyer');
+    standAtMerchant(sim, seller);
+    standAtMerchant(sim, buyer);
+    sim.addItem('wolf_fang', 2, seller);
+    sim.players.get(buyer)!.copper = 1000;
+    sim.marketList('wolf_fang', 2, 100, seller);
+    const listing = sim.marketListings.find((l) => l.sellerKey === 'Seller')!;
+    sim.events.length = 0;
+
+    sim.marketBuy(listing.id, buyer);
+
+    expect(errorsSince(sim)).toEqual([]);
+    expect(copperOf(sim, buyer)).toBe(900);
+    expect(sim.countItem('wolf_fang', buyer)).toBe(2);
+    expect(sim.marketListings.some((l) => l.id === listing.id)).toBe(false);
+    // 5% cut: seller is owed 95, waiting to be collected
+    const info = sim.marketInfoFor(seller)!;
+    expect(info.collectionCopper).toBe(95);
+  });
+
+  it('collecting moves waiting gold into the seller\'s purse', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    const buyer = sim.addPlayer('mage', 'Buyer');
+    standAtMerchant(sim, seller);
+    standAtMerchant(sim, buyer);
+    sim.addItem('wolf_fang', 1, seller);
+    sim.players.get(buyer)!.copper = 500;
+    sim.marketList('wolf_fang', 1, 200, seller);
+    sim.marketBuy(sim.marketListings.find((l) => l.sellerKey === 'Seller')!.id, buyer);
+    expect(copperOf(sim, seller)).toBe(0);
+
+    sim.marketCollect(seller);
+
+    expect(copperOf(sim, seller)).toBe(190); // 200 - 5%
+    expect(sim.marketInfoFor(seller)!.collectionCopper).toBe(0);
+  });
+
+  it('forbids buying your own listing, but lets you reclaim it', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    standAtMerchant(sim, seller);
+    sim.addItem('wolf_fang', 1, seller);
+    sim.players.get(seller)!.copper = 10000;
+    sim.marketList('wolf_fang', 1, 100, seller);
+    const listing = sim.marketListings.find((l) => l.sellerKey === 'Seller')!;
+    sim.events.length = 0;
+
+    sim.marketBuy(listing.id, seller);
+    expect(errorsSince(sim).join(' ')).toMatch(/your own listing/i);
+    expect(copperOf(sim, seller)).toBe(10000); // unchanged
+
+    sim.marketCancel(listing.id, seller);
+    expect(sim.countItem('wolf_fang', seller)).toBe(1); // back in bags
+    expect(sim.marketListings.some((l) => l.id === listing.id)).toBe(false);
+  });
+
+  it('rejects a purchase the buyer cannot afford', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    const buyer = sim.addPlayer('mage', 'Buyer');
+    standAtMerchant(sim, seller);
+    standAtMerchant(sim, buyer);
+    sim.addItem('wolf_fang', 1, seller);
+    sim.players.get(buyer)!.copper = 50;
+    sim.marketList('wolf_fang', 1, 100, seller);
+    const listing = sim.marketListings.find((l) => l.sellerKey === 'Seller')!;
+    sim.events.length = 0;
+
+    sim.marketBuy(listing.id, buyer);
+    expect(errorsSince(sim).join(' ')).toMatch(/afford/i);
+    expect(copperOf(sim, buyer)).toBe(50);
+    expect(sim.marketListings.some((l) => l.id === listing.id)).toBe(true);
+  });
+
+  it('buying house stock never depletes it and pays no one', () => {
+    const sim = makeWorld();
+    const buyer = sim.addPlayer('mage', 'Buyer');
+    standAtMerchant(sim, buyer);
+    const house = sim.marketListings.find((l) => l.house)!;
+    sim.players.get(buyer)!.copper = house.price + 1000;
+    sim.marketBuy(house.id, buyer);
+    // the listing is still on the board and the buyer received the goods
+    expect(sim.marketListings.some((l) => l.id === house.id)).toBe(true);
+    expect(sim.countItem(house.itemId, buyer)).toBeGreaterThanOrEqual(house.count);
+    expect(copperOf(sim, buyer)).toBe(1000);
+  });
+
+  it('returns expired listings to the seller\'s collection', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    standAtMerchant(sim, seller);
+    sim.addItem('wolf_fang', 1, seller);
+    sim.marketList('wolf_fang', 1, 100, seller);
+    const listing = sim.marketListings.find((l) => l.sellerKey === 'Seller')!;
+    listing.expiresAt = sim.time - 1; // force it past due
+    for (let i = 0; i < 20; i++) sim.tick(); // updateMarket runs once a second
+
+    expect(sim.marketListings.some((l) => l.id === listing.id)).toBe(false);
+    const info = sim.marketInfoFor(seller)!;
+    expect(info.collectionItems).toEqual([{ itemId: 'wolf_fang', count: 1 }]);
+  });
+
+  it('refuses to deal with anyone who is not standing at the Merchant', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    teleport(sim, seller, 200, 200);
+    sim.addItem('wolf_fang', 1, seller);
+    sim.events.length = 0;
+
+    sim.marketList('wolf_fang', 1, 100, seller);
+    expect(errorsSince(sim).join(' ')).toMatch(/Merchant/i);
+    expect(sim.countItem('wolf_fang', seller)).toBe(1); // nothing escrowed
+    expect(sim.marketListings.some((l) => l.sellerKey === 'Seller')).toBe(false);
+    expect(sim.marketInfoFor(seller)).toBeNull(); // not streamed when far
+  });
+
+  it('will not broker quest items', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    standAtMerchant(sim, seller);
+    sim.addItem('boar_hide', 1, seller); // a quest item
+    sim.events.length = 0;
+    sim.marketList('boar_hide', 1, 100, seller);
+    expect(errorsSince(sim).join(' ')).toMatch(/quest items/i);
+    expect(sim.marketListings.some((l) => l.sellerKey === 'Seller')).toBe(false);
+  });
+
+  it('caps how many listings one seller may keep', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    standAtMerchant(sim, seller);
+    sim.addItem('wolf_fang', 20, seller);
+    for (let i = 0; i < 12; i++) sim.marketList('wolf_fang', 1, 10, seller);
+    expect(sim.marketInfoFor(seller)!.myListingCount).toBe(12);
+    sim.events.length = 0;
+    sim.marketList('wolf_fang', 1, 10, seller); // one too many
+    expect(errorsSince(sim).join(' ')).toMatch(/at most/i);
+    expect(sim.marketListings.filter((l) => l.sellerKey === 'Seller').length).toBe(12);
+  });
+
+  it('survives a save/load round-trip (persistence)', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    const buyer = sim.addPlayer('mage', 'Buyer');
+    standAtMerchant(sim, seller);
+    standAtMerchant(sim, buyer);
+    sim.addItem('wolf_fang', 3, seller);
+    sim.players.get(buyer)!.copper = 1000;
+    sim.marketList('wolf_fang', 1, 300, seller); // this one will sell -> collection gold
+    sim.marketList('wolf_fang', 2, 150, seller); // this one stays listed
+    sim.marketBuy(sim.marketListings.find((l) => l.sellerKey === 'Seller' && l.count === 1)!.id, buyer);
+
+    const save = sim.serializeMarket();
+    expect(save.listings.length).toBe(1); // only the unsold player listing (house excluded)
+    expect(save.listings[0].secondsLeft).toBeGreaterThan(0);
+
+    const sim2 = makeWorld();
+    const houseBefore = sim2.marketListings.length;
+    sim2.loadMarket(save);
+
+    const loaded = sim2.marketListings.filter((l) => !l.house);
+    expect(loaded.length).toBe(1);
+    expect(loaded[0]).toMatchObject({ sellerKey: 'Seller', itemId: 'wolf_fang', count: 2, price: 150 });
+    expect(Number.isFinite(loaded[0].expiresAt)).toBe(true);
+    // house stock is reseeded, not duplicated from the save
+    expect(sim2.marketListings.filter((l) => l.house).length).toBe(houseBefore);
+    // the waiting sale proceeds came across too
+    const col = (sim2 as unknown as { marketCollections: Map<string, { copper: number }> }).marketCollections.get('Seller');
+    expect(col?.copper).toBe(285); // 300 - 5%
+    // new listings keep climbing past the loaded ids
+    const seller2 = sim2.addPlayer('warrior', 'Seller');
+    standAtMerchant(sim2, seller2);
+    sim2.addItem('bone_fragments', 1, seller2);
+    sim2.marketList('bone_fragments', 1, 50, seller2);
+    const ids = sim2.marketListings.map((l) => l.id);
+    expect(new Set(ids).size).toBe(ids.length); // no id collisions
+  });
+});

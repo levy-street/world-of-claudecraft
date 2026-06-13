@@ -202,6 +202,7 @@ async function main(): Promise<void> {
   if (orphans > 0) console.log(`closed ${orphans} orphaned play session(s) from a previous run`);
   const pruned = await pruneChatLogs(CHAT_LOG_RETENTION_DAYS);
   if (pruned > 0) console.log(`pruned ${pruned} chat log row(s) older than ${CHAT_LOG_RETENTION_DAYS} days`);
+  await game.loadMarket();
   setInterval(() => {
     void pruneChatLogs(CHAT_LOG_RETENTION_DAYS).catch((err) => console.error('chat log prune failed:', err));
   }, 24 * 3600 * 1000).unref();
@@ -310,6 +311,7 @@ async function main(): Promise<void> {
     console.log('shutting down: saving characters...');
     game.stop();
     await game.saveAll('shutdown');
+    await game.saveMarket();
     await game.endAllPlaySessions();
     await game.chatLog.stop();
     await pool.end();

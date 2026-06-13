@@ -38,6 +38,14 @@ const CHAT_BURST = 8; // messages a player may send back-to-back...
 const CHAT_REFILL = 2; // ...then this many more per second (caps spam amplifiers)
 const DUEL_FORFEIT_DISTANCE = 60;
 const TRADE_RANGE = 10;
+// The World Market (the Merchant's auction house)
+const MARKET_RANGE = INTERACT_RANGE + 2; // you must stand at the Merchant to deal
+const MARKET_MAX_LISTINGS = 12; // active player listings per seller
+const MARKET_MIN_PRICE = 1; // copper
+const MARKET_MAX_PRICE = 5_000_000; // 500g ceiling — guards against overflow / fat-finger
+const MARKET_CUT = 0.05; // the Merchant's cut on a completed sale (a gold sink)
+const MARKET_LISTING_DURATION = 48 * 3600; // sim-seconds an unsold listing lingers before returning
+const MARKET_WIRE_LIMIT = 120; // most listings shipped to one client at a time
 const INSTANCE_EMPTY_TIMEOUT = 300; // seconds before an empty instance resets
 const HUNTER_RANGED_DEADZONE = 8;
 const MAX_CLIMB_SLOPE = 1.5; // rise/run above which a ground move is blocked (cliffs, world rim)
@@ -124,6 +132,41 @@ export interface PlayerMeta {
   autoEquip: boolean;
 }
 
+// ---------------------------------------------------------------------------
+// The World Market — a single shared, server-authoritative auction house run
+// by the Merchant NPC. Listings live in the sim (so offline play has a market
+// too and the rules are testable); the server persists them to Postgres.
+// Sellers are keyed by character name, which is globally unique, so proceeds
+// and returns reach the right player even while they are offline.
+// ---------------------------------------------------------------------------
+
+export interface MarketListing {
+  id: number;
+  sellerKey: string; // stable seller identity (character name); '' for house stock
+  sellerName: string; // display name
+  itemId: string;
+  count: number;
+  price: number; // total copper buyout for the whole stack
+  expiresAt: number; // sim.time seconds; Infinity for the Merchant's own stock
+  house: boolean; // the Merchant's standing stock: never expires, never depletes, pays no one
+}
+
+// Gold + items awaiting pickup at the Merchant (sale proceeds, expired
+// listings), keyed by seller name so an offline seller can collect later.
+export interface MarketCollection {
+  copper: number;
+  items: InvSlot[];
+}
+
+// Persistable market state. `secondsLeft` is stored instead of an absolute
+// expiry because sim.time resets to 0 each server boot — on load it becomes
+// `this.time + secondsLeft`, so a restart never silently expires everything.
+export interface MarketSave {
+  listings: { id: number; sellerKey: string; sellerName: string; itemId: string; count: number; price: number; secondsLeft: number }[];
+  collections: { key: string; copper: number; items: InvSlot[] }[];
+  nextListingId: number;
+}
+
 // Persistable character state (stored as JSONB server-side).
 export interface CharacterState {
   level: number;
@@ -191,6 +234,12 @@ export class Sim {
   private chatTokens = new Map<number, { tokens: number; at: number }>();
   // dungeon instances
   instances: InstanceSlot[] = [];
+  // the World Market: one shared listing book, per-seller collections keyed by
+  // character name, and the Merchant entity these are anchored to
+  marketListings: MarketListing[] = [];
+  private marketCollections = new Map<string, MarketCollection>();
+  private nextListingId = 1;
+  private merchantId = -1;
 
   constructor(cfg: SimConfig) {
     this.cfg = {
@@ -207,7 +256,9 @@ export class Sim {
       const safe = this.findSafePos(npcDef.pos.x, npcDef.pos.z, WATER_LEVEL + 0.6);
       const npc = createNpc(this.nextId++, npcDef, this.groundPos(safe.x, safe.z));
       this.addEntity(npc);
+      if (npcDef.market) this.merchantId = npc.id; // the World Market is anchored here
     }
+    this.seedHouseListings();
 
     // Mobs from camps
     for (const camp of CAMPS) {
@@ -592,6 +643,7 @@ export class Sim {
     this.updateDuels();
     this.updateTradesAndInvites();
     this.updateInstances();
+    this.updateMarket();
 
     // movement re-bucketing: queries during the next tick and the server's
     // snapshot broadcast right after this one see fresh cells
@@ -2994,6 +3046,225 @@ export class Sim {
   }
 
   // -------------------------------------------------------------------------
+  // The World Market — the Merchant's auction house
+  // -------------------------------------------------------------------------
+
+  private merchantEntity(): Entity | null {
+    const e = this.entities.get(this.merchantId);
+    return e && e.kind === 'npc' ? e : null;
+  }
+
+  private nearMerchant(e: Entity): boolean {
+    const m = this.merchantEntity();
+    return !!m && dist2d(e.pos, m.pos) <= MARKET_RANGE;
+  }
+
+  private metaByName(name: string): PlayerMeta | null {
+    if (!name) return null;
+    for (const m of this.players.values()) if (m.name === name) return m;
+    return null;
+  }
+
+  private collectionFor(key: string): MarketCollection {
+    let c = this.marketCollections.get(key);
+    if (!c) { c = { copper: 0, items: [] }; this.marketCollections.set(key, c); }
+    return c;
+  }
+
+  // The Merchant always keeps a little stock so the market is never empty —
+  // standing consignments that never expire, never deplete, and pay no one.
+  private seedHouseListings(): void {
+    const stock: { itemId: string; count: number; price: number }[] = [
+      { itemId: 'roasted_boar', count: 5, price: 700 },
+      { itemId: 'spring_water', count: 5, price: 160 },
+      { itemId: 'oiled_boots', count: 1, price: 1900 },
+      { itemId: 'quilted_trousers', count: 1, price: 2400 },
+      { itemId: 'greyjaw_pelt_cloak', count: 1, price: 2900 },
+    ];
+    for (const s of stock) {
+      if (!ITEMS[s.itemId]) continue;
+      this.marketListings.push({
+        id: this.nextListingId++, sellerKey: '', sellerName: 'The Merchant',
+        itemId: s.itemId, count: s.count, price: s.price, expiresAt: Infinity, house: true,
+      });
+    }
+  }
+
+  // List a stack from your bags for sale. The goods are escrowed (pulled from
+  // your bags immediately) and held by the Merchant until bought or reclaimed.
+  marketList(itemId: string, count: number, price: number, pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    const { meta, e: p } = r;
+    if (p.dead) return;
+    if (!this.nearMerchant(p)) { this.error(meta.entityId, 'You must bring your goods to the Merchant.'); return; }
+    const def = ITEMS[itemId];
+    if (!def) return;
+    if (def.kind === 'quest') { this.error(meta.entityId, 'The Merchant will not broker quest items.'); return; }
+    const want = Math.max(1, Math.floor(count));
+    if (this.countItem(itemId, meta.entityId) < want) { this.error(meta.entityId, 'You do not have that many to sell.'); return; }
+    const ask = Math.floor(price);
+    if (!Number.isFinite(ask) || ask < MARKET_MIN_PRICE) { this.error(meta.entityId, 'Name a price of at least 1 copper.'); return; }
+    if (ask > MARKET_MAX_PRICE) { this.error(meta.entityId, 'That price is beyond what the Merchant will broker.'); return; }
+    const mine = this.marketListings.reduce((n, l) => n + (!l.house && l.sellerKey === meta.name ? 1 : 0), 0);
+    if (mine >= MARKET_MAX_LISTINGS) { this.error(meta.entityId, `You may keep at most ${MARKET_MAX_LISTINGS} goods on the market at once.`); return; }
+    this.removeItem(itemId, want, meta.entityId); // escrow
+    this.marketListings.push({
+      id: this.nextListingId++, sellerKey: meta.name, sellerName: meta.name,
+      itemId, count: want, price: ask, expiresAt: this.time + MARKET_LISTING_DURATION, house: false,
+    });
+    this.emit({ type: 'loot', text: `Listed ${def.name}${want > 1 ? ' x' + want : ''} on the World Market for ${formatMoney(ask)}.`, pid: meta.entityId });
+  }
+
+  // Buy a listing outright. Coin leaves the buyer, goods enter their bags, and
+  // the seller's proceeds (less the Merchant's cut) wait in their collection.
+  marketBuy(listingId: number, pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    const { meta, e: p } = r;
+    if (p.dead) return;
+    if (!this.nearMerchant(p)) { this.error(meta.entityId, 'You are too far from the Merchant.'); return; }
+    const idx = this.marketListings.findIndex((l) => l.id === listingId);
+    if (idx < 0) { this.error(meta.entityId, 'That listing is no longer available.'); return; }
+    const listing = this.marketListings[idx];
+    const def = ITEMS[listing.itemId];
+    if (!def) { this.marketListings.splice(idx, 1); return; }
+    if (!listing.house && listing.sellerKey === meta.name) {
+      this.error(meta.entityId, 'That is your own listing — cancel it to reclaim it.');
+      return;
+    }
+    if (meta.copper < listing.price) { this.error(meta.entityId, 'You cannot afford that.'); return; }
+    meta.copper -= listing.price;
+    this.addItem(listing.itemId, listing.count, meta.entityId);
+    if (!listing.house) {
+      const proceeds = Math.max(0, Math.floor(listing.price * (1 - MARKET_CUT)));
+      this.collectionFor(listing.sellerKey).copper += proceeds;
+      this.marketListings.splice(idx, 1);
+      const sellerMeta = this.metaByName(listing.sellerKey);
+      if (sellerMeta) {
+        this.emit({ type: 'loot', text: `${meta.name} bought your ${def.name} for ${formatMoney(listing.price)} — collect ${formatMoney(proceeds)} from the Merchant.`, pid: sellerMeta.entityId });
+      }
+    }
+    this.emit({ type: 'loot', text: `Bought ${def.name}${listing.count > 1 ? ' x' + listing.count : ''} for ${formatMoney(listing.price)}.`, pid: meta.entityId });
+  }
+
+  // Reclaim your own listing; the escrowed goods go straight back to your bags.
+  marketCancel(listingId: number, pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    const { meta, e: p } = r;
+    if (!this.nearMerchant(p)) { this.error(meta.entityId, 'You are too far from the Merchant.'); return; }
+    const idx = this.marketListings.findIndex((l) => l.id === listingId);
+    if (idx < 0) return;
+    const listing = this.marketListings[idx];
+    if (listing.house || listing.sellerKey !== meta.name) { this.error(meta.entityId, 'That is not your listing.'); return; }
+    this.marketListings.splice(idx, 1);
+    this.addItem(listing.itemId, listing.count, meta.entityId);
+    const def = ITEMS[listing.itemId];
+    this.emit({ type: 'loot', text: `Reclaimed ${def?.name ?? listing.itemId}${listing.count > 1 ? ' x' + listing.count : ''} from the market.`, pid: meta.entityId });
+  }
+
+  // Take everything waiting for you at the Merchant: sale gold and any items
+  // returned from expired listings.
+  marketCollect(pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    const { meta, e: p } = r;
+    if (!this.nearMerchant(p)) { this.error(meta.entityId, 'You are too far from the Merchant.'); return; }
+    const col = this.marketCollections.get(meta.name);
+    if (!col || (col.copper <= 0 && col.items.length === 0)) { this.error(meta.entityId, 'You have nothing to collect.'); return; }
+    if (col.copper > 0) {
+      meta.copper += col.copper;
+      this.emit({ type: 'loot', text: `You collect ${formatMoney(col.copper)} from the Merchant.`, pid: meta.entityId });
+    }
+    for (const s of col.items) this.addItem(s.itemId, s.count, meta.entityId);
+    this.marketCollections.delete(meta.name);
+  }
+
+  // Once a second: return expired player listings to their seller's collection.
+  private updateMarket(): void {
+    if (this.tickCount % 20 !== 0) return;
+    for (let i = this.marketListings.length - 1; i >= 0; i--) {
+      const l = this.marketListings[i];
+      if (l.house || this.time < l.expiresAt) continue;
+      this.marketListings.splice(i, 1);
+      this.collectionFor(l.sellerKey).items.push({ itemId: l.itemId, count: l.count });
+      const sellerMeta = this.metaByName(l.sellerKey);
+      if (sellerMeta) {
+        const def = ITEMS[l.itemId];
+        this.emit({ type: 'log', text: `Your market listing of ${def?.name ?? l.itemId} expired and waits at the Merchant.`, color: '#caa472', pid: sellerMeta.entityId });
+      }
+    }
+  }
+
+  marketInfoFor(pid: number): import('../world_api').MarketInfo | null {
+    const meta = this.players.get(pid);
+    const e = this.entities.get(pid);
+    if (!meta || !e) return null;
+    // the World Market is a place you visit — only stream it while standing by
+    // the Merchant, which also bounds the per-snapshot wire cost
+    if (!this.nearMerchant(e)) return null;
+    const sorted = [...this.marketListings].sort((a, b) => {
+      const na = ITEMS[a.itemId]?.name ?? a.itemId;
+      const nb = ITEMS[b.itemId]?.name ?? b.itemId;
+      return na.localeCompare(nb) || a.price - b.price;
+    });
+    const listings = sorted.slice(0, MARKET_WIRE_LIMIT).map((l) => ({
+      id: l.id, sellerName: l.sellerName, itemId: l.itemId, count: l.count,
+      price: l.price, mine: !l.house && l.sellerKey === meta.name, house: l.house,
+    }));
+    const col = this.marketCollections.get(meta.name);
+    const myListingCount = this.marketListings.reduce((n, l) => n + (!l.house && l.sellerKey === meta.name ? 1 : 0), 0);
+    return {
+      listings,
+      collectionCopper: col?.copper ?? 0,
+      collectionItems: col ? col.items.map((s) => ({ ...s })) : [],
+      cutPct: Math.round(MARKET_CUT * 100),
+      maxListings: MARKET_MAX_LISTINGS,
+      myListingCount,
+    };
+  }
+
+  // Persist only player listings + collections; house stock is reseeded each
+  // boot so content edits take effect. secondsLeft survives the time reset.
+  serializeMarket(): MarketSave {
+    return {
+      listings: this.marketListings.filter((l) => !l.house).map((l) => ({
+        id: l.id, sellerKey: l.sellerKey, sellerName: l.sellerName, itemId: l.itemId,
+        count: l.count, price: l.price,
+        secondsLeft: Number.isFinite(l.expiresAt) ? Math.max(0, Math.round(l.expiresAt - this.time)) : MARKET_LISTING_DURATION,
+      })),
+      collections: [...this.marketCollections.entries()].map(([key, c]) => ({
+        key, copper: c.copper, items: c.items.map((s) => ({ ...s })),
+      })),
+      nextListingId: this.nextListingId,
+    };
+  }
+
+  loadMarket(save: MarketSave | null | undefined): void {
+    if (!save) return;
+    for (const l of save.listings ?? []) {
+      if (!l || typeof l.itemId !== 'string' || !ITEMS[l.itemId]) continue;
+      this.marketListings.push({
+        id: l.id, sellerKey: String(l.sellerKey ?? ''), sellerName: String(l.sellerName ?? l.sellerKey ?? '?'),
+        itemId: l.itemId, count: Math.max(1, l.count | 0),
+        price: Math.max(MARKET_MIN_PRICE, Math.min(MARKET_MAX_PRICE, Math.floor(l.price) || MARKET_MIN_PRICE)),
+        expiresAt: this.time + (Number.isFinite(l.secondsLeft) ? Math.max(0, l.secondsLeft) : MARKET_LISTING_DURATION),
+        house: false,
+      });
+    }
+    for (const c of save.collections ?? []) {
+      if (!c || typeof c.key !== 'string') continue;
+      this.marketCollections.set(c.key, {
+        copper: Math.max(0, Math.floor(c.copper) || 0),
+        items: (c.items ?? []).filter((s) => s && ITEMS[s.itemId]).map((s) => ({ itemId: s.itemId, count: Math.max(1, s.count | 0) })),
+      });
+    }
+    const maxId = this.marketListings.reduce((m, l) => Math.max(m, l.id + 1), 1);
+    this.nextListingId = Math.max(this.nextListingId, save.nextListingId ?? 1, maxId);
+  }
+
+  // -------------------------------------------------------------------------
   // Dungeons: party-instanced elite content (the Hollow Crypt and friends)
   // -------------------------------------------------------------------------
 
@@ -3192,6 +3463,10 @@ export class Sim {
     if (!d) return null;
     const otherPid = d.a === this.primaryId ? d.b : d.a;
     return { otherPid, otherName: this.players.get(otherPid)?.name ?? '?', state: d.state };
+  }
+
+  get marketInfo(): import('../world_api').MarketInfo | null {
+    return this.primaryId === -1 ? null : this.marketInfoFor(this.primaryId);
   }
 
   instanceSlotAt(pos: Vec3): number | null {
