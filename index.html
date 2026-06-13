@@ -121,7 +121,8 @@
 
   [hidden] { display: none !important; }
   html, body { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: var(--ui-font); }
-  #game-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  #game-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; }
+  #game-canvas.cam-drag { cursor: grabbing; }
   #nameplates { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
   #ui { position: absolute; inset: 0; pointer-events: none; }
   #ui > * { pointer-events: auto; }

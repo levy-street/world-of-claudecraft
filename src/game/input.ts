@@ -1,8 +1,7 @@
-// WoW-style input: WASD + A/D keyboard turn, Q/E strafe, space jump,
-// left-drag orbits the camera, right-drag mouselooks (turns the character),
-// both buttons run forward, wheel zooms, Tab targets, action-bar keys cast
-// (player-rebindable, see Keybinds), C/P/L/M/B windows, V nameplates,
-// F interacts, R autorun.
+// OSRS-style input: WASD moves relative to the camera (A/D strafe, no keyboard
+// turn), space jump, mouse drag rotates the camera only, both buttons run
+// forward, wheel zooms, Tab targets, action-bar keys cast (player-rebindable,
+// see Keybinds), C/P/L/M/B windows, V nameplates, F interacts, R autorun.
 
 import { Keybinds, actionKind } from './keybinds';
 
@@ -40,7 +39,15 @@ export class Input {
   constructor(private canvas: HTMLCanvasElement, private cb: InputCallbacks, private keybinds: Keybinds) {
     window.addEventListener('keydown', (e) => this.onKeyDown(e));
     window.addEventListener('keyup', (e) => { this.keys.delete(e.code); });
-    window.addEventListener('blur', () => { this.keys.clear(); this.leftDown = false; this.rightDown = false; });
+    window.addEventListener('blur', () => this.releaseCapture());
+    window.addEventListener('pointerup', (e) => this.onMouseUp(e));
+    window.addEventListener('pointercancel', (e) => this.onMouseUp(e));
+    document.addEventListener('pointerlockchange', () => {
+      if (!document.pointerLockElement) this.releaseCapture();
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) this.releaseCapture();
+    });
     canvas.addEventListener('mousedown', (e) => this.onMouseDown(e));
     window.addEventListener('mouseup', (e) => this.onMouseUp(e));
     window.addEventListener('mousemove', (e) => this.onMouseMove(e));
@@ -107,22 +114,29 @@ export class Input {
     }
   }
 
+  /** Drop stuck mouse/keyboard state (window blur, tab away, pointer lock exit). */
+  private releaseCapture(): void {
+    this.keys.clear();
+    this.leftDown = false;
+    this.rightDown = false;
+    this.downButton = -1;
+    this.canvas.classList.remove('cam-drag');
+  }
+
   private onMouseDown(e: MouseEvent): void {
     if (e.button === 0) this.leftDown = true;
     if (e.button === 2) this.rightDown = true;
     this.downButton = e.button;
     this.dragDistance = 0;
-    this.canvas.requestPointerLock?.();
+    this.canvas.classList.add('cam-drag');
   }
 
   private onMouseUp(e: MouseEvent): void {
     const wasDrag = this.dragDistance > 5;
     if (e.button === 0) this.leftDown = false;
     if (e.button === 2) this.rightDown = false;
-    if (!this.leftDown && !this.rightDown && document.pointerLockElement) {
-      document.exitPointerLock();
-    }
-    if (!wasDrag && e.button === this.downButton && (e.target === this.canvas || document.pointerLockElement === this.canvas)) {
+    if (!this.leftDown && !this.rightDown) this.canvas.classList.remove('cam-drag');
+    if (!wasDrag && e.button === this.downButton && e.target === this.canvas) {
       this.cb.onClickPick(e.clientX, e.clientY, e.button);
     }
     this.downButton = -1;
@@ -131,6 +145,7 @@ export class Input {
   private onMouseMove(e: MouseEvent): void {
     if (!this.leftDown && !this.rightDown) return;
     const mx = e.movementX ?? 0, my = e.movementY ?? 0;
+    if (mx === 0 && my === 0) return;
     this.dragDistance += Math.abs(mx) + Math.abs(my);
     this.camYaw -= mx * this.lookSensitivity;
     this.camPitch = Math.min(1.35, Math.max(-0.4, this.camPitch + my * this.lookSensitivity));
@@ -146,17 +161,12 @@ export class Input {
     const k = this.keys;
     const held = (id: string) => this.keybinds.codesForAction(id).some((c) => k.has(c));
     const bothButtons = this.leftDown && this.rightDown;
-    const mouselook = this.rightDown;
-    // A/D (turn) double as strafe while mouselooking, matching WoW; Q/E always strafe
-    const aHeld = held('turnLeft');
-    const dHeld = held('turnRight');
+    // A/D and Q/E all strafe; keyboard never turns the character or camera.
+    const strafeLeft = held('strafeLeft') || held('turnLeft');
+    const strafeRight = held('strafeRight') || held('turnRight');
     const forward = held('forward') || bothButtons || this.autorun;
     const back = held('back');
-    const strafeLeft = held('strafeLeft') || (mouselook && aHeld);
-    const strafeRight = held('strafeRight') || (mouselook && dHeld);
-    const turnLeft = !mouselook && aHeld;
-    const turnRight = !mouselook && dHeld;
     const jump = held('jump');
-    return { forward, back, turnLeft, turnRight, strafeLeft, strafeRight, jump };
+    return { forward, back, turnLeft: false, turnRight: false, strafeLeft, strafeRight, jump };
   }
 }

@@ -220,32 +220,10 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
   let last = performance.now();
   let acc = 0;
 
-  // Camera follow state: keyboard turning advances facing in 20Hz sim steps,
-  // so the camera tracks the player's render-interpolated facing per frame
-  // (same curve the character model follows) instead of the raw tick deltas —
-  // that's what killed the turn stutter. While running, the orbit offset
-  // eases back to zero so the camera settles in behind the character.
-  let lastInterpFacing: number | null = null;
-  const CAM_SETTLE_RATE = 3; // 1/s exponential ease
-
-  function wrapAngle(d: number): number {
-    while (d > Math.PI) d -= 2 * Math.PI;
-    while (d < -Math.PI) d += 2 * Math.PI;
-    return d;
-  }
-
-  function updateCamera(frameDt: number, interpFacing: number): void {
-    if (!input.rightDown) {
-      // follow turns 1:1 (keeps any manual orbit offset constant)
-      if (lastInterpFacing !== null) input.camYaw += wrapAngle(interpFacing - lastInterpFacing);
-      // settle behind the character while moving, unless the player is
-      // actively holding an orbit drag
-      const mi = input.readMoveInput();
-      if ((mi.forward || mi.strafeLeft || mi.strafeRight) && !input.leftDown) {
-        input.camYaw += wrapAngle(interpFacing - input.camYaw) * (1 - Math.exp(-frameDt * CAM_SETTLE_RATE));
-      }
-    }
-    lastInterpFacing = interpFacing; // track through mouselook too — no snap on release
+  /** Face the camera direction while moving so WASD is camera-relative. */
+  function applyCameraFacing(): boolean {
+    const mi = input.readMoveInput();
+    return !!(mi.forward || mi.back || mi.strafeLeft || mi.strafeRight) && !world.player.dead;
   }
 
   function frame(now: number): void {
@@ -258,24 +236,23 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
     // character behind it (other windows stay non-modal, as before)
     input.suspendMovement = hud.isModalOpen();
 
-    const mouselook = input.rightDown && !world.player.dead;
+    const cameraMove = applyCameraFacing();
+    const renderFacing = cameraMove ? input.camYaw : null;
 
     if (offlineSim) {
       acc += frameDt;
       while (acc >= DT) {
         const mi = input.readMoveInput();
         Object.assign(offlineSim.moveInput, mi);
-        if (mouselook) offlineSim.player.facing = input.camYaw;
+        if (cameraMove) offlineSim.player.facing = input.camYaw;
         const events = offlineSim.tick();
         hud.handleEvents(events);
         acc -= DT;
       }
-      const pp = offlineSim.player;
-      updateCamera(frameDt, pp.prevFacing + wrapAngle(pp.facing - pp.prevFacing) * (acc / DT));
       renderer.camYaw = input.camYaw;
       renderer.camPitch = input.camPitch;
       renderer.camDist = input.camDist;
-      renderer.sync(acc / DT, frameDt, mouselook ? input.camYaw : null);
+      renderer.sync(acc / DT, frameDt, renderFacing);
       hud.update();
       return;
     }
@@ -283,20 +260,17 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
     // online: inputs stream on a timer inside ClientWorld; here we mirror state
     const net = online!;
     Object.assign(net.moveInput, input.readMoveInput());
-    net.setMouselookFacing(mouselook ? input.camYaw : null);
-    net.pendingFacingDelta = 0; // superseded by the interpolated follow below
+    net.setMouselookFacing(cameraMove ? input.camYaw : null);
+    net.pendingFacingDelta = 0;
     hud.handleEvents(net.drainEvents());
     if (net.consumeInventoryChanged()) hud.onInventoryChanged();
     const alpha = net.lastSnapAt > 0
       ? Math.min(1.25, (performance.now() - net.lastSnapAt) / Math.max(20, net.snapInterval))
       : 1;
-    const pe = world.player;
-    // facing interp capped at 1 — extrapolating angles past the snapshot oscillates
-    updateCamera(frameDt, pe.prevFacing + wrapAngle(pe.facing - pe.prevFacing) * Math.min(1, alpha));
     renderer.camYaw = input.camYaw;
     renderer.camPitch = input.camPitch;
     renderer.camDist = input.camDist;
-    renderer.sync(alpha, frameDt, mouselook ? input.camYaw : null);
+    renderer.sync(alpha, frameDt, renderFacing);
     hud.update();
   }
   requestAnimationFrame(frame);
