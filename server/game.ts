@@ -4,7 +4,9 @@ import { Sim } from '../src/sim/sim';
 import type { PlayerMeta } from '../src/sim/sim';
 import { DT, Entity, SimEvent, dist2d } from '../src/sim/types';
 import { stealthDetectionRadius, threatEntries } from '../src/sim/threat';
-import { zoneAt, DUNGEONS } from '../src/sim/data';
+import {
+  DUNGEON_LIST, DUNGEONS, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_X, WORLD_MIN_Z, ZONES, dungeonAt, zoneAt,
+} from '../src/sim/data';
 import { saveCharacterState, openPlaySession, closePlaySession, insertChatLogs, pool } from './db';
 import { ChatLogger } from './chat_log';
 import { SocialService } from './social';
@@ -104,10 +106,62 @@ export interface AdminLivePlayer {
   hp: number;
   maxHp: number;
   x: number;
+  y: number;
   z: number;
+  facing: number;
+  realm: string;
   zone: string;
+  status: PresenceStatus;
+  inDungeon: boolean;
+  dungeonId: string | null;
+  dungeonName: string | null;
+  mapX: number;
+  mapZ: number;
   sessionSeconds: number;
   lastSaveSecondsAgo: number;
+}
+
+export interface AdminWorldMap {
+  realm: string;
+  generatedAt: number;
+  bounds: { minX: number; maxX: number; minZ: number; maxZ: number };
+  zones: {
+    id: string;
+    name: string;
+    zMin: number;
+    zMax: number;
+    levelRange: [number, number];
+    biome: string;
+    hub: { x: number; z: number; radius: number; name: string };
+    graveyard: { x: number; z: number };
+    lakes: { x: number; z: number; radius: number }[];
+    pois: { x: number; z: number; label: string }[];
+  }[];
+  dungeons: { id: string; name: string; doorPos: { x: number; z: number }; suggestedPlayers: number }[];
+  players: AdminLivePlayer[];
+}
+
+export type PublicLivePlayer = Pick<
+  AdminLivePlayer,
+  | 'name'
+  | 'class'
+  | 'level'
+  | 'x'
+  | 'z'
+  | 'facing'
+  | 'realm'
+  | 'zone'
+  | 'status'
+  | 'inDungeon'
+  | 'dungeonId'
+  | 'dungeonName'
+  | 'mapX'
+  | 'mapZ'
+  | 'sessionSeconds'
+>;
+
+export interface PublicWorldMap extends Omit<AdminWorldMap, 'players'> {
+  players: PublicLivePlayer[];
 }
 
 interface WireAura {
@@ -497,9 +551,14 @@ export class GameServer {
       const e = this.sim.entities.get(session.pid);
       const meta = this.sim.meta(session.pid);
       if (!e || !meta) continue;
-      const zone = e.dungeonId
-        ? (DUNGEONS[e.dungeonId]?.name ?? e.dungeonId)
-        : zoneAt(e.pos.z).name;
+      const dungeon = e.dungeonId
+        ? (DUNGEONS[e.dungeonId] ?? dungeonAt(e.pos.x))
+        : dungeonAt(e.pos.x);
+      const inDungeon = dungeon !== null || !!e.dungeonId;
+      const outdoorZone = inDungeon && dungeon ? zoneAt(dungeon.doorPos.z) : zoneAt(e.pos.z);
+      const zone = dungeon ? dungeon.name : outdoorZone.name;
+      const status: PresenceStatus = e.dead ? 'dead' : inDungeon ? 'dungeon' : e.inCombat ? 'combat' : 'online';
+      const mapPos = dungeon ? dungeon.doorPos : e.pos;
       players.push({
         pid: session.pid,
         accountId: session.accountId,
@@ -510,13 +569,73 @@ export class GameServer {
         hp: e.hp,
         maxHp: e.maxHp,
         x: round2(e.pos.x),
+        y: round2(e.pos.y),
         z: round2(e.pos.z),
+        facing: round2(e.facing),
+        realm: REALM,
         zone,
+        status,
+        inDungeon,
+        dungeonId: dungeon?.id ?? e.dungeonId ?? null,
+        dungeonName: dungeon?.name ?? (e.dungeonId ? DUNGEONS[e.dungeonId]?.name ?? e.dungeonId : null),
+        mapX: round2(mapPos.x),
+        mapZ: round2(mapPos.z),
         sessionSeconds: Math.round((now - session.joinedAt) / 1000),
         lastSaveSecondsAgo: Math.round((now - session.lastSave) / 1000),
       });
     }
     return players.sort((a, b) => b.sessionSeconds - a.sessionSeconds);
+  }
+
+  worldMap(): AdminWorldMap {
+    return {
+      realm: REALM,
+      generatedAt: Date.now(),
+      bounds: { minX: WORLD_MIN_X, maxX: WORLD_MAX_X, minZ: WORLD_MIN_Z, maxZ: WORLD_MAX_Z },
+      zones: ZONES.map((z) => ({
+        id: z.id,
+        name: z.name,
+        zMin: z.zMin,
+        zMax: z.zMax,
+        levelRange: z.levelRange,
+        biome: z.biome,
+        hub: z.hub,
+        graveyard: z.graveyard,
+        lakes: z.lakes,
+        pois: z.pois,
+      })),
+      dungeons: DUNGEON_LIST.map((d) => ({
+        id: d.id,
+        name: d.name,
+        doorPos: d.doorPos,
+        suggestedPlayers: d.suggestedPlayers,
+      })),
+      players: this.liveSessions(),
+    };
+  }
+
+  publicWorldMap(): PublicWorldMap {
+    const { players, ...map } = this.worldMap();
+    return {
+      ...map,
+      players: players.map((p) => ({
+        name: p.name,
+        class: p.class,
+        level: p.level,
+        x: p.x,
+        z: p.z,
+        facing: p.facing,
+        realm: p.realm,
+        zone: p.zone,
+        status: p.status,
+        inDungeon: p.inDungeon,
+        dungeonId: p.dungeonId,
+        dungeonName: p.dungeonName,
+        mapX: p.mapX,
+        mapZ: p.mapZ,
+        sessionSeconds: p.sessionSeconds,
+      })),
+    };
   }
 
   liveAccountIds(): Set<number> {
