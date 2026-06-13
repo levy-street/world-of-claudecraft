@@ -468,6 +468,15 @@ export type SimEvent = { pid?: number } & (
   | { type: 'duelCountdown'; seconds: number }
   | { type: 'duelStart' }
   | { type: 'duelEnd'; winnerName: string; loserName: string }
+  // Ravenrift 5v5 capture-the-flag battleground
+  | { type: 'bgQueued'; position: number }
+  | { type: 'bgUnqueued' }
+  | { type: 'bgFound'; team: number }
+  | { type: 'bgCountdown'; seconds: number }
+  | { type: 'bgStart' }
+  // flag lifecycle: `team` is the flag that was acted on; `byName` the actor
+  | { type: 'bgFlag'; action: 'taken' | 'dropped' | 'returned' | 'captured'; team: number; byName: string; scoreCrimson: number; scoreAzure: number }
+  | { type: 'bgEnd'; won: boolean; draw: boolean; scoreCrimson: number; scoreAzure: number; ratingBefore: number; ratingAfter: number }
   | { type: 'heal2'; sourceId: number; targetId: number; amount: number; crit: boolean; ability: string }
   // visual-only cue for the renderer: spell projectiles, dot ticks, aoe novas
   | { type: 'spellfx'; sourceId: number; targetId: number; school: string; fx: 'projectile' | 'tick' | 'nova' }

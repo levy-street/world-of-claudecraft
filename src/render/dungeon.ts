@@ -20,6 +20,9 @@ import {
   CRYPT_LAYOUT, SANCTUM_LAYOUT, DUNGEON_WALL_X, TOMB_HD,
   DungeonLayout, GridPoint, WallStub,
 } from '../sim/dungeon_layout';
+import {
+  BASES, BG_HALF_X, BG_HALF_Z, COVER_CRATES, COVER_PILLARS, COVER_WALLS, SPEED_RUNES, TEAM_COLORS,
+} from '../sim/battleground_layout';
 
 const FLAME_EMISSIVE_HIGH = 2.2;
 // dungeon torch point lights: pumped + hung low so warm pools break up the
@@ -237,6 +240,134 @@ export class DungeonInteriors {
     this.emit(group, p);
     group.position.set(ox, 0, oz);
     this.scene.add(group);
+  }
+
+  // Ravenrift battleground: an open-air walled field built from the same kit —
+  // a tiled courtyard floor, perimeter + keep + cover walls, then procedural
+  // team banners, flag stands and glowing sprint-rune pads.
+  private bgMats: { pole?: THREE.Material; stone?: THREE.Material; cloth: Map<number, THREE.Material>; rune?: THREE.Material } = { cloth: new Map() };
+
+  buildBattleground(ox: number, oz: number): void {
+    const group = new THREE.Group();
+    const p = new Placements();
+    const quarter = Math.PI / 2;
+
+    // courtyard floor
+    for (let z = -BG_HALF_Z + 2; z <= BG_HALF_Z - 2; z += FLOOR_CELL) {
+      for (let x = -BG_HALF_X + 2; x <= BG_HALF_X - 2; x += FLOOR_CELL) {
+        const t = hash2(x * 1.31, z);
+        const kind = t < 0.66 ? 'floor_tile_large' : t < 0.8 ? 'floor_tile_large_rocks'
+          : t < 0.9 ? 'floor_dirt_large' : 'floor_dirt_large_rocky';
+        p.add(kind, x, FLOOR_Y, z, Math.floor(hash2(z, x) * 4) * quarter);
+      }
+    }
+    // perimeter ramparts
+    this.addWallRun(p, -BG_HALF_X, -BG_HALF_Z, -BG_HALF_X, BG_HALF_Z);
+    this.addWallRun(p, BG_HALF_X, -BG_HALF_Z, BG_HALF_X, BG_HALF_Z);
+    this.addWallRun(p, -BG_HALF_X, -BG_HALF_Z, BG_HALF_X, -BG_HALF_Z);
+    this.addWallRun(p, -BG_HALF_X, BG_HALF_Z, BG_HALF_X, BG_HALF_Z);
+    // keeps — a three-sided enclosure around each flag, open to the field
+    for (const base of BASES) {
+      const dir = base.team === 0 ? -1 : 1;
+      const backZ = base.flag.z + dir * 8;
+      const sideZ = base.flag.z + dir * 2;
+      this.addWallRun(p, -14, backZ, 14, backZ);
+      this.addWallRun(p, -14, sideZ - 6, -14, sideZ + 6);
+      this.addWallRun(p, 14, sideZ - 6, 14, sideZ + 6);
+    }
+    // central cover
+    for (const w of COVER_WALLS) {
+      if (Math.abs(w.hw - w.hd) < 2 && w.hw > 3) {
+        this.addWallRun(p, w.x - w.hw, w.z - w.hd, w.x + w.hw, w.z - w.hd);
+        this.addWallRun(p, w.x - w.hw, w.z + w.hd, w.x + w.hw, w.z + w.hd);
+        this.addWallRun(p, w.x - w.hw, w.z - w.hd, w.x - w.hw, w.z + w.hd);
+        this.addWallRun(p, w.x + w.hw, w.z - w.hd, w.x + w.hw, w.z + w.hd);
+      } else if (w.hd >= w.hw) {
+        this.addWallRun(p, w.x, w.z - w.hd, w.x, w.z + w.hd);
+      } else {
+        this.addWallRun(p, w.x - w.hw, w.z, w.x + w.hw, w.z);
+      }
+    }
+    for (const pl of COVER_PILLARS) p.add('pillar', pl.x, 0, pl.z, 0, [PILLAR_XZ_SCALE, MODULE_SCALE, PILLAR_XZ_SCALE]);
+    for (const c of COVER_CRATES) p.add(hash2(c.x, c.z) < 0.5 ? 'crates_stacked' : 'box_stacked', c.x, 0, c.z, hash2(c.z, c.x) * Math.PI, 1.0);
+    this.emit(group, p);
+
+    // team identity: banners flanking each keep + a glowing flag pedestal
+    for (const base of BASES) {
+      const color = TEAM_COLORS[base.team];
+      const facing = base.team === 0 ? 0 : Math.PI;
+      this.addBgBanner(group, base.banner.x - 9, base.banner.z, color, facing);
+      this.addBgBanner(group, base.banner.x + 9, base.banner.z, color, facing);
+      this.addBgFlagStand(group, base.flag.x, base.flag.z, color);
+    }
+    for (const rp of SPEED_RUNES) this.addBgRunePad(group, rp.x, rp.z);
+
+    group.position.set(ox, 0, oz);
+    this.scene.add(group);
+  }
+
+  // Tile 'wall' kit modules (8u long at MODULE_SCALE) along a segment.
+  private addWallRun(p: Placements, ax: number, az: number, bx: number, bz: number): void {
+    const dx = bx - ax, dz = bz - az;
+    const len = Math.hypot(dx, dz);
+    if (len < 0.1) return;
+    const n = Math.max(1, Math.round(len / 8));
+    const ry = Math.atan2(dx, dz) + Math.PI / 2;
+    for (let i = 0; i < n; i++) {
+      const t = (i + 0.5) / n;
+      p.add('wall', ax + dx * t, 0, az + dz * t, ry, MODULE_SCALE);
+    }
+  }
+
+  private bgMat(which: 'pole' | 'stone'): THREE.Material {
+    if (this.bgMats[which]) return this.bgMats[which]!;
+    const color = which === 'pole' ? 0x5a4636 : 0x8b8a86;
+    const mat = this.lowGfx
+      ? new THREE.MeshLambertMaterial({ color })
+      : new THREE.MeshStandardMaterial({ color, roughness: 0.9, metalness: 0 });
+    this.bgMats[which] = mat;
+    return mat;
+  }
+
+  private bgClothMat(color: number): THREE.Material {
+    let mat = this.bgMats.cloth.get(color);
+    if (!mat) {
+      mat = this.lowGfx
+        ? new THREE.MeshLambertMaterial({ color, side: THREE.DoubleSide })
+        : new THREE.MeshStandardMaterial({ color, roughness: 0.7, metalness: 0, side: THREE.DoubleSide, emissive: color, emissiveIntensity: 0.25 });
+      this.bgMats.cloth.set(color, mat);
+    }
+    return mat;
+  }
+
+  private addBgBanner(group: THREE.Group, x: number, z: number, color: number, facing: number): void {
+    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.13, 6.5, 6), this.bgMat('pole'));
+    pole.position.set(x, 3.25, z);
+    pole.castShadow = !this.lowGfx;
+    group.add(pole);
+    const cloth = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 3.6), this.bgClothMat(color));
+    cloth.position.set(x, 4.4, z);
+    cloth.rotation.y = facing;
+    group.add(cloth);
+  }
+
+  private addBgFlagStand(group: THREE.Group, x: number, z: number, color: number): void {
+    const ped = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.9, 0.7, 14), this.bgMat('stone'));
+    ped.position.set(x, 0.35, z);
+    ped.receiveShadow = !this.lowGfx;
+    group.add(ped);
+    this.addTorchGlow(group, x, z, color, 0.72, 1.3);
+  }
+
+  private addBgRunePad(group: THREE.Group, x: number, z: number): void {
+    this.addTorchGlow(group, x, z, 0xffd24a, 0.06, 1.1);
+    if (!this.bgMats.rune) {
+      this.bgMats.rune = new THREE.MeshBasicMaterial({ color: 0xffd24a, transparent: true, opacity: 0.7, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
+    }
+    const ring = new THREE.Mesh(new THREE.RingGeometry(1.4, 1.9, 22).rotateX(-Math.PI / 2), this.bgMats.rune);
+    ring.position.set(x, 0.09, z);
+    ring.renderOrder = 1;
+    group.add(ring);
   }
 
   // Hollow Crypt and Sunken Bastion share interior 'crypt'; the origin x-band

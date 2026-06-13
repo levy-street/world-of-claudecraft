@@ -82,6 +82,14 @@ see each other in town. `Enter` opens chat.
 - **Duels**: right-click → *Challenge to a Duel*. 3-second countdown, fight
   until one side hits 1 hp — nobody dies, the winner is announced zone-wide.
   Running 60 yards away forfeits.
+- **Ravenrift** (5v5 ranked capture-the-flag): press `H` (or the ⚑ button) and
+  *Enter the Queue* — solo, or **group up to 5 and queue your whole party
+  together**. Matchmaking forms two balanced teams of five and drops you into a
+  walled, open-air battleground with two keeps. **Steal the enemy banner and
+  run it to your keep to score — first team to 5 captures wins.** Weave the
+  cover to lose pursuers, grab **Sprint Runes** at the flag sections for a burst
+  of speed, and respawn at your keep when you fall (no graveyard run). A
+  separate **squad Elo** ladder tracks wins/losses (`GET /api/squad/leaderboard`).
 - **Multiplayer rules**: classic tap rights (first player to damage a mob owns
   its loot/XP/quest credit — others get "You don't have permission to loot
   that."), mobs retarget the next attacker when their victim dies (no free
@@ -152,7 +160,7 @@ zone map.
 | `Tab` | cycle nearest enemies · left-click target · right-click attack/loot/talk |
 | `1`–`9`, `0`, `-`, `=` | action bar |
 | `F` | interact (loot corpse / pick up object / talk) |
-| `C` `P` `L` `M` `B` | character · spellbook · quest log · world map · bags |
+| `C` `P` `L` `M` `B` `H` | character · spellbook · quest log · world map · bags · battleground (Ravenrift) |
 | `V` / `R` / `Esc` | nameplates · autorun · close windows / clear target |
 
 ### Classic-fidelity checklist
@@ -234,6 +242,7 @@ node scripts/smoke_rogue.mjs    # rogue: combo points, eviscerate, vendor, eatin
 node scripts/visual_tour.mjs    # screenshot tour of the zone + UI into tmp/
 node scripts/mp_integration.mjs # 26-check API/WS/persistence suite (server running)
 node scripts/social_e2e.mjs     # trade + duel over the wire (ALLOW_DEV_COMMANDS=1)
+node scripts/squad_visual.mjs   # several clients queue + play Ravenrift 5v5 capture-the-flag (ALLOW_DEV_COMMANDS=1)
 node scripts/crypt_raid.mjs     # five bots clear the Hollow Crypt (ALLOW_DEV_COMMANDS=1)
 ```
 

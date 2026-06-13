@@ -147,6 +147,37 @@ export function dungeonAt(x: number): DungeonDef | null {
   return dungeonByIndex(Math.round((x - 900) / 600));
 }
 
+// ---------------------------------------------------------------------------
+// Ravenrift — the 5v5 ranked capture-the-flag battleground. Its match instances
+// get their own far-off flat-ground x-band well past the dungeon bands (index
+// 0/1/2 sit at x 900/1500/2100); slots stack along z. Like dungeons, x beyond
+// DUNGEON_X_THRESHOLD means flat ground (world.groundHeight) and instance-local
+// collision (sim/colliders.ts).
+// ---------------------------------------------------------------------------
+
+export const BG_X = 4200; // battleground instances share this x
+export const BG_X_MIN = 3800; // x at/after this = a battleground instance
+export const BG_SLOT_COUNT = 3; // concurrent 5v5 matches the world can host
+const BG_Z0 = -1500;
+const BG_SLOT_SPACING = 300; // > the field footprint (~120yd) so slots never overlap
+
+export function battlegroundOrigin(slot: number): { x: number; z: number } {
+  return { x: BG_X, z: BG_Z0 + slot * BG_SLOT_SPACING };
+}
+
+export function isBgPos(x: number): boolean {
+  return x >= BG_X_MIN;
+}
+
+export function bgOriginAt(z: number): { x: number; z: number; slot: number } {
+  let best = 0, bestD = Infinity;
+  for (let i = 0; i < BG_SLOT_COUNT; i++) {
+    const d = Math.abs(z - battlegroundOrigin(i).z);
+    if (d < bestD) { bestD = d; best = i; }
+  }
+  const o = battlegroundOrigin(best);
+  return { x: o.x, z: o.z, slot: best };
+}
 // Legacy aliases for the Hollow Crypt (tests + scripts reference these).
 export const CRYPT_DOOR_POS = DUNGEONS.hollow_crypt.doorPos;
 export const CRYPT_ENTRY = DUNGEONS.hollow_crypt.entry;
