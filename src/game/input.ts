@@ -6,6 +6,10 @@
 
 import { Keybinds, actionKind } from './keybinds';
 
+// the camera sensitivity that used to be hard-coded in onMouseMove; the
+// settings slider scales this (cameraSpeed 1.0 reproduces the old feel)
+const BASE_LOOK_SENS = 0.0045;
+
 export interface InputCallbacks {
   onTab(): void;
   onAbility(slot: number): void;
@@ -29,6 +33,9 @@ export class Input {
   // one-shot key capture for the rebind UI: the next keydown is delivered here
   // (Escape cancels with null) instead of being dispatched as an action
   private captureCb: ((code: string | null) => void) | null = null;
+  // mouse-look sensitivity, in radians per pixel of drag; the old fixed value
+  // was BASE_LOOK_SENS — setCameraSpeed scales it from the settings menu
+  private lookSensitivity = BASE_LOOK_SENS;
 
   constructor(private canvas: HTMLCanvasElement, private cb: InputCallbacks, private keybinds: Keybinds) {
     window.addEventListener('keydown', (e) => this.onKeyDown(e));
@@ -47,6 +54,11 @@ export class Input {
   /** Capture the next keypress (for the rebind UI) instead of acting on it. */
   captureNextKey(cb: (code: string | null) => void): void {
     this.captureCb = cb;
+  }
+
+  /** Scale mouse-look sensitivity. 1.0 = the original fixed speed. */
+  setCameraSpeed(mult: number): void {
+    this.lookSensitivity = BASE_LOOK_SENS * mult;
   }
 
   private onKeyDown(e: KeyboardEvent): void {
@@ -119,8 +131,8 @@ export class Input {
     if (!this.leftDown && !this.rightDown) return;
     const mx = e.movementX ?? 0, my = e.movementY ?? 0;
     this.dragDistance += Math.abs(mx) + Math.abs(my);
-    this.camYaw -= mx * 0.0045;
-    this.camPitch = Math.min(1.35, Math.max(-0.4, this.camPitch + my * 0.0045));
+    this.camYaw -= mx * this.lookSensitivity;
+    this.camPitch = Math.min(1.35, Math.max(-0.4, this.camPitch + my * this.lookSensitivity));
   }
 
   readMoveInput(): {

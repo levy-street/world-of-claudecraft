@@ -2,6 +2,7 @@ import { Sim } from './sim/sim';
 import { Renderer } from './render/renderer';
 import { Input } from './game/input';
 import { Keybinds } from './game/keybinds';
+import { Settings, GameSettings } from './game/settings';
 import { Hud } from './ui/hud';
 import { audio } from './game/audio';
 import { music } from './game/music';
@@ -86,6 +87,7 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
   const nameplates = $('#nameplates') as HTMLDivElement;
 
   const keybinds = new Keybinds();
+  const settings = new Settings();
   let renderer!: Renderer;
   let hud!: Hud;
   try {
@@ -144,11 +146,28 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
   }, keybinds);
   input.camYaw = world.player.facing;
 
-  // the options menu drives logout + key-capture, both of which need refs that
-  // only exist now (input) or are page-level (reload returns to the start menu)
+  // apply a setting to its live subsystem (also used to apply all on startup)
+  function applySetting(key: keyof GameSettings, value: number): void {
+    const v = settings.set(key, value);
+    switch (key) {
+      case 'cameraSpeed': input.setCameraSpeed(v); break;
+      case 'sfxVolume': audio.setVolume(v); break;
+      case 'musicVolume': music.setVolume(v); break;
+      case 'brightness': renderer.setBrightness(v); break;
+      case 'renderScale': renderer.setRenderScale(v); break;
+    }
+  }
+  // apply persisted settings to the freshly-built subsystems
+  const saved = settings.all();
+  for (const k of Object.keys(saved) as (keyof GameSettings)[]) applySetting(k, saved[k]);
+
+  // the options menu drives logout + key-capture + settings, all of which need
+  // refs that only exist now (input/renderer) or are page-level (reload)
   hud.attachOptions({
     logout: () => location.reload(),
     captureKey: (cb) => input.captureNextKey(cb),
+    settings,
+    onSettingChange: (key, value) => applySetting(key, value),
   });
 
   function interactKey(): void {

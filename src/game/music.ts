@@ -318,9 +318,27 @@ export class MusicDirector {
   private zone: MusicZone | null = null;
   private combat = false;
   private _enabled = (typeof localStorage === 'undefined') ? true : localStorage.getItem(STORAGE_KEY) !== '0';
+  private _vol = 1; // 0..1 volume, set from the settings menu
 
   get enabled(): boolean {
     return this._enabled;
+  }
+
+  // master gain target given the enabled flag and volume (base level 0.15)
+  private masterTarget(): number {
+    return this._enabled ? 0.15 * this._vol : 0;
+  }
+
+  /** Set music volume (0..1). Safe before init(); applied to the master gain. */
+  setVolume(v: number): void {
+    this._vol = Math.min(1, Math.max(0, v));
+    if (this.ctx && this.master) {
+      this.master.gain.setTargetAtTime(this.masterTarget(), this.ctx.currentTime, 0.2);
+    }
+  }
+
+  get volume(): number {
+    return this._vol;
   }
 
   init(): void {
@@ -332,7 +350,7 @@ export class MusicDirector {
     }
     const ctx = this.ctx;
     this.master = ctx.createGain();
-    this.master.gain.value = this._enabled ? 0.15 : 0;
+    this.master.gain.value = this.masterTarget();
     this.master.connect(ctx.destination);
 
     // generated hall impulse response
@@ -376,7 +394,7 @@ export class MusicDirector {
       localStorage.setItem(STORAGE_KEY, on ? '1' : '0');
     } catch { /* private mode */ }
     if (this.ctx && this.master) {
-      this.master.gain.setTargetAtTime(on ? 0.15 : 0, this.ctx.currentTime, 0.3);
+      this.master.gain.setTargetAtTime(this.masterTarget(), this.ctx.currentTime, 0.3);
     }
   }
 

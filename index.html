@@ -324,6 +324,14 @@
     background: linear-gradient(#2c2c3a, #15151f); color: #ffd9a0; border-color: #4a3d1d; }
   .kb-key.capturing { border-color: var(--gold); color: #fff; box-shadow: 0 0 8px #ffd100aa; }
   .kb-note { font-size: 11px; color: #b9ac82; margin: 2px 0 6px; min-height: 14px; line-height: 1.4; }
+  .set-rows { display: flex; flex-direction: column; gap: 6px; margin-bottom: 6px; }
+  .set-row { display: grid; grid-template-columns: 120px 1fr 48px; align-items: center; gap: 10px; padding: 3px 6px; }
+  .set-name { font-size: 12.5px; color: #e8e0c8; }
+  .set-slider { width: 100%; accent-color: var(--gold); cursor: pointer; }
+  .set-val { font-size: 12px; color: #ffd9a0; text-align: right; font-variant-numeric: tabular-nums; }
+  .set-toggle { margin: 0; padding: 3px 14px; }
+  .set-toggle.off { filter: grayscale(0.6) brightness(0.8); }
+  .set-note { font-size: 11px; color: #b9ac82; margin: 6px 0 2px; line-height: 1.4; }
 
   /* tooltip */
   #tooltip { position: absolute; display: none; z-index: 100; pointer-events: none; max-width: 280px;

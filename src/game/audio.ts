@@ -1,16 +1,29 @@
 // Procedural WebAudio sound effects — no audio files.
 
+const SFX_BASE_GAIN = 0.32; // master level at full volume
+
 export class GameAudio {
   private ctx: AudioContext | null = null;
   private master: GainNode | null = null;
   private noiseBuf: AudioBuffer | null = null;
+  private vol = 1; // 0..1, set from the settings menu (applied to the master gain)
+
+  /** Set SFX volume (0..1). Safe before init(); applied when the context exists. */
+  setVolume(v: number): void {
+    this.vol = Math.min(1, Math.max(0, v));
+    if (this.master) this.master.gain.value = SFX_BASE_GAIN * this.vol;
+  }
+
+  get volume(): number {
+    return this.vol;
+  }
 
   init(): void {
     if (this.ctx) return;
     try {
       this.ctx = new AudioContext();
       this.master = this.ctx.createGain();
-      this.master.gain.value = 0.32;
+      this.master.gain.value = SFX_BASE_GAIN * this.vol;
       this.master.connect(this.ctx.destination);
       const len = this.ctx.sampleRate;
       this.noiseBuf = this.ctx.createBuffer(1, len, this.ctx.sampleRate);

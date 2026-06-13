@@ -104,6 +104,9 @@ export class Renderer {
   camPitch = 0.32;
   camDist = 12;
   showNameplates = true;
+  // settings-menu graphics knobs (applied live)
+  private renderScale = 1; // resolution multiplier on top of the device pixel ratio
+  private baseExposure = 1.12; // tone-mapping exposure at brightness 1.0
   private tmpV = new THREE.Vector3();
   private tmpV2 = new THREE.Vector3();
   // floating /say-/yell bubbles, keyed by speaker entity id
@@ -152,7 +155,7 @@ export class Renderer {
     this.webgl.shadowMap.enabled = !LOW_GFX;
     this.webgl.shadowMap.type = THREE.PCFSoftShadowMap;
     this.webgl.toneMapping = THREE.ACESFilmicToneMapping; // OutputPass reads this on the composer path
-    this.webgl.toneMappingExposure = 1.12;
+    this.webgl.toneMappingExposure = this.baseExposure;
     this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 950);
 
     this.scene.fog = new THREE.Fog(0xa6c6e0, 130, 470);
@@ -329,17 +332,33 @@ export class Renderer {
     window.addEventListener('resize', () => {
       this.camera.aspect = window.innerWidth / window.innerHeight;
       this.camera.updateProjectionMatrix();
-      // dragging between monitors changes devicePixelRatio: refresh it before
-      // resizing so the canvas/composer/vfx don't keep the old DPI
-      const ratio = Math.min(window.devicePixelRatio, GFX.pixelRatioCap);
-      this.webgl.setPixelRatio(ratio);
-      this.webgl.setSize(window.innerWidth, window.innerHeight);
-      if (this.post) {
-        this.post.composer.setPixelRatio(ratio);
-        this.post.setSize(window.innerWidth, window.innerHeight);
-      }
-      this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
+      this.applyResolution();
     });
+  }
+
+  // Push the current device pixel ratio (× renderScale, still capped by the
+  // tier) to the renderer, composer, and vfx. Shared by resize and the
+  // render-scale setting so a window resize never drops the chosen scale.
+  private applyResolution(): void {
+    const ratio = Math.min(window.devicePixelRatio, GFX.pixelRatioCap) * this.renderScale;
+    this.webgl.setPixelRatio(ratio);
+    this.webgl.setSize(window.innerWidth, window.innerHeight);
+    if (this.post) {
+      this.post.composer.setPixelRatio(ratio);
+      this.post.setSize(window.innerWidth, window.innerHeight);
+    }
+    this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
+  }
+
+  /** Tone-mapping exposure multiplier (1.0 = the default look). */
+  setBrightness(mult: number): void {
+    this.webgl.toneMappingExposure = this.baseExposure * mult;
+  }
+
+  /** Resolution multiplier on top of the device pixel ratio (0.5..1). */
+  setRenderScale(scale: number): void {
+    this.renderScale = Math.min(1, Math.max(0.5, scale));
+    this.applyResolution();
   }
 
   // Visual reactions to sim events (called by the HUD for every event,
