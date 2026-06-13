@@ -447,6 +447,18 @@ function show(el: string): void {
   // Ensure the main view is switched to hero-view so play sub-panels are visible
   switchMainView('#hero-view');
 
+  const statsPanel = $('#project-stats-panel');
+  if (statsPanel) {
+    const shouldHideStats = el === '#charselect-panel' || el === '#offline-select';
+    statsPanel.toggleAttribute('hidden', shouldHideStats);
+  }
+
+  const logoImg = $('#title-logo');
+  if (logoImg) {
+    const shouldHideLogo = el === '#charselect-panel' || el === '#offline-select';
+    logoImg.toggleAttribute('hidden', shouldHideLogo);
+  }
+
   if (document.activeElement instanceof HTMLInputElement || document.activeElement instanceof HTMLTextAreaElement) {
     document.activeElement.blur();
   }
@@ -1064,6 +1076,20 @@ function translatePage(): void {
     const key = el.getAttribute('data-i18n');
     if (key) {
       el.textContent = t(key as any);
+    }
+  });
+
+  document.querySelectorAll('[data-i18n-aria]').forEach((el) => {
+    const key = el.getAttribute('data-i18n-aria');
+    if (key) {
+      el.setAttribute('aria-label', t(key as any));
+    }
+  });
+
+  document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    if (key) {
+      el.setAttribute('placeholder', t(key as any));
     }
   });
 }
