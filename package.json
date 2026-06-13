@@ -3,12 +3,21 @@
   "version": "0.1.0",
   "private": true,
   "license": "MIT",
+  "author": "spazman2c",
   "type": "module",
+  "main": "electron/main.cjs",
   "description": "World of Claudecraft — a WoW-Classic-style micro-MMO + headless RL training environment",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/spazman2c/world-of-claudecraft.git"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "electron:dev": "node scripts/electron-dev.mjs",
+    "electron:pack": "npm run build && electron-builder --dir",
+    "electron:build": "npm run build && electron-builder",
     "test": "vitest run",
     "build:env": "esbuild headless/env_server.ts --bundle --platform=node --format=cjs --outfile=dist-env/env_server.cjs",
     "env": "npm run build:env && node dist-env/env_server.cjs",
@@ -32,10 +41,50 @@
     "@types/pg": "^8.20.0",
     "@types/three": "^0.165.0",
     "@types/ws": "^8.18.1",
+    "electron": "^42.4.0",
+    "electron-builder": "^26.15.3",
     "esbuild": "^0.28.1",
     "puppeteer-core": "^25.1.0",
     "typescript": "^5.5.0",
     "vite": "^8.0.16",
     "vitest": "^4.1.8"
+  },
+  "build": {
+    "appId": "com.worldofclaudecraft.desktop",
+    "productName": "World of Claudecraft",
+    "icon": "build/icon.png",
+    "files": [
+      "dist/**",
+      "electron/**",
+      "build/icon.png",
+      "build/icon.ico",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "build",
+      "output": "release"
+    },
+    "mac": {
+      "category": "public.app-category.games",
+      "icon": "build/icon.icns",
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        "nsis"
+      ]
+    },
+    "linux": {
+      "category": "Game",
+      "icon": "build/icon.png",
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    }
   }
 }
