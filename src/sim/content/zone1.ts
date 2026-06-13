@@ -145,6 +145,14 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
 // ---------------------------------------------------------------------------
 
 export const ZONE1_NPCS: Record<string, NpcDef> = {
+  the_merchant: {
+    id: 'the_merchant', name: 'The Merchant', title: 'Keeper of the World Market',
+    // centerpiece of the square, just north of the well, facing the approach
+    pos: { x: 0, z: 9.5 }, facing: Math.PI, color: 0xd4af37,
+    questIds: [],
+    market: true,
+    greeting: 'Welcome to the World Market, $C. Buy from every adventurer in the realm — or set out your own wares and let coin find you.',
+  },
   marshal_redbrook: {
     id: 'marshal_redbrook', name: 'Marshal Redbrook', title: 'Town Marshal',
     pos: { x: 4, z: 6 }, facing: Math.PI, color: 0xb7950b,
@@ -462,6 +470,7 @@ export const ZONE1_PROPS: ZonePropsDef = {
   stalls: [
     { x: -8.5, z: 3, rot: Math.PI / 2, r: 1.7 },
     { x: 9.5, z: 17.5, rot: -2.7, r: 1.7 }, // Smith Haldren's smithy stall
+    { x: 0, z: 11.5, rot: Math.PI, r: 1.8 }, // The Merchant's World Market stall
   ],
   mines: [{ x: -88, z: -68, rot: 0.8 }],
   docks: [{ x: -64, z: 60, rot: -2.2, hutLocal: { x: 2.8, z: 2.4, hw: 1.7, hd: 1.5 } }],

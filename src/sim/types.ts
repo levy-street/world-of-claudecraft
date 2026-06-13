@@ -210,6 +210,9 @@ export interface NpcDef {
   color: number;
   questIds: string[];
   vendorItems?: string[];
+  // The Merchant: talking to this NPC opens the player-driven World Market
+  // (auction house) instead of a fixed vendor stock.
+  market?: boolean;
   greeting: string;
 }
 
