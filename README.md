@@ -131,6 +131,19 @@ locked out of the story.
 npm run dev        # open http://localhost:5173 -> Play Offline
 ```
 
+## Desktop app (Electron)
+
+```bash
+npm install
+npm run electron:dev     # Vite + Electron during development
+npm run electron:pack    # build an unpacked desktop app in dist/
+npm run electron:build   # build platform installers/packages in dist/
+```
+
+The Electron app packages the browser client and is ready for offline play.
+Online play still needs the authoritative game server and database running
+separately, just like the web build.
+
 Name your character, pick any of the nine classes, and you're in **Eastbrook
 Vale** (levels 1-7): a market town ringed by six hubs — wolf runs north, boar
 meadows east, the Webwood west, Mirror Lake northwest, a kobold copper dig
