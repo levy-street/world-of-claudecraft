@@ -13,7 +13,7 @@ import { Meters } from './meters';
 import { audio } from '../game/audio';
 import { music } from '../game/music';
 import { iconDataUrl, QUALITY_COLOR } from './icons';
-import { Keybinds, ACTION_SLOTS, isReservedCode, keyLabel } from '../game/keybinds';
+import { Keybinds, BIND_ACTIONS, BIND_CATEGORIES, isReservedCode, keyLabel } from '../game/keybinds';
 
 // hooks main wires after Input exists (the options menu drives both)
 export interface OptionsHooks {
@@ -43,7 +43,7 @@ export class Hud {
   private dragFromSlot: number | null = null;
   private optionsHooks: OptionsHooks | null = null;
   private optionsView: 'main' | 'keybinds' = 'main';
-  private capturingSlot: number | null = null; // action slot awaiting a key
+  private capturingKey: { action: string; index: number } | null = null; // binding awaiting a key
   private keybindNote = '';
   private chatLogEl = $('#chatlog');
   private combatLogEl = $('#combatlog');
@@ -300,7 +300,7 @@ export class Hud {
       label.className = 'icon-label';
       const kb = document.createElement('span');
       kb.className = 'keybind';
-      kb.textContent = this.keybinds.label(i); // rebindable; refreshKeybindLabels keeps it current
+      kb.textContent = this.keybinds.primaryLabel(`slot${i}`); // rebindable; refreshKeybindLabels keeps it current
       const cdOverlay = document.createElement('div');
       cdOverlay.className = 'cd-overlay';
       const cdText = document.createElement('div');
@@ -362,7 +362,7 @@ export class Hud {
   // Repaint the keycap on every action button from the current bindings.
   private refreshKeybindLabels(): void {
     for (let i = 0; i < this.abilityButtons.length; i++) {
-      this.abilityButtons[i].keybindEl.textContent = this.keybinds.label(i);
+      this.abilityButtons[i].keybindEl.textContent = this.keybinds.primaryLabel(`slot${i}`);
     }
   }
 
@@ -1689,7 +1689,7 @@ export class Hud {
   toggleOptionsMenu(): void {
     if (this.optionsOpen) { this.closeOptions(); return; }
     this.optionsView = 'main';
-    this.capturingSlot = null;
+    this.capturingKey = null;
     this.keybindNote = '';
     this.renderOptions();
     $('#options-menu').style.display = 'block';
@@ -1698,7 +1698,7 @@ export class Hud {
 
   closeOptions(): void {
     $('#options-menu').style.display = 'none';
-    this.capturingSlot = null;
+    this.capturingKey = null;
     this.hideTooltip();
   }
 
@@ -1722,44 +1722,58 @@ export class Hud {
     el.querySelector('[data-close]')?.addEventListener('click', () => this.closeOptions());
   }
 
-  // Label shown for an action slot in the rebind list: slot 0 is Attack, the
-  // rest show whatever ability currently occupies that bar slot.
-  private slotActionName(slot: number): string {
+  // Display name for an action row. Action-bar slots show the ability that
+  // currently occupies them (slot 0 is always Attack); everything else uses
+  // its registry label.
+  private actionDisplayName(actionId: string, fallback: string): string {
+    if (!actionId.startsWith('slot')) return fallback;
+    const slot = Number(actionId.slice(4));
     if (slot === 0) return 'Attack';
     const known = this.abilityForSlot(slot);
-    return known ? known.def.name : `Slot ${slot + 1}`;
+    return known ? known.def.name : fallback;
   }
 
   private renderKeybinds(): void {
     const el = $('#options-menu');
     el.innerHTML = `<div class="panel-title"><span>Key Bindings</span><span class="x-btn" data-close>✕</span></div>`;
-    const rows = document.createElement('div');
-    rows.className = 'kb-rows';
-    for (let slot = 0; slot < ACTION_SLOTS; slot++) {
-      const row = document.createElement('div');
-      row.className = 'kb-row';
-      const name = document.createElement('span');
-      name.className = 'kb-name';
-      name.textContent = this.slotActionName(slot);
-      const key = document.createElement('button');
-      key.className = 'btn kb-key' + (this.capturingSlot === slot ? ' capturing' : '');
-      key.textContent = this.capturingSlot === slot ? 'press a key…' : (this.keybinds.label(slot) || '—');
-      key.addEventListener('click', () => this.beginCapture(slot));
-      row.append(name, key);
-      rows.appendChild(row);
-    }
-    el.appendChild(rows);
     const note = document.createElement('div');
     note.className = 'kb-note';
-    note.textContent = this.keybindNote || 'Click a key, then press the key to bind. Esc cancels.';
+    note.textContent = this.keybindNote || 'Click a key cell, then press a key to bind it. Esc cancels. Each action has a primary and an alternate key.';
     el.appendChild(note);
+    const rows = document.createElement('div');
+    rows.className = 'kb-rows';
+    for (const category of BIND_CATEGORIES) {
+      const header = document.createElement('div');
+      header.className = 'kb-cat';
+      header.textContent = category;
+      rows.appendChild(header);
+      for (const action of BIND_ACTIONS.filter((a) => a.category === category)) {
+        const row = document.createElement('div');
+        row.className = 'kb-row';
+        const name = document.createElement('span');
+        name.className = 'kb-name';
+        name.textContent = this.actionDisplayName(action.id, action.label);
+        row.appendChild(name);
+        for (let index = 0; index < 2; index++) {
+          const capturing = this.capturingKey?.action === action.id && this.capturingKey?.index === index;
+          const key = document.createElement('button');
+          key.className = 'btn kb-key' + (capturing ? ' capturing' : '');
+          key.textContent = capturing ? '…' : (this.keybinds.labelAt(action.id, index) || '—');
+          key.title = index === 0 ? 'Primary' : 'Alternate';
+          key.addEventListener('click', () => this.beginCapture(action.id, index, action.label));
+          row.appendChild(key);
+        }
+        rows.appendChild(row);
+      }
+    }
+    el.appendChild(rows);
     const reset = document.createElement('button');
     reset.className = 'btn';
     reset.textContent = 'Reset to Defaults';
     reset.addEventListener('click', () => {
       audio.click();
       this.keybinds.reset();
-      this.capturingSlot = null;
+      this.capturingKey = null;
       this.keybindNote = 'Bindings reset to defaults.';
       this.refreshKeybindLabels();
       this.renderKeybinds();
@@ -1767,24 +1781,25 @@ export class Hud {
     const back = document.createElement('button');
     back.className = 'btn';
     back.textContent = 'Back';
-    back.addEventListener('click', () => { audio.click(); this.optionsView = 'main'; this.capturingSlot = null; this.renderOptions(); });
+    back.addEventListener('click', () => { audio.click(); this.optionsView = 'main'; this.capturingKey = null; this.renderOptions(); });
     el.append(reset, back);
     el.querySelector('[data-close]')?.addEventListener('click', () => this.closeOptions());
   }
 
-  private beginCapture(slot: number): void {
+  private beginCapture(actionId: string, index: number, fallbackLabel: string): void {
     if (!this.optionsHooks) return;
-    this.capturingSlot = slot;
-    this.keybindNote = `Press a key for "${this.slotActionName(slot)}"…`;
+    const name = this.actionDisplayName(actionId, fallbackLabel);
+    this.capturingKey = { action: actionId, index };
+    this.keybindNote = `Press a key for "${name}"…`;
     this.renderKeybinds();
     this.optionsHooks.captureKey((code) => {
-      this.capturingSlot = null;
+      this.capturingKey = null;
       if (code === null) {
         this.keybindNote = 'Rebinding cancelled.';
       } else if (isReservedCode(code)) {
-        this.keybindNote = `${keyLabel(code)} is reserved for movement and can't be bound.`;
-      } else if (this.keybinds.bind(slot, code)) {
-        this.keybindNote = `Bound "${this.slotActionName(slot)}" to ${keyLabel(code)}.`;
+        this.keybindNote = `${keyLabel(code)} is reserved and can't be bound.`;
+      } else if (this.keybinds.bind(actionId, index, code)) {
+        this.keybindNote = `Bound "${name}" to ${keyLabel(code)}.`;
         this.refreshKeybindLabels();
       }
       // re-render only if the menu is still open (player may have closed it)

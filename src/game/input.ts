@@ -4,7 +4,7 @@
 // (player-rebindable, see Keybinds), C/P/L/M/B windows, V nameplates,
 // F interacts, R autorun.
 
-import { Keybinds } from './keybinds';
+import { Keybinds, actionKind } from './keybinds';
 
 export interface InputCallbacks {
   onTab(): void;
@@ -61,30 +61,37 @@ export class Input {
     }
     const tag = (document.activeElement?.tagName ?? '').toLowerCase();
     if (tag === 'input' || tag === 'textarea') return;
-    const slot = this.keybinds.slotForCode(e.code);
-    if (slot !== null) {
-      this.cb.onAbility(slot);
+    // Escape always opens/closes the game menu — never rebindable
+    if (e.code === 'Escape') { this.cb.onUiKey('escape'); return; }
+    if (e.code === 'Tab') e.preventDefault(); // keep Tab from moving DOM focus in-game
+    const action = this.keybinds.actionForCode(e.code);
+    if (action === null) return;
+    if (actionKind(action) === 'held') {
+      // movement: just record the key; readMoveInput polls it each frame
+      this.keys.add(e.code);
+      if (action === 'forward' || action === 'back') this.autorun = false;
       return;
     }
-    switch (e.code) {
-      case 'Tab':
-        e.preventDefault();
-        this.cb.onTab();
-        return;
-      case 'KeyF': this.cb.onUiKey('interact'); return;
-      case 'KeyB': this.cb.onUiKey('bags'); return;
-      case 'KeyC': this.cb.onUiKey('char'); return;
-      case 'KeyP': this.cb.onUiKey('spellbook'); return;
-      case 'KeyL': this.cb.onUiKey('questlog'); return;
-      case 'KeyM': this.cb.onUiKey('map'); return;
-      case 'KeyV': this.cb.onUiKey('nameplates'); return;
-      case 'KeyN': this.cb.onUiKey('meters'); return;
-      case 'Enter': case 'NumpadEnter': this.cb.onUiKey('chat'); return;
-      case 'Escape': this.cb.onUiKey('escape'); return;
-      case 'NumLock': case 'KeyR': this.autorun = !this.autorun; return;
+    this.dispatchEdge(action);
+  }
+
+  // Fire a one-shot (edge) action by id. Action-bar slots route to onAbility;
+  // the rest map to the targeting/interface callbacks; autorun is internal.
+  private dispatchEdge(action: string): void {
+    if (action.startsWith('slot')) { this.cb.onAbility(Number(action.slice(4))); return; }
+    switch (action) {
+      case 'autorun': this.autorun = !this.autorun; return;
+      case 'target': this.cb.onTab(); return;
+      case 'interact': this.cb.onUiKey('interact'); return;
+      case 'bags': this.cb.onUiKey('bags'); return;
+      case 'char': this.cb.onUiKey('char'); return;
+      case 'spellbook': this.cb.onUiKey('spellbook'); return;
+      case 'questlog': this.cb.onUiKey('questlog'); return;
+      case 'map': this.cb.onUiKey('map'); return;
+      case 'nameplates': this.cb.onUiKey('nameplates'); return;
+      case 'meters': this.cb.onUiKey('meters'); return;
+      case 'chat': this.cb.onUiKey('chat'); return;
     }
-    this.keys.add(e.code);
-    if (['KeyW', 'KeyS', 'ArrowUp', 'ArrowDown'].includes(e.code)) this.autorun = false;
   }
 
   private onMouseDown(e: MouseEvent): void {
@@ -124,17 +131,19 @@ export class Input {
       return { forward: false, back: false, turnLeft: false, turnRight: false, strafeLeft: false, strafeRight: false, jump: false };
     }
     const k = this.keys;
+    const held = (id: string) => this.keybinds.codesForAction(id).some((c) => k.has(c));
     const bothButtons = this.leftDown && this.rightDown;
     const mouselook = this.rightDown;
-    const forward = k.has('KeyW') || k.has('ArrowUp') || bothButtons || this.autorun;
-    const back = k.has('KeyS') || k.has('ArrowDown');
-    const aHeld = k.has('KeyA') || k.has('ArrowLeft');
-    const dHeld = k.has('KeyD') || k.has('ArrowRight');
-    const strafeLeft = k.has('KeyQ') || (mouselook && aHeld);
-    const strafeRight = k.has('KeyE') || (mouselook && dHeld);
+    // A/D (turn) double as strafe while mouselooking, matching WoW; Q/E always strafe
+    const aHeld = held('turnLeft');
+    const dHeld = held('turnRight');
+    const forward = held('forward') || bothButtons || this.autorun;
+    const back = held('back');
+    const strafeLeft = held('strafeLeft') || (mouselook && aHeld);
+    const strafeRight = held('strafeRight') || (mouselook && dHeld);
     const turnLeft = !mouselook && aHeld;
     const turnRight = !mouselook && dHeld;
-    const jump = k.has('Space');
+    const jump = held('jump');
     return { forward, back, turnLeft, turnRight, strafeLeft, strafeRight, jump };
   }
 }

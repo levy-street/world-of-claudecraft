@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { Keybinds, isReservedCode, keyLabel } from '../src/game/keybinds';
+import {
+  Keybinds, BIND_ACTIONS, BIND_CATEGORIES, actionKind, isReservedCode, keyLabel,
+} from '../src/game/keybinds';
 
 // minimal localStorage stub (the test env is plain node, no DOM)
 function installStorage(): void {
@@ -17,94 +19,142 @@ beforeEach(() => installStorage());
 describe('keyLabel', () => {
   it('maps codes to short keycaps', () => {
     expect(keyLabel('Digit1')).toBe('1');
-    expect(keyLabel('Digit0')).toBe('0');
     expect(keyLabel('Minus')).toBe('-');
     expect(keyLabel('Equal')).toBe('=');
     expect(keyLabel('KeyR')).toBe('R');
     expect(keyLabel('F5')).toBe('F5');
     expect(keyLabel('Numpad3')).toBe('Num3');
     expect(keyLabel('Space')).toBe('Space');
+    expect(keyLabel('ArrowUp')).toBe('↑');
     expect(keyLabel(null)).toBe('');
   });
 });
 
+describe('registry', () => {
+  it('classifies movement as held and the rest as edge', () => {
+    expect(actionKind('forward')).toBe('held');
+    expect(actionKind('jump')).toBe('held');
+    expect(actionKind('autorun')).toBe('edge');
+    expect(actionKind('target')).toBe('edge');
+    expect(actionKind('slot0')).toBe('edge');
+    expect(actionKind('nope')).toBe(null);
+  });
+
+  it('covers the expected categories and 12 action-bar slots', () => {
+    expect(BIND_CATEGORIES).toContain('Movement');
+    expect(BIND_CATEGORIES).toContain('Action Bar');
+    expect(BIND_ACTIONS.filter((a) => a.category === 'Action Bar').length).toBe(12);
+  });
+});
+
 describe('reserved keys', () => {
-  it('flags movement/system keys', () => {
-    for (const c of ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'KeyQ', 'KeyE', 'Space', 'Tab', 'Escape', 'Enter']) {
-      expect(isReservedCode(c), c).toBe(true);
-    }
-    for (const c of ['Digit1', 'KeyR', 'F1', 'Minus']) {
+  it('reserves only Escape (everything else is rebindable now)', () => {
+    expect(isReservedCode('Escape')).toBe(true);
+    for (const c of ['KeyW', 'Space', 'Tab', 'Enter', 'Digit1', 'KeyR']) {
       expect(isReservedCode(c), c).toBe(false);
     }
   });
 });
 
-describe('Keybinds', () => {
-  it('starts on the default 1..0,-,= layout', () => {
+describe('Keybinds defaults', () => {
+  it('resolves default movement, system, and action-bar keys to actions', () => {
     const kb = new Keybinds();
-    expect(kb.codeForSlot(0)).toBe('Digit1');
-    expect(kb.label(0)).toBe('1'); // slot 0 = Attack, key "1"
-    expect(kb.codeForSlot(9)).toBe('Digit0');
-    expect(kb.label(10)).toBe('-');
-    expect(kb.label(11)).toBe('=');
-    expect(kb.slotForCode('Digit1')).toBe(0);
-    expect(kb.slotForCode('Equal')).toBe(11);
-    expect(kb.slotForCode('KeyZ')).toBe(null);
+    expect(kb.actionForCode('KeyW')).toBe('forward');
+    expect(kb.actionForCode('ArrowUp')).toBe('forward'); // secondary default
+    expect(kb.actionForCode('KeyD')).toBe('turnRight');
+    expect(kb.actionForCode('Space')).toBe('jump');
+    expect(kb.actionForCode('Tab')).toBe('target');
+    expect(kb.actionForCode('KeyB')).toBe('bags');
+    expect(kb.actionForCode('Digit1')).toBe('slot0'); // Attack
+    expect(kb.actionForCode('Equal')).toBe('slot11');
+    expect(kb.actionForCode('KeyJ')).toBe(null);
   });
 
-  it('binds a key to a slot, including the Attack slot', () => {
+  it('exposes primary/secondary codes and labels', () => {
     const kb = new Keybinds();
-    expect(kb.bind(0, 'KeyR')).toBe(true); // rebind Attack off "1"
-    expect(kb.slotForCode('KeyR')).toBe(0);
-    expect(kb.label(0)).toBe('R');
-    expect(kb.slotForCode('Digit1')).toBe(null); // its old key is now free
+    expect(kb.codeAt('forward', 0)).toBe('KeyW');
+    expect(kb.codeAt('forward', 1)).toBe('ArrowUp');
+    expect(kb.codesForAction('forward')).toEqual(['KeyW', 'ArrowUp']);
+    expect(kb.primaryLabel('slot0')).toBe('1');
+    expect(kb.labelAt('forward', 1)).toBe('↑');
+  });
+});
+
+describe('binding', () => {
+  it('rebinds the Attack slot off "1"', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('slot0', 0, 'KeyR')).toBe(true);
+    expect(kb.actionForCode('KeyR')).toBe('slot0');
+    expect(kb.primaryLabel('slot0')).toBe('R');
+    expect(kb.actionForCode('Digit1')).toBe(null); // old key freed
   });
 
-  it('rejects reserved keys and leaves the slot unchanged', () => {
+  it('rebinds a movement key', () => {
     const kb = new Keybinds();
-    expect(kb.bind(2, 'KeyW')).toBe(false);
-    expect(kb.codeForSlot(2)).toBe('Digit3'); // default intact
+    expect(kb.bind('jump', 0, 'KeyJ')).toBe(true);
+    expect(kb.actionForCode('KeyJ')).toBe('jump');
+    expect(kb.actionForCode('Space')).toBe(null);
   });
 
-  it('clears a conflicting binding from its old slot (no duplicates)', () => {
+  it('binds a secondary key without disturbing the primary', () => {
     const kb = new Keybinds();
-    // bind slot 3 to slot 0's default key
-    expect(kb.bind(3, 'Digit1')).toBe(true);
-    expect(kb.slotForCode('Digit1')).toBe(3);
-    expect(kb.codeForSlot(0)).toBe(null); // stolen from slot 0
+    expect(kb.bind('slot1', 1, 'KeyZ')).toBe(true);
+    expect(kb.codeAt('slot1', 0)).toBe('Digit2');
+    expect(kb.codeAt('slot1', 1)).toBe('KeyZ');
+    expect(kb.actionForCode('KeyZ')).toBe('slot1');
   });
 
-  it('clear() removes a slot binding', () => {
+  it('rejects the reserved Escape key', () => {
     const kb = new Keybinds();
-    kb.clear(4);
-    expect(kb.codeForSlot(4)).toBe(null);
-    expect(kb.label(4)).toBe('');
-    expect(kb.slotForCode('Digit5')).toBe(null);
+    expect(kb.bind('jump', 0, 'Escape')).toBe(false);
+    expect(kb.codeAt('jump', 0)).toBe('Space');
+  });
+
+  it('clears a conflicting code from another action (cross-category)', () => {
+    const kb = new Keybinds();
+    // steal W (forward's primary) for the bags window
+    expect(kb.bind('bags', 0, 'KeyW')).toBe(true);
+    expect(kb.actionForCode('KeyW')).toBe('bags');
+    expect(kb.codeAt('forward', 0)).toBe(null); // primary stolen
+    expect(kb.actionForCode('ArrowUp')).toBe('forward'); // alternate still drives forward
+  });
+
+  it('clear() removes one binding slot', () => {
+    const kb = new Keybinds();
+    kb.clear('forward', 1);
+    expect(kb.codesForAction('forward')).toEqual(['KeyW']);
+    expect(kb.actionForCode('ArrowUp')).toBe(null);
   });
 
   it('reset() restores defaults', () => {
     const kb = new Keybinds();
-    kb.bind(0, 'KeyR');
-    kb.clear(5);
+    kb.bind('slot0', 0, 'KeyR');
+    kb.clear('jump', 0);
     kb.reset();
-    expect(kb.codeForSlot(0)).toBe('Digit1');
-    expect(kb.codeForSlot(5)).toBe('Digit6');
+    expect(kb.actionForCode('Digit1')).toBe('slot0');
+    expect(kb.actionForCode('Space')).toBe('jump');
   });
+});
 
-  it('persists across instances', () => {
+describe('persistence', () => {
+  it('round-trips bindings across instances', () => {
     const a = new Keybinds();
-    a.bind(0, 'KeyR');
-    a.bind(1, 'KeyF');
-    const b = new Keybinds(); // reloads from the same storage
-    expect(b.slotForCode('KeyR')).toBe(0);
-    expect(b.slotForCode('KeyF')).toBe(1);
+    a.bind('slot0', 0, 'KeyR');
+    a.bind('jump', 0, 'KeyJ');
+    const b = new Keybinds();
+    expect(b.actionForCode('KeyR')).toBe('slot0');
+    expect(b.actionForCode('KeyJ')).toBe('jump');
+    expect(b.actionForCode('Space')).toBe(null);
   });
 
   it('drops duplicate codes when loading corrupt storage', () => {
-    // two slots claim the same code — the later one must lose it on load
-    localStorage.setItem('woc_keybinds', JSON.stringify(['KeyR', 'KeyR', 'Digit3']));
+    // two actions claim KeyR — the later one must lose it on load
+    localStorage.setItem('woc_keybinds', JSON.stringify({
+      slot0: ['KeyR', null],
+      slot1: ['KeyR', null],
+    }));
     const kb = new Keybinds();
-    expect(kb.slotForCode('KeyR')).toBe(0); // first wins
-    expect(kb.codeForSlot(1)).toBe(null); // duplicate dropped
+    expect(kb.actionForCode('KeyR')).toBe('slot0');
+    expect(kb.codeAt('slot1', 0)).toBe(null);
   });
 });
