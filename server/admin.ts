@@ -135,6 +135,9 @@ export async function handleAdminApi(
     if (path === '/admin/api/online') {
       return ok(res, { players: game.liveSessions() });
     }
+    if (path === '/admin/api/world-map') {
+      return ok(res, game.worldMap());
+    }
     if (path === '/admin/api/activity') {
       const [registrations, sessions, classes, levels] = await Promise.all([
         registrationsByDay(ACTIVITY_WINDOW_DAYS),

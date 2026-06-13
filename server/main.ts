@@ -228,6 +228,9 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const characters = accountId !== null ? await characterCountsByRealm(accountId) : {};
       return json(res, 200, { current: REALM, realms: REALM_DIRECTORY, characters });
     }
+    if (req.method === 'GET' && url === '/api/world-map') {
+      return json(res, 200, game.publicWorldMap());
+    }
     if (req.method === 'GET' && url === '/api/search') {
       const accountId = await bearerAccount(req);
       if (accountId === null) return json(res, 401, { error: 'not authenticated' });

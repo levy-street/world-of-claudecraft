@@ -70,6 +70,14 @@ const fakeGame: any = {
     simEntities: 40, rssBytes: 1, heapUsedBytes: 1,
   }),
   liveSessions: () => [],
+  worldMap: () => ({
+    realm: 'test',
+    generatedAt: 1,
+    bounds: { minX: -1, maxX: 1, minZ: -1, maxZ: 1 },
+    zones: [],
+    dungeons: [],
+    players: [],
+  }),
   liveAccountIds: () => new Set([9]),
   disconnectAccount: vi.fn(),
 };

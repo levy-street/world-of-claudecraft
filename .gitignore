@@ -6,6 +6,7 @@ dist/
 dist-env/
 dist-server/
 media-cache/
+release/
 
 # test artifacts & screenshots
 tmp/

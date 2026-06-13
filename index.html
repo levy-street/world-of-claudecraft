@@ -640,6 +640,181 @@
   }
   .social-link svg { display: block; }
 
+  .live-map-open-link svg {
+    width: 17px;
+    height: 17px;
+    flex: none;
+  }
+
+  #live-map-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 220;
+    display: none;
+    padding: clamp(12px, 2vw, 26px);
+    background:
+      radial-gradient(circle at 28% 16%, rgba(255, 209, 0, 0.09), transparent 28%),
+      linear-gradient(180deg, rgba(6, 7, 12, 0.96), rgba(3, 4, 6, 0.98));
+    color: var(--color-text-light);
+  }
+  #live-map-overlay.open { display: grid; }
+  .live-map-shell {
+    width: min(1280px, 100%);
+    height: min(900px, 100%);
+    min-height: 0;
+    justify-self: center;
+    align-self: center;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 12px;
+    padding: 14px;
+    border: 2px solid var(--border);
+    outline: 1px solid #000;
+    border-radius: var(--radius-md);
+    background: var(--panel-bg);
+    box-shadow: 0 18px 50px #000e, inset 0 1px 0 #ffffff12;
+  }
+  .live-map-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    border-bottom: 1px solid rgba(111, 90, 42, 0.7);
+    padding-bottom: 10px;
+  }
+  .live-map-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+  .live-map-title svg { width: 25px; height: 25px; color: var(--color-primary); }
+  .live-map-title h2 {
+    font-family: var(--font-heading);
+    color: var(--color-primary);
+    font-size: clamp(20px, 2.4vw, 30px);
+    line-height: 1;
+    text-shadow: 1px 1px 2px #000;
+  }
+  #live-map-stamp {
+    color: var(--color-text-muted);
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  #live-map-close {
+    width: 34px;
+    height: 34px;
+    margin: 0;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .live-map-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+    gap: 12px;
+    min-height: 0;
+  }
+  .live-map-board {
+    min-height: 0;
+    border: 1px solid rgba(111, 90, 42, 0.85);
+    border-radius: var(--radius-sm);
+    background: #030407;
+    box-shadow: inset 0 0 20px #000b;
+    overflow: hidden;
+  }
+  #live-map-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+    touch-action: none;
+  }
+  #live-map-canvas.dragging {
+    cursor: grabbing;
+  }
+  .live-map-panel {
+    min-height: 0;
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr);
+    gap: 10px;
+  }
+  .live-map-kpis {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .live-map-kpis div,
+  .live-map-zones span {
+    border: 1px solid rgba(111, 90, 42, 0.8);
+    border-radius: var(--radius-sm);
+    background: rgba(8, 8, 13, 0.78);
+    padding: 8px;
+  }
+  .live-map-kpis b {
+    display: block;
+    color: var(--color-primary);
+    font-family: var(--font-heading);
+    font-size: 23px;
+    line-height: 1;
+  }
+  .live-map-kpis span,
+  .live-map-zones span,
+  .live-map-player small {
+    color: var(--color-text-muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .live-map-zones {
+    display: grid;
+    gap: 6px;
+  }
+  .live-map-zones span {
+    display: flex;
+    justify-content: space-between;
+    text-transform: none;
+  }
+  .live-map-zones b { color: var(--color-primary); }
+  #live-map-roster {
+    min-height: 0;
+    overflow: auto;
+    padding-right: 2px;
+  }
+  .live-map-player {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) minmax(96px, auto);
+    align-items: center;
+    gap: 9px;
+    padding: 8px 2px;
+    border-bottom: 1px solid rgba(111, 90, 42, 0.35);
+  }
+  .live-map-player strong,
+  .live-map-player span {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .live-map-player strong { color: #fff5d5; font-size: 13px; }
+  .live-map-player > div:last-child { text-align: right; min-width: 0; }
+  .live-map-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--dot, var(--color-primary));
+    border: 1px solid #050507;
+    box-shadow: 0 0 8px var(--dot, var(--color-primary));
+  }
+  #live-map-error,
+  .live-map-empty {
+    color: var(--color-text-error);
+    font-size: 12px;
+    min-height: 16px;
+  }
+  .live-map-empty { color: var(--color-text-muted); }
+
   /* ---------- loading screen (entering the world) ---------- */
   #loading-screen {
     position: absolute;
@@ -1950,6 +2125,9 @@
     .community-link { height: 32px; }
     .community-link svg { width: 17px; height: 17px; }
     #quest-tracker { top: 260px; right: 12px; width: 190px; }
+    .live-map-body { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr) minmax(220px, 34vh); }
+    .live-map-shell { padding: 10px; }
+    .live-map-title h2 { font-size: 20px; }
   }
 </style>
 </head>
@@ -2308,8 +2486,35 @@
         <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M20.32 4.37A19.8 19.8 0 0 0 15.36 2.8a13.66 13.66 0 0 0-.64 1.32 18.47 18.47 0 0 0-5.45 0 13.02 13.02 0 0 0-.65-1.32 19.73 19.73 0 0 0-4.96 1.58C.53 9.03-.32 13.56.1 18.02a19.9 19.9 0 0 0 6.08 3.08c.49-.67.93-1.38 1.3-2.13-.72-.27-1.41-.6-2.06-.98.17-.13.34-.26.5-.4a14.16 14.16 0 0 0 12.16 0c.16.14.33.27.5.4-.65.39-1.34.72-2.07.99.38.74.81 1.45 1.31 2.12a19.86 19.86 0 0 0 6.08-3.08c.5-5.17-.85-9.66-3.58-13.65ZM8.02 15.28c-1.18 0-2.15-1.08-2.15-2.41 0-1.33.95-2.42 2.15-2.42 1.2 0 2.17 1.1 2.15 2.42 0 1.33-.95 2.41-2.15 2.41Zm7.96 0c-1.18 0-2.15-1.08-2.15-2.41 0-1.33.95-2.42 2.15-2.42 1.2 0 2.17 1.1 2.15 2.42 0 1.33-.95 2.41-2.15 2.41Z"/></svg>
         <span>Join the Discord</span>
       </a>
+      <a class="social-link live-map-open-link" href="/api/world-map" data-live-map-open>
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M15 6.1 9 3.9 3.8 6A1.25 1.25 0 0 0 3 7.16v12.18c0 .89.9 1.49 1.72 1.14L9 18.72l6 2.18 5.2-2.08c.48-.19.8-.65.8-1.16V5.48c0-.89-.9-1.49-1.72-1.14L15 6.1Zm-1.25 12.02-3.5-1.27V6.78l3.5 1.27v10.07Zm2.5-9.97 2.25-.9v9.56l-2.25.9V8.15Zm-10.75-.5 2.25-.9v9.56l-2.25.9V7.65Z"/></svg>
+        <span>Live Map</span>
+      </a>
     </div>
   </main>
+
+  <div id="live-map-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="live-map-heading">
+    <div class="live-map-shell">
+      <div class="live-map-head">
+        <div class="live-map-title">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M15 6.1 9 3.9 3.8 6A1.25 1.25 0 0 0 3 7.16v12.18c0 .89.9 1.49 1.72 1.14L9 18.72l6 2.18 5.2-2.08c.48-.19.8-.65.8-1.16V5.48c0-.89-.9-1.49-1.72-1.14L15 6.1Zm-1.25 12.02-3.5-1.27V6.78l3.5 1.27v10.07Zm2.5-9.97 2.25-.9v9.56l-2.25.9V8.15Zm-10.75-.5 2.25-.9v9.56l-2.25.9V7.65Z"/></svg>
+          <h2 id="live-map-heading">Live Realm Map</h2>
+        </div>
+        <div id="live-map-stamp">Connecting...</div>
+        <button type="button" class="btn" id="live-map-close" aria-label="Close live map">&times;</button>
+      </div>
+      <div class="live-map-body">
+        <div class="live-map-board">
+          <canvas id="live-map-canvas" width="900" height="1080"></canvas>
+        </div>
+        <aside class="live-map-panel" aria-label="Live players">
+          <div id="live-map-summary"></div>
+          <div id="live-map-error"></div>
+          <div id="live-map-roster"></div>
+        </aside>
+      </div>
+    </div>
+  </div>
 
   <div id="loading-screen">
     <img class="ls-logo" src="/worldofclaudecraft-logo.png" alt="World of Claudecraft" />

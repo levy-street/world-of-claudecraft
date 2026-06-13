@@ -31,10 +31,41 @@ export interface LivePlayer {
   hp: number;
   maxHp: number;
   x: number;
+  y: number;
   z: number;
+  facing: number;
+  realm: string;
   zone: string;
+  status: 'online' | 'combat' | 'dungeon' | 'dead';
+  inDungeon: boolean;
+  dungeonId: string | null;
+  dungeonName: string | null;
+  mapX: number;
+  mapZ: number;
   sessionSeconds: number;
   lastSaveSecondsAgo: number;
+}
+
+export interface WorldMapZone {
+  id: string;
+  name: string;
+  zMin: number;
+  zMax: number;
+  levelRange: [number, number];
+  biome: string;
+  hub: { x: number; z: number; radius: number; name: string };
+  graveyard: { x: number; z: number };
+  lakes: { x: number; z: number; radius: number }[];
+  pois: { x: number; z: number; label: string }[];
+}
+
+export interface WorldMapData {
+  realm: string;
+  generatedAt: number;
+  bounds: { minX: number; maxX: number; minZ: number; maxZ: number };
+  zones: WorldMapZone[];
+  dungeons: { id: string; name: string; doorPos: { x: number; z: number }; suggestedPlayers: number }[];
+  players: LivePlayer[];
 }
 
 export interface Activity {
