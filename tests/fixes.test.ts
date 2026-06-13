@@ -23,6 +23,8 @@ function teleportTo(sim: Sim, x: number, z: number, pid?: number) {
 describe('quest lifecycle', () => {
   it('a turned-in quest cannot be accepted again', () => {
     const sim = makeSim();
+    const redbrook = [...sim.entities.values()].find((e) => e.templateId === 'marshal_redbrook')!;
+    teleportTo(sim, redbrook.pos.x + 2, redbrook.pos.z + 2);
     sim.acceptQuest('q_wolves');
     expect(sim.questState('q_wolves')).toBe('active');
 
@@ -30,8 +32,6 @@ describe('quest lifecycle', () => {
     qp.counts[0] = 8;
     qp.state = 'ready';
 
-    const redbrook = [...sim.entities.values()].find((e) => e.templateId === 'marshal_redbrook')!;
-    teleportTo(sim, redbrook.pos.x + 2, redbrook.pos.z + 2);
     sim.turnInQuest('q_wolves');
     expect(sim.questState('q_wolves')).toBe('done');
     expect(sim.questLog.has('q_wolves')).toBe(false);

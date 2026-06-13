@@ -465,6 +465,19 @@ describe('food, drink, vendor', () => {
     expect(sim.copper).toBe(79);
     expect(sim.countItem('wolf_fang')).toBe(1);
   });
+
+  it('vendor buy rejects stale or invalid merchants with feedback', () => {
+    const sim = makeSim('warrior');
+    const wilkes = [...sim.entities.values()].find((e) => e.templateId === 'trader_wilkes')!;
+    teleportTo(sim, wilkes.pos.x + 40, wilkes.pos.z);
+    sim.copper = 100;
+    sim.events = [];
+
+    sim.buyItem(wilkes.id, 'baked_bread');
+
+    expect(sim.countItem('baked_bread')).toBe(0);
+    expect(sim.events).toContainEqual({ type: 'error', text: 'Too far away.', pid: sim.player.id });
+  });
 });
 
 describe('leveling', () => {
@@ -524,6 +537,22 @@ describe('quests', () => {
     sim.interact();
     expect(sim.questState('q_boars')).toBe('done');
     expect(sim.countItem('boar_hide')).toBe(0);
+  });
+
+  it('quest accept and turn-in reject stale out-of-range dialogs with feedback', () => {
+    const sim = makeSim('warrior');
+    teleportTo(sim, 0, -40);
+    sim.events = [];
+
+    sim.acceptQuest('q_wolves');
+    expect(sim.questState('q_wolves')).toBe('available');
+    expect(sim.events).toContainEqual({ type: 'error', text: 'Too far away.', pid: sim.player.id });
+
+    sim.events = [];
+    sim.questLog.set('q_wolves', { questId: 'q_wolves', counts: [8], state: 'ready' });
+    sim.turnInQuest('q_wolves');
+    expect(sim.questState('q_wolves')).toBe('ready');
+    expect(sim.events).toContainEqual({ type: 'error', text: 'Too far away.', pid: sim.player.id });
   });
 
   it('ground objects can only be picked up with the quest active', () => {

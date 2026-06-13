@@ -1022,9 +1022,8 @@ export class GameServer {
     }
   }
 
-  // the web client applies quest commands optimistically; force the next
-  // snapshot to carry quest state even when the command changed nothing,
-  // so a rejected command still converges back to the server's truth
+  // force the next snapshot to carry quest state even when a quest command
+  // changed nothing, so stale client UI converges back to the server's truth
   private resyncQuests(session: ClientSession): void {
     delete session.lastSent.qlog;
     delete session.lastSent.qdone;

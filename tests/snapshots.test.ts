@@ -55,6 +55,7 @@ function bareClient(pid: number): ClientWorld {
   c.known = [];
   c.questLog = new Map();
   c.questsDone = new Set();
+  c.pendingQuestCommands = new Map();
   c.partyInfo = null;
   c.tradeInfo = null;
   c.duelInfo = null;
@@ -134,8 +135,8 @@ describe('delta snapshots', () => {
     broadcast(server);
     fc.sent.length = 0;
     // unknown quest: the sim rejects it and quest state does not change, but
-    // the next snapshot must still carry quest fields so the client's
-    // optimistic update converges back to the server's truth
+    // the next snapshot must still carry quest fields so stale client UI
+    // converges back to the server's truth
     server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'accept', quest: 'no_such_quest' }));
     broadcast(server);
     const snap = lastSnap(fc.sent);
@@ -221,6 +222,30 @@ describe('chat moderation', () => {
 });
 
 describe('client-side delta merge', () => {
+  it('does not apply optimistic quest accept or completion state', () => {
+    const client = bareClient(1);
+    const sent: any[] = [];
+    (client as any).ws = { readyState: 1, send: (payload: string) => sent.push(JSON.parse(payload)) };
+    const oldWebSocket = (globalThis as any).WebSocket;
+    (globalThis as any).WebSocket = { OPEN: 1 };
+    try {
+      client.acceptQuest('q_wolves');
+      expect(client.questLog.has('q_wolves')).toBe(false);
+      expect(client.questState('q_wolves')).toBe('active');
+      expect(sent).toContainEqual({ t: 'cmd', cmd: 'accept', quest: 'q_wolves' });
+
+      (client as any).pendingQuestCommands.clear();
+      client.questLog.set('q_wolves', { questId: 'q_wolves', counts: [8], state: 'ready' });
+      client.turnInQuest('q_wolves');
+      expect(client.questLog.has('q_wolves')).toBe(true);
+      expect(client.questsDone.has('q_wolves')).toBe(false);
+      expect(client.questState('q_wolves')).toBe('active');
+      expect(sent).toContainEqual({ t: 'cmd', cmd: 'turnin', quest: 'q_wolves' });
+    } finally {
+      (globalThis as any).WebSocket = oldWebSocket;
+    }
+  });
+
   it('keeps previous structures when delta fields are omitted', () => {
     const server = new GameServer();
     const fc = fakeWs();

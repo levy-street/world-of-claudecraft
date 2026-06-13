@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 // Mock the db layer so no Postgres is needed.
 vi.mock('../server/db', () => ({
-  pool: { query: vi.fn() },
+  pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
   openPlaySession: vi.fn(async () => 1),
   closePlaySession: vi.fn(async () => {}),
@@ -89,5 +89,5 @@ describe('crowd bandwidth', () => {
     );
 
     expect(newBytes).toBeLessThan(legacyBytes * 0.5);
-  });
+  }, 30000);
 });

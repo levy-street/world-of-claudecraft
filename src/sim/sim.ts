@@ -2697,7 +2697,12 @@ export class Sim {
     const { meta, e: p } = r;
     const npc = this.entities.get(npcId);
     const def = ITEMS[itemId];
-    if (!npc || npc.kind !== 'npc' || !npc.vendorItems.includes(itemId) || !def?.buyValue) return;
+    if (!npc || npc.kind !== 'npc' || npc.vendorItems.length === 0) {
+      this.error(meta.entityId, 'That merchant is not available.');
+      return;
+    }
+    if (!npc.vendorItems.includes(itemId)) { this.error(meta.entityId, 'That item is not sold here.'); return; }
+    if (!def?.buyValue) { this.error(meta.entityId, 'That item is not for sale.'); return; }
     if (dist2d(p.pos, npc.pos) > INTERACT_RANGE + 2) { this.error(meta.entityId, 'Too far away.'); return; }
     if (meta.copper < def.buyValue) { this.error(meta.entityId, 'Not enough money.'); return; }
     meta.copper -= def.buyValue;
@@ -2710,7 +2715,8 @@ export class Sim {
     if (!r) return;
     const { meta, e: p } = r;
     const def = ITEMS[itemId];
-    if (!def || this.countItem(itemId, meta.entityId) <= 0 || p.dead) return;
+    if (!def || this.countItem(itemId, meta.entityId) <= 0) { this.error(meta.entityId, "You don't have that item."); return; }
+    if (p.dead) { this.error(meta.entityId, "You can't do that while dead."); return; }
     // mirror buyItem's gate: selling requires a vendor in interact range
     const nearVendor = [...this.entities.values()].some((e) =>
       e.kind === 'npc' && e.vendorItems.length > 0 && dist2d(p.pos, e.pos) <= INTERACT_RANGE + 2);
@@ -2855,12 +2861,30 @@ export class Sim {
     return computeQuestState(questId, r.meta.questLog, r.meta.questsDone, r.e.level);
   }
 
+  private questNpcFor(questId: string, role: 'giver' | 'turnIn', p: Entity): { npc: Entity | null; tooFar: boolean } {
+    const quest = QUESTS[questId];
+    const templateId = role === 'giver' ? quest.giverNpcId : quest.turnInNpcId;
+    let sawNpc = false;
+    for (const e of this.entities.values()) {
+      if (e.kind !== 'npc' || e.templateId !== templateId) continue;
+      sawNpc = true;
+      if (dist2d(p.pos, e.pos) <= INTERACT_RANGE + 2) return { npc: e, tooFar: false };
+    }
+    return { npc: null, tooFar: sawNpc };
+  }
+
   acceptQuest(questId: string, pid?: number): void {
     const r = this.resolve(pid);
     if (!r) return;
-    const { meta } = r;
-    if (this.questState(questId, meta.entityId) !== 'available') return;
     const quest = QUESTS[questId];
+    const { meta, e: p } = r;
+    if (!quest) { this.error(meta.entityId, 'That quest is not available.'); return; }
+    if (this.questState(questId, meta.entityId) !== 'available') { this.error(meta.entityId, 'That quest is not available.'); return; }
+    const nearby = this.questNpcFor(questId, 'giver', p);
+    if (!nearby.npc) {
+      this.error(meta.entityId, nearby.tooFar ? 'Too far away.' : 'That quest giver is not nearby.');
+      return;
+    }
     meta.questLog.set(questId, { questId, counts: quest.objectives.map(() => 0), state: 'active' });
     this.emit({ type: 'questAccepted', questId, pid: meta.entityId });
     this.emit({ type: 'log', text: `Quest accepted: ${quest.name}`, color: '#ff0', pid: meta.entityId });
@@ -2880,11 +2904,16 @@ export class Sim {
     const r = this.resolve(pid);
     if (!r) return;
     const { meta, e: p } = r;
-    const qp = meta.questLog.get(questId);
-    if (!qp || qp.state !== 'ready') return;
     const quest = QUESTS[questId];
-    const npc = [...this.entities.values()].find((e) => e.kind === 'npc' && e.templateId === quest.turnInNpcId);
-    if (!npc || dist2d(p.pos, npc.pos) > INTERACT_RANGE + 2) { this.error(meta.entityId, 'Too far away.'); return; }
+    if (!quest) { this.error(meta.entityId, 'That quest is not available.'); return; }
+    const qp = meta.questLog.get(questId);
+    if (!qp) { this.error(meta.entityId, 'That quest is not in your log.'); return; }
+    if (qp.state !== 'ready') { this.error(meta.entityId, 'That quest is not complete.'); return; }
+    const nearby = this.questNpcFor(questId, 'turnIn', p);
+    if (!nearby.npc) {
+      this.error(meta.entityId, nearby.tooFar ? 'Too far away.' : 'That quest turn-in is not nearby.');
+      return;
+    }
 
     for (const obj of quest.objectives) {
       if (obj.type === 'collect' && obj.itemId) this.removeItem(obj.itemId, obj.count, meta.entityId);
