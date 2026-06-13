@@ -4,7 +4,7 @@ import type { IWorld } from '../world_api';
 import { groundHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 import {
   MOBS, ABILITIES, DUNGEON_X_THRESHOLD, DUNGEON_LIST, QUESTS,
-  instanceOrigin, INSTANCE_SLOT_COUNT,
+  instanceOrigin, INSTANCE_SLOT_COUNT, BG_SLOT_COUNT, battlegroundOrigin, isBgPos,
 } from '../sim/data';
 import type { BiomeId } from '../sim/types';
 import { AnimState, CharacterVisual, createCharacterVisual } from './characters';
@@ -407,6 +407,10 @@ export class Renderer {
   private crateMat: THREE.Material | null = null;
   private crateLidMat: THREE.Material | null = null;
   private sparkleMat: THREE.SpriteMaterial | null = null;
+  // Ravenrift flag/rune objects (shared caches; survive interest churn)
+  private bgPoleMat: THREE.Material | null = null;
+  private bgFlagMats = new Map<number, THREE.Material>();
+  private bgRuneMat: THREE.MeshBasicMaterial | null = null;
 
   private createView(e: Entity): void {
     const group = new THREE.Group();
@@ -471,6 +475,49 @@ export class Renderer {
       const glow = new THREE.PointLight(tint, 9, 15, 2);
       glow.position.y = 2.4;
       body!.add(glow);
+      objectMesh = body!;
+    } else if (e.kind === 'object' && e.templateId === 'bg_flag') {
+      // capture-the-flag banner: pole + team-coloured pennant, carried by runners
+      body = new THREE.Group();
+      height = 4.4;
+      this.bgPoleMat ??= new THREE.MeshLambertMaterial({ color: 0x4a3a2a });
+      const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 4.2, 6), this.bgPoleMat);
+      pole.position.y = 2.1;
+      pole.castShadow = !this.lowGfx;
+      body!.add(pole);
+      let clothMat = this.bgFlagMats.get(e.color);
+      if (!clothMat) {
+        const m = new THREE.MeshBasicMaterial({ color: e.color, side: THREE.DoubleSide });
+        if (!this.lowGfx) m.color.multiplyScalar(1.4); // pop against the field via bloom
+        this.bgFlagMats.set(e.color, m);
+        clothMat = m;
+      }
+      const cloth = new THREE.Mesh(new THREE.PlaneGeometry(1.9, 1.25), clothMat);
+      cloth.position.set(0.95, 3.45, 0);
+      body!.add(cloth);
+      objectMesh = body!;
+    } else if (e.kind === 'object' && e.templateId === 'bg_rune') {
+      // speed powerup: a glowing ground glyph with a hovering ring
+      body = new THREE.Group();
+      height = 1.4;
+      if (!this.bgRuneMat) {
+        this.bgRuneMat = new THREE.MeshBasicMaterial({
+          color: e.color, transparent: true, opacity: 0.85, side: THREE.DoubleSide,
+          blending: THREE.AdditiveBlending, depthWrite: false,
+        });
+        if (!this.lowGfx) this.bgRuneMat.color.multiplyScalar(2);
+      }
+      const disc = new THREE.Mesh(new THREE.CircleGeometry(1.2, 22).rotateX(-Math.PI / 2), this.bgRuneMat);
+      disc.position.y = 0.12;
+      body!.add(disc);
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(0.75, 0.13, 8, 18).rotateX(-Math.PI / 2), this.bgRuneMat);
+      ring.position.y = 0.85;
+      body!.add(ring);
+      if (!this.lowGfx) {
+        const l = new THREE.PointLight(e.color, 6, 9, 2);
+        l.position.y = 1.1;
+        body!.add(l);
+      }
       objectMesh = body!;
     } else if (e.kind === 'object') {
       body = new THREE.Group();
@@ -586,11 +633,16 @@ export class Renderer {
   // ---------------------------------------------------------------------
 
   private builtInteriors = new Set<string>();
-  private fogState: 'outdoor' | 'dungeon' | 'underwater' = 'outdoor';
+  private fogState: 'outdoor' | 'dungeon' | 'underwater' | 'battleground' = 'outdoor';
 
   private buildInterior(interior: string, ox: number, oz: number): void {
     this.dungeons ??= new DungeonInteriors(this.scene, this.lowGfx, this.flames, this.fireLights);
     this.dungeons.buildInterior(interior, ox, oz);
+  }
+
+  private buildBg(ox: number, oz: number): void {
+    this.dungeons ??= new DungeonInteriors(this.scene, this.lowGfx, this.flames, this.fireLights);
+    this.dungeons.buildBattleground(ox, oz);
   }
 
   // Outdoor fog presets per biome (high tier eases between them as the
@@ -607,8 +659,21 @@ export class Renderer {
   }
 
   private updateAmbience(px: number, camY: number, dt: number): void {
-    const inside = px > DUNGEON_X_THRESHOLD;
-    if (inside) {
+    const inBg = isBgPos(px);
+    const inside = px > DUNGEON_X_THRESHOLD && !inBg;
+    if (inBg) {
+      // build the Ravenrift battleground the player was matched into
+      const pz = this.sim.player.pos.z;
+      for (let i = 0; i < BG_SLOT_COUNT; i++) {
+        const key = `bg:${i}`;
+        if (this.builtInteriors.has(key)) continue;
+        const o = battlegroundOrigin(i);
+        if (Math.abs(px - o.x) < 220 && Math.abs(pz - o.z) < 200) {
+          this.builtInteriors.add(key);
+          this.buildBg(o.x, o.z);
+        }
+      }
+    } else if (inside) {
       // build the interior copy the player is standing in
       for (const dungeon of DUNGEON_LIST) {
         for (let i = 0; i < INSTANCE_SLOT_COUNT; i++) {
@@ -622,7 +687,9 @@ export class Renderer {
         }
       }
     }
-    const desired = inside ? 'dungeon' : camY < WATER_LEVEL - 0.05 ? 'underwater' : 'outdoor';
+    const desired = inBg ? 'battleground'
+      : inside ? 'dungeon'
+        : camY < WATER_LEVEL - 0.05 ? 'underwater' : 'outdoor';
     const fog = this.scene.fog as THREE.Fog;
     if (desired !== this.fogState) {
       this.fogState = desired;
@@ -634,6 +701,11 @@ export class Renderer {
         fog.color.setHex(0x17506e);
         fog.near = 2;
         fog.far = 48;
+      } else if (desired === 'battleground') {
+        // open-air, but a close haze hides the off-world void past the ramparts
+        fog.color.setHex(0xaecbe0);
+        fog.near = 50;
+        fog.far = 185;
       } else {
         const preset = this.outdoorFogPreset();
         fog.color.setHex(preset.color);

@@ -161,6 +161,40 @@ export async function isAdminAccount(accountId: number): Promise<boolean> {
 }
 
 // ---------------------------------------------------------------------------
+// Ravenrift 5v5 rankings: the all-time ladder. Ratings/records live inside each
+// character's state JSONB (no schema migration needed); only characters who
+// have actually played a match appear.
+// ---------------------------------------------------------------------------
+
+export interface SquadLeaderRow {
+  name: string;
+  class: PlayerClass;
+  level: number;
+  rating: number;
+  wins: number;
+  losses: number;
+}
+
+export async function topSquadRatings(limit = 20): Promise<SquadLeaderRow[]> {
+  const res = await pool.query(
+    `SELECT name, class, level,
+            COALESCE((state->>'squadRating')::int, 1500) AS rating,
+            COALESCE((state->>'squadWins')::int, 0)     AS wins,
+            COALESCE((state->>'squadLosses')::int, 0)   AS losses
+       FROM characters
+      WHERE state IS NOT NULL
+        AND COALESCE((state->>'squadWins')::int, 0) + COALESCE((state->>'squadLosses')::int, 0) > 0
+      ORDER BY rating DESC, wins DESC, name ASC
+      LIMIT $1`,
+    [Math.max(1, Math.min(100, limit))],
+  );
+  return res.rows.map((r) => ({
+    name: r.name, class: r.class, level: r.level,
+    rating: Number(r.rating), wins: Number(r.wins), losses: Number(r.losses),
+  }));
+}
+
+// ---------------------------------------------------------------------------
 // Play sessions: one row per character login, closed on logout. Powers the
 // admin dashboard's playtime / DAU / sessions-per-day metrics.
 // ---------------------------------------------------------------------------

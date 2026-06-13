@@ -306,6 +306,47 @@
 
   /* map */
   #map-window { left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 14px; }
+
+  /* ---------- Ravenrift (5v5 capture the flag) ---------- */
+  .bg-sub { font-family: var(--title-font); color: var(--gold); font-size: 12px; margin: 12px 0 5px; border-bottom: 1px solid #463a1c; padding-bottom: 3px; }
+  .ladder-row { display: grid; grid-template-columns: 24px 1fr auto auto; gap: 8px; align-items: center;
+    font-size: 12px; padding: 3px 6px; border-radius: 4px; color: #e0d6b4; }
+  .ladder-row.me { background: #6aa6ff1f; outline: 1px solid #6aa6ff55; }
+  .ladder-row .rank { color: #998d6a; text-align: right; }
+  .ladder-row .lr-name { color: #cfe0ff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ladder-row .lr-rating { color: #7fb8ff; font-family: var(--title-font); }
+  .ladder-row .lr-wl { color: #8c8468; font-size: 10.5px; }
+  .ladder-empty { font-size: 11.5px; color: #8c8468; font-style: italic; padding: 4px 6px; }
+  #bg-window { left: 50%; top: 50%; transform: translate(-50%, -50%); width: 380px; padding: 14px; }
+  #bg-window .btn { width: 100%; margin: 4px 0 0; box-sizing: border-box; text-align: center; }
+  #bg-window .btn.leave { background: linear-gradient(#3a4a5a, #243140 55%, #1a2430); color: #cfe6ff; }
+  .bg-rank { display: flex; align-items: baseline; gap: 10px; margin: 2px 0 6px; }
+  .bg-rank .rating { font-family: var(--title-font); font-size: 30px; color: #7fb8ff; text-shadow: 0 0 10px #3a78d166, 1px 1px 2px #000; }
+  .bg-rank .wl { font-size: 12px; color: #cfc6a8; }
+  .bg-rank .wl b { color: #7fdc4f; } .bg-rank .wl i { color: #ff7a6a; font-style: normal; }
+  .bg-note { font-size: 11.5px; color: #b6ad8c; line-height: 1.45; margin: 4px 0 2px; font-family: Georgia, serif; }
+  .bg-queue-status { font-size: 12px; color: #7fd4ff; margin-top: 6px; text-align: center; }
+
+  /* in-match scoreboard: pinned top centre */
+  #bg-scoreboard { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); display: none;
+    text-align: center; pointer-events: none; z-index: 18; min-width: 320px;
+    background: linear-gradient(#10131add, #080a0edd); border: 1px solid #3a4a66;
+    border-radius: 9px; padding: 6px 18px 8px; box-shadow: 0 2px 16px #000a; }
+  .bg-score-line { display: flex; align-items: center; justify-content: center; gap: 14px; font-family: var(--title-font); }
+  .bg-score-line .team { font-size: 13px; letter-spacing: 0.5px; }
+  .bg-score-line .crimson { color: #ff6a62; } .bg-score-line .azure { color: #6aa6ff; }
+  .bg-score-line .num { font-size: 26px; text-shadow: 1px 1px 2px #000; }
+  .bg-score-line .flag { font-size: 13px; }
+  .bg-score-line .flag.home { opacity: 0.45; } .bg-score-line .flag.carried { color: #ffd24a; }
+  .bg-score-line .flag.dropped { color: #ff9a3c; }
+  .bg-score-line .dash { color: #998d6a; font-size: 18px; }
+  .bg-caps { font-size: 10.5px; color: #9aa6b8; margin-top: 1px; letter-spacing: 0.4px; }
+  .bg-roster { display: flex; justify-content: center; gap: 5px; margin-top: 4px; flex-wrap: wrap; }
+  .bg-pip { width: 9px; height: 9px; border-radius: 50%; border: 1px solid #000; }
+  .bg-pip.dead { opacity: 0.3; }
+  .bg-pip.flag { box-shadow: 0 0 6px 1px #ffd24a; border-color: #ffd24a; }
+  .bg-respawn { position: absolute; left: 50%; top: 54%; transform: translate(-50%,-50%); text-align: center;
+    color: #ff8d7a; font-family: var(--title-font); font-size: 22px; text-shadow: 2px 2px 6px #000; }
   #map-canvas { border: 2px solid var(--border); outline: 1px solid #000; border-radius: 4px; }
 
   /* ---------- options / game menu (Esc) ---------- */
@@ -538,6 +579,7 @@
           <button class="micro-btn" id="mm-quest" title="Quest Log">Q<span class="keybind">l</span></button>
           <button class="micro-btn" id="mm-map" title="World Map">M<span class="keybind">m</span></button>
           <button class="micro-btn" id="mm-bag" title="Bags">B<span class="keybind">b</span></button>
+          <button class="micro-btn" id="mm-bg" title="Ravenrift (5v5 Capture the Flag)">⚑<span class="keybind">h</span></button>
           <button class="micro-btn" id="mm-music" title="Toggle Music">♪</button>
         </div>
       </div>
@@ -562,6 +604,8 @@
     <div id="quest-log-window" class="window panel"></div>
     <div id="vendor-window" class="window panel"></div>
     <div id="map-window" class="window panel"><canvas id="map-canvas" width="560" height="560"></canvas></div>
+    <div id="bg-window" class="window panel"></div>
+    <div id="bg-scoreboard"></div>
     <div id="options-menu" class="window panel"></div>
     <div id="meters-window" class="panel">
       <div class="panel-title">

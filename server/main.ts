@@ -5,7 +5,7 @@ import { WebSocketServer, WebSocket } from 'ws';
 import {
   ensureSchema, pool, createAccount, findAccount, touchLogin, saveToken, accountForToken,
   listCharacters, getCharacter, createCharacter, deleteCharacter, closeOrphanSessions,
-  pruneChatLogs,
+  pruneChatLogs, topSquadRatings,
 } from './db';
 import { hashPassword, verifyPassword, newToken, validUsername, validPassword, validCharName } from './auth';
 import { json, readBody } from './http_util';
@@ -173,6 +173,10 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         players_online: game.clients.size,
         names: [...game.clients.values()].map((s) => s.name),
       });
+    }
+    if (req.method === 'GET' && url === '/api/squad/leaderboard') {
+      // public all-time Ravenrift 5v5 ladder
+      return json(res, 200, { leaders: await topSquadRatings(20) });
     }
     json(res, 404, { error: 'unknown endpoint' });
   } catch (err: any) {

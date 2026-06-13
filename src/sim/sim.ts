@@ -1,9 +1,11 @@
 import {
-  ABILITIES, CAMPS, CLASSES, DUNGEONS, DUNGEON_LIST, DungeonDef, dungeonAt,
+  ABILITIES, BG_SLOT_COUNT, CAMPS, CLASSES, DUNGEONS, DUNGEON_LIST, DungeonDef,
+  battlegroundOrigin, dungeonAt,
   DUNGEON_X_THRESHOLD, GROUND_OBJECTS, GROUP_XP_BONUS, INSTANCE_SLOT_COUNT,
   ITEMS, MOBS, NPCS, PLAYER_START, QUESTS, REWARD_ARCHETYPE, abilitiesKnownAt, instanceOrigin,
   zoneAt,
 } from './data';
+import { BASES, SPEED_RUNES, TEAM_COLORS, TEAM_NAMES, type Team } from './battleground_layout';
 import { resolvePosition } from './colliders';
 import { findPath } from './pathfind';
 import { createGroundObject, createMob, createNpc, createPlayer, recalcPlayerStats, PlayerEquipment } from './entity';
@@ -32,6 +34,23 @@ const OBJECT_RESPAWN = 30;
 const PARTY_MAX = 5;
 const PARTY_XP_RANGE = 80; // yards: members this close share kill xp/credit
 const DUEL_COUNTDOWN = 3;
+const BG_BASE_RATING = 1500; // every character starts here, unranked
+const BG_MIN_RATING = 100; // a rating floor so a losing streak can't go absurd
+const BG_K_FACTOR = 32; // Elo sensitivity per match
+const BG_LADDER_SIZE = 10; // live online standings shipped to clients
+// Ravenrift 5v5 capture-the-flag
+const BG_TEAM_SIZE = 5; // players per team — a full match is 5v5
+const BG_COUNTDOWN = 8; // pre-match gates: form up at your keep
+const BG_CAPS_TO_WIN = 5; // first team to this many flag captures wins
+const BG_MAX_DURATION = 900; // safety cap; a timed-out match resolves on score
+const BG_RESPAWN_DELAY = 6; // seconds dead before you respawn at your keep
+const BG_FLAG_RETURN_TIME = 12; // a dropped flag auto-returns home after this
+const BG_PICKUP_RADIUS = 2.5; // walk this close to grab a flag / return your own
+const BG_CAPTURE_RADIUS = 4; // carry the enemy flag this close to your stand to score
+const BG_RUNE_RADIUS = 2.5; // step this close to a speed rune to claim it
+const BG_RUNE_COOLDOWN = 22; // a claimed rune recharges over this
+const BG_RUNE_SPEED = 1.4; // sprint multiplier the rune grants
+const BG_RUNE_DURATION = 8; // seconds of haste per rune
 const SAY_RANGE = 25; // /say carries a short distance; /yell across a camp
 const YELL_RANGE = 100;
 const CHAT_BURST = 8; // messages a player may send back-to-back...
@@ -70,6 +89,54 @@ export interface DuelState {
   b: number;
   state: 'countdown' | 'active';
   timer: number; // countdown remaining / elapsed
+}
+
+// Standard Elo. Returns the points the winner gains (and the loser loses) for
+// an outright result; a draw moves each toward its expected score by half.
+export function eloDelta(winnerRating: number, loserRating: number, score = 1): number {
+  const expected = 1 / (1 + 10 ** ((loserRating - winnerRating) / 400));
+  return Math.round(BG_K_FACTOR * (score - expected));
+}
+
+// --- Ravenrift 5v5 capture-the-flag ---
+
+interface BgFlag {
+  team: 0 | 1; // home team
+  home: Vec3; // world-space stand position
+  pos: Vec3; // current world position (== carrier while carried)
+  state: 'home' | 'carried' | 'dropped';
+  carrier: number | null; // pid carrying the enemy flag
+  dropTimer: number; // counts down a dropped flag to its auto-return
+  entityId: number;
+}
+
+interface BgRune {
+  pos: Vec3; // world
+  active: boolean;
+  cooldown: number; // seconds until it recharges
+  entityId: number; // -1 while spent (the rune mesh despawns on cooldown)
+}
+
+// A live battleground. Two teams of pids, per-team scores, the two flags, the
+// speed runes, and the per-player return/respawn bookkeeping.
+export interface BgMatch {
+  id: number;
+  slot: number;
+  teams: [number[], number[]]; // pids, index = team
+  scores: [number, number];
+  flags: [BgFlag, BgFlag];
+  runes: BgRune[];
+  state: 'countdown' | 'active';
+  timer: number; // countdown remaining, then elapsed once active
+  ret: Map<number, { x: number; z: number; facing: number }>; // where each player queued from
+  respawn: Map<number, number>; // pid -> seconds until respawn (absent = alive)
+  ratingAvg: [number, number]; // team average rating at start, for Elo
+}
+
+// A queued group: a whole party (or a solo) that matchmaking keeps together.
+interface BgQueueGroup {
+  pids: number[];
+  ratingAvg: number;
 }
 
 export interface InstanceSlot {
@@ -122,6 +189,10 @@ export interface PlayerMeta {
   questsDone: Set<string>;
   counters: RewardCounters;
   autoEquip: boolean;
+  // Ravenrift 5v5 standing — persisted in CharacterState
+  squadRating: number;
+  squadWins: number;
+  squadLosses: number;
 }
 
 // Persistable character state (stored as JSONB server-side).
@@ -137,6 +208,9 @@ export interface CharacterState {
   inventory: InvSlot[];
   questLog: { questId: string; counts: number[]; state: 'active' | 'ready' | 'done' }[];
   questsDone: string[];
+  squadRating?: number;
+  squadWins?: number;
+  squadLosses?: number;
 }
 
 // Pure quest-state computation, shared by the sim and the network client.
@@ -187,6 +261,12 @@ export class Sim {
   tradeInvites = new Map<number, { fromPid: number; expires: number }>();
   duels = new Map<number, DuelState>(); // pid -> shared duel (both pids)
   duelInvites = new Map<number, { fromPid: number; expires: number }>();
+  // Ravenrift: queued party-groups, live matches keyed by every member pid,
+  // and the set of busy battleground slots
+  bgQueue: BgQueueGroup[] = [];
+  bgMatches = new Map<number, BgMatch>();
+  private bgBusySlots = new Set<number>();
+  private nextBgMatchId = 1;
   // per-player chat token bucket (anti-spam); refilled lazily by sim time
   private chatTokens = new Map<number, { tokens: number; at: number }>();
   // dungeon instances
@@ -310,6 +390,9 @@ export class Sim {
       questsDone: new Set(),
       counters: freshCounters(),
       autoEquip: opts?.autoEquip ?? false,
+      squadRating: opts?.state?.squadRating ?? BG_BASE_RATING,
+      squadWins: opts?.state?.squadWins ?? 0,
+      squadLosses: opts?.state?.squadLosses ?? 0,
     };
     this.players.set(player.id, meta);
     if (this.primaryId === -1) this.primaryId = player.id;
@@ -354,6 +437,11 @@ export class Sim {
     if (trade) this.tradeCancel(pid);
     const duel = this.duels.get(pid);
     if (duel) this.endDuel(duel, duel.a === pid ? duel.b : duel.a);
+    // battleground: drop out of the queue, and leave any live match (the team
+    // fights on a player down)
+    this.bgDequeue(pid);
+    const bg = this.bgMatches.get(pid);
+    if (bg) this.bgRemovePlayer(bg, pid);
     this.partyInvites.delete(pid);
     this.tradeInvites.delete(pid);
     this.duelInvites.delete(pid);
@@ -391,6 +479,9 @@ export class Sim {
       inventory: meta.inventory.map((i) => ({ ...i })),
       questLog: [...meta.questLog.values()].map((q) => ({ questId: q.questId, counts: [...q.counts], state: q.state })),
       questsDone: [...meta.questsDone],
+      squadRating: meta.squadRating,
+      squadWins: meta.squadWins,
+      squadLosses: meta.squadLosses,
     };
   }
 
@@ -590,6 +681,7 @@ export class Sim {
     }
 
     this.updateDuels();
+    this.updateBg();
     this.updateTradesAndInvites();
     this.updateInstances();
 
@@ -1680,6 +1772,13 @@ export class Sim {
       e.chargeTargetId = null;
       e.chargePath = [];
       this.emit({ type: 'playerDeath', pid: e.id });
+      // in a battleground you don't run to a graveyard — drop any flag you were
+      // carrying and queue a timed respawn back at your keep
+      const bg = this.bgMatches.get(e.id);
+      if (bg && bg.state === 'active') {
+        this.bgDropFlagsHeldBy(bg, e, killer);
+        bg.respawn.set(e.id, BG_RESPAWN_DELAY);
+      }
       for (const m of this.entities.values()) {
         if (m.kind === 'mob' && !m.dead && m.aggroTargetId === e.id && m.aiState !== 'dead') {
           // turn on the next nearby attacker; go home only if nobody is left
@@ -2512,6 +2611,9 @@ export class Sim {
     if (!r) return;
     const { meta, e: p } = r;
     if (!p.dead) return;
+    // in a battleground the keep respawn is automatic and timed — releasing
+    // does nothing (you can't graveyard-walk out of the match)
+    if (this.bgMatches.has(p.id)) return;
     p.dead = false;
     // dying in a dungeon sends you to the graveyard of the zone its door is
     // in; dying outdoors, to your current zone's graveyard
@@ -2626,7 +2728,12 @@ export class Sim {
     if (target.kind === 'mob') return target.hostile;
     if (target.kind === 'player' && attacker.kind === 'player') {
       const duel = this.duels.get(attacker.id);
-      return !!duel && duel.state === 'active' && (duel.a === target.id || duel.b === target.id);
+      if (duel && duel.state === 'active' && (duel.a === target.id || duel.b === target.id)) return true;
+      // battleground: hostile to the other team, friendly to your own
+      const bg = this.bgMatches.get(attacker.id);
+      if (bg && bg.state === 'active' && this.bgMatches.get(target.id) === bg) {
+        return this.bgTeamOf(bg, attacker.id) !== this.bgTeamOf(bg, target.id);
+      }
     }
     return false;
   }
@@ -2835,6 +2942,492 @@ export class Sim {
 
   duelFor(pid: number): DuelState | null {
     return this.duels.get(pid) ?? null;
+  }
+
+  // A clean slate so the bout is decided by play, not by what each fighter
+  // walked in carrying: full health/resource, cooldowns and combat reset.
+  private resetForBg(e: Entity): void {
+    const meta = this.players.get(e.id);
+    if (meta) recalcPlayerStats(e, meta.cls, meta.equipment);
+    e.auras = [];
+    e.hp = e.maxHp;
+    e.resource = e.resourceType === 'mana' ? e.maxResource : e.resourceType === 'energy' ? 100 : 0;
+    e.targetId = null;
+    e.autoAttack = false;
+    e.queuedOnSwing = null;
+    e.castingAbility = null;
+    e.castRemaining = 0;
+    e.channeling = false;
+    e.comboPoints = 0;
+    e.comboTargetId = null;
+    e.cooldowns.clear();
+    e.gcdRemaining = 0;
+    e.swingTimer = 0;
+    e.chargeTargetId = null;
+    e.chargePath = [];
+    e.combatTimer = 99;
+    e.inCombat = false;
+    e.sitting = false;
+    e.eating = null;
+    e.drinking = null;
+  }
+
+  // -------------------------------------------------------------------------
+  // Ravenrift — 5v5 ranked capture-the-flag battleground
+  // -------------------------------------------------------------------------
+
+  bgQueueJoin(pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    const id = r.meta.entityId;
+    if (this.bgMatches.has(id)) { this.error(id, 'You are already in a battleground.'); return; }
+    if (r.e.dead) { this.error(id, 'You cannot queue for Ravenrift while dead.'); return; }
+    if (r.e.pos.x > DUNGEON_X_THRESHOLD) { this.error(id, 'You cannot queue from inside an instance.'); return; }
+    // queue the whole party as one group (kept together by matchmaking); solo
+    // players queue alone. Any eligible member can put the party in.
+    const party = this.partyOf(id);
+    const members = party ? party.members.slice(0, BG_TEAM_SIZE) : [id];
+    if (this.bgGroupContaining(id)) {
+      this.emit({ type: 'bgQueued', position: this.bgQueueSize(), pid: id });
+      return;
+    }
+    for (const m of members) {
+      if (this.bgMatches.has(m) || this.bgGroupContaining(m)) { this.error(id, 'A party member is already queued or in a match.'); return; }
+    }
+    const ratingAvg = members.reduce((s, m) => s + (this.players.get(m)?.squadRating ?? BG_BASE_RATING), 0) / members.length;
+    this.bgQueue.push({ pids: [...members], ratingAvg });
+    for (const m of members) {
+      this.emit({ type: 'bgQueued', position: this.bgQueueSize(), pid: m });
+      this.emit({ type: 'log', text: party && members.length > 1
+        ? `Your party of ${members.length} joins the Ravenrift queue.`
+        : 'You join the Ravenrift queue. Need 10 champions to start a match…', color: '#7fd4ff', pid: m });
+    }
+  }
+
+  bgQueueLeave(pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    const group = this.bgGroupContaining(r.meta.entityId);
+    if (!group) return;
+    this.bgQueue = this.bgQueue.filter((g) => g !== group);
+    for (const m of group.pids) {
+      this.emit({ type: 'bgUnqueued', pid: m });
+      this.emit({ type: 'log', text: 'You leave the Ravenrift queue.', color: '#7fd4ff', pid: m });
+    }
+  }
+
+  private bgGroupContaining(pid: number): BgQueueGroup | null {
+    return this.bgQueue.find((g) => g.pids.includes(pid)) ?? null;
+  }
+
+  private bgDequeue(pid: number): boolean {
+    const group = this.bgGroupContaining(pid);
+    if (!group) return false;
+    group.pids = group.pids.filter((p) => p !== pid);
+    if (group.pids.length === 0) this.bgQueue = this.bgQueue.filter((g) => g !== group);
+    return true;
+  }
+
+  private bgQueueSize(): number {
+    return this.bgQueue.reduce((s, g) => s + g.pids.length, 0);
+  }
+
+  private freeBgSlot(): number | null {
+    for (let i = 0; i < BG_SLOT_COUNT; i++) if (!this.bgBusySlots.has(i)) return i;
+    return null;
+  }
+
+  bgTeamOf(match: BgMatch, pid: number): Team {
+    return match.teams[1].includes(pid) ? 1 : 0;
+  }
+
+  bgMatchFor(pid: number): BgMatch | null {
+    return this.bgMatches.get(pid) ?? null;
+  }
+
+  private updateBg(): void {
+    this.matchmakeBg();
+    const seen = new Set<BgMatch>();
+    for (const match of this.bgMatches.values()) {
+      if (seen.has(match)) continue;
+      seen.add(match);
+      if (match.state === 'countdown') {
+        const before = Math.ceil(match.timer);
+        match.timer -= DT;
+        const after = Math.ceil(match.timer);
+        if (after < before && after > 0) {
+          for (const mp of this.bgAll(match)) this.emit({ type: 'bgCountdown', seconds: after, pid: mp });
+        }
+        if (match.timer <= 0) {
+          match.state = 'active';
+          match.timer = 0;
+          for (const mp of this.bgAll(match)) {
+            const e = this.entities.get(mp);
+            if (e) this.resetForBg(e);
+            this.emit({ type: 'log', text: 'The Ravenrift battle begins — take their flag!', color: '#ff5a3c', pid: mp });
+            this.emit({ type: 'bgStart', pid: mp });
+          }
+        }
+        continue;
+      }
+      match.timer += DT;
+      this.bgTickRespawns(match);
+      this.bgTickRunes(match);
+      this.bgTickFlags(match);
+      if (match.timer >= BG_MAX_DURATION) {
+        const w = match.scores[0] === match.scores[1] ? null : match.scores[0] > match.scores[1] ? 0 : 1;
+        this.endBgMatch(match, w, 'timeout');
+      }
+    }
+  }
+
+  private bgAll(match: BgMatch): number[] {
+    return [...match.teams[0], ...match.teams[1]];
+  }
+
+  private bgEmitAll(match: BgMatch, ev: (pid: number) => SimEvent): void {
+    for (const mp of this.bgAll(match)) this.emit(ev(mp));
+  }
+
+  private matchmakeBg(): void {
+    let guard = BG_SLOT_COUNT + 1;
+    while (guard-- > 0) {
+      // drop members who went offline/died/left while waiting
+      for (const g of this.bgQueue) g.pids = g.pids.filter((p) => this.entities.get(p) && !this.entities.get(p)!.dead && !this.bgMatches.has(p));
+      this.bgQueue = this.bgQueue.filter((g) => g.pids.length > 0);
+      if (this.bgQueueSize() < BG_TEAM_SIZE * 2 || this.freeBgSlot() === null) return;
+      // greedily pack whole groups into two teams of five, balancing headcount
+      const groups = [...this.bgQueue].sort((a, b) => b.pids.length - a.pids.length);
+      const teams: [number[], number[]] = [[], []];
+      const used: BgQueueGroup[] = [];
+      for (const g of groups) {
+        const canA = teams[0].length + g.pids.length <= BG_TEAM_SIZE;
+        const canB = teams[1].length + g.pids.length <= BG_TEAM_SIZE;
+        let t = -1;
+        if (canA && canB) t = teams[0].length <= teams[1].length ? 0 : 1;
+        else if (canA) t = 0;
+        else if (canB) t = 1;
+        if (t < 0) continue;
+        teams[t].push(...g.pids);
+        used.push(g);
+      }
+      if (teams[0].length !== BG_TEAM_SIZE || teams[1].length !== BG_TEAM_SIZE) return; // can't form 5v5 yet
+      this.bgQueue = this.bgQueue.filter((g) => !used.includes(g));
+      this.startBgMatch(teams[0], teams[1]);
+    }
+  }
+
+  private startBgMatch(teamA: number[], teamB: number[]): void {
+    const slot = this.freeBgSlot();
+    if (slot === null) { this.bgQueue.unshift({ pids: [...teamA, ...teamB], ratingAvg: BG_BASE_RATING }); return; }
+    this.bgBusySlots.add(slot);
+    const origin = battlegroundOrigin(slot);
+    const ret = new Map<number, { x: number; z: number; facing: number }>();
+    for (const pid of [...teamA, ...teamB]) {
+      const e = this.entities.get(pid);
+      if (e) ret.set(pid, { x: e.pos.x, z: e.pos.z, facing: e.facing });
+    }
+    const flags: [BgFlag, BgFlag] = [0, 1].map((team) => {
+      const home = this.groundPos(origin.x + BASES[team].flag.x, origin.z + BASES[team].flag.z);
+      return { team: team as Team, home, pos: { ...home }, state: 'home' as const, carrier: null, dropTimer: 0, entityId: -1 };
+    }) as [BgFlag, BgFlag];
+    const runes: BgRune[] = SPEED_RUNES.map((rp) => ({
+      pos: this.groundPos(origin.x + rp.x, origin.z + rp.z), active: true, cooldown: 0, entityId: -1,
+    }));
+    const match: BgMatch = {
+      id: this.nextBgMatchId++, slot, teams: [teamA, teamB], scores: [0, 0], flags, runes,
+      state: 'countdown', timer: BG_COUNTDOWN, ret,
+      respawn: new Map(),
+      ratingAvg: [this.bgTeamAvg(teamA), this.bgTeamAvg(teamB)],
+    };
+    for (const pid of this.bgAll(match)) this.bgMatches.set(pid, match);
+    for (const flag of flags) this.bgSpawnFlagEntity(flag);
+    for (const rune of runes) this.bgSpawnRuneEntity(rune);
+    // seat each team at its keep
+    for (const team of [0, 1] as Team[]) {
+      match.teams[team].forEach((pid, i) => this.bgSpawnPlayer(match, pid, team, i));
+    }
+    for (const team of [0, 1] as Team[]) {
+      for (const pid of match.teams[team]) {
+        this.emit({ type: 'bgFound', team, pid });
+        this.emit({ type: 'bgCountdown', seconds: BG_COUNTDOWN, pid });
+        this.emit({ type: 'log', text: `Ravenrift: you fight for the ${TEAM_NAMES[team]}. First to ${BG_CAPS_TO_WIN} captures wins.`, color: '#7fd4ff', pid });
+      }
+    }
+  }
+
+  private bgTeamAvg(pids: number[]): number {
+    if (pids.length === 0) return BG_BASE_RATING;
+    return pids.reduce((s, p) => s + (this.players.get(p)?.squadRating ?? BG_BASE_RATING), 0) / pids.length;
+  }
+
+  // Place a player at one of their keep's spawn points (round-robin by index),
+  // healed and reset for the fight.
+  private bgSpawnPlayer(match: BgMatch, pid: number, team: Team, index: number): void {
+    const e = this.entities.get(pid);
+    if (!e) return;
+    const slot = match.slot;
+    const origin = battlegroundOrigin(slot);
+    const spawns = BASES[team].spawns;
+    const sp = spawns[index % spawns.length];
+    e.pos = this.groundPos(origin.x + sp.x, origin.z + sp.z);
+    e.prevPos = { ...e.pos };
+    e.facing = team === 0 ? 0 : Math.PI; // face the field
+    e.prevFacing = e.facing;
+    this.rebucket(e);
+    this.resetForBg(e);
+  }
+
+  private bgSpawnFlagEntity(flag: BgFlag): void {
+    const e = createGroundObject(this.nextId++, '', `${TEAM_NAMES[flag.team]} Flag`, { ...flag.pos });
+    e.templateId = 'bg_flag';
+    e.objectItemId = null;
+    e.lootable = false;
+    e.color = TEAM_COLORS[flag.team];
+    this.addEntity(e);
+    flag.entityId = e.id;
+  }
+
+  private bgSpawnRuneEntity(rune: BgRune): void {
+    const e = createGroundObject(this.nextId++, '', 'Sprint Rune', { ...rune.pos });
+    e.templateId = 'bg_rune';
+    e.objectItemId = null;
+    e.lootable = false;
+    e.color = 0xffd24a;
+    this.addEntity(e);
+    rune.entityId = e.id;
+  }
+
+  private bgTickRespawns(match: BgMatch): void {
+    for (const [pid, t] of [...match.respawn]) {
+      const left = t - DT;
+      if (left > 0) { match.respawn.set(pid, left); continue; }
+      match.respawn.delete(pid);
+      const e = this.entities.get(pid);
+      if (!e) continue;
+      e.dead = false;
+      const team = this.bgTeamOf(match, pid);
+      const idx = match.teams[team].indexOf(pid);
+      this.bgSpawnPlayer(match, pid, team, idx < 0 ? 0 : idx);
+      this.emit({ type: 'respawn', pid });
+    }
+  }
+
+  private bgTickRunes(match: BgMatch): void {
+    for (const rune of match.runes) {
+      if (!rune.active) {
+        rune.cooldown -= DT;
+        if (rune.cooldown <= 0) { rune.active = true; this.bgSpawnRuneEntity(rune); }
+        continue;
+      }
+      // first live player to step on it claims the sprint
+      for (const pid of this.bgAll(match)) {
+        const e = this.entities.get(pid);
+        if (!e || e.dead) continue;
+        if (dist2d(e.pos, rune.pos) <= BG_RUNE_RADIUS) {
+          this.applyAura(e, {
+            id: 'sprint_rune', name: 'Sprint', kind: 'buff_speed', value: BG_RUNE_SPEED,
+            remaining: BG_RUNE_DURATION, duration: BG_RUNE_DURATION, sourceId: e.id, school: 'physical',
+          });
+          rune.active = false;
+          rune.cooldown = BG_RUNE_COOLDOWN;
+          if (rune.entityId >= 0) { this.dropEntity(rune.entityId); rune.entityId = -1; }
+          this.emit({ type: 'log', text: 'You seize a Sprint Rune!', color: '#ffd24a', pid });
+          break;
+        }
+      }
+    }
+  }
+
+  private bgTickFlags(match: BgMatch): void {
+    for (const flag of match.flags) {
+      if (flag.state === 'carried') {
+        const carrier = flag.carrier !== null ? this.entities.get(flag.carrier) : null;
+        if (!carrier || carrier.dead || !this.bgMatches.has(flag.carrier!)) {
+          this.bgDropFlag(match, flag, carrier ?? null);
+        } else {
+          flag.pos = { ...carrier.pos };
+          this.bgSyncFlagEntity(flag);
+          // captured: carry the enemy flag home to your own stand
+          const carrierTeam = this.bgTeamOf(match, flag.carrier!);
+          const ownHome = match.flags[carrierTeam].home;
+          if (dist2d(carrier.pos, ownHome) <= BG_CAPTURE_RADIUS) {
+            this.bgCapture(match, flag, carrierTeam);
+          }
+        }
+        continue;
+      }
+      // home or dropped: enemies grab it, friends return a dropped one
+      for (const pid of this.bgAll(match)) {
+        const e = this.entities.get(pid);
+        if (!e || e.dead) continue;
+        const team = this.bgTeamOf(match, pid);
+        const d = dist2d(e.pos, flag.pos);
+        if (team !== flag.team && d <= BG_PICKUP_RADIUS && !this.bgIsCarrying(match, pid)) {
+          flag.state = 'carried'; flag.carrier = pid;
+          this.bgEmitAll(match, (mp) => ({ type: 'bgFlag', action: 'taken', team: flag.team, byName: this.players.get(pid)?.name ?? '?', scoreCrimson: match.scores[0], scoreAzure: match.scores[1], pid: mp }));
+          break;
+        }
+        if (team === flag.team && flag.state === 'dropped' && d <= BG_PICKUP_RADIUS) {
+          this.bgReturnFlag(match, flag, this.players.get(pid)?.name ?? '?');
+          break;
+        }
+      }
+      if (flag.state === 'dropped') {
+        flag.dropTimer -= DT;
+        if (flag.dropTimer <= 0) this.bgReturnFlag(match, flag, '');
+        else this.bgSyncFlagEntity(flag);
+      }
+    }
+  }
+
+  private bgIsCarrying(match: BgMatch, pid: number): boolean {
+    return match.flags.some((f) => f.carrier === pid);
+  }
+
+  private bgSyncFlagEntity(flag: BgFlag): void {
+    const e = this.entities.get(flag.entityId);
+    if (!e) return;
+    e.pos = { ...flag.pos };
+    e.prevPos = { ...flag.pos };
+    this.rebucket(e);
+  }
+
+  private bgCapture(match: BgMatch, flag: BgFlag, scoringTeam: Team): void {
+    const carrierName = flag.carrier !== null ? this.players.get(flag.carrier)?.name ?? '?' : '?';
+    match.scores[scoringTeam]++;
+    this.bgReturnFlag(match, flag, '', true); // the captured flag resets home
+    this.bgEmitAll(match, (mp) => ({ type: 'bgFlag', action: 'captured', team: flag.team, byName: carrierName, scoreCrimson: match.scores[0], scoreAzure: match.scores[1], pid: mp }));
+    if (match.scores[scoringTeam] >= BG_CAPS_TO_WIN) this.endBgMatch(match, scoringTeam, 'caps');
+  }
+
+  // Returns a flag to its stand. `silent` skips the event (capture emits its own).
+  private bgReturnFlag(match: BgMatch, flag: BgFlag, byName: string, silent = false): void {
+    flag.state = 'home'; flag.carrier = null; flag.dropTimer = 0;
+    flag.pos = { ...flag.home };
+    this.bgSyncFlagEntity(flag);
+    if (!silent) {
+      this.bgEmitAll(match, (mp) => ({ type: 'bgFlag', action: 'returned', team: flag.team, byName, scoreCrimson: match.scores[0], scoreAzure: match.scores[1], pid: mp }));
+    }
+  }
+
+  private bgDropFlag(match: BgMatch, flag: BgFlag, at: Entity | null): void {
+    const carrierName = flag.carrier !== null ? this.players.get(flag.carrier)?.name ?? '?' : '?';
+    flag.state = 'dropped'; flag.carrier = null; flag.dropTimer = BG_FLAG_RETURN_TIME;
+    if (at) flag.pos = { ...at.pos };
+    this.bgSyncFlagEntity(flag);
+    this.bgEmitAll(match, (mp) => ({ type: 'bgFlag', action: 'dropped', team: flag.team, byName: carrierName, scoreCrimson: match.scores[0], scoreAzure: match.scores[1], pid: mp }));
+  }
+
+  private bgDropFlagsHeldBy(match: BgMatch, e: Entity, _killer: Entity | null): void {
+    for (const flag of match.flags) {
+      if (flag.carrier === e.id) this.bgDropFlag(match, flag, e);
+    }
+  }
+
+  private bgRemovePlayer(match: BgMatch, pid: number): void {
+    for (const flag of match.flags) {
+      if (flag.carrier === pid) this.bgDropFlag(match, flag, this.entities.get(pid) ?? null);
+    }
+    const team = this.bgTeamOf(match, pid);
+    match.teams[team] = match.teams[team].filter((p) => p !== pid);
+    match.respawn.delete(pid);
+    match.ret.delete(pid);
+    this.bgMatches.delete(pid);
+    // a fully-vacated side ends the match in the other team's favour
+    if (match.teams[0].length === 0 || match.teams[1].length === 0) {
+      const winner = match.teams[0].length === 0 && match.teams[1].length === 0
+        ? null : match.teams[0].length === 0 ? 1 : 0;
+      this.endBgMatch(match, winner, 'forfeit');
+    }
+  }
+
+  // winnerTeam null = draw
+  private endBgMatch(match: BgMatch, winnerTeam: Team | null, _reason: 'caps' | 'timeout' | 'forfeit'): void {
+    for (const pid of this.bgAll(match)) this.bgMatches.delete(pid);
+    this.bgBusySlots.delete(match.slot);
+    for (const flag of match.flags) if (flag.entityId >= 0 && this.entities.has(flag.entityId)) this.dropEntity(flag.entityId);
+    for (const rune of match.runes) if (rune.entityId >= 0 && this.entities.has(rune.entityId)) this.dropEntity(rune.entityId);
+
+    const score0 = winnerTeam === null ? 0.5 : winnerTeam === 0 ? 1 : 0;
+    const delta0 = eloDelta(match.ratingAvg[0], match.ratingAvg[1], score0);
+    const delta1 = eloDelta(match.ratingAvg[1], match.ratingAvg[0], 1 - score0);
+    for (const team of [0, 1] as Team[]) {
+      const delta = team === 0 ? delta0 : delta1;
+      for (const pid of match.teams[team]) {
+        const meta = this.players.get(pid);
+        const e = this.entities.get(pid);
+        if (!meta) continue;
+        const before = meta.squadRating;
+        meta.squadRating = Math.max(BG_MIN_RATING, before + delta);
+        if (winnerTeam === null) { /* draw: no W/L */ }
+        else if (winnerTeam === team) meta.squadWins++;
+        else meta.squadLosses++;
+        this.emit({
+          type: 'bgEnd', pid, draw: winnerTeam === null, won: winnerTeam === team,
+          scoreCrimson: match.scores[0], scoreAzure: match.scores[1],
+          ratingBefore: before, ratingAfter: meta.squadRating,
+        });
+        // restore the fighter to where they queued from, healed and out of combat
+        if (e) {
+          const ret = match.ret.get(pid);
+          if (ret) { e.pos = this.groundPos(ret.x, ret.z); e.prevPos = { ...e.pos }; e.facing = ret.facing; this.rebucket(e); }
+          e.auras = []; e.dead = false;
+          recalcPlayerStats(e, meta.cls, meta.equipment);
+          e.hp = e.maxHp;
+          e.resource = e.resourceType === 'mana' ? e.maxResource : e.resourceType === 'energy' ? 100 : 0;
+          e.targetId = null; e.autoAttack = false; e.castingAbility = null; e.channeling = false;
+          e.combatTimer = 99; e.inCombat = false;
+          this.emit({ type: 'respawn', pid });
+        }
+      }
+    }
+  }
+
+  // Live squad standings of rated players currently online, best first.
+  squadLadder(): import('../world_api').SquadLadderEntry[] {
+    const rows: import('../world_api').SquadLadderEntry[] = [];
+    for (const meta of this.players.values()) {
+      if (!this.entities.get(meta.entityId)) continue;
+      rows.push({ pid: meta.entityId, name: meta.name, cls: meta.cls, rating: meta.squadRating, wins: meta.squadWins, losses: meta.squadLosses });
+    }
+    rows.sort((x, y) => y.rating - x.rating || y.wins - x.wins);
+    return rows.slice(0, BG_LADDER_SIZE);
+  }
+
+  bgInfoFor(pid: number): import('../world_api').BgInfo | null {
+    const meta = this.players.get(pid);
+    if (!meta) return null;
+    const match = this.bgMatches.get(pid);
+    let matchInfo: import('../world_api').BgMatchInfo | null = null;
+    if (match) {
+      const myTeam = this.bgTeamOf(match, pid);
+      const flags = match.flags.map((f): import('../world_api').BgFlagInfo => ({
+        state: f.state,
+        carrierName: f.carrier !== null ? this.players.get(f.carrier)?.name ?? null : null,
+        carrierTeam: f.carrier !== null ? this.bgTeamOf(match, f.carrier) : null,
+      })) as [import('../world_api').BgFlagInfo, import('../world_api').BgFlagInfo];
+      const players: import('../world_api').BgPlayerInfo[] = [];
+      for (const team of [0, 1] as Team[]) {
+        for (const mp of match.teams[team]) {
+          const e = this.entities.get(mp);
+          const m = this.players.get(mp);
+          if (!e || !m) continue;
+          players.push({ pid: mp, name: m.name, cls: m.cls, team, carrying: this.bgIsCarrying(match, mp), dead: e.dead, hp: e.hp, mhp: e.maxHp });
+        }
+      }
+      matchInfo = {
+        state: match.state, myTeam, capsToWin: BG_CAPS_TO_WIN,
+        scores: [match.scores[0], match.scores[1]], flags, players,
+        respawnIn: Math.ceil(match.respawn.get(pid) ?? 0),
+      };
+    }
+    const group = this.bgGroupContaining(pid);
+    return {
+      rating: meta.squadRating, wins: meta.squadWins, losses: meta.squadLosses,
+      queued: group !== null, queueSize: this.bgQueueSize(), queuedParty: group?.pids.length ?? 1,
+      match: matchInfo, ladder: this.squadLadder(),
+    };
   }
 
   // -------------------------------------------------------------------------
@@ -3192,6 +3785,26 @@ export class Sim {
     if (!d) return null;
     const otherPid = d.a === this.primaryId ? d.b : d.a;
     return { otherPid, otherName: this.players.get(otherPid)?.name ?? '?', state: d.state };
+  }
+
+  get bgInfo(): import('../world_api').BgInfo | null {
+    return this.primaryId === -1 ? null : this.bgInfoFor(this.primaryId);
+  }
+
+  // Dev/test only: force-start a battleground from whoever is queued, split
+  // into two teams even if there aren't a full ten. Server-gated behind
+  // ALLOW_DEV_COMMANDS so it never runs in production.
+  devStartBg(): void {
+    const pids = this.bgQueue.flatMap((g) => g.pids).filter((p) => this.entities.get(p) && !this.bgMatches.has(p));
+    if (pids.length < 2) return;
+    const take = pids.slice(0, BG_TEAM_SIZE * 2);
+    const half = Math.ceil(take.length / 2);
+    const teamA = take.slice(0, half);
+    const teamB = take.slice(half);
+    this.bgQueue = this.bgQueue
+      .map((g) => ({ ...g, pids: g.pids.filter((p) => !take.includes(p)) }))
+      .filter((g) => g.pids.length > 0);
+    this.startBgMatch(teamA, teamB);
   }
 
   instanceSlotAt(pos: Vec3): number | null {

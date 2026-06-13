@@ -41,6 +41,53 @@ export interface DuelInfo {
   state: 'countdown' | 'active';
 }
 
+// ---- Ravenrift 5v5 capture-the-flag ----
+export interface SquadLadderEntry {
+  pid: number;
+  name: string;
+  cls: PlayerClass;
+  rating: number;
+  wins: number;
+  losses: number;
+}
+
+export interface BgFlagInfo {
+  state: 'home' | 'carried' | 'dropped';
+  carrierName: string | null;
+  carrierTeam: number | null; // which team is carrying it
+}
+
+export interface BgPlayerInfo {
+  pid: number;
+  name: string;
+  cls: PlayerClass;
+  team: number; // 0 = Crimson, 1 = Azure
+  carrying: boolean; // holding the enemy flag
+  dead: boolean;
+  hp: number;
+  mhp: number;
+}
+
+export interface BgMatchInfo {
+  state: 'countdown' | 'active';
+  myTeam: number;
+  capsToWin: number;
+  scores: [number, number]; // [Crimson, Azure]
+  flags: [BgFlagInfo, BgFlagInfo]; // index = flag's home team
+  players: BgPlayerInfo[];
+  respawnIn: number; // seconds until you respawn, 0 if alive
+}
+
+export interface BgInfo {
+  rating: number;
+  wins: number;
+  losses: number;
+  queued: boolean;
+  queueSize: number; // players waiting (across all groups)
+  queuedParty: number; // size of the party you queued with (1 = solo)
+  match: BgMatchInfo | null;
+  ladder: SquadLadderEntry[];
+}
 // The surface the renderer + HUD need from a game world. The offline `Sim`
 // satisfies this structurally; the online `ClientWorld` implements it by
 // mirroring server snapshots and sending commands over the socket.
@@ -80,6 +127,7 @@ export interface IWorld {
   partyInfo: PartyInfo | null;
   tradeInfo: TradeInfo | null;
   duelInfo: DuelInfo | null;
+  bgInfo: BgInfo | null;
   partyInvite(targetPid: number): void;
   partyAccept(): void;
   partyDecline(): void;
@@ -93,6 +141,8 @@ export interface IWorld {
   duelRequest(targetPid: number): void;
   duelAccept(): void;
   duelDecline(): void;
+  bgQueueJoin(): void;
+  bgQueueLeave(): void;
   enterDungeon(dungeonId: string): void;
   leaveDungeon(): void;
 }

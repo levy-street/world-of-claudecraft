@@ -69,6 +69,11 @@ export class Hud {
   private tradeWasOpen = false;
   private lastTradeSig = '';
   private lastPartySig = '';
+  private lastBgSig = '';
+  private lastBgScoreSig = '';
+  // all-time ladder, fetched best-effort from the server (online only)
+  private bgAllTime: { name: string; class: string; level: number; rating: number; wins: number; losses: number }[] | null = null;
+  private bgLbFetchedAt = 0;
   private lastCombatEventAt = 0;
   private lastZoneId = '';
   private mapZoneId = ''; // zone the cached map-window canvas was rendered for
@@ -104,6 +109,7 @@ export class Hud {
     $('#mm-quest').addEventListener('click', () => this.toggleQuestLog());
     $('#mm-map').addEventListener('click', () => this.toggleMap());
     $('#mm-bag').addEventListener('click', () => this.toggleBags());
+    $('#mm-bg').addEventListener('click', () => this.toggleBg());
     const musicBtn = $('#mm-music');
     const styleMusicBtn = () => { musicBtn.style.color = music.enabled ? '#ffd100' : '#666'; };
     styleMusicBtn();
@@ -513,7 +519,21 @@ export class Hud {
     ($('#xpbar .fill') as HTMLElement).style.width = `${(xpFrac * 100).toFixed(1)}%`;
     $('#xpbar .label').textContent = p.level >= MAX_LEVEL ? 'MAX LEVEL' : `${sim.xp} / ${xpNeed} XP (${Math.floor(xpFrac * 100)}%)`;
 
-    $('#death-overlay').style.display = p.dead ? 'flex' : 'none';
+    // death overlay: a battleground death is a timed keep respawn, not a
+    // graveyard run — show the countdown and hide the release button
+    const bgRespawnIn = sim.bgInfo?.match?.respawnIn ?? 0;
+    const overlay = $('#death-overlay');
+    if (p.dead && bgRespawnIn > 0) {
+      overlay.style.display = 'flex';
+      $('#death-overlay h1').textContent = `Respawning at your keep in ${bgRespawnIn}…`;
+      $('#release-btn').style.display = 'none';
+    } else if (p.dead) {
+      overlay.style.display = 'flex';
+      $('#death-overlay h1').textContent = 'You have died.';
+      $('#release-btn').style.display = '';
+    } else {
+      overlay.style.display = 'none';
+    }
 
     // zone transitions: banner + welcome hint when crossing into a new band.
     // A ~5yd dead-band past the boundary stops a player straddling the border
@@ -551,8 +571,10 @@ export class Hud {
     this.updateQuestTracker();
     this.updatePartyFrames();
     this.updateTradeWindow();
+    this.updateBgScoreboard();
     this.updateMinimap();
     if ($('#map-window').style.display === 'block') this.updateMapWindow();
+    if ($('#bg-window').style.display === 'block') this.renderBgWindow();
     if (this.openLootMobId !== null) {
       const mob = sim.entities.get(this.openLootMobId);
       if (!mob || !mob.lootable || dist2d(p.pos, mob.pos) > 7) this.closeLoot();
@@ -718,6 +740,106 @@ export class Hud {
 
   toggleMeters(): void {
     this.meters.toggle();
+  }
+
+  // -------------------------------------------------------------------------
+  // Ravenrift — 5v5 capture-the-flag panel + in-match scoreboard
+  // -------------------------------------------------------------------------
+
+  toggleBg(): void {
+    const el = $('#bg-window');
+    if (el.style.display === 'block') { el.style.display = 'none'; return; }
+    el.style.display = 'block';
+    this.lastBgSig = '';
+    this.fetchBgLeaderboard();
+    this.renderBgWindow();
+  }
+
+  private fetchBgLeaderboard(): void {
+    const now = performance.now();
+    if (now - this.bgLbFetchedAt < 15000) return;
+    this.bgLbFetchedAt = now;
+    fetch('/api/squad/leaderboard')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (d && Array.isArray(d.leaders)) { this.bgAllTime = d.leaders; this.lastBgSig = ''; } })
+      .catch(() => { /* offline — live ladder only */ });
+  }
+
+  private renderBgWindow(): void {
+    const el = $('#bg-window');
+    const b = this.sim.bgInfo;
+    if (!b) {
+      el.innerHTML = `<div class="panel-title"><span>Ravenrift</span><span class="x-btn" data-close>✕</span></div>`
+        + `<div class="bg-note">Ravenrift is a ranked 5v5 capture-the-flag battleground for the live world. Play online, group up to 5, and queue together.</div>`;
+      el.querySelector('[data-close]')?.addEventListener('click', () => { el.style.display = 'none'; });
+      return;
+    }
+    const inMatch = b.match !== null;
+    const party = this.sim.partyInfo;
+    const partySize = party ? party.members.length : 1;
+    const ladderRow = (r: { pid?: number; name: string; cls?: string; class?: string; level?: number; rating: number; wins: number; losses: number }, i: number) => {
+      const me = (r.pid !== undefined && r.pid === this.sim.playerId) || r.name === this.sim.player.name;
+      const clsKey = (r.cls ?? r.class ?? '') as keyof typeof CLASSES;
+      const cls = CLASSES[clsKey]?.name ?? (r.cls ?? r.class ?? '');
+      return `<div class="ladder-row${me ? ' me' : ''}"><span class="rank">${i + 1}</span>`
+        + `<span class="lr-name" title="${r.name} — ${cls}">${r.name}</span>`
+        + `<span class="lr-rating">${r.rating}</span><span class="lr-wl">${r.wins}-${r.losses}</span></div>`;
+    };
+    const online = b.ladder.map(ladderRow).join('') || `<div class="ladder-empty">No squads ranked yet — be the first.</div>`;
+    this.fetchBgLeaderboard();
+    const allTimeRows = (this.bgAllTime ?? []).map(ladderRow).join('');
+    const allTime = this.bgAllTime && this.bgAllTime.length > 0 ? `<div class="bg-sub">Ladder — All-Time</div>${allTimeRows}` : '';
+
+    let action: string;
+    if (inMatch) {
+      action = `<div class="bg-queue-status">⚑ Battle in progress — ${b.match!.scores[0]}–${b.match!.scores[1]}.</div>`;
+    } else if (b.queued) {
+      action = `<button class="btn leave" data-act="leave">Leave Queue</button>`
+        + `<div class="bg-queue-status">Searching… ${b.queueSize}/10 in queue${b.queuedParty > 1 ? ` · party of ${b.queuedParty}` : ''}.</div>`;
+    } else {
+      action = `<button class="btn" data-act="queue">Enter the Queue${partySize > 1 ? ` (party of ${partySize})` : ''}</button>`
+        + `<div class="bg-note">Two teams of five. Steal the enemy banner and run it to your keep — first to 5 captures wins. Grab Sprint Runes to fly across the field, and weave the cover to lose your pursuers. Group up to bring your squad.</div>`;
+    }
+
+    const sig = JSON.stringify([b.rating, b.wins, b.losses, b.queued, b.queueSize, b.queuedParty, inMatch, partySize, b.ladder, this.bgAllTime]);
+    if (sig === this.lastBgSig) return;
+    this.lastBgSig = sig;
+    el.innerHTML = `<div class="panel-title"><span>Ravenrift <span style="color:#998d6a;font-size:11px">5v5 Capture the Flag</span></span><span class="x-btn" data-close>✕</span></div>`
+      + `<div class="bg-rank"><span class="rating">${b.rating}</span><span class="wl">Squad Rating · <b>${b.wins}</b> wins / <i>${b.losses}</i> losses</span></div>`
+      + action
+      + `<div class="bg-sub">Ladder — Online</div>${online}${allTime}`;
+    el.querySelector('[data-close]')?.addEventListener('click', () => { el.style.display = 'none'; });
+    el.querySelector('[data-act="queue"]')?.addEventListener('click', () => { this.sim.bgQueueJoin(); audio.click(); });
+    el.querySelector('[data-act="leave"]')?.addEventListener('click', () => { this.sim.bgQueueLeave(); audio.click(); });
+  }
+
+  // The pinned in-match scoreboard: team scores, flag states, your team's pips.
+  private updateBgScoreboard(): void {
+    const el = $('#bg-scoreboard');
+    const b = this.sim.bgInfo;
+    const m = b?.match ?? null;
+    if (!m) {
+      if (el.style.display !== 'none') { el.style.display = 'none'; this.lastBgScoreSig = ''; }
+      return;
+    }
+    const flagGlyph = (i: number) => {
+      const f = m.flags[i];
+      return `<span class="flag ${f.state} ${i === 0 ? 'crimson' : 'azure'}" title="${i === 0 ? 'Crimson' : 'Azure'} flag: ${f.state}${f.carrierName ? ' by ' + f.carrierName : ''}">⚑</span>`;
+    };
+    const pips = (team: number) => m.players.filter((p) => p.team === team)
+      .map((p) => `<div class="bg-pip${p.dead ? ' dead' : ''}${p.carrying ? ' flag' : ''}" style="background:${team === 0 ? '#ff6a62' : '#6aa6ff'}" title="${p.name}${p.dead ? ' (down)' : ''}${p.carrying ? ' — carrying!' : ''}"></div>`).join('');
+    const sig = JSON.stringify([m.scores, m.flags.map((f) => f.state + (f.carrierName ?? '')), m.players.map((p) => [p.dead, p.carrying]), m.state, m.myTeam]);
+    if (sig !== this.lastBgScoreSig) {
+      this.lastBgScoreSig = sig;
+      const youCrimson = m.myTeam === 0;
+      el.innerHTML = `<div class="bg-score-line">`
+        + `<span class="team crimson">${flagGlyph(0)} Crimson${youCrimson ? ' (you)' : ''}</span>`
+        + `<span class="num crimson">${m.scores[0]}</span><span class="dash">–</span><span class="num azure">${m.scores[1]}</span>`
+        + `<span class="team azure">Azure${!youCrimson ? ' (you)' : ''} ${flagGlyph(1)}</span></div>`
+        + `<div class="bg-caps">${m.state === 'countdown' ? 'FORM UP…' : `FIRST TO ${m.capsToWin} CAPTURES`}</div>`
+        + `<div class="bg-roster">${pips(0)}<span style="width:10px"></span>${pips(1)}</div>`;
+      el.style.display = 'block';
+    }
   }
 
   toggleMap(): void {
@@ -968,6 +1090,42 @@ export class Hud {
           this.combatLog(`${ev.winnerName} has defeated ${ev.loserName} in a duel.`, '#fa6');
           audio.duelEnd();
           break;
+        case 'bgQueued': this.log(`Queued for Ravenrift (${ev.position}/10).`, '#7fd4ff'); break;
+        case 'bgUnqueued': this.log('You leave the Ravenrift queue.', '#7fd4ff'); break;
+        case 'bgFound': {
+          const team = ev.team === 0 ? 'Crimson' : 'Azure';
+          this.showBanner(`Battle found — you fight for the ${team}!`);
+          audio.duelChallenge();
+          break;
+        }
+        case 'bgCountdown': this.showBanner(`Ravenrift begins in ${ev.seconds}…`); audio.duelCountdownTick(); break;
+        case 'bgStart': this.showBanner('Capture the flag!'); audio.duelStart(); break;
+        case 'bgFlag': {
+          const team = ev.team === 0 ? 'Crimson' : 'Azure';
+          const score = `${ev.scoreCrimson}–${ev.scoreAzure}`;
+          if (ev.action === 'captured') {
+            this.showBanner(`${ev.byName} captured the ${team} flag!  ${score}`);
+            this.combatLog(`${ev.byName} captured the ${team} flag. Score ${score}.`, '#ffd24a');
+            audio.questDone();
+          } else if (ev.action === 'taken') {
+            this.combatLog(`${ev.byName} has taken the ${team} flag!`, '#ff9a3c');
+          } else if (ev.action === 'dropped') {
+            this.combatLog(`The ${team} flag was dropped.`, '#cfc6a8');
+          } else {
+            this.combatLog(`The ${team} flag was returned.`, '#9fdc7f');
+          }
+          break;
+        }
+        case 'bgEnd': {
+          const delta = ev.ratingAfter - ev.ratingBefore;
+          const sign = delta >= 0 ? '+' : '';
+          const score = `${ev.scoreCrimson}–${ev.scoreAzure}`;
+          if (ev.draw) this.showBanner(`Ravenrift draw ${score} (${sign}${delta} rating)`);
+          else if (ev.won) { this.showBanner(`Victory!  Ravenrift ${score} — Rating ${ev.ratingAfter} (${sign}${delta})`); audio.duelEnd(); }
+          else { this.showBanner(`Defeat.  Ravenrift ${score} — Rating ${ev.ratingAfter} (${sign}${delta})`); audio.death(); }
+          this.combatLog(`Ravenrift ended ${score}. Squad rating ${ev.ratingAfter} (${sign}${delta}).`, ev.won ? '#7fdc4f' : '#ff7a6a');
+          break;
+        }
         case 'log': this.log(ev.text, ev.color ?? '#ccc'); break;
         case 'playerDeath': {
           this.log('You have died.', '#ff4444');
@@ -1917,7 +2075,7 @@ export class Hud {
       this.sim.tradeCancel();
       closed = true;
     }
-    for (const id of ['#quest-dialog', '#loot-window', '#vendor-window', '#bags', '#char-window', '#spellbook', '#quest-log-window', '#map-window']) {
+    for (const id of ['#quest-dialog', '#loot-window', '#vendor-window', '#bags', '#char-window', '#spellbook', '#quest-log-window', '#map-window', '#bg-window']) {
       const el = $(id);
       if (el.style.display === 'block') {
         el.style.display = 'none';
