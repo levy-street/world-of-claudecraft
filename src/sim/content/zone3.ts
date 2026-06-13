@@ -183,6 +183,7 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     questIds: ['q_stalker_pelts', 'q_glowing_wax'],
     vendorItems: [
       'trail_hardtack', 'meltwater_flask', 'roast_mountain_goat', 'glacier_melt',
+      'highland_spice_loaf', 'crag_elk_ribs', 'glacial_mint_tea',
       'highwatch_breastplate', 'peakwool_robe', 'stalkerhide_jerkin', 'cragwalker_boots', 'windguard_leggings',
     ],
     greeting: 'Wool, hardtack, and steel-shod boots — Highwatch runs on all three, and I am short of everything.',
@@ -632,6 +633,22 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   glacier_melt: {
     id: 'glacier_melt', name: 'Glacier Melt', kind: 'drink', quality: 'common',
     drinkMana: 900, sellValue: 150, buyValue: 2500,
+  },
+  // --- buff food (Quartermaster Bree) ---
+  highland_spice_loaf: {
+    id: 'highland_spice_loaf', name: 'Highland Spice Loaf', kind: 'food', quality: 'common',
+    foodHp: 400, sellValue: 100, buyValue: 2000,
+    buffAura: { auraKind: 'buff_int', value: 6, duration: 900, name: 'Spiced Intellect' },
+  },
+  crag_elk_ribs: {
+    id: 'crag_elk_ribs', name: 'Crag Elk Ribs', kind: 'food', quality: 'common',
+    foodHp: 500, sellValue: 110, buyValue: 2200,
+    buffAura: { auraKind: 'buff_agi', value: 5, duration: 900, name: 'Crag Elk Vigor' },
+  },
+  glacial_mint_tea: {
+    id: 'glacial_mint_tea', name: 'Glacial Mint Tea', kind: 'food', quality: 'common',
+    foodHp: 350, sellValue: 125, buyValue: 2500,
+    buffAura: { auraKind: 'buff_spi', value: 8, duration: 900, name: 'Glacial Clarity' },
   },
   // --- vendor whites (Armorer Hode + Quartermaster Bree) ---
   highwatch_warblade: {

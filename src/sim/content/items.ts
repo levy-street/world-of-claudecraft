@@ -187,4 +187,15 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   spider_leg: { id: 'spider_leg', name: 'Twitching Spider Leg', kind: 'junk', quality: 'poor', sellValue: 4 },
   bone_fragments: { id: 'bone_fragments', name: 'Bone Fragments', kind: 'junk', quality: 'poor', sellValue: 7 },
   linen_scrap: { id: 'linen_scrap', name: 'Linen Scrap', kind: 'junk', quality: 'poor', sellValue: 3 },
+  // --- buff food (Zone 1 - Eastbrook Vale) ---
+  silver_leaf_tea: {
+    id: 'silver_leaf_tea', name: 'Silver Leaf Tea', kind: 'food', quality: 'common',
+    foodHp: 61, sellValue: 12, buyValue: 250,
+    buffAura: { auraKind: 'buff_spi', value: 3, duration: 900, name: 'Silver Leaf Infusion' },
+  },
+  campfire_flatbread: {
+    id: 'campfire_flatbread', name: 'Campfire Flatbread', kind: 'food', quality: 'common',
+    foodHp: 61, sellValue: 15, buyValue: 300,
+    buffAura: { auraKind: 'buff_sta', value: 3, duration: 900, name: 'Campfire Warmth' },
+  },
 };
