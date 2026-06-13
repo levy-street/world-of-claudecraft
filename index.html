@@ -1074,6 +1074,21 @@
     box-shadow: inset 0 0 8px #000;
     margin-top: var(--spacing-xs);
   }
+  #start-flow-status {
+    max-width: min(520px, 88vw);
+    padding: 6px 12px;
+    border: 1px solid rgba(200, 168, 56, 0.38);
+    border-radius: var(--radius-sm);
+    background: rgba(5, 5, 9, 0.62);
+    color: var(--color-primary-dim);
+    font-family: var(--font-heading);
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    line-height: 1.4;
+    text-align: center;
+    text-shadow: 1px 1px 2px #000;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.38);
+  }
 
   /* Wiki view with integrated Controls Guide */
   .wiki-container-layout {
@@ -1930,7 +1945,7 @@
 
   /* ---------- Collapsible Controls Drawer ---------- */
   #btn-toggle-controls {
-    grid-row: 3;
+    grid-row: 4;
     grid-column: 1;
     margin-top: 12px;
     background: linear-gradient(180deg, #1b1b26 0%, #0d0d14 100%);
@@ -3177,7 +3192,7 @@
   }
 </style>
 </head>
-<body>
+<body data-start-flow-state="mode-select" data-active-start-panel="#mode-select" data-has-game="false">
   <canvas id="game-canvas"></canvas>
   <div id="nameplates"></div>
 
@@ -3316,7 +3331,7 @@
   <input id="chat-input" maxlength="200" placeholder="Say something… (/w name whisper, /r reply, /p party, /gu guild, /o officer, /g general)" autocomplete="off" />
   </template>
 
-  <main id="start-screen">
+  <main id="start-screen" data-start-flow-state="mode-select" data-active-start-panel="#mode-select" data-has-game="false">
     <!-- Keep the backdrop here at the top level so it spans the entire screen behind content -->
     <div id="start-screen-backdrop" aria-hidden="true">
       <div class="portal-ring"></div>
@@ -3674,6 +3689,7 @@
     </div>
 
     <footer class="homepage-footer">
+      <div id="start-flow-status" aria-live="polite">Choose online or offline play.</div>
       <div class="footer-social-row">
         <a class="social-link" href="https://github.com/levy-street/world-of-claudecraft" target="_blank" rel="noopener noreferrer">
           <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
