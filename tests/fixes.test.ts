@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
 import { Entity, dist2d } from '../src/sim/types';
-import { CRYPT_DOOR_POS, DUNGEON_X_THRESHOLD, LAKE, MOBS } from '../src/sim/data';
+import { CRYPT_DOOR_POS, DUNGEON_X_THRESHOLD, LAKE, MOBS, NPCS, QUESTS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { groundHeight, WATER_LEVEL } from '../src/sim/world';
 import { isBlocked, resolvePosition } from '../src/sim/colliders';
@@ -244,6 +244,79 @@ describe('boss loot and encounter resets', () => {
     sim.sellItem('wolf_fang');
     expect(sim.countItem('wolf_fang')).toBe(1);
     expect(sim.copper).toBe(copperBefore);
+  });
+});
+
+describe('quest npc roles', () => {
+  it('every quest is listed in the questIds of its giver and turn-in NPCs', () => {
+    // the gossip dialog and markers filter by role, so a quest whose giver
+    // does not list it would be unobtainable
+    for (const quest of Object.values(QUESTS)) {
+      expect(NPCS[quest.giverNpcId]?.questIds, `${quest.id} giver ${quest.giverNpcId}`).toContain(quest.id);
+      expect(NPCS[quest.turnInNpcId]?.questIds, `${quest.id} turn-in ${quest.turnInNpcId}`).toContain(quest.id);
+    }
+  });
+
+  it('interacting with the turn-in NPC does not auto-accept an available quest', () => {
+    const sim = makeSim();
+    (sim as any).grantXp(99999); // well past minLevel 6 for q_fenbridge_muster
+    expect(sim.questState('q_fenbridge_muster')).toBe('available');
+    const warden = [...sim.entities.values()].find((e) => e.templateId === 'warden_fenwick')!;
+    teleportTo(sim, warden.pos.x + 2, warden.pos.z);
+    sim.talkToNpc(warden.id);
+    expect(sim.questState('q_fenbridge_muster')).toBe('available');
+    const aldric = [...sim.entities.values()].find((e) => e.templateId === 'brother_aldric')!;
+    teleportTo(sim, aldric.pos.x + 2, aldric.pos.z);
+    // talkToNpc accepts one available quest per interaction and aldric
+    // offers several — keep talking until the muster order is taken
+    for (let i = 0; i < 10 && sim.questState('q_fenbridge_muster') !== 'active'; i++) sim.talkToNpc(aldric.id);
+    expect(sim.questState('q_fenbridge_muster')).toBe('active');
+  });
+});
+
+describe('warrior charge', () => {
+  function chargeSetup() {
+    const sim = makeSim();
+    (sim as any).grantXp(99999); // learn charge (level 4)
+    const p = sim.player;
+    const wolf = [...sim.entities.values()].find((e) => e.kind === 'mob' && e.templateId === 'forest_wolf' && !e.dead)!;
+    teleportTo(sim, wolf.pos.x - 18, wolf.pos.z);
+    p.facing = Math.atan2(wolf.pos.x - p.pos.x, wolf.pos.z - p.pos.z);
+    sim.targetEntity(wolf.id);
+    return { sim, p, wolf };
+  }
+
+  it('stuns the target immediately and does not teleport', () => {
+    const { sim, p, wolf } = chargeSetup();
+    const before = dist2d(p.pos, wolf.pos);
+    sim.castAbility('charge');
+    expect(wolf.auras.some((a) => a.kind === 'stun')).toBe(true);
+    // still roughly where we started — the run happens over the next ticks
+    expect(dist2d(p.pos, wolf.pos)).toBeGreaterThan(before - 2);
+    expect(p.chargeTargetId).toBe(wolf.id);
+  });
+
+  it('runs to melee range at roughly 3x speed and starts attacking', () => {
+    const { sim, p, wolf } = chargeSetup();
+    sim.castAbility('charge');
+    const start = { ...p.pos };
+    // 10 ticks = 0.5s; at 21 yd/s a clear run covers ~10.5yd, far beyond
+    // the 3.5yd a normal run would manage
+    for (let i = 0; i < 10; i++) sim.tick();
+    expect(dist2d(start, p.pos)).toBeGreaterThan(7);
+    for (let i = 0; i < 50 && p.chargeTargetId !== null; i++) sim.tick();
+    expect(p.chargeTargetId).toBe(null);
+    expect(dist2d(p.pos, wolf.pos)).toBeLessThanOrEqual(5);
+    expect(p.autoAttack).toBe(true);
+  });
+
+  it('gives up cleanly when the target dies mid-charge', () => {
+    const { sim, p, wolf } = chargeSetup();
+    sim.castAbility('charge');
+    sim.tick();
+    wolf.dead = true;
+    sim.tick();
+    expect(p.chargeTargetId).toBe(null);
   });
 });
 

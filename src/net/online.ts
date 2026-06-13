@@ -102,6 +102,7 @@ function blankEntity(id: number): Entity {
     channeling: false, channelTickTimer: 0, channelTickEvery: 0,
     gcdRemaining: 0, cooldowns: new Map(), queuedOnSwing: null, fiveSecondRule: 99,
     comboPoints: 0, comboTargetId: null, overpowerUntil: -1,
+    chargeTargetId: null, chargeTimeLeft: 0, chargePath: [],
     sitting: false, eating: null, drinking: null,
     aiState: 'idle', tappedById: null, pulseTimer: 0, firedSummons: 0, summonedIds: [], enraged: false,
     spawnPos: { x: 0, y: 0, z: 0 }, wanderTarget: null, wanderTimer: 0,
@@ -136,6 +137,9 @@ export class ClientWorld implements IWorld {
 
   private ws: WebSocket;
   private eventQueue: SimEvent[] = [];
+  // inventory deltas arrive in snapshots, separate from the event frames the
+  // HUD redraws on — the frame loop polls this so open panels re-render
+  private invChanged = false;
   private mouselookFacing: number | null = null;
   private sendTimer: number | undefined;
 
@@ -335,7 +339,7 @@ export class ClientWorld implements IWorld {
         : null;
       this.xp = s.xp ?? 0;
       this.copper = s.copper ?? 0;
-      if (s.inv !== undefined) this.inventory = s.inv;
+      if (s.inv !== undefined) { this.inventory = s.inv; this.invChanged = true; }
       if (s.equip !== undefined) this.equipment = s.equip;
       if (s.qlog !== undefined) this.questLog = new Map((s.qlog as QuestProgress[]).map((q) => [q.questId, q]));
       if (s.qdone !== undefined) this.questsDone = new Set(s.qdone);
@@ -364,6 +368,12 @@ export class ClientWorld implements IWorld {
 
   questState(questId: string): QuestState {
     return computeQuestState(questId, this.questLog, this.questsDone, this.player.level);
+  }
+
+  consumeInventoryChanged(): boolean {
+    const v = this.invChanged;
+    this.invChanged = false;
+    return v;
   }
 
   castAbility(abilityId: string): void {

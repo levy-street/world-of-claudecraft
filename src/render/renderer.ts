@@ -3,7 +3,7 @@ import { Entity, SimEvent } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { groundHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 import {
-  MOBS, ABILITIES, DUNGEON_X_THRESHOLD, DUNGEON_LIST,
+  MOBS, ABILITIES, DUNGEON_X_THRESHOLD, DUNGEON_LIST, QUESTS,
   instanceOrigin, INSTANCE_SLOT_COUNT,
 } from '../sim/data';
 import type { BiomeId } from '../sim/types';
@@ -1018,11 +1018,15 @@ export class Renderer {
         v.hpBar.style.display = 'none';
         let marker = '';
         let cls = '';
+        // role-aware: '!' only at the quest's giver, '?' only at its turn-in
+        // NPC (gray while in progress), matching the gossip dialog
         for (const qid of e.questIds) {
+          const quest = QUESTS[qid];
+          if (!quest) continue;
           const st = sim.questState(qid);
-          if (st === 'ready') { marker = '?'; cls = 'ready'; break; }
-          if (st === 'available') { marker = '!'; cls = 'avail'; }
-          else if (st === 'active' && !marker) { marker = '?'; cls = 'active'; }
+          if (st === 'ready' && quest.turnInNpcId === e.templateId) { marker = '?'; cls = 'ready'; break; }
+          if (st === 'available' && quest.giverNpcId === e.templateId) { marker = '!'; cls = 'avail'; }
+          else if (st === 'active' && quest.turnInNpcId === e.templateId && !marker) { marker = '?'; cls = 'active'; }
         }
         v.markerEl.textContent = marker;
         v.markerEl.className = 'np-marker ' + cls;

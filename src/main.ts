@@ -119,15 +119,8 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
   const input = new Input(canvas, {
     onTab: () => world.tabTarget(),
     // slot 0 (key 1) is Attack for every class — auto-attack without needing
-    // right-click; the remaining keys map onto the class kit shifted by one
-    onAbility: (slot) => {
-      if (slot === 0) {
-        if (world.player.autoAttack) world.stopAutoAttack();
-        else world.startAutoAttack();
-      } else {
-        world.castAbilityBySlot(slot - 1);
-      }
-    },
+    // right-click; keys and clicks share the Hud's remappable slot layout
+    onAbility: (slot) => hud.castSlot(slot),
     onUiKey: (key) => {
       switch (key) {
         case 'interact': interactKey(); break;
@@ -245,6 +238,7 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
     net.setMouselookFacing(mouselook ? input.camYaw : null);
     net.pendingFacingDelta = 0; // superseded by the interpolated follow below
     hud.handleEvents(net.drainEvents());
+    if (net.consumeInventoryChanged()) hud.onInventoryChanged();
     const alpha = net.lastSnapAt > 0
       ? Math.min(1.25, (performance.now() - net.lastSnapAt) / Math.max(20, net.snapInterval))
       : 1;

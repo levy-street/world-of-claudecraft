@@ -30,7 +30,10 @@ const ZONE_BANNER_DEADBAND = 5;
 const IGNORED_CHAT_NAMES_KEY = 'woc_ignored_chat_names';
 
 export class Hud {
+  private static readonly BAR_ABILITY_SLOTS = 11; // bar slots 1..11; slot 0 is the fixed Attack toggle
   private abilityButtons: { btn: HTMLButtonElement; label: HTMLSpanElement; cdOverlay: HTMLDivElement; cdText: HTMLDivElement; lastIcon: string }[] = [];
+  private slotMap: (string | null)[] = []; // index = barSlot-1, value = ability id
+  private dragFromSlot: number | null = null;
   private chatLogEl = $('#chatlog');
   private combatLogEl = $('#combatlog');
   private errorEl = $('#error-msg');
@@ -62,6 +65,7 @@ export class Hud {
     this.ignoredChatNames = this.loadIgnoredChatNames();
     this.meters = new Meters(sim);
     this.bindLogTabs();
+    this.loadSlotMap();
     this.buildActionBar();
     this.buildXpTicks();
     $('#pf-name').textContent = sim.player.name;
@@ -217,6 +221,64 @@ export class Hud {
   // Action bar
   // -------------------------------------------------------------------------
 
+  // The hotbar layout is a client-side remap over the learned abilities,
+  // keyed by ability id (known is class-ordered and shifts on level-up, so
+  // indices would not survive). Persisted per class+character.
+  private slotMapKey(): string {
+    return `woc_hotbar_${this.sim.cfg.playerClass}_${this.sim.player.name}`;
+  }
+
+  private loadSlotMap(): void {
+    let arr: unknown = null;
+    try { arr = JSON.parse(localStorage.getItem(this.slotMapKey()) ?? 'null'); } catch { /* corrupt */ }
+    const seen = new Set<string>();
+    this.slotMap = Array.from({ length: Hud.BAR_ABILITY_SLOTS }, (_, i) => {
+      const v = Array.isArray(arr) ? arr[i] : null;
+      if (typeof v !== 'string' || !ABILITIES[v] || seen.has(v)) return null;
+      seen.add(v);
+      return v;
+    });
+  }
+
+  private saveSlotMap(): void {
+    try { localStorage.setItem(this.slotMapKey(), JSON.stringify(this.slotMap)); } catch { /* storage unavailable */ }
+  }
+
+  // Drop unlearned ids; place newly learned abilities in the first empty
+  // slot. With empty storage this reproduces the default class-order layout.
+  private syncSlotMap(): void {
+    const ids = new Set(this.sim.known.map((k) => k.def.id));
+    let dirty = false;
+    for (let i = 0; i < this.slotMap.length; i++) {
+      const id = this.slotMap[i];
+      if (id !== null && !ids.has(id)) { this.slotMap[i] = null; dirty = true; }
+    }
+    for (const k of this.sim.known) {
+      if (this.slotMap.includes(k.def.id)) continue;
+      const empty = this.slotMap.indexOf(null);
+      if (empty !== -1) { this.slotMap[empty] = k.def.id; dirty = true; }
+    }
+    if (dirty) this.saveSlotMap();
+  }
+
+  abilityForSlot(barSlot: number): ResolvedAbility | null { // barSlot 1..11
+    const id = this.slotMap[barSlot - 1];
+    return id ? this.sim.known.find((k) => k.def.id === id) ?? null : null;
+  }
+
+  // Shared entry point for hotbar clicks and the 1..0-= keybinds.
+  castSlot(barSlot: number): void {
+    if (barSlot === 0) {
+      if (this.sim.player.autoAttack) this.sim.stopAutoAttack();
+      else this.sim.startAutoAttack();
+      return;
+    }
+    const known = this.abilityForSlot(barSlot);
+    // cast by ability id: the server validates against its own known list,
+    // so the client-side slot remap never desyncs slot semantics
+    if (known) this.sim.castAbility(known.def.id);
+  }
+
   private buildActionBar(): void {
     const bar = $('#actionbar');
     const keybinds = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '='];
@@ -238,20 +300,49 @@ export class Hud {
       // without right-click need a way in); the kit fills slots 1+
       btn.addEventListener('click', () => {
         audio.click();
-        if (slot === 0) {
-          if (this.sim.player.autoAttack) this.sim.stopAutoAttack();
-          else this.sim.startAutoAttack();
-        } else {
-          this.sim.castAbilityBySlot(slot - 1);
-        }
+        this.castSlot(slot);
       });
       this.attachTooltip(btn, () => {
         if (slot === 0) {
           return '<div class="tt-title">Attack</div><div class="tt-sub">Toggle auto-attack on your target.<br>Right-clicking an enemy also attacks.</div>';
         }
-        const known = this.sim.known[slot - 1];
+        const known = this.abilityForSlot(slot);
         return known ? this.abilityTooltip(known) : '<div class="tt-sub">Empty slot</div>';
       });
+      if (slot >= 1) {
+        // drag an ability onto another slot to swap the two keybinds;
+        // slot 0 (Attack) stays fixed
+        btn.draggable = true;
+        btn.addEventListener('dragstart', (e) => {
+          const known = this.abilityForSlot(slot);
+          if (!known) { e.preventDefault(); return; }
+          this.dragFromSlot = slot;
+          e.dataTransfer!.setData('text/plain', known.def.id);
+          e.dataTransfer!.effectAllowed = 'move';
+          this.hideTooltip();
+        });
+        btn.addEventListener('dragover', (e) => {
+          if (this.dragFromSlot === null || this.dragFromSlot === slot) return;
+          e.preventDefault(); // required to permit the drop
+          e.dataTransfer!.dropEffect = 'move';
+          btn.classList.add('drop-target');
+        });
+        btn.addEventListener('dragleave', () => btn.classList.remove('drop-target'));
+        btn.addEventListener('drop', (e) => {
+          e.preventDefault();
+          btn.classList.remove('drop-target');
+          const from = this.dragFromSlot;
+          this.dragFromSlot = null;
+          if (from === null || from === slot) return;
+          const a = from - 1, b = slot - 1;
+          [this.slotMap[a], this.slotMap[b]] = [this.slotMap[b], this.slotMap[a]]; // swap; empty target = move
+          this.saveSlotMap();
+        });
+        btn.addEventListener('dragend', () => {
+          this.dragFromSlot = null;
+          bar.querySelectorAll('.drop-target').forEach((el) => el.classList.remove('drop-target'));
+        });
+      }
       bar.appendChild(btn);
       this.abilityButtons.push({ btn, label, cdOverlay, cdText, lastIcon: '' });
     }
@@ -270,6 +361,7 @@ export class Hud {
     const sim = this.sim;
     const p = sim.player;
     this.meters.update();
+    this.syncSlotMap(); // picks up newly learned abilities mid-session
 
     // player frame
     $('#pf-level').textContent = String(p.level);
@@ -363,7 +455,7 @@ export class Hud {
         ab.btn.classList.toggle('oor', tgtDist !== null && tgtDist > MELEE_RANGE);
         continue;
       }
-      const known = sim.known[i - 1];
+      const known = this.abilityForSlot(i);
       if (!known) {
         ab.btn.classList.add('empty');
         if (ab.lastIcon !== '') {
@@ -555,8 +647,8 @@ export class Hud {
       const mx = S / 2 + dx, my = S / 2 + dz;
       if ((mx - S / 2) ** 2 + (my - S / 2) ** 2 > (S / 2 - 7) ** 2) continue;
       if (e.kind === 'npc') {
-        const hasAvail = e.questIds.some((q) => this.sim.questState(q) === 'available');
-        const hasReady = e.questIds.some((q) => this.sim.questState(q) === 'ready');
+        const hasAvail = e.questIds.some((q) => QUESTS[q].giverNpcId === e.templateId && this.sim.questState(q) === 'available');
+        const hasReady = e.questIds.some((q) => QUESTS[q].turnInNpcId === e.templateId && this.sim.questState(q) === 'ready');
         ctx.fillStyle = '#ffd100';
         ctx.font = 'bold 11px Georgia';
         ctx.fillText(hasReady ? '?' : hasAvail ? '!' : '•', mx - 2, my + 3);
@@ -677,8 +769,8 @@ export class Hud {
       if (e.kind !== 'npc') continue;
       if (e.pos.z < zone.zMin || e.pos.z >= zone.zMax) continue;
       const { mx, my } = toMap(e.pos.x, e.pos.z);
-      const hasAvail = e.questIds.some((q) => this.sim.questState(q) === 'available');
-      const hasReady = e.questIds.some((q) => this.sim.questState(q) === 'ready');
+      const hasAvail = e.questIds.some((q) => QUESTS[q].giverNpcId === e.templateId && this.sim.questState(q) === 'available');
+      const hasReady = e.questIds.some((q) => QUESTS[q].turnInNpcId === e.templateId && this.sim.questState(q) === 'ready');
       if (hasAvail || hasReady) {
         ctx.fillStyle = '#ffd100';
         ctx.font = 'bold 15px Georgia';
@@ -943,13 +1035,19 @@ export class Hud {
     this.openGossipNpcId = npc.id;
     const el = $('#quest-dialog');
     const def = NPCS[npc.templateId];
-    const interesting = npc.questIds.filter((q) => ['available', 'active', 'ready'].includes(this.sim.questState(q)));
+    // accepted-but-unfinished quests are tracked in the quest log; the NPC
+    // only offers new quests (at the giver) and turn-ins (at the turn-in NPC)
+    const interesting = npc.questIds.filter((q) => {
+      const st = this.sim.questState(q);
+      return (st === 'available' && QUESTS[q].giverNpcId === npc.templateId)
+        || (st === 'ready' && QUESTS[q].turnInNpcId === npc.templateId);
+    });
     let html = `<div class="panel-title"><span>${npc.name}<span style="color:#998d6a;font-size:11px"> &lt;${def?.title ?? ''}&gt;</span></span><span class="x-btn" data-close>✕</span></div>`;
     html += `<div class="qd-text">"${(def?.greeting ?? 'Greetings.').replace('$C', CLASSES[this.sim.cfg.playerClass].name.toLowerCase())}"</div>`;
     if (interesting.length > 0) {
       for (const qid of interesting) {
         const st = this.sim.questState(qid);
-        const icon = st === 'ready' ? '<span class="gold">?</span> ' : st === 'available' ? '<span class="gold">!</span> ' : '<span style="color:#999">…</span> ';
+        const icon = st === 'ready' ? '<span class="gold">?</span> ' : '<span class="gold">!</span> ';
         html += `<div class="qd-list-item" data-quest="${qid}">${icon}${QUESTS[qid].name}</div>`;
       }
     }
@@ -1131,6 +1229,12 @@ export class Hud {
     this.renderBags();
     el.style.display = 'block';
     audio.bagOpen();
+  }
+
+  // Called when an authoritative inventory delta lands (online snapshots
+  // carry inventory separately from the event frames that normally redraw).
+  onInventoryChanged(): void {
+    if ($('#bags').style.display === 'block') this.renderBags();
   }
 
   renderBags(): void {

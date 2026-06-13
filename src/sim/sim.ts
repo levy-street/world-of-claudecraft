@@ -5,6 +5,7 @@ import {
   zoneAt,
 } from './data';
 import { resolvePosition } from './colliders';
+import { findPath } from './pathfind';
 import { createGroundObject, createMob, createNpc, createPlayer, recalcPlayerStats, PlayerEquipment } from './entity';
 import { Rng } from './rng';
 import { SpatialGrid } from './spatial';
@@ -45,6 +46,9 @@ const SWIM_DEPTH = 0.8; // ground this far under the water line = deep water
 const SWIM_SPEED_MULT = 0.65;
 const DOOR_TRIGGER_RADIUS = 2.0; // walking this close to a dungeon door teleports you
 const BODY_RADIUS = 0.5;
+const CHARGE_SPEED_MULT = 3; // warrior charge runs at 3x normal speed
+const CHARGE_MAX_DURATION = 3; // seconds before a blocked charge gives up
+const CHARGE_ARRIVE_RANGE = MELEE_RANGE - 1; // stop inside melee range
 
 export interface Party {
   id: number;
@@ -639,7 +643,58 @@ export class Sim {
       && e.pos.y <= SWIM_SURFACE_Y + 0.15;
   }
 
+  private findChargePath(p: Entity, target: Entity): Vec3[] {
+    return findPath(p.pos, target.pos, {
+      seed: this.cfg.seed,
+      bodyRadius: BODY_RADIUS,
+      maxClimbSlope: MAX_CLIMB_SLOPE,
+      minGround: WATER_LEVEL - SWIM_DEPTH,
+    }).map((w) => ({ x: w.x, y: 0, z: w.z }));
+  }
+
+  // Charge in flight: forced movement toward the target along the pathfound
+  // route. Returns true while it owns the player's movement this tick.
+  private updateChargeMovement(p: Entity): boolean {
+    if (p.chargeTargetId === null) return false;
+    const target = this.entities.get(p.chargeTargetId);
+    p.chargeTimeLeft -= DT;
+    const done = (arrived: boolean): boolean => {
+      p.chargeTargetId = null;
+      p.chargePath = [];
+      if (target) p.facing = angleTo(p.pos, target.pos);
+      if (arrived) this.startAutoAttack(p.id);
+      return true;
+    };
+    if (!target || target.dead || p.chargeTimeLeft <= 0 || this.isRooted(p)) return done(false);
+    if (dist2d(p.pos, target.pos) <= CHARGE_ARRIVE_RANGE) return done(true);
+    if (p.sitting) this.standUp(p);
+    // re-route when the target has run well away from where the path ends
+    const pathEnd = p.chargePath[p.chargePath.length - 1];
+    if (!pathEnd || dist2d(pathEnd, target.pos) > 4) p.chargePath = this.findChargePath(p, target);
+    // steer at the next waypoint; the final leg homes on the live target
+    while (p.chargePath.length > 1 && dist2d(p.pos, p.chargePath[0]) < 1) p.chargePath.shift();
+    const wp = p.chargePath.length > 1 ? p.chargePath[0] : target.pos;
+    p.facing = angleTo(p.pos, wp);
+    const step = Math.min(RUN_SPEED * CHARGE_SPEED_MULT * DT, Math.max(0.01, dist2d(p.pos, wp)));
+    const nx = p.pos.x + Math.sin(p.facing) * step;
+    const nz = p.pos.z + Math.cos(p.facing) * step;
+    // deep water and cliffs end the charge early rather than dragging the player in
+    const h0 = groundHeight(p.pos.x, p.pos.z, this.cfg.seed);
+    const h1 = groundHeight(nx, nz, this.cfg.seed);
+    if (h1 < WATER_LEVEL - SWIM_DEPTH) return done(false);
+    if (h1 > h0 && (h1 - h0) / step > MAX_CLIMB_SLOPE) return done(false);
+    const resolved = resolvePosition(this.cfg.seed, nx, nz, BODY_RADIUS);
+    p.pos.x = resolved.x;
+    p.pos.z = resolved.z;
+    p.pos.y = groundHeight(resolved.x, resolved.z, this.cfg.seed);
+    p.vy = 0;
+    p.onGround = true;
+    p.fallStartY = p.pos.y;
+    return true;
+  }
+
   private updatePlayerMovement(p: Entity, meta: PlayerMeta): void {
+    if (this.updateChargeMovement(p)) return;
     const inp = meta.moveInput;
     // Convention: facing f points along (sin f, cos f); the camera sits behind
     // the player, so screen-right is the world vector (-cos f, sin f).
@@ -1349,15 +1404,13 @@ export class Sim {
         }
         case 'charge': {
           if (!target) break;
-          const ang = angleTo(target.pos, p.pos);
-          const nx = target.pos.x + Math.sin(ang) * 2.5;
-          const nz = target.pos.z + Math.cos(ang) * 2.5;
-          p.pos.x = nx; p.pos.z = nz;
-          p.pos.y = groundHeight(nx, nz, this.cfg.seed);
-          p.facing = angleTo(p.pos, target.pos);
+          // the stun effect in the same ability lands this tick; the player
+          // then runs the route at charge speed instead of teleporting
+          p.chargeTargetId = target.id;
+          p.chargeTimeLeft = CHARGE_MAX_DURATION;
+          p.chargePath = this.findChargePath(p, target);
           if (p.resourceType === 'rage') p.resource = Math.min(p.maxResource, p.resource + 9);
           this.enterCombat(p, target);
-          this.startAutoAttack(p.id);
           break;
         }
       }
@@ -1624,6 +1677,8 @@ export class Sim {
       e.eating = null;
       e.drinking = null;
       e.sitting = false;
+      e.chargeTargetId = null;
+      e.chargePath = [];
       this.emit({ type: 'playerDeath', pid: e.id });
       for (const m of this.entities.values()) {
         if (m.kind === 'mob' && !m.dead && m.aggroTargetId === e.id && m.aiState !== 'dead') {
@@ -2334,7 +2389,7 @@ export class Sim {
       }
     }
     for (const qid of npc.questIds) {
-      if (this.questState(qid, meta.entityId) === 'available') {
+      if (QUESTS[qid].giverNpcId === npc.templateId && this.questState(qid, meta.entityId) === 'available') {
         this.acceptQuest(qid, meta.entityId);
         return;
       }

@@ -147,6 +147,9 @@
   #xpbar .label { position: absolute; inset: 0; font-size: 9px; color: #fff; text-align: center; line-height: 10px; text-shadow: 1px 1px 1px #000; opacity: 0; transition: opacity .15s; }
   #xpbar:hover .label { opacity: 1; }
   #actionbar-row { display: flex; align-items: flex-end; gap: 8px; }
+  /* xp bar stacks directly on the action bar; the taller side-button
+     column must not push it up (it used to float ~150px above the bar) */
+  #actionbar-stack { display: flex; flex-direction: column; }
   #actionbar { display: flex; gap: 4px; padding: 6px; }
   .action-btn { width: 46px; height: 46px; position: relative; border: 2px solid #4a3d1d; border-radius: 6px;
     background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f); color: #fff; cursor: pointer;
@@ -164,6 +167,8 @@
   .action-btn.unusable .icon-label { filter: grayscale(1) brightness(0.5); }
   .action-btn.oor .icon-label { filter: brightness(0.55) saturate(0.4); }
   .action-btn.queued { border-color: #fff; box-shadow: 0 0 9px #ffd100cc, inset 0 1px 0 #ffffff18; }
+  .action-btn:not(.empty)[draggable="true"] { cursor: grab; }
+  .action-btn.drop-target { border-color: #7fd1ff; box-shadow: 0 0 8px #7fd1ff88; }
   #side-buttons { display: flex; flex-direction: column; gap: 4px; padding-bottom: 6px; }
   .micro-btn { width: 34px; height: 30px; border: 2px solid #4a3d1d; border-radius: 5px;
     background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f); color: #d8c89a; cursor: pointer;
@@ -490,9 +495,11 @@
     <div id="quest-tracker"></div>
 
     <div id="bottom-bar">
-      <div id="xpbar"><div class="fill"></div><div class="ticks"></div><div class="label"></div></div>
       <div id="actionbar-row">
-        <div id="actionbar" class="panel"></div>
+        <div id="actionbar-stack">
+          <div id="xpbar"><div class="fill"></div><div class="ticks"></div><div class="label"></div></div>
+          <div id="actionbar" class="panel"></div>
+        </div>
         <div id="side-buttons">
           <button class="micro-btn" id="mm-char" title="Character Info">C<span class="keybind">c</span></button>
           <button class="micro-btn" id="mm-spell" title="Spellbook">S<span class="keybind">p</span></button>

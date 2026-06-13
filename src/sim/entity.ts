@@ -16,6 +16,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     channeling: false, channelTickTimer: 0, channelTickEvery: 0,
     gcdRemaining: 0, cooldowns: new Map(), queuedOnSwing: null, fiveSecondRule: 99,
     comboPoints: 0, comboTargetId: null, overpowerUntil: -1,
+    chargeTargetId: null, chargeTimeLeft: 0, chargePath: [],
     sitting: false, eating: null, drinking: null,
     aiState: 'idle', tappedById: null, pulseTimer: 0, firedSummons: 0, summonedIds: [], enraged: false,
     spawnPos: { ...pos }, wanderTarget: null, wanderTimer: 0,

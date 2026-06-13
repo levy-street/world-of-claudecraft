@@ -391,6 +391,10 @@ export interface Entity {
   comboPoints: number;
   comboTargetId: number | null;
   overpowerUntil: number; // sim-time until which overpower is usable
+  // warrior charge: forced run toward the target along a pathfound route
+  chargeTargetId: number | null;
+  chargeTimeLeft: number; // seconds; failsafe so a blocked charge can't run forever
+  chargePath: Vec3[]; // waypoints consumed front-to-back; last leg homes on the live target
   sitting: boolean;
   eating: Consuming | null;
   drinking: Consuming | null;

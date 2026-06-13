@@ -347,7 +347,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     id: 'q_gravecallers_trail', name: "The Gravecaller's Trail",
     giverNpcId: 'brother_aldric', turnInNpcId: 'brother_aldric',
     text: 'Morthen is dead, yet a question gnaws at me: a sect that hid for a century does not spend itself on one village chapel. He kept a grimoire — his rites, his correspondence. If anything of it survives, it lies in the vestry of the ruined chapel above the crypt. Search the ruin and bring me whatever remains of his writings, $N.',
-    completionText: 'Morthen wrote to a \'Mistcaller\' in the southern fen. The sect is not dead, $N — it has merely been patient.',
+    completionText: 'Morthen wrote to a \'Mistcaller\' in the northern fen. The sect is not dead, $N — it has merely been patient.',
     objectives: [{ type: 'collect', itemId: 'morthen_grimoire', count: 1, label: "Morthen's Grimoire" }],
     xpReward: 900, copperReward: 400, itemRewards: {},
     requiresQuest: 'q_hollow',

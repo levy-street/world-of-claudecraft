@@ -1,5 +1,5 @@
 // Zone 2 — Mirefen Marsh (levels 6-13). Brother Aldric follows the
-// Gravecaller trail south of the causeway: drowned dead rise from the fen,
+// Gravecaller trail north of the causeway: drowned dead rise from the fen,
 // trolls dig into barrow-mounds, and Vael the Mistcaller waits in the
 // Sunken Bastion.
 
@@ -216,7 +216,7 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
   q_fenbridge_muster: {
     id: 'q_fenbridge_muster', name: 'Muster at Fenbridge',
     giverNpcId: 'brother_aldric', turnInNpcId: 'warden_fenwick',
-    text: "Morthen's writings named a master in the southern marsh — a 'Mistcaller.' Now Warden Fenwick has sounded the muster horn at Fenbridge, and I do not believe in coincidence, $N. Take the causeway south, pull the muster order from the gatepost, and present it to the Warden.",
+    text: "Morthen's writings named a master in the northern marsh — a 'Mistcaller.' Now Warden Fenwick has sounded the muster horn at Fenbridge, and I do not believe in coincidence, $N. Take the causeway north, pull the muster order from the gatepost, and present it to the Warden.",
     completionText: "Aldric's seal, is it? Then you'll do. The fen has been swallowing my patrols whole, and I need every blade that floats.",
     objectives: [{ type: 'collect', itemId: 'fen_muster_order', count: 1, label: 'Fenbridge Muster Order' }],
     xpReward: 300, copperReward: 200, itemRewards: {},
@@ -310,7 +310,7 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
   q_drowned_censers: {
     id: 'q_drowned_censers', name: 'Censers from the Deep',
     giverNpcId: 'brother_aldric_fen', turnInNpcId: 'brother_aldric_fen',
-    text: 'South of the widow lake stands a chapel that drowned with its congregation when the marsh rose. The dead there carry rusted censers — funerary ones, the kind swung at a Gravecaller rite. Gather 4 from the chapel yard and I will read what rite was sung over that water.',
+    text: 'North of the widow lake stands a chapel that drowned with its congregation when the marsh rose. The dead there carry rusted censers — funerary ones, the kind swung at a Gravecaller rite. Gather 4 from the chapel yard and I will read what rite was sung over that water.',
     completionText: "As I feared. These censers burned grave-ash, not incense. Someone consecrated that chapel to the drowning — and the rite is signed 'Voss.'",
     objectives: [{ type: 'collect', itemId: 'rusted_censer', count: 4, label: 'Rusted Censer' }],
     xpReward: 1300, copperReward: 500, itemRewards: {},
@@ -358,7 +358,7 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
   q_cult_camp: {
     id: 'q_cult_camp', name: 'Robes in the Reeds',
     giverNpcId: 'scout_maren', turnInNpcId: 'scout_maren',
-    text: "There — south past the third lake, where the mist never lifts. Grey robes, grey banners: Gravecallers, camped in the open like they already own the fen. They have stopped hiding, $N, which means they think they have already won. Prove them wrong. Cut down 12 of their cultists.",
+    text: "There — north past the third lake, where the mist never lifts. Grey robes, grey banners: Gravecallers, camped in the open like they already own the fen. They have stopped hiding, $N, which means they think they have already won. Prove them wrong. Cut down 12 of their cultists.",
     completionText: 'Twelve robes face-down in the mud. Now they know the fen watches back.',
     objectives: [{ type: 'kill', targetMobId: 'gravecaller_cultist', count: 12, label: 'Gravecaller Cultist slain' }],
     xpReward: 1800, copperReward: 700, itemRewards: {},
@@ -379,7 +379,7 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
   q_deacon: {
     id: 'q_deacon', name: 'The Deacon of the Mire',
     giverNpcId: 'warden_fenwick', turnInNpcId: 'warden_fenwick',
-    text: 'So a deacon of the Gravecallers stands at the heart of that camp, singing my drowned wardens up out of the lakes to serve him. His hymn ends today. Take the camp road south, $N, and put Deacon Voss in the ground — deep enough that nobody sings HIM back up.',
+    text: 'So a deacon of the Gravecallers stands at the heart of that camp, singing my drowned wardens up out of the lakes to serve him. His hymn ends today. Take the camp road north, $N, and put Deacon Voss in the ground — deep enough that nobody sings HIM back up.',
     completionText: "Voss is dead and the mist over the camp is already thinning. You have broken their voice in the fen — now only the Bastion remains.",
     objectives: [{ type: 'kill', targetMobId: 'deacon_voss', count: 1, label: 'Deacon Voss slain' }],
     xpReward: 2200, copperReward: 1000,
