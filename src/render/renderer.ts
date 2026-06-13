@@ -8,6 +8,7 @@ import {
 } from '../sim/data';
 import type { BiomeId } from '../sim/types';
 import { AnimState, CharacterVisual, createCharacterVisual } from './characters';
+import { LocoTrack, newLocoTrack, updateLocomotion } from './locomotion';
 import { buildProps } from './props';
 import { plankTexture, sparkleTexture } from './textures';
 import { DungeonInteriors } from './dungeon';
@@ -83,6 +84,9 @@ interface EntityView {
   // render-space position last frame, for true u/s locomotion speed
   lastX: number;
   lastZ: number;
+  // locomotion-state hysteresis so a one-frame speed dip can't reset the
+  // walk clip (see locomotion.ts)
+  loco: LocoTrack;
 }
 
 function collectCasters(root: THREE.Object3D, into: THREE.Object3D[]): void {
@@ -533,6 +537,7 @@ export class Renderer {
       nameplate: np, nameEl, hpBar, hpFill, markerEl: marker, sparkle, objectMesh, portal,
       objectCasters, shadowOn: true, isFar: false,
       lastX: e.pos.x, lastZ: e.pos.z,
+      loco: newLocoTrack(),
     });
   }
 
@@ -796,20 +801,17 @@ export class Renderer {
       // distant rigs swap to the single-draw baked idle-pose mesh
       v.visual.setFar(v.isFar && active === v.visual);
 
-      // animation state machine inputs, derived from render-space motion
+      // animation state machine inputs, derived from render-space motion with
+      // hysteresis so a one-frame speed dip can't reset the walk clip
       const vx = x - v.lastX, vz = z - v.lastZ;
       v.lastX = x;
       v.lastZ = z;
-      const dist = Math.hypot(vx, vz);
-      let speed = dist / Math.max(dt, 1e-4);
-      if (speed > 25) speed = 0; // teleport snap, not locomotion
-      const moving = speed > 0.4;
-      const backwards = moving && dist > 1e-6
-        && (vx * Math.sin(facing) + vz * Math.cos(facing)) / dist < -0.3;
+      const loco = updateLocomotion(v.loco, vx, vz, facing, dt);
+      const moving = loco.moving;
       const st: AnimState = {
-        speed,
+        speed: loco.speed,
         moving,
-        backwards,
+        backwards: loco.backwards,
         dead: e.dead,
         casting: e.castingAbility !== null && !e.dead,
         swimming,
