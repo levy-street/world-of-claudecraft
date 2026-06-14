@@ -4,6 +4,7 @@ use spacetimedb::{client_visibility_filter, reducer, table, Filter, Identity, Re
 const REALM_NAME: &str = "Claudemoon";
 const SESSION_TTL_MICROS: i64 = 7 * 24 * 60 * 60 * 1_000_000;
 const SNAPSHOT_TTL_MICROS: i64 = 30_000_000;
+const BRIDGE_AUTH_ID: u64 = 0;
 
 #[client_visibility_filter]
 const AUTH_STATE_OWNER: Filter = Filter::Sql("SELECT * FROM auth_state WHERE owner = :sender");
@@ -203,6 +204,15 @@ pub struct BridgeHeartbeat {
     pub sessions: u32,
     pub tick: u64,
     pub updated_at: Timestamp,
+}
+
+#[derive(Clone)]
+#[table(accessor = bridge_auth)]
+pub struct BridgeAuth {
+    #[primary_key]
+    pub id: u64,
+    pub owner: Identity,
+    pub created_at: Timestamp,
 }
 
 #[derive(Clone)]
@@ -528,7 +538,8 @@ pub fn report_player_by_name(
 }
 
 #[reducer]
-pub fn bridge_ping(ctx: &ReducerContext, sessions: u32, tick: u64) {
+pub fn bridge_ping(ctx: &ReducerContext, sessions: u32, tick: u64) -> Result<(), String> {
+    require_bridge(ctx)?;
     let row = BridgeHeartbeat {
         id: 0,
         owner: ctx.sender(),
@@ -542,10 +553,12 @@ pub fn bridge_ping(ctx: &ReducerContext, sessions: u32, tick: u64) {
     } else {
         ctx.db.bridge_heartbeat().insert(row);
     }
+    Ok(())
 }
 
 #[reducer]
 pub fn bridge_attach_session(ctx: &ReducerContext, session_id: u64, player_id: u32) -> Result<(), String> {
+    require_bridge(ctx)?;
     let Some(mut session) = ctx.db.world_session().id().find(session_id) else {
         return Err("session not found".into());
     };
@@ -558,6 +571,7 @@ pub fn bridge_attach_session(ctx: &ReducerContext, session_id: u64, player_id: u
 
 #[reducer]
 pub fn bridge_save_character(ctx: &ReducerContext, character_id: u64, level: u32, state_json: String) -> Result<(), String> {
+    require_bridge(ctx)?;
     if state_json.len() > 512 * 1024 {
         return Err("state too large".into());
     }
@@ -573,6 +587,7 @@ pub fn bridge_save_character(ctx: &ReducerContext, character_id: u64, level: u32
 
 #[reducer]
 pub fn bridge_publish_snapshot(ctx: &ReducerContext, session_id: u64, owner: Identity, payload_json: String) -> Result<(), String> {
+    require_bridge(ctx)?;
     if payload_json.len() > 512 * 1024 {
         return Err("snapshot too large".into());
     }
@@ -593,6 +608,7 @@ pub fn bridge_publish_snapshot(ctx: &ReducerContext, session_id: u64, owner: Ide
 
 #[reducer]
 pub fn bridge_publish_events(ctx: &ReducerContext, session_id: u64, owner: Identity, payload_json: String) -> Result<(), String> {
+    require_bridge(ctx)?;
     if payload_json.len() > 128 * 1024 {
         return Err("events too large".into());
     }
@@ -608,6 +624,7 @@ pub fn bridge_publish_events(ctx: &ReducerContext, session_id: u64, owner: Ident
 
 #[reducer]
 pub fn bridge_publish_social(ctx: &ReducerContext, session_id: u64, owner: Identity, payload_json: String) -> Result<(), String> {
+    require_bridge(ctx)?;
     if payload_json.len() > 128 * 1024 {
         return Err("social snapshot too large".into());
     }
@@ -627,6 +644,7 @@ pub fn bridge_publish_social(ctx: &ReducerContext, session_id: u64, owner: Ident
 
 #[reducer]
 pub fn bridge_consume_command(ctx: &ReducerContext, command_id: u64) -> Result<(), String> {
+    require_bridge(ctx)?;
     let Some(mut cmd) = ctx.db.client_command().id().find(command_id) else {
         return Ok(());
     };
@@ -637,6 +655,7 @@ pub fn bridge_consume_command(ctx: &ReducerContext, command_id: u64) -> Result<(
 
 #[reducer]
 pub fn bridge_close_session(ctx: &ReducerContext, session_id: u64, state_json: String, level: u32, reason: String) -> Result<(), String> {
+    require_bridge(ctx)?;
     let Some(mut session) = ctx.db.world_session().id().find(session_id) else {
         return Ok(());
     };
@@ -674,6 +693,21 @@ fn require_session(ctx: &ReducerContext, session_id: u64) -> Result<WorldSession
         return Err("session not found".into());
     }
     Ok(session)
+}
+
+fn require_bridge(ctx: &ReducerContext) -> Result<(), String> {
+    if let Some(auth) = ctx.db.bridge_auth().id().find(BRIDGE_AUTH_ID) {
+        if auth.owner != ctx.sender() {
+            return Err("bridge not authorized".into());
+        }
+        return Ok(());
+    }
+    ctx.db.bridge_auth().insert(BridgeAuth {
+        id: BRIDGE_AUTH_ID,
+        owner: ctx.sender(),
+        created_at: ctx.timestamp,
+    });
+    Ok(())
 }
 
 fn require_owned_character(ctx: &ReducerContext, account_id: u64, character_id: u64) -> Result<Character, String> {

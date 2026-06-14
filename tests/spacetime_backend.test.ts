@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { selectedWorldBackend, spacetimeConnectionConfig } from '../src/net/backend';
 import { reducers } from '../src/net/module_bindings';
+import bridgeAttachSessionReducer from '../src/net/module_bindings/bridge_attach_session_reducer';
+import bridgePingReducer from '../src/net/module_bindings/bridge_ping_reducer';
 import { SpacetimeApi } from '../src/net/spacetime_api';
 import { SpacetimeWorld } from '../src/net/spacetime';
 
@@ -56,5 +58,10 @@ describe('SpacetimeDB generated reducer surface', () => {
     expect(typeof SpacetimeWorld.prototype.buyBackItem).toBe('function');
     expect(typeof SpacetimeWorld.prototype.setMarker).toBe('function');
     expect(String(SpacetimeWorld.prototype.chat)).not.toContain('NOT_IMPLEMENTED');
+  });
+
+  it('does not require a separate bridge secret in generated reducer args', () => {
+    expect(Object.keys(bridgePingReducer)).toEqual(['sessions', 'tick']);
+    expect(Object.keys(bridgeAttachSessionReducer)).toEqual(['sessionId', 'playerId']);
   });
 });

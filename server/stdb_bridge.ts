@@ -133,6 +133,7 @@ class StdbBridge {
     await ensureSchema();
     await this.game.loadMarket();
     this.conn = await this.connect();
+    await this.conn.reducers.bridgePing({ sessions: 0, tick: 0n });
     this.watchTables(this.conn);
     await new Promise<void>((resolve, reject) => {
       this.conn!

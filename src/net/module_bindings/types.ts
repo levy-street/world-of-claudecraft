@@ -33,6 +33,13 @@ export const AuthState = __t.object("AuthState", {
 });
 export type AuthState = __Infer<typeof AuthState>;
 
+export const BridgeAuth = __t.object("BridgeAuth", {
+  id: __t.u64(),
+  owner: __t.identity(),
+  createdAt: __t.timestamp(),
+});
+export type BridgeAuth = __Infer<typeof BridgeAuth>;
+
 export const BridgeHeartbeat = __t.object("BridgeHeartbeat", {
   id: __t.u64(),
   owner: __t.identity(),
