@@ -175,6 +175,31 @@ describe('delta snapshots', () => {
 });
 
 describe('chat moderation', () => {
+  it('marks world enter and leave notices as presence logs', async () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    joinServer(server, fc, 1, 'Testa');
+    fc.sent.length = 0;
+
+    const fc2 = fakeWs();
+    const session2 = joinServer(server, fc2, 2, 'Testb');
+    let events = fc.sent.flatMap((msg) => msg.t === 'events' ? msg.list : []);
+    expect(events).toContainEqual(expect.objectContaining({
+      type: 'log',
+      kind: 'presence',
+      text: expect.stringContaining('has entered World of Claudecraft'),
+    }));
+
+    fc.sent.length = 0;
+    await server.leave(session2, 'disconnected');
+    events = fc.sent.flatMap((msg) => msg.t === 'events' ? msg.list : []);
+    expect(events).toContainEqual(expect.objectContaining({
+      type: 'log',
+      kind: 'presence',
+      text: expect.stringContaining('has left the world'),
+    }));
+  });
+
   it('rate-limits chat bursts per connected client before cooldown', () => {
     const server = new GameServer();
     const fc = fakeWs();

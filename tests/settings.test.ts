@@ -21,6 +21,7 @@ describe('Settings', () => {
     expect(s.get('sfxVolume')).toBe(SETTING_RANGES.sfxVolume.def);
     expect(s.get('renderScale')).toBe(1);
     expect(s.get('fullscreen')).toBe(1);
+    expect(s.get('showPresenceNotices')).toBe(1);
   });
 
   it('clamps out-of-range values to the slider bounds', () => {
@@ -29,6 +30,8 @@ describe('Settings', () => {
     expect(s.set('cameraSpeed', -5)).toBe(SETTING_RANGES.cameraSpeed.min);
     expect(s.set('sfxVolume', 0.5)).toBe(0.5);
     expect(s.set('fullscreen', -1)).toBe(0);
+    expect(s.set('showPresenceNotices', -1)).toBe(0);
+    expect(s.set('showPresenceNotices', 2)).toBe(1);
   });
 
   it('ignores non-finite input, keeping a valid value', () => {
@@ -42,10 +45,12 @@ describe('Settings', () => {
     a.set('cameraSpeed', 0.4);
     a.set('musicVolume', 0.2);
     a.set('fullscreen', 0);
+    a.set('showPresenceNotices', 0);
     const b = new Settings();
     expect(b.get('cameraSpeed')).toBe(0.4);
     expect(b.get('musicVolume')).toBe(0.2);
     expect(b.get('fullscreen')).toBe(0);
+    expect(b.get('showPresenceNotices')).toBe(0);
   });
 
   it('falls back to defaults for missing/corrupt keys', () => {
@@ -54,6 +59,7 @@ describe('Settings', () => {
     expect(s.get('cameraSpeed')).toBe(0.5);
     expect(s.get('brightness')).toBe(SETTING_RANGES.brightness.def); // missing -> default
     expect(s.get('fullscreen')).toBe(SETTING_RANGES.fullscreen.def);
+    expect(s.get('showPresenceNotices')).toBe(1);
   });
 
   it('reset() restores every default', () => {
@@ -61,10 +67,12 @@ describe('Settings', () => {
     s.set('cameraSpeed', 1.2);
     s.set('renderScale', 0.5);
     s.set('fullscreen', 0);
+    s.set('showPresenceNotices', 0);
     s.reset();
     expect(s.get('cameraSpeed')).toBe(SETTING_RANGES.cameraSpeed.def);
     expect(s.get('renderScale')).toBe(SETTING_RANGES.renderScale.def);
     expect(s.get('fullscreen')).toBe(SETTING_RANGES.fullscreen.def);
+    expect(s.get('showPresenceNotices')).toBe(1);
   });
 
   it('all() returns an independent snapshot', () => {

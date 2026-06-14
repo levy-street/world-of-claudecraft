@@ -69,7 +69,7 @@ export class Hud {
   private dragFromSlot: number | null = null;
   private optionsHooks: OptionsHooks | null = null;
   private reportHooks: ReportHooks | null = null;
-  private optionsView: 'main' | 'keybinds' | 'graphics' | 'audio' = 'main';
+  private optionsView: 'main' | 'keybinds' | 'graphics' | 'audio' | 'interface' = 'main';
   private capturingKey: { action: string; index: number } | null = null; // binding awaiting a key
   private keybindNote = '';
   private chatLogEl = $('#chatlog');
@@ -1278,7 +1278,9 @@ export class Hud {
           }
           break;
         }
-        case 'log': this.log(ev.text, ev.color ?? '#ccc'); break;
+        case 'log':
+          if (this.shouldDisplayLog(ev)) this.log(ev.text, ev.color ?? '#ccc');
+          break;
         case 'playerDeath': {
           this.log('You have died.', '#ff4444');
           audio.death();
@@ -1314,6 +1316,10 @@ export class Hud {
   private logZoneWelcome(zone: ZoneDef): void {
     const text = zoneWelcomeText(zone, (questId) => this.sim.questState(questId));
     if (text) this.log(text, '#ffd100');
+  }
+
+  private shouldDisplayLog(ev: Extract<SimEvent, { type: 'log' }>): boolean {
+    return ev.kind !== 'presence' || (this.optionsHooks?.settings.get('showPresenceNotices') ?? 1) >= 0.5;
   }
 
   private chatLogFrom(name: string, text: string, color: string, prefix: string, separator: string): void {
@@ -2705,6 +2711,7 @@ export class Hud {
     if (this.optionsView === 'keybinds') { this.renderKeybinds(); return; }
     if (this.optionsView === 'graphics') { this.renderGraphics(); return; }
     if (this.optionsView === 'audio') { this.renderAudio(); return; }
+    if (this.optionsView === 'interface') { this.renderInterface(); return; }
     const el = $('#options-menu');
     el.innerHTML = `<div class="panel-title"><span>Game Menu</span><span class="x-btn" data-close>✕</span></div>`;
     const list = document.createElement('div');
@@ -2716,8 +2723,9 @@ export class Hud {
       b.addEventListener('click', () => { audio.click(); onClick(); });
       list.appendChild(b);
     };
-    const goto = (view: 'keybinds' | 'graphics' | 'audio') => { this.optionsView = view; this.keybindNote = ''; this.renderOptions(); };
+    const goto = (view: 'keybinds' | 'graphics' | 'audio' | 'interface') => { this.optionsView = view; this.keybindNote = ''; this.renderOptions(); };
     add('Key Bindings', () => goto('keybinds'));
+    add('Interface', () => goto('interface'));
     add('Graphics', () => goto('graphics'));
     add('Audio', () => goto('audio'));
     add('Logout', () => this.optionsHooks?.logout());
@@ -2755,7 +2763,7 @@ export class Hud {
     parent.appendChild(row);
   }
 
-  private settingToggle(parent: HTMLElement, label: string, key: keyof GameSettings): void {
+  private settingToggle(parent: HTMLElement, label: string, key: keyof GameSettings, onText = 'On', offText = 'Off'): void {
     const hooks = this.optionsHooks;
     if (!hooks) return;
     const row = document.createElement('div');
@@ -2763,11 +2771,12 @@ export class Hud {
     const name = document.createElement('span');
     name.className = 'set-name';
     name.textContent = label;
+    const spacer = document.createElement('span');
     const toggle = document.createElement('button');
     toggle.className = 'btn set-toggle';
     const sync = () => {
       const on = hooks.settings.get(key) >= 0.5;
-      toggle.textContent = on ? 'On' : 'Off';
+      toggle.textContent = on ? onText : offText;
       toggle.classList.toggle('off', !on);
       toggle.setAttribute('aria-pressed', String(on));
     };
@@ -2778,7 +2787,7 @@ export class Hud {
       hooks.onSettingChange(key, next);
       sync();
     });
-    row.append(name, toggle);
+    row.append(name, spacer, toggle);
     parent.appendChild(row);
   }
 
@@ -2834,13 +2843,20 @@ export class Hud {
     const name = document.createElement('span');
     name.className = 'set-name';
     name.textContent = 'Music';
+    const spacer = document.createElement('span');
     const toggle = document.createElement('button');
     toggle.className = 'btn set-toggle';
     const sync = () => { toggle.textContent = music.enabled ? 'On' : 'Off'; toggle.classList.toggle('off', !music.enabled); };
     sync();
     toggle.addEventListener('click', () => { audio.click(); music.setEnabled(!music.enabled); sync(); });
-    row.append(name, toggle);
+    row.append(name, spacer, toggle);
     body.appendChild(row);
+    this.settingsViewFooter();
+  }
+
+  private renderInterface(): void {
+    const body = this.settingsViewShell('Interface');
+    this.settingToggle(body, 'Player Enter/Leave', 'showPresenceNotices', 'Shown', 'Hidden');
     this.settingsViewFooter();
   }
 

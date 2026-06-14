@@ -509,7 +509,7 @@ export type SimEvent = { pid?: number } & (
   | { type: 'spellfx'; sourceId: number; targetId: number; school: string; fx: 'projectile' | 'tick' | 'nova' }
   // entityId (when set) anchors the log to that entity so the server only
   // delivers it to nearby players; anchorless logs broadcast server-wide
-  | { type: 'log'; text: string; color?: string; entityId?: number }
+  | { type: 'log'; text: string; color?: string; entityId?: number; kind?: 'presence' }
 );
 
 export interface MoveInput {
