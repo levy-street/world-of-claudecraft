@@ -67,8 +67,12 @@ class FakeDb implements SocialDb {
     const m = this.members.get(c);
     return m ? { guildId: m.guildId, guildName: this.guilds.get(m.guildId)!, rank: m.rank } : null;
   }
-  async addGuildMember(guildId: number, c: number, rank: GuildRank): Promise<void> {
-    if (!this.members.has(c)) this.members.set(c, { guildId, rank });
+  async addGuildMember(guildId: number, c: number, rank: GuildRank): Promise<boolean> {
+    // mirror the real INSERT ... SELECT ... ON CONFLICT: no row if the guild is
+    // gone or the character is already in a guild (lost-race no-op).
+    if (!this.guilds.has(guildId) || this.members.has(c)) return false;
+    this.members.set(c, { guildId, rank });
+    return true;
   }
   async removeGuildMember(c: number): Promise<void> { this.members.delete(c); }
   async setGuildRank(c: number, rank: GuildRank): Promise<void> { const m = this.members.get(c); if (m) m.rank = rank; }
@@ -638,5 +642,75 @@ describe('guild directory + request-to-join (#110)', () => {
     await h.svc.guildRequestJoin(h.actor(2), gid);
     await h.svc.guildDisband(h.actor(1));
     expect(await h.db.joinRequest(2)).toBeNull();
+  });
+
+  // --- authz on the request-resolution path (security-critical) ---
+
+  it('an outsider (non-member) cannot approve a request', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    await h.svc.guildSetListing(h.actor(1), true, 'request');
+    const gid = (await h.db.guildMembership(1))!.guildId;
+    await h.svc.guildRequestJoin(h.actor(2), gid); // Bet requests
+    // Dalet is in no guild at all
+    h.tx.clear();
+    await h.svc.guildApproveRequest(h.actor(4), 2);
+    expect(h.tx.errorsFor(4).join()).toMatch(/not in a guild/i);
+    // request untouched, Bet not admitted
+    expect((await h.svc.snapshot(1)).guild?.requests.map((r) => r.name)).toEqual(['Bet']);
+    expect((await h.svc.snapshot(2)).guild).toBeNull();
+  });
+
+  it('a plain member cannot deny a request', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    await h.svc.guildSetListing(h.actor(1), true, 'request');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildAccept(h.actor(2)); // Bet is a plain member
+    const gid = (await h.db.guildMembership(1))!.guildId;
+    await h.svc.guildRequestJoin(h.actor(3), gid); // Gimel requests
+    h.tx.clear();
+    await h.svc.guildDenyRequest(h.actor(2), 3);
+    expect(h.tx.errorsFor(2).join()).toMatch(/officers and the Guild Master/i);
+    // request still pending (the leader still sees it)
+    expect((await h.svc.snapshot(1)).guild?.requests.map((r) => r.name)).toEqual(['Gimel']);
+  });
+
+  it('an outsider from another guild cannot deny a request', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    await h.svc.guildSetListing(h.actor(1), true, 'request');
+    const gid = (await h.db.guildMembership(1))!.guildId;
+    await h.svc.guildRequestJoin(h.actor(2), gid); // Bet requests to Knights
+    await h.svc.guildCreate(h.actor(3), 'Raiders'); // Gimel leads a different guild
+    h.tx.clear();
+    await h.svc.guildDenyRequest(h.actor(3), 2); // wrong-guild leader
+    expect(h.tx.errorsFor(3).join()).toMatch(/no longer pending/i);
+    expect((await h.svc.snapshot(1)).guild?.requests.map((r) => r.name)).toEqual(['Bet']);
+  });
+
+  it('does not falsely announce a join when the insert is a no-op (lost race)', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    await h.svc.guildSetListing(h.actor(1), true, 'open');
+    const gid = (await h.db.guildMembership(1))!.guildId;
+    // Bet is already in another guild — simulates a racing membership that
+    // lands between the guard check and the ON CONFLICT insert.
+    await h.svc.guildCreate(h.actor(2), 'Raiders');
+    // bypass the early "already in a guild" guard to exercise the no-op path
+    // directly: force the membership check to miss once, then have the insert
+    // hit ON CONFLICT.
+    const realMembership = h.db.guildMembership.bind(h.db);
+    let calls = 0;
+    h.db.guildMembership = async (c: number) => {
+      // first call (the early guard, for Bet) returns null to slip past it
+      if (c === 2 && calls++ === 0) return null;
+      return realMembership(c);
+    };
+    h.tx.clear();
+    await h.svc.guildRequestJoin(h.actor(2), gid);
+    h.db.guildMembership = realMembership;
+    // no "you have joined" success, and no broadcast to the guild
+    expect(h.tx.textFor(2).join()).not.toMatch(/have joined/i);
+    expect(h.tx.errorsFor(2).join()).toMatch(/could not join/i);
+    expect(h.tx.textFor(1).join()).not.toMatch(/has joined the guild/i);
+    // Bet's real guild is unchanged (still Raiders, not Knights)
+    expect((await h.svc.snapshot(2)).guild?.name).toBe('Raiders');
   });
 });

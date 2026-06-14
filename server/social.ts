@@ -99,7 +99,9 @@ export interface SocialDb {
   createGuild(name: string): Promise<number>; // returns guild id; throws on duplicate name
   deleteGuild(id: number): Promise<void>;
   guildMembership(charId: number): Promise<{ guildId: number; guildName: string; rank: GuildRank } | null>;
-  addGuildMember(guildId: number, charId: number, rank: GuildRank): Promise<void>;
+  // Returns true if the row was inserted, false if it was a no-op (the
+  // character was already in a guild — ON CONFLICT, e.g. a lost join race).
+  addGuildMember(guildId: number, charId: number, rank: GuildRank): Promise<boolean>;
   removeGuildMember(charId: number): Promise<void>;
   setGuildRank(charId: number, rank: GuildRank): Promise<void>;
   guildMembers(guildId: number): Promise<(CharInfo & { rank: GuildRank })[]>;
@@ -469,9 +471,10 @@ export class SocialService {
     this.tx.deliver(actor.characterId, [{ type: 'guildDirectory', guilds }]);
   }
 
-  // Ask to join a public guild. 'open' guilds admit instantly (still capped +
-  // atomic via addGuildMember); 'request' guilds queue the request for an
-  // officer to approve. Reuses the same membership/cap guards as invite-accept.
+  // Ask to join a public guild. 'open' guilds admit instantly (still subject to
+  // the member cap, and ON CONFLICT keeps the single-guild PK); 'request' guilds
+  // queue the request for an officer to approve. Reuses the existing app-level
+  // member-cap + membership rules (unchanged), same as invite-accept.
   async guildRequestJoin(actor: SocialActor, guildId: number): Promise<void> {
     if (await this.db.guildMembership(actor.characterId)) { this.err(actor.characterId, 'You are already in a guild.'); return; }
     const listing = await this.db.guildListing(guildId);
@@ -484,7 +487,11 @@ export class SocialService {
     const guildName = await this.guildNameOf(guildId, members);
     if (listing.recruitment === 'open') {
       await this.db.removeJoinRequest(actor.characterId);
-      await this.db.addGuildMember(guildId, actor.characterId, 'member');
+      // Only announce + broadcast when the insert actually landed. ON CONFLICT
+      // makes a lost race (already guilded) a no-op; don't claim a join that
+      // didn't happen.
+      const joined = await this.db.addGuildMember(guildId, actor.characterId, 'member');
+      if (!joined) { this.err(actor.characterId, 'Could not join that guild.'); return; }
       this.info(actor.characterId, `You have joined <${guildName}>.`, '#40ff7f');
       await this.broadcastGuild(guildId, [{ type: 'log', text: `${actor.name} has joined the guild.`, color: '#40ff7f' }]);
       await this.pushGuild(guildId);
@@ -524,7 +531,8 @@ export class SocialService {
     if (await this.db.guildMembership(charId)) { this.err(actor.characterId, `${targetName} is already in a guild.`); await this.pushGuild(membership.guildId); return; }
     const members = await this.db.guildMembers(membership.guildId);
     if (members.length >= GUILD_MEMBER_LIMIT) { this.err(actor.characterId, 'Your guild is full.'); await this.pushGuild(membership.guildId); return; }
-    await this.db.addGuildMember(membership.guildId, charId, 'member');
+    const added = await this.db.addGuildMember(membership.guildId, charId, 'member');
+    if (!added) { this.err(actor.characterId, `${targetName} could not be added to the guild.`); await this.pushGuild(membership.guildId); return; }
     if (this.tx.isOnline(charId)) {
       this.info(charId, `Your request to join <${membership.guildName}> was accepted.`, '#40ff7f');
       this.push(charId);
