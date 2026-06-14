@@ -64,6 +64,7 @@ export class Hud {
   private keybindNote = '';
   private chatLogEl = $('#chatlog');
   private combatLogEl = $('#combatlog');
+  private generalLogEl = $('#generallog');
   private errorEl = $('#error-msg');
   private bannerEl = $('#banner');
   private tooltipEl = $('#tooltip');
@@ -150,6 +151,7 @@ export class Hud {
         const which = tab.dataset.logTab;
         tabs.forEach((t) => t.classList.toggle('active', t === tab));
         $('#chatlog').classList.toggle('active', which === 'chat');
+        $('#generallog').classList.toggle('active', which === 'general');
         $('#combatlog').classList.toggle('active', which === 'combat');
       });
     });
@@ -1070,7 +1072,7 @@ export class Hud {
   }
 
   log(text: string, color = '#ccc'): void {
-    this.appendLog(this.chatLogEl, text, color);
+    this.appendLog(this.generalLogEl, text, color);
   }
 
   private chatLogFrom(name: string, text: string, color: string, prefix: string, separator: string): void {
