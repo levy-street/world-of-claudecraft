@@ -8,13 +8,13 @@ import {
   pruneChatLogs, searchCharacters, characterCountsByRealm, moderationStatusForAccount, renameCharacter,
   findCharacterReportTargetByName, topArenaRatings,
 } from './db';
-import { cleanReportReason, createPlayerReport } from './moderation_db';
+import { cleanReportReason, submitPlayerReportAttempt } from './moderation_db';
 import { resolveReportTarget } from './report_target';
 import {
   hashPassword, verifyPassword, newToken, validUsernameShape, offensiveName, validPassword, normalizeCharName,
 } from './auth';
 import { json, readBody } from './http_util';
-import { rateLimited } from './ratelimit';
+import { rateLimited, requestIp } from './ratelimit';
 import { handleAdminApi } from './admin';
 import { GameServer } from './game';
 import { REALM, REALM_DIRECTORY, REALM_ORIGINS } from './realm';
@@ -272,20 +272,25 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         reportTargetForPid: (pid) => game.reportTargetForPid(pid),
         findCharacterReportTargetByName,
       });
-      if (!resolved.ok) return json(res, resolved.status, { error: resolved.error });
-      try {
-        const report = await createPlayerReport({
-          reporterAccountId: accountId,
-          reporterCharacterId: reporter.id,
-          reporterCharacterName: reporter.name,
-          target: resolved.target,
-          reason,
-          details: body.details,
-        });
-        return json(res, 200, { ok: true, reportId: report.id });
-      } catch (err) {
-        return json(res, 400, { error: err instanceof Error ? err.message : 'could not submit report' });
-      }
+      const result = await submitPlayerReportAttempt({
+        reporterAccountId: accountId,
+        reporterCharacterId: reporter.id,
+        reporterCharacterName: reporter.name,
+        target: resolved.ok ? resolved.target : null,
+        reason,
+        details: body.details,
+        invalidTargetError: resolved.ok ? undefined : resolved.error,
+        invalidTargetStatus: resolved.ok ? undefined : resolved.status,
+        metadata: {
+          ip: requestIp(req),
+          userAgent: String(req.headers['user-agent'] ?? ''),
+          realm: REALM,
+          targetMethod: Number.isFinite(Number(body.targetPid)) ? 'pid' : typeof body.targetCharacterName === 'string' ? 'name' : 'unknown',
+        },
+      });
+      return result.ok
+        ? json(res, 200, { ok: true, reportId: result.reportId })
+        : json(res, result.status, { error: result.error });
     }
     if (req.method === 'GET' && url === '/api/project-stats') {
       const accountsCount = await getAccountsCount();

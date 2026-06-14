@@ -111,6 +111,10 @@ export interface ModerationQueueRow {
   openReports: number;
   latestReportAt: string;
   latestReason: string;
+  latestSource: string;
+  latestReportKind: string;
+  maxAbuseScore: number;
+  abuseReasons: string[];
   characterNames: string[];
   online: boolean;
 }
@@ -120,6 +124,11 @@ export interface ReportDetail {
   reason: string;
   details: string;
   status: string;
+  source: string;
+  reportKind: string;
+  evidence: Record<string, unknown>;
+  abuseScore: number;
+  abuseReasons: string[];
   createdAt: string;
   reporterAccountId: number | null;
   reporterUsername: string | null;
@@ -129,6 +138,23 @@ export interface ReportDetail {
   reportedUsername: string;
   reportedCharacterId: number | null;
   reportedCharacterName: string;
+  relatedEvents: {
+    id: number;
+    createdAt: string;
+    outcome: string;
+    reason: string;
+    reporterAccountId: number | null;
+    reporterCharacterName: string;
+    targetAccountId: number | null;
+    targetCharacterName: string;
+    detailsHash: string;
+    detailsLength: number;
+    ipHash: string;
+    userAgentHash: string;
+    abuseScore: number;
+    abuseReasons: string[];
+    evidence: Record<string, unknown>;
+  }[];
   chatContext: {
     id: number;
     characterName: string;
