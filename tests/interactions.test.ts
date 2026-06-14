@@ -64,6 +64,7 @@ function stubEntity(partial: Partial<Entity> & Pick<Entity, 'id' | 'kind'>): Ent
     firedSummons: 0,
     summonedIds: [],
     enraged: false,
+    evadeTimer: 0,
     dead: false,
     lootable: false,
     respawnAt: 0,
