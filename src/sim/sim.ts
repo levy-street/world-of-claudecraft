@@ -3496,6 +3496,14 @@ export class Sim {
       return null;
     }
 
+    // "/help" (or "/?" / "/commands") lists the available chat commands as a
+    // system notice to the asker only. Like /who, it produces no chat message,
+    // so it works identically offline and online without server wiring.
+    if (/^\/(?:help|commands|\?)(?:\s|$)/i.test(raw)) {
+      for (const line of this.helpLines()) this.error(r.meta.entityId, line);
+      return null;
+    }
+
     // "/w name message" — private whisper to an online player
     const wm = /^\/(?:w|whisper|t|tell)\s+(\S+)\s+([\s\S]+)$/i.exec(raw);
     if (wm) {
@@ -3549,7 +3557,7 @@ export class Sim {
     let clean = raw;
     if (/^\/y(ell)?\s/i.test(raw)) { channel = 'yell'; clean = raw.replace(/^\/y(ell)?\s+/i, '').trim(); }
     else if (/^\/s(ay)?\s/i.test(raw)) { clean = raw.replace(/^\/s(ay)?\s+/i, '').trim(); }
-    else if (raw.startsWith('/')) { this.error(r.meta.entityId, `Unknown command: ${raw.split(' ')[0]}. Try /s /y /w /p /g.`); return null; }
+    else if (raw.startsWith('/')) { this.error(r.meta.entityId, `Unknown command: ${raw.split(' ')[0]}. Type /help for a list.`); return null; }
     if (!clean) return null;
     const range = channel === 'yell' ? YELL_RANGE : SAY_RANGE;
     for (const meta of this.players.values()) {
@@ -4796,6 +4804,16 @@ export class Sim {
 
   private error(pid: number, text: string): void {
     this.emit({ type: 'error', text, pid });
+  }
+
+  // Lines shown by the "/help" command, one system notice per entry. Keep this
+  // in sync with the commands handled in chat() above.
+  private helpLines(): string[] {
+    return [
+      'Chat channels: /s say, /y yell, /g general, /p party.',
+      'Whisper a player with /w <name> <message>.',
+      '/who lists who is online (online play only).',
+    ];
   }
 }
 

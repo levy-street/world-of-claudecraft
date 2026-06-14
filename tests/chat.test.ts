@@ -139,6 +139,42 @@ describe('chat channels', () => {
     }));
   });
 
+  it('/help lists the chat commands as system notices without sending chat', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    sim.tick();
+    sim.chat('/help', a);
+    const events = sim.tick();
+    expect(chatEvents(events)).toHaveLength(0);
+    const help = events.filter((e) => e.type === 'error' && e.pid === a) as Extract<SimEvent, { type: 'error' }>[];
+    expect(help.length).toBeGreaterThan(0);
+    const text = help.map((e) => e.text).join('\n');
+    expect(text).toContain('/w <name> <message>');
+    expect(text).toContain('/who');
+  });
+
+  it('/? and /commands are aliases for /help', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    sim.tick();
+    for (const cmd of ['/?', '/commands']) {
+      sim.chat(cmd, a);
+      const events = sim.tick();
+      expect(chatEvents(events)).toHaveLength(0);
+      expect(events.some((e) => e.type === 'error' && e.pid === a)).toBe(true);
+    }
+  });
+
+  it('an unknown slash command points the player at /help', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    sim.tick();
+    sim.chat('/bogus stuff', a);
+    const events = sim.tick();
+    expect(chatEvents(events)).toHaveLength(0);
+    expect(events.some((e) => e.type === 'error' && e.pid === a && e.text.includes('/help'))).toBe(true);
+  });
+
   it('exact-case whisper wins over a case-variant squatter', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');
