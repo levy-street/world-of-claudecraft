@@ -5,7 +5,7 @@ import {
   type SimEvent, dist2d, MAX_LEVEL, xpForLevel, mobXpValue, rageConversion, rageFromDealing,
   spellHitChance, meleeMissChance,
 } from '../src/sim/types';
-import { QUESTS, abilitiesKnownAt } from '../src/sim/data';
+import { PROPS, QUESTS, abilitiesKnownAt } from '../src/sim/data';
 import { terrainHeight } from '../src/sim/world';
 
 function makeSim(cls: 'warrior' | 'mage' | 'rogue' = 'warrior', seed = 42) {
@@ -122,6 +122,47 @@ describe('world generation', () => {
     expect(terrainHeight(10, 10, 42)).toBe(terrainHeight(10, 10, 42));
     expect(Math.abs(terrainHeight(0, 0, 42) - terrainHeight(8, 8, 42))).toBeLessThan(1.5);
     expect(terrainHeight(-85, 80, 42)).toBeLessThan(-4.5);
+  });
+});
+
+describe('environment hazards', () => {
+  it('slowly burns players standing too close to campfires', () => {
+    const sim = makeSim();
+    const [x, z] = PROPS.campfires[0];
+    teleportTo(sim, x + 1.45, z);
+    const hpBefore = sim.player.hp;
+    const events: SimEvent[] = [];
+
+    for (let i = 0; i < 80; i++) events.push(...sim.tick());
+
+    const fireDamage = events.filter((ev): ev is Extract<SimEvent, { type: 'damage' }> =>
+      ev.type === 'damage' && ev.sourceId === -1 && ev.targetId === sim.player.id && ev.school === 'fire');
+    const damageTaken = fireDamage.reduce((sum, ev) => sum + ev.amount, 0);
+    expect(fireDamage).toHaveLength(2);
+    expect(sim.player.hp).toBe(hpBefore - damageTaken);
+    expect(fireDamage).toContainEqual(expect.objectContaining({
+      type: 'damage',
+      sourceId: -1,
+      targetId: sim.player.id,
+      school: 'fire',
+      ability: 'Fire',
+      kind: 'hit',
+    }));
+    expect(events).toContainEqual({ type: 'spellfx', sourceId: sim.player.id, targetId: sim.player.id, school: 'fire', fx: 'tick' });
+    expect(events).toContainEqual({ type: 'burnReaction', targetId: sim.player.id, pid: sim.player.id });
+  });
+
+  it('does not burn players at a safe distance from campfires', () => {
+    const sim = makeSim();
+    const [x, z] = PROPS.campfires[0];
+    teleportTo(sim, x + 2.5, z);
+    const hpBefore = sim.player.hp;
+    const events: SimEvent[] = [];
+
+    for (let i = 0; i < 80; i++) events.push(...sim.tick());
+
+    expect(sim.player.hp).toBe(hpBefore);
+    expect(events.some((ev) => ev.type === 'burnReaction')).toBe(false);
   });
 });
 

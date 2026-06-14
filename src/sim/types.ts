@@ -507,6 +507,7 @@ export type SimEvent = { pid?: number } & (
   | { type: 'heal2'; sourceId: number; targetId: number; amount: number; crit: boolean; ability: string }
   // visual-only cue for the renderer: spell projectiles, dot ticks, aoe novas
   | { type: 'spellfx'; sourceId: number; targetId: number; school: string; fx: 'projectile' | 'tick' | 'nova' }
+  | { type: 'burnReaction'; targetId: number }
   // entityId (when set) anchors the log to that entity so the server only
   // delivers it to nearby players; anchorless logs broadcast server-wide
   | { type: 'log'; text: string; color?: string; entityId?: number }

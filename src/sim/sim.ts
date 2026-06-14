@@ -1,7 +1,7 @@
 import {
   ABILITIES, ARENA_SLOT_COUNT, CAMPS, CLASSES, DUNGEONS, DUNGEON_LIST, DungeonDef, arenaOrigin, dungeonAt,
   DUNGEON_X_THRESHOLD, GROUND_OBJECTS, GROUP_XP_BONUS, INSTANCE_SLOT_COUNT, isArenaPos,
-  ITEMS, MOBS, NPCS, PLAYER_START, QUESTS, REWARD_ARCHETYPE, abilitiesKnownAt, instanceOrigin,
+  ITEMS, MOBS, NPCS, PLAYER_START, PROPS, QUESTS, REWARD_ARCHETYPE, abilitiesKnownAt, instanceOrigin,
   zoneAt,
 } from './data';
 import { ARENA_SPAWN_A, ARENA_SPAWN_B } from './dungeon_layout';
@@ -74,6 +74,10 @@ const PET_FOLLOW_DISTANCE = 3.5;
 const PET_TELEPORT_DISTANCE = 60; // owner this far away: pet warps to heel
 const PET_ASSIST_RANGE = 50; // how far the pet scans for enemies engaging the pair
 const PET_GROWL_INTERVAL = 8; // controlled pets can tank by forcing attention
+const FIRE_HAZARD_RADIUS = 1.75;
+const FIRE_HAZARD_TICKS = 40; // every 2 seconds
+const FIRE_HAZARD_HP_FRACTION = 0.04;
+const FIRE_HAZARD_MIN_DAMAGE = 2;
 const FRIENDLY_NPC_REJECTED_AURA_KINDS: ReadonlySet<AuraKind> = new Set([
   'dot', 'slow', 'stun', 'root', 'incapacitate', 'polymorph', 'attackspeed', 'sunder',
 ]);
@@ -711,6 +715,7 @@ export class Sim {
         this.updateCasting(p, meta);
         this.updatePlayerAutoAttack(p, meta);
         this.updateRegen(p, meta);
+        this.updateFireHazards(p);
       }
       this.updateTimers(p);
       this.updateAuras(p);
@@ -1008,6 +1013,25 @@ export class Sim {
       }
       c.remaining -= 2;
       if (c.remaining <= 0) p[slot] = null;
+    }
+  }
+
+  private updateFireHazards(p: Entity): void {
+    if (this.tickCount % FIRE_HAZARD_TICKS !== 0) return;
+    const r2 = FIRE_HAZARD_RADIUS * FIRE_HAZARD_RADIUS;
+    for (const [x, z] of PROPS.campfires) {
+      const dx = p.pos.x - x;
+      const dz = p.pos.z - z;
+      if (dx * dx + dz * dz > r2) continue;
+      const hpBefore = p.hp;
+      const dmg = Math.max(FIRE_HAZARD_MIN_DAMAGE, Math.round(p.maxHp * FIRE_HAZARD_HP_FRACTION));
+      this.dealDamage(null, p, dmg, false, 'fire', 'Fire', 'hit', true);
+      if (p.hp < hpBefore) {
+        p.combatTimer = 0;
+        this.emit({ type: 'spellfx', sourceId: p.id, targetId: p.id, school: 'fire', fx: 'tick' });
+        this.emit({ type: 'burnReaction', targetId: p.id, pid: p.id });
+      }
+      break;
     }
   }
 
