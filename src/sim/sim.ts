@@ -3080,7 +3080,7 @@ export class Sim {
         this.error(meta.entityId, 'That potion is not ready yet.');
         return;
       }
-      const restoresMana = (def.potionMana ?? 0) > 0 && p.resourceType === 'mana';
+      const restoresMana = (def.potionMana ?? 0) > 0 && p.resourceType === 'mana' && p.resource < p.maxResource;
       const restoresHp = (def.potionHp ?? 0) > 0 && p.hp < p.maxHp;
       if (!restoresHp && !restoresMana) {
         this.error(meta.entityId, p.hp >= p.maxHp && (def.potionMana ?? 0) === 0 ? 'You are already at full health.' : 'Nothing to restore.');

@@ -531,6 +531,19 @@ describe('food, drink, vendor', () => {
     expect(sim.countItem('minor_mana_potion')).toBe(1); // not consumed
   });
 
+  it('a mana potion is not wasted (consumed + put on cooldown) at full mana', () => {
+    const sim = makeSim('mage');
+    sim.addItem('minor_mana_potion', 1);
+    sim.player.resource = sim.player.maxResource; // already topped off
+
+    sim.useItem('minor_mana_potion');
+    // nothing to restore: the potion stays in the bag and the shared
+    // cooldown is never armed (mirrors the at-full-health guard for HP potions)
+    expect(sim.player.resource).toBe(sim.player.maxResource);
+    expect(sim.countItem('minor_mana_potion')).toBe(1);
+    expect(sim.player.potionCooldownUntil).toBeLessThanOrEqual(sim.time);
+  });
+
   it('out-of-combat mana regen is brisk and scales past the old spi/4+2 rate (#103)', () => {
     const sim = makeSim('mage');
     sim.setPlayerLevel(10);
