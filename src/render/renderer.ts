@@ -4,7 +4,7 @@ import type { IWorld } from '../world_api';
 import { groundHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 import {
   MOBS, ABILITIES, DUNGEON_X_THRESHOLD, DUNGEON_LIST, QUESTS,
-  instanceOrigin, INSTANCE_SLOT_COUNT, ARENA_SLOT_COUNT, arenaOrigin, isArenaPos,
+  instanceOrigin, INSTANCE_SLOT_COUNT, ARENA_SLOT_COUNT, arenaOrigin, isArenaPos, dungeonAt,
 } from '../sim/data';
 import type { BiomeId } from '../sim/types';
 import { AnimState, CharacterVisual, createCharacterVisual } from './characters';
@@ -586,7 +586,7 @@ export class Renderer {
   // ---------------------------------------------------------------------
 
   private builtInteriors = new Set<string>();
-  private fogState: 'outdoor' | 'dungeon' | 'underwater' = 'outdoor';
+  private fogState: 'outdoor' | 'dungeon' | 'temple' | 'underwater' = 'outdoor';
 
   private buildInterior(interior: string, ox: number, oz: number): void {
     this.dungeons ??= new DungeonInteriors(this.scene, this.lowGfx, this.flames, this.fireLights);
@@ -634,7 +634,12 @@ export class Renderer {
         }
       }
     }
-    const desired = inside ? 'dungeon' : camY < WATER_LEVEL - 0.05 ? 'underwater' : 'outdoor';
+    // the Drowned Temple reads as submerged: a teal murk instead of the
+    // crypt's near-black, so its flooded halls feel underwater, not just dark
+    const inTemple = inside && !isArenaPos(px) && dungeonAt(px)?.interior === 'temple';
+    const desired = inTemple ? 'temple'
+      : inside ? 'dungeon'
+        : camY < WATER_LEVEL - 0.05 ? 'underwater' : 'outdoor';
     const fog = this.scene.fog as THREE.Fog;
     if (desired !== this.fogState) {
       this.fogState = desired;
@@ -642,6 +647,10 @@ export class Renderer {
         fog.color.setHex(0x05060a);
         fog.near = 18;
         fog.far = 90;
+      } else if (desired === 'temple') {
+        fog.color.setHex(0x0a3a44);
+        fog.near = 12;
+        fog.far = 78;
       } else if (desired === 'underwater') {
         fog.color.setHex(0x17506e);
         fog.near = 2;
@@ -656,7 +665,7 @@ export class Renderer {
       // underground so the torch point lights own the scene; restore outside.
       // The rim glow cranks up instead — silhouettes must split from the murk.
       if (!this.lowGfx) {
-        const underground = desired === 'dungeon';
+        const underground = desired === 'dungeon' || desired === 'temple';
         this.sun.intensity = underground ? DUNGEON_SUN_INTENSITY : SUN_INTENSITY;
         this.hemi.intensity = underground ? DUNGEON_HEMI_INTENSITY : HEMI_INTENSITY;
         this.scene.environmentIntensity = underground ? DUNGEON_ENV_INTENSITY : this.envOutdoorIntensity;
