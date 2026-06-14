@@ -56,7 +56,23 @@ export function requestIp(req: http.IncomingMessage): string {
   for (let i = chain.length - 1; i >= 0; i--) {
     if (!isTrustedProxy(chain[i])) return chain[i];
   }
-  return chain[0] ?? remote;
+  // Every forwarded hop is itself trusted (or the header is absent): there is
+  // no untrusted client address to key on. Fall back to the real socket peer
+  // rather than chain[0], which is client-supplied and spoofable.
+  return remote;
+}
+
+// Drop expired/empty buckets. Called only when the map exceeds its cap so the
+// common path stays O(1); avoids both the unbounded growth of stale buckets
+// and the previous clear()-everything backstop, which reset every IP's window
+// at once (an attacker spraying distinct IPs could wipe all rate-limit state).
+function pruneExpired(now: number): void {
+  const windowStart = now - WINDOW_MS;
+  for (const [ip, times] of attempts) {
+    const live = times.filter((t) => t > windowStart);
+    if (live.length === 0) attempts.delete(ip);
+    else attempts.set(ip, live);
+  }
 }
 
 export function rateLimited(req: http.IncomingMessage, maxPerMinute = 20): boolean {

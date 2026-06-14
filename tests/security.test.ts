@@ -133,6 +133,14 @@ describe('rate-limit client IP selection', () => {
     // The attacker's counter must survive eviction and stay limited.
     expect(rateLimited(fakeReq({ 'x-forwarded-for': attacker }, '172.18.0.1'))).toBe(true);
   });
+
+  it('keys on the real peer when every forwarded hop is trusted', () => {
+    // chain is all private/trusted (e.g. a misconfigured proxy appending
+    // loopback): there is no untrusted client address, so we must not key on
+    // the spoofable leftmost hop.
+    const req = fakeReq({ 'x-forwarded-for': '10.0.0.5, 127.0.0.1' }, '172.18.0.1');
+    expect(requestIp(req)).toBe('172.18.0.1');
+  });
 });
 
 describe('per-account failed-login throttle (#93)', () => {
