@@ -221,6 +221,11 @@ export interface MarketSave {
   nextListingId: number;
 }
 
+export interface EconomyMutation {
+  characterPids: number[];
+  marketChanged: boolean;
+}
+
 // Persistable character state (stored as JSONB server-side). The arena fields
 // are optional so characters saved before the Ashen Coliseum existed load
 // cleanly (addPlayer falls back to the unranked defaults).
@@ -3849,18 +3854,18 @@ export class Sim {
     session.acceptedB = false;
   }
 
-  tradeConfirm(pid?: number): void {
+  tradeConfirm(pid?: number): EconomyMutation | null {
     const r = this.resolve(pid);
-    if (!r) return;
+    if (!r) return null;
     const session = this.trades.get(r.meta.entityId);
-    if (!session) return;
+    if (!session) return null;
     if (session.a === r.meta.entityId) session.acceptedA = true;
     else session.acceptedB = true;
-    if (!(session.acceptedA && session.acceptedB)) return;
+    if (!(session.acceptedA && session.acceptedB)) return null;
 
     const metaA = this.players.get(session.a);
     const metaB = this.players.get(session.b);
-    if (!metaA || !metaB) { this.tradeCancel(session.a); return; }
+    if (!metaA || !metaB) { this.tradeCancel(session.a); return null; }
     // final validation before the atomic swap
     const valid =
       session.offerA.copper <= metaA.copper &&
@@ -3870,7 +3875,7 @@ export class Sim {
     if (!valid) {
       for (const tPid of [session.a, session.b]) this.error(tPid, 'Trade failed: items or money no longer available.');
       this.closeTrade(session);
-      return;
+      return null;
     }
     // swap
     metaA.copper = metaA.copper - session.offerA.copper + session.offerB.copper;
@@ -3888,6 +3893,7 @@ export class Sim {
       this.emit({ type: 'tradeDone', pid: tPid });
     }
     this.closeTrade(session);
+    return { characterPids: [session.a, session.b], marketChanged: false };
   }
 
   tradeCancel(pid?: number): void {
@@ -3988,93 +3994,102 @@ export class Sim {
 
   // List a stack from your bags for sale. The goods are escrowed (pulled from
   // your bags immediately) and held by the Merchant until bought or reclaimed.
-  marketList(itemId: string, count: number, price: number, pid?: number): void {
+  marketList(itemId: string, count: number, price: number, pid?: number): EconomyMutation | null {
     const r = this.resolve(pid);
-    if (!r) return;
+    if (!r) return null;
     const { meta, e: p } = r;
-    if (p.dead) return;
-    if (!this.nearMerchant(p)) { this.error(meta.entityId, 'You must bring your goods to the Merchant.'); return; }
+    if (p.dead) return null;
+    if (!this.nearMerchant(p)) { this.error(meta.entityId, 'You must bring your goods to the Merchant.'); return null; }
     const def = ITEMS[itemId];
-    if (!def) return;
-    if (def.kind === 'quest') { this.error(meta.entityId, 'The Merchant will not broker quest items.'); return; }
+    if (!def) return null;
+    if (def.kind === 'quest') { this.error(meta.entityId, 'The Merchant will not broker quest items.'); return null; }
     const want = Math.max(1, Math.floor(count));
-    if (this.countItem(itemId, meta.entityId) < want) { this.error(meta.entityId, 'You do not have that many to sell.'); return; }
+    if (this.countItem(itemId, meta.entityId) < want) { this.error(meta.entityId, 'You do not have that many to sell.'); return null; }
     const ask = Math.floor(price);
-    if (!Number.isFinite(ask) || ask < MARKET_MIN_PRICE) { this.error(meta.entityId, 'Name a price of at least 1 copper.'); return; }
-    if (ask > MARKET_MAX_PRICE) { this.error(meta.entityId, 'That price is beyond what the Merchant will broker.'); return; }
+    if (!Number.isFinite(ask) || ask < MARKET_MIN_PRICE) { this.error(meta.entityId, 'Name a price of at least 1 copper.'); return null; }
+    if (ask > MARKET_MAX_PRICE) { this.error(meta.entityId, 'That price is beyond what the Merchant will broker.'); return null; }
     const mine = this.marketListings.reduce((n, l) => n + (!l.house && l.sellerKey === meta.name ? 1 : 0), 0);
-    if (mine >= MARKET_MAX_LISTINGS) { this.error(meta.entityId, `You may keep at most ${MARKET_MAX_LISTINGS} goods on the market at once.`); return; }
+    if (mine >= MARKET_MAX_LISTINGS) { this.error(meta.entityId, `You may keep at most ${MARKET_MAX_LISTINGS} goods on the market at once.`); return null; }
     this.removeItem(itemId, want, meta.entityId); // escrow
     this.marketListings.push({
       id: this.nextListingId++, sellerKey: meta.name, sellerName: meta.name,
       itemId, count: want, price: ask, expiresAt: this.time + MARKET_LISTING_DURATION, house: false,
     });
     this.emit({ type: 'loot', text: `Listed ${def.name}${want > 1 ? ' x' + want : ''} on the World Market for ${formatMoney(ask)}.`, pid: meta.entityId });
+    return { characterPids: [meta.entityId], marketChanged: true };
   }
 
   // Buy a listing outright. Coin leaves the buyer, goods enter their bags, and
   // the seller's proceeds (less the Merchant's cut) wait in their collection.
-  marketBuy(listingId: number, pid?: number): void {
+  marketBuy(listingId: number, pid?: number): EconomyMutation | null {
     const r = this.resolve(pid);
-    if (!r) return;
+    if (!r) return null;
     const { meta, e: p } = r;
-    if (p.dead) return;
-    if (!this.nearMerchant(p)) { this.error(meta.entityId, 'You are too far from the Merchant.'); return; }
+    if (p.dead) return null;
+    if (!this.nearMerchant(p)) { this.error(meta.entityId, 'You are too far from the Merchant.'); return null; }
     const idx = this.marketListings.findIndex((l) => l.id === listingId);
-    if (idx < 0) { this.error(meta.entityId, 'That listing is no longer available.'); return; }
+    if (idx < 0) { this.error(meta.entityId, 'That listing is no longer available.'); return null; }
     const listing = this.marketListings[idx];
     const def = ITEMS[listing.itemId];
-    if (!def) { this.marketListings.splice(idx, 1); return; }
+    if (!def) {
+      this.marketListings.splice(idx, 1);
+      return { characterPids: [], marketChanged: true };
+    }
     if (!listing.house && listing.sellerKey === meta.name) {
       this.error(meta.entityId, 'That is your own listing — cancel it to reclaim it.');
-      return;
+      return null;
     }
-    if (meta.copper < listing.price) { this.error(meta.entityId, 'You cannot afford that.'); return; }
+    if (meta.copper < listing.price) { this.error(meta.entityId, 'You cannot afford that.'); return null; }
     meta.copper -= listing.price;
     this.addItem(listing.itemId, listing.count, meta.entityId);
+    let marketChanged = false;
     if (!listing.house) {
       const proceeds = Math.max(0, Math.floor(listing.price * (1 - MARKET_CUT)));
       this.collectionFor(listing.sellerKey).copper += proceeds;
       this.marketListings.splice(idx, 1);
+      marketChanged = true;
       const sellerMeta = this.metaByName(listing.sellerKey);
       if (sellerMeta) {
         this.emit({ type: 'loot', text: `${meta.name} bought your ${def.name} for ${formatMoney(listing.price)} — collect ${formatMoney(proceeds)} from the Merchant.`, pid: sellerMeta.entityId });
       }
     }
     this.emit({ type: 'loot', text: `Bought ${def.name}${listing.count > 1 ? ' x' + listing.count : ''} for ${formatMoney(listing.price)}.`, pid: meta.entityId });
+    return { characterPids: [meta.entityId], marketChanged };
   }
 
   // Reclaim your own listing; the escrowed goods go straight back to your bags.
-  marketCancel(listingId: number, pid?: number): void {
+  marketCancel(listingId: number, pid?: number): EconomyMutation | null {
     const r = this.resolve(pid);
-    if (!r) return;
+    if (!r) return null;
     const { meta, e: p } = r;
-    if (!this.nearMerchant(p)) { this.error(meta.entityId, 'You are too far from the Merchant.'); return; }
+    if (!this.nearMerchant(p)) { this.error(meta.entityId, 'You are too far from the Merchant.'); return null; }
     const idx = this.marketListings.findIndex((l) => l.id === listingId);
-    if (idx < 0) return;
+    if (idx < 0) return null;
     const listing = this.marketListings[idx];
-    if (listing.house || listing.sellerKey !== meta.name) { this.error(meta.entityId, 'That is not your listing.'); return; }
+    if (listing.house || listing.sellerKey !== meta.name) { this.error(meta.entityId, 'That is not your listing.'); return null; }
     this.marketListings.splice(idx, 1);
     this.addItem(listing.itemId, listing.count, meta.entityId);
     const def = ITEMS[listing.itemId];
     this.emit({ type: 'loot', text: `Reclaimed ${def?.name ?? listing.itemId}${listing.count > 1 ? ' x' + listing.count : ''} from the market.`, pid: meta.entityId });
+    return { characterPids: [meta.entityId], marketChanged: true };
   }
 
   // Take everything waiting for you at the Merchant: sale gold and any items
   // returned from expired listings.
-  marketCollect(pid?: number): void {
+  marketCollect(pid?: number): EconomyMutation | null {
     const r = this.resolve(pid);
-    if (!r) return;
+    if (!r) return null;
     const { meta, e: p } = r;
-    if (!this.nearMerchant(p)) { this.error(meta.entityId, 'You are too far from the Merchant.'); return; }
+    if (!this.nearMerchant(p)) { this.error(meta.entityId, 'You are too far from the Merchant.'); return null; }
     const col = this.marketCollections.get(meta.name);
-    if (!col || (col.copper <= 0 && col.items.length === 0)) { this.error(meta.entityId, 'You have nothing to collect.'); return; }
+    if (!col || (col.copper <= 0 && col.items.length === 0)) { this.error(meta.entityId, 'You have nothing to collect.'); return null; }
     if (col.copper > 0) {
       meta.copper += col.copper;
       this.emit({ type: 'loot', text: `You collect ${formatMoney(col.copper)} from the Merchant.`, pid: meta.entityId });
     }
     for (const s of col.items) this.addItem(s.itemId, s.count, meta.entityId);
     this.marketCollections.delete(meta.name);
+    return { characterPids: [meta.entityId], marketChanged: true };
   }
 
   // Once a second: return expired player listings to their seller's collection.

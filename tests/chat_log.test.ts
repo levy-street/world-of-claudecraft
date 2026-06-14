@@ -4,6 +4,7 @@ vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   insertChatLogs: vi.fn(async () => {}),
   saveCharacterState: vi.fn(async () => {}),
+  saveEconomyState: vi.fn(async () => {}),
   openPlaySession: vi.fn(async () => 1),
   closePlaySession: vi.fn(async () => {}),
 }));
