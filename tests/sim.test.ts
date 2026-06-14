@@ -454,16 +454,48 @@ describe('food, drink, vendor', () => {
     expect(sim.player.resource).toBeGreaterThan(before);
   });
 
+  it('use item returns a structured inventory result', () => {
+    const sim = makeSim('warrior');
+    sim.addItem('baked_bread', 1);
+    const result = sim.useItem('baked_bread');
+    expect(result).toMatchObject({
+      ok: true,
+      reason: 'used',
+      serverMessage: 'You sit down to eat.',
+      changedCopper: 0,
+    });
+    expect(result.changedItems).toEqual([
+      { itemId: 'baked_bread', before: 1, after: 0, delta: -1 },
+    ]);
+  });
+
   it('vendor buys and sells', () => {
     const sim = makeSim('warrior');
     const wilkes = [...sim.entities.values()].find((e) => e.templateId === 'trader_wilkes')!;
     teleportTo(sim, wilkes.pos.x + 2, wilkes.pos.z);
     sim.copper = 100;
-    sim.buyItem(wilkes.id, 'baked_bread');
+    const buy = sim.buyItem(wilkes.id, 'baked_bread');
+    expect(buy).toMatchObject({
+      ok: true,
+      reason: 'bought',
+      changedCopper: -25,
+    });
+    expect(buy.changedItems).toEqual([
+      { itemId: 'baked_bread', before: 0, after: 1, delta: 1 },
+    ]);
     expect(sim.countItem('baked_bread')).toBe(1);
     expect(sim.copper).toBe(75);
     sim.addItem('wolf_fang', 2);
-    sim.sellItem('wolf_fang');
+    const sell = sim.sellItem('wolf_fang');
+    expect(sell).toMatchObject({
+      ok: true,
+      reason: 'sold',
+      serverMessage: 'Sold Cracked Wolf Fang for 4c.',
+      changedCopper: 4,
+    });
+    expect(sell.changedItems).toEqual([
+      { itemId: 'wolf_fang', before: 2, after: 1, delta: -1 },
+    ]);
     expect(sim.copper).toBe(79);
     expect(sim.countItem('wolf_fang')).toBe(1);
   });
@@ -475,10 +507,36 @@ describe('food, drink, vendor', () => {
     sim.copper = 100;
     sim.events = [];
 
-    sim.buyItem(wilkes.id, 'baked_bread');
+    const result = sim.buyItem(wilkes.id, 'baked_bread');
 
+    expect(result).toMatchObject({
+      ok: false,
+      reason: 'too_far',
+      serverMessage: 'Too far away.',
+      changedCopper: 0,
+      changedItems: [],
+    });
     expect(sim.countItem('baked_bread')).toBe(0);
     expect(sim.events).toContainEqual({ type: 'error', text: 'Too far away.', pid: sim.player.id });
+  });
+
+  it('loot corpse returns structured item and copper changes', () => {
+    const sim = makeSim('warrior');
+    const wolf = nearestMob(sim, 'forest_wolf');
+    teleportTo(sim, wolf.pos.x + 2, wolf.pos.z);
+    wolf.lootable = true;
+    wolf.loot = { copper: 12, items: [{ itemId: 'wolf_fang', count: 2 }] };
+    const result = sim.lootCorpse(wolf.id);
+    expect(result).toMatchObject({
+      ok: true,
+      reason: 'looted',
+      changedCopper: 12,
+    });
+    expect(result.changedItems).toEqual([
+      { itemId: 'wolf_fang', before: 0, after: 2, delta: 2 },
+    ]);
+    expect(wolf.lootable).toBe(false);
+    expect(wolf.loot).toBe(null);
   });
 });
 

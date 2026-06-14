@@ -3,7 +3,7 @@
 import { NPCS, abilitiesKnownAt } from '../sim/data';
 import { computeQuestState, ResolvedAbility } from '../sim/sim';
 import {
-  Entity, EquipSlot, InvSlot, MoveInput, PlayerClass, QuestProgress, QuestState, SimEvent,
+  CommandResult, Entity, EquipSlot, InvSlot, MoveInput, PlayerClass, QuestProgress, QuestState, SimEvent,
   emptyMoveInput,
 } from '../sim/types';
 import type { ArenaInfo, CharacterSearchResult, DuelInfo, IWorld, MarketInfo, PartyInfo, SocialInfo, TradeInfo } from '../world_api';
@@ -237,6 +237,8 @@ export class ClientWorld implements IWorld {
   private readonly token: string;
   private readonly base: string;
   private eventQueue: SimEvent[] = [];
+  private nextCommandRequestId = 1;
+  private pendingCommandResults = new Map<number, { resolve: (result: CommandResult) => void; timeout: number }>();
   // inventory deltas arrive in snapshots, separate from the event frames the
   // HUD redraws on — the frame loop polls this so open panels re-render
   private invChanged = false;
@@ -262,6 +264,7 @@ export class ClientWorld implements IWorld {
     this.ws.onclose = () => {
       this.connected = false;
       clearInterval(this.sendTimer);
+      this.resolvePendingCommandResults(this.commandFailure('disconnected', 'Connection to the server was lost.'));
       this.onDisconnect?.('Connection to the server was lost.');
     };
     // input stream at sim rate
@@ -271,6 +274,7 @@ export class ClientWorld implements IWorld {
   close(): void {
     clearInterval(this.sendTimer);
     this.ws.onclose = null;
+    this.resolvePendingCommandResults(this.commandFailure('closed', 'Connection closed.'));
     this.ws.close();
   }
 
@@ -317,6 +321,57 @@ export class ClientWorld implements IWorld {
     this.ws.send(JSON.stringify({ t: 'cmd', ...payload }));
   }
 
+  private cmdWithResult(payload: Record<string, unknown>): Promise<CommandResult> {
+    if (!this.connected || this.ws.readyState !== WebSocket.OPEN) {
+      return Promise.resolve(this.commandFailure('not_connected', 'Not connected.'));
+    }
+    const rid = this.nextCommandRequestId++;
+    return new Promise((resolve) => {
+      const timeout = window.setTimeout(() => {
+        this.pendingCommandResults.delete(rid);
+        resolve(this.commandFailure('timeout', 'No server response.'));
+      }, 5000);
+      this.pendingCommandResults.set(rid, { resolve, timeout });
+      this.ws.send(JSON.stringify({ t: 'cmd', rid, ...payload }));
+    });
+  }
+
+  private commandFailure(reason: string, serverMessage: string): CommandResult {
+    return { ok: false, reason, serverMessage, changedItems: [], changedCopper: 0 };
+  }
+
+  private normalizeCommandResult(result: any): CommandResult {
+    if (typeof result !== 'object' || result === null) {
+      return this.commandFailure('invalid_result', 'Invalid server response.');
+    }
+    const changedItems = Array.isArray(result.changedItems)
+      ? result.changedItems.flatMap((item: any) => {
+        if (typeof item?.itemId !== 'string') return [];
+        return [{
+          itemId: item.itemId,
+          before: Number(item.before) || 0,
+          after: Number(item.after) || 0,
+          delta: Number(item.delta) || 0,
+        }];
+      })
+      : [];
+    return {
+      ok: result.ok === true,
+      reason: typeof result.reason === 'string' ? result.reason : 'unknown',
+      serverMessage: typeof result.serverMessage === 'string' ? result.serverMessage : '',
+      changedItems,
+      changedCopper: Number(result.changedCopper) || 0,
+    };
+  }
+
+  private resolvePendingCommandResults(result: CommandResult): void {
+    for (const [rid, pending] of this.pendingCommandResults) {
+      window.clearTimeout(pending.timeout);
+      pending.resolve(result);
+      this.pendingCommandResults.delete(rid);
+    }
+  }
+
   private onMessage(raw: string): void {
     let msg: any;
     try {
@@ -338,6 +393,15 @@ export class ClientWorld implements IWorld {
     }
     if (msg.t === 'events') {
       for (const ev of msg.list) this.eventQueue.push(ev as SimEvent);
+      return;
+    }
+    if (msg.t === 'cmdResult') {
+      const rid = typeof msg.rid === 'number' ? msg.rid : -1;
+      const pending = this.pendingCommandResults.get(rid);
+      if (!pending) return;
+      window.clearTimeout(pending.timeout);
+      this.pendingCommandResults.delete(rid);
+      pending.resolve(this.normalizeCommandResult(msg.result));
       return;
     }
     if (msg.t === 'social') {
@@ -570,8 +634,8 @@ export class ClientWorld implements IWorld {
   interact(): void {
     this.cmd({ cmd: 'interact' });
   }
-  lootCorpse(id: number): void {
-    this.cmd({ cmd: 'loot', id });
+  lootCorpse(id: number): Promise<CommandResult> {
+    return this.cmdWithResult({ cmd: 'loot', id });
   }
   pickUpObject(id: number): void {
     this.cmd({ cmd: 'pickup', id });
@@ -592,14 +656,14 @@ export class ClientWorld implements IWorld {
   equipItem(itemId: string): void {
     this.cmd({ cmd: 'equip', item: itemId });
   }
-  useItem(itemId: string): void {
-    this.cmd({ cmd: 'use', item: itemId });
+  useItem(itemId: string): Promise<CommandResult> {
+    return this.cmdWithResult({ cmd: 'use', item: itemId });
   }
-  buyItem(npcId: number, itemId: string): void {
-    this.cmd({ cmd: 'buy', npc: npcId, item: itemId });
+  buyItem(npcId: number, itemId: string): Promise<CommandResult> {
+    return this.cmdWithResult({ cmd: 'buy', npc: npcId, item: itemId });
   }
-  sellItem(itemId: string): void {
-    this.cmd({ cmd: 'sell', item: itemId });
+  sellItem(itemId: string): Promise<CommandResult> {
+    return this.cmdWithResult({ cmd: 'sell', item: itemId });
   }
   releaseSpirit(): void {
     this.cmd({ cmd: 'release' });

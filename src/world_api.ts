@@ -1,4 +1,4 @@
-import type { Entity, EquipSlot, InvSlot, MoveInput, PlayerClass, QuestProgress, QuestState, ResourceType } from './sim/types';
+import type { CommandResult, Entity, EquipSlot, InvSlot, MoveInput, PlayerClass, QuestProgress, QuestState, ResourceType } from './sim/types';
 import type { ResolvedAbility } from './sim/sim';
 
 export interface PartyMemberInfo {
@@ -133,6 +133,8 @@ export interface MarketInfo {
   myListingCount: number; // how many active listings the viewer already has
 }
 
+export type CommandResultLike = CommandResult | Promise<CommandResult>;
+
 // The surface the renderer + HUD need from a game world. The offline `Sim`
 // satisfies this structurally; the online `ClientWorld` implements it by
 // mirroring server snapshots and sending commands over the socket.
@@ -157,15 +159,15 @@ export interface IWorld {
   startAutoAttack(): void;
   stopAutoAttack(): void;
   interact(): void;
-  lootCorpse(id: number): void;
+  lootCorpse(id: number): CommandResultLike;
   pickUpObject(id: number): void;
   acceptQuest(questId: string): void;
   turnInQuest(questId: string): void;
   abandonQuest(questId: string): void;
   equipItem(itemId: string): void;
-  useItem(itemId: string): void;
-  buyItem(npcId: number, itemId: string): void;
-  sellItem(itemId: string): void;
+  useItem(itemId: string): CommandResultLike;
+  buyItem(npcId: number, itemId: string): CommandResultLike;
+  sellItem(itemId: string): CommandResultLike;
   releaseSpirit(): void;
   chat(text: string): void;
   // social systems
