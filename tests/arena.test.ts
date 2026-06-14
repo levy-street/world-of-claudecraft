@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { Sim, eloDelta } from '../src/sim/sim';
 import { groundHeight } from '../src/sim/world';
 import { isArenaPos } from '../src/sim/data';
+import type { PlayerClass } from '../src/sim/types';
 
 function makeWorld() {
   return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
@@ -16,16 +17,29 @@ function teleport(sim: Sim, pid: number, x: number, z: number) {
 }
 
 // Queue two players and advance one tick so matchmaking seats them.
-function queueDuo(): { sim: Sim; a: number; b: number } {
+function queueDuo(aClass: PlayerClass = 'warrior', bClass: PlayerClass = 'mage'): { sim: Sim; a: number; b: number } {
   const sim = makeWorld();
-  const a = sim.addPlayer('warrior', 'Aleph');
-  const b = sim.addPlayer('mage', 'Bet');
+  const a = sim.addPlayer(aClass, 'Aleph');
+  const b = sim.addPlayer(bClass, 'Bet');
   teleport(sim, a, 0, -40);
   teleport(sim, b, 6, -40);
   sim.arenaQueueJoin(a);
   sim.arenaQueueJoin(b);
   sim.tick(); // updateArena() matchmakes the pair
   return { sim, a, b };
+}
+
+function face(sim: Sim, pid: number, targetId: number) {
+  const e = sim.entities.get(pid)!;
+  const t = sim.entities.get(targetId)!;
+  e.facing = Math.atan2(t.pos.x - e.pos.x, t.pos.z - e.pos.z);
+}
+
+function finishCast(sim: Sim, pid: number) {
+  for (let i = 0; i < 20 * 4; i++) {
+    sim.tick();
+    if (!sim.entities.get(pid)!.castingAbility) return;
+  }
 }
 
 // Run the countdown out so the bout goes live.
@@ -229,5 +243,66 @@ describe('arena: forfeit + persistence', () => {
     sim.meta(c)!.arenaRating = 1600;
     const ladder = sim.arenaLadder();
     expect(ladder.map((r) => r.name)).toEqual(['High', 'Mid', 'Low']);
+  });
+});
+
+describe('arena: crowd control diminishing returns', () => {
+  it('shortens repeated roots on the same arena target, then resets', () => {
+    const { sim, a, b } = queueDuo('druid', 'warrior');
+    startBout(sim);
+    const druid = sim.entities.get(a)!;
+    const warrior = sim.entities.get(b)!;
+    (sim as any).rng.chance = () => true;
+    sim.setPlayerLevel(8, a);
+    druid.pos.x = warrior.pos.x;
+    druid.pos.z = warrior.pos.z - 8;
+    druid.targetId = b;
+    face(sim, a, b);
+
+    const castRoot = () => {
+      druid.resource = druid.maxResource;
+      druid.gcdRemaining = 0;
+      sim.castAbility('entangling_roots', a);
+      finishCast(sim, a);
+    };
+
+    castRoot();
+    expect(warrior.auras.find((aura) => aura.kind === 'root')?.duration).toBe(12);
+    warrior.auras = [];
+
+    castRoot();
+    expect(warrior.auras.find((aura) => aura.kind === 'root')?.duration).toBe(6);
+    warrior.auras = [];
+
+    castRoot();
+    expect(warrior.auras.find((aura) => aura.kind === 'root')?.duration).toBe(3);
+    warrior.auras = [];
+
+    castRoot();
+    expect(warrior.auras.some((aura) => aura.kind === 'root')).toBe(false);
+
+    for (let i = 0; i < 20 * 18; i++) sim.tick();
+    castRoot();
+    expect(warrior.auras.find((aura) => aura.kind === 'root')?.duration).toBe(12);
+  });
+
+  it('lets Frost Nova root arena opponents through the same root category', () => {
+    const { sim, a, b } = queueDuo();
+    startBout(sim);
+    const warrior = sim.entities.get(a)!;
+    const mage = sim.entities.get(b)!;
+    sim.setPlayerLevel(10, b);
+    mage.pos.x = warrior.pos.x;
+    mage.pos.z = warrior.pos.z - 4;
+    mage.facing = 0;
+
+    sim.castAbility('frost_nova', b);
+    expect(warrior.auras.find((aura) => aura.kind === 'root')?.duration).toBe(8);
+    warrior.auras = [];
+    mage.gcdRemaining = 0;
+    mage.cooldowns.clear();
+
+    sim.castAbility('frost_nova', b);
+    expect(warrior.auras.find((aura) => aura.kind === 'root')?.duration).toBe(4);
   });
 });

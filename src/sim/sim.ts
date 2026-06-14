@@ -17,7 +17,7 @@ import {
 import { groundHeight, WATER_LEVEL } from './world';
 import {
   AbilityDef, AbilityEffect, Aura, AuraKind, CAST_PUSHBACK_SEC, CHANNEL_PUSHBACK_FRACTION, CONSUME_DURATION,
-  CONSUME_TICKS, DT, Entity, EquipSlot, GCD,
+  CONSUME_TICKS, CrowdControlDrCategory, DT, Entity, EquipSlot, GCD,
   INTERACT_RANGE, InvSlot, MELEE_RANGE, MAX_LEVEL,
   MoveInput, PlayerClass, QuestProgress, QuestState, RUN_SPEED, SimConfig, SimEvent, TURN_SPEED, Vec3,
   angleTo, armorReduction, dist2d, emptyMoveInput, isConsuming, meleeMissChance, mobXpValue, normAngle,
@@ -44,6 +44,8 @@ const ARENA_BASE_RATING = 1500; // every character starts here, unranked
 const ARENA_MIN_RATING = 100; // a rating floor so a losing streak can't go absurd
 const ARENA_K_FACTOR = 32; // Elo sensitivity per match
 const ARENA_LADDER_SIZE = 10; // live online standings shipped to clients
+const PVP_CC_DR_RESET = 18; // seconds before a repeated PvP CC category is fresh again
+const PVP_CC_DR_MULTIPLIERS = [1, 0.5, 0.25] as const;
 const SAY_RANGE = 25; // /say carries a short distance; /yell across a camp
 const YELL_RANGE = 100;
 const CHAT_BURST = 8; // messages a player may send back-to-back...
@@ -1558,11 +1560,7 @@ export class Sim {
         }
         case 'root': {
           if (!target || target.dead) break;
-          this.applyAura(target, {
-            id: ability.id + '_root', name: ability.name, kind: 'root',
-            remaining: eff.duration, duration: eff.duration, value: 0,
-            sourceId: p.id, school: ability.school,
-          });
+          this.applyRootAura(p, target, ability.name, ability.id + '_root', eff.duration, ability.school);
           this.enterCombat(p, target);
           break;
         }
@@ -1621,15 +1619,11 @@ export class Sim {
         }
         case 'aoeRoot': {
           this.emit({ type: 'spellfx', sourceId: p.id, targetId: p.id, school: ability.school, fx: 'nova' });
-          for (const m of this.mobsInRadius(p.pos, eff.radius)) {
+          for (const m of this.hostilesInRadius(p, p.pos, eff.radius)) {
             const dmg = this.rng.range(eff.min, eff.max);
             this.dealDamage(p, m, Math.round(dmg), false, ability.school, ability.name, 'hit');
-            if (!m.dead) {
-              this.applyAura(m, {
-                id: ability.id + '_root', name: ability.name, kind: 'root',
-                remaining: eff.duration, duration: eff.duration, value: 0,
-                sourceId: p.id, school: ability.school,
-              });
+            if (!m.dead && this.isHostileTo(p, m)) {
+              this.applyRootAura(p, m, ability.name, ability.id + '_root', eff.duration, ability.school);
             }
           }
           break;
@@ -1759,10 +1753,44 @@ export class Sim {
     }
   }
 
+  private applyRootAura(source: Entity, target: Entity, name: string, id: string, duration: number, school: Aura['school']): void {
+    const remaining = this.diminishedCrowdControlDuration(source, target, 'root', duration);
+    if (remaining === null) return;
+    this.applyAura(target, {
+      id, name, kind: 'root',
+      remaining, duration: remaining, value: 0,
+      sourceId: source.id, school,
+    });
+  }
+
+  private diminishedCrowdControlDuration(
+    source: Entity,
+    target: Entity,
+    category: CrowdControlDrCategory,
+    duration: number,
+  ): number | null {
+    if (source.kind !== 'player' || target.kind !== 'player' || !this.isHostileTo(source, target)) {
+      return duration;
+    }
+    const existing = target.ccDr.get(category);
+    const stage = existing && existing.resetAt > this.time ? existing.stage : 0;
+    if (stage >= PVP_CC_DR_MULTIPLIERS.length) return null;
+    target.ccDr.set(category, { stage: stage + 1, resetAt: this.time + PVP_CC_DR_RESET });
+    return duration * PVP_CC_DR_MULTIPLIERS[stage];
+  }
+
   private mobsInRadius(pos: Vec3, radius: number): Entity[] {
     const out: Entity[] = [];
     this.grid.forEachInRadius(pos.x, pos.z, radius, (e) => {
       if (e.kind === 'mob' && !e.dead && e.hostile) out.push(e);
+    });
+    return out;
+  }
+
+  private hostilesInRadius(source: Entity, pos: Vec3, radius: number): Entity[] {
+    const out: Entity[] = [];
+    this.grid.forEachInRadius(pos.x, pos.z, radius, (e) => {
+      if (e.id !== source.id && !e.dead && this.isHostileTo(source, e)) out.push(e);
     });
     return out;
   }
@@ -2114,6 +2142,7 @@ export class Sim {
     e.dead = true;
     e.hp = 0;
     e.auras = [];
+    e.ccDr.clear();
     e.castingAbility = null;
     this.emit({ type: 'death', entityId: e.id, killerId: killer?.id ?? -1 });
 
@@ -3148,6 +3177,7 @@ export class Sim {
     this.rebucket(p);
     p.facing = 0;
     p.auras = [];
+    p.ccDr.clear();
     recalcPlayerStats(p, meta.cls, meta.equipment);
     p.hp = p.maxHp;
     p.resource = p.resourceType === 'mana' ? p.maxResource : p.resourceType === 'energy' ? 100 : 0;
@@ -3485,6 +3515,7 @@ export class Sim {
     const eb = this.entities.get(duel.b);
     // stop the combatants from swinging at each other
     for (const e of [ea, eb]) {
+      if (e) e.ccDr.clear();
       if (e && e.targetId !== null && (e.targetId === duel.a || e.targetId === duel.b)) {
         e.autoAttack = false;
       }
@@ -3662,6 +3693,7 @@ export class Sim {
     const meta = this.players.get(e.id);
     if (meta) recalcPlayerStats(e, meta.cls, meta.equipment);
     e.auras = [];
+    e.ccDr.clear();
     e.hp = e.maxHp;
     e.resource = e.resourceType === 'mana' ? e.maxResource : e.resourceType === 'energy' ? 100 : 0;
     e.targetId = null;
@@ -3731,6 +3763,7 @@ export class Sim {
       this.rebucket(e);
       if (meta) recalcPlayerStats(e, meta.cls, meta.equipment);
       e.auras = [];
+      e.ccDr.clear();
       e.dead = false;
       e.hp = e.maxHp;
       e.resource = e.resourceType === 'mana' ? e.maxResource : e.resourceType === 'energy' ? 100 : 0;
