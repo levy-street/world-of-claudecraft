@@ -322,7 +322,8 @@ export class Sim {
   marketListings: MarketListing[] = [];
   private marketCollections = new Map<string, MarketCollection>();
   private nextListingId = 1;
-  private merchantId = -1;
+  private merchantId = -1; // primary Merchant (anchors house stock seeding)
+  private marketNpcIds: number[] = []; // every NPC that opens the World Market
 
   constructor(cfg: SimConfig) {
     this.cfg = {
@@ -339,7 +340,12 @@ export class Sim {
       const safe = this.findSafePos(npcDef.pos.x, npcDef.pos.z, WATER_LEVEL + 0.6);
       const npc = createNpc(this.nextId++, npcDef, this.groundPos(safe.x, safe.z));
       this.addEntity(npc);
-      if (npcDef.market) this.merchantId = npc.id; // the World Market is anchored here
+      if (npcDef.market) {
+        // The World Market is shared (global listings); any market NPC opens it.
+        // The first one (Eastbrook's Merchant) stays the primary for house stock.
+        this.marketNpcIds.push(npc.id);
+        if (this.merchantId < 0) this.merchantId = npc.id;
+      }
     }
     this.seedHouseListings();
 
@@ -3951,8 +3957,11 @@ export class Sim {
   }
 
   private nearMerchant(e: Entity): boolean {
-    const m = this.merchantEntity();
-    return !!m && dist2d(e.pos, m.pos) <= MARKET_RANGE;
+    for (const id of this.marketNpcIds) {
+      const m = this.entities.get(id);
+      if (m && m.kind === 'npc' && dist2d(e.pos, m.pos) <= MARKET_RANGE) return true;
+    }
+    return false;
   }
 
   private metaByName(name: string): PlayerMeta | null {
