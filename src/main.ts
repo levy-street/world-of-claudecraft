@@ -18,6 +18,10 @@ import { togglePasswordVisibility, syncInputAriaState, validateForm, handleKeybo
 import { CLASSES, ABILITIES } from './sim/content/classes';
 import { iconDataUrl } from './ui/icons';
 import { getLanguage, setLanguage, t, SupportedLanguage } from './ui/i18n';
+import { initClientTelemetry } from './telemetry/otel';
+
+// Start OTLP trace export (no-op unless VITE_OTEL_ENDPOINT is configured).
+initClientTelemetry();
 
 
 const WORLD_SEED = 20061; // fixed: World of Claudecraft is a persistent place

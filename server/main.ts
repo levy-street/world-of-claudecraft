@@ -19,6 +19,14 @@ import { handleAdminApi } from './admin';
 import { GameServer } from './game';
 import { REALM, REALM_DIRECTORY, REALM_ORIGINS } from './realm';
 import { cacheControlFor, etagFor, isNotModified } from './static_cache';
+import {
+  initTelemetry, shutdownTelemetry, extractContext, tracer, withSpan, SpanKind, SpanStatusCode,
+} from './telemetry';
+import { context, trace } from '@opentelemetry/api';
+
+// Install the tracer + W3C propagator before anything serves traffic. No-op
+// when telemetry is disabled (see telemetry.ts).
+initTelemetry();
 
 const PORT = Number(process.env.PORT ?? 8787);
 const STATIC_DIR = path.join(__dirname, '..', 'dist');
@@ -139,6 +147,38 @@ function maybeCors(req: http.IncomingMessage, res: http.ServerResponse): void {
     res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
     res.setHeader('Access-Control-Max-Age', '600');
   }
+}
+
+// Open a SERVER span for one API request, parented on any inbound traceparent,
+// and run the handler inside its context so DB-query spans nest beneath it. The
+// span stays open until the response finishes (the handler is async). Route is
+// reduced to low cardinality (`/api/characters/123` -> `/api/characters/:id`)
+// so span names group cleanly in ClickHouse.
+function traceHttp(req: http.IncomingMessage, res: http.ServerResponse, fn: () => void): void {
+  const method = req.method ?? 'GET';
+  const rawPath = (req.url ?? '/').split('?')[0];
+  const route = rawPath.replace(/\/\d+(?=\/|$)/g, '/:id');
+  const parent = extractContext(req.headers);
+  const span = tracer().startSpan(`${method} ${route}`, {
+    kind: SpanKind.SERVER,
+    attributes: {
+      'http.request.method': method,
+      'http.route': route,
+      'url.path': rawPath,
+      'woc.realm': REALM,
+    },
+  }, parent);
+  let ended = false;
+  const finish = () => {
+    if (ended) return;
+    ended = true;
+    span.setAttribute('http.response.status_code', res.statusCode);
+    if (res.statusCode >= 500) span.setStatus({ code: SpanStatusCode.ERROR });
+    span.end();
+  };
+  res.once('finish', finish);
+  res.once('close', finish); // client aborted before finish
+  context.with(trace.setSpan(parent, span), fn);
 }
 
 async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
@@ -354,8 +394,11 @@ async function main(): Promise<void> {
     const isApi = url.startsWith('/api/') || url.startsWith('/admin/api/');
     if (isApi) maybeCors(req, res);
     if (req.method === 'OPTIONS' && isApi) { res.writeHead(204); res.end(); return; }
-    if (url.startsWith('/admin/api/')) void handleAdminApi(req, res, game);
-    else if (url.startsWith('/api/')) void handleApi(req, res);
+    // Only the API surface is traced; static asset bytes would be noise. The
+    // span is rooted from any inbound traceparent (the browser client), so its
+    // DB queries continue that distributed trace.
+    if (url.startsWith('/admin/api/')) traceHttp(req, res, () => handleAdminApi(req, res, game));
+    else if (url.startsWith('/api/')) traceHttp(req, res, () => void handleApi(req, res));
     else serveStatic(req, res);
   });
 
@@ -389,6 +432,11 @@ async function main(): Promise<void> {
       return;
     }
 
+    // Continue the browser's connect trace — the client puts its traceparent in
+    // msg.tp. The span covers the token + moderation + character lookups and the
+    // world join; per-command spans for later messages are opened in game.ts.
+    const parent = extractContext({ traceparent: typeof msg.tp === 'string' ? msg.tp : undefined });
+    await withSpan('ws.authenticate', async (span) => {
     const token = typeof msg.token === 'string' ? msg.token : '';
     const characterId = Number(msg.character ?? 'NaN');
     const accountId = await accountForToken(token);
@@ -432,6 +480,11 @@ async function main(): Promise<void> {
     ws.on('error', () => {
       void game.leave(session, 'connection error');
     });
+    span.setAttribute('enduser.id', String(accountId));
+    span.setAttribute('woc.character', character.name);
+    span.setAttribute('woc.class', character.class);
+    span.setAttribute('woc.pid', session.pid);
+    }, { kind: SpanKind.SERVER, parent });
   }
 
   async function onConnection(ws: WebSocket): Promise<void> {
@@ -470,6 +523,7 @@ async function main(): Promise<void> {
     await game.endAllPlaySessions();
     await game.chatLog.stop();
     await pool.end();
+    await shutdownTelemetry(); // flush any buffered spans before exit
     process.exit(0);
   };
   process.on('SIGINT', shutdown);

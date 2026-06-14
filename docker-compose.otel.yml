@@ -1,0 +1,63 @@
+# Observability stack overlay: OpenTelemetry Collector + ClickHouse.
+#
+# Bring it up alongside the game:
+#   docker compose -f docker-compose.yml -f docker-compose.otel.yml up -d --build
+#
+# This points the game server at the collector and stands up ClickHouse as the
+# trace store. Query traces in ClickHouse (table otel.otel_traces) or point
+# Grafana / a ClickHouse UI at it. See docs/OBSERVABILITY.md.
+
+services:
+  game:
+    environment:
+      # Turn the server's tracing on and aim it at the collector in this network.
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_SERVICE_NAME: woc-server
+    depends_on:
+      otel-collector:
+        condition: service_started
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.116.0
+    container_name: eastbrook-otel-collector
+    restart: unless-stopped
+    command: ["--config=/etc/otel/collector.yaml"]
+    environment:
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-otel}
+    volumes:
+      - ./deploy/otel/collector.yaml:/etc/otel/collector.yaml:ro
+    ports:
+      # OTLP/HTTP for the browser client (and anything outside the compose net).
+      - "127.0.0.1:4318:4318"
+      # OTLP/gRPC (optional).
+      - "127.0.0.1:4317:4317"
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.8-alpine
+    container_name: eastbrook-clickhouse
+    restart: unless-stopped
+    environment:
+      CLICKHOUSE_DB: otel
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-otel}
+      # Needed for the default user to create the trace tables.
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: "1"
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    ports:
+      - "127.0.0.1:8123:8123" # HTTP (clients, Grafana, play.clickhouse UI)
+      - "127.0.0.1:9000:9000" # native protocol (the collector uses this)
+    volumes:
+      - eastbrook_clickhouse:/var/lib/clickhouse
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8123/ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+volumes:
+  eastbrook_clickhouse:

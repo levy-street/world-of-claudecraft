@@ -4,6 +4,7 @@ import type { PlayerClass } from '../src/sim/types';
 import type { ChatLogRow } from './chat_log';
 import { SOCIAL_SCHEMA } from './social_db';
 import { REALM } from './realm';
+import { withSpan, SpanKind } from './telemetry';
 
 try {
   process.loadEnvFile?.();
@@ -17,6 +18,43 @@ export const DATABASE_URL =
   })();
 
 export const pool = new Pool({ connectionString: DATABASE_URL, max: 10 });
+
+// Trace every query through the shared pool as a CLIENT span, so any DB work
+// done while a request/command span is active nests beneath it (the Postgres
+// hop of the distributed trace). All server modules use this one pool, so
+// wrapping it here covers auth, characters, social, moderation and chat logs.
+instrumentPoolQuery(pool);
+
+function instrumentPoolQuery(p: Pool): void {
+  const original = p.query.bind(p);
+  // Cover the SQL keyword + first identifier after FROM/INTO/UPDATE for a low
+  // cardinality span name like "db SELECT characters".
+  const summarize = (sql: string): { op: string; name: string } => {
+    const op = (sql.trim().split(/\s+/, 1)[0] || 'query').toUpperCase();
+    const m = /\b(?:from|into|update|table)\s+"?([a-z_][a-z0-9_]*)"?/i.exec(sql);
+    return { op, name: m ? `db ${op} ${m[1]}` : `db ${op}` };
+  };
+  (p as { query: unknown }).query = function patchedQuery(this: unknown, ...args: any[]): any {
+    const last = args[args.length - 1];
+    // pg's callback form has no Promise to await — pass it straight through.
+    if (typeof last === 'function') return (original as any)(...args);
+    const config = args[0];
+    const sql = typeof config === 'string' ? config : (config?.text ?? 'query');
+    const { op, name } = summarize(String(sql));
+    return withSpan(name, async (span) => {
+      const res = await (original as any)(...args);
+      if (res && typeof res.rowCount === 'number') span.setAttribute('db.row_count', res.rowCount);
+      return res;
+    }, {
+      kind: SpanKind.CLIENT,
+      attributes: {
+        'db.system': 'postgresql',
+        'db.operation': op,
+        'db.statement': String(sql).slice(0, 512),
+      },
+    });
+  };
+}
 
 const SCHEMA = `
 CREATE TABLE IF NOT EXISTS accounts (

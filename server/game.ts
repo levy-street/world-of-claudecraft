@@ -12,6 +12,7 @@ import { SocialService } from './social';
 import type { Presence, PresenceStatus, SocialActor, SocialEvent, SocialTransport } from './social';
 import { PgSocialDb } from './social_db';
 import { REALM } from './realm';
+import { withSpan } from './telemetry';
 
 const WORLD_SEED = 20061;
 // Interest management: the client renders entities out to 80yd, so new
@@ -471,6 +472,12 @@ export class GameServer {
 
   async leave(session: ClientSession, reason: string): Promise<void> {
     if (!this.clients.has(session.pid)) return;
+    return withSpan('ws.leave', () => this.leaveInner(session, reason), {
+      attributes: { 'woc.pid': session.pid, 'woc.character': session.name, 'woc.reason': reason },
+    });
+  }
+
+  private async leaveInner(session: ClientSession, reason: string): Promise<void> {
     this.clients.delete(session.pid);
     this.sessionsByCharacterId.delete(session.characterId);
     this.social.forget(session.characterId);
@@ -511,15 +518,19 @@ export class GameServer {
 
   private async saveAllSnapshot(reason: string): Promise<void> {
     const sessions = [...this.clients.values()];
-    let next = 0;
-    const worker = async () => {
-      for (;;) {
-        const session = sessions[next++];
-        if (!session) return;
-        await this.saveCharacter(session).catch((err) => console.error(`${reason} failed for ${session.name}:`, err));
-      }
-    };
-    await Promise.all(Array.from({ length: Math.min(SAVE_CONCURRENCY, sessions.length) }, worker));
+    // A root span for the periodic autosave / shutdown flush; each character's
+    // persistence (and its UPDATE) nests beneath it.
+    await withSpan('game.saveAll', async () => {
+      let next = 0;
+      const worker = async () => {
+        for (;;) {
+          const session = sessions[next++];
+          if (!session) return;
+          await this.saveCharacter(session).catch((err) => console.error(`${reason} failed for ${session.name}:`, err));
+        }
+      };
+      await Promise.all(Array.from({ length: Math.min(SAVE_CONCURRENCY, sessions.length) }, worker));
+    }, { attributes: { 'woc.reason': reason, 'woc.save_count': sessions.length } });
   }
 
   // The World Market is shared global state, persisted as a single JSONB blob.
