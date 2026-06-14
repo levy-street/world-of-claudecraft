@@ -113,22 +113,38 @@ export class Keybinds {
     let stored: unknown = null;
     try { stored = JSON.parse(localStorage.getItem(STORE_KEY) ?? 'null'); } catch { /* corrupt */ }
     if (!stored || typeof stored !== 'object') return;
+    const obj = stored as Record<string, unknown>;
     // Apply stored codes over the defaults, but only for known actions and
     // never letting one code land on two actions (first writer keeps it).
+    // Actions absent from the stored blob (e.g. ones added in a later release
+    // than the player's last save) KEEP their defaults rather than loading
+    // unbound — explicit stored bindings still win, so this only fills gaps.
     const claimed = new Set<string>();
     for (const a of BIND_ACTIONS) {
-      const entry = (stored as Record<string, unknown>)[a.id];
+      const entry = obj[a.id];
+      if (!Array.isArray(entry)) continue; // missing action: keep its default
       const slots: (string | null)[] = [null, null];
       for (let i = 0; i < SLOTS_PER_ACTION; i++) {
-        const v = Array.isArray(entry) ? entry[i] : undefined;
+        const v = entry[i];
         if (typeof v === 'string' && !claimed.has(v) && !isReservedCode(v)) {
           slots[i] = v;
           claimed.add(v);
-        } else {
-          slots[i] = null;
         }
       }
       this.map.set(a.id, slots);
+    }
+    // Second pass: for actions that kept their defaults, drop any code an
+    // explicit stored binding already claimed so the same key can't drive two
+    // actions (preserving the WoW-style uniqueness invariant).
+    for (const a of BIND_ACTIONS) {
+      if (Array.isArray(obj[a.id])) continue;
+      const slots = this.map.get(a.id)!;
+      for (let i = 0; i < slots.length; i++) {
+        const c = slots[i];
+        if (c === null) continue;
+        if (claimed.has(c)) slots[i] = null;
+        else claimed.add(c);
+      }
     }
   }
 
