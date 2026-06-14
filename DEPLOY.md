@@ -99,9 +99,11 @@ For off-box safety, sync the directory to S3 occasionally:
 
 - **Secrets**: the Postgres password is generated at first boot into
   `/opt/eastbrook/.env` (mode 600, gitignored). Nothing else to manage.
-- **Username bans**: set `USERNAME_BANLIST_FILE=/opt/eastbrook/username-banlist.txt`
-  to load blocked username terms from a private newline- or comma-separated
-  file. `USERNAME_BANLIST` can also provide a comma-separated inline list.
+- **Name bans**: set `USERNAME_BANLIST_FILE=/opt/eastbrook/username-banlist.txt`
+  to load blocked username and character-name terms from a private newline- or
+  comma-separated file. `USERNAME_BANLIST` can also provide a comma-separated
+  inline list. Existing matching character names are marked for forced rename
+  on server boot.
 - **Chat censorship**: set `CHAT_CENSOR_FILE=/opt/eastbrook/chat-censor.txt`
   to mask configured terms from a private newline- or comma-separated file.
   `CHAT_CENSOR_LIST` can also provide a comma-separated inline list.
