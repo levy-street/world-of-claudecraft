@@ -20,7 +20,8 @@ import { waterNormalish, waterNormalMaps } from './textures';
 const SEGMENTS_PER_ZONE = 180; // ~2u vertex spacing — enough for the foam band
 
 // Real water normal maps, fetched at module import and gated by the boot
-// preload, so build code below can read them synchronously.
+// preload only for the shader tier. Low/mobile uses generated canvas water
+// so it does not pay network/decode/upload cost for water detail.
 const WATER_TEX: Record<string, THREE.Texture> = {};
 function kickWaterTex(key: string, file: string): void {
   registerPreload(loadTexture(`/textures/water/${file}`, { repeat: true }).then((tex) => {
@@ -29,9 +30,11 @@ function kickWaterTex(key: string, file: string): void {
     return tex;
   }));
 }
-kickWaterTex('n1', 'water_1_normal.jpg');
-kickWaterTex('n2', 'water_2_normal.jpg');
-kickWaterTex('broad', 'waternormals.jpg');
+if (GFX.standardMaterials) {
+  kickWaterTex('n1', 'water_1_normal.jpg');
+  kickWaterTex('n2', 'water_2_normal.jpg');
+  kickWaterTex('broad', 'waternormals.jpg');
+}
 const DEEP_COLOR = new THREE.Color(0x0d3a52);
 const SHALLOW_COLOR = new THREE.Color(0x2d8077);
 const SKY_TINT = new THREE.Color(0x7fb2e0); // matches the sky horizon band
@@ -121,6 +124,9 @@ function buildShaderWater(seed: number): WaterView {
   // legacy procedural maps still get generated (unused) to preserve the
   // shared-LCG call order in textures.ts for everything generated after
   waterNormalMaps();
+  if (!WATER_TEX.n1 || !WATER_TEX.n2 || !WATER_TEX.broad) {
+    throw new Error('water normal textures not preloaded (assetsReady must resolve before buildWater)');
+  }
   const material = new THREE.ShaderMaterial({
     uniforms: {
       ...THREE.UniformsUtils.clone(THREE.UniformsLib.fog),
@@ -165,10 +171,8 @@ function buildShaderWater(seed: number): WaterView {
 function buildPhongWater(): WaterView {
   const tex = waterNormalish();
   tex.repeat.set(30, 30);
-  // the real swell normal map gives the cheap Phong plane textured speculars;
-  // clone so the scroll offset stays independent of the shader-tier caches
-  const norm = WATER_TEX.broad ? WATER_TEX.broad.clone() : null;
-  if (norm) norm.repeat.set(26, 78);
+  const [norm] = waterNormalMaps();
+  norm.repeat.set(26, 78);
   const mat = new THREE.MeshPhongMaterial({
     color: 0x2a6a96, transparent: true, opacity: 0.8, shininess: 140,
     specular: 0xd8ecff, map: tex, normalMap: norm,
@@ -185,10 +189,8 @@ function buildPhongWater(): WaterView {
     update(time: number): void {
       tex.offset.x = time * 0.008;
       tex.offset.y = time * 0.011;
-      if (norm) {
-        norm.offset.x = time * 0.006;
-        norm.offset.y = time * 0.009;
-      }
+      norm.offset.x = time * 0.006;
+      norm.offset.y = time * 0.009;
     },
   };
 }

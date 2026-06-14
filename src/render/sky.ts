@@ -38,19 +38,47 @@ const HDRI_TUNE: Record<BiomeId, { gain: number; clamp: number }> = {
   peaks: { gain: 0.48, clamp: 1.7 },
 };
 
-const BIOME_HDRI: Record<BiomeId, string> = {
+const BIOME_HDRI_2K: Record<BiomeId, string> = {
   vale: '/env/vale_day_2k.hdr',
   marsh: '/env/marsh_overcast_2k.hdr',
   peaks: '/env/peaks_dawn_2k.hdr',
 };
+
+const BIOME_HDRI_1K: Record<BiomeId, string> = {
+  vale: '/env/vale_day_1k.hdr',
+  marsh: '/env/marsh_overcast_1k.hdr',
+  peaks: '/env/peaks_dawn_1k.hdr',
+};
+
+function shouldUseLiteHdri(): boolean {
+  if (typeof location !== 'undefined') {
+    const params = new URLSearchParams(location.search);
+    const forced = params.get('gfx');
+    if (params.has('lowgfx') || forced === 'low') return true;
+    if (forced === 'high' || forced === 'ultra') return false;
+  }
+  if (typeof navigator !== 'undefined') {
+    const nav = navigator as Navigator & { deviceMemory?: number };
+    if (nav.deviceMemory !== undefined && nav.deviceMemory <= 4) return true;
+    if (nav.maxTouchPoints > 0 && typeof matchMedia !== 'undefined') {
+      if (matchMedia('(pointer: coarse)').matches || matchMedia('(max-width: 900px)').matches) return true;
+    }
+  }
+  return false;
+}
+
+const BIOME_HDRI = shouldUseLiteHdri() ? BIOME_HDRI_1K : BIOME_HDRI_2K;
 
 // Measured brightest-texel u (sun azimuth in equirect space) per HDRI — see
 // tmp/analyze_hdr.mjs. Used to rotate each map so its sun matches SUN_ANCHOR.
 const HDRI_SUN_U: Record<BiomeId, number> = { vale: 0.595, marsh: 0.657, peaks: 0.631 };
 
 const hdriStore: Partial<Record<BiomeId, THREE.DataTexture>> = {};
-// ~19MB of HDRs — skip when the URL already forces the gradient-dome tier
-// (an auto-detected low tier still fetches them; the URL guess can't know)
+// 2K HDRs are ~17MB on disk; 1K is ~4MB. Pick the lighter set for phone /
+// low-memory browser sessions before preload starts, and skip entirely when
+// the URL already forces the gradient-dome tier. An auto-detected software-GL
+// low tier can only be known after WebGL context creation, which happens after
+// preload, so this best-effort device gate keeps mobile out of the worst path.
 if (GFX.standardMaterials) {
   for (const biome of Object.keys(BIOME_HDRI) as BiomeId[]) {
     registerPreload(loadHdr(BIOME_HDRI[biome]).then((tex) => {

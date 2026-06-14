@@ -18,6 +18,8 @@ import { togglePasswordVisibility, syncInputAriaState, validateForm, handleKeybo
 import { CLASSES, ABILITIES } from './sim/content/classes';
 import { iconDataUrl } from './ui/icons';
 import { getLanguage, setLanguage, t, SupportedLanguage } from './ui/i18n';
+import { createPerfMonitor } from './game/perf';
+import { updateFollowCameraYaw, wrapAngle } from './game/camera_follow';
 
 
 const WORLD_SEED = 20061; // fixed: World of Claudecraft is a persistent place
@@ -311,9 +313,12 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
   const settings = new Settings();
   let renderer!: Renderer;
   let hud!: Hud;
+  const perf = createPerfMonitor(null);
   try {
     renderer = new Renderer(world, canvas, nameplates);
+    perf.setRenderer(renderer);
     hud = new Hud(world, renderer, keybinds);
+    perf.setHud(hud);
   } catch (err) {
     // e.g. WebGL context creation failure: surface it instead of leaving the
     // loading screen up forever
@@ -358,6 +363,7 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
     // slot 0 (key 1) is Attack for every class — auto-attack without needing
     // right-click; keys and clicks share the Hud's remappable slot layout
     onAbility: (slot) => hud.castSlot(slot),
+    onInputIntent: (kind) => perf.markInputIntent(kind),
     onUiKey: (key) => {
       switch (key) {
         case 'interact': interactKey(); break;
@@ -504,27 +510,19 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
   // that's what killed the turn stutter. While running, the orbit offset
   // eases back to zero so the camera settles in behind the character.
   let lastInterpFacing: number | null = null;
-  const CAM_SETTLE_RATE = 3; // 1/s exponential ease
-
-  function wrapAngle(d: number): number {
-    while (d > Math.PI) d -= 2 * Math.PI;
-    while (d < -Math.PI) d += 2 * Math.PI;
-    return d;
-  }
-
   function updateCamera(frameDt: number, interpFacing: number): void {
-    if (input.isMouseCameraMode()) return;
-    if (!input.isMouselookActive()) {
-      // follow turns 1:1 (keeps any manual orbit offset constant)
-      if (lastInterpFacing !== null) input.camYaw += wrapAngle(interpFacing - lastInterpFacing);
-      // settle behind the character while moving, unless the player is
-      // actively holding an orbit drag
-      const mi = input.readMoveInput();
-      if ((mi.forward || mi.strafeLeft || mi.strafeRight) && !input.leftDown) {
-        input.camYaw += wrapAngle(interpFacing - input.camYaw) * (1 - Math.exp(-frameDt * CAM_SETTLE_RATE));
-      }
-    }
-    lastInterpFacing = interpFacing; // track through mouselook too — no snap on release
+    const mi = input.readMoveInput();
+    const next = updateFollowCameraYaw({
+      camYaw: input.camYaw,
+      interpFacing,
+      frameDt,
+      lastInterpFacing,
+      mouselook: input.isMouselookActive(),
+      moving: mi.forward || mi.strafeLeft || mi.strafeRight,
+      orbiting: input.leftDown,
+    });
+    input.camYaw = next.camYaw;
+    lastInterpFacing = next.lastInterpFacing; // track through mouselook too — no snap on release
   }
 
   // Resolve this step's movement input, folding in click-to-move (#95). Returns
@@ -587,12 +585,14 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
     let frameDt = (now - last) / 1000;
     last = now;
     if (frameDt > 0.25) frameDt = 0.25;
+    perf.frame(frameDt);
 
     // freeze movement while the game menu is up so WASD doesn't walk the
     // character behind it (other windows stay non-modal, as before)
     input.suspendMovement = hud.isModalOpen();
     input.updateTouchLook(frameDt);
     updateHoverCursor();
+    perf.markInputFrame(performance.now());
 
     const mouselook = input.isMouselookActive() && !world.player.dead;
     const controllerFacing = input.controllerFacingOverride();
@@ -606,8 +606,9 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
         Object.assign(offlineSim.moveInput, mi);
         const stepFacing = movementFacing ?? facing;
         if (stepFacing !== null) offlineSim.player.facing = stepFacing;
-        const events = offlineSim.tick();
-        hud.handleEvents(events);
+        perf.markInputSent(performance.now());
+        const events = perf.time('sim', () => offlineSim.tick());
+        perf.time('events', () => hud.handleEvents(events));
         acc -= DT;
       }
       const pp = offlineSim.player;
@@ -615,8 +616,11 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
       renderer.camYaw = input.camYaw;
       renderer.camPitch = input.camPitch;
       renderer.camDist = input.camDist;
-      renderer.sync(acc / DT, frameDt, movementFacing);
-      hud.update();
+      perf.setNetwork(null);
+      perf.time('renderer', () => renderer.sync(acc / DT, frameDt, movementFacing));
+      perf.markInputVisible(performance.now());
+      perf.time('hud', () => hud.update());
+      perf.tick(now);
       return;
     }
 
@@ -626,20 +630,30 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
     const netFacing = movementFacing ?? resolved.facing;
     Object.assign(net.moveInput, resolved.mi);
     net.setMouselookFacing(netFacing);
+    if (net.flushInput()) perf.markInputSent(performance.now());
+    for (const sample of net.consumeInputEchoSamples()) perf.markInputEcho(sample);
     net.pendingFacingDelta = 0; // superseded by the interpolated follow below
-    hud.handleEvents(net.drainEvents());
+    perf.time('events', () => hud.handleEvents(net.drainEvents()));
     if (net.consumeInventoryChanged()) hud.onInventoryChanged();
     const alpha = net.lastSnapAt > 0
       ? Math.min(1.25, (performance.now() - net.lastSnapAt) / Math.max(20, net.snapInterval))
       : 1;
+    perf.setNetwork({
+      connected: net.connected,
+      snapInterval: Math.round(net.snapInterval),
+      lastSnapAge: net.lastSnapAt > 0 ? Math.round(performance.now() - net.lastSnapAt) : -1,
+      alpha: Math.round(alpha * 100) / 100,
+    });
     const pe = world.player;
     // facing interp capped at 1 — extrapolating angles past the snapshot oscillates
     updateCamera(frameDt, pe.prevFacing + wrapAngle(pe.facing - pe.prevFacing) * Math.min(1, alpha));
     renderer.camYaw = input.camYaw;
     renderer.camPitch = input.camPitch;
     renderer.camDist = input.camDist;
-    renderer.sync(alpha, frameDt, movementFacing);
-    hud.update();
+    perf.time('renderer', () => renderer.sync(alpha, frameDt, movementFacing));
+    perf.markInputVisible(performance.now());
+    perf.time('hud', () => hud.update());
+    perf.tick(now);
   }
   requestAnimationFrame(frame);
   // cut to the game only once the first frame is actually on screen
@@ -653,7 +667,7 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
     face(facing: unknown) { input.setControllerFacing(facing); },
     stop() { input.clearControllerMoveInput(); },
   };
-  (window as any).__game = { sim: world, world, renderer, input, hud, online, controller };
+  (window as any).__game = { sim: world, world, renderer, input, hud, online, controller, perf };
 }
 
 // ---------------------------------------------------------------------------

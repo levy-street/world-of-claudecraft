@@ -1,4 +1,4 @@
-// Character asset preparation: preloads every manifest glb, assembles per-key
+// Character asset preparation: preloads manifest glbs, assembles per-key
 // model clones (accessory show/hide + weapon attachments), caches tinted
 // material variants, and bakes a single static idle-pose geometry per key for
 // the far-LOD / shadow-proxy path.
@@ -17,19 +17,37 @@ import { manifestUrls, VISUALS, VisualDef } from './manifest';
 
 const DEFAULT_TINT_STRENGTH = 0.4;
 
+const LOW_URL_ALIAS: Record<string, string> = {
+  'models/chars/skeleton_warrior.glb': 'models/chars/skeleton_minion.glb',
+  'models/chars/skeleton_rogue.glb': 'models/chars/skeleton_minion.glb',
+  'models/chars/skeleton_mage.glb': 'models/chars/skeleton_minion.glb',
+  'models/chars/rogue_hooded.glb': 'models/chars/rogue.glb',
+};
+
 // ---------------------------------------------------------------------------
 // Preload
 // ---------------------------------------------------------------------------
 
 const gltfByUrl = new Map<string, GLTF>();
 
-for (const url of manifestUrls()) {
+function assetUrl(url: string): string {
+  return GFX.standardMaterials ? url : (LOW_URL_ALIAS[url] ?? url);
+}
+
+const preloadUrls = GFX.standardMaterials
+  ? manifestUrls()
+  : [...new Set(manifestUrls()
+    .filter((url) => !url.startsWith('models/weapons/'))
+    .map(assetUrl))];
+
+for (const url of preloadUrls) {
   registerPreload(loadGltf(url).then((g) => { gltfByUrl.set(url, g); }));
 }
 
 function resolvedGltf(url: string): GLTF {
-  const g = gltfByUrl.get(url);
-  if (!g) throw new Error(`character asset not preloaded: ${url}`);
+  const resolvedUrl = assetUrl(url);
+  const g = gltfByUrl.get(resolvedUrl);
+  if (!g) throw new Error(`character asset not preloaded: ${resolvedUrl}`);
   return g;
 }
 
@@ -122,7 +140,8 @@ export function assembleModel(def: VisualDef): THREE.Object3D {
       }
     });
   }
-  for (const att of def.attach ?? []) {
+  const attachments = GFX.standardMaterials ? (def.attach ?? []) : [];
+  for (const att of attachments) {
     // GLTFLoader sanitizes node names (PropertyBinding strips [].:/ chars),
     // so the authored "handslot.r" arrives as "handslotr" — try both
     const bone = root.getObjectByName(att.bone)

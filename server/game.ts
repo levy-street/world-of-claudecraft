@@ -70,6 +70,8 @@ export interface ClientSession {
   lastWhisperFrom: string | null;
   // last explicit channel this player sent to; plain text follows it.
   rememberedChat: RememberedChat;
+  // last client input sequence processed; echoed in snapshots for latency telemetry
+  lastInputSeq: number;
   // serialized form of each delta self field as last sent to this client;
   // a field is omitted from a snapshot while its serialization is unchanged
   lastSent: Record<string, string>;
@@ -432,6 +434,7 @@ export class GameServer {
       blockListLoaded: false,
       lastWhisperFrom: null,
       rememberedChat: { channel: 'say' },
+      lastInputSeq: 0,
       lastSent: {},
       sentEnts: new Map(),
     };
@@ -646,6 +649,9 @@ export class GameServer {
       if (!meta || !e) return;
       const { moveInput, facing } = parseMoveInputFrame(msg);
       Object.assign(meta.moveInput, moveInput);
+      if (typeof msg.seq === 'number' && Number.isFinite(msg.seq) && msg.seq > 0) {
+        session.lastInputSeq = Math.max(session.lastInputSeq, Math.floor(msg.seq));
+      }
       if (facing !== null && !e.dead) {
         e.facing = facing;
       }
@@ -950,6 +956,7 @@ export class GameServer {
       eat: p.eating ? { remaining: round2(p.eating.remaining) } : null,
       drk: p.drinking ? { remaining: round2(p.drinking.remaining) } : null,
       opUntil: p.overpowerUntil > this.sim.time ? 1 : 0,
+      ack: session.lastInputSeq,
     });
     const json = JSON.stringify(self);
     // heavy, rarely-changing fields ride along only when their serialized

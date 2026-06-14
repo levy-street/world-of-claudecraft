@@ -7,9 +7,18 @@ import * as THREE from 'three';
 //   1. '?lowgfx' (legacy flag) or '?gfx=low'  -> low
 //   2. '?gfx=high' / '?gfx=ultra'             -> that tier, EVEN on software GL
 //      (headless screenshot verification: stills render slowly but correctly)
-//   3. otherwise: software GL (SwiftShader/llvmpipe) -> low, real GPUs -> high
+//   3. otherwise: phone-class / low-memory browsers -> low
+//   4. otherwise: software GL (SwiftShader/llvmpipe) -> low, real GPUs -> high
 
 export type GfxTier = 'low' | 'high' | 'ultra';
+
+export interface GfxRuntimeHints {
+  search: string;
+  deviceMemory?: number;
+  maxTouchPoints: number;
+  coarsePointer: boolean;
+  narrowViewport: boolean;
+}
 
 export interface GfxSettings {
   readonly tier: GfxTier;
@@ -42,21 +51,49 @@ function settingsFor(tier: GfxTier): GfxSettings {
     pixelRatioCap: tier === 'low' ? 1 : tier === 'high' ? 1.75 : 2.5,
     shadowMap: tier === 'low' ? 1024 : 4096,
     standardMaterials: tier !== 'low',
-    grassRadius: tier === 'low' ? 45 : 82, // 70 left a visible regen boundary in wide shots
-    grassStep: tier === 'low' ? 3.2 : 1.8,
+    grassRadius: tier === 'low' ? 34 : 82, // low/mobile prioritizes fill/alpha cost over meadow density
+    grassStep: tier === 'low' ? 3.8 : 1.8,
     terrainSplat: tier !== 'low',
     windSway: tier !== 'low',
     maxPointLights: tier === 'low' ? 3 : 6,
   };
 }
 
-/** Tier explicitly requested via URL, or null when it should be auto-detected. */
-export function urlForcedTier(): GfxTier | null {
-  if (typeof location === 'undefined') return null;
-  const params = new URLSearchParams(location.search);
+export function forcedTierFromSearch(search: string): GfxTier | null {
+  const params = new URLSearchParams(search);
   if (params.has('lowgfx')) return 'low';
   const g = params.get('gfx');
   return g === 'low' || g === 'high' || g === 'ultra' ? g : null;
+}
+
+/** Tier explicitly requested via URL, or null when it should be auto-detected. */
+export function urlForcedTier(): GfxTier | null {
+  if (typeof location === 'undefined') return null;
+  return forcedTierFromSearch(location.search);
+}
+
+function runtimeHints(): GfxRuntimeHints {
+  const nav = typeof navigator !== 'undefined'
+    ? navigator as Navigator & { deviceMemory?: number }
+    : null;
+  return {
+    search: typeof location !== 'undefined' ? location.search : '',
+    deviceMemory: nav?.deviceMemory,
+    maxTouchPoints: nav?.maxTouchPoints ?? 0,
+    coarsePointer: typeof matchMedia !== 'undefined' ? matchMedia('(pointer: coarse)').matches : false,
+    narrowViewport: typeof matchMedia !== 'undefined'
+      ? (matchMedia('(max-width: 940px)').matches || matchMedia('(max-height: 760px)').matches)
+      : false,
+  };
+}
+
+export function isConstrainedBrowser(hints: GfxRuntimeHints): boolean {
+  if (hints.deviceMemory !== undefined && hints.deviceMemory <= 4) return true;
+  return hints.maxTouchPoints > 0 && (hints.coarsePointer || hints.narrowViewport);
+}
+
+export function tierFromHints(hints: GfxRuntimeHints, softwareGl: boolean): GfxTier {
+  return forcedTierFromSearch(hints.search) ?? (softwareGl || isConstrainedBrowser(hints) ? 'low' : 'high');
 }
 
 // Software GL (SwiftShader/llvmpipe — headless test runners, VMs) can't take
@@ -77,10 +114,10 @@ export function isSoftwareGL(webgl: THREE.WebGLRenderer): boolean {
 // values); initGfxTier() re-resolves once the GL context exists. The renderer
 // MUST call initGfxTier() right after creating its WebGLRenderer and before
 // building any scene content.
-export let GFX: GfxSettings = settingsFor(urlForcedTier() ?? 'high');
+export let GFX: GfxSettings = settingsFor(tierFromHints(runtimeHints(), false));
 
 export function initGfxTier(webgl: THREE.WebGLRenderer): GfxTier {
-  const tier = urlForcedTier() ?? (isSoftwareGL(webgl) ? 'low' : 'high');
+  const tier = tierFromHints(runtimeHints(), isSoftwareGL(webgl));
   GFX = settingsFor(tier);
   return tier;
 }

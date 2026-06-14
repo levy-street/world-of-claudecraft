@@ -187,7 +187,7 @@ function blankEntity(id: number): Entity {
   return {
     id, kind: 'mob', templateId: '', name: '', level: 1,
     pos: { x: 0, y: 0, z: 0 }, prevPos: { x: 0, y: 0, z: 0 }, facing: 0, prevFacing: 0,
-    vy: 0, onGround: true, fallStartY: 0,
+    vx: 0, vz: 0, vy: 0, onGround: true, fallStartY: 0,
     hp: 1, maxHp: 1, resource: 0, maxResource: 0, resourceType: null,
     stats: { str: 0, agi: 0, sta: 0, int: 0, spi: 0, armor: 0 },
     weapon: { min: 1, max: 2, speed: 2 },
@@ -251,6 +251,12 @@ export class ClientWorld implements IWorld {
   private pendingQuestCommands = new Map<string, 'accept' | 'turnin'>();
   private mouselookFacing: number | null = null;
   private sendTimer: number | undefined;
+  private lastInputSentAt = 0;
+  private lastInputSig = '';
+  private inputSeq = 0;
+  private pendingInputSeqSentAt = new Map<number, number>();
+  private ackedInputSeq = 0;
+  private inputEchoSamples: number[] = [];
 
   constructor(token: string, characterId: number, cls: PlayerClass, base = '') {
     this.characterId = characterId;
@@ -301,15 +307,42 @@ export class ClientWorld implements IWorld {
     this.mouselookFacing = normalizeMoveFacing(facing);
   }
 
+  flushInput(now = performance.now()): boolean {
+    return this.sendInput(now, true);
+  }
+
+  consumeInputEchoSamples(): number[] {
+    const samples = this.inputEchoSamples;
+    this.inputEchoSamples = [];
+    return samples;
+  }
+
   // -----------------------------------------------------------------------
   // Socket
   // -----------------------------------------------------------------------
 
-  private sendInput(): void {
-    if (!this.connected || this.ws.readyState !== WebSocket.OPEN) return;
+  private inputSignature(): string {
+    const mi = this.moveInput;
+    const facing = this.mouselookFacing === null ? '' : Math.round(this.mouselookFacing * 10000).toString();
+    return [
+      mi.forward ? 1 : 0, mi.back ? 1 : 0,
+      mi.turnLeft ? 1 : 0, mi.turnRight ? 1 : 0,
+      mi.strafeLeft ? 1 : 0, mi.strafeRight ? 1 : 0,
+      mi.jump ? 1 : 0, facing,
+    ].join(',');
+  }
+
+  private sendInput(now = performance.now(), changedOnly = false): boolean {
+    if (!this.connected || this.ws.readyState !== WebSocket.OPEN) return false;
+    const sig = this.inputSignature();
+    if (changedOnly) {
+      if (sig === this.lastInputSig) return false;
+      if (now - this.lastInputSentAt < 16) return false;
+    }
     const mi = this.moveInput;
     const msg: Record<string, unknown> = {
       t: 'input',
+      seq: ++this.inputSeq,
       mi: {
         f: mi.forward ? 1 : 0, b: mi.back ? 1 : 0,
         tl: mi.turnLeft ? 1 : 0, tr: mi.turnRight ? 1 : 0,
@@ -319,6 +352,16 @@ export class ClientWorld implements IWorld {
     };
     if (this.mouselookFacing !== null) msg.facing = this.mouselookFacing;
     this.ws.send(JSON.stringify(msg));
+    this.lastInputSentAt = now;
+    this.lastInputSig = sig;
+    this.pendingInputSeqSentAt.set(this.inputSeq, now);
+    if (this.pendingInputSeqSentAt.size > 120) {
+      const stale = this.inputSeq - 120;
+      for (const seq of this.pendingInputSeqSentAt.keys()) {
+        if (seq <= stale) this.pendingInputSeqSentAt.delete(seq);
+      }
+    }
+    return true;
   }
 
   private canSendCommand(): boolean {
@@ -498,6 +541,16 @@ export class ClientWorld implements IWorld {
     const e = s ? applyWire(s) : null;
     if (s && e) {
       seen.add(s.id);
+      if (typeof s.ack === 'number' && s.ack > this.ackedInputSeq) {
+        for (let seq = this.ackedInputSeq + 1; seq <= s.ack; seq++) {
+          const sentAt = this.pendingInputSeqSentAt.get(seq);
+          if (sentAt !== undefined) {
+            this.inputEchoSamples.push(now - sentAt);
+            this.pendingInputSeqSentAt.delete(seq);
+          }
+        }
+        this.ackedInputSeq = s.ack;
+      }
       e.resource = s.res;
       e.maxResource = s.mres;
       e.resourceType = s.rtype;

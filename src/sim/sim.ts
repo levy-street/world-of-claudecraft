@@ -951,8 +951,10 @@ export class Sim {
     const wantsMove = mx !== 0 || mz !== 0 || inp.jump;
     if (wantsMove && p.sitting) this.standUp(p);
 
-    const moving = (mx !== 0 || mz !== 0) && !this.isRooted(p);
+    const hasMoveInput = mx !== 0 || mz !== 0;
+    const moving = hasMoveInput && !this.isRooted(p);
     const swimming = this.isSwimming(p);
+    let wishX = 0, wishZ = 0, wishSpeed = 0;
     if (moving) {
       if (p.castingAbility) this.cancelCast(p);
       const len = Math.hypot(mx, mz);
@@ -964,8 +966,17 @@ export class Sim {
       const sin = Math.sin(p.facing), cos = Math.cos(p.facing);
       const wx = mz * sin - mx * cos;
       const wz = mz * cos + mx * sin;
-      let nx = p.pos.x + wx * speed * DT;
-      let nz = p.pos.z + wz * speed * DT;
+      wishX = wx;
+      wishZ = wz;
+      wishSpeed = speed;
+    }
+
+    const movingOnGround = moving && (p.onGround || swimming);
+    if (movingOnGround || (!p.onGround && (p.vx !== 0 || p.vz !== 0))) {
+      const stepX = movingOnGround ? wishX * wishSpeed : p.vx;
+      const stepZ = movingOnGround ? wishZ * wishSpeed : p.vz;
+      let nx = p.pos.x + stepX * DT;
+      let nz = p.pos.z + stepZ * DT;
       // cliffs and the world rim are walls, not ramps
       if (p.onGround && !swimming) {
         const h0 = groundHeight(p.pos.x, p.pos.z, this.cfg.seed);
@@ -974,12 +985,17 @@ export class Sim {
         if (h1 > h0 && run > 1e-5 && (h1 - h0) / run > MAX_CLIMB_SLOPE) {
           nx = p.pos.x;
           nz = p.pos.z;
+          if (!p.onGround) { p.vx = 0; p.vz = 0; }
         }
       }
       // slide along buildings, trees, crypt walls
       const resolved = resolvePosition(this.cfg.seed, nx, nz, BODY_RADIUS);
       p.pos.x = resolved.x;
       p.pos.z = resolved.z;
+      if (!p.onGround && (resolved.x !== nx || resolved.z !== nz)) {
+        p.vx = (resolved.x - p.prevPos.x) / DT;
+        p.vz = (resolved.z - p.prevPos.z) / DT;
+      }
     }
 
     // Vertical: jumping, gravity, swimming, fall damage
@@ -989,17 +1005,23 @@ export class Sim {
       // treading water at the surface
       p.pos.y = SWIM_SURFACE_Y;
       p.vy = 0;
+      p.vx = 0;
+      p.vz = 0;
       p.onGround = true;
       p.fallStartY = p.pos.y;
       if (inp.jump && !this.isRooted(p)) {
         // small hop to climb onto shores and docks
         p.vy = JUMP_VELOCITY * 0.7;
+        p.vx = wishX * wishSpeed;
+        p.vz = wishZ * wishSpeed;
         p.onGround = false;
       }
       return;
     }
     if (inp.jump && p.onGround && !this.isRooted(p)) {
       p.vy = JUMP_VELOCITY;
+      p.vx = wishX * wishSpeed;
+      p.vz = wishZ * wishSpeed;
       p.onGround = false;
       p.fallStartY = p.pos.y;
     }
@@ -1011,6 +1033,8 @@ export class Sim {
         // splashing into deep water breaks the fall
         p.pos.y = SWIM_SURFACE_Y;
         p.vy = 0;
+        p.vx = 0;
+        p.vz = 0;
         p.onGround = true;
         p.fallStartY = p.pos.y;
         return;
@@ -1018,6 +1042,8 @@ export class Sim {
       if (p.pos.y <= ground) {
         p.pos.y = ground;
         p.vy = 0;
+        p.vx = 0;
+        p.vz = 0;
         p.onGround = true;
         const drop = p.fallStartY - ground;
         if (drop > FALL_SAFE_DISTANCE) {
@@ -1029,6 +1055,8 @@ export class Sim {
     } else {
       if (ground < p.pos.y - 0.4) {
         p.onGround = false;
+        p.vx = 0;
+        p.vz = 0;
         p.vy = 0;
         p.fallStartY = p.pos.y;
       } else {

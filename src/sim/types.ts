@@ -408,6 +408,8 @@ export interface Entity {
   // so each interpolates on its own clock (see ClientWorld.applySnapshot)
   netUpdatedAt?: number;
   netInterval?: number;
+  vx: number; // horizontal air velocity (x, yards/sec)
+  vz: number; // horizontal air velocity (z, yards/sec)
   vy: number; // vertical velocity (jumping/falling)
   onGround: boolean;
   fallStartY: number;

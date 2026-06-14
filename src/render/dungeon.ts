@@ -13,7 +13,6 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { loadGltf, releaseGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
 import { radialGlowTexture } from './textures';
 import { instanceOrigin } from '../sim/data';
 import {
@@ -84,6 +83,7 @@ interface ModuleAsset {
 
 const moduleAssets = new Map<string, ModuleAsset>();
 const packSourceMaterial = new Map<Pack, THREE.MeshStandardMaterial>();
+let dungeonAssetsPromise: Promise<void> | null = null;
 
 // Meshopt-quantized attributes are normalized ints; bake them to plain floats
 // so applyMatrix4/merge cannot clamp world-space values into the [-1,1] range.
@@ -125,19 +125,20 @@ function extractModule(name: string, pack: Pack, gltf: GLTF): void {
   moduleAssets.set(name, { geo: merged, pack });
 }
 
-for (const name of KIT_MODELS) {
-  // release after extraction: 59 parsed GLTFs each embed a copy of the atlas
-  // (~59MB CPU retained for nothing — only merged clones + 2 materials live on)
-  registerPreload(loadGltf(`models/dungeon/${name}.glb`).then((g) => {
-    extractModule(name, 'kit', g);
-    releaseGltf(`models/dungeon/${name}.glb`);
-  }));
+function loadModuleAsset(name: string, pack: Pack): Promise<void> {
+  const url = `models/dungeon/${name}.glb`;
+  return loadGltf(url).then((g) => {
+    extractModule(name, pack, g);
+    releaseGltf(url);
+  });
 }
-for (const name of BITS_MODELS) {
-  registerPreload(loadGltf(`models/dungeon/${name}.glb`).then((g) => {
-    extractModule(name, 'bits', g);
-    releaseGltf(`models/dungeon/${name}.glb`);
-  }));
+
+export function ensureDungeonAssets(): Promise<void> {
+  dungeonAssetsPromise ??= Promise.all([
+    ...KIT_MODELS.map((name) => loadModuleAsset(name, 'kit')),
+    ...BITS_MODELS.map((name) => loadModuleAsset(name, 'bits')),
+  ]).then(() => undefined);
+  return dungeonAssetsPromise;
 }
 
 // ---------------------------------------------------------------------------
@@ -221,7 +222,8 @@ export class DungeonInteriors {
     private fireLights: THREE.PointLight[],
   ) {}
 
-  buildInterior(interior: string, ox: number, oz: number): void {
+  async buildInterior(interior: string, ox: number, oz: number): Promise<void> {
+    await ensureDungeonAssets();
     const layout = interior === 'sanctum' ? SANCTUM_LAYOUT : interior === 'arena' ? ARENA_LAYOUT : CRYPT_LAYOUT;
     const variant = this.variantFor(interior, ox);
     const group = new THREE.Group();
@@ -273,7 +275,7 @@ export class DungeonInteriors {
     for (const [kind, mats] of p.byKind) {
       const asset = moduleAssets.get(kind);
       if (!asset) {
-        // assetsReady() guarantees loads completed; guard against a bad kind name
+        // ensureDungeonAssets() guarantees loads completed; guard against a bad kind name
         console.warn(`dungeon: unknown module kind '${kind}'`);
         continue;
       }

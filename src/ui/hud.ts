@@ -89,6 +89,32 @@ export class Hud {
   private tooltipEl = $('#tooltip');
   private errorTimer: number | undefined;
   private bannerTimer: number | undefined;
+  private pfLevelEl = $('#pf-level');
+  private pfHpEl = $('#pf-hp');
+  private pfHpTextEl = $('#pf-hp-text');
+  private pfResEl = $('#pf-res');
+  private pfResTextEl = $('#pf-res-text');
+  private pfResourceEl = $('#pf-resource');
+  private buffBarEl = $('#buff-bar');
+  private targetFrameEl = $('#target-frame');
+  private targetEliteTagEl = $('#tf-elite-tag');
+  private targetNameEl = $('#tf-name');
+  private targetLevelEl = $('#tf-level');
+  private targetHpEl = $('#tf-hp');
+  private targetHpTextEl = $('#tf-hp-text');
+  private targetPortraitEl = $('#tf-portrait') as unknown as HTMLCanvasElement;
+  private targetDebuffsEl = $('#tf-debuffs');
+  private comboRowEl = $('#combo-row');
+  private castbarEl = $('#castbar');
+  private castbarFillEl = this.castbarEl.querySelector('.fill') as HTMLElement;
+  private castbarLabelEl = this.castbarEl.querySelector('.label') as HTMLElement;
+  private actionbarEl = $('#actionbar');
+  private xpFillEl = $('#xpbar .fill');
+  private xpLabelEl = $('#xpbar .label');
+  private deathOverlayEl = $('#death-overlay');
+  private hotWriteCache = new Map<HTMLElement, string>();
+  private hotDomWrites = 0;
+  private hotDomSkippedWrites = 0;
   private minimapCtx: CanvasRenderingContext2D;
   private minimapBg: HTMLCanvasElement;
   private mapBg: HTMLCanvasElement | null = null;
@@ -125,6 +151,9 @@ export class Hud {
   private lastSocialContent = '';
   private socialNotice: { text: string; error: boolean } | null = null;
   private socialSuggestTimer: number | undefined;
+  private lastHudFastAt = 0;
+  private lastHudMediumAt = 0;
+  private lastHudSlowAt = 0;
   // current typeahead state: which input, its results, and the keyboard-
   // highlighted row (-1 = none), so Enter/Arrow keys can pick a suggestion
   private socialSuggest: { field: string; items: { name: string; cls: string; level: number }[]; index: number } = { field: '', items: [], index: -1 };
@@ -179,6 +208,46 @@ export class Hud {
     this.showBanner(startZone.name);
     this.log(`Welcome to ${startZone.name}!`, '#ffd100');
     this.logZoneWelcome(startZone);
+  }
+
+  private setText(el: HTMLElement, text: string): void {
+    if (this.hotWriteCache.get(el) === text) { this.hotDomSkippedWrites++; return; }
+    this.hotWriteCache.set(el, text);
+    this.hotDomWrites++;
+    el.textContent = text;
+  }
+
+  private setDisplay(el: HTMLElement, display: string): void {
+    const key = `display:${display}`;
+    if (this.hotWriteCache.get(el) === key) { this.hotDomSkippedWrites++; return; }
+    this.hotWriteCache.set(el, key);
+    this.hotDomWrites++;
+    el.style.display = display;
+  }
+
+  private setTransform(el: HTMLElement, transform: string): void {
+    const key = `transform:${transform}`;
+    if (this.hotWriteCache.get(el) === key) { this.hotDomSkippedWrites++; return; }
+    this.hotWriteCache.set(el, key);
+    this.hotDomWrites++;
+    el.style.transform = transform;
+  }
+
+  private setWidth(el: HTMLElement, width: string): void {
+    const key = `width:${width}`;
+    if (this.hotWriteCache.get(el) === key) { this.hotDomSkippedWrites++; return; }
+    this.hotWriteCache.set(el, key);
+    this.hotDomWrites++;
+    el.style.width = width;
+  }
+
+  perfStats(): { hotDomWrites: number; hotDomSkippedWrites: number; hotDomSkipRate: number } {
+    const total = this.hotDomWrites + this.hotDomSkippedWrites;
+    return {
+      hotDomWrites: this.hotDomWrites,
+      hotDomSkippedWrites: this.hotDomSkippedWrites,
+      hotDomSkipRate: total > 0 ? Math.round((this.hotDomSkippedWrites / total) * 1000) / 1000 : 0,
+    };
   }
 
   private bindLogTabs(): void {
@@ -583,91 +652,96 @@ export class Hud {
   update(): void {
     const sim = this.sim;
     const p = sim.player;
+    const now = performance.now();
+    const fastHud = now - this.lastHudFastAt >= 100;
+    if (fastHud) this.lastHudFastAt = now;
+    const mediumHud = now - this.lastHudMediumAt >= 250;
+    if (mediumHud) this.lastHudMediumAt = now;
+    const slowHud = now - this.lastHudSlowAt >= 500;
+    if (slowHud) this.lastHudSlowAt = now;
+
     this.meters.update();
     this.syncSlotMap(); // picks up newly learned abilities mid-session
 
     // player frame
-    $('#pf-level').textContent = String(p.level);
-    ($('#pf-hp') as HTMLElement).style.transform = `scaleX(${p.hp / Math.max(1, p.maxHp)})`;
-    $('#pf-hp-text').textContent = `${p.hp} / ${p.maxHp}`;
+    this.setText(this.pfLevelEl, String(p.level));
+    this.setTransform(this.pfHpEl, `scaleX(${p.hp / Math.max(1, p.maxHp)})`);
+    this.setText(this.pfHpTextEl, `${p.hp} / ${p.maxHp}`);
     const resFrac = p.resource / Math.max(1, p.maxResource);
-    ($('#pf-res') as HTMLElement).style.transform = `scaleX(${resFrac})`;
-    $('#pf-res-text').textContent = `${Math.round(p.resource)} / ${p.maxResource}`;
-    $('#pf-resource').className = 'bar ' + (p.resourceType === 'rage' ? 'rage' : p.resourceType === 'energy' ? 'energy' : 'mana');
+    this.setTransform(this.pfResEl, `scaleX(${resFrac})`);
+    this.setText(this.pfResTextEl, `${Math.round(p.resource)} / ${p.maxResource}`);
+    const resClass = 'bar ' + (p.resourceType === 'rage' ? 'rage' : p.resourceType === 'energy' ? 'energy' : 'mana');
+    if (this.pfResourceEl.className !== resClass) this.pfResourceEl.className = resClass;
 
     // buff bar (player buffs + debuffs)
-    this.renderAuras($('#buff-bar'), p, 'all');
+    this.renderAuras(this.buffBarEl, p, 'all');
 
     // target frame
     const target = p.targetId !== null ? sim.entities.get(p.targetId) : null;
-    const tf = $('#target-frame');
     if (target && target.kind !== 'object') {
-      tf.style.display = 'flex';
-      tf.classList.toggle('elite', !!MOBS[target.templateId]?.elite);
-      $('#tf-elite-tag').textContent = MOBS[target.templateId]?.boss ? 'BOSS' : 'ELITE';
-      $('#tf-name').textContent = target.name;
-      $('#tf-level').textContent = MOBS[target.templateId]?.boss ? '☠' : String(target.level);
-      ($('#tf-hp') as HTMLElement).style.transform = `scaleX(${target.hp / Math.max(1, target.maxHp)})`;
-      $('#tf-hp-text').textContent = target.dead ? 'Dead' : `${target.hp} / ${target.maxHp}`;
-      ($('#tf-name') as HTMLElement).style.color = target.hostile ? '#ff6b5e' : '#9fdc7f';
+      this.setDisplay(this.targetFrameEl, 'flex');
+      this.targetFrameEl.classList.toggle('elite', !!MOBS[target.templateId]?.elite);
+      this.setText(this.targetEliteTagEl, MOBS[target.templateId]?.boss ? 'BOSS' : 'ELITE');
+      this.setText(this.targetNameEl, target.name);
+      this.setText(this.targetLevelEl, MOBS[target.templateId]?.boss ? '☠' : String(target.level));
+      this.setTransform(this.targetHpEl, `scaleX(${target.hp / Math.max(1, target.maxHp)})`);
+      this.setText(this.targetHpTextEl, target.dead ? 'Dead' : `${target.hp} / ${target.maxHp}`);
+      const targetNameColor = target.hostile ? '#ff6b5e' : '#9fdc7f';
+      if (this.targetNameEl.style.color !== targetNameColor) this.targetNameEl.style.color = targetNameColor;
       if (this.lastPortraitTarget !== target.id) {
         this.lastPortraitTarget = target.id;
         const glyph = target.kind === 'npc' ? '💬' : FAMILY_GLYPH[MOBS[target.templateId]?.family ?? 'humanoid'] ?? '🗡️';
-        this.drawPortrait($('#tf-portrait') as unknown as HTMLCanvasElement, glyph, target.color);
+        this.drawPortrait(this.targetPortraitEl, glyph, target.color);
       }
-      this.renderAuras($('#tf-debuffs'), target, 'debuffs');
+      this.renderAuras(this.targetDebuffsEl, target, 'debuffs');
       // combo points
-      const comboRow = $('#combo-row');
       if (p.resourceType === 'energy') {
-        comboRow.style.display = 'flex';
-        if (comboRow.children.length !== 5) {
-          comboRow.innerHTML = '';
+        this.setDisplay(this.comboRowEl, 'flex');
+        if (this.comboRowEl.children.length !== 5) {
+          this.comboRowEl.innerHTML = '';
           for (let i = 0; i < 5; i++) {
             const pip = document.createElement('div');
             pip.className = 'combo-pip';
-            comboRow.appendChild(pip);
+            this.comboRowEl.appendChild(pip);
           }
         }
         const points = p.comboTargetId === target.id ? p.comboPoints : 0;
-        [...comboRow.children].forEach((pip, i) => pip.classList.toggle('on', i < points));
+        [...this.comboRowEl.children].forEach((pip, i) => pip.classList.toggle('on', i < points));
       } else {
-        comboRow.style.display = 'none';
+        this.setDisplay(this.comboRowEl, 'none');
       }
     } else {
-      tf.style.display = 'none';
+      this.setDisplay(this.targetFrameEl, 'none');
       this.lastPortraitTarget = -999;
     }
 
     // cast bar
-    const cb = $('#castbar');
     if (p.castingAbility) {
-      cb.style.display = 'block';
-      cb.classList.toggle('channel', p.channeling);
+      this.setDisplay(this.castbarEl, 'block');
+      this.castbarEl.classList.toggle('channel', p.channeling);
       const frac = p.channeling
         ? p.castRemaining / Math.max(0.01, p.castTotal)
         : 1 - p.castRemaining / Math.max(0.01, p.castTotal);
-      (cb.querySelector('.fill') as HTMLElement).style.width = `${(frac * 100).toFixed(1)}%`;
-      (cb.querySelector('.label') as HTMLElement).textContent = castDisplayName(p.castingAbility);
+      this.setWidth(this.castbarFillEl, `${(frac * 100).toFixed(1)}%`);
+      this.setText(this.castbarLabelEl, castDisplayName(p.castingAbility));
     } else if (p.eating || p.drinking) {
-      cb.style.display = 'block';
-      cb.classList.add('channel');
+      this.setDisplay(this.castbarEl, 'block');
+      this.castbarEl.classList.add('channel');
       const c = p.eating && p.drinking
         ? (p.eating.remaining >= p.drinking.remaining ? p.eating : p.drinking)
         : (p.eating ?? p.drinking)!;
-      (cb.querySelector('.fill') as HTMLElement).style.width = `${((c.remaining / CONSUME_DURATION) * 100).toFixed(1)}%`;
-      (cb.querySelector('.label') as HTMLElement).textContent =
-        p.eating && p.drinking ? 'Eating & Drinking…' : p.eating ? 'Eating…' : 'Drinking…';
+      this.setWidth(this.castbarFillEl, `${((c.remaining / CONSUME_DURATION) * 100).toFixed(1)}%`);
+      this.setText(this.castbarLabelEl, p.eating && p.drinking ? 'Eating & Drinking…' : p.eating ? 'Eating…' : 'Drinking…');
     } else {
-      cb.style.display = 'none';
-      cb.classList.remove('channel');
-      (cb.querySelector('.fill') as HTMLElement).style.width = '0%';
-      (cb.querySelector('.label') as HTMLElement).textContent = '';
+      this.setDisplay(this.castbarEl, 'none');
+      this.castbarEl.classList.remove('channel');
+      this.setWidth(this.castbarFillEl, '0%');
+      this.setText(this.castbarLabelEl, '');
     }
 
     // action bar
     const tgtDist = target && !target.dead ? dist2d(p.pos, target.pos) : null;
-    const actionbar = $('#actionbar');
-    actionbar.classList.toggle('many-spells', this.hotbarActions.filter((action) => action !== null).length > 10);
+    this.actionbarEl.classList.toggle('many-spells', this.hotbarActions.filter((action) => action !== null).length > 10);
     for (let i = 0; i < this.abilityButtons.length; i++) {
       const ab = this.abilityButtons[i];
       if (i === 0) {
@@ -677,9 +751,9 @@ export class Hud {
           ab.lastIcon = '__attack';
           ab.label.style.backgroundImage = `url(${iconDataUrl('ability', 'attack')})`;
         }
-        ab.countEl.textContent = '';
-        ab.cdOverlay.style.height = '0%';
-        ab.cdText.textContent = '';
+        this.setText(ab.countEl, '');
+        if (ab.cdOverlay.style.height !== '0%') ab.cdOverlay.style.height = '0%';
+        this.setText(ab.cdText, '');
         ab.btn.classList.toggle('queued', !!p.autoAttack);
         ab.btn.classList.toggle('oor', tgtDist !== null && tgtDist > MELEE_RANGE);
         continue;
@@ -694,9 +768,9 @@ export class Hud {
           ab.lastIcon = '';
           ab.label.style.backgroundImage = '';
         }
-        ab.countEl.textContent = '';
-        ab.cdOverlay.style.height = '0%';
-        ab.cdText.textContent = '';
+        this.setText(ab.countEl, '');
+        if (ab.cdOverlay.style.height !== '0%') ab.cdOverlay.style.height = '0%';
+        this.setText(ab.cdText, '');
         continue;
       }
       ab.btn.classList.remove('empty');
@@ -707,9 +781,9 @@ export class Hud {
           ab.label.style.backgroundImage = `url(${iconDataUrl('item', item.id)})`;
         }
         const count = this.inventoryCount(item.id);
-        ab.countEl.textContent = String(count);
-        ab.cdOverlay.style.height = '0%';
-        ab.cdText.textContent = '';
+        this.setText(ab.countEl, String(count));
+        if (ab.cdOverlay.style.height !== '0%') ab.cdOverlay.style.height = '0%';
+        this.setText(ab.cdText, '');
         ab.btn.classList.toggle('unusable', count <= 0 || p.dead);
         ab.btn.classList.remove('oor', 'queued');
         continue;
@@ -721,13 +795,14 @@ export class Hud {
         ab.lastIcon = iconKey;
         ab.label.style.backgroundImage = `url(${iconDataUrl('ability', a.id)})`;
       }
-      ab.countEl.textContent = '';
+      this.setText(ab.countEl, '');
       const cd = p.cooldowns.get(a.id) ?? 0;
       const gcdActive = !a.offGcd && p.gcdRemaining > 0;
       const shown = Math.max(cd, gcdActive ? p.gcdRemaining : 0);
       const denom = cd > 0 ? a.cooldown : GCD;
-      ab.cdOverlay.style.height = shown > 0 ? `${Math.min(100, (shown / Math.max(0.01, denom)) * 100)}%` : '0%';
-      ab.cdText.textContent = cd > 1 ? Math.ceil(cd).toString() : '';
+      const cdHeight = shown > 0 ? `${Math.min(100, (shown / Math.max(0.01, denom)) * 100)}%` : '0%';
+      if (ab.cdOverlay.style.height !== cdHeight) ab.cdOverlay.style.height = cdHeight;
+      this.setText(ab.cdText, cd > 1 ? Math.ceil(cd).toString() : '');
       ab.btn.classList.toggle('unusable', p.resource < known!.cost);
       const oor = a.requiresTarget && tgtDist !== null && tgtDist > (a.range > 0 ? a.range : MELEE_RANGE);
       ab.btn.classList.toggle('oor', !!oor);
@@ -737,57 +812,69 @@ export class Hud {
     // xp bar
     const xpNeed = xpForLevel(p.level);
     const xpFrac = p.level >= MAX_LEVEL ? 1 : sim.xp / xpNeed;
-    ($('#xpbar .fill') as HTMLElement).style.width = `${(xpFrac * 100).toFixed(1)}%`;
-    $('#xpbar .label').textContent = p.level >= MAX_LEVEL ? 'MAX LEVEL' : `${sim.xp} / ${xpNeed} XP (${Math.floor(xpFrac * 100)}%)`;
+    this.setWidth(this.xpFillEl, `${(xpFrac * 100).toFixed(1)}%`);
+    this.setText(this.xpLabelEl, p.level >= MAX_LEVEL ? 'MAX LEVEL' : `${sim.xp} / ${xpNeed} XP (${Math.floor(xpFrac * 100)}%)`);
 
-    $('#death-overlay').style.display = p.dead ? 'flex' : 'none';
+    this.setDisplay(this.deathOverlayEl, p.dead ? 'flex' : 'none');
 
-    // zone transitions: banner + welcome hint when crossing into a new band.
-    // A ~5yd dead-band past the boundary stops a player straddling the border
-    // from re-triggering the banner/log (and the map canvas regen) every step.
     const inDungeon = p.pos.x > DUNGEON_X_THRESHOLD;
     const currentZone = zoneAt(p.pos.z);
-    if (!inDungeon && currentZone.id !== this.lastZoneId) {
-      const lastZone = ZONES.find((z) => z.id === this.lastZoneId);
-      const pastDeadBand = !lastZone
-        || p.pos.z < lastZone.zMin - ZONE_BANNER_DEADBAND
-        || p.pos.z >= lastZone.zMax + ZONE_BANNER_DEADBAND;
-      if (pastDeadBand) {
-        if (this.lastZoneId !== '') {
-          this.showBanner(currentZone.name);
-          this.log(`Entering ${currentZone.name}.`, '#ffd100');
-          this.logZoneWelcome(currentZone);
+    if (mediumHud) {
+      // zone transitions: banner + welcome hint when crossing into a new band.
+      // A ~5yd dead-band past the boundary stops a player straddling the border
+      // from re-triggering the banner/log (and the map canvas regen) every step.
+      if (!inDungeon && currentZone.id !== this.lastZoneId) {
+        const lastZone = ZONES.find((z) => z.id === this.lastZoneId);
+        const pastDeadBand = !lastZone
+          || p.pos.z < lastZone.zMin - ZONE_BANNER_DEADBAND
+          || p.pos.z >= lastZone.zMax + ZONE_BANNER_DEADBAND;
+        if (pastDeadBand) {
+          if (this.lastZoneId !== '') {
+            this.showBanner(currentZone.name);
+            this.log(`Entering ${currentZone.name}.`, '#ffd100');
+            this.logZoneWelcome(currentZone);
+          }
+          this.lastZoneId = currentZone.id;
         }
-        this.lastZoneId = currentZone.id;
+      }
+
+      // soundtrack: pick the zone theme and layer in combat percussion.
+      // Combat = a mob is on us, or we traded blows in the last few seconds
+      // (the wire protocol doesn't ship the inCombat flag).
+      let aggroed = false;
+      for (const e of sim.entities.values()) {
+        if (e.kind === 'mob' && !e.dead && e.aggroTargetId === sim.playerId) { aggroed = true; break; }
+      }
+      const inCombat = aggroed || now - this.lastCombatEventAt < 5000;
+      const hub = currentZone.hub;
+      const zone = inDungeon ? 'dungeon'
+        : Math.hypot(p.pos.x - hub.x, p.pos.z - hub.z) < hub.radius + 10 ? 'town' : currentZone.biome;
+      music.update(zone, inCombat);
+
+      this.updateQuestTracker();
+      this.updatePartyFrames();
+      this.updateTradeWindow();
+      this.updateArenaStatus();
+      if ($('#map-window').style.display === 'block') this.updateMapWindow();
+      if ($('#arena-window').style.display === 'block') this.renderArenaWindow();
+      if (this.openLootMobId !== null) {
+        const mob = sim.entities.get(this.openLootMobId);
+        if (!mob || !mob.lootable || dist2d(p.pos, mob.pos) > 7) this.closeLoot();
+      }
+      if (this.openVendorNpcId !== null) {
+        const npc = sim.entities.get(this.openVendorNpcId);
+        if (!npc || dist2d(p.pos, npc.pos) > 8) this.closeVendor();
       }
     }
 
-    // soundtrack: pick the zone theme and layer in combat percussion.
-    // Combat = a mob is on us, or we traded blows in the last few seconds
-    // (the wire protocol doesn't ship the inCombat flag).
-    let aggroed = false;
-    for (const e of sim.entities.values()) {
-      if (e.kind === 'mob' && !e.dead && e.aggroTargetId === sim.playerId) { aggroed = true; break; }
-    }
-    const inCombat = aggroed || performance.now() - this.lastCombatEventAt < 5000;
-    const hub = currentZone.hub;
-    const zone = inDungeon ? 'dungeon'
-      : Math.hypot(p.pos.x - hub.x, p.pos.z - hub.z) < hub.radius + 10 ? 'town' : currentZone.biome;
-    music.update(zone, inCombat);
-
-    this.updateQuestTracker();
-    this.updatePartyFrames();
-    this.updateTradeWindow();
-    this.updateArenaStatus();
     // when a bout begins, get the queue panel out of the way for the fight
     const inArenaMatch = !!this.sim.arenaInfo?.match;
     if (inArenaMatch && !this.arenaMatchSeen && $('#arena-window').style.display === 'block') {
       $('#arena-window').style.display = 'none';
     }
     this.arenaMatchSeen = inArenaMatch;
-    this.updateMinimap();
-    if ($('#map-window').style.display === 'block') this.updateMapWindow();
-    if ($('#social-window').classList.contains('open')) {
+    if (fastHud) this.updateMinimap();
+    if (slowHud && $('#social-window').classList.contains('open')) {
       const struct = this.socialStructSig();
       if (struct !== this.lastSocialStruct) {
         this.lastSocialStruct = struct;
@@ -798,16 +885,7 @@ export class Hud {
         if (content !== this.lastSocialContent) { this.lastSocialContent = content; this.refreshSocialList(); }
       }
     }
-    if ($('#arena-window').style.display === 'block') this.renderArenaWindow();
-    if (this.openLootMobId !== null) {
-      const mob = sim.entities.get(this.openLootMobId);
-      if (!mob || !mob.lootable || dist2d(p.pos, mob.pos) > 7) this.closeLoot();
-    }
-    if (this.openVendorNpcId !== null) {
-      const npc = sim.entities.get(this.openVendorNpcId);
-      if (!npc || dist2d(p.pos, npc.pos) > 8) this.closeVendor();
-    }
-    if (this.marketOpen) {
+    if (slowHud && this.marketOpen) {
       if (!this.nearbyMarketNpc()) this.closeMarket();
       else this.refreshMarket();
     }

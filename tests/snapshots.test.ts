@@ -79,6 +79,12 @@ function bareClient(pid: number): ClientWorld {
   c.connected = true;
   c.eventQueue = [];
   c.mouselookFacing = null;
+  c.lastInputSentAt = 0;
+  c.lastInputSig = '';
+  c.inputSeq = 0;
+  c.pendingInputSeqSentAt = new Map();
+  c.ackedInputSeq = 0;
+  c.inputEchoSamples = [];
   return c;
 }
 
@@ -158,6 +164,36 @@ describe('delta snapshots', () => {
 
     expect(server.sim.meta(session.pid)?.copper).toBe(20);
     expect(server.sim.countItem('wolf_fang', session.pid)).toBe(0);
+  });
+
+  it('echoes the last processed input sequence in self snapshots', () => {
+    server.handleMessage(session, JSON.stringify({ t: 'input', seq: 7, mi: { f: 1 } }));
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.ack).toBe(7);
+
+    server.handleMessage(session, JSON.stringify({ t: 'input', seq: 6, mi: { f: 0 } }));
+    fc.sent.length = 0;
+    broadcast(server);
+    expect(lastSnap(fc.sent).self.ack).toBe(7);
+  });
+
+  it('turns echoed input acks into client latency samples', () => {
+    const client = bareClient(1);
+    const first = { id: 1, k: 'player', tid: 'player', nm: 'Testa', lv: 1, x: 0, y: 0, z: 0, f: 0, hp: 100, mhp: 100 };
+    (client as any).pendingInputSeqSentAt.set(1, 100);
+    (client as any).pendingInputSeqSentAt.set(2, 140);
+
+    const oldPerf = (globalThis as any).performance;
+    (globalThis as any).performance = { now: () => 200 };
+    try {
+      (client as any).applySnapshot({ t: 'snap', ents: [], self: { ...first, ack: 2 } });
+    } finally {
+      (globalThis as any).performance = oldPerf;
+    }
+
+    expect(client.consumeInputEchoSamples()).toEqual([100, 60]);
+    expect(client.consumeInputEchoSamples()).toEqual([]);
   });
 
   it('resends a heavy field once it changes', () => {
@@ -497,6 +533,31 @@ describe('client-side delta merge', () => {
       expect(client.questsDone.has('q_wolves')).toBe(false);
       expect(client.questState('q_wolves')).toBe('active');
       expect(sent).toContainEqual({ t: 'cmd', cmd: 'turnin', quest: 'q_wolves' });
+    } finally {
+      (globalThis as any).WebSocket = oldWebSocket;
+    }
+  });
+
+  it('flushes changed movement immediately without resending unchanged frames', () => {
+    const client = bareClient(1);
+    const sent: any[] = [];
+    (client as any).ws = { readyState: 1, send: (payload: string) => sent.push(JSON.parse(payload)) };
+    const oldWebSocket = (globalThis as any).WebSocket;
+    (globalThis as any).WebSocket = { OPEN: 1 };
+    try {
+      Object.assign(client.moveInput, { forward: true, back: false, turnLeft: false, turnRight: false, strafeLeft: false, strafeRight: false, jump: false });
+      expect(client.flushInput(100)).toBe(true);
+      expect(sent).toEqual([{ t: 'input', seq: 1, mi: { f: 1, b: 0, tl: 0, tr: 0, sl: 0, sr: 0, j: 0 } }]);
+
+      expect(client.flushInput(105)).toBe(false);
+      expect(sent).toHaveLength(1);
+
+      Object.assign(client.moveInput, { forward: false, strafeRight: true });
+      expect(client.flushInput(115)).toBe(false);
+      expect(sent).toHaveLength(1);
+
+      expect(client.flushInput(120)).toBe(true);
+      expect(sent.at(-1)).toEqual({ t: 'input', seq: 2, mi: { f: 0, b: 0, tl: 0, tr: 0, sl: 0, sr: 1, j: 0 } });
     } finally {
       (globalThis as any).WebSocket = oldWebSocket;
     }

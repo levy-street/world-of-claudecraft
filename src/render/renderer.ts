@@ -12,10 +12,10 @@ import { AnimState, CharacterVisual, createCharacterVisual } from './characters'
 import { LocoTrack, newLocoTrack, updateLocomotion } from './locomotion';
 import { buildProps } from './props';
 import { plankTexture, sparkleTexture } from './textures';
-import { DungeonInteriors } from './dungeon';
+import { DungeonInteriors, ensureDungeonAssets } from './dungeon';
 import { Vfx } from './vfx';
 import {
-  GFX, initGfxTier, sharedUniforms, SUN_ANCHOR, SUN_DIR, surfaceMat,
+  GFX, initGfxTier, sharedUniforms, SUN_ANCHOR, SUN_DIR, surfaceMat, urlForcedTier,
 } from './gfx';
 import { buildComposer, PostPipeline } from './post';
 import { buildTerrain, TerrainView } from './terrain';
@@ -29,6 +29,10 @@ const NAMEPLATE_RANGE = 55;
 // Entities further than this from the player are hidden entirely: their rigs
 // are several draw calls each and read as sub-pixel specks long before this.
 const ENTITY_DRAW_RANGE = 80;
+const ENTITY_VIEW_CREATE_RANGE_SQ = ENTITY_DRAW_RANGE * ENTITY_DRAW_RANGE;
+const ENTITY_VIEW_DESTROY_RANGE_SQ = 96 * 96;
+const VIEW_CREATE_BUDGET_LOW = 4;
+const VIEW_CREATE_BUDGET_HIGH = 16;
 // rigs further than this stop casting articulated shadows (~7 draws each) and
 // hand off to a single-draw static-pose shadow proxy (the merged far-LOD mesh
 // with a colorWrite-off material) so mid-ground NPCs keep their grounding for
@@ -62,6 +66,10 @@ const IBL_RAW_SCALE = 0.55;
 const DUNGEON_HEMI_INTENSITY = 0.22; // floor of readability — bosses crushed to black at 0.14
 // character rim glow scales up underground so silhouettes split from the murk
 const DUNGEON_RIM_BOOST = 2.4;
+const RENDERER_PHASE_SAMPLE_LIMIT = 720;
+
+type RendererPhase = 'setup' | 'entities' | 'world' | 'nameplates' | 'submit' | 'total';
+type RendererPhaseStats = Record<RendererPhase, { count: number; avg: number; p95: number; max: number }>;
 
 interface EntityView {
   group: THREE.Group;
@@ -79,6 +87,10 @@ interface EntityView {
   hpFill: HTMLDivElement;
   markerEl: HTMLDivElement;
   raidMarkEl: HTMLDivElement; // party raid/target marker, above the name
+  nameplateDisplay: string;
+  nameplateTransform: string;
+  nameplateSig: string;
+  nameplateHpWidth: string;
   sparkle?: THREE.Sprite; // ground objects
   objectMesh?: THREE.Object3D;
   portal?: THREE.Mesh; // dungeon door swirl
@@ -99,6 +111,29 @@ function collectCasters(root: THREE.Object3D, into: THREE.Object3D[]): void {
   });
 }
 
+function roundMs(v: number): number {
+  return Math.round(v * 100) / 100;
+}
+
+function distSqXZ(a: Entity, b: Entity): number {
+  const dx = a.pos.x - b.pos.x;
+  const dz = a.pos.z - b.pos.z;
+  return dx * dx + dz * dz;
+}
+
+function summarizeMs(values: number[]): { count: number; avg: number; p95: number; max: number } {
+  if (values.length === 0) return { count: 0, avg: 0, p95: 0, max: 0 };
+  const sorted = [...values].sort((a, b) => a - b);
+  const total = values.reduce((a, b) => a + b, 0);
+  const p95Idx = Math.min(sorted.length - 1, Math.max(0, Math.ceil(sorted.length * 0.95) - 1));
+  return {
+    count: values.length,
+    avg: roundMs(total / values.length),
+    p95: roundMs(sorted[p95Idx]),
+    max: roundMs(sorted[sorted.length - 1]),
+  };
+}
+
 export class Renderer {
   scene = new THREE.Scene();
   camera: THREE.PerspectiveCamera;
@@ -113,9 +148,15 @@ export class Renderer {
   camDist = 12;
   showNameplates = true;
   // settings-menu graphics knobs (applied live)
-  private renderScale = 1; // resolution multiplier on top of the device pixel ratio
+  private renderScale = 1; // user-requested resolution ceiling on top of the device pixel ratio
+  private effectiveRenderScale = 1; // runtime value after adaptive backoff
+  private frameMsEma = 16.7;
+  private adaptiveGrace = 2.0;
+  private adaptiveCooldown = 0;
+  private stableFrameTime = 0;
   private baseExposure = 1.12; // tone-mapping exposure at brightness 1.0
   private tmpV = new THREE.Vector3();
+  private viewCandidates: { e: Entity; d2: number }[] = [];
   private tmpV2 = new THREE.Vector3();
   // floating /say-/yell bubbles, keyed by speaker entity id
   private chatBubbles = new Map<number, { el: HTMLDivElement; until: number }>();
@@ -148,6 +189,20 @@ export class Renderer {
   private post: PostPipeline | null = null;
   private godRays: THREE.Sprite[] = [];
   private viewport = { width: 1, height: 1 };
+  private viewportPollTimer = 0;
+  private nameplateTimer = 0;
+  private glVendor = '';
+  private glRenderer = '';
+  private contextLostCount = 0;
+  private contextRestoredCount = 0;
+  private phaseSamples: Record<RendererPhase, number[]> = {
+    setup: [],
+    entities: [],
+    world: [],
+    nameplates: [],
+    submit: [],
+    total: [],
+  };
 
   constructor(private sim: IWorld, canvas: HTMLCanvasElement, nameplateLayer: HTMLDivElement) {
     this.nameplateLayer = nameplateLayer;
@@ -156,6 +211,12 @@ export class Renderer {
     // requesting it here would hit software GL (the autodetect can only run
     // after the context exists) with the most expensive setting there is.
     this.webgl = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance' });
+    this.captureGlIdentity();
+    canvas.addEventListener('webglcontextlost', () => { this.contextLostCount++; });
+    canvas.addEventListener('webglcontextrestored', () => {
+      this.contextRestoredCount++;
+      this.captureGlIdentity();
+    });
     initGfxTier(this.webgl); // software-GL autodetect needs the live context
     this.lowGfx = GFX.tier === 'low';
     const LOW_GFX = this.lowGfx;
@@ -334,8 +395,6 @@ export class Renderer {
     });
     this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
 
-    for (const e of sim.entities.values()) this.createView(e);
-
     // post chain (bloom + grade, GTAO on ultra); low renders direct
     if (GFX.composer) this.post = buildComposer(this.webgl, this.scene, this.camera, this.viewport.width, this.viewport.height);
 
@@ -360,8 +419,20 @@ export class Renderer {
     return { width: Math.max(1, width), height: Math.max(1, height) };
   }
 
-  private resizeViewport(): void {
-    this.viewport = this.measureViewport();
+  private captureGlIdentity(): void {
+    try {
+      const gl = this.webgl.getContext();
+      const dbg = gl.getExtension('WEBGL_debug_renderer_info');
+      this.glVendor = String(dbg ? gl.getParameter(dbg.UNMASKED_VENDOR_WEBGL) : gl.getParameter(gl.VENDOR));
+      this.glRenderer = String(dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER));
+    } catch {
+      this.glVendor = '';
+      this.glRenderer = '';
+    }
+  }
+
+  private resizeViewport(measured = this.measureViewport()): void {
+    this.viewport = measured;
     this.camera.aspect = this.viewport.width / this.viewport.height;
     this.camera.updateProjectionMatrix();
     this.applyResolution();
@@ -371,8 +442,7 @@ export class Renderer {
   // tier) to the renderer, composer, and vfx. Shared by resize and the
   // render-scale setting so a window resize never drops the chosen scale.
   private applyResolution(): void {
-    this.viewport = this.measureViewport();
-    const ratio = Math.min(window.devicePixelRatio, GFX.pixelRatioCap) * this.renderScale;
+    const ratio = Math.min(window.devicePixelRatio, GFX.pixelRatioCap) * this.effectiveRenderScale;
     this.webgl.setPixelRatio(ratio);
     this.webgl.setSize(this.viewport.width, this.viewport.height, false);
     if (this.post) {
@@ -390,7 +460,120 @@ export class Renderer {
   /** Resolution multiplier on top of the device pixel ratio (0.5..1). */
   setRenderScale(scale: number): void {
     this.renderScale = Math.min(1, Math.max(0.5, scale));
+    this.effectiveRenderScale = this.initialEffectiveRenderScale(this.renderScale);
+    this.frameMsEma = 16.7;
+    this.adaptiveGrace = 1.0;
+    this.adaptiveCooldown = 0.5;
+    this.stableFrameTime = 0;
     this.applyResolution();
+  }
+
+  private isMobileRuntime(): boolean {
+    return document.body.classList.contains('mobile-touch');
+  }
+
+  private initialEffectiveRenderScale(scale: number): number {
+    const forcedTier = urlForcedTier();
+    if (this.isMobileRuntime() && forcedTier !== 'high' && forcedTier !== 'ultra') return Math.min(scale, 0.85);
+    return scale;
+  }
+
+  perfStats(): {
+    tier: string;
+    renderScale: number;
+    effectiveRenderScale: number;
+    pixelRatio: number;
+    width: number;
+    height: number;
+    calls: number;
+    triangles: number;
+    textures: number;
+    programs: number;
+    views: number;
+    glVendor: string;
+    glRenderer: string;
+    contextLost: number;
+    contextRestored: number;
+    phaseMs: RendererPhaseStats;
+  } {
+    const info = this.webgl.info;
+    return {
+      tier: GFX.tier,
+      renderScale: this.renderScale,
+      effectiveRenderScale: this.effectiveRenderScale,
+      pixelRatio: this.webgl.getPixelRatio(),
+      width: this.viewport.width,
+      height: this.viewport.height,
+      calls: info.render.calls,
+      triangles: info.render.triangles,
+      textures: info.memory.textures,
+      programs: info.programs?.length ?? 0,
+      views: this.views.size,
+      glVendor: this.glVendor,
+      glRenderer: this.glRenderer,
+      contextLost: this.contextLostCount,
+      contextRestored: this.contextRestoredCount,
+      phaseMs: this.rendererPhaseStats(),
+    };
+  }
+
+  private recordRendererPhase(phase: RendererPhase, ms: number): void {
+    if (!Number.isFinite(ms) || ms < 0) return;
+    const samples = this.phaseSamples[phase];
+    samples.push(Math.min(250, ms));
+    if (samples.length > RENDERER_PHASE_SAMPLE_LIMIT) samples.splice(0, samples.length - RENDERER_PHASE_SAMPLE_LIMIT);
+  }
+
+  private rendererPhaseStats(): RendererPhaseStats {
+    return {
+      setup: summarizeMs(this.phaseSamples.setup),
+      entities: summarizeMs(this.phaseSamples.entities),
+      world: summarizeMs(this.phaseSamples.world),
+      nameplates: summarizeMs(this.phaseSamples.nameplates),
+      submit: summarizeMs(this.phaseSamples.submit),
+      total: summarizeMs(this.phaseSamples.total),
+    };
+  }
+
+  private updateAdaptiveResolution(dt: number): void {
+    if (!Number.isFinite(dt) || dt <= 0) return;
+    const frameMs = Math.min(250, dt * 1000);
+    this.frameMsEma += (frameMs - this.frameMsEma) * 0.08;
+    if (this.adaptiveGrace > 0) {
+      this.adaptiveGrace -= dt;
+      return;
+    }
+    if (this.adaptiveCooldown > 0) {
+      this.adaptiveCooldown -= dt;
+      return;
+    }
+
+    const mobile = this.isMobileRuntime();
+    const minScale = mobile ? 0.55 : (GFX.tier === 'low' ? 0.6 : 0.7);
+    const dropThreshold = mobile ? 20 : 24; // ~50fps mobile, ~42fps desktop
+    const urgentThreshold = mobile ? 28 : 34;
+    const recoverThreshold = mobile ? 15.5 : 14.5;
+
+    if (this.frameMsEma >= dropThreshold && this.effectiveRenderScale > minScale) {
+      const step = this.frameMsEma >= urgentThreshold ? 0.15 : 0.1;
+      this.effectiveRenderScale = Math.max(minScale, Math.round((this.effectiveRenderScale - step) * 100) / 100);
+      this.stableFrameTime = 0;
+      this.adaptiveCooldown = 1.25;
+      this.applyResolution();
+      return;
+    }
+
+    if (this.frameMsEma <= recoverThreshold && this.effectiveRenderScale < this.renderScale) {
+      this.stableFrameTime += dt;
+      if (this.stableFrameTime >= 6) {
+        this.effectiveRenderScale = Math.min(this.renderScale, Math.round((this.effectiveRenderScale + 0.05) * 100) / 100);
+        this.stableFrameTime = 0;
+        this.adaptiveCooldown = 2.0;
+        this.applyResolution();
+      }
+    } else {
+      this.stableFrameTime = 0;
+    }
   }
 
   // Visual reactions to sim events (called by the HUD for every event,
@@ -563,6 +746,7 @@ export class Renderer {
     // nameplate
     const np = document.createElement('div');
     np.className = 'nameplate';
+    np.style.display = 'none';
     const raidMark = document.createElement('div');
     raidMark.className = 'np-raidmark';
     raidMark.style.display = 'none';
@@ -585,6 +769,7 @@ export class Renderer {
     this.views.set(e.id, {
       group, visual, sheepVisual: null, bearVisual: null, height, clickTarget,
       nameplate: np, nameEl, hpBar, hpFill, markerEl: marker, raidMarkEl: raidMark, sparkle, objectMesh, portal,
+      nameplateDisplay: 'none', nameplateTransform: '', nameplateSig: '', nameplateHpWidth: '',
       objectCasters, shadowOn: true, isFar: false,
       lastX: e.pos.x, lastZ: e.pos.z,
       loco: newLocoTrack(),
@@ -621,7 +806,9 @@ export class Renderer {
 
   private buildInterior(interior: string, ox: number, oz: number): void {
     this.dungeons ??= new DungeonInteriors(this.scene, this.lowGfx, this.flames, this.fireLights);
-    this.dungeons.buildInterior(interior, ox, oz);
+    void this.dungeons.buildInterior(interior, ox, oz).catch((err) => {
+      console.error('Failed to build dungeon interior:', err);
+    });
   }
 
   // Outdoor fog presets per biome (high tier eases between them as the
@@ -631,15 +818,17 @@ export class Renderer {
     marsh: { color: 0xa3b294, near: 80, far: 330 },
     peaks: { color: 0xbdd3ec, near: 160, far: 560 },
   };
+  private static LOW_FOG = { color: 0xa6c6e0, near: 70, far: 260 };
 
   private outdoorFogPreset(): { color: number; near: number; far: number } {
-    if (this.lowGfx) return Renderer.BIOME_FOG.vale;
+    if (this.lowGfx) return Renderer.LOW_FOG;
     return Renderer.BIOME_FOG[zoneBiomeAt(this.sim.player.pos.z)];
   }
 
   private updateAmbience(px: number, camY: number, dt: number): void {
     const inside = px > DUNGEON_X_THRESHOLD;
     if (inside && isArenaPos(px)) {
+      void ensureDungeonAssets().catch(() => undefined);
       // build the Ashen Coliseum copy the player was matched into
       const pz = this.sim.player.pos.z;
       for (let i = 0; i < ARENA_SLOT_COUNT; i++) {
@@ -652,6 +841,7 @@ export class Renderer {
         }
       }
     } else if (inside) {
+      void ensureDungeonAssets().catch(() => undefined);
       // build the interior copy the player is standing in
       for (const dungeon of DUNGEON_LIST) {
         for (let i = 0; i < INSTANCE_SLOT_COUNT; i++) {
@@ -750,33 +940,64 @@ export class Renderer {
   }
 
   sync(alpha: number, dt: number, renderFacingOverride: number | null): void {
-    const measured = this.measureViewport();
-    if (measured.width !== this.viewport.width || measured.height !== this.viewport.height) {
-      this.resizeViewport();
+    const totalStart = performance.now();
+    let phaseStart = totalStart;
+    const markPhase = (phase: RendererPhase): void => {
+      const t = performance.now();
+      this.recordRendererPhase(phase, t - phaseStart);
+      phaseStart = t;
+    };
+
+    this.updateAdaptiveResolution(dt);
+    this.viewportPollTimer += dt;
+    if (this.viewportPollTimer >= 0.25) {
+      this.viewportPollTimer = 0;
+      const measured = this.measureViewport();
+      if (measured.width !== this.viewport.width || measured.height !== this.viewport.height) {
+        this.resizeViewport(measured);
+      }
     }
     this.time += dt;
     sharedUniforms.uTime.value = this.time;
     const sim = this.sim;
     const p = sim.player;
     const now = performance.now();
+    markPhase('setup');
 
-    // dynamic worlds: create views for newcomers, drop views for leavers
-    // (doomed ids collected into a reused scratch array — no per-frame alloc)
+    // dynamic worlds: create nearby views lazily and drop views for leavers or
+    // entities that moved well outside the draw band. This avoids building
+    // rig/nameplate DOM for the whole sim on the first rendered frame.
+    let createBudget = this.lowGfx ? VIEW_CREATE_BUDGET_LOW : VIEW_CREATE_BUDGET_HIGH;
+    this.viewCandidates.length = 0;
     for (const e of sim.entities.values()) {
-      if (!this.views.has(e.id)) this.createView(e);
+      if (this.views.has(e.id)) continue;
+      const required = e.id === p.id || e.id === p.targetId;
+      if (required) {
+        this.createView(e);
+      } else {
+        const d2 = distSqXZ(e, p);
+        if (d2 <= ENTITY_VIEW_CREATE_RANGE_SQ) this.viewCandidates.push({ e, d2 });
+      }
+    }
+    if (this.viewCandidates.length > 1) this.viewCandidates.sort((a, b) => a.d2 - b.d2);
+    for (let i = 0; i < this.viewCandidates.length && createBudget > 0; i++, createBudget--) {
+      this.createView(this.viewCandidates[i].e);
     }
     this.doomedIds.length = 0;
     for (const id of this.views.keys()) {
-      if (!sim.entities.has(id)) this.doomedIds.push(id);
+      const e = sim.entities.get(id);
+      if (!e || (id !== p.id && id !== p.targetId && distSqXZ(e, p) > ENTITY_VIEW_DESTROY_RANGE_SQ)) {
+        this.doomedIds.push(id);
+      }
     }
     for (const id of this.doomedIds) this.removeView(id);
 
     // frame parity for distance-tiered mixer throttling
     this.frameIdx = (this.frameIdx + 1) & 0xffff;
 
-    for (const e of sim.entities.values()) {
-      const v = this.views.get(e.id);
-      if (!v) continue;
+    for (const [id, v] of this.views) {
+      const e = sim.entities.get(id);
+      if (!e) continue;
       // form swaps (polymorph sheep, druid bear) — computed up front because
       // the shadow gates below must not run the base rig's proxy under a form
       const polyed = e.auras.some((a) => a.kind === 'polymorph');
@@ -785,7 +1006,7 @@ export class Renderer {
       // distance cull: far rigs are invisible specks but cost real draw calls
       const cdx = e.pos.x - p.pos.x, cdz = e.pos.z - p.pos.z;
       const d2 = cdx * cdx + cdz * cdz;
-      if (e.id !== p.id) {
+      if (id !== p.id) {
         if (d2 > ENTITY_DRAW_RANGE * ENTITY_DRAW_RANGE) {
           v.group.visible = false;
           continue;
@@ -822,7 +1043,7 @@ export class Renderer {
       const z = e.prevPos.z + (e.pos.z - e.prevPos.z) * ea;
       v.group.position.set(x, y, z);
       let facing = e.prevFacing + shortestAngle(e.prevFacing, e.facing) * ea;
-      if (e.id === p.id && renderFacingOverride !== null) facing = renderFacingOverride;
+      if (id === p.id && renderFacingOverride !== null) facing = renderFacingOverride;
       v.group.rotation.y = facing;
 
       if (e.kind === 'object') {
@@ -889,7 +1110,7 @@ export class Renderer {
       // distance-tiered mixer updates: near = every frame, mid = every 2nd,
       // far (static LOD mesh visible) = every 6th; edges latch regardless
       let animate = true;
-      if (e.id !== p.id) {
+      if (id !== p.id) {
         if (v.isFar) animate = ((this.frameIdx + e.id) % 6) === 0;
         else if (d2 > ENTITY_SHADOW_RANGE_SQ) animate = ((this.frameIdx + e.id) & 1) === 0;
       }
@@ -904,17 +1125,22 @@ export class Renderer {
     // selection ring
     const target = p.targetId !== null ? sim.entities.get(p.targetId) : null;
     if (target) {
-      const tv = this.views.get(target.id)!;
-      this.selectionRing.position.copy(tv.group.position);
-      this.selectionRing.position.y += 0.08;
-      this.selectionRing.scale.setScalar(target.scale);
-      const ringMat = this.selectionRing.material as THREE.MeshBasicMaterial;
-      ringMat.color.setHex(target.hostile ? 0xcc2222 : 0xd4af37);
-      if (!this.lowGfx) ringMat.color.multiplyScalar(SELECTION_RING_BOOST); // subtle bloom edge
-      this.selectionRing.visible = true;
+      const tv = this.views.get(target.id);
+      if (tv) {
+        this.selectionRing.position.copy(tv.group.position);
+        this.selectionRing.position.y += 0.08;
+        this.selectionRing.scale.setScalar(target.scale);
+        const ringMat = this.selectionRing.material as THREE.MeshBasicMaterial;
+        ringMat.color.setHex(target.hostile ? 0xcc2222 : 0xd4af37);
+        if (!this.lowGfx) ringMat.color.multiplyScalar(SELECTION_RING_BOOST); // subtle bloom edge
+        this.selectionRing.visible = true;
+      } else {
+        this.selectionRing.visible = false;
+      }
     } else {
       this.selectionRing.visible = false;
     }
+    markPhase('entities');
 
     // fire flicker + rising embers
     for (let i = 0; i < this.flames.length; i++) {
@@ -981,11 +1207,19 @@ export class Renderer {
       sp.visible = this.fogState === 'outdoor';
     }
     this.updateGodRays();
+    markPhase('world');
 
-    this.updateNameplates();
+    this.nameplateTimer += dt;
+    const nameplateInterval = this.isMobileRuntime() ? 1 / 15 : 1 / 24;
+    const fullNameplatePass = this.nameplateTimer >= nameplateInterval;
+    if (fullNameplatePass) this.nameplateTimer = 0;
+    this.updateNameplates(fullNameplatePass);
     this.updateChatBubbles();
+    markPhase('nameplates');
     if (this.post) this.post.render();
     else this.webgl.render(this.scene, this.camera);
+    markPhase('submit');
+    this.recordRendererPhase('total', performance.now() - totalStart);
   }
 
   // Forward-renderer point-light budget: every campfire/torch light exists,
@@ -1059,33 +1293,52 @@ export class Renderer {
     this.camera.lookAt(px, eyeY, pz);
   }
 
-  private updateNameplates(): void {
+  private updateNameplates(fullPass: boolean): void {
     const sim = this.sim;
     const p = sim.player;
     const { width: w, height: h } = this.viewport;
-    for (const e of sim.entities.values()) {
-      const v = this.views.get(e.id);
-      if (!v) continue;
+    for (const [id, v] of this.views) {
+      const e = sim.entities.get(id);
+      if (!e) continue;
       const dx = e.pos.x - p.pos.x, dz = e.pos.z - p.pos.z;
-      const dist = Math.sqrt(dx * dx + dz * dz);
-      const isSelf = e.id === p.id;
+      const d2 = dx * dx + dz * dz;
+      const urgent = id === p.targetId || d2 < 14 * 14 || e.castingAbility !== null;
+      if (!fullPass && !urgent) continue;
+      const dist = Math.sqrt(d2);
+      const isSelf = id === p.id;
       const isDoor = e.templateId === 'dungeon_door' || e.templateId === 'dungeon_exit';
       const hidden = isSelf || dist > NAMEPLATE_RANGE
         || (e.dead && !e.lootable && e.kind === 'mob')
         || (e.kind === 'object' && !isDoor)
         || (!this.showNameplates && e.kind === 'mob' && !e.dead);
       if (hidden) {
-        v.nameplate.style.display = 'none';
+        if (v.nameplateDisplay !== 'none') {
+          v.nameplate.style.display = 'none';
+          v.nameplateDisplay = 'none';
+        }
         continue;
       }
       this.tmpV.copy(v.group.position);
       this.tmpV.y += v.height * e.scale + 0.5;
       this.tmpV.project(this.camera);
-      if (this.tmpV.z > 1) { v.nameplate.style.display = 'none'; continue; }
+      if (this.tmpV.z > 1) {
+        if (v.nameplateDisplay !== 'none') {
+          v.nameplate.style.display = 'none';
+          v.nameplateDisplay = 'none';
+        }
+        continue;
+      }
       const sx = (this.tmpV.x * 0.5 + 0.5) * w;
       const sy = (-this.tmpV.y * 0.5 + 0.5) * h;
-      v.nameplate.style.display = '';
-      v.nameplate.style.transform = `translate(${sx.toFixed(0)}px, ${sy.toFixed(0)}px) translate(-50%, -100%)`;
+      if (v.nameplateDisplay !== '') {
+        v.nameplate.style.display = '';
+        v.nameplateDisplay = '';
+      }
+      const transform = `translate(${sx.toFixed(0)}px, ${sy.toFixed(0)}px) translate(-50%, -100%)`;
+      if (transform !== v.nameplateTransform) {
+        v.nameplate.style.transform = transform;
+        v.nameplateTransform = transform;
+      }
 
       // party raid/target marker (only mobs are markable, so this is null elsewhere)
       const raidMark = this.sim.markerFor(e.id);
@@ -1098,22 +1351,14 @@ export class Renderer {
 
       if (e.kind === 'object') {
         // dungeon doorways announce themselves
-        v.nameEl.style.color = '#c084ff';
-        v.nameEl.textContent = e.name;
-        v.hpBar.style.display = 'none';
-        v.markerEl.textContent = '';
+        this.setNameplateStatic(v, `object|${e.name}`, e.name, '#c084ff', 'none', '', 'np-marker', '1');
       } else if (e.kind === 'player') {
         // other players: friendly blue with an hp bar
-        v.nameEl.style.color = '#7fb8ff';
-        v.nameEl.textContent = `${e.name}`;
-        v.nameplate.style.opacity = e.auras.some((a) => a.kind === 'stealth') ? '0.55' : '1';
-        v.hpBar.style.display = e.dead ? 'none' : '';
-        v.hpFill.style.width = `${(100 * e.hp / Math.max(1, e.maxHp)).toFixed(1)}%`;
-        v.markerEl.textContent = '';
+        const opacity = e.auras.some((a) => a.kind === 'stealth') ? '0.55' : '1';
+        const hpDisplay = e.dead ? 'none' : '';
+        this.setNameplateStatic(v, `player|${e.name}|${hpDisplay}|${opacity}`, e.name, '#7fb8ff', hpDisplay, '', 'np-marker', opacity);
+        this.setNameplateHp(v, e);
       } else if (e.kind === 'npc') {
-        v.nameEl.style.color = '#9fdc7f';
-        v.nameEl.textContent = e.name;
-        v.hpBar.style.display = 'none';
         let marker = '';
         let cls = '';
         // role-aware: '!' only at the quest's giver, '?' only at its turn-in
@@ -1126,20 +1371,47 @@ export class Renderer {
           if (st === 'available' && quest.giverNpcId === e.templateId) { marker = '!'; cls = 'avail'; }
           else if (st === 'active' && quest.turnInNpcId === e.templateId && !marker) { marker = '?'; cls = 'active'; }
         }
-        v.markerEl.textContent = marker;
-        v.markerEl.className = 'np-marker ' + cls;
+        const markerClass = cls ? `np-marker ${cls}` : 'np-marker';
+        this.setNameplateStatic(v, `npc|${e.name}|${marker}|${markerClass}`, e.name, '#9fdc7f', 'none', marker, markerClass, '1');
       } else {
         const diff = e.level - p.level;
         const template = MOBS[e.templateId];
         const elite = !!template?.elite;
-        v.nameEl.style.color = e.dead ? '#999' : diff >= 3 ? '#ff4444' : diff >= 1 ? '#ffaa33' : diff >= -2 ? '#ffe97a' : diff >= -5 ? '#7fdc4f' : '#9d9d9d';
-        v.nameEl.textContent = e.dead ? `${e.name} (corpse)` : `[${e.level}${elite ? '+' : ''}] ${e.name}`;
-        v.hpBar.style.display = e.dead ? 'none' : '';
-        v.hpFill.style.width = `${(100 * e.hp / Math.max(1, e.maxHp)).toFixed(1)}%`;
-        v.markerEl.textContent = e.lootable ? '$' : elite && !e.dead ? '◆' : '';
-        v.markerEl.className = 'np-marker loot';
+        const color = e.dead ? '#999' : diff >= 3 ? '#ff4444' : diff >= 1 ? '#ffaa33' : diff >= -2 ? '#ffe97a' : diff >= -5 ? '#7fdc4f' : '#9d9d9d';
+        const name = e.dead ? `${e.name} (corpse)` : `[${e.level}${elite ? '+' : ''}] ${e.name}`;
+        const hpDisplay = e.dead ? 'none' : '';
+        const marker = e.lootable ? '$' : elite && !e.dead ? '◆' : '';
+        this.setNameplateStatic(v, `mob|${name}|${color}|${hpDisplay}|${marker}`, name, color, hpDisplay, marker, 'np-marker loot', '1');
+        this.setNameplateHp(v, e);
       }
     }
+  }
+
+  private setNameplateStatic(
+    v: EntityView,
+    sig: string,
+    name: string,
+    color: string,
+    hpDisplay: string,
+    marker: string,
+    markerClass: string,
+    opacity: string,
+  ): void {
+    if (sig === v.nameplateSig) return;
+    v.nameplateSig = sig;
+    v.nameEl.textContent = name;
+    v.nameEl.style.color = color;
+    v.hpBar.style.display = hpDisplay;
+    v.markerEl.textContent = marker;
+    v.markerEl.className = markerClass;
+    v.nameplate.style.opacity = opacity;
+  }
+
+  private setNameplateHp(v: EntityView, e: Entity): void {
+    const width = `${(100 * e.hp / Math.max(1, e.maxHp)).toFixed(1)}%`;
+    if (width === v.nameplateHpWidth) return;
+    v.nameplateHpWidth = width;
+    v.hpFill.style.width = width;
   }
 
   // Hang a speech bubble over an entity's head; it follows the entity and

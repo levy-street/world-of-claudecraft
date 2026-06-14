@@ -77,9 +77,9 @@ const LOD_BANDS = {
     { maxHubDist: Infinity, spacing: 3.5 },
   ],
   low: [
-    { maxHubDist: 95, spacing: 2.2 },
-    { maxHubDist: 185, spacing: 3.2 },
-    { maxHubDist: Infinity, spacing: 4.5 },
+    { maxHubDist: 95, spacing: 3.0 },
+    { maxHubDist: 185, spacing: 4.4 },
+    { maxHubDist: Infinity, spacing: 6.5 },
   ],
 } as const;
 
@@ -535,7 +535,7 @@ export function buildTerrain(seed: number): TerrainView {
   const worldDepth = WORLD_MAX_Z - WORLD_MIN_Z;
   const chunksX = Math.ceil((WORLD_MAX_X * 2) / CHUNK_SIZE);
   const chunksZ = Math.ceil(worldDepth / CHUNK_SIZE);
-  const chunks: { mesh: THREE.Mesh; x: number; z: number; radius: number }[] = [];
+  const chunks: { mesh: THREE.Mesh; x: number; z: number; half: number }[] = [];
 
   const bandIndexAt = (cx: number, cz: number): number => {
     const centerX = -WORLD_MAX_X + cx * CHUNK_SIZE + CHUNK_SIZE / 2;
@@ -555,7 +555,7 @@ export function buildTerrain(seed: number): TerrainView {
     group.add(mesh);
     chunks.push({
       mesh, x: x0 + size / 2, z: z0 + size / 2,
-      radius: geo.boundingSphere?.radius ?? size,
+      half: size / 2,
     });
   };
 
@@ -586,7 +586,9 @@ export function buildTerrain(seed: number): TerrainView {
     update(camX: number, camZ: number, fogFar: number): void {
       // fully-fogged chunks are pure overdraw; drop them before the frustum
       for (const chunk of chunks) {
-        chunk.mesh.visible = Math.hypot(chunk.x - camX, chunk.z - camZ) - chunk.radius < fogFar;
+        const dx = Math.max(Math.abs(camX - chunk.x) - chunk.half, 0);
+        const dz = Math.max(Math.abs(camZ - chunk.z) - chunk.half, 0);
+        chunk.mesh.visible = Math.hypot(dx, dz) < fogFar;
       }
     },
   };

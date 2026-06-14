@@ -6,6 +6,7 @@
 
 import { Keybinds, actionKind } from './keybinds';
 import { cursorForHover, type HoverCursorKind } from './cursors';
+import { clickPickFromMouseGesture } from './pointer_pick';
 import { sanitizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import type { MoveInput } from '../sim/types';
 
@@ -20,6 +21,7 @@ export interface InputCallbacks {
   onClickPick(x: number, y: number, button: number): void;
   /** When false, edge actions (spells, UI keys) are ignored. */
   canUseGameKeys?: () => boolean;
+  onInputIntent?(kind: 'move' | 'look' | 'zoom'): void;
 }
 
 export interface TouchMoveInput {
@@ -52,6 +54,8 @@ export class Input {
   private dragDistance = 0;
   private downButton = -1;
   private pointerLockRequestedForDrag = false;
+  private downX = 0;
+  private downY = 0;
   // one-shot key capture for the rebind UI: the next keydown is delivered here
   // (Escape cancels with null) instead of being dispatched as an action
   private captureCb: ((code: string | null) => void) | null = null;
@@ -66,7 +70,9 @@ export class Input {
 
   constructor(private canvas: HTMLCanvasElement, private cb: InputCallbacks, private keybinds: Keybinds) {
     window.addEventListener('keydown', (e) => this.onKeyDown(e));
-    window.addEventListener('keyup', (e) => { this.keys.delete(e.code); });
+    window.addEventListener('keyup', (e) => {
+      if (this.keys.delete(e.code)) this.noteIntent('move');
+    });
     window.addEventListener('blur', () => this.releaseCapture('blur'));
     window.addEventListener('pointerup', (e) => this.onMouseUp(e));
     window.addEventListener('pointercancel', (e) => this.onMouseUp(e));
@@ -82,6 +88,7 @@ export class Input {
     canvas.addEventListener('wheel', (e) => {
       e.preventDefault();
       this.camDist = Math.min(22, Math.max(3, this.camDist + Math.sign(e.deltaY) * 1.4));
+      this.noteIntent('zoom');
     }, { passive: false });
     canvas.addEventListener('contextmenu', (e) => e.preventDefault());
     canvas.addEventListener('mouseenter', () => { this.hoverActive = true; });
@@ -125,25 +132,33 @@ export class Input {
   }
 
   setTouchMove(move: TouchMoveInput): void {
+    const changed = move.forward !== this.touchMove.forward || move.back !== this.touchMove.back
+      || move.strafeLeft !== this.touchMove.strafeLeft || move.strafeRight !== this.touchMove.strafeRight;
     this.touchMove = move;
     if (move.forward || move.back) this.autorun = false;
+    if (changed) this.noteIntent('move');
   }
 
   clearTouchMove(): void {
+    const changed = this.touchMove.forward || this.touchMove.back || this.touchMove.strafeLeft || this.touchMove.strafeRight;
     this.touchMove = { forward: false, back: false, strafeLeft: false, strafeRight: false };
+    if (changed) this.noteIntent('move');
   }
 
   setTouchLook(active: boolean): void {
+    if (active !== this.touchLookActive) this.noteIntent('look');
     this.touchLookActive = active;
   }
 
   setTouchLookVector(v: { x: number; y: number }): void {
+    if (v.x !== this.touchLookVector.x || v.y !== this.touchLookVector.y) this.noteIntent('look');
     this.touchLookVector = v;
   }
 
   applyTouchLookDelta(dx: number, dy: number): void {
     this.camYaw -= dx * this.lookSensitivity;
     this.camPitch = Math.min(1.35, Math.max(-0.4, this.camPitch + dy * this.lookSensitivity));
+    if (dx !== 0 || dy !== 0) this.noteIntent('look');
   }
 
   updateTouchLook(dt: number): void {
@@ -176,12 +191,14 @@ export class Input {
   }
 
   private releaseCapture(_reason: string): void {
+    const hadInput = this.keys.size > 0 || this.leftDown || this.rightDown;
     this.keys.clear();
     this.leftDown = false;
     this.rightDown = false;
     this.downButton = -1;
     this.pointerLockRequestedForDrag = false;
     this.updateCursor();
+    if (hadInput) this.noteIntent('move');
   }
 
   private updateCursor(): void {
@@ -207,6 +224,7 @@ export class Input {
     if (actionKind(action) === 'held') {
       this.keys.add(e.code);
       if (action === 'forward' || action === 'back') this.autorun = false;
+      this.noteIntent('move');
       return;
     }
     this.dispatchEdge(action);
@@ -215,7 +233,7 @@ export class Input {
   private dispatchEdge(action: string): void {
     if (action.startsWith('slot')) { this.cb.onAbility(Number(action.slice(4))); return; }
     switch (action) {
-      case 'autorun': this.autorun = !this.autorun; return;
+      case 'autorun': this.autorun = !this.autorun; this.noteIntent('move'); return;
       case 'target': this.cb.onTab(); return;
       case 'interact': this.cb.onUiKey('interact'); return;
       case 'bags': this.cb.onUiKey('bags'); return;
@@ -234,23 +252,34 @@ export class Input {
   private onMouseDown(e: MouseEvent): void {
     if (e.button === 0) this.leftDown = true;
     if (e.button === 2) this.rightDown = true;
+    if (e.button === 0 || e.button === 2) this.noteIntent(e.button === 2 ? 'look' : 'move');
     this.downButton = e.button;
+    this.downX = e.clientX;
+    this.downY = e.clientY;
     this.dragDistance = 0;
     this.pointerLockRequestedForDrag = false;
     this.updateCursor();
   }
 
   private onMouseUp(e: MouseEvent): void {
-    const wasDrag = this.dragDistance > 5;
     if (e.button === 0) this.leftDown = false;
     if (e.button === 2) this.rightDown = false;
+    if (e.button === 0 || e.button === 2) this.noteIntent(e.button === 2 ? 'look' : 'move');
+    const pick = clickPickFromMouseGesture({
+      button: e.button,
+      downButton: this.downButton,
+      downX: this.downX,
+      downY: this.downY,
+      upX: e.clientX,
+      upY: e.clientY,
+      movementDrag: this.dragDistance,
+      releaseOnCanvas: e.target === this.canvas || document.pointerLockElement === this.canvas,
+      pointerLocked: document.pointerLockElement === this.canvas,
+    });
     if (!this.mouseCameraEnabled && !this.leftDown && !this.rightDown && document.pointerLockElement) {
       document.exitPointerLock();
     }
-    const onCanvas = e.target === this.canvas || document.pointerLockElement === this.canvas;
-    if (!wasDrag && e.button === this.downButton && onCanvas) {
-      this.cb.onClickPick(e.clientX, e.clientY, e.button);
-    }
+    if (pick) this.cb.onClickPick(pick.x, pick.y, pick.button);
     this.downButton = -1;
     this.pointerLockRequestedForDrag = false;
     this.updateCursor();
@@ -271,6 +300,11 @@ export class Input {
     }
     this.camYaw -= mx * this.lookSensitivity;
     this.camPitch = Math.min(1.35, Math.max(-0.4, this.camPitch + my * this.lookSensitivity));
+    if (mx !== 0 || my !== 0) this.noteIntent('look');
+  }
+
+  private noteIntent(kind: 'move' | 'look' | 'zoom'): void {
+    this.cb.onInputIntent?.(kind);
   }
 
   readMoveInput(): MoveInput {

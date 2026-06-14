@@ -53,7 +53,7 @@ const GRASS_WIND_STRENGTH = 0.08;
 const BUCKET_DEPTH = 240;
 
 const MODEL_DIR = 'models/foliage/';
-const MODEL_URLS = {
+const FOLIAGE_MODEL_URLS_HIGH = {
   // pine_3 is shipped but unused: its 462-tri canopy reads as a dead pole
   pine: [1, 2, 4, 5].map((i) => `${MODEL_DIR}pine_${i}.glb`),
   oak: [1, 2, 3, 4, 5].map((i) => `${MODEL_DIR}oak_${i}.glb`),
@@ -65,6 +65,18 @@ const MODEL_URLS = {
   fern: [`${MODEL_DIR}fern.glb`],
   mushroom: [`${MODEL_DIR}mushroom.glb`],
 };
+const FOLIAGE_MODEL_URLS_LOW = {
+  pine: [1].map((i) => `${MODEL_DIR}pine_${i}.glb`),
+  oak: [1].map((i) => `${MODEL_DIR}oak_${i}.glb`),
+  twisted: [1].map((i) => `${MODEL_DIR}twisted_${i}.glb`),
+  dead: [1].map((i) => `${MODEL_DIR}dead_${i}.glb`),
+  rock: [1].map((i) => `${MODEL_DIR}rock_${i}.glb`),
+  bush: [],
+  bushFlowers: [],
+  fern: [],
+  mushroom: [],
+};
+const MODEL_URLS = GFX.standardMaterials ? FOLIAGE_MODEL_URLS_HIGH : FOLIAGE_MODEL_URLS_LOW;
 
 // kick off fetches at import; buildFoliage assumes the cache is populated
 const loadedModels = new Map<string, GLTF>();
@@ -136,7 +148,7 @@ const LOD_HIGH: LodDists = { barkFar: 330, dressFar: 200, rockFar: 360 };
 // low caps must clear the worst camera-to-bucket-CENTRE distance (~158u for a
 // 2-column x 240u-band bucket) or nearby dressing vanishes and trunks pop at
 // bucket boundaries — the windows test bucket centres, not instances
-const LOD_LOW: LodDists = { barkFar: 170, dressFar: 165, rockFar: 240 };
+const LOD_LOW: LodDists = { barkFar: 120, dressFar: 0, rockFar: 150 };
 function lodDists(): LodDists {
   return GFX.standardMaterials ? LOD_HIGH : LOD_LOW;
 }
@@ -426,8 +438,14 @@ function placeSpecies(
 
 function buildTrees(parent: THREE.Group, seed: number, registry: BucketMesh[]): void {
   const decos = generateDecorations(seed);
+  const sourceDecos = GFX.standardMaterials
+    ? decos
+    : decos.filter((d) => {
+      const keep = d.kind === 'rock' ? 0.42 : 0.34;
+      return hashAt(d.x, d.z, 83) < keep;
+    });
   const buckets = new Map<string, Bucket>();
-  for (const d of decos) {
+  for (const d of sourceDecos) {
     const col = d.x < 0 ? 0 : 1;
     const band = Math.floor((d.z - WORLD_MIN_Z) / BUCKET_DEPTH);
     const key = `${band}:${col}`;
@@ -479,7 +497,7 @@ function buildTrees(parent: THREE.Group, seed: number, registry: BucketMesh[]): 
   const colorway = (tint: THREE.Color): THREE.BufferGeometry[] => {
     const singles = rockParts.map((parts) => bakeTopTint(parts[0].geometry.clone(), tint));
     const member = (gi: number, x: number, y: number, z: number, ry: number, s: number): THREE.BufferGeometry =>
-      singles[gi].clone().applyMatrix4(
+      singles[gi % singles.length].clone().applyMatrix4(
         m.compose(v.set(x, y, z), q.setFromAxisAngle(up, ry), sv.set(s, s, s)),
       );
     const cluster = mergeGeometries([
@@ -852,7 +870,7 @@ export function buildFoliage(seed: number): FoliageView {
   group.name = 'foliage';
   const bucketMeshes: BucketMesh[] = [];
   buildTrees(group, seed, bucketMeshes);
-  buildDressing(group, seed, bucketMeshes);
+  if (GFX.standardMaterials) buildDressing(group, seed, bucketMeshes);
   const grass = buildGrassRing(group, seed);
   return {
     group,

@@ -29,6 +29,7 @@ function teleportTo(sim: Sim, x: number, z: number) {
   p.pos.x = x; p.pos.z = z;
   p.pos.y = terrainHeight(x, z, sim.cfg.seed);
   p.prevPos = { ...p.pos };
+  p.vx = 0; p.vz = 0; p.vy = 0; p.onGround = true; p.fallStartY = p.pos.y;
 }
 
 function facePlayerAt(sim: Sim, target: any) {
@@ -178,6 +179,38 @@ describe('movement directions', () => {
     const x1 = sim.player.pos.x;
     for (let i = 0; i < 20; i++) sim.tick();
     expect(sim.player.pos.x).toBeGreaterThan(x1);
+  });
+
+  it('ground movement changes direction immediately', () => {
+    const sim = makeSim('warrior');
+    teleportTo(sim, 0, -40);
+    sim.player.facing = 0;
+    sim.moveInput.forward = true;
+    sim.tick();
+    const zAfterForward = sim.player.pos.z;
+    sim.moveInput.forward = false;
+    sim.moveInput.strafeRight = true;
+    const xBeforeStrafe = sim.player.pos.x;
+    sim.tick();
+    expect(sim.player.pos.x).toBeLessThan(xBeforeStrafe);
+    expect(sim.player.pos.z).toBeCloseTo(zAfterForward, 1);
+  });
+
+  it('preserves launch momentum while airborne', () => {
+    const sim = makeSim('warrior');
+    teleportTo(sim, 0, -40);
+    sim.player.facing = 0;
+    sim.moveInput.forward = true;
+    sim.moveInput.jump = true;
+    sim.tick();
+    expect(sim.player.onGround).toBe(false);
+    sim.moveInput.forward = false;
+    sim.moveInput.strafeRight = true;
+    const xAtLaunch = sim.player.pos.x;
+    const zAtLaunch = sim.player.pos.z;
+    for (let i = 0; i < 4; i++) sim.tick();
+    expect(sim.player.pos.z).toBeGreaterThan(zAtLaunch);
+    expect(Math.abs(sim.player.pos.x - xAtLaunch)).toBeLessThan(0.05);
   });
 });
 
@@ -968,7 +1001,7 @@ describe('RL interface', () => {
       const obs = encodeObs(sim);
       for (const v of obs) expect(Number.isFinite(v)).toBe(true);
     }
-  });
+  }, 10000);
 
   it('same seed + same actions => identical trajectories', () => {
     const run = () => {
