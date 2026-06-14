@@ -195,7 +195,7 @@ describe('rare spawn rules', () => {
       elite: true,
       canSwim: true,
       ccImmune: true,
-      respawnMult: 24,
+      respawnMult: 4,
     });
   });
 
@@ -231,6 +231,15 @@ describe('rare spawn rules', () => {
     const rare = createMob(990003, MOBS.elder_bristleback, 5, { x: 0, y: 0, z: 0 });
     (sim as any).handleDeath(rare, null);
     expect(rare.respawnTimer).toBe(864);
+  });
+
+  it('Mogger respawns on a quest-boss timer instead of a long rare-spawn timer', () => {
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior', respawnSeconds: 2 });
+    const mogger = [...sim.entities.values()].find((e) => e.kind === 'mob' && e.templateId === 'mogger')!;
+
+    (sim as any).handleDeath(mogger, null);
+
+    expect(mogger.respawnTimer).toBe(8);
   });
 
   it('outdoor rare spawns have 3-player mechanics and no-loot summoned helpers', () => {
