@@ -1118,8 +1118,13 @@ export class Hud {
             else audio.meleeHit(ev.crit);
           } else if (isPlayerTarget) {
             this.fct(tgt, `-${ev.amount}`, '#ff5544', ev.crit);
-            this.combatLog(`${src?.name ?? 'Something'} hits you for ${ev.amount}${ev.crit ? ' (Critical)' : ''}.`, '#ff8877');
-            audio.hitTaken();
+            if (ev.sourceId === -1 && ev.school === 'fire' && ev.ability === 'Fire') {
+              this.combatLog(`Fire burns you for ${ev.amount}.`, '#ff8877');
+              audio.fire();
+            } else {
+              this.combatLog(`${src?.name ?? 'Something'} hits you for ${ev.amount}${ev.crit ? ' (Critical)' : ''}.`, '#ff8877');
+              audio.hitTaken();
+            }
           }
           break;
         }
@@ -1275,6 +1280,14 @@ export class Hud {
             this.showBanner(`Defeated by ${ev.oppName}.  Rating ${ev.ratingAfter} (${sign}${delta})`);
             this.combatLog(`${ev.oppName} bested you in the Ashen Coliseum. Rating ${ev.ratingAfter} (${sign}${delta}).`, '#ff7a6a');
             audio.death();
+          }
+          break;
+        }
+        case 'burnReaction': {
+          const tgt = sim.entities.get(ev.targetId);
+          if (tgt && ev.targetId === sim.playerId) {
+            this.fct(tgt, 'Ah!', '#ffb45e', false);
+            audio.burnReaction();
           }
           break;
         }

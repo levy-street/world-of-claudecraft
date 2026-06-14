@@ -86,6 +86,12 @@ export class GameAudio {
     this.tone(160, 0.35, 0.2, 'sawtooth', 0, 60);
   }
 
+  burnReaction(): void {
+    this.tone(520, 0.1, 0.16, 'sawtooth', 0, 360);
+    this.tone(360, 0.18, 0.12, 'triangle', 0.06, 210);
+    this.noise(0.16, 1200, 0.08, 0.75, 'bandpass');
+  }
+
   frost(): void {
     this.noise(0.35, 4500, 0.18, 0.7, 'highpass');
     this.tone(1300, 0.3, 0.12, 'sine', 0, 700);
