@@ -159,6 +159,25 @@ node scripts/tour_temple.mjs   # screenshot tour of the Glimmermere + Drowned Te
 
 
 
+## Mog's Castle — the royal capital
+
+![The gatehouse and curtain wall of Mog's Castle](docs/screenshots/mogs-castle.jpg)
+![King Mog enthroned before the Keep](docs/screenshots/mogs-castle-throne.jpg)
+
+Walk **south** from Eastbrook, through a mountain pass, and the road opens onto
+**Mog's Castle** — the largest settlement on the map and its own zone. A full
+curtain wall with corner towers and a gatehouse rings a courtyard of royal
+services: a **weaponsmith**, **armorer**, **provisioner**, a **general-goods
+trader**, and a **World Market** broker — with **King Mog** himself enthroned on
+a dais before the great Keep, handing out royal favors (clear his roads of Vale
+bandits and wolves). A cathedral, a little town, a windmill and a tournament
+yard round out the grounds. The whole capital is built from the CC0 **KayKit
+Medieval Hexagon** kit (see [CREDITS.md](CREDITS.md)).
+
+```
+node scripts/tour_castle.mjs   # screenshot tour of Mog's Castle (needs `npm run dev`)
+```
+
 ## Play offline
 
 ```bash
@@ -267,6 +286,7 @@ node scripts/smoke_mage.mjs     # mage: casting, polymorph, conjure+drink, death
 node scripts/smoke_rogue.mjs    # rogue: combo points, eviscerate, vendor, eating
 node scripts/visual_tour.mjs    # screenshot tour of the zone + UI into tmp/
 node scripts/tour_temple.mjs    # screenshot tour of the Glimmermere + Drowned Temple into tmp/
+node scripts/tour_castle.mjs    # screenshot tour of Mog's Castle into tmp/
 node scripts/mp_integration.mjs # 26-check API/WS/persistence suite (server running)
 node scripts/social_e2e.mjs     # trade + duel over the wire (ALLOW_DEV_COMMANDS=1)
 node scripts/arena_visual.mjs   # two clients queue + fight a ranked 1v1 in the Ashen Coliseum

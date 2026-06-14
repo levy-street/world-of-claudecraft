@@ -1,0 +1,28 @@
+{
+  "items": [
+    { "src": "/tmp/hexpack/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/blue/building_castle_blue.gltf", "out": "models/hexagon/keep.glb", "type": "static", "maxTex": 256 },
+    { "src": "/tmp/hexpack/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/blue/building_tower_A_blue.gltf", "out": "models/hexagon/tower_a.glb", "type": "static", "maxTex": 256 },
+    { "src": "/tmp/hexpack/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/blue/building_tower_B_blue.gltf", "out": "models/hexagon/tower_b.glb", "type": "static", "maxTex": 256 },
+    { "src": "/tmp/hexpack/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/blue/building_barracks_blue.gltf", "out": "models/hexagon/barracks.glb", "type": "static", "maxTex": 256 },
+    { "src": "/tmp/hexpack/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/blue/building_blacksmith_blue.gltf", "out": "models/hexagon/blacksmith.glb", "type": "static", "maxTex": 256 },
+    { "src": "/tmp/hexpack/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/blue/building_market_blue.gltf", "out": "models/hexagon/market.glb", "type": "static", "maxTex": 256 },
+    { "src": "/tmp/hexpack/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/blue/building_church_blue.gltf", "out": "models/hexagon/cathedral.glb", "type": "static", "maxTex": 256 },
+    { "src": "/tmp/hexpack/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/blue/building_tavern_blue.gltf", "out": "models/hexagon/tavern.glb", "type": "static", "maxTex": 256 },
+    { "src": "/tmp/hexpack/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/blue/building_home_A_blue.gltf", "out": "models/hexagon/home_a.glb", "type": "static", "maxTex": 256 },
+    { "src": "/tmp/hexpack/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/blue/building_home_B_blue.gltf", "out": "models/hexagon/home_b.glb", "type": "static", "maxTex": 256 },
+    { "src": "/tmp/hexpack/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/blue/building_well_blue.gltf", "out": "models/hexagon/well.glb", "type": "static", "maxTex": 256 },
+    { "src": "/tmp/hexpack/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/blue/building_windmill_blue.gltf", "out": "models/hexagon/windmill.glb", "type": "static", "maxTex": 256 },
+    { "src": "/tmp/hexpack/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/blue/building_archeryrange_blue.gltf", "out": "models/hexagon/archery.glb", "type": "static", "maxTex": 256 },
+
+    { "src": "/tmp/hexpack/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/neutral/wall_straight.gltf", "out": "models/hexagon/wall.glb", "type": "static", "maxTex": 256 },
+    { "src": "/tmp/hexpack/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/neutral/wall_straight_gate.gltf", "out": "models/hexagon/wall_gate.glb", "type": "static", "maxTex": 256 },
+    { "src": "/tmp/hexpack/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/neutral/building_stage_A.gltf", "out": "models/hexagon/dais.glb", "type": "static", "maxTex": 256 },
+
+    { "src": "/tmp/hexpack/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props/flag_blue.gltf", "out": "models/hexagon/flag.glb", "type": "static", "maxTex": 256 },
+    { "src": "/tmp/hexpack/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props/barrel.gltf", "out": "models/hexagon/barrel.glb", "type": "static", "maxTex": 256 },
+    { "src": "/tmp/hexpack/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props/crate_A_big.gltf", "out": "models/hexagon/crate.glb", "type": "static", "maxTex": 256 },
+    { "src": "/tmp/hexpack/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props/weaponrack.gltf", "out": "models/hexagon/weaponrack.glb", "type": "static", "maxTex": 256 },
+    { "src": "/tmp/hexpack/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props/target.gltf", "out": "models/hexagon/target.glb", "type": "static", "maxTex": 256 },
+    { "src": "/tmp/hexpack/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props/tent.gltf", "out": "models/hexagon/pavilion.glb", "type": "static", "maxTex": 256 }
+  ]
+}

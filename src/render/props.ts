@@ -90,6 +90,29 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   anvil: { url: '/models/props/anvil.glb', kit: 'qprops' },
   weaponStand: { url: '/models/props/weapon_stand.glb', kit: 'qprops' },
   lanternWall: { url: '/models/props/lantern_wall.glb', kit: 'qprops' },
+  // KayKit Medieval Hexagon pack — Mog's Castle (placed from PROPS.castle)
+  hexKeep: { url: '/models/hexagon/keep.glb', kit: 'hexagon' },
+  hexTowerA: { url: '/models/hexagon/tower_a.glb', kit: 'hexagon' },
+  hexTowerB: { url: '/models/hexagon/tower_b.glb', kit: 'hexagon' },
+  hexBarracks: { url: '/models/hexagon/barracks.glb', kit: 'hexagon' },
+  hexBlacksmith: { url: '/models/hexagon/blacksmith.glb', kit: 'hexagon' },
+  hexMarket: { url: '/models/hexagon/market.glb', kit: 'hexagon' },
+  hexCathedral: { url: '/models/hexagon/cathedral.glb', kit: 'hexagon' },
+  hexTavern: { url: '/models/hexagon/tavern.glb', kit: 'hexagon' },
+  hexHomeA: { url: '/models/hexagon/home_a.glb', kit: 'hexagon' },
+  hexHomeB: { url: '/models/hexagon/home_b.glb', kit: 'hexagon' },
+  hexWell: { url: '/models/hexagon/well.glb', kit: 'hexagon' },
+  hexWindmill: { url: '/models/hexagon/windmill.glb', kit: 'hexagon' },
+  hexArchery: { url: '/models/hexagon/archery.glb', kit: 'hexagon' },
+  hexWall: { url: '/models/hexagon/wall.glb', kit: 'hexagon' },
+  hexWallGate: { url: '/models/hexagon/wall_gate.glb', kit: 'hexagon' },
+  hexDais: { url: '/models/hexagon/dais.glb', kit: 'hexagon' },
+  hexFlag: { url: '/models/hexagon/flag.glb', kit: 'hexagon' },
+  hexBarrel: { url: '/models/hexagon/barrel.glb', kit: 'hexagon' },
+  hexCrate: { url: '/models/hexagon/crate.glb', kit: 'hexagon' },
+  hexWeaponrack: { url: '/models/hexagon/weaponrack.glb', kit: 'hexagon' },
+  hexTarget: { url: '/models/hexagon/target.glb', kit: 'hexagon' },
+  hexPavilion: { url: '/models/hexagon/pavilion.glb', kit: 'hexagon' },
 };
 
 type PropKey = keyof typeof PROP_ASSET_DEFS;
@@ -352,6 +375,18 @@ export function buildProps(seed: number): PropsResult {
     addParts(g, asset, { scale: [b.w / a.size.x, houseHeight[asset] / a.size.y, b.d / a.size.z] });
     g.position.set(b.x, y - 0.12, b.z);
     g.rotation.y = b.rot;
+    group.add(shadowed(g));
+  }
+
+  // ---- Mog's Castle: KayKit hexagon keep / walls / towers / services -------
+  // Each piece is scaled to the world w×d×h carried in its def (a uniform blow-up
+  // of the model's native size) and dropped on the terrain at (x,z).
+  for (const c of PROPS.castle ?? []) {
+    const a = propAsset(c.model as PropKey);
+    const g = new THREE.Group();
+    addParts(g, c.model as PropKey, { scale: [c.w / a.size.x, c.h / a.size.y, c.d / a.size.z] });
+    g.position.set(c.x, ground(c.x, c.z) - 0.12, c.z);
+    g.rotation.y = c.rot;
     group.add(shadowed(g));
   }
 

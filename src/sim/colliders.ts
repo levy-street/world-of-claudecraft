@@ -46,6 +46,14 @@ function staticWorldColliders(seed: number): Collider[] {
   for (const w of PROPS.wells) out.push({ type: 'circle', x: w.x, z: w.z, r: w.r });
   for (const s of PROPS.stalls) out.push({ type: 'circle', x: s.x, z: s.z, r: s.r });
 
+  // Mog's Castle: walls/keep/buildings block as OBBs, towers as circles; the
+  // gate arch and walkable clutter (`collide: 'none'`) are skipped.
+  for (const c of PROPS.castle ?? []) {
+    if (c.collide === 'none') continue;
+    if (c.collide === 'circle') out.push({ type: 'circle', x: c.x, z: c.z, r: c.cr ?? Math.max(c.w, c.d) / 2 });
+    else out.push({ type: 'obb', x: c.x, z: c.z, hw: c.w / 2, hd: c.d / 2, rot: c.rot });
+  }
+
   // mines: mound behind the timber portal
   for (const m of PROPS.mines) {
     const mound = rotY(0, -3.4, m.rot);

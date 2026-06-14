@@ -293,6 +293,13 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: kaykit(['1H_Melee_Attack_Chop']),
     show: ['1H_Sword', 'Knight_Helmet', 'Knight_Cape'],
   },
+  npc_king: {
+    // King Mog — a gilded, crowned knight, head and shoulders above his court.
+    url: `${CHARS}/knight.glb`, height: HUMANOID_H * 1.15,
+    clips: kaykit(['1H_Melee_Attack_Chop']),
+    show: ['1H_Sword', 'Knight_Helmet', 'Knight_Cape'],
+    tint: 0xe6c34d, tintStrength: 0.5,
+  },
   npc_mage: {
     url: `${CHARS}/mage.glb`, height: HUMANOID_H,
     clips: kaykit(['2H_Melee_Attack_Chop']),
@@ -378,6 +385,17 @@ const NPC_KEYS: Record<string, string> = {
   fisherman_brandt: 'npc_villager',
   provisioner_hale: 'npc_villager',
   quartermaster_bree: 'npc_villager',
+  // Mog's Castle
+  king_mog: 'npc_king',
+  royal_weaponsmith: 'npc_smith',
+  royal_armorer: 'npc_smith',
+  royal_provisioner: 'npc_villager',
+  royal_trader: 'npc_villager',
+  market_keeper: 'npc_villager_robed',
+  guard_gate_w: 'npc_knight',
+  guard_gate_e: 'npc_knight',
+  guard_throne_w: 'npc_knight',
+  guard_throne_e: 'npc_knight',
 };
 
 export function visualKeyFor(e: Entity): string {

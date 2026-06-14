@@ -26,6 +26,11 @@ import {
   TEMPLE_CAMPS, TEMPLE_DUNGEON_DEFS, TEMPLE_DUNGEON_MOBS, TEMPLE_ITEMS, TEMPLE_MOBS,
   TEMPLE_NPCS, TEMPLE_OBJECTS, TEMPLE_PROPS, TEMPLE_QUEST_ORDER, TEMPLE_QUESTS,
 } from './content/temple';
+import {
+  MOGS_CASTLE_CAMPS, MOGS_CASTLE_ITEMS, MOGS_CASTLE_MOBS, MOGS_CASTLE_NPCS,
+  MOGS_CASTLE_OBJECTS, MOGS_CASTLE_PROPS, MOGS_CASTLE_QUEST_ORDER, MOGS_CASTLE_QUESTS,
+  MOGS_CASTLE_ROADS, MOGS_CASTLE_ZONE,
+} from './content/mogs_castle';
 
 export { CLASSES, ABILITIES, abilitiesKnownAt } from './content/classes';
 export type { ClassDef } from './content/classes';
@@ -39,33 +44,34 @@ export type {
 // ---------------------------------------------------------------------------
 
 export const ITEMS: Record<string, ItemDef> = {
-  ...BASE_ITEMS, ...ZONE2_ITEMS, ...ZONE3_ITEMS, ...TEMPLE_ITEMS,
+  ...BASE_ITEMS, ...ZONE2_ITEMS, ...ZONE3_ITEMS, ...TEMPLE_ITEMS, ...MOGS_CASTLE_ITEMS,
 };
 
 export const MOBS: Record<string, MobTemplate> = {
   ...ZONE1_MOBS, ...ZONE2_MOBS, ...ZONE3_MOBS, ...DUNGEON_MOBS,
-  ...TEMPLE_MOBS, ...TEMPLE_DUNGEON_MOBS,
+  ...TEMPLE_MOBS, ...TEMPLE_DUNGEON_MOBS, ...MOGS_CASTLE_MOBS,
 };
 
 export const NPCS: Record<string, NpcDef> = {
-  ...ZONE1_NPCS, ...ZONE2_NPCS, ...ZONE3_NPCS, ...TEMPLE_NPCS,
+  ...ZONE1_NPCS, ...ZONE2_NPCS, ...ZONE3_NPCS, ...TEMPLE_NPCS, ...MOGS_CASTLE_NPCS,
 };
 
 export const QUESTS: Record<string, QuestDef> = {
-  ...ZONE1_QUESTS, ...ZONE2_QUESTS, ...ZONE3_QUESTS, ...TEMPLE_QUESTS,
+  ...ZONE1_QUESTS, ...ZONE2_QUESTS, ...ZONE3_QUESTS, ...TEMPLE_QUESTS, ...MOGS_CASTLE_QUESTS,
 };
 
 export const QUEST_ORDER: string[] = [
   ...ZONE1_QUEST_ORDER, ...ZONE2_QUEST_ORDER, ...ZONE3_QUEST_ORDER, ...TEMPLE_QUEST_ORDER,
+  ...MOGS_CASTLE_QUEST_ORDER,
 ];
 
-export const CAMPS: CampDef[] = [...ZONE1_CAMPS, ...ZONE2_CAMPS, ...ZONE3_CAMPS, ...TEMPLE_CAMPS];
+export const CAMPS: CampDef[] = [...ZONE1_CAMPS, ...ZONE2_CAMPS, ...ZONE3_CAMPS, ...TEMPLE_CAMPS, ...MOGS_CASTLE_CAMPS];
 
-export const GROUND_OBJECTS: GroundObjectDef[] = [...ZONE1_OBJECTS, ...ZONE2_OBJECTS, ...ZONE3_OBJECTS, ...TEMPLE_OBJECTS];
+export const GROUND_OBJECTS: GroundObjectDef[] = [...ZONE1_OBJECTS, ...ZONE2_OBJECTS, ...ZONE3_OBJECTS, ...TEMPLE_OBJECTS, ...MOGS_CASTLE_OBJECTS];
 
-export const ROADS: { x: number; z: number }[][] = [...ZONE1_ROADS, ...ZONE2_ROADS, ...ZONE3_ROADS];
+export const ROADS: { x: number; z: number }[][] = [...ZONE1_ROADS, ...ZONE2_ROADS, ...ZONE3_ROADS, ...MOGS_CASTLE_ROADS];
 
-export const PROPS: ZonePropsDef = mergeProps([ZONE1_PROPS, ZONE2_PROPS, ZONE3_PROPS, TEMPLE_PROPS]);
+export const PROPS: ZonePropsDef = mergeProps([MOGS_CASTLE_PROPS, ZONE1_PROPS, ZONE2_PROPS, ZONE3_PROPS, TEMPLE_PROPS]);
 
 function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
   return {
@@ -81,6 +87,7 @@ function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
     ruinRings: sets.flatMap((s) => s.ruinRings),
     fences: sets.flatMap((s) => s.fences),
     graveyards: sets.flatMap((s) => s.graveyards),
+    castle: sets.flatMap((s) => s.castle ?? []),
   };
 }
 
@@ -101,7 +108,9 @@ export const GROUP_XP_BONUS = [1, 1, 1.166, 1.3, 1.43];
 // graveyard, its lakes, and a biome palette the renderer keys off.
 // ---------------------------------------------------------------------------
 
-export const ZONES: ZoneDef[] = [ZONE1_ZONE, ZONE2_ZONE, ZONE3_ZONE];
+// Mog's Castle is the southernmost band (zones run south→north, sorted by zMin
+// so the ridge/biome-blend logic and the contiguity invariant hold).
+export const ZONES: ZoneDef[] = [MOGS_CASTLE_ZONE, ZONE1_ZONE, ZONE2_ZONE, ZONE3_ZONE];
 
 export const WORLD_SIZE = 360; // world width: x spans [-180, 180]
 export const WORLD_MIN_X = -WORLD_SIZE / 2;

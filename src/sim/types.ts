@@ -275,6 +275,24 @@ export interface BuildingDef {
   rot: number;
 }
 
+// A single placed piece of the KayKit Medieval Hexagon kit (Mog's Castle):
+// keep, towers, curtain walls, gatehouse, service buildings, banners, clutter.
+// `model` names a hexagon asset registered in the renderer's PROP_ASSET_DEFS;
+// w/d/h are the world-space size the renderer scales the model to, and the
+// footprint the collider blocks against. `collide` picks the collider shape
+// ('none' for walkable clutter and the gate arch).
+export interface CastlePieceDef {
+  model: string;
+  x: number;
+  z: number;
+  rot: number;
+  w: number;
+  d: number;
+  h: number;
+  collide?: 'obb' | 'circle' | 'none';
+  cr?: number; // circle-collider radius override (defaults to max(w,d)/2)
+}
+
 // Static prop placement per zone — the renderer builds meshes from these and
 // the collider grid blocks movement against them, so they must stay in sync.
 export interface ZonePropsDef {
@@ -290,12 +308,13 @@ export interface ZonePropsDef {
   ruinRings: { x: number; z: number; ringR: number; columns: number }[];
   fences: { x1: number; z1: number; x2: number; z2: number }[];
   graveyards: { x: number; z: number }[]; // 6-headstone cluster anchor
+  castle?: CastlePieceDef[]; // KayKit hexagon castle pieces (Mog's Castle)
 }
 
 export function emptyZoneProps(): ZonePropsDef {
   return {
     buildings: [], wells: [], stalls: [], mines: [], docks: [], tents: [],
-    crates: [], campfires: [], mudHuts: [], ruinRings: [], fences: [], graveyards: [],
+    crates: [], campfires: [], mudHuts: [], ruinRings: [], fences: [], graveyards: [], castle: [],
   };
 }
 
