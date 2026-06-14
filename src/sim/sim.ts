@@ -3569,7 +3569,7 @@ export class Sim {
         if (match.timer <= 0) {
           match.state = 'active';
           match.timer = 0;
-          for (const e of [ea, eb]) this.resetForArena(e);
+          for (const e of [ea, eb]) this.readyArenaFighter(e, { clearPrep: false });
           for (const mPid of [match.a, match.b]) {
             this.emit({ type: 'log', text: 'Fight!', color: '#ff5a3c', pid: mPid });
             this.emit({ type: 'arenaStart', pid: mPid });
@@ -3659,9 +3659,16 @@ export class Sim {
   // A clean slate so the bout is decided by play, not by what each fighter
   // walked in carrying: full health/resource, cooldowns and combat reset.
   private resetForArena(e: Entity): void {
+    this.readyArenaFighter(e, { clearPrep: true });
+  }
+
+  private readyArenaFighter(e: Entity, opts: { clearPrep: boolean }): void {
+    if (opts.clearPrep) {
+      e.auras = [];
+      e.cooldowns.clear();
+    }
     const meta = this.players.get(e.id);
     if (meta) recalcPlayerStats(e, meta.cls, meta.equipment);
-    e.auras = [];
     e.hp = e.maxHp;
     e.resource = e.resourceType === 'mana' ? e.maxResource : e.resourceType === 'energy' ? 100 : 0;
     e.targetId = null;
@@ -3672,7 +3679,6 @@ export class Sim {
     e.channeling = false;
     e.comboPoints = 0;
     e.comboTargetId = null;
-    e.cooldowns.clear();
     e.gcdRemaining = 0;
     e.swingTimer = 0;
     e.chargeTargetId = null;
