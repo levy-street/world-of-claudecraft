@@ -3,6 +3,12 @@ import { fileURLToPath } from 'node:url';
 
 export default defineConfig({
   base: './',
+  // Parent dir has a postcss.config.js with Tailwind — ignore it; this project has no CSS pipeline.
+  css: {
+    postcss: {
+      plugins: [],
+    },
+  },
   server: {
     port: 5173,
     proxy: {

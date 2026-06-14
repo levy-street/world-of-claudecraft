@@ -37,6 +37,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/stag.glb": "/media/models/creatures/stag.ec967c29bd35.glb",
   "models/creatures/tribal.glb": "/media/models/creatures/tribal.36f1f0f698db.glb",
   "models/creatures/velociraptor.glb": "/media/models/creatures/velociraptor.3385fbba757a.glb",
+  "models/creatures/wild_boar.glb": "/media/models/creatures/wild_boar.8464643c5c2d.glb",
   "models/creatures/wolf.glb": "/media/models/creatures/wolf.9ae2ad8b2ab2.glb",
   "models/creatures/yeti.glb": "/media/models/creatures/yeti.acbf79f899d2.glb",
   "models/creatures/yetialt.glb": "/media/models/creatures/yetialt.6c14f370c2af.glb",
