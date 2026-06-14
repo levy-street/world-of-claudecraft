@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import type { WebSocket } from 'ws';
 import { Sim } from '../src/sim/sim';
 import type { PlayerMeta } from '../src/sim/sim';
-import { DT, Entity, SimEvent, dist2d } from '../src/sim/types';
+import { CommandResult, DT, Entity, SimEvent, dist2d } from '../src/sim/types';
 import { stealthDetectionRadius, threatEntries } from '../src/sim/threat';
 import { zoneAt, DUNGEONS } from '../src/sim/data';
 import { saveCharacterState, openPlaySession, closePlaySession, insertChatLogs, pool, loadMarketState, saveMarketState } from './db';
@@ -623,15 +623,31 @@ export class GameServer {
       case 'attack': sim.startAutoAttack(pid); break;
       case 'stopattack': sim.stopAutoAttack(pid); break;
       case 'interact': sim.interact(pid); break;
-      case 'loot': if (typeof msg.id === 'number') sim.lootCorpse(msg.id, pid); break;
+      case 'loot':
+        this.sendCommandResult(session, msg, typeof msg.id === 'number'
+          ? sim.lootCorpse(msg.id, pid)
+          : this.commandFailure('invalid_command', 'Invalid loot command.'));
+        break;
       case 'pickup': if (typeof msg.id === 'number') sim.pickUpObject(msg.id, pid); break;
       case 'accept': if (typeof msg.quest === 'string') { sim.acceptQuest(msg.quest, pid); this.resyncQuests(session); } break;
       case 'turnin': if (typeof msg.quest === 'string') { sim.turnInQuest(msg.quest, pid); this.resyncQuests(session); } break;
       case 'abandon': if (typeof msg.quest === 'string') { sim.abandonQuest(msg.quest, pid); this.resyncQuests(session); } break;
       case 'equip': if (typeof msg.item === 'string') sim.equipItem(msg.item, pid); break;
-      case 'use': if (typeof msg.item === 'string') sim.useItem(msg.item, pid); break;
-      case 'buy': if (typeof msg.npc === 'number' && typeof msg.item === 'string') sim.buyItem(msg.npc, msg.item, pid); break;
-      case 'sell': if (typeof msg.item === 'string') sim.sellItem(msg.item, pid); break;
+      case 'use':
+        this.sendCommandResult(session, msg, typeof msg.item === 'string'
+          ? sim.useItem(msg.item, pid)
+          : this.commandFailure('invalid_command', 'Invalid use command.'));
+        break;
+      case 'buy':
+        this.sendCommandResult(session, msg, typeof msg.npc === 'number' && typeof msg.item === 'string'
+          ? sim.buyItem(msg.npc, msg.item, pid)
+          : this.commandFailure('invalid_command', 'Invalid buy command.'));
+        break;
+      case 'sell':
+        this.sendCommandResult(session, msg, typeof msg.item === 'string'
+          ? sim.sellItem(msg.item, pid)
+          : this.commandFailure('invalid_command', 'Invalid sell command.'));
+        break;
       case 'release': sim.releaseSpirit(pid); break;
       case 'chat': {
         if (typeof msg.text !== 'string') break;
@@ -1074,6 +1090,15 @@ export class GameServer {
   private resyncQuests(session: ClientSession): void {
     delete session.lastSent.qlog;
     delete session.lastSent.qdone;
+  }
+
+  private commandFailure(reason: string, serverMessage: string): CommandResult {
+    return { ok: false, reason, serverMessage, changedItems: [], changedCopper: 0 };
+  }
+
+  private sendCommandResult(session: ClientSession, msg: any, result: CommandResult): void {
+    if (typeof msg.rid !== 'number') return;
+    this.send(session, { t: 'cmdResult', rid: msg.rid, result });
   }
 
   private send(session: ClientSession, obj: unknown): void {

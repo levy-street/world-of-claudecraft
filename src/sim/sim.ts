@@ -17,7 +17,7 @@ import {
 import { groundHeight, WATER_LEVEL } from './world';
 import {
   AbilityDef, AbilityEffect, Aura, AuraKind, CAST_PUSHBACK_SEC, CHANNEL_PUSHBACK_FRACTION, CONSUME_DURATION,
-  CONSUME_TICKS, DT, Entity, EquipSlot, GCD,
+  CONSUME_TICKS, CommandResult, DT, Entity, EquipSlot, GCD,
   INTERACT_RANGE, InvSlot, MELEE_RANGE, MAX_LEVEL,
   MoveInput, PlayerClass, QuestProgress, QuestState, RUN_SPEED, SimConfig, SimEvent, TURN_SPEED, Vec3,
   angleTo, armorReduction, dist2d, emptyMoveInput, isConsuming, meleeMissChance, mobXpValue, normAngle,
@@ -2793,6 +2793,40 @@ export class Sim {
     this.onInventoryChangedForQuests(meta);
   }
 
+  private emptyCommandResult(ok: boolean, reason: string, serverMessage: string): CommandResult {
+    return { ok, reason, serverMessage, changedItems: [], changedCopper: 0 };
+  }
+
+  private inventoryCounts(meta: PlayerMeta): Map<string, number> {
+    const counts = new Map<string, number>();
+    for (const slot of meta.inventory) counts.set(slot.itemId, (counts.get(slot.itemId) ?? 0) + slot.count);
+    return counts;
+  }
+
+  private commandResult(
+    meta: PlayerMeta,
+    beforeItems: Map<string, number>,
+    beforeCopper: number,
+    ok: boolean,
+    reason: string,
+    serverMessage: string,
+  ): CommandResult {
+    const afterItems = this.inventoryCounts(meta);
+    const itemIds = new Set([...beforeItems.keys(), ...afterItems.keys()]);
+    const changedItems = [...itemIds].sort().flatMap((itemId) => {
+      const before = beforeItems.get(itemId) ?? 0;
+      const after = afterItems.get(itemId) ?? 0;
+      return before === after ? [] : [{ itemId, before, after, delta: after - before }];
+    });
+    return {
+      ok,
+      reason,
+      serverMessage,
+      changedItems,
+      changedCopper: meta.copper - beforeCopper,
+    };
+  }
+
   equipItem(itemId: string, pid?: number): void {
     const r = this.resolve(pid);
     if (!r) return;
@@ -2813,15 +2847,27 @@ export class Sim {
     this.emit({ type: 'log', text: `Equipped ${def.name}.`, color: '#8f8', pid: meta.entityId });
   }
 
-  useItem(itemId: string, pid?: number): void {
+  useItem(itemId: string, pid?: number): CommandResult {
     const r = this.resolve(pid);
-    if (!r) return;
+    if (!r) return this.emptyCommandResult(false, 'invalid_player', 'Player not found.');
     const { meta, e: p } = r;
     const def = ITEMS[itemId];
-    if (!def || this.countItem(itemId, meta.entityId) <= 0 || p.dead) return;
+    if (!def) return this.emptyCommandResult(false, 'unknown_item', 'That item does not exist.');
+    if (this.countItem(itemId, meta.entityId) <= 0) return this.emptyCommandResult(false, 'missing_item', "You don't have that item.");
+    if (p.dead) return this.emptyCommandResult(false, 'dead', "You can't do that while dead.");
+    const beforeItems = this.inventoryCounts(meta);
+    const beforeCopper = meta.copper;
     if (def.kind === 'food' || def.kind === 'drink') {
-      if (p.inCombat) { this.error(meta.entityId, "You can't do that while in combat."); return; }
-      if (this.isSwimming(p)) { this.error(meta.entityId, "You can't do that while swimming."); return; }
+      if (p.inCombat) {
+        const msg = "You can't do that while in combat.";
+        this.error(meta.entityId, msg);
+        return this.commandResult(meta, beforeItems, beforeCopper, false, 'in_combat', msg);
+      }
+      if (this.isSwimming(p)) {
+        const msg = "You can't do that while swimming.";
+        this.error(meta.entityId, msg);
+        return this.commandResult(meta, beforeItems, beforeCopper, false, 'swimming', msg);
+      }
       this.removeItem(itemId, 1, meta.entityId);
       p.sitting = true;
       // food and drink occupy separate slots, so you can do both at once
@@ -2833,47 +2879,101 @@ export class Sim {
         manaPer2s: def.drinkMana ? Math.round(def.drinkMana / CONSUME_TICKS) : 0,
         remaining: CONSUME_DURATION,
       };
-      this.emit({ type: 'log', text: def.kind === 'food' ? 'You sit down to eat.' : 'You sit down to drink.', color: '#999', pid: meta.entityId });
+      const msg = def.kind === 'food' ? 'You sit down to eat.' : 'You sit down to drink.';
+      this.emit({ type: 'log', text: msg, color: '#999', pid: meta.entityId });
+      return this.commandResult(meta, beforeItems, beforeCopper, true, 'used', msg);
     } else if (def.kind === 'weapon' || def.kind === 'armor') {
+      if (def.requiredClass && !def.requiredClass.includes(meta.cls)) {
+        const msg = 'You cannot equip that.';
+        this.error(meta.entityId, msg);
+        return this.commandResult(meta, beforeItems, beforeCopper, false, 'wrong_class', msg);
+      }
       this.equipItem(itemId, meta.entityId);
+      return this.commandResult(meta, beforeItems, beforeCopper, true, 'equipped', `Equipped ${def.name}.`);
     }
+    return this.commandResult(meta, beforeItems, beforeCopper, false, 'not_usable', 'That item cannot be used.');
   }
 
-  buyItem(npcId: number, itemId: string, pid?: number): void {
+  buyItem(npcId: number, itemId: string, pid?: number): CommandResult {
     const r = this.resolve(pid);
-    if (!r) return;
+    if (!r) return this.emptyCommandResult(false, 'invalid_player', 'Player not found.');
     const { meta, e: p } = r;
     const npc = this.entities.get(npcId);
     const def = ITEMS[itemId];
+    const beforeItems = this.inventoryCounts(meta);
+    const beforeCopper = meta.copper;
     if (!npc || npc.kind !== 'npc' || npc.vendorItems.length === 0) {
-      this.error(meta.entityId, 'That merchant is not available.');
-      return;
+      const msg = 'That merchant is not available.';
+      this.error(meta.entityId, msg);
+      return this.commandResult(meta, beforeItems, beforeCopper, false, 'not_vendor', msg);
     }
-    if (!npc.vendorItems.includes(itemId)) { this.error(meta.entityId, 'That item is not sold here.'); return; }
-    if (!def?.buyValue) { this.error(meta.entityId, 'That item is not for sale.'); return; }
-    if (dist2d(p.pos, npc.pos) > INTERACT_RANGE + 2) { this.error(meta.entityId, 'Too far away.'); return; }
-    if (meta.copper < def.buyValue) { this.error(meta.entityId, 'Not enough money.'); return; }
+    if (!npc.vendorItems.includes(itemId)) {
+      const msg = 'That item is not sold here.';
+      this.error(meta.entityId, msg);
+      return this.commandResult(meta, beforeItems, beforeCopper, false, 'not_sold', msg);
+    }
+    if (!def?.buyValue) {
+      const msg = 'That item is not for sale.';
+      this.error(meta.entityId, msg);
+      return this.commandResult(meta, beforeItems, beforeCopper, false, 'not_purchasable', msg);
+    }
+    if (dist2d(p.pos, npc.pos) > INTERACT_RANGE + 2) {
+      const msg = 'Too far away.';
+      this.error(meta.entityId, msg);
+      return this.commandResult(meta, beforeItems, beforeCopper, false, 'too_far', msg);
+    }
+    if (meta.copper < def.buyValue) {
+      const msg = 'Not enough money.';
+      this.error(meta.entityId, msg);
+      return this.commandResult(meta, beforeItems, beforeCopper, false, 'not_enough_money', msg);
+    }
     meta.copper -= def.buyValue;
     this.addItem(itemId, 1, meta.entityId);
     this.emit({ type: 'vendor', action: 'buy', itemId, pid: meta.entityId });
+    return this.commandResult(meta, beforeItems, beforeCopper, true, 'bought', `Bought ${def.name}.`);
   }
 
-  sellItem(itemId: string, pid?: number): void {
+  sellItem(itemId: string, pid?: number): CommandResult {
     const r = this.resolve(pid);
-    if (!r) return;
+    if (!r) return this.emptyCommandResult(false, 'invalid_player', 'Player not found.');
     const { meta, e: p } = r;
     const def = ITEMS[itemId];
-    if (!def || this.countItem(itemId, meta.entityId) <= 0) { this.error(meta.entityId, "You don't have that item."); return; }
-    if (p.dead) { this.error(meta.entityId, "You can't do that while dead."); return; }
+    const beforeItems = this.inventoryCounts(meta);
+    const beforeCopper = meta.copper;
+    if (!def) {
+      const msg = 'That item does not exist.';
+      this.error(meta.entityId, msg);
+      return this.commandResult(meta, beforeItems, beforeCopper, false, 'unknown_item', msg);
+    }
+    if (this.countItem(itemId, meta.entityId) <= 0) {
+      const msg = "You don't have that item.";
+      this.error(meta.entityId, msg);
+      return this.commandResult(meta, beforeItems, beforeCopper, false, 'missing_item', msg);
+    }
+    if (p.dead) {
+      const msg = "You can't do that while dead.";
+      this.error(meta.entityId, msg);
+      return this.commandResult(meta, beforeItems, beforeCopper, false, 'dead', msg);
+    }
     // mirror buyItem's gate: selling requires a vendor in interact range
     const nearVendor = [...this.entities.values()].some((e) =>
       e.kind === 'npc' && e.vendorItems.length > 0 && dist2d(p.pos, e.pos) <= INTERACT_RANGE + 2);
-    if (!nearVendor) { this.error(meta.entityId, 'There is no merchant nearby.'); return; }
-    if (def.kind === 'quest') { this.error(meta.entityId, 'You cannot sell quest items.'); return; }
+    if (!nearVendor) {
+      const msg = 'There is no merchant nearby.';
+      this.error(meta.entityId, msg);
+      return this.commandResult(meta, beforeItems, beforeCopper, false, 'no_merchant', msg);
+    }
+    if (def.kind === 'quest') {
+      const msg = 'You cannot sell quest items.';
+      this.error(meta.entityId, msg);
+      return this.commandResult(meta, beforeItems, beforeCopper, false, 'quest_item', msg);
+    }
     this.removeItem(itemId, 1, meta.entityId);
     meta.copper += def.sellValue;
     this.emit({ type: 'vendor', action: 'sell', itemId, pid: meta.entityId });
-    this.emit({ type: 'loot', text: `Sold ${def.name} for ${formatMoney(def.sellValue)}.`, pid: meta.entityId });
+    const msg = `Sold ${def.name} for ${formatMoney(def.sellValue)}.`;
+    this.emit({ type: 'loot', text: msg, pid: meta.entityId });
+    return this.commandResult(meta, beforeItems, beforeCopper, true, 'sold', msg);
   }
 
   private addItemSilent(itemId: string, count: number, meta: PlayerMeta): void {
@@ -2900,21 +3000,29 @@ export class Sim {
   // Interaction: looting, quest NPCs, ground objects
   // -------------------------------------------------------------------------
 
-  lootCorpse(mobId: number, pid?: number): void {
+  lootCorpse(mobId: number, pid?: number): CommandResult {
     const r = this.resolve(pid);
-    if (!r) return;
+    if (!r) return this.emptyCommandResult(false, 'invalid_player', 'Player not found.');
     const { meta, e: p } = r;
     const mob = this.entities.get(mobId);
-    if (!mob || !mob.lootable || !mob.loot) return;
+    const beforeItems = this.inventoryCounts(meta);
+    const beforeCopper = meta.copper;
+    if (!mob || !mob.lootable || !mob.loot) return this.commandResult(meta, beforeItems, beforeCopper, false, 'not_lootable', 'There is nothing to loot.');
     if (mob.tappedById !== null && mob.tappedById !== meta.entityId) {
       // party members of the tapper share loot rights
       const tapperParty = this.partyOf(mob.tappedById);
       if (!tapperParty || !tapperParty.members.includes(meta.entityId)) {
-        this.error(meta.entityId, "You don't have permission to loot that.");
-        return;
+        const msg = "You don't have permission to loot that.";
+        this.error(meta.entityId, msg);
+        return this.commandResult(meta, beforeItems, beforeCopper, false, 'not_allowed', msg);
       }
     }
-    if (dist2d(p.pos, mob.pos) > INTERACT_RANGE) { this.error(meta.entityId, 'Too far away.'); return; }
+    if (dist2d(p.pos, mob.pos) > INTERACT_RANGE) {
+      const msg = 'Too far away.';
+      this.error(meta.entityId, msg);
+      return this.commandResult(meta, beforeItems, beforeCopper, false, 'too_far', msg);
+    }
+    const itemCount = mob.loot.items.reduce((sum, slot) => sum + slot.count, 0);
     if (mob.loot.copper > 0) {
       meta.copper += mob.loot.copper;
       meta.counters.lootCopper += mob.loot.copper;
@@ -2925,6 +3033,10 @@ export class Sim {
     mob.lootable = false;
     mob.corpseTimer = Math.min(mob.corpseTimer, 4);
     if (p.targetId === mobId) p.targetId = null;
+    const pieces = [];
+    if (meta.copper !== beforeCopper) pieces.push(formatMoney(meta.copper - beforeCopper));
+    if (itemCount > 0) pieces.push(`${itemCount} item${itemCount === 1 ? '' : 's'}`);
+    return this.commandResult(meta, beforeItems, beforeCopper, true, 'looted', pieces.length > 0 ? `Looted ${pieces.join(' and ')}.` : 'Looted corpse.');
   }
 
   pickUpObject(objId: number, pid?: number): void {

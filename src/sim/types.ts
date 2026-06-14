@@ -91,6 +91,21 @@ export interface InvSlot {
   count: number;
 }
 
+export interface CommandItemChange {
+  itemId: string;
+  before: number;
+  after: number;
+  delta: number;
+}
+
+export interface CommandResult {
+  ok: boolean;
+  reason: string;
+  serverMessage: string;
+  changedItems: CommandItemChange[];
+  changedCopper: number;
+}
+
 export interface LootEntry {
   itemId?: string;
   copper?: number;

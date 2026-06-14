@@ -157,6 +157,29 @@ describe('delta snapshots', () => {
     expect(snap.self).not.toHaveProperty('inv');
   });
 
+  it('returns structured results for item commands with a request id', () => {
+    const wilkes = [...server.sim.entities.values()].find((e) => e.templateId === 'trader_wilkes')!;
+    const player = server.sim.entities.get(session.pid)!;
+    const pos = server.sim.groundPos(wilkes.pos.x + 2, wilkes.pos.z);
+    player.pos = { ...pos };
+    player.prevPos = { ...pos };
+    server.sim.meta(session.pid)!.copper = 100;
+
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'buy', rid: 42, npc: wilkes.id, item: 'baked_bread' }));
+
+    expect(fc.sent).toContainEqual({
+      t: 'cmdResult',
+      rid: 42,
+      result: {
+        ok: true,
+        reason: 'bought',
+        serverMessage: 'Bought Freshly Baked Bread.',
+        changedItems: [{ itemId: 'baked_bread', before: 0, after: 1, delta: 1 }],
+        changedCopper: -25,
+      },
+    });
+  });
+
   it('each client gets full state on its own first snapshot', () => {
     broadcast(server);
     const fc2 = fakeWs();
