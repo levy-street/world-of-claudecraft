@@ -17,6 +17,10 @@ import { iconDataUrl, QUALITY_COLOR } from './icons';
 import { Keybinds, BIND_ACTIONS, BIND_CATEGORIES, isReservedCode, keyLabel } from '../game/keybinds';
 import { Settings, GameSettings, SETTING_RANGES } from '../game/settings';
 import { chatPlayerContextActions } from './player_context_menu';
+import {
+  appendStoredChatHistory, chatHistoryStorageKey, chatPrivateSeenStorageKey, formatChatTimestamp,
+  readChatPrivateSeenAt, readStoredChatHistory, writeChatPrivateSeenAt, type StoredChatEntry,
+} from './chat_history';
 
 // hooks main wires after Input exists (the options menu drives input, audio,
 // graphics, and logout, all of which live outside the HUD)
@@ -62,6 +66,11 @@ const PARTY_RANGE_YD = 100;
 const ZONE_BANNER_DEADBAND = 5;
 const IGNORED_CHAT_NAMES_KEY = 'woc_ignored_chat_names';
 
+interface ChatLogOptions {
+  isPrivate?: boolean;
+  incomingPrivate?: boolean;
+}
+
 export class Hud {
   private static readonly BAR_ABILITY_SLOTS = 11; // bar slots 1..11; slot 0 is the fixed Attack toggle
   private abilityButtons: { btn: HTMLButtonElement; label: HTMLSpanElement; keybindEl: HTMLSpanElement; cdOverlay: HTMLDivElement; cdText: HTMLDivElement; lastIcon: string }[] = [];
@@ -74,6 +83,7 @@ export class Hud {
   private keybindNote = '';
   private chatLogEl = $('#chatlog');
   private combatLogEl = $('#combatlog');
+  private chatTabEl = document.querySelector<HTMLButtonElement>('.chat-tab[data-log-tab="chat"]');
   private errorEl = $('#error-msg');
   private bannerEl = $('#banner');
   private tooltipEl = $('#tooltip');
@@ -106,6 +116,11 @@ export class Hud {
   private lastZoneId = '';
   private mapZoneId = ''; // zone the cached map-window canvas was rendered for
   private ignoredChatNames = new Set<string>();
+  private chatHistoryKey = '';
+  private chatPrivateSeenKey = '';
+  private privateNoticeCount = 0;
+  private restoredChatRows: { entry: StoredChatEntry; el: HTMLElement; hiddenByFilter: boolean }[] = [];
+  private lastChatBlockSig = '';
   private socialTab: 'friends' | 'guild' | 'ignore' = 'friends';
   // split signatures: structural changes (tab, guild membership) rebuild the
   // whole panel; content-only changes (a friend's presence) refresh just the
@@ -122,8 +137,11 @@ export class Hud {
 
   constructor(private sim: IWorld, private renderer: Renderer, private keybinds: Keybinds) {
     this.ignoredChatNames = this.loadIgnoredChatNames();
+    this.chatHistoryKey = chatHistoryStorageKey(sim.realm, sim.player.name);
+    this.chatPrivateSeenKey = chatPrivateSeenStorageKey(sim.realm, sim.player.name);
     this.meters = new Meters(sim);
     this.bindLogTabs();
+    this.restoreChatHistory();
     this.loadSlotMap();
     this.buildActionBar();
     this.refreshKeybindLabels();
@@ -173,6 +191,7 @@ export class Hud {
         tabs.forEach((t) => t.classList.toggle('active', t === tab));
         $('#chatlog').classList.toggle('active', which === 'chat');
         $('#combatlog').classList.toggle('active', which === 'combat');
+        if (which === 'chat') this.clearPrivateNotice();
       });
     });
   }
@@ -651,6 +670,12 @@ export class Hud {
     const zone = inDungeon ? 'dungeon'
       : Math.hypot(p.pos.x - hub.x, p.pos.z - hub.z) < hub.radius + 10 ? 'town' : currentZone.biome;
     music.update(zone, inCombat);
+
+    const chatBlockSig = this.chatBlockSig();
+    if (chatBlockSig !== this.lastChatBlockSig) {
+      this.lastChatBlockSig = chatBlockSig;
+      this.applyRestoredChatFilters();
+    }
 
     this.updateQuestTracker();
     this.updatePartyFrames();
@@ -1176,13 +1201,16 @@ export class Hud {
           this.refreshGossip();
           break;
         case 'chat': {
-          if (this.isChatIgnored(ev.from)) break;
+          if (this.isChatSenderIgnored(ev.from)) break;
           switch (ev.channel) {
             case 'party': this.chatLogFrom(ev.from, ev.text, '#7fd4ff', '[Party] ', ': '); break;
             case 'yell': this.chatLogFrom(ev.from, ev.text, '#ff5040', '', ' yells: '); break;
             case 'whisper':
-              if (ev.to) this.chatLogFrom(ev.to, ev.text, '#ff80ff', 'To ', ': ');
-              else { this.chatLogFrom(ev.from, ev.text, '#ff80ff', '', ' whispers: '); audio.whisper(); }
+              if (ev.to) this.chatLogFrom(ev.to, ev.text, '#ff80ff', 'To ', ': ', { isPrivate: true });
+              else {
+                this.chatLogFrom(ev.from, ev.text, '#ff80ff', '', ' whispers: ', { isPrivate: true, incomingPrivate: true });
+                audio.whisper();
+              }
               break;
             case 'general': this.chatLogFrom(ev.from, ev.text, '#ffc864', '[General] ', ': '); break;
             case 'guild': this.chatLogFrom(ev.from, ev.text, '#40d264', '[Guild] ', ': '); break;
@@ -1316,23 +1344,130 @@ export class Hud {
     if (text) this.log(text, '#ffd100');
   }
 
-  private chatLogFrom(name: string, text: string, color: string, prefix: string, separator: string): void {
+  private chatLogFrom(name: string, text: string, color: string, prefix: string, separator: string, opts: ChatLogOptions = {}): void {
+    const entry: StoredChatEntry = {
+      kind: 'from',
+      at: Date.now(),
+      color,
+      name,
+      text,
+      prefix,
+      separator,
+      isPrivate: opts.isPrivate === true,
+      incomingPrivate: opts.incomingPrivate === true,
+    };
+    this.appendChatEntry(entry);
+    appendStoredChatHistory(this.chatStorage(), this.chatHistoryKey, entry);
+    if (entry.incomingPrivate) {
+      if (this.isChatLogVisible()) writeChatPrivateSeenAt(this.chatStorage(), this.chatPrivateSeenKey, entry.at);
+      else this.showPrivateNotice();
+    }
+  }
+
+  private restoreChatHistory(): void {
+    const storage = this.chatStorage();
+    const entries = readStoredChatHistory(storage, this.chatHistoryKey);
+    for (const entry of entries) {
+      const el = this.appendChatEntry(entry);
+      this.restoredChatRows.push({ entry, el, hiddenByFilter: false });
+    }
+    this.lastChatBlockSig = this.chatBlockSig();
+    this.applyRestoredChatFilters();
+    const seenAt = readChatPrivateSeenAt(storage, this.chatPrivateSeenKey);
+    const visibleEntries = this.restoredChatRows.filter((row) => row.el.isConnected).map((row) => row.entry);
+    const incomingPrivate = visibleEntries.filter((entry) => entry.incomingPrivate);
+    const latestPrivateAt = incomingPrivate.reduce((latest, entry) => Math.max(latest, entry.at), 0);
+    if (this.isChatLogVisible() && latestPrivateAt > seenAt) {
+      writeChatPrivateSeenAt(storage, this.chatPrivateSeenKey, latestPrivateAt);
+      return;
+    }
+    const unreadPrivate = incomingPrivate.filter((entry) => entry.at > seenAt).length;
+    if (unreadPrivate > 0) this.setPrivateNotice(unreadPrivate);
+  }
+
+  private chatStorage(): Storage | null {
+    try {
+      return window.localStorage;
+    } catch {
+      return null;
+    }
+  }
+
+  private isChatLogVisible(): boolean {
+    return this.chatLogEl.classList.contains('active') && this.chatLogEl.getClientRects().length > 0;
+  }
+
+  private appendChatEntry(entry: StoredChatEntry): HTMLElement {
     const wasNearBottom = this.chatLogEl.scrollHeight - this.chatLogEl.scrollTop - this.chatLogEl.clientHeight < 24;
     const div = document.createElement('div');
-    div.style.color = color;
-    if (prefix) div.append(document.createTextNode(prefix));
+    div.style.color = entry.color;
+    if (entry.isPrivate) div.classList.add('chat-private');
+    if (entry.incomingPrivate) div.classList.add('incoming-private');
+    const time = document.createElement('span');
+    time.className = 'chat-time';
+    time.textContent = `${formatChatTimestamp(entry.at)} `;
+    div.append(time);
+    if (entry.prefix) div.append(document.createTextNode(entry.prefix));
     const sender = document.createElement('span');
     sender.className = 'chat-player-name';
-    sender.textContent = name;
-    sender.title = `Right-click ${name}`;
+    sender.textContent = entry.name;
+    sender.title = `Right-click ${entry.name}`;
     sender.addEventListener('contextmenu', (ev) => {
       ev.preventDefault();
-      this.openChatPlayerContextMenu(name, ev.clientX, ev.clientY);
+      this.openChatPlayerContextMenu(entry.name, ev.clientX, ev.clientY);
     });
-    div.append(sender, document.createTextNode(`${separator}${text}`));
+    div.append(sender, document.createTextNode(`${entry.separator}${entry.text}`));
     this.chatLogEl.appendChild(div);
     while (this.chatLogEl.children.length > 200) this.chatLogEl.removeChild(this.chatLogEl.firstChild!);
     if (wasNearBottom) this.chatLogEl.scrollTop = this.chatLogEl.scrollHeight;
+    return div;
+  }
+
+  private chatBlockSig(): string {
+    const social = this.sim.socialInfo;
+    if (social !== null) return `online:${social.blocks.map((block) => block.name).sort().join('|')}`;
+    return `local:${[...this.ignoredChatNames].sort().join('|')}`;
+  }
+
+  private applyRestoredChatFilters(): void {
+    for (const row of this.restoredChatRows) {
+      const hidden = row.entry.prefix !== 'To ' && this.isChatSenderIgnored(row.entry.name);
+      if (hidden) {
+        if (row.el.isConnected) row.el.remove();
+        row.hiddenByFilter = true;
+      } else if (row.hiddenByFilter) {
+        if (!row.el.isConnected) {
+          this.chatLogEl.appendChild(row.el);
+          while (this.chatLogEl.children.length > 200) this.chatLogEl.removeChild(this.chatLogEl.firstChild!);
+        }
+        row.hiddenByFilter = false;
+      }
+    }
+  }
+
+  onChatOpened(): void {
+    if (this.isChatLogVisible()) this.clearPrivateNotice();
+  }
+
+  private showPrivateNotice(): void {
+    this.setPrivateNotice(this.privateNoticeCount + 1);
+  }
+
+  private setPrivateNotice(count: number): void {
+    if (!this.chatTabEl) return;
+    this.privateNoticeCount = Math.min(99, count);
+    this.chatTabEl.classList.add('has-private');
+    this.chatTabEl.dataset.privateCount = String(this.privateNoticeCount);
+    this.chatTabEl.title = `${this.privateNoticeCount} unread private message${this.privateNoticeCount === 1 ? '' : 's'}`;
+  }
+
+  private clearPrivateNotice(): void {
+    if (!this.chatTabEl) return;
+    this.privateNoticeCount = 0;
+    this.chatTabEl.classList.remove('has-private');
+    delete this.chatTabEl.dataset.privateCount;
+    this.chatTabEl.removeAttribute('title');
+    writeChatPrivateSeenAt(this.chatStorage(), this.chatPrivateSeenKey, Date.now());
   }
 
   private combatLog(text: string, color = '#ccc'): void {
@@ -2208,6 +2343,13 @@ export class Hud {
     return this.ignoredChatNames.has(this.chatIgnoreKey(name));
   }
 
+  private isChatSenderIgnored(name: string): boolean {
+    const social = this.sim.socialInfo;
+    return social !== null
+      ? social.blocks.some((block) => block.name === name)
+      : this.isChatIgnored(name);
+  }
+
   private loadIgnoredChatNames(): Set<string> {
     try {
       const raw = localStorage.getItem(IGNORED_CHAT_NAMES_KEY);
@@ -2233,6 +2375,8 @@ export class Hud {
       this.log(`Ignoring chat from ${name}.`, '#aaf');
     }
     this.saveIgnoredChatNames();
+    this.lastChatBlockSig = this.chatBlockSig();
+    this.applyRestoredChatFilters();
   }
 
   closeContextMenu(): void {
