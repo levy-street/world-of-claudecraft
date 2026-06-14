@@ -1318,6 +1318,7 @@ export class Hud {
             case 'general': this.chatLogFrom(ev.from, ev.text, '#ffc864', '[General] ', ': '); break;
             case 'guild': this.chatLogFrom(ev.from, ev.text, '#40d264', '[Guild] ', ': '); break;
             case 'officer': this.chatLogFrom(ev.from, ev.text, '#4ce0c0', '[Officer] ', ': '); break;
+            case 'roll': this.chatLogFrom(ev.from, ev.text, '#ffd100', '', ' rolls '); break;
             default: this.chatLogFrom(ev.from, ev.text, '#f0ead8', '', ' says: '); break;
           }
           if ((ev.channel === 'say' || ev.channel === 'yell') && ev.entityId !== undefined) {

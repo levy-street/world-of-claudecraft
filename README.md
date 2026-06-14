@@ -75,7 +75,9 @@ see each other in town. `Enter` opens chat.
 - **Parties** (up to 5): right-click a player → *Invite to Party*. Party
   frames on the left, members share tap rights, kill quest credit and split
   XP with the real vanilla group bonuses (1.166/1.3/1.43 for 3/4/5). Party
-  chat with `/p message`. Blue member blips on the minimap.
+  chat with `/p message`. Blue member blips on the minimap. Settle loot
+  disputes with `/roll` (also `/roll N` or `/roll M-N`) — a server-rolled
+  number broadcast to the party, or to nearby players when ungrouped.
 - **Trading**: right-click a player → *Trade*. Both sides stage items + money,
   both must accept, and the swap is atomic and server-validated (quest items
   are untradeable). Walking apart cancels.

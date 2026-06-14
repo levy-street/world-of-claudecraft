@@ -3496,6 +3496,39 @@ export class Sim {
       return null;
     }
 
+    // "/roll", "/roll N", "/roll M-N" — a classic random roll for loot disputes
+    // and social play. Rolled through the deterministic sim RNG so it is
+    // server-authoritative (clients can't fake a result) and identical offline.
+    const rollm = /^\/roll(?:\s+(\d+)(?:\s*-\s*(\d+))?)?\s*$/i.exec(raw);
+    if (rollm) {
+      let lo = 1, hi = 100;
+      if (rollm[1] !== undefined) {
+        const n = parseInt(rollm[1], 10);
+        if (rollm[2] !== undefined) { lo = n; hi = parseInt(rollm[2], 10); }
+        else { hi = n; }
+      }
+      const MAX_ROLL = 1_000_000;
+      if (lo < 1 || hi > MAX_ROLL || lo > hi) {
+        this.error(r.meta.entityId, `Invalid roll range. Use /roll, /roll N, or /roll M-N (1-${MAX_ROLL}).`);
+        return null;
+      }
+      const result = this.rng.int(lo, hi);
+      const text = `${result} (${lo}-${hi})`;
+      const party = this.partyOf(r.meta.entityId);
+      if (party) {
+        for (const mPid of party.members) {
+          this.emit({ type: 'chat', fromPid: r.meta.entityId, from: r.meta.name, text, channel: 'roll', pid: mPid });
+        }
+      } else {
+        for (const meta of this.players.values()) {
+          const e = this.entities.get(meta.entityId);
+          if (!e || dist2d(r.e.pos, e.pos) > SAY_RANGE) continue;
+          this.emit({ type: 'chat', fromPid: r.meta.entityId, from: r.meta.name, text, channel: 'roll', pid: meta.entityId });
+        }
+      }
+      return null;
+    }
+
     // "/w name message" — private whisper to an online player
     const wm = /^\/(?:w|whisper|t|tell)\s+(\S+)\s+([\s\S]+)$/i.exec(raw);
     if (wm) {
@@ -3549,7 +3582,7 @@ export class Sim {
     let clean = raw;
     if (/^\/y(ell)?\s/i.test(raw)) { channel = 'yell'; clean = raw.replace(/^\/y(ell)?\s+/i, '').trim(); }
     else if (/^\/s(ay)?\s/i.test(raw)) { clean = raw.replace(/^\/s(ay)?\s+/i, '').trim(); }
-    else if (raw.startsWith('/')) { this.error(r.meta.entityId, `Unknown command: ${raw.split(' ')[0]}. Try /s /y /w /p /g.`); return null; }
+    else if (raw.startsWith('/')) { this.error(r.meta.entityId, `Unknown command: ${raw.split(' ')[0]}. Try /s /y /w /p /g /roll.`); return null; }
     if (!clean) return null;
     const range = channel === 'yell' ? YELL_RANGE : SAY_RANGE;
     for (const meta of this.players.values()) {

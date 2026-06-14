@@ -205,6 +205,86 @@ describe('chat channels', () => {
     expect(pids).toContain(b);
     expect(pids).not.toContain(outsider);
   });
+
+  it('/roll broadcasts a deterministic result in the default 1-100 range to nearby players', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const near = sim.addPlayer('mage', 'Bet');
+    const far = sim.addPlayer('rogue', 'Gimel');
+    teleport(sim, a, 0, -40);
+    teleport(sim, near, 10, -40); // within SAY_RANGE
+    teleport(sim, far, 80, -40);  // beyond SAY_RANGE
+    sim.tick();
+
+    sim.chat('/roll', a);
+    const msgs = chatEvents(sim.tick());
+    expect(msgs.length).toBeGreaterThan(0);
+    expect(msgs.every((m) => m.channel === 'roll' && m.from === 'Aleph')).toBe(true);
+    // text is "<result> (1-100)" with the result inside the range
+    const m = /^(\d+) \(1-100\)$/.exec(msgs[0].text)!;
+    expect(m).not.toBeNull();
+    const result = Number(m[1]);
+    expect(result).toBeGreaterThanOrEqual(1);
+    expect(result).toBeLessThanOrEqual(100);
+    const pids = msgs.map((x) => x.pid);
+    expect(pids).toContain(a);    // roller sees their own roll
+    expect(pids).toContain(near);
+    expect(pids).not.toContain(far);
+  });
+
+  it('/roll N rolls within 1-N and /roll M-N within the given bounds', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    teleport(sim, a, 0, -40);
+    sim.tick();
+
+    sim.chat('/roll 6', a);
+    let msgs = chatEvents(sim.tick());
+    let m = /^(\d+) \(1-6\)$/.exec(msgs[0].text)!;
+    expect(m).not.toBeNull();
+    expect(Number(m[1])).toBeGreaterThanOrEqual(1);
+    expect(Number(m[1])).toBeLessThanOrEqual(6);
+
+    sim.chat('/roll 50-60', a);
+    msgs = chatEvents(sim.tick());
+    m = /^(\d+) \(50-60\)$/.exec(msgs[0].text)!;
+    expect(m).not.toBeNull();
+    expect(Number(m[1])).toBeGreaterThanOrEqual(50);
+    expect(Number(m[1])).toBeLessThanOrEqual(60);
+  });
+
+  it('/roll prefers the party channel when the roller is grouped', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('mage', 'Bet');
+    const outsider = sim.addPlayer('rogue', 'Gimel');
+    teleport(sim, a, 0, -40);
+    teleport(sim, b, 0, -900);   // out of say range but in the party
+    teleport(sim, outsider, 2, -40);
+    sim.tick();
+    sim.partyInvite(b, a);
+    sim.partyAccept(b);
+    sim.tick();
+
+    sim.chat('/roll', a);
+    const msgs = chatEvents(sim.tick());
+    expect(msgs.every((x) => x.channel === 'roll')).toBe(true);
+    const pids = msgs.map((x) => x.pid);
+    expect(pids).toContain(a);
+    expect(pids).toContain(b);            // distant party member still sees it
+    expect(pids).not.toContain(outsider); // a nearby non-member does not
+  });
+
+  it('rejects a malformed roll range instead of saying it out loud', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    teleport(sim, a, 0, -40);
+    sim.tick();
+    sim.chat('/roll 60-50', a); // min greater than max
+    const events = sim.tick();
+    expect(chatEvents(events)).toHaveLength(0);
+    expect(events.some((e) => e.type === 'error')).toBe(true);
+  });
 });
 
 describe('trade completion event', () => {
