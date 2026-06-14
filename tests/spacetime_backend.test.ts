@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { selectedWorldBackend, spacetimeConnectionConfig } from '../src/net/backend';
 import { reducers, tables } from '../src/net/module_bindings';
+import authorizeBridgeReducer from '../src/net/module_bindings/authorize_bridge_reducer';
 import bridgeAttachSessionReducer from '../src/net/module_bindings/bridge_attach_session_reducer';
 import bridgePingReducer from '../src/net/module_bindings/bridge_ping_reducer';
 import { SpacetimeApi } from '../src/net/spacetime_api';
@@ -42,6 +43,7 @@ describe('SpacetimeDB generated reducer surface', () => {
       'command',
       'reportPlayer',
       'reportPlayerByName',
+      'authorizeBridge',
       'bridgeAttachSession',
       'bridgePublishSnapshot',
       'bridgePublishEvents',
@@ -93,7 +95,8 @@ describe('SpacetimeDB generated reducer surface', () => {
     expect(String(SpacetimeWorld.prototype.chat)).not.toContain('NOT_IMPLEMENTED');
   });
 
-  it('does not require a separate bridge secret in generated reducer args', () => {
+  it('gates bridge setup while keeping routine bridge calls identity-based', () => {
+    expect(Object.keys(authorizeBridgeReducer)).toEqual(['setupToken']);
     expect(Object.keys(bridgePingReducer)).toEqual(['sessions', 'tick']);
     expect(Object.keys(bridgeAttachSessionReducer)).toEqual(['sessionId', 'playerId']);
   });

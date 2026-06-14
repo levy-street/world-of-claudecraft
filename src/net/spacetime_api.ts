@@ -6,7 +6,6 @@ import { StdbClient, rows, table, type StdbConnection, type StdbSubscriptionHand
 type AuthRow = {
   accountId: bigint;
   username: string;
-  token: string;
   error: string;
 };
 
@@ -101,7 +100,7 @@ export class SpacetimeApi {
     const updateAuth = (_ctx: unknown, row: AuthRow) => {
       this.auth = row;
       this.authRevision++;
-      this.token = row.token || null;
+      this.token = this.client.authToken || null;
       this.username = row.username || null;
     };
     const updateRoster = (_ctx: unknown, row: RosterRow) => {
@@ -152,7 +151,7 @@ export class SpacetimeApi {
   private async waitForAuth(revision: number): Promise<void> {
     await waitFor(() => this.authRevision > revision);
     if (this.auth?.error) throw new Error(this.auth.error);
-    if (!this.auth?.token) throw new Error('not authenticated');
+    if (!this.auth || Number(this.auth.accountId) <= 0) throw new Error('not authenticated');
   }
 
   private async waitForRoster(revision: number): Promise<void> {

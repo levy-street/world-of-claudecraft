@@ -78,6 +78,17 @@ function nowMs(): number {
   return typeof performance !== 'undefined' ? performance.now() : Date.now();
 }
 
+const MAX_SEEN_EVENT_IDS = 1_000;
+
+function hashEventPayload(payload: string): string {
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < payload.length; i++) {
+    hash ^= payload.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return (hash >>> 0).toString(16);
+}
+
 export class SpacetimeWorld implements OnlineWorldClient {
   cfg: { seed: number; playerClass: PlayerClass };
   entities = new Map<number, Entity>();
@@ -119,6 +130,7 @@ export class SpacetimeWorld implements OnlineWorldClient {
   private mouselookFacing: number | null = null;
   private sendTimer: ReturnType<typeof setInterval> | null = null;
   private seenEventIds = new Set<string>();
+  private seenEventOrder: string[] = [];
   private characterRows = new Map<string, CharacterRow>();
 
   constructor(config: SpacetimeConnectionConfig, _token: string, characterId: number, cls: PlayerClass) {
@@ -129,10 +141,8 @@ export class SpacetimeWorld implements OnlineWorldClient {
     this.cfg = { seed: 20061, playerClass: cls };
     this.known = abilitiesKnownAt(cls, 1);
     this.client.onDisconnect((reason) => {
-      this.connected = false;
-      this.onDisconnect?.(reason);
+      this.failConnection(reason);
     });
-    this.sendTimer = setInterval(() => this.sendInput(), 50);
     queueMicrotask(() => void this.open());
   }
 
@@ -141,10 +151,7 @@ export class SpacetimeWorld implements OnlineWorldClient {
   }
 
   close(): void {
-    if (this.sendTimer !== null) {
-      clearInterval(this.sendTimer);
-      this.sendTimer = null;
-    }
+    this.clearSendTimer();
     const conn = this.conn;
     const sessionId = this.sessionId;
     this.connected = false;
@@ -206,10 +213,28 @@ export class SpacetimeWorld implements OnlineWorldClient {
       });
       await conn.reducers.enterWorld({ characterId: BigInt(this.characterId) });
     } catch (err) {
-      this.connected = false;
       const message = err instanceof Error && err.message ? err.message : 'Could not connect to SpacetimeDB.';
-      this.onDisconnect?.(message);
+      this.failConnection(message);
     }
+  }
+
+  private clearSendTimer(): void {
+    if (this.sendTimer !== null) {
+      clearInterval(this.sendTimer);
+      this.sendTimer = null;
+    }
+  }
+
+  private startSendTimer(): void {
+    if (this.sendTimer === null) {
+      this.sendTimer = setInterval(() => this.sendInput(), 50);
+    }
+  }
+
+  private failConnection(reason: string): void {
+    this.connected = false;
+    this.clearSendTimer();
+    this.onDisconnect?.(reason);
   }
 
   private watchTables(conn: StdbConnection): void {
@@ -251,8 +276,7 @@ export class SpacetimeWorld implements OnlineWorldClient {
     if (Number(row.characterId) !== this.characterId) return;
     if (!row.active) {
       if (this.sessionId === row.id && row.error) {
-        this.connected = false;
-        this.onDisconnect?.(row.error);
+        this.failConnection(row.error);
       }
       return;
     }
@@ -261,10 +285,10 @@ export class SpacetimeWorld implements OnlineWorldClient {
     if (row.bridgeAttached && row.playerId > 0) {
       this.playerId = row.playerId;
       this.connected = true;
+      this.startSendTimer();
     }
     if (row.error) {
-      this.connected = false;
-      this.onDisconnect?.(row.error);
+      this.failConnection(row.error);
     }
   }
 
@@ -279,10 +303,20 @@ export class SpacetimeWorld implements OnlineWorldClient {
 
   private applyEventRow(row: PayloadRow): void {
     if (!this.matchesSession(row)) return;
-    const eventId = row.id !== undefined ? String(row.id) : `${row.sessionId}:${row.payloadJson}`;
-    if (this.seenEventIds.has(eventId)) return;
-    this.seenEventIds.add(eventId);
+    const eventId = row.id !== undefined ? String(row.id) : `${row.sessionId}:${hashEventPayload(row.payloadJson)}`;
+    if (!this.rememberEventId(eventId)) return;
     this.onMessage(row.payloadJson);
+  }
+
+  private rememberEventId(eventId: string): boolean {
+    if (this.seenEventIds.has(eventId)) return false;
+    this.seenEventIds.add(eventId);
+    this.seenEventOrder.push(eventId);
+    while (this.seenEventOrder.length > MAX_SEEN_EVENT_IDS) {
+      const old = this.seenEventOrder.shift();
+      if (old !== undefined) this.seenEventIds.delete(old);
+    }
+    return true;
   }
 
   private applySocialRow(row: PayloadRow): void {
@@ -333,11 +367,11 @@ export class SpacetimeWorld implements OnlineWorldClient {
       this.cfg.seed = msg.seed;
       if (typeof msg.realm === 'string') this.realm = msg.realm;
       this.connected = true;
+      this.startSendTimer();
       return;
     }
     if (msg.t === 'error') {
-      this.connected = false;
-      this.onDisconnect?.(msg.error ?? 'rejected by server');
+      this.failConnection(msg.error ?? 'rejected by server');
       return;
     }
     if (msg.t === 'events') {

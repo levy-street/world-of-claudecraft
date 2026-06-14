@@ -69,6 +69,7 @@ type BridgeSession = {
 const STDB_URI = process.env.STDB_URI ?? process.env.VITE_STDB_URI ?? 'http://127.0.0.1:3000';
 const STDB_MODULE = process.env.STDB_MODULE ?? process.env.VITE_STDB_MODULE ?? 'worldofclaudecraft';
 const TOKEN_FILE = resolve(process.env.STDB_BRIDGE_TOKEN_FILE ?? '.stdb-bridge-token');
+const BRIDGE_SETUP_TOKEN = process.env.STDB_BRIDGE_SETUP_TOKEN?.trim() || '';
 const SAVE_INTERVAL_MS = 30_000;
 
 function table(db: unknown, camelName: string, snakeName = camelName): any {
@@ -132,6 +133,9 @@ class StdbBridge {
   async start(): Promise<void> {
     this.conn = await this.connect();
     this.game = new GameServer(new StdbGamePersistence(this.conn));
+    if (BRIDGE_SETUP_TOKEN) {
+      await this.conn.reducers.authorizeBridge({ setupToken: BRIDGE_SETUP_TOKEN });
+    }
     await this.conn.reducers.bridgePing({ sessions: 0, tick: 0n });
     this.watchTables(this.conn);
     await new Promise<void>((resolve, reject) => {

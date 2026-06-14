@@ -34,6 +34,7 @@ import {
 } from "spacetimedb";
 
 // Import all reducer arg schemas
+import AuthorizeBridgeReducer from "./authorize_bridge_reducer";
 import BridgeAddBlockReducer from "./bridge_add_block_reducer";
 import BridgeAddFriendReducer from "./bridge_add_friend_reducer";
 import BridgeAddGuildMemberReducer from "./bridge_add_guild_member_reducer";
@@ -338,6 +339,7 @@ const tablesSchema = __schema({
 
 /** The schema information for all reducers in this module. This is defined the same way as the reducers would have been defined in the server, except the body of the reducer is omitted in code generation. */
 const reducersSchema = __reducers(
+  __reducerSchema("authorize_bridge", AuthorizeBridgeReducer),
   __reducerSchema("bridge_add_block", BridgeAddBlockReducer),
   __reducerSchema("bridge_add_friend", BridgeAddFriendReducer),
   __reducerSchema("bridge_add_guild_member", BridgeAddGuildMemberReducer),

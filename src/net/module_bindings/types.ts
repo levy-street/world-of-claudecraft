@@ -27,7 +27,6 @@ export const AuthState = __t.object("AuthState", {
   owner: __t.identity(),
   accountId: __t.u64(),
   username: __t.string(),
-  token: __t.string(),
   expiresAt: __t.timestamp(),
   error: __t.string(),
 });

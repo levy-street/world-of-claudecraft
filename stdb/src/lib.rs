@@ -1,3 +1,5 @@
+use pbkdf2::pbkdf2_hmac;
+use serde::Serialize;
 use sha2::{Digest, Sha256};
 use spacetimedb::{client_visibility_filter, reducer, table, Filter, Identity, ReducerContext, Table, Timestamp};
 
@@ -5,6 +7,9 @@ const REALM_NAME: &str = "Claudemoon";
 const SESSION_TTL_MICROS: i64 = 7 * 24 * 60 * 60 * 1_000_000;
 const SNAPSHOT_TTL_MICROS: i64 = 30_000_000;
 const BRIDGE_AUTH_ID: u64 = 0;
+const BRIDGE_SETUP_TOKEN_HASH: Option<&str> = option_env!("STDB_BRIDGE_SETUP_TOKEN_SHA256");
+const PASSWORD_KDF_ITERS: u32 = 210_000;
+const PASSWORD_HASH_BYTES: usize = 32;
 
 #[client_visibility_filter]
 const AUTH_STATE_OWNER: Filter = Filter::Sql("SELECT * FROM auth_state WHERE owner = :sender");
@@ -38,7 +43,6 @@ pub struct AuthState {
     pub owner: Identity,
     pub account_id: u64,
     pub username: String,
-    pub token: String,
     pub expires_at: Timestamp,
     pub error: String,
 }
@@ -211,6 +215,18 @@ pub struct BridgeAuth {
     pub id: u64,
     pub owner: Identity,
     pub created_at: Timestamp,
+}
+
+#[derive(Serialize)]
+struct CharacterRosterEntry {
+    id: u64,
+    name: String,
+    #[serde(rename = "class")]
+    class_name: String,
+    level: u32,
+    online: bool,
+    #[serde(rename = "forceRename")]
+    force_rename: bool,
 }
 
 #[derive(Clone)]
@@ -632,6 +648,28 @@ pub fn bridge_ping(ctx: &ReducerContext, sessions: u32, tick: u64) -> Result<(),
 }
 
 #[reducer]
+pub fn authorize_bridge(ctx: &ReducerContext, setup_token: String) -> Result<(), String> {
+    let Some(expected_hash) = BRIDGE_SETUP_TOKEN_HASH else {
+        return Err("bridge setup token is not configured".into());
+    };
+    if !constant_time_eq(&hex_sha256(setup_token.trim()), expected_hash) {
+        return Err("bridge setup token is invalid".into());
+    }
+    if let Some(auth) = ctx.db.bridge_auth().id().find(BRIDGE_AUTH_ID) {
+        if auth.owner == ctx.sender() {
+            return Ok(());
+        }
+        return Err("bridge already authorized".into());
+    }
+    ctx.db.bridge_auth().insert(BridgeAuth {
+        id: BRIDGE_AUTH_ID,
+        owner: ctx.sender(),
+        created_at: ctx.timestamp,
+    });
+    Ok(())
+}
+
+#[reducer]
 pub fn bridge_attach_session(ctx: &ReducerContext, session_id: u64, player_id: u32) -> Result<(), String> {
     require_bridge(ctx)?;
     let Some(mut session) = ctx.db.world_session().id().find(session_id) else {
@@ -953,12 +991,7 @@ fn require_bridge(ctx: &ReducerContext) -> Result<(), String> {
         }
         return Ok(());
     }
-    ctx.db.bridge_auth().insert(BridgeAuth {
-        id: BRIDGE_AUTH_ID,
-        owner: ctx.sender(),
-        created_at: ctx.timestamp,
-    });
-    Ok(())
+    Err("bridge not authorized".into())
 }
 
 fn require_owned_character(ctx: &ReducerContext, account_id: u64, character_id: u64) -> Result<Character, String> {
@@ -1002,7 +1035,6 @@ fn write_auth_success(ctx: &ReducerContext, account_id: u64, username: String) {
         owner: ctx.sender(),
         account_id,
         username,
-        token: make_token(ctx, account_id),
         expires_at: ctx.timestamp + spacetimedb::TimeDuration::from_micros(SESSION_TTL_MICROS),
         error: String::new(),
     };
@@ -1018,7 +1050,6 @@ fn write_auth_error(ctx: &ReducerContext, error: &str) {
         owner: ctx.sender(),
         account_id: 0,
         username: String::new(),
-        token: String::new(),
         expires_at: ctx.timestamp,
         error: error.to_string(),
     };
@@ -1032,23 +1063,18 @@ fn write_auth_error(ctx: &ReducerContext, error: &str) {
 fn upsert_roster(ctx: &ReducerContext, account_id: u64, error: &str) {
     let mut rows: Vec<Character> = ctx.db.character().by_account().filter(account_id).collect();
     rows.sort_by(|a, b| a.id.cmp(&b.id));
-    let characters_json = format!(
-        "[{}]",
-        rows.iter()
-            .map(|c| {
-                format!(
-                    "{{\"id\":{},\"name\":\"{}\",\"class\":\"{}\",\"level\":{},\"online\":{},\"forceRename\":{}}}",
-                    c.id,
-                    json_escape(&c.name),
-                    json_escape(&c.class_name),
-                    c.level,
-                    c.online,
-                    c.force_rename
-                )
-            })
-            .collect::<Vec<_>>()
-            .join(",")
-    );
+    let entries: Vec<CharacterRosterEntry> = rows
+        .into_iter()
+        .map(|c| CharacterRosterEntry {
+            id: c.id,
+            name: c.name,
+            class_name: c.class_name,
+            level: c.level,
+            online: c.online,
+            force_rename: c.force_rename,
+        })
+        .collect();
+    let characters_json = serde_json::to_string(&entries).unwrap_or_else(|_| "[]".to_string());
     let row = CharacterRoster {
         owner: ctx.sender(),
         account_id,
@@ -1197,28 +1223,52 @@ fn clean_guild_rank(raw: &str) -> Result<String, String> {
 }
 
 fn make_salt(ctx: &ReducerContext, key: &str) -> String {
-    hex_sha256(&format!("{:?}:{}:{}", ctx.sender(), key, ctx.timestamp.to_micros_since_unix_epoch()))
-}
-
-fn make_token(ctx: &ReducerContext, account_id: u64) -> String {
-    hex_sha256(&format!("{:?}:{}:{}", ctx.sender(), account_id, ctx.timestamp.to_micros_since_unix_epoch()))
+    let nonce_a: u128 = ctx.random();
+    let nonce_b: u128 = ctx.random();
+    hex_sha256(&format!(
+        "{:?}:{}:{}:{}:{}",
+        ctx.sender(),
+        key,
+        ctx.timestamp.to_micros_since_unix_epoch(),
+        nonce_a,
+        nonce_b
+    ))
 }
 
 fn hash_password(salt: &str, password: &str) -> Result<String, String> {
     if password.len() < 6 || password.len() > 128 {
         return Err("password must be 6-128 characters".into());
     }
-    Ok(hex_sha256(&format!("{}:{}", salt, password)))
+    let mut out = [0u8; PASSWORD_HASH_BYTES];
+    pbkdf2_hmac::<Sha256>(password.as_bytes(), salt.as_bytes(), PASSWORD_KDF_ITERS, &mut out);
+    Ok(format!("pbkdf2-sha256${}${}", PASSWORD_KDF_ITERS, hex_bytes(&out)))
 }
 
 fn hex_sha256(input: &str) -> String {
     let digest = Sha256::digest(input.as_bytes());
-    let mut out = String::with_capacity(digest.len() * 2);
-    for b in digest {
+    hex_bytes(&digest)
+}
+
+fn hex_bytes(bytes: &[u8]) -> String {
+    let mut out = String::with_capacity(bytes.len() * 2);
+    for b in bytes {
         out.push(nibble(b >> 4));
         out.push(nibble(b & 0x0f));
     }
     out
+}
+
+fn constant_time_eq(a: &str, b: &str) -> bool {
+    let a = a.as_bytes();
+    let b = b.as_bytes();
+    if a.len() != b.len() {
+        return false;
+    }
+    let mut diff = 0u8;
+    for i in 0..a.len() {
+        diff |= a[i] ^ b[i];
+    }
+    diff == 0
 }
 
 fn nibble(v: u8) -> char {
@@ -1226,15 +1276,4 @@ fn nibble(v: u8) -> char {
         0..=9 => (b'0' + v) as char,
         _ => (b'a' + (v - 10)) as char,
     }
-}
-
-fn json_escape(raw: &str) -> String {
-    raw.chars().flat_map(|c| match c {
-        '"' => "\\\"".chars().collect::<Vec<_>>(),
-        '\\' => "\\\\".chars().collect(),
-        '\n' => "\\n".chars().collect(),
-        '\r' => "\\r".chars().collect(),
-        '\t' => "\\t".chars().collect(),
-        c => vec![c],
-    }).collect()
 }

@@ -6,6 +6,7 @@
 import { type Infer as __Infer } from "spacetimedb";
 
 // Import all reducer arg schemas
+import AuthorizeBridgeReducer from "../authorize_bridge_reducer";
 import BridgeAddBlockReducer from "../bridge_add_block_reducer";
 import BridgeAddFriendReducer from "../bridge_add_friend_reducer";
 import BridgeAddGuildMemberReducer from "../bridge_add_guild_member_reducer";
@@ -40,6 +41,7 @@ import ReportPlayerReducer from "../report_player_reducer";
 import ReportPlayerByNameReducer from "../report_player_by_name_reducer";
 import SetInputReducer from "../set_input_reducer";
 
+export type AuthorizeBridgeParams = __Infer<typeof AuthorizeBridgeReducer>;
 export type BridgeAddBlockParams = __Infer<typeof BridgeAddBlockReducer>;
 export type BridgeAddFriendParams = __Infer<typeof BridgeAddFriendReducer>;
 export type BridgeAddGuildMemberParams = __Infer<typeof BridgeAddGuildMemberReducer>;

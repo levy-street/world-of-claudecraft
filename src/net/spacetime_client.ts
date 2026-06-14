@@ -20,12 +20,20 @@ function tokenKey(config: SpacetimeConnectionConfig): string {
 
 function readStoredToken(config: SpacetimeConnectionConfig): string | undefined {
   if (!storageAvailable()) return undefined;
-  return globalThis.localStorage.getItem(tokenKey(config)) ?? undefined;
+  try {
+    return globalThis.localStorage.getItem(tokenKey(config)) ?? undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 function writeStoredToken(config: SpacetimeConnectionConfig, token: string): void {
   if (!storageAvailable()) return;
-  globalThis.localStorage.setItem(tokenKey(config), token);
+  try {
+    globalThis.localStorage.setItem(tokenKey(config), token);
+  } catch {
+    // Storage can be disabled or quota-limited; the live connection is still valid.
+  }
 }
 
 export function table(db: unknown, camelName: string, snakeName = camelName): any {
@@ -62,6 +70,7 @@ export class StdbClient {
       const fail = (err: Error) => {
         if (settled) return;
         settled = true;
+        this.conn = null;
         this.connecting = null;
         reject(err);
       };
@@ -86,6 +95,10 @@ export class StdbClient {
             this.conn = null;
             this.connecting = null;
             const reason = error?.message || 'Connection to SpacetimeDB was lost.';
+            if (!settled) {
+              settled = true;
+              reject(new Error(reason));
+            }
             for (const handler of this.disconnectHandlers) handler(reason);
           })
           .build();

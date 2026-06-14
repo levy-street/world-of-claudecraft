@@ -10,10 +10,6 @@ import {
   type Infer as __Infer,
 } from "spacetimedb";
 
-export default __t.row({
-  owner: __t.identity().primaryKey(),
-  accountId: __t.u64().name("account_id"),
-  username: __t.string(),
-  expiresAt: __t.timestamp().name("expires_at"),
-  error: __t.string(),
-});
+export default {
+  setupToken: __t.string(),
+};
