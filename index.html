@@ -1239,6 +1239,9 @@
   /* ---------- online auth / character select ---------- */
   .mode-row { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; }
   .mode-card {
+    appearance: none;
+    display: block;
+    font: inherit;
     width: 100%;
     max-width: 280px;
     padding: 26px 22px;
@@ -1257,14 +1260,15 @@
     box-shadow: 0 0 22px var(--color-primary-glow), 0 4px 15px #000c;
     outline: none;
   }
-  .mode-card h2 {
+  .mode-title {
+    display: block;
     font-family: var(--font-heading);
     color: var(--color-primary);
     font-size: 22px;
     margin-bottom: 10px;
     text-shadow: 0 0 8px rgba(255,209,0,0.2), 1px 1px 2px #000;
   }
-  .mode-card p { font-size: 12px; color: #a0aabf; line-height: 1.55; }
+  .mode-copy { display: block; font-size: 12px; color: #a0aabf; line-height: 1.55; }
   #performance-tip {
     margin-top: var(--spacing-lg);
     font-size: 11px;
@@ -3413,14 +3417,14 @@
 
         <div id="mode-select">
           <div class="mode-row">
-            <div class="mode-card panel" id="btn-online" role="button" tabindex="0" data-i18n-aria="mode.onlineAria" aria-label="Play Online: log in to the persistent shared realm">
-              <h2 data-i18n="mode.onlineTitle">Play Online</h2>
-              <p data-i18n="mode.onlineDesc">Log in to the realm. Your characters live on the server and you share the world with everyone else who's on.</p>
-            </div>
-            <div class="mode-card panel" id="btn-offline" role="button" tabindex="0" data-i18n-aria="mode.offlineAria" aria-label="Play Offline: start an instant local single-player session">
-              <h2 data-i18n="mode.offlineTitle">Play Offline</h2>
-              <p data-i18n="mode.offlineDesc">Instant single-player world in your browser. Nothing is saved: perfect for a quick brawl or testing.</p>
-            </div>
+            <button type="button" class="mode-card panel" id="btn-online" data-i18n-aria="mode.onlineAria" aria-label="Play Online: log in to the persistent shared realm">
+              <span class="mode-title" data-i18n="mode.onlineTitle">Play Online</span>
+              <span class="mode-copy" data-i18n="mode.onlineDesc">Log in to the realm. Your characters live on the server and you share the world with everyone else who's on.</span>
+            </button>
+            <button type="button" class="mode-card panel" id="btn-offline" data-i18n-aria="mode.offlineAria" aria-label="Play Offline: start an instant local single-player session">
+              <span class="mode-title" data-i18n="mode.offlineTitle">Play Offline</span>
+              <span class="mode-copy" data-i18n="mode.offlineDesc">Instant single-player world in your browser. Nothing is saved: perfect for a quick brawl or testing.</span>
+            </button>
           </div>
           <div id="performance-tip"><b data-i18n="mode.tipTitle">TIP:</b> <span data-i18n="mode.tipText">For the smoothest experience, turn off ad blocker extensions on this site. Community reports found some blockers can cause lag.</span></div>
         </div>

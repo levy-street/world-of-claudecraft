@@ -1523,10 +1523,7 @@ function wireStartScreens(): void {
   };
 
   onlineBtn.addEventListener('click', handleOnlineSelect);
-  onlineBtn.addEventListener('keydown', (e) => handleKeyboardActivation(e as KeyboardEvent, handleOnlineSelect));
-  
   offlineBtn.addEventListener('click', handleOfflineSelect);
-  offlineBtn.addEventListener('keydown', (e) => handleKeyboardActivation(e as KeyboardEvent, handleOfflineSelect));
 
   btnStartOffline.addEventListener('click', () => {
     const selCard = document.querySelector('#offline-select .mini-class.sel') as HTMLElement | null;
