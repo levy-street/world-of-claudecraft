@@ -6,7 +6,7 @@ import {
   Entity, EquipSlot, InvSlot, MoveInput, PlayerClass, QuestProgress, QuestState, SimEvent,
   emptyMoveInput,
 } from '../sim/types';
-import type { CharacterSearchResult, DuelInfo, IWorld, PartyInfo, SocialInfo, TradeInfo } from '../world_api';
+import type { ArenaInfo, CharacterSearchResult, DuelInfo, IWorld, PartyInfo, SocialInfo, TradeInfo } from '../world_api';
 
 // ---------------------------------------------------------------------------
 // REST
@@ -149,6 +149,11 @@ function wrapAngle(d: number): number {
   return d;
 }
 
+// A single position update never moves an entity more than a few yards by
+// walking; anything past this is a teleport (arena pit, dungeon portal,
+// graveyard release). Those are snapped, not interpolated — see applyWire.
+const TELEPORT_SNAP_DIST_SQ = 40 * 40;
+
 function blankEntity(id: number): Entity {
   return {
     id, kind: 'mob', templateId: '', name: '', level: 1,
@@ -190,6 +195,7 @@ export class ClientWorld implements IWorld {
   partyInfo: PartyInfo | null = null;
   tradeInfo: TradeInfo | null = null;
   duelInfo: DuelInfo | null = null;
+  arenaInfo: ArenaInfo | null = null;
   socialInfo: SocialInfo | null = null;
   realm = '';
   // bumped whenever a fresh social snapshot lands, so an open panel re-renders
@@ -393,12 +399,25 @@ export class ClientWorld implements IWorld {
         }
       }
       e.netUpdatedAt = now;
-      e.prevPos = {
-        x: e.prevPos.x + (e.pos.x - e.prevPos.x) * entAlpha,
-        y: e.prevPos.y + (e.pos.y - e.prevPos.y) * entAlpha,
-        z: e.prevPos.z + (e.pos.z - e.prevPos.z) * entAlpha,
-      };
-      e.prevFacing = e.prevFacing + wrapAngle(e.facing - e.prevFacing) * entFacingAlpha;
+      // A teleport (arena pit, dungeon portal, graveyard release) jumps an
+      // entity far further than any single walking update could. Interpolating
+      // across that gap streaks it across the map — and when its per-entity
+      // interpolation clock isn't established yet, the renderer falls back to
+      // the global alpha and the entity sticks at its old pose until its next
+      // real update (e.g. taking damage). Snap both poses to the destination so
+      // it appears exactly where the server placed it.
+      const teleDx = w.x - e.pos.x, teleDz = w.z - e.pos.z;
+      if (teleDx * teleDx + teleDz * teleDz > TELEPORT_SNAP_DIST_SQ) {
+        e.prevPos = { x: w.x, y: w.y, z: w.z };
+        e.prevFacing = w.f;
+      } else {
+        e.prevPos = {
+          x: e.prevPos.x + (e.pos.x - e.prevPos.x) * entAlpha,
+          y: e.prevPos.y + (e.pos.y - e.prevPos.y) * entAlpha,
+          z: e.prevPos.z + (e.pos.z - e.prevPos.z) * entAlpha,
+        };
+        e.prevFacing = e.prevFacing + wrapAngle(e.facing - e.prevFacing) * entFacingAlpha;
+      }
       e.pos.x = w.x; e.pos.y = w.y; e.pos.z = w.z;
       e.facing = w.f;
       e.hp = w.hp;
@@ -470,6 +489,7 @@ export class ClientWorld implements IWorld {
       if (s.party !== undefined) this.partyInfo = s.party;
       if (s.trade !== undefined) this.tradeInfo = s.trade;
       if (s.duel !== undefined) this.duelInfo = s.duel;
+      if (s.arena !== undefined) this.arenaInfo = s.arena;
       // camera follows server-side facing changes when not mouselooking
       if (prevSelfFacing !== undefined && this.mouselookFacing === null) {
         let d = e.facing - prevSelfFacing;
@@ -612,6 +632,12 @@ export class ClientWorld implements IWorld {
   }
   duelDecline(): void {
     this.cmd({ cmd: 'duel_decline' });
+  }
+  arenaQueueJoin(): void {
+    this.cmd({ cmd: 'arena_queue' });
+  }
+  arenaQueueLeave(): void {
+    this.cmd({ cmd: 'arena_leave' });
   }
   // persistent social (resolved server-side by character name)
   friendAdd(name: string): void { this.cmd({ cmd: 'friend_add', name }); }

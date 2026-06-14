@@ -1,9 +1,10 @@
 import {
-  ABILITIES, CAMPS, CLASSES, DUNGEONS, DUNGEON_LIST, DungeonDef, dungeonAt,
-  DUNGEON_X_THRESHOLD, GROUND_OBJECTS, GROUP_XP_BONUS, INSTANCE_SLOT_COUNT,
+  ABILITIES, ARENA_SLOT_COUNT, CAMPS, CLASSES, DUNGEONS, DUNGEON_LIST, DungeonDef, arenaOrigin, dungeonAt,
+  DUNGEON_X_THRESHOLD, GROUND_OBJECTS, GROUP_XP_BONUS, INSTANCE_SLOT_COUNT, isArenaPos,
   ITEMS, MOBS, NPCS, PLAYER_START, QUESTS, REWARD_ARCHETYPE, abilitiesKnownAt, instanceOrigin,
   zoneAt,
 } from './data';
+import { ARENA_SPAWN_A, ARENA_SPAWN_B } from './dungeon_layout';
 import { resolvePosition } from './colliders';
 import { findPath } from './pathfind';
 import { createGroundObject, createMob, createNpc, createPlayer, recalcPlayerStats, PlayerEquipment } from './entity';
@@ -36,6 +37,14 @@ const OBJECT_RESPAWN = 30;
 const PARTY_MAX = 5;
 const PARTY_XP_RANGE = 80; // yards: members this close share kill xp/credit
 const DUEL_COUNTDOWN = 3;
+// Ashen Coliseum 1v1 arena
+const ARENA_COUNTDOWN = 5; // gates pre-fight: heal up, no swings land yet
+const ARENA_RETURN_DELAY = 5; // aftermath: hold on the sands before going home
+const ARENA_MAX_DURATION = 150; // seconds; a stalling match resolves on hp%
+const ARENA_BASE_RATING = 1500; // every character starts here, unranked
+const ARENA_MIN_RATING = 100; // a rating floor so a losing streak can't go absurd
+const ARENA_K_FACTOR = 32; // Elo sensitivity per match
+const ARENA_LADDER_SIZE = 10; // live online standings shipped to clients
 const SAY_RANGE = 25; // /say carries a short distance; /yell across a camp
 const YELL_RANGE = 100;
 const CHAT_BURST = 8; // messages a player may send back-to-back...
@@ -79,6 +88,30 @@ export interface DuelState {
   b: number;
   state: 'countdown' | 'active';
   timer: number; // countdown remaining / elapsed
+}
+
+// A live 1v1 arena bout. Both combatants are teleported into a private arena
+// instance slot; `return*` remembers where each was standing so the match can
+// put them back when it ends. Ratings are snapshotted at the start purely for
+// the result message — the authoritative values live on each PlayerMeta.
+export interface ArenaMatch {
+  id: number;
+  a: number; // pid
+  b: number; // pid
+  slot: number; // arena instance slot
+  state: 'countdown' | 'active' | 'over';
+  timer: number; // countdown remaining, then elapsed once active, then return countdown
+  returnA: { x: number; z: number; facing: number };
+  returnB: { x: number; z: number; facing: number };
+  ratingA: number;
+  ratingB: number;
+}
+
+// Standard Elo. Returns the points the winner gains (and the loser loses) for
+// an outright result; a draw moves each toward its expected score by half.
+export function eloDelta(winnerRating: number, loserRating: number, score = 1): number {
+  const expected = 1 / (1 + 10 ** ((loserRating - winnerRating) / 400));
+  return Math.round(ARENA_K_FACTOR * (score - expected));
 }
 
 export interface InstanceSlot {
@@ -133,9 +166,15 @@ export interface PlayerMeta {
   questsDone: Set<string>;
   counters: RewardCounters;
   autoEquip: boolean;
+  // Ashen Coliseum standing — persisted in CharacterState
+  arenaRating: number;
+  arenaWins: number;
+  arenaLosses: number;
 }
 
-// Persistable character state (stored as JSONB server-side).
+// Persistable character state (stored as JSONB server-side). The arena fields
+// are optional so characters saved before the Ashen Coliseum existed load
+// cleanly (addPlayer falls back to the unranked defaults).
 export interface CharacterState {
   level: number;
   xp: number;
@@ -148,6 +187,9 @@ export interface CharacterState {
   inventory: InvSlot[];
   questLog: { questId: string; counts: number[]; state: 'active' | 'ready' | 'done' }[];
   questsDone: string[];
+  arenaRating?: number;
+  arenaWins?: number;
+  arenaLosses?: number;
 }
 
 // Pure quest-state computation, shared by the sim and the network client.
@@ -210,6 +252,12 @@ export class Sim {
   tradeInvites = new Map<number, { fromPid: number; expires: number }>();
   duels = new Map<number, DuelState>(); // pid -> shared duel (both pids)
   duelInvites = new Map<number, { fromPid: number; expires: number }>();
+  // arena: a matchmaking queue (pids, oldest first), live bouts keyed by both
+  // pids, and the set of busy instance slots
+  arenaQueue: number[] = [];
+  arenaMatches = new Map<number, ArenaMatch>(); // pid -> shared match (both pids)
+  private arenaBusySlots = new Set<number>();
+  private nextArenaMatchId = 1;
   // per-player chat token bucket (anti-spam); refilled lazily by sim time
   private chatTokens = new Map<number, { tokens: number; at: number }>();
   // dungeon instances
@@ -333,6 +381,9 @@ export class Sim {
       questsDone: new Set(),
       counters: freshCounters(),
       autoEquip: opts?.autoEquip ?? false,
+      arenaRating: opts?.state?.arenaRating ?? ARENA_BASE_RATING,
+      arenaWins: opts?.state?.arenaWins ?? 0,
+      arenaLosses: opts?.state?.arenaLosses ?? 0,
     };
     this.players.set(player.id, meta);
     if (this.primaryId === -1) this.primaryId = player.id;
@@ -377,6 +428,10 @@ export class Sim {
     if (trade) this.tradeCancel(pid);
     const duel = this.duels.get(pid);
     if (duel) this.endDuel(duel, duel.a === pid ? duel.b : duel.a);
+    // arena: leaving the queue is free; disconnecting mid-bout forfeits it
+    this.arenaDequeue(pid);
+    const match = this.arenaMatches.get(pid);
+    if (match) this.endArenaMatch(match, match.a === pid ? match.b : match.a, 'forfeit');
     this.partyInvites.delete(pid);
     this.tradeInvites.delete(pid);
     this.duelInvites.delete(pid);
@@ -422,6 +477,9 @@ export class Sim {
       inventory: meta.inventory.map((i) => ({ ...i })),
       questLog: [...meta.questLog.values()].map((q) => ({ questId: q.questId, counts: [...q.counts], state: q.state })),
       questsDone: [...meta.questsDone],
+      arenaRating: meta.arenaRating,
+      arenaWins: meta.arenaWins,
+      arenaLosses: meta.arenaLosses,
     };
   }
 
@@ -621,6 +679,7 @@ export class Sim {
     }
 
     this.updateDuels();
+    this.updateArena();
     this.updateTradesAndInvites();
     this.updateInstances();
 
@@ -1885,6 +1944,18 @@ export class Sim {
       }
     }
 
+    // arena bouts also end at 1 hp — the loser yields, nobody actually dies
+    const match = target.kind === 'player' ? this.arenaMatches.get(target.id) : undefined;
+    if (match && match.state === 'active' && source && (source.id === match.a || source.id === match.b)) {
+      if (target.hp - amount < 1) {
+        amount = Math.max(0, target.hp - 1);
+        target.hp = 1;
+        this.emit({ type: 'damage', sourceId: source.id, targetId: target.id, amount, crit, school, ability, kind });
+        this.endArenaMatch(match, source.id, 'defeat');
+        return;
+      }
+    }
+
     target.hp = Math.max(0, target.hp - amount);
     this.emit({ type: 'damage', sourceId: source?.id ?? -1, targetId: target.id, amount, crit, school, ability, kind });
 
@@ -3076,7 +3147,9 @@ export class Sim {
     if (target.kind === 'mob') return target.hostile;
     if (target.kind === 'player' && attacker.kind === 'player') {
       const duel = this.duels.get(attacker.id);
-      return !!duel && duel.state === 'active' && (duel.a === target.id || duel.b === target.id);
+      if (duel && duel.state === 'active' && (duel.a === target.id || duel.b === target.id)) return true;
+      const match = this.arenaMatches.get(attacker.id);
+      return !!match && match.state === 'active' && (match.a === target.id || match.b === target.id);
     }
     return false;
   }
@@ -3324,6 +3397,312 @@ export class Sim {
 
   duelFor(pid: number): DuelState | null {
     return this.duels.get(pid) ?? null;
+  }
+
+  // -------------------------------------------------------------------------
+  // The Ashen Coliseum — 1v1 ranked arena (queue, matchmaking, Elo)
+  // -------------------------------------------------------------------------
+
+  arenaQueueJoin(pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    const id = r.meta.entityId;
+    if (this.arenaQueue.includes(id)) {
+      // already waiting — just re-affirm their place in line
+      this.emit({ type: 'arenaQueued', position: this.arenaQueue.indexOf(id) + 1, pid: id });
+      return;
+    }
+    if (this.arenaMatches.has(id)) { this.error(id, 'You are already in an arena match.'); return; }
+    if (r.e.dead) { this.error(id, 'You cannot queue for the arena while dead.'); return; }
+    if (this.duels.has(id)) { this.error(id, 'You cannot queue while dueling.'); return; }
+    if (this.trades.has(id)) { this.error(id, 'Finish your trade before queueing.'); return; }
+    if (r.e.pos.x > DUNGEON_X_THRESHOLD) { this.error(id, 'You cannot queue from inside an instance.'); return; }
+    this.arenaQueue.push(id);
+    this.emit({ type: 'arenaQueued', position: this.arenaQueue.length, pid: id });
+    this.emit({ type: 'log', text: 'You join the Ashen Coliseum queue. Stand by for a worthy opponent…', color: '#ffa040', pid: id });
+  }
+
+  arenaQueueLeave(pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    if (this.arenaDequeue(r.meta.entityId)) {
+      this.emit({ type: 'arenaUnqueued', pid: r.meta.entityId });
+      this.emit({ type: 'log', text: 'You leave the Ashen Coliseum queue.', color: '#ffa040', pid: r.meta.entityId });
+    }
+  }
+
+  private arenaDequeue(pid: number): boolean {
+    const i = this.arenaQueue.indexOf(pid);
+    if (i < 0) return false;
+    this.arenaQueue.splice(i, 1);
+    return true;
+  }
+
+  private freeArenaSlot(): number | null {
+    for (let i = 0; i < ARENA_SLOT_COUNT; i++) {
+      if (!this.arenaBusySlots.has(i)) return i;
+    }
+    return null;
+  }
+
+  private updateArena(): void {
+    this.matchmakeArena();
+    const seen = new Set<ArenaMatch>();
+    for (const match of this.arenaMatches.values()) {
+      if (seen.has(match)) continue;
+      seen.add(match);
+      const ea = this.entities.get(match.a);
+      const eb = this.entities.get(match.b);
+      if (!ea || !eb) {
+        // someone logged out: an already-decided bout just sends the survivor
+        // home; an in-progress one is forfeited to the remaining fighter
+        if (match.state === 'over') this.returnFromArena(match);
+        else this.endArenaMatch(match, ea ? match.a : eb ? match.b : null, 'forfeit');
+        continue;
+      }
+      if (match.state === 'over') {
+        // aftermath: both already cleansed and scored — count down, then go home
+        match.timer -= DT;
+        if (match.timer <= 0) this.returnFromArena(match);
+        continue;
+      }
+      if (match.state === 'countdown') {
+        const before = Math.ceil(match.timer);
+        match.timer -= DT;
+        const after = Math.ceil(match.timer);
+        if (after < before && after > 0) {
+          for (const mPid of [match.a, match.b]) this.emit({ type: 'arenaCountdown', seconds: after, pid: mPid });
+        }
+        if (match.timer <= 0) {
+          match.state = 'active';
+          match.timer = 0;
+          for (const e of [ea, eb]) this.resetForArena(e);
+          for (const mPid of [match.a, match.b]) {
+            this.emit({ type: 'log', text: 'Fight!', color: '#ff5a3c', pid: mPid });
+            this.emit({ type: 'arenaStart', pid: mPid });
+          }
+        }
+        continue;
+      }
+      // active: a stalling bout resolves on remaining-health fraction
+      match.timer += DT;
+      if (match.timer >= ARENA_MAX_DURATION) {
+        const fa = ea.hp / Math.max(1, ea.maxHp);
+        const fb = eb.hp / Math.max(1, eb.maxHp);
+        const winner = Math.abs(fa - fb) < 0.02 ? null : fa > fb ? match.a : match.b;
+        this.endArenaMatch(match, winner, 'timeout');
+      }
+    }
+  }
+
+  // Pair the longest-waiting contender with the nearest-rated opponent still in
+  // line, one bout per free slot. Skips (and drops) anyone who went offline or
+  // died while waiting.
+  private matchmakeArena(): void {
+    let guard = ARENA_SLOT_COUNT + 1;
+    while (guard-- > 0) {
+      this.arenaQueue = this.arenaQueue.filter((id) => {
+        const e = this.entities.get(id);
+        return !!e && !e.dead && !this.arenaMatches.has(id);
+      });
+      if (this.arenaQueue.length < 2 || this.freeArenaSlot() === null) return;
+      const aPid = this.arenaQueue[0];
+      const aRating = this.players.get(aPid)?.arenaRating ?? ARENA_BASE_RATING;
+      let bPid = -1, bestGap = Infinity;
+      for (let i = 1; i < this.arenaQueue.length; i++) {
+        const id = this.arenaQueue[i];
+        const gap = Math.abs((this.players.get(id)?.arenaRating ?? ARENA_BASE_RATING) - aRating);
+        if (gap < bestGap) { bestGap = gap; bPid = id; }
+      }
+      if (bPid < 0) return;
+      this.arenaDequeue(aPid);
+      this.arenaDequeue(bPid);
+      this.startArenaMatch(aPid, bPid);
+    }
+  }
+
+  private startArenaMatch(aPid: number, bPid: number): void {
+    const slot = this.freeArenaSlot();
+    const aMeta = this.players.get(aPid);
+    const bMeta = this.players.get(bPid);
+    const ea = this.entities.get(aPid);
+    const eb = this.entities.get(bPid);
+    if (slot === null || !aMeta || !bMeta || !ea || !eb) {
+      // couldn't seat them — put them back so the next tick retries
+      if (this.entities.get(aPid)) this.arenaQueue.unshift(aPid);
+      if (this.entities.get(bPid)) this.arenaQueue.unshift(bPid);
+      return;
+    }
+    this.arenaBusySlots.add(slot);
+    const match: ArenaMatch = {
+      id: this.nextArenaMatchId++, a: aPid, b: bPid, slot, state: 'countdown', timer: ARENA_COUNTDOWN,
+      returnA: { x: ea.pos.x, z: ea.pos.z, facing: ea.facing },
+      returnB: { x: eb.pos.x, z: eb.pos.z, facing: eb.facing },
+      ratingA: aMeta.arenaRating, ratingB: bMeta.arenaRating,
+    };
+    this.arenaMatches.set(aPid, match);
+    this.arenaMatches.set(bPid, match);
+    const origin = arenaOrigin(slot);
+    this.placeInArena(ea, origin, ARENA_SPAWN_A);
+    this.placeInArena(eb, origin, ARENA_SPAWN_B);
+    this.resetForArena(ea);
+    this.resetForArena(eb);
+    this.emit({ type: 'arenaFound', oppName: bMeta.name, oppClass: bMeta.cls, oppLevel: eb.level, pid: aPid });
+    this.emit({ type: 'arenaFound', oppName: aMeta.name, oppClass: aMeta.cls, oppLevel: ea.level, pid: bPid });
+    for (const mPid of [aPid, bPid]) {
+      this.emit({ type: 'arenaCountdown', seconds: ARENA_COUNTDOWN, pid: mPid });
+      this.emit({ type: 'log', text: 'You step onto the sands of the Ashen Coliseum.', color: '#ffa040', pid: mPid });
+    }
+  }
+
+  private placeInArena(e: Entity, origin: { x: number; z: number }, spawn: { x: number; z: number; facing: number }): void {
+    e.pos = this.groundPos(origin.x + spawn.x, origin.z + spawn.z);
+    e.prevPos = { ...e.pos };
+    e.facing = spawn.facing;
+    e.prevFacing = spawn.facing;
+    this.rebucket(e);
+  }
+
+  // A clean slate so the bout is decided by play, not by what each fighter
+  // walked in carrying: full health/resource, cooldowns and combat reset.
+  private resetForArena(e: Entity): void {
+    const meta = this.players.get(e.id);
+    if (meta) recalcPlayerStats(e, meta.cls, meta.equipment);
+    e.auras = [];
+    e.hp = e.maxHp;
+    e.resource = e.resourceType === 'mana' ? e.maxResource : e.resourceType === 'energy' ? 100 : 0;
+    e.targetId = null;
+    e.autoAttack = false;
+    e.queuedOnSwing = null;
+    e.castingAbility = null;
+    e.castRemaining = 0;
+    e.channeling = false;
+    e.comboPoints = 0;
+    e.comboTargetId = null;
+    e.cooldowns.clear();
+    e.gcdRemaining = 0;
+    e.swingTimer = 0;
+    e.chargeTargetId = null;
+    e.chargePath = [];
+    e.combatTimer = 99;
+    e.inCombat = false;
+    e.sitting = false;
+    e.eating = null;
+    e.drinking = null;
+  }
+
+  // Decide a bout: score it (once), then either send a survivor home now (a
+  // forfeit, where the other fighter is gone) or hold both on the sands for a
+  // brief aftermath before returning them. winnerPid null = draw; reason is
+  // informational (defeat/timeout/forfeit).
+  private endArenaMatch(match: ArenaMatch, winnerPid: number | null, reason: 'defeat' | 'timeout' | 'forfeit'): void {
+    const aMeta = this.players.get(match.a);
+    const bMeta = this.players.get(match.b);
+    const ea = this.entities.get(match.a);
+    const eb = this.entities.get(match.b);
+
+    // rating: zero-sum Elo. A draw nudges each toward its expected score.
+    if (aMeta && bMeta) {
+      const ratingA0 = aMeta.arenaRating;
+      const ratingB0 = bMeta.arenaRating;
+      let deltaA: number;
+      if (winnerPid === null) {
+        deltaA = eloDelta(ratingA0, ratingB0, 0.5);
+        aMeta.arenaWins += 0; bMeta.arenaWins += 0; // draws count as neither
+      } else if (winnerPid === match.a) {
+        deltaA = eloDelta(ratingA0, ratingB0, 1);
+        aMeta.arenaWins++; bMeta.arenaLosses++;
+      } else {
+        deltaA = -eloDelta(ratingB0, ratingA0, 1);
+        bMeta.arenaWins++; aMeta.arenaLosses++;
+      }
+      aMeta.arenaRating = Math.max(ARENA_MIN_RATING, ratingA0 + deltaA);
+      bMeta.arenaRating = Math.max(ARENA_MIN_RATING, ratingB0 - deltaA);
+      this.emit({
+        type: 'arenaEnd', pid: match.a, draw: winnerPid === null, won: winnerPid === match.a,
+        oppName: bMeta.name, ratingBefore: ratingA0, ratingAfter: aMeta.arenaRating,
+      });
+      this.emit({
+        type: 'arenaEnd', pid: match.b, draw: winnerPid === null, won: winnerPid === match.b,
+        oppName: aMeta.name, ratingBefore: ratingB0, ratingAfter: bMeta.arenaRating,
+      });
+    }
+
+    // a forfeit (rage-quit / disconnect) has no aftermath — send the survivor
+    // home immediately rather than leaving them on empty sands
+    if (reason === 'forfeit' || !ea || !eb) { this.returnFromArena(match); return; }
+
+    // decided bout: cleanse both right now so no arena auras/DoTs tick during
+    // the wait, then hold them on the sands for the aftermath countdown
+    this.resetForArena(ea);
+    this.resetForArena(eb);
+    match.state = 'over';
+    match.timer = ARENA_RETURN_DELAY;
+    for (const mPid of [match.a, match.b]) {
+      this.emit({ type: 'log', text: 'The bout is decided. Returning to the world…', color: '#ffa040', pid: mPid });
+    }
+  }
+
+  // Teleport both fighters back to where they queued, fully cleansed (no arena
+  // auras, DoTs, debuffs, cooldowns or combat state follow them out), and
+  // release the instance slot.
+  private returnFromArena(match: ArenaMatch): void {
+    this.arenaMatches.delete(match.a);
+    this.arenaMatches.delete(match.b);
+    this.arenaBusySlots.delete(match.slot);
+    for (const [e, ret] of [[this.entities.get(match.a), match.returnA], [this.entities.get(match.b), match.returnB]] as const) {
+      if (!e) continue;
+      this.resetForArena(e); // strips every aura/effect/cooldown and heals to full
+      e.pos = this.groundPos(ret.x, ret.z);
+      e.prevPos = { ...e.pos };
+      e.facing = ret.facing;
+      e.dead = false;
+      this.rebucket(e);
+      this.emit({ type: 'respawn', pid: e.id });
+    }
+  }
+
+  arenaMatchFor(pid: number): ArenaMatch | null {
+    return this.arenaMatches.get(pid) ?? null;
+  }
+
+  // Live standings of rated players currently online, best first.
+  arenaLadder(): import('../world_api').ArenaLadderEntry[] {
+    const rows: import('../world_api').ArenaLadderEntry[] = [];
+    for (const meta of this.players.values()) {
+      const e = this.entities.get(meta.entityId);
+      if (!e) continue;
+      rows.push({ pid: meta.entityId, name: meta.name, cls: meta.cls, rating: meta.arenaRating, wins: meta.arenaWins, losses: meta.arenaLosses });
+    }
+    rows.sort((x, y) => y.rating - x.rating || y.wins - x.wins);
+    return rows.slice(0, ARENA_LADDER_SIZE);
+  }
+
+  arenaInfoFor(pid: number): import('../world_api').ArenaInfo | null {
+    const meta = this.players.get(pid);
+    if (!meta) return null;
+    const match = this.arenaMatches.get(pid);
+    let matchInfo: import('../world_api').ArenaInfo['match'] = null;
+    if (match) {
+      const oppPid = match.a === pid ? match.b : match.a;
+      const oppMeta = this.players.get(oppPid);
+      const oppE = this.entities.get(oppPid);
+      if (oppMeta && oppE) {
+        matchInfo = {
+          state: match.state, oppName: oppMeta.name, oppClass: oppMeta.cls, oppLevel: oppE.level, oppPid,
+          returnIn: match.state === 'over' ? Math.max(0, Math.ceil(match.timer)) : undefined,
+        };
+      }
+    }
+    return {
+      rating: meta.arenaRating,
+      wins: meta.arenaWins,
+      losses: meta.arenaLosses,
+      queued: this.arenaQueue.includes(pid),
+      queueSize: this.arenaQueue.length,
+      match: matchInfo,
+      ladder: this.arenaLadder(),
+    };
   }
 
   // -------------------------------------------------------------------------
@@ -3682,6 +4061,10 @@ export class Sim {
     if (!d) return null;
     const otherPid = d.a === this.primaryId ? d.b : d.a;
     return { otherPid, otherName: this.players.get(otherPid)?.name ?? '?', state: d.state };
+  }
+
+  get arenaInfo(): import('../world_api').ArenaInfo | null {
+    return this.primaryId === -1 ? null : this.arenaInfoFor(this.primaryId);
   }
 
   instanceSlotAt(pos: Vec3): number | null {

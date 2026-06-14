@@ -1,6 +1,8 @@
 import { generateDecorations } from './world';
-import { DUNGEON_X_THRESHOLD, INSTANCE_SLOT_COUNT, PROPS, dungeonAt, instanceOrigin } from './data';
-import { CRYPT_LAYOUT, SANCTUM_LAYOUT, layoutColliders } from './dungeon_layout';
+import {
+  DUNGEON_X_THRESHOLD, INSTANCE_SLOT_COUNT, PROPS, arenaOriginAt, dungeonAt, instanceOrigin, isArenaPos,
+} from './data';
+import { ARENA_LAYOUT, CRYPT_LAYOUT, SANCTUM_LAYOUT, layoutColliders } from './dungeon_layout';
 
 // Static world collision. Prop placement comes from the per-zone content
 // modules (merged into PROPS by sim/data.ts): the renderer builds its meshes
@@ -85,6 +87,7 @@ function staticWorldColliders(seed: number): Collider[] {
 // drift apart. The boss dais is walkable and deliberately has no collider.
 const CRYPT_COLLIDERS: Collider[] = layoutColliders(CRYPT_LAYOUT);
 const SANCTUM_COLLIDERS: Collider[] = layoutColliders(SANCTUM_LAYOUT);
+const ARENA_COLLIDERS: Collider[] = layoutColliders(ARENA_LAYOUT);
 
 // Interior collider sets keyed by DungeonDef.interior.
 const INTERIOR_COLLIDERS: Record<string, Collider[]> = {
@@ -194,6 +197,11 @@ function instanceLocal(x: number, z: number): { ox: number; oz: number; interior
 // Resolve a movement destination against all static geometry. Movers slide
 // along obstacles. `r` is the body radius.
 export function resolvePosition(seed: number, x: number, z: number, r = 0.5): { x: number; z: number } {
+  if (isArenaPos(x)) {
+    const o = arenaOriginAt(z);
+    const local = resolveAgainst(ARENA_COLLIDERS, x - o.x, z - o.z, r);
+    return { x: local.x + o.x, z: local.z + o.z };
+  }
   if (x > DUNGEON_X_THRESHOLD) {
     const { ox, oz, interior } = instanceLocal(x, z);
     const colliders = INTERIOR_COLLIDERS[interior] ?? CRYPT_COLLIDERS;

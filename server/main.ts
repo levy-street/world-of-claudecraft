@@ -5,7 +5,7 @@ import { WebSocketServer, WebSocket } from 'ws';
 import {
   ensureSchema, pool, createAccount, findAccount, touchLogin, saveToken, accountForToken,
   listCharacters, getCharacter, createCharacter, deleteCharacter, closeOrphanSessions,
-  pruneChatLogs, searchCharacters, characterCountsByRealm, moderationStatusForAccount, renameCharacter,
+  pruneChatLogs, topArenaRatings, searchCharacters, characterCountsByRealm, moderationStatusForAccount, renameCharacter,
   findCharacterReportTargetByName,
 } from './db';
 import { cleanReportReason, createPlayerReport } from './moderation_db';
@@ -273,6 +273,10 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         players_online: game.clients.size,
         names: [...game.clients.values()].map((s) => s.name),
       });
+    }
+    if (req.method === 'GET' && url === '/api/arena/leaderboard') {
+      // public all-time Ashen Coliseum ladder (top rated characters)
+      return json(res, 200, { leaders: await topArenaRatings(20) });
     }
     json(res, 404, { error: 'unknown endpoint' });
   } catch (err: any) {

@@ -41,6 +41,34 @@ export interface DuelInfo {
   state: 'countdown' | 'active';
 }
 
+export interface ArenaLadderEntry {
+  pid: number;
+  name: string;
+  cls: PlayerClass;
+  rating: number;
+  wins: number;
+  losses: number;
+}
+
+export interface ArenaInfo {
+  rating: number;
+  wins: number;
+  losses: number;
+  queued: boolean;
+  queueSize: number;
+  // present only while in a match
+  match: {
+    state: 'countdown' | 'active' | 'over';
+    oppName: string;
+    oppClass: PlayerClass;
+    oppLevel: number;
+    oppPid: number;
+    returnIn?: number; // whole seconds left in the post-bout aftermath ('over')
+  } | null;
+  // live standings of rated players currently online, best first
+  ladder: ArenaLadderEntry[];
+}
+
 // Persistent social state, mirrored from the server's SocialService. Mirrors
 // server/social.ts shapes; kept here so the HUD has no server-side imports.
 export type PresenceStatus = 'online' | 'combat' | 'dungeon' | 'dead';
@@ -79,7 +107,6 @@ export interface CharacterSearchResult {
   cls: string;
   level: number;
 }
-
 // The surface the renderer + HUD need from a game world. The offline `Sim`
 // satisfies this structurally; the online `ClientWorld` implements it by
 // mirroring server snapshots and sending commands over the socket.
@@ -119,6 +146,7 @@ export interface IWorld {
   partyInfo: PartyInfo | null;
   tradeInfo: TradeInfo | null;
   duelInfo: DuelInfo | null;
+  arenaInfo: ArenaInfo | null;
   partyInvite(targetPid: number): void;
   partyAccept(): void;
   partyDecline(): void;
@@ -132,6 +160,8 @@ export interface IWorld {
   duelRequest(targetPid: number): void;
   duelAccept(): void;
   duelDecline(): void;
+  arenaQueueJoin(): void;
+  arenaQueueLeave(): void;
   // the realm (world/shard) this character lives on; '' in offline play
   realm: string;
   // persistent social: friends, ignore/block, guilds (online play only)

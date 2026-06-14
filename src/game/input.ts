@@ -13,7 +13,7 @@ const BASE_LOOK_SENS = 0.0045;
 export interface InputCallbacks {
   onTab(): void;
   onAbility(slot: number): void;
-  onUiKey(key: 'interact' | 'bags' | 'char' | 'spellbook' | 'questlog' | 'map' | 'nameplates' | 'escape' | 'chat' | 'meters' | 'social'): void;
+  onUiKey(key: 'interact' | 'bags' | 'char' | 'spellbook' | 'questlog' | 'map' | 'nameplates' | 'escape' | 'chat' | 'meters' | 'arena' | 'social'): void;
   onClickPick(x: number, y: number, button: number): void;
 }
 
@@ -102,6 +102,7 @@ export class Input {
       case 'map': this.cb.onUiKey('map'); return;
       case 'nameplates': this.cb.onUiKey('nameplates'); return;
       case 'meters': this.cb.onUiKey('meters'); return;
+      case 'arena': this.cb.onUiKey('arena'); return;
       case 'social': this.cb.onUiKey('social'); return;
       case 'chat': this.cb.onUiKey('chat'); return;
     }

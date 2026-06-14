@@ -656,6 +656,9 @@ export class GameServer {
       case 'duel_req': if (typeof msg.id === 'number') sim.duelRequest(msg.id, pid); break;
       case 'duel_accept': sim.duelAccept(pid); break;
       case 'duel_decline': sim.duelDecline(pid); break;
+      // arena (Ashen Coliseum 1v1 queue)
+      case 'arena_queue': sim.arenaQueueJoin(pid); break;
+      case 'arena_leave': sim.arenaQueueLeave(pid); break;
       // social: friends / ignore / guild (persistent, account-scoped)
       case 'friend_add': if (typeof msg.name === 'string') void this.social.friendAdd(this.actorFor(session), msg.name).catch(logSocialErr); break;
       case 'friend_remove': if (typeof msg.name === 'string') void this.social.friendRemove(this.actorFor(session), msg.name).catch(logSocialErr); break;
@@ -878,6 +881,7 @@ export class GameServer {
     maybe('party', this.partyWire(session.pid));
     maybe('trade', this.tradeWire(session.pid));
     maybe('duel', this.duelWire(session.pid));
+    maybe('arena', this.sim.arenaInfoFor(session.pid));
     return extra === '' ? json : json.slice(0, -1) + extra + '}';
   }
 

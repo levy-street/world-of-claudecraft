@@ -82,6 +82,12 @@ export class Hud {
   private tradeWasOpen = false;
   private lastTradeSig = '';
   private lastPartySig = '';
+  private lastArenaSig = '';
+  private lastArenaStatusSig = '';
+  private arenaMatchSeen = false; // closes the queue panel once a bout starts
+  // all-time ladder, fetched best-effort from the server (online only)
+  private arenaAllTime: { name: string; class: string; level: number; rating: number; wins: number; losses: number }[] | null = null;
+  private arenaLbFetchedAt = 0;
   private lastCombatEventAt = 0;
   private lastZoneId = '';
   private mapZoneId = ''; // zone the cached map-window canvas was rendered for
@@ -128,6 +134,7 @@ export class Hud {
     $('#mm-quest').addEventListener('click', () => this.toggleQuestLog());
     $('#mm-map').addEventListener('click', () => this.toggleMap());
     $('#mm-bag').addEventListener('click', () => this.toggleBags());
+    $('#mm-arena').addEventListener('click', () => this.toggleArena());
     $('#social-fab').addEventListener('click', () => this.toggleSocial());
     const musicBtn = $('#mm-music');
     const styleMusicBtn = () => { musicBtn.style.color = music.enabled ? '#ffd100' : '#666'; };
@@ -605,8 +612,16 @@ export class Hud {
     this.updateQuestTracker();
     this.updatePartyFrames();
     this.updateTradeWindow();
+    this.updateArenaStatus();
+    // when a bout begins, get the queue panel out of the way for the fight
+    const inArenaMatch = !!this.sim.arenaInfo?.match;
+    if (inArenaMatch && !this.arenaMatchSeen && $('#arena-window').style.display === 'block') {
+      $('#arena-window').style.display = 'none';
+    }
+    this.arenaMatchSeen = inArenaMatch;
     this.updateMinimap();
     if ($('#map-window').style.display === 'block') this.updateMapWindow();
+    if ($('#arena-window').style.display === 'block') this.renderArenaWindow();
     if ($('#social-window').classList.contains('open')) {
       const struct = this.socialStructSig();
       if (struct !== this.lastSocialStruct) {
@@ -783,6 +798,118 @@ export class Hud {
 
   toggleMeters(): void {
     this.meters.toggle();
+  }
+
+  // -------------------------------------------------------------------------
+  // The Ashen Coliseum — 1v1 arena panel + in-match banner
+  // -------------------------------------------------------------------------
+
+  toggleArena(): void {
+    const el = $('#arena-window');
+    if (el.style.display === 'block') { el.style.display = 'none'; return; }
+    el.style.display = 'block';
+    this.lastArenaSig = '';
+    this.fetchArenaLeaderboard();
+    this.renderArenaWindow();
+  }
+
+  // Best-effort all-time ladder pull. Throttled; silently no-ops offline (no
+  // server) so the panel still shows the live online ladder either way.
+  private fetchArenaLeaderboard(): void {
+    const now = performance.now();
+    if (now - this.arenaLbFetchedAt < 15000) return;
+    this.arenaLbFetchedAt = now;
+    fetch('/api/arena/leaderboard')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (d && Array.isArray(d.leaders)) { this.arenaAllTime = d.leaders; this.lastArenaSig = ''; }
+      })
+      .catch(() => { /* offline or no server — live ladder only */ });
+  }
+
+  private renderArenaWindow(): void {
+    const el = $('#arena-window');
+    const a = this.sim.arenaInfo;
+    if (!a) {
+      // offline / not yet synced: arena is an online ranked feature
+      el.innerHTML = `<div class="panel-title"><span>The Ashen Coliseum</span><span class="x-btn" data-close>✕</span></div>`
+        + `<div class="arena-note">The Ashen Coliseum is a ranked 1v1 arena for the live world. Play online to enter the queue and climb the ladder.</div>`;
+      el.querySelector('[data-close]')?.addEventListener('click', () => { el.style.display = 'none'; });
+      return;
+    }
+    const inMatch = a.match !== null;
+    const myPid = this.sim.playerId;
+    const ladder = a.ladder.map((r, i) => {
+      const me = r.pid === myPid;
+      const cls = CLASSES[r.cls]?.name ?? r.cls;
+      return `<div class="ladder-row${me ? ' me' : ''}"><span class="rank">${i + 1}</span>`
+        + `<span class="lr-name" title="${r.name} — ${cls}">${r.name}</span>`
+        + `<span class="lr-rating">${r.rating}</span>`
+        + `<span class="lr-wl">${r.wins}-${r.losses}</span></div>`;
+    }).join('') || `<div class="ladder-empty">No challengers ranked yet — be the first.</div>`;
+
+    let action: string;
+    if (inMatch) {
+      action = `<div class="arena-queue-status">⚔ Match in progress vs ${a.match!.oppName}.</div>`;
+    } else if (a.queued) {
+      action = `<button class="btn leave" data-act="leave">Leave Queue</button>`
+        + `<div class="arena-queue-status">Searching for an opponent… (${a.queueSize} in queue)</div>`;
+    } else {
+      action = `<button class="btn" data-act="queue">Enter the Queue</button>`
+        + `<div class="arena-note">You will be matched with the nearest-rated challenger online, then teleported to the sands. Win to climb; first to yield (1 health) loses. You return exactly where you queued.</div>`;
+    }
+
+    this.fetchArenaLeaderboard();
+    const allTime = (this.arenaAllTime ?? []).map((r, i) => {
+      const me = r.name === this.sim.player.name;
+      const cls = CLASSES[r.class as keyof typeof CLASSES]?.name ?? r.class;
+      return `<div class="ladder-row${me ? ' me' : ''}"><span class="rank">${i + 1}</span>`
+        + `<span class="lr-name" title="${r.name} — Lv ${r.level} ${cls}">${r.name}</span>`
+        + `<span class="lr-rating">${r.rating}</span>`
+        + `<span class="lr-wl">${r.wins}-${r.losses}</span></div>`;
+    }).join('');
+    const allTimeSection = this.arenaAllTime && this.arenaAllTime.length > 0
+      ? `<div class="arena-sub">Ladder — All-Time</div>${allTime}`
+      : '';
+
+    const sig = JSON.stringify([a.rating, a.wins, a.losses, a.queued, a.queueSize, inMatch, a.ladder, this.arenaAllTime]);
+    if (sig === this.lastArenaSig) return; // nothing changed; skip the DOM churn (and re-bind)
+    this.lastArenaSig = sig;
+
+    el.innerHTML = `<div class="panel-title"><span>The Ashen Coliseum <span style="color:#998d6a;font-size:11px">1v1 Ranked</span></span><span class="x-btn" data-close>✕</span></div>`
+      + `<div class="arena-rank"><span class="rating">${a.rating}</span>`
+      + `<span class="wl">Rating &middot; <b>${a.wins}</b> wins / <i>${a.losses}</i> losses</span></div>`
+      + action
+      + `<div class="arena-sub">Ladder — Online</div>`
+      + ladder
+      + allTimeSection;
+
+    el.querySelector('[data-close]')?.addEventListener('click', () => { el.style.display = 'none'; });
+    el.querySelector('[data-act="queue"]')?.addEventListener('click', () => { this.sim.arenaQueueJoin(); audio.click(); });
+    el.querySelector('[data-act="leave"]')?.addEventListener('click', () => { this.sim.arenaQueueLeave(); audio.click(); });
+  }
+
+  // The pinned in-match banner: opponent name + countdown / live match timer.
+  private updateArenaStatus(): void {
+    const el = $('#arena-status');
+    const a = this.sim.arenaInfo;
+    const m = a?.match ?? null;
+    if (!m) {
+      if (el.style.display !== 'none') el.style.display = 'none';
+      this.lastArenaStatusSig = '';
+      return;
+    }
+    const label = m.state === 'countdown' ? 'Steel yourself…'
+      : m.state === 'over' ? `Returning to the world… ${m.returnIn ?? 0}`
+      : 'Fight to the yield!';
+    const sig = `${m.oppName}|${m.state}|${m.state === 'over' ? (m.returnIn ?? 0) : ''}`;
+    if (sig !== this.lastArenaStatusSig) {
+      this.lastArenaStatusSig = sig;
+      const cls = CLASSES[m.oppClass]?.name ?? m.oppClass;
+      el.innerHTML = `<div class="as-vs">⚔ VS <span class="opp">${m.oppName}</span> <span style="color:#b6ad8c;font-size:11px">Lv ${m.oppLevel} ${cls}</span></div>`
+        + `<div class="as-timer">${label}</div>`;
+      el.style.display = 'block';
+    }
   }
 
   toggleMap(): void {
@@ -1040,6 +1167,44 @@ export class Hud {
           this.combatLog(`${ev.winnerName} has defeated ${ev.loserName} in a duel.`, '#fa6');
           audio.duelEnd();
           break;
+        case 'arenaQueued':
+          this.log(`Queued for the Ashen Coliseum (position ${ev.position}).`, '#ffa040');
+          break;
+        case 'arenaUnqueued':
+          this.log('You leave the Ashen Coliseum queue.', '#ffa040');
+          break;
+        case 'arenaFound': {
+          const cls = CLASSES[ev.oppClass]?.name ?? ev.oppClass;
+          this.showBanner(`Opponent found: ${ev.oppName}`);
+          this.log(`The Coliseum pairs you against ${ev.oppName}, level ${ev.oppLevel} ${cls}.`, '#ffa040');
+          audio.duelChallenge();
+          break;
+        }
+        case 'arenaCountdown':
+          this.showBanner(`The bout begins in ${ev.seconds}…`);
+          audio.duelCountdownTick();
+          break;
+        case 'arenaStart':
+          this.showBanner('Fight!');
+          audio.duelStart();
+          break;
+        case 'arenaEnd': {
+          const delta = ev.ratingAfter - ev.ratingBefore;
+          const sign = delta >= 0 ? '+' : '';
+          if (ev.draw) {
+            this.showBanner(`Arena draw vs ${ev.oppName} (${sign}${delta} rating)`);
+            this.combatLog(`Arena bout vs ${ev.oppName} ended in a draw. Rating ${ev.ratingAfter} (${sign}${delta}).`, '#fa6');
+          } else if (ev.won) {
+            this.showBanner(`Victory vs ${ev.oppName}!  Rating ${ev.ratingAfter} (${sign}${delta})`);
+            this.combatLog(`You defeated ${ev.oppName} in the Ashen Coliseum. Rating ${ev.ratingAfter} (${sign}${delta}).`, '#7fdc4f');
+            audio.duelEnd();
+          } else {
+            this.showBanner(`Defeated by ${ev.oppName}.  Rating ${ev.ratingAfter} (${sign}${delta})`);
+            this.combatLog(`${ev.oppName} bested you in the Ashen Coliseum. Rating ${ev.ratingAfter} (${sign}${delta}).`, '#ff7a6a');
+            audio.death();
+          }
+          break;
+        }
         case 'log': this.log(ev.text, ev.color ?? '#ccc'); break;
         case 'playerDeath': {
           this.log('You have died.', '#ff4444');
@@ -2442,7 +2607,7 @@ export class Hud {
       this.sim.tradeCancel();
       closed = true;
     }
-    for (const id of ['#quest-dialog', '#loot-window', '#vendor-window', '#bags', '#char-window', '#spellbook', '#quest-log-window', '#map-window', '#report-window']) {
+    for (const id of ['#quest-dialog', '#loot-window', '#vendor-window', '#bags', '#char-window', '#spellbook', '#quest-log-window', '#map-window', '#arena-window', '#report-window']) {
       const el = $(id);
       if (el.style.display === 'block') {
         el.style.display = 'none';

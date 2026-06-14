@@ -314,6 +314,40 @@ export async function isAdminAccount(accountId: number): Promise<boolean> {
 }
 
 // ---------------------------------------------------------------------------
+// Arena rankings: the Ashen Coliseum's all-time ladder. Ratings/records live
+// inside each character's state JSONB (no schema migration needed); only
+// characters who have actually fought a bout appear.
+// ---------------------------------------------------------------------------
+
+export interface ArenaLeaderRow {
+  name: string;
+  class: PlayerClass;
+  level: number;
+  rating: number;
+  wins: number;
+  losses: number;
+}
+
+export async function topArenaRatings(limit = 20): Promise<ArenaLeaderRow[]> {
+  const res = await pool.query(
+    `SELECT name, class, level,
+            COALESCE((state->>'arenaRating')::int, 1500) AS rating,
+            COALESCE((state->>'arenaWins')::int, 0)     AS wins,
+            COALESCE((state->>'arenaLosses')::int, 0)   AS losses
+       FROM characters
+      WHERE state IS NOT NULL
+        AND COALESCE((state->>'arenaWins')::int, 0) + COALESCE((state->>'arenaLosses')::int, 0) > 0
+      ORDER BY rating DESC, wins DESC, name ASC
+      LIMIT $1`,
+    [Math.max(1, Math.min(100, limit))],
+  );
+  return res.rows.map((r) => ({
+    name: r.name, class: r.class, level: r.level,
+    rating: Number(r.rating), wins: Number(r.wins), losses: Number(r.losses),
+  }));
+}
+
+// ---------------------------------------------------------------------------
 // Play sessions: one row per character login, closed on logout. Powers the
 // admin dashboard's playtime / DAU / sessions-per-day metrics.
 // ---------------------------------------------------------------------------

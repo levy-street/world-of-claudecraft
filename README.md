@@ -82,6 +82,14 @@ see each other in town. `Enter` opens chat.
 - **Duels**: right-click → *Challenge to a Duel*. 3-second countdown, fight
   until one side hits 1 hp — nobody dies, the winner is announced zone-wide.
   Running 60 yards away forfeits.
+- **The Ashen Coliseum** (1v1 ranked arena): press `G` (or the ⚔ button) to
+  open the arena panel and *Enter the Queue*. Matchmaking pairs you with the
+  nearest-rated challenger online, then teleports you both into a private,
+  torch-lit fighting pit. A 5-second countdown heals and resets both fighters
+  for a fair start; the bout ends when one yields at 1 hp (nobody dies). Wins
+  and losses move a persistent **Elo rating** (everyone starts at 1500), and
+  you return exactly where you queued. The panel shows your standing, the live
+  online ladder, and the all-time leaderboard (`GET /api/arena/leaderboard`).
 - **Multiplayer rules**: classic tap rights (first player to damage a mob owns
   its loot/XP/quest credit — others get "You don't have permission to loot
   that."), mobs retarget the next attacker when their victim dies (no free
@@ -152,7 +160,7 @@ zone map.
 | `Tab` | cycle nearest enemies · left-click target · right-click attack/loot/talk |
 | `1`–`9`, `0`, `-`, `=` | action bar |
 | `F` | interact (loot corpse / pick up object / talk) |
-| `C` `P` `L` `M` `B` | character · spellbook · quest log · world map · bags |
+| `C` `P` `L` `M` `B` `G` | character · spellbook · quest log · world map · bags · arena (Ashen Coliseum) |
 | `V` / `R` / `Esc` | nameplates · autorun · close windows / clear target |
 
 ### Classic-fidelity checklist
@@ -234,6 +242,7 @@ node scripts/smoke_rogue.mjs    # rogue: combo points, eviscerate, vendor, eatin
 node scripts/visual_tour.mjs    # screenshot tour of the zone + UI into tmp/
 node scripts/mp_integration.mjs # 26-check API/WS/persistence suite (server running)
 node scripts/social_e2e.mjs     # trade + duel over the wire (ALLOW_DEV_COMMANDS=1)
+node scripts/arena_visual.mjs   # two clients queue + fight a ranked 1v1 in the Ashen Coliseum
 node scripts/crypt_raid.mjs     # five bots clear the Hollow Crypt (ALLOW_DEV_COMMANDS=1)
 ```
 

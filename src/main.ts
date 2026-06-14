@@ -143,6 +143,7 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
         case 'map': hud.toggleMap(); break;
         case 'nameplates': renderer.showNameplates = !renderer.showNameplates; break;
         case 'meters': hud.toggleMeters(); break;
+        case 'arena': hud.toggleArena(); break;
         case 'social': hud.toggleSocial(); break;
         case 'chat': openChat(); break;
         case 'escape':

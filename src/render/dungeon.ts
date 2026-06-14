@@ -17,7 +17,7 @@ import { registerPreload } from './assets/preload';
 import { radialGlowTexture } from './textures';
 import { instanceOrigin } from '../sim/data';
 import {
-  CRYPT_LAYOUT, SANCTUM_LAYOUT, DUNGEON_WALL_X, TOMB_HD,
+  ARENA_LAYOUT, CRYPT_LAYOUT, SANCTUM_LAYOUT, DUNGEON_WALL_X, TOMB_HD,
   DungeonLayout, GridPoint, WallStub,
 } from '../sim/dungeon_layout';
 
@@ -33,7 +33,7 @@ const FLOOR_CELL = 4; // kit floor tiles are 4x4 at MODULE_SCALE 1
 const FLOOR_Y = -0.05; // tile tops sit 0.05 above origin; sink so tops land at y=0
 const PILLAR_XZ_SCALE = 1.3; // 1.5u kit pillar -> ~1.95u footprint (collider r=1)
 
-type Variant = 'crypt' | 'bastion' | 'sanctum';
+type Variant = 'crypt' | 'bastion' | 'sanctum' | 'arena';
 
 interface TorchColors {
   flame: number;
@@ -45,6 +45,8 @@ const TORCH_COLORS: Record<Variant, TorchColors> = {
   crypt: { flame: 0x7fd4ff, emissive: 0x2288cc, light: 0x66bbff },
   bastion: { flame: 0x7ffbe0, emissive: 0x18b89a, light: 0x4fe3c0 },
   sanctum: { flame: 0xa6ffb8, emissive: 0x22cc55, light: 0x55e08a },
+  // the Ashen Coliseum burns warm — amber braziers ringing the fighting sands
+  arena: { flame: 0xffb24a, emissive: 0xcc5a14, light: 0xff9a3c },
 };
 
 // ---------------------------------------------------------------------------
@@ -220,7 +222,7 @@ export class DungeonInteriors {
   ) {}
 
   buildInterior(interior: string, ox: number, oz: number): void {
-    const layout = interior === 'sanctum' ? SANCTUM_LAYOUT : CRYPT_LAYOUT;
+    const layout = interior === 'sanctum' ? SANCTUM_LAYOUT : interior === 'arena' ? ARENA_LAYOUT : CRYPT_LAYOUT;
     const variant = this.variantFor(interior, ox);
     const group = new THREE.Group();
     const p = new Placements();
@@ -242,6 +244,7 @@ export class DungeonInteriors {
   // Hollow Crypt and Sunken Bastion share interior 'crypt'; the origin x-band
   // (instanceOrigin in sim/data.ts: 900 + index*600) says which dungeon.
   private variantFor(interior: string, ox: number): Variant {
+    if (interior === 'arena') return 'arena';
     if (interior === 'sanctum') return 'sanctum';
     const bastionX = instanceOrigin(1, 0).x;
     return ox >= (instanceOrigin(0, 0).x + bastionX) / 2 ? 'bastion' : 'crypt';
@@ -515,6 +518,12 @@ export class DungeonInteriors {
   // walkable — deliberately NO collider, matching the layout contract).
   private placeDais(group: THREE.Group, p: Placements, layout: DungeonLayout, variant: Variant): void {
     const d = layout.dais;
+    // the arena keeps a flat fighting floor: no raised platform or rim clutter,
+    // just a warm light pool burned into the centre of the sands
+    if (variant === 'arena') {
+      this.addTorchGlow(group, d.x, d.z, TORCH_COLORS.arena.light, 0.07, 2.4);
+      return;
+    }
     const quarter = Math.PI / 2;
     for (let x = -16; x <= 16; x += 4) {
       for (let z = -16; z <= 16; z += 4) {
@@ -546,6 +555,7 @@ export class DungeonInteriors {
 
   // Bone piles / debris strewn along the aisle (legacy deterministic spots)
   private placeAisleClutter(p: Placements, layout: DungeonLayout, variant: Variant): void {
+    if (variant === 'arena') return; // the fighting sands stay clear of obstacles
     const isSanctum = variant === 'sanctum';
     const count = isSanctum ? 14 : 10;
     for (let i = 0; i < count; i++) {
@@ -569,6 +579,16 @@ export class DungeonInteriors {
 
   // Variant-specific dressing hugging the walls (outside the walkable aisle)
   private placeWallDressing(p: Placements, layout: DungeonLayout, variant: Variant): void {
+    if (variant === 'arena') {
+      // gladiatorial weapon trophies mounted high on the pit's side walls
+      for (const z of [layout.zMin + 9, (layout.zMin + layout.zMax) / 2, layout.zMax - 9]) {
+        for (const side of [-1, 1]) {
+          const kind = hash2(side * 4.2, z) < 0.5 ? 'sword_shield' : 'sword_shield_broken';
+          p.add(kind, side * (DUNGEON_WALL_X - 1.1), 4.4, z, side < 0 ? Math.PI / 2 : -Math.PI / 2, 1.7);
+        }
+      }
+      return;
+    }
     // collapsed masonry in the legacy rubble corners
     const rubble: [number, number][] = variant === 'sanctum'
       ? [[-19, 4], [19, 48], [-19, 95], [18, 150]]

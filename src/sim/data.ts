@@ -143,8 +143,43 @@ export function dungeonByIndex(index: number): DungeonDef | null {
 
 // Which dungeon a far-off instance position belongs to, by x-band.
 export function dungeonAt(x: number): DungeonDef | null {
-  if (x <= DUNGEON_X_THRESHOLD) return null;
+  if (x <= DUNGEON_X_THRESHOLD || x >= ARENA_X_MIN) return null;
   return dungeonByIndex(Math.round((x - 900) / 600));
+}
+
+// ---------------------------------------------------------------------------
+// The Ashen Coliseum — 1v1 ranked arena. Its match instances live in their own
+// far-off flat-ground x-band, well past the dungeon bands (index 0/1/2 sit at
+// x 900/1500/2100). Like dungeons, x beyond DUNGEON_X_THRESHOLD means flat
+// ground (world.groundHeight) and instance-local collision (sim/colliders.ts);
+// the band split below keeps arena positions from being read as a dungeon.
+// ---------------------------------------------------------------------------
+
+export const ARENA_X = 3000; // arena instances share this x; slots stack along z
+export const ARENA_X_MIN = 2800; // x at/after this = an arena instance, not a dungeon
+export const ARENA_SLOT_COUNT = 4; // concurrent 1v1 matches the world can host
+const ARENA_Z0 = -1250;
+const ARENA_SLOT_SPACING = 120; // > the pit footprint (~44yd) so slots never overlap
+
+export function arenaOrigin(slot: number): { x: number; z: number } {
+  return { x: ARENA_X, z: ARENA_Z0 + slot * ARENA_SLOT_SPACING };
+}
+
+export function isArenaPos(x: number): boolean {
+  return x >= ARENA_X_MIN;
+}
+
+// Nearest arena instance origin to a far-off position, matched by z-band (the
+// x is shared across slots). Mirrors how the dungeon collider resolver maps a
+// position back to its instance slot.
+export function arenaOriginAt(z: number): { x: number; z: number; slot: number } {
+  let best = 0, bestD = Infinity;
+  for (let i = 0; i < ARENA_SLOT_COUNT; i++) {
+    const d = Math.abs(z - arenaOrigin(i).z);
+    if (d < bestD) { bestD = d; best = i; }
+  }
+  const o = arenaOrigin(best);
+  return { x: o.x, z: o.z, slot: best };
 }
 
 // Legacy aliases for the Hollow Crypt (tests + scripts reference these).

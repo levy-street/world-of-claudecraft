@@ -92,6 +92,30 @@ export const SANCTUM_LAYOUT: DungeonLayout = (() => {
   };
 })();
 
+// The Ashen Coliseum (interior 'arena'): a compact, fully-enclosed square pit
+// — no door, no aisle (combatants are teleported in by matchmaking). Side
+// walls at |x|=23 like the crypt so the KayKit wall modules fit unchanged;
+// four corner pillars carry the arena's warm torches. The dais marker only
+// drives the central floor glow (the renderer skips its platform for the
+// arena), so it stays a flat, obstacle-free fighting ring.
+export const ARENA_LAYOUT: DungeonLayout = {
+  zMin: -20,
+  zMax: 24,
+  sideWallZ: 2,
+  sideWallHd: 23,
+  pillars: [
+    { x: -14, z: -10 }, { x: 14, z: -10 },
+    { x: -14, z: 14 }, { x: 14, z: 14 },
+  ],
+  tombs: [],
+  stubs: [],
+  dais: { x: 0, z: 2, r: 8 },
+};
+
+// Combatant spawn points (instance-local), at opposite ends facing each other.
+export const ARENA_SPAWN_A = { x: 0, z: -14, facing: 0 }; // faces +z toward B
+export const ARENA_SPAWN_B = { x: 0, z: 18, facing: Math.PI }; // faces -z toward A
+
 /** Interior collision set for a layout, in instance-local coordinates. */
 export function layoutColliders(layout: DungeonLayout): Collider[] {
   const out: Collider[] = [];
