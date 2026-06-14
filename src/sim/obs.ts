@@ -83,7 +83,7 @@ export function applyAction(sim: Sim, action: number): void {
 const NEARBY_MOBS = 5;
 
 export function obsSize(): number {
-  return 16 + ABILITY_SLOTS * 2 + 9 + NEARBY_MOBS * 6 + 5 + QUEST_ORDER.length * 2;
+  return 16 + ABILITY_SLOTS * 2 + 9 + NEARBY_MOBS * 6 + 5 + QUEST_ORDER.length * 3;
 }
 
 export function encodeObs(sim: Sim): number[] {
@@ -177,9 +177,10 @@ export function encodeObs(sim: Sim): number[] {
     obs.push(0, 1.5, 0, 0, 0);
   }
 
-  // --- quests (10 x 2 = 20) ---
+  // --- quests (QUEST_ORDER.length x 3) ---
   for (const qid of QUEST_ORDER) {
-    const state = sim.questState(qid);
+    const info = sim.questInfo(qid);
+    const state = info.state;
     obs.push(state === 'done' ? 1 : state === 'ready' ? 0.66 : state === 'active' ? 0.33 : 0);
     const qp = sim.questLog.get(qid);
     if (qp) {
@@ -190,6 +191,7 @@ export function encodeObs(sim: Sim): number[] {
     } else {
       obs.push(state === 'done' ? 1 : 0);
     }
+    obs.push(info.suggestedPlayers ? clamp(info.suggestedPlayers / 5, 0, 1) : 0);
   }
 
   return obs;

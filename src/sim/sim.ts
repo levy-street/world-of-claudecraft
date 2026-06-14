@@ -1,6 +1,6 @@
 import {
   ABILITIES, ARENA_SLOT_COUNT, CAMPS, CLASSES, DUNGEONS, DUNGEON_LIST, DungeonDef, arenaOrigin, dungeonAt,
-  DUNGEON_X_THRESHOLD, GROUND_OBJECTS, GROUP_XP_BONUS, INSTANCE_SLOT_COUNT, isArenaPos,
+  DUNGEON_MOB_IDS, DUNGEON_X_THRESHOLD, GROUND_OBJECTS, GROUP_XP_BONUS, INSTANCE_SLOT_COUNT, isArenaPos,
   ITEMS, MOBS, NPCS, PLAYER_START, QUESTS, REWARD_ARCHETYPE, abilitiesKnownAt, instanceOrigin,
   zoneAt,
 } from './data';
@@ -19,7 +19,7 @@ import {
   AbilityDef, AbilityEffect, Aura, AuraKind, CAST_PUSHBACK_SEC, CHANNEL_PUSHBACK_FRACTION, CONSUME_DURATION,
   CONSUME_TICKS, DT, Entity, EquipSlot, GCD,
   INTERACT_RANGE, InvSlot, MELEE_RANGE, MAX_LEVEL,
-  MoveInput, PlayerClass, QuestProgress, QuestState, RUN_SPEED, SimConfig, SimEvent, TURN_SPEED, Vec3,
+  MoveInput, PlayerClass, QuestInfo, QuestProgress, QuestState, RUN_SPEED, SimConfig, SimEvent, TURN_SPEED, Vec3,
   angleTo, armorReduction, dist2d, emptyMoveInput, isConsuming, meleeMissChance, mobXpValue, normAngle,
   rageFromDealing, rageFromTaking, spellHitChance, xpForLevel,
 } from './types';
@@ -256,6 +256,31 @@ export function computeQuestState(
   if (quest.requiresQuest && !questsDone.has(quest.requiresQuest)) return 'unavailable';
   if (quest.minLevel && playerLevel < quest.minLevel) return 'unavailable';
   return 'available';
+}
+
+export function computeQuestInfo(
+  questId: string,
+  questLog: Map<string, QuestProgress>,
+  questsDone: Set<string>,
+  playerLevel: number,
+): QuestInfo {
+  const state = computeQuestState(questId, questLog, questsDone, playerLevel);
+  const quest = QUESTS[questId];
+  if (!quest) return { questId, state, suggestedPlayers: null, elite: false, dungeon: false };
+  let elite = false;
+  let dungeon = false;
+  for (const obj of quest.objectives) {
+    if (!obj.targetMobId) continue;
+    if (MOBS[obj.targetMobId]?.elite) elite = true;
+    if (DUNGEON_MOB_IDS.has(obj.targetMobId)) dungeon = true;
+  }
+  return {
+    questId,
+    state,
+    suggestedPlayers: quest.suggestedPlayers ?? null,
+    elite,
+    dungeon,
+  };
 }
 
 function copyPos(dst: { x: number; y: number; z: number }, src: { x: number; y: number; z: number }): void {
@@ -3007,6 +3032,12 @@ export class Sim {
     const r = this.resolve(pid);
     if (!r) return 'unavailable';
     return computeQuestState(questId, r.meta.questLog, r.meta.questsDone, r.e.level);
+  }
+
+  questInfo(questId: string, pid?: number): QuestInfo {
+    const r = this.resolve(pid);
+    if (!r) return { questId, state: 'unavailable', suggestedPlayers: null, elite: false, dungeon: false };
+    return computeQuestInfo(questId, r.meta.questLog, r.meta.questsDone, r.e.level);
   }
 
   private questNpcFor(questId: string, role: 'giver' | 'turnIn', p: Entity): { npc: Entity | null; tooFar: boolean } {

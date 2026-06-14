@@ -339,6 +339,14 @@ export interface QuestDef {
 
 export type QuestState = 'unavailable' | 'available' | 'active' | 'ready' | 'done';
 
+export interface QuestInfo {
+  questId: string;
+  state: QuestState;
+  suggestedPlayers: number | null;
+  elite: boolean;
+  dungeon: boolean;
+}
+
 export interface QuestProgress {
   questId: string;
   counts: number[]; // per objective

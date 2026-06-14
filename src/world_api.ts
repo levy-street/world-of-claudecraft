@@ -1,4 +1,4 @@
-import type { Entity, EquipSlot, InvSlot, MoveInput, PlayerClass, QuestProgress, QuestState, ResourceType } from './sim/types';
+import type { Entity, EquipSlot, InvSlot, MoveInput, PlayerClass, QuestInfo, QuestProgress, QuestState, ResourceType } from './sim/types';
 import type { ResolvedAbility } from './sim/sim';
 
 export interface PartyMemberInfo {
@@ -150,6 +150,7 @@ export interface IWorld {
   questLog: Map<string, QuestProgress>;
   questsDone: Set<string>;
   questState(questId: string): QuestState;
+  questInfo(questId: string): QuestInfo;
   castAbility(abilityId: string): void;
   castAbilityBySlot(slot: number): void;
   targetEntity(id: number | null): void;

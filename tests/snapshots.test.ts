@@ -287,6 +287,7 @@ describe('client-side delta merge', () => {
       client.acceptQuest('q_wolves');
       expect(client.questLog.has('q_wolves')).toBe(false);
       expect(client.questState('q_wolves')).toBe('active');
+      expect(client.questInfo('q_wolves').state).toBe('active');
       expect(sent).toContainEqual({ t: 'cmd', cmd: 'accept', quest: 'q_wolves' });
 
       (client as any).pendingQuestCommands.clear();
@@ -295,10 +296,26 @@ describe('client-side delta merge', () => {
       expect(client.questLog.has('q_wolves')).toBe(true);
       expect(client.questsDone.has('q_wolves')).toBe(false);
       expect(client.questState('q_wolves')).toBe('active');
+      expect(client.questInfo('q_wolves').state).toBe('active');
       expect(sent).toContainEqual({ t: 'cmd', cmd: 'turnin', quest: 'q_wolves' });
     } finally {
       (globalThis as any).WebSocket = oldWebSocket;
     }
+  });
+
+  it('computes quest grouping metadata on the client mirror', () => {
+    const client = bareClient(1);
+    client.entities.set(1, { id: 1, level: 20 } as any);
+    client.questsDone.add('q_bones');
+    client.questsDone.add('q_whispers');
+    client.questsDone.add('q_rite');
+
+    expect(client.questInfo('q_hollow')).toMatchObject({
+      state: 'available',
+      suggestedPlayers: 5,
+      elite: true,
+      dungeon: true,
+    });
   });
 
   it('keeps previous structures when delta fields are omitted', () => {

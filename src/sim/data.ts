@@ -42,6 +42,8 @@ export const MOBS: Record<string, MobTemplate> = {
   ...ZONE1_MOBS, ...ZONE2_MOBS, ...ZONE3_MOBS, ...DUNGEON_MOBS,
 };
 
+export const DUNGEON_MOB_IDS = new Set(Object.keys(DUNGEON_MOBS));
+
 export const NPCS: Record<string, NpcDef> = {
   ...ZONE1_NPCS, ...ZONE2_NPCS, ...ZONE3_NPCS,
 };

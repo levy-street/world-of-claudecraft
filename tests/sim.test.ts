@@ -5,7 +5,7 @@ import {
   type SimEvent, dist2d, MAX_LEVEL, xpForLevel, mobXpValue, rageConversion, rageFromDealing,
   spellHitChance, meleeMissChance,
 } from '../src/sim/types';
-import { QUESTS, abilitiesKnownAt } from '../src/sim/data';
+import { QUESTS, QUEST_ORDER, abilitiesKnownAt } from '../src/sim/data';
 import { terrainHeight } from '../src/sim/world';
 
 function makeSim(cls: 'warrior' | 'mage' | 'rogue' = 'warrior', seed = 42) {
@@ -600,6 +600,38 @@ describe('RL interface', () => {
       expect(Number.isFinite(v)).toBe(true);
       expect(Math.abs(v)).toBeLessThanOrEqual(2);
     }
+  });
+
+  it('exposes quest grouping metadata through world state and observations', () => {
+    const sim = makeSim('warrior');
+    sim.setPlayerLevel(20);
+    sim.questsDone.add('q_bones');
+    sim.questsDone.add('q_whispers');
+    sim.questsDone.add('q_rite');
+
+    expect(sim.questInfo('q_hollow')).toMatchObject({
+      state: 'available',
+      suggestedPlayers: 5,
+      elite: true,
+      dungeon: true,
+    });
+    expect(sim.questInfo('q_crushers')).toMatchObject({
+      suggestedPlayers: 3,
+      elite: true,
+      dungeon: false,
+    });
+    expect(sim.questInfo('q_wolves')).toMatchObject({
+      suggestedPlayers: null,
+      elite: false,
+      dungeon: false,
+    });
+
+    const obs = encodeObs(sim);
+    const questBase = obsSize() - QUEST_ORDER.length * 3;
+    const hollowIndex = QUEST_ORDER.indexOf('q_hollow');
+    const wolvesIndex = QUEST_ORDER.indexOf('q_wolves');
+    expect(obs[questBase + hollowIndex * 3 + 2]).toBe(1);
+    expect(obs[questBase + wolvesIndex * 3 + 2]).toBe(0);
   });
 
   it('actions execute without error and sim stays finite', () => {
