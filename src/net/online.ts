@@ -44,6 +44,38 @@ export interface RealmDirectory {
   characters: Record<string, number>; // realm name -> how many characters you have
 }
 
+export interface InvitePreview {
+  token: string;
+  inviterName: string;
+  realm: string;
+  expired: boolean;
+  accepted: boolean;
+}
+
+export interface InviteStats {
+  sentCompleted: number;
+  acceptedCompleted: number;
+  titleUnlocked: boolean;
+}
+
+export interface CreatedInvite {
+  token: string;
+  url: string;
+  expiresAt: string;
+  inviterName: string;
+  realm: string;
+  stats: InviteStats;
+}
+
+export interface InviteAcceptResult {
+  inviterName: string;
+  realm: string;
+  completed: boolean;
+  completedNow: boolean;
+  acceptedCharacterName: string | null;
+  stats: InviteStats;
+}
+
 export class Api {
   token: string | null = null;
   username: string | null = null;
@@ -158,6 +190,23 @@ export class Api {
 
   async projectStats(): Promise<{ accounts_created: number; players_online: number; realm: string }> {
     return this.get('/api/project-stats');
+  }
+
+  async createInvite(characterId: number): Promise<CreatedInvite> {
+    return this.post('/api/invites', { characterId });
+  }
+
+  async inviteStats(): Promise<InviteStats> {
+    const data = await this.get('/api/invites/me');
+    return data.stats ?? { sentCompleted: 0, acceptedCompleted: 0, titleUnlocked: false };
+  }
+
+  async invitePreview(token: string): Promise<InvitePreview> {
+    return this.get(`/api/invites/${encodeURIComponent(token)}`);
+  }
+
+  async acceptInvite(token: string, characterId?: number): Promise<InviteAcceptResult> {
+    return this.post(`/api/invites/${encodeURIComponent(token)}/accept`, characterId === undefined ? {} : { characterId });
   }
 }
 

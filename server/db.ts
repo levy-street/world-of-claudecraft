@@ -104,6 +104,25 @@ CREATE TABLE IF NOT EXISTS world_state (
   data JSONB NOT NULL,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+CREATE TABLE IF NOT EXISTS friend_invites (
+  token TEXT PRIMARY KEY,
+  inviter_account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  inviter_character_id INT NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
+  realm TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  expires_at TIMESTAMPTZ NOT NULL,
+  accepted_account_id INT REFERENCES accounts(id) ON DELETE SET NULL,
+  accepted_character_id INT REFERENCES characters(id) ON DELETE SET NULL,
+  accepted_at TIMESTAMPTZ,
+  completed_at TIMESTAMPTZ,
+  CHECK (accepted_account_id IS NULL OR accepted_account_id <> inviter_account_id)
+);
+CREATE INDEX IF NOT EXISTS friend_invites_inviter_active
+  ON friend_invites(inviter_character_id, expires_at DESC)
+  WHERE accepted_account_id IS NULL;
+CREATE INDEX IF NOT EXISTS friend_invites_accepted_account
+  ON friend_invites(accepted_account_id)
+  WHERE accepted_account_id IS NOT NULL;
 `;
 
 export async function ensureSchema(): Promise<void> {
@@ -169,6 +188,190 @@ export async function saveToken(token: string, accountId: number, ttlHours = 24 
     `INSERT INTO auth_tokens (token, account_id, expires_at) VALUES ($1, $2, now() + ($3 || ' hours')::interval)`,
     [token, accountId, String(ttlHours)],
   );
+}
+
+// ---------------------------------------------------------------------------
+// Friend invite links: opaque share tokens that help a new/returning player
+// land on the inviter's realm, then unlock cosmetic social credit once their
+// character actually enters online play.
+// ---------------------------------------------------------------------------
+
+export interface FriendInviteView {
+  token: string;
+  inviterAccountId: number;
+  inviterCharacterId: number;
+  inviterName: string;
+  realm: string;
+  expiresAt: string;
+  acceptedAccountId: number | null;
+  acceptedCharacterId: number | null;
+  acceptedCharacterName: string | null;
+  completedAt: string | null;
+}
+
+export interface FriendInviteStats {
+  sentCompleted: number;
+  acceptedCompleted: number;
+  titleUnlocked: boolean;
+}
+
+function inviteFromRow(row: any): FriendInviteView {
+  return {
+    token: row.token,
+    inviterAccountId: Number(row.inviter_account_id),
+    inviterCharacterId: Number(row.inviter_character_id),
+    inviterName: row.inviter_name,
+    realm: row.realm,
+    expiresAt: new Date(row.expires_at).toISOString(),
+    acceptedAccountId: row.accepted_account_id === null ? null : Number(row.accepted_account_id),
+    acceptedCharacterId: row.accepted_character_id === null ? null : Number(row.accepted_character_id),
+    acceptedCharacterName: row.accepted_character_name ?? null,
+    completedAt: row.completed_at ? new Date(row.completed_at).toISOString() : null,
+  };
+}
+
+export async function createFriendInvite(
+  token: string,
+  inviterAccountId: number,
+  inviterCharacterId: number,
+  ttlDays = 14,
+): Promise<FriendInviteView> {
+  const existing = await pool.query(
+    `SELECT fi.*, c.name AS inviter_name, ac.name AS accepted_character_name
+       FROM friend_invites fi
+       JOIN characters c ON c.id = fi.inviter_character_id
+       LEFT JOIN characters ac ON ac.id = fi.accepted_character_id
+      WHERE fi.inviter_account_id = $1
+        AND fi.inviter_character_id = $2
+        AND fi.realm = $3
+        AND fi.accepted_account_id IS NULL
+        AND fi.expires_at > now()
+      ORDER BY fi.created_at DESC
+      LIMIT 1`,
+    [inviterAccountId, inviterCharacterId, REALM],
+  );
+  if (existing.rows[0]) return inviteFromRow(existing.rows[0]);
+
+  const res = await pool.query(
+    `INSERT INTO friend_invites (token, inviter_account_id, inviter_character_id, realm, expires_at)
+     VALUES ($1, $2, $3, $4, now() + ($5 || ' days')::interval)
+     RETURNING *,
+       (SELECT name FROM characters WHERE id = $3) AS inviter_name,
+       NULL::text AS accepted_character_name`,
+    [token, inviterAccountId, inviterCharacterId, REALM, String(ttlDays)],
+  );
+  return inviteFromRow(res.rows[0]);
+}
+
+export async function getFriendInvite(token: string): Promise<FriendInviteView | null> {
+  const res = await pool.query(
+    `SELECT fi.*, c.name AS inviter_name, ac.name AS accepted_character_name
+       FROM friend_invites fi
+       JOIN characters c ON c.id = fi.inviter_character_id
+       LEFT JOIN characters ac ON ac.id = fi.accepted_character_id
+      WHERE fi.token = $1`,
+    [token],
+  );
+  return res.rows[0] ? inviteFromRow(res.rows[0]) : null;
+}
+
+export type AcceptFriendInviteResult =
+  | { ok: true; invite: FriendInviteView; completedNow: boolean }
+  | { ok: false; status: 400 | 404 | 409 | 410; error: string };
+
+export async function acceptFriendInvite(
+  token: string,
+  accountId: number,
+  characterId?: number,
+): Promise<AcceptFriendInviteResult> {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const found = await client.query(
+      `SELECT fi.*, c.name AS inviter_name, ac.name AS accepted_character_name
+         FROM friend_invites fi
+         JOIN characters c ON c.id = fi.inviter_character_id
+         LEFT JOIN characters ac ON ac.id = fi.accepted_character_id
+        WHERE fi.token = $1
+        FOR UPDATE OF fi`,
+      [token],
+    );
+    const row = found.rows[0];
+    if (!row) {
+      await client.query('ROLLBACK');
+      return { ok: false, status: 404, error: 'invite not found' };
+    }
+    if (new Date(row.expires_at).getTime() <= Date.now()) {
+      await client.query('ROLLBACK');
+      return { ok: false, status: 410, error: 'invite expired' };
+    }
+    if (Number(row.inviter_account_id) === accountId) {
+      await client.query('ROLLBACK');
+      return { ok: false, status: 400, error: 'you cannot use your own invite' };
+    }
+    if (row.accepted_account_id !== null && Number(row.accepted_account_id) !== accountId) {
+      await client.query('ROLLBACK');
+      return { ok: false, status: 409, error: 'invite already used' };
+    }
+
+    let completedNow = false;
+    let acceptedCharacterId: number | null = row.accepted_character_id === null ? null : Number(row.accepted_character_id);
+    if (characterId !== undefined) {
+      const char = await client.query(
+        'SELECT id, name, realm FROM characters WHERE id = $1 AND account_id = $2',
+        [characterId, accountId],
+      );
+      const c = char.rows[0];
+      if (!c) {
+        await client.query('ROLLBACK');
+        return { ok: false, status: 404, error: 'character not found' };
+      }
+      if (c.realm !== row.realm) {
+        await client.query('ROLLBACK');
+        return { ok: false, status: 400, error: 'wrong realm for this invite' };
+      }
+      acceptedCharacterId = Number(c.id);
+      completedNow = row.completed_at === null;
+    }
+
+    const updated = await client.query(
+      `UPDATE friend_invites
+          SET accepted_account_id = COALESCE(accepted_account_id, $2),
+              accepted_at = COALESCE(accepted_at, now()),
+              accepted_character_id = COALESCE(accepted_character_id, $3),
+              completed_at = CASE WHEN $3::int IS NOT NULL THEN COALESCE(completed_at, now()) ELSE completed_at END
+        WHERE token = $1
+        RETURNING *,
+          (SELECT name FROM characters WHERE id = friend_invites.inviter_character_id) AS inviter_name,
+          (SELECT name FROM characters WHERE id = friend_invites.accepted_character_id) AS accepted_character_name`,
+      [token, accountId, acceptedCharacterId],
+    );
+    await client.query('COMMIT');
+    return { ok: true, invite: inviteFromRow(updated.rows[0]), completedNow };
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+export async function friendInviteStats(accountId: number): Promise<FriendInviteStats> {
+  const res = await pool.query(
+    `SELECT
+       count(*) FILTER (WHERE inviter_account_id = $1 AND completed_at IS NOT NULL)::int AS sent_completed,
+       count(*) FILTER (WHERE accepted_account_id = $1 AND completed_at IS NOT NULL)::int AS accepted_completed
+     FROM friend_invites
+     WHERE inviter_account_id = $1 OR accepted_account_id = $1`,
+    [accountId],
+  );
+  const sentCompleted = Number(res.rows[0]?.sent_completed ?? 0);
+  const acceptedCompleted = Number(res.rows[0]?.accepted_completed ?? 0);
+  return {
+    sentCompleted,
+    acceptedCompleted,
+    titleUnlocked: sentCompleted + acceptedCompleted > 0,
+  };
 }
 
 export async function accountForToken(token: string): Promise<number | null> {

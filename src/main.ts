@@ -8,7 +8,7 @@ import { Hud } from './ui/hud';
 import { audio } from './game/audio';
 import { music } from './game/music';
 import { handlePickedEntity } from './game/interactions';
-import { Api, ClientWorld, CharacterSummary } from './net/online';
+import { Api, ClientWorld, CharacterSummary, InviteAcceptResult, InvitePreview } from './net/online';
 import type { IWorld } from './world_api';
 import { assetsReady } from './render/assets/preload';
 import { CharacterPreview } from './render/characters';
@@ -425,6 +425,21 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
       submit: (targetPid, reason, details) => api.reportPlayer(online.characterId, targetPid, reason, details),
       submitByName: (targetName, reason, details) => api.reportPlayerByName(online.characterId, targetName, reason, details),
     });
+    hud.attachInvites({
+      create: () => api.createInvite(online.characterId),
+      stats: () => api.inviteStats(),
+    });
+    if (pendingInviteCompletion) {
+      const accepted = pendingInviteCompletion;
+      pendingInviteCompletion = null;
+      const inviter = [...world.entities.values()].find((e) => e.kind === 'player' && e.name === accepted.inviterName && e.id !== world.playerId);
+      if (inviter) {
+        world.partyInvite(inviter.id);
+        hud.showError(`Invite complete. Party invite sent to ${accepted.inviterName}.`);
+      } else {
+        hud.showError(`Invite complete. ${accepted.inviterName} is not nearby.`);
+      }
+    }
   }
 
   function interactKey(): void {
@@ -587,10 +602,116 @@ async function startOffline(playerClass: PlayerClass, name: string): Promise<voi
 // ---------------------------------------------------------------------------
 
 const api = new Api();
+const INVITE_TOKEN_KEY = 'woc_pending_invite';
+let pendingInviteToken: string | null = null;
+let pendingInvitePreview: InvitePreview | null = null;
+let pendingInviteCompletion: InviteAcceptResult | null = null;
 
 let activeTransitionTimeout: number | null = null;
 let activeTransitionCleanup: (() => void) | null = null;
 let characterPreview: CharacterPreview | null = null;
+
+function validPendingInviteToken(token: string | null): token is string {
+  return typeof token === 'string' && /^[a-f0-9]{64}$/.test(token);
+}
+
+function capturePendingInviteToken(): void {
+  const params = new URLSearchParams(location.search);
+  const fromUrl = params.get('invite');
+  if (validPendingInviteToken(fromUrl)) {
+    pendingInviteToken = fromUrl;
+    localStorage.setItem(INVITE_TOKEN_KEY, fromUrl);
+    params.delete('invite');
+    const qs = params.toString();
+    history.replaceState(null, '', `${location.pathname}${qs ? `?${qs}` : ''}${location.hash}`);
+    return;
+  }
+  const stored = localStorage.getItem(INVITE_TOKEN_KEY);
+  pendingInviteToken = validPendingInviteToken(stored) ? stored : null;
+}
+
+function clearPendingInvite(): void {
+  pendingInviteToken = null;
+  pendingInvitePreview = null;
+  localStorage.removeItem(INVITE_TOKEN_KEY);
+  renderInviteBanner();
+}
+
+function inviteBannerEl(): HTMLElement {
+  let el = document.getElementById('invite-banner') as HTMLElement | null;
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'invite-banner';
+    el.className = 'panel invite-banner';
+    el.setAttribute('hidden', '');
+    document.body.appendChild(el);
+  }
+  return el;
+}
+
+function renderInviteBanner(message?: string, error = false): void {
+  const el = inviteBannerEl();
+  if (!pendingInviteToken && !message) {
+    el.setAttribute('hidden', '');
+    el.innerHTML = '';
+    return;
+  }
+  const preview = pendingInvitePreview;
+  const text = message ?? (preview
+    ? `${preview.inviterName} invited you to ${preview.realm}.`
+    : 'Friend invite ready.');
+  el.className = `panel invite-banner${error ? ' err' : ''}`;
+  el.innerHTML = `<span>${text}</span><button class="btn btn-small" type="button">Dismiss</button>`;
+  el.removeAttribute('hidden');
+  el.querySelector('button')?.addEventListener('click', () => clearPendingInvite());
+}
+
+async function loadPendingInvitePreview(): Promise<void> {
+  if (!pendingInviteToken) return;
+  renderInviteBanner();
+  try {
+    const preview = await api.invitePreview(pendingInviteToken);
+    if (preview.expired) {
+      clearPendingInvite();
+      renderInviteBanner('That friend invite has expired.', true);
+      return;
+    }
+    pendingInvitePreview = preview;
+    renderInviteBanner();
+  } catch {
+    clearPendingInvite();
+    renderInviteBanner('That friend invite is not valid.', true);
+  }
+}
+
+async function acceptPendingInvite(characterId?: number): Promise<InviteAcceptResult | null> {
+  if (!pendingInviteToken) return null;
+  try {
+    const result = await api.acceptInvite(pendingInviteToken, characterId);
+    pendingInvitePreview = {
+      token: pendingInviteToken,
+      inviterName: result.inviterName,
+      realm: result.realm,
+      expired: false,
+      accepted: true,
+    };
+    if (characterId !== undefined && result.completed) {
+      pendingInviteCompletion = result;
+      clearPendingInvite();
+    } else {
+      renderInviteBanner(`${result.inviterName}'s invite is linked. Create or enter a character on ${result.realm}.`);
+    }
+    return result;
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Could not accept invite.';
+    if (characterId === undefined) {
+      clearPendingInvite();
+      renderInviteBanner(msg, true);
+    }
+    else $('#charselect-error').textContent = msg;
+    return null;
+  }
+}
 
 function updatePreviewContainer(panelId: string): void {
   if (!characterPreview) return;
@@ -847,6 +968,9 @@ function realmPopulation(online: boolean, players: number): { label: string; cls
 async function enterRealmFlow(): Promise<void> {
   const dir = await api.realms();
   $('#realm-list-user').textContent = api.username ? `${api.username}` : '';
+  await acceptPendingInvite();
+  const invited = pendingInvitePreview?.realm ? dir.realms.find((r) => r.name === pendingInvitePreview?.realm) : null;
+  if (invited) { selectRealm(invited); return; }
   const remembered = localStorage.getItem(LAST_REALM_KEY);
   const auto = dir.realms.find((r) => r.name === remembered);
   if (auto) { selectRealm(auto); return; }
@@ -1055,6 +1179,7 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
     audio.init();
     music.init();
     enterLoadingState('Connecting to realm…');
+    await acceptPendingInvite(c.id);
   } finally {
     if (!hasBegunWorldEntry && button) {
       button.disabled = false;
@@ -1465,6 +1590,8 @@ async function loadProjectStats(): Promise<void> {
 }
 
 function wireStartScreens(): void {
+  capturePendingInviteToken();
+  void loadPendingInvitePreview();
   // Initial page translation and stats load
   translatePage();
   void loadProjectStats();

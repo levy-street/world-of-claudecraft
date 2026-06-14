@@ -6,7 +6,8 @@ import {
   ensureSchema, pool, createAccount, findAccount, getAccountsCount, touchLogin, saveToken, accountForToken,
   listCharacters, getCharacter, createCharacter, deleteCharacter, closeOrphanSessions,
   pruneChatLogs, searchCharacters, characterCountsByRealm, moderationStatusForAccount, renameCharacter,
-  findCharacterReportTargetByName, topArenaRatings,
+  findCharacterReportTargetByName, topArenaRatings, createFriendInvite, getFriendInvite,
+  acceptFriendInvite, friendInviteStats,
 } from './db';
 import { cleanReportReason, createPlayerReport } from './moderation_db';
 import { resolveReportTarget } from './report_target';
@@ -29,6 +30,24 @@ const game = new GameServer();
 
 function normalizeDeleteConfirmation(name: unknown): string {
   return typeof name === 'string' ? name.trim().toLowerCase() : '';
+}
+
+function publicOrigin(req: http.IncomingMessage): string {
+  const proto = typeof req.headers['x-forwarded-proto'] === 'string'
+    ? req.headers['x-forwarded-proto'].split(',')[0].trim()
+    : 'http';
+  const host = typeof req.headers['x-forwarded-host'] === 'string'
+    ? req.headers['x-forwarded-host'].split(',')[0].trim()
+    : String(req.headers.host ?? `localhost:${PORT}`);
+  return `${proto}://${host}`;
+}
+
+function inviteUrl(req: http.IncomingMessage, token: string): string {
+  return `${publicOrigin(req)}/?invite=${encodeURIComponent(token)}`;
+}
+
+function validInviteToken(token: string): boolean {
+  return /^[a-f0-9]{64}$/.test(token);
 }
 
 async function bearerAccount(req: http.IncomingMessage): Promise<number | null> {
@@ -255,6 +274,65 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const q = new URL(req.url ?? '/', 'http://localhost').searchParams.get('q') ?? '';
       const results = q.trim().length >= 1 ? await searchCharacters(q, 8) : [];
       return json(res, 200, { results });
+    }
+    if (req.method === 'GET' && url === '/api/invites/me') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return json(res, 200, { stats: await friendInviteStats(accountId) });
+    }
+    if (req.method === 'POST' && url === '/api/invites') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      const body = await readBody(req);
+      const characterId = Number(body.characterId);
+      if (!Number.isFinite(characterId)) return json(res, 400, { error: 'character required' });
+      const character = await getCharacter(accountId, characterId);
+      if (!character) return json(res, 404, { error: 'character not found' });
+      const invite = await createFriendInvite(newToken(), accountId, character.id);
+      return json(res, 200, {
+        token: invite.token,
+        url: inviteUrl(req, invite.token),
+        expiresAt: invite.expiresAt,
+        inviterName: invite.inviterName,
+        realm: invite.realm,
+        stats: await friendInviteStats(accountId),
+      });
+    }
+    const invitePreviewMatch = /^\/api\/invites\/([a-f0-9]{64})$/.exec(url);
+    if (req.method === 'GET' && invitePreviewMatch) {
+      const token = invitePreviewMatch[1];
+      const invite = await getFriendInvite(token);
+      if (!invite) return json(res, 404, { error: 'invite not found' });
+      const expired = new Date(invite.expiresAt).getTime() <= Date.now();
+      return json(res, 200, {
+        token,
+        inviterName: invite.inviterName,
+        realm: invite.realm,
+        expired,
+        accepted: invite.acceptedAccountId !== null,
+      });
+    }
+    const inviteAcceptMatch = /^\/api\/invites\/([a-f0-9]{64})\/accept$/.exec(url);
+    if (req.method === 'POST' && inviteAcceptMatch) {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      const token = inviteAcceptMatch[1];
+      if (!validInviteToken(token)) return json(res, 400, { error: 'invalid invite' });
+      const body = await readBody(req);
+      const rawCharacterId = body.characterId === undefined ? undefined : Number(body.characterId);
+      if (rawCharacterId !== undefined && !Number.isFinite(rawCharacterId)) {
+        return json(res, 400, { error: 'invalid character' });
+      }
+      const result = await acceptFriendInvite(token, accountId, rawCharacterId);
+      if (!result.ok) return json(res, result.status, { error: result.error });
+      return json(res, 200, {
+        inviterName: result.invite.inviterName,
+        realm: result.invite.realm,
+        completed: result.invite.completedAt !== null,
+        completedNow: result.completedNow,
+        acceptedCharacterName: result.invite.acceptedCharacterName,
+        stats: await friendInviteStats(accountId),
+      });
     }
     if (req.method === 'POST' && url === '/api/reports') {
       const accountId = await bearerActiveAccount(req, res);

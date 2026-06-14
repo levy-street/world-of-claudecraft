@@ -32,6 +32,17 @@ export interface ReportHooks {
   submitByName?(targetName: string, reason: string, details: string): Promise<void>;
 }
 
+export interface InviteStatsView {
+  sentCompleted: number;
+  acceptedCompleted: number;
+  titleUnlocked: boolean;
+}
+
+export interface InviteHooks {
+  create(): Promise<{ url: string; expiresAt: string; stats: InviteStatsView }>;
+  stats(): Promise<InviteStatsView>;
+}
+
 const $ = <T extends HTMLElement = HTMLElement>(sel: string): T => document.querySelector(sel) as T;
 const esc = (value: unknown): string => String(value ?? '')
   .replace(/&/g, '&amp;')
@@ -69,6 +80,7 @@ export class Hud {
   private dragFromSlot: number | null = null;
   private optionsHooks: OptionsHooks | null = null;
   private reportHooks: ReportHooks | null = null;
+  private inviteHooks: InviteHooks | null = null;
   private optionsView: 'main' | 'keybinds' | 'graphics' | 'audio' = 'main';
   private capturingKey: { action: string; index: number } | null = null; // binding awaiting a key
   private keybindNote = '';
@@ -113,6 +125,9 @@ export class Hud {
   private lastSocialStruct = '';
   private lastSocialContent = '';
   private socialNotice: { text: string; error: boolean } | null = null;
+  private inviteStats: InviteStatsView | null = null;
+  private inviteLink: string | null = null;
+  private inviteBusy = false;
   private socialSuggestTimer: number | undefined;
   // current typeahead state: which input, its results, and the keyboard-
   // highlighted row (-1 = none), so Enter/Arrow keys can pick a suggestion
@@ -2250,6 +2265,7 @@ export class Hud {
     this.socialNotice = null;
     this.lastSocialStruct = this.socialStructSig();
     this.lastSocialContent = JSON.stringify(this.sim.socialInfo);
+    if (this.inviteHooks) void this.refreshInviteStats();
     this.renderSocial();
   }
 
@@ -2360,7 +2376,7 @@ export class Hud {
   // The add/action row changes with the tab (and guild membership). Inputs
   // tagged data-suggest get the username typeahead.
   private socialFooter(): string {
-    if (this.socialTab === 'friends') return this.addRow('friend', 'friend-add', 'Search to add a friend…', 'Add', 16, true);
+    if (this.socialTab === 'friends') return this.inviteHtml() + this.addRow('friend', 'friend-add', 'Search to add a friend…', 'Add', 16, true);
     if (this.socialTab === 'ignore') return this.addRow('ignore', 'block-add', 'Search to ignore…', 'Ignore', 16, true);
     const guild = this.sim.socialInfo?.guild ?? null;
     if (!guild) return this.addRow('gname', 'guild-create', 'Name your new guild', 'Found', 24, false);
@@ -2381,6 +2397,22 @@ export class Hud {
       + `<button class="btn" data-act="${act}">${label}</button></div>`;
   }
 
+  private inviteHtml(): string {
+    if (!this.inviteHooks) return '';
+    const stats = this.inviteStats;
+    const count = (stats?.sentCompleted ?? 0) + (stats?.acceptedCompleted ?? 0);
+    const state = stats?.titleUnlocked
+      ? `Friend Founder unlocked · ${count} completed`
+      : 'Bring a friend into your realm';
+    const link = this.inviteLink ? `<div class="soc-invite-link">${esc(this.inviteLink)}</div>` : '';
+    return `<div class="soc-invite">`
+      + `<div><b>Invite Friend</b><br><span class="soc-meta">${state}</span></div>`
+      + `<div class="soc-invite-actions">`
+      + `<button class="btn" data-act="create-invite" ${this.inviteBusy ? 'disabled' : ''}>${this.inviteLink ? 'Copy Link' : 'Create Link'}</button>`
+      + `<button class="btn" data-act="open-discord">Discord</button>`
+      + `</div>${link}</div>`;
+  }
+
   // Wire the parts that survive a content refresh: close, tabs, footer + search.
   private wireSocialChrome(el: HTMLElement): void {
     el.querySelector('[data-close]')?.addEventListener('click', () => this.toggleSocial());
@@ -2398,8 +2430,11 @@ export class Hud {
       else if (act === 'guild-create') { const n = field('gname'); if (n) { this.sim.guildCreate(n); this.clearSocialInput('gname'); } }
       else if (act === 'guild-leave') this.sim.guildLeave();
       else if (act === 'guild-disband') this.showPrompt('Disband your guild? This cannot be undone.', 'Disband', () => this.sim.guildDisband(), () => { /* keep */ });
+      else if (act === 'create-invite') void this.createInviteLink();
+      else if (act === 'open-discord') window.open('https://discord.gg/GjhnUsBtw', '_blank', 'noopener,noreferrer');
     };
     el.querySelectorAll('.soc-add .btn').forEach((b) => b.addEventListener('click', () => submit((b as HTMLElement).dataset.act)));
+    el.querySelectorAll('.soc-invite .btn').forEach((b) => b.addEventListener('click', () => submit((b as HTMLElement).dataset.act)));
     // Enter-to-submit only for plain inputs (the guild name). Search inputs get
     // richer keyboard handling — arrows + Enter to pick a suggestion — below.
     el.querySelectorAll('.soc-add input:not([data-suggest])').forEach((inp) => inp.addEventListener('keydown', (e) => {
@@ -2407,6 +2442,34 @@ export class Hud {
       submit((inp.parentElement?.querySelector('.btn') as HTMLElement | null)?.dataset.act);
     }));
     this.wireSuggest(el);
+  }
+
+  private async refreshInviteStats(): Promise<void> {
+    if (!this.inviteHooks || this.sim.socialInfo === null) return;
+    try {
+      this.inviteStats = await this.inviteHooks.stats();
+      if ($('#social-window').classList.contains('open') && this.socialTab === 'friends') this.renderSocial();
+    } catch {
+      // Cosmetic invite status should never break the Social panel.
+    }
+  }
+
+  private async createInviteLink(): Promise<void> {
+    if (!this.inviteHooks || this.inviteBusy) return;
+    this.inviteBusy = true;
+    this.renderSocial();
+    try {
+      const invite = await this.inviteHooks.create();
+      this.inviteStats = invite.stats;
+      this.inviteLink = invite.url;
+      if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(invite.url);
+      this.setSocialNotice('Invite link copied. Send it to a friend or post it in Discord.', false);
+    } catch (err) {
+      this.setSocialNotice(err instanceof Error ? err.message : 'Could not create invite link.', true);
+    } finally {
+      this.inviteBusy = false;
+      this.renderSocial();
+    }
   }
 
   // Wire per-row actions (re-run on every list refresh).
@@ -2674,6 +2737,10 @@ export class Hud {
 
   attachReporting(hooks: ReportHooks): void {
     this.reportHooks = hooks;
+  }
+
+  attachInvites(hooks: InviteHooks): void {
+    this.inviteHooks = hooks;
   }
 
   get optionsOpen(): boolean {

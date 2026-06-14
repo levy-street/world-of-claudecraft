@@ -558,6 +558,10 @@
   .soc-empty { color: #887c5c; font-size: 12px; padding: 10px 6px; text-align: center; }
   .soc-guild-head { font-family: var(--title-font); color: var(--gold); font-size: 15px; padding: 2px 4px 6px; }
   .soc-guild-head .gm { color: #998d6a; font-size: 11px; }
+  .soc-invite { margin: 6px 0 8px; padding: 7px; border: 1px solid #4a3d1d; background: #08070bcc; display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; border-radius: 5px; }
+  .soc-invite-actions { display: flex; gap: 6px; }
+  .soc-invite .btn { margin: 0; padding: 4px 8px; font-size: 11px; }
+  .soc-invite-link { grid-column: 1 / -1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #ffd9a0; font-size: 11px; user-select: text; }
 
   /* map */
   #map-window { left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 14px; }
@@ -687,6 +691,10 @@
   #banner { position: absolute; left: 50%; top: 28%; transform: translateX(-50%); color: var(--gold);
     font-size: 38px; font-weight: bold; text-shadow: 0 0 18px #00000088, 2px 2px 6px #000; opacity: 0;
     transition: opacity 1.2s; pointer-events: none; font-family: var(--title-font); letter-spacing: 1px; white-space: nowrap; }
+  .invite-banner { position: fixed; left: 50%; top: 12px; transform: translateX(-50%); z-index: 140; display: flex; align-items: center; gap: 10px; max-width: min(560px, calc(100vw - 24px)); padding: 8px 10px; color: #f6ead0; font-size: 13px; }
+  .invite-banner.err { border-color: #a94332; color: #ffb3a6; }
+  .invite-banner[hidden] { display: none; }
+  .invite-banner .btn { margin: 0; padding: 3px 8px; font-size: 11px; }
 
   /* ---------- death overlay ---------- */
   #death-overlay { position: absolute; inset: 0; background: radial-gradient(ellipse at center, #40000077 0%, #300000bb 100%);
