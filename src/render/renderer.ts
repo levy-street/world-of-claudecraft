@@ -69,6 +69,7 @@ interface EntityView {
   visual: CharacterVisual | null;
   sheepVisual: CharacterVisual | null; // polymorph form, built lazily
   bearVisual: CharacterVisual | null; // druid bear form, built lazily
+  ghostWolfVisual: CharacterVisual | null; // shaman Ghost Wolf form, built lazily
   /** unscaled height — nameplate/vfx anchor reads height * e.scale */
   height: number;
   /** what removeView pulls back out of clickTargets */
@@ -329,7 +330,7 @@ export class Renderer {
       const v = this.views.get(id);
       if (!v) return null;
       const e = this.sim.entities.get(id);
-      const h = v.height * (e?.scale ?? 1) * frac;
+      const h = this.activeHeight(v) * (e?.scale ?? 1) * frac;
       return new THREE.Vector3(v.group.position.x, v.group.position.y + h, v.group.position.z);
     });
     this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
@@ -583,7 +584,7 @@ export class Renderer {
     const objectCasters: THREE.Object3D[] = [];
     if (!visual) collectCasters(group, objectCasters);
     this.views.set(e.id, {
-      group, visual, sheepVisual: null, bearVisual: null, height, clickTarget,
+      group, visual, sheepVisual: null, bearVisual: null, ghostWolfVisual: null, height, clickTarget,
       nameplate: np, nameEl, hpBar, hpFill, markerEl: marker, raidMarkEl: raidMark, sparkle, objectMesh, portal,
       objectCasters, shadowOn: true, isFar: false,
       lastX: e.pos.x, lastZ: e.pos.z,
@@ -595,7 +596,12 @@ export class Renderer {
   private activeVisual(v: EntityView): CharacterVisual | null {
     if (v.sheepVisual?.root.visible) return v.sheepVisual;
     if (v.bearVisual?.root.visible) return v.bearVisual;
+    if (v.ghostWolfVisual?.root.visible) return v.ghostWolfVisual;
     return v.visual;
+  }
+
+  private activeHeight(v: EntityView): number {
+    return this.activeVisual(v)?.height ?? v.height;
   }
 
   triggerAttack(entityId: number): void {
@@ -736,6 +742,7 @@ export class Renderer {
       v.visual.dispose();
       v.sheepVisual?.dispose();
       v.bearVisual?.dispose();
+      v.ghostWolfVisual?.dispose();
     } else {
       // Object views (door arch, loot crates) own their geometries; their
       // materials are shared caches (door stone / crate planks / sparkle) and
@@ -777,10 +784,11 @@ export class Renderer {
     for (const e of sim.entities.values()) {
       const v = this.views.get(e.id);
       if (!v) continue;
-      // form swaps (polymorph sheep, druid bear) — computed up front because
+      // form swaps (polymorph sheep, druid bear, Ghost Wolf) — computed up front because
       // the shadow gates below must not run the base rig's proxy under a form
       const polyed = e.auras.some((a) => a.kind === 'polymorph');
       const bear = !polyed && e.auras.some((a) => a.kind === 'form_bear');
+      const ghostWolf = !polyed && !bear && e.auras.some((a) => a.kind === 'form_ghost_wolf');
       const stealthed = e.auras.some((a) => a.kind === 'stealth');
       // distance cull: far rigs are invisible specks but cost real draw calls
       const cdx = e.pos.x - p.pos.x, cdz = e.pos.z - p.pos.z;
@@ -799,12 +807,13 @@ export class Renderer {
           v.isFar = d2 > ENTITY_LOD_RANGE_SQ;
           // past the articulated gate the static-pose proxy carries the
           // shadow; an active form's own rig keeps casting instead
-          v.visual.setProxyShadow(!wantShadow && inProxyBand && !polyed && !bear);
-          // sheep/bear keep articulated shadows through the whole proxy band —
+          v.visual.setProxyShadow(!wantShadow && inProxyBand && !polyed && !bear && !ghostWolf);
+          // form rigs keep articulated shadows through the whole proxy band —
           // a frozen humanoid proxy silhouette would be wrong under a form
           const wantFormShadow = wantShadow || inProxyBand;
           v.sheepVisual?.setShadow(wantFormShadow);
           v.bearVisual?.setShadow(wantFormShadow);
+          v.ghostWolfVisual?.setShadow(wantFormShadow);
         } else if (wantShadow !== v.shadowOn) {
           v.shadowOn = wantShadow;
           for (const caster of v.objectCasters) (caster as THREE.Mesh).castShadow = wantShadow;
@@ -849,7 +858,7 @@ export class Renderer {
         && groundHeight(e.pos.x, e.pos.z, this.sim.cfg.seed) < WATER_LEVEL - 0.8
         && e.pos.y <= WATER_LEVEL - 0.5;
 
-      // lazy form visuals, swapped by visibility like the old sheep/bear rigs
+      // lazy form visuals, swapped by visibility so inactive rigs stay mounted
       if (polyed && !v.sheepVisual) {
         v.sheepVisual = createCharacterVisual(e, 'form_sheep');
         v.sheepVisual.root.scale.multiplyScalar(e.scale);
@@ -860,10 +869,17 @@ export class Renderer {
         v.bearVisual.root.scale.multiplyScalar(e.scale);
         v.group.add(v.bearVisual.root);
       }
+      if (ghostWolf && !v.ghostWolfVisual) {
+        v.ghostWolfVisual = createCharacterVisual(e, 'form_ghost_wolf');
+        v.ghostWolfVisual.root.scale.multiplyScalar(e.scale);
+        v.group.add(v.ghostWolfVisual.root);
+      }
       if (v.sheepVisual) v.sheepVisual.root.visible = polyed;
       if (v.bearVisual) v.bearVisual.root.visible = bear;
+      if (v.ghostWolfVisual) v.ghostWolfVisual.root.visible = ghostWolf;
       const active = polyed && v.sheepVisual ? v.sheepVisual
-        : bear && v.bearVisual ? v.bearVisual : v.visual;
+        : bear && v.bearVisual ? v.bearVisual
+          : ghostWolf && v.ghostWolfVisual ? v.ghostWolfVisual : v.visual;
       const ghost = shouldRenderStealthGhost(this.sim.playerId, e);
       active.setGhost(ghost);
       v.visual.root.visible = active === v.visual;
@@ -1079,7 +1095,7 @@ export class Renderer {
         continue;
       }
       this.tmpV.copy(v.group.position);
-      this.tmpV.y += v.height * e.scale + 0.5;
+      this.tmpV.y += this.activeHeight(v) * e.scale + 0.5;
       this.tmpV.project(this.camera);
       if (this.tmpV.z > 1) { v.nameplate.style.display = 'none'; continue; }
       const sx = (this.tmpV.x * 0.5 + 0.5) * w;
@@ -1177,7 +1193,7 @@ export class Renderer {
       // fall back to the live entity position when the rig isn't being drawn
       if (v.group.visible) this.tmpV.copy(v.group.position);
       else this.tmpV.set(e.pos.x, e.pos.y, e.pos.z);
-      this.tmpV.y += v.height * e.scale + 1.0;
+      this.tmpV.y += this.activeHeight(v) * e.scale + 1.0;
       this.tmpV.project(this.camera);
       if (this.tmpV.z > 1) { b.el.style.display = 'none'; continue; }
       b.el.style.display = '';
@@ -1232,7 +1248,7 @@ export class Renderer {
       const e = this.sim.entities.get(id);
       if (!e || (e.dead && !e.lootable)) continue;
       this.tmpV.copy(v.group.position);
-      this.tmpV.y += v.height * e.scale * 0.5;
+      this.tmpV.y += this.activeHeight(v) * e.scale * 0.5;
       this.tmpV.project(this.camera);
       if (this.tmpV.z > 1) continue;
       const sx = (this.tmpV.x * 0.5 + 0.5) * this.viewport.width;

@@ -1017,9 +1017,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'ghost_wolf', name: 'Ghost Wolf', class: 'shaman', learnLevel: 16,
     cost: 35, castTime: 2.0, cooldown: 0, range: 0, school: 'nature',
     requiresTarget: false,
-    effects: [{ type: 'selfBuff', kind: 'buff_speed', value: 1.4, duration: 600 }],
+    effects: [{ type: 'selfBuff', kind: 'form_ghost_wolf', value: 1.4, duration: 600 }],
     icon: 'GW', iconColor: '#aab7b8',
-    description: 'Turns you into a Ghost Wolf, increasing movement speed by 40% for 10 min.',
+    description: 'Turns you into a Ghost Wolf, increasing movement speed by 40% for 10 min. Cast again to return to caster form.',
   },
   stormstrike: {
     id: 'stormstrike', name: 'Stormstrike', class: 'shaman', learnLevel: 20,

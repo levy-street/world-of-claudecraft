@@ -10,7 +10,9 @@ export { CharacterVisual } from './visual';
 export type { AnimState } from './visual';
 export { CharacterPreview } from './preview';
 
-/** Build the visual for an entity (or an explicit form key: polymorph/bear). */
-export function createCharacterVisual(e: Entity, formKey?: 'form_sheep' | 'form_bear'): CharacterVisual {
+type FormVisualKey = 'form_sheep' | 'form_bear' | 'form_ghost_wolf';
+
+/** Build the visual for an entity (or an explicit form key). */
+export function createCharacterVisual(e: Entity, formKey?: FormVisualKey): CharacterVisual {
   return new CharacterVisual(formKey ?? visualKeyFor(e), e.color);
 }

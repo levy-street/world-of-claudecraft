@@ -296,7 +296,8 @@ function isFormToggle(ability: AbilityDef): boolean {
 // cancelling is never gated by cost or cooldown (the cooldown gates re-entry).
 function isToggleBuff(ability: AbilityDef): boolean {
   return ability.effects.some((e) => e.type === 'selfBuff'
-    && (e.kind === 'form_bear' || e.kind === 'form_cat' || e.kind === 'defensive_stance' || e.kind === 'stealth'));
+    && (e.kind === 'form_bear' || e.kind === 'form_cat' || e.kind === 'form_ghost_wolf'
+      || e.kind === 'defensive_stance' || e.kind === 'stealth'));
 }
 
 export class Sim {
@@ -817,6 +818,7 @@ export class Sim {
     for (const a of e.auras) {
       if (a.kind === 'slow' || a.kind === 'stealth') slow = Math.min(slow, a.value);
       if (a.kind === 'buff_speed') speed = Math.max(speed, a.value);
+      if (a.kind === 'form_ghost_wolf') speed = Math.max(speed, a.value);
     }
     return slow * speed;
   }
@@ -1188,6 +1190,16 @@ export class Sim {
     this.emit({ type: 'castStop', entityId: p.id, success: false });
   }
 
+  private removeToggleAura(p: Entity, meta: PlayerMeta, ability: AbilityDef): void {
+    const existing = p.auras.findIndex((a) => a.id === ability.id);
+    if (existing < 0) return;
+    p.auras.splice(existing, 1);
+    if (ability.cooldown > 0) p.cooldowns.set(ability.id, ability.cooldown);
+    if (!ability.offGcd) p.gcdRemaining = Math.max(p.gcdRemaining, this.playerGcdFor(meta.cls));
+    this.emit({ type: 'aura', targetId: p.id, name: ability.name, gained: false });
+    recalcPlayerStats(p, meta.cls, meta.equipment);
+  }
+
   private pushbackCast(p: Entity): void {
     if (p.channeling) {
       p.castRemaining = Math.max(0, p.castRemaining - p.castTotal * CHANNEL_PUSHBACK_FRACTION);
@@ -1230,9 +1242,10 @@ export class Sim {
       this.error(p.id, 'That ability requires combo points.');
       return;
     }
-    // druid forms gate their kit both ways: form abilities need the form, and
-    // everything else (the caster kit) is locked while shapeshifted
+    // Forms gate their kit: druid form abilities need their form, while caster
+    // abilities are locked while in druid forms or Ghost Wolf.
     const form = p.auras.find((a) => a.kind === 'form_bear' || a.kind === 'form_cat');
+    const ghostWolfForm = p.auras.find((a) => a.kind === 'form_ghost_wolf');
     if (ability.requiresForm) {
       const need = ability.requiresForm === 'bear' ? 'form_bear' : 'form_cat';
       if (!form || form.kind !== need) {
@@ -1242,6 +1255,9 @@ export class Sim {
     } else if (form && !isFormToggle(ability)) {
       this.error(p.id, "You can't do that while shapeshifted.");
       return;
+    } else if (ghostWolfForm && !togglingOff) {
+      this.error(p.id, "You can't do that while shapeshifted.");
+      return;
     }
     if (ability.requiresStealth && !p.auras.some((a) => a.kind === 'stealth')) {
       this.error(p.id, 'You must be stealthed.');
@@ -1249,6 +1265,11 @@ export class Sim {
     }
     if (ability.requiresOutOfCombat && p.inCombat) {
       this.error(p.id, "You can't do that while in combat.");
+      return;
+    }
+    if (togglingOff) {
+      if (p.sitting) this.standUp(p);
+      this.removeToggleAura(p, meta, ability);
       return;
     }
 
@@ -1706,7 +1727,7 @@ export class Sim {
         case 'selfBuff': {
           // forms, stances and stealth are toggles: casting again cancels
           const isToggle = eff.kind === 'form_bear' || eff.kind === 'form_cat'
-            || eff.kind === 'defensive_stance' || eff.kind === 'stealth';
+            || eff.kind === 'form_ghost_wolf' || eff.kind === 'defensive_stance' || eff.kind === 'stealth';
           if (isToggle) {
             const existing = p.auras.findIndex((a) => a.id === ability.id);
             if (existing >= 0) {

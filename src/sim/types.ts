@@ -35,7 +35,7 @@ export type AuraKind =
   | 'dot' | 'slow' | 'stun' | 'root' | 'incapacitate' | 'polymorph'
   | 'attackspeed' | 'buff_ap' | 'buff_armor' | 'buff_int' | 'buff_dodge' | 'buff_speed' | 'buff_haste'
   | 'hot' | 'absorb' | 'imbue' | 'buff_sta' | 'buff_allstats' | 'thorns' | 'form_bear'
-  | 'form_cat' | 'stealth' | 'defensive_stance' | 'righteous_fury' | 'sunder';
+  | 'form_cat' | 'form_ghost_wolf' | 'stealth' | 'defensive_stance' | 'righteous_fury' | 'sunder';
 
 export interface Aura {
   id: string; // ability id that applied it
