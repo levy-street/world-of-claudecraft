@@ -364,6 +364,7 @@ const FAMILY_KEYS: Record<string, string> = {
 
 const NPC_KEYS: Record<string, string> = {
   marshal_redbrook: 'npc_knight',
+  eastbrook_guard: 'npc_knight',
   warden_fenwick: 'npc_knight',
   captain_thessaly: 'npc_knight',
   loremaster_caddis: 'npc_mage',

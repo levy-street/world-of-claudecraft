@@ -160,6 +160,13 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     questIds: ['q_wolves', 'q_greyjaw', 'q_bandits', 'q_ringleader'],
     greeting: 'Keep your blade close, $C. The Vale is not what it was.',
   },
+  eastbrook_guard: {
+    id: 'eastbrook_guard', name: 'Guard Mira', title: 'Eastbrook Guard',
+    pos: { x: 13, z: 5 }, facing: -Math.PI / 2, color: 0x8e9aaf,
+    questIds: [],
+    guard: { assistRadius: 12, leashRadius: 12, attackSpeed: 1.8 },
+    greeting: 'Run to the square if the Vale turns on you. I will hold the line.',
+  },
   trader_wilkes: {
     id: 'trader_wilkes', name: 'Trader Wilkes', title: 'Provisioner',
     pos: { x: -7, z: 3 }, facing: Math.PI / 2, color: 0x1e8449,

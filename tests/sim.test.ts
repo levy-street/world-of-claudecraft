@@ -3,7 +3,7 @@ import { Sim } from '../src/sim/sim';
 import { applyAction, encodeObs, obsSize, ACTIONS } from '../src/sim/obs';
 import {
   type SimEvent, dist2d, MAX_LEVEL, xpForLevel, mobXpValue, rageConversion, rageFromDealing,
-  spellHitChance, meleeMissChance,
+  spellHitChance, meleeMissChance, type Entity,
 } from '../src/sim/types';
 import { QUESTS, abilitiesKnownAt } from '../src/sim/data';
 import { terrainHeight } from '../src/sim/world';
@@ -22,6 +22,12 @@ function nearestMob(sim: Sim, templateId?: string) {
     if (d < bestD) { bestD = d; best = e; }
   }
   return best;
+}
+
+function npcByTemplate(sim: Sim, templateId: string): Entity {
+  const npc = [...sim.entities.values()].find((e) => e.kind === 'npc' && e.templateId === templateId);
+  expect(npc).toBeTruthy();
+  return npc!;
 }
 
 function teleportTo(sim: Sim, x: number, z: number) {
@@ -118,6 +124,14 @@ describe('world generation', () => {
     expect(objects.length).toBeGreaterThanOrEqual(6);
   });
 
+  it('places an armed Eastbrook guard with the town NPCs', () => {
+    const sim = makeSim('warrior');
+    const guard = npcByTemplate(sim, 'eastbrook_guard');
+    expect(guard.name).toBe('Guard Mira');
+    expect(dist2d(guard.pos, { x: 0, y: 0, z: 0 })).toBeLessThan(26);
+    expect(guard.weapon.min).toBeGreaterThan(1);
+  });
+
   it('terrain is deterministic, town is flat, lake is below water level', () => {
     expect(terrainHeight(10, 10, 42)).toBe(terrainHeight(10, 10, 42));
     expect(Math.abs(terrainHeight(0, 0, 42) - terrainHeight(8, 8, 42))).toBeLessThan(1.5);
@@ -176,6 +190,99 @@ describe('combat', () => {
     expect(wolf.lootable).toBe(true);
     sim.lootCorpse(wolf.id);
     expect(sim.copper).toBeGreaterThan(0);
+  });
+
+  it('Eastbrook guard assists when a hostile mob chases a player into town', () => {
+    const sim = makeSim('warrior');
+    const guard = npcByTemplate(sim, 'eastbrook_guard');
+    const wolf = nearestMob(sim, 'forest_wolf');
+    wolf.maxHp = 500;
+    wolf.hp = 500;
+    teleportTo(sim, guard.pos.x + 10, guard.pos.z);
+    wolf.pos = { x: guard.pos.x + 7, y: guard.pos.y, z: guard.pos.z };
+    wolf.prevPos = { ...wolf.pos };
+    (sim as any).rebucket(wolf);
+    wolf.aiState = 'chase';
+    wolf.aggroTargetId = sim.playerId;
+    wolf.inCombat = true;
+    wolf.threat.set(sim.playerId, 25);
+
+    for (let i = 0; i < 20 * 5 && wolf.aggroTargetId !== guard.id; i++) sim.tick();
+
+    expect(guard.aggroTargetId).toBe(wolf.id);
+    expect(wolf.aggroTargetId).toBe(guard.id);
+    expect(wolf.threat.get(guard.id)).toBeGreaterThan(wolf.threat.get(sim.playerId) ?? 0);
+  });
+
+  it('Eastbrook guard does not extend aggro outside the town boundary', () => {
+    const sim = makeSim('warrior');
+    const guard = npcByTemplate(sim, 'eastbrook_guard');
+    const wolf = nearestMob(sim, 'forest_wolf');
+    teleportTo(sim, 30, 0);
+    wolf.pos = { x: 30, y: sim.player.pos.y, z: 0 };
+    wolf.prevPos = { ...wolf.pos };
+    (sim as any).rebucket(wolf);
+    wolf.aiState = 'chase';
+    wolf.aggroTargetId = sim.playerId;
+    wolf.inCombat = true;
+    wolf.threat.set(sim.playerId, 25);
+
+    for (let i = 0; i < 20 * 3; i++) sim.tick();
+
+    expect(guard.aggroTargetId).not.toBe(wolf.id);
+    expect(wolf.threat.has(guard.id)).toBe(false);
+  });
+
+  it('scales mob xp when the Eastbrook guard damages less than half the mob', () => {
+    const sim = makeSim('warrior');
+    const guard = npcByTemplate(sim, 'eastbrook_guard');
+    const wolf = nearestMob(sim, 'forest_wolf');
+    teleportTo(sim, 4, 6);
+    sim.acceptQuest('q_wolves');
+    wolf.level = 1;
+    wolf.maxHp = 100;
+    wolf.hp = 100;
+
+    (sim as any).dealDamage(sim.player, wolf, 60, false, 'physical', null, 'hit', true);
+    (sim as any).dealDamage(guard, wolf, 40, false, 'physical', null, 'hit', true);
+
+    expect(wolf.dead).toBe(true);
+    expect(sim.counters.xpGained).toBe(Math.round(mobXpValue(1, 1) * 0.6));
+    expect(sim.meta(sim.playerId)!.questLog.get('q_wolves')!.counts[0]).toBe(0);
+    expect(wolf.lootable).toBe(true);
+  });
+
+  it('blocks quest item drops from guard-assisted kills', () => {
+    const sim = makeSim('warrior');
+    const meta = sim.meta(sim.playerId)!;
+    const greyjaw = nearestMob(sim, 'old_greyjaw');
+    meta.questLog.set('q_greyjaw', { questId: 'q_greyjaw', counts: [0], state: 'active' });
+    greyjaw.guardDamageTaken = 1;
+
+    (sim as any).rollLoot(greyjaw, meta);
+
+    expect((greyjaw.loot?.items ?? []).some((s: { itemId: string }) => s.itemId === 'greyjaw_fang')).toBe(false);
+  });
+
+  it('denies xp, loot, kills, and quest credit when the Eastbrook guard does most of the damage', () => {
+    const sim = makeSim('warrior');
+    const guard = npcByTemplate(sim, 'eastbrook_guard');
+    const wolf = nearestMob(sim, 'forest_wolf');
+    teleportTo(sim, 4, 6);
+    sim.acceptQuest('q_wolves');
+    wolf.level = 1;
+    wolf.maxHp = 100;
+    wolf.hp = 100;
+
+    (sim as any).dealDamage(sim.player, wolf, 40, false, 'physical', null, 'hit', true);
+    (sim as any).dealDamage(guard, wolf, 60, false, 'physical', null, 'hit', true);
+
+    expect(wolf.dead).toBe(true);
+    expect(sim.counters.xpGained).toBe(0);
+    expect(sim.counters.kills).toBe(0);
+    expect(sim.meta(sim.playerId)!.questLog.get('q_wolves')!.counts[0]).toBe(0);
+    expect(wolf.lootable).toBe(false);
+    expect(wolf.loot).toBeNull();
   });
 
   it('warrior generates rage from combat (vanilla formula scale)', () => {

@@ -74,6 +74,7 @@ const PET_FOLLOW_DISTANCE = 3.5;
 const PET_TELEPORT_DISTANCE = 60; // owner this far away: pet warps to heel
 const PET_ASSIST_RANGE = 50; // how far the pet scans for enemies engaging the pair
 const PET_GROWL_INTERVAL = 8; // controlled pets can tank by forcing attention
+const GUARD_REWARD_DENY_FRACTION = 0.5;
 const FRIENDLY_NPC_REJECTED_AURA_KINDS: ReadonlySet<AuraKind> = new Set([
   'dot', 'slow', 'stun', 'root', 'incapacitate', 'polymorph', 'attackspeed', 'sunder',
 ]);
@@ -338,6 +339,7 @@ export class Sim {
     for (const npcDef of Object.values(NPCS)) {
       const safe = this.findSafePos(npcDef.pos.x, npcDef.pos.z, WATER_LEVEL + 0.6);
       const npc = createNpc(this.nextId++, npcDef, this.groundPos(safe.x, safe.z));
+      if (npcDef.guard) this.configureGuardStats(npc, npcDef.guard.attackSpeed);
       this.addEntity(npc);
       if (npcDef.market) this.merchantId = npc.id; // the World Market is anchored here
     }
@@ -722,6 +724,7 @@ export class Sim {
         this.updateAuras(e);
       } else if (e.kind === 'npc') {
         this.cleanseFriendlyNpcAuras(e);
+        this.updateGuardNpc(e);
       } else if (e.kind === 'object') {
         if (!e.lootable) {
           e.respawnTimer -= DT;
@@ -2033,6 +2036,7 @@ export class Sim {
       }
     }
 
+    const hpDamage = Math.min(target.hp, amount);
     target.hp = Math.max(0, target.hp - amount);
     this.emit({ type: 'damage', sourceId: source?.id ?? -1, targetId: target.id, amount, crit, school, ability, kind });
 
@@ -2056,9 +2060,13 @@ export class Sim {
     // classic threat: damage (and the ability's flat bonus) lands on the mob's
     // hate table, scaled by the attacker's stance/form modifiers
     if (source && source.id !== target.id && target.kind === 'mob' && target.hostile
-      && (source.kind === 'player' || source.ownerId !== null)) {
+      && (source.kind === 'player' || source.ownerId !== null || this.isGuardNpc(source))) {
       const threat = (amount * (threatOpts?.mult ?? 1) + (threatOpts?.flat ?? 0)) * threatModifier(source, school);
       addThreat(target, source.id, threat);
+    }
+
+    if (source && source.id !== target.id && this.isGuardNpc(source) && target.kind === 'mob' && target.hostile) {
+      target.guardDamageTaken += hpDamage;
     }
 
     // tap rights: the first player (or their pet) to damage a mob owns it
@@ -2100,7 +2108,7 @@ export class Sim {
     a.inCombat = true;
     b.inCombat = true;
     // players and their pets pull wild mobs; pets never run wild-mob AI
-    const aAttacker = a.kind === 'player' || (a.kind === 'mob' && a.ownerId !== null);
+    const aAttacker = a.kind === 'player' || (a.kind === 'mob' && a.ownerId !== null) || this.isGuardNpc(a);
     if (b.kind === 'mob' && b.ownerId === null && !b.dead && aAttacker && b.aiState !== 'evade') {
       if (b.aiState === 'idle') this.aggroMob(b, a, true);
       else if (b.aggroTargetId === null) b.aggroTargetId = a.id;
@@ -2179,19 +2187,22 @@ export class Sim {
         if (eligible.length === 0) eligible.push(meta);
         const bonus = GROUP_XP_BONUS[Math.min(eligible.length, GROUP_XP_BONUS.length) - 1];
 
-        meta.counters.kills++;
+        const rewardScale = this.guardRewardScale(e);
         if (creditEntity.targetId === e.id) creditEntity.autoAttack = false;
         if (creditEntity.comboTargetId === e.id) {
           creditEntity.comboPoints = 0;
           creditEntity.comboTargetId = null;
           this.emit({ type: 'comboPoint', points: 0, pid: creditEntity.id });
         }
+        if (rewardScale <= 0) return;
+
+        meta.counters.kills++;
         for (const member of eligible) {
           const mE = this.entities.get(member.entityId);
           if (!mE) continue;
-          const xpGain = Math.round((mobXpValue(e.level, mE.level) * eliteMult * bonus) / eligible.length);
+          const xpGain = Math.round((mobXpValue(e.level, mE.level) * eliteMult * bonus * rewardScale) / eligible.length);
           if (xpGain > 0 && mE.level < MAX_LEVEL) this.grantXp(xpGain, member);
-          this.onMobKilledForQuests(e, member);
+          if (e.guardDamageTaken <= 0) this.onMobKilledForQuests(e, member);
         }
         this.rollLoot(e, meta);
       }
@@ -2218,6 +2229,7 @@ export class Sim {
   }
 
   private rollLoot(mob: Entity, meta: PlayerMeta): void {
+    if (this.guardRewardScale(mob) <= 0) return;
     const template = MOBS[mob.templateId];
     if (!template) return;
     let copper = 0;
@@ -2243,6 +2255,7 @@ export class Sim {
         continue;
       }
       if (entry.questId) {
+        if (mob.guardDamageTaken > 0) continue;
         const qp = meta.questLog.get(entry.questId);
         if (!qp || qp.state !== 'active') continue;
         const quest = QUESTS[entry.questId];
@@ -2262,6 +2275,116 @@ export class Sim {
   // -------------------------------------------------------------------------
   // Mob AI
   // -------------------------------------------------------------------------
+
+  private isGuardNpc(e: Entity | null): e is Entity {
+    return !!e && e.kind === 'npc' && NPCS[e.templateId]?.guard !== undefined;
+  }
+
+  private configureGuardStats(guard: Entity, attackSpeed: number): void {
+    const zone = zoneAt(guard.pos.z);
+    const regionLevel = zone.levelRange[1];
+    const damage = 8 + regionLevel * 3;
+    guard.level = regionLevel + 3;
+    guard.maxHp = 500 + regionLevel * 120;
+    guard.hp = guard.maxHp;
+    guard.stats.armor = regionLevel * 35;
+    guard.weapon = {
+      min: Math.round(damage * 0.85),
+      max: Math.round(damage * 1.15),
+      speed: attackSpeed,
+    };
+    guard.moveSpeed = Math.max(8, RUN_SPEED);
+  }
+
+  private guardRewardScale(mob: Entity): number {
+    if (mob.kind !== 'mob' || mob.maxHp <= 0 || mob.guardDamageTaken <= 0) return 1;
+    const fraction = mob.guardDamageTaken / mob.maxHp;
+    return fraction > GUARD_REWARD_DENY_FRACTION ? 0 : Math.max(0, 1 - fraction);
+  }
+
+  private updateGuardNpc(guard: Entity): void {
+    const def = NPCS[guard.templateId]?.guard;
+    if (!def || guard.dead) return;
+
+    guard.combatTimer += DT;
+    let target = guard.aggroTargetId !== null ? this.entities.get(guard.aggroTargetId) ?? null : null;
+    if (!target || target.dead || target.kind !== 'mob' || !target.hostile
+      || dist2d(target.pos, guard.spawnPos) > def.leashRadius || !this.isInsideGuardHub(guard, target.pos)) {
+      target = this.findGuardAssistTarget(guard, def.assistRadius);
+      guard.aggroTargetId = target?.id ?? null;
+      if (target) {
+        addThreat(target, guard.id, topThreatValue(target) + 25);
+        target.aggroTargetId = guard.id;
+        target.aiState = 'chase';
+        target.inCombat = true;
+        guard.aiState = 'chase';
+        guard.inCombat = true;
+      }
+    }
+
+    if (!target) {
+      if (dist2d(guard.pos, guard.spawnPos) > 0.5) this.moveToward(guard, guard.spawnPos, guard.moveSpeed);
+      else {
+        guard.aiState = 'idle';
+        guard.inCombat = false;
+        guard.facing = NPCS[guard.templateId]?.facing ?? guard.facing;
+      }
+      return;
+    }
+
+    const d = dist2d(guard.pos, target.pos);
+    if (d > def.leashRadius || dist2d(guard.pos, guard.spawnPos) > def.leashRadius || !this.isInsideGuardHub(guard, target.pos)) {
+      guard.aggroTargetId = null;
+      guard.aiState = 'idle';
+      return;
+    }
+    if (d > MELEE_RANGE * 0.8) {
+      guard.aiState = 'chase';
+      if (!this.isRooted(guard)) this.moveToward(guard, target.pos, guard.moveSpeed * this.moveSpeedMult(guard));
+      return;
+    }
+
+    guard.aiState = 'attack';
+    guard.facing = angleTo(guard.pos, target.pos);
+    guard.swingTimer -= DT;
+    if (guard.swingTimer <= 0) {
+      this.guardSwing(guard, target);
+      guard.swingTimer = def.attackSpeed * this.swingIntervalMult(guard);
+    }
+  }
+
+  private findGuardAssistTarget(guard: Entity, radius: number): Entity | null {
+    let best: Entity | null = null;
+    let bestD2 = radius * radius;
+    this.grid.forEachInRadius(guard.pos.x, guard.pos.z, radius, (m, d2) => {
+      if (m.kind !== 'mob' || m.dead || !m.hostile || m.ownerId !== null) return;
+      if (m.aiState !== 'chase' && m.aiState !== 'attack') return;
+      if (!this.isInsideGuardHub(guard, m.pos)) return;
+      const target = m.aggroTargetId !== null ? this.entities.get(m.aggroTargetId) : null;
+      if (!target || target.kind !== 'player' || target.dead) return;
+      if (d2 < bestD2) { best = m; bestD2 = d2; }
+    });
+    return best;
+  }
+
+  private isInsideGuardHub(guard: Entity, pos: Vec3): boolean {
+    const hub = zoneAt(guard.spawnPos.z).hub;
+    return dist2d(pos, { x: hub.x, y: 0, z: hub.z }) <= hub.radius;
+  }
+
+  private guardSwing(guard: Entity, target: Entity): void {
+    const missChance = meleeMissChance(guard.level, target.level);
+    const roll = this.rng.next();
+    if (roll < missChance) {
+      this.emit({ type: 'damage', sourceId: guard.id, targetId: target.id, amount: 0, crit: false, school: 'physical', ability: null, kind: 'miss' });
+      return;
+    }
+    let dmg = this.rng.range(guard.weapon.min, guard.weapon.max);
+    const crit = this.rng.chance(0.05);
+    if (crit) dmg *= 2;
+    dmg *= 1 - armorReduction(this.effectiveArmor(target), guard.level);
+    this.dealDamage(guard, target, Math.max(1, Math.round(dmg)), crit, 'physical', null, 'hit');
+  }
 
   // When a mob's target dies/leaves it swings to its next-highest-threat
   // attacker; with an empty hate table it falls back to the nearest living
@@ -2437,8 +2560,10 @@ export class Sim {
           this.retargetMob(mob);
           break;
         }
+        const guardTarget = this.isGuardNpc(target) ? target : null;
         const leash = mob.spawnPos.x > DUNGEON_X_THRESHOLD ? DUNGEON_LEASH_DISTANCE : LEASH_DISTANCE;
-        if (dist2d(mob.pos, mob.spawnPos) > leash) {
+        if ((guardTarget && !this.isInsideGuardHub(guardTarget, mob.pos))
+          || (!guardTarget && dist2d(mob.pos, mob.spawnPos) > leash)) {
           mob.aiState = 'evade';
           mob.aggroTargetId = null;
           clearThreat(mob);
@@ -2492,6 +2617,7 @@ export class Sim {
           mob.auras = [];
           mob.inCombat = false;
           mob.tappedById = null;
+          mob.guardDamageTaken = 0;
           clearThreat(mob);
           this.despawnSummonedAdds(mob);
           mob.firedSummons = 0;
@@ -2620,6 +2746,7 @@ export class Sim {
     mob.lootable = false;
     mob.loot = null;
     mob.tappedById = null;
+    mob.guardDamageTaken = 0;
     mob.ownerId = null; // a dead pet returns to the wild at its old camp
     mob.hostile = true; // ...and is wild again: a tamed beast must not respawn neutral
     mob.pos = { ...mob.spawnPos };
