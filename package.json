@@ -7,6 +7,7 @@
   "description": "World of Claudecraft — a WoW-Classic-style micro-MMO + headless RL training environment",
   "scripts": {
     "dev": "vite",
+    "dev:stdb": "VITE_WORLD_BACKEND=spacetimedb vite",
     "build": "node scripts/build_media_manifest.mjs generate && vite build && node scripts/build_media_manifest.mjs emit",
     "preview": "vite preview",
     "test": "vitest run",
@@ -18,6 +19,12 @@
     "build:server": "esbuild server/main.ts --bundle --platform=node --format=cjs --external:pg-native --external:bufferutil --external:utf-8-validate --outfile=dist-server/server.cjs",
     "server": "npm run build:server && node dist-server/server.cjs",
     "realms": "npm run build:server && node scripts/dev-realms.mjs",
+    "build:stdb-bridge": "esbuild server/stdb_bridge.ts --bundle --platform=node --format=cjs --external:pg-native --external:bufferutil --external:utf-8-validate --outfile=dist-server/stdb_bridge.cjs",
+    "stdb:build": "spacetime build --module-path stdb",
+    "stdb:start": "spacetime start --data-dir .stdb-data --non-interactive",
+    "stdb:publish": "spacetime publish --server local -y --module-path stdb worldofclaudecraft",
+    "stdb:generate": "spacetime generate worldofclaudecraft --lang typescript --out-dir src/net/module_bindings --module-path stdb -y",
+    "stdb:bridge": "npm run stdb:generate && npm run build:stdb-bridge && node dist-server/stdb_bridge.cjs",
     "admin:grant": "node scripts/grant_admin.mjs"
   },
   "dependencies": {
@@ -25,6 +32,7 @@
     "obscenity": "^0.4.6",
     "pg": "^8.21.0",
     "postprocessing": "^6.36.0",
+    "spacetimedb": "2.3.0",
     "three": "^0.165.0",
     "ws": "^8.21.0"
   },

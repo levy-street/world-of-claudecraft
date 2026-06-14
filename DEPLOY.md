@@ -80,6 +80,30 @@ sudo docker compose up -d --build
 Players online during the restart are disconnected for a few seconds and
 can log straight back in; the server saves all characters on shutdown.
 
+## Experimental SpacetimeDB Path
+
+The production/default backend is still Node + Postgres. The SpacetimeDB path is
+gated behind the client build/dev flag `VITE_WORLD_BACKEND=spacetimedb`.
+SpacetimeDB owns account, character, session, input, command, snapshot, event,
+social, report, and stats tables/reducers. A local bridge process preserves
+v0.5 gameplay parity by joining SpacetimeDB sessions into the existing
+authoritative Node simulation and publishing the same world wire frames back to
+SpacetimeDB subscribers.
+
+For local experiments, run the opt-in compose profile:
+
+```bash
+docker compose --profile stdb up -d spacetimedb
+export STDB_BRIDGE_SETUP_TOKEN='<random setup token>'
+export STDB_BRIDGE_SETUP_TOKEN_SHA256="$(printf '%s' "$STDB_BRIDGE_SETUP_TOKEN" | shasum -a 256 | awk '{print $1}')"
+npm run stdb:publish
+STDB_BRIDGE_SETUP_TOKEN="$STDB_BRIDGE_SETUP_TOKEN" npm run stdb:bridge
+VITE_WORLD_BACKEND=spacetimedb VITE_STDB_URI=http://127.0.0.1:3000 npm run dev
+```
+
+The official standalone container listens on port 3000; the compose service
+binds it to loopback only so it is not exposed publicly by default.
+
 ## Backups
 
 A nightly `pg_dump` runs at 03:15 UTC via `/etc/cron.d/eastbrook-backup`,

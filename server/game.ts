@@ -6,11 +6,10 @@ import { DT, Entity, SimEvent, dist2d } from '../src/sim/types';
 import { parseMoveInputFrame } from '../src/sim/move_input';
 import { stealthDetectionRadius, threatEntries } from '../src/sim/threat';
 import { zoneAt, DUNGEONS } from '../src/sim/data';
-import { saveCharacterState, openPlaySession, closePlaySession, insertChatLogs, pool, loadMarketState, saveMarketState } from './db';
 import { ChatLogger } from './chat_log';
 import { SocialService } from './social';
-import type { Presence, PresenceStatus, SocialActor, SocialEvent, SocialTransport } from './social';
-import { PgSocialDb } from './social_db';
+import type { Presence, PresenceStatus, SocialActor, SocialDb, SocialEvent, SocialTransport } from './social';
+import { createMemoryGamePersistence, type GamePersistence } from './game_persistence';
 import { REALM } from './realm';
 
 const WORLD_SEED = 20061;
@@ -296,8 +295,8 @@ export class GameServer {
   sim: Sim;
   clients = new Map<number, ClientSession>(); // by pid
   private readonly sessionsByCharacterId = new Map<number, ClientSession>();
-  readonly chatLog = new ChatLogger(insertChatLogs);
-  private readonly socialDb = new PgSocialDb(pool);
+  readonly chatLog: ChatLogger;
+  private readonly socialDb: SocialDb;
   readonly social: SocialService;
   private wireCache = new Map<number, EntityWireCache>();
   private lastWireSweepTick = 0;
@@ -308,7 +307,9 @@ export class GameServer {
   private peakOnline = 0;
   private tickMsAvg = 0;
 
-  constructor() {
+  constructor(private readonly persistence: GamePersistence = createMemoryGamePersistence()) {
+    this.chatLog = new ChatLogger((rows) => this.persistence.insertChatLogs(rows));
+    this.socialDb = this.persistence.socialDb;
     this.sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', noPlayer: true });
     this.social = new SocialService(this.socialDb, this.socialTransport());
   }
@@ -438,7 +439,7 @@ export class GameServer {
     this.clients.set(pid, session);
     this.sessionsByCharacterId.set(characterId, session);
     this.peakOnline = Math.max(this.peakOnline, this.clients.size);
-    openPlaySession(accountId, characterId, name)
+    this.persistence.openPlaySession(accountId, characterId, name)
       .then((id) => { session.dbSessionId = id; })
       .catch((err) => console.error('failed to open play session:', err));
 
@@ -478,7 +479,7 @@ export class GameServer {
     void this.social.announcePresence({ characterId: session.characterId, name: session.name }, false)
       .catch((err) => console.error('presence announce failed:', err));
     if (session.dbSessionId !== null) {
-      void closePlaySession(session.dbSessionId).catch((err) => console.error('failed to close play session:', err));
+      void this.persistence.closePlaySession(session.dbSessionId).catch((err) => console.error('failed to close play session:', err));
     }
     await this.saveCharacter(session).catch((err) => console.error('save on leave failed:', err));
     this.sim.removePlayer(session.pid);
@@ -489,7 +490,7 @@ export class GameServer {
     const state = this.sim.serializeCharacter(session.pid);
     const e = this.sim.entities.get(session.pid);
     if (state && e) {
-      await saveCharacterState(session.characterId, e.level, state);
+      await this.persistence.saveCharacterState(session.characterId, e.level, state);
       session.lastSave = Date.now();
     }
   }
@@ -525,7 +526,7 @@ export class GameServer {
   // The World Market is shared global state, persisted as a single JSONB blob.
   async loadMarket(): Promise<void> {
     try {
-      this.sim.loadMarket(await loadMarketState());
+      this.sim.loadMarket(await this.persistence.loadMarketState());
     } catch (err) {
       console.error('failed to load world market:', err);
     }
@@ -533,7 +534,7 @@ export class GameServer {
 
   async saveMarket(): Promise<void> {
     try {
-      await saveMarketState(this.sim.serializeMarket());
+      await this.persistence.saveMarketState(this.sim.serializeMarket());
     } catch (err) {
       console.error('failed to save world market:', err);
     }
@@ -544,7 +545,7 @@ export class GameServer {
   async endAllPlaySessions(): Promise<void> {
     for (const session of this.clients.values()) {
       if (session.dbSessionId === null) continue;
-      await closePlaySession(session.dbSessionId).catch((err) => console.error('failed to close play session:', err));
+      await this.persistence.closePlaySession(session.dbSessionId).catch((err) => console.error('failed to close play session:', err));
     }
   }
 

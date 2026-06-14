@@ -6,6 +6,8 @@ dist/
 dist-env/
 dist-server/
 media-cache/
+.stdb-data/
+.stdb-bridge-token
 
 # test artifacts & screenshots
 tmp/
@@ -25,3 +27,5 @@ __pycache__/
 Thumbs.db
 *.log
 .claude/
+stdb/target/
+.context-engine/
