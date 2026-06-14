@@ -48,11 +48,13 @@ class FakeDb implements SocialDb {
   }
   async blockedIds(c: number): Promise<number[]> { return [...(this.blocks.get(c) ?? [])]; }
 
-  async createGuild(name: string): Promise<number> {
-    if ([...this.guilds.values()].some((n) => n.toLowerCase() === name.toLowerCase())) throw new Error('duplicate guild');
+  async createGuildWithLeader(name: string, leaderId: number): Promise<{ guildId: number } | { error: 'name_taken' | 'already_in_guild' }> {
+    if ([...this.guilds.values()].some((n) => n.toLowerCase() === name.toLowerCase())) return { error: 'name_taken' };
+    if (this.members.has(leaderId)) return { error: 'already_in_guild' };
     const id = this.nextGuildId++;
     this.guilds.set(id, name);
-    return id;
+    this.members.set(leaderId, { guildId: id, rank: 'leader' });
+    return { guildId: id };
   }
   async deleteGuild(id: number): Promise<void> {
     this.guilds.delete(id);
@@ -62,8 +64,13 @@ class FakeDb implements SocialDb {
     const m = this.members.get(c);
     return m ? { guildId: m.guildId, guildName: this.guilds.get(m.guildId)!, rank: m.rank } : null;
   }
-  async addGuildMember(guildId: number, c: number, rank: GuildRank): Promise<void> {
-    if (!this.members.has(c)) this.members.set(c, { guildId, rank });
+  async addGuildMemberAtomic(guildId: number, c: number, rank: GuildRank, limit: number): Promise<'ok' | 'full' | 'already_member' | 'no_guild'> {
+    if (!this.guilds.has(guildId)) return 'no_guild';
+    if (this.members.has(c)) return 'already_member';
+    const count = [...this.members.values()].filter((m) => m.guildId === guildId).length;
+    if (count >= limit) return 'full';
+    this.members.set(c, { guildId, rank });
+    return 'ok';
   }
   async removeGuildMember(c: number): Promise<void> { this.members.delete(c); }
   async setGuildRank(c: number, rank: GuildRank): Promise<void> { const m = this.members.get(c); if (m) m.rank = rank; }
@@ -72,6 +79,7 @@ class FakeDb implements SocialDb {
       .filter(([, m]) => m.guildId === guildId)
       .map(([cid, m]) => ({ ...this.chars.get(cid)!, rank: m.rank }));
   }
+  guildCount(): number { return this.guilds.size; } // test helper: detect orphaned guilds
 }
 
 class FakeTransport implements SocialTransport {
@@ -442,5 +450,54 @@ describe('guilds', () => {
     h.tx.clear();
     await h.svc.guildInvite(h.actor(1), 'Bet');
     expect(h.tx.errorsFor(1).join()).toMatch(/already in a guild/i);
+  });
+});
+
+describe('guild atomicity (#149)', () => {
+  let h: ReturnType<typeof setup>;
+  beforeEach(() => {
+    h = setup();
+    h.add(1, 'Aleph'); h.add(2, 'Bet');
+    h.tx.setOnline(1); h.tx.setOnline(2);
+  });
+
+  it('two racing guild_create packets from one character leave no orphan guild', async () => {
+    // Both calls pass the "are you already in a guild?" check before either
+    // writes its member row. The non-atomic flow created two guilds and orphaned
+    // the leaderless second one; the atomic create must produce exactly one.
+    await Promise.all([
+      h.svc.guildCreate(h.actor(1), 'Iron Vanguard'),
+      h.svc.guildCreate(h.actor(1), 'Storm Wardens'),
+    ]);
+    expect(h.db.guildCount()).toBe(1);
+    const snap = await h.svc.snapshot(1);
+    expect(snap.guild?.rank).toBe('leader');
+    expect(snap.guild?.members.map((m) => m.name)).toEqual(['Aleph']);
+  });
+
+  it('refuses to create a second guild when already in one (no orphan)', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    h.tx.clear();
+    await h.svc.guildCreate(h.actor(1), 'Raiders');
+    expect(h.tx.errorsFor(1).join()).toMatch(/already in a guild/i);
+    expect(h.db.guildCount()).toBe(1);
+  });
+
+  it('guildAccept surfaces a full guild reported by the atomic add', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    h.db.addGuildMemberAtomic = async () => 'full';
+    await h.svc.guildAccept(h.actor(2));
+    expect(h.tx.errorsFor(2).join()).toMatch(/full/i);
+    expect((await h.svc.snapshot(2)).guild).toBeNull();
+  });
+
+  it('guildAccept surfaces a vanished guild reported by the atomic add', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    h.db.addGuildMemberAtomic = async () => 'no_guild';
+    await h.svc.guildAccept(h.actor(2));
+    expect(h.tx.errorsFor(2).join()).toMatch(/no longer exists/i);
+    expect((await h.svc.snapshot(2)).guild).toBeNull();
   });
 });
