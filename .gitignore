@@ -28,3 +28,4 @@ Thumbs.db
 *.log
 .claude/
 stdb/target/
+.context-engine/
