@@ -166,6 +166,7 @@ export interface IWorld {
   abandonQuest(questId: string): void;
   equipItem(itemId: string): void;
   useItem(itemId: string): void;
+  discardItem(itemId: string, count?: number): void;
   buyItem(npcId: number, itemId: string): void;
   sellItem(itemId: string, count?: number): void;
   buyBackItem(itemId: string): void;

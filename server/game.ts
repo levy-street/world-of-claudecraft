@@ -668,6 +668,11 @@ export class GameServer {
       case 'abandon': if (typeof msg.quest === 'string') { sim.abandonQuest(msg.quest, pid); this.resyncQuests(session); } break;
       case 'equip': if (typeof msg.item === 'string') sim.equipItem(msg.item, pid); break;
       case 'use': if (typeof msg.item === 'string') sim.useItem(msg.item, pid); break;
+      case 'discard':
+        if (typeof msg.item === 'string') {
+          sim.discardItem(msg.item, typeof msg.count === 'number' ? msg.count : undefined, pid);
+        }
+        break;
       case 'buy': if (typeof msg.npc === 'number' && typeof msg.item === 'string') sim.buyItem(msg.npc, msg.item, pid); break;
       case 'sell':
         if (typeof msg.item === 'string') {

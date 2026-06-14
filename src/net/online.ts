@@ -625,6 +625,9 @@ export class ClientWorld implements IWorld {
   useItem(itemId: string): void {
     this.cmd({ cmd: 'use', item: itemId });
   }
+  discardItem(itemId: string, count?: number): void {
+    this.cmd({ cmd: 'discard', item: itemId, count });
+  }
   buyItem(npcId: number, itemId: string): void {
     this.cmd({ cmd: 'buy', npc: npcId, item: itemId });
   }
