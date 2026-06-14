@@ -483,6 +483,25 @@ describe('boss loot and encounter resets', () => {
     expect(mob.lootable).toBe(false);
   });
 
+  it('does not drop a quest-gated item whose quest has no matching collect objective', () => {
+    const sim = makeSim();
+    const a = sim.playerId;
+    // q_boars only collects boar_hide; it has no collect objective for greyjaw_fang.
+    sim.meta(a)!.questLog.set('q_boars', { questId: 'q_boars', counts: [0], state: 'active' });
+    const mob = createMob(990102, MOBS.wild_boar, 3, { x: 20, y: 0, z: 22 });
+    // Inject a (mis)configured drop gated on q_boars but for an item the quest
+    // does not collect. It must never drop, even at chance 1.
+    const bogus = { itemId: 'greyjaw_fang', chance: 1, questId: 'q_boars' };
+    MOBS.wild_boar.loot.push(bogus as any);
+    try {
+      (sim as any).rollLoot(mob, sim.meta(a)!, [sim.meta(a)!]);
+    } finally {
+      MOBS.wild_boar.loot.pop();
+    }
+    const dropped = (mob.loot?.items ?? []).some((slot) => slot.itemId === 'greyjaw_fang');
+    expect(dropped).toBe(false);
+  });
+
   it('boss adds despawn on encounter reset instead of stacking across pulls', () => {
     const sim = makeSim();
     const p = sim.player;
