@@ -129,6 +129,19 @@ describe('arena: a full bout', () => {
     expect(eb.hp).toBe(eb.maxHp);
   });
 
+  it('keeps buffs cast during the countdown when the fight starts', () => {
+    const { sim, b } = queueDuo();
+    const mage = sim.entities.get(b)!;
+
+    sim.castAbility('frost_armor', b);
+    expect(mage.auras.some((aura) => aura.id === 'frost_armor')).toBe(true);
+
+    startBout(sim);
+
+    expect(sim.arenaMatchFor(b)!.state).toBe('active');
+    expect(mage.auras.some((aura) => aura.id === 'frost_armor')).toBe(true);
+  });
+
   it('ends at 1 health: winner declared, ratings move, nobody dies, both returned', () => {
     const { sim, a, b } = queueDuo();
     startBout(sim);
