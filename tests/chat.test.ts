@@ -139,6 +139,38 @@ describe('chat channels', () => {
     }));
   });
 
+  it('/played reports zero on a freshly joined character', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    teleport(sim, a, 0, -40);
+    sim.tick();
+    sim.chat('/played', a);
+    const events = sim.tick();
+    expect(chatEvents(events)).toHaveLength(0);
+    expect(events).toContainEqual(expect.objectContaining({
+      type: 'error',
+      pid: a,
+      text: 'Time played this session: 0s.',
+    }));
+  });
+
+  it('/played accumulates session time as the sim advances', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    teleport(sim, a, 0, -40);
+    // 20 ticks per sim-second; advance just over a minute of world time
+    for (let i = 0; i < 20 * 65; i++) sim.tick();
+    sim.chat('/played', a);
+    const events = sim.tick();
+    expect(chatEvents(events)).toHaveLength(0);
+    const played = events.find(
+      (e): e is Extract<SimEvent, { type: 'error' }> =>
+        e.type === 'error' && e.text.startsWith('Time played'),
+    );
+    // once past a minute the line switches to "Xm Ys" form
+    expect(played?.text).toMatch(/^Time played this session: 1m \d+s\.$/);
+  });
+
   it('exact-case whisper wins over a case-variant squatter', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');
