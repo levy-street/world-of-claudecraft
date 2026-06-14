@@ -276,6 +276,34 @@ describe('combat', () => {
     expect(wolf.leashAnchor).not.toBeNull();
   });
 
+  it('chasing mobs slide around a camp prop to reach the player instead of pinning on it', () => {
+    // Gravecaller Summoners pinned on their own camp tent while chasing: moveToward
+    // pushed straight into the collider with no way around it, so the mob froze a few
+    // yards short of the player. collide-and-slide must let it round the prop.
+    const sim = makeSim('warrior', 20061);
+    const tent = { x: -3, z: 505, y: 0 }; // tent collider radius ~1.95
+    const mob = [...sim.entities.values()]
+      .filter((e: any) => e.kind === 'mob' && e.templateId === 'gravecaller_summoner')
+      .sort((a: any, b: any) => dist2d(a.spawnPos, tent) - dist2d(b.spawnPos, tent))[0] as any;
+
+    mob.maxHp = 100000; mob.hp = 100000;
+    mob.pos = { x: tent.x, z: tent.z + 5, y: 0 }; mob.prevPos = { ...mob.pos };
+    mob.spawnPos = { ...mob.pos };
+    teleportTo(sim, tent.x, tent.z - 5); // player on the far side, tent dead between them (10yd)
+    mob.aiState = 'chase';
+    mob.aggroTargetId = sim.playerId;
+    mob.inCombat = true;
+    mob.leashAnchor = { ...mob.pos };
+    mob.threat.set(sim.playerId, 1e6);
+
+    let minDist = Infinity;
+    for (let i = 0; i < 60; i++) { // 3s — reaches melee well before any disengage
+      sim.tick();
+      minDist = Math.min(minDist, dist2d(mob.pos, sim.player.pos));
+    }
+    expect(minDist).toBeLessThanOrEqual(5); // got into melee range — routed around the tent
+  });
+
   it('social pulls only very close same-template mobs', () => {
     const sim = makeSim('warrior');
     const wolf = nearestMob(sim, 'forest_wolf');

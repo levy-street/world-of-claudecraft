@@ -33,6 +33,10 @@ const EVADE_SPEED_MULT = 1.6;
 // immune while resetting, a permanent stall = a permanently unkillable mob. If it
 // can't get closer to home for this long, it starts phasing through the blocker.
 const EVADE_STALL_TIMEOUT = 3;
+// Heading offsets (radians) a mob tries when its straight path is blocked, so it
+// can slide around a prop instead of pinning on it. Desired heading (0) first;
+// only evaluated past the first entry when that straight step is obstructed.
+const MOVE_SLIDE_FAN = [0, 0.5, -0.5, 1.0, -1.0, 1.6, -1.6];
 const BACKPEDAL_MULT = 0.65;
 const GRAVITY = 16;
 const JUMP_VELOCITY = 6;
@@ -2827,27 +2831,43 @@ export class Sim {
   private moveToward(e: Entity, dest: Vec3, speed: number, ignoreObstacles = false): boolean {
     const d = dist2d(e.pos, dest);
     if (d < 0.3) return true;
-    e.facing = angleTo(e.pos, dest);
+    const desired = angleTo(e.pos, dest);
+    e.facing = desired;
     const step = Math.min(speed * DT, d);
-    const nx = e.pos.x + Math.sin(e.facing) * step;
-    const nz = e.pos.z + Math.cos(e.facing) * step;
     const canSwim = this.mobCanSwim(MOBS[e.templateId]);
+
     if (ignoreObstacles) {
+      const nx = e.pos.x + Math.sin(desired) * step;
+      const nz = e.pos.z + Math.cos(desired) * step;
       e.pos.x = nx;
       e.pos.z = nz;
       const g = groundHeight(nx, nz, this.cfg.seed);
       e.pos.y = Math.max(g, SWIM_SURFACE_Y); // ride the surface while phasing, don't sink under terrain/water
       return d - step < 0.3;
     }
-    const ground = groundHeight(nx, nz, this.cfg.seed);
-    // landlocked creatures stop at the waterline instead of walking under it
-    if (!canSwim && ground < WATER_LEVEL - SWIM_DEPTH) return false;
-    const resolved = resolvePosition(this.cfg.seed, nx, nz, BODY_RADIUS);
-    e.pos.x = resolved.x;
-    e.pos.z = resolved.z;
-    const g = groundHeight(e.pos.x, e.pos.z, this.cfg.seed);
+
+    // Mobs have no nav mesh. Try the straight path first; only if a prop or the
+    // waterline eats it do we fan the heading out and take the best slide AROUND
+    // the obstacle. That lets a mob round the camp props to reach its target
+    // instead of pinning on them. Open-ground movers take the first branch and
+    // do a single collision check, exactly as before — no added cost.
+    let bestX = e.pos.x, bestZ = e.pos.z, bestProgress = 1e-3;
+    for (const off of MOVE_SLIDE_FAN) {
+      const a = desired + off;
+      const nx = e.pos.x + Math.sin(a) * step;
+      const nz = e.pos.z + Math.cos(a) * step;
+      // landlocked creatures stop at the waterline instead of walking under it
+      if (!canSwim && groundHeight(nx, nz, this.cfg.seed) < WATER_LEVEL - SWIM_DEPTH) continue;
+      const r = resolvePosition(this.cfg.seed, nx, nz, BODY_RADIUS);
+      const progress = d - Math.hypot(r.x - dest.x, r.z - dest.z);
+      if (progress > bestProgress) { bestProgress = progress; bestX = r.x; bestZ = r.z; }
+      if (off === 0 && progress >= step - 1e-3) break; // straight path is clear
+    }
+    e.pos.x = bestX;
+    e.pos.z = bestZ;
+    const g = groundHeight(bestX, bestZ, this.cfg.seed);
     e.pos.y = canSwim && g < WATER_LEVEL - SWIM_DEPTH ? SWIM_SURFACE_Y : g;
-    return d - step < 0.3;
+    return dist2d(e.pos, dest) < 0.3;
   }
 
   // Would a normal (collision- and water-aware) step toward `dest` be blocked —
