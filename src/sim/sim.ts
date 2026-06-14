@@ -2472,8 +2472,19 @@ export class Sim {
       mob.inCombat = true;
       return;
     }
-    mob.aggroTargetId = null;
+    this.beginMobEvade(mob);
+  }
+
+  private beginMobEvade(mob: Entity): void {
     mob.aiState = 'evade';
+    mob.aggroTargetId = null;
+    mob.hp = mob.maxHp;
+    mob.auras = [];
+    mob.inCombat = false;
+    mob.tappedById = null;
+    mob.enraged = false;
+    clearThreat(mob);
+    mob.leashAnchor = null;
   }
 
   /** Highest-threat living attacker on the table; prunes stale entries. */
@@ -2640,10 +2651,7 @@ export class Sim {
         const leash = mob.spawnPos.x > DUNGEON_X_THRESHOLD ? DUNGEON_LEASH_DISTANCE : LEASH_DISTANCE;
         const leashAnchor = mob.leashAnchor ?? mob.spawnPos;
         if (dist2d(mob.pos, leashAnchor) > leash) {
-          mob.aiState = 'evade';
-          mob.aggroTargetId = null;
-          clearThreat(mob);
-          mob.leashAnchor = null;
+          this.beginMobEvade(mob);
           break;
         }
         const d = dist2d(mob.pos, target.pos);
@@ -2652,8 +2660,17 @@ export class Sim {
           mob.swingTimer = Math.min(mob.swingTimer, 0.4);
           break;
         }
-        if (!this.isRooted(mob)) this.moveToward(mob, target.pos, mob.moveSpeed * this.moveSpeedMult(mob));
-        else mob.facing = angleTo(mob.pos, target.pos);
+        if (!this.isRooted(mob)) {
+          this.moveToward(mob, target.pos, mob.moveSpeed * this.moveSpeedMult(mob));
+          const afterD = dist2d(mob.pos, target.pos);
+          if (afterD < d - 1e-3) {
+            break;
+          } else {
+            this.beginMobEvade(mob);
+          }
+        } else {
+          mob.facing = angleTo(mob.pos, target.pos);
+        }
         break;
       }
       case 'attack': {
@@ -2721,6 +2738,7 @@ export class Sim {
     mob.tappedById = null;
     mob.leashAnchor = null;
     mob.evadeStall = 0;
+    mob.aggroTargetId = null;
     clearThreat(mob);
     this.despawnSummonedAdds(mob);
     mob.firedSummons = 0;

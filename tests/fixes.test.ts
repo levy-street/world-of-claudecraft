@@ -20,6 +20,10 @@ function teleportTo(sim: Sim, x: number, z: number, pid?: number) {
   p.prevPos = { ...p.pos };
 }
 
+function hit(sim: Sim, source: Entity, target: Entity, amount: number) {
+  (sim as any).dealDamage(source, target, amount, false, 'physical', null, 'hit', true);
+}
+
 describe('quest lifecycle', () => {
   it('stops showing the Redbrook starter hint after the first quest is accepted', () => {
     const sim = makeSim();
@@ -157,6 +161,61 @@ describe('swimming', () => {
     wolf.spawnPos = { ...wolf.pos };
     for (let i = 0; i < 100; i++) sim.tick();
     expect(groundHeight(wolf.pos.x, wolf.pos.z, SEED)).toBeGreaterThan(WATER_LEVEL - 0.8);
+  });
+
+  it('landlocked mobs evade as soon as a deep-water target cannot be reached', () => {
+    const sim = makeSim();
+    const wolf = [...sim.entities.values()].find((e) => e.templateId === 'forest_wolf')!;
+    const p = sim.player;
+    teleportTo(sim, LAKE.x, LAKE.z);
+
+    let shore: { x: number; z: number } | null = null;
+    for (let r = 5; r < 80; r += 0.25) {
+      const x = LAKE.x + r;
+      const z = LAKE.z;
+      if (
+        groundHeight(x, z, SEED) > WATER_LEVEL - 0.8 &&
+        groundHeight(x - 0.5, z, SEED) < WATER_LEVEL - 0.8
+      ) {
+        shore = { x, z };
+        break;
+      }
+    }
+    expect(shore).not.toBeNull();
+
+    wolf.pos = { ...sim.groundPos(shore!.x, shore!.z) };
+    wolf.prevPos = { ...wolf.pos };
+    wolf.spawnPos = { ...sim.groundPos(shore!.x + 10, shore!.z) };
+    wolf.hp = Math.max(1, wolf.maxHp - 10);
+    wolf.aiState = 'chase';
+    wolf.aggroTargetId = p.id;
+    wolf.inCombat = true;
+    wolf.leashAnchor = { ...wolf.pos };
+    wolf.threat.set(p.id, 50);
+
+    sim.tick();
+    expect(wolf.aiState).toBe('evade');
+    expect(wolf.hp).toBe(wolf.maxHp);
+    hit(sim, p, wolf, 99999);
+    expect(wolf.dead).toBe(false);
+    expect(wolf.hp).toBe(wolf.maxHp);
+
+    let resetPos: Entity['pos'] | null = null;
+    for (let i = 0; i < 200; i++) {
+      sim.tick();
+      const state: string = wolf.aiState;
+      if (state === 'idle') {
+        resetPos = { ...wolf.pos };
+        break;
+      }
+    }
+
+    expect(wolf.aiState).toBe('idle');
+    expect(wolf.aggroTargetId).toBeNull();
+    expect(wolf.threat.size).toBe(0);
+    expect(wolf.hp).toBe(wolf.maxHp);
+    expect(resetPos).not.toBeNull();
+    expect(dist2d(resetPos!, wolf.spawnPos)).toBeLessThan(0.5);
   });
 
   it('rare swimmers can chase into deep water', () => {
