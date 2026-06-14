@@ -189,6 +189,7 @@ export interface PlayerMeta {
   entityId: number;
   cls: PlayerClass;
   name: string;
+  marketKey: string;
   moveInput: MoveInput;
   inventory: InvSlot[];
   vendorBuyback: InvSlot[];
@@ -210,13 +211,13 @@ export interface PlayerMeta {
 // The World Market — a single shared, server-authoritative auction house run
 // by the Merchant NPC. Listings live in the sim (so offline play has a market
 // too and the rules are testable); the server persists them to Postgres.
-// Sellers are keyed by character name, which is globally unique, so proceeds
-// and returns reach the right player even while they are offline.
+// Online sellers are keyed by durable character identity; local/offline play
+// falls back to character name so existing saved markets remain usable.
 // ---------------------------------------------------------------------------
 
 export interface MarketListing {
   id: number;
-  sellerKey: string; // stable seller identity (character name); '' for house stock
+  sellerKey: string; // stable seller identity; '' for house stock
   sellerName: string; // display name
   itemId: string;
   count: number;
@@ -226,7 +227,7 @@ export interface MarketListing {
 }
 
 // Gold + items awaiting pickup at the Merchant (sale proceeds, expired
-// listings), keyed by seller name so an offline seller can collect later.
+// listings), keyed by the same seller identity as MarketListing.sellerKey.
 export interface MarketCollection {
   copper: number;
   items: InvSlot[];
@@ -441,7 +442,7 @@ export class Sim {
   // Players: join / leave / persistence
   // -------------------------------------------------------------------------
 
-  addPlayer(cls: PlayerClass, name: string, opts?: { autoEquip?: boolean; state?: CharacterState }): number {
+  addPlayer(cls: PlayerClass, name: string, opts?: { autoEquip?: boolean; state?: CharacterState; marketKey?: string }): number {
     // Characters saved inside a dungeon instance rejoin at its entrance —
     // their old instance is gone (or belongs to someone else) by now.
     let savedPos = opts?.state?.pos ?? null;
@@ -459,6 +460,7 @@ export class Sim {
       entityId: player.id,
       cls,
       name,
+      marketKey: opts?.marketKey ?? name,
       moveInput: emptyMoveInput(),
       inventory: [],
       vendorBuyback: [],
@@ -4425,9 +4427,9 @@ export class Sim {
     return !!m && dist2d(e.pos, m.pos) <= MARKET_RANGE;
   }
 
-  private metaByName(name: string): PlayerMeta | null {
-    if (!name) return null;
-    for (const m of this.players.values()) if (m.name === name) return m;
+  private metaByMarketKey(key: string): PlayerMeta | null {
+    if (!key) return null;
+    for (const m of this.players.values()) if (m.marketKey === key) return m;
     return null;
   }
 
@@ -4435,6 +4437,19 @@ export class Sim {
     let c = this.marketCollections.get(key);
     if (!c) { c = { copper: 0, items: [] }; this.marketCollections.set(key, c); }
     return c;
+  }
+
+  claimMarketKey(legacyKey: string, marketKey: string): void {
+    if (!legacyKey || !marketKey || legacyKey === marketKey) return;
+    for (const listing of this.marketListings) {
+      if (!listing.house && listing.sellerKey === legacyKey) listing.sellerKey = marketKey;
+    }
+    const legacyCollection = this.marketCollections.get(legacyKey);
+    if (!legacyCollection) return;
+    const collection = this.collectionFor(marketKey);
+    collection.copper += legacyCollection.copper;
+    collection.items.push(...legacyCollection.items.map((s) => ({ ...s })));
+    this.marketCollections.delete(legacyKey);
   }
 
   // The Merchant always keeps a little stock so the market is never empty —
@@ -4472,11 +4487,11 @@ export class Sim {
     const ask = Math.floor(price);
     if (!Number.isFinite(ask) || ask < MARKET_MIN_PRICE) { this.error(meta.entityId, 'Name a price of at least 1 copper.'); return; }
     if (ask > MARKET_MAX_PRICE) { this.error(meta.entityId, 'That price is beyond what the Merchant will broker.'); return; }
-    const mine = this.marketListings.reduce((n, l) => n + (!l.house && l.sellerKey === meta.name ? 1 : 0), 0);
+    const mine = this.marketListings.reduce((n, l) => n + (!l.house && l.sellerKey === meta.marketKey ? 1 : 0), 0);
     if (mine >= MARKET_MAX_LISTINGS) { this.error(meta.entityId, `You may keep at most ${MARKET_MAX_LISTINGS} goods on the market at once.`); return; }
     this.removeItem(itemId, want, meta.entityId); // escrow
     this.marketListings.push({
-      id: this.nextListingId++, sellerKey: meta.name, sellerName: meta.name,
+      id: this.nextListingId++, sellerKey: meta.marketKey, sellerName: meta.name,
       itemId, count: want, price: ask, expiresAt: this.time + MARKET_LISTING_DURATION, house: false,
     });
     this.emit({ type: 'loot', text: `Listed ${def.name}${want > 1 ? ' x' + want : ''} on the World Market for ${formatMoney(ask)}.`, pid: meta.entityId });
@@ -4495,7 +4510,7 @@ export class Sim {
     const listing = this.marketListings[idx];
     const def = ITEMS[listing.itemId];
     if (!def) { this.marketListings.splice(idx, 1); return; }
-    if (!listing.house && listing.sellerKey === meta.name) {
+    if (!listing.house && listing.sellerKey === meta.marketKey) {
       this.error(meta.entityId, 'That is your own listing — cancel it to reclaim it.');
       return;
     }
@@ -4506,7 +4521,7 @@ export class Sim {
       const proceeds = Math.max(0, Math.floor(listing.price * (1 - MARKET_CUT)));
       this.collectionFor(listing.sellerKey).copper += proceeds;
       this.marketListings.splice(idx, 1);
-      const sellerMeta = this.metaByName(listing.sellerKey);
+      const sellerMeta = this.metaByMarketKey(listing.sellerKey);
       if (sellerMeta) {
         this.emit({ type: 'loot', text: `${meta.name} bought your ${def.name} for ${formatMoney(listing.price)} — collect ${formatMoney(proceeds)} from the Merchant.`, pid: sellerMeta.entityId });
       }
@@ -4523,7 +4538,7 @@ export class Sim {
     const idx = this.marketListings.findIndex((l) => l.id === listingId);
     if (idx < 0) return;
     const listing = this.marketListings[idx];
-    if (listing.house || listing.sellerKey !== meta.name) { this.error(meta.entityId, 'That is not your listing.'); return; }
+    if (listing.house || listing.sellerKey !== meta.marketKey) { this.error(meta.entityId, 'That is not your listing.'); return; }
     this.marketListings.splice(idx, 1);
     this.addItem(listing.itemId, listing.count, meta.entityId);
     const def = ITEMS[listing.itemId];
@@ -4537,14 +4552,14 @@ export class Sim {
     if (!r) return;
     const { meta, e: p } = r;
     if (!this.nearMerchant(p)) { this.error(meta.entityId, 'You are too far from the Merchant.'); return; }
-    const col = this.marketCollections.get(meta.name);
+    const col = this.marketCollections.get(meta.marketKey);
     if (!col || (col.copper <= 0 && col.items.length === 0)) { this.error(meta.entityId, 'You have nothing to collect.'); return; }
     if (col.copper > 0) {
       meta.copper += col.copper;
       this.emit({ type: 'loot', text: `You collect ${formatMoney(col.copper)} from the Merchant.`, pid: meta.entityId });
     }
     for (const s of col.items) this.addItem(s.itemId, s.count, meta.entityId);
-    this.marketCollections.delete(meta.name);
+    this.marketCollections.delete(meta.marketKey);
   }
 
   // Once a second: return expired player listings to their seller's collection.
@@ -4555,7 +4570,7 @@ export class Sim {
       if (l.house || this.time < l.expiresAt) continue;
       this.marketListings.splice(i, 1);
       this.collectionFor(l.sellerKey).items.push({ itemId: l.itemId, count: l.count });
-      const sellerMeta = this.metaByName(l.sellerKey);
+      const sellerMeta = this.metaByMarketKey(l.sellerKey);
       if (sellerMeta) {
         const def = ITEMS[l.itemId];
         this.emit({ type: 'log', text: `Your market listing of ${def?.name ?? l.itemId} expired and waits at the Merchant.`, color: '#caa472', pid: sellerMeta.entityId });
@@ -4577,10 +4592,10 @@ export class Sim {
     });
     const listings = sorted.slice(0, MARKET_WIRE_LIMIT).map((l) => ({
       id: l.id, sellerName: l.sellerName, itemId: l.itemId, count: l.count,
-      price: l.price, mine: !l.house && l.sellerKey === meta.name, house: l.house,
+      price: l.price, mine: !l.house && l.sellerKey === meta.marketKey, house: l.house,
     }));
-    const col = this.marketCollections.get(meta.name);
-    const myListingCount = this.marketListings.reduce((n, l) => n + (!l.house && l.sellerKey === meta.name ? 1 : 0), 0);
+    const col = this.marketCollections.get(meta.marketKey);
+    const myListingCount = this.marketListings.reduce((n, l) => n + (!l.house && l.sellerKey === meta.marketKey ? 1 : 0), 0);
     return {
       listings,
       collectionCopper: col?.copper ?? 0,

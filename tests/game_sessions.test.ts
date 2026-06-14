@@ -43,4 +43,37 @@ describe('GameServer sessions', () => {
     const rejoined = expectJoined(server.join(fakeWs(), 13, 101, 'Indexa', 'warrior', null));
     expect((server as any).sessionByCharacterId(101)).toBe(rejoined);
   });
+
+  it('uses the durable character id for online market listings', () => {
+    const server = new GameServer();
+    server.sim.loadMarket({
+      listings: [
+        { id: 50, sellerKey: 'Seller', sellerName: 'Seller', itemId: 'bone_fragments', count: 1, price: 75, secondsLeft: 60 },
+      ],
+      collections: [
+        { key: 'Seller', copper: 25, items: [{ itemId: 'wolf_fang', count: 2 }] },
+      ],
+      nextListingId: 51,
+    });
+    const session = expectJoined(server.join(fakeWs(), 11, 101, 'Seller', 'warrior', null));
+    const merchant = [...server.sim.entities.values()].find((e) => e.templateId === 'the_merchant')!;
+    const player = server.sim.entities.get(session.pid)!;
+    player.pos = { ...merchant.pos };
+    player.prevPos = { ...player.pos };
+
+    expect(server.sim.players.get(session.pid)?.marketKey).toBe('character:101');
+    expect(server.sim.marketListings.find((l) => l.id === 50)).toMatchObject({
+      sellerKey: 'character:101',
+      sellerName: 'Seller',
+    });
+    expect(server.sim.marketInfoFor(session.pid)?.collectionCopper).toBe(25);
+    server.sim.addItem('wolf_fang', 1, session.pid);
+    server.sim.marketList('wolf_fang', 1, 100, session.pid);
+
+    expect(server.sim.marketListings.find((l) => l.sellerKey === 'character:101' && l.itemId === 'wolf_fang')).toMatchObject({
+      sellerName: 'Seller',
+      itemId: 'wolf_fang',
+      count: 1,
+    });
+  });
 });
