@@ -763,8 +763,7 @@ export class Hud {
     }
 
     // soundtrack: pick the zone theme and layer in combat percussion.
-    // Combat = a mob is on us, or we traded blows in the last few seconds
-    // (the wire protocol doesn't ship the inCombat flag).
+    // Combat = a mob is on us, or we traded blows in the last few seconds.
     let aggroed = false;
     for (const e of sim.entities.values()) {
       if (e.kind === 'mob' && !e.dead && e.aggroTargetId === sim.playerId) { aggroed = true; break; }

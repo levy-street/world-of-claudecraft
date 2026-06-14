@@ -172,6 +172,50 @@ describe('delta snapshots', () => {
     expect(snap.self).not.toHaveProperty('stats');
   });
 
+  it('use command consumes food and mirrors eating state online', () => {
+    server.sim.addItem('baked_bread', 1, session.pid);
+    const player = server.sim.entities.get(session.pid)!;
+    player.hp = 20;
+    player.inCombat = false;
+    player.combatTimer = 99;
+    broadcast(server);
+
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(lastSnap(fc.sent));
+    expect(client.inventory).toEqual([{ itemId: 'baked_bread', count: 1 }]);
+
+    fc.sent.length = 0;
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'use', item: 'baked_bread' }));
+    broadcast(server);
+
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.eat).toEqual({ remaining: 18 });
+    expect(snap.self.inv).toEqual([]);
+    (client as any).applySnapshot(snap);
+    expect(client.inventory).toEqual([]);
+    expect(client.player.eating).not.toBeNull();
+  });
+
+  it('resends inventory after rejected food use commands', () => {
+    server.sim.addItem('baked_bread', 1, session.pid);
+    const player = server.sim.entities.get(session.pid)!;
+    player.hp = 20;
+    player.inCombat = true;
+    broadcast(server);
+    fc.sent.length = 0;
+
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'use', item: 'baked_bread' }));
+    broadcast(server);
+
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.cbt).toBe(1);
+    expect(snap.self.eat).toBeNull();
+    expect(snap.self.inv).toEqual([{ itemId: 'baked_bread', count: 1 }]);
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(snap);
+    expect(client.player.inCombat).toBe(true);
+  });
+
   it('mirrors vendor buyback deltas to the client', () => {
     const wilkes = [...server.sim.entities.values()].find((e) => e.templateId === 'trader_wilkes')!;
     const player = server.sim.entities.get(session.pid)!;
