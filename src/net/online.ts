@@ -198,7 +198,7 @@ function blankEntity(id: number): Entity {
     channeling: false, channelTickTimer: 0, channelTickEvery: 0,
     gcdRemaining: 0, cooldowns: new Map(), queuedOnSwing: null, fiveSecondRule: 99,
     comboPoints: 0, comboTargetId: null, overpowerUntil: -1, potionCooldownUntil: -1, savedMana: 0,
-    chargeTargetId: null, chargeTimeLeft: 0, chargePath: [],
+    chargeTargetId: null, chargeTimeLeft: 0, chargePath: [], followTargetId: null,
     sitting: false, eating: null, drinking: null,
     aiState: 'idle', tappedById: null, pulseTimer: 0, firedSummons: 0, summonedIds: [], enraged: false,
     threat: new Map(), forcedTargetId: null, forcedTargetTimer: 0, ownerId: null, petTauntTimer: 0,

@@ -83,6 +83,8 @@ const BODY_RADIUS = 0.5;
 const CHARGE_SPEED_MULT = 3; // warrior charge runs at 3x normal speed
 const CHARGE_MAX_DURATION = 3; // seconds before a blocked charge gives up
 const CHARGE_ARRIVE_RANGE = MELEE_RANGE - 1; // stop inside melee range
+const FOLLOW_STOP_DIST = 3; // /follow trails this close behind the leader (yards)
+const FOLLOW_MAX_RANGE = 60; // give up follow once the leader is this far away
 const PET_LEASH = 40; // yards from the owner before a pet gives up its target
 const PET_FOLLOW_DISTANCE = 3.5;
 const PET_TELEPORT_DISTANCE = 60; // owner this far away: pet warps to heel
@@ -926,8 +928,58 @@ export class Sim {
     return true;
   }
 
+  // /follow: a second forced-movement mode (like charge) that trails another
+  // player. Returns true when it has taken over locomotion for this tick so the
+  // normal input-driven movement below is skipped. Any manual movement, combat,
+  // or the leader slipping out of range ends the follow.
+  stopFollow(p: Entity, msg?: string): void {
+    if (p.followTargetId === null) return;
+    p.followTargetId = null;
+    if (msg) this.error(p.id, msg);
+  }
+
+  private updateFollowMovement(p: Entity, meta: PlayerMeta): boolean {
+    if (p.followTargetId === null) return false;
+    const inp = meta.moveInput;
+    // any manual locomotion (incl. camera turns) breaks follow, classic-style
+    if (inp.forward || inp.back || inp.strafeLeft || inp.strafeRight || inp.jump
+      || inp.turnLeft || inp.turnRight) {
+      this.stopFollow(p, 'You stop following.');
+      return false;
+    }
+    const t = this.entities.get(p.followTargetId);
+    if (!t || t.dead || t.kind !== 'player' || !this.players.has(t.id)) {
+      this.stopFollow(p, 'There is no one to follow.');
+      return false;
+    }
+    if (p.inCombat) { this.stopFollow(p, 'You stop following — you are in combat.'); return false; }
+    const d = dist2d(p.pos, t.pos);
+    if (d > FOLLOW_MAX_RANGE) { this.stopFollow(p, `${t.name} is too far away to follow.`); return false; }
+    // always turn to face the leader, even while held in place
+    p.facing = angleTo(p.pos, t.pos);
+    if (this.isStunned(p) || this.isRooted(p) || d <= FOLLOW_STOP_DIST) return true;
+    let speed = RUN_SPEED * this.moveSpeedMult(p);
+    if (this.isSwimming(p)) speed *= SWIM_SPEED_MULT;
+    const step = Math.min(speed * DT, d - FOLLOW_STOP_DIST);
+    const nx = p.pos.x + Math.sin(p.facing) * step;
+    const nz = p.pos.z + Math.cos(p.facing) * step;
+    const h0 = groundHeight(p.pos.x, p.pos.z, this.cfg.seed);
+    const h1 = groundHeight(nx, nz, this.cfg.seed);
+    if (h1 < WATER_LEVEL - SWIM_DEPTH) return true; // don't trail into deep water
+    if (h1 > h0 && step > 1e-5 && (h1 - h0) / step > MAX_CLIMB_SLOPE) return true; // wall/cliff
+    const resolved = resolvePosition(this.cfg.seed, nx, nz, BODY_RADIUS);
+    p.pos.x = resolved.x;
+    p.pos.z = resolved.z;
+    p.pos.y = groundHeight(resolved.x, resolved.z, this.cfg.seed);
+    p.vy = 0;
+    p.onGround = true;
+    p.fallStartY = p.pos.y;
+    return true;
+  }
+
   private updatePlayerMovement(p: Entity, meta: PlayerMeta): void {
     if (this.updateChargeMovement(p)) return;
+    if (this.updateFollowMovement(p, meta)) return;
     const inp = meta.moveInput;
     // Convention: facing f points along (sin f, cos f); the camera sits behind
     // the player, so screen-right is the world vector (-cos f, sin f).
@@ -1222,6 +1274,8 @@ export class Sim {
       this.error(p.id, p.resourceType === 'rage' ? 'Not enough rage!' : p.resourceType === 'energy' ? 'Not enough energy!' : 'Not enough mana!');
       return;
     }
+    // casting is deliberate action — drop any active follow so you don't drift
+    this.stopFollow(p);
     if (ability.requiresDodgeProc && this.time > p.overpowerUntil) {
       this.error(p.id, 'Your target must dodge first.');
       return;
@@ -2273,6 +2327,7 @@ export class Sim {
       e.sitting = false;
       e.chargeTargetId = null;
       e.chargePath = [];
+      e.followTargetId = null;
       this.emit({ type: 'playerDeath', pid: e.id });
       for (const m of this.entities.values()) {
         if (m.kind === 'mob' && !m.dead && m.aggroTargetId === e.id && m.aiState !== 'dead') {
@@ -2916,6 +2971,8 @@ export class Sim {
     const r = this.resolve(pid);
     if (!r) return;
     const p = r.e;
+    // switching to a different target ends a follow (re-targeting is manual intent)
+    if (p.followTargetId !== null && id !== p.followTargetId) this.stopFollow(p, 'You stop following.');
     if (id === null) { p.targetId = null; p.autoAttack = false; return; }
     const e = this.entities.get(id);
     if (!e || (e.dead && !e.lootable)) return;
@@ -3496,6 +3553,44 @@ export class Sim {
       return null;
     }
 
+    // "/unfollow" stops an active follow
+    if (/^\/unfollow(?:\s|$)/i.test(raw)) {
+      if (r.e.followTargetId === null) this.error(r.meta.entityId, 'You are not following anyone.');
+      else this.stopFollow(r.e, 'You stop following.');
+      return null;
+    }
+
+    // "/follow [name]" trails another player; with no name it follows the
+    // current target. Movement, combat, casting, re-targeting, or the leader
+    // moving out of range all end it (see updateFollowMovement).
+    const fm = /^\/follow(?:\s+([\s\S]+))?$/i.exec(raw);
+    if (fm) {
+      if (r.e.inCombat) { this.error(r.meta.entityId, "You can't start following while in combat."); return null; }
+      let target: PlayerMeta | null = null;
+      const nameArg = (fm[1] ?? '').trim();
+      if (nameArg) {
+        const wanted = nameArg.toLowerCase();
+        const ci: PlayerMeta[] = [];
+        for (const meta of this.players.values()) {
+          if (meta.name === nameArg) { target = meta; break; }
+          if (meta.name.toLowerCase() === wanted) ci.push(meta);
+        }
+        if (!target) {
+          if (ci.length === 1) target = ci[0];
+          else if (ci.length > 1) { this.error(r.meta.entityId, `Several players match '${nameArg}'. Use exact capitalization.`); return null; }
+        }
+        if (!target) { this.error(r.meta.entityId, `There is no player named '${nameArg}' online.`); return null; }
+      } else {
+        const cur = r.e.targetId !== null ? this.players.get(r.e.targetId) : undefined;
+        if (!cur) { this.error(r.meta.entityId, 'Target a player to follow, or use /follow <name>.'); return null; }
+        target = cur;
+      }
+      if (target.entityId === r.meta.entityId) { this.error(r.meta.entityId, "You can't follow yourself."); return null; }
+      r.e.followTargetId = target.entityId;
+      this.error(r.meta.entityId, `Now following ${target.name}.`);
+      return null;
+    }
+
     // "/w name message" — private whisper to an online player
     const wm = /^\/(?:w|whisper|t|tell)\s+(\S+)\s+([\s\S]+)$/i.exec(raw);
     if (wm) {
@@ -3549,7 +3644,7 @@ export class Sim {
     let clean = raw;
     if (/^\/y(ell)?\s/i.test(raw)) { channel = 'yell'; clean = raw.replace(/^\/y(ell)?\s+/i, '').trim(); }
     else if (/^\/s(ay)?\s/i.test(raw)) { clean = raw.replace(/^\/s(ay)?\s+/i, '').trim(); }
-    else if (raw.startsWith('/')) { this.error(r.meta.entityId, `Unknown command: ${raw.split(' ')[0]}. Try /s /y /w /p /g.`); return null; }
+    else if (raw.startsWith('/')) { this.error(r.meta.entityId, `Unknown command: ${raw.split(' ')[0]}. Try /s /y /w /p /g /follow.`); return null; }
     if (!clean) return null;
     const range = channel === 'yell' ? YELL_RANGE : SAY_RANGE;
     for (const meta of this.players.values()) {
@@ -4080,6 +4175,7 @@ export class Sim {
     e.swingTimer = 0;
     e.chargeTargetId = null;
     e.chargePath = [];
+    e.followTargetId = null;
     e.combatTimer = 99;
     e.inCombat = false;
     e.sitting = false;

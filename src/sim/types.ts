@@ -450,6 +450,7 @@ export interface Entity {
   chargeTargetId: number | null;
   chargeTimeLeft: number; // seconds; failsafe so a blocked charge can't run forever
   chargePath: Vec3[]; // waypoints consumed front-to-back; last leg homes on the live target
+  followTargetId: number | null; // /follow: auto-walk after another player until interrupted
   savedMana: number; // druid forms: mana put aside while running on rage/energy
   sitting: boolean;
   eating: Consuming | null;
