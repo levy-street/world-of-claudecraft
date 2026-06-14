@@ -8,6 +8,7 @@ import {
 } from '../sim/types';
 import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import type { ArenaInfo, CharacterSearchResult, DuelInfo, IWorld, MarketInfo, PartyInfo, SocialInfo, TradeInfo } from '../world_api';
+import { tracedFetch, startClientSpan } from '../telemetry/otel';
 
 // ---------------------------------------------------------------------------
 // REST
@@ -27,7 +28,7 @@ export function buildWebSocketUrl(protocol: string, host: string): string {
   return `${proto}://${host}/ws`;
 }
 
-export function buildWebSocketAuthMessage(token: string, characterId: number): { t: 'auth'; token: string; character: number } {
+export function buildWebSocketAuthMessage(token: string, characterId: number): { t: 'auth'; token: string; character: number; tp?: string } {
   return { t: 'auth', token, character: characterId };
 }
 
@@ -83,7 +84,7 @@ export class Api {
   }
 
   private async post(path: string, body: unknown): Promise<any> {
-    const res = await fetch(this.base + path, {
+    const res = await tracedFetch(`POST ${path}`, this.base + path, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -97,7 +98,7 @@ export class Api {
   }
 
   private async get(path: string): Promise<any> {
-    const res = await fetch(this.base + path, {
+    const res = await tracedFetch(`GET ${path}`, this.base + path, {
       headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
     });
     const data = await res.json().catch(() => ({}));
@@ -106,7 +107,7 @@ export class Api {
   }
 
   private async delete(path: string, body: unknown): Promise<any> {
-    const res = await fetch(this.base + path, {
+    const res = await tracedFetch(`DELETE ${path}`, this.base + path, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -264,7 +265,12 @@ export class ClientWorld implements IWorld {
       : buildWebSocketUrl(location.protocol, location.host);
     this.ws = new WebSocket(wsUrl);
     this.ws.onopen = () => {
-      this.ws.send(JSON.stringify(buildWebSocketAuthMessage(token, characterId)));
+      // Root the server's ws.authenticate span on a client connect span.
+      const { traceparent, span } = startClientSpan('ws.connect', { 'woc.character_id': characterId });
+      const authMsg = buildWebSocketAuthMessage(token, characterId);
+      if (traceparent) authMsg.tp = traceparent;
+      this.ws.send(JSON.stringify(authMsg));
+      span.end();
     };
     this.ws.onmessage = (ev) => this.onMessage(String(ev.data));
     this.ws.onclose = () => {
@@ -709,7 +715,7 @@ export class ClientWorld implements IWorld {
     const q = query.trim();
     if (!q) return [];
     try {
-      const res = await fetch(`${this.base}/api/search?q=${encodeURIComponent(q)}`, { headers: { Authorization: `Bearer ${this.token}` } });
+      const res = await tracedFetch('GET /api/search', `${this.base}/api/search?q=${encodeURIComponent(q)}`, { headers: { Authorization: `Bearer ${this.token}` } });
       if (!res.ok) return [];
       return (await res.json()).results ?? [];
     } catch {

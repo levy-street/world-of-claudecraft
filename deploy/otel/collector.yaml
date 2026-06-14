@@ -1,0 +1,60 @@
+# OpenTelemetry Collector config: receive OTLP traces from the game server and
+# the browser client, batch them, and write them to ClickHouse.
+#
+# Used by docker-compose.otel.yml. The ClickHouse exporter ships with the
+# contrib collector image (otel/opentelemetry-collector-contrib).
+
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4318
+        # The browser client posts spans directly from the page, so the OTLP/HTTP
+        # receiver must answer CORS preflight for the site origin(s).
+        cors:
+          allowed_origins:
+            - http://localhost:5173
+            - http://localhost:8787
+            - https://*
+      grpc:
+        endpoint: 0.0.0.0:4317
+
+processors:
+  batch:
+    timeout: 5s
+    send_batch_size: 1024
+  # Drop the very chattiest spans if they ever get instrumented; keeps storage
+  # sane. Harmless no-op today.
+  memory_limiter:
+    check_interval: 1s
+    limit_percentage: 80
+    spike_limit_percentage: 25
+
+exporters:
+  clickhouse:
+    endpoint: tcp://clickhouse:9000?dial_timeout=10s
+    database: otel
+    username: default
+    password: ${env:CLICKHOUSE_PASSWORD}
+    # The exporter creates these tables on first run when create_schema is true.
+    create_schema: true
+    ttl: 720h # 30 days
+    traces_table_name: otel_traces
+    timeout: 10s
+    retry_on_failure:
+      enabled: true
+      initial_interval: 5s
+      max_elapsed_time: 300s
+  # Uncomment to also see spans in the collector logs while wiring things up.
+  # debug:
+  #   verbosity: detailed
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [clickhouse]
+  telemetry:
+    logs:
+      level: info
