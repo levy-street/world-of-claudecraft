@@ -14,6 +14,7 @@ import { assetsReady } from './render/assets/preload';
 import { CharacterPreview } from './render/characters';
 import { DT, INTERACT_RANGE, PlayerClass, dist2d } from './sim/types';
 import { togglePasswordVisibility, syncInputAriaState, validateForm, handleKeyboardActivation, validateCharacterName } from './ui/auth_utils';
+import { startFlowStatusText, StartFlowPanel, StartFlowSnapshot, StartFlowState } from './ui/start_flow_state';
 import { CLASSES, ABILITIES } from './sim/content/classes';
 import { iconDataUrl } from './ui/icons';
 import { getLanguage, setLanguage, t, SupportedLanguage } from './ui/i18n';
@@ -207,6 +208,37 @@ function requestPreferredFullscreen(): void {
     return;
   }
   if (new Settings().get('fullscreen') >= 0.5) requestBrowserFullscreen();
+}
+
+function setOptionalDataset(el: HTMLElement, key: string, value: string | number | undefined): void {
+  if (value === undefined || value === '') delete el.dataset[key];
+  else el.dataset[key] = String(value);
+}
+
+function setStartFlowState(
+  state: StartFlowState,
+  panel: StartFlowPanel,
+  details: Partial<Omit<StartFlowSnapshot, 'state' | 'panel' | 'hasGame'>> = {},
+): void {
+  const snapshot: StartFlowSnapshot = {
+    state,
+    panel,
+    hasGame: Boolean((window as any).__game),
+    ...details,
+  };
+  const status = document.querySelector('#start-flow-status') as HTMLElement | null;
+  const startScreen = document.querySelector('#start-screen') as HTMLElement | null;
+  const targets = [document.body, startScreen].filter((el): el is HTMLElement => Boolean(el));
+  for (const target of targets) {
+    target.dataset.startFlowState = snapshot.state;
+    target.dataset.activeStartPanel = snapshot.panel;
+    target.dataset.hasGame = snapshot.hasGame ? 'true' : 'false';
+    setOptionalDataset(target, 'startFlowRealm', snapshot.realm);
+    setOptionalDataset(target, 'startFlowUsername', snapshot.username);
+    setOptionalDataset(target, 'startFlowCharacterCount', snapshot.characterCount);
+  }
+  if (status) status.textContent = startFlowStatusText(snapshot);
+  (window as any).__wocStartFlow = snapshot;
 }
 
 // ---------------------------------------------------------------------------
@@ -561,6 +593,7 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
   requestAnimationFrame(() => requestAnimationFrame(() => hideLoadingScreen()));
 
   (window as any).__game = { sim: world, world, renderer, input, hud, online };
+  setStartFlowState('game-ready', 'none', { realm: api.realm || undefined });
 }
 
 // ---------------------------------------------------------------------------
@@ -591,6 +624,20 @@ const api = new Api();
 let activeTransitionTimeout: number | null = null;
 let activeTransitionCleanup: (() => void) | null = null;
 let characterPreview: CharacterPreview | null = null;
+let authRequestId = 0;
+let realmListRequestId = 0;
+let characterListRequestId = 0;
+
+function stateForPanel(panel: StartFlowPanel): StartFlowState {
+  switch (panel) {
+    case '#mode-select': return 'mode-select';
+    case '#login-panel': return 'login';
+    case '#realm-panel': return 'realm-list';
+    case '#charselect-panel': return 'character-select';
+    case '#offline-select': return 'offline-select';
+    case 'none': return 'game-ready';
+  }
+}
 
 function updatePreviewContainer(panelId: string): void {
   if (!characterPreview) return;
@@ -719,6 +766,10 @@ function show(el: string): void {
   if (document.activeElement instanceof HTMLInputElement || document.activeElement instanceof HTMLTextAreaElement) {
     document.activeElement.blur();
   }
+  setStartFlowState(stateForPanel(el as StartFlowPanel), el as StartFlowPanel, {
+    username: api.username ?? undefined,
+    realm: api.realm || undefined,
+  });
 
   // Reset currently rendered classes to force re-render/animation when opening a panel
   currentlyRenderedClass['offline-class-details'] = null;
@@ -845,6 +896,7 @@ function realmPopulation(online: boolean, players: number): { label: string; cls
 // the chosen realm). We remember the last realm and jump straight to its
 // characters, with a "Change Realm" button back to this list.
 async function enterRealmFlow(): Promise<void> {
+  setStartFlowState('realm-loading', '#realm-panel', { username: api.username ?? undefined });
   const dir = await api.realms();
   $('#realm-list-user').textContent = api.username ? `${api.username}` : '';
   const remembered = localStorage.getItem(LAST_REALM_KEY);
@@ -854,9 +906,16 @@ async function enterRealmFlow(): Promise<void> {
 }
 
 function showRealmList(dir?: import('./net/online').RealmDirectory): void {
+  const requestId = ++realmListRequestId;
   show('#realm-panel');
   const listEl = $('#realm-list');
+  const isCurrentRequest = () => requestId === realmListRequestId
+    && document.body.dataset.activeStartPanel === '#realm-panel';
   const render = (d: import('./net/online').RealmDirectory) => {
+    if (!isCurrentRequest()) return;
+    setStartFlowState(d.realms.length === 0 ? 'realm-empty' : 'realm-list', '#realm-panel', {
+      username: api.username ?? undefined,
+    });
     if (d.realms.length === 0) { listEl.innerHTML = '<div class="realm-loading">No realms available.</div>'; return; }
     // recommend the lowest-population online realm (WoW nudges new players there)
     listEl.innerHTML = d.realms.map((r) => {
@@ -878,6 +937,7 @@ function showRealmList(dir?: import('./net/online').RealmDirectory): void {
     let bestPlayers = Infinity, bestName = '';
     void Promise.all(d.realms.map(async (r) => {
       const st = await api.realmStatus(r.url || '');
+      if (!isCurrentRequest()) return;
       const row = listEl.querySelector(`.realm-row[data-name="${CSS.escape(r.name)}"]`) as HTMLElement | null;
       if (!row) return;
       const pop = realmPopulation(st.online, st.players);
@@ -888,19 +948,29 @@ function showRealmList(dir?: import('./net/online').RealmDirectory): void {
       row.classList.toggle('offline', !st.online);
       if (st.online && st.players < bestPlayers) { bestPlayers = st.players; bestName = r.name; }
     })).then(() => {
+      if (!isCurrentRequest()) return;
       const recRow = bestName ? listEl.querySelector(`.realm-row[data-name="${CSS.escape(bestName)}"]`) : null;
       recRow?.querySelector('[data-rec]')?.removeAttribute('hidden');
     });
   };
   if (dir) render(dir);
-  else { listEl.innerHTML = '<div class="realm-loading">Loading realms…</div>'; void api.realms().then(render); }
+  else {
+    setStartFlowState('realm-loading', '#realm-panel', { username: api.username ?? undefined });
+    listEl.innerHTML = '<div class="realm-loading">Loading realms…</div>';
+    void api.realms().then(render);
+  }
 }
 
 function selectRealm(entry: import('./net/online').RealmEntry): void {
+  realmListRequestId += 1;
   api.setRealm(entry.url);
   api.realm = entry.name;
   localStorage.setItem(LAST_REALM_KEY, entry.name);
   show('#charselect-panel');
+  setStartFlowState('character-loading', '#charselect-panel', {
+    username: api.username ?? undefined,
+    realm: api.realm,
+  });
   void refreshCharacters();
 }
 
@@ -945,14 +1015,37 @@ async function refreshCharacters(): Promise<void> {
     btn.classList.toggle('active', on);
     btn.setAttribute('aria-selected', String(on));
   });
+  const requestId = ++characterListRequestId;
+  const requestRealm = api.realm;
   const listEl = $('#char-list');
+  if (document.body.dataset.activeStartPanel !== '#charselect-panel') return;
+  setStartFlowState('character-loading', '#charselect-panel', {
+    username: api.username ?? undefined,
+    realm: api.realm || undefined,
+  });
   listEl.innerHTML = '<li class="char-list-message">Loading…</li>';
   try {
     const chars = await api.characters();
+    if (
+      requestId !== characterListRequestId
+      || document.body.dataset.activeStartPanel !== '#charselect-panel'
+      || api.realm !== requestRealm
+    ) return;
     if (api.realm) $('#charselect-realm').textContent = `Realm: ${api.realm}`;
     listEl.innerHTML = '';
     if (chars.length === 0) {
+      setStartFlowState('character-empty', '#charselect-panel', {
+        username: api.username ?? undefined,
+        realm: api.realm || undefined,
+        characterCount: 0,
+      });
       listEl.innerHTML = '<li class="char-list-message">No characters yet (create one below).</li>';
+    } else {
+      setStartFlowState('character-select', '#charselect-panel', {
+        username: api.username ?? undefined,
+        realm: api.realm || undefined,
+        characterCount: chars.length,
+      });
     }
     for (const c of chars) {
       const row = document.createElement('li');
@@ -1026,6 +1119,16 @@ async function refreshCharacters(): Promise<void> {
       firstRow.click();
     }
   } catch (err: any) {
+    if (
+      requestId !== characterListRequestId
+      || document.body.dataset.activeStartPanel !== '#charselect-panel'
+      || api.realm !== requestRealm
+    ) return;
+    setStartFlowState('character-error', '#charselect-panel', {
+      username: api.username ?? undefined,
+      realm: api.realm || undefined,
+      error: err.message,
+    });
     listEl.innerHTML = `<li class="char-list-message char-list-error">${err.message}</li>`;
   }
 }
@@ -1054,6 +1157,10 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
     if (!(await prepareWorldEntry())) return;
     audio.init();
     music.init();
+    setStartFlowState('world-connecting', '#charselect-panel', {
+      username: api.username ?? undefined,
+      realm: api.realm || undefined,
+    });
     enterLoadingState('Connecting to realm…');
   } finally {
     if (!hasBegunWorldEntry && button) {
@@ -1643,15 +1750,20 @@ function wireStartScreens(): void {
 
   // login
   const doAuth = async (mode: 'login' | 'register') => {
+    const requestId = ++authRequestId;
     const username = ($('#login-user') as unknown as HTMLInputElement).value.trim();
     const password = ($('#login-pass') as unknown as HTMLInputElement).value;
     loginError('');
+    setStartFlowState('authenticating', '#login-panel', { username });
     try {
       if (mode === 'login') await api.login(username, password);
       else await api.register(username, password);
+      if (requestId !== authRequestId || document.body.dataset.activeStartPanel !== '#login-panel') return;
       $('#charselect-user').textContent = api.username ?? '';
       await enterRealmFlow();
     } catch (err: any) {
+      if (requestId !== authRequestId || document.body.dataset.activeStartPanel !== '#login-panel') return;
+      setStartFlowState('login', '#login-panel', { username });
       loginError(err.message);
     }
   };
@@ -2094,6 +2206,8 @@ function wireStartScreens(): void {
       characterPreview.setClass(cls);
     }
   });
+
+  setStartFlowState('mode-select', '#mode-select');
 }
 
 wireStartScreens();
