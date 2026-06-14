@@ -29,8 +29,13 @@
     --gold-dim: #c8a838;
     --border: #6f5a2a;
     --panel-bg: linear-gradient(170deg, #15151fF2 0%, #0b0b12F2 60%, #08080dF2 100%);
-    --title-font: 'Palatino Linotype', Palatino, Georgia, serif;
-    --ui-font: 'Arial', 'Helvetica', sans-serif;
+    /* CJK (Chinese/Japanese/Korean) system-font fallback chain. Appended to
+       every font stack so Chinese text renders natively on every platform
+       (macOS/iOS, Windows, Linux) with no web-font download. */
+    --cjk: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', 'Noto Sans CJK SC', 'Source Han Sans SC', 'WenQuanYi Micro Hei';
+    --title-font: 'Palatino Linotype', Palatino, Georgia, var(--cjk), serif;
+    --ui-font: 'Arial', 'Helvetica', var(--cjk), sans-serif;
+    --serif-font: Georgia, var(--cjk), serif;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
   html, body { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: var(--ui-font); }
@@ -229,7 +234,7 @@
   /* ---------- windows ---------- */
   .window { position: absolute; display: none; padding: 12px; z-index: 20; }
   #quest-dialog { left: 50%; top: 14%; transform: translateX(-50%); width: 440px; max-height: 64%; overflow-y: auto; }
-  .qd-text { font-size: 12.5px; line-height: 1.55; color: #e8e0c8; margin-bottom: 10px; font-family: Georgia, serif; }
+  .qd-text { font-size: 12.5px; line-height: 1.55; color: #e8e0c8; margin-bottom: 10px; font-family: var(--serif-font); }
   .qd-sub { font-family: var(--title-font); color: var(--gold); font-size: 13px; margin: 8px 0 4px; }
   .qd-obj { font-size: 12px; color: #cfc6a8; margin: 2px 0; }
   .qd-reward-row { display: flex; gap: 6px; align-items: center; margin-top: 4px; }
@@ -316,7 +321,7 @@
   .arena-rank .wl b { color: #7fdc4f; } .arena-rank .wl i { color: #ff7a6a; font-style: normal; }
   #arena-window .btn { width: 100%; margin: 4px 0 0; box-sizing: border-box; text-align: center; }
   #arena-window .btn.leave { background: linear-gradient(#5a4a18, #3a2f0d 55%, #2a2208); color: #ffe6a8; }
-  .arena-note { font-size: 11.5px; color: #b6ad8c; line-height: 1.45; margin: 4px 0 2px; font-family: Georgia, serif; }
+  .arena-note { font-size: 11.5px; color: #b6ad8c; line-height: 1.45; margin: 4px 0 2px; font-family: var(--serif-font); }
   .arena-queue-status { font-size: 12px; color: #ffd100; margin-top: 6px; text-align: center; }
   .ladder-row { display: grid; grid-template-columns: 24px 1fr auto auto; gap: 8px; align-items: center;
     font-size: 12px; padding: 3px 6px; border-radius: 4px; color: #e0d6b4; }
@@ -345,7 +350,7 @@
   .mkt-tab.sel { color: var(--gold); background: #ffffff16; border-bottom-color: #cc9a3c; }
   .mkt-tab .pip { color: #9fdc7f; font-size: 10.5px; }
   #market-body { overflow-y: auto; flex: 1; min-height: 80px; }
-  .mkt-note { font-size: 11.5px; color: #b6ad8c; line-height: 1.45; margin: 2px 0 8px; font-family: Georgia, serif; }
+  .mkt-note { font-size: 11.5px; color: #b6ad8c; line-height: 1.45; margin: 2px 0 8px; font-family: var(--serif-font); }
   .mkt-row { display: grid; grid-template-columns: 30px 1fr auto auto; gap: 9px; align-items: center;
     padding: 5px 6px; border-radius: 4px; font-size: 12px; }
   .mkt-row:hover { background: #ffffff0d; }
@@ -474,7 +479,7 @@
   .ls-bar { width: min(420px, 70vw); height: 14px; border: 2px solid var(--border); outline: 1px solid #000;
     border-radius: 8px; background: #0009; overflow: hidden; box-shadow: 0 2px 14px #000c, inset 0 1px 4px #000a; }
   #ls-fill { height: 100%; width: 0%; background: linear-gradient(180deg, #ffd100, #c8a838); transition: width .2s ease; }
-  #ls-status { color: #e8d8a8; font-family: Georgia, serif; font-size: 13px; text-shadow: 1px 1px 2px #000; }
+  #ls-status { color: #e8d8a8; font-family: var(--serif-font); font-size: 13px; text-shadow: 1px 1px 2px #000; }
 
   /* ---------- online auth / character select ---------- */
   .mode-row { display: flex; gap: 24px; }
@@ -524,7 +529,7 @@
   #prompt-stack { position: absolute; left: 50%; top: 34%; transform: translateX(-50%); z-index: 80;
     display: flex; flex-direction: column; gap: 10px; }
   .prompt { padding: 14px 18px; text-align: center; min-width: 300px; }
-  .prompt .prompt-text { font-size: 13.5px; color: #e8e0c8; margin-bottom: 4px; font-family: Georgia, serif; }
+  .prompt .prompt-text { font-size: 13.5px; color: #e8e0c8; margin-bottom: 4px; font-family: var(--serif-font); }
 
   /* ---------- trade window ---------- */
   #trade-window { left: 50%; top: 18%; transform: translateX(-50%); width: 460px; }
@@ -544,6 +549,14 @@
   #target-frame.elite .portrait { border-color: var(--gold); box-shadow: 0 0 12px #ffd10066, 0 2px 8px #000c; }
   #tf-elite-tag { font-size: 9px; color: var(--gold); font-family: var(--title-font); letter-spacing: 1px; text-align: center; display: none; }
   #target-frame.elite #tf-elite-tag { display: block; }
+
+  /* ---------- language picker ---------- */
+  #lang-picker { position: absolute; top: 14px; right: 16px; display: flex; gap: 6px; z-index: 40; }
+  .lang-btn { font-family: var(--title-font); font-size: 13px; color: #cabb8c; cursor: pointer;
+    background: #1a1410; border: 1px solid var(--border); border-radius: 4px; padding: 4px 12px;
+    text-shadow: 1px 1px 1px #000; }
+  .lang-btn:hover { color: #fff; border-color: var(--gold-dim); }
+  .lang-btn.on { color: #1a1206; background: linear-gradient(#ffd76b, #d9a531); border-color: var(--gold); font-weight: bold; }
 </style>
 </head>
 <body>
@@ -601,21 +614,21 @@
           <div id="actionbar" class="panel"></div>
         </div>
         <div id="side-buttons">
-          <button class="micro-btn" id="mm-char" title="Character Info">C<span class="keybind">c</span></button>
-          <button class="micro-btn" id="mm-spell" title="Spellbook">S<span class="keybind">p</span></button>
-          <button class="micro-btn" id="mm-quest" title="Quest Log">Q<span class="keybind">l</span></button>
-          <button class="micro-btn" id="mm-map" title="World Map">M<span class="keybind">m</span></button>
-          <button class="micro-btn" id="mm-bag" title="Bags">B<span class="keybind">b</span></button>
-          <button class="micro-btn" id="mm-arena" title="Ashen Coliseum (1v1 Arena)">⚔<span class="keybind">g</span></button>
-          <button class="micro-btn" id="mm-music" title="Toggle Music">♪</button>
+          <button class="micro-btn" id="mm-char" data-i18n-attr="title:hud.btn.char" title="Character Info">C<span class="keybind">c</span></button>
+          <button class="micro-btn" id="mm-spell" data-i18n-attr="title:hud.btn.spell" title="Spellbook">S<span class="keybind">p</span></button>
+          <button class="micro-btn" id="mm-quest" data-i18n-attr="title:hud.btn.quest" title="Quest Log">Q<span class="keybind">l</span></button>
+          <button class="micro-btn" id="mm-map" data-i18n-attr="title:hud.btn.map" title="World Map">M<span class="keybind">m</span></button>
+          <button class="micro-btn" id="mm-bag" data-i18n-attr="title:hud.btn.bags" title="Bags">B<span class="keybind">b</span></button>
+          <button class="micro-btn" id="mm-arena" data-i18n-attr="title:hud.btn.arena" title="Ashen Coliseum (1v1 Arena)">⚔<span class="keybind">g</span></button>
+          <button class="micro-btn" id="mm-music" data-i18n-attr="title:hud.btn.music" title="Toggle Music">♪</button>
         </div>
       </div>
     </div>
 
     <div id="chatlog-wrap">
       <div id="chatlog-tabs">
-        <button class="chat-tab active" data-log-tab="chat">Chat</button>
-        <button class="chat-tab" data-log-tab="combat">Combat Log</button>
+        <button class="chat-tab active" data-log-tab="chat" data-i18n="chat.tab.chat">Chat</button>
+        <button class="chat-tab" data-log-tab="combat" data-i18n="chat.tab.combat">Combat Log</button>
       </div>
       <div id="chatlog-frame" class="panel">
         <div id="chatlog" class="chat-pane active"></div>
@@ -638,13 +651,13 @@
     <div id="meters-window" class="panel">
       <div class="panel-title">
         <span class="mt-tabs">
-          <button class="mt-tab on" data-tab="dmg">Dmg</button>
-          <button class="mt-tab" data-tab="heal">Heal</button>
-          <button class="mt-tab" data-tab="threat">Threat</button>
+          <button class="mt-tab on" data-tab="dmg" data-i18n="meters.tab.dmg">Dmg</button>
+          <button class="mt-tab" data-tab="heal" data-i18n="meters.tab.heal">Heal</button>
+          <button class="mt-tab" data-tab="threat" data-i18n="meters.tab.threat">Threat</button>
         </span>
         <span>
-          <button class="x-btn mt-prev" title="older segment">&#9664;</button>
-          <button class="x-btn mt-next" title="newer segment">&#9654;</button>
+          <button class="x-btn mt-prev" data-i18n-attr="title:meters.title.older" title="older segment">&#9664;</button>
+          <button class="x-btn mt-next" data-i18n-attr="title:meters.title.newer" title="newer segment">&#9654;</button>
           <button class="x-btn mt-close">&times;</button>
         </span>
       </div>
@@ -658,81 +671,85 @@
     <div id="banner"></div>
 
     <div id="death-overlay">
-      <h1>You have died.</h1>
-      <button class="btn" id="release-btn">Release Spirit</button>
+      <h1 data-i18n="death.title">You have died.</h1>
+      <button class="btn" id="release-btn" data-i18n="death.release">Release Spirit</button>
     </div>
   </div>
 
-  <input id="chat-input" maxlength="200" placeholder="Say something… (/y yell, /w name whisper, /g general, /p party)" autocomplete="off" />
+  <input id="chat-input" maxlength="200" data-i18n-attr="placeholder:chat.input.ph" placeholder="Say something… (/y yell, /w name whisper, /g general, /p party)" autocomplete="off" />
 
   <div id="start-screen">
+    <div id="lang-picker">
+      <button class="lang-btn" data-lang="en">English</button>
+      <button class="lang-btn" data-lang="zh">中文</button>
+    </div>
     <img id="title-logo" src="/worldofclaudecraft-logo.png" alt="World of Claudecraft" />
 
     <div id="mode-select">
       <div class="mode-row">
         <div class="mode-card panel" id="btn-online">
-          <h2>Play Online</h2>
-          <p>Log in to the realm. Your characters live on the server and you share the world with everyone else who's on.</p>
+          <h2 data-i18n="mode.online.title">Play Online</h2>
+          <p data-i18n="mode.online.desc">Log in to the realm. Your characters live on the server and you share the world with everyone else who's on.</p>
         </div>
         <div class="mode-card panel" id="btn-offline">
-          <h2>Play Offline</h2>
-          <p>Instant single-player world in your browser. Nothing is saved — perfect for a quick brawl or testing.</p>
+          <h2 data-i18n="mode.offline.title">Play Offline</h2>
+          <p data-i18n="mode.offline.desc">Instant single-player world in your browser. Nothing is saved — perfect for a quick brawl or testing.</p>
         </div>
       </div>
-      <div id="performance-tip"><b>TIP:</b> For the smoothest experience, turn off ad blocker extensions on this site. Community reports found some blockers can cause lag.</div>
+      <div id="performance-tip" data-i18n-html="tip.perf"><b>TIP:</b> For the smoothest experience, turn off ad blocker extensions on this site. Community reports found some blockers can cause lag.</div>
     </div>
 
     <div id="login-panel" class="panel auth-panel" style="display:none">
-      <div class="panel-title"><span>Account</span></div>
-      <input id="login-user" maxlength="24" placeholder="Username" autocomplete="username" />
-      <input id="login-pass" type="password" maxlength="128" placeholder="Password" autocomplete="current-password" />
+      <div class="panel-title"><span data-i18n="login.title">Account</span></div>
+      <input id="login-user" maxlength="24" data-i18n-attr="placeholder:login.user.ph" placeholder="Username" autocomplete="username" />
+      <input id="login-pass" type="password" maxlength="128" data-i18n-attr="placeholder:login.pass.ph" placeholder="Password" autocomplete="current-password" />
       <div id="login-error" class="auth-error"></div>
       <div>
-        <button class="btn" id="btn-login">Log In</button>
-        <button class="btn" id="btn-register">Create Account</button>
-        <button class="btn" id="btn-login-back">Back</button>
+        <button class="btn" id="btn-login" data-i18n="login.logIn">Log In</button>
+        <button class="btn" id="btn-register" data-i18n="login.createAccount">Create Account</button>
+        <button class="btn" id="btn-login-back" data-i18n="login.back">Back</button>
       </div>
     </div>
 
     <div id="charselect-panel" class="panel auth-panel" style="display:none">
-      <div class="panel-title"><span>Characters — <span id="charselect-user" class="gold"></span></span></div>
+      <div class="panel-title"><span><span data-i18n="charselect.title.prefix">Characters — </span><span id="charselect-user" class="gold"></span></span></div>
       <div id="char-list"></div>
       <div class="char-create">
-        <div class="qd-sub">Create a character</div>
-        <input id="new-char-name" maxlength="16" placeholder="Name" />
+        <div class="qd-sub" data-i18n="charselect.create.heading">Create a character</div>
+        <input id="new-char-name" maxlength="16" data-i18n-attr="placeholder:charselect.name.ph" placeholder="Name" />
         <div class="mini-class-row">
-          <div class="mini-class" data-class="warrior">⚔️ Warrior</div>
-          <div class="mini-class" data-class="paladin">🔨 Paladin</div>
-          <div class="mini-class" data-class="hunter">🏹 Hunter</div>
-          <div class="mini-class" data-class="rogue">🗡️ Rogue</div>
-          <div class="mini-class" data-class="priest">✝️ Priest</div>
-          <div class="mini-class" data-class="shaman">🌩️ Shaman</div>
-          <div class="mini-class" data-class="mage">🔮 Mage</div>
-          <div class="mini-class" data-class="warlock">🕯️ Warlock</div>
-          <div class="mini-class" data-class="druid">🐻 Druid</div>
+          <div class="mini-class" data-class="warrior">⚔️ <span class="cls-name">Warrior</span></div>
+          <div class="mini-class" data-class="paladin">🔨 <span class="cls-name">Paladin</span></div>
+          <div class="mini-class" data-class="hunter">🏹 <span class="cls-name">Hunter</span></div>
+          <div class="mini-class" data-class="rogue">🗡️ <span class="cls-name">Rogue</span></div>
+          <div class="mini-class" data-class="priest">✝️ <span class="cls-name">Priest</span></div>
+          <div class="mini-class" data-class="shaman">🌩️ <span class="cls-name">Shaman</span></div>
+          <div class="mini-class" data-class="mage">🔮 <span class="cls-name">Mage</span></div>
+          <div class="mini-class" data-class="warlock">🕯️ <span class="cls-name">Warlock</span></div>
+          <div class="mini-class" data-class="druid">🐻 <span class="cls-name">Druid</span></div>
         </div>
         <div id="charselect-error" class="auth-error"></div>
-        <button class="btn" id="btn-create-char">Create</button>
-        <button class="btn" id="btn-charselect-back">Back</button>
+        <button class="btn" id="btn-create-char" data-i18n="charselect.create">Create</button>
+        <button class="btn" id="btn-charselect-back" data-i18n="charselect.back">Back</button>
       </div>
     </div>
 
     <div id="offline-select" style="display:none">
-      <div id="name-row"><input id="char-name" maxlength="16" placeholder="Character name" value="" /></div>
+      <div id="name-row"><input id="char-name" maxlength="16" data-i18n-attr="placeholder:offline.name.ph" placeholder="Character name" value="" /></div>
       <div class="class-row">
-        <div class="class-card panel" data-class="warrior"><div class="crest">⚔️</div><h2 style="color:#c79c6e">Warrior</h2><p>Rage, Heroic Strike, Charge, Overpower.</p></div>
-        <div class="class-card panel" data-class="paladin"><div class="crest">🔨</div><h2 style="color:#f58cba">Paladin</h2><p>Seals, Judgement, Holy Light, plate-clad.</p></div>
-        <div class="class-card panel" data-class="hunter"><div class="crest">🏹</div><h2 style="color:#abd473">Hunter</h2><p>Auto Shot at range, stings and traps... of a sort.</p></div>
-        <div class="class-card panel" data-class="rogue"><div class="crest">🗡️</div><h2 style="color:#fff569">Rogue</h2><p>Energy, combo points, Backstab, Eviscerate.</p></div>
-        <div class="class-card panel" data-class="priest"><div class="crest">✝️</div><h2 style="color:#ffffff">Priest</h2><p>Heals, shields, Renew — and Shadow Word: Pain.</p></div>
-        <div class="class-card panel" data-class="shaman"><div class="crest">🌩️</div><h2 style="color:#5f9bef">Shaman</h2><p>Lightning, shocks, weapon imbues, heals.</p></div>
-        <div class="class-card panel" data-class="mage"><div class="crest">🔮</div><h2 style="color:#69ccf0">Mage</h2><p>Fireball, Frostbolt, Polymorph, conjured water.</p></div>
-        <div class="class-card panel" data-class="warlock"><div class="crest">🕯️</div><h2 style="color:#9482c9">Warlock</h2><p>Dots, curses, Life Tap, Drain Life.</p></div>
-        <div class="class-card panel" data-class="druid"><div class="crest">🐻</div><h2 style="color:#ff7d0a">Druid</h2><p>Wrath, HoTs, roots — and Bear Form at 10.</p></div>
+        <div class="class-card panel" data-class="warrior"><div class="crest">⚔️</div><h2 class="cls-name" style="color:#c79c6e">Warrior</h2><p data-i18n="class.blurb.warrior">Rage, Heroic Strike, Charge, Overpower.</p></div>
+        <div class="class-card panel" data-class="paladin"><div class="crest">🔨</div><h2 class="cls-name" style="color:#f58cba">Paladin</h2><p data-i18n="class.blurb.paladin">Seals, Judgement, Holy Light, plate-clad.</p></div>
+        <div class="class-card panel" data-class="hunter"><div class="crest">🏹</div><h2 class="cls-name" style="color:#abd473">Hunter</h2><p data-i18n="class.blurb.hunter">Auto Shot at range, stings and traps... of a sort.</p></div>
+        <div class="class-card panel" data-class="rogue"><div class="crest">🗡️</div><h2 class="cls-name" style="color:#fff569">Rogue</h2><p data-i18n="class.blurb.rogue">Energy, combo points, Backstab, Eviscerate.</p></div>
+        <div class="class-card panel" data-class="priest"><div class="crest">✝️</div><h2 class="cls-name" style="color:#ffffff">Priest</h2><p data-i18n="class.blurb.priest">Heals, shields, Renew — and Shadow Word: Pain.</p></div>
+        <div class="class-card panel" data-class="shaman"><div class="crest">🌩️</div><h2 class="cls-name" style="color:#5f9bef">Shaman</h2><p data-i18n="class.blurb.shaman">Lightning, shocks, weapon imbues, heals.</p></div>
+        <div class="class-card panel" data-class="mage"><div class="crest">🔮</div><h2 class="cls-name" style="color:#69ccf0">Mage</h2><p data-i18n="class.blurb.mage">Fireball, Frostbolt, Polymorph, conjured water.</p></div>
+        <div class="class-card panel" data-class="warlock"><div class="crest">🕯️</div><h2 class="cls-name" style="color:#9482c9">Warlock</h2><p data-i18n="class.blurb.warlock">Dots, curses, Life Tap, Drain Life.</p></div>
+        <div class="class-card panel" data-class="druid"><div class="crest">🐻</div><h2 class="cls-name" style="color:#ff7d0a">Druid</h2><p data-i18n="class.blurb.druid">Wrath, HoTs, roots — and Bear Form at 10.</p></div>
       </div>
     </div>
 
-    <div id="controls-hint">
+    <div id="controls-hint" data-i18n-html="controls.hint">
       <b>WASD</b> move &middot; <b>A/D</b> turn, <b>Q/E</b> strafe &middot; <b>right-drag</b> mouselook &middot; <b>left-drag</b> orbit camera &middot; wheel zoom &middot; <b>Space</b> jump<br/>
       <b>Tab</b> target &middot; <b>1-9,0</b> abilities &middot; <b>F</b> interact/loot &middot; <b>C</b> character &middot; <b>P</b> spellbook &middot; <b>L</b> quest log &middot; <b>M</b> map &middot; <b>B</b> bags &middot; <b>V</b> nameplates &middot; <b>R</b> autorun &middot; <b>Enter</b> chat &middot; <b>Esc</b> menu (rebind keys)
     </div>
@@ -740,11 +757,11 @@
     <div id="social-links">
       <a class="social-link" href="https://github.com/levy-street/world-of-claudecraft" target="_blank" rel="noopener noreferrer">
         <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
-        <span>View the source on GitHub</span>
+        <span data-i18n="social.github">View the source on GitHub</span>
       </a>
       <a class="social-link" href="https://discord.gg/GjhnUsBtw" target="_blank" rel="noopener noreferrer">
         <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M20.32 4.37A19.8 19.8 0 0 0 15.36 2.8a13.66 13.66 0 0 0-.64 1.32 18.47 18.47 0 0 0-5.45 0 13.02 13.02 0 0 0-.65-1.32 19.73 19.73 0 0 0-4.96 1.58C.53 9.03-.32 13.56.1 18.02a19.9 19.9 0 0 0 6.08 3.08c.49-.67.93-1.38 1.3-2.13-.72-.27-1.41-.6-2.06-.98.17-.13.34-.26.5-.4a14.16 14.16 0 0 0 12.16 0c.16.14.33.27.5.4-.65.39-1.34.72-2.07.99.38.74.81 1.45 1.31 2.12a19.86 19.86 0 0 0 6.08-3.08c.5-5.17-.85-9.66-3.58-13.65ZM8.02 15.28c-1.18 0-2.15-1.08-2.15-2.41 0-1.33.95-2.42 2.15-2.42 1.2 0 2.17 1.1 2.15 2.42 0 1.33-.95 2.41-2.15 2.41Zm7.96 0c-1.18 0-2.15-1.08-2.15-2.41 0-1.33.95-2.42 2.15-2.42 1.2 0 2.17 1.1 2.15 2.42 0 1.33-.95 2.41-2.15 2.41Z"/></svg>
-        <span>Join the Discord</span>
+        <span data-i18n="social.discord">Join the Discord</span>
       </a>
     </div>
   </div>
@@ -753,7 +770,7 @@
     <img class="ls-logo" src="/worldofclaudecraft-logo.png" alt="World of Claudecraft" />
     <div class="ls-progress">
       <div class="ls-bar"><div id="ls-fill"></div></div>
-      <div id="ls-status">Entering the world&hellip;</div>
+      <div id="ls-status" data-i18n="loading.enter">Entering the world&hellip;</div>
     </div>
   </div>
 

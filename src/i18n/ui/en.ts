@@ -1,0 +1,412 @@
+// English UI strings. This is the canonical key set — every key used with
+// t() or a data-i18n attribute must exist here. ui/zh.ts mirrors these keys
+// with Chinese translations; anything missing there falls back to this file.
+//
+// {placeholders} are interpolated by t(key, params).
+
+export const EN: Record<string, string> = {
+  // ---- Language picker ----------------------------------------------------
+  'lang.label': 'Language',
+
+  // ---- Start screen / mode select ----------------------------------------
+  'mode.online.title': 'Play Online',
+  'mode.online.desc': "Log in to the realm. Your characters live on the server and you share the world with everyone else who's on.",
+  'mode.offline.title': 'Play Offline',
+  'mode.offline.desc': 'Instant single-player world in your browser. Nothing is saved — perfect for a quick brawl or testing.',
+  'tip.perf': '<b>TIP:</b> For the smoothest experience, turn off ad blocker extensions on this site. Community reports found some blockers can cause lag.',
+  'controls.hint': '<b>WASD</b> move &middot; <b>A/D</b> turn, <b>Q/E</b> strafe &middot; <b>right-drag</b> mouselook &middot; <b>left-drag</b> orbit camera &middot; wheel zoom &middot; <b>Space</b> jump<br/><b>Tab</b> target &middot; <b>1-9,0</b> abilities &middot; <b>F</b> interact/loot &middot; <b>C</b> character &middot; <b>P</b> spellbook &middot; <b>L</b> quest log &middot; <b>M</b> map &middot; <b>B</b> bags &middot; <b>V</b> nameplates &middot; <b>R</b> autorun &middot; <b>Enter</b> chat &middot; <b>Esc</b> menu (rebind keys)',
+  'social.github': 'View the source on GitHub',
+  'social.discord': 'Join the Discord',
+
+  // ---- Login / account ----------------------------------------------------
+  'login.title': 'Account',
+  'login.user.ph': 'Username',
+  'login.pass.ph': 'Password',
+  'login.logIn': 'Log In',
+  'login.createAccount': 'Create Account',
+  'login.back': 'Back',
+
+  // ---- Character select / create -----------------------------------------
+  'charselect.title.prefix': 'Characters — ',
+  'charselect.create.heading': 'Create a character',
+  'charselect.name.ph': 'Name',
+  'charselect.create': 'Create',
+  'charselect.back': 'Back',
+  'offline.name.ph': 'Character name',
+
+  // ---- Class blurbs (offline class cards) --------------------------------
+  'class.blurb.warrior': 'Rage, Heroic Strike, Charge, Overpower.',
+  'class.blurb.paladin': 'Seals, Judgement, Holy Light, plate-clad.',
+  'class.blurb.hunter': 'Auto Shot at range, stings and traps... of a sort.',
+  'class.blurb.rogue': 'Energy, combo points, Backstab, Eviscerate.',
+  'class.blurb.priest': 'Heals, shields, Renew — and Shadow Word: Pain.',
+  'class.blurb.shaman': 'Lightning, shocks, weapon imbues, heals.',
+  'class.blurb.mage': 'Fireball, Frostbolt, Polymorph, conjured water.',
+  'class.blurb.warlock': 'Dots, curses, Life Tap, Drain Life.',
+  'class.blurb.druid': 'Wrath, HoTs, roots — and Bear Form at 10.',
+
+  // ---- HUD micro-buttons (title tooltips) --------------------------------
+  'hud.btn.char': 'Character Info',
+  'hud.btn.spell': 'Spellbook',
+  'hud.btn.quest': 'Quest Log',
+  'hud.btn.map': 'World Map',
+  'hud.btn.bags': 'Bags',
+  'hud.btn.arena': 'Ashen Coliseum (1v1 Arena)',
+  'hud.btn.music': 'Toggle Music',
+
+  // ---- Chat ---------------------------------------------------------------
+  'chat.tab.chat': 'Chat',
+  'chat.tab.combat': 'Combat Log',
+  'chat.input.ph': 'Say something… (/y yell, /w name whisper, /g general, /p party)',
+  'chat.party': '[Party] {from}: {text}',
+  'chat.yell': '{from} yells: {text}',
+  'chat.whisperTo': 'To {to}: {text}',
+  'chat.whisperFrom': '{from} whispers: {text}',
+  'chat.general': '[General] {from}: {text}',
+  'chat.say': '{from} says: {text}',
+  'chat.ignored.on': 'Ignoring chat from {name}.',
+  'chat.ignored.off': 'No longer ignoring {name}.',
+
+  // ---- Combat meters ------------------------------------------------------
+  'meters.tab.dmg': 'Dmg',
+  'meters.tab.heal': 'Heal',
+  'meters.tab.threat': 'Threat',
+  'meters.title.older': 'older segment',
+  'meters.title.newer': 'newer segment',
+  'meters.label.dmg': 'Damage',
+  'meters.label.heal': 'Healing',
+  'meters.label.threat': 'Threat',
+  'meters.allSession': 'All (session)',
+  'meters.current': 'Current',
+  'meters.lastFight': 'Last fight',
+  'meters.fightN': 'Fight -{n}',
+  'meters.empty': 'No combat recorded yet.',
+  'meters.target': 'Target: {name}',
+  'meters.noTarget': 'No target engaged.',
+
+  // ---- Death / respawn ----------------------------------------------------
+  'death.title': 'You have died.',
+  'death.release': 'Release Spirit',
+
+  // ---- Loading / fatal ----------------------------------------------------
+  'loading.enter': 'Entering the world…',
+  'loading.world': 'Loading world…',
+  'loading.worldProgress': 'Loading world… {done}/{total}',
+  'loading.assetFail': 'Asset loading failed — try reloading. {err}',
+  'loading.entering': 'Entering the world…',
+  'loading.rendererFail': 'Could not start the renderer — try reloading. {err}',
+  'connect.realm': 'Connecting to realm…',
+  'fatal.enterTimeout': 'Could not enter world (timeout). Is the game server running?',
+  'fatal.returnToLogin': 'Return to Login',
+
+  // ---- Character select (dynamic) ----------------------------------------
+  'charselect.loading': 'Loading…',
+  'charselect.none': 'No characters yet — create one below.',
+  'charselect.pickClass': 'Pick a class.',
+  'char.enterWorld': 'Enter World',
+  'char.inWorldSuffix': ' — in world',
+  'name.default': 'Adventurer',
+
+  // ---- Log lines (chat log) ----------------------------------------------
+  'log.welcome': 'Welcome to {zone}!',
+  'log.entering': 'Entering {zone}.',
+  'log.xpGain': 'You gain {amount} experience.',
+  'log.levelUp': 'You have reached level {level}!',
+  'log.died': 'You have died.',
+  'log.respawn': 'You feel rested and whole again.',
+
+  // ---- Banners ------------------------------------------------------------
+  'banner.level': 'Level {level}!',
+
+  // ---- XP bar -------------------------------------------------------------
+  'xp.max': 'MAX LEVEL',
+  'xp.bar': '{xp} / {need} XP ({pct}%)',
+
+  // ---- Combat log + floating combat text ---------------------------------
+  'fct.miss': 'Miss',
+  'fct.dodge': 'Dodge',
+  'combat.attackWord': 'attack',
+  'combat.something': 'Something',
+  'combat.you': 'you',
+  'combat.critSuffix': ' (Critical)',
+  'combat.yourMiss': 'Your {ability} misses {target}.',
+  'combat.yourDodge': 'Your {ability} is dodged by {target}.',
+  'combat.yourHit': 'Your {ability} hits {target} for {amount}{crit}.',
+  'combat.hitsYou': '{source} hits you for {amount}{crit}.',
+  'combat.dies': '{name} dies.',
+  'combat.yourHeal': 'Your {ability} heals {target} for {amount}{crit}.',
+  'combat.duelResult': '{winner} has defeated {loser} in a duel.',
+  'combat.arenaDraw': 'Arena bout vs {opp} ended in a draw. Rating {rating} ({sign}{delta}).',
+  'combat.arenaWin': 'You defeated {opp} in the Ashen Coliseum. Rating {rating} ({sign}{delta}).',
+  'combat.arenaLoss': '{opp} bested you in the Ashen Coliseum. Rating {rating} ({sign}{delta}).',
+  'combat.auraGain': 'You gain {aura}.',
+  'combat.auraFade': '{aura} fades from you.',
+  'combat.auraAfflict': '{target} is afflicted by {aura}.',
+
+  // ---- Social prompts -----------------------------------------------------
+  'prompt.invite.text': '<b>{name}</b> invites you to join their party.',
+  'prompt.invite.btn': 'Join Party',
+  'prompt.trade.text': '<b>{name}</b> wants to trade with you.',
+  'prompt.trade.btn': 'Open Trade',
+  'prompt.duel.text': '<b>{name}</b> has challenged you to a duel!',
+  'prompt.duel.btn': 'Accept Duel',
+
+  // ---- Arena (Ashen Coliseum) --------------------------------------------
+  'arena.queued': 'Queued for the Ashen Coliseum (position {position}).',
+  'arena.leftQueue': 'You leave the Ashen Coliseum queue.',
+  'arena.paired': 'The Coliseum pairs you against {opp}, level {level} {cls}.',
+  'arena.title': 'The Ashen Coliseum',
+  'arena.ranked': '1v1 Ranked',
+  'arena.offlineNote': 'The Ashen Coliseum is a ranked 1v1 arena for the live world. Play online to enter the queue and climb the ladder.',
+  'arena.ladderEmpty': 'No challengers ranked yet — be the first.',
+  'arena.inMatch': '⚔ Match in progress vs {opp}.',
+  'arena.searching': 'Searching for an opponent… ({n} in queue)',
+  'arena.queueNote': 'You will be matched with the nearest-rated challenger online, then teleported to the sands. Win to climb; first to yield (1 health) loses. You return exactly where you queued.',
+  'arena.ladderAllTime': 'Ladder — All-Time',
+  'arena.ladderOnline': 'Ladder — Online',
+  'arena.record': 'Rating &middot; <b>{wins}</b> wins / <i>{losses}</i> losses',
+  'arena.vsSub': 'Lv {level} {cls}',
+  'arena.leaveQueue': 'Leave Queue',
+  'arena.enterQueue': 'Enter the Queue',
+  'arena.steel': 'Steel yourself…',
+  'arena.fightToYield': 'Fight to the yield!',
+  'arena.oppFound': 'Opponent found: {opp}',
+  'arena.boutIn': 'The bout begins in {seconds}…',
+  'arena.fight': 'Fight!',
+  'arena.draw': 'Arena draw vs {opp} ({sign}{delta} rating)',
+  'arena.victory': 'Victory vs {opp}!  Rating {rating} ({sign}{delta})',
+  'arena.defeat': 'Defeated by {opp}.  Rating {rating} ({sign}{delta})',
+
+  // ---- Duels --------------------------------------------------------------
+  'duel.countdown': 'Duel begins in {seconds}…',
+  'duel.result': '{winner} has defeated {loser} in a duel!',
+
+  // ---- Quest dialog / tracker / log --------------------------------------
+  'quest.objectives': 'Objectives',
+  'quest.rewards': 'Rewards',
+  'quest.accept': 'Accept',
+  'quest.complete': 'Complete Quest',
+  'quest.back': 'Back',
+  'quest.abandon': 'Abandon Quest',
+  'quest.suggestedPlayers': 'Suggested players: {n}',
+  'quest.completeTag': '(Complete)',
+  'quest.tracker.header': 'Quests',
+  'quest.log.title': 'Quest Log',
+  'quest.log.summary': '{active} active · {done} completed',
+  'quest.log.empty': 'No active quests.',
+  'quest.log.emptyHint': 'Seek out townsfolk marked with <span class="gold">!</span> to find work.',
+  'quest.reward.xp': '{xp} experience',
+  'gossip.browseGoods': 'Let me browse your goods.',
+  'gossip.showMarket': 'Show me the World Market.',
+
+  // ---- Loot ---------------------------------------------------------------
+  'loot.takeAll': 'Take All',
+
+  // ---- Vendor -------------------------------------------------------------
+  'vendor.goods': '{name} — Goods',
+  'vendor.sellHint': 'Click an item in your bags to sell it while this window is open.',
+  'vendor.clickBuy': 'Click to buy',
+  'vendor.clickSell': 'Click to sell for {money}',
+
+  // ---- World Market -------------------------------------------------------
+  'market.title': 'The World Market',
+  'market.subtitle': "the Merchant's exchange",
+  'market.tab.browse': 'Browse',
+  'market.tab.sell': 'Sell',
+  'market.tab.collect': 'Collect',
+  'market.browse.empty': 'Step up to the Merchant to deal.',
+  'market.sell.empty': 'The market is quiet. Be the first — list something on the Sell tab.',
+  'market.browse.note': 'Goods listed by adventurers across the realm. Click Buy to purchase a stack outright.',
+  'market.sell.note': 'List goods from your bags. The Merchant takes a {cut}% cut when an item sells. You are using {used}/{max} listing slots.',
+  'market.sell.pickHint': 'Click an item in your bags to choose what to sell.',
+  'market.list': 'List on the World Market',
+  'market.collect.empty': 'Nothing waiting. Sale proceeds and expired listings collect here.',
+  'market.collect.note': 'Earnings and returned goods the Merchant is holding for you.',
+  'market.collectAll': 'Collect All',
+  'market.each': '{money} each',
+  'market.merchantStock': "Merchant's stock",
+  'market.buy': 'Buy',
+  'market.reclaim': 'Reclaim',
+  'market.quantity': 'Quantity',
+  'market.ofN': 'of {n}',
+  'market.priceEach': 'Price each',
+  'coin.g': 'g',
+  'coin.s': 's',
+  'coin.c': 'c',
+  'market.err.minPrice': 'Name a price of at least 1 copper.',
+  'market.err.noQuestItems': 'The Merchant will not broker quest items.',
+
+  // ---- Bags ---------------------------------------------------------------
+  'bags.title': 'Bags',
+  'bags.empty': 'Your bags are empty.',
+  'market.saleProceeds': 'Sale proceeds',
+  'bag.tip.trade': 'Click to offer in trade',
+  'bag.tip.questNoMarket': 'Cannot be sold on the market',
+  'bag.tip.market': 'Click to put on the market',
+  'bag.tip.sell': 'Click to sell',
+  'bag.tip.equip': 'Click to equip',
+  'bag.tip.consume': 'Click to consume',
+
+  // ---- Spellbook ----------------------------------------------------------
+  'spellbook.title': 'Spellbook',
+  'spellbook.trainable': 'Trainable at level {level}',
+  'spellbook.trainableTip': 'You will learn this at level {level}.',
+  'spell.channeled': 'Channeled',
+  'spell.castS': '{s}s cast',
+  'spell.cooldownS': '{s}s cooldown',
+  'quest.returnTo': 'Return to {name}',
+
+  // ---- Character sheet ----------------------------------------------------
+  'char.levelClass': 'Level {level} {cls}',
+  'char.slot.mainhand': 'Main Hand',
+  'char.slot.chest': 'Chest',
+  'char.slot.legs': 'Legs',
+  'char.slot.feet': 'Feet',
+  'char.slot.empty': 'Empty',
+  'char.stat.strength': 'Strength:',
+  'char.stat.agility': 'Agility:',
+  'char.stat.stamina': 'Stamina:',
+  'char.stat.intellect': 'Intellect:',
+  'char.stat.spirit': 'Spirit:',
+  'char.stat.armor': 'Armor:',
+  'char.stat.attackPower': 'Attack Power:',
+  'char.stat.dps': 'Damage/sec:',
+  'char.stat.crit': 'Crit Chance:',
+  'char.stat.dodge': 'Dodge:',
+
+  // ---- Tooltips -----------------------------------------------------------
+  'tt.classes': 'Classes: {classes}',
+  'tt.secondsRemaining': '{n} seconds remaining',
+  'tt.damageLine': '{min} - {max} Damage&nbsp;&nbsp;Speed {speed}',
+  'tt.dpsLine': '({dps} damage per second)',
+  'tt.dagger': 'Dagger',
+  'tt.armorLine': '{v} Armor',
+  'tt.statPlus': '+{v} {stat}',
+  'tt.useFood': 'Use: Restores {hp} health over 18 sec. Must remain seated while eating.',
+  'tt.useDrink': 'Use: Restores {mana} mana over 18 sec. Must remain seated while drinking.',
+  'tt.questItem': 'Quest Item',
+  'tt.sellPrice': 'Sell price: {money}',
+  'tt.rank': 'Rank {n}',
+  'tt.cost': '{cost} {res}',
+  'tt.rangeYd': '{range} yd range',
+  'tt.channeled': 'Channeled ({sec} sec)',
+  'tt.castSec': '{sec} sec cast',
+  'tt.instant': 'Instant',
+  'tt.cooldown': '{sec} sec cooldown',
+
+  // ---- Stat / resource words ---------------------------------------------
+  'stat.str': 'Strength',
+  'stat.agi': 'Agility',
+  'stat.sta': 'Stamina',
+  'stat.int': 'Intellect',
+  'stat.spi': 'Spirit',
+  'res.rage': 'Rage',
+  'res.energy': 'Energy',
+  'res.mana': 'Mana',
+
+  // ---- Cast bar / target frame transient states --------------------------
+  'cast.eating': 'Eating…',
+  'cast.drinking': 'Drinking…',
+  'cast.eatingDrinking': 'Eating & Drinking…',
+  'target.dead': 'Dead',
+
+  // ---- Target frame -------------------------------------------------------
+  'target.elite': 'ELITE',
+  'target.boss': 'BOSS',
+  'target.corpse': '{name} (corpse)',
+
+  // ---- Party / context menu ----------------------------------------------
+  'party.leave': 'Leave Party',
+  'menu.invite': 'Invite to Party',
+  'menu.trade': 'Trade',
+  'menu.duel': 'Challenge to a Duel',
+  'menu.ignore': 'Ignore Chat',
+  'menu.unignore': 'Unignore Chat',
+  'menu.removeFromParty': 'Remove from Party',
+  'menu.cancel': 'Cancel',
+  'prompt.decline': 'Decline',
+  'prompt.accept': 'Accept',
+  'prompt.partyInvite': '{name} invites you to a party.',
+  'prompt.tradeRequest': '{name} wants to trade.',
+  'prompt.duelRequest': '{name} challenges you to a duel.',
+
+  // ---- Trade --------------------------------------------------------------
+  'trade.with': 'Trade with {name}',
+  'trade.yourOffer': 'Your offer',
+  'trade.theirOffer': "{name}'s offer",
+  'trade.accept': 'Accept Trade',
+  'trade.waiting': 'Waiting…',
+  'trade.hint': 'Click an offered item to remove it. Both sides must press Accept Trade.',
+  'trade.cancel': 'Cancel',
+  'trade.addHint': 'Click items in your bags to add them',
+  'trade.nothingYet': 'Nothing offered yet',
+  'trade.moneyLabel': 'Money:',
+  'trade.copperWord': 'copper',
+
+  // ---- Options / settings menu -------------------------------------------
+  'menu.game.title': 'Game Menu',
+  'menu.keyBindings': 'Key Bindings',
+  'menu.graphics': 'Graphics',
+  'menu.audio': 'Audio',
+  'menu.logout': 'Logout',
+  'menu.return': 'Return to Game',
+  'settings.reset': 'Reset to Defaults',
+  'settings.back': 'Back',
+  'settings.cameraSpeed': 'Camera Speed',
+  'settings.brightness': 'Brightness',
+  'settings.renderQuality': 'Render Quality',
+  'settings.sfx': 'Sound Effects',
+  'settings.musicVolume': 'Music Volume',
+  'settings.music': 'Music',
+  'settings.on': 'On',
+  'settings.off': 'Off',
+  'settings.graphicsNote': 'Lower Camera Speed for a calmer mouselook. Render Quality below 100% boosts FPS on weaker machines.',
+
+  // ---- Key bindings -------------------------------------------------------
+  'keybinds.title': 'Key Bindings',
+  'keybinds.instructions': 'Click a key cell, then press a key to bind it. Esc cancels. Each action has a primary and an alternate key.',
+  'keybinds.primary': 'Primary',
+  'keybinds.alternate': 'Alternate',
+  'keybinds.reset': 'Bindings reset to defaults.',
+  'keybinds.capture': 'Press a key for "{name}"…',
+  'keybinds.cancelled': 'Rebinding cancelled.',
+  'keybinds.reserved': '{key} is reserved and can\'t be bound.',
+  'keybinds.bound': 'Bound "{name}" to {key}.',
+
+  // ---- Keybind action labels ---------------------------------------------
+  'keybind.act.forward': 'Move Forward',
+  'keybind.act.back': 'Move Backward',
+  'keybind.act.turnLeft': 'Turn Left',
+  'keybind.act.turnRight': 'Turn Right',
+  'keybind.act.strafeLeft': 'Strafe Left',
+  'keybind.act.strafeRight': 'Strafe Right',
+  'keybind.act.jump': 'Jump',
+  'keybind.act.autorun': 'Toggle Autorun',
+  'keybind.act.targetNearest': 'Target Nearest Enemy',
+  'keybind.act.interact': 'Interact / Loot',
+  'keybind.act.character': 'Character',
+  'keybind.act.spellbook': 'Spellbook',
+  'keybind.act.questlog': 'Quest Log',
+  'keybind.act.worldmap': 'World Map',
+  'keybind.act.bags': 'Bags',
+  'keybind.act.nameplates': 'Toggle Nameplates',
+  'keybind.act.meters': 'Damage Meters',
+  'keybind.act.arena': 'Arena (Ashen Coliseum)',
+  'keybind.act.chat': 'Open Chat',
+  'keybind.act.attack': 'Attack',
+  'keybind.act.actionbar': 'Action Bar {n}',
+  'keybind.cat.Movement': 'Movement',
+  'keybind.cat.Targeting': 'Targeting',
+  'keybind.cat.Interface': 'Interface',
+  'keybind.cat.Action Bar': 'Action Bar',
+
+  // ---- Interaction feedback ----------------------------------------------
+  'interact.tooFar': 'Too far away.',
+  'interact.nothing': 'Nothing to interact with.',
+
+  // ---- NPC greeting -------------------------------------------------------
+  'npc.greetingDefault': 'Greetings.',
+
+  // ---- Dungeon portals (nameplates) --------------------------------------
+  'dungeon.exit': '{name} Exit',
+};

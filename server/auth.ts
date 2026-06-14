@@ -85,6 +85,11 @@ export function validPassword(p: unknown): p is string {
   return typeof p === 'string' && p.length >= 6 && p.length <= 128;
 }
 
+// Character names allow any Unicode letter (Latin, Chinese/CJK, etc.) plus
+// combining marks and space/apostrophe/hyphen, must start with a letter, and
+// are 2-16 code points long. Digits and punctuation stay disallowed (so e.g.
+// reserved "GM01"-style names remain rejected). Mirrored client-side by
+// sanitizeOfflineName() in src/main.ts.
 export function validCharName(n: unknown): n is string {
-  return typeof n === 'string' && /^[A-Za-z][A-Za-z' -]{1,15}$/.test(n);
+  return typeof n === 'string' && /^[\p{L}][\p{L}\p{M}' -]{1,15}$/u.test(n);
 }

@@ -1,5 +1,6 @@
 import { INTERACT_RANGE, dist2d } from '../sim/types';
 import type { IWorld } from '../world_api';
+import { t } from '../i18n';
 
 export interface PickInteractionWorld {
   player: IWorld['player'];
@@ -36,16 +37,16 @@ export function handlePickedEntity(
     // players: right-click only targets — the interaction menu lives on the
     // target portrait (right-click it), like classic WoW unit frames
     if (e.kind === 'object') {
-      if (d > INTERACT_RANGE + 1) { hud.showError('Too far away.'); return; }
+      if (d > INTERACT_RANGE + 1) { hud.showError(t('interact.tooFar')); return; }
       if (e.templateId === 'dungeon_door' && e.dungeonId) world.enterDungeon(e.dungeonId);
       else if (e.templateId === 'dungeon_exit') world.leaveDungeon();
       else world.pickUpObject(id);
     } else if (e.kind === 'mob' && e.dead && e.lootable) {
       if (d <= INTERACT_RANGE + 1) hud.openLoot(id, screenX, screenY);
-      else hud.showError('Too far away.');
+      else hud.showError(t('interact.tooFar'));
     } else if (e.kind === 'npc') {
       if (d <= INTERACT_RANGE + 2) hud.openQuestDialog(id);
-      else hud.showError('Too far away.');
+      else hud.showError(t('interact.tooFar'));
     } else if (e.kind === 'mob' && !e.dead && e.hostile) {
       world.startAutoAttack();
     }

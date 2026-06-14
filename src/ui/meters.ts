@@ -11,6 +11,8 @@
 import type { IWorld } from '../world_api';
 import type { SimEvent } from '../sim/types';
 import { CLASSES } from '../sim/data';
+import { t } from '../i18n';
+import { mobName } from '../i18n/content';
 
 const ENCOUNTER_END_SECONDS = 5;
 const HISTORY_CAP = 8;
@@ -35,6 +37,8 @@ export interface Encounter {
   /** mob entity id with the most party damage (threat tab subject) */
   mainMobId: number | null;
   mainMobName: string;
+  /** mob template id of the threat subject, for localizing its display name */
+  mainMobTemplate: string;
   /** maxHp of the biggest mob damaged — used to pick the label */
   biggestMobHp: number;
 }
@@ -42,7 +46,7 @@ export interface Encounter {
 function newEncounter(now: number): Encounter {
   return {
     label: 'Combat', startedAt: now, duration: 0, tallies: new Map(),
-    mainMobId: null, mainMobName: '', biggestMobHp: -1,
+    mainMobId: null, mainMobName: '', mainMobTemplate: '', biggestMobHp: -1,
   };
 }
 
@@ -96,6 +100,7 @@ export class MeterData {
           this.current.biggestMobHp = target.maxHp;
           this.current.label = target.name;
           this.current.mainMobName = target.name;
+          this.current.mainMobTemplate = target.templateId;
           this.current.mainMobId = ev.targetId;
         }
       }
@@ -141,8 +146,6 @@ export class MeterData {
 // ---------------------------------------------------------------------------
 
 type Tab = 'dmg' | 'heal' | 'threat';
-
-const TAB_LABEL: Record<Tab, string> = { dmg: 'Damage', heal: 'Healing', threat: 'Threat' };
 
 export class Meters {
   private data: MeterData;
@@ -217,23 +220,23 @@ export class Meters {
   private viewedEncounter(): { enc: Encounter | null; viewName: string } {
     const h = this.data.history;
     if (this.viewIdx === h.length + 1 || (this.viewIdx > 0 && h.length === 0)) {
-      return { enc: this.data.allTime, viewName: 'All (session)' };
+      return { enc: this.data.allTime, viewName: t('meters.allSession') };
     }
     if (this.viewIdx === 0) {
       const enc = this.data.current ?? h[0] ?? null;
-      return { enc, viewName: this.data.current ? 'Current' : enc ? 'Last fight' : 'Current' };
+      return { enc, viewName: this.data.current ? t('meters.current') : enc ? t('meters.lastFight') : t('meters.current') };
     }
-    return { enc: h[this.viewIdx - 1] ?? null, viewName: `Fight -${this.viewIdx}` };
+    return { enc: h[this.viewIdx - 1] ?? null, viewName: t('meters.fightN', { n: this.viewIdx }) };
   }
 
   render(force = false): void {
     if (!this.isOpen && !force) return;
     this.lastRender = performance.now();
     const { enc, viewName } = this.viewedEncounter();
-    this.titleEl.textContent = `${TAB_LABEL[this.tab]} — ${viewName}`;
+    this.titleEl.textContent = `${t(`meters.label.${this.tab}`)} — ${viewName}`;
 
     if (!enc || enc.tallies.size === 0) {
-      this.subEl.textContent = 'No combat recorded yet.';
+      this.subEl.textContent = t('meters.empty');
       this.rowsEl.innerHTML = '';
       return;
     }
@@ -241,9 +244,13 @@ export class Meters {
     const isThreat = this.tab === 'threat';
     const mob = isThreat && enc.mainMobId !== null ? this.world.entities.get(enc.mainMobId) : null;
     const aggroPid = mob && !mob.dead ? mob.aggroTargetId : null;
+    // localize the threat subject / encounter label off the mob template id
+    const mobLabel = enc.mainMobTemplate ? mobName(enc.mainMobTemplate) : enc.mainMobName;
+    const encLabel = enc === this.data.allTime ? t('meters.allSession')
+      : enc.mainMobTemplate ? mobName(enc.mainMobTemplate) : enc.label;
     this.subEl.textContent = isThreat
-      ? (enc.mainMobName ? `Target: ${enc.mainMobName}` : 'No target engaged.')
-      : `${enc.label} — ${fmtDuration(enc.duration)}`;
+      ? (enc.mainMobName ? t('meters.target', { name: mobLabel }) : t('meters.noTarget'))
+      : `${encLabel} — ${fmtDuration(enc.duration)}`;
 
     const rows = [...enc.tallies.values()]
       .map((t) => ({

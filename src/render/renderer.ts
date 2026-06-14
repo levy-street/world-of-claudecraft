@@ -21,6 +21,8 @@ import { buildTerrain, TerrainView } from './terrain';
 import { buildWater, WaterView } from './water';
 import { buildClouds, buildSky, SkyView } from './sky';
 import { buildFoliage, FoliageView } from './foliage';
+import { t } from '../i18n';
+import { mobName, npcName, itemName, dungeonName } from '../i18n/content';
 
 const NAMEPLATE_RANGE = 55;
 // Entities further than this from the player are hidden entirely: their rigs
@@ -1043,11 +1045,14 @@ export class Renderer {
       if (e.kind === 'object') {
         // dungeon doorways announce themselves
         v.nameEl.style.color = '#c084ff';
-        v.nameEl.textContent = e.name;
+        v.nameEl.textContent = e.objectItemId ? itemName(e.objectItemId)
+          : e.templateId === 'dungeon_exit' && e.dungeonId ? t('dungeon.exit', { name: dungeonName(e.dungeonId) })
+          : e.dungeonId ? dungeonName(e.dungeonId)
+          : e.name;
         v.hpBar.style.display = 'none';
         v.markerEl.textContent = '';
       } else if (e.kind === 'player') {
-        // other players: friendly blue with an hp bar
+        // other players: friendly blue with an hp bar (names are user data — unlocalized)
         v.nameEl.style.color = '#7fb8ff';
         v.nameEl.textContent = `${e.name}`;
         v.hpBar.style.display = e.dead ? 'none' : '';
@@ -1055,7 +1060,7 @@ export class Renderer {
         v.markerEl.textContent = '';
       } else if (e.kind === 'npc') {
         v.nameEl.style.color = '#9fdc7f';
-        v.nameEl.textContent = e.name;
+        v.nameEl.textContent = npcName(e.templateId);
         v.hpBar.style.display = 'none';
         let marker = '';
         let cls = '';
@@ -1076,7 +1081,8 @@ export class Renderer {
         const template = MOBS[e.templateId];
         const elite = !!template?.elite;
         v.nameEl.style.color = e.dead ? '#999' : diff >= 3 ? '#ff4444' : diff >= 1 ? '#ffaa33' : diff >= -2 ? '#ffe97a' : diff >= -5 ? '#7fdc4f' : '#9d9d9d';
-        v.nameEl.textContent = e.dead ? `${e.name} (corpse)` : `[${e.level}${elite ? '+' : ''}] ${e.name}`;
+        const mn = mobName(e.templateId);
+        v.nameEl.textContent = e.dead ? t('target.corpse', { name: mn }) : `[${e.level}${elite ? '+' : ''}] ${mn}`;
         v.hpBar.style.display = e.dead ? 'none' : '';
         v.hpFill.style.width = `${(100 * e.hp / Math.max(1, e.maxHp)).toFixed(1)}%`;
         v.markerEl.textContent = e.lootable ? '$' : elite && !e.dead ? '◆' : '';

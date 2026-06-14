@@ -11,6 +11,8 @@ import { Api, ClientWorld, CharacterSummary } from './net/online';
 import type { IWorld } from './world_api';
 import { assetsReady } from './render/assets/preload';
 import { DT, INTERACT_RANGE, PlayerClass, dist2d } from './sim/types';
+import { t, setLocale, getLocale, onLocaleChange, localizeDom, Locale } from './i18n';
+import { className } from './i18n/content';
 
 const WORLD_SEED = 20061; // fixed: World of Claudecraft is a persistent place
 
@@ -41,7 +43,7 @@ function setLoadingStatus(text: string): void {
 
 function setLoadingProgress(done: number, total: number): void {
   $('#ls-fill').style.width = total > 0 ? `${Math.round((done / total) * 100)}%` : '0%';
-  setLoadingStatus(`Loading world… ${done}/${total}`);
+  setLoadingStatus(t('loading.worldProgress', { done, total }));
 }
 
 function hideLoadingScreen(): void {
@@ -73,15 +75,15 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
   // Model/texture/HDRI fetches were kicked off at module import; the renderer
   // builds its scene synchronously, so everything must be resolved first.
   // The loading screen covers the gap — not a silent black screen.
-  showLoadingScreen('Loading world…');
+  showLoadingScreen(t('loading.world'));
   $('#start-screen').style.display = 'none';
   try {
     await assetsReady((done, total) => setLoadingProgress(done, total));
   } catch (err) {
-    fatalOverlay(`Asset loading failed — try reloading. ${err instanceof Error ? err.message : err}`);
+    fatalOverlay(t('loading.assetFail', { err: err instanceof Error ? err.message : String(err) }));
     return;
   }
-  setLoadingStatus('Entering the world…');
+  setLoadingStatus(t('loading.entering'));
 
   const canvas = $('#game-canvas') as unknown as HTMLCanvasElement;
   const nameplates = $('#nameplates') as HTMLDivElement;
@@ -96,7 +98,7 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
   } catch (err) {
     // e.g. WebGL context creation failure — surface it instead of leaving the
     // loading screen up forever
-    fatalOverlay(`Could not start the renderer — try reloading. ${err instanceof Error ? err.message : err}`);
+    fatalOverlay(t('loading.rendererFail', { err: err instanceof Error ? err.message : String(err) }));
     return;
   }
 
@@ -191,7 +193,7 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
       return;
     }
     if (bestNpc !== null) { hud.openQuestDialog(bestNpc); return; }
-    hud.showError('Nothing to interact with.');
+    hud.showError(t('interact.nothing'));
   }
 
   function handlePick(x: number, y: number, button: number): void {
@@ -297,11 +299,14 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
 // ---------------------------------------------------------------------------
 
 // Offline names go straight into innerHTML paths (quest $N text, char window
-// title), so enforce the server's character-name rule client-side too:
-// strip anything outside [A-Za-z' -], then require /^[A-Za-z][A-Za-z' -]{1,15}$/.
+// title), so enforce the server's character-name rule client-side too. The
+// rule allows Unicode letters (Latin, Chinese/CJK, etc.), combining marks, and
+// space/apostrophe/hyphen, must start with a letter, and is 2-16 chars long —
+// mirrors validCharName() in server/auth.ts. Slicing is code-point-safe.
 function sanitizeOfflineName(raw: string): string {
-  const stripped = raw.replace(/[^A-Za-z' -]/g, '').replace(/^[^A-Za-z]+/, '').slice(0, 16);
-  return /^[A-Za-z][A-Za-z' -]{1,15}$/.test(stripped) ? stripped : 'Adventurer';
+  const cleaned = raw.replace(/[^\p{L}\p{M}' -]/gu, '').replace(/^[^\p{L}]+/u, '');
+  const stripped = Array.from(cleaned).slice(0, 16).join('');
+  return /^[\p{L}][\p{L}\p{M}' -]{1,15}$/u.test(stripped) ? stripped : t('name.default');
 }
 
 function startOffline(playerClass: PlayerClass, name: string): void {
@@ -329,19 +334,20 @@ function loginError(text: string): void {
 
 async function refreshCharacters(): Promise<void> {
   const listEl = $('#char-list');
-  listEl.innerHTML = '<div style="color:#887c5c;font-size:12px">Loading…</div>';
+  listEl.innerHTML = `<div style="color:#887c5c;font-size:12px">${t('charselect.loading')}</div>`;
   try {
     const chars = await api.characters();
     listEl.innerHTML = '';
     if (chars.length === 0) {
-      listEl.innerHTML = '<div style="color:#887c5c;font-size:12px;padding:6px 0">No characters yet — create one below.</div>';
+      listEl.innerHTML = `<div style="color:#887c5c;font-size:12px;padding:6px 0">${t('charselect.none')}</div>`;
     }
     for (const c of chars) {
       const row = document.createElement('div');
       row.className = 'char-row' + (c.online ? ' online' : '');
+      const sub = t('char.levelClass', { level: c.level, cls: className(c.class) }) + (c.online ? t('char.inWorldSuffix') : '');
       row.innerHTML = `<span class="char-name">${c.name}</span>
-        <span class="char-sub">Level ${c.level} ${c.class[0].toUpperCase()}${c.class.slice(1)}${c.online ? ' — in world' : ''}</span>
-        <button class="btn" ${c.online ? 'disabled' : ''}>Enter World</button>`;
+        <span class="char-sub">${sub}</span>
+        <button class="btn" ${c.online ? 'disabled' : ''}>${t('char.enterWorld')}</button>`;
       row.querySelector('button')!.addEventListener('click', () => enterWorld(c));
       listEl.appendChild(row);
     }
@@ -355,11 +361,11 @@ function fatalOverlay(message: string): void {
   if (document.getElementById('disconnect-overlay')) return; // first reason wins
   const el = document.createElement('div');
   el.id = 'disconnect-overlay';
-  el.style.cssText = 'position:absolute;inset:0;background:#000c;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;z-index:200;color:#e8d8a8;font-family:Georgia,serif;font-size:20px;';
+  el.style.cssText = 'position:absolute;inset:0;background:#000c;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;z-index:200;color:#e8d8a8;font-family:var(--serif-font);font-size:20px;';
   el.innerHTML = `<div>${message}</div>`;
   const btn = document.createElement('button');
   btn.className = 'btn';
-  btn.textContent = 'Return to Login';
+  btn.textContent = t('fatal.returnToLogin');
   btn.addEventListener('click', () => location.reload());
   el.appendChild(btn);
   document.body.appendChild(el);
@@ -369,7 +375,7 @@ function enterWorld(c: CharacterSummary): void {
   if (!beginWorldEntry()) return;
   audio.init();
   music.init();
-  showLoadingScreen('Connecting to realm…');
+  showLoadingScreen(t('connect.realm'));
   const world = new ClientWorld(api.token!, c.id, c.class);
   // wait for hello + first snapshot so the world starts populated
   const waitStart = Date.now();
@@ -380,7 +386,7 @@ function enterWorld(c: CharacterSummary): void {
     } else if (Date.now() - waitStart > 10000) {
       clearInterval(poll);
       world.close();
-      fatalOverlay('Could not enter world (timeout). Is the game server running?');
+      fatalOverlay(t('fatal.enterTimeout'));
     }
   }, 50);
   // a rejected join must stop the poll too, or its timeout overlay would
@@ -442,7 +448,7 @@ function wireStartScreens(): void {
     const name = ($('#new-char-name') as unknown as HTMLInputElement).value.trim();
     const clsEl = document.querySelector('#charselect-panel .mini-class.sel') as HTMLElement | null;
     loginError('');
-    if (!clsEl) { $('#charselect-error').textContent = 'Pick a class.'; return; }
+    if (!clsEl) { $('#charselect-error').textContent = t('charselect.pickClass'); return; }
     try {
       await api.createCharacter(name, clsEl.dataset.class as PlayerClass);
       ($('#new-char-name') as unknown as HTMLInputElement).value = '';
@@ -455,4 +461,38 @@ function wireStartScreens(): void {
   $('#btn-charselect-back').addEventListener('click', () => show('#login-panel'));
 }
 
+// ---------------------------------------------------------------------------
+// i18n wiring (language picker + class-name labels)
+// ---------------------------------------------------------------------------
+
+// Class names are *content*, not UI chrome, so the .cls-name labels in the
+// class cards are filled from the localized content accessor rather than a
+// data-i18n key. The emoji prefix in the markup is left untouched.
+function localizeClassNames(): void {
+  document.querySelectorAll<HTMLElement>('.cls-name').forEach((el) => {
+    const cls = el.closest('[data-class]')?.getAttribute('data-class');
+    if (cls) el.textContent = className(cls as PlayerClass);
+  });
+}
+
+function wireLangPicker(): void {
+  const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('#lang-picker .lang-btn'));
+  const syncActive = () => buttons.forEach((b) => b.classList.toggle('on', b.dataset.lang === getLocale()));
+  for (const b of buttons) {
+    b.addEventListener('click', () => setLocale(b.dataset.lang as Locale));
+  }
+  syncActive();
+  onLocaleChange(() => {
+    syncActive();
+    localizeClassNames();
+    // re-localize the character list if the player is looking at it
+    if ($('#charselect-panel').style.display !== 'none') void refreshCharacters();
+  });
+}
+
+// Hydrate static markup, then wire interactivity. localizeDom runs first so the
+// start screen shows the active locale immediately (no English flash).
+localizeDom(document);
+localizeClassNames();
 wireStartScreens();
+wireLangPicker();

@@ -152,6 +152,15 @@ describe('gm privilege boundaries', () => {
     expect(validCharName('GM99')).toBe(false);
   });
 
+  it('accepts Chinese (CJK) character names but still rejects digits/punctuation', () => {
+    expect(validCharName('战士')).toBe(true);
+    expect(validCharName('诺克萨斯')).toBe(true);
+    expect(validCharName('Aldric')).toBe(true); // Latin still allowed
+    expect(validCharName('张三123')).toBe(false); // digits disallowed
+    expect(validCharName('名')).toBe(false); // too short (min 2)
+    expect(validCharName('一二三四五六七八九十一二三四五六七')).toBe(false); // >16
+  });
+
   it('does not restore gm privilege from client-controlled saved character state', () => {
     const source = new Sim({ seed: 42, playerClass: 'warrior' });
     const state = source.serializeCharacter(source.playerId) as any;

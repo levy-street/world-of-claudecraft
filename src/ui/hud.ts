@@ -13,8 +13,33 @@ import { Meters } from './meters';
 import { audio } from '../game/audio';
 import { music } from '../game/music';
 import { iconDataUrl, QUALITY_COLOR } from './icons';
-import { Keybinds, BIND_ACTIONS, BIND_CATEGORIES, isReservedCode, keyLabel } from '../game/keybinds';
+import { Keybinds, BIND_ACTIONS, BIND_CATEGORIES, BindAction, isReservedCode, keyLabel } from '../game/keybinds';
 import { Settings, GameSettings, SETTING_RANGES } from '../game/settings';
+import { t, onLocaleChange } from '../i18n';
+import { localizeError } from '../i18n/errors';
+import {
+  abilityName, abilityDesc, auraName, auraDisplayName, className, dungeonName, itemName, mobName,
+  npcGreeting, npcName, npcTitle, poiLabel, questCompletion, questName, questObjective,
+  questText, zoneName, zoneWelcome,
+} from '../i18n/content';
+
+// Localized label for a rebindable action (keybinds.ts stays English/pure).
+const BIND_LABEL_KEY: Record<string, string> = {
+  forward: 'keybind.act.forward', back: 'keybind.act.back', turnLeft: 'keybind.act.turnLeft',
+  turnRight: 'keybind.act.turnRight', strafeLeft: 'keybind.act.strafeLeft', strafeRight: 'keybind.act.strafeRight',
+  jump: 'keybind.act.jump', autorun: 'keybind.act.autorun', target: 'keybind.act.targetNearest',
+  interact: 'keybind.act.interact', char: 'keybind.act.character', spellbook: 'keybind.act.spellbook',
+  questlog: 'keybind.act.questlog', map: 'keybind.act.worldmap', bags: 'keybind.act.bags',
+  nameplates: 'keybind.act.nameplates', meters: 'keybind.act.meters', arena: 'keybind.act.arena',
+  chat: 'keybind.act.chat',
+};
+function bindActionLabel(a: BindAction): string {
+  if (a.id === 'slot0') return t('keybind.act.attack');
+  const m = a.id.match(/^slot(\d+)$/);
+  if (m) return t('keybind.act.actionbar', { n: Number(m[1]) + 1 });
+  const key = BIND_LABEL_KEY[a.id];
+  return key ? t(key) : a.label;
+}
 
 // hooks main wires after Input exists (the options menu drives input, audio,
 // graphics, and logout, all of which live outside the HUD)
@@ -35,6 +60,10 @@ const CLASS_GLYPH: Record<string, string> = {
   warrior: '⚔️', paladin: '🔨', hunter: '🏹', rogue: '🗡️', priest: '✝️',
   shaman: '🌩️', mage: '🔮', warlock: '🕯️', druid: '🐻',
 };
+
+// CJK-capable font stack for <canvas> text (the map/minimap labels). CSS vars
+// don't apply to a 2D context's `font`, so the families are spelled out here.
+const CANVAS_CJK_FONT = "'Microsoft YaHei','PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','WenQuanYi Micro Hei',Georgia,serif";
 
 // yards past a zone boundary before the crossing banner/welcome commits
 const ZONE_BANNER_DEADBAND = 5;
@@ -104,9 +133,9 @@ export class Hud {
     $('#target-frame').addEventListener('contextmenu', (ev) => {
       ev.preventDefault();
       const tid = this.sim.player.targetId;
-      const t = tid !== null ? this.sim.entities.get(tid) : null;
-      if (t && t.kind === 'player' && t.id !== this.sim.playerId) {
-        this.openContextMenu(t.id, t.name, (ev as MouseEvent).clientX, (ev as MouseEvent).clientY);
+      const te = tid !== null ? this.sim.entities.get(tid) : null;
+      if (te && te.kind === 'player' && te.id !== this.sim.playerId) {
+        this.openContextMenu(te.id, te.name, (ev as MouseEvent).clientX, (ev as MouseEvent).clientY);
       }
     });
     $('#mm-char').addEventListener('click', () => this.toggleChar());
@@ -124,9 +153,36 @@ export class Hud {
     });
     const startZone = zoneAt(sim.player.pos.z);
     this.lastZoneId = startZone.id;
-    this.showBanner(startZone.name);
-    this.log(`Welcome to ${startZone.name}!`, '#ffd100');
-    this.log(startZone.welcome, '#ffd100');
+    this.showBanner(zoneName(startZone.id));
+    this.log(t('log.welcome', { zone: zoneName(startZone.id) }), '#ffd100');
+    this.log(zoneWelcome(startZone.id), '#ffd100');
+    // re-paint locale-sensitive surfaces when the player switches language
+    onLocaleChange(() => this.onLocaleChanged());
+  }
+
+  // Repaint locale-sensitive UI after a language switch. Per-frame surfaces
+  // (player/target frames, quest tracker, minimap, party/trade/arena via their
+  // sig caches) refresh on their own; here we only clear those caches and
+  // re-render the one-shot windows that are open right now.
+  private onLocaleChanged(): void {
+    this.lastArenaSig = this.lastArenaStatusSig = this.lastMarketSig = '';
+    this.lastTradeSig = this.lastPartySig = '';
+    this.refreshKeybindLabels();
+    if ($('#char-window').style.display === 'block') this.renderChar();
+    if ($('#spellbook').style.display === 'block') this.renderSpellbook();
+    if ($('#quest-log-window').style.display === 'block') this.renderQuestLog();
+    if ($('#bags').style.display === 'block') this.renderBags();
+    if (this.openVendorNpcId !== null) this.renderVendor();
+    if ($('#options-menu').style.display === 'block') this.renderOptions();
+    this.refreshGossip();
+  }
+
+  // Localized display name for an entity in combat-log lines.
+  private entLabel(e: Entity | undefined | null): string {
+    if (!e) return t('combat.something');
+    if (e.kind === 'mob') return mobName(e.templateId);
+    if (e.kind === 'npc') return npcName(e.templateId);
+    return e.name; // players (and objects): name is user/content data
   }
 
   private bindLogTabs(): void {
@@ -134,7 +190,7 @@ export class Hud {
     tabs.forEach((tab) => {
       tab.addEventListener('click', () => {
         const which = tab.dataset.logTab;
-        tabs.forEach((t) => t.classList.toggle('active', t === tab));
+        tabs.forEach((tb) => tb.classList.toggle('active', tb === tab));
         $('#chatlog').classList.toggle('active', which === 'chat');
         $('#combatlog').classList.toggle('active', which === 'combat');
       });
@@ -195,52 +251,51 @@ export class Hud {
 
   private itemTooltip(item: ItemDef): string {
     const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff';
-    let html = `<div class="tt-title" style="color:${qColor}">${item.name}</div>`;
+    let html = `<div class="tt-title" style="color:${qColor}">${itemName(item.id)}</div>`;
     if (item.slot) {
-      const slotNames: Record<string, string> = { mainhand: 'Main Hand', chest: 'Chest', legs: 'Legs', feet: 'Feet' };
-      html += `<div class="tt-sub">${slotNames[item.slot]}</div>`;
+      html += `<div class="tt-sub">${t(`char.slot.${item.slot}`)}</div>`;
     }
     if (item.weapon) {
       const dps = ((item.weapon.min + item.weapon.max) / 2 / item.weapon.speed).toFixed(1);
-      html += `<div class="tt-stat">${item.weapon.min} - ${item.weapon.max} Damage&nbsp;&nbsp;Speed ${item.weapon.speed.toFixed(1)}</div>`;
-      html += `<div class="tt-stat">(${dps} damage per second)</div>`;
-      if (item.weapon.dagger) html += `<div class="tt-sub">Dagger</div>`;
+      html += `<div class="tt-stat">${t('tt.damageLine', { min: item.weapon.min, max: item.weapon.max, speed: item.weapon.speed.toFixed(1) })}</div>`;
+      html += `<div class="tt-stat">${t('tt.dpsLine', { dps })}</div>`;
+      if (item.weapon.dagger) html += `<div class="tt-sub">${t('tt.dagger')}</div>`;
     }
     if (item.stats) {
       for (const [k, v] of Object.entries(item.stats)) {
-        if (k === 'armor') html += `<div class="tt-stat">${v} Armor</div>`;
-        else html += `<div class="tt-green">+${v} ${k[0].toUpperCase()}${k.slice(1)}</div>`;
+        if (k === 'armor') html += `<div class="tt-stat">${t('tt.armorLine', { v })}</div>`;
+        else html += `<div class="tt-green">${t('tt.statPlus', { v, stat: t(`stat.${k}`) })}</div>`;
       }
     }
-    if (item.foodHp) html += `<div class="tt-desc">Use: Restores ${item.foodHp} health over 18 sec. Must remain seated while eating.</div>`;
-    if (item.drinkMana) html += `<div class="tt-desc">Use: Restores ${item.drinkMana} mana over 18 sec. Must remain seated while drinking.</div>`;
-    if (item.kind === 'quest') html += `<div class="tt-desc">Quest Item</div>`;
-    if (item.requiredClass) html += `<div class="tt-sub">Classes: ${item.requiredClass.map((c) => CLASSES[c].name).join(', ')}</div>`;
-    if (item.sellValue > 0) html += `<div class="tt-sub">Sell price: ${formatMoney(item.sellValue)}</div>`;
+    if (item.foodHp) html += `<div class="tt-desc">${t('tt.useFood', { hp: item.foodHp })}</div>`;
+    if (item.drinkMana) html += `<div class="tt-desc">${t('tt.useDrink', { mana: item.drinkMana })}</div>`;
+    if (item.kind === 'quest') html += `<div class="tt-desc">${t('tt.questItem')}</div>`;
+    if (item.requiredClass) html += `<div class="tt-sub">${t('tt.classes', { classes: item.requiredClass.map((c) => className(c)).join('、') })}</div>`;
+    if (item.sellValue > 0) html += `<div class="tt-sub">${t('tt.sellPrice', { money: formatMoney(item.sellValue) })}</div>`;
     return html;
   }
 
   private abilityTooltip(res: ResolvedAbility): string {
     const a = res.def;
-    const resName = this.sim.player.resourceType === 'rage' ? 'Rage' : this.sim.player.resourceType === 'energy' ? 'Energy' : 'Mana';
+    const resName = this.sim.player.resourceType === 'rage' ? t('res.rage') : this.sim.player.resourceType === 'energy' ? t('res.energy') : t('res.mana');
     let dmgText = '';
     for (const eff of res.effects) {
-      if (eff.type === 'directDamage') dmgText = eff.min === eff.max ? `${eff.min}` : `${eff.min} to ${eff.max}`;
+      if (eff.type === 'directDamage') dmgText = eff.min === eff.max ? `${eff.min}` : `${eff.min}-${eff.max}`;
       if (eff.type === 'weaponDamage' || eff.type === 'weaponStrike') dmgText = `${eff.bonus}`;
       if (eff.type === 'dot') dmgText = `${eff.total}`;
-      if (eff.type === 'aoeDamage' || eff.type === 'aoeRoot') dmgText = `${eff.min} to ${eff.max}`;
+      if (eff.type === 'aoeDamage' || eff.type === 'aoeRoot') dmgText = `${eff.min}-${eff.max}`;
     }
-    let html = `<div class="tt-title">${a.name}</div>`;
-    html += `<div class="tt-sub">Rank ${res.rank}</div>`;
+    let html = `<div class="tt-title">${abilityName(a.id)}</div>`;
+    html += `<div class="tt-sub">${t('tt.rank', { n: res.rank })}</div>`;
     const costLine: string[] = [];
-    if (res.cost > 0) costLine.push(`${res.cost} ${resName}`);
-    if (a.range > 0) costLine.push(`${a.minRange ? a.minRange + '-' : ''}${a.range} yd range`);
+    if (res.cost > 0) costLine.push(t('tt.cost', { cost: res.cost, res: resName }));
+    if (a.range > 0) costLine.push(t('tt.rangeYd', { range: `${a.minRange ? a.minRange + '-' : ''}${a.range}` }));
     if (costLine.length) html += `<div class="tt-stat">${costLine.join(' &nbsp; ')}</div>`;
     const castLine: string[] = [];
-    castLine.push(a.channel ? `Channeled (${a.channel.duration} sec)` : res.castTime > 0 ? `${res.castTime} sec cast` : 'Instant');
-    if (a.cooldown > 0) castLine.push(`${a.cooldown} sec cooldown`);
+    castLine.push(a.channel ? t('tt.channeled', { sec: a.channel.duration }) : res.castTime > 0 ? t('tt.castSec', { sec: res.castTime }) : t('tt.instant'));
+    if (a.cooldown > 0) castLine.push(t('tt.cooldown', { sec: a.cooldown }));
     html += `<div class="tt-stat">${castLine.join(' &nbsp; ')}</div>`;
-    html += `<div class="tt-desc">${a.description.replace('$d', dmgText)}</div>`;
+    html += `<div class="tt-desc">${abilityDesc(a.id).replace('$d', dmgText)}</div>`;
     return html;
   }
 
@@ -414,11 +469,12 @@ export class Hud {
     if (target && target.kind !== 'object') {
       tf.style.display = 'flex';
       tf.classList.toggle('elite', !!MOBS[target.templateId]?.elite);
-      $('#tf-elite-tag').textContent = MOBS[target.templateId]?.boss ? 'BOSS' : 'ELITE';
-      $('#tf-name').textContent = target.name;
+      $('#tf-elite-tag').textContent = MOBS[target.templateId]?.boss ? t('target.boss') : t('target.elite');
+      $('#tf-name').textContent = target.kind === 'npc' ? npcName(target.templateId)
+        : target.kind === 'mob' ? mobName(target.templateId) : target.name;
       $('#tf-level').textContent = MOBS[target.templateId]?.boss ? '☠' : String(target.level);
       ($('#tf-hp') as HTMLElement).style.transform = `scaleX(${target.hp / Math.max(1, target.maxHp)})`;
-      $('#tf-hp-text').textContent = target.dead ? 'Dead' : `${target.hp} / ${target.maxHp}`;
+      $('#tf-hp-text').textContent = target.dead ? t('target.dead') : `${target.hp} / ${target.maxHp}`;
       ($('#tf-name') as HTMLElement).style.color = target.hostile ? '#ff6b5e' : '#9fdc7f';
       if (this.lastPortraitTarget !== target.id) {
         this.lastPortraitTarget = target.id;
@@ -457,7 +513,7 @@ export class Hud {
         ? p.castRemaining / Math.max(0.01, p.castTotal)
         : 1 - p.castRemaining / Math.max(0.01, p.castTotal);
       (cb.querySelector('.fill') as HTMLElement).style.width = `${(frac * 100).toFixed(1)}%`;
-      (cb.querySelector('.label') as HTMLElement).textContent = ABILITIES[p.castingAbility].name;
+      (cb.querySelector('.label') as HTMLElement).textContent = abilityName(p.castingAbility);
     } else if (p.eating || p.drinking) {
       cb.style.display = 'block';
       cb.classList.add('channel');
@@ -466,7 +522,7 @@ export class Hud {
         : (p.eating ?? p.drinking)!;
       (cb.querySelector('.fill') as HTMLElement).style.width = `${((c.remaining / CONSUME_DURATION) * 100).toFixed(1)}%`;
       (cb.querySelector('.label') as HTMLElement).textContent =
-        p.eating && p.drinking ? 'Eating & Drinking…' : p.eating ? 'Eating…' : 'Drinking…';
+        p.eating && p.drinking ? t('cast.eatingDrinking') : p.eating ? t('cast.eating') : t('cast.drinking');
     } else {
       cb.style.display = 'none';
     }
@@ -522,7 +578,7 @@ export class Hud {
     const xpNeed = xpForLevel(p.level);
     const xpFrac = p.level >= MAX_LEVEL ? 1 : sim.xp / xpNeed;
     ($('#xpbar .fill') as HTMLElement).style.width = `${(xpFrac * 100).toFixed(1)}%`;
-    $('#xpbar .label').textContent = p.level >= MAX_LEVEL ? 'MAX LEVEL' : `${sim.xp} / ${xpNeed} XP (${Math.floor(xpFrac * 100)}%)`;
+    $('#xpbar .label').textContent = p.level >= MAX_LEVEL ? t('xp.max') : t('xp.bar', { xp: sim.xp, need: xpNeed, pct: Math.floor(xpFrac * 100) });
 
     $('#death-overlay').style.display = p.dead ? 'flex' : 'none';
 
@@ -531,6 +587,8 @@ export class Hud {
     // from re-triggering the banner/log (and the map canvas regen) every step.
     const inDungeon = p.pos.x > DUNGEON_X_THRESHOLD;
     const currentZone = zoneAt(p.pos.z);
+    // keep the minimap zone label current + localized
+    $('#zone-label').textContent = zoneName(currentZone.id);
     if (!inDungeon && currentZone.id !== this.lastZoneId) {
       const lastZone = ZONES.find((z) => z.id === this.lastZoneId);
       const pastDeadBand = !lastZone
@@ -538,9 +596,9 @@ export class Hud {
         || p.pos.z >= lastZone.zMax + ZONE_BANNER_DEADBAND;
       if (pastDeadBand) {
         if (this.lastZoneId !== '') {
-          this.showBanner(currentZone.name);
-          this.log(`Entering ${currentZone.name}.`, '#ffd100');
-          this.log(currentZone.welcome, '#ffd100');
+          this.showBanner(zoneName(currentZone.id));
+          this.log(t('log.entering', { zone: zoneName(currentZone.id) }), '#ffd100');
+          this.log(zoneWelcome(currentZone.id), '#ffd100');
         }
         this.lastZoneId = currentZone.id;
       }
@@ -596,20 +654,20 @@ export class Hud {
       dur.className = 'dur';
       dur.textContent = a.remaining < 99 ? `${Math.ceil(a.remaining)}s` : '';
       d.appendChild(dur);
-      this.attachTooltip(d, () => `<div class="tt-title">${a.name}</div><div class="tt-sub">${Math.ceil(a.remaining)} seconds remaining</div>`);
+      this.attachTooltip(d, () => `<div class="tt-title">${auraName(a)}</div><div class="tt-sub">${t('tt.secondsRemaining', { n: Math.ceil(a.remaining) })}</div>`);
       el.appendChild(d);
     }
   }
 
   private updateQuestTracker(): void {
     const el = $('#quest-tracker');
-    let html = this.sim.questLog.size > 0 ? '<div class="qt-header">Quests</div>' : '';
+    let html = this.sim.questLog.size > 0 ? `<div class="qt-header">${t('quest.tracker.header')}</div>` : '';
     for (const qp of this.sim.questLog.values()) {
       const quest = QUESTS[qp.questId];
-      html += `<div class="qt-title">${quest.name}${qp.state === 'ready' ? ' <span style="color:#7fdc4f">(Complete)</span>' : ''}</div>`;
+      html += `<div class="qt-title">${questName(qp.questId)}${qp.state === 'ready' ? ` <span style="color:#7fdc4f">${t('quest.completeTag')}</span>` : ''}</div>`;
       quest.objectives.forEach((obj, i) => {
         const done = qp.counts[i] >= obj.count;
-        html += `<div class="qt-obj${done ? ' done' : ''}">- ${obj.label}: ${qp.counts[i]}/${obj.count}</div>`;
+        html += `<div class="qt-obj${done ? ' done' : ''}">- ${questObjective(qp.questId, i)}: ${qp.counts[i]}/${obj.count}</div>`;
       });
     }
     if (el.innerHTML !== html) el.innerHTML = html;
@@ -769,8 +827,8 @@ export class Hud {
     const a = this.sim.arenaInfo;
     if (!a) {
       // offline / not yet synced: arena is an online ranked feature
-      el.innerHTML = `<div class="panel-title"><span>The Ashen Coliseum</span><span class="x-btn" data-close>✕</span></div>`
-        + `<div class="arena-note">The Ashen Coliseum is a ranked 1v1 arena for the live world. Play online to enter the queue and climb the ladder.</div>`;
+      el.innerHTML = `<div class="panel-title"><span>${t('arena.title')}</span><span class="x-btn" data-close>✕</span></div>`
+        + `<div class="arena-note">${t('arena.offlineNote')}</div>`;
       el.querySelector('[data-close]')?.addEventListener('click', () => { el.style.display = 'none'; });
       return;
     }
@@ -778,46 +836,46 @@ export class Hud {
     const myPid = this.sim.playerId;
     const ladder = a.ladder.map((r, i) => {
       const me = r.pid === myPid;
-      const cls = CLASSES[r.cls]?.name ?? r.cls;
+      const cls = className(r.cls);
       return `<div class="ladder-row${me ? ' me' : ''}"><span class="rank">${i + 1}</span>`
         + `<span class="lr-name" title="${r.name} — ${cls}">${r.name}</span>`
         + `<span class="lr-rating">${r.rating}</span>`
         + `<span class="lr-wl">${r.wins}-${r.losses}</span></div>`;
-    }).join('') || `<div class="ladder-empty">No challengers ranked yet — be the first.</div>`;
+    }).join('') || `<div class="ladder-empty">${t('arena.ladderEmpty')}</div>`;
 
     let action: string;
     if (inMatch) {
-      action = `<div class="arena-queue-status">⚔ Match in progress vs ${a.match!.oppName}.</div>`;
+      action = `<div class="arena-queue-status">${t('arena.inMatch', { opp: a.match!.oppName })}</div>`;
     } else if (a.queued) {
-      action = `<button class="btn leave" data-act="leave">Leave Queue</button>`
-        + `<div class="arena-queue-status">Searching for an opponent… (${a.queueSize} in queue)</div>`;
+      action = `<button class="btn leave" data-act="leave">${t('arena.leaveQueue')}</button>`
+        + `<div class="arena-queue-status">${t('arena.searching', { n: a.queueSize })}</div>`;
     } else {
-      action = `<button class="btn" data-act="queue">Enter the Queue</button>`
-        + `<div class="arena-note">You will be matched with the nearest-rated challenger online, then teleported to the sands. Win to climb; first to yield (1 health) loses. You return exactly where you queued.</div>`;
+      action = `<button class="btn" data-act="queue">${t('arena.enterQueue')}</button>`
+        + `<div class="arena-note">${t('arena.queueNote')}</div>`;
     }
 
     this.fetchArenaLeaderboard();
     const allTime = (this.arenaAllTime ?? []).map((r, i) => {
       const me = r.name === this.sim.player.name;
-      const cls = CLASSES[r.class as keyof typeof CLASSES]?.name ?? r.class;
+      const cls = className(r.class);
       return `<div class="ladder-row${me ? ' me' : ''}"><span class="rank">${i + 1}</span>`
         + `<span class="lr-name" title="${r.name} — Lv ${r.level} ${cls}">${r.name}</span>`
         + `<span class="lr-rating">${r.rating}</span>`
         + `<span class="lr-wl">${r.wins}-${r.losses}</span></div>`;
     }).join('');
     const allTimeSection = this.arenaAllTime && this.arenaAllTime.length > 0
-      ? `<div class="arena-sub">Ladder — All-Time</div>${allTime}`
+      ? `<div class="arena-sub">${t('arena.ladderAllTime')}</div>${allTime}`
       : '';
 
     const sig = JSON.stringify([a.rating, a.wins, a.losses, a.queued, a.queueSize, inMatch, a.ladder, this.arenaAllTime]);
     if (sig === this.lastArenaSig) return; // nothing changed; skip the DOM churn (and re-bind)
     this.lastArenaSig = sig;
 
-    el.innerHTML = `<div class="panel-title"><span>The Ashen Coliseum <span style="color:#998d6a;font-size:11px">1v1 Ranked</span></span><span class="x-btn" data-close>✕</span></div>`
+    el.innerHTML = `<div class="panel-title"><span>${t('arena.title')} <span style="color:#998d6a;font-size:11px">${t('arena.ranked')}</span></span><span class="x-btn" data-close>✕</span></div>`
       + `<div class="arena-rank"><span class="rating">${a.rating}</span>`
-      + `<span class="wl">Rating &middot; <b>${a.wins}</b> wins / <i>${a.losses}</i> losses</span></div>`
+      + `<span class="wl">${t('arena.record', { wins: a.wins, losses: a.losses })}</span></div>`
       + action
-      + `<div class="arena-sub">Ladder — Online</div>`
+      + `<div class="arena-sub">${t('arena.ladderOnline')}</div>`
       + ladder
       + allTimeSection;
 
@@ -836,12 +894,12 @@ export class Hud {
       this.lastArenaStatusSig = '';
       return;
     }
-    const label = m.state === 'countdown' ? 'Steel yourself…' : 'Fight to the yield!';
+    const label = m.state === 'countdown' ? t('arena.steel') : t('arena.fightToYield');
     const sig = `${m.oppName}|${m.state}`;
     if (sig !== this.lastArenaStatusSig) {
       this.lastArenaStatusSig = sig;
-      const cls = CLASSES[m.oppClass]?.name ?? m.oppClass;
-      el.innerHTML = `<div class="as-vs">⚔ VS <span class="opp">${m.oppName}</span> <span style="color:#b6ad8c;font-size:11px">Lv ${m.oppLevel} ${cls}</span></div>`
+      const cls = className(m.oppClass);
+      el.innerHTML = `<div class="as-vs">⚔ VS <span class="opp">${m.oppName}</span> <span style="color:#b6ad8c;font-size:11px">${t('arena.vsSub', { level: m.oppLevel, cls })}</span></div>`
         + `<div class="as-timer">${label}</div>`;
       el.style.display = 'block';
     }
@@ -882,21 +940,21 @@ export class Hud {
       my: ((region.maxZ - z) / spanZ) * S,
     });
     // zone title
-    ctx.font = 'bold 16px Georgia';
+    ctx.font = `bold 16px ${CANVAS_CJK_FONT}`;
     ctx.textAlign = 'center';
     ctx.strokeStyle = '#000';
     ctx.lineWidth = 3;
     ctx.fillStyle = '#ffe9a0';
-    ctx.strokeText(zone.name, S / 2, 20);
-    ctx.fillText(zone.name, S / 2, 20);
+    ctx.strokeText(zoneName(zone.id), S / 2, 20);
+    ctx.fillText(zoneName(zone.id), S / 2, 20);
     // labels
-    ctx.font = 'bold 13px Georgia';
+    ctx.font = `bold 13px ${CANVAS_CJK_FONT}`;
     const label = (x: number, z: number, text: string) => {
       const { mx, my } = toMap(x, z);
       ctx.strokeText(text, mx, my);
       ctx.fillText(text, mx, my);
     };
-    for (const poi of zone.pois) label(poi.x, poi.z, poi.label);
+    for (const poi of zone.pois) label(poi.x, poi.z, poiLabel(zone.id, poi.label));
     // dungeon entrance portals in this zone
     for (const dungeon of DUNGEON_LIST) {
       if (dungeon.doorPos.z < zone.zMin || dungeon.doorPos.z >= zone.zMax) continue;
@@ -907,10 +965,10 @@ export class Hud {
       ctx.fill();
       ctx.stroke();
       ctx.fillStyle = '#e0c0ff';
-      ctx.font = 'bold 12px Georgia';
-      ctx.strokeText(dungeon.name, mx, my - 9);
-      ctx.fillText(dungeon.name, mx, my - 9);
-      ctx.font = 'bold 13px Georgia';
+      ctx.font = `bold 12px ${CANVAS_CJK_FONT}`;
+      ctx.strokeText(dungeonName(dungeon.id), mx, my - 9);
+      ctx.fillText(dungeonName(dungeon.id), mx, my - 9);
+      ctx.font = `bold 13px ${CANVAS_CJK_FONT}`;
       ctx.fillStyle = '#ffe9a0';
     }
     // npcs
@@ -962,10 +1020,12 @@ export class Hud {
           const isPlayerSource = ev.sourceId === sim.playerId;
           const isPlayerTarget = ev.targetId === sim.playerId;
           if (isPlayerSource || isPlayerTarget) this.lastCombatEventAt = performance.now();
+          const abil = ev.ability ? abilityName(ev.ability) : t('combat.attackWord');
+          const crit = ev.crit ? t('combat.critSuffix') : '';
           if (ev.kind === 'miss' || ev.kind === 'dodge') {
-            this.fct(tgt, ev.kind === 'miss' ? 'Miss' : 'Dodge', isPlayerTarget ? '#bbb' : '#fff', false);
+            this.fct(tgt, ev.kind === 'miss' ? t('fct.miss') : t('fct.dodge'), isPlayerTarget ? '#bbb' : '#fff', false);
             if (isPlayerSource) {
-              this.combatLog(`Your ${ev.ability ?? 'attack'} ${ev.kind === 'miss' ? 'misses' : 'is dodged by'} ${tgt.name}.`, '#ccc');
+              this.combatLog(t(ev.kind === 'miss' ? 'combat.yourMiss' : 'combat.yourDodge', { ability: abil, target: this.entLabel(tgt) }), '#ccc');
               audio.meleeMiss();
             }
             break;
@@ -973,14 +1033,14 @@ export class Hud {
           if (isPlayerSource && !isPlayerTarget) {
             const color = ev.ability ? '#ffe97a' : '#fff';
             this.fct(tgt, `${ev.amount}${ev.crit ? '!' : ''}`, color, ev.crit);
-            this.combatLog(`Your ${ev.ability ?? 'attack'} hits ${tgt.name} for ${ev.amount}${ev.crit ? ' (Critical)' : ''}.`, ev.ability ? '#ffe97a' : '#eee');
+            this.combatLog(t('combat.yourHit', { ability: abil, target: this.entLabel(tgt), amount: ev.amount, crit }), ev.ability ? '#ffe97a' : '#eee');
             if (ev.school === 'fire') audio.fire();
             else if (ev.school === 'frost') audio.frost();
             else if (ev.school === 'arcane') audio.arcane();
             else audio.meleeHit(ev.crit);
           } else if (isPlayerTarget) {
             this.fct(tgt, `-${ev.amount}`, '#ff5544', ev.crit);
-            this.combatLog(`${src?.name ?? 'Something'} hits you for ${ev.amount}${ev.crit ? ' (Critical)' : ''}.`, '#ff8877');
+            this.combatLog(t('combat.hitsYou', { source: this.entLabel(src), amount: ev.amount, crit }), '#ff8877');
             audio.hitTaken();
           }
           break;
@@ -993,17 +1053,17 @@ export class Hud {
         }
         case 'death': {
           const e = sim.entities.get(ev.entityId);
-          if (e && ev.entityId !== sim.playerId) this.combatLog(`${e.name} dies.`, '#aaa');
+          if (e && ev.entityId !== sim.playerId) this.combatLog(t('combat.dies', { name: this.entLabel(e) }), '#aaa');
           break;
         }
         case 'xp': {
           this.fct(sim.player, `+${ev.amount} XP`, '#b974ff', false);
-          this.log(`You gain ${ev.amount} experience.`, '#a980d8');
+          this.log(t('log.xpGain', { amount: ev.amount }), '#a980d8');
           break;
         }
         case 'levelup': {
-          this.showBanner(`Level ${ev.level}!`);
-          this.log(`You have reached level ${ev.level}!`, '#ffd100');
+          this.showBanner(t('banner.level', { level: ev.level }));
+          this.log(t('log.levelUp', { level: ev.level }), '#ffd100');
           audio.levelUp();
           break;
         }
@@ -1028,8 +1088,7 @@ export class Hud {
           break;
         case 'questProgress': this.log(ev.text, '#dcd29f'); break;
         case 'questReady': {
-          const q = QUESTS[ev.questId];
-          this.showBanner(`${q.name} (Complete)`);
+          this.showBanner(`${questName(ev.questId)} ${t('quest.completeTag')}`);
           audio.questDone();
           break;
         }
@@ -1040,14 +1099,14 @@ export class Hud {
         case 'chat': {
           if (this.isChatIgnored(ev.from)) break;
           switch (ev.channel) {
-            case 'party': this.log(`[Party] ${ev.from}: ${ev.text}`, '#7fd4ff'); break;
-            case 'yell': this.log(`${ev.from} yells: ${ev.text}`, '#ff5040'); break;
+            case 'party': this.log(t('chat.party', { from: ev.from, text: ev.text }), '#7fd4ff'); break;
+            case 'yell': this.log(t('chat.yell', { from: ev.from, text: ev.text }), '#ff5040'); break;
             case 'whisper':
-              if (ev.to) this.log(`To ${ev.to}: ${ev.text}`, '#ff80ff');
-              else { this.log(`${ev.from} whispers: ${ev.text}`, '#ff80ff'); audio.whisper(); }
+              if (ev.to) this.log(t('chat.whisperTo', { to: ev.to, text: ev.text }), '#ff80ff');
+              else { this.log(t('chat.whisperFrom', { from: ev.from, text: ev.text }), '#ff80ff'); audio.whisper(); }
               break;
-            case 'general': this.log(`[General] ${ev.from}: ${ev.text}`, '#ffc864'); break;
-            default: this.log(`${ev.from} says: ${ev.text}`, '#f0ead8'); break;
+            case 'general': this.log(t('chat.general', { from: ev.from, text: ev.text }), '#ffc864'); break;
+            default: this.log(t('chat.say', { from: ev.from, text: ev.text }), '#f0ead8'); break;
           }
           if ((ev.channel === 'say' || ev.channel === 'yell') && ev.entityId !== undefined) {
             this.renderer.showChatBubble(ev.entityId, ev.text, ev.channel === 'yell');
@@ -1063,83 +1122,88 @@ export class Hud {
           if (tgt && ev.amount > 0) {
             this.fct(tgt, `+${ev.amount}${ev.crit ? '!' : ''}`, '#3ce63c', ev.crit);
             if (ev.sourceId === sim.playerId) {
-              this.combatLog(`Your ${ev.ability} heals ${ev.targetId === sim.playerId ? 'you' : tgt.name} for ${ev.amount}${ev.crit ? ' (Critical)' : ''}.`, '#7fdc4f');
+              this.combatLog(t('combat.yourHeal', {
+                ability: abilityName(ev.ability),
+                target: ev.targetId === sim.playerId ? t('combat.you') : this.entLabel(tgt),
+                amount: ev.amount,
+                crit: ev.crit ? t('combat.critSuffix') : '',
+              }), '#7fdc4f');
             }
           }
           break;
         }
         case 'partyInvite':
           audio.questAccept();
-          this.showPrompt(`<b>${ev.fromName}</b> invites you to join their party.`, 'Join Party',
+          this.showPrompt(t('prompt.invite.text', { name: ev.fromName }), t('prompt.invite.btn'),
             () => this.sim.partyAccept(), () => this.sim.partyDecline());
           break;
         case 'tradeRequest':
           audio.click();
-          this.showPrompt(`<b>${ev.fromName}</b> wants to trade with you.`, 'Open Trade',
+          this.showPrompt(t('prompt.trade.text', { name: ev.fromName }), t('prompt.trade.btn'),
             () => this.sim.tradeAccept(), () => { /* let it expire */ });
           break;
         case 'duelRequest':
           audio.duelChallenge();
-          this.showPrompt(`<b>${ev.fromName}</b> has challenged you to a duel!`, 'Accept Duel',
+          this.showPrompt(t('prompt.duel.text', { name: ev.fromName }), t('prompt.duel.btn'),
             () => this.sim.duelAccept(), () => this.sim.duelDecline());
           break;
         case 'duelCountdown':
-          this.showBanner(`Duel begins in ${ev.seconds}…`);
+          this.showBanner(t('duel.countdown', { seconds: ev.seconds }));
           audio.duelCountdownTick();
           break;
         case 'duelStart':
           audio.duelStart();
           break;
         case 'duelEnd':
-          this.showBanner(`${ev.winnerName} has defeated ${ev.loserName} in a duel!`);
-          this.combatLog(`${ev.winnerName} has defeated ${ev.loserName} in a duel.`, '#fa6');
+          this.showBanner(t('duel.result', { winner: ev.winnerName, loser: ev.loserName }));
+          this.combatLog(t('combat.duelResult', { winner: ev.winnerName, loser: ev.loserName }), '#fa6');
           audio.duelEnd();
           break;
         case 'arenaQueued':
-          this.log(`Queued for the Ashen Coliseum (position ${ev.position}).`, '#ffa040');
+          this.log(t('arena.queued', { position: ev.position }), '#ffa040');
           break;
         case 'arenaUnqueued':
-          this.log('You leave the Ashen Coliseum queue.', '#ffa040');
+          this.log(t('arena.leftQueue'), '#ffa040');
           break;
         case 'arenaFound': {
-          const cls = CLASSES[ev.oppClass]?.name ?? ev.oppClass;
-          this.showBanner(`Opponent found: ${ev.oppName}`);
-          this.log(`The Coliseum pairs you against ${ev.oppName}, level ${ev.oppLevel} ${cls}.`, '#ffa040');
+          const cls = className(ev.oppClass);
+          this.showBanner(t('arena.oppFound', { opp: ev.oppName }));
+          this.log(t('arena.paired', { opp: ev.oppName, level: ev.oppLevel, cls }), '#ffa040');
           audio.duelChallenge();
           break;
         }
         case 'arenaCountdown':
-          this.showBanner(`The bout begins in ${ev.seconds}…`);
+          this.showBanner(t('arena.boutIn', { seconds: ev.seconds }));
           audio.duelCountdownTick();
           break;
         case 'arenaStart':
-          this.showBanner('Fight!');
+          this.showBanner(t('arena.fight'));
           audio.duelStart();
           break;
         case 'arenaEnd': {
           const delta = ev.ratingAfter - ev.ratingBefore;
           const sign = delta >= 0 ? '+' : '';
           if (ev.draw) {
-            this.showBanner(`Arena draw vs ${ev.oppName} (${sign}${delta} rating)`);
-            this.combatLog(`Arena bout vs ${ev.oppName} ended in a draw. Rating ${ev.ratingAfter} (${sign}${delta}).`, '#fa6');
+            this.showBanner(t('arena.draw', { opp: ev.oppName, sign, delta }));
+            this.combatLog(t('combat.arenaDraw', { opp: ev.oppName, rating: ev.ratingAfter, sign, delta }), '#fa6');
           } else if (ev.won) {
-            this.showBanner(`Victory vs ${ev.oppName}!  Rating ${ev.ratingAfter} (${sign}${delta})`);
-            this.combatLog(`You defeated ${ev.oppName} in the Ashen Coliseum. Rating ${ev.ratingAfter} (${sign}${delta}).`, '#7fdc4f');
+            this.showBanner(t('arena.victory', { opp: ev.oppName, rating: ev.ratingAfter, sign, delta }));
+            this.combatLog(t('combat.arenaWin', { opp: ev.oppName, rating: ev.ratingAfter, sign, delta }), '#7fdc4f');
             audio.duelEnd();
           } else {
-            this.showBanner(`Defeated by ${ev.oppName}.  Rating ${ev.ratingAfter} (${sign}${delta})`);
-            this.combatLog(`${ev.oppName} bested you in the Ashen Coliseum. Rating ${ev.ratingAfter} (${sign}${delta}).`, '#ff7a6a');
+            this.showBanner(t('arena.defeat', { opp: ev.oppName, rating: ev.ratingAfter, sign, delta }));
+            this.combatLog(t('combat.arenaLoss', { opp: ev.oppName, rating: ev.ratingAfter, sign, delta }), '#ff7a6a');
             audio.death();
           }
           break;
         }
         case 'log': this.log(ev.text, ev.color ?? '#ccc'); break;
         case 'playerDeath': {
-          this.log('You have died.', '#ff4444');
+          this.log(t('log.died'), '#ff4444');
           audio.death();
           break;
         }
-        case 'respawn': this.log('You feel rested and whole again.', '#7fdc4f'); break;
+        case 'respawn': this.log(t('log.respawn'), '#7fdc4f'); break;
         case 'castStart': {
           const a = ABILITIES[ev.ability];
           if (a?.school === 'fire') audio.castStart();
@@ -1151,10 +1215,11 @@ export class Hud {
         case 'aura': {
           const tgt = sim.entities.get(ev.targetId);
           if (ev.name === 'Polymorph' && ev.gained) audio.sheep();
+          const auraLabel = auraDisplayName(ev.name);
           if (ev.targetId === sim.playerId) {
-            this.combatLog(ev.gained ? `You gain ${ev.name}.` : `${ev.name} fades from you.`, '#d8a0d8');
+            this.combatLog(t(ev.gained ? 'combat.auraGain' : 'combat.auraFade', { aura: auraLabel }), '#d8a0d8');
           } else if (tgt && ev.gained) {
-            this.combatLog(`${tgt.name} is afflicted by ${ev.name}.`, '#d8a0d8');
+            this.combatLog(t('combat.auraAfflict', { target: this.entLabel(tgt), aura: auraLabel }), '#d8a0d8');
           }
           break;
         }
@@ -1194,7 +1259,8 @@ export class Hud {
   }
 
   showError(text: string): void {
-    this.errorEl.textContent = text;
+    // sim/server errors arrive as canonical English; localize at display time
+    this.errorEl.textContent = localizeError(text);
     this.errorEl.style.opacity = '1';
     clearTimeout(this.errorTimer);
     this.errorTimer = window.setTimeout(() => { this.errorEl.style.opacity = '0'; }, 1600);
@@ -1229,20 +1295,24 @@ export class Hud {
       return (st === 'available' && QUESTS[q].giverNpcId === npc.templateId)
         || (st === 'ready' && QUESTS[q].turnInNpcId === npc.templateId);
     });
-    let html = `<div class="panel-title"><span>${npc.name}<span style="color:#998d6a;font-size:11px"> &lt;${def?.title ?? ''}&gt;</span></span><span class="x-btn" data-close>✕</span></div>`;
-    html += `<div class="qd-text">"${(def?.greeting ?? 'Greetings.').replace('$C', CLASSES[this.sim.cfg.playerClass].name.toLowerCase())}"</div>`;
+    const title = npcTitle(npc.templateId) || def?.title || '';
+    const greeting = (npcGreeting(npc.templateId) || t('npc.greetingDefault'))
+      .replace(/\$C/g, className(this.sim.cfg.playerClass).toLowerCase())
+      .replace(/\$N/g, this.sim.player.name);
+    let html = `<div class="panel-title"><span>${npcName(npc.templateId)}<span style="color:#998d6a;font-size:11px"> &lt;${title}&gt;</span></span><span class="x-btn" data-close>✕</span></div>`;
+    html += `<div class="qd-text">"${greeting}"</div>`;
     if (interesting.length > 0) {
       for (const qid of interesting) {
         const st = this.sim.questState(qid);
         const icon = st === 'ready' ? '<span class="gold">?</span> ' : '<span class="gold">!</span> ';
-        html += `<div class="qd-list-item" data-quest="${qid}">${icon}${QUESTS[qid].name}</div>`;
+        html += `<div class="qd-list-item" data-quest="${qid}">${icon}${questName(qid)}</div>`;
       }
     }
     if (npc.vendorItems.length > 0) {
-      html += `<div class="qd-list-item" data-vendor="1"><span style="color:#9fdc7f">$</span> Let me browse your goods.</div>`;
+      html += `<div class="qd-list-item" data-vendor="1"><span style="color:#9fdc7f">$</span> ${t('gossip.browseGoods')}</div>`;
     }
     if (def?.market) {
-      html += `<div class="qd-list-item" data-market="1"><span style="color:#ffd24a">⚖</span> Show me the World Market.</div>`;
+      html += `<div class="qd-list-item" data-market="1"><span style="color:#ffd24a">⚖</span> ${t('gossip.showMarket')}</div>`;
     }
     el.innerHTML = html;
     el.querySelectorAll('[data-quest]').forEach((item) => {
@@ -1264,20 +1334,21 @@ export class Hud {
     const el = $('#quest-dialog');
     const quest = QUESTS[questId];
     const state = this.sim.questState(questId);
-    const text = (state === 'ready' ? quest.completionText : quest.text).replace(/\$N/g, this.sim.player.name);
-    let html = `<div class="panel-title"><span>${quest.name}${quest.suggestedPlayers ? ` <span style="color:#f96;font-size:11px">(Suggested players: ${quest.suggestedPlayers})</span>` : ''}</span><span class="x-btn" data-close>✕</span></div>`;
+    const text = (state === 'ready' ? questCompletion(questId) : questText(questId)).replace(/\$N/g, this.sim.player.name);
+    const suggested = quest.suggestedPlayers ? ` <span style="color:#f96;font-size:11px">(${t('quest.suggestedPlayers', { n: quest.suggestedPlayers })})</span>` : '';
+    let html = `<div class="panel-title"><span>${questName(questId)}${suggested}</span><span class="x-btn" data-close>✕</span></div>`;
     html += `<div class="qd-text">${text}</div>`;
     if (state !== 'ready') {
       const qp = this.sim.questLog.get(questId);
-      html += `<div class="qd-sub">Objectives</div>`;
-      html += quest.objectives.map((o, i) => `<div class="qd-obj">&bull; ${o.label}: ${qp ? Math.min(qp.counts[i], o.count) : 0}/${o.count}</div>`).join('');
+      html += `<div class="qd-sub">${t('quest.objectives')}</div>`;
+      html += quest.objectives.map((o, i) => `<div class="qd-obj">&bull; ${questObjective(questId, i)}: ${qp ? Math.min(qp.counts[i], o.count) : 0}/${o.count}</div>`).join('');
     }
-    html += `<div class="qd-sub">Rewards</div>`;
-    html += `<div class="qd-obj">${quest.xpReward} experience &nbsp; ${this.moneyHtml(quest.copperReward)}</div>`;
+    html += `<div class="qd-sub">${t('quest.rewards')}</div>`;
+    html += `<div class="qd-obj">${t('quest.reward.xp', { xp: quest.xpReward })} &nbsp; ${this.moneyHtml(quest.copperReward)}</div>`;
     const rewardItem = quest.itemRewards[this.sim.cfg.playerClass];
     if (rewardItem) {
       const item = ITEMS[rewardItem];
-      html += `<div class="qd-reward-row" data-reward>${this.itemIcon(item)}<span style="color:${QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff'};font-size:12px">${item.name}</span></div>`;
+      html += `<div class="qd-reward-row" data-reward>${this.itemIcon(item)}<span style="color:${QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff'};font-size:12px">${itemName(item.id)}</span></div>`;
     }
     el.innerHTML = html;
     const rewardRow = el.querySelector('[data-reward]') as HTMLElement | null;
@@ -1286,19 +1357,19 @@ export class Hud {
     if (state === 'available') {
       const btn = document.createElement('button');
       btn.className = 'btn';
-      btn.textContent = 'Accept';
+      btn.textContent = t('quest.accept');
       btn.addEventListener('click', () => { this.sim.acceptQuest(questId); this.renderGossip(npc); });
       el.appendChild(btn);
     } else if (state === 'ready') {
       const btn = document.createElement('button');
       btn.className = 'btn';
-      btn.textContent = 'Complete Quest';
+      btn.textContent = t('quest.complete');
       btn.addEventListener('click', () => { this.sim.turnInQuest(questId); this.renderGossip(npc); });
       el.appendChild(btn);
     }
     const back = document.createElement('button');
     back.className = 'btn';
-    back.textContent = 'Back';
+    back.textContent = t('quest.back');
     back.addEventListener('click', () => this.renderGossip(npc));
     el.appendChild(back);
     el.querySelector('[data-close]')?.addEventListener('click', () => this.closeQuestDialog());
@@ -1329,13 +1400,13 @@ export class Hud {
     if (!mob?.loot) return;
     this.openLootMobId = mobId;
     const el = $('#loot-window');
-    let html = `<div class="panel-title"><span>${mob.name}</span><span class="x-btn" data-close>✕</span></div>`;
+    let html = `<div class="panel-title"><span>${mob.kind === 'mob' ? mobName(mob.templateId) : mob.name}</span><span class="x-btn" data-close>✕</span></div>`;
     if (mob.loot.copper > 0) {
       html += `<div class="loot-item"><img class="item-icon q-common" src="${iconDataUrl('item', 'coin_gold')}" alt="" draggable="false"><span>${this.moneyHtml(mob.loot.copper)}</span></div>`;
     }
     for (const s of mob.loot.items) {
       const item = ITEMS[s.itemId];
-      html += `<div class="loot-item" data-item="${s.itemId}">${this.itemIcon(item)}<span style="font-size:12px">${item.name}${s.count > 1 ? ' x' + s.count : ''}</span></div>`;
+      html += `<div class="loot-item" data-item="${s.itemId}">${this.itemIcon(item)}<span style="font-size:12px">${itemName(item.id)}${s.count > 1 ? ' x' + s.count : ''}</span></div>`;
     }
     el.innerHTML = html;
     el.querySelectorAll('[data-item]').forEach((row) => {
@@ -1344,7 +1415,7 @@ export class Hud {
     });
     const btn = document.createElement('button');
     btn.className = 'btn';
-    btn.textContent = 'Take All';
+    btn.textContent = t('loot.takeAll');
     btn.addEventListener('click', () => { this.sim.lootCorpse(mobId); this.closeLoot(); });
     el.appendChild(btn);
     el.querySelector('[data-close]')?.addEventListener('click', () => this.closeLoot());
@@ -1379,23 +1450,23 @@ export class Hud {
     // collapses the scrolled list — drop the tooltip and restore the scroll
     this.hideTooltip();
     const scrollTop = el.scrollTop;
-    let html = `<div class="panel-title"><span>${npc.name} — Goods</span><span class="x-btn" data-close>✕</span></div>`;
+    let html = `<div class="panel-title"><span>${t('vendor.goods', { name: npcName(npc.templateId) })}</span><span class="x-btn" data-close>✕</span></div>`;
     el.innerHTML = html;
     for (const itemId of npc.vendorItems) {
       const item = ITEMS[itemId];
       if (!item?.buyValue) continue;
       const row = document.createElement('div');
       row.className = 'vendor-item';
-      row.innerHTML = `${this.itemIcon(item)}<span class="vi-name">${item.name}</span><span class="vi-price">${this.moneyHtml(item.buyValue)}</span>`;
+      row.innerHTML = `${this.itemIcon(item)}<span class="vi-name">${itemName(item.id)}</span><span class="vi-price">${this.moneyHtml(item.buyValue)}</span>`;
       row.addEventListener('click', () => {
         this.sim.buyItem(npc.id, itemId);
       });
-      this.attachTooltip(row, () => this.itemTooltip(item) + '<div class="tt-sub">Click to buy</div>');
+      this.attachTooltip(row, () => this.itemTooltip(item) + `<div class="tt-sub">${t('vendor.clickBuy')}</div>`);
       el.appendChild(row);
     }
     const hint = document.createElement('div');
     hint.className = 'vendor-hint';
-    hint.textContent = 'Click an item in your bags to sell it while this window is open.';
+    hint.textContent = t('vendor.sellHint');
     el.appendChild(hint);
     el.querySelector('[data-close]')?.addEventListener('click', () => this.closeVendor());
     el.style.display = 'block';
@@ -1463,17 +1534,17 @@ export class Hud {
     const tab = (id: typeof this.marketTab, label: string, pip = '') =>
       `<div class="mkt-tab${this.marketTab === id ? ' sel' : ''}" data-tab="${id}">${label}${pip}</div>`;
     el.innerHTML =
-      `<div class="panel-title"><span>The World Market <span style="color:#998d6a;font-size:11px">— the Merchant's exchange</span></span><span class="x-btn" data-close>✕</span></div>`
+      `<div class="panel-title"><span>${t('market.title')} <span style="color:#998d6a;font-size:11px">— ${t('market.subtitle')}</span></span><span class="x-btn" data-close>✕</span></div>`
       + `<div class="mkt-tabs">`
-      + tab('browse', 'Browse')
-      + tab('sell', 'Sell')
-      + tab('collect', 'Collect', collectN > 0 ? ` <span class="pip">(${collectN})</span>` : '')
+      + tab('browse', t('market.tab.browse'))
+      + tab('sell', t('market.tab.sell'))
+      + tab('collect', t('market.tab.collect'), collectN > 0 ? ` <span class="pip">(${collectN})</span>` : '')
       + `</div>`
       + `<div id="market-body"></div>`;
     el.querySelector('[data-close]')?.addEventListener('click', () => this.closeMarket());
-    el.querySelectorAll('[data-tab]').forEach((t) => {
-      t.addEventListener('click', () => {
-        const next = (t as HTMLElement).dataset.tab as typeof this.marketTab;
+    el.querySelectorAll('[data-tab]').forEach((tabEl) => {
+      tabEl.addEventListener('click', () => {
+        const next = (tabEl as HTMLElement).dataset.tab as typeof this.marketTab;
         if (next === this.marketTab) return;
         this.marketTab = next;
         this.lastMarketSig = '';
@@ -1494,14 +1565,14 @@ export class Hud {
     if (sig === this.lastMarketSig) return;
     this.lastMarketSig = sig;
     const collectTab = $('#market-window').querySelector('[data-tab="collect"]');
-    if (collectTab) collectTab.innerHTML = `Collect${collectN > 0 ? ` <span class="pip">(${collectN})</span>` : ''}`;
+    if (collectTab) collectTab.innerHTML = `${t('market.tab.collect')}${collectN > 0 ? ` <span class="pip">(${collectN})</span>` : ''}`;
     this.renderMarketContent(info);
   }
 
   private renderMarketContent(info: MarketInfo | null): void {
     const body = document.getElementById('market-body');
     if (!body) return;
-    if (!info) { body.innerHTML = `<div class="mkt-empty">Step up to the Merchant to deal.</div>`; return; }
+    if (!info) { body.innerHTML = `<div class="mkt-empty">${t('market.browse.empty')}</div>`; return; }
     if (this.marketTab === 'browse') this.renderMarketBrowse(body, info);
     else if (this.marketTab === 'sell') this.renderMarketSell(body, info);
     else this.renderMarketCollect(body, info);
@@ -1509,25 +1580,25 @@ export class Hud {
 
   private renderMarketBrowse(body: HTMLElement, info: MarketInfo): void {
     if (info.listings.length === 0) {
-      body.innerHTML = `<div class="mkt-empty">The market is quiet. Be the first — list something on the Sell tab.</div>`;
+      body.innerHTML = `<div class="mkt-empty">${t('market.sell.empty')}</div>`;
       return;
     }
-    body.innerHTML = `<div class="mkt-note">Goods listed by adventurers across the realm. Click Buy to purchase a stack outright.</div>`;
+    body.innerHTML = `<div class="mkt-note">${t('market.browse.note')}</div>`;
     for (const l of info.listings) {
       const item = ITEMS[l.itemId];
       if (!item) continue;
       const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff';
       const row = document.createElement('div');
       row.className = 'mkt-row';
-      const each = l.count > 1 ? `<br><span class="seller">${formatMoney(Math.ceil(l.price / l.count))} each</span>` : '';
+      const each = l.count > 1 ? `<br><span class="seller">${t('market.each', { money: formatMoney(Math.ceil(l.price / l.count)) })}</span>` : '';
       row.innerHTML =
         `${this.itemIcon(item)}`
-        + `<span class="mkt-name"><span class="nm" style="color:${qColor}">${item.name}${l.count > 1 ? ' <span style="color:#ccc">x' + l.count + '</span>' : ''}</span>`
-        + `<span class="seller${l.house ? ' house' : ''}">${l.house ? "Merchant's stock" : l.sellerName}</span></span>`
+        + `<span class="mkt-name"><span class="nm" style="color:${qColor}">${itemName(item.id)}${l.count > 1 ? ' <span style="color:#ccc">x' + l.count + '</span>' : ''}</span>`
+        + `<span class="seller${l.house ? ' house' : ''}">${l.house ? t('market.merchantStock') : l.sellerName}</span></span>`
         + `<span class="mkt-price">${this.moneyHtml(l.price)}${each}</span>`;
       const btn = document.createElement('button');
       btn.className = 'mkt-btn' + (l.mine ? ' cancel' : '');
-      btn.textContent = l.mine ? 'Reclaim' : 'Buy';
+      btn.textContent = l.mine ? t('market.reclaim') : t('market.buy');
       btn.addEventListener('click', () => {
         if (l.mine) this.sim.marketCancel(l.id);
         else this.sim.marketBuy(l.id);
@@ -1540,46 +1611,46 @@ export class Hud {
   }
 
   private renderMarketSell(body: HTMLElement, info: MarketInfo): void {
-    body.innerHTML = `<div class="mkt-note">List goods from your bags. The Merchant takes a ${info.cutPct}% cut when an item sells. You are using ${info.myListingCount}/${info.maxListings} listing slots.</div>`;
+    body.innerHTML = `<div class="mkt-note">${t('market.sell.note', { cut: info.cutPct, used: info.myListingCount, max: info.maxListings })}</div>`;
     const item = this.marketSellItem ? ITEMS[this.marketSellItem] : null;
     const have = this.marketSellItem ? this.bagCount(this.marketSellItem) : 0;
     const pick = document.createElement('div');
     if (!item || have <= 0) {
       pick.className = 'mkt-sell-pick empty';
-      pick.textContent = 'Click an item in your bags to choose what to sell.';
+      pick.textContent = t('market.sell.pickHint');
       body.appendChild(pick);
       return;
     }
     const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff';
     pick.className = 'mkt-sell-pick';
-    pick.innerHTML = `${this.itemIcon(item)}<span class="ps-name" style="color:${qColor}">${item.name}</span>`;
+    pick.innerHTML = `${this.itemIcon(item)}<span class="ps-name" style="color:${qColor}">${itemName(item.id)}</span>`;
     body.appendChild(pick);
 
     const form = document.createElement('div');
     form.className = 'mkt-price-form';
     const qtyRow = have > 1
-      ? `<div class="mkt-price-row"><label>Quantity</label><input class="coininput" id="mkt-qty" type="number" min="1" max="${have}" value="1"> <span class="mkt-coin-tag">of ${have}</span></div>`
+      ? `<div class="mkt-price-row"><label>${t('market.quantity')}</label><input class="coininput" id="mkt-qty" type="number" min="1" max="${have}" value="1"> <span class="mkt-coin-tag">${t('market.ofN', { n: have })}</span></div>`
       : '';
     // a gentle starting ask: a few times vendor value, never below 1c
     const suggested = Math.max(1, item.buyValue ?? Math.max(1, item.sellValue) * 4);
     const g = Math.floor(suggested / 10000), s = Math.floor((suggested % 10000) / 100), c = suggested % 100;
     form.innerHTML = qtyRow
-      + `<div class="mkt-price-row"><label>Price each</label>`
-      + `<input class="coininput" id="mkt-g" type="number" min="0" value="${g}"><span class="mkt-coin-tag">g</span>`
-      + `<input class="coininput" id="mkt-s" type="number" min="0" max="99" value="${s}"><span class="mkt-coin-tag">s</span>`
-      + `<input class="coininput" id="mkt-c" type="number" min="0" max="99" value="${c}"><span class="mkt-coin-tag">c</span></div>`;
+      + `<div class="mkt-price-row"><label>${t('market.priceEach')}</label>`
+      + `<input class="coininput" id="mkt-g" type="number" min="0" value="${g}"><span class="mkt-coin-tag">${t('coin.g')}</span>`
+      + `<input class="coininput" id="mkt-s" type="number" min="0" max="99" value="${s}"><span class="mkt-coin-tag">${t('coin.s')}</span>`
+      + `<input class="coininput" id="mkt-c" type="number" min="0" max="99" value="${c}"><span class="mkt-coin-tag">${t('coin.c')}</span></div>`;
     body.appendChild(form);
 
     const listBtn = document.createElement('button');
     listBtn.className = 'mkt-list-btn';
-    listBtn.textContent = 'List on the World Market';
+    listBtn.textContent = t('market.list');
     listBtn.addEventListener('click', () => {
       const qty = have > 1 ? Math.max(1, Math.min(have, parseInt(($('#mkt-qty') as HTMLInputElement)?.value || '1', 10) || 1)) : 1;
       const gg = Math.max(0, parseInt(($('#mkt-g') as HTMLInputElement)?.value || '0', 10) || 0);
       const ss = Math.max(0, parseInt(($('#mkt-s') as HTMLInputElement)?.value || '0', 10) || 0);
       const cc = Math.max(0, parseInt(($('#mkt-c') as HTMLInputElement)?.value || '0', 10) || 0);
       const each = gg * 10000 + ss * 100 + cc;
-      if (each < 1) { this.showError('Name a price of at least 1 copper.'); return; }
+      if (each < 1) { this.showError(t('market.err.minPrice')); return; }
       this.sim.marketList(this.marketSellItem!, qty, each * qty);
       this.marketSellItem = null;
       audio.coin();
@@ -1590,14 +1661,14 @@ export class Hud {
 
   private renderMarketCollect(body: HTMLElement, info: MarketInfo): void {
     if (info.collectionCopper <= 0 && info.collectionItems.length === 0) {
-      body.innerHTML = `<div class="mkt-empty">Nothing waiting. Sale proceeds and expired listings collect here.</div>`;
+      body.innerHTML = `<div class="mkt-empty">${t('market.collect.empty')}</div>`;
       return;
     }
-    body.innerHTML = `<div class="mkt-note">Earnings and returned goods the Merchant is holding for you.</div>`;
+    body.innerHTML = `<div class="mkt-note">${t('market.collect.note')}</div>`;
     if (info.collectionCopper > 0) {
       const row = document.createElement('div');
       row.className = 'mkt-collect';
-      row.innerHTML = `<span>Sale proceeds</span><span class="mkt-price">${this.moneyHtml(info.collectionCopper)}</span>`;
+      row.innerHTML = `<span>${t('market.saleProceeds')}</span><span class="mkt-price">${this.moneyHtml(info.collectionCopper)}</span>`;
       body.appendChild(row);
     }
     for (const s of info.collectionItems) {
@@ -1606,13 +1677,13 @@ export class Hud {
       const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff';
       const row = document.createElement('div');
       row.className = 'mkt-collect';
-      row.innerHTML = `<span style="display:flex;gap:8px;align-items:center">${this.itemIcon(item)}<span style="color:${qColor}">${item.name}${s.count > 1 ? ' x' + s.count : ''}</span></span>`;
+      row.innerHTML = `<span style="display:flex;gap:8px;align-items:center">${this.itemIcon(item)}<span style="color:${qColor}">${itemName(item.id)}${s.count > 1 ? ' x' + s.count : ''}</span></span>`;
       this.attachTooltip(row, () => this.itemTooltip(item));
       body.appendChild(row);
     }
     const btn = document.createElement('button');
     btn.className = 'mkt-list-btn';
-    btn.textContent = 'Collect All';
+    btn.textContent = t('market.collectAll');
     btn.addEventListener('click', () => { this.sim.marketCollect(); audio.coin(); });
     body.appendChild(btn);
   }
@@ -1638,11 +1709,11 @@ export class Hud {
   renderBags(): void {
     const el = $('#bags');
     const sim = this.sim;
-    el.innerHTML = `<div class="panel-title"><span>Bags</span><span class="x-btn" data-close>✕</span></div>`;
+    el.innerHTML = `<div class="panel-title"><span>${t('bags.title')}</span><span class="x-btn" data-close>✕</span></div>`;
     const grid = document.createElement('div');
     grid.className = 'bag-grid';
     if (sim.inventory.length === 0) {
-      grid.innerHTML = `<div style="font-size:12px;color:#887c5c;padding:6px">Your bags are empty.</div>`;
+      grid.innerHTML = `<div style="font-size:12px;color:#887c5c;padding:6px">${t('bags.empty')}</div>`;
     }
     for (const s of [...sim.inventory]) {
       const item = ITEMS[s.itemId];
@@ -1650,12 +1721,12 @@ export class Hud {
       const row = document.createElement('div');
       row.className = 'bag-item';
       const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff';
-      row.innerHTML = `${this.itemIcon(item)}<span style="color:${qColor}">${item.name}</span><span class="bi-count">${s.count > 1 ? 'x' + s.count : ''}</span>`;
+      row.innerHTML = `${this.itemIcon(item)}<span style="color:${qColor}">${itemName(item.id)}</span><span class="bi-count">${s.count > 1 ? 'x' + s.count : ''}</span>`;
       row.addEventListener('click', () => {
         if (this.tradeOpen) {
           this.addItemToTrade(s.itemId);
         } else if (this.marketOpen && this.marketTab === 'sell') {
-          if (item.kind === 'quest') { this.showError('The Merchant will not broker quest items.'); return; }
+          if (item.kind === 'quest') { this.showError(t('market.err.noQuestItems')); return; }
           this.marketSellItem = s.itemId;
           this.renderMarket();
         } else if (this.vendorOpen) {
@@ -1667,11 +1738,11 @@ export class Hud {
       });
       this.attachTooltip(row, () => {
         let extra = '';
-        if (this.tradeOpen) extra = '<div class="tt-sub">Click to offer in trade</div>';
-        else if (this.marketOpen && this.marketTab === 'sell') extra = item.kind === 'quest' ? '<div class="tt-sub">Cannot be sold on the market</div>' : '<div class="tt-sub">Click to put on the market</div>';
-        else if (this.vendorOpen) extra = '<div class="tt-sub">Click to sell</div>';
-        else if (item.kind === 'weapon' || item.kind === 'armor') extra = '<div class="tt-sub">Click to equip</div>';
-        else if (item.kind === 'food' || item.kind === 'drink') extra = '<div class="tt-sub">Click to consume</div>';
+        if (this.tradeOpen) extra = `<div class="tt-sub">${t('bag.tip.trade')}</div>`;
+        else if (this.marketOpen && this.marketTab === 'sell') extra = `<div class="tt-sub">${item.kind === 'quest' ? t('bag.tip.questNoMarket') : t('bag.tip.market')}</div>`;
+        else if (this.vendorOpen) extra = `<div class="tt-sub">${t('bag.tip.sell')}</div>`;
+        else if (item.kind === 'weapon' || item.kind === 'armor') extra = `<div class="tt-sub">${t('bag.tip.equip')}</div>`;
+        else if (item.kind === 'food' || item.kind === 'drink') extra = `<div class="tt-sub">${t('bag.tip.consume')}</div>`;
         return this.itemTooltip(item) + extra;
       });
       grid.appendChild(row);
@@ -1699,25 +1770,21 @@ export class Hud {
     const el = $('#char-window');
     const sim = this.sim;
     const p = sim.player;
-    const cls = CLASSES[sim.cfg.playerClass];
-    let html = `<div class="panel-title"><span>${p.name} <span style="color:#998d6a;font-size:11px">Level ${p.level} ${cls.name}</span></span><span class="x-btn" data-close>✕</span></div>`;
+    let html = `<div class="panel-title"><span>${p.name} <span style="color:#998d6a;font-size:11px">${t('char.levelClass', { level: p.level, cls: className(sim.cfg.playerClass) })}</span></span><span class="x-btn" data-close>✕</span></div>`;
     html += `<div class="paperdoll"><div class="equip-col" id="equip-col"></div></div>`;
     const wpn = sim.equipment.mainhand ? ITEMS[sim.equipment.mainhand] : null;
     const dps = wpn?.weapon ? ((wpn.weapon.min + wpn.weapon.max) / 2 + (p.attackPower / 14) * wpn.weapon.speed) / wpn.weapon.speed : 0;
     html += `<div class="char-stats">
-      <span>Strength: <b>${p.stats.str}</b></span><span>Armor: <b>${p.stats.armor}</b></span>
-      <span>Agility: <b>${p.stats.agi}</b></span><span>Attack Power: <b>${p.attackPower}</b></span>
-      <span>Stamina: <b>${p.stats.sta}</b></span><span>Damage/sec: <b>${dps.toFixed(1)}</b></span>
-      <span>Intellect: <b>${p.stats.int}</b></span><span>Crit Chance: <b>${(p.critChance * 100).toFixed(1)}%</b></span>
-      <span>Spirit: <b>${p.stats.spi}</b></span><span>Dodge: <b>${(p.dodgeChance * 100).toFixed(1)}%</b></span>
+      <span>${t('char.stat.strength')} <b>${p.stats.str}</b></span><span>${t('char.stat.armor')} <b>${p.stats.armor}</b></span>
+      <span>${t('char.stat.agility')} <b>${p.stats.agi}</b></span><span>${t('char.stat.attackPower')} <b>${p.attackPower}</b></span>
+      <span>${t('char.stat.stamina')} <b>${p.stats.sta}</b></span><span>${t('char.stat.dps')} <b>${dps.toFixed(1)}</b></span>
+      <span>${t('char.stat.intellect')} <b>${p.stats.int}</b></span><span>${t('char.stat.crit')} <b>${(p.critChance * 100).toFixed(1)}%</b></span>
+      <span>${t('char.stat.spirit')} <b>${p.stats.spi}</b></span><span>${t('char.stat.dodge')} <b>${(p.dodgeChance * 100).toFixed(1)}%</b></span>
     </div>`;
     el.innerHTML = html;
     const col = el.querySelector('#equip-col')!;
-    const slots: { key: 'mainhand' | 'chest' | 'legs' | 'feet'; name: string }[] = [
-      { key: 'mainhand', name: 'Main Hand' },
-      { key: 'chest', name: 'Chest' },
-      { key: 'legs', name: 'Legs' },
-      { key: 'feet', name: 'Feet' },
+    const slots: { key: 'mainhand' | 'chest' | 'legs' | 'feet' }[] = [
+      { key: 'mainhand' }, { key: 'chest' }, { key: 'legs' }, { key: 'feet' },
     ];
     for (const slot of slots) {
       const itemId = sim.equipment[slot.key];
@@ -1726,7 +1793,7 @@ export class Hud {
       row.className = 'equip-slot';
       const qColor = !item ? '#666' : QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff';
       row.innerHTML = `${item ? this.itemIcon(item) : `<img class="item-icon" style="border-color:#444" src="${iconDataUrl('item', 'slot_empty')}" alt="" draggable="false">`}
-        <div><div class="slot-name">${slot.name}</div><div class="slot-item" style="color:${qColor}">${item ? item.name : 'Empty'}</div></div>`;
+        <div><div class="slot-name">${t(`char.slot.${slot.key}`)}</div><div class="slot-item" style="color:${qColor}">${item ? itemName(item.id) : t('char.slot.empty')}</div></div>`;
       if (item) this.attachTooltip(row, () => this.itemTooltip(item));
       col.appendChild(row);
     }
@@ -1747,7 +1814,7 @@ export class Hud {
   renderSpellbook(): void {
     const el = $('#spellbook');
     const sim = this.sim;
-    el.innerHTML = `<div class="panel-title"><span>Spellbook</span><span class="x-btn" data-close>✕</span></div>`;
+    el.innerHTML = `<div class="panel-title"><span>${t('spellbook.title')}</span><span class="x-btn" data-close>✕</span></div>`;
     const cls = CLASSES[sim.cfg.playerClass];
     for (const abilityId of cls.abilities) {
       const def = ABILITIES[abilityId];
@@ -1756,10 +1823,10 @@ export class Hud {
       row.className = 'spell-row';
       const locked = !known;
       row.innerHTML = `<div class="spell-icon" style="background-image:url(${iconDataUrl('ability', abilityId)});${locked ? 'filter:grayscale(1) brightness(0.5)' : ''}"></div>
-        <div><div class="spell-name" style="${locked ? 'color:#777' : ''}">${def.name}${known && known.rank > 1 ? ` <span style="color:#998d6a;font-size:11px">Rank ${known.rank}</span>` : ''}</div>
-        <div class="spell-sub">${locked ? `Trainable at level ${def.learnLevel}` : describeCost(known!, sim)}</div></div>`;
+        <div><div class="spell-name" style="${locked ? 'color:#777' : ''}">${abilityName(abilityId)}${known && known.rank > 1 ? ` <span style="color:#998d6a;font-size:11px">${t('tt.rank', { n: known.rank })}</span>` : ''}</div>
+        <div class="spell-sub">${locked ? t('spellbook.trainable', { level: def.learnLevel }) : describeCost(known!, sim)}</div></div>`;
       if (known) this.attachTooltip(row, () => this.abilityTooltip(known));
-      else this.attachTooltip(row, () => `<div class="tt-title" style="color:#999">${def.name}</div><div class="tt-sub">You will learn this at level ${def.learnLevel}.</div>`);
+      else this.attachTooltip(row, () => `<div class="tt-title" style="color:#999">${abilityName(abilityId)}</div><div class="tt-sub">${t('spellbook.trainableTip', { level: def.learnLevel })}</div>`);
       el.appendChild(row);
     }
     el.querySelector('[data-close]')?.addEventListener('click', () => { el.style.display = 'none'; this.hideTooltip(); });
@@ -1779,7 +1846,7 @@ export class Hud {
   renderQuestLog(): void {
     const el = $('#quest-log-window');
     const sim = this.sim;
-    el.innerHTML = `<div class="panel-title"><span>Quest Log <span style="color:#998d6a;font-size:11px">${sim.questLog.size} active &middot; ${sim.questsDone.size} completed</span></span><span class="x-btn" data-close>✕</span></div>`;
+    el.innerHTML = `<div class="panel-title"><span>${t('quest.log.title')} <span style="color:#998d6a;font-size:11px">${t('quest.log.summary', { active: sim.questLog.size, done: sim.questsDone.size })}</span></span><span class="x-btn" data-close>✕</span></div>`;
     const cols = document.createElement('div');
     cols.className = 'ql-cols';
     const list = document.createElement('div');
@@ -1791,8 +1858,8 @@ export class Hud {
 
     const quests = [...sim.questLog.values()];
     if (quests.length === 0) {
-      list.innerHTML = '<div style="color:#887c5c;font-size:12px;padding:4px">No active quests.</div>';
-      detail.innerHTML = '<div class="qd-text">Seek out townsfolk marked with <span class="gold">!</span> to find work.</div>';
+      list.innerHTML = `<div style="color:#887c5c;font-size:12px;padding:4px">${t('quest.log.empty')}</div>`;
+      detail.innerHTML = `<div class="qd-text">${t('quest.log.emptyHint')}</div>`;
     }
     if (!this.selectedQuestLogId || !sim.questLog.has(this.selectedQuestLogId)) {
       this.selectedQuestLogId = quests[0]?.questId ?? null;
@@ -1801,23 +1868,24 @@ export class Hud {
       const quest = QUESTS[qp.questId];
       const item = document.createElement('div');
       item.className = 'ql-item' + (qp.questId === this.selectedQuestLogId ? ' sel' : '');
-      item.textContent = `${quest.name}${qp.state === 'ready' ? ' ✓' : ''}`;
+      item.textContent = `${questName(qp.questId)}${qp.state === 'ready' ? ' ✓' : ''}`;
       item.addEventListener('click', () => { this.selectedQuestLogId = qp.questId; this.renderQuestLog(); });
       list.appendChild(item);
     }
     if (this.selectedQuestLogId) {
       const qp = sim.questLog.get(this.selectedQuestLogId)!;
       const quest = QUESTS[this.selectedQuestLogId];
-      let html = `<div class="qd-sub" style="font-size:15px">${quest.name}${quest.suggestedPlayers ? ` <span style="color:#f96;font-size:11px">(Suggested players: ${quest.suggestedPlayers})</span>` : ''}</div>`;
-      html += quest.objectives.map((o, i) => `<div class="qd-obj" style="color:${qp.counts[i] >= o.count ? '#7fdc4f' : '#cfc6a8'}">&bull; ${o.label}: ${qp.counts[i]}/${o.count}</div>`).join('');
-      html += `<div class="qd-text" style="margin-top:8px">${quest.text.replace(/\$N/g, sim.player.name)}</div>`;
-      html += `<div class="qd-sub">Rewards</div><div class="qd-obj">${quest.xpReward} experience &nbsp; ${this.moneyHtml(quest.copperReward)}</div>`;
-      const giver = NPCS[quest.turnInNpcId];
-      html += `<div class="qd-obj" style="margin-top:6px;color:#998d6a">Return to ${giver?.name ?? '?'}</div>`;
+      const qid = this.selectedQuestLogId;
+      const suggested = quest.suggestedPlayers ? ` <span style="color:#f96;font-size:11px">(${t('quest.suggestedPlayers', { n: quest.suggestedPlayers })})</span>` : '';
+      let html = `<div class="qd-sub" style="font-size:15px">${questName(qid)}${suggested}</div>`;
+      html += quest.objectives.map((o, i) => `<div class="qd-obj" style="color:${qp.counts[i] >= o.count ? '#7fdc4f' : '#cfc6a8'}">&bull; ${questObjective(qid, i)}: ${qp.counts[i]}/${o.count}</div>`).join('');
+      html += `<div class="qd-text" style="margin-top:8px">${questText(qid).replace(/\$N/g, sim.player.name)}</div>`;
+      html += `<div class="qd-sub">${t('quest.rewards')}</div><div class="qd-obj">${t('quest.reward.xp', { xp: quest.xpReward })} &nbsp; ${this.moneyHtml(quest.copperReward)}</div>`;
+      html += `<div class="qd-obj" style="margin-top:6px;color:#998d6a">${t('quest.returnTo', { name: npcName(quest.turnInNpcId) })}</div>`;
       detail.innerHTML = html;
       const abandon = document.createElement('button');
       abandon.className = 'btn';
-      abandon.textContent = 'Abandon Quest';
+      abandon.textContent = t('quest.abandon');
       abandon.addEventListener('click', () => { sim.abandonQuest(this.selectedQuestLogId!); this.renderQuestLog(); });
       detail.appendChild(abandon);
     }
@@ -1859,7 +1927,7 @@ export class Hud {
     const leave = document.createElement('button');
     leave.className = 'btn';
     leave.id = 'party-leave';
-    leave.textContent = 'Leave Party';
+    leave.textContent = t('party.leave');
     leave.addEventListener('click', () => this.sim.partyLeave());
     el.appendChild(leave);
   }
@@ -1875,12 +1943,12 @@ export class Hud {
     const isMember = !!party?.members.some((m) => m.pid === pid);
     const ignored = this.isChatIgnored(name);
     let html = `<div class="ctx-title">${name}</div>`;
-    if (!isMember) html += `<div class="ctx-item" data-act="invite">Invite to Party</div>`;
-    html += `<div class="ctx-item" data-act="trade">Trade</div>`;
-    html += `<div class="ctx-item" data-act="duel">Challenge to a Duel</div>`;
-    html += `<div class="ctx-item" data-act="ignore">${ignored ? 'Unignore' : 'Ignore'} Chat</div>`;
-    if (isLeader && isMember && pid !== this.sim.playerId) html += `<div class="ctx-item" data-act="kick">Remove from Party</div>`;
-    html += `<div class="ctx-item" data-act="close">Cancel</div>`;
+    if (!isMember) html += `<div class="ctx-item" data-act="invite">${t('menu.invite')}</div>`;
+    html += `<div class="ctx-item" data-act="trade">${t('menu.trade')}</div>`;
+    html += `<div class="ctx-item" data-act="duel">${t('menu.duel')}</div>`;
+    html += `<div class="ctx-item" data-act="ignore">${ignored ? t('menu.unignore') : t('menu.ignore')}</div>`;
+    if (isLeader && isMember && pid !== this.sim.playerId) html += `<div class="ctx-item" data-act="kick">${t('menu.removeFromParty')}</div>`;
+    html += `<div class="ctx-item" data-act="close">${t('menu.cancel')}</div>`;
     el.innerHTML = html;
     el.style.left = `${Math.min(window.innerWidth - 170, x)}px`;
     el.style.top = `${Math.min(window.innerHeight - 200, y)}px`;
@@ -1925,10 +1993,10 @@ export class Hud {
     if (!key) return;
     if (this.ignoredChatNames.has(key)) {
       this.ignoredChatNames.delete(key);
-      this.log(`No longer ignoring ${name}.`, '#aaf');
+      this.log(t('chat.ignored.off', { name }), '#aaf');
     } else {
       this.ignoredChatNames.add(key);
-      this.log(`Ignoring chat from ${name}.`, '#aaf');
+      this.log(t('chat.ignored.on', { name }), '#aaf');
     }
     this.saveIgnoredChatNames();
   }
@@ -1951,7 +2019,7 @@ export class Hud {
     accept.textContent = acceptLabel;
     const decline = document.createElement('button');
     decline.className = 'btn';
-    decline.textContent = 'Decline';
+    decline.textContent = t('prompt.decline');
     accept.addEventListener('click', () => { prompt.remove(); onAccept(); });
     decline.addEventListener('click', () => { prompt.remove(); onDecline(); });
     prompt.append(accept, decline);
@@ -2007,31 +2075,31 @@ export class Hud {
 
     const itemRow = (s: InvSlot, mine: boolean) => {
       const item = ITEMS[s.itemId];
-      return `<div class="trade-item${mine ? ' mine' : ''}" data-item="${mine ? s.itemId : ''}">${this.itemIcon(item)}<span>${item?.name ?? s.itemId}${s.count > 1 ? ' x' + s.count : ''}</span></div>`;
+      return `<div class="trade-item${mine ? ' mine' : ''}" data-item="${mine ? s.itemId : ''}">${this.itemIcon(item)}<span>${item ? itemName(item.id) : s.itemId}${s.count > 1 ? ' x' + s.count : ''}</span></div>`;
     };
     el.innerHTML = `
-      <div class="panel-title"><span>Trade with ${info.otherName}</span><span class="x-btn" data-close>✕</span></div>
+      <div class="panel-title"><span>${t('trade.with', { name: info.otherName })}</span><span class="x-btn" data-close>✕</span></div>
       <div class="trade-cols">
         <div class="trade-col ${info.myAccepted ? 'accepted' : ''}">
-          <h4>Your offer</h4>
-          <div class="trade-items">${info.myOffer.items.map((s) => itemRow(s, true)).join('') || '<div style="color:#665c40;font-size:11px;padding:4px">Click items in your bags to add them</div>'}</div>
-          <div class="trade-money">Money: <input id="trade-copper" type="number" min="0" value="${this.stagedTrade.copper}" /> copper</div>
+          <h4>${t('trade.yourOffer')}</h4>
+          <div class="trade-items">${info.myOffer.items.map((s) => itemRow(s, true)).join('') || `<div style="color:#665c40;font-size:11px;padding:4px">${t('trade.addHint')}</div>`}</div>
+          <div class="trade-money">${t('trade.moneyLabel')} <input id="trade-copper" type="number" min="0" value="${this.stagedTrade.copper}" /> ${t('trade.copperWord')}</div>
         </div>
         <div class="trade-col ${info.theirAccepted ? 'accepted' : ''}">
-          <h4>${info.otherName}'s offer</h4>
-          <div class="trade-items">${info.theirOffer.items.map((s) => itemRow(s, false)).join('') || '<div style="color:#665c40;font-size:11px;padding:4px">Nothing offered yet</div>'}</div>
-          <div class="trade-money">Money: <span class="gold">${formatMoney(info.theirOffer.copper)}</span></div>
+          <h4>${t('trade.theirOffer', { name: info.otherName })}</h4>
+          <div class="trade-items">${info.theirOffer.items.map((s) => itemRow(s, false)).join('') || `<div style="color:#665c40;font-size:11px;padding:4px">${t('trade.nothingYet')}</div>`}</div>
+          <div class="trade-money">${t('trade.moneyLabel')} <span class="gold">${formatMoney(info.theirOffer.copper)}</span></div>
         </div>
       </div>
-      <div class="trade-hint">Click an offered item to remove it. Both sides must press Accept Trade.</div>`;
+      <div class="trade-hint">${t('trade.hint')}</div>`;
     const acceptBtn = document.createElement('button');
     acceptBtn.className = 'btn';
-    acceptBtn.textContent = info.myAccepted ? 'Waiting…' : 'Accept Trade';
+    acceptBtn.textContent = info.myAccepted ? t('trade.waiting') : t('trade.accept');
     acceptBtn.disabled = info.myAccepted;
     acceptBtn.addEventListener('click', () => this.sim.tradeConfirm());
     const cancelBtn = document.createElement('button');
     cancelBtn.className = 'btn';
-    cancelBtn.textContent = 'Cancel';
+    cancelBtn.textContent = t('trade.cancel');
     cancelBtn.addEventListener('click', () => this.sim.tradeCancel());
     el.append(acceptBtn, cancelBtn);
     el.querySelector('[data-close]')?.addEventListener('click', () => this.sim.tradeCancel());
@@ -2092,7 +2160,7 @@ export class Hud {
     if (this.optionsView === 'graphics') { this.renderGraphics(); return; }
     if (this.optionsView === 'audio') { this.renderAudio(); return; }
     const el = $('#options-menu');
-    el.innerHTML = `<div class="panel-title"><span>Game Menu</span><span class="x-btn" data-close>✕</span></div>`;
+    el.innerHTML = `<div class="panel-title"><span>${t('menu.game.title')}</span><span class="x-btn" data-close>✕</span></div>`;
     const list = document.createElement('div');
     list.className = 'opt-list';
     const add = (text: string, onClick: () => void) => {
@@ -2103,11 +2171,11 @@ export class Hud {
       list.appendChild(b);
     };
     const goto = (view: 'keybinds' | 'graphics' | 'audio') => { this.optionsView = view; this.keybindNote = ''; this.renderOptions(); };
-    add('Key Bindings', () => goto('keybinds'));
-    add('Graphics', () => goto('graphics'));
-    add('Audio', () => goto('audio'));
-    add('Logout', () => this.optionsHooks?.logout());
-    add('Return to Game', () => this.closeOptions());
+    add(t('menu.keyBindings'), () => goto('keybinds'));
+    add(t('menu.graphics'), () => goto('graphics'));
+    add(t('menu.audio'), () => goto('audio'));
+    add(t('menu.logout'), () => this.optionsHooks?.logout());
+    add(t('menu.return'), () => this.closeOptions());
     el.appendChild(list);
     el.querySelector('[data-close]')?.addEventListener('click', () => this.closeOptions());
   }
@@ -2154,7 +2222,7 @@ export class Hud {
     const el = $('#options-menu');
     const reset = document.createElement('button');
     reset.className = 'btn';
-    reset.textContent = 'Reset to Defaults';
+    reset.textContent = t('settings.reset');
     reset.addEventListener('click', () => {
       audio.click();
       this.optionsHooks?.settings.reset();
@@ -2165,36 +2233,36 @@ export class Hud {
     });
     const back = document.createElement('button');
     back.className = 'btn';
-    back.textContent = 'Back';
+    back.textContent = t('settings.back');
     back.addEventListener('click', () => { audio.click(); this.optionsView = 'main'; this.renderOptions(); });
     el.append(reset, back);
     el.querySelector('[data-close]')?.addEventListener('click', () => this.closeOptions());
   }
 
   private renderGraphics(): void {
-    const body = this.settingsViewShell('Graphics');
-    this.settingSlider(body, 'Camera Speed', 'cameraSpeed');
-    this.settingSlider(body, 'Brightness', 'brightness');
-    this.settingSlider(body, 'Render Quality', 'renderScale');
+    const body = this.settingsViewShell(t('menu.graphics'));
+    this.settingSlider(body, t('settings.cameraSpeed'), 'cameraSpeed');
+    this.settingSlider(body, t('settings.brightness'), 'brightness');
+    this.settingSlider(body, t('settings.renderQuality'), 'renderScale');
     const note = document.createElement('div');
     note.className = 'set-note';
-    note.textContent = 'Lower Camera Speed for a calmer mouselook. Render Quality below 100% boosts FPS on weaker machines.';
+    note.textContent = t('settings.graphicsNote');
     $('#options-menu').appendChild(note);
     this.settingsViewFooter();
   }
 
   private renderAudio(): void {
-    const body = this.settingsViewShell('Audio');
-    this.settingSlider(body, 'Sound Effects', 'sfxVolume');
-    this.settingSlider(body, 'Music Volume', 'musicVolume');
+    const body = this.settingsViewShell(t('menu.audio'));
+    this.settingSlider(body, t('settings.sfx'), 'sfxVolume');
+    this.settingSlider(body, t('settings.musicVolume'), 'musicVolume');
     const row = document.createElement('div');
     row.className = 'set-row';
     const name = document.createElement('span');
     name.className = 'set-name';
-    name.textContent = 'Music';
+    name.textContent = t('settings.music');
     const toggle = document.createElement('button');
     toggle.className = 'btn set-toggle';
-    const sync = () => { toggle.textContent = music.enabled ? 'On' : 'Off'; toggle.classList.toggle('off', !music.enabled); };
+    const sync = () => { toggle.textContent = music.enabled ? t('settings.on') : t('settings.off'); toggle.classList.toggle('off', !music.enabled); };
     sync();
     toggle.addEventListener('click', () => { audio.click(); music.setEnabled(!music.enabled); sync(); });
     row.append(name, toggle);
@@ -2205,42 +2273,45 @@ export class Hud {
   // Display name for an action row. Action-bar slots show the ability that
   // currently occupies them (slot 0 is always Attack); everything else uses
   // its registry label.
-  private actionDisplayName(actionId: string, fallback: string): string {
-    if (!actionId.startsWith('slot')) return fallback;
-    const slot = Number(actionId.slice(4));
-    if (slot === 0) return 'Attack';
-    const known = this.abilityForSlot(slot);
-    return known ? known.def.name : fallback;
+  private actionDisplayName(actionId: string): string {
+    if (actionId.startsWith('slot')) {
+      const slot = Number(actionId.slice(4));
+      if (slot === 0) return t('keybind.act.attack');
+      const known = this.abilityForSlot(slot);
+      if (known) return abilityName(known.def.id);
+    }
+    const a = BIND_ACTIONS.find((x) => x.id === actionId);
+    return a ? bindActionLabel(a) : actionId;
   }
 
   private renderKeybinds(): void {
     const el = $('#options-menu');
-    el.innerHTML = `<div class="panel-title"><span>Key Bindings</span><span class="x-btn" data-close>✕</span></div>`;
+    el.innerHTML = `<div class="panel-title"><span>${t('keybinds.title')}</span><span class="x-btn" data-close>✕</span></div>`;
     const note = document.createElement('div');
     note.className = 'kb-note';
-    note.textContent = this.keybindNote || 'Click a key cell, then press a key to bind it. Esc cancels. Each action has a primary and an alternate key.';
+    note.textContent = this.keybindNote || t('keybinds.instructions');
     el.appendChild(note);
     const rows = document.createElement('div');
     rows.className = 'kb-rows';
     for (const category of BIND_CATEGORIES) {
       const header = document.createElement('div');
       header.className = 'kb-cat';
-      header.textContent = category;
+      header.textContent = t(`keybind.cat.${category}`);
       rows.appendChild(header);
       for (const action of BIND_ACTIONS.filter((a) => a.category === category)) {
         const row = document.createElement('div');
         row.className = 'kb-row';
         const name = document.createElement('span');
         name.className = 'kb-name';
-        name.textContent = this.actionDisplayName(action.id, action.label);
+        name.textContent = this.actionDisplayName(action.id);
         row.appendChild(name);
         for (let index = 0; index < 2; index++) {
           const capturing = this.capturingKey?.action === action.id && this.capturingKey?.index === index;
           const key = document.createElement('button');
           key.className = 'btn kb-key' + (capturing ? ' capturing' : '');
           key.textContent = capturing ? '…' : (this.keybinds.labelAt(action.id, index) || '—');
-          key.title = index === 0 ? 'Primary' : 'Alternate';
-          key.addEventListener('click', () => this.beginCapture(action.id, index, action.label));
+          key.title = index === 0 ? t('keybinds.primary') : t('keybinds.alternate');
+          key.addEventListener('click', () => this.beginCapture(action.id, index));
           row.appendChild(key);
         }
         rows.appendChild(row);
@@ -2249,37 +2320,37 @@ export class Hud {
     el.appendChild(rows);
     const reset = document.createElement('button');
     reset.className = 'btn';
-    reset.textContent = 'Reset to Defaults';
+    reset.textContent = t('settings.reset');
     reset.addEventListener('click', () => {
       audio.click();
       this.keybinds.reset();
       this.capturingKey = null;
-      this.keybindNote = 'Bindings reset to defaults.';
+      this.keybindNote = t('keybinds.reset');
       this.refreshKeybindLabels();
       this.renderKeybinds();
     });
     const back = document.createElement('button');
     back.className = 'btn';
-    back.textContent = 'Back';
+    back.textContent = t('settings.back');
     back.addEventListener('click', () => { audio.click(); this.optionsView = 'main'; this.capturingKey = null; this.renderOptions(); });
     el.append(reset, back);
     el.querySelector('[data-close]')?.addEventListener('click', () => this.closeOptions());
   }
 
-  private beginCapture(actionId: string, index: number, fallbackLabel: string): void {
+  private beginCapture(actionId: string, index: number): void {
     if (!this.optionsHooks) return;
-    const name = this.actionDisplayName(actionId, fallbackLabel);
+    const name = this.actionDisplayName(actionId);
     this.capturingKey = { action: actionId, index };
-    this.keybindNote = `Press a key for "${name}"…`;
+    this.keybindNote = t('keybinds.capture', { name });
     this.renderKeybinds();
     this.optionsHooks.captureKey((code) => {
       this.capturingKey = null;
       if (code === null) {
-        this.keybindNote = 'Rebinding cancelled.';
+        this.keybindNote = t('keybinds.cancelled');
       } else if (isReservedCode(code)) {
-        this.keybindNote = `${keyLabel(code)} is reserved and can't be bound.`;
+        this.keybindNote = t('keybinds.reserved', { key: keyLabel(code) });
       } else if (this.keybinds.bind(actionId, index, code)) {
-        this.keybindNote = `Bound "${name}" to ${keyLabel(code)}.`;
+        this.keybindNote = t('keybinds.bound', { name, key: keyLabel(code) });
         this.refreshKeybindLabels();
       }
       // re-render only if the menu is still open (player may have closed it)
@@ -2316,11 +2387,11 @@ export class Hud {
 }
 
 function describeCost(known: ResolvedAbility, sim: IWorld): string {
-  const resName = sim.player.resourceType === 'rage' ? 'Rage' : sim.player.resourceType === 'energy' ? 'Energy' : 'Mana';
+  const resName = sim.player.resourceType === 'rage' ? t('res.rage') : sim.player.resourceType === 'energy' ? t('res.energy') : t('res.mana');
   const parts: string[] = [];
-  if (known.cost > 0) parts.push(`${known.cost} ${resName}`);
-  parts.push(known.def.channel ? 'Channeled' : known.castTime > 0 ? `${known.castTime}s cast` : 'Instant');
-  if (known.def.cooldown > 0) parts.push(`${known.def.cooldown}s cooldown`);
+  if (known.cost > 0) parts.push(t('tt.cost', { cost: known.cost, res: resName }));
+  parts.push(known.def.channel ? t('spell.channeled') : known.castTime > 0 ? t('spell.castS', { s: known.castTime }) : t('tt.instant'));
+  if (known.def.cooldown > 0) parts.push(t('spell.cooldownS', { s: known.def.cooldown }));
   return parts.join(' · ');
 }
 

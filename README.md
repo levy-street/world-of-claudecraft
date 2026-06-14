@@ -151,6 +151,25 @@ Gravewyrm** beneath the peaks. Each hub has vendors (including weapon- and
 armorsmiths selling honest white gear), a graveyard, its own music, and a
 zone map.
 
+## Languages — English / 中文
+
+The client ships **English and Simplified Chinese (中文)**. Pick a language with
+the **English / 中文** buttons on the title screen, or in-game from
+**Esc → (language)**; the choice persists in `localStorage` and auto-detects
+from the browser on first run. Everything a player reads is localized — UI
+chrome, every class/ability/item/NPC/mob name, all quest prose and objectives,
+zone and dungeon names, the combat log, and on-screen errors — and **player
+characters may be named in Chinese** (or Latin). CJK glyphs render via a
+system-font fallback chain, so no web font is downloaded.
+
+i18n lives entirely in the **presentation layer** (`src/i18n/`): the
+deterministic simulation core (`src/sim/`) stays canonical English, so the
+authoritative server, the headless RL environment, and the tests are
+unaffected. Translations overlay by stable content id and fall back to English
+when absent, so a missing string is never fatal. Adding another language is a
+matter of one UI dictionary (`src/i18n/ui/`) and one content overlay
+(`src/i18n/content/`).
+
 ### Controls (classic layout)
 
 | Input | Action |
