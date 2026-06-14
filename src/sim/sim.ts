@@ -199,6 +199,9 @@ export interface PlayerMeta {
   arenaRating: number;
   arenaWins: number;
   arenaLosses: number;
+  // Session-only: name of the last player who whispered us, for "/r" replies.
+  // Never persisted — a fresh login starts with no reply target.
+  lastWhisperFrom?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -3496,8 +3499,19 @@ export class Sim {
       return null;
     }
 
+    // "/r message" — reply to the last player who whispered us. Rewrite it to
+    // the "/w <name> message" form so delivery, the echo, and case-matching
+    // all stay in the single whisper handler below.
+    const rm = /^\/r(?:eply)?\s+([\s\S]+)$/i.exec(raw);
+    let line = raw;
+    if (rm) {
+      const replyTo = r.meta.lastWhisperFrom;
+      if (!replyTo) { this.error(r.meta.entityId, 'You have no one to reply to.'); return null; }
+      line = `/w ${replyTo} ${rm[1]}`;
+    }
+
     // "/w name message" — private whisper to an online player
-    const wm = /^\/(?:w|whisper|t|tell)\s+(\S+)\s+([\s\S]+)$/i.exec(raw);
+    const wm = /^\/(?:w|whisper|t|tell)\s+(\S+)\s+([\s\S]+)$/i.exec(line);
     if (wm) {
       const targetName = wm[1];
       const msg = wm[2].trim();
@@ -3518,10 +3532,14 @@ export class Sim {
       }
       if (!target) { this.error(r.meta.entityId, `There is no player named '${targetName}' online.`); return null; }
       if (target.entityId === r.meta.entityId) { this.error(r.meta.entityId, 'You mutter to yourself. Nobody hears it.'); return null; }
+      // classic-WoW "/r": the recipient's reply target is whoever last
+      // whispered them, so record it on the target (not the sender).
+      target.lastWhisperFrom = r.meta.name;
       this.emit({ type: 'chat', fromPid: r.meta.entityId, from: r.meta.name, text: msg, channel: 'whisper', pid: target.entityId });
       this.emit({ type: 'chat', fromPid: r.meta.entityId, from: r.meta.name, to: target.name, text: msg, channel: 'whisper', pid: r.meta.entityId });
       return { channel: 'whisper', message: msg };
     }
+
 
     // "/p message" goes to the party channel
     if (/^\/p(arty)?\s/i.test(raw)) {
@@ -3549,7 +3567,7 @@ export class Sim {
     let clean = raw;
     if (/^\/y(ell)?\s/i.test(raw)) { channel = 'yell'; clean = raw.replace(/^\/y(ell)?\s+/i, '').trim(); }
     else if (/^\/s(ay)?\s/i.test(raw)) { clean = raw.replace(/^\/s(ay)?\s+/i, '').trim(); }
-    else if (raw.startsWith('/')) { this.error(r.meta.entityId, `Unknown command: ${raw.split(' ')[0]}. Try /s /y /w /p /g.`); return null; }
+    else if (raw.startsWith('/')) { this.error(r.meta.entityId, `Unknown command: ${raw.split(' ')[0]}. Try /s /y /w /r /p /g.`); return null; }
     if (!clean) return null;
     const range = channel === 'yell' ? YELL_RANGE : SAY_RANGE;
     for (const meta of this.players.values()) {

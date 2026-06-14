@@ -80,6 +80,71 @@ describe('chat channels', () => {
     expect(msgs.some((m) => m.pid === c)).toBe(false);
   });
 
+  it('/r replies to the last player who whispered you', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('mage', 'Bet');
+    teleport(sim, b, 0, -900); // reply ignores distance, like whisper
+    sim.tick();
+
+    sim.chat('/w bet psst, secret', a);
+    sim.tick();
+    // Bet replies without naming Aleph
+    sim.chat('/r got it', b);
+    const msgs = chatEvents(sim.tick());
+    expect(msgs).toHaveLength(2);
+    const toTarget = msgs.find((m) => m.pid === a)!;
+    expect(toTarget.channel).toBe('whisper');
+    expect(toTarget.from).toBe('Bet');
+    expect(toTarget.text).toBe('got it');
+    const echo = msgs.find((m) => m.pid === b)!;
+    expect(echo.to).toBe('Aleph');
+  });
+
+  it('/r with no prior whisper errors instead of saying it out loud', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    sim.tick();
+    sim.chat('/r hello?', a);
+    const events = sim.tick();
+    expect(chatEvents(events)).toHaveLength(0);
+    expect(events.some((e) => e.type === 'error')).toBe(true);
+  });
+
+  it('/r reply target follows the most recent incoming whisper', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('mage', 'Bet');
+    const c = sim.addPlayer('rogue', 'Gimel');
+    sim.tick();
+
+    sim.chat('/w aleph first', b); // Bet -> Aleph
+    sim.tick();
+    sim.chat('/w aleph second', c); // Gimel -> Aleph (now the reply target)
+    sim.tick();
+    sim.chat('/r back to you', a);
+    const msgs = chatEvents(sim.tick());
+    const toTarget = msgs.find((m) => m.channel === 'whisper' && m.to === undefined)!;
+    expect(toTarget.pid).toBe(c);
+  });
+
+  it('sending a whisper does not change your own /r target', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('mage', 'Bet');
+    sim.addPlayer('rogue', 'Gimel');
+    sim.tick();
+
+    sim.chat('/w aleph incoming', b); // Bet whispers Aleph -> Aleph's reply target is Bet
+    sim.tick();
+    sim.chat('/w gimel outgoing', a); // Aleph whispers Gimel; reply target stays Bet
+    sim.tick();
+    sim.chat('/r still bet', a);
+    const msgs = chatEvents(sim.tick());
+    const toTarget = msgs.find((m) => m.channel === 'whisper' && m.to === undefined)!;
+    expect(toTarget.pid).toBe(b);
+  });
+
   it('whisper to an unknown player errors instead of leaking text', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');
