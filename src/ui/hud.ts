@@ -2692,6 +2692,7 @@ export class Hud {
     this.keybindNote = '';
     this.renderOptions();
     $('#options-menu').style.display = 'block';
+    music.pauseForMenu();
     audio.click();
   }
 
@@ -2699,6 +2700,7 @@ export class Hud {
     $('#options-menu').style.display = 'none';
     this.capturingKey = null;
     this.hideTooltip();
+    music.resumeFromMenu();
   }
 
   private renderOptions(): void {
