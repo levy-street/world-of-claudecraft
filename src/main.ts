@@ -1566,62 +1566,75 @@ async function loadProjectStats(): Promise<void> {
 // ---------------------------------------------------------------------------
 
 let leaderboardLoading = false;
+let leaderboardReloadPending = false;
 
 async function loadLeaderboard(): Promise<void> {
   const statusEl = $('#leaderboard-status');
-  const tableEl = $('#leaderboard-table') as HTMLElement | null;
+  const tableEl = $('#leaderboard-table');
   const bodyEl = $('#leaderboard-body');
   const filterEl = $('#leaderboard-class-filter') as HTMLSelectElement | null;
   if (!statusEl || !tableEl || !bodyEl) return;
-  if (leaderboardLoading) return;
+  // If a request is already in flight, mark that the inputs changed and let the
+  // running call re-fetch with the latest filter when it finishes. This keeps
+  // the table from showing stale results for a filter the user already left.
+  if (leaderboardLoading) { leaderboardReloadPending = true; return; }
   leaderboardLoading = true;
 
-  const selected = filterEl?.value || '';
-  const cls = selected ? (selected as PlayerClass) : undefined;
-
-  statusEl.textContent = t('highscores.loading');
-  statusEl.toggleAttribute('hidden', false);
-  tableEl.toggleAttribute('hidden', true);
-
   try {
-    const { leaders } = await api.leaderboard(cls);
-    bodyEl.innerHTML = '';
-    if (!leaders.length) {
-      statusEl.textContent = t('highscores.empty');
+    do {
+      leaderboardReloadPending = false;
+      const selected = filterEl?.value || '';
+      const cls = selected ? (selected as PlayerClass) : undefined;
+
+      statusEl.textContent = t('highscores.loading');
       statusEl.toggleAttribute('hidden', false);
       tableEl.toggleAttribute('hidden', true);
-      return;
-    }
-    leaders.forEach((row, i) => {
-      const tr = document.createElement('tr');
-      tr.className = 'lb-row';
 
-      const rankTd = document.createElement('td');
-      rankTd.className = 'lb-col-rank';
-      rankTd.textContent = String(i + 1);
+      try {
+        const { leaders } = await api.leaderboard(cls);
+        // A newer filter arrived while this request was in flight — discard
+        // these results and loop to fetch the current selection instead.
+        if (leaderboardReloadPending) continue;
+        bodyEl.innerHTML = '';
+        if (!leaders.length) {
+          statusEl.textContent = t('highscores.empty');
+          statusEl.toggleAttribute('hidden', false);
+          tableEl.toggleAttribute('hidden', true);
+          continue;
+        }
+        leaders.forEach((row, i) => {
+          const tr = document.createElement('tr');
+          tr.className = 'lb-row';
 
-      const nameTd = document.createElement('td');
-      nameTd.className = 'lb-col-name';
-      nameTd.textContent = row.name; // player-controlled — keep as text only
+          const rankTd = document.createElement('td');
+          rankTd.className = 'lb-col-rank';
+          rankTd.textContent = String(i + 1);
 
-      const classTd = document.createElement('td');
-      classTd.className = `lb-col-class class-${row.class}`;
-      classTd.textContent = CLASSES[row.class]?.name ?? row.class;
+          const nameTd = document.createElement('td');
+          nameTd.className = 'lb-col-name';
+          nameTd.textContent = row.name; // player-controlled — keep as text only
 
-      const levelTd = document.createElement('td');
-      levelTd.className = 'lb-col-level';
-      levelTd.textContent = String(row.level);
+          const classTd = document.createElement('td');
+          classTd.className = `lb-col-class class-${row.class}`;
+          classTd.textContent = t(`classes.${row.class}` as Parameters<typeof t>[0]);
 
-      tr.append(rankTd, nameTd, classTd, levelTd);
-      bodyEl.appendChild(tr);
-    });
-    statusEl.toggleAttribute('hidden', true);
-    tableEl.toggleAttribute('hidden', false);
-  } catch (err) {
-    console.error('Failed to fetch leaderboard:', err);
-    statusEl.textContent = t('highscores.error');
-    statusEl.toggleAttribute('hidden', false);
-    tableEl.toggleAttribute('hidden', true);
+          const levelTd = document.createElement('td');
+          levelTd.className = 'lb-col-level';
+          levelTd.textContent = String(row.level);
+
+          tr.append(rankTd, nameTd, classTd, levelTd);
+          bodyEl.appendChild(tr);
+        });
+        statusEl.toggleAttribute('hidden', true);
+        tableEl.toggleAttribute('hidden', false);
+      } catch (err) {
+        console.error('Failed to fetch leaderboard:', err);
+        if (leaderboardReloadPending) continue;
+        statusEl.textContent = t('highscores.error');
+        statusEl.toggleAttribute('hidden', false);
+        tableEl.toggleAttribute('hidden', true);
+      }
+    } while (leaderboardReloadPending);
   } finally {
     leaderboardLoading = false;
   }
