@@ -1129,6 +1129,109 @@
     margin-top: var(--spacing-xs);
   }
 
+  /* High Scores leaderboard view */
+  .leaderboard-panel {
+    max-width: 680px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg) var(--spacing-lg);
+  }
+
+  .leaderboard-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+  }
+
+  .leaderboard-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-xs);
+  }
+
+  .leaderboard-filter-label {
+    font-family: var(--font-sans);
+    color: var(--color-text-light);
+    font-size: 12.5px;
+    text-shadow: 1px 1px 2px #000;
+  }
+
+  .leaderboard-class-filter {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-light);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    padding: 5px var(--spacing-sm);
+  }
+
+  .leaderboard-status {
+    font-family: var(--font-sans);
+    color: var(--color-text-light);
+    font-size: 13.5px;
+    line-height: 1.6;
+    text-shadow: 1px 1px 2px #000;
+    padding: var(--spacing-md) 0;
+  }
+
+  .leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-sans);
+    color: var(--color-text-light);
+    text-align: left;
+  }
+
+  .leaderboard-table th {
+    font-family: var(--font-heading);
+    color: var(--color-primary);
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 8px var(--spacing-sm);
+    border-bottom: 2px solid var(--color-border-default);
+    text-shadow: 1px 1px 2px #000;
+  }
+
+  .leaderboard-table td {
+    font-size: 14px;
+    padding: 7px var(--spacing-sm);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+    text-shadow: 1px 1px 2px #000;
+  }
+
+  .leaderboard-table tbody tr:nth-child(odd) {
+    background: rgba(0, 0, 0, 0.25);
+  }
+
+  .leaderboard-table .lb-col-rank {
+    width: 56px;
+    color: var(--color-primary-dim);
+    font-family: var(--font-heading);
+    text-align: center;
+  }
+
+  .leaderboard-table .lb-col-name {
+    font-weight: 600;
+  }
+
+  .leaderboard-table .lb-col-level {
+    width: 80px;
+    text-align: center;
+  }
+
+  .leaderboard-table tbody tr:nth-child(1) .lb-col-rank,
+  .leaderboard-table tbody tr:nth-child(2) .lb-col-rank,
+  .leaderboard-table tbody tr:nth-child(3) .lb-col-rank {
+    color: var(--color-primary);
+    font-size: 16px;
+  }
+
   /* Wiki view with integrated Controls Guide */
   .wiki-container-layout {
     max-width: 800px;
@@ -3642,15 +3745,43 @@
       </section>
 
       <section id="highscores-view" class="view-section" hidden aria-hidden="true">
-        <div class="parchment-panel skeleton-panel">
-          <div class="skeleton-icon-wrapper">
-            <svg viewBox="0 0 24 24" class="skeleton-svg-icon" aria-hidden="true">
-              <path fill="currentColor" d="M12 2C11.5 2 6 4 6 4V10C6 14.41 9.59 18 12 18.5C14.41 18 18 14.41 18 10V4C18 4 12.5 2 12 2M12 16.5C10.32 15.5 8 12.78 8 10V5.37L12 3.91L16 5.37V10C16 12.78 13.68 15.5 12 16.5Z"/>
-            </svg>
+        <div class="parchment-panel leaderboard-panel">
+          <div class="leaderboard-header">
+            <div class="skeleton-icon-wrapper">
+              <svg viewBox="0 0 24 24" class="skeleton-svg-icon" aria-hidden="true">
+                <path fill="currentColor" d="M12 2C11.5 2 6 4 6 4V10C6 14.41 9.59 18 12 18.5C14.41 18 18 14.41 18 10V4C18 4 12.5 2 12 2M12 16.5C10.32 15.5 8 12.78 8 10V5.37L12 3.91L16 5.37V10C16 12.78 13.68 15.5 12 16.5Z"/>
+              </svg>
+            </div>
+            <h2 class="skeleton-title" data-i18n="highscores.title">High Scores Leaderboard</h2>
+            <p class="skeleton-desc" data-i18n="highscores.desc">Track the realm's greatest champions and compare your progress.</p>
           </div>
-          <h2 class="skeleton-title" data-i18n="highscores.title">High Scores Leaderboard</h2>
-          <p class="skeleton-desc" data-i18n="highscores.desc">Track the realm's greatest champions and compare your progress.</p>
-          <div class="coming-soon-badge" data-i18n="comingSoon.placeholder">Coming Soon...</div>
+          <div class="leaderboard-controls">
+            <label class="leaderboard-filter-label" for="leaderboard-class-filter" data-i18n="highscores.filterByClass">Filter by class</label>
+            <select id="leaderboard-class-filter" class="leaderboard-class-filter">
+              <option value="" data-i18n="highscores.allClasses">All Classes</option>
+              <option value="warrior">Warrior</option>
+              <option value="paladin">Paladin</option>
+              <option value="hunter">Hunter</option>
+              <option value="rogue">Rogue</option>
+              <option value="priest">Priest</option>
+              <option value="shaman">Shaman</option>
+              <option value="mage">Mage</option>
+              <option value="warlock">Warlock</option>
+              <option value="druid">Druid</option>
+            </select>
+          </div>
+          <div id="leaderboard-status" class="leaderboard-status" data-i18n="highscores.loading">Loading rankings…</div>
+          <table id="leaderboard-table" class="leaderboard-table" hidden>
+            <thead>
+              <tr>
+                <th class="lb-col-rank" data-i18n="highscores.colRank">Rank</th>
+                <th class="lb-col-name" data-i18n="highscores.colName">Champion</th>
+                <th class="lb-col-class" data-i18n="highscores.colClass">Class</th>
+                <th class="lb-col-level" data-i18n="highscores.colLevel">Level</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-body"></tbody>
+          </table>
         </div>
       </section>
 

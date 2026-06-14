@@ -6,8 +6,9 @@ import {
   ensureSchema, pool, createAccount, findAccount, getAccountsCount, touchLogin, saveToken, accountForToken,
   listCharacters, getCharacter, createCharacter, deleteCharacter, closeOrphanSessions,
   pruneChatLogs, searchCharacters, characterCountsByRealm, moderationStatusForAccount, renameCharacter,
-  findCharacterReportTargetByName, topArenaRatings,
+  findCharacterReportTargetByName, topArenaRatings, topCharacters,
 } from './db';
+import { ALL_CLASSES, type PlayerClass } from '../src/sim/types';
 import { cleanReportReason, createPlayerReport } from './moderation_db';
 import { resolveReportTarget } from './report_target';
 import {
@@ -314,6 +315,16 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     if (req.method === 'GET' && url === '/api/arena/leaderboard') {
       // public all-time Ashen Coliseum ladder (top rated characters)
       return json(res, 200, { leaders: await topArenaRatings(20) });
+    }
+    if (req.method === 'GET' && url === '/api/leaderboard') {
+      // public realm high-scores board: top characters by level (xp breaks
+      // ties), optionally filtered to one class via ?class=mage. Unknown class
+      // values are ignored by topCharacters and fall back to the full board.
+      const classParam = new URL(req.url ?? '/', 'http://localhost').searchParams.get('class') ?? undefined;
+      const cls = classParam && ALL_CLASSES.includes(classParam as PlayerClass)
+        ? (classParam as PlayerClass)
+        : undefined;
+      return json(res, 200, { leaders: await topCharacters(20, cls), class: cls ?? null });
     }
     json(res, 404, { error: 'unknown endpoint' });
   } catch (err: any) {

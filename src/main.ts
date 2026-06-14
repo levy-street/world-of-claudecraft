@@ -1557,6 +1557,76 @@ async function loadProjectStats(): Promise<void> {
   }
 }
 
+// ---------------------------------------------------------------------------
+// High Scores leaderboard (homepage view). Fetches the realm's top characters
+// by level from /api/leaderboard and renders them into the #highscores-view
+// table. Player names are written via textContent (never innerHTML) so a
+// crafted character name can't inject markup. Offline / no-server falls back to
+// a friendly status message — the leaderboard is an online feature.
+// ---------------------------------------------------------------------------
+
+let leaderboardLoading = false;
+
+async function loadLeaderboard(): Promise<void> {
+  const statusEl = $('#leaderboard-status');
+  const tableEl = $('#leaderboard-table') as HTMLElement | null;
+  const bodyEl = $('#leaderboard-body');
+  const filterEl = $('#leaderboard-class-filter') as HTMLSelectElement | null;
+  if (!statusEl || !tableEl || !bodyEl) return;
+  if (leaderboardLoading) return;
+  leaderboardLoading = true;
+
+  const selected = filterEl?.value || '';
+  const cls = selected ? (selected as PlayerClass) : undefined;
+
+  statusEl.textContent = t('highscores.loading');
+  statusEl.toggleAttribute('hidden', false);
+  tableEl.toggleAttribute('hidden', true);
+
+  try {
+    const { leaders } = await api.leaderboard(cls);
+    bodyEl.innerHTML = '';
+    if (!leaders.length) {
+      statusEl.textContent = t('highscores.empty');
+      statusEl.toggleAttribute('hidden', false);
+      tableEl.toggleAttribute('hidden', true);
+      return;
+    }
+    leaders.forEach((row, i) => {
+      const tr = document.createElement('tr');
+      tr.className = 'lb-row';
+
+      const rankTd = document.createElement('td');
+      rankTd.className = 'lb-col-rank';
+      rankTd.textContent = String(i + 1);
+
+      const nameTd = document.createElement('td');
+      nameTd.className = 'lb-col-name';
+      nameTd.textContent = row.name; // player-controlled — keep as text only
+
+      const classTd = document.createElement('td');
+      classTd.className = `lb-col-class class-${row.class}`;
+      classTd.textContent = CLASSES[row.class]?.name ?? row.class;
+
+      const levelTd = document.createElement('td');
+      levelTd.className = 'lb-col-level';
+      levelTd.textContent = String(row.level);
+
+      tr.append(rankTd, nameTd, classTd, levelTd);
+      bodyEl.appendChild(tr);
+    });
+    statusEl.toggleAttribute('hidden', true);
+    tableEl.toggleAttribute('hidden', false);
+  } catch (err) {
+    console.error('Failed to fetch leaderboard:', err);
+    statusEl.textContent = t('highscores.error');
+    statusEl.toggleAttribute('hidden', false);
+    tableEl.toggleAttribute('hidden', true);
+  } finally {
+    leaderboardLoading = false;
+  }
+}
+
 function wireStartScreens(): void {
   // Initial page translation and stats load
   translatePage();
@@ -2095,7 +2165,12 @@ function wireStartScreens(): void {
     show('#mode-select');
   });
 
-  setupNavBtn(navBtnHighscores, '#highscores-view');
+  setupNavBtn(navBtnHighscores, '#highscores-view', () => {
+    switchMainView('#highscores-view');
+    void loadLeaderboard();
+  });
+  const leaderboardFilter = $('#leaderboard-class-filter') as HTMLSelectElement | null;
+  leaderboardFilter?.addEventListener('change', () => { void loadLeaderboard(); });
   setupNavBtn(navBtnWiki, '#wiki-view');
   setupNavBtn(navBtnNews, '#news-view');
   setupNavBtn(navBtnDownload, '#download-view');

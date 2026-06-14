@@ -160,6 +160,18 @@ export class Api {
   async projectStats(): Promise<{ accounts_created: number; players_online: number; realm: string }> {
     return this.get('/api/project-stats');
   }
+
+  async leaderboard(cls?: PlayerClass): Promise<{ leaders: LeaderEntry[]; class: PlayerClass | null }> {
+    const query = cls ? `?class=${encodeURIComponent(cls)}` : '';
+    return this.get(`/api/leaderboard${query}`);
+  }
+}
+
+export interface LeaderEntry {
+  name: string;
+  class: PlayerClass;
+  level: number;
+  xp: number;
 }
 
 // ---------------------------------------------------------------------------

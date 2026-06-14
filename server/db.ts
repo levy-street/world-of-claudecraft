@@ -1,6 +1,7 @@
 import { Pool } from 'pg';
 import type { CharacterState, MarketSave } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
+import { ALL_CLASSES } from '../src/sim/types';
 import type { ChatLogRow } from './chat_log';
 import { SOCIAL_SCHEMA } from './social_db';
 import { REALM } from './realm';
@@ -356,6 +357,45 @@ export async function topArenaRatings(limit = 20): Promise<ArenaLeaderRow[]> {
   return res.rows.map((r) => ({
     name: r.name, class: r.class, level: r.level,
     rating: Number(r.rating), wins: Number(r.wins), losses: Number(r.losses),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Player leaderboard: the realm's high-scores board. Ranks characters by
+// level (xp breaks ties), optionally filtered to one class. Reads straight
+// from the `characters` table — `level` is a real column and `xp` lives in the
+// state JSONB, so no schema migration is needed. Mirrors topArenaRatings'
+// realm-scoping + limit-clamping discipline.
+// ---------------------------------------------------------------------------
+
+export interface LeaderRow {
+  name: string;
+  class: PlayerClass;
+  level: number;
+  xp: number;
+}
+
+export async function topCharacters(limit = 20, cls?: PlayerClass): Promise<LeaderRow[]> {
+  const params: unknown[] = [REALM];
+  let classPredicate = '';
+  if (cls && ALL_CLASSES.includes(cls)) {
+    params.push(cls);
+    classPredicate = `AND class = $${params.length}`;
+  }
+  params.push(Math.max(1, Math.min(100, limit)));
+  const limitParam = `$${params.length}`;
+  const res = await pool.query(
+    `SELECT name, class, level,
+            COALESCE((state->>'xp')::int, 0) AS xp
+       FROM characters
+      WHERE realm = $1
+        ${classPredicate}
+      ORDER BY level DESC, xp DESC, name ASC
+      LIMIT ${limitParam}`,
+    params,
+  );
+  return res.rows.map((r) => ({
+    name: r.name, class: r.class, level: r.level, xp: Number(r.xp),
   }));
 }
 
