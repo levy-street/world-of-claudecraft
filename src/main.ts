@@ -406,6 +406,7 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
       case 'brightness': renderer.setBrightness(v); break;
       case 'renderScale': renderer.setRenderScale(v); break;
       case 'fullscreen': v >= 0.5 ? requestPreferredFullscreen() : exitBrowserFullscreen(); break;
+      case 'showPresenceNotices': break;
     }
   }
   // apply persisted settings to the freshly-built subsystems

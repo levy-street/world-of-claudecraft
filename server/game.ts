@@ -429,7 +429,7 @@ export class GameServer {
       cls,
       realm: REALM,
     });
-    this.broadcastSystem(`${name} has entered World of Claudecraft.`);
+    this.broadcastSystem(`${name} has entered World of Claudecraft.`, 'presence');
     void this.initSocial(session);
     return session;
   }
@@ -460,7 +460,7 @@ export class GameServer {
     }
     await this.saveCharacter(session).catch((err) => console.error('save on leave failed:', err));
     this.sim.removePlayer(session.pid);
-    this.broadcastSystem(`${session.name} has left the world. (${reason})`);
+    this.broadcastSystem(`${session.name} has left the world. (${reason})`, 'presence');
   }
 
   async saveCharacter(session: ClientSession): Promise<void> {
@@ -1063,9 +1063,9 @@ export class GameServer {
     return false;
   }
 
-  private broadcastSystem(text: string): void {
+  private broadcastSystem(text: string, kind?: Extract<SimEvent, { type: 'log' }>['kind']): void {
     for (const session of this.clients.values()) {
-      this.send(session, { t: 'events', list: [{ type: 'log', text, color: '#ffd100' }] });
+      this.send(session, { t: 'events', list: [{ type: 'log', text, color: '#ffd100', kind }] });
     }
   }
 
