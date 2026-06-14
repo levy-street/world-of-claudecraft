@@ -1,9 +1,9 @@
 // Online play: REST auth client + WebSocket world mirror.
 
-import { NPCS, abilitiesKnownAt } from '../sim/data';
+import { ITEMS, NPCS, abilitiesKnownAt } from '../sim/data';
 import { computeQuestState, ResolvedAbility } from '../sim/sim';
 import {
-  Entity, EquipSlot, InvSlot, MoveInput, PlayerClass, QuestProgress, QuestState, SimEvent,
+  CONSUME_DURATION, CONSUME_TICKS, Entity, EquipSlot, InvSlot, MoveInput, PlayerClass, QuestProgress, QuestState, SimEvent,
   emptyMoveInput,
 } from '../sim/types';
 import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
@@ -325,9 +325,10 @@ export class ClientWorld implements IWorld {
     return this.connected && this.ws.readyState === WebSocket.OPEN;
   }
 
-  private cmd(payload: Record<string, unknown>): void {
-    if (!this.canSendCommand()) return;
+  private cmd(payload: Record<string, unknown>): boolean {
+    if (!this.canSendCommand()) return false;
     this.ws.send(JSON.stringify({ t: 'cmd', ...payload }));
+    return true;
   }
 
   private onMessage(raw: string): void {
@@ -465,6 +466,7 @@ export class ClientWorld implements IWorld {
       e.hp = w.hp;
       e.maxHp = w.mhp;
       e.dead = !!w.dead;
+      e.inCombat = !!w.cbt;
       e.lootable = !!w.loot;
       e.hostile = !!w.h;
       e.castingAbility = w.cast ?? null;
@@ -570,6 +572,33 @@ export class ClientWorld implements IWorld {
     return v;
   }
 
+  private predictConsumeItem(itemId: string): void {
+    const item = ITEMS[itemId];
+    if (!item || (item.kind !== 'food' && item.kind !== 'drink')) return;
+    const p = this.entities.get(this.playerId);
+    if (!p || p.dead || p.inCombat) return;
+    const idx = this.inventory.findIndex((slot) => slot.itemId === itemId && slot.count > 0);
+    if (idx < 0) return;
+
+    const nextInventory = this.inventory.map((slot) => ({ ...slot }));
+    const slot = nextInventory[idx];
+    slot.count -= 1;
+    if (slot.count <= 0) nextInventory.splice(idx, 1);
+    this.inventory = nextInventory;
+    this.invChanged = true;
+
+    p.sitting = true;
+    const consume = {
+      itemId,
+      kind: item.kind,
+      hpPer2s: item.foodHp ? Math.round(item.foodHp / CONSUME_TICKS) : 0,
+      manaPer2s: item.drinkMana ? Math.round(item.drinkMana / CONSUME_TICKS) : 0,
+      remaining: CONSUME_DURATION,
+    };
+    if (item.kind === 'food') p.eating = consume;
+    else p.drinking = consume;
+  }
+
   castAbility(abilityId: string): void {
     this.cmd({ cmd: 'cast', ability: abilityId });
   }
@@ -623,7 +652,8 @@ export class ClientWorld implements IWorld {
     this.cmd({ cmd: 'equip', item: itemId });
   }
   useItem(itemId: string): void {
-    this.cmd({ cmd: 'use', item: itemId });
+    if (!this.cmd({ cmd: 'use', item: itemId })) return;
+    this.predictConsumeItem(itemId);
   }
   buyItem(npcId: number, itemId: string): void {
     this.cmd({ cmd: 'buy', npc: npcId, item: itemId });

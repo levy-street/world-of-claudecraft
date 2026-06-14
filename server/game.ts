@@ -155,6 +155,7 @@ function dynamicFields(e: Entity): Record<string, unknown> {
     hp: e.hp, mhp: e.maxHp,
   };
   if (e.dead) out.dead = 1;
+  if (e.inCombat) out.cbt = 1;
   if (e.lootable) out.loot = 1;
   if (e.hostile) out.h = 1;
   if (e.castingAbility) {
@@ -666,8 +667,18 @@ export class GameServer {
       case 'accept': if (typeof msg.quest === 'string') { sim.acceptQuest(msg.quest, pid); this.resyncQuests(session); } break;
       case 'turnin': if (typeof msg.quest === 'string') { sim.turnInQuest(msg.quest, pid); this.resyncQuests(session); } break;
       case 'abandon': if (typeof msg.quest === 'string') { sim.abandonQuest(msg.quest, pid); this.resyncQuests(session); } break;
-      case 'equip': if (typeof msg.item === 'string') sim.equipItem(msg.item, pid); break;
-      case 'use': if (typeof msg.item === 'string') sim.useItem(msg.item, pid); break;
+      case 'equip':
+        if (typeof msg.item === 'string') {
+          sim.equipItem(msg.item, pid);
+          this.resyncItems(session);
+        }
+        break;
+      case 'use':
+        if (typeof msg.item === 'string') {
+          sim.useItem(msg.item, pid);
+          this.resyncItems(session);
+        }
+        break;
       case 'buy': if (typeof msg.npc === 'number' && typeof msg.item === 'string') sim.buyItem(msg.npc, msg.item, pid); break;
       case 'sell':
         if (typeof msg.item === 'string') {
@@ -1239,6 +1250,16 @@ export class GameServer {
   private resyncQuests(session: ClientSession): void {
     delete session.lastSent.qlog;
     delete session.lastSent.qdone;
+  }
+
+  // Item commands can consume stacks, equip gear, or start cooldowns. Re-echo
+  // the affected self fields so optimistic clients always reconcile.
+  private resyncItems(session: ClientSession): void {
+    delete session.lastSent.inv;
+    delete session.lastSent.equip;
+    delete session.lastSent.cds;
+    delete session.lastSent.stats;
+    delete session.lastSent.weapon;
   }
 
   private send(session: ClientSession, obj: unknown): void {
