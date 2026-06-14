@@ -167,6 +167,23 @@ describe('per-account failed-login throttle (#93)', () => {
     expect(authThrottled('account_a')).toBe(true);
     expect(authThrottled('account_b')).toBe(false);
   });
+
+  it('keeps an account locked out after the memory backstop evicts', () => {
+    // A credential-stuffing flood spreads guesses across thousands of accounts,
+    // pushing the failure map past its backstop threshold. The backstop must
+    // evict expired one-off entries, NOT wipe the live lockout counter for an
+    // account actively under attack — otherwise flooding silently disables the
+    // per-account throttle exactly when it is needed most.
+    const victim = 'lockme_account';
+    for (let i = 0; i < 10; i++) recordAuthFailure(victim);
+    expect(authThrottled(victim)).toBe(true);
+
+    // Churn past MAX_TRACKED_IPS (10_000) distinct accounts to trip the backstop.
+    for (let i = 0; i < 10_050; i++) recordAuthFailure(`throwaway_${i}`);
+
+    // The victim's lockout must survive eviction.
+    expect(authThrottled(victim)).toBe(true);
+  });
 });
 
 describe('malformed websocket frames cannot crash the server', () => {
