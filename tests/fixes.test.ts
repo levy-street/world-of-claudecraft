@@ -318,6 +318,13 @@ describe('warrior charge', () => {
     (sim as any).grantXp(99999); // learn charge (level 4)
     const p = sim.player;
     const wolf = [...sim.entities.values()].find((e) => e.kind === 'mob' && e.templateId === 'forest_wolf' && !e.dead)!;
+    // A level-20 warrior one-shots a ~28hp wolf, and the swing that lands the
+    // instant the charge arrives would clear autoAttack (target died). Whether
+    // that kill connects rides the shared RNG stream — which shifts as world
+    // content grows — so beef the wolf up to survive the engaging swing and
+    // keep this test about charge -> melee -> auto-attack, not the kill roll.
+    wolf.maxHp = 10000;
+    wolf.hp = 10000;
     teleportTo(sim, wolf.pos.x - 18, wolf.pos.z);
     p.facing = Math.atan2(wolf.pos.x - p.pos.x, wolf.pos.z - p.pos.z);
     sim.targetEntity(wolf.id);
