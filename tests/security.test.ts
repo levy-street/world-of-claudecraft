@@ -1,8 +1,8 @@
 import { EventEmitter } from 'node:events';
-import { rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { buildWebSocketAuthMessage, buildWebSocketUrl } from '../src/net/online';
 import { Sim } from '../src/sim/sim';
 import { normalizeCharName, offensiveName, offensiveUsername, validCharName, validUsername } from '../server/auth';
@@ -298,6 +298,51 @@ describe('username censorship', () => {
       });
     } finally {
       rmSync(file, { force: true });
+    }
+  });
+
+  it('caches file-backed banned terms until banlist env changes', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'woc-banlist-'));
+    const firstFile = join(dir, 'first.txt');
+    const secondFile = join(dir, 'second.txt');
+    writeFileSync(firstFile, 'fileterm\n');
+    writeFileSync(secondFile, 'otherterm\n');
+
+    try {
+      withUsernameBanlist({ file: firstFile }, () => {
+        expect(offensiveName('fileterm')).toBe(true);
+        writeFileSync(firstFile, 'changedterm\n');
+        expect(offensiveName('fileterm')).toBe(true);
+        expect(offensiveName('changedterm')).toBe(false);
+
+        process.env.USERNAME_BANLIST_FILE = secondFile;
+        expect(offensiveName('fileterm')).toBe(false);
+        expect(offensiveName('otherterm')).toBe(true);
+
+        delete process.env.USERNAME_BANLIST_FILE;
+        expect(offensiveName('otherterm')).toBe(false);
+      });
+    } finally {
+      rmSync(dir, { force: true, recursive: true });
+    }
+  });
+
+  it('retries file-backed banned terms after a failed read', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'woc-banlist-missing-'));
+    const missingFile = join(dir, 'missing.txt');
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+    try {
+      withUsernameBanlist({ file: missingFile }, () => {
+        expect(offensiveName('laterterm')).toBe(false);
+        expect(warn).toHaveBeenCalledOnce();
+
+        writeFileSync(missingFile, 'laterterm\n');
+        expect(offensiveName('laterterm')).toBe(true);
+      });
+    } finally {
+      warn.mockRestore();
+      rmSync(dir, { force: true, recursive: true });
     }
   });
 });
