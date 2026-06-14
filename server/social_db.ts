@@ -98,10 +98,19 @@ CREATE UNIQUE INDEX IF NOT EXISTS guilds_realm_name ON guilds(realm, name);
 -- pick how outsiders may join. Existing guilds default to unlisted, so the
 -- directory stays empty until a leader opts in. recruitment is only meaningful
 -- while is_public is true: 'request' queues a join request for officers to
--- approve; 'open' lets anyone join instantly (still capped + atomic).
+-- approve; 'open' lets anyone join instantly (still subject to the member cap).
 ALTER TABLE guilds ADD COLUMN IF NOT EXISTS is_public BOOLEAN NOT NULL DEFAULT false;
 ALTER TABLE guilds ADD COLUMN IF NOT EXISTS recruitment TEXT NOT NULL DEFAULT 'request';
 CREATE INDEX IF NOT EXISTS guilds_public ON guilds(realm, is_public);
+-- defense-in-depth: the app validates recruitment, but pin the domain at the DB
+-- too. ADD CONSTRAINT is not idempotent, so guard it (re-runs of ensureSchema).
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'guilds_recruitment_check') THEN
+    ALTER TABLE guilds ADD CONSTRAINT guilds_recruitment_check
+      CHECK (recruitment IN ('closed', 'request', 'open'));
+  END IF;
+END $$;
 
 CREATE TABLE IF NOT EXISTS guild_members (
   character_id INT PRIMARY KEY REFERENCES characters(id) ON DELETE CASCADE,
@@ -245,7 +254,9 @@ export class PgSocialDb implements SocialDb {
       await client.query('BEGIN');
       // lock the guild row so concurrent accepts serialize — without this the
       // count-then-insert races and N pending invitees can all pass the cap.
-      const g = await client.query('SELECT id FROM guilds WHERE id = $1 FOR UPDATE', [guildId]);
+      // realm-scoped: a cross-realm guild id resolves to no row, so it can never
+      // gain a member (shared-DB deploys) — same isolation guildListing enforces.
+      const g = await client.query('SELECT id FROM guilds WHERE id = $1 AND realm = $2 FOR UPDATE', [guildId, REALM]);
       if (g.rowCount === 0) { await client.query('ROLLBACK'); return 'no_guild'; }
       const existing = await client.query('SELECT 1 FROM guild_members WHERE character_id = $1', [charId]);
       if ((existing.rowCount ?? 0) > 0) { await client.query('ROLLBACK'); return 'already_member'; }
@@ -298,7 +309,11 @@ export class PgSocialDb implements SocialDb {
   }
 
   async guildListing(guildId: number): Promise<{ isPublic: boolean; recruitment: RecruitmentMode } | null> {
-    const res = await this.pool.query('SELECT is_public, recruitment FROM guilds WHERE id = $1', [guildId]);
+    // realm-scoped: a client can supply an arbitrary guild id, so the join path
+    // must not resolve a guild from another realm (shared-DB deploys). Returns
+    // null for a cross-realm id, which makes guildRequestJoin refuse it — the
+    // same isolation the directory enforces.
+    const res = await this.pool.query('SELECT is_public, recruitment FROM guilds WHERE id = $1 AND realm = $2', [guildId, REALM]);
     const row = res.rows[0];
     return row ? { isPublic: row.is_public, recruitment: row.recruitment } : null;
   }

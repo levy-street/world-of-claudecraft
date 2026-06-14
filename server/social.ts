@@ -107,7 +107,8 @@ export interface SocialDb {
   createGuildWithLeader(name: string, leaderId: number): Promise<{ guildId: number } | { error: 'name_taken' | 'already_in_guild' }>;
   deleteGuild(id: number): Promise<void>;
   guildMembership(charId: number): Promise<{ guildId: number; guildName: string; rank: GuildRank } | null>;
-  // seat a member atomically, enforcing the cap under concurrent accepts
+  // seat a member atomically, enforcing the cap under concurrent accepts; the
+  // realm-scoped lock also refuses a cross-realm guild id (returns 'no_guild')
   addGuildMemberAtomic(guildId: number, charId: number, rank: GuildRank, limit: number): Promise<'ok' | 'full' | 'already_member' | 'no_guild'>;
   removeGuildMember(charId: number): Promise<void>;
   setGuildRank(charId: number, rank: GuildRank): Promise<void>;
@@ -494,9 +495,9 @@ export class SocialService {
     this.tx.deliver(actor.characterId, [{ type: 'guildDirectory', guilds }]);
   }
 
-  // Ask to join a public guild. 'open' guilds admit instantly (still capped +
-  // atomic via addGuildMemberAtomic); 'request' guilds queue the request for an
-  // officer to approve. Reuses the same membership/cap guards as invite-accept.
+  // Ask to join a public guild. 'open' guilds admit instantly (cap + single-guild
+  // rule enforced atomically via addGuildMemberAtomic); 'request' guilds queue the
+  // request for an officer to approve. Same atomic guard as invite-accept.
   async guildRequestJoin(actor: SocialActor, guildId: number): Promise<void> {
     if (await this.db.guildMembership(actor.characterId)) { this.err(actor.characterId, 'You are already in a guild.'); return; }
     const listing = await this.db.guildListing(guildId);
