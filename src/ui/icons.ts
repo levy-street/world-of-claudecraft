@@ -1080,6 +1080,7 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   aura_buff_allstats: r('arcane', 'arcanePink', ['gem']),
   aura_thorns: r('nature', 'leafGreen', ['leaf', { p: 'claw_slash', ...BR }]),
   aura_form_bear: r('earth', 'earthBrown', ['paw']),
+  aura_form_ghost_wolf: r('frost', 'ice', ['paw'], ['motion']),
 };
 
 // ---------------------------------------------------------------------------

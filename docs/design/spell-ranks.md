@@ -257,7 +257,7 @@
 | Ability | Learn | Cost | Cast/CD | Effects |
 |---|---|---|---|---|
 | `frost_shock` | 14 | 50 | inst, 6cd, 20yd | directDamage 36–42 + slow 0.5/8s |
-| `ghost_wolf` | 16 | 35 | 2.0s cast | selfBuff buff_speed 1.4, 10min |
+| `ghost_wolf` | 16 | 35 | 2.0s cast | selfBuff form_ghost_wolf 1.4, 10min |
 | `stormstrike` | 20 | 40 | inst, 12cd | weaponStrike +26 |
 
 **Sanity** — L14: LB R3 avg 48 → 292/48 ≈ 6.1 casts ✓ (the brief's own anchor). L20: LB R4 avg 80 → 5 casts, or shock-weave melee w/ Rockbiter R3 ✓.

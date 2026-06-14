@@ -72,6 +72,7 @@ describe('threat from damage', () => {
     for (let i = 0; i < 30; i++) sim.tick();
     sim.castAbility('defensive_stance');
     expect(sim.player.auras.some((a) => a.kind === 'defensive_stance')).toBe(false);
+    expect(sim.player.cooldowns.get('defensive_stance')).toBeGreaterThan(0);
   });
 
   it('bear form multiplies threat by 1.3', () => {

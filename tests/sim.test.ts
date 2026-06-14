@@ -8,7 +8,7 @@ import {
 import { LAKE, QUESTS, abilitiesKnownAt } from '../src/sim/data';
 import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
 
-function makeSim(cls: 'warrior' | 'mage' | 'rogue' = 'warrior', seed = 42) {
+function makeSim(cls: 'warrior' | 'mage' | 'rogue' | 'shaman' = 'warrior', seed = 42) {
   return new Sim({ seed, playerClass: cls, autoEquip: true });
 }
 
@@ -178,6 +178,44 @@ describe('movement directions', () => {
     const x1 = sim.player.pos.x;
     for (let i = 0; i < 20; i++) sim.tick();
     expect(sim.player.pos.x).toBeGreaterThan(x1);
+  });
+
+  it('ghost wolf increases forward movement speed', () => {
+    const normal = makeSim('shaman');
+    const wolf = makeSim('shaman');
+
+    for (const sim of [normal, wolf]) {
+      teleportTo(sim, 0, -40);
+      sim.player.facing = 0;
+    }
+
+    wolf.setPlayerLevel(16);
+    wolf.castAbility('ghost_wolf');
+    for (let i = 0; i < 20 * 2; i++) wolf.tick();
+    expect(wolf.player.auras.some((a) => a.id === 'ghost_wolf' && a.kind === 'form_ghost_wolf')).toBe(true);
+
+    wolf.events.length = 0;
+    wolf.castAbility('lightning_bolt');
+    expect(wolf.player.castingAbility).toBeNull();
+    expect(wolf.events.some((e) => e.type === 'error' && /shapeshifted/.test(e.text))).toBe(true);
+
+    normal.moveInput.forward = true;
+    wolf.moveInput.forward = true;
+    for (let i = 0; i < 20; i++) {
+      normal.tick();
+      wolf.tick();
+    }
+
+    expect(dist2d(wolf.player.pos, { x: 0, y: 0, z: -40 }))
+      .toBeGreaterThan(dist2d(normal.player.pos, { x: 0, y: 0, z: -40 }) * 1.3);
+
+    wolf.moveInput.forward = false;
+    for (let i = 0; i < 20; i++) wolf.tick();
+    wolf.player.sitting = true;
+    wolf.castAbility('ghost_wolf');
+    expect(wolf.player.auras.some((a) => a.kind === 'form_ghost_wolf')).toBe(false);
+    expect(wolf.player.sitting).toBe(false);
+    expect(wolf.player.gcdRemaining).toBeGreaterThan(0);
   });
 });
 

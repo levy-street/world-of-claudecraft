@@ -189,6 +189,10 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/yetialt.glb`, height: 1.9,
     clips: BIPED14, tint: 0x5a4030, tintStrength: 0.55,
   },
+  form_ghost_wolf: {
+    url: `${CREATURES}/wolf.glb`, height: 1.6,
+    clips: animal(['Attack']), tint: 0x9fb8c8, tintStrength: 0.6,
+  },
 
   // -- mob families --------------------------------------------------------
   mob_wolf: {
