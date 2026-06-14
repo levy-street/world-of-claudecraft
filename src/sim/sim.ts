@@ -49,6 +49,36 @@ const PVP_CC_DR_RESET = 18; // seconds before a repeated PvP CC category is fres
 const PVP_CC_DR_MULTIPLIERS = [1, 0.5, 0.25] as const;
 const SAY_RANGE = 25; // /say carries a short distance; /yell across a camp
 const YELL_RANGE = 100;
+
+// Predefined social emotes. Each entry maps a command (and its aliases) to the
+// third-person action text shown to everyone in /say range. `solo` is used with
+// no target; `target` (when present) is used when the emote names another
+// player and contains a `%t` placeholder for that player's name. The actor's
+// own name is rendered separately by the client, so these strings start at the
+// verb (e.g. "Aleph" + " waves.").
+interface EmoteDef { solo: string; target?: string }
+const EMOTES: Record<string, EmoteDef> = {
+  wave: { solo: 'waves.', target: 'waves at %t.' },
+  bow: { solo: 'bows.', target: 'bows before %t.' },
+  cheer: { solo: 'cheers!', target: 'cheers at %t!' },
+  dance: { solo: 'bursts into dance.', target: 'dances with %t.' },
+  laugh: { solo: 'laughs.', target: 'laughs at %t.' },
+  cry: { solo: 'cries.', target: "cries on %t's shoulder." },
+  salute: { solo: 'salutes.', target: 'salutes %t.' },
+  thank: { solo: 'thanks everyone.', target: 'thanks %t.' },
+  clap: { solo: 'applauds. Bravo!', target: 'applauds %t. Bravo!' },
+  greet: { solo: 'greets everyone with a hearty hello.', target: 'greets %t with a hearty hello.' },
+  roar: { solo: 'lets out a mighty roar.', target: 'roars at %t.' },
+  sigh: { solo: 'sighs.', target: 'sighs at %t.' },
+  kneel: { solo: 'kneels down.', target: 'kneels before %t.' },
+  point: { solo: 'points.', target: 'points at %t.' },
+  flex: { solo: 'flexes.', target: 'flexes at %t.' },
+  cower: { solo: 'cowers in fear.', target: 'cowers in fear at the sight of %t.' },
+};
+// Command aliases → canonical emote key above.
+const EMOTE_ALIASES: Record<string, string> = {
+  hi: 'greet', hello: 'greet', thanks: 'thank', applaud: 'clap',
+};
 const CHAT_BURST = 8; // messages a player may send back-to-back...
 const CHAT_REFILL = 2; // ...then this many more per second (caps spam amplifiers)
 const DUEL_FORFEIT_DISTANCE = 60;
@@ -3543,13 +3573,42 @@ export class Sim {
       return { channel: 'general', message: clean };
     }
 
+    // "/me <action>" — freeform third-person action text, e.g.
+    // "/me ponders the void" → "Aleph ponders the void". Emotes never become
+    // the player's sticky chat channel, so this returns null on success.
+    const meMatch = /^\/(?:me|emote|e)\s+([\s\S]+)$/i.exec(raw);
+    if (meMatch) {
+      const action = meMatch[1].trim();
+      if (action) this.broadcastEmote(r.meta, r.e, action);
+      return null;
+    }
+
+    // "/wave", "/dance [name]" — predefined social emotes. An optional name
+    // targets an online player (in range or not); unknown names fall back to
+    // the untargeted form, matching WoW.
+    const emMatch = /^\/([a-z]+)(?:\s+(\S+))?\s*$/i.exec(raw);
+    if (emMatch) {
+      const key = EMOTE_ALIASES[emMatch[1].toLowerCase()] ?? emMatch[1].toLowerCase();
+      const def = EMOTES[key];
+      if (def) {
+        const targetName = emMatch[2];
+        let text = def.solo;
+        if (targetName && def.target) {
+          const t = this.findPlayerByName(targetName);
+          if (t) text = def.target.replace('%t', t.name === r.meta.name ? 'themselves' : t.name);
+        }
+        this.broadcastEmote(r.meta, r.e, text);
+        return null;
+      }
+    }
+
     // bare text and "/s" are local say; "/y" carries further — both are
     // delivered per-player by range and carry the speaker for chat bubbles
     let channel: 'say' | 'yell' = 'say';
     let clean = raw;
     if (/^\/y(ell)?\s/i.test(raw)) { channel = 'yell'; clean = raw.replace(/^\/y(ell)?\s+/i, '').trim(); }
     else if (/^\/s(ay)?\s/i.test(raw)) { clean = raw.replace(/^\/s(ay)?\s+/i, '').trim(); }
-    else if (raw.startsWith('/')) { this.error(r.meta.entityId, `Unknown command: ${raw.split(' ')[0]}. Try /s /y /w /p /g.`); return null; }
+    else if (raw.startsWith('/')) { this.error(r.meta.entityId, `Unknown command: ${raw.split(' ')[0]}. Try /s /y /w /p /g, /me, or an emote like /wave.`); return null; }
     if (!clean) return null;
     const range = channel === 'yell' ? YELL_RANGE : SAY_RANGE;
     for (const meta of this.players.values()) {
@@ -3558,6 +3617,31 @@ export class Sim {
       this.emit({ type: 'chat', fromPid: r.meta.entityId, from: r.meta.name, text: clean, channel, entityId: r.e.id, pid: meta.entityId });
     }
     return { channel, message: clean };
+  }
+
+  // Resolve a player by name the same way whispers do: an exact-case match
+  // wins outright, otherwise a case-insensitive match is used only when it is
+  // unambiguous.
+  private findPlayerByName(name: string): PlayerMeta | null {
+    const wanted = name.toLowerCase();
+    const ci: PlayerMeta[] = [];
+    for (const meta of this.players.values()) {
+      if (meta.name === name) return meta;
+      if (meta.name.toLowerCase() === wanted) ci.push(meta);
+    }
+    return ci.length === 1 ? ci[0] : null;
+  }
+
+  // Send a third-person emote to every player within /say range (including the
+  // actor). `from` carries the actor's name so the client can render it as a
+  // clickable name; `text` is the action predicate (e.g. "waves at Bet.").
+  private broadcastEmote(actor: PlayerMeta, actorEntity: Entity, text: string): void {
+    const body = text.slice(0, 200);
+    for (const meta of this.players.values()) {
+      const e = this.entities.get(meta.entityId);
+      if (!e || dist2d(actorEntity.pos, e.pos) > SAY_RANGE) continue;
+      this.emit({ type: 'chat', fromPid: actor.entityId, from: actor.name, text: body, channel: 'emote', entityId: actorEntity.id, pid: meta.entityId });
+    }
   }
 
   // -------------------------------------------------------------------------

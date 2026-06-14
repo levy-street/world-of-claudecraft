@@ -1318,10 +1318,12 @@ export class Hud {
             case 'general': this.chatLogFrom(ev.from, ev.text, '#ffc864', '[General] ', ': '); break;
             case 'guild': this.chatLogFrom(ev.from, ev.text, '#40d264', '[Guild] ', ': '); break;
             case 'officer': this.chatLogFrom(ev.from, ev.text, '#4ce0c0', '[Officer] ', ': '); break;
+            case 'emote': this.chatLogFrom(ev.from, ev.text, '#ff8040', '', ' '); break;
             default: this.chatLogFrom(ev.from, ev.text, '#f0ead8', '', ' says: '); break;
           }
-          if ((ev.channel === 'say' || ev.channel === 'yell') && ev.entityId !== undefined) {
-            this.renderer.showChatBubble(ev.entityId, ev.text, ev.channel === 'yell');
+          if ((ev.channel === 'say' || ev.channel === 'yell' || ev.channel === 'emote') && ev.entityId !== undefined) {
+            const bubble = ev.channel === 'emote' ? `${ev.from} ${ev.text}` : ev.text;
+            this.renderer.showChatBubble(ev.entityId, bubble, ev.channel === 'yell');
           }
           break;
         }
