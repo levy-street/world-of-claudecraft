@@ -51,6 +51,13 @@ export interface Aura {
   stacks?: number; // sunder armor: applications stack up to the effect's cap
 }
 
+export type CrowdControlDrCategory = 'root';
+
+export interface CrowdControlDrState {
+  stage: number;
+  resetAt: number;
+}
+
 export interface Stats {
   str: number;
   agi: number;
@@ -400,6 +407,7 @@ export interface Entity {
   inCombat: boolean;
   combatTimer: number; // time since last combat event
   auras: Aura[];
+  ccDr: Map<CrowdControlDrCategory, CrowdControlDrState>;
   castingAbility: string | null;
   castRemaining: number;
   castTotal: number;

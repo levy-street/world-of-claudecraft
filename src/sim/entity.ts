@@ -12,7 +12,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     attackPower: 0, rangedPower: 0, critChance: 0.05, dodgeChance: 0.05, moveSpeed: 7, hostile: false,
     targetId: null, autoAttack: false, swingTimer: 0,
     inCombat: false, combatTimer: 99,
-    auras: [], castingAbility: null, castRemaining: 0, castTotal: 0,
+    auras: [], ccDr: new Map(), castingAbility: null, castRemaining: 0, castTotal: 0,
     channeling: false, channelTickTimer: 0, channelTickEvery: 0,
     gcdRemaining: 0, cooldowns: new Map(), queuedOnSwing: null, fiveSecondRule: 99,
     comboPoints: 0, comboTargetId: null, overpowerUntil: -1, savedMana: 0,
