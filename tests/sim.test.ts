@@ -405,10 +405,16 @@ describe('food, drink, vendor', () => {
     expect(sim.player.hp).toBeGreaterThan(hpBefore);
     // moving stands up and stops the meal
     sim.moveInput.forward = true;
-    sim.tick();
+    const events = sim.tick();
     expect(sim.player.sitting).toBe(false);
     expect(sim.player.eating).toBe(null);
     expect(sim.player.drinking).toBe(null);
+    expect(events).toContainEqual(expect.objectContaining({
+      type: 'consumeCancel',
+      reason: 'movement',
+      eating: true,
+      drinking: false,
+    }));
   });
 
   it('eats and drinks at the same time', () => {
@@ -436,6 +442,44 @@ describe('food, drink, vendor', () => {
     (sim as any).dealDamage(null, sim.player, 1, false, 'physical', 'Test', 'hit', true);
     expect(sim.player.eating).toBe(null);
     expect(sim.player.drinking).toBe(null);
+    expect(sim.events).toContainEqual(expect.objectContaining({
+      type: 'consumeCancel',
+      reason: 'damage',
+      eating: true,
+      drinking: true,
+    }));
+  });
+
+  it('reports casting and combat consume cancel reasons', () => {
+    const caster = makeSim('mage');
+    caster.addItem('spring_water', 1);
+    caster.player.resource = caster.player.maxResource;
+    caster.player.combatTimer = 99;
+    caster.player.inCombat = false;
+    caster.useItem('spring_water');
+    caster.castAbility('arcane_intellect');
+    expect(caster.player.drinking).toBe(null);
+    expect(caster.events).toContainEqual(expect.objectContaining({
+      type: 'consumeCancel',
+      reason: 'casting',
+      drinking: true,
+    }));
+
+    const attacker = makeSim('warrior');
+    const wolf = nearestMob(attacker)!;
+    attacker.targetEntity(wolf.id);
+    attacker.addItem('baked_bread', 1);
+    attacker.player.hp = 20;
+    attacker.player.combatTimer = 99;
+    attacker.player.inCombat = false;
+    attacker.useItem('baked_bread');
+    attacker.startAutoAttack();
+    expect(attacker.player.eating).toBe(null);
+    expect(attacker.events).toContainEqual(expect.objectContaining({
+      type: 'consumeCancel',
+      reason: 'combat',
+      eating: true,
+    }));
   });
 
   it('mage conjures water and drinking restores mana', () => {

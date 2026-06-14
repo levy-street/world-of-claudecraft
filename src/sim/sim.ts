@@ -17,10 +17,10 @@ import {
 import { groundHeight, WATER_LEVEL } from './world';
 import {
   AbilityDef, AbilityEffect, Aura, AuraKind, CAST_PUSHBACK_SEC, CHANNEL_PUSHBACK_FRACTION, CONSUME_DURATION,
-  CONSUME_TICKS, DT, Entity, EquipSlot, GCD,
+  CONSUME_TICKS, ConsumeCancelReason, DT, Entity, EquipSlot, GCD,
   INTERACT_RANGE, InvSlot, MELEE_RANGE, MAX_LEVEL,
   MoveInput, PlayerClass, QuestProgress, QuestState, RUN_SPEED, SimConfig, SimEvent, TURN_SPEED, Vec3,
-  angleTo, armorReduction, dist2d, emptyMoveInput, isConsuming, meleeMissChance, mobXpValue, normAngle,
+  angleTo, armorReduction, dist2d, emptyMoveInput, meleeMissChance, mobXpValue, normAngle,
   rageFromDealing, rageFromTaking, spellHitChance, xpForLevel,
 } from './types';
 
@@ -832,7 +832,7 @@ export class Sim {
     };
     if (!target || target.dead || p.chargeTimeLeft <= 0 || this.isRooted(p)) return done(false);
     if (dist2d(p.pos, target.pos) <= CHARGE_ARRIVE_RANGE) return done(true);
-    if (p.sitting) this.standUp(p);
+    if (p.sitting) this.standUp(p, 'movement');
     // re-route when the target has run well away from where the path ends
     const pathEnd = p.chargePath[p.chargePath.length - 1];
     if (!pathEnd || dist2d(pathEnd, target.pos) > 4) p.chargePath = this.findChargePath(p, target);
@@ -876,7 +876,7 @@ export class Sim {
     if (inp.strafeRight) mx += 1;
 
     const wantsMove = mx !== 0 || mz !== 0 || inp.jump;
-    if (wantsMove && p.sitting) this.standUp(p);
+    if (wantsMove && p.sitting) this.standUp(p, 'movement');
 
     const moving = (mx !== 0 || mz !== 0) && !this.isRooted(p);
     const swimming = this.isSwimming(p);
@@ -965,13 +965,19 @@ export class Sim {
     }
   }
 
-  private standUp(p: Entity): void {
+  private cancelConsume(p: Entity, reason: ConsumeCancelReason): boolean {
+    const eating = p.eating !== null;
+    const drinking = p.drinking !== null;
+    if (!eating && !drinking) return false;
+    p.eating = null;
+    p.drinking = null;
+    this.emit({ type: 'consumeCancel', reason, eating, drinking, pid: p.id });
+    return true;
+  }
+
+  private standUp(p: Entity, reason: ConsumeCancelReason = 'standing'): void {
     p.sitting = false;
-    if (isConsuming(p)) {
-      p.eating = null;
-      p.drinking = null;
-      this.emit({ type: 'log', text: 'You stand up.', color: '#999', pid: p.id });
-    }
+    this.cancelConsume(p, reason);
   }
 
   // -------------------------------------------------------------------------
@@ -1222,7 +1228,7 @@ export class Sim {
         }
       }
     }
-    if (p.sitting) this.standUp(p);
+    if (p.sitting) this.standUp(p, 'casting');
 
     // Heroic-strike style: queue on next swing, pay cost on the swing itself.
     if (ability.onNextSwing) {
@@ -1868,7 +1874,7 @@ export class Sim {
     if (p.dead) return;
     const t = p.targetId !== null ? this.entities.get(p.targetId) : null;
     if (!t || t.dead || !this.isHostileTo(p, t)) { this.error(p.id, 'Invalid attack target.'); return; }
-    if (p.sitting) this.standUp(p);
+    if (p.sitting) this.standUp(p, 'combat');
     p.autoAttack = true;
   }
 
@@ -2080,7 +2086,7 @@ export class Sim {
       if (target.resourceType === 'rage' && source && source.id !== target.id) {
         target.resource = Math.min(target.maxResource, target.resource + rageFromTaking(amount, target.level));
       }
-      if (isConsuming(target)) { target.eating = null; target.drinking = null; }
+      this.cancelConsume(target, amount > 0 ? 'damage' : 'combat');
       if (target.sitting) target.sitting = false;
       // vanilla spell pushback: a landed hit delays the cast rather than
       // cancelling it (misses and fully absorbed hits don't push back)
@@ -2133,8 +2139,7 @@ export class Sim {
       e.autoAttack = false;
       e.queuedOnSwing = null;
       e.comboPoints = 0;
-      e.eating = null;
-      e.drinking = null;
+      this.cancelConsume(e, 'damage');
       e.sitting = false;
       e.chargeTargetId = null;
       e.chargePath = [];
