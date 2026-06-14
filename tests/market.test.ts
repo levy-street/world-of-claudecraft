@@ -169,6 +169,43 @@ describe('the World Market — the Merchant', () => {
     expect(info.collectionItems).toEqual([{ itemId: 'wolf_fang', count: 1 }]);
   });
 
+  it('keeps market ownership stable when the seller display name changes', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller', { marketKey: 'character:123' });
+    const buyer = sim.addPlayer('mage', 'Buyer', { marketKey: 'character:456' });
+    standAtMerchant(sim, seller);
+    standAtMerchant(sim, buyer);
+    sim.addItem('wolf_fang', 2, seller);
+    sim.players.get(buyer)!.copper = 1000;
+    sim.marketList('wolf_fang', 1, 100, seller);
+    sim.marketList('wolf_fang', 1, 200, seller);
+    const listingToCancel = sim.marketListings.find((l) => l.sellerKey === 'character:123' && l.price === 100)!;
+    const listingToBuy = sim.marketListings.find((l) => l.sellerKey === 'character:123' && l.price === 200)!;
+
+    sim.players.get(seller)!.name = 'Renamed';
+    sim.entities.get(seller)!.name = 'Renamed';
+    const oldNameOwner = sim.addPlayer('warrior', 'Seller', { marketKey: 'character:789' });
+    standAtMerchant(sim, oldNameOwner);
+    sim.events.length = 0;
+
+    sim.marketCancel(listingToCancel.id, oldNameOwner);
+    expect(errorsSince(sim).join(' ')).toMatch(/not your listing/i);
+    expect(sim.marketListings.some((l) => l.id === listingToCancel.id)).toBe(true);
+
+    sim.marketCancel(listingToCancel.id, seller);
+    expect(sim.countItem('wolf_fang', seller)).toBe(1);
+    expect(sim.marketListings.some((l) => l.id === listingToCancel.id)).toBe(false);
+
+    sim.marketBuy(listingToBuy.id, buyer);
+    sim.events.length = 0;
+    sim.marketCollect(oldNameOwner);
+    expect(errorsSince(sim).join(' ')).toMatch(/nothing to collect/i);
+    expect(copperOf(sim, oldNameOwner)).toBe(0);
+
+    sim.marketCollect(seller);
+    expect(copperOf(sim, seller)).toBe(190);
+  });
+
   it('refuses to deal with anyone who is not standing at the Merchant', () => {
     const sim = makeWorld();
     const seller = sim.addPlayer('warrior', 'Seller');
@@ -209,18 +246,19 @@ describe('the World Market — the Merchant', () => {
 
   it('survives a save/load round-trip (persistence)', () => {
     const sim = makeWorld();
-    const seller = sim.addPlayer('warrior', 'Seller');
-    const buyer = sim.addPlayer('mage', 'Buyer');
+    const seller = sim.addPlayer('warrior', 'Seller', { marketKey: 'character:123' });
+    const buyer = sim.addPlayer('mage', 'Buyer', { marketKey: 'character:456' });
     standAtMerchant(sim, seller);
     standAtMerchant(sim, buyer);
     sim.addItem('wolf_fang', 3, seller);
     sim.players.get(buyer)!.copper = 1000;
     sim.marketList('wolf_fang', 1, 300, seller); // this one will sell -> collection gold
     sim.marketList('wolf_fang', 2, 150, seller); // this one stays listed
-    sim.marketBuy(sim.marketListings.find((l) => l.sellerKey === 'Seller' && l.count === 1)!.id, buyer);
+    sim.marketBuy(sim.marketListings.find((l) => l.sellerKey === 'character:123' && l.count === 1)!.id, buyer);
 
     const save = sim.serializeMarket();
     expect(save.listings.length).toBe(1); // only the unsold player listing (house excluded)
+    expect(save.listings[0]).toMatchObject({ sellerKey: 'character:123', sellerName: 'Seller' });
     expect(save.listings[0].secondsLeft).toBeGreaterThan(0);
 
     const sim2 = makeWorld();
@@ -229,12 +267,12 @@ describe('the World Market — the Merchant', () => {
 
     const loaded = sim2.marketListings.filter((l) => !l.house);
     expect(loaded.length).toBe(1);
-    expect(loaded[0]).toMatchObject({ sellerKey: 'Seller', itemId: 'wolf_fang', count: 2, price: 150 });
+    expect(loaded[0]).toMatchObject({ sellerKey: 'character:123', sellerName: 'Seller', itemId: 'wolf_fang', count: 2, price: 150 });
     expect(Number.isFinite(loaded[0].expiresAt)).toBe(true);
     // house stock is reseeded, not duplicated from the save
     expect(sim2.marketListings.filter((l) => l.house).length).toBe(houseBefore);
     // the waiting sale proceeds came across too
-    const col = (sim2 as unknown as { marketCollections: Map<string, { copper: number }> }).marketCollections.get('Seller');
+    const col = (sim2 as unknown as { marketCollections: Map<string, { copper: number }> }).marketCollections.get('character:123');
     expect(col?.copper).toBe(285); // 300 - 5%
     // new listings keep climbing past the loaded ids
     const seller2 = sim2.addPlayer('warrior', 'Seller');
@@ -243,5 +281,28 @@ describe('the World Market — the Merchant', () => {
     sim2.marketList('bone_fragments', 1, 50, seller2);
     const ids = sim2.marketListings.map((l) => l.id);
     expect(new Set(ids).size).toBe(ids.length); // no id collisions
+  });
+
+  it('loads old name-keyed market saves for local play', () => {
+    const sim = makeWorld();
+    sim.loadMarket({
+      listings: [
+        { id: 50, sellerKey: 'Seller', sellerName: 'Seller', itemId: 'wolf_fang', count: 1, price: 75, secondsLeft: 60 },
+      ],
+      collections: [
+        { key: 'Seller', copper: 25, items: [{ itemId: 'bone_fragments', count: 2 }] },
+      ],
+      nextListingId: 51,
+    });
+    const seller = sim.addPlayer('warrior', 'Seller');
+    standAtMerchant(sim, seller);
+
+    expect(sim.marketInfoFor(seller)!.listings.find((l) => l.id === 50)).toMatchObject({
+      sellerName: 'Seller',
+      mine: true,
+    });
+    sim.marketCollect(seller);
+    expect(copperOf(sim, seller)).toBe(25);
+    expect(sim.countItem('bone_fragments', seller)).toBe(2);
   });
 });
