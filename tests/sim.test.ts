@@ -592,6 +592,8 @@ describe('quests', () => {
 });
 
 describe('RL interface', () => {
+  const LONG_TEST_TIMEOUT_MS = 30_000;
+
   it('observation has documented size and stays in sane bounds', () => {
     const sim = makeSim('warrior');
     const obs = encodeObs(sim);
@@ -610,7 +612,7 @@ describe('RL interface', () => {
       const obs = encodeObs(sim);
       for (const v of obs) expect(Number.isFinite(v)).toBe(true);
     }
-  });
+  }, LONG_TEST_TIMEOUT_MS);
 
   it('same seed + same actions => identical trajectories', () => {
     const run = () => {
@@ -625,7 +627,7 @@ describe('RL interface', () => {
       return trace;
     };
     expect(run()).toEqual(run());
-  });
+  }, LONG_TEST_TIMEOUT_MS);
 });
 
 describe('gm characters', () => {

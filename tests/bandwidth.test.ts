@@ -16,6 +16,7 @@ const SNAPSHOTS_PER_SECOND = 20;
 const PLAYERS = 30;
 const WARMUP_TICKS = 5;
 const MEASURE_TICKS = 200;
+const LONG_TEST_TIMEOUT_MS = 30_000;
 
 // deterministic LCG so the walk pattern is reproducible
 function makeRng(seed: number): () => number {
@@ -89,5 +90,5 @@ describe('crowd bandwidth', () => {
     );
 
     expect(newBytes).toBeLessThan(legacyBytes * 0.5);
-  }, 30000);
+  }, LONG_TEST_TIMEOUT_MS);
 });
