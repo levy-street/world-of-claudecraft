@@ -2359,7 +2359,11 @@ export class Sim {
     if (!qp || qp.state !== 'active') return false;
     const quest = QUESTS[entry.questId];
     const objIdx = quest.objectives.findIndex((o) => o.type === 'collect' && o.itemId === entry.itemId);
-    return objIdx < 0 || this.countItem(entry.itemId, meta.entityId) < quest.objectives[objIdx].count;
+    // A quest-gated drop is only "needed" while the player has an actual collect
+    // objective for this item that is still short of its required count. If the
+    // quest has no matching collect objective, the player never needs the item,
+    // so it must not drop (fail closed rather than dropping unconditionally).
+    return objIdx >= 0 && this.countItem(entry.itemId, meta.entityId) < quest.objectives[objIdx].count;
   }
 
   private rollLoot(mob: Entity, meta: PlayerMeta, eligible: PlayerMeta[] = [meta]): void {
