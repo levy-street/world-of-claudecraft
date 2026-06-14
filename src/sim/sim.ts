@@ -760,9 +760,18 @@ export class Sim {
     // with, instead of one full scan per player
     this.engagedPids.clear();
     for (const e of this.entities.values()) {
-      if (e.kind === 'mob' && !e.dead && (e.aiState === 'chase' || e.aiState === 'attack') && e.aggroTargetId !== null) {
+      if (e.kind !== 'mob' || e.dead) continue;
+      // a wild mob actively engaged keeps its target in combat — and if that
+      // target is someone's pet, the pet's owner stays in combat too, so a
+      // hunter/warlock can't regen, eat/drink, or use out-of-combat abilities
+      // while their pet tanks
+      if (e.ownerId === null && (e.aiState === 'chase' || e.aiState === 'attack') && e.aggroTargetId !== null) {
         this.engagedPids.add(e.aggroTargetId);
+        const tgt = this.entities.get(e.aggroTargetId);
+        if (tgt && tgt.ownerId !== null) this.engagedPids.add(tgt.ownerId);
       }
+      // a player's pet that is engaging an enemy keeps its owner in combat
+      if (e.ownerId !== null && e.aggroTargetId !== null) this.engagedPids.add(e.ownerId);
     }
     for (const meta of this.players.values()) {
       const p = this.entities.get(meta.entityId);
