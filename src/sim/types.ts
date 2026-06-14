@@ -244,7 +244,7 @@ export interface DungeonDef {
   entry: { x: number; z: number }; // player arrival point (instance-local)
   exitOffset: { x: number; z: number }; // exit portal (instance-local)
   spawns: DungeonSpawn[];
-  interior: 'crypt' | 'sanctum'; // renderer + collider interior builder key
+  interior: 'crypt' | 'sanctum' | 'temple'; // renderer + collider interior builder key
   suggestedPlayers: number;
   enterText: string;
   leaveText: string;

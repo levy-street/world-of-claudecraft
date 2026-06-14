@@ -23,6 +23,7 @@ runs for everyone online.
 | ![Dusk at the Eastbrook campfire](docs/screenshots/eastbrook-dusk.jpg)<br>*Dusk at the Eastbrook campfire* | ![Elite pulls in the Hollow Crypt](docs/screenshots/hollow-crypt.jpg)<br>*Torch-lit elite pulls in the Hollow Crypt* |
 | ![The restless dead at the ruined chapel](docs/screenshots/restless-dead.jpg)<br>*The restless dead at the ruined chapel* | ![A brawl with Vale Bandits](docs/screenshots/vale-bandits.jpg)<br>*Outnumbered at the bandit camp* |
 | ![Old Greyjaw hunted down on the north road](docs/screenshots/old-greyjaw.jpg)<br>*Old Greyjaw, the rare spawn, run down on the north road* | ![Vendor and bags UI](docs/screenshots/vendor-and-bags.jpg)<br>*Gearing up at Smith Haldren's — tooltips, bags, coin* |
+| ![The moongate on the Glimmermere shore](docs/screenshots/glimmermere-moongate.jpg)<br>*The drowned climb out at the Glimmermere moongate* | ![Ysolei on the altar of the Drowned Temple](docs/screenshots/drowned-temple-altar.jpg)<br>*Moonfire and the altar of the Drowned Temple* |
 
 ![World of Claude](worldofclaude.png)
 
@@ -130,6 +131,31 @@ boneguard and drakonid, Korgath the Bound (enrages below 30%), Grand
 Necromancer Velkhar (more add waves), and **Korzul the Gravewyrm** — epic
 weapons drop here, and the lead-up quest chain is soloable so nobody is
 locked out of the story.
+
+## The Drowned Temple — a portal to a sunken moon-cult (5-player)
+
+A separate story from the Gravecaller conspiracy. High in Thornpeak Heights,
+the **Glimmermere** — a still mountain tarn — has begun to glow and give up its
+dead, and a **moongate** has reopened on its shore. **Ondrel Vane, Tidewatcher**
+keeps a lonely watch there and sets you on a self-contained, soloable lead-up:
+cull the **Glimmermere Waders** that climb from the water, silence the **Drowned
+Votaries** of the Pale Choir, and slay **Sethrael the Palecoil**, the moon-serpent
+guarding the deep shelf.
+
+Walk into the moongate and you step through into **The Drowned Temple** — a
+5-player elite instance with its own pale, moon-violet look (a flooded
+antechamber of reliquary altars, a chamber-waist arch, then a colonnaded
+moon-sanctum). Paired elite packs — drowned templeguards, pale choir acolytes,
+glimmerscale lurkers and pearlguard sentinels — lead to **Choirmother Selthe**
+holding the threshold, and finally **Ysolei, Avatar of the Drowned Moon**
+(level 18) coiled on the great altar: she pulses **Lunar Tide** AoE every 9s,
+summons **Moonspawn** at 60% and 30% health, and enrages below 30%. Blue (rare)
+gear drops here — a class-split set of weapons and the **Moonshroud** chestpieces
+— bridging the gap between the Sunken Bastion (13) and the Gravewyrm Sanctum (20).
+
+```
+node scripts/tour_temple.mjs   # screenshot tour of the Glimmermere + Drowned Temple (needs `npm run dev`)
+```
 
 
 
@@ -240,6 +266,7 @@ node scripts/smoke_browser.mjs  # warrior E2E (needs `npm run dev` running)
 node scripts/smoke_mage.mjs     # mage: casting, polymorph, conjure+drink, death/release
 node scripts/smoke_rogue.mjs    # rogue: combo points, eviscerate, vendor, eating
 node scripts/visual_tour.mjs    # screenshot tour of the zone + UI into tmp/
+node scripts/tour_temple.mjs    # screenshot tour of the Glimmermere + Drowned Temple into tmp/
 node scripts/mp_integration.mjs # 26-check API/WS/persistence suite (server running)
 node scripts/social_e2e.mjs     # trade + duel over the wire (ALLOW_DEV_COMMANDS=1)
 node scripts/arena_visual.mjs   # two clients queue + fight a ranked 1v1 in the Ashen Coliseum

@@ -24,6 +24,7 @@ export const ZONE3_ZONE: ZoneDef = {
     { x: -90, z: 700, label: 'Ogre Foothills' },
     { x: -130, z: 740, label: "Drogmar's War-Camp" },
     { x: 110, z: 760, label: 'Stormcrag' },
+    { x: -70, z: 770, label: 'The Glimmermere' },
     { x: 55, z: 820, label: 'Wyrmcult Tents' },
     { x: -40, z: 830, label: 'Revenant Fields' },
     { x: 0, z: 880, label: 'Gravewyrm Sanctum' },
