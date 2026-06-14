@@ -18,7 +18,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     comboPoints: 0, comboTargetId: null, overpowerUntil: -1, savedMana: 0,
     chargeTargetId: null, chargeTimeLeft: 0, chargePath: [],
     sitting: false, eating: null, drinking: null,
-    aiState: 'idle', tappedById: null, pulseTimer: 0, firedSummons: 0, summonedIds: [], enraged: false,
+    aiState: 'idle', tappedById: null, guardDamageTaken: 0, pulseTimer: 0, firedSummons: 0, summonedIds: [], enraged: false,
     threat: new Map(), forcedTargetId: null, forcedTargetTimer: 0, ownerId: null, petTauntTimer: 0,
     spawnPos: { ...pos }, wanderTarget: null, wanderTimer: 0,
     aggroTargetId: null, respawnTimer: 0, corpseTimer: 0, lootable: false, loot: null,

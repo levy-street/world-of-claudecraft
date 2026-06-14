@@ -226,6 +226,7 @@ export interface NpcDef {
   // The Merchant: talking to this NPC opens the player-driven World Market
   // (auction house) instead of a fixed vendor stock.
   market?: boolean;
+  guard?: { assistRadius: number; leashRadius: number; attackSpeed: number };
   greeting: string;
 }
 
@@ -424,6 +425,7 @@ export interface Entity {
   // mob AI
   aiState: AiState;
   tappedById: number | null; // first player to damage this mob owns loot/xp/quest credit
+  guardDamageTaken: number; // town-guard damage used to scale or deny mob rewards
   /** Classic-style hate table: attacker entity id (player or pet) -> threat.
    *  Wiped on evade/respawn/death; drives target selection with the 110%
    *  melee / 130% ranged pull-over rules. */
