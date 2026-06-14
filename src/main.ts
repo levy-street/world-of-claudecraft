@@ -9,6 +9,9 @@ import { audio } from './game/audio';
 import { music } from './game/music';
 import { handlePickedEntity } from './game/interactions';
 import { Api, ClientWorld, CharacterSummary } from './net/online';
+import { selectedWorldBackend, spacetimeConnectionConfig } from './net/backend';
+import { SpacetimeWorld } from './net/spacetime';
+import type { OnlineWorldClient } from './net/world_client';
 import type { IWorld } from './world_api';
 import { assetsReady } from './render/assets/preload';
 import { CharacterPreview } from './render/characters';
@@ -285,7 +288,7 @@ function mountGameUi(): void {
 // Shared game wiring (used by both offline sim and online world)
 // ---------------------------------------------------------------------------
 
-async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWorld | null): Promise<void> {
+async function startGame(world: IWorld, offlineSim: Sim | null, online: OnlineWorldClient | null): Promise<void> {
   // Model/texture/HDRI fetches were kicked off at module import; the renderer
   // builds its scene synchronously, so everything must be resolved first.
   // The loading screen covers the gap — not a silent black screen.
@@ -1045,6 +1048,13 @@ function fatalOverlay(message: string): void {
   document.body.appendChild(el);
 }
 
+function createOnlineWorld(c: CharacterSummary): OnlineWorldClient {
+  if (selectedWorldBackend() === 'spacetimedb') {
+    return new SpacetimeWorld(spacetimeConnectionConfig(), api.token!, c.id, c.class);
+  }
+  return new ClientWorld(api.token!, c.id, c.class, api.base);
+}
+
 async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Promise<void> {
   try {
     if (button) {
@@ -1061,7 +1071,7 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
       button.textContent = 'Enter World';
     }
   }
-  const world = new ClientWorld(api.token!, c.id, c.class, api.base);
+  const world = createOnlineWorld(c);
   // wait for hello + first snapshot so the world starts populated
   const waitStart = Date.now();
   const poll = setInterval(() => {

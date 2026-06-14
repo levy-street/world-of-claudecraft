@@ -7,6 +7,7 @@
   "description": "World of Claudecraft — a WoW-Classic-style micro-MMO + headless RL training environment",
   "scripts": {
     "dev": "vite",
+    "dev:stdb": "VITE_WORLD_BACKEND=spacetimedb vite",
     "build": "node scripts/build_media_manifest.mjs generate && vite build && node scripts/build_media_manifest.mjs emit",
     "preview": "vite preview",
     "test": "vitest run",
@@ -18,6 +19,10 @@
     "build:server": "esbuild server/main.ts --bundle --platform=node --format=cjs --external:pg-native --external:bufferutil --external:utf-8-validate --outfile=dist-server/server.cjs",
     "server": "npm run build:server && node dist-server/server.cjs",
     "realms": "npm run build:server && node scripts/dev-realms.mjs",
+    "stdb:build": "cd stdb && spacetime build",
+    "stdb:start": "spacetime start",
+    "stdb:publish": "spacetime publish -p stdb worldofclaudecraft",
+    "stdb:generate": "spacetime generate --lang typescript --out-dir src/net/module_bindings -p stdb",
     "admin:grant": "node scripts/grant_admin.mjs"
   },
   "dependencies": {

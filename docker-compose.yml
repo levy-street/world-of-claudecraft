@@ -40,5 +40,19 @@ services:
     volumes:
       - ${EASTBROOK_MEDIA_DIR:-./media-cache}:/app/dist/media
 
+  # Experimental SpacetimeDB host. It is behind a compose profile so the
+  # default `docker compose up` path remains the Node + Postgres stack.
+  spacetimedb:
+    image: clockworklabs/spacetime:latest
+    container_name: eastbrook-spacetimedb
+    profiles: ["stdb"]
+    restart: unless-stopped
+    command: ["start"]
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - eastbrook_stdbdata:/stdb
+
 volumes:
   eastbrook_pgdata:
+  eastbrook_stdbdata:
