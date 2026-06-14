@@ -337,6 +337,7 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
   function openChat(): void {
     chatInput.style.display = 'block';
     chatInput.focus();
+    hud.onChatOpened();
   }
   chatInput.addEventListener('keydown', (e) => {
     e.stopPropagation();
