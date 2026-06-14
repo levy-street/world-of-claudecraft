@@ -28,6 +28,7 @@ const LEASH_DISTANCE = 45;
 const DUNGEON_LEASH_DISTANCE = 70;
 const CORPSE_DURATION = 60;
 const EVADE_SPEED_MULT = 1.6;
+const EVADE_RESET_TIMEOUT = 12;
 const BACKPEDAL_MULT = 0.65;
 const GRAVITY = 16;
 const JUMP_VELOCITY = 6;
@@ -1961,7 +1962,8 @@ export class Sim {
     pet.hostile = true;
     pet.aggroTargetId = null;
     pet.inCombat = false;
-    pet.aiState = pet.dead ? 'dead' : 'evade';
+    if (pet.dead) pet.aiState = 'dead';
+    else this.startEvade(pet);
     clearThreat(pet);
     for (const m of this.entities.values()) {
       if (m.kind !== 'mob' || m.id === pet.id) continue;
@@ -2467,8 +2469,30 @@ export class Sim {
       mob.inCombat = true;
       return;
     }
+    this.startEvade(mob);
+  }
+
+  private startEvade(mob: Entity): void {
     mob.aggroTargetId = null;
     mob.aiState = 'evade';
+    mob.evadeTimer = 0;
+  }
+
+  private finishEvade(mob: Entity): void {
+    mob.pos = { ...mob.spawnPos };
+    mob.prevPos = { ...mob.spawnPos };
+    mob.aiState = 'idle';
+    mob.hp = mob.maxHp;
+    mob.auras = [];
+    mob.inCombat = false;
+    mob.tappedById = null;
+    mob.leashAnchor = null;
+    clearThreat(mob);
+    this.despawnSummonedAdds(mob);
+    mob.firedSummons = 0;
+    mob.enraged = false;
+    mob.evadeTimer = 0;
+    mob.wanderTimer = this.rng.range(2, 8);
   }
 
   /** Highest-threat living attacker on the table; prunes stale entries. */
@@ -2575,6 +2599,7 @@ export class Sim {
     if (!mob.hostile) mob.hostile = true;
 
     if (mob.inCombat) this.updateBossMechanics(mob);
+    if (mob.aiState === 'evade') mob.evadeTimer += DT;
 
     if (this.isStunned(mob)) {
       if (mob.auras.some((a) => a.kind === 'polymorph')) {
@@ -2635,8 +2660,7 @@ export class Sim {
         const leash = mob.spawnPos.x > DUNGEON_X_THRESHOLD ? DUNGEON_LEASH_DISTANCE : LEASH_DISTANCE;
         const leashAnchor = mob.leashAnchor ?? mob.spawnPos;
         if (dist2d(mob.pos, leashAnchor) > leash) {
-          mob.aiState = 'evade';
-          mob.aggroTargetId = null;
+          this.startEvade(mob);
           clearThreat(mob);
           mob.leashAnchor = null;
           break;
@@ -2684,19 +2708,7 @@ export class Sim {
       }
       case 'evade': {
         const arrived = this.moveToward(mob, mob.spawnPos, mob.moveSpeed * EVADE_SPEED_MULT);
-        if (arrived) {
-          mob.aiState = 'idle';
-          mob.hp = mob.maxHp;
-          mob.auras = [];
-          mob.inCombat = false;
-          mob.tappedById = null;
-          mob.leashAnchor = null;
-          clearThreat(mob);
-          this.despawnSummonedAdds(mob);
-          mob.firedSummons = 0;
-          mob.enraged = false;
-          mob.wanderTimer = this.rng.range(2, 8);
-        }
+        if (arrived || mob.evadeTimer >= EVADE_RESET_TIMEOUT) this.finishEvade(mob);
         break;
       }
     }
@@ -2832,6 +2844,7 @@ export class Sim {
     mob.aggroTargetId = null;
     mob.inCombat = false;
     mob.leashAnchor = null;
+    mob.evadeTimer = 0;
     clearThreat(mob);
     this.despawnSummonedAdds(mob);
     mob.firedSummons = 0;

@@ -509,6 +509,33 @@ describe('boss loot and encounter resets', () => {
     expect(thralls()).toBe(0);
   });
 
+  it('resets evading Gravecaller Summoners that stall against camp props', () => {
+    const sim = makeSim();
+    const summoner = [...sim.entities.values()]
+      .find((e) => e.kind === 'mob' && e.templateId === 'gravecaller_summoner')!;
+
+    summoner.pos = sim.groundPos(summoner.spawnPos.x, summoner.spawnPos.z - 9);
+    summoner.prevPos = { ...summoner.pos };
+    summoner.aiState = 'evade';
+    summoner.aggroTargetId = null;
+    summoner.inCombat = true;
+    summoner.evadeTimer = 0;
+
+    for (let i = 0; i < 20 * 14; i++) sim.tick();
+
+    expect(summoner.aiState).toBe('idle');
+    expect(dist2d(summoner.pos, summoner.spawnPos)).toBeLessThan(0.1);
+
+    const hp = summoner.hp;
+    teleportTo(sim, summoner.pos.x - 1.5, summoner.pos.z);
+    sim.player.facing = Math.atan2(summoner.pos.x - sim.player.pos.x, summoner.pos.z - sim.player.pos.z);
+    sim.targetEntity(summoner.id);
+    sim.startAutoAttack();
+    for (let i = 0; i < 20 * 4 && summoner.hp === hp; i++) sim.tick();
+
+    expect(summoner.hp).toBeLessThan(hp);
+  });
+
   it('leaveDungeon outdoors is a no-op (no crypt-door fallback teleport)', () => {
     const sim = makeSim();
     const p = sim.player;

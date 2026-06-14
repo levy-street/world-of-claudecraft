@@ -473,6 +473,7 @@ export interface Entity {
   leashAnchor: Vec3 | null; // refreshed by hostile player/pet actions; spawnPos remains the true home
   wanderTarget: Vec3 | null;
   wanderTimer: number;
+  evadeTimer: number;
   aggroTargetId: number | null;
   /** GM character: invulnerable (dealDamage no-ops). Server-set from the
    *  characters.is_gm column; never user-settable. */
