@@ -5,7 +5,7 @@ import {
   zoneAt,
 } from './data';
 import { ARENA_SPAWN_A, ARENA_SPAWN_B } from './dungeon_layout';
-import { resolvePosition } from './colliders';
+import { hasLineOfSight, resolvePosition } from './colliders';
 import { findPath } from './pathfind';
 import { createGroundObject, createMob, createNpc, createPlayer, recalcPlayerStats, PlayerEquipment } from './entity';
 import { Rng } from './rng';
@@ -1271,6 +1271,7 @@ export class Sim {
       const maxRange = ability.range > 0 ? ability.range : MELEE_RANGE;
       if (d > maxRange) { this.error(p.id, 'Out of range.'); return; }
       if (ability.minRange && d < ability.minRange) { this.error(p.id, 'Too close!'); return; }
+      if (this.requiresHostileLineOfSight(ability) && !this.canSeeTarget(p, target, true)) return;
       const facingDiff = Math.abs(normAngle(angleTo(p.pos, target.pos) - p.facing));
       if (facingDiff > MELEE_ARC) { this.error(p.id, 'You must be facing your target.'); return; }
       // execute-style gate: only usable while the target is nearly dead
@@ -1369,6 +1370,7 @@ export class Sim {
   private applyChannelTick(p: Entity, res: ResolvedAbility): void {
     const target = p.targetId !== null ? this.entities.get(p.targetId) : null;
     if (!target || target.dead) { this.cancelCast(p); return; }
+    if (this.requiresHostileLineOfSight(res.def) && !this.canSeeTarget(p, target, false)) { this.cancelCast(p); return; }
     this.emit({ type: 'spellfx', sourceId: p.id, targetId: target.id, school: res.def.school, fx: 'projectile' });
     for (const eff of res.effects) {
       if (eff.type === 'directDamage') {
@@ -1453,6 +1455,7 @@ export class Sim {
       const d = dist2d(p.pos, target.pos);
       const maxRange = ability.range > 0 ? ability.range : MELEE_RANGE;
       if (d > maxRange + 2) { this.error(p.id, 'Out of range.'); return; }
+      if (this.requiresHostileLineOfSight(ability) && !this.canSeeTarget(p, target, true)) return;
     }
     if (p.resource < res.cost && !this.formShiftKind(p, ability)) { this.error(p.id, 'Not enough ' + (p.resourceType ?? 'resource') + '!'); return; }
 
@@ -2010,6 +2013,7 @@ export class Sim {
     // casters (wand-style, no dead zone so they don't run into melee — #94)
     const ranged = CLASSES[meta.cls].ranged;
     if (ranged && d <= ranged.maxRange && d >= (ranged.wand ? 0 : ranged.minRange)) {
+      if (!this.canSeeTarget(p, t, false)) return;
       this.rangedSwing(p, t, ranged);
       p.swingTimer = ranged.speed * this.swingIntervalMult(p);
       return;
@@ -2060,6 +2064,16 @@ export class Sim {
     // wand bolts are magic — armor doesn't apply; physical auto shot is mitigated
     if (!ranged.wand) dmg *= 1 - armorReduction(this.effectiveArmor(target), attacker.level);
     this.dealDamage(attacker, target, Math.max(1, Math.round(dmg)), crit, school, label, 'hit');
+  }
+
+  private requiresHostileLineOfSight(ability: AbilityDef): boolean {
+    return ability.requiresTarget && ability.targetType !== 'friendly' && ability.range > MELEE_RANGE;
+  }
+
+  private canSeeTarget(source: Entity, target: Entity, emitError: boolean): boolean {
+    if (hasLineOfSight(this.cfg.seed, source.pos.x, source.pos.z, target.pos.x, target.pos.z)) return true;
+    if (emitError) this.error(source.id, 'Target not in line of sight.');
+    return false;
   }
 
   // Returns true if the swing connected.
