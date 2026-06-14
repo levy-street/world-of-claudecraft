@@ -2994,6 +2994,24 @@ export class Sim {
     this.onInventoryChangedForQuests(meta);
   }
 
+  discardItem(itemId: string, count = 1, pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    const { meta } = r;
+    const def = ITEMS[itemId];
+    const available = this.countItem(itemId, meta.entityId);
+    if (!def || available <= 0) { this.error(meta.entityId, "You don't have that item."); return; }
+    const discardCount = Number.isFinite(count) ? Math.min(Math.floor(count), available) : 0;
+    if (discardCount <= 0) return;
+    this.removeItem(itemId, discardCount, meta.entityId);
+    this.emit({
+      type: 'log',
+      text: `Discarded ${def.name}${discardCount > 1 ? ' x' + discardCount : ''}.`,
+      color: '#999',
+      pid: meta.entityId,
+    });
+  }
+
   equipItem(itemId: string, pid?: number): void {
     const r = this.resolve(pid);
     if (!r) return;
