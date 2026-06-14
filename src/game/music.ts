@@ -319,6 +319,7 @@ export class MusicDirector {
   private combat = false;
   private _enabled = (typeof localStorage === 'undefined') ? true : localStorage.getItem(STORAGE_KEY) !== '0';
   private _vol = 1; // 0..1 volume, set from the settings menu
+  private _menuPaused = false; // temporary mute while the game menu is open
 
   get enabled(): boolean {
     return this._enabled;
@@ -326,7 +327,8 @@ export class MusicDirector {
 
   // master gain target given the enabled flag and volume (base level 0.15)
   private masterTarget(): number {
-    return this._enabled ? 0.15 * this._vol : 0;
+    if (!this._enabled || this._menuPaused) return 0;
+    return 0.15 * this._vol;
   }
 
   /** Set music volume (0..1). Safe before init(); applied to the master gain. */
@@ -395,6 +397,28 @@ export class MusicDirector {
     } catch { /* private mode */ }
     if (this.ctx && this.master) {
       this.master.gain.setTargetAtTime(this.masterTarget(), this.ctx.currentTime, 0.3);
+    }
+  }
+
+  /** Fade out while the game menu is open; does not change the music toggle. */
+  pauseForMenu(): void {
+    if (this._menuPaused) return;
+    this._menuPaused = true;
+    if (!this.ctx) return;
+    void this.ctx.resume();
+    if (this.master) {
+      this.master.gain.setTargetAtTime(0, this.ctx.currentTime, 0.2);
+    }
+  }
+
+  /** Restore playback after closing the game menu. */
+  resumeFromMenu(): void {
+    if (!this._menuPaused) return;
+    this._menuPaused = false;
+    if (!this.ctx) return;
+    void this.ctx.resume();
+    if (this.master) {
+      this.master.gain.setTargetAtTime(this.masterTarget(), this.ctx.currentTime, 0.35);
     }
   }
 
