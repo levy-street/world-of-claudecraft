@@ -16,6 +16,7 @@ import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { radialGlowTexture } from './textures';
+import { sharedUniforms } from './gfx';
 import { instanceOrigin } from '../sim/data';
 import {
   ARENA_LAYOUT, CRYPT_LAYOUT, SANCTUM_LAYOUT, TEMPLE_LAYOUT, DUNGEON_WALL_X, TOMB_HD,
@@ -51,6 +52,53 @@ const TORCH_COLORS: Record<Variant, TorchColors> = {
   // the Ashen Coliseum burns warm — amber braziers ringing the fighting sands
   arena: { flame: 0xffb24a, emissive: 0xcc5a14, light: 0xff9a3c },
 };
+
+// The Drowned Temple is flooded — a translucent, self-animating water sheet
+// (driven by the shared uTime so it needs no per-frame plumbing) with cheap
+// layered-sine caustics, a fresnel sheen and bioluminescent glow in the
+// ripples. Nothing else in the game floods its floor, which is the point.
+const TEMPLE_WATER_VERT = /* glsl */ `
+  uniform float uTime;
+  varying vec3 vWPos;
+  #include <fog_pars_vertex>
+  void main() {
+    vec3 pos = position;
+    pos.y += sin(uTime * 1.3 + pos.x * 0.5) * 0.02 + sin(uTime * 0.9 + pos.z * 0.42) * 0.02;
+    vec4 wp = modelMatrix * vec4(pos, 1.0);
+    vWPos = wp.xyz;
+    vec4 mv = viewMatrix * wp;
+    gl_Position = projectionMatrix * mv;
+    #include <fog_vertex>
+  }
+`;
+const TEMPLE_WATER_FRAG = /* glsl */ `
+  uniform float uTime;
+  uniform vec3 uShallow;
+  uniform vec3 uDeep;
+  uniform vec3 uGlow;
+  varying vec3 vWPos;
+  #include <common>
+  #include <fog_pars_fragment>
+  void main() {
+    vec3 V = normalize(cameraPosition - vWPos);
+    float fres = 0.12 + 0.88 * pow(1.0 - clamp(V.y, 0.0, 1.0), 3.0);
+    // layered-sine caustic web (three octaves so the veins read from any angle)
+    vec2 p = vWPos.xz;
+    float c = sin(p.x * 0.8 + uTime * 1.1) * sin(p.y * 0.75 - uTime * 0.95)
+            + 0.6 * sin((p.x - p.y) * 0.55 + uTime * 0.8)
+            + 0.4 * sin((p.x + p.y) * 1.3 - uTime * 1.4);
+    float caust = smoothstep(0.5, 1.5, c * 0.5 + 0.7);
+    // slow deep/shallow banding so the sheet never reads as a flat slab
+    vec3 col = mix(uDeep, uShallow, 0.45 + 0.45 * sin(p.x * 0.18 + p.y * 0.12 + uTime * 0.3));
+    col += uGlow * caust;                            // bright bioluminescent veins
+    col = mix(col, uShallow * 1.35, fres * 0.55);    // glassy fresnel sheen at grazing
+    float alpha = clamp(0.72 + caust * 0.22, 0.0, 0.97);
+    gl_FragColor = vec4(col, alpha);
+    #include <tonemapping_fragment>
+    #include <colorspace_fragment>
+    #include <fog_fragment>
+  }
+`;
 
 // ---------------------------------------------------------------------------
 // Module assets: loaded once at import, geometry merged per model, one shared
@@ -216,6 +264,7 @@ export class DungeonInteriors {
   private glowDecalMats = new Map<number, THREE.MeshBasicMaterial>();
   private flameGeo: THREE.BufferGeometry | null = null;
   private packMats = new Map<Pack, THREE.Material>();
+  private waterMat: THREE.ShaderMaterial | null = null;
 
   constructor(
     private scene: THREE.Scene,
@@ -240,10 +289,117 @@ export class DungeonInteriors {
     this.placeDais(group, p, layout, variant);
     this.placeAisleClutter(p, layout, variant);
     this.placeWallDressing(p, layout, variant);
+    if (variant === 'temple') {
+      this.placeFloodwater(group, layout);
+      this.placeAquaticDressing(group, layout);
+    }
 
     this.emit(group, p);
     group.position.set(ox, 0, oz);
     this.scene.add(group);
+  }
+
+  // -------------------------------------------------------------------------
+  // The Drowned Temple's water: a translucent caustic sheet flooding the whole
+  // room (the raised altar dais emerges as an island), bioluminescent pools
+  // pooled into the flood, kelp climbing the colonnade and lily pads drifting
+  // by the walls. All deterministic; nothing here is shared with other rooms.
+  // -------------------------------------------------------------------------
+
+  private templeWaterMaterial(): THREE.ShaderMaterial {
+    if (this.waterMat) return this.waterMat;
+    this.waterMat = new THREE.ShaderMaterial({
+      uniforms: {
+        ...THREE.UniformsUtils.clone(THREE.UniformsLib.fog),
+        uTime: sharedUniforms.uTime,
+        uShallow: { value: new THREE.Color(0x49c9bd) },
+        uDeep: { value: new THREE.Color(0x07303c) },
+        uGlow: { value: new THREE.Color(0x76f0dd) },
+      },
+      vertexShader: TEMPLE_WATER_VERT,
+      fragmentShader: TEMPLE_WATER_FRAG,
+      transparent: true,
+      depthWrite: false,
+      fog: true,
+    });
+    return this.waterMat;
+  }
+
+  private placeFloodwater(group: THREE.Group, layout: DungeonLayout): void {
+    const length = layout.zMax - layout.zMin;
+    const geo = new THREE.PlaneGeometry(2 * (DUNGEON_WALL_X - 1), length).rotateX(-Math.PI / 2);
+    geo.translate(0, 0.2, (layout.zMin + layout.zMax) / 2); // shin-deep over the floor (y=0)
+    const sheet = new THREE.Mesh(geo, this.templeWaterMaterial());
+    sheet.renderOrder = 1; // floats over the floor tiles
+    group.add(sheet);
+    // bioluminescent pools breathed along the flooded aisle + at the altar
+    for (let z = layout.zMin + 14; z < layout.zMax - 8; z += 22) {
+      this.addTorchGlow(group, 0, z, 0x37e6cf, 0.24, 1.4);
+    }
+    this.addTorchGlow(group, layout.dais.x, layout.dais.z, 0x37e6cf, 0.74, 2.0);
+  }
+
+  private placeAquaticDressing(group: THREE.Group, layout: DungeonLayout): void {
+    const inWaist = (z: number) => layout.stubs.some((s) => Math.abs(z - s.z) < s.hd + 2);
+    const obj = new THREE.Object3D();
+
+    // lily pads drifting on the flood, hugging the walls (clear of the aisle)
+    const padGeo = new THREE.CircleGeometry(0.95, 14).rotateX(-Math.PI / 2);
+    const padMat = new THREE.MeshLambertMaterial({
+      color: 0x2f6e3a, emissive: 0x0c3a26, emissiveIntensity: 0.5, side: THREE.DoubleSide,
+      transparent: true, opacity: 0.95,
+    });
+    const pads: THREE.Matrix4[] = [];
+    for (let z = layout.zMin + 8; z < layout.zMax - 6; z += 12) {
+      for (const side of [-1, 1]) {
+        if (inWaist(z)) continue;
+        const h = hash2(side * 5.7, z);
+        if (h < 0.4) continue;
+        const x = side * (9 + h * 9);
+        obj.position.set(x, 0.22, z + (hash2(z, side) - 0.5) * 4);
+        obj.rotation.set(0, hash2(x, z) * Math.PI, 0);
+        obj.scale.setScalar(0.7 + hash2(z * 1.7, x) * 0.7);
+        obj.updateMatrix();
+        pads.push(obj.matrix.clone());
+      }
+    }
+    if (pads.length) {
+      const padMesh = new THREE.InstancedMesh(padGeo, padMat, pads.length);
+      for (let i = 0; i < pads.length; i++) padMesh.setMatrixAt(i, pads[i]);
+      padMesh.instanceMatrix.needsUpdate = true;
+      padMesh.renderOrder = 2;
+      group.add(padMesh);
+    }
+
+    // kelp climbing out of the flood near the colonnade and walls
+    const kelpGeo = new THREE.CylinderGeometry(0.05, 0.22, 1, 5).translate(0, 0.5, 0);
+    const kelpMat = new THREE.MeshLambertMaterial({ color: 0x1f6b52, emissive: 0x0a3326, emissiveIntensity: 0.6 });
+    const stalks: THREE.Matrix4[] = [];
+    for (let z = layout.zMin + 10; z < layout.zMax - 8; z += 13) {
+      for (const side of [-1, 1]) {
+        if (inWaist(z)) continue;
+        const h = hash2(side * 3.1, z * 1.3);
+        if (h < 0.45) continue;
+        const cx = side * (13 + h * 7);
+        const clump = 2 + Math.floor(hash2(z, side * 2.2) * 2);
+        for (let k = 0; k < clump; k++) {
+          const jx = cx + (hash2(cx + k, z) - 0.5) * 2.2;
+          const jz = z + (hash2(z, cx + k * 3) - 0.5) * 2.2;
+          const height = 2.4 + hash2(jx, jz) * 2.4;
+          obj.position.set(jx, 0.05, jz);
+          obj.rotation.set((hash2(jx, jz * 2) - 0.5) * 0.5, hash2(jz, jx) * Math.PI, (hash2(jx * 2, jz) - 0.5) * 0.5);
+          obj.scale.set(1, height, 1);
+          obj.updateMatrix();
+          stalks.push(obj.matrix.clone());
+        }
+      }
+    }
+    if (stalks.length) {
+      const kelpMesh = new THREE.InstancedMesh(kelpGeo, kelpMat, stalks.length);
+      for (let i = 0; i < stalks.length; i++) kelpMesh.setMatrixAt(i, stalks[i]);
+      kelpMesh.instanceMatrix.needsUpdate = true;
+      group.add(kelpMesh);
+    }
   }
 
   // Hollow Crypt and Sunken Bastion share interior 'crypt'; the origin x-band
