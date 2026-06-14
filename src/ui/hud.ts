@@ -1293,6 +1293,7 @@ export class Hud {
           break;
         }
         case 'castStop': break;
+        case 'consumeCancel': break;
         case 'aura': {
           const tgt = sim.entities.get(ev.targetId);
           if (ev.name === 'Polymorph' && ev.gained) audio.sheep();

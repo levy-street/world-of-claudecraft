@@ -358,6 +358,8 @@ export interface Consuming {
   remaining: number;
 }
 
+export type ConsumeCancelReason = 'movement' | 'damage' | 'combat' | 'casting' | 'standing';
+
 export function isConsuming(e: { eating: Consuming | null; drinking: Consuming | null }): boolean {
   return e.eating !== null || e.drinking !== null;
 }
@@ -478,6 +480,7 @@ export type SimEvent = { pid?: number } & (
   | { type: 'aura'; targetId: number; name: string; gained: boolean }
   | { type: 'castStart'; entityId: number; ability: string; time: number }
   | { type: 'castStop'; entityId: number; success: boolean }
+  | { type: 'consumeCancel'; reason: ConsumeCancelReason; eating: boolean; drinking: boolean }
   | { type: 'comboPoint'; points: number }
   | { type: 'playerDeath' }
   | { type: 'respawn' }
