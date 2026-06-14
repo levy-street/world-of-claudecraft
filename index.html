@@ -596,6 +596,29 @@
   .soc-empty { color: #887c5c; font-size: 12px; padding: 10px 6px; text-align: center; }
   .soc-guild-head { font-family: var(--title-font); color: var(--gold); font-size: 15px; padding: 2px 4px 6px; }
   .soc-guild-head .gm { color: #998d6a; font-size: 11px; }
+  /* recruitment toggle (leader) + join-request rows (officers) */
+  .soc-recruit { display: flex; flex-wrap: wrap; gap: 5px; margin: 4px 0 8px; align-items: center; }
+  .soc-recruit .lbl { color: #998d6a; font-size: 11px; margin-right: 2px; }
+  .soc-recruit .chip { font-size: 11px; padding: 4px 9px; border-radius: 4px; cursor: pointer;
+    color: #d8c89a; background: #1a1410; border: 1px solid #463a1c; }
+  .soc-recruit .chip:hover { color: var(--gold); }
+  .soc-recruit .chip.on { color: var(--gold); border-color: #6f5a2a; background: linear-gradient(#2a2436, #161220); }
+  .soc-reqs-head { color: #7fd4ff; font-size: 11px; font-family: var(--title-font); margin: 8px 4px 2px; }
+  .soc-x.ok { color: #bfe8a0; border-color: #2f5a22; background: #16280f; }
+  .soc-x.ok:hover { color: #d8ffb0; border-color: #4a8a32; }
+
+  /* ---------- public guild directory (#110) ---------- */
+  #guild-directory-window { left: 50%; top: 50%; transform: translate(-50%, -50%); width: 380px;
+    max-height: 76vh; display: none; flex-direction: column; padding: 14px; }
+  #guild-directory-window.open { display: flex; }
+  .gdir-body { overflow-y: auto; flex: 1; min-height: 80px; margin-top: 6px; }
+  .gdir-row { display: flex; align-items: center; gap: 10px; padding: 8px 6px; border-radius: 4px; border-bottom: 1px solid #2a2418; }
+  .gdir-row:hover { background: #ffffff10; }
+  .gdir-id { display: flex; flex-direction: column; min-width: 0; flex: 1 1 auto; }
+  .gdir-name { color: var(--gold); font-family: var(--title-font); font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .gdir-meta { color: #998d6a; font-size: 11px; }
+  .gdir-meta .open { color: #7fdc4f; } .gdir-meta .req { color: #7fd4ff; }
+  #guild-directory-window .btn { margin: 0; padding: 6px 12px; font-size: 11px; flex: none; }
 
   /* map */
   #map-window { left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 14px; }
@@ -3371,6 +3394,7 @@
     <div id="arena-status"></div>
     <div id="options-menu" class="window panel"></div>
     <div id="social-window" class="window panel"></div>
+    <div id="guild-directory-window" class="window panel"></div>
     <div id="report-window" class="window panel"></div>
     <button id="social-fab" title="Friends &amp; Guild (O)" aria-label="Friends &amp; Guild">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>

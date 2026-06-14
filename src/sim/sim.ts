@@ -3821,6 +3821,12 @@ export class Sim {
   guildDemote(_name: string): void {}
   guildTransfer(_name: string): void {}
   guildDisband(): void {}
+  guildDirectory(): void {}
+  guildSetListing(_isPublic: boolean, _recruitment: import('../world_api').RecruitmentMode): void {}
+  guildRequestJoin(_guildId: number): void {}
+  guildCancelRequest(): void {}
+  guildApproveRequest(_charId: number): void {}
+  guildDenyRequest(_charId: number): void {}
   searchCharacters(_query: string): Promise<import('../world_api').CharacterSearchResult[]> { return Promise.resolve([]); }
 
   private updateDuels(): void {

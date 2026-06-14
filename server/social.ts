@@ -10,6 +10,11 @@
 
 export type GuildRank = 'leader' | 'officer' | 'member';
 
+// How outsiders may join a public guild (#110). Only meaningful while the
+// guild is listed in the directory; 'closed' is the implicit mode of an
+// unlisted guild (invite-only).
+export type RecruitmentMode = 'closed' | 'request' | 'open';
+
 // Where a character is and what they're doing, for friend/guild rosters.
 // `realm` is the world/shard the character lives on (stored per character so
 // it survives logout and is ready for future cross-realm play); `zone` and
@@ -45,11 +50,28 @@ export interface GuildMemberEntry extends CharInfo {
   status?: PresenceStatus;
 }
 
+// A pending request to join a guild, shown to officers/leader in their panel.
+export interface JoinRequestEntry extends CharInfo {}
+
+// One row in the public guild directory.
+export interface GuildDirectoryEntry {
+  id: number;
+  name: string;
+  memberCount: number;
+  recruitment: RecruitmentMode;
+  leaderName: string | null;
+}
+
 export interface GuildView {
   id: number;
   name: string;
   rank: GuildRank;
+  // directory listing state, so the leader's panel can show/toggle it
+  isPublic: boolean;
+  recruitment: RecruitmentMode;
   members: GuildMemberEntry[];
+  // outstanding join requests (only populated for officers + leader)
+  requests: JoinRequestEntry[];
 }
 
 export interface SocialSnapshot {
@@ -81,6 +103,14 @@ export interface SocialDb {
   removeGuildMember(charId: number): Promise<void>;
   setGuildRank(charId: number, rank: GuildRank): Promise<void>;
   guildMembers(guildId: number): Promise<(CharInfo & { rank: GuildRank })[]>;
+  // public directory + request-to-join (#110)
+  setGuildListing(guildId: number, isPublic: boolean, recruitment: RecruitmentMode): Promise<void>;
+  guildListing(guildId: number): Promise<{ isPublic: boolean; recruitment: RecruitmentMode } | null>;
+  guildDirectory(): Promise<GuildDirectoryEntry[]>;
+  addJoinRequest(guildId: number, charId: number): Promise<void>;
+  removeJoinRequest(charId: number): Promise<void>;
+  joinRequest(charId: number): Promise<{ guildId: number } | null>;
+  joinRequests(guildId: number): Promise<JoinRequestEntry[]>;
 }
 
 export interface SocialActor {
@@ -109,7 +139,9 @@ export type SocialEvent =
   | { type: 'log'; text: string; color?: string }
   | { type: 'error'; text: string }
   | { type: 'chat'; from: string; text: string; channel: 'guild' | 'officer' }
-  | { type: 'guildInvite'; fromName: string; guildName: string };
+  | { type: 'guildInvite'; fromName: string; guildName: string }
+  // response to a directory browse request (#110)
+  | { type: 'guildDirectory'; guilds: GuildDirectoryEntry[] };
 
 const FRIEND_LIMIT = 50;
 const BLOCK_LIMIT = 50;
@@ -127,6 +159,7 @@ export function validateGuildName(name: string): string | null {
 }
 
 const RANK_LABEL: Record<GuildRank, string> = { leader: 'Guild Master', officer: 'Officer', member: 'Member' };
+const RECRUIT_LABEL: Record<RecruitmentMode, string> = { closed: 'invite only', request: 'request to join', open: 'open recruitment' };
 
 export class SocialService {
   private pendingGuildInvites = new Map<number, { guildId: number; guildName: string; fromName: string; expiresAt: number }>();
@@ -149,14 +182,23 @@ export class SocialService {
     ]);
     let guild: GuildView | null = null;
     if (membership) {
-      const members = await this.db.guildMembers(membership.guildId);
+      const isOfficer = membership.rank !== 'member';
+      const [members, listing, requests] = await Promise.all([
+        this.db.guildMembers(membership.guildId),
+        this.db.guildListing(membership.guildId),
+        // only officers + leader see (and act on) pending join requests
+        isOfficer ? this.db.joinRequests(membership.guildId) : Promise.resolve([]),
+      ]);
       guild = {
         id: membership.guildId,
         name: membership.guildName,
         rank: membership.rank,
+        isPublic: listing?.isPublic ?? false,
+        recruitment: listing?.recruitment ?? 'request',
         members: members
           .map((m) => ({ ...m, ...this.presence(m.id) }))
           .sort((a, b) => rankOrder(a.rank) - rankOrder(b.rank) || a.name.localeCompare(b.name)),
+        requests: requests.sort((a, b) => a.name.localeCompare(b.name)),
       };
     }
     return {
@@ -390,6 +432,141 @@ export class SocialService {
       if (this.tx.isOnline(m.id)) {
         this.info(m.id, `<${membership.guildName}> has been disbanded.`, '#ffd100');
         this.push(m.id);
+      }
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Public directory + request-to-join (#110)
+  // -------------------------------------------------------------------------
+
+  // Leader-only: list the guild in the public directory and choose how
+  // outsiders may join ('request' = approval queue, 'open' = instant join).
+  // Passing isPublic=false unlists the guild (recruitment is then irrelevant).
+  async guildSetListing(actor: SocialActor, isPublic: boolean, recruitment: RecruitmentMode): Promise<void> {
+    const membership = await this.db.guildMembership(actor.characterId);
+    if (!membership) { this.err(actor.characterId, 'You are not in a guild.'); return; }
+    if (membership.rank !== 'leader') { this.err(actor.characterId, 'Only the Guild Master may change the guild listing.'); return; }
+    if (recruitment !== 'closed' && recruitment !== 'request' && recruitment !== 'open') {
+      this.err(actor.characterId, 'Invalid recruitment mode.'); return;
+    }
+    // an unlisted guild is closed to outside joins regardless of the mode sent
+    const mode: RecruitmentMode = isPublic ? recruitment : 'closed';
+    await this.db.setGuildListing(membership.guildId, isPublic, mode);
+    this.info(
+      actor.characterId,
+      isPublic
+        ? `<${membership.guildName}> is now listed in the guild directory (${RECRUIT_LABEL[mode]}).`
+        : `<${membership.guildName}> is no longer listed in the guild directory.`,
+      '#40ff7f',
+    );
+    await this.pushGuild(membership.guildId);
+  }
+
+  // Anyone: browse the public directory. Delivered as a one-shot event.
+  async guildDirectory(actor: SocialActor): Promise<void> {
+    const guilds = await this.db.guildDirectory();
+    this.tx.deliver(actor.characterId, [{ type: 'guildDirectory', guilds }]);
+  }
+
+  // Ask to join a public guild. 'open' guilds admit instantly (still capped +
+  // atomic via addGuildMember); 'request' guilds queue the request for an
+  // officer to approve. Reuses the same membership/cap guards as invite-accept.
+  async guildRequestJoin(actor: SocialActor, guildId: number): Promise<void> {
+    if (await this.db.guildMembership(actor.characterId)) { this.err(actor.characterId, 'You are already in a guild.'); return; }
+    const listing = await this.db.guildListing(guildId);
+    if (!listing || !listing.isPublic || listing.recruitment === 'closed') {
+      this.err(actor.characterId, 'That guild is not accepting join requests.'); return;
+    }
+    const members = await this.db.guildMembers(guildId);
+    if (members.length === 0) { this.err(actor.characterId, 'That guild no longer exists.'); return; }
+    if (members.length >= GUILD_MEMBER_LIMIT) { this.err(actor.characterId, 'That guild is full.'); return; }
+    const guildName = await this.guildNameOf(guildId, members);
+    if (listing.recruitment === 'open') {
+      await this.db.removeJoinRequest(actor.characterId);
+      await this.db.addGuildMember(guildId, actor.characterId, 'member');
+      this.info(actor.characterId, `You have joined <${guildName}>.`, '#40ff7f');
+      await this.broadcastGuild(guildId, [{ type: 'log', text: `${actor.name} has joined the guild.`, color: '#40ff7f' }]);
+      await this.pushGuild(guildId);
+      this.push(actor.characterId);
+      return;
+    }
+    // request mode: queue it and let officers know
+    const existing = await this.db.joinRequest(actor.characterId);
+    if (existing && existing.guildId === guildId) { this.err(actor.characterId, `You already have a pending request to <${guildName}>.`); return; }
+    await this.db.addJoinRequest(guildId, actor.characterId);
+    this.info(actor.characterId, `Your request to join <${guildName}> has been sent.`, '#40ff7f');
+    await this.notifyOfficers(guildId, members, `${actor.name} has requested to join the guild.`);
+    await this.pushGuild(guildId);
+  }
+
+  // Withdraw your own pending request.
+  async guildCancelRequest(actor: SocialActor): Promise<void> {
+    const existing = await this.db.joinRequest(actor.characterId);
+    if (!existing) { this.err(actor.characterId, 'You have no pending guild request.'); return; }
+    await this.db.removeJoinRequest(actor.characterId);
+    this.info(actor.characterId, 'Your guild request has been withdrawn.');
+    await this.pushGuild(existing.guildId);
+  }
+
+  // Officer/leader: admit a pending requester. Re-checks the cap and that the
+  // requester is still guildless, so a stale request can't overflow the guild.
+  async guildApproveRequest(actor: SocialActor, charId: number): Promise<void> {
+    const membership = await this.db.guildMembership(actor.characterId);
+    if (!membership) { this.err(actor.characterId, 'You are not in a guild.'); return; }
+    if (membership.rank === 'member') { this.err(actor.characterId, 'Only officers and the Guild Master may approve requests.'); return; }
+    const request = await this.db.joinRequest(charId);
+    if (!request || request.guildId !== membership.guildId) { this.err(actor.characterId, 'That request is no longer pending.'); return; }
+    // clear the request regardless — it is being resolved one way or another
+    await this.db.removeJoinRequest(charId);
+    const target = await this.db.getCharacter(charId);
+    const targetName = target?.name ?? 'The applicant';
+    if (await this.db.guildMembership(charId)) { this.err(actor.characterId, `${targetName} is already in a guild.`); await this.pushGuild(membership.guildId); return; }
+    const members = await this.db.guildMembers(membership.guildId);
+    if (members.length >= GUILD_MEMBER_LIMIT) { this.err(actor.characterId, 'Your guild is full.'); await this.pushGuild(membership.guildId); return; }
+    await this.db.addGuildMember(membership.guildId, charId, 'member');
+    if (this.tx.isOnline(charId)) {
+      this.info(charId, `Your request to join <${membership.guildName}> was accepted.`, '#40ff7f');
+      this.push(charId);
+    }
+    await this.broadcastGuild(membership.guildId, [{ type: 'log', text: `${targetName} has joined the guild.`, color: '#40ff7f' }]);
+    await this.pushGuild(membership.guildId);
+  }
+
+  // Officer/leader: reject a pending requester.
+  async guildDenyRequest(actor: SocialActor, charId: number): Promise<void> {
+    const membership = await this.db.guildMembership(actor.characterId);
+    if (!membership) { this.err(actor.characterId, 'You are not in a guild.'); return; }
+    if (membership.rank === 'member') { this.err(actor.characterId, 'Only officers and the Guild Master may deny requests.'); return; }
+    const request = await this.db.joinRequest(charId);
+    if (!request || request.guildId !== membership.guildId) { this.err(actor.characterId, 'That request is no longer pending.'); return; }
+    await this.db.removeJoinRequest(charId);
+    const target = await this.db.getCharacter(charId);
+    if (target && this.tx.isOnline(charId)) {
+      this.info(charId, `Your request to join <${membership.guildName}> was declined.`, '#ffd100');
+    }
+    this.info(actor.characterId, `Request from ${target?.name ?? 'the applicant'} declined.`);
+    await this.pushGuild(membership.guildId);
+  }
+
+  private async guildNameOf(guildId: number, members: (CharInfo & { rank: GuildRank })[]): Promise<string> {
+    const leader = members.find((m) => m.rank === 'leader');
+    if (leader) {
+      const m = await this.db.guildMembership(leader.id);
+      if (m && m.guildId === guildId) return m.guildName;
+    }
+    // fall back to any member's membership row for the canonical name
+    for (const member of members) {
+      const m = await this.db.guildMembership(member.id);
+      if (m && m.guildId === guildId) return m.guildName;
+    }
+    return 'the guild';
+  }
+
+  private async notifyOfficers(guildId: number, members: (CharInfo & { rank: GuildRank })[], text: string): Promise<void> {
+    for (const m of members) {
+      if ((m.rank === 'officer' || m.rank === 'leader') && this.tx.isOnline(m.id)) {
+        this.tx.deliver(m.id, [{ type: 'log', text, color: '#7fd4ff' }]);
       }
     }
   }

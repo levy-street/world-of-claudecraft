@@ -1,4 +1,4 @@
-import type { Entity, EquipSlot, InvSlot, MoveInput, PlayerClass, QuestProgress, QuestState, ResourceType } from './sim/types';
+import type { Entity, EquipSlot, GuildDirectoryEntry, InvSlot, MoveInput, PlayerClass, QuestProgress, QuestState, RecruitmentMode, ResourceType } from './sim/types';
 import type { ResolvedAbility } from './sim/sim';
 
 export interface PartyMemberInfo {
@@ -62,12 +62,27 @@ export interface GuildMemberInfo extends FriendInfo {
   rank: GuildRank;
 }
 
+// A pending applicant, shown to officers/leader in the guild panel (#110).
+export interface GuildRequestInfo {
+  id: number;
+  name: string;
+  cls: string;
+  level: number;
+}
+
 export interface GuildInfo {
   id: number;
   name: string;
   rank: GuildRank;
+  // directory listing state, so the leader can see/toggle it
+  isPublic: boolean;
+  recruitment: RecruitmentMode;
   members: GuildMemberInfo[];
+  // outstanding join requests (populated only for officers + leader)
+  requests: GuildRequestInfo[];
 }
+
+export type { GuildDirectoryEntry, RecruitmentMode } from './sim/types';
 
 export interface SocialInfo {
   friends: FriendInfo[];
@@ -212,6 +227,14 @@ export interface IWorld {
   guildDemote(name: string): void;
   guildTransfer(name: string): void;
   guildDisband(): void;
+  // public guild directory + request-to-join (#110). The directory is fetched
+  // on demand; the result is delivered via a 'guildDirectory' SimEvent.
+  guildDirectory(): void;
+  guildSetListing(isPublic: boolean, recruitment: RecruitmentMode): void;
+  guildRequestJoin(guildId: number): void;
+  guildCancelRequest(): void;
+  guildApproveRequest(charId: number): void;
+  guildDenyRequest(charId: number): void;
   // realm-scoped username typeahead for friend/ignore/guild search
   searchCharacters(query: string): Promise<CharacterSearchResult[]>;
   arenaQueueJoin(): void;
