@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
-import { Entity, dist2d } from '../src/sim/types';
+import { Entity, PlayerClass, dist2d } from '../src/sim/types';
 import { CRYPT_DOOR_POS, DUNGEON_LIST, DUNGEON_X_THRESHOLD, ITEMS, LAKE, MOBS, NPCS, QUESTS, zoneAt, zoneWelcomeText } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { groundHeight, WATER_LEVEL } from '../src/sim/world';
@@ -8,7 +8,7 @@ import { isBlocked, resolvePosition } from '../src/sim/colliders';
 
 const SEED = 20061;
 
-function makeSim(cls: 'warrior' | 'mage' = 'warrior') {
+function makeSim(cls: PlayerClass = 'warrior') {
   return new Sim({ seed: SEED, playerClass: cls });
 }
 
@@ -18,6 +18,13 @@ function teleportTo(sim: Sim, x: number, z: number, pid?: number) {
   p.pos.z = z;
   p.pos.y = groundHeight(x, z, sim.cfg.seed);
   p.prevPos = { ...p.pos };
+}
+
+function placeEntity(sim: Sim, e: Entity, x: number, z: number) {
+  e.pos.x = x;
+  e.pos.z = z;
+  e.pos.y = groundHeight(x, z, sim.cfg.seed);
+  e.prevPos = { ...e.pos };
 }
 
 describe('quest lifecycle', () => {
@@ -337,6 +344,67 @@ describe('dungeon instance placement and targetability', () => {
         expect(isBlocked(SEED, mob.pos.x, mob.pos.z, 0.5), `${dungeon.id} ${mob.name} spawned in geometry`).toBe(false);
       }
     }
+  });
+
+  it('blocks hostile ranged casts through Gravewyrm Sanctum chamber walls', () => {
+    const sim = makeSim('mage');
+    sim.setPlayerLevel(20);
+    sim.enterDungeon('gravewyrm_sanctum');
+    const p = sim.player;
+    const origin = { x: p.pos.x, z: p.pos.z - 4 };
+    const target = [...sim.entities.values()].find((e) => e.kind === 'mob' && e.templateId === 'sanctum_boneguard')!;
+    teleportTo(sim, origin.x - 10, origin.z + 60);
+    placeEntity(sim, target, origin.x - 10, origin.z + 75);
+    p.facing = 0;
+    p.resource = p.maxResource;
+    sim.targetEntity(target.id);
+
+    sim.castAbility('fireball');
+
+    expect(p.castingAbility).toBeNull();
+    expect(sim.events).toContainEqual(expect.objectContaining({
+      type: 'error',
+      text: 'Target not in line of sight.',
+    }));
+  });
+
+  it('allows hostile ranged casts through the Gravewyrm Sanctum center passage', () => {
+    const sim = makeSim('mage');
+    sim.setPlayerLevel(20);
+    sim.enterDungeon('gravewyrm_sanctum');
+    const p = sim.player;
+    const origin = { x: p.pos.x, z: p.pos.z - 4 };
+    const target = [...sim.entities.values()].find((e) => e.kind === 'mob' && e.templateId === 'sanctum_boneguard')!;
+    teleportTo(sim, origin.x, origin.z + 60);
+    placeEntity(sim, target, origin.x, origin.z + 75);
+    p.facing = 0;
+    p.resource = p.maxResource;
+    sim.targetEntity(target.id);
+
+    sim.castAbility('fireball');
+
+    expect(p.castingAbility).toBe('fireball');
+  });
+
+  it('blocks Auto Shot through Gravewyrm Sanctum chamber walls', () => {
+    const sim = makeSim('hunter');
+    sim.setPlayerLevel(20);
+    sim.enterDungeon('gravewyrm_sanctum');
+    const p = sim.player;
+    const origin = { x: p.pos.x, z: p.pos.z - 4 };
+    const target = [...sim.entities.values()].find((e) => e.kind === 'mob' && e.templateId === 'sanctum_boneguard')!;
+    teleportTo(sim, origin.x - 10, origin.z + 60);
+    placeEntity(sim, target, origin.x - 10, origin.z + 75);
+    p.facing = 0;
+    p.swingTimer = 0;
+    sim.targetEntity(target.id);
+    sim.startAutoAttack();
+    sim.events.length = 0;
+
+    const events = sim.tick();
+
+    expect(target.hp).toBe(target.maxHp);
+    expect(events.some((e) => e.type === 'spellfx' && e.fx === 'projectile')).toBe(false);
   });
 });
 

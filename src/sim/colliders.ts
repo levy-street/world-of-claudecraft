@@ -181,6 +181,74 @@ function resolveAgainst(list: Collider[], x: number, z: number, r: number): { x:
   return { x: px, z: pz };
 }
 
+function segmentIntersectsCircle(
+  ax: number, az: number, bx: number, bz: number,
+  c: CircleCollider,
+): boolean {
+  const dx = bx - ax, dz = bz - az;
+  const len2 = dx * dx + dz * dz;
+  if (len2 < 1e-8) {
+    const px = ax - c.x, pz = az - c.z;
+    return px * px + pz * pz < c.r * c.r;
+  }
+  const t = Math.max(0, Math.min(1, ((c.x - ax) * dx + (c.z - az) * dz) / len2));
+  const px = ax + dx * t - c.x, pz = az + dz * t - c.z;
+  return px * px + pz * pz < c.r * c.r;
+}
+
+function segmentIntersectsAabb(
+  ax: number, az: number, bx: number, bz: number,
+  hw: number, hd: number,
+): boolean {
+  let tMin = 0, tMax = 1;
+  const dx = bx - ax, dz = bz - az;
+  for (const [p, d, min, max] of [
+    [ax, dx, -hw, hw],
+    [az, dz, -hd, hd],
+  ] as const) {
+    if (Math.abs(d) < 1e-8) {
+      if (p <= min || p >= max) return false;
+      continue;
+    }
+    const inv = 1 / d;
+    let t1 = (min - p) * inv;
+    let t2 = (max - p) * inv;
+    if (t1 > t2) [t1, t2] = [t2, t1];
+    tMin = Math.max(tMin, t1);
+    tMax = Math.min(tMax, t2);
+    if (tMin >= tMax) return false;
+  }
+  return true;
+}
+
+function segmentIntersectsObb(
+  ax: number, az: number, bx: number, bz: number,
+  c: ObbCollider,
+): boolean {
+  const a = rotY(ax - c.x, az - c.z, -c.rot);
+  const b = rotY(bx - c.x, bz - c.z, -c.rot);
+  return segmentIntersectsAabb(a.x, a.z, b.x, b.z, c.hw, c.hd);
+}
+
+function segmentIntersectsCollider(
+  ax: number, az: number, bx: number, bz: number,
+  c: Collider,
+): boolean {
+  return c.type === 'circle'
+    ? segmentIntersectsCircle(ax, az, bx, bz, c)
+    : segmentIntersectsObb(ax, az, bx, bz, c);
+}
+
+function anySegmentHit(
+  colliders: Iterable<Collider>,
+  ax: number, az: number, bx: number, bz: number,
+): boolean {
+  for (const c of colliders) {
+    if (segmentIntersectsCollider(ax, az, bx, bz, c)) return true;
+  }
+  return false;
+}
+
 function instanceLocal(x: number, z: number): { ox: number; oz: number; interior: string } {
   const dungeon = dungeonAt(x);
   const index = dungeon?.index ?? 0;
@@ -218,4 +286,35 @@ export function resolvePosition(seed: number, x: number, z: number, r = 0.5): { 
 export function isBlocked(seed: number, x: number, z: number, r = 0.5): boolean {
   const res = resolvePosition(seed, x, z, r);
   return Math.abs(res.x - x) > 1e-4 || Math.abs(res.z - z) > 1e-4;
+}
+
+export function hasLineOfSight(seed: number, ax: number, az: number, bx: number, bz: number): boolean {
+  if (isArenaPos(ax) || isArenaPos(bx)) {
+    if (!isArenaPos(ax) || !isArenaPos(bx)) return false;
+    const oa = arenaOriginAt(az), ob = arenaOriginAt(bz);
+    if (oa.slot !== ob.slot) return false;
+    return !anySegmentHit(ARENA_COLLIDERS, ax - oa.x, az - oa.z, bx - oa.x, bz - oa.z);
+  }
+  if (ax > DUNGEON_X_THRESHOLD || bx > DUNGEON_X_THRESHOLD) {
+    if (ax <= DUNGEON_X_THRESHOLD || bx <= DUNGEON_X_THRESHOLD) return false;
+    const da = dungeonAt(ax), db = dungeonAt(bx);
+    if (!da || !db || da.id !== db.id) return false;
+    const a = instanceLocal(ax, az), b = instanceLocal(bx, bz);
+    if (a.ox !== b.ox || a.oz !== b.oz) return false;
+    const colliders = INTERIOR_COLLIDERS[a.interior] ?? CRYPT_COLLIDERS;
+    return !anySegmentHit(colliders, ax - a.ox, az - a.oz, bx - a.ox, bz - a.oz);
+  }
+  const minX = Math.min(ax, bx), maxX = Math.max(ax, bx);
+  const minZ = Math.min(az, bz), maxZ = Math.max(az, bz);
+  const x0 = Math.floor(minX / GRID_CELL), x1 = Math.floor(maxX / GRID_CELL);
+  const z0 = Math.floor(minZ / GRID_CELL), z1 = Math.floor(maxZ / GRID_CELL);
+  const candidates = new Set<Collider>();
+  const grid = gridFor(seed);
+  for (let gx = x0; gx <= x1; gx++) {
+    for (let gz = z0; gz <= z1; gz++) {
+      const list = grid.cells.get(gx + ',' + gz);
+      if (list) for (const c of list) candidates.add(c);
+    }
+  }
+  return !anySegmentHit(candidates, ax, az, bx, bz);
 }
