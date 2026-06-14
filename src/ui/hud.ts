@@ -24,6 +24,7 @@ import {
   clearHotbarSlot, encodeHotbarAction, HOTBAR_ACTION_MIME, HotbarAction, parseHotbarAction, parseHotbarActions,
   placeAbilityOnSlot, placeItemOnSlot, swapHotbarSlots, syncHotbarActions,
 } from './hotbar';
+import { formatDialogueText } from './dialogue_text';
 
 // hooks main wires after Input exists (the options menu drives input, audio,
 // graphics, and logout, all of which live outside the HUD)
@@ -1530,7 +1531,7 @@ export class Hud {
         || (st === 'ready' && QUESTS[q].turnInNpcId === npc.templateId);
     });
     let html = `<div class="panel-title"><span>${npc.name}<span style="color:#998d6a;font-size:11px"> &lt;${def?.title ?? ''}&gt;</span></span><span class="x-btn" data-close>✕</span></div>`;
-    html += `<div class="qd-text">"${(def?.greeting ?? 'Greetings.').replace('$C', CLASSES[this.sim.cfg.playerClass].name.toLowerCase())}"</div>`;
+    html += `<div class="qd-text">"${formatDialogueText(def?.greeting ?? 'Greetings.', this.sim.player.name, this.sim.cfg.playerClass)}"</div>`;
     if (interesting.length > 0) {
       for (const qid of interesting) {
         const st = this.sim.questState(qid);
@@ -1564,7 +1565,7 @@ export class Hud {
     const el = $('#quest-dialog');
     const quest = QUESTS[questId];
     const state = this.sim.questState(questId);
-    const text = (state === 'ready' ? quest.completionText : quest.text).replace(/\$N/g, this.sim.player.name);
+    const text = formatDialogueText(state === 'ready' ? quest.completionText : quest.text, this.sim.player.name, this.sim.cfg.playerClass);
     let html = `<div class="panel-title"><span>${quest.name}${quest.suggestedPlayers ? ` <span style="color:#f96;font-size:11px">(Suggested players: ${quest.suggestedPlayers})</span>` : ''}</span><span class="x-btn" data-close>✕</span></div>`;
     html += `<div class="qd-text">${text}</div>`;
     if (state !== 'ready') {
@@ -2220,7 +2221,7 @@ export class Hud {
       const quest = QUESTS[this.selectedQuestLogId];
       let html = `<div class="qd-sub" style="font-size:15px">${quest.name}${quest.suggestedPlayers ? ` <span style="color:#f96;font-size:11px">(Suggested players: ${quest.suggestedPlayers})</span>` : ''}</div>`;
       html += quest.objectives.map((o, i) => `<div class="qd-obj" style="color:${qp.counts[i] >= o.count ? '#7fdc4f' : '#cfc6a8'}">&bull; ${o.label}: ${qp.counts[i]}/${o.count}</div>`).join('');
-      html += `<div class="qd-text" style="margin-top:8px">${quest.text.replace(/\$N/g, sim.player.name)}</div>`;
+      html += `<div class="qd-text" style="margin-top:8px">${formatDialogueText(quest.text, sim.player.name, sim.cfg.playerClass)}</div>`;
       html += `<div class="qd-sub">Rewards</div><div class="qd-obj">${quest.xpReward} experience &nbsp; ${this.moneyHtml(quest.copperReward)}</div>`;
       const giver = NPCS[quest.turnInNpcId];
       html += `<div class="qd-obj" style="margin-top:6px;color:#998d6a">Return to ${giver?.name ?? '?'}</div>`;
