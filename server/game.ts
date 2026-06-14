@@ -5,7 +5,7 @@ import type { PlayerMeta } from '../src/sim/sim';
 import { DT, Entity, SimEvent, dist2d } from '../src/sim/types';
 import { stealthDetectionRadius, threatEntries } from '../src/sim/threat';
 import { zoneAt, DUNGEONS } from '../src/sim/data';
-import { saveCharacterState, openPlaySession, closePlaySession, insertChatLogs, loadMarketState, saveMarketState, pool } from './db';
+import { saveCharacterState, openPlaySession, closePlaySession, insertChatLogs, pool } from './db';
 import { ChatLogger } from './chat_log';
 import { SocialService } from './social';
 import type { Presence, PresenceStatus, SocialActor, SocialEvent, SocialTransport } from './social';
@@ -370,7 +370,6 @@ export class GameServer {
       if (this.saveTimer >= AUTOSAVE_SECONDS) {
         this.saveTimer = 0;
         void this.saveAll('autosave');
-        void this.saveMarket();
       }
     }, 50);
   }
@@ -462,23 +461,6 @@ export class GameServer {
   async saveAll(reason: string): Promise<void> {
     for (const session of this.clients.values()) {
       await this.saveCharacter(session).catch((err) => console.error(`${reason} failed for ${session.name}:`, err));
-    }
-  }
-
-  // The World Market is shared global state, persisted as a single JSONB blob.
-  async loadMarket(): Promise<void> {
-    try {
-      this.sim.loadMarket(await loadMarketState());
-    } catch (err) {
-      console.error('failed to load world market:', err);
-    }
-  }
-
-  async saveMarket(): Promise<void> {
-    try {
-      await saveMarketState(this.sim.serializeMarket());
-    } catch (err) {
-      console.error('failed to save world market:', err);
     }
   }
 
@@ -677,15 +659,6 @@ export class GameServer {
       // arena (Ashen Coliseum 1v1 queue)
       case 'arena_queue': sim.arenaQueueJoin(pid); break;
       case 'arena_leave': sim.arenaQueueLeave(pid); break;
-      // World Market (the Merchant's auction house)
-      case 'market_list':
-        if (typeof msg.item === 'string' && typeof msg.count === 'number' && typeof msg.price === 'number') {
-          sim.marketList(msg.item, msg.count, msg.price, pid);
-        }
-        break;
-      case 'market_buy': if (typeof msg.id === 'number') sim.marketBuy(msg.id, pid); break;
-      case 'market_cancel': if (typeof msg.id === 'number') sim.marketCancel(msg.id, pid); break;
-      case 'market_collect': sim.marketCollect(pid); break;
       // social: friends / ignore / guild (persistent, account-scoped)
       case 'friend_add': if (typeof msg.name === 'string') void this.social.friendAdd(this.actorFor(session), msg.name).catch(logSocialErr); break;
       case 'friend_remove': if (typeof msg.name === 'string') void this.social.friendRemove(this.actorFor(session), msg.name).catch(logSocialErr); break;
@@ -909,9 +882,6 @@ export class GameServer {
     maybe('trade', this.tradeWire(session.pid));
     maybe('duel', this.duelWire(session.pid));
     maybe('arena', this.sim.arenaInfoFor(session.pid));
-    // market info is null unless the player is standing at the Merchant, so it
-    // only rides the wire for players actually browsing the World Market
-    maybe('market', this.sim.marketInfoFor(session.pid));
     return extra === '' ? json : json.slice(0, -1) + extra + '}';
   }
 

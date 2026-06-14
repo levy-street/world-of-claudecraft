@@ -1,5 +1,5 @@
 import { Pool } from 'pg';
-import type { CharacterState, MarketSave } from '../src/sim/sim';
+import type { CharacterState } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 import type { ChatLogRow } from './chat_log';
 import { SOCIAL_SCHEMA } from './social_db';
@@ -71,11 +71,6 @@ CREATE TABLE IF NOT EXISTS chat_logs (
 );
 CREATE INDEX IF NOT EXISTS chat_logs_created ON chat_logs(created_at);
 CREATE INDEX IF NOT EXISTS chat_logs_character ON chat_logs(character_id, created_at);
-CREATE TABLE IF NOT EXISTS world_state (
-  key TEXT PRIMARY KEY,
-  data JSONB NOT NULL,
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
 CREATE TABLE IF NOT EXISTS player_reports (
   id BIGSERIAL PRIMARY KEY,
   reporter_account_id INT REFERENCES accounts(id) ON DELETE SET NULL,
@@ -350,33 +345,6 @@ export async function topArenaRatings(limit = 20): Promise<ArenaLeaderRow[]> {
     name: r.name, class: r.class, level: r.level,
     rating: Number(r.rating), wins: Number(r.wins), losses: Number(r.losses),
   }));
-}
-
-// ---------------------------------------------------------------------------
-// World state: a tiny key→JSONB store for shared, global game state that isn't
-// tied to one character. The World Market (the Merchant's auction house) lives
-// here under the 'market' key — listings + per-seller collections.
-// ---------------------------------------------------------------------------
-
-export async function loadWorldState<T>(key: string): Promise<T | null> {
-  const res = await pool.query('SELECT data FROM world_state WHERE key = $1', [key]);
-  return (res.rows[0]?.data as T) ?? null;
-}
-
-export async function saveWorldState(key: string, data: unknown): Promise<void> {
-  await pool.query(
-    `INSERT INTO world_state (key, data, updated_at) VALUES ($1, $2, now())
-     ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
-    [key, JSON.stringify(data)],
-  );
-}
-
-export async function loadMarketState(): Promise<MarketSave | null> {
-  return loadWorldState<MarketSave>('market');
-}
-
-export async function saveMarketState(save: MarketSave): Promise<void> {
-  await saveWorldState('market', save);
 }
 
 // ---------------------------------------------------------------------------

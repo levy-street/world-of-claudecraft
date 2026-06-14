@@ -6,7 +6,7 @@ import {
   Entity, EquipSlot, InvSlot, MoveInput, PlayerClass, QuestProgress, QuestState, SimEvent,
   emptyMoveInput,
 } from '../sim/types';
-import type { ArenaInfo, CharacterSearchResult, DuelInfo, IWorld, MarketInfo, PartyInfo, SocialInfo, TradeInfo } from '../world_api';
+import type { ArenaInfo, CharacterSearchResult, DuelInfo, IWorld, PartyInfo, SocialInfo, TradeInfo } from '../world_api';
 
 // ---------------------------------------------------------------------------
 // REST
@@ -196,7 +196,6 @@ export class ClientWorld implements IWorld {
   tradeInfo: TradeInfo | null = null;
   duelInfo: DuelInfo | null = null;
   arenaInfo: ArenaInfo | null = null;
-  marketInfo: MarketInfo | null = null;
   socialInfo: SocialInfo | null = null;
   realm = '';
   // bumped whenever a fresh social snapshot lands, so an open panel re-renders
@@ -491,7 +490,6 @@ export class ClientWorld implements IWorld {
       if (s.trade !== undefined) this.tradeInfo = s.trade;
       if (s.duel !== undefined) this.duelInfo = s.duel;
       if (s.arena !== undefined) this.arenaInfo = s.arena;
-      if (s.market !== undefined) this.marketInfo = s.market;
       // camera follows server-side facing changes when not mouselooking
       if (prevSelfFacing !== undefined && this.mouselookFacing === null) {
         let d = e.facing - prevSelfFacing;
@@ -640,18 +638,6 @@ export class ClientWorld implements IWorld {
   }
   arenaQueueLeave(): void {
     this.cmd({ cmd: 'arena_leave' });
-  }
-  marketList(itemId: string, count: number, price: number): void {
-    this.cmd({ cmd: 'market_list', item: itemId, count, price });
-  }
-  marketBuy(listingId: number): void {
-    this.cmd({ cmd: 'market_buy', id: listingId });
-  }
-  marketCancel(listingId: number): void {
-    this.cmd({ cmd: 'market_cancel', id: listingId });
-  }
-  marketCollect(): void {
-    this.cmd({ cmd: 'market_collect' });
   }
   // persistent social (resolved server-side by character name)
   friendAdd(name: string): void { this.cmd({ cmd: 'friend_add', name }); }
