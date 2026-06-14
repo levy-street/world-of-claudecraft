@@ -31,6 +31,28 @@ export function buildWebSocketAuthMessage(token: string, characterId: number): {
 }
 
 export type RealmType = 'Normal' | 'PvP' | 'RP' | 'RP-PvP';
+export type ClientConnectionPhase = 'connecting' | 'authenticating' | 'connected' | 'disconnected' | 'closed' | 'rejected';
+export type ClientWebSocketState = 'connecting' | 'open' | 'closing' | 'closed' | 'unknown';
+
+export interface ClientSendFailure {
+  kind: 'input' | 'cmd';
+  reason: 'socket-not-open' | 'send-failed';
+  phase: ClientConnectionPhase;
+  socketState: ClientWebSocketState;
+  command?: string;
+  message?: string;
+  at: number;
+}
+
+export interface ClientConnectionStatus {
+  phase: ClientConnectionPhase;
+  connected: boolean;
+  canSend: boolean;
+  socketState: ClientWebSocketState;
+  reason: string;
+  lastChangedAt: number;
+  lastSendFailure: ClientSendFailure | null;
+}
 
 export interface RealmEntry {
   name: string;
@@ -243,6 +265,11 @@ export class ClientWorld implements IWorld {
   private pendingQuestCommands = new Map<string, 'accept' | 'turnin'>();
   private mouselookFacing: number | null = null;
   private sendTimer: number | undefined;
+  private connectionPhase: ClientConnectionPhase = 'connecting';
+  private connectionReason = 'Opening WebSocket.';
+  private connectionChangedAt = Date.now();
+  private lastSendFailure: ClientSendFailure | null = null;
+  private closedByClient = false;
 
   constructor(token: string, characterId: number, cls: PlayerClass, base = '') {
     this.characterId = characterId;
@@ -256,19 +283,31 @@ export class ClientWorld implements IWorld {
       : buildWebSocketUrl(location.protocol, location.host);
     this.ws = new WebSocket(wsUrl);
     this.ws.onopen = () => {
-      this.ws.send(JSON.stringify(buildWebSocketAuthMessage(token, characterId)));
+      this.setConnectionPhase('authenticating', 'Authenticating with the realm.');
+      try {
+        this.ws.send(JSON.stringify(buildWebSocketAuthMessage(token, characterId)));
+      } catch (err) {
+        this.handleSendError('cmd', 'auth', err);
+      }
     };
     this.ws.onmessage = (ev) => this.onMessage(String(ev.data));
     this.ws.onclose = () => {
       this.connected = false;
+      Object.assign(this.moveInput, emptyMoveInput());
       clearInterval(this.sendTimer);
-      this.onDisconnect?.('Connection to the server was lost.');
+      if (this.connectionPhase === 'rejected' || this.connectionPhase === 'disconnected') return;
+      this.setConnectionPhase(this.closedByClient ? 'closed' : 'disconnected', this.closedByClient ? 'Connection closed.' : 'Connection to the server was lost.');
+      if (!this.closedByClient) this.onDisconnect?.('Connection to the server was lost.');
     };
     // input stream at sim rate
     this.sendTimer = window.setInterval(() => this.sendInput(), 50);
   }
 
   close(): void {
+    this.closedByClient = true;
+    this.connected = false;
+    this.setConnectionPhase('closed', 'Connection closed.');
+    Object.assign(this.moveInput, emptyMoveInput());
     clearInterval(this.sendTimer);
     this.ws.onclose = null;
     this.ws.close();
@@ -292,8 +331,94 @@ export class ClientWorld implements IWorld {
   // Socket
   // -----------------------------------------------------------------------
 
+  private setConnectionPhase(phase: ClientConnectionPhase, reason: string): void {
+    this.connectionPhase = phase;
+    this.connectionReason = reason;
+    this.connectionChangedAt = Date.now();
+  }
+
+  private socketState(): ClientWebSocketState {
+    switch (this.ws.readyState) {
+      case WebSocket.CONNECTING: return 'connecting';
+      case WebSocket.OPEN: return 'open';
+      case WebSocket.CLOSING: return 'closing';
+      case WebSocket.CLOSED: return 'closed';
+      default: return 'unknown';
+    }
+  }
+
+  canSendToServer(): boolean {
+    return (this.connectionPhase ?? 'connected') === 'connected'
+      && this.connected
+      && this.ws.readyState === WebSocket.OPEN;
+  }
+
+  getConnectionStatus(): ClientConnectionStatus {
+    return {
+      phase: this.connectionPhase,
+      connected: this.connected,
+      canSend: this.canSendToServer(),
+      socketState: this.socketState(),
+      reason: this.connectionReason,
+      lastChangedAt: this.connectionChangedAt,
+      lastSendFailure: this.lastSendFailure ? { ...this.lastSendFailure } : null,
+    };
+  }
+
+  get connectionStatus(): ClientConnectionStatus {
+    return this.getConnectionStatus();
+  }
+
+  setMoveInput(mi: MoveInput): boolean {
+    if (!this.canSendToServer()) {
+      Object.assign(this.moveInput, emptyMoveInput());
+      this.recordSendFailure('input', 'socket-not-open');
+      return false;
+    }
+    Object.assign(this.moveInput, mi);
+    return true;
+  }
+
+  private recordSendFailure(
+    kind: ClientSendFailure['kind'],
+    reason: ClientSendFailure['reason'],
+    command?: string,
+    err?: unknown,
+  ): void {
+    if (
+      reason === 'socket-not-open'
+      && this.connectionPhase === 'disconnected'
+      && this.lastSendFailure?.reason === 'send-failed'
+    ) return;
+    this.lastSendFailure = {
+      kind,
+      reason,
+      phase: this.connectionPhase,
+      socketState: this.socketState(),
+      ...(command ? { command } : {}),
+      ...(err instanceof Error ? { message: err.message } : {}),
+      at: Date.now(),
+    };
+  }
+
+  private handleSendError(kind: ClientSendFailure['kind'], command: string | undefined, err: unknown): void {
+    this.recordSendFailure(kind, 'send-failed', command, err);
+    this.connected = false;
+    this.setConnectionPhase('disconnected', 'Connection to the server stopped accepting messages.');
+    Object.assign(this.moveInput, emptyMoveInput());
+    clearInterval(this.sendTimer);
+    if (this.ws.readyState === WebSocket.CONNECTING || this.ws.readyState === WebSocket.OPEN) {
+      try { this.ws.close(); } catch {}
+    }
+    this.onDisconnect?.('Connection to the server stopped accepting messages.');
+  }
+
   private sendInput(): void {
-    if (!this.connected || this.ws.readyState !== WebSocket.OPEN) return;
+    if (!this.canSendToServer()) {
+      Object.assign(this.moveInput, emptyMoveInput());
+      this.recordSendFailure('input', 'socket-not-open');
+      return;
+    }
     const mi = this.moveInput;
     const msg: Record<string, unknown> = {
       t: 'input',
@@ -305,16 +430,26 @@ export class ClientWorld implements IWorld {
       },
     };
     if (this.mouselookFacing !== null) msg.facing = this.mouselookFacing;
-    this.ws.send(JSON.stringify(msg));
+    try {
+      this.ws.send(JSON.stringify(msg));
+    } catch (err) {
+      this.handleSendError('input', undefined, err);
+    }
   }
 
-  private canSendCommand(): boolean {
-    return this.connected && this.ws.readyState === WebSocket.OPEN;
-  }
-
-  private cmd(payload: Record<string, unknown>): void {
-    if (!this.canSendCommand()) return;
-    this.ws.send(JSON.stringify({ t: 'cmd', ...payload }));
+  private cmd(payload: Record<string, unknown>): boolean {
+    const command = typeof payload.cmd === 'string' ? payload.cmd : undefined;
+    if (!this.canSendToServer()) {
+      this.recordSendFailure('cmd', 'socket-not-open', command);
+      return false;
+    }
+    try {
+      this.ws.send(JSON.stringify({ t: 'cmd', ...payload }));
+      return true;
+    } catch (err) {
+      this.handleSendError('cmd', command, err);
+      return false;
+    }
   }
 
   private onMessage(raw: string): void {
@@ -329,10 +464,15 @@ export class ClientWorld implements IWorld {
       this.cfg.seed = msg.seed;
       if (typeof msg.realm === 'string') this.realm = msg.realm;
       this.connected = true;
+      this.lastSendFailure = null;
+      this.setConnectionPhase('connected', 'Connected to the realm.');
       return;
     }
     if (msg.t === 'error') {
       this.connected = false;
+      this.setConnectionPhase('rejected', msg.error ?? 'Rejected by server.');
+      Object.assign(this.moveInput, emptyMoveInput());
+      clearInterval(this.sendTimer);
       this.onDisconnect?.(msg.error ?? 'rejected by server');
       return;
     }
@@ -547,6 +687,7 @@ export class ClientWorld implements IWorld {
     this.cmd({ cmd: 'castSlot', slot });
   }
   targetEntity(id: number | null): void {
+    if (!this.cmd({ cmd: 'target', id })) return;
     // optimistic local update for snappy UI
     const p = this.entities.get(this.playerId);
     if (p) {
@@ -556,7 +697,6 @@ export class ClientWorld implements IWorld {
         if (e && (!e.dead || e.lootable)) p.targetId = id;
       }
     }
-    this.cmd({ cmd: 'target', id });
   }
   tabTarget(): void {
     this.cmd({ cmd: 'tab' });
@@ -577,14 +717,12 @@ export class ClientWorld implements IWorld {
     this.cmd({ cmd: 'pickup', id });
   }
   acceptQuest(questId: string): void {
-    if (!this.canSendCommand()) return;
+    if (!this.cmd({ cmd: 'accept', quest: questId })) return;
     this.pendingQuestCommands.set(questId, 'accept');
-    this.cmd({ cmd: 'accept', quest: questId });
   }
   turnInQuest(questId: string): void {
-    if (!this.canSendCommand()) return;
+    if (!this.cmd({ cmd: 'turnin', quest: questId })) return;
     this.pendingQuestCommands.set(questId, 'turnin');
-    this.cmd({ cmd: 'turnin', quest: questId });
   }
   abandonQuest(questId: string): void {
     this.cmd({ cmd: 'abandon', quest: questId });

@@ -539,7 +539,7 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
 
     // online: inputs stream on a timer inside ClientWorld; here we mirror state
     const net = online!;
-    Object.assign(net.moveInput, input.readMoveInput());
+    net.setMoveInput(input.readMoveInput());
     net.setMouselookFacing(mouselook ? input.camYaw : null);
     net.pendingFacingDelta = 0; // superseded by the interpolated follow below
     hud.handleEvents(net.drainEvents());
@@ -560,7 +560,15 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
   // cut to the game only once the first frame is actually on screen
   requestAnimationFrame(() => requestAnimationFrame(() => hideLoadingScreen()));
 
-  (window as any).__game = { sim: world, world, renderer, input, hud, online };
+  (window as any).__game = {
+    sim: world,
+    world,
+    renderer,
+    input,
+    hud,
+    online,
+    connection: () => online?.getConnectionStatus() ?? null,
+  };
 }
 
 // ---------------------------------------------------------------------------
