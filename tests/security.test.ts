@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { buildWebSocketAuthMessage, buildWebSocketUrl } from '../src/net/online';
 import { Sim } from '../src/sim/sim';
-import { normalizeCharName, offensiveName, offensiveUsername, validCharName, validUsername } from '../server/auth';
+import { normalizeCharName, offensiveCharacterName, offensiveName, offensiveUsername, validCharName, validUsername } from '../server/auth';
 import { rateLimited, requestIp } from '../server/ratelimit';
 
 function fakeReq(headers: Record<string, string>, remoteAddress: string) {
@@ -245,7 +245,15 @@ describe('username censorship', () => {
   });
 });
 
-describe('character name censorship', () => {
+describe('character name moderation', () => {
+  it('allows normal character names that meet the shape rules', () => {
+    withUsernameBanlist({ inline: 'blockedterm' }, () => {
+      expect(validCharName('Jaina Proudmoore')).toBe(true);
+      expect(validCharName("Kael'thas")).toBe(true);
+      expect(validCharName('Rexxar-Misha')).toBe(true);
+    });
+  });
+
   it('rejects profanity in character names', () => {
     withUsernameBanlist({}, () => {
       expect(validCharName('Fuuuck')).toBe(false);
@@ -261,6 +269,29 @@ describe('character name censorship', () => {
   it('applies configured banned username terms to character names too', () => {
     withUsernameBanlist({ inline: 'gravecaller' }, () => {
       expect(validCharName('Grave Caller')).toBe(false);
+    });
+  });
+
+  it('rejects configured banned terms in new character names', () => {
+    withUsernameBanlist({ inline: 'blockedterm' }, () => {
+      expect(validCharName('Blockedterm')).toBe(false);
+      expect(validCharName('Ablockedterm')).toBe(false);
+    });
+  });
+
+  it('normalizes spaces, hyphens, and apostrophes before checking character names', () => {
+    withUsernameBanlist({ inline: 'blockedterm' }, () => {
+      expect(offensiveCharacterName("B'locked-Term")).toBe(true);
+      expect(validCharName("B'locked-Term")).toBe(false);
+    });
+  });
+
+  it('preserves space-containing banned character name terms', () => {
+    withUsernameBanlist({ inline: 'blocked term' }, () => {
+      expect(offensiveCharacterName('Blocked')).toBe(false);
+      expect(validCharName('Blocked')).toBe(true);
+      expect(offensiveCharacterName('Blocked Term')).toBe(true);
+      expect(validCharName('Blocked Term')).toBe(false);
     });
   });
 });

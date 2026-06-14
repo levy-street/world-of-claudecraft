@@ -55,8 +55,8 @@ const BUILT_IN_BANNED_NAME_TERMS = parseBanlist([
   'hitler',
 ].join('\n'));
 
-function normalizedUsernameForCensorship(username: string): string {
-  return username
+function normalizedNameForCensorship(name: string): string {
+  return name
     .toLowerCase()
     .replace(/[0134578!|@$+]/g, (ch) => CONFUSABLE_CHARS[ch] ?? ch)
     .replace(/[^a-z]/g, '');
@@ -64,12 +64,13 @@ function normalizedUsernameForCensorship(username: string): string {
 
 function parseBanlist(raw: string | undefined): string[] {
   return (raw ?? '')
-    .split(/[\s,]+/)
-    .map((term) => normalizedUsernameForCensorship(term))
+    .split(/[\n,]+/)
+    .map((term) => term.trim())
+    .map((term) => normalizedNameForCensorship(term))
     .filter((term) => term.length > 0);
 }
 
-function bannedUsernameTerms(): string[] {
+export function configuredBannedNameTerms(): string[] {
   const terms = BUILT_IN_BANNED_NAME_TERMS.concat(parseBanlist(process.env.USERNAME_BANLIST));
   const file = process.env.USERNAME_BANLIST_FILE;
   if (!file) return terms;
@@ -81,20 +82,26 @@ function bannedUsernameTerms(): string[] {
   }
 }
 
-export function offensiveUsername(u: unknown): boolean {
-  return offensiveName(u);
-}
-
-export function offensiveName(u: unknown): boolean {
+function offensiveName(u: unknown, terms = configuredBannedNameTerms()): boolean {
   if (typeof u !== 'string') return false;
-  const normalized = normalizedUsernameForCensorship(u);
+  const normalized = normalizedNameForCensorship(u);
   return profanityMatcher.hasMatch(u) ||
     profanityMatcher.hasMatch(normalized) ||
-    bannedUsernameTerms().some((term) => normalized.includes(term));
+    terms.some((term) => normalized.includes(term));
 }
 
+export function offensiveUsername(u: unknown, terms = configuredBannedNameTerms()): boolean {
+  return offensiveName(u, terms);
+}
+
+export function offensiveCharacterName(n: unknown, terms = configuredBannedNameTerms()): boolean {
+  return offensiveName(n, terms);
+}
+
+export { offensiveName };
+
 export function validUsername(u: unknown): u is string {
-  return validUsernameShape(u) && !offensiveName(u);
+  return validUsernameShape(u) && !offensiveUsername(u);
 }
 
 export function validUsernameShape(u: unknown): u is string {
@@ -106,7 +113,7 @@ export function validPassword(p: unknown): p is string {
 }
 
 export function validCharName(n: unknown): n is string {
-  return validCharNameShape(n) && !offensiveName(n);
+  return validCharNameShape(n) && !offensiveCharacterName(n);
 }
 
 export function validCharNameShape(n: unknown): n is string {

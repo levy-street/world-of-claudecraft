@@ -4,6 +4,7 @@ import type { PlayerClass } from '../src/sim/types';
 import type { ChatLogRow } from './chat_log';
 import { SOCIAL_SCHEMA } from './social_db';
 import { REALM } from './realm';
+import { configuredBannedNameTerms, offensiveCharacterName } from './auth';
 
 try {
   process.loadEnvFile?.();
@@ -310,6 +311,24 @@ export async function renameCharacter(accountId: number, characterId: number, na
     [characterId, accountId, name, REALM],
   );
   return res.rows[0] ?? null;
+}
+
+export async function markOffensiveCharacterNamesForRename(): Promise<number> {
+  const terms = configuredBannedNameTerms();
+  if (terms.length === 0) return 0;
+
+  const res = await pool.query('SELECT id, name FROM characters WHERE realm = $1 AND force_rename = FALSE', [REALM]);
+  const ids = res.rows
+    .filter((row) => offensiveCharacterName(row.name, terms))
+    .map((row) => Number(row.id))
+    .filter((id) => Number.isFinite(id));
+  if (ids.length === 0) return 0;
+
+  const update = await pool.query(
+    'UPDATE characters SET force_rename = TRUE, updated_at = now() WHERE realm = $1 AND id = ANY($2::int[]) AND force_rename = FALSE',
+    [REALM, ids],
+  );
+  return update.rowCount ?? 0;
 }
 
 export async function saveCharacterState(characterId: number, level: number, state: CharacterState): Promise<void> {

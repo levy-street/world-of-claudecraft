@@ -6,7 +6,7 @@ import {
   ensureSchema, pool, createAccount, findAccount, getAccountsCount, touchLogin, saveToken, accountForToken,
   listCharacters, getCharacter, createCharacter, deleteCharacter, closeOrphanSessions,
   pruneChatLogs, searchCharacters, characterCountsByRealm, moderationStatusForAccount, renameCharacter,
-  findCharacterReportTargetByName, topArenaRatings,
+  findCharacterReportTargetByName, markOffensiveCharacterNamesForRename, topArenaRatings,
 } from './db';
 import { cleanReportReason, createPlayerReport } from './moderation_db';
 import { resolveReportTarget } from './report_target';
@@ -331,6 +331,8 @@ async function main(): Promise<void> {
     }
   }
   await ensureSchema();
+  const markedForRename = await markOffensiveCharacterNamesForRename();
+  if (markedForRename > 0) console.log(`marked ${markedForRename} character name(s) for forced rename`);
   const orphans = await closeOrphanSessions();
   if (orphans > 0) console.log(`closed ${orphans} orphaned play session(s) from a previous run`);
   const pruned = await pruneChatLogs(CHAT_LOG_RETENTION_DAYS);
