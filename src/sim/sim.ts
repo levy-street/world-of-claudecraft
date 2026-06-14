@@ -3401,6 +3401,14 @@ export class Sim {
     this.duelInvites.delete(r.meta.entityId);
     const other = this.players.get(invite.fromPid);
     if (!other) return;
+    // Re-validate: the challenger may have multiple pending challenges out, and
+    // either fighter could have entered a duel since. Starting one here would
+    // overwrite a live duel (this.duels is keyed per-pid) and leave the original
+    // opponent fighting a duel nobody else is tracking.
+    if (this.duels.has(invite.fromPid) || this.duels.has(r.meta.entityId)) {
+      this.error(r.meta.entityId, 'A duel is already in progress.');
+      return;
+    }
     const duel: DuelState = { a: invite.fromPid, b: r.meta.entityId, state: 'countdown', timer: DUEL_COUNTDOWN };
     this.duels.set(duel.a, duel);
     this.duels.set(duel.b, duel);
@@ -3809,6 +3817,14 @@ export class Sim {
     if (!invite || invite.expires < this.time) { this.error(r.meta.entityId, 'The trade request has expired.'); return; }
     this.tradeInvites.delete(r.meta.entityId);
     if (!this.players.get(invite.fromPid)) return;
+    // Re-validate availability: an inviter can have several outgoing invites at
+    // once, and either party may have started a trade since the request. Opening
+    // a session here would clobber a live one (this.trades is keyed per-pid) and
+    // strand the other partner in a desynced window.
+    if (this.trades.has(invite.fromPid) || this.trades.has(r.meta.entityId)) {
+      this.error(r.meta.entityId, 'That player is already trading.');
+      return;
+    }
     const session: TradeSession = {
       a: invite.fromPid, b: r.meta.entityId,
       offerA: { items: [], copper: 0 }, offerB: { items: [], copper: 0 },
