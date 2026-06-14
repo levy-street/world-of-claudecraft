@@ -2162,6 +2162,7 @@ export class Hud {
         <option value="harassment">Harassment / abuse</option>
         <option value="spam">Spam</option>
         <option value="cheating">Cheating / exploit</option>
+        <option value="botting">Botting / automation</option>
         <option value="offensive_name_or_chat">Offensive name or chat</option>
         <option value="other">Other</option>
       </select>
@@ -2191,7 +2192,7 @@ export class Hud {
       request
         .then(() => {
           el.style.display = 'none';
-          this.log(`Report submitted for ${name}.`, '#ffd100');
+          this.log(`Report received for ${name}. You can also ignore or block players who are disrupting your chat.`, '#ffd100');
         })
         .catch((err: unknown) => {
           submit.disabled = false;

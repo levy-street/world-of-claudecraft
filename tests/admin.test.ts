@@ -179,6 +179,10 @@ describe('admin api auth', () => {
       openReports: 4,
       latestReportAt: new Date().toISOString(),
       latestReason: 'spam',
+      latestSource: 'system',
+      latestReportKind: 'report_abuse',
+      maxAbuseScore: 120,
+      abuseReasons: ['reporter_spam'],
       characterNames: ['Badactor'],
       online: true,
     }]);

@@ -126,7 +126,7 @@ export function renderModerationQueue(rows: ModerationQueueRow[]): string {
       <td>${escapeHtml(r.username)}${r.online ? ' <span class="badge">online</span>' : ''}</td>
       <td>${r.characterNames.map(escapeHtml).join(', ') || '—'}</td>
       <td class="num">${r.openReports}</td>
-      <td>${escapeHtml(reasonLabel(r.latestReason))}</td>
+      <td>${reportKindBadge(r.latestSource, r.latestReportKind)} ${escapeHtml(reasonLabel(r.latestReason))}${r.maxAbuseScore > 0 ? ` <span class="badge warn">score ${r.maxAbuseScore}</span>` : ''}</td>
       <td>${fmtRelative(r.latestReportAt)}</td>
       <td>${statusBadge(r.status, r.suspendedUntil)}</td>
     </tr>`);
@@ -140,6 +140,20 @@ export function renderModerationQueue(rows: ModerationQueueRow[]): string {
 
 export function renderModerationDetail(d: ModerationAccountDetail): string {
   const reports = d.reports.map((r) => {
+    const evidence = renderEvidence(r.evidence);
+    const events = r.relatedEvents.length === 0
+      ? '<div class="empty">no related submission events</div>'
+      : `<table><thead><tr><th>Time</th><th>Outcome</th><th>Reporter</th><th>Target</th><th class="num">Score</th><th>Signals</th></tr></thead><tbody>${
+          r.relatedEvents.map((event) => `
+            <tr>
+              <td>${fmtDate(event.createdAt)}</td>
+              <td>${escapeHtml(event.outcome)}</td>
+              <td>${event.reporterAccountId ?? '—'} / ${escapeHtml(event.reporterCharacterName || 'unknown')}</td>
+              <td>${event.targetAccountId ?? '—'} / ${escapeHtml(event.targetCharacterName || 'unknown')}</td>
+              <td class="num">${event.abuseScore}</td>
+              <td>${event.abuseReasons.map(escapeHtml).join(', ') || '—'}</td>
+            </tr>`).join('')
+        }</tbody></table>`;
     const chat = r.chatContext.length === 0
       ? '<div class="empty">no recent chat from this character before the report</div>'
       : `<table><thead><tr><th>Time</th><th>Channel</th><th>Message</th></tr></thead><tbody>${
@@ -151,17 +165,21 @@ export function renderModerationDetail(d: ModerationAccountDetail): string {
             </tr>`).join('')
         }</tbody></table>`;
     return `<div class="mod-report panel" data-report-id="${r.id}">
-      <div class="panel-title">Report #${r.id} <span class="hint">${fmtDate(r.createdAt)}</span></div>
+      <div class="panel-title">Report #${r.id} ${reportKindBadge(r.source, r.reportKind)} <span class="hint">${fmtDate(r.createdAt)}</span></div>
       <div class="mod-report-meta">
         <div><b>Reporter:</b> ${escapeHtml(r.reporterUsername ?? 'unknown')} / ${escapeHtml(r.reporterCharacterName || 'unknown')}</div>
         <div><b>Reported:</b> ${escapeHtml(r.reportedUsername)} / ${escapeHtml(r.reportedCharacterName || 'unknown')}</div>
         <div><b>Reason:</b> ${escapeHtml(reasonLabel(r.reason))}</div>
+        <div><b>Abuse score:</b> ${r.abuseScore}${r.abuseReasons.length > 0 ? ` (${r.abuseReasons.map(escapeHtml).join(', ')})` : ''}</div>
       </div>
       <div class="mod-details">${escapeHtml(r.details || 'No extra details provided.')}</div>
+      ${evidence}
       <div class="mod-actions">
         <button data-ignore-report="${r.id}">Ignore</button>
         ${r.reportedCharacterId ? `<button data-force-rename-character="${r.reportedCharacterId}" data-character-name="${escapeHtml(r.reportedCharacterName)}">Force Name Change</button>` : ''}
       </div>
+      <h4>Related report submissions</h4>
+      ${events}
       <h4>Recent chat before this report</h4>
       ${chat}
     </div>`;
@@ -194,9 +212,31 @@ function reasonLabel(reason: string): string {
     harassment: 'Harassment / abuse',
     spam: 'Spam',
     cheating: 'Cheating / exploit',
+    botting: 'Botting / automation',
     offensive_name_or_chat: 'Offensive name or chat',
+    report_abuse: 'Report abuse',
     other: 'Other',
   } as Record<string, string>)[reason] ?? reason;
+}
+
+function reportKindBadge(source: string, kind: string): string {
+  if (source === 'system' || kind === 'report_abuse') {
+    return '<span class="badge warn">System: report abuse</span>';
+  }
+  return '';
+}
+
+function renderEvidence(evidence: Record<string, unknown>): string {
+  const entries = Object.entries(evidence).filter(([, value]) => value !== undefined && value !== null && value !== '');
+  if (entries.length === 0) return '';
+  return `<div class="mod-report-meta">${entries.slice(0, 12).map(([key, value]) => `
+    <div><b>${escapeHtml(key)}:</b> ${escapeHtml(formatEvidenceValue(value))}</div>`).join('')}</div>`;
+}
+
+function formatEvidenceValue(value: unknown): string {
+  if (Array.isArray(value)) return value.map((v) => typeof v === 'object' ? JSON.stringify(v) : String(v)).join(', ');
+  if (value && typeof value === 'object') return JSON.stringify(value);
+  return String(value);
 }
 
 function statusBadge(status: string, suspendedUntil: string | null): string {

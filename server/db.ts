@@ -87,8 +87,46 @@ CREATE TABLE IF NOT EXISTS player_reports (
   reviewed_by_account_id INT REFERENCES accounts(id) ON DELETE SET NULL,
   review_note TEXT NOT NULL DEFAULT ''
 );
+ALTER TABLE player_reports ADD COLUMN IF NOT EXISTS source TEXT NOT NULL DEFAULT 'player';
+ALTER TABLE player_reports ADD COLUMN IF NOT EXISTS report_kind TEXT NOT NULL DEFAULT 'player_report';
+ALTER TABLE player_reports ADD COLUMN IF NOT EXISTS realm TEXT NOT NULL DEFAULT '${REALM.replace(/'/g, "''")}';
+ALTER TABLE player_reports ADD COLUMN IF NOT EXISTS evidence JSONB NOT NULL DEFAULT '{}'::jsonb;
+ALTER TABLE player_reports ADD COLUMN IF NOT EXISTS abuse_score INT NOT NULL DEFAULT 0;
+ALTER TABLE player_reports ADD COLUMN IF NOT EXISTS abuse_reasons TEXT[] NOT NULL DEFAULT '{}';
+ALTER TABLE player_reports ADD COLUMN IF NOT EXISTS dedupe_key TEXT NOT NULL DEFAULT '';
 CREATE INDEX IF NOT EXISTS player_reports_reported_status ON player_reports(reported_account_id, status, created_at DESC);
 CREATE INDEX IF NOT EXISTS player_reports_reporter_created ON player_reports(reporter_account_id, created_at DESC);
+CREATE UNIQUE INDEX IF NOT EXISTS player_reports_open_system_abuse_dedupe
+  ON player_reports(dedupe_key)
+  WHERE status = 'open' AND source = 'system' AND report_kind = 'report_abuse' AND dedupe_key <> '';
+CREATE TABLE IF NOT EXISTS report_events (
+  id BIGSERIAL PRIMARY KEY,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  realm TEXT NOT NULL DEFAULT '${REALM.replace(/'/g, "''")}',
+  reporter_account_id INT REFERENCES accounts(id) ON DELETE SET NULL,
+  reporter_character_id INT REFERENCES characters(id) ON DELETE SET NULL,
+  reporter_character_name TEXT NOT NULL DEFAULT '',
+  target_account_id INT REFERENCES accounts(id) ON DELETE SET NULL,
+  target_character_id INT REFERENCES characters(id) ON DELETE SET NULL,
+  target_character_name TEXT NOT NULL DEFAULT '',
+  reason TEXT NOT NULL DEFAULT '',
+  details_hash TEXT NOT NULL DEFAULT '',
+  details_length INT NOT NULL DEFAULT 0,
+  outcome TEXT NOT NULL,
+  player_report_id BIGINT REFERENCES player_reports(id) ON DELETE SET NULL,
+  ip_hash TEXT NOT NULL DEFAULT '',
+  user_agent_hash TEXT NOT NULL DEFAULT '',
+  abuse_score INT NOT NULL DEFAULT 0,
+  abuse_reasons TEXT[] NOT NULL DEFAULT '{}',
+  evidence JSONB NOT NULL DEFAULT '{}'::jsonb
+);
+CREATE INDEX IF NOT EXISTS report_events_reporter_created ON report_events(reporter_account_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS report_events_target_created ON report_events(target_account_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS report_events_target_time ON report_events(target_account_id, created_at);
+CREATE INDEX IF NOT EXISTS report_events_reporter_target_created ON report_events(reporter_account_id, target_account_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS report_events_ip_created ON report_events(ip_hash, created_at DESC);
+CREATE INDEX IF NOT EXISTS report_events_outcome ON report_events(outcome);
+CREATE INDEX IF NOT EXISTS report_events_player_report ON report_events(player_report_id);
 CREATE TABLE IF NOT EXISTS account_moderation_actions (
   id BIGSERIAL PRIMARY KEY,
   account_id INT REFERENCES accounts(id) ON DELETE CASCADE,
