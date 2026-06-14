@@ -23,6 +23,7 @@ export const ZONE1_ZONE: ZoneDef = {
   pois: [
     { x: 0, z: -3, label: 'Eastbrook' },
     { x: -2, z: 70, label: 'Wolf Run' },
+    { x: 35, z: 120, label: 'Blighted Hollow' },
     { x: 65, z: 0, label: 'Boar Meadow' },
     { x: -88, z: 82, label: 'Mirror Lake' },
     { x: -60, z: 4, label: 'Webwood' },
@@ -138,6 +139,32 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
       { itemId: 'quilted_trousers', chance: 0.5 },
     ],
     scale: 1.25, color: 0x6c3483,
+  },
+  // #112 — the starter zone's notorious elite (a Hogger homage). Calls its pack
+  // for aid at half health, then enrages near death. Tuned as a 2-3 player pull.
+  diremaw: {
+    id: 'diremaw', name: 'Diremaw the Blighted', minLevel: 8, maxLevel: 8, family: 'beast',
+    elite: true, boss: true, rare: true,
+    hpBase: 70, hpPerLevel: 20, dmgBase: 7, dmgPerLevel: 2.2, attackSpeed: 2.2,
+    armorPerLevel: 22, moveSpeed: 8, aggroRadius: 14,
+    summonAdds: { mobId: 'blighted_packling', count: 2, atHpPct: [0.5] },
+    enrage: { belowHpPct: 0.3, dmgMult: 1.4 },
+    loot: [
+      { copper: 320, chance: 1 },
+      { itemId: 'wolf_fang', chance: 1 },
+      { itemId: 'diremaw_hide', chance: 0.6 },
+      { itemId: 'blightfang_cleaver', chance: 0.35 },
+    ],
+    scale: 1.45, color: 0x4a5a3a,
+  },
+  // Diremaw's summoned pack — level-appropriate so the add phase is a real
+  // threat. Adds never drop loot.
+  blighted_packling: {
+    id: 'blighted_packling', name: 'Blighted Packling', minLevel: 7, maxLevel: 7, family: 'beast',
+    hpBase: 42, hpPerLevel: 14, dmgBase: 5, dmgPerLevel: 1.8, attackSpeed: 2.0,
+    armorPerLevel: 14, moveSpeed: 8.5, aggroRadius: 10,
+    loot: [],
+    scale: 0.95, color: 0x5a6a4a,
   },
 };
 
@@ -401,6 +428,8 @@ export const ZONE1_CAMPS: CampDef[] = [
   { mobId: 'forest_wolf', center: { x: -15, z: 55 }, radius: 22, count: 7 },
   { mobId: 'forest_wolf', center: { x: 20, z: 70 }, radius: 20, count: 6 },
   { mobId: 'old_greyjaw', center: { x: 0, z: 95 }, radius: 8, count: 1 },
+  // Elite boss: Blighted Hollow, deep in the north woods past the wolf runs
+  { mobId: 'diremaw', center: { x: 35, z: 120 }, radius: 2, count: 1 },
   // Boars: east meadow
   { mobId: 'wild_boar', center: { x: 55, z: 12 }, radius: 22, count: 6 },
   { mobId: 'wild_boar', center: { x: 80, z: -15 }, radius: 18, count: 5 },

@@ -81,6 +81,15 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     id: 'greyjaw_pelt_cloak', name: "Greyjaw's Pelt Leggings", kind: 'armor', slot: 'legs', quality: 'uncommon',
     stats: { armor: 35, sta: 1, agi: 1 }, sellValue: 110,
   },
+  // --- Diremaw (starter elite boss, #112) drops; usable by any class ---
+  diremaw_hide: {
+    id: 'diremaw_hide', name: "Diremaw's Tainted Hide", kind: 'armor', slot: 'chest', quality: 'uncommon',
+    stats: { armor: 78, sta: 3 }, sellValue: 160,
+  },
+  blightfang_cleaver: {
+    id: 'blightfang_cleaver', name: 'Blightfang Cleaver', kind: 'weapon', slot: 'mainhand', quality: 'rare',
+    weapon: { min: 8, max: 14, speed: 2.5 }, stats: { str: 3, sta: 2 }, sellValue: 600,
+  },
   // --- food & drink (vendor) ---
   baked_bread: {
     id: 'baked_bread', name: 'Freshly Baked Bread', kind: 'food', quality: 'common',

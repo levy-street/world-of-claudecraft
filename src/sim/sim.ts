@@ -2364,6 +2364,14 @@ export class Sim {
     if (mob.dead) {
       mob.corpseTimer -= DT;
       mob.respawnTimer -= DT;
+      // summoned boss adds are temporary: remove them when their corpse fades
+      // instead of respawning like a normal overworld mob (else a killed add
+      // wave would return ~respawnSeconds later even though its threshold fired
+      // only once).
+      if (mob.summoned) {
+        if (mob.corpseTimer <= 0) this.dropEntity(mob.id);
+        return;
+      }
       // dungeon mobs stay dead until the instance resets
       const isInstanceMob = mob.spawnPos.x > DUNGEON_X_THRESHOLD;
       if (!isInstanceMob && mob.respawnTimer <= 0 && (mob.corpseTimer <= 0 || !mob.lootable)) {
@@ -2644,7 +2652,9 @@ export class Sim {
 
   // Encounter reset: remove the adds a boss summoned this pull so retries
   // start clean (firedSummons re-fires a fresh wave per pull). Player
-  // target/combo refs are cleared first, like freeInstance does.
+  // target/combo refs are cleared first, like freeInstance does. Called on
+  // evade and respawn — NOT on boss death: a slain boss's adds intentionally
+  // keep fighting and drop when killed (or are swept here on the next respawn).
   private despawnSummonedAdds(boss: Entity): void {
     if (boss.summonedIds.length === 0) return;
     for (const id of boss.summonedIds) {
@@ -2699,6 +2709,7 @@ export class Sim {
       const level = this.rng.int(template.minLevel, template.maxLevel);
       const add = createMob(this.nextId++, template, level, pos);
       add.spawnPos = { ...boss.spawnPos }; // leashes with the boss; stays dead in instances
+      add.summoned = true; // temporary — never respawns once killed (see updateMob)
       add.tappedById = boss.tappedById;
       this.addEntity(add);
       boss.summonedIds.push(add.id);

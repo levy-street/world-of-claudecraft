@@ -435,6 +435,7 @@ export interface Entity {
   pulseTimer: number; // boss aoe pulse countdown
   firedSummons: number; // summonAdds thresholds already triggered
   summonedIds: number[]; // live adds this boss summoned; despawned on reset
+  summoned?: boolean; // a temporary boss add — never respawns; removed when its corpse fades
   enraged: boolean; // enrage mechanic active
   spawnPos: Vec3;
   wanderTarget: Vec3 | null;
