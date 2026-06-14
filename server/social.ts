@@ -74,10 +74,21 @@ export interface GuildView {
   requests: JoinRequestEntry[];
 }
 
+// The requesting player's own outstanding join request (#110). Populated only
+// when the player is guildless and has a pending request, so the client can
+// show a "Pending request to <guild>" state with a Withdraw action. This is the
+// requester-side mirror of GuildView.requests (the officer-facing pending list).
+export interface MyJoinRequest {
+  guildId: number;
+  guildName: string;
+}
+
 export interface SocialSnapshot {
   friends: FriendEntry[];
   blocks: CharRef[];
   guild: GuildView | null;
+  // the player's own pending guild request, if any (null when none / in a guild)
+  myRequest: MyJoinRequest | null;
 }
 
 // Storage abstraction. The Postgres implementation lives in social_db.ts; the
@@ -112,6 +123,10 @@ export interface SocialDb {
   addJoinRequest(guildId: number, charId: number): Promise<void>;
   removeJoinRequest(charId: number): Promise<void>;
   joinRequest(charId: number): Promise<{ guildId: number } | null>;
+  // like joinRequest, but resolves the guild name in the same (realm-scoped)
+  // query so the requester's snapshot can name the guild it's pending on.
+  // Returns null for a missing/cross-realm guild, same isolation as guildListing.
+  myJoinRequest(charId: number): Promise<{ guildId: number; guildName: string } | null>;
   joinRequests(guildId: number): Promise<JoinRequestEntry[]>;
 }
 
@@ -183,6 +198,9 @@ export class SocialService {
       this.db.guildMembership(charId),
     ]);
     let guild: GuildView | null = null;
+    // the player's own pending request (only meaningful while guildless — the
+    // request flow refuses to queue a request for someone already in a guild)
+    let myRequest: MyJoinRequest | null = null;
     if (membership) {
       const isOfficer = membership.rank !== 'member';
       const [members, listing, requests] = await Promise.all([
@@ -202,6 +220,8 @@ export class SocialService {
           .sort((a, b) => rankOrder(a.rank) - rankOrder(b.rank) || a.name.localeCompare(b.name)),
         requests: requests.sort((a, b) => a.name.localeCompare(b.name)),
       };
+    } else {
+      myRequest = await this.db.myJoinRequest(charId);
     }
     return {
       friends: friends
@@ -209,6 +229,7 @@ export class SocialService {
         .sort((a, b) => Number(b.online) - Number(a.online) || a.name.localeCompare(b.name)),
       blocks,
       guild,
+      myRequest,
     };
   }
 

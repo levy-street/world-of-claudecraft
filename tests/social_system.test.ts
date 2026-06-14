@@ -112,6 +112,14 @@ class FakeDb implements SocialDb {
     const gid = this.requests.get(charId);
     return gid === undefined ? null : { guildId: gid };
   }
+  async myJoinRequest(charId: number): Promise<{ guildId: number; guildName: string } | null> {
+    // mirror the real realm-scoped INNER JOIN: no row when the target guild is
+    // gone (FK cascade would clear it, but be belt-and-braces like the query)
+    const gid = this.requests.get(charId);
+    if (gid === undefined) return null;
+    const name = this.guilds.get(gid);
+    return name === undefined ? null : { guildId: gid, guildName: name };
+  }
   async joinRequests(guildId: number): Promise<JoinRequestEntry[]> {
     return [...this.requests.entries()]
       .filter(([, gid]) => gid === guildId)
@@ -712,5 +720,77 @@ describe('guild directory + request-to-join (#110)', () => {
     expect(h.tx.textFor(1).join()).not.toMatch(/has joined the guild/i);
     // Bet's real guild is unchanged (still Raiders, not Knights)
     expect((await h.svc.snapshot(2)).guild?.name).toBe('Raiders');
+  });
+
+  // --- requester-side pending state: snapshot.myRequest (#110) ---
+
+  it('exposes myRequest to the requester after a pending request', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    await h.svc.guildSetListing(h.actor(1), true, 'request');
+    const gid = (await h.db.guildMembership(1))!.guildId;
+    // no request yet -> null
+    expect((await h.svc.snapshot(2)).myRequest).toBeNull();
+    await h.svc.guildRequestJoin(h.actor(2), gid);
+    const snap = await h.svc.snapshot(2);
+    expect(snap.guild).toBeNull(); // still not a member
+    expect(snap.myRequest).toEqual({ guildId: gid, guildName: 'Knights' });
+  });
+
+  it('scopes myRequest to the requester — others do not see it', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    await h.svc.guildSetListing(h.actor(1), true, 'request');
+    const gid = (await h.db.guildMembership(1))!.guildId;
+    await h.svc.guildRequestJoin(h.actor(2), gid); // only Bet requests
+    expect((await h.svc.snapshot(2)).myRequest).toEqual({ guildId: gid, guildName: 'Knights' });
+    // a different guildless player has no request of their own
+    expect((await h.svc.snapshot(3)).myRequest).toBeNull();
+    // the leader (in a guild) sees the officer-facing request, not a myRequest
+    const leaderSnap = await h.svc.snapshot(1);
+    expect(leaderSnap.myRequest).toBeNull();
+    expect(leaderSnap.guild?.requests.map((r) => r.name)).toEqual(['Bet']);
+  });
+
+  it('clears myRequest when the requester withdraws', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    await h.svc.guildSetListing(h.actor(1), true, 'request');
+    const gid = (await h.db.guildMembership(1))!.guildId;
+    await h.svc.guildRequestJoin(h.actor(2), gid);
+    expect((await h.svc.snapshot(2)).myRequest).not.toBeNull();
+    await h.svc.guildCancelRequest(h.actor(2));
+    expect((await h.svc.snapshot(2)).myRequest).toBeNull();
+    // and the request is gone from the officer-facing list too
+    expect((await h.svc.snapshot(1)).guild?.requests).toHaveLength(0);
+  });
+
+  it('clears myRequest once the request is approved (now a member)', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    await h.svc.guildSetListing(h.actor(1), true, 'request');
+    const gid = (await h.db.guildMembership(1))!.guildId;
+    await h.svc.guildRequestJoin(h.actor(2), gid);
+    await h.svc.guildApproveRequest(h.actor(1), 2);
+    const snap = await h.svc.snapshot(2);
+    expect(snap.guild?.name).toBe('Knights'); // joined
+    expect(snap.myRequest).toBeNull(); // no lingering pending state
+  });
+
+  it('does not expose myRequest after an instant open-guild join', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    await h.svc.guildSetListing(h.actor(1), true, 'open');
+    const gid = (await h.db.guildMembership(1))!.guildId;
+    await h.svc.guildRequestJoin(h.actor(2), gid); // open = instant join, no queued request
+    const snap = await h.svc.snapshot(2);
+    expect(snap.guild?.name).toBe('Knights');
+    expect(snap.myRequest).toBeNull();
+  });
+
+  it('does not expose myRequest after the request is denied', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    await h.svc.guildSetListing(h.actor(1), true, 'request');
+    const gid = (await h.db.guildMembership(1))!.guildId;
+    await h.svc.guildRequestJoin(h.actor(2), gid);
+    await h.svc.guildDenyRequest(h.actor(1), 2);
+    const snap = await h.svc.snapshot(2);
+    expect(snap.guild).toBeNull();
+    expect(snap.myRequest).toBeNull();
   });
 });

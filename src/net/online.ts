@@ -354,7 +354,7 @@ export class ClientWorld implements IWorld {
       return;
     }
     if (msg.t === 'social') {
-      this.socialInfo = { friends: msg.friends ?? [], blocks: msg.blocks ?? [], guild: msg.guild ?? null };
+      this.socialInfo = { friends: msg.friends ?? [], blocks: msg.blocks ?? [], guild: msg.guild ?? null, myRequest: msg.myRequest ?? null };
       this.socialDirty = true;
       return;
     }

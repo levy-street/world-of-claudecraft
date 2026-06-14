@@ -2604,7 +2604,12 @@ export class Hud {
 
   private guildHtml(): string {
     const guild = this.sim.socialInfo?.guild ?? null;
-    if (!guild) return `<div class="soc-empty">You are not in a guild. Browse the directory below, found your own, or get invited by an existing guild.</div>`;
+    if (!guild) {
+      // requester-side mirror of approve/deny (#110): if the player has an
+      // outstanding join request, show its pending state above the empty notice.
+      const pending = this.pendingRequestHtml();
+      return pending + `<div class="soc-empty">You are not in a guild. Browse the directory below, found your own, or get invited by an existing guild.</div>`;
+    }
     const me = guild.rank;
     const head = `<div class="soc-guild-head">&lt;${esc(guild.name)}&gt; <span class="gm">— you are ${rankLabel(me)} &middot; ${guild.members.length} member${guild.members.length === 1 ? '' : 's'}</span></div>`;
     // leader: toggle the public directory listing + recruitment mode
@@ -2664,6 +2669,18 @@ export class Hud {
       + `<span class="soc-x" data-act="gdeny" data-id="${r.id}" title="Decline ${esc(r.name)}">✕</span>`
       + `</span></div>`).join('');
     return `<div class="soc-reqs-head">Join requests (${reqs.length})</div>` + rows;
+  }
+
+  // Requester-side mirror of requestsHtml (#110): when the player has an
+  // outstanding join request, show which guild it's pending on and a Withdraw
+  // action wired to the existing guildCancelRequest flow.
+  private pendingRequestHtml(): string {
+    const req = this.sim.socialInfo?.myRequest ?? null;
+    if (!req) return '';
+    return `<div class="soc-pending">`
+      + `<span class="soc-pending-id">Pending request to <span class="gold">&lt;${esc(req.guildName)}&gt;</span></span>`
+      + `<button class="btn" data-act="guild-withdraw" title="Withdraw your request to join &lt;${esc(req.guildName)}&gt;">Withdraw request</button>`
+      + `</div>`;
   }
 
   // The add/action row changes with the tab (and guild membership). Inputs
@@ -2742,6 +2759,10 @@ export class Hud {
       const mode = (c as HTMLElement).dataset.recruit as 'closed' | 'request' | 'open';
       if (mode === 'closed') this.sim.guildSetListing(false, 'closed');
       else this.sim.guildSetListing(true, mode);
+    }));
+    // requester-side: withdraw a pending join request (#110)
+    scope.querySelectorAll('.soc-pending [data-act="guild-withdraw"]').forEach((b) => b.addEventListener('click', () => {
+      this.sim.guildCancelRequest();
     }));
     scope.querySelectorAll('[data-whisper]').forEach((w) => w.addEventListener('click', () => {
       this.startWhisper((w as HTMLElement).dataset.whisper ?? '');

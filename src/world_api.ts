@@ -84,10 +84,20 @@ export interface GuildInfo {
 
 export type { GuildDirectoryEntry, RecruitmentMode } from './sim/types';
 
+// The player's own outstanding join request (#110), so the guild tab can show a
+// "Pending request to <guild>" state with a Withdraw action. Requester-side
+// mirror of GuildInfo.requests; null when the player has no pending request.
+export interface MyJoinRequestInfo {
+  guildId: number;
+  guildName: string;
+}
+
 export interface SocialInfo {
   friends: FriendInfo[];
   blocks: { id: number; name: string }[];
   guild: GuildInfo | null;
+  // the player's own pending guild request, if any (null when none / in a guild)
+  myRequest: MyJoinRequestInfo | null;
 }
 
 export interface CharacterSearchResult {

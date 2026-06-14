@@ -317,6 +317,21 @@ export class PgSocialDb implements SocialDb {
     return row ? { guildId: row.guild_id } : null;
   }
 
+  async myJoinRequest(charId: number): Promise<{ guildId: number; guildName: string } | null> {
+    // Realm-scoped join to the target guild so the requester's own snapshot can
+    // name it. The INNER JOIN with realm = $2 yields no row for a cross-realm or
+    // already-gone guild, matching guildListing's isolation (FK cascade normally
+    // clears the request when a guild is deleted, so the guard is belt-and-braces).
+    const res = await this.pool.query(
+      `SELECT r.guild_id, g.name AS guild_name
+       FROM guild_join_requests r JOIN guilds g ON g.id = r.guild_id
+       WHERE r.character_id = $1 AND g.realm = $2`,
+      [charId, REALM],
+    );
+    const row = res.rows[0];
+    return row ? { guildId: row.guild_id, guildName: row.guild_name } : null;
+  }
+
   async joinRequests(guildId: number): Promise<JoinRequestEntry[]> {
     const res = await this.pool.query(
       `SELECT c.id, c.name, c.class AS cls, c.level, c.realm
