@@ -6,6 +6,7 @@ dist/
 dist-env/
 dist-server/
 media-cache/
+src/net/module_bindings/
 
 # test artifacts & screenshots
 tmp/
@@ -25,3 +26,4 @@ __pycache__/
 Thumbs.db
 *.log
 .claude/
+.context-engine/git_history_cache.json
