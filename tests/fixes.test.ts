@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
+import { encodeObs } from '../src/sim/obs';
 import { Entity, dist2d } from '../src/sim/types';
 import { CRYPT_DOOR_POS, DUNGEON_X_THRESHOLD, LAKE, MOBS, NPCS, QUESTS, zoneAt, zoneWelcomeText } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
@@ -355,6 +356,31 @@ describe('warrior charge', () => {
     wolf.dead = true;
     sim.tick();
     expect(p.chargeTargetId).toBe(null);
+  });
+});
+
+describe('RL observation encoding', () => {
+  // The target block, the nearby-mob block, and the interactable block all
+  // encode entity distance as clamp(d / 40, ...). The target field used to clamp
+  // to [0, 1] while the others use [0, 1.5] (the 60-unit observation radius), so
+  // a target between 40 and 60 units saturated and lost distance granularity.
+  // Index 39 is the target distance: 16 self + 20 abilities + presence/hp/level.
+  const TARGET_DIST_INDEX = 39;
+
+  it('encodes target distance on the same 1.5 scale as nearby mobs', () => {
+    const sim = makeSim();
+    const p = sim.player;
+    teleportTo(sim, 0, -40); // open road
+    const mob = [...sim.entities.values()].find((e) => e.kind === 'mob' && !e.dead)!;
+    // park the mob 50 units away (inside the 60-unit obs radius, beyond the
+    // old 40-unit saturation point)
+    mob.pos = { ...sim.groundPos(p.pos.x + 50, p.pos.z) };
+    expect(dist2d(p.pos, mob.pos)).toBeCloseTo(50, 0);
+
+    sim.targetEntity(mob.id);
+    const obs = encodeObs(sim);
+    expect(obs[TARGET_DIST_INDEX]).toBeGreaterThan(1); // would be clamped to 1 before the fix
+    expect(obs[TARGET_DIST_INDEX]).toBeCloseTo(50 / 40, 5);
   });
 });
 

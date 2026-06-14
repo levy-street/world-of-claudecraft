@@ -126,7 +126,10 @@ export function encodeObs(sim: Sim): number[] {
     obs.push(1);
     obs.push(target.hp / Math.max(1, target.maxHp));
     obs.push(clamp((target.level - p.level) / 5, -1, 1));
-    obs.push(clamp(d / 40, 0, 1));
+    // distance shares the d/40 scale used for nearby mobs and the interactable
+    // below; clamp to the same 1.5 ceiling (the 60-unit observation radius) so a
+    // target beyond 40 units stays distinguishable instead of saturating at 1
+    obs.push(clamp(d / 40, 0, 1.5));
     obs.push(Math.sin(rel));
     obs.push(Math.cos(rel));
     obs.push(target.hostile ? 1 : 0);
