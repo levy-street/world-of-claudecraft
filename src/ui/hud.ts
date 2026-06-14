@@ -8,7 +8,10 @@ import {
 } from '../sim/data';
 import type { ZoneDef } from '../sim/data';
 import type { InvSlot } from '../sim/types';
-import { AbilityEffect, CONSUME_DURATION, Entity, GCD, ItemDef, SimEvent, dist2d, xpForLevel, MAX_LEVEL, MELEE_RANGE } from '../sim/types';
+import { AbilityEffect, CONSUME_DURATION, Entity, GCD, ItemDef, SimEvent, dist2d, MAX_LEVEL, MELEE_RANGE, MILESTONES, virtualLevel, canPrestige, xpUntilNextPrestige } from '../sim/types';
+import type { LeaderboardEntry } from '../world_api';
+import { xpBarView, formatXp } from './xp_bar';
+import { t } from './i18n';
 import { terrainHeight, WATER_LEVEL, roadDistance } from '../sim/world';
 import { Meters } from './meters';
 import { audio } from '../game/audio';
@@ -151,6 +154,7 @@ export class Hud {
     $('#mm-bag').addEventListener('click', () => this.toggleBags());
     $('#social-fab').addEventListener('click', () => this.toggleSocial());
     $('#mm-arena').addEventListener('click', () => this.toggleArena());
+    $('#mm-leaderboard').addEventListener('click', () => this.toggleLeaderboard());
     const musicBtn = $('#mm-music');
     const styleMusicBtn = () => { musicBtn.style.color = music.enabled ? '#ffd100' : '#666'; };
     styleMusicBtn();
@@ -611,11 +615,13 @@ export class Hud {
       ab.btn.classList.toggle('queued', p.queuedOnSwing === a.id);
     }
 
-    // xp bar
-    const xpNeed = xpForLevel(p.level);
-    const xpFrac = p.level >= MAX_LEVEL ? 1 : sim.xp / xpNeed;
-    ($('#xpbar .fill') as HTMLElement).style.width = `${(xpFrac * 100).toFixed(1)}%`;
-    $('#xpbar .label').textContent = p.level >= MAX_LEVEL ? 'MAX LEVEL' : `${sim.xp} / ${xpNeed} XP (${Math.floor(xpFrac * 100)}%)`;
+    // xp bar — pre-cap shows the level bar; post-cap fills toward the next
+    // virtual level (Max-Level XP Overflow), with distinct prestige/gold styling.
+    const showOverflow = (this.optionsHooks?.settings.get('showOverflowXp') ?? 1) >= 0.5;
+    const bar = xpBarView({ level: p.level, xp: sim.xp, lifetimeXp: sim.lifetimeXp, showOverflow });
+    ($('#xpbar .fill') as HTMLElement).style.width = `${(bar.fillFrac * 100).toFixed(1)}%`;
+    $('#xpbar .label').textContent = bar.label;
+    $('#xpbar').classList.toggle('overflow', bar.postCap);
 
     $('#death-overlay').style.display = p.dead ? 'flex' : 'none';
 
@@ -1142,6 +1148,20 @@ export class Hud {
         case 'levelup': {
           this.showBanner(`Level ${ev.level}!`);
           this.log(`You have reached level ${ev.level}!`, '#ffd100');
+          audio.levelUp();
+          break;
+        }
+        case 'virtualLevelUp': {
+          // cosmetic post-cap "level up" — reuses the levelup banner + sound
+          this.showBanner(`${t('game.progression.virtualLevelUp')} ${ev.level}!`);
+          this.log(`${t('game.progression.virtualLevelUp')} ${ev.level}!`, '#ffd100');
+          audio.levelUp();
+          break;
+        }
+        case 'milestoneUnlocked': {
+          const name = this.milestoneName(ev.milestoneId);
+          this.showBanner(`${t('game.milestone.unlocked')}: ${name}`);
+          this.log(`${t('game.milestone.unlocked')}: ${name}`, '#ffd100');
           audio.levelUp();
           break;
         }
@@ -1880,7 +1900,9 @@ export class Hud {
       <span>Intellect: <b>${p.stats.int}</b></span><span>Crit Chance: <b>${(p.critChance * 100).toFixed(1)}%</b></span>
       <span>Spirit: <b>${p.stats.spi}</b></span><span>Dodge: <b>${(p.dodgeChance * 100).toFixed(1)}%</b></span>
     </div>`;
+    html += this.progressionHtml(p.level);
     el.innerHTML = html;
+    el.querySelector('[data-act="prestige"]')?.addEventListener('click', () => this.openPrestigeDialog());
     const col = el.querySelector('#equip-col')!;
     const slots: { key: 'mainhand' | 'chest' | 'legs' | 'feet'; name: string }[] = [
       { key: 'mainhand', name: 'Main Hand' },
@@ -1900,6 +1922,127 @@ export class Hud {
       col.appendChild(row);
     }
     el.querySelector('[data-close]')?.addEventListener('click', () => { el.style.display = 'none'; this.hideTooltip(); });
+  }
+
+  // -------------------------------------------------------------------------
+  // Post-cap progression (Max-Level XP Overflow): character-sheet block,
+  // milestone badges, prestige dialog, and the lifetime-XP leaderboard panel.
+  // -------------------------------------------------------------------------
+
+  private milestoneName(id: string): string {
+    switch (id) {
+      case 'veteran': return t('game.milestone.veteran');
+      case 'champion': return t('game.milestone.champion');
+      case 'paragon': return t('game.milestone.paragon');
+      case 'mythic': return t('game.milestone.mythic');
+      case 'eternal': return t('game.milestone.eternal');
+      default: return id;
+    }
+  }
+
+  // The "Progression" group on the character sheet: total XP, virtual level,
+  // prestige rank (when prestiged), unlocked milestone badges, and — at the cap
+  // — the opt-in Prestige button.
+  private progressionHtml(level: number): string {
+    const sim = this.sim;
+    const vlevel = virtualLevel(sim.lifetimeXp);
+    const unlocked = new Set(sim.unlockedMilestones);
+    const badges = MILESTONES.filter((m) => unlocked.has(m.id))
+      .map((m) => `<span class="ms-badge ms-${m.kind}">${this.milestoneName(m.id)}</span>`)
+      .join('');
+    let html = `<div class="cp-title">${t('game.progression.heading')}</div>`;
+    html += `<div class="char-stats cp-stats">
+      <span>${t('game.progression.totalXp')}: <b>${formatXp(sim.lifetimeXp)}</b></span>
+      <span>${t('game.progression.virtualLevel')}: <b>${vlevel}</b></span>`;
+    if (sim.prestigeRank > 0) html += `<span>${t('game.progression.prestigeRank')}: <b>★ ${sim.prestigeRank}</b></span>`;
+    html += `</div>`;
+    html += `<div class="cp-milestones"><span class="cp-ms-label">${t('game.progression.milestones')}:</span> ${badges || `<span class="cp-none">${t('game.progression.none')}</span>`}</div>`;
+    if (level >= MAX_LEVEL) {
+      // The button reflects the server's authoritative prestige gate (post-cap
+      // XP earned). It's disabled — and the requirement shown — until eligible;
+      // the server re-checks regardless, so a forged click does nothing.
+      const ready = canPrestige(level, sim.lifetimeXp, sim.prestigeRank);
+      html += `<div class="cp-actions"><button class="btn" data-act="prestige"${ready ? '' : ' disabled'}>${t('game.prestige.action')}${sim.prestigeRank > 0 ? ` (★ ${sim.prestigeRank})` : ''}</button>`;
+      if (!ready) html += `<span class="cp-hint">${formatXp(xpUntilNextPrestige(sim.lifetimeXp, sim.prestigeRank))} ${t('game.prestige.needXp')}</span>`;
+      html += `</div>`;
+    }
+    return `<div class="char-progression">${html}</div>`;
+  }
+
+  private openPrestigeDialog(): void {
+    const p = this.sim.player;
+    // Mirror the server's gate; the server enforces it authoritatively anyway.
+    if (!canPrestige(p.level, this.sim.lifetimeXp, this.sim.prestigeRank)) {
+      this.showError(p.level < MAX_LEVEL
+        ? t('game.prestige.needCap')
+        : `${formatXp(xpUntilNextPrestige(this.sim.lifetimeXp, this.sim.prestigeRank))} ${t('game.prestige.needXp')}`);
+      return;
+    }
+    this.confirmDialog(
+      t('game.prestige.title'),
+      t('game.prestige.body'),
+      t('game.prestige.confirm'),
+      t('game.prestige.cancel'),
+      () => { this.sim.prestige(); audio.click(); },
+    );
+  }
+
+  // Minimal modal confirm dialog (reuses the .window/.panel chrome). Used by the
+  // prestige flow; built on demand and removed on dismiss.
+  private confirmDialog(title: string, body: string, okText: string, cancelText: string, onOk: () => void): void {
+    document.getElementById('confirm-dialog')?.remove();
+    const el = document.createElement('div');
+    el.id = 'confirm-dialog';
+    el.className = 'window panel';
+    el.style.display = 'block';
+    el.innerHTML = `<div class="panel-title"><span>${title}</span><span class="x-btn" data-cancel>✕</span></div>`
+      + `<div class="cd-body">${body}</div>`
+      + `<div class="cd-actions"><button class="btn" data-cancel>${cancelText}</button><button class="btn cd-ok" data-ok>${okText}</button></div>`;
+    document.body.appendChild(el);
+    const close = () => el.remove();
+    el.querySelectorAll('[data-cancel]').forEach((b) => b.addEventListener('click', () => { audio.click(); close(); }));
+    el.querySelector('[data-ok]')?.addEventListener('click', () => { close(); onOk(); });
+  }
+
+  toggleLeaderboard(): void {
+    const el = $('#leaderboard-window');
+    if (el.style.display === 'block') { el.style.display = 'none'; this.hideTooltip(); return; }
+    el.style.display = 'block';
+    void this.renderLeaderboard();
+  }
+
+  async renderLeaderboard(): Promise<void> {
+    const el = $('#leaderboard-window');
+    const myName = this.sim.player.name;
+    el.innerHTML = `<div class="panel-title"><span>${t('game.leaderboard.title')} <span style="color:#998d6a;font-size:11px">${t('game.leaderboard.subtitle')}${this.sim.realm ? ` &middot; ${this.sim.realm}` : ''}</span></span><span class="x-btn" data-close>✕</span></div>`
+      + `<div class="lb-body"><div class="lb-loading">${t('game.leaderboard.loading')}</div></div>`;
+    el.querySelector('[data-close]')?.addEventListener('click', () => { el.style.display = 'none'; });
+
+    let rows: LeaderboardEntry[] = [];
+    try { rows = await this.sim.leaderboard(); } catch { rows = []; }
+    // panel may have been closed while the fetch was in flight
+    if (el.style.display !== 'block') return;
+    const body = el.querySelector('.lb-body')!;
+    if (rows.length === 0) {
+      body.innerHTML = `<div class="lb-empty">${t('game.leaderboard.empty')}</div>`;
+      return;
+    }
+    const header = `<div class="lb-row lb-head"><span class="lb-rank">${t('game.leaderboard.rank')}</span><span class="lb-name">${t('game.leaderboard.name')}</span><span class="lb-lvl">${t('game.leaderboard.level')}</span><span class="lb-vlvl">${t('game.leaderboard.vlevel')}</span><span class="lb-xp">${t('game.leaderboard.lifetimeXp')}</span></div>`;
+    const rowHtml = (r: LeaderboardEntry, mine: boolean): string => {
+      const cls = CLASSES[r.cls];
+      const star = r.prestigeRank > 0 ? `<span class="lb-prestige" title="${t('game.prestige.rank')} ${r.prestigeRank}">★${r.prestigeRank}</span> ` : '';
+      const title = cls ? ` title="${cls.name}"` : '';
+      return `<div class="lb-row${mine ? ' lb-mine' : ''}"><span class="lb-rank">${r.rank}</span>`
+        + `<span class="lb-name"${title}>${star}${r.name}${mine ? ` <span class="lb-you">(${t('game.leaderboard.you')})</span>` : ''}</span>`
+        + `<span class="lb-lvl">${r.level}</span><span class="lb-vlvl">${r.virtualLevel}</span><span class="lb-xp">${formatXp(r.lifetimeXp)}</span></div>`;
+    };
+    const mineIndex = rows.findIndex((r) => r.name === myName);
+    let html = header + rows.map((r) => rowHtml(r, r.name === myName)).join('');
+    // sticky "your standing" row when the viewer is outside the visible list
+    if (mineIndex === -1) {
+      html += `<div class="lb-sticky"><div class="lb-row lb-mine"><span class="lb-rank">—</span><span class="lb-name">${myName} <span class="lb-you">(${t('game.leaderboard.you')})</span></span><span class="lb-lvl">${this.sim.player.level}</span><span class="lb-vlvl">${virtualLevel(this.sim.lifetimeXp)}</span><span class="lb-xp">${formatXp(this.sim.lifetimeXp)}</span></div></div>`;
+    }
+    body.innerHTML = html;
   }
 
   // -------------------------------------------------------------------------
@@ -2818,9 +2961,10 @@ export class Hud {
     this.settingSlider(body, 'Brightness', 'brightness');
     this.settingSlider(body, 'Render Quality', 'renderScale');
     this.settingToggle(body, 'Fullscreen', 'fullscreen');
+    this.settingToggle(body, t('game.settings.showOverflowXp'), 'showOverflowXp');
     const note = document.createElement('div');
     note.className = 'set-note';
-    note.textContent = 'Lower Camera Speed for a calmer mouselook. Render Quality below 100% boosts FPS on weaker machines.';
+    note.textContent = 'Lower Camera Speed for a calmer mouselook. Render Quality below 100% boosts FPS on weaker machines. Show Overflow XP keeps the XP bar filling past the level cap.';
     $('#options-menu').appendChild(note);
     this.settingsViewFooter();
   }
@@ -2943,7 +3087,9 @@ export class Hud {
       closed = true;
     }
     if (this.marketOpen) { this.closeMarket(); closed = true; }
-    for (const id of ['#quest-dialog', '#loot-window', '#vendor-window', '#bags', '#char-window', '#spellbook', '#quest-log-window', '#map-window', '#report-window', '#arena-window']) {
+    const confirmEl = document.getElementById('confirm-dialog');
+    if (confirmEl) { confirmEl.remove(); closed = true; }
+    for (const id of ['#quest-dialog', '#loot-window', '#vendor-window', '#bags', '#char-window', '#spellbook', '#quest-log-window', '#map-window', '#report-window', '#arena-window', '#leaderboard-window']) {
       const el = $(id);
       if (el.style.display === 'block') {
         el.style.display = 'none';

@@ -15,6 +15,7 @@ import {
   TAUNT_FORCE_SECONDS, addThreat, clearThreat, stealthDetectionRadius, threatModifier, topThreatValue,
 } from './threat';
 import { groundHeight, WATER_LEVEL } from './world';
+import type { LeaderboardEntry } from '../world_api';
 import {
   AbilityDef, AbilityEffect, Aura, AuraKind, CAST_PUSHBACK_SEC, CHANNEL_PUSHBACK_FRACTION, CONSUME_DURATION,
   CONSUME_TICKS, DT, Entity, EquipSlot, GCD,
@@ -22,6 +23,7 @@ import {
   MoveInput, PlayerClass, QuestProgress, QuestState, RUN_SPEED, SimConfig, SimEvent, TURN_SPEED, Vec3,
   angleTo, armorReduction, dist2d, emptyMoveInput, isConsuming, meleeMissChance, mobXpValue, normAngle,
   rageFromDealing, rageFromTaking, spellHitChance, xpForLevel,
+  MILESTONES, virtualLevel, xpToReachLevel, canPrestige,
 } from './types';
 
 const LEASH_DISTANCE = 45;
@@ -175,6 +177,13 @@ export interface PlayerMeta {
   copper: number;
   equipment: PlayerEquipment;
   xp: number;
+  // Post-cap progression (Max-Level XP Overflow). `lifetimeXp` is the monotonic
+  // 64-bit-safe total of all XP ever earned — it keeps growing at the cap and is
+  // the leaderboard sort key + virtual-level source. `prestigeRank` and
+  // `unlockedMilestones` are cosmetic-only. All persisted in CharacterState.
+  lifetimeXp: number;
+  prestigeRank: number;
+  unlockedMilestones: Set<string>;
   known: ResolvedAbility[];
   questLog: Map<string, QuestProgress>;
   questsDone: Set<string>;
@@ -227,6 +236,11 @@ export interface MarketSave {
 export interface CharacterState {
   level: number;
   xp: number;
+  // Post-cap progression. All optional so characters saved before the Max-Level
+  // XP Overflow system load cleanly (addPlayer backfills lifetimeXp from level).
+  lifetimeXp?: number;
+  prestigeRank?: number;
+  unlockedMilestones?: string[];
   copper: number;
   hp: number;
   resource: number;
@@ -439,6 +453,9 @@ export class Sim {
       copper: 0,
       equipment: { mainhand: classDef.startWeapon, chest: classDef.startChest },
       xp: 0,
+      lifetimeXp: 0,
+      prestigeRank: 0,
+      unlockedMilestones: new Set(),
       known: [],
       questLog: new Map(),
       questsDone: new Set(),
@@ -457,6 +474,12 @@ export class Sim {
       player.facing = s.facing;
       player.prevFacing = s.facing;
       meta.xp = s.xp;
+      // Backfill lifetimeXp for pre-overflow saves from the level they reached
+      // plus their current bar progress, so the leaderboard is meaningful for
+      // existing characters from day one.
+      meta.lifetimeXp = s.lifetimeXp ?? (xpToReachLevel(player.level) + Math.max(0, s.xp));
+      meta.prestigeRank = s.prestigeRank ?? 0;
+      if (s.unlockedMilestones) for (const id of s.unlockedMilestones) meta.unlockedMilestones.add(id);
       meta.copper = s.copper;
       meta.equipment = { ...s.equipment };
       meta.inventory = s.inventory.map((i) => ({ ...i }));
@@ -531,6 +554,9 @@ export class Sim {
     return {
       level: e.level,
       xp: meta.xp,
+      lifetimeXp: meta.lifetimeXp,
+      prestigeRank: meta.prestigeRank,
+      unlockedMilestones: [...meta.unlockedMilestones],
       copper: meta.copper,
       hp: e.hp,
       resource: e.resource,
@@ -580,6 +606,36 @@ export class Sim {
   }
   set xp(v: number) {
     this.primary.xp = v;
+  }
+  get lifetimeXp(): number {
+    return this.primary.lifetimeXp;
+  }
+  get prestigeRank(): number {
+    return this.primary.prestigeRank;
+  }
+  get unlockedMilestones(): string[] {
+    return [...this.primary.unlockedMilestones];
+  }
+  // Offline leaderboard: rank the players the local sim knows about by lifetime
+  // XP. Online play overrides this with the cached, realm-scoped server query.
+  leaderboard(): Promise<LeaderboardEntry[]> {
+    const rows = [...this.players.values()]
+      .map((m) => {
+        const e = this.entities.get(m.entityId);
+        return e ? { meta: m, e } : null;
+      })
+      .filter((x): x is { meta: PlayerMeta; e: Entity } => x !== null)
+      .sort((a, b) => b.meta.lifetimeXp - a.meta.lifetimeXp || b.e.level - a.e.level || a.meta.name.localeCompare(b.meta.name))
+      .map(({ meta, e }, i) => ({
+        rank: i + 1,
+        name: meta.name,
+        cls: meta.cls,
+        level: e.level,
+        virtualLevel: virtualLevel(meta.lifetimeXp),
+        lifetimeXp: meta.lifetimeXp,
+        prestigeRank: meta.prestigeRank,
+      }));
+    return Promise.resolve(rows);
   }
   get known(): ResolvedAbility[] {
     return this.primary.known;
@@ -677,6 +733,10 @@ export class Sim {
     const r = this.resolve(pid);
     if (!r) return;
     r.e.level = Math.max(1, Math.min(MAX_LEVEL, level));
+    // Keep lifetimeXp consistent with the level so post-cap progression starts
+    // from a sane baseline (virtualLevel never falls below the real level). Only
+    // ever raises it — lifetimeXp is monotonic.
+    r.meta.lifetimeXp = Math.max(r.meta.lifetimeXp, xpToReachLevel(r.e.level));
     recalcPlayerStats(r.e, r.meta.cls, r.meta.equipment);
     r.e.hp = r.e.maxHp;
     if (r.e.resourceType === 'mana') r.e.resource = r.e.maxResource;
@@ -2189,8 +2249,11 @@ export class Sim {
         for (const member of eligible) {
           const mE = this.entities.get(member.entityId);
           if (!mE) continue;
+          // mobXpValue keeps the level-diff (anti-farm) scaling; grantXp now
+          // routes the award to lifetimeXp even at the cap, so the party gate no
+          // longer blocks max-level members — it just forwards every positive award.
           const xpGain = Math.round((mobXpValue(e.level, mE.level) * eliteMult * bonus) / eligible.length);
-          if (xpGain > 0 && mE.level < MAX_LEVEL) this.grantXp(xpGain, member);
+          if (xpGain > 0) this.grantXp(xpGain, member);
           this.onMobKilledForQuests(e, member);
         }
         this.rollLoot(e, meta);
@@ -2200,10 +2263,19 @@ export class Sim {
 
   grantXp(amount: number, meta: PlayerMeta = this.primary): void {
     const p = this.entities.get(meta.entityId);
-    if (!p || p.level >= MAX_LEVEL) return;
-    meta.xp += amount;
+    if (!p || amount <= 0) return;
+    // Lifetime XP accrues for EVERY award, including at the cap — this is what
+    // makes post-cap progression work. It feeds the virtual level, the
+    // leaderboard, and cosmetic milestones. The level bar below only advances
+    // while under the cap; once capped the remainder lives on in lifetimeXp
+    // rather than being discarded to gold/zero (FR-1.4).
+    this.accrueLifetimeXp(amount, meta, p);
     meta.counters.xpGained += amount;
     this.emit({ type: 'xp', amount, pid: p.id });
+
+    if (p.level >= MAX_LEVEL) return; // bar frozen at cap; lifetimeXp already credited
+
+    meta.xp += amount;
     while (p.level < MAX_LEVEL && meta.xp >= xpForLevel(p.level)) {
       meta.xp -= xpForLevel(p.level);
       p.level++;
@@ -2214,7 +2286,59 @@ export class Sim {
       this.emit({ type: 'levelup', level: p.level, pid: p.id });
       this.refreshKnownAbilities(meta, true);
     }
+    // Dinged to cap mid-grant: clear the leftover from the BAR. It is not lost —
+    // the full award was already added to lifetimeXp above (FR-1.4).
     if (p.level >= MAX_LEVEL) meta.xp = 0;
+  }
+
+  // Add to the monotonic lifetime counter, emitting cosmetic virtual-level-up
+  // events past the cap and unlocking any newly crossed milestones. Cheap: one
+  // add plus an O(log n) table lookup, never touched on the per-tick hot path.
+  private accrueLifetimeXp(amount: number, meta: PlayerMeta, p: Entity): void {
+    const atCap = p.level >= MAX_LEVEL;
+    const beforeVL = atCap ? virtualLevel(meta.lifetimeXp) : 0;
+    meta.lifetimeXp += amount;
+    // 64-bit-safe invariant: JS numbers are exact to 2^53. A single character
+    // reaching this is effectively impossible, but clamp + log if it ever does.
+    if (meta.lifetimeXp >= Number.MAX_SAFE_INTEGER) {
+      meta.lifetimeXp = Number.MAX_SAFE_INTEGER;
+      console.warn(`lifetimeXp for ${meta.name} hit the 2^53 ceiling and was clamped`);
+    }
+    if (atCap) {
+      const afterVL = virtualLevel(meta.lifetimeXp);
+      for (let v = beforeVL + 1; v <= afterVL; v++) {
+        this.emit({ type: 'virtualLevelUp', level: v, pid: p.id });
+      }
+    }
+    this.checkMilestones(meta, p);
+  }
+
+  // Unlock any cosmetic milestone whose lifetime-XP threshold was just crossed.
+  private checkMilestones(meta: PlayerMeta, p: Entity): void {
+    for (const m of MILESTONES) {
+      if (meta.lifetimeXp >= m.lifetimeXp && !meta.unlockedMilestones.has(m.id)) {
+        meta.unlockedMilestones.add(m.id);
+        this.emit({ type: 'milestoneUnlocked', milestoneId: m.id, pid: p.id });
+      }
+    }
+  }
+
+  // Opt-in cosmetic prestige (Phase 4): only at the cap. Resets the level XP
+  // bar, bumps the prestige rank for a badge by the name + on the leaderboard,
+  // and deliberately leaves lifetimeXp, level, gear, talents, and learned
+  // abilities untouched — strictly cosmetic, zero power change (FR-6.1/6.3).
+  prestige(pid?: number): boolean {
+    const r = this.resolve(pid);
+    if (!r) return false;
+    // Authoritative anti-abuse gate: must be at the cap AND have earned a full
+    // prestige bar of post-cap XP since the last rank. This caps prestigeRank at
+    // what lifetimeXp supports, so spamming the `prestige` command (e.g. from a
+    // hacked client) can never inflate the rank beyond XP actually earned.
+    if (!canPrestige(r.e.level, r.meta.lifetimeXp, r.meta.prestigeRank)) return false;
+    r.meta.xp = 0;
+    r.meta.prestigeRank += 1;
+    this.emit({ type: 'log', pid: r.e.id, text: `You have prestiged! Prestige Rank ${r.meta.prestigeRank}.`, color: '#ffd100' });
+    return true;
   }
 
   private rollLoot(mob: Entity, meta: PlayerMeta): void {

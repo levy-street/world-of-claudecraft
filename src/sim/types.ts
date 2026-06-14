@@ -468,6 +468,10 @@ export type SimEvent = { pid?: number } & (
   | { type: 'death'; entityId: number; killerId: number }
   | { type: 'xp'; amount: number }
   | { type: 'levelup'; level: number }
+  // post-cap cosmetic progression (Max-Level XP Overflow): crossing a virtual
+  // level past the cap, and unlocking a cosmetic lifetime-XP milestone
+  | { type: 'virtualLevelUp'; level: number }
+  | { type: 'milestoneUnlocked'; milestoneId: string }
   | { type: 'learnAbility'; abilityId: string; rank: number }
   | { type: 'loot'; text: string }
   | { type: 'error'; text: string }
@@ -563,6 +567,113 @@ export const MAX_LEVEL = 20;
 
 export function xpForLevel(level: number): number {
   return XP_TABLE[Math.min(level - 1, XP_TABLE.length - 1)];
+}
+
+// ---------------------------------------------------------------------------
+// Post-cap progression — "Max-Level XP Overflow" (see docs/prd/…).
+//
+// At the level cap, XP keeps accruing into a 64-bit lifetime counter that
+// drives a cosmetic *virtual level* so the XP bar keeps "leveling" forever.
+// The threshold table below is the cumulative lifetime XP needed to reach each
+// virtual level. Real levels 1..20 reuse XP_TABLE exactly (so below the cap
+// `virtualLevel(lifetimeXp) === level`); past the cap the per-level cost keeps
+// growing geometrically (RuneScape-style ~10%/level) so the grind has a long
+// tail but the bar always visibly moves. Built once and cached.
+// ---------------------------------------------------------------------------
+
+const POSTCAP_GROWTH = 1.1; // each virtual level past the cap costs ~10% more
+export const MAX_VIRTUAL_LEVEL = 200; // table bound; far beyond any reachable lifetime total
+
+// VLEVEL_CUM[v] = total lifetime XP required to *reach* virtual level v.
+// VLEVEL_CUM[1] = 0; index 0 is unused padding.
+const VLEVEL_CUM: number[] = (() => {
+  const cum: number[] = [0, 0];
+  let total = 0;
+  // real levels: 1→2 … 19→20 come straight from XP_TABLE
+  for (let lvl = 1; lvl < MAX_LEVEL; lvl++) {
+    total += XP_TABLE[lvl - 1];
+    cum[lvl + 1] = total;
+  }
+  // post-cap: continue from the 20→21 step, growing geometrically
+  let step = XP_TABLE[MAX_LEVEL - 1];
+  for (let lvl = MAX_LEVEL; lvl < MAX_VIRTUAL_LEVEL; lvl++) {
+    total += Math.round(step);
+    cum[lvl + 1] = total;
+    step *= POSTCAP_GROWTH;
+  }
+  return cum;
+})();
+
+// Total lifetime XP needed to reach a given (virtual or real) level. Used to
+// backfill `lifetimeXp` for characters saved before the counter existed.
+export function xpToReachLevel(level: number): number {
+  return VLEVEL_CUM[Math.max(1, Math.min(MAX_VIRTUAL_LEVEL, Math.floor(level)))];
+}
+
+// Cosmetic virtual level for a lifetime-XP total. Below the cap this equals the
+// real level; at/after the cap it climbs past MAX_LEVEL. O(log n) over the
+// cached table — never recomputed per frame, never per combat tick.
+export function virtualLevel(lifetimeXp: number): number {
+  const xp = Math.max(0, lifetimeXp);
+  let lo = 1, hi = MAX_VIRTUAL_LEVEL;
+  while (lo < hi) {
+    const mid = (lo + hi + 1) >> 1;
+    if (VLEVEL_CUM[mid] <= xp) lo = mid;
+    else hi = mid - 1;
+  }
+  return lo;
+}
+
+// Progress within the current virtual level: how much lifetime XP into it, and
+// how much that level costs in total. Pre-cap callers use the level bar instead.
+export function virtualLevelProgress(lifetimeXp: number): { level: number; into: number; span: number } {
+  const level = virtualLevel(lifetimeXp);
+  const floor = VLEVEL_CUM[level];
+  const next = VLEVEL_CUM[Math.min(level + 1, MAX_VIRTUAL_LEVEL)];
+  const span = Math.max(1, next - floor);
+  return { level, into: Math.max(0, Math.min(span, lifetimeXp - floor)), span };
+}
+
+// Cosmetic lifetime-XP milestones (Paragon-style). Strictly cosmetic — they
+// grant titles / nameplate borders, never power. Ordered by threshold.
+export interface MilestoneDef {
+  id: string;
+  lifetimeXp: number;
+  kind: 'title' | 'border';
+}
+export const MILESTONES: MilestoneDef[] = [
+  { id: 'veteran', lifetimeXp: 250_000, kind: 'title' },
+  { id: 'champion', lifetimeXp: 500_000, kind: 'title' },
+  { id: 'paragon', lifetimeXp: 1_000_000, kind: 'border' },
+  { id: 'mythic', lifetimeXp: 2_500_000, kind: 'border' },
+  { id: 'eternal', lifetimeXp: 5_000_000, kind: 'title' },
+];
+
+// Prestige cost. Each prestige rank requires a full level-cap bar's worth of
+// post-cap lifetime XP, so prestige rank is a pure function of XP actually
+// earned past the cap. This is the anti-abuse guard: the prestige command can't
+// be spammed from a hacked client to inflate the (leaderboard-visible) rank —
+// the server caps rank at maxPrestigeRank(lifetimeXp) regardless of how many
+// prestige commands arrive.
+export const PRESTIGE_XP_PER_RANK = xpForLevel(MAX_LEVEL); // = 23,200
+
+// Highest prestige rank the given lifetime XP can support (post-cap XP / cost).
+export function maxPrestigeRank(lifetimeXp: number): number {
+  const earned = lifetimeXp - xpToReachLevel(MAX_LEVEL);
+  return earned <= 0 ? 0 : Math.floor(earned / PRESTIGE_XP_PER_RANK);
+}
+
+// Authoritative prestige eligibility: at the cap, and with enough unspent
+// post-cap XP for the next rank. Used server-side (enforced) and client-side
+// (to enable/disable the button — display only).
+export function canPrestige(level: number, lifetimeXp: number, prestigeRank: number): boolean {
+  return level >= MAX_LEVEL && prestigeRank < maxPrestigeRank(lifetimeXp);
+}
+
+// Lifetime XP still needed before the next prestige rank unlocks (0 if ready).
+export function xpUntilNextPrestige(lifetimeXp: number, prestigeRank: number): number {
+  const target = xpToReachLevel(MAX_LEVEL) + (prestigeRank + 1) * PRESTIGE_XP_PER_RANK;
+  return Math.max(0, target - lifetimeXp);
 }
 
 // Zero-difference band: how many levels below you a mob stops giving XP.

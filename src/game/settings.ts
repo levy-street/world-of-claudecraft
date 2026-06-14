@@ -9,6 +9,7 @@ export interface GameSettings {
   brightness: number;   // tone-mapping exposure multiplier
   renderScale: number;  // resolution multiplier on top of the device pixel ratio
   fullscreen: number;   // 0/1 browser fullscreen preference
+  showOverflowXp: number; // 1 = show post-cap virtual-level overflow bar (default), 0 = classic "MAX LEVEL"
 }
 
 interface Range { min: number; max: number; def: number }
@@ -23,6 +24,9 @@ export const SETTING_RANGES: Record<keyof GameSettings, Range> = {
   brightness: { min: 0.6, max: 1.5, def: 1 },
   renderScale: { min: 0.5, max: 1, def: 1 },
   fullscreen: { min: 0, max: 1, def: 1 },
+  // on by default: post-cap players see their overflow/virtual-level bar; turn
+  // off for the classic static "MAX LEVEL" text (Max-Level XP Overflow)
+  showOverflowXp: { min: 0, max: 1, def: 1 },
 };
 
 const STORE_KEY = 'woc_settings';

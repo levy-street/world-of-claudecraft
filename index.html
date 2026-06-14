@@ -300,11 +300,14 @@
   #bottom-bar { position: absolute; left: 50%; transform: translateX(-50%); bottom: 6px; text-align: center; }
   #xpbar { width: 612px; height: 10px; background: #14101e; border: 1px solid #000; outline: 1px solid #3a3148;
     margin: 0 auto 4px; position: relative; border-radius: 2px; overflow: hidden; }
-  #xpbar .fill { height: 100%; width: 0%; background: linear-gradient(#b85eff, #6a1bb0); }
+  #xpbar .fill { height: 100%; width: 0%; background: linear-gradient(#b85eff, #6a1bb0); transition: background .3s; }
   #xpbar .ticks { position: absolute; inset: 0; display: flex; }
   #xpbar .ticks i { flex: 1; border-right: 1px solid #00000055; }
   #xpbar .label { position: absolute; inset: 0; font-size: 9px; color: #fff; text-align: center; line-height: 10px; text-shadow: 1px 1px 1px #000; opacity: 0; transition: opacity .15s; }
   #xpbar:hover .label { opacity: 1; }
+  /* Post-cap overflow bar (Max-Level XP Overflow): gold/prestige tint. */
+  #xpbar.overflow { outline-color: #b8902a; box-shadow: 0 0 6px #f5c84355; }
+  #xpbar.overflow .fill { background: linear-gradient(#ffe27a, #d99a1c); }
   #actionbar-row { display: flex; align-items: flex-end; gap: 8px; }
   /* xp bar stacks directly on the action bar; the taller side-button
      column must not push it up (it used to float ~150px above the bar) */
@@ -484,6 +487,41 @@
   .ql-item { padding: 4px 6px; font-size: 12px; color: #d8c89a; cursor: pointer; border-radius: 3px; font-family: var(--title-font); }
   .ql-item:hover, .ql-item.sel { background: #ffffff14; color: var(--gold); }
   .ql-detail { flex: 1; font-size: 12px; max-height: 380px; overflow-y: auto; }
+
+  /* post-cap progression: character-sheet block + milestone badges */
+  .char-progression { margin-top: 10px; border-top: 1px solid #463a1c; padding-top: 8px; }
+  .cp-title { font-family: var(--title-font); color: var(--gold); font-size: 12px; letter-spacing: .4px; margin-bottom: 4px; }
+  .char-progression .cp-stats { border-top: none; margin-top: 0; padding-top: 0; }
+  .cp-milestones { font-size: 11.5px; color: #b9ac82; margin-top: 6px; display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+  .cp-none { color: #7c7256; font-style: italic; }
+  .ms-badge { display: inline-block; font-size: 10.5px; padding: 1px 7px; border-radius: 8px; font-family: var(--title-font);
+    border: 1px solid #b8902a; color: #ffe27a; background: #2a210c; }
+  .ms-badge.ms-border { border-color: #c97bff; color: #e6c8ff; background: #2a1838; }
+  .cp-actions { margin-top: 8px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .cp-actions .btn[disabled] { opacity: 0.45; cursor: not-allowed; filter: grayscale(0.5); pointer-events: none; }
+  .cp-hint { font-size: 11px; color: #b9ac82; }
+
+  /* lifetime-XP leaderboard panel (modeled on the quest-log window) */
+  #leaderboard-window { left: 50%; top: 12%; transform: translateX(-50%); width: 480px; max-height: 70%; display: none; }
+  .lb-body { margin-top: 8px; max-height: 56vh; overflow-y: auto; }
+  .lb-loading, .lb-empty { font-size: 12px; color: #b9ac82; padding: 10px 4px; text-align: center; }
+  .lb-row { display: grid; grid-template-columns: 44px 1fr 44px 48px 96px; align-items: center; gap: 6px; padding: 4px 8px; font-size: 12px; border-radius: 3px; }
+  .lb-row:nth-child(odd) { background: #ffffff08; }
+  .lb-head { color: var(--gold); font-family: var(--title-font); font-size: 11px; letter-spacing: .3px; background: none; border-bottom: 1px solid #463a1c; }
+  .lb-rank { text-align: center; color: #d8c89a; }
+  .lb-name { color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lb-lvl, .lb-vlvl { text-align: center; color: #cfc6a8; }
+  .lb-xp { text-align: right; color: #ffe27a; }
+  .lb-row.lb-mine { background: #f5c84322; outline: 1px solid #b8902a; }
+  .lb-you { color: #b8902a; font-size: 10px; }
+  .lb-prestige { color: #ffd100; font-size: 10px; }
+  .lb-sticky { position: sticky; bottom: 0; margin-top: 6px; border-top: 1px solid #463a1c; background: #160f08; padding-top: 4px; }
+
+  /* generic confirm dialog (prestige) */
+  #confirm-dialog { left: 50%; top: 50%; transform: translate(-50%, -50%); width: 360px; padding: 14px; z-index: 60; }
+  #confirm-dialog .cd-body { font-size: 12.5px; line-height: 1.55; color: #e8e0c8; margin: 10px 0; }
+  #confirm-dialog .cd-actions { display: flex; justify-content: flex-end; gap: 8px; }
+  #confirm-dialog .cd-ok { background: linear-gradient(#8a6a26, #5a4413 55%, #473409); color: #ffe6a8; }
 
   /* vendor */
   #vendor-window { left: 50%; top: 16%; transform: translateX(-50%); width: 400px; max-height: 68%; overflow-y: auto; }
@@ -1074,6 +1112,57 @@
     box-shadow: inset 0 0 8px #000;
     margin-top: var(--spacing-xs);
   }
+
+  /* Home-page global leaderboard (Max-Level XP Overflow) */
+  .hs-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-lg);
+    max-width: 720px;
+  }
+  .hs-leaderboard {
+    width: 100%;
+    margin-top: var(--spacing-sm);
+    text-align: left;
+  }
+  .hs-loading, .hs-empty, .hs-error {
+    color: var(--color-text-light);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    text-align: center;
+    padding: 18px 0;
+  }
+  .hs-error { color: #e08a7a; }
+  .hs-row {
+    display: grid;
+    grid-template-columns: 48px 1fr 120px 56px 64px 120px;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 12px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--color-text-light);
+    border-radius: var(--radius-sm);
+  }
+  .hs-row:nth-child(even) { background: rgba(255, 255, 255, 0.035); }
+  .hs-head {
+    font-family: var(--font-heading);
+    color: var(--color-primary);
+    font-size: 11px;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--color-border-default);
+    background: none !important;
+  }
+  .hs-rank { text-align: center; font-weight: 700; color: var(--color-primary-dim); }
+  .hs-row.hs-top .hs-rank { color: #ffd86b; text-shadow: 0 0 8px #f5c84366; }
+  .hs-name { color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hs-realm, .hs-lvl, .hs-vlvl { color: var(--color-text-muted, #b9ac82); }
+  .hs-lvl, .hs-vlvl { text-align: center; }
+  .hs-xp { text-align: right; color: #ffe27a; font-variant-numeric: tabular-nums; }
+  .hs-prestige { color: #ffd100; font-size: 11px; margin-right: 4px; }
 
   /* Wiki view with integrated Controls Guide */
   .wiki-container-layout {
@@ -3249,6 +3338,7 @@
           <button class="micro-btn" id="mm-map" title="World Map">M<span class="keybind">m</span></button>
           <button class="micro-btn" id="mm-bag" title="Bags">B<span class="keybind">b</span></button>
           <button class="micro-btn" id="mm-arena" title="Ashen Coliseum (1v1 Arena)">⚔<span class="keybind">g</span></button>
+          <button class="micro-btn" id="mm-leaderboard" title="Leaderboard (Lifetime XP)">🏆<span class="keybind">k</span></button>
           <button class="micro-btn" id="mm-music" title="Toggle Music">♪</button>
         </div>
         <div id="meters-window" class="panel">
@@ -3294,6 +3384,7 @@
       <canvas id="map-canvas" width="560" height="560"></canvas>
     </div>
     <div id="arena-window" class="window panel"></div>
+    <div id="leaderboard-window" class="window panel"></div>
     <div id="market-window" class="window panel"></div>
     <div id="arena-status"></div>
     <div id="options-menu" class="window panel"></div>
@@ -3569,15 +3660,17 @@
       </section>
 
       <section id="highscores-view" class="view-section" hidden aria-hidden="true">
-        <div class="parchment-panel skeleton-panel">
+        <div class="parchment-panel hs-panel">
           <div class="skeleton-icon-wrapper">
             <svg viewBox="0 0 24 24" class="skeleton-svg-icon" aria-hidden="true">
               <path fill="currentColor" d="M12 2C11.5 2 6 4 6 4V10C6 14.41 9.59 18 12 18.5C14.41 18 18 14.41 18 10V4C18 4 12.5 2 12 2M12 16.5C10.32 15.5 8 12.78 8 10V5.37L12 3.91L16 5.37V10C16 12.78 13.68 15.5 12 16.5Z"/>
             </svg>
           </div>
           <h2 class="skeleton-title" data-i18n="highscores.title">High Scores Leaderboard</h2>
-          <p class="skeleton-desc" data-i18n="highscores.desc">Track the realm's greatest champions and compare your progress.</p>
-          <div class="coming-soon-badge" data-i18n="comingSoon.placeholder">Coming Soon...</div>
+          <p class="skeleton-desc" data-i18n="game.leaderboard.globalSubtitle">Top champions across all realms</p>
+          <div id="hs-leaderboard" class="hs-leaderboard" aria-live="polite">
+            <div class="hs-loading" data-i18n="game.leaderboard.loading">Loading rankings…</div>
+          </div>
         </div>
       </section>
 

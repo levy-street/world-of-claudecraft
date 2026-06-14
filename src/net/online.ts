@@ -6,7 +6,7 @@ import {
   Entity, EquipSlot, InvSlot, MoveInput, PlayerClass, QuestProgress, QuestState, SimEvent,
   emptyMoveInput,
 } from '../sim/types';
-import type { ArenaInfo, CharacterSearchResult, DuelInfo, IWorld, MarketInfo, PartyInfo, SocialInfo, TradeInfo } from '../world_api';
+import type { ArenaInfo, CharacterSearchResult, DuelInfo, IWorld, LeaderboardEntry, MarketInfo, PartyInfo, SocialInfo, TradeInfo } from '../world_api';
 
 // ---------------------------------------------------------------------------
 // REST
@@ -159,6 +159,16 @@ export class Api {
   async projectStats(): Promise<{ accounts_created: number; players_online: number; realm: string }> {
     return this.get('/api/project-stats');
   }
+
+  // Lifetime-XP leaderboard for the home page. 'global' ranks across all realms.
+  async leaderboard(scope: 'realm' | 'global' = 'global', limit = 100): Promise<LeaderboardEntry[]> {
+    try {
+      const data = await this.get(`/api/leaderboard?scope=${scope}&metric=lifetimeXp&limit=${limit}`);
+      return data.leaders ?? [];
+    } catch {
+      return [];
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -212,6 +222,10 @@ export class ClientWorld implements IWorld {
   equipment: Partial<Record<EquipSlot, string>> = {};
   copper = 0;
   xp = 0;
+  // Post-cap progression (Max-Level XP Overflow), mirrored from snapshot self.
+  lifetimeXp = 0;
+  prestigeRank = 0;
+  unlockedMilestones: string[] = [];
   known: ResolvedAbility[] = [];
   questLog = new Map<string, QuestProgress>();
   questsDone = new Set<string>();
@@ -494,6 +508,9 @@ export class ClientWorld implements IWorld {
         ? { itemId: '', kind: 'drink', hpPer2s: 0, manaPer2s: 0, remaining: s.drk.remaining }
         : null;
       this.xp = s.xp ?? 0;
+      this.lifetimeXp = s.lxp ?? 0;
+      this.prestigeRank = s.prk ?? 0;
+      if (s.milestones !== undefined) this.unlockedMilestones = s.milestones;
       this.copper = s.copper ?? 0;
       if (s.inv !== undefined) { this.inventory = s.inv; this.invChanged = true; }
       if (s.equip !== undefined) this.equipment = s.equip;
@@ -696,6 +713,18 @@ export class ClientWorld implements IWorld {
   }
   leaveDungeon(): void {
     this.cmd({ cmd: 'leave_dungeon' });
+  }
+  async leaderboard(): Promise<LeaderboardEntry[]> {
+    try {
+      const res = await fetch(`${this.base}/api/leaderboard?metric=lifetimeXp&limit=100`);
+      if (!res.ok) return [];
+      return (await res.json()).leaders ?? [];
+    } catch {
+      return [];
+    }
+  }
+  prestige(): void {
+    this.cmd({ cmd: 'prestige' });
   }
   // legacy aliases kept for older scripts
   enterCrypt(): void {

@@ -9,7 +9,8 @@ import { audio } from './game/audio';
 import { music } from './game/music';
 import { handlePickedEntity } from './game/interactions';
 import { Api, ClientWorld, CharacterSummary } from './net/online';
-import type { IWorld } from './world_api';
+import type { IWorld, LeaderboardEntry } from './world_api';
+import { formatXp } from './ui/xp_bar';
 import { assetsReady } from './render/assets/preload';
 import { CharacterPreview } from './render/characters';
 import { DT, INTERACT_RANGE, PlayerClass, dist2d } from './sim/types';
@@ -369,6 +370,7 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
         case 'meters': hud.toggleMeters(); break;
         case 'social': hud.toggleSocial(); break;
         case 'arena': hud.toggleArena(); break;
+        case 'leaderboard': hud.toggleLeaderboard(); break;
         case 'chat': openChat(); break;
         case 'escape':
           // close the topmost panel; if nothing was open, open the game menu
@@ -1464,6 +1466,50 @@ async function loadProjectStats(): Promise<void> {
   }
 }
 
+// Home-page global (cross-realm) lifetime-XP leaderboard. Server computes the
+// virtual level + ranking; this only renders. Re-fetched each time the High
+// Scores view is opened (the server caches, so this is cheap).
+let highscoresLoading = false;
+async function loadHighscores(): Promise<void> {
+  const host = $('#hs-leaderboard');
+  if (!host || highscoresLoading) return;
+  highscoresLoading = true;
+  host.innerHTML = `<div class="hs-loading">${t('game.leaderboard.loading')}</div>`;
+  let rows: LeaderboardEntry[] = [];
+  try {
+    rows = await api.leaderboard('global', 100);
+  } catch {
+    host.innerHTML = `<div class="hs-error">${t('game.leaderboard.retry')}</div>`;
+    highscoresLoading = false;
+    return;
+  }
+  highscoresLoading = false;
+  if (rows.length === 0) {
+    host.innerHTML = `<div class="hs-empty">${t('game.leaderboard.empty')}</div>`;
+    return;
+  }
+  const esc = (s: string): string => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!));
+  const head = `<div class="hs-row hs-head">`
+    + `<span class="hs-rank">${t('game.leaderboard.rank')}</span>`
+    + `<span class="hs-name">${t('game.leaderboard.name')}</span>`
+    + `<span class="hs-realm">${t('game.leaderboard.realmCol')}</span>`
+    + `<span class="hs-lvl">${t('game.leaderboard.level')}</span>`
+    + `<span class="hs-vlvl">${t('game.leaderboard.vlevel')}</span>`
+    + `<span class="hs-xp">${t('game.leaderboard.lifetimeXp')}</span></div>`;
+  const body = rows.map((r) => {
+    const cls = CLASSES[r.cls];
+    const star = r.prestigeRank > 0 ? `<span class="hs-prestige" title="${t('game.prestige.rank')} ${r.prestigeRank}">★${r.prestigeRank}</span>` : '';
+    return `<div class="hs-row${r.rank <= 3 ? ' hs-top' : ''}">`
+      + `<span class="hs-rank">${r.rank}</span>`
+      + `<span class="hs-name"${cls ? ` title="${esc(cls.name)}"` : ''}>${star}${esc(r.name)}</span>`
+      + `<span class="hs-realm">${esc(r.realm ?? '')}</span>`
+      + `<span class="hs-lvl">${r.level}</span>`
+      + `<span class="hs-vlvl">${r.virtualLevel}</span>`
+      + `<span class="hs-xp">${formatXp(r.lifetimeXp)}</span></div>`;
+  }).join('');
+  host.innerHTML = head + body;
+}
+
 function wireStartScreens(): void {
   // Initial page translation and stats load
   translatePage();
@@ -2002,7 +2048,10 @@ function wireStartScreens(): void {
     show('#mode-select');
   });
 
-  setupNavBtn(navBtnHighscores, '#highscores-view');
+  setupNavBtn(navBtnHighscores, '#highscores-view', () => {
+    switchMainView('#highscores-view');
+    void loadHighscores();
+  });
   setupNavBtn(navBtnWiki, '#wiki-view');
   setupNavBtn(navBtnNews, '#news-view');
   setupNavBtn(navBtnDownload, '#download-view');

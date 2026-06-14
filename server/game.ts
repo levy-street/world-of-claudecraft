@@ -706,6 +706,9 @@ export class GameServer {
       // arena (Ashen Coliseum 1v1 queue)
       case 'arena_queue': sim.arenaQueueJoin(pid); break;
       case 'arena_leave': sim.arenaQueueLeave(pid); break;
+
+      // post-cap cosmetic prestige (Max-Level XP Overflow, Phase 4)
+      case 'prestige': sim.prestige(pid); break;
       // World Market (the Merchant's auction house)
       case 'market_list':
         if (typeof msg.item === 'string' && typeof msg.count === 'number' && typeof msg.price === 'number') {
@@ -884,6 +887,8 @@ export class GameServer {
       mres: p.maxResource,
       rtype: p.resourceType,
       xp: meta.xp,
+      lxp: meta.lifetimeXp,
+      prk: meta.prestigeRank,
       copper: meta.copper,
       gcd: round2(p.gcdRemaining),
       combo: p.comboPoints,
@@ -915,6 +920,7 @@ export class GameServer {
     maybe('equip', meta.equipment);
     maybe('qlog', [...meta.questLog.values()]);
     maybe('qdone', [...meta.questsDone]);
+    maybe('milestones', [...meta.unlockedMilestones]);
     maybe('cds', Object.fromEntries([...p.cooldowns.entries()].map(([k, v]) => [k, round2(v)])));
     maybe('stats', p.stats);
     maybe('weapon', p.weapon);

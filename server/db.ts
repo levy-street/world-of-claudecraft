@@ -44,6 +44,13 @@ CREATE TABLE IF NOT EXISTS characters (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS characters_account ON characters(account_id);
+-- Max-Level XP Overflow leaderboard: indexed lifetime-XP sort key. The first
+-- index serves the realm-scoped in-game panel; the second serves the global
+-- (cross-realm) home-page board.
+CREATE INDEX IF NOT EXISTS characters_lifetime_xp
+  ON characters (realm, ((state->>'lifetimeXp')::bigint) DESC);
+CREATE INDEX IF NOT EXISTS characters_lifetime_xp_global
+  ON characters (((state->>'lifetimeXp')::bigint) DESC);
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS is_admin BOOLEAN NOT NULL DEFAULT FALSE;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS suspended_until TIMESTAMPTZ;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS banned_at TIMESTAMPTZ;
@@ -355,6 +362,56 @@ export async function topArenaRatings(limit = 20): Promise<ArenaLeaderRow[]> {
   return res.rows.map((r) => ({
     name: r.name, class: r.class, level: r.level,
     rating: Number(r.rating), wins: Number(r.wins), losses: Number(r.losses),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Lifetime-XP leaderboard (Max-Level XP Overflow). Ranks characters by the
+// `lifetimeXp` stored in their state JSONB. Realm-scoped (FR-4.3) and backed by
+// the `characters_lifetime_xp` index. Read through the server-side cache in
+// main.ts — never run per request under load.
+// ---------------------------------------------------------------------------
+
+export interface LifetimeXpLeaderRow {
+  name: string;
+  class: PlayerClass;
+  level: number;
+  realm: string;
+  lifetimeXp: number;
+  prestigeRank: number;
+}
+
+// `global: true` ranks across every realm (for the home-page board); otherwise
+// it is scoped to this process's realm (the in-game panel). Both paths sort on
+// the indexed lifetime-XP expression and are read through the main.ts cache.
+export async function topLifetimeXp(limit = 100, opts: { global?: boolean } = {}): Promise<LifetimeXpLeaderRow[]> {
+  const cap = Math.max(1, Math.min(100, limit));
+  const res = opts.global
+    ? await pool.query(
+        `SELECT name, class, level, realm,
+                COALESCE((state->>'lifetimeXp')::bigint, 0) AS lifetime_xp,
+                COALESCE((state->>'prestigeRank')::int, 0)  AS prestige_rank
+           FROM characters
+          WHERE state IS NOT NULL
+            AND COALESCE((state->>'lifetimeXp')::bigint, 0) > 0
+          ORDER BY lifetime_xp DESC, level DESC, name ASC
+          LIMIT $1`,
+        [cap],
+      )
+    : await pool.query(
+        `SELECT name, class, level, realm,
+                COALESCE((state->>'lifetimeXp')::bigint, 0) AS lifetime_xp,
+                COALESCE((state->>'prestigeRank')::int, 0)  AS prestige_rank
+           FROM characters
+          WHERE realm = $1 AND state IS NOT NULL
+            AND COALESCE((state->>'lifetimeXp')::bigint, 0) > 0
+          ORDER BY lifetime_xp DESC, level DESC, name ASC
+          LIMIT $2`,
+        [REALM, cap],
+      );
+  return res.rows.map((r) => ({
+    name: r.name, class: r.class, level: r.level, realm: r.realm,
+    lifetimeXp: Number(r.lifetime_xp), prestigeRank: Number(r.prestige_rank),
   }));
 }
 

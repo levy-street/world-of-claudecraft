@@ -6,8 +6,10 @@ import {
   ensureSchema, pool, createAccount, findAccount, getAccountsCount, touchLogin, saveToken, accountForToken,
   listCharacters, getCharacter, createCharacter, deleteCharacter, closeOrphanSessions,
   pruneChatLogs, searchCharacters, characterCountsByRealm, moderationStatusForAccount, renameCharacter,
-  findCharacterReportTargetByName, topArenaRatings,
+  findCharacterReportTargetByName, topArenaRatings, topLifetimeXp,
 } from './db';
+import { virtualLevel } from '../src/sim/types';
+import type { LeaderboardEntry } from '../src/world_api';
 import { cleanReportReason, createPlayerReport } from './moderation_db';
 import { resolveReportTarget } from './report_target';
 import {
@@ -26,6 +28,48 @@ const STATIC_DIR = path.join(__dirname, '..', 'dist');
 const CHAT_LOG_RETENTION_DAYS = Number(process.env.CHAT_LOG_RETENTION_DAYS ?? 90);
 
 const game = new GameServer();
+
+// ---------------------------------------------------------------------------
+// Lifetime-XP leaderboard cache (Max-Level XP Overflow, FR-4.2 / PR-3).
+// Same shape as the chat-censor memoization: compute once, serve from memory,
+// refresh on an interval. The query is never run per request under load — at
+// most once per LEADERBOARD_TTL_MS, plus the boot warm-up below.
+// ---------------------------------------------------------------------------
+const LEADERBOARD_TTL_MS = 30_000;
+const LEADERBOARD_SIZE = 100;
+// One cache per scope: 'realm' for the in-game panel, 'global' for the
+// cross-realm home-page board.
+const leaderboardCache: Record<'realm' | 'global', { at: number; entries: LeaderboardEntry[] } | null> = {
+  realm: null,
+  global: null,
+};
+
+async function refreshLeaderboard(scope: 'realm' | 'global'): Promise<LeaderboardEntry[]> {
+  const rows = await topLifetimeXp(LEADERBOARD_SIZE, { global: scope === 'global' });
+  const entries: LeaderboardEntry[] = rows.map((r, i) => ({
+    rank: i + 1,
+    name: r.name,
+    cls: r.class,
+    level: r.level,
+    virtualLevel: virtualLevel(r.lifetimeXp),
+    lifetimeXp: r.lifetimeXp,
+    prestigeRank: r.prestigeRank,
+    ...(scope === 'global' ? { realm: r.realm } : {}),
+  }));
+  leaderboardCache[scope] = { at: Date.now(), entries };
+  return entries;
+}
+
+async function getLeaderboard(scope: 'realm' | 'global'): Promise<LeaderboardEntry[]> {
+  const cached = leaderboardCache[scope];
+  if (cached && Date.now() - cached.at < LEADERBOARD_TTL_MS) return cached.entries;
+  try {
+    return await refreshLeaderboard(scope);
+  } catch (err) {
+    console.error(`leaderboard refresh failed (${scope}):`, err);
+    return cached?.entries ?? [];
+  }
+}
 
 function normalizeDeleteConfirmation(name: unknown): string {
   return typeof name === 'string' ? name.trim().toLowerCase() : '';
@@ -307,6 +351,18 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       // public all-time Ashen Coliseum ladder (top rated characters)
       return json(res, 200, { leaders: await topArenaRatings(20) });
     }
+    if (req.method === 'GET' && url === '/api/leaderboard') {
+      // lifetime-XP leaderboard (Max-Level XP Overflow), served from the
+      // in-memory cache. metric is fixed to lifetimeXp. ?scope=global ranks
+      // across every realm (home page); default is this process's realm (the
+      // in-game panel). Optional ?limit=N (1..100). `url` is the path only, so
+      // the query string is parsed from req.url.
+      const params = new URLSearchParams((req.url ?? '').split('?')[1] ?? '');
+      const scope: 'realm' | 'global' = params.get('scope') === 'global' ? 'global' : 'realm';
+      const limit = Math.max(1, Math.min(LEADERBOARD_SIZE, Number(params.get('limit')) || LEADERBOARD_SIZE));
+      const entries = await getLeaderboard(scope);
+      return json(res, 200, { realm: REALM, scope, metric: 'lifetimeXp', leaders: entries.slice(0, limit) });
+    }
     json(res, 404, { error: 'unknown endpoint' });
   } catch (err: any) {
     console.error('api error:', err);
@@ -339,6 +395,14 @@ async function main(): Promise<void> {
   setInterval(() => {
     void pruneChatLogs(CHAT_LOG_RETENTION_DAYS).catch((err) => console.error('chat log prune failed:', err));
   }, 24 * 3600 * 1000).unref();
+  // keep both leaderboard caches warm so the first viewer never waits on the
+  // query and it never recomputes per request (PR-3)
+  const warmLeaderboards = () => {
+    void refreshLeaderboard('realm').catch((err) => console.error('leaderboard refresh failed (realm):', err));
+    void refreshLeaderboard('global').catch((err) => console.error('leaderboard refresh failed (global):', err));
+  };
+  warmLeaderboards();
+  setInterval(warmLeaderboards, LEADERBOARD_TTL_MS).unref();
   console.log('database ready');
 
   const server = http.createServer((req, res) => {

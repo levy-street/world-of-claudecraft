@@ -81,6 +81,19 @@ export interface CharacterSearchResult {
   level: number;
 }
 
+// One ranked row of the lifetime-XP leaderboard (Max-Level XP Overflow). Always
+// computed server-side; the client only displays it.
+export interface LeaderboardEntry {
+  rank: number;
+  name: string;
+  cls: PlayerClass;
+  level: number;
+  virtualLevel: number;
+  lifetimeXp: number;
+  prestigeRank: number;
+  realm?: string; // present on the global (cross-realm) home-page board
+}
+
 export interface ArenaLadderEntry {
   pid: number;
   name: string;
@@ -146,6 +159,11 @@ export interface IWorld {
   equipment: Partial<Record<EquipSlot, string>>;
   copper: number;
   xp: number;
+  // Post-cap progression (Max-Level XP Overflow). All server-authoritative;
+  // the client renders these as-is and derives virtual level from lifetimeXp.
+  lifetimeXp: number;
+  prestigeRank: number;
+  unlockedMilestones: string[];
   known: ResolvedAbility[];
   questLog: Map<string, QuestProgress>;
   questsDone: Set<string>;
@@ -216,4 +234,8 @@ export interface IWorld {
   marketCollect(): void;
   enterDungeon(dungeonId: string): void;
   leaveDungeon(): void;
+  // Post-cap progression: the realm-scoped lifetime-XP leaderboard, and the
+  // opt-in cosmetic prestige action (Phase 4).
+  leaderboard(): Promise<LeaderboardEntry[]>;
+  prestige(): void;
 }

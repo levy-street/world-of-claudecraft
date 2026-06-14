@@ -12,7 +12,70 @@ export type Leaves<T, D extends number = 5> = [D] extends [never]
   ? { [K in keyof T]-?: Join<K, Leaves<T[K], Prev[D]>> }[keyof T]
   : "";
 
+// In-game HUD strings for the Max-Level XP Overflow / post-cap progression
+// system. The in-game HUD shipped English-only; these are registered here so
+// they route through t() per the i18n constraint. Every locale references this
+// same English object (translations are a follow-up), which keeps the
+// `: typeof en` shape exact across all languages.
+export const gameStrings = {
+  xp: {
+    suffix: "XP",
+    maxLevel: "MAX LEVEL",
+    totalXp: "total XP",
+    lv: "Lv",
+    toNext: "to next",
+  },
+  progression: {
+    heading: "Progression",
+    totalXp: "Total XP",
+    virtualLevel: "Virtual Level",
+    prestigeRank: "Prestige Rank",
+    milestones: "Milestones",
+    none: "None yet",
+    virtualLevelUp: "Virtual Level",
+  },
+  leaderboard: {
+    title: "Leaderboard",
+    subtitle: "Lifetime XP",
+    rank: "Rank",
+    name: "Name",
+    realmCol: "Realm",
+    level: "Lvl",
+    vlevel: "V.Lvl",
+    lifetimeXp: "Lifetime XP",
+    yourRank: "Your Standing",
+    empty: "No champions yet — be the first to make your mark.",
+    loading: "Loading rankings…",
+    unranked: "Unranked",
+    you: "You",
+    globalSubtitle: "Top champions across all realms",
+    retry: "Could not load the leaderboard. Try again.",
+  },
+  milestone: {
+    unlocked: "Milestone Unlocked",
+    veteran: "Veteran",
+    champion: "Champion",
+    paragon: "Paragon",
+    mythic: "Mythic",
+    eternal: "Eternal",
+  },
+  prestige: {
+    action: "Prestige",
+    title: "Prestige Character",
+    body: "Prestige raises your Prestige Rank by 1 and resets your level XP bar. It does NOT change your level, gear, talents, abilities, or your lifetime XP and leaderboard standing — it is a cosmetic flex only.",
+    confirm: "Prestige",
+    cancel: "Cancel",
+    rank: "Prestige",
+    needCap: "You must be at the level cap to prestige.",
+    needXp: "more lifetime XP to prestige",
+  },
+  settings: {
+    showOverflowXp: "Show Overflow XP",
+  },
+};
+
 export const en = {
+  game: gameStrings,
   nav: {
     home: "Home",
     play: "Play",
@@ -143,6 +206,7 @@ export const en = {
 };
 
 export const es: typeof en = {
+  game: gameStrings,
   nav: {
     home: "Inicio",
     play: "Jugar",
@@ -273,6 +337,7 @@ export const es: typeof en = {
 };
 
 export const es_ES: typeof en = {
+  game: gameStrings,
   nav: {
     home: "Inicio",
     play: "Jugar",
@@ -403,6 +468,7 @@ export const es_ES: typeof en = {
 };
 
 export const fr_FR: typeof en = {
+  game: gameStrings,
   nav: {
     home: "Accueil",
     play: "Jouer",
@@ -533,6 +599,7 @@ export const fr_FR: typeof en = {
 };
 
 export const fr_CA: typeof en = {
+  game: gameStrings,
   nav: {
     home: "Accueil",
     play: "Jouer",
@@ -663,6 +730,7 @@ export const fr_CA: typeof en = {
 };
 
 export const en_CA: typeof en = {
+  game: gameStrings,
   nav: {
     home: "Home",
     play: "Play",
@@ -793,6 +861,7 @@ export const en_CA: typeof en = {
 };
 
 export const it_IT: typeof en = {
+  game: gameStrings,
   nav: {
     home: "Pagina principale",
     play: "Gioca",
@@ -923,6 +992,7 @@ export const it_IT: typeof en = {
 };
 
 export const de_DE: typeof en = {
+  game: gameStrings,
   nav: {
     home: "Startseite",
     play: "Spielen",
@@ -1053,6 +1123,7 @@ export const de_DE: typeof en = {
 };
 
 export const zh_CN: typeof en = {
+  game: gameStrings,
   nav: {
     home: "首页",
     play: "开始游戏",
@@ -1183,6 +1254,7 @@ export const zh_CN: typeof en = {
 };
 
 export const zh_TW: typeof en = {
+  game: gameStrings,
   nav: {
     home: "首頁",
     play: "開始遊戲",
@@ -1313,6 +1385,7 @@ export const zh_TW: typeof en = {
 };
 
 export const ko_KR: typeof en = {
+  game: gameStrings,
   nav: {
     home: "홈",
     play: "플레이",
@@ -1443,6 +1516,7 @@ export const ko_KR: typeof en = {
 };
 
 export const ja_JP: typeof en = {
+  game: gameStrings,
   nav: {
     home: "ホーム",
     play: "プレイ",
@@ -1573,6 +1647,7 @@ export const ja_JP: typeof en = {
 };
 
 export const pt_BR: typeof en = {
+  game: gameStrings,
   nav: {
     home: "Início",
     play: "Jogar",
@@ -1703,6 +1778,7 @@ export const pt_BR: typeof en = {
 };
 
 export const ru_RU: typeof en = {
+  game: gameStrings,
   nav: {
     home: "Главная",
     play: "Играть",
