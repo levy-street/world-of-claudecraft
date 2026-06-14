@@ -1,0 +1,14 @@
+[package]
+name = "worldofclaudecraft-module"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+sha2 = "0.10"
+spacetimedb = { version = "=2.3.0", features = ["unstable"] }
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(debug_reducers)'] }

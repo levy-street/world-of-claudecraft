@@ -27,3 +27,4 @@ Thumbs.db
 *.log
 .claude/
 .context-engine/git_history_cache.json
+/stdb/target
