@@ -325,6 +325,30 @@ describe('guilds', () => {
     expect((await h.svc.snapshot(2)).guild).toBeNull();
   });
 
+  it('rejects inviting someone who already has a pending guild invite', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    await h.svc.guildCreate(h.actor(3), 'Raiders');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    h.tx.clear();
+    // a second guild tries to invite Bet while the first invite is still live
+    await h.svc.guildInvite(h.actor(3), 'Bet');
+    expect(h.tx.errorsFor(3).join()).toMatch(/already has a pending guild invitation/i);
+    // the original invite is untouched, so Bet still joins the first guild
+    await h.svc.guildAccept(h.actor(2));
+    expect((await h.svc.snapshot(2)).guild?.name).toBe('Knights');
+  });
+
+  it('allows a fresh invite once the previous one has expired', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    await h.svc.guildCreate(h.actor(3), 'Raiders');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    h.advance(61_000); // first invite lapses
+    h.tx.clear();
+    await h.svc.guildInvite(h.actor(3), 'Bet');
+    expect(h.tx.errorsFor(3)).toHaveLength(0);
+    expect(h.tx.eventsFor(2).some((e) => e.type === 'guildInvite')).toBe(true);
+  });
+
   it('routes guild chat only to guild members', async () => {
     await h.svc.guildCreate(h.actor(1), 'Knights');
     await h.svc.guildInvite(h.actor(1), 'Bet');

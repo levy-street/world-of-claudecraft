@@ -292,6 +292,10 @@ export class SocialService {
     if (target.id === actor.characterId) { this.err(actor.characterId, 'You are already in the guild.'); return; }
     if (!this.tx.isOnline(target.id)) { this.err(actor.characterId, `${target.name} must be online to be invited.`); return; }
     if (await this.db.guildMembership(target.id)) { this.err(actor.characterId, `${target.name} is already in a guild.`); return; }
+    const existing = this.pendingGuildInvites.get(target.id);
+    if (existing && existing.expiresAt >= this.now()) {
+      this.err(actor.characterId, `${target.name} already has a pending guild invitation.`); return;
+    }
     const members = await this.db.guildMembers(membership.guildId);
     if (members.length >= GUILD_MEMBER_LIMIT) { this.err(actor.characterId, 'Your guild is full.'); return; }
     this.pendingGuildInvites.set(target.id, {
