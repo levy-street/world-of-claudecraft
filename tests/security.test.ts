@@ -2,11 +2,11 @@ import { EventEmitter } from 'node:events';
 import { rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { buildWebSocketAuthMessage, buildWebSocketUrl } from '../src/net/online';
 import { Sim } from '../src/sim/sim';
 import { normalizeCharName, offensiveName, offensiveUsername, validCharName, validUsername } from '../server/auth';
-import { rateLimited, requestIp, authThrottled, recordAuthFailure, clearAuthFailures } from '../server/ratelimit';
+import { rateLimited, requestIp, authThrottled, recordAuthFailure, clearAuthFailures, authFailureCount, resetAuthFailures } from '../server/ratelimit';
 
 function fakeReq(headers: Record<string, string>, remoteAddress: string) {
   const req: any = new EventEmitter();
@@ -136,6 +136,10 @@ describe('rate-limit client IP selection', () => {
 });
 
 describe('per-account failed-login throttle (#93)', () => {
+  // The failure map is module-level shared state; reset it so the flood tests
+  // below (and any future order changes) can't leak entries between cases.
+  beforeEach(() => resetAuthFailures());
+
   it('throttles an account after repeated failed logins, regardless of source IP', () => {
     const user = 'victim_account';
     expect(authThrottled(user)).toBe(false);
@@ -166,6 +170,36 @@ describe('per-account failed-login throttle (#93)', () => {
     for (let i = 0; i < 10; i++) recordAuthFailure('account_a');
     expect(authThrottled('account_a')).toBe(true);
     expect(authThrottled('account_b')).toBe(false);
+  });
+
+  it('keeps a throttled-then-idle victim throttled after the backstop trips', () => {
+    // Models the REAL flow: once an account is throttled, handleApi rejects it
+    // BEFORE recordAuthFailure runs (server/main.ts), so the victim's timestamps
+    // go stale and it is never re-touched. An attacker then floods the map with
+    // >10k NEWER distinct one-off failures. A least-recently-active eviction that
+    // ignored throttle state would pick the idle victim as "oldest" and evict it,
+    // resetting its throttle — the exact #147 bypass through a new door. The
+    // backstop must refuse to evict currently-throttled accounts.
+    const victim = 'idle_victim';
+    for (let i = 0; i < 10; i++) recordAuthFailure(victim);
+    expect(authThrottled(victim)).toBe(true);
+
+    // Flood past MAX_TRACKED_IPS (10_000) with newer accounts; victim untouched.
+    for (let i = 0; i < 10_050; i++) recordAuthFailure(`floodacct_${i}`);
+
+    // The idle victim must stay throttled — its counter must survive eviction.
+    expect(authThrottled(victim)).toBe(true);
+  });
+
+  it('keeps the failure map bounded under a flood of distinct in-window accounts', () => {
+    // A pure flood is all in-window, so expired-only eviction would delete
+    // nothing and the map would grow unbounded (and every subsequent call would
+    // re-scan a growing map → O(n^2)). The backstop must fall back to evicting
+    // the least-recently-active accounts so the map stays bounded near the cap.
+    for (let i = 0; i < 12_000; i++) recordAuthFailure(`floodbound_${i}`);
+
+    // MAX_TRACKED_IPS is 10_000; allow a small margin for the just-recorded entry.
+    expect(authFailureCount()).toBeLessThanOrEqual(10_001);
   });
 });
 

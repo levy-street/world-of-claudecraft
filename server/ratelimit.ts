@@ -101,13 +101,21 @@ function authKey(username: string): string {
   return username.trim().toLowerCase();
 }
 
+// Single source of truth for "is this account at/over the failure ceiling right
+// now". Both authThrottled() and the memory backstop's eviction skip-check call
+// this, so the two can never drift apart — if they did, the backstop could evict
+// a still-throttled account and silently re-open the flood-reset bypass (#147).
+function isThrottled(times: number[], windowStart: number): boolean {
+  return times.filter((t) => t > windowStart).length >= MAX_AUTH_FAILURES;
+}
+
 /** True once an account has hit the failed-attempt ceiling within the window. */
 export function authThrottled(username: string): boolean {
   const key = authKey(username);
   const windowStart = Date.now() - AUTH_FAIL_WINDOW_MS;
   const recent = (authFailures.get(key) ?? []).filter((t) => t > windowStart);
   if (recent.length > 0) authFailures.set(key, recent); else authFailures.delete(key);
-  return recent.length >= MAX_AUTH_FAILURES;
+  return isThrottled(recent, windowStart);
 }
 
 /** Record a failed login for an account (call on bad password / unknown user). */
@@ -117,7 +125,61 @@ export function recordAuthFailure(username: string): void {
   const recent = (authFailures.get(key) ?? []).filter((t) => t > windowStart);
   recent.push(Date.now());
   authFailures.set(key, recent);
-  if (authFailures.size > MAX_TRACKED_IPS) authFailures.clear(); // memory backstop
+  // Memory backstop: keep the map bounded without a blanket clear(), which would
+  // also wipe the counter we just recorded — letting an attacker bypass the
+  // throttle by flooding the map with failures against many distinct usernames
+  // to force the overflow. First evict accounts whose window has fully expired.
+  if (authFailures.size > MAX_TRACKED_IPS) {
+    for (const [k, times] of authFailures) {
+      if (k === key) continue;
+      if (times.length === 0 || times[times.length - 1] <= windowStart) {
+        authFailures.delete(k);
+      }
+      if (authFailures.size <= MAX_TRACKED_IPS) break;
+    }
+    // A pure flood is all in-window, so nothing above is expired and the map
+    // would grow unbounded (and each call would re-scan it). Fall back to
+    // evicting the least-recently-active account until back under the cap.
+    //
+    // Critically, NEVER evict a currently-throttled account (isThrottled) or the
+    // account just recorded. In the real flow (server/main.ts) a throttled
+    // account is rejected BEFORE recordAuthFailure runs, so its timestamps go
+    // stale and it would otherwise look "oldest" — letting an attacker reset a
+    // victim's throttle simply by flooding the map with newer one-off failures.
+    // Only non-throttled idle entries (the flood's count-of-1 buckets) are
+    // sacrificed — the cost of a memory bound.
+    while (authFailures.size > MAX_TRACKED_IPS) {
+      let oldestKey: string | undefined;
+      let oldestSeen = Infinity;
+      for (const [k, times] of authFailures) {
+        if (k === key) continue;
+        // Currently throttled? Same predicate authThrottled uses; never evict it.
+        if (isThrottled(times, windowStart)) continue;
+        const last = times.length === 0 ? 0 : times[times.length - 1];
+        if (last < oldestSeen) {
+          oldestSeen = last;
+          oldestKey = k;
+        }
+      }
+      // Nothing evictable means every remaining account is either the current
+      // one or currently throttled. Accept a SOFT cap and stop rather than
+      // reset any throttle. This only happens once an attacker has genuinely
+      // locked out >MAX_TRACKED_IPS distinct accounts (100k+ failed logins);
+      // we fail toward protection (map grows) instead of toward bypass.
+      if (oldestKey === undefined) break;
+      authFailures.delete(oldestKey);
+    }
+  }
+}
+
+/** Number of accounts currently tracked. Exposed for the backstop-bound test. */
+export function authFailureCount(): number {
+  return authFailures.size;
+}
+
+/** Reset all tracked failures. Test-only — keeps the shared map isolated per test. */
+export function resetAuthFailures(): void {
+  authFailures.clear();
 }
 
 /** Clear an account's failure history after a successful login. */
