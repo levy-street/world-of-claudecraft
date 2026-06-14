@@ -4,8 +4,8 @@ import type { WebSocket } from 'ws';
 import { DbConnection } from '../src/net/module_bindings';
 import type { PlayerClass } from '../src/sim/types';
 import type { CharacterState } from '../src/sim/sim';
-import { ensureSchema } from './db';
 import { GameServer, type ClientSession } from './game';
+import { StdbGamePersistence } from './stdb_persistence';
 
 try {
   process.loadEnvFile?.();
@@ -124,22 +124,20 @@ class BridgeSocket {
 
 class StdbBridge {
   private conn: DbConnection | null = null;
-  private readonly game = new GameServer();
+  private game: GameServer | null = null;
   private readonly sessions = new Map<string, BridgeSession>();
   private readonly consumedCommands = new Set<string>();
   private saveTimer: ReturnType<typeof setInterval> | null = null;
 
   async start(): Promise<void> {
-    await ensureSchema();
-    await this.game.loadMarket();
     this.conn = await this.connect();
+    this.game = new GameServer(new StdbGamePersistence(this.conn));
     await this.conn.reducers.bridgePing({ sessions: 0, tick: 0n });
     this.watchTables(this.conn);
     await new Promise<void>((resolve, reject) => {
       this.conn!
         .subscriptionBuilder()
         .onApplied(() => {
-          this.scanInitialRows();
           resolve();
         })
         .onError((ctx: any) => reject(new Error(ctx?.event?.message ?? 'SpacetimeDB bridge subscription failed')))
@@ -148,9 +146,16 @@ class StdbBridge {
           'SELECT * FROM input_state',
           'SELECT * FROM client_command',
           'SELECT * FROM character',
+          'SELECT * FROM world_state',
+          'SELECT * FROM friend_link',
+          'SELECT * FROM block_link',
+          'SELECT * FROM guild',
+          'SELECT * FROM guild_member',
         ]);
     });
+    await this.game.loadMarket();
     this.game.start();
+    this.scanInitialRows();
     this.saveTimer = setInterval(() => void this.saveAll(), SAVE_INTERVAL_MS);
     console.log(`SpacetimeDB bridge online: ${STDB_URI}/${STDB_MODULE}`);
   }
@@ -242,7 +247,7 @@ class StdbBridge {
       if (bridge) void this.publishOutbound(bridge, payload);
       else void this.publishEarly(row, payload);
     }) as unknown as WebSocket;
-    const result = this.game.join(
+    const result = this.requireGame().join(
       socket,
       Number(row.accountId),
       Number(row.characterId),
@@ -314,7 +319,7 @@ class StdbBridge {
   private applyInput(row: InputStateRow): void {
     const bridge = this.sessions.get(String(row.sessionId));
     if (!bridge) return;
-    this.game.handleMessage(bridge.gameSession, JSON.stringify({
+    this.requireGame().handleMessage(bridge.gameSession, JSON.stringify({
       t: 'input',
       mi: {
         f: row.forward ? 1 : 0,
@@ -336,15 +341,16 @@ class StdbBridge {
     const bridge = this.sessions.get(String(row.sessionId));
     if (!bridge) return;
     this.consumedCommands.add(commandId);
-    this.game.handleMessage(bridge.gameSession, row.payloadJson || JSON.stringify({ t: 'cmd', cmd: row.kind }));
+    this.requireGame().handleMessage(bridge.gameSession, row.payloadJson || JSON.stringify({ t: 'cmd', cmd: row.kind }));
     void this.conn?.reducers.bridgeConsumeCommand({ commandId: row.id }).catch((err) => {
       console.error('failed to mark STDB command consumed:', err);
     });
   }
 
   private async saveSession(bridge: BridgeSession): Promise<{ stateJson: string; level: number }> {
-    const state = this.game.sim.serializeCharacter(bridge.gameSession.pid);
-    const entity = this.game.sim.entities.get(bridge.gameSession.pid);
+    const game = this.requireGame();
+    const state = game.sim.serializeCharacter(bridge.gameSession.pid);
+    const entity = game.sim.entities.get(bridge.gameSession.pid);
     const stateJson = state ? JSON.stringify(state) : '';
     const level = entity?.level ?? 1;
     if (this.conn?.isActive && stateJson) {
@@ -360,7 +366,7 @@ class StdbBridge {
   private async closeSession(bridge: BridgeSession, reason: string): Promise<void> {
     if (!this.sessions.delete(String(bridge.stdbId))) return;
     const saved = await this.saveSession(bridge).catch(() => ({ stateJson: '', level: 1 }));
-    await this.game.leave(bridge.gameSession, reason).catch((err) => console.error('bridge leave failed:', err));
+    await this.requireGame().leave(bridge.gameSession, reason).catch((err) => console.error('bridge leave failed:', err));
     await this.conn?.reducers.bridgeCloseSession({
       sessionId: bridge.stdbId,
       stateJson: saved.stateJson,
@@ -370,7 +376,8 @@ class StdbBridge {
   }
 
   private async saveAll(): Promise<void> {
-    await this.conn?.reducers.bridgePing({ sessions: this.sessions.size, tick: BigInt(this.game.sim.tickCount) }).catch(() => {});
+    const game = this.game;
+    await this.conn?.reducers.bridgePing({ sessions: this.sessions.size, tick: BigInt(game?.sim.tickCount ?? 0) }).catch(() => {});
     for (const bridge of this.sessions.values()) {
       await this.saveSession(bridge).catch((err) => console.error(`STDB save failed for ${bridge.characterId}:`, err));
     }
@@ -378,9 +385,14 @@ class StdbBridge {
 
   private async stop(): Promise<void> {
     if (this.saveTimer !== null) clearInterval(this.saveTimer);
-    this.game.stop();
+    this.game?.stop();
     await this.saveAll().catch(() => {});
     this.conn?.disconnect();
+  }
+
+  private requireGame(): GameServer {
+    if (!this.game) throw new Error('SpacetimeDB bridge game server is not initialized');
+    return this.game;
   }
 }
 

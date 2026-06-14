@@ -33,6 +33,14 @@ export const AuthState = __t.object("AuthState", {
 });
 export type AuthState = __Infer<typeof AuthState>;
 
+export const BlockLink = __t.object("BlockLink", {
+  key: __t.string(),
+  characterId: __t.u64(),
+  blockedId: __t.u64(),
+  createdAt: __t.timestamp(),
+});
+export type BlockLink = __Infer<typeof BlockLink>;
+
 export const BridgeAuth = __t.object("BridgeAuth", {
   id: __t.u64(),
   owner: __t.identity(),
@@ -74,6 +82,17 @@ export const CharacterRoster = __t.object("CharacterRoster", {
 });
 export type CharacterRoster = __Infer<typeof CharacterRoster>;
 
+export const ChatLog = __t.object("ChatLog", {
+  id: __t.u64(),
+  accountId: __t.u64(),
+  characterId: __t.u64(),
+  characterName: __t.string(),
+  channel: __t.string(),
+  message: __t.string(),
+  createdAt: __t.timestamp(),
+});
+export type ChatLog = __Infer<typeof ChatLog>;
+
 export const ClientCommand = __t.object("ClientCommand", {
   id: __t.u64(),
   owner: __t.identity(),
@@ -84,6 +103,31 @@ export const ClientCommand = __t.object("ClientCommand", {
   consumed: __t.bool(),
 });
 export type ClientCommand = __Infer<typeof ClientCommand>;
+
+export const FriendLink = __t.object("FriendLink", {
+  key: __t.string(),
+  characterId: __t.u64(),
+  friendId: __t.u64(),
+  createdAt: __t.timestamp(),
+});
+export type FriendLink = __Infer<typeof FriendLink>;
+
+export const Guild = __t.object("Guild", {
+  id: __t.u64(),
+  name: __t.string(),
+  nameKey: __t.string(),
+  realm: __t.string(),
+  createdAt: __t.timestamp(),
+});
+export type Guild = __Infer<typeof Guild>;
+
+export const GuildMember = __t.object("GuildMember", {
+  characterId: __t.u64(),
+  guildId: __t.u64(),
+  rank: __t.string(),
+  joinedAt: __t.timestamp(),
+});
+export type GuildMember = __Infer<typeof GuildMember>;
 
 export const InputState = __t.object("InputState", {
   sessionId: __t.u64(),
@@ -100,6 +144,17 @@ export const InputState = __t.object("InputState", {
   updatedAt: __t.timestamp(),
 });
 export type InputState = __Infer<typeof InputState>;
+
+export const PlaySession = __t.object("PlaySession", {
+  id: __t.u64(),
+  accountId: __t.u64(),
+  characterId: __t.u64(),
+  characterName: __t.string(),
+  startedAt: __t.timestamp(),
+  ended: __t.bool(),
+  updatedAt: __t.timestamp(),
+});
+export type PlaySession = __Infer<typeof PlaySession>;
 
 export const PlayerReport = __t.object("PlayerReport", {
   id: __t.u64(),
@@ -164,4 +219,11 @@ export const WorldSnapshot = __t.object("WorldSnapshot", {
   updatedAt: __t.timestamp(),
 });
 export type WorldSnapshot = __Infer<typeof WorldSnapshot>;
+
+export const WorldState = __t.object("WorldState", {
+  key: __t.string(),
+  payloadJson: __t.string(),
+  updatedAt: __t.timestamp(),
+});
+export type WorldState = __Infer<typeof WorldState>;
 

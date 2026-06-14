@@ -17,6 +17,7 @@ import { json, readBody } from './http_util';
 import { rateLimited, authThrottled, recordAuthFailure, clearAuthFailures } from './ratelimit';
 import { handleAdminApi } from './admin';
 import { GameServer } from './game';
+import { createPostgresGamePersistence } from './postgres_game_persistence';
 import { REALM, REALM_DIRECTORY, REALM_ORIGINS } from './realm';
 import { cacheControlFor, etagFor, isNotModified } from './static_cache';
 
@@ -25,7 +26,7 @@ const STATIC_DIR = path.join(__dirname, '..', 'dist');
 // How long chat logs are kept (0 = forever); pruned at boot and daily.
 const CHAT_LOG_RETENTION_DAYS = Number(process.env.CHAT_LOG_RETENTION_DAYS ?? 90);
 
-const game = new GameServer();
+const game = new GameServer(createPostgresGamePersistence());
 
 function normalizeDeleteConfirmation(name: unknown): string {
   return typeof name === 'string' ? name.trim().toLowerCase() : '';

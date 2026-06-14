@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { selectedWorldBackend, spacetimeConnectionConfig } from '../src/net/backend';
-import { reducers } from '../src/net/module_bindings';
+import { reducers, tables } from '../src/net/module_bindings';
 import bridgeAttachSessionReducer from '../src/net/module_bindings/bridge_attach_session_reducer';
 import bridgePingReducer from '../src/net/module_bindings/bridge_ping_reducer';
 import { SpacetimeApi } from '../src/net/spacetime_api';
@@ -48,6 +48,39 @@ describe('SpacetimeDB generated reducer surface', () => {
       'bridgePublishSocial',
       'bridgeConsumeCommand',
       'bridgeCloseSession',
+      'bridgeSaveCharacter',
+      'bridgeSaveWorldState',
+      'bridgeOpenPlaySession',
+      'bridgeClosePlaySession',
+      'bridgeInsertChatLog',
+      'bridgeAddFriend',
+      'bridgeRemoveFriend',
+      'bridgeAddBlock',
+      'bridgeRemoveBlock',
+      'bridgeCreateGuild',
+      'bridgeDeleteGuild',
+      'bridgeAddGuildMember',
+      'bridgeRemoveGuildMember',
+      'bridgeSetGuildRank',
+    ]));
+  });
+
+  it('exposes STDB game-state tables while keeping private internals out of generated bindings', () => {
+    expect(Object.keys(tables)).toEqual(expect.arrayContaining([
+      'character',
+      'world_session',
+      'world_snapshot',
+      'world_state',
+      'play_session',
+      'friend_link',
+      'block_link',
+      'guild',
+      'guild_member',
+    ]));
+    expect(Object.keys(tables)).not.toEqual(expect.arrayContaining([
+      'account',
+      'bridge_auth',
+      'chat_log',
     ]));
   });
 

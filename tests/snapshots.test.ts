@@ -14,6 +14,7 @@ vi.mock('../server/db', () => ({
 
 import { censorChatText, GameServer, ClientSession } from '../server/game';
 import { saveCharacterState } from '../server/db';
+import { createMemoryGamePersistence, type GamePersistence } from '../server/game_persistence';
 import { ClientWorld } from '../src/net/online';
 import type { PlayerClass } from '../src/sim/types';
 
@@ -52,6 +53,10 @@ function eventTexts(sent: any[]): string[] {
 
 function broadcast(server: GameServer): void {
   (server as any).broadcastSnapshots();
+}
+
+function persistenceWithSaveMock(): GamePersistence {
+  return { ...createMemoryGamePersistence(), saveCharacterState };
 }
 
 // A ClientWorld without the WebSocket plumbing, to drive applySnapshot directly.
@@ -353,7 +358,7 @@ describe('autosaves', () => {
   });
 
   it('skips overlapping saveAll runs while saving each current session once', async () => {
-    const server = new GameServer();
+    const server = new GameServer(persistenceWithSaveMock());
     joinServer(server, fakeWs(), 1, 'Testa');
     joinServer(server, fakeWs(), 2, 'Testb');
     joinServer(server, fakeWs(), 3, 'Testc');
@@ -380,7 +385,7 @@ describe('autosaves', () => {
   });
 
   it('waits for an active autosave before running the shutdown save pass', async () => {
-    const server = new GameServer();
+    const server = new GameServer(persistenceWithSaveMock());
     joinServer(server, fakeWs(), 1, 'Testa');
     joinServer(server, fakeWs(), 2, 'Testb');
 

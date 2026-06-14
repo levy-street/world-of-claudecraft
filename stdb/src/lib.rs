@@ -9,8 +9,6 @@ const BRIDGE_AUTH_ID: u64 = 0;
 #[client_visibility_filter]
 const AUTH_STATE_OWNER: Filter = Filter::Sql("SELECT * FROM auth_state WHERE owner = :sender");
 #[client_visibility_filter]
-const SESSION_OWNER: Filter = Filter::Sql("SELECT * FROM world_session WHERE owner = :sender");
-#[client_visibility_filter]
 const SNAPSHOT_OWNER: Filter = Filter::Sql("SELECT * FROM world_snapshot WHERE owner = :sender");
 #[client_visibility_filter]
 const EVENT_OWNER: Filter = Filter::Sql("SELECT * FROM world_event WHERE owner = :sender");
@@ -18,7 +16,7 @@ const EVENT_OWNER: Filter = Filter::Sql("SELECT * FROM world_event WHERE owner =
 const SOCIAL_OWNER: Filter = Filter::Sql("SELECT * FROM social_snapshot WHERE owner = :sender");
 
 #[derive(Clone)]
-#[table(accessor = account, public, index(accessor = by_username, btree(columns = [username_key])))]
+#[table(accessor = account, index(accessor = by_username, btree(columns = [username_key])))]
 pub struct Account {
     #[primary_key]
     #[auto_inc]
@@ -213,6 +211,83 @@ pub struct BridgeAuth {
     pub id: u64,
     pub owner: Identity,
     pub created_at: Timestamp,
+}
+
+#[derive(Clone)]
+#[table(accessor = world_state, public)]
+pub struct WorldState {
+    #[primary_key]
+    pub key: String,
+    pub payload_json: String,
+    pub updated_at: Timestamp,
+}
+
+#[derive(Clone)]
+#[table(accessor = play_session, public, index(accessor = by_character, btree(columns = [character_id])))]
+pub struct PlaySession {
+    #[primary_key]
+    pub id: u64,
+    pub account_id: u64,
+    pub character_id: u64,
+    pub character_name: String,
+    pub started_at: Timestamp,
+    pub ended: bool,
+    pub updated_at: Timestamp,
+}
+
+#[derive(Clone)]
+#[table(accessor = chat_log, index(accessor = by_character, btree(columns = [character_id])))]
+pub struct ChatLog {
+    #[primary_key]
+    #[auto_inc]
+    pub id: u64,
+    pub account_id: u64,
+    pub character_id: u64,
+    pub character_name: String,
+    pub channel: String,
+    pub message: String,
+    pub created_at: Timestamp,
+}
+
+#[derive(Clone)]
+#[table(accessor = friend_link, public, index(accessor = by_character, btree(columns = [character_id])), index(accessor = by_friend, btree(columns = [friend_id])))]
+pub struct FriendLink {
+    #[primary_key]
+    pub key: String,
+    pub character_id: u64,
+    pub friend_id: u64,
+    pub created_at: Timestamp,
+}
+
+#[derive(Clone)]
+#[table(accessor = block_link, public, index(accessor = by_character, btree(columns = [character_id])))]
+pub struct BlockLink {
+    #[primary_key]
+    pub key: String,
+    pub character_id: u64,
+    pub blocked_id: u64,
+    pub created_at: Timestamp,
+}
+
+#[derive(Clone)]
+#[table(accessor = guild, public, index(accessor = by_name, btree(columns = [name_key])))]
+pub struct Guild {
+    #[primary_key]
+    pub id: u64,
+    pub name: String,
+    pub name_key: String,
+    pub realm: String,
+    pub created_at: Timestamp,
+}
+
+#[derive(Clone)]
+#[table(accessor = guild_member, public, index(accessor = by_guild, btree(columns = [guild_id])))]
+pub struct GuildMember {
+    #[primary_key]
+    pub character_id: u64,
+    pub guild_id: u64,
+    pub rank: String,
+    pub joined_at: Timestamp,
 }
 
 #[derive(Clone)]
@@ -674,6 +749,182 @@ pub fn bridge_close_session(ctx: &ReducerContext, session_id: u64, state_json: S
     Ok(())
 }
 
+#[reducer]
+pub fn bridge_save_world_state(ctx: &ReducerContext, key: String, payload_json: String) -> Result<(), String> {
+    require_bridge(ctx)?;
+    let key = clean_state_key(&key)?;
+    if payload_json.len() > 1024 * 1024 {
+        return Err("world state too large".into());
+    }
+    let row = WorldState { key: key.clone(), payload_json, updated_at: ctx.timestamp };
+    if ctx.db.world_state().key().find(key).is_some() {
+        ctx.db.world_state().key().update(row);
+    } else {
+        ctx.db.world_state().insert(row);
+    }
+    Ok(())
+}
+
+#[reducer]
+pub fn bridge_open_play_session(ctx: &ReducerContext, id: u64, account_id: u64, character_id: u64, character_name: String) -> Result<(), String> {
+    require_bridge(ctx)?;
+    let character_name = clean_bounded_text(&character_name, 64, "character name")?;
+    let row = PlaySession {
+        id,
+        account_id,
+        character_id,
+        character_name,
+        started_at: ctx.timestamp,
+        ended: false,
+        updated_at: ctx.timestamp,
+    };
+    if ctx.db.play_session().id().find(id).is_some() {
+        ctx.db.play_session().id().update(row);
+    } else {
+        ctx.db.play_session().insert(row);
+    }
+    Ok(())
+}
+
+#[reducer]
+pub fn bridge_close_play_session(ctx: &ReducerContext, id: u64) -> Result<(), String> {
+    require_bridge(ctx)?;
+    let Some(mut row) = ctx.db.play_session().id().find(id) else {
+        return Ok(());
+    };
+    row.ended = true;
+    row.updated_at = ctx.timestamp;
+    ctx.db.play_session().id().update(row);
+    Ok(())
+}
+
+#[reducer]
+pub fn bridge_insert_chat_log(ctx: &ReducerContext, account_id: u64, character_id: u64, character_name: String, channel: String, message: String) -> Result<(), String> {
+    require_bridge(ctx)?;
+    let character_name = clean_bounded_text(&character_name, 64, "character name")?;
+    let channel = clean_bounded_text(&channel, 32, "channel")?;
+    let message = clean_bounded_text(&message, 240, "message")?;
+    ctx.db.chat_log().insert(ChatLog {
+        id: 0,
+        account_id,
+        character_id,
+        character_name,
+        channel,
+        message,
+        created_at: ctx.timestamp,
+    });
+    Ok(())
+}
+
+#[reducer]
+pub fn bridge_add_friend(ctx: &ReducerContext, character_id: u64, friend_id: u64) -> Result<(), String> {
+    require_bridge(ctx)?;
+    if character_id == friend_id {
+        return Err("cannot friend self".into());
+    }
+    let key = social_key(character_id, friend_id);
+    if ctx.db.friend_link().key().find(key.clone()).is_none() {
+        ctx.db.friend_link().insert(FriendLink { key, character_id, friend_id, created_at: ctx.timestamp });
+    }
+    Ok(())
+}
+
+#[reducer]
+pub fn bridge_remove_friend(ctx: &ReducerContext, character_id: u64, friend_id: u64) -> Result<(), String> {
+    require_bridge(ctx)?;
+    ctx.db.friend_link().key().delete(social_key(character_id, friend_id));
+    Ok(())
+}
+
+#[reducer]
+pub fn bridge_add_block(ctx: &ReducerContext, character_id: u64, blocked_id: u64) -> Result<(), String> {
+    require_bridge(ctx)?;
+    if character_id == blocked_id {
+        return Err("cannot block self".into());
+    }
+    let key = social_key(character_id, blocked_id);
+    if ctx.db.block_link().key().find(key.clone()).is_none() {
+        ctx.db.block_link().insert(BlockLink { key, character_id, blocked_id, created_at: ctx.timestamp });
+    }
+    ctx.db.friend_link().key().delete(social_key(character_id, blocked_id));
+    Ok(())
+}
+
+#[reducer]
+pub fn bridge_remove_block(ctx: &ReducerContext, character_id: u64, blocked_id: u64) -> Result<(), String> {
+    require_bridge(ctx)?;
+    ctx.db.block_link().key().delete(social_key(character_id, blocked_id));
+    Ok(())
+}
+
+#[reducer]
+pub fn bridge_create_guild(ctx: &ReducerContext, id: u64, name: String) -> Result<(), String> {
+    require_bridge(ctx)?;
+    let name = clean_guild_name(&name)?;
+    let name_key = guild_name_key(&name);
+    if ctx.db.guild().by_name().filter(&name_key).next().is_some() {
+        return Err("guild name already exists".into());
+    }
+    if ctx.db.guild().id().find(id).is_some() {
+        return Err("guild id already exists".into());
+    }
+    ctx.db.guild().insert(Guild {
+        id,
+        name,
+        name_key,
+        realm: REALM_NAME.to_string(),
+        created_at: ctx.timestamp,
+    });
+    Ok(())
+}
+
+#[reducer]
+pub fn bridge_delete_guild(ctx: &ReducerContext, id: u64) -> Result<(), String> {
+    require_bridge(ctx)?;
+    let members: Vec<u64> = ctx.db.guild_member().by_guild().filter(id).map(|m| m.character_id).collect();
+    for character_id in members {
+        ctx.db.guild_member().character_id().delete(character_id);
+    }
+    ctx.db.guild().id().delete(id);
+    Ok(())
+}
+
+#[reducer]
+pub fn bridge_add_guild_member(ctx: &ReducerContext, guild_id: u64, character_id: u64, rank: String) -> Result<(), String> {
+    require_bridge(ctx)?;
+    if ctx.db.guild().id().find(guild_id).is_none() {
+        return Err("guild not found".into());
+    }
+    if ctx.db.guild_member().character_id().find(character_id).is_some() {
+        return Ok(());
+    }
+    ctx.db.guild_member().insert(GuildMember {
+        character_id,
+        guild_id,
+        rank: clean_guild_rank(&rank)?,
+        joined_at: ctx.timestamp,
+    });
+    Ok(())
+}
+
+#[reducer]
+pub fn bridge_remove_guild_member(ctx: &ReducerContext, character_id: u64) -> Result<(), String> {
+    require_bridge(ctx)?;
+    ctx.db.guild_member().character_id().delete(character_id);
+    Ok(())
+}
+
+#[reducer]
+pub fn bridge_set_guild_rank(ctx: &ReducerContext, character_id: u64, rank: String) -> Result<(), String> {
+    require_bridge(ctx)?;
+    let Some(mut row) = ctx.db.guild_member().character_id().find(character_id) else {
+        return Ok(());
+    };
+    row.rank = clean_guild_rank(&rank)?;
+    ctx.db.guild_member().character_id().update(row);
+    Ok(())
+}
+
 fn require_account(ctx: &ReducerContext) -> Result<u64, String> {
     let Some(auth) = ctx.db.auth_state().owner().find(ctx.sender()) else {
         return Err("not logged in".into());
@@ -894,6 +1145,55 @@ fn clean_report_text(raw: &str, max_len: usize, field: &str) -> Result<String, S
         return Err(format!("{field} is too long"));
     }
     Ok(s.to_string())
+}
+
+fn clean_bounded_text(raw: &str, max_len: usize, field: &str) -> Result<String, String> {
+    let s = raw.trim();
+    if s.len() > max_len {
+        return Err(format!("{field} is too long"));
+    }
+    Ok(s.to_string())
+}
+
+fn clean_state_key(raw: &str) -> Result<String, String> {
+    let s = raw.trim();
+    if s.is_empty() || s.len() > 64 {
+        return Err("world state key is invalid".into());
+    }
+    if !s.chars().all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-') {
+        return Err("world state key is invalid".into());
+    }
+    Ok(s.to_string())
+}
+
+fn social_key(a: u64, b: u64) -> String {
+    format!("{a}:{b}")
+}
+
+fn clean_guild_name(raw: &str) -> Result<String, String> {
+    let s = raw.trim();
+    if s.len() < 3 || s.len() > 24 {
+        return Err("guild name is invalid".into());
+    }
+    let mut chars = s.chars();
+    if !chars.next().is_some_and(|c| c.is_ascii_alphabetic()) || !s.chars().last().is_some_and(|c| c.is_ascii_alphabetic()) {
+        return Err("guild name is invalid".into());
+    }
+    if !s.chars().all(|c| c.is_ascii_alphabetic() || c == ' ') || s.contains("  ") {
+        return Err("guild name is invalid".into());
+    }
+    Ok(s.to_string())
+}
+
+fn guild_name_key(name: &str) -> String {
+    name.split_whitespace().collect::<Vec<_>>().join(" ").to_lowercase()
+}
+
+fn clean_guild_rank(raw: &str) -> Result<String, String> {
+    match raw {
+        "leader" | "officer" | "member" => Ok(raw.to_string()),
+        _ => Err("guild rank is invalid".into()),
+    }
 }
 
 fn make_salt(ctx: &ReducerContext, key: &str) -> String {

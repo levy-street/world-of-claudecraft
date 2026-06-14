@@ -34,14 +34,27 @@ import {
 } from "spacetimedb";
 
 // Import all reducer arg schemas
+import BridgeAddBlockReducer from "./bridge_add_block_reducer";
+import BridgeAddFriendReducer from "./bridge_add_friend_reducer";
+import BridgeAddGuildMemberReducer from "./bridge_add_guild_member_reducer";
 import BridgeAttachSessionReducer from "./bridge_attach_session_reducer";
+import BridgeClosePlaySessionReducer from "./bridge_close_play_session_reducer";
 import BridgeCloseSessionReducer from "./bridge_close_session_reducer";
 import BridgeConsumeCommandReducer from "./bridge_consume_command_reducer";
+import BridgeCreateGuildReducer from "./bridge_create_guild_reducer";
+import BridgeDeleteGuildReducer from "./bridge_delete_guild_reducer";
+import BridgeInsertChatLogReducer from "./bridge_insert_chat_log_reducer";
+import BridgeOpenPlaySessionReducer from "./bridge_open_play_session_reducer";
 import BridgePingReducer from "./bridge_ping_reducer";
 import BridgePublishEventsReducer from "./bridge_publish_events_reducer";
 import BridgePublishSnapshotReducer from "./bridge_publish_snapshot_reducer";
 import BridgePublishSocialReducer from "./bridge_publish_social_reducer";
+import BridgeRemoveBlockReducer from "./bridge_remove_block_reducer";
+import BridgeRemoveFriendReducer from "./bridge_remove_friend_reducer";
+import BridgeRemoveGuildMemberReducer from "./bridge_remove_guild_member_reducer";
 import BridgeSaveCharacterReducer from "./bridge_save_character_reducer";
+import BridgeSaveWorldStateReducer from "./bridge_save_world_state_reducer";
+import BridgeSetGuildRankReducer from "./bridge_set_guild_rank_reducer";
 import CommandReducer from "./command_reducer";
 import CreateCharacterReducer from "./create_character_reducer";
 import DeleteCharacterReducer from "./delete_character_reducer";
@@ -58,38 +71,29 @@ import SetInputReducer from "./set_input_reducer";
 // Import all procedure arg schemas
 
 // Import all table schema definitions
-import AccountRow from "./account_table";
 import AuthStateRow from "./auth_state_table";
+import BlockLinkRow from "./block_link_table";
 import BridgeHeartbeatRow from "./bridge_heartbeat_table";
 import CharacterRow from "./character_table";
 import CharacterRosterRow from "./character_roster_table";
 import ClientCommandRow from "./client_command_table";
+import FriendLinkRow from "./friend_link_table";
+import GuildRow from "./guild_table";
+import GuildMemberRow from "./guild_member_table";
 import InputStateRow from "./input_state_table";
+import PlaySessionRow from "./play_session_table";
 import PlayerReportRow from "./player_report_table";
 import ProjectStatsRow from "./project_stats_table";
 import SocialSnapshotRow from "./social_snapshot_table";
 import WorldEventRow from "./world_event_table";
 import WorldSessionRow from "./world_session_table";
 import WorldSnapshotRow from "./world_snapshot_table";
+import WorldStateRow from "./world_state_table";
 
 /** Type-only namespace exports for generated type groups. */
 
 /** The schema information for all tables in this module. This is defined the same was as the tables would have been defined in the server. */
 const tablesSchema = __schema({
-  account: __table({
-    name: 'account',
-    indexes: [
-      { accessor: 'id', name: 'account_id_idx_btree', algorithm: 'btree', columns: [
-        'id',
-      ] },
-      { accessor: 'by_username', name: 'account_username_key_idx_btree', algorithm: 'btree', columns: [
-        'usernameKey',
-      ] },
-    ],
-    constraints: [
-      { name: 'account_id_key', constraint: 'unique', columns: ['id'] },
-    ],
-  }, AccountRow),
   auth_state: __table({
     name: 'auth_state',
     indexes: [
@@ -101,6 +105,20 @@ const tablesSchema = __schema({
       { name: 'auth_state_owner_key', constraint: 'unique', columns: ['owner'] },
     ],
   }, AuthStateRow),
+  block_link: __table({
+    name: 'block_link',
+    indexes: [
+      { accessor: 'by_character', name: 'block_link_character_id_idx_btree', algorithm: 'btree', columns: [
+        'characterId',
+      ] },
+      { accessor: 'key', name: 'block_link_key_idx_btree', algorithm: 'btree', columns: [
+        'key',
+      ] },
+    ],
+    constraints: [
+      { name: 'block_link_key_key', constraint: 'unique', columns: ['key'] },
+    ],
+  }, BlockLinkRow),
   bridge_heartbeat: __table({
     name: 'bridge_heartbeat',
     indexes: [
@@ -154,6 +172,51 @@ const tablesSchema = __schema({
       { name: 'client_command_id_key', constraint: 'unique', columns: ['id'] },
     ],
   }, ClientCommandRow),
+  friend_link: __table({
+    name: 'friend_link',
+    indexes: [
+      { accessor: 'by_character', name: 'friend_link_character_id_idx_btree', algorithm: 'btree', columns: [
+        'characterId',
+      ] },
+      { accessor: 'by_friend', name: 'friend_link_friend_id_idx_btree', algorithm: 'btree', columns: [
+        'friendId',
+      ] },
+      { accessor: 'key', name: 'friend_link_key_idx_btree', algorithm: 'btree', columns: [
+        'key',
+      ] },
+    ],
+    constraints: [
+      { name: 'friend_link_key_key', constraint: 'unique', columns: ['key'] },
+    ],
+  }, FriendLinkRow),
+  guild: __table({
+    name: 'guild',
+    indexes: [
+      { accessor: 'id', name: 'guild_id_idx_btree', algorithm: 'btree', columns: [
+        'id',
+      ] },
+      { accessor: 'by_name', name: 'guild_name_key_idx_btree', algorithm: 'btree', columns: [
+        'nameKey',
+      ] },
+    ],
+    constraints: [
+      { name: 'guild_id_key', constraint: 'unique', columns: ['id'] },
+    ],
+  }, GuildRow),
+  guild_member: __table({
+    name: 'guild_member',
+    indexes: [
+      { accessor: 'character_id', name: 'guild_member_character_id_idx_btree', algorithm: 'btree', columns: [
+        'characterId',
+      ] },
+      { accessor: 'by_guild', name: 'guild_member_guild_id_idx_btree', algorithm: 'btree', columns: [
+        'guildId',
+      ] },
+    ],
+    constraints: [
+      { name: 'guild_member_character_id_key', constraint: 'unique', columns: ['characterId'] },
+    ],
+  }, GuildMemberRow),
   input_state: __table({
     name: 'input_state',
     indexes: [
@@ -165,6 +228,20 @@ const tablesSchema = __schema({
       { name: 'input_state_session_id_key', constraint: 'unique', columns: ['sessionId'] },
     ],
   }, InputStateRow),
+  play_session: __table({
+    name: 'play_session',
+    indexes: [
+      { accessor: 'by_character', name: 'play_session_character_id_idx_btree', algorithm: 'btree', columns: [
+        'characterId',
+      ] },
+      { accessor: 'id', name: 'play_session_id_idx_btree', algorithm: 'btree', columns: [
+        'id',
+      ] },
+    ],
+    constraints: [
+      { name: 'play_session_id_key', constraint: 'unique', columns: ['id'] },
+    ],
+  }, PlaySessionRow),
   player_report: __table({
     name: 'player_report',
     indexes: [
@@ -246,18 +323,42 @@ const tablesSchema = __schema({
       { name: 'world_snapshot_session_id_key', constraint: 'unique', columns: ['sessionId'] },
     ],
   }, WorldSnapshotRow),
+  world_state: __table({
+    name: 'world_state',
+    indexes: [
+      { accessor: 'key', name: 'world_state_key_idx_btree', algorithm: 'btree', columns: [
+        'key',
+      ] },
+    ],
+    constraints: [
+      { name: 'world_state_key_key', constraint: 'unique', columns: ['key'] },
+    ],
+  }, WorldStateRow),
 });
 
 /** The schema information for all reducers in this module. This is defined the same way as the reducers would have been defined in the server, except the body of the reducer is omitted in code generation. */
 const reducersSchema = __reducers(
+  __reducerSchema("bridge_add_block", BridgeAddBlockReducer),
+  __reducerSchema("bridge_add_friend", BridgeAddFriendReducer),
+  __reducerSchema("bridge_add_guild_member", BridgeAddGuildMemberReducer),
   __reducerSchema("bridge_attach_session", BridgeAttachSessionReducer),
+  __reducerSchema("bridge_close_play_session", BridgeClosePlaySessionReducer),
   __reducerSchema("bridge_close_session", BridgeCloseSessionReducer),
   __reducerSchema("bridge_consume_command", BridgeConsumeCommandReducer),
+  __reducerSchema("bridge_create_guild", BridgeCreateGuildReducer),
+  __reducerSchema("bridge_delete_guild", BridgeDeleteGuildReducer),
+  __reducerSchema("bridge_insert_chat_log", BridgeInsertChatLogReducer),
+  __reducerSchema("bridge_open_play_session", BridgeOpenPlaySessionReducer),
   __reducerSchema("bridge_ping", BridgePingReducer),
   __reducerSchema("bridge_publish_events", BridgePublishEventsReducer),
   __reducerSchema("bridge_publish_snapshot", BridgePublishSnapshotReducer),
   __reducerSchema("bridge_publish_social", BridgePublishSocialReducer),
+  __reducerSchema("bridge_remove_block", BridgeRemoveBlockReducer),
+  __reducerSchema("bridge_remove_friend", BridgeRemoveFriendReducer),
+  __reducerSchema("bridge_remove_guild_member", BridgeRemoveGuildMemberReducer),
   __reducerSchema("bridge_save_character", BridgeSaveCharacterReducer),
+  __reducerSchema("bridge_save_world_state", BridgeSaveWorldStateReducer),
+  __reducerSchema("bridge_set_guild_rank", BridgeSetGuildRankReducer),
   __reducerSchema("command", CommandReducer),
   __reducerSchema("create_character", CreateCharacterReducer),
   __reducerSchema("delete_character", DeleteCharacterReducer),

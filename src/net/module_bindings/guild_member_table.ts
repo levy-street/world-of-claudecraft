@@ -11,13 +11,8 @@ import {
 } from "spacetimedb";
 
 export default __t.row({
-  id: __t.u64().primaryKey(),
-  owner: __t.identity(),
-  username: __t.string(),
-  usernameKey: __t.string().name("username_key"),
-  passwordSalt: __t.string().name("password_salt"),
-  passwordHash: __t.string().name("password_hash"),
-  createdAt: __t.timestamp().name("created_at"),
-  isAdmin: __t.bool().name("is_admin"),
-  banned: __t.bool(),
+  characterId: __t.u64().primaryKey().name("character_id"),
+  guildId: __t.u64().name("guild_id"),
+  rank: __t.string(),
+  joinedAt: __t.timestamp().name("joined_at"),
 });
