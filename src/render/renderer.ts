@@ -24,6 +24,7 @@ import { buildClouds, buildSky, SkyView } from './sky';
 import { buildFoliage, FoliageView } from './foliage';
 import { shouldRenderStealthGhost } from './stealth';
 import { raidMarkerDataUrl } from '../ui/icons';
+import { isProjectedNameplateAnchorVisible } from './nameplate_projection';
 
 const NAMEPLATE_RANGE = 55;
 // Entities further than this from the player are hidden entirely: their rigs
@@ -1057,6 +1058,7 @@ export class Renderer {
     const groundY = groundHeight(cx, cz, this.sim.cfg.seed) + 0.6;
     this.camera.position.set(cx, Math.max(cy, groundY), cz);
     this.camera.lookAt(px, eyeY, pz);
+    this.camera.updateMatrixWorld();
   }
 
   private updateNameplates(): void {
@@ -1080,8 +1082,12 @@ export class Renderer {
       }
       this.tmpV.copy(v.group.position);
       this.tmpV.y += v.height * e.scale + 0.5;
+      if (!isProjectedNameplateAnchorVisible(this.camera, this.tmpV, this.tmpV2)) {
+        v.nameplate.style.display = 'none';
+        continue;
+      }
       this.tmpV.project(this.camera);
-      if (this.tmpV.z > 1) { v.nameplate.style.display = 'none'; continue; }
+      if (this.tmpV.z < -1 || this.tmpV.z > 1) { v.nameplate.style.display = 'none'; continue; }
       const sx = (this.tmpV.x * 0.5 + 0.5) * w;
       const sy = (-this.tmpV.y * 0.5 + 0.5) * h;
       v.nameplate.style.display = '';
@@ -1178,8 +1184,12 @@ export class Renderer {
       if (v.group.visible) this.tmpV.copy(v.group.position);
       else this.tmpV.set(e.pos.x, e.pos.y, e.pos.z);
       this.tmpV.y += v.height * e.scale + 1.0;
+      if (!isProjectedNameplateAnchorVisible(this.camera, this.tmpV, this.tmpV2)) {
+        b.el.style.display = 'none';
+        continue;
+      }
       this.tmpV.project(this.camera);
-      if (this.tmpV.z > 1) { b.el.style.display = 'none'; continue; }
+      if (this.tmpV.z < -1 || this.tmpV.z > 1) { b.el.style.display = 'none'; continue; }
       b.el.style.display = '';
       const sx = (this.tmpV.x * 0.5 + 0.5) * w;
       const sy = (-this.tmpV.y * 0.5 + 0.5) * h;
