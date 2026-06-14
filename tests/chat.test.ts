@@ -279,3 +279,69 @@ describe('snapshot interpolation continuity', () => {
     expect(e.prevPos.x).toBeLessThan(e.pos.x);
   });
 });
+
+function logEvents(events: SimEvent[]): Extract<SimEvent, { type: 'log' }>[] {
+  return events.filter((e): e is Extract<SimEvent, { type: 'log' }> => e.type === 'log');
+}
+
+describe('/afk and /dnd presence', () => {
+  it('/afk confirms to the setter and auto-replies to whisperers (still delivering)', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('mage', 'Bet');
+    sim.tick();
+
+    sim.chat('/afk grabbing lunch', a);
+    const confirm = logEvents(sim.tick());
+    expect(confirm.some((m) => m.pid === a && /Away From Keyboard: grabbing lunch/.test(m.text))).toBe(true);
+
+    sim.chat('/w Aleph you around?', b);
+    const out = sim.tick();
+    // Bet gets an auto-reply line about Aleph being away...
+    expect(logEvents(out).some((m) => m.pid === b && /Aleph is Away From Keyboard: grabbing lunch/.test(m.text))).toBe(true);
+    // ...and the whisper is still delivered to Aleph (afk does not withhold)
+    expect(chatEvents(out).some((m) => m.channel === 'whisper' && m.pid === a && m.text === 'you around?')).toBe(true);
+  });
+
+  it('/dnd withholds the whisper but still echoes the sender and notifies them', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('mage', 'Bet');
+    sim.tick();
+
+    sim.chat('/dnd raiding', a);
+    sim.tick();
+
+    sim.chat('/w Aleph ping', b);
+    const out = sim.tick();
+    expect(logEvents(out).some((m) => m.pid === b && /Aleph is Do Not Disturb: raiding/.test(m.text))).toBe(true);
+    // the recipient copy (no `to`) must not reach Aleph
+    expect(chatEvents(out).some((m) => m.channel === 'whisper' && m.pid === a)).toBe(false);
+    // but the sender still sees their own outgoing line (carries `to`)
+    expect(chatEvents(out).some((m) => m.channel === 'whisper' && m.pid === b && m.to === 'Aleph')).toBe(true);
+  });
+
+  it('repeating the bare command toggles the status off', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    sim.tick();
+
+    sim.chat('/afk', a);
+    sim.tick();
+    sim.chat('/afk', a);
+    const out = logEvents(sim.tick());
+    expect(out.some((m) => m.pid === a && /no longer Away From Keyboard/.test(m.text))).toBe(true);
+  });
+
+  it('sending any other chat clears an away status', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    sim.tick();
+
+    sim.chat('/afk', a);
+    sim.tick();
+    sim.chat('back now', a);
+    const out = logEvents(sim.tick());
+    expect(out.some((m) => m.pid === a && /no longer marked as away/.test(m.text))).toBe(true);
+  });
+});

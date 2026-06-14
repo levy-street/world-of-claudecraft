@@ -94,6 +94,10 @@ see each other in town. `Enter` opens chat.
   its loot/XP/quest credit — others get "You don't have permission to loot
   that."), mobs retarget the next attacker when their victim dies (no free
   resets), join/leave announcements, `/say`-style chat.
+- **Away status**: `/afk [message]` and `/dnd [message]` mark you as away.
+  Anyone who whispers you gets an automatic reply with your message; `/dnd`
+  also withholds the incoming whisper. Repeat the bare command (or just send
+  any other chat) to clear it. Status is session-only and resets on login.
 
 ## The Hollow Crypt — 5-player elite instance
 

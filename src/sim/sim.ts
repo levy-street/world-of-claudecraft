@@ -199,6 +199,16 @@ export interface PlayerMeta {
   arenaRating: number;
   arenaWins: number;
   arenaLosses: number;
+  // Transient presence status. Set by /afk and /dnd, cleared when the player
+  // chats again. Session-only — never persisted, so it resets on login.
+  away: AwayStatus | null;
+}
+
+// Away-from-keyboard / do-not-disturb presence. `afk` still delivers whispers
+// (the sender just gets a heads-up); `dnd` withholds them.
+export interface AwayStatus {
+  mode: 'afk' | 'dnd';
+  message: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -468,6 +478,7 @@ export class Sim {
       arenaRating: opts?.state?.arenaRating ?? ARENA_BASE_RATING,
       arenaWins: opts?.state?.arenaWins ?? 0,
       arenaLosses: opts?.state?.arenaLosses ?? 0,
+      away: null,
     };
     this.players.set(player.id, meta);
     if (this.primaryId === -1) this.primaryId = player.id;
@@ -3491,6 +3502,30 @@ export class Sim {
       return null;
     }
 
+    // "/afk [message]" / "/dnd [message]" — set a presence status. Repeating
+    // the same command with no message toggles it off. While away, anyone who
+    // whispers you gets an auto-reply; /dnd also withholds the whisper itself.
+    const awaym = /^\/(afk|dnd)(?:\s+([\s\S]+))?$/i.exec(raw);
+    if (awaym) {
+      const mode = awaym[1].toLowerCase() as AwayStatus['mode'];
+      const custom = awaym[2]?.trim();
+      if (r.meta.away?.mode === mode && !custom) {
+        r.meta.away = null;
+        this.emit({ type: 'log', text: mode === 'afk' ? 'You are no longer Away From Keyboard.' : 'You have left Do Not Disturb mode.', color: '#ffd100', pid: r.meta.entityId });
+      } else {
+        const message = custom || (mode === 'afk' ? 'Away From Keyboard' : 'Do Not Disturb');
+        r.meta.away = { mode, message };
+        this.emit({ type: 'log', text: mode === 'afk' ? `You are now Away From Keyboard: ${message}` : `You are now in Do Not Disturb mode: ${message}`, color: '#ffd100', pid: r.meta.entityId });
+      }
+      return null;
+    }
+
+    // Any other chat means you're back — clear a lingering away status.
+    if (r.meta.away) {
+      r.meta.away = null;
+      this.emit({ type: 'log', text: 'You are no longer marked as away.', color: '#ffd100', pid: r.meta.entityId });
+    }
+
     if (/^\/who(?:\s|$)/i.test(raw)) {
       this.error(r.meta.entityId, 'The /who roster is available in online play.');
       return null;
@@ -3518,6 +3553,16 @@ export class Sim {
       }
       if (!target) { this.error(r.meta.entityId, `There is no player named '${targetName}' online.`); return null; }
       if (target.entityId === r.meta.entityId) { this.error(r.meta.entityId, 'You mutter to yourself. Nobody hears it.'); return null; }
+      if (target.away) {
+        const label = target.away.mode === 'afk' ? 'Away From Keyboard' : 'Do Not Disturb';
+        this.emit({ type: 'log', text: `${target.name} is ${label}: ${target.away.message}`, color: '#ffd100', pid: r.meta.entityId });
+        if (target.away.mode === 'dnd') {
+          // Withhold the whisper, but still echo the sender's own line so they
+          // see what they tried to send.
+          this.emit({ type: 'chat', fromPid: r.meta.entityId, from: r.meta.name, to: target.name, text: msg, channel: 'whisper', pid: r.meta.entityId });
+          return { channel: 'whisper', message: msg };
+        }
+      }
       this.emit({ type: 'chat', fromPid: r.meta.entityId, from: r.meta.name, text: msg, channel: 'whisper', pid: target.entityId });
       this.emit({ type: 'chat', fromPid: r.meta.entityId, from: r.meta.name, to: target.name, text: msg, channel: 'whisper', pid: r.meta.entityId });
       return { channel: 'whisper', message: msg };
@@ -3549,7 +3594,7 @@ export class Sim {
     let clean = raw;
     if (/^\/y(ell)?\s/i.test(raw)) { channel = 'yell'; clean = raw.replace(/^\/y(ell)?\s+/i, '').trim(); }
     else if (/^\/s(ay)?\s/i.test(raw)) { clean = raw.replace(/^\/s(ay)?\s+/i, '').trim(); }
-    else if (raw.startsWith('/')) { this.error(r.meta.entityId, `Unknown command: ${raw.split(' ')[0]}. Try /s /y /w /p /g.`); return null; }
+    else if (raw.startsWith('/')) { this.error(r.meta.entityId, `Unknown command: ${raw.split(' ')[0]}. Try /s /y /w /p /g /afk /dnd.`); return null; }
     if (!clean) return null;
     const range = channel === 'yell' ? YELL_RANGE : SAY_RANGE;
     for (const meta of this.players.values()) {
