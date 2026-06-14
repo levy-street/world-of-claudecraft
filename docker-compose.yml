@@ -47,7 +47,7 @@ services:
     container_name: eastbrook-spacetimedb
     profiles: ["stdb"]
     restart: unless-stopped
-    command: ["start"]
+    command: ["start", "--data-dir", "/stdb/data", "--non-interactive"]
     ports:
       - "127.0.0.1:3000:3000"
     volumes:

@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { selectedWorldBackend, spacetimeConnectionConfig } from '../src/net/backend';
+import { reducers } from '../src/net/module_bindings';
+import { SpacetimeApi } from '../src/net/spacetime_api';
 import { SpacetimeWorld } from '../src/net/spacetime';
 
 describe('SpacetimeDB backend flag', () => {
@@ -25,19 +27,34 @@ describe('SpacetimeDB backend flag', () => {
   });
 });
 
-describe('SpacetimeWorld Phase 0 stub', () => {
-  it('implements the online world surface without opening a Node websocket', async () => {
-    const world = new SpacetimeWorld({ uri: 'http://127.0.0.1:3000', moduleName: 'worldofclaudecraft' }, 'token', 7, 'mage');
-    let reason = '';
-    world.onDisconnect = (message) => { reason = message; };
-    await Promise.resolve();
+describe('SpacetimeDB generated reducer surface', () => {
+  it('includes auth, roster, world, bridge, and report reducers', () => {
+    expect(Object.keys(reducers)).toEqual(expect.arrayContaining([
+      'register',
+      'login',
+      'listCharacters',
+      'createCharacter',
+      'enterWorld',
+      'leaveWorld',
+      'setInput',
+      'command',
+      'reportPlayer',
+      'reportPlayerByName',
+      'bridgeAttachSession',
+      'bridgePublishSnapshot',
+      'bridgePublishEvents',
+      'bridgePublishSocial',
+      'bridgeConsumeCommand',
+      'bridgeCloseSession',
+    ]));
+  });
 
-    expect(world.characterId).toBe(7);
-    expect(world.connected).toBe(false);
-    expect(world.cfg.playerClass).toBe('mage');
-    expect(world.uri).toBe('http://127.0.0.1:3000');
-    expect(world.moduleName).toBe('worldofclaudecraft');
-    expect(reason).toContain('Phase 0 client seam');
-    expect(() => world.chat('hello')).toThrow(/SpacetimeDB backend is selected/);
+  it('keeps the API and world client surfaces wired without Phase 0 stubs', () => {
+    expect(typeof SpacetimeApi.prototype.login).toBe('function');
+    expect(typeof SpacetimeApi.prototype.reportPlayer).toBe('function');
+    expect(typeof SpacetimeWorld.prototype.chat).toBe('function');
+    expect(typeof SpacetimeWorld.prototype.buyBackItem).toBe('function');
+    expect(typeof SpacetimeWorld.prototype.setMarker).toBe('function');
+    expect(String(SpacetimeWorld.prototype.chat)).not.toContain('NOT_IMPLEMENTED');
   });
 });
