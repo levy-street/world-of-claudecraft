@@ -11,6 +11,7 @@ import { handlePickedEntity, hoverCursorKind } from './game/interactions';
 import { clickMoveStep, manualMovementOverrides } from './game/click_move';
 import { Api, ClientWorld, CharacterSummary } from './net/online';
 import { selectedWorldBackend, spacetimeConnectionConfig } from './net/backend';
+import { SpacetimeApi } from './net/spacetime_api';
 import { SpacetimeWorld } from './net/spacetime';
 import type { OnlineWorldClient } from './net/world_client';
 import type { IWorld } from './world_api';
@@ -682,7 +683,9 @@ async function startOffline(playerClass: PlayerClass, name: string): Promise<voi
 // Online flow: login -> character select -> world
 // ---------------------------------------------------------------------------
 
-const api = new Api();
+const api = selectedWorldBackend() === 'spacetimedb'
+  ? new SpacetimeApi(spacetimeConnectionConfig())
+  : new Api();
 
 let activeTransitionTimeout: number | null = null;
 let activeTransitionCleanup: (() => void) | null = null;
@@ -1143,7 +1146,7 @@ function fatalOverlay(message: string): void {
 
 function createOnlineWorld(c: CharacterSummary): OnlineWorldClient {
   if (selectedWorldBackend() === 'spacetimedb') {
-    return new SpacetimeWorld(spacetimeConnectionConfig(), api.token!, c.id, c.class);
+    return new SpacetimeWorld(spacetimeConnectionConfig(), api.token ?? '', c.id, c.class);
   }
   return new ClientWorld(api.token!, c.id, c.class, api.base);
 }

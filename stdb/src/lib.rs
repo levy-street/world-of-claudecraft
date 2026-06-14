@@ -172,6 +172,28 @@ pub struct SocialSnapshot {
 }
 
 #[derive(Clone)]
+#[table(
+    accessor = player_report,
+    public,
+    index(accessor = by_reporter, btree(columns = [reporter_character_id])),
+    index(accessor = by_target_name, btree(columns = [target_character_name]))
+)]
+pub struct PlayerReport {
+    #[primary_key]
+    #[auto_inc]
+    pub id: u64,
+    pub owner: Identity,
+    pub account_id: u64,
+    pub reporter_character_id: u64,
+    pub target_pid: u32,
+    pub target_character_name: String,
+    pub reason: String,
+    pub details: String,
+    pub status: String,
+    pub created_at: Timestamp,
+}
+
+#[derive(Clone)]
 #[table(accessor = bridge_heartbeat, public)]
 pub struct BridgeHeartbeat {
     #[primary_key]
@@ -485,6 +507,27 @@ pub fn command(ctx: &ReducerContext, session_id: u64, kind: String, payload_json
 }
 
 #[reducer]
+pub fn report_player(ctx: &ReducerContext, reporter_character_id: u64, target_pid: u32, reason: String, details: String) -> Result<(), String> {
+    let account_id = require_account(ctx)?;
+    require_owned_character(ctx, account_id, reporter_character_id)?;
+    write_report(ctx, account_id, reporter_character_id, target_pid, String::new(), reason, details)
+}
+
+#[reducer]
+pub fn report_player_by_name(
+    ctx: &ReducerContext,
+    reporter_character_id: u64,
+    target_character_name: String,
+    reason: String,
+    details: String,
+) -> Result<(), String> {
+    let account_id = require_account(ctx)?;
+    require_owned_character(ctx, account_id, reporter_character_id)?;
+    let target_character_name = clean_report_name(&target_character_name)?;
+    write_report(ctx, account_id, reporter_character_id, 0, target_character_name, reason, details)
+}
+
+#[reducer]
 pub fn bridge_ping(ctx: &ReducerContext, sessions: u32, tick: u64) {
     let row = BridgeHeartbeat {
         id: 0,
@@ -633,6 +676,42 @@ fn require_session(ctx: &ReducerContext, session_id: u64) -> Result<WorldSession
     Ok(session)
 }
 
+fn require_owned_character(ctx: &ReducerContext, account_id: u64, character_id: u64) -> Result<Character, String> {
+    let Some(ch) = ctx.db.character().id().find(character_id) else {
+        return Err("character not found".into());
+    };
+    if ch.account_id != account_id {
+        return Err("character not found".into());
+    }
+    Ok(ch)
+}
+
+fn write_report(
+    ctx: &ReducerContext,
+    account_id: u64,
+    reporter_character_id: u64,
+    target_pid: u32,
+    target_character_name: String,
+    reason: String,
+    details: String,
+) -> Result<(), String> {
+    let reason = clean_report_text(&reason, 64, "reason")?;
+    let details = clean_report_text(&details, 1_000, "details")?;
+    ctx.db.player_report().insert(PlayerReport {
+        id: 0,
+        owner: ctx.sender(),
+        account_id,
+        reporter_character_id,
+        target_pid,
+        target_character_name,
+        reason,
+        details,
+        status: "open".to_string(),
+        created_at: ctx.timestamp,
+    });
+    Ok(())
+}
+
 fn write_auth_success(ctx: &ReducerContext, account_id: u64, username: String) {
     let row = AuthState {
         owner: ctx.sender(),
@@ -762,6 +841,25 @@ fn clean_class(raw: &str) -> Result<String, String> {
         "warrior" | "paladin" | "hunter" | "rogue" | "priest" | "shaman" | "mage" | "warlock" | "druid" => Ok(raw.to_string()),
         _ => Err("invalid class".into()),
     }
+}
+
+fn clean_report_name(raw: &str) -> Result<String, String> {
+    let s = raw.trim();
+    if s.is_empty() || s.len() > 64 {
+        return Err("target name is invalid".into());
+    }
+    Ok(s.to_string())
+}
+
+fn clean_report_text(raw: &str, max_len: usize, field: &str) -> Result<String, String> {
+    let s = raw.trim();
+    if s.is_empty() {
+        return Err(format!("{field} is required"));
+    }
+    if s.len() > max_len {
+        return Err(format!("{field} is too long"));
+    }
+    Ok(s.to_string())
 }
 
 fn make_salt(ctx: &ReducerContext, key: &str) -> String {

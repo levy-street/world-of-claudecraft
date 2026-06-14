@@ -19,10 +19,12 @@
     "build:server": "esbuild server/main.ts --bundle --platform=node --format=cjs --external:pg-native --external:bufferutil --external:utf-8-validate --outfile=dist-server/server.cjs",
     "server": "npm run build:server && node dist-server/server.cjs",
     "realms": "npm run build:server && node scripts/dev-realms.mjs",
-    "stdb:build": "cd stdb && spacetime build",
-    "stdb:start": "spacetime start",
-    "stdb:publish": "spacetime publish -p stdb worldofclaudecraft",
-    "stdb:generate": "spacetime generate --lang typescript --out-dir src/net/module_bindings -p stdb",
+    "build:stdb-bridge": "esbuild server/stdb_bridge.ts --bundle --platform=node --format=cjs --external:pg-native --external:bufferutil --external:utf-8-validate --outfile=dist-server/stdb_bridge.cjs",
+    "stdb:build": "spacetime build --module-path stdb",
+    "stdb:start": "spacetime start --data-dir .stdb-data --non-interactive",
+    "stdb:publish": "spacetime publish --server local -y --module-path stdb worldofclaudecraft",
+    "stdb:generate": "spacetime generate worldofclaudecraft --lang typescript --out-dir src/net/module_bindings --module-path stdb -y",
+    "stdb:bridge": "npm run stdb:generate && npm run build:stdb-bridge && node dist-server/stdb_bridge.cjs",
     "admin:grant": "node scripts/grant_admin.mjs"
   },
   "dependencies": {
@@ -30,6 +32,7 @@
     "obscenity": "^0.4.6",
     "pg": "^8.21.0",
     "postprocessing": "^6.36.0",
+    "spacetimedb": "2.3.0",
     "three": "^0.165.0",
     "ws": "^8.21.0"
   },

@@ -6,7 +6,8 @@ dist/
 dist-env/
 dist-server/
 media-cache/
-src/net/module_bindings/
+.stdb-data/
+.stdb-bridge-token
 
 # test artifacts & screenshots
 tmp/
@@ -26,5 +27,4 @@ __pycache__/
 Thumbs.db
 *.log
 .claude/
-.context-engine/git_history_cache.json
-/stdb/target
+stdb/target/
