@@ -1,9 +1,9 @@
 // Online play: REST auth client + WebSocket world mirror.
 
 import { NPCS, abilitiesKnownAt } from '../sim/data';
-import { computeQuestState, ResolvedAbility } from '../sim/sim';
+import { computeQuestInfo, computeQuestState, ResolvedAbility } from '../sim/sim';
 import {
-  Entity, EquipSlot, InvSlot, MoveInput, PlayerClass, QuestProgress, QuestState, SimEvent,
+  Entity, EquipSlot, InvSlot, MoveInput, PlayerClass, QuestInfo, QuestProgress, QuestState, SimEvent,
   emptyMoveInput,
 } from '../sim/types';
 import type { ArenaInfo, CharacterSearchResult, DuelInfo, IWorld, MarketInfo, PartyInfo, SocialInfo, TradeInfo } from '../world_api';
@@ -532,6 +532,13 @@ export class ClientWorld implements IWorld {
       return 'active';
     }
     return state;
+  }
+
+  questInfo(questId: string): QuestInfo {
+    return {
+      ...computeQuestInfo(questId, this.questLog, this.questsDone, this.player.level),
+      state: this.questState(questId),
+    };
   }
 
   consumeInventoryChanged(): boolean {
