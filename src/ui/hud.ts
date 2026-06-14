@@ -1802,6 +1802,7 @@ export class Hud {
   // carry inventory separately from the event frames that normally redraw).
   onInventoryChanged(): void {
     if ($('#bags').style.display === 'block') this.renderBags();
+    this.renderCharIfOpen();
   }
 
   renderBags(): void {
@@ -1832,6 +1833,7 @@ export class Hud {
         } else {
           this.sim.useItem(s.itemId);
           this.renderBags();
+          this.renderCharIfOpen();
         }
       });
       this.attachTooltip(row, () => {
@@ -1851,6 +1853,10 @@ export class Hud {
     money.innerHTML = this.moneyHtml(sim.copper);
     el.appendChild(money);
     el.querySelector('[data-close]')?.addEventListener('click', () => { el.style.display = 'none'; this.hideTooltip(); });
+  }
+
+  private renderCharIfOpen(): void {
+    if ($('#char-window').style.display === 'block') this.renderChar();
   }
 
   // -------------------------------------------------------------------------
