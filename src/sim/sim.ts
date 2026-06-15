@@ -3549,6 +3549,12 @@ export class Sim {
       return null;
     }
 
+    // "/combo" — self-only readout of combo points built on the current target
+    if (/^\/(?:combo|cp|combopoints)(?:\s|$)/i.test(raw)) {
+      this.error(r.meta.entityId, this.comboReadout(r.e));
+      return null;
+    }
+
     // "/w name message" — private whisper to an online player
     const wm = /^\/(?:w|whisper|t|tell)\s+(\S+)\s+([\s\S]+)$/i.exec(raw);
     if (wm) {
@@ -4845,6 +4851,13 @@ export class Sim {
       if (Math.abs(pos.x - origin.x) < 120 && Math.abs(pos.z - origin.z) < 250) return inst.slot;
     }
     return null;
+  }
+
+  private comboReadout(e: Entity): string {
+    if (e.comboPoints <= 0) return 'You have no combo points built up.';
+    const target = e.comboTargetId !== null ? this.entities.get(e.comboTargetId) : undefined;
+    const on = target ? ` on ${target.name}` : '';
+    return `Combo points: ${e.comboPoints}/5${on}.`;
   }
 
   private error(pid: number, text: string): void {
