@@ -2802,6 +2802,10 @@ export class Sim {
     if (d > PET_TELEPORT_DISTANCE) {
       pet.pos = { ...owner.pos };
       pet.prevPos = { ...pet.pos };
+      // a warp is a teleport: keep the spatial grid exact this tick instead of
+      // waiting for the end-of-tick refresh, so same-tick aggro/AoE queries
+      // don't miss the pet at its old cell (matches every other teleport site)
+      this.rebucket(pet);
     } else if (d > PET_FOLLOW_DISTANCE && !this.isRooted(pet)) {
       this.moveToward(pet, owner.pos, Math.max(pet.moveSpeed, RUN_SPEED * 1.1) * this.moveSpeedMult(pet));
     }
