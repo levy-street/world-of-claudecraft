@@ -12,7 +12,7 @@ import { Rng } from './rng';
 import { SpatialGrid } from './spatial';
 import {
   HEAL_THREAT_FACTOR, MELEE_SWITCH_MULT, RANGED_SWITCH_MULT,
-  TAUNT_FORCE_SECONDS, addThreat, clearThreat, stealthDetectionRadius, threatModifier, topThreatValue,
+  TAUNT_FORCE_SECONDS, addThreat, clearThreat, stealthDetectionRadius, threatEntries, threatModifier, topThreatValue,
 } from './threat';
 import { groundHeight, WATER_LEVEL } from './world';
 import {
@@ -3549,6 +3549,14 @@ export class Sim {
       return null;
     }
 
+    // "/threat" (alias "/aggro") — self-only readout of the threat table on the
+    // player's current target. Reads live state only; returns null so the line
+    // is shown only to the caller and never broadcast or logged.
+    if (/^\/(?:threat|aggro)(?:\s|$)/i.test(raw)) {
+      this.error(r.meta.entityId, this.threatReadout(r.e));
+      return null;
+    }
+
     // "/w name message" — private whisper to an online player
     const wm = /^\/(?:w|whisper|t|tell)\s+(\S+)\s+([\s\S]+)$/i.exec(raw);
     if (wm) {
@@ -4849,6 +4857,32 @@ export class Sim {
 
   private error(pid: number, text: string): void {
     this.emit({ type: 'error', text, pid });
+  }
+
+  /** Self-only readout of the threat table on the player's current target,
+   *  highest first, as a percentage of the current threat leader. */
+  private threatReadout(self: Entity): string {
+    const t = self.targetId !== null ? this.entities.get(self.targetId) : undefined;
+    if (!t || t.hp <= 0) return 'You have no target.';
+    if (t.kind !== 'mob') return `Threat is only tracked on enemies; ${t.name} is not one.`;
+    const entries = threatEntries(t, 10);
+    if (entries.length === 0) return `Nobody has any threat on ${t.name}.`;
+    const top = entries[0][1] || 1;
+    const parts = entries.map(([id, v], i) => {
+      const pct = Math.round((v / top) * 100);
+      const you = id === self.id ? ' (you)' : '';
+      const lead = i === 0 ? ' [leader]' : '';
+      return `${this.threatName(id)}${you} ${pct}%${lead}`;
+    });
+    return `Threat on ${t.name} (${entries.length}): ${parts.join(', ')}.`;
+  }
+
+  /** Display name for a threat-table source: a player by pid, else the entity
+   *  (pet/mob) name, else a placeholder for sources that have despawned. */
+  private threatName(id: number): string {
+    const meta = this.players.get(id);
+    if (meta) return meta.name;
+    return this.entities.get(id)?.name || 'Unknown';
   }
 }
 
