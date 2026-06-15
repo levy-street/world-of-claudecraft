@@ -457,6 +457,26 @@ describe('rogue', () => {
     expect(sim.player.comboPoints).toBe(0);
   });
 
+  it('toggling stealth off does not re-arm its cooldown', () => {
+    const sim = makeSim('rogue');
+    (sim as any).grantXp(xpForLevel(1) + xpForLevel(2) + 10); // reach level 3, learns stealth (lvl 2)
+    expect(sim.known.map((k) => k.def.id)).toContain('stealth');
+    // Stealth on: arms the 10s re-entry cooldown.
+    sim.castAbility('stealth');
+    expect(sim.player.auras.some((a) => a.kind === 'stealth')).toBe(true);
+    expect(sim.player.cooldowns.has('stealth')).toBe(true);
+    // Wait out the cooldown (10s @ 20 ticks/s = 200 ticks).
+    for (let i = 0; i < 220; i++) sim.tick();
+    expect(sim.player.cooldowns.has('stealth')).toBe(false);
+    // Toggling stealth off is free and must not re-arm the cooldown.
+    sim.castAbility('stealth');
+    expect(sim.player.auras.some((a) => a.kind === 'stealth')).toBe(false);
+    expect(sim.player.cooldowns.has('stealth')).toBe(false);
+    // Therefore the rogue can immediately re-stealth.
+    sim.castAbility('stealth');
+    expect(sim.player.auras.some((a) => a.kind === 'stealth')).toBe(true);
+  });
+
   it('rogue GCD is 1.0s', () => {
     const sim = makeSim('rogue');
     expect(sim.playerGcd).toBe(1.0);
@@ -1031,5 +1051,78 @@ describe('gm characters', () => {
     const before = sim.player.hp;
     (sim as any).dealDamage(null, sim.player, 5, false, 'physical', 'Test', 'hit', true);
     expect(sim.player.hp).toBe(before - 5);
+  });
+});
+
+describe('friendly targeting (#133)', () => {
+  // Drop an ally `dx` yards east of the caster and return its entity.
+  function addAllyAt(sim: Sim, name: string, dx: number) {
+    const p = sim.player;
+    const pid = sim.addPlayer('priest', name);
+    const e = sim.entities.get(pid)!;
+    e.pos.x = p.pos.x + dx; e.pos.z = p.pos.z;
+    e.pos.y = terrainHeight(e.pos.x, e.pos.z, sim.cfg.seed);
+    e.prevPos = { ...e.pos };
+    return e;
+  }
+
+  it('targetNearestFriendly picks the closest ally and never auto-attacks', () => {
+    const sim = makeSim('warrior');
+    const far = addAllyAt(sim, 'Far', 12);
+    const near = addAllyAt(sim, 'Near', 5);
+    sim.tick(); // rebucket the spatial grid
+    sim.targetNearestFriendly();
+    expect(sim.player.targetId).toBe(near.id);
+    expect(sim.player.targetId).not.toBe(far.id);
+    expect(sim.player.autoAttack).toBe(false);
+  });
+
+  it('targetNearestFriendly never targets yourself', () => {
+    const sim = makeSim('warrior');
+    sim.tick();
+    sim.targetNearestFriendly();
+    expect(sim.player.targetId).toBeNull();
+  });
+
+  it('ignores allies beyond 40 yards and keeps the current target', () => {
+    const sim = makeSim('warrior');
+    addAllyAt(sim, 'WayOut', 60);
+    sim.tick();
+    sim.player.targetId = 1234;
+    sim.targetNearestFriendly();
+    expect(sim.player.targetId).toBe(1234);
+  });
+
+  it('skips dead allies', () => {
+    const sim = makeSim('warrior');
+    const ally = addAllyAt(sim, 'Downed', 5);
+    ally.dead = true; ally.hp = 0;
+    sim.tick();
+    sim.targetNearestFriendly();
+    expect(sim.player.targetId).toBeNull();
+  });
+
+  it('friendlyTabTarget cycles allies by distance and wraps', () => {
+    const sim = makeSim('warrior');
+    const a = addAllyAt(sim, 'A', 5);
+    const b = addAllyAt(sim, 'B', 10);
+    const c = addAllyAt(sim, 'C', 15);
+    sim.tick();
+    sim.friendlyTabTarget();             // none -> nearest
+    expect(sim.player.targetId).toBe(a.id);
+    sim.friendlyTabTarget();
+    expect(sim.player.targetId).toBe(b.id);
+    sim.friendlyTabTarget();
+    expect(sim.player.targetId).toBe(c.id);
+    sim.friendlyTabTarget();             // wraps back to nearest
+    expect(sim.player.targetId).toBe(a.id);
+  });
+
+  it('friendlyTabTarget is a no-op when no ally is nearby', () => {
+    const sim = makeSim('warrior');
+    sim.player.targetId = 77;
+    sim.tick();
+    sim.friendlyTabTarget();
+    expect(sim.player.targetId).toBe(77);
   });
 });

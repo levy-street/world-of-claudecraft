@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
+import { ACTIONS, encodeObs } from '../src/sim/obs';
 import { Entity, dist2d } from '../src/sim/types';
 import { CRYPT_DOOR_POS, DUNGEON_LIST, DUNGEON_X_THRESHOLD, ITEMS, LAKE, MOBS, NPCS, QUESTS, zoneAt, zoneWelcomeText } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
@@ -704,6 +705,89 @@ describe('aoe damage vs armor', () => {
   });
 });
 
+describe('RL observation encoding', () => {
+  // The target block, the nearby-mob block, and the interactable block all
+  // encode entity distance as clamp(d / 40, ...). The target field used to clamp
+  // to [0, 1] while the others use [0, 1.5] (the 60-unit observation radius), so
+  // a target between 40 and 60 units saturated and lost distance granularity.
+  // Target distance index: 16 self + 2 fields per ability slot + presence/hp/level.
+  const ABILITY_SLOTS = ACTIONS.length - 13;
+  const TARGET_DIST_INDEX = 16 + ABILITY_SLOTS * 2 + 3;
+
+  it('encodes target distance on the same 1.5 scale as nearby mobs', () => {
+    const sim = makeSim();
+    const p = sim.player;
+    teleportTo(sim, 0, -40); // open road
+    const mob = [...sim.entities.values()].find((e) => e.kind === 'mob' && !e.dead)!;
+    // park the mob 50 units away (inside the 60-unit obs radius, beyond the
+    // old 40-unit saturation point)
+    mob.pos = { ...sim.groundPos(p.pos.x + 50, p.pos.z) };
+    expect(dist2d(p.pos, mob.pos)).toBeCloseTo(50, 0);
+
+    sim.targetEntity(mob.id);
+    const obs = encodeObs(sim);
+    expect(obs[TARGET_DIST_INDEX]).toBeGreaterThan(1); // would be clamped to 1 before the fix
+    expect(obs[TARGET_DIST_INDEX]).toBeCloseTo(50 / 40, 5);
+  });
+});
+
+describe('pet heel warp', () => {
+  it('keeps the spatial grid exact when a pet warps to its owner', () => {
+    const sim = makeSim();
+    const p = sim.player;
+    // park the owner in open space away from the spawn camp
+    teleportTo(sim, p.pos.x + 400, p.pos.z + 400);
+
+    // adopt a wild beast as a heeling pet and strand it far from the owner
+    const pet = [...sim.entities.values()].find((e) => e.kind === 'mob' && !e.dead)!;
+    pet.ownerId = p.id;
+    pet.hostile = false;
+    pet.aggroTargetId = null;
+    pet.inCombat = false;
+    pet.pos = { x: p.pos.x + 200, z: p.pos.z, y: p.pos.y };
+    pet.prevPos = { ...pet.pos };
+    (sim as any).grid.update(pet); // grid now buckets the pet at its far cell
+
+    // 200 yds away with nothing to fight: the pet warps back to heel
+    (sim as any).updatePet(pet);
+    expect(dist2d(pet.pos, p.pos)).toBeLessThan(1);
+
+    // a same-tick radius query at the warp destination must see the pet — it
+    // would miss it if the grid still held the pet in its stale far-away cell
+    const found: number[] = [];
+    (sim as any).grid.forEachInRadius(p.pos.x, p.pos.z, 5, (e: Entity) => found.push(e.id));
+    expect(found).toContain(pet.id);
+  });
+});
+
+describe('mob tap rights', () => {
+  function wolf(sim: Sim): Entity {
+    return [...sim.entities.values()].find((e) => e.kind === 'mob' && e.templateId === 'forest_wolf')!;
+  }
+
+  it('a hit that deals real damage claims the mob', () => {
+    const sim = makeSim('mage');
+    const m = wolf(sim);
+    expect(m.tappedById).toBeNull();
+    (sim as any).dealDamage(sim.player, m, 7, false, 'fire', 'test', 'hit');
+    expect(m.tappedById).toBe(sim.player.id);
+  });
+
+  it('a fully absorbed (zero-damage) hit does not claim the mob', () => {
+    const sim = makeSim('mage');
+    const m = wolf(sim);
+    // a shield that soaks the whole hit — the mob takes no real damage
+    m.auras.push({
+      id: 'test_absorb', name: 'Test Shield', kind: 'absorb',
+      remaining: 30, duration: 30, value: 1000, sourceId: m.id, school: 'arcane',
+    } as any);
+    const hpBefore = m.hp;
+    (sim as any).dealDamage(sim.player, m, 50, false, 'fire', 'test', 'hit');
+    expect(m.hp).toBe(hpBefore); // nothing got through
+    expect(m.tappedById).toBeNull(); // so nobody owns the tap yet
+  });
+});
+
 describe('spell visuals', () => {
   it('hostile casts emit projectile spellfx events', () => {
     const sim = makeSim('mage');
@@ -717,5 +801,54 @@ describe('spell visuals', () => {
     for (let i = 0; i < 60; i++) events.push(...sim.tick());
     const fx = events.filter((e) => e.type === 'spellfx');
     expect(fx.some((e) => e.type === 'spellfx' && e.fx === 'projectile' && e.school === 'fire')).toBe(true);
+  });
+});
+
+describe('trade and duel invites validate availability at accept time', () => {
+  it('a second invitee cannot hijack the inviter who is already trading', () => {
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior', noPlayer: true });
+    const a = sim.addPlayer('warrior', 'Anna');
+    const b = sim.addPlayer('mage', 'Bert');
+    const c = sim.addPlayer('warrior', 'Cara');
+
+    // Anna fires off trade requests to both Bert and Cara while still free.
+    sim.tradeRequest(b, a);
+    sim.tradeRequest(c, a);
+
+    // Bert accepts first — Anna and Bert are now trading together.
+    sim.tradeAccept(b);
+    const annaSession = sim.tradeFor(a);
+    const bertSession = sim.tradeFor(b);
+    expect(annaSession).not.toBeNull();
+    expect(annaSession).toBe(bertSession);
+
+    // Cara accepts the stale request. This must NOT silently replace Anna's
+    // live session with Bert (which would desync Bert's trade window).
+    sim.tradeAccept(c);
+
+    expect(sim.tradeFor(c)).toBeNull();
+    // Anna is still trading with the same partner she actually opened with.
+    expect(sim.tradeFor(a)).toBe(bertSession);
+    expect(sim.tradeFor(b)).toBe(bertSession);
+  });
+
+  it('a second challenger acceptance cannot hijack a duelist mid-duel', () => {
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior', noPlayer: true });
+    const a = sim.addPlayer('warrior', 'Anna');
+    const b = sim.addPlayer('mage', 'Bert');
+    const c = sim.addPlayer('warrior', 'Cara');
+
+    sim.duelRequest(b, a);
+    sim.duelRequest(c, a);
+
+    sim.duelAccept(b);
+    const annaDuel = sim.duelFor(a);
+    expect(annaDuel).not.toBeNull();
+    expect(sim.duelFor(b)).toBe(annaDuel);
+
+    sim.duelAccept(c);
+    expect(sim.duelFor(c)).toBeNull();
+    expect(sim.duelFor(a)).toBe(annaDuel);
+    expect(sim.duelFor(b)).toBe(annaDuel);
   });
 });

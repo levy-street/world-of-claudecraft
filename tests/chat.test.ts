@@ -3,6 +3,7 @@ import { Sim } from '../src/sim/sim';
 import { ClientWorld } from '../src/net/online';
 import { SimEvent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+import { zoneAt } from '../src/sim/data';
 
 function makeWorld() {
   return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
@@ -80,6 +81,71 @@ describe('chat channels', () => {
     expect(msgs.some((m) => m.pid === c)).toBe(false);
   });
 
+  it('/r replies to the last player who whispered you', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('mage', 'Bet');
+    teleport(sim, b, 0, -900); // reply ignores distance, like whisper
+    sim.tick();
+
+    sim.chat('/w bet psst, secret', a);
+    sim.tick();
+    // Bet replies without naming Aleph
+    sim.chat('/r got it', b);
+    const msgs = chatEvents(sim.tick());
+    expect(msgs).toHaveLength(2);
+    const toTarget = msgs.find((m) => m.pid === a)!;
+    expect(toTarget.channel).toBe('whisper');
+    expect(toTarget.from).toBe('Bet');
+    expect(toTarget.text).toBe('got it');
+    const echo = msgs.find((m) => m.pid === b)!;
+    expect(echo.to).toBe('Aleph');
+  });
+
+  it('/r with no prior whisper errors instead of saying it out loud', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    sim.tick();
+    sim.chat('/r hello?', a);
+    const events = sim.tick();
+    expect(chatEvents(events)).toHaveLength(0);
+    expect(events.some((e) => e.type === 'error')).toBe(true);
+  });
+
+  it('/r reply target follows the most recent incoming whisper', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('mage', 'Bet');
+    const c = sim.addPlayer('rogue', 'Gimel');
+    sim.tick();
+
+    sim.chat('/w aleph first', b); // Bet -> Aleph
+    sim.tick();
+    sim.chat('/w aleph second', c); // Gimel -> Aleph (now the reply target)
+    sim.tick();
+    sim.chat('/r back to you', a);
+    const msgs = chatEvents(sim.tick());
+    const toTarget = msgs.find((m) => m.channel === 'whisper' && m.to === undefined)!;
+    expect(toTarget.pid).toBe(c);
+  });
+
+  it('sending a whisper does not change your own /r target', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('mage', 'Bet');
+    sim.addPlayer('rogue', 'Gimel');
+    sim.tick();
+
+    sim.chat('/w aleph incoming', b); // Bet whispers Aleph -> Aleph's reply target is Bet
+    sim.tick();
+    sim.chat('/w gimel outgoing', a); // Aleph whispers Gimel; reply target stays Bet
+    sim.tick();
+    sim.chat('/r still bet', a);
+    const msgs = chatEvents(sim.tick());
+    const toTarget = msgs.find((m) => m.channel === 'whisper' && m.to === undefined)!;
+    expect(toTarget.pid).toBe(b);
+  });
+
   it('whisper to an unknown player errors instead of leaking text', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');
@@ -137,6 +203,105 @@ describe('chat channels', () => {
       type: 'error',
       text: 'The /who roster is available in online play.',
     }));
+  });
+
+  it('/help lists the chat commands as system notices without sending chat', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    sim.tick();
+    sim.chat('/help', a);
+    const events = sim.tick();
+    expect(chatEvents(events)).toHaveLength(0);
+    const help = events.filter((e) => e.type === 'error' && e.pid === a) as Extract<SimEvent, { type: 'error' }>[];
+    expect(help.length).toBeGreaterThan(0);
+    const text = help.map((e) => e.text).join('\n');
+    expect(text).toContain('/w <name> <message>');
+    expect(text).toContain('/who');
+  });
+
+  it('/? and /commands are aliases for /help', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    sim.tick();
+    for (const cmd of ['/?', '/commands']) {
+      sim.chat(cmd, a);
+      const events = sim.tick();
+      expect(chatEvents(events)).toHaveLength(0);
+      expect(events.some((e) => e.type === 'error' && e.pid === a)).toBe(true);
+    }
+  });
+
+  it('an unknown slash command points the player at /help', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    sim.tick();
+    sim.chat('/bogus stuff', a);
+    const events = sim.tick();
+    expect(chatEvents(events)).toHaveLength(0);
+    expect(events.some((e) => e.type === 'error' && e.pid === a && e.text.includes('/help'))).toBe(true);
+  });
+
+  it('/played reports zero on a freshly joined character', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    teleport(sim, a, 0, -40);
+    sim.tick();
+    sim.chat('/played', a);
+    const events = sim.tick();
+    expect(chatEvents(events)).toHaveLength(0);
+    expect(events).toContainEqual(expect.objectContaining({
+      type: 'error',
+      pid: a,
+      text: 'Time played this session: 0s.',
+    }));
+  });
+
+  it('/played accumulates session time as the sim advances', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    teleport(sim, a, 0, -40);
+    // 20 ticks per sim-second; advance just over a minute of world time
+    for (let i = 0; i < 20 * 65; i++) sim.tick();
+    sim.chat('/played', a);
+    const events = sim.tick();
+    expect(chatEvents(events)).toHaveLength(0);
+    const played = events.find(
+      (e): e is Extract<SimEvent, { type: 'error' }> =>
+        e.type === 'error' && e.text.startsWith('Time played'),
+    );
+    // once past a minute the line switches to "Xm Ys" form
+    expect(played?.text).toMatch(/^Time played this session: 1m \d+s\.$/);
+  });
+
+  it('/where reports the caller\'s zone, level range, and coordinates', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    teleport(sim, a, 12, -340);
+    sim.tick();
+    const zone = zoneAt(-340);
+    const [lo, hi] = zone.levelRange;
+    sim.chat('/where', a);
+    const events = sim.tick();
+    expect(chatEvents(events)).toHaveLength(0);
+    expect(events).toContainEqual(expect.objectContaining({
+      type: 'error',
+      pid: a,
+      text: `You are in ${zone.name} (levels ${lo}–${hi}) at (12, -340).`,
+    }));
+  });
+
+  it('/where accepts the /loc and /zone aliases', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    teleport(sim, a, 0, -40);
+    sim.tick();
+    const expected = `You are in ${zoneAt(-40).name}`;
+    for (const cmd of ['/loc', '/zone']) {
+      sim.chat(cmd, a);
+      const events = sim.tick();
+      expect(chatEvents(events)).toHaveLength(0);
+      expect(events.some((e) => e.type === 'error' && e.text.startsWith(expected))).toBe(true);
+    }
   });
 
   it('exact-case whisper wins over a case-variant squatter', () => {
@@ -204,6 +369,86 @@ describe('chat channels', () => {
     expect(pids).toContain(a);
     expect(pids).toContain(b);
     expect(pids).not.toContain(outsider);
+  });
+
+  it('/roll broadcasts a deterministic result in the default 1-100 range to nearby players', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const near = sim.addPlayer('mage', 'Bet');
+    const far = sim.addPlayer('rogue', 'Gimel');
+    teleport(sim, a, 0, -40);
+    teleport(sim, near, 10, -40); // within SAY_RANGE
+    teleport(sim, far, 80, -40);  // beyond SAY_RANGE
+    sim.tick();
+
+    sim.chat('/roll', a);
+    const msgs = chatEvents(sim.tick());
+    expect(msgs.length).toBeGreaterThan(0);
+    expect(msgs.every((m) => m.channel === 'roll' && m.from === 'Aleph')).toBe(true);
+    // text is "<result> (1-100)" with the result inside the range
+    const m = /^(\d+) \(1-100\)$/.exec(msgs[0].text)!;
+    expect(m).not.toBeNull();
+    const result = Number(m[1]);
+    expect(result).toBeGreaterThanOrEqual(1);
+    expect(result).toBeLessThanOrEqual(100);
+    const pids = msgs.map((x) => x.pid);
+    expect(pids).toContain(a);    // roller sees their own roll
+    expect(pids).toContain(near);
+    expect(pids).not.toContain(far);
+  });
+
+  it('/roll N rolls within 1-N and /roll M-N within the given bounds', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    teleport(sim, a, 0, -40);
+    sim.tick();
+
+    sim.chat('/roll 6', a);
+    let msgs = chatEvents(sim.tick());
+    let m = /^(\d+) \(1-6\)$/.exec(msgs[0].text)!;
+    expect(m).not.toBeNull();
+    expect(Number(m[1])).toBeGreaterThanOrEqual(1);
+    expect(Number(m[1])).toBeLessThanOrEqual(6);
+
+    sim.chat('/roll 50-60', a);
+    msgs = chatEvents(sim.tick());
+    m = /^(\d+) \(50-60\)$/.exec(msgs[0].text)!;
+    expect(m).not.toBeNull();
+    expect(Number(m[1])).toBeGreaterThanOrEqual(50);
+    expect(Number(m[1])).toBeLessThanOrEqual(60);
+  });
+
+  it('/roll prefers the party channel when the roller is grouped', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('mage', 'Bet');
+    const outsider = sim.addPlayer('rogue', 'Gimel');
+    teleport(sim, a, 0, -40);
+    teleport(sim, b, 0, -900);   // out of say range but in the party
+    teleport(sim, outsider, 2, -40);
+    sim.tick();
+    sim.partyInvite(b, a);
+    sim.partyAccept(b);
+    sim.tick();
+
+    sim.chat('/roll', a);
+    const msgs = chatEvents(sim.tick());
+    expect(msgs.every((x) => x.channel === 'roll')).toBe(true);
+    const pids = msgs.map((x) => x.pid);
+    expect(pids).toContain(a);
+    expect(pids).toContain(b);            // distant party member still sees it
+    expect(pids).not.toContain(outsider); // a nearby non-member does not
+  });
+
+  it('rejects a malformed roll range instead of saying it out loud', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    teleport(sim, a, 0, -40);
+    sim.tick();
+    sim.chat('/roll 60-50', a); // min greater than max
+    const events = sim.tick();
+    expect(chatEvents(events)).toHaveLength(0);
+    expect(events.some((e) => e.type === 'error')).toBe(true);
   });
 });
 
@@ -358,5 +603,71 @@ describe('snapshot interpolation continuity', () => {
     expect(e.prevPos.x).toBeLessThanOrEqual(12.5); // <= 1.25 extrapolation cap
     // and the interpolation target is always ahead of the anchor
     expect(e.prevPos.x).toBeLessThan(e.pos.x);
+  });
+});
+
+function logEvents(events: SimEvent[]): Extract<SimEvent, { type: 'log' }>[] {
+  return events.filter((e): e is Extract<SimEvent, { type: 'log' }> => e.type === 'log');
+}
+
+describe('/afk and /dnd presence', () => {
+  it('/afk confirms to the setter and auto-replies to whisperers (still delivering)', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('mage', 'Bet');
+    sim.tick();
+
+    sim.chat('/afk grabbing lunch', a);
+    const confirm = logEvents(sim.tick());
+    expect(confirm.some((m) => m.pid === a && /Away From Keyboard: grabbing lunch/.test(m.text))).toBe(true);
+
+    sim.chat('/w Aleph you around?', b);
+    const out = sim.tick();
+    // Bet gets an auto-reply line about Aleph being away...
+    expect(logEvents(out).some((m) => m.pid === b && /Aleph is Away From Keyboard: grabbing lunch/.test(m.text))).toBe(true);
+    // ...and the whisper is still delivered to Aleph (afk does not withhold)
+    expect(chatEvents(out).some((m) => m.channel === 'whisper' && m.pid === a && m.text === 'you around?')).toBe(true);
+  });
+
+  it('/dnd withholds the whisper but still echoes the sender and notifies them', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('mage', 'Bet');
+    sim.tick();
+
+    sim.chat('/dnd raiding', a);
+    sim.tick();
+
+    sim.chat('/w Aleph ping', b);
+    const out = sim.tick();
+    expect(logEvents(out).some((m) => m.pid === b && /Aleph is Do Not Disturb: raiding/.test(m.text))).toBe(true);
+    // the recipient copy (no `to`) must not reach Aleph
+    expect(chatEvents(out).some((m) => m.channel === 'whisper' && m.pid === a)).toBe(false);
+    // but the sender still sees their own outgoing line (carries `to`)
+    expect(chatEvents(out).some((m) => m.channel === 'whisper' && m.pid === b && m.to === 'Aleph')).toBe(true);
+  });
+
+  it('repeating the bare command toggles the status off', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    sim.tick();
+
+    sim.chat('/afk', a);
+    sim.tick();
+    sim.chat('/afk', a);
+    const out = logEvents(sim.tick());
+    expect(out.some((m) => m.pid === a && /no longer Away From Keyboard/.test(m.text))).toBe(true);
+  });
+
+  it('sending any other chat clears an away status', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    sim.tick();
+
+    sim.chat('/afk', a);
+    sim.tick();
+    sim.chat('back now', a);
+    const out = logEvents(sim.tick());
+    expect(out.some((m) => m.pid === a && /no longer marked as away/.test(m.text))).toBe(true);
   });
 });

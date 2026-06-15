@@ -355,6 +355,32 @@ describe('rogue stealth', () => {
     expect(wolf.aiState).not.toBe('idle');
   });
 
+  it('a closer stealthed player does not shield a visible ally from aggro', () => {
+    // Regression: the idle-mob check only evaluated the single NEAREST player.
+    // A stealthed player standing closest shrank the detection radius and, being
+    // nearest, was the only candidate considered — so a visible groupmate well
+    // inside the normal aggro radius was silently ignored.
+    const sim = new Sim({ seed: 42, playerClass: 'rogue', noPlayer: true });
+    const rogue = sim.entities.get(sim.addPlayer('rogue', 'Sneak'))!;
+    const warrior = sim.entities.get(sim.addPlayer('warrior', 'Visible'))!;
+    sim.setPlayerLevel(5, rogue.id);
+    sim.setPlayerLevel(5, warrior.id);
+    const wolf = nearestMob(sim, 'forest_wolf', rogue);
+    wolf.wanderTarget = null;
+    // equal levels: no level-difference radius skew (forest_wolf aggroRadius 10,
+    // shrunk to ~2.5 while stealthed)
+    wolf.level = 5;
+    // rogue is NEAREST (4yd) but stealthed and outside its shrunk radius;
+    // the warrior is visible at 6yd, well inside the wolf's 10yd aggro radius
+    teleport(sim, rogue, wolf.pos.x + 4, wolf.pos.z);
+    teleport(sim, warrior, wolf.pos.x + 6, wolf.pos.z);
+    sim.castAbility('stealth', rogue.id);
+    expect(rogue.auras.some((a) => a.kind === 'stealth')).toBe(true);
+    for (let i = 0; i < 20 && wolf.aiState === 'idle'; i++) sim.tick();
+    expect(wolf.aiState).not.toBe('idle');
+    expect(wolf.aggroTargetId).toBe(warrior.id);
+  });
+
   it('cannot stealth in combat; acting breaks stealth; ambush requires it', () => {
     const sim = makeSim('rogue');
     sim.setPlayerLevel(16);

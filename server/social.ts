@@ -226,6 +226,8 @@ export class SocialService {
   async friendRemove(actor: SocialActor, name: string): Promise<void> {
     const target = await this.db.findCharacterByName(String(name ?? '').trim());
     if (!target) { this.err(actor.characterId, `No character named '${name}' on your friends list.`); return; }
+    const friends = await this.db.listFriends(actor.characterId);
+    if (!friends.some((f) => f.id === target.id)) { this.err(actor.characterId, `${target.name} is not on your friends list.`); return; }
     await this.db.removeFriend(actor.characterId, target.id);
     this.info(actor.characterId, `${target.name} removed from friends.`);
     this.push(actor.characterId);
@@ -282,6 +284,8 @@ export class SocialService {
   async blockRemove(actor: SocialActor, name: string): Promise<void> {
     const target = await this.db.findCharacterByName(String(name ?? '').trim());
     if (!target) { this.err(actor.characterId, `No character named '${name}' on your ignore list.`); return; }
+    const blocks = await this.db.listBlocks(actor.characterId);
+    if (!blocks.some((b) => b.id === target.id)) { this.err(actor.characterId, `${target.name} is not on your ignore list.`); return; }
     await this.db.removeBlock(actor.characterId, target.id);
     this.info(actor.characterId, `${target.name} is no longer ignored.`);
     this.tx.onBlocksChanged(actor.characterId, await this.db.blockedIds(actor.characterId));

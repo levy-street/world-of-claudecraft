@@ -1,4 +1,4 @@
-import { ITEMS, QUESTS, QUEST_ORDER, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from './data';
+import { CLASSES, ITEMS, QUESTS, QUEST_ORDER, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from './data';
 import { Sim } from './sim';
 import { Entity, GCD, angleTo, dist2d, normAngle, xpForLevel, MAX_LEVEL } from './types';
 
@@ -6,6 +6,12 @@ import { Entity, GCD, angleTo, dist2d, normAngle, xpForLevel, MAX_LEVEL } from '
 // Discrete action space for RL agents.
 // Movement actions are "held" for the duration of one env step (frame-skip).
 // ---------------------------------------------------------------------------
+
+// Ability slots must cover the largest class kit so the RL agent can observe
+// and cast every ability a player can learn. Derived from CLASSES (not a fixed
+// constant) so adding abilities to any class can never silently leave high
+// learn-order slots unreachable. See abilitiesKnownAt(): one entry per ability.
+const ABILITY_SLOTS = Math.max(...Object.values(CLASSES).map((c) => c.abilities.length));
 
 export const ACTIONS = [
   'noop',          // 0
@@ -18,23 +24,14 @@ export const ACTIONS = [
   'jump',          // 7  (forward+jump)
   'target_nearest',// 8
   'attack',        // 9  start auto-attack on current target
-  'ability_1',     // 10  abilities index the learned list in learn order
-  'ability_2',     // 11
-  'ability_3',     // 12
-  'ability_4',     // 13
-  'ability_5',     // 14
-  'ability_6',     // 15
-  'ability_7',     // 16
-  'ability_8',     // 17
-  'ability_9',     // 18
-  'ability_10',    // 19
-  'interact',      // 20 loot corpse / pick up object / talk to quest npc
-  'stop',          // 21 stop moving + stop attacking
-  'eat_drink',     // 22 consume best food (or water for mana classes) from bags
+  // abilities index the learned list in learn order: ability_1 .. ability_N
+  ...Array.from({ length: ABILITY_SLOTS }, (_, i) => `ability_${i + 1}`),
+  'interact',      // loot corpse / pick up object / talk to quest npc
+  'stop',          // stop moving + stop attacking
+  'eat_drink',     // consume best food (or water for mana classes) from bags
 ] as const;
 
 export const NUM_ACTIONS = ACTIONS.length;
-const ABILITY_SLOTS = 10;
 
 export function applyAction(sim: Sim, action: number): void {
   const inp = sim.moveInput;
@@ -126,7 +123,10 @@ export function encodeObs(sim: Sim): number[] {
     obs.push(1);
     obs.push(target.hp / Math.max(1, target.maxHp));
     obs.push(clamp((target.level - p.level) / 5, -1, 1));
-    obs.push(clamp(d / 40, 0, 1));
+    // distance shares the d/40 scale used for nearby mobs and the interactable
+    // below; clamp to the same 1.5 ceiling (the 60-unit observation radius) so a
+    // target beyond 40 units stays distinguishable instead of saturating at 1
+    obs.push(clamp(d / 40, 0, 1.5));
     obs.push(Math.sin(rel));
     obs.push(Math.cos(rel));
     obs.push(target.hostile ? 1 : 0);

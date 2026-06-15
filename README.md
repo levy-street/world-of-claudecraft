@@ -75,7 +75,9 @@ see each other in town. `Enter` opens chat.
 - **Parties** (up to 5): right-click a player → *Invite to Party*. Party
   frames on the left, members share tap rights, kill quest credit and split
   XP with the real vanilla group bonuses (1.166/1.3/1.43 for 3/4/5). Party
-  chat with `/p message`. Blue member blips on the minimap.
+  chat with `/p message`. Blue member blips on the minimap. Settle loot
+  disputes with `/roll` (also `/roll N` or `/roll M-N`) — a server-rolled
+  number broadcast to the party, or to nearby players when ungrouped.
 - **Trading**: right-click a player → *Trade*. Both sides stage items + money,
   both must accept, and the swap is atomic and server-validated (quest items
   are untradeable). Walking apart cancels.
@@ -94,6 +96,10 @@ see each other in town. `Enter` opens chat.
   its loot/XP/quest credit — others get "You don't have permission to loot
   that."), mobs retarget the next attacker when their victim dies (no free
   resets), join/leave announcements, `/say`-style chat.
+- **Away status**: `/afk [message]` and `/dnd [message]` mark you as away.
+  Anyone who whispers you gets an automatic reply with your message; `/dnd`
+  also withholds the incoming whisper. Repeat the bare command (or just send
+  any other chat) to clear it. Status is session-only and resets on login.
 
 ## The Hollow Crypt — 5-player elite instance
 

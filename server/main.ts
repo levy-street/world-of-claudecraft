@@ -10,6 +10,7 @@ import {
 } from './db';
 import { cleanReportReason, createPlayerReport } from './moderation_db';
 import { resolveReportTarget } from './report_target';
+import { bufferHandshakeMessages } from './ws_buffer';
 import {
   hashPassword, verifyPassword, newToken, validUsernameShape, offensiveName, validPassword, normalizeCharName,
 } from './auth';
@@ -223,8 +224,17 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const name = normalizeCharName(body.name);
       if (name === null) return json(res, 400, { error: 'invalid character name (2-16 letters)' });
       if (offensiveName(name)) return json(res, 400, { error: 'character name is not allowed' });
+      const characterId = Number(renameMatch[1]);
+      // A rename mutates the DB name and clears force_rename, but a live
+      // ClientSession keeps its own copy of the name (used by reports, chat and
+      // /api/status). Renaming an online character desyncs that copy and — worse
+      // — lets a force-renamed player already in the world clear the moderation
+      // flag without ever leaving. Mirror the DELETE guard and require offline.
+      if ([...game.clients.values()].some((s) => s.characterId === characterId)) {
+        return json(res, 400, { error: 'character is currently online' });
+      }
       try {
-        const c = await renameCharacter(accountId, Number(renameMatch[1]), name);
+        const c = await renameCharacter(accountId, characterId, name);
         if (!c) return json(res, 404, { error: 'character not found' });
         return json(res, 200, { id: c.id, name: c.name, class: c.class, level: c.level, forceRename: c.force_rename });
       } catch (err: any) {
@@ -451,7 +461,12 @@ async function main(): Promise<void> {
 
     ws.once('message', (data) => {
       clearTimeout(authTimer);
-      void authenticateWebSocket(ws, String(data));
+      // Buffer any frames the client sends while the async auth/join handshake
+      // is still in flight, then replay them once authenticateWebSocket has
+      // attached the permanent message handler. Without this the frames are
+      // silently dropped (see ws_buffer.ts).
+      const flush = bufferHandshakeMessages(ws);
+      void authenticateWebSocket(ws, String(data)).finally(flush);
     });
   }
 

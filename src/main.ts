@@ -355,6 +355,8 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
 
   const input = new Input(canvas, {
     onTab: () => world.tabTarget(),
+    onTargetFriendly: () => world.targetNearestFriendly(),
+    onCycleFriendly: () => world.friendlyTabTarget(),
     // slot 0 (key 1) is Attack for every class — auto-attack without needing
     // right-click; keys and clicks share the Hud's remappable slot layout
     onAbility: (slot) => hud.castSlot(slot),

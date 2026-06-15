@@ -206,6 +206,12 @@ describe('friends', () => {
     expect((await h.svc.snapshot(1)).friends).toHaveLength(0);
   });
 
+  it('does not claim success when removing someone who is not a friend', async () => {
+    await h.svc.friendRemove(h.actor(1), 'Bet');
+    expect(h.tx.errorsFor(1).join()).toMatch(/not on your friends list/i);
+    expect(h.tx.textFor(1).join()).not.toMatch(/removed from friends/i);
+  });
+
   it('notifies watching friends when a character comes online', async () => {
     // 1 has 2 on their friends list; 2 logs in
     await h.svc.friendAdd(h.actor(1), 'Bet');
@@ -240,6 +246,12 @@ describe('ignore / block', () => {
     await h.svc.blockRemove(h.actor(1), 'Bet');
     expect((await h.svc.snapshot(1)).blocks).toHaveLength(0);
     expect(h.tx.blockSets.get(1)).toEqual([]);
+  });
+
+  it('does not claim success when unignoring someone who is not ignored', async () => {
+    await h.svc.blockRemove(h.actor(1), 'Bet');
+    expect(h.tx.errorsFor(1).join()).toMatch(/not on your ignore list/i);
+    expect(h.tx.textFor(1).join()).not.toMatch(/no longer ignored/i);
   });
 
   it('refuses to block yourself', async () => {

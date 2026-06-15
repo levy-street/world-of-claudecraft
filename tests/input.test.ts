@@ -41,6 +41,8 @@ function makeInput() {
   };
   const cb = {
     onTab: vi.fn(),
+    onTargetFriendly: vi.fn(),
+    onCycleFriendly: vi.fn(),
     onAbility: vi.fn(),
     onUiKey: vi.fn(),
     onClickPick: vi.fn(),

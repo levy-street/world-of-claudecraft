@@ -57,6 +57,7 @@ export interface ClientSession {
   alive: boolean;
   joinedAt: number;
   dbSessionId: number | null; // play_sessions row, set once the insert lands
+  left: boolean; // set in leave(); guards against the open-session insert landing after disconnect
   chatTokens: number;
   chatLastRefill: number;
   chatLastRateError: number;
@@ -429,7 +430,7 @@ export class GameServer {
     }
     const session: ClientSession = {
       ws, accountId, characterId, pid, name,
-      lastSave: Date.now(), alive: true, joinedAt: Date.now(), dbSessionId: null,
+      lastSave: Date.now(), alive: true, joinedAt: Date.now(), dbSessionId: null, left: false,
       chatTokens: CHAT_RATE_BURST, chatLastRefill: Date.now() / 1000, chatLastRateError: 0,
       chatRateViolations: 0, chatCooldownUntil: 0,
       blockedIds: new Set(),
@@ -443,7 +444,14 @@ export class GameServer {
     this.sessionsByCharacterId.set(characterId, session);
     this.peakOnline = Math.max(this.peakOnline, this.clients.size);
     openPlaySession(accountId, characterId, name)
-      .then((id) => { session.dbSessionId = id; })
+      .then((id) => {
+        session.dbSessionId = id;
+        // If the player disconnected before this insert landed, leave() saw a
+        // null id and skipped the close. Close it now so the row isn't orphaned.
+        if (session.left) {
+          void closePlaySession(id).catch((err) => console.error('failed to close play session:', err));
+        }
+      })
       .catch((err) => console.error('failed to open play session:', err));
 
     this.send(session, {
@@ -475,6 +483,7 @@ export class GameServer {
 
   async leave(session: ClientSession, reason: string): Promise<void> {
     if (!this.clients.has(session.pid)) return;
+    session.left = true;
     this.clients.delete(session.pid);
     this.sessionsByCharacterId.delete(session.characterId);
     this.social.forget(session.characterId);
@@ -662,6 +671,8 @@ export class GameServer {
       case 'target': sim.targetEntity(typeof msg.id === 'number' ? msg.id : null, pid); break;
       case 'tab': sim.tabTarget(pid); break;
       case 'targetNearest': sim.targetNearestEnemy(pid); break;
+      case 'tabFriendly': sim.friendlyTabTarget(pid); break;
+      case 'targetNearestFriendly': sim.targetNearestFriendly(pid); break;
       case 'attack': sim.startAutoAttack(pid); break;
       case 'stopattack': sim.stopAutoAttack(pid); break;
       case 'interact': sim.interact(pid); break;
