@@ -1,7 +1,7 @@
 import { EventEmitter } from 'node:events';
 import { describe, expect, it } from 'vitest';
 import type * as http from 'node:http';
-import { readBody } from '../server/http_util';
+import { readBody, isUniqueViolation } from '../server/http_util';
 
 // Minimal IncomingMessage stand-in: an emitter that records whether the
 // request was destroyed so we can assert readBody stops reading the socket.
@@ -53,5 +53,25 @@ describe('readBody', () => {
     await expect(promise).rejects.toThrow('body too large');
     // Late chunks arriving after the abort must not be appended or throw.
     expect(() => req.emit('data', 'y'.repeat(1024 * 1024))).not.toThrow();
+  });
+});
+
+describe('isUniqueViolation', () => {
+  it('matches a Postgres unique-constraint error by SQLSTATE code', () => {
+    // what node-postgres throws for a UNIQUE index conflict
+    const err = Object.assign(new Error('duplicate key value violates unique constraint "accounts_username_key"'), { code: '23505' });
+    expect(isUniqueViolation(err)).toBe(true);
+  });
+
+  it('matches by message when no code is present', () => {
+    expect(isUniqueViolation(new Error('unique constraint failed'))).toBe(true);
+  });
+
+  it('ignores unrelated errors and non-errors', () => {
+    expect(isUniqueViolation(Object.assign(new Error('connection reset'), { code: '08006' }))).toBe(false);
+    expect(isUniqueViolation(new Error('boom'))).toBe(false);
+    expect(isUniqueViolation(null)).toBe(false);
+    expect(isUniqueViolation(undefined)).toBe(false);
+    expect(isUniqueViolation('nope')).toBe(false);
   });
 });

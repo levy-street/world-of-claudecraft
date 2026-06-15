@@ -175,12 +175,36 @@ export class PgSocialDb implements SocialDb {
     return res.rows.map((r) => r.blocked_id);
   }
 
-  async createGuild(name: string): Promise<number> {
-    const res = await this.pool.query(
-      'INSERT INTO guilds (name, realm) VALUES ($1, $2) RETURNING id',
-      [name, DEFAULT_REALM],
-    );
-    return res.rows[0].id;
+  async createGuildWithLeader(name: string, leaderId: number): Promise<{ guildId: number } | { error: 'name_taken' | 'already_in_guild' }> {
+    const client = await this.pool.connect();
+    try {
+      await client.query('BEGIN');
+      let guildId: number;
+      try {
+        const res = await client.query('INSERT INTO guilds (name, realm) VALUES ($1, $2) RETURNING id', [name, DEFAULT_REALM]);
+        guildId = res.rows[0].id;
+      } catch (err) {
+        await client.query('ROLLBACK');
+        if ((err as { code?: string }).code === '23505') return { error: 'name_taken' }; // unique (realm, name)
+        throw err;
+      }
+      // guild_members.character_id is the PK, so this seats the leader only if
+      // they are not already in a guild; 0 rows => roll the new guild back so no
+      // orphaned, leaderless guild is left behind.
+      const mem = await client.query(
+        `INSERT INTO guild_members (guild_id, character_id, rank) VALUES ($1, $2, 'leader')
+         ON CONFLICT (character_id) DO NOTHING`,
+        [guildId, leaderId],
+      );
+      if (mem.rowCount === 0) { await client.query('ROLLBACK'); return { error: 'already_in_guild' }; }
+      await client.query('COMMIT');
+      return { guildId };
+    } catch (err) {
+      await client.query('ROLLBACK').catch(() => {});
+      throw err;
+    } finally {
+      client.release();
+    }
   }
 
   async deleteGuild(id: number): Promise<void> {
@@ -198,12 +222,35 @@ export class PgSocialDb implements SocialDb {
     return row ? { guildId: row.guild_id, guildName: row.guild_name, rank: row.rank } : null;
   }
 
-  async addGuildMember(guildId: number, charId: number, rank: GuildRank): Promise<void> {
-    await this.pool.query(
-      `INSERT INTO guild_members (guild_id, character_id, rank) VALUES ($1, $2, $3)
-       ON CONFLICT (character_id) DO NOTHING`,
-      [guildId, charId, rank],
-    );
+  async addGuildMemberAtomic(guildId: number, charId: number, rank: GuildRank, limit: number): Promise<'ok' | 'full' | 'already_member' | 'no_guild'> {
+    const client = await this.pool.connect();
+    try {
+      await client.query('BEGIN');
+      // lock the guild row so concurrent accepts serialize — without this the
+      // count-then-insert races and N pending invitees can all pass the cap.
+      const g = await client.query('SELECT id FROM guilds WHERE id = $1 FOR UPDATE', [guildId]);
+      if (g.rowCount === 0) { await client.query('ROLLBACK'); return 'no_guild'; }
+      const existing = await client.query('SELECT 1 FROM guild_members WHERE character_id = $1', [charId]);
+      if ((existing.rowCount ?? 0) > 0) { await client.query('ROLLBACK'); return 'already_member'; }
+      const cnt = await client.query('SELECT count(*)::int AS n FROM guild_members WHERE guild_id = $1', [guildId]);
+      if (cnt.rows[0].n >= limit) { await client.query('ROLLBACK'); return 'full'; }
+      // ON CONFLICT guards the gap between the membership check above and this
+      // insert: if the character joined a guild concurrently, the character_id
+      // PK conflicts -> 0 rows -> report already_member instead of throwing.
+      const ins = await client.query(
+        `INSERT INTO guild_members (guild_id, character_id, rank) VALUES ($1, $2, $3)
+         ON CONFLICT (character_id) DO NOTHING`,
+        [guildId, charId, rank],
+      );
+      if (ins.rowCount === 0) { await client.query('ROLLBACK'); return 'already_member'; }
+      await client.query('COMMIT');
+      return 'ok';
+    } catch (err) {
+      await client.query('ROLLBACK').catch(() => {});
+      throw err;
+    } finally {
+      client.release();
+    }
   }
 
   async removeGuildMember(charId: number): Promise<void> {

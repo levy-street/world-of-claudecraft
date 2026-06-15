@@ -10,7 +10,7 @@
 
 import { ABILITIES, ITEMS } from '../sim/data';
 
-export type IconKind = 'ability' | 'item' | 'aura';
+export type IconKind = 'ability' | 'item' | 'aura' | 'crest';
 
 type Ctx = CanvasRenderingContext2D;
 
@@ -1082,6 +1082,49 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   aura_form_bear: r('earth', 'earthBrown', ['paw']),
 };
 
+// Crests: class / mob-family / status glyphs, painted with the same primitive
+// vocabulary so unit-frame portraits and party rows match the spellbook art
+// (replaces the old emoji FAMILY_GLYPH/CLASS_GLYPH; see docs/design/icon-system.md §10).
+const CREST_RECIPES: Record<string, IconRecipe> = {
+  // player classes (motif + class-flavoured background)
+  class_warrior: r('fury', 'steel', ['sword'], ['glow']),
+  class_paladin: r('holy', 'holyGold', ['mace'], ['glow']),
+  class_hunter: r('nature', 'leafGreen', ['arrow'], ['glow']),
+  class_rogue: r('shadow', 'steel', [{ p: 'dagger', x: -6, rot: -0.42 }, { p: 'dagger', x: 6, rot: 0.42 }], ['motion']),
+  class_priest: r('holy', 'silverWhite', ['cross'], ['glow', 'sparkle']),
+  class_shaman: r('storm', 'sky', ['lightning'], ['glow']),
+  class_mage: r('arcane', 'arcanePink', ['sigil_rune'], ['sparkle', 'glow']),
+  class_warlock: r('shadow', 'shadowPurple', ['skull'], ['glow']),
+  class_druid: r('nature', 'leafGreen', ['paw'], ['sparkle']),
+  // mob families
+  family_beast: r('earth', 'earthBrown', ['paw']),
+  family_humanoid: r('steel', 'steel', ['sword']),
+  family_murloc: r('drink', 'sky', ['droplet']),
+  family_spider: r('shadow', 'silverWhite', ['web']),
+  family_kobold: r('earth', 'gold', ['candle']),
+  family_undead: r('shadow', 'bone', ['skull']),
+  family_troll: r('junk', 'bone', ['bone']),
+  family_ogre: r('fury', 'earthBrown', ['fist']),
+  family_elemental: r('storm', 'sky', ['lightning'], ['glow']),
+  family_dragonkin: r('fire', 'ember', ['claw_slash'], ['glow']),
+  family_sheep: r('nature', 'silverWhite', ['sheep_head']),
+  // status / interaction markers
+  status_npc: r('parchment', 'gold', ['sigil_rune']),
+  status_boss: r('shadow', 'bone', ['skull'], ['glow']),
+  status_dead: r('junk', 'bone', ['skull']),
+  status_combat: r('fury', 'blood', ['sword']),
+  // talent-tree icons (used when a node has no linked ability — derived from its
+  // stat/global effect; see talentEffectIcon in hud.ts)
+  talent_armor: r('steel', 'steel', ['shield']),
+  talent_crit: r('fury', 'gold', ['sword', { p: 'sunburst', ...TL }]),
+  talent_dodge: r('storm', 'sky', ['shield'], ['motion']),
+  talent_ap: r('fury', 'gold', ['fist']),
+  talent_health: r('blood', 'blood', ['heart']),
+  talent_haste: r('storm', 'sky', ['lightning']),
+  talent_choice: r('arcane', 'arcanePink', ['gem'], ['sparkle']),
+  talent_generic: r('steel', 'steel', ['sigil_rune']),
+};
+
 // ---------------------------------------------------------------------------
 // Procedural fallbacks for ids without a hand-assigned recipe
 // ---------------------------------------------------------------------------
@@ -1314,6 +1357,8 @@ function resolveRecipe(kind: IconKind, id: string): IconRecipe {
     recipe = ABILITY_RECIPES[id] ?? abilityFallback(id);
   } else if (kind === 'item') {
     recipe = ITEM_RECIPES[id] ?? itemFallback(id);
+  } else if (kind === 'crest') {
+    recipe = CREST_RECIPES[id] ?? null;
   } else {
     // auras carry the ability id that applied them, or a generic aura_<kind>
     recipe = AURA_RECIPES[id] ?? ABILITY_RECIPES[id] ?? abilityFallback(id);
@@ -1329,13 +1374,26 @@ function resolveRecipe(kind: IconKind, id: string): IconRecipe {
 }
 
 const DEFAULT_ICON_SIZE = 96; // crisp at 46px buttons on 2x displays
+const canvasCache = new Map<string, HTMLCanvasElement>();
 
-// Returns a cached PNG data URL for the icon of the given ability/item/aura id.
+// Returns the cached composited <canvas> for an icon (ability/item/aura/crest).
+// Synchronous — safe to drawImage immediately (used for unit-frame portraits).
+export function iconCanvas(kind: IconKind, id: string, size: number = DEFAULT_ICON_SIZE): HTMLCanvasElement {
+  const key = `${kind}|${id}|${size}`;
+  let canvas = canvasCache.get(key);
+  if (!canvas) {
+    canvas = compose(resolveRecipe(kind, id), key, size);
+    canvasCache.set(key, canvas);
+  }
+  return canvas;
+}
+
+// Returns a cached PNG data URL for the icon of the given ability/item/aura/crest id.
 export function iconDataUrl(kind: IconKind, id: string, size: number = DEFAULT_ICON_SIZE): string {
   const key = `${kind}|${id}|${size}`;
   const cached = urlCache.get(key);
   if (cached) return cached;
-  const url = compose(resolveRecipe(kind, id), key, size).toDataURL();
+  const url = iconCanvas(kind, id, size).toDataURL();
   urlCache.set(key, url);
   return url;
 }

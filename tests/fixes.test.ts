@@ -195,7 +195,7 @@ describe('rare spawn rules', () => {
       elite: true,
       canSwim: true,
       ccImmune: true,
-      respawnMult: 24,
+      respawnMult: 4,
     });
   });
 
@@ -231,6 +231,15 @@ describe('rare spawn rules', () => {
     const rare = createMob(990003, MOBS.elder_bristleback, 5, { x: 0, y: 0, z: 0 });
     (sim as any).handleDeath(rare, null);
     expect(rare.respawnTimer).toBe(864);
+  });
+
+  it('Mogger respawns on a quest-boss timer instead of a long rare-spawn timer', () => {
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior', respawnSeconds: 2 });
+    const mogger = [...sim.entities.values()].find((e) => e.kind === 'mob' && e.templateId === 'mogger')!;
+
+    (sim as any).handleDeath(mogger, null);
+
+    expect(mogger.respawnTimer).toBe(8);
   });
 
   it('outdoor rare spawns have 3-player mechanics and no-loot summoned helpers', () => {
@@ -483,6 +492,25 @@ describe('boss loot and encounter resets', () => {
     expect(mob.lootable).toBe(false);
   });
 
+  it('does not drop a quest-gated item whose quest has no matching collect objective', () => {
+    const sim = makeSim();
+    const a = sim.playerId;
+    // q_boars only collects boar_hide; it has no collect objective for greyjaw_fang.
+    sim.meta(a)!.questLog.set('q_boars', { questId: 'q_boars', counts: [0], state: 'active' });
+    const mob = createMob(990102, MOBS.wild_boar, 3, { x: 20, y: 0, z: 22 });
+    // Inject a (mis)configured drop gated on q_boars but for an item the quest
+    // does not collect. It must never drop, even at chance 1.
+    const bogus = { itemId: 'greyjaw_fang', chance: 1, questId: 'q_boars' };
+    MOBS.wild_boar.loot.push(bogus as any);
+    try {
+      (sim as any).rollLoot(mob, sim.meta(a)!, [sim.meta(a)!]);
+    } finally {
+      MOBS.wild_boar.loot.pop();
+    }
+    const dropped = (mob.loot?.items ?? []).some((slot) => slot.itemId === 'greyjaw_fang');
+    expect(dropped).toBe(false);
+  });
+
   it('boss adds despawn on encounter reset instead of stacking across pulls', () => {
     const sim = makeSim();
     const p = sim.player;
@@ -614,6 +642,93 @@ describe('warrior charge', () => {
     wolf.dead = true;
     sim.tick();
     expect(p.chargeTargetId).toBe(null);
+  });
+});
+
+describe('mob tap rights', () => {
+  function wolf(sim: Sim): Entity {
+    return [...sim.entities.values()].find((e) => e.kind === 'mob' && e.templateId === 'forest_wolf')!;
+  }
+
+  it('a hit that deals real damage claims the mob', () => {
+    const sim = makeSim('mage');
+    const m = wolf(sim);
+    expect(m.tappedById).toBeNull();
+    (sim as any).dealDamage(sim.player, m, 7, false, 'fire', 'test', 'hit');
+    expect(m.tappedById).toBe(sim.player.id);
+  });
+
+  it('a fully absorbed (zero-damage) hit does not claim the mob', () => {
+    const sim = makeSim('mage');
+    const m = wolf(sim);
+    // a shield that soaks the whole hit — the mob takes no real damage
+    m.auras.push({
+      id: 'test_absorb', name: 'Test Shield', kind: 'absorb',
+      remaining: 30, duration: 30, value: 1000, sourceId: m.id, school: 'arcane',
+    } as any);
+    const hpBefore = m.hp;
+    (sim as any).dealDamage(sim.player, m, 50, false, 'fire', 'test', 'hit');
+    expect(m.hp).toBe(hpBefore); // nothing got through
+    expect(m.tappedById).toBeNull(); // so nobody owns the tap yet
+  });
+});
+
+describe('pet heel warp', () => {
+  it('keeps the spatial grid exact when a pet warps to its owner', () => {
+    const sim = makeSim();
+    const p = sim.player;
+    // park the owner in open space away from the spawn camp
+    teleportTo(sim, p.pos.x + 400, p.pos.z + 400);
+
+    // adopt a wild beast as a heeling pet and strand it far from the owner
+    const pet = [...sim.entities.values()].find((e) => e.kind === 'mob' && !e.dead)!;
+    pet.ownerId = p.id;
+    pet.hostile = false;
+    pet.aggroTargetId = null;
+    pet.inCombat = false;
+    pet.pos = { x: p.pos.x + 200, z: p.pos.z, y: p.pos.y };
+    pet.prevPos = { ...pet.pos };
+    (sim as any).grid.update(pet); // grid now buckets the pet at its far cell
+
+    // 200 yds away with nothing to fight: the pet warps back to heel
+    (sim as any).updatePet(pet);
+    expect(dist2d(pet.pos, p.pos)).toBeLessThan(1);
+
+    // a same-tick radius query at the warp destination must see the pet — it
+    // would miss it if the grid still held the pet in its stale far-away cell
+    const found: number[] = [];
+    (sim as any).grid.forEachInRadius(p.pos.x, p.pos.z, 5, (e: Entity) => found.push(e.id));
+    expect(found).toContain(pet.id);
+  });
+});
+
+describe('aoe damage vs armor', () => {
+  // Armor mitigates physical damage only. The single-target path already
+  // gates armor on `!isSpell`; the AoE path must match so spell-school novas
+  // (Arcane Explosion, Consecration) ignore the target's armor like every
+  // other spell in the game.
+  function aoeSetup(ability: string) {
+    const sim = makeSim('mage');
+    (sim as any).grantXp(99999); // level up far past Arcane Explosion (lvl 14)
+    const p = sim.player;
+    const wolf = [...sim.entities.values()].find((e) => e.kind === 'mob' && e.templateId === 'forest_wolf' && !e.dead)!;
+    wolf.maxHp = 100000;
+    wolf.hp = 100000;
+    // huge armor pins armorReduction at its 0.75 cap — a mitigated arcane hit
+    // would land at <=8, well under the unmitigated 26-31 band.
+    wolf.stats.armor = 10_000_000;
+    teleportTo(sim, wolf.pos.x, wolf.pos.z + 1);
+    sim.targetEntity(wolf.id);
+    return { sim, p, wolf, ability };
+  }
+
+  it('arcane explosion ignores the target armor (spell school)', () => {
+    const { sim, wolf } = aoeSetup('arcane_explosion');
+    const before = wolf.hp;
+    sim.castAbility('arcane_explosion');
+    for (let i = 0; i < 3; i++) sim.tick();
+    // full unmitigated arcane damage is 26-31; mitigated would be <=8
+    expect(before - wolf.hp).toBeGreaterThanOrEqual(20);
   });
 });
 

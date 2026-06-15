@@ -76,6 +76,10 @@ export interface ClientSession {
   // wire versions of each entity this client knows about: known entities
   // get identity-less "lite" records, unchanged ones ride in the keep list
   sentEnts: Map<number, SentEntityVersions>;
+  // character ids of this player's friends + guild members, captured from the
+  // last social snapshot. Drives the cheap periodic position push (no DB) that
+  // keeps allies live on the world map.
+  socialTrackedIds?: number[];
 }
 
 interface SentEntityVersions {
@@ -303,6 +307,7 @@ export class GameServer {
   private lastWireSweepTick = 0;
   private interval: NodeJS.Timeout | null = null;
   private saveTimer = 0;
+  private socialPosTimer = 0;
   private saveAllInFlight: Promise<void> | null = null;
   private readonly startedAt = Date.now();
   private peakOnline = 0;
@@ -348,7 +353,7 @@ export class GameServer {
     else if (e.dungeonId) status = 'dungeon';
     else if (e.inCombat) status = 'combat';
     const zone = e.dungeonId ? (DUNGEONS[e.dungeonId]?.name ?? e.dungeonId) : zoneAt(e.pos.z).name;
-    return { zone, status };
+    return { zone, status, x: e.pos.x, z: e.pos.z };
   }
 
   private socialTransport(): SocialTransport {
@@ -367,6 +372,10 @@ export class GameServer {
         const s = this.sessionByCharacterId(id);
         if (s) s.blockedIds = new Set(ids);
       },
+      isIgnoring: (recipientId, senderCharacterId) => {
+        const s = this.sessionByCharacterId(recipientId);
+        return s ? s.blockedIds.has(senderCharacterId) : false;
+      },
     };
   }
 
@@ -376,8 +385,31 @@ export class GameServer {
     try {
       const snap = await this.social.snapshot(charId);
       this.send(session, { t: 'social', ...snap });
+      // remember who to track for the live position push (friends + guildmates)
+      session.socialTrackedIds = [
+        ...snap.friends.map((f) => f.id),
+        ...(snap.guild ? snap.guild.members.map((m) => m.id) : []),
+      ];
     } catch (err) {
       console.error('social snapshot failed:', err);
+    }
+  }
+
+  // Cheap (no-DB) periodic push: refresh the live positions of each client's
+  // already-known friends/guildmates so they stay current on the world map.
+  private broadcastSocialPositions(): void {
+    for (const session of this.clients.values()) {
+      const ids = session.socialTrackedIds;
+      if (!ids || ids.length === 0) continue;
+      const list: { id: number; x: number; z: number; zone: string; status: PresenceStatus }[] = [];
+      for (const id of ids) {
+        const other = this.sessionByCharacterId(id);
+        if (!other) continue; // offline — snapshots own the online/offline flip
+        const loc = this.presenceOf(other);
+        if (loc.x === undefined || loc.z === undefined) continue;
+        list.push({ id, x: loc.x, z: loc.z, zone: loc.zone, status: loc.status });
+      }
+      if (list.length > 0) this.send(session, { t: 'socialpos', list });
     }
   }
 
@@ -396,6 +428,11 @@ export class GameServer {
         acc -= DT;
       }
       this.broadcastSnapshots();
+      this.socialPosTimer += dt;
+      if (this.socialPosTimer >= 1) {
+        this.socialPosTimer = 0;
+        this.broadcastSocialPositions();
+      }
       const tickMs = Number(process.hrtime.bigint() - now) / 1e6;
       this.tickMsAvg = this.tickMsAvg === 0 ? tickMs : this.tickMsAvg + TICK_EMA_ALPHA * (tickMs - this.tickMsAvg);
       this.saveTimer += dt;
@@ -668,6 +705,11 @@ export class GameServer {
       case 'abandon': if (typeof msg.quest === 'string') { sim.abandonQuest(msg.quest, pid); this.resyncQuests(session); } break;
       case 'equip': if (typeof msg.item === 'string') sim.equipItem(msg.item, pid); break;
       case 'use': if (typeof msg.item === 'string') sim.useItem(msg.item, pid); break;
+      case 'discard':
+        if (typeof msg.item === 'string') {
+          sim.discardItem(msg.item, typeof msg.count === 'number' ? msg.count : undefined, pid);
+        }
+        break;
       case 'buy': if (typeof msg.npc === 'number' && typeof msg.item === 'string') sim.buyItem(msg.npc, msg.item, pid); break;
       case 'sell':
         if (typeof msg.item === 'string') {
@@ -759,9 +801,41 @@ export class GameServer {
       // arena (Ashen Coliseum 1v1 queue)
       case 'arena_queue': sim.arenaQueueJoin(pid); break;
       case 'arena_leave': sim.arenaQueueLeave(pid); break;
+
+      // post-cap cosmetic prestige (Max-Level XP Overflow, Phase 4)
+      case 'prestige': sim.prestige(pid); break;
+
+      // Talents & Specializations — every allocation re-validated in the Sim.
+      case 'applyTalents': {
+        const a = msg.alloc;
+        if (a && typeof a === 'object') {
+          sim.applyTalents({
+            spec: typeof a.spec === 'string' ? a.spec : null,
+            ranks: (a.ranks && typeof a.ranks === 'object') ? a.ranks : {},
+            choices: (a.choices && typeof a.choices === 'object') ? a.choices : {},
+          }, pid);
+        }
+        break;
+      }
+      case 'respec': sim.respec(pid); break;
+      case 'setSpec': sim.setSpec(typeof msg.spec === 'string' ? msg.spec : null, pid); break;
+      case 'saveLoadout': {
+        const a = msg.alloc;
+        const alloc = a && typeof a === 'object'
+          ? {
+            spec: typeof a.spec === 'string' ? a.spec : null,
+            ranks: (a.ranks && typeof a.ranks === 'object') ? a.ranks : {},
+            choices: (a.choices && typeof a.choices === 'object') ? a.choices : {},
+          }
+          : undefined;
+        if (typeof msg.name === 'string') sim.saveLoadout(msg.name, Array.isArray(msg.bar) ? msg.bar : [], pid, alloc);
+        break;
+      }
+      case 'switchLoadout': if (typeof msg.index === 'number') sim.switchLoadout(msg.index | 0, pid); break;
+      case 'deleteLoadout': if (typeof msg.index === 'number') sim.deleteLoadout(msg.index | 0, pid); break;
       // World Market (the Merchant's auction house)
       case 'market_list':
-        if (typeof msg.item === 'string' && typeof msg.count === 'number' && typeof msg.price === 'number') {
+        if (typeof msg.item === 'string' && Number.isFinite(msg.count) && Number.isFinite(msg.price)) {
           sim.marketList(msg.item, msg.count, msg.price, pid);
         }
         break;
@@ -937,6 +1011,8 @@ export class GameServer {
       mres: p.maxResource,
       rtype: p.resourceType,
       xp: meta.xp,
+      lxp: meta.lifetimeXp,
+      prk: meta.prestigeRank,
       copper: meta.copper,
       gcd: round2(p.gcdRemaining),
       combo: p.comboPoints,
@@ -969,6 +1045,7 @@ export class GameServer {
     maybe('equip', meta.equipment);
     maybe('qlog', [...meta.questLog.values()]);
     maybe('qdone', [...meta.questsDone]);
+    maybe('milestones', [...meta.unlockedMilestones]);
     maybe('cds', Object.fromEntries([...p.cooldowns.entries()].map(([k, v]) => [k, round2(v)])));
     maybe('stats', p.stats);
     maybe('weapon', p.weapon);
@@ -980,6 +1057,9 @@ export class GameServer {
     // market info is null unless the player is standing at the Merchant, so it
     // only rides the wire for players actually browsing the World Market
     maybe('market', this.sim.marketInfoFor(session.pid));
+    // talents/spec/loadouts ride the wire only when they change (PR-5: never
+    // every snapshot). The client recomputes its known abilities from this.
+    maybe('tal', { alloc: meta.talents, spec: meta.talentMods.spec, role: meta.talentMods.role, loadouts: meta.loadouts, activeLoadout: meta.activeLoadout });
     return extra === '' ? json : json.slice(0, -1) + extra + '}';
   }
 

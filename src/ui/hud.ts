@@ -1,8 +1,8 @@
 import { formatMoney, ResolvedAbility } from '../sim/sim';
-import type { IWorld, MarketInfo } from '../world_api';
+import type { FriendInfo, IWorld, MarketInfo } from '../world_api';
 import { Renderer } from '../render/renderer';
 import {
-  ABILITIES, CLASSES, DUNGEON_LIST, DUNGEON_X_THRESHOLD, ITEMS, MOBS, NPCS, QUESTS,
+  ABILITIES, CLASSES, DUNGEON_LIST, DUNGEON_X_THRESHOLD, ITEMS, MOBS, NPCS, PROPS, QUESTS,
   WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_X, WORLD_MIN_Z, ZONES, dungeonAt, questRewardItem, zoneAt,
   zoneWelcomeText,
 } from '../sim/data';
@@ -10,16 +10,26 @@ import type { ZoneDef } from '../sim/data';
 import type { InvSlot } from '../sim/types';
 import {
   AbilityEffect, CONSUME_DURATION, Entity, FISHING_CAST_ID, FISHING_CAST_NAME, GCD, ItemDef, SimEvent,
-  dist2d, xpForLevel, MAX_LEVEL, MELEE_RANGE,
+  dist2d, xpForLevel, MAX_LEVEL, MELEE_RANGE, MILESTONES, virtualLevel, canPrestige, xpUntilNextPrestige,
 } from '../sim/types';
-import { terrainHeight, WATER_LEVEL, roadDistance } from '../sim/world';
+import type { LeaderboardEntry } from '../world_api';
+import { xpBarView, formatXp } from './xp_bar';
+import { t } from './i18n';
+import { terrainHeight, WATER_LEVEL, roadDistance, generateDecorations } from '../sim/world';
+import type { Decoration } from '../sim/world';
 import { Meters } from './meters';
 import { audio } from '../game/audio';
 import { music } from '../game/music';
-import { iconDataUrl, QUALITY_COLOR, raidMarkerDataUrl, RAID_MARKER_NAMES } from './icons';
+import { iconDataUrl, iconCanvas, QUALITY_COLOR, raidMarkerDataUrl, RAID_MARKER_NAMES } from './icons';
+import { svgIcon } from './ui_icons';
 import { Keybinds, BIND_ACTIONS, BIND_CATEGORIES, isReservedCode, keyLabel } from '../game/keybinds';
 import { Settings, GameSettings, BoolSettingKey, NumericSettingKey, SETTING_RANGES } from '../game/settings';
 import { chatPlayerContextActions } from './player_context_menu';
+import {
+  talentsFor, computeTalentModifiers, validateAllocation, dormantNodes, pointsSpent,
+  exportBuild, importBuild, cloneAllocation, talentPointsAtLevel, FIRST_TALENT_LEVEL,
+  type TalentAllocation, type TalentNode, type SpecDef, type Role, type TalentEffect,
+} from '../sim/content/talents';
 import {
   clearHotbarSlot, encodeHotbarAction, HOTBAR_ACTION_MIME, HotbarAction, parseHotbarAction, parseHotbarActions,
   placeAbilityOnSlot, placeItemOnSlot, swapHotbarSlots, syncHotbarActions,
@@ -48,19 +58,31 @@ const esc = (value: unknown): string => String(value ?? '')
   .replace(/'/g, '&#39;');
 const castDisplayName = (id: string): string => id === FISHING_CAST_ID ? FISHING_CAST_NAME : ABILITIES[id]?.name ?? id;
 
-const FAMILY_GLYPH: Record<string, string> = {
-  beast: '🐾', humanoid: '🗡️', murloc: '🐟', spider: '🕷️', kobold: '⛏️', undead: '💀',
-  troll: '🦴', ogre: '👊', elemental: '🌀', dragonkin: '🐉',
-};
-const CLASS_GLYPH: Record<string, string> = {
-  warrior: '⚔️', paladin: '🔨', hunter: '🏹', rogue: '🗡️', priest: '✝️',
-  shaman: '🌩️', mage: '🔮', warlock: '🕯️', druid: '🐻',
-};
-
 // Classic class colors (CLASSES[cls].color is a 0xRRGGBB number) as a CSS
 // string, used to color-code party members on the minimap and in the frames.
 const classCss = (cls: string): string =>
   '#' + ((CLASSES as Record<string, { color: number }>)[cls]?.color ?? 0x5fa8ff).toString(16).padStart(6, '0');
+
+// Talent icons derive from a node's effect — an ability-linked node shows that
+// ability's painted icon; a stat/global node shows a themed crest — so they
+// match the spellbook art and the 8 unwritten class trees inherit consistent
+// icons automatically, with no hand-set glyphs to keep in sync.
+const TALENT_STAT_CREST: Record<string, string> = {
+  armorPct: 'talent_armor', armor: 'talent_armor',
+  crit: 'talent_crit', spellPower: 'talent_crit',
+  dodge: 'talent_dodge',
+  ap: 'talent_ap', apPct: 'talent_ap',
+  maxHpPct: 'talent_health', sta: 'talent_health',
+  haste: 'talent_haste',
+};
+function talentEffectIcon(effect: TalentEffect | undefined, kind: string): string {
+  const ab = effect?.grant?.ability ?? effect?.ability?.[0]?.ability;
+  if (ab && ABILITIES[ab]) return iconDataUrl('ability', ab);
+  const stat = effect?.stats ? Object.keys(effect.stats)[0] : undefined;
+  if (stat) return iconDataUrl('crest', TALENT_STAT_CREST[stat] ?? 'talent_generic');
+  if (effect?.global) return iconDataUrl('crest', effect.global.threatPct ? 'talent_armor' : 'talent_crit');
+  return iconDataUrl('crest', kind === 'choice' ? 'talent_choice' : 'talent_generic');
+}
 
 // Party frames dim and the minimap pins members to the rim once they pass
 // this range (yards) — just inside the server's ~120 yd interest scope.
@@ -69,6 +91,12 @@ const PARTY_RANGE_YD = 100;
 // yards past a zone boundary before the crossing banner/welcome commits
 const ZONE_BANNER_DEADBAND = 5;
 const IGNORED_CHAT_NAMES_KEY = 'woc_ignored_chat_names';
+
+// world map: terrain is pre-rendered for the whole zone at this resolution
+// (cached per zone) and a sub-rect is blitted for the current zoom.
+const MAP_BG_RES = 480;
+const MAP_MAX_ZOOM = 6;
+const MAP_DETAIL_ZOOM = 2.2; // at/above this zoom, overlay buildings + vegetation
 
 export class Hud {
   private static readonly BAR_ABILITY_SLOTS = 11; // bar slots 1..11; slot 0 is the fixed Attack toggle
@@ -116,6 +144,11 @@ export class Hud {
   private lastCombatEventAt = 0;
   private lastZoneId = '';
   private mapZoneId = ''; // zone the cached map-window canvas was rendered for
+  private mapZoom = 1; // world-map zoom: 1 = whole zone, up to MAP_MAX_ZOOM
+  private mapCenter: { x: number; z: number } | null = null; // pan target; null = follow player
+  private mapDrag: { px: number; py: number; cx: number; cz: number } | null = null;
+  private mapView: { spanX: number; spanZ: number; minX: number; maxX: number; minZ: number; maxZ: number } | null = null;
+  private mapDecorations: Decoration[] | null = null; // cached trees/rocks (whole world)
   private ignoredChatNames = new Set<string>();
   private socialTab: 'friends' | 'guild' | 'ignore' = 'friends';
   // split signatures: structural changes (tab, guild membership) rebuild the
@@ -130,6 +163,9 @@ export class Hud {
   private socialSuggest: { field: string; items: { name: string; cls: string; level: number }[]; index: number } = { field: '', items: [], index: -1 };
 
   private meters: Meters;
+  // Talents: a local staged allocation the user edits before committing (Apply).
+  private talentStage: TalentAllocation | null = null;
+  private talentTab: 'class' | 'spec' = 'class';
 
   constructor(private sim: IWorld, private renderer: Renderer, private keybinds: Keybinds) {
     this.ignoredChatNames = this.loadIgnoredChatNames();
@@ -140,10 +176,13 @@ export class Hud {
     this.refreshKeybindLabels();
     this.buildXpTicks();
     $('#pf-name').textContent = sim.player.name;
-    this.drawPortrait($('#pf-portrait') as unknown as HTMLCanvasElement, CLASS_GLYPH[sim.cfg.playerClass], CLASSES[sim.cfg.playerClass].color);
+    this.drawPortrait($('#pf-portrait') as unknown as HTMLCanvasElement, `class_${sim.cfg.playerClass}`);
     const mm = $('#minimap') as unknown as HTMLCanvasElement;
     this.minimapCtx = mm.getContext('2d')!;
     this.minimapBg = this.renderTerrainCanvas(140, { minX: WORLD_MIN_X, maxX: WORLD_MAX_X, minZ: WORLD_MIN_Z, maxZ: WORLD_MAX_Z });
+    mm.style.cursor = 'pointer';
+    mm.title = 'Open world map';
+    mm.addEventListener('click', () => this.toggleMap());
     $('#release-btn').addEventListener('click', () => { this.sim.releaseSpirit(); });
     // classic WoW: the player interaction menu opens from the target portrait
     $('#target-frame').addEventListener('contextmenu', (ev) => {
@@ -161,14 +200,56 @@ export class Hud {
     });
     $('#mm-char').addEventListener('click', () => this.toggleChar());
     $('#mm-spell').addEventListener('click', () => this.toggleSpellbook());
+    $('#mm-talents')?.addEventListener('click', () => this.toggleTalents());
     $('#mm-quest').addEventListener('click', () => this.toggleQuestLog());
     $('#mm-map').addEventListener('click', () => this.toggleMap());
     $('#map-close').addEventListener('click', () => { $('#map-window').style.display = 'none'; });
+    const mapCanvas = $('#map-canvas') as unknown as HTMLCanvasElement;
+    mapCanvas.addEventListener('wheel', (ev) => {
+      ev.preventDefault();
+      this.zoomMap((ev as WheelEvent).deltaY < 0 ? 1.2 : 1 / 1.2);
+    }, { passive: false });
+    $('#map-zoom-in')?.addEventListener('click', () => this.zoomMap(1.4));
+    $('#map-zoom-out')?.addEventListener('click', () => this.zoomMap(1 / 1.4));
+    // drag to pan (only meaningful while zoomed in; at zoom 1 the whole zone fits)
+    mapCanvas.addEventListener('pointerdown', (ev) => {
+      if (!this.mapView || this.mapZoom <= 1) return;
+      const base = this.mapCenter ?? { x: this.sim.player.pos.x, z: this.sim.player.pos.z };
+      this.mapCenter = { ...base };
+      this.mapDrag = { px: ev.clientX, py: ev.clientY, cx: base.x, cz: base.z };
+      mapCanvas.setPointerCapture(ev.pointerId);
+      mapCanvas.style.cursor = 'grabbing';
+    });
+    mapCanvas.addEventListener('pointermove', (ev) => {
+      if (!this.mapDrag || !this.mapView) return;
+      const rect = mapCanvas.getBoundingClientRect();
+      // "grab the paper" pan: the world point under the cursor stays under it.
+      // toMap draws +X to the left and +Z up (mx = (maxX-x)/span, my = (maxZ-z)/
+      // span), so a cursor delta of (dx, dy) px shifts the centre by (+dx, +dy)
+      // world units on each axis.
+      const wppx = this.mapView.spanX / rect.width;
+      const wppy = this.mapView.spanZ / rect.height;
+      this.mapCenter = {
+        x: this.mapDrag.cx + (ev.clientX - this.mapDrag.px) * wppx,
+        z: this.mapDrag.cz + (ev.clientY - this.mapDrag.py) * wppy,
+      };
+      this.updateMapWindow();
+    });
+    const endDrag = () => { this.mapDrag = null; mapCanvas.style.cursor = ''; };
+    mapCanvas.addEventListener('pointerup', endDrag);
+    mapCanvas.addEventListener('pointercancel', endDrag);
     $('#mm-bag').addEventListener('click', () => this.toggleBags());
-    $('#social-fab').addEventListener('click', () => this.toggleSocial());
+    $('#mm-social').addEventListener('click', () => this.toggleSocial());
+    $('#mm-options')?.addEventListener('click', () => this.toggleOptionsMenu());
     $('#mm-arena').addEventListener('click', () => this.toggleArena());
+    $('#mm-leaderboard').addEventListener('click', () => this.toggleLeaderboard());
     const musicBtn = $('#mm-music');
-    const styleMusicBtn = () => { musicBtn.style.color = music.enabled ? '#ffd100' : '#666'; };
+    const styleMusicBtn = () => {
+      // keep the note clearly readable when off (a plain tan, not gold) — the
+      // slash, not dimming, signals "muted"
+      musicBtn.style.color = music.enabled ? 'var(--gold)' : '#cdbd8e';
+      musicBtn.classList.toggle('mm-muted', !music.enabled);
+    };
     styleMusicBtn();
     musicBtn.addEventListener('click', () => {
       music.setEnabled(!music.enabled);
@@ -197,19 +278,13 @@ export class Hud {
   // Portraits, icons, tooltips, money
   // -------------------------------------------------------------------------
 
-  private drawPortrait(canvas: HTMLCanvasElement, glyph: string, tint: number): void {
+  // Portrait = the procedural crest for a class (`class_<id>`), mob family
+  // (`family_<id>`) or status (`status_npc`), painted by icons.ts and blitted in.
+  private drawPortrait(canvas: HTMLCanvasElement, crestId: string): void {
     const ctx = canvas.getContext('2d')!;
     const s = canvas.width;
-    const g = ctx.createRadialGradient(s * 0.38, s * 0.32, 2, s / 2, s / 2, s * 0.62);
-    const c = '#' + tint.toString(16).padStart(6, '0');
-    g.addColorStop(0, shade(c, 0.45));
-    g.addColorStop(1, shade(c, -0.65));
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, s, s);
-    ctx.font = `${Math.floor(s * 0.58)}px serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(glyph, s / 2, s / 2 + 2);
+    ctx.clearRect(0, 0, s, s);
+    ctx.drawImage(iconCanvas('crest', crestId, s), 0, 0, s, s);
   }
 
   private itemIcon(item: ItemDef): string {
@@ -554,6 +629,14 @@ export class Hud {
           this.dragAction = null;
           this.clearActionDropTargets();
         });
+        // right-click clears the slot so a full bar can make room for new spells
+        btn.addEventListener('contextmenu', (e) => {
+          e.preventDefault();
+          if (this.hotbarActions[slot - 1] === null) return;
+          this.hotbarActions = clearHotbarSlot(this.hotbarActions, slot - 1);
+          this.saveSlotMap();
+          this.hideTooltip();
+        });
       }
       bar.appendChild(btn);
       this.abilityButtons.push({ btn, label, countEl, keybindEl: kb, cdOverlay, cdText, lastIcon: '' });
@@ -586,6 +669,12 @@ export class Hud {
     this.meters.update();
     this.syncSlotMap(); // picks up newly learned abilities mid-session
 
+    // talent buttons glow while the player has unspent points (and a tree exists)
+    const tp = sim.talentPoints();
+    const talGlow = talentsFor(sim.cfg.playerClass) !== null && tp.spent < tp.total;
+    document.getElementById('mm-talents')?.classList.toggle('has-points', talGlow);
+    document.getElementById('mobile-talents')?.classList.toggle('has-points', talGlow);
+
     // player frame
     $('#pf-level').textContent = String(p.level);
     ($('#pf-hp') as HTMLElement).style.transform = `scaleX(${p.hp / Math.max(1, p.maxHp)})`;
@@ -609,11 +698,13 @@ export class Hud {
       $('#tf-level').textContent = MOBS[target.templateId]?.boss ? '☠' : String(target.level);
       ($('#tf-hp') as HTMLElement).style.transform = `scaleX(${target.hp / Math.max(1, target.maxHp)})`;
       $('#tf-hp-text').textContent = target.dead ? 'Dead' : `${target.hp} / ${target.maxHp}`;
-      ($('#tf-name') as HTMLElement).style.color = target.hostile ? '#ff6b5e' : '#9fdc7f';
+      ($('#tf-name') as HTMLElement).style.color = target.hostile ? 'var(--color-hostile)' : 'var(--color-friendly)';
       if (this.lastPortraitTarget !== target.id) {
         this.lastPortraitTarget = target.id;
-        const glyph = target.kind === 'npc' ? '💬' : FAMILY_GLYPH[MOBS[target.templateId]?.family ?? 'humanoid'] ?? '🗡️';
-        this.drawPortrait($('#tf-portrait') as unknown as HTMLCanvasElement, glyph, target.color);
+        const crestId = target.kind === 'npc'
+          ? 'status_npc'
+          : `family_${MOBS[target.templateId]?.family ?? 'humanoid'}`;
+        this.drawPortrait($('#tf-portrait') as unknown as HTMLCanvasElement, crestId);
       }
       this.renderAuras($('#tf-debuffs'), target, 'debuffs');
       // combo points
@@ -734,11 +825,13 @@ export class Hud {
       ab.btn.classList.toggle('queued', p.queuedOnSwing === a.id);
     }
 
-    // xp bar
-    const xpNeed = xpForLevel(p.level);
-    const xpFrac = p.level >= MAX_LEVEL ? 1 : sim.xp / xpNeed;
-    ($('#xpbar .fill') as HTMLElement).style.width = `${(xpFrac * 100).toFixed(1)}%`;
-    $('#xpbar .label').textContent = p.level >= MAX_LEVEL ? 'MAX LEVEL' : `${sim.xp} / ${xpNeed} XP (${Math.floor(xpFrac * 100)}%)`;
+    // xp bar — pre-cap shows the level bar; post-cap fills toward the next
+    // virtual level (Max-Level XP Overflow), with distinct prestige/gold styling.
+    const showOverflow = (this.optionsHooks?.settings.get('showOverflowXp') ?? 1) >= 0.5;
+    const bar = xpBarView({ level: p.level, xp: sim.xp, lifetimeXp: sim.lifetimeXp, showOverflow });
+    ($('#xpbar .fill') as HTMLElement).style.width = `${(bar.fillFrac * 100).toFixed(1)}%`;
+    $('#xpbar .label').textContent = bar.label;
+    $('#xpbar').classList.toggle('overflow', bar.postCap);
 
     $('#death-overlay').style.display = p.dead ? 'flex' : 'none';
 
@@ -864,6 +957,7 @@ export class Hud {
     const ctx = c.getContext('2d')!;
     const img = ctx.createImageData(W, H);
     const seed = this.sim.cfg.seed;
+    let prevH = 0; // height of the left-neighbour pixel, for free hillshade
     for (let iy = 0; iy < H; iy++) {
       for (let ix = 0; ix < W; ix++) {
         // +Z up, +X LEFT: facing 0 is +Z ("north") and turning right
@@ -886,6 +980,14 @@ export class Hud {
         }
         if (nearHub) { r = 125; g = 100; b = 66; }
         else if (h >= WATER_LEVEL && roadDistance(x, z) < 2.4) { r = 138; g = 111; b = 71; }
+        // hillshade: relief from the west→east slope, reusing the already-computed
+        // left-neighbour height so it costs no extra terrainHeight() calls
+        const left = ix === 0 ? h : prevH;
+        prevH = h;
+        if (h >= WATER_LEVEL) {
+          const shade = Math.max(0.74, Math.min(1.28, 1 + (h - left) * 0.16));
+          r = Math.min(255, r * shade); g = Math.min(255, g * shade); b = Math.min(255, b * shade);
+        }
         const k = (iy * W + ix) * 4;
         img.data[k] = r; img.data[k + 1] = g; img.data[k + 2] = b; img.data[k + 3] = 255;
       }
@@ -912,13 +1014,32 @@ export class Hud {
     const sy = (WORLD_MAX_Z - p.pos.z) * bgPxPerYard - sw / 2;
     ctx.drawImage(bg, sx, sy, sw, sw, 0, 0, S, S);
 
+    // friend/guild lookup for colouring nearby allies (party markers are drawn
+    // separately below, so skip party members here to avoid double dots)
+    const social = this.sim.socialInfo;
+    const friendNames = social ? new Set(social.friends.filter((f) => f.online).map((f) => f.name)) : null;
+    const guildNames = social?.guild ? new Set(social.guild.members.map((m) => m.name)) : null;
+    const partyPids = this.sim.partyInfo ? new Set(this.sim.partyInfo.members.map((m) => m.pid)) : null;
+
     for (const e of this.sim.entities.values()) {
       if (e.id === p.id) continue;
       const dx = -(e.pos.x - p.pos.x) * pxPerYard; // +X is map-left
       const dz = -(e.pos.z - p.pos.z) * pxPerYard;
       const mx = S / 2 + dx, my = S / 2 + dz;
       if ((mx - S / 2) ** 2 + (my - S / 2) ** 2 > (S / 2 - 7) ** 2) continue;
-      if (e.kind === 'npc') {
+      if (e.kind === 'player' && !(partyPids && partyPids.has(e.id))) {
+        const isFriend = friendNames?.has(e.name) ?? false;
+        const isGuild = !isFriend && (guildNames?.has(e.name) ?? false);
+        if (isFriend || isGuild) {
+          ctx.fillStyle = isFriend ? '#4ade80' : '#60a5fa';
+          ctx.strokeStyle = '#000';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.arc(mx, my, 3, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+        }
+      } else if (e.kind === 'npc') {
         const hasAvail = e.questIds.some((q) => QUESTS[q].giverNpcId === e.templateId && this.sim.questState(q) === 'available');
         const hasReady = e.questIds.some((q) => QUESTS[q].turnInNpcId === e.templateId && this.sim.questState(q) === 'ready');
         ctx.fillStyle = '#ffd100';
@@ -1011,6 +1132,7 @@ export class Hud {
   toggleArena(): void {
     const el = $('#arena-window');
     if (el.style.display === 'block') { el.style.display = 'none'; return; }
+    this.closeOtherWindows('#arena-window');
     el.style.display = 'block';
     this.lastArenaSig = '';
     this.fetchArenaLeaderboard();
@@ -1036,7 +1158,7 @@ export class Hud {
     const a = this.sim.arenaInfo;
     if (!a) {
       // offline / not yet synced: arena is an online ranked feature
-      el.innerHTML = `<div class="panel-title"><span>The Ashen Coliseum</span><span class="x-btn" data-close>✕</span></div>`
+      el.innerHTML = `<div class="panel-title"><span>The Ashen Coliseum</span><span class="x-btn" data-close>${svgIcon('close')}</span></div>`
         + `<div class="arena-note">The Ashen Coliseum is a ranked 1v1 arena for the live world. Play online to enter the queue and climb the ladder.</div>`;
       el.querySelector('[data-close]')?.addEventListener('click', () => { el.style.display = 'none'; });
       return;
@@ -1047,14 +1169,14 @@ export class Hud {
       const me = r.pid === myPid;
       const cls = CLASSES[r.cls]?.name ?? r.cls;
       return `<div class="ladder-row${me ? ' me' : ''}"><span class="rank">${i + 1}</span>`
-        + `<span class="lr-name" title="${r.name} — ${cls}">${r.name}</span>`
+        + `<span class="lr-name" title="${esc(r.name)} — ${esc(cls)}">${esc(r.name)}</span>`
         + `<span class="lr-rating">${r.rating}</span>`
         + `<span class="lr-wl">${r.wins}-${r.losses}</span></div>`;
     }).join('') || `<div class="ladder-empty">No challengers ranked yet — be the first.</div>`;
 
     let action: string;
     if (inMatch) {
-      action = `<div class="arena-queue-status">⚔ Match in progress vs ${a.match!.oppName}.</div>`;
+      action = `<div class="arena-queue-status">${svgIcon('arena')} Match in progress vs ${esc(a.match!.oppName)}.</div>`;
     } else if (a.queued) {
       action = `<button class="btn leave" data-act="leave">Leave Queue</button>`
         + `<div class="arena-queue-status">Searching for an opponent… (${a.queueSize} in queue)</div>`;
@@ -1068,7 +1190,7 @@ export class Hud {
       const me = r.name === this.sim.player.name;
       const cls = CLASSES[r.class as keyof typeof CLASSES]?.name ?? r.class;
       return `<div class="ladder-row${me ? ' me' : ''}"><span class="rank">${i + 1}</span>`
-        + `<span class="lr-name" title="${r.name} — Lv ${r.level} ${cls}">${r.name}</span>`
+        + `<span class="lr-name" title="${esc(r.name)} — Lv ${r.level} ${esc(cls)}">${esc(r.name)}</span>`
         + `<span class="lr-rating">${r.rating}</span>`
         + `<span class="lr-wl">${r.wins}-${r.losses}</span></div>`;
     }).join('');
@@ -1080,7 +1202,7 @@ export class Hud {
     if (sig === this.lastArenaSig) return; // nothing changed; skip the DOM churn (and re-bind)
     this.lastArenaSig = sig;
 
-    el.innerHTML = `<div class="panel-title"><span>The Ashen Coliseum <span style="color:#998d6a;font-size:11px">1v1 Ranked</span></span><span class="x-btn" data-close>✕</span></div>`
+    el.innerHTML = `<div class="panel-title"><span>The Ashen Coliseum <span style="color:#998d6a;font-size:11px">1v1 Ranked</span></span><span class="x-btn" data-close>${svgIcon('close')}</span></div>`
       + `<div class="arena-rank"><span class="rating">${a.rating}</span>`
       + `<span class="wl">Rating &middot; <b>${a.wins}</b> wins / <i>${a.losses}</i> losses</span></div>`
       + action
@@ -1110,7 +1232,7 @@ export class Hud {
     if (sig !== this.lastArenaStatusSig) {
       this.lastArenaStatusSig = sig;
       const cls = CLASSES[m.oppClass]?.name ?? m.oppClass;
-      el.innerHTML = `<div class="as-vs">⚔ VS <span class="opp">${m.oppName}</span> <span style="color:#b6ad8c;font-size:11px">Lv ${m.oppLevel} ${cls}</span></div>`
+      el.innerHTML = `<div class="as-vs">${svgIcon('arena')} VS <span class="opp">${esc(m.oppName)}</span> <span style="color:#b6ad8c;font-size:11px">Lv ${m.oppLevel} ${esc(cls)}</span></div>`
         + `<div class="as-timer">${label}</div>`;
       el.style.display = 'block';
     }
@@ -1119,8 +1241,22 @@ export class Hud {
   toggleMap(): void {
     const el = $('#map-window');
     if (el.style.display === 'block') { el.style.display = 'none'; return; }
+    this.closeOtherWindows('#map-window');
+    this.mapZoom = 1; // always open at the full-zone view, following the player
+    this.mapCenter = null;
     el.style.display = 'block';
     this.updateMapWindow();
+  }
+
+  // scroll-wheel / button zoom for the world map (clamped to [1, MAP_MAX_ZOOM])
+  private zoomMap(factor: number): void {
+    const prev = this.mapZoom;
+    this.mapZoom = Math.max(1, Math.min(MAP_MAX_ZOOM, this.mapZoom * factor));
+    // zooming back to 1 resumes following the player; a fresh zoom-in from the
+    // follow view anchors the pan at the player so dragging starts from there
+    if (this.mapZoom === 1) this.mapCenter = null;
+    else if (prev === 1 && !this.mapCenter) this.mapCenter = { x: this.sim.player.pos.x, z: this.sim.player.pos.z };
+    if ($('#map-window').style.display === 'block') this.updateMapWindow();
   }
 
   // The map window shows the zone band the player is standing in (each band
@@ -1137,19 +1273,42 @@ export class Hud {
     const zone: ZoneDef = dungeon
       ? zoneAt(dungeon.doorPos.z)
       : ZONES.find((z) => z.id === this.lastZoneId) ?? zoneAt(p.pos.z);
-    const region = { minX: WORLD_MIN_X, maxX: WORLD_MAX_X, minZ: zone.zMin, maxZ: zone.zMax };
+    const full = { minX: WORLD_MIN_X, maxX: WORLD_MAX_X, minZ: zone.zMin, maxZ: zone.zMax };
     if (!this.mapBg || this.mapZoneId !== zone.id) {
-      this.mapBg = this.renderTerrainCanvas(280, region);
+      this.mapBg = this.renderTerrainCanvas(MAP_BG_RES, full); // whole zone, cached & detailed
       this.mapZoneId = zone.id;
     }
+    // zoomed view: a sub-rectangle of the zone, centred on the player and
+    // clamped to the zone bounds (zoom 1 = the whole zone).
+    const fullSpanX = full.maxX - full.minX;
+    const fullSpanZ = full.maxZ - full.minZ;
+    const spanX = fullSpanX / this.mapZoom;
+    const spanZ = fullSpanZ / this.mapZoom;
+    // centre on the pan target if the user dragged, else follow the player
+    const baseX = this.mapCenter ? this.mapCenter.x : p.pos.x;
+    const baseZ = this.mapCenter ? this.mapCenter.z : p.pos.z;
+    const cx = Math.max(full.minX + spanX / 2, Math.min(full.maxX - spanX / 2, baseX));
+    const cz = Math.max(full.minZ + spanZ / 2, Math.min(full.maxZ - spanZ / 2, baseZ));
+    const region = { minX: cx - spanX / 2, maxX: cx + spanX / 2, minZ: cz - spanZ / 2, maxZ: cz + spanZ / 2 };
+    this.mapView = { spanX, spanZ, minX: full.minX, maxX: full.maxX, minZ: full.minZ, maxZ: full.maxZ };
+    if (!this.mapDrag) canvas.style.cursor = this.mapZoom > 1 ? 'grab' : 'default';
+    // blit the matching sub-rect of the cached terrain (note: +X is map-left)
+    const bg = this.mapBg;
     ctx.imageSmoothingEnabled = true;
-    ctx.drawImage(this.mapBg, 0, 0, S, S);
-    const spanX = region.maxX - region.minX;
-    const spanZ = region.maxZ - region.minZ;
+    ctx.drawImage(
+      bg,
+      ((full.maxX - region.maxX) / fullSpanX) * bg.width,
+      ((full.maxZ - region.maxZ) / fullSpanZ) * bg.height,
+      (spanX / fullSpanX) * bg.width,
+      (spanZ / fullSpanZ) * bg.height,
+      0, 0, S, S,
+    );
     const toMap = (x: number, z: number) => ({
       mx: ((region.maxX - x) / spanX) * S, // +X is map-left (east = -X)
       my: ((region.maxZ - z) / spanZ) * S,
     });
+    // zoomed in far enough → overlay buildings + vegetation (under the labels)
+    if (this.mapZoom >= MAP_DETAIL_ZOOM) this.drawMapDetail(ctx, region, toMap);
     // zone title
     ctx.font = 'bold 16px Georgia';
     ctx.textAlign = 'center';
@@ -1210,6 +1369,93 @@ export class Hud {
       ctx.stroke();
       ctx.restore();
     }
+    // friends (green) and guild members (blue), plotted anywhere in this zone
+    // from the live positions the server streams for online allies. socialInfo
+    // is null offline, so this is online-only.
+    const social = this.sim.socialInfo;
+    if (social) {
+      ctx.lineWidth = 3;
+      ctx.font = 'bold 11px Georgia';
+      ctx.textAlign = 'center';
+      const selfName = p.name;
+      const drawn = new Set<number>();
+      const plotAlly = (m: FriendInfo, color: string) => {
+        if (!m.online || m.x === undefined || m.z === undefined || m.name === selfName || drawn.has(m.id)) return;
+        if (m.z < zone.zMin || m.z >= zone.zMax || m.x > WORLD_MAX_X) return;
+        drawn.add(m.id);
+        const { mx, my } = toMap(m.x, m.z);
+        ctx.fillStyle = color;
+        ctx.strokeStyle = '#000';
+        ctx.beginPath();
+        ctx.arc(mx, my, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = color;
+        ctx.strokeText(m.name, mx, my - 8);
+        ctx.fillText(m.name, mx, my - 8);
+      };
+      for (const f of social.friends) plotAlly(f, '#4ade80'); // friends green (win ties)
+      if (social.guild) for (const m of social.guild.members) plotAlly(m, '#60a5fa');
+    }
+  }
+
+  // Buildings + vegetation overlay for the zoomed-in map, drawn from the same
+  // shared world data the renderer uses (PROPS + generateDecorations), so it
+  // matches the actual world. Only invoked at/above MAP_DETAIL_ZOOM.
+  private drawMapDetail(
+    ctx: CanvasRenderingContext2D,
+    region: { minX: number; maxX: number; minZ: number; maxZ: number },
+    toMap: (x: number, z: number) => { mx: number; my: number },
+  ): void {
+    const inView = (x: number, z: number) =>
+      x >= region.minX - 6 && x <= region.maxX + 6 && z >= region.minZ - 6 && z <= region.maxZ + 6;
+    // px per world unit (use the X axis; footprints stay roughly to scale)
+    const ppu = ((toMap(region.minX + 1, region.minZ).mx - toMap(region.minX, region.minZ).mx) ** 2) ** 0.5;
+
+    // vegetation: pine/oak/rock scattered across the world (cached once)
+    if (!this.mapDecorations) this.mapDecorations = generateDecorations(this.sim.cfg.seed);
+    for (const d of this.mapDecorations) {
+      if (!inView(d.x, d.z)) continue;
+      const { mx, my } = toMap(d.x, d.z);
+      if (d.kind === 'rock') {
+        ctx.fillStyle = '#8c8b86';
+        ctx.beginPath(); ctx.arc(mx, my, Math.max(1.2, ppu * 0.5), 0, Math.PI * 2); ctx.fill();
+      } else {
+        ctx.fillStyle = d.kind === 'tree' ? '#2f6b34' : '#4f8c3a'; // pine darker, oak lighter
+        const r = Math.max(1.6, ppu * 0.8);
+        ctx.beginPath(); ctx.arc(mx, my, r, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+
+    // buildings: rotated footprints (house/inn brown, chapel stone)
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = '#1a140a';
+    for (const b of PROPS.buildings) {
+      if (!inView(b.x, b.z)) continue;
+      const c = Math.cos(b.rot), s = Math.sin(b.rot);
+      const corner = (dx: number, dz: number) => toMap(b.x + dx * c - dz * s, b.z + dx * s + dz * c);
+      const p0 = corner(-b.w / 2, -b.d / 2), p1 = corner(b.w / 2, -b.d / 2);
+      const p2 = corner(b.w / 2, b.d / 2), p3 = corner(-b.w / 2, b.d / 2);
+      ctx.fillStyle = b.kind === 'chapel' ? '#9b9080' : b.kind === 'inn' ? '#8a6233' : '#7a5630';
+      ctx.beginPath();
+      ctx.moveTo(p0.mx, p0.my); ctx.lineTo(p1.mx, p1.my); ctx.lineTo(p2.mx, p2.my); ctx.lineTo(p3.mx, p3.my);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+    }
+
+    // smaller props as dots
+    const dot = (x: number, z: number, color: string, r = Math.max(1.8, ppu * 0.7)) => {
+      if (!inView(x, z)) return;
+      const { mx, my } = toMap(x, z);
+      ctx.fillStyle = color;
+      ctx.beginPath(); ctx.arc(mx, my, r, 0, Math.PI * 2); ctx.fill();
+    };
+    for (const w of PROPS.wells) dot(w.x, w.z, '#5a7fa8');
+    for (const st of PROPS.stalls) dot(st.x, st.z, '#b07a3a');
+    for (const tn of PROPS.tents) dot(tn.x, tn.z, '#9a8a5a');
+    for (const m of PROPS.mines) dot(m.x, m.z, '#6a5a4a');
+    for (const g of PROPS.graveyards) dot(g.x, g.z, '#8a929c');
+    for (const [x, z] of PROPS.mudHuts) dot(x, z, '#7a6a4a');
+    for (const [x, z] of PROPS.campfires) dot(x, z, '#ff9a3c', Math.max(1.4, ppu * 0.5));
   }
 
   // -------------------------------------------------------------------------
@@ -1274,6 +1520,25 @@ export class Hud {
           this.showBanner(`Level ${ev.level}!`);
           this.log(`You have reached level ${ev.level}!`, '#ffd100');
           audio.levelUp();
+          // First talent point (and spec) unlock — nudge the player to the panel.
+          if (ev.level === FIRST_TALENT_LEVEL && talentsFor(this.sim.cfg.playerClass)) {
+            this.showBanner(t('game.talents.unlockBanner'));
+            this.log(t('game.talents.unlockHint'), '#ffd100');
+          }
+          break;
+        }
+        case 'virtualLevelUp': {
+          // cosmetic post-cap "level up" — reuses the levelup banner + sound
+          this.showBanner(`${t('game.progression.virtualLevelUp')} ${ev.level}!`);
+          this.log(`${t('game.progression.virtualLevelUp')} ${ev.level}!`, '#ffd100');
+          audio.levelUp();
+          break;
+        }
+        case 'milestoneUnlocked': {
+          const name = this.milestoneName(ev.milestoneId);
+          this.showBanner(`${t('game.milestone.unlocked')}: ${name}`);
+          this.log(`${t('game.milestone.unlocked')}: ${name}`, '#ffd100');
+          audio.levelUp();
           break;
         }
         case 'learnAbility': break; // logged by sim
@@ -1318,10 +1583,12 @@ export class Hud {
             case 'general': this.chatLogFrom(ev.from, ev.text, '#ffc864', '[General] ', ': '); break;
             case 'guild': this.chatLogFrom(ev.from, ev.text, '#40d264', '[Guild] ', ': '); break;
             case 'officer': this.chatLogFrom(ev.from, ev.text, '#4ce0c0', '[Officer] ', ': '); break;
+            case 'emote': this.chatLogFrom(ev.from, ev.text, '#ff8040', '', ' '); break;
             default: this.chatLogFrom(ev.from, ev.text, '#f0ead8', '', ' says: '); break;
           }
-          if ((ev.channel === 'say' || ev.channel === 'yell') && ev.entityId !== undefined) {
-            this.renderer.showChatBubble(ev.entityId, ev.text, ev.channel === 'yell');
+          if ((ev.channel === 'say' || ev.channel === 'yell' || ev.channel === 'emote') && ev.entityId !== undefined) {
+            const bubble = ev.channel === 'emote' ? `${ev.from} ${ev.text}` : ev.text;
+            this.renderer.showChatBubble(ev.entityId, bubble, ev.channel === 'yell');
           }
           break;
         }
@@ -1515,6 +1782,7 @@ export class Hud {
   openQuestDialog(npcId: number): void {
     const npc = this.sim.entities.get(npcId);
     if (!npc || npc.kind !== 'npc') return;
+    this.closeOtherWindows('#quest-dialog');
     this.renderGossip(npc);
   }
 
@@ -1529,7 +1797,7 @@ export class Hud {
       return (st === 'available' && QUESTS[q].giverNpcId === npc.templateId)
         || (st === 'ready' && QUESTS[q].turnInNpcId === npc.templateId);
     });
-    let html = `<div class="panel-title"><span>${npc.name}<span style="color:#998d6a;font-size:11px"> &lt;${def?.title ?? ''}&gt;</span></span><span class="x-btn" data-close>✕</span></div>`;
+    let html = `<div class="panel-title"><span>${npc.name}<span style="color:#998d6a;font-size:11px"> &lt;${def?.title ?? ''}&gt;</span></span><span class="x-btn" data-close>${svgIcon('close')}</span></div>`;
     html += `<div class="qd-text">"${(def?.greeting ?? 'Greetings.').replace('$C', CLASSES[this.sim.cfg.playerClass].name.toLowerCase())}"</div>`;
     if (interesting.length > 0) {
       for (const qid of interesting) {
@@ -1542,7 +1810,7 @@ export class Hud {
       html += `<div class="qd-list-item" data-vendor="1"><span style="color:#9fdc7f">$</span> Let me browse your goods.</div>`;
     }
     if (def?.market) {
-      html += `<div class="qd-list-item" data-market="1"><span style="color:#ffd24a">⚖</span> Show me the World Market.</div>`;
+      html += `<div class="qd-list-item" data-market="1"><span style="color:#ffd24a">${svgIcon('market')}</span> Show me the World Market.</div>`;
     }
     el.innerHTML = html;
     el.querySelectorAll('[data-quest]').forEach((item) => {
@@ -1565,7 +1833,7 @@ export class Hud {
     const quest = QUESTS[questId];
     const state = this.sim.questState(questId);
     const text = (state === 'ready' ? quest.completionText : quest.text).replace(/\$N/g, this.sim.player.name);
-    let html = `<div class="panel-title"><span>${quest.name}${quest.suggestedPlayers ? ` <span style="color:#f96;font-size:11px">(Suggested players: ${quest.suggestedPlayers})</span>` : ''}</span><span class="x-btn" data-close>✕</span></div>`;
+    let html = `<div class="panel-title"><span>${quest.name}${quest.suggestedPlayers ? ` <span style="color:#f96;font-size:11px">(Suggested players: ${quest.suggestedPlayers})</span>` : ''}</span><span class="x-btn" data-close>${svgIcon('close')}</span></div>`;
     html += `<div class="qd-text">${text}</div>`;
     if (state !== 'ready') {
       const qp = this.sim.questLog.get(questId);
@@ -1629,9 +1897,10 @@ export class Hud {
     if (!mob?.loot) return;
     const visibleItems = mob.loot.items.filter((s) => !s.personalFor || s.personalFor.includes(this.sim.playerId));
     if (mob.loot.copper <= 0 && visibleItems.length === 0) return;
+    this.closeOtherWindows('#loot-window');
     this.openLootMobId = mobId;
     const el = $('#loot-window');
-    let html = `<div class="panel-title"><span>${mob.name}</span><span class="x-btn" data-close>✕</span></div>`;
+    let html = `<div class="panel-title"><span>${mob.name}</span><span class="x-btn" data-close>${svgIcon('close')}</span></div>`;
     if (mob.loot.copper > 0) {
       html += `<div class="loot-item"><img class="item-icon q-common" src="${iconDataUrl('item', 'coin_gold')}" alt="" draggable="false"><span>${this.moneyHtml(mob.loot.copper)}</span></div>`;
     }
@@ -1652,6 +1921,7 @@ export class Hud {
     el.querySelector('[data-close]')?.addEventListener('click', () => this.closeLoot());
     el.style.left = `${Math.min(window.innerWidth - 260, Math.max(10, screenX - 115))}px`;
     el.style.top = `${Math.min(window.innerHeight - 280, Math.max(10, screenY - 30))}px`;
+    el.style.transform = 'none'; // loot pops at the cursor, not the centred slot
     el.style.display = 'block';
   }
 
@@ -1666,7 +1936,9 @@ export class Hud {
   // -------------------------------------------------------------------------
 
   openVendor(npcId: number): void {
+    this.closeOtherWindows(['#vendor-window', '#bags']);
     this.openVendorNpcId = npcId;
+    document.body.classList.add('vendor-open');
     this.renderVendor();
     this.renderBags();
     $('#bags').style.display = 'block';
@@ -1681,7 +1953,7 @@ export class Hud {
     // collapses the scrolled list — drop the tooltip and restore the scroll
     this.hideTooltip();
     const scrollTop = el.scrollTop;
-    let html = `<div class="panel-title"><span>${npc.name} — Goods</span><span class="x-btn" data-close>✕</span></div>`;
+    let html = `<div class="panel-title"><span>${npc.name} — Goods</span><span class="x-btn" data-close>${svgIcon('close')}</span></div>`;
     el.innerHTML = html;
     for (const itemId of npc.vendorItems) {
       const item = ITEMS[itemId];
@@ -1731,6 +2003,7 @@ export class Hud {
   closeVendor(): void {
     $('#vendor-window').style.display = 'none';
     this.openVendorNpcId = null;
+    document.body.classList.remove('vendor-open'); // bags (if still open) re-centres
     this.hideTooltip();
     if ($('#bags').style.display === 'block') this.renderBags();
   }
@@ -1744,6 +2017,7 @@ export class Hud {
   // -------------------------------------------------------------------------
 
   openMarket(): void {
+    this.closeOtherWindows('#market-window');
     this.marketOpen = true;
     this.marketTab = 'browse';
     this.marketSellItem = null;
@@ -1789,7 +2063,7 @@ export class Hud {
     const tab = (id: typeof this.marketTab, label: string, pip = '') =>
       `<div class="mkt-tab${this.marketTab === id ? ' sel' : ''}" data-tab="${id}">${label}${pip}</div>`;
     el.innerHTML =
-      `<div class="panel-title"><span>The World Market <span style="color:#998d6a;font-size:11px">— the Merchant's exchange</span></span><span class="x-btn" data-close>✕</span></div>`
+      `<div class="panel-title"><span>The World Market <span style="color:#998d6a;font-size:11px">— the Merchant's exchange</span></span><span class="x-btn" data-close>${svgIcon('close')}</span></div>`
       + `<div class="mkt-tabs">`
       + tab('browse', 'Browse')
       + tab('sell', 'Sell')
@@ -1849,7 +2123,7 @@ export class Hud {
       row.innerHTML =
         `${this.itemIcon(item)}`
         + `<span class="mkt-name"><span class="nm" style="color:${qColor}">${item.name}${l.count > 1 ? ' <span style="color:#ccc">x' + l.count + '</span>' : ''}</span>`
-        + `<span class="seller${l.house ? ' house' : ''}">${l.house ? "Merchant's stock" : l.sellerName}</span></span>`
+        + `<span class="seller${l.house ? ' house' : ''}">${l.house ? "Merchant's stock" : esc(l.sellerName)}</span></span>`
         + `<span class="mkt-price">${this.moneyHtml(l.price)}${each}</span>`;
       const btn = document.createElement('button');
       btn.className = 'mkt-btn' + (l.mine ? ' cancel' : '');
@@ -1950,6 +2224,7 @@ export class Hud {
   toggleBags(): void {
     const el = $('#bags');
     if (el.style.display === 'block') { el.style.display = 'none'; this.hideTooltip(); audio.bagClose(); return; }
+    this.closeOtherWindows('#bags');
     this.renderBags();
     el.style.display = 'block';
     audio.bagOpen();
@@ -1960,13 +2235,17 @@ export class Hud {
   onInventoryChanged(): void {
     if ($('#bags').style.display === 'block') this.renderBags();
     if (this.openVendorNpcId !== null) this.renderVendor();
+    this.renderCharIfOpen();
+  }
+
+  private renderCharIfOpen(): void {
     if ($('#char-window').style.display === 'block') this.renderChar();
   }
 
   renderBags(): void {
     const el = $('#bags');
     const sim = this.sim;
-    el.innerHTML = `<div class="panel-title"><span>Bags</span><span class="x-btn" data-close>✕</span></div>`;
+    el.innerHTML = `<div class="panel-title"><span>Bags</span><span class="x-btn" data-close>${svgIcon('close')}</span></div>`;
     const grid = document.createElement('div');
     grid.className = 'bag-grid';
     if (sim.inventory.length === 0) {
@@ -1988,9 +2267,12 @@ export class Hud {
           this.renderMarket();
         } else if (this.vendorOpen) {
           this.sellBagItem(s, ev);
+        } else if (item.kind === 'quest') {
+          this.showDiscardItemPrompt(s.itemId, Math.max(1, Math.floor(s.count)));
         } else {
           this.sim.useItem(s.itemId);
           this.renderBags();
+          this.renderCharIfOpen();
         }
       });
       row.addEventListener('contextmenu', (ev) => {
@@ -2016,7 +2298,8 @@ export class Hud {
         let extra = '';
         if (this.tradeOpen) extra = '<div class="tt-sub">Click to offer in trade</div>';
         else if (this.marketOpen && this.marketTab === 'sell') extra = item.kind === 'quest' ? '<div class="tt-sub">Cannot be sold on the market</div>' : '<div class="tt-sub">Click to put on the market</div>';
-        else if (this.vendorOpen) extra = '<div class="tt-sub">Click to sell</div>';
+        else if (this.vendorOpen) extra = item.kind === 'quest' ? '<div class="tt-sub">Cannot be sold to merchants</div>' : '<div class="tt-sub">Click to sell</div>';
+        else if (item.kind === 'quest') extra = '<div class="tt-sub">Click to destroy</div>';
         else if (item.kind === 'weapon' || item.kind === 'armor') extra = '<div class="tt-sub">Click to equip</div>';
         else if (item.kind === 'food' || item.kind === 'drink') extra = '<div class="tt-sub">Click to consume</div>';
         else if (item.kind === 'potion') extra = '<div class="tt-sub">Click to use — instant, usable in combat</div>';
@@ -2042,6 +2325,51 @@ export class Hud {
     } else {
       this.sim.sellItem(slot.itemId);
     }
+  }
+
+  private showDiscardItemPrompt(itemId: string, maxCount: number): void {
+    document.querySelectorAll('.discard-item-prompt').forEach((el) => el.remove());
+    const item = ITEMS[itemId];
+    const stack = $('#prompt-stack');
+    const prompt = document.createElement('div');
+    prompt.className = 'prompt panel discard-item-prompt';
+    prompt.innerHTML = `<div class="prompt-text">Destroy ${esc(item?.name ?? itemId)}</div>`;
+    let input: HTMLInputElement | null = null;
+    if (maxCount > 1) {
+      input = document.createElement('input');
+      input.className = 'prompt-number';
+      input.type = 'number';
+      input.min = '1';
+      input.max = String(maxCount);
+      input.step = '1';
+      input.value = '1';
+      prompt.appendChild(input);
+    }
+    const confirm = document.createElement('button');
+    confirm.className = 'btn';
+    confirm.textContent = 'Destroy';
+    const cancel = document.createElement('button');
+    cancel.className = 'btn';
+    cancel.textContent = 'Cancel';
+    const close = () => prompt.remove();
+    const submit = () => {
+      const count = input ? Math.max(1, Math.min(maxCount, Math.floor(Number(input.value) || 0))) : 1;
+      this.sim.discardItem(itemId, count);
+      close();
+      this.hideTooltip();
+      this.renderBags();
+    };
+    confirm.addEventListener('click', submit);
+    cancel.addEventListener('click', close);
+    if (input) {
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') submit();
+        else if (e.key === 'Escape') close();
+      });
+    }
+    prompt.append(confirm, cancel);
+    stack.appendChild(prompt);
+    if (input) window.setTimeout(() => { input.focus(); input.select(); }, 0);
   }
 
   private showSellQuantityPrompt(itemId: string, maxCount: number): void {
@@ -2088,6 +2416,7 @@ export class Hud {
   toggleChar(): void {
     const el = $('#char-window');
     if (el.style.display === 'block') { el.style.display = 'none'; this.hideTooltip(); return; }
+    this.closeOtherWindows('#char-window');
     this.renderChar();
     el.style.display = 'block';
   }
@@ -2097,7 +2426,7 @@ export class Hud {
     const sim = this.sim;
     const p = sim.player;
     const cls = CLASSES[sim.cfg.playerClass];
-    let html = `<div class="panel-title"><span>${p.name} <span style="color:#998d6a;font-size:11px">Level ${p.level} ${cls.name}</span></span><span class="x-btn" data-close>✕</span></div>`;
+    let html = `<div class="panel-title"><span>${p.name} <span style="color:#998d6a;font-size:11px">Level ${p.level} ${cls.name}</span></span><span class="x-btn" data-close>${svgIcon('close')}</span></div>`;
     html += `<div class="paperdoll"><div class="equip-col" id="equip-col"></div></div>`;
     const wpn = sim.equipment.mainhand ? ITEMS[sim.equipment.mainhand] : null;
     const dps = wpn?.weapon ? ((wpn.weapon.min + wpn.weapon.max) / 2 + (p.attackPower / 14) * wpn.weapon.speed) / wpn.weapon.speed : 0;
@@ -2108,7 +2437,10 @@ export class Hud {
       <span>Intellect: <b>${p.stats.int}</b></span><span>Crit Chance: <b>${(p.critChance * 100).toFixed(1)}%</b></span>
       <span>Spirit: <b>${p.stats.spi}</b></span><span>Dodge: <b>${(p.dodgeChance * 100).toFixed(1)}%</b></span>
     </div>`;
+    html += this.talentSummaryHtml();
+    html += this.progressionHtml(p.level);
     el.innerHTML = html;
+    el.querySelector('[data-act="prestige"]')?.addEventListener('click', () => this.openPrestigeDialog());
     const col = el.querySelector('#equip-col')!;
     const slots: { key: 'mainhand' | 'chest' | 'legs' | 'feet'; name: string }[] = [
       { key: 'mainhand', name: 'Main Hand' },
@@ -2131,12 +2463,274 @@ export class Hud {
   }
 
   // -------------------------------------------------------------------------
+  // Post-cap progression (Max-Level XP Overflow): character-sheet block,
+  // milestone badges, prestige dialog, and the lifetime-XP leaderboard panel.
+  // -------------------------------------------------------------------------
+
+  private milestoneName(id: string): string {
+    switch (id) {
+      case 'veteran': return t('game.milestone.veteran');
+      case 'champion': return t('game.milestone.champion');
+      case 'paragon': return t('game.milestone.paragon');
+      case 'mythic': return t('game.milestone.mythic');
+      case 'eternal': return t('game.milestone.eternal');
+      default: return id;
+    }
+  }
+
+  // Character-sheet summary of the current specialization, role, and Mastery
+  // (FR-8.6). Reuses the progression-block styling.
+  private talentSummaryHtml(): string {
+    const ct = talentsFor(this.sim.cfg.playerClass);
+    if (!ct) return '';
+    const sp = ct.specs.find((s) => s.id === this.sim.talentSpec);
+    const specName = sp ? esc(sp.name) : t('game.talents.noSpec');
+    let html = `<div class="char-progression"><div class="cp-title">${t('game.talents.specTab')}</div>`;
+    html += `<div class="char-stats cp-stats"><span>${t('game.talents.specTab')}: <b>${specName}</b></span>`;
+    if (sp) html += `<span>${t('game.talents.role')}: <b>${this.roleLabel(sp.role)}</b></span>`;
+    html += `</div>`;
+    if (sp) html += `<div class="cp-milestones"><span class="cp-ms-label">${t('game.talents.mastery')}:</span> <b style="color:var(--gold)">${esc(sp.mastery.name)}</b> <span class="cp-none">${esc(sp.mastery.description)}</span></div>`;
+    return html + `</div>`;
+  }
+
+  // The "Progression" group on the character sheet: total XP, virtual level,
+  // prestige rank (when prestiged), unlocked milestone badges, and — at the cap
+  // — the opt-in Prestige button.
+  private progressionHtml(level: number): string {
+    const sim = this.sim;
+    const vlevel = virtualLevel(sim.lifetimeXp);
+    const unlocked = new Set(sim.unlockedMilestones);
+    const badges = MILESTONES.filter((m) => unlocked.has(m.id))
+      .map((m) => `<span class="ms-badge ms-${m.kind}">${this.milestoneName(m.id)}</span>`)
+      .join('');
+    let html = `<div class="cp-title">${t('game.progression.heading')}</div>`;
+    html += `<div class="char-stats cp-stats">
+      <span>${t('game.progression.totalXp')}: <b>${formatXp(sim.lifetimeXp)}</b></span>
+      <span>${t('game.progression.virtualLevel')}: <b>${vlevel}</b></span>`;
+    if (sim.prestigeRank > 0) html += `<span>${t('game.progression.prestigeRank')}: <b>★ ${sim.prestigeRank}</b></span>`;
+    html += `</div>`;
+    html += `<div class="cp-milestones"><span class="cp-ms-label">${t('game.progression.milestones')}:</span> ${badges || `<span class="cp-none">${t('game.progression.none')}</span>`}</div>`;
+    if (level >= MAX_LEVEL) {
+      // The button reflects the server's authoritative prestige gate (post-cap
+      // XP earned). It's disabled — and the requirement shown — until eligible;
+      // the server re-checks regardless, so a forged click does nothing.
+      const ready = canPrestige(level, sim.lifetimeXp, sim.prestigeRank);
+      html += `<div class="cp-actions"><button class="btn" data-act="prestige"${ready ? '' : ' disabled'}>${t('game.prestige.action')}${sim.prestigeRank > 0 ? ` (★ ${sim.prestigeRank})` : ''}</button>`;
+      if (!ready) html += `<span class="cp-hint">${formatXp(xpUntilNextPrestige(sim.lifetimeXp, sim.prestigeRank))} ${t('game.prestige.needXp')}</span>`;
+      html += `</div>`;
+    }
+    return `<div class="char-progression">${html}</div>`;
+  }
+
+  private openPrestigeDialog(): void {
+    const p = this.sim.player;
+    // Mirror the server's gate; the server enforces it authoritatively anyway.
+    if (!canPrestige(p.level, this.sim.lifetimeXp, this.sim.prestigeRank)) {
+      this.showError(p.level < MAX_LEVEL
+        ? t('game.prestige.needCap')
+        : `${formatXp(xpUntilNextPrestige(this.sim.lifetimeXp, this.sim.prestigeRank))} ${t('game.prestige.needXp')}`);
+      return;
+    }
+    this.confirmDialog(
+      t('game.prestige.title'),
+      t('game.prestige.body'),
+      t('game.prestige.confirm'),
+      t('game.prestige.cancel'),
+      () => { this.sim.prestige(); audio.click(); },
+    );
+  }
+
+  // Minimal modal confirm dialog (reuses the .window/.panel chrome). Used by the
+  // prestige flow; built on demand and removed on dismiss.
+  private confirmDialog(title: string, body: string, okText: string, cancelText: string, onOk: () => void): void {
+    document.getElementById('confirm-dialog')?.remove();
+    const el = document.createElement('div');
+    el.id = 'confirm-dialog';
+    el.className = 'window panel';
+    el.style.display = 'block';
+    el.innerHTML = `<div class="panel-title"><span>${title}</span><span class="x-btn" data-cancel>${svgIcon('close')}</span></div>`
+      + `<div class="cd-body">${body}</div>`
+      + `<div class="cd-actions"><button class="btn" data-cancel>${cancelText}</button><button class="btn cd-ok" data-ok>${okText}</button></div>`;
+    document.body.appendChild(el);
+    const close = () => el.remove();
+    el.querySelectorAll('[data-cancel]').forEach((b) => b.addEventListener('click', () => { audio.click(); close(); }));
+    el.querySelector('[data-ok]')?.addEventListener('click', () => { close(); onOk(); });
+  }
+
+  // In-app text-input modal (reuses the confirm-dialog chrome) — replaces native
+  // window.prompt for build name / import / export. `readOnly` + `copy` powers
+  // the export view (selectable string + Copy button).
+  private inputDialog(opts: {
+    title: string; label?: string; value?: string; placeholder?: string;
+    multiline?: boolean; readOnly?: boolean; copy?: boolean;
+    selectText?: boolean;
+    okText?: string; cancelText?: string; onOk?: (value: string) => void;
+  }): void {
+    document.getElementById('confirm-dialog')?.remove();
+    const el = document.createElement('div');
+    el.id = 'confirm-dialog';
+    el.className = 'window panel';
+    el.style.display = 'block';
+    const field = opts.multiline
+      ? `<textarea class="cd-input" rows="3" ${opts.readOnly ? 'readonly' : ''} placeholder="${esc(opts.placeholder ?? '')}">${esc(opts.value ?? '')}</textarea>`
+      : `<input class="cd-input" type="text" ${opts.readOnly ? 'readonly' : ''} placeholder="${esc(opts.placeholder ?? '')}" value="${esc(opts.value ?? '')}">`;
+    el.innerHTML = `<div class="panel-title"><span>${esc(opts.title)}</span><span class="x-btn" data-cancel>${svgIcon('close')}</span></div>`
+      + (opts.label ? `<div class="cd-body">${esc(opts.label)}</div>` : '')
+      + `<div class="cd-field">${field}</div>`
+      + `<div class="cd-actions"><button class="btn" data-cancel>${esc(opts.cancelText ?? t('game.talents.cancel'))}</button>`
+      + (opts.copy ? `<button class="btn" data-copy>${t('game.talents.copy')}</button>` : '')
+      + (opts.onOk ? `<button class="btn cd-ok" data-ok>${esc(opts.okText ?? t('game.talents.save'))}</button>` : '')
+      + `</div>`;
+    document.body.appendChild(el);
+    const input = el.querySelector('.cd-input') as HTMLInputElement | HTMLTextAreaElement;
+    const close = () => el.remove();
+    const submit = () => { const v = input?.value ?? ''; close(); opts.onOk?.(v); };
+    el.querySelectorAll('[data-cancel]').forEach((b) => b.addEventListener('click', () => { audio.click(); close(); }));
+    el.querySelector('[data-ok]')?.addEventListener('click', submit);
+    el.querySelector('[data-copy]')?.addEventListener('click', () => {
+      input.select();
+      navigator.clipboard?.writeText(input.value).catch(() => { /* clipboard blocked; manual select still works */ });
+      this.showError(t('game.talents.exportCopied'));
+    });
+    if (!opts.multiline) input?.addEventListener('keydown', (e) => { if ((e as KeyboardEvent).key === 'Enter') { e.preventDefault(); submit(); } });
+    input?.focus();
+    if (opts.readOnly || opts.selectText) input?.select?.();
+  }
+
+  // Generic in-app dropdown (replaces native <select>). The selected value lives
+  // in root.dataset.value; pass onChange to react live. Closes on click-away.
+  private buildDropdown(options: { value: string; label: string }[], current: string, onChange?: (value: string) => void, placeholder?: string): HTMLElement {
+    const root = document.createElement('div');
+    root.className = 'ui-dd';
+    root.dataset.value = current;
+    const labelOf = (v: string) => options.find((o) => o.value === v)?.label ?? placeholder ?? '';
+    root.innerHTML = `<button type="button" class="btn ui-dd-btn"><span class="ui-dd-label">${esc(labelOf(current))}</span><span class="ui-dd-caret">▾</span></button>`
+      + `<div class="ui-dd-menu" hidden>${options.map((o) => `<div class="ui-dd-item${o.value === current ? ' sel' : ''}" data-val="${esc(o.value)}">${esc(o.label)}</div>`).join('')}</div>`;
+    const menu = root.querySelector('.ui-dd-menu') as HTMLElement;
+    const labelEl = root.querySelector('.ui-dd-label') as HTMLElement;
+    root.querySelector('.ui-dd-btn')!.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (menu.hasAttribute('hidden')) {
+        menu.removeAttribute('hidden');
+        setTimeout(() => document.addEventListener('click', () => menu.setAttribute('hidden', ''), { once: true }), 0);
+      } else menu.setAttribute('hidden', '');
+    });
+    root.querySelectorAll('.ui-dd-item').forEach((item) => item.addEventListener('click', () => {
+      const v = item.getAttribute('data-val') ?? '';
+      root.dataset.value = v;
+      labelEl.textContent = labelOf(v);
+      root.querySelectorAll('.ui-dd-item').forEach((x) => x.classList.toggle('sel', x === item));
+      menu.setAttribute('hidden', '');
+      onChange?.(v);
+    }));
+    return root;
+  }
+
+  // WoW-style choice-node picker: clicking an octagon node opens a flyout of its
+  // options; selecting one assigns it (spending a point if needed). Anchored to
+  // the node, closes on click-away.
+  private openChoicePopup(anchor: HTMLElement, node: TalentNode, stage: TalentAllocation): void {
+    document.getElementById('tal-choice-pop')?.remove();
+    const cls = this.sim.cfg.playerClass;
+    const total = this.sim.talentPoints().total;
+    const ranks = stage.ranks[node.id] ?? 0;
+    const pop = document.createElement('div');
+    pop.id = 'tal-choice-pop';
+    pop.className = 'tal-choice-pop';
+    pop.setAttribute('role', 'menu');
+    pop.setAttribute('aria-label', node.name);
+    pop.innerHTML = (node.choices ?? []).map((o) => {
+      const sel = stage.choices[node.id] === o.id;
+      return `<div class="tal-choice-opt${sel ? ' sel' : ''}" role="menuitemradio" tabindex="0" aria-checked="${sel}" data-opt="${esc(o.id)}"><span class="tco-icon" style="background-image:url(${talentEffectIcon(o.effect, 'passive')})"></span>`
+        + `<span class="tco-text"><b>${esc(o.name)}</b><span>${esc(o.description)}</span></span></div>`;
+    }).join('');
+    document.body.appendChild(pop);
+    const r = anchor.getBoundingClientRect();
+    const preferredLeft = r.left + r.width / 2 - pop.offsetWidth / 2;
+    const left = Math.max(8, Math.min(window.innerWidth - pop.offsetWidth - 8, preferredLeft));
+    const top = Math.max(8, Math.min(window.innerHeight - pop.offsetHeight - 8, r.bottom + 12));
+    const caretLeft = Math.max(14, Math.min(pop.offsetWidth - 14, r.left + r.width / 2 - left));
+    pop.style.left = `${left}px`;
+    pop.style.top = `${top}px`;
+    pop.style.setProperty('--tal-choice-caret-left', `${caretLeft}px`);
+    const choose = (optEl: Element) => {
+      const optId = optEl.getAttribute('data-opt') ?? '';
+      if (ranks === 0) {
+        const cand = cloneAllocation(stage);
+        cand.ranks[node.id] = 1; cand.choices[node.id] = optId;
+        if (!validateAllocation(cls, cand, total).ok) { pop.remove(); return; } // can't afford / gated
+        stage.ranks[node.id] = 1;
+      }
+      stage.choices[node.id] = optId;
+      pop.remove();
+      this.renderTalents();
+    };
+    pop.querySelectorAll('.tal-choice-opt').forEach((optEl) => {
+      optEl.addEventListener('click', (e) => {
+        e.stopPropagation();
+        choose(optEl);
+      });
+      optEl.addEventListener('keydown', (e) => {
+        const ke = e as KeyboardEvent;
+        if (ke.key === 'Escape') { ke.preventDefault(); pop.remove(); anchor.focus(); return; }
+        this.keyboardActivate(ke, () => choose(optEl));
+      });
+    });
+    const firstOpt = (pop.querySelector('.tal-choice-opt.sel') ?? pop.querySelector('.tal-choice-opt')) as HTMLElement | null;
+    firstOpt?.focus();
+    setTimeout(() => document.addEventListener('click', () => pop.remove(), { once: true }), 0);
+  }
+
+  toggleLeaderboard(): void {
+    const el = $('#leaderboard-window');
+    if (el.style.display === 'block') { el.style.display = 'none'; this.hideTooltip(); return; }
+    this.closeOtherWindows('#leaderboard-window');
+    el.style.display = 'block';
+    void this.renderLeaderboard();
+  }
+
+  async renderLeaderboard(): Promise<void> {
+    const el = $('#leaderboard-window');
+    const myName = this.sim.player.name;
+    el.innerHTML = `<div class="panel-title"><span>${t('game.leaderboard.title')} <span style="color:#998d6a;font-size:11px">${t('game.leaderboard.subtitle')}${this.sim.realm ? ` &middot; ${this.sim.realm}` : ''}</span></span><span class="x-btn" data-close>${svgIcon('close')}</span></div>`
+      + `<div class="lb-body"><div class="lb-loading">${t('game.leaderboard.loading')}</div></div>`;
+    el.querySelector('[data-close]')?.addEventListener('click', () => { el.style.display = 'none'; });
+
+    let rows: LeaderboardEntry[] = [];
+    try { rows = await this.sim.leaderboard(); } catch { rows = []; }
+    // panel may have been closed while the fetch was in flight
+    if (el.style.display !== 'block') return;
+    const body = el.querySelector('.lb-body')!;
+    if (rows.length === 0) {
+      body.innerHTML = `<div class="lb-empty">${t('game.leaderboard.empty')}</div>`;
+      return;
+    }
+    const header = `<div class="lb-row lb-head"><span class="lb-rank">${t('game.leaderboard.rank')}</span><span class="lb-name">${t('game.leaderboard.name')}</span><span class="lb-lvl">${t('game.leaderboard.level')}</span><span class="lb-vlvl">${t('game.leaderboard.vlevel')}</span><span class="lb-xp">${t('game.leaderboard.lifetimeXp')}</span></div>`;
+    const rowHtml = (r: LeaderboardEntry, mine: boolean): string => {
+      const cls = CLASSES[r.cls];
+      const star = r.prestigeRank > 0 ? `<span class="lb-prestige" title="${t('game.prestige.rank')} ${r.prestigeRank}">★${r.prestigeRank}</span> ` : '';
+      const title = cls ? ` title="${cls.name}"` : '';
+      return `<div class="lb-row${mine ? ' lb-mine' : ''}"><span class="lb-rank">${r.rank}</span>`
+        + `<span class="lb-name"${title}>${star}${r.name}${mine ? ` <span class="lb-you">(${t('game.leaderboard.you')})</span>` : ''}</span>`
+        + `<span class="lb-lvl">${r.level}</span><span class="lb-vlvl">${r.virtualLevel}</span><span class="lb-xp">${formatXp(r.lifetimeXp)}</span></div>`;
+    };
+    const mineIndex = rows.findIndex((r) => r.name === myName);
+    let html = header + rows.map((r) => rowHtml(r, r.name === myName)).join('');
+    // sticky "your standing" row when the viewer is outside the visible list
+    if (mineIndex === -1) {
+      html += `<div class="lb-sticky"><div class="lb-row lb-mine"><span class="lb-rank">—</span><span class="lb-name">${myName} <span class="lb-you">(${t('game.leaderboard.you')})</span></span><span class="lb-lvl">${this.sim.player.level}</span><span class="lb-vlvl">${virtualLevel(this.sim.lifetimeXp)}</span><span class="lb-xp">${formatXp(this.sim.lifetimeXp)}</span></div></div>`;
+    }
+    body.innerHTML = html;
+  }
+
+  // -------------------------------------------------------------------------
   // Spellbook
   // -------------------------------------------------------------------------
 
   toggleSpellbook(): void {
     const el = $('#spellbook');
     if (el.style.display === 'block') { el.style.display = 'none'; this.hideTooltip(); return; }
+    this.closeOtherWindows('#spellbook');
     this.renderSpellbook();
     el.style.display = 'block';
   }
@@ -2144,7 +2738,7 @@ export class Hud {
   renderSpellbook(): void {
     const el = $('#spellbook');
     const sim = this.sim;
-    el.innerHTML = `<div class="panel-title"><span>Spellbook</span><span class="x-btn" data-close>✕</span></div>`;
+    el.innerHTML = `<div class="panel-title"><span>Spellbook</span><span class="x-btn" data-close>${svgIcon('close')}</span></div>`;
     const cls = CLASSES[sim.cfg.playerClass];
     for (const abilityId of cls.abilities) {
       const def = ABILITIES[abilityId];
@@ -2176,12 +2770,381 @@ export class Hud {
   }
 
   // -------------------------------------------------------------------------
+  // Talents & Specializations panel (bound to 'N'). Staged-edit model: the user
+  // edits a local copy (talentStage), then Apply commits the whole build via the
+  // server-authoritative IWorld.applyTalents (which re-validates). Class/Spec
+  // tabs, shape-coded nodes (square=active, circle=passive, octagon=choice),
+  // prereq arrows, dormant (red) dependents, loadouts, and import/export.
+  // -------------------------------------------------------------------------
+
+  toggleTalents(): void {
+    const el = $('#talents-window');
+    if (el.style.display === 'block') { el.style.display = 'none'; this.hideTooltip(); this.talentStage = null; return; }
+    this.closeOtherWindows('#talents-window');
+    this.talentStage = cloneAllocation(this.sim.talents);
+    this.renderTalents();
+    el.style.display = 'block';
+  }
+
+  private roleLabel(role: Role): string {
+    return role === 'tank' ? t('game.talents.roleTank') : role === 'healer' ? t('game.talents.roleHealer') : t('game.talents.roleDps');
+  }
+
+  private keyboardActivate(e: KeyboardEvent, action: () => void): void {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    action();
+  }
+
+  // Structural equality of two allocations (ignores key order / zero ranks), so
+  // the Apply button only lights up on a real change.
+  private allocsEqual(a: TalentAllocation, b: TalentAllocation): boolean {
+    if ((a.spec ?? null) !== (b.spec ?? null)) return false;
+    const ak = Object.keys(a.ranks).filter((k) => a.ranks[k] > 0).sort();
+    const bk = Object.keys(b.ranks).filter((k) => b.ranks[k] > 0).sort();
+    if (ak.length !== bk.length || ak.some((k, i) => k !== bk[i] || a.ranks[k] !== b.ranks[k])) return false;
+    for (const k of ak) if ((a.choices[k] ?? null) !== (b.choices[k] ?? null)) return false;
+    return true;
+  }
+
+  renderTalents(): void {
+    const el = $('#talents-window');
+    if (el.style.display !== 'block' && this.talentStage === null) return;
+    const cls = this.sim.cfg.playerClass;
+    const ct = talentsFor(cls);
+    const close = `<span class="x-btn" data-close>${svgIcon('close')}</span>`;
+    if (!ct) {
+      el.innerHTML = `<div class="panel-title"><span>${t('game.talents.title')} <span style="color:#998d6a;font-size:11px">${esc(CLASSES[cls].name)}</span></span>${close}</div>`
+        + `<div class="tal-empty tal-coming-soon" data-talents-coming-soon>`
+        + `<b>${t('game.talents.comingSoonTitle')}</b>`
+        + `<span>${t('game.talents.comingSoonBody')}</span>`
+        + `</div>`;
+      el.querySelector('[data-close]')?.addEventListener('click', () => { el.style.display = 'none'; this.hideTooltip(); });
+      return;
+    }
+    const stage = this.talentStage ?? (this.talentStage = cloneAllocation(this.sim.talents));
+    const total = this.sim.talentPoints().total;
+    const spent = pointsSpent(stage);
+    const treeSpent = (tree: 'class' | 'spec') => ct.nodes
+      .filter((n) => n.tree === tree && (tree === 'class' || n.specId === stage.spec))
+      .reduce((a, n) => a + (stage.ranks[n.id] ?? 0), 0);
+
+    el.innerHTML =
+      `<div class="panel-title"><span>${t('game.talents.title')} <span style="color:#998d6a;font-size:11px">${esc(CLASSES[cls].name)}</span></span>${close}</div>`
+      + `<div class="tal-head"><span>${t('game.talents.available')}: <b>${Math.max(0, total - spent)}</b> / ${total}</span><span>${t('game.talents.spent')}: <b>${spent}</b></span></div>`
+      + `<div class="tal-help">${esc(t('game.talents.pointSource').replace('{first}', String(FIRST_TALENT_LEVEL)).replace('{cap}', String(MAX_LEVEL)))}</div>`
+      + `<div class="tal-tabs" role="tablist" aria-label="${esc(t('game.talents.title'))}">`
+      + `<div class="tal-tab${this.talentTab === 'class' ? ' active' : ''}" role="tab" tabindex="${this.talentTab === 'class' ? '0' : '-1'}" aria-selected="${this.talentTab === 'class'}" aria-controls="tal-body" data-tab="class"><span class="tal-tab-label">${t('game.talents.classTab')}</span><span class="tt-pts">${treeSpent('class')}</span></div>`
+      + `<div class="tal-tab${this.talentTab === 'spec' ? ' active' : ''}" role="tab" tabindex="${this.talentTab === 'spec' ? '0' : '-1'}" aria-selected="${this.talentTab === 'spec'}" aria-controls="tal-body" data-tab="spec"><span class="tal-tab-label">${t('game.talents.specTab')}</span><span class="tt-pts">${treeSpent('spec')}</span></div>`
+      + `</div><div id="tal-body" role="tabpanel"></div>`
+      + this.talentFooterHtml(stage, total, spent);
+
+    const switchTab = (tab: HTMLElement) => {
+      this.talentTab = tab.dataset.tab as 'class' | 'spec';
+      this.renderTalents();
+    };
+    el.querySelectorAll('.tal-tab').forEach((tab) => {
+      tab.addEventListener('click', () => switchTab(tab as HTMLElement));
+      tab.addEventListener('keydown', (e) => this.keyboardActivate(e as KeyboardEvent, () => switchTab(tab as HTMLElement)));
+    });
+    el.querySelector('[data-close]')?.addEventListener('click', () => { el.style.display = 'none'; this.hideTooltip(); this.talentStage = null; });
+
+    const body = el.querySelector('#tal-body') as HTMLElement;
+    if (this.talentTab === 'class') {
+      const tree = document.createElement('div'); tree.className = 'tal-tree'; body.appendChild(tree);
+      this.renderTalentTree(tree, ct, stage, 'class', undefined);
+    } else {
+      this.renderSpecTab(body, ct, stage);
+    }
+    this.wireTalentFooter(el, stage, total);
+  }
+
+  private renderSpecTab(body: HTMLElement, ct: NonNullable<ReturnType<typeof talentsFor>>, stage: TalentAllocation): void {
+    const picker = document.createElement('div'); picker.className = 'tal-specs';
+    picker.setAttribute('role', 'radiogroup');
+    picker.setAttribute('aria-label', t('game.talents.specTab'));
+    for (const sp of ct.specs) {
+      const card = document.createElement('div');
+      const selected = stage.spec === sp.id;
+      card.className = 'tal-spec' + (selected ? ' sel' : '');
+      card.setAttribute('role', 'radio');
+      card.setAttribute('tabindex', selected || !stage.spec ? '0' : '-1');
+      card.setAttribute('aria-checked', String(selected));
+      card.setAttribute('aria-label', `${sp.name}, ${this.roleLabel(sp.role)}`);
+      card.innerHTML = `<div class="ts-icon" style="background-image:url(${iconDataUrl('ability', sp.signature)})"></div><div class="ts-name">${esc(sp.name)}</div><div class="ts-role">${this.roleLabel(sp.role)}</div>`;
+      this.attachTooltip(card, () => `<div class="tt-title">${esc(sp.name)}</div><div class="tt-sub">${esc(sp.description)}</div>`
+        + `<div class="tt-sub" style="color:#ffd100">${t('game.talents.signature')}: ${esc(ABILITIES[sp.signature]?.name ?? sp.signature)}</div>`
+        + `<div class="tt-sub">${t('game.talents.mastery')}: ${esc(sp.mastery.name)} — ${esc(sp.mastery.description)}</div>`);
+      card.addEventListener('click', () => this.stageSetSpec(stage, sp.id));
+      card.addEventListener('keydown', (e) => this.keyboardActivate(e as KeyboardEvent, () => this.stageSetSpec(stage, sp.id)));
+      picker.appendChild(card);
+    }
+    body.appendChild(picker);
+    const sp = ct.specs.find((s) => s.id === stage.spec);
+    if (!sp) { const e = document.createElement('div'); e.className = 'tal-empty'; e.textContent = t('game.talents.chooseSpec'); body.appendChild(e); return; }
+    const m = document.createElement('div'); m.className = 'tal-mastery';
+    m.innerHTML = `<b>${t('game.talents.mastery')}: ${esc(sp.mastery.name)}</b> — ${esc(sp.mastery.description)}`;
+    body.appendChild(m);
+    const tree = document.createElement('div'); tree.className = 'tal-tree'; body.appendChild(tree);
+    this.renderTalentTree(tree, ct, stage, 'spec', sp.id);
+  }
+
+  private stageSetSpec(stage: TalentAllocation, specId: string): void {
+    if (stage.spec === specId) return;
+    stage.spec = specId;
+    const ct = talentsFor(this.sim.cfg.playerClass);
+    for (const id of Object.keys(stage.ranks)) {
+      const n = ct?.nodes.find((x) => x.id === id);
+      if (n?.tree === 'spec' && n.specId !== specId) { delete stage.ranks[id]; delete stage.choices[id]; }
+    }
+    this.renderTalents();
+  }
+
+  private renderTalentTree(host: HTMLElement, ct: NonNullable<ReturnType<typeof talentsFor>>, stage: TalentAllocation, tree: 'class' | 'spec', specId: string | undefined): void {
+    const cls = this.sim.cfg.playerClass;
+    const nodes = ct.nodes.filter((n) => n.tree === tree && (tree === 'class' || n.specId === specId));
+    if (nodes.length === 0) { host.innerHTML = `<div class="tal-empty">${t('game.talents.pickSpecFirst')}</div>`; return; }
+    const cols = Math.max(...nodes.map((n) => n.col)) + 1;
+    const rows = Math.max(...nodes.map((n) => n.row)) + 1;
+    const CW = 86, CH = 70, NS = 46, TOP = 6;
+    const W = cols * CW, H = rows * CH + TOP;
+    host.style.width = `${W}px`; host.style.height = `${H}px`;
+    const cx = (n: TalentNode) => n.col * CW + CW / 2;
+    const cy = (n: TalentNode) => n.row * CH + TOP + NS / 2;
+    const byId = new Map(nodes.map((n) => [n.id, n]));
+    const dormant = dormantNodes(cls, stage);
+    const total = this.sim.talentPoints().total;
+
+    let svg = `<svg class="tal-arrows" width="${W}" height="${H}">`;
+    for (const n of nodes) for (const req of n.requires ?? []) {
+      const r = byId.get(req); if (!r) continue;
+      const filled = (stage.ranks[req] ?? 0) > 0;
+      svg += `<line x1="${cx(r)}" y1="${cy(r) + NS / 2}" x2="${cx(n)}" y2="${cy(n) - NS / 2}" stroke="${filled ? '#f5c843' : '#5a4a22'}" stroke-width="2"/>`;
+    }
+    host.insertAdjacentHTML('beforeend', svg + `</svg>`);
+
+    for (const n of nodes) {
+      const ranks = stage.ranks[n.id] ?? 0;
+      const isDormant = dormant.has(n.id);
+      const cand = cloneAllocation(stage);
+      cand.ranks[n.id] = ranks + 1;
+      if (n.kind === 'choice' && !cand.choices[n.id]) cand.choices[n.id] = n.choices![0].id;
+      const canAdd = ranks < n.maxRank && validateAllocation(cls, cand, total).ok;
+      const shape = n.kind === 'active' ? 'square' : n.kind === 'choice' ? 'octagon' : 'circle';
+      const state = isDormant ? 'dormant' : ranks >= n.maxRank ? 'maxed' : ranks > 0 ? 'filled' : canAdd ? 'avail' : 'locked';
+      const chosen = n.kind === 'choice' ? n.choices!.find((c) => c.id === stage.choices[n.id]) : undefined;
+      const div = document.createElement('div');
+      div.className = `tal-node ${shape} ${state}`;
+      div.setAttribute('role', 'button');
+      div.setAttribute('tabindex', '0');
+      div.setAttribute('aria-pressed', String(ranks > 0));
+      if (!canAdd && ranks <= 0) div.setAttribute('aria-disabled', 'true');
+      const chosenLabel = chosen ? `, ${chosen.name}` : '';
+      div.setAttribute('aria-label', `${n.name}${chosenLabel}, ${t('game.talents.rank')} ${ranks}/${n.maxRank}`);
+      div.style.left = `${n.col * CW + (CW - NS) / 2}px`;
+      div.style.top = `${n.row * CH + TOP}px`;
+      const icon = document.createElement('span');
+      icon.className = 'tal-icon';
+      icon.style.backgroundImage = `url(${chosen ? talentEffectIcon(chosen.effect, 'choice') : talentEffectIcon(n.effect, n.kind)})`;
+      div.appendChild(icon);
+      if (ranks > 0 || n.maxRank > 1) {
+        const badge = document.createElement('span'); badge.className = 'tal-rank'; badge.textContent = `${ranks}/${n.maxRank}`;
+        div.appendChild(badge);
+      }
+      this.attachTooltip(div, () => this.talentTooltip(n, stage, isDormant));
+      div.addEventListener('click', () => {
+        // octagon choice nodes open a WoW-style option flyout; others add a rank
+        if (n.kind === 'choice') this.openChoicePopup(div, n, stage);
+        else this.talentNodeClick(stage, n);
+      });
+      div.addEventListener('keydown', (e) => {
+        const ke = e as KeyboardEvent;
+        if (ke.key === 'Backspace' || ke.key === 'Delete') {
+          ke.preventDefault();
+          this.talentNodeRemove(stage, n);
+          return;
+        }
+        this.keyboardActivate(ke, () => {
+          if (n.kind === 'choice') this.openChoicePopup(div, n, stage);
+          else this.talentNodeClick(stage, n);
+        });
+      });
+      div.addEventListener('contextmenu', (e) => { e.preventDefault(); this.talentNodeRemove(stage, n); });
+      host.appendChild(div);
+    }
+  }
+
+  private talentNodeClick(stage: TalentAllocation, n: TalentNode): void {
+    const cls = this.sim.cfg.playerClass;
+    const total = this.sim.talentPoints().total;
+    const ranks = stage.ranks[n.id] ?? 0;
+    if (ranks >= n.maxRank) return;
+    const cand = cloneAllocation(stage); cand.ranks[n.id] = ranks + 1;
+    if (!validateAllocation(cls, cand, total).ok) return;
+    stage.ranks[n.id] = ranks + 1;
+    this.renderTalents();
+  }
+
+  private talentNodeRemove(stage: TalentAllocation, n: TalentNode): void {
+    const ranks = stage.ranks[n.id] ?? 0;
+    if (ranks <= 0) return;
+    if (ranks - 1 <= 0) { delete stage.ranks[n.id]; delete stage.choices[n.id]; }
+    else stage.ranks[n.id] = ranks - 1;
+    this.renderTalents();
+  }
+
+  private talentTooltip(n: TalentNode, stage: TalentAllocation, isDormant: boolean): string {
+    const ranks = stage.ranks[n.id] ?? 0;
+    let html = `<div class="tt-title">${esc(n.name)}</div><div class="tt-sub">${esc(n.description)}</div>`;
+    if (n.kind === 'choice') {
+      for (const o of n.choices!) {
+        const sel = stage.choices[n.id] === o.id;
+        html += `<div class="tt-sub" style="color:${sel ? '#ffd100' : '#aaa'}"><img class="tt-opt-icon" src="${talentEffectIcon(o.effect, 'passive')}" alt=""> ${esc(o.name)} — ${esc(o.description)}</div>`;
+      }
+      html += `<div class="tt-sub" style="color:#8aa">${t('game.talents.cycleHint')}</div>`;
+    } else {
+      html += `<div class="tt-sub">${t('game.talents.rank')} ${ranks}/${n.maxRank}</div>`;
+    }
+    const ct = talentsFor(this.sim.cfg.playerClass);
+    if (n.requires?.length) {
+      const names = n.requires.map((r) => ct?.nodes.find((x) => x.id === r)?.name ?? r).join(', ');
+      html += `<div class="tt-sub" style="color:#caa">${t('game.talents.requires')}: ${esc(names)}</div>`;
+    }
+    if (n.pointsGate) html += `<div class="tt-sub" style="color:#caa">${n.pointsGate} ${t('game.talents.pointsGate')}</div>`;
+    if (isDormant) html += `<div class="tt-sub" style="color:#e0635a">${t('game.talents.dormant')}</div>`;
+    html += `<div class="tt-sub" style="color:#8aa">${t('game.talents.editHint')}</div>`;
+    return html;
+  }
+
+  private talentFooterHtml(stage: TalentAllocation, total: number, spent: number): string {
+    const cls = this.sim.cfg.playerClass;
+    const valid = validateAllocation(cls, stage, total).ok;
+    return `<div class="tal-foot">`
+      + `<section class="tal-build-card tal-build-current" aria-label="${esc(t('game.talents.currentBuild'))}">`
+      + `<div class="tal-build-head"><span>${t('game.talents.currentBuild')}</span><span class="tal-loadslot"></span></div>`
+      + `<div class="tal-build-actions">`
+      + `<button class="btn tal-primary" data-act="save"${valid ? '' : ' disabled'}>${t('game.talents.saveBuild')}</button>`
+      + `<button class="btn tal-secondary" data-act="export">${t('game.talents.export')}</button>`
+      + `<button class="btn tal-secondary" data-act="del"${this.sim.activeLoadout >= 0 ? '' : ' disabled'}>${t('game.talents.deleteBuild')}</button>`
+      + `<button class="btn tal-secondary" data-act="clear"${spent > 0 ? '' : ' disabled'}>${t('game.talents.clear')}</button>`
+      + `</div>`
+      + `<div class="tal-build-help">${t('game.talents.currentBuildHint')}</div>`
+      + `</section>`
+      + `<section class="tal-build-card tal-build-create" aria-label="${esc(t('game.talents.createBuild'))}">`
+      + `<div class="tal-build-head"><span>${t('game.talents.createBuild')}</span></div>`
+      + `<div class="tal-build-actions">`
+      + `<button class="btn tal-primary" data-act="new"${valid ? '' : ' disabled'}>${t('game.talents.newBuild')}</button>`
+      + `<button class="btn tal-secondary" data-act="import">${t('game.talents.import')}</button>`
+      + `</div>`
+      + `<div class="tal-build-help">${t('game.talents.createBuildHint')}</div>`
+      + `</section>`
+      + `</div>`;
+  }
+
+  private wireTalentFooter(el: HTMLElement, stage: TalentAllocation, total: number): void {
+    const cls = this.sim.cfg.playerClass;
+    el.querySelector('[data-act="clear"]')?.addEventListener('click', () => {
+      stage.ranks = {}; stage.choices = {};
+      this.renderTalents();
+    });
+    const saveStagedBuild = (name: string): void => {
+      const n = name.trim();
+      if (!n) return;
+      this.sim.saveLoadout(n, this.hotbarActions.map((a) => (a && a.type === 'ability' ? a.id : null)), cloneAllocation(stage));
+      this.talentStage = cloneAllocation(stage);
+      this.renderTalents();
+    };
+    const promptNewBuild = (): void => {
+      this.inputDialog({
+        title: t('game.talents.saveBuildAs'), label: t('game.talents.namePrompt'),
+        value: `Build ${this.sim.loadouts.length + 1}`, okText: t('game.talents.save'),
+        selectText: true,
+        onOk: saveStagedBuild,
+      });
+    };
+    el.querySelector('[data-act="save"]')?.addEventListener('click', () => {
+      if (!validateAllocation(cls, stage, total).ok) {
+        this.showError(t('game.talents.buildInvalid'));
+        return;
+      }
+      const active = this.sim.activeLoadout >= 0 ? this.sim.loadouts[this.sim.activeLoadout] : null;
+      if (active) saveStagedBuild(active.name);
+      else promptNewBuild();
+    });
+    el.querySelector('[data-act="new"]')?.addEventListener('click', () => {
+      if (!validateAllocation(cls, stage, total).ok) {
+        this.showError(t('game.talents.buildInvalid'));
+        return;
+      }
+      promptNewBuild();
+    });
+    // in-app loadout dropdown (shared component, no native <select>)
+    const slot = el.querySelector('.tal-loadslot');
+    if (slot) {
+      const opts = this.sim.loadouts.length
+        ? this.sim.loadouts.map((l, i) => ({ value: String(i), label: l.name }))
+        : [{ value: '-1', label: t('game.talents.noBuilds') }];
+      const current = this.sim.activeLoadout >= 0 ? String(this.sim.activeLoadout) : (this.sim.loadouts.length ? '' : '-1');
+      slot.replaceWith(this.buildDropdown(opts, current, (v) => {
+        const i = parseInt(v, 10);
+        const lo = this.sim.loadouts[i];
+        if (!lo) return;
+        this.sim.switchLoadout(i);
+        this.applyLoadoutBar(lo.bar);
+        this.talentStage = cloneAllocation(lo.alloc);
+        this.renderTalents();
+      }, t('game.talents.loadouts')));
+    }
+    el.querySelector('[data-act="del"]')?.addEventListener('click', () => {
+      if (this.sim.activeLoadout < 0) { this.showError(t('game.talents.selectBuildFirst')); return; }
+      const active = this.sim.loadouts[this.sim.activeLoadout];
+      if (!active) { this.showError(t('game.talents.selectBuildFirst')); return; }
+      const body = esc(t('game.talents.deleteBuildBody').replace('{name}', active.name));
+      this.confirmDialog(t('game.talents.deleteBuildTitle'), body, t('game.talents.deleteBuildConfirm'), t('game.talents.cancel'), () => {
+        this.sim.deleteLoadout(this.sim.activeLoadout);
+        this.renderTalents();
+      });
+    });
+    el.querySelector('[data-act="export"]')?.addEventListener('click', () => {
+      const active = this.sim.activeLoadout >= 0 ? this.sim.loadouts[this.sim.activeLoadout] : null;
+      this.inputDialog({
+        title: t('game.talents.export'), label: t('game.talents.exportTitle'),
+        value: exportBuild(cls, active?.alloc ?? stage), multiline: true, readOnly: true,
+        copy: true, cancelText: t('game.talents.close'),
+      });
+    });
+    el.querySelector('[data-act="import"]')?.addEventListener('click', () => {
+      this.inputDialog({
+        title: t('game.talents.import'), label: t('game.talents.importPrompt'),
+        placeholder: 'eyJ2Ijox…', multiline: true, okText: t('game.talents.import'),
+        onOk: (str) => {
+          const res = importBuild(str.trim());
+          if (!res.ok || res.cls !== cls) { this.showError(t('game.talents.invalidBuild')); return; }
+          this.talentStage = res.alloc;
+          this.renderTalents();
+        },
+      });
+    });
+  }
+
+  // Restore a saved loadout's action bar into the per-class slot map (reuses the
+  // existing hotbar persistence; only places ids that resolve to real abilities).
+  private applyLoadoutBar(bar: (string | null)[]): void {
+    this.hotbarActions = Array.from({ length: Hud.BAR_ABILITY_SLOTS }, (_, i) => {
+      const v = bar[i];
+      return typeof v === 'string' && ABILITIES[v] ? { type: 'ability' as const, id: v } : null;
+    });
+    this.saveSlotMap();
+  }
+
+  // -------------------------------------------------------------------------
   // Quest log window
   // -------------------------------------------------------------------------
 
   toggleQuestLog(): void {
     const el = $('#quest-log-window');
     if (el.style.display === 'block') { el.style.display = 'none'; this.hideTooltip(); return; }
+    this.closeOtherWindows('#quest-log-window');
     this.renderQuestLog();
     el.style.display = 'block';
   }
@@ -2189,7 +3152,7 @@ export class Hud {
   renderQuestLog(): void {
     const el = $('#quest-log-window');
     const sim = this.sim;
-    el.innerHTML = `<div class="panel-title"><span>Quest Log <span style="color:#998d6a;font-size:11px">${sim.questLog.size} active &middot; ${sim.questsDone.size} completed</span></span><span class="x-btn" data-close>✕</span></div>`;
+    el.innerHTML = `<div class="panel-title"><span>Quest Log <span style="color:#998d6a;font-size:11px">${sim.questLog.size} active &middot; ${sim.questsDone.size} completed</span></span><span class="x-btn" data-close>${svgIcon('close')}</span></div>`;
     const cols = document.createElement('div');
     cols.className = 'ql-cols';
     const list = document.createElement('div');
@@ -2222,6 +3185,11 @@ export class Hud {
       html += quest.objectives.map((o, i) => `<div class="qd-obj" style="color:${qp.counts[i] >= o.count ? '#7fdc4f' : '#cfc6a8'}">&bull; ${o.label}: ${qp.counts[i]}/${o.count}</div>`).join('');
       html += `<div class="qd-text" style="margin-top:8px">${quest.text.replace(/\$N/g, sim.player.name)}</div>`;
       html += `<div class="qd-sub">Rewards</div><div class="qd-obj">${quest.xpReward} experience &nbsp; ${this.moneyHtml(quest.copperReward)}</div>`;
+      const logReward = questRewardItem(quest, this.sim.cfg.playerClass);
+      if (logReward) {
+        const ri = ITEMS[logReward];
+        html += `<div class="qd-obj" style="color:${QUALITY_COLOR[ri.quality ?? 'common'] ?? '#fff'}">&bull; ${ri.name}</div>`;
+      }
       const giver = NPCS[quest.turnInNpcId];
       html += `<div class="qd-obj" style="margin-top:6px;color:#998d6a">Return to ${giver?.name ?? '?'}</div>`;
       detail.innerHTML = html;
@@ -2265,11 +3233,12 @@ export class Hud {
         + (m.oor ? ' oor' : '');
       frame.style.setProperty('--cls', classCss(m.cls));
       const resClass = m.rtype === 'rage' ? 'rage' : m.rtype === 'energy' ? 'energy' : 'mana';
-      const badge = m.dead ? '<span class="pf-badge dead" title="Dead">💀</span>'
-        : m.inCombat ? '<span class="pf-badge combat" title="In combat">⚔️</span>' : '';
+      const badge = m.dead ? `<span class="pf-badge dead" title="Dead">${svgIcon('skull')}</span>`
+        : m.inCombat ? `<span class="pf-badge combat" title="In combat">${svgIcon('arena')}</span>` : '';
       const range = m.oor ? '<span class="pf-badge oor" title="Out of range">⤢</span>' : '';
+      const crest = m.cls ? `<img class="pfm-crest" src="${iconDataUrl('crest', `class_${m.cls}`, 20)}" alt="">` : '';
       frame.innerHTML = `
-        <div class="pfm-name"><span class="pfm-id">${CLASS_GLYPH[m.cls] ?? ''} ${m.name}</span><span class="pfm-meta">${badge}${range}<span class="lead">${info.leader === m.pid ? '★' : ''}${m.level}</span></span></div>
+        <div class="pfm-name"><span class="pfm-id">${crest}${esc(m.name)}</span><span class="pfm-meta">${badge}${range}<span class="lead">${info.leader === m.pid ? '★' : ''}${m.level}</span></span></div>
         <div class="bar hp"><div class="bar-fill" style="transform:scaleX(${(m.hp / Math.max(1, m.mhp)).toFixed(3)})"></div></div>
         <div class="bar ${resClass}"><div class="bar-fill" style="transform:scaleX(${(m.res / Math.max(1, m.mres)).toFixed(3)})"></div></div>`;
       frame.addEventListener('click', () => this.sim.targetEntity(m.pid));
@@ -2422,18 +3391,13 @@ export class Hud {
 
   private openReportWindow(target: { pid?: number; name: string }): void {
     if (!this.reportHooks) return;
+    this.closeOtherWindows('#report-window');
     const { pid, name } = target;
     const el = $('#report-window');
     el.innerHTML = `
-      <div class="panel-title">Report ${esc(name)}<button data-close>×</button></div>
+      <div class="panel-title"><span>Report ${esc(name)}</span><span class="x-btn" data-close>${svgIcon('close')}</span></div>
       <label class="report-label">Reason</label>
-      <select id="report-reason">
-        <option value="harassment">Harassment / abuse</option>
-        <option value="spam">Spam</option>
-        <option value="cheating">Cheating / exploit</option>
-        <option value="offensive_name_or_chat">Offensive name or chat</option>
-        <option value="other">Other</option>
-      </select>
+      <div id="report-reason-slot"></div>
       <label class="report-label">Details</label>
       <textarea id="report-details" maxlength="1000" placeholder="What happened?"></textarea>
       <div class="report-error" id="report-error"></div>
@@ -2441,13 +3405,19 @@ export class Hud {
         <button class="btn" id="report-submit">Submit Report</button>
         <button class="btn" data-close>Cancel</button>
       </div>`;
-    el.style.left = `${Math.max(12, Math.min(window.innerWidth - 340, window.innerWidth / 2 - 160))}px`;
-    el.style.top = `${Math.max(20, Math.min(window.innerHeight - 300, window.innerHeight / 2 - 150))}px`;
-    el.style.display = 'block';
+    el.style.display = 'block'; // centred by the shared .window rule
+    const reasonDD = this.buildDropdown([
+      { value: 'harassment', label: 'Harassment / abuse' },
+      { value: 'spam', label: 'Spam' },
+      { value: 'cheating', label: 'Cheating / exploit' },
+      { value: 'offensive_name_or_chat', label: 'Offensive name or chat' },
+      { value: 'other', label: 'Other' },
+    ], 'harassment');
+    el.querySelector('#report-reason-slot')?.replaceWith(reasonDD);
     el.querySelectorAll('[data-close]').forEach((btn) => btn.addEventListener('click', () => { el.style.display = 'none'; }));
     const submit = $('#report-submit') as HTMLButtonElement;
     submit.addEventListener('click', () => {
-      const reason = ($('#report-reason') as HTMLSelectElement).value;
+      const reason = reasonDD.dataset.value ?? 'other';
       const details = ($('#report-details') as HTMLTextAreaElement).value;
       submit.disabled = true;
       const request = pid !== undefined
@@ -2515,6 +3485,7 @@ export class Hud {
   toggleSocial(): void {
     const el = $('#social-window');
     if (el.classList.contains('open')) { el.classList.remove('open'); return; }
+    this.closeOtherWindows('#social-window');
     el.classList.add('open');
     this.socialNotice = null;
     this.lastSocialStruct = this.socialStructSig();
@@ -2538,7 +3509,7 @@ export class Hud {
     const tab = this.socialTab;
     const online = this.sim.socialInfo !== null;
     const realmTag = online && this.sim.realm ? ` <span class="soc-realm-tag">— ${esc(this.sim.realm)}</span>` : '';
-    el.innerHTML = `<div class="panel-title"><span>Social${realmTag}</span><span class="x-btn" data-close>✕</span></div>`
+    el.innerHTML = `<div class="panel-title"><span>Social${realmTag}</span><span class="x-btn" data-close>${svgIcon('close')}</span></div>`
       + `<div class="soc-tabs">`
       + `<div class="soc-tab ${tab === 'friends' ? 'on' : ''}" data-tab="friends">Friends</div>`
       + `<div class="soc-tab ${tab === 'guild' ? 'on' : ''}" data-tab="guild">Guild</div>`
@@ -2577,12 +3548,13 @@ export class Hud {
       const name = f.online
         ? `<span class="soc-name soc-link" data-whisper="${esc(f.name)}" title="Whisper ${esc(f.name)}">${esc(f.name)}</span>`
         : `<span class="soc-name">${esc(f.name)}</span>`;
-      const whisper = f.online ? `<span class="soc-x" data-whisper="${esc(f.name)}" title="Whisper ${esc(f.name)}">✉</span>` : '';
+      const whisper = f.online ? `<span class="soc-x" data-whisper="${esc(f.name)}" title="Whisper ${esc(f.name)}">${svgIcon('whisper')}</span>` : '';
+      const tip = esc(dotTitle(f.online, f.status, f.zone));
       return `<div class="soc-row">`
-        + `<span class="soc-dot ${dot === 'off' ? '' : dot}" title="${esc(dotTitle(f.online, f.status, f.zone))}"></span>`
-        + `<span>${name}<br><span class="soc-meta">Lvl ${f.level} ${cap(f.cls)}</span></span>`
-        + `<span class="soc-meta">${meta}</span>`
-        + `<span class="soc-actions">${whisper}<span class="soc-x" data-act="unfriend" data-name="${esc(f.name)}" title="Remove ${esc(f.name)} from friends">✕</span></span>`
+        + `<span class="soc-dot ${dot === 'off' ? '' : dot}" title="${tip}"></span>`
+        + `<span class="soc-id">${name}<span class="soc-sub">Lvl ${f.level} ${cap(f.cls)}</span></span>`
+        + `<span class="soc-meta" title="${tip}">${meta}</span>`
+        + `<span class="soc-actions">${whisper}<span class="soc-x" data-act="unfriend" data-name="${esc(f.name)}" title="Remove ${esc(f.name)} from friends">${svgIcon('close')}</span></span>`
         + `</div>`;
     }).join('');
   }
@@ -2592,7 +3564,7 @@ export class Hud {
     if (blocks.length === 0) return `<div class="soc-empty">Your ignore list is empty.</div>`;
     return blocks.map((b) => `<div class="soc-row">`
       + `<span class="soc-name">${esc(b.name)}</span>`
-      + `<span class="soc-actions" style="margin-left:auto"><span class="soc-x" data-act="unblock" data-name="${esc(b.name)}" title="Stop ignoring ${esc(b.name)}">✕</span></span>`
+      + `<span class="soc-actions" style="margin-left:auto"><span class="soc-x" data-act="unblock" data-name="${esc(b.name)}" title="Stop ignoring ${esc(b.name)}">${svgIcon('close')}</span></span>`
       + `</div>`).join('');
   }
 
@@ -2611,17 +3583,18 @@ export class Hud {
       const name = m.online && !self
         ? `<span class="soc-name soc-link" data-whisper="${esc(m.name)}" title="Whisper ${esc(m.name)}">${nameInner}</span>`
         : `<span class="soc-name">${nameInner}</span>`;
-      let actions = m.online && !self ? `<span class="soc-x" data-whisper="${esc(m.name)}" title="Whisper ${esc(m.name)}">✉</span>` : '';
-      if (!self && me === 'leader') actions += `<span class="soc-x" data-act="gtransfer" data-name="${esc(m.name)}" title="Make ${esc(m.name)} Guild Master">♛</span>`;
+      let actions = m.online && !self ? `<span class="soc-x" data-whisper="${esc(m.name)}" title="Whisper ${esc(m.name)}">${svgIcon('whisper')}</span>` : '';
+      if (!self && me === 'leader') actions += `<span class="soc-x" data-act="gtransfer" data-name="${esc(m.name)}" title="Make ${esc(m.name)} Guild Master">${svgIcon('crown')}</span>`;
       if (!self && me === 'leader' && m.rank === 'member') actions += `<span class="soc-x" data-act="promote" data-name="${esc(m.name)}" title="Promote ${esc(m.name)} to officer">▲</span>`;
       if (!self && me === 'leader' && m.rank === 'officer') actions += `<span class="soc-x" data-act="demote" data-name="${esc(m.name)}" title="Demote ${esc(m.name)} to member">▼</span>`;
       // leaders may remove members + officers; officers may remove only members
       const canKick = !self && ((me === 'leader' && m.rank !== 'leader') || (me === 'officer' && m.rank === 'member'));
-      if (canKick) actions += `<span class="soc-x" data-act="gkick" data-name="${esc(m.name)}" title="Remove ${esc(m.name)} from guild">✕</span>`;
+      if (canKick) actions += `<span class="soc-x" data-act="gkick" data-name="${esc(m.name)}" title="Remove ${esc(m.name)} from guild">${svgIcon('close')}</span>`;
+      const tip = esc(dotTitle(m.online, m.status, m.zone));
       return `<div class="soc-row">`
-        + `<span class="soc-dot ${dot === 'off' ? '' : dot}" title="${esc(dotTitle(m.online, m.status, m.zone))}"></span>`
-        + `<span>${name}<br><span class="soc-meta">Lvl ${m.level} ${cap(m.cls)}</span></span>`
-        + `<span class="soc-meta">${meta}</span>`
+        + `<span class="soc-dot ${dot === 'off' ? '' : dot}" title="${tip}"></span>`
+        + `<span class="soc-id">${name}<span class="soc-sub">Lvl ${m.level} ${cap(m.cls)}</span></span>`
+        + `<span class="soc-meta" title="${tip}">${meta}</span>`
         + (actions ? `<span class="soc-actions">${actions}</span>` : '')
         + `</div>`;
     }).join('');
@@ -2638,7 +3611,7 @@ export class Hud {
     let foot = '';
     if (guild.rank !== 'member') foot += this.addRow('ginvite', 'guild-invite', 'Search to invite…', 'Invite', 16, true);
     // WoW: a Guild Master with other members can't just leave — they disband
-    // (or hand over leadership via the ♛ action). Everyone else can leave.
+    // (or hand over leadership via the crown action). Everyone else can leave.
     foot += guild.rank === 'leader' && guild.members.length > 1
       ? `<div class="soc-add soc-leave"><button class="btn" data-act="guild-disband">Disband Guild</button></div>`
       : `<div class="soc-add soc-leave"><button class="btn" data-act="guild-leave">Leave Guild</button></div>`;
@@ -2892,7 +3865,7 @@ export class Hud {
       return `<div class="trade-item${mine ? ' mine' : ''}" data-item="${mine ? s.itemId : ''}">${this.itemIcon(item)}<span>${item?.name ?? s.itemId}${s.count > 1 ? ' x' + s.count : ''}</span></div>`;
     };
     el.innerHTML = `
-      <div class="panel-title"><span>Trade with ${info.otherName}</span><span class="x-btn" data-close>✕</span></div>
+      <div class="panel-title"><span>Trade with ${esc(info.otherName)}</span><span class="x-btn" data-close>${svgIcon('close')}</span></div>
       <div class="trade-cols">
         <div class="trade-col ${info.myAccepted ? 'accepted' : ''}">
           <h4>Your offer</h4>
@@ -2900,7 +3873,7 @@ export class Hud {
           <div class="trade-money">Money: <input id="trade-copper" type="number" min="0" value="${this.stagedTrade.copper}" /> copper</div>
         </div>
         <div class="trade-col ${info.theirAccepted ? 'accepted' : ''}">
-          <h4>${info.otherName}'s offer</h4>
+          <h4>${esc(info.otherName)}'s offer</h4>
           <div class="trade-items">${info.theirOffer.items.map((s) => itemRow(s, false)).join('') || '<div style="color:#665c40;font-size:11px;padding:4px">Nothing offered yet</div>'}</div>
           <div class="trade-money">Money: <span class="gold">${formatMoney(info.theirOffer.copper)}</span></div>
         </div>
@@ -2959,11 +3932,13 @@ export class Hud {
 
   toggleOptionsMenu(): void {
     if (this.optionsOpen) { this.closeOptions(); return; }
+    this.closeOtherWindows('#options-menu');
     this.optionsView = 'main';
     this.capturingKey = null;
     this.keybindNote = '';
     this.renderOptions();
     $('#options-menu').style.display = 'block';
+    music.pauseForMenu();
     audio.click();
   }
 
@@ -2971,6 +3946,7 @@ export class Hud {
     $('#options-menu').style.display = 'none';
     this.capturingKey = null;
     this.hideTooltip();
+    music.resumeFromMenu();
   }
 
   private renderOptions(): void {
@@ -2978,7 +3954,7 @@ export class Hud {
     if (this.optionsView === 'graphics') { this.renderGraphics(); return; }
     if (this.optionsView === 'audio') { this.renderAudio(); return; }
     const el = $('#options-menu');
-    el.innerHTML = `<div class="panel-title"><span>Game Menu</span><span class="x-btn" data-close>✕</span></div>`;
+    el.innerHTML = `<div class="panel-title"><span>Game Menu</span><span class="x-btn" data-close>${svgIcon('close')}</span></div>`;
     const list = document.createElement('div');
     list.className = 'opt-list';
     const add = (text: string, onClick: () => void) => {
@@ -3027,7 +4003,7 @@ export class Hud {
     parent.appendChild(row);
   }
 
-  private settingToggle(parent: HTMLElement, label: string, key: 'fullscreen'): void {
+  private settingToggle(parent: HTMLElement, label: string, key: 'fullscreen' | 'showOverflowXp'): void {
     const hooks = this.optionsHooks;
     if (!hooks) return;
     const row = document.createElement('div');
@@ -3056,7 +4032,7 @@ export class Hud {
 
   private settingsViewShell(title: string): HTMLElement {
     const el = $('#options-menu');
-    el.innerHTML = `<div class="panel-title"><span>${title}</span><span class="x-btn" data-close>✕</span></div>`;
+    el.innerHTML = `<div class="panel-title"><span>${title}</span><span class="x-btn" data-close>${svgIcon('close')}</span></div>`;
     const body = document.createElement('div');
     body.className = 'set-rows';
     el.appendChild(body);
@@ -3090,9 +4066,10 @@ export class Hud {
     this.settingSlider(body, 'Brightness', 'brightness');
     this.settingSlider(body, 'Render Quality', 'renderScale');
     this.settingToggle(body, 'Fullscreen', 'fullscreen');
+    this.settingToggle(body, t('game.settings.showOverflowXp'), 'showOverflowXp');
     const note = document.createElement('div');
     note.className = 'set-note';
-    note.textContent = 'Lower Camera Speed for a calmer mouselook. Render Quality below 100% boosts FPS on weaker machines.';
+    note.textContent = 'Lower Camera Speed for a calmer mouselook. Render Quality below 100% boosts FPS on weaker machines. Show Overflow XP keeps the XP bar filling past the level cap.';
     $('#options-menu').appendChild(note);
     this.settingsViewFooter();
   }
@@ -3129,9 +4106,13 @@ export class Hud {
     return item ? item.name : fallback;
   }
 
-  private settingBoolToggleKeybind(parent: HTMLElement, label: string, key: BoolSettingKey): void {
+  // Toggle row styled for the Key Bindings panel. Handles the bool Mouse Camera
+  // setting and the numeric (0/1) Click to Move setting, which both live here
+  // alongside the rebindable keys.
+  private settingToggleKeybind(parent: HTMLElement, label: string, key: BoolSettingKey | 'clickToMove'): void {
     const hooks = this.optionsHooks;
     if (!hooks) return;
+    const isOn = () => (key === 'clickToMove' ? hooks.settings.get(key) >= 0.5 : hooks.settings.get(key));
     const row = document.createElement('div');
     row.className = 'kb-row kb-toggle-row';
     const name = document.createElement('span');
@@ -3141,7 +4122,7 @@ export class Hud {
     toggle.type = 'button';
     toggle.className = 'btn kb-key kb-toggle';
     const sync = () => {
-      const on = hooks.settings.get(key);
+      const on = isOn();
       toggle.textContent = on ? 'On' : 'Off';
       toggle.classList.toggle('off', !on);
       toggle.setAttribute('aria-pressed', on ? 'true' : 'false');
@@ -3149,8 +4130,9 @@ export class Hud {
     sync();
     toggle.addEventListener('click', () => {
       audio.click();
-      const next = !hooks.settings.get(key);
-      hooks.onSettingChange(key, hooks.settings.set(key, next));
+      const next = !isOn();
+      if (key === 'clickToMove') hooks.onSettingChange(key, next ? 1 : 0);
+      else hooks.onSettingChange(key, hooks.settings.set(key, next));
       sync();
     });
     row.append(name, toggle);
@@ -3159,12 +4141,13 @@ export class Hud {
 
   private renderKeybinds(): void {
     const el = $('#options-menu');
-    el.innerHTML = `<div class="panel-title"><span>Key Bindings</span><span class="x-btn" data-close>✕</span></div>`;
-    this.settingBoolToggleKeybind(el, 'Mouse Camera', 'mouseCamera');
+    el.innerHTML = `<div class="panel-title"><span>Key Bindings</span><span class="x-btn" data-close>${svgIcon('close')}</span></div>`;
+    this.settingToggleKeybind(el, 'Mouse Camera', 'mouseCamera');
+    this.settingToggleKeybind(el, 'Click to Move', 'clickToMove');
     const note = document.createElement('div');
     note.className = 'kb-note';
     note.textContent = this.keybindNote
-      || 'Mouse Camera off: A/D turns, drag to orbit (classic). On: camera-relative WASD, A/D strafes. Click a key cell to rebind; Esc cancels.';
+      || 'Mouse Camera off: A/D turns, drag to orbit (classic). On: camera-relative WASD, A/D strafes. Click to Move: left-click the ground or an enemy to walk there. Click a key cell to rebind; Esc cancels.';
     el.appendChild(note);
     const rows = document.createElement('div');
     rows.className = 'kb-rows';
@@ -3235,6 +4218,34 @@ export class Hud {
 
   // -------------------------------------------------------------------------
 
+  // The mutually-exclusive modal windows. They all share one centred position
+  // (see the `.window` rule), so only one may be visible at a time — the vendor
+  // is the lone pairing (it opens bags alongside, laid out side-by-side).
+  private static readonly MODAL_IDS = ['#quest-dialog', '#loot-window', '#vendor-window', '#bags', '#char-window', '#spellbook', '#talents-window', '#quest-log-window', '#map-window', '#report-window', '#arena-window', '#leaderboard-window'];
+
+  // Opening any window closes the others first, so panels never stack. `keep`
+  // is the window (or windows, e.g. vendor+bags) being opened.
+  private closeOtherWindows(keep?: string | string[]): void {
+    const keepSet = new Set(Array.isArray(keep) ? keep : keep ? [keep] : []);
+    for (const id of Hud.MODAL_IDS) {
+      if (keepSet.has(id)) continue;
+      const el = document.querySelector<HTMLElement>(id);
+      if (el && el.style.display !== 'none' && el.style.display !== '') el.style.display = 'none';
+    }
+    if (!keepSet.has('#talents-window')) this.talentStage = null;
+    if (!keepSet.has('#loot-window')) this.openLootMobId = null;
+    if (!keepSet.has('#vendor-window')) {
+      this.openVendorNpcId = null;
+      document.body.classList.remove('vendor-open');
+    }
+    const social = document.querySelector<HTMLElement>('#social-window');
+    if (!keepSet.has('#social-window') && social?.classList.contains('open')) social.classList.remove('open');
+    if (!keepSet.has('#options-menu') && this.optionsOpen) this.closeOptions();
+    if (!keepSet.has('#market-window') && this.marketOpen) this.closeMarket();
+    this.closeContextMenu();
+    this.hideTooltip();
+  }
+
   // Closes the topmost UI. Returns true if something was closed.
   closeAll(): boolean {
     let closed = false;
@@ -3247,7 +4258,9 @@ export class Hud {
       closed = true;
     }
     if (this.marketOpen) { this.closeMarket(); closed = true; }
-    for (const id of ['#quest-dialog', '#loot-window', '#vendor-window', '#bags', '#char-window', '#spellbook', '#quest-log-window', '#map-window', '#report-window', '#arena-window']) {
+    const confirmEl = document.getElementById('confirm-dialog');
+    if (confirmEl) { confirmEl.remove(); closed = true; }
+    for (const id of Hud.MODAL_IDS) {
       const el = $(id);
       if (el.style.display === 'block') {
         el.style.display = 'none';
@@ -3285,6 +4298,8 @@ function statusLabel(status: string | undefined): string {
   }
 }
 
+// Hover text spelling out what a status dot means, so the orange/grey circles
+// aren't a mystery (#100).
 function dotTitle(online: boolean, status: string | undefined, zone: string | undefined): string {
   if (!online) return 'Offline';
   const where = zone ? ` — ${zone}` : '';
@@ -3293,19 +4308,4 @@ function dotTitle(online: boolean, status: string | undefined, zone: string | un
 
 function rankLabel(rank: string): string {
   return rank === 'leader' ? 'Guild Master' : rank === 'officer' ? 'Officer' : 'Member';
-}
-
-function shade(hex: string, amt: number): string {
-  const n = parseInt(hex.slice(1), 16);
-  let r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
-  if (amt >= 0) {
-    r = Math.round(r + (255 - r) * amt);
-    g = Math.round(g + (255 - g) * amt);
-    b = Math.round(b + (255 - b) * amt);
-  } else {
-    r = Math.round(r * (1 + amt));
-    g = Math.round(g * (1 + amt));
-    b = Math.round(b * (1 + amt));
-  }
-  return `rgb(${r},${g},${b})`;
 }

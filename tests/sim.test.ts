@@ -531,6 +531,19 @@ describe('food, drink, vendor', () => {
     expect(sim.countItem('minor_mana_potion')).toBe(1); // not consumed
   });
 
+  it('a mana potion is not wasted (consumed + put on cooldown) at full mana', () => {
+    const sim = makeSim('mage');
+    sim.addItem('minor_mana_potion', 1);
+    sim.player.resource = sim.player.maxResource; // already topped off
+
+    sim.useItem('minor_mana_potion');
+    // nothing to restore: the potion stays in the bag and the shared
+    // cooldown is never armed (mirrors the at-full-health guard for HP potions)
+    expect(sim.player.resource).toBe(sim.player.maxResource);
+    expect(sim.countItem('minor_mana_potion')).toBe(1);
+    expect(sim.player.potionCooldownUntil).toBeLessThanOrEqual(sim.time);
+  });
+
   it('out-of-combat mana regen is brisk and scales past the old spi/4+2 rate (#103)', () => {
     const sim = makeSim('mage');
     sim.setPlayerLevel(10);
@@ -837,6 +850,23 @@ describe('food, drink, vendor', () => {
 
     expect(sim.copper).toBe(0);
     expect(sim.countItem('wolf_fang')).toBe(2);
+  });
+
+  it('discarding quest items removes them without vendor payout or buyback', () => {
+    const sim = makeSim('warrior');
+    const meta = sim.meta(sim.playerId)!;
+    meta.questLog.set('q_widows', { questId: 'q_widows', counts: [10, 0], state: 'active' });
+    sim.addItem('widow_venom_sac', 6);
+    expect(meta.questLog.get('q_widows')).toMatchObject({ counts: [10, 6], state: 'ready' });
+    sim.events = [];
+
+    sim.discardItem('widow_venom_sac', 2);
+
+    expect(sim.countItem('widow_venom_sac')).toBe(4);
+    expect(sim.copper).toBe(0);
+    expect(sim.vendorBuyback).toEqual([]);
+    expect(meta.questLog.get('q_widows')).toMatchObject({ counts: [10, 4], state: 'active' });
+    expect(sim.events).toContainEqual({ type: 'log', text: 'Discarded Widow Venom Sac x2.', color: '#999', pid: sim.player.id });
   });
 });
 

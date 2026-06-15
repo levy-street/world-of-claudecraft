@@ -1,5 +1,6 @@
 import type { Entity, EquipSlot, InvSlot, MoveInput, PlayerClass, QuestProgress, QuestState, ResourceType } from './sim/types';
 import type { ResolvedAbility } from './sim/sim';
+import type { TalentAllocation, SavedLoadout, Role } from './sim/content/talents';
 
 export interface PartyMemberInfo {
   pid: number;
@@ -56,6 +57,9 @@ export interface FriendInfo {
   online: boolean;
   zone?: string;
   status?: PresenceStatus;
+  // live world position of an online character, for plotting on the map
+  x?: number;
+  z?: number;
 }
 
 export interface GuildMemberInfo extends FriendInfo {
@@ -79,6 +83,19 @@ export interface CharacterSearchResult {
   name: string;
   cls: string;
   level: number;
+}
+
+// One ranked row of the lifetime-XP leaderboard (Max-Level XP Overflow). Always
+// computed server-side; the client only displays it.
+export interface LeaderboardEntry {
+  rank: number;
+  name: string;
+  cls: PlayerClass;
+  level: number;
+  virtualLevel: number;
+  lifetimeXp: number;
+  prestigeRank: number;
+  realm?: string; // present on the global (cross-realm) home-page board
 }
 
 export interface ArenaLadderEntry {
@@ -148,6 +165,11 @@ export interface IWorld {
   equipment: Partial<Record<EquipSlot, string>>;
   copper: number;
   xp: number;
+  // Post-cap progression (Max-Level XP Overflow). All server-authoritative;
+  // the client renders these as-is and derives virtual level from lifetimeXp.
+  lifetimeXp: number;
+  prestigeRank: number;
+  unlockedMilestones: string[];
   known: ResolvedAbility[];
   questLog: Map<string, QuestProgress>;
   questsDone: Set<string>;
@@ -166,6 +188,7 @@ export interface IWorld {
   abandonQuest(questId: string): void;
   equipItem(itemId: string): void;
   useItem(itemId: string): void;
+  discardItem(itemId: string, count?: number): void;
   buyItem(npcId: number, itemId: string): void;
   sellItem(itemId: string, count?: number): void;
   buyBackItem(itemId: string): void;
@@ -223,4 +246,22 @@ export interface IWorld {
   marketCollect(): void;
   enterDungeon(dungeonId: string): void;
   leaveDungeon(): void;
+  // Post-cap progression: the realm-scoped lifetime-XP leaderboard, and the
+  // opt-in cosmetic prestige action (Phase 4).
+  leaderboard(): Promise<LeaderboardEntry[]>;
+  prestige(): void;
+  // Talents & Specializations. State is server-authoritative; the client stages
+  // edits locally and commits via applyTalents (the server re-validates).
+  talents: TalentAllocation;
+  talentSpec: string | null;
+  talentRole: Role | null;
+  loadouts: SavedLoadout[];
+  activeLoadout: number;
+  talentPoints(): { total: number; spent: number };
+  applyTalents(alloc: TalentAllocation): void;
+  respec(): void;
+  setSpec(specId: string | null): void;
+  saveLoadout(name: string, bar: (string | null)[], alloc?: TalentAllocation): void;
+  switchLoadout(index: number): void;
+  deleteLoadout(index: number): void;
 }

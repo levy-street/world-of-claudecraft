@@ -1,4 +1,5 @@
-import type { AbilityDef, PlayerClass, Stats, WeaponInfo } from '../types';
+import type { AbilityDef, AbilityEffect, PlayerClass, Stats, WeaponInfo } from '../types';
+import type { TalentModifiers } from './talents';
 
 // ---------------------------------------------------------------------------
 // Player classes — per-level base stats follow vanilla growth curves.
@@ -23,7 +24,6 @@ export interface ClassDef {
   ranged?: WeaponInfo & { maxRange: number; minRange: number; wand?: boolean; school?: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature' };
   abilities: string[]; // full kit, in learn order
   color: number;
-  crest: string; // portrait glyph
 }
 
 export const CLASSES: Record<PlayerClass, ClassDef> = {
@@ -41,7 +41,6 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     startChest: 'recruit_tunic',
     abilities: ['heroic_strike', 'battle_shout', 'charge', 'rend', 'thunder_clap', 'hamstring', 'bloodrage', 'overpower', 'execute', 'slam', 'cleave', 'defensive_stance', 'sunder_armor', 'taunt'],
     color: 0xc79c6e,
-    crest: '⚔',
   },
   mage: {
     id: 'mage',
@@ -58,7 +57,6 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     ranged: { min: 3, max: 6, speed: 1.8, maxRange: 30, minRange: 0, wand: true, school: 'arcane' },
     abilities: ['fireball', 'frost_armor', 'arcane_intellect', 'frostbolt', 'conjure_water', 'fire_blast', 'arcane_missiles', 'polymorph', 'frost_nova', 'arcane_explosion', 'scorch', 'ice_barrier'],
     color: 0x69ccf0,
-    crest: '✦',
   },
   rogue: {
     id: 'rogue',
@@ -74,7 +72,6 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     startChest: 'footpad_jerkin',
     abilities: ['sinister_strike', 'eviscerate', 'backstab', 'gouge', 'evasion', 'slice_and_dice', 'sprint', 'kidney_shot', 'ambush', 'adrenaline_rush', 'stealth'],
     color: 0xfff569,
-    crest: '⚷',
   },
   paladin: {
     id: 'paladin',
@@ -90,7 +87,6 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     startChest: 'recruit_tunic',
     abilities: ['seal_of_righteousness', 'holy_light', 'devotion_aura', 'judgement', 'blessing_of_might', 'divine_protection', 'hammer_of_justice', 'lay_on_hands', 'flash_of_light', 'exorcism', 'consecration', 'righteous_fury'],
     color: 0xf58cba,
-    crest: '🔨',
   },
   hunter: {
     id: 'hunter',
@@ -107,7 +103,6 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     ranged: { min: 5, max: 9, speed: 2.3, maxRange: 35, minRange: 8 },
     abilities: ['raptor_strike', 'aspect_of_the_hawk', 'serpent_sting', 'arcane_shot', 'concussive_shot', 'mongoose_bite', 'wing_clip', 'aspect_of_the_cheetah', 'aimed_shot', 'rapid_fire', 'tame_beast', 'dismiss_pet'],
     color: 0xabd473,
-    crest: '🏹',
   },
   priest: {
     id: 'priest',
@@ -124,7 +119,6 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     ranged: { min: 3, max: 6, speed: 1.8, maxRange: 30, minRange: 0, wand: true, school: 'holy' },
     abilities: ['smite', 'lesser_heal', 'power_word_fortitude', 'shadow_word_pain', 'power_word_shield', 'renew', 'mind_blast', 'heal', 'mind_flay', 'flash_heal'],
     color: 0xfffff0,
-    crest: '✝',
   },
   shaman: {
     id: 'shaman',
@@ -140,7 +134,6 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     startChest: 'footpad_jerkin',
     abilities: ['lightning_bolt', 'rockbiter_weapon', 'healing_wave', 'earth_shock', 'lightning_shield', 'flame_shock', 'frost_shock', 'ghost_wolf', 'stormstrike'],
     color: 0x0070de,
-    crest: '🌩',
   },
   warlock: {
     id: 'warlock',
@@ -157,7 +150,6 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     ranged: { min: 3, max: 6, speed: 1.8, maxRange: 30, minRange: 0, wand: true, school: 'shadow' },
     abilities: ['shadow_bolt', 'demon_skin', 'immolate', 'corruption', 'life_tap', 'curse_of_agony', 'drain_life', 'fear', 'searing_pain', 'shadowburn'],
     color: 0x9482c9,
-    crest: '🕯',
   },
   druid: {
     id: 'druid',
@@ -173,7 +165,6 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     startChest: 'footpad_jerkin',
     abilities: ['wrath', 'healing_touch', 'mark_of_the_wild', 'moonfire', 'rejuvenation', 'thorns', 'entangling_roots', 'bear_form', 'regrowth', 'barkskin', 'starfire', 'maul', 'growl', 'cat_form', 'claw', 'ferocious_bite', 'swipe'],
     color: 0xff7d0a,
-    crest: '🐻',
   },
 };
 
@@ -194,7 +185,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 3, level: 14, cost: 15, threatFlat: 59, effects: [{ type: 'weaponDamage', bonus: 32 }] },
       { rank: 4, level: 20, cost: 15, threatFlat: 78, effects: [{ type: 'weaponDamage', bonus: 44 }] },
     ],
-    icon: 'HS', iconColor: '#c0392b',
     description: 'A strong attack that increases melee damage by $d. Activates on your next swing.',
   },
   battle_shout: {
@@ -206,7 +196,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 12, cost: 10, effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 35, duration: 120 }] },
       { rank: 3, level: 20, cost: 10, effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 50, duration: 120 }] },
     ],
-    icon: 'BS', iconColor: '#e67e22',
     description: 'Increases your attack power by 20 for 2 min.',
   },
   charge: {
@@ -214,7 +203,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 0, castTime: 0, cooldown: 15, range: 25, minRange: 8, school: 'physical',
     requiresTarget: true, offGcd: true,
     effects: [{ type: 'charge' }, { type: 'stun', duration: 1 }],
-    icon: 'CH', iconColor: '#d35400',
     description: 'Charges an enemy, generating 9 rage and stunning it for 1 sec. 8-25 yd range.',
   },
   rend: {
@@ -226,7 +214,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 10, cost: 10, effects: [{ type: 'dot', total: 21, duration: 9, interval: 3 }] },
       { rank: 3, level: 16, cost: 10, effects: [{ type: 'dot', total: 36, duration: 12, interval: 3 }] },
     ],
-    icon: 'RE', iconColor: '#922b21',
     description: 'Wounds the target, causing them to bleed for $d damage over 9 sec.',
   },
   thunder_clap: {
@@ -254,7 +241,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
         ],
       },
     ],
-    icon: 'TC', iconColor: '#2980b9',
     description: 'Blasts nearby enemies for $d damage and slows their attacks by 10% for 10 sec.',
   },
   hamstring: {
@@ -266,7 +252,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       rank: 2, level: 16, cost: 10,
       effects: [{ type: 'directDamage', min: 12, max: 12 }, { type: 'slow', mult: 0.5, duration: 15 }],
     }],
-    icon: 'HA', iconColor: '#a93226',
     description: 'Maims the enemy for 5 damage, slowing its movement by 50% for 15 sec.',
   },
   bloodrage: {
@@ -274,7 +259,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 0, castTime: 0, cooldown: 60, range: 0, school: 'physical',
     requiresTarget: false, offGcd: true,
     effects: [{ type: 'selfDamagePctMax', pct: 0.08 }, { type: 'gainResource', amount: 10 }],
-    icon: 'BR', iconColor: '#e74c3c',
     description: 'Generates 10 rage at the cost of health.',
   },
   overpower: {
@@ -283,7 +267,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true, requiresDodgeProc: true,
     effects: [{ type: 'weaponStrike', bonus: 5, cannotBeDodged: true }],
     ranks: [{ rank: 2, level: 16, cost: 5, effects: [{ type: 'weaponStrike', bonus: 15, cannotBeDodged: true }] }],
-    icon: 'OP', iconColor: '#f39c12',
     description: 'Instant attack for weapon damage +5. Only usable after the target dodges. Cannot be dodged.',
   },
   execute: {
@@ -291,7 +274,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 15, castTime: 0, cooldown: 0, range: 0, school: 'physical',
     requiresTarget: true, requiresTargetHpBelow: 0.2,
     effects: [{ type: 'directDamage', min: 60, max: 75 }],
-    icon: 'EX', iconColor: '#7b241c',
     description: 'Attempt to finish off a wounded foe, causing $d damage. Only usable on enemies below 20% health.',
   },
   slam: {
@@ -299,7 +281,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 15, castTime: 1.5, cooldown: 0, range: 0, school: 'physical',
     requiresTarget: true,
     effects: [{ type: 'weaponStrike', bonus: 25 }],
-    icon: 'SL', iconColor: '#b9770e',
     description: 'Slams the opponent for weapon damage plus $d.',
   },
   cleave: {
@@ -308,7 +289,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     threat: { flat: 30 }, // classic 100 at rank 5/level 58, scaled to the 1-20 band
     effects: [{ type: 'aoeDamage', min: 20, max: 26, radius: 5 }],
-    icon: 'CL', iconColor: '#cb4335',
     description: 'A sweeping strike that hits all enemies in front of you for $d damage.',
   },
   defensive_stance: {
@@ -316,7 +296,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 0, castTime: 0, cooldown: 1, range: 0, school: 'physical',
     requiresTarget: false, offGcd: true,
     effects: [{ type: 'selfBuff', kind: 'defensive_stance', value: 0.9, duration: 3600 }],
-    icon: 'DS', iconColor: '#8d99ae',
     description: 'A defensive combat stance: you generate 30% more threat but deal and take 10% less damage. Cast again to leave the stance.',
   },
   sunder_armor: {
@@ -328,7 +307,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ranks: [
       { rank: 2, level: 16, cost: 15, threatFlat: 130, effects: [{ type: 'sunder', armor: 40, maxStacks: 5 }] },
     ],
-    icon: 'SA', iconColor: '#b0843c',
     description: 'Sunders the target\'s armor, reducing it by $d per application. Stacks up to 5 times. Generates a high amount of threat.',
   },
   taunt: {
@@ -336,7 +314,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 0, castTime: 0, cooldown: 10, range: 8, school: 'physical',
     requiresTarget: true, offGcd: true,
     effects: [{ type: 'taunt' }],
-    icon: 'TA', iconColor: '#c0392b',
     description: 'Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec.',
   },
 
@@ -356,7 +333,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       rank: 4, level: 18, cost: 95, castTime: 3.0,
       effects: [{ type: 'directDamage', min: 58, max: 78 }, { type: 'dot', total: 12, duration: 8, interval: 2 }],
     }],
-    icon: 'FB', iconColor: '#e74c3c',
     description: 'Hurls a fiery ball that causes $d Fire damage plus additional damage over time.',
   },
   frost_armor: {
@@ -368,7 +344,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 10, cost: 30, effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 50, duration: 1800 }] },
       { rank: 3, level: 18, cost: 45, effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 70, duration: 1800 }] },
     ],
-    icon: 'FA', iconColor: '#aed6f1',
     description: 'Encases you in frost, increasing armor by 30 for 30 min.',
   },
   arcane_intellect: {
@@ -377,7 +352,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'buff_int', value: 2, duration: 1800 }],
     ranks: [{ rank: 2, level: 14, cost: 60, effects: [{ type: 'selfBuff', kind: 'buff_int', value: 7, duration: 1800 }] }],
-    icon: 'AI', iconColor: '#bb8fce',
     description: 'Increases Intellect by 2 for 30 min.',
   },
   frostbolt: {
@@ -395,7 +369,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       rank: 4, level: 20, cost: 70, castTime: 2.5,
       effects: [{ type: 'directDamage', min: 66, max: 74 }, { type: 'slow', mult: 0.6, duration: 9 }],
     }],
-    icon: 'FR', iconColor: '#3498db',
     description: 'Launches a bolt of frost, causing $d Frost damage and slowing movement by 40%.',
   },
   conjure_water: {
@@ -407,7 +380,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 10, cost: 70, effects: [] },
       { rank: 3, level: 16, cost: 110, effects: [] },
     ],
-    icon: 'CW', iconColor: '#5dade2',
     description: 'Conjures 2 bottles of water, restoring mana when drunk. Higher ranks conjure purer water.',
   },
   fire_blast: {
@@ -419,7 +391,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 12, cost: 60, effects: [{ type: 'directDamage', min: 44, max: 54 }] },
       { rank: 3, level: 18, cost: 85, effects: [{ type: 'directDamage', min: 68, max: 82 }] },
     ],
-    icon: 'BL', iconColor: '#e67e22',
     description: 'Blasts the enemy for $d Fire damage. Instant.',
   },
   arcane_missiles: {
@@ -431,7 +402,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 14, cost: 75, effects: [{ type: 'directDamage', min: 14, max: 14 }] },
       { rank: 3, level: 20, cost: 105, effects: [{ type: 'directDamage', min: 22, max: 22 }] },
     ],
-    icon: 'AM', iconColor: '#c39bd3',
     description: 'Launches Arcane Missiles at the enemy, causing 8 Arcane damage each second for 3 sec.',
   },
   polymorph: {
@@ -440,7 +410,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [{ type: 'polymorph', duration: 15 }],
     ranks: [{ rank: 2, level: 18, cost: 70, effects: [{ type: 'polymorph', duration: 20 }] }],
-    icon: 'PM', iconColor: '#f5b7b1',
     description: 'Transforms the enemy into a sheep for up to 15 sec. The sheep wanders and heals rapidly. Any damage breaks the effect. Beasts and humanoids only.',
   },
   frost_nova: {
@@ -449,7 +418,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'aoeRoot', duration: 8, radius: 10, min: 6, max: 7 }],
     ranks: [{ rank: 2, level: 16, cost: 50, effects: [{ type: 'aoeRoot', duration: 8, radius: 10, min: 12, max: 14 }] }],
-    icon: 'NV', iconColor: '#85c1e9',
     description: 'Freezes all nearby enemies in place for up to 8 sec, dealing $d Frost damage.',
   },
   arcane_explosion: {
@@ -457,7 +425,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 60, castTime: 0, cooldown: 0, range: 0, school: 'arcane',
     requiresTarget: false,
     effects: [{ type: 'aoeDamage', min: 26, max: 31, radius: 10 }],
-    icon: 'AE', iconColor: '#af7ac5',
     description: 'A burst of Arcane energy hits all nearby enemies for $d Arcane damage.',
   },
   scorch: {
@@ -465,7 +432,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 35, castTime: 1.5, cooldown: 0, range: 30, school: 'fire',
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 32, max: 40 }],
-    icon: 'SC', iconColor: '#dc7633',
     description: 'Scorches the enemy for $d Fire damage. Quick to cast.',
   },
   ice_barrier: {
@@ -473,7 +439,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 90, castTime: 0, cooldown: 30, range: 0, school: 'frost',
     requiresTarget: false,
     effects: [{ type: 'absorb', amount: 130, duration: 60 }],
-    icon: 'IB', iconColor: '#d6eaf8',
     description: 'Shields you in ice, absorbing 130 damage for 60 sec.',
   },
 
@@ -488,7 +453,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 3, level: 14, cost: 45, effects: [{ type: 'weaponStrike', bonus: 12 }] },
       { rank: 4, level: 20, cost: 45, effects: [{ type: 'weaponStrike', bonus: 18 }] },
     ],
-    icon: 'SS', iconColor: '#f4d03f',
     description: 'An instant strike for weapon damage plus $d. Awards 1 combo point.',
   },
   eviscerate: {
@@ -500,7 +464,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 12, cost: 35, effects: [{ type: 'finisherDamage', base: 8, perCombo: 12, variance: 6 }] },
       { rank: 3, level: 18, cost: 35, effects: [{ type: 'finisherDamage', base: 14, perCombo: 18, variance: 9 }] },
     ],
-    icon: 'EV', iconColor: '#cb4335',
     description: 'Finishing move that causes damage per combo point.',
   },
   backstab: {
@@ -512,7 +475,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 12, cost: 60, effects: [{ type: 'weaponStrike', bonus: 20, requiresBehind: true, weaponMult: 1.5 }] },
       { rank: 3, level: 18, cost: 60, effects: [{ type: 'weaponStrike', bonus: 32, requiresBehind: true, weaponMult: 1.5 }] },
     ],
-    icon: 'BK', iconColor: '#ec7063',
     description: 'Backstab the target for 150% weapon damage plus $d. Must be behind the target. Requires a dagger. Awards 1 combo point.',
   },
   gouge: {
@@ -524,7 +486,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       rank: 2, level: 14, cost: 45,
       effects: [{ type: 'directDamage', min: 15, max: 17 }, { type: 'incapacitate', duration: 4 }],
     }],
-    icon: 'GO', iconColor: '#d98880',
     description: 'Strikes the target, incapacitating it for 4 sec. Any damage breaks the effect. Awards 1 combo point.',
   },
   evasion: {
@@ -532,7 +493,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 0, castTime: 0, cooldown: 300, range: 0, school: 'physical',
     requiresTarget: false, offGcd: true,
     effects: [{ type: 'selfBuff', kind: 'buff_dodge', value: 0.5, duration: 15 }],
-    icon: 'EA', iconColor: '#82e0aa',
     description: 'Increases your dodge chance by 50% for 15 sec.',
   },
   slice_and_dice: {
@@ -540,7 +500,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 25, castTime: 0, cooldown: 0, range: 0, school: 'physical',
     requiresTarget: true, spendsCombo: true,
     effects: [{ type: 'finisherHaste', mult: 1.3, basedur: 9, perCombo: 3 }],
-    icon: 'SD', iconColor: '#f7dc6f',
     description: 'Finishing move that increases melee attack speed by 30%. Lasts longer per combo point.',
   },
   sprint: {
@@ -548,7 +507,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 0, castTime: 0, cooldown: 300, range: 0, school: 'physical',
     requiresTarget: false, offGcd: true,
     effects: [{ type: 'selfBuff', kind: 'buff_speed', value: 1.7, duration: 15 }],
-    icon: 'SP', iconColor: '#aab7b8',
     description: 'Increases your movement speed by 70% for 15 sec.',
   },
   kidney_shot: {
@@ -556,7 +514,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 25, castTime: 0, cooldown: 20, range: 0, school: 'physical',
     requiresTarget: true, spendsCombo: true,
     effects: [{ type: 'finisherStun', base: 1, perCombo: 1 }],
-    icon: 'KS', iconColor: '#e59866',
     description: 'Finishing move that stuns the target. Lasts 1 sec longer per combo point.',
   },
   ambush: {
@@ -564,7 +521,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 60, castTime: 0, cooldown: 0, range: 0, school: 'physical',
     requiresTarget: true, awardsCombo: 1, requiresStealth: true,
     effects: [{ type: 'weaponStrike', bonus: 28, requiresBehind: true, weaponMult: 2.5 }],
-    icon: 'AB', iconColor: '#935116',
     description: 'Ambush the target for 250% weapon damage plus $d. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point.',
   },
   stealth: {
@@ -572,7 +528,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 0, castTime: 0, cooldown: 10, range: 0, school: 'physical',
     requiresTarget: false, offGcd: true, requiresOutOfCombat: true,
     effects: [{ type: 'selfBuff', kind: 'stealth', value: 0.7, duration: 3600 }],
-    icon: 'ST', iconColor: '#5d6d7e',
     description: 'Conceals you in the shadows: enemies barely notice you, but you move 30% slower. Attacking or taking damage breaks Stealth. Cast again to step out.',
   },
   adrenaline_rush: {
@@ -580,7 +535,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 0, castTime: 0, cooldown: 180, range: 0, school: 'physical',
     requiresTarget: false, offGcd: true,
     effects: [{ type: 'gainResource', amount: 60 }],
-    icon: 'AR', iconColor: '#f5b041',
     description: 'Your blood runs hot, instantly restoring 60 energy.',
   },
 
@@ -594,7 +548,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 10, cost: 35, effects: [{ type: 'imbue', bonus: 7, duration: 30, judgeMin: 18, judgeMax: 28 }] },
       { rank: 3, level: 16, cost: 50, effects: [{ type: 'imbue', bonus: 11, duration: 30, judgeMin: 30, judgeMax: 44 }] },
     ],
-    icon: 'SR', iconColor: '#f9e79f',
     description: 'Fills you with Holy power for 30 sec, causing each of your melee swings to deal 4 additional Holy damage. Unleash with Judgement.',
   },
   holy_light: {
@@ -607,7 +560,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 3, level: 14, cost: 95, effects: [{ type: 'heal', min: 122, max: 144 }] },
       { rank: 4, level: 20, cost: 140, effects: [{ type: 'heal', min: 190, max: 222 }] },
     ],
-    icon: 'HL', iconColor: '#fdf2c7',
     description: 'Heals a friendly target for $d.',
   },
   devotion_aura: {
@@ -619,7 +571,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 12, cost: 0, effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 75, duration: 1800 }] },
       { rank: 3, level: 18, cost: 0, effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 110, duration: 1800 }] },
     ],
-    icon: 'DA', iconColor: '#f4d03f',
     description: 'Increases your armor by 40 for 30 min.',
   },
   judgement: {
@@ -627,7 +578,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 30, castTime: 0, cooldown: 10, range: 10, school: 'holy',
     requiresTarget: true,
     effects: [{ type: 'judgement' }],
-    icon: 'JD', iconColor: '#f5b041',
     description: 'Unleashes your active Seal upon the enemy, consuming it to deal its judgement damage.',
   },
   blessing_of_might: {
@@ -639,7 +589,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 12, cost: 40, effects: [{ type: 'buffTarget', kind: 'buff_ap', value: 30, duration: 300 }] },
       { rank: 3, level: 20, cost: 60, effects: [{ type: 'buffTarget', kind: 'buff_ap', value: 45, duration: 300 }] },
     ],
-    icon: 'BM', iconColor: '#f8c471',
     description: 'Places a Blessing on a friendly target, increasing attack power by 15 for 5 min.',
   },
   divine_protection: {
@@ -648,7 +597,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false, offGcd: true,
     effects: [{ type: 'absorb', amount: 50, duration: 10 }],
     ranks: [{ rank: 2, level: 14, cost: 25, effects: [{ type: 'absorb', amount: 110, duration: 10 }] }],
-    icon: 'DP', iconColor: '#fcf3cf',
     description: 'A holy shield absorbs 50 damage for 10 sec.',
   },
   hammer_of_justice: {
@@ -657,7 +605,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [{ type: 'stun', duration: 3 }],
     ranks: [{ rank: 2, level: 16, cost: 45, effects: [{ type: 'stun', duration: 4 }] }],
-    icon: 'HJ', iconColor: '#d4ac0d',
     description: 'Stuns the target for 3 sec.',
   },
   lay_on_hands: {
@@ -666,7 +613,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true, targetType: 'friendly',
     effects: [{ type: 'heal', min: 250, max: 250 }],
     ranks: [{ rank: 2, level: 18, cost: 0, effects: [{ type: 'heal', min: 600, max: 600 }] }],
-    icon: 'LH', iconColor: '#fef9e7',
     description: 'A massive surge of healing: restores 250 health. 10 min cooldown.',
   },
   flash_of_light: {
@@ -674,7 +620,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 35, castTime: 1.5, cooldown: 0, range: 30, school: 'holy',
     requiresTarget: true, targetType: 'friendly',
     effects: [{ type: 'heal', min: 62, max: 76 }],
-    icon: 'FL', iconColor: '#fcf3cf',
     description: 'A quick, efficient flash of Light that heals a friendly target for $d.',
   },
   exorcism: {
@@ -682,7 +627,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 55, castTime: 0, cooldown: 15, range: 30, school: 'holy',
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 46, max: 56 }],
-    icon: 'EX', iconColor: '#f7dc6f',
     description: 'Banishes the wicked with Holy wrath, causing $d Holy damage.',
   },
   consecration: {
@@ -690,7 +634,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 60, castTime: 0, cooldown: 8, range: 0, school: 'holy',
     requiresTarget: false,
     effects: [{ type: 'aoeDamage', min: 28, max: 34, radius: 8 }],
-    icon: 'CN', iconColor: '#f9e79f',
     description: 'Consecrates the ground beneath you, searing nearby enemies for $d Holy damage.',
   },
   righteous_fury: {
@@ -698,7 +641,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 30, castTime: 0, cooldown: 0, range: 0, school: 'holy',
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'righteous_fury', value: 1.6, duration: 1800 }],
-    icon: 'RF', iconColor: '#f1c40f',
     description: 'Increases the threat generated by your Holy damage by 60% for 30 min. The tanking paladin\'s cornerstone.',
   },
 
@@ -708,7 +650,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 0, castTime: 6, cooldown: 0, range: 20, school: 'nature',
     requiresTarget: true,
     effects: [{ type: 'tamePet' }],
-    icon: 'TB', iconColor: '#52be80',
     description: 'Begins taming a beast to be your companion. It must be your level or lower and not an elite. Your pet follows you, attacks your enemies, and holds threat of its own. You may have one pet at a time.',
   },
   dismiss_pet: {
@@ -716,7 +657,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 0, castTime: 0, cooldown: 0, range: 0, school: 'nature',
     requiresTarget: false,
     effects: [{ type: 'dismissPet' }],
-    icon: 'DP', iconColor: '#7f8c8d',
     description: 'Releases your pet back to the wild.',
   },
   raptor_strike: {
@@ -729,7 +669,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 3, level: 14, cost: 35, effects: [{ type: 'weaponDamage', bonus: 18 }] },
       { rank: 4, level: 20, cost: 45, effects: [{ type: 'weaponDamage', bonus: 27 }] },
     ],
-    icon: 'RS', iconColor: '#a9dfbf',
     description: 'A strong melee attack that increases damage by 5. Activates on your next swing.',
   },
   aspect_of_the_hawk: {
@@ -741,7 +680,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 12, cost: 30, effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 35, duration: 1800 }] },
       { rank: 3, level: 18, cost: 40, effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 50, duration: 1800 }] },
     ],
-    icon: 'AH', iconColor: '#7dcea0',
     description: 'Take on the aspect of the hawk, increasing attack power by 20 for 30 min.',
   },
   serpent_sting: {
@@ -753,7 +691,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 10, cost: 25, effects: [{ type: 'dot', total: 35, duration: 15, interval: 3 }] },
       { rank: 3, level: 16, cost: 35, effects: [{ type: 'dot', total: 55, duration: 15, interval: 3 }] },
     ],
-    icon: 'SS', iconColor: '#58d68d',
     description: 'Stings the target, dealing $d Nature damage over 15 sec.',
   },
   arcane_shot: {
@@ -765,7 +702,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 12, cost: 40, effects: [{ type: 'directDamage', min: 24, max: 30 }] },
       { rank: 3, level: 18, cost: 55, effects: [{ type: 'directDamage', min: 38, max: 47 }] },
     ],
-    icon: 'AS', iconColor: '#bb8fce',
     description: 'An instant shot that deals $d Arcane damage.',
   },
   concussive_shot: {
@@ -773,7 +709,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 20, castTime: 0, cooldown: 12, range: 35, minRange: 8, school: 'physical',
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 4, max: 6 }, { type: 'slow', mult: 0.5, duration: 4 }],
-    icon: 'CS', iconColor: '#85c1e9',
     description: 'Dazes the target, slowing movement by 50% for 4 sec.',
   },
   mongoose_bite: {
@@ -782,7 +717,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true, requiresDodgeProc: true,
     effects: [{ type: 'weaponStrike', bonus: 12, cannotBeDodged: true }],
     ranks: [{ rank: 2, level: 16, cost: 10, effects: [{ type: 'weaponStrike', bonus: 24, cannotBeDodged: true }] }],
-    icon: 'MB', iconColor: '#52be80',
     description: 'Counterattack after the target dodges for weapon damage plus 12. Cannot be dodged.',
   },
   wing_clip: {
@@ -790,7 +724,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 20, castTime: 0, cooldown: 0, range: 0, school: 'physical',
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 3, max: 5 }, { type: 'slow', mult: 0.6, duration: 10 }],
-    icon: 'WC', iconColor: '#a3e4d7',
     description: 'Inflicts a wound that slows the enemy by 40% for 10 sec.',
   },
   aspect_of_the_cheetah: {
@@ -798,7 +731,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 20, castTime: 0, cooldown: 0, range: 0, school: 'nature',
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'buff_speed', value: 1.3, duration: 1800 }],
-    icon: 'AC', iconColor: '#f8c471',
     description: 'Take on the aspect of the cheetah, increasing movement speed by 30% for 30 min.',
   },
   aimed_shot: {
@@ -806,7 +738,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 50, castTime: 3.0, cooldown: 6, range: 35, minRange: 8, school: 'physical',
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 50, max: 62 }],
-    icon: 'AI', iconColor: '#d35400',
     description: 'A carefully aimed shot that deals $d damage.',
   },
   rapid_fire: {
@@ -814,7 +745,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 0, castTime: 0, cooldown: 300, range: 0, school: 'physical',
     requiresTarget: false, offGcd: true,
     effects: [{ type: 'selfBuff', kind: 'buff_haste', value: 1.4, duration: 15 }],
-    icon: 'RF', iconColor: '#ec7063',
     description: 'Increases your attack speed by 40% for 15 sec.',
   },
 
@@ -829,7 +759,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 3, level: 14, cost: 48, castTime: 2.5, effects: [{ type: 'directDamage', min: 42, max: 52 }] },
       { rank: 4, level: 20, cost: 70, castTime: 2.5, effects: [{ type: 'directDamage', min: 64, max: 78 }] },
     ],
-    icon: 'SM', iconColor: '#fdf2c7',
     description: 'Smites the enemy for $d Holy damage.',
   },
   lesser_heal: {
@@ -841,7 +770,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 6, cost: 45, effects: [{ type: 'heal', min: 72, max: 86 }] },
       { rank: 3, level: 12, cost: 65, effects: [{ type: 'heal', min: 110, max: 132 }] },
     ],
-    icon: 'LH', iconColor: '#fef9e7',
     description: 'Heals a friendly target for $d.',
   },
   power_word_fortitude: {
@@ -853,7 +781,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 12, cost: 55, effects: [{ type: 'buffTarget', kind: 'buff_sta', value: 7, duration: 1800 }] },
       { rank: 3, level: 20, cost: 80, effects: [{ type: 'buffTarget', kind: 'buff_sta', value: 12, duration: 1800 }] },
     ],
-    icon: 'PF', iconColor: '#fff',
     description: 'Increases the target\'s Stamina by 3 for 30 min.',
   },
   shadow_word_pain: {
@@ -865,7 +792,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 10, cost: 38, effects: [{ type: 'dot', total: 54, duration: 18, interval: 3 }] },
       { rank: 3, level: 16, cost: 55, effects: [{ type: 'dot', total: 84, duration: 18, interval: 3 }] },
     ],
-    icon: 'SW', iconColor: '#9b59b6',
     description: 'A word of darkness causes $d Shadow damage over 18 sec.',
   },
   power_word_shield: {
@@ -877,7 +803,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 12, cost: 70, effects: [{ type: 'absorb', amount: 90, duration: 30 }] },
       { rank: 3, level: 18, cost: 100, effects: [{ type: 'absorb', amount: 145, duration: 30 }] },
     ],
-    icon: 'PS', iconColor: '#fcf3cf',
     description: 'Shields the target, absorbing 48 damage for 30 sec.',
   },
   renew: {
@@ -889,7 +814,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 14, cost: 50, effects: [{ type: 'hot', total: 90, duration: 15, interval: 3 }] },
       { rank: 3, level: 20, cost: 75, effects: [{ type: 'hot', total: 140, duration: 15, interval: 3 }] },
     ],
-    icon: 'RN', iconColor: '#abebc6',
     description: 'Heals the target for $d over 15 sec.',
   },
   mind_blast: {
@@ -901,7 +825,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 14, cost: 70, effects: [{ type: 'directDamage', min: 60, max: 66 }] },
       { rank: 3, level: 20, cost: 95, effects: [{ type: 'directDamage', min: 86, max: 94 }] },
     ],
-    icon: 'MB', iconColor: '#bb8fce',
     description: 'Blasts the target\'s mind for $d Shadow damage.',
   },
   heal: {
@@ -910,7 +833,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true, targetType: 'friendly',
     effects: [{ type: 'heal', min: 165, max: 195 }],
     ranks: [{ rank: 2, level: 20, cost: 130, effects: [{ type: 'heal', min: 230, max: 270 }] }],
-    icon: 'HE', iconColor: '#fdf2c7',
     description: 'A slow but powerful prayer that heals a friendly target for $d.',
   },
   mind_flay: {
@@ -918,7 +840,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 45, castTime: 0, channel: { duration: 3, ticks: 3 }, cooldown: 0, range: 20, school: 'shadow',
     requiresTarget: true,
     effects: [{ type: 'drainTick', min: 12, max: 12, healFrac: 0 }],
-    icon: 'MF', iconColor: '#7d3c98',
     description: 'Assaults the target\'s mind with Shadow energy, causing 12 damage each second for 3 sec.',
   },
   flash_heal: {
@@ -926,7 +847,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 75, castTime: 1.5, cooldown: 0, range: 30, school: 'holy',
     requiresTarget: true, targetType: 'friendly',
     effects: [{ type: 'heal', min: 120, max: 142 }],
-    icon: 'FH', iconColor: '#fef9e7',
     description: 'A fast prayer that heals a friendly target for $d.',
   },
 
@@ -941,7 +861,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 3, level: 14, cost: 40, castTime: 2.5, effects: [{ type: 'directDamage', min: 45, max: 51 }] },
       { rank: 4, level: 20, cost: 60, castTime: 3.0, effects: [{ type: 'directDamage', min: 75, max: 85 }] },
     ],
-    icon: 'LB', iconColor: '#85c1e9',
     description: 'Hurls a bolt of lightning for $d Nature damage.',
   },
   rockbiter_weapon: {
@@ -953,7 +872,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 8, cost: 30, effects: [{ type: 'imbue', bonus: 9, duration: 300 }] },
       { rank: 3, level: 16, cost: 45, effects: [{ type: 'imbue', bonus: 14, duration: 300 }] },
     ],
-    icon: 'RB', iconColor: '#b9770e',
     description: 'Imbues your weapon with the fury of stone: each swing deals 5 additional damage for 5 min.',
   },
   healing_wave: {
@@ -966,7 +884,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 3, level: 12, cost: 65, castTime: 2.5, effects: [{ type: 'heal', min: 92, max: 110 }] },
       { rank: 4, level: 18, cost: 90, castTime: 2.5, effects: [{ type: 'heal', min: 138, max: 164 }] },
     ],
-    icon: 'HW', iconColor: '#aed6f1',
     description: 'Heals a friendly target for $d.',
   },
   earth_shock: {
@@ -978,7 +895,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 10, cost: 45, effects: [{ type: 'directDamage', min: 33, max: 38 }] },
       { rank: 3, level: 16, cost: 65, effects: [{ type: 'directDamage', min: 54, max: 61 }] },
     ],
-    icon: 'ES', iconColor: '#b9770e',
     description: 'Instantly shocks the target with concussive force for $d Nature damage.',
   },
   lightning_shield: {
@@ -990,7 +906,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 12, cost: 40, effects: [{ type: 'selfBuff', kind: 'thorns', value: 20, duration: 600 }] },
       { rank: 3, level: 18, cost: 55, effects: [{ type: 'selfBuff', kind: 'thorns', value: 29, duration: 600 }] },
     ],
-    icon: 'LS', iconColor: '#5dade2',
     description: 'Surrounds you with crackling lightning: melee attackers take 13 Nature damage.',
   },
   flame_shock: {
@@ -1002,7 +917,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       rank: 2, level: 16, cost: 55,
       effects: [{ type: 'directDamage', min: 42, max: 42 }, { type: 'dot', total: 48, duration: 12, interval: 3 }],
     }],
-    icon: 'FS', iconColor: '#e74c3c',
     description: 'Sears the target with fire for 25 damage plus $d over 12 sec.',
   },
   frost_shock: {
@@ -1010,7 +924,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 50, castTime: 0, cooldown: 6, range: 20, school: 'frost',
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 36, max: 42 }, { type: 'slow', mult: 0.5, duration: 8 }],
-    icon: 'FK', iconColor: '#85c1e9',
     description: 'Instantly shocks the target with frost for $d Frost damage and slows its movement by 50% for 8 sec.',
   },
   ghost_wolf: {
@@ -1018,7 +931,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 35, castTime: 2.0, cooldown: 0, range: 0, school: 'nature',
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'buff_speed', value: 1.4, duration: 600 }],
-    icon: 'GW', iconColor: '#aab7b8',
     description: 'Turns you into a Ghost Wolf, increasing movement speed by 40% for 10 min.',
   },
   stormstrike: {
@@ -1026,7 +938,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 40, castTime: 0, cooldown: 12, range: 0, school: 'physical',
     requiresTarget: true,
     effects: [{ type: 'weaponStrike', bonus: 26 }],
-    icon: 'ST', iconColor: '#5dade2',
     description: 'Channels the storm through your weapon, instantly striking for weapon damage plus $d.',
   },
 
@@ -1041,7 +952,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 3, level: 14, cost: 55, castTime: 2.7, effects: [{ type: 'directDamage', min: 42, max: 53 }] },
       { rank: 4, level: 20, cost: 80, castTime: 3.0, effects: [{ type: 'directDamage', min: 68, max: 84 }] },
     ],
-    icon: 'SB', iconColor: '#9b59b6',
     description: 'Sends a shadowy bolt at the enemy for $d Shadow damage.',
   },
   demon_skin: {
@@ -1053,7 +963,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 12, cost: 35, effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 55, duration: 1800 }] },
       { rank: 3, level: 20, cost: 50, effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 80, duration: 1800 }] },
     ],
-    icon: 'DS', iconColor: '#7d6608',
     description: 'Demonic skin increases your armor by 30 for 30 min.',
   },
   immolate: {
@@ -1068,7 +977,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       rank: 3, level: 16, cost: 60,
       effects: [{ type: 'directDamage', min: 38, max: 38 }, { type: 'dot', total: 60, duration: 15, interval: 3 }],
     }],
-    icon: 'IM', iconColor: '#e67e22',
     description: 'Burns the enemy for 11 Fire damage and an additional $d over 15 sec.',
   },
   corruption: {
@@ -1080,7 +988,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 12, cost: 55, effects: [{ type: 'dot', total: 72, duration: 18, interval: 3 }] },
       { rank: 3, level: 18, cost: 75, effects: [{ type: 'dot', total: 108, duration: 18, interval: 3 }] },
     ],
-    icon: 'CO', iconColor: '#6c3483',
     description: 'Corrupts the target, causing $d Shadow damage over 18 sec.',
   },
   life_tap: {
@@ -1092,7 +999,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 14, cost: 0, effects: [{ type: 'lifeTap', hp: 55, mana: 55 }] },
       { rank: 3, level: 20, cost: 0, effects: [{ type: 'lifeTap', hp: 85, mana: 85 }] },
     ],
-    icon: 'LT', iconColor: '#76448a',
     description: 'Converts 30 health into 30 mana.',
   },
   curse_of_agony: {
@@ -1104,7 +1010,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 14, cost: 40, effects: [{ type: 'dot', total: 72, duration: 24, interval: 3 }] },
       { rank: 3, level: 20, cost: 60, effects: [{ type: 'dot', total: 112, duration: 24, interval: 3 }] },
     ],
-    icon: 'CA', iconColor: '#512e5f',
     description: 'Curses the target with agony: $d Shadow damage over 24 sec.',
   },
   drain_life: {
@@ -1116,7 +1021,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 14, cost: 50, effects: [{ type: 'drainTick', min: 12, max: 12, healFrac: 1 }] },
       { rank: 3, level: 20, cost: 70, effects: [{ type: 'drainTick', min: 17, max: 17, healFrac: 1 }] },
     ],
-    icon: 'DL', iconColor: '#a569bd',
     description: 'Drains the target\'s life, transferring 7 health to you each second for 5 sec.',
   },
   fear: {
@@ -1124,7 +1028,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 40, castTime: 1.5, cooldown: 0, range: 20, school: 'shadow',
     requiresTarget: true,
     effects: [{ type: 'incapacitate', duration: 8 }],
-    icon: 'FE', iconColor: '#5b2c6f',
     description: 'Strikes terror into the enemy, leaving it cowering for up to 8 sec. Any damage breaks the effect.',
   },
   searing_pain: {
@@ -1132,7 +1035,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 35, castTime: 1.5, cooldown: 0, range: 30, school: 'fire',
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 30, max: 38 }],
-    icon: 'SP', iconColor: '#dc7633',
     description: 'Sears the enemy with agonizing fire for $d Fire damage. Quick to cast.',
   },
   shadowburn: {
@@ -1140,7 +1042,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 70, castTime: 0, cooldown: 15, range: 20, school: 'shadow',
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 56, max: 66 }],
-    icon: 'SH', iconColor: '#6c3483',
     description: 'Instantly blasts the target with Shadow Flame for $d Shadow damage.',
   },
 
@@ -1155,7 +1056,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 3, level: 14, cost: 48, effects: [{ type: 'directDamage', min: 38, max: 45 }] },
       { rank: 4, level: 20, cost: 70, effects: [{ type: 'directDamage', min: 60, max: 71 }] },
     ],
-    icon: 'WR', iconColor: '#58d68d',
     description: 'Hurls a bolt of nature energy for $d Nature damage.',
   },
   healing_touch: {
@@ -1168,7 +1068,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 3, level: 14, cost: 75, effects: [{ type: 'heal', min: 115, max: 140 }] },
       { rank: 4, level: 20, cost: 110, effects: [{ type: 'heal', min: 175, max: 208 }] },
     ],
-    icon: 'HT', iconColor: '#a9dfbf',
     description: 'Heals a friendly target for $d.',
   },
   mark_of_the_wild: {
@@ -1180,7 +1079,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 10, cost: 35, effects: [{ type: 'buffTarget', kind: 'buff_armor', value: 50, duration: 1800 }] },
       { rank: 3, level: 16, cost: 50, effects: [{ type: 'buffTarget', kind: 'buff_armor', value: 75, duration: 1800 }] },
     ],
-    icon: 'MW', iconColor: '#f5cba7',
     description: 'Places the Mark of the Wild on a friendly target, increasing armor by 25 for 30 min.',
   },
   moonfire: {
@@ -1195,7 +1093,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       rank: 3, level: 16, cost: 60,
       effects: [{ type: 'directDamage', min: 28, max: 34 }, { type: 'dot', total: 40, duration: 12, interval: 3 }],
     }],
-    icon: 'MF', iconColor: '#d2b4de',
     description: 'Burns the enemy with moonfire for $d Arcane damage plus damage over time.',
   },
   rejuvenation: {
@@ -1208,7 +1105,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 3, level: 16, cost: 60, effects: [{ type: 'hot', total: 88, duration: 12, interval: 3 }] },
       { rank: 4, level: 20, cost: 80, effects: [{ type: 'hot', total: 116, duration: 12, interval: 3 }] },
     ],
-    icon: 'RJ', iconColor: '#82e0aa',
     description: 'Heals the target for $d over 12 sec.',
   },
   thorns: {
@@ -1220,7 +1116,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 14, cost: 35, effects: [{ type: 'buffTarget', kind: 'thorns', value: 6, duration: 600 }] },
       { rank: 3, level: 20, cost: 50, effects: [{ type: 'buffTarget', kind: 'thorns', value: 9, duration: 600 }] },
     ],
-    icon: 'TH', iconColor: '#7dcea0',
     description: 'Thorns sprout from the target: melee attackers take 3 Nature damage.',
   },
   entangling_roots: {
@@ -1232,7 +1127,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       rank: 2, level: 16, cost: 50,
       effects: [{ type: 'root', duration: 12 }, { type: 'dot', total: 32, duration: 12, interval: 3 }],
     }],
-    icon: 'ER', iconColor: '#229954',
     description: 'Roots the target in place for up to 12 sec.',
   },
   bear_form: {
@@ -1240,7 +1134,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 30, castTime: 0, cooldown: 0, range: 0, school: 'physical',
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'form_bear', value: 0.65, duration: 3600 }],
-    icon: 'BF', iconColor: '#b9770e',
     description: 'Shapeshift into a bear: armor +65%, attack power +15, your attacks build rage and generate 30% more threat. Cast again to return to caster form.',
   },
   maul: {
@@ -1252,7 +1145,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ranks: [
       { rank: 2, level: 16, cost: 15, threatFlat: 50, effects: [{ type: 'weaponDamage', bonus: 27 }] },
     ],
-    icon: 'MA', iconColor: '#a04000',
     description: 'A mauling attack that increases melee damage by $d and causes a high amount of threat. Activates on your next swing. Bear Form only.',
   },
   growl: {
@@ -1260,7 +1152,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 0, castTime: 0, cooldown: 10, range: 8, school: 'physical',
     requiresTarget: true, offGcd: true, requiresForm: 'bear',
     effects: [{ type: 'taunt' }],
-    icon: 'GR', iconColor: '#873600',
     description: 'Growls at the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec. Bear Form only.',
   },
   cat_form: {
@@ -1268,7 +1159,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 30, castTime: 0, cooldown: 0, range: 0, school: 'physical',
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'form_cat', value: 0.71, duration: 3600 }],
-    icon: 'CF', iconColor: '#e67e22',
     description: 'Shapeshift into a cat: attack power rises with your level, your attacks use energy and combo points, and you generate 29% less threat. Cast again to return to caster form.',
   },
   claw: {
@@ -1279,7 +1169,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ranks: [
       { rank: 2, level: 18, cost: 45, effects: [{ type: 'weaponStrike', bonus: 20 }] },
     ],
-    icon: 'CW', iconColor: '#d35400',
     description: 'Claw the enemy for weapon damage plus $d. Awards 1 combo point. Cat Form only.',
   },
   ferocious_bite: {
@@ -1287,7 +1176,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 35, castTime: 0, cooldown: 0, range: 0, school: 'physical',
     requiresTarget: true, spendsCombo: true, requiresForm: 'cat',
     effects: [{ type: 'finisherDamage', base: 10, perCombo: 14, variance: 6 }],
-    icon: 'FB', iconColor: '#ba4a00',
     description: 'Finishing move that causes damage per combo point. Cat Form only.',
   },
   swipe: {
@@ -1296,7 +1184,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false, requiresForm: 'bear',
     threat: { mult: 1.75 }, // classic: swipe damage causes 1.75x threat
     effects: [{ type: 'aoeDamage', min: 12, max: 15, radius: 5 }],
-    icon: 'SW', iconColor: '#935116',
     description: 'Swipe nearby enemies for $d damage. Causes extra threat. Bear Form only.',
   },
   regrowth: {
@@ -1304,7 +1191,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 55, castTime: 2.0, cooldown: 0, range: 30, school: 'nature',
     requiresTarget: true, targetType: 'friendly',
     effects: [{ type: 'heal', min: 52, max: 62 }, { type: 'hot', total: 49, duration: 21, interval: 3 }],
-    icon: 'RG', iconColor: '#58d68d',
     description: 'Heals a friendly target for $d and an additional amount over 21 sec.',
   },
   barkskin: {
@@ -1312,7 +1198,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 30, castTime: 0, cooldown: 60, range: 0, school: 'nature',
     requiresTarget: false, offGcd: true,
     effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 150, duration: 15 }],
-    icon: 'BA', iconColor: '#935116',
     description: 'Your skin hardens like bark, increasing armor by 150 for 15 sec.',
   },
   starfire: {
@@ -1320,17 +1205,125 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 80, castTime: 3.0, cooldown: 0, range: 30, school: 'arcane',
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 60, max: 74 }],
-    icon: 'SF', iconColor: '#d2b4de',
     description: 'Calls down a bolt of stellar fire, causing $d Arcane damage.',
+  },
+
+  // ============== TALENT-GRANTED (Warrior) ==============
+  // Not in CLASSES.warrior.abilities — unlocked only via talent grants (spec
+  // signatures + active nodes), so abilitiesKnownAt adds them by `mods.grants`.
+  mortal_strike: {
+    id: 'mortal_strike', name: 'Mortal Strike', class: 'warrior', learnLevel: 10,
+    cost: 30, castTime: 0, cooldown: 6, range: 0, school: 'physical',
+    requiresTarget: true, threat: { mult: 1.2 },
+    effects: [{ type: 'weaponStrike', bonus: 40 }],
+    description: 'A vicious strike dealing weapon damage plus $d. (Arms signature)',
+  },
+  bloodthirst: {
+    id: 'bloodthirst', name: 'Bloodthirst', class: 'warrior', learnLevel: 10,
+    cost: 30, castTime: 0, cooldown: 6, range: 0, school: 'physical',
+    requiresTarget: true,
+    effects: [{ type: 'weaponStrike', bonus: 35, weaponMult: 0.6 }],
+    description: 'Instantly attack in a blood frenzy for $d. (Fury signature)',
+  },
+  shield_slam: {
+    id: 'shield_slam', name: 'Shield Slam', class: 'warrior', learnLevel: 10,
+    cost: 20, castTime: 0, cooldown: 6, range: 0, school: 'physical',
+    requiresTarget: true, threat: { flat: 110 },
+    effects: [{ type: 'weaponStrike', bonus: 30, weaponMult: 0.5 }],
+    description: 'Slam the target with your shield for $d and massive threat. (Protection signature)',
+  },
+  whirlwind: {
+    id: 'whirlwind', name: 'Whirlwind', class: 'warrior', learnLevel: 10,
+    cost: 25, castTime: 0, cooldown: 10, range: 0, school: 'physical',
+    requiresTarget: true,
+    effects: [{ type: 'aoeDamage', min: 30, max: 42, radius: 8 }],
+    description: 'Spin in a deadly arc, striking all nearby enemies for $d. (Fury talent)',
+  },
+  berserker_rage: {
+    id: 'berserker_rage', name: 'Berserker Rage', class: 'warrior', learnLevel: 10,
+    cost: 0, castTime: 0, cooldown: 30, range: 0, school: 'physical',
+    requiresTarget: false, offGcd: true,
+    effects: [{ type: 'gainResource', amount: 20 }],
+    description: 'Enter a berserker rage, generating 20 rage. (Warrior talent)',
   },
 };
 
-// Abilities a class knows at a given level, with active rank values resolved.
-export function abilitiesKnownAt(cls: PlayerClass, level: number): { def: AbilityDef; rank: number; cost: number; castTime: number; effects: AbilityDef['effects']; threatFlat: number; threatMult: number }[] {
-  const out = [];
-  for (const id of CLASSES[cls].abilities) {
+// A class ability resolved to a concrete rank, with talent modifiers already
+// folded into its cost / cast / cooldown / effects. The combat path reads only
+// these flat numbers — it never consults the talent tree. Structurally matches
+// sim's ResolvedAbility.
+export interface KnownAbility {
+  def: AbilityDef;
+  rank: number;
+  cost: number;
+  castTime: number;
+  cooldown: number;
+  effects: AbilityEffect[];
+  threatFlat: number;
+  threatMult: number;
+}
+
+// Scale one effect's damage/heal magnitudes, returning a NEW effect object — the
+// base content arrays are shared module data and must never be mutated. `flat`
+// is added once to the effect's primary magnitude.
+function scaleEffect(eff: AbilityEffect, dmgMult: number, healMult: number, flat: number): AbilityEffect {
+  switch (eff.type) {
+    case 'weaponDamage': return { ...eff, bonus: Math.round(eff.bonus * dmgMult + flat) };
+    case 'weaponStrike': return { ...eff, bonus: Math.round(eff.bonus * dmgMult + flat) };
+    case 'directDamage': return { ...eff, min: Math.round(eff.min * dmgMult + flat), max: Math.round(eff.max * dmgMult + flat) };
+    case 'dot': return { ...eff, total: Math.round(eff.total * dmgMult + flat) };
+    case 'aoeDamage': return { ...eff, min: Math.round(eff.min * dmgMult + flat), max: Math.round(eff.max * dmgMult + flat) };
+    case 'aoeRoot': return { ...eff, min: Math.round(eff.min * dmgMult), max: Math.round(eff.max * dmgMult) };
+    case 'drainTick': return { ...eff, min: Math.round(eff.min * dmgMult), max: Math.round(eff.max * dmgMult) };
+    case 'finisherDamage': return { ...eff, base: Math.round(eff.base * dmgMult + flat), perCombo: Math.round(eff.perCombo * dmgMult) };
+    case 'imbue': return { ...eff, bonus: Math.round(eff.bonus * dmgMult + flat), judgeMin: eff.judgeMin === undefined ? undefined : Math.round(eff.judgeMin * dmgMult + flat), judgeMax: eff.judgeMax === undefined ? undefined : Math.round(eff.judgeMax * dmgMult + flat) };
+    case 'heal': return { ...eff, min: Math.round(eff.min * healMult + flat), max: Math.round(eff.max * healMult + flat) };
+    case 'hot': return { ...eff, total: Math.round(eff.total * healMult + flat) };
+    case 'absorb': return { ...eff, amount: Math.round(eff.amount * healMult + flat) };
+    case 'buffTarget': return { ...eff, value: Math.round(eff.value * dmgMult + flat) };
+    case 'selfBuff': return { ...eff, value: Math.round(eff.value * dmgMult + flat) };
+    case 'lifeTap': return { ...eff, mana: Math.round(eff.mana * dmgMult + flat) };
+    case 'gainResource': return { ...eff, amount: Math.round(eff.amount * dmgMult + flat) };
+    default: return eff;
+  }
+}
+
+// Fold precomputed talent modifiers into one resolved ability (FR-5.3). Global
+// melee/spell/heal mults apply to every ability of the right school; per-ability
+// mods stack on top and also tune cost / cast time / cooldown.
+function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
+  const am = mods.abilities[entry.def.id];
+  const physical = entry.def.school === 'physical';
+  const globalDmg = physical ? mods.global.meleeDmgPct : mods.global.spellDmgPct;
+  const dmgMult = 1 + globalDmg + (am?.dmgPct ?? 0);
+  const healMult = 1 + mods.global.healPct + (am?.dmgPct ?? 0);
+  const flat = am?.flatDmg ?? 0;
+  if (dmgMult !== 1 || healMult !== 1 || flat !== 0) {
+    entry.effects = entry.effects.map((e) => scaleEffect(e, dmgMult, healMult, flat));
+  }
+  if (am) {
+    if (am.costPct) entry.cost = Math.max(0, Math.round(entry.cost * (1 + am.costPct)));
+    if (am.castPct) entry.castTime = Math.max(0, entry.castTime * (1 + am.castPct));
+    if (am.cooldownPct) entry.cooldown = Math.max(0, entry.cooldown * (1 + am.cooldownPct));
+  }
+}
+
+// Abilities a class knows at a given level, with rank values resolved and any
+// talent modifiers (granted abilities + per-ability/global tweaks) applied.
+export function abilitiesKnownAt(cls: PlayerClass, level: number, mods?: TalentModifiers): KnownAbility[] {
+  const out: KnownAbility[] = [];
+  const baseIds = CLASSES[cls].abilities;
+  const ids = [...baseIds];
+  const grantIds = new Set<string>();
+  for (const g of mods?.grants ?? []) grantIds.add(g.ability);
+  for (const g of mods?.grants ?? []) if (!ids.includes(g.ability)) ids.push(g.ability);
+
+  for (const id of ids) {
     const def = ABILITIES[id];
-    if (def.learnLevel > level) continue;
+    if (!def) continue;
+    const granted = grantIds.has(id) || !baseIds.includes(id);
+    if (!granted && def.learnLevel > level) continue; // class kit is level-gated; grants bypass it
+
     let rank = 1, cost = def.cost, castTime = def.castTime, effects = def.effects;
     let threatFlat = def.threat?.flat ?? 0;
     const threatMult = def.threat?.mult ?? 1;
@@ -1343,7 +1336,9 @@ export function abilitiesKnownAt(cls: PlayerClass, level: number): { def: Abilit
         if (r.threatFlat !== undefined) threatFlat = r.threatFlat;
       }
     }
-    out.push({ def, rank, cost, castTime, effects, threatFlat, threatMult });
+    const entry: KnownAbility = { def, rank, cost, castTime, cooldown: def.cooldown, effects, threatFlat, threatMult };
+    if (mods) applyTalentMods(entry, mods);
+    out.push(entry);
   }
   return out;
 }

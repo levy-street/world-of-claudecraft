@@ -14,7 +14,7 @@ import { resolveRealm } from '../server/realm';
 class FakeDb implements SocialDb {
   private chars = new Map<number, CharInfo>();
   private friends = new Map<number, Set<number>>();
-  private blocks = new Map<number, Set<number>>();
+  blocks = new Map<number, Set<number>>();
   private guilds = new Map<number, string>();
   private members = new Map<number, { guildId: number; rank: GuildRank }>();
   private nextGuildId = 1;
@@ -48,11 +48,13 @@ class FakeDb implements SocialDb {
   }
   async blockedIds(c: number): Promise<number[]> { return [...(this.blocks.get(c) ?? [])]; }
 
-  async createGuild(name: string): Promise<number> {
-    if ([...this.guilds.values()].some((n) => n.toLowerCase() === name.toLowerCase())) throw new Error('duplicate guild');
+  async createGuildWithLeader(name: string, leaderId: number): Promise<{ guildId: number } | { error: 'name_taken' | 'already_in_guild' }> {
+    if ([...this.guilds.values()].some((n) => n.toLowerCase() === name.toLowerCase())) return { error: 'name_taken' };
+    if (this.members.has(leaderId)) return { error: 'already_in_guild' };
     const id = this.nextGuildId++;
     this.guilds.set(id, name);
-    return id;
+    this.members.set(leaderId, { guildId: id, rank: 'leader' });
+    return { guildId: id };
   }
   async deleteGuild(id: number): Promise<void> {
     this.guilds.delete(id);
@@ -62,8 +64,13 @@ class FakeDb implements SocialDb {
     const m = this.members.get(c);
     return m ? { guildId: m.guildId, guildName: this.guilds.get(m.guildId)!, rank: m.rank } : null;
   }
-  async addGuildMember(guildId: number, c: number, rank: GuildRank): Promise<void> {
-    if (!this.members.has(c)) this.members.set(c, { guildId, rank });
+  async addGuildMemberAtomic(guildId: number, c: number, rank: GuildRank, limit: number): Promise<'ok' | 'full' | 'already_member' | 'no_guild'> {
+    if (!this.guilds.has(guildId)) return 'no_guild';
+    if (this.members.has(c)) return 'already_member';
+    const count = [...this.members.values()].filter((m) => m.guildId === guildId).length;
+    if (count >= limit) return 'full';
+    this.members.set(c, { guildId, rank });
+    return 'ok';
   }
   async removeGuildMember(c: number): Promise<void> { this.members.delete(c); }
   async setGuildRank(c: number, rank: GuildRank): Promise<void> { const m = this.members.get(c); if (m) m.rank = rank; }
@@ -72,6 +79,7 @@ class FakeDb implements SocialDb {
       .filter(([, m]) => m.guildId === guildId)
       .map(([cid, m]) => ({ ...this.chars.get(cid)!, rank: m.rank }));
   }
+  guildCount(): number { return this.guilds.size; } // test helper: detect orphaned guilds
 }
 
 class FakeTransport implements SocialTransport {
@@ -104,6 +112,9 @@ class FakeTransport implements SocialTransport {
   }
   pushSnapshot(id: number): void { this.snapshotCount.set(id, (this.snapshotCount.get(id) ?? 0) + 1); }
   onBlocksChanged(id: number, ids: number[]): void { this.blockSets.set(id, ids); }
+  isIgnoring(recipientId: number, senderCharacterId: number): boolean {
+    return !!this.db.blocks.get(recipientId)?.has(senderCharacterId);
+  }
 
   eventsFor(id: number): SocialEvent[] { return this.delivered.get(id) ?? []; }
   errorsFor(id: number): string[] { return this.eventsFor(id).filter((e) => e.type === 'error').map((e: any) => e.text); }
@@ -183,6 +194,14 @@ describe('friends', () => {
     expect(snap.friends[1].zone).toBeUndefined();
   });
 
+  it('carries live coordinates for online friends (for the world map)', async () => {
+    await h.svc.friendAdd(h.actor(1), 'Bet');
+    h.tx.setOnline(2, { zone: 'Mirewood', status: 'online', x: 12.5, z: -34 });
+    const snap = await h.svc.snapshot(1);
+    expect(snap.friends[0].x).toBe(12.5);
+    expect(snap.friends[0].z).toBe(-34);
+  });
+
   it('refuses self-friending and duplicates', async () => {
     await h.svc.friendAdd(h.actor(1), 'Aleph');
     expect(h.tx.errorsFor(1).join()).toMatch(/yourself/i);
@@ -201,6 +220,12 @@ describe('friends', () => {
     await h.svc.friendAdd(h.actor(1), 'Bet');
     await h.svc.friendRemove(h.actor(1), 'Bet');
     expect((await h.svc.snapshot(1)).friends).toHaveLength(0);
+  });
+
+  it('does not claim success when removing someone who is not a friend', async () => {
+    await h.svc.friendRemove(h.actor(1), 'Bet');
+    expect(h.tx.errorsFor(1).join()).toMatch(/not on your friends list/i);
+    expect(h.tx.textFor(1).join()).not.toMatch(/removed from friends/i);
   });
 
   it('notifies watching friends when a character comes online', async () => {
@@ -239,9 +264,25 @@ describe('ignore / block', () => {
     expect(h.tx.blockSets.get(1)).toEqual([]);
   });
 
+  it('does not claim success when unignoring someone who is not ignored', async () => {
+    await h.svc.blockRemove(h.actor(1), 'Bet');
+    expect(h.tx.errorsFor(1).join()).toMatch(/not on your ignore list/i);
+    expect(h.tx.textFor(1).join()).not.toMatch(/no longer ignored/i);
+  });
+
   it('refuses to block yourself', async () => {
     await h.svc.blockAdd(h.actor(1), 'Aleph');
     expect(h.tx.errorsFor(1).join()).toMatch(/yourself/i);
+  });
+
+  it('refuses to friend a player you are ignoring', async () => {
+    await h.svc.blockAdd(h.actor(1), 'Bet');
+    h.tx.clear();
+    await h.svc.friendAdd(h.actor(1), 'Bet');
+    expect(h.tx.errorsFor(1).join()).toMatch(/ignoring/i);
+    const snap = await h.svc.snapshot(1);
+    expect(snap.friends).toHaveLength(0);
+    expect(snap.blocks.map((b) => b.name)).toEqual(['Bet']);
   });
 });
 
@@ -347,6 +388,30 @@ describe('guilds', () => {
     expect((await h.svc.snapshot(2)).guild).toBeNull();
   });
 
+  it('rejects inviting someone who already has a pending guild invite', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    await h.svc.guildCreate(h.actor(3), 'Raiders');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    h.tx.clear();
+    // a second guild tries to invite Bet while the first invite is still live
+    await h.svc.guildInvite(h.actor(3), 'Bet');
+    expect(h.tx.errorsFor(3).join()).toMatch(/already has a pending guild invitation/i);
+    // the original invite is untouched, so Bet still joins the first guild
+    await h.svc.guildAccept(h.actor(2));
+    expect((await h.svc.snapshot(2)).guild?.name).toBe('Knights');
+  });
+
+  it('allows a fresh invite once the previous one has expired', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    await h.svc.guildCreate(h.actor(3), 'Raiders');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    h.advance(61_000); // first invite lapses
+    h.tx.clear();
+    await h.svc.guildInvite(h.actor(3), 'Bet');
+    expect(h.tx.errorsFor(3)).toHaveLength(0);
+    expect(h.tx.eventsFor(2).some((e) => e.type === 'guildInvite')).toBe(true);
+  });
+
   it('routes guild chat only to guild members', async () => {
     await h.svc.guildCreate(h.actor(1), 'Knights');
     await h.svc.guildInvite(h.actor(1), 'Bet');
@@ -357,6 +422,37 @@ describe('guilds', () => {
     expect(h.tx.eventsFor(1).some((e) => e.type === 'chat' && e.channel === 'guild' && e.text === 'hello guild')).toBe(true);
     expect(h.tx.eventsFor(2).some((e) => e.type === 'chat' && e.text === 'hello guild')).toBe(true);
     expect(h.tx.eventsFor(3)).toHaveLength(0); // Gimel is not in the guild
+  });
+
+  it('suppresses guild chat from a player the recipient ignores', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildAccept(h.actor(2));
+    await h.svc.guildInvite(h.actor(1), 'Gimel');
+    await h.svc.guildAccept(h.actor(3));
+    // Bet ignores Aleph
+    await h.svc.blockAdd(h.actor(2), 'Aleph');
+    h.tx.clear();
+    const ok = await h.svc.guildChat(h.actor(1), 'hello guild');
+    expect(ok).toBe(true);
+    // Aleph still sees their own line; an uninvolved member (Gimel) sees it
+    expect(h.tx.eventsFor(1).some((e) => e.type === 'chat' && e.text === 'hello guild')).toBe(true);
+    expect(h.tx.eventsFor(3).some((e) => e.type === 'chat' && e.text === 'hello guild')).toBe(true);
+    // Bet, who ignores Aleph, receives nothing
+    expect(h.tx.eventsFor(2)).toHaveLength(0);
+  });
+
+  it('suppresses officer chat from an officer the recipient ignores', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildAccept(h.actor(2));
+    await h.svc.guildSetRank(h.actor(1), 'Bet', 'officer');
+    // Bet ignores the Guild Master Aleph
+    await h.svc.blockAdd(h.actor(2), 'Aleph');
+    h.tx.clear();
+    expect(await h.svc.officerChat(h.actor(1), 'officers only')).toBe(true);
+    expect(h.tx.eventsFor(1).some((e) => e.type === 'chat' && e.channel === 'officer')).toBe(true);
+    expect(h.tx.eventsFor(2)).toHaveLength(0);
   });
 
   it('blocks guild chat from a non-member', async () => {
@@ -442,5 +538,54 @@ describe('guilds', () => {
     h.tx.clear();
     await h.svc.guildInvite(h.actor(1), 'Bet');
     expect(h.tx.errorsFor(1).join()).toMatch(/already in a guild/i);
+  });
+});
+
+describe('guild atomicity (#149)', () => {
+  let h: ReturnType<typeof setup>;
+  beforeEach(() => {
+    h = setup();
+    h.add(1, 'Aleph'); h.add(2, 'Bet');
+    h.tx.setOnline(1); h.tx.setOnline(2);
+  });
+
+  it('two racing guild_create packets from one character leave no orphan guild', async () => {
+    // Both calls pass the "are you already in a guild?" check before either
+    // writes its member row. The non-atomic flow created two guilds and orphaned
+    // the leaderless second one; the atomic create must produce exactly one.
+    await Promise.all([
+      h.svc.guildCreate(h.actor(1), 'Iron Vanguard'),
+      h.svc.guildCreate(h.actor(1), 'Storm Wardens'),
+    ]);
+    expect(h.db.guildCount()).toBe(1);
+    const snap = await h.svc.snapshot(1);
+    expect(snap.guild?.rank).toBe('leader');
+    expect(snap.guild?.members.map((m) => m.name)).toEqual(['Aleph']);
+  });
+
+  it('refuses to create a second guild when already in one (no orphan)', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    h.tx.clear();
+    await h.svc.guildCreate(h.actor(1), 'Raiders');
+    expect(h.tx.errorsFor(1).join()).toMatch(/already in a guild/i);
+    expect(h.db.guildCount()).toBe(1);
+  });
+
+  it('guildAccept surfaces a full guild reported by the atomic add', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    h.db.addGuildMemberAtomic = async () => 'full';
+    await h.svc.guildAccept(h.actor(2));
+    expect(h.tx.errorsFor(2).join()).toMatch(/full/i);
+    expect((await h.svc.snapshot(2)).guild).toBeNull();
+  });
+
+  it('guildAccept surfaces a vanished guild reported by the atomic add', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    h.db.addGuildMemberAtomic = async () => 'no_guild';
+    await h.svc.guildAccept(h.actor(2));
+    expect(h.tx.errorsFor(2).join()).toMatch(/no longer exists/i);
+    expect((await h.svc.snapshot(2)).guild).toBeNull();
   });
 });

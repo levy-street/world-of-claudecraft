@@ -12,6 +12,9 @@ export const SETTING_RANGES = {
   brightness: { min: 0.6, max: 1.5, def: 1 },
   renderScale: { min: 0.5, max: 1, def: 1 },
   fullscreen: { min: 0, max: 1, def: 1 },
+  // on by default: post-cap players see their overflow/virtual-level bar; turn
+  // off for the classic static "MAX LEVEL" text (Max-Level XP Overflow)
+  showOverflowXp: { min: 0, max: 1, def: 1 },
   // off by default: always-on click-to-move would disrupt the precise melee
   // positioning the team wanted to preserve, so it's opt-in (#95)
   clickToMove: { min: 0, max: 1, def: 0 },

@@ -32,6 +32,8 @@ describe("i18n Translation Foundation", () => {
     expect(t("wiki.title")).toBe("Game Wiki & Guide");
     expect(t("news.title")).toBe("News & Updates");
     expect(t("download.title")).toBe("Download Desktop Launcher");
+    expect(t("game.talents.comingSoonTitle")).toBe("Talents coming soon");
+    expect(t("game.talents.comingSoonBody")).toContain("does not have talent trees yet");
   });
 
   it("updates language and retrieves Spanish translations", () => {

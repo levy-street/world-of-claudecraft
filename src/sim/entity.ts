@@ -1,5 +1,6 @@
 import { CLASSES, ITEMS, MOBS, NpcDef } from './data';
 import type { Entity, EquipSlot, MobTemplate, PlayerClass, Stats, Vec3 } from './types';
+import type { TalentModifiers } from './content/talents';
 
 function baseEntity(id: number, pos: Vec3): Entity {
   return {
@@ -50,8 +51,10 @@ function manaFromIntellect(int: number): number {
   return Math.min(int, 20) + Math.max(0, int - 20) * 15;
 }
 
-// Recompute all derived stats for the player from class, level, gear and buffs.
-export function recalcPlayerStats(e: Entity, cls: PlayerClass, equipment: PlayerEquipment): void {
+// Recompute all derived stats for the player from class, level, gear, buffs, and
+// precomputed talent modifiers. `mods` is the flat struct resolved at
+// allocation/respec time (computeTalentModifiers) — this never walks the tree.
+export function recalcPlayerStats(e: Entity, cls: PlayerClass, equipment: PlayerEquipment, mods?: TalentModifiers): void {
   const def = CLASSES[cls];
   const lvl = e.level;
   const s: Stats = {
@@ -90,6 +93,16 @@ export function recalcPlayerStats(e: Entity, cls: PlayerClass, equipment: Player
     else if (a.kind === 'form_bear') bearForm = true;
     else if (a.kind === 'form_cat') catForm = true;
   }
+  // Talent passive stat modifiers (flat additions + a stamina percent before the
+  // HP derivation below). AP/armor/maxHp percents are applied at their own steps.
+  if (mods) {
+    const m = mods.stats;
+    s.str += m.str; s.agi += m.agi; s.sta += m.sta; s.int += m.int; s.spi += m.spi;
+    s.armor += m.armor;
+    bonusAp += m.ap;
+    bonusDodge += m.dodge;
+    if (m.staPct) s.sta = Math.round(s.sta * (1 + m.staPct));
+  }
   s.armor += s.agi * 2;
   if (bearForm) {
     s.armor = Math.round(s.armor * 1.65);
@@ -98,6 +111,7 @@ export function recalcPlayerStats(e: Entity, cls: PlayerClass, equipment: Player
   if (catForm) {
     bonusAp += 10 + lvl * 2;
   }
+  if (mods?.stats.armorPct) s.armor = Math.round(s.armor * (1 + mods.stats.armorPct));
 
   e.stats = s;
   const weapon = (equipment.mainhand && ITEMS[equipment.mainhand]?.weapon) || { min: 1, max: 2, speed: 2 };
@@ -108,15 +122,16 @@ export function recalcPlayerStats(e: Entity, cls: PlayerClass, equipment: Player
     cls === 'warrior' || cls === 'paladin' || cls === 'shaman' || cls === 'druid' ? s.str * 2
       : cls === 'rogue' || cls === 'hunter' ? s.str + s.agi
         : s.str;
-  e.attackPower = apFromStats + bonusAp;
+  e.attackPower = Math.round((apFromStats + bonusAp) * (1 + (mods?.stats.apPct ?? 0)));
   // Hunters: ranged AP = 2/agi (vanilla)
-  e.rangedPower = cls === 'hunter' ? s.agi * 2 + bonusAp : 0;
+  e.rangedPower = cls === 'hunter' ? Math.round((s.agi * 2 + bonusAp) * (1 + (mods?.stats.apPct ?? 0))) : 0;
   // Crit: ~1% per 20 agi at low level
-  e.critChance = 0.05 + s.agi * 0.0005;
+  e.critChance = 0.05 + s.agi * 0.0005 + (mods?.stats.crit ?? 0);
   e.dodgeChance = 0.05 + s.agi * 0.0005 + bonusDodge;
 
   const hpFrac = e.maxHp > 0 ? e.hp / e.maxHp : 1;
   e.maxHp = def.baseHp + def.hpPerLevel * (lvl - 1) + hpFromStamina(s.sta);
+  if (mods?.stats.maxHpPct) e.maxHp = Math.round(e.maxHp * (1 + mods.stats.maxHpPct));
   e.hp = Math.max(1, Math.round(e.maxHp * hpFrac));
   if (e.dead) e.hp = 0;
 

@@ -120,10 +120,10 @@ describe('chat channels', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');
     sim.tick();
-    sim.chat('/dance', a);
+    sim.chat('/wiggle', a);
     const events = sim.tick();
     expect(chatEvents(events)).toHaveLength(0);
-    expect(events.some((e) => e.type === 'error' && e.text.includes('/dance'))).toBe(true);
+    expect(events.some((e) => e.type === 'error' && e.text.includes('/wiggle'))).toBe(true);
   });
 
   it('/who explains that the roster is online-only in offline sim play', () => {
@@ -204,6 +204,87 @@ describe('chat channels', () => {
     expect(pids).toContain(a);
     expect(pids).toContain(b);
     expect(pids).not.toContain(outsider);
+  });
+});
+
+describe('emotes', () => {
+  it('a predefined emote reaches everyone in say range with third-person text', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const near = sim.addPlayer('mage', 'Bet');
+    const far = sim.addPlayer('rogue', 'Gimel');
+    teleport(sim, a, 0, -40);
+    teleport(sim, near, 10, -40); // within say range
+    teleport(sim, far, 60, -40);  // beyond say range
+    sim.tick();
+
+    sim.chat('/wave', a);
+    const msgs = chatEvents(sim.tick());
+    expect(msgs.every((m) => m.channel === 'emote' && m.from === 'Aleph' && m.text === 'waves.')).toBe(true);
+    const pids = msgs.map((m) => m.pid).sort();
+    expect(pids).toContain(a);    // the actor sees their own emote
+    expect(pids).toContain(near);
+    expect(pids).not.toContain(far);
+  });
+
+  it('a targeted emote names an online player', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('mage', 'Bet');
+    teleport(sim, a, 0, -40);
+    teleport(sim, b, 10, -40);
+    sim.tick();
+
+    sim.chat('/bow Bet', a);
+    const msgs = chatEvents(sim.tick());
+    expect(msgs[0].channel).toBe('emote');
+    expect(msgs[0].text).toBe('bows before Bet.');
+  });
+
+  it('a targeted emote falls back to the solo form for an unknown name', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    sim.tick();
+
+    sim.chat('/cheer Nobody', a);
+    const msgs = chatEvents(sim.tick());
+    expect(msgs[0].text).toBe('cheers!');
+  });
+
+  it('emote aliases resolve to the canonical emote', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    sim.tick();
+
+    sim.chat('/hi', a);
+    const msgs = chatEvents(sim.tick());
+    expect(msgs[0].text).toBe('greets everyone with a hearty hello.');
+  });
+
+  it('/me broadcasts freeform action text', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    sim.tick();
+
+    sim.chat('/me ponders the void', a);
+    const msgs = chatEvents(sim.tick());
+    expect(msgs[0].channel).toBe('emote');
+    expect(msgs[0].from).toBe('Aleph');
+    expect(msgs[0].text).toBe('ponders the void');
+  });
+
+  it('an empty /me does nothing', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    sim.tick();
+
+    sim.chat('/me   ', a);
+    const events = sim.tick();
+    expect(chatEvents(events)).toHaveLength(0);
+    // a bare "/me" with no body is an unknown command
+    sim.chat('/me', a);
+    const events2 = sim.tick();
+    expect(events2.some((e) => e.type === 'error')).toBe(true);
   });
 });
 

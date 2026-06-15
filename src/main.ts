@@ -10,13 +10,15 @@ import { music } from './game/music';
 import { handlePickedEntity, hoverCursorKind } from './game/interactions';
 import { clickMoveStep, manualMovementOverrides } from './game/click_move';
 import { Api, ClientWorld, CharacterSummary } from './net/online';
-import type { IWorld } from './world_api';
+import type { IWorld, LeaderboardEntry } from './world_api';
+import { formatXp } from './ui/xp_bar';
 import { assetsReady } from './render/assets/preload';
 import { CharacterPreview } from './render/characters';
 import { DT, INTERACT_RANGE, PlayerClass, dist2d } from './sim/types';
 import { togglePasswordVisibility, syncInputAriaState, validateForm, handleKeyboardActivation, validateCharacterName } from './ui/auth_utils';
 import { CLASSES, ABILITIES } from './sim/content/classes';
 import { iconDataUrl } from './ui/icons';
+import { hydrateIcons } from './ui/ui_icons';
 import { getLanguage, setLanguage, t, SupportedLanguage } from './ui/i18n';
 
 
@@ -24,6 +26,17 @@ const WORLD_SEED = 20061; // fixed: World of Claudecraft is a persistent place
 
 const $ = <T extends HTMLElement = HTMLElement>(sel: string): T => document.querySelector(sel) as T;
 let pendingDeleteCharacter: CharacterSummary | null = null;
+
+declare const __APP_VERSION__: string;
+declare const __APP_BUILD_ID__: string;
+declare const __APP_BUILD_DATE__: string;
+
+function syncBuildInfo(): void {
+  const el = document.getElementById('game-version');
+  if (!el) return;
+  el.textContent = `v${__APP_VERSION__} · build ${__APP_BUILD_ID__}`;
+  el.title = `Built ${__APP_BUILD_DATE__}`;
+}
 
 function syncAppViewport(): void {
   const useStableGameViewport = document.body.classList.contains('game-active') && isPhoneTouchDevice();
@@ -54,6 +67,7 @@ function syncPhoneTouchClass(): void {
 }
 
 syncAppViewport();
+syncBuildInfo();
 preventMobileZoom();
 syncPhoneTouchClass();
 window.matchMedia(PHONE_TOUCH_QUERY).addEventListener?.('change', syncPhoneTouchClass);
@@ -248,6 +262,18 @@ function hideLoadingScreen(): void {
   }, LOADING_FADE_MS);
 }
 
+// Resolve only after the browser has actually painted. The scene build
+// (new Renderer/new Hud) runs fully synchronously and blocks the main thread,
+// so without a real paint first the loading screen never shows on warm loads
+// (cached assets ⇒ assetsReady resolves on a microtask) and entry looks frozen.
+// Two rAFs guarantee a paint happened between them — same idiom used to cut to
+// the game on the first rendered frame below.
+function nextPaint(): Promise<void> {
+  return new Promise((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+  });
+}
+
 // The loading screen blocks pointer input but a covered button keeps keyboard
 // focus, so Enter/Space could re-fire it mid-entry. One entry per page load;
 // every failure path recovers via fatalOverlay's reload.
@@ -295,6 +321,9 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
   if (document.activeElement instanceof HTMLElement) {
     document.activeElement.blur();
   }
+  // Paint the loading screen before anything can block — assetsReady may resolve
+  // immediately when assets are already cached, and the scene build is synchronous.
+  await nextPaint();
   try {
     await assetsReady((done, total) => setLoadingProgress(done, total));
   } catch (err) {
@@ -302,6 +331,9 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
     return;
   }
   setLoadingStatus('Entering the world…');
+  // Let the final status + full progress bar paint before the synchronous
+  // Renderer/Hud build freezes the main thread for a beat.
+  await nextPaint();
   mountGameUi();
 
   const canvas = $('#game-canvas') as unknown as HTMLCanvasElement;
@@ -314,6 +346,8 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
   try {
     renderer = new Renderer(world, canvas, nameplates);
     hud = new Hud(world, renderer, keybinds);
+    hydrateIcons(); // swap [data-icon] placeholders (micro-menu, mobile bar, meters) for inline SVG
+
   } catch (err) {
     // e.g. WebGL context creation failure: surface it instead of leaving the
     // loading screen up forever
@@ -367,9 +401,11 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
         case 'questlog': hud.toggleQuestLog(); break;
         case 'map': hud.toggleMap(); break;
         case 'nameplates': renderer.showNameplates = !renderer.showNameplates; break;
+        case 'talents': hud.toggleTalents(); break;
         case 'meters': hud.toggleMeters(); break;
         case 'social': hud.toggleSocial(); break;
         case 'arena': hud.toggleArena(); break;
+        case 'leaderboard': hud.toggleLeaderboard(); break;
         case 'chat': openChat(); break;
         case 'escape':
           // close the topmost panel; if nothing was open, open the game menu
@@ -394,6 +430,7 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
     onArena: () => hud.toggleArena(),
     onQuestLog: () => hud.toggleQuestLog(),
     onSpellbook: () => hud.toggleSpellbook(),
+    onTalents: () => hud.toggleTalents(),
     onMeters: () => hud.toggleMeters(),
     onMap: () => hud.toggleMap(),
   });
@@ -1557,6 +1594,50 @@ async function loadProjectStats(): Promise<void> {
   }
 }
 
+// Home-page global (cross-realm) lifetime-XP leaderboard. Server computes the
+// virtual level + ranking; this only renders. Re-fetched each time the High
+// Scores view is opened (the server caches, so this is cheap).
+let highscoresLoading = false;
+async function loadHighscores(): Promise<void> {
+  const host = $('#hs-leaderboard');
+  if (!host || highscoresLoading) return;
+  highscoresLoading = true;
+  host.innerHTML = `<div class="hs-loading">${t('game.leaderboard.loading')}</div>`;
+  let rows: LeaderboardEntry[] = [];
+  try {
+    rows = await api.leaderboard('global', 100);
+  } catch {
+    host.innerHTML = `<div class="hs-error">${t('game.leaderboard.retry')}</div>`;
+    highscoresLoading = false;
+    return;
+  }
+  highscoresLoading = false;
+  if (rows.length === 0) {
+    host.innerHTML = `<div class="hs-empty">${t('game.leaderboard.empty')}</div>`;
+    return;
+  }
+  const esc = (s: string): string => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!));
+  const head = `<div class="hs-row hs-head">`
+    + `<span class="hs-rank">${t('game.leaderboard.rank')}</span>`
+    + `<span class="hs-name">${t('game.leaderboard.name')}</span>`
+    + `<span class="hs-realm">${t('game.leaderboard.realmCol')}</span>`
+    + `<span class="hs-lvl">${t('game.leaderboard.level')}</span>`
+    + `<span class="hs-vlvl">${t('game.leaderboard.vlevel')}</span>`
+    + `<span class="hs-xp">${t('game.leaderboard.lifetimeXp')}</span></div>`;
+  const body = rows.map((r) => {
+    const cls = CLASSES[r.cls];
+    const star = r.prestigeRank > 0 ? `<span class="hs-prestige" title="${t('game.prestige.rank')} ${r.prestigeRank}">★${r.prestigeRank}</span>` : '';
+    return `<div class="hs-row${r.rank <= 3 ? ' hs-top' : ''}">`
+      + `<span class="hs-rank">${r.rank}</span>`
+      + `<span class="hs-name"${cls ? ` title="${esc(cls.name)}"` : ''}>${star}${esc(r.name)}</span>`
+      + `<span class="hs-realm">${esc(r.realm ?? '')}</span>`
+      + `<span class="hs-lvl">${r.level}</span>`
+      + `<span class="hs-vlvl">${r.virtualLevel}</span>`
+      + `<span class="hs-xp">${formatXp(r.lifetimeXp)}</span></div>`;
+  }).join('');
+  host.innerHTML = head + body;
+}
+
 function wireStartScreens(): void {
   // Initial page translation and stats load
   translatePage();
@@ -2095,7 +2176,10 @@ function wireStartScreens(): void {
     show('#mode-select');
   });
 
-  setupNavBtn(navBtnHighscores, '#highscores-view');
+  setupNavBtn(navBtnHighscores, '#highscores-view', () => {
+    switchMainView('#highscores-view');
+    void loadHighscores();
+  });
   setupNavBtn(navBtnWiki, '#wiki-view');
   setupNavBtn(navBtnNews, '#news-view');
   setupNavBtn(navBtnDownload, '#download-view');

@@ -160,6 +160,23 @@ describe('delta snapshots', () => {
     expect(server.sim.countItem('wolf_fang', session.pid)).toBe(0);
   });
 
+  it('discard command mirrors inventory and quest progress changes', () => {
+    const meta = server.sim.meta(session.pid)!;
+    meta.questLog.set('q_widows', { questId: 'q_widows', counts: [10, 0], state: 'active' });
+    server.sim.addItem('widow_venom_sac', 6, session.pid);
+    broadcast(server);
+    fc.sent.length = 0;
+
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'discard', item: 'widow_venom_sac', count: 2 }));
+    broadcast(server);
+
+    expect(server.sim.countItem('widow_venom_sac', session.pid)).toBe(4);
+    expect(meta.questLog.get('q_widows')).toMatchObject({ counts: [10, 4], state: 'active' });
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.inv).toEqual([{ itemId: 'widow_venom_sac', count: 4 }]);
+    expect(snap.self.qlog).toEqual([{ questId: 'q_widows', counts: [10, 4], state: 'active' }]);
+  });
+
   it('resends a heavy field once it changes', () => {
     broadcast(server);
     fc.sent.length = 0;
