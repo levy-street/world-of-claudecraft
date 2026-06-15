@@ -2725,6 +2725,7 @@ export class Sim {
     this.despawnSummonedAdds(mob);
     mob.firedSummons = 0;
     mob.enraged = false;
+    mob.healedThisPull = false;
     mob.wanderTimer = this.rng.range(2, 8);
   }
 
@@ -2889,6 +2890,7 @@ export class Sim {
     this.despawnSummonedAdds(mob);
     mob.firedSummons = 0;
     mob.enraged = false;
+    mob.healedThisPull = false;
     mob.wanderTimer = this.rng.range(2, 8);
     for (const meta of this.players.values()) {
       const e = this.entities.get(meta.entityId);
@@ -2918,7 +2920,7 @@ export class Sim {
   // and reset on evade/respawn.
   private updateBossMechanics(mob: Entity): void {
     const tmpl = MOBS[mob.templateId];
-    if (!tmpl || (!tmpl.summonAdds && !tmpl.enrage)) return;
+    if (!tmpl || (!tmpl.summonAdds && !tmpl.enrage && !tmpl.desperateHeal)) return;
     const hpFrac = mob.hp / Math.max(1, mob.maxHp);
     if (tmpl.summonAdds) {
       const thresholds = tmpl.summonAdds.atHpPct;
@@ -2932,6 +2934,16 @@ export class Sim {
       this.emit({ type: 'aura', targetId: mob.id, name: 'Enrage', gained: true });
       this.emit({ type: 'log', text: `${mob.name} becomes enraged!`, color: '#ff6666', entityId: mob.id });
       this.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school: 'fire', fx: 'nova' });
+    }
+    if (tmpl.desperateHeal && !mob.healedThisPull && hpFrac <= tmpl.desperateHeal.belowHpPct) {
+      mob.healedThisPull = true;
+      const heal = Math.min(mob.maxHp - mob.hp, Math.round(mob.maxHp * tmpl.desperateHeal.healPct));
+      if (heal > 0) {
+        mob.hp += heal;
+        this.emit({ type: 'heal', targetId: mob.id, amount: heal });
+        this.emit({ type: 'log', text: `${mob.name} draws on a desperate second wind!`, color: '#66ff99', entityId: mob.id });
+        this.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school: 'nature', fx: 'nova' });
+      }
     }
   }
 
