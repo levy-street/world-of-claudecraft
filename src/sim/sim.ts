@@ -3549,6 +3549,13 @@ export class Sim {
       return null;
     }
 
+    // "/range" (also /dist, /distance) — self-only readout of how far the
+    // player's current target is, and whether it sits inside melee reach
+    if (/^\/(?:range|dist|distance)(?:\s|$)/i.test(raw)) {
+      this.error(r.meta.entityId, this.rangeReadout(r.e));
+      return null;
+    }
+
     // "/w name message" — private whisper to an online player
     const wm = /^\/(?:w|whisper|t|tell)\s+(\S+)\s+([\s\S]+)$/i.exec(raw);
     if (wm) {
@@ -4849,6 +4856,20 @@ export class Sim {
 
   private error(pid: number, text: string): void {
     this.emit({ type: 'error', text, pid });
+  }
+
+  // Distance from the player to their current target. Reads only live Entity
+  // state (targetId + positions), so it needs no new fields and works online
+  // for free. The in-melee hint compares the RAW distance to MELEE_RANGE — the
+  // same threshold the swing-resolution code uses — while the displayed yards
+  // are rounded, so the hint stays truthful even when rounding lands on 5yd.
+  private rangeReadout(self: Entity): string {
+    if (self.targetId === null) return 'You have no target.';
+    const t = this.entities.get(self.targetId);
+    if (!t) return 'You have no target.';
+    const d = dist2d(self.pos, t.pos);
+    const reach = d <= MELEE_RANGE ? 'in melee range' : 'out of melee range';
+    return `Your target ${t.name} is ${Math.round(d)}yd away (${reach}).`;
   }
 }
 
