@@ -57,6 +57,7 @@ const ARENA_BASE_RATING = 1500; // every character starts here, unranked
 const ARENA_MIN_RATING = 100; // a rating floor so a losing streak can't go absurd
 const ARENA_K_FACTOR = 32; // Elo sensitivity per match
 const ARENA_LADDER_SIZE = 10; // live online standings shipped to clients
+const ARENA_REMATCH_COOLDOWN = 10 * 60; // anti win-trade: same pair waits before rematching
 const PVP_CC_DR_RESET = 18; // seconds before a repeated PvP CC category is fresh again
 const PVP_CC_DR_MULTIPLIERS = [1, 0.5, 0.25] as const;
 const SAY_RANGE = 25; // /say carries a short distance; /yell across a camp
@@ -103,6 +104,7 @@ const MARKET_MAX_PRICE = 5_000_000; // 500g ceiling — guards against overflow 
 const MARKET_CUT = 0.05; // the Merchant's cut on a completed sale (a gold sink)
 const MARKET_LISTING_DURATION = 48 * 3600; // sim-seconds an unsold listing lingers before returning
 const MARKET_WIRE_LIMIT = 120; // most listings shipped to one client at a time
+const MARKET_CHARACTER_KEY_PREFIX = 'char:'; // online stable seller identity prefix
 const VENDOR_BUYBACK_LIMIT = 12;
 const INSTANCE_EMPTY_TIMEOUT = 300; // seconds before an empty instance resets
 const MAX_CLIMB_SLOPE = 1.5; // rise/run above which a ground move is blocked (cliffs, world rim)
@@ -184,6 +186,10 @@ export function eloDelta(winnerRating: number, loserRating: number, score = 1): 
   return Math.round(ARENA_K_FACTOR * (score - expected));
 }
 
+export function marketSellerKeyForCharacterId(characterId: number): string {
+  return `${MARKET_CHARACTER_KEY_PREFIX}${Math.max(0, Math.floor(characterId))}`;
+}
+
 export interface InstanceSlot {
   dungeonId: string;
   slot: number;
@@ -227,6 +233,9 @@ export interface PlayerMeta {
   entityId: number;
   cls: PlayerClass;
   name: string;
+  // Stable online seller identity (`char:<characters.id>`). Offline/legacy
+  // players omit it and fall back to character name.
+  characterKey?: string;
   moveInput: MoveInput;
   inventory: InvSlot[];
   vendorBuyback: InvSlot[];
@@ -249,6 +258,9 @@ export interface PlayerMeta {
   arenaRating: number;
   arenaWins: number;
   arenaLosses: number;
+  // dungeonId -> lockout period id in which the character already received the
+  // instance boss reward. Persisted in CharacterState.
+  dungeonBossLockouts: Record<string, string>;
   // Talents & Specializations. `talents` is the active allocation; `talentMods`
   // is its precomputed flat struct — resolved only on allocation/respec/loadout
   // change (recomputeTalents), never walked on the combat or stat hot path.
@@ -262,13 +274,14 @@ export interface PlayerMeta {
 // The World Market — a single shared, server-authoritative auction house run
 // by the Merchant NPC. Listings live in the sim (so offline play has a market
 // too and the rules are testable); the server persists them to Postgres.
-// Sellers are keyed by character name, which is globally unique, so proceeds
-// and returns reach the right player even while they are offline.
+// Online sellers are keyed by stable character id (`char:<id>`), with legacy
+// name keys still recognized for pre-migration listings. This prevents
+// delete/recreate-with-same-name attacks from collecting someone else's sales.
 // ---------------------------------------------------------------------------
 
 export interface MarketListing {
   id: number;
-  sellerKey: string; // stable seller identity (character name); '' for house stock
+  sellerKey: string; // stable seller identity (`char:<id>` online; legacy name offline); '' for house stock
   sellerName: string; // display name
   itemId: string;
   count: number;
@@ -278,7 +291,7 @@ export interface MarketListing {
 }
 
 // Gold + items awaiting pickup at the Merchant (sale proceeds, expired
-// listings), keyed by seller name so an offline seller can collect later.
+// listings), keyed by stable seller key so an offline seller can collect later.
 export interface MarketCollection {
   copper: number;
   items: InvSlot[];
@@ -317,6 +330,7 @@ export interface CharacterState {
   arenaRating?: number;
   arenaWins?: number;
   arenaLosses?: number;
+  dungeonBossLockouts?: Record<string, string>;
   // Talents & Specializations (JSONB; no schema migration). All optional so
   // characters saved before talents existed load cleanly (default: no points spent).
   talents?: TalentAllocation;
@@ -399,12 +413,14 @@ export class Sim {
   arenaMatches = new Map<number, ArenaMatch>(); // pid -> shared match (both pids)
   private arenaBusySlots = new Set<number>();
   private nextArenaMatchId = 1;
+  private arenaRecentOpponents = new Map<string, Map<string, number>>(); // stable arena key -> opp key -> expiresAt sim.time
   // per-player chat token bucket (anti-spam); refilled lazily by sim time
   private chatTokens = new Map<number, { tokens: number; at: number }>();
   // dungeon instances
   instances: InstanceSlot[] = [];
+  private dungeonBossLootAccess = new Map<number, Set<number>>(); // boss corpse id -> pids allowed to loot this kill
   // the World Market: one shared listing book, per-seller collections keyed by
-  // character name, and the Merchant entity these are anchored to
+  // stable seller key, and the Merchant entity these are anchored to
   marketListings: MarketListing[] = [];
   private marketCollections = new Map<string, MarketCollection>();
   private nextListingId = 1;
@@ -417,6 +433,7 @@ export class Sim {
       respawnSeconds: cfg.respawnSeconds ?? 25,
       autoEquip: cfg.autoEquip ?? false,
       playerName: cfg.playerName ?? 'Adventurer',
+      dungeonLockoutPeriod: cfg.dungeonLockoutPeriod ?? '',
     };
     this.rng = new Rng(cfg.seed);
 
@@ -474,6 +491,10 @@ export class Sim {
     }
   }
 
+  setDungeonLockoutPeriod(period: string): void {
+    this.cfg.dungeonLockoutPeriod = String(period || '');
+  }
+
   // -------------------------------------------------------------------------
   // Entity roster: every add/remove/teleport goes through these so the
   // spatial indexes always match the entities map
@@ -487,6 +508,7 @@ export class Sim {
 
   private dropEntity(id: number): void {
     this.clearEntityMarker(id); // a despawned entity keeps no raid marker
+    this.dungeonBossLootAccess.delete(id);
     const e = this.entities.get(id);
     if (!e) return;
     this.grid.remove(e);
@@ -503,7 +525,7 @@ export class Sim {
   // Players: join / leave / persistence
   // -------------------------------------------------------------------------
 
-  addPlayer(cls: PlayerClass, name: string, opts?: { autoEquip?: boolean; state?: CharacterState }): number {
+  addPlayer(cls: PlayerClass, name: string, opts?: { autoEquip?: boolean; state?: CharacterState; characterKey?: string }): number {
     // Characters saved inside a dungeon instance rejoin at its entrance —
     // their old instance is gone (or belongs to someone else) by now.
     let savedPos = opts?.state?.pos ?? null;
@@ -521,6 +543,7 @@ export class Sim {
       entityId: player.id,
       cls,
       name,
+      characterKey: opts?.characterKey ? String(opts.characterKey) : undefined,
       moveInput: emptyMoveInput(),
       inventory: [],
       vendorBuyback: [],
@@ -538,6 +561,7 @@ export class Sim {
       arenaRating: opts?.state?.arenaRating ?? ARENA_BASE_RATING,
       arenaWins: opts?.state?.arenaWins ?? 0,
       arenaLosses: opts?.state?.arenaLosses ?? 0,
+      dungeonBossLockouts: { ...(opts?.state?.dungeonBossLockouts ?? {}) },
       talents: emptyAllocation(),
       talentMods: emptyModifiers(),
       loadouts: [],
@@ -603,6 +627,7 @@ export class Sim {
     this.arenaDequeue(pid);
     const match = this.arenaMatches.get(pid);
     if (match) this.endArenaMatch(match, match.a === pid ? match.b : match.a, 'forfeit');
+    this.forgetTransientArenaRecentOpponent(pid);
     this.partyInvites.delete(pid);
     this.tradeInvites.delete(pid);
     this.duelInvites.delete(pid);
@@ -655,6 +680,7 @@ export class Sim {
       arenaRating: meta.arenaRating,
       arenaWins: meta.arenaWins,
       arenaLosses: meta.arenaLosses,
+      dungeonBossLockouts: { ...meta.dungeonBossLockouts },
       talents: cloneAllocation(meta.talents),
       loadouts: meta.loadouts.map((l) => ({ name: l.name, alloc: cloneAllocation(l.alloc), bar: [...l.bar] })),
       activeLoadout: meta.activeLoadout,
@@ -2659,7 +2685,27 @@ export class Sim {
           if (xpGain > 0) this.grantXp(xpGain, member);
           this.onMobKilledForQuests(e, member);
         }
-        this.rollLoot(e, meta, eligible);
+        const dungeon = this.dungeonForBossMob(e);
+        if (dungeon && this.cfg.dungeonLockoutPeriod) {
+          const unlocked = eligible.filter((member) => !this.hasDungeonBossLockout(member, dungeon.id));
+          if (unlocked.length === 0) {
+            for (const member of eligible) {
+              this.emit({ type: 'log', text: `${dungeon.name}'s boss reward is already locked for this reset.`, color: '#caa472', pid: member.entityId });
+            }
+            return;
+          }
+          this.dungeonBossLootAccess.set(e.id, new Set(unlocked.map((member) => member.entityId)));
+          for (const member of unlocked) this.markDungeonBossLockout(member, dungeon.id);
+          for (const member of eligible) {
+            if (!unlocked.includes(member)) {
+              this.emit({ type: 'log', text: `${dungeon.name}'s boss reward is already locked for this reset.`, color: '#caa472', pid: member.entityId });
+            }
+          }
+          this.rollLoot(e, meta, unlocked);
+          if (!e.lootable || !e.loot) this.dungeonBossLootAccess.delete(e.id);
+        } else {
+          this.rollLoot(e, meta, eligible);
+        }
       }
     }
   }
@@ -2757,6 +2803,22 @@ export class Sim {
     return objIdx >= 0 && this.countItem(entry.itemId, meta.entityId) < quest.objectives[objIdx].count;
   }
 
+  private dungeonForBossMob(mob: Entity): DungeonDef | null {
+    const template = MOBS[mob.templateId];
+    if (!template?.boss) return null;
+    return dungeonAt(mob.spawnPos.x);
+  }
+
+  private hasDungeonBossLockout(meta: PlayerMeta, dungeonId: string): boolean {
+    const period = this.cfg.dungeonLockoutPeriod;
+    return !!period && meta.dungeonBossLockouts[dungeonId] === period;
+  }
+
+  private markDungeonBossLockout(meta: PlayerMeta, dungeonId: string): void {
+    const period = this.cfg.dungeonLockoutPeriod;
+    if (period) meta.dungeonBossLockouts[dungeonId] = period;
+  }
+
   private rollLoot(mob: Entity, meta: PlayerMeta, eligible: PlayerMeta[] = [meta]): void {
     const template = MOBS[mob.templateId];
     if (!template) return;
@@ -2838,6 +2900,7 @@ export class Sim {
       mob.loot = null;
       mob.lootable = false;
       mob.corpseTimer = Math.min(mob.corpseTimer, 4);
+      this.dungeonBossLootAccess.delete(mob.id);
     }
   }
 
@@ -3262,6 +3325,7 @@ export class Sim {
 
   private respawnMob(mob: Entity): void {
     this.clearNonPlayerStatAuras(mob);
+    this.dungeonBossLootAccess.delete(mob.id);
     mob.dead = false;
     mob.lootable = false;
     mob.loot = null;
@@ -3681,6 +3745,11 @@ export class Sim {
       }
     }
     if (dist2d(p.pos, mob.pos) > INTERACT_RANGE) { this.error(meta.entityId, 'Too far away.'); return; }
+    const bossAccess = this.dungeonBossLootAccess.get(mob.id);
+    if (bossAccess && !bossAccess.has(meta.entityId)) {
+      this.error(meta.entityId, 'You are locked to this boss reward for the current reset.');
+      return;
+    }
     if (mob.loot.copper > 0) {
       meta.copper += mob.loot.copper;
       meta.counters.lootCopper += mob.loot.copper;
@@ -4503,10 +4572,54 @@ export class Sim {
     }
   }
 
+  private arenaIdentityKey(pid: number): string {
+    const meta = this.players.get(pid);
+    return meta?.characterKey ? `character:${meta.characterKey}` : `pid:${pid}`;
+  }
+
+  private arenaRecentlyMatched(aPid: number, bPid: number): boolean {
+    const aKey = this.arenaIdentityKey(aPid);
+    const bKey = this.arenaIdentityKey(bPid);
+    return (this.arenaRecentOpponents.get(aKey)?.get(bKey) ?? 0) > this.time;
+  }
+
+  private noteArenaOpponents(aPid: number, bPid: number): void {
+    const aKey = this.arenaIdentityKey(aPid);
+    const bKey = this.arenaIdentityKey(bPid);
+    const until = this.time + ARENA_REMATCH_COOLDOWN;
+    let aRecent = this.arenaRecentOpponents.get(aKey);
+    if (!aRecent) { aRecent = new Map(); this.arenaRecentOpponents.set(aKey, aRecent); }
+    let bRecent = this.arenaRecentOpponents.get(bKey);
+    if (!bRecent) { bRecent = new Map(); this.arenaRecentOpponents.set(bKey, bRecent); }
+    aRecent.set(bKey, until);
+    bRecent.set(aKey, until);
+  }
+
+  private pruneArenaRecentOpponents(): void {
+    for (const [key, recent] of this.arenaRecentOpponents.entries()) {
+      for (const [oppKey, until] of recent.entries()) {
+        if (until <= this.time) recent.delete(oppKey);
+      }
+      if (recent.size === 0) this.arenaRecentOpponents.delete(key);
+    }
+  }
+
+  private forgetTransientArenaRecentOpponent(pid: number): void {
+    const key = this.arenaIdentityKey(pid);
+    // Online characters keep a stable characterKey, so their short rematch
+    // cooldown should survive reconnects. Offline/test-only pid identities can
+    // be forgotten immediately to avoid stale pid-key buildup.
+    if (!key.startsWith('pid:')) return;
+    this.arenaRecentOpponents.delete(key);
+    for (const recent of this.arenaRecentOpponents.values()) recent.delete(key);
+  }
+
   // Pair the longest-waiting contender with the nearest-rated opponent still in
   // line, one bout per free slot. Skips (and drops) anyone who went offline or
-  // died while waiting.
+  // died while waiting, and skips immediate same-pair rematches to make
+  // low-population win-trading slower and more visible.
   private matchmakeArena(): void {
+    this.pruneArenaRecentOpponents();
     let guard = ARENA_SLOT_COUNT + 1;
     while (guard-- > 0) {
       this.arenaQueue = this.arenaQueue.filter((id) => {
@@ -4514,13 +4627,18 @@ export class Sim {
         return !!e && !e.dead && !this.arenaMatches.has(id);
       });
       if (this.arenaQueue.length < 2 || this.freeArenaSlot() === null) return;
-      const aPid = this.arenaQueue[0];
-      const aRating = this.players.get(aPid)?.arenaRating ?? ARENA_BASE_RATING;
-      let bPid = -1, bestGap = Infinity;
-      for (let i = 1; i < this.arenaQueue.length; i++) {
-        const id = this.arenaQueue[i];
-        const gap = Math.abs((this.players.get(id)?.arenaRating ?? ARENA_BASE_RATING) - aRating);
-        if (gap < bestGap) { bestGap = gap; bPid = id; }
+      let aPid = -1, bPid = -1;
+      for (let aIdx = 0; aIdx < this.arenaQueue.length - 1; aIdx++) {
+        const candidateA = this.arenaQueue[aIdx];
+        const aRating = this.players.get(candidateA)?.arenaRating ?? ARENA_BASE_RATING;
+        let bestPid = -1, bestGap = Infinity;
+        for (let bIdx = aIdx + 1; bIdx < this.arenaQueue.length; bIdx++) {
+          const id = this.arenaQueue[bIdx];
+          if (this.arenaRecentlyMatched(candidateA, id)) continue;
+          const gap = Math.abs((this.players.get(id)?.arenaRating ?? ARENA_BASE_RATING) - aRating);
+          if (gap < bestGap) { bestGap = gap; bestPid = id; }
+        }
+        if (bestPid >= 0) { aPid = candidateA; bPid = bestPid; break; }
       }
       if (bPid < 0) return;
       this.arenaDequeue(aPid);
@@ -4550,6 +4668,7 @@ export class Sim {
     };
     this.arenaMatches.set(aPid, match);
     this.arenaMatches.set(bPid, match);
+    this.noteArenaOpponents(aPid, bPid);
     const origin = arenaOrigin(slot);
     this.placeInArena(ea, origin, ARENA_SPAWN_A);
     this.placeInArena(eb, origin, ARENA_SPAWN_B);
@@ -4891,9 +5010,28 @@ export class Sim {
     return !!m && dist2d(e.pos, m.pos) <= MARKET_RANGE;
   }
 
-  private metaByName(name: string): PlayerMeta | null {
-    if (!name) return null;
-    for (const m of this.players.values()) if (m.name === name) return m;
+  private primaryMarketSellerKey(meta: PlayerMeta): string {
+    return meta.characterKey ?? meta.name;
+  }
+
+  private marketSellerKeys(meta: PlayerMeta): string[] {
+    const keys = [this.primaryMarketSellerKey(meta)];
+    // Pre-hardening persisted market rows used the display name as the key.
+    // Keep those collectable/cancellable by the same live character after the
+    // server starts writing stable character ids.
+    if (meta.name && !keys.includes(meta.name)) keys.push(meta.name);
+    return keys;
+  }
+
+  private marketListingOwnedBy(listing: MarketListing, meta: PlayerMeta): boolean {
+    return !listing.house && this.marketSellerKeys(meta).includes(listing.sellerKey);
+  }
+
+  private metaByMarketKey(key: string): PlayerMeta | null {
+    if (!key) return null;
+    for (const m of this.players.values()) {
+      if (this.marketSellerKeys(m).includes(key)) return m;
+    }
     return null;
   }
 
@@ -4939,11 +5077,11 @@ export class Sim {
     const ask = Math.floor(price);
     if (!Number.isFinite(ask) || ask < MARKET_MIN_PRICE) { this.error(meta.entityId, 'Name a price of at least 1 copper.'); return; }
     if (ask > MARKET_MAX_PRICE) { this.error(meta.entityId, 'That price is beyond what the Merchant will broker.'); return; }
-    const mine = this.marketListings.reduce((n, l) => n + (!l.house && l.sellerKey === meta.name ? 1 : 0), 0);
+    const mine = this.marketListings.reduce((n, l) => n + (this.marketListingOwnedBy(l, meta) ? 1 : 0), 0);
     if (mine >= MARKET_MAX_LISTINGS) { this.error(meta.entityId, `You may keep at most ${MARKET_MAX_LISTINGS} goods on the market at once.`); return; }
     this.removeItem(itemId, want, meta.entityId); // escrow
     this.marketListings.push({
-      id: this.nextListingId++, sellerKey: meta.name, sellerName: meta.name,
+      id: this.nextListingId++, sellerKey: this.primaryMarketSellerKey(meta), sellerName: meta.name,
       itemId, count: want, price: ask, expiresAt: this.time + MARKET_LISTING_DURATION, house: false,
     });
     this.emit({ type: 'loot', text: `Listed ${def.name}${want > 1 ? ' x' + want : ''} on the World Market for ${formatMoney(ask)}.`, pid: meta.entityId });
@@ -4962,7 +5100,7 @@ export class Sim {
     const listing = this.marketListings[idx];
     const def = ITEMS[listing.itemId];
     if (!def) { this.marketListings.splice(idx, 1); return; }
-    if (!listing.house && listing.sellerKey === meta.name) {
+    if (this.marketListingOwnedBy(listing, meta)) {
       this.error(meta.entityId, 'That is your own listing — cancel it to reclaim it.');
       return;
     }
@@ -4973,7 +5111,7 @@ export class Sim {
       const proceeds = Math.max(0, Math.floor(listing.price * (1 - MARKET_CUT)));
       this.collectionFor(listing.sellerKey).copper += proceeds;
       this.marketListings.splice(idx, 1);
-      const sellerMeta = this.metaByName(listing.sellerKey);
+      const sellerMeta = this.metaByMarketKey(listing.sellerKey);
       if (sellerMeta) {
         this.emit({ type: 'loot', text: `${meta.name} bought your ${def.name} for ${formatMoney(listing.price)} — collect ${formatMoney(proceeds)} from the Merchant.`, pid: sellerMeta.entityId });
       }
@@ -4990,7 +5128,7 @@ export class Sim {
     const idx = this.marketListings.findIndex((l) => l.id === listingId);
     if (idx < 0) return;
     const listing = this.marketListings[idx];
-    if (listing.house || listing.sellerKey !== meta.name) { this.error(meta.entityId, 'That is not your listing.'); return; }
+    if (!this.marketListingOwnedBy(listing, meta)) { this.error(meta.entityId, 'That is not your listing.'); return; }
     this.marketListings.splice(idx, 1);
     this.addItem(listing.itemId, listing.count, meta.entityId);
     const def = ITEMS[listing.itemId];
@@ -5004,14 +5142,22 @@ export class Sim {
     if (!r) return;
     const { meta, e: p } = r;
     if (!this.nearMerchant(p)) { this.error(meta.entityId, 'You are too far from the Merchant.'); return; }
-    const col = this.marketCollections.get(meta.name);
-    if (!col || (col.copper <= 0 && col.items.length === 0)) { this.error(meta.entityId, 'You have nothing to collect.'); return; }
-    if (col.copper > 0) {
-      meta.copper += col.copper;
-      this.emit({ type: 'loot', text: `You collect ${formatMoney(col.copper)} from the Merchant.`, pid: meta.entityId });
+    const keys = this.marketSellerKeys(meta);
+    let copper = 0;
+    const items: InvSlot[] = [];
+    for (const key of keys) {
+      const col = this.marketCollections.get(key);
+      if (!col) continue;
+      copper += Math.max(0, col.copper);
+      items.push(...col.items.map((s) => ({ ...s })));
     }
-    for (const s of col.items) this.addItem(s.itemId, s.count, meta.entityId);
-    this.marketCollections.delete(meta.name);
+    if (copper <= 0 && items.length === 0) { this.error(meta.entityId, 'You have nothing to collect.'); return; }
+    if (copper > 0) {
+      meta.copper += copper;
+      this.emit({ type: 'loot', text: `You collect ${formatMoney(copper)} from the Merchant.`, pid: meta.entityId });
+    }
+    for (const s of items) this.addItem(s.itemId, s.count, meta.entityId);
+    for (const key of keys) this.marketCollections.delete(key);
   }
 
   // Once a second: return expired player listings to their seller's collection.
@@ -5022,7 +5168,7 @@ export class Sim {
       if (l.house || this.time < l.expiresAt) continue;
       this.marketListings.splice(i, 1);
       this.collectionFor(l.sellerKey).items.push({ itemId: l.itemId, count: l.count });
-      const sellerMeta = this.metaByName(l.sellerKey);
+      const sellerMeta = this.metaByMarketKey(l.sellerKey);
       if (sellerMeta) {
         const def = ITEMS[l.itemId];
         this.emit({ type: 'log', text: `Your market listing of ${def?.name ?? l.itemId} expired and waits at the Merchant.`, color: '#caa472', pid: sellerMeta.entityId });
@@ -5044,14 +5190,22 @@ export class Sim {
     });
     const listings = sorted.slice(0, MARKET_WIRE_LIMIT).map((l) => ({
       id: l.id, sellerName: l.sellerName, itemId: l.itemId, count: l.count,
-      price: l.price, mine: !l.house && l.sellerKey === meta.name, house: l.house,
+      price: l.price, mine: this.marketListingOwnedBy(l, meta), house: l.house,
     }));
-    const col = this.marketCollections.get(meta.name);
-    const myListingCount = this.marketListings.reduce((n, l) => n + (!l.house && l.sellerKey === meta.name ? 1 : 0), 0);
+    const keys = this.marketSellerKeys(meta);
+    let collectionCopper = 0;
+    const collectionItems: InvSlot[] = [];
+    for (const key of keys) {
+      const col = this.marketCollections.get(key);
+      if (!col) continue;
+      collectionCopper += Math.max(0, col.copper);
+      collectionItems.push(...col.items.map((s) => ({ ...s })));
+    }
+    const myListingCount = this.marketListings.reduce((n, l) => n + (this.marketListingOwnedBy(l, meta) ? 1 : 0), 0);
     return {
       listings,
-      collectionCopper: col?.copper ?? 0,
-      collectionItems: col ? col.items.map((s) => ({ ...s })) : [],
+      collectionCopper,
+      collectionItems,
       cutPct: Math.round(MARKET_CUT * 100),
       maxListings: MARKET_MAX_LISTINGS,
       myListingCount,

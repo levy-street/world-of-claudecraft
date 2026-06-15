@@ -224,6 +224,62 @@ describe('the World Market — the Merchant', () => {
     expect(sim.marketListings.filter((l) => l.sellerKey === 'Seller').length).toBe(12);
   });
 
+  it('uses stable character keys for online listings', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller', { characterKey: 'char:1' });
+    standAtMerchant(sim, seller);
+    sim.addItem('wolf_fang', 1, seller);
+
+    sim.marketList('wolf_fang', 1, 100, seller);
+
+    const listing = sim.marketListings.find((l) => !l.house && l.itemId === 'wolf_fang')!;
+    expect(listing).toMatchObject({ sellerKey: 'char:1', sellerName: 'Seller' });
+    expect(sim.marketInfoFor(seller)!.myListingCount).toBe(1);
+  });
+
+  it('does not let a deleted/recreated same-name character collect stable-key sale proceeds', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller', { characterKey: 'char:1' });
+    const buyer = sim.addPlayer('mage', 'Buyer', { characterKey: 'char:99' });
+    standAtMerchant(sim, seller);
+    standAtMerchant(sim, buyer);
+    sim.addItem('wolf_fang', 1, seller);
+    sim.players.get(buyer)!.copper = 500;
+    sim.marketList('wolf_fang', 1, 100, seller);
+    sim.marketBuy(sim.marketListings.find((l) => l.sellerKey === 'char:1')!.id, buyer);
+    sim.removePlayer(seller);
+
+    const impostor = sim.addPlayer('rogue', 'Seller', { characterKey: 'char:2' });
+    standAtMerchant(sim, impostor);
+    sim.events.length = 0;
+    sim.marketCollect(impostor);
+
+    expect(copperOf(sim, impostor)).toBe(0);
+    expect(errorsSince(sim).join(' ')).toMatch(/nothing to collect/i);
+
+    const realSeller = sim.addPlayer('warrior', 'SellerRenamed', { characterKey: 'char:1' });
+    standAtMerchant(sim, realSeller);
+    sim.marketCollect(realSeller);
+    expect(copperOf(sim, realSeller)).toBe(95);
+  });
+
+  it('keeps legacy name-keyed collections collectable after the stable-key migration', () => {
+    const sim = makeWorld();
+    sim.loadMarket({
+      listings: [],
+      collections: [{ key: 'Seller', copper: 123, items: [{ itemId: 'wolf_fang', count: 1 }] }],
+      nextListingId: 1,
+    });
+    const seller = sim.addPlayer('warrior', 'Seller', { characterKey: 'char:1' });
+    standAtMerchant(sim, seller);
+
+    sim.marketCollect(seller);
+
+    expect(copperOf(sim, seller)).toBe(123);
+    expect(sim.countItem('wolf_fang', seller)).toBe(1);
+    expect(sim.marketInfoFor(seller)!.collectionCopper).toBe(0);
+  });
+
   it('survives a save/load round-trip (persistence)', () => {
     const sim = makeWorld();
     const seller = sim.addPlayer('warrior', 'Seller');

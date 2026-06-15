@@ -261,6 +261,39 @@ describe('delta snapshots', () => {
   });
 });
 
+describe('server input hardening', () => {
+  it('rate-limits non-chat command bursts per connected client', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Testa');
+    fc.sent.length = 0;
+
+    for (let i = 0; i < 31; i++) {
+      server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'tab' }));
+    }
+
+    const events = fc.sent.flatMap((msg) => msg.t === 'events' ? msg.list : []);
+    expect(events).toContainEqual(expect.objectContaining({
+      type: 'error',
+      text: 'You are issuing commands too quickly. Slow down.',
+    }));
+  });
+
+  it('clamps client-requested facing so an input frame cannot snap 180 degrees', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Testa');
+    const player = server.sim.entities.get(session.pid)!;
+    player.facing = 0;
+
+    server.handleMessage(session, JSON.stringify({ t: 'input', mi: {}, facing: Math.PI }));
+    expect(player.facing).toBeCloseTo(Math.PI / 2);
+
+    server.handleMessage(session, JSON.stringify({ t: 'input', mi: {}, facing: Math.PI }));
+    expect(player.facing).toBeCloseTo(Math.PI);
+  });
+});
+
 describe('chat moderation', () => {
   it('rate-limits chat bursts per connected client before cooldown', () => {
     const server = new GameServer();

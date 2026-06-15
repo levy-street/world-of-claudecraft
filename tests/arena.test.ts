@@ -204,11 +204,62 @@ describe('arena: a full bout', () => {
     // run the aftermath out so the slot is released
     for (let i = 0; i < 20 * 6 && sim.arenaMatchFor(a); i++) sim.tick();
     expect(sim.arenaMatchFor(a)).toBe(null);
-    // requeue both — a fresh match must seat without "all arenas busy"
+    // A third contender can still be seated immediately: the free-slot check
+    // must not be confused by the new rematch cooldown for Aleph/Bet.
+    const c = sim.addPlayer('rogue', 'Gimel');
+    teleport(sim, c, 12, -40);
+    sim.arenaQueueJoin(a);
+    sim.arenaQueueJoin(b);
+    sim.arenaQueueJoin(c);
+    sim.tick();
+    expect(sim.arenaMatchFor(a)).toBeTruthy();
+    const rematch = sim.arenaMatchFor(a)!;
+    expect([rematch.a, rematch.b].sort()).toEqual([a, c].sort());
+    expect(sim.arenaMatchFor(b)).toBe(null);
+    expect(sim.arenaInfoFor(b)!.queued).toBe(true);
+  });
+
+  it('does not immediately rematch the same pair after a bout', () => {
+    const { sim, a, b } = queueDuo();
+    startBout(sim);
+    (sim as any).dealDamage(sim.entities.get(a)!, sim.entities.get(b)!, 99999, false, 'physical', null, 'hit');
+    for (let i = 0; i < 20 * 6 && sim.arenaMatchFor(a); i++) sim.tick();
+
     sim.arenaQueueJoin(a);
     sim.arenaQueueJoin(b);
     sim.tick();
-    expect(sim.arenaMatchFor(a)).toBeTruthy();
+
+    expect(sim.arenaMatchFor(a)).toBe(null);
+    expect(sim.arenaMatchFor(b)).toBe(null);
+    expect(sim.arenaInfoFor(a)!.queued).toBe(true);
+    expect(sim.arenaInfoFor(b)!.queued).toBe(true);
+  });
+
+  it('keeps same-character rematch cooldowns across reconnects', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph', { characterKey: 'char:1' });
+    const b = sim.addPlayer('mage', 'Bet', { characterKey: 'char:2' });
+    teleport(sim, a, 0, -40);
+    teleport(sim, b, 6, -40);
+    sim.arenaQueueJoin(a);
+    sim.arenaQueueJoin(b);
+    sim.tick();
+    startBout(sim);
+    (sim as any).dealDamage(sim.entities.get(a)!, sim.entities.get(b)!, 99999, false, 'physical', null, 'hit');
+    for (let i = 0; i < 20 * 6 && sim.arenaMatchFor(a); i++) sim.tick();
+    sim.removePlayer(a);
+    sim.removePlayer(b);
+
+    const a2 = sim.addPlayer('warrior', 'Aleph', { characterKey: 'char:1' });
+    const b2 = sim.addPlayer('mage', 'Bet', { characterKey: 'char:2' });
+    teleport(sim, a2, 0, -40);
+    teleport(sim, b2, 6, -40);
+    sim.arenaQueueJoin(a2);
+    sim.arenaQueueJoin(b2);
+    sim.tick();
+
+    expect(sim.arenaMatchFor(a2)).toBe(null);
+    expect(sim.arenaMatchFor(b2)).toBe(null);
   });
 });
 

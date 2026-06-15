@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+const normalizedHtml = html.replace(/\r\n/g, '\n');
 
 function splitGameUiTemplate(): { templateHtml: string; liveHtml: string } {
   const marker = '<template id="game-ui-template">';
@@ -38,7 +39,7 @@ describe('client HTML shell', () => {
   });
 
   it('caps mobile quest and NPC panels instead of stretching them edge to edge', () => {
-    expect(html).toContain('body.mobile-touch #quest-log-window,\n  body.mobile-touch #vendor-window,\n  body.mobile-touch #quest-dialog');
+    expect(normalizedHtml).toContain('body.mobile-touch #quest-log-window,\n  body.mobile-touch #vendor-window,\n  body.mobile-touch #quest-dialog');
     expect(html).toContain('width: clamp(320px, 76vw, 680px);');
     expect(html).toContain('max-width: calc(100vw - 20px);');
     expect(html).toContain('transform: translateX(-50%);');

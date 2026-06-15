@@ -350,6 +350,14 @@ describe('dungeon instance placement and targetability', () => {
 });
 
 describe('boss loot and encounter resets', () => {
+  function killMorthen(sim: Sim, pid = sim.playerId): Entity {
+    sim.enterDungeon('hollow_crypt', pid);
+    const boss = [...sim.entities.values()].find((e) => e.templateId === 'morthen' && e.spawnPos.x > DUNGEON_X_THRESHOLD && !e.dead);
+    if (!boss) throw new Error('Morthen was not spawned in the instance');
+    (sim as any).dealDamage(sim.entities.get(pid)!, boss, 999999, false, 'physical', null, 'hit');
+    return boss;
+  }
+
   it('boss roll groups drop at most one item from each exclusive table', () => {
     const sim = makeSim();
     const meta = sim.meta(sim.playerId)!;
@@ -387,6 +395,49 @@ describe('boss loot and encounter resets', () => {
       }
       if (exactlyOne) expect([...seen].sort()).toEqual([...groupItems].sort()); // all three reachable
     }
+  });
+
+  it('persists dungeon boss reward lockouts in character state', () => {
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior', dungeonLockoutPeriod: 'day1' });
+    sim.meta(sim.playerId)!.dungeonBossLockouts.hollow_crypt = 'day1';
+
+    const state = sim.serializeCharacter(sim.playerId)!;
+    const sim2 = new Sim({ seed: SEED, playerClass: 'warrior', noPlayer: true, dungeonLockoutPeriod: 'day1' });
+    const reloaded = sim2.addPlayer('warrior', 'Reloaded', { state });
+
+    expect(sim2.meta(reloaded)!.dungeonBossLockouts.hollow_crypt).toBe('day1');
+  });
+
+  it('locks dungeon boss loot after the first reward in the same reset period', () => {
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior', dungeonLockoutPeriod: 'day1' });
+    const firstBoss = killMorthen(sim);
+
+    expect(sim.meta(sim.playerId)!.dungeonBossLockouts.hollow_crypt).toBe('day1');
+    expect(firstBoss.lootable).toBe(true);
+    expect((firstBoss.loot?.items.length ?? 0) + (firstBoss.loot?.copper ?? 0)).toBeGreaterThan(0);
+
+    const lockedState = sim.serializeCharacter(sim.playerId)!;
+    const sim2 = new Sim({ seed: SEED, playerClass: 'warrior', noPlayer: true, dungeonLockoutPeriod: 'day1' });
+    const reloaded = sim2.addPlayer('warrior', 'Reloaded', { state: lockedState });
+    const secondBoss = killMorthen(sim2, reloaded);
+
+    expect(secondBoss.lootable).toBe(false);
+    expect(secondBoss.loot).toBeNull();
+    expect(sim2.events.some((e) => e.type === 'log' && e.text.includes('already locked'))).toBe(true);
+  });
+
+  it('allows dungeon boss rewards again in a new reset period', () => {
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior', dungeonLockoutPeriod: 'day1' });
+    killMorthen(sim);
+    const lockedState = sim.serializeCharacter(sim.playerId)!;
+
+    const sim2 = new Sim({ seed: SEED, playerClass: 'warrior', noPlayer: true, dungeonLockoutPeriod: 'day2' });
+    const reloaded = sim2.addPlayer('warrior', 'Reloaded', { state: lockedState });
+    const boss = killMorthen(sim2, reloaded);
+
+    expect(sim2.meta(reloaded)!.dungeonBossLockouts.hollow_crypt).toBe('day2');
+    expect(boss.lootable).toBe(true);
+    expect((boss.loot?.items.length ?? 0) + (boss.loot?.copper ?? 0)).toBeGreaterThan(0);
   });
 
   it('dungeon bosses always drop gear but cap bonus quality drops', () => {

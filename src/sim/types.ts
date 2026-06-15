@@ -565,6 +565,9 @@ export interface SimConfig {
   respawnSeconds?: number; // mob respawn time (default 25)
   autoEquip?: boolean; // auto-equip better gear on loot (headless convenience)
   playerName?: string;
+  // Empty/offline default disables real-time reward lockouts. Online servers pass
+  // a deterministic period id (for example an ISO UTC date) at boot.
+  dungeonLockoutPeriod?: string;
   noPlayer?: boolean; // multiplayer server: start with an empty world and addPlayer() later
 }
 

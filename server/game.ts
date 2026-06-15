@@ -1,8 +1,8 @@
 import { readFileSync } from 'node:fs';
 import type { WebSocket } from 'ws';
-import { Sim } from '../src/sim/sim';
+import { Sim, marketSellerKeyForCharacterId } from '../src/sim/sim';
 import type { PlayerMeta } from '../src/sim/sim';
-import { DT, Entity, SimEvent, dist2d } from '../src/sim/types';
+import { DT, Entity, SimEvent, dist2d, normAngle } from '../src/sim/types';
 import { parseMoveInputFrame } from '../src/sim/move_input';
 import { stealthDetectionRadius, threatEntries } from '../src/sim/threat';
 import { zoneAt, DUNGEONS } from '../src/sim/data';
@@ -43,9 +43,23 @@ const CHAT_RATE_REFILL_PER_SECOND = 1 / 3; // sustained 20 messages/minute
 const CHAT_RATE_ERROR_COOLDOWN_SECONDS = 4;
 const CHAT_COOLDOWN_SECONDS = 20;
 const CHAT_RATE_VIOLATIONS_FOR_COOLDOWN = 3;
+const CMD_RATE_BURST = 30;
+const CMD_RATE_REFILL_PER_SECOND = 15;
+const CMD_RATE_ERROR_COOLDOWN_SECONDS = 2;
+const MAX_SERVER_FACING_STEP = Math.PI / 2; // per input frame; blocks instant 180 snaps without fighting mouse turn
 const WHO_RESULT_LIMIT = 50;
 // Exponential moving average weight for the per-tick duration stat.
 const TICK_EMA_ALPHA = 0.05;
+
+function currentDungeonLockoutPeriod(now = new Date()): string {
+  return now.toISOString().slice(0, 10);
+}
+
+function clampFacingStep(current: number, requested: number): number {
+  const delta = normAngle(requested - current);
+  const step = Math.max(-MAX_SERVER_FACING_STEP, Math.min(MAX_SERVER_FACING_STEP, delta));
+  return normAngle(current + step);
+}
 
 export interface ClientSession {
   ws: WebSocket;
@@ -62,6 +76,9 @@ export interface ClientSession {
   chatLastRateError: number;
   chatRateViolations: number;
   chatCooldownUntil: number;
+  cmdTokens: number;
+  cmdLastRefill: number;
+  cmdLastRateError: number;
   // character ids this player has ignored; chat from them is dropped before
   // delivery. Loaded from the DB on join, kept in sync by social commands.
   blockedIds: Set<number>;
@@ -312,9 +329,15 @@ export class GameServer {
   private readonly startedAt = Date.now();
   private peakOnline = 0;
   private tickMsAvg = 0;
+  private dungeonLockoutPeriod = currentDungeonLockoutPeriod();
 
   constructor() {
-    this.sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', noPlayer: true });
+    this.sim = new Sim({
+      seed: WORLD_SEED,
+      playerClass: 'warrior',
+      noPlayer: true,
+      dungeonLockoutPeriod: this.dungeonLockoutPeriod,
+    });
     this.social = new SocialService(this.socialDb, this.socialTransport());
   }
 
@@ -423,6 +446,7 @@ export class GameServer {
       if (dt > 0.5) dt = 0.5;
       acc += dt;
       while (acc >= DT) {
+        this.refreshDungeonLockoutPeriod();
         const events = this.sim.tick();
         this.routeEvents(events);
         acc -= DT;
@@ -448,11 +472,21 @@ export class GameServer {
     if (this.interval) clearInterval(this.interval);
   }
 
+  private refreshDungeonLockoutPeriod(now = new Date()): void {
+    const period = currentDungeonLockoutPeriod(now);
+    if (period === this.dungeonLockoutPeriod) return;
+    this.dungeonLockoutPeriod = period;
+    this.sim.setDungeonLockoutPeriod(period);
+  }
+
   // -------------------------------------------------------------------------
 
   join(ws: WebSocket, accountId: number, characterId: number, name: string, cls: import('../src/sim/types').PlayerClass, state: import('../src/sim/sim').CharacterState | null, isGm = false): ClientSession | { error: string } {
     if (this.sessionsByCharacterId.has(characterId)) return { error: 'character already in world' };
-    const pid = this.sim.addPlayer(cls, name, { state: state ?? undefined });
+    const pid = this.sim.addPlayer(cls, name, {
+      state: state ?? undefined,
+      characterKey: marketSellerKeyForCharacterId(characterId),
+    });
     if (isGm) {
       // GM characters: invulnerable, and always at the level cap (the row is
       // created without state, so the first join levels them up)
@@ -465,6 +499,7 @@ export class GameServer {
       lastSave: Date.now(), alive: true, joinedAt: Date.now(), dbSessionId: null,
       chatTokens: CHAT_RATE_BURST, chatLastRefill: Date.now() / 1000, chatLastRateError: 0,
       chatRateViolations: 0, chatCooldownUntil: 0,
+      cmdTokens: CMD_RATE_BURST, cmdLastRefill: Date.now() / 1000, cmdLastRateError: 0,
       blockedIds: new Set(),
       blockListLoaded: false,
       lastWhisperFrom: null,
@@ -684,11 +719,12 @@ export class GameServer {
       const { moveInput, facing } = parseMoveInputFrame(msg);
       Object.assign(meta.moveInput, moveInput);
       if (facing !== null && !e.dead) {
-        e.facing = facing;
+        e.facing = clampFacingStep(e.facing, facing);
       }
       return;
     }
     if (msg.t !== 'cmd') return;
+    if (!this.consumeCommandToken(session)) return;
     switch (msg.cmd) {
       case 'castSlot': sim.castAbilityBySlot(msg.slot | 0, pid); break;
       case 'cast': if (typeof msg.ability === 'string') sim.castAbility(msg.ability, pid); break;
@@ -1214,6 +1250,22 @@ export class GameServer {
       channel: sent.channel,
       message: sent.message,
     });
+  }
+
+  private consumeCommandToken(session: ClientSession): boolean {
+    const now = Date.now() / 1000;
+    const elapsed = Math.max(0, now - session.cmdLastRefill);
+    session.cmdTokens = Math.min(CMD_RATE_BURST, session.cmdTokens + elapsed * CMD_RATE_REFILL_PER_SECOND);
+    session.cmdLastRefill = now;
+    if (session.cmdTokens >= 1) {
+      session.cmdTokens -= 1;
+      return true;
+    }
+    if (now - session.cmdLastRateError >= CMD_RATE_ERROR_COOLDOWN_SECONDS) {
+      session.cmdLastRateError = now;
+      this.send(session, { t: 'events', list: [{ type: 'error', text: 'You are issuing commands too quickly. Slow down.' }] });
+    }
+    return false;
   }
 
   private consumeChatToken(session: ClientSession): boolean {
