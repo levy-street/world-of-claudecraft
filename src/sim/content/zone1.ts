@@ -265,6 +265,7 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
       'q_bones', 'q_whispers', 'q_names_of_the_dead', 'q_silence_the_call',
       'q_rite', 'q_sexton', 'q_hollow', 'q_gravecallers_trail', 'q_fenbridge_muster',
     ],
+    trains: 'first_aid',
     greeting: 'The Light keep you. Even the dead find no rest here of late.',
   },
   smith_haldren: {

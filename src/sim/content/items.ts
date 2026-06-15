@@ -265,4 +265,38 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   spider_leg: { id: 'spider_leg', name: 'Twitching Spider Leg', kind: 'junk', quality: 'poor', sellValue: 4 },
   bone_fragments: { id: 'bone_fragments', name: 'Bone Fragments', kind: 'junk', quality: 'poor', sellValue: 7 },
   linen_scrap: { id: 'linen_scrap', name: 'Linen Scrap', kind: 'junk', quality: 'poor', sellValue: 3 },
+  // Professions — cloth materials (level-banded humanoid drops) + First Aid bandages.
+  // Cloth and bandages stack to 20 (vanilla cloth stack size).
+  linen_cloth: { id: 'linen_cloth', name: 'Linen Cloth', kind: 'reagent', quality: 'common', sellValue: 4, stackSize: 20 },
+  wool_cloth: { id: 'wool_cloth', name: 'Wool Cloth', kind: 'reagent', quality: 'common', sellValue: 8, stackSize: 20 },
+  silk_cloth: { id: 'silk_cloth', name: 'Silk Cloth', kind: 'reagent', quality: 'common', sellValue: 14, stackSize: 20 },
+  // Bandage heal totals = ~2/3 of AVERAGE unequipped player HP at the level
+  // matching each cloth's mob band (you bandage near the mobs you farm), so a
+  // bandage restores a solid chunk (~65% of an average bar, less for plate) rather
+  // than a full heal. Classic uniform 8s channel, stack to 20. PRD §17.1a has the
+  // HP reference tables. (Reduced 1/3 from the full-bar baseline.)
+  linen_bandage: {        // band lvl ~5 (avg HP ~165)
+    id: 'linen_bandage', name: 'Linen Bandage', kind: 'tool', quality: 'common',
+    use: { type: 'bandage', totalHeal: 105, channelTime: 8 }, sellValue: 1, stackSize: 20, requiredLevel: 1,
+  },
+  heavy_linen_bandage: {  // band lvl ~8 (avg HP ~250)
+    id: 'heavy_linen_bandage', name: 'Heavy Linen Bandage', kind: 'tool', quality: 'common',
+    use: { type: 'bandage', totalHeal: 175, channelTime: 8 }, sellValue: 2, stackSize: 20, requiredLevel: 3,
+  },
+  wool_bandage: {         // band lvl ~11 (avg HP ~310)
+    id: 'wool_bandage', name: 'Wool Bandage', kind: 'tool', quality: 'common',
+    use: { type: 'bandage', totalHeal: 240, channelTime: 8 }, sellValue: 3, stackSize: 20, requiredLevel: 6,
+  },
+  heavy_wool_bandage: {   // band lvl ~14 (avg HP ~400)
+    id: 'heavy_wool_bandage', name: 'Heavy Wool Bandage', kind: 'tool', quality: 'common',
+    use: { type: 'bandage', totalHeal: 305, channelTime: 8 }, sellValue: 4, stackSize: 20, requiredLevel: 8,
+  },
+  silk_bandage: {         // band lvl ~17 (avg HP ~490)
+    id: 'silk_bandage', name: 'Silk Bandage', kind: 'tool', quality: 'common',
+    use: { type: 'bandage', totalHeal: 385, channelTime: 8 }, sellValue: 6, stackSize: 20, requiredLevel: 10,
+  },
+  heavy_silk_bandage: {   // band lvl ~20 (avg HP ~610)
+    id: 'heavy_silk_bandage', name: 'Heavy Silk Bandage', kind: 'tool', quality: 'common',
+    use: { type: 'bandage', totalHeal: 480, channelTime: 8 }, sellValue: 8, stackSize: 20, requiredLevel: 12,
+  },
 };

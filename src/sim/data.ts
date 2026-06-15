@@ -9,6 +9,7 @@ import type {
   PlayerClass, QuestDef, QuestState, ZoneDef, ZonePropsDef,
 } from './types';
 import { BASE_ITEMS } from './content/items';
+import { validateProfessions } from './content/professions';
 import {
   GRAVEYARD_POS, LAKE, TOWN_RADIUS, ZONE1_CAMPS, ZONE1_MOBS, ZONE1_NPCS, ZONE1_OBJECTS,
   ZONE1_PROPS, ZONE1_QUESTS, ZONE1_QUEST_ORDER, ZONE1_ROADS, ZONE1_ZONE,
@@ -51,6 +52,13 @@ export type {
 // ---------------------------------------------------------------------------
 
 export const ITEMS: Record<string, ItemDef> = mergeItems(BASE_ITEMS, ZONE2_ITEMS, ZONE3_ITEMS, TEMPLE_ITEMS);
+
+// fail fast on a malformed professions registry (unknown reagent/output item,
+// unordered difficulty thresholds), same as validateTalentTree at import
+{
+  const errs = validateProfessions(ITEMS);
+  if (errs.length) throw new Error(`Invalid professions registry: ${errs.join('; ')}`);
+}
 
 export const MOBS: Record<string, MobTemplate> = {
   ...ZONE1_MOBS, ...ZONE2_MOBS, ...ZONE3_MOBS, ...DUNGEON_MOBS,

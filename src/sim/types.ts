@@ -13,6 +13,23 @@ export const FISHING_CAST_ID = 'fishing';
 export const FISHING_CAST_NAME = 'Fishing';
 export const FISHING_CAST_TIME = 5;
 
+// Professions & secondary skills. Skill caps at 100 (level cap 20 × 5), split
+// into two trainable tiers: Apprentice (1–50) and Journeyman (1–100, trainable
+// only once the skill reaches 40). Vanilla uses 75-point increments and gates
+// the next tier at the previous cap minus ~25 (Journeyman at 50); we compress to
+// a 100 ceiling. See docs/prd/professions-and-crafting.md §3.1a.
+export const PROFESSION_MAX = 100;
+export const APPRENTICE_CAP = 50;
+export const JOURNEYMAN_CAP = 100;
+export const JOURNEYMAN_REQ_SKILL = 40;
+// Training Journeyman also needs a minimum character level, so you can't max a
+// skill at level 1 — it gates behind some actual leveling.
+export const JOURNEYMAN_REQ_LEVEL = 5;
+// Skill-up chance by recipe difficulty color relative to current skill.
+export const SKILLUP_CHANCE = { orange: 1.0, yellow: 0.75, green: 0.25, grey: 0 } as const;
+// 'Recently Bandaged' debuff window (seconds).
+export const RECENTLY_BANDAGED_TIME = 60;
+
 export type PlayerClass =
   | 'warrior' | 'paladin' | 'hunter' | 'rogue' | 'priest'
   | 'shaman' | 'mage' | 'warlock' | 'druid';
@@ -39,7 +56,9 @@ export type AuraKind =
   | 'dot' | 'slow' | 'stun' | 'root' | 'incapacitate' | 'polymorph'
   | 'attackspeed' | 'debuff_ap' | 'buff_ap' | 'buff_armor' | 'buff_int' | 'buff_dodge' | 'buff_speed' | 'buff_haste'
   | 'hot' | 'absorb' | 'imbue' | 'buff_sta' | 'buff_allstats' | 'thorns' | 'form_bear'
-  | 'form_cat' | 'stealth' | 'defensive_stance' | 'righteous_fury' | 'sunder' | 'mortal_wound';
+  | 'form_cat' | 'stealth' | 'defensive_stance' | 'righteous_fury' | 'sunder' | 'mortal_wound'
+  // First Aid: blocks re-bandaging the same target for a short window
+  | 'recently_bandaged';
 
 export interface Aura {
   id: string; // ability id that applied it
@@ -84,12 +103,16 @@ export interface WeaponInfo {
 export type EquipSlot = 'mainhand' | 'chest' | 'legs' | 'feet';
 
 export type ItemUse =
-  | { type: 'fishing' };
+  | { type: 'fishing' }
+  // First Aid bandage: channel for `channelTime`s, healing `totalHeal` over that
+  // window via a hot aura. Channel breaks on damage/move like the fishing cast.
+  | { type: 'bandage'; totalHeal: number; channelTime: number };
 
 export interface ItemDef {
   id: string;
   name: string;
-  kind: 'weapon' | 'armor' | 'quest' | 'junk' | 'food' | 'drink' | 'tool' | 'potion';
+  // 'reagent' is a crafting material (cloth, ore, herb, leather) — stacks, no equip
+  kind: 'weapon' | 'armor' | 'quest' | 'junk' | 'food' | 'drink' | 'tool' | 'potion' | 'reagent';
   slot?: EquipSlot;
   weapon?: WeaponInfo;
   stats?: Partial<Stats>;
@@ -109,6 +132,11 @@ export interface ItemDef {
   potionMana?: number;
   quality?: 'poor' | 'common' | 'uncommon' | 'rare' | 'epic'; // gray/white/green/blue/purple name colors
   requiredClass?: PlayerClass[];
+  // Minimum character level to use (or equip) this item. Omitted = no requirement.
+  requiredLevel?: number;
+  // Max units per inventory slot; overflow spills into additional slots.
+  // Omitted = unbounded (the historical default for every item).
+  stackSize?: number;
 }
 
 export interface InvSlot {
@@ -300,6 +328,8 @@ export interface NpcDef {
   // The Merchant: talking to this NPC opens the player-driven World Market
   // (auction house) instead of a fixed vendor stock.
   market?: boolean;
+  // Profession trainer: a profession id this NPC teaches (Apprentice + Journeyman).
+  trains?: string;
   greeting: string;
 }
 
@@ -315,6 +345,10 @@ export interface GroundObjectDef {
   itemId: string;
   name: string;
   positions: { x: number; z: number }[];
+  // Gathering nodes (mining/herbalism): require a profession skill and yield a
+  // random stack via a gather cast instead of instant pickup. Used from Commit 2.
+  gatherSkill?: { profId: string; requiredSkill: number };
+  yield?: { min: number; max: number };
 }
 
 export interface DungeonSpawn {
@@ -563,6 +597,9 @@ export type SimEvent = { pid?: number } & (
   | { type: 'virtualLevelUp'; level: number }
   | { type: 'milestoneUnlocked'; milestoneId: string }
   | { type: 'learnAbility'; abilityId: string; rank: number }
+  // Professions: a profession skill rose (FCT + sound), or a tier/profession was learned
+  | { type: 'skillUp'; profId: string; skill: number }
+  | { type: 'professionLearned'; profId: string; tier: string }
   | { type: 'loot'; text: string }
   | { type: 'error'; text: string }
   | { type: 'questAccepted'; questId: string }
