@@ -23,6 +23,7 @@ PRDs say so explicitly) and note the deviation.
 |---|---|
 | `talents-and-specializations.md` | Talents/specs flagship milestone (one-class slice first, then 9 classes). |
 | `max-level-xp-overflow.md` | Post-cap XP overflow / prestige progression. |
+| `professions-and-crafting.md` | Tradeskill framework + full roster (cloth/First Aid foundation, then gathering + production professions); two-tier skill cap (Apprentice 50 / Journeyman 100), 3-commit rollout. |
 | `build-prompts.md` | Two self-contained prompts that drive end-to-end PRD implementation (used with `/gsd:*`). |
 
 ## screenshots/
