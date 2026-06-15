@@ -3549,6 +3549,11 @@ export class Sim {
       return null;
     }
 
+    if (/^\/(?:falling|jump|airborne)(?:\s|$)/i.test(raw)) {
+      this.error(r.meta.entityId, this.fallingReadout(r.e));
+      return null;
+    }
+
     // "/w name message" — private whisper to an online player
     const wm = /^\/(?:w|whisper|t|tell)\s+(\S+)\s+([\s\S]+)$/i.exec(raw);
     if (wm) {
@@ -4845,6 +4850,23 @@ export class Sim {
       if (Math.abs(pos.x - origin.x) < 120 && Math.abs(pos.z - origin.z) < 250) return inst.slot;
     }
     return null;
+  }
+
+  // Self-only readout of vertical/fall state — surfaces the otherwise-invisible
+  // jump physics (sim.ts updatePlayerMovement). Reads only live Entity fields and
+  // the same groundHeight()/FALL_SAFE_DISTANCE the landing-damage model uses, so
+  // the "this will hurt" preview matches what an actual landing would deal.
+  private fallingReadout(e: Entity): string {
+    const ground = groundHeight(e.pos.x, e.pos.z, this.cfg.seed);
+    if (e.onGround) return 'You are on solid ground.';
+    const height = Math.max(0, Math.round(e.pos.y - ground));
+    if (e.vy > 0) return `You are airborne and rising — ${height}yd above the ground.`;
+    const drop = e.fallStartY - ground;
+    const danger =
+      drop > FALL_SAFE_DISTANCE
+        ? ' Brace for impact — this fall is going to hurt.'
+        : ' It should be a safe landing.';
+    return `You are falling — ${height}yd above the ground.${danger}`;
   }
 
   private error(pid: number, text: string): void {
