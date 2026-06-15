@@ -3549,6 +3549,12 @@ export class Sim {
       return null;
     }
 
+    // "/gear" (aliases /equip, /equipment) — self-only readout of equipped items
+    if (/^\/(?:gear|equip|equipment)(?:\s|$)/i.test(raw)) {
+      this.error(r.meta.entityId, this.gearReadout(r.meta));
+      return null;
+    }
+
     // "/w name message" — private whisper to an online player
     const wm = /^\/(?:w|whisper|t|tell)\s+(\S+)\s+([\s\S]+)$/i.exec(raw);
     if (wm) {
@@ -4849,6 +4855,26 @@ export class Sim {
 
   private error(pid: number, text: string): void {
     this.emit({ type: 'error', text, pid });
+  }
+
+  // Self-only readout of equipped items, walked in a fixed slot order so the
+  // line is stable and empty slots are visible (the point of a gear check).
+  private gearReadout(meta: PlayerMeta): string {
+    const slots: [EquipSlot, string][] = [
+      ['mainhand', 'Main Hand'],
+      ['chest', 'Chest'],
+      ['legs', 'Legs'],
+      ['feet', 'Feet'],
+    ];
+    let worn = 0;
+    const parts = slots.map(([slot, label]) => {
+      const itemId = meta.equipment[slot];
+      if (!itemId) return `${label}: (empty)`;
+      worn++;
+      return `${label}: ${ITEMS[itemId]?.name ?? itemId}`;
+    });
+    if (worn === 0) return 'You have nothing equipped.';
+    return `Equipped (${worn}/${slots.length}): ${parts.join(', ')}.`;
   }
 }
 
