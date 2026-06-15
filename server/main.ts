@@ -223,8 +223,17 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const name = normalizeCharName(body.name);
       if (name === null) return json(res, 400, { error: 'invalid character name (2-16 letters)' });
       if (offensiveName(name)) return json(res, 400, { error: 'character name is not allowed' });
+      const characterId = Number(renameMatch[1]);
+      // A rename mutates the DB name and clears force_rename, but a live
+      // ClientSession keeps its own copy of the name (used by reports, chat and
+      // /api/status). Renaming an online character desyncs that copy and — worse
+      // — lets a force-renamed player already in the world clear the moderation
+      // flag without ever leaving. Mirror the DELETE guard and require offline.
+      if ([...game.clients.values()].some((s) => s.characterId === characterId)) {
+        return json(res, 400, { error: 'character is currently online' });
+      }
       try {
-        const c = await renameCharacter(accountId, Number(renameMatch[1]), name);
+        const c = await renameCharacter(accountId, characterId, name);
         if (!c) return json(res, 404, { error: 'character not found' });
         return json(res, 200, { id: c.id, name: c.name, class: c.class, level: c.level, forceRename: c.force_rename });
       } catch (err: any) {
