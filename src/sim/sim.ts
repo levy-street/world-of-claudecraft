@@ -3549,6 +3549,11 @@ export class Sim {
       return null;
     }
 
+    if (/^\/(?:speed|movespeed|ms)(?:\s|$)/i.test(raw)) {
+      this.error(r.meta.entityId, this.speedReadout(r.e));
+      return null;
+    }
+
     // "/w name message" — private whisper to an online player
     const wm = /^\/(?:w|whisper|t|tell)\s+(\S+)\s+([\s\S]+)$/i.exec(raw);
     if (wm) {
@@ -4845,6 +4850,19 @@ export class Sim {
       if (Math.abs(pos.x - origin.x) < 120 && Math.abs(pos.z - origin.z) < 250) return inst.slot;
     }
     return null;
+  }
+
+  // Self-only readout of current movement speed as a percent of normal run
+  // speed. Effective speed is RUN_SPEED * moveSpeedMult(p), where the
+  // multiplier folds slow/stealth auras against speed buffs; a root pins the
+  // player regardless of the multiplier, so it is reported first.
+  private speedReadout(e: Entity): string {
+    if (this.isRooted(e)) return 'You are rooted in place and cannot move.';
+    const mult = this.moveSpeedMult(e);
+    const pct = Math.round(mult * 100);
+    if (pct > 100) return `Movement speed: ${pct}% of normal (hastened).`;
+    if (pct < 100) return `Movement speed: ${pct}% of normal (slowed).`;
+    return 'Movement speed: 100% of normal.';
   }
 
   private error(pid: number, text: string): void {
