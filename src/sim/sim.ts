@@ -3549,6 +3549,11 @@ export class Sim {
       return null;
     }
 
+    if (/^\/(queued|onswing|swingqueue)(?:\s|$)/i.test(raw)) {
+      this.error(r.meta.entityId, this.queuedReadout(r.e));
+      return null;
+    }
+
     // "/w name message" — private whisper to an online player
     const wm = /^\/(?:w|whisper|t|tell)\s+(\S+)\s+([\s\S]+)$/i.exec(raw);
     if (wm) {
@@ -4849,6 +4854,25 @@ export class Sim {
 
   private error(pid: number, text: string): void {
     this.emit({ type: 'error', text, pid });
+  }
+
+  // Self-only readout of the ability armed to fire on the next melee swing
+  // (Heroic Strike / Raptor Strike / Maul). Distinct from /casting (active
+  // cast bar) and /cooldowns (recharge timers): an on-swing ability is neither
+  // casting nor on cooldown, just waiting for the swing — and it silently
+  // fizzles if the resource can't be paid when the swing lands (see swing
+  // resolution), so the readout flags that case up front.
+  private queuedReadout(e: Entity): string {
+    if (!e.queuedOnSwing) return 'You have no ability queued for your next swing.';
+    const queued = this.resolvedAbility(e.queuedOnSwing, e.id);
+    const name = queued?.def.name ?? e.queuedOnSwing;
+    if (!queued) return `${name} is queued for your next melee swing.`;
+    const res = e.resourceType ?? 'resource';
+    const have = Math.floor(e.resource);
+    if (e.resource >= queued.cost) {
+      return `${name} is queued for your next melee swing (costs ${queued.cost} ${res}; you have ${have}).`;
+    }
+    return `${name} is queued for your next melee swing, but you cannot afford it (costs ${queued.cost} ${res}; you have ${have}) — it will fizzle.`;
   }
 }
 
