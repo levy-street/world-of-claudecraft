@@ -457,6 +457,26 @@ describe('rogue', () => {
     expect(sim.player.comboPoints).toBe(0);
   });
 
+  it('toggling stealth off does not re-arm its cooldown', () => {
+    const sim = makeSim('rogue');
+    (sim as any).grantXp(xpForLevel(1) + xpForLevel(2) + 10); // reach level 3, learns stealth (lvl 2)
+    expect(sim.known.map((k) => k.def.id)).toContain('stealth');
+    // Stealth on: arms the 10s re-entry cooldown.
+    sim.castAbility('stealth');
+    expect(sim.player.auras.some((a) => a.kind === 'stealth')).toBe(true);
+    expect(sim.player.cooldowns.has('stealth')).toBe(true);
+    // Wait out the cooldown (10s @ 20 ticks/s = 200 ticks).
+    for (let i = 0; i < 220; i++) sim.tick();
+    expect(sim.player.cooldowns.has('stealth')).toBe(false);
+    // Toggling stealth off is free and must not re-arm the cooldown.
+    sim.castAbility('stealth');
+    expect(sim.player.auras.some((a) => a.kind === 'stealth')).toBe(false);
+    expect(sim.player.cooldowns.has('stealth')).toBe(false);
+    // Therefore the rogue can immediately re-stealth.
+    sim.castAbility('stealth');
+    expect(sim.player.auras.some((a) => a.kind === 'stealth')).toBe(true);
+  });
+
   it('rogue GCD is 1.0s', () => {
     const sim = makeSim('rogue');
     expect(sim.playerGcd).toBe(1.0);
