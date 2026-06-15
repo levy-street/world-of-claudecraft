@@ -3911,6 +3911,23 @@ export class Sim {
     }
   }
 
+  // Drop every aura on `target` that was applied by `sourceId` (e.g. an
+  // opponent's lingering DoT/CC), emitting the fade events the client expects.
+  private clearAurasFromSource(target: Entity, sourceId: number): void {
+    let statsDirty = false;
+    for (let i = target.auras.length - 1; i >= 0; i--) {
+      const a = target.auras[i];
+      if (a.sourceId !== sourceId) continue;
+      target.auras.splice(i, 1);
+      this.emit({ type: 'aura', targetId: target.id, name: a.name, gained: false });
+      if (a.kind.startsWith('buff') || a.kind.startsWith('form')) statsDirty = true;
+    }
+    if (statsDirty && target.kind === 'player') {
+      const meta = this.players.get(target.id);
+      if (meta) recalcPlayerStats(target, meta.cls, meta.equipment);
+    }
+  }
+
   // winnerPid null = draw/cancelled
   private endDuel(duel: DuelState, winnerPid: number | null): void {
     this.duels.delete(duel.a);
@@ -3926,6 +3943,12 @@ export class Sim {
         e.autoAttack = false;
       }
     }
+    // A duel is non-lethal: damage from the opponent is capped at 1 HP only
+    // while the duel is live (see dealDamage). Strip the debuffs each fighter
+    // applied to the other so a leftover DoT can't tick the loser to a real
+    // death moments after the bout ends.
+    if (ea) this.clearAurasFromSource(ea, duel.b);
+    if (eb) this.clearAurasFromSource(eb, duel.a);
     if (winnerPid !== null && aMeta && bMeta) {
       const winner = winnerPid === duel.a ? aMeta : bMeta;
       const loser = winnerPid === duel.a ? bMeta : aMeta;
