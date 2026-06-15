@@ -46,6 +46,17 @@ describe('registry', () => {
     expect(BIND_CATEGORIES).toContain('Action Bar');
     expect(BIND_ACTIONS.filter((a) => a.category === 'Action Bar').length).toBe(12);
   });
+
+  it('no two actions share a default code', () => {
+    const seen = new Map<string, string>();
+    for (const a of BIND_ACTIONS) {
+      for (const code of a.defaults) {
+        const prev = seen.get(code);
+        expect(prev, `${a.id} and ${prev} both default to ${code}`).toBeUndefined();
+        seen.set(code, a.id);
+      }
+    }
+  });
 });
 
 describe('reserved keys', () => {
