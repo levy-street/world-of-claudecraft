@@ -3549,6 +3549,14 @@ export class Sim {
       return null;
     }
 
+    // "/xp" (aliases /exp, /experience) — self-only readout of leveling
+    // progress. Like /who's reply it returns null so it is never logged or
+    // said, and works online for free (no server interceptor routes it).
+    if (/^\/(?:xp|exp|experience)(?:\s|$)/i.test(raw)) {
+      this.error(r.meta.entityId, this.xpReadout(r.meta, r.e.level));
+      return null;
+    }
+
     // "/w name message" — private whisper to an online player
     const wm = /^\/(?:w|whisper|t|tell)\s+(\S+)\s+([\s\S]+)$/i.exec(raw);
     if (wm) {
@@ -4849,6 +4857,17 @@ export class Sim {
 
   private error(pid: number, text: string): void {
     this.emit({ type: 'error', text, pid });
+  }
+
+  // One-line leveling summary for the /xp readout. At MAX_LEVEL there is no
+  // "next level" so we avoid the percent/remaining math (xpForLevel is 0 there).
+  private xpReadout(meta: PlayerMeta, level: number): string {
+    if (level >= MAX_LEVEL) return `Level ${MAX_LEVEL} — maximum level reached.`;
+    const need = xpForLevel(level);
+    const have = Math.max(0, Math.min(meta.xp, need));
+    const pct = Math.floor((have / need) * 100);
+    const fmt = (n: number) => n.toLocaleString('en-US');
+    return `Level ${level} — ${fmt(have)}/${fmt(need)} XP (${pct}%), ${fmt(need - have)} to go.`;
   }
 }
 
