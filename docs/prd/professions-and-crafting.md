@@ -7,8 +7,8 @@
 | **Created** | 2026-06-15 |
 | **Source demand** | Internal roadmap: tradeskills are the next major content pillar after talents (v0.6). Fishing already has a cast-model stub in the sim. |
 | **Related systems** | Items/loot (`src/sim/content/items.ts`, `src/sim/data.ts`), loot resolution (`src/sim/sim.ts` `rollLoot`), cast model (`src/sim/sim.ts` fishing path), persistence (`src/sim/sim.ts` `CharacterState`, `server/db.ts`), NPCs/trainers (`src/sim/types.ts` `NpcDef`, `talkToNpc`), command layer (`src/world_api.ts`, `server/game.ts`), HUD (`src/ui/hud.ts`), i18n (`src/ui/i18n.ts`) |
-| **Companion docs** | `docs/prd/talents-and-specializations.md` (subsystem-pattern precedent), planner-researcher agent-memory (`item-system`, `channel-cast-model`, `character-persistence`, `npc-trainer-model`) |
-| **Scale** | Framework milestone, not a single PR. This PRD builds the **bones** of the profession system and proves them with three concrete deliverables. Adding tailoring/cooking/mining/herbalism later is then mostly content authoring. |
+| **Companion docs** | `docs/prd/talents-and-specializations.md` (the subsystem-pattern precedent this feature follows) |
+| **Scale** | Framework milestone delivered as **three PRs** (see §20). **PR 1 — this submission —** builds the bones of the profession system (skills, recipes, crafting, trainers, economy) and proves them end to end with cloth + First Aid. PRs 2 and 3 (gathering, then production professions) follow if PR 1 is approved, and are then mostly content authoring on the rails PR 1 lays down. |
 
 ---
 
@@ -344,15 +344,26 @@ LEARN (trainer)                CRAFT (recipe)                       GATHER (node
 
 ---
 
-## 13. Open questions
+## 13. Decisions & open questions
 
-1. ~~**Skill cap mapping:**~~ **Resolved:** cap is **100** (level 20 × 5), two tiers — Apprentice (cap 50) and Journeyman (cap 100, requires skill 40). Vanilla's 75-increment / 50-gate scheme is recorded in §3.1a for a future cap raise.
-2. **Primary-profession slot limit:** First Aid is secondary (no limit). Do we stub the "pick 2 primary" rule now for forward-compat, or defer entirely until a primary profession ships?
-3. **Skill-up trigger for First Aid:** on bandage **craft** only (this PRD's assumption), or also on **use**? Classic is craft-side; confirm.
-4. **Station model:** does any v1 recipe need a station (e.g. a cooking fire), or are all First Aid bandages craftable anywhere? (If none, `station` ships unused but defined.)
-5. **Cloth tiers:** one tier (linen) in v1, or seed wool/etc. for level bands now?
-6. **Keybind:** which key for the professions window ('K'?), and does it share the talents/spellbook mutual-exclusion group?
-7. **Gather nodes live in v1?** Framework is built in Phase 5; do we also place a few mining/herb nodes as a demo, or keep nodes dormant until a gathering profession is authored?
+### Resolved in PR 1 (the design choices made here)
+- **Skill cap & tiers:** cap **100** (level 20 × 5); **Apprentice** (cap 50) → **Journeyman** (cap 100), Journeyman gated at skill **40 and character level 5**. Vanilla's 75-increment scheme recorded in §3.1a for a future cap raise. (§3.1, §3.1a, §6.1)
+- **Cloth tiers:** three tiers banded by mob level with overlap — linen 1–8, wool 7–15, silk 14–20 — dropped by humanoid/murloc/kobold families via one `rollLoot` injection; a failed cloth roll drops the tier's **scrap** (`linen_/wool_/silk_scrap`) instead. (§6.3, §6.10)
+- **Primary-profession cap:** **2 primaries; secondary skills unlimited**, enforced at the trainer. Implemented (synthetic-tested until a primary profession ships). (§6.1)
+- **Skill-up trigger:** First Aid skills up on bandage **craft**, not on use (classic-side). (§6.5)
+- **"Recently Bandaged" timing:** applied at **cast start**, so interrupting the channel can't dodge the cooldown. (§6.6)
+- **Recipe access:** recipes are **learned from the trainer**, not auto-unlocked by skill; the starter recipe is taught free on learning the profession. (§6.10)
+- **Learning costs:** tiers **50/500** (secondary) and **150/1500** (primary); recipe cost **round(skill² × 0.1)** secondary / **× 0.2** primary (min 5c). Calibrated against the live economy. (§6.10)
+- **UI direction:** vanilla **profession-as-ability** opens the craft window; **`K`** opens a read-only Skills pane (grouped Professions / Secondary Skills, bars vs current tier cap). (§6.8)
+- **Bandage use-level gates:** require character level **1/3/6/8/10/12** by tier. (§17.1a)
+
+### Open — for the owner / reviewers
+1. **Economy goals & cost weight (the big one).** What role should professions play in the economy, and how expensive *should* learning be? PR 1's costs were tuned against the current numbers — median quest reward ~600c, vendor gear ~1500c, and **no repair/durability/death sinks exist** (the economy is income-rich, sink-poor) — landing full First Aid at ~2350c (≈ 4 quests). But the *intended* weight is a design call we don't have a house answer for: should professions be a trivial convenience, a meaningful gold sink, or a major one? This directly drives `TIER_COST` / `RECIPE_COST_K`. **There is no economy design doc; this is genuinely open and we'd value the owner's direction.**
+2. **Bandage heal values.** The six bandage heal totals (§17.1a) were derived from real data — average unequipped HP per class at each cloth band's level, then reduced ~⅓, and cross-checked against live healing spells — so they're *reasoned*, not arbitrary. But they're genuinely hard to lock without the owner's **current and long-term aims for player health and itemization**: how much HP a geared character is expected to have at each level now and as gear is added, and how strong out-of-combat healing should be relative to that. If HP pools or gear stats shift, these want a retune. Values live on each bandage item's `use.totalHeal` (pure tuning, no code change). **Open: what are the target HP curves and the intended power of bandages within them?**
+3. **Drop-rate tuning.** Cloth drops at ~35% on cloth-family kills (scrap ~30% of the misses) — first-pass, wants playtest validation.
+4. **Gather nodes are not in PR 1.** Cloth comes from mob drops only here; the gather-node framework lands with PR 2's gathering professions (see §19, §20).
+
+(Part II / PRs 2–3 open questions — smelting, bag slots, station placement, node density — are in §21.)
 
 ---
 
@@ -517,20 +528,20 @@ These generalize §6.4's gather framework to cover all three gathering professio
 - **FR-19.3 Node render:** resource-node entities (kind `'object'`, templateId prefix `node_`) get a sparkle/glow in the renderer so they read as gatherable (extend `src/render/props.ts` or a small `nodes` helper). Skinnable corpses get a subtle skin-prompt affordance in the interact tooltip.
 - **FR-19.4 Stations** (`forge`, `cookfire`, optional `alch_bench`) are world props flagged interactable; a craft whose recipe has a `station` validates the player is within range of a matching station prop, else a reason event. v1 may co-locate stations with existing camp/town props.
 
-## 20. Full rollout phasing — the 3-commit plan
+## 20. Rollout plan — three PRs
 
-The whole roster ships in **three logical commits**, each leaving `npm run build && npm test` green. Within a commit the work follows §10's phase order; the commit boundary is where the tree is coherent and reviewable.
+The roster ships as **three PRs**, each leaving `npm run build && npm test` green and independently reviewable and mergeable. **PR 1 is this submission.** PRs 2 and 3 are scoped below but **not yet built** — they depend on PR 1's framework merging first, and are then largely content authoring on its rails.
 
-### Commit 1 — Foundation (framework + cloth + First Aid + crafting UI)
-Everything in §§1–14: `professionSkills` + tier state + persistence; `professions.ts` registry + `RecipeDef`/`ProfessionDef`/`ProfessionTier` + load validation + constants; `'reagent'` kind; `skillUp` event; cloth-drop injection in `rollLoot`; general `craft()` cast + `completeCraft` + `rollSkillUp` + difficulty coloring; First Aid content (2 tiers, bandage recipe above 50) + bandage channel HoT + "Recently Bandaged" (applied at cast start); trainers (`NpcDef.trains`, gossip "Train", `learnProfession(profId, tier)` with primary-slot + Journeyman gates); IWorld/`cmd`/server dispatch; **UI per §6.8 decision (B)** — profession-as-ability opens the craft window + `K` read-only Skills pane (grouped Professions/Secondary, tier-cap bars) + difficulty colors + Craft button + skill-up FCT; i18n. **Tests:** `tests/professions.test.ts` (registry validation, cloth determinism, craft loop, tiers, First Aid, persistence).
+### PR 1 — Foundation: framework + cloth + First Aid + crafting & economy  ← **this PR**
+Shipped and green (`npm run build && npm test`): `professionSkills` + `professionTiers` + `learnedRecipes` state + persistence; `professions.ts` registry (`RecipeDef`/`ProfessionDef`/`ProfessionTier`) + load validation + cost/tier constants; `'reagent'` item kind, `stackSize`, `requiredLevel`; `skillUp`/`professionLearned`/`recipeLearned` events; level-banded cloth drops + tiered scrap consolation in `rollLoot`; general `craft()` cast → `completeCraft` → `rollSkillUp` with difficulty coloring; First Aid content (2 tiers, six-bandage ladder) + bandage channel HoT + "Recently Bandaged" at cast start; trainers (`NpcDef.trains`, gossip "Train" view, `learnProfession(profId, tier)` + `learnRecipe(recipeId)` with primary-slot/Journeyman/level/cost gates); **trainer-taught recipes + learning costs** (§6.10); bandage tooltips; IWorld/`cmd`/server dispatch + delta snapshot; **UI per §6.8 (B)** — profession-as-ability opens the craft window + `K` Skills pane. **Tests:** `tests/professions.test.ts` (registry, cloth banding/determinism, craft + skill-up loop, tiers, costs + recipe learning, First Aid bandage + debuff + interrupt, persistence, primary-slot cap) + snapshot/keybind coverage.
 
-### Commit 2 — Gathering + secondary skills (nodes, Mining, Herbalism, Skinning, Fishing, Cooking)
-Generalize the gather framework (§19): ore/herb `GroundObjectDef` nodes + `startGather` cast + node render sparkle; corpse `startSkin` for Skinning (`skinnable`/`skinReq`); re-home Fishing under the framework (skill-up + tiers); Cooking (raw→cooked via craft loop, `cookfire` station, "Well Fed" buff). Add gathering/secondary `ProfessionDef`s + their trainers + node placements in zone `*_OBJECTS` + material items (ore/herbs/leather/meat). Smelting (Mining craft at `forge`). **Tests:** extend `tests/professions.test.ts` (node gather gate + yield + respawn, skinning gate, fishing skill-up, cooking transform, station range).
+### PR 2 — Gathering + secondary skills (Mining, Herbalism, Skinning, Fishing, Cooking) + nodes
+Generalize the gather framework (§19): ore/herb `GroundObjectDef` nodes + `startGather` cast + node render sparkle; corpse `startSkin` for Skinning (`skinnable`/`skinReq`); re-home Fishing under the framework (skill-up + tiers); Cooking (raw→cooked via the craft loop, `cookfire` station, "Well Fed" buff). Add gathering/secondary `ProfessionDef`s + trainers + node placements in zone `*_OBJECTS` + material items (ore/herbs/leather/meat). Smelting (Mining craft at a `forge`, incl. Mass Smelt). **Tests:** node gather gate + yield + respawn, skinning gate, fishing skill-up, cooking transform, station range.
 
-### Commit 3 — Production professions + content (Blacksmithing, Leatherworking, Tailoring, Alchemy)
-Author the four production `ProfessionDef`s + recipe spreads across 1–100 with tier gates; their trainers; crafted output items (armor/weapons/potions/elixirs reusing existing equip + `Aura` buff paths); `forge`/`alch_bench` stations; bolt-of-cloth/vial intermediates. Enforce the 2-primary slot cap at the trainer. Full i18n pass across all locales for every new string. **Tests:** production recipe gating + output equip/use, primary-slot cap rejection, station-required rejection, end-to-end chains (ore→bar→armor; herb→potion; cloth→bandage & cloth→armor; skin→leather→armor; fish→cook).
+### PR 3 — Production professions + content (Blacksmithing, Leatherworking, Tailoring, Alchemy)
+Author the four production `ProfessionDef`s + recipe spreads across 1–100 with tier gates; their trainers; crafted output items (armor/weapons/potions/elixirs reusing existing equip + `Aura` buff paths); `forge`/`alch_bench` stations; bolt-of-cloth/vial intermediates. Full i18n pass for every new string. **Tests:** production recipe gating + output equip/use, station-required rejection, end-to-end chains (ore→bar→armor; herb→potion; cloth→bandage & cloth→armor; skin→leather→armor; fish→cook).
 
-> **Why 3 commits, not 1:** each commit is independently shippable and reviewable — Commit 1 is playable on its own (First Aid + cloth), Commit 2 adds the gather economy, Commit 3 spends it. If review or testing forces a pause, the tree is never half-wired. This respects the project's "build phase-by-phase, green between phases" rule while honoring the "one-shot, ~3 commits" intent.
+> **Why three PRs, not one:** each is independently shippable and reviewable — PR 1 stands alone and is playable (First Aid + cloth + crafting + economy), PR 2 adds the gather economy, PR 3 spends it. Splitting keeps each review tractable and the tree always green, and lets the owner approve the framework before the content fan-out. PRs 2–3 are intentionally deferred until PR 1 lands.
 
 ## 21. Open questions (Part II)
 
