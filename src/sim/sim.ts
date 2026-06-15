@@ -3549,6 +3549,13 @@ export class Sim {
       return null;
     }
 
+    // "/targetbuffs" (aliases /debuffs, /tb) — self-only readout of the auras
+    // currently on your target, each tagged as a buff or debuff
+    if (/^\/(?:targetbuffs|debuffs|tb)(?:\s|$)/i.test(raw)) {
+      this.error(r.meta.entityId, this.targetBuffsReadout(r.e));
+      return null;
+    }
+
     // "/w name message" — private whisper to an online player
     const wm = /^\/(?:w|whisper|t|tell)\s+(\S+)\s+([\s\S]+)$/i.exec(raw);
     if (wm) {
@@ -4847,9 +4854,36 @@ export class Sim {
     return null;
   }
 
+  // Self-only readout of the auras on the player's current target, each tagged
+  // [buff] or [debuff]. Mirrors the self-aura readout but reaches across to the
+  // target's live Entity.auras, so it works for mobs, pets, and other players.
+  private targetBuffsReadout(self: Entity): string {
+    const target = self.targetId !== null ? this.entities.get(self.targetId) : undefined;
+    if (!target || target.hp <= 0) return 'You have no target.';
+    const auras = target.auras;
+    if (auras.length === 0) return `${target.name} has no active effects.`;
+    const parts = auras.map((a) => {
+      const stack = (a.stacks ?? 1) > 1 ? ` x${a.stacks}` : '';
+      const tag = isHarmfulAura(a.kind) ? 'debuff' : 'buff';
+      return `${a.name}${stack} [${tag}] (${Math.ceil(a.remaining)}s)`;
+    });
+    return `Effects on ${target.name} (${auras.length}): ${parts.join(', ')}.`;
+  }
+
   private error(pid: number, text: string): void {
     this.emit({ type: 'error', text, pid });
   }
+}
+
+// The auras a target carries that are working against it. Everything else
+// (buff_*, hot, absorb, imbue, stances, forms, stealth, thorns, attackspeed
+// haste) is treated as helpful/neutral. Used by /targetbuffs to tag each aura.
+const HARMFUL_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
+  'dot', 'slow', 'stun', 'root', 'incapacitate', 'polymorph', 'sunder',
+]);
+
+function isHarmfulAura(kind: AuraKind): boolean {
+  return HARMFUL_AURA_KINDS.has(kind);
 }
 
 export function formatMoney(copper: number): string {
