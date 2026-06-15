@@ -3549,6 +3549,13 @@ export class Sim {
       return null;
     }
 
+    // "/buyback" — self-only readout of items sold to a merchant that can
+    // still be repurchased (each at its sell value); never broadcast.
+    if (/^\/(?:buyback|bb|repurchase)(?:\s|$)/i.test(raw)) {
+      this.error(r.meta.entityId, this.buybackReadout(r.meta));
+      return null;
+    }
+
     // "/w name message" — private whisper to an online player
     const wm = /^\/(?:w|whisper|t|tell)\s+(\S+)\s+([\s\S]+)$/i.exec(raw);
     if (wm) {
@@ -4845,6 +4852,17 @@ export class Sim {
       if (Math.abs(pos.x - origin.x) < 120 && Math.abs(pos.z - origin.z) < 250) return inst.slot;
     }
     return null;
+  }
+
+  private buybackReadout(meta: PlayerMeta): string {
+    const slots = meta.vendorBuyback.filter((s) => ITEMS[s.itemId] && s.count > 0);
+    if (slots.length === 0) return 'Your vendor buyback list is empty.';
+    const parts = slots.map((s) => {
+      const def = ITEMS[s.itemId];
+      const qty = s.count > 1 ? ` x${s.count}` : '';
+      return `${def.name}${qty} (${formatMoney(def.sellValue)} each)`;
+    });
+    return `Vendor buyback (${slots.length}): ${parts.join(', ')}. Repurchase at any merchant.`;
   }
 
   private error(pid: number, text: string): void {
