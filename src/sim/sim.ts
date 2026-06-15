@@ -3549,6 +3549,15 @@ export class Sim {
       return null;
     }
 
+    // "/completed" (aliases /questsdone, /qdone) — self-only readout of the
+    // quests you have turned in, in completion order. Self-only error reply,
+    // returns null so it is neither logged nor spoken; works online for free
+    // (no server interceptor).
+    if (/^\/(?:completed|questsdone|qdone)(?:\s|$)/i.test(raw)) {
+      this.error(r.meta.entityId, this.completedReadout(r.meta));
+      return null;
+    }
+
     // "/w name message" — private whisper to an online player
     const wm = /^\/(?:w|whisper|t|tell)\s+(\S+)\s+([\s\S]+)$/i.exec(raw);
     if (wm) {
@@ -4845,6 +4854,16 @@ export class Sim {
       if (Math.abs(pos.x - origin.x) < 120 && Math.abs(pos.z - origin.z) < 250) return inst.slot;
     }
     return null;
+  }
+
+  // Readout for "/completed": the quests you have turned in, in completion
+  // order (questsDone is a Set whose insertion order is preserved on save/load).
+  // Reads only PlayerMeta.questsDone + the QUESTS registry for names (no new
+  // fields); distinct from /quest, which lists the active log.
+  private completedReadout(meta: PlayerMeta): string {
+    const names = [...meta.questsDone].map((id) => QUESTS[id]?.name ?? id);
+    if (names.length === 0) return 'You have not completed any quests yet.';
+    return `Completed quests (${names.length}): ${names.join(', ')}.`;
   }
 
   private error(pid: number, text: string): void {
