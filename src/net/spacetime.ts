@@ -2,11 +2,15 @@ import { NPCS, abilitiesKnownAt } from '../sim/data';
 import { computeQuestState } from '../sim/sim';
 import type { ResolvedAbility } from '../sim/sim';
 import {
+  cloneAllocation, computeTalentModifiers, emptyAllocation, talentPointsAtLevel, pointsSpent,
+  type TalentAllocation, type SavedLoadout, type Role,
+} from '../sim/content/talents';
+import {
   Entity, EquipSlot, InvSlot, MoveInput, PlayerClass, QuestProgress, QuestState, SimEvent,
-  emptyMoveInput,
+  emptyMoveInput, virtualLevel,
 } from '../sim/types';
 import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
-import type { ArenaInfo, CharacterSearchResult, DuelInfo, MarketInfo, PartyInfo, SocialInfo, TradeInfo } from '../world_api';
+import type { ArenaInfo, CharacterSearchResult, DuelInfo, FriendInfo, LeaderboardEntry, MarketInfo, PartyInfo, PresenceStatus, SocialInfo, TradeInfo } from '../world_api';
 import type { OnlineWorldClient } from './world_client';
 import type { SpacetimeConnectionConfig } from './backend';
 import { StdbClient, rows, table, type StdbConnection, type StdbSubscriptionHandle } from './spacetime_client';
@@ -32,6 +36,9 @@ type CharacterRow = {
   name: string;
   className: string;
   level: number;
+  realm: string;
+  lifetimeXp: bigint;
+  prestigeRank: number;
 };
 
 function wrapAngle(d: number): number {
@@ -67,7 +74,7 @@ function blankEntity(id: number): Entity {
     sitting: false, eating: null, drinking: null,
     aiState: 'idle', tappedById: null, pulseTimer: 0, firedSummons: 0, summonedIds: [], enraged: false,
     threat: new Map(), forcedTargetId: null, forcedTargetTimer: 0, ownerId: null, petTauntTimer: 0,
-    spawnPos: { x: 0, y: 0, z: 0 }, leashAnchor: null, wanderTarget: null, wanderTimer: 0,
+    spawnPos: { x: 0, y: 0, z: 0 }, leashAnchor: null, evadeStall: 0, wanderTarget: null, wanderTimer: 0,
     aggroTargetId: null, respawnTimer: 0, corpseTimer: 0, lootable: false, loot: null,
     xpValue: 0, questIds: [], vendorItems: [], objectItemId: null, dungeonId: null,
     dead: false, scale: 1, color: 0xffffff,
@@ -99,7 +106,15 @@ export class SpacetimeWorld implements OnlineWorldClient {
   equipment: Partial<Record<EquipSlot, string>> = {};
   copper = 0;
   xp = 0;
+  lifetimeXp = 0;
+  prestigeRank = 0;
+  unlockedMilestones: string[] = [];
   known: ResolvedAbility[];
+  talents: TalentAllocation = emptyAllocation();
+  talentSpec: string | null = null;
+  talentRole: Role | null = null;
+  loadouts: SavedLoadout[] = [];
+  activeLoadout = -1;
   questLog = new Map<string, QuestProgress>();
   questsDone = new Set<string>();
   partyInfo: PartyInfo | null = null;
@@ -208,7 +223,7 @@ export class SpacetimeWorld implements OnlineWorldClient {
             'SELECT * FROM world_snapshot',
             'SELECT * FROM world_event',
             'SELECT * FROM social_snapshot',
-            'SELECT * FROM character',
+            'SELECT * FROM character_directory',
           ]);
       });
       await conn.reducers.enterWorld({ characterId: BigInt(this.characterId) });
@@ -242,7 +257,7 @@ export class SpacetimeWorld implements OnlineWorldClient {
     const snapshotTable = table(conn.db, 'worldSnapshot', 'world_snapshot');
     const eventTable = table(conn.db, 'worldEvent', 'world_event');
     const socialTable = table(conn.db, 'socialSnapshot', 'social_snapshot');
-    const characterTable = table(conn.db, 'character');
+    const characterTable = table(conn.db, 'characterDirectory', 'character_directory');
 
     sessionTable.onInsert((_ctx: unknown, row: WorldSessionRow) => this.applySession(row));
     sessionTable.onUpdate((_ctx: unknown, _old: WorldSessionRow, row: WorldSessionRow) => this.applySession(row));
@@ -264,7 +279,7 @@ export class SpacetimeWorld implements OnlineWorldClient {
     const snapshotTable = table(conn.db, 'worldSnapshot', 'world_snapshot');
     const eventTable = table(conn.db, 'worldEvent', 'world_event');
     const socialTable = table(conn.db, 'socialSnapshot', 'social_snapshot');
-    const characterTable = table(conn.db, 'character');
+    const characterTable = table(conn.db, 'characterDirectory', 'character_directory');
     for (const row of rows<CharacterRow>(characterTable)) this.characterRows.set(row.name.toLowerCase(), row);
     for (const row of rows<WorldSessionRow>(sessionTable)) this.applySession(row);
     for (const row of rows<PayloadRow>(snapshotTable)) this.applySnapshotRow(row);
@@ -381,6 +396,21 @@ export class SpacetimeWorld implements OnlineWorldClient {
     if (msg.t === 'social') {
       this.socialInfo = { friends: msg.friends ?? [], blocks: msg.blocks ?? [], guild: msg.guild ?? null };
       this.socialDirty = true;
+      return;
+    }
+    if (msg.t === 'socialpos') {
+      if (this.socialInfo && Array.isArray(msg.list)) {
+        const byId = new Map<number, { x: number; z: number; zone: string; status: PresenceStatus }>();
+        for (const e of msg.list) byId.set(e.id, e);
+        const apply = (arr: FriendInfo[]) => {
+          for (const m of arr) {
+            const u = byId.get(m.id);
+            if (u) { m.x = u.x; m.z = u.z; m.zone = u.zone; m.status = u.status; m.online = true; }
+          }
+        };
+        apply(this.socialInfo.friends);
+        if (this.socialInfo.guild) apply(this.socialInfo.guild.members);
+      }
       return;
     }
     if (msg.t === 'snap') {
@@ -509,6 +539,9 @@ export class SpacetimeWorld implements OnlineWorldClient {
         ? { itemId: '', kind: 'drink', hpPer2s: 0, manaPer2s: 0, remaining: s.drk.remaining }
         : null;
       this.xp = s.xp ?? 0;
+      this.lifetimeXp = s.lxp ?? 0;
+      this.prestigeRank = s.prk ?? 0;
+      if (s.milestones !== undefined) this.unlockedMilestones = s.milestones;
       this.copper = s.copper ?? 0;
       if (s.inv !== undefined) { this.inventory = s.inv; this.invChanged = true; }
       if (s.buyback !== undefined) { this.vendorBuyback = s.buyback; this.invChanged = true; }
@@ -516,7 +549,14 @@ export class SpacetimeWorld implements OnlineWorldClient {
       if (s.qlog !== undefined) this.questLog = new Map((s.qlog as QuestProgress[]).map((q) => [q.questId, q]));
       if (s.qdone !== undefined) this.questsDone = new Set(s.qdone);
       if (s.qlog !== undefined || s.qdone !== undefined) this.pendingQuestCommands.clear();
-      this.known = abilitiesKnownAt(this.cfg.playerClass, e.level);
+      if (s.tal !== undefined && s.tal) {
+        this.talents = s.tal.alloc ?? emptyAllocation();
+        this.talentSpec = s.tal.spec ?? null;
+        this.talentRole = s.tal.role ?? null;
+        this.loadouts = s.tal.loadouts ?? [];
+        this.activeLoadout = typeof s.tal.activeLoadout === 'number' ? s.tal.activeLoadout : -1;
+      }
+      this.known = abilitiesKnownAt(this.cfg.playerClass, e.level, computeTalentModifiers(this.cfg.playerClass, this.talents));
       if (s.party !== undefined) this.partyInfo = s.party;
       if (s.marks !== undefined) this.markers = s.marks ?? {};
       if (s.trade !== undefined) this.tradeInfo = s.trade;
@@ -574,6 +614,7 @@ export class SpacetimeWorld implements OnlineWorldClient {
   abandonQuest(questId: string): void { this.cmd({ cmd: 'abandon', quest: questId }); }
   equipItem(itemId: string): void { this.cmd({ cmd: 'equip', item: itemId }); }
   useItem(itemId: string): void { this.cmd({ cmd: 'use', item: itemId }); }
+  discardItem(itemId: string, count?: number): void { this.cmd({ cmd: 'discard', item: itemId, count }); }
   buyItem(npcId: number, itemId: string): void { this.cmd({ cmd: 'buy', npc: npcId, item: itemId }); }
   sellItem(itemId: string, count?: number): void { this.cmd({ cmd: 'sell', item: itemId, count }); }
   buyBackItem(itemId: string): void { this.cmd({ cmd: 'buyback', item: itemId }); }
@@ -626,6 +667,71 @@ export class SpacetimeWorld implements OnlineWorldClient {
   marketCollect(): void { this.cmd({ cmd: 'market_collect' }); }
   enterDungeon(dungeonId: string): void { this.cmd({ cmd: 'enter_dungeon', dungeon: dungeonId }); }
   leaveDungeon(): void { this.cmd({ cmd: 'leave_dungeon' }); }
+  async leaderboard(): Promise<LeaderboardEntry[]> {
+    return [...this.characterRows.values()]
+      .map((row) => ({
+        name: row.name,
+        cls: row.className as PlayerClass,
+        level: Number(row.level),
+        realm: row.realm || this.realm || 'Claudemoon',
+        lifetimeXp: Number(row.lifetimeXp ?? 0n),
+        prestigeRank: Number(row.prestigeRank ?? 0),
+      }))
+      .filter((row) => row.lifetimeXp > 0)
+      .sort((a, b) => b.lifetimeXp - a.lifetimeXp || b.level - a.level || a.name.localeCompare(b.name))
+      .slice(0, 100)
+      .map((row, i) => ({
+        rank: i + 1,
+        name: row.name,
+        cls: row.cls,
+        level: row.level,
+        virtualLevel: virtualLevel(row.lifetimeXp),
+        lifetimeXp: row.lifetimeXp,
+        prestigeRank: row.prestigeRank,
+        realm: row.realm,
+      }));
+  }
+  prestige(): void { this.cmd({ cmd: 'prestige' }); }
+  talentPoints(): { total: number; spent: number } {
+    const level = this.entities.get(this.playerId)?.level ?? 1;
+    return { total: talentPointsAtLevel(level), spent: pointsSpent(this.talents) };
+  }
+  applyTalents(alloc: TalentAllocation): void { this.cmd({ cmd: 'applyTalents', alloc }); }
+  respec(): void { this.cmd({ cmd: 'respec' }); }
+  setSpec(specId: string | null): void { this.cmd({ cmd: 'setSpec', spec: specId }); }
+  saveLoadout(name: string, bar: (string | null)[], alloc?: TalentAllocation): void {
+    this.cmd({ cmd: 'saveLoadout', name, bar, alloc });
+    if (alloc) {
+      const clean = (name || 'Build').toString().slice(0, 24);
+      const safeBar = Array.isArray(bar) ? bar.slice(0, 16).map((b) => (typeof b === 'string' ? b : null)) : [];
+      const saved = { name: clean, alloc: cloneAllocation(alloc), bar: safeBar };
+      this.talents = cloneAllocation(alloc);
+      const existing = this.loadouts.findIndex((l) => l.name === clean);
+      if (existing >= 0) {
+        this.loadouts[existing] = saved;
+        this.activeLoadout = existing;
+      } else {
+        this.loadouts = [...this.loadouts, saved];
+        this.activeLoadout = this.loadouts.length - 1;
+      }
+      this.known = abilitiesKnownAt(this.cfg.playerClass, this.player.level, computeTalentModifiers(this.cfg.playerClass, this.talents));
+    }
+  }
+  switchLoadout(index: number): void { this.cmd({ cmd: 'switchLoadout', index }); }
+  deleteLoadout(index: number): void {
+    this.cmd({ cmd: 'deleteLoadout', index });
+    if (index < 0 || index >= this.loadouts.length) return;
+    const wasActive = this.activeLoadout === index;
+    this.loadouts = this.loadouts.filter((_, i) => i !== index);
+    if (wasActive) {
+      this.activeLoadout = this.loadouts.length > 0 ? Math.min(index, this.loadouts.length - 1) : -1;
+      const next = this.activeLoadout >= 0 ? this.loadouts[this.activeLoadout] : null;
+      if (next) {
+        this.talents = cloneAllocation(next.alloc);
+        this.known = abilitiesKnownAt(this.cfg.playerClass, this.player.level, computeTalentModifiers(this.cfg.playerClass, this.talents));
+      }
+    } else if (this.activeLoadout > index) this.activeLoadout -= 1;
+  }
   enterCrypt(): void { this.enterDungeon('hollow_crypt'); }
   leaveCrypt(): void { this.leaveDungeon(); }
 }

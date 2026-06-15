@@ -12,7 +12,7 @@ import {
 
 export default __t.row({
   sessionId: __t.u64().primaryKey().name("session_id"),
-  owner: __t.identity(),
+  bridgeOwner: __t.identity().name("bridge_owner"),
   forward: __t.bool(),
   back: __t.bool(),
   turnLeft: __t.bool().name("turn_left"),

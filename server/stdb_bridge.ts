@@ -34,6 +34,8 @@ type CharacterRow = {
   name: string;
   className: string;
   level: number;
+  lifetimeXp: bigint;
+  prestigeRank: number;
   stateJson: string;
 };
 
@@ -129,6 +131,7 @@ class StdbBridge {
   private readonly sessions = new Map<string, BridgeSession>();
   private readonly consumedCommands = new Set<string>();
   private saveTimer: ReturnType<typeof setInterval> | null = null;
+  private stopping: Promise<void> | null = null;
 
   async start(): Promise<void> {
     this.conn = await this.connect();
@@ -146,15 +149,15 @@ class StdbBridge {
         })
         .onError((ctx: any) => reject(new Error(ctx?.event?.message ?? 'SpacetimeDB bridge subscription failed')))
         .subscribe([
-          'SELECT * FROM world_session',
-          'SELECT * FROM input_state',
-          'SELECT * FROM client_command',
-          'SELECT * FROM character',
-          'SELECT * FROM world_state',
-          'SELECT * FROM friend_link',
-          'SELECT * FROM block_link',
-          'SELECT * FROM guild',
-          'SELECT * FROM guild_member',
+          'SELECT * FROM bridge_session',
+          'SELECT * FROM bridge_input_state',
+          'SELECT * FROM bridge_client_command',
+          'SELECT * FROM bridge_character_state',
+          'SELECT * FROM bridge_world_state',
+          'SELECT * FROM bridge_friend_link',
+          'SELECT * FROM bridge_block_link',
+          'SELECT * FROM bridge_guild',
+          'SELECT * FROM bridge_guild_member',
         ]);
     });
     await this.game.loadMarket();
@@ -187,9 +190,12 @@ class StdbBridge {
           })
           .onConnectError((_ctx, error) => fail(error))
           .onDisconnect((_ctx, error) => {
+            if (this.stopping) return;
             console.error('SpacetimeDB bridge disconnected:', error?.message ?? 'connection closed');
             process.exitCode = 1;
-            void this.stop();
+            void this.stop().finally(() => {
+              process.exit(process.exitCode ?? 1);
+            });
           })
           .build();
       } catch (err) {
@@ -199,9 +205,9 @@ class StdbBridge {
   }
 
   private watchTables(conn: DbConnection): void {
-    const sessionTable = table(conn.db, 'worldSession', 'world_session');
-    const inputTable = table(conn.db, 'inputState', 'input_state');
-    const commandTable = table(conn.db, 'clientCommand', 'client_command');
+    const sessionTable = table(conn.db, 'bridgeSession', 'bridge_session');
+    const inputTable = table(conn.db, 'bridgeInputState', 'bridge_input_state');
+    const commandTable = table(conn.db, 'bridgeClientCommand', 'bridge_client_command');
 
     sessionTable.onInsert((_ctx: unknown, row: WorldSessionRow) => void this.syncSession(row));
     sessionTable.onUpdate((_ctx: unknown, _old: WorldSessionRow, row: WorldSessionRow) => void this.syncSession(row));
@@ -213,9 +219,9 @@ class StdbBridge {
 
   private scanInitialRows(): void {
     if (!this.conn) return;
-    const sessionTable = table(this.conn.db, 'worldSession', 'world_session');
-    const inputTable = table(this.conn.db, 'inputState', 'input_state');
-    const commandTable = table(this.conn.db, 'clientCommand', 'client_command');
+    const sessionTable = table(this.conn.db, 'bridgeSession', 'bridge_session');
+    const inputTable = table(this.conn.db, 'bridgeInputState', 'bridge_input_state');
+    const commandTable = table(this.conn.db, 'bridgeClientCommand', 'bridge_client_command');
     for (const row of rows<WorldSessionRow>(sessionTable)) void this.syncSession(row);
     for (const row of rows<InputStateRow>(inputTable)) this.applyInput(row);
     for (const row of rows<ClientCommandRow>(commandTable)) this.applyCommand(row);
@@ -223,7 +229,7 @@ class StdbBridge {
 
   private characterFor(id: bigint): CharacterRow | null {
     if (!this.conn) return null;
-    const characterTable = table(this.conn.db, 'character');
+    const characterTable = table(this.conn.db, 'bridgeCharacterState', 'bridge_character_state');
     return rows<CharacterRow>(characterTable).find((row) => row.id === id) ?? null;
   }
 
@@ -351,25 +357,29 @@ class StdbBridge {
     });
   }
 
-  private async saveSession(bridge: BridgeSession): Promise<{ stateJson: string; level: number }> {
+  private async saveSession(bridge: BridgeSession): Promise<{ stateJson: string; level: number; lifetimeXp: bigint; prestigeRank: number }> {
     const game = this.requireGame();
     const state = game.sim.serializeCharacter(bridge.gameSession.pid);
     const entity = game.sim.entities.get(bridge.gameSession.pid);
     const stateJson = state ? JSON.stringify(state) : '';
     const level = entity?.level ?? 1;
+    const lifetimeXp = BigInt(Math.max(0, Math.trunc(state?.lifetimeXp ?? 0)));
+    const prestigeRank = Math.max(0, Math.trunc(state?.prestigeRank ?? 0));
     if (this.conn?.isActive && stateJson) {
       await this.conn.reducers.bridgeSaveCharacter({
         characterId: BigInt(bridge.characterId),
         level,
+        lifetimeXp,
+        prestigeRank,
         stateJson,
       });
     }
-    return { stateJson, level };
+    return { stateJson, level, lifetimeXp, prestigeRank };
   }
 
   private async closeSession(bridge: BridgeSession, reason: string): Promise<void> {
     if (!this.sessions.delete(String(bridge.stdbId))) return;
-    const saved = await this.saveSession(bridge).catch(() => ({ stateJson: '', level: 1 }));
+    const saved = await this.saveSession(bridge).catch(() => ({ stateJson: '', level: 1, lifetimeXp: 0n, prestigeRank: 0 }));
     await this.requireGame().leave(bridge.gameSession, reason).catch((err) => console.error('bridge leave failed:', err));
     await this.conn?.reducers.bridgeCloseSession({
       sessionId: bridge.stdbId,
@@ -387,10 +397,25 @@ class StdbBridge {
     }
   }
 
-  private async stop(): Promise<void> {
+  stop(): Promise<void> {
+    if (this.stopping) return this.stopping;
+    this.stopping = this.stopOnce();
+    return this.stopping;
+  }
+
+  private async stopOnce(): Promise<void> {
     if (this.saveTimer !== null) clearInterval(this.saveTimer);
-    this.game?.stop();
+    this.saveTimer = null;
+    const game = this.game;
     await this.saveAll().catch(() => {});
+    for (const bridge of [...this.sessions.values()]) {
+      await this.closeSession(bridge, 'bridge shutdown').catch((err) => console.error('bridge session cleanup failed:', err));
+    }
+    game?.stop();
+    await game?.saveAll('shutdown').catch((err) => console.error('bridge shutdown save failed:', err));
+    await game?.saveMarket().catch((err) => console.error('bridge market save failed:', err));
+    await game?.endAllPlaySessions().catch((err) => console.error('bridge play-session cleanup failed:', err));
+    await game?.chatLog.stop().catch((err) => console.error('bridge chat-log flush failed:', err));
     this.conn?.disconnect();
   }
 
@@ -406,5 +431,14 @@ bridge.start().catch((err) => {
   process.exit(1);
 });
 
-process.on('SIGINT', () => process.exit(0));
-process.on('SIGTERM', () => process.exit(0));
+async function shutdown(signal: NodeJS.Signals): Promise<void> {
+  console.log(`received ${signal}, shutting down SpacetimeDB bridge`);
+  await bridge.stop().catch((err) => {
+    console.error('SpacetimeDB bridge shutdown failed:', err);
+    process.exitCode = 1;
+  });
+  process.exit(process.exitCode ?? 0);
+}
+
+process.on('SIGINT', () => void shutdown('SIGINT'));
+process.on('SIGTERM', () => void shutdown('SIGTERM'));

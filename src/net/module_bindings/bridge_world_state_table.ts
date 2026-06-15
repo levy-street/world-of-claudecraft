@@ -12,7 +12,7 @@ import {
 
 export default __t.row({
   key: __t.string().primaryKey(),
-  characterId: __t.u64().name("character_id"),
-  friendId: __t.u64().name("friend_id"),
-  createdAt: __t.timestamp().name("created_at"),
+  bridgeOwner: __t.identity().name("bridge_owner"),
+  payloadJson: __t.string().name("payload_json"),
+  updatedAt: __t.timestamp().name("updated_at"),
 });

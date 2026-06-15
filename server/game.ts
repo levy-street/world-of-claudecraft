@@ -516,7 +516,7 @@ export class GameServer {
     void this.social.announcePresence({ characterId: session.characterId, name: session.name }, false)
       .catch((err) => console.error('presence announce failed:', err));
     if (session.dbSessionId !== null) {
-      void this.persistence.closePlaySession(session.dbSessionId).catch((err) => console.error('failed to close play session:', err));
+      await this.persistence.closePlaySession(session.dbSessionId).catch((err) => console.error('failed to close play session:', err));
     }
     await this.saveCharacter(session).catch((err) => console.error('save on leave failed:', err));
     this.sim.removePlayer(session.pid);

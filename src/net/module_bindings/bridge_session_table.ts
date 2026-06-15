@@ -12,10 +12,16 @@ import {
 
 export default __t.row({
   id: __t.u64().primaryKey(),
+  bridgeOwner: __t.identity().name("bridge_owner"),
+  owner: __t.identity(),
   accountId: __t.u64().name("account_id"),
   characterId: __t.u64().name("character_id"),
+  playerId: __t.u32().name("player_id"),
+  className: __t.string().name("class_name"),
   characterName: __t.string().name("character_name"),
+  active: __t.bool(),
+  bridgeAttached: __t.bool().name("bridge_attached"),
   startedAt: __t.timestamp().name("started_at"),
-  ended: __t.bool(),
   updatedAt: __t.timestamp().name("updated_at"),
+  error: __t.string(),
 });

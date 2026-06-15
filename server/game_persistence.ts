@@ -59,6 +59,18 @@ class MemorySocialDb implements SocialDb {
     return id;
   }
 
+  async createGuildWithLeader(name: string, leaderId: number): Promise<{ guildId: number } | { error: 'name_taken' | 'already_in_guild' }> {
+    if (this.guildByCharacter.has(leaderId)) return { error: 'already_in_guild' };
+    const key = name.trim().toLowerCase();
+    for (const guild of this.guilds.values()) {
+      if (guild.name.trim().toLowerCase() === key) return { error: 'name_taken' };
+    }
+    const id = this.nextGuild++;
+    this.guilds.set(id, { name });
+    this.guildByCharacter.set(leaderId, { guildId: id, rank: 'leader' });
+    return { guildId: id };
+  }
+
   async deleteGuild(id: number): Promise<void> {
     this.guilds.delete(id);
     for (const [charId, member] of this.guildByCharacter) {
@@ -75,6 +87,18 @@ class MemorySocialDb implements SocialDb {
 
   async addGuildMember(guildId: number, charId: number, rank: GuildRank): Promise<void> {
     this.guildByCharacter.set(charId, { guildId, rank });
+  }
+
+  async addGuildMemberAtomic(guildId: number, charId: number, rank: GuildRank, limit: number): Promise<'ok' | 'full' | 'already_member' | 'no_guild'> {
+    if (!this.guilds.has(guildId)) return 'no_guild';
+    if (this.guildByCharacter.has(charId)) return 'already_member';
+    let count = 0;
+    for (const member of this.guildByCharacter.values()) {
+      if (member.guildId === guildId) count++;
+    }
+    if (count >= limit) return 'full';
+    this.guildByCharacter.set(charId, { guildId, rank });
+    return 'ok';
   }
 
   async removeGuildMember(charId: number): Promise<void> {

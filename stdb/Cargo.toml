@@ -14,4 +14,11 @@ sha2 = "0.10"
 spacetimedb = { version = "=2.3.0", features = ["unstable", "rand"] }
 
 [lints.rust]
+unsafe_code = "forbid"
+warnings = "deny"
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(debug_reducers)'] }
+
+[lints.clippy]
+dbg_macro = "deny"
+todo = "deny"
+unwrap_used = "deny"

@@ -11,14 +11,9 @@ import {
 } from "spacetimedb";
 
 export default __t.row({
-  id: __t.u64().primaryKey(),
-  accountId: __t.u64().name("account_id"),
-  name: __t.string(),
-  nameKey: __t.string().name("name_key"),
-  className: __t.string().name("class_name"),
-  level: __t.u32(),
-  stateJson: __t.string().name("state_json"),
-  online: __t.bool(),
-  forceRename: __t.bool().name("force_rename"),
-  updatedAt: __t.timestamp().name("updated_at"),
+  characterId: __t.u64().primaryKey().name("character_id"),
+  bridgeOwner: __t.identity().name("bridge_owner"),
+  guildId: __t.u64().name("guild_id"),
+  rank: __t.string(),
+  joinedAt: __t.timestamp().name("joined_at"),
 });

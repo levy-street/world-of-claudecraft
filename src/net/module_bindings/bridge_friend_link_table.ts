@@ -11,11 +11,9 @@ import {
 } from "spacetimedb";
 
 export default __t.row({
-  id: __t.u64().primaryKey(),
-  owner: __t.identity(),
-  sessionId: __t.u64().name("session_id"),
-  kind: __t.string(),
-  payloadJson: __t.string().name("payload_json"),
+  key: __t.string().primaryKey(),
+  bridgeOwner: __t.identity().name("bridge_owner"),
+  characterId: __t.u64().name("character_id"),
+  friendId: __t.u64().name("friend_id"),
   createdAt: __t.timestamp().name("created_at"),
-  consumed: __t.bool(),
 });

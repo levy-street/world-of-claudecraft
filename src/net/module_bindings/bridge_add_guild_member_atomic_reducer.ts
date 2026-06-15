@@ -11,9 +11,8 @@ import {
 } from "spacetimedb";
 
 export default {
+  guildId: __t.u64(),
   characterId: __t.u64(),
-  level: __t.u32(),
-  lifetimeXp: __t.u64(),
-  prestigeRank: __t.u32(),
-  stateJson: __t.string(),
+  rank: __t.string(),
+  limit: __t.u32(),
 };

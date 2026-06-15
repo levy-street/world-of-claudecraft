@@ -1,4 +1,6 @@
 import type { PlayerClass } from '../sim/types';
+import { virtualLevel } from '../sim/types';
+import type { LeaderboardEntry } from '../world_api';
 import type { CharacterSummary, RealmDirectory } from './online';
 import type { SpacetimeConnectionConfig } from './backend';
 import { StdbClient, rows, table, type StdbConnection, type StdbSubscriptionHandle } from './spacetime_client';
@@ -19,6 +21,15 @@ type ProjectStatsRow = {
   realm: string;
   accountsCreated: bigint;
   playersOnline: number;
+};
+
+type CharacterDirectoryRow = {
+  name: string;
+  className: PlayerClass;
+  level: number;
+  realm: string;
+  lifetimeXp: bigint;
+  prestigeRank: number;
 };
 
 function asError(err: unknown, fallback = 'request failed'): Error {
@@ -67,6 +78,7 @@ export class SpacetimeApi {
   private auth: AuthRow | null = null;
   private roster: RosterRow | null = null;
   private stats: ProjectStatsRow | null = null;
+  private directoryRows = new Map<string, CharacterDirectoryRow>();
   private authRevision = 0;
   private rosterRevision = 0;
   private statsRevision = 0;
@@ -96,6 +108,7 @@ export class SpacetimeApi {
     const authTable = table(conn.db, 'authState', 'auth_state');
     const rosterTable = table(conn.db, 'characterRoster', 'character_roster');
     const statsTable = table(conn.db, 'projectStats', 'project_stats');
+    const directoryTable = table(conn.db, 'characterDirectory', 'character_directory');
 
     const updateAuth = (_ctx: unknown, row: AuthRow) => {
       this.auth = row;
@@ -113,6 +126,9 @@ export class SpacetimeApi {
       this.statsRevision++;
       this.realm = row.realm || this.realm;
     };
+    const updateDirectory = (_ctx: unknown, row: CharacterDirectoryRow) => {
+      this.directoryRows.set(row.name.toLowerCase(), row);
+    };
 
     authTable.onInsert(updateAuth);
     authTable.onUpdate((_ctx: unknown, _old: AuthRow, row: AuthRow) => updateAuth(_ctx, row));
@@ -120,6 +136,12 @@ export class SpacetimeApi {
     rosterTable.onUpdate((_ctx: unknown, _old: RosterRow, row: RosterRow) => updateRoster(_ctx, row));
     statsTable.onInsert(updateStats);
     statsTable.onUpdate((_ctx: unknown, _old: ProjectStatsRow, row: ProjectStatsRow) => updateStats(_ctx, row));
+    directoryTable.onInsert(updateDirectory);
+    directoryTable.onUpdate((_ctx: unknown, old: CharacterDirectoryRow, row: CharacterDirectoryRow) => {
+      this.directoryRows.delete(old.name.toLowerCase());
+      updateDirectory(_ctx, row);
+    });
+    directoryTable.onDelete((_ctx: unknown, row: CharacterDirectoryRow) => this.directoryRows.delete(row.name.toLowerCase()));
 
     await new Promise<void>((resolve, reject) => {
       this.subscription = conn
@@ -128,6 +150,7 @@ export class SpacetimeApi {
           for (const row of rows<AuthRow>(authTable)) updateAuth(null, row);
           for (const row of rows<RosterRow>(rosterTable)) updateRoster(null, row);
           for (const row of rows<ProjectStatsRow>(statsTable)) updateStats(null, row);
+          for (const row of rows<CharacterDirectoryRow>(directoryTable)) updateDirectory(null, row);
           resolve();
         })
         .onError((ctx: any) => reject(new Error(ctx?.event?.message ?? 'SpacetimeDB subscription failed')))
@@ -135,6 +158,7 @@ export class SpacetimeApi {
           'SELECT * FROM auth_state',
           'SELECT * FROM character_roster',
           'SELECT * FROM project_stats',
+          'SELECT * FROM character_directory',
         ]);
     });
   }
@@ -242,6 +266,35 @@ export class SpacetimeApi {
       players_online: Number(this.stats?.playersOnline ?? 0),
       realm: this.stats?.realm ?? 'Claudemoon',
     };
+  }
+
+  async leaderboard(scope: 'realm' | 'global' = 'global', limit = 100): Promise<LeaderboardEntry[]> {
+    await this.ensureReady();
+    const cap = Math.max(1, Math.min(100, Math.trunc(limit || 100)));
+    const currentRealm = this.stats?.realm ?? this.realm ?? 'Claudemoon';
+    return [...this.directoryRows.values()]
+      .filter((row) => scope === 'global' || !row.realm || row.realm === currentRealm)
+      .map((row) => ({
+        name: row.name,
+        cls: row.className,
+        level: Number(row.level),
+        realm: row.realm || currentRealm,
+        lifetimeXp: Number(row.lifetimeXp ?? 0n),
+        prestigeRank: Number(row.prestigeRank ?? 0),
+      }))
+      .filter((row) => row.lifetimeXp > 0)
+      .sort((a, b) => b.lifetimeXp - a.lifetimeXp || b.level - a.level || a.name.localeCompare(b.name))
+      .slice(0, cap)
+      .map((row, i) => ({
+        rank: i + 1,
+        name: row.name,
+        cls: row.cls,
+        level: row.level,
+        virtualLevel: virtualLevel(row.lifetimeXp),
+        lifetimeXp: row.lifetimeXp,
+        prestigeRank: row.prestigeRank,
+        ...(scope === 'global' ? { realm: row.realm } : {}),
+      }));
   }
 
   close(): void {

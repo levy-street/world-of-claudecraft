@@ -23,6 +23,20 @@ export const Account = __t.object("Account", {
 });
 export type Account = __Infer<typeof Account>;
 
+export const AuthAttempt = __t.object("AuthAttempt", {
+  key: __t.string(),
+  count: __t.u32(),
+  windowStartedAt: __t.timestamp(),
+});
+export type AuthAttempt = __Infer<typeof AuthAttempt>;
+
+export const AuthFailure = __t.object("AuthFailure", {
+  usernameKey: __t.string(),
+  count: __t.u32(),
+  windowStartedAt: __t.timestamp(),
+});
+export type AuthFailure = __Infer<typeof AuthFailure>;
+
 export const AuthState = __t.object("AuthState", {
   owner: __t.identity(),
   accountId: __t.u64(),
@@ -47,6 +61,72 @@ export const BridgeAuth = __t.object("BridgeAuth", {
 });
 export type BridgeAuth = __Infer<typeof BridgeAuth>;
 
+export const BridgeBlockLink = __t.object("BridgeBlockLink", {
+  key: __t.string(),
+  bridgeOwner: __t.identity(),
+  characterId: __t.u64(),
+  blockedId: __t.u64(),
+  createdAt: __t.timestamp(),
+});
+export type BridgeBlockLink = __Infer<typeof BridgeBlockLink>;
+
+export const BridgeCharacterState = __t.object("BridgeCharacterState", {
+  id: __t.u64(),
+  bridgeOwner: __t.identity(),
+  accountId: __t.u64(),
+  name: __t.string(),
+  nameKey: __t.string(),
+  className: __t.string(),
+  level: __t.u32(),
+  lifetimeXp: __t.u64(),
+  prestigeRank: __t.u32(),
+  stateJson: __t.string(),
+  online: __t.bool(),
+  forceRename: __t.bool(),
+  updatedAt: __t.timestamp(),
+});
+export type BridgeCharacterState = __Infer<typeof BridgeCharacterState>;
+
+export const BridgeClientCommand = __t.object("BridgeClientCommand", {
+  id: __t.u64(),
+  bridgeOwner: __t.identity(),
+  owner: __t.identity(),
+  sessionId: __t.u64(),
+  kind: __t.string(),
+  payloadJson: __t.string(),
+  createdAt: __t.timestamp(),
+  consumed: __t.bool(),
+});
+export type BridgeClientCommand = __Infer<typeof BridgeClientCommand>;
+
+export const BridgeFriendLink = __t.object("BridgeFriendLink", {
+  key: __t.string(),
+  bridgeOwner: __t.identity(),
+  characterId: __t.u64(),
+  friendId: __t.u64(),
+  createdAt: __t.timestamp(),
+});
+export type BridgeFriendLink = __Infer<typeof BridgeFriendLink>;
+
+export const BridgeGuild = __t.object("BridgeGuild", {
+  id: __t.u64(),
+  bridgeOwner: __t.identity(),
+  name: __t.string(),
+  nameKey: __t.string(),
+  realm: __t.string(),
+  createdAt: __t.timestamp(),
+});
+export type BridgeGuild = __Infer<typeof BridgeGuild>;
+
+export const BridgeGuildMember = __t.object("BridgeGuildMember", {
+  characterId: __t.u64(),
+  bridgeOwner: __t.identity(),
+  guildId: __t.u64(),
+  rank: __t.string(),
+  joinedAt: __t.timestamp(),
+});
+export type BridgeGuildMember = __Infer<typeof BridgeGuildMember>;
+
 export const BridgeHeartbeat = __t.object("BridgeHeartbeat", {
   id: __t.u64(),
   owner: __t.identity(),
@@ -57,19 +137,78 @@ export const BridgeHeartbeat = __t.object("BridgeHeartbeat", {
 });
 export type BridgeHeartbeat = __Infer<typeof BridgeHeartbeat>;
 
+export const BridgeInputState = __t.object("BridgeInputState", {
+  sessionId: __t.u64(),
+  bridgeOwner: __t.identity(),
+  forward: __t.bool(),
+  back: __t.bool(),
+  turnLeft: __t.bool(),
+  turnRight: __t.bool(),
+  strafeLeft: __t.bool(),
+  strafeRight: __t.bool(),
+  jump: __t.bool(),
+  facingValid: __t.bool(),
+  facing: __t.f32(),
+  updatedAt: __t.timestamp(),
+});
+export type BridgeInputState = __Infer<typeof BridgeInputState>;
+
+export const BridgeSession = __t.object("BridgeSession", {
+  id: __t.u64(),
+  bridgeOwner: __t.identity(),
+  owner: __t.identity(),
+  accountId: __t.u64(),
+  characterId: __t.u64(),
+  playerId: __t.u32(),
+  className: __t.string(),
+  characterName: __t.string(),
+  active: __t.bool(),
+  bridgeAttached: __t.bool(),
+  startedAt: __t.timestamp(),
+  updatedAt: __t.timestamp(),
+  error: __t.string(),
+});
+export type BridgeSession = __Infer<typeof BridgeSession>;
+
+export const BridgeWorldState = __t.object("BridgeWorldState", {
+  key: __t.string(),
+  bridgeOwner: __t.identity(),
+  payloadJson: __t.string(),
+  updatedAt: __t.timestamp(),
+});
+export type BridgeWorldState = __Infer<typeof BridgeWorldState>;
+
 export const Character = __t.object("Character", {
   id: __t.u64(),
+  owner: __t.identity(),
   accountId: __t.u64(),
   name: __t.string(),
   nameKey: __t.string(),
   className: __t.string(),
   level: __t.u32(),
+  lifetimeXp: __t.u64(),
+  prestigeRank: __t.u32(),
   stateJson: __t.string(),
   online: __t.bool(),
   forceRename: __t.bool(),
   updatedAt: __t.timestamp(),
 });
 export type Character = __Infer<typeof Character>;
+
+export const CharacterDirectory = __t.object("CharacterDirectory", {
+  id: __t.u64(),
+  name: __t.string(),
+  nameKey: __t.string(),
+  className: __t.string(),
+  level: __t.u32(),
+  realm: __t.string(),
+  lifetimeXp: __t.u64(),
+  prestigeRank: __t.u32(),
+  online: __t.bool(),
+  forceRename: __t.bool(),
+  updatedAt: __t.timestamp(),
+});
+export type CharacterDirectory = __Infer<typeof CharacterDirectory>;
 
 export const CharacterRoster = __t.object("CharacterRoster", {
   owner: __t.identity(),

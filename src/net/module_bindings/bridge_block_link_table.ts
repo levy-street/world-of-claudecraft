@@ -11,9 +11,9 @@ import {
 } from "spacetimedb";
 
 export default __t.row({
-  id: __t.u64().primaryKey(),
-  name: __t.string(),
-  nameKey: __t.string().name("name_key"),
-  realm: __t.string(),
+  key: __t.string().primaryKey(),
+  bridgeOwner: __t.identity().name("bridge_owner"),
+  characterId: __t.u64().name("character_id"),
+  blockedId: __t.u64().name("blocked_id"),
   createdAt: __t.timestamp().name("created_at"),
 });

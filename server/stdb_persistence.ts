@@ -27,11 +27,17 @@ function bigintId(v: number): bigint {
   return BigInt(Math.max(0, Math.trunc(v)));
 }
 
+function reducerMessage(err: unknown): string {
+  return err instanceof Error ? err.message : String(err ?? '');
+}
+
 type CharacterRow = {
   id: bigint;
   name: string;
   className: string;
   level: number;
+  lifetimeXp: bigint;
+  prestigeRank: number;
 };
 
 type FriendLinkRow = {
@@ -74,12 +80,14 @@ export class StdbGamePersistence implements GamePersistence {
     await this.conn.reducers.bridgeSaveCharacter({
       characterId: bigintId(characterId),
       level,
+      lifetimeXp: BigInt(Math.max(0, Math.trunc(state.lifetimeXp ?? 0))),
+      prestigeRank: Math.max(0, Math.trunc(state.prestigeRank ?? 0)),
       stateJson: JSON.stringify(state),
     });
   }
 
   async loadMarketState(): Promise<MarketSave | null> {
-    const stateTable = table(this.conn.db, 'worldState', 'world_state');
+    const stateTable = table(this.conn.db, 'bridgeWorldState', 'bridge_world_state');
     const row = rows<WorldStateRow>(stateTable).find((r) => r.key === 'market');
     if (!row?.payloadJson) return null;
     try {
@@ -192,6 +200,23 @@ class StdbSocialDb implements SocialDb {
     return id;
   }
 
+  async createGuildWithLeader(name: string, leaderId: number): Promise<{ guildId: number } | { error: 'name_taken' | 'already_in_guild' }> {
+    const id = this.nextGuildId();
+    try {
+      await this.conn.reducers.bridgeCreateGuildWithLeader({
+        id: bigintId(id),
+        name,
+        leaderId: bigintId(leaderId),
+      });
+      return { guildId: id };
+    } catch (err) {
+      const message = reducerMessage(err);
+      if (message.includes('already_in_guild')) return { error: 'already_in_guild' };
+      if (message.includes('name_taken')) return { error: 'name_taken' };
+      throw err;
+    }
+  }
+
   async deleteGuild(id: number): Promise<void> {
     await this.conn.reducers.bridgeDeleteGuild({ id: bigintId(id) });
   }
@@ -209,6 +234,24 @@ class StdbSocialDb implements SocialDb {
       characterId: bigintId(charId),
       rank,
     });
+  }
+
+  async addGuildMemberAtomic(guildId: number, charId: number, rank: GuildRank, limit: number): Promise<'ok' | 'full' | 'already_member' | 'no_guild'> {
+    try {
+      await this.conn.reducers.bridgeAddGuildMemberAtomic({
+        guildId: bigintId(guildId),
+        characterId: bigintId(charId),
+        rank,
+        limit,
+      });
+      return 'ok';
+    } catch (err) {
+      const message = reducerMessage(err);
+      if (message.includes('no_guild')) return 'no_guild';
+      if (message.includes('already_member')) return 'already_member';
+      if (message.includes('full')) return 'full';
+      throw err;
+    }
   }
 
   async removeGuildMember(charId: number): Promise<void> {
@@ -230,23 +273,23 @@ class StdbSocialDb implements SocialDb {
   }
 
   private characters(): CharacterRow[] {
-    return rows<CharacterRow>(table(this.conn.db, 'character'));
+    return rows<CharacterRow>(table(this.conn.db, 'bridgeCharacterState', 'bridge_character_state'));
   }
 
   private friendLinks(): FriendLinkRow[] {
-    return rows<FriendLinkRow>(table(this.conn.db, 'friendLink', 'friend_link'));
+    return rows<FriendLinkRow>(table(this.conn.db, 'bridgeFriendLink', 'bridge_friend_link'));
   }
 
   private blockLinks(): BlockLinkRow[] {
-    return rows<BlockLinkRow>(table(this.conn.db, 'blockLink', 'block_link'));
+    return rows<BlockLinkRow>(table(this.conn.db, 'bridgeBlockLink', 'bridge_block_link'));
   }
 
   private guilds(): GuildRow[] {
-    return rows<GuildRow>(table(this.conn.db, 'guild'));
+    return rows<GuildRow>(table(this.conn.db, 'bridgeGuild', 'bridge_guild'));
   }
 
   private guildMembersRows(): GuildMemberRow[] {
-    return rows<GuildMemberRow>(table(this.conn.db, 'guildMember', 'guild_member'));
+    return rows<GuildMemberRow>(table(this.conn.db, 'bridgeGuildMember', 'bridge_guild_member'));
   }
 
   private characterById(id: number): CharacterRow | null {
