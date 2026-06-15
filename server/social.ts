@@ -103,6 +103,9 @@ export interface SocialTransport {
   pushSnapshot(characterId: number): void;
   // a character's block set changed; refresh the in-memory chat filter
   onBlocksChanged(characterId: number, blockedIds: number[]): void;
+  // true if `recipientId` has `senderCharacterId` on their ignore list, so
+  // guild/officer chat can honour the same filter say/whisper already apply
+  isIgnoring(recipientId: number, senderCharacterId: number): boolean;
 }
 
 export type SocialEvent =
@@ -440,7 +443,15 @@ export class SocialService {
     if (!text) return false;
     const membership = await this.db.guildMembership(actor.characterId);
     if (!membership) { this.err(actor.characterId, 'You are not in a guild.'); return false; }
-    await this.broadcastGuild(membership.guildId, [{ type: 'chat', from: actor.name, text, channel: 'guild' }]);
+    const event: SocialEvent = { type: 'chat', from: actor.name, text, channel: 'guild' };
+    const members = await this.db.guildMembers(membership.guildId);
+    for (const m of members) {
+      if (!this.tx.isOnline(m.id)) continue;
+      // a player who ignores the speaker does not see their guild chat (the
+      // speaker always sees their own line); mirrors say/whisper filtering
+      if (m.id !== actor.characterId && this.tx.isIgnoring(m.id, actor.characterId)) continue;
+      this.tx.deliver(m.id, [event]);
+    }
     return true;
   }
 
@@ -454,6 +465,8 @@ export class SocialService {
     const members = await this.db.guildMembers(membership.guildId);
     for (const m of members) {
       if ((m.rank === 'officer' || m.rank === 'leader') && this.tx.isOnline(m.id)) {
+        // honour the recipient's ignore list, just like guild/say/whisper
+        if (m.id !== actor.characterId && this.tx.isIgnoring(m.id, actor.characterId)) continue;
         this.tx.deliver(m.id, [{ type: 'chat', from: actor.name, text, channel: 'officer' }]);
       }
     }

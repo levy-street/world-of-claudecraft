@@ -367,6 +367,10 @@ export class GameServer {
         const s = this.sessionByCharacterId(id);
         if (s) s.blockedIds = new Set(ids);
       },
+      isIgnoring: (recipientId, senderCharacterId) => {
+        const s = this.sessionByCharacterId(recipientId);
+        return s ? s.blockedIds.has(senderCharacterId) : false;
+      },
     };
   }
 
