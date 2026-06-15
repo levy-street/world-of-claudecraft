@@ -3549,6 +3549,13 @@ export class Sim {
       return null;
     }
 
+    // "/casting" (aliases /cast, /castbar) — self-only readout of the player's
+    // current cast or channel progress
+    if (/^\/(?:casting|cast|castbar)(?:\s|$)/i.test(raw)) {
+      this.error(r.meta.entityId, this.castingReadout(r.e));
+      return null;
+    }
+
     // "/w name message" — private whisper to an online player
     const wm = /^\/(?:w|whisper|t|tell)\s+(\S+)\s+([\s\S]+)$/i.exec(raw);
     if (wm) {
@@ -4849,6 +4856,22 @@ export class Sim {
 
   private error(pid: number, text: string): void {
     this.emit({ type: 'error', text, pid });
+  }
+
+  // Reads the live cast-bar state (no stored fields): castingAbility holds an
+  // ability id or the FISHING_CAST_ID sentinel, channeling distinguishes a
+  // channel from a normal cast. Times are fractional seconds, so toFixed(1)
+  // stays truthful rather than rounding a 2.5s cast to "3s".
+  private castingReadout(e: Entity): string {
+    if (!e.castingAbility) return 'You are not casting anything.';
+    const remaining = e.castRemaining.toFixed(1);
+    const total = e.castTotal.toFixed(1);
+    if (e.castingAbility === FISHING_CAST_ID) {
+      return `You are fishing — ${remaining}s of ${total}s remaining.`;
+    }
+    const name = ABILITIES[e.castingAbility]?.name ?? e.castingAbility;
+    const verb = e.channeling ? 'Channeling' : 'Casting';
+    return `${verb} ${name} — ${remaining}s of ${total}s remaining.`;
   }
 }
 
