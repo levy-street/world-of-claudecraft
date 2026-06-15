@@ -408,9 +408,19 @@ export async function closePlaySession(sessionId: number): Promise<void> {
 }
 
 // Sessions left open by a crash have an unknown duration; close them at their
-// start time so they don't inflate playtime stats forever.
+// start time so they don't inflate playtime stats forever. Scope this to the
+// current realm: in the process-per-realm model peers share one database, and
+// an unscoped UPDATE would force-close sessions still live on other realms.
 export async function closeOrphanSessions(): Promise<number> {
-  const res = await pool.query('UPDATE play_sessions SET ended_at = started_at WHERE ended_at IS NULL');
+  const res = await pool.query(
+    `UPDATE play_sessions ps
+        SET ended_at = ps.started_at
+       FROM characters c
+      WHERE ps.character_id = c.id
+        AND c.realm = $1
+        AND ps.ended_at IS NULL`,
+    [REALM],
+  );
   return res.rowCount ?? 0;
 }
 
