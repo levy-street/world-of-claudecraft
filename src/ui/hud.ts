@@ -41,6 +41,10 @@ import {
 } from '../sim/content/talents';
 import { talentChoiceIconDataUrl, talentNodeIconDataUrl } from './talent_icons';
 import {
+  PROFESSIONS, RECIPES, difficultyColor, tierCap, nextTier,
+  type RecipeDef, type ProfessionDef, type TierId, type DifficultyColor,
+} from '../sim/content/professions';
+import {
   clearHotbarSlot, encodeHotbarAction, HOTBAR_ACTION_MIME, HotbarAction, parseHotbarAction, parseHotbarActions,
   placeAbilityOnSlot, placeItemOnSlot, swapHotbarSlots, syncHotbarActions,
 } from './hotbar';
@@ -383,6 +387,7 @@ export class Hud {
     $('#mm-char').addEventListener('click', () => this.toggleChar());
     $('#mm-spell').addEventListener('click', () => this.toggleSpellbook());
     $('#mm-talents')?.addEventListener('click', () => this.toggleTalents());
+    $('#mm-skills')?.addEventListener('click', () => this.toggleSkills());
     $('#mm-quest').addEventListener('click', () => this.toggleQuestLog());
     $('#mm-map').addEventListener('click', () => this.toggleMap());
     $('#map-close').addEventListener('click', () => { $('#map-window').style.display = 'none'; });
@@ -2430,11 +2435,29 @@ export class Hud {
         }
         case 'learnAbility': break; // logged by sim
         case 'comboPoint': break;
+        case 'skillUp': {
+          const name = PROFESSIONS[ev.profId]?.name ?? ev.profId;
+          this.fct(sim.player, `${name} ${ev.skill}`, '#ffd100', false);
+          this.log(`Your skill in ${name} increased to ${ev.skill}.`, '#ffd100');
+          audio.lootItem();
+          this.refreshProfessionWindows();
+          break;
+        }
+        case 'professionLearned': {
+          const name = PROFESSIONS[ev.profId]?.name ?? ev.profId;
+          const label = ev.tier === 'journeyman' ? `Journeyman ${name}` : name;
+          this.showBanner(`Learned ${label}`);
+          this.log(`You have learned ${label}.`, '#7fd0ff');
+          audio.levelUp();
+          this.refreshProfessionWindows();
+          break;
+        }
         case 'loot': {
           this.log(this.localizeLootText(ev.text), '#7fdc4f');
           if (ev.text.includes('loot') || ev.text.includes('Sold') || ev.text.includes('Bought back')) audio.coin();
           else audio.lootItem();
           if ($('#bags').style.display !== 'none') this.renderBags();
+          this.refreshProfessionWindows(); // reagents consumed / output added
           break;
         }
         case 'vendor': {
@@ -3004,7 +3027,29 @@ export class Hud {
     if (def?.market) {
       html += `<button type="button" class="qd-list-item" data-market="1" aria-label="${esc(t('questUi.dialog.worldMarketAria'))}"><span class="gold">${svgIcon('market')}</span> ${esc(t('questUi.dialog.worldMarket'))}</button>`;
     }
+    // Profession trainer: offer the next learnable tier (Apprentice, then Journeyman).
+    const trains = def?.trains ? PROFESSIONS[def.trains] : null;
+    let trainLabel: string | null = null;
+    if (trains) {
+      const learned = this.sim.professionSkills[trains.id] !== undefined;
+      if (!learned) {
+        trainLabel = `Train ${trains.name}`;
+      } else {
+        // only offer the next tier once the player actually qualifies (skill + level)
+        const next = nextTier(trains, this.sim.professionTiers[trains.id] as TierId | undefined);
+        const skill = this.sim.professionSkills[trains.id] ?? 0;
+        if (next && skill >= next.requiresSkill && this.sim.player.level >= next.requiresLevel) {
+          trainLabel = `Train Journeyman ${trains.name}`;
+        }
+      }
+      if (trainLabel) html += `<div class="qd-list-item" data-train="1"><span style="color:#7fd0ff">✦</span> ${trainLabel}</div>`;
+    }
     el.innerHTML = html;
+    el.querySelector('[data-train]')?.addEventListener('click', () => {
+      const learned = this.sim.professionSkills[trains!.id] !== undefined;
+      this.sim.learnProfession(trains!.id, learned ? 'journeyman' : 'apprentice');
+      this.renderGossip(npc); // refresh (offline updates immediately; online catches up)
+    });
     el.querySelectorAll('[data-quest]').forEach((item) => {
       item.addEventListener('click', () => this.renderQuestDetail(npc, (item as HTMLElement).dataset.quest!));
     });
@@ -4092,7 +4137,122 @@ export class Hud {
       empty.textContent = t('abilityUi.spellbook.empty');
       list.appendChild(empty);
     }
+    // Professions & secondary skills live in the spellbook too (vanilla); clicking
+    // one opens its craft window. Pure-gather skills (no recipes) are listed read-only.
+    const profs = Object.keys(sim.professionSkills).map((id) => PROFESSIONS[id]).filter(Boolean) as ProfessionDef[];
+    if (profs.length) {
+      const header = document.createElement('div');
+      header.className = 'qd-sub';
+      header.textContent = 'Professions';
+      el.appendChild(header);
+      for (const prof of profs) {
+        const skill = sim.professionSkills[prof.id] ?? 0;
+        const cap = tierCap(prof, sim.professionTiers[prof.id] as TierId | undefined);
+        const openable = prof.recipes.length > 0;
+        const icon = openable ? iconDataUrl('item', RECIPES[prof.recipes[0]].output.itemId) : iconDataUrl('ability', prof.id);
+        const row = document.createElement('div');
+        row.className = 'spell-row';
+        if (openable) row.style.cursor = 'pointer';
+        row.innerHTML = `<div class="spell-icon" style="background-image:url(${icon})"></div>
+          <div><div class="spell-name">${prof.name}</div><div class="spell-sub">${skill} / ${cap}${openable ? '' : ' (gathered in the world)'}</div></div>`;
+        if (openable) row.addEventListener('click', () => { el.style.display = 'none'; this.openCraft(prof.id); });
+        el.appendChild(row);
+      }
+    }
     el.querySelector('[data-close]')?.addEventListener('click', () => { el.style.display = 'none'; this.hideTooltip(); });
+  }
+
+  // -------------------------------------------------------------------------
+  // Professions & secondary skills (vanilla model, PRD §6.8 option B). The K
+  // Skills pane is a read-only overview grouped by category with tier-cap bars;
+  // each profession's craft window (and the spellbook profession row) opens via
+  // openCraft. All state is server-authoritative (read from IWorld).
+  // -------------------------------------------------------------------------
+
+  private craftProfId: string | null = null;
+
+  toggleSkills(): void {
+    const el = $('#skills-window');
+    if (el.style.display === 'block') { el.style.display = 'none'; this.hideTooltip(); return; }
+    this.closeOtherWindows('#skills-window');
+    this.renderSkills();
+    el.style.display = 'block';
+  }
+
+  private renderSkills(): void {
+    const el = $('#skills-window');
+    const sim = this.sim;
+    const known = Object.keys(sim.professionSkills).map((id) => PROFESSIONS[id]).filter(Boolean) as ProfessionDef[];
+    let html = `<div class="panel-title"><span>Skills</span><span class="x-btn" data-close>${svgIcon('close')}</span></div>`;
+    const group = (label: string, kind: 'primary' | 'secondary'): void => {
+      const list = known.filter((p) => p.kind === kind);
+      if (!list.length) return;
+      html += `<div class="qd-sub">${label}</div>`;
+      for (const prof of list) {
+        const skill = sim.professionSkills[prof.id] ?? 0;
+        const cap = tierCap(prof, sim.professionTiers[prof.id] as TierId | undefined);
+        const pct = cap > 0 ? Math.round((skill / cap) * 100) : 0;
+        const openable = prof.recipes.length > 0;
+        html += `<div class="skill-row">
+          <div class="skill-name">${prof.name}</div>
+          <div class="skill-bar"><div class="skill-fill" style="width:${pct}%"></div><span class="skill-num">${skill} / ${cap}</span></div>
+          ${openable ? `<button class="btn-sm" data-open="${prof.id}">Open</button>` : '<span class="skill-open-spacer"></span>'}
+        </div>`;
+      }
+    };
+    group('Professions', 'primary');
+    group('Secondary Skills', 'secondary');
+    if (!known.length) html += `<div class="qd-text" style="color:#999">You have not learned any professions or secondary skills yet. Seek out a trainer.</div>`;
+    el.innerHTML = html;
+    el.querySelectorAll('[data-open]').forEach((b) => b.addEventListener('click', () => this.openCraft((b as HTMLElement).dataset.open!)));
+    el.querySelector('[data-close]')?.addEventListener('click', () => { el.style.display = 'none'; this.hideTooltip(); });
+  }
+
+  openCraft(profId: string): void {
+    if (!PROFESSIONS[profId] || PROFESSIONS[profId].recipes.length === 0) return;
+    this.craftProfId = profId;
+    this.closeOtherWindows('#craft-window');
+    this.renderCraft();
+    $('#craft-window').style.display = 'block';
+  }
+
+  private renderCraft(): void {
+    const el = $('#craft-window');
+    const prof = this.craftProfId ? PROFESSIONS[this.craftProfId] : null;
+    if (!prof) { el.style.display = 'none'; return; }
+    const sim = this.sim;
+    const skill = sim.professionSkills[prof.id] ?? 0;
+    const cap = tierCap(prof, sim.professionTiers[prof.id] as TierId | undefined);
+    const COLOR: Record<DifficultyColor, string> = { orange: '#ff8040', yellow: '#ffd100', green: '#4ad14a', grey: '#9090a0' };
+    let html = `<div class="panel-title"><span>${prof.name} <span style="color:#998d6a;font-size:11px">${skill} / ${cap}</span></span><span class="x-btn" data-close>${svgIcon('close')}</span></div>`;
+    const available = prof.recipes.map((id) => RECIPES[id]).filter((r) => r && skill >= r.requiredSkill) as RecipeDef[];
+    for (const r of available) {
+      const batch = r.batch ?? 1;
+      const out = ITEMS[r.output.itemId];
+      const reagents = r.reagents.map((reg) => {
+        const have = this.inventoryCount(reg.itemId);
+        const need = reg.count * batch;
+        return `<span style="color:${have >= need ? '#9fdc7f' : '#e06b6b'}">${ITEMS[reg.itemId]?.name ?? reg.itemId} ${have}/${need}</span>`;
+      }).join(', ');
+      const canCraft = r.reagents.every((reg) => this.inventoryCount(reg.itemId) >= reg.count * batch);
+      html += `<div class="craft-row">
+        <div class="craft-icon" style="background-image:url(${iconDataUrl('item', r.output.itemId)})"></div>
+        <div class="craft-info"><div class="craft-name" style="color:${COLOR[difficultyColor(skill, r)]}">${out?.name ?? r.name}</div>
+        <div class="craft-reagents">${reagents}</div></div>
+        <button class="btn-sm" data-craft="${r.id}"${canCraft ? '' : ' disabled'}>Craft</button>
+      </div>`;
+    }
+    if (!available.length) html += `<div class="qd-text" style="color:#999">No recipes available at your current skill.</div>`;
+    el.innerHTML = html;
+    el.querySelectorAll('[data-craft]').forEach((b) => b.addEventListener('click', () => this.sim.craft((b as HTMLElement).dataset.craft!)));
+    el.querySelector('[data-close]')?.addEventListener('click', () => { el.style.display = 'none'; this.hideTooltip(); });
+  }
+
+  // Re-render the craft/skills windows when profession state changes (skill-up,
+  // reagents consumed on craft completion). Called from onEvent.
+  private refreshProfessionWindows(): void {
+    if ($('#craft-window').style.display === 'block') this.renderCraft();
+    if ($('#skills-window').style.display === 'block') this.renderSkills();
   }
 
   // -------------------------------------------------------------------------

@@ -752,6 +752,27 @@
     background-color: #15151f; background-size: cover; background-position: center; background-repeat: no-repeat;
     border: 2px solid #4a3d1d; }
 
+  /* professions: skills pane + craft window */
+  #skills-window { width: 360px; }
+  #craft-window { width: 360px; }
+  .skill-row { display: flex; align-items: center; gap: 10px; padding: 5px 4px; }
+  .skill-row .skill-name { width: 120px; font-size: 13px; color: #fff; font-family: var(--title-font); }
+  .skill-bar { position: relative; flex: 1; height: 16px; background: #15151f; border: 1px solid #4a3d1d; border-radius: 3px; overflow: hidden; }
+  .skill-fill { position: absolute; inset: 0 auto 0 0; background: linear-gradient(#6ea84f, #3f7a2c); }
+  .skill-num { position: absolute; inset: 0; text-align: center; font-size: 11px; line-height: 16px; color: #fff; text-shadow: 0 1px 1px #000; }
+  .skill-open-spacer { width: 52px; flex: none; }
+  .btn-sm { flex: none; font-family: var(--title-font); font-size: 11px; color: #f3e6c0; background: #2a2418;
+    border: 1px solid #6b5a2d; border-radius: 3px; padding: 3px 8px; cursor: pointer; }
+  .btn-sm:hover { background: #3a3018; }
+  .btn-sm:disabled { opacity: 0.45; cursor: default; }
+  .craft-row { display: flex; align-items: center; gap: 10px; padding: 5px 4px; border-radius: 4px; }
+  .craft-row:hover { background: #ffffff0e; }
+  .craft-icon { width: 32px; height: 32px; flex: none; border-radius: 5px; background-color: #15151f;
+    background-size: cover; background-position: center; border: 2px solid #4a3d1d; }
+  .craft-info { flex: 1; }
+  .craft-name { font-size: 13px; font-family: var(--title-font); }
+  .craft-reagents { font-size: 11px; color: #998d6a; }
+
   /* quest log */
   #quest-log-window { width: 520px; }
   #quest-log-window .ql-cols { display: flex; gap: 12px; }
@@ -4404,6 +4425,8 @@
     <div id="char-window" class="window panel"></div>
     <div id="spellbook" class="window panel"></div>
     <div id="talents-window" class="window panel"></div>
+    <div id="skills-window" class="window panel"></div>
+    <div id="craft-window" class="window panel"></div>
     <div id="quest-log-window" class="window panel"></div>
     <div id="vendor-window" class="window panel"></div>
     <div id="map-window" class="window panel">
@@ -4426,11 +4449,12 @@
       <button class="micro-btn" id="mm-char" data-i18n-title="hud.keybinds.actions.char" data-i18n-aria="hud.keybinds.actions.char" title="Character" aria-label="Character" data-icon="character"><span class="keybind">c</span></button>
       <button class="micro-btn" id="mm-spell" data-i18n-title="abilityUi.spellbook.title" data-i18n-aria="abilityUi.spellbook.title" title="Spellbook" aria-label="Spellbook" data-icon="spellbook"><span class="keybind">p</span></button>
       <button class="micro-btn" id="mm-talents" data-i18n-title="game.talents.title" data-i18n-aria="game.talents.title" title="Talents" aria-label="Talents" data-icon="talents"><span class="keybind">n</span></button>
+      <button class="micro-btn" id="mm-skills" data-i18n-title="game.professions.skillsTitle" data-i18n-aria="game.professions.skillsTitle" title="Skills" aria-label="Skills" data-icon="skills"><span class="keybind">k</span></button>
       <button class="micro-btn" id="mm-quest" data-i18n-title="questUi.log.title" data-i18n-aria="questUi.log.title" title="Quest Log" aria-label="Quest Log" data-icon="questlog"><span class="keybind">l</span></button>
       <button class="micro-btn" id="mm-map" data-i18n-title="hud.keybinds.actions.map" data-i18n-aria="hud.keybinds.actions.map" title="World Map" aria-label="World Map" data-icon="map"><span class="keybind">m</span></button>
       <button class="micro-btn" id="mm-bag" data-i18n-title="itemUi.bags.title" data-i18n-aria="itemUi.bags.title" title="Bags" aria-label="Bags" data-icon="bags"><span class="keybind">b</span></button>
       <button class="micro-btn" id="mm-arena" data-i18n-title="hud.keybinds.actions.arena" data-i18n-aria="hud.keybinds.actions.arena" title="Arena (Ashen Coliseum)" aria-label="Arena (Ashen Coliseum)" data-icon="arena"><span class="keybind">g</span></button>
-      <button class="micro-btn" id="mm-leaderboard" data-i18n-title="game.leaderboard.title" data-i18n-aria="game.leaderboard.title" title="Leaderboard" aria-label="Leaderboard" data-icon="leaderboard"><span class="keybind">k</span></button>
+      <button class="micro-btn" id="mm-leaderboard" data-i18n-title="game.leaderboard.title" data-i18n-aria="game.leaderboard.title" title="Leaderboard" aria-label="Leaderboard" data-icon="leaderboard"><span class="keybind">y</span></button>
       <button class="micro-btn" id="mm-emote" aria-label="Emotes" data-icon="emote"><span class="keybind">x</span></button>
       <button class="micro-btn" id="mm-music" data-i18n-title="hud.options.music" data-i18n-aria="hud.options.music" title="Music" aria-label="Music" data-icon="music"></button>
       <button class="micro-btn" id="mm-social" data-i18n-title="hud.keybinds.actions.social" data-i18n-aria="hud.keybinds.actions.social" title="Friends &amp; Guild" aria-label="Friends &amp; Guild" data-icon="social"><span class="keybind">o</span></button>

@@ -31,7 +31,7 @@ export interface InputCallbacks {
   onTargetFriendly(): void;
   onCycleFriendly(): void;
   onAbility(slot: number): void;
-  onUiKey(key: 'interact' | 'bags' | 'char' | 'spellbook' | 'talents' | 'questlog' | 'map' | 'nameplates' | 'escape' | 'chat' | 'meters' | 'social' | 'arena' | 'leaderboard'): void;
+  onUiKey(key: 'interact' | 'bags' | 'char' | 'spellbook' | 'talents' | 'skills' | 'questlog' | 'map' | 'nameplates' | 'escape' | 'chat' | 'meters' | 'social' | 'arena' | 'leaderboard'): void;
   onEmoteWheel(open: boolean): void;
   onClickPick(x: number, y: number, button: number): void;
   /** When false, edge actions (spells, UI keys) are ignored. */
@@ -387,6 +387,7 @@ export class Input {
       case 'char': this.cb.onUiKey('char'); return;
       case 'spellbook': this.cb.onUiKey('spellbook'); return;
       case 'talents': this.cb.onUiKey('talents'); return;
+      case 'skills': this.cb.onUiKey('skills'); return;
       case 'questlog': this.cb.onUiKey('questlog'); return;
       case 'map': this.cb.onUiKey('map'); return;
       case 'nameplates': this.cb.onUiKey('nameplates'); return;

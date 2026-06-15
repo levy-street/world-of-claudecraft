@@ -1064,6 +1064,16 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
     { p: 'bone', x: -6, y: -4, s: 0.8 }, { p: 'bone', x: 8, y: 6, s: 0.7, rot: 1.2 },
   ], ['crack']),
   linen_scrap: r('junk', 'silverWhite', [{ p: 'pelt', pal: 'silverWhite' }]),
+  // Professions — cloth tiers + First Aid bandages (red cross on a cloth bolt)
+  linen_cloth: r('cloth', 'silverWhite', [{ p: 'pelt', pal: 'silverWhite' }]),
+  wool_cloth: r('cloth', 'earthBrown', [{ p: 'pelt', pal: 'earthBrown' }]),
+  silk_cloth: r('cloth', 'gold', [{ p: 'pelt', pal: 'gold' }]),
+  linen_bandage: r('cloth', 'silverWhite', [{ p: 'cross', pal: 'blood', s: 0.8 }]),
+  heavy_linen_bandage: r('cloth', 'silverWhite', [{ p: 'cross', pal: 'blood', s: 0.95 }], ['glow']),
+  wool_bandage: r('cloth', 'earthBrown', [{ p: 'cross', pal: 'blood', s: 0.8 }]),
+  heavy_wool_bandage: r('cloth', 'earthBrown', [{ p: 'cross', pal: 'blood', s: 0.95 }], ['glow']),
+  silk_bandage: r('cloth', 'gold', [{ p: 'cross', pal: 'blood', s: 0.8 }]),
+  heavy_silk_bandage: r('cloth', 'gold', [{ p: 'cross', pal: 'blood', s: 0.95 }], ['glow']),
   // misc UI icons (not real items)
   coin_gold: r('treasure', 'gold', ['coin'], ['sparkle']),
   slot_empty: r('junk', 'silverWhite', []),
