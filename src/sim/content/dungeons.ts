@@ -134,7 +134,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     id: 'korgath_the_bound', name: 'Korgath the Bound', minLevel: 20, maxLevel: 20, family: 'ogre', elite: true,
     hpBase: 260, hpPerLevel: 36, dmgBase: 14, dmgPerLevel: 2.9, attackSpeed: 2.8,
     armorPerLevel: 30, moveSpeed: 7, aggroRadius: 15,
-    enrage: { belowHpPct: 0.30, dmgMult: 1.5 },
+    enrage: { belowHpPct: 0.30, dmgMult: 1.5, hasteMult: 1.3 },
     loot: [
       { copper: 5000, chance: 1 },
       { itemId: 'boneplate_vest', chance: 0.34, rollGroup: 'korgath_guaranteed_uncommon' },
@@ -178,7 +178,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     hpBase: 420, hpPerLevel: 48, dmgBase: 15, dmgPerLevel: 3.0, attackSpeed: 2.6,
     armorPerLevel: 34, moveSpeed: 7, aggroRadius: 18,
     aoePulse: { min: 30, max: 42, radius: 14, every: 8, name: 'Necrotic Shockwave' },
-    enrage: { belowHpPct: 0.30, dmgMult: 1.5 },
+    enrage: { belowHpPct: 0.30, dmgMult: 1.5, hasteMult: 1.3 },
     loot: [
       { copper: 50000, chance: 1 },
       { itemId: 'boneplate_vest', chance: 0.34, rollGroup: 'korzul_guaranteed_uncommon' },

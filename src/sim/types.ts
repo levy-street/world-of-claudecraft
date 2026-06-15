@@ -161,8 +161,9 @@ export interface MobTemplate {
   aoePulse?: { min: number; max: number; radius: number; every: number; name: string; school?: string; fx?: 'nova' | 'projectile' };
   // Boss mechanic: spawn adds when hp first drops below each threshold (descending fractions).
   summonAdds?: { mobId: string; count: number; atHpPct: number[] };
-  // Boss mechanic: damage multiplier once hp drops below the threshold.
-  enrage?: { belowHpPct: number; dmgMult: number };
+  // Boss mechanic: damage multiplier (and optional swing-speed haste) once hp
+  // drops below the threshold. hasteMult > 1 makes the enraged mob swing faster.
+  enrage?: { belowHpPct: number; dmgMult: number; hasteMult?: number };
 }
 
 export type AbilityEffect =

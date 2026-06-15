@@ -873,6 +873,12 @@ export class Sim {
       if (a.kind === 'attackspeed') m *= a.value;
       if (a.kind === 'buff_haste') m /= a.value;
     }
+    // Enrage frenzy: an enraged mob swings faster (mirrors the inline dmgMult
+    // applied in mobSwing). Composes with any slow/haste auras above.
+    if (e.enraged) {
+      const h = MOBS[e.templateId]?.enrage?.hasteMult;
+      if (h && h > 0) m /= h;
+    }
     return m;
   }
 

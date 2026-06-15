@@ -77,7 +77,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     hpBase: 260, hpPerLevel: 52, dmgBase: 11, dmgPerLevel: 3.3, attackSpeed: 2.4,
     armorPerLevel: 30, moveSpeed: 7.2, aggroRadius: 12,
     aoePulse: { min: 12, max: 18, radius: 8, every: 9, name: 'Bristleback Stomp', school: 'physical' },
-    enrage: { belowHpPct: 0.35, dmgMult: 1.4 },
+    enrage: { belowHpPct: 0.35, dmgMult: 1.4, hasteMult: 1.3 },
     loot: [
       { copper: 120, chance: 1 },
       { itemId: 'tough_jerky', chance: 1 },
@@ -130,7 +130,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 34, moveSpeed: 7.4, aggroRadius: 14,
     aoePulse: { min: 14, max: 20, radius: 8, every: 10, name: 'Ground Pound', school: 'physical' },
     summonAdds: { mobId: 'mogger_lackey', count: 2, atHpPct: [0.70] },
-    enrage: { belowHpPct: 0.30, dmgMult: 1.6 },
+    enrage: { belowHpPct: 0.30, dmgMult: 1.6, hasteMult: 1.3 },
     loot: [
       { copper: 180, chance: 1 },
       { itemId: 'linen_scrap', chance: 1 },

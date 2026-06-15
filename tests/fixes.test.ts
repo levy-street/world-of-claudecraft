@@ -259,7 +259,7 @@ describe('rare spawn rules', () => {
     }
 
     expect(MOBS.mogger.summonAdds).toEqual({ mobId: 'mogger_lackey', count: 2, atHpPct: [0.70] });
-    expect(MOBS.mogger.enrage).toEqual({ belowHpPct: 0.30, dmgMult: 1.6 });
+    expect(MOBS.mogger.enrage).toEqual({ belowHpPct: 0.30, dmgMult: 1.6, hasteMult: 1.3 });
   });
 });
 
