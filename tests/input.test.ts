@@ -70,4 +70,26 @@ describe('Input pointer lock', () => {
 
     expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
   });
+
+  it('keeps held movement keys when releasing RMB exits pointer lock', () => {
+    const { canvas, canvasListeners, windowListeners, documentListeners, input } = makeInput();
+
+    // Player is running forward...
+    windowListeners.get('keydown')!({ code: 'KeyW', repeat: false });
+    expect(input.readMoveInput().forward).toBe(true);
+
+    // ...while right-mouse steering, which becomes a drag and grabs pointer lock.
+    canvasListeners.get('mousedown')!({ button: 2 });
+    windowListeners.get('mousemove')!({ movementX: 10, movementY: 0 });
+    (document as any).pointerLockElement = canvas;
+
+    // Releasing RMB exits pointer lock; the browser then fires pointerlockchange.
+    windowListeners.get('mouseup')!({ button: 2 });
+    expect((document as any).exitPointerLock).toHaveBeenCalled();
+    (document as any).pointerLockElement = null;
+    documentListeners.get('pointerlockchange')!({});
+
+    // The keyboard key is still physically held, so forward movement must persist.
+    expect(input.readMoveInput().forward).toBe(true);
+  });
 });

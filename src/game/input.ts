@@ -71,7 +71,7 @@ export class Input {
     window.addEventListener('pointerup', (e) => this.onMouseUp(e));
     window.addEventListener('pointercancel', (e) => this.onMouseUp(e));
     document.addEventListener('pointerlockchange', () => {
-      if (!document.pointerLockElement) this.releaseCapture('pointerlock');
+      if (!document.pointerLockElement) this.releasePointerDrag();
     });
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) this.releaseCapture('hidden');
@@ -177,6 +177,14 @@ export class Input {
 
   private releaseCapture(_reason: string): void {
     this.keys.clear();
+    this.releasePointerDrag();
+  }
+
+  // Drop the mouse-drag/steer state without touching held keyboard keys. Used
+  // when pointer lock ends — releasing RMB exits the lock, but the window still
+  // has focus and will deliver keyups normally, so clearing `keys` here would
+  // wrongly stop a player who is still holding a movement key (e.g. W).
+  private releasePointerDrag(): void {
     this.leftDown = false;
     this.rightDown = false;
     this.downButton = -1;
