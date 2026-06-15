@@ -3549,6 +3549,14 @@ export class Sim {
       return null;
     }
 
+    // "/pettaunt" (aliases /pettaunt /growl) — self-only readout of the
+    // controlled pet's Growl (taunt) cooldown, the otherwise-invisible
+    // petTauntTimer that drives the pet's forced-aggro pulses
+    if (/^\/(?:pettaunt|petgrowl|growl)(?:\s|$)/i.test(raw)) {
+      this.error(r.meta.entityId, this.petTauntReadout(r.e));
+      return null;
+    }
+
     // "/w name message" — private whisper to an online player
     const wm = /^\/(?:w|whisper|t|tell)\s+(\S+)\s+([\s\S]+)$/i.exec(raw);
     if (wm) {
@@ -4845,6 +4853,20 @@ export class Sim {
       if (Math.abs(pos.x - origin.x) < 120 && Math.abs(pos.z - origin.z) < 250) return inst.slot;
     }
     return null;
+  }
+
+  // Self-only readout of the controlled pet's Growl (taunt) cooldown. Reads
+  // only the live pet Entity's petTauntTimer (the same field updatePet counts
+  // down at sim.ts ~2770 and resets to PET_GROWL_INTERVAL after each growl), so
+  // it stays truthful without any new state. Distinct from /pet (vitals) and
+  // /cooldowns (the player's own ability map, which never holds this timer).
+  private petTauntReadout(owner: Entity): string {
+    const pet = this.petOf(owner.id);
+    if (!pet) return 'You do not have a pet.';
+    if (pet.petTauntTimer <= 0) {
+      return `Your pet's Growl is ready — it will taunt its target on the next melee swing.`;
+    }
+    return `Your pet's Growl is on cooldown — ready in ${Math.ceil(pet.petTauntTimer)}s.`;
   }
 
   private error(pid: number, text: string): void {
