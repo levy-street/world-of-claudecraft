@@ -3549,6 +3549,15 @@ export class Sim {
       return null;
     }
 
+    // "/form" — self-only readout of the active shapeshift form or combat
+    // stance. Distinct from /buffs (which lists every aura with its timer):
+    // forms/stances are persistent toggles, so this reports the one active
+    // toggle by name, without a meaningless countdown.
+    if (/^\/(form|stance|shapeshift)(?:\s|$)/i.test(raw)) {
+      this.error(r.meta.entityId, this.formReadout(r.e));
+      return null;
+    }
+
     // "/w name message" — private whisper to an online player
     const wm = /^\/(?:w|whisper|t|tell)\s+(\S+)\s+([\s\S]+)$/i.exec(raw);
     if (wm) {
@@ -4845,6 +4854,19 @@ export class Sim {
       if (Math.abs(pos.x - origin.x) < 120 && Math.abs(pos.z - origin.z) < 250) return inst.slot;
     }
     return null;
+  }
+
+  // Reports the active shapeshift form or combat stance. Anchored to the
+  // same toggle set the cast path treats as mutually-exclusive persistent
+  // states (form_bear / form_cat / defensive_stance / stealth); realistically
+  // only one is ever active, so the first match is the answer.
+  private formReadout(e: Entity): string {
+    const form = e.auras.find((a) =>
+      a.kind === 'form_bear' || a.kind === 'form_cat'
+      || a.kind === 'defensive_stance' || a.kind === 'stealth');
+    if (!form) return 'You are not in any form or stance.';
+    if (form.kind === 'stealth') return 'You are stealthed.';
+    return `You are in ${form.name}.`;
   }
 
   private error(pid: number, text: string): void {
