@@ -58,11 +58,36 @@ export class MobileControls {
     this.moveJoystick.addEventListener('pointermove', (e) => this.onMoveMove(e));
     this.moveJoystick.addEventListener('pointerup', (e) => this.onMoveEnd(e));
     this.moveJoystick.addEventListener('pointercancel', (e) => this.onMoveEnd(e));
+    this.moveJoystick.addEventListener('lostpointercapture', (e) => this.onMoveEnd(e));
 
     this.cameraJoystick.addEventListener('pointerdown', (e) => this.onCameraDown(e));
     this.cameraJoystick.addEventListener('pointermove', (e) => this.onCameraMove(e));
     this.cameraJoystick.addEventListener('pointerup', (e) => this.onCameraEnd(e));
     this.cameraJoystick.addEventListener('pointercancel', (e) => this.onCameraEnd(e));
+    this.cameraJoystick.addEventListener('lostpointercapture', (e) => this.onCameraEnd(e));
+
+    window.addEventListener('pointermove', (e) => {
+      this.onMoveMove(e);
+      this.onCameraMove(e);
+    });
+    window.addEventListener('pointerup', (e) => {
+      this.onMoveEnd(e);
+      this.onCameraEnd(e);
+    });
+    window.addEventListener('pointercancel', (e) => {
+      this.onMoveEnd(e);
+      this.onCameraEnd(e);
+    });
+    window.addEventListener('blur', () => {
+      this.releaseMove();
+      this.releaseCamera();
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        this.releaseMove();
+        this.releaseCamera();
+      }
+    });
 
     this.bindButton('mobile-attack-nearest', () => this.callbacks.onAttackNearest());
     this.bindButton('mobile-target', () => this.callbacks.onTarget());
@@ -150,6 +175,13 @@ export class MobileControls {
   }
 
   private releaseMove(): void {
+    if (this.joyPointer !== null) {
+      try {
+        if (this.moveJoystick?.hasPointerCapture?.(this.joyPointer)) {
+          this.moveJoystick.releasePointerCapture(this.joyPointer);
+        }
+      } catch { /* capture may already be gone on mobile browser gesture changes */ }
+    }
     this.joyPointer = null;
     this.input.clearTouchMove();
     if (this.moveStick) this.moveStick.style.transform = '';
@@ -185,6 +217,13 @@ export class MobileControls {
   }
 
   private releaseCamera(): void {
+    if (this.lookPointer !== null) {
+      try {
+        if (this.cameraJoystick?.hasPointerCapture?.(this.lookPointer)) {
+          this.cameraJoystick.releasePointerCapture(this.lookPointer);
+        }
+      } catch { /* capture may already be gone on mobile browser gesture changes */ }
+    }
     this.lookPointer = null;
     this.input.setTouchLook(false);
     this.input.setTouchLookVector({ x: 0, y: 0 });
