@@ -3,6 +3,7 @@ import { Sim } from '../src/sim/sim';
 import { ClientWorld } from '../src/net/online';
 import { SimEvent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+import { zoneAt } from '../src/sim/data';
 
 function makeWorld() {
   return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
@@ -137,6 +138,37 @@ describe('chat channels', () => {
       type: 'error',
       text: 'The /who roster is available in online play.',
     }));
+  });
+
+  it('/where reports the caller\'s zone, level range, and coordinates', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    teleport(sim, a, 12, -340);
+    sim.tick();
+    const zone = zoneAt(-340);
+    const [lo, hi] = zone.levelRange;
+    sim.chat('/where', a);
+    const events = sim.tick();
+    expect(chatEvents(events)).toHaveLength(0);
+    expect(events).toContainEqual(expect.objectContaining({
+      type: 'error',
+      pid: a,
+      text: `You are in ${zone.name} (levels ${lo}–${hi}) at (12, -340).`,
+    }));
+  });
+
+  it('/where accepts the /loc and /zone aliases', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    teleport(sim, a, 0, -40);
+    sim.tick();
+    const expected = `You are in ${zoneAt(-40).name}`;
+    for (const cmd of ['/loc', '/zone']) {
+      sim.chat(cmd, a);
+      const events = sim.tick();
+      expect(chatEvents(events)).toHaveLength(0);
+      expect(events.some((e) => e.type === 'error' && e.text.startsWith(expected))).toBe(true);
+    }
   });
 
   it('exact-case whisper wins over a case-variant squatter', () => {

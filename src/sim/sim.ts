@@ -3549,6 +3549,18 @@ export class Sim {
       return null;
     }
 
+    // "/where" (aliases /loc, /zone) — self-only report of the caller's current
+    // zone, its level range, and coordinates. Reuses the self-only error reply
+    // like /who and /played; emits no chat event and is not logged.
+    if (/^\/(?:where|loc|zone)(?:\s|$)/i.test(raw)) {
+      const zone = zoneAt(r.e.pos.z);
+      const [lo, hi] = zone.levelRange;
+      const x = Math.floor(r.e.pos.x);
+      const z = Math.floor(r.e.pos.z);
+      this.error(r.meta.entityId, `You are in ${zone.name} (levels ${lo}–${hi}) at (${x}, ${z}).`);
+      return null;
+    }
+
     // "/w name message" — private whisper to an online player
     const wm = /^\/(?:w|whisper|t|tell)\s+(\S+)\s+([\s\S]+)$/i.exec(raw);
     if (wm) {
