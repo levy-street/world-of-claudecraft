@@ -175,21 +175,26 @@ export function nextTier(prof: ProfessionDef, learnedTier: TierId | undefined): 
 }
 
 // --- learning costs (copper) ----------------------------------------------
-// Flat tier cost by kind (primaries cost more than secondaries). Recipes cost
-// per required-skill, so a recipe at skill 20 costs the same across same-kind
-// professions. Trainers charge both; the starter recipe (skill <= 1) is free.
+// Costs start cheap and ramp up fast. Tiers jump ~10x from Apprentice to
+// Journeyman; primaries cost ~3x secondaries. Recipe cost scales with the SQUARE
+// of required skill, so a recipe at skill 20 costs the same across same-kind
+// professions but high-skill recipes get expensive quickly. The starter recipe
+// (skill <= 1) is taught free. Calibrated against the live economy (median quest
+// ~600c, vendor gear ~1500c) in .claude/design/economy-reference.local.md.
 export const TIER_COST: Record<ProfessionKind, Record<TierId, number>> = {
-  secondary: { apprentice: 20, journeyman: 100 },
-  primary: { apprentice: 75, journeyman: 300 },
+  secondary: { apprentice: 50, journeyman: 500 },
+  primary: { apprentice: 150, journeyman: 1500 },
 };
-export const RECIPE_COST_PER_SKILL: Record<ProfessionKind, number> = { secondary: 1, primary: 2 };
+// quadratic coefficient: cost = round(requiredSkill^2 * k), floored at MIN
+export const RECIPE_COST_K: Record<ProfessionKind, number> = { secondary: 0.1, primary: 0.2 };
+const MIN_RECIPE_COST = 5;
 
 export function tierLearnCost(prof: ProfessionDef, tier: TierId): number {
   return TIER_COST[prof.kind][tier];
 }
 export function recipeLearnCost(recipe: RecipeDef): number {
   const kind = PROFESSIONS[recipe.profId]?.kind ?? 'secondary';
-  return recipe.requiredSkill * RECIPE_COST_PER_SKILL[kind];
+  return Math.max(MIN_RECIPE_COST, Math.round(recipe.requiredSkill * recipe.requiredSkill * RECIPE_COST_K[kind]));
 }
 
 // Validate the registry against the item table. Returns a list of problems

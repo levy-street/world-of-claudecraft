@@ -3,7 +3,7 @@ import { Sim } from '../src/sim/sim';
 import { ITEMS, NPCS } from '../src/sim/data';
 import {
   PROFESSIONS, RECIPES, validateProfessions, difficultyColor,
-  clothCandidates, tierCap, nextTier, STANDARD_TIERS,
+  clothCandidates, tierCap, nextTier, STANDARD_TIERS, tierLearnCost, recipeLearnCost,
 } from '../src/sim/content/professions';
 
 function makeSim(cls: 'warrior' | 'mage' = 'warrior', seed = 42) {
@@ -204,7 +204,7 @@ describe('professions — trainers & tier gate', () => {
     sim.learnProfession('first_aid', 'apprentice');
     expect(meta.professionSkills.first_aid).toBe(1);
     expect(meta.professionTiers.first_aid).toBe('apprentice');
-    expect(meta.copper).toBe(980); // secondary Apprentice costs 20c
+    expect(meta.copper).toBe(1000 - tierLearnCost(PROFESSIONS.first_aid, 'apprentice'));
     expect([...meta.learnedRecipes]).toContain('linen_bandage'); // starter auto-learned free
 
     sim.learnProfession('first_aid', 'journeyman'); // skill 1 < 40 → rejected
@@ -265,10 +265,11 @@ describe('professions — learning costs & recipes', () => {
     const sim = makeSim();
     atTrainer(sim);
     const meta = metaOf(sim);
-    meta.copper = 0;
+    const appCost = tierLearnCost(PROFESSIONS.first_aid, 'apprentice');
+    meta.copper = appCost - 1;
     sim.learnProfession('first_aid', 'apprentice');
-    expect(meta.professionSkills.first_aid).toBeUndefined(); // can't afford 20c
-    meta.copper = 20;
+    expect(meta.professionSkills.first_aid).toBeUndefined(); // can't afford it
+    meta.copper = appCost;
     sim.learnProfession('first_aid', 'apprentice');
     expect(meta.professionSkills.first_aid).toBe(1);
     expect(meta.copper).toBe(0);
@@ -291,7 +292,7 @@ describe('professions — learning costs & recipes', () => {
     const before = meta.copper;
     sim.learnRecipe('heavy_linen_bandage');
     expect([...meta.learnedRecipes]).toContain('heavy_linen_bandage');
-    expect(before - meta.copper).toBe(25);
+    expect(before - meta.copper).toBe(recipeLearnCost(RECIPES.heavy_linen_bandage));
 
     // now it crafts
     sim.craft('heavy_linen_bandage');
