@@ -3549,6 +3549,11 @@ export class Sim {
       return null;
     }
 
+    if (/^\/(?:potion|potioncd|pot)(?:\s|$)/i.test(raw)) {
+      this.error(r.meta.entityId, this.potionReadout(r.e));
+      return null;
+    }
+
     // "/w name message" — private whisper to an online player
     const wm = /^\/(?:w|whisper|t|tell)\s+(\S+)\s+([\s\S]+)$/i.exec(raw);
     if (wm) {
@@ -4849,6 +4854,16 @@ export class Sim {
 
   private error(pid: number, text: string): void {
     this.emit({ type: 'error', text, pid });
+  }
+
+  // Self-only readout of the shared combat-potion cooldown (#103). Distinct from
+  // /cooldowns, which reads the per-ability Entity.cooldowns map and never shows
+  // this separate 60s potion timer. potionCooldownUntil is an absolute sim-time
+  // deadline, so the remaining time is computed against this.time.
+  private potionReadout(e: Entity): string {
+    const remaining = e.potionCooldownUntil - this.time;
+    if (remaining <= 0) return 'Combat potion is ready to use.';
+    return `Combat potion on cooldown — ready in ${Math.ceil(remaining)}s.`;
   }
 }
 
