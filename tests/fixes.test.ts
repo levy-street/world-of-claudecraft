@@ -617,6 +617,36 @@ describe('warrior charge', () => {
   });
 });
 
+describe('aoe damage vs armor', () => {
+  // Armor mitigates physical damage only. The single-target path already
+  // gates armor on `!isSpell`; the AoE path must match so spell-school novas
+  // (Arcane Explosion, Consecration) ignore the target's armor like every
+  // other spell in the game.
+  function aoeSetup(ability: string) {
+    const sim = makeSim('mage');
+    (sim as any).grantXp(99999); // level up far past Arcane Explosion (lvl 14)
+    const p = sim.player;
+    const wolf = [...sim.entities.values()].find((e) => e.kind === 'mob' && e.templateId === 'forest_wolf' && !e.dead)!;
+    wolf.maxHp = 100000;
+    wolf.hp = 100000;
+    // huge armor pins armorReduction at its 0.75 cap — a mitigated arcane hit
+    // would land at <=8, well under the unmitigated 26-31 band.
+    wolf.stats.armor = 10_000_000;
+    teleportTo(sim, wolf.pos.x, wolf.pos.z + 1);
+    sim.targetEntity(wolf.id);
+    return { sim, p, wolf, ability };
+  }
+
+  it('arcane explosion ignores the target armor (spell school)', () => {
+    const { sim, wolf } = aoeSetup('arcane_explosion');
+    const before = wolf.hp;
+    sim.castAbility('arcane_explosion');
+    for (let i = 0; i < 3; i++) sim.tick();
+    // full unmitigated arcane damage is 26-31; mitigated would be <=8
+    expect(before - wolf.hp).toBeGreaterThanOrEqual(20);
+  });
+});
+
 describe('spell visuals', () => {
   it('hostile casts emit projectile spellfx events', () => {
     const sim = makeSim('mage');

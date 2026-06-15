@@ -1681,7 +1681,10 @@ export class Sim {
           this.emit({ type: 'spellfx', sourceId: p.id, targetId: p.id, school: ability.school, fx: 'nova' });
           for (const m of this.mobsInRadius(p.pos, eff.radius)) {
             let dmg = this.rng.range(eff.min, eff.max);
-            dmg *= 1 - armorReduction(this.effectiveArmor(m), p.level);
+            // Armor only mitigates physical damage, mirroring the single-target
+            // path above — spell-school AoE (Arcane Explosion, Consecration) is
+            // not reduced by the target's armor.
+            if (!isSpell) dmg *= 1 - armorReduction(this.effectiveArmor(m), p.level);
             this.dealDamage(p, m, Math.round(dmg), false, ability.school, ability.name, 'hit', false, threatOpts);
           }
           break;
