@@ -4,7 +4,7 @@
 // stored now so cross-realm friends/guilds need no migration later).
 
 import type { Pool } from 'pg';
-import type { CharInfo, CharRef, GuildRank, SocialDb } from './social';
+import type { CharInfo, CharRef, GuildDirectoryEntry, GuildRank, JoinRequestEntry, RecruitmentMode, SocialDb } from './social';
 import { REALM } from './realm';
 
 // kept as an alias for the schema's column default; the live realm is REALM
@@ -94,6 +94,23 @@ CREATE TABLE IF NOT EXISTS guilds (
 -- guild names are likewise unique per realm
 ALTER TABLE guilds DROP CONSTRAINT IF EXISTS guilds_name_key;
 CREATE UNIQUE INDEX IF NOT EXISTS guilds_realm_name ON guilds(realm, name);
+-- public guild directory (#110): a guild can opt into a browsable listing and
+-- pick how outsiders may join. Existing guilds default to unlisted, so the
+-- directory stays empty until a leader opts in. recruitment is only meaningful
+-- while is_public is true: 'request' queues a join request for officers to
+-- approve; 'open' lets anyone join instantly (still subject to the member cap).
+ALTER TABLE guilds ADD COLUMN IF NOT EXISTS is_public BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE guilds ADD COLUMN IF NOT EXISTS recruitment TEXT NOT NULL DEFAULT 'request';
+CREATE INDEX IF NOT EXISTS guilds_public ON guilds(realm, is_public);
+-- defense-in-depth: the app validates recruitment, but pin the domain at the DB
+-- too. ADD CONSTRAINT is not idempotent, so guard it (re-runs of ensureSchema).
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'guilds_recruitment_check') THEN
+    ALTER TABLE guilds ADD CONSTRAINT guilds_recruitment_check
+      CHECK (recruitment IN ('closed', 'request', 'open'));
+  END IF;
+END $$;
 
 CREATE TABLE IF NOT EXISTS guild_members (
   character_id INT PRIMARY KEY REFERENCES characters(id) ON DELETE CASCADE,
@@ -102,6 +119,15 @@ CREATE TABLE IF NOT EXISTS guild_members (
   joined_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS guild_members_guild ON guild_members(guild_id);
+
+-- pending requests to join a guild (#110). PK on character_id mirrors the
+-- single-guild rule: a player has at most one outstanding request at a time.
+CREATE TABLE IF NOT EXISTS guild_join_requests (
+  character_id INT PRIMARY KEY REFERENCES characters(id) ON DELETE CASCADE,
+  guild_id INT NOT NULL REFERENCES guilds(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS guild_join_requests_guild ON guild_join_requests(guild_id);
 `;
 
 const CHAR_COLS = 'id, name, class AS cls, level, realm';
@@ -198,12 +224,19 @@ export class PgSocialDb implements SocialDb {
     return row ? { guildId: row.guild_id, guildName: row.guild_name, rank: row.rank } : null;
   }
 
-  async addGuildMember(guildId: number, charId: number, rank: GuildRank): Promise<void> {
-    await this.pool.query(
-      `INSERT INTO guild_members (guild_id, character_id, rank) VALUES ($1, $2, $3)
+  async addGuildMember(guildId: number, charId: number, rank: GuildRank): Promise<boolean> {
+    // The INSERT ... SELECT only emits a row when the target guild is on this
+    // realm, so a cross-realm guild id can never gain a member. ON CONFLICT
+    // keeps the single-guild PK invariant; rowCount tells the caller whether
+    // the member was actually added (false = no-op: already guilded, or a
+    // cross-realm/missing guild).
+    const res = await this.pool.query(
+      `INSERT INTO guild_members (guild_id, character_id, rank)
+       SELECT $1, $2, $3 FROM guilds WHERE id = $1 AND realm = $4
        ON CONFLICT (character_id) DO NOTHING`,
-      [guildId, charId, rank],
+      [guildId, charId, rank, REALM],
     );
+    return (res.rowCount ?? 0) > 0;
   }
 
   async removeGuildMember(charId: number): Promise<void> {
@@ -219,6 +252,91 @@ export class PgSocialDb implements SocialDb {
       `SELECT c.id, c.name, c.class AS cls, c.level, c.realm, gm.rank
        FROM guild_members gm JOIN characters c ON c.id = gm.character_id
        WHERE gm.guild_id = $1 ORDER BY gm.joined_at`,
+      [guildId],
+    );
+    return res.rows;
+  }
+
+  // ---- public directory + request-to-join (#110) -------------------------
+
+  async setGuildListing(guildId: number, isPublic: boolean, recruitment: RecruitmentMode): Promise<void> {
+    await this.pool.query(
+      'UPDATE guilds SET is_public = $2, recruitment = $3 WHERE id = $1',
+      [guildId, isPublic, recruitment],
+    );
+  }
+
+  async guildListing(guildId: number): Promise<{ isPublic: boolean; recruitment: RecruitmentMode } | null> {
+    // realm-scoped: a client can supply an arbitrary guild id, so the join path
+    // must not resolve a guild from another realm (shared-DB deploys). Returns
+    // null for a cross-realm id, which makes guildRequestJoin refuse it — the
+    // same isolation the directory enforces.
+    const res = await this.pool.query('SELECT is_public, recruitment FROM guilds WHERE id = $1 AND realm = $2', [guildId, REALM]);
+    const row = res.rows[0];
+    return row ? { isPublic: row.is_public, recruitment: row.recruitment } : null;
+  }
+
+  async guildDirectory(): Promise<GuildDirectoryEntry[]> {
+    // public guilds on this realm, with live member count and the leader's name.
+    const res = await this.pool.query(
+      `SELECT g.id, g.name, g.recruitment,
+              COUNT(gm.character_id)::int AS member_count,
+              MAX(CASE WHEN gm.rank = 'leader' THEN lc.name END) AS leader_name
+       FROM guilds g
+       LEFT JOIN guild_members gm ON gm.guild_id = g.id
+       LEFT JOIN characters lc ON lc.id = gm.character_id
+       WHERE g.realm = $1 AND g.is_public = true
+       GROUP BY g.id, g.name, g.recruitment
+       ORDER BY member_count DESC, g.name`,
+      [REALM],
+    );
+    return res.rows.map((r) => ({
+      id: r.id,
+      name: r.name,
+      recruitment: r.recruitment,
+      memberCount: r.member_count,
+      leaderName: r.leader_name ?? null,
+    }));
+  }
+
+  async addJoinRequest(guildId: number, charId: number): Promise<void> {
+    await this.pool.query(
+      `INSERT INTO guild_join_requests (guild_id, character_id) VALUES ($1, $2)
+       ON CONFLICT (character_id) DO UPDATE SET guild_id = EXCLUDED.guild_id, created_at = now()`,
+      [guildId, charId],
+    );
+  }
+
+  async removeJoinRequest(charId: number): Promise<void> {
+    await this.pool.query('DELETE FROM guild_join_requests WHERE character_id = $1', [charId]);
+  }
+
+  async joinRequest(charId: number): Promise<{ guildId: number } | null> {
+    const res = await this.pool.query('SELECT guild_id FROM guild_join_requests WHERE character_id = $1', [charId]);
+    const row = res.rows[0];
+    return row ? { guildId: row.guild_id } : null;
+  }
+
+  async myJoinRequest(charId: number): Promise<{ guildId: number; guildName: string } | null> {
+    // Realm-scoped join to the target guild so the requester's own snapshot can
+    // name it. The INNER JOIN with realm = $2 yields no row for a cross-realm or
+    // already-gone guild, matching guildListing's isolation (FK cascade normally
+    // clears the request when a guild is deleted, so the guard is belt-and-braces).
+    const res = await this.pool.query(
+      `SELECT r.guild_id, g.name AS guild_name
+       FROM guild_join_requests r JOIN guilds g ON g.id = r.guild_id
+       WHERE r.character_id = $1 AND g.realm = $2`,
+      [charId, REALM],
+    );
+    const row = res.rows[0];
+    return row ? { guildId: row.guild_id, guildName: row.guild_name } : null;
+  }
+
+  async joinRequests(guildId: number): Promise<JoinRequestEntry[]> {
+    const res = await this.pool.query(
+      `SELECT c.id, c.name, c.class AS cls, c.level, c.realm
+       FROM guild_join_requests r JOIN characters c ON c.id = r.character_id
+       WHERE r.guild_id = $1 ORDER BY r.created_at`,
       [guildId],
     );
     return res.rows;

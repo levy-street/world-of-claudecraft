@@ -354,7 +354,7 @@ export class ClientWorld implements IWorld {
       return;
     }
     if (msg.t === 'social') {
-      this.socialInfo = { friends: msg.friends ?? [], blocks: msg.blocks ?? [], guild: msg.guild ?? null };
+      this.socialInfo = { friends: msg.friends ?? [], blocks: msg.blocks ?? [], guild: msg.guild ?? null, myRequest: msg.myRequest ?? null };
       this.socialDirty = true;
       return;
     }
@@ -705,6 +705,12 @@ export class ClientWorld implements IWorld {
   guildDemote(name: string): void { this.cmd({ cmd: 'guild_demote', name }); }
   guildTransfer(name: string): void { this.cmd({ cmd: 'guild_transfer', name }); }
   guildDisband(): void { this.cmd({ cmd: 'guild_disband' }); }
+  guildDirectory(): void { this.cmd({ cmd: 'guild_directory' }); }
+  guildSetListing(isPublic: boolean, recruitment: import('../world_api').RecruitmentMode): void { this.cmd({ cmd: 'guild_listing', public: isPublic, recruitment }); }
+  guildRequestJoin(guildId: number): void { this.cmd({ cmd: 'guild_request', id: guildId }); }
+  guildCancelRequest(): void { this.cmd({ cmd: 'guild_request_cancel' }); }
+  guildApproveRequest(charId: number): void { this.cmd({ cmd: 'guild_approve', id: charId }); }
+  guildDenyRequest(charId: number): void { this.cmd({ cmd: 'guild_deny', id: charId }); }
   async searchCharacters(query: string): Promise<CharacterSearchResult[]> {
     const q = query.trim();
     if (!q) return [];

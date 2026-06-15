@@ -756,6 +756,17 @@ export class GameServer {
       case 'guild_demote': if (typeof msg.name === 'string') void this.social.guildSetRank(this.actorFor(session), msg.name, 'member').catch(logSocialErr); break;
       case 'guild_transfer': if (typeof msg.name === 'string') void this.social.guildTransferLeader(this.actorFor(session), msg.name).catch(logSocialErr); break;
       case 'guild_disband': void this.social.guildDisband(this.actorFor(session)).catch(logSocialErr); break;
+      // public directory + request-to-join (#110)
+      case 'guild_directory': void this.social.guildDirectory(this.actorFor(session)).catch(logSocialErr); break;
+      case 'guild_listing':
+        if (typeof msg.public === 'boolean' && typeof msg.recruitment === 'string') {
+          void this.social.guildSetListing(this.actorFor(session), msg.public, msg.recruitment).catch(logSocialErr);
+        }
+        break;
+      case 'guild_request': if (typeof msg.id === 'number') void this.social.guildRequestJoin(this.actorFor(session), msg.id).catch(logSocialErr); break;
+      case 'guild_request_cancel': void this.social.guildCancelRequest(this.actorFor(session)).catch(logSocialErr); break;
+      case 'guild_approve': if (typeof msg.id === 'number') void this.social.guildApproveRequest(this.actorFor(session), msg.id).catch(logSocialErr); break;
+      case 'guild_deny': if (typeof msg.id === 'number') void this.social.guildDenyRequest(this.actorFor(session), msg.id).catch(logSocialErr); break;
       // arena (Ashen Coliseum 1v1 queue)
       case 'arena_queue': sim.arenaQueueJoin(pid); break;
       case 'arena_leave': sim.arenaQueueLeave(pid); break;

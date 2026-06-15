@@ -128,6 +128,8 @@ export class Hud {
   // current typeahead state: which input, its results, and the keyboard-
   // highlighted row (-1 = none), so Enter/Arrow keys can pick a suggestion
   private socialSuggest: { field: string; items: { name: string; cls: string; level: number }[]; index: number } = { field: '', items: [], index: -1 };
+  // public guild directory (#110): last fetched listing, rendered in a modal
+  private guildDirectoryEntries: import('../world_api').GuildDirectoryEntry[] | null = null;
 
   private meters: Meters;
 
@@ -1348,6 +1350,10 @@ export class Hud {
           audio.questAccept();
           this.showPrompt(`<b>${ev.fromName}</b> invites you to join <span class="gold">&lt;${ev.guildName}&gt;</span>.`, 'Join Guild',
             () => this.sim.guildAccept(), () => this.sim.guildDecline());
+          break;
+        case 'guildDirectory':
+          this.guildDirectoryEntries = ev.guilds;
+          this.renderGuildDirectory();
           break;
         case 'tradeRequest':
           audio.click();
@@ -2598,9 +2604,18 @@ export class Hud {
 
   private guildHtml(): string {
     const guild = this.sim.socialInfo?.guild ?? null;
-    if (!guild) return `<div class="soc-empty">You are not in a guild. Found one below, or get invited by an existing guild.</div>`;
+    if (!guild) {
+      // requester-side mirror of approve/deny (#110): if the player has an
+      // outstanding join request, show its pending state above the empty notice.
+      const pending = this.pendingRequestHtml();
+      return pending + `<div class="soc-empty">You are not in a guild. Browse the directory below, found your own, or get invited by an existing guild.</div>`;
+    }
     const me = guild.rank;
     const head = `<div class="soc-guild-head">&lt;${esc(guild.name)}&gt; <span class="gm">— you are ${rankLabel(me)} &middot; ${guild.members.length} member${guild.members.length === 1 ? '' : 's'}</span></div>`;
+    // leader: toggle the public directory listing + recruitment mode
+    const recruit = me === 'leader' ? this.recruitToggleHtml(guild) : '';
+    // officers + leader: pending join requests with approve/deny
+    const requests = me !== 'member' ? this.requestsHtml(guild) : '';
     const rows = guild.members.map((m) => {
       const dot = m.online ? (m.status ?? 'online') : 'off';
       const meta = m.online
@@ -2625,7 +2640,47 @@ export class Hud {
         + (actions ? `<span class="soc-actions">${actions}</span>` : '')
         + `</div>`;
     }).join('');
-    return head + rows;
+    return head + recruit + requests + rows;
+  }
+
+  // Leader-only: pick whether the guild is listed publicly and how it recruits.
+  private recruitToggleHtml(guild: NonNullable<typeof this.sim.socialInfo>['guild']): string {
+    if (!guild) return '';
+    const mode = guild.isPublic ? guild.recruitment : 'closed';
+    const chip = (m: 'closed' | 'request' | 'open', label: string): string =>
+      `<span class="chip ${mode === m ? 'on' : ''}" data-recruit="${m}" title="${esc(label)}">${esc(label)}</span>`;
+    return `<div class="soc-recruit">`
+      + `<span class="lbl">Recruitment:</span>`
+      + chip('closed', 'Invite only')
+      + chip('request', 'Request to join')
+      + chip('open', 'Open')
+      + `</div>`;
+  }
+
+  // Officers + leader: pending applicants with approve/deny.
+  private requestsHtml(guild: NonNullable<typeof this.sim.socialInfo>['guild']): string {
+    const reqs = guild?.requests ?? [];
+    if (reqs.length === 0) return '';
+    const rows = reqs.map((r) => `<div class="soc-row">`
+      + `<span class="soc-dot online"></span>`
+      + `<span>${esc(r.name)}<br><span class="soc-meta">Lvl ${r.level} ${cap(r.cls)}</span></span>`
+      + `<span class="soc-actions">`
+      + `<span class="soc-x ok" data-act="gapprove" data-id="${r.id}" title="Accept ${esc(r.name)}">✓</span>`
+      + `<span class="soc-x" data-act="gdeny" data-id="${r.id}" title="Decline ${esc(r.name)}">✕</span>`
+      + `</span></div>`).join('');
+    return `<div class="soc-reqs-head">Join requests (${reqs.length})</div>` + rows;
+  }
+
+  // Requester-side mirror of requestsHtml (#110): when the player has an
+  // outstanding join request, show which guild it's pending on and a Withdraw
+  // action wired to the existing guildCancelRequest flow.
+  private pendingRequestHtml(): string {
+    const req = this.sim.socialInfo?.myRequest ?? null;
+    if (!req) return '';
+    return `<div class="soc-pending">`
+      + `<span class="soc-pending-id">Pending request to <span class="gold">&lt;${esc(req.guildName)}&gt;</span></span>`
+      + `<button class="btn" data-act="guild-withdraw" title="Withdraw your request to join &lt;${esc(req.guildName)}&gt;">Withdraw request</button>`
+      + `</div>`;
   }
 
   // The add/action row changes with the tab (and guild membership). Inputs
@@ -2634,7 +2689,10 @@ export class Hud {
     if (this.socialTab === 'friends') return this.addRow('friend', 'friend-add', 'Search to add a friend…', 'Add', 16, true);
     if (this.socialTab === 'ignore') return this.addRow('ignore', 'block-add', 'Search to ignore…', 'Ignore', 16, true);
     const guild = this.sim.socialInfo?.guild ?? null;
-    if (!guild) return this.addRow('gname', 'guild-create', 'Name your new guild', 'Found', 24, false);
+    if (!guild) {
+      return `<div class="soc-add soc-leave"><button class="btn" data-act="guild-browse">Browse Guilds</button></div>`
+        + this.addRow('gname', 'guild-create', 'Name your new guild', 'Found', 24, false);
+    }
     let foot = '';
     if (guild.rank !== 'member') foot += this.addRow('ginvite', 'guild-invite', 'Search to invite…', 'Invite', 16, true);
     // WoW: a Guild Master with other members can't just leave — they disband
@@ -2668,6 +2726,7 @@ export class Hud {
       else if (act === 'guild-invite') void this.socialResolveAndAct('ginvite', field('ginvite'));
       else if (act === 'guild-create') { const n = field('gname'); if (n) { this.sim.guildCreate(n); this.clearSocialInput('gname'); } }
       else if (act === 'guild-leave') this.sim.guildLeave();
+      else if (act === 'guild-browse') this.openGuildDirectory();
       else if (act === 'guild-disband') this.showPrompt('Disband your guild? This cannot be undone.', 'Disband', () => this.sim.guildDisband(), () => { /* keep */ });
     };
     el.querySelectorAll('.soc-add .btn').forEach((b) => b.addEventListener('click', () => submit((b as HTMLElement).dataset.act)));
@@ -2685,12 +2744,25 @@ export class Hud {
     scope.querySelectorAll('.soc-x').forEach((x) => x.addEventListener('click', () => {
       const act = (x as HTMLElement).dataset.act;
       const name = (x as HTMLElement).dataset.name ?? '';
+      const id = Number((x as HTMLElement).dataset.id);
       if (act === 'unfriend') this.sim.friendRemove(name);
       else if (act === 'unblock') this.sim.blockRemove(name);
       else if (act === 'gkick') this.sim.guildKick(name);
       else if (act === 'promote') this.sim.guildPromote(name);
       else if (act === 'demote') this.sim.guildDemote(name);
+      else if (act === 'gapprove') this.sim.guildApproveRequest(id);
+      else if (act === 'gdeny') this.sim.guildDenyRequest(id);
       else if (act === 'gtransfer') this.showPrompt(`Make <b>${esc(name)}</b> the Guild Master? You will step down to Officer.`, 'Promote', () => this.sim.guildTransfer(name), () => { /* keep */ });
+    }));
+    // leader recruitment chips: list/unlist + pick mode in one click
+    scope.querySelectorAll('.soc-recruit .chip').forEach((c) => c.addEventListener('click', () => {
+      const mode = (c as HTMLElement).dataset.recruit as 'closed' | 'request' | 'open';
+      if (mode === 'closed') this.sim.guildSetListing(false, 'closed');
+      else this.sim.guildSetListing(true, mode);
+    }));
+    // requester-side: withdraw a pending join request (#110)
+    scope.querySelectorAll('.soc-pending [data-act="guild-withdraw"]').forEach((b) => b.addEventListener('click', () => {
+      this.sim.guildCancelRequest();
     }));
     scope.querySelectorAll('[data-whisper]').forEach((w) => w.addEventListener('click', () => {
       this.startWhisper((w as HTMLElement).dataset.whisper ?? '');
@@ -2806,6 +2878,59 @@ export class Hud {
     box.textContent = this.socialNotice.text;
     box.className = 'soc-notice' + (this.socialNotice.error ? ' err' : ' ok');
     box.style.display = 'block';
+  }
+
+  // -------------------------------------------------------------------------
+  // Public guild directory (#110): browse modal + request-to-join
+  // -------------------------------------------------------------------------
+
+  private openGuildDirectory(): void {
+    const el = $('#guild-directory-window');
+    el.classList.add('open');
+    // show a loading state, then ask the server for the current listing
+    this.guildDirectoryEntries = null;
+    this.renderGuildDirectory();
+    this.sim.guildDirectory();
+  }
+
+  private closeGuildDirectory(): void {
+    $('#guild-directory-window').classList.remove('open');
+  }
+
+  private renderGuildDirectory(): void {
+    const el = $('#guild-directory-window');
+    if (!el.classList.contains('open')) return;
+    const entries = this.guildDirectoryEntries;
+    const inGuild = !!this.sim.socialInfo?.guild;
+    let body: string;
+    if (entries === null) {
+      body = `<div class="soc-empty">Loading guilds…</div>`;
+    } else if (entries.length === 0) {
+      body = `<div class="soc-empty">No public guilds are recruiting right now.</div>`;
+    } else {
+      body = entries.map((g) => {
+        const modeLabel = g.recruitment === 'open'
+          ? `<span class="open">Open recruitment</span>`
+          : `<span class="req">Request to join</span>`;
+        const leader = g.leaderName ? ` &middot; led by ${esc(g.leaderName)}` : '';
+        const action = inGuild
+          ? ''
+          : `<button class="btn" data-join="${g.id}">${g.recruitment === 'open' ? 'Join' : 'Request'}</button>`;
+        return `<div class="gdir-row">`
+          + `<span class="gdir-id"><span class="gdir-name">&lt;${esc(g.name)}&gt;</span>`
+          + `<span class="gdir-meta">${g.memberCount} member${g.memberCount === 1 ? '' : 's'} &middot; ${modeLabel}${leader}</span></span>`
+          + action
+          + `</div>`;
+      }).join('');
+    }
+    el.innerHTML = `<div class="panel-title"><span>Guild Directory</span><span class="x-btn" data-close>✕</span></div>`
+      + `<div class="gdir-body">${body}</div>`;
+    el.querySelector('[data-close]')?.addEventListener('click', () => this.closeGuildDirectory());
+    el.querySelectorAll('[data-join]').forEach((b) => b.addEventListener('click', () => {
+      const id = Number((b as HTMLElement).dataset.join);
+      this.sim.guildRequestJoin(id);
+      this.closeGuildDirectory();
+    }));
   }
 
   // Open the chat bar pre-filled with a whisper to this player (WoW-style DM).

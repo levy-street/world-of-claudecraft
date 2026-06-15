@@ -497,6 +497,18 @@ export interface Entity {
 
 // `pid` (when present) marks a personal event that should only be delivered to
 // that player entity's owner; events without pid are world-visible.
+// How outsiders may join a public guild (#110). Mirrors server/social.ts.
+export type RecruitmentMode = 'closed' | 'request' | 'open';
+
+// One row of the public guild directory.
+export interface GuildDirectoryEntry {
+  id: number;
+  name: string;
+  memberCount: number;
+  recruitment: RecruitmentMode;
+  leaderName: string | null;
+}
+
 export type SimEvent = { pid?: number } & (
   | { type: 'damage'; sourceId: number; targetId: number; amount: number; crit: boolean; school: string; ability: string | null; kind: 'hit' | 'miss' | 'dodge' | 'parry' }
   | { type: 'heal'; targetId: number; amount: number }
@@ -526,6 +538,8 @@ export type SimEvent = { pid?: number } & (
   // a guild invitation from an online guild officer/leader; resolved by name
   // server-side so it carries no pid
   | { type: 'guildInvite'; fromName: string; guildName: string }
+  // the public guild directory, delivered in response to a browse request (#110)
+  | { type: 'guildDirectory'; guilds: GuildDirectoryEntry[] }
   | { type: 'tradeRequest'; fromPid: number; fromName: string }
   | { type: 'tradeDone' }
   | { type: 'duelRequest'; fromPid: number; fromName: string }
