@@ -3549,6 +3549,15 @@ export class Sim {
       return null;
     }
 
+    // "/pois" (aliases /poi, /landmarks) — self-only readout of the named
+    // landmarks in your current zone, nearest first, with their distance. Self-
+    // only error reply, returns null so it is neither logged nor spoken; works
+    // online for free (no server interceptor).
+    if (/^\/(?:pois|poi|landmarks)(?:\s|$)/i.test(raw)) {
+      this.error(r.meta.entityId, this.poisReadout(r.e));
+      return null;
+    }
+
     // "/w name message" — private whisper to an online player
     const wm = /^\/(?:w|whisper|t|tell)\s+(\S+)\s+([\s\S]+)$/i.exec(raw);
     if (wm) {
@@ -4845,6 +4854,20 @@ export class Sim {
       if (Math.abs(pos.x - origin.x) < 120 && Math.abs(pos.z - origin.z) < 250) return inst.slot;
     }
     return null;
+  }
+
+  // Readout for "/pois": the named landmarks of your current zone, nearest
+  // first, each with its distance in yards. Reads only the static ZoneDef.pois
+  // (the same labels the HUD pins on the map) and your live position — no new
+  // fields.
+  private poisReadout(self: Entity): string {
+    const zone = zoneAt(self.pos.z);
+    if (zone.pois.length === 0) return `${zone.name} has no notable landmarks.`;
+    const parts = zone.pois
+      .map((p) => ({ label: p.label, d: dist2d(self.pos, { x: p.x, y: 0, z: p.z }) }))
+      .sort((a, b) => a.d - b.d)
+      .map((p) => `${p.label} (${Math.round(p.d)}yd)`);
+    return `Landmarks in ${zone.name} (${parts.length}): ${parts.join(', ')}.`;
   }
 
   private error(pid: number, text: string): void {
