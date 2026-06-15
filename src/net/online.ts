@@ -346,6 +346,11 @@ export class ClientWorld implements IWorld {
     }
     if (msg.t === 'error') {
       this.connected = false;
+      // Disarm the close handler and input timer the same way close() does,
+      // so the imminent socket close can't fire onDisconnect a second time and
+      // overwrite this rejection reason with a generic "connection lost".
+      clearInterval(this.sendTimer);
+      this.ws.onclose = null;
       this.onDisconnect?.(msg.error ?? 'rejected by server');
       return;
     }

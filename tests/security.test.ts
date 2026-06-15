@@ -3,7 +3,7 @@ import { rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { buildWebSocketAuthMessage, buildWebSocketUrl } from '../src/net/online';
+import { buildWebSocketAuthMessage, buildWebSocketUrl, ClientWorld } from '../src/net/online';
 import { Sim } from '../src/sim/sim';
 import { normalizeCharName, offensiveName, offensiveUsername, validCharName, validUsername } from '../server/auth';
 import { rateLimited, requestIp, authThrottled, recordAuthFailure, clearAuthFailures } from '../server/ratelimit';
@@ -166,6 +166,30 @@ describe('per-account failed-login throttle (#93)', () => {
     for (let i = 0; i < 10; i++) recordAuthFailure('account_a');
     expect(authThrottled('account_a')).toBe(true);
     expect(authThrottled('account_b')).toBe(false);
+  });
+});
+
+describe('server-rejected connections disconnect exactly once', () => {
+  // Regression: when the server sends an {t:'error'} frame and then closes the
+  // socket, the error branch must disarm ws.onclose (and stop the input timer)
+  // the way close() does. Otherwise onDisconnect fires twice — and the second
+  // call clobbers the real rejection reason with a generic "connection lost".
+  it('handles an error frame without letting onclose re-fire onDisconnect', () => {
+    const c: any = Object.create(ClientWorld.prototype);
+    c.connected = true;
+    c.sendTimer = setInterval(() => {}, 1000) as unknown as number;
+    const reasons: string[] = [];
+    c.onDisconnect = (reason: string) => reasons.push(reason);
+    // stand-in socket whose onclose would also report a (generic) reason
+    c.ws = { onclose: () => reasons.push('Connection to the server was lost.') };
+
+    (c as ClientWorld as any).onMessage(JSON.stringify({ t: 'error', error: 'rejected by server' }));
+
+    // close handler disarmed, so even if the socket now closes it cannot re-fire
+    expect(c.ws.onclose).toBe(null);
+    if (typeof c.ws.onclose === 'function') c.ws.onclose();
+    expect(reasons).toEqual(['rejected by server']);
+    expect(c.connected).toBe(false);
   });
 });
 
