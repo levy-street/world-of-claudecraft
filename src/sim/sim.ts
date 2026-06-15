@@ -3549,6 +3549,12 @@ export class Sim {
       return null;
     }
 
+    // "/consumable" — self-only readout of active food/drink regen
+    if (/^\/(consumable|consumables|eat|drink)(?:\s|$)/i.test(raw)) {
+      this.error(r.meta.entityId, this.consumableReadout(r.e));
+      return null;
+    }
+
     // "/w name message" — private whisper to an online player
     const wm = /^\/(?:w|whisper|t|tell)\s+(\S+)\s+([\s\S]+)$/i.exec(raw);
     if (wm) {
@@ -4849,6 +4855,25 @@ export class Sim {
 
   private error(pid: number, text: string): void {
     this.emit({ type: 'error', text, pid });
+  }
+
+  // Self-only readout of what the player is currently eating/drinking. Food and
+  // drink occupy separate slots and tick concurrently, each on its own remaining
+  // timer, so both are reported with their own restore rate and time left.
+  private consumableReadout(e: Entity): string {
+    const parts: string[] = [];
+    for (const c of [e.eating, e.drinking]) {
+      if (!c) continue;
+      const name = ITEMS[c.itemId]?.name ?? c.itemId;
+      const restores: string[] = [];
+      if (c.hpPer2s > 0) restores.push(`+${c.hpPer2s} HP/2s`);
+      if (c.manaPer2s > 0) restores.push(`+${c.manaPer2s} mana/2s`);
+      restores.push(`${Math.ceil(c.remaining)}s left`);
+      const verb = c.kind === 'food' ? 'eating' : 'drinking';
+      parts.push(`${verb} ${name} (${restores.join(', ')})`);
+    }
+    if (parts.length === 0) return 'You are not eating or drinking.';
+    return `You are ${parts.join(' and ')}.`;
   }
 }
 
