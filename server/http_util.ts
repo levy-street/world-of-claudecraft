@@ -6,6 +6,16 @@ export function json(res: http.ServerResponse, status: number, body: unknown): v
   res.end(data);
 }
 
+// A Postgres unique-constraint violation (SQLSTATE 23505). The REST layer maps
+// this to 409 Conflict: the pre-insert existence check (e.g. findAccount) is
+// inherently TOCTOU, so the UNIQUE index is the real guard. When a racing
+// request wins the insert, this lets us return "already taken" instead of a
+// generic 500. The message fallback covers driver/test errors without a code.
+export function isUniqueViolation(err: unknown): boolean {
+  const e = err as { code?: unknown; message?: unknown } | null;
+  return e?.code === '23505' || (typeof e?.message === 'string' && e.message.includes('unique'));
+}
+
 export function readBody(req: http.IncomingMessage): Promise<any> {
   return new Promise((resolve, reject) => {
     let data = '';

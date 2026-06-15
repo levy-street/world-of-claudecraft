@@ -13,7 +13,7 @@ import { resolveReportTarget } from './report_target';
 import {
   hashPassword, verifyPassword, newToken, validUsernameShape, offensiveName, validPassword, normalizeCharName,
 } from './auth';
-import { json, readBody } from './http_util';
+import { json, readBody, isUniqueViolation } from './http_util';
 import { rateLimited, authThrottled, recordAuthFailure, clearAuthFailures } from './ratelimit';
 import { handleAdminApi } from './admin';
 import { GameServer } from './game';
@@ -154,7 +154,16 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       if (!validPassword(body.password)) return json(res, 400, { error: 'password must be at least 6 chars' });
       const existing = await findAccount(body.username);
       if (existing) return json(res, 409, { error: 'username already taken' });
-      const account = await createAccount(body.username, await hashPassword(body.password));
+      let account;
+      try {
+        account = await createAccount(body.username, await hashPassword(body.password));
+      } catch (err: any) {
+        // a concurrent registration can win the insert after our findAccount
+        // check; the username UNIQUE index is the real guard. Surface it as a
+        // 409 like the duplicate path above, not a generic 500.
+        if (isUniqueViolation(err)) return json(res, 409, { error: 'username already taken' });
+        throw err;
+      }
       const token = newToken();
       await saveToken(token, account.id);
       return json(res, 200, { token, username: account.username });
@@ -207,9 +216,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           const c = await createCharacter(accountId, name, body.class);
           return json(res, 200, { id: c.id, name: c.name, class: c.class, level: c.level, forceRename: c.force_rename });
         } catch (err: any) {
-          if (String(err?.message).includes('unique') || err?.code === '23505') {
-            return json(res, 409, { error: 'that name is taken' });
-          }
+          if (isUniqueViolation(err)) return json(res, 409, { error: 'that name is taken' });
           throw err;
         }
       }
@@ -228,9 +235,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         if (!c) return json(res, 404, { error: 'character not found' });
         return json(res, 200, { id: c.id, name: c.name, class: c.class, level: c.level, forceRename: c.force_rename });
       } catch (err: any) {
-        if (String(err?.message).includes('unique') || err?.code === '23505') {
-          return json(res, 409, { error: 'that name is taken' });
-        }
+        if (isUniqueViolation(err)) return json(res, 409, { error: 'that name is taken' });
         throw err;
       }
     }
