@@ -340,6 +340,18 @@ describe('dungeon instance placement and targetability', () => {
   });
 });
 
+describe('mob stat scaling', () => {
+  it('scales armor from level 1 like hp and damage, not one level ahead', () => {
+    const template = MOBS['gray_wolf'] ?? Object.values(MOBS)[0];
+    const lvl1 = createMob(910001, template, 1, { x: 0, y: 0, z: 0 });
+    const lvl10 = createMob(910010, template, 10, { x: 0, y: 0, z: 0 });
+    // A level-1 mob has no level-scaled armor (no armorBase in the template).
+    expect(lvl1.stats.armor).toBe(0);
+    // Each level adds exactly armorPerLevel, matching the (level - 1) convention.
+    expect(lvl10.stats.armor).toBe(Math.round(template.armorPerLevel * 9));
+  });
+});
+
 describe('boss loot and encounter resets', () => {
   it('boss roll groups drop at most one item from each exclusive table', () => {
     const sim = makeSim();

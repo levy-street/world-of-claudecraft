@@ -158,7 +158,9 @@ export function createMob(id: number, template: MobTemplate, level: number, pos:
   e.hp = e.maxHp;
   const dmg = (template.dmgBase + template.dmgPerLevel * (level - 1)) * dmgMult;
   e.weapon = { min: Math.round(dmg * 0.8), max: Math.round(dmg * 1.25), speed: template.attackSpeed };
-  e.stats.armor = Math.round(template.armorPerLevel * level);
+  // Armor scales from level 1 like hp/dmg above: a template has no armorBase,
+  // so a level-1 mob gets 0 and each level adds armorPerLevel.
+  e.stats.armor = Math.round(template.armorPerLevel * (level - 1));
   e.moveSpeed = template.moveSpeed;
   e.scale = template.scale;
   e.color = template.color;
