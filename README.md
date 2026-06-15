@@ -269,6 +269,11 @@ tests/        vitest suite
 scripts/      browser E2E + screenshot tour + multiplayer integration tests
 ```
 
+For agents and multiplayer scripts, see
+[docs/agent-observable-state.md](docs/agent-observable-state.md) for the
+online/offline observable state contract, including combat aggro and threat
+fields.
+
 Names, quests and the zones are original; formulas and mechanics follow
 vanilla. World seed is fixed in `src/main.ts` so the world is the same place
 every visit.
