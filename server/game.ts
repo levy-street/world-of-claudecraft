@@ -935,6 +935,16 @@ export class GameServer {
       }
       case 'respec': sim.respec(pid); break;
       case 'setSpec': sim.setSpec(typeof msg.spec === 'string' ? msg.spec : null, pid); break;
+
+      // Professions & secondary skills — learn/craft validated inside the Sim.
+      case 'learnProfession':
+        if (typeof msg.prof === 'string' && (msg.tier === 'apprentice' || msg.tier === 'journeyman')) {
+          sim.learnProfession(msg.prof, msg.tier, pid);
+        }
+        break;
+      case 'craft':
+        if (typeof msg.recipe === 'string') sim.craft(msg.recipe, pid);
+        break;
       case 'saveLoadout': {
         const a = msg.alloc;
         const alloc = a && typeof a === 'object'
@@ -1178,6 +1188,9 @@ export class GameServer {
     // talents/spec/loadouts ride the wire only when they change (PR-5: never
     // every snapshot). The client recomputes its known abilities from this.
     maybe('tal', { alloc: meta.talents, spec: meta.talentMods.spec, role: meta.talentMods.role, loadouts: meta.loadouts, activeLoadout: meta.activeLoadout });
+    // professions/secondary skills ride the wire only when they change
+    maybe('skills', meta.professionSkills);
+    maybe('profTiers', meta.professionTiers);
     return extra === '' ? json : json.slice(0, -1) + extra + '}';
   }
 

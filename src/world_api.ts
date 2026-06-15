@@ -298,4 +298,10 @@ export interface IWorld {
   saveLoadout(name: string, bar: (string | null)[], alloc?: TalentAllocation): void;
   switchLoadout(index: number): void;
   deleteLoadout(index: number): void;
+  // Professions & secondary skills. Server-authoritative: the client reads these
+  // mirrored values and sends learn/craft intents (validated server-side).
+  professionSkills: Record<string, number>;
+  professionTiers: Record<string, string>;
+  learnProfession(profId: string, tier: string): void;
+  craft(recipeId: string): void;
 }

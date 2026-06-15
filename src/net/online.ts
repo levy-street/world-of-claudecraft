@@ -246,6 +246,9 @@ export class ClientWorld implements IWorld {
   talentRole: Role | null = null;
   loadouts: SavedLoadout[] = [];
   activeLoadout = -1;
+  // Professions & secondary skills, mirrored from snapshot self (sent on change).
+  professionSkills: Record<string, number> = {};
+  professionTiers: Record<string, string> = {};
   questLog = new Map<string, QuestProgress>();
   questsDone = new Set<string>();
   partyInfo: PartyInfo | null = null;
@@ -670,6 +673,9 @@ export class ClientWorld implements IWorld {
       }
       const talents = this.talents ?? (this.talents = emptyAllocation());
       this.known = abilitiesKnownAt(this.cfg.playerClass, e.level, computeTalentModifiers(this.cfg.playerClass, talents));
+      // professions (sent on change); delta-guarded so a missing field keeps state
+      if (s.skills !== undefined) this.professionSkills = s.skills ?? {};
+      if (s.profTiers !== undefined) this.professionTiers = s.profTiers ?? {};
       if (s.party !== undefined) this.partyInfo = s.party;
       if (s.marks !== undefined) this.markers = s.marks ?? {}; // null = cleared (no party/disband)
       if (s.trade !== undefined) this.tradeInfo = s.trade;
@@ -770,6 +776,12 @@ export class ClientWorld implements IWorld {
   }
   useItem(itemId: string): void {
     this.cmd({ cmd: 'use', item: itemId });
+  }
+  learnProfession(profId: string, tier: string): void {
+    this.cmd({ cmd: 'learnProfession', prof: profId, tier });
+  }
+  craft(recipeId: string): void {
+    this.cmd({ cmd: 'craft', recipe: recipeId });
   }
   discardItem(itemId: string, count?: number): void {
     this.cmd({ cmd: 'discard', item: itemId, count });
