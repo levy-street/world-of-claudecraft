@@ -648,6 +648,7 @@ export class Hud {
         : 1 - p.castRemaining / Math.max(0.01, p.castTotal);
       (cb.querySelector('.fill') as HTMLElement).style.width = `${(frac * 100).toFixed(1)}%`;
       (cb.querySelector('.label') as HTMLElement).textContent = castDisplayName(p.castingAbility);
+      (cb.querySelector('.timer') as HTMLElement).textContent = `${Math.max(0, p.castRemaining).toFixed(1)}`;
     } else if (p.eating || p.drinking) {
       cb.style.display = 'block';
       cb.classList.add('channel');
@@ -657,11 +658,13 @@ export class Hud {
       (cb.querySelector('.fill') as HTMLElement).style.width = `${((c.remaining / CONSUME_DURATION) * 100).toFixed(1)}%`;
       (cb.querySelector('.label') as HTMLElement).textContent =
         p.eating && p.drinking ? 'Eating & Drinking…' : p.eating ? 'Eating…' : 'Drinking…';
+      (cb.querySelector('.timer') as HTMLElement).textContent = `${Math.max(0, c.remaining).toFixed(1)}`;
     } else {
       cb.style.display = 'none';
       cb.classList.remove('channel');
       (cb.querySelector('.fill') as HTMLElement).style.width = '0%';
       (cb.querySelector('.label') as HTMLElement).textContent = '';
+      (cb.querySelector('.timer') as HTMLElement).textContent = '';
     }
 
     // action bar

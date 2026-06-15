@@ -324,6 +324,8 @@
   #castbar.channel .fill { background: linear-gradient(#8ad4ff, #1a74c9 60%, #125a9a); }
   #castbar .label { position: absolute; inset: 0; text-align: center; font-size: 12px; line-height: 21px;
     color: #fff; text-shadow: 1px 1px 2px #000; font-family: var(--title-font); }
+  #castbar .timer { position: absolute; top: 0; right: 6px; line-height: 21px; font-size: 11px;
+    color: #fff; text-shadow: 1px 1px 2px #000; font-family: var(--title-font); font-variant-numeric: tabular-nums; }
 
   /* ---------- bottom cluster ---------- */
   #bottom-bar { position: absolute; left: 50%; transform: translateX(-50%); bottom: 6px; text-align: center; }
@@ -3278,7 +3280,7 @@
     <div id="prompt-stack"></div>
     <div id="trade-window" class="window panel"></div>
 
-    <div id="castbar"><div class="fill"></div><div class="label"></div></div>
+    <div id="castbar"><div class="fill"></div><div class="label"></div><div class="timer"></div></div>
 
     <div id="minimap-wrap">
       <div id="zone-label">Eastbrook Vale</div>
