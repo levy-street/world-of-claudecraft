@@ -19,7 +19,7 @@ export type UiIconName =
   | 'map' | 'leaderboard' | 'character' | 'social' | 'attack' | 'market'
   | 'chat' | 'interact'
   // hand-authored geometrics
-  | 'close' | 'prev' | 'next' | 'more' | 'meters'
+  | 'close' | 'prev' | 'next' | 'more' | 'meters' | 'nameplates'
   | 'whisper' | 'music' | 'talents' | 'skull';
 
 // Inner SVG markup per icon (one or more <path>). Default fill rule is nonzero
@@ -48,6 +48,7 @@ const ICONS: Record<UiIconName, string> = {
   next: '<path d="M176 96 376 256 176 416Z"/>',
   more: '<path d="M94 256a34 34 0 1 0 68 0 34 34 0 1 0-68 0M222 256a34 34 0 1 0 68 0 34 34 0 1 0-68 0M350 256a34 34 0 1 0 68 0 34 34 0 1 0-68 0Z"/>',
   meters: '<path d="M84 288h72v152H84zM220 184h72v256h-72zM356 96h72v344h-72z"/>',
+  nameplates: '<path d="M56 120h400v84H56zM56 236h400v52H56zM200 312h112v40H200z"/>',
   whisper: '<path fill-rule="evenodd" d="M48 112h416a16 16 0 0 1 16 16v256a16 16 0 0 1-16 16H48a16 16 0 0 1-16-16V128a16 16 0 0 1 16-16zM72 152 256 292 440 152z"/>',
   music: '<path d="M158 374a54 54 0 1 0 108 0 54 54 0 1 0-108 0M260 128h22v246h-22zM282 122c46 16 70 58 46 98 12-32-6-62-46-74z"/>',
   talents: '<path d="M256 138v104M256 242l-96 86M256 242l96 86" stroke="currentColor" stroke-width="28" fill="none" stroke-linecap="round"/><circle cx="256" cy="116" r="44"/><circle cx="150" cy="352" r="44"/><circle cx="362" cy="352" r="44"/>',
