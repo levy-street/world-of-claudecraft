@@ -243,6 +243,16 @@ describe('ignore / block', () => {
     await h.svc.blockAdd(h.actor(1), 'Aleph');
     expect(h.tx.errorsFor(1).join()).toMatch(/yourself/i);
   });
+
+  it('refuses to friend a player you are ignoring', async () => {
+    await h.svc.blockAdd(h.actor(1), 'Bet');
+    h.tx.clear();
+    await h.svc.friendAdd(h.actor(1), 'Bet');
+    expect(h.tx.errorsFor(1).join()).toMatch(/ignoring/i);
+    const snap = await h.svc.snapshot(1);
+    expect(snap.friends).toHaveLength(0);
+    expect(snap.blocks.map((b) => b.name)).toEqual(['Bet']);
+  });
 });
 
 describe('guilds', () => {

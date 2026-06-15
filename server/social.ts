@@ -204,6 +204,14 @@ export class SocialService {
     const target = await this.resolveTarget(actor, name);
     if (!target) return;
     if (target.id === actor.characterId) { this.err(actor.characterId, 'You cannot befriend yourself.'); return; }
+    // friends and ignore are mutually exclusive — blockAdd drops an ignored
+    // player from your friends, so friendAdd must refuse the reverse, or a
+    // player could end up both ignored and friended at once.
+    const blocks = await this.db.listBlocks(actor.characterId);
+    if (blocks.some((b) => b.id === target.id)) {
+      this.err(actor.characterId, `You are ignoring ${target.name}. Remove them from your ignore list first.`);
+      return;
+    }
     const friends = await this.db.listFriends(actor.characterId);
     if (friends.some((f) => f.id === target.id)) { this.err(actor.characterId, `${target.name} is already your friend.`); return; }
     if (friends.length >= FRIEND_LIMIT) { this.err(actor.characterId, 'Your friends list is full.'); return; }
