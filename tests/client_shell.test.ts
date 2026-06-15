@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
-const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
 
 function splitGameUiTemplate(): { templateHtml: string; liveHtml: string } {
   const marker = '<template id="game-ui-template">';

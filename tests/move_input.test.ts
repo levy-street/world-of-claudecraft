@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { Input } from '../src/game/input';
 import { Keybinds } from '../src/game/keybinds';
 import { ClientWorld } from '../src/net/online';
+import { predictPlayerMovement } from '../src/net/prediction';
+import { Sim } from '../src/sim/sim';
+import { DT } from '../src/sim/types';
 import { normalizeMoveFacing, parseMoveInputFrame, sanitizeMoveInput } from '../src/sim/move_input';
 
 describe('movement input sanitizing', () => {
@@ -123,5 +126,54 @@ describe('agent movement channel', () => {
     client.setMouselookFacing(Math.PI * 401);
 
     expect(client.mouselookFacing).toBeCloseTo(Math.PI);
+  });
+});
+
+describe('online movement prediction', () => {
+  it('moves the local render pose immediately from sanitized input', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior' });
+    const p = sim.player;
+    const pos = { ...p.pos };
+
+    predictPlayerMovement(sim.cfg.seed, p, pos, 0, {
+      forward: true,
+      back: false,
+      turnLeft: false,
+      turnRight: false,
+      strafeLeft: false,
+      strafeRight: false,
+      jump: false,
+    }, DT);
+
+    expect(pos.z).toBeGreaterThan(p.pos.z);
+    expect(pos.z - p.pos.z).toBeCloseTo(7 * DT, 1);
+  });
+
+  it('lets ClientWorld predict self without waiting for another snapshot', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior' });
+    const client: any = Object.create(ClientWorld.prototype);
+    client.cfg = { seed: sim.cfg.seed, playerClass: 'warrior' };
+    client.playerId = sim.player.id;
+    client.entities = new Map([[sim.player.id, structuredClone(sim.player)]]);
+    client.moveInput = {
+      forward: true,
+      back: false,
+      turnLeft: false,
+      turnRight: false,
+      strafeLeft: false,
+      strafeRight: false,
+      jump: false,
+    };
+    client.mouselookFacing = null;
+    client.selfAuthPos = { ...sim.player.pos };
+    client.selfAuthFacing = sim.player.facing;
+    client.selfRenderPos = { ...sim.player.pos };
+    client.selfRenderFacing = sim.player.facing;
+
+    client.predictSelf(DT);
+
+    const predicted = client.entities.get(sim.player.id);
+    expect(predicted.pos.z).toBeGreaterThan(sim.player.pos.z);
+    expect(predicted.prevPos.z).toBe(predicted.pos.z);
   });
 });
