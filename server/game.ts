@@ -1,12 +1,13 @@
 import { readFileSync } from 'node:fs';
 import type { WebSocket } from 'ws';
 import { Sim } from '../src/sim/sim';
-import type { PlayerMeta } from '../src/sim/sim';
+import type { EconomyMutation, MarketSave, PlayerMeta } from '../src/sim/sim';
 import { DT, Entity, SimEvent, dist2d } from '../src/sim/types';
 import { parseMoveInputFrame } from '../src/sim/move_input';
 import { stealthDetectionRadius, threatEntries } from '../src/sim/threat';
 import { zoneAt, DUNGEONS } from '../src/sim/data';
-import { saveCharacterState, openPlaySession, closePlaySession, insertChatLogs, pool, loadMarketState, saveMarketState } from './db';
+import { saveCharacterState, saveEconomyState, openPlaySession, closePlaySession, insertChatLogs, pool, loadMarketState, saveMarketState } from './db';
+import type { CharacterStateWrite } from './db';
 import { ChatLogger } from './chat_log';
 import { SocialService } from './social';
 import type { Presence, PresenceStatus, SocialActor, SocialEvent, SocialTransport } from './social';
@@ -296,6 +297,9 @@ export class GameServer {
   sim: Sim;
   clients = new Map<number, ClientSession>(); // by pid
   private readonly sessionsByCharacterId = new Map<number, ClientSession>();
+  private readonly characterSaveQueues = new Map<number, Promise<void>>();
+  private marketSaveQueue: Promise<void> = Promise.resolve();
+  private economySaveQueue: Promise<void> = Promise.resolve();
   readonly chatLog = new ChatLogger(insertChatLogs);
   private readonly socialDb = new PgSocialDb(pool);
   readonly social: SocialService;
@@ -488,10 +492,31 @@ export class GameServer {
   async saveCharacter(session: ClientSession): Promise<void> {
     const state = this.sim.serializeCharacter(session.pid);
     const e = this.sim.entities.get(session.pid);
+    const characterId = session.characterId;
     if (state && e) {
-      await saveCharacterState(session.characterId, e.level, state);
-      session.lastSave = Date.now();
+      const level = e.level;
+      await this.enqueueCharacterSave(characterId, async () => {
+        await saveCharacterState(characterId, level, state);
+        session.lastSave = Date.now();
+      });
     }
+  }
+
+  private enqueueCharacterSave(characterId: number, task: () => Promise<void>): Promise<void> {
+    const prior = this.characterSaveQueues.get(characterId) ?? Promise.resolve();
+    const current = prior.then(task);
+    const tail = current
+      .catch((err) => console.error(`character save failed for ${characterId}:`, err))
+      .then(() => undefined);
+    this.trackCharacterSaveTail(characterId, tail);
+    return tail;
+  }
+
+  private trackCharacterSaveTail(characterId: number, tail: Promise<void>): void {
+    this.characterSaveQueues.set(characterId, tail);
+    void tail.finally(() => {
+      if (this.characterSaveQueues.get(characterId) === tail) this.characterSaveQueues.delete(characterId);
+    });
   }
 
   async saveAll(reason: string): Promise<void> {
@@ -532,11 +557,54 @@ export class GameServer {
   }
 
   async saveMarket(): Promise<void> {
-    try {
-      await saveMarketState(this.sim.serializeMarket());
-    } catch (err) {
-      console.error('failed to save world market:', err);
+    const save = this.sim.serializeMarket();
+    await this.enqueueMarketSave(async () => {
+      await saveMarketState(save);
+    });
+  }
+
+  private enqueueMarketSave(task: () => Promise<void>): Promise<void> {
+    const current = this.marketSaveQueue.then(task);
+    this.marketSaveQueue = current
+      .catch((err) => console.error('failed to save world market:', err))
+      .then(() => undefined);
+    return this.marketSaveQueue;
+  }
+
+  private persistEconomyMutation(mutation: EconomyMutation | null): void {
+    if (!mutation) return;
+    const characters: CharacterStateWrite[] = [];
+    const seenCharacterIds = new Set<number>();
+    for (const pid of mutation.characterPids) {
+      const session = this.clients.get(pid);
+      const entity = this.sim.entities.get(pid);
+      const state = this.sim.serializeCharacter(pid);
+      if (!session || !entity || !state || seenCharacterIds.has(session.characterId)) continue;
+      seenCharacterIds.add(session.characterId);
+      characters.push({ characterId: session.characterId, level: entity.level, state });
     }
+    const market = mutation.marketChanged ? this.sim.serializeMarket() : null;
+    if (characters.length === 0 && market === null) return;
+    void this.enqueueEconomySave(
+      characters.map((c) => c.characterId),
+      market,
+      async () => saveEconomyState(characters, market),
+    );
+  }
+
+  private enqueueEconomySave(characterIds: number[], market: MarketSave | null, task: () => Promise<void>): Promise<void> {
+    const ids = [...new Set(characterIds)].sort((a, b) => a - b);
+    const waits = ids.map((id) => this.characterSaveQueues.get(id) ?? Promise.resolve());
+    if (market !== null) waits.push(this.marketSaveQueue);
+    waits.push(this.economySaveQueue);
+    const current = Promise.all(waits).then(task);
+    const tail = current
+      .catch((err) => console.error('failed to save economy transfer:', err))
+      .then(() => undefined);
+    this.economySaveQueue = tail;
+    for (const id of ids) this.trackCharacterSaveTail(id, tail);
+    if (market !== null) this.marketSaveQueue = tail;
+    return tail;
   }
 
   // Close every open play_sessions row; called on graceful shutdown so the
@@ -640,6 +708,7 @@ export class GameServer {
     if (typeof msg !== 'object' || msg === null || Array.isArray(msg)) return;
     const sim = this.sim;
     const pid = session.pid;
+    if (this.clients.get(pid) !== session) return;
     if (msg.t === 'input') {
       const meta = sim.meta(pid);
       const e = sim.entities.get(pid);
@@ -734,7 +803,15 @@ export class GameServer {
       case 'trade_offer':
         if (Array.isArray(msg.items)) sim.tradeSetOffer(msg.items, Number(msg.copper) || 0, pid);
         break;
-      case 'trade_confirm': sim.tradeConfirm(pid); break;
+      case 'trade_confirm': {
+        const trade = sim.tradeFor(pid);
+        if (trade && (!this.clients.has(trade.a) || !this.clients.has(trade.b))) {
+          sim.tradeCancel(pid);
+          break;
+        }
+        this.persistEconomyMutation(sim.tradeConfirm(pid));
+        break;
+      }
       case 'trade_cancel': sim.tradeCancel(pid); break;
       // duels
       case 'duel_req': if (typeof msg.id === 'number') sim.duelRequest(msg.id, pid); break;
@@ -762,12 +839,12 @@ export class GameServer {
       // World Market (the Merchant's auction house)
       case 'market_list':
         if (typeof msg.item === 'string' && typeof msg.count === 'number' && typeof msg.price === 'number') {
-          sim.marketList(msg.item, msg.count, msg.price, pid);
+          this.persistEconomyMutation(sim.marketList(msg.item, msg.count, msg.price, pid));
         }
         break;
-      case 'market_buy': if (typeof msg.id === 'number') sim.marketBuy(msg.id, pid); break;
-      case 'market_cancel': if (typeof msg.id === 'number') sim.marketCancel(msg.id, pid); break;
-      case 'market_collect': sim.marketCollect(pid); break;
+      case 'market_buy': if (typeof msg.id === 'number') this.persistEconomyMutation(sim.marketBuy(msg.id, pid)); break;
+      case 'market_cancel': if (typeof msg.id === 'number') this.persistEconomyMutation(sim.marketCancel(msg.id, pid)); break;
+      case 'market_collect': this.persistEconomyMutation(sim.marketCollect(pid)); break;
       // dev/ops commands, only when ALLOW_DEV_COMMANDS=1 (never in production)
       case 'dev_level': {
         if (process.env.ALLOW_DEV_COMMANDS === '1' && typeof msg.level === 'number') {

@@ -319,6 +319,38 @@ export async function saveCharacterState(characterId: number, level: number, sta
   );
 }
 
+export interface CharacterStateWrite {
+  characterId: number;
+  level: number;
+  state: CharacterState;
+}
+
+export async function saveEconomyState(characters: CharacterStateWrite[], market: MarketSave | null): Promise<void> {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    for (const character of characters) {
+      await client.query(
+        'UPDATE characters SET level = $2, state = $3, updated_at = now() WHERE id = $1',
+        [character.characterId, character.level, JSON.stringify(character.state)],
+      );
+    }
+    if (market !== null) {
+      await client.query(
+        `INSERT INTO world_state (key, data, updated_at) VALUES ($1, $2, now())
+         ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
+        ['market', JSON.stringify(market)],
+      );
+    }
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
 export async function isAdminAccount(accountId: number): Promise<boolean> {
   const res = await pool.query('SELECT is_admin FROM accounts WHERE id = $1', [accountId]);
   return res.rows[0]?.is_admin === true;
