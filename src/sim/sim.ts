@@ -3596,6 +3596,14 @@ export class Sim {
       return { channel: 'general', message: clean };
     }
 
+    // "/stats" (aliases "/st", "/sheet") — self-only character sheet readout.
+    // Reads only live entity state, returns null so it is neither logged nor
+    // spoken, and works online for free (no server interceptor).
+    if (/^\/(?:stats|st|sheet)(?:\s|$)/i.test(raw)) {
+      this.error(r.meta.entityId, this.statsReadout(r.meta, r.e));
+      return null;
+    }
+
     // bare text and "/s" are local say; "/y" carries further — both are
     // delivered per-player by range and carry the speaker for chat bubbles
     let channel: 'say' | 'yell' = 'say';
@@ -4845,6 +4853,20 @@ export class Sim {
       if (Math.abs(pos.x - origin.x) < 120 && Math.abs(pos.z - origin.z) < 250) return inst.slot;
     }
     return null;
+  }
+
+  // Builds the self-only "/stats" readout line from live entity state. The
+  // resource clause is dropped for classes whose resourceType is null.
+  private statsReadout(meta: PlayerMeta, e: Entity): string {
+    const className = CLASSES[meta.cls].name;
+    const crit = (e.critChance * 100).toFixed(1);
+    let line = `Level ${e.level} ${className} — HP ${Math.round(e.hp)}/${Math.round(e.maxHp)}`;
+    if (e.resourceType) {
+      const res = e.resourceType.charAt(0).toUpperCase() + e.resourceType.slice(1);
+      line += `, ${res} ${Math.round(e.resource)}/${Math.round(e.maxResource)}`;
+    }
+    line += `. AP ${Math.round(e.attackPower)}, Crit ${crit}%, Armor ${Math.round(e.stats.armor)}.`;
+    return line;
   }
 
   private error(pid: number, text: string): void {
