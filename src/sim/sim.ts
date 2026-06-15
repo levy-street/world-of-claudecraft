@@ -3549,6 +3549,15 @@ export class Sim {
       return null;
     }
 
+    // "/consider" (aliases /con, /difficulty) — self-only readout sizing up your
+    // current target's level relative to yours, with a difficulty verdict. Self-
+    // only error reply, returns null so it is neither logged nor spoken; works
+    // online for free (no server interceptor).
+    if (/^\/(?:consider|con|difficulty)(?:\s|$)/i.test(raw)) {
+      this.error(r.meta.entityId, this.considerReadout(r.e));
+      return null;
+    }
+
     // "/w name message" — private whisper to an online player
     const wm = /^\/(?:w|whisper|t|tell)\s+(\S+)\s+([\s\S]+)$/i.exec(raw);
     if (wm) {
@@ -4845,6 +4854,26 @@ export class Sim {
       if (Math.abs(pos.x - origin.x) < 120 && Math.abs(pos.z - origin.z) < 250) return inst.slot;
     }
     return null;
+  }
+
+  // Readout for "/consider": sizes up the current target's level versus yours.
+  // The verdict bands track the real combat model — meleeMissChance (types.ts)
+  // applies a sharp miss penalty once the target is 3+ levels above you (its
+  // `diff > 2` cliff), and dodge/crit also scale with the level gap — so a
+  // target 3+ levels up is flagged as a steep step beyond a merely tough one.
+  // Reads only the live target Entity.level versus your own (no new fields).
+  private considerReadout(self: Entity): string {
+    const t = self.targetId !== null ? this.entities.get(self.targetId) : undefined;
+    if (!t) return 'You have no target to consider.';
+    const diff = t.level - self.level;
+    let verdict: string;
+    if (diff >= 5) verdict = 'an overwhelming fight';
+    else if (diff >= 3) verdict = 'a daunting fight';
+    else if (diff >= 1) verdict = 'a tough fight';
+    else if (diff === 0) verdict = 'an even fight';
+    else if (diff >= -2) verdict = 'a manageable fight';
+    else verdict = 'an easy fight';
+    return `${t.name} is level ${t.level} — ${verdict} for you (level ${self.level}).`;
   }
 
   private error(pid: number, text: string): void {
