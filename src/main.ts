@@ -1557,6 +1557,149 @@ async function loadProjectStats(): Promise<void> {
   }
 }
 
+// ---------------------------------------------------------------------------
+// High Scores leaderboard (homepage view). Fetches the realm's top characters
+// by level from /api/leaderboard and renders them into the #highscores-view
+// table. Player names are written via textContent (never innerHTML) so a
+// crafted character name can't inject markup. Offline / no-server falls back to
+// a friendly status message — the leaderboard is an online feature.
+// ---------------------------------------------------------------------------
+
+let leaderboardLoading = false;
+let leaderboardReloadPending = false;
+
+async function loadLeaderboard(): Promise<void> {
+  const statusEl = $('#leaderboard-status');
+  const tableEl = $('#leaderboard-table');
+  const bodyEl = $('#leaderboard-body');
+  const filterEl = $('#leaderboard-class-filter') as HTMLSelectElement | null;
+  if (!statusEl || !tableEl || !bodyEl) return;
+  // If a request is already in flight, mark that the inputs changed and let the
+  // running call re-fetch with the latest filter when it finishes. This keeps
+  // the table from showing stale results for a filter the user already left.
+  if (leaderboardLoading) { leaderboardReloadPending = true; return; }
+  leaderboardLoading = true;
+
+  try {
+    do {
+      leaderboardReloadPending = false;
+      const selected = filterEl?.value || '';
+      const cls = selected ? (selected as PlayerClass) : undefined;
+
+      statusEl.textContent = t('highscores.loading');
+      statusEl.toggleAttribute('hidden', false);
+      tableEl.toggleAttribute('hidden', true);
+
+      try {
+        const { leaders } = await api.leaderboard(cls);
+        // A newer filter arrived while this request was in flight — discard
+        // these results and loop to fetch the current selection instead.
+        if (leaderboardReloadPending) continue;
+        bodyEl.innerHTML = '';
+        if (!leaders.length) {
+          statusEl.textContent = t('highscores.empty');
+          statusEl.toggleAttribute('hidden', false);
+          tableEl.toggleAttribute('hidden', true);
+          continue;
+        }
+        leaders.forEach((row, i) => {
+          const tr = document.createElement('tr');
+          tr.className = 'lb-row';
+
+          const rankTd = document.createElement('td');
+          rankTd.className = 'lb-col-rank';
+          rankTd.textContent = String(i + 1);
+
+          const nameTd = document.createElement('td');
+          nameTd.className = 'lb-col-name';
+          nameTd.textContent = row.name; // player-controlled — keep as text only
+
+          const classTd = document.createElement('td');
+          classTd.className = `lb-col-class class-${row.class}`;
+          classTd.textContent = t(`classes.${row.class}` as Parameters<typeof t>[0]);
+
+          const levelTd = document.createElement('td');
+          levelTd.className = 'lb-col-level';
+          levelTd.textContent = String(row.level);
+
+          tr.append(rankTd, nameTd, classTd, levelTd);
+          bodyEl.appendChild(tr);
+        });
+        statusEl.toggleAttribute('hidden', true);
+        tableEl.toggleAttribute('hidden', false);
+      } catch (err) {
+        console.error('Failed to fetch leaderboard:', err);
+        if (leaderboardReloadPending) continue;
+        statusEl.textContent = t('highscores.error');
+        statusEl.toggleAttribute('hidden', false);
+        tableEl.toggleAttribute('hidden', true);
+      }
+    } while (leaderboardReloadPending);
+  } finally {
+    leaderboardLoading = false;
+  }
+}
+
+// "See where you rank": look up a single character's position on the board by
+// name, even when it's outside the visible top 20. The board is unauthenticated,
+// so the name typed into the input is the identity. The current class filter
+// scopes the ranking pool so "rank" agrees with the table the player is looking
+// at. Result text is built from createElement/textContent (names are untrusted).
+let rankLookupLoading = false;
+
+async function lookupRank(): Promise<void> {
+  const inputEl = $('#leaderboard-rank-input') as HTMLInputElement | null;
+  const resultEl = $('#leaderboard-rank-result');
+  const filterEl = $('#leaderboard-class-filter') as HTMLSelectElement | null;
+  if (!inputEl || !resultEl) return;
+  if (rankLookupLoading) return;
+
+  const character = inputEl.value.trim();
+  if (!character) {
+    resultEl.toggleAttribute('hidden', true);
+    return;
+  }
+  const selected = filterEl?.value || '';
+  const cls = selected ? (selected as PlayerClass) : undefined;
+
+  rankLookupLoading = true;
+  resultEl.textContent = t('highscores.rankLoading');
+  resultEl.toggleAttribute('hidden', false);
+  try {
+    const { rank } = await api.rank(character, cls);
+    // Like the board's stale-filter guard: if the player edited the name or
+    // changed the class filter while this request was in flight, the captured
+    // inputs no longer match the current controls — discard this response so a
+    // stale rank can't render under the new controls.
+    if (inputEl.value.trim() !== character || (filterEl?.value || '') !== selected) return;
+    resultEl.textContent = '';
+    if (!rank) {
+      resultEl.textContent = t('highscores.rankNotFound');
+      return;
+    }
+    // "Ranked #N — Name (Class) · Level L", assembled from nodes so the
+    // player-controlled name is only ever inserted as text.
+    const prefix = document.createElement('span');
+    prefix.textContent = `${t('highscores.rankPrefix')} `;
+
+    const number = document.createElement('span');
+    number.className = 'lb-rank-number';
+    number.textContent = `#${rank.rank}`;
+
+    const details = document.createElement('span');
+    const className = t(`classes.${rank.class}` as Parameters<typeof t>[0]);
+    details.textContent = ` — ${rank.name} (${className}) · ${t('highscores.colLevel')} ${rank.level}`;
+
+    resultEl.append(prefix, number, details);
+  } catch (err) {
+    console.error('Failed to look up rank:', err);
+    resultEl.textContent = t('highscores.rankError');
+    resultEl.toggleAttribute('hidden', false);
+  } finally {
+    rankLookupLoading = false;
+  }
+}
+
 function wireStartScreens(): void {
   // Initial page translation and stats load
   translatePage();
@@ -2095,7 +2238,20 @@ function wireStartScreens(): void {
     show('#mode-select');
   });
 
-  setupNavBtn(navBtnHighscores, '#highscores-view');
+  setupNavBtn(navBtnHighscores, '#highscores-view', () => {
+    switchMainView('#highscores-view');
+    void loadLeaderboard();
+  });
+  const leaderboardFilter = $('#leaderboard-class-filter') as HTMLSelectElement | null;
+  // Clear a previously-rendered rank when the controls change, so a stale rank
+  // can't linger under a new name/filter (the in-flight case is handled by the
+  // capture-and-compare guard inside lookupRank).
+  const clearRankResult = (): void => { $('#leaderboard-rank-result')?.toggleAttribute('hidden', true); };
+  leaderboardFilter?.addEventListener('change', () => { clearRankResult(); void loadLeaderboard(); });
+  const rankForm = $('#leaderboard-rank-form') as HTMLFormElement | null;
+  rankForm?.addEventListener('submit', (e) => { e.preventDefault(); void lookupRank(); });
+  const rankInput = $('#leaderboard-rank-input') as HTMLInputElement | null;
+  rankInput?.addEventListener('input', clearRankResult);
   setupNavBtn(navBtnWiki, '#wiki-view');
   setupNavBtn(navBtnNews, '#news-view');
   setupNavBtn(navBtnDownload, '#download-view');
