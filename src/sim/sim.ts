@@ -3549,6 +3549,12 @@ export class Sim {
       return null;
     }
 
+    // "/overpower" — self-only readout of the warrior Overpower reactive window
+    if (/^\/(?:overpower|op|overpowered)(?:\s|$)/i.test(raw)) {
+      this.error(r.meta.entityId, this.overpowerReadout(r.e, r.meta));
+      return null;
+    }
+
     // "/w name message" — private whisper to an online player
     const wm = /^\/(?:w|whisper|t|tell)\s+(\S+)\s+([\s\S]+)$/i.exec(raw);
     if (wm) {
@@ -4845,6 +4851,18 @@ export class Sim {
       if (Math.abs(pos.x - origin.x) < 120 && Math.abs(pos.z - origin.z) < 250) return inst.slot;
     }
     return null;
+  }
+
+  // Overpower is a warrior reactive: an enemy dodging the player's attack opens
+  // a 5s window (overpowerUntil = time + 5) in which the ability becomes usable.
+  // It is neither an aura nor a normal cooldown, so no other readout exposes it.
+  private overpowerReadout(e: Entity, meta: PlayerMeta): string {
+    if (meta.cls !== 'warrior') return 'Overpower is a warrior ability; your class cannot use it.';
+    const remaining = Math.ceil(e.overpowerUntil - this.time);
+    if (remaining > 0) {
+      return `Overpower is ready — strike within ${remaining}s (an enemy dodged your attack).`;
+    }
+    return 'Overpower is not available. It opens for 5s after an enemy dodges your attack.';
   }
 
   private error(pid: number, text: string): void {
