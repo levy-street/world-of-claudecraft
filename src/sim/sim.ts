@@ -3549,6 +3549,14 @@ export class Sim {
       return null;
     }
 
+    // "/session" — self-only readout of this session's combat tally. Like the
+    // other readouts it emits a private error line and returns null, so it is
+    // never logged or broadcast and works online without a server interceptor.
+    if (/^\/(?:session|sess|sessionstats)(?:\s|$)/i.test(raw)) {
+      this.error(r.meta.entityId, this.sessionReadout(r.meta));
+      return null;
+    }
+
     // "/w name message" — private whisper to an online player
     const wm = /^\/(?:w|whisper|t|tell)\s+(\S+)\s+([\s\S]+)$/i.exec(raw);
     if (wm) {
@@ -4849,6 +4857,19 @@ export class Sim {
 
   private error(pid: number, text: string): void {
     this.emit({ type: 'error', text, pid });
+  }
+
+  // Build the self-only "/session" line from this session's RewardCounters.
+  // Counters are reset each boot (freshCounters), so this is always per-session.
+  // Format kills/deaths first, then a damage clause, then XP — using
+  // toLocaleString('en-US') for thousands separators on the large numbers.
+  private sessionReadout(meta: PlayerMeta): string {
+    const c = meta.counters;
+    const n = (v: number) => v.toLocaleString('en-US');
+    const plural = (v: number, word: string) => `${n(v)} ${word}${v === 1 ? '' : 's'}`;
+    return `Session: ${plural(c.kills, 'kill')}, ${plural(c.deaths, 'death')}. ` +
+      `Damage dealt ${n(c.damageDealt)}, taken ${n(c.damageTaken)}. ` +
+      `XP gained ${n(c.xpGained)}.`;
   }
 }
 
