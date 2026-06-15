@@ -3549,6 +3549,12 @@ export class Sim {
       return null;
     }
 
+    // "/arena" (aliases "/pvp", "/rating") — self-only Ashen Coliseum standing
+    if (/^\/(?:arena|pvp|rating)(?:\s|$)/i.test(raw)) {
+      this.error(r.meta.entityId, this.arenaReadout(r.meta));
+      return null;
+    }
+
     // "/w name message" — private whisper to an online player
     const wm = /^\/(?:w|whisper|t|tell)\s+(\S+)\s+([\s\S]+)$/i.exec(raw);
     if (wm) {
@@ -4845,6 +4851,17 @@ export class Sim {
       if (Math.abs(pos.x - origin.x) < 120 && Math.abs(pos.z - origin.z) < 250) return inst.slot;
     }
     return null;
+  }
+
+  // Self-only readout of a character's Ashen Coliseum standing. Reads only the
+  // persisted PlayerMeta arena fields (no new state). Draws count as neither a
+  // win nor a loss (see resolveArena), so "matches played" is wins + losses.
+  private arenaReadout(meta: PlayerMeta): string {
+    const { arenaRating: rating, arenaWins: wins, arenaLosses: losses } = meta;
+    const played = wins + losses;
+    if (played <= 0) return `Arena: Rating ${rating} — no matches played yet.`;
+    const pct = Math.round((wins / played) * 100);
+    return `Arena: Rating ${rating} — ${wins} wins, ${losses} losses (${pct}% win rate).`;
   }
 
   private error(pid: number, text: string): void {
