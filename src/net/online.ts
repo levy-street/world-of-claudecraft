@@ -165,6 +165,16 @@ export class Api {
     const query = cls ? `?class=${encodeURIComponent(cls)}` : '';
     return this.get(`/api/leaderboard${query}`);
   }
+
+  // Look up one character's position on the high-scores board by name (the
+  // public board is unauthenticated, so the name is the identity). `rank` is
+  // null when no such character exists on the realm (or isn't in the filtered
+  // class pool). An optional class scopes the ranking pool, matching the board.
+  async rank(character: string, cls?: PlayerClass): Promise<{ rank: RankEntry | null; class: PlayerClass | null }> {
+    const params = new URLSearchParams({ character });
+    if (cls) params.set('class', cls);
+    return this.get(`/api/leaderboard/rank?${params.toString()}`);
+  }
 }
 
 export interface LeaderEntry {
@@ -172,6 +182,10 @@ export interface LeaderEntry {
   class: PlayerClass;
   level: number;
   xp: number;
+}
+
+export interface RankEntry extends LeaderEntry {
+  rank: number;
 }
 
 // ---------------------------------------------------------------------------

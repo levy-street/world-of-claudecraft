@@ -399,6 +399,89 @@ export async function topCharacters(limit = 20, cls?: PlayerClass): Promise<Lead
   }));
 }
 
+export interface CharacterRankRow extends LeaderRow {
+  rank: number;
+}
+
+// "See where you rank": look up one character by name and report its position
+// on the same high-scores board, even when it's outside the visible top-20.
+// The board is unauthenticated, so the character is identified by name (the
+// public, in-game identity), case-insensitively — exactly how
+// findCharacterReportTargetByName resolves a name. Rank is computed as the
+// count of characters strictly ahead under the *same* ordering as
+// topCharacters (level DESC, xp DESC, name ASC), plus one. An optional class
+// scopes the ranking pool to that class (so "rank among mages" matches the
+// board's mage filter). Returns null when no such character exists on this
+// realm. Realm-scoped + class-validated like topCharacters; no schema
+// migration (level is a column, xp lives in the state JSONB).
+export async function characterRank(name: string, cls?: PlayerClass): Promise<CharacterRankRow | null> {
+  const term = name.trim();
+  if (!term) return null;
+  const validCls = cls && ALL_CLASSES.includes(cls) ? cls : undefined;
+  // Find the target character first (its level/xp anchor the rank comparison).
+  // If a class filter is active and the character isn't of that class, it isn't
+  // part of that ranking pool, so report it as unranked (null).
+  const params: unknown[] = [REALM, term];
+  let classPredicate = '';
+  if (validCls) {
+    params.push(validCls);
+    classPredicate = `AND class = $${params.length}`;
+  }
+  const found = await pool.query(
+    `SELECT id, name, class, level,
+            COALESCE((state->>'xp')::int, 0) AS xp
+       FROM characters
+      WHERE realm = $1
+        AND lower(name) = lower($2)
+        ${classPredicate}
+      LIMIT 1`,
+    params,
+  );
+  const me = found.rows[0];
+  if (!me) return null;
+  const myLevel = Number(me.level);
+  const myXp = Number(me.xp);
+  // Count everyone strictly ahead of this character under the board's ordering
+  // (level DESC, xp DESC, name ASC). When a class filter is active the pool is
+  // limited to that class, matching topCharacters' filtered board.
+  //
+  // Exclude the target row itself by primary id. Under READ COMMITTED the two
+  // queries see different snapshots, so if the (online) target autosaves a
+  // higher level/xp between the SELECT above and this COUNT, it could otherwise
+  // satisfy `level > $2` / `xp > $3` against its own captured anchor and be
+  // counted as ahead of itself → an intermittent rank+1. `id <> $4` makes the
+  // count immune to the target's own row changing. The name ($5) is still
+  // needed for the legitimate equal-level/equal-xp tiebreak against *other*
+  // characters (board order is name ASC).
+  const aheadParams: unknown[] = [REALM, myLevel, myXp, me.id, me.name];
+  let aheadClassPredicate = '';
+  if (validCls) {
+    aheadParams.push(validCls);
+    aheadClassPredicate = `AND class = $${aheadParams.length}`;
+  }
+  const ahead = await pool.query(
+    `SELECT COUNT(*)::int AS ahead
+       FROM characters
+      WHERE realm = $1
+        AND id <> $4
+        ${aheadClassPredicate}
+        AND (
+          level > $2
+          OR (level = $2 AND COALESCE((state->>'xp')::int, 0) > $3)
+          OR (level = $2 AND COALESCE((state->>'xp')::int, 0) = $3 AND name < $5)
+        )`,
+    aheadParams,
+  );
+  const aheadCount = Number(ahead.rows[0]?.ahead ?? 0);
+  return {
+    name: me.name,
+    class: me.class,
+    level: myLevel,
+    xp: myXp,
+    rank: aheadCount + 1,
+  };
+}
+
 // ---------------------------------------------------------------------------
 // World state: a tiny key→JSONB store for shared, global game state that isn't
 // tied to one character. The World Market (the Merchant's auction house) lives

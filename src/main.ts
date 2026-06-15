@@ -1640,6 +1640,66 @@ async function loadLeaderboard(): Promise<void> {
   }
 }
 
+// "See where you rank": look up a single character's position on the board by
+// name, even when it's outside the visible top 20. The board is unauthenticated,
+// so the name typed into the input is the identity. The current class filter
+// scopes the ranking pool so "rank" agrees with the table the player is looking
+// at. Result text is built from createElement/textContent (names are untrusted).
+let rankLookupLoading = false;
+
+async function lookupRank(): Promise<void> {
+  const inputEl = $('#leaderboard-rank-input') as HTMLInputElement | null;
+  const resultEl = $('#leaderboard-rank-result');
+  const filterEl = $('#leaderboard-class-filter') as HTMLSelectElement | null;
+  if (!inputEl || !resultEl) return;
+  if (rankLookupLoading) return;
+
+  const character = inputEl.value.trim();
+  if (!character) {
+    resultEl.toggleAttribute('hidden', true);
+    return;
+  }
+  const selected = filterEl?.value || '';
+  const cls = selected ? (selected as PlayerClass) : undefined;
+
+  rankLookupLoading = true;
+  resultEl.textContent = t('highscores.rankLoading');
+  resultEl.toggleAttribute('hidden', false);
+  try {
+    const { rank } = await api.rank(character, cls);
+    // Like the board's stale-filter guard: if the player edited the name or
+    // changed the class filter while this request was in flight, the captured
+    // inputs no longer match the current controls — discard this response so a
+    // stale rank can't render under the new controls.
+    if (inputEl.value.trim() !== character || (filterEl?.value || '') !== selected) return;
+    resultEl.textContent = '';
+    if (!rank) {
+      resultEl.textContent = t('highscores.rankNotFound');
+      return;
+    }
+    // "Ranked #N — Name (Class) · Level L", assembled from nodes so the
+    // player-controlled name is only ever inserted as text.
+    const prefix = document.createElement('span');
+    prefix.textContent = `${t('highscores.rankPrefix')} `;
+
+    const number = document.createElement('span');
+    number.className = 'lb-rank-number';
+    number.textContent = `#${rank.rank}`;
+
+    const details = document.createElement('span');
+    const className = t(`classes.${rank.class}` as Parameters<typeof t>[0]);
+    details.textContent = ` — ${rank.name} (${className}) · ${t('highscores.colLevel')} ${rank.level}`;
+
+    resultEl.append(prefix, number, details);
+  } catch (err) {
+    console.error('Failed to look up rank:', err);
+    resultEl.textContent = t('highscores.rankError');
+    resultEl.toggleAttribute('hidden', false);
+  } finally {
+    rankLookupLoading = false;
+  }
+}
+
 function wireStartScreens(): void {
   // Initial page translation and stats load
   translatePage();
@@ -2183,7 +2243,15 @@ function wireStartScreens(): void {
     void loadLeaderboard();
   });
   const leaderboardFilter = $('#leaderboard-class-filter') as HTMLSelectElement | null;
-  leaderboardFilter?.addEventListener('change', () => { void loadLeaderboard(); });
+  // Clear a previously-rendered rank when the controls change, so a stale rank
+  // can't linger under a new name/filter (the in-flight case is handled by the
+  // capture-and-compare guard inside lookupRank).
+  const clearRankResult = (): void => { $('#leaderboard-rank-result')?.toggleAttribute('hidden', true); };
+  leaderboardFilter?.addEventListener('change', () => { clearRankResult(); void loadLeaderboard(); });
+  const rankForm = $('#leaderboard-rank-form') as HTMLFormElement | null;
+  rankForm?.addEventListener('submit', (e) => { e.preventDefault(); void lookupRank(); });
+  const rankInput = $('#leaderboard-rank-input') as HTMLInputElement | null;
+  rankInput?.addEventListener('input', clearRankResult);
   setupNavBtn(navBtnWiki, '#wiki-view');
   setupNavBtn(navBtnNews, '#news-view');
   setupNavBtn(navBtnDownload, '#download-view');

@@ -1232,6 +1232,77 @@
     font-size: 16px;
   }
 
+  /* "See where you rank" lookup — find a character's position even outside the
+     visible top 20. Themed to match the filter controls above. */
+  .leaderboard-rank-lookup {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--color-border-default);
+  }
+
+  .leaderboard-rank-label {
+    font-family: var(--font-sans);
+    color: var(--color-text-light);
+    font-size: 12.5px;
+    text-shadow: 1px 1px 2px #000;
+  }
+
+  .leaderboard-rank-form {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+
+  .leaderboard-rank-input {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-light);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    padding: 5px var(--spacing-sm);
+    min-width: 180px;
+  }
+
+  .leaderboard-rank-btn {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    color: var(--color-primary);
+    font-family: var(--font-heading);
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 6px var(--spacing-md);
+    cursor: pointer;
+    text-shadow: 1px 1px 2px #000;
+  }
+
+  .leaderboard-rank-btn:hover {
+    border-color: var(--color-primary);
+  }
+
+  .leaderboard-rank-result {
+    font-family: var(--font-sans);
+    color: var(--color-text-light);
+    font-size: 13.5px;
+    line-height: 1.6;
+    text-shadow: 1px 1px 2px #000;
+    text-align: center;
+    padding-top: var(--spacing-xs);
+  }
+
+  .leaderboard-rank-result .lb-rank-number {
+    color: var(--color-primary);
+    font-family: var(--font-heading);
+    font-size: 16px;
+  }
+
   /* Wiki view with integrated Controls Guide */
   .wiki-container-layout {
     max-width: 800px;
@@ -3782,6 +3853,14 @@
             </thead>
             <tbody id="leaderboard-body"></tbody>
           </table>
+          <div class="leaderboard-rank-lookup">
+            <label class="leaderboard-rank-label" for="leaderboard-rank-input" data-i18n="highscores.findMyRank">See where you rank</label>
+            <form id="leaderboard-rank-form" class="leaderboard-rank-form">
+              <input id="leaderboard-rank-input" class="leaderboard-rank-input" type="text" maxlength="32" autocomplete="off" data-i18n-placeholder="highscores.findMyRankPlaceholder" placeholder="Character name" />
+              <button id="leaderboard-rank-btn" class="leaderboard-rank-btn" type="submit" data-i18n="highscores.findMyRankButton">Find</button>
+            </form>
+            <div id="leaderboard-rank-result" class="leaderboard-rank-result" hidden></div>
+          </div>
         </div>
       </section>
 

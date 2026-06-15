@@ -6,7 +6,7 @@ import {
   ensureSchema, pool, createAccount, findAccount, getAccountsCount, touchLogin, saveToken, accountForToken,
   listCharacters, getCharacter, createCharacter, deleteCharacter, closeOrphanSessions,
   pruneChatLogs, searchCharacters, characterCountsByRealm, moderationStatusForAccount, renameCharacter,
-  findCharacterReportTargetByName, topArenaRatings, topCharacters,
+  findCharacterReportTargetByName, topArenaRatings, topCharacters, characterRank,
 } from './db';
 import { ALL_CLASSES, type PlayerClass } from '../src/sim/types';
 import { cleanReportReason, createPlayerReport } from './moderation_db';
@@ -325,6 +325,23 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         ? (classParam as PlayerClass)
         : undefined;
       return json(res, 200, { leaders: await topCharacters(20, cls), class: cls ?? null });
+    }
+    if (req.method === 'GET' && url === '/api/leaderboard/rank') {
+      // public "see where you rank": given a character name (the board is
+      // unauthenticated, so the name is the identity), return that character's
+      // position on the high-scores board even if it's outside the top 20.
+      // Optional ?class= scopes the ranking pool the same way the board's class
+      // filter does. Unknown class falls back to the full board; a missing or
+      // unranked character returns { rank: null }.
+      const search = new URL(req.url ?? '/', 'http://localhost').searchParams;
+      const character = (search.get('character') ?? '').trim();
+      if (!character) return json(res, 400, { error: 'character name is required' });
+      const classParam = search.get('class') ?? undefined;
+      const cls = classParam && ALL_CLASSES.includes(classParam as PlayerClass)
+        ? (classParam as PlayerClass)
+        : undefined;
+      const entry = await characterRank(character, cls);
+      return json(res, 200, { rank: entry, class: cls ?? null });
     }
     json(res, 404, { error: 'unknown endpoint' });
   } catch (err: any) {
