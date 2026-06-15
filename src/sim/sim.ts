@@ -3549,6 +3549,12 @@ export class Sim {
       return null;
     }
 
+    // "/pet" (aliases /companion /pets) — self-only readout of your active pet
+    if (/^\/(?:pet|pets|companion)(?:\s|$)/i.test(raw)) {
+      this.error(r.meta.entityId, this.petReadout(r.e));
+      return null;
+    }
+
     // "/w name message" — private whisper to an online player
     const wm = /^\/(?:w|whisper|t|tell)\s+(\S+)\s+([\s\S]+)$/i.exec(raw);
     if (wm) {
@@ -4849,6 +4855,18 @@ export class Sim {
 
   private error(pid: number, text: string): void {
     this.emit({ type: 'error', text, pid });
+  }
+
+  // Self-only readout of the player's active pet: name, level, beast family,
+  // and current health. Reads live pet state via petOf() so it stays accurate
+  // regardless of how the pet was acquired (tame, summon).
+  private petReadout(owner: Entity): string {
+    const pet = this.petOf(owner.id);
+    if (!pet) return 'You do not have a pet.';
+    const family = MOBS[pet.templateId]?.family;
+    const kind = family ? ` ${family}` : '';
+    const pct = pet.maxHp > 0 ? Math.round((pet.hp / pet.maxHp) * 100) : 0;
+    return `Your pet: ${pet.name} (level ${pet.level}${kind}) — HP ${pet.hp}/${pet.maxHp} (${pct}%).`;
   }
 }
 
