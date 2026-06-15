@@ -658,6 +658,8 @@ export class GameServer {
       case 'target': sim.targetEntity(typeof msg.id === 'number' ? msg.id : null, pid); break;
       case 'tab': sim.tabTarget(pid); break;
       case 'targetNearest': sim.targetNearestEnemy(pid); break;
+      case 'tabFriendly': sim.friendlyTabTarget(pid); break;
+      case 'targetNearestFriendly': sim.targetNearestFriendly(pid); break;
       case 'attack': sim.startAutoAttack(pid); break;
       case 'stopattack': sim.stopAutoAttack(pid); break;
       case 'interact': sim.interact(pid); break;

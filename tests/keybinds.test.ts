@@ -67,7 +67,9 @@ describe('Keybinds defaults', () => {
     expect(kb.actionForCode('KeyB')).toBe('bags');
     expect(kb.actionForCode('Digit1')).toBe('slot0'); // Attack
     expect(kb.actionForCode('Equal')).toBe('slot11');
-    expect(kb.actionForCode('KeyJ')).toBe(null);
+    expect(kb.actionForCode('KeyH')).toBe('targetFriendly');
+    expect(kb.actionForCode('KeyJ')).toBe('targetFriendlyNext');
+    expect(kb.actionForCode('KeyZ')).toBe(null);
   });
 
   it('exposes primary/secondary codes and labels', () => {

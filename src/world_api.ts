@@ -156,6 +156,8 @@ export interface IWorld {
   castAbilityBySlot(slot: number): void;
   targetEntity(id: number | null): void;
   tabTarget(): void;
+  targetNearestFriendly(): void;
+  friendlyTabTarget(): void;
   startAutoAttack(): void;
   stopAutoAttack(): void;
   interact(): void;

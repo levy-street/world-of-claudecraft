@@ -591,6 +591,12 @@ export class ClientWorld implements IWorld {
   tabTarget(): void {
     this.cmd({ cmd: 'tab' });
   }
+  targetNearestFriendly(): void {
+    this.cmd({ cmd: 'targetNearestFriendly' });
+  }
+  friendlyTabTarget(): void {
+    this.cmd({ cmd: 'tabFriendly' });
+  }
   startAutoAttack(): void {
     this.cmd({ cmd: 'attack' });
   }

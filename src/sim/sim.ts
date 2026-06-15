@@ -3005,6 +3005,43 @@ export class Sim {
     if (best) p.targetId = (best as Entity).id;
   }
 
+  // Nearby allies a beneficial spell can land on: other players (and friendly
+  // pets) within range, never yourself, never dead/hostile. Mirrors the enemy
+  // targeting helpers so heals/buffs are reachable by keyboard, not just by
+  // clicking party frames or world models (#133).
+  private friendlyCandidates(p: Entity): { e: Entity; d: number }[] {
+    const out: { e: Entity; d: number }[] = [];
+    this.grid.forEachInRadius(p.pos.x, p.pos.z, 40, (e, d2) => {
+      if (e.id === p.id || e.dead || !this.isFriendlyTo(p, e)) return;
+      out.push({ e, d: Math.sqrt(d2) });
+    });
+    return out;
+  }
+
+  targetNearestFriendly(pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    const p = r.e;
+    let best: Entity | null = null;
+    let bestD = Infinity;
+    for (const c of this.friendlyCandidates(p)) {
+      if (c.d < bestD) { bestD = c.d; best = c.e; }
+    }
+    if (best) p.targetId = best.id;
+  }
+
+  friendlyTabTarget(pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    const p = r.e;
+    const candidates = this.friendlyCandidates(p);
+    if (candidates.length === 0) return;
+    candidates.sort((a, b) => a.d - b.d);
+    const curIdx = candidates.findIndex((c) => c.e.id === p.targetId);
+    const next = candidates[(curIdx + 1) % candidates.length];
+    p.targetId = next.e.id;
+  }
+
   // -------------------------------------------------------------------------
   // Inventory, items, vendor
   // -------------------------------------------------------------------------
