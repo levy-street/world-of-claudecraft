@@ -632,3 +632,52 @@ describe('spell visuals', () => {
     expect(fx.some((e) => e.type === 'spellfx' && e.fx === 'projectile' && e.school === 'fire')).toBe(true);
   });
 });
+
+describe('trade and duel invites validate availability at accept time', () => {
+  it('a second invitee cannot hijack the inviter who is already trading', () => {
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior', noPlayer: true });
+    const a = sim.addPlayer('warrior', 'Anna');
+    const b = sim.addPlayer('mage', 'Bert');
+    const c = sim.addPlayer('warrior', 'Cara');
+
+    // Anna fires off trade requests to both Bert and Cara while still free.
+    sim.tradeRequest(b, a);
+    sim.tradeRequest(c, a);
+
+    // Bert accepts first — Anna and Bert are now trading together.
+    sim.tradeAccept(b);
+    const annaSession = sim.tradeFor(a);
+    const bertSession = sim.tradeFor(b);
+    expect(annaSession).not.toBeNull();
+    expect(annaSession).toBe(bertSession);
+
+    // Cara accepts the stale request. This must NOT silently replace Anna's
+    // live session with Bert (which would desync Bert's trade window).
+    sim.tradeAccept(c);
+
+    expect(sim.tradeFor(c)).toBeNull();
+    // Anna is still trading with the same partner she actually opened with.
+    expect(sim.tradeFor(a)).toBe(bertSession);
+    expect(sim.tradeFor(b)).toBe(bertSession);
+  });
+
+  it('a second challenger acceptance cannot hijack a duelist mid-duel', () => {
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior', noPlayer: true });
+    const a = sim.addPlayer('warrior', 'Anna');
+    const b = sim.addPlayer('mage', 'Bert');
+    const c = sim.addPlayer('warrior', 'Cara');
+
+    sim.duelRequest(b, a);
+    sim.duelRequest(c, a);
+
+    sim.duelAccept(b);
+    const annaDuel = sim.duelFor(a);
+    expect(annaDuel).not.toBeNull();
+    expect(sim.duelFor(b)).toBe(annaDuel);
+
+    sim.duelAccept(c);
+    expect(sim.duelFor(c)).toBeNull();
+    expect(sim.duelFor(a)).toBe(annaDuel);
+    expect(sim.duelFor(b)).toBe(annaDuel);
+  });
+});
