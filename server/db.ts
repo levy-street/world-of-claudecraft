@@ -18,7 +18,9 @@ export const DATABASE_URL =
 
 export const pool = new Pool({ connectionString: DATABASE_URL, max: 10 });
 
-const SCHEMA = `
+const REALM_SQL_DEFAULT = REALM.replace(/'/g, "''");
+
+export const SCHEMA = `
 CREATE TABLE IF NOT EXISTS accounts (
   id SERIAL PRIMARY KEY,
   username TEXT UNIQUE NOT NULL,
@@ -38,12 +40,14 @@ CREATE TABLE IF NOT EXISTS characters (
   account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
   name TEXT UNIQUE NOT NULL,
   class TEXT NOT NULL,
+  realm TEXT NOT NULL DEFAULT '${REALM_SQL_DEFAULT}',
   level INT NOT NULL DEFAULT 1,
   state JSONB,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS characters_account ON characters(account_id);
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS realm TEXT NOT NULL DEFAULT '${REALM_SQL_DEFAULT}';
 -- Max-Level XP Overflow leaderboard: indexed lifetime-XP sort key. The first
 -- index serves the realm-scoped in-game panel; the second serves the global
 -- (cross-realm) home-page board.

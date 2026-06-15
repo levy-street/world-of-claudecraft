@@ -1991,6 +1991,36 @@ export type SupportedLanguage = keyof typeof translations;
 
 let currentLanguage: SupportedLanguage = "en";
 
+function browserStorage(): Storage | null {
+  try {
+    const storage = globalThis.localStorage;
+    return storage && typeof storage === "object" ? storage : null;
+  } catch {
+    return null;
+  }
+}
+
+function getStoredLanguage(): SupportedLanguage | null {
+  const storage = browserStorage();
+  if (!storage || typeof storage.getItem !== "function") return null;
+  try {
+    const saved = storage.getItem("locale") as SupportedLanguage | null;
+    return saved && translations[saved] ? saved : null;
+  } catch {
+    return null;
+  }
+}
+
+function setStoredLanguage(lang: SupportedLanguage): void {
+  const storage = browserStorage();
+  if (!storage || typeof storage.setItem !== "function") return;
+  try {
+    storage.setItem("locale", lang);
+  } catch {
+    // Storage may be disabled or unavailable in test/browser privacy modes.
+  }
+}
+
 // Initialize language from URL query or localStorage if available (browser environments)
 if (typeof window !== "undefined" && window.location) {
   const params = new URLSearchParams(window.location.search);
@@ -1998,16 +2028,10 @@ if (typeof window !== "undefined" && window.location) {
   if (langParam && translations[langParam]) {
     currentLanguage = langParam;
   } else {
-    const saved = localStorage.getItem("locale") as SupportedLanguage | null;
-    if (saved && translations[saved]) {
-      currentLanguage = saved;
-    }
+    currentLanguage = getStoredLanguage() ?? currentLanguage;
   }
-} else if (typeof localStorage !== "undefined") {
-  const saved = localStorage.getItem("locale") as SupportedLanguage | null;
-  if (saved && translations[saved]) {
-    currentLanguage = saved;
-  }
+} else {
+  currentLanguage = getStoredLanguage() ?? currentLanguage;
 }
 
 export function getLanguage(): SupportedLanguage {
@@ -2016,9 +2040,7 @@ export function getLanguage(): SupportedLanguage {
 
 export function setLanguage(lang: SupportedLanguage): void {
   currentLanguage = lang;
-  if (typeof localStorage !== "undefined") {
-    localStorage.setItem("locale", lang);
-  }
+  setStoredLanguage(lang);
 }
 
 export function t(key: Leaves<typeof en>): string {
