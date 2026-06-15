@@ -2,7 +2,7 @@ import {
   ABILITIES, ARENA_SLOT_COUNT, CAMPS, CLASSES, DUNGEONS, DUNGEON_LIST, DungeonDef, arenaOrigin, dungeonAt,
   DUNGEON_X_THRESHOLD, GROUND_OBJECTS, GROUP_XP_BONUS, INSTANCE_SLOT_COUNT, isArenaPos,
   ITEMS, MOBS, NPCS, PLAYER_START, QUESTS, questRewardItemId, abilitiesKnownAt, instanceOrigin,
-  zoneAt,
+  zoneAt, ZONES,
 } from './data';
 import { ARENA_SPAWN_A, ARENA_SPAWN_B } from './dungeon_layout';
 import { resolvePosition } from './colliders';
@@ -3549,6 +3549,13 @@ export class Sim {
       return null;
     }
 
+    // "/zones" (aliases /zonelist, /worldmap) — self-only readout of every
+    // overworld zone with its level range, tagging the one you're standing in.
+    if (/^\/(?:zones|zonelist|worldmap)(?:\s|$)/i.test(raw)) {
+      this.error(r.meta.entityId, this.zonesReadout(r.e.pos.z));
+      return null;
+    }
+
     // "/w name message" — private whisper to an online player
     const wm = /^\/(?:w|whisper|t|tell)\s+(\S+)\s+([\s\S]+)$/i.exec(raw);
     if (wm) {
@@ -4845,6 +4852,21 @@ export class Sim {
       if (Math.abs(pos.x - origin.x) < 120 && Math.abs(pos.z - origin.z) < 250) return inst.slot;
     }
     return null;
+  }
+
+  // Self-only readout for "/zones": lists every overworld zone in travel order
+  // (south -> north) with its level range, tagging the zone the player is in.
+  // `currentZ` is the player's world Z (use zoneAt(currentZ) to find their zone).
+  // ZONES is the ordered ZoneDef[] from ./data; each has .name and
+  // .levelRange = [min, max].
+  private zonesReadout(currentZ: number): string {
+    if (ZONES.length === 0) return 'No zones are defined.';
+    const here = zoneAt(currentZ);
+    const parts = ZONES.map((z) => {
+      const line = `${z.name} (Lvl ${z.levelRange[0]}-${z.levelRange[1]})`;
+      return z.id === here.id ? `${line} [you are here]` : line;
+    });
+    return `Zones (${ZONES.length}): ${parts.join(', ')}.`;
   }
 
   private error(pid: number, text: string): void {
