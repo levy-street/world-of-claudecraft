@@ -3596,6 +3596,12 @@ export class Sim {
       return { channel: 'general', message: clean };
     }
 
+    // "/quest" (aliases /quests, /ql) — self-only readout of the active quest log
+    if (/^\/(?:quests?|ql)(?:\s|$)/i.test(raw)) {
+      this.error(r.meta.entityId, this.questReadout(r.meta));
+      return null;
+    }
+
     // bare text and "/s" are local say; "/y" carries further — both are
     // delivered per-player by range and carry the speaker for chat bubbles
     let channel: 'say' | 'yell' = 'say';
@@ -4849,6 +4855,24 @@ export class Sim {
 
   private error(pid: number, text: string): void {
     this.emit({ type: 'error', text, pid });
+  }
+
+  // Self-only readout of the active quest log: one entry per tracked quest with
+  // per-objective progress. questLog only ever holds 'active'/'ready' quests
+  // (turn-in deletes the entry), so iterating it gives exactly what to show.
+  private questReadout(meta: PlayerMeta): string {
+    const lines: string[] = [];
+    for (const [qid, qp] of meta.questLog) {
+      const quest = QUESTS[qid];
+      if (!quest) continue;
+      const objs = quest.objectives
+        .map((o, i) => `${o.label} ${Math.min(qp.counts[i] ?? 0, o.count)}/${o.count}`)
+        .join(', ');
+      const tag = qp.state === 'ready' ? ' (ready)' : '';
+      lines.push(`${quest.name}${tag} — ${objs}`);
+    }
+    if (lines.length === 0) return 'Your quest log is empty.';
+    return `Quest log (${lines.length}): ${lines.join(' | ')}.`;
   }
 }
 
