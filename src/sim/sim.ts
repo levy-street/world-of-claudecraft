@@ -2599,15 +2599,23 @@ export class Sim {
     switch (mob.aiState) {
       case 'idle': {
         const template = MOBS[mob.templateId];
-        const nearest = this.nearestLivingPlayer(mob.pos, 25);
-        if (nearest) {
-          let radius = Math.max(4, Math.min(20, template.aggroRadius + (mob.level - nearest.e.level) * 1.5));
+        // Evaluate every nearby player against ITS OWN effective radius, not
+        // just the single closest one. A stealthed player standing closer
+        // shrinks only its own detectability and must not mask a visible
+        // groupmate who is well inside the normal aggro radius.
+        let detected: Entity | null = null;
+        let detectedD = Infinity;
+        this.playerGrid.forEachInRadius(mob.pos.x, mob.pos.z, 25, (e, d2) => {
+          if (e.dead) return;
+          let radius = Math.max(4, Math.min(20, template.aggroRadius + (mob.level - e.level) * 1.5));
           // stealthed rogues are harder to detect, relative to observer level
-          if (nearest.e.auras.some((a) => a.kind === 'stealth')) radius = stealthDetectionRadius(mob, nearest.e, radius);
-          if (nearest.d < radius) {
-            this.aggroMob(mob, nearest.e, true);
-            break;
-          }
+          if (e.auras.some((a) => a.kind === 'stealth')) radius = stealthDetectionRadius(mob, e, radius);
+          const d = Math.sqrt(d2);
+          if (d < radius && d < detectedD) { detected = e; detectedD = d; }
+        });
+        if (detected) {
+          this.aggroMob(mob, detected, true);
+          break;
         }
         mob.wanderTimer -= DT;
         if (mob.wanderTimer <= 0) {
