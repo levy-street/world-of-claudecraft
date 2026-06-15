@@ -125,7 +125,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
   },
   mogger: {
     id: 'mogger', name: 'Mogger', minLevel: 6, maxLevel: 6, family: 'humanoid', rare: true,
-    elite: true, canSwim: true, ccImmune: true, respawnMult: 24,
+    elite: true, canSwim: true, ccImmune: true, respawnMult: 4,
     hpBase: 300, hpPerLevel: 58, dmgBase: 12, dmgPerLevel: 3.5, attackSpeed: 2.2,
     armorPerLevel: 34, moveSpeed: 7.4, aggroRadius: 14,
     aoePulse: { min: 14, max: 20, radius: 8, every: 10, name: 'Ground Pound', school: 'physical' },

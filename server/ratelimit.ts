@@ -117,7 +117,20 @@ export function recordAuthFailure(username: string): void {
   const recent = (authFailures.get(key) ?? []).filter((t) => t > windowStart);
   recent.push(Date.now());
   authFailures.set(key, recent);
-  if (authFailures.size > MAX_TRACKED_IPS) authFailures.clear(); // memory backstop
+  // Memory backstop: evict only accounts whose window has fully expired rather
+  // than clearing everything. A blanket clear() would also wipe the live
+  // lockout counters we are accumulating against accounts under attack — which
+  // is exactly when a credential-stuffing flood inflates this map past the cap,
+  // silently disabling the per-account throttle. Mirrors rateLimited() above.
+  if (authFailures.size > MAX_TRACKED_IPS) {
+    for (const [k, times] of authFailures) {
+      if (k === key) continue;
+      if (times.length === 0 || times[times.length - 1] <= windowStart) {
+        authFailures.delete(k);
+      }
+      if (authFailures.size <= MAX_TRACKED_IPS) break;
+    }
+  }
 }
 
 /** Clear an account's failure history after a successful login. */

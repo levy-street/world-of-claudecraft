@@ -71,3 +71,37 @@ describe('Input pointer lock', () => {
     expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('Input movement is not cancelled by a camera drag', () => {
+  // Discord regression: walking with W (or any held key) then right/left-drag to
+  // look around and releasing the button stopped movement, because exiting
+  // pointer lock cleared the held keyboard keys.
+  function walkAndDrag(button: number, windowListeners: Map<string, (e: any) => void>, canvasListeners: Map<string, (e: any) => void>, documentListeners: Map<string, (e: any) => void>) {
+    windowListeners.get('keydown')!({ code: 'KeyW', repeat: false });        // hold forward
+    canvasListeners.get('mousedown')!({ button });                           // press camera button
+    windowListeners.get('mousemove')!({ movementX: 6, movementY: 2 });       // drag → pointer lock
+    (globalThis as any).document.pointerLockElement = (globalThis as any).document; // lock engaged
+    windowListeners.get('mouseup')!({ button });                             // release → exitPointerLock
+    (globalThis as any).document.pointerLockElement = null;                  // lock ends
+    documentListeners.get('pointerlockchange')!({});                         // browser fires change
+  }
+
+  it('keeps walking forward after a right-drag ends', () => {
+    const { input, windowListeners, canvasListeners, documentListeners } = makeInput();
+    walkAndDrag(2, windowListeners, canvasListeners, documentListeners);
+    expect(input.readMoveInput().forward).toBe(true);
+  });
+
+  it('keeps walking forward after a left-drag ends', () => {
+    const { input, windowListeners, canvasListeners, documentListeners } = makeInput();
+    walkAndDrag(0, windowListeners, canvasListeners, documentListeners);
+    expect(input.readMoveInput().forward).toBe(true);
+  });
+
+  it('still forgets held keys on focus loss so movement cannot stick', () => {
+    const { input, windowListeners } = makeInput();
+    windowListeners.get('keydown')!({ code: 'KeyW', repeat: false });
+    windowListeners.get('blur')!({});
+    expect(input.readMoveInput().forward).toBe(false);
+  });
+});

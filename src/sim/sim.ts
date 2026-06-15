@@ -8,6 +8,11 @@ import { ARENA_SPAWN_A, ARENA_SPAWN_B } from './dungeon_layout';
 import { resolvePosition } from './colliders';
 import { findPath } from './pathfind';
 import { createGroundObject, createMob, createNpc, createPlayer, recalcPlayerStats, PlayerEquipment } from './entity';
+import {
+  computeTalentModifiers, emptyAllocation, emptyModifiers, talentsFor, talentPointsAtLevel,
+  validateAllocation, cloneAllocation, pointsSpent, FIRST_TALENT_LEVEL, MAX_LOADOUTS,
+  type TalentAllocation, type TalentModifiers, type SavedLoadout, type Role,
+} from './content/talents';
 import { Rng } from './rng';
 import { SpatialGrid } from './spatial';
 import {
@@ -15,6 +20,7 @@ import {
   TAUNT_FORCE_SECONDS, addThreat, clearThreat, stealthDetectionRadius, threatModifier, topThreatValue,
 } from './threat';
 import { groundHeight, WATER_LEVEL } from './world';
+import type { LeaderboardEntry } from '../world_api';
 import {
   AbilityDef, AbilityEffect, Aura, AuraKind, CAST_PUSHBACK_SEC, CHANNEL_PUSHBACK_FRACTION, CONSUME_DURATION,
   CONSUME_TICKS, CrowdControlDrCategory, DT, Entity, EquipSlot, FISHING_CAST_ID, FISHING_CAST_TIME, GCD,
@@ -22,12 +28,18 @@ import {
   MoveInput, PlayerClass, QuestProgress, QuestState, RUN_SPEED, SimConfig, SimEvent, TURN_SPEED, Vec3,
   angleTo, armorReduction, dist2d, emptyMoveInput, isConsuming, meleeMissChance, mobXpValue, normAngle,
   rageFromDealing, rageFromTaking, spellHitChance, xpForLevel,
+  MILESTONES, virtualLevel, xpToReachLevel, canPrestige,
 } from './types';
 
 const LEASH_DISTANCE = 45;
 const DUNGEON_LEASH_DISTANCE = 70;
 const CORPSE_DURATION = 60;
 const EVADE_SPEED_MULT = 1.6;
+// An evading mob walks a straight line home (no pathfinding) and stalls if deep
+// water or a collider sits between it and its spawn. Since evading mobs are
+// immune while resetting, a permanent stall = a permanently unkillable mob. If it
+// can't get closer to home for this long, it starts phasing through the blocker.
+const EVADE_STALL_TIMEOUT = 3;
 const BACKPEDAL_MULT = 0.65;
 const GRAVITY = 16;
 const JUMP_VELOCITY = 6;
@@ -49,6 +61,36 @@ const PVP_CC_DR_RESET = 18; // seconds before a repeated PvP CC category is fres
 const PVP_CC_DR_MULTIPLIERS = [1, 0.5, 0.25] as const;
 const SAY_RANGE = 25; // /say carries a short distance; /yell across a camp
 const YELL_RANGE = 100;
+
+// Predefined social emotes. Each entry maps a command (and its aliases) to the
+// third-person action text shown to everyone in /say range. `solo` is used with
+// no target; `target` (when present) is used when the emote names another
+// player and contains a `%t` placeholder for that player's name. The actor's
+// own name is rendered separately by the client, so these strings start at the
+// verb (e.g. "Aleph" + " waves.").
+interface EmoteDef { solo: string; target?: string }
+const EMOTES: Record<string, EmoteDef> = {
+  wave: { solo: 'waves.', target: 'waves at %t.' },
+  bow: { solo: 'bows.', target: 'bows before %t.' },
+  cheer: { solo: 'cheers!', target: 'cheers at %t!' },
+  dance: { solo: 'bursts into dance.', target: 'dances with %t.' },
+  laugh: { solo: 'laughs.', target: 'laughs at %t.' },
+  cry: { solo: 'cries.', target: "cries on %t's shoulder." },
+  salute: { solo: 'salutes.', target: 'salutes %t.' },
+  thank: { solo: 'thanks everyone.', target: 'thanks %t.' },
+  clap: { solo: 'applauds. Bravo!', target: 'applauds %t. Bravo!' },
+  greet: { solo: 'greets everyone with a hearty hello.', target: 'greets %t with a hearty hello.' },
+  roar: { solo: 'lets out a mighty roar.', target: 'roars at %t.' },
+  sigh: { solo: 'sighs.', target: 'sighs at %t.' },
+  kneel: { solo: 'kneels down.', target: 'kneels before %t.' },
+  point: { solo: 'points.', target: 'points at %t.' },
+  flex: { solo: 'flexes.', target: 'flexes at %t.' },
+  cower: { solo: 'cowers in fear.', target: 'cowers in fear at the sight of %t.' },
+};
+// Command aliases → canonical emote key above.
+const EMOTE_ALIASES: Record<string, string> = {
+  hi: 'greet', hello: 'greet', thanks: 'thank', applaud: 'clap',
+};
 const CHAT_BURST = 8; // messages a player may send back-to-back...
 const CHAT_REFILL = 2; // ...then this many more per second (caps spam amplifiers)
 const DUEL_FORFEIT_DISTANCE = 60;
@@ -156,6 +198,7 @@ export interface ResolvedAbility {
   rank: number;
   cost: number;
   castTime: number;
+  cooldown: number;   // base def.cooldown, after talent cooldown modifiers
   effects: AbilityEffect[];
   threatFlat: number; // classic bonus threat on a successful use
   threatMult: number; // classic multiplier on this ability's damage-threat
@@ -190,6 +233,13 @@ export interface PlayerMeta {
   copper: number;
   equipment: PlayerEquipment;
   xp: number;
+  // Post-cap progression (Max-Level XP Overflow). `lifetimeXp` is the monotonic
+  // 64-bit-safe total of all XP ever earned — it keeps growing at the cap and is
+  // the leaderboard sort key + virtual-level source. `prestigeRank` and
+  // `unlockedMilestones` are cosmetic-only. All persisted in CharacterState.
+  lifetimeXp: number;
+  prestigeRank: number;
+  unlockedMilestones: Set<string>;
   known: ResolvedAbility[];
   questLog: Map<string, QuestProgress>;
   questsDone: Set<string>;
@@ -199,6 +249,13 @@ export interface PlayerMeta {
   arenaRating: number;
   arenaWins: number;
   arenaLosses: number;
+  // Talents & Specializations. `talents` is the active allocation; `talentMods`
+  // is its precomputed flat struct — resolved only on allocation/respec/loadout
+  // change (recomputeTalents), never walked on the combat or stat hot path.
+  talents: TalentAllocation;
+  talentMods: TalentModifiers;
+  loadouts: SavedLoadout[];
+  activeLoadout: number; // index into loadouts, or -1 for none
 }
 
 // ---------------------------------------------------------------------------
@@ -242,6 +299,11 @@ export interface MarketSave {
 export interface CharacterState {
   level: number;
   xp: number;
+  // Post-cap progression. All optional so characters saved before the Max-Level
+  // XP Overflow system load cleanly (addPlayer backfills lifetimeXp from level).
+  lifetimeXp?: number;
+  prestigeRank?: number;
+  unlockedMilestones?: string[];
   copper: number;
   hp: number;
   resource: number;
@@ -255,6 +317,11 @@ export interface CharacterState {
   arenaRating?: number;
   arenaWins?: number;
   arenaLosses?: number;
+  // Talents & Specializations (JSONB; no schema migration). All optional so
+  // characters saved before talents existed load cleanly (default: no points spent).
+  talents?: TalentAllocation;
+  loadouts?: SavedLoadout[];
+  activeLoadout?: number;
 }
 
 // Pure quest-state computation, shared by the sim and the network client.
@@ -460,6 +527,9 @@ export class Sim {
       copper: 0,
       equipment: { mainhand: classDef.startWeapon, chest: classDef.startChest },
       xp: 0,
+      lifetimeXp: 0,
+      prestigeRank: 0,
+      unlockedMilestones: new Set(),
       known: [],
       questLog: new Map(),
       questsDone: new Set(),
@@ -468,6 +538,10 @@ export class Sim {
       arenaRating: opts?.state?.arenaRating ?? ARENA_BASE_RATING,
       arenaWins: opts?.state?.arenaWins ?? 0,
       arenaLosses: opts?.state?.arenaLosses ?? 0,
+      talents: emptyAllocation(),
+      talentMods: emptyModifiers(),
+      loadouts: [],
+      activeLoadout: -1,
     };
     this.players.set(player.id, meta);
     if (this.primaryId === -1) this.primaryId = player.id;
@@ -478,6 +552,12 @@ export class Sim {
       player.facing = s.facing;
       player.prevFacing = s.facing;
       meta.xp = s.xp;
+      // Backfill lifetimeXp for pre-overflow saves from the level they reached
+      // plus their current bar progress, so the leaderboard is meaningful for
+      // existing characters from day one.
+      meta.lifetimeXp = s.lifetimeXp ?? (xpToReachLevel(player.level) + Math.max(0, s.xp));
+      meta.prestigeRank = s.prestigeRank ?? 0;
+      if (s.unlockedMilestones) for (const id of s.unlockedMilestones) meta.unlockedMilestones.add(id);
       meta.copper = s.copper;
       meta.equipment = { ...s.equipment };
       meta.inventory = s.inventory.map((i) => ({ ...i }));
@@ -486,10 +566,16 @@ export class Sim {
         if (q.state !== 'done') meta.questLog.set(q.questId, { questId: q.questId, counts: [...q.counts], state: q.state });
       }
       for (const q of s.questsDone) meta.questsDone.add(q);
+      if (s.talents) meta.talents = { spec: s.talents.spec ?? null, ranks: { ...s.talents.ranks }, choices: { ...s.talents.choices } };
+      if (s.loadouts) meta.loadouts = s.loadouts.map((l) => ({ name: l.name, alloc: cloneAllocation(l.alloc), bar: [...(l.bar ?? [])] }));
+      if (typeof s.activeLoadout === 'number') meta.activeLoadout = s.activeLoadout;
     }
 
+    // Resolve the flat talent struct once, before the stat pass + ability
+    // resolver below consume it (they only ever read these flat numbers).
+    meta.talentMods = computeTalentModifiers(cls, meta.talents);
     this.refreshKnownAbilities(meta, false);
-    recalcPlayerStats(player, cls, meta.equipment);
+    recalcPlayerStats(player, cls, meta.equipment, meta.talentMods);
     if (opts?.state) {
       player.hp = Math.max(1, Math.min(player.maxHp, opts.state.hp));
       player.resource = classDef.resourceType === 'mana'
@@ -553,6 +639,9 @@ export class Sim {
     return {
       level: e.level,
       xp: meta.xp,
+      lifetimeXp: meta.lifetimeXp,
+      prestigeRank: meta.prestigeRank,
+      unlockedMilestones: [...meta.unlockedMilestones],
       copper: meta.copper,
       hp: e.hp,
       resource: e.resource,
@@ -566,6 +655,9 @@ export class Sim {
       arenaRating: meta.arenaRating,
       arenaWins: meta.arenaWins,
       arenaLosses: meta.arenaLosses,
+      talents: cloneAllocation(meta.talents),
+      loadouts: meta.loadouts.map((l) => ({ name: l.name, alloc: cloneAllocation(l.alloc), bar: [...l.bar] })),
+      activeLoadout: meta.activeLoadout,
     };
   }
 
@@ -607,6 +699,36 @@ export class Sim {
   set xp(v: number) {
     this.primary.xp = v;
   }
+  get lifetimeXp(): number {
+    return this.primary.lifetimeXp;
+  }
+  get prestigeRank(): number {
+    return this.primary.prestigeRank;
+  }
+  get unlockedMilestones(): string[] {
+    return [...this.primary.unlockedMilestones];
+  }
+  // Offline leaderboard: rank the players the local sim knows about by lifetime
+  // XP. Online play overrides this with the cached, realm-scoped server query.
+  leaderboard(): Promise<LeaderboardEntry[]> {
+    const rows = [...this.players.values()]
+      .map((m) => {
+        const e = this.entities.get(m.entityId);
+        return e ? { meta: m, e } : null;
+      })
+      .filter((x): x is { meta: PlayerMeta; e: Entity } => x !== null)
+      .sort((a, b) => b.meta.lifetimeXp - a.meta.lifetimeXp || b.e.level - a.e.level || a.meta.name.localeCompare(b.meta.name))
+      .map(({ meta, e }, i) => ({
+        rank: i + 1,
+        name: meta.name,
+        cls: meta.cls,
+        level: e.level,
+        virtualLevel: virtualLevel(meta.lifetimeXp),
+        lifetimeXp: meta.lifetimeXp,
+        prestigeRank: meta.prestigeRank,
+      }));
+    return Promise.resolve(rows);
+  }
   get known(): ResolvedAbility[] {
     return this.primary.known;
   }
@@ -618,6 +740,21 @@ export class Sim {
   }
   get counters(): RewardCounters {
     return this.primary.counters;
+  }
+  get talents(): TalentAllocation {
+    return this.primary.talents;
+  }
+  get talentSpec(): string | null {
+    return this.primary.talentMods.spec;
+  }
+  get talentRole(): Role | null {
+    return this.primary.talentMods.role;
+  }
+  get loadouts(): SavedLoadout[] {
+    return this.primary.loadouts;
+  }
+  get activeLoadout(): number {
+    return this.primary.activeLoadout;
   }
 
   meta(pid: number): PlayerMeta | null {
@@ -672,7 +809,7 @@ export class Sim {
     const e = this.entities.get(meta.entityId);
     if (!e) return;
     const before = new Map(meta.known.map((k) => [k.def.id, k.rank]));
-    meta.known = abilitiesKnownAt(meta.cls, e.level);
+    meta.known = abilitiesKnownAt(meta.cls, e.level, meta.talentMods);
     if (announce) {
       for (const k of meta.known) {
         const prev = before.get(k.def.id);
@@ -703,10 +840,188 @@ export class Sim {
     const r = this.resolve(pid);
     if (!r) return;
     r.e.level = Math.max(1, Math.min(MAX_LEVEL, level));
-    recalcPlayerStats(r.e, r.meta.cls, r.meta.equipment);
+    // Keep lifetimeXp consistent with the level so post-cap progression starts
+    // from a sane baseline (virtualLevel never falls below the real level). Only
+    // ever raises it — lifetimeXp is monotonic.
+    r.meta.lifetimeXp = Math.max(r.meta.lifetimeXp, xpToReachLevel(r.e.level));
+    recalcPlayerStats(r.e, r.meta.cls, r.meta.equipment, r.meta.talentMods);
     r.e.hp = r.e.maxHp;
     if (r.e.resourceType === 'mana') r.e.resource = r.e.maxResource;
     this.refreshKnownAbilities(r.meta, false);
+  }
+
+  // -------------------------------------------------------------------------
+  // Talents & Specializations (server-authoritative). Every allocation change
+  // validates against the level-derived point budget + tree rules, then
+  // recomputes the flat modifier struct. Restricted to out-of-combat (and not
+  // mid-arena): talents never change during a fight.
+  // -------------------------------------------------------------------------
+
+  // The ONLY place a talent tree is walked. Re-resolves the flat modifier struct
+  // and refreshes the stat pass + known-ability resolver that consume it.
+  private recomputeTalents(meta: PlayerMeta): void {
+    meta.talentMods = computeTalentModifiers(meta.cls, meta.talents);
+    const e = this.entities.get(meta.entityId);
+    if (e) recalcPlayerStats(e, meta.cls, meta.equipment, meta.talentMods);
+    this.refreshKnownAbilities(meta, false);
+  }
+
+  private talentLockReason(p: Entity): string | null {
+    if (p.inCombat) return 'You cannot change talents in combat.';
+    if (this.arenaMatches.has(p.id)) return 'You cannot change talents during an arena match.';
+    return null;
+  }
+
+  talentPoints(pid?: number): { total: number; spent: number } {
+    const r = this.resolve(pid);
+    if (!r) return { total: 0, spent: 0 };
+    return { total: talentPointsAtLevel(r.e.level), spent: pointsSpent(r.meta.talents) };
+  }
+
+  private sanitizeTalentAllocation(alloc: TalentAllocation): TalentAllocation {
+    const sanitized: TalentAllocation = { spec: alloc.spec ?? null, ranks: {}, choices: { ...alloc.choices } };
+    for (const id in alloc.ranks) { const v = Math.floor(alloc.ranks[id]); if (v > 0) sanitized.ranks[id] = v; }
+    return sanitized;
+  }
+
+  // Commit a whole staged allocation in one shot (the UI's "Apply"). Rejects any
+  // allocation that fails server-side validation with a reason event (FR-4.5).
+  applyTalents(alloc: TalentAllocation, pid?: number): boolean {
+    const r = this.resolve(pid);
+    if (!r) return false;
+    const lock = this.talentLockReason(r.e);
+    if (lock) { this.error(r.e.id, lock); return false; }
+    const sanitized = this.sanitizeTalentAllocation(alloc);
+    if (sanitized.spec && r.e.level < FIRST_TALENT_LEVEL) { this.error(r.e.id, `You may choose a specialization at level ${FIRST_TALENT_LEVEL}.`); return false; }
+    const check = validateAllocation(r.meta.cls, sanitized, talentPointsAtLevel(r.e.level));
+    if (!check.ok) { this.error(r.e.id, check.reason ?? 'Invalid talent build.'); return false; }
+    r.meta.talents = sanitized;
+    this.recomputeTalents(r.meta);
+    this.emit({ type: 'log', pid: r.e.id, text: 'Talents updated.', color: '#ffd100' });
+    return true;
+  }
+
+  // Spend a single point into a node (incremental API; the UI mostly stages then
+  // applies). Validated identically by building + checking a candidate alloc.
+  spendTalent(nodeId: string, pid?: number): boolean {
+    const r = this.resolve(pid);
+    if (!r) return false;
+    const cand = cloneAllocation(r.meta.talents);
+    cand.ranks[nodeId] = (cand.ranks[nodeId] ?? 0) + 1;
+    return this.applyTalents(cand, pid);
+  }
+
+  // Choose / change specialization. Switching specs drops the previous spec
+  // tree's points (they belonged to that tree); the class tree is untouched.
+  setSpec(specId: string | null, pid?: number): boolean {
+    const r = this.resolve(pid);
+    if (!r) return false;
+    const lock = this.talentLockReason(r.e);
+    if (lock) { this.error(r.e.id, lock); return false; }
+    const ct = talentsFor(r.meta.cls);
+    if (specId !== null && !ct?.specs.some((s) => s.id === specId)) { this.error(r.e.id, 'Unknown specialization.'); return false; }
+    const cand = cloneAllocation(r.meta.talents);
+    cand.spec = specId;
+    for (const id of Object.keys(cand.ranks)) {
+      const node = ct?.nodes.find((n) => n.id === id);
+      if (node?.tree === 'spec' && node.specId !== specId) { delete cand.ranks[id]; delete cand.choices[id]; }
+    }
+    return this.applyTalents(cand, pid);
+  }
+
+  // Free respec (out of combat): wipe all talent points. Spec is retained.
+  respec(pid?: number): boolean {
+    const r = this.resolve(pid);
+    if (!r) return false;
+    const lock = this.talentLockReason(r.e);
+    if (lock) { this.error(r.e.id, lock); return false; }
+    r.meta.talents = { spec: r.meta.talents.spec, ranks: {}, choices: {} };
+    this.recomputeTalents(r.meta);
+    this.emit({ type: 'log', pid: r.e.id, text: 'Talents reset.', color: '#ffd100' });
+    return true;
+  }
+
+  // Save the current build (talents + spec + the given action-bar slot map) as a
+  // named loadout. A same-named loadout is overwritten; otherwise appended up to
+  // MAX_LOADOUTS. Returns the loadout index (-1 on failure).
+  saveLoadout(name: string, bar: (string | null)[], pidOrAlloc?: number | TalentAllocation, allocMaybe?: TalentAllocation): number {
+    const pid = typeof pidOrAlloc === 'number' ? pidOrAlloc : undefined;
+    const alloc = typeof pidOrAlloc === 'object' ? pidOrAlloc : allocMaybe;
+    const r = this.resolve(pid);
+    if (!r) return -1;
+    if (alloc) {
+      const lock = this.talentLockReason(r.e);
+      if (lock) { this.error(r.e.id, lock); return -1; }
+      const sanitized = this.sanitizeTalentAllocation(alloc);
+      if (sanitized.spec && r.e.level < FIRST_TALENT_LEVEL) { this.error(r.e.id, `You may choose a specialization at level ${FIRST_TALENT_LEVEL}.`); return -1; }
+      const check = validateAllocation(r.meta.cls, sanitized, talentPointsAtLevel(r.e.level));
+      if (!check.ok) { this.error(r.e.id, check.reason ?? 'Invalid talent build.'); return -1; }
+      r.meta.talents = sanitized;
+      this.recomputeTalents(r.meta);
+    }
+    const clean = (name || 'Build').toString().slice(0, 24);
+    const safeBar = Array.isArray(bar) ? bar.slice(0, 16).map((b) => (typeof b === 'string' ? b : null)) : [];
+    const lo: SavedLoadout = { name: clean, alloc: cloneAllocation(r.meta.talents), bar: safeBar };
+    const existing = r.meta.loadouts.findIndex((l) => l.name === clean);
+    if (existing >= 0) {
+      r.meta.loadouts[existing] = lo;
+      r.meta.activeLoadout = existing;
+      this.emit({ type: 'log', pid: r.e.id, text: `Saved build "${clean}".`, color: '#ffd100' });
+      return existing;
+    }
+    if (r.meta.loadouts.length >= MAX_LOADOUTS) { this.error(r.e.id, `You can save at most ${MAX_LOADOUTS} loadouts.`); return -1; }
+    r.meta.loadouts.push(lo);
+    r.meta.activeLoadout = r.meta.loadouts.length - 1;
+    this.emit({ type: 'log', pid: r.e.id, text: `Saved build "${clean}".`, color: '#ffd100' });
+    return r.meta.activeLoadout;
+  }
+
+  // Apply a saved loadout's talents (out of combat). The action bar is restored
+  // client-side from the loadout's stored slot map. Re-validated server-side.
+  switchLoadout(index: number, pid?: number): boolean {
+    const r = this.resolve(pid);
+    if (!r) return false;
+    const lock = this.talentLockReason(r.e);
+    if (lock) { this.error(r.e.id, lock); return false; }
+    const lo = r.meta.loadouts[index];
+    if (!lo) { this.error(r.e.id, 'No such loadout.'); return false; }
+    if (lo.alloc.spec && r.e.level < FIRST_TALENT_LEVEL) { this.error(r.e.id, 'That loadout needs a higher level.'); return false; }
+    const check = validateAllocation(r.meta.cls, lo.alloc, talentPointsAtLevel(r.e.level));
+    if (!check.ok) { this.error(r.e.id, `Loadout invalid: ${check.reason ?? 'unknown'}`); return false; }
+    r.meta.talents = cloneAllocation(lo.alloc);
+    r.meta.activeLoadout = index;
+    this.recomputeTalents(r.meta);
+    this.emit({ type: 'log', pid: r.e.id, text: `Loadout "${lo.name}" applied.`, color: '#ffd100' });
+    return true;
+  }
+
+  deleteLoadout(index: number, pid?: number): boolean {
+    const r = this.resolve(pid);
+    if (!r || index < 0 || index >= r.meta.loadouts.length) return false;
+    const wasActive = r.meta.activeLoadout === index;
+    const name = r.meta.loadouts[index].name;
+    r.meta.loadouts.splice(index, 1);
+    if (wasActive) {
+      r.meta.activeLoadout = r.meta.loadouts.length > 0 ? Math.min(index, r.meta.loadouts.length - 1) : -1;
+      const next = r.meta.activeLoadout >= 0 ? r.meta.loadouts[r.meta.activeLoadout] : null;
+      if (next) {
+        r.meta.talents = cloneAllocation(next.alloc);
+        this.recomputeTalents(r.meta);
+      }
+    } else if (r.meta.activeLoadout > index) r.meta.activeLoadout -= 1;
+    this.emit({ type: 'log', pid: r.e.id, text: `Deleted build "${name}".`, color: '#ffd100' });
+    return true;
+  }
+
+  // Threat modifier including the tank-role talent bonus (e.g. Protection's
+  // Vengeance Mastery). Reads the precomputed flat threatPct — no tree walk.
+  private threatMod(source: Entity, school: string): number {
+    let m = threatModifier(source, school);
+    if (source.kind === 'player') {
+      const meta = this.players.get(source.id);
+      if (meta) m *= 1 + meta.talentMods.global.threatPct;
+    }
+    return m;
   }
 
   resolvedAbility(abilityId: string, pid?: number): ResolvedAbility | null {
@@ -760,9 +1075,18 @@ export class Sim {
     // with, instead of one full scan per player
     this.engagedPids.clear();
     for (const e of this.entities.values()) {
-      if (e.kind === 'mob' && !e.dead && (e.aiState === 'chase' || e.aiState === 'attack') && e.aggroTargetId !== null) {
+      if (e.kind !== 'mob' || e.dead) continue;
+      // a wild mob actively engaged keeps its target in combat — and if that
+      // target is someone's pet, the pet's owner stays in combat too, so a
+      // hunter/warlock can't regen, eat/drink, or use out-of-combat abilities
+      // while their pet tanks
+      if (e.ownerId === null && (e.aiState === 'chase' || e.aiState === 'attack') && e.aggroTargetId !== null) {
         this.engagedPids.add(e.aggroTargetId);
+        const tgt = this.entities.get(e.aggroTargetId);
+        if (tgt && tgt.ownerId !== null) this.engagedPids.add(tgt.ownerId);
       }
+      // a player's pet that is engaging an enemy keeps its owner in combat
+      if (e.ownerId !== null && e.aggroTargetId !== null) this.engagedPids.add(e.ownerId);
     }
     for (const meta of this.players.values()) {
       const p = this.entities.get(meta.entityId);
@@ -1139,7 +1463,7 @@ export class Sim {
     }
     if (statsDirty && e.kind === 'player') {
       const meta = this.players.get(e.id);
-      if (meta) recalcPlayerStats(e, meta.cls, meta.equipment);
+      if (meta) recalcPlayerStats(e, meta.cls, meta.equipment, meta.talentMods);
     }
   }
 
@@ -1312,7 +1636,7 @@ export class Sim {
 
     if (ability.channel) {
       this.spendResource(p, res.cost);
-      if (ability.cooldown > 0) p.cooldowns.set(ability.id, ability.cooldown);
+      if (res.cooldown > 0) p.cooldowns.set(ability.id, res.cooldown);
       p.castingAbility = ability.id;
       p.castTotal = ability.channel.duration;
       p.castRemaining = ability.channel.duration;
@@ -1405,7 +1729,7 @@ export class Sim {
   // Party membership does not change threat; it only affects social systems.
   private healingThreat(source: Entity, target: Entity, healed: number): void {
     if (source.kind !== 'player' || healed <= 0) return;
-    const total = healed * HEAL_THREAT_FACTOR * threatModifier(source, 'physical');
+    const total = healed * HEAL_THREAT_FACTOR * this.threatMod(source, 'physical');
     const aware: Entity[] = [];
     for (const m of this.entities.values()) {
       if (m.kind !== 'mob' || m.dead || !m.hostile || !m.inCombat || m.threat.size === 0) continue;
@@ -1454,14 +1778,14 @@ export class Sim {
     // helpful spells never miss
     if (ability.targetType === 'friendly') {
       this.spendResource(p, res.cost);
-      if (ability.cooldown > 0) p.cooldowns.set(ability.id, ability.cooldown);
+      if (res.cooldown > 0) p.cooldowns.set(ability.id, res.cooldown);
       this.runEffects(p, meta, target, res);
       return;
     }
 
     if (target && ability.school !== 'physical') {
       this.spendResource(p, res.cost);
-      if (ability.cooldown > 0) p.cooldowns.set(ability.id, ability.cooldown);
+      if (res.cooldown > 0) p.cooldowns.set(ability.id, res.cooldown);
       this.emit({ type: 'spellfx', sourceId: p.id, targetId: target.id, school: ability.school, fx: 'projectile' });
       if (!this.rng.chance(spellHitChance(p.level, target.level))) {
         this.emit({ type: 'damage', sourceId: p.id, targetId: target.id, amount: 0, crit: false, school: ability.school, ability: ability.name, kind: 'miss' });
@@ -1473,7 +1797,7 @@ export class Sim {
     }
 
     this.spendAbilityCost(p, res);
-    if (ability.cooldown > 0) p.cooldowns.set(ability.id, ability.cooldown);
+    if (res.cooldown > 0) p.cooldowns.set(ability.id, res.cooldown);
     this.runEffects(p, meta, target, res);
   }
 
@@ -1676,7 +2000,10 @@ export class Sim {
           this.emit({ type: 'spellfx', sourceId: p.id, targetId: p.id, school: ability.school, fx: 'nova' });
           for (const m of this.mobsInRadius(p.pos, eff.radius)) {
             let dmg = this.rng.range(eff.min, eff.max);
-            dmg *= 1 - armorReduction(this.effectiveArmor(m), p.level);
+            // Armor only mitigates physical damage, mirroring the single-target
+            // path above — spell-school AoE (Arcane Explosion, Consecration) is
+            // not reduced by the target's armor.
+            if (!isSpell) dmg *= 1 - armorReduction(this.effectiveArmor(m), p.level);
             this.dealDamage(p, m, Math.round(dmg), false, ability.school, ability.name, 'hit', false, threatOpts);
           }
           break;
@@ -1712,7 +2039,7 @@ export class Sim {
             if (existing >= 0) {
               p.auras.splice(existing, 1);
               this.emit({ type: 'aura', targetId: p.id, name: ability.name, gained: false });
-              recalcPlayerStats(p, meta.cls, meta.equipment);
+              recalcPlayerStats(p, meta.cls, meta.equipment, meta.talentMods);
               break;
             }
           }
@@ -1731,7 +2058,7 @@ export class Sim {
             remaining: eff.duration, duration: eff.duration, value: eff.value,
             sourceId: p.id, school: ability.school,
           });
-          recalcPlayerStats(p, meta.cls, meta.equipment);
+          recalcPlayerStats(p, meta.cls, meta.equipment, meta.talentMods);
           break;
         }
         case 'gainResource': {
@@ -1777,7 +2104,7 @@ export class Sim {
             });
           }
           // sunder deals no damage: its threat is the flat value, stance-scaled
-          addThreat(target, p.id, res.threatFlat * threatModifier(p, 'physical'));
+          addThreat(target, p.id, res.threatFlat * this.threatMod(p, 'physical'));
           this.enterCombat(p, target);
           break;
         }
@@ -1831,7 +2158,7 @@ export class Sim {
     this.refreshMobLeashFromAction(source ?? null, target);
     if (target.kind === 'player') {
       const meta = this.players.get(target.id);
-      if (meta) recalcPlayerStats(target, meta.cls, meta.equipment);
+      if (meta) recalcPlayerStats(target, meta.cls, meta.equipment, meta.talentMods);
     }
   }
 
@@ -2185,12 +2512,12 @@ export class Sim {
     // hate table, scaled by the attacker's stance/form modifiers
     if (source && source.id !== target.id && target.kind === 'mob' && target.hostile
       && (source.kind === 'player' || source.ownerId !== null)) {
-      const threat = (amount * (threatOpts?.mult ?? 1) + (threatOpts?.flat ?? 0)) * threatModifier(source, school);
+      const threat = (amount * (threatOpts?.mult ?? 1) + (threatOpts?.flat ?? 0)) * this.threatMod(source, school);
       addThreat(target, source.id, threat);
     }
 
     // tap rights: the first player (or their pet) to damage a mob owns it
-    if (source && target.kind === 'mob' && target.hostile && target.tappedById === null && amount >= 0) {
+    if (source && target.kind === 'mob' && target.hostile && target.tappedById === null && amount > 0) {
       if (source.kind === 'player') target.tappedById = source.id;
       else if (source.ownerId !== null) target.tappedById = source.ownerId;
     }
@@ -2325,8 +2652,11 @@ export class Sim {
         for (const member of eligible) {
           const mE = this.entities.get(member.entityId);
           if (!mE) continue;
+          // mobXpValue keeps the level-diff (anti-farm) scaling; grantXp now
+          // routes the award to lifetimeXp even at the cap, so the party gate no
+          // longer blocks max-level members — it just forwards every positive award.
           const xpGain = Math.round((mobXpValue(e.level, mE.level) * eliteMult * bonus) / eligible.length);
-          if (xpGain > 0 && mE.level < MAX_LEVEL) this.grantXp(xpGain, member);
+          if (xpGain > 0) this.grantXp(xpGain, member);
           this.onMobKilledForQuests(e, member);
         }
         this.rollLoot(e, meta, eligible);
@@ -2336,21 +2666,82 @@ export class Sim {
 
   grantXp(amount: number, meta: PlayerMeta = this.primary): void {
     const p = this.entities.get(meta.entityId);
-    if (!p || p.level >= MAX_LEVEL) return;
-    meta.xp += amount;
+    if (!p || amount <= 0) return;
+    // Lifetime XP accrues for EVERY award, including at the cap — this is what
+    // makes post-cap progression work. It feeds the virtual level, the
+    // leaderboard, and cosmetic milestones. The level bar below only advances
+    // while under the cap; once capped the remainder lives on in lifetimeXp
+    // rather than being discarded to gold/zero (FR-1.4).
+    this.accrueLifetimeXp(amount, meta, p);
     meta.counters.xpGained += amount;
     this.emit({ type: 'xp', amount, pid: p.id });
+
+    if (p.level >= MAX_LEVEL) return; // bar frozen at cap; lifetimeXp already credited
+
+    meta.xp += amount;
     while (p.level < MAX_LEVEL && meta.xp >= xpForLevel(p.level)) {
       meta.xp -= xpForLevel(p.level);
       p.level++;
       meta.counters.levelUps++;
-      recalcPlayerStats(p, meta.cls, meta.equipment);
+      recalcPlayerStats(p, meta.cls, meta.equipment, meta.talentMods);
       p.hp = p.maxHp;
       if (p.resourceType === 'mana') p.resource = p.maxResource;
       this.emit({ type: 'levelup', level: p.level, pid: p.id });
       this.refreshKnownAbilities(meta, true);
     }
+    // Dinged to cap mid-grant: clear the leftover from the BAR. It is not lost —
+    // the full award was already added to lifetimeXp above (FR-1.4).
     if (p.level >= MAX_LEVEL) meta.xp = 0;
+  }
+
+  // Add to the monotonic lifetime counter, emitting cosmetic virtual-level-up
+  // events past the cap and unlocking any newly crossed milestones. Cheap: one
+  // add plus an O(log n) table lookup, never touched on the per-tick hot path.
+  private accrueLifetimeXp(amount: number, meta: PlayerMeta, p: Entity): void {
+    const atCap = p.level >= MAX_LEVEL;
+    const beforeVL = atCap ? virtualLevel(meta.lifetimeXp) : 0;
+    meta.lifetimeXp += amount;
+    // 64-bit-safe invariant: JS numbers are exact to 2^53. A single character
+    // reaching this is effectively impossible, but clamp + log if it ever does.
+    if (meta.lifetimeXp >= Number.MAX_SAFE_INTEGER) {
+      meta.lifetimeXp = Number.MAX_SAFE_INTEGER;
+      console.warn(`lifetimeXp for ${meta.name} hit the 2^53 ceiling and was clamped`);
+    }
+    if (atCap) {
+      const afterVL = virtualLevel(meta.lifetimeXp);
+      for (let v = beforeVL + 1; v <= afterVL; v++) {
+        this.emit({ type: 'virtualLevelUp', level: v, pid: p.id });
+      }
+    }
+    this.checkMilestones(meta, p);
+  }
+
+  // Unlock any cosmetic milestone whose lifetime-XP threshold was just crossed.
+  private checkMilestones(meta: PlayerMeta, p: Entity): void {
+    for (const m of MILESTONES) {
+      if (meta.lifetimeXp >= m.lifetimeXp && !meta.unlockedMilestones.has(m.id)) {
+        meta.unlockedMilestones.add(m.id);
+        this.emit({ type: 'milestoneUnlocked', milestoneId: m.id, pid: p.id });
+      }
+    }
+  }
+
+  // Opt-in cosmetic prestige (Phase 4): only at the cap. Resets the level XP
+  // bar, bumps the prestige rank for a badge by the name + on the leaderboard,
+  // and deliberately leaves lifetimeXp, level, gear, talents, and learned
+  // abilities untouched — strictly cosmetic, zero power change (FR-6.1/6.3).
+  prestige(pid?: number): boolean {
+    const r = this.resolve(pid);
+    if (!r) return false;
+    // Authoritative anti-abuse gate: must be at the cap AND have earned a full
+    // prestige bar of post-cap XP since the last rank. This caps prestigeRank at
+    // what lifetimeXp supports, so spamming the `prestige` command (e.g. from a
+    // hacked client) can never inflate the rank beyond XP actually earned.
+    if (!canPrestige(r.e.level, r.meta.lifetimeXp, r.meta.prestigeRank)) return false;
+    r.meta.xp = 0;
+    r.meta.prestigeRank += 1;
+    this.emit({ type: 'log', pid: r.e.id, text: `You have prestiged! Prestige Rank ${r.meta.prestigeRank}.`, color: '#ffd100' });
+    return true;
   }
 
   private needsQuestDrop(entry: LootEntry, meta: PlayerMeta): boolean {
@@ -2359,7 +2750,11 @@ export class Sim {
     if (!qp || qp.state !== 'active') return false;
     const quest = QUESTS[entry.questId];
     const objIdx = quest.objectives.findIndex((o) => o.type === 'collect' && o.itemId === entry.itemId);
-    return objIdx < 0 || this.countItem(entry.itemId, meta.entityId) < quest.objectives[objIdx].count;
+    // A quest-gated drop is only "needed" while the player has an actual collect
+    // objective for this item that is still short of its required count. If the
+    // quest has no matching collect objective, the player never needs the item,
+    // so it must not drop (fail closed rather than dropping unconditionally).
+    return objIdx >= 0 && this.countItem(entry.itemId, meta.entityId) < quest.objectives[objIdx].count;
   }
 
   private rollLoot(mob: Entity, meta: PlayerMeta, eligible: PlayerMeta[] = [meta]): void {
@@ -2683,23 +3078,44 @@ export class Sim {
         break;
       }
       case 'evade': {
-        const arrived = this.moveToward(mob, mob.spawnPos, mob.moveSpeed * EVADE_SPEED_MULT);
+        // moveToward has no pathfinding: a straight line home that crosses a prop
+        // (the camp tent/crate/campfire) or deep water makes no progress, so the
+        // mob stays evading — and therefore immune — forever. Walk home normally,
+        // but once stalled, phase straight through the blocker just until a normal
+        // step works again. Phasing always makes progress, so arrival is the
+        // backstop: worst case it phases the rest of the way home.
+        const phasing = mob.evadeStall >= EVADE_STALL_TIMEOUT;
+        const distBefore = dist2d(mob.pos, mob.spawnPos);
+        const arrived = this.moveToward(mob, mob.spawnPos, mob.moveSpeed * EVADE_SPEED_MULT, phasing);
         if (arrived) {
-          mob.aiState = 'idle';
-          mob.hp = mob.maxHp;
-          mob.auras = [];
-          mob.inCombat = false;
-          mob.tappedById = null;
-          mob.leashAnchor = null;
-          clearThreat(mob);
-          this.despawnSummonedAdds(mob);
-          mob.firedSummons = 0;
-          mob.enraged = false;
-          mob.wanderTimer = this.rng.range(2, 8);
+          this.resetEvadingMob(mob);
+        } else if (phasing) {
+          if (!this.blockedTowardSpawn(mob, mob.spawnPos)) mob.evadeStall = 0; // cleared the obstacle
+        } else if (dist2d(mob.pos, mob.spawnPos) < distBefore - 1e-3) {
+          mob.evadeStall = 0; // walking home fine
+        } else {
+          mob.evadeStall += DT; // pinned on something
         }
         break;
       }
     }
+  }
+
+  // An evading mob has reached its spawn (walking or phasing): drop the pull
+  // entirely and return to idle at full health, ready to be pulled again.
+  private resetEvadingMob(mob: Entity): void {
+    mob.aiState = 'idle';
+    mob.hp = mob.maxHp;
+    mob.auras = [];
+    mob.inCombat = false;
+    mob.tappedById = null;
+    mob.leashAnchor = null;
+    mob.evadeStall = 0;
+    clearThreat(mob);
+    this.despawnSummonedAdds(mob);
+    mob.firedSummons = 0;
+    mob.enraged = false;
+    mob.wanderTimer = this.rng.range(2, 8);
   }
 
   private mobSwing(mob: Entity, target: Entity): void {
@@ -2776,6 +3192,10 @@ export class Sim {
     if (d > PET_TELEPORT_DISTANCE) {
       pet.pos = { ...owner.pos };
       pet.prevPos = { ...pet.pos };
+      // a warp is a teleport: keep the spatial grid exact this tick instead of
+      // waiting for the end-of-tick refresh, so same-tick aggro/AoE queries
+      // don't miss the pet at its old cell (matches every other teleport site)
+      this.rebucket(pet);
     } else if (d > PET_FOLLOW_DISTANCE && !this.isRooted(pet)) {
       this.moveToward(pet, owner.pos, Math.max(pet.moveSpeed, RUN_SPEED * 1.1) * this.moveSpeedMult(pet));
     }
@@ -2795,15 +3215,25 @@ export class Sim {
     return best;
   }
 
-  private moveToward(e: Entity, dest: Vec3, speed: number): boolean {
+  // Step `e` one tick toward `dest`. With `ignoreObstacles`, the mover phases
+  // straight through props and water — used to free a stuck evader, never for
+  // normal locomotion. Returns true on arrival.
+  private moveToward(e: Entity, dest: Vec3, speed: number, ignoreObstacles = false): boolean {
     const d = dist2d(e.pos, dest);
     if (d < 0.3) return true;
     e.facing = angleTo(e.pos, dest);
     const step = Math.min(speed * DT, d);
     const nx = e.pos.x + Math.sin(e.facing) * step;
     const nz = e.pos.z + Math.cos(e.facing) * step;
-    const ground = groundHeight(nx, nz, this.cfg.seed);
     const canSwim = this.mobCanSwim(MOBS[e.templateId]);
+    if (ignoreObstacles) {
+      e.pos.x = nx;
+      e.pos.z = nz;
+      const g = groundHeight(nx, nz, this.cfg.seed);
+      e.pos.y = Math.max(g, SWIM_SURFACE_Y); // ride the surface while phasing, don't sink under terrain/water
+      return d - step < 0.3;
+    }
+    const ground = groundHeight(nx, nz, this.cfg.seed);
     // landlocked creatures stop at the waterline instead of walking under it
     if (!canSwim && ground < WATER_LEVEL - SWIM_DEPTH) return false;
     const resolved = resolvePosition(this.cfg.seed, nx, nz, BODY_RADIUS);
@@ -2812,6 +3242,22 @@ export class Sim {
     const g = groundHeight(e.pos.x, e.pos.z, this.cfg.seed);
     e.pos.y = canSwim && g < WATER_LEVEL - SWIM_DEPTH ? SWIM_SURFACE_Y : g;
     return d - step < 0.3;
+  }
+
+  // Would a normal (collision- and water-aware) step toward `dest` be blocked —
+  // i.e. is a prop or deep water right in front of this mob? Used to decide when
+  // a phasing evader has cleared the obstacle and can walk normally again.
+  private blockedTowardSpawn(e: Entity, dest: Vec3): boolean {
+    const d = dist2d(e.pos, dest);
+    if (d < 0.3) return false;
+    const facing = angleTo(e.pos, dest);
+    const step = Math.min(e.moveSpeed * EVADE_SPEED_MULT * DT, d);
+    const nx = e.pos.x + Math.sin(facing) * step;
+    const nz = e.pos.z + Math.cos(facing) * step;
+    if (!this.mobCanSwim(MOBS[e.templateId]) && groundHeight(nx, nz, this.cfg.seed) < WATER_LEVEL - SWIM_DEPTH) return true;
+    const resolved = resolvePosition(this.cfg.seed, nx, nz, BODY_RADIUS);
+    // a collider ate most of the intended movement -> still blocked
+    return Math.hypot(nx - resolved.x, nz - resolved.z) > step * 0.5;
   }
 
   private respawnMob(mob: Entity): void {
@@ -2832,6 +3278,7 @@ export class Sim {
     mob.aggroTargetId = null;
     mob.inCombat = false;
     mob.leashAnchor = null;
+    mob.evadeStall = 0;
     clearThreat(mob);
     this.despawnSummonedAdds(mob);
     mob.firedSummons = 0;
@@ -2994,6 +3441,24 @@ export class Sim {
     this.onInventoryChangedForQuests(meta);
   }
 
+  discardItem(itemId: string, count = 1, pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    const { meta } = r;
+    const def = ITEMS[itemId];
+    const available = this.countItem(itemId, meta.entityId);
+    if (!def || available <= 0) { this.error(meta.entityId, "You don't have that item."); return; }
+    const discardCount = Number.isFinite(count) ? Math.min(Math.floor(count), available) : 0;
+    if (discardCount <= 0) return;
+    this.removeItem(itemId, discardCount, meta.entityId);
+    this.emit({
+      type: 'log',
+      text: `Discarded ${def.name}${discardCount > 1 ? ' x' + discardCount : ''}.`,
+      color: '#999',
+      pid: meta.entityId,
+    });
+  }
+
   equipItem(itemId: string, pid?: number): void {
     const r = this.resolve(pid);
     if (!r) return;
@@ -3010,7 +3475,7 @@ export class Sim {
     this.removeItem(itemId, 1, meta.entityId);
     if (old) this.addItemSilent(old, 1, meta);
     meta.equipment[slot] = itemId;
-    recalcPlayerStats(p, meta.cls, meta.equipment);
+    recalcPlayerStats(p, meta.cls, meta.equipment, meta.talentMods);
     this.emit({ type: 'log', text: `Equipped ${def.name}.`, color: '#8f8', pid: meta.entityId });
   }
 
@@ -3080,7 +3545,7 @@ export class Sim {
         this.error(meta.entityId, 'That potion is not ready yet.');
         return;
       }
-      const restoresMana = (def.potionMana ?? 0) > 0 && p.resourceType === 'mana';
+      const restoresMana = (def.potionMana ?? 0) > 0 && p.resourceType === 'mana' && p.resource < p.maxResource;
       const restoresHp = (def.potionHp ?? 0) > 0 && p.hp < p.maxHp;
       if (!restoresHp && !restoresMana) {
         this.error(meta.entityId, p.hp >= p.maxHp && (def.potionMana ?? 0) === 0 ? 'You are already at full health.' : 'Nothing to restore.');
@@ -3460,7 +3925,7 @@ export class Sim {
     p.facing = 0;
     p.auras = [];
     p.ccDr.clear();
-    recalcPlayerStats(p, meta.cls, meta.equipment);
+    recalcPlayerStats(p, meta.cls, meta.equipment, meta.talentMods);
     p.hp = p.maxHp;
     p.resource = p.resourceType === 'mana' ? p.maxResource : p.resourceType === 'energy' ? 100 : 0;
     p.targetId = null;
@@ -3543,13 +4008,42 @@ export class Sim {
       return { channel: 'general', message: clean };
     }
 
+    // "/me <action>" — freeform third-person action text, e.g.
+    // "/me ponders the void" → "Aleph ponders the void". Emotes never become
+    // the player's sticky chat channel, so this returns null on success.
+    const meMatch = /^\/(?:me|emote|e)\s+([\s\S]+)$/i.exec(raw);
+    if (meMatch) {
+      const action = meMatch[1].trim();
+      if (action) this.broadcastEmote(r.meta, r.e, action);
+      return null;
+    }
+
+    // "/wave", "/dance [name]" — predefined social emotes. An optional name
+    // targets an online player (in range or not); unknown names fall back to
+    // the untargeted form, matching WoW.
+    const emMatch = /^\/([a-z]+)(?:\s+(\S+))?\s*$/i.exec(raw);
+    if (emMatch) {
+      const key = EMOTE_ALIASES[emMatch[1].toLowerCase()] ?? emMatch[1].toLowerCase();
+      const def = EMOTES[key];
+      if (def) {
+        const targetName = emMatch[2];
+        let text = def.solo;
+        if (targetName && def.target) {
+          const t = this.findPlayerByName(targetName);
+          if (t) text = def.target.replace('%t', t.name === r.meta.name ? 'themselves' : t.name);
+        }
+        this.broadcastEmote(r.meta, r.e, text);
+        return null;
+      }
+    }
+
     // bare text and "/s" are local say; "/y" carries further — both are
     // delivered per-player by range and carry the speaker for chat bubbles
     let channel: 'say' | 'yell' = 'say';
     let clean = raw;
     if (/^\/y(ell)?\s/i.test(raw)) { channel = 'yell'; clean = raw.replace(/^\/y(ell)?\s+/i, '').trim(); }
     else if (/^\/s(ay)?\s/i.test(raw)) { clean = raw.replace(/^\/s(ay)?\s+/i, '').trim(); }
-    else if (raw.startsWith('/')) { this.error(r.meta.entityId, `Unknown command: ${raw.split(' ')[0]}. Try /s /y /w /p /g.`); return null; }
+    else if (raw.startsWith('/')) { this.error(r.meta.entityId, `Unknown command: ${raw.split(' ')[0]}. Try /s /y /w /p /g, /me, or an emote like /wave.`); return null; }
     if (!clean) return null;
     const range = channel === 'yell' ? YELL_RANGE : SAY_RANGE;
     for (const meta of this.players.values()) {
@@ -3558,6 +4052,31 @@ export class Sim {
       this.emit({ type: 'chat', fromPid: r.meta.entityId, from: r.meta.name, text: clean, channel, entityId: r.e.id, pid: meta.entityId });
     }
     return { channel, message: clean };
+  }
+
+  // Resolve a player by name the same way whispers do: an exact-case match
+  // wins outright, otherwise a case-insensitive match is used only when it is
+  // unambiguous.
+  private findPlayerByName(name: string): PlayerMeta | null {
+    const wanted = name.toLowerCase();
+    const ci: PlayerMeta[] = [];
+    for (const meta of this.players.values()) {
+      if (meta.name === name) return meta;
+      if (meta.name.toLowerCase() === wanted) ci.push(meta);
+    }
+    return ci.length === 1 ? ci[0] : null;
+  }
+
+  // Send a third-person emote to every player within /say range (including the
+  // actor). `from` carries the actor's name so the client can render it as a
+  // clickable name; `text` is the action predicate (e.g. "waves at Bet.").
+  private broadcastEmote(actor: PlayerMeta, actorEntity: Entity, text: string): void {
+    const body = text.slice(0, 200);
+    for (const meta of this.players.values()) {
+      const e = this.entities.get(meta.entityId);
+      if (!e || dist2d(actorEntity.pos, e.pos) > SAY_RANGE) continue;
+      this.emit({ type: 'chat', fromPid: actor.entityId, from: actor.name, text: body, channel: 'emote', entityId: actorEntity.id, pid: meta.entityId });
+    }
   }
 
   // -------------------------------------------------------------------------
@@ -4065,7 +4584,7 @@ export class Sim {
       e.ccDr.clear();
     }
     const meta = this.players.get(e.id);
-    if (meta) recalcPlayerStats(e, meta.cls, meta.equipment);
+    if (meta) recalcPlayerStats(e, meta.cls, meta.equipment, meta.talentMods);
     e.hp = e.maxHp;
     e.resource = e.resourceType === 'mana' ? e.maxResource : e.resourceType === 'energy' ? 100 : 0;
     e.targetId = null;
@@ -4414,6 +4933,7 @@ export class Sim {
     const def = ITEMS[itemId];
     if (!def) return;
     if (def.kind === 'quest') { this.error(meta.entityId, 'The Merchant will not broker quest items.'); return; }
+    if (!Number.isFinite(count)) { this.error(meta.entityId, 'Name how many you wish to sell.'); return; }
     const want = Math.max(1, Math.floor(count));
     if (this.countItem(itemId, meta.entityId) < want) { this.error(meta.entityId, 'You do not have that many to sell.'); return; }
     const ask = Math.floor(price);

@@ -467,6 +467,32 @@ describe('hunter pets', () => {
     expect(boar.tappedById).toBe(sim.playerId);
   });
 
+  it('keeps the owner in combat while their pet tanks a mob', () => {
+    // Regression: inCombat was recomputed only from a mob's *direct* target,
+    // so when a mob attacked the pet (mob.aggroTargetId === pet.id) the owner
+    // was never marked engaged. Once the owner's combatTimer passed 5s with no
+    // personal damage, they dropped out of combat mid-fight and could regen
+    // health, eat/drink, and use out-of-combat-only abilities while the pet
+    // kept fighting.
+    const { sim, wolf: pet } = tamedSetup();
+    const boar = nearestMob(sim, 'wild_boar');
+    beefUp(boar);
+    teleport(sim, sim.player, boar.pos.x + 4, boar.pos.z);
+    teleport(sim, pet, boar.pos.x + 5, boar.pos.z);
+    hit(sim, sim.player, boar, 5); // boar comes for the hunter; pet assists
+
+    // let the boar transfer onto the tanking pet
+    for (let i = 0; i < 20 * 20 && boar.aggroTargetId !== pet.id; i++) sim.tick();
+    expect(boar.aggroTargetId).toBe(pet.id);
+
+    // owner stops dealing damage; age their personal combat timer past 5s
+    sim.player.combatTimer = 99;
+    sim.tick();
+
+    expect(pet.inCombat).toBe(true);
+    expect(sim.player.inCombat).toBe(true);
+  });
+
   it('dismiss releases the pet back to the wild', () => {
     const { sim, wolf } = tamedSetup();
     const priestId = sim.addPlayer('priest', 'Priest');

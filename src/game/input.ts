@@ -16,7 +16,7 @@ const TOUCH_LOOK_PITCH_RATE = 2.2;
 export interface InputCallbacks {
   onTab(): void;
   onAbility(slot: number): void;
-  onUiKey(key: 'interact' | 'bags' | 'char' | 'spellbook' | 'questlog' | 'map' | 'nameplates' | 'escape' | 'chat' | 'meters' | 'social' | 'arena'): void;
+  onUiKey(key: 'interact' | 'bags' | 'char' | 'spellbook' | 'talents' | 'questlog' | 'map' | 'nameplates' | 'escape' | 'chat' | 'meters' | 'social' | 'arena' | 'leaderboard'): void;
   onClickPick(x: number, y: number, button: number): void;
   /** When false, edge actions (spells, UI keys) are ignored. */
   canUseGameKeys?: () => boolean;
@@ -175,12 +175,18 @@ export class Input {
     return this.controllerFacing;
   }
 
-  private releaseCapture(_reason: string): void {
-    this.keys.clear();
+  private releaseCapture(reason: string): void {
+    // Always drop the mouse-drag state so a button can't stick "held".
     this.leftDown = false;
     this.rightDown = false;
     this.downButton = -1;
     this.pointerLockRequestedForDrag = false;
+    // Focus loss (blur / tab hidden) means the OS will swallow the matching
+    // keyup, so we must forget held movement keys or they'd stick on. A pointer
+    // -lock exit is different: the window still has focus and keyup will fire
+    // normally, so clearing keys here would cancel a walk the instant a camera
+    // drag ends (every right/left-drag exits pointer lock on release).
+    if (reason !== 'pointerlock') this.keys.clear();
     this.updateCursor();
   }
 
@@ -221,12 +227,14 @@ export class Input {
       case 'bags': this.cb.onUiKey('bags'); return;
       case 'char': this.cb.onUiKey('char'); return;
       case 'spellbook': this.cb.onUiKey('spellbook'); return;
+      case 'talents': this.cb.onUiKey('talents'); return;
       case 'questlog': this.cb.onUiKey('questlog'); return;
       case 'map': this.cb.onUiKey('map'); return;
       case 'nameplates': this.cb.onUiKey('nameplates'); return;
       case 'meters': this.cb.onUiKey('meters'); return;
       case 'social': this.cb.onUiKey('social'); return;
       case 'arena': this.cb.onUiKey('arena'); return;
+      case 'leaderboard': this.cb.onUiKey('leaderboard'); return;
       case 'chat': this.cb.onUiKey('chat'); return;
     }
   }
@@ -236,6 +244,9 @@ export class Input {
     if (e.button === 2) this.rightDown = true;
     this.downButton = e.button;
     this.dragDistance = 0;
+    // Pointer lock is requested lazily once a drag actually begins (see
+    // onMouseMove) — NOT on every press, which spammed the browser "mouse
+    // capture" banner on every right-click used to attack/look (#116).
     this.pointerLockRequestedForDrag = false;
     this.updateCursor();
   }
@@ -265,6 +276,8 @@ export class Input {
     const mx = e.movementX ?? 0, my = e.movementY ?? 0;
     if (mx === 0 && my === 0) return;
     this.dragDistance += Math.abs(mx) + Math.abs(my);
+    // Engage pointer lock only once the press turns into an actual camera drag —
+    // one banner per drag, none for a plain click (#116).
     if (!this.mouseCameraEnabled && this.dragDistance > 5 && !this.pointerLockRequestedForDrag) {
       this.pointerLockRequestedForDrag = true;
       this.canvas.requestPointerLock?.();

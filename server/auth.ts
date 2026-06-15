@@ -69,16 +69,29 @@ function parseBanlist(raw: string | undefined): string[] {
     .filter((term) => term.length > 0);
 }
 
+let banlistCacheKey: string | null = null;
+let banlistCacheTerms: string[] = [];
+
 function bannedUsernameTerms(): string[] {
-  const terms = BUILT_IN_BANNED_NAME_TERMS.concat(parseBanlist(process.env.USERNAME_BANLIST));
-  const file = process.env.USERNAME_BANLIST_FILE;
-  if (!file) return terms;
+  const rawList = process.env.USERNAME_BANLIST ?? '';
+  const file = process.env.USERNAME_BANLIST_FILE ?? '';
+  const cacheKey = `${rawList}\0${file}`;
+  if (cacheKey === banlistCacheKey) return banlistCacheTerms;
+
+  const terms = BUILT_IN_BANNED_NAME_TERMS.concat(parseBanlist(rawList));
+  if (!file) {
+    banlistCacheTerms = terms;
+    banlistCacheKey = cacheKey;
+    return banlistCacheTerms;
+  }
   try {
-    return terms.concat(parseBanlist(readFileSync(file, 'utf8')));
+    banlistCacheTerms = terms.concat(parseBanlist(readFileSync(file, 'utf8')));
   } catch (err) {
     console.warn(`could not read USERNAME_BANLIST_FILE (${file}):`, err);
     return terms;
   }
+  banlistCacheKey = cacheKey;
+  return banlistCacheTerms;
 }
 
 export function offensiveUsername(u: unknown): boolean {

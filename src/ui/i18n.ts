@@ -12,7 +12,132 @@ export type Leaves<T, D extends number = 5> = [D] extends [never]
   ? { [K in keyof T]-?: Join<K, Leaves<T[K], Prev[D]>> }[keyof T]
   : "";
 
+// In-game HUD strings for the Max-Level XP Overflow / post-cap progression
+// system. The in-game HUD shipped English-only; these are registered here so
+// they route through t() per the i18n constraint. Every locale references this
+// same English object (translations are a follow-up), which keeps the
+// `: typeof en` shape exact across all languages.
+export const gameStrings = {
+  xp: {
+    suffix: "XP",
+    maxLevel: "MAX LEVEL",
+    totalXp: "total XP",
+    lv: "Lv",
+    toNext: "to next",
+  },
+  progression: {
+    heading: "Progression",
+    totalXp: "Total XP",
+    virtualLevel: "Virtual Level",
+    prestigeRank: "Prestige Rank",
+    milestones: "Milestones",
+    none: "None yet",
+    virtualLevelUp: "Virtual Level",
+  },
+  leaderboard: {
+    title: "Leaderboard",
+    subtitle: "Lifetime XP",
+    rank: "Rank",
+    name: "Name",
+    realmCol: "Realm",
+    level: "Lvl",
+    vlevel: "V.Lvl",
+    lifetimeXp: "Lifetime XP",
+    yourRank: "Your Standing",
+    empty: "No champions yet — be the first to make your mark.",
+    loading: "Loading rankings…",
+    unranked: "Unranked",
+    you: "You",
+    globalSubtitle: "Top champions across all realms",
+    retry: "Could not load the leaderboard. Try again.",
+  },
+  milestone: {
+    unlocked: "Milestone Unlocked",
+    veteran: "Veteran",
+    champion: "Champion",
+    paragon: "Paragon",
+    mythic: "Mythic",
+    eternal: "Eternal",
+  },
+  prestige: {
+    action: "Prestige",
+    title: "Prestige Character",
+    body: "Prestige raises your Prestige Rank by 1 and resets your level XP bar. It does NOT change your level, gear, talents, abilities, or your lifetime XP and leaderboard standing — it is a cosmetic flex only.",
+    confirm: "Prestige",
+    cancel: "Cancel",
+    rank: "Prestige",
+    needCap: "You must be at the level cap to prestige.",
+    needXp: "more lifetime XP to prestige",
+  },
+  settings: {
+    showOverflowXp: "Show Overflow XP",
+  },
+  // Talents & Specializations — UI chrome only (node/spec names are content,
+  // rendered directly like ability names). Registered here so the panel routes
+  // through t() per the i18n constraint.
+  talents: {
+    title: "Talents",
+    classTab: "Class",
+    specTab: "Specialization",
+    available: "Available",
+    spent: "Spent",
+    pointSource: "Earn 1 talent point each level from level {first} to {cap}. Level up to get more points.",
+    apply: "Apply changes",
+    clear: "Reset points",
+    reset: "Reset",
+    chooseSpec: "Choose a Specialization",
+    noSpec: "No specialization chosen",
+    role: "Role",
+    mastery: "Mastery",
+    signature: "Signature",
+    roleTank: "Tank",
+    roleHealer: "Healer",
+    roleDps: "Damage",
+    loadouts: "Saved builds",
+    currentBuild: "Current build",
+    createBuild: "Create build",
+    saveBuild: "Save current",
+    saveBuildAs: "Save build",
+    newBuild: "New build",
+    deleteBuild: "Delete",
+    currentBuildHint: "Choose a saved build, then Save current to update it. Export shares the selected build.",
+    createBuildHint: "New build saves your current points as a separate build. Import pastes a shared build string.",
+    buildHint: "Choose a saved build, update it with Save current, or create another with New build.",
+    buildInvalid: "This build is not valid yet.",
+    selectBuildFirst: "Select a saved build to delete.",
+    deleteBuildTitle: "Delete saved build?",
+    deleteBuildBody: "Delete “{name}”? This removes only the saved build; your current talents stay unchanged.",
+    deleteBuildConfirm: "Delete build",
+    namePrompt: "Name this build:",
+    import: "Import",
+    export: "Export",
+    importPrompt: "Paste a build string:",
+    exportCopied: "Build string copied to clipboard.",
+    exportTitle: "Build string (copy & share):",
+    invalidBuild: "That build string is invalid.",
+    rank: "Rank",
+    requires: "Requires",
+    pointsGate: "points spent in tree",
+    dormant: "Inactive — prerequisite refunded",
+    editHint: "Left-click to add • Right-click to remove",
+    cycleHint: "Click to choose an option",
+    combatLocked: "You can't change talents in combat.",
+    nothingStaged: "No changes to apply.",
+    pickSpecFirst: "Choose a specialization to access this tree.",
+    unlockBanner: "Talents Unlocked!",
+    unlockHint: "You've earned your first talent point — press N to open Talents.",
+    copy: "Copy",
+    close: "Close",
+    cancel: "Cancel",
+    noBuilds: "No saved builds",
+    save: "Save",
+    comingSoonTitle: "Talents coming soon",
+    comingSoonBody: "This class does not have talent trees yet. You can keep playing normally; full trees will arrive in a future update.",
+  },
+};
+
 export const en = {
+  game: gameStrings,
   nav: {
     home: "Home",
     play: "Play",
@@ -143,6 +268,7 @@ export const en = {
 };
 
 export const es: typeof en = {
+  game: gameStrings,
   nav: {
     home: "Inicio",
     play: "Jugar",
@@ -273,6 +399,7 @@ export const es: typeof en = {
 };
 
 export const es_ES: typeof en = {
+  game: gameStrings,
   nav: {
     home: "Inicio",
     play: "Jugar",
@@ -403,6 +530,7 @@ export const es_ES: typeof en = {
 };
 
 export const fr_FR: typeof en = {
+  game: gameStrings,
   nav: {
     home: "Accueil",
     play: "Jouer",
@@ -533,6 +661,7 @@ export const fr_FR: typeof en = {
 };
 
 export const fr_CA: typeof en = {
+  game: gameStrings,
   nav: {
     home: "Accueil",
     play: "Jouer",
@@ -663,6 +792,7 @@ export const fr_CA: typeof en = {
 };
 
 export const en_CA: typeof en = {
+  game: gameStrings,
   nav: {
     home: "Home",
     play: "Play",
@@ -793,6 +923,7 @@ export const en_CA: typeof en = {
 };
 
 export const it_IT: typeof en = {
+  game: gameStrings,
   nav: {
     home: "Pagina principale",
     play: "Gioca",
@@ -923,6 +1054,7 @@ export const it_IT: typeof en = {
 };
 
 export const de_DE: typeof en = {
+  game: gameStrings,
   nav: {
     home: "Startseite",
     play: "Spielen",
@@ -1053,6 +1185,7 @@ export const de_DE: typeof en = {
 };
 
 export const zh_CN: typeof en = {
+  game: gameStrings,
   nav: {
     home: "首页",
     play: "开始游戏",
@@ -1183,6 +1316,7 @@ export const zh_CN: typeof en = {
 };
 
 export const zh_TW: typeof en = {
+  game: gameStrings,
   nav: {
     home: "首頁",
     play: "開始遊戲",
@@ -1313,6 +1447,7 @@ export const zh_TW: typeof en = {
 };
 
 export const ko_KR: typeof en = {
+  game: gameStrings,
   nav: {
     home: "홈",
     play: "플레이",
@@ -1443,6 +1578,7 @@ export const ko_KR: typeof en = {
 };
 
 export const ja_JP: typeof en = {
+  game: gameStrings,
   nav: {
     home: "ホーム",
     play: "プレイ",
@@ -1573,6 +1709,7 @@ export const ja_JP: typeof en = {
 };
 
 export const pt_BR: typeof en = {
+  game: gameStrings,
   nav: {
     home: "Início",
     play: "Jogar",
@@ -1703,6 +1840,7 @@ export const pt_BR: typeof en = {
 };
 
 export const ru_RU: typeof en = {
+  game: gameStrings,
   nav: {
     home: "Главная",
     play: "Играть",

@@ -183,6 +183,23 @@ describe('the World Market — the Merchant', () => {
     expect(sim.marketInfoFor(seller)).toBeNull(); // not streamed when far
   });
 
+  it('rejects a non-finite count without escrowing goods or listing them', () => {
+    for (const badCount of [NaN, Infinity, -Infinity]) {
+      const sim = makeWorld();
+      const seller = sim.addPlayer('warrior', 'Seller');
+      standAtMerchant(sim, seller);
+      sim.addItem('wolf_fang', 3, seller);
+      sim.events.length = 0;
+
+      sim.marketList('wolf_fang', badCount, 100, seller);
+
+      // an error is surfaced, nothing is escrowed, and no listing is created
+      expect(errorsSince(sim).length).toBeGreaterThan(0);
+      expect(sim.countItem('wolf_fang', seller)).toBe(3); // nothing removed
+      expect(sim.marketListings.some((l) => l.sellerKey === 'Seller')).toBe(false);
+    }
+  });
+
   it('will not broker quest items', () => {
     const sim = makeWorld();
     const seller = sim.addPlayer('warrior', 'Seller');
