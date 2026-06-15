@@ -184,6 +184,112 @@ describe('chat channels', () => {
     expect(delivered).toBeLessThan(20);
   });
 
+  it('a joined player hears /world only from other joined players', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('mage', 'Bet');
+    const outsider = sim.addPlayer('rogue', 'Gimel');
+    // distance must not matter for a global channel
+    teleport(sim, a, 0, -40);
+    teleport(sim, b, 0, -900);
+    teleport(sim, outsider, 2, -40);
+    sim.tick();
+    sim.chat('/join world', a);
+    sim.chat('/join world', b);
+    sim.tick();
+
+    sim.chat('/world anyone for the crypt?', a);
+    const msgs = chatEvents(sim.tick());
+    expect(msgs.every((m) => m.channel === 'world' && m.text === 'anyone for the crypt?')).toBe(true);
+    const pids = msgs.map((m) => m.pid).sort();
+    expect(pids).toContain(a);          // sender hears their own message
+    expect(pids).toContain(b);          // joined, ignores distance
+    expect(pids).not.toContain(outsider); // never joined → never hears it
+  });
+
+  it('talking in a channel you have not joined errors instead of broadcasting', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    sim.tick();
+    sim.chat('/world hello?', a);
+    const events = sim.tick();
+    expect(chatEvents(events)).toHaveLength(0);
+    expect(events.some((e) => e.type === 'error' && /not in the world channel/i.test(e.text))).toBe(true);
+  });
+
+  it('/leave stops further delivery on that channel', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('mage', 'Bet');
+    sim.chat('/join world', a);
+    sim.chat('/join world', b);
+    sim.tick();
+    sim.chat('/leave world', b);
+    sim.tick();
+
+    sim.chat('/world still around?', a);
+    const pids = chatEvents(sim.tick()).map((m) => m.pid);
+    expect(pids).toContain(a);
+    expect(pids).not.toContain(b); // left the channel
+  });
+
+  it('world and lfg are independent channels', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('mage', 'Bet');
+    sim.chat('/join world', a);
+    sim.chat('/join lfg', a);
+    sim.chat('/join lfg', b); // b is only in lfg, not world
+    sim.tick();
+
+    sim.chat('/world world only', a);
+    const worldPids = chatEvents(sim.tick()).map((m) => m.pid);
+    expect(worldPids).toContain(a);
+    expect(worldPids).not.toContain(b);
+
+    sim.chat('/lfg lfg only', a);
+    const lfgMsgs = chatEvents(sim.tick());
+    expect(lfgMsgs.every((m) => m.channel === 'lfg')).toBe(true);
+    const lfgPids = lfgMsgs.map((m) => m.pid);
+    expect(lfgPids).toContain(a);
+    expect(lfgPids).toContain(b);
+  });
+
+  it('/join confirms with a chat-log notice', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    sim.tick();
+    sim.chat('/join world', a);
+    const events = sim.tick();
+    expect(events.some((e) => e.type === 'log' && e.pid === a && /joined the world channel/i.test(e.text))).toBe(true);
+  });
+
+  it('/join rejects unknown channels and the always-on general channel', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    sim.tick();
+    sim.chat('/join nonsense', a);
+    sim.chat('/join general', a);
+    const events = sim.tick();
+    expect(events.some((e) => e.type === 'error' && /no channel named/i.test(e.text))).toBe(true);
+    expect(events.some((e) => e.type === 'error' && /general channel is always on/i.test(e.text))).toBe(true);
+    expect(chatEvents(events)).toHaveLength(0); // nothing said out loud
+  });
+
+  it('a player who leaves the game is dropped from channel rosters', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('mage', 'Bet');
+    sim.chat('/join world', a);
+    sim.chat('/join world', b);
+    sim.tick();
+    sim.removePlayer(b);
+
+    sim.chat('/world anyone left?', a);
+    const pids = chatEvents(sim.tick()).map((m) => m.pid);
+    expect(pids).toEqual([a]); // only the remaining subscriber
+  });
+
   it('party channel still works and stays private to the party', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');

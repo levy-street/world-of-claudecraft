@@ -179,9 +179,14 @@ export interface RewardCounters {
 }
 
 export interface SentChat {
-  channel: 'say' | 'yell' | 'whisper' | 'general' | 'party';
+  channel: 'say' | 'yell' | 'whisper' | 'general' | 'party' | 'world' | 'lfg';
   message: string;
 }
+
+// Opt-in global chat channels a player can /join and /leave. `general` is
+// always-on (everyone hears /g), so it is intentionally not joinable here.
+export const JOINABLE_CHANNELS = ['world', 'lfg'] as const;
+export type JoinableChannel = (typeof JOINABLE_CHANNELS)[number];
 
 // Per-player progression and bags. The entity holds combat state; this holds
 // everything that belongs to the character sheet.
@@ -339,6 +344,8 @@ export class Sim {
   private nextArenaMatchId = 1;
   // per-player chat token bucket (anti-spam); refilled lazily by sim time
   private chatTokens = new Map<number, { tokens: number; at: number }>();
+  // per-player set of opt-in global channels (world, lfg) joined via /join
+  private channelSubs = new Map<number, Set<JoinableChannel>>();
   // dungeon instances
   instances: InstanceSlot[] = [];
   // the World Market: one shared listing book, per-seller collections keyed by
@@ -548,6 +555,7 @@ export class Sim {
     this.dropEntity(pid);
     this.players.delete(pid);
     this.chatTokens.delete(pid);
+    this.channelSubs.delete(pid);
     if (this.primaryId === pid) this.primaryId = this.players.size > 0 ? [...this.players.keys()][0] : -1;
   }
 
@@ -3596,13 +3604,40 @@ export class Sim {
       return { channel: 'general', message: clean };
     }
 
+    // "/join <channel>" / "/leave <channel>" — opt-in global channels
+    const jm = /^\/(join|leave)\b\s*(\S*)\s*$/i.exec(raw);
+    if (jm) {
+      this.handleChannelMembership(r.meta, jm[1].toLowerCase() as 'join' | 'leave', jm[2].toLowerCase());
+      return null;
+    }
+
+    // "/world message" / "/lfg message" — talk in an opt-in channel; only
+    // players who have /join-ed it hear the message (the sender included)
+    const cm = /^\/(world|lfg)\s+([\s\S]+)$/i.exec(raw);
+    if (cm) {
+      const channel = cm[1].toLowerCase() as JoinableChannel;
+      const clean = cm[2].trim();
+      if (!clean) return null;
+      const mine = this.channelSubs.get(r.meta.entityId);
+      if (!mine || !mine.has(channel)) {
+        this.error(r.meta.entityId, `You are not in the ${channel} channel. Type /join ${channel} first.`);
+        return null;
+      }
+      for (const [subPid, set] of this.channelSubs) {
+        if (set.has(channel) && this.players.has(subPid)) {
+          this.emit({ type: 'chat', fromPid: r.meta.entityId, from: r.meta.name, text: clean, channel, pid: subPid });
+        }
+      }
+      return { channel, message: clean };
+    }
+
     // bare text and "/s" are local say; "/y" carries further — both are
     // delivered per-player by range and carry the speaker for chat bubbles
     let channel: 'say' | 'yell' = 'say';
     let clean = raw;
     if (/^\/y(ell)?\s/i.test(raw)) { channel = 'yell'; clean = raw.replace(/^\/y(ell)?\s+/i, '').trim(); }
     else if (/^\/s(ay)?\s/i.test(raw)) { clean = raw.replace(/^\/s(ay)?\s+/i, '').trim(); }
-    else if (raw.startsWith('/')) { this.error(r.meta.entityId, `Unknown command: ${raw.split(' ')[0]}. Try /s /y /w /p /g.`); return null; }
+    else if (raw.startsWith('/')) { this.error(r.meta.entityId, `Unknown command: ${raw.split(' ')[0]}. Try /s /y /w /p /g /join /world /lfg.`); return null; }
     if (!clean) return null;
     const range = channel === 'yell' ? YELL_RANGE : SAY_RANGE;
     for (const meta of this.players.values()) {
@@ -4849,6 +4884,42 @@ export class Sim {
 
   private error(pid: number, text: string): void {
     this.emit({ type: 'error', text, pid });
+  }
+
+  // A positive, personal chat-log notice (e.g. confirming a /join). Unlike
+  // error(), this lands in the chat log rather than flashing the error toast.
+  private notice(pid: number, text: string, color = '#ffd100'): void {
+    this.emit({ type: 'log', text, color, pid });
+  }
+
+  // Handles /join and /leave for the opt-in global channels.
+  private handleChannelMembership(meta: PlayerMeta, action: 'join' | 'leave', arg: string): void {
+    const pid = meta.entityId;
+    if (!arg) {
+      this.error(pid, `Usage: /${action} <channel>. Channels: ${JOINABLE_CHANNELS.join(', ')}.`);
+      return;
+    }
+    if (arg === 'general') {
+      this.error(pid, 'The General channel is always on — just use /g.');
+      return;
+    }
+    if (!JOINABLE_CHANNELS.includes(arg as JoinableChannel)) {
+      this.error(pid, `There is no channel named '${arg}'. Channels: ${JOINABLE_CHANNELS.join(', ')}.`);
+      return;
+    }
+    const channel = arg as JoinableChannel;
+    let set = this.channelSubs.get(pid);
+    if (action === 'join') {
+      if (!set) { set = new Set(); this.channelSubs.set(pid, set); }
+      if (set.has(channel)) { this.error(pid, `You are already in the ${channel} channel.`); return; }
+      set.add(channel);
+      this.notice(pid, `Joined the ${channel} channel. Type /${channel} <message> to talk.`);
+    } else {
+      if (!set || !set.has(channel)) { this.error(pid, `You are not in the ${channel} channel.`); return; }
+      set.delete(channel);
+      if (set.size === 0) this.channelSubs.delete(pid);
+      this.notice(pid, `Left the ${channel} channel.`);
+    }
   }
 }
 

@@ -133,7 +133,7 @@ interface WhoRosterRow {
 }
 
 type RememberedChat =
-  | { channel: 'say' | 'yell' | 'general' | 'party' | 'guild' | 'officer' }
+  | { channel: 'say' | 'yell' | 'general' | 'party' | 'guild' | 'officer' | 'world' | 'lfg' }
   | { channel: 'whisper'; target: string };
 
 // Identity fields rarely change, so they ride only in "full" records: on an
@@ -1106,6 +1106,10 @@ export class GameServer {
           return this.sim.chat(`/p ${body}`, pid);
         case 'general':
           return this.sim.chat(`/general ${body}`, pid);
+        case 'world':
+          return this.sim.chat(`/world ${body}`, pid);
+        case 'lfg':
+          return this.sim.chat(`/lfg ${body}`, pid);
         case 'yell':
           return this.sim.chat(`/y ${body}`, pid);
         case 'say':

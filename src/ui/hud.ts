@@ -179,6 +179,7 @@ export class Hud {
     this.showBanner(startZone.name);
     this.log(`Welcome to ${startZone.name}!`, '#ffd100');
     this.logZoneWelcome(startZone);
+    this.log('Tip: type /join world or /join lfg to chat with players across the realm.', '#7fd4ff');
   }
 
   private bindLogTabs(): void {
@@ -1316,6 +1317,8 @@ export class Hud {
               else { this.chatLogFrom(ev.from, ev.text, '#ff80ff', '', ' whispers: '); audio.whisper(); }
               break;
             case 'general': this.chatLogFrom(ev.from, ev.text, '#ffc864', '[General] ', ': '); break;
+            case 'world': this.chatLogFrom(ev.from, ev.text, '#ff9d5c', '[World] ', ': '); break;
+            case 'lfg': this.chatLogFrom(ev.from, ev.text, '#5cd6a0', '[LFG] ', ': '); break;
             case 'guild': this.chatLogFrom(ev.from, ev.text, '#40d264', '[Guild] ', ': '); break;
             case 'officer': this.chatLogFrom(ev.from, ev.text, '#4ce0c0', '[Officer] ', ': '); break;
             default: this.chatLogFrom(ev.from, ev.text, '#f0ead8', '', ' says: '); break;
