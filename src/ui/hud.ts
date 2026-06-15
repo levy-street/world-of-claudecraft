@@ -1047,14 +1047,14 @@ export class Hud {
       const me = r.pid === myPid;
       const cls = CLASSES[r.cls]?.name ?? r.cls;
       return `<div class="ladder-row${me ? ' me' : ''}"><span class="rank">${i + 1}</span>`
-        + `<span class="lr-name" title="${r.name} — ${cls}">${r.name}</span>`
+        + `<span class="lr-name" title="${esc(r.name)} — ${esc(cls)}">${esc(r.name)}</span>`
         + `<span class="lr-rating">${r.rating}</span>`
         + `<span class="lr-wl">${r.wins}-${r.losses}</span></div>`;
     }).join('') || `<div class="ladder-empty">No challengers ranked yet — be the first.</div>`;
 
     let action: string;
     if (inMatch) {
-      action = `<div class="arena-queue-status">⚔ Match in progress vs ${a.match!.oppName}.</div>`;
+      action = `<div class="arena-queue-status">⚔ Match in progress vs ${esc(a.match!.oppName)}.</div>`;
     } else if (a.queued) {
       action = `<button class="btn leave" data-act="leave">Leave Queue</button>`
         + `<div class="arena-queue-status">Searching for an opponent… (${a.queueSize} in queue)</div>`;
@@ -1068,7 +1068,7 @@ export class Hud {
       const me = r.name === this.sim.player.name;
       const cls = CLASSES[r.class as keyof typeof CLASSES]?.name ?? r.class;
       return `<div class="ladder-row${me ? ' me' : ''}"><span class="rank">${i + 1}</span>`
-        + `<span class="lr-name" title="${r.name} — Lv ${r.level} ${cls}">${r.name}</span>`
+        + `<span class="lr-name" title="${esc(r.name)} — Lv ${r.level} ${esc(cls)}">${esc(r.name)}</span>`
         + `<span class="lr-rating">${r.rating}</span>`
         + `<span class="lr-wl">${r.wins}-${r.losses}</span></div>`;
     }).join('');
@@ -1110,7 +1110,7 @@ export class Hud {
     if (sig !== this.lastArenaStatusSig) {
       this.lastArenaStatusSig = sig;
       const cls = CLASSES[m.oppClass]?.name ?? m.oppClass;
-      el.innerHTML = `<div class="as-vs">⚔ VS <span class="opp">${m.oppName}</span> <span style="color:#b6ad8c;font-size:11px">Lv ${m.oppLevel} ${cls}</span></div>`
+      el.innerHTML = `<div class="as-vs">⚔ VS <span class="opp">${esc(m.oppName)}</span> <span style="color:#b6ad8c;font-size:11px">Lv ${m.oppLevel} ${esc(cls)}</span></div>`
         + `<div class="as-timer">${label}</div>`;
       el.style.display = 'block';
     }
@@ -1849,7 +1849,7 @@ export class Hud {
       row.innerHTML =
         `${this.itemIcon(item)}`
         + `<span class="mkt-name"><span class="nm" style="color:${qColor}">${item.name}${l.count > 1 ? ' <span style="color:#ccc">x' + l.count + '</span>' : ''}</span>`
-        + `<span class="seller${l.house ? ' house' : ''}">${l.house ? "Merchant's stock" : l.sellerName}</span></span>`
+        + `<span class="seller${l.house ? ' house' : ''}">${l.house ? "Merchant's stock" : esc(l.sellerName)}</span></span>`
         + `<span class="mkt-price">${this.moneyHtml(l.price)}${each}</span>`;
       const btn = document.createElement('button');
       btn.className = 'mkt-btn' + (l.mine ? ' cancel' : '');
@@ -2892,7 +2892,7 @@ export class Hud {
       return `<div class="trade-item${mine ? ' mine' : ''}" data-item="${mine ? s.itemId : ''}">${this.itemIcon(item)}<span>${item?.name ?? s.itemId}${s.count > 1 ? ' x' + s.count : ''}</span></div>`;
     };
     el.innerHTML = `
-      <div class="panel-title"><span>Trade with ${info.otherName}</span><span class="x-btn" data-close>✕</span></div>
+      <div class="panel-title"><span>Trade with ${esc(info.otherName)}</span><span class="x-btn" data-close>✕</span></div>
       <div class="trade-cols">
         <div class="trade-col ${info.myAccepted ? 'accepted' : ''}">
           <h4>Your offer</h4>
@@ -2900,7 +2900,7 @@ export class Hud {
           <div class="trade-money">Money: <input id="trade-copper" type="number" min="0" value="${this.stagedTrade.copper}" /> copper</div>
         </div>
         <div class="trade-col ${info.theirAccepted ? 'accepted' : ''}">
-          <h4>${info.otherName}'s offer</h4>
+          <h4>${esc(info.otherName)}'s offer</h4>
           <div class="trade-items">${info.theirOffer.items.map((s) => itemRow(s, false)).join('') || '<div style="color:#665c40;font-size:11px;padding:4px">Nothing offered yet</div>'}</div>
           <div class="trade-money">Money: <span class="gold">${formatMoney(info.theirOffer.copper)}</span></div>
         </div>
