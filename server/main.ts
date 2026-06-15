@@ -10,6 +10,7 @@ import {
 } from './db';
 import { cleanReportReason, createPlayerReport } from './moderation_db';
 import { resolveReportTarget } from './report_target';
+import { bufferHandshakeMessages } from './ws_buffer';
 import {
   hashPassword, verifyPassword, newToken, validUsernameShape, offensiveName, validPassword, normalizeCharName,
 } from './auth';
@@ -451,7 +452,12 @@ async function main(): Promise<void> {
 
     ws.once('message', (data) => {
       clearTimeout(authTimer);
-      void authenticateWebSocket(ws, String(data));
+      // Buffer any frames the client sends while the async auth/join handshake
+      // is still in flight, then replay them once authenticateWebSocket has
+      // attached the permanent message handler. Without this the frames are
+      // silently dropped (see ws_buffer.ts).
+      const flush = bufferHandshakeMessages(ws);
+      void authenticateWebSocket(ws, String(data)).finally(flush);
     });
   }
 
