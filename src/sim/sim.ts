@@ -34,6 +34,17 @@ const EVADE_SPEED_MULT = 1.6;
 // can't get closer to home for this long, it starts phasing through the blocker.
 const EVADE_STALL_TIMEOUT = 3;
 const BACKPEDAL_MULT = 0.65;
+// Low-HP flee ("fear"): a cowardly mob at or below this HP fraction panics, turns
+// and runs from its attacker for FLEE_DURATION seconds at FLEE_SPEED_MULT speed,
+// calling same-family allies within FLEE_HELP_RADIUS to assist. It flees only once
+// per pull, then recovers its nerve and re-engages if it survived.
+const FLEE_HP_THRESHOLD = 0.2;
+const FLEE_DURATION = 5;
+const FLEE_SPEED_MULT = 1.4;
+const FLEE_HELP_RADIUS = 8;
+// Only sentient, cowardly families flee; beasts/undead/elementals/dragonkin fight
+// to the death. Elites, rares, and bosses never flee regardless of family.
+const FLEEING_FAMILIES: ReadonlySet<MobFamily> = new Set(['humanoid', 'kobold', 'murloc', 'troll']);
 const GRAVITY = 16;
 const JUMP_VELOCITY = 6;
 const MELEE_ARC = 2.2; // radians half-arc within which melee swings connect
@@ -765,7 +776,7 @@ export class Sim {
     // with, instead of one full scan per player
     this.engagedPids.clear();
     for (const e of this.entities.values()) {
-      if (e.kind === 'mob' && !e.dead && (e.aiState === 'chase' || e.aiState === 'attack') && e.aggroTargetId !== null) {
+      if (e.kind === 'mob' && !e.dead && (e.aiState === 'chase' || e.aiState === 'attack' || e.aiState === 'flee') && e.aggroTargetId !== null) {
         this.engagedPids.add(e.aggroTargetId);
       }
     }
@@ -1900,6 +1911,7 @@ export class Sim {
     mob.forcedTargetTimer = TAUNT_FORCE_SECONDS;
     if (mob.aiState === 'idle') this.aggroMob(mob, p, false);
     else if (mob.aiState === 'chase' || mob.aiState === 'attack') mob.aggroTargetId = p.id;
+    else if (mob.aiState === 'flee') { mob.aggroTargetId = p.id; mob.aiState = 'attack'; mob.fleeTimer = 0; }
     this.enterCombat(p, mob);
   }
 
@@ -2522,7 +2534,7 @@ export class Sim {
   }
 
   private aggroMob(mob: Entity, target: Entity, social: boolean): void {
-    if (mob.dead || mob.aiState === 'evade' || mob.aiState === 'chase' || mob.aiState === 'attack') return;
+    if (mob.dead || mob.aiState === 'evade' || mob.aiState === 'chase' || mob.aiState === 'attack' || mob.aiState === 'flee') return;
     mob.aiState = 'chase';
     mob.aggroTargetId = target.id;
     mob.inCombat = true;
@@ -2637,6 +2649,7 @@ export class Sim {
           this.retargetMob(mob);
           break;
         }
+        if (this.maybeFlee(mob, target)) break;
         const leash = mob.spawnPos.x > DUNGEON_X_THRESHOLD ? DUNGEON_LEASH_DISTANCE : LEASH_DISTANCE;
         const leashAnchor = mob.leashAnchor ?? mob.spawnPos;
         if (dist2d(mob.pos, leashAnchor) > leash) {
@@ -2660,6 +2673,7 @@ export class Sim {
         this.updateMobTarget(mob);
         const target = mob.aggroTargetId !== null ? this.entities.get(mob.aggroTargetId) : null;
         if (!target || target.dead) { this.retargetMob(mob); break; }
+        if (this.maybeFlee(mob, target)) break;
         const d = dist2d(mob.pos, target.pos);
         if (d > MELEE_RANGE) { mob.aiState = 'chase'; break; }
         mob.facing = angleTo(mob.pos, target.pos);
@@ -2684,6 +2698,36 @@ export class Sim {
               }
             }
           }
+        }
+        break;
+      }
+      case 'flee': {
+        const target = mob.aggroTargetId !== null ? this.entities.get(mob.aggroTargetId) : null;
+        if (!target || target.dead) { this.retargetMob(mob); break; }
+        // Outran the leash while panicking: drop the pull and reset home.
+        const leash = mob.spawnPos.x > DUNGEON_X_THRESHOLD ? DUNGEON_LEASH_DISTANCE : LEASH_DISTANCE;
+        const leashAnchor = mob.leashAnchor ?? mob.spawnPos;
+        if (dist2d(mob.pos, leashAnchor) > leash) {
+          mob.aiState = 'evade';
+          mob.aggroTargetId = null;
+          clearThreat(mob);
+          mob.leashAnchor = null;
+          break;
+        }
+        mob.fleeTimer -= DT;
+        if (mob.fleeTimer <= 0) {
+          // Recover nerve and turn to fight again; hasFled keeps it from re-fleeing.
+          mob.aiState = 'attack';
+          mob.swingTimer = Math.min(mob.swingTimer, 0.4);
+          break;
+        }
+        // Run directly away from the attacker. A root pins it in place (it just
+        // cowers facing away); a stun is already handled by the early return above.
+        const away = angleTo(target.pos, mob.pos);
+        mob.facing = away;
+        if (!this.isRooted(mob)) {
+          const fleePos = this.groundPos(mob.pos.x + Math.sin(away) * 10, mob.pos.z + Math.cos(away) * 10);
+          this.moveToward(mob, fleePos, mob.moveSpeed * FLEE_SPEED_MULT * this.moveSpeedMult(mob));
         }
         break;
       }
@@ -2721,11 +2765,51 @@ export class Sim {
     mob.tappedById = null;
     mob.leashAnchor = null;
     mob.evadeStall = 0;
+    mob.fleeTimer = 0;
+    mob.hasFled = false;
     clearThreat(mob);
     this.despawnSummonedAdds(mob);
     mob.firedSummons = 0;
     mob.enraged = false;
     mob.wanderTimer = this.rng.range(2, 8);
+  }
+
+  // Cowardly mobs panic once per pull at low HP: turn and run from the attacker
+  // for a few seconds, rallying nearby same-family allies. Returns true if the mob
+  // entered (or is already in) the flee state so the caller can stop its turn.
+  private canFlee(mob: Entity): boolean {
+    if (mob.hasFled || mob.enraged) return false;
+    const tmpl = MOBS[mob.templateId];
+    if (!tmpl || tmpl.boss || tmpl.elite || tmpl.rare) return false;
+    return FLEEING_FAMILIES.has(tmpl.family);
+  }
+
+  private maybeFlee(mob: Entity, target: Entity): boolean {
+    if (mob.maxHp <= 0 || mob.hp / mob.maxHp > FLEE_HP_THRESHOLD) return false;
+    if (!this.canFlee(mob)) return false;
+    mob.aiState = 'flee';
+    mob.hasFled = true;
+    mob.fleeTimer = FLEE_DURATION;
+    this.emit({ type: 'log', text: `${mob.name} attempts to flee!`, color: '#ffd966', entityId: mob.id });
+    this.callForHelp(mob, target);
+    return true;
+  }
+
+  // A fleeing mob shouts for aid: nearby idle same-family mobs join the fight,
+  // mirroring the social-pull seeding in aggroMob.
+  private callForHelp(mob: Entity, target: Entity): void {
+    const family = MOBS[mob.templateId]?.family;
+    if (!family) return;
+    this.grid.forEachInRadius(mob.pos.x, mob.pos.z, FLEE_HELP_RADIUS, (m, d2) => {
+      if (m.kind === 'mob' && m.id !== mob.id && !m.dead && m.hostile && m.aiState === 'idle' && m.ownerId === null
+        && MOBS[m.templateId]?.family === family && d2 < FLEE_HELP_RADIUS * FLEE_HELP_RADIUS) {
+        m.aiState = 'chase';
+        m.aggroTargetId = target.id;
+        m.inCombat = true;
+        m.leashAnchor = { ...m.pos };
+        addThreat(m, target.id, 1);
+      }
+    });
   }
 
   private mobSwing(mob: Entity, target: Entity): void {

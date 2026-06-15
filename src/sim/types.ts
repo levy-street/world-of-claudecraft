@@ -29,7 +29,7 @@ export interface Vec3 {
 
 export type EntityKind = 'player' | 'mob' | 'npc' | 'object';
 
-export type AiState = 'idle' | 'chase' | 'attack' | 'evade' | 'dead';
+export type AiState = 'idle' | 'chase' | 'attack' | 'flee' | 'evade' | 'dead';
 
 export type AuraKind =
   | 'dot' | 'slow' | 'stun' | 'root' | 'incapacitate' | 'polymorph'
@@ -472,6 +472,8 @@ export interface Entity {
   spawnPos: Vec3;
   leashAnchor: Vec3 | null; // refreshed by hostile player/pet actions; spawnPos remains the true home
   evadeStall: number; // seconds an evading mob has failed to get closer to home; snaps it home if it can't path back (e.g. across water)
+  fleeTimer: number; // seconds left in a low-HP panic flee; counts down in the 'flee' state
+  hasFled: boolean; // a cowardly mob flees only once per pull; cleared when it resets at spawn
   wanderTarget: Vec3 | null;
   wanderTimer: number;
   aggroTargetId: number | null;
