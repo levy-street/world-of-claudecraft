@@ -26,6 +26,10 @@ import {
 
 const LEASH_DISTANCE = 45;
 const DUNGEON_LEASH_DISTANCE = 70;
+// Classic "trivial con": a wild mob this many levels below the player goes
+// passive and will not auto-aggro from proximity (it still fights back if
+// attacked). Elites, rares, and bosses are never trivial.
+const TRIVIAL_LEVEL_GAP = 10;
 const CORPSE_DURATION = 60;
 const EVADE_SPEED_MULT = 1.6;
 // An evading mob walks a straight line home (no pathfinding) and stalls if deep
@@ -2553,6 +2557,14 @@ export class Sim {
     return best ? { e: best, d: Math.sqrt(bestD2) } : null;
   }
 
+  // Classic "trivial con": a wild mob far below the player's level stops
+  // auto-aggroing from proximity. Elites, rares, and bosses are never trivial.
+  private isTrivialTo(mob: Entity, player: Entity): boolean {
+    const template = MOBS[mob.templateId];
+    if (template.elite || template.rare || template.boss) return false;
+    return player.level - mob.level >= TRIVIAL_LEVEL_GAP;
+  }
+
   private updateMob(mob: Entity): void {
     if (mob.dead) {
       mob.corpseTimer -= DT;
@@ -2600,7 +2612,7 @@ export class Sim {
       case 'idle': {
         const template = MOBS[mob.templateId];
         const nearest = this.nearestLivingPlayer(mob.pos, 25);
-        if (nearest) {
+        if (nearest && !this.isTrivialTo(mob, nearest.e)) {
           let radius = Math.max(4, Math.min(20, template.aggroRadius + (mob.level - nearest.e.level) * 1.5));
           // stealthed rogues are harder to detect, relative to observer level
           if (nearest.e.auras.some((a) => a.kind === 'stealth')) radius = stealthDetectionRadius(mob, nearest.e, radius);
