@@ -229,9 +229,14 @@ export async function moderateAccount(input: {
         [input.accountId, reason],
       );
     } else {
+      // Suspending supersedes any standing ban (an admin downgrading a ban to a
+      // timed suspension). banned_at must be cleared here for the same reason
+      // the ban branch clears suspended_until — moderationStatusForAccount reads
+      // banned_at first, so a leftover ban would mask the suspension entirely
+      // and leave the account locked out forever.
       await client.query(
         `UPDATE accounts
-         SET suspended_until = $2, moderation_reason = $3
+         SET banned_at = NULL, suspended_until = $2, moderation_reason = $3
          WHERE id = $1`,
         [input.accountId, expiresAt!.toISOString(), reason],
       );

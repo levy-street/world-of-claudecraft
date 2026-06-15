@@ -153,6 +153,29 @@ describe('moderation report helpers', () => {
     expect(client.release).toHaveBeenCalledTimes(1);
   });
 
+  it('clears the opposing lock flag so a ban and a suspension never both stand', async () => {
+    // Banning must clear any standing suspension; suspending must clear any
+    // standing ban. The latter matters because moderationStatusForAccount reads
+    // banned_at before suspended_until, so a leftover ban would silently mask a
+    // downgrade-to-suspension and keep the account locked out forever.
+    const banClient = clientStub();
+    connect.mockResolvedValueOnce(banClient as any);
+    await moderateAccount({ accountId: 2, adminAccountId: 1, action: 'ban', reason: 'cheating' });
+    const banUpdate = banClient.query.mock.calls.find((c) => /UPDATE accounts/.test(c[0]))![0];
+    expect(banUpdate).toMatch(/banned_at = now\(\)/);
+    expect(banUpdate).toMatch(/suspended_until = NULL/);
+
+    const suspendClient = clientStub();
+    connect.mockResolvedValueOnce(suspendClient as any);
+    await moderateAccount({
+      accountId: 2, adminAccountId: 1, action: 'suspend', reason: 'cooling off',
+      expiresAt: new Date(Date.now() + 3600_000).toISOString(),
+    });
+    const suspendUpdate = suspendClient.query.mock.calls.find((c) => /UPDATE accounts/.test(c[0]))![0];
+    expect(suspendUpdate).toMatch(/banned_at = NULL/);
+    expect(suspendUpdate).toMatch(/suspended_until = \$2/);
+  });
+
   it('marks a character for forced rename and action-resolves its reports', async () => {
     query.mockResolvedValueOnce({ rows: [{ account_id: 2 }] } as any);
     const client = clientStub();
