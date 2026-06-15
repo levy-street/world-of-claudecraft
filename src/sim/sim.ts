@@ -2195,7 +2195,7 @@ export class Sim {
     }
 
     // tap rights: the first player (or their pet) to damage a mob owns it
-    if (source && target.kind === 'mob' && target.hostile && target.tappedById === null && amount >= 0) {
+    if (source && target.kind === 'mob' && target.hostile && target.tappedById === null && amount > 0) {
       if (source.kind === 'player') target.tappedById = source.id;
       else if (source.ownerId !== null) target.tappedById = source.ownerId;
     }

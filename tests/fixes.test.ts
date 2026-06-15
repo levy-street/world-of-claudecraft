@@ -617,6 +617,34 @@ describe('warrior charge', () => {
   });
 });
 
+describe('mob tap rights', () => {
+  function wolf(sim: Sim): Entity {
+    return [...sim.entities.values()].find((e) => e.kind === 'mob' && e.templateId === 'forest_wolf')!;
+  }
+
+  it('a hit that deals real damage claims the mob', () => {
+    const sim = makeSim('mage');
+    const m = wolf(sim);
+    expect(m.tappedById).toBeNull();
+    (sim as any).dealDamage(sim.player, m, 7, false, 'fire', 'test', 'hit');
+    expect(m.tappedById).toBe(sim.player.id);
+  });
+
+  it('a fully absorbed (zero-damage) hit does not claim the mob', () => {
+    const sim = makeSim('mage');
+    const m = wolf(sim);
+    // a shield that soaks the whole hit — the mob takes no real damage
+    m.auras.push({
+      id: 'test_absorb', name: 'Test Shield', kind: 'absorb',
+      remaining: 30, duration: 30, value: 1000, sourceId: m.id, school: 'arcane',
+    } as any);
+    const hpBefore = m.hp;
+    (sim as any).dealDamage(sim.player, m, 50, false, 'fire', 'test', 'hit');
+    expect(m.hp).toBe(hpBefore); // nothing got through
+    expect(m.tappedById).toBeNull(); // so nobody owns the tap yet
+  });
+});
+
 describe('spell visuals', () => {
   it('hostile casts emit projectile spellfx events', () => {
     const sim = makeSim('mage');
