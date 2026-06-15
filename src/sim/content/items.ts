@@ -265,6 +265,8 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   spider_leg: { id: 'spider_leg', name: 'Twitching Spider Leg', kind: 'junk', quality: 'poor', sellValue: 4 },
   bone_fragments: { id: 'bone_fragments', name: 'Bone Fragments', kind: 'junk', quality: 'poor', sellValue: 7 },
   linen_scrap: { id: 'linen_scrap', name: 'Linen Scrap', kind: 'junk', quality: 'poor', sellValue: 3 },
+  wool_scrap: { id: 'wool_scrap', name: 'Wool Scrap', kind: 'junk', quality: 'poor', sellValue: 5 },
+  silk_scrap: { id: 'silk_scrap', name: 'Silk Scrap', kind: 'junk', quality: 'poor', sellValue: 8 },
   // Professions — cloth materials (level-banded humanoid drops) + First Aid bandages.
   // Cloth and bandages stack to 20 (vanilla cloth stack size).
   linen_cloth: { id: 'linen_cloth', name: 'Linen Cloth', kind: 'reagent', quality: 'common', sellValue: 4, stackSize: 20 },

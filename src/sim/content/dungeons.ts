@@ -16,7 +16,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     id: 'hollow_acolyte', name: 'Hollow Acolyte', minLevel: 8, maxLevel: 8, family: 'undead', elite: true,
     hpBase: 44, hpPerLevel: 18, dmgBase: 8, dmgPerLevel: 2.3, attackSpeed: 2.0,
     armorPerLevel: 14, moveSpeed: 7, aggroRadius: 12,
-    loot: [{ copper: 110, chance: 1 }, { itemId: 'linen_scrap', chance: 0.6 }],
+    loot: [{ copper: 110, chance: 1 }],
     scale: 1.0, color: 0x5b2c6f,
   },
   bonechill_widow: {
@@ -62,7 +62,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     id: 'tidebound_acolyte', name: 'Tidebound Acolyte', minLevel: 12, maxLevel: 13, family: 'humanoid', elite: true,
     hpBase: 50, hpPerLevel: 20, dmgBase: 10, dmgPerLevel: 2.5, attackSpeed: 2.0,
     armorPerLevel: 14, moveSpeed: 7, aggroRadius: 12,
-    loot: [{ copper: 170, chance: 1 }, { itemId: 'linen_scrap', chance: 0.5 }],
+    loot: [{ copper: 170, chance: 1 }],
     desperateHeal: { belowHpPct: 0.3, healPct: 0.25 },
     scale: 1.0, color: 0x1f618d,
   },

@@ -41,7 +41,7 @@ import {
 } from '../sim/content/talents';
 import { talentChoiceIconDataUrl, talentNodeIconDataUrl } from './talent_icons';
 import {
-  PROFESSIONS, RECIPES, difficultyColor, tierCap, nextTier,
+  PROFESSIONS, RECIPES, difficultyColor, tierCap, nextTier, tierLearnCost, recipeLearnCost,
   type RecipeDef, type ProfessionDef, type TierId, type DifficultyColor,
 } from '../sim/content/professions';
 import {
@@ -1015,12 +1015,17 @@ export class Hud {
     if (item.foodHp) html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useFood', { amount: itemNumber(item.foodHp), seconds: itemNumber(CONSUME_DURATION) }))}</div>`;
     if (item.drinkMana) html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useDrink', { amount: itemNumber(item.drinkMana), seconds: itemNumber(CONSUME_DURATION) }))}</div>`;
     if (item.use?.type === 'fishing') html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useFishing'))}</div>`;
+    if (item.use?.type === 'bandage') html += `<div class="tt-desc">Use: Channel a heal for ${item.use.totalHeal} health over ${item.use.channelTime} sec. The target cannot be bandaged again for 1 min, and the channel breaks if you move or take damage.</div>`;
     if (item.potionHp) html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useHealingPotion', { amount: itemNumber(item.potionHp) }))}</div>`;
     if (item.potionMana) html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useManaPotion', { amount: itemNumber(item.potionMana) }))}</div>`;
     if (item.kind === 'quest') html += `<div class="tt-desc">${esc(t('itemUi.tooltip.questItem'))}</div>`;
     if (item.requiredClass) {
       html += `<div class="tt-sub">${esc(t('itemUi.tooltip.classes', { classes: item.requiredClass.map(classDisplayName).join(', ') }))}</div>`;
     }
+    if (item.requiredLevel && item.requiredLevel > 1) html += `<div class="tt-sub">Requires Level ${item.requiredLevel}</div>`;
+    // surface the profession + skill needed to craft this item (e.g. a bandage)
+    const recipe = Object.values(RECIPES).find((r) => r.output.itemId === item.id);
+    if (recipe) html += `<div class="tt-sub">Requires ${PROFESSIONS[recipe.profId]?.name ?? recipe.profId} (${recipe.requiredSkill})</div>`;
     if (item.sellValue > 0) html += `<div class="tt-sub">${esc(t('itemUi.tooltip.sellPrice', { money: formatLocalizedMoney(item.sellValue) }))}</div>`;
     return html;
   }
@@ -2452,6 +2457,14 @@ export class Hud {
           this.refreshProfessionWindows();
           break;
         }
+        case 'recipeLearned': {
+          const recipe = RECIPES[ev.recipeId];
+          const name = recipe ? (ITEMS[recipe.output.itemId]?.name ?? recipe.name) : ev.recipeId;
+          this.log(`You have learned to make ${name}.`, '#7fd0ff');
+          audio.lootItem();
+          this.refreshProfessionWindows();
+          break;
+        }
         case 'loot': {
           this.log(this.localizeLootText(ev.text), '#7fdc4f');
           if (ev.text.includes('loot') || ev.text.includes('Sold') || ev.text.includes('Bought back')) audio.coin();
@@ -2993,6 +3006,7 @@ export class Hud {
   private renderGossip(npc: Entity): void {
     this.openGossipNpcId = npc.id;
     this.openQuestDetailId = null;
+    this.trainerProfId = null;
     const el = $('#quest-dialog');
     const def = NPCS[npc.templateId];
     // accepted-but-unfinished quests are tracked in the quest log; the NPC
@@ -3027,29 +3041,13 @@ export class Hud {
     if (def?.market) {
       html += `<button type="button" class="qd-list-item" data-market="1" aria-label="${esc(t('questUi.dialog.worldMarketAria'))}"><span class="gold">${svgIcon('market')}</span> ${esc(t('questUi.dialog.worldMarket'))}</button>`;
     }
-    // Profession trainer: offer the next learnable tier (Apprentice, then Journeyman).
+    // Profession trainer: open a training view (tiers + learnable recipes).
     const trains = def?.trains ? PROFESSIONS[def.trains] : null;
-    let trainLabel: string | null = null;
     if (trains) {
-      const learned = this.sim.professionSkills[trains.id] !== undefined;
-      if (!learned) {
-        trainLabel = `Train ${trains.name}`;
-      } else {
-        // only offer the next tier once the player actually qualifies (skill + level)
-        const next = nextTier(trains, this.sim.professionTiers[trains.id] as TierId | undefined);
-        const skill = this.sim.professionSkills[trains.id] ?? 0;
-        if (next && skill >= next.requiresSkill && this.sim.player.level >= next.requiresLevel) {
-          trainLabel = `Train Journeyman ${trains.name}`;
-        }
-      }
-      if (trainLabel) html += `<div class="qd-list-item" data-train="1"><span style="color:#7fd0ff">✦</span> ${trainLabel}</div>`;
+      html += `<div class="qd-list-item" data-train="1"><span style="color:#7fd0ff">✦</span> Train ${trains.name}</div>`;
     }
     el.innerHTML = html;
-    el.querySelector('[data-train]')?.addEventListener('click', () => {
-      const learned = this.sim.professionSkills[trains!.id] !== undefined;
-      this.sim.learnProfession(trains!.id, learned ? 'journeyman' : 'apprentice');
-      this.renderGossip(npc); // refresh (offline updates immediately; online catches up)
-    });
+    el.querySelector('[data-train]')?.addEventListener('click', () => this.renderTrainer(npc, trains!.id));
     el.querySelectorAll('[data-quest]').forEach((item) => {
       item.addEventListener('click', () => this.renderQuestDetail(npc, (item as HTMLElement).dataset.quest!));
     });
@@ -3064,6 +3062,55 @@ export class Hud {
     el.querySelector('[data-close]')?.addEventListener('click', () => this.closeQuestDialog());
     el.style.display = 'block';
     this.focusFirstInteractive(el);
+  }
+
+  // Trainer view (rendered inside the gossip window): learn the next tier and any
+  // recipes the player's skill now allows, each for its copper cost.
+  private renderTrainer(npc: Entity, profId: string): void {
+    const prof = PROFESSIONS[profId];
+    if (!prof) return;
+    this.trainerNpcId = npc.id;
+    this.trainerProfId = profId;
+    const el = $('#quest-dialog');
+    const sim = this.sim;
+    const known = sim.professionSkills[profId] !== undefined;
+    const skill = sim.professionSkills[profId] ?? 0;
+    const cap = tierCap(prof, sim.professionTiers[profId] as TierId | undefined);
+    let html = `<div class="panel-title"><span>Train ${prof.name}</span><span class="x-btn" data-close>${svgIcon('close')}</span></div>`;
+    if (known) html += `<div class="qd-sub">${prof.name} ${skill} / ${cap}</div>`;
+    let anything = false;
+    if (!known) {
+      anything = true;
+      html += `<div class="qd-list-item" data-tier="apprentice">Learn ${prof.name} (Apprentice) &mdash; ${this.moneyHtml(tierLearnCost(prof, 'apprentice'))}</div>`;
+    } else {
+      const next = nextTier(prof, sim.professionTiers[profId] as TierId | undefined);
+      if (next && skill >= next.requiresSkill && sim.player.level >= next.requiresLevel) {
+        anything = true;
+        html += `<div class="qd-list-item" data-tier="${next.id}">Learn Journeyman ${prof.name} &mdash; ${this.moneyHtml(tierLearnCost(prof, next.id))}</div>`;
+      }
+      const learnable = prof.recipes.map((id) => RECIPES[id]).filter((r) => r && skill >= r.requiredSkill && !sim.learnedRecipes.includes(r.id)) as RecipeDef[];
+      if (learnable.length) {
+        anything = true;
+        html += `<div class="qd-sub">Recipes</div>`;
+        for (const r of learnable) {
+          html += `<div class="qd-list-item" data-recipe="${r.id}"><span style="background-image:url(${iconDataUrl('item', r.output.itemId)});width:18px;height:18px;display:inline-block;background-size:cover;vertical-align:middle;border-radius:3px;margin-right:6px"></span>${ITEMS[r.output.itemId]?.name ?? r.name} &mdash; ${this.moneyHtml(recipeLearnCost(r))}</div>`;
+        }
+      }
+    }
+    if (!anything) html += `<div class="qd-text" style="color:#999">Nothing new to train right now. Raise your skill and return.</div>`;
+    html += `<div class="qd-list-item" data-back="1">&larr; Back</div>`;
+    el.innerHTML = html;
+    el.querySelector('[data-tier]')?.addEventListener('click', (e) => {
+      this.sim.learnProfession(profId, (e.currentTarget as HTMLElement).dataset.tier as string);
+      this.renderTrainer(npc, profId);
+    });
+    el.querySelectorAll('[data-recipe]').forEach((it) => it.addEventListener('click', () => {
+      this.sim.learnRecipe((it as HTMLElement).dataset.recipe!);
+      this.renderTrainer(npc, profId);
+    }));
+    el.querySelector('[data-back]')?.addEventListener('click', () => this.renderGossip(npc));
+    el.querySelector('[data-close]')?.addEventListener('click', () => this.closeQuestDialog());
+    el.style.display = 'block';
   }
 
   private renderQuestDetail(npc: Entity, questId: string): void {
@@ -3124,6 +3171,7 @@ export class Hud {
     $('#quest-dialog').style.display = 'none';
     this.openGossipNpcId = null;
     this.openQuestDetailId = null;
+    this.trainerProfId = null;
     this.hideTooltip();
     const target = this.questDialogReturnFocus;
     this.questDialogReturnFocus = null;
@@ -4170,6 +4218,8 @@ export class Hud {
   // -------------------------------------------------------------------------
 
   private craftProfId: string | null = null;
+  private trainerNpcId: number | null = null;
+  private trainerProfId: string | null = null;
 
   toggleSkills(): void {
     const el = $('#skills-window');
@@ -4225,7 +4275,9 @@ export class Hud {
     const cap = tierCap(prof, sim.professionTiers[prof.id] as TierId | undefined);
     const COLOR: Record<DifficultyColor, string> = { orange: '#ff8040', yellow: '#ffd100', green: '#4ad14a', grey: '#9090a0' };
     let html = `<div class="panel-title"><span>${prof.name} <span style="color:#998d6a;font-size:11px">${skill} / ${cap}</span></span><span class="x-btn" data-close>${svgIcon('close')}</span></div>`;
-    const available = prof.recipes.map((id) => RECIPES[id]).filter((r) => r && skill >= r.requiredSkill) as RecipeDef[];
+    // only recipes the player has learned from a trainer (skill alone isn't enough)
+    const learned = this.sim.learnedRecipes;
+    const available = prof.recipes.map((id) => RECIPES[id]).filter((r) => r && learned.includes(r.id)) as RecipeDef[];
     for (const r of available) {
       const batch = r.batch ?? 1;
       const out = ITEMS[r.output.itemId];
@@ -4242,9 +4294,13 @@ export class Hud {
         <button class="btn-sm" data-craft="${r.id}"${canCraft ? '' : ' disabled'}>Craft</button>
       </div>`;
     }
-    if (!available.length) html += `<div class="qd-text" style="color:#999">No recipes available at your current skill.</div>`;
+    if (!available.length) html += `<div class="qd-text" style="color:#999">You have not learned any recipes yet. Visit a trainer to learn them.</div>`;
     el.innerHTML = html;
     el.querySelectorAll('[data-craft]').forEach((b) => b.addEventListener('click', () => this.sim.craft((b as HTMLElement).dataset.craft!)));
+    el.querySelectorAll('.craft-row').forEach((row, i) => {
+      const r = available[i];
+      if (r) this.attachTooltip(row as HTMLElement, () => this.itemTooltip(ITEMS[r.output.itemId]));
+    });
     el.querySelector('[data-close]')?.addEventListener('click', () => { el.style.display = 'none'; this.hideTooltip(); });
   }
 
@@ -4253,6 +4309,11 @@ export class Hud {
   private refreshProfessionWindows(): void {
     if ($('#craft-window').style.display === 'block') this.renderCraft();
     if ($('#skills-window').style.display === 'block') this.renderSkills();
+    // re-render the trainer view too (a skill-up may unlock new learnable recipes)
+    if (this.trainerProfId !== null && this.trainerNpcId !== null && $('#quest-dialog').style.display === 'block') {
+      const npc = this.sim.entities.get(this.trainerNpcId);
+      if (npc) this.renderTrainer(npc, this.trainerProfId);
+    }
   }
 
   // -------------------------------------------------------------------------

@@ -131,6 +131,17 @@ export const PROFESSIONS: Record<string, ProfessionDef> = {
 // level-20+ humanoids — see docs/prd/professions-and-crafting.md §22.
 export const CLOTH_DROP_CHANCE = 0.35;
 export const CLOTH_QTY = { min: 1, max: 2 } as const;
+// Families that drop cloth (the cloth-wearing humanoid types). These are exactly
+// the families that used to drop the legacy linen_scrap junk.
+export const CLOTH_FAMILIES: string[] = ['humanoid', 'murloc', 'kobold'];
+// Cloth scrap is a consolation junk drop: a cloth-band mob that fails its cloth
+// roll can still drop the scrap matching its tier (one scrap per cloth tier).
+export const SCRAP_DROP_CHANCE = 0.3;
+export const CLOTH_SCRAP: Record<string, string> = {
+  linen_cloth: 'linen_scrap',
+  wool_cloth: 'wool_scrap',
+  silk_cloth: 'silk_scrap',
+};
 export const CLOTH_BANDS: { itemId: string; min: number; max: number }[] = [
   { itemId: 'linen_cloth', min: 1, max: 8 },
   { itemId: 'wool_cloth', min: 7, max: 15 },
@@ -161,6 +172,24 @@ export function tierCap(prof: ProfessionDef, learnedTier: TierId | undefined): n
 export function nextTier(prof: ProfessionDef, learnedTier: TierId | undefined): ProfessionTier | null {
   const idx = learnedTier ? prof.tiers.findIndex((t) => t.id === learnedTier) : -1;
   return prof.tiers[idx + 1] ?? null;
+}
+
+// --- learning costs (copper) ----------------------------------------------
+// Flat tier cost by kind (primaries cost more than secondaries). Recipes cost
+// per required-skill, so a recipe at skill 20 costs the same across same-kind
+// professions. Trainers charge both; the starter recipe (skill <= 1) is free.
+export const TIER_COST: Record<ProfessionKind, Record<TierId, number>> = {
+  secondary: { apprentice: 20, journeyman: 100 },
+  primary: { apprentice: 75, journeyman: 300 },
+};
+export const RECIPE_COST_PER_SKILL: Record<ProfessionKind, number> = { secondary: 1, primary: 2 };
+
+export function tierLearnCost(prof: ProfessionDef, tier: TierId): number {
+  return TIER_COST[prof.kind][tier];
+}
+export function recipeLearnCost(recipe: RecipeDef): number {
+  const kind = PROFESSIONS[recipe.profId]?.kind ?? 'secondary';
+  return recipe.requiredSkill * RECIPE_COST_PER_SKILL[kind];
 }
 
 // Validate the registry against the item table. Returns a list of problems

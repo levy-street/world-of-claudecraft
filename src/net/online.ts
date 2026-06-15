@@ -249,6 +249,7 @@ export class ClientWorld implements IWorld {
   // Professions & secondary skills, mirrored from snapshot self (sent on change).
   professionSkills: Record<string, number> = {};
   professionTiers: Record<string, string> = {};
+  learnedRecipes: string[] = [];
   questLog = new Map<string, QuestProgress>();
   questsDone = new Set<string>();
   partyInfo: PartyInfo | null = null;
@@ -676,6 +677,7 @@ export class ClientWorld implements IWorld {
       // professions (sent on change); delta-guarded so a missing field keeps state
       if (s.skills !== undefined) this.professionSkills = s.skills ?? {};
       if (s.profTiers !== undefined) this.professionTiers = s.profTiers ?? {};
+      if (s.recipes !== undefined) this.learnedRecipes = s.recipes ?? [];
       if (s.party !== undefined) this.partyInfo = s.party;
       if (s.marks !== undefined) this.markers = s.marks ?? {}; // null = cleared (no party/disband)
       if (s.trade !== undefined) this.tradeInfo = s.trade;
@@ -779,6 +781,9 @@ export class ClientWorld implements IWorld {
   }
   learnProfession(profId: string, tier: string): void {
     this.cmd({ cmd: 'learnProfession', prof: profId, tier });
+  }
+  learnRecipe(recipeId: string): void {
+    this.cmd({ cmd: 'learnRecipe', recipe: recipeId });
   }
   craft(recipeId: string): void {
     this.cmd({ cmd: 'craft', recipe: recipeId });

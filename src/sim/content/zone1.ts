@@ -152,7 +152,6 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     enrage: { belowHpPct: 0.30, dmgMult: 1.6, hasteMult: 1.3 },
     loot: [
       { copper: 180, chance: 1 },
-      { itemId: 'linen_scrap', chance: 1 },
       { itemId: 'moggers_stomper_boots', chance: 0.3 },
       { itemId: 'moggers_shiv', chance: 0.25, rollGroup: 'mogger_chase' },
       { itemId: 'cryptstalker_jerkin', chance: 0.25, rollGroup: 'mogger_chase' },
@@ -173,7 +172,6 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     loot: [
       { copper: 18, chance: 1 },
       { itemId: 'mudfin_scale', chance: 0.5 },
-      { itemId: 'linen_scrap', chance: 0.2 },
     ],
     scale: 0.8, color: 0x52be80,
   },
@@ -185,7 +183,6 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
       { copper: 22, chance: 1 },
       { itemId: 'tallow_candle', chance: 0.6 },
       { itemId: 'blessed_wax', chance: 0.45, questId: 'q_rite' },
-      { itemId: 'linen_scrap', chance: 0.25 },
     ],
     scale: 0.85, color: 0x9c640c,
   },
@@ -196,7 +193,6 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     loot: [
       { copper: 25, chance: 1 },
       { itemId: 'bandit_bandana', chance: 0.5 },
-      { itemId: 'linen_scrap', chance: 0.3 },
     ],
     scale: 1.0, color: 0x943126,
   },

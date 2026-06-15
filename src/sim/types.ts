@@ -600,6 +600,7 @@ export type SimEvent = { pid?: number } & (
   // Professions: a profession skill rose (FCT + sound), or a tier/profession was learned
   | { type: 'skillUp'; profId: string; skill: number }
   | { type: 'professionLearned'; profId: string; tier: string }
+  | { type: 'recipeLearned'; recipeId: string }
   | { type: 'loot'; text: string }
   | { type: 'error'; text: string }
   | { type: 'questAccepted'; questId: string }

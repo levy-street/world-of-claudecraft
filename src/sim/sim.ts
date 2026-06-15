@@ -14,8 +14,8 @@ import {
   type TalentAllocation, type TalentModifiers, type SavedLoadout, type Role,
 } from './content/talents';
 import {
-  PROFESSIONS, RECIPES, difficultyColor, tierCap, nextTier,
-  CLOTH_DROP_CHANCE, CLOTH_QTY, clothCandidates,
+  PROFESSIONS, RECIPES, difficultyColor, tierCap, nextTier, tierLearnCost, recipeLearnCost,
+  CLOTH_DROP_CHANCE, CLOTH_QTY, CLOTH_FAMILIES, SCRAP_DROP_CHANCE, CLOTH_SCRAP, clothCandidates,
   type RecipeDef, type TierId as ProfTierId,
 } from './content/professions';
 import { Rng } from './rng';
@@ -338,6 +338,9 @@ export interface PlayerMeta {
   // `professionTiers` records the highest tier learned (gates the skill cap).
   professionSkills: Record<string, number>;
   professionTiers: Record<string, ProfTierId>;
+  // Recipes learned from a trainer (must be learned before crafting, even once
+  // the skill requirement is met). The starter recipe is auto-learned for free.
+  learnedRecipes: Set<string>;
 }
 
 // Away-from-keyboard / do-not-disturb presence. `afk` still delivers whispers
@@ -416,6 +419,7 @@ export interface CharacterState {
   // saves load cleanly (default: nothing known).
   professionSkills?: Record<string, number>;
   professionTiers?: Record<string, string>;
+  learnedRecipes?: string[];
 }
 
 export interface PetState {
@@ -703,6 +707,7 @@ export class Sim {
       away: null,
       professionSkills: {},
       professionTiers: {},
+      learnedRecipes: new Set(),
     };
     this.players.set(player.id, meta);
     player.skin = meta.skin; // mirror onto the entity so the renderer + wire can read it
@@ -733,6 +738,7 @@ export class Sim {
       if (typeof s.activeLoadout === 'number') meta.activeLoadout = s.activeLoadout;
       if (s.professionSkills) meta.professionSkills = { ...s.professionSkills };
       if (s.professionTiers) meta.professionTiers = { ...s.professionTiers } as Record<string, ProfTierId>;
+      if (s.learnedRecipes) for (const r of s.learnedRecipes) meta.learnedRecipes.add(r);
     }
 
     // Resolve the flat talent struct once, before the stat pass + ability
@@ -829,6 +835,7 @@ export class Sim {
       skin: meta.skin,
       professionSkills: { ...meta.professionSkills },
       professionTiers: { ...meta.professionTiers },
+      learnedRecipes: [...meta.learnedRecipes],
     };
   }
 
@@ -949,6 +956,9 @@ export class Sim {
   }
   get professionTiers(): Record<string, string> {
     return this.primary.professionTiers;
+  }
+  get learnedRecipes(): string[] {
+    return [...this.primary.learnedRecipes];
   }
 
   meta(pid: number): PlayerMeta | null {
@@ -3621,16 +3631,22 @@ export class Sim {
       if (entry.copper) copper += this.rng.int(Math.ceil(entry.copper * 0.6), Math.ceil(entry.copper * 1.4));
       if (entry.itemId) items.push({ itemId: entry.itemId, count: 1 });
     }
-    // Family-gated cloth (Tailoring/First Aid material): every humanoid has a
-    // chance to drop a small stack, the tier banded by mob level (linen/wool/silk)
-    // with overlap. Injected here, after the per-mob loot loop, so we don't edit
-    // every humanoid template. Drop-or-not first, then pick a tier among the
-    // candidates for this level, then quantity — deterministic per kill.
-    if (template.family === 'humanoid' && this.rng.chance(CLOTH_DROP_CHANCE)) {
+    // Family-gated cloth (Tailoring/First Aid material): cloth-wearing humanoid
+    // families have a chance to drop a small stack, the tier banded by mob level
+    // (linen/wool/silk) with overlap. Injected here, after the per-mob loot loop,
+    // so we don't edit every template. This replaces the legacy linen_scrap junk.
+    // Drop-or-not first, then pick a tier among candidates, then quantity.
+    if (CLOTH_FAMILIES.includes(template.family)) {
       const cands = clothCandidates(mob.level);
       if (cands.length > 0) {
-        const itemId = cands.length === 1 ? cands[0] : cands[this.rng.int(0, cands.length - 1)];
-        items.push({ itemId, count: this.rng.int(CLOTH_QTY.min, CLOTH_QTY.max) });
+        // pick the tier first (so cloth and its consolation scrap match the level)
+        const tier = cands.length === 1 ? cands[0] : cands[this.rng.int(0, cands.length - 1)];
+        if (this.rng.chance(CLOTH_DROP_CHANCE)) {
+          items.push({ itemId: tier, count: this.rng.int(CLOTH_QTY.min, CLOTH_QTY.max) });
+        } else if (this.rng.chance(SCRAP_DROP_CHANCE)) {
+          // no cloth this time — drop the scrap junk for this tier instead
+          items.push({ itemId: CLOTH_SCRAP[tier] ?? 'linen_scrap', count: 1 });
+        }
       }
     }
     if (copper > 0 || items.length > 0) {
@@ -4763,8 +4779,15 @@ export class Sim {
       }
       const t = prof.tiers.find((x) => x.id === 'apprentice');
       if (t && p.level < t.requiresLevel) { this.error(meta.entityId, `Requires level ${t.requiresLevel}.`); return; }
+      const cost = tierLearnCost(prof, 'apprentice');
+      if (meta.copper < cost) { this.error(meta.entityId, 'Not enough money.'); return; }
+      meta.copper -= cost;
       meta.professionSkills[profId] = 1;
       meta.professionTiers[profId] = 'apprentice';
+      // teach the starter recipe(s) for free so the profession is usable at once
+      for (const rid of prof.recipes) {
+        if ((RECIPES[rid]?.requiredSkill ?? 99) <= 1) meta.learnedRecipes.add(rid);
+      }
     } else {
       if (!known) { this.error(meta.entityId, `Learn ${prof.name} first.`); return; }
       const next = nextTier(prof, meta.professionTiers[profId]);
@@ -4774,9 +4797,33 @@ export class Sim {
       }
       // Journeyman also needs a minimum character level — can't max a skill at level 1.
       if (p.level < next.requiresLevel) { this.error(meta.entityId, `Requires level ${next.requiresLevel}.`); return; }
+      const cost = tierLearnCost(prof, next.id);
+      if (meta.copper < cost) { this.error(meta.entityId, 'Not enough money.'); return; }
+      meta.copper -= cost;
       meta.professionTiers[profId] = next.id;
     }
     this.emit({ type: 'professionLearned', profId, tier: meta.professionTiers[profId], pid: meta.entityId });
+  }
+
+  learnRecipe(recipeId: string, pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    const { meta, e: p } = r;
+    const recipe = RECIPES[recipeId];
+    if (!recipe) { this.error(meta.entityId, 'No such recipe.'); return; }
+    const prof = PROFESSIONS[recipe.profId];
+    if (!prof) { this.error(meta.entityId, 'No such profession.'); return; }
+    if (!this.nearTrainer(p, recipe.profId)) { this.error(meta.entityId, 'You must speak to a trainer.'); return; }
+    if (meta.professionSkills[recipe.profId] === undefined) { this.error(meta.entityId, `Learn ${prof.name} first.`); return; }
+    if (meta.learnedRecipes.has(recipeId)) { this.error(meta.entityId, 'You already know that recipe.'); return; }
+    if ((meta.professionSkills[recipe.profId] ?? 0) < recipe.requiredSkill) {
+      this.error(meta.entityId, `Requires ${prof.name} ${recipe.requiredSkill}.`); return;
+    }
+    const cost = recipeLearnCost(recipe);
+    if (meta.copper < cost) { this.error(meta.entityId, 'Not enough money.'); return; }
+    meta.copper -= cost;
+    meta.learnedRecipes.add(recipeId);
+    this.emit({ type: 'recipeLearned', recipeId, pid: meta.entityId });
   }
 
   craft(recipeId: string, pid?: number): void {
@@ -4790,6 +4837,7 @@ export class Sim {
     if (p.castingAbility || isConsuming(p)) { this.error(meta.entityId, 'You are busy.'); return; }
     const skill = meta.professionSkills[recipe.profId];
     if (skill === undefined) { this.error(meta.entityId, 'You have not learned that profession.'); return; }
+    if (!meta.learnedRecipes.has(recipeId)) { this.error(meta.entityId, 'You have not learned that recipe.'); return; }
     if (skill < recipe.requiredSkill) { this.error(meta.entityId, 'Your skill is too low.'); return; }
     if (recipe.station && !this.nearStation(p, recipe.station)) { this.error(meta.entityId, `You need to be near a ${recipe.station}.`); return; }
     const batch = recipe.batch ?? 1;

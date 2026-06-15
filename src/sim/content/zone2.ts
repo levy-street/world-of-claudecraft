@@ -162,7 +162,6 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 20, moveSpeed: 7, aggroRadius: 11,
     loot: [
       { copper: 55, chance: 1 },
-      { itemId: 'linen_scrap', chance: 0.3 },
       { itemId: 'tallow_candle', chance: 0.3 },
     ],
     scale: 1.0, color: 0x6c3483,

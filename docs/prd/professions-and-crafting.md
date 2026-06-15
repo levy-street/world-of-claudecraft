@@ -229,7 +229,14 @@ The "requires skill level 40" gate means a player must skill Apprentice up towar
 ### 6.9 Persistence & networking
 - **FR-9.1** `professionSkills` (and the learned-tier state from FR-1.4, e.g. `professionTiers`) added to `CharacterState` (JSONB, no migration); serialized in `serializeCharacter`, reloaded in `addPlayer` with `{}` fallback. Old saves load with no professions known.
 - **FR-9.2** New commands `learnProfession`, `craft` through `IWorld` → `cmd()` → `server/game.ts` switch → `Sim`. Gather routes through existing `interact`.
-- **FR-9.3** Server sends `professionSkills` in the self-snapshot only when it changes (`maybe('skills', ...)`); `ClientWorld` mirrors it and re-renders the window.
+- **FR-9.3** Server sends `professionSkills`/`professionTiers`/`learnedRecipes` in the self-snapshot only when they change (`maybe('skills'|'profTiers'|'recipes', ...)`); `ClientWorld` mirrors them and re-renders the windows.
+
+### 6.10 Learning costs & trainer-taught recipes
+- **FR-10.1 Tier costs.** Learning a tier costs copper at the trainer, flat by kind: secondary **20c/100c** (Apprentice/Journeyman), primary **75c/300c**. Rejected if the player can't afford it. (Distinct from talent respec, which is free — these are one-time, non-escalating sinks, the vanilla profession model. Constants: `TIER_COST` in `professions.ts`.)
+- **FR-10.2 Recipes are learned from a trainer**, not auto-unlocked by skill. A recipe must be in the character's `learnedRecipes` to craft it, even once the skill requirement is met. State: `learnedRecipes: Set<string>` on `PlayerMeta` / `string[]` on `CharacterState` (JSONB).
+- **FR-10.3 Recipe cost** scales with the recipe's `requiredSkill`, the same across same-kind professions: `requiredSkill × 1c` (secondary) / `× 2c` (primary). So a recipe at skill 20 costs the same in any secondary profession. `learnRecipe(recipeId)` validates near-trainer + profession-known + skill-met + not-already-known + affordable, then deducts copper. The **starter recipe (skill ≤ 1) is auto-learned free** when the profession is learned, so it is usable immediately.
+- **FR-10.4 Trainer UI.** The gossip "Train" option opens a training view (in the gossip window) listing the next learnable tier and every recipe the player's skill now allows but hasn't learned, each with its copper cost and a Learn action. The craft window shows only **learned** recipes. A skill-up re-renders the trainer view so newly-eligible recipes appear.
+- **FR-10.5 Cloth scrap consolation.** A cloth-band mob (humanoid/murloc/kobold) that fails its cloth roll has a chance (`SCRAP_DROP_CHANCE`) to drop the **scrap junk for its tier** instead (`linen_scrap`/`wool_scrap`/`silk_scrap`) — folded into the same `rollLoot` injection, replacing the old scattered per-mob `linen_scrap` entries.
 
 ---
 

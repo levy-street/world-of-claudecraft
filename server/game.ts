@@ -942,6 +942,9 @@ export class GameServer {
           sim.learnProfession(msg.prof, msg.tier, pid);
         }
         break;
+      case 'learnRecipe':
+        if (typeof msg.recipe === 'string') sim.learnRecipe(msg.recipe, pid);
+        break;
       case 'craft':
         if (typeof msg.recipe === 'string') sim.craft(msg.recipe, pid);
         break;
@@ -1191,6 +1194,7 @@ export class GameServer {
     // professions/secondary skills ride the wire only when they change
     maybe('skills', meta.professionSkills);
     maybe('profTiers', meta.professionTiers);
+    maybe('recipes', [...meta.learnedRecipes]);
     return extra === '' ? json : json.slice(0, -1) + extra + '}';
   }
 

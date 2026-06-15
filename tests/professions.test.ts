@@ -13,6 +13,14 @@ const metaOf = (sim: Sim) => (sim as any).players.get(sim.player.id);
 const tick = (sim: Sim, secs: number) => { for (let i = 0; i < 20 * secs; i++) sim.tick(); };
 const findEntity = (sim: Sim, pred: (e: any) => boolean) =>
   [...(sim as any).entities.values()].find(pred);
+// teleport the player onto the First Aid trainer and rebucket the grid
+const atTrainer = (sim: Sim): void => {
+  const npc = findEntity(sim, (e) => e.kind === 'npc' && e.templateId === 'brother_aldric') as any;
+  sim.player.pos.x = npc.pos.x;
+  sim.player.pos.z = npc.pos.z;
+  sim.player.prevPos = { ...sim.player.pos };
+  sim.tick();
+};
 
 describe('professions — registry & pure helpers', () => {
   it('the registry validates against the item table', () => {
@@ -62,6 +70,7 @@ describe('professions — crafting & skill-ups', () => {
     const meta = metaOf(sim);
     meta.professionSkills.first_aid = 1;
     meta.professionTiers.first_aid = 'apprentice';
+    meta.learnedRecipes.add('linen_bandage');
     sim.addItem('linen_cloth', 5);
 
     sim.craft('linen_bandage');
@@ -76,6 +85,7 @@ describe('professions — crafting & skill-ups', () => {
     const sim = makeSim();
     metaOf(sim).professionSkills.first_aid = 1;
     metaOf(sim).professionTiers.first_aid = 'apprentice';
+    metaOf(sim).learnedRecipes.add('linen_bandage');
     sim.craft('linen_bandage');
     expect(sim.player.castingAbility).toBeNull();
     expect(sim.countItem('linen_bandage')).toBe(0);
@@ -86,6 +96,7 @@ describe('professions — crafting & skill-ups', () => {
     const meta = metaOf(sim);
     meta.professionSkills.first_aid = 50; // at apprentice cap
     meta.professionTiers.first_aid = 'apprentice';
+    meta.learnedRecipes.add('linen_bandage');
     sim.addItem('linen_cloth', 5);
     sim.craft('linen_bandage');
     tick(sim, 4);
@@ -97,6 +108,7 @@ describe('professions — crafting & skill-ups', () => {
     const meta = metaOf(sim);
     meta.professionSkills.first_aid = 50; // apprentice cap
     meta.professionTiers.first_aid = 'journeyman'; // trained, so cap is 100
+    meta.learnedRecipes.add('silk_bandage');
     sim.addItem('silk_cloth', 5);
     sim.craft('silk_bandage'); // requiredSkill 70 > current 50 → rejected
     expect(sim.player.castingAbility).toBeNull();
@@ -111,6 +123,7 @@ describe('professions — crafting & skill-ups', () => {
     const meta = metaOf(sim);
     meta.professionSkills.first_aid = 60;
     meta.professionTiers.first_aid = 'journeyman'; // cap 100
+    meta.learnedRecipes.add('wool_bandage');
     sim.addItem('wool_cloth', 5);
     sim.craft('wool_bandage'); // orange at 60 → always skills up
     tick(sim, 4);
@@ -187,9 +200,12 @@ describe('professions — trainers & tier gate', () => {
     sim.tick(); // rebucket the spatial grid so nearTrainer sees the npc
 
     const meta = metaOf(sim);
+    meta.copper = 1000; // enough to afford the tier costs
     sim.learnProfession('first_aid', 'apprentice');
     expect(meta.professionSkills.first_aid).toBe(1);
     expect(meta.professionTiers.first_aid).toBe('apprentice');
+    expect(meta.copper).toBe(980); // secondary Apprentice costs 20c
+    expect([...meta.learnedRecipes]).toContain('linen_bandage'); // starter auto-learned free
 
     sim.learnProfession('first_aid', 'journeyman'); // skill 1 < 40 → rejected
     expect(meta.professionTiers.first_aid).toBe('apprentice');
@@ -225,6 +241,7 @@ describe('professions — trainers & tier gate', () => {
       sim.player.prevPos = { ...sim.player.pos };
       sim.tick();
       const meta = metaOf(sim);
+      meta.copper = 1000;
       meta.professionSkills.p1 = 1; meta.professionTiers.p1 = 'apprentice';
       meta.professionSkills.p2 = 1; meta.professionTiers.p2 = 'apprentice';
 
@@ -243,20 +260,73 @@ describe('professions — trainers & tier gate', () => {
   });
 });
 
+describe('professions — learning costs & recipes', () => {
+  it('learning a tier costs copper and is rejected when broke', () => {
+    const sim = makeSim();
+    atTrainer(sim);
+    const meta = metaOf(sim);
+    meta.copper = 0;
+    sim.learnProfession('first_aid', 'apprentice');
+    expect(meta.professionSkills.first_aid).toBeUndefined(); // can't afford 20c
+    meta.copper = 20;
+    sim.learnProfession('first_aid', 'apprentice');
+    expect(meta.professionSkills.first_aid).toBe(1);
+    expect(meta.copper).toBe(0);
+  });
+
+  it('recipes must be learned from the trainer, not just unlocked by skill', () => {
+    const sim = makeSim();
+    atTrainer(sim);
+    const meta = metaOf(sim);
+    meta.copper = 1000;
+    sim.learnProfession('first_aid', 'apprentice'); // auto-learns the starter (linen_bandage)
+    meta.professionSkills.first_aid = 30; // skill is now enough for heavy_linen (req 25)
+    sim.addItem('linen_cloth', 5);
+
+    // not learned yet → cannot craft despite skill + materials
+    sim.craft('heavy_linen_bandage');
+    expect(sim.player.castingAbility).toBeNull();
+
+    // learn it from the trainer (cost = 25 skill x 1c secondary)
+    const before = meta.copper;
+    sim.learnRecipe('heavy_linen_bandage');
+    expect([...meta.learnedRecipes]).toContain('heavy_linen_bandage');
+    expect(before - meta.copper).toBe(25);
+
+    // now it crafts
+    sim.craft('heavy_linen_bandage');
+    expect(sim.player.castingAbility).toBe('craft:heavy_linen_bandage');
+  });
+
+  it('cannot learn a recipe above current skill', () => {
+    const sim = makeSim();
+    atTrainer(sim);
+    const meta = metaOf(sim);
+    meta.copper = 1000;
+    sim.learnProfession('first_aid', 'apprentice'); // skill 1
+    sim.learnRecipe('heavy_linen_bandage'); // requires skill 25 → rejected
+    expect([...meta.learnedRecipes]).not.toContain('heavy_linen_bandage');
+  });
+});
+
 describe('professions — persistence', () => {
   it('professionSkills/Tiers round-trip through save/load', () => {
     const sim = makeSim('warrior', 7);
     const meta = metaOf(sim);
     meta.professionSkills.first_aid = 73;
     meta.professionTiers.first_aid = 'journeyman';
+    meta.learnedRecipes.add('linen_bandage');
+    meta.learnedRecipes.add('wool_bandage');
     const state = sim.serializeCharacter(sim.player.id)!;
     expect(state.professionSkills).toEqual({ first_aid: 73 });
     expect(state.professionTiers).toEqual({ first_aid: 'journeyman' });
+    expect(state.learnedRecipes).toEqual(['linen_bandage', 'wool_bandage']);
 
     const reloaded = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true, noPlayer: true } as any);
     const pid = reloaded.addPlayer('warrior', 'Reloaded', { state });
     const rmeta = (reloaded as any).players.get(pid);
     expect(rmeta.professionSkills.first_aid).toBe(73);
+    expect([...rmeta.learnedRecipes]).toEqual(['linen_bandage', 'wool_bandage']);
     expect(rmeta.professionTiers.first_aid).toBe('journeyman');
   });
 

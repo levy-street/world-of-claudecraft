@@ -14,7 +14,7 @@ import { saveCharacterState } from '../server/db';
 import { ClientWorld } from '../src/net/online';
 import { DT, type PlayerClass } from '../src/sim/types';
 
-const DELTA_KEYS = ['inv', 'buyback', 'equip', 'qlog', 'qdone', 'cds', 'stats', 'weapon', 'party', 'trade', 'duel', 'skills', 'profTiers'];
+const DELTA_KEYS = ['inv', 'buyback', 'equip', 'qlog', 'qdone', 'cds', 'stats', 'weapon', 'party', 'trade', 'duel', 'skills', 'profTiers', 'recipes'];
 
 interface FakeClient {
   sent: any[];
