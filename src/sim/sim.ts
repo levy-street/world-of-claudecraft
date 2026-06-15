@@ -3549,6 +3549,15 @@ export class Sim {
       return null;
     }
 
+    // "/dungeons" (aliases /dungeon, /instances) — self-only readout of every
+    // group instance, the overworld zone its door sits in, and its suggested
+    // party size. Self-only error reply, returns null so it is neither logged
+    // nor spoken; works online for free (no server interceptor).
+    if (/^\/(?:dungeons|dungeon|instances)(?:\s|$)/i.test(raw)) {
+      this.error(r.meta.entityId, this.dungeonsReadout());
+      return null;
+    }
+
     // "/w name message" — private whisper to an online player
     const wm = /^\/(?:w|whisper|t|tell)\s+(\S+)\s+([\s\S]+)$/i.exec(raw);
     if (wm) {
@@ -4845,6 +4854,15 @@ export class Sim {
       if (Math.abs(pos.x - origin.x) < 120 && Math.abs(pos.z - origin.z) < 250) return inst.slot;
     }
     return null;
+  }
+
+  // Readout for "/dungeons": lists every group instance in entrance order with
+  // the overworld zone its door sits in and its suggested party size. Reads
+  // only the static DUNGEON_LIST (already entrance-sorted by index) and the
+  // door zone via zoneAt — no new fields.
+  private dungeonsReadout(): string {
+    const parts = DUNGEON_LIST.map((d) => `${d.name} (${zoneAt(d.doorPos.z).name}, ${d.suggestedPlayers} players)`);
+    return `Dungeons (${parts.length}): ${parts.join(', ')}.`;
   }
 
   private error(pid: number, text: string): void {
