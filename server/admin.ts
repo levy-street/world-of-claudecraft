@@ -1,6 +1,6 @@
 import * as http from 'node:http';
 import { json, readBody } from './http_util';
-import { rateLimited } from './ratelimit';
+import { authThrottled, clearAuthFailures, rateLimited, recordAuthFailure } from './ratelimit';
 import { findAccount, touchLogin, saveToken, accountForToken, isAdminAccount } from './db';
 import { verifyPassword, newToken } from './auth';
 import {
@@ -56,10 +56,19 @@ async function handleLogin(req: http.IncomingMessage, res: http.ServerResponse):
     return fail(res, 429, 'too many attempts — wait a minute and try again');
   }
   const body = await readBody(req);
-  const account = typeof body.username === 'string' ? await findAccount(body.username) : null;
+  const username = typeof body.username === 'string' ? body.username : '';
+  // Mirror the public login throttle on the admin login surface too. The
+  // per-IP bucket above stops one noisy source, but distributed credential
+  // stuffing against a single admin username must share one server-side bucket.
+  if (username && authThrottled(username)) {
+    return fail(res, 429, 'too many failed attempts — wait a few minutes and try again');
+  }
+  const account = username ? await findAccount(username) : null;
   if (!account || !(await verifyPassword(String(body.password ?? ''), account.password_hash))) {
+    if (username) recordAuthFailure(username);
     return fail(res, 401, 'invalid username or password');
   }
+  clearAuthFailures(username); // correct password: forgive earlier typos, even for non-admins
   if (!(await isAdminAccount(account.id))) {
     return fail(res, 403, 'this account does not have admin access');
   }

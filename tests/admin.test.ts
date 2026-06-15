@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { EventEmitter } from 'node:events';
+import { hashPassword } from '../server/auth';
+import { authThrottled, clearAuthFailures, recordAuthFailure } from '../server/ratelimit';
 
 // Mock the db layers so no Postgres is needed; the router logic is under test.
 vi.mock('../server/db', () => ({
@@ -39,12 +41,12 @@ import { forceCharacterRename, ignoreReport, moderateAccount, moderationQueue, m
 
 const VALID_TOKEN = 'a'.repeat(64);
 
-function fakeReq(opts: { method?: string; url?: string; token?: string; body?: unknown } = {}) {
+function fakeReq(opts: { method?: string; url?: string; token?: string; body?: unknown; remoteAddress?: string } = {}) {
   const req: any = new EventEmitter();
   req.method = opts.method ?? 'GET';
   req.url = opts.url ?? '/admin/api/overview';
   req.headers = opts.token ? { authorization: `Bearer ${opts.token}` } : {};
-  req.socket = { remoteAddress: `10.0.0.${Math.floor(Math.random() * 250) + 1}` };
+  req.socket = { remoteAddress: opts.remoteAddress ?? `10.0.0.${Math.floor(Math.random() * 250) + 1}` };
   if (opts.method === 'POST') {
     setImmediate(() => {
       if (opts.body !== undefined) req.emit('data', JSON.stringify(opts.body));
@@ -76,6 +78,8 @@ const fakeGame: any = {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  clearAuthFailures('adminbrute');
+  clearAuthFailures('nonadmin');
 });
 
 describe('admin api auth', () => {
@@ -118,19 +122,69 @@ describe('admin api auth', () => {
   });
 
   it('rejects admin login for a non-admin account even with the right password', async () => {
-    // scrypt hash of "hunter22" is irrelevant — verifyPassword fails on a junk
-    // hash, so this asserts the credential failure path returns 401.
-    vi.mocked(findAccount).mockResolvedValue({ id: 3, username: 'bob', password_hash: 'junk' });
+    vi.mocked(findAccount).mockResolvedValue({ id: 3, username: 'nonadmin', password_hash: await hashPassword('hunter22') });
+    vi.mocked(isAdminAccount).mockResolvedValue(false);
     const res = fakeRes();
 
     await handleAdminApi(
-      fakeReq({ method: 'POST', url: '/admin/api/login', body: { username: 'bob', password: 'hunter22' } }),
+      fakeReq({ method: 'POST', url: '/admin/api/login', body: { username: 'nonadmin', password: 'hunter22' } }),
       res,
       fakeGame,
     );
 
-    expect(res.statusCode).toBe(401);
-    expect(res.body.error).toMatch(/invalid username or password/);
+    expect(res.statusCode).toBe(403);
+    expect(res.body.error).toMatch(/admin access/);
+  });
+
+  it('throttles distributed failed admin-login attempts by username', async () => {
+    vi.mocked(findAccount).mockResolvedValue(null);
+
+    for (let i = 0; i < 10; i++) {
+      const res = fakeRes();
+      await handleAdminApi(
+        fakeReq({
+          method: 'POST',
+          url: '/admin/api/login',
+          remoteAddress: `10.41.0.${i + 1}`,
+          body: { username: 'adminbrute', password: `wrong-${i}` },
+        }),
+        res,
+        fakeGame,
+      );
+      expect(res.statusCode).toBe(401);
+    }
+
+    const blocked = fakeRes();
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        url: '/admin/api/login',
+        remoteAddress: '10.41.0.250',
+        body: { username: 'adminbrute', password: 'still-wrong' },
+      }),
+      blocked,
+      fakeGame,
+    );
+
+    expect(blocked.statusCode).toBe(429);
+    expect(blocked.body.error).toMatch(/too many failed attempts/);
+  });
+
+  it('clears admin-login failure history after a correct password before denying non-admins', async () => {
+    for (let i = 0; i < 9; i++) recordAuthFailure('nonadmin');
+    vi.mocked(findAccount).mockResolvedValue({ id: 3, username: 'nonadmin', password_hash: await hashPassword('hunter22') });
+    vi.mocked(isAdminAccount).mockResolvedValue(false);
+    const res = fakeRes();
+
+    await handleAdminApi(
+      fakeReq({ method: 'POST', url: '/admin/api/login', body: { username: 'nonadmin', password: 'hunter22' } }),
+      res,
+      fakeGame,
+    );
+
+    expect(res.statusCode).toBe(403);
+    recordAuthFailure('nonadmin');
+    expect(authThrottled('nonadmin')).toBe(false);
   });
 
   it('rejects non-GET methods on data endpoints', async () => {
