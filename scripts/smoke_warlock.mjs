@@ -54,7 +54,8 @@ for (let i = 0; i < 40 && !imp; i++) {
 }
 check('Summon Imp conjures a pet', !!imp && imp.templateId === 'warlock_imp', imp ? imp.templateId : 'none');
 
-// pull a wolf, then IDLE the player — only the imp fights. If the wolf bleeds, the imp auto-firebolts.
+// pull a BEEFED wolf, then IDLE the player — only the imp fights. The imp should heel
+// right at your side and Firebolt your target, so the wolf bleeds while you do nothing.
 const wolfId = await page.evaluate(() => {
   const sim = window.__game.sim;
   const p = sim.player;
@@ -65,7 +66,8 @@ const wolfId = await page.evaluate(() => {
       if (dd < d) { d = dd; wolf = e; }
     }
   }
-  p.pos.x = wolf.pos.x + 12; p.pos.z = wolf.pos.z;
+  wolf.maxHp = 4000; wolf.hp = 4000; // survive so the imp keeps firing at your side
+  p.pos.x = wolf.pos.x + 10; p.pos.z = wolf.pos.z;
   p.resource = p.maxResource;
   sim.targetEntity(wolf.id);
   p.facing = Math.atan2(wolf.pos.x - p.pos.x, wolf.pos.z - p.pos.z);
@@ -76,25 +78,29 @@ const wolfId = await page.evaluate(() => {
 await sleep(800);
 const hpAtPull = await page.evaluate((id) => window.__game.sim.entities.get(id).hp, wolfId);
 
-// from here the player does nothing; keep them alive so only the imp's damage moves the wolf bar
-let impEngaged = false, wolfHp = hpAtPull;
-for (let i = 0; i < 60; i++) {
+// player idles; wait until the imp is both DAMAGING the wolf and HEELED to your side.
+let impEngaged = false, wolfHp = hpAtPull, impDist = 99;
+for (let i = 0; i < 80; i++) {
   const s = await page.evaluate((id) => {
     const sim = window.__game.sim;
     const p = sim.player;
-    p.hp = p.maxHp;            // player is a bystander
-    p.autoAttack = false;
+    p.hp = p.maxHp; p.autoAttack = false; // bystander
     const w = sim.entities.get(id);
     const pet = sim.petOf(p.id);
-    return { whp: w ? w.hp : 0, wdead: !w || w.dead, petTarget: pet ? pet.aggroTargetId : null };
+    return {
+      whp: w ? w.hp : 0, wdead: !w || w.dead,
+      petTarget: pet ? pet.aggroTargetId : null,
+      petDist: pet ? Math.hypot(pet.pos.x - p.pos.x, pet.pos.z - p.pos.z) : 99,
+    };
   }, wolfId);
   if (s.petTarget === wolfId) impEngaged = true;
-  wolfHp = s.whp;
-  if (s.wdead || hpAtPull - wolfHp >= 10) break;
+  wolfHp = s.whp; impDist = s.petDist;
+  if ((hpAtPull - wolfHp >= 10) && impDist <= 5) break; // damaging AND heeled close
   await sleep(500);
 }
 check('imp assists the owner (targets the wolf)', impEngaged);
 check('imp auto-firebolts: wolf HP drops while player idles', hpAtPull - wolfHp >= 1, `pull=${Math.round(hpAtPull)} -> ${Math.round(wolfHp)}`);
+check('imp heels close to the player (stands at your side)', impDist <= 5, `dist=${impDist.toFixed(1)}yd`);
 await page.screenshot({ path: 'tmp/wl1_imp_firebolt.png' });
 
 // ---- Summon Voidwalker at level 10 ----

@@ -653,7 +653,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description: 'Begins taming a beast to be your companion. It must be your level or lower and not an elite. Your pet follows you, attacks your enemies, and holds threat of its own. You may have one pet at a time.',
   },
   dismiss_pet: {
-    id: 'dismiss_pet', name: 'Dismiss Pet', class: 'hunter', learnLevel: 1,
+    id: 'dismiss_pet', name: 'Dismiss Pet', class: 'hunter', learnLevel: 5,
     cost: 0, castTime: 0, cooldown: 0, range: 0, school: 'nature',
     requiresTarget: false,
     effects: [{ type: 'dismissPet' }],

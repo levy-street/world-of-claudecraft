@@ -605,6 +605,15 @@ describe('warlock demon pets', () => {
     expect(mob.forcedTargetId).not.toBe(imp.id); // DPS demon: no Growl/taunt
   });
 
+  it('the imp heels close to the owner instead of parking at range', () => {
+    const { sim, imp } = summonSetup();
+    const owner = sim.player;
+    teleport(sim, imp, owner.pos.x + 12, owner.pos.z); // shove it away, no target
+    sim.targetEntity(null);
+    for (let i = 0; i < 20 * 10; i++) sim.tick();
+    expect(dist2d(imp.pos, owner.pos)).toBeLessThan(6); // jogged back to your side
+  });
+
   it('dismiss despawns the demon entirely - no corpse, no respawn', () => {
     const { sim, imp } = summonSetup();
     sim.castAbility('dismiss_pet');
