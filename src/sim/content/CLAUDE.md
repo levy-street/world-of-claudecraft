@@ -22,6 +22,10 @@ module and spreads it into the flat tables the engine reads (`ITEMS`, `MOBS`,
   `items.ts` (`BASE_ITEMS`); `zone2`/`zone3` export their own `ZONE{N}_ITEMS`.
 - `dungeons.ts` — `DUNGEON_MOBS` + spawn lists + `DUNGEON_DEFS`.
 - `items.ts` — `BASE_ITEMS` (starter/quest/vendor/junk) + class-archetype groups.
+- `professions.ts` — the profession framework: `PROFESSIONS` + `RECIPES`
+  registries (`ProfessionDef`/`RecipeDef`/`ProfessionTier`), cloth bands/scrap,
+  difficulty coloring, learning-cost helpers, and `validateProfessions` (run at
+  `data.ts` load). Merged into `PROFESSIONS`/`RECIPES` flat tables.
 
 ## Vanilla fidelity (YOU MUST)
 Abilities gain ranks at **real vanilla learn levels** with real values. The
@@ -69,6 +73,25 @@ cross-reference it; do not invent costs/levels/damage.
 - Build strings (`exportBuild`/`importBuild`, base64), loadouts (`SavedLoadout`,
   `MAX_LOADOUTS`), dormant-node detection, and respec all live here. Allocation is
   **server-authoritative**: `validateAllocation` re-checks on apply regardless of UI.
+
+## Professions framework (`professions.ts`)
+- **Pure data + helpers, no engine logic** (the Sim owns learn/craft/skill-up).
+  `PROFESSIONS` (`ProfessionDef`) and `RECIPES` (`RecipeDef`) are flat registries;
+  `validateProfessions(ITEMS)` runs at `data.ts` import and **throws** on a bad
+  registry (unknown reagent/output item, disordered difficulty thresholds, a recipe
+  gated above `maxSkill`), same fail-fast pattern as `validateTalentTree`.
+- **Adding a profession:** add a `ProfessionDef` (`kind: primary|secondary`, its
+  two `STANDARD_TIERS`, recipe ids) + its `RecipeDef`s here, a trainer NPC
+  (`NpcDef.trains: '<profId>'`) in a zone file, and any material/output items in
+  `items.ts`. No engine change — the Sim reads the registry.
+- **Recipes are trainer-taught, not skill-unlocked:** a recipe must be in the
+  character's `learnedRecipes` to craft, even once `requiredSkill` is met. Difficulty
+  color (orange→grey, keyed off `requiredSkill`/`yellowAt`/`greenAt`/`greyAt`) drives
+  the skill-up chance. Costs come from `tierLearnCost`/`recipeLearnCost` (don't inline
+  cost numbers). Learn/craft are **server-authoritative** (validated in `sim.ts`).
+- Today only First Aid (secondary) is authored; cloth bands (`CLOTH_BANDS`) and the
+  `gatherSkill` type stub are the seams for the gathering/production professions in
+  PRs 2–3 — see `docs/prd/professions-and-crafting.md`.
 
 ## Never do here
 - Never put combat/sim behavior in a content file — it stays declarative data.

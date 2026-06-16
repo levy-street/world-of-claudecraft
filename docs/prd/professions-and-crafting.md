@@ -86,12 +86,12 @@ The "requires skill level 40" gate means a player must skill Apprentice up towar
 | Item data model | `src/sim/types.ts:85` (`ItemDef`), `kind` union at `:88` | `'weapon'|'armor'|'quest'|'junk'|'food'|'drink'|'tool'|'potion'`. **No `'reagent'`/`'material'` kind.** `ItemUse` has only `{ type: 'fishing' }`. |
 | Item stacking | `src/sim/sim.ts` `addItem(itemId, count)` | all items stack by default, increments existing `InvSlot.count` or pushes new. No flag needed. |
 | Loot entry shape | `src/sim/types.ts:121` (`LootEntry`/`LootSlot`) | `LootSlot` has `count`; `lootCorpse` already loops `for i<count` calling `addItem` per unit, so `count > 1` works today. `LootEntry` itself has no count, `rollLoot` pushes `count:1`. |
-| Loot resolution | `src/sim/sim.ts` `rollLoot(mob, meta, eligible)` (~`:2760`) | three branches: rollGroup, questId, normal. **Cloth injection point: after the entry loop**, gate on `template.family === 'humanoid'`, roll quantity once. |
+| Loot resolution | `src/sim/sim.ts` `rollLoot(mob, meta, eligible)` (~`:2819`) | three branches: rollGroup, questId, normal. **Cloth injection point: after the entry loop**, gate on `CLOTH_FAMILIES.includes(template.family)`, pick tier then roll drop-or-not then quantity/scrap. |
 | Existing cloth item | `src/sim/content/items.ts:267` (`linen_scrap`) | `kind:'junk'`, already in several humanoid loot tables (mogger 100%, vale_bandit 50%, mudfin_murloc 20%, tunnel_rat 25%). Redesign into a stacking material. |
-| **Cast model (the template)** | `src/sim/sim.ts` fishing path: `startFishing` (~`:3489`), `updateCasting` (~`:1494`), `FISHING_CAST_ID`/`FISHING_CAST_TIME` (`src/sim/types.ts:12`) | sets `castingAbility`, `castTotal`, `castRemaining`, `channeling=false`, emits `castStart`; completion dispatches by `castId`. **Reuse for bandage/craft/gather casts.** |
+| **Cast model (the template)** | `src/sim/sim.ts` fishing path: `startFishing` (~`:3580`), `updateCasting` (~`:1521`), `FISHING_CAST_ID`/`FISHING_CAST_TIME` (`src/sim/types.ts:12`) | sets `castingAbility`, `castTotal`, `castRemaining`, `channeling=false`, emits `castStart`; completion dispatches by `castId`. **Reuse for bandage/craft/gather casts.** |
 | Cast cancel | `src/sim/sim.ts` `cancelCast` on move (~`:952`), on damage during fishing cast (~`:2543`) | bandage channel and gather cast must cancel on the same triggers. |
 | Aura HoT tick | `src/sim/sim.ts` `updateAuras` (`kind:'hot'`) | per-tick heal of `min(value, maxHp-hp)`; `tickInterval=2` mimics vanilla 2s ticks. **Template for the bandage HoT.** `breaksOnDamage` exists on `Aura` (`types.ts:54`). |
-| World nodes (interactables) | `src/sim/types.ts:269` (`GroundObjectDef`), spawned in `Sim` ctor (~`:452`), `pickUpObject` (~`:3706`), `interact()` dispatch (~`:3739`) | objects respawn after `OBJECT_RESPAWN` (~30s). Today single-item instant pickup. **Gather nodes extend this with a skill gate + cast + quantity.** |
+| World nodes (interactables) | `src/sim/types.ts:299` (`GroundObjectDef`), `pickUpObject` (~`:4007`), `interact()` dispatch (~`:4030`) | objects respawn after `OBJECT_RESPAWN` (~30s). Today single-item instant pickup. **Gather nodes extend this with a skill gate + cast + quantity.** |
 | PlayerMeta (in-memory sheet) | `src/sim/sim.ts:226` | holds `inventory`, `equipment`, `xp`, `talents`, `loadouts`, etc. **Add `professionSkills`.** |
 | CharacterState (persisted JSONB) | `src/sim/sim.ts:299` | optional fields backfill on load (talents pattern). **Add optional `professionSkills`, no migration.** |
 | Serialize / reload | `src/sim/sim.ts` `serializeCharacter` (~`:635`), `addPlayer` reload (~`:569`) | talents fields show the additive-optional pattern exactly. |
@@ -163,8 +163,8 @@ The "requires skill level 40" gate means a player must skill Apprentice up towar
     id: string;
     profId: string;
     name: string; icon: string;
-    requiredSkill: number;      // gate to learn/use
-    orangeAt: number; yellowAt: number; greenAt: number;  // difficulty coloring
+    requiredSkill: number;      // min skill to craft (== the orange threshold)
+    yellowAt: number; greenAt: number; greyAt: number;  // difficulty coloring (orange is implicit below yellowAt)
     reagents: { itemId: string; count: number }[];
     output: { itemId: string; count: number };
     castTime: number;           // seconds, cast-bar duration (smelt ~3s; some vanilla crafts ~10s)
@@ -173,20 +173,20 @@ The "requires skill level 40" gate means a player must skill Apprentice up towar
                                 // but still rolls only ONE skill-up — a throughput option, not a skill accelerator
   }
   ```
-- **FR-2.3** Validated at load: recipe `profId` exists, reagents/outputs reference real `ITEMS`, `orangeAt ≤ yellowAt ≤ greenAt`, no recipe gated above `maxSkill`.
-- **FR-2.4** "Known recipes" is derived: a recipe is available when `professionSkills[profId] >= recipe.requiredSkill`. No separate learned-recipe state in v1.
+- **FR-2.3** Validated at load: recipe `profId` exists, reagents/outputs reference real `ITEMS`, `requiredSkill ≤ yellowAt ≤ greenAt ≤ greyAt`, no recipe gated above `maxSkill`.
+- **FR-2.4** A recipe is craftable only when it is **both** in the character's `learnedRecipes` (taught by a trainer, see FR-10.2) **and** `professionSkills[profId] >= recipe.requiredSkill`. Skill alone does not unlock a recipe; the starter recipe is taught free on learning the profession.
 
 ### 6.3 Materials & cloth drops (Deliverable 1)
 - **FR-3.1** Add an item `kind` for crafting materials (add `'reagent'` to the union; update any `kind`-gated checks in `useItem`/`autoEquip` — neither acts on the new kind).
 - **FR-3.2** Redesign `linen_scrap` into a stacking material item (e.g. `linen_cloth`), keep a migration-safe alias if the old id is in live inventories.
-- **FR-3.3** Cloth drops via a **family-gated injection in `rollLoot`** after the normal entry loop: if `template.family === 'humanoid'`, roll a drop chance once and a quantity once (one `rng.chance` + one `rng.int`), pushing `{ itemId: cloth, count }`. This adds exactly two deterministic RNG calls per humanoid kill and avoids editing every mob template.
+- **FR-3.3** Cloth drops via a **family-gated injection in `rollLoot`** after the normal entry loop: if `CLOTH_FAMILIES.includes(template.family)` (humanoid/murloc/kobold), pick the level-band tier, then roll drop-or-not; on a hit push `{ itemId: cloth, count }`, on a miss roll the consolation scrap (FR-10.5). This adds a small fixed number of deterministic RNG draws per cloth-family kill (see FR-3.4) and avoids editing every mob template.
 - **FR-3.4 Cloth tiers by mob level, with overlap.** Three cloth tiers drop banded by the **mob's level**, with intentional overlap bands so the transition is gradual (a mid-band mob can drop either neighbouring tier):
   | Cloth | Mob level band |
   |---|---|
   | `linen_cloth` | 1–8 |
   | `wool_cloth` | 7–15 |
   | `silk_cloth` | 14–20 |
-  In an overlap band (levels 7–8 → linen **or** wool; levels 14–15 → wool **or** silk) the injection picks uniformly among the candidate tiers for that mob. The **drop-or-not** roll (`CLOTH_DROP_CHANCE`, ~35%) happens first and is independent of tier — a humanoid still frequently drops no cloth at all; only when it does drop is the tier chosen. Sequence per humanoid kill: one `rng.chance` (drop?), then on a hit one `rng.int` to pick the tier among candidates (skipped if only one), then one `rng.int` for quantity.
+  In an overlap band (levels 7–8 → linen **or** wool; levels 14–15 → wool **or** silk) the injection picks uniformly among the candidate tiers for that mob. Sequence per cloth-family kill: first one `rng.int` to **pick the tier** among candidates (skipped if only one), so cloth and its consolation scrap share a level band; then one `rng.chance` for **drop-or-not** (`CLOTH_DROP_CHANCE`, ~35%); then on a hit one `rng.int` for quantity, or on a miss one `rng.chance` for the scrap consolation (`SCRAP_DROP_CHANCE`, ~30%). A cloth-family mob still frequently drops no cloth at all.
 
 ### 6.4 General cast-driven action (craft / gather)
 - **FR-4.1** Add a general craft cast: `craft(recipeId)` validates (known profession, meets `requiredSkill`, owns reagents, in range of `station` if any, not in combat-cancel state), then starts a cast (`castingAbility = 'craft:'+recipeId`, `castTotal/castRemaining = recipe.castTime`), emitting `castStart`. Reagents are reserved/consumed on **completion**, not on start.
@@ -276,7 +276,7 @@ LEARN (trainer)                CRAFT (recipe)                       GATHER (node
 - **PR-1** No per-tick profession work. Skill-ups and crafts are discrete events; the cast tick already exists.
 - **PR-2** Recipe/profession lookups are O(1) flat-map reads from the `PROFESSIONS` registry; difficulty color is arithmetic.
 - **PR-3** `professionSkills` sent only on change (never every snapshot); it is a small string→int map.
-- **PR-4** Cloth injection adds exactly two RNG calls per humanoid kill, both deterministic; no change to the RNG sequence for non-humanoids.
+- **PR-4** Cloth injection adds a small fixed number of deterministic RNG draws per cloth-family kill (2–3: tier pick when multi-candidate, drop roll, then quantity or scrap); **no change to the RNG sequence for non-cloth-family mobs** (verified by `tests/professions.test.ts`).
 
 ---
 

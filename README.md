@@ -263,6 +263,9 @@ Stormstrike, and Starfire)**
   respawns; a rare spawn (Old Greyjaw) on a long timer
 - Death → release spirit → graveyard; falling damage; swimming slows you
 - Quest log with abandon, gossip dialogs with greetings, per-class rewards
+- Professions: First Aid (secondary skill) — kill humanoids for cloth, learn
+  from a trainer, craft bandages and channel them to heal; vanilla Apprentice/
+  Journeyman skill tiers with orange/yellow/green skill-up chances
 
 **Presentation**
 - Procedural everything: timber-framed houses, shingled roofs, chapel, market
