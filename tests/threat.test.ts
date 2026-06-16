@@ -453,7 +453,8 @@ describe('hunter pets', () => {
     const boar = nearestMob(sim, 'wild_boar');
     teleport(sim, sim.player, boar.pos.x + 4, boar.pos.z);
     teleport(sim, pet, boar.pos.x + 5, boar.pos.z);
-    hit(sim, sim.player, boar, 5); // boar comes for the hunter
+    sim.targetEntity(boar.id); // you attack the boar; the pet assists your target
+    hit(sim, sim.player, boar, 5);
     let petThreat = 0;
     for (let i = 0; i < 20 * 20 && petThreat === 0; i++) {
       sim.tick();
@@ -479,7 +480,8 @@ describe('hunter pets', () => {
     beefUp(boar);
     teleport(sim, sim.player, boar.pos.x + 4, boar.pos.z);
     teleport(sim, pet, boar.pos.x + 5, boar.pos.z);
-    hit(sim, sim.player, boar, 5); // boar comes for the hunter; pet assists
+    sim.targetEntity(boar.id); // you attack the boar; the pet assists and taunts
+    hit(sim, sim.player, boar, 5);
 
     // let the boar transfer onto the tanking pet
     for (let i = 0; i < 20 * 20 && boar.aggroTargetId !== pet.id; i++) sim.tick();
@@ -553,6 +555,138 @@ describe('hunter pets', () => {
     const events = sim.tick();
     expect(events.some((e) => e.type === 'error' && /too high level/.test(e.text))).toBe(true);
     expect(wolf.ownerId).toBe(null);
+  });
+});
+
+describe('warlock demon pets', () => {
+  function summonSetup() {
+    const sim = new Sim({ seed: 42, playerClass: 'warlock', autoEquip: true });
+    sim.setPlayerLevel(5); // Summon Imp unlocks at level 5
+    sim.player.resource = sim.player.maxResource;
+    sim.castAbility('summon_imp');
+    for (let i = 0; i < 20 * 4; i++) sim.tick(); // 3s cast + settle
+    const imp = sim.petOf(sim.playerId)!;
+    return { sim, imp };
+  }
+
+  it('summon imp conjures an owned, non-hostile demon pet', () => {
+    const { sim, imp } = summonSetup();
+    expect(imp).toBeTruthy();
+    expect(imp.templateId).toBe('warlock_imp');
+    expect(imp.ownerId).toBe(sim.playerId);
+    expect(imp.summoned).toBe(true);
+    expect(imp.hostile).toBe(false);
+  });
+
+  it('the imp firebolts the target the owner is fighting, builds its own threat, and never growls', () => {
+    const { sim, imp } = summonSetup();
+    const mob = nearestMob(sim);
+    beefUp(mob);
+    teleport(sim, sim.player, mob.pos.x + 10, mob.pos.z);
+    teleport(sim, imp, mob.pos.x + 10, mob.pos.z);
+    sim.targetEntity(mob.id);
+    hit(sim, sim.player, mob, 5); // owner engages -> the imp assists
+
+    let petThreat = 0;
+    let fireFromImp = false;
+    for (let i = 0; i < 20 * 20 && !(petThreat > 0 && fireFromImp); i++) {
+      const evs = sim.tick();
+      for (const ev of evs) {
+        if (ev.type === 'damage' && ev.sourceId === imp.id && ev.school === 'fire' && ev.amount > 0) {
+          fireFromImp = true;
+        }
+      }
+      petThreat = mob.threat.get(imp.id) ?? 0;
+    }
+    expect(imp.aggroTargetId).toBe(mob.id);
+    expect(fireFromImp).toBe(true); // it nukes with Firebolt, not melee
+    expect(petThreat).toBeGreaterThan(0);
+    expect(mob.tappedById).toBe(sim.playerId); // pet damage taps for the owner
+    expect(mob.forcedTargetId).not.toBe(imp.id); // DPS demon: no Growl/taunt
+  });
+
+  it('dismiss despawns the demon entirely - no corpse, no respawn', () => {
+    const { sim, imp } = summonSetup();
+    sim.castAbility('dismiss_pet');
+    sim.tick();
+    expect(sim.petOf(sim.playerId)).toBe(null);
+    expect(sim.entities.get(imp.id)).toBeUndefined();
+  });
+
+  it('summoning again replaces the existing demon (one pet at a time)', () => {
+    const { sim, imp } = summonSetup();
+    sim.player.resource = sim.player.maxResource;
+    sim.castAbility('summon_imp');
+    for (let i = 0; i < 20 * 4; i++) sim.tick();
+    const imp2 = sim.petOf(sim.playerId)!;
+    expect(imp2.id).not.toBe(imp.id);
+    expect(sim.entities.get(imp.id)).toBeUndefined();
+    const pets = [...sim.entities.values()].filter(
+      (e) => e.kind === 'mob' && e.ownerId === sim.playerId && !e.dead,
+    );
+    expect(pets).toHaveLength(1);
+  });
+
+  it('a slain imp vanishes and does not respawn', () => {
+    const { sim, imp } = summonSetup();
+    (sim as any).dealDamage(null, imp, imp.hp, false, 'fire', 'test', 'hit');
+    expect(imp.dead).toBe(true);
+    sim.tick(); // updateMob dead-branch drops summoned pets
+    expect(sim.entities.get(imp.id)).toBeUndefined();
+    expect(sim.petOf(sim.playerId)).toBe(null);
+  });
+
+  it('imp Firebolt damage scales with the pet (owner) level', () => {
+    function maxImpHit(level: number): number {
+      const sim = new Sim({ seed: 7, playerClass: 'warlock', autoEquip: true });
+      sim.setPlayerLevel(level);
+      sim.player.resource = sim.player.maxResource;
+      sim.castAbility('summon_imp');
+      for (let i = 0; i < 20 * 4; i++) sim.tick();
+      const imp = sim.petOf(sim.playerId)!;
+      const mob = nearestMob(sim);
+      beefUp(mob);
+      teleport(sim, sim.player, mob.pos.x + 10, mob.pos.z);
+      teleport(sim, imp, mob.pos.x + 10, mob.pos.z);
+      sim.targetEntity(mob.id);
+      hit(sim, sim.player, mob, 5);
+      let best = 0;
+      for (let i = 0; i < 20 * 15; i++) {
+        for (const ev of sim.tick()) {
+          if (ev.type === 'damage' && ev.sourceId === imp.id && ev.school === 'fire') best = Math.max(best, ev.amount);
+        }
+      }
+      return best;
+    }
+    expect(maxImpHit(15)).toBeGreaterThan(maxImpHit(5));
+  });
+
+  it('summon voidwalker conjures a melee tank demon that taunts (Growls)', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warlock', autoEquip: true });
+    sim.setPlayerLevel(10);
+    sim.player.resource = sim.player.maxResource;
+    sim.castAbility('summon_voidwalker');
+    for (let i = 0; i < 20 * 6; i++) sim.tick(); // 5s cast
+    const vw = sim.petOf(sim.playerId)!;
+    expect(vw.templateId).toBe('warlock_voidwalker');
+    expect(vw.summoned).toBe(true);
+    expect(vw.maxHp).toBeGreaterThan(150); // tanky
+
+    const mob = nearestMob(sim);
+    beefUp(mob);
+    teleport(sim, sim.player, mob.pos.x + 4, mob.pos.z);
+    teleport(sim, vw, mob.pos.x + 3, mob.pos.z);
+    sim.targetEntity(mob.id);
+    hit(sim, sim.player, mob, 5);
+    let petThreat = 0;
+    for (let i = 0; i < 20 * 20 && !(petThreat > 0 && mob.forcedTargetId === vw.id); i++) {
+      sim.tick();
+      petThreat = mob.threat.get(vw.id) ?? 0;
+    }
+    expect(vw.aggroTargetId).toBe(mob.id);
+    expect(petThreat).toBeGreaterThan(0);
+    expect(mob.forcedTargetId).toBe(vw.id); // voidwalker Growls/taunts (tank demon)
+    expect(mob.aggroTargetId).toBe(vw.id);
   });
 });
 

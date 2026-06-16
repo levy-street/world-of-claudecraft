@@ -22,6 +22,7 @@ import {
   ZONE3_QUESTS, ZONE3_QUEST_ORDER, ZONE3_ROADS, ZONE3_ZONE,
 } from './content/zone3';
 import { DUNGEON_DEFS, DUNGEON_MOBS } from './content/dungeons';
+import { PET_MOBS } from './content/pets';
 
 export { CLASSES, ABILITIES, abilitiesKnownAt } from './content/classes';
 export type { ClassDef } from './content/classes';
@@ -39,7 +40,7 @@ export const ITEMS: Record<string, ItemDef> = {
 };
 
 export const MOBS: Record<string, MobTemplate> = {
-  ...ZONE1_MOBS, ...ZONE2_MOBS, ...ZONE3_MOBS, ...DUNGEON_MOBS,
+  ...ZONE1_MOBS, ...ZONE2_MOBS, ...ZONE3_MOBS, ...DUNGEON_MOBS, ...PET_MOBS,
 };
 
 export const NPCS: Record<string, NpcDef> = {

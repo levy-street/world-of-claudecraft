@@ -984,6 +984,8 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   lightning_shield: r('storm', 'sky', ['shield', { p: 'lightning', s: 0.6 }], ['glow']),
   flame_shock: r('fire', 'ember', ['flame'], ['arcs']),
   // warlock
+  summon_imp: r('shadow', 'ember', ['skull', { p: 'flame', ...BR, pal: 'ember' }], ['glow']),
+  summon_voidwalker: r('shadow', 'shadowPurple', ['shield', { p: 'eye', ...TL }], ['glow']),
   shadow_bolt: r('shadow', 'shadowPurple', ['bolt'], ['glow']),
   demon_skin: r('shadow', 'venom', [{ p: 'chestplate', pal: 'venom' }]),
   immolate: r('fire', 'ember', ['flame'], ['crack', 'glow']),

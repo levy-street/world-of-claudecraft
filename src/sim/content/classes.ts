@@ -148,7 +148,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     startWeapon: 'gnarled_staff',
     startChest: 'apprentice_robe',
     ranged: { min: 3, max: 6, speed: 1.8, maxRange: 30, minRange: 0, wand: true, school: 'shadow' },
-    abilities: ['shadow_bolt', 'demon_skin', 'immolate', 'corruption', 'life_tap', 'curse_of_agony', 'drain_life', 'fear', 'searing_pain', 'shadowburn'],
+    abilities: ['summon_imp', 'summon_voidwalker', 'shadow_bolt', 'demon_skin', 'immolate', 'corruption', 'life_tap', 'curse_of_agony', 'drain_life', 'fear', 'searing_pain', 'shadowburn', 'dismiss_pet'],
     color: 0x9482c9,
   },
   druid: {
@@ -653,11 +653,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description: 'Begins taming a beast to be your companion. It must be your level or lower and not an elite. Your pet follows you, attacks your enemies, and holds threat of its own. You may have one pet at a time.',
   },
   dismiss_pet: {
-    id: 'dismiss_pet', name: 'Dismiss Pet', class: 'hunter', learnLevel: 10,
+    id: 'dismiss_pet', name: 'Dismiss Pet', class: 'hunter', learnLevel: 1,
     cost: 0, castTime: 0, cooldown: 0, range: 0, school: 'nature',
     requiresTarget: false,
     effects: [{ type: 'dismissPet' }],
-    description: 'Releases your pet back to the wild.',
+    description: 'Dismisses your pet — a tamed beast returns to the wild; a summoned demon is banished.',
   },
   raptor_strike: {
     id: 'raptor_strike', name: 'Raptor Strike', class: 'hunter', learnLevel: 1,
@@ -1043,6 +1043,20 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 56, max: 66 }],
     description: 'Instantly blasts the target with Shadow Flame for $d Shadow damage.',
+  },
+  summon_imp: {
+    id: 'summon_imp', name: 'Summon Imp', class: 'warlock', learnLevel: 5,
+    cost: 45, castTime: 3, cooldown: 0, range: 0, school: 'shadow',
+    requiresTarget: false,
+    effects: [{ type: 'summonPet', mobId: 'warlock_imp' }],
+    description: 'Summons an Imp under the command of the Warlock. The Imp assails your foes with Firebolts and holds threat of its own. You may have one demon at a time; summoning again replaces it.',
+  },
+  summon_voidwalker: {
+    id: 'summon_voidwalker', name: 'Summon Voidwalker', class: 'warlock', learnLevel: 10,
+    cost: 70, castTime: 5, cooldown: 0, range: 0, school: 'shadow',
+    requiresTarget: false,
+    effects: [{ type: 'summonPet', mobId: 'warlock_voidwalker' }],
+    description: 'Summons a Voidwalker demon. The Voidwalker is a durable melee guardian that taunts your foes and holds their attention. You may have one demon at a time; summoning again replaces it.',
   },
 
   // ====================== DRUID ======================

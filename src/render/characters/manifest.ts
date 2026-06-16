@@ -203,6 +203,16 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/spider.glb`, height: 1.4,
     clips: SPIDER, tint: 'entity', tintStrength: 0.35,
   },
+  // warlock demon pet: small fel-red demon (demonalt uses the 14-clip biped rig)
+  mob_imp: {
+    url: `${CREATURES}/demonalt.glb`, height: 1.1,
+    clips: BIPED14, tint: 'entity', tintStrength: 0.5,
+  },
+  // warlock voidwalker: a larger hovering void demon (demon.glb uses the floating rig)
+  mob_voidwalker: {
+    url: `${CREATURES}/demon.glb`, height: 2.0,
+    clips: FLOATING, tint: 'entity', tintStrength: 0.45,
+  },
   mob_murloc: {
     url: `${CREATURES}/frog.glb`, height: 1.7,
     clips: BIPED14, tint: 'entity', tintStrength: 0.45,
@@ -329,6 +339,8 @@ export const VISUALS: Record<string, VisualDef> = {
 // ---------------------------------------------------------------------------
 
 const MOB_KEYS: Record<string, string> = {
+  warlock_imp: 'mob_imp',
+  warlock_voidwalker: 'mob_voidwalker',
   wild_boar: 'mob_boar',
   elder_bristleback: 'mob_boar',
   // gravecaller cult + necromancers: dark-robed casters

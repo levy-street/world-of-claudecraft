@@ -24,7 +24,7 @@ import type { LeaderboardEntry } from '../world_api';
 import {
   AbilityDef, AbilityEffect, Aura, AuraKind, CAST_PUSHBACK_SEC, CHANNEL_PUSHBACK_FRACTION, CONSUME_DURATION,
   CONSUME_TICKS, CrowdControlDrCategory, DT, Entity, EquipSlot, FISHING_CAST_ID, FISHING_CAST_TIME, GCD,
-  INTERACT_RANGE, InvSlot, LootEntry, LootSlot, MELEE_RANGE, MAX_LEVEL, MobFamily,
+  INTERACT_RANGE, InvSlot, LootEntry, LootSlot, MELEE_RANGE, MAX_LEVEL, MobFamily, MobTemplate,
   MoveInput, PlayerClass, QuestProgress, QuestState, RUN_SPEED, SimConfig, SimEvent, TURN_SPEED, Vec3,
   angleTo, armorReduction, dist2d, emptyMoveInput, isConsuming, meleeMissChance, mobXpValue, normAngle,
   rageFromDealing, rageFromTaking, spellHitChance, xpForLevel,
@@ -2121,7 +2121,12 @@ export class Sim {
           const pet = this.petOf(p.id);
           if (!pet) { this.error(p.id, 'You have no pet.'); break; }
           this.emit({ type: 'log', text: `You dismiss ${pet.name}.`, color: '#999', pid: p.id });
-          this.releasePetToWild(pet);
+          if (pet.summoned) this.despawnPet(pet);
+          else this.releasePetToWild(pet);
+          break;
+        }
+        case 'summonPet': {
+          this.summonPet(p, eff.mobId);
           break;
         }
       }
@@ -2295,6 +2300,45 @@ export class Sim {
       m.threat.delete(pet.id);
       if (m.aggroTargetId === pet.id && !m.dead && m.aiState !== 'dead') this.retargetMob(m);
     }
+  }
+
+  /** Warlock demon summon: conjure a fresh pet from a template, owned by the
+   *  caster. Replaces any existing pet. Unlike a tamed beast, a summoned pet
+   *  despawns (rather than returning to the wild) on dismiss, owner logout, or
+   *  death — see `despawnPet` and the dead-branch of `updateMob`. */
+  private summonPet(owner: Entity, mobId: string): void {
+    const template = MOBS[mobId];
+    if (!template) { this.error(owner.id, 'Summon failed.'); return; }
+    const existing = this.petOf(owner.id);
+    if (existing) this.despawnPet(existing);
+    // place the demon just behind the caster
+    const pos = this.groundPos(
+      owner.pos.x + Math.sin(owner.facing + Math.PI) * 2,
+      owner.pos.z + Math.cos(owner.facing + Math.PI) * 2,
+    );
+    const pet = createMob(this.nextId++, template, owner.level, pos);
+    pet.ownerId = owner.id;
+    pet.summoned = true;
+    pet.petTauntTimer = 0;
+    pet.hostile = false;
+    pet.aiState = 'idle';
+    pet.tappedById = null;
+    pet.spawnPos = { ...pos };
+    this.addEntity(pet);
+    this.emit({ type: 'spellfx', sourceId: owner.id, targetId: pet.id, school: 'shadow', fx: 'nova' });
+    this.emit({ type: 'log', text: `You summon ${pet.name}.`, color: '#a6f', pid: owner.id });
+    this.emit({ type: 'aura', targetId: pet.id, name: 'Summoned', gained: true });
+  }
+
+  /** Remove a summoned pet from the world entirely — no corpse, no respawn.
+   *  Mobs that were fighting it forget it. */
+  private despawnPet(pet: Entity): void {
+    for (const m of this.entities.values()) {
+      if (m.kind !== 'mob' || m.id === pet.id) continue;
+      m.threat.delete(pet.id);
+      if (m.aggroTargetId === pet.id && !m.dead && m.aiState !== 'dead') this.retargetMob(m);
+    }
+    this.dropEntity(pet.id);
   }
 
   // -------------------------------------------------------------------------
@@ -2945,6 +2989,8 @@ export class Sim {
 
   private updateMob(mob: Entity): void {
     if (mob.dead) {
+      // a slain summoned demon leaves no corpse and never respawns — it vanishes
+      if (mob.summoned) { this.dropEntity(mob.id); return; }
       mob.corpseTimer -= DT;
       mob.respawnTimer -= DT;
       // dungeon mobs stay dead until the instance resets
@@ -3153,7 +3199,9 @@ export class Sim {
   private updatePet(pet: Entity): void {
     const owner = pet.ownerId !== null ? this.entities.get(pet.ownerId) : null;
     if (!owner || owner.kind !== 'player' || !this.players.has(owner.id)) {
-      this.releasePetToWild(pet);
+      // owner logged out / left: a summoned demon vanishes; a tamed beast goes home
+      if (pet.summoned) this.despawnPet(pet);
+      else this.releasePetToWild(pet);
       return;
     }
     if (this.isStunned(pet)) return;
@@ -3162,18 +3210,26 @@ export class Sim {
     let target = pet.aggroTargetId !== null ? this.entities.get(pet.aggroTargetId) ?? null : null;
     if (target && (target.dead || target.kind !== 'mob' || !target.hostile)) target = null;
     if (target && dist2d(owner.pos, pet.pos) > PET_LEASH) target = null;
+    // stick to a target only while it's still your target or it has aggroed the pet
+    // (it pulled aggro) — otherwise drop it and re-mirror whatever you're attacking
+    if (target && owner.targetId !== target.id && target.aggroTargetId !== pet.id) target = null;
     if (!target && !owner.dead) target = this.petPickTarget(pet, owner);
     pet.aggroTargetId = target?.id ?? null;
     pet.inCombat = target !== null;
 
     if (target) {
+      // ranged demon pets (imp Firebolt) stand off and nuke instead of meleeing
+      const ranged = MOBS[pet.templateId]?.petRanged;
+      if (ranged) { this.petCastRanged(pet, owner, target, ranged); return; }
       const d = dist2d(pet.pos, target.pos);
       if (d > MELEE_RANGE * 0.8) {
         if (!this.isRooted(pet)) this.moveToward(pet, target.pos, pet.moveSpeed * this.moveSpeedMult(pet));
         pet.swingTimer = Math.max(0, pet.swingTimer - DT);
       } else {
         pet.facing = angleTo(pet.pos, target.pos);
-        if (pet.petTauntTimer <= 0) {
+        // Growl is the tank pet's threat tool: tamed beasts and tank demons (voidwalker)
+        // taunt; DPS demons (imp) don't. petGrowls opts a summoned pet into tanking.
+        if (pet.petTauntTimer <= 0 && (!pet.summoned || !!MOBS[pet.templateId]?.petGrowls)) {
           this.applyTaunt(pet, target);
           pet.petTauntTimer = PET_GROWL_INTERVAL;
         }
@@ -3188,6 +3244,13 @@ export class Sim {
 
     // heel
     pet.swingTimer = Math.max(0, pet.swingTimer - DT);
+    this.petHeel(pet, owner);
+  }
+
+  // Follow the owner at heel: warp in if left far behind, otherwise jog to the
+  // owner's side and stop close (PET_FOLLOW_DISTANCE). Shared by the idle pet and
+  // the ranged imp, which heels next to you while it fires.
+  private petHeel(pet: Entity, owner: Entity): void {
     const d = dist2d(pet.pos, owner.pos);
     if (d > PET_TELEPORT_DISTANCE) {
       pet.pos = { ...owner.pos };
@@ -3206,13 +3269,47 @@ export class Sim {
     let bestD = PET_ASSIST_RANGE;
     for (const m of this.entities.values()) {
       if (m.kind !== 'mob' || m.dead || !m.hostile || m.ownerId !== null) continue;
-      const engagingUs = m.aggroTargetId === owner.id || m.aggroTargetId === pet.id;
-      const ownerOffense = owner.targetId === m.id && (owner.autoAttack || m.threat.has(owner.id));
-      if (!engagingUs && !ownerOffense) continue;
+      // attack what you attack (your current target, once you've engaged it)...
+      const yourTarget = owner.targetId === m.id && (owner.autoAttack || m.threat.has(owner.id));
+      // ...otherwise only defend itself if a mob has aggroed onto the pet.
+      const attackingPet = m.aggroTargetId === pet.id;
+      if (!yourTarget && !attackingPet) continue;
       const d = dist2d(pet.pos, m.pos);
       if (d < bestD) { best = m; bestD = d; }
     }
     return best;
+  }
+
+  // Ranged pet brain (warlock imp): heel next to the owner (stand close, like an
+  // idle pet) and fire at the owner's target whenever it's within `range`. The pet
+  // builds its own threat through dealDamage, exactly like a melee pet's swings.
+  private petCastRanged(pet: Entity, owner: Entity, target: Entity, ranged: NonNullable<MobTemplate['petRanged']>): void {
+    this.petHeel(pet, owner);
+    const d = dist2d(pet.pos, target.pos);
+    if (d > ranged.range) {
+      pet.swingTimer = Math.max(0, pet.swingTimer - DT);
+      return;
+    }
+    pet.facing = angleTo(pet.pos, target.pos);
+    pet.swingTimer -= DT;
+    if (pet.swingTimer <= 0) {
+      this.petFirebolt(pet, target, ranged);
+      pet.swingTimer = ranged.speed * this.swingIntervalMult(pet);
+    }
+  }
+
+  private petFirebolt(pet: Entity, target: Entity, ranged: NonNullable<MobTemplate['petRanged']>): void {
+    if (target.dead) return;
+    const school = ranged.school as Aura['school'];
+    this.emit({ type: 'spellfx', sourceId: pet.id, targetId: target.id, school, fx: 'projectile' });
+    if (this.rng.next() >= spellHitChance(pet.level, target.level)) {
+      this.emit({ type: 'damage', sourceId: pet.id, targetId: target.id, amount: 0, crit: false, school, ability: ranged.name, kind: 'miss' });
+      return;
+    }
+    let dmg = this.rng.range(ranged.min, ranged.max) + (ranged.perLevel ?? 0) * (pet.level - 1);
+    const crit = this.rng.chance(0.05);
+    if (crit) dmg *= 1.5; // spell crits are +50% in vanilla
+    this.dealDamage(pet, target, Math.max(1, Math.round(dmg)), crit, school, ranged.name, 'hit');
   }
 
   // Step `e` one tick toward `dest`. With `ignoreObstacles`, the mover phases

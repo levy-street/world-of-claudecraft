@@ -159,6 +159,12 @@ export interface MobTemplate {
   respawnMult?: number;
   // Boss mechanic: periodic AoE pulse around the mob while in combat.
   aoePulse?: { min: number; max: number; radius: number; every: number; name: string; school?: string; fx?: 'nova' | 'projectile' };
+  // Pet behavior: a ranged single-target attack (warlock imp Firebolt). When set, an
+  // owned pet stands off at `range` and casts this instead of running into melee.
+  petRanged?: { min: number; max: number; range: number; speed: number; school: string; name: string; perLevel?: number };
+  // Pet behavior: this pet taunts (Growl) to hold threat, like a tamed beast. Summoned
+  // pets default to no taunt (DPS demons); set true for tank demons (warlock voidwalker).
+  petGrowls?: boolean;
   // Boss mechanic: spawn adds when hp first drops below each threshold (descending fractions).
   summonAdds?: { mobId: string; count: number; atHpPct: number[] };
   // Boss mechanic: damage multiplier once hp drops below the threshold.
@@ -196,7 +202,8 @@ export type AbilityEffect =
   | { type: 'sunder'; armor: number; maxStacks: number } // sunder armor: stacking armor debuff + flat threat
   | { type: 'taunt' } // taunt/growl: match top threat and force-attack the caster
   | { type: 'tamePet' } // hunter tame beast: the targeted mob becomes the caster's pet
-  | { type: 'dismissPet' }; // release the caster's pet back to the wild
+  | { type: 'dismissPet' } // release the caster's pet back to the wild
+  | { type: 'summonPet'; mobId: string }; // warlock: conjure a demon pet from a mob template
 
 export interface AbilityRank {
   rank: number;
@@ -463,6 +470,7 @@ export interface Entity {
   forcedTargetTimer: number; // seconds left on the forced-attack window
   ownerId: number | null; // controlled pets: owning player's entity id (null = wild)
   petTauntTimer: number; // controlled pet Growl cooldown
+  summoned: boolean; // pet was conjured (warlock demon), not tamed: despawns on dismiss/owner-leave/death
   pulseTimer: number; // boss aoe pulse countdown
   firedSummons: number; // summonAdds thresholds already triggered
   summonedIds: number[]; // live adds this boss summoned; despawned on reset
