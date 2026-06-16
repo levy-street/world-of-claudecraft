@@ -6,12 +6,12 @@ import {
   ensureSchema, pool, createAccount, findAccount, getAccountsCount, touchLogin, saveToken, accountForToken,
   listCharacters, getCharacter, createCharacterCapped, deleteCharacter, closeOrphanSessions,
   pruneChatLogs, searchCharacters, characterCountsByRealm, moderationStatusForAccount, renameCharacter,
-  findCharacterReportTargetByName, topArenaRatings, topLifetimeXp, chatMuteStatusForAccount,
+  findCharacterReportTargetByName, topArenaRatings, topLifetimeXp, chatMuteStatusForAccount, getArmoryCharacter,
 } from './db';
 import { virtualLevel } from '../src/sim/types';
 import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
-import type { LeaderboardEntry } from '../src/world_api';
+import type { LeaderboardEntry, ArmoryProfile } from '../src/world_api';
 import { cleanReportReason, createPlayerReport, createSuspiciousRegistrationReport } from './moderation_db';
 import { resolveReportTarget } from './report_target';
 import { bufferHandshakeMessages } from './ws_buffer';
@@ -521,6 +521,22 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const limit = Math.max(1, Math.min(RELEASES_SIZE, Number(params.get('limit')) || RELEASES_SIZE));
       const entries = await getReleases();
       return json(res, 200, { repo: GITHUB_REPO, releases: entries.slice(0, limit) });
+    }
+    if (req.method === 'GET' && url === '/api/armory') {
+      // Public, read-only character profile for the shareable Armory page. No auth.
+      const params = new URLSearchParams((req.url ?? '').split('?')[1] ?? '');
+      const name = String(params.get('name') ?? '').trim();
+      if (!name || name.length > 32) return json(res, 400, { error: 'name required' });
+      const row = await getArmoryCharacter(name);
+      if (!row) return json(res, 404, { error: 'character not found' });
+      const profile: ArmoryProfile = {
+        name: row.name, cls: row.class, level: row.level,
+        virtualLevel: virtualLevel(row.lifetimeXp), lifetimeXp: row.lifetimeXp,
+        prestigeRank: row.prestigeRank, realm: row.realm,
+        arenaRating: row.arenaRating, arenaWins: row.arenaWins, arenaLosses: row.arenaLosses,
+        equipment: row.equipment, talents: row.talents ?? null,
+      };
+      return json(res, 200, { character: profile });
     }
     json(res, 404, { error: 'unknown endpoint' });
   } catch (err: any) {

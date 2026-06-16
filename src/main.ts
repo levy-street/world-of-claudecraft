@@ -12,6 +12,7 @@ import { clickMoveShouldCancel, clickMoveStep, stepAngleToward } from './game/cl
 import { Api, ClientWorld, CharacterSummary, type ReleaseEntry } from './net/online';
 import type { IWorld, LeaderboardEntry } from './world_api';
 import { formatXp } from './ui/xp_bar';
+import { armoryProfileHtml } from './ui/armory';
 import { assetsReady } from './render/assets/preload';
 import { CharacterPreview } from './render/characters';
 import { skinCount } from './render/characters/manifest';
@@ -1110,7 +1111,7 @@ const hoverTimeouts: Record<string, number | null> = {
 };
 
 function switchMainView(targetId: string): void {
-  const views = ['#hero-view', '#highscores-view', '#wiki-view', '#news-view', '#download-view'];
+  const views = ['#hero-view', '#highscores-view', '#wiki-view', '#news-view', '#download-view', '#armory-view'];
   const currentViewId = views.find(id => {
     const el = $(id);
     return el && !el.hasAttribute('hidden');
@@ -1123,7 +1124,8 @@ function switchMainView(targetId: string): void {
     '#highscores-view': 'nav-btn-highscores',
     '#wiki-view': 'nav-btn-wiki',
     '#news-view': 'nav-btn-news',
-    '#download-view': 'nav-btn-download'
+    '#download-view': 'nav-btn-download',
+    '#armory-view': 'nav-btn-armory'
   };
 
   const activeNavId = navMap[targetId];
@@ -2121,6 +2123,51 @@ async function loadHighscores(): Promise<void> {
       + `<span class="hs-xp">${formatXp(r.lifetimeXp)}</span></div>`;
   }).join('');
   host.innerHTML = head + body;
+  host.querySelectorAll('.hs-row:not(.hs-head)').forEach((row, i) => {
+    const name = rows[i]?.name;
+    if (!name) return;
+    const el = row as HTMLElement;
+    el.style.cursor = 'pointer';
+    el.title = `View ${name}'s armory`;
+    el.addEventListener('click', () => openArmory(name));
+  });
+}
+
+let armoryLoading = false;
+function openArmory(name: string): void {
+  switchMainView('#armory-view');
+  const url = new URL(window.location.href);
+  url.searchParams.set('armory', name);
+  window.history.pushState({}, '', url.toString());
+  void loadArmory(name);
+}
+async function loadArmory(name: string): Promise<void> {
+  const host = $('#armory-content');
+  if (!host || armoryLoading) return;
+  const esc = (s: string): string => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!));
+  const input = $('#armory-search-input') as HTMLInputElement | null;
+  if (input) input.value = name;
+  armoryLoading = true;
+  host.innerHTML = `<div class="armory-loading">${t('armory.loading', { name: esc(name) })}</div>`;
+  let profile = null;
+  try { profile = await api.armory(name); } catch { profile = null; }
+  armoryLoading = false;
+  if (!profile) {
+    host.innerHTML = `<div class="armory-empty">${t('armory.notFound', { name: esc(name) })}</div>`;
+    return;
+  }
+  const shareUrl = `${location.origin}${location.pathname}?armory=${encodeURIComponent(profile.name)}`;
+  host.innerHTML = armoryProfileHtml(profile)
+    + `<div class="armory-share"><button id="armory-copy" class="armory-search-btn" type="button">${t('armory.copyLink')}</button>`
+    + `<input class="armory-share-url" type="text" readonly value="${esc(shareUrl)}"></div>`;
+  const copy = $('#armory-copy');
+  if (copy) {
+    copy.addEventListener('click', () => {
+      try { void navigator.clipboard?.writeText(shareUrl); } catch { /* clipboard unavailable */ }
+      copy.textContent = t('armory.copied');
+      window.setTimeout(() => { copy.textContent = t('armory.copyLink'); }, 1500);
+    });
+  }
 }
 
 // Minimal, safe Markdown → HTML for GitHub release notes. The input is escaped
@@ -2901,6 +2948,7 @@ function wireStartScreens(): void {
   const navBtnWiki = $('#nav-btn-wiki');
   const navBtnNews = $('#nav-btn-news');
   const navBtnDownload = $('#nav-btn-download');
+  const navBtnArmory = $('#nav-btn-armory');
   const navBtnLogin = $('#nav-btn-login');
 
   const deleteConfirmInput = $('#delete-character-confirm') as HTMLInputElement;
@@ -2982,6 +3030,21 @@ function wireStartScreens(): void {
     void loadNews();
   });
   setupNavBtn(navBtnDownload, '#download-view');
+  setupNavBtn(navBtnArmory, '#armory-view');
+  const armoryForm = $('#armory-search') as HTMLFormElement | null;
+  if (armoryForm) {
+    armoryForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const input = $('#armory-search-input') as HTMLInputElement | null;
+      const name = (input?.value ?? '').trim();
+      if (name) openArmory(name);
+    });
+  }
+  const armoryParam = new URLSearchParams(location.search).get('armory');
+  if (armoryParam && armoryParam.trim()) {
+    switchMainView('#armory-view');
+    void loadArmory(armoryParam.trim());
+  }
   setupNavBtn(navBtnLogin, '#hero-view', () => {
     show('#login-panel');
   });

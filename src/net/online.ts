@@ -1,17 +1,45 @@
 // Online play: REST auth client + WebSocket world mirror.
 
-import { NPCS, abilitiesKnownAt } from '../sim/data';
-import { computeQuestState, ResolvedAbility } from '../sim/sim';
+import { NPCS, abilitiesKnownAt } from "../sim/data";
+import { computeQuestState, ResolvedAbility } from "../sim/sim";
 import {
-  cloneAllocation, computeTalentModifiers, emptyAllocation, talentPointsAtLevel, pointsSpent,
-  type TalentAllocation, type SavedLoadout, type Role,
-} from '../sim/content/talents';
+  cloneAllocation,
+  computeTalentModifiers,
+  emptyAllocation,
+  talentPointsAtLevel,
+  pointsSpent,
+  type TalentAllocation,
+  type SavedLoadout,
+  type Role,
+} from "../sim/content/talents";
 import {
-  Entity, EquipSlot, InvSlot, MoveInput, PlayerClass, QuestProgress, QuestState, SimEvent,
+  Entity,
+  EquipSlot,
+  InvSlot,
+  MoveInput,
+  PlayerClass,
+  QuestProgress,
+  QuestState,
+  SimEvent,
   emptyMoveInput,
-} from '../sim/types';
-import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
-import { isOverheadEmoteId, type ArenaInfo, type CharacterSearchResult, type DuelInfo, type FriendInfo, type IWorld, type LeaderboardEntry, type MarketInfo, type OverheadEmoteId, type PartyInfo, type PresenceStatus, type SocialInfo, type TradeInfo } from '../world_api';
+} from "../sim/types";
+import { normalizeMoveFacing, sanitizeMoveInput } from "../sim/move_input";
+import {
+  isOverheadEmoteId,
+  type ArenaInfo,
+  type ArmoryProfile,
+  type CharacterSearchResult,
+  type DuelInfo,
+  type FriendInfo,
+  type IWorld,
+  type LeaderboardEntry,
+  type MarketInfo,
+  type OverheadEmoteId,
+  type PartyInfo,
+  type PresenceStatus,
+  type SocialInfo,
+  type TradeInfo,
+} from "../world_api";
 
 // ---------------------------------------------------------------------------
 // REST
@@ -28,15 +56,18 @@ export interface CharacterSummary {
 }
 
 export function buildWebSocketUrl(protocol: string, host: string): string {
-  const proto = protocol === 'https:' ? 'wss' : 'ws';
+  const proto = protocol === "https:" ? "wss" : "ws";
   return `${proto}://${host}/ws`;
 }
 
-export function buildWebSocketAuthMessage(token: string, characterId: number): { t: 'auth'; token: string; character: number } {
-  return { t: 'auth', token, character: characterId };
+export function buildWebSocketAuthMessage(
+  token: string,
+  characterId: number,
+): { t: "auth"; token: string; character: number } {
+  return { t: "auth", token, character: characterId };
 }
 
-export type RealmType = 'Normal' | 'PvP' | 'RP' | 'RP-PvP';
+export type RealmType = "Normal" | "PvP" | "RP" | "RP-PvP";
 
 export interface RealmEntry {
   name: string;
@@ -68,29 +99,39 @@ export class Api {
   realm: string | null = null;
   // base origin for realm-scoped calls (characters, search, ws). '' = the page
   // origin; set to another realm's origin when the player picks a realm
-  base = '';
+  base = "";
 
   setRealm(url: string): void {
-    this.base = url || '';
+    this.base = url || "";
   }
 
   // The realm directory is always read from the page's own server. Sending the
   // token (when logged in) also returns per-realm character counts.
   async realms(): Promise<RealmDirectory> {
     try {
-      const res = await fetch('/api/realms', { headers: this.token ? { Authorization: `Bearer ${this.token}` } : {} });
-      if (!res.ok) return { current: '', realms: [], characters: {} };
+      const res = await fetch("/api/realms", {
+        headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
+      });
+      if (!res.ok) return { current: "", realms: [], characters: {} };
       const d = await res.json();
-      return { current: d.current ?? '', realms: d.realms ?? [], characters: d.characters ?? {} };
+      return {
+        current: d.current ?? "",
+        realms: d.realms ?? [],
+        characters: d.characters ?? {},
+      };
     } catch {
-      return { current: '', realms: [], characters: {} };
+      return { current: "", realms: [], characters: {} };
     }
   }
 
   // Live status for a realm (population + reachability), for the realm picker.
-  async realmStatus(url: string): Promise<{ online: boolean; players: number }> {
+  async realmStatus(
+    url: string,
+  ): Promise<{ online: boolean; players: number }> {
     try {
-      const res = await fetch(`${url}/api/status`, { signal: AbortSignal.timeout(3000) });
+      const res = await fetch(`${url}/api/status`, {
+        signal: AbortSignal.timeout(3000),
+      });
       if (!res.ok) return { online: false, players: 0 };
       const d = await res.json();
       return { online: true, players: d.players_online ?? 0 };
@@ -101,15 +142,16 @@ export class Api {
 
   private async post(path: string, body: unknown): Promise<any> {
     const res = await fetch(this.base + path, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}),
       },
       body: JSON.stringify(body),
     });
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data.error ?? `request failed (${res.status})`);
+    if (!res.ok)
+      throw new Error(data.error ?? `request failed (${res.status})`);
     return data;
   }
 
@@ -118,44 +160,66 @@ export class Api {
       headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
     });
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data.error ?? `request failed (${res.status})`);
+    if (!res.ok)
+      throw new Error(data.error ?? `request failed (${res.status})`);
     return data;
   }
 
   private async delete(path: string, body: unknown): Promise<any> {
     const res = await fetch(this.base + path, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}),
       },
       body: JSON.stringify(body),
     });
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data.error ?? `request failed (${res.status})`);
+    if (!res.ok)
+      throw new Error(data.error ?? `request failed (${res.status})`);
     return data;
   }
 
-  async register(username: string, password: string, turnstileToken = ''): Promise<void> {
-    const data = await this.post('/api/register', { username, password, turnstileToken });
+  async register(
+    username: string,
+    password: string,
+    turnstileToken = "",
+  ): Promise<void> {
+    const data = await this.post("/api/register", {
+      username,
+      password,
+      turnstileToken,
+    });
     this.token = data.token;
     this.username = data.username;
   }
 
-  async login(username: string, password: string, turnstileToken = ''): Promise<void> {
-    const data = await this.post('/api/login', { username, password, turnstileToken });
+  async login(
+    username: string,
+    password: string,
+    turnstileToken = "",
+  ): Promise<void> {
+    const data = await this.post("/api/login", {
+      username,
+      password,
+      turnstileToken,
+    });
     this.token = data.token;
     this.username = data.username;
   }
 
   async characters(): Promise<CharacterSummary[]> {
-    const data = await this.get('/api/characters');
-    if (typeof data.realm === 'string') this.realm = data.realm;
+    const data = await this.get("/api/characters");
+    if (typeof data.realm === "string") this.realm = data.realm;
     return data.characters;
   }
 
-  async createCharacter(name: string, cls: PlayerClass, skin = 0): Promise<void> {
-    await this.post('/api/characters', { name, class: cls, skin });
+  async createCharacter(
+    name: string,
+    cls: PlayerClass,
+    skin = 0,
+  ): Promise<void> {
+    await this.post("/api/characters", { name, class: cls, skin });
   }
 
   async renameCharacter(characterId: number, name: string): Promise<void> {
@@ -166,22 +230,51 @@ export class Api {
     await this.delete(`/api/characters/${characterId}`, { name });
   }
 
-  async reportPlayer(reporterCharacterId: number, targetPid: number, reason: string, details: string): Promise<void> {
-    await this.post('/api/reports', { reporterCharacterId, targetPid, reason, details });
+  async reportPlayer(
+    reporterCharacterId: number,
+    targetPid: number,
+    reason: string,
+    details: string,
+  ): Promise<void> {
+    await this.post("/api/reports", {
+      reporterCharacterId,
+      targetPid,
+      reason,
+      details,
+    });
   }
 
-  async reportPlayerByName(reporterCharacterId: number, targetCharacterName: string, reason: string, details: string): Promise<void> {
-    await this.post('/api/reports', { reporterCharacterId, targetCharacterName, reason, details });
+  async reportPlayerByName(
+    reporterCharacterId: number,
+    targetCharacterName: string,
+    reason: string,
+    details: string,
+  ): Promise<void> {
+    await this.post("/api/reports", {
+      reporterCharacterId,
+      targetCharacterName,
+      reason,
+      details,
+    });
   }
 
-  async projectStats(): Promise<{ accounts_created: number; players_online: number; realm: string }> {
-    return this.get('/api/project-stats');
+  async projectStats(): Promise<{
+    accounts_created: number;
+    players_online: number;
+    realm: string;
+  }> {
+    return this.get("/api/project-stats");
   }
 
   // Lifetime-XP leaderboard for the home page. 'global' ranks across all realms.
-  async leaderboard(scope: 'realm' | 'global' = 'global', limit = 100): Promise<LeaderboardEntry[]> {
+  async leaderboard(
+    scope: "realm" | "global" = "global",
+    limit = 100,
+  ): Promise<LeaderboardEntry[]> {
     try {
-      const data = await this.get(`/api/leaderboard?scope=${scope}&metric=lifetimeXp&limit=${limit}`);
+      const data = await this.get(
+        `/api/leaderboard?scope=${scope}&metric=lifetimeXp&limit=${limit}`,
+      );
       return data.leaders ?? [];
     } catch {
       return [];
@@ -200,6 +293,18 @@ export class Api {
       return [];
     }
   }
+
+  // Public, read-only character profile for the shareable Armory page.
+  async armory(name: string): Promise<ArmoryProfile | null> {
+    try {
+      const data = await this.get(
+        `/api/armory?name=${encodeURIComponent(name)}`,
+      );
+      return data.character ?? null;
+    } catch {
+      return null;
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -212,7 +317,10 @@ function wrapAngle(d: number): number {
   return d;
 }
 
-function copyPos(dst: { x: number; y: number; z: number }, src: { x: number; y: number; z: number }): void {
+function copyPos(
+  dst: { x: number; y: number; z: number },
+  src: { x: number; y: number; z: number },
+): void {
   dst.x = src.x;
   dst.y = src.y;
   dst.z = src.z;
@@ -225,28 +333,102 @@ const TELEPORT_SNAP_DIST_SQ = 40 * 40;
 
 function blankEntity(id: number): Entity {
   return {
-    id, kind: 'mob', templateId: '', name: '', level: 1, mendTimer: 0,
-    pos: { x: 0, y: 0, z: 0 }, prevPos: { x: 0, y: 0, z: 0 }, facing: 0, prevFacing: 0,
-    vx: 0, vz: 0, vy: 0, onGround: true, fallStartY: 0,
-    hp: 1, maxHp: 1, resource: 0, maxResource: 0, resourceType: null,
-    overheadEmoteId: null, overheadEmoteUntil: 0, overheadEmoteSeq: 0,
+    id,
+    kind: "mob",
+    templateId: "",
+    name: "",
+    level: 1,
+    mendTimer: 0,
+    pos: { x: 0, y: 0, z: 0 },
+    prevPos: { x: 0, y: 0, z: 0 },
+    facing: 0,
+    prevFacing: 0,
+    vx: 0,
+    vz: 0,
+    vy: 0,
+    onGround: true,
+    fallStartY: 0,
+    hp: 1,
+    maxHp: 1,
+    resource: 0,
+    maxResource: 0,
+    resourceType: null,
+    overheadEmoteId: null,
+    overheadEmoteUntil: 0,
+    overheadEmoteSeq: 0,
     stats: { str: 0, agi: 0, sta: 0, int: 0, spi: 0, armor: 0 },
     weapon: { min: 1, max: 2, speed: 2 },
-    attackPower: 0, rangedPower: 0, critChance: 0.05, dodgeChance: 0.05, moveSpeed: 7, hostile: false,
-    targetId: null, autoAttack: false, swingTimer: 0,
-    inCombat: false, combatTimer: 99,
-    auras: [], ccDr: new Map(), castingAbility: null, castRemaining: 0, castTotal: 0,
-    channeling: false, channelTickTimer: 0, channelTickEvery: 0,
-    gcdRemaining: 0, cooldowns: new Map(), queuedOnSwing: null, fiveSecondRule: 99,
-    comboPoints: 0, comboTargetId: null, overpowerUntil: -1, potionCooldownUntil: -1, savedMana: 0,
-    chargeTargetId: null, chargeTimeLeft: 0, chargePath: [], followTargetId: null,
-    sitting: false, eating: null, drinking: null,
-    aiState: 'idle', tappedById: null, pulseTimer: 0, stompTimer: 0, detonateTimer: Infinity, firedSummons: 0, summonedIds: [], enraged: false, healedThisPull: false,
-    threat: new Map(), forcedTargetId: null, forcedTargetTimer: 0, ownerId: null, petMode: 'defensive', petTauntTimer: 0,
-    spawnPos: { x: 0, y: 0, z: 0 }, leashAnchor: null, evadeStall: 0, fleeTimer: 0, hasFled: false, wanderTarget: null, wanderTimer: 0,
-    aggroTargetId: null, respawnTimer: 0, corpseTimer: 0, lootable: false, loot: null,
-    xpValue: 0, questIds: [], vendorItems: [], objectItemId: null, dungeonId: null,
-    dead: false, scale: 1, color: 0xffffff, skin: 0,
+    attackPower: 0,
+    rangedPower: 0,
+    critChance: 0.05,
+    dodgeChance: 0.05,
+    moveSpeed: 7,
+    hostile: false,
+    targetId: null,
+    autoAttack: false,
+    swingTimer: 0,
+    inCombat: false,
+    combatTimer: 99,
+    auras: [],
+    ccDr: new Map(),
+    castingAbility: null,
+    castRemaining: 0,
+    castTotal: 0,
+    channeling: false,
+    channelTickTimer: 0,
+    channelTickEvery: 0,
+    gcdRemaining: 0,
+    cooldowns: new Map(),
+    queuedOnSwing: null,
+    fiveSecondRule: 99,
+    comboPoints: 0,
+    comboTargetId: null,
+    overpowerUntil: -1,
+    potionCooldownUntil: -1,
+    savedMana: 0,
+    chargeTargetId: null,
+    chargeTimeLeft: 0,
+    chargePath: [],
+    followTargetId: null,
+    sitting: false,
+    eating: null,
+    drinking: null,
+    aiState: "idle",
+    tappedById: null,
+    pulseTimer: 0,
+    stompTimer: 0,
+    detonateTimer: Infinity,
+    firedSummons: 0,
+    summonedIds: [],
+    enraged: false,
+    healedThisPull: false,
+    threat: new Map(),
+    forcedTargetId: null,
+    forcedTargetTimer: 0,
+    ownerId: null,
+    petMode: "defensive",
+    petTauntTimer: 0,
+    spawnPos: { x: 0, y: 0, z: 0 },
+    leashAnchor: null,
+    evadeStall: 0,
+    fleeTimer: 0,
+    hasFled: false,
+    wanderTarget: null,
+    wanderTimer: 0,
+    aggroTargetId: null,
+    respawnTimer: 0,
+    corpseTimer: 0,
+    lootable: false,
+    loot: null,
+    xpValue: 0,
+    questIds: [],
+    vendorItems: [],
+    objectItemId: null,
+    dungeonId: null,
+    dead: false,
+    scale: 1,
+    color: 0xffffff,
+    skin: 0,
   };
 }
 
@@ -280,7 +462,7 @@ export class ClientWorld implements IWorld {
   arenaInfo: ArenaInfo | null = null;
   marketInfo: MarketInfo | null = null;
   markers: Record<number, number> = {}; // entityId -> markerId, mirrored from the self-wire
-  realm = '';
+  realm = "";
   // bumped whenever a fresh social snapshot lands, so an open panel re-renders
   private socialDirty = false;
   // snapshot interpolation
@@ -304,17 +486,17 @@ export class ClientWorld implements IWorld {
   // chat locally when the player's filter is on. Hard words never arrive here.
   profanityWords: string[] = [];
   private profanityDirty = false;
-  private pendingQuestCommands = new Map<string, 'accept' | 'turnin'>();
+  private pendingQuestCommands = new Map<string, "accept" | "turnin">();
   private mouselookFacing: number | null = null;
   private sendTimer: number | undefined;
   private lastInputSentAt = 0;
-  private lastInputSig = '';
+  private lastInputSig = "";
   private inputSeq = 0;
   private pendingInputSeqSentAt = new Map<number, number>();
   private ackedInputSeq = 0;
   private inputEchoSamples: number[] = [];
 
-  constructor(token: string, characterId: number, cls: PlayerClass, base = '') {
+  constructor(token: string, characterId: number, cls: PlayerClass, base = "") {
     this.characterId = characterId;
     this.token = token;
     this.base = base;
@@ -322,17 +504,19 @@ export class ClientWorld implements IWorld {
     // when a realm was picked, connect to that realm's origin; otherwise the
     // page's own host
     const wsUrl = base
-      ? base.replace(/^http/, 'ws') + '/ws'
+      ? base.replace(/^http/, "ws") + "/ws"
       : buildWebSocketUrl(location.protocol, location.host);
     this.ws = new WebSocket(wsUrl);
     this.ws.onopen = () => {
-      this.ws.send(JSON.stringify(buildWebSocketAuthMessage(token, characterId)));
+      this.ws.send(
+        JSON.stringify(buildWebSocketAuthMessage(token, characterId)),
+      );
     };
     this.ws.onmessage = (ev) => this.onMessage(String(ev.data));
     this.ws.onclose = () => {
       this.connected = false;
       clearInterval(this.sendTimer);
-      this.onDisconnect?.('Connection to the server was lost.');
+      this.onDisconnect?.("Connection to the server was lost.");
     };
     // input stream at sim rate
     this.sendTimer = window.setInterval(() => this.sendInput(), 50);
@@ -379,13 +563,20 @@ export class ClientWorld implements IWorld {
 
   private inputSignature(): string {
     const mi = this.moveInput;
-    const facing = this.mouselookFacing === null ? '' : Math.round(this.mouselookFacing * 10000).toString();
+    const facing =
+      this.mouselookFacing === null
+        ? ""
+        : Math.round(this.mouselookFacing * 10000).toString();
     return [
-      mi.forward ? 1 : 0, mi.back ? 1 : 0,
-      mi.turnLeft ? 1 : 0, mi.turnRight ? 1 : 0,
-      mi.strafeLeft ? 1 : 0, mi.strafeRight ? 1 : 0,
-      mi.jump ? 1 : 0, facing,
-    ].join(',');
+      mi.forward ? 1 : 0,
+      mi.back ? 1 : 0,
+      mi.turnLeft ? 1 : 0,
+      mi.turnRight ? 1 : 0,
+      mi.strafeLeft ? 1 : 0,
+      mi.strafeRight ? 1 : 0,
+      mi.jump ? 1 : 0,
+      facing,
+    ].join(",");
   }
 
   private sendInput(now = performance.now(), changedOnly = false): boolean {
@@ -397,12 +588,15 @@ export class ClientWorld implements IWorld {
     }
     const mi = this.moveInput;
     const msg: Record<string, unknown> = {
-      t: 'input',
+      t: "input",
       seq: ++this.inputSeq,
       mi: {
-        f: mi.forward ? 1 : 0, b: mi.back ? 1 : 0,
-        tl: mi.turnLeft ? 1 : 0, tr: mi.turnRight ? 1 : 0,
-        sl: mi.strafeLeft ? 1 : 0, sr: mi.strafeRight ? 1 : 0,
+        f: mi.forward ? 1 : 0,
+        b: mi.back ? 1 : 0,
+        tl: mi.turnLeft ? 1 : 0,
+        tr: mi.turnRight ? 1 : 0,
+        sl: mi.strafeLeft ? 1 : 0,
+        sr: mi.strafeRight ? 1 : 0,
         j: mi.jump ? 1 : 0,
       },
     };
@@ -426,7 +620,7 @@ export class ClientWorld implements IWorld {
 
   private cmd(payload: Record<string, unknown>): void {
     if (!this.canSendCommand()) return;
-    this.ws.send(JSON.stringify({ t: 'cmd', ...payload }));
+    this.ws.send(JSON.stringify({ t: "cmd", ...payload }));
   }
 
   /** Raw WS command — used by dev scripts and browser console when online. */
@@ -441,49 +635,64 @@ export class ClientWorld implements IWorld {
     } catch {
       return;
     }
-    if (msg.t === 'hello') {
+    if (msg.t === "hello") {
       this.playerId = msg.pid;
       this.cfg.seed = msg.seed;
-      if (typeof msg.realm === 'string') this.realm = msg.realm;
+      if (typeof msg.realm === "string") this.realm = msg.realm;
       if (Array.isArray(msg.softWords)) {
-        this.profanityWords = msg.softWords.filter((w: unknown): w is string => typeof w === 'string');
+        this.profanityWords = msg.softWords.filter(
+          (w: unknown): w is string => typeof w === "string",
+        );
         this.profanityDirty = true;
       }
       this.connected = true;
       return;
     }
-    if (msg.t === 'censor') {
+    if (msg.t === "censor") {
       // live word-list update pushed after an admin edits the filter
       this.profanityWords = Array.isArray(msg.words)
-        ? msg.words.filter((w: unknown): w is string => typeof w === 'string')
+        ? msg.words.filter((w: unknown): w is string => typeof w === "string")
         : [];
       this.profanityDirty = true;
       return;
     }
-    if (msg.t === 'error') {
+    if (msg.t === "error") {
       this.connected = false;
-      this.onDisconnect?.(msg.error ?? 'rejected by server');
+      this.onDisconnect?.(msg.error ?? "rejected by server");
       return;
     }
-    if (msg.t === 'events') {
+    if (msg.t === "events") {
       for (const ev of msg.list) this.eventQueue.push(ev as SimEvent);
       return;
     }
-    if (msg.t === 'social') {
-      this.socialInfo = { friends: msg.friends ?? [], blocks: msg.blocks ?? [], guild: msg.guild ?? null };
+    if (msg.t === "social") {
+      this.socialInfo = {
+        friends: msg.friends ?? [],
+        blocks: msg.blocks ?? [],
+        guild: msg.guild ?? null,
+      };
       this.socialDirty = true;
       return;
     }
-    if (msg.t === 'socialpos') {
+    if (msg.t === "socialpos") {
       // live position refresh for friends/guildmates (drives the world map);
       // merge into the existing roster in place — snapshots own online/offline.
       if (this.socialInfo && Array.isArray(msg.list)) {
-        const byId = new Map<number, { x: number; z: number; zone: string; status: PresenceStatus }>();
+        const byId = new Map<
+          number,
+          { x: number; z: number; zone: string; status: PresenceStatus }
+        >();
         for (const e of msg.list) byId.set(e.id, e);
         const apply = (arr: FriendInfo[]) => {
           for (const m of arr) {
             const u = byId.get(m.id);
-            if (u) { m.x = u.x; m.z = u.z; m.zone = u.zone; m.status = u.status; m.online = true; }
+            if (u) {
+              m.x = u.x;
+              m.z = u.z;
+              m.zone = u.zone;
+              m.status = u.status;
+              m.online = true;
+            }
           }
         };
         apply(this.socialInfo.friends);
@@ -491,7 +700,7 @@ export class ClientWorld implements IWorld {
       }
       return;
     }
-    if (msg.t === 'snap') {
+    if (msg.t === "snap") {
       this.applySnapshot(msg);
     }
   }
@@ -513,12 +722,17 @@ export class ClientWorld implements IWorld {
     // the interpolation alpha the render loop reached on its last frame
     // (same formula and caps as main.ts); used below to re-anchor the new
     // interpolation segment at the pose currently on screen
-    const contAlpha = this.lastSnapAt > 0
-      ? Math.min(1.25, (now - this.lastSnapAt) / Math.max(20, this.snapInterval))
-      : 1;
+    const contAlpha =
+      this.lastSnapAt > 0
+        ? Math.min(
+            1.25,
+            (now - this.lastSnapAt) / Math.max(20, this.snapInterval),
+          )
+        : 1;
     if (this.lastSnapAt > 0) {
       const gap = now - this.lastSnapAt;
-      if (gap > 5 && gap < 500) this.snapInterval = this.snapInterval * 0.9 + gap * 0.1;
+      if (gap > 5 && gap < 500)
+        this.snapInterval = this.snapInterval * 0.9 + gap * 0.1;
     }
     this.lastSnapAt = now;
 
@@ -550,7 +764,7 @@ export class ClientWorld implements IWorld {
         e.scale = w.sc ?? 1;
         e.color = w.c ?? 0xffffff;
         e.dungeonId = w.dgn ?? null;
-        if (e.kind === 'npc') {
+        if (e.kind === "npc") {
           const def = NPCS[e.templateId];
           e.questIds = def ? [...def.questIds] : [];
           e.vendorItems = def?.vendorItems ? [...def.vendorItems] : [];
@@ -565,9 +779,12 @@ export class ClientWorld implements IWorld {
       // the global snapshot clock the camera follow uses.
       const prevUpdatedAt = e.netUpdatedAt;
       const prevInterval = e.netInterval;
-      const entAlpha = w.id !== this.playerId && prevUpdatedAt !== undefined && prevInterval !== undefined
-        ? Math.min(1.25, (now - prevUpdatedAt) / Math.max(20, prevInterval))
-        : contAlpha;
+      const entAlpha =
+        w.id !== this.playerId &&
+        prevUpdatedAt !== undefined &&
+        prevInterval !== undefined
+          ? Math.min(1.25, (now - prevUpdatedAt) / Math.max(20, prevInterval))
+          : contAlpha;
       const entFacingAlpha = Math.min(1, entAlpha);
       // per-entity update clock: distant entities are sent below snapshot
       // rate, so each one interpolates over its own measured cadence. Only
@@ -577,7 +794,8 @@ export class ClientWorld implements IWorld {
       if (prevUpdatedAt !== undefined) {
         const gap = now - prevUpdatedAt;
         if (gap > 5 && gap < 450) {
-          e.netInterval = prevInterval === undefined ? gap : prevInterval * 0.7 + gap * 0.3;
+          e.netInterval =
+            prevInterval === undefined ? gap : prevInterval * 0.7 + gap * 0.3;
         }
       }
       e.netUpdatedAt = now;
@@ -588,10 +806,14 @@ export class ClientWorld implements IWorld {
       // the global alpha and the entity sticks at its old pose until its next
       // real update (e.g. taking damage). Snap both poses to the destination so
       // it appears exactly where the server placed it.
-      const teleDx = w.x - e.pos.x, teleDz = w.z - e.pos.z;
+      const teleDx = w.x - e.pos.x,
+        teleDz = w.z - e.pos.z;
       const wasDead = e.dead;
       const nowDead = !!w.dead;
-      if ((wasDead && !nowDead) || teleDx * teleDx + teleDz * teleDz > TELEPORT_SNAP_DIST_SQ) {
+      if (
+        (wasDead && !nowDead) ||
+        teleDx * teleDx + teleDz * teleDz > TELEPORT_SNAP_DIST_SQ
+      ) {
         e.prevPos = { x: w.x, y: w.y, z: w.z };
         e.prevFacing = w.f;
       } else {
@@ -600,15 +822,18 @@ export class ClientWorld implements IWorld {
           y: e.prevPos.y + (e.pos.y - e.prevPos.y) * entAlpha,
           z: e.prevPos.z + (e.pos.z - e.prevPos.z) * entAlpha,
         };
-        e.prevFacing = e.prevFacing + wrapAngle(e.facing - e.prevFacing) * entFacingAlpha;
+        e.prevFacing =
+          e.prevFacing + wrapAngle(e.facing - e.prevFacing) * entFacingAlpha;
       }
-      e.pos.x = w.x; e.pos.y = w.y; e.pos.z = w.z;
+      e.pos.x = w.x;
+      e.pos.y = w.y;
+      e.pos.z = w.z;
       e.facing = w.f;
       e.hp = w.hp;
       e.maxHp = w.mhp;
       e.overheadEmoteId = isOverheadEmoteId(w.emo) ? w.emo : null;
       e.overheadEmoteUntil = e.overheadEmoteId ? Number.POSITIVE_INFINITY : 0;
-      if (typeof w.emoSeq === 'number') e.overheadEmoteSeq = w.emoSeq;
+      if (typeof w.emoSeq === "number") e.overheadEmoteSeq = w.emoSeq;
       e.dead = nowDead;
       e.lootable = !!w.loot;
       e.hostile = !!w.h;
@@ -620,12 +845,18 @@ export class ClientWorld implements IWorld {
       e.aggroTargetId = w.aggro ?? null;
       e.tappedById = w.tap ?? null;
       e.ownerId = w.own ?? null;
-      e.petMode = w.pm ?? 'defensive';
+      e.petMode = w.pm ?? "defensive";
       e.petTauntTimer = w.pt ?? 0;
       e.threat = new Map(w.thr ?? []);
       e.auras = (w.auras ?? []).map((a: any) => ({
-        id: a.id, name: a.name, kind: a.kind, remaining: a.rem, duration: a.dur,
-        value: 0, sourceId: 0, school: 'physical' as const,
+        id: a.id,
+        name: a.name,
+        kind: a.kind,
+        remaining: a.rem,
+        duration: a.dur,
+        value: 0,
+        sourceId: 0,
+        school: "physical" as const,
       }));
       e.loot = w.lootList ?? null;
       return e;
@@ -645,7 +876,7 @@ export class ClientWorld implements IWorld {
     const e = s ? applyWire(s) : null;
     if (s && e) {
       seen.add(s.id);
-      if (typeof s.ack === 'number' && s.ack > this.ackedInputSeq) {
+      if (typeof s.ack === "number" && s.ack > this.ackedInputSeq) {
         for (let seq = this.ackedInputSeq + 1; seq <= s.ack; seq++) {
           const sentAt = this.pendingInputSeqSentAt.get(seq);
           if (sentAt !== undefined) {
@@ -660,7 +891,10 @@ export class ClientWorld implements IWorld {
       e.resourceType = s.rtype;
       // delta fields: the server omits them while unchanged, so only the
       // snapshots that carry them rebuild the local structures
-      if (s.cds !== undefined) e.cooldowns = new Map(Object.entries(s.cds).map(([k, v]) => [k, Number(v)]));
+      if (s.cds !== undefined)
+        e.cooldowns = new Map(
+          Object.entries(s.cds).map(([k, v]) => [k, Number(v)]),
+        );
       e.gcdRemaining = s.gcd ?? 0;
       e.comboPoints = s.combo ?? 0;
       e.comboTargetId = s.comboTgt ?? null;
@@ -673,22 +907,44 @@ export class ClientWorld implements IWorld {
       e.dodgeChance = s.dodge ?? 0.05;
       e.weapon = s.weapon ?? e.weapon;
       e.eating = s.eat
-        ? { itemId: '', kind: 'food', hpPer2s: 0, manaPer2s: 0, remaining: s.eat.remaining }
+        ? {
+            itemId: "",
+            kind: "food",
+            hpPer2s: 0,
+            manaPer2s: 0,
+            remaining: s.eat.remaining,
+          }
         : null;
       e.drinking = s.drk
-        ? { itemId: '', kind: 'drink', hpPer2s: 0, manaPer2s: 0, remaining: s.drk.remaining }
+        ? {
+            itemId: "",
+            kind: "drink",
+            hpPer2s: 0,
+            manaPer2s: 0,
+            remaining: s.drk.remaining,
+          }
         : null;
       this.xp = s.xp ?? 0;
       this.lifetimeXp = s.lxp ?? 0;
       this.prestigeRank = s.prk ?? 0;
       if (s.milestones !== undefined) this.unlockedMilestones = s.milestones;
       this.copper = s.copper ?? 0;
-      if (s.inv !== undefined) { this.inventory = s.inv; this.invChanged = true; }
-      if (s.buyback !== undefined) { this.vendorBuyback = s.buyback; this.invChanged = true; }
+      if (s.inv !== undefined) {
+        this.inventory = s.inv;
+        this.invChanged = true;
+      }
+      if (s.buyback !== undefined) {
+        this.vendorBuyback = s.buyback;
+        this.invChanged = true;
+      }
       if (s.equip !== undefined) this.equipment = s.equip;
-      if (s.qlog !== undefined) this.questLog = new Map((s.qlog as QuestProgress[]).map((q) => [q.questId, q]));
+      if (s.qlog !== undefined)
+        this.questLog = new Map(
+          (s.qlog as QuestProgress[]).map((q) => [q.questId, q]),
+        );
       if (s.qdone !== undefined) this.questsDone = new Set(s.qdone);
-      if (s.qlog !== undefined || s.qdone !== undefined) this.pendingQuestCommands?.clear();
+      if (s.qlog !== undefined || s.qdone !== undefined)
+        this.pendingQuestCommands?.clear();
       // talent state (heavy field, sent on change): mirror it, then resolve known
       // with the precomputed modifiers so granted abilities + tweaks show locally.
       if (s.tal !== undefined && s.tal) {
@@ -696,10 +952,15 @@ export class ClientWorld implements IWorld {
         this.talentSpec = s.tal.spec ?? null;
         this.talentRole = s.tal.role ?? null;
         this.loadouts = s.tal.loadouts ?? [];
-        this.activeLoadout = typeof s.tal.activeLoadout === 'number' ? s.tal.activeLoadout : -1;
+        this.activeLoadout =
+          typeof s.tal.activeLoadout === "number" ? s.tal.activeLoadout : -1;
       }
       const talents = this.talents ?? (this.talents = emptyAllocation());
-      this.known = abilitiesKnownAt(this.cfg.playerClass, e.level, computeTalentModifiers(this.cfg.playerClass, talents));
+      this.known = abilitiesKnownAt(
+        this.cfg.playerClass,
+        e.level,
+        computeTalentModifiers(this.cfg.playerClass, talents),
+      );
       if (s.party !== undefined) this.partyInfo = s.party;
       if (s.marks !== undefined) this.markers = s.marks ?? {}; // null = cleared (no party/disband)
       if (s.trade !== undefined) this.tradeInfo = s.trade;
@@ -726,10 +987,18 @@ export class ClientWorld implements IWorld {
   // -----------------------------------------------------------------------
 
   questState(questId: string): QuestState {
-    const state = computeQuestState(questId, this.questLog, this.questsDone, this.player.level);
+    const state = computeQuestState(
+      questId,
+      this.questLog,
+      this.questsDone,
+      this.player.level,
+    );
     const pending = this.pendingQuestCommands?.get(questId);
-    if ((pending === 'accept' && state === 'available') || (pending === 'turnin' && state === 'ready')) {
-      return 'active';
+    if (
+      (pending === "accept" && state === "available") ||
+      (pending === "turnin" && state === "ready")
+    ) {
+      return "active";
     }
     return state;
   }
@@ -741,10 +1010,10 @@ export class ClientWorld implements IWorld {
   }
 
   castAbility(abilityId: string): void {
-    this.cmd({ cmd: 'cast', ability: abilityId });
+    this.cmd({ cmd: "cast", ability: abilityId });
   }
   castAbilityBySlot(slot: number): void {
-    this.cmd({ cmd: 'castSlot', slot });
+    this.cmd({ cmd: "castSlot", slot });
   }
   targetEntity(id: number | null): void {
     // optimistic local update for snappy UI
@@ -756,74 +1025,74 @@ export class ClientWorld implements IWorld {
         if (e && (!e.dead || e.lootable)) p.targetId = id;
       }
     }
-    this.cmd({ cmd: 'target', id });
+    this.cmd({ cmd: "target", id });
   }
   tabTarget(): void {
-    this.cmd({ cmd: 'tab' });
+    this.cmd({ cmd: "tab" });
   }
   targetNearestFriendly(): void {
-    this.cmd({ cmd: 'targetNearestFriendly' });
+    this.cmd({ cmd: "targetNearestFriendly" });
   }
   friendlyTabTarget(): void {
-    this.cmd({ cmd: 'tabFriendly' });
+    this.cmd({ cmd: "tabFriendly" });
   }
   startAutoAttack(): void {
-    this.cmd({ cmd: 'attack' });
+    this.cmd({ cmd: "attack" });
   }
   stopAutoAttack(): void {
-    this.cmd({ cmd: 'stopattack' });
+    this.cmd({ cmd: "stopattack" });
   }
   interact(): void {
-    this.cmd({ cmd: 'interact' });
+    this.cmd({ cmd: "interact" });
   }
   lootCorpse(id: number): void {
-    this.cmd({ cmd: 'loot', id });
+    this.cmd({ cmd: "loot", id });
   }
   pickUpObject(id: number): void {
-    this.cmd({ cmd: 'pickup', id });
+    this.cmd({ cmd: "pickup", id });
   }
   acceptQuest(questId: string): void {
     if (!this.canSendCommand()) return;
-    this.pendingQuestCommands.set(questId, 'accept');
-    this.cmd({ cmd: 'accept', quest: questId });
+    this.pendingQuestCommands.set(questId, "accept");
+    this.cmd({ cmd: "accept", quest: questId });
   }
   turnInQuest(questId: string): void {
     if (!this.canSendCommand()) return;
-    this.pendingQuestCommands.set(questId, 'turnin');
-    this.cmd({ cmd: 'turnin', quest: questId });
+    this.pendingQuestCommands.set(questId, "turnin");
+    this.cmd({ cmd: "turnin", quest: questId });
   }
   abandonQuest(questId: string): void {
-    this.cmd({ cmd: 'abandon', quest: questId });
+    this.cmd({ cmd: "abandon", quest: questId });
   }
   equipItem(itemId: string): void {
-    this.cmd({ cmd: 'equip', item: itemId });
+    this.cmd({ cmd: "equip", item: itemId });
   }
   useItem(itemId: string): void {
-    this.cmd({ cmd: 'use', item: itemId });
+    this.cmd({ cmd: "use", item: itemId });
   }
   discardItem(itemId: string, count?: number): void {
-    this.cmd({ cmd: 'discard', item: itemId, count });
+    this.cmd({ cmd: "discard", item: itemId, count });
   }
   buyItem(npcId: number, itemId: string): void {
-    this.cmd({ cmd: 'buy', npc: npcId, item: itemId });
+    this.cmd({ cmd: "buy", npc: npcId, item: itemId });
   }
   sellItem(itemId: string, count?: number): void {
-    this.cmd({ cmd: 'sell', item: itemId, count });
+    this.cmd({ cmd: "sell", item: itemId, count });
   }
   buyBackItem(itemId: string): void {
-    this.cmd({ cmd: 'buyback', item: itemId });
+    this.cmd({ cmd: "buyback", item: itemId });
   }
   changeSkin(skin: number): void {
     const idx = Math.max(0, Math.min(7, Math.floor(skin)));
     const p = this.entities.get(this.playerId);
     if (p) p.skin = idx;
-    this.cmd({ cmd: 'change_skin', skin: idx });
+    this.cmd({ cmd: "change_skin", skin: idx });
   }
   releaseSpirit(): void {
-    this.cmd({ cmd: 'release' });
+    this.cmd({ cmd: "release" });
   }
   chat(text: string): void {
-    this.cmd({ cmd: 'chat', text });
+    this.cmd({ cmd: "chat", text });
   }
   playEmote(emoteId: OverheadEmoteId): void {
     if (!this.player.dead) {
@@ -831,135 +1100,168 @@ export class ClientWorld implements IWorld {
       this.player.overheadEmoteUntil = Number.POSITIVE_INFINITY;
       this.player.overheadEmoteSeq += 1;
     }
-    this.cmd({ cmd: 'emote', emote: emoteId });
+    this.cmd({ cmd: "emote", emote: emoteId });
   }
   abandonPet(): void {
-    this.cmd({ cmd: 'pet_abandon' });
+    this.cmd({ cmd: "pet_abandon" });
   }
   renamePet(name: string): void {
-    this.cmd({ cmd: 'pet_rename', name });
+    this.cmd({ cmd: "pet_rename", name });
   }
   revivePet(): void {
-    this.cmd({ cmd: 'pet_revive' });
+    this.cmd({ cmd: "pet_revive" });
   }
   petAttack(): void {
-    this.cmd({ cmd: 'pet_attack' });
+    this.cmd({ cmd: "pet_attack" });
   }
   petTaunt(): void {
-    this.cmd({ cmd: 'pet_taunt' });
+    this.cmd({ cmd: "pet_taunt" });
   }
   feedPet(itemId: string): void {
-    this.cmd({ cmd: 'pet_feed', item: itemId });
+    this.cmd({ cmd: "pet_feed", item: itemId });
   }
   healPet(): void {
-    this.cmd({ cmd: 'pet_heal' });
+    this.cmd({ cmd: "pet_heal" });
   }
-  setPetMode(mode: 'passive' | 'defensive' | 'aggressive'): void {
-    this.cmd({ cmd: 'pet_mode', mode });
+  setPetMode(mode: "passive" | "defensive" | "aggressive"): void {
+    this.cmd({ cmd: "pet_mode", mode });
   }
   // social systems
   partyInvite(targetPid: number): void {
-    this.cmd({ cmd: 'pinvite', id: targetPid });
+    this.cmd({ cmd: "pinvite", id: targetPid });
   }
   partyAccept(): void {
-    this.cmd({ cmd: 'paccept' });
+    this.cmd({ cmd: "paccept" });
   }
   partyDecline(): void {
-    this.cmd({ cmd: 'pdecline' });
+    this.cmd({ cmd: "pdecline" });
   }
   partyLeave(): void {
-    this.cmd({ cmd: 'pleave' });
+    this.cmd({ cmd: "pleave" });
   }
   partyKick(targetPid: number): void {
-    this.cmd({ cmd: 'pkick', id: targetPid });
+    this.cmd({ cmd: "pkick", id: targetPid });
   }
   // raid/target markers
   markerFor(entityId: number): number | null {
     return this.markers[entityId] ?? null;
   }
   setMarker(entityId: number, markerId: number): void {
-    this.cmd({ cmd: 'setMarker', id: entityId, marker: markerId });
+    this.cmd({ cmd: "setMarker", id: entityId, marker: markerId });
   }
   clearMarker(entityId: number): void {
-    this.cmd({ cmd: 'clearMarker', id: entityId });
+    this.cmd({ cmd: "clearMarker", id: entityId });
   }
   tradeRequest(targetPid: number): void {
-    this.cmd({ cmd: 'trade_req', id: targetPid });
+    this.cmd({ cmd: "trade_req", id: targetPid });
   }
   tradeAccept(): void {
-    this.cmd({ cmd: 'trade_accept' });
+    this.cmd({ cmd: "trade_accept" });
   }
   tradeSetOffer(items: InvSlot[], copper: number): void {
-    this.cmd({ cmd: 'trade_offer', items, copper });
+    this.cmd({ cmd: "trade_offer", items, copper });
   }
   tradeConfirm(): void {
-    this.cmd({ cmd: 'trade_confirm' });
+    this.cmd({ cmd: "trade_confirm" });
   }
   tradeCancel(): void {
-    this.cmd({ cmd: 'trade_cancel' });
+    this.cmd({ cmd: "trade_cancel" });
   }
   duelRequest(targetPid: number): void {
-    this.cmd({ cmd: 'duel_req', id: targetPid });
+    this.cmd({ cmd: "duel_req", id: targetPid });
   }
   duelAccept(): void {
-    this.cmd({ cmd: 'duel_accept' });
+    this.cmd({ cmd: "duel_accept" });
   }
   duelDecline(): void {
-    this.cmd({ cmd: 'duel_decline' });
+    this.cmd({ cmd: "duel_decline" });
   }
   // persistent social (resolved server-side by character name)
-  friendAdd(name: string): void { this.cmd({ cmd: 'friend_add', name }); }
-  friendRemove(name: string): void { this.cmd({ cmd: 'friend_remove', name }); }
-  blockAdd(name: string): void { this.cmd({ cmd: 'block_add', name }); }
-  blockRemove(name: string): void { this.cmd({ cmd: 'block_remove', name }); }
-  guildCreate(name: string): void { this.cmd({ cmd: 'guild_create', name }); }
-  guildInvite(name: string): void { this.cmd({ cmd: 'guild_invite', name }); }
-  guildAccept(): void { this.cmd({ cmd: 'guild_accept' }); }
-  guildDecline(): void { this.cmd({ cmd: 'guild_decline' }); }
-  guildLeave(): void { this.cmd({ cmd: 'guild_leave' }); }
-  guildKick(name: string): void { this.cmd({ cmd: 'guild_kick', name }); }
-  guildPromote(name: string): void { this.cmd({ cmd: 'guild_promote', name }); }
-  guildDemote(name: string): void { this.cmd({ cmd: 'guild_demote', name }); }
-  guildTransfer(name: string): void { this.cmd({ cmd: 'guild_transfer', name }); }
-  guildDisband(): void { this.cmd({ cmd: 'guild_disband' }); }
+  friendAdd(name: string): void {
+    this.cmd({ cmd: "friend_add", name });
+  }
+  friendRemove(name: string): void {
+    this.cmd({ cmd: "friend_remove", name });
+  }
+  blockAdd(name: string): void {
+    this.cmd({ cmd: "block_add", name });
+  }
+  blockRemove(name: string): void {
+    this.cmd({ cmd: "block_remove", name });
+  }
+  guildCreate(name: string): void {
+    this.cmd({ cmd: "guild_create", name });
+  }
+  guildInvite(name: string): void {
+    this.cmd({ cmd: "guild_invite", name });
+  }
+  guildAccept(): void {
+    this.cmd({ cmd: "guild_accept" });
+  }
+  guildDecline(): void {
+    this.cmd({ cmd: "guild_decline" });
+  }
+  guildLeave(): void {
+    this.cmd({ cmd: "guild_leave" });
+  }
+  guildKick(name: string): void {
+    this.cmd({ cmd: "guild_kick", name });
+  }
+  guildPromote(name: string): void {
+    this.cmd({ cmd: "guild_promote", name });
+  }
+  guildDemote(name: string): void {
+    this.cmd({ cmd: "guild_demote", name });
+  }
+  guildTransfer(name: string): void {
+    this.cmd({ cmd: "guild_transfer", name });
+  }
+  guildDisband(): void {
+    this.cmd({ cmd: "guild_disband" });
+  }
   async searchCharacters(query: string): Promise<CharacterSearchResult[]> {
     const q = query.trim();
     if (!q) return [];
     try {
-      const res = await fetch(`${this.base}/api/search?q=${encodeURIComponent(q)}`, { headers: { Authorization: `Bearer ${this.token}` } });
+      const res = await fetch(
+        `${this.base}/api/search?q=${encodeURIComponent(q)}`,
+        { headers: { Authorization: `Bearer ${this.token}` } },
+      );
       if (!res.ok) return [];
       return (await res.json()).results ?? [];
     } catch {
       return [];
     }
   }
-  arenaQueueJoin(format?: import('../world_api').ArenaFormat): void {
-    this.cmd({ cmd: 'arena_queue', format: format ?? '1v1' });
+  arenaQueueJoin(format?: import("../world_api").ArenaFormat): void {
+    this.cmd({ cmd: "arena_queue", format: format ?? "1v1" });
   }
   arenaQueueLeave(): void {
-    this.cmd({ cmd: 'arena_leave' });
+    this.cmd({ cmd: "arena_leave" });
   }
   marketList(itemId: string, count: number, price: number): void {
-    this.cmd({ cmd: 'market_list', item: itemId, count, price });
+    this.cmd({ cmd: "market_list", item: itemId, count, price });
   }
   marketBuy(listingId: number): void {
-    this.cmd({ cmd: 'market_buy', id: listingId });
+    this.cmd({ cmd: "market_buy", id: listingId });
   }
   marketCancel(listingId: number): void {
-    this.cmd({ cmd: 'market_cancel', id: listingId });
+    this.cmd({ cmd: "market_cancel", id: listingId });
   }
   marketCollect(): void {
-    this.cmd({ cmd: 'market_collect' });
+    this.cmd({ cmd: "market_collect" });
   }
   enterDungeon(dungeonId: string): void {
-    this.cmd({ cmd: 'enter_dungeon', dungeon: dungeonId });
+    this.cmd({ cmd: "enter_dungeon", dungeon: dungeonId });
   }
   leaveDungeon(): void {
-    this.cmd({ cmd: 'leave_dungeon' });
+    this.cmd({ cmd: "leave_dungeon" });
   }
   async leaderboard(): Promise<LeaderboardEntry[]> {
     try {
-      const res = await fetch(`${this.base}/api/leaderboard?metric=lifetimeXp&limit=100`);
+      const res = await fetch(
+        `${this.base}/api/leaderboard?metric=lifetimeXp&limit=100`,
+      );
       if (!res.ok) return [];
       return (await res.json()).leaders ?? [];
     } catch {
@@ -967,28 +1269,41 @@ export class ClientWorld implements IWorld {
     }
   }
   prestige(): void {
-    this.cmd({ cmd: 'prestige' });
+    this.cmd({ cmd: "prestige" });
   }
   // Talents & Specializations — the server re-validates every allocation.
   talentPoints(): { total: number; spent: number } {
     const level = this.entities.get(this.playerId)?.level ?? 1;
-    return { total: talentPointsAtLevel(level), spent: pointsSpent(this.talents) };
+    return {
+      total: talentPointsAtLevel(level),
+      spent: pointsSpent(this.talents),
+    };
   }
   applyTalents(alloc: TalentAllocation): void {
-    this.cmd({ cmd: 'applyTalents', alloc });
+    this.cmd({ cmd: "applyTalents", alloc });
   }
   respec(): void {
-    this.cmd({ cmd: 'respec' });
+    this.cmd({ cmd: "respec" });
   }
   setSpec(specId: string | null): void {
-    this.cmd({ cmd: 'setSpec', spec: specId });
+    this.cmd({ cmd: "setSpec", spec: specId });
   }
-  saveLoadout(name: string, bar: (string | null)[], alloc?: TalentAllocation): void {
-    this.cmd({ cmd: 'saveLoadout', name, bar, alloc });
+  saveLoadout(
+    name: string,
+    bar: (string | null)[],
+    alloc?: TalentAllocation,
+  ): void {
+    this.cmd({ cmd: "saveLoadout", name, bar, alloc });
     if (alloc) {
-      const clean = (name || 'Build').toString().slice(0, 24);
-      const safeBar = Array.isArray(bar) ? bar.slice(0, 16).map((b) => (typeof b === 'string' ? b : null)) : [];
-      const saved = { name: clean, alloc: cloneAllocation(alloc), bar: safeBar };
+      const clean = (name || "Build").toString().slice(0, 24);
+      const safeBar = Array.isArray(bar)
+        ? bar.slice(0, 16).map((b) => (typeof b === "string" ? b : null))
+        : [];
+      const saved = {
+        name: clean,
+        alloc: cloneAllocation(alloc),
+        bar: safeBar,
+      };
       this.talents = cloneAllocation(alloc);
       const existing = this.loadouts.findIndex((l) => l.name === clean);
       if (existing >= 0) {
@@ -998,29 +1313,41 @@ export class ClientWorld implements IWorld {
         this.loadouts = [...this.loadouts, saved];
         this.activeLoadout = this.loadouts.length - 1;
       }
-      this.known = abilitiesKnownAt(this.cfg.playerClass, this.player.level, computeTalentModifiers(this.cfg.playerClass, this.talents));
+      this.known = abilitiesKnownAt(
+        this.cfg.playerClass,
+        this.player.level,
+        computeTalentModifiers(this.cfg.playerClass, this.talents),
+      );
     }
   }
   switchLoadout(index: number): void {
-    this.cmd({ cmd: 'switchLoadout', index });
+    this.cmd({ cmd: "switchLoadout", index });
   }
   deleteLoadout(index: number): void {
-    this.cmd({ cmd: 'deleteLoadout', index });
+    this.cmd({ cmd: "deleteLoadout", index });
     if (index < 0 || index >= this.loadouts.length) return;
     const wasActive = this.activeLoadout === index;
     this.loadouts = this.loadouts.filter((_, i) => i !== index);
     if (wasActive) {
-      this.activeLoadout = this.loadouts.length > 0 ? Math.min(index, this.loadouts.length - 1) : -1;
-      const next = this.activeLoadout >= 0 ? this.loadouts[this.activeLoadout] : null;
+      this.activeLoadout =
+        this.loadouts.length > 0
+          ? Math.min(index, this.loadouts.length - 1)
+          : -1;
+      const next =
+        this.activeLoadout >= 0 ? this.loadouts[this.activeLoadout] : null;
       if (next) {
         this.talents = cloneAllocation(next.alloc);
-        this.known = abilitiesKnownAt(this.cfg.playerClass, this.player.level, computeTalentModifiers(this.cfg.playerClass, this.talents));
+        this.known = abilitiesKnownAt(
+          this.cfg.playerClass,
+          this.player.level,
+          computeTalentModifiers(this.cfg.playerClass, this.talents),
+        );
       }
     } else if (this.activeLoadout > index) this.activeLoadout -= 1;
   }
   // legacy aliases kept for older scripts
   enterCrypt(): void {
-    this.enterDungeon('hollow_crypt');
+    this.enterDungeon("hollow_crypt");
   }
   leaveCrypt(): void {
     this.leaveDungeon();

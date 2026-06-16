@@ -552,6 +552,50 @@ export async function topLifetimeXp(limit = 100, opts: { global?: boolean } = {}
   }));
 }
 
+// One character's public, shareable profile for the Armory. Names are globally
+// UNIQUE, so the name alone identifies a row. We read the whole state JSONB but
+// return ONLY the safe subset (class/level/gear/talents/arena/XP) and never
+// copper, inventory, position, quests, or account data.
+export interface ArmoryRow {
+  name: string;
+  class: PlayerClass;
+  level: number;
+  realm: string;
+  lifetimeXp: number;
+  prestigeRank: number;
+  arenaRating: number;
+  arenaWins: number;
+  arenaLosses: number;
+  equipment: Record<string, string>;
+  talents: CharacterState['talents'] | null;
+}
+
+export async function getArmoryCharacter(name: string): Promise<ArmoryRow | null> {
+  const res = await pool.query(
+    `SELECT name, class, level, realm, state
+       FROM characters
+      WHERE lower(name) = lower($1) AND state IS NOT NULL
+      LIMIT 1`,
+    [name],
+  );
+  const row = res.rows[0];
+  if (!row) return null;
+  const s: CharacterState = row.state;
+  return {
+    name: row.name,
+    class: row.class,
+    level: row.level,
+    realm: row.realm,
+    lifetimeXp: Number(s.lifetimeXp ?? 0),
+    prestigeRank: Number(s.prestigeRank ?? 0),
+    arenaRating: Number(s.arenaRating ?? 0),
+    arenaWins: Number(s.arenaWins ?? 0),
+    arenaLosses: Number(s.arenaLosses ?? 0),
+    equipment: (s.equipment ?? {}) as Record<string, string>,
+    talents: s.talents ?? null,
+  };
+}
+
 // ---------------------------------------------------------------------------
 // World state: a tiny key→JSONB store for shared, global game state that isn't
 // tied to one character. The World Market (the Merchant's auction house) lives

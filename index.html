@@ -1834,6 +1834,36 @@
     padding: var(--spacing-lg);
     max-width: 720px;
   }
+  .armory-page { max-width: 720px; margin: 0 auto; padding: 8px 12px; }
+  .armory-intro { color: #b9b0a0; margin: 4px 0 12px; }
+  .armory-search { display: flex; gap: 8px; margin-bottom: 14px; }
+  #armory-search-input { flex: 1; padding: 8px 10px; border-radius: 6px; border: 1px solid #4a3d1d; background: #15151f; color: #f0e9d8; font-size: 15px; }
+  .armory-search-btn { padding: 8px 14px; border-radius: 6px; border: 1px solid #6a5a2a; background: linear-gradient(#3a3320,#262014); color: var(--gold); cursor: pointer; font-family: var(--title-font); }
+  .armory-search-btn:hover { border-color: var(--gold); }
+  .armory-loading, .armory-empty { color: #b9b0a0; padding: 16px; text-align: center; }
+  .armory-card { background: rgba(12,12,18,0.6); border: 1px solid #4a3d1d; border-radius: 10px; padding: 14px 16px; }
+  .armory-header { border-left: 4px solid #888; padding: 4px 0 10px 12px; margin-bottom: 10px; border-bottom: 1px solid #2a2a36; }
+  .armory-name { font-family: var(--title-font); font-size: 26px; text-shadow: 1px 1px 2px #000; }
+  .armory-sub { color: #c9c0b0; font-size: 14px; margin-top: 2px; }
+  .armory-vlevel, .armory-prestige { color: var(--gold); }
+  .armory-stats { display: flex; gap: 18px; flex-wrap: wrap; margin: 6px 0 10px 12px; }
+  .armory-stat { display: flex; flex-direction: column; }
+  .armory-stat span { color: #9a9382; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
+  .armory-stat b { color: #f0e9d8; font-size: 16px; }
+  .armory-section-title { font-family: var(--title-font); color: var(--gold); margin: 12px 0 6px 12px; font-size: 14px; letter-spacing: .04em; }
+  .armory-gear { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 12px; }
+  .armory-slot { display: flex; gap: 8px; align-items: center; background: #14141c; border: 1px solid #2e2e3a; border-radius: 6px; padding: 6px; }
+  .armory-slot.empty { opacity: .55; }
+  .armory-slot .item-icon { width: 40px; height: 40px; border-radius: 4px; border: 1px solid #4a3d1d; }
+  .armory-slot-name { color: #9a9382; font-size: 11px; }
+  .armory-slot-item { font-size: 14px; }
+  .armory-slot-item.empty { color: #666; }
+  .armory-slot-stats { color: #7fd6a0; font-size: 11px; margin-top: 1px; }
+  .armory-talents { padding: 0 12px; color: #d8cfbf; }
+  .armory-mastery { margin-top: 6px; color: #b9b0a0; font-size: 13px; }
+  .armory-mastery span { color: #9a9382; font-size: 11px; text-transform: uppercase; }
+  .armory-share { display: flex; gap: 8px; align-items: center; margin: 14px 12px 0; }
+  .armory-share-url { flex: 1; padding: 6px 8px; border-radius: 6px; border: 1px solid #4a3d1d; background: #15151f; color: #b9b0a0; font-size: 12px; }
   .hs-leaderboard {
     width: 100%;
     margin-top: var(--spacing-sm);
@@ -5484,6 +5514,9 @@
               <button type="button" class="nav-link" id="nav-btn-highscores" aria-selected="false" aria-pressed="false" data-i18n="nav.highscores">High Scores</button>
             </li>
             <li class="nav-item">
+              <button type="button" class="nav-link" id="nav-btn-armory" aria-selected="false" aria-pressed="false" data-i18n="armory.navTab">Armory</button>
+            </li>
+            <li class="nav-item">
               <button type="button" class="nav-link" id="nav-btn-wiki" aria-selected="false" aria-pressed="false" data-i18n="nav.wiki">Wiki</button>
             </li>
             <li class="nav-item">
@@ -5805,6 +5838,18 @@
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section id="armory-view" class="view-section" hidden aria-hidden="true">
+        <div class="armory-page">
+          <h2 class="view-title" data-i18n="armory.title">Character Armory</h2>
+          <p class="armory-intro" data-i18n="armory.intro">Look up any character to see their class, gear, talents and progress, then share the link.</p>
+          <form id="armory-search" class="armory-search" autocomplete="off">
+            <input id="armory-search-input" type="text" placeholder="Character name" maxlength="32" aria-label="Character name" data-i18n-placeholder="armory.searchPlaceholder" data-i18n-aria="armory.searchPlaceholder" />
+            <button type="submit" class="armory-search-btn" data-i18n="armory.search">Search</button>
+          </form>
+          <div id="armory-content" class="armory-content"></div>
         </div>
       </section>
 
