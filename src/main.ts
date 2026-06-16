@@ -10,6 +10,7 @@ import { music } from './game/music';
 import { handlePickedEntity, hoverCursorKind } from './game/interactions';
 import { clickMoveShouldCancel, clickMoveStep, stepAngleToward } from './game/click_move';
 import { Api, ClientWorld, CharacterSummary } from './net/online';
+import { setWocBalance, setWalletUiEnabled } from './ui/wallet_balance';
 // The wallet module (Reown AppKit + @solana/web3.js, ~1MB) is loaded lazily via
 // dynamic import() in the wallet controller below, so it stays out of the main
 // entry chunk and only loads when the feature is enabled + used.
@@ -2104,6 +2105,8 @@ const shortenAddress = (a: string): string => `${a.slice(0, 4)}…${a.slice(-4)}
 const formatWoc = (n: number): string => n.toLocaleString(undefined, { maximumFractionDigits: 2 });
 
 function updateWalletButton(): void {
+  // mirror the balance into the HUD store so the bag footer stays in sync
+  setWocBalance(connectedWocBalance);
   const btn = document.getElementById('btn-wallet');
   const label = document.getElementById('wallet-label');
   if (!btn || !label) return;
@@ -2235,6 +2238,7 @@ async function switchWallet(): Promise<void> {
 }
 
 function wireWallet(): void {
+  setWalletUiEnabled(WALLET_ENABLED);
   const btn = document.getElementById('btn-wallet');
   if (!btn) return;
   // Feature-gate: with no project id configured, remove the wallet row entirely

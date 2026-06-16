@@ -926,7 +926,11 @@
   }
   #bags .panel-title { flex: none; }
   #bags .bag-grid { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
-  #bags .money { flex: none; }
+  #bags .money { flex: none; display: flex; align-items: center; gap: 10px; }
+  /* coins stay right-aligned whether or not the $WOC chip is present */
+  #bags .money .money-inline { margin-left: auto; }
+  .woc-balance { display: inline-flex; align-items: center; gap: 5px; color: var(--gold-dim); font-weight: 600; white-space: nowrap; }
+  .woc-coin { display: inline-block; width: 11px; height: 11px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #c9a3ff, #6b3fa0); box-shadow: 0 0 4px rgba(150, 90, 230, 0.5); }
   .bag-grid { display: flex; flex-direction: column; gap: 2px; }
   .bag-item { display: flex; gap: 8px; align-items: center; width: 100%; font-size: 12px; padding: 3px 4px; border: 0; border-radius: 3px; cursor: pointer; background: transparent; color: inherit; font-family: var(--ui-font); text-align: left; }
   .bag-item:hover { background: #ffffff12; }
