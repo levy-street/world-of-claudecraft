@@ -341,6 +341,9 @@ export interface PlayerMeta {
   // Recipes learned from a trainer (must be learned before crafting, even once
   // the skill requirement is met). The starter recipe is auto-learned for free.
   learnedRecipes: Set<string>;
+  // same ids as learnedRecipes, kept in sync on add; the per-tick snapshot reads
+  // this instead of spreading the Set every frame. recipes are add-only in v1
+  learnedRecipesArr: string[];
 }
 
 // Away-from-keyboard / do-not-disturb presence. `afk` still delivers whispers
@@ -708,6 +711,7 @@ export class Sim {
       professionSkills: {},
       professionTiers: {},
       learnedRecipes: new Set(),
+      learnedRecipesArr: [],
     };
     this.players.set(player.id, meta);
     player.skin = meta.skin; // mirror onto the entity so the renderer + wire can read it
@@ -739,6 +743,7 @@ export class Sim {
       if (s.professionSkills) meta.professionSkills = { ...s.professionSkills };
       if (s.professionTiers) meta.professionTiers = { ...s.professionTiers } as Record<string, ProfTierId>;
       if (s.learnedRecipes) for (const r of s.learnedRecipes) meta.learnedRecipes.add(r);
+      meta.learnedRecipesArr = [...meta.learnedRecipes];
     }
 
     // Resolve the flat talent struct once, before the stat pass + ability
@@ -954,7 +959,7 @@ export class Sim {
   get professionSkills(): Record<string, number> {
     return this.primary.professionSkills;
   }
-  get professionTiers(): Record<string, string> {
+  get professionTiers(): Record<string, ProfTierId> {
     return this.primary.professionTiers;
   }
   get learnedRecipes(): string[] {
@@ -3635,7 +3640,8 @@ export class Sim {
     // families have a chance to drop a small stack, the tier banded by mob level
     // (linen/wool/silk) with overlap. Injected here, after the per-mob loot loop,
     // so we don't edit every template. This replaces the legacy linen_scrap junk.
-    // Drop-or-not first, then pick a tier among candidates, then quantity.
+    // Pick the tier first (so cloth and its consolation scrap share a level band),
+    // then roll drop-or-not, then quantity on a hit / scrap on a miss.
     if (CLOTH_FAMILIES.includes(template.family)) {
       const cands = clothCandidates(mob.level);
       if (cands.length > 0) {
@@ -4786,7 +4792,10 @@ export class Sim {
       meta.professionTiers[profId] = 'apprentice';
       // teach the starter recipe(s) for free so the profession is usable at once
       for (const rid of prof.recipes) {
-        if ((RECIPES[rid]?.requiredSkill ?? 99) <= 1) meta.learnedRecipes.add(rid);
+        if ((RECIPES[rid]?.requiredSkill ?? 99) <= 1 && !meta.learnedRecipes.has(rid)) {
+          meta.learnedRecipes.add(rid);
+          meta.learnedRecipesArr.push(rid);
+        }
       }
     } else {
       if (!known) { this.error(meta.entityId, `Learn ${prof.name} first.`); return; }
@@ -4823,6 +4832,7 @@ export class Sim {
     if (meta.copper < cost) { this.error(meta.entityId, 'Not enough money.'); return; }
     meta.copper -= cost;
     meta.learnedRecipes.add(recipeId);
+    meta.learnedRecipesArr.push(recipeId);
     this.emit({ type: 'recipeLearned', recipeId, pid: meta.entityId });
   }
 
@@ -4891,6 +4901,8 @@ export class Sim {
     if (p.auras.some((a) => a.kind === 'recently_bandaged')) { this.error(meta.entityId, 'That target was bandaged too recently.'); return; }
     if (p.hp >= p.maxHp) { this.error(meta.entityId, 'You are already at full health.'); return; }
     if (p.sitting) this.standUp(p);
+    // bandage is consumed at cast start (vanilla: an interrupt wastes it), unlike
+    // craft reagents which are consumed only on completion
     this.removeItem(itemId, 1, meta.entityId);
     // Channel heals over its duration via a hot aura; cancelling removes it.
     const ticks = Math.max(1, Math.round(use.channelTime));

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { Sim } from '../src/sim/sim';
-import { ITEMS, NPCS } from '../src/sim/data';
+import { ITEMS, NPCS, MOBS } from '../src/sim/data';
 import {
   PROFESSIONS, RECIPES, validateProfessions, difficultyColor,
   clothCandidates, tierCap, nextTier, STANDARD_TIERS, tierLearnCost, recipeLearnCost,
@@ -128,6 +128,59 @@ describe('professions — crafting & skill-ups', () => {
     sim.craft('wool_bandage'); // orange at 60 → always skills up
     tick(sim, 4);
     expect(meta.professionSkills.first_aid).toBe(61);
+  });
+
+  it('a craft cast cancelled by movement consumes no reagents', () => {
+    const sim = makeSim();
+    const meta = metaOf(sim);
+    meta.professionSkills.first_aid = 1;
+    meta.professionTiers.first_aid = 'apprentice';
+    meta.learnedRecipes.add('linen_bandage');
+    sim.addItem('linen_cloth', 3);
+
+    sim.craft('linen_bandage');
+    expect(sim.player.castingAbility).toBe('craft:linen_bandage');
+
+    // move mid-cast: the channel cancels, nothing consumed or produced
+    sim.moveInput.forward = true;
+    sim.tick();
+
+    expect(sim.player.castingAbility).toBeNull();
+    expect(sim.countItem('linen_cloth')).toBe(3); // reagents intact
+    expect(sim.countItem('linen_bandage')).toBe(0); // no output
+  });
+});
+
+describe('professions — loot determinism', () => {
+  it('cloth injection draws no RNG for non-cloth-family mobs', () => {
+    const sim = makeSim();
+    const meta = metaOf(sim);
+    const rng: any = (sim as any).rng;
+    const orig = rng.next.bind(rng);
+    let draws = 0;
+    rng.next = () => { draws++; return orig(); };
+    const s0 = rng.s;
+    // reset to the same rng state each call so the base loot path makes identical
+    // (conditional) draws, isolating the cloth block as the only variable
+    const countDraws = (templateId: string, level: number): number => {
+      rng.s = s0;
+      draws = 0;
+      (sim as any).rollLoot({ templateId, level, loot: undefined, lootable: false }, meta);
+      return draws;
+    };
+    const familyId = (fam: string) =>
+      Object.keys(MOBS).find((id) => (MOBS as any)[id].family === fam);
+    const humanId = familyId('humanoid');
+    const beastId = familyId('beast');
+    expect(humanId).toBeTruthy();
+    expect(beastId).toBeTruthy();
+
+    // a cloth family draws extra RNG only while its level sits in a cloth band
+    expect(countDraws(humanId!, 5)).toBeGreaterThan(countDraws(humanId!, 30));
+    // a non-cloth family never enters the cloth block: identical draws in/out of band
+    expect(countDraws(beastId!, 5)).toBe(countDraws(beastId!, 30));
+
+    rng.next = orig;
   });
 });
 

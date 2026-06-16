@@ -42,7 +42,7 @@ import {
 import { talentChoiceIconDataUrl, talentNodeIconDataUrl } from './talent_icons';
 import {
   PROFESSIONS, RECIPES, difficultyColor, tierCap, nextTier, tierLearnCost, recipeLearnCost,
-  type RecipeDef, type ProfessionDef, type TierId, type DifficultyColor,
+  type RecipeDef, type ProfessionDef, type DifficultyColor,
 } from '../sim/content/professions';
 import {
   clearHotbarSlot, encodeHotbarAction, HOTBAR_ACTION_MIME, HotbarAction, parseHotbarAction, parseHotbarActions,
@@ -3075,7 +3075,7 @@ export class Hud {
     const sim = this.sim;
     const known = sim.professionSkills[profId] !== undefined;
     const skill = sim.professionSkills[profId] ?? 0;
-    const cap = tierCap(prof, sim.professionTiers[profId] as TierId | undefined);
+    const cap = tierCap(prof, sim.professionTiers[profId]);
     let html = `<div class="panel-title"><span>${t('game.professions.trainTitle').replace('{name}', prof.name)}</span><span class="x-btn" data-close>${svgIcon('close')}</span></div>`;
     if (known) html += `<div class="qd-sub">${prof.name} ${skill} / ${cap}</div>`;
     let anything = false;
@@ -3083,7 +3083,7 @@ export class Hud {
       anything = true;
       html += `<div class="qd-list-item" data-tier="apprentice">${t('game.professions.learnApprentice').replace('{name}', prof.name)} &mdash; ${this.moneyHtml(tierLearnCost(prof, 'apprentice'))}</div>`;
     } else {
-      const next = nextTier(prof, sim.professionTiers[profId] as TierId | undefined);
+      const next = nextTier(prof, sim.professionTiers[profId]);
       if (next && skill >= next.requiresSkill && sim.player.level >= next.requiresLevel) {
         anything = true;
         html += `<div class="qd-list-item" data-tier="${next.id}">${t('game.professions.learnJourneyman').replace('{name}', prof.name)} &mdash; ${this.moneyHtml(tierLearnCost(prof, next.id))}</div>`;
@@ -4195,7 +4195,7 @@ export class Hud {
       el.appendChild(header);
       for (const prof of profs) {
         const skill = sim.professionSkills[prof.id] ?? 0;
-        const cap = tierCap(prof, sim.professionTiers[prof.id] as TierId | undefined);
+        const cap = tierCap(prof, sim.professionTiers[prof.id]);
         const openable = prof.recipes.length > 0;
         const icon = openable ? iconDataUrl('item', RECIPES[prof.recipes[0]].output.itemId) : iconDataUrl('ability', prof.id);
         const row = document.createElement('div');
@@ -4240,7 +4240,7 @@ export class Hud {
       html += `<div class="qd-sub">${label}</div>`;
       for (const prof of list) {
         const skill = sim.professionSkills[prof.id] ?? 0;
-        const cap = tierCap(prof, sim.professionTiers[prof.id] as TierId | undefined);
+        const cap = tierCap(prof, sim.professionTiers[prof.id]);
         const pct = cap > 0 ? Math.round((skill / cap) * 100) : 0;
         const openable = prof.recipes.length > 0;
         html += `<div class="skill-row">
@@ -4272,7 +4272,7 @@ export class Hud {
     if (!prof) { el.style.display = 'none'; return; }
     const sim = this.sim;
     const skill = sim.professionSkills[prof.id] ?? 0;
-    const cap = tierCap(prof, sim.professionTiers[prof.id] as TierId | undefined);
+    const cap = tierCap(prof, sim.professionTiers[prof.id]);
     const COLOR: Record<DifficultyColor, string> = { orange: '#ff8040', yellow: '#ffd100', green: '#4ad14a', grey: '#9090a0' };
     let html = `<div class="panel-title"><span>${prof.name} <span style="color:#998d6a;font-size:11px">${skill} / ${cap}</span></span><span class="x-btn" data-close>${svgIcon('close')}</span></div>`;
     // only recipes the player has learned from a trainer (skill alone isn't enough)

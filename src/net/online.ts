@@ -12,6 +12,7 @@ import {
 } from '../sim/types';
 import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import { isOverheadEmoteId, type ArenaInfo, type CharacterSearchResult, type DuelInfo, type FriendInfo, type IWorld, type LeaderboardEntry, type MarketInfo, type OverheadEmoteId, type PartyInfo, type PresenceStatus, type SocialInfo, type TradeInfo } from '../world_api';
+import type { TierId } from '../sim/content/professions';
 
 // ---------------------------------------------------------------------------
 // REST
@@ -248,7 +249,7 @@ export class ClientWorld implements IWorld {
   activeLoadout = -1;
   // Professions & secondary skills, mirrored from snapshot self (sent on change).
   professionSkills: Record<string, number> = {};
-  professionTiers: Record<string, string> = {};
+  professionTiers: Record<string, TierId> = {};
   learnedRecipes: string[] = [];
   questLog = new Map<string, QuestProgress>();
   questsDone = new Set<string>();
@@ -676,7 +677,7 @@ export class ClientWorld implements IWorld {
       this.known = abilitiesKnownAt(this.cfg.playerClass, e.level, computeTalentModifiers(this.cfg.playerClass, talents));
       // professions (sent on change); delta-guarded so a missing field keeps state
       if (s.skills !== undefined) this.professionSkills = s.skills ?? {};
-      if (s.profTiers !== undefined) this.professionTiers = s.profTiers ?? {};
+      if (s.profTiers !== undefined) this.professionTiers = (s.profTiers ?? {}) as Record<string, TierId>;
       if (s.recipes !== undefined) this.learnedRecipes = s.recipes ?? [];
       if (s.party !== undefined) this.partyInfo = s.party;
       if (s.marks !== undefined) this.markers = s.marks ?? {}; // null = cleared (no party/disband)

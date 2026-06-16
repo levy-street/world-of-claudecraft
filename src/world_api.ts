@@ -1,6 +1,7 @@
 import { OVERHEAD_EMOTE_IDS, type Entity, type EquipSlot, type InvSlot, type MoveInput, type OverheadEmoteId, type PetMode, type PlayerClass, type QuestProgress, type QuestState, type ResourceType } from './sim/types';
 import type { ResolvedAbility } from './sim/sim';
 import type { TalentAllocation, SavedLoadout, Role } from './sim/content/talents';
+import type { TierId } from './sim/content/professions';
 
 export interface PartyMemberInfo {
   pid: number;
@@ -301,7 +302,7 @@ export interface IWorld {
   // Professions & secondary skills. Server-authoritative: the client reads these
   // mirrored values and sends learn/craft intents (validated server-side).
   professionSkills: Record<string, number>;
-  professionTiers: Record<string, string>;
+  professionTiers: Record<string, TierId>;
   learnedRecipes: string[];
   learnProfession(profId: string, tier: string): void;
   learnRecipe(recipeId: string): void;

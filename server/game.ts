@@ -1194,7 +1194,8 @@ export class GameServer {
     // professions/secondary skills ride the wire only when they change
     maybe('skills', meta.professionSkills);
     maybe('profTiers', meta.professionTiers);
-    maybe('recipes', [...meta.learnedRecipes]);
+    // stable array kept in sync on add, avoids spreading the Set every snapshot
+    maybe('recipes', meta.learnedRecipesArr);
     return extra === '' ? json : json.slice(0, -1) + extra + '}';
   }
 

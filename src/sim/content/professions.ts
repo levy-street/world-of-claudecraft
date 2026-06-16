@@ -14,6 +14,7 @@
 import {
   APPRENTICE_CAP, JOURNEYMAN_CAP, JOURNEYMAN_REQ_SKILL, JOURNEYMAN_REQ_LEVEL, PROFESSION_MAX,
 } from '../types';
+import type { MobFamily } from '../types';
 
 export type ProfessionKind = 'primary' | 'secondary';
 export type TierId = 'apprentice' | 'journeyman';
@@ -133,7 +134,7 @@ export const CLOTH_DROP_CHANCE = 0.35;
 export const CLOTH_QTY = { min: 1, max: 2 } as const;
 // Families that drop cloth (the cloth-wearing humanoid types). These are exactly
 // the families that used to drop the legacy linen_scrap junk.
-export const CLOTH_FAMILIES: string[] = ['humanoid', 'murloc', 'kobold'];
+export const CLOTH_FAMILIES: MobFamily[] = ['humanoid', 'murloc', 'kobold'];
 // Cloth scrap is a consolation junk drop: a cloth-band mob that fails its cloth
 // roll can still drop the scrap matching its tier (one scrap per cloth tier).
 export const SCRAP_DROP_CHANCE = 0.3;
@@ -147,8 +148,17 @@ export const CLOTH_BANDS: { itemId: string; min: number; max: number }[] = [
   { itemId: 'wool_cloth', min: 7, max: 15 },
   { itemId: 'silk_cloth', min: 14, max: 20 },
 ];
-export function clothCandidates(mobLevel: number): string[] {
-  return CLOTH_BANDS.filter((b) => mobLevel >= b.min && mobLevel <= b.max).map((b) => b.itemId);
+// precomputed level -> tier-ids, built once at load (rollLoot runs this per kill,
+// hot under RL bench). generous ceiling above today's level cap; out-of-range
+// falls back to the shared empty array.
+const CLOTH_BANDS_MAX_LEVEL = 40;
+const NO_CLOTH: readonly string[] = Object.freeze([]);
+const CLOTH_BY_LEVEL: readonly (readonly string[])[] = Object.freeze(
+  Array.from({ length: CLOTH_BANDS_MAX_LEVEL + 1 }, (_, lvl) =>
+    Object.freeze(CLOTH_BANDS.filter((b) => lvl >= b.min && lvl <= b.max).map((b) => b.itemId))),
+);
+export function clothCandidates(mobLevel: number): readonly string[] {
+  return CLOTH_BY_LEVEL[mobLevel] ?? NO_CLOTH;
 }
 
 // --- helpers (pure) ------------------------------------------------------
@@ -180,7 +190,8 @@ export function nextTier(prof: ProfessionDef, learnedTier: TierId | undefined): 
 // of required skill, so a recipe at skill 20 costs the same across same-kind
 // professions but high-skill recipes get expensive quickly. The starter recipe
 // (skill <= 1) is taught free. Calibrated against the live economy (median quest
-// ~600c, vendor gear ~1500c) in .claude/design/economy-reference.local.md.
+// ~600c, vendor gear ~1500c); see docs/prd/professions-and-crafting.md open
+// question on economy weight.
 // Apprentice (the entry cost to start a profession) stays cheap; everything past it
 // ramps hard — Journeyman and recipes are ~3x the first pass so a fully-trained
 // profession is a real gold investment, not pocket change.
