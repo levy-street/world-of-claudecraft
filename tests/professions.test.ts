@@ -200,11 +200,11 @@ describe('professions — trainers & tier gate', () => {
     sim.tick(); // rebucket the spatial grid so nearTrainer sees the npc
 
     const meta = metaOf(sim);
-    meta.copper = 1000; // enough to afford the tier costs
+    meta.copper = 5000; // enough to afford both tier costs (Apprentice + Journeyman)
     sim.learnProfession('first_aid', 'apprentice');
     expect(meta.professionSkills.first_aid).toBe(1);
     expect(meta.professionTiers.first_aid).toBe('apprentice');
-    expect(meta.copper).toBe(1000 - tierLearnCost(PROFESSIONS.first_aid, 'apprentice'));
+    expect(meta.copper).toBe(5000 - tierLearnCost(PROFESSIONS.first_aid, 'apprentice'));
     expect([...meta.learnedRecipes]).toContain('linen_bandage'); // starter auto-learned free
 
     sim.learnProfession('first_aid', 'journeyman'); // skill 1 < 40 → rejected

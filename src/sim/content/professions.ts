@@ -181,12 +181,15 @@ export function nextTier(prof: ProfessionDef, learnedTier: TierId | undefined): 
 // professions but high-skill recipes get expensive quickly. The starter recipe
 // (skill <= 1) is taught free. Calibrated against the live economy (median quest
 // ~600c, vendor gear ~1500c) in .claude/design/economy-reference.local.md.
+// Apprentice (the entry cost to start a profession) stays cheap; everything past it
+// ramps hard — Journeyman and recipes are ~3x the first pass so a fully-trained
+// profession is a real gold investment, not pocket change.
 export const TIER_COST: Record<ProfessionKind, Record<TierId, number>> = {
-  secondary: { apprentice: 50, journeyman: 500 },
-  primary: { apprentice: 150, journeyman: 1500 },
+  secondary: { apprentice: 50, journeyman: 1500 },
+  primary: { apprentice: 150, journeyman: 4500 },
 };
 // quadratic coefficient: cost = round(requiredSkill^2 * k), floored at MIN
-export const RECIPE_COST_K: Record<ProfessionKind, number> = { secondary: 0.1, primary: 0.2 };
+export const RECIPE_COST_K: Record<ProfessionKind, number> = { secondary: 0.3, primary: 0.6 };
 const MIN_RECIPE_COST = 5;
 
 export function tierLearnCost(prof: ProfessionDef, tier: TierId): number {
