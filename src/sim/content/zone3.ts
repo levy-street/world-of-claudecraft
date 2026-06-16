@@ -725,14 +725,17 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   wyrmfang_greatblade: {
     id: 'wyrmfang_greatblade', name: 'Wyrmfang Greatblade', kind: 'weapon', slot: 'mainhand', quality: 'epic',
     weapon: { min: 30, max: 48, speed: 2.6 }, stats: { str: 10, sta: 6 }, sellValue: 8000, requiredClass: ['warrior', 'paladin', 'shaman'],
+    weaponModel: 'wyrmfang_1handed',
   },
   staff_of_the_gravewyrm: {
     id: 'staff_of_the_gravewyrm', name: 'Staff of the Gravewyrm', kind: 'weapon', slot: 'mainhand', quality: 'epic',
     weapon: { min: 32, max: 52, speed: 3.0 }, stats: { int: 12, spi: 6 }, sellValue: 8000, requiredClass: ['mage', 'priest', 'warlock', 'druid'],
+    weaponModel: 'gravewyrm_staff',
   },
   fang_of_korzul: {
     id: 'fang_of_korzul', name: 'Fang of Korzul', kind: 'weapon', slot: 'mainhand', quality: 'epic',
     weapon: { min: 19, max: 30, speed: 1.7, dagger: true }, stats: { agi: 11, sta: 5 }, sellValue: 8000, requiredClass: ['rogue', 'hunter'],
+    weaponModel: 'korzul_dagger',
   },
   // --- vendor food & drink (Quartermaster Bree) ---
   trail_hardtack: {

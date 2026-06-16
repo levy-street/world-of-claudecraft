@@ -8,7 +8,7 @@ import type { OverheadEmoteId } from '../../world_api';
 import { GFX } from '../gfx';
 import type { EmoteClipSpec, VisualDef } from './manifest';
 import {
-  applyMaterials, assembleModel, prepareVisual, skinTexture, tintedFarMaterials,
+  applyMaterials, assembleModel, prepareVisual, skinTexture, syncWeaponAttachments, tintedFarMaterials,
 } from './assets';
 
 /** Renderer-derived animation inputs (same facts the old pose machine used). */
@@ -104,6 +104,7 @@ export class CharacterVisual {
   private shadowOn = true;
   private far = false;
   private bobPhase = Math.random() * Math.PI * 2;
+  private mainhandItemId: string | null = null;
 
   constructor(key: string, entityColor: number, skinIndex = 0) {
     const prep = prepareVisual(key);
@@ -314,6 +315,14 @@ export class CharacterVisual {
       if (mesh.isMesh) this.originalMaterials.set(mesh, mesh.material);
     });
     if (this.ghosted) this.setGhost(true);
+  }
+
+  /** Swap attached weapon props when mainhand equipment changes (epic item models). */
+  setMainhand(itemId: string | null): void {
+    const next = itemId ?? null;
+    if (next === this.mainhandItemId) return;
+    this.mainhandItemId = next;
+    syncWeaponAttachments(this.model, this.def, next);
   }
 
   dispose(): void {

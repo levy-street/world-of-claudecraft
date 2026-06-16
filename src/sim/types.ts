@@ -108,6 +108,8 @@ export interface ItemDef {
   potionHp?: number;
   potionMana?: number;
   quality?: 'poor' | 'common' | 'uncommon' | 'rare' | 'epic'; // gray/white/green/blue/purple name colors
+  /** Optional glb basename under models/weapons/ — overrides the class default prop when equipped. */
+  weaponModel?: string;
   requiredClass?: PlayerClass[];
 }
 
@@ -548,6 +550,8 @@ export interface Entity {
   scale: number;
   color: number;
   skin: number; // player appearance: index into SKINS[visualKey]; 0 = default. synced in identity fields.
+  /** Equipped mainhand item id — players only; synced for weapon prop visuals. */
+  mainhand: string | null;
 }
 
 // `pid` (when present) marks a personal event that should only be delivered to

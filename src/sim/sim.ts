@@ -712,6 +712,7 @@ export class Sim {
       if (s.loadouts) meta.loadouts = s.loadouts.map((l) => ({ name: l.name, alloc: cloneAllocation(l.alloc), bar: [...(l.bar ?? [])] }));
       if (typeof s.activeLoadout === 'number') meta.activeLoadout = s.activeLoadout;
     }
+    player.mainhand = meta.equipment.mainhand ?? null;
 
     // Resolve the flat talent struct once, before the stat pass + ability
     // resolver below consume it (they only ever read these flat numbers).
@@ -4608,6 +4609,7 @@ export class Sim {
     this.removeItem(itemId, 1, meta.entityId);
     if (old) this.addItemSilent(old, 1, meta);
     meta.equipment[slot] = itemId;
+    p.mainhand = slot === 'mainhand' ? itemId : (p.mainhand ?? null);
     recalcPlayerStats(p, meta.cls, meta.equipment, meta.talentMods);
     this.emit({ type: 'log', text: `Equipped ${def.name}.`, color: '#8f8', pid: meta.entityId });
   }

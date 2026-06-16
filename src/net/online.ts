@@ -221,7 +221,7 @@ function blankEntity(id: number): Entity {
     spawnPos: { x: 0, y: 0, z: 0 }, leashAnchor: null, evadeStall: 0, fleeTimer: 0, hasFled: false, wanderTarget: null, wanderTimer: 0,
     aggroTargetId: null, respawnTimer: 0, corpseTimer: 0, lootable: false, loot: null,
     xpValue: 0, questIds: [], vendorItems: [], objectItemId: null, dungeonId: null,
-    dead: false, scale: 1, color: 0xffffff, skin: 0,
+    dead: false, scale: 1, color: 0xffffff, skin: 0, mainhand: null,
   };
 }
 
@@ -517,6 +517,7 @@ export class ClientWorld implements IWorld {
         e.name = w.nm;
         e.level = w.lv;
         e.skin = w.sk ?? 0;
+        e.mainhand = w.mh ?? null;
         e.scale = w.sc ?? 1;
         e.color = w.c ?? 0xffffff;
         e.dungeonId = w.dgn ?? null;
@@ -655,7 +656,10 @@ export class ClientWorld implements IWorld {
       this.copper = s.copper ?? 0;
       if (s.inv !== undefined) { this.inventory = s.inv; this.invChanged = true; }
       if (s.buyback !== undefined) { this.vendorBuyback = s.buyback; this.invChanged = true; }
-      if (s.equip !== undefined) this.equipment = s.equip;
+      if (s.equip !== undefined) {
+        this.equipment = s.equip;
+        e.mainhand = s.equip.mainhand ?? null;
+      }
       if (s.qlog !== undefined) this.questLog = new Map((s.qlog as QuestProgress[]).map((q) => [q.questId, q]));
       if (s.qdone !== undefined) this.questsDone = new Set(s.qdone);
       if (s.qlog !== undefined || s.qdone !== undefined) this.pendingQuestCommands?.clear();

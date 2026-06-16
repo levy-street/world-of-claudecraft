@@ -25,7 +25,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     spawnPos: { ...pos }, leashAnchor: null, evadeStall: 0, fleeTimer: 0, hasFled: false, wanderTarget: null, wanderTimer: 0,
     aggroTargetId: null, respawnTimer: 0, corpseTimer: 0, lootable: false, loot: null,
     xpValue: 0, questIds: [], vendorItems: [], objectItemId: null, dungeonId: null,
-    dead: false, scale: 1, color: 0xffffff, skin: 0,
+    dead: false, scale: 1, color: 0xffffff, skin: 0, mainhand: null,
   };
 }
 
