@@ -1,0 +1,16 @@
+/* World of Claudecraft dev wiki — light brand tint over the default theme.
+   Structure (sidebar/TOC/search) is stock VitePress; this is only color. */
+:root {
+  --vp-c-brand-1: #c9a23a;
+  --vp-c-brand-2: #d8b24e;
+  --vp-c-brand-3: #b8902f;
+  --vp-c-brand-soft: rgba(201, 162, 58, 0.16);
+}
+.dark {
+  --vp-c-brand-1: #e3c45f;
+  --vp-c-brand-2: #f0d477;
+  --vp-c-brand-3: #c9a23a;
+}
+:root {
+  --vp-home-hero-name-color: var(--vp-c-brand-1);
+}

@@ -136,6 +136,16 @@ correct*.
   run (`npx vitest run <file>`, `npm test`, `npm run build`, the S3 i18n guard
   `tests/localization_fixes.test.ts`), never on "looks done."
 
+## Dev wiki — keep it in sync
+The public dev wiki (`docs/wiki/*.md`, a VitePress site served at `/dev`) is the
+roadmap + system-design backlog — the **source of truth for project direction**.
+When a PR **ships or changes a system, or shifts priorities, update it in the same
+PR**: flip the relevant `docs/wiki/system-designs/` status, reflect it in
+`current-state.md`, move/annotate the `roadmap.md` item, and name the affected page
+in the PR description. Trivial/no-behavior PRs are exempt. Keep edits light (a status
+flip + a line). It's dependency-isolated; rebuild with `npm run devwiki:build`.
+
 ## Pointers
 `README.md` (host/develop/play + fidelity checklist) · `DEPLOY.md` (production) ·
-`CREDITS.md` (asset licenses) · `docs/design/` (design docs) · `docs/prd/` (feature specs).
+`CREDITS.md` (asset licenses) · `docs/wiki/` (dev wiki: vision/roadmap/system designs, at `/dev`) ·
+`docs/design/` (design docs) · `docs/prd/` (feature specs).

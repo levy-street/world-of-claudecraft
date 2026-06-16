@@ -103,6 +103,17 @@ node scripts/smoke_rogue.mjs
 
 Browser or visual UI changes should be verified with a running dev server and browser automation when feasible.
 
+## Dev Wiki Sync Rules
+
+- The public dev wiki lives in `docs/wiki/*.md` (a VitePress site served at `/dev`) and is the source of truth for project direction: vision, roadmap, design lens, and the system-design backlog. The markdown is canonical; rebuild with `npm run devwiki:build`. It is dependency-isolated from the game (`docs/wiki/package.json`).
+- When a PR ships or changes a system, or shifts priorities, update the wiki **in the same PR**:
+  - Flip the status of the relevant design in `docs/wiki/system-designs/` (💡 Idea → 📐 Scoped → ✅ Ready → 🚧 In progress → 🏁 Shipped).
+  - Reflect behavior changes in `docs/wiki/current-state.md` (the implementation inventory).
+  - Move or annotate the matching item in `docs/wiki/roadmap.md`.
+  - Reference the affected wiki page(s) in the PR description.
+- Trivial PRs (typo, pure refactor, no behavior change) do not need wiki updates.
+- Keep wiki edits light: a status flip plus a line or two, not essays. Don't let wiki churn block a code PR — but don't let the roadmap silently drift from reality either.
+
 ## Git And Commit Rules
 
 - Do not commit unless the user explicitly asks.

@@ -6,6 +6,13 @@
 > https://worldofclaudecraft.com. Re-running
 > `ansible-playbook playbooks/setup_server.yml -e target_host=idyllic-games-prod`
 > pulls and redeploys. The guide below is the generic, standalone path.
+>
+> **Dev wiki note:** the public `/dev` development wiki is a **static VitePress
+> site** built from `docs/wiki/*.md` (`cd docs/wiki && npm ci && npm run build` →
+> `.vitepress/dist`), separate from the game build. Production fronts the stack
+> with **nginx** (not Caddy), so the `eastbrook_game` role in `ansible-scripts`
+> must (1) build the site on deploy and (2) serve `.vitepress/dist` at `/dev` with
+> extensionless-URL fallback (`try_files $uri $uri.html $uri/index.html =404;`).
 
 One EC2 instance runs everything: the game server, Postgres, MediaWiki, and Caddy
 (TLS reverse proxy). Sized for a small population — a `t4g.small`
@@ -58,6 +65,15 @@ the Elastic IP.
 ```bash
 ssh ubuntu@<elastic-ip>
 echo 'play.example.com {
+	# Public dev wiki — static VitePress build (docs/wiki/.vitepress/dist).
+	# handle_path strips /dev; try_files resolves VitePress clean URLs.
+	handle_path /dev/* {
+		root * /opt/eastbrook/docs/wiki/.vitepress/dist
+		try_files {path} {path}.html {path}/index.html
+		file_server
+		encode gzip
+	}
+	redir /dev /dev/
 	route /wiki* {
 		reverse_proxy localhost:8080
 	}
@@ -71,6 +87,26 @@ Caddy fetches and renews the Let's Encrypt certificate automatically;
 WebSockets are proxied with no extra config, and the client auto-selects
 `wss://` on https pages. Open `https://play.example.com` and you're live.
 
+### The public dev wiki (`/dev`)
+
+`worldofclaudecraft.com/dev` is a **static [VitePress](https://vitepress.dev) site**
+— a focused, searchable docs site for the development wiki (vision, roadmap, design
+lens, system designs). It is fully public; the same content lives openly in
+`docs/wiki/*.md` in the repo, which is the **source of truth**. The canonical way to
+change it is a **PR to the markdown**; the site rebuilds on deploy.
+
+It's deliberately **isolated from the game build** (its own `docs/wiki/package.json`,
+so VitePress never enters the game's dependency set). Build it separately:
+
+```bash
+cd /opt/eastbrook/docs/wiki && npm ci && npm run build   # → .vitepress/dist
+```
+
+The reverse proxy serves that `dist/` at `/dev` (see the Caddyfile above; use
+extensionless-URL fallback). Each page exposes a **Copy as Markdown** button, raw
+`/dev/raw/<page>.md` URLs, and `/dev/llms.txt` + `/dev/llms-full.txt` bundles so
+agents can ingest the docs directly.
+
 ## Updating the game
 
 ```bash
@@ -78,6 +114,7 @@ ssh ubuntu@<elastic-ip>
 cd /opt/eastbrook
 sudo git pull
 sudo docker compose up -d --build
+cd docs/wiki && npm ci && npm run build   # rebuild the /dev wiki from the markdown
 ```
 
 Players online during the restart are disconnected for a few seconds and
