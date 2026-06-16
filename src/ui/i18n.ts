@@ -10481,6 +10481,31 @@ export const gameStrings = {
     comingSoonTitle: "Talents coming soon",
     comingSoonBody: "This class does not have talent trees yet. You can keep playing normally; full trees will arrive in a future update.",
   },
+  // Professions & crafting (First Aid, cloth, trainers). {tokens} are filled by
+  // the caller via .replace(); follows the same shape as talents above.
+  professions: {
+    skillsTitle: "Skills",
+    professions: "Professions",
+    secondary: "Secondary Skills",
+    open: "Open",
+    noSkills: "You have not learned any professions or secondary skills yet. Seek out a trainer.",
+    craft: "Craft",
+    noRecipes: "You have not learned any recipes yet. Visit a trainer to learn them.",
+    trainTitle: "Train {name}",
+    learnApprentice: "Learn {name} (Apprentice)",
+    learnJourneyman: "Learn Journeyman {name}",
+    recipes: "Recipes",
+    nothingToTrain: "Nothing new to train right now. Raise your skill and return.",
+    back: "← Back",
+    gatheredSuffix: " (gathered in the world)",
+    skillIncreased: "Your skill in {name} increased to {skill}.",
+    journeymanLabel: "Journeyman {name}",
+    learnedBanner: "Learned {label}",
+    learnedLog: "You have learned {label}.",
+    recipeLearnedLog: "You have learned to make {name}.",
+    bandageUse: "Use: Channel a heal for {heal} health over {time} sec. The target cannot be bandaged again for 1 min, and the channel breaks if you move or take damage.",
+    requiresProf: "Requires {name} ({skill})",
+  },
 };
 
 const gameStringsEnCA: typeof gameStrings = {

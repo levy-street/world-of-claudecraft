@@ -1015,7 +1015,7 @@ export class Hud {
     if (item.foodHp) html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useFood', { amount: itemNumber(item.foodHp), seconds: itemNumber(CONSUME_DURATION) }))}</div>`;
     if (item.drinkMana) html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useDrink', { amount: itemNumber(item.drinkMana), seconds: itemNumber(CONSUME_DURATION) }))}</div>`;
     if (item.use?.type === 'fishing') html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useFishing'))}</div>`;
-    if (item.use?.type === 'bandage') html += `<div class="tt-desc">Use: Channel a heal for ${item.use.totalHeal} health over ${item.use.channelTime} sec. The target cannot be bandaged again for 1 min, and the channel breaks if you move or take damage.</div>`;
+    if (item.use?.type === 'bandage') html += `<div class="tt-desc">${t('game.professions.bandageUse').replace('{heal}', String(item.use.totalHeal)).replace('{time}', String(item.use.channelTime))}</div>`;
     if (item.potionHp) html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useHealingPotion', { amount: itemNumber(item.potionHp) }))}</div>`;
     if (item.potionMana) html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useManaPotion', { amount: itemNumber(item.potionMana) }))}</div>`;
     if (item.kind === 'quest') html += `<div class="tt-desc">${esc(t('itemUi.tooltip.questItem'))}</div>`;
@@ -1025,7 +1025,7 @@ export class Hud {
     if (item.requiredLevel && item.requiredLevel > 1) html += `<div class="tt-sub">Requires Level ${item.requiredLevel}</div>`;
     // surface the profession + skill needed to craft this item (e.g. a bandage)
     const recipe = Object.values(RECIPES).find((r) => r.output.itemId === item.id);
-    if (recipe) html += `<div class="tt-sub">Requires ${PROFESSIONS[recipe.profId]?.name ?? recipe.profId} (${recipe.requiredSkill})</div>`;
+    if (recipe) html += `<div class="tt-sub">${t('game.professions.requiresProf').replace('{name}', PROFESSIONS[recipe.profId]?.name ?? recipe.profId).replace('{skill}', String(recipe.requiredSkill))}</div>`;
     if (item.sellValue > 0) html += `<div class="tt-sub">${esc(t('itemUi.tooltip.sellPrice', { money: formatLocalizedMoney(item.sellValue) }))}</div>`;
     return html;
   }
@@ -2443,16 +2443,16 @@ export class Hud {
         case 'skillUp': {
           const name = PROFESSIONS[ev.profId]?.name ?? ev.profId;
           this.fct(sim.player, `${name} ${ev.skill}`, '#ffd100', false);
-          this.log(`Your skill in ${name} increased to ${ev.skill}.`, '#ffd100');
+          this.log(t('game.professions.skillIncreased').replace('{name}', name).replace('{skill}', String(ev.skill)), '#ffd100');
           audio.lootItem();
           this.refreshProfessionWindows();
           break;
         }
         case 'professionLearned': {
           const name = PROFESSIONS[ev.profId]?.name ?? ev.profId;
-          const label = ev.tier === 'journeyman' ? `Journeyman ${name}` : name;
-          this.showBanner(`Learned ${label}`);
-          this.log(`You have learned ${label}.`, '#7fd0ff');
+          const label = ev.tier === 'journeyman' ? t('game.professions.journeymanLabel').replace('{name}', name) : name;
+          this.showBanner(t('game.professions.learnedBanner').replace('{label}', label));
+          this.log(t('game.professions.learnedLog').replace('{label}', label), '#7fd0ff');
           audio.levelUp();
           this.refreshProfessionWindows();
           break;
@@ -2460,7 +2460,7 @@ export class Hud {
         case 'recipeLearned': {
           const recipe = RECIPES[ev.recipeId];
           const name = recipe ? (ITEMS[recipe.output.itemId]?.name ?? recipe.name) : ev.recipeId;
-          this.log(`You have learned to make ${name}.`, '#7fd0ff');
+          this.log(t('game.professions.recipeLearnedLog').replace('{name}', name), '#7fd0ff');
           audio.lootItem();
           this.refreshProfessionWindows();
           break;
@@ -3076,29 +3076,29 @@ export class Hud {
     const known = sim.professionSkills[profId] !== undefined;
     const skill = sim.professionSkills[profId] ?? 0;
     const cap = tierCap(prof, sim.professionTiers[profId] as TierId | undefined);
-    let html = `<div class="panel-title"><span>Train ${prof.name}</span><span class="x-btn" data-close>${svgIcon('close')}</span></div>`;
+    let html = `<div class="panel-title"><span>${t('game.professions.trainTitle').replace('{name}', prof.name)}</span><span class="x-btn" data-close>${svgIcon('close')}</span></div>`;
     if (known) html += `<div class="qd-sub">${prof.name} ${skill} / ${cap}</div>`;
     let anything = false;
     if (!known) {
       anything = true;
-      html += `<div class="qd-list-item" data-tier="apprentice">Learn ${prof.name} (Apprentice) &mdash; ${this.moneyHtml(tierLearnCost(prof, 'apprentice'))}</div>`;
+      html += `<div class="qd-list-item" data-tier="apprentice">${t('game.professions.learnApprentice').replace('{name}', prof.name)} &mdash; ${this.moneyHtml(tierLearnCost(prof, 'apprentice'))}</div>`;
     } else {
       const next = nextTier(prof, sim.professionTiers[profId] as TierId | undefined);
       if (next && skill >= next.requiresSkill && sim.player.level >= next.requiresLevel) {
         anything = true;
-        html += `<div class="qd-list-item" data-tier="${next.id}">Learn Journeyman ${prof.name} &mdash; ${this.moneyHtml(tierLearnCost(prof, next.id))}</div>`;
+        html += `<div class="qd-list-item" data-tier="${next.id}">${t('game.professions.learnJourneyman').replace('{name}', prof.name)} &mdash; ${this.moneyHtml(tierLearnCost(prof, next.id))}</div>`;
       }
       const learnable = prof.recipes.map((id) => RECIPES[id]).filter((r) => r && skill >= r.requiredSkill && !sim.learnedRecipes.includes(r.id)) as RecipeDef[];
       if (learnable.length) {
         anything = true;
-        html += `<div class="qd-sub">Recipes</div>`;
+        html += `<div class="qd-sub">${t('game.professions.recipes')}</div>`;
         for (const r of learnable) {
           html += `<div class="qd-list-item" data-recipe="${r.id}"><span style="background-image:url(${iconDataUrl('item', r.output.itemId)});width:18px;height:18px;display:inline-block;background-size:cover;vertical-align:middle;border-radius:3px;margin-right:6px"></span>${ITEMS[r.output.itemId]?.name ?? r.name} &mdash; ${this.moneyHtml(recipeLearnCost(r))}</div>`;
         }
       }
     }
-    if (!anything) html += `<div class="qd-text" style="color:#999">Nothing new to train right now. Raise your skill and return.</div>`;
-    html += `<div class="qd-list-item" data-back="1">&larr; Back</div>`;
+    if (!anything) html += `<div class="qd-text" style="color:#999">${t('game.professions.nothingToTrain')}</div>`;
+    html += `<div class="qd-list-item" data-back="1">${t('game.professions.back')}</div>`;
     el.innerHTML = html;
     el.querySelector('[data-tier]')?.addEventListener('click', (e) => {
       this.sim.learnProfession(profId, (e.currentTarget as HTMLElement).dataset.tier as string);
@@ -4191,7 +4191,7 @@ export class Hud {
     if (profs.length) {
       const header = document.createElement('div');
       header.className = 'qd-sub';
-      header.textContent = 'Professions';
+      header.textContent = t('game.professions.professions');
       el.appendChild(header);
       for (const prof of profs) {
         const skill = sim.professionSkills[prof.id] ?? 0;
@@ -4202,7 +4202,7 @@ export class Hud {
         row.className = 'spell-row';
         if (openable) row.style.cursor = 'pointer';
         row.innerHTML = `<div class="spell-icon" style="background-image:url(${icon})"></div>
-          <div><div class="spell-name">${prof.name}</div><div class="spell-sub">${skill} / ${cap}${openable ? '' : ' (gathered in the world)'}</div></div>`;
+          <div><div class="spell-name">${prof.name}</div><div class="spell-sub">${skill} / ${cap}${openable ? '' : t('game.professions.gatheredSuffix')}</div></div>`;
         if (openable) row.addEventListener('click', () => { el.style.display = 'none'; this.openCraft(prof.id); });
         el.appendChild(row);
       }
@@ -4233,7 +4233,7 @@ export class Hud {
     const el = $('#skills-window');
     const sim = this.sim;
     const known = Object.keys(sim.professionSkills).map((id) => PROFESSIONS[id]).filter(Boolean) as ProfessionDef[];
-    let html = `<div class="panel-title"><span>Skills</span><span class="x-btn" data-close>${svgIcon('close')}</span></div>`;
+    let html = `<div class="panel-title"><span>${t('game.professions.skillsTitle')}</span><span class="x-btn" data-close>${svgIcon('close')}</span></div>`;
     const group = (label: string, kind: 'primary' | 'secondary'): void => {
       const list = known.filter((p) => p.kind === kind);
       if (!list.length) return;
@@ -4246,13 +4246,13 @@ export class Hud {
         html += `<div class="skill-row">
           <div class="skill-name">${prof.name}</div>
           <div class="skill-bar"><div class="skill-fill" style="width:${pct}%"></div><span class="skill-num">${skill} / ${cap}</span></div>
-          ${openable ? `<button class="btn-sm" data-open="${prof.id}">Open</button>` : '<span class="skill-open-spacer"></span>'}
+          ${openable ? `<button class="btn-sm" data-open="${prof.id}">${t('game.professions.open')}</button>` : '<span class="skill-open-spacer"></span>'}
         </div>`;
       }
     };
-    group('Professions', 'primary');
-    group('Secondary Skills', 'secondary');
-    if (!known.length) html += `<div class="qd-text" style="color:#999">You have not learned any professions or secondary skills yet. Seek out a trainer.</div>`;
+    group(t('game.professions.professions'), 'primary');
+    group(t('game.professions.secondary'), 'secondary');
+    if (!known.length) html += `<div class="qd-text" style="color:#999">${t('game.professions.noSkills')}</div>`;
     el.innerHTML = html;
     el.querySelectorAll('[data-open]').forEach((b) => b.addEventListener('click', () => this.openCraft((b as HTMLElement).dataset.open!)));
     el.querySelector('[data-close]')?.addEventListener('click', () => { el.style.display = 'none'; this.hideTooltip(); });
@@ -4291,10 +4291,10 @@ export class Hud {
         <div class="craft-icon" style="background-image:url(${iconDataUrl('item', r.output.itemId)})"></div>
         <div class="craft-info"><div class="craft-name" style="color:${COLOR[difficultyColor(skill, r)]}">${out?.name ?? r.name}</div>
         <div class="craft-reagents">${reagents}</div></div>
-        <button class="btn-sm" data-craft="${r.id}"${canCraft ? '' : ' disabled'}>Craft</button>
+        <button class="btn-sm" data-craft="${r.id}"${canCraft ? '' : ' disabled'}>${t('game.professions.craft')}</button>
       </div>`;
     }
-    if (!available.length) html += `<div class="qd-text" style="color:#999">You have not learned any recipes yet. Visit a trainer to learn them.</div>`;
+    if (!available.length) html += `<div class="qd-text" style="color:#999">${t('game.professions.noRecipes')}</div>`;
     el.innerHTML = html;
     el.querySelectorAll('[data-craft]').forEach((b) => b.addEventListener('click', () => this.sim.craft((b as HTMLElement).dataset.craft!)));
     el.querySelectorAll('.craft-row').forEach((row, i) => {
