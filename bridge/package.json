@@ -1,0 +1,21 @@
+{
+  "name": "@woc/bridge",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "STUB (RFC) — multi-agent host running elizaOS agents against a WoC realm.",
+  "scripts": {
+    "dev": "echo 'TODO(eliza): node --loader for index.ts against npm run server'",
+    "test": "echo 'TODO(eliza): vitest provisioning + payment flow (devnet/mocked)'"
+  },
+  "dependencies": {
+    "@solana/web3.js": "^1.95.0",
+    "bs58": "^6.0.0",
+    "pg": "^8.21.0",
+    "ws": "^8.21.0"
+  },
+  "peerDependencies": {
+    "@elizaos/core": "^2.0.0-beta"
+  },
+  "comment": "STUB — not wired into the root workspace/build/CI. See docs/prd/eliza-agents.md."
+}
