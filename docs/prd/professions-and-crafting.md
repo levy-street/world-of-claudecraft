@@ -8,7 +8,7 @@
 | **Source demand** | Internal roadmap: tradeskills are the next major content pillar after talents (v0.6). Fishing already has a cast-model stub in the sim. |
 | **Related systems** | Items/loot (`src/sim/content/items.ts`, `src/sim/data.ts`), loot resolution (`src/sim/sim.ts` `rollLoot`), cast model (`src/sim/sim.ts` fishing path), persistence (`src/sim/sim.ts` `CharacterState`, `server/db.ts`), NPCs/trainers (`src/sim/types.ts` `NpcDef`, `talkToNpc`), command layer (`src/world_api.ts`, `server/game.ts`), HUD (`src/ui/hud.ts`), i18n (`src/ui/i18n.ts`) |
 | **Companion docs** | `docs/prd/talents-and-specializations.md` (the subsystem-pattern precedent this feature follows) |
-| **Scale** | Framework milestone delivered as **three PRs** (see §20). **PR 1 — this submission —** builds the bones of the profession system (skills, recipes, crafting, trainers, economy) and proves them end to end with cloth + First Aid. PRs 2 and 3 (gathering, then production professions) follow if PR 1 is approved, and are then mostly content authoring on the rails PR 1 lays down. |
+| **Scale** | Framework milestone delivered as **three PRs** (see §20). **PR 1 — this submission —** builds the bones of the profession system (skills, recipes, crafting, trainers, economy) and proves them end to end with cloth + First Aid. PR 2 (gathering) still adds one engine piece — the gather-cast path in `interact()` (specified here, not built in PR 1) — then is mostly content; PR 3 (production professions) is pure content on PR 1's craft rails. |
 
 ---
 
@@ -126,7 +126,7 @@ The "requires skill level 40" gate means a player must skill Apprentice up towar
 
 ### Non-goals (v1)
 - No primary-profession slot limit enforcement yet (First Aid is secondary; slot rules land when primary professions do, see Open Questions).
-- No specific primary professions shipped (mining/herbalism/tailoring/cooking) — the framework supports them, but only First Aid is authored here. Gathering-node mechanics are built but no live nodes need ship until a gathering profession does.
+- No specific primary professions shipped (mining/herbalism/tailoring/cooking) — the framework supports them, but only First Aid is authored here. Gathering-node mechanics are specified (§6.4, §16) but not built in PR 1; the gather-cast path lands with PR 2's first gathering profession (PR 1 stubs only the `gatherSkill` type field).
 - No recipe discovery, recipe drops, or trainer recipe purchasing economy.
 - No enchanting "apply to item", no profession quests, no specializations.
 - No raising the level/skill cap design beyond mapping skill range to our cap.
@@ -192,7 +192,7 @@ The "requires skill level 40" gate means a player must skill Apprentice up towar
 - **FR-4.1** Add a general craft cast: `craft(recipeId)` validates (known profession, meets `requiredSkill`, owns reagents, in range of `station` if any, not in combat-cancel state), then starts a cast (`castingAbility = 'craft:'+recipeId`, `castTotal/castRemaining = recipe.castTime`), emitting `castStart`. Reagents are reserved/consumed on **completion**, not on start.
 - **FR-4.2** `updateCasting` dispatches craft-cast completion to `completeCraft`: re-validate reagents, consume them (× `batch` if set), `addItem(output × batch)`, then `rollSkillUp(profId, recipe)` **once** regardless of batch size (Mass Smelt yields 5 bars but a single skill-up roll).
 - **FR-4.3** Craft cast cancels on movement and on damage, exactly like the fishing cast (reuse `cancelCast`); on cancel, no reagents are consumed.
-- **FR-4.4** Gather framework: a `GroundObjectDef` may carry `gatherSkill?: { profId; requiredSkill }` and a yield range. `interact()` on such a node starts a **gather cast** (cast-bar, classic-accurate) instead of instant `pickUpObject`; completion yields `rng.int(min,max)` items, rolls a skill-up, and starts the node's respawn timer. (No live gather nodes ship in v1, but the path is built and unit-tested.)
+- **FR-4.4** Gather framework (specified here, implemented in PR 2): a `GroundObjectDef` may carry `gatherSkill?: { profId; requiredSkill }` and a yield range. `interact()` on such a node starts a **gather cast** (cast-bar, classic-accurate) instead of instant `pickUpObject`; completion yields `rng.int(min,max)` items, rolls a skill-up, and starts the node's respawn timer. **PR 1 stubs only the `gatherSkill` type field** as a forward-compat marker; the `interact()` gather-cast path, `startGather`/`completeGather`, and node tests land with PR 2's first gathering profession, since PR 1 ships no gather nodes.
 
 ### 6.5 Skill-up loop
 - **FR-5.1** `rollSkillUp(profId, recipe)` computes difficulty color from current skill vs the recipe's `orangeAt/yellowAt/greenAt`, then rolls skill-up chance by color (orange = 1.0 always, yellow ≈ 0.75 high, green ≈ 0.25 low, grey = 0 none). On success, increment `professionSkills[profId]` **clamped to the learned tier's cap** (50 Apprentice / 100 Journeyman, per FR-1.4), and emit a `skillUp` event. A player at their tier cap (e.g. 50, Journeyman not yet trained) gets no further skill-ups until they train the next tier.
@@ -218,7 +218,7 @@ The "requires skill level 40" gate means a player must skill Apprentice up towar
 > **(B) Vanilla: profession-as-ability + a read-only Skills pane** — learning a profession grants a spellbook ability that opens *that profession's* craft window, and a separate `K` Skills pane lists all skills with level bars.
 > **We chose (B).** Rationale: it is literally how vanilla works (Tailoring/Blacksmithing/Alchemy/Cooking/First Aid are all spellbook abilities that open their trade window), it matches the project's classic-fidelity bar, and it reuses existing machinery (`abilitiesKnownAt`, the spellbook, the action-bar slot system, the cast UI) instead of adding a bespoke tabbed panel. The craft window is one reusable component scoped by `professionId`. `K` is the vanilla Skills tab.
 
-- **FR-8.1 Profession ability.** Learning a profession grants a **profession ability** (shown in the spellbook, draggable to the action bar). Using it **opens that profession's craft window** (it does not "cast"). Implemented via the learned-abilities path (`abilitiesKnownAt`/`refreshKnownAbilities`) so it rides the existing spellbook + hotbar systems. Gathering professions: Mining's ability opens the smelting window; pure-gather skills with no craft (e.g. Fishing) may have no window (gather is in-world).
+- **FR-8.1 Profession in the spellbook + Skills pane.** Each learned profession surfaces two ways: a **Professions section in the spellbook** (rendered from `professionSkills`; clicking a craftable profession opens its craft window) and the **`K` Skills pane** (read-only overview, Open button on craftable professions). Using a profession **opens its craft window** (it does not "cast"). Pure-gather skills with no craft (e.g. Fishing) list read-only (gather is in-world). *Future option:* grant a real draggable **profession ability** via the learned-abilities path (`abilitiesKnownAt`/`refreshKnownAbilities`) so First Aid can sit on the action bar and open the window from a hotkey, as in vanilla; PR 1 ships the spellbook-section + Skills-pane approach, which is simpler and reuses no ability-slot machinery.
 - **FR-8.2 Craft window** (one reusable component, parameterized by `professionId`): lists the profession's **available** recipes (skill ≥ requiredSkill) with **difficulty-color** swatches (orange/yellow/green/grey), reagent requirements with have/need counts from inventory, and a **Craft** button (disabled when reagents are short). For Mining it also offers **Smelt** and **Mass Smelt**.
 - **FR-8.3** Craft button calls `world.craft(recipeId)`; the channel shows via the existing cast-bar UI.
 - **FR-8.4 `K` — Skills pane** (read-only overview; vanilla Skills tab). Lists every known skill **grouped by category**: **"Professions"** (`kind:'primary'`) and **"Secondary Skills"** (`kind:'secondary'`, e.g. First Aid). Each row is a **progress bar measured against the current tier cap**, i.e. `skill / tierCap(prof, learnedTier)` — so **50/50 Apprentice reads full**, and after training Journeyman the same skill reads **50/100 (half)**. Each row shows `current/cap` text and an **Open** button that opens that profession's craft window. Bound to `K` (vanilla's skills key; also used as the all-skills overview).
@@ -297,9 +297,9 @@ LEARN (trainer)                CRAFT (recipe)                       GATHER (node
 | **2 — Craft engine + skill-up** | General `craft()` cast (reuse fishing model), `completeCraft` (consume→produce), `rollSkillUp` with difficulty coloring; IWorld/`cmd`/server `case 'craft'` | Medium | M |
 | **3 — First Aid content + bandage channel + tiers** | First Aid `ProfessionDef` (2 tiers) + bandage recipes incl. one above skill 50; bandage `ItemUse` + `startBandage` channel + HoT aura + "Recently Bandaged" debuff; trainers (`NpcDef.trains`, gossip option, `learnProfession(profId, tier)`); Journeyman gate at skill 40 + tier-cap clamp | Medium | M |
 | **4 — Professions UI** | Window bound to a key; profession/skill/recipe rendering with difficulty colors + have/need reagents; Craft button; skill-up FCT + sound; i18n; char-sheet surfacing | Medium | M–L |
-| **5 — Gather framework (no live nodes)** | `GroundObjectDef.gatherSkill`, gather-cast path in `interact`, yield + skill-up + respawn; unit-tested with a fixture node | Low–Med | S–M |
+| **5 — Gather framework (PR 2)** | `GroundObjectDef.gatherSkill`, gather-cast path in `interact`, yield + skill-up + respawn; unit-tested with a fixture node. **PR 1 stubs only the `gatherSkill` type field**; the rest lands with PR 2's first gathering profession. | Low–Med | S–M |
 
-**Recommendation:** Phases 0→4 deliver the full vertical (cloth → craft a bandage → channel it → skill up → see it in the window). Phase 5 lands the gather rails so the first gathering profession is pure content.
+**Recommendation:** Phases 0→4 are PR 1 and deliver the full vertical (cloth → craft a bandage → channel it → skill up → see it in the window). Phase 5 (the gather rails) moves to PR 2, where it ships alongside the first gathering profession that needs it.
 
 ---
 
@@ -312,7 +312,7 @@ LEARN (trainer)                CRAFT (recipe)                       GATHER (node
 - First Aid: learn from trainer sets skill 1; bandage channel applies HoT; HoT heals per tick; channel cancels on damage/move; "Recently Bandaged" blocks re-bandage; bandage **craft** grants skill, **use** does not.
 - Tiers: skill clamps at 50 without Journeyman; learning Journeyman is rejected below skill 40 and accepted at ≥ 40; after Journeyman, skill climbs to 100; a recipe with `requiredSkill > 50` is unusable until Journeyman is learned.
 - Persistence: `professionSkills` round-trips through `serializeCharacter`/`addPlayer`; old save without the field loads as `{}`.
-- Gather framework: node with `gatherSkill` starts a cast; completion yields items + skill-up + respawn; skill gate rejects under-skilled gather.
+- Gather framework (PR 2): node with `gatherSkill` starts a cast; completion yields items + skill-up + respawn; skill gate rejects under-skilled gather. (PR 1 verifies only that the cloth injection leaves the non-cloth-family RNG sequence unchanged.)
 
 ### 11.2 Multiplayer correctness (ClientWorld path)
 - `learnProfession`/`craft` validated server-side; client-claimed skill/materials rejected.
@@ -334,7 +334,7 @@ LEARN (trainer)                CRAFT (recipe)                       GATHER (node
 
 | Risk | Mitigation |
 |---|---|
-| Over-fitting the framework to First Aid | Generalize state (`professionSkills` map), recipe schema, and cast action from day one; build the gather path (Phase 5) to force generality |
+| Over-fitting the framework to First Aid | Generalize state (`professionSkills` map), recipe schema, and cast action from day one; keep the `RecipeDef` station/batch fields and the `gatherSkill` type stub as forward-compat seams. PR 2 building the gather path on these seams is the real generality test. |
 | Reagent dupe/loss on cancelled craft | Consume reagents only in `completeCraft`, never on start; unit-test cancel paths |
 | Cloth drop breaks RNG determinism | Inject after the loop with a fixed two-call sequence gated on humanoid family; determinism test |
 | Bandage channel exploits (heal while taking damage) | Cancel channel on damage/move like fishing; "Recently Bandaged" debuff; HoT applied only on completion |
@@ -353,8 +353,8 @@ LEARN (trainer)                CRAFT (recipe)                       GATHER (node
 - **Skill-up trigger:** First Aid skills up on bandage **craft**, not on use (classic-side). (§6.5)
 - **"Recently Bandaged" timing:** applied at **cast start**, so interrupting the channel can't dodge the cooldown. (§6.6)
 - **Recipe access:** recipes are **learned from the trainer**, not auto-unlocked by skill; the starter recipe is taught free on learning the profession. (§6.10)
-- **Learning costs:** tiers **50/500** (secondary) and **150/1500** (primary); recipe cost **round(skill² × 0.1)** secondary / **× 0.2** primary (min 5c). Calibrated against the live economy. (§6.10)
-- **UI direction:** vanilla **profession-as-ability** opens the craft window; **`K`** opens a read-only Skills pane (grouped Professions / Secondary Skills, bars vs current tier cap). (§6.8)
+- **Learning costs:** tiers **50/1500** (secondary) and **150/4500** (primary); recipe cost **round(skill² × 0.3)** secondary / **× 0.6** primary (min 5c). Apprentice stays cheap; Journeyman and recipes ramp hard (post-entry costs tripled from an earlier pass). Calibrated against the live economy. (§6.10, FR-10.1)
+- **UI direction:** a **spellbook Professions section** opens the craft window; **`K`** opens a read-only Skills pane (grouped Professions / Secondary Skills, bars vs current tier cap). Draggable action-bar ability deferred (FR-8.1). (§6.8)
 - **Bandage use-level gates:** require character level **1/3/6/8/10/12** by tier. (§17.1a)
 
 ### Open — for the owner / reviewers
@@ -375,8 +375,8 @@ LEARN (trainer)                CRAFT (recipe)                       GATHER (node
 - First Aid is learnable by any character from a trainer, bandages craft from cloth, the bandage channel heals over time and breaks on damage/move, and "Recently Bandaged" blocks spam.
 - Skill caps at **100** (level 20 × 5); **Apprentice** caps skill at 50 and **Journeyman** (trainable only at skill ≥ 40) raises the cap to 100; `skillUp` clamps to the learned tier and a recipe above 50 is reachable only after Journeyman.
 - The professions window renders known professions, skill levels, recipes with difficulty colors and have/need reagents, and crafts via a server-authoritative command; skill-ups show as FCT + sound.
-- The gather framework (skill-gated cast, yield, skill-up, respawn) is built and unit-tested, ready for a future gathering profession.
-- All profession logic is server-authoritative; all UI strings are i18n-registered; `npm run build && npm test` pass.
+- The gather framework (skill-gated cast, yield, skill-up, respawn) is **specified** for PR 2; PR 1 ships only the `gatherSkill` type stub on `GroundObjectDef` (no `interact()` gather path, no gather nodes).
+- All profession logic is server-authoritative; new UI strings route through `t()` (`game.professions.*`); `npm run build && npm test` pass.
 
 ---
 
@@ -533,7 +533,7 @@ These generalize §6.4's gather framework to cover all three gathering professio
 The roster ships as **three PRs**, each leaving `npm run build && npm test` green and independently reviewable and mergeable. **PR 1 is this submission.** PRs 2 and 3 are scoped below but **not yet built** — they depend on PR 1's framework merging first, and are then largely content authoring on its rails.
 
 ### PR 1 — Foundation: framework + cloth + First Aid + crafting & economy  ← **this PR**
-Shipped and green (`npm run build && npm test`): `professionSkills` + `professionTiers` + `learnedRecipes` state + persistence; `professions.ts` registry (`RecipeDef`/`ProfessionDef`/`ProfessionTier`) + load validation + cost/tier constants; `'reagent'` item kind, `stackSize`, `requiredLevel`; `skillUp`/`professionLearned`/`recipeLearned` events; level-banded cloth drops + tiered scrap consolation in `rollLoot`; general `craft()` cast → `completeCraft` → `rollSkillUp` with difficulty coloring; First Aid content (2 tiers, six-bandage ladder) + bandage channel HoT + "Recently Bandaged" at cast start; trainers (`NpcDef.trains`, gossip "Train" view, `learnProfession(profId, tier)` + `learnRecipe(recipeId)` with primary-slot/Journeyman/level/cost gates); **trainer-taught recipes + learning costs** (§6.10); bandage tooltips; IWorld/`cmd`/server dispatch + delta snapshot; **UI per §6.8 (B)** — profession-as-ability opens the craft window + `K` Skills pane. **Tests:** `tests/professions.test.ts` (registry, cloth banding/determinism, craft + skill-up loop, tiers, costs + recipe learning, First Aid bandage + debuff + interrupt, persistence, primary-slot cap) + snapshot/keybind coverage.
+Shipped and green (`npm run build && npm test`): `professionSkills` + `professionTiers` + `learnedRecipes` state + persistence; `professions.ts` registry (`RecipeDef`/`ProfessionDef`/`ProfessionTier`) + load validation + cost/tier constants; `'reagent'` item kind, `stackSize`, `requiredLevel`; `skillUp`/`professionLearned`/`recipeLearned` events; level-banded cloth drops + tiered scrap consolation in `rollLoot`; general `craft()` cast → `completeCraft` → `rollSkillUp` with difficulty coloring; First Aid content (2 tiers, six-bandage ladder) + bandage channel HoT + "Recently Bandaged" at cast start; trainers (`NpcDef.trains`, gossip "Train" view, `learnProfession(profId, tier)` + `learnRecipe(recipeId)` with primary-slot/Journeyman/level/cost gates); **trainer-taught recipes + learning costs** (§6.10); bandage tooltips; IWorld/`cmd`/server dispatch + delta snapshot; **UI per §6.8 (B)** — a spellbook Professions section opens the craft window, plus the `K` Skills pane (see FR-8.1). **Tests:** `tests/professions.test.ts` (registry, cloth banding/determinism, craft + skill-up loop, tiers, costs + recipe learning, First Aid bandage + debuff + interrupt, persistence, primary-slot cap) + snapshot/keybind coverage.
 
 ### PR 2 — Gathering + secondary skills (Mining, Herbalism, Skinning, Fishing, Cooking) + nodes
 Generalize the gather framework (§19): ore/herb `GroundObjectDef` nodes + `startGather` cast + node render sparkle; corpse `startSkin` for Skinning (`skinnable`/`skinReq`); re-home Fishing under the framework (skill-up + tiers); Cooking (raw→cooked via the craft loop, `cookfire` station, "Well Fed" buff). Add gathering/secondary `ProfessionDef`s + trainers + node placements in zone `*_OBJECTS` + material items (ore/herbs/leather/meat). Smelting (Mining craft at a `forge`, incl. Mass Smelt). **Tests:** node gather gate + yield + respawn, skinning gate, fishing skill-up, cooking transform, station range.
