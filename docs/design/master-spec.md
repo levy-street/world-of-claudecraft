@@ -53,6 +53,8 @@ Lore beats: the ledger reveals Sexton Marrow was the chapel's living caretaker �
 
 Elite multipliers (2.3× hp, 1.5× dmg, 2× XP) applied by the sim — values below are pre-elite bases.
 
+> Note: the per-mob `linen_scrap` loot entries below are superseded by the professions system. Cloth and cloth scrap now drop from a shared, level-banded table keyed on mob family (humanoid/murloc/kobold), not from individual mob loot lists; see `docs/prd/professions-and-crafting.md`. These rows are kept as historical reference.
+
 | id | name | family | lvl | flags | hpBase/perLvl | dmgBase/perLvl | atkSpd | notes / loot highlights |
 |---|---|---|---|---|---|---|---|---|
 | mire_prowler | Mire Prowler | beast | 7–8 | — | 46/19 | 7/2.1 | 2.0 | copper 30; mire_prowler_pelt 0.6 (q_prowler_pelts); soggy_moccasin 0.3 |
