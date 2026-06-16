@@ -2218,9 +2218,12 @@ async function switchWallet(): Promise<void> {
 function wireWallet(): void {
   const btn = document.getElementById('btn-wallet');
   if (!btn) return;
-  btn.addEventListener('click', () => { void onWalletButtonClick(); });
-  document.getElementById('btn-wallet-switch')?.addEventListener('click', () => { void switchWallet(); });
-  document.getElementById('btn-wallet-signout')?.addEventListener('click', () => { void signOutWallet(); });
+  // These async actions are fire-and-forget from the click, so attach a .catch:
+  // an AppKit open/disconnect rejection must surface, not vanish silently.
+  const onErr = (what: string) => (e: unknown) => console.error(`[wallet] ${what} failed`, e);
+  btn.addEventListener('click', () => { onWalletButtonClick().catch(onErr('action')); });
+  document.getElementById('btn-wallet-switch')?.addEventListener('click', () => { switchWallet().catch(onErr('switch')); });
+  document.getElementById('btn-wallet-signout')?.addEventListener('click', () => { signOutWallet().catch(onErr('sign out')); });
   onWalletChange((state) => {
     if (state.address) void refreshWocBalance(state.address);
     else connectedWocBalance = null;
