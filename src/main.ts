@@ -10,6 +10,7 @@ import { music } from './game/music';
 import { handlePickedEntity, hoverCursorKind } from './game/interactions';
 import { clickMoveShouldCancel, clickMoveStep, stepAngleToward } from './game/click_move';
 import { Api, ClientWorld, CharacterSummary } from './net/online';
+import { initWallet, openWalletModal, signMessageBase58, currentWallet, onWalletChange, walletConfigured, fetchWocBalance } from './net/wallet';
 import type { IWorld, LeaderboardEntry } from './world_api';
 import { formatXp } from './ui/xp_bar';
 import { assetsReady } from './render/assets/preload';
@@ -2078,10 +2079,144 @@ async function loadHighscores(): Promise<void> {
   host.innerHTML = head + body;
 }
 
+// ── Non-custodial Solana wallet linking (Reown) ─────────────────────────────
+// The header button connects a wallet (AppKit) and, once the player is logged
+// in, binds it to their account by signing a server-issued challenge. Wallet
+// connection persists in the browser (AppKit/localStorage); the account↔wallet
+// link is the durable, server-verified artifact.
+let linkedWalletPubkey: string | null = null;
+let connectedWocBalance: number | null = null;
+
+const shortenAddress = (a: string): string => `${a.slice(0, 4)}…${a.slice(-4)}`;
+const formatWoc = (n: number): string => n.toLocaleString(undefined, { maximumFractionDigits: 2 });
+
+function updateWalletButton(): void {
+  const btn = document.getElementById('btn-wallet');
+  const label = document.getElementById('wallet-label');
+  if (!btn || !label) return;
+  const { address, isConnected } = currentWallet();
+  btn.classList.remove('is-connected', 'is-linked');
+  if (!isConnected || !address) {
+    label.textContent = 'Connect Wallet';
+    btn.title = 'Connect your Solana wallet';
+    return;
+  }
+  // $WOC balance sits to the left of the address once it has loaded.
+  const balance = connectedWocBalance !== null ? `${formatWoc(connectedWocBalance)} $WOC · ` : '';
+  const short = shortenAddress(address);
+  if (linkedWalletPubkey && linkedWalletPubkey === address) {
+    btn.classList.add('is-linked');
+    label.textContent = `${balance}${short} ✓`;
+    btn.title = 'Wallet linked to your account — click to manage';
+  } else if (api.token) {
+    btn.classList.add('is-connected');
+    label.textContent = `${balance}${short}`;
+    btn.title = 'Click to sign and link this wallet to your account';
+  } else {
+    btn.classList.add('is-connected');
+    label.textContent = `${balance}${short}`;
+    btn.title = 'Connected — log in to link this wallet to your account';
+  }
+}
+
+// Read the connected wallet's $WOC balance and re-render. Ignores a stale
+// response if the connected wallet changed while the RPC call was in flight.
+async function refreshWocBalance(address: string): Promise<void> {
+  connectedWocBalance = null;
+  updateWalletButton();
+  const balance = await fetchWocBalance(address);
+  if (currentWallet().address === address) {
+    connectedWocBalance = balance;
+    updateWalletButton();
+  }
+}
+
+function flashWalletError(message: string): void {
+  const btn = document.getElementById('btn-wallet');
+  const label = document.getElementById('wallet-label');
+  if (!btn || !label) return;
+  const previous = label.textContent;
+  label.textContent = message;
+  btn.title = message;
+  window.setTimeout(() => {
+    if (label.textContent === message) label.textContent = previous;
+    updateWalletButton();
+  }, 4000);
+}
+
+// Refreshed after login: ask the server which wallet (if any) this account has
+// linked, so the button can show the verified ✓ state.
+async function refreshWalletLinkStatus(): Promise<void> {
+  if (!api.token) {
+    linkedWalletPubkey = null;
+    updateWalletButton();
+    return;
+  }
+  try {
+    const wallet = await api.linkedWallet();
+    linkedWalletPubkey = wallet?.pubkey ?? null;
+  } catch (err) {
+    console.error('[wallet] could not load link status', err);
+    linkedWalletPubkey = null;
+  }
+  updateWalletButton();
+}
+
+// challenge → sign → link, with a verified mirror written server-side.
+async function runWalletLink(address: string): Promise<void> {
+  const btn = document.getElementById('btn-wallet');
+  btn?.classList.add('busy');
+  try {
+    const { message, nonce } = await api.walletLinkChallenge(address);
+    const signature = await signMessageBase58(message);
+    const result = await api.linkWallet(address, signature, nonce);
+    linkedWalletPubkey = result.pubkey;
+    updateWalletButton();
+  } catch (err: any) {
+    console.error('[wallet] link failed', err);
+    flashWalletError(err?.message ? `Link failed: ${err.message}`.slice(0, 48) : 'Link failed');
+  } finally {
+    btn?.classList.remove('busy');
+  }
+}
+
+async function onWalletButtonClick(): Promise<void> {
+  const { address, isConnected } = currentWallet();
+  if (!isConnected || !address) {
+    await openWalletModal(); // connect
+    return;
+  }
+  if (linkedWalletPubkey === address) {
+    await openWalletModal(); // already linked → manage / disconnect
+    return;
+  }
+  if (api.token) {
+    await runWalletLink(address); // connected + logged in + unlinked → sign-to-link
+    return;
+  }
+  await openWalletModal(); // connected but logged out → manage; link happens after login
+}
+
+function wireWallet(): void {
+  const btn = document.getElementById('btn-wallet');
+  if (!btn) return;
+  btn.addEventListener('click', () => { void onWalletButtonClick(); });
+  onWalletChange((state) => {
+    if (state.address) void refreshWocBalance(state.address);
+    else connectedWocBalance = null;
+    updateWalletButton();
+  });
+  // With a real project id, init eagerly so a persisted connection shows on
+  // load; otherwise stay lazy (first click) to avoid relay noise in dev.
+  if (walletConfigured()) initWallet();
+  updateWalletButton();
+}
+
 function wireStartScreens(): void {
   // Initial page translation and stats load
   translatePage();
   void loadProjectStats();
+  wireWallet();
 
   // mode select
   const onlineBtn = $('#btn-online');
@@ -2281,6 +2416,9 @@ function wireStartScreens(): void {
     // so don't reset the widget or let the user re-submit the (now duplicate) auth.
     try {
       $('#charselect-user').textContent = api.username ?? '';
+      // bind-on-login: surface the account's linked wallet (and flip a
+      // connected-but-unlinked button into a "Link" call-to-action).
+      void refreshWalletLinkStatus();
       await enterRealmFlow();
     } catch (err) {
       loginError(userFacingApiError(err));

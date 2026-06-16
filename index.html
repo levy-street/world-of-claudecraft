@@ -1461,6 +1461,64 @@
   }
   .donate-cta svg { width: 16px; height: 16px; display: block; }
 
+  /* Connect-wallet CTA — outlined gold to sit beside (not compete with) the
+     filled Donate button. Turns blue when a wallet is connected and green once
+     the wallet is verified-linked to the account. */
+  .wallet-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--gold-dim);
+    background: rgba(11, 11, 18, 0.55);
+    color: var(--gold);
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: border-color var(--transition-speed) var(--transition-ease),
+                box-shadow var(--transition-speed) var(--transition-ease),
+                color var(--transition-speed) var(--transition-ease);
+  }
+  .wallet-cta:hover,
+  .wallet-cta:focus-visible {
+    border-color: var(--gold);
+    box-shadow: 0 0 12px var(--color-primary-glow);
+    outline: none;
+  }
+  .wallet-cta svg { width: 16px; height: 16px; display: block; }
+  .wallet-cta.is-connected { color: var(--color-text-light); border-color: var(--color-mana); }
+  .wallet-cta.is-linked { color: var(--color-text-success); border-color: var(--color-text-success); }
+  .wallet-cta.is-connected #wallet-label,
+  .wallet-cta.is-linked #wallet-label {
+    font-family: 'SFMono-Regular', ui-monospace, 'Courier New', monospace;
+    font-size: 12px;
+    letter-spacing: 0;
+  }
+  .wallet-cta.busy { opacity: 0.6; pointer-events: none; }
+
+  /* Wallet row inside the (logged-in) character-select panel — the account
+     context where linking actually belongs. */
+  .cs-wallet {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(199, 148, 26, 0.18);
+  }
+  .cs-wallet-label {
+    font-family: var(--font-heading);
+    color: var(--gold-dim);
+    font-size: 13px;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+  }
+
   /* Footer donate link keeps the social-link shape but warms up on hover. */
   .footer-lang-row { display: flex; justify-content: center; }
   .social-link.donate:hover,
@@ -4625,6 +4683,13 @@
           <h2 class="auth-title"><span data-i18n="auth.characters">Characters:</span> <span id="charselect-user" class="gold"></span></h2>
           <div class="cs-realm" id="charselect-realm"></div>
           <button type="button" class="btn btn-secondary btn-small" id="btn-change-realm" data-i18n="auth.changeRealm">Change Realm</button>
+          <div class="cs-wallet">
+            <span class="cs-wallet-label">$WOC Wallet</span>
+            <button type="button" class="wallet-cta" id="btn-wallet" title="Link your Solana wallet" aria-label="Connect your Solana wallet">
+              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h13a1 1 0 0 1 1 1v2"></path><path d="M3 7v10a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-3"></path><path d="M21 11h-4a2 2 0 0 0 0 4h4a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1Z"></path></svg>
+              <span id="wallet-label">Connect Wallet</span>
+            </button>
+          </div>
           <div class="mobile-char-tabs" role="tablist" data-i18n-aria="a11y.characterActions" aria-label="Character actions">
             <button type="button" class="mobile-char-tab active" data-char-tab="characters" role="tab" aria-selected="true" data-i18n="character.tabCharacters">Characters</button>
             <button type="button" class="mobile-char-tab" data-char-tab="create" role="tab" aria-selected="false" data-i18n="character.tabCreate">Create</button>
