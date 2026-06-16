@@ -10,7 +10,9 @@ import { music } from './game/music';
 import { handlePickedEntity, hoverCursorKind } from './game/interactions';
 import { clickMoveShouldCancel, clickMoveStep, stepAngleToward } from './game/click_move';
 import { Api, ClientWorld, CharacterSummary } from './net/online';
-import { initWallet, openWalletModal, signMessageBase58, currentWallet, onWalletChange, walletConfigured, fetchWocBalance, disconnectWallet } from './net/wallet';
+// The wallet module (Reown AppKit + @solana/web3.js, ~1MB) is loaded lazily via
+// dynamic import() in the wallet controller below, so it stays out of the main
+// entry chunk and only loads when the feature is enabled + used.
 import type { IWorld, LeaderboardEntry } from './world_api';
 import { formatXp } from './ui/xp_bar';
 import { assetsReady } from './render/assets/preload';
@@ -2087,6 +2089,17 @@ async function loadHighscores(): Promise<void> {
 let linkedWalletPubkey: string | null = null;
 let connectedWocBalance: number | null = null;
 
+// Feature flag: the wallet UI is shown only when a Reown project id is set.
+// Read straight from env here (no module load) so an unconfigured deploy never
+// shows a dead button and never downloads the wallet chunk.
+const WALLET_ENABLED = String(import.meta.env.VITE_REOWN_PROJECT_ID ?? '').trim().length > 0;
+
+// Lazily load the heavy wallet module the first time it's needed, then cache it.
+let walletMod: typeof import('./net/wallet') | null = null;
+function loadWallet(): Promise<typeof import('./net/wallet')> {
+  return walletMod ? Promise.resolve(walletMod) : import('./net/wallet').then((m) => (walletMod = m));
+}
+
 const shortenAddress = (a: string): string => `${a.slice(0, 4)}…${a.slice(-4)}`;
 const formatWoc = (n: number): string => n.toLocaleString(undefined, { maximumFractionDigits: 2 });
 
@@ -2094,7 +2107,8 @@ function updateWalletButton(): void {
   const btn = document.getElementById('btn-wallet');
   const label = document.getElementById('wallet-label');
   if (!btn || !label) return;
-  const { address, isConnected } = currentWallet();
+  // currentWallet is sync; before the module loads, treat as disconnected.
+  const { address, isConnected } = walletMod ? walletMod.currentWallet() : { address: null, isConnected: false };
   const connected = isConnected && !!address;
   // Switch / Sign out are only meaningful once a wallet is connected.
   const switchBtn = document.getElementById('btn-wallet-switch');
@@ -2130,8 +2144,9 @@ function updateWalletButton(): void {
 async function refreshWocBalance(address: string): Promise<void> {
   connectedWocBalance = null;
   updateWalletButton();
-  const balance = await fetchWocBalance(address);
-  if (currentWallet().address === address) {
+  const wallet = await loadWallet();
+  const balance = await wallet.fetchWocBalance(address);
+  if (wallet.currentWallet().address === address) {
     connectedWocBalance = balance;
     updateWalletButton();
   }
@@ -2173,8 +2188,9 @@ async function runWalletLink(address: string): Promise<void> {
   const btn = document.getElementById('btn-wallet');
   btn?.classList.add('busy');
   try {
+    const wallet = await loadWallet();
     const { message, nonce } = await api.walletLinkChallenge(address);
-    const signature = await signMessageBase58(message);
+    const signature = await wallet.signMessageBase58(message);
     const result = await api.linkWallet(address, signature, nonce);
     linkedWalletPubkey = result.pubkey;
     updateWalletButton();
@@ -2187,51 +2203,63 @@ async function runWalletLink(address: string): Promise<void> {
 }
 
 async function onWalletButtonClick(): Promise<void> {
-  const { address, isConnected } = currentWallet();
+  const wallet = await loadWallet();
+  const { address, isConnected } = wallet.currentWallet();
   if (!isConnected || !address) {
-    await openWalletModal(); // connect
+    await wallet.openWalletModal(); // connect
     return;
   }
   if (linkedWalletPubkey === address) {
-    await openWalletModal(); // already linked → manage / disconnect
+    await wallet.openWalletModal(); // already linked → manage / disconnect
     return;
   }
   if (api.token) {
     await runWalletLink(address); // connected + logged in + unlinked → sign-to-link
     return;
   }
-  await openWalletModal(); // connected but logged out → manage; link happens after login
+  await wallet.openWalletModal(); // connected but logged out → manage; link happens after login
 }
 
 // Sign out: disconnect the wallet connection. The account↔wallet link persists
 // server-side, so reconnecting the same wallet re-shows the ✓ linked state.
 async function signOutWallet(): Promise<void> {
-  await disconnectWallet();
+  const wallet = await loadWallet();
+  await wallet.disconnectWallet();
 }
 
 // Switch: disconnect, then reopen the picker to connect a different wallet.
 async function switchWallet(): Promise<void> {
-  await disconnectWallet();
-  await openWalletModal();
+  const wallet = await loadWallet();
+  await wallet.disconnectWallet();
+  await wallet.openWalletModal();
 }
 
 function wireWallet(): void {
   const btn = document.getElementById('btn-wallet');
   if (!btn) return;
+  // Feature-gate: with no project id configured, remove the wallet row entirely
+  // (no dead button) and never download the wallet chunk.
+  if (!WALLET_ENABLED) {
+    document.querySelector('.cs-wallet')?.remove();
+    return;
+  }
   // These async actions are fire-and-forget from the click, so attach a .catch:
   // an AppKit open/disconnect rejection must surface, not vanish silently.
   const onErr = (what: string) => (e: unknown) => console.error(`[wallet] ${what} failed`, e);
   btn.addEventListener('click', () => { onWalletButtonClick().catch(onErr('action')); });
   document.getElementById('btn-wallet-switch')?.addEventListener('click', () => { switchWallet().catch(onErr('switch')); });
   document.getElementById('btn-wallet-signout')?.addEventListener('click', () => { signOutWallet().catch(onErr('sign out')); });
-  onWalletChange((state) => {
-    if (state.address) void refreshWocBalance(state.address);
-    else connectedWocBalance = null;
+  // Load the wallet chunk (separate async bundle), then subscribe to changes and
+  // init so a persisted connection is reflected on the character screen.
+  loadWallet().then((wallet) => {
+    wallet.onWalletChange((state) => {
+      if (state.address) void refreshWocBalance(state.address);
+      else connectedWocBalance = null;
+      updateWalletButton();
+    });
+    wallet.initWallet();
     updateWalletButton();
-  });
-  // With a real project id, init eagerly so a persisted connection shows on
-  // load; otherwise stay lazy (first click) to avoid relay noise in dev.
-  if (walletConfigured()) initWallet();
+  }).catch((e) => console.error('[wallet] load failed', e));
   updateWalletButton();
 }
 
