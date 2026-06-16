@@ -693,6 +693,7 @@ export class GameServer {
       case 'castSlot': sim.castAbilityBySlot(msg.slot | 0, pid); break;
       case 'cast': if (typeof msg.ability === 'string') sim.castAbility(msg.ability, pid); break;
       case 'target': sim.targetEntity(typeof msg.id === 'number' ? msg.id : null, pid); break;
+      case 'pet': if (msg.action === 'attack' || msg.action === 'follow' || msg.action === 'stay') sim.petCommand(msg.action, pid); break;
       case 'tab': sim.tabTarget(pid); break;
       case 'targetNearest': sim.targetNearestEnemy(pid); break;
       case 'attack': sim.startAutoAttack(pid); break;

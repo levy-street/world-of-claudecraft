@@ -177,6 +177,7 @@ export interface IWorld {
   castAbility(abilityId: string): void;
   castAbilityBySlot(slot: number): void;
   targetEntity(id: number | null): void;
+  petCommand(cmd: 'attack' | 'follow' | 'stay'): void;
   tabTarget(): void;
   startAutoAttack(): void;
   stopAutoAttack(): void;

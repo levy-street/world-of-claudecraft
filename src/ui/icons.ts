@@ -961,6 +961,11 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   hammer_of_justice: r('holy', 'gold', ['mace'], ['arcs']),
   lay_on_hands: r('holy', 'holyGold', [{ p: 'sunburst', ...BIG }, 'hand'], ['sparkle', 'glow']),
   // hunter
+  pet_attack: r('fury', 'blood', ['claw_slash'], ['motion']),
+  pet_follow: r('leather', 'bone', ['paw']),
+  pet_stay: r('steel', 'steel', ['hand']),
+  revive_pet: r('holy', 'holyGold', ['paw'], ['glow', 'sparkle']),
+  mend_pet: r('nature', 'leafGreen', ['heart', { p: 'paw', ...BR }], ['sparkle']),
   raptor_strike: r('earth', 'blood', ['claw_slash']),
   aspect_of_the_hawk: r('storm', 'sky', ['wing'], ['glow']),
   serpent_sting: r('nature', 'venom', ['fang'], ['drips']),

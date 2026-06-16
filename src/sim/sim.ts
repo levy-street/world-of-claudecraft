@@ -130,6 +130,8 @@ const PET_FOLLOW_DISTANCE = 3.5;
 const PET_TELEPORT_DISTANCE = 60; // owner this far away: pet warps to heel
 const PET_ASSIST_RANGE = 50; // how far the pet scans for enemies engaging the pair
 const PET_GROWL_INTERVAL = 8; // controlled pets can tank by forcing attention
+const PET_REGEN_INTERVAL_TICKS = 20; // out-of-combat pet HP regen cadence (1s at 20 Hz)
+const PET_REGEN_FRACTION = 0.06; // ...heals ~6% of max HP per tick: a few seconds to full
 const FRIENDLY_NPC_REJECTED_AURA_KINDS: ReadonlySet<AuraKind> = new Set([
   'dot', 'slow', 'stun', 'root', 'incapacitate', 'polymorph', 'attackspeed', 'sunder',
 ]);
@@ -2124,6 +2126,24 @@ export class Sim {
           this.releasePetToWild(pet);
           break;
         }
+        case 'revivePet': {
+          this.revivePet(p);
+          break;
+        }
+        case 'mendPet': {
+          const pet = this.petOf(p.id);
+          if (!pet) { this.error(p.id, 'You have no pet.'); break; }
+          const ticks = Math.max(1, Math.round(eff.duration / eff.interval));
+          this.applyAura(pet, {
+            id: 'mend_pet', name: 'Mend Pet', kind: 'hot',
+            remaining: eff.duration, duration: eff.duration,
+            value: Math.max(1, Math.round(eff.total / ticks)),
+            tickInterval: eff.interval, tickTimer: eff.interval,
+            sourceId: p.id, school: 'nature',
+          });
+          this.emit({ type: 'log', text: `You mend ${pet.name}.`, color: '#6f6', pid: p.id });
+          break;
+        }
       }
       if (target?.dead) target = null;
     }
@@ -2236,6 +2256,76 @@ export class Sim {
     return null;
   }
 
+  /** A player's dead-but-revivable pet (kept by handleDeath, not released wild). */
+  deadPetOf(ownerPid: number): Entity | null {
+    for (const e of this.entities.values()) {
+      if (e.kind === 'mob' && e.ownerId === ownerPid && e.dead) return e;
+    }
+    return null;
+  }
+
+  // Pet command bar: Attack the owner's current target, Follow (recall to heel),
+  // or Stay (hold position). Networked like any other player command.
+  petCommand(cmd: 'attack' | 'follow' | 'stay', pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    const owner = r.e;
+    const pet = this.petOf(owner.id);
+    if (!pet) { this.error(owner.id, 'You have no pet.'); return; }
+    switch (cmd) {
+      case 'attack': {
+        const t = owner.targetId !== null ? this.entities.get(owner.targetId) : null;
+        if (!t || t.dead || t.kind !== 'mob' || !t.hostile || t.ownerId !== null) {
+          this.error(owner.id, 'You have no attackable target.');
+          return;
+        }
+        pet.petStay = false;
+        pet.petCommandTarget = t.id;
+        pet.aggroTargetId = t.id;
+        this.emit({ type: 'log', text: `${pet.name} attacks ${t.name}.`, color: '#8f8', pid: owner.id });
+        break;
+      }
+      case 'follow': {
+        pet.petStay = false;
+        pet.petCommandTarget = null;
+        pet.aggroTargetId = null;
+        pet.inCombat = false;
+        this.emit({ type: 'log', text: `${pet.name} follows you.`, color: '#9cf', pid: owner.id });
+        break;
+      }
+      case 'stay': {
+        pet.petStay = true;
+        pet.petCommandTarget = null;
+        this.emit({ type: 'log', text: `${pet.name} stays.`, color: '#9cf', pid: owner.id });
+        break;
+      }
+    }
+  }
+
+  /** Revive Pet (hunter, learned at 10): bring your dead pet back at your side. */
+  private revivePet(owner: Entity): void {
+    const pet = this.deadPetOf(owner.id);
+    if (!pet) { this.error(owner.id, 'You have no pet to revive.'); return; }
+    this.clearNonPlayerStatAuras(pet);
+    pet.auras = [];
+    pet.dead = false;
+    pet.aiState = 'idle';
+    pet.hp = Math.max(1, Math.round(pet.maxHp * 0.5)); // revived at half health
+    pet.inCombat = false;
+    pet.aggroTargetId = null;
+    pet.petStay = false;
+    pet.petCommandTarget = null;
+    pet.petTauntTimer = 0;
+    pet.corpseTimer = 0;
+    pet.respawnTimer = 0;
+    clearThreat(pet);
+    pet.pos = { ...owner.pos }; // returns to your side
+    pet.prevPos = { ...pet.pos };
+    this.rebucket(pet);
+    this.emit({ type: 'log', text: `${pet.name} is revived.`, color: '#6f6', pid: owner.id });
+    this.emit({ type: 'aura', targetId: pet.id, name: 'Revived', gained: true });
+  }
+
   private tameError(p: Entity, target: Entity): string | null {
     if (target.kind !== 'mob' || !target.hostile) return 'You cannot tame that.';
     const template = MOBS[target.templateId];
@@ -2250,7 +2340,11 @@ export class Sim {
   private completeTame(p: Entity, target: Entity): void {
     const err = this.tameError(p, target);
     if (err) { this.error(p.id, err); return; }
+    const oldDead = this.deadPetOf(p.id);
+    if (oldDead) this.releasePetToWild(oldDead); // abandon a dead pet to tame a new one
     target.ownerId = p.id;
+    target.petStay = false;
+    target.petCommandTarget = null;
     target.petTauntTimer = 0;
     target.hostile = false;
     target.aiState = 'idle';
@@ -2618,8 +2712,12 @@ export class Sim {
       e.aggroTargetId = null;
       clearThreat(e);
       if (e.ownerId !== null) {
-        this.emit({ type: 'log', text: `${e.name} dies.`, color: '#f66', pid: e.ownerId });
-        return; // pets drop no loot and grant no credit; they respawn wild
+        // the pet stays yours in death (a revivable corpse), not released to the wild
+        e.petStay = false;
+        e.petCommandTarget = null;
+        e.inCombat = false;
+        this.emit({ type: 'log', text: `${e.name} has died. Use Revive Pet to bring it back.`, color: '#f66', pid: e.ownerId });
+        return; // pets drop no loot and grant no credit
       }
 
       // credit goes to the tapping player (fall back to the killer)
@@ -2945,6 +3043,13 @@ export class Sim {
 
   private updateMob(mob: Entity): void {
     if (mob.dead) {
+      // a slain tamed pet stays YOURS (a revivable corpse) and does not respawn wild.
+      // If its owner has gone, let it decay like any other mob.
+      if (mob.ownerId !== null) {
+        const owner = this.entities.get(mob.ownerId);
+        if (!owner || owner.kind !== 'player' || !this.players.has(owner.id)) this.releasePetToWild(mob);
+        return;
+      }
       mob.corpseTimer -= DT;
       mob.respawnTimer -= DT;
       // dungeon mobs stay dead until the instance resets
@@ -3153,23 +3258,32 @@ export class Sim {
   private updatePet(pet: Entity): void {
     const owner = pet.ownerId !== null ? this.entities.get(pet.ownerId) : null;
     if (!owner || owner.kind !== 'player' || !this.players.has(owner.id)) {
-      this.releasePetToWild(pet);
+      if (!pet.dead) this.releasePetToWild(pet);
       return;
     }
+    if (pet.dead) return; // a dead pet waits for Revive Pet (handleDeath keeps it yours)
     if (this.isStunned(pet)) return;
     pet.petTauntTimer = Math.max(0, pet.petTauntTimer - DT);
 
     let target = pet.aggroTargetId !== null ? this.entities.get(pet.aggroTargetId) ?? null : null;
     if (target && (target.dead || target.kind !== 'mob' || !target.hostile)) target = null;
     if (target && dist2d(owner.pos, pet.pos) > PET_LEASH) target = null;
-    if (!target && !owner.dead) target = this.petPickTarget(pet, owner);
+    if (!target && !owner.dead) target = this.petAcquireTarget(pet, owner);
     pet.aggroTargetId = target?.id ?? null;
     pet.inCombat = target !== null;
+
+    // out-of-combat HP regen: a pet recovers quickly at your side (vanilla feel)
+    if (!pet.inCombat && pet.hp < pet.maxHp && this.tickCount % PET_REGEN_INTERVAL_TICKS === 0) {
+      const heal = Math.min(pet.maxHp - pet.hp, Math.max(2, Math.round(pet.maxHp * PET_REGEN_FRACTION)));
+      pet.hp += heal;
+      this.emit({ type: 'heal', targetId: pet.id, amount: heal });
+    }
 
     if (target) {
       const d = dist2d(pet.pos, target.pos);
       if (d > MELEE_RANGE * 0.8) {
-        if (!this.isRooted(pet)) this.moveToward(pet, target.pos, pet.moveSpeed * this.moveSpeedMult(pet));
+        // on Stay the pet holds its ground instead of chasing out of melee
+        if (!pet.petStay && !this.isRooted(pet)) this.moveToward(pet, target.pos, pet.moveSpeed * this.moveSpeedMult(pet));
         pet.swingTimer = Math.max(0, pet.swingTimer - DT);
       } else {
         pet.facing = angleTo(pet.pos, target.pos);
@@ -3186,8 +3300,9 @@ export class Sim {
       return;
     }
 
-    // heel
+    // no target: Stay holds position, otherwise heel to the owner
     pet.swingTimer = Math.max(0, pet.swingTimer - DT);
+    if (pet.petStay) return;
     const d = dist2d(pet.pos, owner.pos);
     if (d > PET_TELEPORT_DISTANCE) {
       pet.pos = { ...owner.pos };
@@ -3201,14 +3316,26 @@ export class Sim {
     }
   }
 
-  private petPickTarget(pet: Entity, owner: Entity): Entity | null {
+  // Pet target selection. An explicit Attack order (petCommandTarget) wins and
+  // sticks until that mob dies. Otherwise the pet defends the pair: it assists
+  // whatever you're attacking and whatever attacks you or it. On Stay it only
+  // defends itself (it won't run off to assist).
+  private petAcquireTarget(pet: Entity, owner: Entity): Entity | null {
+    if (pet.petCommandTarget !== null) {
+      const t = this.entities.get(pet.petCommandTarget);
+      if (t && !t.dead && t.kind === 'mob' && t.hostile && t.ownerId === null && dist2d(owner.pos, t.pos) <= PET_LEASH) {
+        return t;
+      }
+      pet.petCommandTarget = null; // order done or no longer valid
+    }
     let best: Entity | null = null;
     let bestD = PET_ASSIST_RANGE;
     for (const m of this.entities.values()) {
       if (m.kind !== 'mob' || m.dead || !m.hostile || m.ownerId !== null) continue;
-      const engagingUs = m.aggroTargetId === owner.id || m.aggroTargetId === pet.id;
-      const ownerOffense = owner.targetId === m.id && (owner.autoAttack || m.threat.has(owner.id));
-      if (!engagingUs && !ownerOffense) continue;
+      const attackingPet = m.aggroTargetId === pet.id; // it pulled aggro: always defend
+      const defendPair = !pet.petStay && (m.aggroTargetId === owner.id
+        || (owner.targetId === m.id && (owner.autoAttack || m.threat.has(owner.id))));
+      if (!attackingPet && !defendPair) continue;
       const d = dist2d(pet.pos, m.pos);
       if (d < bestD) { best = m; bestD = d; }
     }

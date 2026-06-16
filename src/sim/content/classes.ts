@@ -101,7 +101,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     startWeapon: 'rusty_hatchet',
     startChest: 'footpad_jerkin',
     ranged: { min: 5, max: 9, speed: 2.3, maxRange: 35, minRange: 8 },
-    abilities: ['raptor_strike', 'aspect_of_the_hawk', 'serpent_sting', 'arcane_shot', 'concussive_shot', 'mongoose_bite', 'wing_clip', 'aspect_of_the_cheetah', 'aimed_shot', 'rapid_fire', 'tame_beast', 'dismiss_pet'],
+    abilities: ['raptor_strike', 'aspect_of_the_hawk', 'serpent_sting', 'arcane_shot', 'concussive_shot', 'mongoose_bite', 'wing_clip', 'aspect_of_the_cheetah', 'aimed_shot', 'rapid_fire', 'tame_beast', 'dismiss_pet', 'revive_pet', 'mend_pet'],
     color: 0xabd473,
   },
   priest: {
@@ -658,6 +658,23 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'dismissPet' }],
     description: 'Releases your pet back to the wild.',
+  },
+  revive_pet: {
+    id: 'revive_pet', name: 'Revive Pet', class: 'hunter', learnLevel: 10,
+    cost: 40, castTime: 3, cooldown: 0, range: 0, school: 'nature',
+    requiresTarget: false,
+    effects: [{ type: 'revivePet' }],
+    description: 'Returns your dead pet to life at your side with half its health. You must have a fallen pet to revive.',
+  },
+  mend_pet: {
+    id: 'mend_pet', name: 'Mend Pet', class: 'hunter', learnLevel: 12,
+    cost: 30, castTime: 0, cooldown: 0, range: 0, school: 'nature',
+    requiresTarget: false,
+    effects: [{ type: 'mendPet', total: 50, duration: 5, interval: 1 }],
+    ranks: [
+      { rank: 2, level: 18, cost: 50, effects: [{ type: 'mendPet', total: 90, duration: 5, interval: 1 }] },
+    ],
+    description: 'Heals your pet for $d health over 5 sec.',
   },
   raptor_strike: {
     id: 'raptor_strike', name: 'Raptor Strike', class: 'hunter', learnLevel: 1,

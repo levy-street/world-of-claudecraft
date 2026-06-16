@@ -499,6 +499,75 @@ export class Hud {
   }
 
   // Shared entry point for hotbar clicks and the 1..0-= keybinds.
+  // The pet command bar (Attack / Follow / Stay, plus Revive when the pet is down).
+  // Shown only while you own a pet. Commands flow through IWorld.petCommand.
+  private buildPetBar(): void {
+    const bar = $('#pet-bar');
+    bar.innerHTML = '';
+    const frame = document.createElement('div');
+    frame.className = 'pet-frame';
+    const name = document.createElement('div');
+    name.className = 'pet-name';
+    name.id = 'pet-name';
+    const hp = document.createElement('div');
+    hp.className = 'bar hp';
+    const fill = document.createElement('div');
+    fill.className = 'bar-fill';
+    fill.id = 'pet-hp';
+    hp.appendChild(fill);
+    frame.append(name, hp);
+    const cmds = document.createElement('div');
+    cmds.className = 'pet-cmds';
+    const defs = [
+      { cmd: 'attack', icon: 'pet_attack', title: 'Attack \u2014 send your pet at your target' },
+      { cmd: 'follow', icon: 'pet_follow', title: 'Follow \u2014 call your pet back to your side' },
+      { cmd: 'stay', icon: 'pet_stay', title: 'Stay \u2014 hold position' },
+      { cmd: 'revive', icon: 'revive_pet', title: 'Revive Pet \u2014 bring your fallen pet back' },
+    ] as const;
+    for (const d of defs) {
+      const btn = document.createElement('button');
+      btn.className = 'pet-btn' + (d.cmd === 'revive' ? ' pet-revive' : '');
+      btn.dataset.cmd = d.cmd;
+      btn.title = d.title;
+      const lab = document.createElement('span');
+      lab.className = 'icon-label';
+      lab.style.backgroundImage = `url(${iconDataUrl('ability', d.icon)})`;
+      btn.appendChild(lab);
+      btn.addEventListener('click', () => {
+        audio.click();
+        if (d.cmd === 'revive') this.sim.castAbility('revive_pet');
+        else this.sim.petCommand(d.cmd as 'attack' | 'follow' | 'stay');
+      });
+      cmds.appendChild(btn);
+    }
+    bar.append(frame, cmds);
+  }
+
+  private updatePetBar(): void {
+    const bar = $('#pet-bar');
+    const myId = this.sim.playerId;
+    let pet: Entity | null = null;
+    let deadPet: Entity | null = null;
+    for (const e of this.sim.entities.values()) {
+      if (e.kind === 'mob' && e.ownerId === myId) {
+        if (e.dead) deadPet = e;
+        else pet = e;
+      }
+    }
+    const shown = pet ?? deadPet;
+    if (!shown) { bar.style.display = 'none'; return; }
+    if (bar.children.length === 0) this.buildPetBar();
+    bar.style.display = 'flex';
+    ($('#pet-name') as HTMLElement).textContent = shown.name;
+    const pct = shown.maxHp > 0 ? Math.max(0, Math.min(1, shown.hp / shown.maxHp)) * 100 : 0;
+    ($('#pet-hp') as HTMLElement).style.width = `${pct}%`;
+    const alive = !!pet;
+    for (const b of Array.from(bar.querySelectorAll('.pet-btn')) as HTMLElement[]) {
+      const isRevive = b.dataset.cmd === 'revive';
+      b.style.display = (isRevive ? !alive : alive) ? 'block' : 'none';
+    }
+  }
+
   castSlot(barSlot: number): void {
     if (barSlot === 0) {
       if (this.sim.player.autoAttack) this.sim.stopAutoAttack();
@@ -728,6 +797,8 @@ export class Hud {
       tf.style.display = 'none';
       this.lastPortraitTarget = -999;
     }
+
+    this.updatePetBar();
 
     // cast bar
     const cb = $('#castbar');

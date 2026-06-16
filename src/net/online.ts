@@ -215,7 +215,7 @@ function blankEntity(id: number): Entity {
     chargeTargetId: null, chargeTimeLeft: 0, chargePath: [],
     sitting: false, eating: null, drinking: null,
     aiState: 'idle', tappedById: null, pulseTimer: 0, firedSummons: 0, summonedIds: [], enraged: false,
-    threat: new Map(), forcedTargetId: null, forcedTargetTimer: 0, ownerId: null, petTauntTimer: 0,
+    threat: new Map(), forcedTargetId: null, forcedTargetTimer: 0, ownerId: null, petTauntTimer: 0, petStay: false, petCommandTarget: null,
     spawnPos: { x: 0, y: 0, z: 0 }, leashAnchor: null, evadeStall: 0, wanderTarget: null, wanderTimer: 0,
     aggroTargetId: null, respawnTimer: 0, corpseTimer: 0, lootable: false, loot: null,
     xpValue: 0, questIds: [], vendorItems: [], objectItemId: null, dungeonId: null,
@@ -641,6 +641,21 @@ export class ClientWorld implements IWorld {
       }
     }
     this.cmd({ cmd: 'target', id });
+  }
+
+  petCommand(cmd: 'attack' | 'follow' | 'stay'): void {
+    // optimistic local update so the bar feels responsive; the server re-resolves
+    const p = this.entities.get(this.playerId);
+    let pet: Entity | null = null;
+    for (const e of this.entities.values()) {
+      if (e.kind === 'mob' && e.ownerId === this.playerId && !e.dead) { pet = e; break; }
+    }
+    if (pet) {
+      if (cmd === 'stay') { pet.petStay = true; pet.petCommandTarget = null; }
+      else if (cmd === 'follow') { pet.petStay = false; pet.petCommandTarget = null; pet.aggroTargetId = null; }
+      else if (cmd === 'attack' && p) { pet.petStay = false; pet.petCommandTarget = p.targetId; }
+    }
+    this.cmd({ cmd: 'pet', action: cmd });
   }
   tabTarget(): void {
     this.cmd({ cmd: 'tab' });

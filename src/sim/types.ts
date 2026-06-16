@@ -196,7 +196,9 @@ export type AbilityEffect =
   | { type: 'sunder'; armor: number; maxStacks: number } // sunder armor: stacking armor debuff + flat threat
   | { type: 'taunt' } // taunt/growl: match top threat and force-attack the caster
   | { type: 'tamePet' } // hunter tame beast: the targeted mob becomes the caster's pet
-  | { type: 'dismissPet' }; // release the caster's pet back to the wild
+  | { type: 'dismissPet' } // release the caster's pet back to the wild
+  | { type: 'revivePet' } // hunter: bring a dead pet back to life at the owner
+  | { type: 'mendPet'; total: number; duration: number; interval: number }; // hunter: heal-over-time on the pet
 
 export interface AbilityRank {
   rank: number;
@@ -463,6 +465,8 @@ export interface Entity {
   forcedTargetTimer: number; // seconds left on the forced-attack window
   ownerId: number | null; // controlled pets: owning player's entity id (null = wild)
   petTauntTimer: number; // controlled pet Growl cooldown
+  petStay: boolean; // pet command: hold position instead of following the owner
+  petCommandTarget: number | null; // pet command: an explicit Attack order (mob entity id)
   pulseTimer: number; // boss aoe pulse countdown
   firedSummons: number; // summonAdds thresholds already triggered
   summonedIds: number[]; // live adds this boss summoned; despawned on reset

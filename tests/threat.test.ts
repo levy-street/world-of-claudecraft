@@ -513,10 +513,7 @@ describe('hunter pets', () => {
     expect(sim.petOf(sim.playerId)).toBe(null);
   });
 
-  it('a tamed beast that dies respawns hostile, not a grey unattackable zombie', () => {
-    // Regression: respawnMob cleared ownerId ("back to the wild") but left
-    // hostile=false, so any tamed-then-killed beast respawned permanently
-    // neutral — grey on the unit frame and rejected with "Invalid attack target".
+  it('a dead pet stays yours (revivable) and does not respawn wild; Revive Pet brings it back', () => {
     const sim = new Sim({ seed: 42, playerClass: 'hunter', respawnSeconds: 2, autoEquip: true });
     sim.setPlayerLevel(10);
     const wolf = nearestMob(sim, 'forest_wolf');
@@ -526,19 +523,79 @@ describe('hunter pets', () => {
     sim.castAbility('tame_beast');
     for (let i = 0; i < 20 * 7; i++) sim.tick(); // 6s cast
     expect(wolf.ownerId).toBe(sim.playerId);
-    expect(wolf.hostile).toBe(false); // tamed pets are neutral
 
-    // the pet falls in combat and its corpse respawns at its old camp
-    const boar = nearestMob(sim, 'wild_boar');
-    wolf.hp = 1;
-    hit(sim, boar, wolf, 9999);
-    for (let i = 0; i < 20 * 5 && !wolf.dead; i++) sim.tick();
+    // the pet falls
+    (sim as any).dealDamage(null, wolf, wolf.hp, false, 'physical', 'test', 'hit');
     expect(wolf.dead).toBe(true);
 
-    for (let i = 0; i < 20 * 10 && wolf.dead; i++) sim.tick();
+    // it stays YOURS and does NOT respawn into the wild (it waits for Revive Pet)
+    for (let i = 0; i < 20 * 10; i++) sim.tick();
+    expect(wolf.dead).toBe(true);
+    expect(wolf.ownerId).toBe(sim.playerId);
+
+    // Revive Pet brings the same pet back at your side, alive and friendly
+    sim.player.resource = sim.player.maxResource;
+    sim.castAbility('revive_pet');
+    for (let i = 0; i < 20 * 4; i++) sim.tick(); // 3s cast
     expect(wolf.dead).toBe(false);
-    expect(wolf.ownerId).toBe(null); // back to the wild
-    expect(wolf.hostile).toBe(true); // ...and attackable again
+    expect(wolf.ownerId).toBe(sim.playerId);
+    expect(wolf.hostile).toBe(false);
+    expect(wolf.hp).toBeGreaterThan(0);
+    expect(dist2d(wolf.pos, sim.player.pos)).toBeLessThan(8); // returned to your side
+  });
+
+  it('Stay holds the pet in place; Follow recalls it to your side', () => {
+    const { sim, wolf: pet } = tamedSetup();
+    teleport(sim, sim.player, sim.player.pos.x + 28, sim.player.pos.z);
+    for (let i = 0; i < 20 * 6; i++) sim.tick();
+    expect(dist2d(pet.pos, sim.player.pos)).toBeLessThan(8); // follows by default
+
+    sim.petCommand('stay');
+    const stayPos = { ...pet.pos };
+    teleport(sim, sim.player, sim.player.pos.x + 28, sim.player.pos.z);
+    for (let i = 0; i < 20 * 6; i++) sim.tick();
+    expect(dist2d(pet.pos, stayPos)).toBeLessThan(2); // stayed put
+    expect(dist2d(pet.pos, sim.player.pos)).toBeGreaterThan(10);
+
+    sim.petCommand('follow');
+    for (let i = 0; i < 20 * 6; i++) sim.tick();
+    expect(dist2d(pet.pos, sim.player.pos)).toBeLessThan(8); // came back
+  });
+
+  it('Attack command sends the pet at your target and it builds its own threat', () => {
+    const { sim, wolf: pet } = tamedSetup();
+    const boar = nearestMob(sim, 'wild_boar');
+    beefUp(boar);
+    teleport(sim, sim.player, boar.pos.x + 6, boar.pos.z);
+    teleport(sim, pet, sim.player.pos.x + 1, sim.player.pos.z);
+    sim.targetEntity(boar.id); // the player does NOT attack; only the pet is sent
+    sim.petCommand('attack');
+    let petThreat = 0;
+    for (let i = 0; i < 20 * 15 && petThreat === 0; i++) { sim.tick(); petThreat = boar.threat.get(pet.id) ?? 0; }
+    expect(pet.aggroTargetId).toBe(boar.id);
+    expect(petThreat).toBeGreaterThan(0);
+    expect(boar.tappedById).toBe(sim.playerId);
+  });
+
+  it('a pet heals out of combat', () => {
+    const { sim, wolf: pet } = tamedSetup();
+    sim.tick();
+    expect(pet.inCombat).toBe(false);
+    pet.hp = 1;
+    for (let i = 0; i < 20 * 8; i++) sim.tick();
+    expect(pet.hp).toBeGreaterThan(1);
+  });
+
+  it('Mend Pet applies a heal-over-time to your pet', () => {
+    const { sim, wolf: pet } = tamedSetup();
+    sim.setPlayerLevel(12); // Mend Pet unlocks at 12
+    pet.hp = Math.max(1, pet.maxHp - 60);
+    const before = pet.hp;
+    sim.player.resource = sim.player.maxResource;
+    sim.castAbility('mend_pet');
+    expect(pet.auras.some((a) => a.id === 'mend_pet')).toBe(true);
+    for (let i = 0; i < 20 * 3; i++) sim.tick();
+    expect(pet.hp).toBeGreaterThan(before);
   });
 
   it('tame validation: too-high level and elites are refused', () => {
