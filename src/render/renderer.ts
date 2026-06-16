@@ -951,13 +951,22 @@ export class Renderer {
     }
   }
 
-  // Swap the prefiltered environment map to the dominant biome's HDRI as the
-  // camera crosses zone bands (the dome cross-fades the same textures); a
-  // brief intensity dip masks the hard texture swap, then eases back like fog.
+  // Swap the prefiltered environment map once the sky blend is clearly inside
+  // the next biome. Hysteresis avoids flip-flopping near the midpoint and keeps
+  // the IBL texture upload away from the exact zone/music handoff frame.
   private updateEnvBiome(dt: number): void {
     if (this.lowGfx || this.envRTs.size < 2) return;
     const blend = this.skyView.biomeAt(this.camera.position.z);
-    const dominant = blend.t < 0.5 ? blend.from : blend.to;
+    let dominant = this.envBiome;
+    if (blend.from === blend.to) {
+      dominant = blend.from;
+    } else if (this.envBiome === blend.from) {
+      dominant = blend.t > 0.68 ? blend.to : blend.from;
+    } else if (this.envBiome === blend.to) {
+      dominant = blend.t < 0.32 ? blend.from : blend.to;
+    } else {
+      dominant = blend.t < 0.5 ? blend.from : blend.to;
+    }
     if (dominant !== this.envBiome && this.envRTs.has(dominant)) {
       this.envBiome = dominant;
       this.scene.environment = this.envRTs.get(dominant)!.texture;

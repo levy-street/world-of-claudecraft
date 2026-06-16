@@ -156,6 +156,7 @@ const DEFAULT_EMOTE_WHEEL: OverheadEmoteId[] = ['wave', 'laugh', 'question', 'ch
 
 // yards past a zone boundary before the crossing banner/welcome commits
 const ZONE_BANNER_DEADBAND = 5;
+const MUSIC_ZONE_PREWARM_DISTANCE = 140;
 const IGNORED_CHAT_NAMES_KEY = 'woc_ignored_chat_names';
 const BIND_CATEGORY_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   Movement: 'hud.keybinds.categories.movement',
@@ -1725,6 +1726,16 @@ export class Hud {
       const zone = musicZoneForLocation(
         currentZone.id, currentZone.biome, inHub, inDungeon, dungeon?.id ?? null,
       );
+      if (!inDungeon) {
+        const zoneIndex = ZONES.findIndex((z) => z.id === currentZone.id);
+        const prepareZone = (candidate: ZoneDef | undefined): void => {
+          if (!candidate) return;
+          const nearCandidateHub = Math.hypot(p.pos.x - candidate.hub.x, p.pos.z - candidate.hub.z) < candidate.hub.radius + 10;
+          music.prepare(musicZoneForLocation(candidate.id, candidate.biome, nearCandidateHub, false, null));
+        };
+        if (currentZone.zMax - p.pos.z <= MUSIC_ZONE_PREWARM_DISTANCE) prepareZone(ZONES[zoneIndex + 1]);
+        if (p.pos.z - currentZone.zMin <= MUSIC_ZONE_PREWARM_DISTANCE) prepareZone(ZONES[zoneIndex - 1]);
+      }
       music.update(zone, inCombat);
 
       this.updateQuestTracker();

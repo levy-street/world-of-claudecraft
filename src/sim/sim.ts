@@ -1572,8 +1572,9 @@ export class Sim {
           if (!p.onGround) { p.vx = 0; p.vz = 0; }
         }
       }
-      // slide along buildings, trees, crypt walls
-      const resolved = resolvePosition(this.cfg.seed, nx, nz, BODY_RADIUS);
+      // slide along buildings, fences, trees, crypt walls; low fence props can
+      // be cleared while the player is airborne.
+      const resolved = resolvePosition(this.cfg.seed, nx, nz, BODY_RADIUS, p.onGround ? -Infinity : Infinity);
       p.pos.x = resolved.x;
       p.pos.z = resolved.z;
       if (!p.onGround && (resolved.x !== nx || resolved.z !== nz)) {
@@ -3148,7 +3149,9 @@ export class Sim {
       return;
     }
     let dmg = this.rng.range(ranged.min, ranged.max) + (attacker.rangedPower / 14) * ranged.speed;
-    const crit = this.rng.chance(attacker.critChance);
+    // ranged white hits suffer the same higher-level crit suppression as melee
+    const critChance = Math.max(0.005, attacker.critChance - Math.max(0, target.level - attacker.level) * 0.002);
+    const crit = this.rng.chance(critChance);
     if (crit) dmg *= 2;
     // wand bolts are magic — armor doesn't apply; physical auto shot is mitigated
     if (!ranged.wand) dmg *= 1 - armorReduction(this.effectiveArmor(target), attacker.level);

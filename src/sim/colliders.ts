@@ -14,6 +14,8 @@ export interface CircleCollider {
   x: number;
   z: number;
   r: number;
+  /** Feet-height above which movement can pass over this collider. */
+  movementTopY?: number;
   /** Absolute world-space top used by camera occlusion; movement ignores it. */
   cameraTopY?: number;
   /**
@@ -31,6 +33,8 @@ export interface ObbCollider {
   hw: number; // half width (local x)
   hd: number; // half depth (local z)
   rot: number; // yaw, three.js rotation.y convention
+  /** Feet-height above which movement can pass over this collider. */
+  movementTopY?: number;
   /** Absolute world-space top used by camera occlusion; movement ignores it. */
   cameraTopY?: number;
   /** See {@link CircleCollider.camGhost}. */
@@ -38,6 +42,11 @@ export interface ObbCollider {
 }
 
 export type Collider = CircleCollider | ObbCollider;
+
+const FENCE_MODULE_LENGTH = 2.35;
+const FENCE_COLLIDER_THICKNESS = 0.45;
+const FENCE_MOVEMENT_HEIGHT = 0.2;
+const FENCE_CAMERA_HEIGHT = 1.25;
 
 function topY(seed: number, x: number, z: number, height: number): number {
   return groundHeight(x, z, seed) + height;
@@ -90,6 +99,29 @@ function staticWorldColliders(seed: number): Collider[] {
       const ang = (i / ruin.columns) * Math.PI * 2;
       const x = ruin.x + Math.sin(ang) * ruin.ringR, z = ruin.z + Math.cos(ang) * ruin.ringR;
       out.push({ type: 'circle', x, z, r: 0.6, cameraTopY: topY(seed, x, z, 4.3) });
+    }
+  }
+  for (const f of PROPS.fences) {
+    const len = Math.hypot(f.x2 - f.x1, f.z2 - f.z1);
+    if (len < 1e-5) continue;
+    const n = Math.max(1, Math.round(len / FENCE_MODULE_LENGTH));
+    const dirx = (f.x2 - f.x1) / len, dirz = (f.z2 - f.z1) / len;
+    const yaw = Math.atan2(-dirz, dirx); // module length runs along local +x
+    for (let i = 0; i < n; i++) {
+      const x0 = f.x1 + (f.x2 - f.x1) * (i / n), z0 = f.z1 + (f.z2 - f.z1) * (i / n);
+      const x1 = f.x1 + (f.x2 - f.x1) * ((i + 1) / n), z1 = f.z1 + (f.z2 - f.z1) * ((i + 1) / n);
+      const x = (x0 + x1) / 2, z = (z0 + z1) / 2;
+      const segmentLen = Math.hypot(x1 - x0, z1 - z0);
+      out.push({
+        type: 'obb',
+        x,
+        z,
+        hw: segmentLen / 2,
+        hd: FENCE_COLLIDER_THICKNESS / 2,
+        rot: yaw,
+        movementTopY: topY(seed, x, z, FENCE_MOVEMENT_HEIGHT),
+        cameraTopY: topY(seed, x, z, FENCE_CAMERA_HEIGHT),
+      });
     }
   }
 
@@ -166,7 +198,8 @@ function gridFor(seed: number): ColliderGrid {
 }
 
 // Push (x,z) out of one collider. Returns the corrected point, or null if clear.
-function pushOut(c: Collider, x: number, z: number, r: number): { x: number; z: number } | null {
+function pushOut(c: Collider, x: number, z: number, r: number, y = -Infinity): { x: number; z: number } | null {
+  if (c.movementTopY !== undefined && y > c.movementTopY) return null;
   if (c.type === 'circle') {
     const dx = x - c.x, dz = z - c.z;
     const min = c.r + r;
@@ -190,12 +223,12 @@ function pushOut(c: Collider, x: number, z: number, r: number): { x: number; z: 
   return { x: c.x + world.x, z: c.z + world.z };
 }
 
-function resolveAgainst(list: Collider[], x: number, z: number, r: number): { x: number; z: number } {
+function resolveAgainst(list: Collider[], x: number, z: number, r: number, y = -Infinity): { x: number; z: number } {
   let px = x, pz = z;
   for (let iter = 0; iter < 3; iter++) {
     let moved = false;
     for (const c of list) {
-      const res = pushOut(c, px, pz, r);
+      const res = pushOut(c, px, pz, r, y);
       if (res) {
         px = res.x;
         pz = res.z;
@@ -222,23 +255,23 @@ function instanceLocal(x: number, z: number): { ox: number; oz: number; interior
 
 // Resolve a movement destination against all static geometry. Movers slide
 // along obstacles. `r` is the body radius.
-export function resolvePosition(seed: number, x: number, z: number, r = 0.5): { x: number; z: number } {
+export function resolvePosition(seed: number, x: number, z: number, r = 0.5, y = -Infinity): { x: number; z: number } {
   if (isArenaPos(x)) {
     const o = arenaOriginAt(z);
-    const local = resolveAgainst(ARENA_COLLIDERS, x - o.x, z - o.z, r);
+    const local = resolveAgainst(ARENA_COLLIDERS, x - o.x, z - o.z, r, y);
     return { x: local.x + o.x, z: local.z + o.z };
   }
   if (x > DUNGEON_X_THRESHOLD) {
     const { ox, oz, interior } = instanceLocal(x, z);
     const colliders = INTERIOR_COLLIDERS[interior] ?? CRYPT_COLLIDERS;
-    const local = resolveAgainst(colliders, x - ox, z - oz, r);
+    const local = resolveAgainst(colliders, x - ox, z - oz, r, y);
     return { x: local.x + ox, z: local.z + oz };
   }
   const grid = gridFor(seed);
   const key = Math.floor(x / GRID_CELL) + ',' + Math.floor(z / GRID_CELL);
   const list = grid.cells.get(key);
   if (!list) return { x, z };
-  return resolveAgainst(list, x, z, r);
+  return resolveAgainst(list, x, z, r, y);
 }
 
 export function isBlocked(seed: number, x: number, z: number, r = 0.5): boolean {

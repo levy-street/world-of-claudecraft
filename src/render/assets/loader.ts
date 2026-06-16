@@ -9,6 +9,8 @@ import { assetUrl } from './media';
 import { assetLoadStarted, recordAssetLoad } from './stats';
 
 let gltfLoader: GLTFLoader | null = null;
+let rgbeLoader: RGBELoader | null = null;
+let textureLoader: THREE.TextureLoader | null = null;
 const gltfCache = new Map<string, Promise<GLTF>>();
 const hdrCache = new Map<string, Promise<THREE.DataTexture>>();
 const texCache = new Map<string, Promise<THREE.Texture>>();
@@ -61,6 +63,16 @@ function loader(): GLTFLoader {
   return gltfLoader;
 }
 
+function hdrLoader(): RGBELoader {
+  if (!rgbeLoader) rgbeLoader = new RGBELoader();
+  return rgbeLoader;
+}
+
+function texLoader(): THREE.TextureLoader {
+  if (!textureLoader) textureLoader = new THREE.TextureLoader();
+  return textureLoader;
+}
+
 /** Load + parse a .glb once; subsequent calls share the same parsed scene.
  *  Consumers must treat the result as immutable — clone before mutating. */
 export function loadGltf(url: string): Promise<GLTF> {
@@ -97,7 +109,7 @@ export function loadHdr(url: string): Promise<THREE.DataTexture> {
   if (!p) {
     const startedAt = assetLoadStarted();
     p = scheduleLoad(hdrQueue, () => new Promise<THREE.DataTexture>((resolve, reject) => {
-      new RGBELoader().load(resolved, (tex) => {
+      hdrLoader().load(resolved, (tex) => {
         tex.mapping = THREE.EquirectangularReflectionMapping;
         recordAssetLoad('hdr', resolved, startedAt);
         resolve(tex);
@@ -119,7 +131,7 @@ export function loadTexture(url: string, opts: { srgb?: boolean; repeat?: boolea
   if (!p) {
     const startedAt = assetLoadStarted();
     p = scheduleLoad(textureQueue, () => new Promise<THREE.Texture>((resolve, reject) => {
-      new THREE.TextureLoader().load(resolved, (tex) => {
+      texLoader().load(resolved, (tex) => {
         if (opts.srgb) tex.colorSpace = THREE.SRGBColorSpace;
         if (opts.repeat) tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
         recordAssetLoad('texture', resolved, startedAt);

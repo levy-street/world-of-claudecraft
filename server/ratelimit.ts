@@ -70,7 +70,10 @@ export function requestIp(req: http.IncomingMessage): string {
   for (let i = chain.length - 1; i >= 0; i--) {
     if (!isTrustedProxy(chain[i])) return chain[i];
   }
-  return chain[0] ?? remote;
+  // Every forwarded hop is itself trusted (or the header is absent): there is
+  // no untrusted client address to key on. Fall back to the real socket peer
+  // rather than chain[0], which is client-supplied and spoofable.
+  return remote;
 }
 
 export function rateLimited(req: http.IncomingMessage, maxPerMinute = 20): boolean {

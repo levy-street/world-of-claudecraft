@@ -58,6 +58,18 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+async function closeBrowser(browser, timeoutMs = 5000) {
+  let timedOut = false;
+  const closePromise = browser.close();
+  await Promise.race([
+    closePromise,
+    sleep(timeoutMs).then(() => { timedOut = true; }),
+  ]);
+  if (!timedOut) return;
+  browser.process()?.kill('SIGKILL');
+  await closePromise.catch(() => undefined);
+}
+
 function numberEnv(name) {
   if (process.env[name] === undefined || process.env[name] === '') return null;
   const value = Number(process.env[name]);
@@ -95,6 +107,16 @@ async function bootOffline(page, viewport) {
   }, viewport.label === 'mobile' ? 'MobilePerf' : 'DesktopPerf');
   await page.$eval('#offline-select .mini-class[data-class="warrior"]', (el) => el.click());
   await page.$eval('#btn-start-offline', (el) => el.click());
+  if (viewport.isMobile) {
+    await page.waitForFunction(
+      () => {
+        const prompt = document.querySelector('#mobile-preflight');
+        return Boolean(prompt && getComputedStyle(prompt).display !== 'none' && prompt.classList.contains('visible'));
+      },
+      { timeout: 10000 },
+    ).catch(() => undefined);
+    await page.$eval('#mobile-preflight-continue', (el) => el.click()).catch(() => undefined);
+  }
   try {
     await page.waitForFunction(
       () => Boolean(window.__game?.sim?.player && window.__game?.perf?.report),
@@ -391,7 +413,7 @@ try {
     results.push(await runViewport(browser, viewport));
   }
 } finally {
-  await browser.close();
+  await closeBrowser(browser);
 }
 
 const artifact = {

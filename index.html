@@ -70,8 +70,8 @@
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 <link rel="preload" as="image" href="/loading-screen.jpg" />
-<link rel="preload" as="image" href="./ui/cursors/hand-default.png" />
-<link rel="preload" as="image" href="./ui/cursors/attack-sword.png" />
+<link rel="preload" as="image" href="/ui/cursors/hand-default.png" />
+<link rel="preload" as="image" href="/ui/cursors/attack-sword.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..700&family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet">
@@ -153,10 +153,10 @@
     --app-vw: 100vw;
     --app-vh: 100vh;
     /* Shared with src/game/cursors.ts — keep hotspots in sync. */
-    --cursor-hand: url('./ui/cursors/hand-default.png') 12 2, default;
-    --cursor-sword: url('./ui/cursors/attack-sword.png') 4 4, pointer;
-    --cursor-shield: url('./ui/cursors/friendly-shield.png') 13 30, default;
-    --cursor-grab: url('./ui/cursors/hand-grab.png') 11 16, grabbing;
+    --cursor-hand: url('/ui/cursors/hand-default.png') 12 2, default;
+    --cursor-sword: url('/ui/cursors/attack-sword.png') 4 4, pointer;
+    --cursor-shield: url('/ui/cursors/friendly-shield.png') 13 30, default;
+    --cursor-grab: url('/ui/cursors/hand-grab.png') 11 16, grabbing;
   }
   * { 
     box-sizing: border-box; 
@@ -215,6 +215,26 @@
     overflow: hidden;
     touch-action: none;
     overscroll-behavior: none;
+  }
+  html:fullscreen,
+  html:fullscreen body,
+  html:-webkit-full-screen,
+  html:-webkit-full-screen body {
+    width: 100vw;
+    height: 100vh;
+    min-width: 100vw;
+    min-height: 100vh;
+  }
+  @supports (width: 100dvw) and (height: 100dvh) {
+    html:fullscreen,
+    html:fullscreen body,
+    html:-webkit-full-screen,
+    html:-webkit-full-screen body {
+      width: 100dvw;
+      height: 100dvh;
+      min-width: 100dvw;
+      min-height: 100dvh;
+    }
   }
   #game-canvas { position: fixed; left: 0; top: 0; width: var(--app-vw); height: var(--app-vh); display: block; z-index: 0; }
   .click-move-marker {
@@ -1821,17 +1841,30 @@
 
   /* ---------- loading screen (entering the world) ---------- */
   #loading-screen {
-    position: absolute;
+    position: fixed;
     inset: 0;
+    width: 100vw;
+    height: 100vh;
+    min-width: 100vw;
+    min-height: 100vh;
+    box-sizing: border-box;
     z-index: 150;
     display: none;
-    background: #0a0d14 url('/loading-screen.jpg') center / cover no-repeat;
+    background: #0a0d14 url('/loading-screen.jpg') center / 100% 100% no-repeat;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
     padding: 6vh 0 7vh;
     opacity: 1;
     transition: opacity .35s ease;
+  }
+  @supports (width: 100dvw) and (height: 100dvh) {
+    #loading-screen {
+      width: 100dvw;
+      height: 100dvh;
+      min-width: 100dvw;
+      min-height: 100dvh;
+    }
   }
   #loading-screen.visible { display: flex; }
   #loading-screen.fade { opacity: 0; }
@@ -1851,7 +1884,14 @@
     overflow: hidden;
     box-shadow: 0 2px 14px #000c, inset 0 1px 4px #000a;
   }
-  #ls-fill { height: 100%; width: 0%; background: linear-gradient(180deg, var(--color-primary), var(--color-primary-dim)); transition: width .2s ease; }
+  #ls-fill {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(180deg, var(--color-primary), var(--color-primary-dim));
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform .2s linear;
+  }
   #ls-status { color: var(--color-text-light); font-family: var(--font-heading); font-size: 13px; text-shadow: 1px 1px 2px #000; }
 
   /* ---------- online auth / character select ---------- */

@@ -3,7 +3,7 @@ import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { buildWebSocketAuthMessage, buildWebSocketUrl } from '../src/net/online';
+import { buildWebSocketAuthMessage, buildWebSocketUrl, ClientWorld } from '../src/net/online';
 import { Sim } from '../src/sim/sim';
 import { normalizeCharName, offensiveName, offensiveUsername, validCharName, validUsername } from '../server/auth';
 import { rateLimited, requestIp, authThrottled, recordAuthFailure, clearAuthFailures, authFailureCount, resetAuthFailures, trackedIpCount, resetRateLimits } from '../server/ratelimit';
@@ -204,6 +204,14 @@ describe('rate-limit client IP selection', () => {
     // MAX_TRACKED_IPS is 10_000; allow a small margin for the just-recorded entry.
     expect(trackedIpCount()).toBeLessThanOrEqual(10_001);
   });
+
+  it('keys on the real peer when every forwarded hop is trusted', () => {
+    // chain is all private/trusted (e.g. a misconfigured proxy appending
+    // loopback): there is no untrusted client address, so we must not key on
+    // the spoofable leftmost hop.
+    const req = fakeReq({ 'x-forwarded-for': '10.0.0.5, 127.0.0.1' }, '172.18.0.1');
+    expect(requestIp(req)).toBe('172.18.0.1');
+  });
 });
 
 describe('per-account failed-login throttle (#93)', () => {
@@ -288,6 +296,30 @@ describe('per-account failed-login throttle (#93)', () => {
 
     // MAX_TRACKED_IPS is 10_000; allow a small margin for the just-recorded entry.
     expect(authFailureCount()).toBeLessThanOrEqual(10_001);
+  });
+});
+
+describe('server-rejected connections disconnect exactly once', () => {
+  // Regression: when the server sends an {t:'error'} frame and then closes the
+  // socket, the error branch must disarm ws.onclose (and stop the input timer)
+  // the way close() does. Otherwise onDisconnect fires twice — and the second
+  // call clobbers the real rejection reason with a generic "connection lost".
+  it('handles an error frame without letting onclose re-fire onDisconnect', () => {
+    const c: any = Object.create(ClientWorld.prototype);
+    c.connected = true;
+    c.sendTimer = setInterval(() => {}, 1000) as unknown as number;
+    const reasons: string[] = [];
+    c.onDisconnect = (reason: string) => reasons.push(reason);
+    // stand-in socket whose onclose would also report a (generic) reason
+    c.ws = { onclose: () => reasons.push('Connection to the server was lost.') };
+
+    (c as ClientWorld as any).onMessage(JSON.stringify({ t: 'error', error: 'rejected by server' }));
+
+    // close handler disarmed, so even if the socket now closes it cannot re-fire
+    expect(c.ws.onclose).toBe(null);
+    if (typeof c.ws.onclose === 'function') c.ws.onclose();
+    expect(reasons).toEqual(['rejected by server']);
+    expect(c.connected).toBe(false);
   });
 });
 

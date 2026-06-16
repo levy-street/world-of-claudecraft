@@ -598,6 +598,35 @@ describe('client-side delta merge', () => {
     }
   });
 
+  it('snaps the interpolation anchor on a teleport but tweens normal moves', () => {
+    const client = bareClient(1);
+    const ent = (x: number, z: number) => ({
+      id: 2, k: 'mob', tid: 'wolf', nm: 'Wolf', lv: 3,
+      x, y: 0, z, f: 0, hp: 40, mhp: 40,
+    });
+    const apply = (x: number, z: number) => (client as any).applySnapshot({ ents: [ent(x, z)] });
+
+    // first sight: anchor initialised to the spawn pose
+    apply(10, 20);
+    let e = client.entities.get(2)!;
+    expect(e.prevPos).toMatchObject({ x: 10, z: 20 });
+
+    // a normal step keeps the anchor behind the new pose so the renderer can
+    // interpolate across the gap (anchor stays at the previous server pose)
+    apply(12, 21);
+    e = client.entities.get(2)!;
+    expect(e.pos).toMatchObject({ x: 12, z: 21 });
+    expect(e.prevPos.x).not.toBe(12);
+    expect(e.prevPos.z).not.toBe(21);
+
+    // a teleport is a discontinuity: the anchor snaps to the destination so
+    // the entity does not streak across the map over the next interval
+    apply(220, 240);
+    e = client.entities.get(2)!;
+    expect(e.pos).toMatchObject({ x: 220, z: 240 });
+    expect(e.prevPos).toMatchObject({ x: 220, z: 240 });
+  });
+
   it('keeps previous structures when delta fields are omitted', () => {
     const server = new GameServer();
     const fc = fakeWs();

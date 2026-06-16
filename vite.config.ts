@@ -68,9 +68,18 @@ export default defineConfig({
         main: fileURLToPath(new URL('index.html', import.meta.url)),
         admin: fileURLToPath(new URL('admin.html', import.meta.url)),
       },
+      output: {
+        manualChunks(id) {
+          if (!id.includes('/node_modules/')) return undefined;
+          if (id.includes('/node_modules/three/')) return 'vendor-three';
+          if (id.includes('/node_modules/postprocessing/') || id.includes('/node_modules/n8ao/')) return 'vendor-rendering';
+          return 'vendor';
+        },
+      },
     },
   },
   test: {
     exclude: ['**/node_modules/**', '**/dist/**', '**/.claude/**'],
+    setupFiles: ['tests/setup.ts'],
   },
 });

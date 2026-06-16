@@ -175,7 +175,8 @@ window.addEventListener('orientationchange', () => {
   window.setTimeout(syncAppViewport, 800);
 });
 window.visualViewport?.addEventListener('resize', syncAppViewport);
-document.addEventListener('fullscreenchange', syncAppViewport);
+document.addEventListener('fullscreenchange', queueAppViewportSyncs);
+document.addEventListener('webkitfullscreenchange', queueAppViewportSyncs);
 
 function requestMobileFullscreenLandscape(): void {
   if (!isPhoneTouchDevice()) return;
@@ -270,9 +271,7 @@ function showMobilePreflightPrompt(): Promise<void> {
   mobilePreflightPromptPromise = new Promise((resolve) => {
     continueBtn.onclick = () => {
       requestMobileFullscreenLandscape();
-      syncAppViewport();
-      window.setTimeout(syncAppViewport, 250);
-      window.setTimeout(syncAppViewport, 800);
+      queueAppViewportSyncs();
       hideMobilePreflightPrompt();
       mobilePreflightPromptPromise = null;
       resolve();
@@ -302,17 +301,109 @@ function currentFullscreenElement(): Element | null {
   return document.fullscreenElement ?? doc.webkitFullscreenElement ?? null;
 }
 
-function requestBrowserFullscreen(): void {
-  if (currentFullscreenElement()) return;
+function queueAppViewportSyncs(): void {
+  syncAppViewport();
+  requestAnimationFrame(() => syncAppViewport());
+  requestAnimationFrame(() => requestAnimationFrame(() => syncAppViewport()));
+  window.setTimeout(syncAppViewport, 120);
+  window.setTimeout(syncAppViewport, 350);
+  window.setTimeout(syncAppViewport, 800);
+}
+
+type ViewportSnapshot = { width: number; height: number };
+
+function viewportSnapshot(): ViewportSnapshot {
+  return {
+    width: Math.max(1, Math.round(window.innerWidth)),
+    height: Math.max(1, Math.round(window.innerHeight)),
+  };
+}
+
+function viewportNearScreen(viewport: ViewportSnapshot): boolean {
+  const width = Math.round(window.screen?.width ?? 0);
+  const height = Math.round(window.screen?.height ?? 0);
+  if (width <= 0 || height <= 0) return false;
+  return viewport.width >= width - 8 && viewport.height >= height - 8;
+}
+
+async function waitForFullscreenElement(): Promise<boolean> {
+  if (currentFullscreenElement()) return true;
+  const startedAt = performance.now();
+  return new Promise((resolve) => {
+    const tick = (): void => {
+      if (currentFullscreenElement()) {
+        resolve(true);
+        return;
+      }
+      if (performance.now() - startedAt >= 700) {
+        resolve(false);
+        return;
+      }
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  });
+}
+
+async function waitForFullscreenViewportSettled(before: ViewportSnapshot): Promise<void> {
+  if (!currentFullscreenElement()) return;
+  const requireGrowth = !viewportNearScreen(before);
+  const startedAt = performance.now();
+  let last = viewportSnapshot();
+  let stableFrames = 0;
+
+  await new Promise<void>((resolve) => {
+    const tick = (): void => {
+      syncAppViewport();
+      if (!currentFullscreenElement()) {
+        resolve();
+        return;
+      }
+
+      const current = viewportSnapshot();
+      const grewPastWindow = current.width > before.width + 32 || current.height > before.height + 32;
+      const sizeReady = !requireGrowth || grewPastWindow || viewportNearScreen(current);
+      stableFrames = sizeReady && current.width === last.width && current.height === last.height
+        ? stableFrames + 1
+        : 0;
+      last = current;
+
+      if ((sizeReady && stableFrames >= 8) || performance.now() - startedAt >= 4500) {
+        resolve();
+        return;
+      }
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  });
+}
+
+async function settleAppViewportAfterFullscreen(): Promise<void> {
+  queueAppViewportSyncs();
+  const before = viewportSnapshot();
+  await waitForFullscreenViewportSettled(before);
+  syncAppViewport();
+}
+
+async function requestBrowserFullscreen(): Promise<void> {
+  if (currentFullscreenElement()) {
+    await settleAppViewportAfterFullscreen();
+    return;
+  }
   const root = document.documentElement as FullscreenElement;
   const request = root.requestFullscreen?.bind(root) ?? root.webkitRequestFullscreen?.bind(root);
   if (!request) return;
+  const before = viewportSnapshot();
   try {
     const result = request();
-    if (result instanceof Promise) void result.catch(() => {});
+    if (result && typeof (result as Promise<void>).catch === 'function') await (result as Promise<void>).catch(() => {});
   } catch {
     // Browsers can reject fullscreen outside a direct user gesture.
   }
+  queueAppViewportSyncs();
+  await waitForFullscreenElement();
+  await waitForFullscreenViewportSettled(before);
+  syncAppViewport();
 }
 
 function exitBrowserFullscreen(): void {
@@ -326,12 +417,12 @@ function exitBrowserFullscreen(): void {
   }
 }
 
-function requestPreferredFullscreen(): void {
+async function requestPreferredFullscreen(): Promise<void> {
   if (isPhoneTouchDevice()) {
     requestMobileFullscreenLandscape();
     return;
   }
-  if (new Settings().get('fullscreen') >= 0.5) requestBrowserFullscreen();
+  if (new Settings().get('fullscreen') >= 0.5) await requestBrowserFullscreen();
 }
 
 // ---------------------------------------------------------------------------
@@ -339,17 +430,127 @@ function requestPreferredFullscreen(): void {
 // ---------------------------------------------------------------------------
 
 const LOADING_FADE_MS = 350; // keep in sync with the #loading-screen CSS transition
+const LOADING_PROGRESS_STORAGE_KEY = 'woc_loading_ms_avg';
+const LOADING_PROGRESS_DEFAULT_MS = 4200;
+const LOADING_PROGRESS_MIN_MS = 900;
+const LOADING_PROGRESS_MAX_MS = 15000;
+const LOADING_PROGRESS_SOFT_CAP = 0.92;
 
 let loadingHideTimer: number | null = null;
+let loadingProgressFrame: number | null = null;
+let loadingProgressStartedAt = 0;
+let loadingProgressExpectedMs = LOADING_PROGRESS_DEFAULT_MS;
+let loadingProgressFloor = 0;
+let loadingProgressValue = 0;
+let loadingProgressLastFrameAt = 0;
+
+function clamp(n: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, n));
+}
+
+function loadingProgressEstimateMs(): number {
+  try {
+    const stored = window.localStorage.getItem(LOADING_PROGRESS_STORAGE_KEY);
+    const parsed = stored === null ? NaN : Number(stored);
+    if (Number.isFinite(parsed)) return clamp(parsed, LOADING_PROGRESS_MIN_MS, LOADING_PROGRESS_MAX_MS);
+  } catch {
+    // localStorage may be unavailable in private/cross-origin contexts.
+  }
+  return LOADING_PROGRESS_DEFAULT_MS;
+}
+
+function rememberLoadingProgressDuration(ms: number): void {
+  if (!Number.isFinite(ms) || ms <= 0) return;
+  const clamped = clamp(ms, LOADING_PROGRESS_MIN_MS, LOADING_PROGRESS_MAX_MS);
+  try {
+    const previous = loadingProgressEstimateMs();
+    const next = Math.round(previous * 0.65 + clamped * 0.35);
+    window.localStorage.setItem(LOADING_PROGRESS_STORAGE_KEY, String(next));
+  } catch {
+    // Best-effort UX smoothing only.
+  }
+}
+
+function setLoadingFill(progress: number, transitionMs = 200): void {
+  const fill = $('#ls-fill');
+  fill.style.transitionDuration = `${Math.max(0, Math.round(transitionMs))}ms`;
+  fill.style.transform = `scaleX(${clamp(progress, 0, 1).toFixed(3)})`;
+}
+
+function tickLoadingProgress(now: number): void {
+  if (loadingProgressStartedAt <= 0) return;
+  const elapsed = Math.max(0, now - loadingProgressStartedAt);
+  const estimated = clamp(elapsed / loadingProgressExpectedMs, 0, 1) * LOADING_PROGRESS_SOFT_CAP;
+  const target = Math.min(LOADING_PROGRESS_SOFT_CAP, Math.max(estimated, loadingProgressFloor));
+  const dt = loadingProgressLastFrameAt > 0 ? Math.max(0, now - loadingProgressLastFrameAt) : 16;
+  loadingProgressLastFrameAt = now;
+  if (target > loadingProgressValue) {
+    const stepDt = Math.min(dt, 100);
+    const maxStep = Math.max(0.002, (stepDt / loadingProgressExpectedMs) * 1.2);
+    loadingProgressValue = Math.min(target, loadingProgressValue + maxStep);
+  } else {
+    const ease = clamp(dt / 300, 0.04, 0.2);
+    loadingProgressValue += (target - loadingProgressValue) * ease;
+  }
+  setLoadingFill(loadingProgressValue);
+  loadingProgressFrame = window.requestAnimationFrame(tickLoadingProgress);
+}
+
+function startLoadingProgress(): void {
+  if (loadingProgressFrame !== null) {
+    window.cancelAnimationFrame(loadingProgressFrame);
+    loadingProgressFrame = null;
+  }
+  loadingProgressStartedAt = performance.now();
+  loadingProgressExpectedMs = loadingProgressEstimateMs();
+  loadingProgressFloor = 0;
+  loadingProgressValue = 0;
+  loadingProgressLastFrameAt = 0;
+  setLoadingFill(0, 0);
+  loadingProgressFrame = window.requestAnimationFrame(tickLoadingProgress);
+}
+
+function advanceLoadingProgress(progress: number): void {
+  loadingProgressFloor = Math.max(loadingProgressFloor, clamp(progress, 0, LOADING_PROGRESS_SOFT_CAP));
+}
+
+function coastLoadingProgressTo(progress: number): void {
+  if (loadingProgressFrame !== null) {
+    window.cancelAnimationFrame(loadingProgressFrame);
+    loadingProgressFrame = null;
+  }
+  const elapsed = loadingProgressStartedAt > 0 ? performance.now() - loadingProgressStartedAt : 0;
+  const remaining = clamp(loadingProgressExpectedMs - elapsed, 650, 1800);
+  loadingProgressFloor = Math.max(loadingProgressFloor, progress);
+  loadingProgressValue = Math.max(loadingProgressValue, progress);
+  setLoadingFill(progress, remaining);
+}
+
+function finishLoadingProgress(recordDuration: boolean): void {
+  if (loadingProgressFrame !== null) {
+    window.cancelAnimationFrame(loadingProgressFrame);
+    loadingProgressFrame = null;
+  }
+  if (recordDuration && loadingProgressStartedAt > 0) {
+    rememberLoadingProgressDuration(performance.now() - loadingProgressStartedAt);
+  }
+  loadingProgressStartedAt = 0;
+  loadingProgressFloor = 1;
+  loadingProgressValue = 1;
+  setLoadingFill(1, LOADING_FADE_MS);
+}
 
 function showLoadingScreen(statusText: string): void {
+  queueAppViewportSyncs();
   const el = $('#loading-screen');
+  const wasVisible = el.classList.contains('visible');
   if (loadingHideTimer !== null) {
     window.clearTimeout(loadingHideTimer);
     loadingHideTimer = null;
   }
   el.classList.remove('fade');
   el.classList.add('visible');
+  if (!wasVisible) startLoadingProgress();
   setLoadingStatus(statusText);
 }
 
@@ -358,13 +559,15 @@ function setLoadingStatus(text: string): void {
 }
 
 function setLoadingProgress(done: number, total: number): void {
-  $('#ls-fill').style.width = total > 0 ? `${Math.round((done / total) * 100)}%` : '0%';
+  const assetProgress = total > 0 ? clamp(done / total, 0, 1) : 0;
+  advanceLoadingProgress(0.08 + assetProgress * 0.82);
   setLoadingStatus(t('loading.worldProgress', { done, total }));
 }
 
-function hideLoadingScreen(): void {
+function hideLoadingScreen(recordDuration = true): void {
   const el = $('#loading-screen');
   if (!el.classList.contains('visible')) return;
+  finishLoadingProgress(recordDuration);
   el.classList.add('fade');
   loadingHideTimer = window.setTimeout(() => {
     el.classList.remove('visible', 'fade');
@@ -402,16 +605,14 @@ function enterLoadingState(statusText: string): void {
 }
 
 async function prepareWorldEntry(): Promise<boolean> {
-  if (hasBegunWorldEntry) return false;
+  if (!beginWorldEntry()) return false;
   if (isPhoneTouchDevice()) {
     await showMobilePreflightPrompt();
   } else {
-    requestPreferredFullscreen();
+    await requestPreferredFullscreen();
   }
-  syncAppViewport();
-  window.setTimeout(syncAppViewport, 250);
-  window.setTimeout(syncAppViewport, 800);
-  return beginWorldEntry();
+  queueAppViewportSyncs();
+  return true;
 }
 
 function mountGameUi(): void {
@@ -446,7 +647,8 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
     return;
   }
   setLoadingStatus(t('loading.enteringWorld'));
-  // Let the final status + full progress bar paint before the synchronous
+  coastLoadingProgressTo(LOADING_PROGRESS_SOFT_CAP);
+  // Let the final status + near-complete progress bar paint before the synchronous
   // Renderer/Hud build freezes the main thread for a beat.
   await nextPaint();
   mountGameUi();
@@ -601,7 +803,7 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
       case 'musicVolume': music.setVolume(v); break;
       case 'brightness': renderer.setBrightness(v); break;
       case 'renderScale': renderer.setRenderScale(v); break;
-      case 'fullscreen': v >= 0.5 ? requestPreferredFullscreen() : exitBrowserFullscreen(); break;
+      case 'fullscreen': v >= 0.5 ? void requestPreferredFullscreen() : exitBrowserFullscreen(); break;
       case 'clickToMove': if (v < 0.5) input.clearClickMove(); syncClickMoveInput(); break;
       case 'clickToMoveButton': syncClickMoveInput(); break;
       case 'touchOpacity': document.documentElement.style.setProperty('--touch-opacity', String(v)); break;
@@ -1456,7 +1658,7 @@ async function refreshCharacters(): Promise<void> {
 }
 
 function fatalOverlay(message: string): void {
-  hideLoadingScreen(); // its art would bleed through the translucent backdrop
+  hideLoadingScreen(false); // its art would bleed through the translucent backdrop
   if (document.getElementById('disconnect-overlay')) return; // first reason wins
   const el = document.createElement('div');
   el.id = 'disconnect-overlay';
@@ -1827,6 +2029,48 @@ function renderClassDetails(panelId: string, className: PlayerClass): void {
 
 const STATS_CACHE_KEY = 'woc_cached_stats';
 const STATS_CACHE_TTL_MS = 30000; // 30 seconds
+const DEV_STATS_QUERY_KEY = 'stats';
+const DEV_STATS_STORAGE_KEY = 'woc_fetch_project_stats';
+
+function safeLocalStorage(): Storage | null {
+  try {
+    const storage = globalThis.localStorage;
+    return storage
+      && typeof storage.getItem === 'function'
+      && typeof storage.setItem === 'function'
+      ? storage
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+function shouldSkipOptionalProjectStatsFetch(): boolean {
+  if (!import.meta.env.DEV || typeof location === 'undefined') return false;
+  const host = location.hostname;
+  const localFrontend = (host === 'localhost' || host === '127.0.0.1' || host === '::1') && (location.port === '5173' || location.port === '4173');
+  if (!localFrontend) return false;
+  const params = new URLSearchParams(location.search);
+  if (params.has(DEV_STATS_QUERY_KEY)) return false;
+  return safeLocalStorage()?.getItem(DEV_STATS_STORAGE_KEY) !== '1';
+}
+
+function applyProjectStatsFallback(
+  cached: { realm: string; accounts_created: number; players_online: number; timestamp: number } | null,
+  realmEl: HTMLElement,
+  accountsEl: HTMLElement,
+  playersEl: HTMLElement,
+): void {
+  if (cached) {
+    realmEl.textContent = t('realm.statsRealmOffline', { realm: cached.realm });
+    accountsEl.textContent = String(cached.accounts_created);
+    playersEl.textContent = String(cached.players_online);
+    return;
+  }
+  realmEl.textContent = t('realm.statsOffline');
+  accountsEl.textContent = '-';
+  playersEl.textContent = '-';
+}
 
 function readTranslationKey(value: string | null): TranslationKey | null {
   return value ? value as TranslationKey : null;
@@ -1938,8 +2182,9 @@ async function loadProjectStats(): Promise<void> {
 
   // 1. Try to read from localStorage first
   let cached: { realm: string; accounts_created: number; players_online: number; timestamp: number } | null = null;
-  if (typeof localStorage !== 'undefined') {
-    const raw = localStorage.getItem(STATS_CACHE_KEY);
+  const storage = safeLocalStorage();
+  if (storage) {
+    const raw = storage.getItem(STATS_CACHE_KEY);
     if (raw) {
       try {
         cached = JSON.parse(raw);
@@ -1955,6 +2200,11 @@ async function loadProjectStats(): Promise<void> {
     return;
   }
 
+  if (shouldSkipOptionalProjectStatsFetch()) {
+    applyProjectStatsFallback(cached, realmEl, accountsEl, playersEl);
+    return;
+  }
+
   // 2. Fetch fresh stats
   try {
     const data = await api.projectStats();
@@ -1964,24 +2214,14 @@ async function loadProjectStats(): Promise<void> {
     playersEl.textContent = String(data.players_online);
 
     // Save to cache with timestamp
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem(STATS_CACHE_KEY, JSON.stringify({
+    if (storage) {
+      storage.setItem(STATS_CACHE_KEY, JSON.stringify({
         ...data,
         timestamp: Date.now(),
       }));
     }
-  } catch (err) {
-    console.error('Failed to fetch project stats:', err);
-    // If API fails, fall back to cached data (even if expired)
-    if (cached) {
-      realmEl.textContent = t('realm.statsRealmOffline', { realm: cached.realm });
-      accountsEl.textContent = String(cached.accounts_created);
-      playersEl.textContent = String(cached.players_online);
-    } else {
-      realmEl.textContent = t('realm.statsOffline');
-      accountsEl.textContent = '-';
-      playersEl.textContent = '-';
-    }
+  } catch {
+    applyProjectStatsFallback(cached, realmEl, accountsEl, playersEl);
   }
 }
 

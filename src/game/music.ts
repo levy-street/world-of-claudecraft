@@ -61,6 +61,8 @@ interface Layer {
   nextIdx: number;
   loopCount: number;
   transpose: number;
+  warmUntil: number;
+  fadeUntil: number;
 }
 
 const mtof = (m: number): number => 440 * Math.pow(2, (m - 69) / 12);
@@ -491,6 +493,7 @@ function composeCombat(): Theme {
 
 const FADE_SECONDS = 2.2;
 const LOOKAHEAD = 0.6;
+const PREWARM_SECONDS = 18;
 const STORAGE_KEY = 'ev_music_on';
 
 // The combat ostinato is written from D3; transpose it onto each zone's tonal
@@ -1082,7 +1085,17 @@ export class MusicDirector {
       gain.gain.value = 0;
       gain.connect(this.master);
       gain.connect(this.reverbSend);
-      this.layers[name] = { theme, gain, target: 0, anchor: 0, nextIdx: -1, loopCount: 0, transpose: 0 };
+      this.layers[name] = {
+        theme,
+        gain,
+        target: 0,
+        anchor: 0,
+        nextIdx: -1,
+        loopCount: 0,
+        transpose: 0,
+        warmUntil: 0,
+        fadeUntil: 0,
+      };
     }
     this.timer = window.setInterval(() => this.tickScheduler(), 110);
   }
@@ -1119,6 +1132,15 @@ export class MusicDirector {
     }
   }
 
+  /** Silently schedule a likely-next theme so crossing a zone boundary does not
+   * create a burst of WebAudio nodes on the same frame as the transition. */
+  prepare(zone: MusicZone): void {
+    if (!this.ctx || zone === this.zone) return;
+    const layer = this.layers[zone];
+    if (!layer) return;
+    layer.warmUntil = Math.max(layer.warmUntil, this.ctx.currentTime + PREWARM_SECONDS);
+  }
+
   // called every frame by the HUD; cheap unless the state changed
   update(zone: MusicZone, inCombat: boolean): void {
     if (!this.ctx) return;
@@ -1135,6 +1157,7 @@ export class MusicDirector {
         // fade out faster than fade in so instance music doesn't bleed into the world
         const fade = target > 0 ? FADE_SECONDS / 3 : 0.35;
         layer.gain.gain.setTargetAtTime(target, now, fade);
+        layer.fadeUntil = now + fade * 4;
         if (target === 0) layer.nextIdx = -1;
       }
     }
@@ -1146,25 +1169,30 @@ export class MusicDirector {
     const combatTarget = inCombat ? 1 : 0;
     if (combatLayer.target !== combatTarget) {
       combatLayer.target = combatTarget;
-      combatLayer.gain.gain.setTargetAtTime(combatTarget, now, inCombat ? 0.35 : FADE_SECONDS / 3);
+      const fade = inCombat ? 0.35 : FADE_SECONDS / 3;
+      combatLayer.gain.gain.setTargetAtTime(combatTarget, now, fade);
+      combatLayer.fadeUntil = now + fade * 4;
     }
   }
 
   private tickScheduler(): void {
     const ctx = this.ctx;
     if (!ctx || !this._enabled) return;
+    const now = ctx.currentTime;
     const horizon = ctx.currentTime + LOOKAHEAD;
     for (const layer of Object.values(this.layers)) {
-      // schedule only active layers — don't keep pumping long dungeon notes
-      // while a fading-out gain node is still above zero
-      if (layer.target <= 0.001) {
+      // Schedule active layers, plus muted layers that were prewarmed because a
+      // boundary is nearby. Do not keep adding notes during the short fade-out:
+      // that avoids audible bleed while still keeping likely-next themes hot.
+      const warming = layer.warmUntil > now && now >= layer.fadeUntil;
+      if (layer.target <= 0.001 && !warming) {
         layer.nextIdx = -1;
         continue;
       }
       const spb = 60 / layer.theme.bpm;
       const loopBeats = layer.theme.bars * 4;
       if (layer.nextIdx === -1) {
-        layer.anchor = ctx.currentTime + 0.15;
+        layer.anchor = now + 0.15;
         layer.nextIdx = 0;
         layer.loopCount = 0;
       }
@@ -1172,7 +1200,7 @@ export class MusicDirector {
         const evt = layer.theme.events[layer.nextIdx];
         const when = layer.anchor + (layer.loopCount * loopBeats + evt.beat) * spb;
         if (when > horizon) break;
-        if (when >= ctx.currentTime - 0.03) {
+        if (when >= now - 0.03) {
           this.synth!.playNote(evt, when, spb, layer);
         }
         layer.nextIdx++;

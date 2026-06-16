@@ -12,6 +12,7 @@
     "test": "vitest run",
     "perf:tour": "node scripts/perf_tour.mjs",
     "feel:smoke": "node scripts/feel_smoke.mjs",
+    "smoke:mobile": "node scripts/mobile_runtime_smoke.mjs",
     "asset:budget": "node scripts/asset_budget.mjs",
     "build:env": "esbuild headless/env_server.ts --bundle --platform=node --format=cjs --outfile=dist-env/env_server.cjs",
     "env": "npm run build:env && node dist-env/env_server.cjs",

@@ -5,6 +5,7 @@ import fs from 'node:fs';
 
 import { BROWSER_PATH as EDGE } from './browser_path.mjs';
 const URL = process.env.GAME_URL ?? 'http://localhost:5173';
+const MIN_FORWARD_DISTANCE = Number(process.env.SMOKE_MIN_FORWARD_DISTANCE ?? 1.5);
 fs.mkdirSync('tmp', { recursive: true });
 
 const browser = await puppeteer.launch({
@@ -15,12 +16,13 @@ const browser = await puppeteer.launch({
 });
 const page = await browser.newPage();
 const errors = [];
+const failures = [];
 page.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
 page.on('console', (msg) => {
   if (msg.type() === 'error') errors.push('CONSOLE: ' + msg.text());
 });
 
-await page.goto(URL, { waitUntil: 'networkidle0', timeout: 30000 });
+await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 45000 });
 await page.click('#btn-offline');
 await new Promise((r) => setTimeout(r, 200));
 await page.type('#char-name', 'Adventurer');
@@ -50,7 +52,9 @@ const state1 = await page.evaluate(() => {
 });
 console.log('after running:', JSON.stringify(state1));
 const moved = Math.hypot(state1.x - state0.x, state1.z - state0.z);
-console.log('moved distance:', moved.toFixed(1), moved > 10 ? 'OK' : 'FAIL');
+const movedOk = moved >= MIN_FORWARD_DISTANCE;
+console.log('moved distance:', moved.toFixed(1), movedOk ? 'OK' : 'FAIL');
+if (!movedOk) failures.push(`forward movement too small: ${moved.toFixed(2)} < ${MIN_FORWARD_DISTANCE}`);
 
 // turn for a second, then jump
 await page.keyboard.down('a');
@@ -113,6 +117,7 @@ for (let i = 0; i < 30; i++) {
   if (s.wolfDead) { killed = true; break; }
 }
 console.log('wolf killed:', killed ? 'OK' : 'FAIL');
+if (!killed) failures.push('wolf was not killed within the combat smoke window');
 await page.screenshot({ path: 'tmp/06_killed.png' });
 
 // loot it
@@ -149,6 +154,7 @@ const accepted = await page.evaluate(async () => {
   return false;
 });
 console.log('quest accepted:', accepted ? 'OK' : 'FAIL');
+if (!accepted) failures.push('starter quest was not accepted');
 await new Promise((r) => setTimeout(r, 300));
 await page.screenshot({ path: 'tmp/09_quest_tracker.png' });
 
@@ -169,7 +175,14 @@ console.log('final:', JSON.stringify(final));
 if (errors.length) {
   console.log('\n=== PAGE ERRORS ===');
   for (const e of errors.slice(0, 20)) console.log(e);
+  failures.push(`${errors.length} browser error(s) captured`);
 } else {
   console.log('no page errors');
 }
 await browser.close();
+
+if (failures.length) {
+  console.error('\n=== SMOKE FAILURES ===');
+  for (const failure of failures) console.error(failure);
+  process.exitCode = 1;
+}
