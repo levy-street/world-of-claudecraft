@@ -101,6 +101,24 @@ for (let i = 0; i < 80; i++) {
 check('imp assists the owner (targets the wolf)', impEngaged);
 check('imp auto-firebolts: wolf HP drops while player idles', hpAtPull - wolfHp >= 1, `pull=${Math.round(hpAtPull)} -> ${Math.round(wolfHp)}`);
 check('imp heels close to the player (stands at your side)', impDist <= 5, `dist=${impDist.toFixed(1)}yd`);
+// frame a clear showcase: imp at your side, firing; camera looks down + zoomed out
+await page.evaluate((id) => {
+  const g = window.__game, sim = g.sim, p = sim.player;
+  const w = sim.entities.get(id);
+  if (w) p.facing = Math.atan2(w.pos.x - p.pos.x, w.pos.z - p.pos.z);
+  const pet = sim.petOf(p.id);
+  if (pet) { // put the imp at the player's side and a touch toward the camera (foreground)
+    const fx = Math.sin(p.facing), fz = Math.cos(p.facing);   // forward (toward wolf)
+    const sx = Math.cos(p.facing), sz = -Math.sin(p.facing);  // sideways
+    pet.pos.x = p.pos.x + sx * 2.4 - fx * 1.4;
+    pet.pos.z = p.pos.z + sz * 2.4 - fz * 1.4;
+    pet.pos.y = p.pos.y;
+    pet.prevPos = { ...pet.pos };
+  }
+  g.input.camPitch = 0.5; // 3/4 view
+  g.input.camDist = 9;    // zoom in so the imp reads clearly
+}, wolfId);
+await sleep(900);
 await page.screenshot({ path: 'tmp/wl1_imp_firebolt.png' });
 
 // ---- Summon Voidwalker at level 10 ----
@@ -177,6 +195,16 @@ for (let i = 0; i < 80 && !(taunted && vwThreat); i++) {
 }
 check('voidwalker builds its own threat', vwThreat);
 check('voidwalker taunts (Growl): wolf forced onto the pet', taunted);
+// frame a clear showcase: the voidwalker tanking the wolf, camera down + zoomed out
+await page.evaluate((ids) => {
+  const g = window.__game, sim = g.sim, p = sim.player;
+  const w = sim.entities.get(ids.wolf);
+  const pet = sim.petOf(p.id);
+  if (w) p.facing = Math.atan2(w.pos.x - p.pos.x, w.pos.z - p.pos.z);
+  g.input.camPitch = 0.5;
+  g.input.camDist = 11;
+}, { wolf: wolf2 });
+await sleep(900);
 await page.screenshot({ path: 'tmp/wl2_voidwalker_tank.png' });
 
 check('no page/console errors', errors.length === 0, errors.slice(0, 5).join(' || '));
