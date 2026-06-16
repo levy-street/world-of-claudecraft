@@ -1,5 +1,4 @@
 import * as http from 'node:http';
-import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { WebSocketServer, WebSocket } from 'ws';
 import {
@@ -23,7 +22,7 @@ import { requestIp, rateLimited, authThrottled, recordAuthFailure, clearAuthFail
 import { handleAdminApi } from './admin';
 import { GameServer } from './game';
 import { REALM, REALM_DIRECTORY, REALM_ORIGINS } from './realm';
-import { cacheControlFor, etagFor, isNotModified } from './static_cache';
+import { createStaticHandler } from './static_files';
 
 const PORT = Number(process.env.PORT ?? 8787);
 const STATIC_DIR = path.join(__dirname, '..', 'dist');
@@ -113,80 +112,7 @@ function requestMetadata(req: http.IncomingMessage): { ip: string; userAgent: st
   };
 }
 
-const MIME: Record<string, string> = {
-  '.html': 'text/html', '.js': 'application/javascript', '.css': 'text/css',
-  '.png': 'image/png', '.svg': 'image/svg+xml', '.json': 'application/json',
-  '.glb': 'model/gltf-binary', '.gltf': 'model/gltf+json', '.bin': 'application/octet-stream',
-  '.hdr': 'application/octet-stream', '.ktx2': 'image/ktx2', '.wasm': 'application/wasm',
-  '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp',
-};
-
-// The admin dashboard is reached via the admin.* subdomain (Caddy proxies it
-// to this same port) or /admin for local dev. The hostname only picks which
-// HTML shell is served — the admin API itself is gated by admin tokens.
-function isAdminRequest(req: http.IncomingMessage): boolean {
-  const host = String(req.headers.host ?? '').toLowerCase();
-  const urlPath = (req.url ?? '/').split('?')[0];
-  return host.startsWith('admin.') || urlPath === '/admin' || urlPath === '/admin/';
-}
-
-function serveStatic(req: http.IncomingMessage, res: http.ServerResponse): void {
-  const shell = isAdminRequest(req) ? 'admin.html' : 'index.html';
-  let urlPath = (req.url ?? '/').split('?')[0];
-  if (urlPath === '/wiki' || urlPath === '/wiki/' || urlPath.startsWith('/wiki/')) {
-    res.writeHead(302, { Location: WIKI_URL });
-    res.end();
-    return;
-  }
-  if (urlPath === '/' || urlPath === '/admin' || urlPath === '/admin/') urlPath = `/${shell}`;
-  // normalize once and reuse for BOTH file resolution and cache policy —
-  // otherwise /assets/../x would serve a mutable file with immutable caching
-  urlPath = path.posix.normalize(urlPath).replace(/^([.][.][/\\])+/, '');
-  const file = path.join(STATIC_DIR, urlPath);
-  const stats = file.startsWith(STATIC_DIR) && fs.existsSync(file) ? fs.statSync(file) : null;
-  if (!stats?.isFile()) {
-    // Asset paths must 404, not SPA-fall-back: a missing .glb served as index.html
-    // surfaces as a cryptic GLTFLoader parse error instead of a clear 404.
-    if (path.extname(urlPath) && path.extname(urlPath) !== '.html') {
-      res.writeHead(404, { 'Content-Type': 'text/plain' });
-      res.end('not found');
-      return;
-    }
-    // SPA fallback
-    const index = path.join(STATIC_DIR, shell);
-    if (fs.existsSync(index)) {
-      res.writeHead(200, { 'Content-Type': 'text/html', 'Cache-Control': 'no-cache' });
-      fs.createReadStream(index).pipe(res);
-    } else {
-      res.writeHead(404);
-      res.end('not found (run `npm run build` to serve the client from the game server)');
-    }
-    return;
-  }
-  const isReadMethod = req.method === 'GET' || req.method === 'HEAD';
-  const etag = etagFor(stats);
-  const validators = {
-    'Cache-Control': cacheControlFor(urlPath),
-    'ETag': etag,
-    'Last-Modified': stats.mtime.toUTCString(),
-  };
-  if (isReadMethod && isNotModified(req.headers, etag, stats.mtime)) {
-    res.writeHead(304, validators);
-    res.end();
-    return;
-  }
-  res.writeHead(200, {
-    ...validators,
-    'Content-Type': MIME[path.extname(file)] ?? 'application/octet-stream',
-    'Content-Length': stats.size,
-  });
-  if (req.method === 'HEAD') {
-    // don't read a multi-MB asset from disk just to discard the bytes
-    res.end();
-    return;
-  }
-  fs.createReadStream(file).pipe(res);
-}
+const serveStatic = createStaticHandler(STATIC_DIR, { wikiUrl: WIKI_URL });
 
 // ---------------------------------------------------------------------------
 // REST API
@@ -463,7 +389,15 @@ async function main(): Promise<void> {
     if (req.method === 'OPTIONS' && isApi) { res.writeHead(204); res.end(); return; }
     if (url.startsWith('/admin/api/')) void handleAdminApi(req, res, game);
     else if (url.startsWith('/api/')) void handleApi(req, res);
-    else serveStatic(req, res);
+    else void serveStatic(req, res).catch((err) => {
+      console.error('static file request failed:', err);
+      if (!res.headersSent) {
+        res.writeHead(500, { 'Content-Type': 'text/plain' });
+        res.end('internal server error');
+      } else {
+        res.destroy();
+      }
+    });
   });
 
   // cap frame size: the largest legitimate client message is a small JSON
