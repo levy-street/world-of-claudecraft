@@ -10,7 +10,7 @@ import { music } from './game/music';
 import { handlePickedEntity, hoverCursorKind } from './game/interactions';
 import { clickMoveShouldCancel, clickMoveStep, stepAngleToward } from './game/click_move';
 import { Api, ClientWorld, CharacterSummary } from './net/online';
-import { initWallet, openWalletModal, signMessageBase58, currentWallet, onWalletChange, walletConfigured, fetchWocBalance } from './net/wallet';
+import { initWallet, openWalletModal, signMessageBase58, currentWallet, onWalletChange, walletConfigured, fetchWocBalance, disconnectWallet } from './net/wallet';
 import type { IWorld, LeaderboardEntry } from './world_api';
 import { formatXp } from './ui/xp_bar';
 import { assetsReady } from './render/assets/preload';
@@ -2095,8 +2095,14 @@ function updateWalletButton(): void {
   const label = document.getElementById('wallet-label');
   if (!btn || !label) return;
   const { address, isConnected } = currentWallet();
+  const connected = isConnected && !!address;
+  // Switch / Sign out are only meaningful once a wallet is connected.
+  const switchBtn = document.getElementById('btn-wallet-switch');
+  const signoutBtn = document.getElementById('btn-wallet-signout');
+  if (switchBtn) switchBtn.hidden = !connected;
+  if (signoutBtn) signoutBtn.hidden = !connected;
   btn.classList.remove('is-connected', 'is-linked');
-  if (!isConnected || !address) {
+  if (!connected) {
     label.textContent = 'Connect Wallet';
     btn.title = 'Connect your Solana wallet';
     return;
@@ -2197,10 +2203,24 @@ async function onWalletButtonClick(): Promise<void> {
   await openWalletModal(); // connected but logged out → manage; link happens after login
 }
 
+// Sign out: disconnect the wallet connection. The account↔wallet link persists
+// server-side, so reconnecting the same wallet re-shows the ✓ linked state.
+async function signOutWallet(): Promise<void> {
+  await disconnectWallet();
+}
+
+// Switch: disconnect, then reopen the picker to connect a different wallet.
+async function switchWallet(): Promise<void> {
+  await disconnectWallet();
+  await openWalletModal();
+}
+
 function wireWallet(): void {
   const btn = document.getElementById('btn-wallet');
   if (!btn) return;
   btn.addEventListener('click', () => { void onWalletButtonClick(); });
+  document.getElementById('btn-wallet-switch')?.addEventListener('click', () => { void switchWallet(); });
+  document.getElementById('btn-wallet-signout')?.addEventListener('click', () => { void signOutWallet(); });
   onWalletChange((state) => {
     if (state.address) void refreshWocBalance(state.address);
     else connectedWocBalance = null;

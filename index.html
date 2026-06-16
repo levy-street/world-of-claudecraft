@@ -1518,6 +1518,31 @@
     letter-spacing: 0.4px;
     white-space: nowrap;
   }
+  .cs-wallet-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+  /* Secondary wallet controls (Switch / Sign out) — only shown when connected. */
+  .wallet-mini {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border-default);
+    background: rgba(11, 11, 18, 0.55);
+    color: var(--color-text-muted);
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color var(--transition-speed) var(--transition-ease),
+                border-color var(--transition-speed) var(--transition-ease);
+  }
+  .wallet-mini svg { width: 14px; height: 14px; display: block; }
+  .wallet-mini:hover,
+  .wallet-mini:focus-visible { color: var(--color-text-light); border-color: var(--gold-dim); outline: none; }
+  #btn-wallet-signout:hover,
+  #btn-wallet-signout:focus-visible { color: var(--color-text-error); border-color: var(--color-text-error); }
+  .wallet-mini[hidden] { display: none; }
 
   /* Footer donate link keeps the social-link shape but warms up on hover. */
   .footer-lang-row { display: flex; justify-content: center; }
@@ -4685,10 +4710,20 @@
           <button type="button" class="btn btn-secondary btn-small" id="btn-change-realm" data-i18n="auth.changeRealm">Change Realm</button>
           <div class="cs-wallet">
             <span class="cs-wallet-label">$WOC Wallet</span>
-            <button type="button" class="wallet-cta" id="btn-wallet" title="Link your Solana wallet" aria-label="Connect your Solana wallet">
-              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h13a1 1 0 0 1 1 1v2"></path><path d="M3 7v10a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-3"></path><path d="M21 11h-4a2 2 0 0 0 0 4h4a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1Z"></path></svg>
-              <span id="wallet-label">Connect Wallet</span>
-            </button>
+            <div class="cs-wallet-actions">
+              <button type="button" class="wallet-cta" id="btn-wallet" title="Link your Solana wallet" aria-label="Connect your Solana wallet">
+                <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h13a1 1 0 0 1 1 1v2"></path><path d="M3 7v10a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-3"></path><path d="M21 11h-4a2 2 0 0 0 0 4h4a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1Z"></path></svg>
+                <span id="wallet-label">Connect Wallet</span>
+              </button>
+              <button type="button" class="wallet-mini" id="btn-wallet-switch" title="Connect a different wallet" hidden>
+                <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+                <span>Switch</span>
+              </button>
+              <button type="button" class="wallet-mini" id="btn-wallet-signout" title="Disconnect this wallet" hidden>
+                <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                <span>Sign out</span>
+              </button>
+            </div>
           </div>
           <div class="mobile-char-tabs" role="tablist" data-i18n-aria="a11y.characterActions" aria-label="Character actions">
             <button type="button" class="mobile-char-tab active" data-char-tab="characters" role="tab" aria-selected="true" data-i18n="character.tabCharacters">Characters</button>
