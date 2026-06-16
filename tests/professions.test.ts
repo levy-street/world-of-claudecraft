@@ -240,6 +240,15 @@ describe('professions — First Aid bandage + debuff', () => {
     // anti-abuse: the cooldown was applied at cast start, so interrupting does NOT dodge it
     expect(sim.player.auras.some((a: any) => a.kind === 'recently_bandaged')).toBe(true);
   });
+
+  it('can start a bandage while in combat (it just breaks on damage)', () => {
+    const sim = makeSim();
+    sim.addItem('linen_bandage', 1);
+    sim.player.hp = 1;
+    sim.player.inCombat = true; // bandaging in combat is allowed; only damage/move/action interrupts it
+    sim.useItem('linen_bandage');
+    expect(sim.player.castingAbility).toBe('bandage');
+  });
 });
 
 describe('professions — trainers & tier gate', () => {

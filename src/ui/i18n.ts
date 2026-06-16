@@ -7114,6 +7114,7 @@ const ITEM_ENTITY_IDS = [
   "fang_of_korzul", "trail_hardtack", "meltwater_flask", "roast_mountain_goat", "glacier_melt", "highwatch_warblade", "craghorn_staff",
   "icevein_dirk", "highwatch_breastplate", "peakwool_robe", "stalkerhide_jerkin", "cragwalker_boots", "windguard_leggings",
   "ogre_toe_ring", "inert_storm_shard", "frayed_prayer_beads", "cracked_wyrm_scale",
+  "linen_cloth", "wool_cloth", "silk_cloth", "wool_scrap", "silk_scrap", "linen_bandage", "heavy_linen_bandage", "wool_bandage", "heavy_wool_bandage", "silk_bandage", "heavy_silk_bandage",
 ] as const;
 
 type ItemEntityId = typeof ITEM_ENTITY_IDS[number];
@@ -7160,7 +7161,8 @@ const phase8En = {
       "Wyrmcult Grand Robe", "Wyrmscale Jerkin", "Wyrmfang Greatblade", "Staff of the Gravewyrm", "Fang of Korzul", "Highwatch Trail Hardtack", "Meltwater Flask",
       "Roast Mountain Goat", "Glacier Melt", "Highwatch Warblade", "Craghorn Staff", "Icevein Dirk", "Highwatch Breastplate", "Peakwool Robe", "Stalkerhide Jerkin",
       "Cragwalker Boots", "Windguard Leggings", "Ogre Toe Ring", "Inert Storm Shard", "Frayed Prayer Beads", "Cracked Wyrm Scale",
-    ]),
+          "Linen Cloth", "Wool Cloth", "Silk Cloth", "Wool Scrap", "Silk Scrap", "Linen Bandage", "Heavy Linen Bandage", "Wool Bandage", "Heavy Wool Bandage", "Silk Bandage", "Heavy Silk Bandage",
+]),
   },
 };
 
@@ -7193,7 +7195,8 @@ const phase8 = {
         "Gran toga del Culto del Wyrm", "Jubón de escamas de wyrm", "Gran hoja Colmillo de Wyrm", "Bastón del Gravewyrm", "Colmillo de Korzul", "Galleta de viaje de Highwatch", "Frasco de agua de deshielo",
         "Cabra montesa asada", "Agua de glaciar", "Hoja de guerra de Highwatch", "Bastón de Cuernorroca", "Puñal Vena de Hielo", "Coraza de Highwatch", "Toga de lana de cumbre", "Jubón de piel de acechador",
         "Botas Caminarrocas", "Leotardos Guardavientos", "Anillo de dedo de ogro", "Fragmento de tormenta inerte", "Cuentas de oración deshilachadas", "Escama de wyrm agrietada",
-      ]),
+            "Tela de lino", "Tela de lana", "Tela de seda", "Retal de lana", "Retal de seda", "Vendaje de lino", "Vendaje de lino grueso", "Vendaje de lana", "Vendaje de lana grueso", "Vendaje de seda", "Vendaje de seda grueso",
+]),
     },
   },
   es_ES: {} as typeof phase8En,
@@ -7224,7 +7227,8 @@ const phase8 = {
         "Grande robe du Culte du Wyrm", "Pourpoint en écailles de wyrm", "Grande lame Croc-de-wyrm", "Bâton du Gravewyrm", "Croc de Korzul", "Biscuit de route de Highwatch", "Flasque d'eau de fonte",
         "Chèvre de montagne rôtie", "Fonte de glacier", "Lame de guerre de Highwatch", "Bâton de corne-roche", "Dague Veine-de-glace", "Cuirasse de Highwatch", "Robe en laine des cimes", "Pourpoint en peau de rôdeur",
         "Bottes Marchecrag", "Jambières Gardevent", "Anneau d'orteil ogre", "Éclat de tempête inerte", "Perles de prière effilochées", "Écaille de wyrm fendue",
-      ]),
+            "Étoffe de lin", "Étoffe de laine", "Étoffe de soie", "Bout de laine", "Bout de soie", "Bandage en lin", "Bandage en lin épais", "Bandage en laine", "Bandage en laine épais", "Bandage en soie", "Bandage en soie épais",
+]),
     },
   },
   fr_CA: {} as typeof phase8En,
@@ -7256,7 +7260,8 @@ const phase8 = {
         "Grande veste del Culto del Wyrm", "Giaco di scaglie di wyrm", "Spadone Zanna di Wyrm", "Bastone del Gravewyrm", "Zanna di Korzul", "Galletta da sentiero di Highwatch", "Fiasca di acqua di disgelo",
         "Capra di montagna arrosto", "Fusione glaciale", "Lama da guerra di Highwatch", "Bastone di Corno Roccioso", "Pugnale Venaghiaccio", "Corazza di Highwatch", "Veste di lana delle vette", "Giaco di pelle di predatore",
         "Stivali Camminarocce", "Gambiere Guardavento", "Anello da dito d'ogre", "Scheggia di tempesta inerte", "Grani di preghiera sfilacciati", "Scaglia di wyrm incrinata",
-      ]),
+            "Lino", "Lana", "Seta", "Ritaglio di lana", "Ritaglio di seta", "Benda di lino", "Benda di lino pesante", "Benda di lana", "Benda di lana pesante", "Benda di seta", "Benda di seta pesante",
+]),
     },
   },
   de_DE: {
@@ -7286,7 +7291,8 @@ const phase8 = {
         "Große Robe des Wyrmkults", "Wyrmschuppenwams", "Wyrmzahn-Großklinge", "Stab des Gravewyrm", "Korzuls Fangzahn", "Highwatch-Reisezwieback", "Schmelzwasserflasche",
         "Gebratene Bergziege", "Gletscherschmelze", "Highwatch-Kriegsklinge", "Felshornstab", "Eisaderdolch", "Highwatch-Brustplatte", "Gipfelwollrobe", "Pirschhauttunika",
         "Felswandererstiefel", "Windwachtgamaschen", "Ogerzehenring", "Träger Sturmsplitter", "Ausgefranste Gebetsperlen", "Gesprungene Wyrmschuppe",
-      ]),
+            "Leinenstoff", "Wollstoff", "Seidenstoff", "Wollfetzen", "Seidenfetzen", "Leinenverband", "Schwerer Leinenverband", "Wollverband", "Schwerer Wollverband", "Seidenverband", "Schwerer Seidenverband",
+]),
     },
   },
   zh_CN: {
@@ -7316,7 +7322,8 @@ const phase8 = {
         "龙教大长袍", "龙鳞皮甲", "龙牙巨刃", "墓龙法杖", "科祖尔之牙", "高望行军硬饼", "融雪水瓶",
         "烤山羊", "冰川融水", "高望战刃", "岩角法杖", "冰脉短匕", "高望胸甲", "峰羊毛长袍", "潜猎者皮甲",
         "岩行者长靴", "风卫护腿", "食人魔趾环", "惰性风暴碎片", "磨损的祈祷珠", "裂开的龙鳞",
-      ]),
+            "亚麻布", "毛布", "丝绸", "羊毛碎布", "丝绸碎布", "亚麻绷带", "厚亚麻绷带", "羊毛绷带", "厚羊毛绷带", "丝绸绷带", "厚丝绸绷带",
+]),
     },
   },
   zh_TW: {
@@ -7346,7 +7353,8 @@ const phase8 = {
         "龍教大長袍", "龍鱗皮甲", "龍牙巨刃", "墓龍法杖", "科祖爾之牙", "高望行軍硬餅", "融雪水瓶",
         "烤山羊", "冰川融水", "高望戰刃", "岩角法杖", "冰脈短匕", "高望胸甲", "峰羊毛長袍", "潛獵者皮甲",
         "岩行者長靴", "風衛護腿", "巨魔趾環", "惰性風暴碎片", "磨損的祈禱珠", "裂開的龍鱗",
-      ]),
+            "亞麻布", "羊毛布", "絲綢", "羊毛碎布", "絲綢碎布", "亞麻繃帶", "厚亞麻繃帶", "羊毛繃帶", "厚羊毛繃帶", "絲綢繃帶", "厚絲綢繃帶",
+]),
     },
   },
   ko_KR: {
@@ -7376,7 +7384,8 @@ const phase8 = {
         "고룡교단 대로브", "고룡비늘 웃옷", "고룡송곳니 대검", "무덤고룡의 지팡이", "코르줄의 송곳니", "하이워치 여정 건빵", "눈녹은 물 플라스크",
         "구운 산양", "빙하 녹은물", "하이워치 전투검", "바위뿔 지팡이", "얼음맥 더크", "하이워치 흉갑", "봉우리양모 로브", "추적자가죽 웃옷",
         "바위걸음 장화", "바람수호 다리보호구", "오우거 발가락 반지", "비활성 폭풍 파편", "해진 기도 구슬", "갈라진 고룡 비늘",
-      ]),
+            "마직물", "양모천", "비단천", "양모 조각", "비단 조각", "마직 붕대", "두꺼운 마직 붕대", "양모 붕대", "두꺼운 양모 붕대", "비단 붕대", "두꺼운 비단 붕대",
+]),
     },
   },
   ja_JP: {
@@ -7406,7 +7415,8 @@ const phase8 = {
         "ワーム教団の大ローブ", "ワーム鱗のジャーキン", "ワーム牙の大剣", "墓ワームの杖", "コルズルの牙", "ハイウォッチの旅堅パン", "雪解け水のフラスコ",
         "焼き山羊肉", "氷河の融け水", "ハイウォッチの戦刃", "岩角の杖", "氷脈のダーク", "ハイウォッチの胸当て", "峰羊毛のローブ", "追跡者革のジャーキン",
         "岩歩きのブーツ", "風守りのレギンス", "オーガの足指輪", "不活性の嵐片", "ほつれた祈りの数珠", "割れたワームの鱗",
-      ]),
+            "亜麻布", "ウール布", "絹布", "ウールの切れ端", "絹の切れ端", "亜麻の包帯", "厚手の亜麻の包帯", "ウールの包帯", "厚手のウールの包帯", "絹の包帯", "厚手の絹の包帯",
+]),
     },
   },
   pt_BR: {
@@ -7436,7 +7446,8 @@ const phase8 = {
         "Grande veste do Culto do Wyrm", "Gibão de escamas de wyrm", "Grande lâmina Presa de Wyrm", "Cajado do Gravewyrm", "Presa de Korzul", "Biscoito de trilha de Highwatch", "Frasco de água de degelo",
         "Cabra montesa assada", "Derretimento glacial", "Lâmina de guerra de Highwatch", "Cajado Chifre de Rocha", "Punhal Veiogelo", "Peitoral de Highwatch", "Veste de lã das alturas", "Gibão de pele de espreitador",
         "Botas Caminhapedra", "Perneiras Guardavento", "Anel de dedo de ogro", "Estilhaço de tempestade inerte", "Contas de oração desfiadas", "Escama de wyrm rachada",
-      ]),
+            "Tecido de Linho", "Tecido de Lã", "Tecido de Seda", "Retalho de Lã", "Retalho de Seda", "Atadura de Linho", "Atadura de Linho Pesada", "Atadura de Lã", "Atadura de Lã Pesada", "Atadura de Seda", "Atadura de Seda Pesada",
+]),
     },
   },
   ru_RU: {
@@ -7466,7 +7477,8 @@ const phase8 = {
         "Великая роба Культа Вирма", "Куртка из вирмовой чешуи", "Великий клинок Клык Вирма", "Посох Могильного Вирма", "Клык Корзула", "Походный сухарь Хайвотча", "Фляга талой воды",
         "Жареный горный козел", "Ледниковая талая вода", "Боевой клинок Хайвотча", "Посох Камнерога", "Кортик Ледяной Жилы", "Кираса Хайвотча", "Роба из горной шерсти", "Куртка из шкуры охотника",
         "Сапоги Камнехода", "Поножи Ветростража", "Кольцо на палец огра", "Инертный осколок бури", "Истрепанные молитвенные четки", "Треснувшая чешуя вирма",
-      ]),
+            "Льняная ткань", "Шерстяная ткань", "Шёлковая ткань", "Шерстяной лоскут", "Шёлковый лоскут", "Льняная повязка", "Тяжёлая льняная повязка", "Шерстяная повязка", "Тяжёлая шерстяная повязка", "Шёлковая повязка", "Тяжёлая шёлковая повязка",
+]),
     },
   },
 };
@@ -7846,7 +7858,7 @@ const phase11En = {
   },
   itemUi: {
     ...phase8.en.itemUi,
-    kind: { ...phase8.en.itemUi.kind, tool: "Tool", potion: "Potion" },
+    kind: { ...phase8.en.itemUi.kind, tool: "Tool", potion: "Potion", reagent: "Trade Good" },
     tooltip: {
       ...phase8.en.itemUi.tooltip,
       useFishing: "Use: Fish in nearby waters.",
@@ -7984,7 +7996,7 @@ const phase11 = {
     },
     itemUi: {
       ...phase8.es.itemUi,
-      kind: { ...phase8.es.itemUi.kind, tool: "Herramienta", potion: "Poción" },
+      kind: { ...phase8.es.itemUi.kind, tool: "Herramienta", potion: "Poción", reagent: "Material" },
       tooltip: {
         ...phase8.es.itemUi.tooltip,
         useFishing: "Uso: pesca en aguas cercanas.",
@@ -8120,7 +8132,7 @@ const phase11 = {
     },
     itemUi: {
       ...phase8.fr_FR.itemUi,
-      kind: { ...phase8.fr_FR.itemUi.kind, tool: "Outil", potion: "Potion" },
+      kind: { ...phase8.fr_FR.itemUi.kind, tool: "Outil", potion: "Potion", reagent: "Composant" },
       tooltip: {
         ...phase8.fr_FR.itemUi.tooltip,
         useFishing: "Utiliser : pêcher dans les eaux proches.",
@@ -8257,7 +8269,7 @@ const phase11 = {
     },
     itemUi: {
       ...phase8.it_IT.itemUi,
-      kind: { ...phase8.it_IT.itemUi.kind, tool: "Strumento", potion: "Pozione" },
+      kind: { ...phase8.it_IT.itemUi.kind, tool: "Strumento", potion: "Pozione", reagent: "Materiale" },
       tooltip: {
         ...phase8.it_IT.itemUi.tooltip,
         useFishing: "Uso: pesca nelle acque vicine.",
@@ -8392,7 +8404,7 @@ const phase11 = {
     },
     itemUi: {
       ...phase8.de_DE.itemUi,
-      kind: { ...phase8.de_DE.itemUi.kind, tool: "Werkzeug", potion: "Trank" },
+      kind: { ...phase8.de_DE.itemUi.kind, tool: "Werkzeug", potion: "Trank", reagent: "Handelsware" },
       tooltip: {
         ...phase8.de_DE.itemUi.tooltip,
         useFishing: "Benutzen: Angelt in nahen Gewässern.",
@@ -8527,7 +8539,7 @@ const phase11 = {
     },
     itemUi: {
       ...phase8.zh_CN.itemUi,
-      kind: { ...phase8.zh_CN.itemUi.kind, tool: "工具", potion: "药水" },
+      kind: { ...phase8.zh_CN.itemUi.kind, tool: "工具", potion: "药水", reagent: "材料" },
       tooltip: {
         ...phase8.zh_CN.itemUi.tooltip,
         useFishing: "使用：在附近水域钓鱼。",
@@ -8662,7 +8674,7 @@ const phase11 = {
     },
     itemUi: {
       ...phase8.zh_TW.itemUi,
-      kind: { ...phase8.zh_TW.itemUi.kind, tool: "工具", potion: "藥水" },
+      kind: { ...phase8.zh_TW.itemUi.kind, tool: "工具", potion: "藥水", reagent: "材料" },
       tooltip: {
         ...phase8.zh_TW.itemUi.tooltip,
         useFishing: "使用：在附近水域釣魚。",
@@ -8797,7 +8809,7 @@ const phase11 = {
     },
     itemUi: {
       ...phase8.ko_KR.itemUi,
-      kind: { ...phase8.ko_KR.itemUi.kind, tool: "도구", potion: "물약" },
+      kind: { ...phase8.ko_KR.itemUi.kind, tool: "도구", potion: "물약", reagent: "재료" },
       tooltip: {
         ...phase8.ko_KR.itemUi.tooltip,
         useFishing: "사용: 가까운 물가에서 낚시합니다.",
@@ -8932,7 +8944,7 @@ const phase11 = {
     },
     itemUi: {
       ...phase8.ja_JP.itemUi,
-      kind: { ...phase8.ja_JP.itemUi.kind, tool: "道具", potion: "ポーション" },
+      kind: { ...phase8.ja_JP.itemUi.kind, tool: "道具", potion: "ポーション", reagent: "素材" },
       tooltip: {
         ...phase8.ja_JP.itemUi.tooltip,
         useFishing: "使用: 近くの水辺で釣りをします。",
@@ -9067,7 +9079,7 @@ const phase11 = {
     },
     itemUi: {
       ...phase8.pt_BR.itemUi,
-      kind: { ...phase8.pt_BR.itemUi.kind, tool: "Ferramenta", potion: "Poção" },
+      kind: { ...phase8.pt_BR.itemUi.kind, tool: "Ferramenta", potion: "Poção", reagent: "Material" },
       tooltip: {
         ...phase8.pt_BR.itemUi.tooltip,
         useFishing: "Uso: pesca em águas próximas.",
@@ -9202,7 +9214,7 @@ const phase11 = {
     },
     itemUi: {
       ...phase8.ru_RU.itemUi,
-      kind: { ...phase8.ru_RU.itemUi.kind, tool: "Инструмент", potion: "Зелье" },
+      kind: { ...phase8.ru_RU.itemUi.kind, tool: "Инструмент", potion: "Зелье", reagent: "Реагент" },
       tooltip: {
         ...phase8.ru_RU.itemUi.tooltip,
         useFishing: "Использование: ловите рыбу в ближайшей воде.",
@@ -10517,6 +10529,7 @@ const gameStringsEnCA: typeof gameStrings = {
 };
 
 const gameStringsEs: typeof gameStrings = {
+  professions: gameStrings.professions,
   xp: { suffix: "EXP", maxLevel: "NIVEL MÁX.", totalXp: "EXP total", lv: "Nv", toNext: "para el siguiente" },
   progression: {
     heading: "Progreso",
@@ -10627,6 +10640,7 @@ const gameStringsEs: typeof gameStrings = {
 const gameStringsEsES: typeof gameStrings = gameStringsEs;
 
 const gameStringsFrFR: typeof gameStrings = {
+  professions: gameStrings.professions,
   xp: { suffix: "EXP", maxLevel: "NIVEAU MAX.", totalXp: "EXP totale", lv: "Niv.", toNext: "avant le suivant" },
   progression: {
     heading: "Progression",
@@ -10737,6 +10751,7 @@ const gameStringsFrFR: typeof gameStrings = {
 const gameStringsFrCA: typeof gameStrings = gameStringsFrFR;
 
 const gameStringsItIT: typeof gameStrings = {
+  professions: gameStrings.professions,
   xp: { suffix: "PE", maxLevel: "LIVELLO MAX", totalXp: "PE totali", lv: "Liv", toNext: "al prossimo" },
   progression: { heading: "Progressione", totalXp: "PE totali", virtualLevel: "Livello virtuale", prestigeRank: "Rango prestigio", milestones: "Traguardi", none: "Ancora nessuno", virtualLevelUp: "Livello virtuale" },
   leaderboard: { title: "Classifica", subtitle: "PE totali", rank: "Posizione", name: "Nome", realmCol: "Reame", level: "Liv", vlevel: "Liv.V", lifetimeXp: "PE totali", yourRank: "La tua posizione", empty: "Non ci sono ancora campioni: lascia il primo segno.", loading: "Caricamento classifica...", unranked: "Non classificato", you: "Tu", globalSubtitle: "Migliori campioni di tutti i reami", retry: "Impossibile caricare la classifica. Riprova." },
@@ -10749,6 +10764,7 @@ const gameStringsItIT: typeof gameStrings = {
 };
 
 const gameStringsDeDE: typeof gameStrings = {
+  professions: gameStrings.professions,
   xp: { suffix: "EP", maxLevel: "MAX. STUFE", totalXp: "EP gesamt", lv: "St.", toNext: "bis zur nächsten" },
   progression: { heading: "Fortschritt", totalXp: "EP gesamt", virtualLevel: "Virtuelle Stufe", prestigeRank: "Prestigerang", milestones: "Meilensteine", none: "Noch keine", virtualLevelUp: "Virtuelle Stufe" },
   leaderboard: { title: "Rangliste", subtitle: "Lebenszeit-EP", rank: "Rang", name: "Name", realmCol: "Realm", level: "St.", vlevel: "V.St.", lifetimeXp: "Lebenszeit-EP", yourRank: "Euer Rang", empty: "Noch keine Champions; setzt als Erste ein Zeichen.", loading: "Rangliste wird geladen...", unranked: "Ohne Rang", you: "Ihr", globalSubtitle: "Beste Champions aller Realms", retry: "Rangliste konnte nicht geladen werden. Versucht es erneut." },
@@ -10761,6 +10777,7 @@ const gameStringsDeDE: typeof gameStrings = {
 };
 
 const gameStringsZhCN: typeof gameStrings = {
+  professions: gameStrings.professions,
   xp: { suffix: "经验", maxLevel: "满级", totalXp: "总经验", lv: "等级", toNext: "到下一级" },
   progression: { heading: "进度", totalXp: "总经验", virtualLevel: "虚拟等级", prestigeRank: "声望阶级", milestones: "里程碑", none: "尚无", virtualLevelUp: "虚拟等级" },
   leaderboard: { title: "排行榜", subtitle: "终身经验", rank: "名次", name: "名称", realmCol: "服务器", level: "等级", vlevel: "虚等", lifetimeXp: "终身经验", yourRank: "你的排名", empty: "还没有冠军；成为第一个留下传说的人。", loading: "正在加载排名...", unranked: "未上榜", you: "你", globalSubtitle: "所有服务器的顶尖冠军", retry: "无法加载排行榜。请重试。" },
@@ -10773,6 +10790,7 @@ const gameStringsZhCN: typeof gameStrings = {
 };
 
 const gameStringsZhTW: typeof gameStrings = {
+  professions: gameStrings.professions,
   xp: { suffix: "經驗", maxLevel: "滿級", totalXp: "總經驗", lv: "等級", toNext: "到下一級" },
   progression: { heading: "進度", totalXp: "總經驗", virtualLevel: "虛擬等級", prestigeRank: "威望階級", milestones: "里程碑", none: "尚無", virtualLevelUp: "虛擬等級" },
   leaderboard: { title: "排行榜", subtitle: "終身經驗", rank: "名次", name: "名稱", realmCol: "伺服器", level: "等級", vlevel: "虛等", lifetimeXp: "終身經驗", yourRank: "你的排名", empty: "還沒有冠軍；成為第一個留下傳說的人。", loading: "正在載入排名...", unranked: "未上榜", you: "你", globalSubtitle: "所有伺服器的頂尖冠軍", retry: "無法載入排行榜。請再試一次。" },
@@ -10841,6 +10859,7 @@ const gameStringsZhTW: typeof gameStrings = {
 };
 
 const gameStringsKoKR: typeof gameStrings = {
+  professions: gameStrings.professions,
   xp: { suffix: "경험치", maxLevel: "최대 레벨", totalXp: "총 경험치", lv: "레벨", toNext: "다음까지" },
   progression: { heading: "진행도", totalXp: "총 경험치", virtualLevel: "가상 레벨", prestigeRank: "명예 등급", milestones: "이정표", none: "아직 없음", virtualLevelUp: "가상 레벨" },
   leaderboard: { title: "순위표", subtitle: "누적 경험치", rank: "순위", name: "이름", realmCol: "서버", level: "레벨", vlevel: "가상", lifetimeXp: "누적 경험치", yourRank: "내 순위", empty: "아직 영웅이 없습니다. 첫 흔적을 남겨 보세요.", loading: "순위 불러오는 중...", unranked: "순위 없음", you: "나", globalSubtitle: "모든 서버의 최고 영웅", retry: "순위표를 불러오지 못했습니다. 다시 시도하세요." },
@@ -10851,6 +10870,7 @@ const gameStringsKoKR: typeof gameStrings = {
 };
 
 const gameStringsJaJP: typeof gameStrings = {
+  professions: gameStrings.professions,
   xp: { suffix: "経験値", maxLevel: "最大レベル", totalXp: "総経験値", lv: "Lv", toNext: "次まで" },
   progression: { heading: "進行", totalXp: "総経験値", virtualLevel: "仮想レベル", prestigeRank: "威信ランク", milestones: "到達点", none: "まだなし", virtualLevelUp: "仮想レベル" },
   leaderboard: { title: "ランキング", subtitle: "累計経験値", rank: "順位", name: "名前", realmCol: "レルム", level: "Lv", vlevel: "仮Lv", lifetimeXp: "累計経験値", yourRank: "あなたの順位", empty: "まだ英雄はいません。最初の名を刻みましょう。", loading: "ランキングを読み込み中...", unranked: "順位なし", you: "あなた", globalSubtitle: "全レルムの上位英雄", retry: "ランキングを読み込めませんでした。もう一度お試しください。" },
@@ -10861,6 +10881,7 @@ const gameStringsJaJP: typeof gameStrings = {
 };
 
 const gameStringsPtBR: typeof gameStrings = {
+  professions: gameStrings.professions,
   xp: { suffix: "EXP", maxLevel: "NÍVEL MAX.", totalXp: "EXP total", lv: "Nv", toNext: "para o próximo" },
   progression: { heading: "Progressão", totalXp: "EXP total", virtualLevel: "Nível virtual", prestigeRank: "Grau de prestígio", milestones: "Marcos", none: "Nenhum ainda", virtualLevelUp: "Nível virtual" },
   leaderboard: { title: "Classificação", subtitle: "EXP vitalícia", rank: "Posição", name: "Nome", realmCol: "Reino", level: "Nv", vlevel: "Nv.V", lifetimeXp: "EXP vitalícia", yourRank: "Sua posição", empty: "Ainda não há campeões; seja o primeiro a deixar sua marca.", loading: "Carregando classificação...", unranked: "Sem ranking", you: "Você", globalSubtitle: "Maiores campeões de todos os reinos", retry: "Não foi possível carregar a classificação. Tente novamente." },
@@ -10929,6 +10950,7 @@ const gameStringsPtBR: typeof gameStrings = {
 };
 
 const gameStringsRuRU: typeof gameStrings = {
+  professions: gameStrings.professions,
   xp: { suffix: "опыт", maxLevel: "МАКС. УРОВЕНЬ", totalXp: "всего опыта", lv: "Ур.", toNext: "до следующего" },
   progression: { heading: "Прогресс", totalXp: "Всего опыта", virtualLevel: "Виртуальный уровень", prestigeRank: "Ранг престижа", milestones: "Вехи", none: "Пока нет", virtualLevelUp: "Виртуальный уровень" },
   leaderboard: { title: "Рейтинг", subtitle: "Опыт за все время", rank: "Место", name: "Имя", realmCol: "Мир", level: "Ур.", vlevel: "Вирт.", lifetimeXp: "Опыт за все время", yourRank: "Ваше место", empty: "Чемпионов пока нет; станьте первым.", loading: "Загрузка рейтинга...", unranked: "Без места", you: "Вы", globalSubtitle: "Лучшие чемпионы всех миров", retry: "Не удалось загрузить рейтинг. Попробуйте еще раз." },

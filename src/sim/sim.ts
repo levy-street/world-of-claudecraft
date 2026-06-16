@@ -351,6 +351,7 @@ export interface PlayerMeta {
 export interface AwayStatus {
   mode: 'afk' | 'dnd';
   message: string;
+}
 
 // ---------------------------------------------------------------------------
 // The World Market — a single shared, server-authoritative auction house run
@@ -443,6 +444,7 @@ interface PendingMobRespawn {
   facing: number;
   dungeonId: string | null;
   timer: number;
+}
 
 // Pure quest-state computation, shared by the sim and the network client.
 export function computeQuestState(
@@ -4894,7 +4896,8 @@ export class Sim {
 
   private startBandage(p: Entity, meta: PlayerMeta, itemId: string, use: { totalHeal: number; channelTime: number }): void {
     if (p.dead) { this.error(meta.entityId, "You can't do that while dead."); return; }
-    if (p.inCombat) { this.error(meta.entityId, "You can't bandage in combat."); return; }
+    // bandaging IS allowed in combat; the channel just breaks on damage/move/action
+    // (handled by the profession-cast interrupt), so there's no combat gate here.
     if (this.isSwimming(p)) { this.error(meta.entityId, "You can't do that while swimming."); return; }
     if (p.castingAbility || isConsuming(p)) { this.error(meta.entityId, 'You are busy.'); return; }
     // v1: self-bandage only. The cooldown debuff blocks re-application.

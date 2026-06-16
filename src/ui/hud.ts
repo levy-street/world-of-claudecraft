@@ -137,6 +137,7 @@ const ITEM_KIND_LABEL_KEYS: Record<ItemDef['kind'], TranslationKey> = {
   drink: 'itemUi.kind.drink',
   tool: 'itemUi.kind.tool',
   potion: 'itemUi.kind.potion',
+  reagent: 'itemUi.kind.reagent',
 };
 const ITEM_STAT_LABEL_KEYS: Partial<Record<keyof Stats, TranslationKey>> = {
   armor: 'itemUi.stats.armor',
