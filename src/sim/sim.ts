@@ -7180,6 +7180,17 @@ export class Sim {
     return instanceOrigin(DUNGEONS[inst.dungeonId].index, inst.slot);
   }
 
+  // The claimed instance an entity is currently standing in (same occupancy bands as
+  // updateInstances), or null if it is outdoors.
+  private instanceContaining(e: Entity): InstanceSlot | null {
+    for (const inst of this.instances) {
+      if (inst.partyKey === null) continue;
+      const o = this.instanceOriginOf(inst);
+      if (Math.abs(e.pos.x - o.x) < 120 && Math.abs(e.pos.z - o.z) < 250) return inst;
+    }
+    return null;
+  }
+
   // Walking into a dungeon door teleports you through it (no click needed).
   // Party members who walk in land in the same instance via instanceKeyFor.
   private dungeonDoorIds: number[] | null = null;
@@ -7248,6 +7259,18 @@ export class Sim {
     // that silently teleported outdoor callers to the Hollow Crypt door)
     const dungeon = dungeonAt(p.pos.x);
     if (!dungeon) return;
+    // Drop the departing player from every mob in this instance so they stop
+    // targeting someone who has left: each switches to whoever else is on its
+    // threat table, or de-aggros and returns home if no one remains (retargetMob).
+    const inst = this.instanceContaining(p);
+    if (inst) {
+      for (const id of inst.mobIds) {
+        const m = this.entities.get(id);
+        if (!m || m.dead) continue;
+        m.threat.delete(p.id);
+        if (m.aggroTargetId === p.id) this.retargetMob(m);
+      }
+    }
     p.pos = this.groundPos(dungeon.doorPos.x, dungeon.doorPos.z - 4);
     p.prevPos = { ...p.pos };
     this.rebucket(p);
