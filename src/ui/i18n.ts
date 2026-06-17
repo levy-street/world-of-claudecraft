@@ -2733,6 +2733,7 @@ const hudStringsEn = {
       target: "Target: {name}",
       noTargetEngaged: "No target engaged.",
       segmentSummary: "{label} - {duration}",
+      partyTotal: "{label} - {duration} · {total} ({dps}/s)",
       olderSegment: "Older segment",
       newerSegment: "Newer segment",
       close: "Close meters",
@@ -3034,7 +3035,7 @@ const hudStrings = {
         },
       },
       meters: {
-        damage: "Daño", healing: "Sanación", threat: "Amenaza", damageShort: "Daño", healingShort: "Sanar", current: "Actual", lastFight: "Último combate", fightIndex: "Combate -{index}", allSession: "Total (sesión)", title: "{tab} - {view}", noCombat: "Aún no hay combate registrado.", target: "Objetivo: {name}", noTargetEngaged: "No hay objetivo enfrentado.", segmentSummary: "{label} - {duration}", olderSegment: "Segmento anterior", newerSegment: "Segmento siguiente", close: "Cerrar medidores",
+        damage: "Daño", healing: "Sanación", threat: "Amenaza", damageShort: "Daño", healingShort: "Sanar", current: "Actual", lastFight: "Último combate", fightIndex: "Combate -{index}", allSession: "Total (sesión)", title: "{tab} - {view}", noCombat: "Aún no hay combate registrado.", target: "Objetivo: {name}", noTargetEngaged: "No hay objetivo enfrentado.", segmentSummary: "{label} - {duration}", partyTotal: "{label} - {duration} · {total} ({dps}/s)", olderSegment: "Segmento anterior", newerSegment: "Segmento siguiente", close: "Cerrar medidores",
       },
       chat: {
         rightClickName: "Clic derecho en {name}",
@@ -3155,7 +3156,7 @@ const hudStrings = {
         },
       },
       meters: {
-        damage: "Dégâts", healing: "Soins", threat: "Menace", damageShort: "Dég.", healingShort: "Soins", current: "Actuel", lastFight: "Dernier combat", fightIndex: "Combat -{index}", allSession: "Tout (session)", title: "{tab} - {view}", noCombat: "Aucun combat enregistré.", target: "Cible : {name}", noTargetEngaged: "Aucune cible engagée.", segmentSummary: "{label} - {duration}", olderSegment: "Segment précédent", newerSegment: "Segment suivant", close: "Fermer les compteurs",
+        damage: "Dégâts", healing: "Soins", threat: "Menace", damageShort: "Dég.", healingShort: "Soins", current: "Actuel", lastFight: "Dernier combat", fightIndex: "Combat -{index}", allSession: "Tout (session)", title: "{tab} - {view}", noCombat: "Aucun combat enregistré.", target: "Cible : {name}", noTargetEngaged: "Aucune cible engagée.", segmentSummary: "{label} - {duration}", partyTotal: "{label} - {duration} · {total} ({dps}/s)", olderSegment: "Segment précédent", newerSegment: "Segment suivant", close: "Fermer les compteurs",
       },
       chat: {
         rightClickName: "Clic droit sur {name}",
@@ -3277,7 +3278,7 @@ const hudStrings = {
         },
       },
       meters: {
-        damage: "Danni", healing: "Cure", threat: "Minaccia", damageShort: "Danni", healingShort: "Cure", current: "Attuale", lastFight: "Ultimo scontro", fightIndex: "Scontro -{index}", allSession: "Tutto (sessione)", title: "{tab} - {view}", noCombat: "Nessun combattimento registrato.", target: "Bersaglio: {name}", noTargetEngaged: "Nessun bersaglio ingaggiato.", segmentSummary: "{label} - {duration}", olderSegment: "Segmento precedente", newerSegment: "Segmento successivo", close: "Chiudi misuratori",
+        damage: "Danni", healing: "Cure", threat: "Minaccia", damageShort: "Danni", healingShort: "Cure", current: "Attuale", lastFight: "Ultimo scontro", fightIndex: "Scontro -{index}", allSession: "Tutto (sessione)", title: "{tab} - {view}", noCombat: "Nessun combattimento registrato.", target: "Bersaglio: {name}", noTargetEngaged: "Nessun bersaglio ingaggiato.", segmentSummary: "{label} - {duration}", partyTotal: "{label} - {duration} · {total} ({dps}/s)", olderSegment: "Segmento precedente", newerSegment: "Segmento successivo", close: "Chiudi misuratori",
       },
       chat: {
         rightClickName: "Clic destro su {name}",
@@ -3397,7 +3398,7 @@ const hudStrings = {
         },
       },
       meters: {
-        damage: "Schaden", healing: "Heilung", threat: "Bedrohung", damageShort: "Schad.", healingShort: "Heil.", current: "Aktuell", lastFight: "Letzter Kampf", fightIndex: "Kampf -{index}", allSession: "Alles (Sitzung)", title: "{tab} - {view}", noCombat: "Noch kein Kampf aufgezeichnet.", target: "Ziel: {name}", noTargetEngaged: "Kein Ziel im Kampf.", segmentSummary: "{label} - {duration}", olderSegment: "Älteres Segment", newerSegment: "Neueres Segment", close: "Anzeigen schließen",
+        damage: "Schaden", healing: "Heilung", threat: "Bedrohung", damageShort: "Schad.", healingShort: "Heil.", current: "Aktuell", lastFight: "Letzter Kampf", fightIndex: "Kampf -{index}", allSession: "Alles (Sitzung)", title: "{tab} - {view}", noCombat: "Noch kein Kampf aufgezeichnet.", target: "Ziel: {name}", noTargetEngaged: "Kein Ziel im Kampf.", segmentSummary: "{label} - {duration}", partyTotal: "{label} - {duration} · {total} ({dps}/s)", olderSegment: "Älteres Segment", newerSegment: "Neueres Segment", close: "Anzeigen schließen",
       },
       chat: {
         rightClickName: "Rechtsklick auf {name}",
@@ -3517,7 +3518,7 @@ const hudStrings = {
         },
       },
       meters: {
-        damage: "伤害", healing: "治疗", threat: "仇恨", damageShort: "伤害", healingShort: "治疗", current: "当前", lastFight: "上一场战斗", fightIndex: "战斗 -{index}", allSession: "全部（本次会话）", title: "{tab} - {view}", noCombat: "尚无战斗记录。", target: "目标：{name}", noTargetEngaged: "未交战目标。", segmentSummary: "{label} - {duration}", olderSegment: "较早片段", newerSegment: "较新片段", close: "关闭统计",
+        damage: "伤害", healing: "治疗", threat: "仇恨", damageShort: "伤害", healingShort: "治疗", current: "当前", lastFight: "上一场战斗", fightIndex: "战斗 -{index}", allSession: "全部（本次会话）", title: "{tab} - {view}", noCombat: "尚无战斗记录。", target: "目标：{name}", noTargetEngaged: "未交战目标。", segmentSummary: "{label} - {duration}", partyTotal: "{label} - {duration} · {total} ({dps}/s)", olderSegment: "较早片段", newerSegment: "较新片段", close: "关闭统计",
       },
       chat: {
         rightClickName: "右键点击 {name}",
@@ -3637,7 +3638,7 @@ const hudStrings = {
         },
       },
       meters: {
-        damage: "傷害", healing: "治療", threat: "仇恨", damageShort: "傷害", healingShort: "治療", current: "目前", lastFight: "上一場戰鬥", fightIndex: "戰鬥 -{index}", allSession: "全部（本次連線）", title: "{tab} - {view}", noCombat: "尚無戰鬥紀錄。", target: "目標：{name}", noTargetEngaged: "沒有交戰目標。", segmentSummary: "{label} - {duration}", olderSegment: "較早片段", newerSegment: "較新片段", close: "關閉統計",
+        damage: "傷害", healing: "治療", threat: "仇恨", damageShort: "傷害", healingShort: "治療", current: "目前", lastFight: "上一場戰鬥", fightIndex: "戰鬥 -{index}", allSession: "全部（本次連線）", title: "{tab} - {view}", noCombat: "尚無戰鬥紀錄。", target: "目標：{name}", noTargetEngaged: "沒有交戰目標。", segmentSummary: "{label} - {duration}", partyTotal: "{label} - {duration} · {total} ({dps}/s)", olderSegment: "較早片段", newerSegment: "較新片段", close: "關閉統計",
       },
       chat: {
         rightClickName: "右鍵點擊 {name}",
@@ -3757,7 +3758,7 @@ const hudStrings = {
         },
       },
       meters: {
-        damage: "피해", healing: "치유", threat: "위협", damageShort: "피해", healingShort: "치유", current: "현재", lastFight: "지난 전투", fightIndex: "전투 -{index}", allSession: "전체 (세션)", title: "{tab} - {view}", noCombat: "아직 기록된 전투가 없습니다.", target: "대상: {name}", noTargetEngaged: "교전 중인 대상이 없습니다.", segmentSummary: "{label} - {duration}", olderSegment: "이전 구간", newerSegment: "다음 구간", close: "미터 닫기",
+        damage: "피해", healing: "치유", threat: "위협", damageShort: "피해", healingShort: "치유", current: "현재", lastFight: "지난 전투", fightIndex: "전투 -{index}", allSession: "전체 (세션)", title: "{tab} - {view}", noCombat: "아직 기록된 전투가 없습니다.", target: "대상: {name}", noTargetEngaged: "교전 중인 대상이 없습니다.", segmentSummary: "{label} - {duration}", partyTotal: "{label} - {duration} · {total} ({dps}/s)", olderSegment: "이전 구간", newerSegment: "다음 구간", close: "미터 닫기",
       },
       chat: {
         rightClickName: "{name} 우클릭",
@@ -3877,7 +3878,7 @@ const hudStrings = {
         },
       },
       meters: {
-        damage: "ダメージ", healing: "回復", threat: "脅威", damageShort: "ダメ", healingShort: "回復", current: "現在", lastFight: "前回の戦闘", fightIndex: "戦闘 -{index}", allSession: "全体（セッション）", title: "{tab} - {view}", noCombat: "まだ戦闘記録がありません。", target: "対象: {name}", noTargetEngaged: "交戦中の対象がいません。", segmentSummary: "{label} - {duration}", olderSegment: "前の区間", newerSegment: "次の区間", close: "メーターを閉じる",
+        damage: "ダメージ", healing: "回復", threat: "脅威", damageShort: "ダメ", healingShort: "回復", current: "現在", lastFight: "前回の戦闘", fightIndex: "戦闘 -{index}", allSession: "全体（セッション）", title: "{tab} - {view}", noCombat: "まだ戦闘記録がありません。", target: "対象: {name}", noTargetEngaged: "交戦中の対象がいません。", segmentSummary: "{label} - {duration}", partyTotal: "{label} - {duration} · {total} ({dps}/s)", olderSegment: "前の区間", newerSegment: "次の区間", close: "メーターを閉じる",
       },
       chat: {
         rightClickName: "{name}を右クリック",
@@ -3997,7 +3998,7 @@ const hudStrings = {
         },
       },
       meters: {
-        damage: "Dano", healing: "Cura", threat: "Ameaça", damageShort: "Dano", healingShort: "Cura", current: "Atual", lastFight: "Última luta", fightIndex: "Luta -{index}", allSession: "Tudo (sessão)", title: "{tab} - {view}", noCombat: "Nenhum combate registrado ainda.", target: "Alvo: {name}", noTargetEngaged: "Nenhum alvo engajado.", segmentSummary: "{label} - {duration}", olderSegment: "Segmento anterior", newerSegment: "Segmento seguinte", close: "Fechar medidores",
+        damage: "Dano", healing: "Cura", threat: "Ameaça", damageShort: "Dano", healingShort: "Cura", current: "Atual", lastFight: "Última luta", fightIndex: "Luta -{index}", allSession: "Tudo (sessão)", title: "{tab} - {view}", noCombat: "Nenhum combate registrado ainda.", target: "Alvo: {name}", noTargetEngaged: "Nenhum alvo engajado.", segmentSummary: "{label} - {duration}", partyTotal: "{label} - {duration} · {total} ({dps}/s)", olderSegment: "Segmento anterior", newerSegment: "Segmento seguinte", close: "Fechar medidores",
       },
       chat: {
         rightClickName: "Clique direito em {name}",
@@ -4117,7 +4118,7 @@ const hudStrings = {
         },
       },
       meters: {
-        damage: "Урон", healing: "Исцеление", threat: "Угроза", damageShort: "Урон", healingShort: "Исц.", current: "Текущий", lastFight: "Последний бой", fightIndex: "Бой -{index}", allSession: "Все (сеанс)", title: "{tab} - {view}", noCombat: "Боевые данные еще не записаны.", target: "Цель: {name}", noTargetEngaged: "Нет цели в бою.", segmentSummary: "{label} - {duration}", olderSegment: "Предыдущий сегмент", newerSegment: "Следующий сегмент", close: "Закрыть счетчики",
+        damage: "Урон", healing: "Исцеление", threat: "Угроза", damageShort: "Урон", healingShort: "Исц.", current: "Текущий", lastFight: "Последний бой", fightIndex: "Бой -{index}", allSession: "Все (сеанс)", title: "{tab} - {view}", noCombat: "Боевые данные еще не записаны.", target: "Цель: {name}", noTargetEngaged: "Нет цели в бою.", segmentSummary: "{label} - {duration}", partyTotal: "{label} - {duration} · {total} ({dps}/s)", olderSegment: "Предыдущий сегмент", newerSegment: "Следующий сегмент", close: "Закрыть счетчики",
       },
       chat: {
         rightClickName: "ПКМ по {name}",

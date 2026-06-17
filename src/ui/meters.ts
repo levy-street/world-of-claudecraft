@@ -12,7 +12,7 @@
 import type { IWorld } from '../world_api';
 import type { SimEvent } from '../sim/types';
 import { CLASSES } from '../sim/data';
-import { t, type TranslationKey } from './i18n';
+import { t, formatNumber, type TranslationKey } from './i18n';
 import { tEntity } from './entity_i18n';
 
 const ENCOUNTER_END_SECONDS = 5;
@@ -288,26 +288,43 @@ export class Meters {
       .sort((a, b) => b.value - a.value);
 
     const top = rows[0]?.value ?? 1;
+    // party aggregate across the visible rows — drives each row's % share and,
+    // for the dmg/heal tabs, the Recount-style party total/DPS in the subtitle.
+    const total = rows.reduce((s, r) => s + r.value, 0);
+    if (!isThreat && total > 0) {
+      this.subEl.textContent = t('hud.meters.partyTotal', {
+        label: encounterLabel,
+        duration: fmtDuration(enc.duration),
+        total: fmtNum(total),
+        dps: fmtNum(total / enc.duration),
+      });
+    }
     this.rowsEl.innerHTML = '';
-    for (const { t, value } of rows) {
+    let rank = 0;
+    for (const { t: tally, value } of rows) {
+      rank++;
       const row = document.createElement('div');
       row.className = 'mt-row';
       const fill = document.createElement('div');
       fill.className = 'mt-fill';
       fill.style.width = `${Math.max(4, (value / top) * 100)}%`;
-      const color = t.cls && (CLASSES as Record<string, { color: number }>)[t.cls]?.color;
+      const color = tally.cls && (CLASSES as Record<string, { color: number }>)[tally.cls]?.color;
       fill.style.background = color ? `#${color.toString(16).padStart(6, '0')}cc` : '#888888cc';
+      const rankEl = document.createElement('span');
+      rankEl.className = 'mt-rank';
+      rankEl.textContent = `${rank}.`;
       const label = document.createElement('span');
       label.className = 'mt-label';
-      const hasAggro = isThreat && aggroPid === t.pid;
-      label.textContent = t.name;
+      const hasAggro = isThreat && aggroPid === tally.pid;
+      label.textContent = tally.name;
       const num = document.createElement('span');
       num.className = 'mt-num';
+      const pct = formatNumber(total > 0 ? value / total : 0, { style: 'percent', maximumFractionDigits: 0 });
       num.textContent = isThreat
-        ? fmtNum(value)
-        : `${fmtNum(value)} (${fmtNum(value / enc.duration)}/s)`;
+        ? `${fmtNum(value)} · ${pct}`
+        : `${fmtNum(value)} (${fmtNum(value / enc.duration)}/s · ${pct})`;
       if (hasAggro) row.classList.add('aggro');
-      row.append(fill, label, num);
+      row.append(fill, rankEl, label, num);
       this.rowsEl.appendChild(row);
     }
   }
