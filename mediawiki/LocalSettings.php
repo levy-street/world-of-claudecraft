@@ -23,16 +23,25 @@ $wgDBtype = 'mysql';
 $wgDBserver = getenv( 'MEDIAWIKI_DB_HOST' ) ?: 'mediawiki-db';
 $wgDBname = getenv( 'MEDIAWIKI_DB_NAME' ) ?: 'mediawiki';
 $wgDBuser = getenv( 'MEDIAWIKI_DB_USER' ) ?: 'mediawiki';
-$wgDBpassword = getenv( 'MEDIAWIKI_DB_PASSWORD' ) ?: 'mediawiki';
+$wgDBpassword = getenv( 'MEDIAWIKI_DB_PASSWORD' );
+if ( $wgDBpassword === false || $wgDBpassword === '' ) {
+	die( 'MEDIAWIKI_DB_PASSWORD environment variable must be set' );
+}
 $wgDBprefix = '';
 $wgDBTableOptions = 'ENGINE=InnoDB, DEFAULT CHARSET=binary';
 
 $wgMainCacheType = CACHE_ACCEL;
 $wgMemCachedServers = [];
 
-$wgSecretKey = getenv( 'MEDIAWIKI_SECRET_KEY' ) ?: 'local-dev-change-me-world-of-claudecraft';
+$wgSecretKey = getenv( 'MEDIAWIKI_SECRET_KEY' );
+if ( $wgSecretKey === false || $wgSecretKey === '' ) {
+	die( 'MEDIAWIKI_SECRET_KEY environment variable must be set' );
+}
 $wgAuthenticationTokenVersion = '1';
-$wgUpgradeKey = getenv( 'MEDIAWIKI_UPGRADE_KEY' ) ?: 'local-dev-upgrade-key';
+$wgUpgradeKey = getenv( 'MEDIAWIKI_UPGRADE_KEY' );
+if ( $wgUpgradeKey === false || $wgUpgradeKey === '' ) {
+	die( 'MEDIAWIKI_UPGRADE_KEY environment variable must be set' );
+}
 
 $wgLanguageCode = 'en';
 $wgLocaltimezone = 'UTC';
