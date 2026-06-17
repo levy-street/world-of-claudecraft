@@ -39,6 +39,18 @@ export const ZONE1_ZONE: ZoneDef = {
 // ---------------------------------------------------------------------------
 
 export const ZONE1_MOBS: Record<string, MobTemplate> = {
+  // Eastbrook practice target: a near-immortal, stationary dummy for testing
+  // damage rotations and the combat meters. Inert (never fights back), drops a
+  // worthless bale of straw if somehow felled, and pops back up after 10s.
+  training_dummy: {
+    id: 'training_dummy', name: 'Training Dummy', minLevel: 10, maxLevel: 10, family: 'humanoid',
+    hpBase: 999999, hpPerLevel: 0, dmgBase: 0, dmgPerLevel: 0, attackSpeed: 2.0,
+    armorPerLevel: 0, moveSpeed: 0, aggroRadius: 0,
+    loot: [{ itemId: 'bale_of_straw', chance: 1 }],
+    scale: 1.4, color: 0xb8924a,
+    dummy: true,
+    respawnSeconds: 10,
+  },
   warlock_imp: {
     id: 'warlock_imp', name: 'Fire Demon', minLevel: 1, maxLevel: 20, family: 'demon',
     hpBase: 24, hpPerLevel: 11, dmgBase: 2, dmgPerLevel: 0.7, attackSpeed: 2.0,
@@ -513,6 +525,8 @@ export const ZONE1_QUEST_ORDER = [
 // ---------------------------------------------------------------------------
 
 export const ZONE1_CAMPS: CampDef[] = [
+  // Training dummy: a single fixed target in the Eastbrook square, near the smith.
+  { mobId: 'training_dummy', center: { x: 14, z: 13 }, radius: 0, count: 1 },
   // Wolves: north woods
   { mobId: 'forest_wolf', center: { x: -15, z: 55 }, radius: 22, count: 7 },
   { mobId: 'forest_wolf', center: { x: 20, z: 70 }, radius: 20, count: 6 },

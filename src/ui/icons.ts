@@ -1036,6 +1036,7 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
     { p: 'fang', pal: 'gold', x: 18, y: -1, s: 0.5, rot: 1.55 },
   ], ['sparkle']),
   tangled_weed: r('junk', 'venom', [{ p: 'tendrils', pal: 'venom' }]),
+  bale_of_straw: r('junk', 'gold', [{ p: 'tendrils', pal: 'gold' }]),
   roasted_boar: r('food', 'ember', ['meat']),
   conjured_water: r('arcane', 'sky', [{ p: 'potion', pal: 'sky' }], ['sparkle']),
   gravecaller_blade: r('shadow', 'steel', ['sword', { p: 'skull', ...BR }], ['glow']),

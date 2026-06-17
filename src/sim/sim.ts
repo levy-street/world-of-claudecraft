@@ -40,6 +40,9 @@ const DUNGEON_LEASH_DISTANCE = 70;
 // attacked). Elites, rares, and bosses are never trivial.
 const TRIVIAL_LEVEL_GAP = 10;
 const CORPSE_DURATION = 60;
+// Training dummy: seconds after the last hit before it drops combat and resets
+// to full health (mirrors the 5s player out-of-combat window).
+const DUMMY_RESET_SECONDS = 5;
 const EVADE_SPEED_MULT = 1.6;
 // An evading mob walks a straight line home (no pathfinding) and stalls if deep
 // water or a collider sits between it and its spawn. Since evading mobs are
@@ -3389,13 +3392,14 @@ export class Sim {
     b.combatTimer = 0;
     a.inCombat = true;
     b.inCombat = true;
-    // players and their pets pull wild mobs; pets never run wild-mob AI
+    // players and their pets pull wild mobs; pets never run wild-mob AI.
+    // Training dummies are inert: they never aggro, on either side.
     const aAttacker = a.kind === 'player' || (a.kind === 'mob' && a.ownerId !== null);
-    if (b.kind === 'mob' && b.ownerId === null && !b.dead && aAttacker && b.aiState !== 'evade') {
+    if (b.kind === 'mob' && b.ownerId === null && !b.dead && aAttacker && b.aiState !== 'evade' && !MOBS[b.templateId]?.dummy) {
       if (b.aiState === 'idle') this.aggroMob(b, a, true);
       else if (b.aggroTargetId === null) b.aggroTargetId = a.id;
     }
-    if (a.kind === 'mob' && a.ownerId === null && !a.dead && b.kind === 'player' && a.aiState === 'idle') {
+    if (a.kind === 'mob' && a.ownerId === null && !a.dead && b.kind === 'player' && a.aiState === 'idle' && !MOBS[a.templateId]?.dummy) {
       this.aggroMob(a, b, false);
     }
   }
@@ -3449,7 +3453,11 @@ export class Sim {
       const template = MOBS[e.templateId];
       e.aiState = 'dead';
       e.corpseTimer = CORPSE_DURATION;
-      e.respawnTimer = this.cfg.respawnSeconds * (template?.respawnMult ?? (template?.rare ? 4 : 1));
+      e.respawnTimer = template?.respawnSeconds
+        ?? this.cfg.respawnSeconds * (template?.respawnMult ?? (template?.rare ? 4 : 1));
+      // A fixed respawn also clears the corpse that fast, so the mob is back on
+      // schedule whether or not its loot was taken (training dummy: 10s).
+      if (template?.respawnSeconds !== undefined) e.corpseTimer = Math.min(e.corpseTimer, template.respawnSeconds);
       e.aggroTargetId = null;
       clearThreat(e);
       if (e.ownerId !== null) {
@@ -3834,6 +3842,20 @@ export class Sim {
     // target" wolves players hit. Restore hostility so no mob can ever be left
     // permanently untargetable, whatever path corrupted it.
     if (!mob.hostile) mob.hostile = true;
+
+    // Training dummy: stays attackable (hostile, so it counts for damage and
+    // shows on meters) but is otherwise inert — never aggros, moves, or fights
+    // back. It drops combat and resets to full a few seconds after the last
+    // hit, like a real practice target.
+    if (MOBS[mob.templateId]?.dummy) {
+      if (mob.combatTimer >= DUMMY_RESET_SECONDS) {
+        mob.inCombat = false;
+        mob.hp = mob.maxHp;
+      } else {
+        mob.inCombat = true;
+      }
+      return;
+    }
 
     if (mob.inCombat) this.updateBossMechanics(mob);
 

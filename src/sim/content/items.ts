@@ -138,6 +138,10 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     id: 'tangled_weed', name: 'Tangled Weed', kind: 'junk', quality: 'poor',
     sellValue: 1,
   },
+  bale_of_straw: {
+    id: 'bale_of_straw', name: 'Bale of Straw', kind: 'junk', quality: 'poor',
+    sellValue: 1,
+  },
   roasted_boar: {
     id: 'roasted_boar', name: 'Roasted Boar Meat', kind: 'food', quality: 'common',
     foodHp: 117, sellValue: 12, buyValue: 100,

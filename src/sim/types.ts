@@ -175,6 +175,13 @@ export interface MobTemplate {
   canSwim?: boolean;
   ccImmune?: boolean;
   respawnMult?: number;
+  // Fixed respawn delay in seconds, overriding the world default * respawnMult.
+  // Also caps the corpse decay so the mob is back exactly this fast.
+  respawnSeconds?: number;
+  // Training dummy: a stationary practice target. Stays attackable (counts for
+  // damage/meters) but never moves, aggros, or retaliates, and heals to full a
+  // few seconds after the last hit. See `updateMob`/`enterCombat` in sim.ts.
+  dummy?: boolean;
   // Boss mechanic: periodic AoE pulse around the mob while in combat.
   aoePulse?: { min: number; max: number; radius: number; every: number; name: string; school?: string; fx?: 'nova' | 'projectile' };
   // Boss mechanic: spawn adds when hp first drops below each threshold (descending fractions).
