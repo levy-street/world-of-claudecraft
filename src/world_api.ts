@@ -210,6 +210,11 @@ export interface IWorld {
   friendlyTabTarget(): void;
   startAutoAttack(): void;
   stopAutoAttack(): void;
+  // Live auto-attack swing-timer state for the local player, driving the HUD
+  // swing/weave indicator below the cast bar. `active` is false the instant
+  // auto-attack stops; `total` is the full swing interval (weapon/ranged speed
+  // scaled by haste/slow auras) and `remaining` the seconds until the next swing.
+  swingTimerView(): { active: boolean; remaining: number; total: number };
   interact(): void;
   lootCorpse(id: number): void;
   pickUpObject(id: number): void;

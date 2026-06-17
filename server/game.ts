@@ -1267,6 +1267,8 @@ export class GameServer {
       comboTgt: p.comboTargetId,
       target: p.targetId,
       auto: p.autoAttack,
+      sw: round2(p.swingTimer),
+      swt: round2(this.sim.swingTimerState(p.id).total),
       queued: p.queuedOnSwing,
       ap: p.attackPower,
       crit: p.critChance,

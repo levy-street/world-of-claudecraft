@@ -262,6 +262,10 @@ export class Hud {
   private castbarFillEl = this.castbarEl.querySelector('.fill') as HTMLElement;
   private castbarLabelEl = this.castbarEl.querySelector('.label') as HTMLElement;
   private castbarTimerEl = this.castbarEl.querySelector('.timer') as HTMLElement;
+  private swingbarEl = $('#swingbar');
+  private swingbarFillEl = this.swingbarEl.querySelector('.fill') as HTMLElement;
+  private swingbarLabelEl = this.swingbarEl.querySelector('.label') as HTMLElement;
+  private swingbarTimerEl = this.swingbarEl.querySelector('.timer') as HTMLElement;
   private actionbarEl = $('#actionbar');
   private xpFillEl = $('#xpbar .fill');
   private xpLabelEl = $('#xpbar .label');
@@ -1653,6 +1657,23 @@ export class Hud {
       this.setWidth(this.castbarFillEl, '0%');
       this.setText(this.castbarLabelEl, '');
       this.setText(this.castbarTimerEl, '');
+    }
+
+    // swing timer — fills toward the next auto-attack swing so melee can weave
+    // specials between swings; hides the instant auto-attack stops.
+    const swing = this.sim.swingTimerView();
+    if (swing.active && swing.total > 0) {
+      this.setDisplay(this.swingbarEl, 'block');
+      const frac = Math.min(1, Math.max(0, (swing.total - swing.remaining) / swing.total));
+      this.setWidth(this.swingbarFillEl, `${(frac * 100).toFixed(1)}%`);
+      this.swingbarEl.classList.toggle('imminent', frac >= 0.85);
+      this.setText(this.swingbarLabelEl, t('hud.core.swingTimer'));
+      this.setText(this.swingbarTimerEl, formatNumber(Math.max(0, swing.remaining), { minimumFractionDigits: 1, maximumFractionDigits: 1 }));
+    } else {
+      this.setDisplay(this.swingbarEl, 'none');
+      this.setWidth(this.swingbarFillEl, '0%');
+      this.swingbarEl.classList.remove('imminent');
+      this.setText(this.swingbarTimerEl, '');
     }
 
     // action bar

@@ -3120,6 +3120,25 @@ export class Sim {
     if (r) r.e.autoAttack = false;
   }
 
+  // Live auto-attack swing-timer state for the swing/weave HUD indicator (and
+  // the self snapshot the server sends to online clients). `total` reuses the
+  // exact expression updatePlayerAutoAttack resets the timer with — the ranged
+  // speed for hunters/wand casters, else the equipped weapon's speed, scaled by
+  // any haste/slow auras (swingIntervalMult). `active` is false whenever
+  // auto-attack is off so the indicator hides the instant you stop swinging.
+  swingTimerState(pid?: number): { active: boolean; remaining: number; total: number } {
+    const r = this.resolve(pid);
+    if (!r) return { active: false, remaining: 0, total: 0 };
+    const { e: p, meta } = r;
+    const base = CLASSES[meta.cls].ranged?.speed ?? p.weapon.speed;
+    const total = base * this.swingIntervalMult(p);
+    return { active: p.autoAttack, remaining: Math.max(0, p.swingTimer), total };
+  }
+
+  swingTimerView(): { active: boolean; remaining: number; total: number } {
+    return this.swingTimerState();
+  }
+
   private updatePlayerAutoAttack(p: Entity, meta: PlayerMeta): void {
     p.swingTimer = Math.max(0, p.swingTimer - DT);
     if (!p.autoAttack || p.castingAbility) return;

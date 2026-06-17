@@ -501,6 +501,17 @@
   #castbar .timer { position: absolute; top: 0; right: 6px; line-height: 21px; font-size: 11px;
     color: #fff; text-shadow: 1px 1px 2px #000; font-family: var(--title-font); font-variant-numeric: tabular-nums; }
 
+  /* ---------- swing timer (auto-attack / weave indicator) ---------- */
+  #swingbar { position: absolute; left: 50%; transform: translateX(-50%); bottom: 180px; width: 300px;
+    height: 16px; display: none; border: 2px solid var(--border); outline: 1px solid #000; border-radius: 4px; background: #100c08; overflow: hidden; }
+  #swingbar .fill { height: 100%; width: 0%; background: linear-gradient(#ff9d6e, #c0392b 60%, #7a1f12);
+    box-shadow: inset 0 1px 0 #fff4; }
+  #swingbar.imminent .fill { background: linear-gradient(#fff0b0, #ffd24a 60%, #c98f1a); }
+  #swingbar .label { position: absolute; inset: 0; text-align: center; font-size: 10px; line-height: 12px;
+    color: #fff; text-shadow: 1px 1px 2px #000; font-family: var(--title-font); letter-spacing: .4px; }
+  #swingbar .timer { position: absolute; top: 0; right: 6px; line-height: 12px; font-size: 10px;
+    color: #fff; text-shadow: 1px 1px 2px #000; font-family: var(--title-font); font-variant-numeric: tabular-nums; }
+
   /* ---------- bottom cluster ---------- */
   #bottom-bar { position: absolute; left: 50%; transform: translateX(-50%); bottom: 6px; text-align: center; }
   #xpbar { width: 612px; height: 10px; background: #14101e; border: 1px solid #000; outline: 1px solid #3a3148;
@@ -4092,6 +4103,20 @@
     opacity: 0.9;
   }
   body.mobile-touch #castbar .label { display: none; }
+  body.mobile-touch #swingbar {
+    position: fixed;
+    left: calc(max(18px, env(safe-area-inset-left)) + 132px);
+    bottom: calc(26px + env(safe-area-inset-bottom));
+    width: min(170px, calc(50vw - 164px));
+    min-width: 112px;
+    height: 5px;
+    transform: none;
+    z-index: 19;
+    border-width: 1px;
+    border-radius: 2px;
+    opacity: 0.9;
+  }
+  body.mobile-touch #swingbar .label, body.mobile-touch #swingbar .timer { display: none; }
   body.mobile-touch #actionbar-row { display: block; }
   body.mobile-touch #actionbar-stack {
     width: 100%;
@@ -4280,6 +4305,9 @@
     right: auto;
   }
   body.mobile-touch.mobile-left-handed #castbar {
+    left: auto; right: calc(max(18px, env(safe-area-inset-right)) + 132px);
+  }
+  body.mobile-touch.mobile-left-handed #swingbar {
     left: auto; right: calc(max(18px, env(safe-area-inset-right)) + 132px);
   }
   body.mobile-touch.mobile-left-handed #meters-window {
@@ -4743,6 +4771,13 @@
       width: min(160px, calc(50vw - 166px));
       min-width: 100px;
       height: 5px;
+    }
+    body.mobile-touch #swingbar {
+      left: calc(max(20px, env(safe-area-inset-left)) + 112px);
+      bottom: calc(23px + env(safe-area-inset-bottom));
+      width: min(160px, calc(50vw - 166px));
+      min-width: 100px;
+      height: 4px;
     }
     body.mobile-touch #petbar {
       top: max(6px, env(safe-area-inset-top));
@@ -5303,6 +5338,7 @@
     <div id="trade-window" class="window panel"></div>
 
     <div id="castbar"><div class="fill"></div><div class="label"></div><div class="timer"></div></div>
+    <div id="swingbar"><div class="fill"></div><div class="label"></div><div class="timer"></div></div>
 
     <div id="minimap-wrap">
       <div id="zone-label" data-i18n="entities.zones.eastbrook_vale.name">Eastbrook Vale</div>

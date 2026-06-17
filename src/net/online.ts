@@ -286,6 +286,11 @@ export class ClientWorld implements IWorld {
   // snapshot interpolation
   lastSnapAt = 0;
   snapInterval = 50; // ms, adapts to measured cadence
+  // swing-timer indicator: server-sent remaining/interval + the wall-clock
+  // anchor at which they arrived, so swingTimerView() extrapolates smoothly.
+  private selfSwingRemaining = 0;
+  private selfSwingTotal = 0;
+  private selfSwingAt = 0;
   // camera follow for keyboard turns applied by the main loop
   pendingFacingDelta = 0;
   connected = false;
@@ -666,6 +671,13 @@ export class ClientWorld implements IWorld {
       e.comboTargetId = s.comboTgt ?? null;
       e.targetId = s.target ?? null;
       e.autoAttack = !!s.auto;
+      // swing-timer indicator: anchor the remaining-time + interval the server
+      // sent so swingTimerView() can extrapolate a smooth countdown between
+      // snapshots (render-only timing — never feeds gameplay).
+      e.swingTimer = s.sw ?? e.swingTimer;
+      this.selfSwingRemaining = s.sw ?? this.selfSwingRemaining;
+      this.selfSwingTotal = s.swt ?? this.selfSwingTotal;
+      this.selfSwingAt = performance.now();
       e.queuedOnSwing = s.queued ?? null;
       e.stats = s.stats ?? e.stats;
       e.attackPower = s.ap ?? 0;
@@ -772,6 +784,13 @@ export class ClientWorld implements IWorld {
   }
   stopAutoAttack(): void {
     this.cmd({ cmd: 'stopattack' });
+  }
+  swingTimerView(): { active: boolean; remaining: number; total: number } {
+    const e = this.entities.get(this.playerId);
+    if (!e || !e.autoAttack) return { active: false, remaining: 0, total: this.selfSwingTotal };
+    const elapsed = (performance.now() - this.selfSwingAt) / 1000;
+    const remaining = Math.max(0, this.selfSwingRemaining - elapsed);
+    return { active: true, remaining, total: this.selfSwingTotal };
   }
   interact(): void {
     this.cmd({ cmd: 'interact' });

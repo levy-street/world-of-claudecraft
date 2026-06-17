@@ -295,6 +295,41 @@ describe('combat', () => {
     expect(sim.player.resource).toBeGreaterThan(0);
   });
 
+  it('swing timer reports active countdown while auto-attacking and stops on kill', () => {
+    const sim = makeSim('warrior');
+    const wolf = nearestMob(sim, 'forest_wolf');
+    teleportTo(sim, wolf.pos.x + 2, wolf.pos.z);
+    // idle: no auto-attack means the indicator is inactive
+    expect(sim.swingTimerView().active).toBe(false);
+
+    sim.targetEntity(wolf.id);
+    facePlayerAt(sim, wolf);
+    sim.startAutoAttack();
+    // total swing interval mirrors the equipped weapon speed (no haste auras)
+    expect(sim.swingTimerView().total).toBeCloseTo(sim.player.weapon.speed, 5);
+
+    // after the first swing, the timer is armed (remaining > 0, within interval)
+    let armed = false;
+    for (let i = 0; i < 20 * 5 && !armed; i++) {
+      sim.tick();
+      facePlayerAt(sim, wolf);
+      const v = sim.swingTimerView();
+      if (v.active && v.remaining > 0) armed = true;
+    }
+    expect(armed).toBe(true);
+    const view = sim.swingTimerView();
+    expect(view.remaining).toBeGreaterThan(0);
+    expect(view.remaining).toBeLessThanOrEqual(view.total + 1e-6);
+
+    // run until the wolf dies; the sim drops auto-attack so the indicator hides
+    for (let i = 0; i < 20 * 120 && !wolf.dead; i++) {
+      sim.tick();
+      facePlayerAt(sim, wolf);
+    }
+    expect(wolf.dead).toBe(true);
+    expect(sim.swingTimerView().active).toBe(false);
+  });
+
   it('warrior generates rage when taking damage from enemy level', () => {
     const sim = makeSim('warrior');
     const wolf = nearestMob(sim, 'forest_wolf');
