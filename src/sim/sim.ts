@@ -5410,7 +5410,10 @@ export class Sim {
           // Withhold the whisper, but still echo the sender's own line so they
           // see what they tried to send.
           this.emit({ type: 'chat', fromPid: r.meta.entityId, from: r.meta.name, to: target.name, text: msg, channel: 'whisper', pid: r.meta.entityId });
-          return { channel: 'whisper', message: msg };
+          // Carry `target` so the sender's sticky whisper channel still updates —
+          // a withheld DND whisper is still a whisper they sent, so a bare
+          // follow-up must continue the whisper rather than fall back to /say.
+          return { channel: 'whisper', message: msg, target: target.name };
         }
       }
       // classic-WoW "/r": the recipient's reply target is whoever last

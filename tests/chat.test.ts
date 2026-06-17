@@ -839,6 +839,26 @@ describe('/afk and /dnd presence', () => {
     expect(chatEvents(out).some((m) => m.channel === 'whisper' && m.pid === b && m.to === 'Aleph')).toBe(true);
   });
 
+  it('a /dnd whisper still reports the recipient so the sender’s reply channel sticks', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('mage', 'Bet');
+    sim.tick();
+
+    sim.chat('/dnd raiding', a);
+    sim.tick();
+
+    // The whisper to a DND player is withheld from the recipient, but the
+    // returned SentChat must still carry the resolved recipient: the server
+    // uses `sent.target` to set the sender's sticky whisper channel. Without
+    // it, Bet's next bare line falls back to /say and leaks what was meant to
+    // be a private reply.
+    const sent = sim.chat('/w Aleph ping', b);
+    expect(sent).not.toBeNull();
+    expect(sent!.channel).toBe('whisper');
+    expect(sent!.target).toBe('Aleph');
+  });
+
   it('repeating the bare command toggles the status off', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');
