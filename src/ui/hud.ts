@@ -1118,6 +1118,7 @@ export class Hud {
   private abilityTooltip(res: ResolvedAbility): string {
     const a = res.def;
     const damageText = abilityEffectText(res.effects);
+    const overTimeText = abilityOverTimeText(res.effects);
     let html = `<div class="tt-title">${esc(abilityDisplayName(a))}</div>`;
     html += `<div class="tt-sub">${esc(t('abilityUi.tooltip.rank', { rank: formatAbilityNumber(res.rank) }))}</div>`;
     const costLine: string[] = [];
@@ -1133,7 +1134,7 @@ export class Hud {
     const castLine = [abilityCastLine(res)];
     if (a.cooldown > 0) castLine.push(t('abilityUi.tooltip.cooldownSeconds', { seconds: formatAbilityNumber(a.cooldown) }));
     html += `<div class="tt-stat">${castLine.map(esc).join(' &nbsp; ')}</div>`;
-    html += `<div class="tt-desc">${esc(abilityDisplayDescription(a, damageText))}</div>`;
+    html += `<div class="tt-desc">${esc(abilityDisplayDescription(a, damageText, overTimeText))}</div>`;
     const requirements = abilityRequirementLines(a);
     if (requirements.length) {
       html += requirements.map((line) => `<div class="tt-sub">${esc(line)}</div>`).join('');
@@ -5994,8 +5995,8 @@ function abilityDisplayName(def: AbilityDef): string {
   return tEntity({ kind: 'ability', id: def.id, field: 'name' });
 }
 
-function abilityDisplayDescription(def: AbilityDef, damageText: string): string {
-  return tEntity({ kind: 'ability', id: def.id, field: 'description', values: { damage: damageText } });
+function abilityDisplayDescription(def: AbilityDef, damageText: string, overTimeText: string): string {
+  return tEntity({ kind: 'ability', id: def.id, field: 'description', values: { damage: damageText, overTime: overTimeText } });
 }
 
 function classDisplayName(cls: PlayerClass): string {
@@ -6231,6 +6232,30 @@ function abilityEffectText(effects: AbilityEffect[]): string {
     default:
       return '';
   }
+}
+
+// The secondary "over time" total (DoT/HoT) shown alongside a primary direct,
+// weapon, or heal number — e.g. Regrowth's HoT or Rake's bleed. Empty when the
+// ability has no primary effect (then the DoT/HoT total is already the primary
+// number returned by abilityEffectText) or has no over-time component, so the
+// {overTime} token simply renders blank for those abilities.
+function abilityOverTimeText(effects: AbilityEffect[]): string {
+  const hasPrimary = effects.some((eff) =>
+    eff.type === 'directDamage' ||
+    eff.type === 'heal' ||
+    eff.type === 'weaponDamage' ||
+    eff.type === 'weaponStrike' ||
+    eff.type === 'aoeDamage' ||
+    eff.type === 'aoeRoot' ||
+    eff.type === 'finisherDamage' ||
+    eff.type === 'drainTick'
+  );
+  if (!hasPrimary) return '';
+  const ot = effects.find(
+    (eff): eff is Extract<AbilityEffect, { type: 'dot' } | { type: 'hot' }> =>
+      eff.type === 'dot' || eff.type === 'hot',
+  );
+  return ot ? formatAbilityNumber(ot.total) : '';
 }
 
 function abilityAmountRange(min: number, max: number): string {

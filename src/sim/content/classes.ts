@@ -333,7 +333,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       rank: 4, level: 18, cost: 95, castTime: 3.0,
       effects: [{ type: 'directDamage', min: 58, max: 78 }, { type: 'dot', total: 12, duration: 8, interval: 2 }],
     }],
-    description: 'Hurls a fiery ball that causes $d Fire damage plus additional damage over time.',
+    description: 'Hurls a fiery ball that causes $d Fire damage plus {overTime} additional damage over time.',
   },
   frost_armor: {
     id: 'frost_armor', name: 'Frost Armor', class: 'mage', learnLevel: 1,
@@ -924,7 +924,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       rank: 2, level: 16, cost: 55,
       effects: [{ type: 'directDamage', min: 42, max: 42 }, { type: 'dot', total: 48, duration: 12, interval: 3 }],
     }],
-    description: 'Sears the target with fire for 25 damage plus $d over 12 sec.',
+    description: 'Sears the target with fire for $d damage plus {overTime} over 12 sec.',
   },
   frost_shock: {
     id: 'frost_shock', name: 'Frost Shock', class: 'shaman', learnLevel: 14,
@@ -984,7 +984,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       rank: 3, level: 16, cost: 60,
       effects: [{ type: 'directDamage', min: 38, max: 38 }, { type: 'dot', total: 60, duration: 15, interval: 3 }],
     }],
-    description: 'Burns the enemy for 11 Fire damage and an additional $d over 15 sec.',
+    description: 'Burns the enemy for $d Fire damage and an additional {overTime} over 15 sec.',
   },
   corruption: {
     id: 'corruption', name: 'Corruption', class: 'warlock', learnLevel: 4,
@@ -1114,7 +1114,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       rank: 3, level: 16, cost: 60,
       effects: [{ type: 'directDamage', min: 28, max: 34 }, { type: 'dot', total: 40, duration: 12, interval: 3 }],
     }],
-    description: 'Burns the enemy with moonfire for $d Arcane damage plus damage over time.',
+    description: 'Burns the enemy with moonfire for $d Arcane damage plus {overTime} damage over time.',
   },
   rejuvenation: {
     id: 'rejuvenation', name: 'Rejuvenation', class: 'druid', learnLevel: 4,
@@ -1214,7 +1214,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ranks: [
       { rank: 2, level: 18, cost: 35, effects: [{ type: 'weaponStrike', bonus: 12 }, { type: 'dot', total: 48, duration: 9, interval: 3 }] },
     ],
-    description: 'A stealth opener that rakes the enemy for weapon damage plus $d and causes bleeding damage over 9 sec. Awards 1 combo point. Wolf Form only.',
+    description: 'A stealth opener that rakes the enemy for weapon damage plus $d and causes {overTime} bleeding damage over 9 sec. Awards 1 combo point. Wolf Form only.',
   },
   claw: {
     id: 'claw', name: 'Claw', class: 'druid', learnLevel: 12,
@@ -1246,7 +1246,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 55, castTime: 2.0, cooldown: 0, range: 30, school: 'nature',
     requiresTarget: true, targetType: 'friendly',
     effects: [{ type: 'heal', min: 52, max: 62 }, { type: 'hot', total: 49, duration: 21, interval: 3 }],
-    description: 'Heals a friendly target for $d and an additional amount over 21 sec.',
+    description: 'Heals a friendly target for $d and an additional {overTime} over 21 sec.',
   },
   barkskin: {
     id: 'barkskin', name: 'Barkskin', class: 'druid', learnLevel: 16,
