@@ -589,7 +589,8 @@ export interface Entity {
   spawnPos: Vec3;
   leashAnchor: Vec3 | null; // refreshed by hostile player/pet actions; spawnPos remains the true home
   evadeStall: number; // seconds an evading mob has failed to get closer to home; snaps it home if it can't path back (e.g. across water)
-  fleeTimer: number; // seconds left in a low-HP panic flee; counts down in the 'flee' state
+  fleeTimer: number; // safety cap (s) on a low-HP flee; counts down in the 'flee' state
+  fleeTarget: Vec3 | null; // retreat point a fleeing mob walks to before turning to fight
   hasFled: boolean; // a cowardly mob flees only once per pull; cleared when it resets at spawn
   wanderTarget: Vec3 | null;
   wanderTimer: number;

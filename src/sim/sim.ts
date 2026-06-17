@@ -51,13 +51,21 @@ const EVADE_STALL_TIMEOUT = 3;
 // only evaluated past the first entry when that straight step is obstructed.
 const MOVE_SLIDE_FAN = [0, 0.5, -0.5, 1.0, -1.0, 1.6, -1.6];
 const BACKPEDAL_MULT = 0.65;
-// Low-HP flee ("fear"): a cowardly mob at or below this HP fraction panics, turns
-// and runs from its attacker for FLEE_DURATION seconds at FLEE_SPEED_MULT speed,
-// calling same-family allies within FLEE_HELP_RADIUS to assist. It flees only once
-// per pull, then recovers its nerve and re-engages if it survived.
+// Feared targets (the `fear_incap` aura, e.g. Warlock fear) flee at this x speed.
+// Distinct from the low-HP cowardly flee below.
+const FEAR_SPEED_MULT = 1.4;
+// Low-HP cowardly flee: a mob at or below FLEE_HP_THRESHOLD breaks off ONCE per pull
+// and RETREATS to a random point FLEE_RETREAT_MIN..MAX yards away from its attacker,
+// WALKING at MOB_FLEE_SPEED_MULT x its move speed. On arrival (within FLEE_ARRIVE_DIST)
+// -- or after the FLEE_MAX_DURATION safety cap if it cannot path there -- it turns and
+// fights normally. It calls same-family allies within FLEE_HELP_RADIUS to assist.
 const FLEE_HP_THRESHOLD = 0.2;
-const FLEE_DURATION = 5;
-const FLEE_SPEED_MULT = 1.4;
+const MOB_FLEE_SPEED_MULT = 0.5; // half walk speed (was a 1.4x panic sprint)
+const FLEE_RETREAT_MIN = 8; // yards
+const FLEE_RETREAT_MAX = 14; // yards (well within LEASH_DISTANCE = 45)
+const FLEE_RETREAT_SPREAD = 0.8; // +/- radians of jitter around "directly away"
+const FLEE_ARRIVE_DIST = 1.5; // yards; this close to the point counts as arrived
+const FLEE_MAX_DURATION = 8; // s; safety cap if rooted/blocked and it never arrives
 const FLEE_HELP_RADIUS = 8;
 // Only sentient, cowardly families flee; beasts/undead/elementals/dragonkin fight
 // to the death. Elites, rares, and bosses never flee regardless of family.
@@ -1325,7 +1333,7 @@ export class Sim {
     if (!aura || e.auras.some((a) => a.kind === 'root')) return false;
     const angle = Number.isFinite(aura.value) ? aura.value : e.facing;
     const dest = this.groundPos(e.pos.x + Math.sin(angle) * 10, e.pos.z + Math.cos(angle) * 10);
-    this.moveToward(e, dest, e.moveSpeed * FLEE_SPEED_MULT * this.moveSpeedMult(e));
+    this.moveToward(e, dest, e.moveSpeed * FEAR_SPEED_MULT * this.moveSpeedMult(e));
     return true;
   }
   // Silence locks out spell (non-physical) casts but leaves physical abilities,
@@ -2677,7 +2685,7 @@ export class Sim {
     mob.forcedTargetTimer = TAUNT_FORCE_SECONDS;
     if (mob.aiState === 'idle') this.aggroMob(mob, p, false);
     else if (mob.aiState === 'chase' || mob.aiState === 'attack') mob.aggroTargetId = p.id;
-    else if (mob.aiState === 'flee') { mob.aggroTargetId = p.id; mob.aiState = 'attack'; mob.fleeTimer = 0; }
+    else if (mob.aiState === 'flee') { mob.aggroTargetId = p.id; mob.aiState = 'attack'; mob.fleeTimer = 0; mob.fleeTarget = null; }
     this.enterCombat(p, mob);
   }
 
@@ -3990,22 +3998,26 @@ export class Sim {
           mob.aggroTargetId = null;
           clearThreat(mob);
           mob.leashAnchor = null;
+          mob.fleeTarget = null;
           break;
         }
         mob.fleeTimer -= DT;
-        if (mob.fleeTimer <= 0) {
-          // Recover nerve and turn to fight again; hasFled keeps it from re-fleeing.
+        const dest = mob.fleeTarget;
+        const arrived = !dest || dist2d(mob.pos, dest) <= FLEE_ARRIVE_DIST;
+        if (arrived || mob.fleeTimer <= 0) {
+          // Reached the retreat spot (or gave up): turn and fight normally.
+          // hasFled keeps it from re-fleeing this pull.
           mob.aiState = 'attack';
+          mob.fleeTarget = null;
+          mob.facing = angleTo(mob.pos, target.pos);
           mob.swingTimer = Math.min(mob.swingTimer, 0.4);
           break;
         }
-        // Run directly away from the attacker. A root pins it in place (it just
-        // cowers facing away); a stun is already handled by the early return above.
-        const away = angleTo(target.pos, mob.pos);
-        mob.facing = away;
+        // Walk to the chosen retreat point at half speed. A root pins it in place
+        // (it cowers facing its goal); a stun is handled by the early return above.
+        mob.facing = angleTo(mob.pos, dest);
         if (!this.isRooted(mob)) {
-          const fleePos = this.groundPos(mob.pos.x + Math.sin(away) * 10, mob.pos.z + Math.cos(away) * 10);
-          this.moveToward(mob, fleePos, mob.moveSpeed * FLEE_SPEED_MULT * this.moveSpeedMult(mob));
+          this.moveToward(mob, dest, mob.moveSpeed * MOB_FLEE_SPEED_MULT * this.moveSpeedMult(mob));
         }
         break;
       }
@@ -4044,6 +4056,7 @@ export class Sim {
     mob.leashAnchor = null;
     mob.evadeStall = 0;
     mob.fleeTimer = 0;
+    mob.fleeTarget = null;
     mob.hasFled = false;
     clearThreat(mob);
     this.despawnSummonedAdds(mob);
@@ -4070,10 +4083,21 @@ export class Sim {
     if (!this.canFlee(mob)) return false;
     mob.aiState = 'flee';
     mob.hasFled = true;
-    mob.fleeTimer = FLEE_DURATION;
+    mob.fleeTimer = FLEE_MAX_DURATION;
+    mob.fleeTarget = this.pickFleePoint(mob, target);
     this.emit({ type: 'log', text: `${mob.name} attempts to flee!`, color: '#ffd966', entityId: mob.id });
     this.callForHelp(mob, target);
     return true;
+  }
+
+  // A retreat point a short, random distance away from the attacker -- the mob walks
+  // here at half speed, then turns and fights. Direction is "directly away" jittered
+  // by +/-FLEE_RETREAT_SPREAD so a fleeing pack does not all run to the same spot.
+  private pickFleePoint(mob: Entity, target: Entity): Vec3 {
+    const away = angleTo(target.pos, mob.pos);
+    const ang = away + this.rng.range(-FLEE_RETREAT_SPREAD, FLEE_RETREAT_SPREAD);
+    const dist = this.rng.range(FLEE_RETREAT_MIN, FLEE_RETREAT_MAX);
+    return this.groundPos(mob.pos.x + Math.sin(ang) * dist, mob.pos.z + Math.cos(ang) * dist);
   }
 
   // A fleeing mob shouts for aid: nearby idle same-family mobs join the fight,

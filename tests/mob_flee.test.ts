@@ -1,7 +1,7 @@
-// Cowardly mobs (sentient families: humanoid/kobold/murloc/troll) panic at low HP
-// instead of fighting to the death: they turn and run from their attacker for a few
-// seconds, rallying nearby same-family allies, then recover their nerve. They flee
-// only ONCE per pull, and elites/bosses/beasts never flee.
+// Cowardly mobs (sentient families: humanoid/kobold/murloc/troll) break off at low HP
+// instead of fighting to the death: they RETREAT at half speed to a random point a
+// short way off, rallying nearby same-family allies, then turn and fight again. They
+// flee only ONCE per pull, and elites/bosses/beasts never flee.
 import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
 import { dist2d } from '../src/sim/types';
@@ -66,6 +66,42 @@ describe('cowardly mobs flee at low HP', () => {
 
     expect(mob.aiState === 'flee' || mob.hasFled).toBe(true);
     expect(dist2d(mob.pos, sim.player.pos)).toBeGreaterThan(before);
+  });
+
+  it('retreats at reduced (half) speed, not a panic sprint', () => {
+    const sim = makeSim();
+    const mob = wildMobs(sim)[0];
+    engageLowHp(sim, mob, 'gravecaller_cultist', 0.1);
+
+    sim.tick(); // enters the flee state and picks a fixed retreat point
+    expect(mob.aiState).toBe('flee');
+    expect(mob.fleeTarget).not.toBeNull();
+
+    const from = { ...mob.pos };
+    sim.tick(); // first step of the retreat
+    const step = dist2d(mob.pos, from);
+    const fullWalkStep = mob.moveSpeed / 20; // DT = 1/20
+    expect(step).toBeGreaterThan(0);
+    expect(step).toBeLessThan(fullWalkStep * 0.75); // clearly slower than walking
+  });
+
+  it('retreats to its chosen point, then stops fleeing to re-engage', () => {
+    const sim = makeSim();
+    const mob = wildMobs(sim)[0];
+    engageLowHp(sim, mob, 'gravecaller_cultist', 0.1);
+
+    sim.tick();
+    const target = { ...mob.fleeTarget! }; // capture before it is cleared on arrival
+
+    let stopped = false;
+    for (let i = 0; i < 20 * 12; i++) {
+      sim.tick();
+      if (mob.aiState !== 'flee') { stopped = true; break; }
+    }
+    expect(stopped).toBe(true);
+    expect(mob.aiState).not.toBe('flee');
+    // destination-based, not a fixed timer: it actually reached the retreat point
+    expect(dist2d(mob.pos, target)).toBeLessThan(2);
   });
 
   it('calls a nearby same-family ally into the fight when it flees', () => {
