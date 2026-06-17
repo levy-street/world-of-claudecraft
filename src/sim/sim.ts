@@ -14,6 +14,13 @@ import {
   validateAllocation, cloneAllocation, pointsSpent, FIRST_TALENT_LEVEL, MAX_LOADOUTS,
   type TalentAllocation, type TalentModifiers, type SavedLoadout, type Role,
 } from './content/talents';
+import {
+  PROFESSIONS, RECIPES, difficultyColor, tierCap, nextTier, tierLearnCost, recipeLearnCost,
+  CLOTH_DROP_CHANCE, CLOTH_QTY, CLOTH_FAMILIES, SCRAP_DROP_CHANCE, CLOTH_SCRAP, clothCandidates,
+  leatherCandidates, skinReq, skinDifficulty, SKIN_QTY, SKIN_HIDE_CHANCE, HIDE_BY_LEATHER,
+  SKIN_FAILURE_CHANCE, SCRAP_COUNT_BY_LEATHER,
+  type RecipeDef, type TierId as ProfTierId, type DifficultyColor,
+} from './content/professions';
 import { Rng } from './rng';
 import { SpatialGrid } from './spatial';
 import {
@@ -32,6 +39,7 @@ import {
   rageFromDealing, rageFromTaking, spellHitChance, xpForLevel,
   MILESTONES, virtualLevel, xpToReachLevel, canPrestige,
   ArenaFormat, ArenaStanding, ArenaCombatant,
+  SKILLUP_CHANCE, RECENTLY_BANDAGED_TIME,
 } from './types';
 
 const LEASH_DISTANCE = 45;
@@ -41,6 +49,20 @@ const DUNGEON_LEASH_DISTANCE = 70;
 // attacked). Elites, rares, and bosses are never trivial.
 const TRIVIAL_LEVEL_GAP = 10;
 const CORPSE_DURATION = 60;
+// Professions: craft casts use this id prefix (+recipeId); bandages this id. A
+// character may know at most this many primary professions (secondaries are free).
+const CRAFT_CAST_PREFIX = 'craft:';
+const BANDAGE_CAST_ID = 'bandage';
+// Skinning: the cast id encodes the target corpse (skin:<mobId>), mirroring the
+// craft prefix, so completion knows which corpse to resolve.
+const SKIN_CAST_PREFIX = 'skin:';
+const SKIN_CAST_TIME = 2;
+// After a skinnable corpse is looted, guarantee at least this long before it
+// despawns so there's always time to skin it — even if it was looted at the very
+// end of its corpse life. Only ever extends the window (max with what's left), so
+// looting promptly is never hindered. Comfortably fits the 2s skin cast.
+const SKIN_LOOT_GRACE = 5;
+const MAX_PRIMARY_PROFESSIONS = 2;
 const EVADE_SPEED_MULT = 1.6;
 // An evading mob walks a straight line home (no pathfinding) and stalls if deep
 // water or a collider sits between it and its spawn. Since evading mobs are
@@ -353,6 +375,17 @@ export interface PlayerMeta {
   // Session-only: name of the last player who whispered us, for "/r" replies.
   // Never persisted — a fresh login starts with no reply target.
   lastWhisperFrom?: string;
+  // Professions & secondary skills. `professionSkills` maps a profession id to a
+  // current skill level (1..100); a profession is "known" when present.
+  // `professionTiers` records the highest tier learned (gates the skill cap).
+  professionSkills: Record<string, number>;
+  professionTiers: Record<string, ProfTierId>;
+  // Recipes learned from a trainer (must be learned before crafting, even once
+  // the skill requirement is met). The starter recipe is auto-learned for free.
+  learnedRecipes: Set<string>;
+  // same ids as learnedRecipes, kept in sync on add; the per-tick snapshot reads
+  // this instead of spreading the Set every frame. recipes are add-only in v1
+  learnedRecipesArr: string[];
 }
 
 // Away-from-keyboard / do-not-disturb presence. `afk` still delivers whispers
@@ -436,6 +469,11 @@ export interface CharacterState {
   activeLoadout?: number;
   pet?: PetState | null;
   skin?: number; // appearance index (JSONB; optional so pre-skin saves load as 0)
+  // Professions & secondary skills (JSONB; no migration). Optional so pre-profession
+  // saves load cleanly (default: nothing known).
+  professionSkills?: Record<string, number>;
+  professionTiers?: Record<string, string>;
+  learnedRecipes?: string[];
 }
 
 export interface PetState {
@@ -742,6 +780,10 @@ export class Sim {
       loadouts: [],
       activeLoadout: -1,
       away: null,
+      professionSkills: {},
+      professionTiers: {},
+      learnedRecipes: new Set(),
+      learnedRecipesArr: [],
     };
     this.players.set(player.id, meta);
     player.skin = meta.skin; // mirror onto the entity so the renderer + wire can read it
@@ -770,6 +812,10 @@ export class Sim {
       if (s.talents) meta.talents = { spec: s.talents.spec ?? null, ranks: { ...s.talents.ranks }, choices: { ...s.talents.choices } };
       if (s.loadouts) meta.loadouts = s.loadouts.map((l) => ({ name: l.name, alloc: cloneAllocation(l.alloc), bar: [...(l.bar ?? [])] }));
       if (typeof s.activeLoadout === 'number') meta.activeLoadout = s.activeLoadout;
+      if (s.professionSkills) meta.professionSkills = { ...s.professionSkills };
+      if (s.professionTiers) meta.professionTiers = { ...s.professionTiers } as Record<string, ProfTierId>;
+      if (s.learnedRecipes) for (const r of s.learnedRecipes) meta.learnedRecipes.add(r);
+      meta.learnedRecipesArr = [...meta.learnedRecipes];
     }
 
     // Resolve the flat talent struct once, before the stat pass + ability
@@ -873,6 +919,9 @@ export class Sim {
       activeLoadout: meta.activeLoadout,
       pet: this.serializePet(pid),
       skin: meta.skin,
+      professionSkills: { ...meta.professionSkills },
+      professionTiers: { ...meta.professionTiers },
+      learnedRecipes: [...meta.learnedRecipes],
     };
   }
 
@@ -987,6 +1036,15 @@ export class Sim {
   }
   get activeLoadout(): number {
     return this.primary.activeLoadout;
+  }
+  get professionSkills(): Record<string, number> {
+    return this.primary.professionSkills;
+  }
+  get professionTiers(): Record<string, ProfTierId> {
+    return this.primary.professionTiers;
+  }
+  get learnedRecipes(): string[] {
+    return [...this.primary.learnedRecipes];
   }
 
   meta(pid: number): PlayerMeta | null {
@@ -1920,12 +1978,28 @@ export class Sim {
         this.completeFishing(p, meta);
         return;
       }
+      if (castId === BANDAGE_CAST_ID) {
+        // debuff applied at cast start, hot healed over the channel — nothing to finalize
+        return;
+      }
+      if (castId.startsWith(CRAFT_CAST_PREFIX)) {
+        this.completeCraft(p, meta, castId.slice(CRAFT_CAST_PREFIX.length));
+        return;
+      }
+      if (castId.startsWith(SKIN_CAST_PREFIX)) {
+        this.completeSkin(p, meta, Number(castId.slice(SKIN_CAST_PREFIX.length)));
+        return;
+      }
       const res = this.resolvedAbility(castId, p.id);
       if (res) this.applyAbility(p, meta, res);
     }
   }
 
   private cancelCast(p: Entity): void {
+    // interrupted bandage: stop the HoT immediately (no heal for the rest)
+    if (p.castingAbility === BANDAGE_CAST_ID) {
+      p.auras = p.auras.filter((a) => a.id !== BANDAGE_CAST_ID);
+    }
     p.castingAbility = null;
     p.castRemaining = 0;
     p.channeling = false;
@@ -3465,7 +3539,7 @@ export class Sim {
       // vanilla spell pushback: a landed hit delays the cast rather than
       // cancelling it (misses and fully absorbed hits don't push back)
       if (target.castingAbility && source && source.id !== target.id && amount > 0 && kind === 'hit') {
-        if (target.castingAbility === FISHING_CAST_ID) this.cancelCast(target);
+        if (this.isProfessionCast(target.castingAbility)) this.cancelCast(target);
         else if (!ignoresDamagePushback(target.castingAbility)) this.pushbackCast(target);
       }
     }
@@ -3728,6 +3802,25 @@ export class Sim {
       if (entry.copper) copper += this.rng.int(Math.ceil(entry.copper * 0.6), Math.ceil(entry.copper * 1.4));
       if (entry.itemId) items.push({ itemId: entry.itemId, count: 1 });
     }
+    // Family-gated cloth (Tailoring/First Aid material): cloth-wearing humanoid
+    // families have a chance to drop a small stack, the tier banded by mob level
+    // (linen/wool/silk) with overlap. Injected here, after the per-mob loot loop,
+    // so we don't edit every template. This replaces the legacy linen_scrap junk.
+    // Pick the tier first (so cloth and its consolation scrap share a level band),
+    // then roll drop-or-not, then quantity on a hit / scrap on a miss.
+    if (CLOTH_FAMILIES.includes(template.family)) {
+      const cands = clothCandidates(mob.level);
+      if (cands.length > 0) {
+        // pick the tier first (so cloth and its consolation scrap match the level)
+        const tier = cands.length === 1 ? cands[0] : cands[this.rng.int(0, cands.length - 1)];
+        if (this.rng.chance(CLOTH_DROP_CHANCE)) {
+          items.push({ itemId: tier, count: this.rng.int(CLOTH_QTY.min, CLOTH_QTY.max) });
+        } else if (this.rng.chance(SCRAP_DROP_CHANCE)) {
+          // no cloth this time — drop the scrap junk for this tier instead
+          items.push({ itemId: CLOTH_SCRAP[tier] ?? 'linen_scrap', count: 1 });
+        }
+      }
+    }
     if (copper > 0 || items.length > 0) {
       mob.loot = { copper, items };
       mob.lootable = true;
@@ -3807,6 +3900,12 @@ export class Sim {
       mob.loot = null;
       mob.lootable = false;
       mob.corpseTimer = Math.min(mob.corpseTimer, 4);
+      // An unskinned skinnable corpse holds a short post-loot grace so there's
+      // always time to skin it (the respawn timer is the despawn gate once
+      // looted; max() only ever extends, never shortens an early-loot window).
+      if (MOBS[mob.templateId]?.skinnable && !mob.skinned) {
+        mob.respawnTimer = Math.max(mob.respawnTimer, SKIN_LOOT_GRACE);
+      }
     }
   }
 
@@ -4644,6 +4743,7 @@ export class Sim {
     mob.dead = false;
     mob.lootable = false;
     mob.loot = null;
+    mob.skinned = false;
     mob.tappedById = null;
     mob.ownerId = null;
     mob.hostile = true;
@@ -4960,10 +5060,23 @@ export class Sim {
     if (!r) return;
     const { meta } = r;
     const def = ITEMS[itemId];
-    const existing = meta.inventory.find((s) => s.itemId === itemId);
-    if (existing) existing.count += count;
-    else meta.inventory.push({ itemId, count });
-    this.emit({ type: 'loot', text: `You receive: ${def?.name ?? itemId}${count > 1 ? ' x' + count : ''}.`, pid: meta.entityId });
+    const received = count;
+    // Respect stackSize: top up existing partial stacks, then spill into new
+    // slots. Items with no stackSize stay one unbounded slot (historical default).
+    const cap = def?.stackSize ?? Infinity;
+    for (let i = 0; i < meta.inventory.length && count > 0; i++) {
+      const s = meta.inventory[i];
+      if (s.itemId !== itemId || s.count >= cap) continue;
+      const add = Math.min(cap - s.count, count);
+      s.count += add;
+      count -= add;
+    }
+    while (count > 0) {
+      const add = Math.min(cap, count);
+      meta.inventory.push({ itemId, count: add });
+      count -= add;
+    }
+    this.emit({ type: 'loot', text: `You receive: ${def?.name ?? itemId}${received > 1 ? ' x' + received : ''}.`, pid: meta.entityId });
     this.onInventoryChangedForQuests(meta);
     if (meta.autoEquip && (def?.kind === 'weapon' || def?.kind === 'armor')) {
       this.maybeAutoEquip(itemId, meta);
@@ -5071,6 +5184,337 @@ export class Sim {
     }
   }
 
+  // Skinning (gathering, corpse-based). The last action on a beast corpse: only
+  // available once all loot is taken, then a short cast yields leather + a rare
+  // hide and despawns the corpse. Server-authoritative; client sends skin(mobId).
+  skin(mobId: number, pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    const mob = this.entities.get(mobId);
+    if (!mob) { this.error(r.meta.entityId, "You can't skin that."); return; }
+    this.startSkin(r.e, r.meta, mob);
+  }
+
+  private startSkin(p: Entity, meta: PlayerMeta, mob: Entity): void {
+    if (p.dead) { this.error(meta.entityId, "You can't do that while dead."); return; }
+    if (p.inCombat) { this.error(meta.entityId, "You can't do that while in combat."); return; }
+    if (this.isSwimming(p)) { this.error(meta.entityId, "You can't do that while swimming."); return; }
+    if (p.castingAbility || isConsuming(p)) { this.error(meta.entityId, 'You are busy.'); return; }
+    if (meta.professionSkills.skinning === undefined) { this.error(meta.entityId, 'You have not learned Skinning.'); return; }
+    if (mob.kind !== 'mob' || !mob.dead) { this.error(meta.entityId, "You can't skin that."); return; }
+    if (!MOBS[mob.templateId]?.skinnable) { this.error(meta.entityId, 'That creature cannot be skinned.'); return; }
+    if (mob.skinned) { this.error(meta.entityId, 'That corpse has already been skinned.'); return; }
+    // loot before skin: skinning is the last action, blocked while any loot remains
+    if (mob.lootable) { this.error(meta.entityId, 'You must loot the corpse first.'); return; }
+    if (dist2d(p.pos, mob.pos) > INTERACT_RANGE) { this.error(meta.entityId, 'Too far away.'); return; }
+    const req = skinReq(mob.level);
+    if ((meta.professionSkills.skinning ?? 0) < req) { this.error(meta.entityId, `Requires Skinning ${req}.`); return; }
+    if (p.sitting) this.standUp(p);
+    p.castingAbility = SKIN_CAST_PREFIX + mob.id;
+    p.castTotal = SKIN_CAST_TIME;
+    p.castRemaining = SKIN_CAST_TIME;
+    p.channeling = false;
+    this.emit({ type: 'castStart', entityId: p.id, ability: p.castingAbility, time: SKIN_CAST_TIME });
+  }
+
+  private completeSkin(p: Entity, meta: PlayerMeta, mobId: number): void {
+    const mob = this.entities.get(mobId);
+    if (!mob || !mob.dead || mob.kind !== 'mob') return;
+    if (!MOBS[mob.templateId]?.skinnable || mob.skinned) return;
+    // re-validate the gates that could change during the cast
+    if (p.inCombat) { this.error(meta.entityId, "You can't do that while in combat."); return; }
+    if (mob.lootable) { this.error(meta.entityId, 'You must loot the corpse first.'); return; }
+    if (dist2d(p.pos, mob.pos) > INTERACT_RANGE) { this.error(meta.entityId, 'Too far away.'); return; }
+    const skill = meta.professionSkills.skinning ?? 0;
+    if (skill < skinReq(mob.level)) { this.error(meta.entityId, `Requires Skinning ${skinReq(mob.level)}.`); return; }
+    const color = skinDifficulty(skill, mob.level);
+    // pick the level-banded leather tier (uniform within an overlap band)
+    const cands = leatherCandidates(mob.level);
+    const tier = cands.length === 0 ? 'light_leather'
+      : cands.length === 1 ? cands[0] : cands[this.rng.int(0, cands.length - 1)];
+    // difficulty-scaled failure: ruined scraps instead of leather (0 at grey).
+    // Draw order is fixed (tier pick, fail roll, qty/scrap, hide, skill-up) for
+    // determinism; the fail roll is skipped entirely at grey (chance 0).
+    const failChance = SKIN_FAILURE_CHANCE[color];
+    if (failChance > 0 && this.rng.chance(failChance)) {
+      const sc = SCRAP_COUNT_BY_LEATHER[tier] ?? { min: 1, max: 2 };
+      this.addItem('ruined_leather_scraps', this.rng.int(sc.min, sc.max), meta.entityId);
+    } else {
+      this.addItem(tier, this.rng.int(SKIN_QTY.min, SKIN_QTY.max), meta.entityId);
+    }
+    // independent rare hide roll
+    if (this.rng.chance(SKIN_HIDE_CHANCE)) {
+      const hide = HIDE_BY_LEATHER[tier];
+      if (hide) this.addItem(hide, 1, meta.entityId);
+    }
+    // mark skinned (blocks re-skin) and collapse the corpse's own timer like a
+    // looted corpse; it despawns on the normal respawn timer (skin requires the
+    // corpse already looted, so respawn is gated by respawnTimer either way).
+    mob.skinned = true;
+    mob.corpseTimer = Math.min(mob.corpseTimer, 4);
+    this.rollSkillUpColor(meta, 'skinning', color);
+  }
+
+  // -------------------------------------------------------------------------
+  // Professions & crafting (server-authoritative). Skill, materials, and output
+  // are computed here; clients send only learnProfession / craft intents.
+  // -------------------------------------------------------------------------
+
+  private isProfessionCast(castId: string | null): boolean {
+    return castId === FISHING_CAST_ID || castId === BANDAGE_CAST_ID
+      || (castId !== null && (castId.startsWith(CRAFT_CAST_PREFIX) || castId.startsWith(SKIN_CAST_PREFIX)));
+  }
+
+  private skillCap(meta: PlayerMeta, profId: string): number {
+    const prof = PROFESSIONS[profId];
+    return prof ? tierCap(prof, meta.professionTiers[profId]) : 0;
+  }
+
+  private primaryProfCount(meta: PlayerMeta): number {
+    let n = 0;
+    for (const id of Object.keys(meta.professionSkills)) if (PROFESSIONS[id]?.kind === 'primary') n++;
+    return n;
+  }
+
+  // highest trainer tier for a profession among nearby NPCs (journeyman beats
+  // apprentice), or null if none in range. apprentice trainers live in the starting
+  // town, journeyman trainers in later towns; this drives the learn-tier gate
+  private bestTrainerTier(p: Entity, profId: string): 'apprentice' | 'journeyman' | null {
+    let best: 'apprentice' | 'journeyman' | null = null;
+    this.grid.forEachInRadius(p.pos.x, p.pos.z, INTERACT_RANGE + 2, (e) => {
+      if (e.kind !== 'npc' || NPCS[e.templateId]?.trains !== profId) return;
+      const tier = NPCS[e.templateId]?.trainsMaxTier ?? 'journeyman';
+      if (tier === 'journeyman') best = 'journeyman';
+      else if (best === null) best = 'apprentice';
+    });
+    return best;
+  }
+
+  private nearStation(p: Entity, station: string): boolean {
+    let found = false;
+    this.grid.forEachInRadius(p.pos.x, p.pos.z, INTERACT_RANGE + 3, (e) => {
+      if (e.kind === 'object' && e.templateId === 'station_' + station) found = true;
+    });
+    return found;
+  }
+
+  learnProfession(profId: string, tier: ProfTierId, pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    const { meta, e: p } = r;
+    const prof = PROFESSIONS[profId];
+    if (!prof) { this.error(meta.entityId, 'No such profession.'); return; }
+    const trainerTier = this.bestTrainerTier(p, profId);
+    if (!trainerTier) { this.error(meta.entityId, 'You must speak to a trainer.'); return; }
+    const known = meta.professionSkills[profId] !== undefined;
+    if (tier === 'apprentice') {
+      if (known) { this.error(meta.entityId, `You already know ${prof.name}.`); return; }
+      if (prof.kind === 'primary' && this.primaryProfCount(meta) >= MAX_PRIMARY_PROFESSIONS) {
+        this.error(meta.entityId, 'You already know two primary professions.'); return;
+      }
+      const t = prof.tiers.find((x) => x.id === 'apprentice');
+      if (t && p.level < t.requiresLevel) { this.error(meta.entityId, `Requires level ${t.requiresLevel}.`); return; }
+      const cost = tierLearnCost(prof, 'apprentice');
+      if (meta.copper < cost) { this.error(meta.entityId, 'Not enough money.'); return; }
+      meta.copper -= cost;
+      meta.professionSkills[profId] = 1;
+      meta.professionTiers[profId] = 'apprentice';
+      // teach the starter recipe(s) for free so the profession is usable at once
+      for (const rid of prof.recipes) {
+        if ((RECIPES[rid]?.requiredSkill ?? 99) <= 1 && !meta.learnedRecipes.has(rid)) {
+          meta.learnedRecipes.add(rid);
+          meta.learnedRecipesArr.push(rid);
+        }
+      }
+    } else {
+      if (!known) { this.error(meta.entityId, `Learn ${prof.name} first.`); return; }
+      // journeyman (and beyond) is taught only by a journeyman trainer in a later town
+      if (trainerTier !== 'journeyman') { this.error(meta.entityId, 'You must speak to a trainer.'); return; }
+      const next = nextTier(prof, meta.professionTiers[profId]);
+      if (!next || next.id !== tier) { this.error(meta.entityId, 'There is nothing more to learn yet.'); return; }
+      if ((meta.professionSkills[profId] ?? 0) < next.requiresSkill) {
+        this.error(meta.entityId, `Requires ${prof.name} ${next.requiresSkill}.`); return;
+      }
+      // Journeyman also needs a minimum character level — can't max a skill at level 1.
+      if (p.level < next.requiresLevel) { this.error(meta.entityId, `Requires level ${next.requiresLevel}.`); return; }
+      const cost = tierLearnCost(prof, next.id);
+      if (meta.copper < cost) { this.error(meta.entityId, 'Not enough money.'); return; }
+      meta.copper -= cost;
+      meta.professionTiers[profId] = next.id;
+    }
+    this.emit({ type: 'professionLearned', profId, tier: meta.professionTiers[profId], pid: meta.entityId });
+  }
+
+  learnRecipe(recipeId: string, pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    const { meta, e: p } = r;
+    const recipe = RECIPES[recipeId];
+    if (!recipe) { this.error(meta.entityId, 'No such recipe.'); return; }
+    const prof = PROFESSIONS[recipe.profId];
+    if (!prof) { this.error(meta.entityId, 'No such profession.'); return; }
+    const trainerTier = this.bestTrainerTier(p, recipe.profId);
+    if (!trainerTier) { this.error(meta.entityId, 'You must speak to a trainer.'); return; }
+    if (meta.professionSkills[recipe.profId] === undefined) { this.error(meta.entityId, `Learn ${prof.name} first.`); return; }
+    if (meta.learnedRecipes.has(recipeId)) { this.error(meta.entityId, 'You already know that recipe.'); return; }
+    if ((meta.professionSkills[recipe.profId] ?? 0) < recipe.requiredSkill) {
+      this.error(meta.entityId, `Requires ${prof.name} ${recipe.requiredSkill}.`); return;
+    }
+    // apprentice trainers only teach recipes below the apprentice cap; higher recipes
+    // need a journeyman trainer (mirrors the journeyman tier gate above)
+    const appCap = prof.tiers.find((tr) => tr.id === 'apprentice')?.cap ?? 0;
+    if (trainerTier === 'apprentice' && recipe.requiredSkill >= appCap) {
+      this.error(meta.entityId, 'You must speak to a trainer.'); return;
+    }
+    const cost = recipeLearnCost(recipe);
+    if (meta.copper < cost) { this.error(meta.entityId, 'Not enough money.'); return; }
+    meta.copper -= cost;
+    meta.learnedRecipes.add(recipeId);
+    meta.learnedRecipesArr.push(recipeId);
+    this.emit({ type: 'recipeLearned', recipeId, pid: meta.entityId });
+  }
+
+  // Unlearn a profession: wipes its skill, learned tier, and every learned recipe
+  // that belongs to it. Frees a primary slot (the 2-primary cap counts known
+  // primaries), so a player can swap professions. Server-authoritative; the client
+  // confirms before sending. Re-learning starts again from skill 1.
+  dropProfession(profId: string, pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    const { meta } = r;
+    const prof = PROFESSIONS[profId];
+    if (!prof) { this.error(meta.entityId, 'No such profession.'); return; }
+    if (meta.professionSkills[profId] === undefined) { this.error(meta.entityId, 'You have not learned that profession.'); return; }
+    delete meta.professionSkills[profId];
+    delete meta.professionTiers[profId];
+    for (const id of [...meta.learnedRecipes]) {
+      if (RECIPES[id]?.profId === profId) meta.learnedRecipes.delete(id);
+    }
+    meta.learnedRecipesArr = [...meta.learnedRecipes];
+    this.emit({ type: 'professionDropped', profId, pid: meta.entityId });
+  }
+
+  // Recipe taught by a pattern item (vendor-bought / looted) — mirrors the
+  // trainer learnRecipe checks minus trainer proximity and copper cost, then
+  // consumes the item. The seam for recipe sources beyond trainers (PR 2 ships
+  // the seam; every PR-2 recipe is still trainer-taught).
+  private learnRecipeFromItem(meta: PlayerMeta, itemId: string, recipeId: string): void {
+    const recipe = RECIPES[recipeId];
+    if (!recipe) { this.error(meta.entityId, 'No such recipe.'); return; }
+    const prof = PROFESSIONS[recipe.profId];
+    if (!prof) { this.error(meta.entityId, 'No such profession.'); return; }
+    if (meta.professionSkills[recipe.profId] === undefined) { this.error(meta.entityId, `Learn ${prof.name} first.`); return; }
+    if (meta.learnedRecipes.has(recipeId)) { this.error(meta.entityId, 'You already know that recipe.'); return; }
+    if ((meta.professionSkills[recipe.profId] ?? 0) < recipe.requiredSkill) {
+      this.error(meta.entityId, `Requires ${prof.name} ${recipe.requiredSkill}.`); return;
+    }
+    meta.learnedRecipes.add(recipeId);
+    meta.learnedRecipesArr.push(recipeId);
+    this.removeItem(itemId, 1, meta.entityId);
+    this.emit({ type: 'recipeLearned', recipeId, pid: meta.entityId });
+  }
+
+  craft(recipeId: string, pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    const { meta, e: p } = r;
+    const recipe = RECIPES[recipeId];
+    if (!recipe) { this.error(meta.entityId, 'No such recipe.'); return; }
+    if (p.dead) { this.error(meta.entityId, "You can't do that while dead."); return; }
+    if (p.inCombat) { this.error(meta.entityId, "You can't do that while in combat."); return; }
+    if (p.castingAbility || isConsuming(p)) { this.error(meta.entityId, 'You are busy.'); return; }
+    const skill = meta.professionSkills[recipe.profId];
+    if (skill === undefined) { this.error(meta.entityId, 'You have not learned that profession.'); return; }
+    if (!meta.learnedRecipes.has(recipeId)) { this.error(meta.entityId, 'You have not learned that recipe.'); return; }
+    if (skill < recipe.requiredSkill) { this.error(meta.entityId, 'Your skill is too low.'); return; }
+    if (recipe.station && !this.nearStation(p, recipe.station)) { this.error(meta.entityId, `You need to be near a ${recipe.station}.`); return; }
+    const batch = recipe.batch ?? 1;
+    for (const reg of recipe.reagents) {
+      if (this.countItem(reg.itemId, meta.entityId) < reg.count * batch) { this.error(meta.entityId, 'You lack the materials.'); return; }
+    }
+    if (p.sitting) this.standUp(p);
+    p.castingAbility = CRAFT_CAST_PREFIX + recipeId;
+    p.castTotal = recipe.castTime;
+    p.castRemaining = recipe.castTime;
+    p.channeling = false;
+    this.emit({ type: 'castStart', entityId: p.id, ability: p.castingAbility, time: recipe.castTime });
+  }
+
+  private completeCraft(p: Entity, meta: PlayerMeta, recipeId: string): void {
+    const recipe = RECIPES[recipeId];
+    if (!recipe) return;
+    // recipe must still be known — the profession can be dropped mid-cast (unlearn),
+    // which removes the recipe; without this the craft would still produce + skill up
+    if (!meta.learnedRecipes.has(recipeId)) return;
+    const batch = recipe.batch ?? 1;
+    // re-validate on completion — reagents are only ever consumed here, never on start
+    for (const reg of recipe.reagents) {
+      if (this.countItem(reg.itemId, meta.entityId) < reg.count * batch) { this.error(meta.entityId, 'You lack the materials.'); return; }
+    }
+    for (const reg of recipe.reagents) this.removeItem(reg.itemId, reg.count * batch, meta.entityId);
+    this.addItem(recipe.output.itemId, recipe.output.count * batch, meta.entityId);
+    const out = ITEMS[recipe.output.itemId];
+    this.emit({ type: 'log', text: `You make ${recipe.output.count * batch}x ${out?.name ?? recipe.name}.`, color: '#9f9', pid: meta.entityId });
+    // Mass-craft (batch) still rolls a single skill-up — throughput, not a skill accelerator.
+    this.rollSkillUp(meta, recipe);
+  }
+
+  private rollSkillUp(meta: PlayerMeta, recipe: RecipeDef): void {
+    const skill = meta.professionSkills[recipe.profId] ?? 0;
+    this.rollSkillUpColor(meta, recipe.profId, difficultyColor(skill, recipe));
+  }
+
+  // Skill-up by difficulty color, clamped to the learned tier cap. Shared by the
+  // craft loop (recipe difficulty) and the gather loop (skin difficulty).
+  private rollSkillUpColor(meta: PlayerMeta, profId: string, color: DifficultyColor): void {
+    if (!PROFESSIONS[profId]) return;
+    const skill = meta.professionSkills[profId] ?? 0;
+    const cap = this.skillCap(meta, profId);
+    if (skill >= cap) return; // at the learned tier's cap — train the next tier to continue
+    const chance = SKILLUP_CHANCE[color];
+    if (chance <= 0) return;
+    if (this.rng.chance(chance)) {
+      const next = Math.min(cap, skill + 1);
+      meta.professionSkills[profId] = next;
+      this.emit({ type: 'skillUp', profId, skill: next, pid: meta.entityId });
+    }
+  }
+
+  private startBandage(p: Entity, meta: PlayerMeta, itemId: string, use: { totalHeal: number; channelTime: number }): void {
+    if (p.dead) { this.error(meta.entityId, "You can't do that while dead."); return; }
+    // bandaging IS allowed in combat; the channel just breaks on damage/move/action
+    // (handled by the profession-cast interrupt), so there's no combat gate here.
+    if (this.isSwimming(p)) { this.error(meta.entityId, "You can't do that while swimming."); return; }
+    if (p.castingAbility || isConsuming(p)) { this.error(meta.entityId, 'You are busy.'); return; }
+    // v1: self-bandage only. The cooldown debuff blocks re-application.
+    if (p.auras.some((a) => a.kind === 'recently_bandaged')) { this.error(meta.entityId, 'That target was bandaged too recently.'); return; }
+    if (p.hp >= p.maxHp) { this.error(meta.entityId, 'You are already at full health.'); return; }
+    if (p.sitting) this.standUp(p);
+    // bandage is consumed at cast start (vanilla: an interrupt wastes it), unlike
+    // craft reagents which are consumed only on completion
+    this.removeItem(itemId, 1, meta.entityId);
+    // Channel heals over its duration via a hot aura; cancelling removes it.
+    const ticks = Math.max(1, Math.round(use.channelTime));
+    p.auras.push({
+      id: BANDAGE_CAST_ID, name: 'Bandage', kind: 'hot', remaining: use.channelTime, duration: use.channelTime,
+      value: Math.max(1, Math.round(use.totalHeal / ticks)), tickInterval: 1, tickTimer: 1,
+      sourceId: p.id, school: 'physical',
+    });
+    // Apply Recently Bandaged at the START (vanilla behavior): interrupting the
+    // channel does NOT dodge the cooldown, so you can't spam-cancel to re-bandage.
+    p.auras.push({
+      id: 'recently_bandaged', name: 'Recently Bandaged', kind: 'recently_bandaged',
+      remaining: RECENTLY_BANDAGED_TIME, duration: RECENTLY_BANDAGED_TIME, value: 0,
+      sourceId: p.id, school: 'physical',
+    });
+    this.emit({ type: 'aura', targetId: p.id, name: 'Recently Bandaged', gained: true });
+    p.castingAbility = BANDAGE_CAST_ID;
+    p.castTotal = use.channelTime;
+    p.castRemaining = use.channelTime;
+    p.channeling = false; // cast-style so it breaks on move/damage; the hot does the healing
+    this.emit({ type: 'castStart', entityId: p.id, ability: BANDAGE_CAST_ID, time: use.channelTime });
+  }
+
   useItem(itemId: string, pid?: number): void {
     const r = this.resolve(pid);
     if (!r) return;
@@ -5078,11 +5522,20 @@ export class Sim {
     const def = ITEMS[itemId];
     if (!def) return;
     if (this.countItem(itemId, meta.entityId) <= 0) { this.error(meta.entityId, "You don't have that item."); return; }
+    if (def.requiredLevel && p.level < def.requiredLevel) { this.error(meta.entityId, `Requires level ${def.requiredLevel}.`); return; }
     if (def.use?.type === 'fishing') {
       this.startFishing(p, meta);
       return;
     }
-    if (p.castingAbility === FISHING_CAST_ID) { this.error(meta.entityId, 'You are busy.'); return; }
+    if (def.use?.type === 'bandage') {
+      this.startBandage(p, meta, itemId, def.use);
+      return;
+    }
+    if (def.use?.type === 'learnRecipe') {
+      this.learnRecipeFromItem(meta, itemId, def.use.recipeId);
+      return;
+    }
+    if (this.isProfessionCast(p.castingAbility)) { this.error(meta.entityId, 'You are busy.'); return; }
     if (p.dead) return;
     if (def.kind === 'food' || def.kind === 'drink') {
       if (p.inCombat) { this.error(meta.entityId, "You can't do that while in combat."); return; }
@@ -5203,9 +5656,21 @@ export class Sim {
   }
 
   private addItemSilent(itemId: string, count: number, meta: PlayerMeta): void {
-    const existing = meta.inventory.find((s) => s.itemId === itemId);
-    if (existing) existing.count += count;
-    else meta.inventory.push({ itemId, count });
+    // respect stackSize like addItem, so returning a stackable item (buyback,
+    // equip-swap) can't overflow a slot past its cap
+    const cap = ITEMS[itemId]?.stackSize ?? Infinity;
+    for (let i = 0; i < meta.inventory.length && count > 0; i++) {
+      const s = meta.inventory[i];
+      if (s.itemId !== itemId || s.count >= cap) continue;
+      const add = Math.min(cap - s.count, count);
+      s.count += add;
+      count -= add;
+    }
+    while (count > 0) {
+      const add = Math.min(cap, count);
+      meta.inventory.push({ itemId, count: add });
+      count -= add;
+    }
   }
 
   private maybeAutoEquip(itemId: string, meta: PlayerMeta): void {
@@ -5491,8 +5956,14 @@ export class Sim {
     let bestObjD2 = INTERACT_RANGE * INTERACT_RANGE;
     let bestNpc: Entity | null = null;
     let bestNpcD2 = INTERACT_RANGE * INTERACT_RANGE;
+    let bestSkin: Entity | null = null;
+    let bestSkinD2 = INTERACT_RANGE * INTERACT_RANGE;
+    const knowsSkinning = r.meta.professionSkills.skinning !== undefined;
     this.grid.forEachInRadius(p.pos.x, p.pos.z, INTERACT_RANGE, (e, d2) => {
       if (e.kind === 'mob' && e.lootable && d2 < bestCorpseD2) { bestCorpse = e; bestCorpseD2 = d2; }
+      // a looted, un-skinned beast corpse is a skin target (lowest interact priority)
+      if (knowsSkinning && e.kind === 'mob' && e.dead && !e.lootable && !e.skinned
+        && MOBS[e.templateId]?.skinnable && d2 < bestSkinD2) { bestSkin = e; bestSkinD2 = d2; }
       if (e.kind === 'object' && e.lootable && d2 < bestObjD2) { bestObj = e; bestObjD2 = d2; }
       if (e.kind === 'npc' && d2 < bestNpcD2) { bestNpc = e; bestNpcD2 = d2; }
     });
@@ -5500,6 +5971,7 @@ export class Sim {
     const corpse = bestCorpse as Entity | null;
     const obj = bestObj as Entity | null;
     const npc = bestNpc as Entity | null;
+    const skinTarget = bestSkin as Entity | null;
     if (corpse) { this.lootCorpse(corpse.id, p.id); return; }
     if (obj) {
       if (obj.templateId === 'dungeon_door' && obj.dungeonId) { this.enterDungeon(obj.dungeonId, p.id); return; }
@@ -5507,7 +5979,9 @@ export class Sim {
       this.pickUpObject(obj.id, p.id);
       return;
     }
-    if (npc) this.talkToNpc(npc.id, p.id);
+    if (npc) { this.talkToNpc(npc.id, p.id); return; }
+    // nothing to loot/open/talk to — skin a nearby beast corpse if we can
+    if (skinTarget) this.startSkin(p, r.meta, skinTarget);
   }
 
   talkToNpc(npcId: number, pid?: number): void {

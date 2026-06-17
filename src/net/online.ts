@@ -12,6 +12,7 @@ import {
 } from '../sim/types';
 import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import { isOverheadEmoteId, type ArenaInfo, type CharacterSearchResult, type DuelInfo, type FriendInfo, type IWorld, type LeaderboardEntry, type MarketInfo, type OverheadEmoteId, type PartyInfo, type PresenceStatus, type SocialInfo, type TradeInfo } from '../world_api';
+import type { TierId } from '../sim/content/professions';
 
 // ---------------------------------------------------------------------------
 // REST
@@ -271,6 +272,10 @@ export class ClientWorld implements IWorld {
   talentRole: Role | null = null;
   loadouts: SavedLoadout[] = [];
   activeLoadout = -1;
+  // Professions & secondary skills, mirrored from snapshot self (sent on change).
+  professionSkills: Record<string, number> = {};
+  professionTiers: Record<string, TierId> = {};
+  learnedRecipes: string[] = [];
   questLog = new Map<string, QuestProgress>();
   questsDone = new Set<string>();
   partyInfo: PartyInfo | null = null;
@@ -612,6 +617,7 @@ export class ClientWorld implements IWorld {
       if (typeof w.emoSeq === 'number') e.overheadEmoteSeq = w.emoSeq;
       e.dead = nowDead;
       e.lootable = !!w.loot;
+      e.skinned = !!w.skd;
       e.hostile = !!w.h;
       e.castingAbility = w.cast ?? null;
       e.castRemaining = w.castRem ?? 0;
@@ -701,6 +707,10 @@ export class ClientWorld implements IWorld {
       }
       const talents = this.talents ?? (this.talents = emptyAllocation());
       this.known = abilitiesKnownAt(this.cfg.playerClass, e.level, computeTalentModifiers(this.cfg.playerClass, talents));
+      // professions (sent on change); delta-guarded so a missing field keeps state
+      if (s.skills !== undefined) this.professionSkills = s.skills ?? {};
+      if (s.profTiers !== undefined) this.professionTiers = (s.profTiers ?? {}) as Record<string, TierId>;
+      if (s.recipes !== undefined) this.learnedRecipes = s.recipes ?? [];
       if (s.party !== undefined) this.partyInfo = s.party;
       if (s.marks !== undefined) this.markers = s.marks ?? {}; // null = cleared (no party/disband)
       if (s.trade !== undefined) this.tradeInfo = s.trade;
@@ -780,6 +790,9 @@ export class ClientWorld implements IWorld {
   lootCorpse(id: number): void {
     this.cmd({ cmd: 'loot', id });
   }
+  skin(mobId: number): void {
+    this.cmd({ cmd: 'skin', id: mobId });
+  }
   pickUpObject(id: number): void {
     this.cmd({ cmd: 'pickup', id });
   }
@@ -801,6 +814,18 @@ export class ClientWorld implements IWorld {
   }
   useItem(itemId: string): void {
     this.cmd({ cmd: 'use', item: itemId });
+  }
+  learnProfession(profId: string, tier: string): void {
+    this.cmd({ cmd: 'learnProfession', prof: profId, tier });
+  }
+  learnRecipe(recipeId: string): void {
+    this.cmd({ cmd: 'learnRecipe', recipe: recipeId });
+  }
+  dropProfession(profId: string): void {
+    this.cmd({ cmd: 'dropProfession', prof: profId });
+  }
+  craft(recipeId: string): void {
+    this.cmd({ cmd: 'craft', recipe: recipeId });
   }
   discardItem(itemId: string, count?: number): void {
     this.cmd({ cmd: 'discard', item: itemId, count });

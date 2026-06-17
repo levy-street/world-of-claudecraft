@@ -20,7 +20,7 @@ export type UiIconName =
   | 'chat' | 'interact' | 'emote'
   // hand-authored geometrics
   | 'close' | 'prev' | 'next' | 'more' | 'meters'
-  | 'whisper' | 'music' | 'talents' | 'skull' | 'jump' | 'autorun' | 'nameplates' | 'vibrate';
+  | 'whisper' | 'music' | 'talents' | 'skills' | 'skull' | 'jump' | 'autorun' | 'nameplates' | 'vibrate';
 
 // Inner SVG markup per icon (one or more <path>). Default fill rule is nonzero
 // (correct for game-icons.net art incl. overlaps); the two hand-authored cut-out
@@ -55,6 +55,7 @@ const ICONS: Record<UiIconName, string> = {
   whisper: '<path fill-rule="evenodd" d="M48 112h416a16 16 0 0 1 16 16v256a16 16 0 0 1-16 16H48a16 16 0 0 1-16-16V128a16 16 0 0 1 16-16zM72 152 256 292 440 152z"/>',
   music: '<path d="M158 374a54 54 0 1 0 108 0 54 54 0 1 0-108 0M260 128h22v246h-22zM282 122c46 16 70 58 46 98 12-32-6-62-46-74z"/>',
   talents: '<path d="M256 138v104M256 242l-96 86M256 242l96 86" stroke="currentColor" stroke-width="28" fill="none" stroke-linecap="round"/><circle cx="256" cy="116" r="44"/><circle cx="150" cy="352" r="44"/><circle cx="362" cy="352" r="44"/>',
+  skills: '<path d="M120 160h272M120 256h272M120 352h200" stroke="currentColor" stroke-width="34" fill="none" stroke-linecap="round"/>',
   skull: '<path fill-rule="evenodd" d="M256 64C176 64 112 124 112 198c0 38 16 70 40 92v44a24 24 0 0 0 24 24h160a24 24 0 0 0 24-24v-44c24-22 40-54 40-92 0-74-64-134-144-134zM196 176a36 36 0 0 0 0 72 36 36 0 0 0 0-72zM316 176a36 36 0 0 0 0 72 36 36 0 0 0 0-72zM238 300h36v58h-36z"/>',
   jump: '<path d="M256 56 400 216 320 216 320 344 192 344 192 216 112 216Z"/><rect x="144" y="408" width="224" height="40" rx="14"/>',
   autorun: '<path d="M136 264 256 152 376 264M136 392 256 280 376 392" stroke="currentColor" stroke-width="34" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',

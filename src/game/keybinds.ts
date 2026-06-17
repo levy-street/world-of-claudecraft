@@ -60,7 +60,8 @@ export const BIND_ACTIONS: BindAction[] = [
   { id: 'meters', label: 'Damage Meters', category: 'Interface', kind: 'edge', defaults: ['KeyH'] },
   { id: 'social', label: 'Friends & Guild', category: 'Interface', kind: 'edge', defaults: ['KeyO'] },
   { id: 'arena', label: 'Arena (Ashen Coliseum)', category: 'Interface', kind: 'edge', defaults: ['KeyG'] },
-  { id: 'leaderboard', label: 'Leaderboard', category: 'Interface', kind: 'edge', defaults: ['KeyK'] },
+  { id: 'skills', label: 'Skills', category: 'Interface', kind: 'edge', defaults: ['KeyK'] },
+  { id: 'leaderboard', label: 'Leaderboard', category: 'Interface', kind: 'edge', defaults: ['KeyY'] },
   { id: 'chat', label: 'Open Chat', category: 'Interface', kind: 'edge', defaults: ['Enter', 'NumpadEnter'] },
   { id: 'emoteWheel', label: 'Emote Wheel', category: 'Interface', kind: 'held', defaults: ['KeyX'] },
   // Action bar (slot 0 = Attack)

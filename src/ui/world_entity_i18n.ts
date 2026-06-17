@@ -30,6 +30,7 @@ const MOB_IDS = [
   'fallen_captain_aldren', 'corrupted_priest_malric', 'deathstalker_voss',
   'vision_aldren_warrior', 'vision_malric_mage', 'vision_deathstalker_voss',
   'bound_guardian',
+  'craghorn_bear', 'frostfang_lynx',
 ] as const;
 
 const NPC_IDS = [
@@ -37,7 +38,8 @@ const NPC_IDS = [
   'smith_haldren', 'fisherman_brandt', 'foreman_odell', 'warden_fenwick', 'brother_aldric_fen',
   'provisioner_hale', 'herbalist_yara', 'scout_maren', 'captain_thessaly',
   'brother_aldric_highwatch', 'scout_maren_highwatch', 'quartermaster_bree', 'armorer_hode',
-  'loremaster_caddis',
+  'loremaster_caddis', 'tanner_yorvek', 'leatherworker_brida', 'tailor_marlena',
+  'tanner_sull', 'leatherworker_orsa', 'tailor_evelle',
 ] as const;
 
 const QUEST_IDS = [

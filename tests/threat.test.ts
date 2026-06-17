@@ -963,6 +963,8 @@ describe('druid forms', () => {
     sim.player.facing = Math.atan2(wolf.pos.x - sim.player.pos.x, wolf.pos.z - sim.player.pos.z);
     for (let i = 0; i < 32; i++) sim.tick();
     sim.player.resource = 100;
+    // pin the hit roll: worldgen rng draws shift per content, this test only cares that rake lands and awards a combo point
+    (sim as any).rng.next = () => 0.99;
     sim.castAbility('rake');
     sim.tick();
     expect(sim.player.auras.some((a) => a.kind === 'stealth')).toBe(false);

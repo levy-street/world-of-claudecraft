@@ -39,6 +39,8 @@ describe('mob silence ("Silencing Shriek")', () => {
     p.maxHp = 100000; p.hp = 100000;
     const mob = spawnSummoner(sim, p);
     MOBS['gravecaller_summoner'].silence!.chance = 1; // deterministic for the test
+    // pin the hit roll: worldgen rng draws shift per content, this test only cares that the landed-hit effect applies
+    (sim as any).rng.next = () => 0.99;
     swing(sim, mob, p);
     MOBS['gravecaller_summoner'].silence!.chance = 0.3;
     const aura = p.auras.find((a) => a.kind === 'silence');

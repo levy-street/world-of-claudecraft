@@ -7187,6 +7187,8 @@ const ITEM_ENTITY_IDS = [
   "fang_of_korzul", "trail_hardtack", "meltwater_flask", "roast_mountain_goat", "glacier_melt", "highwatch_warblade", "craghorn_staff",
   "icevein_dirk", "highwatch_breastplate", "peakwool_robe", "stalkerhide_jerkin", "cragwalker_boots", "windguard_leggings",
   "ogre_toe_ring", "inert_storm_shard", "frayed_prayer_beads", "cracked_wyrm_scale",
+  // professions: skinning leather/hides, tailoring cloth, crafted gear, bandages
+  "bolt_of_linen", "bolt_of_silk", "bolt_of_woolen", "coarse_thread", "cured_heavy_hide", "cured_leather_pants", "cured_light_hide", "cured_medium_hide", "direhide_legguards", "fine_thread", "heavy_hide", "heavy_leather", "heavy_leather_straps", "heavy_leather_vest", "heavy_linen_bandage", "heavy_silk_bandage", "heavy_wool_bandage", "light_hide", "light_leather", "light_leather_boots", "light_leather_straps", "light_leather_vest", "linen_bandage", "linen_boots", "linen_cloth", "linen_pants", "linen_robe", "medium_hide", "medium_leather", "medium_leather_boots", "medium_leather_pants", "medium_leather_vest", "rough_thread", "ruined_leather_scraps", "salt", "silk_bandage", "silk_brocade_robe", "silk_cloth", "silk_leggings", "silk_scrap", "silk_slippers", "studded_leather_vest", "wool_bandage", "wool_cloth", "wool_scrap", "woolen_leggings", "woolen_slippers", "woolen_tunic",
 ] as const;
 
 type ItemEntityId = typeof ITEM_ENTITY_IDS[number];
@@ -7233,7 +7235,8 @@ const itemNamesEn = {
       "Wyrmcult Grand Robe", "Wyrmscale Jerkin", "Wyrmfang Greatblade", "Staff of the Gravewyrm", "Fang of Korzul", "Highwatch Trail Hardtack", "Meltwater Flask",
       "Roast Mountain Goat", "Glacier Melt", "Highwatch Warblade", "Craghorn Staff", "Icevein Dirk", "Highwatch Breastplate", "Peakwool Robe", "Stalkerhide Jerkin",
       "Cragwalker Boots", "Windguard Leggings", "Ogre Toe Ring", "Inert Storm Shard", "Frayed Prayer Beads", "Cracked Wyrm Scale",
-    ]),
+        "Bolt of Linen Cloth", "Bolt of Silk Cloth", "Bolt of Woolen Cloth", "Coarse Thread", "Cured Heavy Hide", "Cured Leather Pants", "Cured Light Hide", "Cured Medium Hide", "Direhide Legguards", "Fine Thread", "Heavy Hide", "Heavy Leather", "Heavy Leather Straps", "Heavy Leather Vest", "Heavy Linen Bandage", "Heavy Silk Bandage", "Heavy Wool Bandage", "Light Hide", "Light Leather", "Light Leather Boots", "Light Leather Straps", "Light Leather Vest", "Linen Bandage", "Linen Boots", "Linen Cloth", "Linen Pants", "Linen Robe", "Medium Hide", "Medium Leather", "Medium Leather Boots", "Medium Leather Pants", "Medium Leather Vest", "Rough Thread", "Ruined Leather Scraps", "Refined Salt", "Silk Bandage", "Silk Brocade Robe", "Silk Cloth", "Silk Leggings", "Silk Scrap", "Silk Slippers", "Studded Leather Vest", "Wool Bandage", "Wool Cloth", "Wool Scrap", "Woolen Leggings", "Woolen Slippers", "Woolen Tunic",
+]),
   },
 };
 
@@ -7266,7 +7269,8 @@ export const itemNames = {
         "Gran toga del Culto del Wyrm", "Jubón de escamas de wyrm", "Gran hoja Colmillo de Wyrm", "Bastón del Gravewyrm", "Colmillo de Korzul", "Galleta de viaje de Highwatch", "Frasco de agua de deshielo",
         "Cabra montesa asada", "Agua de glaciar", "Hoja de guerra de Highwatch", "Bastón de Cuernorroca", "Puñal Vena de Hielo", "Coraza de Highwatch", "Toga de lana de cumbre", "Jubón de piel de acechador",
         "Botas Caminarrocas", "Leotardos Guardavientos", "Anillo de dedo de ogro", "Fragmento de tormenta inerte", "Cuentas de oración deshilachadas", "Escama de wyrm agrietada",
-      ]),
+            "Rollo de tela de lino", "Rollo de tela de seda", "Rollo de tela de lana", "Hilo basto", "Pellejo pesado curtido", "Pantalones de cuero curtido", "Pellejo ligero curtido", "Pellejo medio curtido", "Quijotes de pellejo siniestro", "Hilo fino", "Pellejo pesado", "Cuero pesado", "Correas de cuero pesado", "Chaleco de cuero pesado", "Vendaje de lino grueso", "Vendaje de seda grueso", "Vendaje de lana grueso", "Pellejo ligero", "Cuero ligero", "Botas de cuero ligero", "Correas de cuero ligero", "Chaleco de cuero ligero", "Vendaje de lino", "Botas de lino", "Tela de lino", "Pantalones de lino", "Toga de lino", "Pellejo medio", "Cuero medio", "Botas de cuero medio", "Pantalones de cuero medio", "Chaleco de cuero medio", "Hilo rústico", "Retazos de cuero arruinado", "Sal refinada", "Vendaje de seda", "Toga de brocado de seda", "Tela de seda", "Leotardos de seda", "Retal de seda", "Zapatillas de seda", "Chaleco de cuero tachonado", "Vendaje de lana", "Tela de lana", "Retal de lana", "Leotardos de lana", "Zapatillas de lana", "Túnica de lana",
+]),
     },
   },
   es_ES: {} as typeof itemNamesEn,
@@ -7297,7 +7301,8 @@ export const itemNames = {
         "Grande robe du Culte du Wyrm", "Pourpoint en écailles de wyrm", "Grande lame Croc-de-wyrm", "Bâton du Gravewyrm", "Croc de Korzul", "Biscuit de route de Highwatch", "Flasque d'eau de fonte",
         "Chèvre de montagne rôtie", "Fonte de glacier", "Lame de guerre de Highwatch", "Bâton de corne-roche", "Dague Veine-de-glace", "Cuirasse de Highwatch", "Robe en laine des cimes", "Pourpoint en peau de rôdeur",
         "Bottes Marchecrag", "Jambières Gardevent", "Anneau d'orteil ogre", "Éclat de tempête inerte", "Perles de prière effilochées", "Écaille de wyrm fendue",
-      ]),
+            "Rouleau de toile de lin", "Rouleau de toile de soie", "Rouleau de toile de laine", "Fil grossier", "Peau épaisse tannée", "Pantalon en cuir tanné", "Peau légère tannée", "Peau moyenne tannée", "Jambières en peau funeste", "Fil fin", "Peau épaisse", "Cuir épais", "Lanières de cuir épais", "Gilet en cuir épais", "Bandage en lin épais", "Bandage en soie épais", "Bandage en laine épais", "Peau légère", "Cuir léger", "Bottes en cuir léger", "Lanières de cuir léger", "Gilet en cuir léger", "Bandage en lin", "Bottes en lin", "Étoffe de lin", "Pantalon en lin", "Robe en lin", "Peau moyenne", "Cuir moyen", "Bottes en cuir moyen", "Pantalon en cuir moyen", "Gilet en cuir moyen", "Fil brut", "Lambeaux de cuir abîmé", "Sel raffiné", "Bandage en soie", "Robe en brocart de soie", "Étoffe de soie", "Jambières en soie", "Bout de soie", "Chaussons en soie", "Gilet en cuir clouté", "Bandage en laine", "Étoffe de laine", "Bout de laine", "Jambières en laine", "Chaussons en laine", "Tunique en laine",
+]),
     },
   },
   fr_CA: {} as typeof itemNamesEn,
@@ -7329,7 +7334,8 @@ export const itemNames = {
         "Grande veste del Culto del Wyrm", "Giaco di scaglie di wyrm", "Spadone Zanna di Wyrm", "Bastone del Gravewyrm", "Zanna di Korzul", "Galletta da sentiero di Highwatch", "Fiasca di acqua di disgelo",
         "Capra di montagna arrosto", "Fusione glaciale", "Lama da guerra di Highwatch", "Bastone di Corno Roccioso", "Pugnale Venaghiaccio", "Corazza di Highwatch", "Veste di lana delle vette", "Giaco di pelle di predatore",
         "Stivali Camminarocce", "Gambiere Guardavento", "Anello da dito d'ogre", "Scheggia di tempesta inerte", "Grani di preghiera sfilacciati", "Scaglia di wyrm incrinata",
-      ]),
+            "Rotolo di tela di lino", "Rotolo di tela di seta", "Rotolo di tela di lana", "Filo grezzo", "Pelle pesante conciata", "Pantaloni di cuoio conciato", "Pelle leggera conciata", "Pelle media conciata", "Gambali di pelle sinistra", "Filo fine", "Pelle pesante", "Cuoio pesante", "Cinghie di cuoio pesante", "Gilet di cuoio pesante", "Benda di lino pesante", "Benda di seta pesante", "Benda di lana pesante", "Pelle leggera", "Cuoio leggero", "Stivali di cuoio leggero", "Cinghie di cuoio leggero", "Gilet di cuoio leggero", "Benda di lino", "Stivali di lino", "Lino", "Pantaloni di lino", "Veste di lino", "Pelle media", "Cuoio medio", "Stivali di cuoio medio", "Pantaloni di cuoio medio", "Gilet di cuoio medio", "Filo ruvido", "Brandelli di cuoio rovinato", "Sale raffinato", "Benda di seta", "Veste di broccato di seta", "Seta", "Gambiere di seta", "Ritaglio di seta", "Pantofole di seta", "Gilet di cuoio borchiato", "Benda di lana", "Lana", "Ritaglio di lana", "Gambiere di lana", "Pantofole di lana", "Tunica di lana",
+]),
     },
   },
   de_DE: {
@@ -7359,7 +7365,8 @@ export const itemNames = {
         "Große Robe des Wyrmkults", "Wyrmschuppenwams", "Wyrmzahn-Großklinge", "Stab des Gravewyrm", "Korzuls Fangzahn", "Highwatch-Reisezwieback", "Schmelzwasserflasche",
         "Gebratene Bergziege", "Gletscherschmelze", "Highwatch-Kriegsklinge", "Felshornstab", "Eisaderdolch", "Highwatch-Brustplatte", "Gipfelwollrobe", "Pirschhauttunika",
         "Felswandererstiefel", "Windwachtgamaschen", "Ogerzehenring", "Träger Sturmsplitter", "Ausgefranste Gebetsperlen", "Gesprungene Wyrmschuppe",
-      ]),
+            "Ballen Leinenstoff", "Ballen Seidenstoff", "Ballen Wollstoff", "Grober Faden", "Gegerbte schwere Haut", "Gegerbte Lederhose", "Gegerbte leichte Haut", "Gegerbte mittlere Haut", "Grauenhautbeinschienen", "Feiner Faden", "Schwere Haut", "Schweres Leder", "Schwere Lederriemen", "Schwere Lederweste", "Schwerer Leinenverband", "Schwerer Seidenverband", "Schwerer Wollverband", "Leichte Haut", "Leichtes Leder", "Leichte Lederstiefel", "Leichte Lederriemen", "Leichte Lederweste", "Leinenverband", "Leinenstiefel", "Leinenstoff", "Leinenhose", "Leinenrobe", "Mittlere Haut", "Mittleres Leder", "Mittlere Lederstiefel", "Mittlere Lederhose", "Mittlere Lederweste", "Rauer Faden", "Ruinierte Lederfetzen", "Raffiniertes Salz", "Seidenverband", "Seidenbrokatrobe", "Seidenstoff", "Seidenbeinlinge", "Seidenfetzen", "Seidenschuhe", "Beschlagene Lederweste", "Wollverband", "Wollstoff", "Wollfetzen", "Wollbeinlinge", "Wollschuhe", "Wolltunika",
+]),
     },
   },
   zh_CN: {
@@ -7389,7 +7396,8 @@ export const itemNames = {
         "龙教大长袍", "龙鳞皮甲", "龙牙巨刃", "墓龙法杖", "科祖尔之牙", "高望行军硬饼", "融雪水瓶",
         "烤山羊", "冰川融水", "高望战刃", "岩角法杖", "冰脉短匕", "高望胸甲", "峰羊毛长袍", "潜猎者皮甲",
         "岩行者长靴", "风卫护腿", "食人魔趾环", "惰性风暴碎片", "磨损的祈祷珠", "裂开的龙鳞",
-      ]),
+            "亚麻布卷", "丝绸布卷", "羊毛布卷", "粗线", "硝制厚革", "硝制皮裤", "硝制轻革", "硝制中革", "厄兽皮护腿", "细线", "厚革", "厚皮", "厚皮带", "厚皮背心", "厚亚麻绷带", "厚丝绸绷带", "厚羊毛绷带", "轻革", "轻皮", "轻皮靴", "轻皮带", "轻皮背心", "亚麻绷带", "亚麻布靴", "亚麻布", "亚麻布裤", "亚麻布长袍", "中革", "中皮", "中皮靴", "中皮裤", "中皮背心", "粗糙线", "破损的皮革碎片", "精盐", "丝绸绷带", "丝绸织锦长袍", "丝绸", "丝绸护腿", "丝绸碎布", "丝绸便鞋", "镶钉皮背心", "羊毛绷带", "毛布", "羊毛碎布", "羊毛护腿", "羊毛便鞋", "羊毛外衣",
+]),
     },
   },
   zh_TW: {
@@ -7419,7 +7427,8 @@ export const itemNames = {
         "龍教大長袍", "龍鱗皮甲", "龍牙巨刃", "墓龍法杖", "科祖爾之牙", "高望行軍硬餅", "融雪水瓶",
         "烤山羊", "冰川融水", "高望戰刃", "岩角法杖", "冰脈短匕", "高望胸甲", "峰羊毛長袍", "潛獵者皮甲",
         "岩行者長靴", "風衛護腿", "巨魔趾環", "惰性風暴碎片", "磨損的祈禱珠", "裂開的龍鱗",
-      ]),
+            "亞麻布卷", "絲綢布卷", "羊毛布卷", "粗線", "硝製厚革", "硝製皮褲", "硝製輕革", "硝製中革", "厄獸皮護腿", "細線", "厚革", "厚皮", "厚皮帶", "厚皮背心", "厚亞麻繃帶", "厚絲綢繃帶", "厚羊毛繃帶", "輕革", "輕皮", "輕皮靴", "輕皮帶", "輕皮背心", "亞麻繃帶", "亞麻布靴", "亞麻布", "亞麻布褲", "亞麻布長袍", "中革", "中皮", "中皮靴", "中皮褲", "中皮背心", "粗糙線", "破損的皮革碎片", "精鹽", "絲綢繃帶", "絲綢織錦長袍", "絲綢", "絲綢護腿", "絲綢碎布", "絲綢便鞋", "鑲釘皮背心", "羊毛繃帶", "羊毛布", "羊毛碎布", "羊毛護腿", "羊毛便鞋", "羊毛外衣",
+]),
     },
   },
   ko_KR: {
@@ -7449,7 +7458,8 @@ export const itemNames = {
         "고룡교단 대로브", "고룡비늘 웃옷", "고룡송곳니 대검", "무덤고룡의 지팡이", "코르줄의 송곳니", "하이워치 여정 건빵", "눈녹은 물 플라스크",
         "구운 산양", "빙하 녹은물", "하이워치 전투검", "바위뿔 지팡이", "얼음맥 더크", "하이워치 흉갑", "봉우리양모 로브", "추적자가죽 웃옷",
         "바위걸음 장화", "바람수호 다리보호구", "오우거 발가락 반지", "비활성 폭풍 파편", "해진 기도 구슬", "갈라진 고룡 비늘",
-      ]),
+            "마직물 두루마리", "비단천 두루마리", "양모천 두루마리", "거친 실", "무두질한 두꺼운 생가죽", "무두질한 가죽 바지", "무두질한 가벼운 생가죽", "무두질한 중간 생가죽", "공포가죽 다리보호구", "고운 실", "두꺼운 생가죽", "두꺼운 가죽", "두꺼운 가죽끈", "두꺼운 가죽 조끼", "두꺼운 마직 붕대", "두꺼운 비단 붕대", "두꺼운 양모 붕대", "가벼운 생가죽", "가벼운 가죽", "가벼운 가죽 장화", "가벼운 가죽끈", "가벼운 가죽 조끼", "마직 붕대", "마직 장화", "마직물", "마직 바지", "마직 로브", "중간 생가죽", "중간 가죽", "중간 가죽 장화", "중간 가죽 바지", "중간 가죽 조끼", "투박한 실", "못 쓰는 가죽 조각", "정제 소금", "비단 붕대", "비단 양단 로브", "비단천", "비단 다리보호구", "비단 조각", "비단 슬리퍼", "징 박은 가죽 조끼", "양모 붕대", "양모천", "양모 조각", "양모 다리보호구", "양모 슬리퍼", "양모 튜닉",
+]),
     },
   },
   ja_JP: {
@@ -7479,7 +7489,8 @@ export const itemNames = {
         "ワーム教団の大ローブ", "ワーム鱗のジャーキン", "ワーム牙の大剣", "墓ワームの杖", "コルズルの牙", "ハイウォッチの旅堅パン", "雪解け水のフラスコ",
         "焼き山羊肉", "氷河の融け水", "ハイウォッチの戦刃", "岩角の杖", "氷脈のダーク", "ハイウォッチの胸当て", "峰羊毛のローブ", "追跡者革のジャーキン",
         "岩歩きのブーツ", "風守りのレギンス", "オーガの足指輪", "不活性の嵐片", "ほつれた祈りの数珠", "割れたワームの鱗",
-      ]),
+            "亜麻布の反物", "絹布の反物", "ウール布の反物", "粗い糸", "なめした厚い生皮", "なめし革のズボン", "なめした軽い生皮", "なめした中級の生皮", "凶獣皮のレギンス", "上質な糸", "厚い生皮", "厚い革", "厚い革ひも", "厚い革のベスト", "厚手の亜麻の包帯", "厚手の絹の包帯", "厚手のウールの包帯", "軽い生皮", "軽い革", "軽い革のブーツ", "軽い革ひも", "軽い革のベスト", "亜麻の包帯", "亜麻布のブーツ", "亜麻布", "亜麻布のズボン", "亜麻布のローブ", "中級の生皮", "中級の革", "中級の革のブーツ", "中級の革のズボン", "中級の革のベスト", "ざらつく糸", "傷んだ革の切れ端", "精製塩", "絹の包帯", "絹の錦織りローブ", "絹布", "絹のレギンス", "絹の切れ端", "絹のスリッパ", "鋲打ち革のベスト", "ウールの包帯", "ウール布", "ウールの切れ端", "ウールのレギンス", "ウールのスリッパ", "ウールのチュニック",
+]),
     },
   },
   pt_BR: {
@@ -7509,7 +7520,8 @@ export const itemNames = {
         "Grande veste do Culto do Wyrm", "Gibão de escamas de wyrm", "Grande lâmina Presa de Wyrm", "Cajado do Gravewyrm", "Presa de Korzul", "Biscoito de trilha de Highwatch", "Frasco de água de degelo",
         "Cabra montesa assada", "Derretimento glacial", "Lâmina de guerra de Highwatch", "Cajado Chifre de Rocha", "Punhal Veiogelo", "Peitoral de Highwatch", "Veste de lã das alturas", "Gibão de pele de espreitador",
         "Botas Caminhapedra", "Perneiras Guardavento", "Anel de dedo de ogro", "Estilhaço de tempestade inerte", "Contas de oração desfiadas", "Escama de wyrm rachada",
-      ]),
+            "Rolo de Tecido de Linho", "Rolo de Tecido de Seda", "Rolo de Tecido de Lã", "Linha Grossa", "Pele Pesada Curtida", "Calças de Couro Curtido", "Pele Leve Curtida", "Pele Média Curtida", "Perneiras de Pele Sinistra", "Linha Fina", "Pele Pesada", "Couro Pesado", "Tiras de Couro Pesado", "Colete de Couro Pesado", "Atadura de Linho Pesada", "Atadura de Seda Pesada", "Atadura de Lã Pesada", "Pele Leve", "Couro Leve", "Botas de Couro Leve", "Tiras de Couro Leve", "Colete de Couro Leve", "Atadura de Linho", "Botas de Linho", "Tecido de Linho", "Calças de Linho", "Veste de Linho", "Pele Média", "Couro Médio", "Botas de Couro Médio", "Calças de Couro Médio", "Colete de Couro Médio", "Linha Rústica", "Retalhos de Couro Arruinado", "Sal Refinado", "Atadura de Seda", "Veste de Brocado de Seda", "Tecido de Seda", "Perneiras de Seda", "Retalho de Seda", "Pantufas de Seda", "Colete de Couro Cravejado", "Atadura de Lã", "Tecido de Lã", "Retalho de Lã", "Perneiras de Lã", "Pantufas de Lã", "Túnica de Lã",
+]),
     },
   },
   ru_RU: {
@@ -7539,7 +7551,8 @@ export const itemNames = {
         "Великая роба Культа Вирма", "Куртка из вирмовой чешуи", "Великий клинок Клык Вирма", "Посох Могильного Вирма", "Клык Корзула", "Походный сухарь Хайвотча", "Фляга талой воды",
         "Жареный горный козел", "Ледниковая талая вода", "Боевой клинок Хайвотча", "Посох Камнерога", "Кортик Ледяной Жилы", "Кираса Хайвотча", "Роба из горной шерсти", "Куртка из шкуры охотника",
         "Сапоги Камнехода", "Поножи Ветростража", "Кольцо на палец огра", "Инертный осколок бури", "Истрепанные молитвенные четки", "Треснувшая чешуя вирма",
-      ]),
+            "Рулон льняной ткани", "Рулон шёлковой ткани", "Рулон шерстяной ткани", "Грубая нить", "Выделанная тяжелая шкура", "Штаны из выделанной кожи", "Выделанная легкая шкура", "Выделанная средняя шкура", "Поножи из жуткой шкуры", "Тонкая нить", "Тяжелая шкура", "Тяжелая кожа", "Тяжелые кожаные ремни", "Жилет из тяжелой кожи", "Тяжёлая льняная повязка", "Тяжёлая шёлковая повязка", "Тяжёлая шерстяная повязка", "Легкая шкура", "Легкая кожа", "Сапоги из легкой кожи", "Легкие кожаные ремни", "Жилет из легкой кожи", "Льняная повязка", "Льняные сапоги", "Льняная ткань", "Льняные штаны", "Льняная роба", "Средняя шкура", "Средняя кожа", "Сапоги из средней кожи", "Штаны из средней кожи", "Жилет из средней кожи", "Шероховатая нить", "Испорченные обрезки кожи", "Очищенная соль", "Шёлковая повязка", "Роба из шёлковой парчи", "Шёлковая ткань", "Шёлковые поножи", "Шёлковый лоскут", "Шёлковые туфли", "Клепаный кожаный жилет", "Шерстяная повязка", "Шерстяная ткань", "Шерстяной лоскут", "Шерстяные поножи", "Шерстяные туфли", "Шерстяная туника",
+]),
     },
   },
 };
@@ -7915,7 +7928,7 @@ const mergePetHud = {
 const mergeStringsEn = {
   abilityUi: {
     ...abilityStrings.en.abilityUi,
-    cast: { fishing: "Fishing", demonHeal: "Demon Heal" },
+    cast: { fishing: "Fishing", demonHeal: "Demon Heal", skinning: "Skinning" },
     actionBar: {
       ...abilityStrings.en.abilityUi.actionBar,
       clearHint: "Shift-right-click or Shift-Delete to clear",
@@ -7925,7 +7938,7 @@ const mergeStringsEn = {
   },
   itemUi: {
     ...itemNames.en.itemUi,
-    kind: { ...itemNames.en.itemUi.kind, tool: "Tool", potion: "Potion" },
+    kind: { ...itemNames.en.itemUi.kind, tool: "Tool", potion: "Potion", reagent: "Trade Good" },
     tooltip: {
       ...itemNames.en.itemUi.tooltip,
       useFishing: "Use: Fish in nearby waters.",
@@ -8053,7 +8066,7 @@ export const mergeStrings = {
   es: {
     abilityUi: {
       ...abilityStrings.es.abilityUi,
-      cast: { fishing: "Pesca", demonHeal: "Sanación demoníaca" },
+      cast: { fishing: "Pesca", demonHeal: "Sanación demoníaca", skinning: "Desuello" },
       actionBar: {
         ...abilityStrings.es.abilityUi.actionBar,
         clearHint: "Mayús-clic derecho o Mayús-Supr para vaciar",
@@ -8063,7 +8076,7 @@ export const mergeStrings = {
     },
     itemUi: {
       ...itemNames.es.itemUi,
-      kind: { ...itemNames.es.itemUi.kind, tool: "Herramienta", potion: "Poción" },
+      kind: { ...itemNames.es.itemUi.kind, tool: "Herramienta", potion: "Poción", reagent: "Material" },
       tooltip: {
         ...itemNames.es.itemUi.tooltip,
         useFishing: "Uso: pesca en aguas cercanas.",
@@ -8189,7 +8202,7 @@ export const mergeStrings = {
   fr_FR: {
     abilityUi: {
       ...abilityStrings.fr_FR.abilityUi,
-      cast: { fishing: "Pêche", demonHeal: "Soin démoniaque" },
+      cast: { fishing: "Pêche", demonHeal: "Soin démoniaque", skinning: "Dépeçage" },
       actionBar: {
         ...abilityStrings.fr_FR.abilityUi.actionBar,
         clearHint: "Maj-clic droit ou Maj-Suppr pour vider",
@@ -8199,7 +8212,7 @@ export const mergeStrings = {
     },
     itemUi: {
       ...itemNames.fr_FR.itemUi,
-      kind: { ...itemNames.fr_FR.itemUi.kind, tool: "Outil", potion: "Potion" },
+      kind: { ...itemNames.fr_FR.itemUi.kind, tool: "Outil", potion: "Potion", reagent: "Composant" },
       tooltip: {
         ...itemNames.fr_FR.itemUi.tooltip,
         useFishing: "Utiliser : pêcher dans les eaux proches.",
@@ -8326,7 +8339,7 @@ export const mergeStrings = {
   it_IT: {
     abilityUi: {
       ...abilityStrings.it_IT.abilityUi,
-      cast: { fishing: "Pesca", demonHeal: "Cura demoniaca" },
+      cast: { fishing: "Pesca", demonHeal: "Cura demoniaca", skinning: "Scuoiatura" },
       actionBar: {
         ...abilityStrings.it_IT.abilityUi.actionBar,
         clearHint: "Maiusc-clic destro o Maiusc-Canc per svuotare",
@@ -8336,7 +8349,7 @@ export const mergeStrings = {
     },
     itemUi: {
       ...itemNames.it_IT.itemUi,
-      kind: { ...itemNames.it_IT.itemUi.kind, tool: "Strumento", potion: "Pozione" },
+      kind: { ...itemNames.it_IT.itemUi.kind, tool: "Strumento", potion: "Pozione", reagent: "Materiale" },
       tooltip: {
         ...itemNames.it_IT.itemUi.tooltip,
         useFishing: "Uso: pesca nelle acque vicine.",
@@ -8461,7 +8474,7 @@ export const mergeStrings = {
   de_DE: {
     abilityUi: {
       ...abilityStrings.de_DE.abilityUi,
-      cast: { fishing: "Angeln", demonHeal: "Dämonenheilung" },
+      cast: { fishing: "Angeln", demonHeal: "Dämonenheilung", skinning: "Kürschnerei" },
       actionBar: {
         ...abilityStrings.de_DE.abilityUi.actionBar,
         clearHint: "Umschalt-Rechtsklick oder Umschalt-Entf zum Leeren",
@@ -8471,7 +8484,7 @@ export const mergeStrings = {
     },
     itemUi: {
       ...itemNames.de_DE.itemUi,
-      kind: { ...itemNames.de_DE.itemUi.kind, tool: "Werkzeug", potion: "Trank" },
+      kind: { ...itemNames.de_DE.itemUi.kind, tool: "Werkzeug", potion: "Trank", reagent: "Handelsware" },
       tooltip: {
         ...itemNames.de_DE.itemUi.tooltip,
         useFishing: "Benutzen: Angelt in nahen Gewässern.",
@@ -8596,7 +8609,7 @@ export const mergeStrings = {
   zh_CN: {
     abilityUi: {
       ...abilityStrings.zh_CN.abilityUi,
-      cast: { fishing: "钓鱼", demonHeal: "恶魔治疗" },
+      cast: { fishing: "钓鱼", demonHeal: "恶魔治疗", skinning: "剥皮" },
       actionBar: {
         ...abilityStrings.zh_CN.abilityUi.actionBar,
         clearHint: "Shift-右键或 Shift-Delete 清除",
@@ -8606,7 +8619,7 @@ export const mergeStrings = {
     },
     itemUi: {
       ...itemNames.zh_CN.itemUi,
-      kind: { ...itemNames.zh_CN.itemUi.kind, tool: "工具", potion: "药水" },
+      kind: { ...itemNames.zh_CN.itemUi.kind, tool: "工具", potion: "药水", reagent: "材料" },
       tooltip: {
         ...itemNames.zh_CN.itemUi.tooltip,
         useFishing: "使用：在附近水域钓鱼。",
@@ -8731,7 +8744,7 @@ export const mergeStrings = {
   zh_TW: {
     abilityUi: {
       ...abilityStrings.zh_TW.abilityUi,
-      cast: { fishing: "釣魚", demonHeal: "惡魔治療" },
+      cast: { fishing: "釣魚", demonHeal: "惡魔治療", skinning: "剝皮" },
       actionBar: {
         ...abilityStrings.zh_TW.abilityUi.actionBar,
         clearHint: "Shift-右鍵或 Shift-Delete 清除",
@@ -8741,7 +8754,7 @@ export const mergeStrings = {
     },
     itemUi: {
       ...itemNames.zh_TW.itemUi,
-      kind: { ...itemNames.zh_TW.itemUi.kind, tool: "工具", potion: "藥水" },
+      kind: { ...itemNames.zh_TW.itemUi.kind, tool: "工具", potion: "藥水", reagent: "材料" },
       tooltip: {
         ...itemNames.zh_TW.itemUi.tooltip,
         useFishing: "使用：在附近水域釣魚。",
@@ -8866,7 +8879,7 @@ export const mergeStrings = {
   ko_KR: {
     abilityUi: {
       ...abilityStrings.ko_KR.abilityUi,
-      cast: { fishing: "낚시", demonHeal: "악마 치유" },
+      cast: { fishing: "낚시", demonHeal: "악마 치유", skinning: "무두질" },
       actionBar: {
         ...abilityStrings.ko_KR.abilityUi.actionBar,
         clearHint: "Shift-우클릭 또는 Shift-Delete로 비우기",
@@ -8876,7 +8889,7 @@ export const mergeStrings = {
     },
     itemUi: {
       ...itemNames.ko_KR.itemUi,
-      kind: { ...itemNames.ko_KR.itemUi.kind, tool: "도구", potion: "물약" },
+      kind: { ...itemNames.ko_KR.itemUi.kind, tool: "도구", potion: "물약", reagent: "재료" },
       tooltip: {
         ...itemNames.ko_KR.itemUi.tooltip,
         useFishing: "사용: 가까운 물가에서 낚시합니다.",
@@ -9001,7 +9014,7 @@ export const mergeStrings = {
   ja_JP: {
     abilityUi: {
       ...abilityStrings.ja_JP.abilityUi,
-      cast: { fishing: "釣り", demonHeal: "悪魔の治癒" },
+      cast: { fishing: "釣り", demonHeal: "悪魔の治癒", skinning: "皮剥ぎ" },
       actionBar: {
         ...abilityStrings.ja_JP.abilityUi.actionBar,
         clearHint: "Shift-右クリックまたはShift-Deleteで消去",
@@ -9011,7 +9024,7 @@ export const mergeStrings = {
     },
     itemUi: {
       ...itemNames.ja_JP.itemUi,
-      kind: { ...itemNames.ja_JP.itemUi.kind, tool: "道具", potion: "ポーション" },
+      kind: { ...itemNames.ja_JP.itemUi.kind, tool: "道具", potion: "ポーション", reagent: "素材" },
       tooltip: {
         ...itemNames.ja_JP.itemUi.tooltip,
         useFishing: "使用: 近くの水辺で釣りをします。",
@@ -9136,7 +9149,7 @@ export const mergeStrings = {
   pt_BR: {
     abilityUi: {
       ...abilityStrings.pt_BR.abilityUi,
-      cast: { fishing: "Pesca", demonHeal: "Cura demoníaca" },
+      cast: { fishing: "Pesca", demonHeal: "Cura demoníaca", skinning: "Esfolamento" },
       actionBar: {
         ...abilityStrings.pt_BR.abilityUi.actionBar,
         clearHint: "Shift-clique direito ou Shift-Delete para limpar",
@@ -9146,7 +9159,7 @@ export const mergeStrings = {
     },
     itemUi: {
       ...itemNames.pt_BR.itemUi,
-      kind: { ...itemNames.pt_BR.itemUi.kind, tool: "Ferramenta", potion: "Poção" },
+      kind: { ...itemNames.pt_BR.itemUi.kind, tool: "Ferramenta", potion: "Poção", reagent: "Material" },
       tooltip: {
         ...itemNames.pt_BR.itemUi.tooltip,
         useFishing: "Uso: pesca em águas próximas.",
@@ -9271,7 +9284,7 @@ export const mergeStrings = {
   ru_RU: {
     abilityUi: {
       ...abilityStrings.ru_RU.abilityUi,
-      cast: { fishing: "Рыбная ловля", demonHeal: "Исцеление демона" },
+      cast: { fishing: "Рыбная ловля", demonHeal: "Исцеление демона", skinning: "Снятие шкур" },
       actionBar: {
         ...abilityStrings.ru_RU.abilityUi.actionBar,
         clearHint: "Shift-правый щелчок или Shift-Delete, чтобы очистить",
@@ -9281,7 +9294,7 @@ export const mergeStrings = {
     },
     itemUi: {
       ...itemNames.ru_RU.itemUi,
-      kind: { ...itemNames.ru_RU.itemUi.kind, tool: "Инструмент", potion: "Зелье" },
+      kind: { ...itemNames.ru_RU.itemUi.kind, tool: "Инструмент", potion: "Зелье", reagent: "Реагент" },
       tooltip: {
         ...itemNames.ru_RU.itemUi.tooltip,
         useFishing: "Использование: ловите рыбу в ближайшей воде.",
@@ -10599,6 +10612,34 @@ export const gameStrings = {
     comingSoonTitle: "Talents coming soon",
     comingSoonBody: "This class does not have talent trees yet. You can keep playing normally; full trees will arrive in a future update.",
   },
+  professions: {
+    skillsTitle: "Skills",
+    professions: "Professions",
+    secondary: "Secondary Skills",
+    open: "Open",
+    noSkills: "You have not learned any professions or secondary skills yet. Seek out a trainer.",
+    craft: "Craft",
+    noRecipes: "You have not learned any recipes yet. Visit a trainer to learn them.",
+    trainTitle: "Train {name}",
+    learnApprentice: "Learn {name} (Apprentice)",
+    learnJourneyman: "Learn Journeyman {name}",
+    recipes: "Recipes",
+    nothingToTrain: "Nothing new to train right now. Raise your skill and return.",
+    taughtAllIKnow: "I've taught you all I know.",
+    unlearn: "Unlearn",
+    unlearnTitle: "Unlearn {name}?",
+    unlearnBody: "Unlearn {name}? You will lose all skill progress and every recipe you have learned for it. A primary profession frees its slot so you can learn another.",
+    unlearnedLog: "You have unlearned {name}.",
+    back: "← Back",
+    gatheredSuffix: " (gathered in the world)",
+    skillIncreased: "Your skill in {name} increased to {skill}.",
+    journeymanLabel: "Journeyman {name}",
+    learnedBanner: "Learned {label}",
+    learnedLog: "You have learned {label}.",
+    recipeLearnedLog: "You have learned to make {name}.",
+    bandageUse: "Use: Channel a heal for {heal} health over {time} sec. The target cannot be bandaged again for 1 min, and the channel breaks if you move or take damage.",
+    requiresProf: "Requires {name} ({skill})",
+  },
 };
 
 export const gameStringsEnCA: typeof gameStrings = {
@@ -10715,6 +10756,7 @@ export const gameStringsEs: typeof gameStrings = {
     comingSoonTitle: "Talentos próximamente",
     comingSoonBody: "Esta clase aún no tiene árboles de talentos. Puedes seguir jugando normalmente; los árboles completos llegarán en una actualización futura.",
   },
+  professions: gameStrings.professions,
 };
 
 export const gameStringsEsES: typeof gameStrings = gameStringsEs;
@@ -10825,6 +10867,7 @@ export const gameStringsFrFR: typeof gameStrings = {
     comingSoonTitle: "Talents à venir",
     comingSoonBody: "Cette classe n'a pas encore d'arbres de talents. Vous pouvez continuer à jouer normalement; les arbres complets arriveront dans une future mise à jour.",
   },
+  professions: gameStrings.professions,
 };
 
 export const gameStringsFrCA: typeof gameStrings = gameStringsFrFR;
@@ -10839,6 +10882,7 @@ export const gameStringsItIT: typeof gameStrings = {
   talents: {
     title: "Talenti", classTab: "Classe", specTab: "Specializzazione", available: "Disponibili", spent: "Spesi", pointSource: "Ottieni 1 punto talento a ogni livello dal {first} al {cap}. Sali di livello per ottenerne altri.", apply: "Applica modifiche", clear: "Azzera punti", reset: "Azzera", chooseSpec: "Scegli una specializzazione", noSpec: "Nessuna specializzazione scelta", role: "Ruolo", mastery: "Maestria", signature: "Firma", roleTank: "Difensore", roleHealer: "Guaritore", roleDps: "Danni", loadouts: "Build salvate", currentBuild: "Build attuale", createBuild: "Crea build", saveBuild: "Salva attuale", saveBuildAs: "Salva build", newBuild: "Nuova build", deleteBuild: "Elimina", currentBuildHint: "Scegli una build salvata, poi Salva attuale per aggiornarla. Esporta condivide la build selezionata.", createBuildHint: "Nuova build salva i punti attuali separatamente. Importa incolla una stringa condivisa.", buildHint: "Scegli una build salvata, aggiornala con Salva attuale o creane un'altra.", buildInvalid: "Questa build non è ancora valida.", selectBuildFirst: "Seleziona una build salvata da eliminare.", deleteBuildTitle: "Eliminare la build salvata?", deleteBuildBody: "Eliminare \"{name}\"? Rimuove solo la build salvata; i talenti attuali restano invariati.", deleteBuildConfirm: "Elimina build", namePrompt: "Nome di questa build:", import: "Importa", export: "Esporta", importPrompt: "Incolla una stringa build:", exportCopied: "Stringa build copiata negli appunti.", exportTitle: "Stringa build (copia e condividi):", invalidBuild: "Questa stringa build non è valida.", rank: "Grado", requires: "Richiede", pointsGate: "punti spesi nell'albero", dormant: "Inattivo: prerequisito rimborsato", editHint: "Clic sinistro per aggiungere - clic destro per rimuovere", cycleHint: "Clicca per scegliere un'opzione", combatLocked: "Non puoi cambiare talenti in combattimento.", nothingStaged: "Nessuna modifica da applicare.", pickSpecFirst: "Scegli una specializzazione per accedere a questo albero.", unlockBanner: "Talenti sbloccati!", unlockHint: "Hai ottenuto il tuo primo punto talento: premi N per aprire Talenti.", copy: "Copia", close: "Chiudi", cancel: "Annulla", noBuilds: "Nessuna build salvata", save: "Salva", comingSoonTitle: "Talenti in arrivo", comingSoonBody: "Questa classe non ha ancora alberi dei talenti. Puoi continuare a giocare normalmente; gli alberi completi arriveranno in un futuro aggiornamento.",
   },
+  professions: gameStrings.professions,
 };
 
 export const gameStringsDeDE: typeof gameStrings = {
@@ -10851,6 +10895,7 @@ export const gameStringsDeDE: typeof gameStrings = {
   talents: {
     title: "Talente", classTab: "Klasse", specTab: "Spezialisierung", available: "Verfügbar", spent: "Ausgegeben", pointSource: "Ihr erhaltet pro Stufe von {first} bis {cap} 1 Talentpunkt. Steigt auf, um mehr Punkte zu bekommen.", apply: "Änderungen anwenden", clear: "Punkte zurücksetzen", reset: "Zurücksetzen", chooseSpec: "Spezialisierung wählen", noSpec: "Keine Spezialisierung gewählt", role: "Rolle", mastery: "Meisterschaft", signature: "Signatur", roleTank: "Tank", roleHealer: "Heiler", roleDps: "Schaden", loadouts: "Gespeicherte Builds", currentBuild: "Aktueller Build", createBuild: "Build erstellen", saveBuild: "Aktuellen speichern", saveBuildAs: "Build speichern", newBuild: "Neuer Build", deleteBuild: "Löschen", currentBuildHint: "Wählt einen gespeicherten Build und dann Aktuellen speichern, um ihn zu aktualisieren. Exportieren teilt den gewählten Build.", createBuildHint: "Neuer Build speichert Eure aktuellen Punkte separat. Importieren fügt eine geteilte Zeichenfolge ein.", buildHint: "Wählt einen gespeicherten Build, aktualisiert ihn oder erstellt einen neuen.", buildInvalid: "Dieser Build ist noch nicht gültig.", selectBuildFirst: "Wählt zuerst einen gespeicherten Build zum Löschen.", deleteBuildTitle: "Gespeicherten Build löschen?", deleteBuildBody: "\"{name}\" löschen? Nur der gespeicherte Build wird entfernt; Eure aktuellen Talente bleiben erhalten.", deleteBuildConfirm: "Build löschen", namePrompt: "Name dieses Builds:", import: "Importieren", export: "Exportieren", importPrompt: "Build-Zeichenfolge einfügen:", exportCopied: "Build-Zeichenfolge in die Zwischenablage kopiert.", exportTitle: "Build-Zeichenfolge (kopieren und teilen):", invalidBuild: "Diese Build-Zeichenfolge ist ungültig.", rank: "Rang", requires: "Benötigt", pointsGate: "Punkte im Baum ausgegeben", dormant: "Inaktiv: Voraussetzung erstattet", editHint: "Linksklick zum Hinzufügen - Rechtsklick zum Entfernen", cycleHint: "Klicken, um eine Option zu wählen", combatLocked: "Im Kampf könnt Ihr keine Talente ändern.", nothingStaged: "Keine Änderungen zum Anwenden.", pickSpecFirst: "Wählt eine Spezialisierung, um diesen Baum zu öffnen.", unlockBanner: "Talente freigeschaltet!", unlockHint: "Ihr habt Euren ersten Talentpunkt verdient: Drückt N, um Talente zu öffnen.", copy: "Kopieren", close: "Schließen", cancel: "Abbrechen", noBuilds: "Keine gespeicherten Builds", save: "Speichern", comingSoonTitle: "Talente folgen bald", comingSoonBody: "Diese Klasse hat noch keine Talentbäume. Ihr könnt normal weiterspielen; vollständige Bäume kommen in einem zukünftigen Update.",
   },
+  professions: gameStrings.professions,
 };
 
 export const gameStringsZhCN: typeof gameStrings = {
@@ -10863,6 +10908,7 @@ export const gameStringsZhCN: typeof gameStrings = {
   talents: {
     title: "天赋", classTab: "职业", specTab: "专精", available: "可用", spent: "已用", pointSource: "从 {first} 级到 {cap} 级，每升一级获得 1 点天赋点。继续升级可获得更多点数。", apply: "应用更改", clear: "重置点数", reset: "重置", chooseSpec: "选择一个专精", noSpec: "未选择专精", role: "职责", mastery: "精通", signature: "标志技能", roleTank: "坦克", roleHealer: "治疗", roleDps: "伤害", loadouts: "已保存配置", currentBuild: "当前配置", createBuild: "创建配置", saveBuild: "保存当前", saveBuildAs: "保存配置", newBuild: "新配置", deleteBuild: "删除", currentBuildHint: "选择已保存配置，然后用保存当前更新它。导出会分享所选配置。", createBuildHint: "新配置会把当前点数另存为一个配置。导入可粘贴分享字符串。", buildHint: "选择已保存配置，用保存当前更新，或创建新配置。", buildInvalid: "此配置尚未有效。", selectBuildFirst: "先选择要删除的已保存配置。", deleteBuildTitle: "删除已保存配置？", deleteBuildBody: "删除“{name}”？这只会移除已保存配置；当前天赋不会改变。", deleteBuildConfirm: "删除配置", namePrompt: "为此配置命名：", import: "导入", export: "导出", importPrompt: "粘贴配置字符串：", exportCopied: "配置字符串已复制到剪贴板。", exportTitle: "配置字符串（复制并分享）：", invalidBuild: "该配置字符串无效。", rank: "等级", requires: "需要", pointsGate: "点已投入此树", dormant: "未激活：前置已退还", editHint: "左键添加 - 右键移除", cycleHint: "点击选择选项", combatLocked: "战斗中不能更改天赋。", nothingStaged: "没有要应用的更改。", pickSpecFirst: "选择专精后才能使用此树。", unlockBanner: "天赋已解锁！", unlockHint: "你获得了第一个天赋点：按 N 打开天赋。", copy: "复制", close: "关闭", cancel: "取消", noBuilds: "没有已保存配置", save: "保存", comingSoonTitle: "天赋即将推出", comingSoonBody: "此职业还没有天赋树。你可以继续正常游玩；完整天赋树会在未来更新中到来。",
   },
+  professions: gameStrings.professions,
 };
 
 export const gameStringsZhTW: typeof gameStrings = {
@@ -10931,6 +10977,7 @@ export const gameStringsZhTW: typeof gameStrings = {
     comingSoonTitle: "天賦即將推出",
     comingSoonBody: "此職業還沒有天賦樹。你可以繼續正常遊玩；完整天賦樹會在未來更新中到來。",
   },
+  professions: gameStrings.professions,
 };
 
 export const gameStringsKoKR: typeof gameStrings = {
@@ -10941,6 +10988,7 @@ export const gameStringsKoKR: typeof gameStrings = {
   prestige: { action: "명예 승급", title: "캐릭터 명예 승급", body: "명예 승급은 명예 등급을 1 올리고 레벨 경험치 막대를 초기화합니다. 레벨, 장비, 특성, 능력, 누적 경험치, 순위표 위치는 바뀌지 않으며 외형적 표시입니다.", confirm: "명예 승급", cancel: "취소", rank: "명예", needCap: "명예 승급을 하려면 최대 레벨이어야 합니다.", needXp: "명예 승급까지 필요한 추가 누적 경험치" },
   settings: { showOverflowXp: "초과 경험치 표시" },
   talents: { title: "특성", classTab: "직업", specTab: "전문화", available: "사용 가능", spent: "사용함", pointSource: "{first}레벨부터 {cap}레벨까지 레벨마다 특성 점수 1점을 얻습니다. 더 많은 점수를 얻으려면 레벨을 올리세요.", apply: "변경 적용", clear: "점수 초기화", reset: "초기화", chooseSpec: "전문화 선택", noSpec: "선택한 전문화 없음", role: "역할", mastery: "숙련", signature: "대표 기술", roleTank: "방어", roleHealer: "치유", roleDps: "피해", loadouts: "저장한 빌드", currentBuild: "현재 빌드", createBuild: "빌드 만들기", saveBuild: "현재 저장", saveBuildAs: "빌드 저장", newBuild: "새 빌드", deleteBuild: "삭제", currentBuildHint: "저장한 빌드를 고른 뒤 현재 저장으로 갱신하세요. 내보내기는 선택한 빌드를 공유합니다.", createBuildHint: "새 빌드는 현재 점수를 별도 빌드로 저장합니다. 가져오기는 공유 문자열을 붙여넣습니다.", buildHint: "저장한 빌드를 고르고 현재 저장으로 갱신하거나 새 빌드를 만드세요.", buildInvalid: "이 빌드는 아직 유효하지 않습니다.", selectBuildFirst: "삭제할 저장 빌드를 먼저 선택하세요.", deleteBuildTitle: "저장한 빌드를 삭제할까요?", deleteBuildBody: "\"{name}\"을(를) 삭제할까요? 저장한 빌드만 삭제되며 현재 특성은 유지됩니다.", deleteBuildConfirm: "빌드 삭제", namePrompt: "이 빌드 이름:", import: "가져오기", export: "내보내기", importPrompt: "빌드 문자열 붙여넣기:", exportCopied: "빌드 문자열이 클립보드에 복사되었습니다.", exportTitle: "빌드 문자열(복사해 공유):", invalidBuild: "그 빌드 문자열은 유효하지 않습니다.", rank: "등급", requires: "필요", pointsGate: "점이 이 트리에 사용됨", dormant: "비활성: 선행 조건 환불됨", editHint: "왼쪽 클릭 추가 - 오른쪽 클릭 제거", cycleHint: "클릭해 옵션 선택", combatLocked: "전투 중에는 특성을 바꿀 수 없습니다.", nothingStaged: "적용할 변경이 없습니다.", pickSpecFirst: "이 트리를 사용하려면 전문화를 선택하세요.", unlockBanner: "특성 해제!", unlockHint: "첫 특성 점수를 얻었습니다. N을 눌러 특성을 여세요.", copy: "복사", close: "닫기", cancel: "취소", noBuilds: "저장한 빌드 없음", save: "저장", comingSoonTitle: "특성 준비 중", comingSoonBody: "이 직업은 아직 특성 트리가 없습니다. 계속 정상적으로 플레이할 수 있으며 전체 트리는 향후 업데이트에 추가됩니다." },
+  professions: gameStrings.professions,
 };
 
 export const gameStringsJaJP: typeof gameStrings = {
@@ -10951,6 +10999,7 @@ export const gameStringsJaJP: typeof gameStrings = {
   prestige: { action: "威信", title: "キャラクター威信化", body: "威信は威信ランクを1上げ、レベル経験値バーをリセットします。レベル、装備、タレント、アビリティ、累計経験値、ランキング順位は変わりません。見た目の栄誉です。", confirm: "威信", cancel: "キャンセル", rank: "威信", needCap: "威信を得るにはレベル上限に達している必要があります。", needXp: "威信までに必要な追加累計経験値" },
   settings: { showOverflowXp: "超過経験値を表示" },
   talents: { title: "タレント", classTab: "クラス", specTab: "専門化", available: "使用可能", spent: "使用済み", pointSource: "レベル{first}から{cap}まで、レベルごとにタレントポイントを1獲得します。さらにポイントを得るにはレベルを上げてください。", apply: "変更を適用", clear: "ポイントをリセット", reset: "リセット", chooseSpec: "専門化を選択", noSpec: "専門化未選択", role: "役割", mastery: "熟達", signature: "シグネチャ", roleTank: "タンク", roleHealer: "ヒーラー", roleDps: "ダメージ", loadouts: "保存ビルド", currentBuild: "現在のビルド", createBuild: "ビルド作成", saveBuild: "現在を保存", saveBuildAs: "ビルド保存", newBuild: "新規ビルド", deleteBuild: "削除", currentBuildHint: "保存ビルドを選び、現在を保存で更新します。エクスポートは選択したビルドを共有します。", createBuildHint: "新規ビルドは現在のポイントを別ビルドとして保存します。インポートは共有文字列を貼り付けます。", buildHint: "保存ビルドを選び、現在を保存で更新するか、新規ビルドを作成します。", buildInvalid: "このビルドはまだ有効ではありません。", selectBuildFirst: "削除する保存ビルドを選択してください。", deleteBuildTitle: "保存ビルドを削除しますか?", deleteBuildBody: "\"{name}\"を削除しますか? 保存ビルドだけを削除し、現在のタレントは変わりません。", deleteBuildConfirm: "ビルド削除", namePrompt: "このビルドの名前:", import: "インポート", export: "エクスポート", importPrompt: "ビルド文字列を貼り付け:", exportCopied: "ビルド文字列をクリップボードにコピーしました。", exportTitle: "ビルド文字列(コピーして共有):", invalidBuild: "そのビルド文字列は無効です。", rank: "ランク", requires: "必要", pointsGate: "ポイントをこのツリーに使用", dormant: "休眠: 前提が払い戻されました", editHint: "左クリックで追加 - 右クリックで削除", cycleHint: "クリックして選択", combatLocked: "戦闘中はタレントを変更できません。", nothingStaged: "適用する変更はありません。", pickSpecFirst: "このツリーを使うには専門化を選択してください。", unlockBanner: "タレント解除!", unlockHint: "最初のタレントポイントを獲得しました。Nでタレントを開きます。", copy: "コピー", close: "閉じる", cancel: "キャンセル", noBuilds: "保存ビルドなし", save: "保存", comingSoonTitle: "タレント準備中", comingSoonBody: "このクラスにはまだタレントツリーがありません。通常通りプレイできます。完全なツリーは今後のアップデートで追加されます。" },
+  professions: gameStrings.professions,
 };
 
 export const gameStringsPtBR: typeof gameStrings = {
@@ -11019,6 +11068,7 @@ export const gameStringsPtBR: typeof gameStrings = {
     comingSoonTitle: "Talentos em breve",
     comingSoonBody: "Esta classe ainda não tem árvores de talentos. Você pode continuar jogando normalmente; as árvores completas chegarão em uma atualização futura.",
   },
+  professions: gameStrings.professions,
 };
 
 export const gameStringsRuRU: typeof gameStrings = {
@@ -11029,6 +11079,7 @@ export const gameStringsRuRU: typeof gameStrings = {
   prestige: { action: "Престиж", title: "Престиж персонажа", body: "Престиж повышает ранг престижа на 1 и сбрасывает шкалу опыта уровня. Он не меняет уровень, снаряжение, таланты, способности, общий опыт или место в рейтинге; это только косметический знак.", confirm: "Престиж", cancel: "Отмена", rank: "Престиж", needCap: "Для престижа нужен максимальный уровень.", needXp: "еще общего опыта до престижа" },
   settings: { showOverflowXp: "Показывать лишний опыт" },
   talents: { title: "Таланты", classTab: "Класс", specTab: "Специализация", available: "Доступно", spent: "Потрачено", pointSource: "Получайте 1 очко талантов за каждый уровень с {first} по {cap}. Повышайте уровень, чтобы получить больше очков.", apply: "Применить изменения", clear: "Сбросить очки", reset: "Сброс", chooseSpec: "Выберите специализацию", noSpec: "Специализация не выбрана", role: "Роль", mastery: "Мастерство", signature: "Ключевое", roleTank: "Танк", roleHealer: "Лекарь", roleDps: "Урон", loadouts: "Сохраненные билды", currentBuild: "Текущий билд", createBuild: "Создать билд", saveBuild: "Сохранить текущий", saveBuildAs: "Сохранить билд", newBuild: "Новый билд", deleteBuild: "Удалить", currentBuildHint: "Выберите сохраненный билд, затем сохраните текущий для обновления. Экспорт делится выбранным билдом.", createBuildHint: "Новый билд сохраняет текущие очки отдельно. Импорт вставляет общую строку.", buildHint: "Выберите сохраненный билд, обновите его или создайте новый.", buildInvalid: "Этот билд пока недействителен.", selectBuildFirst: "Сначала выберите сохраненный билд для удаления.", deleteBuildTitle: "Удалить сохраненный билд?", deleteBuildBody: "Удалить \"{name}\"? Будет удален только сохраненный билд; текущие таланты не изменятся.", deleteBuildConfirm: "Удалить билд", namePrompt: "Название этого билда:", import: "Импорт", export: "Экспорт", importPrompt: "Вставьте строку билда:", exportCopied: "Строка билда скопирована в буфер обмена.", exportTitle: "Строка билда (скопируйте и поделитесь):", invalidBuild: "Эта строка билда недействительна.", rank: "Ранг", requires: "Требуется", pointsGate: "очков вложено в дерево", dormant: "Неактивно: требование возвращено", editHint: "ЛКМ добавить - ПКМ убрать", cycleHint: "Щелкните, чтобы выбрать вариант", combatLocked: "В бою нельзя менять таланты.", nothingStaged: "Нет изменений для применения.", pickSpecFirst: "Выберите специализацию, чтобы открыть это дерево.", unlockBanner: "Таланты открыты!", unlockHint: "Вы получили первое очко талантов: нажмите N, чтобы открыть Таланты.", copy: "Копировать", close: "Закрыть", cancel: "Отмена", noBuilds: "Нет сохраненных билдов", save: "Сохранить", comingSoonTitle: "Таланты скоро появятся", comingSoonBody: "У этого класса еще нет деревьев талантов. Можно продолжать играть как обычно; полные деревья появятся в будущем обновлении." },
+  professions: gameStrings.professions,
 };
 
 export const en = {

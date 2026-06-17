@@ -1,4 +1,5 @@
 import { INTERACT_RANGE, dist2d, Entity } from '../sim/types';
+import { MOBS } from '../sim/data';
 import type { HoverCursorKind } from './cursors';
 import type { IWorld } from '../world_api';
 
@@ -8,11 +9,22 @@ export interface PickInteractionWorld {
   entities: IWorld['entities'];
   duelInfo?: IWorld['duelInfo'];
   arenaInfo?: IWorld['arenaInfo'];
+  professionSkills: IWorld['professionSkills'];
   targetEntity(id: number | null): void;
   enterDungeon(dungeonId: string): void;
   leaveDungeon(): void;
   pickUpObject(id: number): void;
+  skin(mobId: number): void;
   startAutoAttack(): void;
+}
+
+// A looted, un-skinned beast corpse the player knows Skinning for. Loot comes
+// first (the loot branch handles a still-lootable corpse), so this only fires
+// once the corpse has no loot left.
+function canSkin(world: PickInteractionWorld, e: Entity): boolean {
+  if (e.kind !== 'mob' || !e.dead || e.lootable || e.skinned) return false;
+  if (!MOBS[e.templateId]?.skinnable) return false;
+  return world.professionSkills.skinning !== undefined;
 }
 
 export interface PickInteractionHud {
@@ -94,6 +106,9 @@ export function handlePickedEntity(
     } else if (e.kind === 'mob' && e.dead && e.lootable) {
       if (d <= INTERACT_RANGE + 1) hud.openLoot(id, screenX, screenY);
       else hud.showError('Too far away.');
+    } else if (canSkin(world, e)) {
+      if (d <= INTERACT_RANGE + 1) world.skin(id);
+      else hud.showError('Too far away.');
     } else if (e.kind === 'npc') {
       if (d <= INTERACT_RANGE + 2) {
         hud.openQuestDialog(id);
@@ -113,6 +128,9 @@ export function handlePickedEntity(
     } else if (e.kind === 'mob' && e.dead && e.lootable) {
       const d = dist2d(world.player.pos, e.pos);
       if (d <= INTERACT_RANGE + 1) hud.openLoot(id, screenX, screenY);
+    } else if (canSkin(world, e)) {
+      const d = dist2d(world.player.pos, e.pos);
+      if (d <= INTERACT_RANGE + 1) world.skin(id);
     } else if (e.kind === 'npc') {
       // left-click talks too — Mac trackpads make right-click a chore;
       // out of range it just targets (no error spam while exploring)

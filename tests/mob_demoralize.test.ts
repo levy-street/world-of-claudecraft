@@ -28,6 +28,8 @@ describe('mob demoralize-on-hit', () => {
 
     const baseAp = (sim as any).effectiveAttackPower(victim);
 
+    // pin the hit roll: worldgen rng draws shift per content, this test only cares that the landed-hit effect applies
+    (sim as any).rng.next = () => 0.99;
     (sim as any).mobSwing(bones, victim);
 
     const aura = victim.auras.find((a) => a.name === 'Withering Wail');

@@ -3,6 +3,7 @@
 // leading to the Hollow Crypt.
 
 import type { CampDef, GroundObjectDef, MobTemplate, NpcDef, QuestDef, ZoneDef, ZonePropsDef } from '../types';
+import { TRADE_GOODS } from './professions';
 
 export const TOWN_RADIUS = 26;
 export const GRAVEYARD_POS = { x: -12, z: -14 };
@@ -57,7 +58,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     petRole: 'melee_tank',
   },
   forest_wolf: {
-    id: 'forest_wolf', name: 'Forest Wolf', minLevel: 1, maxLevel: 2, family: 'beast',
+    id: 'forest_wolf', name: 'Forest Wolf', minLevel: 1, maxLevel: 2, family: 'beast', skinnable: true,
     hpBase: 28, hpPerLevel: 14, dmgBase: 3, dmgPerLevel: 1.6, attackSpeed: 2.0,
     armorPerLevel: 10, moveSpeed: 8, aggroRadius: 10,
     loot: [
@@ -68,7 +69,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     packFrenzy: { radius: 12, hasteMult: 1.3, duration: 8 },
   },
   old_greyjaw: {
-    id: 'old_greyjaw', name: 'Old Greyjaw', minLevel: 4, maxLevel: 4, family: 'beast', rare: true,
+    id: 'old_greyjaw', name: 'Old Greyjaw', minLevel: 4, maxLevel: 4, family: 'beast', rare: true, skinnable: true,
     hpBase: 110, hpPerLevel: 20, dmgBase: 5, dmgPerLevel: 2.0, attackSpeed: 1.8,
     armorPerLevel: 16, moveSpeed: 8.5, aggroRadius: 12,
     loot: [
@@ -79,7 +80,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     scale: 1.25, color: 0x566061,
   },
   wild_boar: {
-    id: 'wild_boar', name: 'Wild Boar', minLevel: 2, maxLevel: 3, family: 'beast',
+    id: 'wild_boar', name: 'Wild Boar', minLevel: 2, maxLevel: 3, family: 'beast', skinnable: true,
     hpBase: 34, hpPerLevel: 16, dmgBase: 4, dmgPerLevel: 1.8, attackSpeed: 2.2,
     armorPerLevel: 14, moveSpeed: 7.5, aggroRadius: 9,
     // Stiff bristles prick anyone who melees the boar.
@@ -92,7 +93,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     scale: 0.85, color: 0x935116,
   },
   elder_bristleback: {
-    id: 'elder_bristleback', name: 'Elder Bristleback', minLevel: 5, maxLevel: 5, family: 'beast', rare: true,
+    id: 'elder_bristleback', name: 'Elder Bristleback', minLevel: 5, maxLevel: 5, family: 'beast', rare: true, skinnable: true,
     elite: true, canSwim: true, ccImmune: true, respawnMult: 432,
     hpBase: 260, hpPerLevel: 52, dmgBase: 11, dmgPerLevel: 3.3, attackSpeed: 2.4,
     armorPerLevel: 30, moveSpeed: 7.2, aggroRadius: 12,
@@ -157,7 +158,6 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     enrage: { belowHpPct: 0.30, dmgMult: 1.6, hasteMult: 1.3 },
     loot: [
       { copper: 180, chance: 1 },
-      { itemId: 'linen_scrap', chance: 1 },
       { itemId: 'moggers_stomper_boots', chance: 0.3 },
       { itemId: 'moggers_shiv', chance: 0.25, rollGroup: 'mogger_chase' },
       { itemId: 'cryptstalker_jerkin', chance: 0.25, rollGroup: 'mogger_chase' },
@@ -178,7 +178,6 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     loot: [
       { copper: 18, chance: 1 },
       { itemId: 'mudfin_scale', chance: 0.5 },
-      { itemId: 'linen_scrap', chance: 0.2 },
     ],
     scale: 0.8, color: 0x52be80,
   },
@@ -190,7 +189,6 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
       { copper: 22, chance: 1 },
       { itemId: 'tallow_candle', chance: 0.6 },
       { itemId: 'blessed_wax', chance: 0.45, questId: 'q_rite' },
-      { itemId: 'linen_scrap', chance: 0.25 },
     ],
     scale: 0.85, color: 0x9c640c,
   },
@@ -201,7 +199,6 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     loot: [
       { copper: 25, chance: 1 },
       { itemId: 'bandit_bandana', chance: 0.5 },
-      { itemId: 'linen_scrap', chance: 0.3 },
     ],
     scale: 1.0, color: 0x943126,
   },
@@ -256,7 +253,7 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     id: 'trader_wilkes', name: 'Trader Wilkes', title: 'Provisioner',
     pos: { x: -7, z: 3 }, facing: Math.PI / 2, color: 0x1e8449,
     questIds: ['q_boars', 'q_supplies'],
-    vendorItems: ['baked_bread', 'spring_water', 'roasted_boar', 'tough_jerky', 'minor_healing_potion', 'minor_mana_potion'],
+    vendorItems: ['baked_bread', 'spring_water', 'roasted_boar', 'tough_jerky', 'minor_healing_potion', 'minor_mana_potion', ...TRADE_GOODS],
     greeting: 'Fresh bread, clean water, fair prices. What can I get you?',
   },
   apothecary_lin: {
@@ -272,6 +269,8 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
       'q_bones', 'q_whispers', 'q_names_of_the_dead', 'q_silence_the_call',
       'q_rite', 'q_sexton', 'q_hollow', 'q_gravecallers_trail', 'q_fenbridge_muster',
     ],
+    trains: 'first_aid',
+    trainsMaxTier: 'apprentice',
     greeting: 'The Light keep you. Even the dead find no rest here of late.',
   },
   smith_haldren: {
@@ -302,6 +301,31 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     pos: { x: -4, z: -14 }, facing: -2.14, color: 0xa04000,
     questIds: ['q_mine'],
     greeting: "Whole dig's crawling with those candle-headed vermin!",
+  },
+  // Profession trainers (PR 2) — a crafting corner near Smith Haldren in town.
+  tanner_yorvek: {
+    id: 'tanner_yorvek', name: 'Tanner Yorvek', title: 'Skinning Trainer',
+    pos: { x: -2, z: 16 }, facing: -2.4, color: 0x6e4b2a,
+    questIds: [],
+    trains: 'skinning',
+    trainsMaxTier: 'apprentice',
+    greeting: 'A clean skin starts with a steady knife. Mind the loot first — pelts come last.',
+  },
+  leatherworker_brida: {
+    id: 'leatherworker_brida', name: 'Leatherworker Brida', title: 'Leatherworking Trainer',
+    pos: { x: 12, z: 17 }, facing: -2.6, color: 0x8a5a2b,
+    questIds: [],
+    trains: 'leatherworking',
+    trainsMaxTier: 'apprentice',
+    greeting: 'Bring me leather and I will show you how to make it hold a shape.',
+  },
+  tailor_marlena: {
+    id: 'tailor_marlena', name: 'Tailor Marlena', title: 'Tailoring Trainer',
+    pos: { x: 2, z: 18 }, facing: Math.PI, color: 0x5b6e9c,
+    questIds: [],
+    trains: 'tailoring',
+    trainsMaxTier: 'apprentice',
+    greeting: 'Bolts of good cloth and a fine thread, $N — that is the whole secret of it.',
   },
 };
 

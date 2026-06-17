@@ -6,6 +6,7 @@
 import type {
   CampDef, GroundObjectDef, ItemDef, MobTemplate, NpcDef, PlayerClass, QuestDef, ZoneDef, ZonePropsDef,
 } from '../types';
+import { TRADE_GOODS } from './professions';
 
 export const DEEPFEN_SHALLOWS_LAKE = { x: -110, z: 310, radius: 35 };
 
@@ -54,7 +55,7 @@ export const ZONE2_ROADS: { x: number; z: number }[][] = [
 
 export const ZONE2_MOBS: Record<string, MobTemplate> = {
   mire_prowler: {
-    id: 'mire_prowler', name: 'Mire Prowler', minLevel: 7, maxLevel: 8, family: 'beast',
+    id: 'mire_prowler', name: 'Mire Prowler', minLevel: 7, maxLevel: 8, family: 'beast', skinnable: true,
     hpBase: 46, hpPerLevel: 19, dmgBase: 7, dmgPerLevel: 2.1, attackSpeed: 2.0,
     armorPerLevel: 12, moveSpeed: 8.5, aggroRadius: 11,
     loot: [
@@ -168,7 +169,6 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 20, moveSpeed: 7, aggroRadius: 11,
     loot: [
       { copper: 55, chance: 1 },
-      { itemId: 'linen_scrap', chance: 0.3 },
       { itemId: 'tallow_candle', chance: 0.3 },
     ],
     scale: 1.0, color: 0x6c3483,
@@ -269,6 +269,8 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
       'q_idols', 'q_drowned', 'q_drowned_censers', 'q_no_rest', 'q_summoners',
       'q_bastion_door', 'q_mistcaller', 'q_highwatch_summons',
     ],
+    trains: 'first_aid',
+    trainsMaxTier: 'journeyman',
     greeting: 'The Light keep you above the water, $N. The dead in this fen do not sleep — they wade.',
   },
   provisioner_hale: {
@@ -279,6 +281,7 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
       'fenbridge_rye', 'marsh_mint_tea', 'smoked_eel', 'silvermist_cordial',
       'bogiron_mace', 'fenreed_staff', 'mirefen_skinner', 'bogiron_hauberk',
       'marshcloth_robe', 'reedwoven_jerkin', 'fenwalker_boots', 'reedwoven_trousers',
+      ...TRADE_GOODS,
     ],
     greeting: 'Dry boots, dry bread, dry powder — at Fenbridge you get two of the three on a good day.',
   },
@@ -293,6 +296,32 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
     pos: { x: 6, z: 312 }, facing: -0.6, color: 0x7d6608,
     questIds: ['q_troll_fetishes', 'q_cult_camp', 'q_olen'],
     greeting: 'Quiet feet and a short blade keep you breathing out here. Speak quick — I am due back in the reeds.',
+  },
+  // Journeyman profession trainers — a crafting row on Fenbridge's east boardwalk.
+  // The starting town (Eastbrook) teaches only Apprentice; these raise the cap.
+  tanner_sull: {
+    id: 'tanner_sull', name: 'Tanner Sull', title: 'Skinning Trainer',
+    pos: { x: 12, z: 302 }, facing: -2.2, color: 0x6e4b2a,
+    questIds: [],
+    trains: 'skinning',
+    trainsMaxTier: 'journeyman',
+    greeting: 'Fen-beasts wear hide three times the thickness of vale game, $N. I will teach you to take it whole.',
+  },
+  leatherworker_orsa: {
+    id: 'leatherworker_orsa', name: 'Leatherworker Orsa', title: 'Leatherworking Trainer',
+    pos: { x: 14, z: 305 }, facing: -2.4, color: 0x8a5a2b,
+    questIds: [],
+    trains: 'leatherworking',
+    trainsMaxTier: 'journeyman',
+    greeting: 'Marsh-cured leather laughs at the rot. Master it here, beyond what Eastbrook could show you.',
+  },
+  tailor_evelle: {
+    id: 'tailor_evelle', name: 'Tailor Evelle', title: 'Tailoring Trainer',
+    pos: { x: 13, z: 308 }, facing: -2.6, color: 0x5b6e9c,
+    questIds: [],
+    trains: 'tailoring',
+    trainsMaxTier: 'journeyman',
+    greeting: 'A damp fen rots a careless seam in a week. The Journeyman stitch holds through the wettest reeds.',
   },
 };
 

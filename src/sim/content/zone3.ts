@@ -6,6 +6,7 @@
 import type {
   CampDef, GroundObjectDef, ItemDef, MobTemplate, NpcDef, QuestDef, ZoneDef, ZonePropsDef,
 } from '../types';
+import { TRADE_GOODS } from './professions';
 
 export const ZONE3_ZONE: ZoneDef = {
   id: 'thornpeak_heights',
@@ -46,7 +47,7 @@ export const ZONE3_ROADS: { x: number; z: number }[][] = [
 
 export const ZONE3_MOBS: Record<string, MobTemplate> = {
   ridge_stalker: {
-    id: 'ridge_stalker', name: 'Ridge Stalker', minLevel: 13, maxLevel: 14, family: 'beast',
+    id: 'ridge_stalker', name: 'Ridge Stalker', minLevel: 13, maxLevel: 14, family: 'beast', skinnable: true,
     hpBase: 58, hpPerLevel: 21, dmgBase: 10, dmgPerLevel: 2.5, attackSpeed: 1.9,
     armorPerLevel: 14, moveSpeed: 8, aggroRadius: 11,
     loot: [
@@ -54,6 +55,29 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
       { itemId: 'ridge_stalker_pelt', chance: 0.6, questId: 'q_stalker_pelts' },
     ],
     scale: 0.95, color: 0x8c8270,
+  },
+  // Skinnable high-level beasts (PR 2) — the source of heavy leather (only
+  // ridge_stalker reached L14 before), so the 14–20 leather band has real prey.
+  frostfang_lynx: {
+    id: 'frostfang_lynx', name: 'Frostfang Lynx', minLevel: 16, maxLevel: 17, family: 'beast', skinnable: true,
+    hpBase: 70, hpPerLevel: 22, dmgBase: 12, dmgPerLevel: 2.6, attackSpeed: 1.8,
+    armorPerLevel: 15, moveSpeed: 8.5, aggroRadius: 11,
+    loot: [
+      { copper: 80, chance: 1 },
+      { itemId: 'tough_jerky', chance: 0.3 },
+    ],
+    scale: 1.0, color: 0xc8d0d8,
+  },
+  craghorn_bear: {
+    id: 'craghorn_bear', name: 'Craghorn Bear', minLevel: 18, maxLevel: 19, family: 'beast', skinnable: true,
+    hpBase: 95, hpPerLevel: 24, dmgBase: 14, dmgPerLevel: 2.8, attackSpeed: 2.4,
+    armorPerLevel: 18, moveSpeed: 7, aggroRadius: 11,
+    enrage: { belowHpPct: 0.3, dmgMult: 1.3, hasteMult: 1.2 },
+    loot: [
+      { copper: 95, chance: 1 },
+      { itemId: 'tough_jerky', chance: 0.35 },
+    ],
+    scale: 1.3, color: 0x5c4632,
   },
   deeprock_kobold: {
     id: 'deeprock_kobold', name: 'Deeprock Tunneler', minLevel: 14, maxLevel: 15, family: 'kobold',
@@ -171,7 +195,6 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     loot: [
       { copper: 100, chance: 1 },
       { itemId: 'ritual_phylactery', chance: 0.55, questId: 'q_necromancers' },
-      { itemId: 'linen_scrap', chance: 0.3 },
     ],
     manaBurn: { chance: 0.3, amount: 80, name: 'Mana Sear', school: 'shadow' },
     scale: 1.0, color: 0x533566,
@@ -321,6 +344,7 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     vendorItems: [
       'trail_hardtack', 'meltwater_flask', 'roast_mountain_goat', 'glacier_melt',
       'highwatch_breastplate', 'peakwool_robe', 'stalkerhide_jerkin', 'cragwalker_boots', 'windguard_leggings',
+      ...TRADE_GOODS,
     ],
     greeting: 'Wool, hardtack, and steel-shod boots — Highwatch runs on all three, and I am short of everything.',
   },
@@ -675,6 +699,13 @@ export const ZONE3_CAMPS: CampDef[] = [
   { mobId: 'boneclad_revenant', center: { x: -40, z: 830 }, radius: 20, count: 8 },
   { mobId: 'boneclad_revenant', center: { x: -15, z: 860 }, radius: 16, count: 6 },
   { mobId: 'marrowlord_varkas', center: { x: -34, z: 842 }, radius: 5, count: 1 },
+  // Skinnable high-level beasts (PR 2) — appended at the END so existing camps'
+  // spawn RNG draws are unchanged (only the post-worldgen RNG state shifts). They
+  // give the 14-20 heavy-leather band real prey (only ridge_stalker reached L14).
+  { mobId: 'frostfang_lynx', center: { x: -95, z: 650 }, radius: 20, count: 6 },
+  { mobId: 'frostfang_lynx', center: { x: -70, z: 672 }, radius: 16, count: 5 },
+  { mobId: 'craghorn_bear', center: { x: 150, z: 700 }, radius: 20, count: 5 },
+  { mobId: 'craghorn_bear', center: { x: 128, z: 728 }, radius: 16, count: 4 },
 ];
 
 export const ZONE3_OBJECTS: GroundObjectDef[] = [

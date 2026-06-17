@@ -117,10 +117,36 @@ const petEnTable = {
   "aura.fed": "Fed",
 } as const;
 
-const enTable = { ...baseEnTable, ...petEnTable } as const;
+const professionEnTable = {
+  "log.craftMake": "You make {count}x {item}.",
+  "error.noProfession": "No such profession.",
+  "error.mustSpeakTrainer": "You must speak to a trainer.",
+  "error.alreadyKnowProfession": "You already know {prof}.",
+  "error.twoPrimaryProfessions": "You already know two primary professions.",
+  "error.requiresProfLevel": "Requires level {level}.",
+  "error.learnProfFirst": "Learn {prof} first.",
+  "error.nothingMoreToLearn": "There is nothing more to learn yet.",
+  "error.requiresProfSkill": "Requires {prof} {skill}.",
+  "error.noRecipe": "No such recipe.",
+  "error.alreadyKnowRecipe": "You already know that recipe.",
+  "error.notLearnedProfession": "You have not learned that profession.",
+  "error.notLearnedRecipe": "You have not learned that recipe.",
+  "error.skillTooLow": "Your skill is too low.",
+  "error.nearStation": "You need to be near a {station}.",
+  "error.lackMaterials": "You lack the materials.",
+  "error.recentlyBandaged": "That target was bandaged too recently.",
+  "error.notLearnedSkinning": "You have not learned Skinning.",
+  "error.cannotSkinThat": "You can't skin that.",
+  "error.creatureNotSkinnable": "That creature cannot be skinned.",
+  "error.corpseAlreadySkinned": "That corpse has already been skinned.",
+  "error.lootCorpseFirst": "You must loot the corpse first.",
+} as const;
+
+const enTable = { ...baseEnTable, ...petEnTable, ...professionEnTable } as const;
 
 type BaseSimMessageKey = keyof typeof baseEnTable;
 type PetSimMessageKey = keyof typeof petEnTable;
+type ProfSimMessageKey = keyof typeof professionEnTable;
 export type SimMessageKey = keyof typeof enTable;
 
 // Per-locale table. Typed Record<SupportedLanguage, Record<...>> so tsc fails on
@@ -1451,8 +1477,146 @@ const PET_DICT: Record<SupportedLanguage, Record<PetSimMessageKey, string>> = {
   ru_RU: PET_DICT_RU,
 };
 
+const PROF_DICT_EN: Record<ProfSimMessageKey, string> = professionEnTable;
+const PROF_DICT_ES: Record<ProfSimMessageKey, string> = {
+  "log.craftMake": "Creas {count}x {item}.",
+  "error.noProfession": "No existe esa profesión.",
+  "error.mustSpeakTrainer": "Debes hablar con un instructor.",
+  "error.alreadyKnowProfession": "Ya conoces {prof}.",
+  "error.twoPrimaryProfessions": "Ya conoces dos profesiones principales.",
+  "error.requiresProfLevel": "Requiere nivel {level}.",
+  "error.learnProfFirst": "Aprende {prof} primero.",
+  "error.nothingMoreToLearn": "No hay nada más que aprender por ahora.",
+  "error.requiresProfSkill": "Requiere {prof} {skill}.",
+  "error.noRecipe": "No existe esa receta.",
+  "error.alreadyKnowRecipe": "Ya conoces esa receta.",
+  "error.notLearnedProfession": "No has aprendido esa profesión.",
+  "error.notLearnedRecipe": "No has aprendido esa receta.",
+  "error.skillTooLow": "Tu habilidad es demasiado baja.",
+  "error.nearStation": "Necesitas estar cerca de un {station}.",
+  "error.lackMaterials": "Te faltan los materiales.",
+  "error.recentlyBandaged": "Ese objetivo fue vendado hace muy poco.",
+  "error.notLearnedSkinning": "No has aprendido Desuello.",
+  "error.cannotSkinThat": "No puedes desollar eso.",
+  "error.creatureNotSkinnable": "Esa criatura no se puede desollar.",
+  "error.corpseAlreadySkinned": "Ese cadáver ya ha sido desollado.",
+  "error.lootCorpseFirst": "Primero debes saquear el cadáver.",
+};
+const PROF_DICT_FR: Record<ProfSimMessageKey, string> = {
+  "log.craftMake": "Vous fabriquez {count}x {item}.",
+  "error.noProfession": "Cette profession n'existe pas.",
+  "error.mustSpeakTrainer": "Vous devez parler à un formateur.",
+  "error.alreadyKnowProfession": "Vous connaissez déjà {prof}.",
+  "error.twoPrimaryProfessions": "Vous connaissez déjà deux professions principales.",
+  "error.requiresProfLevel": "Nécessite le niveau {level}.",
+  "error.learnProfFirst": "Apprenez d'abord {prof}.",
+  "error.nothingMoreToLearn": "Il n'y a plus rien à apprendre pour l'instant.",
+  "error.requiresProfSkill": "Nécessite {prof} {skill}.",
+  "error.noRecipe": "Cette recette n'existe pas.",
+  "error.alreadyKnowRecipe": "Vous connaissez déjà cette recette.",
+  "error.notLearnedProfession": "Vous n'avez pas appris cette profession.",
+  "error.notLearnedRecipe": "Vous n'avez pas appris cette recette.",
+  "error.skillTooLow": "Votre compétence est trop faible.",
+  "error.nearStation": "Vous devez être près d'un {station}.",
+  "error.lackMaterials": "Il vous manque les matériaux.",
+  "error.recentlyBandaged": "Cette cible a été bandée trop récemment.",
+  "error.notLearnedSkinning": "Vous n'avez pas appris le Dépeçage.",
+  "error.cannotSkinThat": "Vous ne pouvez pas dépecer cela.",
+  "error.creatureNotSkinnable": "Cette créature ne peut pas être dépecée.",
+  "error.corpseAlreadySkinned": "Ce cadavre a déjà été dépecé.",
+  "error.lootCorpseFirst": "Vous devez d'abord piller le cadavre.",
+};
+const PROF_DICT_IT: Record<ProfSimMessageKey, string> = {
+  "log.craftMake": "Crei {count}x {item}.",
+  "error.noProfession": "Quella professione non esiste.",
+  "error.mustSpeakTrainer": "Devi parlare con un addestratore.",
+  "error.alreadyKnowProfession": "Conosci già {prof}.",
+  "error.twoPrimaryProfessions": "Conosci già due professioni primarie.",
+  "error.requiresProfLevel": "Richiede il livello {level}.",
+  "error.learnProfFirst": "Impara prima {prof}.",
+  "error.nothingMoreToLearn": "Non c'è altro da imparare per ora.",
+  "error.requiresProfSkill": "Richiede {prof} {skill}.",
+  "error.noRecipe": "Quella ricetta non esiste.",
+  "error.alreadyKnowRecipe": "Conosci già quella ricetta.",
+  "error.notLearnedProfession": "Non hai imparato quella professione.",
+  "error.notLearnedRecipe": "Non hai imparato quella ricetta.",
+  "error.skillTooLow": "La tua abilità è troppo bassa.",
+  "error.nearStation": "Devi essere vicino a un {station}.",
+  "error.lackMaterials": "Ti mancano i materiali.",
+  "error.recentlyBandaged": "Quel bersaglio è stato bendato troppo di recente.",
+  "error.notLearnedSkinning": "Non hai imparato Scuoiatura.",
+  "error.cannotSkinThat": "Non puoi scuoiare quello.",
+  "error.creatureNotSkinnable": "Quella creatura non può essere scuoiata.",
+  "error.corpseAlreadySkinned": "Quel cadavere è già stato scuoiato.",
+  "error.lootCorpseFirst": "Devi prima saccheggiare il cadavere.",
+};
+const PROF_DICT_DE: Record<ProfSimMessageKey, string> = {
+  "log.craftMake": "Du stellst {count}x {item} her.",
+  "error.noProfession": "Diesen Beruf gibt es nicht.",
+  "error.mustSpeakTrainer": "Du musst mit einem Lehrer sprechen.",
+  "error.alreadyKnowProfession": "Du beherrschst {prof} bereits.",
+  "error.twoPrimaryProfessions": "Du beherrschst bereits zwei Hauptberufe.",
+  "error.requiresProfLevel": "Erfordert Stufe {level}.",
+  "error.learnProfFirst": "Erlerne zuerst {prof}.",
+  "error.nothingMoreToLearn": "Es gibt vorerst nichts mehr zu lernen.",
+  "error.requiresProfSkill": "Erfordert {prof} {skill}.",
+  "error.noRecipe": "Dieses Rezept gibt es nicht.",
+  "error.alreadyKnowRecipe": "Du kennst dieses Rezept bereits.",
+  "error.notLearnedProfession": "Du hast diesen Beruf nicht erlernt.",
+  "error.notLearnedRecipe": "Du hast dieses Rezept nicht erlernt.",
+  "error.skillTooLow": "Dein Können ist zu gering.",
+  "error.nearStation": "Du musst dich in der Nähe eines {station} befinden.",
+  "error.lackMaterials": "Dir fehlen die Materialien.",
+  "error.recentlyBandaged": "Dieses Ziel wurde erst kürzlich verbunden.",
+  "error.notLearnedSkinning": "Du hast Kürschnerei nicht erlernt.",
+  "error.cannotSkinThat": "Das kannst du nicht häuten.",
+  "error.creatureNotSkinnable": "Diese Kreatur kann nicht gehäutet werden.",
+  "error.corpseAlreadySkinned": "Dieser Kadaver wurde bereits gehäutet.",
+  "error.lootCorpseFirst": "Du musst zuerst den Kadaver plündern.",
+};
+const PROF_DICT_PT: Record<ProfSimMessageKey, string> = {
+  "log.craftMake": "Você cria {count}x {item}.",
+  "error.noProfession": "Essa profissão não existe.",
+  "error.mustSpeakTrainer": "Você precisa falar com um treinador.",
+  "error.alreadyKnowProfession": "Você já conhece {prof}.",
+  "error.twoPrimaryProfessions": "Você já conhece duas profissões primárias.",
+  "error.requiresProfLevel": "Requer nível {level}.",
+  "error.learnProfFirst": "Aprenda {prof} primeiro.",
+  "error.nothingMoreToLearn": "Não há mais nada para aprender por enquanto.",
+  "error.requiresProfSkill": "Requer {prof} {skill}.",
+  "error.noRecipe": "Essa receita não existe.",
+  "error.alreadyKnowRecipe": "Você já conhece essa receita.",
+  "error.notLearnedProfession": "Você não aprendeu essa profissão.",
+  "error.notLearnedRecipe": "Você não aprendeu essa receita.",
+  "error.skillTooLow": "Sua habilidade é muito baixa.",
+  "error.nearStation": "Você precisa estar perto de um {station}.",
+  "error.lackMaterials": "Faltam os materiais.",
+  "error.recentlyBandaged": "Esse alvo foi enfaixado recentemente.",
+  "error.notLearnedSkinning": "Você não aprendeu Esfolamento.",
+  "error.cannotSkinThat": "Você não pode esfolar isso.",
+  "error.creatureNotSkinnable": "Essa criatura não pode ser esfolada.",
+  "error.corpseAlreadySkinned": "Esse cadáver já foi esfolado.",
+  "error.lootCorpseFirst": "Você deve saquear o cadáver primeiro.",
+};
+const PROF_DICT: Record<SupportedLanguage, Record<ProfSimMessageKey, string>> = {
+  en: PROF_DICT_EN,
+  en_CA: PROF_DICT_EN,
+  es: PROF_DICT_ES,
+  es_ES: PROF_DICT_ES,
+  fr_FR: PROF_DICT_FR,
+  fr_CA: PROF_DICT_FR,
+  it_IT: PROF_DICT_IT,
+  de_DE: PROF_DICT_DE,
+  zh_CN: PROF_DICT_EN,
+  zh_TW: PROF_DICT_EN,
+  ko_KR: PROF_DICT_EN,
+  ja_JP: PROF_DICT_EN,
+  pt_BR: PROF_DICT_PT,
+  ru_RU: PROF_DICT_EN,
+};
+
 export const DICT: Record<SupportedLanguage, Record<SimMessageKey, string>> = Object.fromEntries(
-  supportedLanguages.map((lang) => [lang, { ...BASE_DICT[lang], ...PET_DICT[lang] }]),
+  supportedLanguages.map((lang) => [lang, { ...BASE_DICT[lang], ...PET_DICT[lang], ...PROF_DICT[lang] }]),
 ) as Record<SupportedLanguage, Record<SimMessageKey, string>>;
 
 function interpolate(template: string, params?: InterpolationValues): string {
@@ -2099,6 +2263,15 @@ const RULES: Rule[] = [
   { re: /^(.+) cannot queue while dueling\.$/, build: (m) => tArenaExtra('memberDueling', { name: m[1] }) },
   { re: /^(.+) must finish trading before queueing\.$/, build: (m) => tArenaExtra('memberTrading', { name: m[1] }) },
   { re: /^(.+) cannot queue from inside an instance\.$/, build: (m) => tArenaExtra('memberInstance', { name: m[1] }) },
+  // Professions. Order matters: "Requires level N." must precede the generic
+  // "Requires {prof} {skill}." rule, and the exact recipe/primary lines are caught
+  // by the EXACT table before "You already know {prof}." reaches RULES.
+  { re: /^You make (\d+)x (.+)\.$/, build: (m) => tSim('log.craftMake', { count: m[1], item: locItem(m[2]) }) },
+  { re: /^Requires level (\d+)\.$/, build: (m) => tSim('error.requiresProfLevel', { level: m[1] }) },
+  { re: /^Learn (.+) first\.$/, build: (m) => tSim('error.learnProfFirst', { prof: m[1] }) },
+  { re: /^You already know (.+)\.$/, build: (m) => tSim('error.alreadyKnowProfession', { prof: m[1] }) },
+  { re: /^Requires (.+) (\S+)\.$/, build: (m) => tSim('error.requiresProfSkill', { prof: m[1], skill: m[2] }) },
+  { re: /^You need to be near a (.+)\.$/, build: (m) => tSim('error.nearStation', { station: m[1] }) },
 ];
 
 // Returns the localized form of a sim-emitted message, or null if not one of ours.

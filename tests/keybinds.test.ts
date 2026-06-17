@@ -207,7 +207,8 @@ describe('persistence', () => {
     expect(kb.actionForCode('KeyH')).toBe('targetFriendly');
     expect(kb.actionForCode('Enter')).toBe('chat');
     expect(kb.actionForCode('Equal')).toBe('slot11');
-    expect(kb.actionForCode('KeyY')).toBe(null);
+    expect(kb.actionForCode('KeyK')).toBe('skills');
+    expect(kb.actionForCode('KeyY')).toBe('leaderboard');
   });
 
   it('drops a retained default that a stored binding already claimed', () => {

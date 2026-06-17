@@ -1,6 +1,7 @@
 import { OVERHEAD_EMOTE_IDS, type ArenaCombatant, type ArenaFormat, type ArenaStanding, type Entity, type EquipSlot, type InvSlot, type MoveInput, type OverheadEmoteId, type PetMode, type PlayerClass, type QuestProgress, type QuestState, type ResourceType } from './sim/types';
 import type { ResolvedAbility } from './sim/sim';
 import type { TalentAllocation, SavedLoadout, Role } from './sim/content/talents';
+import type { TierId } from './sim/content/professions';
 
 export interface PartyMemberInfo {
   pid: number;
@@ -216,6 +217,8 @@ export interface IWorld {
   stopAutoAttack(): void;
   interact(): void;
   lootCorpse(id: number): void;
+  // Skinning (gathering): skin a looted beast corpse for leather/hides.
+  skin(mobId: number): void;
   pickUpObject(id: number): void;
   acceptQuest(questId: string): void;
   turnInQuest(questId: string): void;
@@ -308,4 +311,13 @@ export interface IWorld {
   saveLoadout(name: string, bar: (string | null)[], alloc?: TalentAllocation): void;
   switchLoadout(index: number): void;
   deleteLoadout(index: number): void;
+  // Professions & secondary skills. Server-authoritative: the client reads these
+  // mirrored values and sends learn/craft intents (validated server-side).
+  professionSkills: Record<string, number>;
+  professionTiers: Record<string, TierId>;
+  learnedRecipes: string[];
+  learnProfession(profId: string, tier: string): void;
+  learnRecipe(recipeId: string): void;
+  dropProfession(profId: string): void;
+  craft(recipeId: string): void;
 }

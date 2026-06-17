@@ -132,6 +132,34 @@ export const en: EnTranslations = {
       "save": "Save",
       "comingSoonTitle": "Talents coming soon",
       "comingSoonBody": "This class does not have talent trees yet. You can keep playing normally; full trees will arrive in a future update."
+    },
+    "professions": {
+      "skillsTitle": "Skills",
+      "professions": "Professions",
+      "secondary": "Secondary Skills",
+      "open": "Open",
+      "noSkills": "You have not learned any professions or secondary skills yet. Seek out a trainer.",
+      "craft": "Craft",
+      "noRecipes": "You have not learned any recipes yet. Visit a trainer to learn them.",
+      "trainTitle": "Train {name}",
+      "learnApprentice": "Learn {name} (Apprentice)",
+      "learnJourneyman": "Learn Journeyman {name}",
+      "recipes": "Recipes",
+      "nothingToTrain": "Nothing new to train right now. Raise your skill and return.",
+      "taughtAllIKnow": "I've taught you all I know.",
+      "unlearn": "Unlearn",
+      "unlearnTitle": "Unlearn {name}?",
+      "unlearnBody": "Unlearn {name}? You will lose all skill progress and every recipe you have learned for it. A primary profession frees its slot so you can learn another.",
+      "unlearnedLog": "You have unlearned {name}.",
+      "back": "← Back",
+      "gatheredSuffix": " (gathered in the world)",
+      "skillIncreased": "Your skill in {name} increased to {skill}.",
+      "journeymanLabel": "Journeyman {name}",
+      "learnedBanner": "Learned {label}",
+      "learnedLog": "You have learned {label}.",
+      "recipeLearnedLog": "You have learned to make {name}.",
+      "bandageUse": "Use: Channel a heal for {heal} health over {time} sec. The target cannot be bandaged again for 1 min, and the channel breaks if you move or take damage.",
+      "requiresProf": "Requires {name} ({skill})"
     }
   },
   "nav": {
@@ -1007,7 +1035,8 @@ export const en: EnTranslations = {
     },
     "cast": {
       "fishing": "Fishing",
-      "demonHeal": "Demon Heal"
+      "demonHeal": "Demon Heal",
+      "skinning": "Skinning"
     }
   },
   "questUi": {
@@ -1109,7 +1138,8 @@ export const en: EnTranslations = {
       "food": "Food",
       "drink": "Drink",
       "tool": "Tool",
-      "potion": "Potion"
+      "potion": "Potion",
+      "reagent": "Trade Good"
     },
     "stats": {
       "armor": "Armor",
@@ -2147,6 +2177,150 @@ export const en: EnTranslations = {
       "cracked_wyrm_scale": {
         "name": "Cracked Wyrm Scale"
       },
+      "bolt_of_linen": {
+        "name": "Bolt of Linen Cloth"
+      },
+      "bolt_of_silk": {
+        "name": "Bolt of Silk Cloth"
+      },
+      "bolt_of_woolen": {
+        "name": "Bolt of Woolen Cloth"
+      },
+      "coarse_thread": {
+        "name": "Coarse Thread"
+      },
+      "cured_heavy_hide": {
+        "name": "Cured Heavy Hide"
+      },
+      "cured_leather_pants": {
+        "name": "Cured Leather Pants"
+      },
+      "cured_light_hide": {
+        "name": "Cured Light Hide"
+      },
+      "cured_medium_hide": {
+        "name": "Cured Medium Hide"
+      },
+      "direhide_legguards": {
+        "name": "Direhide Legguards"
+      },
+      "fine_thread": {
+        "name": "Fine Thread"
+      },
+      "heavy_hide": {
+        "name": "Heavy Hide"
+      },
+      "heavy_leather": {
+        "name": "Heavy Leather"
+      },
+      "heavy_leather_straps": {
+        "name": "Heavy Leather Straps"
+      },
+      "heavy_leather_vest": {
+        "name": "Heavy Leather Vest"
+      },
+      "heavy_linen_bandage": {
+        "name": "Heavy Linen Bandage"
+      },
+      "heavy_silk_bandage": {
+        "name": "Heavy Silk Bandage"
+      },
+      "heavy_wool_bandage": {
+        "name": "Heavy Wool Bandage"
+      },
+      "light_hide": {
+        "name": "Light Hide"
+      },
+      "light_leather": {
+        "name": "Light Leather"
+      },
+      "light_leather_boots": {
+        "name": "Light Leather Boots"
+      },
+      "light_leather_straps": {
+        "name": "Light Leather Straps"
+      },
+      "light_leather_vest": {
+        "name": "Light Leather Vest"
+      },
+      "linen_bandage": {
+        "name": "Linen Bandage"
+      },
+      "linen_boots": {
+        "name": "Linen Boots"
+      },
+      "linen_cloth": {
+        "name": "Linen Cloth"
+      },
+      "linen_pants": {
+        "name": "Linen Pants"
+      },
+      "linen_robe": {
+        "name": "Linen Robe"
+      },
+      "medium_hide": {
+        "name": "Medium Hide"
+      },
+      "medium_leather": {
+        "name": "Medium Leather"
+      },
+      "medium_leather_boots": {
+        "name": "Medium Leather Boots"
+      },
+      "medium_leather_pants": {
+        "name": "Medium Leather Pants"
+      },
+      "medium_leather_vest": {
+        "name": "Medium Leather Vest"
+      },
+      "rough_thread": {
+        "name": "Rough Thread"
+      },
+      "ruined_leather_scraps": {
+        "name": "Ruined Leather Scraps"
+      },
+      "salt": {
+        "name": "Refined Salt"
+      },
+      "silk_bandage": {
+        "name": "Silk Bandage"
+      },
+      "silk_brocade_robe": {
+        "name": "Silk Brocade Robe"
+      },
+      "silk_cloth": {
+        "name": "Silk Cloth"
+      },
+      "silk_leggings": {
+        "name": "Silk Leggings"
+      },
+      "silk_scrap": {
+        "name": "Silk Scrap"
+      },
+      "silk_slippers": {
+        "name": "Silk Slippers"
+      },
+      "studded_leather_vest": {
+        "name": "Studded Leather Vest"
+      },
+      "wool_bandage": {
+        "name": "Wool Bandage"
+      },
+      "wool_cloth": {
+        "name": "Wool Cloth"
+      },
+      "wool_scrap": {
+        "name": "Wool Scrap"
+      },
+      "woolen_leggings": {
+        "name": "Woolen Leggings"
+      },
+      "woolen_slippers": {
+        "name": "Woolen Slippers"
+      },
+      "woolen_tunic": {
+        "name": "Woolen Tunic"
+      },
       "bristleback_maul": {
         "name": "Bristleback Maul"
       },
@@ -2590,6 +2764,12 @@ export const en: EnTranslations = {
       "bound_guardian": {
         "name": "The Bound Guardian"
       },
+      "craghorn_bear": {
+        "name": "Craghorn Bear"
+      },
+      "frostfang_lynx": {
+        "name": "Frostfang Lynx"
+      },
       "elder_bristleback": {
         "name": "Elder Bristleback"
       },
@@ -2767,6 +2947,36 @@ export const en: EnTranslations = {
         "name": "Loremaster Caddis",
         "title": "Loremaster",
         "greeting": "Mind the loose shale, {className}. The mountain has been... restless of late. I intend to learn why."
+      },
+      "tanner_yorvek": {
+        "name": "Tanner Yorvek",
+        "title": "Skinning Trainer",
+        "greeting": "A clean skin starts with a steady knife. Mind the loot first - pelts come last."
+      },
+      "leatherworker_brida": {
+        "name": "Leatherworker Brida",
+        "title": "Leatherworking Trainer",
+        "greeting": "Bring me leather and I will show you how to make it hold a shape."
+      },
+      "tailor_marlena": {
+        "name": "Tailor Marlena",
+        "title": "Tailoring Trainer",
+        "greeting": "Bolts of good cloth and a fine thread, {playerName} - that is the whole secret of it."
+      },
+      "tanner_sull": {
+        "name": "Tanner Sull",
+        "title": "Skinning Trainer",
+        "greeting": "Fen-beasts wear hide three times the thickness of vale game, {playerName}. I will teach you to take it whole."
+      },
+      "leatherworker_orsa": {
+        "name": "Leatherworker Orsa",
+        "title": "Leatherworking Trainer",
+        "greeting": "Marsh-cured leather laughs at the rot. Master it here, beyond what Eastbrook could show you."
+      },
+      "tailor_evelle": {
+        "name": "Tailor Evelle",
+        "title": "Tailoring Trainer",
+        "greeting": "A damp fen rots a careless seam in a week. The Journeyman stitch holds through the wettest reeds."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -3838,6 +4048,34 @@ export const es: EnTranslations = {
       "save": "Guardar",
       "comingSoonTitle": "Talentos próximamente",
       "comingSoonBody": "Esta clase aún no tiene árboles de talentos. Puedes seguir jugando normalmente; los árboles completos llegarán en una actualización futura."
+    },
+    "professions": {
+      "skillsTitle": "Skills",
+      "professions": "Professions",
+      "secondary": "Secondary Skills",
+      "open": "Open",
+      "noSkills": "You have not learned any professions or secondary skills yet. Seek out a trainer.",
+      "craft": "Craft",
+      "noRecipes": "You have not learned any recipes yet. Visit a trainer to learn them.",
+      "trainTitle": "Train {name}",
+      "learnApprentice": "Learn {name} (Apprentice)",
+      "learnJourneyman": "Learn Journeyman {name}",
+      "recipes": "Recipes",
+      "nothingToTrain": "Nothing new to train right now. Raise your skill and return.",
+      "taughtAllIKnow": "I've taught you all I know.",
+      "unlearn": "Unlearn",
+      "unlearnTitle": "Unlearn {name}?",
+      "unlearnBody": "Unlearn {name}? You will lose all skill progress and every recipe you have learned for it. A primary profession frees its slot so you can learn another.",
+      "unlearnedLog": "You have unlearned {name}.",
+      "back": "← Back",
+      "gatheredSuffix": " (gathered in the world)",
+      "skillIncreased": "Your skill in {name} increased to {skill}.",
+      "journeymanLabel": "Journeyman {name}",
+      "learnedBanner": "Learned {label}",
+      "learnedLog": "You have learned {label}.",
+      "recipeLearnedLog": "You have learned to make {name}.",
+      "bandageUse": "Use: Channel a heal for {heal} health over {time} sec. The target cannot be bandaged again for 1 min, and the channel breaks if you move or take damage.",
+      "requiresProf": "Requires {name} ({skill})"
     }
   },
   "nav": {
@@ -4713,7 +4951,8 @@ export const es: EnTranslations = {
     },
     "cast": {
       "fishing": "Pesca",
-      "demonHeal": "Sanación demoníaca"
+      "demonHeal": "Sanación demoníaca",
+      "skinning": "Skinning"
     }
   },
   "questUi": {
@@ -4815,7 +5054,8 @@ export const es: EnTranslations = {
       "food": "Comida",
       "drink": "Bebida",
       "tool": "Herramienta",
-      "potion": "Poción"
+      "potion": "Poción",
+      "reagent": "Trade Good"
     },
     "stats": {
       "armor": "Armadura",
@@ -5853,6 +6093,150 @@ export const es: EnTranslations = {
       "cracked_wyrm_scale": {
         "name": "Escama de wyrm agrietada"
       },
+      "bolt_of_linen": {
+        "name": "Rollo de tela de lino"
+      },
+      "bolt_of_silk": {
+        "name": "Rollo de tela de seda"
+      },
+      "bolt_of_woolen": {
+        "name": "Rollo de tela de lana"
+      },
+      "coarse_thread": {
+        "name": "Hilo basto"
+      },
+      "cured_heavy_hide": {
+        "name": "Pellejo pesado curtido"
+      },
+      "cured_leather_pants": {
+        "name": "Pantalones de cuero curtido"
+      },
+      "cured_light_hide": {
+        "name": "Pellejo ligero curtido"
+      },
+      "cured_medium_hide": {
+        "name": "Pellejo medio curtido"
+      },
+      "direhide_legguards": {
+        "name": "Quijotes de pellejo siniestro"
+      },
+      "fine_thread": {
+        "name": "Hilo fino"
+      },
+      "heavy_hide": {
+        "name": "Pellejo pesado"
+      },
+      "heavy_leather": {
+        "name": "Cuero pesado"
+      },
+      "heavy_leather_straps": {
+        "name": "Correas de cuero pesado"
+      },
+      "heavy_leather_vest": {
+        "name": "Chaleco de cuero pesado"
+      },
+      "heavy_linen_bandage": {
+        "name": "Vendaje de lino grueso"
+      },
+      "heavy_silk_bandage": {
+        "name": "Vendaje de seda grueso"
+      },
+      "heavy_wool_bandage": {
+        "name": "Vendaje de lana grueso"
+      },
+      "light_hide": {
+        "name": "Pellejo ligero"
+      },
+      "light_leather": {
+        "name": "Cuero ligero"
+      },
+      "light_leather_boots": {
+        "name": "Botas de cuero ligero"
+      },
+      "light_leather_straps": {
+        "name": "Correas de cuero ligero"
+      },
+      "light_leather_vest": {
+        "name": "Chaleco de cuero ligero"
+      },
+      "linen_bandage": {
+        "name": "Vendaje de lino"
+      },
+      "linen_boots": {
+        "name": "Botas de lino"
+      },
+      "linen_cloth": {
+        "name": "Tela de lino"
+      },
+      "linen_pants": {
+        "name": "Pantalones de lino"
+      },
+      "linen_robe": {
+        "name": "Toga de lino"
+      },
+      "medium_hide": {
+        "name": "Pellejo medio"
+      },
+      "medium_leather": {
+        "name": "Cuero medio"
+      },
+      "medium_leather_boots": {
+        "name": "Botas de cuero medio"
+      },
+      "medium_leather_pants": {
+        "name": "Pantalones de cuero medio"
+      },
+      "medium_leather_vest": {
+        "name": "Chaleco de cuero medio"
+      },
+      "rough_thread": {
+        "name": "Hilo rústico"
+      },
+      "ruined_leather_scraps": {
+        "name": "Retazos de cuero arruinado"
+      },
+      "salt": {
+        "name": "Sal refinada"
+      },
+      "silk_bandage": {
+        "name": "Vendaje de seda"
+      },
+      "silk_brocade_robe": {
+        "name": "Toga de brocado de seda"
+      },
+      "silk_cloth": {
+        "name": "Tela de seda"
+      },
+      "silk_leggings": {
+        "name": "Leotardos de seda"
+      },
+      "silk_scrap": {
+        "name": "Retal de seda"
+      },
+      "silk_slippers": {
+        "name": "Zapatillas de seda"
+      },
+      "studded_leather_vest": {
+        "name": "Chaleco de cuero tachonado"
+      },
+      "wool_bandage": {
+        "name": "Vendaje de lana"
+      },
+      "wool_cloth": {
+        "name": "Tela de lana"
+      },
+      "wool_scrap": {
+        "name": "Retal de lana"
+      },
+      "woolen_leggings": {
+        "name": "Leotardos de lana"
+      },
+      "woolen_slippers": {
+        "name": "Zapatillas de lana"
+      },
+      "woolen_tunic": {
+        "name": "Túnica de lana"
+      },
       "bristleback_maul": {
         "name": "Maza Bristleback"
       },
@@ -6296,6 +6680,12 @@ export const es: EnTranslations = {
       "bound_guardian": {
         "name": "Guardián Vinculado"
       },
+      "craghorn_bear": {
+        "name": "Craghorn Bear"
+      },
+      "frostfang_lynx": {
+        "name": "Frostfang Lynx"
+      },
       "elder_bristleback": {
         "name": "Viejo Bristleback"
       },
@@ -6473,6 +6863,36 @@ export const es: EnTranslations = {
         "name": "Maestro de saber Caddis",
         "title": "Maestro de saber",
         "greeting": "Cuida la pizarra suelta, {className}. La montaña está inquieta últimamente y quiero saber por qué."
+      },
+      "tanner_yorvek": {
+        "name": "Tanner Yorvek",
+        "title": "Skinning Trainer",
+        "greeting": "A clean skin starts with a steady knife. Mind the loot first - pelts come last."
+      },
+      "leatherworker_brida": {
+        "name": "Leatherworker Brida",
+        "title": "Leatherworking Trainer",
+        "greeting": "Bring me leather and I will show you how to make it hold a shape."
+      },
+      "tailor_marlena": {
+        "name": "Tailor Marlena",
+        "title": "Tailoring Trainer",
+        "greeting": "Bolts of good cloth and a fine thread, {playerName} - that is the whole secret of it."
+      },
+      "tanner_sull": {
+        "name": "Tanner Sull",
+        "title": "Skinning Trainer",
+        "greeting": "Fen-beasts wear hide three times the thickness of vale game, {playerName}. I will teach you to take it whole."
+      },
+      "leatherworker_orsa": {
+        "name": "Leatherworker Orsa",
+        "title": "Leatherworking Trainer",
+        "greeting": "Marsh-cured leather laughs at the rot. Master it here, beyond what Eastbrook could show you."
+      },
+      "tailor_evelle": {
+        "name": "Tailor Evelle",
+        "title": "Tailoring Trainer",
+        "greeting": "A damp fen rots a careless seam in a week. The Journeyman stitch holds through the wettest reeds."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -7544,6 +7964,34 @@ export const es_ES: EnTranslations = {
       "save": "Guardar",
       "comingSoonTitle": "Talentos próximamente",
       "comingSoonBody": "Esta clase aún no tiene árboles de talentos. Puedes seguir jugando normalmente; los árboles completos llegarán en una actualización futura."
+    },
+    "professions": {
+      "skillsTitle": "Skills",
+      "professions": "Professions",
+      "secondary": "Secondary Skills",
+      "open": "Open",
+      "noSkills": "You have not learned any professions or secondary skills yet. Seek out a trainer.",
+      "craft": "Craft",
+      "noRecipes": "You have not learned any recipes yet. Visit a trainer to learn them.",
+      "trainTitle": "Train {name}",
+      "learnApprentice": "Learn {name} (Apprentice)",
+      "learnJourneyman": "Learn Journeyman {name}",
+      "recipes": "Recipes",
+      "nothingToTrain": "Nothing new to train right now. Raise your skill and return.",
+      "taughtAllIKnow": "I've taught you all I know.",
+      "unlearn": "Unlearn",
+      "unlearnTitle": "Unlearn {name}?",
+      "unlearnBody": "Unlearn {name}? You will lose all skill progress and every recipe you have learned for it. A primary profession frees its slot so you can learn another.",
+      "unlearnedLog": "You have unlearned {name}.",
+      "back": "← Back",
+      "gatheredSuffix": " (gathered in the world)",
+      "skillIncreased": "Your skill in {name} increased to {skill}.",
+      "journeymanLabel": "Journeyman {name}",
+      "learnedBanner": "Learned {label}",
+      "learnedLog": "You have learned {label}.",
+      "recipeLearnedLog": "You have learned to make {name}.",
+      "bandageUse": "Use: Channel a heal for {heal} health over {time} sec. The target cannot be bandaged again for 1 min, and the channel breaks if you move or take damage.",
+      "requiresProf": "Requires {name} ({skill})"
     }
   },
   "nav": {
@@ -8419,7 +8867,8 @@ export const es_ES: EnTranslations = {
     },
     "cast": {
       "fishing": "Pesca",
-      "demonHeal": "Sanación demoníaca"
+      "demonHeal": "Sanación demoníaca",
+      "skinning": "Skinning"
     }
   },
   "questUi": {
@@ -8521,7 +8970,8 @@ export const es_ES: EnTranslations = {
       "food": "Comida",
       "drink": "Bebida",
       "tool": "Herramienta",
-      "potion": "Poción"
+      "potion": "Poción",
+      "reagent": "Trade Good"
     },
     "stats": {
       "armor": "Armadura",
@@ -9559,6 +10009,150 @@ export const es_ES: EnTranslations = {
       "cracked_wyrm_scale": {
         "name": "Escama de wyrm agrietada"
       },
+      "bolt_of_linen": {
+        "name": "Rollo de tela de lino"
+      },
+      "bolt_of_silk": {
+        "name": "Rollo de tela de seda"
+      },
+      "bolt_of_woolen": {
+        "name": "Rollo de tela de lana"
+      },
+      "coarse_thread": {
+        "name": "Hilo basto"
+      },
+      "cured_heavy_hide": {
+        "name": "Pellejo pesado curtido"
+      },
+      "cured_leather_pants": {
+        "name": "Pantalones de cuero curtido"
+      },
+      "cured_light_hide": {
+        "name": "Pellejo ligero curtido"
+      },
+      "cured_medium_hide": {
+        "name": "Pellejo medio curtido"
+      },
+      "direhide_legguards": {
+        "name": "Quijotes de pellejo siniestro"
+      },
+      "fine_thread": {
+        "name": "Hilo fino"
+      },
+      "heavy_hide": {
+        "name": "Pellejo pesado"
+      },
+      "heavy_leather": {
+        "name": "Cuero pesado"
+      },
+      "heavy_leather_straps": {
+        "name": "Correas de cuero pesado"
+      },
+      "heavy_leather_vest": {
+        "name": "Chaleco de cuero pesado"
+      },
+      "heavy_linen_bandage": {
+        "name": "Vendaje de lino grueso"
+      },
+      "heavy_silk_bandage": {
+        "name": "Vendaje de seda grueso"
+      },
+      "heavy_wool_bandage": {
+        "name": "Vendaje de lana grueso"
+      },
+      "light_hide": {
+        "name": "Pellejo ligero"
+      },
+      "light_leather": {
+        "name": "Cuero ligero"
+      },
+      "light_leather_boots": {
+        "name": "Botas de cuero ligero"
+      },
+      "light_leather_straps": {
+        "name": "Correas de cuero ligero"
+      },
+      "light_leather_vest": {
+        "name": "Chaleco de cuero ligero"
+      },
+      "linen_bandage": {
+        "name": "Vendaje de lino"
+      },
+      "linen_boots": {
+        "name": "Botas de lino"
+      },
+      "linen_cloth": {
+        "name": "Tela de lino"
+      },
+      "linen_pants": {
+        "name": "Pantalones de lino"
+      },
+      "linen_robe": {
+        "name": "Toga de lino"
+      },
+      "medium_hide": {
+        "name": "Pellejo medio"
+      },
+      "medium_leather": {
+        "name": "Cuero medio"
+      },
+      "medium_leather_boots": {
+        "name": "Botas de cuero medio"
+      },
+      "medium_leather_pants": {
+        "name": "Pantalones de cuero medio"
+      },
+      "medium_leather_vest": {
+        "name": "Chaleco de cuero medio"
+      },
+      "rough_thread": {
+        "name": "Hilo rústico"
+      },
+      "ruined_leather_scraps": {
+        "name": "Retazos de cuero arruinado"
+      },
+      "salt": {
+        "name": "Sal refinada"
+      },
+      "silk_bandage": {
+        "name": "Vendaje de seda"
+      },
+      "silk_brocade_robe": {
+        "name": "Toga de brocado de seda"
+      },
+      "silk_cloth": {
+        "name": "Tela de seda"
+      },
+      "silk_leggings": {
+        "name": "Leotardos de seda"
+      },
+      "silk_scrap": {
+        "name": "Retal de seda"
+      },
+      "silk_slippers": {
+        "name": "Zapatillas de seda"
+      },
+      "studded_leather_vest": {
+        "name": "Chaleco de cuero tachonado"
+      },
+      "wool_bandage": {
+        "name": "Vendaje de lana"
+      },
+      "wool_cloth": {
+        "name": "Tela de lana"
+      },
+      "wool_scrap": {
+        "name": "Retal de lana"
+      },
+      "woolen_leggings": {
+        "name": "Leotardos de lana"
+      },
+      "woolen_slippers": {
+        "name": "Zapatillas de lana"
+      },
+      "woolen_tunic": {
+        "name": "Túnica de lana"
+      },
       "bristleback_maul": {
         "name": "Maza Bristleback"
       },
@@ -10002,6 +10596,12 @@ export const es_ES: EnTranslations = {
       "bound_guardian": {
         "name": "Guardián Vinculado"
       },
+      "craghorn_bear": {
+        "name": "Craghorn Bear"
+      },
+      "frostfang_lynx": {
+        "name": "Frostfang Lynx"
+      },
       "elder_bristleback": {
         "name": "Viejo Bristleback"
       },
@@ -10179,6 +10779,36 @@ export const es_ES: EnTranslations = {
         "name": "Maestro de saber Caddis",
         "title": "Maestro de saber",
         "greeting": "Cuida la pizarra suelta, {className}. La montaña está inquieta últimamente y quiero saber por qué."
+      },
+      "tanner_yorvek": {
+        "name": "Tanner Yorvek",
+        "title": "Skinning Trainer",
+        "greeting": "A clean skin starts with a steady knife. Mind the loot first - pelts come last."
+      },
+      "leatherworker_brida": {
+        "name": "Leatherworker Brida",
+        "title": "Leatherworking Trainer",
+        "greeting": "Bring me leather and I will show you how to make it hold a shape."
+      },
+      "tailor_marlena": {
+        "name": "Tailor Marlena",
+        "title": "Tailoring Trainer",
+        "greeting": "Bolts of good cloth and a fine thread, {playerName} - that is the whole secret of it."
+      },
+      "tanner_sull": {
+        "name": "Tanner Sull",
+        "title": "Skinning Trainer",
+        "greeting": "Fen-beasts wear hide three times the thickness of vale game, {playerName}. I will teach you to take it whole."
+      },
+      "leatherworker_orsa": {
+        "name": "Leatherworker Orsa",
+        "title": "Leatherworking Trainer",
+        "greeting": "Marsh-cured leather laughs at the rot. Master it here, beyond what Eastbrook could show you."
+      },
+      "tailor_evelle": {
+        "name": "Tailor Evelle",
+        "title": "Tailoring Trainer",
+        "greeting": "A damp fen rots a careless seam in a week. The Journeyman stitch holds through the wettest reeds."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -11250,6 +11880,34 @@ export const fr_FR: EnTranslations = {
       "save": "Sauvegarder",
       "comingSoonTitle": "Talents à venir",
       "comingSoonBody": "Cette classe n'a pas encore d'arbres de talents. Vous pouvez continuer à jouer normalement; les arbres complets arriveront dans une future mise à jour."
+    },
+    "professions": {
+      "skillsTitle": "Skills",
+      "professions": "Professions",
+      "secondary": "Secondary Skills",
+      "open": "Open",
+      "noSkills": "You have not learned any professions or secondary skills yet. Seek out a trainer.",
+      "craft": "Craft",
+      "noRecipes": "You have not learned any recipes yet. Visit a trainer to learn them.",
+      "trainTitle": "Train {name}",
+      "learnApprentice": "Learn {name} (Apprentice)",
+      "learnJourneyman": "Learn Journeyman {name}",
+      "recipes": "Recipes",
+      "nothingToTrain": "Nothing new to train right now. Raise your skill and return.",
+      "taughtAllIKnow": "I've taught you all I know.",
+      "unlearn": "Unlearn",
+      "unlearnTitle": "Unlearn {name}?",
+      "unlearnBody": "Unlearn {name}? You will lose all skill progress and every recipe you have learned for it. A primary profession frees its slot so you can learn another.",
+      "unlearnedLog": "You have unlearned {name}.",
+      "back": "← Back",
+      "gatheredSuffix": " (gathered in the world)",
+      "skillIncreased": "Your skill in {name} increased to {skill}.",
+      "journeymanLabel": "Journeyman {name}",
+      "learnedBanner": "Learned {label}",
+      "learnedLog": "You have learned {label}.",
+      "recipeLearnedLog": "You have learned to make {name}.",
+      "bandageUse": "Use: Channel a heal for {heal} health over {time} sec. The target cannot be bandaged again for 1 min, and the channel breaks if you move or take damage.",
+      "requiresProf": "Requires {name} ({skill})"
     }
   },
   "nav": {
@@ -12125,7 +12783,8 @@ export const fr_FR: EnTranslations = {
     },
     "cast": {
       "fishing": "Pêche",
-      "demonHeal": "Soin démoniaque"
+      "demonHeal": "Soin démoniaque",
+      "skinning": "Skinning"
     }
   },
   "questUi": {
@@ -12227,7 +12886,8 @@ export const fr_FR: EnTranslations = {
       "food": "Nourriture",
       "drink": "Boisson",
       "tool": "Outil",
-      "potion": "Potion"
+      "potion": "Potion",
+      "reagent": "Trade Good"
     },
     "stats": {
       "armor": "Armure",
@@ -13265,6 +13925,150 @@ export const fr_FR: EnTranslations = {
       "cracked_wyrm_scale": {
         "name": "Écaille de wyrm fendue"
       },
+      "bolt_of_linen": {
+        "name": "Rouleau de toile de lin"
+      },
+      "bolt_of_silk": {
+        "name": "Rouleau de toile de soie"
+      },
+      "bolt_of_woolen": {
+        "name": "Rouleau de toile de laine"
+      },
+      "coarse_thread": {
+        "name": "Fil grossier"
+      },
+      "cured_heavy_hide": {
+        "name": "Peau épaisse tannée"
+      },
+      "cured_leather_pants": {
+        "name": "Pantalon en cuir tanné"
+      },
+      "cured_light_hide": {
+        "name": "Peau légère tannée"
+      },
+      "cured_medium_hide": {
+        "name": "Peau moyenne tannée"
+      },
+      "direhide_legguards": {
+        "name": "Jambières en peau funeste"
+      },
+      "fine_thread": {
+        "name": "Fil fin"
+      },
+      "heavy_hide": {
+        "name": "Peau épaisse"
+      },
+      "heavy_leather": {
+        "name": "Cuir épais"
+      },
+      "heavy_leather_straps": {
+        "name": "Lanières de cuir épais"
+      },
+      "heavy_leather_vest": {
+        "name": "Gilet en cuir épais"
+      },
+      "heavy_linen_bandage": {
+        "name": "Bandage en lin épais"
+      },
+      "heavy_silk_bandage": {
+        "name": "Bandage en soie épais"
+      },
+      "heavy_wool_bandage": {
+        "name": "Bandage en laine épais"
+      },
+      "light_hide": {
+        "name": "Peau légère"
+      },
+      "light_leather": {
+        "name": "Cuir léger"
+      },
+      "light_leather_boots": {
+        "name": "Bottes en cuir léger"
+      },
+      "light_leather_straps": {
+        "name": "Lanières de cuir léger"
+      },
+      "light_leather_vest": {
+        "name": "Gilet en cuir léger"
+      },
+      "linen_bandage": {
+        "name": "Bandage en lin"
+      },
+      "linen_boots": {
+        "name": "Bottes en lin"
+      },
+      "linen_cloth": {
+        "name": "Étoffe de lin"
+      },
+      "linen_pants": {
+        "name": "Pantalon en lin"
+      },
+      "linen_robe": {
+        "name": "Robe en lin"
+      },
+      "medium_hide": {
+        "name": "Peau moyenne"
+      },
+      "medium_leather": {
+        "name": "Cuir moyen"
+      },
+      "medium_leather_boots": {
+        "name": "Bottes en cuir moyen"
+      },
+      "medium_leather_pants": {
+        "name": "Pantalon en cuir moyen"
+      },
+      "medium_leather_vest": {
+        "name": "Gilet en cuir moyen"
+      },
+      "rough_thread": {
+        "name": "Fil brut"
+      },
+      "ruined_leather_scraps": {
+        "name": "Lambeaux de cuir abîmé"
+      },
+      "salt": {
+        "name": "Sel raffiné"
+      },
+      "silk_bandage": {
+        "name": "Bandage en soie"
+      },
+      "silk_brocade_robe": {
+        "name": "Robe en brocart de soie"
+      },
+      "silk_cloth": {
+        "name": "Étoffe de soie"
+      },
+      "silk_leggings": {
+        "name": "Jambières en soie"
+      },
+      "silk_scrap": {
+        "name": "Bout de soie"
+      },
+      "silk_slippers": {
+        "name": "Chaussons en soie"
+      },
+      "studded_leather_vest": {
+        "name": "Gilet en cuir clouté"
+      },
+      "wool_bandage": {
+        "name": "Bandage en laine"
+      },
+      "wool_cloth": {
+        "name": "Étoffe de laine"
+      },
+      "wool_scrap": {
+        "name": "Bout de laine"
+      },
+      "woolen_leggings": {
+        "name": "Jambières en laine"
+      },
+      "woolen_slippers": {
+        "name": "Chaussons en laine"
+      },
+      "woolen_tunic": {
+        "name": "Tunique en laine"
+      },
       "bristleback_maul": {
         "name": "Maillet Bristleback"
       },
@@ -13708,6 +14512,12 @@ export const fr_FR: EnTranslations = {
       "bound_guardian": {
         "name": "Gardien lié"
       },
+      "craghorn_bear": {
+        "name": "Craghorn Bear"
+      },
+      "frostfang_lynx": {
+        "name": "Frostfang Lynx"
+      },
       "elder_bristleback": {
         "name": "Ancien Bristleback"
       },
@@ -13885,6 +14695,36 @@ export const fr_FR: EnTranslations = {
         "name": "Maître du savoir Caddis",
         "title": "Maître du savoir",
         "greeting": "Méfiez-vous des schistes instables, {className}. La montagne est agitée ces temps-ci, et je veux savoir pourquoi."
+      },
+      "tanner_yorvek": {
+        "name": "Tanner Yorvek",
+        "title": "Skinning Trainer",
+        "greeting": "A clean skin starts with a steady knife. Mind the loot first - pelts come last."
+      },
+      "leatherworker_brida": {
+        "name": "Leatherworker Brida",
+        "title": "Leatherworking Trainer",
+        "greeting": "Bring me leather and I will show you how to make it hold a shape."
+      },
+      "tailor_marlena": {
+        "name": "Tailor Marlena",
+        "title": "Tailoring Trainer",
+        "greeting": "Bolts of good cloth and a fine thread, {playerName} - that is the whole secret of it."
+      },
+      "tanner_sull": {
+        "name": "Tanner Sull",
+        "title": "Skinning Trainer",
+        "greeting": "Fen-beasts wear hide three times the thickness of vale game, {playerName}. I will teach you to take it whole."
+      },
+      "leatherworker_orsa": {
+        "name": "Leatherworker Orsa",
+        "title": "Leatherworking Trainer",
+        "greeting": "Marsh-cured leather laughs at the rot. Master it here, beyond what Eastbrook could show you."
+      },
+      "tailor_evelle": {
+        "name": "Tailor Evelle",
+        "title": "Tailoring Trainer",
+        "greeting": "A damp fen rots a careless seam in a week. The Journeyman stitch holds through the wettest reeds."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -14956,6 +15796,34 @@ export const fr_CA: EnTranslations = {
       "save": "Sauvegarder",
       "comingSoonTitle": "Talents à venir",
       "comingSoonBody": "Cette classe n'a pas encore d'arbres de talents. Vous pouvez continuer à jouer normalement; les arbres complets arriveront dans une future mise à jour."
+    },
+    "professions": {
+      "skillsTitle": "Skills",
+      "professions": "Professions",
+      "secondary": "Secondary Skills",
+      "open": "Open",
+      "noSkills": "You have not learned any professions or secondary skills yet. Seek out a trainer.",
+      "craft": "Craft",
+      "noRecipes": "You have not learned any recipes yet. Visit a trainer to learn them.",
+      "trainTitle": "Train {name}",
+      "learnApprentice": "Learn {name} (Apprentice)",
+      "learnJourneyman": "Learn Journeyman {name}",
+      "recipes": "Recipes",
+      "nothingToTrain": "Nothing new to train right now. Raise your skill and return.",
+      "taughtAllIKnow": "I've taught you all I know.",
+      "unlearn": "Unlearn",
+      "unlearnTitle": "Unlearn {name}?",
+      "unlearnBody": "Unlearn {name}? You will lose all skill progress and every recipe you have learned for it. A primary profession frees its slot so you can learn another.",
+      "unlearnedLog": "You have unlearned {name}.",
+      "back": "← Back",
+      "gatheredSuffix": " (gathered in the world)",
+      "skillIncreased": "Your skill in {name} increased to {skill}.",
+      "journeymanLabel": "Journeyman {name}",
+      "learnedBanner": "Learned {label}",
+      "learnedLog": "You have learned {label}.",
+      "recipeLearnedLog": "You have learned to make {name}.",
+      "bandageUse": "Use: Channel a heal for {heal} health over {time} sec. The target cannot be bandaged again for 1 min, and the channel breaks if you move or take damage.",
+      "requiresProf": "Requires {name} ({skill})"
     }
   },
   "nav": {
@@ -15831,7 +16699,8 @@ export const fr_CA: EnTranslations = {
     },
     "cast": {
       "fishing": "Pêche",
-      "demonHeal": "Soin démoniaque"
+      "demonHeal": "Soin démoniaque",
+      "skinning": "Skinning"
     }
   },
   "questUi": {
@@ -15933,7 +16802,8 @@ export const fr_CA: EnTranslations = {
       "food": "Nourriture",
       "drink": "Boisson",
       "tool": "Outil",
-      "potion": "Potion"
+      "potion": "Potion",
+      "reagent": "Trade Good"
     },
     "stats": {
       "armor": "Armure",
@@ -16971,6 +17841,150 @@ export const fr_CA: EnTranslations = {
       "cracked_wyrm_scale": {
         "name": "Écaille de wyrm fendue"
       },
+      "bolt_of_linen": {
+        "name": "Rouleau de toile de lin"
+      },
+      "bolt_of_silk": {
+        "name": "Rouleau de toile de soie"
+      },
+      "bolt_of_woolen": {
+        "name": "Rouleau de toile de laine"
+      },
+      "coarse_thread": {
+        "name": "Fil grossier"
+      },
+      "cured_heavy_hide": {
+        "name": "Peau épaisse tannée"
+      },
+      "cured_leather_pants": {
+        "name": "Pantalon en cuir tanné"
+      },
+      "cured_light_hide": {
+        "name": "Peau légère tannée"
+      },
+      "cured_medium_hide": {
+        "name": "Peau moyenne tannée"
+      },
+      "direhide_legguards": {
+        "name": "Jambières en peau funeste"
+      },
+      "fine_thread": {
+        "name": "Fil fin"
+      },
+      "heavy_hide": {
+        "name": "Peau épaisse"
+      },
+      "heavy_leather": {
+        "name": "Cuir épais"
+      },
+      "heavy_leather_straps": {
+        "name": "Lanières de cuir épais"
+      },
+      "heavy_leather_vest": {
+        "name": "Gilet en cuir épais"
+      },
+      "heavy_linen_bandage": {
+        "name": "Bandage en lin épais"
+      },
+      "heavy_silk_bandage": {
+        "name": "Bandage en soie épais"
+      },
+      "heavy_wool_bandage": {
+        "name": "Bandage en laine épais"
+      },
+      "light_hide": {
+        "name": "Peau légère"
+      },
+      "light_leather": {
+        "name": "Cuir léger"
+      },
+      "light_leather_boots": {
+        "name": "Bottes en cuir léger"
+      },
+      "light_leather_straps": {
+        "name": "Lanières de cuir léger"
+      },
+      "light_leather_vest": {
+        "name": "Gilet en cuir léger"
+      },
+      "linen_bandage": {
+        "name": "Bandage en lin"
+      },
+      "linen_boots": {
+        "name": "Bottes en lin"
+      },
+      "linen_cloth": {
+        "name": "Étoffe de lin"
+      },
+      "linen_pants": {
+        "name": "Pantalon en lin"
+      },
+      "linen_robe": {
+        "name": "Robe en lin"
+      },
+      "medium_hide": {
+        "name": "Peau moyenne"
+      },
+      "medium_leather": {
+        "name": "Cuir moyen"
+      },
+      "medium_leather_boots": {
+        "name": "Bottes en cuir moyen"
+      },
+      "medium_leather_pants": {
+        "name": "Pantalon en cuir moyen"
+      },
+      "medium_leather_vest": {
+        "name": "Gilet en cuir moyen"
+      },
+      "rough_thread": {
+        "name": "Fil brut"
+      },
+      "ruined_leather_scraps": {
+        "name": "Lambeaux de cuir abîmé"
+      },
+      "salt": {
+        "name": "Sel raffiné"
+      },
+      "silk_bandage": {
+        "name": "Bandage en soie"
+      },
+      "silk_brocade_robe": {
+        "name": "Robe en brocart de soie"
+      },
+      "silk_cloth": {
+        "name": "Étoffe de soie"
+      },
+      "silk_leggings": {
+        "name": "Jambières en soie"
+      },
+      "silk_scrap": {
+        "name": "Bout de soie"
+      },
+      "silk_slippers": {
+        "name": "Chaussons en soie"
+      },
+      "studded_leather_vest": {
+        "name": "Gilet en cuir clouté"
+      },
+      "wool_bandage": {
+        "name": "Bandage en laine"
+      },
+      "wool_cloth": {
+        "name": "Étoffe de laine"
+      },
+      "wool_scrap": {
+        "name": "Bout de laine"
+      },
+      "woolen_leggings": {
+        "name": "Jambières en laine"
+      },
+      "woolen_slippers": {
+        "name": "Chaussons en laine"
+      },
+      "woolen_tunic": {
+        "name": "Tunique en laine"
+      },
       "bristleback_maul": {
         "name": "Maillet Bristleback"
       },
@@ -17414,6 +18428,12 @@ export const fr_CA: EnTranslations = {
       "bound_guardian": {
         "name": "Gardien lié"
       },
+      "craghorn_bear": {
+        "name": "Craghorn Bear"
+      },
+      "frostfang_lynx": {
+        "name": "Frostfang Lynx"
+      },
       "elder_bristleback": {
         "name": "Ancien Bristleback"
       },
@@ -17591,6 +18611,36 @@ export const fr_CA: EnTranslations = {
         "name": "Maître du savoir Caddis",
         "title": "Maître du savoir",
         "greeting": "Méfiez-vous des schistes instables, {className}. La montagne est agitée ces temps-ci, et je veux savoir pourquoi."
+      },
+      "tanner_yorvek": {
+        "name": "Tanner Yorvek",
+        "title": "Skinning Trainer",
+        "greeting": "A clean skin starts with a steady knife. Mind the loot first - pelts come last."
+      },
+      "leatherworker_brida": {
+        "name": "Leatherworker Brida",
+        "title": "Leatherworking Trainer",
+        "greeting": "Bring me leather and I will show you how to make it hold a shape."
+      },
+      "tailor_marlena": {
+        "name": "Tailor Marlena",
+        "title": "Tailoring Trainer",
+        "greeting": "Bolts of good cloth and a fine thread, {playerName} - that is the whole secret of it."
+      },
+      "tanner_sull": {
+        "name": "Tanner Sull",
+        "title": "Skinning Trainer",
+        "greeting": "Fen-beasts wear hide three times the thickness of vale game, {playerName}. I will teach you to take it whole."
+      },
+      "leatherworker_orsa": {
+        "name": "Leatherworker Orsa",
+        "title": "Leatherworking Trainer",
+        "greeting": "Marsh-cured leather laughs at the rot. Master it here, beyond what Eastbrook could show you."
+      },
+      "tailor_evelle": {
+        "name": "Tailor Evelle",
+        "title": "Tailoring Trainer",
+        "greeting": "A damp fen rots a careless seam in a week. The Journeyman stitch holds through the wettest reeds."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -18662,6 +19712,34 @@ export const en_CA: EnTranslations = {
       "save": "Save",
       "comingSoonTitle": "Talents coming soon",
       "comingSoonBody": "This class does not have talent trees yet. You can keep playing normally; full trees will arrive in a future update."
+    },
+    "professions": {
+      "skillsTitle": "Skills",
+      "professions": "Professions",
+      "secondary": "Secondary Skills",
+      "open": "Open",
+      "noSkills": "You have not learned any professions or secondary skills yet. Seek out a trainer.",
+      "craft": "Craft",
+      "noRecipes": "You have not learned any recipes yet. Visit a trainer to learn them.",
+      "trainTitle": "Train {name}",
+      "learnApprentice": "Learn {name} (Apprentice)",
+      "learnJourneyman": "Learn Journeyman {name}",
+      "recipes": "Recipes",
+      "nothingToTrain": "Nothing new to train right now. Raise your skill and return.",
+      "taughtAllIKnow": "I've taught you all I know.",
+      "unlearn": "Unlearn",
+      "unlearnTitle": "Unlearn {name}?",
+      "unlearnBody": "Unlearn {name}? You will lose all skill progress and every recipe you have learned for it. A primary profession frees its slot so you can learn another.",
+      "unlearnedLog": "You have unlearned {name}.",
+      "back": "← Back",
+      "gatheredSuffix": " (gathered in the world)",
+      "skillIncreased": "Your skill in {name} increased to {skill}.",
+      "journeymanLabel": "Journeyman {name}",
+      "learnedBanner": "Learned {label}",
+      "learnedLog": "You have learned {label}.",
+      "recipeLearnedLog": "You have learned to make {name}.",
+      "bandageUse": "Use: Channel a heal for {heal} health over {time} sec. The target cannot be bandaged again for 1 min, and the channel breaks if you move or take damage.",
+      "requiresProf": "Requires {name} ({skill})"
     }
   },
   "nav": {
@@ -19537,7 +20615,8 @@ export const en_CA: EnTranslations = {
     },
     "cast": {
       "fishing": "Fishing",
-      "demonHeal": "Demon Heal"
+      "demonHeal": "Demon Heal",
+      "skinning": "Skinning"
     }
   },
   "questUi": {
@@ -19639,7 +20718,8 @@ export const en_CA: EnTranslations = {
       "food": "Food",
       "drink": "Drink",
       "tool": "Tool",
-      "potion": "Potion"
+      "potion": "Potion",
+      "reagent": "Trade Good"
     },
     "stats": {
       "armor": "Armor",
@@ -20677,6 +21757,150 @@ export const en_CA: EnTranslations = {
       "cracked_wyrm_scale": {
         "name": "Cracked Wyrm Scale"
       },
+      "bolt_of_linen": {
+        "name": "Bolt of Linen Cloth"
+      },
+      "bolt_of_silk": {
+        "name": "Bolt of Silk Cloth"
+      },
+      "bolt_of_woolen": {
+        "name": "Bolt of Woolen Cloth"
+      },
+      "coarse_thread": {
+        "name": "Coarse Thread"
+      },
+      "cured_heavy_hide": {
+        "name": "Cured Heavy Hide"
+      },
+      "cured_leather_pants": {
+        "name": "Cured Leather Pants"
+      },
+      "cured_light_hide": {
+        "name": "Cured Light Hide"
+      },
+      "cured_medium_hide": {
+        "name": "Cured Medium Hide"
+      },
+      "direhide_legguards": {
+        "name": "Direhide Legguards"
+      },
+      "fine_thread": {
+        "name": "Fine Thread"
+      },
+      "heavy_hide": {
+        "name": "Heavy Hide"
+      },
+      "heavy_leather": {
+        "name": "Heavy Leather"
+      },
+      "heavy_leather_straps": {
+        "name": "Heavy Leather Straps"
+      },
+      "heavy_leather_vest": {
+        "name": "Heavy Leather Vest"
+      },
+      "heavy_linen_bandage": {
+        "name": "Heavy Linen Bandage"
+      },
+      "heavy_silk_bandage": {
+        "name": "Heavy Silk Bandage"
+      },
+      "heavy_wool_bandage": {
+        "name": "Heavy Wool Bandage"
+      },
+      "light_hide": {
+        "name": "Light Hide"
+      },
+      "light_leather": {
+        "name": "Light Leather"
+      },
+      "light_leather_boots": {
+        "name": "Light Leather Boots"
+      },
+      "light_leather_straps": {
+        "name": "Light Leather Straps"
+      },
+      "light_leather_vest": {
+        "name": "Light Leather Vest"
+      },
+      "linen_bandage": {
+        "name": "Linen Bandage"
+      },
+      "linen_boots": {
+        "name": "Linen Boots"
+      },
+      "linen_cloth": {
+        "name": "Linen Cloth"
+      },
+      "linen_pants": {
+        "name": "Linen Pants"
+      },
+      "linen_robe": {
+        "name": "Linen Robe"
+      },
+      "medium_hide": {
+        "name": "Medium Hide"
+      },
+      "medium_leather": {
+        "name": "Medium Leather"
+      },
+      "medium_leather_boots": {
+        "name": "Medium Leather Boots"
+      },
+      "medium_leather_pants": {
+        "name": "Medium Leather Pants"
+      },
+      "medium_leather_vest": {
+        "name": "Medium Leather Vest"
+      },
+      "rough_thread": {
+        "name": "Rough Thread"
+      },
+      "ruined_leather_scraps": {
+        "name": "Ruined Leather Scraps"
+      },
+      "salt": {
+        "name": "Refined Salt"
+      },
+      "silk_bandage": {
+        "name": "Silk Bandage"
+      },
+      "silk_brocade_robe": {
+        "name": "Silk Brocade Robe"
+      },
+      "silk_cloth": {
+        "name": "Silk Cloth"
+      },
+      "silk_leggings": {
+        "name": "Silk Leggings"
+      },
+      "silk_scrap": {
+        "name": "Silk Scrap"
+      },
+      "silk_slippers": {
+        "name": "Silk Slippers"
+      },
+      "studded_leather_vest": {
+        "name": "Studded Leather Vest"
+      },
+      "wool_bandage": {
+        "name": "Wool Bandage"
+      },
+      "wool_cloth": {
+        "name": "Wool Cloth"
+      },
+      "wool_scrap": {
+        "name": "Wool Scrap"
+      },
+      "woolen_leggings": {
+        "name": "Woolen Leggings"
+      },
+      "woolen_slippers": {
+        "name": "Woolen Slippers"
+      },
+      "woolen_tunic": {
+        "name": "Woolen Tunic"
+      },
       "bristleback_maul": {
         "name": "Bristleback Maul"
       },
@@ -21120,6 +22344,12 @@ export const en_CA: EnTranslations = {
       "bound_guardian": {
         "name": "The Bound Guardian"
       },
+      "craghorn_bear": {
+        "name": "Craghorn Bear"
+      },
+      "frostfang_lynx": {
+        "name": "Frostfang Lynx"
+      },
       "elder_bristleback": {
         "name": "Elder Bristleback"
       },
@@ -21297,6 +22527,36 @@ export const en_CA: EnTranslations = {
         "name": "Loremaster Caddis",
         "title": "Loremaster",
         "greeting": "Mind the loose shale, {className}. The mountain has been... restless of late. I intend to learn why."
+      },
+      "tanner_yorvek": {
+        "name": "Tanner Yorvek",
+        "title": "Skinning Trainer",
+        "greeting": "A clean skin starts with a steady knife. Mind the loot first - pelts come last."
+      },
+      "leatherworker_brida": {
+        "name": "Leatherworker Brida",
+        "title": "Leatherworking Trainer",
+        "greeting": "Bring me leather and I will show you how to make it hold a shape."
+      },
+      "tailor_marlena": {
+        "name": "Tailor Marlena",
+        "title": "Tailoring Trainer",
+        "greeting": "Bolts of good cloth and a fine thread, {playerName} - that is the whole secret of it."
+      },
+      "tanner_sull": {
+        "name": "Tanner Sull",
+        "title": "Skinning Trainer",
+        "greeting": "Fen-beasts wear hide three times the thickness of vale game, {playerName}. I will teach you to take it whole."
+      },
+      "leatherworker_orsa": {
+        "name": "Leatherworker Orsa",
+        "title": "Leatherworking Trainer",
+        "greeting": "Marsh-cured leather laughs at the rot. Master it here, beyond what Eastbrook could show you."
+      },
+      "tailor_evelle": {
+        "name": "Tailor Evelle",
+        "title": "Tailoring Trainer",
+        "greeting": "A damp fen rots a careless seam in a week. The Journeyman stitch holds through the wettest reeds."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -22368,6 +23628,34 @@ export const it_IT: EnTranslations = {
       "save": "Salva",
       "comingSoonTitle": "Talenti in arrivo",
       "comingSoonBody": "Questa classe non ha ancora alberi dei talenti. Puoi continuare a giocare normalmente; gli alberi completi arriveranno in un futuro aggiornamento."
+    },
+    "professions": {
+      "skillsTitle": "Skills",
+      "professions": "Professions",
+      "secondary": "Secondary Skills",
+      "open": "Open",
+      "noSkills": "You have not learned any professions or secondary skills yet. Seek out a trainer.",
+      "craft": "Craft",
+      "noRecipes": "You have not learned any recipes yet. Visit a trainer to learn them.",
+      "trainTitle": "Train {name}",
+      "learnApprentice": "Learn {name} (Apprentice)",
+      "learnJourneyman": "Learn Journeyman {name}",
+      "recipes": "Recipes",
+      "nothingToTrain": "Nothing new to train right now. Raise your skill and return.",
+      "taughtAllIKnow": "I've taught you all I know.",
+      "unlearn": "Unlearn",
+      "unlearnTitle": "Unlearn {name}?",
+      "unlearnBody": "Unlearn {name}? You will lose all skill progress and every recipe you have learned for it. A primary profession frees its slot so you can learn another.",
+      "unlearnedLog": "You have unlearned {name}.",
+      "back": "← Back",
+      "gatheredSuffix": " (gathered in the world)",
+      "skillIncreased": "Your skill in {name} increased to {skill}.",
+      "journeymanLabel": "Journeyman {name}",
+      "learnedBanner": "Learned {label}",
+      "learnedLog": "You have learned {label}.",
+      "recipeLearnedLog": "You have learned to make {name}.",
+      "bandageUse": "Use: Channel a heal for {heal} health over {time} sec. The target cannot be bandaged again for 1 min, and the channel breaks if you move or take damage.",
+      "requiresProf": "Requires {name} ({skill})"
     }
   },
   "nav": {
@@ -23243,7 +24531,8 @@ export const it_IT: EnTranslations = {
     },
     "cast": {
       "fishing": "Pesca",
-      "demonHeal": "Cura demoniaca"
+      "demonHeal": "Cura demoniaca",
+      "skinning": "Skinning"
     }
   },
   "questUi": {
@@ -23345,7 +24634,8 @@ export const it_IT: EnTranslations = {
       "food": "Cibo",
       "drink": "Bevanda",
       "tool": "Strumento",
-      "potion": "Pozione"
+      "potion": "Pozione",
+      "reagent": "Trade Good"
     },
     "stats": {
       "armor": "Armatura",
@@ -24383,6 +25673,150 @@ export const it_IT: EnTranslations = {
       "cracked_wyrm_scale": {
         "name": "Scaglia di wyrm incrinata"
       },
+      "bolt_of_linen": {
+        "name": "Rotolo di tela di lino"
+      },
+      "bolt_of_silk": {
+        "name": "Rotolo di tela di seta"
+      },
+      "bolt_of_woolen": {
+        "name": "Rotolo di tela di lana"
+      },
+      "coarse_thread": {
+        "name": "Filo grezzo"
+      },
+      "cured_heavy_hide": {
+        "name": "Pelle pesante conciata"
+      },
+      "cured_leather_pants": {
+        "name": "Pantaloni di cuoio conciato"
+      },
+      "cured_light_hide": {
+        "name": "Pelle leggera conciata"
+      },
+      "cured_medium_hide": {
+        "name": "Pelle media conciata"
+      },
+      "direhide_legguards": {
+        "name": "Gambali di pelle sinistra"
+      },
+      "fine_thread": {
+        "name": "Filo fine"
+      },
+      "heavy_hide": {
+        "name": "Pelle pesante"
+      },
+      "heavy_leather": {
+        "name": "Cuoio pesante"
+      },
+      "heavy_leather_straps": {
+        "name": "Cinghie di cuoio pesante"
+      },
+      "heavy_leather_vest": {
+        "name": "Gilet di cuoio pesante"
+      },
+      "heavy_linen_bandage": {
+        "name": "Benda di lino pesante"
+      },
+      "heavy_silk_bandage": {
+        "name": "Benda di seta pesante"
+      },
+      "heavy_wool_bandage": {
+        "name": "Benda di lana pesante"
+      },
+      "light_hide": {
+        "name": "Pelle leggera"
+      },
+      "light_leather": {
+        "name": "Cuoio leggero"
+      },
+      "light_leather_boots": {
+        "name": "Stivali di cuoio leggero"
+      },
+      "light_leather_straps": {
+        "name": "Cinghie di cuoio leggero"
+      },
+      "light_leather_vest": {
+        "name": "Gilet di cuoio leggero"
+      },
+      "linen_bandage": {
+        "name": "Benda di lino"
+      },
+      "linen_boots": {
+        "name": "Stivali di lino"
+      },
+      "linen_cloth": {
+        "name": "Lino"
+      },
+      "linen_pants": {
+        "name": "Pantaloni di lino"
+      },
+      "linen_robe": {
+        "name": "Veste di lino"
+      },
+      "medium_hide": {
+        "name": "Pelle media"
+      },
+      "medium_leather": {
+        "name": "Cuoio medio"
+      },
+      "medium_leather_boots": {
+        "name": "Stivali di cuoio medio"
+      },
+      "medium_leather_pants": {
+        "name": "Pantaloni di cuoio medio"
+      },
+      "medium_leather_vest": {
+        "name": "Gilet di cuoio medio"
+      },
+      "rough_thread": {
+        "name": "Filo ruvido"
+      },
+      "ruined_leather_scraps": {
+        "name": "Brandelli di cuoio rovinato"
+      },
+      "salt": {
+        "name": "Sale raffinato"
+      },
+      "silk_bandage": {
+        "name": "Benda di seta"
+      },
+      "silk_brocade_robe": {
+        "name": "Veste di broccato di seta"
+      },
+      "silk_cloth": {
+        "name": "Seta"
+      },
+      "silk_leggings": {
+        "name": "Gambiere di seta"
+      },
+      "silk_scrap": {
+        "name": "Ritaglio di seta"
+      },
+      "silk_slippers": {
+        "name": "Pantofole di seta"
+      },
+      "studded_leather_vest": {
+        "name": "Gilet di cuoio borchiato"
+      },
+      "wool_bandage": {
+        "name": "Benda di lana"
+      },
+      "wool_cloth": {
+        "name": "Lana"
+      },
+      "wool_scrap": {
+        "name": "Ritaglio di lana"
+      },
+      "woolen_leggings": {
+        "name": "Gambiere di lana"
+      },
+      "woolen_slippers": {
+        "name": "Pantofole di lana"
+      },
+      "woolen_tunic": {
+        "name": "Tunica di lana"
+      },
       "bristleback_maul": {
         "name": "Maglio Bristleback"
       },
@@ -24826,6 +26260,12 @@ export const it_IT: EnTranslations = {
       "bound_guardian": {
         "name": "Guardiano Vincolato"
       },
+      "craghorn_bear": {
+        "name": "Craghorn Bear"
+      },
+      "frostfang_lynx": {
+        "name": "Frostfang Lynx"
+      },
       "elder_bristleback": {
         "name": "Bristleback anziano"
       },
@@ -25003,6 +26443,36 @@ export const it_IT: EnTranslations = {
         "name": "Maestro del sapere Caddis",
         "title": "Maestro del sapere",
         "greeting": "Fai attenzione allo scisto instabile, {className}. La montagna è inquieta da qualche tempo, e voglio sapere perché."
+      },
+      "tanner_yorvek": {
+        "name": "Tanner Yorvek",
+        "title": "Skinning Trainer",
+        "greeting": "A clean skin starts with a steady knife. Mind the loot first - pelts come last."
+      },
+      "leatherworker_brida": {
+        "name": "Leatherworker Brida",
+        "title": "Leatherworking Trainer",
+        "greeting": "Bring me leather and I will show you how to make it hold a shape."
+      },
+      "tailor_marlena": {
+        "name": "Tailor Marlena",
+        "title": "Tailoring Trainer",
+        "greeting": "Bolts of good cloth and a fine thread, {playerName} - that is the whole secret of it."
+      },
+      "tanner_sull": {
+        "name": "Tanner Sull",
+        "title": "Skinning Trainer",
+        "greeting": "Fen-beasts wear hide three times the thickness of vale game, {playerName}. I will teach you to take it whole."
+      },
+      "leatherworker_orsa": {
+        "name": "Leatherworker Orsa",
+        "title": "Leatherworking Trainer",
+        "greeting": "Marsh-cured leather laughs at the rot. Master it here, beyond what Eastbrook could show you."
+      },
+      "tailor_evelle": {
+        "name": "Tailor Evelle",
+        "title": "Tailoring Trainer",
+        "greeting": "A damp fen rots a careless seam in a week. The Journeyman stitch holds through the wettest reeds."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -26074,6 +27544,34 @@ export const de_DE: EnTranslations = {
       "save": "Speichern",
       "comingSoonTitle": "Talente folgen bald",
       "comingSoonBody": "Diese Klasse hat noch keine Talentbäume. Ihr könnt normal weiterspielen; vollständige Bäume kommen in einem zukünftigen Update."
+    },
+    "professions": {
+      "skillsTitle": "Skills",
+      "professions": "Professions",
+      "secondary": "Secondary Skills",
+      "open": "Open",
+      "noSkills": "You have not learned any professions or secondary skills yet. Seek out a trainer.",
+      "craft": "Craft",
+      "noRecipes": "You have not learned any recipes yet. Visit a trainer to learn them.",
+      "trainTitle": "Train {name}",
+      "learnApprentice": "Learn {name} (Apprentice)",
+      "learnJourneyman": "Learn Journeyman {name}",
+      "recipes": "Recipes",
+      "nothingToTrain": "Nothing new to train right now. Raise your skill and return.",
+      "taughtAllIKnow": "I've taught you all I know.",
+      "unlearn": "Unlearn",
+      "unlearnTitle": "Unlearn {name}?",
+      "unlearnBody": "Unlearn {name}? You will lose all skill progress and every recipe you have learned for it. A primary profession frees its slot so you can learn another.",
+      "unlearnedLog": "You have unlearned {name}.",
+      "back": "← Back",
+      "gatheredSuffix": " (gathered in the world)",
+      "skillIncreased": "Your skill in {name} increased to {skill}.",
+      "journeymanLabel": "Journeyman {name}",
+      "learnedBanner": "Learned {label}",
+      "learnedLog": "You have learned {label}.",
+      "recipeLearnedLog": "You have learned to make {name}.",
+      "bandageUse": "Use: Channel a heal for {heal} health over {time} sec. The target cannot be bandaged again for 1 min, and the channel breaks if you move or take damage.",
+      "requiresProf": "Requires {name} ({skill})"
     }
   },
   "nav": {
@@ -26949,7 +28447,8 @@ export const de_DE: EnTranslations = {
     },
     "cast": {
       "fishing": "Angeln",
-      "demonHeal": "Dämonenheilung"
+      "demonHeal": "Dämonenheilung",
+      "skinning": "Skinning"
     }
   },
   "questUi": {
@@ -27051,7 +28550,8 @@ export const de_DE: EnTranslations = {
       "food": "Essen",
       "drink": "Getränk",
       "tool": "Werkzeug",
-      "potion": "Trank"
+      "potion": "Trank",
+      "reagent": "Trade Good"
     },
     "stats": {
       "armor": "Rüstung",
@@ -28089,6 +29589,150 @@ export const de_DE: EnTranslations = {
       "cracked_wyrm_scale": {
         "name": "Gesprungene Wyrmschuppe"
       },
+      "bolt_of_linen": {
+        "name": "Ballen Leinenstoff"
+      },
+      "bolt_of_silk": {
+        "name": "Ballen Seidenstoff"
+      },
+      "bolt_of_woolen": {
+        "name": "Ballen Wollstoff"
+      },
+      "coarse_thread": {
+        "name": "Grober Faden"
+      },
+      "cured_heavy_hide": {
+        "name": "Gegerbte schwere Haut"
+      },
+      "cured_leather_pants": {
+        "name": "Gegerbte Lederhose"
+      },
+      "cured_light_hide": {
+        "name": "Gegerbte leichte Haut"
+      },
+      "cured_medium_hide": {
+        "name": "Gegerbte mittlere Haut"
+      },
+      "direhide_legguards": {
+        "name": "Grauenhautbeinschienen"
+      },
+      "fine_thread": {
+        "name": "Feiner Faden"
+      },
+      "heavy_hide": {
+        "name": "Schwere Haut"
+      },
+      "heavy_leather": {
+        "name": "Schweres Leder"
+      },
+      "heavy_leather_straps": {
+        "name": "Schwere Lederriemen"
+      },
+      "heavy_leather_vest": {
+        "name": "Schwere Lederweste"
+      },
+      "heavy_linen_bandage": {
+        "name": "Schwerer Leinenverband"
+      },
+      "heavy_silk_bandage": {
+        "name": "Schwerer Seidenverband"
+      },
+      "heavy_wool_bandage": {
+        "name": "Schwerer Wollverband"
+      },
+      "light_hide": {
+        "name": "Leichte Haut"
+      },
+      "light_leather": {
+        "name": "Leichtes Leder"
+      },
+      "light_leather_boots": {
+        "name": "Leichte Lederstiefel"
+      },
+      "light_leather_straps": {
+        "name": "Leichte Lederriemen"
+      },
+      "light_leather_vest": {
+        "name": "Leichte Lederweste"
+      },
+      "linen_bandage": {
+        "name": "Leinenverband"
+      },
+      "linen_boots": {
+        "name": "Leinenstiefel"
+      },
+      "linen_cloth": {
+        "name": "Leinenstoff"
+      },
+      "linen_pants": {
+        "name": "Leinenhose"
+      },
+      "linen_robe": {
+        "name": "Leinenrobe"
+      },
+      "medium_hide": {
+        "name": "Mittlere Haut"
+      },
+      "medium_leather": {
+        "name": "Mittleres Leder"
+      },
+      "medium_leather_boots": {
+        "name": "Mittlere Lederstiefel"
+      },
+      "medium_leather_pants": {
+        "name": "Mittlere Lederhose"
+      },
+      "medium_leather_vest": {
+        "name": "Mittlere Lederweste"
+      },
+      "rough_thread": {
+        "name": "Rauer Faden"
+      },
+      "ruined_leather_scraps": {
+        "name": "Ruinierte Lederfetzen"
+      },
+      "salt": {
+        "name": "Raffiniertes Salz"
+      },
+      "silk_bandage": {
+        "name": "Seidenverband"
+      },
+      "silk_brocade_robe": {
+        "name": "Seidenbrokatrobe"
+      },
+      "silk_cloth": {
+        "name": "Seidenstoff"
+      },
+      "silk_leggings": {
+        "name": "Seidenbeinlinge"
+      },
+      "silk_scrap": {
+        "name": "Seidenfetzen"
+      },
+      "silk_slippers": {
+        "name": "Seidenschuhe"
+      },
+      "studded_leather_vest": {
+        "name": "Beschlagene Lederweste"
+      },
+      "wool_bandage": {
+        "name": "Wollverband"
+      },
+      "wool_cloth": {
+        "name": "Wollstoff"
+      },
+      "wool_scrap": {
+        "name": "Wollfetzen"
+      },
+      "woolen_leggings": {
+        "name": "Wollbeinlinge"
+      },
+      "woolen_slippers": {
+        "name": "Wollschuhe"
+      },
+      "woolen_tunic": {
+        "name": "Wolltunika"
+      },
       "bristleback_maul": {
         "name": "Bristleback-Schlägel"
       },
@@ -28532,6 +30176,12 @@ export const de_DE: EnTranslations = {
       "bound_guardian": {
         "name": "Gebundener Wächter"
       },
+      "craghorn_bear": {
+        "name": "Craghorn Bear"
+      },
+      "frostfang_lynx": {
+        "name": "Frostfang Lynx"
+      },
       "elder_bristleback": {
         "name": "Alter Bristleback"
       },
@@ -28709,6 +30359,36 @@ export const de_DE: EnTranslations = {
         "name": "Lehrmeister Caddis",
         "title": "Lehrmeister",
         "greeting": "Achte auf lockeren Schiefer, {className}. Der Berg ist unruhig geworden, und ich will wissen warum."
+      },
+      "tanner_yorvek": {
+        "name": "Tanner Yorvek",
+        "title": "Skinning Trainer",
+        "greeting": "A clean skin starts with a steady knife. Mind the loot first - pelts come last."
+      },
+      "leatherworker_brida": {
+        "name": "Leatherworker Brida",
+        "title": "Leatherworking Trainer",
+        "greeting": "Bring me leather and I will show you how to make it hold a shape."
+      },
+      "tailor_marlena": {
+        "name": "Tailor Marlena",
+        "title": "Tailoring Trainer",
+        "greeting": "Bolts of good cloth and a fine thread, {playerName} - that is the whole secret of it."
+      },
+      "tanner_sull": {
+        "name": "Tanner Sull",
+        "title": "Skinning Trainer",
+        "greeting": "Fen-beasts wear hide three times the thickness of vale game, {playerName}. I will teach you to take it whole."
+      },
+      "leatherworker_orsa": {
+        "name": "Leatherworker Orsa",
+        "title": "Leatherworking Trainer",
+        "greeting": "Marsh-cured leather laughs at the rot. Master it here, beyond what Eastbrook could show you."
+      },
+      "tailor_evelle": {
+        "name": "Tailor Evelle",
+        "title": "Tailoring Trainer",
+        "greeting": "A damp fen rots a careless seam in a week. The Journeyman stitch holds through the wettest reeds."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -29780,6 +31460,34 @@ export const zh_CN: EnTranslations = {
       "save": "保存",
       "comingSoonTitle": "天赋即将推出",
       "comingSoonBody": "此职业还没有天赋树。你可以继续正常游玩；完整天赋树会在未来更新中到来。"
+    },
+    "professions": {
+      "skillsTitle": "Skills",
+      "professions": "Professions",
+      "secondary": "Secondary Skills",
+      "open": "Open",
+      "noSkills": "You have not learned any professions or secondary skills yet. Seek out a trainer.",
+      "craft": "Craft",
+      "noRecipes": "You have not learned any recipes yet. Visit a trainer to learn them.",
+      "trainTitle": "Train {name}",
+      "learnApprentice": "Learn {name} (Apprentice)",
+      "learnJourneyman": "Learn Journeyman {name}",
+      "recipes": "Recipes",
+      "nothingToTrain": "Nothing new to train right now. Raise your skill and return.",
+      "taughtAllIKnow": "I've taught you all I know.",
+      "unlearn": "Unlearn",
+      "unlearnTitle": "Unlearn {name}?",
+      "unlearnBody": "Unlearn {name}? You will lose all skill progress and every recipe you have learned for it. A primary profession frees its slot so you can learn another.",
+      "unlearnedLog": "You have unlearned {name}.",
+      "back": "← Back",
+      "gatheredSuffix": " (gathered in the world)",
+      "skillIncreased": "Your skill in {name} increased to {skill}.",
+      "journeymanLabel": "Journeyman {name}",
+      "learnedBanner": "Learned {label}",
+      "learnedLog": "You have learned {label}.",
+      "recipeLearnedLog": "You have learned to make {name}.",
+      "bandageUse": "Use: Channel a heal for {heal} health over {time} sec. The target cannot be bandaged again for 1 min, and the channel breaks if you move or take damage.",
+      "requiresProf": "Requires {name} ({skill})"
     }
   },
   "nav": {
@@ -30655,7 +32363,8 @@ export const zh_CN: EnTranslations = {
     },
     "cast": {
       "fishing": "钓鱼",
-      "demonHeal": "恶魔治疗"
+      "demonHeal": "恶魔治疗",
+      "skinning": "Skinning"
     }
   },
   "questUi": {
@@ -30757,7 +32466,8 @@ export const zh_CN: EnTranslations = {
       "food": "食物",
       "drink": "饮料",
       "tool": "工具",
-      "potion": "药水"
+      "potion": "药水",
+      "reagent": "Trade Good"
     },
     "stats": {
       "armor": "护甲",
@@ -31795,6 +33505,150 @@ export const zh_CN: EnTranslations = {
       "cracked_wyrm_scale": {
         "name": "裂开的龙鳞"
       },
+      "bolt_of_linen": {
+        "name": "亚麻布卷"
+      },
+      "bolt_of_silk": {
+        "name": "丝绸布卷"
+      },
+      "bolt_of_woolen": {
+        "name": "羊毛布卷"
+      },
+      "coarse_thread": {
+        "name": "粗线"
+      },
+      "cured_heavy_hide": {
+        "name": "硝制厚革"
+      },
+      "cured_leather_pants": {
+        "name": "硝制皮裤"
+      },
+      "cured_light_hide": {
+        "name": "硝制轻革"
+      },
+      "cured_medium_hide": {
+        "name": "硝制中革"
+      },
+      "direhide_legguards": {
+        "name": "厄兽皮护腿"
+      },
+      "fine_thread": {
+        "name": "细线"
+      },
+      "heavy_hide": {
+        "name": "厚革"
+      },
+      "heavy_leather": {
+        "name": "厚皮"
+      },
+      "heavy_leather_straps": {
+        "name": "厚皮带"
+      },
+      "heavy_leather_vest": {
+        "name": "厚皮背心"
+      },
+      "heavy_linen_bandage": {
+        "name": "厚亚麻绷带"
+      },
+      "heavy_silk_bandage": {
+        "name": "厚丝绸绷带"
+      },
+      "heavy_wool_bandage": {
+        "name": "厚羊毛绷带"
+      },
+      "light_hide": {
+        "name": "轻革"
+      },
+      "light_leather": {
+        "name": "轻皮"
+      },
+      "light_leather_boots": {
+        "name": "轻皮靴"
+      },
+      "light_leather_straps": {
+        "name": "轻皮带"
+      },
+      "light_leather_vest": {
+        "name": "轻皮背心"
+      },
+      "linen_bandage": {
+        "name": "亚麻绷带"
+      },
+      "linen_boots": {
+        "name": "亚麻布靴"
+      },
+      "linen_cloth": {
+        "name": "亚麻布"
+      },
+      "linen_pants": {
+        "name": "亚麻布裤"
+      },
+      "linen_robe": {
+        "name": "亚麻布长袍"
+      },
+      "medium_hide": {
+        "name": "中革"
+      },
+      "medium_leather": {
+        "name": "中皮"
+      },
+      "medium_leather_boots": {
+        "name": "中皮靴"
+      },
+      "medium_leather_pants": {
+        "name": "中皮裤"
+      },
+      "medium_leather_vest": {
+        "name": "中皮背心"
+      },
+      "rough_thread": {
+        "name": "粗糙线"
+      },
+      "ruined_leather_scraps": {
+        "name": "破损的皮革碎片"
+      },
+      "salt": {
+        "name": "精盐"
+      },
+      "silk_bandage": {
+        "name": "丝绸绷带"
+      },
+      "silk_brocade_robe": {
+        "name": "丝绸织锦长袍"
+      },
+      "silk_cloth": {
+        "name": "丝绸"
+      },
+      "silk_leggings": {
+        "name": "丝绸护腿"
+      },
+      "silk_scrap": {
+        "name": "丝绸碎布"
+      },
+      "silk_slippers": {
+        "name": "丝绸便鞋"
+      },
+      "studded_leather_vest": {
+        "name": "镶钉皮背心"
+      },
+      "wool_bandage": {
+        "name": "羊毛绷带"
+      },
+      "wool_cloth": {
+        "name": "毛布"
+      },
+      "wool_scrap": {
+        "name": "羊毛碎布"
+      },
+      "woolen_leggings": {
+        "name": "羊毛护腿"
+      },
+      "woolen_slippers": {
+        "name": "羊毛便鞋"
+      },
+      "woolen_tunic": {
+        "name": "羊毛外衣"
+      },
       "bristleback_maul": {
         "name": "硬鬃重槌"
       },
@@ -32238,6 +34092,12 @@ export const zh_CN: EnTranslations = {
       "bound_guardian": {
         "name": "受缚守卫者"
       },
+      "craghorn_bear": {
+        "name": "Craghorn Bear"
+      },
+      "frostfang_lynx": {
+        "name": "Frostfang Lynx"
+      },
       "elder_bristleback": {
         "name": "年长硬鬃"
       },
@@ -32415,6 +34275,36 @@ export const zh_CN: EnTranslations = {
         "name": "凯迪斯博学者",
         "title": "博学者",
         "greeting": "小心松动的页岩，{className}。这座山近来不安，我想知道原因。"
+      },
+      "tanner_yorvek": {
+        "name": "Tanner Yorvek",
+        "title": "Skinning Trainer",
+        "greeting": "A clean skin starts with a steady knife. Mind the loot first - pelts come last."
+      },
+      "leatherworker_brida": {
+        "name": "Leatherworker Brida",
+        "title": "Leatherworking Trainer",
+        "greeting": "Bring me leather and I will show you how to make it hold a shape."
+      },
+      "tailor_marlena": {
+        "name": "Tailor Marlena",
+        "title": "Tailoring Trainer",
+        "greeting": "Bolts of good cloth and a fine thread, {playerName} - that is the whole secret of it."
+      },
+      "tanner_sull": {
+        "name": "Tanner Sull",
+        "title": "Skinning Trainer",
+        "greeting": "Fen-beasts wear hide three times the thickness of vale game, {playerName}. I will teach you to take it whole."
+      },
+      "leatherworker_orsa": {
+        "name": "Leatherworker Orsa",
+        "title": "Leatherworking Trainer",
+        "greeting": "Marsh-cured leather laughs at the rot. Master it here, beyond what Eastbrook could show you."
+      },
+      "tailor_evelle": {
+        "name": "Tailor Evelle",
+        "title": "Tailoring Trainer",
+        "greeting": "A damp fen rots a careless seam in a week. The Journeyman stitch holds through the wettest reeds."
       },
       "tidewatcher_ondrel": {
         "name": "翁德雷尔·凡恩",
@@ -33486,6 +35376,34 @@ export const zh_TW: EnTranslations = {
       "save": "儲存",
       "comingSoonTitle": "天賦即將推出",
       "comingSoonBody": "此職業還沒有天賦樹。你可以繼續正常遊玩；完整天賦樹會在未來更新中到來。"
+    },
+    "professions": {
+      "skillsTitle": "Skills",
+      "professions": "Professions",
+      "secondary": "Secondary Skills",
+      "open": "Open",
+      "noSkills": "You have not learned any professions or secondary skills yet. Seek out a trainer.",
+      "craft": "Craft",
+      "noRecipes": "You have not learned any recipes yet. Visit a trainer to learn them.",
+      "trainTitle": "Train {name}",
+      "learnApprentice": "Learn {name} (Apprentice)",
+      "learnJourneyman": "Learn Journeyman {name}",
+      "recipes": "Recipes",
+      "nothingToTrain": "Nothing new to train right now. Raise your skill and return.",
+      "taughtAllIKnow": "I've taught you all I know.",
+      "unlearn": "Unlearn",
+      "unlearnTitle": "Unlearn {name}?",
+      "unlearnBody": "Unlearn {name}? You will lose all skill progress and every recipe you have learned for it. A primary profession frees its slot so you can learn another.",
+      "unlearnedLog": "You have unlearned {name}.",
+      "back": "← Back",
+      "gatheredSuffix": " (gathered in the world)",
+      "skillIncreased": "Your skill in {name} increased to {skill}.",
+      "journeymanLabel": "Journeyman {name}",
+      "learnedBanner": "Learned {label}",
+      "learnedLog": "You have learned {label}.",
+      "recipeLearnedLog": "You have learned to make {name}.",
+      "bandageUse": "Use: Channel a heal for {heal} health over {time} sec. The target cannot be bandaged again for 1 min, and the channel breaks if you move or take damage.",
+      "requiresProf": "Requires {name} ({skill})"
     }
   },
   "nav": {
@@ -34361,7 +36279,8 @@ export const zh_TW: EnTranslations = {
     },
     "cast": {
       "fishing": "釣魚",
-      "demonHeal": "惡魔治療"
+      "demonHeal": "惡魔治療",
+      "skinning": "Skinning"
     }
   },
   "questUi": {
@@ -34463,7 +36382,8 @@ export const zh_TW: EnTranslations = {
       "food": "食物",
       "drink": "飲料",
       "tool": "工具",
-      "potion": "藥水"
+      "potion": "藥水",
+      "reagent": "Trade Good"
     },
     "stats": {
       "armor": "護甲",
@@ -35501,6 +37421,150 @@ export const zh_TW: EnTranslations = {
       "cracked_wyrm_scale": {
         "name": "裂開的龍鱗"
       },
+      "bolt_of_linen": {
+        "name": "亞麻布卷"
+      },
+      "bolt_of_silk": {
+        "name": "絲綢布卷"
+      },
+      "bolt_of_woolen": {
+        "name": "羊毛布卷"
+      },
+      "coarse_thread": {
+        "name": "粗線"
+      },
+      "cured_heavy_hide": {
+        "name": "硝製厚革"
+      },
+      "cured_leather_pants": {
+        "name": "硝製皮褲"
+      },
+      "cured_light_hide": {
+        "name": "硝製輕革"
+      },
+      "cured_medium_hide": {
+        "name": "硝製中革"
+      },
+      "direhide_legguards": {
+        "name": "厄獸皮護腿"
+      },
+      "fine_thread": {
+        "name": "細線"
+      },
+      "heavy_hide": {
+        "name": "厚革"
+      },
+      "heavy_leather": {
+        "name": "厚皮"
+      },
+      "heavy_leather_straps": {
+        "name": "厚皮帶"
+      },
+      "heavy_leather_vest": {
+        "name": "厚皮背心"
+      },
+      "heavy_linen_bandage": {
+        "name": "厚亞麻繃帶"
+      },
+      "heavy_silk_bandage": {
+        "name": "厚絲綢繃帶"
+      },
+      "heavy_wool_bandage": {
+        "name": "厚羊毛繃帶"
+      },
+      "light_hide": {
+        "name": "輕革"
+      },
+      "light_leather": {
+        "name": "輕皮"
+      },
+      "light_leather_boots": {
+        "name": "輕皮靴"
+      },
+      "light_leather_straps": {
+        "name": "輕皮帶"
+      },
+      "light_leather_vest": {
+        "name": "輕皮背心"
+      },
+      "linen_bandage": {
+        "name": "亞麻繃帶"
+      },
+      "linen_boots": {
+        "name": "亞麻布靴"
+      },
+      "linen_cloth": {
+        "name": "亞麻布"
+      },
+      "linen_pants": {
+        "name": "亞麻布褲"
+      },
+      "linen_robe": {
+        "name": "亞麻布長袍"
+      },
+      "medium_hide": {
+        "name": "中革"
+      },
+      "medium_leather": {
+        "name": "中皮"
+      },
+      "medium_leather_boots": {
+        "name": "中皮靴"
+      },
+      "medium_leather_pants": {
+        "name": "中皮褲"
+      },
+      "medium_leather_vest": {
+        "name": "中皮背心"
+      },
+      "rough_thread": {
+        "name": "粗糙線"
+      },
+      "ruined_leather_scraps": {
+        "name": "破損的皮革碎片"
+      },
+      "salt": {
+        "name": "精鹽"
+      },
+      "silk_bandage": {
+        "name": "絲綢繃帶"
+      },
+      "silk_brocade_robe": {
+        "name": "絲綢織錦長袍"
+      },
+      "silk_cloth": {
+        "name": "絲綢"
+      },
+      "silk_leggings": {
+        "name": "絲綢護腿"
+      },
+      "silk_scrap": {
+        "name": "絲綢碎布"
+      },
+      "silk_slippers": {
+        "name": "絲綢便鞋"
+      },
+      "studded_leather_vest": {
+        "name": "鑲釘皮背心"
+      },
+      "wool_bandage": {
+        "name": "羊毛繃帶"
+      },
+      "wool_cloth": {
+        "name": "羊毛布"
+      },
+      "wool_scrap": {
+        "name": "羊毛碎布"
+      },
+      "woolen_leggings": {
+        "name": "羊毛護腿"
+      },
+      "woolen_slippers": {
+        "name": "羊毛便鞋"
+      },
+      "woolen_tunic": {
+        "name": "羊毛外衣"
+      },
       "bristleback_maul": {
         "name": "硬鬃重槌"
       },
@@ -35944,6 +38008,12 @@ export const zh_TW: EnTranslations = {
       "bound_guardian": {
         "name": "受縛守衛者"
       },
+      "craghorn_bear": {
+        "name": "Craghorn Bear"
+      },
+      "frostfang_lynx": {
+        "name": "Frostfang Lynx"
+      },
       "elder_bristleback": {
         "name": "年長硬鬃"
       },
@@ -36121,6 +38191,36 @@ export const zh_TW: EnTranslations = {
         "name": "凱迪斯博學者",
         "title": "博學者",
         "greeting": "小心鬆動的頁岩，{className}。這座山近來不安，我想知道原因。"
+      },
+      "tanner_yorvek": {
+        "name": "Tanner Yorvek",
+        "title": "Skinning Trainer",
+        "greeting": "A clean skin starts with a steady knife. Mind the loot first - pelts come last."
+      },
+      "leatherworker_brida": {
+        "name": "Leatherworker Brida",
+        "title": "Leatherworking Trainer",
+        "greeting": "Bring me leather and I will show you how to make it hold a shape."
+      },
+      "tailor_marlena": {
+        "name": "Tailor Marlena",
+        "title": "Tailoring Trainer",
+        "greeting": "Bolts of good cloth and a fine thread, {playerName} - that is the whole secret of it."
+      },
+      "tanner_sull": {
+        "name": "Tanner Sull",
+        "title": "Skinning Trainer",
+        "greeting": "Fen-beasts wear hide three times the thickness of vale game, {playerName}. I will teach you to take it whole."
+      },
+      "leatherworker_orsa": {
+        "name": "Leatherworker Orsa",
+        "title": "Leatherworking Trainer",
+        "greeting": "Marsh-cured leather laughs at the rot. Master it here, beyond what Eastbrook could show you."
+      },
+      "tailor_evelle": {
+        "name": "Tailor Evelle",
+        "title": "Tailoring Trainer",
+        "greeting": "A damp fen rots a careless seam in a week. The Journeyman stitch holds through the wettest reeds."
       },
       "tidewatcher_ondrel": {
         "name": "翁德瑞爾·韋恩",
@@ -37192,6 +39292,34 @@ export const ko_KR: EnTranslations = {
       "save": "저장",
       "comingSoonTitle": "특성 준비 중",
       "comingSoonBody": "이 직업은 아직 특성 트리가 없습니다. 계속 정상적으로 플레이할 수 있으며 전체 트리는 향후 업데이트에 추가됩니다."
+    },
+    "professions": {
+      "skillsTitle": "Skills",
+      "professions": "Professions",
+      "secondary": "Secondary Skills",
+      "open": "Open",
+      "noSkills": "You have not learned any professions or secondary skills yet. Seek out a trainer.",
+      "craft": "Craft",
+      "noRecipes": "You have not learned any recipes yet. Visit a trainer to learn them.",
+      "trainTitle": "Train {name}",
+      "learnApprentice": "Learn {name} (Apprentice)",
+      "learnJourneyman": "Learn Journeyman {name}",
+      "recipes": "Recipes",
+      "nothingToTrain": "Nothing new to train right now. Raise your skill and return.",
+      "taughtAllIKnow": "I've taught you all I know.",
+      "unlearn": "Unlearn",
+      "unlearnTitle": "Unlearn {name}?",
+      "unlearnBody": "Unlearn {name}? You will lose all skill progress and every recipe you have learned for it. A primary profession frees its slot so you can learn another.",
+      "unlearnedLog": "You have unlearned {name}.",
+      "back": "← Back",
+      "gatheredSuffix": " (gathered in the world)",
+      "skillIncreased": "Your skill in {name} increased to {skill}.",
+      "journeymanLabel": "Journeyman {name}",
+      "learnedBanner": "Learned {label}",
+      "learnedLog": "You have learned {label}.",
+      "recipeLearnedLog": "You have learned to make {name}.",
+      "bandageUse": "Use: Channel a heal for {heal} health over {time} sec. The target cannot be bandaged again for 1 min, and the channel breaks if you move or take damage.",
+      "requiresProf": "Requires {name} ({skill})"
     }
   },
   "nav": {
@@ -38067,7 +40195,8 @@ export const ko_KR: EnTranslations = {
     },
     "cast": {
       "fishing": "낚시",
-      "demonHeal": "악마 치유"
+      "demonHeal": "악마 치유",
+      "skinning": "Skinning"
     }
   },
   "questUi": {
@@ -38169,7 +40298,8 @@ export const ko_KR: EnTranslations = {
       "food": "음식",
       "drink": "음료",
       "tool": "도구",
-      "potion": "물약"
+      "potion": "물약",
+      "reagent": "Trade Good"
     },
     "stats": {
       "armor": "방어도",
@@ -39207,6 +41337,150 @@ export const ko_KR: EnTranslations = {
       "cracked_wyrm_scale": {
         "name": "갈라진 고룡 비늘"
       },
+      "bolt_of_linen": {
+        "name": "마직물 두루마리"
+      },
+      "bolt_of_silk": {
+        "name": "비단천 두루마리"
+      },
+      "bolt_of_woolen": {
+        "name": "양모천 두루마리"
+      },
+      "coarse_thread": {
+        "name": "거친 실"
+      },
+      "cured_heavy_hide": {
+        "name": "무두질한 두꺼운 생가죽"
+      },
+      "cured_leather_pants": {
+        "name": "무두질한 가죽 바지"
+      },
+      "cured_light_hide": {
+        "name": "무두질한 가벼운 생가죽"
+      },
+      "cured_medium_hide": {
+        "name": "무두질한 중간 생가죽"
+      },
+      "direhide_legguards": {
+        "name": "공포가죽 다리보호구"
+      },
+      "fine_thread": {
+        "name": "고운 실"
+      },
+      "heavy_hide": {
+        "name": "두꺼운 생가죽"
+      },
+      "heavy_leather": {
+        "name": "두꺼운 가죽"
+      },
+      "heavy_leather_straps": {
+        "name": "두꺼운 가죽끈"
+      },
+      "heavy_leather_vest": {
+        "name": "두꺼운 가죽 조끼"
+      },
+      "heavy_linen_bandage": {
+        "name": "두꺼운 마직 붕대"
+      },
+      "heavy_silk_bandage": {
+        "name": "두꺼운 비단 붕대"
+      },
+      "heavy_wool_bandage": {
+        "name": "두꺼운 양모 붕대"
+      },
+      "light_hide": {
+        "name": "가벼운 생가죽"
+      },
+      "light_leather": {
+        "name": "가벼운 가죽"
+      },
+      "light_leather_boots": {
+        "name": "가벼운 가죽 장화"
+      },
+      "light_leather_straps": {
+        "name": "가벼운 가죽끈"
+      },
+      "light_leather_vest": {
+        "name": "가벼운 가죽 조끼"
+      },
+      "linen_bandage": {
+        "name": "마직 붕대"
+      },
+      "linen_boots": {
+        "name": "마직 장화"
+      },
+      "linen_cloth": {
+        "name": "마직물"
+      },
+      "linen_pants": {
+        "name": "마직 바지"
+      },
+      "linen_robe": {
+        "name": "마직 로브"
+      },
+      "medium_hide": {
+        "name": "중간 생가죽"
+      },
+      "medium_leather": {
+        "name": "중간 가죽"
+      },
+      "medium_leather_boots": {
+        "name": "중간 가죽 장화"
+      },
+      "medium_leather_pants": {
+        "name": "중간 가죽 바지"
+      },
+      "medium_leather_vest": {
+        "name": "중간 가죽 조끼"
+      },
+      "rough_thread": {
+        "name": "투박한 실"
+      },
+      "ruined_leather_scraps": {
+        "name": "못 쓰는 가죽 조각"
+      },
+      "salt": {
+        "name": "정제 소금"
+      },
+      "silk_bandage": {
+        "name": "비단 붕대"
+      },
+      "silk_brocade_robe": {
+        "name": "비단 양단 로브"
+      },
+      "silk_cloth": {
+        "name": "비단천"
+      },
+      "silk_leggings": {
+        "name": "비단 다리보호구"
+      },
+      "silk_scrap": {
+        "name": "비단 조각"
+      },
+      "silk_slippers": {
+        "name": "비단 슬리퍼"
+      },
+      "studded_leather_vest": {
+        "name": "징 박은 가죽 조끼"
+      },
+      "wool_bandage": {
+        "name": "양모 붕대"
+      },
+      "wool_cloth": {
+        "name": "양모천"
+      },
+      "wool_scrap": {
+        "name": "양모 조각"
+      },
+      "woolen_leggings": {
+        "name": "양모 다리보호구"
+      },
+      "woolen_slippers": {
+        "name": "양모 슬리퍼"
+      },
+      "woolen_tunic": {
+        "name": "양모 튜닉"
+      },
       "bristleback_maul": {
         "name": "뻣센등뼈 철퇴"
       },
@@ -39650,6 +41924,12 @@ export const ko_KR: EnTranslations = {
       "bound_guardian": {
         "name": "속박된 수호자"
       },
+      "craghorn_bear": {
+        "name": "Craghorn Bear"
+      },
+      "frostfang_lynx": {
+        "name": "Frostfang Lynx"
+      },
       "elder_bristleback": {
         "name": "늙은 뻣센등뼈"
       },
@@ -39827,6 +42107,36 @@ export const ko_KR: EnTranslations = {
         "name": "현자 캐디스",
         "title": "현자",
         "greeting": "느슨한 혈암을 조심하십시오, {className}. 산이 요즘 불안정해졌고, 나는 그 이유를 알고 싶습니다."
+      },
+      "tanner_yorvek": {
+        "name": "Tanner Yorvek",
+        "title": "Skinning Trainer",
+        "greeting": "A clean skin starts with a steady knife. Mind the loot first - pelts come last."
+      },
+      "leatherworker_brida": {
+        "name": "Leatherworker Brida",
+        "title": "Leatherworking Trainer",
+        "greeting": "Bring me leather and I will show you how to make it hold a shape."
+      },
+      "tailor_marlena": {
+        "name": "Tailor Marlena",
+        "title": "Tailoring Trainer",
+        "greeting": "Bolts of good cloth and a fine thread, {playerName} - that is the whole secret of it."
+      },
+      "tanner_sull": {
+        "name": "Tanner Sull",
+        "title": "Skinning Trainer",
+        "greeting": "Fen-beasts wear hide three times the thickness of vale game, {playerName}. I will teach you to take it whole."
+      },
+      "leatherworker_orsa": {
+        "name": "Leatherworker Orsa",
+        "title": "Leatherworking Trainer",
+        "greeting": "Marsh-cured leather laughs at the rot. Master it here, beyond what Eastbrook could show you."
+      },
+      "tailor_evelle": {
+        "name": "Tailor Evelle",
+        "title": "Tailoring Trainer",
+        "greeting": "A damp fen rots a careless seam in a week. The Journeyman stitch holds through the wettest reeds."
       },
       "tidewatcher_ondrel": {
         "name": "온드렐 베인",
@@ -40898,6 +43208,34 @@ export const ja_JP: EnTranslations = {
       "save": "保存",
       "comingSoonTitle": "タレント準備中",
       "comingSoonBody": "このクラスにはまだタレントツリーがありません。通常通りプレイできます。完全なツリーは今後のアップデートで追加されます。"
+    },
+    "professions": {
+      "skillsTitle": "Skills",
+      "professions": "Professions",
+      "secondary": "Secondary Skills",
+      "open": "Open",
+      "noSkills": "You have not learned any professions or secondary skills yet. Seek out a trainer.",
+      "craft": "Craft",
+      "noRecipes": "You have not learned any recipes yet. Visit a trainer to learn them.",
+      "trainTitle": "Train {name}",
+      "learnApprentice": "Learn {name} (Apprentice)",
+      "learnJourneyman": "Learn Journeyman {name}",
+      "recipes": "Recipes",
+      "nothingToTrain": "Nothing new to train right now. Raise your skill and return.",
+      "taughtAllIKnow": "I've taught you all I know.",
+      "unlearn": "Unlearn",
+      "unlearnTitle": "Unlearn {name}?",
+      "unlearnBody": "Unlearn {name}? You will lose all skill progress and every recipe you have learned for it. A primary profession frees its slot so you can learn another.",
+      "unlearnedLog": "You have unlearned {name}.",
+      "back": "← Back",
+      "gatheredSuffix": " (gathered in the world)",
+      "skillIncreased": "Your skill in {name} increased to {skill}.",
+      "journeymanLabel": "Journeyman {name}",
+      "learnedBanner": "Learned {label}",
+      "learnedLog": "You have learned {label}.",
+      "recipeLearnedLog": "You have learned to make {name}.",
+      "bandageUse": "Use: Channel a heal for {heal} health over {time} sec. The target cannot be bandaged again for 1 min, and the channel breaks if you move or take damage.",
+      "requiresProf": "Requires {name} ({skill})"
     }
   },
   "nav": {
@@ -41773,7 +44111,8 @@ export const ja_JP: EnTranslations = {
     },
     "cast": {
       "fishing": "釣り",
-      "demonHeal": "悪魔の治癒"
+      "demonHeal": "悪魔の治癒",
+      "skinning": "Skinning"
     }
   },
   "questUi": {
@@ -41875,7 +44214,8 @@ export const ja_JP: EnTranslations = {
       "food": "食べ物",
       "drink": "飲み物",
       "tool": "道具",
-      "potion": "ポーション"
+      "potion": "ポーション",
+      "reagent": "Trade Good"
     },
     "stats": {
       "armor": "防御力",
@@ -42913,6 +45253,150 @@ export const ja_JP: EnTranslations = {
       "cracked_wyrm_scale": {
         "name": "割れたワームの鱗"
       },
+      "bolt_of_linen": {
+        "name": "亜麻布の反物"
+      },
+      "bolt_of_silk": {
+        "name": "絹布の反物"
+      },
+      "bolt_of_woolen": {
+        "name": "ウール布の反物"
+      },
+      "coarse_thread": {
+        "name": "粗い糸"
+      },
+      "cured_heavy_hide": {
+        "name": "なめした厚い生皮"
+      },
+      "cured_leather_pants": {
+        "name": "なめし革のズボン"
+      },
+      "cured_light_hide": {
+        "name": "なめした軽い生皮"
+      },
+      "cured_medium_hide": {
+        "name": "なめした中級の生皮"
+      },
+      "direhide_legguards": {
+        "name": "凶獣皮のレギンス"
+      },
+      "fine_thread": {
+        "name": "上質な糸"
+      },
+      "heavy_hide": {
+        "name": "厚い生皮"
+      },
+      "heavy_leather": {
+        "name": "厚い革"
+      },
+      "heavy_leather_straps": {
+        "name": "厚い革ひも"
+      },
+      "heavy_leather_vest": {
+        "name": "厚い革のベスト"
+      },
+      "heavy_linen_bandage": {
+        "name": "厚手の亜麻の包帯"
+      },
+      "heavy_silk_bandage": {
+        "name": "厚手の絹の包帯"
+      },
+      "heavy_wool_bandage": {
+        "name": "厚手のウールの包帯"
+      },
+      "light_hide": {
+        "name": "軽い生皮"
+      },
+      "light_leather": {
+        "name": "軽い革"
+      },
+      "light_leather_boots": {
+        "name": "軽い革のブーツ"
+      },
+      "light_leather_straps": {
+        "name": "軽い革ひも"
+      },
+      "light_leather_vest": {
+        "name": "軽い革のベスト"
+      },
+      "linen_bandage": {
+        "name": "亜麻の包帯"
+      },
+      "linen_boots": {
+        "name": "亜麻布のブーツ"
+      },
+      "linen_cloth": {
+        "name": "亜麻布"
+      },
+      "linen_pants": {
+        "name": "亜麻布のズボン"
+      },
+      "linen_robe": {
+        "name": "亜麻布のローブ"
+      },
+      "medium_hide": {
+        "name": "中級の生皮"
+      },
+      "medium_leather": {
+        "name": "中級の革"
+      },
+      "medium_leather_boots": {
+        "name": "中級の革のブーツ"
+      },
+      "medium_leather_pants": {
+        "name": "中級の革のズボン"
+      },
+      "medium_leather_vest": {
+        "name": "中級の革のベスト"
+      },
+      "rough_thread": {
+        "name": "ざらつく糸"
+      },
+      "ruined_leather_scraps": {
+        "name": "傷んだ革の切れ端"
+      },
+      "salt": {
+        "name": "精製塩"
+      },
+      "silk_bandage": {
+        "name": "絹の包帯"
+      },
+      "silk_brocade_robe": {
+        "name": "絹の錦織りローブ"
+      },
+      "silk_cloth": {
+        "name": "絹布"
+      },
+      "silk_leggings": {
+        "name": "絹のレギンス"
+      },
+      "silk_scrap": {
+        "name": "絹の切れ端"
+      },
+      "silk_slippers": {
+        "name": "絹のスリッパ"
+      },
+      "studded_leather_vest": {
+        "name": "鋲打ち革のベスト"
+      },
+      "wool_bandage": {
+        "name": "ウールの包帯"
+      },
+      "wool_cloth": {
+        "name": "ウール布"
+      },
+      "wool_scrap": {
+        "name": "ウールの切れ端"
+      },
+      "woolen_leggings": {
+        "name": "ウールのレギンス"
+      },
+      "woolen_slippers": {
+        "name": "ウールのスリッパ"
+      },
+      "woolen_tunic": {
+        "name": "ウールのチュニック"
+      },
       "bristleback_maul": {
         "name": "ブリストルバックの大槌"
       },
@@ -43356,6 +45840,12 @@ export const ja_JP: EnTranslations = {
       "bound_guardian": {
         "name": "縛られし守護者"
       },
+      "craghorn_bear": {
+        "name": "Craghorn Bear"
+      },
+      "frostfang_lynx": {
+        "name": "Frostfang Lynx"
+      },
       "elder_bristleback": {
         "name": "老ブリストルバック"
       },
@@ -43533,6 +46023,36 @@ export const ja_JP: EnTranslations = {
         "name": "博識者キャディス",
         "title": "博識者",
         "greeting": "崩れやすい頁岩に気をつけてください、{className}。山は近ごろ落ち着きがなく、その理由を知りたいのです。"
+      },
+      "tanner_yorvek": {
+        "name": "Tanner Yorvek",
+        "title": "Skinning Trainer",
+        "greeting": "A clean skin starts with a steady knife. Mind the loot first - pelts come last."
+      },
+      "leatherworker_brida": {
+        "name": "Leatherworker Brida",
+        "title": "Leatherworking Trainer",
+        "greeting": "Bring me leather and I will show you how to make it hold a shape."
+      },
+      "tailor_marlena": {
+        "name": "Tailor Marlena",
+        "title": "Tailoring Trainer",
+        "greeting": "Bolts of good cloth and a fine thread, {playerName} - that is the whole secret of it."
+      },
+      "tanner_sull": {
+        "name": "Tanner Sull",
+        "title": "Skinning Trainer",
+        "greeting": "Fen-beasts wear hide three times the thickness of vale game, {playerName}. I will teach you to take it whole."
+      },
+      "leatherworker_orsa": {
+        "name": "Leatherworker Orsa",
+        "title": "Leatherworking Trainer",
+        "greeting": "Marsh-cured leather laughs at the rot. Master it here, beyond what Eastbrook could show you."
+      },
+      "tailor_evelle": {
+        "name": "Tailor Evelle",
+        "title": "Tailoring Trainer",
+        "greeting": "A damp fen rots a careless seam in a week. The Journeyman stitch holds through the wettest reeds."
       },
       "tidewatcher_ondrel": {
         "name": "オンドレル・ヴェイン",
@@ -44604,6 +47124,34 @@ export const pt_BR: EnTranslations = {
       "save": "Salvar",
       "comingSoonTitle": "Talentos em breve",
       "comingSoonBody": "Esta classe ainda não tem árvores de talentos. Você pode continuar jogando normalmente; as árvores completas chegarão em uma atualização futura."
+    },
+    "professions": {
+      "skillsTitle": "Skills",
+      "professions": "Professions",
+      "secondary": "Secondary Skills",
+      "open": "Open",
+      "noSkills": "You have not learned any professions or secondary skills yet. Seek out a trainer.",
+      "craft": "Craft",
+      "noRecipes": "You have not learned any recipes yet. Visit a trainer to learn them.",
+      "trainTitle": "Train {name}",
+      "learnApprentice": "Learn {name} (Apprentice)",
+      "learnJourneyman": "Learn Journeyman {name}",
+      "recipes": "Recipes",
+      "nothingToTrain": "Nothing new to train right now. Raise your skill and return.",
+      "taughtAllIKnow": "I've taught you all I know.",
+      "unlearn": "Unlearn",
+      "unlearnTitle": "Unlearn {name}?",
+      "unlearnBody": "Unlearn {name}? You will lose all skill progress and every recipe you have learned for it. A primary profession frees its slot so you can learn another.",
+      "unlearnedLog": "You have unlearned {name}.",
+      "back": "← Back",
+      "gatheredSuffix": " (gathered in the world)",
+      "skillIncreased": "Your skill in {name} increased to {skill}.",
+      "journeymanLabel": "Journeyman {name}",
+      "learnedBanner": "Learned {label}",
+      "learnedLog": "You have learned {label}.",
+      "recipeLearnedLog": "You have learned to make {name}.",
+      "bandageUse": "Use: Channel a heal for {heal} health over {time} sec. The target cannot be bandaged again for 1 min, and the channel breaks if you move or take damage.",
+      "requiresProf": "Requires {name} ({skill})"
     }
   },
   "nav": {
@@ -45479,7 +48027,8 @@ export const pt_BR: EnTranslations = {
     },
     "cast": {
       "fishing": "Pesca",
-      "demonHeal": "Cura demoníaca"
+      "demonHeal": "Cura demoníaca",
+      "skinning": "Skinning"
     }
   },
   "questUi": {
@@ -45581,7 +48130,8 @@ export const pt_BR: EnTranslations = {
       "food": "Comida",
       "drink": "Bebida",
       "tool": "Ferramenta",
-      "potion": "Poção"
+      "potion": "Poção",
+      "reagent": "Trade Good"
     },
     "stats": {
       "armor": "Armadura",
@@ -46619,6 +49169,150 @@ export const pt_BR: EnTranslations = {
       "cracked_wyrm_scale": {
         "name": "Escama de wyrm rachada"
       },
+      "bolt_of_linen": {
+        "name": "Rolo de Tecido de Linho"
+      },
+      "bolt_of_silk": {
+        "name": "Rolo de Tecido de Seda"
+      },
+      "bolt_of_woolen": {
+        "name": "Rolo de Tecido de Lã"
+      },
+      "coarse_thread": {
+        "name": "Linha Grossa"
+      },
+      "cured_heavy_hide": {
+        "name": "Pele Pesada Curtida"
+      },
+      "cured_leather_pants": {
+        "name": "Calças de Couro Curtido"
+      },
+      "cured_light_hide": {
+        "name": "Pele Leve Curtida"
+      },
+      "cured_medium_hide": {
+        "name": "Pele Média Curtida"
+      },
+      "direhide_legguards": {
+        "name": "Perneiras de Pele Sinistra"
+      },
+      "fine_thread": {
+        "name": "Linha Fina"
+      },
+      "heavy_hide": {
+        "name": "Pele Pesada"
+      },
+      "heavy_leather": {
+        "name": "Couro Pesado"
+      },
+      "heavy_leather_straps": {
+        "name": "Tiras de Couro Pesado"
+      },
+      "heavy_leather_vest": {
+        "name": "Colete de Couro Pesado"
+      },
+      "heavy_linen_bandage": {
+        "name": "Atadura de Linho Pesada"
+      },
+      "heavy_silk_bandage": {
+        "name": "Atadura de Seda Pesada"
+      },
+      "heavy_wool_bandage": {
+        "name": "Atadura de Lã Pesada"
+      },
+      "light_hide": {
+        "name": "Pele Leve"
+      },
+      "light_leather": {
+        "name": "Couro Leve"
+      },
+      "light_leather_boots": {
+        "name": "Botas de Couro Leve"
+      },
+      "light_leather_straps": {
+        "name": "Tiras de Couro Leve"
+      },
+      "light_leather_vest": {
+        "name": "Colete de Couro Leve"
+      },
+      "linen_bandage": {
+        "name": "Atadura de Linho"
+      },
+      "linen_boots": {
+        "name": "Botas de Linho"
+      },
+      "linen_cloth": {
+        "name": "Tecido de Linho"
+      },
+      "linen_pants": {
+        "name": "Calças de Linho"
+      },
+      "linen_robe": {
+        "name": "Veste de Linho"
+      },
+      "medium_hide": {
+        "name": "Pele Média"
+      },
+      "medium_leather": {
+        "name": "Couro Médio"
+      },
+      "medium_leather_boots": {
+        "name": "Botas de Couro Médio"
+      },
+      "medium_leather_pants": {
+        "name": "Calças de Couro Médio"
+      },
+      "medium_leather_vest": {
+        "name": "Colete de Couro Médio"
+      },
+      "rough_thread": {
+        "name": "Linha Rústica"
+      },
+      "ruined_leather_scraps": {
+        "name": "Retalhos de Couro Arruinado"
+      },
+      "salt": {
+        "name": "Sal Refinado"
+      },
+      "silk_bandage": {
+        "name": "Atadura de Seda"
+      },
+      "silk_brocade_robe": {
+        "name": "Veste de Brocado de Seda"
+      },
+      "silk_cloth": {
+        "name": "Tecido de Seda"
+      },
+      "silk_leggings": {
+        "name": "Perneiras de Seda"
+      },
+      "silk_scrap": {
+        "name": "Retalho de Seda"
+      },
+      "silk_slippers": {
+        "name": "Pantufas de Seda"
+      },
+      "studded_leather_vest": {
+        "name": "Colete de Couro Cravejado"
+      },
+      "wool_bandage": {
+        "name": "Atadura de Lã"
+      },
+      "wool_cloth": {
+        "name": "Tecido de Lã"
+      },
+      "wool_scrap": {
+        "name": "Retalho de Lã"
+      },
+      "woolen_leggings": {
+        "name": "Perneiras de Lã"
+      },
+      "woolen_slippers": {
+        "name": "Pantufas de Lã"
+      },
+      "woolen_tunic": {
+        "name": "Túnica de Lã"
+      },
       "bristleback_maul": {
         "name": "Malho Bristleback"
       },
@@ -47062,6 +49756,12 @@ export const pt_BR: EnTranslations = {
       "bound_guardian": {
         "name": "Guardião Vinculado"
       },
+      "craghorn_bear": {
+        "name": "Craghorn Bear"
+      },
+      "frostfang_lynx": {
+        "name": "Frostfang Lynx"
+      },
       "elder_bristleback": {
         "name": "Bristleback ancião"
       },
@@ -47239,6 +49939,36 @@ export const pt_BR: EnTranslations = {
         "name": "Mestre do saber Caddis",
         "title": "Mestre do saber",
         "greeting": "Cuidado com a ardósia solta, {className}. A montanha anda inquieta, e quero saber por quê."
+      },
+      "tanner_yorvek": {
+        "name": "Tanner Yorvek",
+        "title": "Skinning Trainer",
+        "greeting": "A clean skin starts with a steady knife. Mind the loot first - pelts come last."
+      },
+      "leatherworker_brida": {
+        "name": "Leatherworker Brida",
+        "title": "Leatherworking Trainer",
+        "greeting": "Bring me leather and I will show you how to make it hold a shape."
+      },
+      "tailor_marlena": {
+        "name": "Tailor Marlena",
+        "title": "Tailoring Trainer",
+        "greeting": "Bolts of good cloth and a fine thread, {playerName} - that is the whole secret of it."
+      },
+      "tanner_sull": {
+        "name": "Tanner Sull",
+        "title": "Skinning Trainer",
+        "greeting": "Fen-beasts wear hide three times the thickness of vale game, {playerName}. I will teach you to take it whole."
+      },
+      "leatherworker_orsa": {
+        "name": "Leatherworker Orsa",
+        "title": "Leatherworking Trainer",
+        "greeting": "Marsh-cured leather laughs at the rot. Master it here, beyond what Eastbrook could show you."
+      },
+      "tailor_evelle": {
+        "name": "Tailor Evelle",
+        "title": "Tailoring Trainer",
+        "greeting": "A damp fen rots a careless seam in a week. The Journeyman stitch holds through the wettest reeds."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -48310,6 +51040,34 @@ export const ru_RU: EnTranslations = {
       "save": "Сохранить",
       "comingSoonTitle": "Таланты скоро появятся",
       "comingSoonBody": "У этого класса еще нет деревьев талантов. Можно продолжать играть как обычно; полные деревья появятся в будущем обновлении."
+    },
+    "professions": {
+      "skillsTitle": "Skills",
+      "professions": "Professions",
+      "secondary": "Secondary Skills",
+      "open": "Open",
+      "noSkills": "You have not learned any professions or secondary skills yet. Seek out a trainer.",
+      "craft": "Craft",
+      "noRecipes": "You have not learned any recipes yet. Visit a trainer to learn them.",
+      "trainTitle": "Train {name}",
+      "learnApprentice": "Learn {name} (Apprentice)",
+      "learnJourneyman": "Learn Journeyman {name}",
+      "recipes": "Recipes",
+      "nothingToTrain": "Nothing new to train right now. Raise your skill and return.",
+      "taughtAllIKnow": "I've taught you all I know.",
+      "unlearn": "Unlearn",
+      "unlearnTitle": "Unlearn {name}?",
+      "unlearnBody": "Unlearn {name}? You will lose all skill progress and every recipe you have learned for it. A primary profession frees its slot so you can learn another.",
+      "unlearnedLog": "You have unlearned {name}.",
+      "back": "← Back",
+      "gatheredSuffix": " (gathered in the world)",
+      "skillIncreased": "Your skill in {name} increased to {skill}.",
+      "journeymanLabel": "Journeyman {name}",
+      "learnedBanner": "Learned {label}",
+      "learnedLog": "You have learned {label}.",
+      "recipeLearnedLog": "You have learned to make {name}.",
+      "bandageUse": "Use: Channel a heal for {heal} health over {time} sec. The target cannot be bandaged again for 1 min, and the channel breaks if you move or take damage.",
+      "requiresProf": "Requires {name} ({skill})"
     }
   },
   "nav": {
@@ -49185,7 +51943,8 @@ export const ru_RU: EnTranslations = {
     },
     "cast": {
       "fishing": "Рыбная ловля",
-      "demonHeal": "Исцеление демона"
+      "demonHeal": "Исцеление демона",
+      "skinning": "Skinning"
     }
   },
   "questUi": {
@@ -49287,7 +52046,8 @@ export const ru_RU: EnTranslations = {
       "food": "Еда",
       "drink": "Напиток",
       "tool": "Инструмент",
-      "potion": "Зелье"
+      "potion": "Зелье",
+      "reagent": "Trade Good"
     },
     "stats": {
       "armor": "Броня",
@@ -50325,6 +53085,150 @@ export const ru_RU: EnTranslations = {
       "cracked_wyrm_scale": {
         "name": "Треснувшая чешуя вирма"
       },
+      "bolt_of_linen": {
+        "name": "Рулон льняной ткани"
+      },
+      "bolt_of_silk": {
+        "name": "Рулон шёлковой ткани"
+      },
+      "bolt_of_woolen": {
+        "name": "Рулон шерстяной ткани"
+      },
+      "coarse_thread": {
+        "name": "Грубая нить"
+      },
+      "cured_heavy_hide": {
+        "name": "Выделанная тяжелая шкура"
+      },
+      "cured_leather_pants": {
+        "name": "Штаны из выделанной кожи"
+      },
+      "cured_light_hide": {
+        "name": "Выделанная легкая шкура"
+      },
+      "cured_medium_hide": {
+        "name": "Выделанная средняя шкура"
+      },
+      "direhide_legguards": {
+        "name": "Поножи из жуткой шкуры"
+      },
+      "fine_thread": {
+        "name": "Тонкая нить"
+      },
+      "heavy_hide": {
+        "name": "Тяжелая шкура"
+      },
+      "heavy_leather": {
+        "name": "Тяжелая кожа"
+      },
+      "heavy_leather_straps": {
+        "name": "Тяжелые кожаные ремни"
+      },
+      "heavy_leather_vest": {
+        "name": "Жилет из тяжелой кожи"
+      },
+      "heavy_linen_bandage": {
+        "name": "Тяжёлая льняная повязка"
+      },
+      "heavy_silk_bandage": {
+        "name": "Тяжёлая шёлковая повязка"
+      },
+      "heavy_wool_bandage": {
+        "name": "Тяжёлая шерстяная повязка"
+      },
+      "light_hide": {
+        "name": "Легкая шкура"
+      },
+      "light_leather": {
+        "name": "Легкая кожа"
+      },
+      "light_leather_boots": {
+        "name": "Сапоги из легкой кожи"
+      },
+      "light_leather_straps": {
+        "name": "Легкие кожаные ремни"
+      },
+      "light_leather_vest": {
+        "name": "Жилет из легкой кожи"
+      },
+      "linen_bandage": {
+        "name": "Льняная повязка"
+      },
+      "linen_boots": {
+        "name": "Льняные сапоги"
+      },
+      "linen_cloth": {
+        "name": "Льняная ткань"
+      },
+      "linen_pants": {
+        "name": "Льняные штаны"
+      },
+      "linen_robe": {
+        "name": "Льняная роба"
+      },
+      "medium_hide": {
+        "name": "Средняя шкура"
+      },
+      "medium_leather": {
+        "name": "Средняя кожа"
+      },
+      "medium_leather_boots": {
+        "name": "Сапоги из средней кожи"
+      },
+      "medium_leather_pants": {
+        "name": "Штаны из средней кожи"
+      },
+      "medium_leather_vest": {
+        "name": "Жилет из средней кожи"
+      },
+      "rough_thread": {
+        "name": "Шероховатая нить"
+      },
+      "ruined_leather_scraps": {
+        "name": "Испорченные обрезки кожи"
+      },
+      "salt": {
+        "name": "Очищенная соль"
+      },
+      "silk_bandage": {
+        "name": "Шёлковая повязка"
+      },
+      "silk_brocade_robe": {
+        "name": "Роба из шёлковой парчи"
+      },
+      "silk_cloth": {
+        "name": "Шёлковая ткань"
+      },
+      "silk_leggings": {
+        "name": "Шёлковые поножи"
+      },
+      "silk_scrap": {
+        "name": "Шёлковый лоскут"
+      },
+      "silk_slippers": {
+        "name": "Шёлковые туфли"
+      },
+      "studded_leather_vest": {
+        "name": "Клепаный кожаный жилет"
+      },
+      "wool_bandage": {
+        "name": "Шерстяная повязка"
+      },
+      "wool_cloth": {
+        "name": "Шерстяная ткань"
+      },
+      "wool_scrap": {
+        "name": "Шерстяной лоскут"
+      },
+      "woolen_leggings": {
+        "name": "Шерстяные поножи"
+      },
+      "woolen_slippers": {
+        "name": "Шерстяные туфли"
+      },
+      "woolen_tunic": {
+        "name": "Шерстяная туника"
+      },
       "bristleback_maul": {
         "name": "Кувалда Щетиноспина"
       },
@@ -50768,6 +53672,12 @@ export const ru_RU: EnTranslations = {
       "bound_guardian": {
         "name": "Связанный страж"
       },
+      "craghorn_bear": {
+        "name": "Craghorn Bear"
+      },
+      "frostfang_lynx": {
+        "name": "Frostfang Lynx"
+      },
       "elder_bristleback": {
         "name": "Старый Щетиноспин"
       },
@@ -50945,6 +53855,36 @@ export const ru_RU: EnTranslations = {
         "name": "Хранитель знаний Каддис",
         "title": "Хранитель знаний",
         "greeting": "Осторожнее с рыхлым сланцем, {className}. Гора стала беспокойной, и я намерен узнать почему."
+      },
+      "tanner_yorvek": {
+        "name": "Tanner Yorvek",
+        "title": "Skinning Trainer",
+        "greeting": "A clean skin starts with a steady knife. Mind the loot first - pelts come last."
+      },
+      "leatherworker_brida": {
+        "name": "Leatherworker Brida",
+        "title": "Leatherworking Trainer",
+        "greeting": "Bring me leather and I will show you how to make it hold a shape."
+      },
+      "tailor_marlena": {
+        "name": "Tailor Marlena",
+        "title": "Tailoring Trainer",
+        "greeting": "Bolts of good cloth and a fine thread, {playerName} - that is the whole secret of it."
+      },
+      "tanner_sull": {
+        "name": "Tanner Sull",
+        "title": "Skinning Trainer",
+        "greeting": "Fen-beasts wear hide three times the thickness of vale game, {playerName}. I will teach you to take it whole."
+      },
+      "leatherworker_orsa": {
+        "name": "Leatherworker Orsa",
+        "title": "Leatherworking Trainer",
+        "greeting": "Marsh-cured leather laughs at the rot. Master it here, beyond what Eastbrook could show you."
+      },
+      "tailor_evelle": {
+        "name": "Tailor Evelle",
+        "title": "Tailoring Trainer",
+        "greeting": "A damp fen rots a careless seam in a week. The Journeyman stitch holds through the wettest reeds."
       },
       "tidewatcher_ondrel": {
         "name": "Ондрел Вейн",
@@ -51911,19 +54851,607 @@ export const translations = {
 };
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "abilityUi.cast.skinning",
+    "entities.mobs.craghorn_bear.name",
+    "entities.mobs.frostfang_lynx.name",
+    "entities.npcs.leatherworker_brida.greeting",
+    "entities.npcs.leatherworker_brida.name",
+    "entities.npcs.leatherworker_brida.title",
+    "entities.npcs.leatherworker_orsa.greeting",
+    "entities.npcs.leatherworker_orsa.name",
+    "entities.npcs.leatherworker_orsa.title",
+    "entities.npcs.tailor_evelle.greeting",
+    "entities.npcs.tailor_evelle.name",
+    "entities.npcs.tailor_evelle.title",
+    "entities.npcs.tailor_marlena.greeting",
+    "entities.npcs.tailor_marlena.name",
+    "entities.npcs.tailor_marlena.title",
+    "entities.npcs.tanner_sull.greeting",
+    "entities.npcs.tanner_sull.name",
+    "entities.npcs.tanner_sull.title",
+    "entities.npcs.tanner_yorvek.greeting",
+    "entities.npcs.tanner_yorvek.name",
+    "entities.npcs.tanner_yorvek.title",
+    "game.professions.back",
+    "game.professions.bandageUse",
+    "game.professions.craft",
+    "game.professions.gatheredSuffix",
+    "game.professions.journeymanLabel",
+    "game.professions.learnApprentice",
+    "game.professions.learnJourneyman",
+    "game.professions.learnedBanner",
+    "game.professions.learnedLog",
+    "game.professions.noRecipes",
+    "game.professions.noSkills",
+    "game.professions.nothingToTrain",
+    "game.professions.open",
+    "game.professions.professions",
+    "game.professions.recipeLearnedLog",
+    "game.professions.recipes",
+    "game.professions.requiresProf",
+    "game.professions.secondary",
+    "game.professions.skillIncreased",
+    "game.professions.skillsTitle",
+    "game.professions.taughtAllIKnow",
+    "game.professions.trainTitle",
+    "game.professions.unlearn",
+    "game.professions.unlearnBody",
+    "game.professions.unlearnTitle",
+    "game.professions.unlearnedLog",
+    "itemUi.kind.reagent"
+  ],
+  "es_ES": [
+    "abilityUi.cast.skinning",
+    "entities.mobs.craghorn_bear.name",
+    "entities.mobs.frostfang_lynx.name",
+    "entities.npcs.leatherworker_brida.greeting",
+    "entities.npcs.leatherworker_brida.name",
+    "entities.npcs.leatherworker_brida.title",
+    "entities.npcs.leatherworker_orsa.greeting",
+    "entities.npcs.leatherworker_orsa.name",
+    "entities.npcs.leatherworker_orsa.title",
+    "entities.npcs.tailor_evelle.greeting",
+    "entities.npcs.tailor_evelle.name",
+    "entities.npcs.tailor_evelle.title",
+    "entities.npcs.tailor_marlena.greeting",
+    "entities.npcs.tailor_marlena.name",
+    "entities.npcs.tailor_marlena.title",
+    "entities.npcs.tanner_sull.greeting",
+    "entities.npcs.tanner_sull.name",
+    "entities.npcs.tanner_sull.title",
+    "entities.npcs.tanner_yorvek.greeting",
+    "entities.npcs.tanner_yorvek.name",
+    "entities.npcs.tanner_yorvek.title",
+    "game.professions.back",
+    "game.professions.bandageUse",
+    "game.professions.craft",
+    "game.professions.gatheredSuffix",
+    "game.professions.journeymanLabel",
+    "game.professions.learnApprentice",
+    "game.professions.learnJourneyman",
+    "game.professions.learnedBanner",
+    "game.professions.learnedLog",
+    "game.professions.noRecipes",
+    "game.professions.noSkills",
+    "game.professions.nothingToTrain",
+    "game.professions.open",
+    "game.professions.professions",
+    "game.professions.recipeLearnedLog",
+    "game.professions.recipes",
+    "game.professions.requiresProf",
+    "game.professions.secondary",
+    "game.professions.skillIncreased",
+    "game.professions.skillsTitle",
+    "game.professions.taughtAllIKnow",
+    "game.professions.trainTitle",
+    "game.professions.unlearn",
+    "game.professions.unlearnBody",
+    "game.professions.unlearnTitle",
+    "game.professions.unlearnedLog",
+    "itemUi.kind.reagent"
+  ],
+  "fr_FR": [
+    "abilityUi.cast.skinning",
+    "entities.mobs.craghorn_bear.name",
+    "entities.mobs.frostfang_lynx.name",
+    "entities.npcs.leatherworker_brida.greeting",
+    "entities.npcs.leatherworker_brida.name",
+    "entities.npcs.leatherworker_brida.title",
+    "entities.npcs.leatherworker_orsa.greeting",
+    "entities.npcs.leatherworker_orsa.name",
+    "entities.npcs.leatherworker_orsa.title",
+    "entities.npcs.tailor_evelle.greeting",
+    "entities.npcs.tailor_evelle.name",
+    "entities.npcs.tailor_evelle.title",
+    "entities.npcs.tailor_marlena.greeting",
+    "entities.npcs.tailor_marlena.name",
+    "entities.npcs.tailor_marlena.title",
+    "entities.npcs.tanner_sull.greeting",
+    "entities.npcs.tanner_sull.name",
+    "entities.npcs.tanner_sull.title",
+    "entities.npcs.tanner_yorvek.greeting",
+    "entities.npcs.tanner_yorvek.name",
+    "entities.npcs.tanner_yorvek.title",
+    "game.professions.back",
+    "game.professions.bandageUse",
+    "game.professions.craft",
+    "game.professions.gatheredSuffix",
+    "game.professions.journeymanLabel",
+    "game.professions.learnApprentice",
+    "game.professions.learnJourneyman",
+    "game.professions.learnedBanner",
+    "game.professions.learnedLog",
+    "game.professions.noRecipes",
+    "game.professions.noSkills",
+    "game.professions.nothingToTrain",
+    "game.professions.open",
+    "game.professions.professions",
+    "game.professions.recipeLearnedLog",
+    "game.professions.recipes",
+    "game.professions.requiresProf",
+    "game.professions.secondary",
+    "game.professions.skillIncreased",
+    "game.professions.skillsTitle",
+    "game.professions.taughtAllIKnow",
+    "game.professions.trainTitle",
+    "game.professions.unlearn",
+    "game.professions.unlearnBody",
+    "game.professions.unlearnTitle",
+    "game.professions.unlearnedLog",
+    "itemUi.kind.reagent"
+  ],
+  "fr_CA": [
+    "abilityUi.cast.skinning",
+    "entities.mobs.craghorn_bear.name",
+    "entities.mobs.frostfang_lynx.name",
+    "entities.npcs.leatherworker_brida.greeting",
+    "entities.npcs.leatherworker_brida.name",
+    "entities.npcs.leatherworker_brida.title",
+    "entities.npcs.leatherworker_orsa.greeting",
+    "entities.npcs.leatherworker_orsa.name",
+    "entities.npcs.leatherworker_orsa.title",
+    "entities.npcs.tailor_evelle.greeting",
+    "entities.npcs.tailor_evelle.name",
+    "entities.npcs.tailor_evelle.title",
+    "entities.npcs.tailor_marlena.greeting",
+    "entities.npcs.tailor_marlena.name",
+    "entities.npcs.tailor_marlena.title",
+    "entities.npcs.tanner_sull.greeting",
+    "entities.npcs.tanner_sull.name",
+    "entities.npcs.tanner_sull.title",
+    "entities.npcs.tanner_yorvek.greeting",
+    "entities.npcs.tanner_yorvek.name",
+    "entities.npcs.tanner_yorvek.title",
+    "game.professions.back",
+    "game.professions.bandageUse",
+    "game.professions.craft",
+    "game.professions.gatheredSuffix",
+    "game.professions.journeymanLabel",
+    "game.professions.learnApprentice",
+    "game.professions.learnJourneyman",
+    "game.professions.learnedBanner",
+    "game.professions.learnedLog",
+    "game.professions.noRecipes",
+    "game.professions.noSkills",
+    "game.professions.nothingToTrain",
+    "game.professions.open",
+    "game.professions.professions",
+    "game.professions.recipeLearnedLog",
+    "game.professions.recipes",
+    "game.professions.requiresProf",
+    "game.professions.secondary",
+    "game.professions.skillIncreased",
+    "game.professions.skillsTitle",
+    "game.professions.taughtAllIKnow",
+    "game.professions.trainTitle",
+    "game.professions.unlearn",
+    "game.professions.unlearnBody",
+    "game.professions.unlearnTitle",
+    "game.professions.unlearnedLog",
+    "itemUi.kind.reagent"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": []
+  "it_IT": [
+    "abilityUi.cast.skinning",
+    "entities.mobs.craghorn_bear.name",
+    "entities.mobs.frostfang_lynx.name",
+    "entities.npcs.leatherworker_brida.greeting",
+    "entities.npcs.leatherworker_brida.name",
+    "entities.npcs.leatherworker_brida.title",
+    "entities.npcs.leatherworker_orsa.greeting",
+    "entities.npcs.leatherworker_orsa.name",
+    "entities.npcs.leatherworker_orsa.title",
+    "entities.npcs.tailor_evelle.greeting",
+    "entities.npcs.tailor_evelle.name",
+    "entities.npcs.tailor_evelle.title",
+    "entities.npcs.tailor_marlena.greeting",
+    "entities.npcs.tailor_marlena.name",
+    "entities.npcs.tailor_marlena.title",
+    "entities.npcs.tanner_sull.greeting",
+    "entities.npcs.tanner_sull.name",
+    "entities.npcs.tanner_sull.title",
+    "entities.npcs.tanner_yorvek.greeting",
+    "entities.npcs.tanner_yorvek.name",
+    "entities.npcs.tanner_yorvek.title",
+    "game.professions.back",
+    "game.professions.bandageUse",
+    "game.professions.craft",
+    "game.professions.gatheredSuffix",
+    "game.professions.journeymanLabel",
+    "game.professions.learnApprentice",
+    "game.professions.learnJourneyman",
+    "game.professions.learnedBanner",
+    "game.professions.learnedLog",
+    "game.professions.noRecipes",
+    "game.professions.noSkills",
+    "game.professions.nothingToTrain",
+    "game.professions.open",
+    "game.professions.professions",
+    "game.professions.recipeLearnedLog",
+    "game.professions.recipes",
+    "game.professions.requiresProf",
+    "game.professions.secondary",
+    "game.professions.skillIncreased",
+    "game.professions.skillsTitle",
+    "game.professions.taughtAllIKnow",
+    "game.professions.trainTitle",
+    "game.professions.unlearn",
+    "game.professions.unlearnBody",
+    "game.professions.unlearnTitle",
+    "game.professions.unlearnedLog",
+    "itemUi.kind.reagent"
+  ],
+  "de_DE": [
+    "abilityUi.cast.skinning",
+    "entities.mobs.craghorn_bear.name",
+    "entities.mobs.frostfang_lynx.name",
+    "entities.npcs.leatherworker_brida.greeting",
+    "entities.npcs.leatherworker_brida.name",
+    "entities.npcs.leatherworker_brida.title",
+    "entities.npcs.leatherworker_orsa.greeting",
+    "entities.npcs.leatherworker_orsa.name",
+    "entities.npcs.leatherworker_orsa.title",
+    "entities.npcs.tailor_evelle.greeting",
+    "entities.npcs.tailor_evelle.name",
+    "entities.npcs.tailor_evelle.title",
+    "entities.npcs.tailor_marlena.greeting",
+    "entities.npcs.tailor_marlena.name",
+    "entities.npcs.tailor_marlena.title",
+    "entities.npcs.tanner_sull.greeting",
+    "entities.npcs.tanner_sull.name",
+    "entities.npcs.tanner_sull.title",
+    "entities.npcs.tanner_yorvek.greeting",
+    "entities.npcs.tanner_yorvek.name",
+    "entities.npcs.tanner_yorvek.title",
+    "game.professions.back",
+    "game.professions.bandageUse",
+    "game.professions.craft",
+    "game.professions.gatheredSuffix",
+    "game.professions.journeymanLabel",
+    "game.professions.learnApprentice",
+    "game.professions.learnJourneyman",
+    "game.professions.learnedBanner",
+    "game.professions.learnedLog",
+    "game.professions.noRecipes",
+    "game.professions.noSkills",
+    "game.professions.nothingToTrain",
+    "game.professions.open",
+    "game.professions.professions",
+    "game.professions.recipeLearnedLog",
+    "game.professions.recipes",
+    "game.professions.requiresProf",
+    "game.professions.secondary",
+    "game.professions.skillIncreased",
+    "game.professions.skillsTitle",
+    "game.professions.taughtAllIKnow",
+    "game.professions.trainTitle",
+    "game.professions.unlearn",
+    "game.professions.unlearnBody",
+    "game.professions.unlearnTitle",
+    "game.professions.unlearnedLog",
+    "itemUi.kind.reagent"
+  ],
+  "zh_CN": [
+    "abilityUi.cast.skinning",
+    "entities.mobs.craghorn_bear.name",
+    "entities.mobs.frostfang_lynx.name",
+    "entities.npcs.leatherworker_brida.greeting",
+    "entities.npcs.leatherworker_brida.name",
+    "entities.npcs.leatherworker_brida.title",
+    "entities.npcs.leatherworker_orsa.greeting",
+    "entities.npcs.leatherworker_orsa.name",
+    "entities.npcs.leatherworker_orsa.title",
+    "entities.npcs.tailor_evelle.greeting",
+    "entities.npcs.tailor_evelle.name",
+    "entities.npcs.tailor_evelle.title",
+    "entities.npcs.tailor_marlena.greeting",
+    "entities.npcs.tailor_marlena.name",
+    "entities.npcs.tailor_marlena.title",
+    "entities.npcs.tanner_sull.greeting",
+    "entities.npcs.tanner_sull.name",
+    "entities.npcs.tanner_sull.title",
+    "entities.npcs.tanner_yorvek.greeting",
+    "entities.npcs.tanner_yorvek.name",
+    "entities.npcs.tanner_yorvek.title",
+    "game.professions.back",
+    "game.professions.bandageUse",
+    "game.professions.craft",
+    "game.professions.gatheredSuffix",
+    "game.professions.journeymanLabel",
+    "game.professions.learnApprentice",
+    "game.professions.learnJourneyman",
+    "game.professions.learnedBanner",
+    "game.professions.learnedLog",
+    "game.professions.noRecipes",
+    "game.professions.noSkills",
+    "game.professions.nothingToTrain",
+    "game.professions.open",
+    "game.professions.professions",
+    "game.professions.recipeLearnedLog",
+    "game.professions.recipes",
+    "game.professions.requiresProf",
+    "game.professions.secondary",
+    "game.professions.skillIncreased",
+    "game.professions.skillsTitle",
+    "game.professions.taughtAllIKnow",
+    "game.professions.trainTitle",
+    "game.professions.unlearn",
+    "game.professions.unlearnBody",
+    "game.professions.unlearnTitle",
+    "game.professions.unlearnedLog",
+    "itemUi.kind.reagent"
+  ],
+  "zh_TW": [
+    "abilityUi.cast.skinning",
+    "entities.mobs.craghorn_bear.name",
+    "entities.mobs.frostfang_lynx.name",
+    "entities.npcs.leatherworker_brida.greeting",
+    "entities.npcs.leatherworker_brida.name",
+    "entities.npcs.leatherworker_brida.title",
+    "entities.npcs.leatherworker_orsa.greeting",
+    "entities.npcs.leatherworker_orsa.name",
+    "entities.npcs.leatherworker_orsa.title",
+    "entities.npcs.tailor_evelle.greeting",
+    "entities.npcs.tailor_evelle.name",
+    "entities.npcs.tailor_evelle.title",
+    "entities.npcs.tailor_marlena.greeting",
+    "entities.npcs.tailor_marlena.name",
+    "entities.npcs.tailor_marlena.title",
+    "entities.npcs.tanner_sull.greeting",
+    "entities.npcs.tanner_sull.name",
+    "entities.npcs.tanner_sull.title",
+    "entities.npcs.tanner_yorvek.greeting",
+    "entities.npcs.tanner_yorvek.name",
+    "entities.npcs.tanner_yorvek.title",
+    "game.professions.back",
+    "game.professions.bandageUse",
+    "game.professions.craft",
+    "game.professions.gatheredSuffix",
+    "game.professions.journeymanLabel",
+    "game.professions.learnApprentice",
+    "game.professions.learnJourneyman",
+    "game.professions.learnedBanner",
+    "game.professions.learnedLog",
+    "game.professions.noRecipes",
+    "game.professions.noSkills",
+    "game.professions.nothingToTrain",
+    "game.professions.open",
+    "game.professions.professions",
+    "game.professions.recipeLearnedLog",
+    "game.professions.recipes",
+    "game.professions.requiresProf",
+    "game.professions.secondary",
+    "game.professions.skillIncreased",
+    "game.professions.skillsTitle",
+    "game.professions.taughtAllIKnow",
+    "game.professions.trainTitle",
+    "game.professions.unlearn",
+    "game.professions.unlearnBody",
+    "game.professions.unlearnTitle",
+    "game.professions.unlearnedLog",
+    "itemUi.kind.reagent"
+  ],
+  "ko_KR": [
+    "abilityUi.cast.skinning",
+    "entities.mobs.craghorn_bear.name",
+    "entities.mobs.frostfang_lynx.name",
+    "entities.npcs.leatherworker_brida.greeting",
+    "entities.npcs.leatherworker_brida.name",
+    "entities.npcs.leatherworker_brida.title",
+    "entities.npcs.leatherworker_orsa.greeting",
+    "entities.npcs.leatherworker_orsa.name",
+    "entities.npcs.leatherworker_orsa.title",
+    "entities.npcs.tailor_evelle.greeting",
+    "entities.npcs.tailor_evelle.name",
+    "entities.npcs.tailor_evelle.title",
+    "entities.npcs.tailor_marlena.greeting",
+    "entities.npcs.tailor_marlena.name",
+    "entities.npcs.tailor_marlena.title",
+    "entities.npcs.tanner_sull.greeting",
+    "entities.npcs.tanner_sull.name",
+    "entities.npcs.tanner_sull.title",
+    "entities.npcs.tanner_yorvek.greeting",
+    "entities.npcs.tanner_yorvek.name",
+    "entities.npcs.tanner_yorvek.title",
+    "game.professions.back",
+    "game.professions.bandageUse",
+    "game.professions.craft",
+    "game.professions.gatheredSuffix",
+    "game.professions.journeymanLabel",
+    "game.professions.learnApprentice",
+    "game.professions.learnJourneyman",
+    "game.professions.learnedBanner",
+    "game.professions.learnedLog",
+    "game.professions.noRecipes",
+    "game.professions.noSkills",
+    "game.professions.nothingToTrain",
+    "game.professions.open",
+    "game.professions.professions",
+    "game.professions.recipeLearnedLog",
+    "game.professions.recipes",
+    "game.professions.requiresProf",
+    "game.professions.secondary",
+    "game.professions.skillIncreased",
+    "game.professions.skillsTitle",
+    "game.professions.taughtAllIKnow",
+    "game.professions.trainTitle",
+    "game.professions.unlearn",
+    "game.professions.unlearnBody",
+    "game.professions.unlearnTitle",
+    "game.professions.unlearnedLog",
+    "itemUi.kind.reagent"
+  ],
+  "ja_JP": [
+    "abilityUi.cast.skinning",
+    "entities.mobs.craghorn_bear.name",
+    "entities.mobs.frostfang_lynx.name",
+    "entities.npcs.leatherworker_brida.greeting",
+    "entities.npcs.leatherworker_brida.name",
+    "entities.npcs.leatherworker_brida.title",
+    "entities.npcs.leatherworker_orsa.greeting",
+    "entities.npcs.leatherworker_orsa.name",
+    "entities.npcs.leatherworker_orsa.title",
+    "entities.npcs.tailor_evelle.greeting",
+    "entities.npcs.tailor_evelle.name",
+    "entities.npcs.tailor_evelle.title",
+    "entities.npcs.tailor_marlena.greeting",
+    "entities.npcs.tailor_marlena.name",
+    "entities.npcs.tailor_marlena.title",
+    "entities.npcs.tanner_sull.greeting",
+    "entities.npcs.tanner_sull.name",
+    "entities.npcs.tanner_sull.title",
+    "entities.npcs.tanner_yorvek.greeting",
+    "entities.npcs.tanner_yorvek.name",
+    "entities.npcs.tanner_yorvek.title",
+    "game.professions.back",
+    "game.professions.bandageUse",
+    "game.professions.craft",
+    "game.professions.gatheredSuffix",
+    "game.professions.journeymanLabel",
+    "game.professions.learnApprentice",
+    "game.professions.learnJourneyman",
+    "game.professions.learnedBanner",
+    "game.professions.learnedLog",
+    "game.professions.noRecipes",
+    "game.professions.noSkills",
+    "game.professions.nothingToTrain",
+    "game.professions.open",
+    "game.professions.professions",
+    "game.professions.recipeLearnedLog",
+    "game.professions.recipes",
+    "game.professions.requiresProf",
+    "game.professions.secondary",
+    "game.professions.skillIncreased",
+    "game.professions.skillsTitle",
+    "game.professions.taughtAllIKnow",
+    "game.professions.trainTitle",
+    "game.professions.unlearn",
+    "game.professions.unlearnBody",
+    "game.professions.unlearnTitle",
+    "game.professions.unlearnedLog",
+    "itemUi.kind.reagent"
+  ],
+  "pt_BR": [
+    "abilityUi.cast.skinning",
+    "entities.mobs.craghorn_bear.name",
+    "entities.mobs.frostfang_lynx.name",
+    "entities.npcs.leatherworker_brida.greeting",
+    "entities.npcs.leatherworker_brida.name",
+    "entities.npcs.leatherworker_brida.title",
+    "entities.npcs.leatherworker_orsa.greeting",
+    "entities.npcs.leatherworker_orsa.name",
+    "entities.npcs.leatherworker_orsa.title",
+    "entities.npcs.tailor_evelle.greeting",
+    "entities.npcs.tailor_evelle.name",
+    "entities.npcs.tailor_evelle.title",
+    "entities.npcs.tailor_marlena.greeting",
+    "entities.npcs.tailor_marlena.name",
+    "entities.npcs.tailor_marlena.title",
+    "entities.npcs.tanner_sull.greeting",
+    "entities.npcs.tanner_sull.name",
+    "entities.npcs.tanner_sull.title",
+    "entities.npcs.tanner_yorvek.greeting",
+    "entities.npcs.tanner_yorvek.name",
+    "entities.npcs.tanner_yorvek.title",
+    "game.professions.back",
+    "game.professions.bandageUse",
+    "game.professions.craft",
+    "game.professions.gatheredSuffix",
+    "game.professions.journeymanLabel",
+    "game.professions.learnApprentice",
+    "game.professions.learnJourneyman",
+    "game.professions.learnedBanner",
+    "game.professions.learnedLog",
+    "game.professions.noRecipes",
+    "game.professions.noSkills",
+    "game.professions.nothingToTrain",
+    "game.professions.open",
+    "game.professions.professions",
+    "game.professions.recipeLearnedLog",
+    "game.professions.recipes",
+    "game.professions.requiresProf",
+    "game.professions.secondary",
+    "game.professions.skillIncreased",
+    "game.professions.skillsTitle",
+    "game.professions.taughtAllIKnow",
+    "game.professions.trainTitle",
+    "game.professions.unlearn",
+    "game.professions.unlearnBody",
+    "game.professions.unlearnTitle",
+    "game.professions.unlearnedLog",
+    "itemUi.kind.reagent"
+  ],
+  "ru_RU": [
+    "abilityUi.cast.skinning",
+    "entities.mobs.craghorn_bear.name",
+    "entities.mobs.frostfang_lynx.name",
+    "entities.npcs.leatherworker_brida.greeting",
+    "entities.npcs.leatherworker_brida.name",
+    "entities.npcs.leatherworker_brida.title",
+    "entities.npcs.leatherworker_orsa.greeting",
+    "entities.npcs.leatherworker_orsa.name",
+    "entities.npcs.leatherworker_orsa.title",
+    "entities.npcs.tailor_evelle.greeting",
+    "entities.npcs.tailor_evelle.name",
+    "entities.npcs.tailor_evelle.title",
+    "entities.npcs.tailor_marlena.greeting",
+    "entities.npcs.tailor_marlena.name",
+    "entities.npcs.tailor_marlena.title",
+    "entities.npcs.tanner_sull.greeting",
+    "entities.npcs.tanner_sull.name",
+    "entities.npcs.tanner_sull.title",
+    "entities.npcs.tanner_yorvek.greeting",
+    "entities.npcs.tanner_yorvek.name",
+    "entities.npcs.tanner_yorvek.title",
+    "game.professions.back",
+    "game.professions.bandageUse",
+    "game.professions.craft",
+    "game.professions.gatheredSuffix",
+    "game.professions.journeymanLabel",
+    "game.professions.learnApprentice",
+    "game.professions.learnJourneyman",
+    "game.professions.learnedBanner",
+    "game.professions.learnedLog",
+    "game.professions.noRecipes",
+    "game.professions.noSkills",
+    "game.professions.nothingToTrain",
+    "game.professions.open",
+    "game.professions.professions",
+    "game.professions.recipeLearnedLog",
+    "game.professions.recipes",
+    "game.professions.requiresProf",
+    "game.professions.secondary",
+    "game.professions.skillIncreased",
+    "game.professions.skillsTitle",
+    "game.professions.taughtAllIKnow",
+    "game.professions.trainTitle",
+    "game.professions.unlearn",
+    "game.professions.unlearnBody",
+    "game.professions.unlearnTitle",
+    "game.professions.unlearnedLog",
+    "itemUi.kind.reagent"
+  ]
 };
 
 export const en_XA: EnTranslations = {
@@ -52049,6 +55577,34 @@ export const en_XA: EnTranslations = {
       "save": "[Šáʋé]",
       "comingSoonTitle": "[Ţáļéñţš çóɱíñĝ šóóñ]",
       "comingSoonBody": "[Ţĥíš çļášš ðóéš ñóţ ĥáʋé ţáļéñţ ţŕééš ýéţ. Ýóú çáñ ķééþ þļáýíñĝ ñóŕɱáļļý; ƒúļļ ţŕééš ŵíļļ áŕŕíʋé íñ á ƒúţúŕé úþðáţé.]"
+    },
+    "professions": {
+      "skillsTitle": "[Šķíļļš]",
+      "professions": "[Þŕóƒéššíóñš]",
+      "secondary": "[Šéçóñðáŕý Šķíļļš]",
+      "open": "[Óþéñ]",
+      "noSkills": "[Ýóú ĥáʋé ñóţ ļéáŕñéð áñý þŕóƒéššíóñš óŕ šéçóñðáŕý šķíļļš ýéţ. Šééķ óúţ á ţŕáíñéŕ.]",
+      "craft": "[Çŕáƒţ]",
+      "noRecipes": "[Ýóú ĥáʋé ñóţ ļéáŕñéð áñý ŕéçíþéš ýéţ. Ʋíšíţ á ţŕáíñéŕ ţó ļéáŕñ ţĥéɱ.]",
+      "trainTitle": "[Ţŕáíñ {name}]",
+      "learnApprentice": "[Ļéáŕñ {name} (Áþþŕéñţíçé)]",
+      "learnJourneyman": "[Ļéáŕñ Ĵóúŕñéýɱáñ {name}]",
+      "recipes": "[Ŕéçíþéš]",
+      "nothingToTrain": "[Ñóţĥíñĝ ñéŵ ţó ţŕáíñ ŕíĝĥţ ñóŵ. Ŕáíšé ýóúŕ šķíļļ áñð ŕéţúŕñ.]",
+      "taughtAllIKnow": "[Í'ʋé ţáúĝĥţ ýóú áļļ Í ķñóŵ.]",
+      "unlearn": "[Úñļéáŕñ]",
+      "unlearnTitle": "[Úñļéáŕñ {name}?]",
+      "unlearnBody": "[Úñļéáŕñ {name}? Ýóú ŵíļļ ļóšé áļļ šķíļļ þŕóĝŕéšš áñð éʋéŕý ŕéçíþé ýóú ĥáʋé ļéáŕñéð ƒóŕ íţ. Á þŕíɱáŕý þŕóƒéššíóñ ƒŕééš íţš šļóţ šó ýóú çáñ ļéáŕñ áñóţĥéŕ.]",
+      "unlearnedLog": "[Ýóú ĥáʋé úñļéáŕñéð {name}.]",
+      "back": "[← Ɓáçķ]",
+      "gatheredSuffix": "[ (ĝáţĥéŕéð íñ ţĥé ŵóŕļð)]",
+      "skillIncreased": "[Ýóúŕ šķíļļ íñ {name} íñçŕéášéð ţó {skill}.]",
+      "journeymanLabel": "[Ĵóúŕñéýɱáñ {name}]",
+      "learnedBanner": "[Ļéáŕñéð {label}]",
+      "learnedLog": "[Ýóú ĥáʋé ļéáŕñéð {label}.]",
+      "recipeLearnedLog": "[Ýóú ĥáʋé ļéáŕñéð ţó ɱáķé {name}.]",
+      "bandageUse": "[Úšé: Çĥáññéļ á ĥéáļ ƒóŕ {heal} ĥéáļţĥ óʋéŕ {time} šéç. Ţĥé ţáŕĝéţ çáññóţ ƀé ƀáñðáĝéð áĝáíñ ƒóŕ 1 ɱíñ, áñð ţĥé çĥáññéļ ƀŕéáķš íƒ ýóú ɱóʋé óŕ ţáķé ðáɱáĝé.]",
+      "requiresProf": "[Ŕéɋúíŕéš {name} ({skill})]"
     }
   },
   "nav": {
@@ -52924,7 +56480,8 @@ export const en_XA: EnTranslations = {
     },
     "cast": {
       "fishing": "[Ƒíšĥíñĝ]",
-      "demonHeal": "[Ðéɱóñ Ĥéáļ]"
+      "demonHeal": "[Ðéɱóñ Ĥéáļ]",
+      "skinning": "[Šķíññíñĝ]"
     }
   },
   "questUi": {
@@ -53026,7 +56583,8 @@ export const en_XA: EnTranslations = {
       "food": "[Ƒóóð]",
       "drink": "[Ðŕíñķ]",
       "tool": "[Ţóóļ]",
-      "potion": "[Þóţíóñ]"
+      "potion": "[Þóţíóñ]",
+      "reagent": "[Ţŕáðé Ĝóóð]"
     },
     "stats": {
       "armor": "[Áŕɱóŕ]",
@@ -54064,6 +57622,150 @@ export const en_XA: EnTranslations = {
       "cracked_wyrm_scale": {
         "name": "[Çŕáçķéð Ŵýŕɱ Šçáļé]"
       },
+      "bolt_of_linen": {
+        "name": "[Ɓóļţ óƒ Ļíñéñ Çļóţĥ]"
+      },
+      "bolt_of_silk": {
+        "name": "[Ɓóļţ óƒ Šíļķ Çļóţĥ]"
+      },
+      "bolt_of_woolen": {
+        "name": "[Ɓóļţ óƒ Ŵóóļéñ Çļóţĥ]"
+      },
+      "coarse_thread": {
+        "name": "[Çóáŕšé Ţĥŕéáð]"
+      },
+      "cured_heavy_hide": {
+        "name": "[Çúŕéð Ĥéáʋý Ĥíðé]"
+      },
+      "cured_leather_pants": {
+        "name": "[Çúŕéð Ļéáţĥéŕ Þáñţš]"
+      },
+      "cured_light_hide": {
+        "name": "[Çúŕéð Ļíĝĥţ Ĥíðé]"
+      },
+      "cured_medium_hide": {
+        "name": "[Çúŕéð Ɱéðíúɱ Ĥíðé]"
+      },
+      "direhide_legguards": {
+        "name": "[Ðíŕéĥíðé Ļéĝĝúáŕðš]"
+      },
+      "fine_thread": {
+        "name": "[Ƒíñé Ţĥŕéáð]"
+      },
+      "heavy_hide": {
+        "name": "[Ĥéáʋý Ĥíðé]"
+      },
+      "heavy_leather": {
+        "name": "[Ĥéáʋý Ļéáţĥéŕ]"
+      },
+      "heavy_leather_straps": {
+        "name": "[Ĥéáʋý Ļéáţĥéŕ Šţŕáþš]"
+      },
+      "heavy_leather_vest": {
+        "name": "[Ĥéáʋý Ļéáţĥéŕ Ʋéšţ]"
+      },
+      "heavy_linen_bandage": {
+        "name": "[Ĥéáʋý Ļíñéñ Ɓáñðáĝé]"
+      },
+      "heavy_silk_bandage": {
+        "name": "[Ĥéáʋý Šíļķ Ɓáñðáĝé]"
+      },
+      "heavy_wool_bandage": {
+        "name": "[Ĥéáʋý Ŵóóļ Ɓáñðáĝé]"
+      },
+      "light_hide": {
+        "name": "[Ļíĝĥţ Ĥíðé]"
+      },
+      "light_leather": {
+        "name": "[Ļíĝĥţ Ļéáţĥéŕ]"
+      },
+      "light_leather_boots": {
+        "name": "[Ļíĝĥţ Ļéáţĥéŕ Ɓóóţš]"
+      },
+      "light_leather_straps": {
+        "name": "[Ļíĝĥţ Ļéáţĥéŕ Šţŕáþš]"
+      },
+      "light_leather_vest": {
+        "name": "[Ļíĝĥţ Ļéáţĥéŕ Ʋéšţ]"
+      },
+      "linen_bandage": {
+        "name": "[Ļíñéñ Ɓáñðáĝé]"
+      },
+      "linen_boots": {
+        "name": "[Ļíñéñ Ɓóóţš]"
+      },
+      "linen_cloth": {
+        "name": "[Ļíñéñ Çļóţĥ]"
+      },
+      "linen_pants": {
+        "name": "[Ļíñéñ Þáñţš]"
+      },
+      "linen_robe": {
+        "name": "[Ļíñéñ Ŕóƀé]"
+      },
+      "medium_hide": {
+        "name": "[Ɱéðíúɱ Ĥíðé]"
+      },
+      "medium_leather": {
+        "name": "[Ɱéðíúɱ Ļéáţĥéŕ]"
+      },
+      "medium_leather_boots": {
+        "name": "[Ɱéðíúɱ Ļéáţĥéŕ Ɓóóţš]"
+      },
+      "medium_leather_pants": {
+        "name": "[Ɱéðíúɱ Ļéáţĥéŕ Þáñţš]"
+      },
+      "medium_leather_vest": {
+        "name": "[Ɱéðíúɱ Ļéáţĥéŕ Ʋéšţ]"
+      },
+      "rough_thread": {
+        "name": "[Ŕóúĝĥ Ţĥŕéáð]"
+      },
+      "ruined_leather_scraps": {
+        "name": "[Ŕúíñéð Ļéáţĥéŕ Šçŕáþš]"
+      },
+      "salt": {
+        "name": "[Ŕéƒíñéð Šáļţ]"
+      },
+      "silk_bandage": {
+        "name": "[Šíļķ Ɓáñðáĝé]"
+      },
+      "silk_brocade_robe": {
+        "name": "[Šíļķ Ɓŕóçáðé Ŕóƀé]"
+      },
+      "silk_cloth": {
+        "name": "[Šíļķ Çļóţĥ]"
+      },
+      "silk_leggings": {
+        "name": "[Šíļķ Ļéĝĝíñĝš]"
+      },
+      "silk_scrap": {
+        "name": "[Šíļķ Šçŕáþ]"
+      },
+      "silk_slippers": {
+        "name": "[Šíļķ Šļíþþéŕš]"
+      },
+      "studded_leather_vest": {
+        "name": "[Šţúððéð Ļéáţĥéŕ Ʋéšţ]"
+      },
+      "wool_bandage": {
+        "name": "[Ŵóóļ Ɓáñðáĝé]"
+      },
+      "wool_cloth": {
+        "name": "[Ŵóóļ Çļóţĥ]"
+      },
+      "wool_scrap": {
+        "name": "[Ŵóóļ Šçŕáþ]"
+      },
+      "woolen_leggings": {
+        "name": "[Ŵóóļéñ Ļéĝĝíñĝš]"
+      },
+      "woolen_slippers": {
+        "name": "[Ŵóóļéñ Šļíþþéŕš]"
+      },
+      "woolen_tunic": {
+        "name": "[Ŵóóļéñ Ţúñíç]"
+      },
       "bristleback_maul": {
         "name": "[Ɓŕíšţļéƀáçķ Ɱáúļ]"
       },
@@ -54507,6 +58209,12 @@ export const en_XA: EnTranslations = {
       "bound_guardian": {
         "name": "[Ţĥé Ɓóúñð Ĝúáŕðíáñ]"
       },
+      "craghorn_bear": {
+        "name": "[Çŕáĝĥóŕñ Ɓéáŕ]"
+      },
+      "frostfang_lynx": {
+        "name": "[Ƒŕóšţƒáñĝ Ļýñẋ]"
+      },
       "elder_bristleback": {
         "name": "[Éļðéŕ Ɓŕíšţļéƀáçķ]"
       },
@@ -54684,6 +58392,36 @@ export const en_XA: EnTranslations = {
         "name": "[Ļóŕéɱášţéŕ Çáððíš]",
         "title": "[Ļóŕéɱášţéŕ]",
         "greeting": "[Ɱíñð ţĥé ļóóšé šĥáļé, {className}. Ţĥé ɱóúñţáíñ ĥáš ƀééñ... ŕéšţļéšš óƒ ļáţé. Í íñţéñð ţó ļéáŕñ ŵĥý.]"
+      },
+      "tanner_yorvek": {
+        "name": "[Ţáññéŕ Ýóŕʋéķ]",
+        "title": "[Šķíññíñĝ Ţŕáíñéŕ]",
+        "greeting": "[Á çļéáñ šķíñ šţáŕţš ŵíţĥ á šţéáðý ķñíƒé. Ɱíñð ţĥé ļóóţ ƒíŕšţ - þéļţš çóɱé ļášţ.]"
+      },
+      "leatherworker_brida": {
+        "name": "[Ļéáţĥéŕŵóŕķéŕ Ɓŕíðá]",
+        "title": "[Ļéáţĥéŕŵóŕķíñĝ Ţŕáíñéŕ]",
+        "greeting": "[Ɓŕíñĝ ɱé ļéáţĥéŕ áñð Í ŵíļļ šĥóŵ ýóú ĥóŵ ţó ɱáķé íţ ĥóļð á šĥáþé.]"
+      },
+      "tailor_marlena": {
+        "name": "[Ţáíļóŕ Ɱáŕļéñá]",
+        "title": "[Ţáíļóŕíñĝ Ţŕáíñéŕ]",
+        "greeting": "[Ɓóļţš óƒ ĝóóð çļóţĥ áñð á ƒíñé ţĥŕéáð, {playerName} - ţĥáţ íš ţĥé ŵĥóļé šéçŕéţ óƒ íţ.]"
+      },
+      "tanner_sull": {
+        "name": "[Ţáññéŕ Šúļļ]",
+        "title": "[Šķíññíñĝ Ţŕáíñéŕ]",
+        "greeting": "[Ƒéñ-ƀéášţš ŵéáŕ ĥíðé ţĥŕéé ţíɱéš ţĥé ţĥíçķñéšš óƒ ʋáļé ĝáɱé, {playerName}. Í ŵíļļ ţéáçĥ ýóú ţó ţáķé íţ ŵĥóļé.]"
+      },
+      "leatherworker_orsa": {
+        "name": "[Ļéáţĥéŕŵóŕķéŕ Óŕšá]",
+        "title": "[Ļéáţĥéŕŵóŕķíñĝ Ţŕáíñéŕ]",
+        "greeting": "[Ɱáŕšĥ-çúŕéð ļéáţĥéŕ ļáúĝĥš áţ ţĥé ŕóţ. Ɱášţéŕ íţ ĥéŕé, ƀéýóñð ŵĥáţ Éášţƀŕóóķ çóúļð šĥóŵ ýóú.]"
+      },
+      "tailor_evelle": {
+        "name": "[Ţáíļóŕ Éʋéļļé]",
+        "title": "[Ţáíļóŕíñĝ Ţŕáíñéŕ]",
+        "greeting": "[Á ðáɱþ ƒéñ ŕóţš á çáŕéļéšš šéáɱ íñ á ŵééķ. Ţĥé Ĵóúŕñéýɱáñ šţíţçĥ ĥóļðš ţĥŕóúĝĥ ţĥé ŵéţţéšţ ŕééðš.]"
       },
       "tidewatcher_ondrel": {
         "name": "[Óñðŕéļ Ʋáñé]",

@@ -208,6 +208,7 @@ function dynamicFields(e: Entity): Record<string, unknown> {
   };
   if (e.dead) out.dead = 1;
   if (e.lootable) out.loot = 1;
+  if (e.skinned) out.skd = 1;
   if (e.hostile) out.h = 1;
   if (e.castingAbility) {
     out.cast = e.castingAbility;
@@ -934,6 +935,7 @@ export class GameServer {
       case 'stopattack': sim.stopAutoAttack(pid); break;
       case 'interact': sim.interact(pid); break;
       case 'loot': if (typeof msg.id === 'number') sim.lootCorpse(msg.id, pid); break;
+      case 'skin': if (typeof msg.id === 'number') sim.skin(msg.id, pid); break;
       case 'pickup': if (typeof msg.id === 'number') sim.pickUpObject(msg.id, pid); break;
       case 'accept': if (typeof msg.quest === 'string') { sim.acceptQuest(msg.quest, pid); this.resyncQuests(session); } break;
       case 'turnin': if (typeof msg.quest === 'string') { sim.turnInQuest(msg.quest, pid); this.resyncQuests(session); } break;
@@ -1083,6 +1085,22 @@ export class GameServer {
       }
       case 'respec': sim.respec(pid); break;
       case 'setSpec': sim.setSpec(typeof msg.spec === 'string' ? msg.spec : null, pid); break;
+
+      // Professions & secondary skills — learn/craft validated inside the Sim.
+      case 'learnProfession':
+        if (typeof msg.prof === 'string' && (msg.tier === 'apprentice' || msg.tier === 'journeyman')) {
+          sim.learnProfession(msg.prof, msg.tier, pid);
+        }
+        break;
+      case 'learnRecipe':
+        if (typeof msg.recipe === 'string') sim.learnRecipe(msg.recipe, pid);
+        break;
+      case 'dropProfession':
+        if (typeof msg.prof === 'string') sim.dropProfession(msg.prof, pid);
+        break;
+      case 'craft':
+        if (typeof msg.recipe === 'string') sim.craft(msg.recipe, pid);
+        break;
       case 'saveLoadout': {
         const a = msg.alloc;
         const alloc = a && typeof a === 'object'
@@ -1326,6 +1344,11 @@ export class GameServer {
     // talents/spec/loadouts ride the wire only when they change (PR-5: never
     // every snapshot). The client recomputes its known abilities from this.
     maybe('tal', { alloc: meta.talents, spec: meta.talentMods.spec, role: meta.talentMods.role, loadouts: meta.loadouts, activeLoadout: meta.activeLoadout });
+    // professions/secondary skills ride the wire only when they change
+    maybe('skills', meta.professionSkills);
+    maybe('profTiers', meta.professionTiers);
+    // stable array kept in sync on add, avoids spreading the Set every snapshot
+    maybe('recipes', meta.learnedRecipesArr);
     return extra === '' ? json : json.slice(0, -1) + extra + '}';
   }
 
