@@ -741,22 +741,6 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     id: 'fang_of_korzul', name: 'Fang of Korzul', kind: 'weapon', slot: 'mainhand', quality: 'epic',
     weapon: { min: 19, max: 30, speed: 1.7, dagger: true }, stats: { agi: 11, sta: 5 }, sellValue: 8000, requiredClass: ['rogue', 'hunter'],
   },
-  // --- Inventory 2.0 epics: one per armor archetype, filling the new slots and
-  // named into the existing Deathlord/Necromancer's/Wyrmshadow Korzul epic families.
-  // Budgeted just under the matching chest epic and slot-weighted (head≈1.0,
-  // shoulder≈0.75, gloves≈0.65) so they slot cleanly into each set. ---
-  deathlords_dread_visage: {
-    id: 'deathlords_dread_visage', name: "Deathlord's Dread Visage", kind: 'armor', slot: 'helmet', quality: 'epic',
-    stats: { armor: 245, str: 7, sta: 9 }, sellValue: 9000, requiredClass: ['warrior', 'paladin', 'shaman'],
-  },
-  necromancers_soulspire_mantle: {
-    id: 'necromancers_soulspire_mantle', name: "Necromancer's Soulspire Mantle", kind: 'armor', slot: 'shoulder', quality: 'epic',
-    stats: { armor: 70, int: 11, spi: 6 }, sellValue: 9000, requiredClass: ['mage', 'priest', 'warlock', 'druid'],
-  },
-  wyrmshadow_talongrips: {
-    id: 'wyrmshadow_talongrips', name: 'Wyrmshadow Talongrips', kind: 'armor', slot: 'gloves', quality: 'epic',
-    stats: { armor: 110, agi: 10, sta: 5 }, sellValue: 9000, requiredClass: ['rogue', 'hunter'],
-  },
   // --- vendor food & drink (Quartermaster Bree) ---
   trail_hardtack: {
     id: 'trail_hardtack', name: 'Highwatch Trail Hardtack', kind: 'food', quality: 'common',

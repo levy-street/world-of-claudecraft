@@ -5403,12 +5403,8 @@ const itemStringsEn = {
     },
     slots: {
       mainhand: "Main Hand",
-      helmet: "Helmet",
-      shoulder: "Shoulder",
       chest: "Chest",
-      waist: "Waist",
       legs: "Legs",
-      gloves: "Gloves",
       feet: "Feet",
     },
     quality: {
@@ -5542,7 +5538,7 @@ const itemStrings = {
   es: {
     itemUi: {
       money: { goldShort: "o", silverShort: "p", copperShort: "c", gold: "oro", silver: "plata", copper: "cobre" },
-      slots: { mainhand: "Mano principal", chest: "Pecho", legs: "Piernas", feet: "Pies", helmet: "Helmet", shoulder: "Shoulder", waist: "Waist", gloves: "Gloves" /* i18n-todo */ },
+      slots: { mainhand: "Mano principal", chest: "Pecho", legs: "Piernas", feet: "Pies" },
       quality: { poor: "Pobre", common: "Común", uncommon: "Poco común", rare: "Raro", epic: "Épico" },
       kind: { weapon: "Arma", armor: "Armadura", quest: "Objeto de misión", junk: "Chatarra", food: "Comida", drink: "Bebida" },
       stats: { armor: "Armadura", str: "Fuerza", agi: "Agilidad", sta: "Aguante", int: "Intelecto", spi: "Espíritu", attackPower: "Poder de ataque", dps: "Daño/seg", critChance: "Prob. de crítico", dodge: "Esquiva" },
@@ -5565,7 +5561,7 @@ const itemStrings = {
   fr_FR: {
     itemUi: {
       money: { goldShort: "po", silverShort: "pa", copperShort: "pc", gold: "or", silver: "argent", copper: "cuivre" },
-      slots: { mainhand: "Main droite", chest: "Torse", legs: "Jambes", feet: "Pieds", helmet: "Helmet", shoulder: "Shoulder", waist: "Waist", gloves: "Gloves" /* i18n-todo */ },
+      slots: { mainhand: "Main droite", chest: "Torse", legs: "Jambes", feet: "Pieds" },
       quality: { poor: "Médiocre", common: "Commun", uncommon: "Inhabituel", rare: "Rare", epic: "Épique" },
       kind: { weapon: "Arme", armor: "Armure", quest: "Objet de quête", junk: "Camelote", food: "Nourriture", drink: "Boisson" },
       stats: { armor: "Armure", str: "Force", agi: "Agilité", sta: "Endurance", int: "Intelligence", spi: "Esprit", attackPower: "Puissance d'attaque", dps: "Dégâts/s", critChance: "Chances de critique", dodge: "Esquive" },
@@ -5589,7 +5585,7 @@ const itemStrings = {
   it_IT: {
     itemUi: {
       money: { goldShort: "o", silverShort: "a", copperShort: "r", gold: "oro", silver: "argento", copper: "rame" },
-      slots: { mainhand: "Mano principale", chest: "Torace", legs: "Gambe", feet: "Piedi", helmet: "Helmet", shoulder: "Shoulder", waist: "Waist", gloves: "Gloves" /* i18n-todo */ },
+      slots: { mainhand: "Mano principale", chest: "Torace", legs: "Gambe", feet: "Piedi" },
       quality: { poor: "Scadente", common: "Comune", uncommon: "Non comune", rare: "Raro", epic: "Epico" },
       kind: { weapon: "Arma", armor: "Armatura", quest: "Oggetto missione", junk: "Cianfrusaglia", food: "Cibo", drink: "Bevanda" },
       stats: { armor: "Armatura", str: "Forza", agi: "Agilità", sta: "Tempra", int: "Intelletto", spi: "Spirito", attackPower: "Potenza d'attacco", dps: "Danni/sec", critChance: "Prob. critico", dodge: "Schivata" },
@@ -5611,7 +5607,7 @@ const itemStrings = {
   de_DE: {
     itemUi: {
       money: { goldShort: "G", silverShort: "S", copperShort: "K", gold: "Gold", silver: "Silber", copper: "Kupfer" },
-      slots: { mainhand: "Waffenhand", chest: "Brust", legs: "Beine", feet: "Füße", helmet: "Helmet", shoulder: "Shoulder", waist: "Waist", gloves: "Gloves" /* i18n-todo */ },
+      slots: { mainhand: "Waffenhand", chest: "Brust", legs: "Beine", feet: "Füße" },
       quality: { poor: "Schlecht", common: "Gewöhnlich", uncommon: "Ungewöhnlich", rare: "Selten", epic: "Episch" },
       kind: { weapon: "Waffe", armor: "Rüstung", quest: "Questgegenstand", junk: "Plunder", food: "Essen", drink: "Getränk" },
       stats: { armor: "Rüstung", str: "Stärke", agi: "Beweglichkeit", sta: "Ausdauer", int: "Intelligenz", spi: "Willenskraft", attackPower: "Angriffskraft", dps: "Schaden/Sek.", critChance: "Krit. Chance", dodge: "Ausweichen" },
@@ -5633,7 +5629,7 @@ const itemStrings = {
   zh_CN: {
     itemUi: {
       money: { goldShort: "金", silverShort: "银", copperShort: "铜", gold: "金币", silver: "银币", copper: "铜币" },
-      slots: { mainhand: "主手", chest: "胸部", legs: "腿部", feet: "脚部", helmet: "Helmet", shoulder: "Shoulder", waist: "Waist", gloves: "Gloves" /* i18n-todo */ },
+      slots: { mainhand: "主手", chest: "胸部", legs: "腿部", feet: "脚部" },
       quality: { poor: "粗糙", common: "普通", uncommon: "优秀", rare: "精良", epic: "史诗" },
       kind: { weapon: "武器", armor: "护甲", quest: "任务物品", junk: "杂物", food: "食物", drink: "饮料" },
       stats: { armor: "护甲", str: "力量", agi: "敏捷", sta: "耐力", int: "智力", spi: "精神", attackPower: "攻击强度", dps: "每秒伤害", critChance: "暴击几率", dodge: "躲闪" },
@@ -5655,7 +5651,7 @@ const itemStrings = {
   zh_TW: {
     itemUi: {
       money: { goldShort: "金", silverShort: "銀", copperShort: "銅", gold: "金幣", silver: "銀幣", copper: "銅幣" },
-      slots: { mainhand: "主手", chest: "胸部", legs: "腿部", feet: "腳部", helmet: "Helmet", shoulder: "Shoulder", waist: "Waist", gloves: "Gloves" /* i18n-todo */ },
+      slots: { mainhand: "主手", chest: "胸部", legs: "腿部", feet: "腳部" },
       quality: { poor: "粗糙", common: "普通", uncommon: "優秀", rare: "精良", epic: "史詩" },
       kind: { weapon: "武器", armor: "護甲", quest: "任務物品", junk: "雜物", food: "食物", drink: "飲料" },
       stats: { armor: "護甲", str: "力量", agi: "敏捷", sta: "耐力", int: "智力", spi: "精神", attackPower: "攻擊強度", dps: "每秒傷害", critChance: "爆擊機率", dodge: "閃躲" },
@@ -5677,7 +5673,7 @@ const itemStrings = {
   ko_KR: {
     itemUi: {
       money: { goldShort: "금", silverShort: "은", copperShort: "동", gold: "금화", silver: "은화", copper: "동화" },
-      slots: { mainhand: "주장비", chest: "가슴", legs: "다리", feet: "발", helmet: "Helmet", shoulder: "Shoulder", waist: "Waist", gloves: "Gloves" /* i18n-todo */ },
+      slots: { mainhand: "주장비", chest: "가슴", legs: "다리", feet: "발" },
       quality: { poor: "하급", common: "일반", uncommon: "고급", rare: "희귀", epic: "영웅" },
       kind: { weapon: "무기", armor: "방어구", quest: "퀘스트 아이템", junk: "잡동사니", food: "음식", drink: "음료" },
       stats: { armor: "방어도", str: "힘", agi: "민첩성", sta: "체력", int: "지능", spi: "정신력", attackPower: "전투력", dps: "초당 피해", critChance: "치명타율", dodge: "회피" },
@@ -5699,7 +5695,7 @@ const itemStrings = {
   ja_JP: {
     itemUi: {
       money: { goldShort: "金", silverShort: "銀", copperShort: "銅", gold: "金貨", silver: "銀貨", copper: "銅貨" },
-      slots: { mainhand: "メインハンド", chest: "胸", legs: "脚", feet: "足", helmet: "Helmet", shoulder: "Shoulder", waist: "Waist", gloves: "Gloves" /* i18n-todo */ },
+      slots: { mainhand: "メインハンド", chest: "胸", legs: "脚", feet: "足" },
       quality: { poor: "粗悪", common: "一般", uncommon: "良質", rare: "レア", epic: "エピック" },
       kind: { weapon: "武器", armor: "防具", quest: "クエストアイテム", junk: "雑貨", food: "食べ物", drink: "飲み物" },
       stats: { armor: "防御力", str: "筋力", agi: "敏捷性", sta: "スタミナ", int: "知力", spi: "精神力", attackPower: "攻撃力", dps: "秒間ダメージ", critChance: "クリティカル率", dodge: "回避" },
@@ -5721,7 +5717,7 @@ const itemStrings = {
   pt_BR: {
     itemUi: {
       money: { goldShort: "o", silverShort: "p", copperShort: "c", gold: "ouro", silver: "prata", copper: "cobre" },
-      slots: { mainhand: "Mão principal", chest: "Peito", legs: "Pernas", feet: "Pés", helmet: "Helmet", shoulder: "Shoulder", waist: "Waist", gloves: "Gloves" /* i18n-todo */ },
+      slots: { mainhand: "Mão principal", chest: "Peito", legs: "Pernas", feet: "Pés" },
       quality: { poor: "Ruim", common: "Comum", uncommon: "Incomum", rare: "Raro", epic: "Épico" },
       kind: { weapon: "Arma", armor: "Armadura", quest: "Item de missão", junk: "Sucata", food: "Comida", drink: "Bebida" },
       stats: { armor: "Armadura", str: "Força", agi: "Agilidade", sta: "Vigor", int: "Intelecto", spi: "Espírito", attackPower: "Poder de ataque", dps: "Dano/s", critChance: "Chance crítica", dodge: "Esquiva" },
@@ -5743,7 +5739,7 @@ const itemStrings = {
   ru_RU: {
     itemUi: {
       money: { goldShort: "з", silverShort: "с", copperShort: "м", gold: "золото", silver: "серебро", copper: "медь" },
-      slots: { mainhand: "Правая рука", chest: "Грудь", legs: "Ноги", feet: "Ступни", helmet: "Helmet", shoulder: "Shoulder", waist: "Waist", gloves: "Gloves" /* i18n-todo */ },
+      slots: { mainhand: "Правая рука", chest: "Грудь", legs: "Ноги", feet: "Ступни" },
       quality: { poor: "Низкое", common: "Обычное", uncommon: "Необычное", rare: "Редкое", epic: "Эпическое" },
       kind: { weapon: "Оружие", armor: "Броня", quest: "Задание", junk: "Хлам", food: "Еда", drink: "Напиток" },
       stats: { armor: "Броня", str: "Сила", agi: "Ловкость", sta: "Выносливость", int: "Интеллект", spi: "Дух", attackPower: "Сила атаки", dps: "Урон/сек", critChance: "Шанс крита", dodge: "Уклонение" },

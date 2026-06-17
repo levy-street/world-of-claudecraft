@@ -113,12 +113,8 @@ const PET_MODE_DESC_KEYS: Record<PetMode, TranslationKey> = {
 type ItemQuality = NonNullable<ItemDef['quality']>;
 const ITEM_SLOT_LABEL_KEYS: Record<EquipSlot, TranslationKey> = {
   mainhand: 'itemUi.slots.mainhand',
-  helmet: 'itemUi.slots.helmet',
-  shoulder: 'itemUi.slots.shoulder',
   chest: 'itemUi.slots.chest',
-  waist: 'itemUi.slots.waist',
   legs: 'itemUi.slots.legs',
-  gloves: 'itemUi.slots.gloves',
   feet: 'itemUi.slots.feet',
 };
 const ITEM_QUALITY_LABEL_KEYS: Record<ItemQuality, TranslationKey> = {
@@ -3849,12 +3845,11 @@ export class Hud {
     const className = classDisplayName(cls.id);
     let html = `<div class="panel-title"><span>${esc(p.name)} <span class="panel-subtitle">${esc(t('itemUi.equipment.levelClass', { level: formatNumber(p.level, { maximumFractionDigits: 0 }), className }))}</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
     html += `<div class="paperdoll">
-      <div class="equip-col" id="equip-col-left"></div>
+      <div class="equip-col" id="equip-col"></div>
       <div class="char-model-panel">
         <div id="char-model-preview" class="char-model-preview"></div>
         <div id="char-skin-row" class="skin-row char-skin-row" role="list" aria-label="Chroma"></div>
       </div>
-      <div class="equip-col equip-col-right" id="equip-col-right"></div>
     </div>`;
     const wpn = sim.equipment.mainhand ? ITEMS[sim.equipment.mainhand] : null;
     const dps = wpn?.weapon ? ((wpn.weapon.min + wpn.weapon.max) / 2 + (p.attackPower / 14) * wpn.weapon.speed) / wpn.weapon.speed : 0;
@@ -3869,25 +3864,14 @@ export class Hud {
     html += this.progressionHtml(p.level);
     el.innerHTML = html;
     el.querySelector('[data-act="prestige"]')?.addEventListener('click', () => this.openPrestigeDialog());
-    const leftCol = el.querySelector('#equip-col-left')!;
-    const rightCol = el.querySelector('#equip-col-right')!;
-    // Two columns flanking the model, like the classic WoW character sheet:
-    // the left column holds head/shoulder/chest (+ weapon, since we have no
-    // neck/back/wrist slots to fill it) and the right column holds the
-    // hands/waist/legs/feet quartet.
-    const leftSlots: { key: EquipSlot; name: string }[] = [
-      { key: 'helmet', name: itemSlotName('helmet') },
-      { key: 'shoulder', name: itemSlotName('shoulder') },
-      { key: 'chest', name: itemSlotName('chest') },
+    const col = el.querySelector('#equip-col')!;
+    const slots: { key: EquipSlot; name: string }[] = [
       { key: 'mainhand', name: itemSlotName('mainhand') },
-    ];
-    const rightSlots: { key: EquipSlot; name: string }[] = [
-      { key: 'gloves', name: itemSlotName('gloves') },
-      { key: 'waist', name: itemSlotName('waist') },
+      { key: 'chest', name: itemSlotName('chest') },
       { key: 'legs', name: itemSlotName('legs') },
       { key: 'feet', name: itemSlotName('feet') },
     ];
-    const buildSlotRow = (slot: { key: EquipSlot; name: string }): HTMLElement => {
+    for (const slot of slots) {
       const itemId = sim.equipment[slot.key];
       const item = itemId ? ITEMS[itemId] : null;
       const row = document.createElement('div');
@@ -3896,10 +3880,8 @@ export class Hud {
       row.innerHTML = `${item ? this.itemIcon(item) : `<img class="item-icon" style="border-color:#444" src="${iconDataUrl('item', 'slot_empty')}" alt="" draggable="false">`}
         <div><div class="slot-name">${esc(slot.name)}</div><div class="slot-item" style="color:${qColor}">${item ? esc(itemDisplayName(item)) : esc(t('itemUi.equipment.empty'))}</div></div>`;
       if (item) this.attachTooltip(row, () => this.itemTooltip(item));
-      return row;
-    };
-    for (const slot of leftSlots) leftCol.appendChild(buildSlotRow(slot));
-    for (const slot of rightSlots) rightCol.appendChild(buildSlotRow(slot));
+      col.appendChild(row);
+    }
     this.renderCharPreview();
     this.renderCharSkinPicker();
     el.querySelector('[data-close]')?.addEventListener('click', () => { el.style.display = 'none'; this.hideTooltip(); });

@@ -7835,12 +7835,8 @@ export class Sim {
   private gearReadout(meta: PlayerMeta): string {
     const slots: [EquipSlot, string][] = [
       ['mainhand', 'Main Hand'],
-      ['helmet', 'Helmet'],
-      ['shoulder', 'Shoulder'],
       ['chest', 'Chest'],
-      ['waist', 'Waist'],
       ['legs', 'Legs'],
-      ['gloves', 'Gloves'],
       ['feet', 'Feet'],
     ];
     let worn = 0;

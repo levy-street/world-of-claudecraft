@@ -69,7 +69,7 @@ export function recalcPlayerStats(e: Entity, cls: PlayerClass, equipment: Player
     spi: def.baseStats.spi + def.statsPerLevel.spi * (lvl - 1),
     armor: def.baseStats.armor + def.statsPerLevel.armor * (lvl - 1),
   };
-  for (const slot of ['mainhand', 'helmet', 'shoulder', 'chest', 'waist', 'legs', 'gloves', 'feet'] as EquipSlot[]) {
+  for (const slot of ['mainhand', 'chest', 'legs', 'feet'] as EquipSlot[]) {
     const itemId = equipment[slot];
     if (!itemId) continue;
     const item = ITEMS[itemId];

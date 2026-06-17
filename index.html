@@ -738,15 +738,13 @@
   .q-epic { border-color: #a335ee !important; box-shadow: 0 0 6px #a335ee66; }
 
   /* character window */
-  #char-window { width: 600px; }
-  .paperdoll { display: flex; gap: 10px; align-items: flex-start; }
-  .equip-col { display: flex; flex-direction: column; gap: 5px; width: 150px; flex-shrink: 0; }
-  .equip-col-right .equip-slot { flex-direction: row-reverse; text-align: right; }
-  .equip-slot { display: flex; gap: 7px; align-items: center; width: 100%; }
-  .equip-slot > div { min-width: 0; }
+  #char-window { width: 430px; }
+  .paperdoll { display: flex; gap: 10px; }
+  .equip-col { display: flex; flex-direction: column; gap: 5px; }
+  .equip-slot { display: flex; gap: 7px; align-items: center; width: 142px; }
   .equip-slot .slot-name { font-size: 10px; color: #998d6a; }
-  .equip-slot .slot-item { font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .char-model-panel { flex: 1; min-width: 0; min-height: 172px; border: 1px solid #463a1c; border-radius: 5px; background: rgba(0, 0, 0, 0.28); overflow: hidden; display: flex; flex-direction: column; }
+  .equip-slot .slot-item { font-size: 11px; }
+  .char-model-panel { flex: 1; min-width: 0; height: 172px; border: 1px solid #463a1c; border-radius: 5px; background: rgba(0, 0, 0, 0.28); overflow: hidden; display: flex; flex-direction: column; }
   .char-model-preview { width: 100%; flex: 1; min-height: 0; }
   .char-model-preview canvas { display: block; width: 100% !important; height: 100% !important; }
   .char-skin-row { justify-content: center; align-items: center; margin: 0; padding: 6px 0 8px; flex-shrink: 0; }
@@ -4399,10 +4397,6 @@
     box-sizing: border-box;
     overflow-y: auto;
   }
-  /* Narrow the flanking equip columns so both fit beside the model on a phone. */
-  body.mobile-touch .equip-col { width: 108px; }
-  body.mobile-touch .equip-slot .slot-name { font-size: 9px; }
-  body.mobile-touch .equip-slot .slot-item { font-size: 10px; }
   body.mobile-touch .mkt-price-row {
     flex-wrap: wrap;
   }

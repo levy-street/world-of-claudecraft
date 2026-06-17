@@ -20,14 +20,10 @@ describe('/gear command', () => {
     sim.chat('/gear', a);
     const text = errorText(sim.tick());
     expect(text).toBeDefined();
-    expect(text).toMatch(/^Equipped \(2\/8\):/);
+    expect(text).toMatch(/^Equipped \(2\/4\):/);
     expect(text).toContain('Main Hand:');
     expect(text).toContain('Chest:');
-    expect(text).toContain('Helmet: (empty)');
-    expect(text).toContain('Shoulder: (empty)');
-    expect(text).toContain('Waist: (empty)');
     expect(text).toContain('Legs: (empty)');
-    expect(text).toContain('Gloves: (empty)');
     expect(text).toContain('Feet: (empty)');
     // fixed slot order: main hand before chest before legs before feet
     expect(text!.indexOf('Main Hand')).toBeLessThan(text!.indexOf('Chest'));
@@ -39,15 +35,11 @@ describe('/gear command', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');
     const meta = sim.players.get(a)!;
-    meta.equipment = {
-      mainhand: 'worn_sword', helmet: 'cryptbone_helm', shoulder: 'cryptbone_pauldrons',
-      chest: 'recruit_tunic', waist: 'mistveil_cord', legs: 'quilted_trousers',
-      gloves: 'mistveil_grips', feet: 'oiled_boots',
-    };
+    meta.equipment = { mainhand: 'worn_sword', chest: 'recruit_tunic', legs: 'quilted_trousers', feet: 'oiled_boots' };
     sim.tick();
     sim.chat('/gear', a);
     const text = errorText(sim.tick());
-    expect(text).toMatch(/^Equipped \(8\/8\):/);
+    expect(text).toMatch(/^Equipped \(4\/4\):/);
     expect(text).toContain('Worn Shortsword');
     expect(text).toContain('Quilted Trousers');
     expect(text).not.toContain('(empty)');

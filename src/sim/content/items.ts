@@ -117,45 +117,6 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     id: 'cryptbone_greaves', name: 'Cryptbone Greaves', kind: 'armor', slot: 'legs', quality: 'uncommon',
     stats: { armor: 48, sta: 2 }, sellValue: 180,
   },
-  // --- Inventory 2.0: helmet/shoulder/waist/gloves. ---
-  // No documented armor/stat budget exists, so these are balanced to the
-  // *empirical* convention of the existing class-neutral mid-tier pieces:
-  // armor is slot-weighted off the legs/chest baseline (head≈1.0, shoulder≈0.75,
-  // gloves≈0.65, waist≈0.55) and stat points track peers (uncommon ~L10-13 ≈ 2-4
-  // pts; class-neutral rare ~L20 ≈ 5-7 pts, cf. cryptbone_greaves / trollhide_leggings
-  // / korgaths_chainwraps / stormshard_leggings). Class-neutral on purpose.
-  cryptbone_helm: {
-    id: 'cryptbone_helm', name: 'Cryptbone Helm', kind: 'armor', slot: 'helmet', quality: 'uncommon',
-    stats: { armor: 48, sta: 3 }, sellValue: 185,
-  },
-  cryptbone_pauldrons: {
-    id: 'cryptbone_pauldrons', name: 'Cryptbone Pauldrons', kind: 'armor', slot: 'shoulder', quality: 'uncommon',
-    stats: { armor: 36, sta: 2 }, sellValue: 140,
-  },
-  mistveil_cord: {
-    id: 'mistveil_cord', name: 'Mistveil Cord', kind: 'armor', slot: 'waist', quality: 'uncommon',
-    stats: { armor: 30, sta: 2, agi: 1 }, sellValue: 150,
-  },
-  mistveil_grips: {
-    id: 'mistveil_grips', name: 'Mistveil Grips', kind: 'armor', slot: 'gloves', quality: 'uncommon',
-    stats: { armor: 36, agi: 2, sta: 1 }, sellValue: 165,
-  },
-  boundstone_helm: {
-    id: 'boundstone_helm', name: 'Boundstone Helm', kind: 'armor', slot: 'helmet', quality: 'rare',
-    stats: { armor: 105, sta: 4, str: 3 }, sellValue: 460,
-  },
-  boundstone_girdle: {
-    id: 'boundstone_girdle', name: 'Boundstone Girdle', kind: 'armor', slot: 'waist', quality: 'rare',
-    stats: { armor: 60, sta: 4, str: 2 }, sellValue: 340,
-  },
-  gravewyrm_mantle: {
-    id: 'gravewyrm_mantle', name: 'Gravewyrm Mantle', kind: 'armor', slot: 'shoulder', quality: 'rare',
-    stats: { armor: 82, agi: 4, sta: 2 }, sellValue: 410,
-  },
-  gravewyrm_gauntlets: {
-    id: 'gravewyrm_gauntlets', name: 'Gravewyrm Gauntlets', kind: 'armor', slot: 'gloves', quality: 'rare',
-    stats: { armor: 72, str: 3, sta: 2 }, sellValue: 390,
-  },
   // --- food & drink (vendor) ---
   baked_bread: {
     id: 'baked_bread', name: 'Freshly Baked Bread', kind: 'food', quality: 'common',
