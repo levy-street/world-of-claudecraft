@@ -25,7 +25,7 @@ import type { LeaderboardEntry } from '../world_api';
 import {
   AbilityDef, AbilityEffect, Aura, AuraKind, CAST_PUSHBACK_SEC, CHANNEL_PUSHBACK_FRACTION, CONSUME_DURATION,
   CONSUME_TICKS, CrowdControlDrCategory, DT, Entity, EquipSlot, FISHING_CAST_ID, FISHING_CAST_TIME, GCD,
-  INTERACT_RANGE, InvSlot, LootEntry, LootSlot, MELEE_RANGE, MAX_LEVEL, MobFamily, MobTemplate,
+  FAST_TRAVEL_COST, INTERACT_RANGE, InvSlot, LootEntry, LootSlot, MELEE_RANGE, MAX_LEVEL, MobFamily, MobTemplate,
   MoveInput, OverheadEmoteId, PetMode, PlayerClass, QuestProgress, QuestState, RUN_SPEED, SimConfig, SimEvent, TURN_SPEED, Vec3,
   angleTo, armorReduction, dist2d, emptyMoveInput, isConsuming, meleeMissChance, mobXpValue, normAngle,
   rageFromDealing, rageFromTaking, spellHitChance, xpForLevel,
@@ -4996,6 +4996,29 @@ export class Sim {
     meta.copper -= def.buyValue;
     this.addItem(itemId, 1, meta.entityId);
     this.emit({ type: 'vendor', action: 'buy', itemId, pid: meta.entityId });
+  }
+
+  // Wayfinder fast-travel: pay 1 silver to teleport to another town's hub. The
+  // client only offers the other towns; we still guard range, funds, and a
+  // same-town request server-side. Teleport mirrors enterDungeon (pos + rebucket).
+  travelTo(npcId: number, zoneIndex: number, pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    const { meta, e: p } = r;
+    if (p.dead) return;
+    const npc = this.entities.get(npcId);
+    if (!npc || npc.kind !== 'npc' || !NPCS[npc.templateId]?.wayfinder) return;
+    if (dist2d(p.pos, npc.pos) > INTERACT_RANGE + 2) { this.error(meta.entityId, 'Too far away.'); return; }
+    const zone = ZONES[zoneIndex];
+    if (!zone || zoneAt(p.pos.z).id === zone.id) return; // no such destination / already there
+    if (meta.copper < FAST_TRAVEL_COST) { this.error(meta.entityId, 'Not enough money.'); return; }
+    meta.copper -= FAST_TRAVEL_COST;
+    p.pos = this.groundPos(zone.hub.x, zone.hub.z);
+    p.prevPos = { ...p.pos };
+    this.rebucket(p);
+    p.facing = 0;
+    p.targetId = null;
+    p.autoAttack = false;
   }
 
   private vendorInRange(p: Entity): boolean {

@@ -807,6 +807,9 @@ export class ClientWorld implements IWorld {
   buyItem(npcId: number, itemId: string): void {
     this.cmd({ cmd: 'buy', npc: npcId, item: itemId });
   }
+  travelTo(npcId: number, zoneIndex: number): void {
+    this.cmd({ cmd: 'travel', npc: npcId, zone: zoneIndex });
+  }
   sellItem(itemId: string, count?: number): void {
     this.cmd({ cmd: 'sell', item: itemId, count });
   }

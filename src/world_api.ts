@@ -221,6 +221,8 @@ export interface IWorld {
   discardItem(itemId: string, count?: number): void;
   buyItem(npcId: number, itemId: string): void;
   sellItem(itemId: string, count?: number): void;
+  /** Pay a wayfinder for fast travel (teleport) to the hub of ZONES[zoneIndex]. */
+  travelTo(npcId: number, zoneIndex: number): void;
   buyBackItem(itemId: string): void;
   changeSkin(skin: number): void;
   releaseSpirit(): void;

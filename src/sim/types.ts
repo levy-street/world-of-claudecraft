@@ -6,6 +6,7 @@ export const RUN_SPEED = 7; // yards/sec, classic run speed
 export const TURN_SPEED = Math.PI; // rad/sec keyboard turning
 export const MELEE_RANGE = 5; // yards
 export const INTERACT_RANGE = 5;
+export const FAST_TRAVEL_COST = 100; // copper (1 silver) a wayfinder charges for fast travel between towns
 export const GCD = 1.5; // seconds
 export const CAST_PUSHBACK_SEC = 0.5; // vanilla: each hit delays a cast by 0.5s
 export const CHANNEL_PUSHBACK_FRACTION = 0.25; // vanilla: each hit shaves 25% off a channel
@@ -363,6 +364,9 @@ export interface NpcDef {
   // The Merchant: talking to this NPC opens the player-driven World Market
   // (auction house) instead of a fixed vendor stock.
   market?: boolean;
+  // Wayfinder: talking to this NPC opens a fast-travel menu that teleports the
+  // player between town hubs for FAST_TRAVEL_COST. See `travelTo` in sim.ts.
+  wayfinder?: boolean;
   greeting: string;
 }
 

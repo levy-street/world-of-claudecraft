@@ -238,6 +238,13 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
 // ---------------------------------------------------------------------------
 
 export const ZONE1_NPCS: Record<string, NpcDef> = {
+  wayfinder_eastbrook: {
+    id: 'wayfinder_eastbrook', name: 'Wenna Vell', title: 'Wayfinder',
+    pos: { x: -9, z: 11 }, facing: -0.7, color: 0x5b8fb0,
+    questIds: [],
+    wayfinder: true,
+    greeting: 'Step onto the waystone, traveler. Where shall I send you?',
+  },
   the_merchant: {
     id: 'the_merchant', name: 'The Merchant', title: 'Keeper of the World Market',
     // centerpiece of the square, just north of the well, facing the approach

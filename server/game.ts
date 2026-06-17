@@ -929,6 +929,7 @@ export class GameServer {
         }
         break;
       case 'buy': if (typeof msg.npc === 'number' && typeof msg.item === 'string') sim.buyItem(msg.npc, msg.item, pid); break;
+      case 'travel': if (typeof msg.npc === 'number' && typeof msg.zone === 'number') sim.travelTo(msg.npc, msg.zone, pid); break;
       case 'sell':
         if (typeof msg.item === 'string') {
           sim.sellItem(msg.item, typeof msg.count === 'number' ? msg.count : undefined, pid);

@@ -215,6 +215,13 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
 // ---------------------------------------------------------------------------
 
 export const ZONE3_NPCS: Record<string, NpcDef> = {
+  wayfinder_highwatch: {
+    id: 'wayfinder_highwatch', name: 'Old Brannoch', title: 'Wayfinder',
+    pos: { x: -12, z: 663 }, facing: -0.7, color: 0x5b8fb0,
+    questIds: [],
+    wayfinder: true,
+    greeting: 'Step onto the waystone, traveler. Where shall I send you?',
+  },
   captain_thessaly: {
     id: 'captain_thessaly', name: 'Captain Thessaly', title: 'Highwatch Captain',
     pos: { x: 4, z: 664 }, facing: -2.0, color: 0x85929e,

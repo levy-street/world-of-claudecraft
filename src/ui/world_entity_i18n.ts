@@ -19,6 +19,7 @@ const NPC_IDS = [
   'provisioner_hale', 'herbalist_yara', 'scout_maren', 'captain_thessaly',
   'brother_aldric_highwatch', 'scout_maren_highwatch', 'quartermaster_bree', 'armorer_hode',
   'loremaster_caddis',
+  'wayfinder_eastbrook', 'wayfinder_fenbridge', 'wayfinder_highwatch',
 ] as const;
 
 const QUEST_IDS = [
@@ -1162,6 +1163,9 @@ const esData: LocaleData = {
     ['Intendente Bree', 'Intendente de Highwatch', 'Lana, galleta dura y botas herradas: Highwatch vive de las tres, y apenas tengo existencias.'],
     ['Armero Hode', 'Maestro armero', 'La forja está caliente y la piedra gira. Si corta, lo vendo.'],
     ['Maestro de saber Caddis', 'Maestro de saber', 'Cuida la pizarra suelta, {className}. La montaña está inquieta últimamente y quiero saber por qué.'],
+    ['Wenna Vell', 'Guía de Caminos', 'Sube a la piedra de paso, viajero. ¿Adónde quieres ir?'],
+    ['Tomas Karr', 'Guía de Caminos', 'Sube a la piedra de paso, viajero. ¿Adónde quieres ir?'],
+    ['Old Brannoch', 'Guía de Caminos', 'Sube a la piedra de paso, viajero. ¿Adónde quieres ir?'],
   ],
   questTitles: [
     'Lobos a la puerta', 'El viejo lobo', 'Pieles de Bristleback', 'Amenaza de Webwood', 'Problemas en el lago', 'Ratas en la mina',
@@ -1231,6 +1235,9 @@ const frData: LocaleData = {
     ['Quartier-maître Bree', 'Quartier-maître de Highwatch', 'Laine, biscuit dur et bottes ferrées: Highwatch vit de ces trois choses, et je manque de tout.'],
     ['Armurier Hode', 'Maître armurier', 'La forge est chaude et la meule tourne. Si ça coupe, je le vends.'],
     ['Maître du savoir Caddis', 'Maître du savoir', 'Méfiez-vous des schistes instables, {className}. La montagne est agitée ces temps-ci, et je veux savoir pourquoi.'],
+    ['Wenna Vell', 'Guide des Chemins', 'Monte sur la pierre de voyage, voyageur. Où veux-tu aller ?'],
+    ['Tomas Karr', 'Guide des Chemins', 'Monte sur la pierre de voyage, voyageur. Où veux-tu aller ?'],
+    ['Old Brannoch', 'Guide des Chemins', 'Monte sur la pierre de voyage, voyageur. Où veux-tu aller ?'],
   ],
   questTitles: [
     'Des loups à la porte', 'Le vieux loup', 'Peaux de Bristleback', 'La menace de Webwood', 'Troubles au lac', 'Des rats dans la mine',
@@ -1299,6 +1306,9 @@ const deData: LocaleData = {
     ['Quartiermeisterin Bree', 'Quartiermeisterin von Highwatch', 'Wolle, Hartzwieback und beschlagene Stiefel: Highwatch lebt von allen dreien, und mir fehlt alles.'],
     ['Rüstungsschmied Hode', 'Meisterrüster', 'Die Esse ist heiß und der Schleifstein dreht sich. Wenn es schneidet, verkaufe ich es.'],
     ['Lehrmeister Caddis', 'Lehrmeister', 'Achte auf lockeren Schiefer, {className}. Der Berg ist unruhig geworden, und ich will wissen warum.'],
+    ['Wenna Vell', 'Wegfinder', 'Tritt auf den Wegstein, Reisender. Wohin soll ich dich schicken?'],
+    ['Tomas Karr', 'Wegfinder', 'Tritt auf den Wegstein, Reisender. Wohin soll ich dich schicken?'],
+    ['Old Brannoch', 'Wegfinder', 'Tritt auf den Wegstein, Reisender. Wohin soll ich dich schicken?'],
   ],
   questTitles: [
     'Wölfe vor der Tür', 'Der alte Wolf', 'Bristleback-Häute', 'Bedrohung aus Webwood', 'Ärger am See', 'Ratten in der Mine',
@@ -1368,6 +1378,9 @@ const itData: LocaleData = {
     ['Quartiermastro Bree', 'Quartiermastro di Highwatch', 'Lana, gallette dure e stivali ferrati: Highwatch vive di queste tre cose, e a me manca tutto.'],
     ['Armaiolo Hode', 'Maestro armaiolo', 'La forgia è calda e la mola gira. Se taglia, lo vendo.'],
     ['Maestro del sapere Caddis', 'Maestro del sapere', 'Fai attenzione allo scisto instabile, {className}. La montagna è inquieta da qualche tempo, e voglio sapere perché.'],
+    ['Wenna Vell', 'Guida dei Cammini', 'Sali sulla pietra di viaggio, viaggiatore. Dove vuoi andare?'],
+    ['Tomas Karr', 'Guida dei Cammini', 'Sali sulla pietra di viaggio, viaggiatore. Dove vuoi andare?'],
+    ['Old Brannoch', 'Guida dei Cammini', 'Sali sulla pietra di viaggio, viaggiatore. Dove vuoi andare?'],
   ],
   questTitles: [
     'Lupi alla porta', 'Il vecchio lupo', 'Pelli di Bristleback', 'La minaccia di Webwood', 'Problemi al lago', 'Ratti nella miniera',
@@ -1434,6 +1447,9 @@ const zhCnData: LocaleData = {
     ['布里军需官', '高望军需官', '羊毛，硬饼，铁掌靴：高望靠这三样维持，而我什么都缺。'],
     ['霍德护甲匠', '护甲大师', '炉火正旺，砂轮正转。能砍的东西，我都卖。'],
     ['凯迪斯博学者', '博学者', '小心松动的页岩，{className}。这座山近来不安，我想知道原因。'],
+    ['Wenna Vell', '向导', '踏上传送石吧，旅行者。你想去哪里？'],
+    ['Tomas Karr', '向导', '踏上传送石吧，旅行者。你想去哪里？'],
+    ['Old Brannoch', '向导', '踏上传送石吧，旅行者。你想去哪里？'],
   ],
   questTitles: [
     '门前群狼', '老狼', '硬鬃皮', '网木之患', '湖边麻烦', '矿洞里的鼠患', '不宁的死者', '被盗的补给', '地下低语',
@@ -1496,6 +1512,9 @@ const zhTwData: LocaleData = {
     ['布里軍需官', '高望軍需官', '羊毛，硬餅，鐵掌靴：高望靠這三樣維持，而我什麼都缺。'],
     ['霍德護甲匠', '護甲大師', '爐火正旺，砂輪正轉。能砍的東西，我都賣。'],
     ['凱迪斯博學者', '博學者', '小心鬆動的頁岩，{className}。這座山近來不安，我想知道原因。'],
+    ['Wenna Vell', '嚮導', '踏上傳送石吧，旅行者。你想去哪裡？'],
+    ['Tomas Karr', '嚮導', '踏上傳送石吧，旅行者。你想去哪裡？'],
+    ['Old Brannoch', '嚮導', '踏上傳送石吧，旅行者。你想去哪裡？'],
   ],
   questTitles: [
     '門前群狼', '老狼', '硬鬃皮', '網木之患', '湖邊麻煩', '礦洞裡的鼠患', '不寧的死者', '被盜的補給',
@@ -1560,6 +1579,9 @@ const koData: LocaleData = {
     ['병참장교 브리', '하이워치 병참장교', '양모, 딱딱한 건빵, 쇠박은 장화: 하이워치는 이 세 가지로 버티지만 나는 전부 부족합니다.'],
     ['방어구 제작자 호드', '장인 방어구 제작자', '화덕은 뜨겁고 숫돌은 돌고 있습니다. 베는 물건이라면 팝니다.'],
     ['현자 캐디스', '현자', '느슨한 혈암을 조심하십시오, {className}. 산이 요즘 불안정해졌고, 나는 그 이유를 알고 싶습니다.'],
+    ['Wenna Vell', '길잡이', '이동석에 올라서게, 여행자여. 어디로 보내 줄까?'],
+    ['Tomas Karr', '길잡이', '이동석에 올라서게, 여행자여. 어디로 보내 줄까?'],
+    ['Old Brannoch', '길잡이', '이동석에 올라서게, 여행자여. 어디로 보내 줄까?'],
   ],
   questTitles: [
     '문 앞의 늑대들', '늙은 늑대', '성난등 가죽', '그물나무의 위협', '호숫가의 골칫거리', '광산의 쥐들',
@@ -1627,6 +1649,9 @@ const jaData: LocaleData = {
     ['需品係ブリー', 'ハイウォッチ需品係', '羊毛、堅パン、鋲打ちの靴。ハイウォッチはこの三つで保っていますが、私はすべて不足しています。'],
     ['防具師ホード', '熟練防具師', '炉は熱く、砥石は回っています。切れるものなら売ります。'],
     ['博識者キャディス', '博識者', '崩れやすい頁岩に気をつけてください、{className}。山は近ごろ落ち着きがなく、その理由を知りたいのです。'],
+    ['Wenna Vell', '道案内人', '旅の石に乗りなさい、旅人よ。どこへ送ろうか？'],
+    ['Tomas Karr', '道案内人', '旅の石に乗りなさい、旅人よ。どこへ送ろうか？'],
+    ['Old Brannoch', '道案内人', '旅の石に乗りなさい、旅人よ。どこへ送ろうか？'],
   ],
   questTitles: [
     '戸口の狼', '老いた狼', 'ブリッスルバックの皮', 'ウェブウッドの脅威', '湖の騒ぎ', '鉱山の鼠',
@@ -1695,6 +1720,9 @@ const ptData: LocaleData = {
     ['Intendente Bree', 'Intendente de Highwatch', 'Lã, biscoito duro e botas ferradas: Highwatch vive dessas três coisas, e estou sem tudo.'],
     ['Armeiro Hode', 'Mestre armeiro', 'A forja está quente e a pedra gira. Se corta, eu vendo.'],
     ['Mestre do saber Caddis', 'Mestre do saber', 'Cuidado com a ardósia solta, {className}. A montanha anda inquieta, e quero saber por quê.'],
+    ['Wenna Vell', 'Guia de Caminhos', 'Suba na pedra de viagem, viajante. Para onde quer ir?'],
+    ['Tomas Karr', 'Guia de Caminhos', 'Suba na pedra de viagem, viajante. Para onde quer ir?'],
+    ['Old Brannoch', 'Guia de Caminhos', 'Suba na pedra de viagem, viajante. Para onde quer ir?'],
   ],
   questTitles: [
     'Lobos à porta', 'O velho lobo', 'Peles de Bristleback', 'A ameaça de Webwood', 'Problemas no lago', 'Ratos na mina',
@@ -1765,6 +1793,9 @@ const ruData: LocaleData = {
     ['Квартирмейстер Бри', 'Квартирмейстер Хайвотча', 'Шерсть, сухари и подбитые железом сапоги: Хайвотч держится на этом, а мне не хватает всего.'],
     ['Бронник Ходе', 'Мастер-бронник', 'Горн горяч, точило крутится. Если режет, я это продаю.'],
     ['Хранитель знаний Каддис', 'Хранитель знаний', 'Осторожнее с рыхлым сланцем, {className}. Гора стала беспокойной, и я намерен узнать почему.'],
+    ['Wenna Vell', 'Путеводитель', 'Встань на путевой камень, путник. Куда тебя отправить?'],
+    ['Tomas Karr', 'Путеводитель', 'Встань на путевой камень, путник. Куда тебя отправить?'],
+    ['Old Brannoch', 'Путеводитель', 'Встань на путевой камень, путник. Куда тебя отправить?'],
   ],
   questTitles: [
     'Волки у дверей', 'Старый волк', 'Шкуры щетиноспинов', 'Угроза Вебвуда', 'Беда у озера', 'Крысы в шахте',

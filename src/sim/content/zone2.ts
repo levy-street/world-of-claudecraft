@@ -256,6 +256,13 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
 // ---------------------------------------------------------------------------
 
 export const ZONE2_NPCS: Record<string, NpcDef> = {
+  wayfinder_fenbridge: {
+    id: 'wayfinder_fenbridge', name: 'Tomas Karr', title: 'Wayfinder',
+    pos: { x: -10, z: 303 }, facing: -0.7, color: 0x5b8fb0,
+    questIds: [],
+    wayfinder: true,
+    greeting: 'Step onto the waystone, traveler. Where shall I send you?',
+  },
   warden_fenwick: {
     id: 'warden_fenwick', name: 'Warden Fenwick', title: 'Warden of Fenbridge',
     pos: { x: 3, z: 304 }, facing: Math.PI, color: 0x7e5109,

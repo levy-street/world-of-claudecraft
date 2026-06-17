@@ -12,7 +12,7 @@ import {
 import type { ZoneDef } from '../sim/data';
 import type { AbilityDef, EquipSlot, InvSlot, PetMode, PlayerClass, ResourceType, Stats } from '../sim/types';
 import {
-  AbilityEffect, CONSUME_DURATION, Entity, FISHING_CAST_ID, GCD, ItemDef, SimEvent,
+  AbilityEffect, CONSUME_DURATION, Entity, FISHING_CAST_ID, FAST_TRAVEL_COST, GCD, ItemDef, SimEvent,
   dist2d, xpForLevel, MAX_LEVEL, MELEE_RANGE, MILESTONES, virtualLevel, canPrestige, xpUntilNextPrestige,
 } from '../sim/types';
 import { xpBarView, formatXp } from './xp_bar';
@@ -3149,6 +3149,15 @@ export class Hud {
     if (def?.market) {
       html += `<button type="button" class="qd-list-item" data-market="1" aria-label="${esc(t('questUi.dialog.worldMarketAria'))}"><span class="gold">${svgIcon('market')}</span> ${esc(t('questUi.dialog.worldMarket'))}</button>`;
     }
+    if (def?.wayfinder) {
+      // wayfinders offer the other two town hubs (no fast travel to where you stand)
+      const here = zoneAt(npc.pos.z).id;
+      ZONES.forEach((zone, i) => {
+        if (zone.id === here) return;
+        const town = zoneDisplayName(zone.id);
+        html += `<button type="button" class="qd-list-item" data-travel="${i}" aria-label="${esc(t('questUi.dialog.travelToAria', { name: town }))}"><span class="gold">${svgIcon('map')}</span> ${esc(t('questUi.dialog.travelTo', { name: town }))} ${this.moneyHtml(FAST_TRAVEL_COST)}</button>`;
+      });
+    }
     el.innerHTML = html;
     el.querySelectorAll('[data-quest]').forEach((item) => {
       item.addEventListener('click', () => this.renderQuestDetail(npc, (item as HTMLElement).dataset.quest!));
@@ -3160,6 +3169,12 @@ export class Hud {
     el.querySelector('[data-market]')?.addEventListener('click', () => {
       this.closeQuestDialog(false);
       this.openMarket();
+    });
+    el.querySelectorAll('[data-travel]').forEach((item) => {
+      item.addEventListener('click', () => {
+        this.closeQuestDialog(false);
+        this.sim.travelTo(npc.id, Number((item as HTMLElement).dataset.travel));
+      });
     });
     el.querySelector('[data-close]')?.addEventListener('click', () => this.closeQuestDialog());
     el.style.display = 'block';
