@@ -46,6 +46,9 @@ const EVADE_SPEED_MULT = 1.6;
 // immune while resetting, a permanent stall = a permanently unkillable mob. If it
 // can't get closer to home for this long, it starts phasing through the blocker.
 const EVADE_STALL_TIMEOUT = 3;
+// Seconds a mob may fail to advance toward its target before giving it up — a mob
+// pinned out of reach (terrain/water/a prop) otherwise chases forever and never leashes.
+const CHASE_STALL_TIMEOUT = 5;
 // Heading offsets (radians) a mob tries when its straight path is blocked, so it
 // can slide around a prop instead of pinning on it. Desired heading (0) first;
 // only evaluated past the first entry when that straight step is obstructed.
@@ -3699,6 +3702,7 @@ export class Sim {
   // attacker. With no living threat left, it evades home instead of grabbing a
   // nearby bystander who never acted on the mob.
   private retargetMob(mob: Entity): void {
+    mob.chaseStall = 0;
     const next = this.highestThreatTarget(mob);
     if (next) {
       mob.aggroTargetId = next.id;
@@ -3913,10 +3917,27 @@ export class Sim {
         if (d <= MELEE_RANGE * 0.8) {
           mob.aiState = 'attack';
           mob.swingTimer = Math.min(mob.swingTimer, 0.4);
+          mob.chaseStall = 0;
           break;
         }
-        if (!this.isRooted(mob)) this.moveToward(mob, target.pos, mob.moveSpeed * this.moveSpeedMult(mob));
-        else mob.facing = angleTo(mob.pos, target.pos);
+        if (!this.isRooted(mob)) {
+          const px = mob.pos.x, pz = mob.pos.z;
+          this.moveToward(mob, target.pos, mob.moveSpeed * this.moveSpeedMult(mob));
+          // Give-up: a mob pinned out of reach of its target (terrain/water/a prop)
+          // would otherwise chase forever and never leash. After CHASE_STALL_TIMEOUT
+          // of no forward progress, drop this target and take the next on the threat
+          // table, or evade home if there is no one else (retargetMob).
+          const moved = Math.hypot(mob.pos.x - px, mob.pos.z - pz);
+          if (moved < mob.moveSpeed * DT * 0.25) mob.chaseStall += DT;
+          else mob.chaseStall = 0;
+          if (mob.chaseStall >= CHASE_STALL_TIMEOUT) {
+            mob.threat.delete(target.id);
+            this.retargetMob(mob);
+            break;
+          }
+        } else {
+          mob.facing = angleTo(mob.pos, target.pos);
+        }
         break;
       }
       case 'attack': {

@@ -22,7 +22,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     sitting: false, eating: null, drinking: null,
     aiState: 'idle', tappedById: null, pulseTimer: 0, stompTimer: 0, detonateTimer: Infinity, mendTimer: 0, firedSummons: 0, summonedIds: [], enraged: false, healedThisPull: false,
     threat: new Map(), forcedTargetId: null, forcedTargetTimer: 0, ownerId: null, petMode: 'defensive', petTauntTimer: 0,
-    spawnPos: { ...pos }, leashAnchor: null, evadeStall: 0, fleeTimer: 0, hasFled: false, wanderTarget: null, wanderTimer: 0,
+    spawnPos: { ...pos }, leashAnchor: null, evadeStall: 0, chaseStall: 0, fleeTimer: 0, hasFled: false, wanderTarget: null, wanderTimer: 0,
     aggroTargetId: null, respawnTimer: 0, corpseTimer: 0, lootable: false, loot: null,
     xpValue: 0, questIds: [], vendorItems: [], objectItemId: null, dungeonId: null,
     dead: false, scale: 1, color: 0xffffff, skin: 0,
