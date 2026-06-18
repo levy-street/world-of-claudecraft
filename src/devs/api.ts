@@ -31,7 +31,22 @@ export interface DevsProfile {
   character: { name: string; class: string; level: number; lifetimeXp: number } | null;
   contribution: ContributionScore | { error: string } | null;
   woc: WocBalance | { error: string; address: string } | null;
+  rewards: RewardsInfo;
 }
+
+export interface RewardsInfo {
+  enabled: boolean;
+  decimals: number;
+  rateBaseUnits: string;
+  claimedBaseUnits: string;
+  claimableBaseUnits: string;
+  claimableUi: number;
+  walletLinked: boolean;
+}
+
+export type ClaimResult =
+  | { ok: true; signature: string; amountBaseUnits: string; amountUi: number }
+  | { ok: false; reason: string };
 
 export interface LeaderboardRow {
   githubUsername: string;
@@ -91,4 +106,8 @@ export function unlinkGithub(cfg: DevsApiConfig): Promise<{ githubUsername: null
 
 export function linkWallet(cfg: DevsApiConfig, solanaAddress: string): Promise<{ solanaAddress: string | null }> {
   return request(cfg, '/api/devs/link-wallet', { method: 'POST', body: JSON.stringify({ solanaAddress }) });
+}
+
+export function claimRewards(cfg: DevsApiConfig): Promise<ClaimResult> {
+  return request<ClaimResult>(cfg, '/api/devs/claim', { method: 'POST' });
 }

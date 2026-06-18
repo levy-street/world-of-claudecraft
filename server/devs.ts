@@ -4,8 +4,10 @@
 // World of ClaudeCraft repo into in-game progression and $WOC rewards. This
 // module computes a contributor's stats live from the GitHub API, scores them
 // into contribution points + a contribution level, and reads a linked Solana
-// wallet's $WOC balance over raw JSON-RPC. No extra runtime deps (uses the
-// platform `fetch`); results are cached briefly so a portal load is cheap.
+// wallet's $WOC balance over raw JSON-RPC. Reward CLAIMS (gated) transfer $WOC
+// from a treasury via @solana/spl-token; balance reads stay on raw `fetch`.
+import { Connection, Keypair, PublicKey } from '@solana/web3.js';
+import { TOKEN_2022_PROGRAM_ID, getOrCreateAssociatedTokenAccount, transferChecked } from '@solana/spl-token';
 
 const GITHUB_REPO = process.env.DEVS_GITHUB_REPO?.trim() || 'levy-street/world-of-claudecraft';
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN?.trim() || process.env.DEVS_GITHUB_TOKEN?.trim() || '';
@@ -162,5 +164,52 @@ export async function fetchWocBalance(owner: string): Promise<WocBalance> {
   return { address: owner, mint: WOC_MINT, decimals: WOC_DECIMALS, uiAmount };
 }
 
+// ---------------------------------------------------------------------------
+// $WOC rewards (GATED — real money). Inert unless a treasury keypair AND a
+// positive reward rate are configured. Rewards are TRANSFERS from a pre-funded
+// treasury (the mint has no mint authority), never new mints.
+// ---------------------------------------------------------------------------
+
+const ZERO = BigInt(0);
+
+export function rewardRateBaseUnits(): bigint {
+  const raw = process.env.WOC_REWARD_RATE_BASE_UNITS?.trim();
+  if (!raw || !/^\d+$/.test(raw)) return ZERO;
+  return BigInt(raw);
+}
+
+/** Treasury keypair from a Solana CLI keypair JSON byte array, or null. */
+export function loadTreasuryKeypair(): Keypair | null {
+  const raw = process.env.SOLANA_TREASURY_KEYPAIR;
+  if (!raw) return null;
+  return Keypair.fromSecretKey(Uint8Array.from(JSON.parse(raw) as number[]));
+}
+
+export function rewardsEnabled(): boolean {
+  return rewardRateBaseUnits() > ZERO && process.env.SOLANA_TREASURY_KEYPAIR != null;
+}
+
+export function computeClaimable(points: number, claimedBaseUnits: bigint): bigint {
+  const earned = BigInt(Math.max(0, Math.trunc(points))) * rewardRateBaseUnits();
+  const claimable = earned - claimedBaseUnits;
+  return claimable > ZERO ? claimable : ZERO;
+}
+
+/** Build, sign, and send a Token-2022 transfer of `amount` base units of $WOC. */
+export async function transferWoc(treasury: Keypair, recipientAddress: string, amount: bigint): Promise<string> {
+  const conn = new Connection(SOLANA_RPC_URL, 'confirmed');
+  const mint = new PublicKey(WOC_MINT);
+  const fromAta = await getOrCreateAssociatedTokenAccount(
+    conn, treasury, mint, treasury.publicKey, false, 'confirmed', undefined, TOKEN_2022_PROGRAM_ID,
+  );
+  const toAta = await getOrCreateAssociatedTokenAccount(
+    conn, treasury, mint, new PublicKey(recipientAddress), false, 'confirmed', undefined, TOKEN_2022_PROGRAM_ID,
+  );
+  return transferChecked(
+    conn, treasury, fromAta.address, mint, toAta.address, treasury, amount, WOC_DECIMALS, [], { commitment: 'confirmed' }, TOKEN_2022_PROGRAM_ID,
+  );
+}
+
 export const DEVS_GITHUB_REPO = GITHUB_REPO;
 export const DEVS_WOC_MINT = WOC_MINT;
+export const DEVS_WOC_DECIMALS = WOC_DECIMALS;

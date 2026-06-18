@@ -149,3 +149,58 @@ export async function contributionLeaderboard(limit = 25): Promise<LeaderboardRo
     prsMerged: r.prs_merged,
   }));
 }
+
+// --- $WOC reward ledger (reserve-then-pay) ----------------------------------
+
+export async function getClaimedBaseUnits(accountId: number): Promise<bigint> {
+  const res = await pool.query('SELECT claimed_base_units FROM devs_contribution_score WHERE account_id = $1', [accountId]);
+  return BigInt(res.rows[0]?.claimed_base_units ?? 0);
+}
+
+// Reserve in a short, row-locked transaction that COMMITS before any transfer:
+// reads claimed FOR UPDATE, advances it to `earnedBaseUnits`, and returns the
+// reserved delta. A concurrent/retried claim sees the advanced total and gets 0,
+// so we can never pay twice. Errs toward under-paying (operator-reconcilable).
+export async function reserveClaim(
+  accountId: number,
+  earnedBaseUnits: bigint,
+): Promise<{ amount: bigint; priorClaimed: bigint }> {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const r = await client.query(
+      'SELECT claimed_base_units FROM devs_contribution_score WHERE account_id = $1 FOR UPDATE',
+      [accountId],
+    );
+    const prior = BigInt(r.rows[0]?.claimed_base_units ?? 0);
+    const amount = earnedBaseUnits > prior ? earnedBaseUnits - prior : BigInt(0);
+    if (amount > BigInt(0)) {
+      await client.query('UPDATE devs_contribution_score SET claimed_base_units = $2 WHERE account_id = $1', [
+        accountId,
+        (prior + amount).toString(),
+      ]);
+    }
+    await client.query('COMMIT');
+    return { amount, priorClaimed: prior };
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+// Roll a reservation back if the on-chain transfer never landed.
+export async function releaseClaim(accountId: number, priorClaimed: bigint): Promise<void> {
+  await pool.query('UPDATE devs_contribution_score SET claimed_base_units = $2 WHERE account_id = $1', [
+    accountId,
+    priorClaimed.toString(),
+  ]);
+}
+
+export async function finalizeClaim(accountId: number, signature: string): Promise<void> {
+  await pool.query(
+    'UPDATE devs_contribution_score SET last_claim_sig = $2, last_claim_at = now() WHERE account_id = $1',
+    [accountId, signature],
+  );
+}
