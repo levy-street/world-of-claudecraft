@@ -7,7 +7,7 @@ import {
   listCharacters, getCharacter, createCharacterCapped, deleteCharacter, closeOrphanSessions,
   pruneChatLogs, searchCharacters, characterCountsByRealm, moderationStatusForAccount, renameCharacter,
   findCharacterReportTargetByName, topArenaRatings, topLifetimeXp, chatMuteStatusForAccount,
-  referralCountForAccount, primarySlugForAccount,
+  referralCountForAccount, primarySlugForAccount, lifetimeXpStanding,
 } from './db';
 import { virtualLevel } from '../src/sim/types';
 import { Sim } from '../src/sim/sim';
@@ -316,6 +316,14 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     }
     const delMatch = /^\/api\/characters\/(\d+)$/.exec(url);
     const renameMatch = /^\/api\/characters\/(\d+)\/rename$/.exec(url);
+    const standingMatch = /^\/api\/characters\/(\d+)\/standing$/.exec(url);
+    if (req.method === 'GET' && standingMatch) {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      const standing = await lifetimeXpStanding(accountId, Number(standingMatch[1]));
+      if (!standing) return json(res, 404, { error: 'character not found' });
+      return json(res, 200, standing);
+    }
     if (req.method === 'POST' && renameMatch) {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;

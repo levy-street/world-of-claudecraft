@@ -477,6 +477,32 @@ export async function primarySlugForAccount(accountId: number): Promise<string |
   return res.rows[0]?.slug ?? null;
 }
 
+// Where a character ranks among all characters on its realm by lifetime XP (the
+// canonical progression metric — encodes level plus post-cap overflow), for the
+// player card's "Top N%" flex. Ownership + realm are enforced via the caller's
+// account; returns null when the character isn't the caller's. rank is 1-based
+// (1 = highest lifetime XP on the realm); total is the realm population.
+export async function lifetimeXpStanding(
+  accountId: number,
+  characterId: number,
+): Promise<{ rank: number; total: number } | null> {
+  const own = await pool.query(
+    `SELECT COALESCE((state->>'lifetimeXp')::bigint, 0)::text AS xp
+       FROM characters WHERE id = $1 AND account_id = $2 AND realm = $3`,
+    [characterId, accountId, REALM],
+  );
+  if ((own.rowCount ?? 0) === 0) return null;
+  const xp = own.rows[0].xp as string;
+  const res = await pool.query(
+    `SELECT
+       (SELECT count(*) FROM characters
+         WHERE realm = $1 AND COALESCE((state->>'lifetimeXp')::bigint, 0) > $2::bigint)::int AS ahead,
+       (SELECT count(*) FROM characters WHERE realm = $1)::int AS total`,
+    [REALM, xp],
+  );
+  return { rank: (res.rows[0]?.ahead ?? 0) + 1, total: res.rows[0]?.total ?? 0 };
+}
+
 export async function moderationStatusForAccount(accountId: number): Promise<AccountModerationStatus> {
   const res = await pool.query(
     `SELECT banned_at, suspended_until, moderation_reason, chat_muted_until, chat_strikes

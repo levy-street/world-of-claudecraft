@@ -24,8 +24,16 @@ export interface ReferralInfo {
 }
 export type ReferralProvider = () => Promise<ReferralInfo>;
 
+/** A character's realm standing by lifetime XP (rank 1 = highest of `total`). */
+export interface CharacterStanding {
+  rank: number;
+  total: number;
+}
+export type StandingProvider = () => Promise<CharacterStanding | null>;
+
 let uploader: CardUploader | null = null;
 let referralProvider: ReferralProvider | null = null;
+let standingProvider: StandingProvider | null = null;
 
 /** main.ts injects the authenticated uploader on world entry (null to clear). */
 export function setCardUploader(fn: CardUploader | null): void {
@@ -35,6 +43,11 @@ export function setCardUploader(fn: CardUploader | null): void {
 /** main.ts injects a referral-stats fetcher on world entry (null to clear). */
 export function setReferralProvider(fn: ReferralProvider | null): void {
   referralProvider = fn;
+}
+
+/** main.ts injects a character-standing fetcher on world entry (null to clear). */
+export function setStandingProvider(fn: StandingProvider | null): void {
+  standingProvider = fn;
 }
 
 /** True when the current session can host a card (online play). */
@@ -51,4 +64,9 @@ export function publishCard(png: Blob): Promise<PublishedCard> {
 /** Referral stats for the card footer, or null when unavailable (offline). */
 export function fetchReferralInfo(): Promise<ReferralInfo | null> {
   return referralProvider ? referralProvider() : Promise.resolve(null);
+}
+
+/** Character standing for the card's "Top N%", or null when unavailable. */
+export function fetchStanding(): Promise<CharacterStanding | null> {
+  return standingProvider ? standingProvider() : Promise.resolve(null);
 }

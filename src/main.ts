@@ -11,7 +11,7 @@ import { handlePickedEntity, hoverCursorKind } from './game/interactions';
 import { clickMoveShouldCancel, clickMoveStep, stepAngleToward } from './game/click_move';
 import { Api, ClientWorld, CharacterSummary } from './net/online';
 import { setWocBalance, setWalletUiEnabled } from './ui/wallet_balance';
-import { setCardUploader, setReferralProvider } from './ui/player_card_share';
+import { setCardUploader, setReferralProvider, setStandingProvider } from './ui/player_card_share';
 // The wallet module (Reown AppKit + @solana/web3.js, ~1MB) is loaded lazily via
 // dynamic import() in the wallet controller below, so it stays out of the main
 // entry chunk and only loads when the feature is enabled + used.
@@ -1560,6 +1560,7 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
     return { url: new URL(r.url, api.base || location.origin).href, ref: r.ref };
   });
   setReferralProvider(() => api.referralStats());
+  setStandingProvider(() => api.characterStanding(c.id));
   // wait for hello + first snapshot so the world starts populated
   const waitStart = Date.now();
   const poll = setInterval(() => {
@@ -1578,6 +1579,7 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
     clearInterval(poll);
     setCardUploader(null);
     setReferralProvider(null);
+    setStandingProvider(null);
     fatalOverlay(userFacingApiError(reason));
   };
 }

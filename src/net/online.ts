@@ -225,6 +225,18 @@ export class Api {
       return { count: 0, slug: null };
     }
   }
+
+  // A character's realm standing by lifetime XP (rank 1 = highest), for the
+  // card's "Top N%" flex. Best-effort: null on error so the card still renders.
+  async characterStanding(characterId: number): Promise<{ rank: number; total: number } | null> {
+    try {
+      const data = await this.get(`/api/characters/${characterId}/standing`);
+      if (typeof data.rank === 'number' && typeof data.total === 'number') return { rank: data.rank, total: data.total };
+      return null;
+    } catch {
+      return null;
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------

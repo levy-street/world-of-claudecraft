@@ -40,6 +40,8 @@ export interface PlayerCardData {
   /** Post-cap virtual level (null below cap). */
   virtualLevel: number | null;
   prestigeRank: number;
+  /** Realm percentile by lifetime XP (e.g. 3 = top 3%), or null to hide it. */
+  topPercent: number | null;
   /** Connected wallet's $WOC balance (null when no wallet). Drives the badge. */
   balance: number | null;
   /** Handle shown in the footer referral line (the card slug, or the name). */
@@ -125,6 +127,16 @@ function fillTextClamped(ctx: CanvasRenderingContext2D, text: string, x: number,
 const TITLE_FONT = 'Cinzel, Georgia, serif';
 const BODY_FONT = '"Alegreya Sans", "Segoe UI", system-ui, sans-serif';
 
+// The brand logo lockup (served from /public). Same-origin, so drawing it does
+// not taint the canvas. Loaded best-effort: if it's missing the footer falls
+// back to a text wordmark rather than failing the whole card.
+const LOGO_URL = '/worldofclaudecraft-logo.png';
+
+/** Format a realm percentile as a card chip label, e.g. 3 → "TOP 3%". */
+function formatTopPercent(pct: number): string {
+  return pct < 1 ? `TOP ${pct.toFixed(1)}%` : `TOP ${Math.ceil(pct)}%`;
+}
+
 /**
  * Composite the player card and return the canvas (2400×1260). The caller can
  * scale it for preview or export it to a PNG blob. Fonts are awaited so the
@@ -142,9 +154,10 @@ export async function renderPlayerCardCanvas(data: PlayerCardData): Promise<HTML
   }
 
   const tier = holderTierForBalance(data.balance);
-  const [charImg, badgeImg] = await Promise.all([
+  const [charImg, badgeImg, logoImg] = await Promise.all([
     loadImage(data.characterImage),
     tier ? loadImage(holderTierBadgeDataUrl(tier, 256)) : Promise.resolve(null),
+    loadImage(LOGO_URL).catch(() => null), // best-effort brand mark
   ]);
 
   const canvas = document.createElement('canvas');
@@ -160,7 +173,7 @@ export async function renderPlayerCardCanvas(data: PlayerCardData): Promise<HTML
   if (tier && badgeImg) drawBadge(ctx, tier, badgeImg, data.balance);
   drawStats(ctx, data);
   drawGear(ctx, data);
-  drawFooter(ctx, data);
+  drawFooter(ctx, data, logoImg);
   drawFrame(ctx, data.classColor);
 
   return canvas;
@@ -217,6 +230,23 @@ function drawHeader(ctx: CanvasRenderingContext2D, data: PlayerCardData): void {
   ctx.font = `600 24px ${BODY_FONT}`;
   const sub = `Level ${data.level} · ${data.className}`;
   ctx.fillText(sub, x, 130);
+  const subW = ctx.measureText(sub).width;
+
+  // A "TOP N%" flex chip beside the subtitle (only shown when it's a flex).
+  if (data.topPercent !== null) {
+    const label = formatTopPercent(data.topPercent);
+    ctx.font = `700 16px ${BODY_FONT}`;
+    const tw = ctx.measureText(label).width;
+    const padX = 12;
+    const chipX = x + subW + 16;
+    const chipY = 109;
+    const chipH = 26;
+    ctx.fillStyle = COL.gold;
+    roundRect(ctx, chipX, chipY, tw + padX * 2, chipH, 13);
+    ctx.fill();
+    ctx.fillStyle = '#1c1407';
+    ctx.fillText(label, chipX + padX, chipY + 18);
+  }
 
   ctx.fillStyle = COL.muted;
   ctx.font = `400 19px ${BODY_FONT}`;
@@ -316,11 +346,18 @@ function drawGear(ctx: CanvasRenderingContext2D, data: PlayerCardData): void {
   }
 }
 
-function drawFooter(ctx: CanvasRenderingContext2D, data: PlayerCardData): void {
+function drawFooter(ctx: CanvasRenderingContext2D, data: PlayerCardData, logo: HTMLImageElement | null): void {
   const y = CARD_H - 26;
-  ctx.fillStyle = COL.gold;
-  ctx.font = `700 24px ${TITLE_FONT}`;
-  ctx.fillText('WORLD OF CLAUDECRAFT', 478, y);
+  // Brand mark: the real logo lockup when available, else a text wordmark.
+  if (logo && logo.width > 0) {
+    const h = 52;
+    const w = (logo.width / logo.height) * h;
+    ctx.drawImage(logo, 478, CARD_H - 30 - h, w, h);
+  } else {
+    ctx.fillStyle = COL.gold;
+    ctx.font = `700 24px ${TITLE_FONT}`;
+    ctx.fillText('WORLD OF CLAUDECRAFT', 478, y);
+  }
 
   ctx.textAlign = 'right';
   ctx.fillStyle = COL.cream;

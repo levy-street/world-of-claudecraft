@@ -25,7 +25,7 @@ import { iconDataUrl, iconCanvas, QUALITY_COLOR, raidMarkerDataUrl, RAID_MARKER_
 import { svgIcon } from './ui_icons';
 import { walletUiEnabled, wocBalance, onWalletUiChange } from './wallet_balance';
 import { renderPlayerCardCanvas, cardCanvasToBlob, CARD_POSES, type PlayerCardData, type PlayerCardStat } from './player_card';
-import { cardHostingAvailable, publishCard, fetchReferralInfo, type PublishedCard } from './player_card_share';
+import { cardHostingAvailable, publishCard, fetchReferralInfo, fetchStanding, type PublishedCard, type CharacterStanding } from './player_card_share';
 import { holderTierForBalance } from './holder_tier';
 import { Keybinds, BIND_ACTIONS, BIND_CATEGORIES, isReservedCode, keyLabel } from '../game/keybinds';
 import { Settings, GameSettings, BoolSettingKey, NumericSettingKey, SETTING_RANGES, clickMoveButtonLabel, normalizeClickMoveButton } from '../game/settings';
@@ -3825,9 +3825,9 @@ export class Hud {
     const linkRow = back.querySelector('.pc-link') as HTMLElement;
     const setStatus = (msg: string) => { status.textContent = msg; };
 
-    // Referral info is online-only (null offline); it enriches the footer. Fetch
-    // once and reuse across pose re-renders.
-    const referral = await fetchReferralInfo();
+    // Referral info + realm standing are online-only (null offline). Fetch once
+    // and reuse across pose re-renders.
+    const [referral, standing] = await Promise.all([fetchReferralInfo(), fetchStanding()]);
     if (this.cardModalEl !== back) return; // modal closed while awaiting
 
     // Current card state, shared with the action handlers by reference so a pose
@@ -3840,7 +3840,7 @@ export class Hud {
       const pose = CARD_POSES[poseIndex];
       poseButtons.forEach((b, i) => b.classList.toggle('sel', i === poseIndex));
       const characterImage = preview.captureCloseup({ poseClips: pose.clips, poseFraction: pose.fraction });
-      const data = this.buildPlayerCardData(characterImage, referral);
+      const data = this.buildPlayerCardData(characterImage, referral, standing);
       const canvas = await renderPlayerCardCanvas(data);
       if (this.cardModalEl !== back) return; // modal closed mid-render
       canvas.classList.add('pc-card-canvas');
@@ -3987,13 +3987,26 @@ export class Hud {
     return `I'm forging my legend in World of Claudecraft — Level ${data.level} ${data.className}${tierBit}. Join my realm:`;
   }
 
-  private buildPlayerCardData(characterImage: string, referral: { count: number; slug: string | null } | null): PlayerCardData {
+  private buildPlayerCardData(
+    characterImage: string,
+    referral: { count: number; slug: string | null } | null,
+    standing: CharacterStanding | null,
+  ): PlayerCardData {
     const sim = this.sim;
     const p = sim.player;
     const cls = sim.cfg.playerClass;
     const classColor = '#' + (p.color & 0xffffff).toString(16).padStart(6, '0');
     const num = (n: number) => formatNumber(n, { maximumFractionDigits: 0 });
     const pct = (n: number) => `${formatNumber(n * 100, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`;
+
+    // Realm percentile by lifetime XP. Only surfaced as a flex when the realm is
+    // populated enough to be meaningful and the character is in the top half —
+    // no one wants to broadcast "Top 90%".
+    let topPercent: number | null = null;
+    if (standing && standing.total >= 10 && standing.rank >= 1) {
+      const p100 = (standing.rank / standing.total) * 100;
+      if (p100 <= 50) topPercent = p100;
+    }
 
     const wpn = sim.equipment.mainhand ? ITEMS[sim.equipment.mainhand] : null;
     const dps = wpn?.weapon
@@ -4042,10 +4055,11 @@ export class Hud {
       arenaRating: rating,
       virtualLevel: null,
       prestigeRank: sim.prestigeRank,
+      topPercent,
       balance: wocBalance(),
       referralHandle: referral?.slug ?? this.cardSlug(p.name),
       referralCount: referral?.count ?? null,
-      siteUrl: location.host,
+      siteUrl: 'worldofclaudecraft.com',
     };
   }
 

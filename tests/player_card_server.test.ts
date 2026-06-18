@@ -15,6 +15,7 @@ vi.mock('pg', () => ({
 import {
   handleCardUpload, handleCardRoutes, captureReferral, slugify, isValidSlug,
 } from '../server/player_card';
+import { lifetimeXpStanding } from '../server/db';
 
 const PNG_MAGIC = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 const fakePng = Buffer.concat([PNG_MAGIC, Buffer.from('IDATfake-pixels')]);
@@ -51,12 +52,17 @@ let slugRows: any[] = [];          // SELECT character_id FROM player_cards WHER
 let cardRows: any[] = [];          // getPlayerCardBySlug
 let accountForSlugRows: any[] = [];
 let upsertThrows: Error | null = null;
+let standingXpRows: any[] = [];    // lifetimeXpStanding ownership/xp lookup
+let standingCountRows: any[] = []; // lifetimeXpStanding ahead/total
 
 beforeEach(() => {
   characterRows = []; slugRows = []; cardRows = []; accountForSlugRows = []; upsertThrows = null;
+  standingXpRows = []; standingCountRows = [];
   dbMock.query.mockReset();
   dbMock.query.mockImplementation((sql: string) => {
     const s = String(sql).replace(/\s+/g, ' ').trim();
+    if (s.includes('::text AS xp')) return Promise.resolve({ rows: standingXpRows, rowCount: standingXpRows.length });
+    if (s.includes('AS ahead')) return Promise.resolve({ rows: standingCountRows });
     if (s.includes('SELECT id, account_id, name, class, level, state')) return Promise.resolve({ rows: characterRows });
     if (s.includes('SELECT character_id FROM player_cards WHERE slug')) return Promise.resolve({ rows: slugRows });
     if (s.includes('INSERT INTO player_cards')) {
@@ -202,6 +208,26 @@ describe('GET /p/<slug>', () => {
     await handleCardRoutes(makeGetReq('/p/..%2f..%2fetc'), res);
     expect(res.statusCode).toBe(404);
     expect(dbMock.query).not.toHaveBeenCalled();
+  });
+});
+
+describe('lifetimeXpStanding', () => {
+  it('returns 1-based rank + realm total for an owned character', async () => {
+    standingXpRows = [{ xp: '12345' }];
+    standingCountRows = [{ ahead: 9, total: 500 }];
+    const s = await lifetimeXpStanding(1, 42);
+    expect(s).toEqual({ rank: 10, total: 500 }); // 9 ahead → rank 10
+  });
+
+  it('returns null when the character is not the caller’s', async () => {
+    standingXpRows = []; // ownership/realm lookup found nothing
+    expect(await lifetimeXpStanding(1, 999)).toBeNull();
+  });
+
+  it('ranks a brand-new character (0 ahead) as rank 1', async () => {
+    standingXpRows = [{ xp: '0' }];
+    standingCountRows = [{ ahead: 0, total: 3 }];
+    expect(await lifetimeXpStanding(1, 5)).toEqual({ rank: 1, total: 3 });
   });
 });
 
