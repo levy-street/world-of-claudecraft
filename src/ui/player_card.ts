@@ -67,6 +67,30 @@ const COL = {
   panelEdge: 'rgba(255,209,0,0.14)',
 };
 
+/** A selectable pose for the card avatar. `clips` is tried in order against the
+ *  model (first present wins; Idle is the universal fallback); `fraction` is the
+ *  point in the clip (0..1) to freeze. Verified to read well across all classes. */
+export interface CardPose {
+  id: string;
+  label: string;
+  clips: readonly string[];
+  fraction: number;
+}
+
+export const CARD_POSES: readonly CardPose[] = [
+  // Heroic raised weapon — epic across warrior/mage/hunter/etc. The default.
+  { id: 'hero', label: 'Hero', clips: ['Spellcast_Raise', 'Spellcasting', 'Idle'], fraction: 0.5 },
+  // Class-appropriate combat action (melee swing / drawn bow / cast).
+  { id: 'battle', label: 'Battle', clips: ['2H_Melee_Attack_Chop', '1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal', 'Dualwield_Melee_Attack_Chop', '2H_Ranged_Shoot', 'Spellcast_Shoot', 'Idle'], fraction: 0.4 },
+  // Arm-up celebration.
+  { id: 'victory', label: 'Victory', clips: ['Cheer', 'Jump_Idle', 'Idle'], fraction: 0.5 },
+];
+
+/** Human-readable $WOC amount: whole tokens with thousands separators. */
+function formatWoc(n: number): string {
+  return (n >= 1 ? Math.round(n) : n).toLocaleString('en-US', { maximumFractionDigits: n >= 1 ? 0 : 2 });
+}
+
 function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -133,7 +157,7 @@ export async function renderPlayerCardCanvas(data: PlayerCardData): Promise<HTML
   drawBackdrop(ctx, data.classColor);
   drawCharacter(ctx, charImg);
   drawHeader(ctx, data);
-  if (tier && badgeImg) drawBadge(ctx, tier, badgeImg);
+  if (tier && badgeImg) drawBadge(ctx, tier, badgeImg, data.balance);
   drawStats(ctx, data);
   drawGear(ctx, data);
   drawFooter(ctx, data);
@@ -199,9 +223,9 @@ function drawHeader(ctx: CanvasRenderingContext2D, data: PlayerCardData): void {
   ctx.fillText(data.realm ? `${data.realm} Realm` : 'World of Claudecraft', x, 158);
 }
 
-function drawBadge(ctx: CanvasRenderingContext2D, tier: HolderTier, badge: HTMLImageElement): void {
+function drawBadge(ctx: CanvasRenderingContext2D, tier: HolderTier, badge: HTMLImageElement, balance: number | null): void {
   const cx = 1108;
-  const cy = 92;
+  const cy = 96;
   const r = 52;
   ctx.save();
   ctx.shadowColor = hexWithAlpha(tier.glow, 0.9);
@@ -209,13 +233,22 @@ function drawBadge(ctx: CanvasRenderingContext2D, tier: HolderTier, badge: HTMLI
   ctx.drawImage(badge, cx - r, cy - r, r * 2, r * 2);
   ctx.restore();
 
+  const right = cx - r - 14;
   ctx.textAlign = 'right';
+  // Tier name.
   ctx.fillStyle = tier.ring;
   ctx.font = `700 22px ${TITLE_FONT}`;
-  ctx.fillText(tier.name.toUpperCase(), cx - r - 14, cy - 4);
+  ctx.fillText(tier.name.toUpperCase(), right, cy - 22);
+  // The actual on-chain bag — the flex.
+  if (balance !== null) {
+    ctx.fillStyle = COL.gold;
+    ctx.font = `700 24px ${BODY_FONT}`;
+    fillTextClamped(ctx, `${formatWoc(balance)} $WOC`, right, cy + 4, 380);
+  }
+  // Flavour line.
   ctx.fillStyle = COL.muted;
-  ctx.font = `400 15px ${BODY_FONT}`;
-  fillTextClamped(ctx, tier.flavor, cx - r - 14, cy + 20, 360);
+  ctx.font = `400 14px ${BODY_FONT}`;
+  fillTextClamped(ctx, tier.flavor, right, cy + 26, 400);
   ctx.textAlign = 'left';
 }
 

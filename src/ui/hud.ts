@@ -24,7 +24,7 @@ import { music, musicZoneForLocation } from '../game/music';
 import { iconDataUrl, iconCanvas, QUALITY_COLOR, raidMarkerDataUrl, RAID_MARKER_NAMES } from './icons';
 import { svgIcon } from './ui_icons';
 import { walletUiEnabled, wocBalance, onWalletUiChange } from './wallet_balance';
-import { renderPlayerCardCanvas, cardCanvasToBlob, type PlayerCardData, type PlayerCardStat } from './player_card';
+import { renderPlayerCardCanvas, cardCanvasToBlob, CARD_POSES, type PlayerCardData, type PlayerCardStat } from './player_card';
 import { cardHostingAvailable, publishCard, fetchReferralInfo, type PublishedCard } from './player_card_share';
 import { holderTierForBalance } from './holder_tier';
 import { Keybinds, BIND_ACTIONS, BIND_CATEGORIES, isReservedCode, keyLabel } from '../game/keybinds';
@@ -3798,15 +3798,17 @@ export class Hud {
     if (!this.charPreview) this.renderCharPreview();
     const preview = this.charPreview;
     if (!preview) return;
-    const characterImage = preview.captureCloseup();
 
     this.cardModalEl?.remove();
     const back = document.createElement('div');
     back.className = 'modal-backdrop';
     back.id = 'player-card-modal';
+    const poseBtns = CARD_POSES.map((p, i) =>
+      `<button type="button" class="btn pc-pose${i === 0 ? ' sel' : ''}" data-pose="${i}">${esc(p.label)}</button>`).join('');
     back.innerHTML = `<div class="window panel pc-modal">`
       + `<div class="panel-title"><span>Player Card</span><span class="x-btn" data-close>${svgIcon('close')}</span></div>`
       + `<div class="pc-preview pc-loading">Forging your card…</div>`
+      + `<div class="pc-poses" role="group" aria-label="Pose">${poseBtns}</div>`
       + `<div class="pc-actions"></div>`
       + `<div class="pc-link" hidden><span class="pc-link-label">Your referral link — anyone who joins through it is credited to you:</span>`
       + `<input class="pc-link-input" type="text" readonly aria-label="Your referral link"></div>`
@@ -3818,35 +3820,61 @@ export class Hud {
     back.addEventListener('click', (e) => { if (e.target === back) close(); });
     back.querySelector('[data-close]')?.addEventListener('click', () => { audio.click(); close(); });
 
+    const previewBox = back.querySelector('.pc-preview') as HTMLElement;
     const status = back.querySelector('.pc-status') as HTMLElement;
+    const linkRow = back.querySelector('.pc-link') as HTMLElement;
     const setStatus = (msg: string) => { status.textContent = msg; };
 
-    // Referral info is online-only (null offline); it enriches the footer.
+    // Referral info is online-only (null offline); it enriches the footer. Fetch
+    // once and reuse across pose re-renders.
     const referral = await fetchReferralInfo();
     if (this.cardModalEl !== back) return; // modal closed while awaiting
-    const data = this.buildPlayerCardData(characterImage, referral);
-    const canvas = await renderPlayerCardCanvas(data);
+
+    // Current card state, shared with the action handlers by reference so a pose
+    // change (which re-captures + re-composites) also invalidates any publish.
+    const state: { canvas: HTMLCanvasElement | null; data: PlayerCardData | null; published: PublishedCard | null } =
+      { canvas: null, data: null, published: null };
+
+    const poseButtons = Array.from(back.querySelectorAll<HTMLButtonElement>('.pc-pose'));
+    const compose = async (poseIndex: number): Promise<void> => {
+      const pose = CARD_POSES[poseIndex];
+      poseButtons.forEach((b, i) => b.classList.toggle('sel', i === poseIndex));
+      const characterImage = preview.captureCloseup({ poseClips: pose.clips, poseFraction: pose.fraction });
+      const data = this.buildPlayerCardData(characterImage, referral);
+      const canvas = await renderPlayerCardCanvas(data);
+      if (this.cardModalEl !== back) return; // modal closed mid-render
+      canvas.classList.add('pc-card-canvas');
+      previewBox.classList.remove('pc-loading');
+      previewBox.innerHTML = '';
+      previewBox.appendChild(canvas);
+      // A new pose is a different image, so any prior publish is stale.
+      state.canvas = canvas;
+      state.data = data;
+      state.published = null;
+      linkRow.hidden = true;
+      setStatus('');
+    };
+
+    poseButtons.forEach((b, i) => b.addEventListener('click', () => {
+      if (b.classList.contains('sel')) return;
+      audio.click();
+      void compose(i);
+    }));
+
+    await compose(0);
     if (this.cardModalEl !== back) return;
-
-    const previewBox = back.querySelector('.pc-preview') as HTMLElement;
-    previewBox.classList.remove('pc-loading');
-    previewBox.innerHTML = '';
-    canvas.classList.add('pc-card-canvas');
-    previewBox.appendChild(canvas);
-
-    this.wireCardActions(back, canvas, data, setStatus);
+    this.wireCardActions(back, state, setStatus);
   }
 
   private wireCardActions(
     back: HTMLElement,
-    canvas: HTMLCanvasElement,
-    data: PlayerCardData,
+    state: { canvas: HTMLCanvasElement | null; data: PlayerCardData | null; published: PublishedCard | null },
     setStatus: (msg: string) => void,
   ): void {
     const actions = back.querySelector('.pc-actions') as HTMLElement;
     const linkRow = back.querySelector('.pc-link') as HTMLElement;
     const linkInput = back.querySelector('.pc-link-input') as HTMLInputElement;
-    const fileName = `${(data.referralHandle || 'player').replace(/[^a-z0-9-]/g, '')}-woc-card.png`;
+    const fileName = () => `${(state.data?.referralHandle || 'player').replace(/[^a-z0-9-]/g, '')}-woc-card.png`;
     const mkBtn = (label: string, cls = ''): HTMLButtonElement => {
       const b = document.createElement('button');
       b.type = 'button';
@@ -3857,18 +3885,19 @@ export class Hud {
     };
     const errMsg = (err: unknown) => (err instanceof Error ? err.message : 'Something went wrong.');
 
-    // Publish-once: hosting a public card is needed for X / copy-link; cache the
-    // result so repeated actions don't re-upload. On success the player's
-    // referral link is revealed so it's tangible (and selectable as a fallback).
-    let published: PublishedCard | null = null;
+    // Publish-once per pose: hosting a public card is needed for X / copy-link.
+    // The result is cached on `state` and cleared whenever the pose changes, so
+    // switching pose after publishing re-uploads the new image on next share.
     const publishOnce = async (): Promise<PublishedCard> => {
-      if (published) return published;
+      if (state.published) return state.published;
+      if (!state.canvas) throw new Error('card is still rendering');
       setStatus('Publishing card…');
-      published = await publishCard(await cardCanvasToBlob(canvas));
-      linkInput.value = published.url;
+      const pub = await publishCard(await cardCanvasToBlob(state.canvas));
+      state.published = pub;
+      linkInput.value = pub.url;
       linkRow.hidden = false;
       setStatus('Card published — share your referral link below.');
-      return published;
+      return pub;
     };
 
     if (cardHostingAvailable()) {
@@ -3878,7 +3907,8 @@ export class Hud {
         xb.disabled = true;
         try {
           const pub = await publishOnce();
-          const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(this.cardShareText(data))}&url=${encodeURIComponent(pub.url)}`;
+          const text = state.data ? this.cardShareText(state.data) : 'World of Claudecraft';
+          const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(pub.url)}`;
           window.open(intent, '_blank', 'noopener,noreferrer');
         } catch (err) {
           setStatus(errMsg(err));
@@ -3907,11 +3937,12 @@ export class Hud {
     const dl = mkBtn('Download');
     dl.addEventListener('click', async () => {
       audio.click();
-      const blob = await cardCanvasToBlob(canvas);
+      if (!state.canvas) return;
+      const blob = await cardCanvasToBlob(state.canvas);
       const href = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = href;
-      a.download = fileName;
+      a.download = fileName();
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -3926,10 +3957,11 @@ export class Hud {
       const sb = mkBtn('Share…');
       sb.addEventListener('click', async () => {
         audio.click();
+        if (!state.canvas) return;
         sb.disabled = true;
         try {
-          const file = new File([await cardCanvasToBlob(canvas)], fileName, { type: 'image/png' });
-          const payload: ShareData = { files: [file], title: 'World of Claudecraft', text: this.cardShareText(data) };
+          const file = new File([await cardCanvasToBlob(state.canvas)], fileName(), { type: 'image/png' });
+          const payload: ShareData = { files: [file], title: 'World of Claudecraft', text: state.data ? this.cardShareText(state.data) : 'World of Claudecraft' };
           // Attach the hosted link when hosting is available; if publishing
           // fails, fall back to sharing just the image file.
           if (cardHostingAvailable()) {

@@ -227,7 +227,9 @@ export class CharacterPreview {
    * untouched. Because nothing awaits between the off-pose render and the
    * restore, the browser never paints the intermediate frame.
    */
-  captureCloseup(opts: { width?: number; height?: number; angle?: number } = {}): string {
+  captureCloseup(
+    opts: { width?: number; height?: number; angle?: number; poseClips?: readonly string[]; poseFraction?: number } = {},
+  ): string {
     const width = Math.max(1, Math.round(opts.width ?? 540));
     const height = Math.max(1, Math.round(opts.height ?? 720));
     const angle = opts.angle ?? -0.42; // gentle 3/4 turn for a heroic stance
@@ -238,6 +240,12 @@ export class CharacterPreview {
     const prevAspect = this.camera.aspect;
     const prevPos = this.camera.position.clone();
     const prevRotY = this.characterGroup.rotation.y;
+
+    // Optionally lock a deliberate pose for the shot (e.g. a hero/cast/cheer
+    // stance) instead of whatever idle frame is up. Restored via clearPose below.
+    const posed = opts.poseClips && opts.poseClips.length > 0
+      ? this.currentVisual?.poseFreeze(opts.poseClips, opts.poseFraction ?? 0.5) ?? null
+      : null;
 
     // Pixel-exact buffer (ratio 1 → drawingBuffer is exactly width×height).
     this.renderer.setPixelRatio(1);
@@ -250,7 +258,8 @@ export class CharacterPreview {
     this.renderer.render(this.scene, this.camera);
     const url = this.canvas.toDataURL('image/png');
 
-    // Restore the live preview exactly as it was.
+    // Restore the live preview exactly as it was (camera + idle animation).
+    if (posed) this.currentVisual?.clearPose();
     this.renderer.setPixelRatio(prevPixelRatio);
     this.renderer.setSize(prevSize.x, prevSize.y, false);
     this.camera.aspect = prevAspect;
