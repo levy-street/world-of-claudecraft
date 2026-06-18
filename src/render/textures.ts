@@ -1130,3 +1130,53 @@ export function sparkleTexture(): THREE.CanvasTexture {
   tex.colorSpace = THREE.SRGBColorSpace;
   return tex;
 }
+
+// Sharp white star shard for +9 weapon glitter (cool white, not gold).
+let glitterShardTex: THREE.CanvasTexture | null = null;
+export function glitterShardTexture(): THREE.CanvasTexture {
+  if (glitterShardTex) return glitterShardTex;
+  const c = document.createElement('canvas');
+  c.width = 64;
+  c.height = 64;
+  const ctx = c.getContext('2d')!;
+  ctx.clearRect(0, 0, 64, 64);
+  const core = ctx.createRadialGradient(32, 32, 0, 32, 32, 10);
+  core.addColorStop(0, 'rgba(255,255,255,1)');
+  core.addColorStop(0.45, 'rgba(210,240,255,0.55)');
+  core.addColorStop(1, 'rgba(180,220,255,0)');
+  ctx.fillStyle = core;
+  ctx.beginPath();
+  ctx.arc(32, 32, 10, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,0.95)';
+  ctx.lineWidth = 1.5;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(32, 3); ctx.lineTo(32, 61);
+  ctx.moveTo(3, 32); ctx.lineTo(61, 32);
+  ctx.moveTo(10, 10); ctx.lineTo(54, 54);
+  ctx.moveTo(54, 10); ctx.lineTo(10, 54);
+  ctx.stroke();
+  glitterShardTex = new THREE.CanvasTexture(c);
+  glitterShardTex.colorSpace = THREE.SRGBColorSpace;
+  return glitterShardTex;
+}
+
+// Soft cool-white puff halo for weapon glitter sprites.
+let glitterSoftTex: THREE.CanvasTexture | null = null;
+export function glitterSoftTexture(): THREE.CanvasTexture {
+  if (glitterSoftTex) return glitterSoftTex;
+  const c = document.createElement('canvas');
+  c.width = 64;
+  c.height = 64;
+  const ctx = c.getContext('2d')!;
+  const g = ctx.createRadialGradient(32, 32, 0, 32, 32, 30);
+  g.addColorStop(0, 'rgba(255,255,255,0.9)');
+  g.addColorStop(0.3, 'rgba(200,235,255,0.4)');
+  g.addColorStop(1, 'rgba(160,210,255,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, 64, 64);
+  glitterSoftTex = new THREE.CanvasTexture(c);
+  glitterSoftTex.colorSpace = THREE.SRGBColorSpace;
+  return glitterSoftTex;
+}

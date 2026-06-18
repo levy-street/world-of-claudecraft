@@ -8,12 +8,16 @@ import {
 import { ARENA_SPAWN_A, ARENA_SPAWN_B, ARENA_SPAWNS_A_2v2, ARENA_SPAWNS_B_2v2 } from './dungeon_layout';
 import { lineOfSightClear, resolvePosition } from './colliders';
 import { findPath } from './pathfind';
-import { createGroundObject, createMob, createNpc, createPlayer, recalcPlayerStats, PlayerEquipment } from './entity';
+import { createGroundObject, createMob, createNpc, createPlayer, recalcPlayerStats, PlayerEquipment, PlayerEquipmentEnhance } from './entity';
 import {
   computeTalentModifiers, emptyAllocation, emptyModifiers, talentsFor, talentPointsAtLevel,
   validateAllocation, cloneAllocation, pointsSpent, FIRST_TALENT_LEVEL, MAX_LOADOUTS,
   type TalentAllocation, type TalentModifiers, type SavedLoadout, type Role,
 } from './content/talents';
+import {
+  canEnhanceItem, ENHANCE_MATERIALS, ENHANCE_SUCCESS_RATE, enhanceTierForLevel,
+  findInvIndex, materialCostForLevel, MAX_ENHANCE, stacksMerge, stackEnhance,
+} from './content/enhancement';
 import { Rng } from './rng';
 import { SpatialGrid } from './spatial';
 import {
@@ -30,7 +34,7 @@ import {
   angleTo, armorReduction, dist2d, emptyMoveInput, isConsuming, meleeMissChance, mobXpValue, normAngle,
   rageFromDealing, rageFromTaking, spellHitChance, xpForLevel,
   MILESTONES, virtualLevel, xpToReachLevel, canPrestige,
-  ArenaFormat, ArenaCombatant,
+  ArenaFormat, ArenaCombatant, EnhanceRef,
 } from './types';
 
 const LEASH_DISTANCE = 45;
@@ -302,6 +306,7 @@ export interface PlayerMeta {
   vendorBuyback: InvSlot[];
   copper: number;
   equipment: PlayerEquipment;
+  equipmentEnhance?: PlayerEquipmentEnhance;
   xp: number;
   // Post-cap progression (Max-Level XP Overflow). `lifetimeXp` is the monotonic
   // 64-bit-safe total of all XP ever earned — it keeps growing at the cap and is
@@ -396,6 +401,7 @@ export interface CharacterState {
   pos: { x: number; z: number };
   facing: number;
   equipment: PlayerEquipment;
+  equipmentEnhance?: PlayerEquipmentEnhance;
   inventory: InvSlot[];
   vendorBuyback?: InvSlot[];
   questLog: { questId: string; counts: number[]; state: 'active' | 'ready' | 'done' }[];
@@ -683,6 +689,7 @@ export class Sim {
       vendorBuyback: [],
       copper: 0,
       equipment: { mainhand: classDef.startWeapon, chest: classDef.startChest },
+      equipmentEnhance: {},
       xp: 0,
       lifetimeXp: 0,
       prestigeRank: 0,
@@ -720,6 +727,7 @@ export class Sim {
       if (s.unlockedMilestones) for (const id of s.unlockedMilestones) meta.unlockedMilestones.add(id);
       meta.copper = s.copper;
       meta.equipment = { ...s.equipment };
+      meta.equipmentEnhance = { ...(s.equipmentEnhance ?? {}) };
       meta.inventory = s.inventory.map((i) => ({ ...i }));
       meta.vendorBuyback = (s.vendorBuyback ?? []).map((i) => ({ ...i }));
       for (const q of s.questLog) {
@@ -735,7 +743,7 @@ export class Sim {
     // resolver below consume it (they only ever read these flat numbers).
     meta.talentMods = computeTalentModifiers(cls, meta.talents);
     this.refreshKnownAbilities(meta, false);
-    recalcPlayerStats(player, cls, meta.equipment, meta.talentMods);
+    recalcPlayerStats(player, cls, meta.equipment, meta.talentMods, meta.equipmentEnhance);
     if (opts?.state) {
       player.hp = Math.max(1, Math.min(player.maxHp, opts.state.hp));
       player.resource = classDef.resourceType === 'mana'
@@ -814,6 +822,7 @@ export class Sim {
       pos: { x: e.pos.x, z: e.pos.z },
       facing: e.facing,
       equipment: { ...meta.equipment },
+      equipmentEnhance: { ...(meta.equipmentEnhance ?? {}) },
       inventory: meta.inventory.map((i) => ({ ...i })),
       vendorBuyback: meta.vendorBuyback.map((i) => ({ ...i })),
       questLog: [...meta.questLog.values()].map((q) => ({ questId: q.questId, counts: [...q.counts], state: q.state })),
@@ -871,6 +880,9 @@ export class Sim {
   }
   get equipment(): PlayerEquipment {
     return this.primary.equipment;
+  }
+  get equipmentEnhance(): PlayerEquipmentEnhance {
+    return this.primary.equipmentEnhance ?? {};
   }
   get copper(): number {
     return this.primary.copper;
@@ -1029,7 +1041,7 @@ export class Sim {
     // from a sane baseline (virtualLevel never falls below the real level). Only
     // ever raises it — lifetimeXp is monotonic.
     r.meta.lifetimeXp = Math.max(r.meta.lifetimeXp, xpToReachLevel(r.e.level));
-    recalcPlayerStats(r.e, r.meta.cls, r.meta.equipment, r.meta.talentMods);
+    recalcPlayerStats(r.e, r.meta.cls, r.meta.equipment, r.meta.talentMods, r.meta.equipmentEnhance);
     r.e.hp = r.e.maxHp;
     if (r.e.resourceType === 'mana') r.e.resource = r.e.maxResource;
     this.refreshKnownAbilities(r.meta, false);
@@ -1048,7 +1060,7 @@ export class Sim {
   private recomputeTalents(meta: PlayerMeta): void {
     meta.talentMods = computeTalentModifiers(meta.cls, meta.talents);
     const e = this.entities.get(meta.entityId);
-    if (e) recalcPlayerStats(e, meta.cls, meta.equipment, meta.talentMods);
+    if (e) recalcPlayerStats(e, meta.cls, meta.equipment, meta.talentMods, meta.equipmentEnhance);
     this.refreshKnownAbilities(meta, false);
   }
 
@@ -1782,7 +1794,7 @@ export class Sim {
     }
     if (statsDirty && e.kind === 'player') {
       const meta = this.players.get(e.id);
-      if (meta) recalcPlayerStats(e, meta.cls, meta.equipment, meta.talentMods);
+      if (meta) recalcPlayerStats(e, meta.cls, meta.equipment, meta.talentMods, meta.equipmentEnhance);
     }
   }
 
@@ -2466,7 +2478,7 @@ export class Sim {
             if (existing >= 0) {
               p.auras.splice(existing, 1);
               this.emit({ type: 'aura', targetId: p.id, name: ability.name, gained: false });
-              recalcPlayerStats(p, meta.cls, meta.equipment, meta.talentMods);
+              recalcPlayerStats(p, meta.cls, meta.equipment, meta.talentMods, meta.equipmentEnhance);
               break;
             }
           }
@@ -2485,7 +2497,7 @@ export class Sim {
             remaining: eff.duration, duration: eff.duration, value: eff.value,
             sourceId: p.id, school: ability.school,
           });
-          recalcPlayerStats(p, meta.cls, meta.equipment, meta.talentMods);
+          recalcPlayerStats(p, meta.cls, meta.equipment, meta.talentMods, meta.equipmentEnhance);
           break;
         }
         case 'gainResource': {
@@ -2592,7 +2604,7 @@ export class Sim {
     this.refreshMobLeashFromAction(source ?? null, target);
     if (target.kind === 'player') {
       const meta = this.players.get(target.id);
-      if (meta) recalcPlayerStats(target, meta.cls, meta.equipment, meta.talentMods);
+      if (meta) recalcPlayerStats(target, meta.cls, meta.equipment, meta.talentMods, meta.equipmentEnhance);
     }
   }
 
@@ -3526,7 +3538,7 @@ export class Sim {
       meta.xp -= xpForLevel(p.level);
       p.level++;
       meta.counters.levelUps++;
-      recalcPlayerStats(p, meta.cls, meta.equipment, meta.talentMods);
+      recalcPlayerStats(p, meta.cls, meta.equipment, meta.talentMods, meta.equipmentEnhance);
       p.hp = p.maxHp;
       if (p.resourceType === 'mana') p.resource = p.maxResource;
       this.emit({ type: 'levelup', level: p.level, pid: p.id });
@@ -4807,34 +4819,49 @@ export class Sim {
     return n;
   }
 
-  addItem(itemId: string, count: number, pid?: number): void {
+  addItem(itemId: string, count: number, pid?: number, enhance = 0): void {
     const r = this.resolve(pid);
     if (!r) return;
     const { meta } = r;
     const def = ITEMS[itemId];
-    const existing = meta.inventory.find((s) => s.itemId === itemId);
-    if (existing) existing.count += count;
-    else meta.inventory.push({ itemId, count });
-    this.emit({ type: 'loot', text: `You receive: ${def?.name ?? itemId}${count > 1 ? ' x' + count : ''}.`, pid: meta.entityId });
+    const enh = Math.max(0, Math.min(MAX_ENHANCE, Math.floor(enhance)));
+    for (let i = 0; i < count; i++) {
+      const existing = meta.inventory.find((s) => stacksMerge(s, itemId, enh));
+      if (existing && enh === 0) existing.count += 1;
+      else {
+        const slot: InvSlot = { itemId, count: 1 };
+        if (enh > 0) slot.enhance = enh;
+        meta.inventory.push(slot);
+      }
+    }
+    this.emit({ type: 'loot', text: `You receive: ${def?.name ?? itemId}${count > 1 ? ' x' + count : ''}${enh > 0 ? ` (+${enh})` : ''}.`, pid: meta.entityId });
     this.onInventoryChangedForQuests(meta);
-    if (meta.autoEquip && (def?.kind === 'weapon' || def?.kind === 'armor')) {
+    if (meta.autoEquip && enh === 0 && (def?.kind === 'weapon' || def?.kind === 'armor')) {
       this.maybeAutoEquip(itemId, meta);
     }
   }
 
-  removeItem(itemId: string, count: number, pid?: number): void {
+  removeItem(itemId: string, count: number, pid?: number, enhance?: number): void {
     const r = this.resolve(pid);
     if (!r) return;
     const { meta } = r;
-    for (let i = meta.inventory.length - 1; i >= 0 && count > 0; i--) {
+    let left = count;
+    for (let i = meta.inventory.length - 1; i >= 0 && left > 0; i--) {
       const s = meta.inventory[i];
       if (s.itemId !== itemId) continue;
-      const take = Math.min(s.count, count);
+      if (enhance !== undefined && stackEnhance(s) !== enhance) continue;
+      const take = Math.min(s.count, left);
       s.count -= take;
-      count -= take;
+      left -= take;
       if (s.count <= 0) meta.inventory.splice(i, 1);
     }
     this.onInventoryChangedForQuests(meta);
+  }
+
+  removeMaterial(materialId: string, count: number, pid?: number): boolean {
+    if (this.countItem(materialId, pid) < count) return false;
+    this.removeItem(materialId, count, pid);
+    return true;
   }
 
   discardItem(itemId: string, count = 1, pid?: number): void {
@@ -4855,24 +4882,33 @@ export class Sim {
     });
   }
 
-  equipItem(itemId: string, pid?: number): void {
+  equipItem(itemId: string, pid?: number, enhance?: number): void {
     const r = this.resolve(pid);
     if (!r) return;
     const { meta, e: p } = r;
     const def = ITEMS[itemId];
     if (!def || !def.slot || (def.kind !== 'weapon' && def.kind !== 'armor')) return;
-    if (this.countItem(itemId, meta.entityId) <= 0) return;
+    const idx = findInvIndex(meta.inventory, itemId, enhance);
+    if (idx < 0) return;
     if (def.requiredClass && !def.requiredClass.includes(meta.cls)) {
       this.error(meta.entityId, 'You cannot equip that.');
       return;
     }
     const slot = def.slot;
+    const stack = meta.inventory[idx];
+    const newEnh = stackEnhance(stack);
     const old = meta.equipment[slot];
-    this.removeItem(itemId, 1, meta.entityId);
-    if (old) this.addItemSilent(old, 1, meta);
+    const oldEnh = meta.equipmentEnhance?.[slot] ?? 0;
+    stack.count -= 1;
+    if (stack.count <= 0) meta.inventory.splice(idx, 1);
+    if (old) this.addItemSilent(old, 1, meta, oldEnh);
     meta.equipment[slot] = itemId;
-    recalcPlayerStats(p, meta.cls, meta.equipment, meta.talentMods);
-    this.emit({ type: 'log', text: `Equipped ${def.name}.`, color: '#8f8', pid: meta.entityId });
+    if (!meta.equipmentEnhance) meta.equipmentEnhance = {};
+    if (newEnh > 0) meta.equipmentEnhance[slot] = newEnh;
+    else delete meta.equipmentEnhance[slot];
+    recalcPlayerStats(p, meta.cls, meta.equipment, meta.talentMods, meta.equipmentEnhance);
+    const label = newEnh > 0 ? `${def.name} (+${newEnh})` : def.name;
+    this.emit({ type: 'log', text: `Equipped ${label}.`, color: '#8f8', pid: meta.entityId });
   }
 
   private hasFishableWaterAhead(p: Entity): boolean {
@@ -5054,10 +5090,103 @@ export class Sim {
     this.emit({ type: 'loot', text: `Bought back ${def.name} for ${formatMoney(def.sellValue)}.`, pid: meta.entityId });
   }
 
-  private addItemSilent(itemId: string, count: number, meta: PlayerMeta): void {
-    const existing = meta.inventory.find((s) => s.itemId === itemId);
-    if (existing) existing.count += count;
-    else meta.inventory.push({ itemId, count });
+  private addItemSilent(itemId: string, count: number, meta: PlayerMeta, enhance = 0): void {
+    const enh = Math.max(0, Math.min(MAX_ENHANCE, Math.floor(enhance)));
+    for (let i = 0; i < count; i++) {
+      const existing = meta.inventory.find((s) => stacksMerge(s, itemId, enh));
+      if (existing && enh === 0) existing.count += 1;
+      else {
+        const slot: InvSlot = { itemId, count: 1 };
+        if (enh > 0) slot.enhance = enh;
+        meta.inventory.push(slot);
+      }
+    }
+  }
+
+  enhancerInRange(p: Entity): boolean {
+    for (const e of this.entities.values()) {
+      if (e.kind !== 'npc') continue;
+      const def = NPCS[e.templateId];
+      if (!def?.enhancer) continue;
+      if (dist2d(p.pos, e.pos) <= INTERACT_RANGE + 2) return true;
+    }
+    return false;
+  }
+
+  enhanceItem(ref: EnhanceRef, pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    const { meta, e: p } = r;
+    if (!this.enhancerInRange(p)) {
+      this.error(meta.entityId, 'You must be at a smith to enhance equipment.');
+      return;
+    }
+    let itemId: string;
+    let currentEnh = 0;
+    if (ref.source === 'inv') {
+      const slot = meta.inventory[ref.index];
+      if (!slot) { this.error(meta.entityId, 'Invalid item.'); return; }
+      itemId = slot.itemId;
+      currentEnh = stackEnhance(slot);
+    } else {
+      itemId = meta.equipment[ref.slot] ?? '';
+      currentEnh = meta.equipmentEnhance?.[ref.slot] ?? 0;
+    }
+    const def = ITEMS[itemId];
+    if (!canEnhanceItem(def)) {
+      this.error(meta.entityId, 'That item cannot be enhanced.');
+      return;
+    }
+    if (currentEnh >= MAX_ENHANCE) {
+      this.error(meta.entityId, 'That item is already fully enhanced.');
+      return;
+    }
+    const target = currentEnh + 1;
+    const tier = enhanceTierForLevel(target);
+    const materialId = ENHANCE_MATERIALS[tier];
+    const cost = materialCostForLevel(target);
+    if (this.countItem(materialId, meta.entityId) < cost) {
+      this.error(meta.entityId, `You need ${cost} ${ITEMS[materialId]?.name ?? materialId}.`);
+      return;
+    }
+    if (!this.removeMaterial(materialId, cost, meta.entityId)) return;
+
+    const success = this.rng.chance(ENHANCE_SUCCESS_RATE[target] ?? 0.5);
+    const setEnhance = (level: number): void => {
+      if (ref.source === 'inv') {
+        const slot = meta.inventory[ref.index];
+        if (!slot) return;
+        if (level > 0) slot.enhance = level;
+        else delete slot.enhance;
+      } else {
+        if (!meta.equipmentEnhance) meta.equipmentEnhance = {};
+        if (level > 0) meta.equipmentEnhance[ref.slot] = level;
+        else delete meta.equipmentEnhance[ref.slot];
+      }
+    };
+
+    if (success) {
+      setEnhance(target);
+      this.emit({
+        type: 'log',
+        text: `${def!.name} improved to +${target}.`,
+        color: '#ffd700',
+        pid: meta.entityId,
+      });
+    } else {
+      const next = Math.max(0, currentEnh - 1);
+      setEnhance(next);
+      this.emit({
+        type: 'log',
+        text: next > 0
+          ? `${def!.name} failed to enhance and dropped to +${next}.`
+          : `${def!.name} failed to enhance and returned to +0.`,
+        color: '#f88',
+        pid: meta.entityId,
+      });
+    }
+    recalcPlayerStats(p, meta.cls, meta.equipment, meta.talentMods, meta.equipmentEnhance);
+    this.onInventoryChangedForQuests(meta);
   }
 
   private maybeAutoEquip(itemId: string, meta: PlayerMeta): void {
@@ -5343,7 +5472,7 @@ export class Sim {
     p.facing = 0;
     p.auras = [];
     p.ccDr.clear();
-    recalcPlayerStats(p, meta.cls, meta.equipment, meta.talentMods);
+    recalcPlayerStats(p, meta.cls, meta.equipment, meta.talentMods, meta.equipmentEnhance);
     p.hp = p.maxHp;
     p.resource = p.resourceType === 'mana' ? p.maxResource : p.resourceType === 'energy' ? 100 : 0;
     p.targetId = null;
@@ -5390,19 +5519,20 @@ export class Sim {
       }
       return null;
     }
-    const giveM = /^\/(?:dev\s+give|devgive)\s+(\S+)(?:\s+(\d+))?\s*$/i.exec(raw);
+    const giveM = /^\/(?:dev\s+give|devgive)\s+(\S+)(?:\s+(\d+))?(?:\s+(\d+))?\s*$/i.exec(raw);
     if (giveM) {
       const itemId = giveM[1];
       const count = Math.max(1, Math.min(20, Number(giveM[2] ?? 1)));
+      const enhance = Math.max(0, Math.min(MAX_ENHANCE, Number(giveM[3] ?? 0)));
       if (!ITEMS[itemId]) {
         this.error(pid, `[dev] Unknown item '${itemId}'.`);
         return null;
       }
-      this.addItem(itemId, count, pid);
+      this.addItem(itemId, count, pid, enhance);
       return null;
     }
     if (/^\/dev(?:\s|$)/i.test(raw)) {
-      this.error(pid, 'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count]');
+      this.error(pid, 'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count] [enhance]');
       return null;
     }
     return undefined;
@@ -6166,7 +6296,7 @@ export class Sim {
     }
     if (statsDirty && target.kind === 'player') {
       const meta = this.players.get(target.id);
-      if (meta) recalcPlayerStats(target, meta.cls, meta.equipment, meta.talentMods);
+      if (meta) recalcPlayerStats(target, meta.cls, meta.equipment, meta.talentMods, meta.equipmentEnhance);
     }
   }
 
@@ -6629,7 +6759,7 @@ export class Sim {
       e.ccDr.clear();
     }
     const meta = this.players.get(e.id);
-    if (meta) recalcPlayerStats(e, meta.cls, meta.equipment, meta.talentMods);
+    if (meta) recalcPlayerStats(e, meta.cls, meta.equipment, meta.talentMods, meta.equipmentEnhance);
     e.hp = e.maxHp;
     e.resource = e.resourceType === 'mana' ? e.maxResource : e.resourceType === 'energy' ? 100 : 0;
     e.targetId = null;

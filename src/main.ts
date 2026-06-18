@@ -1008,7 +1008,12 @@ function sanitizeOfflineName(raw: string): string {
 async function startOffline(playerClass: PlayerClass, name: string, skin = 0): Promise<void> {
   if (!(await prepareWorldEntry())) return;
   enterLoadingState(t('loading.world'));
-  const sim = new Sim({ seed: WORLD_SEED, playerClass, playerName: name });
+  const sim = new Sim({
+    seed: WORLD_SEED,
+    playerClass,
+    playerName: name,
+    devCommands: import.meta.env.DEV,
+  });
   sim.setPlayerSkin(sim.playerId, skin);
   void startGame(sim, sim, null);
 }

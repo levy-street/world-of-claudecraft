@@ -1022,6 +1022,8 @@ export const en: EnTranslations = {
       "readyQuestAria": "Quest ready to turn in: {name}",
       "browseGoods": "Let me browse your goods.",
       "browseGoodsAria": "Browse goods from {name}",
+      "enhanceEquipment": "Improve my equipment.",
+      "enhanceEquipmentAria": "Enhance equipment with {name}",
       "worldMarket": "Show me the World Market.",
       "worldMarketAria": "Open the World Market",
       "accept": "Accept",
@@ -1087,7 +1089,8 @@ export const en: EnTranslations = {
       "food": "Food",
       "drink": "Drink",
       "tool": "Tool",
-      "potion": "Potion"
+      "potion": "Potion",
+      "material": "Material"
     },
     "stats": {
       "armor": "Armor",
@@ -1155,6 +1158,18 @@ export const en: EnTranslations = {
       "sellQuantityInput": "Quantity to sell",
       "sellQuantityConfirm": "Sell",
       "sellQuantityCancel": "Cancel"
+    },
+    "enhance": {
+      "title": "{name}: Enhancement",
+      "close": "Close enhancement",
+      "noItems": "You have no weapons or armor to improve.",
+      "current": "Current: +{level}",
+      "target": "Attempt: +{level}",
+      "material": "Material: {count}× {item} (you have {have})",
+      "chance": "Success chance: {percent}%",
+      "risk": "On failure the material is consumed and the item drops one level.",
+      "confirm": "Enhance",
+      "maxLevel": "This item is fully enhanced and cannot be improved further."
     },
     "market": {
       "title": "The World Market",
@@ -1836,6 +1851,15 @@ export const en: EnTranslations = {
       },
       "morthen_grimoire": {
         "name": "Morthen's Grimoire"
+      },
+      "crypt_refinement_shard": {
+        "name": "Crypt Refinement Shard"
+      },
+      "bastion_ward_core": {
+        "name": "Bastion Ward Core"
+      },
+      "gravewyrm_ember": {
+        "name": "Gravewyrm Ember"
       },
       "wolf_fang": {
         "name": "Cracked Wolf Fang"
@@ -4556,6 +4580,8 @@ export const es: EnTranslations = {
       "readyQuestAria": "Misión lista para entregar: {name}",
       "browseGoods": "Déjame ver tus mercancías.",
       "browseGoodsAria": "Ver mercancías de {name}",
+      "enhanceEquipment": "Improve my equipment.",
+      "enhanceEquipmentAria": "Enhance equipment with {name}",
       "worldMarket": "Muéstrame el Mercado Mundial.",
       "worldMarketAria": "Abrir el Mercado Mundial",
       "accept": "Aceptar",
@@ -4621,7 +4647,8 @@ export const es: EnTranslations = {
       "food": "Comida",
       "drink": "Bebida",
       "tool": "Herramienta",
-      "potion": "Poción"
+      "potion": "Poción",
+      "material": "Material"
     },
     "stats": {
       "armor": "Armadura",
@@ -4689,6 +4716,18 @@ export const es: EnTranslations = {
       "sellQuantityInput": "Cantidad a vender",
       "sellQuantityConfirm": "Vender",
       "sellQuantityCancel": "Cancelar"
+    },
+    "enhance": {
+      "title": "{name}: Enhancement",
+      "close": "Close enhancement",
+      "noItems": "You have no weapons or armor to improve.",
+      "current": "Current: +{level}",
+      "target": "Attempt: +{level}",
+      "material": "Material: {count}× {item} (you have {have})",
+      "chance": "Success chance: {percent}%",
+      "risk": "On failure the material is consumed and the item drops one level.",
+      "confirm": "Enhance",
+      "maxLevel": "This item is fully enhanced and cannot be improved further."
     },
     "market": {
       "title": "Mercado Mundial",
@@ -5370,6 +5409,15 @@ export const es: EnTranslations = {
       },
       "morthen_grimoire": {
         "name": "Grimorio de Morthen"
+      },
+      "crypt_refinement_shard": {
+        "name": "Crypt Refinement Shard"
+      },
+      "bastion_ward_core": {
+        "name": "Bastion Ward Core"
+      },
+      "gravewyrm_ember": {
+        "name": "Gravewyrm Ember"
       },
       "wolf_fang": {
         "name": "Colmillo de lobo quebrado"
@@ -8090,6 +8138,8 @@ export const es_ES: EnTranslations = {
       "readyQuestAria": "Misión lista para entregar: {name}",
       "browseGoods": "Déjame ver tus mercancías.",
       "browseGoodsAria": "Ver mercancías de {name}",
+      "enhanceEquipment": "Improve my equipment.",
+      "enhanceEquipmentAria": "Enhance equipment with {name}",
       "worldMarket": "Muéstrame el Mercado Mundial.",
       "worldMarketAria": "Abrir el Mercado Mundial",
       "accept": "Aceptar",
@@ -8155,7 +8205,8 @@ export const es_ES: EnTranslations = {
       "food": "Comida",
       "drink": "Bebida",
       "tool": "Herramienta",
-      "potion": "Poción"
+      "potion": "Poción",
+      "material": "Material"
     },
     "stats": {
       "armor": "Armadura",
@@ -8223,6 +8274,18 @@ export const es_ES: EnTranslations = {
       "sellQuantityInput": "Cantidad a vender",
       "sellQuantityConfirm": "Vender",
       "sellQuantityCancel": "Cancelar"
+    },
+    "enhance": {
+      "title": "{name}: Enhancement",
+      "close": "Close enhancement",
+      "noItems": "You have no weapons or armor to improve.",
+      "current": "Current: +{level}",
+      "target": "Attempt: +{level}",
+      "material": "Material: {count}× {item} (you have {have})",
+      "chance": "Success chance: {percent}%",
+      "risk": "On failure the material is consumed and the item drops one level.",
+      "confirm": "Enhance",
+      "maxLevel": "This item is fully enhanced and cannot be improved further."
     },
     "market": {
       "title": "Mercado Mundial",
@@ -8904,6 +8967,15 @@ export const es_ES: EnTranslations = {
       },
       "morthen_grimoire": {
         "name": "Grimorio de Morthen"
+      },
+      "crypt_refinement_shard": {
+        "name": "Crypt Refinement Shard"
+      },
+      "bastion_ward_core": {
+        "name": "Bastion Ward Core"
+      },
+      "gravewyrm_ember": {
+        "name": "Gravewyrm Ember"
       },
       "wolf_fang": {
         "name": "Colmillo de lobo quebrado"
@@ -11624,6 +11696,8 @@ export const fr_FR: EnTranslations = {
       "readyQuestAria": "Quête prête à rendre : {name}",
       "browseGoods": "Laissez-moi voir vos marchandises.",
       "browseGoodsAria": "Voir les marchandises de {name}",
+      "enhanceEquipment": "Improve my equipment.",
+      "enhanceEquipmentAria": "Enhance equipment with {name}",
       "worldMarket": "Montrez-moi le marché mondial.",
       "worldMarketAria": "Ouvrir le marché mondial",
       "accept": "Accepter",
@@ -11689,7 +11763,8 @@ export const fr_FR: EnTranslations = {
       "food": "Nourriture",
       "drink": "Boisson",
       "tool": "Outil",
-      "potion": "Potion"
+      "potion": "Potion",
+      "material": "Material"
     },
     "stats": {
       "armor": "Armure",
@@ -11757,6 +11832,18 @@ export const fr_FR: EnTranslations = {
       "sellQuantityInput": "Quantité à vendre",
       "sellQuantityConfirm": "Vendre",
       "sellQuantityCancel": "Annuler"
+    },
+    "enhance": {
+      "title": "{name}: Enhancement",
+      "close": "Close enhancement",
+      "noItems": "You have no weapons or armor to improve.",
+      "current": "Current: +{level}",
+      "target": "Attempt: +{level}",
+      "material": "Material: {count}× {item} (you have {have})",
+      "chance": "Success chance: {percent}%",
+      "risk": "On failure the material is consumed and the item drops one level.",
+      "confirm": "Enhance",
+      "maxLevel": "This item is fully enhanced and cannot be improved further."
     },
     "market": {
       "title": "Marché mondial",
@@ -12438,6 +12525,15 @@ export const fr_FR: EnTranslations = {
       },
       "morthen_grimoire": {
         "name": "Grimoire de Morthen"
+      },
+      "crypt_refinement_shard": {
+        "name": "Crypt Refinement Shard"
+      },
+      "bastion_ward_core": {
+        "name": "Bastion Ward Core"
+      },
+      "gravewyrm_ember": {
+        "name": "Gravewyrm Ember"
       },
       "wolf_fang": {
         "name": "Croc de loup fendu"
@@ -15158,6 +15254,8 @@ export const fr_CA: EnTranslations = {
       "readyQuestAria": "Quête prête à rendre : {name}",
       "browseGoods": "Laissez-moi voir vos marchandises.",
       "browseGoodsAria": "Voir les marchandises de {name}",
+      "enhanceEquipment": "Improve my equipment.",
+      "enhanceEquipmentAria": "Enhance equipment with {name}",
       "worldMarket": "Montrez-moi le marché mondial.",
       "worldMarketAria": "Ouvrir le marché mondial",
       "accept": "Accepter",
@@ -15223,7 +15321,8 @@ export const fr_CA: EnTranslations = {
       "food": "Nourriture",
       "drink": "Boisson",
       "tool": "Outil",
-      "potion": "Potion"
+      "potion": "Potion",
+      "material": "Material"
     },
     "stats": {
       "armor": "Armure",
@@ -15291,6 +15390,18 @@ export const fr_CA: EnTranslations = {
       "sellQuantityInput": "Quantité à vendre",
       "sellQuantityConfirm": "Vendre",
       "sellQuantityCancel": "Annuler"
+    },
+    "enhance": {
+      "title": "{name}: Enhancement",
+      "close": "Close enhancement",
+      "noItems": "You have no weapons or armor to improve.",
+      "current": "Current: +{level}",
+      "target": "Attempt: +{level}",
+      "material": "Material: {count}× {item} (you have {have})",
+      "chance": "Success chance: {percent}%",
+      "risk": "On failure the material is consumed and the item drops one level.",
+      "confirm": "Enhance",
+      "maxLevel": "This item is fully enhanced and cannot be improved further."
     },
     "market": {
       "title": "Marché mondial",
@@ -15972,6 +16083,15 @@ export const fr_CA: EnTranslations = {
       },
       "morthen_grimoire": {
         "name": "Grimoire de Morthen"
+      },
+      "crypt_refinement_shard": {
+        "name": "Crypt Refinement Shard"
+      },
+      "bastion_ward_core": {
+        "name": "Bastion Ward Core"
+      },
+      "gravewyrm_ember": {
+        "name": "Gravewyrm Ember"
       },
       "wolf_fang": {
         "name": "Croc de loup fendu"
@@ -18692,6 +18812,8 @@ export const en_CA: EnTranslations = {
       "readyQuestAria": "Quest ready to turn in: {name}",
       "browseGoods": "Let me browse your goods.",
       "browseGoodsAria": "Browse goods from {name}",
+      "enhanceEquipment": "Improve my equipment.",
+      "enhanceEquipmentAria": "Enhance equipment with {name}",
       "worldMarket": "Show me the World Market.",
       "worldMarketAria": "Open the World Market",
       "accept": "Accept",
@@ -18757,7 +18879,8 @@ export const en_CA: EnTranslations = {
       "food": "Food",
       "drink": "Drink",
       "tool": "Tool",
-      "potion": "Potion"
+      "potion": "Potion",
+      "material": "Material"
     },
     "stats": {
       "armor": "Armor",
@@ -18825,6 +18948,18 @@ export const en_CA: EnTranslations = {
       "sellQuantityInput": "Quantity to sell",
       "sellQuantityConfirm": "Sell",
       "sellQuantityCancel": "Cancel"
+    },
+    "enhance": {
+      "title": "{name}: Enhancement",
+      "close": "Close enhancement",
+      "noItems": "You have no weapons or armor to improve.",
+      "current": "Current: +{level}",
+      "target": "Attempt: +{level}",
+      "material": "Material: {count}× {item} (you have {have})",
+      "chance": "Success chance: {percent}%",
+      "risk": "On failure the material is consumed and the item drops one level.",
+      "confirm": "Enhance",
+      "maxLevel": "This item is fully enhanced and cannot be improved further."
     },
     "market": {
       "title": "The World Market",
@@ -19506,6 +19641,15 @@ export const en_CA: EnTranslations = {
       },
       "morthen_grimoire": {
         "name": "Morthen's Grimoire"
+      },
+      "crypt_refinement_shard": {
+        "name": "Crypt Refinement Shard"
+      },
+      "bastion_ward_core": {
+        "name": "Bastion Ward Core"
+      },
+      "gravewyrm_ember": {
+        "name": "Gravewyrm Ember"
       },
       "wolf_fang": {
         "name": "Cracked Wolf Fang"
@@ -22226,6 +22370,8 @@ export const it_IT: EnTranslations = {
       "readyQuestAria": "Missione pronta da consegnare: {name}",
       "browseGoods": "Fammi vedere la tua merce.",
       "browseGoodsAria": "Vedi la merce di {name}",
+      "enhanceEquipment": "Improve my equipment.",
+      "enhanceEquipmentAria": "Enhance equipment with {name}",
       "worldMarket": "Mostrami il Mercato Mondiale.",
       "worldMarketAria": "Apri il Mercato Mondiale",
       "accept": "Accetta",
@@ -22291,7 +22437,8 @@ export const it_IT: EnTranslations = {
       "food": "Cibo",
       "drink": "Bevanda",
       "tool": "Strumento",
-      "potion": "Pozione"
+      "potion": "Pozione",
+      "material": "Material"
     },
     "stats": {
       "armor": "Armatura",
@@ -22359,6 +22506,18 @@ export const it_IT: EnTranslations = {
       "sellQuantityInput": "Quantità da vendere",
       "sellQuantityConfirm": "Vendi",
       "sellQuantityCancel": "Annulla"
+    },
+    "enhance": {
+      "title": "{name}: Enhancement",
+      "close": "Close enhancement",
+      "noItems": "You have no weapons or armor to improve.",
+      "current": "Current: +{level}",
+      "target": "Attempt: +{level}",
+      "material": "Material: {count}× {item} (you have {have})",
+      "chance": "Success chance: {percent}%",
+      "risk": "On failure the material is consumed and the item drops one level.",
+      "confirm": "Enhance",
+      "maxLevel": "This item is fully enhanced and cannot be improved further."
     },
     "market": {
       "title": "Mercato Mondiale",
@@ -23040,6 +23199,15 @@ export const it_IT: EnTranslations = {
       },
       "morthen_grimoire": {
         "name": "Grimorio di Morthen"
+      },
+      "crypt_refinement_shard": {
+        "name": "Crypt Refinement Shard"
+      },
+      "bastion_ward_core": {
+        "name": "Bastion Ward Core"
+      },
+      "gravewyrm_ember": {
+        "name": "Gravewyrm Ember"
       },
       "wolf_fang": {
         "name": "Zanna di lupo incrinata"
@@ -25760,6 +25928,8 @@ export const de_DE: EnTranslations = {
       "readyQuestAria": "Quest bereit zur Abgabe: {name}",
       "browseGoods": "Lasst mich Eure Waren ansehen.",
       "browseGoodsAria": "Waren von {name} ansehen",
+      "enhanceEquipment": "Improve my equipment.",
+      "enhanceEquipmentAria": "Enhance equipment with {name}",
       "worldMarket": "Zeigt mir den Weltmarkt.",
       "worldMarketAria": "Weltmarkt öffnen",
       "accept": "Annehmen",
@@ -25825,7 +25995,8 @@ export const de_DE: EnTranslations = {
       "food": "Essen",
       "drink": "Getränk",
       "tool": "Werkzeug",
-      "potion": "Trank"
+      "potion": "Trank",
+      "material": "Material"
     },
     "stats": {
       "armor": "Rüstung",
@@ -25893,6 +26064,18 @@ export const de_DE: EnTranslations = {
       "sellQuantityInput": "Zu verkaufende Menge",
       "sellQuantityConfirm": "Verkaufen",
       "sellQuantityCancel": "Abbrechen"
+    },
+    "enhance": {
+      "title": "{name}: Enhancement",
+      "close": "Close enhancement",
+      "noItems": "You have no weapons or armor to improve.",
+      "current": "Current: +{level}",
+      "target": "Attempt: +{level}",
+      "material": "Material: {count}× {item} (you have {have})",
+      "chance": "Success chance: {percent}%",
+      "risk": "On failure the material is consumed and the item drops one level.",
+      "confirm": "Enhance",
+      "maxLevel": "This item is fully enhanced and cannot be improved further."
     },
     "market": {
       "title": "Weltmarkt",
@@ -26574,6 +26757,15 @@ export const de_DE: EnTranslations = {
       },
       "morthen_grimoire": {
         "name": "Morthens Grimoire"
+      },
+      "crypt_refinement_shard": {
+        "name": "Crypt Refinement Shard"
+      },
+      "bastion_ward_core": {
+        "name": "Bastion Ward Core"
+      },
+      "gravewyrm_ember": {
+        "name": "Gravewyrm Ember"
       },
       "wolf_fang": {
         "name": "Gesprungener Wolfszahn"
@@ -29294,6 +29486,8 @@ export const zh_CN: EnTranslations = {
       "readyQuestAria": "可交付任务：{name}",
       "browseGoods": "让我看看你的货物。",
       "browseGoodsAria": "查看 {name} 的货物",
+      "enhanceEquipment": "Improve my equipment.",
+      "enhanceEquipmentAria": "Enhance equipment with {name}",
       "worldMarket": "让我看看世界市场。",
       "worldMarketAria": "打开世界市场",
       "accept": "接受",
@@ -29359,7 +29553,8 @@ export const zh_CN: EnTranslations = {
       "food": "食物",
       "drink": "饮料",
       "tool": "工具",
-      "potion": "药水"
+      "potion": "药水",
+      "material": "Material"
     },
     "stats": {
       "armor": "护甲",
@@ -29427,6 +29622,18 @@ export const zh_CN: EnTranslations = {
       "sellQuantityInput": "要出售的数量",
       "sellQuantityConfirm": "出售",
       "sellQuantityCancel": "取消"
+    },
+    "enhance": {
+      "title": "{name}: Enhancement",
+      "close": "Close enhancement",
+      "noItems": "You have no weapons or armor to improve.",
+      "current": "Current: +{level}",
+      "target": "Attempt: +{level}",
+      "material": "Material: {count}× {item} (you have {have})",
+      "chance": "Success chance: {percent}%",
+      "risk": "On failure the material is consumed and the item drops one level.",
+      "confirm": "Enhance",
+      "maxLevel": "This item is fully enhanced and cannot be improved further."
     },
     "market": {
       "title": "世界市场",
@@ -30108,6 +30315,15 @@ export const zh_CN: EnTranslations = {
       },
       "morthen_grimoire": {
         "name": "莫森的魔典"
+      },
+      "crypt_refinement_shard": {
+        "name": "Crypt Refinement Shard"
+      },
+      "bastion_ward_core": {
+        "name": "Bastion Ward Core"
+      },
+      "gravewyrm_ember": {
+        "name": "Gravewyrm Ember"
       },
       "wolf_fang": {
         "name": "裂开的狼牙"
@@ -32828,6 +33044,8 @@ export const zh_TW: EnTranslations = {
       "readyQuestAria": "可交付任務：{name}",
       "browseGoods": "讓我看看你的貨物。",
       "browseGoodsAria": "查看 {name} 的貨物",
+      "enhanceEquipment": "Improve my equipment.",
+      "enhanceEquipmentAria": "Enhance equipment with {name}",
       "worldMarket": "讓我看看世界市場。",
       "worldMarketAria": "開啟世界市場",
       "accept": "接受",
@@ -32893,7 +33111,8 @@ export const zh_TW: EnTranslations = {
       "food": "食物",
       "drink": "飲料",
       "tool": "工具",
-      "potion": "藥水"
+      "potion": "藥水",
+      "material": "Material"
     },
     "stats": {
       "armor": "護甲",
@@ -32961,6 +33180,18 @@ export const zh_TW: EnTranslations = {
       "sellQuantityInput": "要出售的數量",
       "sellQuantityConfirm": "出售",
       "sellQuantityCancel": "取消"
+    },
+    "enhance": {
+      "title": "{name}: Enhancement",
+      "close": "Close enhancement",
+      "noItems": "You have no weapons or armor to improve.",
+      "current": "Current: +{level}",
+      "target": "Attempt: +{level}",
+      "material": "Material: {count}× {item} (you have {have})",
+      "chance": "Success chance: {percent}%",
+      "risk": "On failure the material is consumed and the item drops one level.",
+      "confirm": "Enhance",
+      "maxLevel": "This item is fully enhanced and cannot be improved further."
     },
     "market": {
       "title": "世界市場",
@@ -33642,6 +33873,15 @@ export const zh_TW: EnTranslations = {
       },
       "morthen_grimoire": {
         "name": "莫森的魔典"
+      },
+      "crypt_refinement_shard": {
+        "name": "Crypt Refinement Shard"
+      },
+      "bastion_ward_core": {
+        "name": "Bastion Ward Core"
+      },
+      "gravewyrm_ember": {
+        "name": "Gravewyrm Ember"
       },
       "wolf_fang": {
         "name": "裂開的狼牙"
@@ -36362,6 +36602,8 @@ export const ko_KR: EnTranslations = {
       "readyQuestAria": "완료 보고 가능한 퀘스트: {name}",
       "browseGoods": "물건을 보여 주세요.",
       "browseGoodsAria": "{name}의 물건 보기",
+      "enhanceEquipment": "Improve my equipment.",
+      "enhanceEquipmentAria": "Enhance equipment with {name}",
       "worldMarket": "세계 시장을 보여 주세요.",
       "worldMarketAria": "세계 시장 열기",
       "accept": "수락",
@@ -36427,7 +36669,8 @@ export const ko_KR: EnTranslations = {
       "food": "음식",
       "drink": "음료",
       "tool": "도구",
-      "potion": "물약"
+      "potion": "물약",
+      "material": "Material"
     },
     "stats": {
       "armor": "방어도",
@@ -36495,6 +36738,18 @@ export const ko_KR: EnTranslations = {
       "sellQuantityInput": "판매할 수량",
       "sellQuantityConfirm": "판매",
       "sellQuantityCancel": "취소"
+    },
+    "enhance": {
+      "title": "{name}: Enhancement",
+      "close": "Close enhancement",
+      "noItems": "You have no weapons or armor to improve.",
+      "current": "Current: +{level}",
+      "target": "Attempt: +{level}",
+      "material": "Material: {count}× {item} (you have {have})",
+      "chance": "Success chance: {percent}%",
+      "risk": "On failure the material is consumed and the item drops one level.",
+      "confirm": "Enhance",
+      "maxLevel": "This item is fully enhanced and cannot be improved further."
     },
     "market": {
       "title": "세계 시장",
@@ -37176,6 +37431,15 @@ export const ko_KR: EnTranslations = {
       },
       "morthen_grimoire": {
         "name": "모르덴의 마법서"
+      },
+      "crypt_refinement_shard": {
+        "name": "Crypt Refinement Shard"
+      },
+      "bastion_ward_core": {
+        "name": "Bastion Ward Core"
+      },
+      "gravewyrm_ember": {
+        "name": "Gravewyrm Ember"
       },
       "wolf_fang": {
         "name": "갈라진 늑대 송곳니"
@@ -39896,6 +40160,8 @@ export const ja_JP: EnTranslations = {
       "readyQuestAria": "報告可能なクエスト: {name}",
       "browseGoods": "品物を見せてください。",
       "browseGoodsAria": "{name}の品物を見る",
+      "enhanceEquipment": "Improve my equipment.",
+      "enhanceEquipmentAria": "Enhance equipment with {name}",
       "worldMarket": "ワールドマーケットを見せてください。",
       "worldMarketAria": "ワールドマーケットを開く",
       "accept": "受諾",
@@ -39961,7 +40227,8 @@ export const ja_JP: EnTranslations = {
       "food": "食べ物",
       "drink": "飲み物",
       "tool": "道具",
-      "potion": "ポーション"
+      "potion": "ポーション",
+      "material": "Material"
     },
     "stats": {
       "armor": "防御力",
@@ -40029,6 +40296,18 @@ export const ja_JP: EnTranslations = {
       "sellQuantityInput": "売却する数量",
       "sellQuantityConfirm": "売却",
       "sellQuantityCancel": "キャンセル"
+    },
+    "enhance": {
+      "title": "{name}: Enhancement",
+      "close": "Close enhancement",
+      "noItems": "You have no weapons or armor to improve.",
+      "current": "Current: +{level}",
+      "target": "Attempt: +{level}",
+      "material": "Material: {count}× {item} (you have {have})",
+      "chance": "Success chance: {percent}%",
+      "risk": "On failure the material is consumed and the item drops one level.",
+      "confirm": "Enhance",
+      "maxLevel": "This item is fully enhanced and cannot be improved further."
     },
     "market": {
       "title": "ワールドマーケット",
@@ -40710,6 +40989,15 @@ export const ja_JP: EnTranslations = {
       },
       "morthen_grimoire": {
         "name": "モーセンの魔導書"
+      },
+      "crypt_refinement_shard": {
+        "name": "Crypt Refinement Shard"
+      },
+      "bastion_ward_core": {
+        "name": "Bastion Ward Core"
+      },
+      "gravewyrm_ember": {
+        "name": "Gravewyrm Ember"
       },
       "wolf_fang": {
         "name": "割れた狼の牙"
@@ -43430,6 +43718,8 @@ export const pt_BR: EnTranslations = {
       "readyQuestAria": "Missão pronta para entrega: {name}",
       "browseGoods": "Deixe-me ver suas mercadorias.",
       "browseGoodsAria": "Ver mercadorias de {name}",
+      "enhanceEquipment": "Improve my equipment.",
+      "enhanceEquipmentAria": "Enhance equipment with {name}",
       "worldMarket": "Mostre-me o Mercado Mundial.",
       "worldMarketAria": "Abrir o Mercado Mundial",
       "accept": "Aceitar",
@@ -43495,7 +43785,8 @@ export const pt_BR: EnTranslations = {
       "food": "Comida",
       "drink": "Bebida",
       "tool": "Ferramenta",
-      "potion": "Poção"
+      "potion": "Poção",
+      "material": "Material"
     },
     "stats": {
       "armor": "Armadura",
@@ -43563,6 +43854,18 @@ export const pt_BR: EnTranslations = {
       "sellQuantityInput": "Quantidade para vender",
       "sellQuantityConfirm": "Vender",
       "sellQuantityCancel": "Cancelar"
+    },
+    "enhance": {
+      "title": "{name}: Enhancement",
+      "close": "Close enhancement",
+      "noItems": "You have no weapons or armor to improve.",
+      "current": "Current: +{level}",
+      "target": "Attempt: +{level}",
+      "material": "Material: {count}× {item} (you have {have})",
+      "chance": "Success chance: {percent}%",
+      "risk": "On failure the material is consumed and the item drops one level.",
+      "confirm": "Enhance",
+      "maxLevel": "This item is fully enhanced and cannot be improved further."
     },
     "market": {
       "title": "Mercado Mundial",
@@ -44244,6 +44547,15 @@ export const pt_BR: EnTranslations = {
       },
       "morthen_grimoire": {
         "name": "Grimório de Morthen"
+      },
+      "crypt_refinement_shard": {
+        "name": "Crypt Refinement Shard"
+      },
+      "bastion_ward_core": {
+        "name": "Bastion Ward Core"
+      },
+      "gravewyrm_ember": {
+        "name": "Gravewyrm Ember"
       },
       "wolf_fang": {
         "name": "Presa de lobo rachada"
@@ -46964,6 +47276,8 @@ export const ru_RU: EnTranslations = {
       "readyQuestAria": "Задание готово к сдаче: {name}",
       "browseGoods": "Покажите ваши товары.",
       "browseGoodsAria": "Посмотреть товары у {name}",
+      "enhanceEquipment": "Improve my equipment.",
+      "enhanceEquipmentAria": "Enhance equipment with {name}",
       "worldMarket": "Покажите мне мировой рынок.",
       "worldMarketAria": "Открыть мировой рынок",
       "accept": "Принять",
@@ -47029,7 +47343,8 @@ export const ru_RU: EnTranslations = {
       "food": "Еда",
       "drink": "Напиток",
       "tool": "Инструмент",
-      "potion": "Зелье"
+      "potion": "Зелье",
+      "material": "Material"
     },
     "stats": {
       "armor": "Броня",
@@ -47097,6 +47412,18 @@ export const ru_RU: EnTranslations = {
       "sellQuantityInput": "Количество для продажи",
       "sellQuantityConfirm": "Продать",
       "sellQuantityCancel": "Отмена"
+    },
+    "enhance": {
+      "title": "{name}: Enhancement",
+      "close": "Close enhancement",
+      "noItems": "You have no weapons or armor to improve.",
+      "current": "Current: +{level}",
+      "target": "Attempt: +{level}",
+      "material": "Material: {count}× {item} (you have {have})",
+      "chance": "Success chance: {percent}%",
+      "risk": "On failure the material is consumed and the item drops one level.",
+      "confirm": "Enhance",
+      "maxLevel": "This item is fully enhanced and cannot be improved further."
     },
     "market": {
       "title": "Мировой рынок",
@@ -47778,6 +48105,15 @@ export const ru_RU: EnTranslations = {
       },
       "morthen_grimoire": {
         "name": "Гримуар Мортена"
+      },
+      "crypt_refinement_shard": {
+        "name": "Crypt Refinement Shard"
+      },
+      "bastion_ward_core": {
+        "name": "Bastion Ward Core"
+      },
+      "gravewyrm_ember": {
+        "name": "Gravewyrm Ember"
       },
       "wolf_fang": {
         "name": "Треснувший волчий клык"
@@ -49503,19 +49839,222 @@ export const translations = {
 };
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "entities.items.bastion_ward_core.name",
+    "entities.items.crypt_refinement_shard.name",
+    "entities.items.gravewyrm_ember.name",
+    "itemUi.enhance.chance",
+    "itemUi.enhance.close",
+    "itemUi.enhance.confirm",
+    "itemUi.enhance.current",
+    "itemUi.enhance.material",
+    "itemUi.enhance.maxLevel",
+    "itemUi.enhance.noItems",
+    "itemUi.enhance.risk",
+    "itemUi.enhance.target",
+    "itemUi.enhance.title",
+    "itemUi.kind.material",
+    "questUi.dialog.enhanceEquipment",
+    "questUi.dialog.enhanceEquipmentAria"
+  ],
+  "es_ES": [
+    "entities.items.bastion_ward_core.name",
+    "entities.items.crypt_refinement_shard.name",
+    "entities.items.gravewyrm_ember.name",
+    "itemUi.enhance.chance",
+    "itemUi.enhance.close",
+    "itemUi.enhance.confirm",
+    "itemUi.enhance.current",
+    "itemUi.enhance.material",
+    "itemUi.enhance.maxLevel",
+    "itemUi.enhance.noItems",
+    "itemUi.enhance.risk",
+    "itemUi.enhance.target",
+    "itemUi.enhance.title",
+    "itemUi.kind.material",
+    "questUi.dialog.enhanceEquipment",
+    "questUi.dialog.enhanceEquipmentAria"
+  ],
+  "fr_FR": [
+    "entities.items.bastion_ward_core.name",
+    "entities.items.crypt_refinement_shard.name",
+    "entities.items.gravewyrm_ember.name",
+    "itemUi.enhance.chance",
+    "itemUi.enhance.close",
+    "itemUi.enhance.confirm",
+    "itemUi.enhance.current",
+    "itemUi.enhance.material",
+    "itemUi.enhance.maxLevel",
+    "itemUi.enhance.noItems",
+    "itemUi.enhance.risk",
+    "itemUi.enhance.target",
+    "itemUi.enhance.title",
+    "itemUi.kind.material",
+    "questUi.dialog.enhanceEquipment",
+    "questUi.dialog.enhanceEquipmentAria"
+  ],
+  "fr_CA": [
+    "entities.items.bastion_ward_core.name",
+    "entities.items.crypt_refinement_shard.name",
+    "entities.items.gravewyrm_ember.name",
+    "itemUi.enhance.chance",
+    "itemUi.enhance.close",
+    "itemUi.enhance.confirm",
+    "itemUi.enhance.current",
+    "itemUi.enhance.material",
+    "itemUi.enhance.maxLevel",
+    "itemUi.enhance.noItems",
+    "itemUi.enhance.risk",
+    "itemUi.enhance.target",
+    "itemUi.enhance.title",
+    "itemUi.kind.material",
+    "questUi.dialog.enhanceEquipment",
+    "questUi.dialog.enhanceEquipmentAria"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": []
+  "it_IT": [
+    "entities.items.bastion_ward_core.name",
+    "entities.items.crypt_refinement_shard.name",
+    "entities.items.gravewyrm_ember.name",
+    "itemUi.enhance.chance",
+    "itemUi.enhance.close",
+    "itemUi.enhance.confirm",
+    "itemUi.enhance.current",
+    "itemUi.enhance.material",
+    "itemUi.enhance.maxLevel",
+    "itemUi.enhance.noItems",
+    "itemUi.enhance.risk",
+    "itemUi.enhance.target",
+    "itemUi.enhance.title",
+    "itemUi.kind.material",
+    "questUi.dialog.enhanceEquipment",
+    "questUi.dialog.enhanceEquipmentAria"
+  ],
+  "de_DE": [
+    "entities.items.bastion_ward_core.name",
+    "entities.items.crypt_refinement_shard.name",
+    "entities.items.gravewyrm_ember.name",
+    "itemUi.enhance.chance",
+    "itemUi.enhance.close",
+    "itemUi.enhance.confirm",
+    "itemUi.enhance.current",
+    "itemUi.enhance.material",
+    "itemUi.enhance.maxLevel",
+    "itemUi.enhance.noItems",
+    "itemUi.enhance.risk",
+    "itemUi.enhance.target",
+    "itemUi.enhance.title",
+    "questUi.dialog.enhanceEquipment",
+    "questUi.dialog.enhanceEquipmentAria"
+  ],
+  "zh_CN": [
+    "entities.items.bastion_ward_core.name",
+    "entities.items.crypt_refinement_shard.name",
+    "entities.items.gravewyrm_ember.name",
+    "itemUi.enhance.chance",
+    "itemUi.enhance.close",
+    "itemUi.enhance.confirm",
+    "itemUi.enhance.current",
+    "itemUi.enhance.material",
+    "itemUi.enhance.maxLevel",
+    "itemUi.enhance.noItems",
+    "itemUi.enhance.risk",
+    "itemUi.enhance.target",
+    "itemUi.enhance.title",
+    "itemUi.kind.material",
+    "questUi.dialog.enhanceEquipment",
+    "questUi.dialog.enhanceEquipmentAria"
+  ],
+  "zh_TW": [
+    "entities.items.bastion_ward_core.name",
+    "entities.items.crypt_refinement_shard.name",
+    "entities.items.gravewyrm_ember.name",
+    "itemUi.enhance.chance",
+    "itemUi.enhance.close",
+    "itemUi.enhance.confirm",
+    "itemUi.enhance.current",
+    "itemUi.enhance.material",
+    "itemUi.enhance.maxLevel",
+    "itemUi.enhance.noItems",
+    "itemUi.enhance.risk",
+    "itemUi.enhance.target",
+    "itemUi.enhance.title",
+    "itemUi.kind.material",
+    "questUi.dialog.enhanceEquipment",
+    "questUi.dialog.enhanceEquipmentAria"
+  ],
+  "ko_KR": [
+    "entities.items.bastion_ward_core.name",
+    "entities.items.crypt_refinement_shard.name",
+    "entities.items.gravewyrm_ember.name",
+    "itemUi.enhance.chance",
+    "itemUi.enhance.close",
+    "itemUi.enhance.confirm",
+    "itemUi.enhance.current",
+    "itemUi.enhance.material",
+    "itemUi.enhance.maxLevel",
+    "itemUi.enhance.noItems",
+    "itemUi.enhance.risk",
+    "itemUi.enhance.target",
+    "itemUi.enhance.title",
+    "itemUi.kind.material",
+    "questUi.dialog.enhanceEquipment",
+    "questUi.dialog.enhanceEquipmentAria"
+  ],
+  "ja_JP": [
+    "entities.items.bastion_ward_core.name",
+    "entities.items.crypt_refinement_shard.name",
+    "entities.items.gravewyrm_ember.name",
+    "itemUi.enhance.chance",
+    "itemUi.enhance.close",
+    "itemUi.enhance.confirm",
+    "itemUi.enhance.current",
+    "itemUi.enhance.material",
+    "itemUi.enhance.maxLevel",
+    "itemUi.enhance.noItems",
+    "itemUi.enhance.risk",
+    "itemUi.enhance.target",
+    "itemUi.enhance.title",
+    "itemUi.kind.material",
+    "questUi.dialog.enhanceEquipment",
+    "questUi.dialog.enhanceEquipmentAria"
+  ],
+  "pt_BR": [
+    "entities.items.bastion_ward_core.name",
+    "entities.items.crypt_refinement_shard.name",
+    "entities.items.gravewyrm_ember.name",
+    "itemUi.enhance.chance",
+    "itemUi.enhance.close",
+    "itemUi.enhance.confirm",
+    "itemUi.enhance.current",
+    "itemUi.enhance.material",
+    "itemUi.enhance.maxLevel",
+    "itemUi.enhance.noItems",
+    "itemUi.enhance.risk",
+    "itemUi.enhance.target",
+    "itemUi.enhance.title",
+    "itemUi.kind.material",
+    "questUi.dialog.enhanceEquipment",
+    "questUi.dialog.enhanceEquipmentAria"
+  ],
+  "ru_RU": [
+    "entities.items.bastion_ward_core.name",
+    "entities.items.crypt_refinement_shard.name",
+    "entities.items.gravewyrm_ember.name",
+    "itemUi.enhance.chance",
+    "itemUi.enhance.close",
+    "itemUi.enhance.confirm",
+    "itemUi.enhance.current",
+    "itemUi.enhance.material",
+    "itemUi.enhance.maxLevel",
+    "itemUi.enhance.noItems",
+    "itemUi.enhance.risk",
+    "itemUi.enhance.target",
+    "itemUi.enhance.title",
+    "itemUi.kind.material",
+    "questUi.dialog.enhanceEquipment",
+    "questUi.dialog.enhanceEquipmentAria"
+  ]
 };
 
 export const en_XA: EnTranslations = {
@@ -50531,6 +51070,8 @@ export const en_XA: EnTranslations = {
       "readyQuestAria": "[Ɋúéšţ ŕéáðý ţó ţúŕñ íñ: {name}]",
       "browseGoods": "[Ļéţ ɱé ƀŕóŵšé ýóúŕ ĝóóðš.]",
       "browseGoodsAria": "[Ɓŕóŵšé ĝóóðš ƒŕóɱ {name}]",
+      "enhanceEquipment": "[Íɱþŕóʋé ɱý éɋúíþɱéñţ.]",
+      "enhanceEquipmentAria": "[Éñĥáñçé éɋúíþɱéñţ ŵíţĥ {name}]",
       "worldMarket": "[Šĥóŵ ɱé ţĥé Ŵóŕļð Ɱáŕķéţ.]",
       "worldMarketAria": "[Óþéñ ţĥé Ŵóŕļð Ɱáŕķéţ]",
       "accept": "[Áççéþţ]",
@@ -50596,7 +51137,8 @@ export const en_XA: EnTranslations = {
       "food": "[Ƒóóð]",
       "drink": "[Ðŕíñķ]",
       "tool": "[Ţóóļ]",
-      "potion": "[Þóţíóñ]"
+      "potion": "[Þóţíóñ]",
+      "material": "[Ɱáţéŕíáļ]"
     },
     "stats": {
       "armor": "[Áŕɱóŕ]",
@@ -50664,6 +51206,18 @@ export const en_XA: EnTranslations = {
       "sellQuantityInput": "[Ɋúáñţíţý ţó šéļļ]",
       "sellQuantityConfirm": "[Šéļļ]",
       "sellQuantityCancel": "[Çáñçéļ]"
+    },
+    "enhance": {
+      "title": "[{name}: Éñĥáñçéɱéñţ]",
+      "close": "[Çļóšé éñĥáñçéɱéñţ]",
+      "noItems": "[Ýóú ĥáʋé ñó ŵéáþóñš óŕ áŕɱóŕ ţó íɱþŕóʋé.]",
+      "current": "[Çúŕŕéñţ: +{level}]",
+      "target": "[Áţţéɱþţ: +{level}]",
+      "material": "[Ɱáţéŕíáļ: {count}× {item} (ýóú ĥáʋé {have})]",
+      "chance": "[Šúççéšš çĥáñçé: {percent}%]",
+      "risk": "[Óñ ƒáíļúŕé ţĥé ɱáţéŕíáļ íš çóñšúɱéð áñð ţĥé íţéɱ ðŕóþš óñé ļéʋéļ.]",
+      "confirm": "[Éñĥáñçé]",
+      "maxLevel": "[Ţĥíš íţéɱ íš ƒúļļý éñĥáñçéð áñð çáññóţ ƀé íɱþŕóʋéð ƒúŕţĥéŕ.]"
     },
     "market": {
       "title": "[Ţĥé Ŵóŕļð Ɱáŕķéţ]",
@@ -51345,6 +51899,15 @@ export const en_XA: EnTranslations = {
       },
       "morthen_grimoire": {
         "name": "[Ɱóŕţĥéñ'š Ĝŕíɱóíŕé]"
+      },
+      "crypt_refinement_shard": {
+        "name": "[Çŕýþţ Ŕéƒíñéɱéñţ Šĥáŕð]"
+      },
+      "bastion_ward_core": {
+        "name": "[Ɓášţíóñ Ŵáŕð Çóŕé]"
+      },
+      "gravewyrm_ember": {
+        "name": "[Ĝŕáʋéŵýŕɱ Éɱƀéŕ]"
       },
       "wolf_fang": {
         "name": "[Çŕáçķéð Ŵóļƒ Ƒáñĝ]"

@@ -1,7 +1,14 @@
 import { CLASSES, ITEMS, MOBS, NpcDef } from './data';
 import type { Entity, EquipSlot, MobTemplate, PlayerClass, Stats, Vec3 } from './types';
 import type { TalentModifiers } from './content/talents';
+import { scaledArmorStats, scaledWeapon } from './content/enhancement';
 
+export type PlayerEquipment = Partial<Record<EquipSlot, string>>;
+export type PlayerEquipmentEnhance = Partial<Record<EquipSlot, number>>;
+
+function slotEnhance(equipmentEnhance: PlayerEquipmentEnhance | undefined, slot: EquipSlot): number {
+  return equipmentEnhance?.[slot] ?? 0;
+}
 function baseEntity(id: number, pos: Vec3): Entity {
   return {
     id, kind: 'mob', templateId: '', name: '', level: 1,
@@ -25,8 +32,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     spawnPos: { ...pos }, leashAnchor: null, evadeStall: 0, fleeTimer: 0, hasFled: false, wanderTarget: null, wanderTimer: 0,
     aggroTargetId: null, respawnTimer: 0, corpseTimer: 0, lootable: false, loot: null,
     xpValue: 0, questIds: [], vendorItems: [], objectItemId: null, dungeonId: null,
-    dead: false, scale: 1, color: 0xffffff, skin: 0,
-  };
+    dead: false, scale: 1, color: 0xffffff, skin: 0, mainhandEnhance: 0,  };
 }
 
 export function createPlayer(id: number, cls: PlayerClass, pos: Vec3, name: string): Entity {
@@ -41,16 +47,12 @@ export function createPlayer(id: number, cls: PlayerClass, pos: Vec3, name: stri
   return e;
 }
 
-export type PlayerEquipment = Partial<Record<EquipSlot, string>>;
-
 // Vanilla rules: first 20 stamina gives 1 hp each, the rest 10 hp each.
 // First 20 intellect gives 1 mana each, the rest 15 mana each.
 function hpFromStamina(sta: number): number {
   return Math.min(sta, 20) + Math.max(0, sta - 20) * 10;
 }
 function manaFromIntellect(int: number): number {
-  // Floor at 0 so an Intellect-draining debuff (negative buff_int) can never push
-  // the mana pool below its level-based base into negative territory.
   const i = Math.max(0, int);
   return Math.min(i, 20) + Math.max(0, i - 20) * 15;
 }
@@ -58,7 +60,13 @@ function manaFromIntellect(int: number): number {
 // Recompute all derived stats for the player from class, level, gear, buffs, and
 // precomputed talent modifiers. `mods` is the flat struct resolved at
 // allocation/respec time (computeTalentModifiers) — this never walks the tree.
-export function recalcPlayerStats(e: Entity, cls: PlayerClass, equipment: PlayerEquipment, mods?: TalentModifiers): void {
+export function recalcPlayerStats(
+  e: Entity,
+  cls: PlayerClass,
+  equipment: PlayerEquipment,
+  mods?: TalentModifiers,
+  equipmentEnhance?: PlayerEquipmentEnhance,
+): void {
   const def = CLASSES[cls];
   const lvl = e.level;
   const s: Stats = {
@@ -73,13 +81,16 @@ export function recalcPlayerStats(e: Entity, cls: PlayerClass, equipment: Player
     const itemId = equipment[slot];
     if (!itemId) continue;
     const item = ITEMS[itemId];
-    if (!item?.stats) continue;
-    s.str += item.stats.str ?? 0;
-    s.agi += item.stats.agi ?? 0;
-    s.sta += item.stats.sta ?? 0;
-    s.int += item.stats.int ?? 0;
-    s.spi += item.stats.spi ?? 0;
-    s.armor += item.stats.armor ?? 0;
+    if (!item) continue;
+    const enh = slotEnhance(equipmentEnhance, slot);
+    const stats = scaledArmorStats(item.stats, enh);
+    if (!stats) continue;
+    s.str += stats.str ?? 0;
+    s.agi += stats.agi ?? 0;
+    s.sta += stats.sta ?? 0;
+    s.int += stats.int ?? 0;
+    s.spi += stats.spi ?? 0;
+    s.armor += stats.armor ?? 0;
   }
   // Buff auras
   let bonusAp = 0;
@@ -119,8 +130,12 @@ export function recalcPlayerStats(e: Entity, cls: PlayerClass, equipment: Player
   if (mods?.stats.armorPct) s.armor = Math.round(s.armor * (1 + mods.stats.armorPct));
 
   e.stats = s;
-  const weapon = (equipment.mainhand && ITEMS[equipment.mainhand]?.weapon) || { min: 1, max: 2, speed: 2 };
-  e.weapon = weapon;
+  const mainId = equipment.mainhand;
+  const mainDef = mainId ? ITEMS[mainId] : null;
+  const mainEnh = slotEnhance(equipmentEnhance, 'mainhand');
+  const baseWeapon = mainDef?.weapon || { min: 1, max: 2, speed: 2 };
+  e.weapon = scaledWeapon(baseWeapon, mainEnh);
+  e.mainhandEnhance = mainEnh;
   // Melee AP by class (vanilla-ish): warriors/paladins/shamans/druids 2/str,
   // rogues str+agi, hunters str+agi, pure casters str.
   const apFromStats =

@@ -907,6 +907,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   "itemUi.kind.drink": "Getränk",
   "itemUi.kind.tool": "Werkzeug",
   "itemUi.kind.potion": "Trank",
+  "itemUi.kind.material": "Material",
   "itemUi.stats.armor": "Rüstung",
   "itemUi.stats.str": "Stärke",
   "itemUi.stats.agi": "Beweglichkeit",

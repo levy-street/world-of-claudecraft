@@ -283,6 +283,7 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
       'eastbrook_chain_vest', 'valespun_robe', 'tanned_leather_jerkin',
       'hobnail_boots', 'eastbrook_wool_trousers',
     ],
+    enhancer: true,
     greeting: 'Mind the sparks, $C. Good steel is the difference between a scar and a grave.',
   },
   fisherman_brandt: {

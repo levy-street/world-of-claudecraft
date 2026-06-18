@@ -10,7 +10,7 @@ import {
   zoneWelcomeText,
 } from '../sim/data';
 import type { ZoneDef } from '../sim/data';
-import type { AbilityDef, EquipSlot, InvSlot, PetMode, PlayerClass, ResourceType, Stats } from '../sim/types';
+import type { AbilityDef, EnhanceRef, EquipSlot, InvSlot, PetMode, PlayerClass, ResourceType, Stats } from '../sim/types';
 import {
   AbilityEffect, CONSUME_DURATION, Entity, FISHING_CAST_ID, GCD, ItemDef, SimEvent,
   dist2d, xpForLevel, MAX_LEVEL, MELEE_RANGE, MILESTONES, virtualLevel, canPrestige, xpUntilNextPrestige,
@@ -39,6 +39,10 @@ import {
   exportBuild, importBuild, cloneAllocation, talentPointsAtLevel, FIRST_TALENT_LEVEL,
   type TalentAllocation, type TalentNode, type SpecDef, type Role,
 } from '../sim/content/talents';
+import {
+  ENHANCE_MATERIALS, ENHANCE_SUCCESS_RATE, MAX_ENHANCE, canEnhanceItem, enhanceTierForLevel,
+  materialCostForLevel, scaledArmorStats, scaledWeapon, stackEnhance,
+} from '../sim/content/enhancement';
 import { talentChoiceIconDataUrl, talentNodeIconDataUrl } from './talent_icons';
 import {
   clearHotbarSlot, encodeHotbarAction, HOTBAR_ACTION_MIME, HotbarAction, parseHotbarAction, parseHotbarActions,
@@ -133,6 +137,7 @@ const ITEM_KIND_LABEL_KEYS: Record<ItemDef['kind'], TranslationKey> = {
   drink: 'itemUi.kind.drink',
   tool: 'itemUi.kind.tool',
   potion: 'itemUi.kind.potion',
+  material: 'itemUi.kind.material',
 };
 const ITEM_STAT_LABEL_KEYS: Partial<Record<keyof Stats, TranslationKey>> = {
   armor: 'itemUi.stats.armor',
@@ -275,6 +280,8 @@ export class Hud {
   private mapBg: HTMLCanvasElement | null = null;
   private openLootMobId: number | null = null;
   private openVendorNpcId: number | null = null;
+  private openEnhanceNpcId: number | null = null;
+  private selectedEnhanceRef: EnhanceRef | null = null;
   private openGossipNpcId: number | null = null;
   private openQuestDetailId: string | null = null;
   private selectedQuestLogId: string | null = null;
@@ -673,6 +680,7 @@ export class Hud {
       case 'trade-window': this.sim.tradeCancel(); this.hideTooltip(); break;
       case 'market-window': this.closeMarket(); break;
       case 'vendor-window': this.closeVendor(); break;
+      case 'enhance-window': this.closeEnhance(); break;
       case 'loot-window': this.closeLoot(); break;
       case 'quest-dialog': this.closeQuestDialog(); break;
       case 'bags': el.style.display = 'none'; this.hideTooltip(); this.cancelPetFeed(); break;
@@ -936,9 +944,10 @@ export class Hud {
     ctx.drawImage(iconCanvas('crest', crestId, s), 0, 0, s, s);
   }
 
-  private itemIcon(item: ItemDef): string {
+  private itemIcon(item: ItemDef, enhance = 0): string {
     const q = item.quality ?? 'common';
-    return `<img class="item-icon q-${q}" src="${iconDataUrl('item', item.id)}" alt="" draggable="false">`;
+    const enhCls = enhance >= 9 ? ' enh-9' : enhance >= 7 ? ' enh-7' : '';
+    return `<img class="item-icon q-${q}${enhCls}" src="${iconDataUrl('item', item.id)}" alt="" draggable="false">`;
   }
 
   moneyHtml(copper: number): string {
@@ -1004,9 +1013,13 @@ export class Hud {
     this.tooltipEl.style.display = 'none';
   }
 
-  private itemTooltip(item: ItemDef): string {
+  private itemTooltip(item: ItemDef, enhance = 0): string {
     const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff';
     let html = `<div class="tt-title" style="color:${qColor}">${esc(itemDisplayName(item))}</div>`;
+    if (enhance > 0) {
+      const cls = enhance >= 9 ? 'enh-label-9' : enhance >= 7 ? 'enh-label-7' : 'tt-green';
+      html += `<div class="tt-stat ${cls}">+${enhance}</div>`;
+    }
     html += `<div class="tt-sub">${esc(t('itemUi.tooltip.qualityKind', {
       quality: itemQualityLabel(item.quality),
       kind: itemKindLabel(item.kind),
@@ -1014,18 +1027,20 @@ export class Hud {
     if (item.slot) {
       html += `<div class="tt-sub">${esc(itemSlotName(item.slot))}</div>`;
     }
-    if (item.weapon) {
-      const dps = (item.weapon.min + item.weapon.max) / 2 / item.weapon.speed;
+    const weapon = item.weapon ? scaledWeapon(item.weapon, enhance) : null;
+    if (weapon) {
+      const dps = (weapon.min + weapon.max) / 2 / weapon.speed;
       html += `<div class="tt-stat">${esc(t('itemUi.tooltip.damageSpeed', {
-        min: itemNumber(item.weapon.min),
-        max: itemNumber(item.weapon.max),
-        speed: itemNumber(item.weapon.speed, 1),
+        min: itemNumber(weapon.min),
+        max: itemNumber(weapon.max),
+        speed: itemNumber(weapon.speed, 1),
       }))}</div>`;
       html += `<div class="tt-stat">${esc(t('itemUi.tooltip.dps', { dps: itemNumber(dps, 1) }))}</div>`;
-      if (item.weapon.dagger) html += `<div class="tt-sub">${esc(t('itemUi.tooltip.dagger'))}</div>`;
+      if (weapon.dagger) html += `<div class="tt-sub">${esc(t('itemUi.tooltip.dagger'))}</div>`;
     }
-    if (item.stats) {
-      for (const [k, v] of Object.entries(item.stats)) {
+    const armorStats = scaledArmorStats(item.stats, enhance);
+    if (armorStats) {
+      for (const [k, v] of Object.entries(armorStats)) {
         if (v === undefined) continue;
         if (k === 'armor') {
           html += `<div class="tt-stat">${esc(t('itemUi.tooltip.armorStat', { value: itemNumber(v) }))}</div>`;
@@ -1096,6 +1111,7 @@ export class Hud {
     if (log.style.display === 'block') this.renderQuestLog();
     if ($('#bags').style.display === 'block') this.renderBags();
     if (this.openVendorNpcId !== null && $('#vendor-window').style.display === 'block') this.renderVendor();
+    if (this.openEnhanceNpcId !== null && $('#enhance-window').style.display === 'block') this.renderEnhance();
     if (this.marketOpen) {
       this.lastMarketSig = '';
       this.renderMarket();
@@ -3146,6 +3162,9 @@ export class Hud {
     if (npc.vendorItems.length > 0) {
       html += `<button type="button" class="qd-list-item" data-vendor="1" aria-label="${esc(t('questUi.dialog.browseGoodsAria', { name: npcName }))}"><span class="quest-complete">$</span> ${esc(t('questUi.dialog.browseGoods'))}</button>`;
     }
+    if (def?.enhancer) {
+      html += `<button type="button" class="qd-list-item" data-enhance="1" aria-label="${esc(t('questUi.dialog.enhanceEquipmentAria', { name: npcName }))}"><span class="gold">+</span> ${esc(t('questUi.dialog.enhanceEquipment'))}</button>`;
+    }
     if (def?.market) {
       html += `<button type="button" class="qd-list-item" data-market="1" aria-label="${esc(t('questUi.dialog.worldMarketAria'))}"><span class="gold">${svgIcon('market')}</span> ${esc(t('questUi.dialog.worldMarket'))}</button>`;
     }
@@ -3156,6 +3175,10 @@ export class Hud {
     el.querySelector('[data-vendor]')?.addEventListener('click', () => {
       this.closeQuestDialog(false);
       this.openVendor(npc.id);
+    });
+    el.querySelector('[data-enhance]')?.addEventListener('click', () => {
+      this.closeQuestDialog(false);
+      this.openEnhance(npc.id);
     });
     el.querySelector('[data-market]')?.addEventListener('click', () => {
       this.closeQuestDialog(false);
@@ -3371,6 +3394,130 @@ export class Hud {
 
   get vendorOpen(): boolean {
     return this.openVendorNpcId !== null;
+  }
+
+  // -------------------------------------------------------------------------
+  // Equipment enhancement (smith NPC)
+  // -------------------------------------------------------------------------
+
+  openEnhance(npcId: number): void {
+    this.closeOtherWindows(['#enhance-window', '#bags']);
+    this.openEnhanceNpcId = npcId;
+    this.selectedEnhanceRef = null;
+    this.renderEnhance();
+    $('#enhance-window').style.display = 'block';
+    this.focusFirstInteractive($('#enhance-window'));
+  }
+
+  private enhanceCandidates(): { ref: EnhanceRef; itemId: string; enhance: number; label: string }[] {
+    const out: { ref: EnhanceRef; itemId: string; enhance: number; label: string }[] = [];
+    const sim = this.sim;
+    for (let i = 0; i < sim.inventory.length; i++) {
+      const slot = sim.inventory[i];
+      const def = ITEMS[slot.itemId];
+      if (!canEnhanceItem(def)) continue;
+      const enh = stackEnhance(slot);
+      out.push({
+        ref: { source: 'inv', index: i },
+        itemId: slot.itemId,
+        enhance: enh,
+        label: itemSlotName(def!.slot!),
+      });
+    }
+    const slots: EquipSlot[] = ['mainhand', 'chest', 'legs', 'feet'];
+    for (const eqSlot of slots) {
+      const itemId = sim.equipment[eqSlot];
+      if (!itemId) continue;
+      const def = ITEMS[itemId];
+      if (!canEnhanceItem(def)) continue;
+      const enh = sim.equipmentEnhance[eqSlot] ?? 0;
+      out.push({
+        ref: { source: 'equip', slot: eqSlot },
+        itemId,
+        enhance: enh,
+        label: itemSlotName(eqSlot),
+      });
+    }
+    return out;
+  }
+
+  private enhanceRefKey(ref: EnhanceRef): string {
+    return ref.source === 'inv' ? `inv:${ref.index}` : `eq:${ref.slot}`;
+  }
+
+  private renderEnhance(): void {
+    if (this.openEnhanceNpcId === null) return;
+    const npc = this.sim.entities.get(this.openEnhanceNpcId);
+    if (!npc) return;
+    const el = $('#enhance-window');
+    this.hideTooltip();
+    const candidates = this.enhanceCandidates();
+    if (!this.selectedEnhanceRef && candidates.length > 0) this.selectedEnhanceRef = candidates[0].ref;
+    const selKey = this.selectedEnhanceRef ? this.enhanceRefKey(this.selectedEnhanceRef) : '';
+    let canGo = false;
+    let html = `<div class="panel-title"><span>${esc(t('itemUi.enhance.title', { name: entityDisplayName(npc) }))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('itemUi.enhance.close'))}">${svgIcon('close')}</button></div>`;
+    if (candidates.length === 0) {
+      html += `<div class="enh-detail">${esc(t('itemUi.enhance.noItems'))}</div>`;
+    } else {
+      for (const c of candidates) {
+        const item = ITEMS[c.itemId];
+        const key = this.enhanceRefKey(c.ref);
+        const sel = key === selKey ? ' sel' : '';
+        const enhLabel = c.enhance > 0 ? ` +${c.enhance}` : '';
+        html += `<button type="button" class="enh-row${sel}" data-ref="${esc(key)}">${this.itemIcon(item, c.enhance)}<span class="enh-meta"><span class="enh-name" style="color:${QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff'}">${esc(itemDisplayName(item))}${enhLabel}</span>${esc(c.label)}</span></button>`;
+      }
+      const sel = candidates.find((c) => this.enhanceRefKey(c.ref) === selKey) ?? candidates[0];
+      const atMax = sel.enhance >= MAX_ENHANCE;
+      if (atMax) {
+        html += `<div class="enh-detail">${esc(t('itemUi.enhance.current', { level: sel.enhance }))}<br>${esc(t('itemUi.enhance.maxLevel'))}</div>`;
+      } else {
+        const target = sel.enhance + 1;
+        const tier = enhanceTierForLevel(target);
+        const materialId = ENHANCE_MATERIALS[tier];
+        const material = ITEMS[materialId];
+        const cost = materialCostForLevel(target);
+        const have = this.sim.inventory.reduce((n, s) => n + (s.itemId === materialId ? s.count : 0), 0);
+        const rate = Math.round((ENHANCE_SUCCESS_RATE[target] ?? 0) * 100);
+        canGo = have >= cost;
+        html += `<div class="enh-detail">${esc(t('itemUi.enhance.current', { level: sel.enhance }))}<br>${esc(t('itemUi.enhance.target', { level: target }))}<br>${esc(t('itemUi.enhance.material', { count: cost, item: itemDisplayName(material), have }))}<br>${esc(t('itemUi.enhance.chance', { percent: rate }))}<br>${esc(t('itemUi.enhance.risk'))}</div>`;
+        html += `<div class="enh-actions"><button type="button" class="btn" data-enhance-go${canGo ? '' : ' disabled'} aria-disabled="${canGo ? 'false' : 'true'}">${esc(t('itemUi.enhance.confirm'))}</button></div>`;
+      }
+    }
+    el.innerHTML = html;
+    el.querySelector('[data-close]')?.addEventListener('click', () => this.closeEnhance());
+    el.querySelectorAll('[data-ref]').forEach((row) => {
+      row.addEventListener('click', () => {
+        const key = (row as HTMLElement).dataset.ref!;
+        const pick = candidates.find((c) => this.enhanceRefKey(c.ref) === key);
+        if (pick) {
+          this.selectedEnhanceRef = pick.ref;
+          this.renderEnhance();
+        }
+      });
+      const pick = candidates.find((c) => (row as HTMLElement).dataset.ref === this.enhanceRefKey(c.ref));
+      if (pick) {
+        const item = ITEMS[pick.itemId];
+        this.attachTooltip(row as HTMLElement, () => this.itemTooltip(item, pick.enhance));
+      }
+    });
+    const goBtn = el.querySelector('[data-enhance-go]') as HTMLButtonElement | null;
+    if (goBtn && canGo) {
+      goBtn.addEventListener('click', () => {
+        if (!this.selectedEnhanceRef) return;
+        this.sim.enhanceItem(this.selectedEnhanceRef);
+        this.renderEnhance();
+        if ($('#bags').style.display !== 'none') this.renderBags();
+        if ($('#char-window').style.display === 'block') this.renderChar();
+      });
+    }
+    el.style.display = 'block';
+  }
+
+  closeEnhance(): void {
+    $('#enhance-window').style.display = 'none';
+    this.openEnhanceNpcId = null;
+    this.selectedEnhanceRef = null;
+    this.hideTooltip();
   }
 
   // -------------------------------------------------------------------------
@@ -3636,6 +3783,7 @@ export class Hud {
   onInventoryChanged(): void {
     if ($('#bags').style.display !== 'none') this.renderBags();
     if (this.openVendorNpcId !== null) this.renderVendor();
+    if (this.openEnhanceNpcId !== null) this.renderEnhance();
     this.renderCharIfOpen();
   }
 
@@ -3664,7 +3812,9 @@ export class Hud {
         item: itemName,
         count: formatNumber(s.count, { maximumFractionDigits: 0 }),
       }));
-      row.innerHTML = `${this.itemIcon(item)}<span style="color:${qColor}">${esc(itemName)}</span><span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
+      const enh = stackEnhance(s);
+      const enhSuffix = enh > 0 ? ` +${enh}` : '';
+      row.innerHTML = `${this.itemIcon(item, enh)}<span style="color:${qColor}">${esc(itemName)}${enhSuffix}</span><span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
       row.addEventListener('click', (ev) => {
         if (this.tradeOpen) {
           this.addItemToTrade(s.itemId);
@@ -3717,7 +3867,7 @@ export class Hud {
         else if (item.kind === 'food' || item.kind === 'drink') extra = `<div class="tt-sub">${esc(t('itemUi.tooltip.clickConsume'))}</div>`;
         else if (item.kind === 'potion') extra = `<div class="tt-sub">${esc(t('itemUi.tooltip.clickUseInstant'))}</div>`;
         else if (item.use) extra = `<div class="tt-sub">${esc(t('itemUi.tooltip.clickUse'))}</div>`;
-        return this.itemTooltip(item) + extra;
+        return this.itemTooltip(item, enh) + extra;
       });
       grid.appendChild(row);
     }
@@ -3877,9 +4027,11 @@ export class Hud {
       const row = document.createElement('div');
       row.className = 'equip-slot';
       const qColor = !item ? '#666' : QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff';
-      row.innerHTML = `${item ? this.itemIcon(item) : `<img class="item-icon" style="border-color:#444" src="${iconDataUrl('item', 'slot_empty')}" alt="" draggable="false">`}
-        <div><div class="slot-name">${esc(slot.name)}</div><div class="slot-item" style="color:${qColor}">${item ? esc(itemDisplayName(item)) : esc(t('itemUi.equipment.empty'))}</div></div>`;
-      if (item) this.attachTooltip(row, () => this.itemTooltip(item));
+      const enh = sim.equipmentEnhance[slot.key] ?? 0;
+      const enhSuffix = enh > 0 ? ` +${enh}` : '';
+      row.innerHTML = `${item ? this.itemIcon(item, enh) : `<img class="item-icon" style="border-color:#444" src="${iconDataUrl('item', 'slot_empty')}" alt="" draggable="false">`}
+        <div><div class="slot-name">${esc(slot.name)}</div><div class="slot-item" style="color:${qColor}">${item ? esc(itemDisplayName(item)) + enhSuffix : esc(t('itemUi.equipment.empty'))}</div></div>`;
+      if (item) this.attachTooltip(row, () => this.itemTooltip(item, enh));
       col.appendChild(row);
     }
     this.renderCharPreview();

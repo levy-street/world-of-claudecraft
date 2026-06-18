@@ -1,4 +1,5 @@
-import { OVERHEAD_EMOTE_IDS, type ArenaCombatant, type ArenaFormat, type Entity, type EquipSlot, type InvSlot, type MoveInput, type OverheadEmoteId, type PetMode, type PlayerClass, type QuestProgress, type QuestState, type ResourceType } from './sim/types';
+import { OVERHEAD_EMOTE_IDS, type ArenaCombatant, type ArenaFormat, type EnhanceRef, type Entity, type EquipSlot, type InvSlot, type MoveInput, type OverheadEmoteId, type PetMode, type PlayerClass, type QuestProgress, type QuestState, type ResourceType } from './sim/types';
+import type { PlayerEquipmentEnhance } from './sim/entity';
 import type { ResolvedAbility } from './sim/sim';
 import type { TalentAllocation, SavedLoadout, Role } from './sim/content/talents';
 
@@ -191,6 +192,7 @@ export interface IWorld {
   inventory: InvSlot[];
   vendorBuyback: InvSlot[];
   equipment: Partial<Record<EquipSlot, string>>;
+  equipmentEnhance: PlayerEquipmentEnhance;
   copper: number;
   xp: number;
   // Post-cap progression (Max-Level XP Overflow). All server-authoritative;
@@ -222,6 +224,7 @@ export interface IWorld {
   buyItem(npcId: number, itemId: string): void;
   sellItem(itemId: string, count?: number): void;
   buyBackItem(itemId: string): void;
+  enhanceItem(ref: EnhanceRef): void;
   changeSkin(skin: number): void;
   releaseSpirit(): void;
   chat(text: string): void;

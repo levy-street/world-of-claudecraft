@@ -4715,6 +4715,8 @@ const questStringsEn = {
       readyQuestAria: "Quest ready to turn in: {name}",
       browseGoods: "Let me browse your goods.",
       browseGoodsAria: "Browse goods from {name}",
+      enhanceEquipment: "Improve my equipment.",
+      enhanceEquipmentAria: "Enhance equipment with {name}",
       worldMarket: "Show me the World Market.",
       worldMarketAria: "Open the World Market",
       accept: "Accept",
@@ -4781,6 +4783,8 @@ export const questStrings = {
         readyQuestAria: "Misión lista para entregar: {name}",
         browseGoods: "Déjame ver tus mercancías.",
         browseGoodsAria: "Ver mercancías de {name}",
+        enhanceEquipment: questStringsEn.questUi.dialog.enhanceEquipment,
+        enhanceEquipmentAria: questStringsEn.questUi.dialog.enhanceEquipmentAria,
         worldMarket: "Muéstrame el Mercado Mundial.",
         worldMarketAria: "Abrir el Mercado Mundial",
         accept: "Aceptar",
@@ -4845,6 +4849,8 @@ export const questStrings = {
         readyQuestAria: "Quête prête à rendre : {name}",
         browseGoods: "Laissez-moi voir vos marchandises.",
         browseGoodsAria: "Voir les marchandises de {name}",
+        enhanceEquipment: questStringsEn.questUi.dialog.enhanceEquipment,
+        enhanceEquipmentAria: questStringsEn.questUi.dialog.enhanceEquipmentAria,
         worldMarket: "Montrez-moi le marché mondial.",
         worldMarketAria: "Ouvrir le marché mondial",
         accept: "Accepter",
@@ -4910,6 +4916,8 @@ export const questStrings = {
         readyQuestAria: "Missione pronta da consegnare: {name}",
         browseGoods: "Fammi vedere la tua merce.",
         browseGoodsAria: "Vedi la merce di {name}",
+        enhanceEquipment: questStringsEn.questUi.dialog.enhanceEquipment,
+        enhanceEquipmentAria: questStringsEn.questUi.dialog.enhanceEquipmentAria,
         worldMarket: "Mostrami il Mercato Mondiale.",
         worldMarketAria: "Apri il Mercato Mondiale",
         accept: "Accetta",
@@ -4973,6 +4981,8 @@ export const questStrings = {
         readyQuestAria: "Quest bereit zur Abgabe: {name}",
         browseGoods: "Lasst mich Eure Waren ansehen.",
         browseGoodsAria: "Waren von {name} ansehen",
+        enhanceEquipment: questStringsEn.questUi.dialog.enhanceEquipment,
+        enhanceEquipmentAria: questStringsEn.questUi.dialog.enhanceEquipmentAria,
         worldMarket: "Zeigt mir den Weltmarkt.",
         worldMarketAria: "Weltmarkt öffnen",
         accept: "Annehmen",
@@ -5036,6 +5046,8 @@ export const questStrings = {
         readyQuestAria: "可交付任务：{name}",
         browseGoods: "让我看看你的货物。",
         browseGoodsAria: "查看 {name} 的货物",
+        enhanceEquipment: questStringsEn.questUi.dialog.enhanceEquipment,
+        enhanceEquipmentAria: questStringsEn.questUi.dialog.enhanceEquipmentAria,
         worldMarket: "让我看看世界市场。",
         worldMarketAria: "打开世界市场",
         accept: "接受",
@@ -5099,6 +5111,8 @@ export const questStrings = {
         readyQuestAria: "可交付任務：{name}",
         browseGoods: "讓我看看你的貨物。",
         browseGoodsAria: "查看 {name} 的貨物",
+        enhanceEquipment: questStringsEn.questUi.dialog.enhanceEquipment,
+        enhanceEquipmentAria: questStringsEn.questUi.dialog.enhanceEquipmentAria,
         worldMarket: "讓我看看世界市場。",
         worldMarketAria: "開啟世界市場",
         accept: "接受",
@@ -5162,6 +5176,8 @@ export const questStrings = {
         readyQuestAria: "완료 보고 가능한 퀘스트: {name}",
         browseGoods: "물건을 보여 주세요.",
         browseGoodsAria: "{name}의 물건 보기",
+        enhanceEquipment: questStringsEn.questUi.dialog.enhanceEquipment,
+        enhanceEquipmentAria: questStringsEn.questUi.dialog.enhanceEquipmentAria,
         worldMarket: "세계 시장을 보여 주세요.",
         worldMarketAria: "세계 시장 열기",
         accept: "수락",
@@ -5225,6 +5241,8 @@ export const questStrings = {
         readyQuestAria: "報告可能なクエスト: {name}",
         browseGoods: "品物を見せてください。",
         browseGoodsAria: "{name}の品物を見る",
+        enhanceEquipment: questStringsEn.questUi.dialog.enhanceEquipment,
+        enhanceEquipmentAria: questStringsEn.questUi.dialog.enhanceEquipmentAria,
         worldMarket: "ワールドマーケットを見せてください。",
         worldMarketAria: "ワールドマーケットを開く",
         accept: "受諾",
@@ -5288,6 +5306,8 @@ export const questStrings = {
         readyQuestAria: "Missão pronta para entrega: {name}",
         browseGoods: "Deixe-me ver suas mercadorias.",
         browseGoodsAria: "Ver mercadorias de {name}",
+        enhanceEquipment: questStringsEn.questUi.dialog.enhanceEquipment,
+        enhanceEquipmentAria: questStringsEn.questUi.dialog.enhanceEquipmentAria,
         worldMarket: "Mostre-me o Mercado Mundial.",
         worldMarketAria: "Abrir o Mercado Mundial",
         accept: "Aceitar",
@@ -5351,6 +5371,8 @@ export const questStrings = {
         readyQuestAria: "Задание готово к сдаче: {name}",
         browseGoods: "Покажите ваши товары.",
         browseGoodsAria: "Посмотреть товары у {name}",
+        enhanceEquipment: questStringsEn.questUi.dialog.enhanceEquipment,
+        enhanceEquipmentAria: questStringsEn.questUi.dialog.enhanceEquipmentAria,
         worldMarket: "Покажите мне мировой рынок.",
         worldMarketAria: "Открыть мировой рынок",
         accept: "Принять",
@@ -5477,6 +5499,18 @@ const itemStringsEn = {
       hint: "Click an item in your bags to sell it while this window is open.",
       buyAria: "Buy {item} for {price}",
     },
+    enhance: {
+      title: "{name}: Enhancement",
+      close: "Close enhancement",
+      noItems: "You have no weapons or armor to improve.",
+      current: "Current: +{level}",
+      target: "Attempt: +{level}",
+      material: "Material: {count}× {item} (you have {have})",
+      chance: "Success chance: {percent}%",
+      risk: "On failure the material is consumed and the item drops one level.",
+      confirm: "Enhance",
+      maxLevel: "This item is fully enhanced and cannot be improved further.",
+    },
     market: {
       title: "The World Market",
       subtitle: "the Merchant's exchange",
@@ -5551,6 +5585,7 @@ export const itemStrings = {
       bags: { title: "Bolsas", close: "Cerrar bolsas", empty: "Tus bolsas están vacías.", itemAria: "{item}, cantidad {count}", stackCount: "x{count}", destroyTitle: "Destruir {item}", destroyConfirm: "Destruir", destroyCancel: "Cancelar" },
       equipment: { empty: "Vacío", levelClass: "Nivel {level} {className}" },
       vendor: { goodsTitle: "{name}: mercancías", close: "Cerrar vendedor", hint: "Haz clic en un objeto de tus bolsas para venderlo mientras esta ventana esté abierta.", buyAria: "Comprar {item} por {price}" },
+      enhance: itemStringsEn.itemUi.enhance,
       market: {
         title: "Mercado Mundial", subtitle: "intercambio del Mercader", close: "Cerrar mercado", browse: "Explorar", sell: "Vender", collect: "Recoger", collectWithCount: "Recoger ({count})", noMerchant: "Acércate al Mercader para comerciar.", emptyBrowse: "El mercado está tranquilo. Sé el primero en publicar algo en la pestaña Vender.", browseNote: "Mercancías publicadas por aventureros del reino entero. Elige Comprar para adquirir un montón al instante.", merchantStock: "Existencias del Mercader", stackCount: "x{count}", each: "{money} cada uno", buy: "Comprar", reclaim: "Recuperar", buyAria: "Comprar {item} por {price}", reclaimAria: "Recuperar {item}", sellNote: "Publica mercancías de tus bolsas. El Mercader toma un {cut}% cuando un objeto se vende. Usas {used}/{max} espacios de venta.", sellPickEmpty: "Haz clic en un objeto de tus bolsas para elegir qué vender.", quantity: "Cantidad", quantityOf: "de {count}", priceEach: "Precio por unidad", listButton: "Publicar en el Mercado Mundial", minPriceError: "Pon un precio de al menos 1 cobre.", collectEmpty: "No hay nada esperando. Las ganancias y publicaciones vencidas se recogen aquí.", collectNote: "Ganancias y bienes devueltos que el Mercader guarda para ti.", saleProceeds: "Ganancias de venta", collectAll: "Recoger lote completo",
       },
@@ -5574,6 +5609,7 @@ export const itemStrings = {
       bags: { title: "Sacs", close: "Fermer les sacs", empty: "Vos sacs sont vides.", itemAria: "{item}, quantité {count}", stackCount: "x{count}", destroyTitle: "Détruire {item}", destroyConfirm: "Détruire", destroyCancel: "Annuler" },
       equipment: { empty: "Vide", levelClass: "Niveau {level} {className}" },
       vendor: { goodsTitle: "{name} : marchandises", close: "Fermer le vendeur", hint: "Cliquez sur un objet dans vos sacs pour le vendre tant que cette fenêtre est ouverte.", buyAria: "Acheter {item} pour {price}" },
+      enhance: itemStringsEn.itemUi.enhance,
       market: {
         title: "Marché mondial", subtitle: "bourse du Marchand", close: "Fermer le marché", browse: "Parcourir", sell: "Vendre", collect: "Récupérer", collectWithCount: "Récupérer ({count})", noMerchant: "Approchez-vous du Marchand pour faire affaire.", emptyBrowse: "Le marché est calme. Soyez le premier à publier quelque chose dans l'onglet Vendre.", browseNote: "Marchandises proposées par les aventuriers du royaume. Choisissez Acheter pour obtenir un lot immédiatement.", merchantStock: "Stock du Marchand", stackCount: "x{count}", each: "{money} l'unité", buy: "Acheter", reclaim: "Reprendre", buyAria: "Acheter {item} pour {price}", reclaimAria: "Reprendre {item}", sellNote: "Listez des marchandises depuis vos sacs. Le Marchand prend {cut}% quand un objet est vendu. Vous utilisez {used}/{max} emplacements.", sellPickEmpty: "Cliquez sur un objet dans vos sacs pour choisir quoi vendre.", quantity: "Quantité", quantityOf: "sur {count}", priceEach: "Prix unitaire", listButton: "Publier au Marché mondial", minPriceError: "Indiquez un prix d'au moins 1 cuivre.", collectEmpty: "Rien en attente. Les recettes et annonces expirées se récupèrent ici.", collectNote: "Recettes et biens retournés que le Marchand garde pour vous.", saleProceeds: "Recettes de vente", collectAll: "Tout récupérer",
       },
@@ -5598,6 +5634,7 @@ export const itemStrings = {
       bags: { title: "Borse", close: "Chiudi borse", empty: "Le tue borse sono vuote.", itemAria: "{item}, quantità {count}", stackCount: "x{count}", destroyTitle: "Distruggi {item}", destroyConfirm: "Distruggi", destroyCancel: "Annulla" },
       equipment: { empty: "Vuoto", levelClass: "Livello {level} {className}" },
       vendor: { goodsTitle: "{name}: merci", close: "Chiudi venditore", hint: "Clicca su un oggetto nelle borse per venderlo mentre questa finestra è aperta.", buyAria: "Compra {item} per {price}" },
+      enhance: itemStringsEn.itemUi.enhance,
       market: {
         title: "Mercato Mondiale", subtitle: "scambio del Mercante", close: "Chiudi mercato", browse: "Sfoglia", sell: "Vendi", collect: "Ritira", collectWithCount: "Ritira ({count})", noMerchant: "Avvicinati al Mercante per trattare.", emptyBrowse: "Il mercato è silenzioso. Sii il primo a pubblicare qualcosa nella scheda Vendi.", browseNote: "Merci pubblicate dagli avventurieri del reame. Scegli Compra per acquistare subito una pila.", merchantStock: "Scorte del Mercante", stackCount: "x{count}", each: "{money} ciascuno", buy: "Compra", reclaim: "Riprendi", buyAria: "Compra {item} per {price}", reclaimAria: "Riprendi {item}", sellNote: "Metti in vendita merci dalle borse. Il Mercante prende il {cut}% quando un oggetto viene venduto. Usi {used}/{max} spazi.", sellPickEmpty: "Clicca su un oggetto nelle borse per scegliere cosa vendere.", quantity: "Quantità", quantityOf: "di {count}", priceEach: "Prezzo unitario", listButton: "Metti sul Mercato Mondiale", minPriceError: "Indica un prezzo di almeno 1 rame.", collectEmpty: "Non c'è nulla in attesa. Ricavi e inserzioni scadute si ritirano qui.", collectNote: "Ricavi e merci restituite che il Mercante conserva per te.", saleProceeds: "Ricavi di vendita", collectAll: "Ritira tutto",
       },
@@ -5620,6 +5657,7 @@ export const itemStrings = {
       bags: { title: "Taschen", close: "Taschen schließen", empty: "Eure Taschen sind leer.", itemAria: "{item}, Menge {count}", stackCount: "x{count}", destroyTitle: "{item} zerstören", destroyConfirm: "Zerstören", destroyCancel: "Abbrechen" },
       equipment: { empty: "Leer", levelClass: "Stufe {level} {className}" },
       vendor: { goodsTitle: "{name}: Waren", close: "Händler schließen", hint: "Klickt auf einen Gegenstand in Euren Taschen, um ihn zu verkaufen, solange dieses Fenster geöffnet ist.", buyAria: "{item} für {price} kaufen" },
+      enhance: itemStringsEn.itemUi.enhance,
       market: {
         title: "Weltmarkt", subtitle: "Börse des Händlers", close: "Markt schließen", browse: "Durchsuchen", sell: "Verkaufen", collect: "Abholen", collectWithCount: "Abholen ({count})", noMerchant: "Tretet an den Händler heran, um zu handeln.", emptyBrowse: "Der Markt ist ruhig. Stellt als Erste etwas im Reiter Verkaufen ein.", browseNote: "Waren von Abenteurern im ganzen Reich. Wählt Kaufen, um einen Stapel sofort zu erwerben.", merchantStock: "Händlerbestand", stackCount: "x{count}", each: "{money} pro Stück", buy: "Kaufen", reclaim: "Zurückholen", buyAria: "{item} für {price} kaufen", reclaimAria: "{item} zurückholen", sellNote: "Stellt Waren aus Euren Taschen ein. Der Händler nimmt {cut}% beim Verkauf. Ihr nutzt {used}/{max} Verkaufsplätze.", sellPickEmpty: "Klickt auf einen Gegenstand in Euren Taschen, um ihn zu verkaufen.", quantity: "Menge", quantityOf: "von {count}", priceEach: "Preis je Stück", listButton: "Auf dem Weltmarkt einstellen", minPriceError: "Nennt einen Preis von mindestens 1 Kupfer.", collectEmpty: "Nichts wartet. Verkaufserlöse und abgelaufene Angebote werden hier abgeholt.", collectNote: "Erlöse und zurückgegebene Waren, die der Händler für Euch hält.", saleProceeds: "Verkaufserlöse", collectAll: "Alles abholen",
       },
@@ -5642,6 +5680,7 @@ export const itemStrings = {
       bags: { title: "背包", close: "关闭背包", empty: "你的背包是空的。", itemAria: "{item}，数量 {count}", stackCount: "x{count}", destroyTitle: "摧毁 {item}", destroyConfirm: "摧毁", destroyCancel: "取消" },
       equipment: { empty: "空", levelClass: "{level} 级 {className}" },
       vendor: { goodsTitle: "{name}：货物", close: "关闭商人", hint: "此窗口打开时，点击背包中的物品即可出售。", buyAria: "以 {price} 购买 {item}" },
+      enhance: itemStringsEn.itemUi.enhance,
       market: {
         title: "世界市场", subtitle: "商人的交易所", close: "关闭市场", browse: "浏览", sell: "出售", collect: "领取", collectWithCount: "领取（{count}）", noMerchant: "靠近商人才能交易。", emptyBrowse: "市场很安静。到出售标签页率先上架物品。", browseNote: "来自全境冒险者的货物。选择购买即可直接买下一组。", merchantStock: "商人库存", stackCount: "x{count}", each: "每个 {money}", buy: "购买", reclaim: "取回", buyAria: "以 {price} 购买 {item}", reclaimAria: "取回 {item}", sellNote: "从背包上架货物。物品售出时商人抽取 {cut}%。你正在使用 {used}/{max} 个上架位。", sellPickEmpty: "点击背包中的物品来选择要出售的货物。", quantity: "数量", quantityOf: "共 {count}", priceEach: "单价", listButton: "上架到世界市场", minPriceError: "价格至少为 1 铜币。", collectEmpty: "没有待领取内容。销售收益和过期上架会在这里领取。", collectNote: "商人为你保管的收益和退回货物。", saleProceeds: "销售收益", collectAll: "全部领取",
       },
@@ -5664,6 +5703,7 @@ export const itemStrings = {
       bags: { title: "背包", close: "關閉背包", empty: "你的背包是空的。", itemAria: "{item}，數量 {count}", stackCount: "x{count}", destroyTitle: "摧毀 {item}", destroyConfirm: "摧毀", destroyCancel: "取消" },
       equipment: { empty: "空", levelClass: "{level} 級 {className}" },
       vendor: { goodsTitle: "{name}：貨物", close: "關閉商人", hint: "此視窗開啟時，點擊背包中的物品即可出售。", buyAria: "以 {price} 購買 {item}" },
+      enhance: itemStringsEn.itemUi.enhance,
       market: {
         title: "世界市場", subtitle: "商人的交易所", close: "關閉市場", browse: "瀏覽", sell: "出售", collect: "領取", collectWithCount: "領取（{count}）", noMerchant: "靠近商人才能交易。", emptyBrowse: "市場很安靜。到出售分頁率先上架物品。", browseNote: "來自全境冒險者的貨物。選擇購買即可直接買下一組。", merchantStock: "商人庫存", stackCount: "x{count}", each: "每個 {money}", buy: "購買", reclaim: "取回", buyAria: "以 {price} 購買 {item}", reclaimAria: "取回 {item}", sellNote: "從背包上架貨物。物品售出時商人抽取 {cut}%。你正在使用 {used}/{max} 個上架位。", sellPickEmpty: "點擊背包中的物品來選擇要出售的貨物。", quantity: "數量", quantityOf: "共 {count}", priceEach: "單價", listButton: "上架到世界市場", minPriceError: "價格至少為 1 銅幣。", collectEmpty: "沒有待領取內容。銷售收益和過期上架會在這裡領取。", collectNote: "商人為你保管的收益和退回貨物。", saleProceeds: "銷售收益", collectAll: "全部領取",
       },
@@ -5686,6 +5726,7 @@ export const itemStrings = {
       bags: { title: "가방", close: "가방 닫기", empty: "가방이 비어 있습니다.", itemAria: "{item}, 수량 {count}", stackCount: "x{count}", destroyTitle: "{item} 파괴", destroyConfirm: "파괴", destroyCancel: "취소" },
       equipment: { empty: "비어 있음", levelClass: "{level}레벨 {className}" },
       vendor: { goodsTitle: "{name}: 상품", close: "상인 닫기", hint: "이 창이 열려 있을 때 가방의 아이템을 클릭하면 판매합니다.", buyAria: "{price}에 {item} 구매" },
+      enhance: itemStringsEn.itemUi.enhance,
       market: {
         title: "세계 시장", subtitle: "상인의 거래소", close: "시장 닫기", browse: "보기", sell: "판매", collect: "수령", collectWithCount: "수령 ({count})", noMerchant: "상인에게 가까이 가야 거래할 수 있습니다.", emptyBrowse: "시장이 조용합니다. 판매 탭에서 먼저 물건을 올려 보세요.", browseNote: "왕국 전역의 모험가가 올린 상품입니다. 구매를 선택하면 묶음을 바로 삽니다.", merchantStock: "상인 재고", stackCount: "x{count}", each: "개당 {money}", buy: "구매", reclaim: "회수", buyAria: "{price}에 {item} 구매", reclaimAria: "{item} 회수", sellNote: "가방의 상품을 올립니다. 아이템이 팔리면 상인이 {cut}%를 가져갑니다. 등록 칸 {used}/{max}개 사용 중입니다.", sellPickEmpty: "판매할 아이템을 선택하려면 가방에서 클릭하세요.", quantity: "수량", quantityOf: "/ {count}", priceEach: "개당 가격", listButton: "세계 시장에 등록", minPriceError: "가격은 최소 1동화여야 합니다.", collectEmpty: "기다리는 물건이 없습니다. 판매 대금과 만료된 등록품은 여기에서 받습니다.", collectNote: "상인이 보관 중인 수익과 반환된 상품입니다.", saleProceeds: "판매 대금", collectAll: "모두 수령",
       },
@@ -5708,6 +5749,7 @@ export const itemStrings = {
       bags: { title: "バッグ", close: "バッグを閉じる", empty: "バッグは空です。", itemAria: "{item}、数量 {count}", stackCount: "x{count}", destroyTitle: "{item}を破棄", destroyConfirm: "破棄", destroyCancel: "キャンセル" },
       equipment: { empty: "空", levelClass: "レベル{level} {className}" },
       vendor: { goodsTitle: "{name}: 商品", close: "商人を閉じる", hint: "このウィンドウが開いている間、バッグ内のアイテムをクリックすると売却できます。", buyAria: "{item}を{price}で購入" },
+      enhance: itemStringsEn.itemUi.enhance,
       market: {
         title: "ワールドマーケット", subtitle: "商人の取引所", close: "市場を閉じる", browse: "閲覧", sell: "売却", collect: "受取", collectWithCount: "受取（{count}）", noMerchant: "取引するには商人に近づいてください。", emptyBrowse: "市場は静かです。売却タブで最初に何かを出品しましょう。", browseNote: "王国中の冒険者が出品した品です。購入を選ぶとスタックを即時購入します。", merchantStock: "商人の在庫", stackCount: "x{count}", each: "各 {money}", buy: "購入", reclaim: "回収", buyAria: "{item}を{price}で購入", reclaimAria: "{item}を回収", sellNote: "バッグから品物を出品します。売れると商人が{cut}%を受け取ります。出品枠 {used}/{max} を使用中です。", sellPickEmpty: "売るものを選ぶにはバッグ内のアイテムをクリックしてください。", quantity: "数量", quantityOf: "/ {count}", priceEach: "単価", listButton: "ワールドマーケットに出品", minPriceError: "価格は最低1銅貨にしてください。", collectEmpty: "待機中のものはありません。売上と期限切れの出品はここで受け取ります。", collectNote: "商人が預かっている売上と返却品です。", saleProceeds: "売上", collectAll: "すべて受け取る",
       },
@@ -5730,6 +5772,7 @@ export const itemStrings = {
       bags: { title: "Bolsas", close: "Fechar bolsas", empty: "Suas bolsas estão vazias.", itemAria: "{item}, quantidade {count}", stackCount: "x{count}", destroyTitle: "Destruir {item}", destroyConfirm: "Destruir", destroyCancel: "Cancelar" },
       equipment: { empty: "Vazio", levelClass: "Nível {level} {className}" },
       vendor: { goodsTitle: "{name}: mercadorias", close: "Fechar vendedor", hint: "Clique em um item nas suas bolsas para vendê-lo enquanto esta janela estiver aberta.", buyAria: "Comprar {item} por {price}" },
+      enhance: itemStringsEn.itemUi.enhance,
       market: {
         title: "Mercado Mundial", subtitle: "bolsa do Mercador", close: "Fechar mercado", browse: "Procurar", sell: "Vender", collect: "Coletar", collectWithCount: "Coletar ({count})", noMerchant: "Aproxime-se do Mercador para negociar.", emptyBrowse: "O mercado está quieto. Seja o primeiro a listar algo na aba Vender.", browseNote: "Mercadorias listadas por aventureiros do reino inteiro. Escolha Comprar para adquirir uma pilha imediatamente.", merchantStock: "Estoque do Mercador", stackCount: "x{count}", each: "{money} cada", buy: "Comprar", reclaim: "Recuperar", buyAria: "Comprar {item} por {price}", reclaimAria: "Recuperar {item}", sellNote: "Liste mercadorias das suas bolsas. O Mercador fica com {cut}% quando um item é vendido. Você usa {used}/{max} espaços.", sellPickEmpty: "Clique em um item nas suas bolsas para escolher o que vender.", quantity: "Quantidade", quantityOf: "de {count}", priceEach: "Preço unitário", listButton: "Listar no Mercado Mundial", minPriceError: "Informe um preço de pelo menos 1 cobre.", collectEmpty: "Nada esperando. Receitas de venda e listagens expiradas ficam aqui.", collectNote: "Receitas e bens devolvidos que o Mercador guarda para você.", saleProceeds: "Receitas da venda", collectAll: "Coletar tudo",
       },
@@ -5752,6 +5795,7 @@ export const itemStrings = {
       bags: { title: "Сумки", close: "Закрыть сумки", empty: "Ваши сумки пусты.", itemAria: "{item}, количество {count}", stackCount: "x{count}", destroyTitle: "Уничтожить {item}", destroyConfirm: "Уничтожить", destroyCancel: "Отмена" },
       equipment: { empty: "Пусто", levelClass: "Уровень {level} {className}" },
       vendor: { goodsTitle: "{name}: товары", close: "Закрыть торговца", hint: "Нажмите на предмет в сумках, чтобы продать его, пока это окно открыто.", buyAria: "Купить {item} за {price}" },
+      enhance: itemStringsEn.itemUi.enhance,
       market: {
         title: "Мировой рынок", subtitle: "биржа Торговца", close: "Закрыть рынок", browse: "Просмотр", sell: "Продать", collect: "Забрать", collectWithCount: "Забрать ({count})", noMerchant: "Подойдите к Торговцу, чтобы заключать сделки.", emptyBrowse: "На рынке тихо. Выставьте что-нибудь первым на вкладке Продать.", browseNote: "Товары, выставленные искателями приключений со всего мира. Выберите Купить, чтобы сразу приобрести стопку.", merchantStock: "Запасы Торговца", stackCount: "x{count}", each: "{money} за штуку", buy: "Купить", reclaim: "Вернуть", buyAria: "Купить {item} за {price}", reclaimAria: "Вернуть {item}", sellNote: "Выставляйте товары из сумок. Торговец берет {cut}% при продаже. Использовано мест: {used}/{max}.", sellPickEmpty: "Нажмите на предмет в сумках, чтобы выбрать товар для продажи.", quantity: "Количество", quantityOf: "из {count}", priceEach: "Цена за штуку", listButton: "Выставить на мировой рынок", minPriceError: "Назовите цену не меньше 1 меди.", collectEmpty: "Ничего не ждет. Выручка и истекшие лоты собираются здесь.", collectNote: "Выручка и возвращенные товары, которые Торговец хранит для вас.", saleProceeds: "Выручка", collectAll: "Забрать все",
       },
@@ -7113,7 +7157,8 @@ const ITEM_ENTITY_IDS = [
   "eastbrook_arming_sword", "bronzework_mace", "vale_carving_knife", "hickory_shortstaff", "eastbrook_chain_vest", "valespun_robe",
   "tanned_leather_jerkin", "hobnail_boots", "eastbrook_wool_trousers", "gravecaller_blade", "widowfang_dirk", "gravecaller_staff",
   "marrowtread_boots", "sextons_slippers", "gravewalker_softboots", "boar_hide", "gravecaller_sigil", "blessed_wax", "ghostly_essence",
-  "webwood_silk", "supply_crate", "greyjaw_fang", "weathered_ledger_page", "morthen_grimoire", "wolf_fang", "bandit_bandana",
+  "webwood_silk", "supply_crate", "greyjaw_fang", "weathered_ledger_page", "morthen_grimoire",
+  "crypt_refinement_shard", "bastion_ward_core", "gravewyrm_ember", "wolf_fang", "bandit_bandana",
   "tough_jerky", "mudfin_scale", "tallow_candle", "spider_leg", "bone_fragments", "linen_scrap", "fen_muster_order",
   "mire_prowler_pelt", "lost_caravan_goods", "waterlogged_idol", "widow_venom_sac", "rusted_censer", "troll_fetish", "grubjaw_tusk",
   "cult_cipher", "bastion_ward_stone", "deacons_cleaver", "staff_of_drowned_prayers", "mistbinder_kris", "drownedguard_breastplate",
@@ -7162,7 +7207,7 @@ const itemNamesEn = {
       "Eastbrook Arming Sword", "Bronzework Mace", "Vale Carving Knife", "Hickory Shortstaff", "Eastbrook Chainmail Vest", "Valespun Robe", "Tanned Leather Jerkin",
       "Hobnailed Boots", "Eastbrook Wool Trousers", "Gravecaller's Broadblade", "Widowfang Dirk", "Staff of the Hollow", "Marrowtread Boots", "Sexton's Slippers",
       "Gravewalker Softboots", "Bristly Boar Hide", "Gravecaller's Sigil", "Blessed Tallow", "Ghostly Essence", "Webwood Silk Gland", "Stolen Supply Crate",
-      "Old Greyjaw's Fang", "Weathered Ledger Page", "Morthen's Grimoire", "Cracked Wolf Fang", "Red Bandana", "Tough Jerky", "Slimy Murloc Scale", "Tallow Candle",
+      "Old Greyjaw's Fang", "Weathered Ledger Page", "Morthen's Grimoire", "Crypt Refinement Shard", "Bastion Ward Core", "Gravewyrm Ember", "Cracked Wolf Fang", "Red Bandana", "Tough Jerky", "Slimy Murloc Scale", "Tallow Candle",
       "Twitching Spider Leg", "Bone Fragments", "Linen Scrap", "Fenbridge Muster Order", "Mire Prowler Pelt", "Lost Caravan Goods", "Waterlogged Idol", "Widow Venom Sac",
       "Rusted Censer", "Mirefen Troll Fetish", "Grubjaw's Tusk", "Gravecaller Cipher", "Bastion Ward Stone", "Deacon's Cleaver", "Staff of Drowned Prayers",
       "Mistbinder Kris", "Drownedguard Breastplate", "Fenmist Robe", "Eelskin Tunic", "Trollhide Leggings", "Marshstrider Boots", "Mistcaller's Edge", "Vael's Mist-Staff",
@@ -7195,7 +7240,7 @@ export const itemNames = {
         "Espada de armar de Eastbrook", "Maza de broncista", "Cuchillo de trinchar del Valle", "Bastón corto de nogal", "Chaleco de cota de Eastbrook", "Toga Hilavalle", "Jubón de cuero curtido",
         "Botas claveteadas", "Pantalones de lana de Eastbrook", "Mandoble de Gravecaller", "Puñal Colmillo de Viuda", "Bastón del Hueco", "Botas Pisatuétanos", "Zapatillas del sacristán",
         "Botas blandas del Caminante de Tumbas", "Piel erizada de jabalí", "Sigilo de Gravecaller", "Sebo bendito", "Esencia fantasmal", "Glándula de seda de Webwood", "Cajón de suministros robado",
-        "Colmillo del viejo Greyjaw", "Página de libro mayor ajada", "Grimorio de Morthen", "Colmillo de lobo quebrado", "Pañuelo rojo", "Cecina dura", "Escama viscosa de múrloc", "Vela de sebo",
+        "Colmillo del viejo Greyjaw", "Página de libro mayor ajada", "Grimorio de Morthen", "Fragmento de refinamiento de cripta", "Núcleo de guardia del bastión", "Ascua de Gravewyrm", "Colmillo de lobo quebrado", "Pañuelo rojo", "Cecina dura", "Escama viscosa de múrloc", "Vela de sebo",
         "Pata de araña crispada", "Fragmentos de hueso", "Retal de lino", "Orden de alistamiento de Fenbridge", "Piel de merodeador del pantano", "Bienes de la caravana perdida", "Ídolo empapado", "Saco de veneno de viuda",
         "Incensario oxidado", "Fetiche trol de Mirefen", "Colmillo de Grubjaw", "Cifra de Gravecaller", "Piedra de guarda del Bastión", "Cuchilla del diácono", "Bastón de plegarias ahogadas",
         "Cris atanieblas", "Coraza de Guardia Ahogada", "Toga de niebla del pantano", "Túnica de piel de anguila", "Leotardos de piel de trol", "Botas Zancapantanos", "Filo de Mistcaller", "Bastón de niebla de Vael",
@@ -7226,7 +7271,7 @@ export const itemNames = {
         "Épée d'armes d'Eastbrook", "Masse ouvragée en bronze", "Couteau à découper du Val", "Bâton court en hickory", "Gilet de mailles d'Eastbrook", "Robe filée du Val", "Pourpoint en cuir tanné",
         "Bottes cloutées", "Pantalon de laine d'Eastbrook", "Grande lame de Gravecaller", "Dague Croc-de-veuve", "Bâton du Creux", "Bottes Fouletombe", "Mules du sacristain",
         "Bottes souples Marchetombe", "Peau hérissée de sanglier", "Sceau de Gravecaller", "Suif béni", "Essence spectrale", "Glande de soie de Webwood", "Caisse de fournitures volée",
-        "Croc du vieux Greyjaw", "Page de registre usée", "Grimoire de Morthen", "Croc de loup fendu", "Bandana rouge", "Viande séchée coriace", "Écaille de murloc visqueuse", "Chandelle de suif",
+        "Croc du vieux Greyjaw", "Page de registre usée", "Grimoire de Morthen", "Éclat de raffinement de la crypte", "Noyau de garde du bastion", "Braise de Gravewyrm", "Croc de loup fendu", "Bandana rouge", "Viande séchée coriace", "Écaille de murloc visqueuse", "Chandelle de suif",
         "Patte d'araignée frémissante", "Fragments d'os", "Chute de lin", "Ordre de rassemblement de Fenbridge", "Peau de rôdeur du bourbier", "Marchandises de la caravane perdue", "Idole détrempée", "Sac à venin de veuve",
         "Encensoir rouillé", "Fétiche troll de Mirefen", "Défense de Grubjaw", "Chiffre de Gravecaller", "Pierre de garde du Bastion", "Fendoir du diacre", "Bâton des prières noyées",
         "Kris Lie-brume", "Cuirasse Garde-noyé", "Robe de brume des marais", "Tunique en peau d'anguille", "Jambières en peau de troll", "Bottes Marchemarais", "Tranchant de Mistcaller", "Bâton de brume de Vael",
@@ -7258,7 +7303,7 @@ export const itemNames = {
         "Spada d'arme di Eastbrook", "Mazza bronzata", "Coltello da intaglio della Valle", "Bastone corto di noce americano", "Gilet di maglia di Eastbrook", "Veste Filovalle", "Giaco di cuoio conciato",
         "Stivali chiodati", "Pantaloni di lana di Eastbrook", "Lama larga di Gravecaller", "Pugnale Zanna di Vedova", "Bastone del Vuoto", "Stivali Passomidollo", "Pantofole del sagrestano",
         "Stivaletti morbidi del Camminatombe", "Pelle ispida di cinghiale", "Sigillo di Gravecaller", "Sego benedetto", "Essenza spettrale", "Ghiandola di seta di Webwood", "Cassa di rifornimenti rubata",
-        "Zanna del vecchio Greyjaw", "Pagina di registro logora", "Grimorio di Morthen", "Zanna di lupo incrinata", "Bandana rossa", "Carne secca dura", "Scaglia viscida di murloc", "Candela di sego",
+        "Zanna del vecchio Greyjaw", "Pagina di registro logora", "Grimorio di Morthen", "Frammento di raffinamento della cripta", "Nucleo di guardia del bastione", "Brace di Gravewyrm", "Zanna di lupo incrinata", "Bandana rossa", "Carne secca dura", "Scaglia viscida di murloc", "Candela di sego",
         "Zampa di ragno fremente", "Frammenti d'osso", "Ritaglio di lino", "Ordine di raduno di Fenbridge", "Pelliccia di predatore del pantano", "Merci della carovana perduta", "Idolo zuppo", "Sacca di veleno di vedova",
         "Turibolo arrugginito", "Feticcio troll di Mirefen", "Zanna di Grubjaw", "Cifrario di Gravecaller", "Pietra di guardia del Bastione", "Mannaia del diacono", "Bastone delle preghiere annegate",
         "Kris Leganebbia", "Corazza Guardia Annegata", "Veste di nebbia palustre", "Tunica di pelle d'anguilla", "Gambiere di pelle di troll", "Stivali Passapaludi", "Filo di Mistcaller", "Bastone di nebbia di Vael",
@@ -7288,7 +7333,7 @@ export const itemNames = {
         "Eastbrook-Wehrschwert", "Bronzewerkstreitkolben", "Talschnitzmesser", "Hickory-Kurzstab", "Eastbrook-Kettenweste", "Talgesponnene Robe", "Gegerbtes Lederwams",
         "Nagelstiefel", "Eastbrook-Wollhose", "Gravecallers Breitschwert", "Witwenzahn-Dolch", "Stab der Höhlung", "Markschrittstiefel", "Pantoffeln des Küsters",
         "Weiche Grabwandlerstiefel", "Borstige Eberhaut", "Gravecallers Siegel", "Gesegneter Talg", "Geisterhafte Essenz", "Seidendrüse von Webwood", "Gestohlene Vorratskiste",
-        "Zahn des alten Greyjaw", "Verwitterte Buchseite", "Morthens Grimoire", "Gesprungener Wolfszahn", "Rotes Halstuch", "Zähes Dörrfleisch", "Schleimige Murlocschuppe", "Talgkerze",
+        "Zahn des alten Greyjaw", "Verwitterte Buchseite", "Morthens Grimoire", "Krypta-Veredelungssplitter", "Bastion-Wardskern", "Gravewyrm-Glut", "Gesprungener Wolfszahn", "Rotes Halstuch", "Zähes Dörrfleisch", "Schleimige Murlocschuppe", "Talgkerze",
         "Zuckendes Spinnenbein", "Knochenfragmente", "Leinenfetzen", "Musterungsbefehl von Fenbridge", "Balg eines Moorpirschers", "Waren der verlorenen Karawane", "Durchnässtes Götzenbild", "Witwengiftsack",
         "Rostiges Räuchergefäß", "Mirefen-Trollfetisch", "Grubjaws Hauer", "Gravecaller-Chiffre", "Bastion-Wachstein", "Beil des Diakons", "Stab ertrunkener Gebete",
         "Nebelbinder-Kris", "Brustplatte der Ertrunkenenwache", "Fenmist-Robe", "Aalhaut-Tunika", "Trollhautgamaschen", "Marschschreiterstiefel", "Mistcallers Schneide", "Vaels Nebelstab",
@@ -7318,7 +7363,7 @@ export const itemNames = {
         "东溪武装剑", "青铜工艺钉锤", "溪谷雕肉刀", "山胡桃短杖", "东溪链甲背心", "谷纺长袍", "鞣制皮甲",
         "钉底靴", "东溪羊毛长裤", "唤墓者宽刃剑", "寡妇牙短匕", "空洞法杖", "踏髓长靴", "司事便鞋",
         "墓行者软靴", "硬鬃野猪皮", "唤墓者徽记", "祝福油脂", "幽魂精华", "网木丝腺", "被盗补给箱",
-        "老灰颚的尖牙", "风化账页", "莫森的魔典", "裂开的狼牙", "红色面巾", "硬肉干", "黏滑鱼人鳞片", "油脂蜡烛",
+        "老灰颚的尖牙", "风化账页", "莫森的魔典", "地穴精炼碎片", "堡垒护核", "墓龙余烬", "裂开的狼牙", "红色面巾", "硬肉干", "黏滑鱼人鳞片", "油脂蜡烛",
         "抽搐的蜘蛛腿", "骨头碎片", "亚麻碎布", "芬桥集结令", "泥沼潜伏者毛皮", "遗失商队货物", "浸水神像", "寡妇毒囊",
         "生锈香炉", "泥沼巨魔护符", "格鲁布颚的獠牙", "唤墓者密文", "堡垒护符石", "执事劈刀", "溺亡祈祷法杖",
         "缚雾短剑", "溺卫胸甲", "沼雾长袍", "鳗皮外套", "巨魔皮护腿", "沼行者长靴", "唤雾者之锋", "维尔的雾杖",
@@ -7348,7 +7393,7 @@ export const itemNames = {
         "東溪武裝劍", "青銅工藝釘錘", "溪谷雕肉刀", "山胡桃短杖", "東溪鎖甲背心", "谷紡長袍", "鞣製皮甲",
         "釘底靴", "東溪羊毛長褲", "喚墓者寬刃劍", "寡婦牙短匕", "空洞法杖", "踏髓長靴", "司事便鞋",
         "墓行者軟靴", "硬鬃野豬皮", "喚墓者徽記", "祝福油脂", "幽魂精華", "網木絲腺", "被盜補給箱",
-        "老灰顎的尖牙", "風化帳頁", "莫森的魔典", "裂開的狼牙", "紅色面巾", "硬肉乾", "黏滑魚人鱗片", "油脂蠟燭",
+        "老灰顎的尖牙", "風化帳頁", "莫森的魔典", "地穴精煉碎片", "堡壘護核", "墓龍餘燼", "裂開的狼牙", "紅色面巾", "硬肉乾", "黏滑魚人鱗片", "油脂蠟燭",
         "抽搐的蜘蛛腿", "骨頭碎片", "亞麻碎布", "芬橋集結令", "泥沼潛伏者毛皮", "遺失商隊貨物", "浸水神像", "寡婦毒囊",
         "生鏽香爐", "泥沼巨魔護符", "格魯布顎的獠牙", "喚墓者密文", "堡壘護符石", "執事劈刀", "溺亡祈禱法杖",
         "縛霧短劍", "溺衛胸甲", "沼霧長袍", "鰻皮外套", "巨魔皮護腿", "沼行者長靴", "喚霧者之鋒", "維爾的霧杖",
@@ -7378,7 +7423,7 @@ export const itemNames = {
         "이스트브룩 무장검", "청동세공 철퇴", "계곡 조각칼", "히코리 짧은지팡이", "이스트브룩 사슬조끼", "계곡방적 로브", "무두질한 가죽 웃옷",
         "징박은 장화", "이스트브룩 양모 바지", "무덤부름 넓은날검", "과부송곳니 더크", "공허의 지팡이", "골수밟이 장화", "성구지기의 슬리퍼",
         "무덤걸음 부드러운장화", "억센 멧돼지 가죽", "무덤부름 인장", "축복받은 수지", "유령 정수", "그물나무 비단샘", "도난당한 보급 상자",
-        "늙은 그레이죠의 송곳니", "풍화된 장부 페이지", "모르덴의 마법서", "갈라진 늑대 송곳니", "붉은 두건", "질긴 육포", "끈적한 멀록 비늘", "수지 양초",
+        "늙은 그레이죠의 송곳니", "풍화된 장부 페이지", "모르덴의 마법서", "지하묘지 정제 파편", "요새 수호 핵", "무덤고룡 불씨", "갈라진 늑대 송곳니", "붉은 두건", "질긴 육포", "끈적한 멀록 비늘", "수지 양초",
         "꿈틀대는 거미 다리", "뼈 조각", "아마포 조각", "펜브리지 소집 명령서", "수렁 배회자 가죽", "잃어버린 대상단 물품", "물먹은 우상", "과부 독주머니",
         "녹슨 향로", "마이어펜 트롤 부적", "그럽죠의 엄니", "무덤부름 암호문", "요새 수호석", "부제의 도끼", "익사한 기도의 지팡이",
         "안개결속 크리스", "익사수호자 흉갑", "수렁안개 로브", "뱀장어가죽 튜닉", "트롤가죽 다리보호구", "늪지걸음 장화", "안개부름 칼날", "바엘의 안개지팡이",
@@ -7408,7 +7453,7 @@ export const itemNames = {
         "イーストブルックの武装剣", "青銅細工のメイス", "谷の彫りナイフ", "ヒッコリーの短杖", "イーストブルックの鎖帷子ベスト", "谷紡ぎのローブ", "なめし革のジャーキン",
         "鋲打ちブーツ", "イーストブルックの羊毛ズボン", "グレイブコーラーの大刃", "ウィドウファングのダーク", "虚ろの杖", "髄踏みのブーツ", "墓守のスリッパ",
         "墓歩きの柔らかいブーツ", "剛毛猪の皮", "グレイブコーラーの印章", "祝福された獣脂", "幽霊のエッセンス", "ウェブウッドの絹腺", "盗まれた補給箱",
-        "老グレイジョーの牙", "風化した帳簿のページ", "モーセンの魔導書", "割れた狼の牙", "赤いバンダナ", "硬い干し肉", "ぬめるマーロックの鱗", "獣脂のろうそく",
+        "老グレイジョーの牙", "風化した帳簿のページ", "モーセンの魔導書", "地下墓地精錬の欠片", "堡塁守護の核", "墓竜の残り火", "割れた狼の牙", "赤いバンダナ", "硬い干し肉", "ぬめるマーロックの鱗", "獣脂のろうそく",
         "ぴくつく蜘蛛の脚", "骨の破片", "リネンの切れ端", "フェンブリッジ召集令", "沼の徘徊者の毛皮", "失われた隊商の物資", "水浸しの偶像", "寡婦蜘蛛の毒嚢",
         "錆びた香炉", "マイアフェン・トロルの護符", "グラブジョーの牙", "グレイブコーラーの暗号", "砦の護り石", "助祭の肉切り", "溺れた祈りの杖",
         "霧縛りのクリス", "溺れ衛兵の胸当て", "沼霧のローブ", "ウナギ皮のチュニック", "トロル革のレギンス", "沼渡りのブーツ", "ミストコーラーの刃", "ヴァエルの霧杖",
@@ -7438,7 +7483,7 @@ export const itemNames = {
         "Espada de armas de Eastbrook", "Maça de bronzeiro", "Faca de entalhe do Vale", "Cajado curto de nogueira", "Colete de cota de Eastbrook", "Veste Fiavale", "Gibão de couro curtido",
         "Botas cravejadas", "Calças de lã de Eastbrook", "Lâmina larga de Gravecaller", "Punhal Presa-de-viúva", "Cajado do Vazio", "Botas Pisamedula", "Pantufas do sacristão",
         "Botas macias do Andatumbas", "Pele eriçada de javali", "Sigilo de Gravecaller", "Sebo abençoado", "Essência espectral", "Glândula de seda de Webwood", "Caixote de suprimentos roubado",
-        "Presa do velho Greyjaw", "Página de livro-caixa gasta", "Grimório de Morthen", "Presa de lobo rachada", "Bandana vermelha", "Charque duro", "Escama viscosa de murloc", "Vela de sebo",
+        "Presa do velho Greyjaw", "Página de livro-caixa gasta", "Grimório de Morthen", "Fragmento de refinamento da cripta", "Núcleo de guarda do bastião", "Brasa de Gravewyrm", "Presa de lobo rachada", "Bandana vermelha", "Charque duro", "Escama viscosa de murloc", "Vela de sebo",
         "Perna de aranha trêmula", "Fragmentos de osso", "Retalho de linho", "Ordem de convocação de Fenbridge", "Pele de espreitador do brejo", "Mercadorias da caravana perdida", "Ídolo encharcado", "Bolsa de veneno de viúva",
         "Incensário enferrujado", "Fetiche troll de Mirefen", "Presa de Grubjaw", "Cifra de Gravecaller", "Pedra de guarda do Bastião", "Cutelo do diácono", "Cajado das preces afogadas",
         "Kris Prendenévoa", "Peitoral da Guarda Afogada", "Veste de névoa do brejo", "Túnica de pele de enguia", "Perneiras de pele de troll", "Botas Passabrejo", "Gume de Mistcaller", "Cajado de névoa de Vael",
@@ -7468,7 +7513,7 @@ export const itemNames = {
         "Истврукский строевой меч", "Бронзовая булава", "Долинный разделочный нож", "Короткий посох из гикори", "Истврукский кольчужный жилет", "Долиннопрядная роба", "Куртка из дубленой кожи",
         "Подбитые гвоздями сапоги", "Истврукские шерстяные штаны", "Широкий клинок Могильного Зова", "Кортик Вдовьего Клыка", "Посох Пустоты", "Сапоги Костоступа", "Туфли пономаря",
         "Мягкие сапоги Могильного Скитальца", "Щетинистая кабанья шкура", "Сигил Могильного Зова", "Благословенное сало", "Призрачная эссенция", "Шелковая железа Вебвуда", "Украденный ящик припасов",
-        "Клык старого Серочелюста", "Выветренная страница книги учета", "Гримуар Мортена", "Треснувший волчий клык", "Красная бандана", "Жесткое вяленое мясо", "Слизистая чешуя мурлока", "Сальная свеча",
+        "Клык старого Серочелюста", "Выветренная страница книги учета", "Гримуар Мортена", "Осколок усовершенствования склепа", "Ядро стражи бастиона", "Уголь Gravewyrm", "Треснувший волчий клык", "Красная бандана", "Жесткое вяленое мясо", "Слизистая чешуя мурлока", "Сальная свеча",
         "Дергающаяся нога паука", "Фрагменты костей", "Лоскут льна", "Приказ о сборе в Фенбридже", "Шкура болотного хищника", "Товары пропавшего каравана", "Размокший идол", "Ядовитый мешочек вдовы",
         "Ржавое кадило", "Фетиш тролля Мирефена", "Клык Грубджо", "Шифр Могильного Зова", "Обереговый камень бастиона", "Тесак дьякона", "Посох утонувших молитв",
         "Крис Туманной Связи", "Кираса Утонувшей стражи", "Болотная туманная роба", "Туника из кожи угря", "Поножи из кожи тролля", "Сапоги Болотного Странника", "Лезвие Зовущего Туман", "Туманный посох Ваэля",
@@ -7867,7 +7912,7 @@ const mergeStringsEn = {
   },
   itemUi: {
     ...itemNames.en.itemUi,
-    kind: { ...itemNames.en.itemUi.kind, tool: "Tool", potion: "Potion" },
+    kind: { ...itemNames.en.itemUi.kind, tool: "Tool", potion: "Potion", material: "Material" },
     tooltip: {
       ...itemNames.en.itemUi.tooltip,
       useFishing: "Use: Fish in nearby waters.",
@@ -7886,6 +7931,18 @@ const mergeStringsEn = {
       sellQuantityInput: "Quantity to sell",
       sellQuantityConfirm: "Sell",
       sellQuantityCancel: "Cancel",
+    },
+    enhance: {
+      title: "{name}: Enhancement",
+      close: "Close enhancement",
+      noItems: "You have no weapons or armor to improve.",
+      current: "Current: +{level}",
+      target: "Attempt: +{level}",
+      material: "Material: {count}× {item} (you have {have})",
+      chance: "Success chance: {percent}%",
+      risk: "On failure the material is consumed and the item drops one level.",
+      confirm: "Enhance",
+      maxLevel: "This item is fully enhanced and cannot be improved further.",
     },
     logs: {
       ...itemNames.en.itemUi.logs,
@@ -8005,7 +8062,7 @@ export const mergeStrings = {
     },
     itemUi: {
       ...itemNames.es.itemUi,
-      kind: { ...itemNames.es.itemUi.kind, tool: "Herramienta", potion: "Poción" },
+      kind: { ...itemNames.es.itemUi.kind, tool: "Herramienta", potion: "Poción", material: "Material" },
       tooltip: {
         ...itemNames.es.itemUi.tooltip,
         useFishing: "Uso: pesca en aguas cercanas.",
@@ -8025,6 +8082,7 @@ export const mergeStrings = {
         sellQuantityConfirm: "Vender",
         sellQuantityCancel: "Cancelar",
       },
+      enhance: mergeStringsEn.itemUi.enhance,
       logs: {
         ...itemNames.es.itemUi.logs,
         boughtBackItem: "Recompraste {item} por {money}.",
@@ -8141,7 +8199,7 @@ export const mergeStrings = {
     },
     itemUi: {
       ...itemNames.fr_FR.itemUi,
-      kind: { ...itemNames.fr_FR.itemUi.kind, tool: "Outil", potion: "Potion" },
+      kind: { ...itemNames.fr_FR.itemUi.kind, tool: "Outil", potion: "Potion", material: "Matériau" },
       tooltip: {
         ...itemNames.fr_FR.itemUi.tooltip,
         useFishing: "Utiliser : pêcher dans les eaux proches.",
@@ -8161,6 +8219,7 @@ export const mergeStrings = {
         sellQuantityConfirm: "Vendre",
         sellQuantityCancel: "Annuler",
       },
+      enhance: mergeStringsEn.itemUi.enhance,
       logs: {
         ...itemNames.fr_FR.itemUi.logs,
         boughtBackItem: "Vous avez racheté {item} pour {money}.",
@@ -8278,7 +8337,7 @@ export const mergeStrings = {
     },
     itemUi: {
       ...itemNames.it_IT.itemUi,
-      kind: { ...itemNames.it_IT.itemUi.kind, tool: "Strumento", potion: "Pozione" },
+      kind: { ...itemNames.it_IT.itemUi.kind, tool: "Strumento", potion: "Pozione", material: "Materiale" },
       tooltip: {
         ...itemNames.it_IT.itemUi.tooltip,
         useFishing: "Uso: pesca nelle acque vicine.",
@@ -8298,6 +8357,7 @@ export const mergeStrings = {
         sellQuantityConfirm: "Vendi",
         sellQuantityCancel: "Annulla",
       },
+      enhance: mergeStringsEn.itemUi.enhance,
       logs: {
         ...itemNames.it_IT.itemUi.logs,
         boughtBackItem: "Hai ricomprato {item} per {money}.",
@@ -8413,7 +8473,7 @@ export const mergeStrings = {
     },
     itemUi: {
       ...itemNames.de_DE.itemUi,
-      kind: { ...itemNames.de_DE.itemUi.kind, tool: "Werkzeug", potion: "Trank" },
+      kind: { ...itemNames.de_DE.itemUi.kind, tool: "Werkzeug", potion: "Trank", material: "Material" },
       tooltip: {
         ...itemNames.de_DE.itemUi.tooltip,
         useFishing: "Benutzen: Angelt in nahen Gewässern.",
@@ -8433,6 +8493,7 @@ export const mergeStrings = {
         sellQuantityConfirm: "Verkaufen",
         sellQuantityCancel: "Abbrechen",
       },
+      enhance: mergeStringsEn.itemUi.enhance,
       logs: {
         ...itemNames.de_DE.itemUi.logs,
         boughtBackItem: "{item} für {money} zurückgekauft.",
@@ -8548,7 +8609,7 @@ export const mergeStrings = {
     },
     itemUi: {
       ...itemNames.zh_CN.itemUi,
-      kind: { ...itemNames.zh_CN.itemUi.kind, tool: "工具", potion: "药水" },
+      kind: { ...itemNames.zh_CN.itemUi.kind, tool: "工具", potion: "药水", material: "材料" },
       tooltip: {
         ...itemNames.zh_CN.itemUi.tooltip,
         useFishing: "使用：在附近水域钓鱼。",
@@ -8568,6 +8629,7 @@ export const mergeStrings = {
         sellQuantityConfirm: "出售",
         sellQuantityCancel: "取消",
       },
+      enhance: mergeStringsEn.itemUi.enhance,
       logs: {
         ...itemNames.zh_CN.itemUi.logs,
         boughtBackItem: "你以 {money} 回购了 {item}。",
@@ -8683,7 +8745,7 @@ export const mergeStrings = {
     },
     itemUi: {
       ...itemNames.zh_TW.itemUi,
-      kind: { ...itemNames.zh_TW.itemUi.kind, tool: "工具", potion: "藥水" },
+      kind: { ...itemNames.zh_TW.itemUi.kind, tool: "工具", potion: "藥水", material: "材料" },
       tooltip: {
         ...itemNames.zh_TW.itemUi.tooltip,
         useFishing: "使用：在附近水域釣魚。",
@@ -8703,6 +8765,7 @@ export const mergeStrings = {
         sellQuantityConfirm: "出售",
         sellQuantityCancel: "取消",
       },
+      enhance: mergeStringsEn.itemUi.enhance,
       logs: {
         ...itemNames.zh_TW.itemUi.logs,
         boughtBackItem: "你以 {money} 買回了 {item}。",
@@ -8818,7 +8881,7 @@ export const mergeStrings = {
     },
     itemUi: {
       ...itemNames.ko_KR.itemUi,
-      kind: { ...itemNames.ko_KR.itemUi.kind, tool: "도구", potion: "물약" },
+      kind: { ...itemNames.ko_KR.itemUi.kind, tool: "도구", potion: "물약", material: "재료" },
       tooltip: {
         ...itemNames.ko_KR.itemUi.tooltip,
         useFishing: "사용: 가까운 물가에서 낚시합니다.",
@@ -8838,6 +8901,7 @@ export const mergeStrings = {
         sellQuantityConfirm: "판매",
         sellQuantityCancel: "취소",
       },
+      enhance: mergeStringsEn.itemUi.enhance,
       logs: {
         ...itemNames.ko_KR.itemUi.logs,
         boughtBackItem: "{item}을(를) {money}에 되샀습니다.",
@@ -8953,7 +9017,7 @@ export const mergeStrings = {
     },
     itemUi: {
       ...itemNames.ja_JP.itemUi,
-      kind: { ...itemNames.ja_JP.itemUi.kind, tool: "道具", potion: "ポーション" },
+      kind: { ...itemNames.ja_JP.itemUi.kind, tool: "道具", potion: "ポーション", material: "素材" },
       tooltip: {
         ...itemNames.ja_JP.itemUi.tooltip,
         useFishing: "使用: 近くの水辺で釣りをします。",
@@ -8973,6 +9037,7 @@ export const mergeStrings = {
         sellQuantityConfirm: "売却",
         sellQuantityCancel: "キャンセル",
       },
+      enhance: mergeStringsEn.itemUi.enhance,
       logs: {
         ...itemNames.ja_JP.itemUi.logs,
         boughtBackItem: "{item}を{money}で買い戻しました。",
@@ -9088,7 +9153,7 @@ export const mergeStrings = {
     },
     itemUi: {
       ...itemNames.pt_BR.itemUi,
-      kind: { ...itemNames.pt_BR.itemUi.kind, tool: "Ferramenta", potion: "Poção" },
+      kind: { ...itemNames.pt_BR.itemUi.kind, tool: "Ferramenta", potion: "Poção", material: "Material" },
       tooltip: {
         ...itemNames.pt_BR.itemUi.tooltip,
         useFishing: "Uso: pesca em águas próximas.",
@@ -9108,6 +9173,7 @@ export const mergeStrings = {
         sellQuantityConfirm: "Vender",
         sellQuantityCancel: "Cancelar",
       },
+      enhance: mergeStringsEn.itemUi.enhance,
       logs: {
         ...itemNames.pt_BR.itemUi.logs,
         boughtBackItem: "Você recomprou {item} por {money}.",
@@ -9223,7 +9289,7 @@ export const mergeStrings = {
     },
     itemUi: {
       ...itemNames.ru_RU.itemUi,
-      kind: { ...itemNames.ru_RU.itemUi.kind, tool: "Инструмент", potion: "Зелье" },
+      kind: { ...itemNames.ru_RU.itemUi.kind, tool: "Инструмент", potion: "Зелье", material: "Материал" },
       tooltip: {
         ...itemNames.ru_RU.itemUi.tooltip,
         useFishing: "Использование: ловите рыбу в ближайшей воде.",
@@ -9243,6 +9309,7 @@ export const mergeStrings = {
         sellQuantityConfirm: "Продать",
         sellQuantityCancel: "Отмена",
       },
+      enhance: mergeStringsEn.itemUi.enhance,
       logs: {
         ...itemNames.ru_RU.itemUi.logs,
         boughtBackItem: "Вы выкупили {item} за {money}.",

@@ -736,6 +736,33 @@
   .q-uncommon { border-color: #1eff00 !important; }
   .q-rare { border-color: #0070dd !important; }
   .q-epic { border-color: #a335ee !important; box-shadow: 0 0 6px #a335ee66; }
+  .item-icon.enh-7 {
+    animation: enh-shimmer-7 2.8s ease-in-out infinite;
+    box-shadow: 0 0 8px #1eff0044;
+  }
+  .item-icon.enh-9 {
+    animation: enh-shimmer-9 1.4s ease-in-out infinite;
+    box-shadow: 0 0 12px #ffd70088, 0 0 4px #a335ee66;
+  }
+  @keyframes enh-shimmer-7 {
+    0%, 100% { filter: brightness(1) saturate(1); }
+    50% { filter: brightness(1.25) saturate(1.2); }
+  }
+  @keyframes enh-shimmer-9 {
+    0%, 100% { filter: brightness(1.1) saturate(1.1); box-shadow: 0 0 10px #ffd70066; }
+    50% { filter: brightness(1.45) saturate(1.35); box-shadow: 0 0 16px #ffd700cc, 0 0 6px #ffaa00aa; }
+  }
+  .enh-label-7 { color: #1eff00; font-weight: bold; }
+  .enh-label-9 { color: #ffd700; font-weight: bold; text-shadow: 0 0 6px #ffd70088; }
+
+  /* enhancement smith */
+  #enhance-window { width: 360px; }
+  .enh-row { display: flex; gap: 8px; align-items: center; width: 100%; padding: 6px 5px; border: 0; border-radius: 4px; cursor: pointer; background: transparent; color: inherit; font-family: var(--ui-font); text-align: left; }
+  .enh-row:hover, .enh-row.sel { background: #ffffff10; }
+  .enh-row .enh-meta { flex: 1; font-size: 11px; color: #c8b888; line-height: 1.4; }
+  .enh-row .enh-name { font-size: 12px; display: block; }
+  .enh-detail { font-size: 11px; color: #c8b888; margin: 8px 0; line-height: 1.5; }
+  .enh-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; border-top: 1px solid #463a1c; padding-top: 8px; }
 
   /* character window */
   #char-window { width: 430px; }
@@ -5390,6 +5417,7 @@
     <div id="talents-window" class="window panel"></div>
     <div id="quest-log-window" class="window panel"></div>
     <div id="vendor-window" class="window panel"></div>
+    <div id="enhance-window" class="window panel"></div>
     <div id="map-window" class="window panel">
       <button class="x-btn" id="map-close" data-i18n-title="hud.core.closeMap" data-i18n-aria="hud.core.closeMap" title="Close map" aria-label="Close map" data-icon="close"></button>
       <div id="map-zoom">

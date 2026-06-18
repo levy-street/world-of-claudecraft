@@ -256,6 +256,19 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   greyjaw_fang: { id: 'greyjaw_fang', name: "Old Greyjaw's Fang", kind: 'quest', sellValue: 0, questId: 'q_greyjaw' },
   weathered_ledger_page: { id: 'weathered_ledger_page', name: 'Weathered Ledger Page', kind: 'quest', sellValue: 0, questId: 'q_names_of_the_dead' },
   morthen_grimoire: { id: 'morthen_grimoire', name: "Morthen's Grimoire", kind: 'quest', sellValue: 0, questId: 'q_gravecallers_trail' },
+  // --- enhancement materials (boss drops) ---
+  crypt_refinement_shard: {
+    id: 'crypt_refinement_shard', name: 'Crypt Refinement Shard', kind: 'material', quality: 'uncommon',
+    enhanceTier: 1, sellValue: 0,
+  },
+  bastion_ward_core: {
+    id: 'bastion_ward_core', name: 'Bastion Ward Core', kind: 'material', quality: 'rare',
+    enhanceTier: 2, sellValue: 0,
+  },
+  gravewyrm_ember: {
+    id: 'gravewyrm_ember', name: 'Gravewyrm Ember', kind: 'material', quality: 'epic',
+    enhanceTier: 3, sellValue: 0,
+  },
   // --- junk (gray) ---
   wolf_fang: { id: 'wolf_fang', name: 'Cracked Wolf Fang', kind: 'junk', quality: 'poor', sellValue: 4 },
   bandit_bandana: { id: 'bandit_bandana', name: 'Red Bandana', kind: 'junk', quality: 'poor', sellValue: 6 },

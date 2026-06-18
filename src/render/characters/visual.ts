@@ -6,6 +6,7 @@
 import * as THREE from 'three';
 import type { OverheadEmoteId } from '../../world_api';
 import { GFX } from '../gfx';
+import { glitterShardTexture, glitterSoftTexture } from '../textures';
 import type { EmoteClipSpec, VisualDef } from './manifest';
 import {
   applyMaterials, assembleModel, prepareVisual, skinTexture, tintedFarMaterials,
@@ -24,6 +25,76 @@ const SWIM_PITCH_PROCEDURAL = 1.18;
 const SWIM_RISE = 0.95; // body must break the surface or only the hat floats
 const MIXER_DT_CAP = 0.3; // throttled entities never integrate a huge step
 const GHOST_OPACITY = 0.34;
+const ENH_SPARKLE_HDR = 2.0;
+
+interface WeaponSpan {
+  axis: 0 | 1 | 2;
+  min: number;
+  max: number;
+  center: THREE.Vector3;
+  perpA: 0 | 1 | 2;
+  perpB: 0 | 1 | 2;
+  perpRadius: number;
+}
+
+interface GlitterSlot {
+  base: THREE.Vector3;
+  phase: number;
+  spin: number;
+  size: number;
+  sharp: boolean;
+  rateA: number;
+  rateB: number;
+  rateC: number;
+  orbitRate: number;
+  drift: number;
+}
+
+const _weaponBox = new THREE.Box3();
+const _weaponCorner = new THREE.Vector3();
+const _weaponSize = new THREE.Vector3();
+
+function glitterCount(level: number): number {
+  if (level >= 9) return 26;
+  if (level >= 8) return 14;
+  if (level >= 7) return 6;
+  return 0;
+}
+
+function glitterTier(level: number): {
+  size: number; peakOpacity: number; floorOpacity: number; twinkleScale: number; motionScale: number; gleam: number;
+} {
+  if (level >= 9) return { size: 0.14, peakOpacity: 0.82, floorOpacity: 0.04, twinkleScale: 1.05, motionScale: 1.55, gleam: 0.38 };
+  if (level >= 8) return { size: 0.11, peakOpacity: 0.64, floorOpacity: 0.03, twinkleScale: 0.92, motionScale: 1.3, gleam: 0.28 };
+  return { size: 0.08, peakOpacity: 0.38, floorOpacity: 0.02, twinkleScale: 0.8, motionScale: 1.05, gleam: 0.18 };
+}
+
+/** Layered organic shimmer — soft breathing glow with occasional gentle gleam peaks. */
+function organicTwinkle(t: number, slot: GlitterSlot, gleam: number): number {
+  const a = 0.5 + 0.5 * Math.sin(t * slot.rateA + slot.phase);
+  const b = 0.5 + 0.5 * Math.sin(t * slot.rateB + slot.phase * 1.618);
+  const c = 0.5 + 0.5 * Math.sin(t * slot.rateC + slot.phase * 2.399);
+  const breath = 0.6 + 0.4 * Math.sin(t * slot.drift * 0.5 + slot.phase * 0.71);
+  const blend = (a * 0.4 + b * 0.35 + c * 0.25) * breath;
+  const soft = blend * blend * (3 - 2 * blend);
+  const gleamPeak = Math.pow(Math.max(0, Math.sin(t * slot.rateA * 1.25 + slot.phase * 0.53)), 3.2) * gleam;
+  return Math.min(1, soft * 0.7 + gleamPeak + blend * 0.18);
+}
+
+function axisCoord(v: THREE.Vector3, axis: 0 | 1 | 2): number {
+  return axis === 0 ? v.x : axis === 1 ? v.y : v.z;
+}
+
+function setAxisCoord(v: THREE.Vector3, axis: 0 | 1 | 2, value: number): void {
+  if (axis === 0) v.x = value;
+  else if (axis === 1) v.y = value;
+  else v.z = value;
+}
+
+function slotHash(i: number, salt: number): number {
+  const x = Math.sin(i * 12.9898 + salt * 78.233) * 43758.5453;
+  return x - Math.floor(x);
+}
 
 // shared invisible click capsule — raycaster ignores `visible`, render doesn't
 let clickGeoSingleton: THREE.CylinderGeometry | null = null;
@@ -89,6 +160,13 @@ export class CharacterVisual {
   private far = false;
   private bobPhase = Math.random() * Math.PI * 2;
 
+  private mainhandEnhance = 0;
+  private mainhandWeaponMeshes: THREE.Mesh[] = [];
+  private weaponSpan: WeaponSpan | null = null;
+  private glitterSlots: GlitterSlot[] = [];
+  private enhanceGlitters: THREE.Sprite[] = [];
+  private sparkleBone: THREE.Object3D | null = null;
+
   constructor(key: string, entityColor: number, skinIndex = 0) {
     const prep = prepareVisual(key);
     this.def = prep.def;
@@ -100,10 +178,14 @@ export class CharacterVisual {
     // model: yaw/scale/feet normalization wrapper around the skinned clone
     this.model = assembleModel(prep.def);
     applyMaterials(this.model, prep.def, entityColor, skinTexture(key, skinIndex));
+    this.collectMainhandWeaponMeshes();
     this.model.traverse((o) => {
       const mesh = o as THREE.Mesh;
       if (mesh.isMesh) this.originalMaterials.set(mesh, mesh.material);
     });
+    this.sparkleBone = this.model.getObjectByName('handslotr')
+      ?? this.model.getObjectByName('handslot.r')
+      ?? this.modelWrap;
     this.modelWrap.rotation.y = prep.def.yaw ?? 0;
     this.modelWrap.scale.setScalar(prep.normScale);
     this.modelWrap.position.y = prep.yOffset;
@@ -220,6 +302,7 @@ export class CharacterVisual {
       this.mixer.update(this.pendingDt);
       this.pendingDt = 0;
     }
+    this.tickMainhandEnhanceFx(dt);
   }
 
   // -------------------------------------------------------------------------
@@ -291,6 +374,7 @@ export class CharacterVisual {
     if (skinIndex === this.skinIndex) return;
     this.skinIndex = skinIndex;
     applyMaterials(this.model, this.def, this.entityColor, skinTexture(this.key, skinIndex));
+    this.collectMainhandWeaponMeshes();
     // re-snapshot the material map ghost/restore relies on, then re-ghost if stealthed
     this.originalMaterials.clear();
     this.model.traverse((o) => {
@@ -298,9 +382,200 @@ export class CharacterVisual {
       if (mesh.isMesh) this.originalMaterials.set(mesh, mesh.material);
     });
     if (this.ghosted) this.setGhost(true);
+    this.resetWeaponEmissive();
+    this.syncEnhanceGlitters();
+  }
+
+  /** +7/+8/+9 mainhand glitter — sprite-only, distributed along the full weapon. */
+  setMainhandEnhance(level: number): void {
+    const next = Math.max(0, Math.min(9, Math.floor(level)));
+    if (next === this.mainhandEnhance) return;
+    this.mainhandEnhance = next;
+    this.resetWeaponEmissive();
+    this.syncEnhanceGlitters();
+  }
+
+  /** Mainhand prop meshes only — clone materials so prior glow experiments never leak. */
+  private collectMainhandWeaponMeshes(): void {
+    this.mainhandWeaponMeshes = [];
+    this.weaponSpan = null;
+    const handBone = this.model.getObjectByName('handslotr')
+      ?? this.model.getObjectByName('handslot.r');
+    if (!handBone) return;
+    handBone.traverse((o) => {
+      const mesh = o as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      if (Array.isArray(mesh.material)) mesh.material = mesh.material.map((m) => m.clone());
+      else mesh.material = mesh.material.clone();
+      this.mainhandWeaponMeshes.push(mesh);
+    });
+    this.measureWeaponSpan(handBone);
+  }
+
+  /** Weapon AABB in hand-bone space — glitter slots span grip to tip on the long axis. */
+  private measureWeaponSpan(handBone: THREE.Object3D): void {
+    _weaponBox.makeEmpty();
+    handBone.updateWorldMatrix(true, true);
+    for (const mesh of this.mainhandWeaponMeshes) {
+      mesh.updateWorldMatrix(true, false);
+      const gb = mesh.geometry.boundingBox ?? (mesh.geometry.computeBoundingBox(), mesh.geometry.boundingBox);
+      if (!gb) continue;
+      const { min, max } = gb;
+      for (const xi of [min.x, max.x]) {
+        for (const yi of [min.y, max.y]) {
+          for (const zi of [min.z, max.z]) {
+            _weaponCorner.set(xi, yi, zi).applyMatrix4(mesh.matrixWorld);
+            handBone.worldToLocal(_weaponCorner);
+            _weaponBox.expandByPoint(_weaponCorner);
+          }
+        }
+      }
+    }
+    if (_weaponBox.isEmpty()) {
+      this.weaponSpan = {
+        axis: 1, min: 0.02, max: 0.48,
+        center: new THREE.Vector3(0, 0.25, 0),
+        perpA: 0, perpB: 2, perpRadius: 0.035,
+      };
+      return;
+    }
+    _weaponBox.getSize(_weaponSize);
+    const axis: 0 | 1 | 2 = _weaponSize.x >= _weaponSize.y && _weaponSize.x >= _weaponSize.z
+      ? 0 : _weaponSize.y >= _weaponSize.z ? 1 : 2;
+    const axes: (0 | 1 | 2)[] = [0, 1, 2];
+    const perp = axes.filter((a) => a !== axis);
+    const center = _weaponBox.getCenter(new THREE.Vector3());
+    const perpRadius = Math.max(
+      0.02,
+      axisCoord(_weaponSize, perp[0]) * 0.42,
+      axisCoord(_weaponSize, perp[1]) * 0.42,
+    );
+    this.weaponSpan = {
+      axis,
+      min: axis === 0 ? _weaponBox.min.x : axis === 1 ? _weaponBox.min.y : _weaponBox.min.z,
+      max: axis === 0 ? _weaponBox.max.x : axis === 1 ? _weaponBox.max.y : _weaponBox.max.z,
+      center,
+      perpA: perp[0],
+      perpB: perp[1],
+      perpRadius,
+    };
+  }
+
+  private resetWeaponEmissive(): void {
+    const tint = (mat: THREE.Material): void => {
+      const m = mat as THREE.MeshStandardMaterial & THREE.MeshLambertMaterial;
+      if (!('emissive' in m) || !m.emissive) return;
+      m.emissive.setHex(0x000000);
+      m.emissiveIntensity = 0;
+    };
+    for (const mesh of this.mainhandWeaponMeshes) {
+      if (Array.isArray(mesh.material)) mesh.material.forEach(tint);
+      else tint(mesh.material);
+    }
+  }
+
+  private buildGlitterSlots(level: number): GlitterSlot[] {
+    const count = glitterCount(level);
+    const span = this.weaponSpan ?? {
+      axis: 1 as const, min: 0.02, max: 0.48,
+      center: new THREE.Vector3(0, 0.25, 0),
+      perpA: 0 as const, perpB: 2 as const, perpRadius: 0.035,
+    };
+    const tier = glitterTier(level);
+    const slots: GlitterSlot[] = [];
+    for (let i = 0; i < count; i++) {
+      const t = count === 1 ? 0.5 : i / (count - 1);
+      const along = span.min + (span.max - span.min) * t;
+      const pos = span.center.clone();
+      setAxisCoord(pos, span.axis, along);
+      const ja = (slotHash(i, 1.1) - 0.5) * span.perpRadius * 2;
+      const jb = (slotHash(i, 2.7) - 0.5) * span.perpRadius * 2;
+      setAxisCoord(pos, span.perpA, axisCoord(pos, span.perpA) + ja);
+      setAxisCoord(pos, span.perpB, axisCoord(pos, span.perpB) + jb);
+      slots.push({
+        base: pos,
+        phase: slotHash(i, 3.9) * Math.PI * 2,
+        spin: (slotHash(i, 5.3) - 0.5) * 1.4,
+        size: tier.size * (0.75 + slotHash(i, 7.1) * 0.5),
+        sharp: i % 3 !== 1,
+        rateA: 0.85 + slotHash(i, 8.2) * 1.15,
+        rateB: 0.65 + slotHash(i, 9.4) * 0.95,
+        rateC: 0.48 + slotHash(i, 10.6) * 0.72,
+        orbitRate: 0.5 + slotHash(i, 11.8) * 0.78,
+        drift: 0.32 + slotHash(i, 12.9) * 0.48,
+      });
+    }
+    return slots;
+  }
+
+  private tickMainhandEnhanceFx(dt: number): void {
+    if (this.mainhandEnhance < 7) return;
+    const tier = glitterTier(this.mainhandEnhance);
+    const wall = performance.now() * 0.001;
+    const tTwinkle = wall * tier.twinkleScale + this.bobPhase;
+    const tMotion = wall * tier.motionScale + this.bobPhase;
+    const span = this.weaponSpan;
+    const bladeLen = span ? Math.max(0.08, span.max - span.min) : 0.4;
+    const hdrBase = GFX.composer ? ENH_SPARKLE_HDR : 1;
+    for (let i = 0; i < this.enhanceGlitters.length; i++) {
+      const slot = this.glitterSlots[i];
+      const sprite = this.enhanceGlitters[i];
+      if (!slot || !sprite) continue;
+      const mat = sprite.material as THREE.SpriteMaterial;
+      const shimmer = organicTwinkle(tTwinkle, slot, tier.gleam);
+      const orbit = tMotion * slot.orbitRate + slot.phase;
+      const orbit2 = tMotion * slot.orbitRate * 0.58 + slot.phase * 1.73;
+      sprite.position.copy(slot.base);
+      if (span) {
+        const crawl = Math.sin(tMotion * slot.drift + slot.phase * 1.4) * bladeLen * 0.055;
+        const lift = Math.sin(tMotion * slot.drift * 1.2 + slot.phase * 0.6) * 0.016;
+        setAxisCoord(sprite.position, span.axis, axisCoord(sprite.position, span.axis) + crawl);
+        setAxisCoord(sprite.position, span.perpA,
+          axisCoord(sprite.position, span.perpA) + Math.sin(orbit) * span.perpRadius * 0.42
+            + Math.cos(orbit2) * span.perpRadius * 0.16);
+        setAxisCoord(sprite.position, span.perpB,
+          axisCoord(sprite.position, span.perpB) + Math.cos(orbit * 1.19) * span.perpRadius * 0.42
+            + Math.sin(orbit2) * span.perpRadius * 0.16);
+        setAxisCoord(sprite.position, span.axis, axisCoord(sprite.position, span.axis) + lift);
+      }
+      const s = slot.size * (0.58 + shimmer * 0.48);
+      sprite.scale.set(s, s, 1);
+      mat.opacity = tier.floorOpacity + shimmer * tier.peakOpacity;
+      mat.color.setScalar(hdrBase * (0.92 + shimmer * 0.55));
+      mat.rotation += slot.spin * dt * 1.6;
+      sprite.visible = true;
+    }
+  }
+
+  private syncEnhanceGlitters(): void {
+    this.clearEnhanceGlitters();
+    if (this.mainhandEnhance < 7 || !this.sparkleBone) return;
+    this.glitterSlots = this.buildGlitterSlots(this.mainhandEnhance);
+    for (const slot of this.glitterSlots) {
+      const mat = new THREE.SpriteMaterial({
+        map: slot.sharp ? glitterShardTexture() : glitterSoftTexture(),
+        transparent: true,
+        depthWrite: false,
+        color: new THREE.Color(0xeaf6ff),
+        opacity: 0,
+      });
+      const sprite = new THREE.Sprite(mat);
+      sprite.position.copy(slot.base);
+      sprite.scale.set(slot.size, slot.size, 1);
+      sprite.visible = false;
+      this.sparkleBone.add(sprite);
+      this.enhanceGlitters.push(sprite);
+    }
+  }
+
+  private clearEnhanceGlitters(): void {
+    for (const sprite of this.enhanceGlitters) sprite.parent?.remove(sprite);
+    this.enhanceGlitters = [];
+    this.glitterSlots = [];
   }
 
   dispose(): void {
+    this.clearEnhanceGlitters();
     this.mixer.stopAllAction();
     this.mixer.uncacheRoot(this.model);
     this.root.removeFromParent();

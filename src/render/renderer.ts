@@ -128,6 +128,7 @@ interface EntityView {
   nameplateSig: string;
   nameplateHpWidth: string;
   comboSig: string; // cheap-diff for the combo pip row
+  mainhandEnh: number;
   sparkle?: THREE.Sprite; // ground objects
   objectMesh?: THREE.Object3D;
   portal?: THREE.Mesh; // dungeon door swirl
@@ -835,7 +836,7 @@ export class Renderer {
     this.views.set(e.id, {
       group, visual, sheepVisual: null, bearVisual: null, catVisual: null, height, clickTarget,
       nameplate: np, nameEl, hpBar, hpFill, emoteEl, emoteIconEl, emoteLabelEl, markerEl: marker, raidMarkEl: raidMark, comboRow, comboPips, sparkle, objectMesh, portal,
-      nameplateDisplay: 'none', nameplateTransform: '', nameplateSig: '', nameplateHpWidth: '', comboSig: '',
+      nameplateDisplay: 'none', nameplateTransform: '', nameplateSig: '', nameplateHpWidth: '', comboSig: '', mainhandEnh: -1,
       objectCasters, shadowOn: true, isFar: false, lastOverheadEmoteKey: null,
       lastX: e.pos.x, lastZ: e.pos.z, skin: e.skin,
       loco: newLocoTrack(),
@@ -1147,6 +1148,10 @@ export class Renderer {
 
       // live skin swap — appearance changed (in-game changer or a multiplayer peer)
       if (e.skin !== v.skin) { v.skin = e.skin; v.visual.setSkin(e.skin); }
+      if (e.kind === 'player' && e.mainhandEnhance !== v.mainhandEnh) {
+        v.mainhandEnh = e.mainhandEnhance;
+        v.visual.setMainhandEnhance(e.mainhandEnhance);
+      }
 
       // swimming pose: prone at the surface (derived here — the sim is unaware)
       const swimming = !e.dead

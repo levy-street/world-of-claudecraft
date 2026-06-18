@@ -7,7 +7,7 @@ import {
   type TalentAllocation, type SavedLoadout, type Role,
 } from '../sim/content/talents';
 import {
-  Entity, EquipSlot, InvSlot, MoveInput, PlayerClass, QuestProgress, QuestState, SimEvent,
+  Entity, EquipSlot, EnhanceRef, InvSlot, MoveInput, PlayerClass, QuestProgress, QuestState, SimEvent,
   emptyMoveInput,
 } from '../sim/types';
 import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
@@ -246,7 +246,7 @@ function blankEntity(id: number): Entity {
     spawnPos: { x: 0, y: 0, z: 0 }, leashAnchor: null, evadeStall: 0, fleeTimer: 0, hasFled: false, wanderTarget: null, wanderTimer: 0,
     aggroTargetId: null, respawnTimer: 0, corpseTimer: 0, lootable: false, loot: null,
     xpValue: 0, questIds: [], vendorItems: [], objectItemId: null, dungeonId: null,
-    dead: false, scale: 1, color: 0xffffff, skin: 0,
+    dead: false, scale: 1, color: 0xffffff, skin: 0, mainhandEnhance: 0,
   };
 }
 
@@ -258,6 +258,7 @@ export class ClientWorld implements IWorld {
   inventory: InvSlot[] = [];
   vendorBuyback: InvSlot[] = [];
   equipment: Partial<Record<EquipSlot, string>> = {};
+  equipmentEnhance: Partial<Record<EquipSlot, number>> = {};
   copper = 0;
   xp = 0;
   // Post-cap progression (Max-Level XP Overflow), mirrored from snapshot self.
@@ -628,6 +629,7 @@ export class ClientWorld implements IWorld {
         value: 0, sourceId: 0, school: 'physical' as const,
       }));
       e.loot = w.lootList ?? null;
+      if (e.kind === 'player') e.mainhandEnhance = w.enh ?? 0;
       return e;
     };
 
@@ -686,6 +688,7 @@ export class ClientWorld implements IWorld {
       if (s.inv !== undefined) { this.inventory = s.inv; this.invChanged = true; }
       if (s.buyback !== undefined) { this.vendorBuyback = s.buyback; this.invChanged = true; }
       if (s.equip !== undefined) this.equipment = s.equip;
+      if (s.eqEnh !== undefined) this.equipmentEnhance = s.eqEnh;
       if (s.qlog !== undefined) this.questLog = new Map((s.qlog as QuestProgress[]).map((q) => [q.questId, q]));
       if (s.qdone !== undefined) this.questsDone = new Set(s.qdone);
       if (s.qlog !== undefined || s.qdone !== undefined) this.pendingQuestCommands?.clear();
@@ -812,6 +815,9 @@ export class ClientWorld implements IWorld {
   }
   buyBackItem(itemId: string): void {
     this.cmd({ cmd: 'buyback', item: itemId });
+  }
+  enhanceItem(ref: EnhanceRef): void {
+    this.cmd({ cmd: 'enhance', ref });
   }
   changeSkin(skin: number): void {
     const idx = Math.max(0, Math.min(7, Math.floor(skin)));

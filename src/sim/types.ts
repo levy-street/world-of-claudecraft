@@ -91,14 +91,20 @@ export interface WeaponInfo {
 
 export type EquipSlot = 'mainhand' | 'chest' | 'legs' | 'feet';
 
+export type EnhanceRef =
+  | { source: 'inv'; index: number }
+  | { source: 'equip'; slot: EquipSlot };
+
 export type ItemUse =
   | { type: 'fishing' };
 
 export interface ItemDef {
   id: string;
   name: string;
-  kind: 'weapon' | 'armor' | 'quest' | 'junk' | 'food' | 'drink' | 'tool' | 'potion';
+  kind: 'weapon' | 'armor' | 'quest' | 'junk' | 'food' | 'drink' | 'tool' | 'potion' | 'material';
   slot?: EquipSlot;
+  /** Boss refinement material tier (+1..+3, +4..+6, +7..+9). */
+  enhanceTier?: 1 | 2 | 3;
   weapon?: WeaponInfo;
   stats?: Partial<Stats>;
   use?: ItemUse;
@@ -122,6 +128,8 @@ export interface ItemDef {
 export interface InvSlot {
   itemId: string;
   count: number;
+  /** +1..+9 on weapon/armor stacks (count is always 1 when set). */
+  enhance?: number;
 }
 
 export interface LootSlot extends InvSlot {
@@ -363,6 +371,8 @@ export interface NpcDef {
   // The Merchant: talking to this NPC opens the player-driven World Market
   // (auction house) instead of a fixed vendor stock.
   market?: boolean;
+  /** Opens the equipment enhancement panel. */
+  enhancer?: boolean;
   greeting: string;
 }
 
@@ -613,6 +623,8 @@ export interface Entity {
   scale: number;
   color: number;
   skin: number; // player appearance: index into SKINS[visualKey]; 0 = default. synced in identity fields.
+  /** Mainhand enhance level for 3D glitter wire sync (players only). */
+  mainhandEnhance: number;
 }
 
 // `pid` (when present) marks a personal event that should only be delivered to

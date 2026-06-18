@@ -1,7 +1,7 @@
 import type { WebSocket } from 'ws';
 import { Sim } from '../src/sim/sim';
 import type { PlayerMeta } from '../src/sim/sim';
-import { DT, Entity, SimEvent, dist2d, emptyMoveInput } from '../src/sim/types';
+import { DT, Entity, EquipSlot, EnhanceRef, SimEvent, dist2d, emptyMoveInput } from '../src/sim/types';
 import { parseMoveInputFrame } from '../src/sim/move_input';
 import { stealthDetectionRadius, threatEntries } from '../src/sim/threat';
 import { zoneAt, DUNGEONS } from '../src/sim/data';
@@ -231,6 +231,7 @@ function dynamicFields(e: Entity): Record<string, unknown> {
   if (e.kind === 'mob' && e.lootable && e.loot) {
     out.lootList = { copper: e.loot.copper, items: e.loot.items };
   }
+  if (e.kind === 'player' && e.mainhandEnhance > 0) out.enh = e.mainhandEnhance;
   return out;
 }
 
@@ -922,6 +923,15 @@ export class GameServer {
       case 'turnin': if (typeof msg.quest === 'string') { sim.turnInQuest(msg.quest, pid); this.resyncQuests(session); } break;
       case 'abandon': if (typeof msg.quest === 'string') { sim.abandonQuest(msg.quest, pid); this.resyncQuests(session); } break;
       case 'equip': if (typeof msg.item === 'string') sim.equipItem(msg.item, pid); break;
+      case 'enhance': {
+        const ref = msg.ref as { source?: string; index?: number; slot?: string } | undefined;
+        if (ref?.source === 'inv' && typeof ref.index === 'number') {
+          sim.enhanceItem({ source: 'inv', index: ref.index }, pid);
+        } else if (ref?.source === 'equip' && typeof ref.slot === 'string') {
+          sim.enhanceItem({ source: 'equip', slot: ref.slot as EquipSlot }, pid);
+        }
+        break;
+      }
       case 'use': if (typeof msg.item === 'string') sim.useItem(msg.item, pid); break;
       case 'discard':
         if (typeof msg.item === 'string') {
@@ -1292,6 +1302,7 @@ export class GameServer {
     maybe('inv', meta.inventory);
     maybe('buyback', meta.vendorBuyback);
     maybe('equip', meta.equipment);
+    maybe('eqEnh', meta.equipmentEnhance ?? {});
     maybe('qlog', [...meta.questLog.values()]);
     maybe('qdone', [...meta.questsDone]);
     maybe('milestones', [...meta.unlockedMilestones]);
