@@ -181,6 +181,11 @@ CREATE TABLE IF NOT EXISTS devs_contribution_score (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS devs_contribution_score_points ON devs_contribution_score(points DESC);
+-- $WOC reward ledger (reserve-then-pay): how many base units this contributor
+-- has already been paid, plus the last on-chain signature. Append-only advance.
+ALTER TABLE devs_contribution_score ADD COLUMN IF NOT EXISTS claimed_base_units BIGINT NOT NULL DEFAULT 0;
+ALTER TABLE devs_contribution_score ADD COLUMN IF NOT EXISTS last_claim_sig TEXT;
+ALTER TABLE devs_contribution_score ADD COLUMN IF NOT EXISTS last_claim_at TIMESTAMPTZ;
 `;
 
 export async function ensureSchema(): Promise<void> {

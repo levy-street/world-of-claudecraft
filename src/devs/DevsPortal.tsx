@@ -7,6 +7,7 @@ import {
   verifyGithubLink,
   unlinkGithub,
   linkWallet,
+  claimRewards,
   isContribution,
   isWocBalance,
   type DevsApiConfig,
@@ -172,6 +173,21 @@ function WalletCard({ profile, config, onReload }: { profile: DevsProfile; confi
   const [value, setValue] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [claimBusy, setClaimBusy] = useState(false);
+  const [claimMsg, setClaimMsg] = useState<string | null>(null);
+  const claim = async () => {
+    setClaimBusy(true);
+    setClaimMsg(null);
+    try {
+      const r = await claimRewards(config);
+      setClaimMsg(r.ok ? `Claimed ${r.amountUi.toLocaleString()} $WOC` : 'Nothing to claim yet');
+      onReload();
+    } catch (e) {
+      setClaimMsg((e as Error).message);
+    } finally {
+      setClaimBusy(false);
+    }
+  };
   const submit = async () => {
     if (!value.trim()) return;
     setBusy(true);
@@ -199,6 +215,20 @@ function WalletCard({ profile, config, onReload }: { profile: DevsProfile; confi
             <a href={`https://solscan.io/account/${profile.solanaAddress}`} target="_blank" rel="noopener noreferrer">{short(profile.solanaAddress)}</a>
             <button className="devs-btn ghost" style={{ marginLeft: 'auto', padding: '4px 10px', fontSize: 12 }} onClick={() => void linkWallet(config, '').then(onReload)}>Unlink</button>
           </div>
+          {profile.rewards.enabled ? (
+            <div style={{ marginTop: 16, borderTop: '1px solid rgba(245,197,66,0.18)', paddingTop: 14 }}>
+              <h3>Claimable rewards</h3>
+              <div className="devs-woc"><span className="amt">{profile.rewards.claimableUi.toLocaleString()}</span><span className="sym">$WOC</span></div>
+              <div className="devs-field" style={{ marginTop: 10 }}>
+                <button className="devs-btn" onClick={() => void claim()} disabled={claimBusy || profile.rewards.claimableUi <= 0}>
+                  {claimBusy ? 'Claiming…' : 'Claim $WOC'}
+                </button>
+              </div>
+              {claimMsg && <div className="devs-note" style={{ marginTop: 6 }}>{claimMsg}</div>}
+            </div>
+          ) : (
+            <p className="devs-note" style={{ marginTop: 12 }}>You’ve earned {profile.rewards.claimableUi.toLocaleString()} $WOC in contribution rewards — claims open once the treasury is live.</p>
+          )}
         </>
       ) : (
         <>

@@ -14,16 +14,30 @@ import {
   leadCharacter,
   upsertContributionScore,
   contributionLeaderboard,
+  getClaimedBaseUnits,
+  reserveClaim,
+  releaseClaim,
+  finalizeClaim,
 } from './devs_db';
 import {
   fetchContributionStats,
   scoreContributions,
   fetchWocBalance,
   fetchGithubBio,
+  rewardsEnabled,
+  rewardRateBaseUnits,
+  computeClaimable,
+  transferWoc,
+  loadTreasuryKeypair,
   POINTS,
   DEVS_GITHUB_REPO,
   DEVS_WOC_MINT,
+  DEVS_WOC_DECIMALS,
 } from './devs';
+
+function baseUnitsToUi(v: bigint): number {
+  return Number(v) / 10 ** DEVS_WOC_DECIMALS;
+}
 
 const GITHUB_USERNAME_RE = /^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$/;
 // Base58, 32–44 chars — the shape of a Solana public key.
@@ -51,11 +65,13 @@ export async function handleDevsApi(
     // Contributions only count once GitHub ownership is proven — otherwise
     // anyone could claim a prolific contributor's handle and farm the board.
     let contribution: unknown = null;
+    let earnedPoints = 0;
     if (links?.githubUsername && links.githubVerified) {
       try {
         const scored = scoreContributions(await fetchContributionStats(links.githubUsername));
         await upsertContributionScore(accountId, links.githubUsername, scored.points, scored.level, scored.prsMerged);
         contribution = scored;
+        earnedPoints = scored.points;
       } catch (err) {
         console.error('[devs] contribution fetch failed:', (err as Error).message);
         contribution = { error: 'contribution_fetch_failed' };
@@ -72,6 +88,18 @@ export async function handleDevsApi(
       }
     }
 
+    const claimed = links?.githubVerified ? await getClaimedBaseUnits(accountId) : BigInt(0);
+    const claimable = computeClaimable(earnedPoints, claimed);
+    const rewards = {
+      enabled: rewardsEnabled(),
+      decimals: DEVS_WOC_DECIMALS,
+      rateBaseUnits: rewardRateBaseUnits().toString(),
+      claimedBaseUnits: claimed.toString(),
+      claimableBaseUnits: claimable.toString(),
+      claimableUi: baseUnitsToUi(claimable),
+      walletLinked: !!links?.solanaAddress,
+    };
+
     return json(res, 200, {
       repo: DEVS_GITHUB_REPO,
       mint: DEVS_WOC_MINT,
@@ -83,6 +111,7 @@ export async function handleDevsApi(
       character,
       contribution,
       woc,
+      rewards,
     });
   }
 
@@ -126,6 +155,44 @@ export async function handleDevsApi(
     if (raw && !SOLANA_ADDRESS_RE.test(raw)) return json(res, 400, { error: 'invalid Solana address' });
     await setSolanaAddress(accountId, raw || null);
     return json(res, 200, { solanaAddress: raw || null });
+  }
+
+  // Claim accrued $WOC — reserve-then-pay so a retry/concurrent claim can never
+  // double-pay. GATED: inert unless a treasury keypair + positive rate are set.
+  if (url === '/api/devs/claim' && method === 'POST') {
+    if (!rewardsEnabled()) return json(res, 503, { error: 'rewards are not enabled' });
+    const links = await getDevsLinks(accountId);
+    if (!links?.githubUsername || !links.githubVerified) return json(res, 400, { error: 'verify your GitHub first' });
+    if (!links.solanaAddress) return json(res, 400, { error: 'link a Solana wallet first' });
+    const treasury = loadTreasuryKeypair();
+    if (!treasury) return json(res, 503, { error: 'rewards are not enabled' });
+
+    // Recompute live so the claim reflects current contributions, and ensure the
+    // ledger row exists before we lock it.
+    const scored = scoreContributions(await fetchContributionStats(links.githubUsername));
+    await upsertContributionScore(accountId, links.githubUsername, scored.points, scored.level, scored.prsMerged);
+    const earned = BigInt(scored.points) * rewardRateBaseUnits();
+
+    const { amount, priorClaimed } = await reserveClaim(accountId, earned);
+    if (amount <= BigInt(0)) return json(res, 200, { ok: false, reason: 'nothing_to_claim' });
+
+    let signature: string;
+    try {
+      signature = await transferWoc(treasury, links.solanaAddress, amount);
+    } catch (err) {
+      // The reservation committed first, so this can only have UNDER-paid —
+      // release it so the player can retry.
+      await releaseClaim(accountId, priorClaimed);
+      console.error('[devs] $WOC transfer failed:', (err as Error).message);
+      return json(res, 502, { error: 'transfer failed — try again shortly' });
+    }
+    await finalizeClaim(accountId, signature);
+    return json(res, 200, {
+      ok: true,
+      signature,
+      amountBaseUnits: amount.toString(),
+      amountUi: baseUnitsToUi(amount),
+    });
   }
 
   if (url === '/api/devs/leaderboard' && method === 'GET') {
