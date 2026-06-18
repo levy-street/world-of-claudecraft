@@ -132,6 +132,13 @@ function ContributionBlock({ profile }: { profile: DevsProfile }) {
         </div>
         <div className="devs-track"><div className="devs-fill" style={{ width: `${pct}%` }} /></div>
       </div>
+      <p className="devs-note" style={{ marginTop: 12 }}>
+        ⚔️ Each contribution point grants <strong>{profile.characterXp.perPoint} XP</strong> to your character —{' '}
+        <strong>{profile.characterXp.total.toLocaleString()} XP</strong> earned so far.
+        {profile.characterXp.justGranted > 0 && (
+          <> <span style={{ color: 'var(--devs-gold-soft)' }}>+{profile.characterXp.justGranted.toLocaleString()} XP queued — applies next time you enter the world.</span></>
+        )}
+      </p>
     </div>
   );
 }

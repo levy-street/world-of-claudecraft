@@ -186,6 +186,23 @@ CREATE INDEX IF NOT EXISTS devs_contribution_score_points ON devs_contribution_s
 ALTER TABLE devs_contribution_score ADD COLUMN IF NOT EXISTS claimed_base_units BIGINT NOT NULL DEFAULT 0;
 ALTER TABLE devs_contribution_score ADD COLUMN IF NOT EXISTS last_claim_sig TEXT;
 ALTER TABLE devs_contribution_score ADD COLUMN IF NOT EXISTS last_claim_at TIMESTAMPTZ;
+-- Contribution XP already written to character_grants (so growing contributions
+-- only ever grant the delta, never re-grant).
+ALTER TABLE devs_contribution_score ADD COLUMN IF NOT EXISTS granted_xp BIGINT NOT NULL DEFAULT 0;
+-- Out-of-game character rewards (e.g. Devs-portal contribution XP), applied
+-- authoritatively by the game server on character load. Append-only; never write
+-- characters.state directly while a player is online.
+CREATE TABLE IF NOT EXISTS character_grants (
+  id BIGSERIAL PRIMARY KEY,
+  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  character_id INT NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
+  kind TEXT NOT NULL,
+  amount BIGINT NOT NULL,
+  reason TEXT NOT NULL DEFAULT '',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  applied_at TIMESTAMPTZ
+);
+CREATE INDEX IF NOT EXISTS character_grants_pending ON character_grants(character_id) WHERE applied_at IS NULL;
 `;
 
 export async function ensureSchema(): Promise<void> {
@@ -484,6 +501,37 @@ export async function saveCharacterState(characterId: number, level: number, sta
     'UPDATE characters SET level = $2, state = $3, updated_at = now() WHERE id = $1',
     [characterId, level, JSON.stringify(state)],
   );
+}
+
+// Apply-on-load: sum a character's unapplied XP grants in a row-locked tx that
+// stamps them applied, returning the total to award through the sim. Locking the
+// rows (then summing in JS — Postgres forbids FOR UPDATE with aggregates) means a
+// concurrent join can never apply the same grants twice. Errs toward under-
+// granting (a crash after the stamp loses that award), which is operator-fixable.
+export async function takePendingXpGrants(characterId: number): Promise<number> {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const locked = await client.query(
+      `SELECT id, amount FROM character_grants
+        WHERE character_id = $1 AND kind = 'xp' AND applied_at IS NULL FOR UPDATE`,
+      [characterId],
+    );
+    const total = locked.rows.reduce((sum, row) => sum + Number(row.amount), 0);
+    if (locked.rows.length > 0) {
+      await client.query(
+        `UPDATE character_grants SET applied_at = now() WHERE id = ANY($1::bigint[])`,
+        [locked.rows.map((r) => r.id)],
+      );
+    }
+    await client.query('COMMIT');
+    return total;
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 
 export async function isAdminAccount(accountId: number): Promise<boolean> {

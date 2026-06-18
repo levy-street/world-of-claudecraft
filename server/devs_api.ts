@@ -18,6 +18,7 @@ import {
   reserveClaim,
   releaseClaim,
   finalizeClaim,
+  grantContributionXp,
 } from './devs_db';
 import {
   fetchContributionStats,
@@ -29,6 +30,8 @@ import {
   computeClaimable,
   transferWoc,
   loadTreasuryKeypair,
+  contributionXpFor,
+  xpPerPoint,
   POINTS,
   DEVS_GITHUB_REPO,
   DEVS_WOC_MINT,
@@ -66,10 +69,14 @@ export async function handleDevsApi(
     // anyone could claim a prolific contributor's handle and farm the board.
     let contribution: unknown = null;
     let earnedPoints = 0;
+    let characterXpJustGranted = 0;
     if (links?.githubUsername && links.githubVerified) {
       try {
         const scored = scoreContributions(await fetchContributionStats(links.githubUsername));
         await upsertContributionScore(accountId, links.githubUsername, scored.points, scored.level, scored.prsMerged);
+        // The keystone: turn contribution points into real in-game character XP.
+        // Writes only the delta since last sync; applied in-game on next load.
+        characterXpJustGranted = await grantContributionXp(accountId, contributionXpFor(scored.points));
         contribution = scored;
         earnedPoints = scored.points;
       } catch (err) {
@@ -112,6 +119,11 @@ export async function handleDevsApi(
       contribution,
       woc,
       rewards,
+      characterXp: {
+        perPoint: xpPerPoint(),
+        total: contributionXpFor(earnedPoints),
+        justGranted: characterXpJustGranted,
+      },
     });
   }
 

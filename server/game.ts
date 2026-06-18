@@ -5,7 +5,7 @@ import { DT, Entity, SimEvent, dist2d, emptyMoveInput } from '../src/sim/types';
 import { parseMoveInputFrame } from '../src/sim/move_input';
 import { stealthDetectionRadius, threatEntries } from '../src/sim/threat';
 import { zoneAt, DUNGEONS } from '../src/sim/data';
-import { saveCharacterState, openPlaySession, closePlaySession, insertChatLogs, pool, loadMarketState, saveMarketState } from './db';
+import { saveCharacterState, openPlaySession, closePlaySession, insertChatLogs, pool, loadMarketState, saveMarketState, takePendingXpGrants } from './db';
 import type { AccountChatMuteStatus, RequestMetadata } from './db';
 import { ChatFilter } from './chat_filter';
 import { loadChatFilterState, applyChatStrike, recordChatViolation } from './chat_filter_db';
@@ -619,6 +619,18 @@ export class GameServer {
     this.send(session, { t: 'events', list: [{ type: 'log', text: `${name} has entered World of ClaudeCraft.`, color: '#ffd100' }] });
     void this.initSocial(session);
     return session;
+  }
+
+  // Apply any out-of-game XP grants (e.g. Devs-portal contribution rewards) to a
+  // freshly-joined character through the sim's own grantXp, so leveling, XP
+  // overflow, and rested XP behave exactly like in-game XP. Returns XP awarded.
+  async applyPendingXpGrants(characterId: number, pid: number): Promise<number> {
+    const total = await takePendingXpGrants(characterId);
+    if (total > 0) {
+      const meta = this.sim.meta(pid);
+      if (meta) this.sim.grantXp(total, meta);
+    }
+    return total;
   }
 
   // Load the player's block list, send their friends/ignore/guild panel, and

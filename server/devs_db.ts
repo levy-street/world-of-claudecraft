@@ -82,6 +82,7 @@ export async function setSolanaAddress(accountId: number, address: string | null
 }
 
 export interface LeadCharacter {
+  id: number;
   name: string;
   class: string;
   level: number;
@@ -92,7 +93,7 @@ export interface LeadCharacter {
 // Devs portal shows their contributions powering up.
 export async function leadCharacter(accountId: number): Promise<LeadCharacter | null> {
   const res = await pool.query(
-    `SELECT name, class, level, COALESCE((state->>'lifetimeXp')::bigint, 0) AS lifetime_xp
+    `SELECT id, name, class, level, COALESCE((state->>'lifetimeXp')::bigint, 0) AS lifetime_xp
        FROM characters
       WHERE account_id = $1 AND realm = $2
       ORDER BY level DESC, lifetime_xp DESC
@@ -101,7 +102,46 @@ export async function leadCharacter(accountId: number): Promise<LeadCharacter | 
   );
   const row = res.rows[0];
   if (!row) return null;
-  return { name: row.name, class: row.class, level: row.level, lifetimeXp: Number(row.lifetime_xp) };
+  return { id: row.id, name: row.name, class: row.class, level: row.level, lifetimeXp: Number(row.lifetime_xp) };
+}
+
+// The keystone write-back: ensure the player's lead character has been granted
+// XP for their TOTAL contribution XP, writing only the delta since last time.
+// The granted_xp ledger (advanced in the same tx as the grant insert) makes this
+// idempotent — calling it repeatedly with the same total is a no-op. The grant
+// is applied in-game on the character's next load (takePendingXpGrants).
+// Returns the XP just granted (0 if none, or if the player has no character yet).
+export async function grantContributionXp(accountId: number, totalContributionXp: number): Promise<number> {
+  const lead = await leadCharacter(accountId);
+  if (!lead) return 0;
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const r = await client.query(
+      'SELECT granted_xp FROM devs_contribution_score WHERE account_id = $1 FOR UPDATE',
+      [accountId],
+    );
+    const granted = Number(r.rows[0]?.granted_xp ?? 0);
+    const delta = Math.max(0, Math.trunc(totalContributionXp) - granted);
+    if (delta > 0) {
+      await client.query(
+        `INSERT INTO character_grants (account_id, character_id, kind, amount, reason)
+         VALUES ($1, $2, 'xp', $3, $4)`,
+        [accountId, lead.id, delta, 'devs:contribution-xp'],
+      );
+      await client.query('UPDATE devs_contribution_score SET granted_xp = $2 WHERE account_id = $1', [
+        accountId,
+        granted + delta,
+      ]);
+    }
+    await client.query('COMMIT');
+    return delta;
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 
 export async function upsertContributionScore(
