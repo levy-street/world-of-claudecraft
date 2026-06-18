@@ -1,10 +1,15 @@
 // Devs portal REST surface — /api/devs/*. All routes are account-scoped: the
 // caller is already resolved to an accountId (bearer token) by the dispatcher.
 import http from 'node:http';
+import { randomBytes } from 'node:crypto';
 import { json, readBody } from './http_util';
 import {
   getDevsLinks,
-  setGithubUsername,
+  startGithubLink,
+  getGithubChallenge,
+  markGithubVerified,
+  unlinkGithub,
+  githubVerifiedElsewhere,
   setSolanaAddress,
   leadCharacter,
   upsertContributionScore,
@@ -14,6 +19,7 @@ import {
   fetchContributionStats,
   scoreContributions,
   fetchWocBalance,
+  fetchGithubBio,
   POINTS,
   DEVS_GITHUB_REPO,
   DEVS_WOC_MINT,
@@ -22,6 +28,13 @@ import {
 const GITHUB_USERNAME_RE = /^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$/;
 // Base58, 32–44 chars — the shape of a Solana public key.
 const SOLANA_ADDRESS_RE = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+
+function newVerifyCode(): string {
+  return `woc-verify-${randomBytes(6).toString('hex')}`;
+}
+function cleanGithub(raw: unknown): string {
+  return typeof raw === 'string' ? raw.trim().replace(/^@/, '') : '';
+}
 
 export async function handleDevsApi(
   url: string,
@@ -35,8 +48,10 @@ export async function handleDevsApi(
     const links = await getDevsLinks(accountId);
     const character = await leadCharacter(accountId);
 
+    // Contributions only count once GitHub ownership is proven — otherwise
+    // anyone could claim a prolific contributor's handle and farm the board.
     let contribution: unknown = null;
-    if (links?.githubUsername) {
+    if (links?.githubUsername && links.githubVerified) {
       try {
         const scored = scoreContributions(await fetchContributionStats(links.githubUsername));
         await upsertContributionScore(accountId, links.githubUsername, scored.points, scored.level, scored.prsMerged);
@@ -63,6 +78,7 @@ export async function handleDevsApi(
       points: POINTS,
       username: links?.username ?? null,
       githubUsername: links?.githubUsername ?? null,
+      githubVerified: links?.githubVerified ?? false,
       solanaAddress: links?.solanaAddress ?? null,
       character,
       contribution,
@@ -70,12 +86,38 @@ export async function handleDevsApi(
     });
   }
 
-  if (url === '/api/devs/link-github' && method === 'POST') {
+  // Step 1: claim a username + get the one-time code to drop in your GitHub bio.
+  if (url === '/api/devs/link-github/start' && method === 'POST') {
     const body = await readBody(req);
-    const raw = typeof body.githubUsername === 'string' ? body.githubUsername.trim().replace(/^@/, '') : '';
-    if (raw && !GITHUB_USERNAME_RE.test(raw)) return json(res, 400, { error: 'invalid GitHub username' });
-    await setGithubUsername(accountId, raw || null);
-    return json(res, 200, { githubUsername: raw || null });
+    const raw = cleanGithub(body.githubUsername);
+    if (!raw || !GITHUB_USERNAME_RE.test(raw)) return json(res, 400, { error: 'invalid GitHub username' });
+    if (await githubVerifiedElsewhere(accountId, raw)) {
+      return json(res, 409, { error: 'that GitHub account is already linked to another player' });
+    }
+    const code = newVerifyCode();
+    await startGithubLink(accountId, raw, code);
+    return json(res, 200, { githubUsername: raw, verified: false, code });
+  }
+
+  // Step 2: prove ownership — we read your public bio and look for the code.
+  if (url === '/api/devs/link-github/verify' && method === 'POST') {
+    const challenge = await getGithubChallenge(accountId);
+    if (!challenge) return json(res, 400, { error: 'start the GitHub link first' });
+    if (await githubVerifiedElsewhere(accountId, challenge.githubUsername)) {
+      return json(res, 409, { error: 'that GitHub account is already linked to another player' });
+    }
+    const bio = await fetchGithubBio(challenge.githubUsername);
+    if (bio === null) return json(res, 502, { error: 'could not read your GitHub profile — try again shortly' });
+    if (!bio.includes(challenge.code)) {
+      return json(res, 400, { error: 'verification code not found in your GitHub bio yet', verified: false });
+    }
+    await markGithubVerified(accountId);
+    return json(res, 200, { githubUsername: challenge.githubUsername, verified: true });
+  }
+
+  if (url === '/api/devs/link-github/unlink' && method === 'POST') {
+    await unlinkGithub(accountId);
+    return json(res, 200, { githubUsername: null, verified: false });
   }
 
   if (url === '/api/devs/link-wallet' && method === 'POST') {
