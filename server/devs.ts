@@ -91,11 +91,15 @@ async function ghSearchCount(q: string): Promise<number> {
 }
 
 async function ghCommitCount(githubUser: string): Promise<number> {
+  // Commit search is GA (the old cloak-preview accept header is gone) and has a
+  // stricter rate limit than issue search, so a token matters more here — but we
+  // surface a failure rather than silently reporting a fake 0 (which would
+  // misrepresent a rate-limited request as "no commits").
   const res = await fetch(
     `https://api.github.com/search/commits?q=${encodeURIComponent(`repo:${GITHUB_REPO} author:${githubUser}`)}&per_page=1`,
-    { headers: { ...ghHeaders(), Accept: 'application/vnd.github.cloak-preview+json' } },
+    { headers: ghHeaders() },
   );
-  if (!res.ok) return 0; // commit search is best-effort (stricter rate limits)
+  if (!res.ok) throw new Error(`github commit search ${res.status}`);
   const body = (await res.json()) as { total_count?: number };
   return body.total_count ?? 0;
 }
@@ -143,6 +147,10 @@ export interface WocBalance {
 }
 
 export async function fetchWocBalance(owner: string): Promise<WocBalance> {
+  // getTokenAccountsByOwner with a `{mint}` filter is the documented way to read a
+  // holding for a specific mint — the RPC resolves the mint's token program, so
+  // it works for Token-2022 $WOC. (An owner can hold it across several accounts,
+  // so we sum.) A non-OK response throws rather than reporting a misleading 0.
   const res = await fetch(SOLANA_RPC_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
