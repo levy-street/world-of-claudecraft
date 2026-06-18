@@ -3,7 +3,9 @@ import './styles.css';
 import {
   getProfile,
   getLeaderboard,
-  linkGithub,
+  startGithubLink,
+  verifyGithubLink,
+  unlinkGithub,
   linkWallet,
   isContribution,
   isWocBalance,
@@ -29,16 +31,33 @@ function Header() {
   );
 }
 
-function GithubLinkForm({ config, onLinked }: { config: DevsApiConfig; onLinked: () => void }) {
-  const [value, setValue] = useState('');
+function GithubLinkForm({ config, onLinked, initialUsername = '' }: { config: DevsApiConfig; onLinked: () => void; initialUsername?: string }) {
+  const [value, setValue] = useState(initialUsername);
+  const [code, setCode] = useState<string | null>(null);
+  const [username, setUsername] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-  const submit = async () => {
+
+  const start = async () => {
     if (!value.trim()) return;
     setBusy(true);
     setErr(null);
     try {
-      await linkGithub(config, value.trim());
+      const r = await startGithubLink(config, value.trim());
+      setCode(r.code);
+      setUsername(r.githubUsername);
+    } catch (e) {
+      setErr((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const verify = async () => {
+    setBusy(true);
+    setErr(null);
+    try {
+      await verifyGithubLink(config);
       onLinked();
     } catch (e) {
       setErr((e as Error).message);
@@ -46,21 +65,41 @@ function GithubLinkForm({ config, onLinked }: { config: DevsApiConfig; onLinked:
       setBusy(false);
     }
   };
+
+  if (code) {
+    return (
+      <div>
+        <h3>Verify GitHub ownership</h3>
+        <p className="devs-note">
+          Add this one-time code to your <a className="devs-linked" style={{ display: 'inline' }} href={`https://github.com/${username}`} target="_blank" rel="noopener noreferrer">@{username}</a> GitHub bio
+          (Settings → Profile → Bio), then verify. You can remove it afterward.
+        </p>
+        <div className="devs-field">
+          <input className="devs-input" readOnly value={code} onFocus={(e) => e.currentTarget.select()} />
+          <button className="devs-btn ghost" onClick={() => void navigator.clipboard?.writeText(code)}>Copy</button>
+          <button className="devs-btn" onClick={() => void verify()} disabled={busy}>{busy ? 'Verifying…' : 'Verify'}</button>
+        </div>
+        <button className="devs-btn ghost" style={{ marginTop: 8, padding: '4px 10px', fontSize: 12 }} onClick={() => { setCode(null); setErr(null); }}>Use a different username</button>
+        {err && <div className="devs-error">{err}</div>}
+      </div>
+    );
+  }
+
   return (
     <div>
       <h3>Link your GitHub</h3>
-      <p className="devs-note">Connect your GitHub username to count your contributions to the repo.</p>
+      <p className="devs-note">Connect your GitHub account to count your contributions to the repo. We’ll verify you own it.</p>
       <div className="devs-field">
         <input
           className="devs-input"
           placeholder="github-username"
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && void submit()}
+          onKeyDown={(e) => e.key === 'Enter' && void start()}
           disabled={busy}
         />
-        <button className="devs-btn" onClick={() => void submit()} disabled={busy || !value.trim()}>
-          {busy ? 'Linking…' : 'Link GitHub'}
+        <button className="devs-btn" onClick={() => void start()} disabled={busy || !value.trim()}>
+          {busy ? 'Starting…' : 'Get code'}
         </button>
       </div>
       {err && <div className="devs-error">{err}</div>}
@@ -112,17 +151,17 @@ function ProfileCard({ profile, config, onReload }: { profile: DevsProfile; conf
       )}
 
       <div style={{ marginTop: 16 }}>
-        {profile.githubUsername ? (
+        {profile.githubUsername && profile.githubVerified ? (
           <>
             <div className="devs-linked">
-              <span>Linked:</span>
+              <span>Linked ✓</span>
               <a href={`https://github.com/${profile.githubUsername}`} target="_blank" rel="noopener noreferrer">@{profile.githubUsername}</a>
-              <button className="devs-btn ghost" style={{ marginLeft: 'auto', padding: '4px 10px', fontSize: 12 }} onClick={() => void unlinkGithub(config, onReload)}>Unlink</button>
+              <button className="devs-btn ghost" style={{ marginLeft: 'auto', padding: '4px 10px', fontSize: 12 }} onClick={() => void unlinkGithub(config).then(onReload)}>Unlink</button>
             </div>
             <div style={{ marginTop: 12 }}><ContributionBlock profile={profile} /></div>
           </>
         ) : (
-          <GithubLinkForm config={config} onLinked={onReload} />
+          <GithubLinkForm config={config} onLinked={onReload} initialUsername={profile.githubUsername ?? ''} />
         )}
       </div>
     </section>
@@ -158,7 +197,7 @@ function WalletCard({ profile, config, onReload }: { profile: DevsProfile; confi
           )}
           <div className="devs-linked" style={{ marginTop: 8 }}>
             <a href={`https://solscan.io/account/${profile.solanaAddress}`} target="_blank" rel="noopener noreferrer">{short(profile.solanaAddress)}</a>
-            <button className="devs-btn ghost" style={{ marginLeft: 'auto', padding: '4px 10px', fontSize: 12 }} onClick={() => void unlinkWallet(config, onReload)}>Unlink</button>
+            <button className="devs-btn ghost" style={{ marginLeft: 'auto', padding: '4px 10px', fontSize: 12 }} onClick={() => void linkWallet(config, '').then(onReload)}>Unlink</button>
           </div>
         </>
       ) : (
@@ -201,14 +240,6 @@ function LeaderboardCard({ rows, you }: { rows: LeaderboardRow[]; you: string | 
   );
 }
 
-async function unlinkGithub(config: DevsApiConfig, onReload: () => void) {
-  await linkGithub(config, '');
-  onReload();
-}
-async function unlinkWallet(config: DevsApiConfig, onReload: () => void) {
-  await linkWallet(config, '');
-  onReload();
-}
 function cap(s: string) { return s ? s[0].toUpperCase() + s.slice(1) : s; }
 function short(a: string) { return a.length > 12 ? `${a.slice(0, 4)}…${a.slice(-4)}` : a; }
 

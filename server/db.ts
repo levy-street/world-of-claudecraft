@@ -166,6 +166,10 @@ CREATE INDEX IF NOT EXISTS chat_violations_account ON chat_violations(account_id
 -- a Solana wallet (for $WOC balance / rewards) to a player account.
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS github_username TEXT;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS solana_address TEXT;
+-- GitHub ownership proof: a one-time code the player drops in their GitHub bio,
+-- verified server-side before contributions/leaderboard/rewards count.
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS github_verify_code TEXT;
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS github_verified BOOLEAN NOT NULL DEFAULT FALSE;
 -- Cached contribution score per linked account, refreshed when a player loads
 -- their Devs profile. Lets the leaderboard rank without re-hitting GitHub.
 CREATE TABLE IF NOT EXISTS devs_contribution_score (

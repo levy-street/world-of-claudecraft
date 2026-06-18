@@ -120,6 +120,15 @@ export async function fetchContributionStats(githubUser: string): Promise<Contri
   return stats;
 }
 
+// Read a user's public GitHub bio — used to confirm they placed the one-time
+// verification code there before we credit their contributions.
+export async function fetchGithubBio(githubUser: string): Promise<string | null> {
+  const res = await fetch(`https://api.github.com/users/${encodeURIComponent(githubUser)}`, { headers: ghHeaders() });
+  if (!res.ok) return null;
+  const body = (await res.json()) as { bio?: string | null };
+  return body.bio ?? null;
+}
+
 // ---------------------------------------------------------------------------
 // $WOC balance (raw Solana JSON-RPC, Token-2022 aware via mint filter)
 // ---------------------------------------------------------------------------

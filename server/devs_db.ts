@@ -6,21 +6,75 @@ import { REALM } from './realm';
 export interface DevsLinks {
   username: string;
   githubUsername: string | null;
+  githubVerified: boolean;
   solanaAddress: string | null;
 }
 
 export async function getDevsLinks(accountId: number): Promise<DevsLinks | null> {
   const res = await pool.query(
-    'SELECT username, github_username, solana_address FROM accounts WHERE id = $1',
+    'SELECT username, github_username, github_verified, solana_address FROM accounts WHERE id = $1',
     [accountId],
   );
   const row = res.rows[0];
   if (!row) return null;
-  return { username: row.username, githubUsername: row.github_username, solanaAddress: row.solana_address };
+  return {
+    username: row.username,
+    githubUsername: row.github_username,
+    githubVerified: !!row.github_verified,
+    solanaAddress: row.solana_address,
+  };
 }
 
-export async function setGithubUsername(accountId: number, githubUsername: string | null): Promise<void> {
-  await pool.query('UPDATE accounts SET github_username = $2 WHERE id = $1', [accountId, githubUsername]);
+// --- GitHub ownership: a one-time bio code, verified server-side ------------
+
+export interface GithubChallenge {
+  githubUsername: string;
+  code: string;
+}
+
+// Begin (or restart) verification: claim a username + stash an unverified code.
+// A username can only be VERIFIED to one account (partial unique index below),
+// but two accounts may hold an unverified claim until one proves ownership.
+export async function startGithubLink(accountId: number, githubUsername: string, code: string): Promise<void> {
+  await pool.query(
+    `UPDATE accounts SET github_username = $2, github_verify_code = $3, github_verified = FALSE WHERE id = $1`,
+    [accountId, githubUsername, code],
+  );
+}
+
+export async function getGithubChallenge(accountId: number): Promise<GithubChallenge | null> {
+  const res = await pool.query(
+    'SELECT github_username, github_verify_code FROM accounts WHERE id = $1',
+    [accountId],
+  );
+  const row = res.rows[0];
+  if (!row || !row.github_username || !row.github_verify_code) return null;
+  return { githubUsername: row.github_username, code: row.github_verify_code };
+}
+
+export async function markGithubVerified(accountId: number): Promise<void> {
+  await pool.query(
+    'UPDATE accounts SET github_verified = TRUE, github_verify_code = NULL WHERE id = $1',
+    [accountId],
+  );
+}
+
+export async function unlinkGithub(accountId: number): Promise<void> {
+  await pool.query(
+    `UPDATE accounts SET github_username = NULL, github_verify_code = NULL, github_verified = FALSE WHERE id = $1`,
+    [accountId],
+  );
+  await pool.query('DELETE FROM devs_contribution_score WHERE account_id = $1', [accountId]);
+}
+
+// Is this GitHub identity already verified by a DIFFERENT account? Guards against
+// two players both proving the same handle (the first to verify wins it).
+export async function githubVerifiedElsewhere(accountId: number, githubUsername: string): Promise<boolean> {
+  const res = await pool.query(
+    `SELECT 1 FROM accounts WHERE id <> $1 AND github_verified = TRUE AND lower(github_username) = lower($2) LIMIT 1`,
+    [accountId, githubUsername],
+  );
+  return res.rowCount! > 0;
 }
 
 export async function setSolanaAddress(accountId: number, address: string | null): Promise<void> {

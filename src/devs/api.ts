@@ -26,6 +26,7 @@ export interface DevsProfile {
   points: Record<string, number>;
   username: string | null;
   githubUsername: string | null;
+  githubVerified: boolean;
   solanaAddress: string | null;
   character: { name: string; class: string; level: number; lifetimeXp: number } | null;
   contribution: ContributionScore | { error: string } | null;
@@ -76,8 +77,16 @@ export function getLeaderboard(cfg: DevsApiConfig): Promise<LeaderboardRow[]> {
   return request<{ leaderboard: LeaderboardRow[] }>(cfg, '/api/devs/leaderboard').then((r) => r.leaderboard);
 }
 
-export function linkGithub(cfg: DevsApiConfig, githubUsername: string): Promise<{ githubUsername: string | null }> {
-  return request(cfg, '/api/devs/link-github', { method: 'POST', body: JSON.stringify({ githubUsername }) });
+export function startGithubLink(cfg: DevsApiConfig, githubUsername: string): Promise<{ githubUsername: string; code: string; verified: boolean }> {
+  return request(cfg, '/api/devs/link-github/start', { method: 'POST', body: JSON.stringify({ githubUsername }) });
+}
+
+export function verifyGithubLink(cfg: DevsApiConfig): Promise<{ githubUsername: string; verified: boolean }> {
+  return request(cfg, '/api/devs/link-github/verify', { method: 'POST' });
+}
+
+export function unlinkGithub(cfg: DevsApiConfig): Promise<{ githubUsername: null; verified: boolean }> {
+  return request(cfg, '/api/devs/link-github/unlink', { method: 'POST' });
 }
 
 export function linkWallet(cfg: DevsApiConfig, solanaAddress: string): Promise<{ solanaAddress: string | null }> {
