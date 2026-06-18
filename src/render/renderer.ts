@@ -108,6 +108,7 @@ interface EntityView {
   bearVisual: CharacterVisual | null; // druid bear form, built lazily
   catVisual: CharacterVisual | null; // druid cat form, built lazily
   skin: number; // last-rendered appearance skin — diffed each frame for live swaps
+  mainhand?: string; // last-rendered mainhand item id (local player equip sync)
   /** unscaled height — nameplate/vfx anchor reads height * e.scale */
   height: number;
   /** what removeView pulls back out of clickTargets */
@@ -770,6 +771,9 @@ export class Renderer {
       visual.root.scale.multiplyScalar(e.scale);
       group.add(visual.root);
       height = visual.height;
+      if (e.kind === 'player') {
+        visual.setMainhand(e.mainhand ?? null);
+      }
     }
 
     let clickTarget: THREE.Object3D;
@@ -839,6 +843,7 @@ export class Renderer {
       nameplateDisplay: 'none', nameplateTransform: '', nameplateSig: '', nameplateHpWidth: '', comboSig: '', mainhandEnh: -1,
       objectCasters, shadowOn: true, isFar: false, lastOverheadEmoteKey: null,
       lastX: e.pos.x, lastZ: e.pos.z, skin: e.skin,
+      mainhand: e.kind === 'player' ? (e.mainhand ?? undefined) : undefined,
       loco: newLocoTrack(),
     });
   }
@@ -1151,6 +1156,15 @@ export class Renderer {
       if (e.kind === 'player' && e.mainhandEnhance !== v.mainhandEnh) {
         v.mainhandEnh = e.mainhandEnhance;
         v.visual.setMainhandEnhance(e.mainhandEnhance);
+      }
+
+      // live weapon model swap — item-specific glbs (epics) override class defaults
+      if (e.kind === 'player') {
+        const mh = e.mainhand ?? null;
+        if (mh !== (v.mainhand ?? null)) {
+          v.mainhand = mh ?? undefined;
+          v.visual.setMainhand(mh);
+        }
       }
 
       // swimming pose: prone at the surface (derived here — the sim is unaware)

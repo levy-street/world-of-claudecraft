@@ -14,6 +14,9 @@ import { loadGltf, loadTexture } from '../assets/loader';
 import { registerPreload } from '../assets/preload';
 import { GFX, addRimGlow } from '../gfx';
 import { manifestUrls, SKINS, VISUALS, VisualDef, type AttachDef } from './manifest';
+import { itemWeaponModelUrls, resolveWeaponAttachments } from './weapon_attachments';
+
+export { resolveWeaponAttachments } from './weapon_attachments';
 
 const DEFAULT_TINT_STRENGTH = 0.4;
 
@@ -40,6 +43,9 @@ const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
   staff: '2H_Staff',
   dagger: 'Knife',
   wand: '1H_Wand',
+  korzul_dagger: 'Knife',
+  gravewyrm_staff: '2H_Staff',
+  wyrmfang_1handed: '1H_Sword',
 };
 
 const KAYKIT_HAND_GRIPS: Record<string, { r: HandGrip; l?: HandGrip }> = {
@@ -148,7 +154,26 @@ function attachProp(root: THREE.Object3D, bone: THREE.Object3D, att: AttachDef):
   } else if (isHandslotBone(att.bone)) {
     applyHandGrip(payload, root, att.bone, att.url);
   }
+  payload.userData.weaponProp = true;
   bone.add(payload);
+}
+
+function findHandBone(root: THREE.Object3D, boneName: string): THREE.Object3D | null {
+  return root.getObjectByName(boneName)
+    ?? root.getObjectByName(boneName.replace(/[[\].:/]/g, ''))
+    ?? null;
+}
+
+/** Drop attached weapon props and re-attach from the resolved list (live equip swaps). */
+export function syncWeaponAttachments(root: THREE.Object3D, def: VisualDef, mainhandId: string | null): void {
+  const drop: THREE.Object3D[] = [];
+  root.traverse((o) => { if (o.userData.weaponProp) drop.push(o); });
+  for (const o of drop) o.removeFromParent();
+  for (const att of resolveWeaponAttachments(def, mainhandId)) {
+    const bone = findHandBone(root, att.bone);
+    if (!bone) continue;
+    attachProp(root, bone, att);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -162,7 +187,7 @@ function assetUrl(url: string): string {
 }
 
 const preloadUrls = GFX.standardMaterials
-  ? manifestUrls()
+  ? [...new Set([...manifestUrls(), ...itemWeaponModelUrls()])]
   : [...new Set(manifestUrls()
     .filter((url) => !url.startsWith('models/weapons/'))
     .map(assetUrl))];

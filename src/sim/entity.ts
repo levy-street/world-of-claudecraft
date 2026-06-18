@@ -32,7 +32,8 @@ function baseEntity(id: number, pos: Vec3): Entity {
     spawnPos: { ...pos }, leashAnchor: null, evadeStall: 0, fleeTimer: 0, hasFled: false, wanderTarget: null, wanderTimer: 0,
     aggroTargetId: null, respawnTimer: 0, corpseTimer: 0, lootable: false, loot: null,
     xpValue: 0, questIds: [], vendorItems: [], objectItemId: null, dungeonId: null,
-    dead: false, scale: 1, color: 0xffffff, skin: 0, mainhandEnhance: 0,  };
+    dead: false, scale: 1, color: 0xffffff, skin: 0, mainhand: null, mainhandEnhance: 0,
+  };
 }
 
 export function createPlayer(id: number, cls: PlayerClass, pos: Vec3, name: string): Entity {
@@ -135,6 +136,7 @@ export function recalcPlayerStats(
   const mainEnh = slotEnhance(equipmentEnhance, 'mainhand');
   const baseWeapon = mainDef?.weapon || { min: 1, max: 2, speed: 2 };
   e.weapon = scaledWeapon(baseWeapon, mainEnh);
+  e.mainhand = mainId ?? null;
   e.mainhandEnhance = mainEnh;
   // Melee AP by class (vanilla-ish): warriors/paladins/shamans/druids 2/str,
   // rogues str+agi, hunters str+agi, pure casters str.

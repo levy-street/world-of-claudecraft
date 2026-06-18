@@ -738,6 +738,7 @@ export class Sim {
       if (s.loadouts) meta.loadouts = s.loadouts.map((l) => ({ name: l.name, alloc: cloneAllocation(l.alloc), bar: [...(l.bar ?? [])] }));
       if (typeof s.activeLoadout === 'number') meta.activeLoadout = s.activeLoadout;
     }
+    player.mainhand = meta.equipment.mainhand ?? null;
 
     // Resolve the flat talent struct once, before the stat pass + ability
     // resolver below consume it (they only ever read these flat numbers).

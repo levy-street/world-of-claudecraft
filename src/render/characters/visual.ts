@@ -9,7 +9,7 @@ import { GFX } from '../gfx';
 import { glitterShardTexture, glitterSoftTexture } from '../textures';
 import type { EmoteClipSpec, VisualDef } from './manifest';
 import {
-  applyMaterials, assembleModel, prepareVisual, skinTexture, tintedFarMaterials,
+  applyMaterials, assembleModel, prepareVisual, skinTexture, syncWeaponAttachments, tintedFarMaterials,
 } from './assets';
 import { desiredBaseState, locomotionTimeScale, type AnimState, type BaseState } from './anim_state';
 
@@ -159,6 +159,7 @@ export class CharacterVisual {
   private shadowOn = true;
   private far = false;
   private bobPhase = Math.random() * Math.PI * 2;
+  private mainhandItemId: string | null = null;
 
   private mainhandEnhance = 0;
   private mainhandWeaponMeshes: THREE.Mesh[] = [];
@@ -572,6 +573,14 @@ export class CharacterVisual {
     for (const sprite of this.enhanceGlitters) sprite.parent?.remove(sprite);
     this.enhanceGlitters = [];
     this.glitterSlots = [];
+  }
+
+  /** Swap attached weapon props when mainhand equipment changes (epic item models). */
+  setMainhand(itemId: string | null): void {
+    const next = itemId ?? null;
+    if (next === this.mainhandItemId) return;
+    this.mainhandItemId = next;
+    syncWeaponAttachments(this.model, this.def, next);
   }
 
   dispose(): void {

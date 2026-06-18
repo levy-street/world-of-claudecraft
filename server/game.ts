@@ -189,6 +189,7 @@ type RememberedChat =
 function identityFields(e: Entity): Record<string, unknown> {
   const out: Record<string, unknown> = { k: e.kind, tid: e.templateId, nm: e.name, lv: e.level };
   if (e.skin) out.sk = e.skin;
+  if (e.mainhand) out.mh = e.mainhand;
   if (e.dungeonId) out.dgn = e.dungeonId;
   if (e.scale !== 1) out.sc = e.scale;
   if (e.color !== 0xffffff) out.c = e.color;
