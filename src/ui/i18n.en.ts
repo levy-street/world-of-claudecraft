@@ -11721,8 +11721,12 @@ export const en = {
     wiki: "Wiki",
     news: "News",
     download: "Download",
+    devs: "Devs",
     loginRegister: "Login/Register",
     donate: "Donate",
+  },
+  devs: {
+    loading: "Loading the Devs portal…",
   },
   stats: {
     title: "Realm Status",

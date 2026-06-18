@@ -1797,6 +1797,42 @@
     transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
   }
 
+  /* Devs portal — the companion dashboard embedded inside the platform shell. */
+  #devs-view { padding: 0 16px 24px; }
+  .devs-portal-shell {
+    position: relative;
+    width: 100%;
+    max-width: min(1400px, 96vw);
+    margin: 0 auto;
+    height: min(82vh, 1100px);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(245, 197, 66, 0.28);
+    background: #0b0b12;
+    box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.55);
+  }
+  .devs-portal-frame {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+    background: transparent;
+  }
+  .devs-portal-loading {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #cbb46a;
+    font-family: var(--title-font, serif);
+    letter-spacing: 0.06em;
+    font-size: 15px;
+  }
+
   .view-section[hidden] {
     display: none !important;
     opacity: 0;
@@ -6336,6 +6372,9 @@
               <button type="button" class="nav-link" id="nav-btn-download" aria-selected="false" aria-pressed="false" data-i18n="nav.download">Download</button>
             </li>
             <li class="nav-item">
+              <button type="button" class="nav-link" id="nav-btn-devs" aria-selected="false" aria-pressed="false" data-i18n="nav.devs">Devs</button>
+            </li>
+            <li class="nav-item">
               <button type="button" class="nav-link" id="nav-btn-login" aria-selected="false" aria-pressed="false" data-i18n="nav.loginRegister">Login/Register</button>
             </li>
           </ul>
@@ -6700,6 +6739,12 @@
           <h2 class="skeleton-title" data-i18n="download.title">Download Desktop Launcher</h2>
           <p class="skeleton-desc" data-i18n="download.desc">Get the standalone launcher for optimized performance and full-screen play.</p>
           <div class="coming-soon-badge" data-i18n="comingSoon.placeholder">Coming Soon...</div>
+        </div>
+      </section>
+      <section id="devs-view" class="view-section" hidden aria-hidden="true">
+        <div class="devs-portal-shell">
+          <div class="devs-portal-loading" id="devs-portal-loading" data-i18n="devs.loading">Loading the Devs portal…</div>
+          <iframe id="devs-portal-frame" class="devs-portal-frame" title="World of ClaudeCraft — Devs portal" referrerpolicy="no-referrer-when-downgrade" allow="clipboard-write"></iframe>
         </div>
       </section>
     </div>

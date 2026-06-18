@@ -158,8 +158,12 @@ export const en: EnTranslations = {
     "wiki": "Wiki",
     "news": "News",
     "download": "Download",
+    "devs": "Devs",
     "loginRegister": "Login/Register",
     "donate": "Donate"
+  },
+  "devs": {
+    "loading": "Loading the Devs portal…"
   },
   "stats": {
     "title": "Realm Status",
@@ -4206,8 +4210,12 @@ export const es: EnTranslations = {
     "wiki": "Wiki",
     "news": "Noticias",
     "download": "Descargar",
+    "devs": "Devs",
     "loginRegister": "Iniciar Sesión/Registrarse",
     "donate": "Donar"
+  },
+  "devs": {
+    "loading": "Loading the Devs portal…"
   },
   "stats": {
     "title": "Estado del Reino",
@@ -8254,8 +8262,12 @@ export const es_ES: EnTranslations = {
     "wiki": "Wiki",
     "news": "Noticias",
     "download": "Descargar",
+    "devs": "Devs",
     "loginRegister": "Iniciar sesión/Registrarse",
     "donate": "Donar"
+  },
+  "devs": {
+    "loading": "Loading the Devs portal…"
   },
   "stats": {
     "title": "Estado del Reino",
@@ -12302,8 +12314,12 @@ export const fr_FR: EnTranslations = {
     "wiki": "Wiki",
     "news": "Actualités",
     "download": "Télécharger",
+    "devs": "Devs",
     "loginRegister": "Se connecter/S'inscrire",
     "donate": "Faire un don"
+  },
+  "devs": {
+    "loading": "Loading the Devs portal…"
   },
   "stats": {
     "title": "Statut du royaume",
@@ -16350,8 +16366,12 @@ export const fr_CA: EnTranslations = {
     "wiki": "Wiki",
     "news": "Actualités",
     "download": "Télécharger",
+    "devs": "Devs",
     "loginRegister": "Se connecter/S'enregistrer",
     "donate": "Faire un don"
+  },
+  "devs": {
+    "loading": "Loading the Devs portal…"
   },
   "stats": {
     "title": "Statut du royaume",
@@ -20398,8 +20418,12 @@ export const en_CA: EnTranslations = {
     "wiki": "Wiki",
     "news": "News",
     "download": "Download",
+    "devs": "Devs",
     "loginRegister": "Login/Register",
     "donate": "Donate"
+  },
+  "devs": {
+    "loading": "Loading the Devs portal…"
   },
   "stats": {
     "title": "Realm Status",
@@ -24446,8 +24470,12 @@ export const it_IT: EnTranslations = {
     "wiki": "Wiki",
     "news": "Novità",
     "download": "Scarica",
+    "devs": "Devs",
     "loginRegister": "Accedi/Registrati",
     "donate": "Dona"
+  },
+  "devs": {
+    "loading": "Loading the Devs portal…"
   },
   "stats": {
     "title": "Stato del Reame",
@@ -28494,8 +28522,12 @@ export const de_DE: EnTranslations = {
     "wiki": "Wiki",
     "news": "Neuigkeiten",
     "download": "Herunterladen",
+    "devs": "Devs",
     "loginRegister": "Einloggen/Registrieren",
     "donate": "Spenden"
+  },
+  "devs": {
+    "loading": "Loading the Devs portal…"
   },
   "stats": {
     "title": "Realmstatus",
@@ -32542,8 +32574,12 @@ export const zh_CN: EnTranslations = {
     "wiki": "百科指南",
     "news": "新闻资讯",
     "download": "下载客户端",
+    "devs": "Devs",
     "loginRegister": "登录/注册",
     "donate": "捐赠"
+  },
+  "devs": {
+    "loading": "Loading the Devs portal…"
   },
   "stats": {
     "title": "服务器状态",
@@ -36590,8 +36626,12 @@ export const zh_TW: EnTranslations = {
     "wiki": "百科指南",
     "news": "最新消息",
     "download": "下載客戶端",
+    "devs": "Devs",
     "loginRegister": "登入/註冊",
     "donate": "捐贈"
+  },
+  "devs": {
+    "loading": "Loading the Devs portal…"
   },
   "stats": {
     "title": "伺服器狀態",
@@ -40638,8 +40678,12 @@ export const ko_KR: EnTranslations = {
     "wiki": "위키",
     "news": "새소식",
     "download": "다운로드",
+    "devs": "Devs",
     "loginRegister": "로그인/회원가입",
     "donate": "후원"
+  },
+  "devs": {
+    "loading": "Loading the Devs portal…"
   },
   "stats": {
     "title": "렐름 상태",
@@ -44686,8 +44730,12 @@ export const ja_JP: EnTranslations = {
     "wiki": "Wiki",
     "news": "ニュース",
     "download": "ダウンロード",
+    "devs": "Devs",
     "loginRegister": "ログイン/登録",
     "donate": "寄付"
+  },
+  "devs": {
+    "loading": "Loading the Devs portal…"
   },
   "stats": {
     "title": "レルムステータス",
@@ -48734,8 +48782,12 @@ export const pt_BR: EnTranslations = {
     "wiki": "Wiki",
     "news": "Notícias",
     "download": "Baixar",
+    "devs": "Devs",
     "loginRegister": "Entrar/Registrar",
     "donate": "Doar"
+  },
+  "devs": {
+    "loading": "Loading the Devs portal…"
   },
   "stats": {
     "title": "Status do Reino",
@@ -52782,8 +52834,12 @@ export const ru_RU: EnTranslations = {
     "wiki": "Вики",
     "news": "Новости",
     "download": "Скачать",
+    "devs": "Devs",
     "loginRegister": "Войти / Зарегистрироваться",
     "donate": "Пожертвовать"
+  },
+  "devs": {
+    "loading": "Loading the Devs portal…"
   },
   "stats": {
     "title": "Статус игрового мира",
@@ -56700,6 +56756,7 @@ export const translations = {
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "devs.loading",
     "entities.abilities.aspect_of_the_monkey.description",
     "entities.abilities.aspect_of_the_monkey.name",
     "entities.abilities.commanding_shout.description",
@@ -56751,9 +56808,11 @@ export const pending: Record<string, readonly string[]> = {
     "hud.options.tooltipScale",
     "itemUi.kind.elixir",
     "itemUi.tooltip.currentlyEquipped",
-    "itemUi.tooltip.ifYouEquip"
+    "itemUi.tooltip.ifYouEquip",
+    "nav.devs"
   ],
   "es_ES": [
+    "devs.loading",
     "entities.abilities.aspect_of_the_monkey.description",
     "entities.abilities.aspect_of_the_monkey.name",
     "entities.abilities.commanding_shout.description",
@@ -56805,9 +56864,11 @@ export const pending: Record<string, readonly string[]> = {
     "hud.options.tooltipScale",
     "itemUi.kind.elixir",
     "itemUi.tooltip.currentlyEquipped",
-    "itemUi.tooltip.ifYouEquip"
+    "itemUi.tooltip.ifYouEquip",
+    "nav.devs"
   ],
   "fr_FR": [
+    "devs.loading",
     "entities.abilities.aspect_of_the_monkey.description",
     "entities.abilities.aspect_of_the_monkey.name",
     "entities.abilities.commanding_shout.description",
@@ -56859,9 +56920,11 @@ export const pending: Record<string, readonly string[]> = {
     "hud.options.tooltipScale",
     "itemUi.kind.elixir",
     "itemUi.tooltip.currentlyEquipped",
-    "itemUi.tooltip.ifYouEquip"
+    "itemUi.tooltip.ifYouEquip",
+    "nav.devs"
   ],
   "fr_CA": [
+    "devs.loading",
     "entities.abilities.aspect_of_the_monkey.description",
     "entities.abilities.aspect_of_the_monkey.name",
     "entities.abilities.commanding_shout.description",
@@ -56913,10 +56976,12 @@ export const pending: Record<string, readonly string[]> = {
     "hud.options.tooltipScale",
     "itemUi.kind.elixir",
     "itemUi.tooltip.currentlyEquipped",
-    "itemUi.tooltip.ifYouEquip"
+    "itemUi.tooltip.ifYouEquip",
+    "nav.devs"
   ],
   "en_CA": [],
   "it_IT": [
+    "devs.loading",
     "entities.abilities.aspect_of_the_monkey.description",
     "entities.abilities.aspect_of_the_monkey.name",
     "entities.abilities.commanding_shout.description",
@@ -56968,9 +57033,11 @@ export const pending: Record<string, readonly string[]> = {
     "hud.options.tooltipScale",
     "itemUi.kind.elixir",
     "itemUi.tooltip.currentlyEquipped",
-    "itemUi.tooltip.ifYouEquip"
+    "itemUi.tooltip.ifYouEquip",
+    "nav.devs"
   ],
   "de_DE": [
+    "devs.loading",
     "entities.abilities.aspect_of_the_monkey.description",
     "entities.abilities.aspect_of_the_monkey.name",
     "entities.abilities.commanding_shout.description",
@@ -57022,9 +57089,11 @@ export const pending: Record<string, readonly string[]> = {
     "hud.options.tooltipScale",
     "itemUi.kind.elixir",
     "itemUi.tooltip.currentlyEquipped",
-    "itemUi.tooltip.ifYouEquip"
+    "itemUi.tooltip.ifYouEquip",
+    "nav.devs"
   ],
   "zh_CN": [
+    "devs.loading",
     "entities.abilities.aspect_of_the_monkey.description",
     "entities.abilities.aspect_of_the_monkey.name",
     "entities.abilities.commanding_shout.description",
@@ -57076,9 +57145,11 @@ export const pending: Record<string, readonly string[]> = {
     "hud.options.tooltipScale",
     "itemUi.kind.elixir",
     "itemUi.tooltip.currentlyEquipped",
-    "itemUi.tooltip.ifYouEquip"
+    "itemUi.tooltip.ifYouEquip",
+    "nav.devs"
   ],
   "zh_TW": [
+    "devs.loading",
     "entities.abilities.aspect_of_the_monkey.description",
     "entities.abilities.aspect_of_the_monkey.name",
     "entities.abilities.commanding_shout.description",
@@ -57130,9 +57201,11 @@ export const pending: Record<string, readonly string[]> = {
     "hud.options.tooltipScale",
     "itemUi.kind.elixir",
     "itemUi.tooltip.currentlyEquipped",
-    "itemUi.tooltip.ifYouEquip"
+    "itemUi.tooltip.ifYouEquip",
+    "nav.devs"
   ],
   "ko_KR": [
+    "devs.loading",
     "entities.abilities.aspect_of_the_monkey.description",
     "entities.abilities.aspect_of_the_monkey.name",
     "entities.abilities.commanding_shout.description",
@@ -57184,9 +57257,11 @@ export const pending: Record<string, readonly string[]> = {
     "hud.options.tooltipScale",
     "itemUi.kind.elixir",
     "itemUi.tooltip.currentlyEquipped",
-    "itemUi.tooltip.ifYouEquip"
+    "itemUi.tooltip.ifYouEquip",
+    "nav.devs"
   ],
   "ja_JP": [
+    "devs.loading",
     "entities.abilities.aspect_of_the_monkey.description",
     "entities.abilities.aspect_of_the_monkey.name",
     "entities.abilities.commanding_shout.description",
@@ -57238,9 +57313,11 @@ export const pending: Record<string, readonly string[]> = {
     "hud.options.tooltipScale",
     "itemUi.kind.elixir",
     "itemUi.tooltip.currentlyEquipped",
-    "itemUi.tooltip.ifYouEquip"
+    "itemUi.tooltip.ifYouEquip",
+    "nav.devs"
   ],
   "pt_BR": [
+    "devs.loading",
     "entities.abilities.aspect_of_the_monkey.description",
     "entities.abilities.aspect_of_the_monkey.name",
     "entities.abilities.commanding_shout.description",
@@ -57292,9 +57369,11 @@ export const pending: Record<string, readonly string[]> = {
     "hud.options.tooltipScale",
     "itemUi.kind.elixir",
     "itemUi.tooltip.currentlyEquipped",
-    "itemUi.tooltip.ifYouEquip"
+    "itemUi.tooltip.ifYouEquip",
+    "nav.devs"
   ],
   "ru_RU": [
+    "devs.loading",
     "entities.abilities.aspect_of_the_monkey.description",
     "entities.abilities.aspect_of_the_monkey.name",
     "entities.abilities.commanding_shout.description",
@@ -57346,7 +57425,8 @@ export const pending: Record<string, readonly string[]> = {
     "hud.options.tooltipScale",
     "itemUi.kind.elixir",
     "itemUi.tooltip.currentlyEquipped",
-    "itemUi.tooltip.ifYouEquip"
+    "itemUi.tooltip.ifYouEquip",
+    "nav.devs"
   ]
 };
 
@@ -57499,8 +57579,12 @@ export const en_XA: EnTranslations = {
     "wiki": "[Ŵíķí]",
     "news": "[Ñéŵš]",
     "download": "[Ðóŵñļóáð]",
+    "devs": "[Ðéʋš]",
     "loginRegister": "[Ļóĝíñ/Ŕéĝíšţéŕ]",
     "donate": "[Ðóñáţé]"
+  },
+  "devs": {
+    "loading": "[Ļóáðíñĝ ţĥé Ðéʋš þóŕţáļ…]"
   },
   "stats": {
     "title": "[Ŕéáļɱ Šţáţúš]",
