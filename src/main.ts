@@ -11,6 +11,7 @@ import { handlePickedEntity, hoverCursorKind } from './game/interactions';
 import { clickMoveShouldCancel, clickMoveStep, stepAngleToward } from './game/click_move';
 import { Api, ClientWorld, CharacterSummary } from './net/online';
 import { setWocBalance, setWalletUiEnabled } from './ui/wallet_balance';
+import { setCardUploader, setReferralProvider } from './ui/player_card_share';
 // The wallet module (Reown AppKit + @solana/web3.js, ~1MB) is loaded lazily via
 // dynamic import() in the wallet controller below, so it stays out of the main
 // entry chunk and only loads when the feature is enabled + used.
@@ -987,6 +988,15 @@ async function startOffline(playerClass: PlayerClass, name: string, skin = 0): P
 
 const api = new Api();
 
+// Referral capture: a visitor who arrives from a shared player card link
+// (?ref=<slug>) carries the referrer's slug into registration. Read it once at
+// load and sanitise it to the server's slug shape so a junk param is dropped.
+const REFERRAL_SLUG = (() => {
+  const raw = new URLSearchParams(location.search).get('ref') ?? '';
+  const slug = raw.trim().toLowerCase();
+  return /^[a-z0-9][a-z0-9-]{0,63}$/.test(slug) ? slug : '';
+})();
+
 let activeTransitionTimeout: number | null = null;
 let activeTransitionCleanup: (() => void) | null = null;
 let characterPreview: CharacterPreview | null = null;
@@ -1542,6 +1552,14 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
     }
   }
   const world = new ClientWorld(api.token!, c.id, c.class, api.base);
+  // Wire shareable player cards for this online session: publishing uploads the
+  // composited PNG to this realm and returns an absolute public page URL, and
+  // the referral provider feeds the card footer. Both are cleared on disconnect.
+  setCardUploader(async (png) => {
+    const r = await api.uploadCard(c.id, png);
+    return { url: new URL(r.url, api.base || location.origin).href, ref: r.ref };
+  });
+  setReferralProvider(() => api.referralStats());
   // wait for hello + first snapshot so the world starts populated
   const waitStart = Date.now();
   const poll = setInterval(() => {
@@ -1558,6 +1576,8 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
   // mask the real reason (e.g. "character already in world")
   world.onDisconnect = (reason) => {
     clearInterval(poll);
+    setCardUploader(null);
+    setReferralProvider(null);
     fatalOverlay(userFacingApiError(reason));
   };
 }
@@ -2459,7 +2479,7 @@ function wireStartScreens(): void {
     }
     try {
       if (mode === 'login') await api.login(username, password, token);
-      else await api.register(username, password, token);
+      else await api.register(username, password, token, REFERRAL_SLUG);
     } catch (err) {
       // Auth itself failed (bad credentials, taken username, Turnstile reject…).
       // The token is single-use, so refresh the widget for the next attempt.

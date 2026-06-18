@@ -24,6 +24,9 @@ import { music, musicZoneForLocation } from '../game/music';
 import { iconDataUrl, iconCanvas, QUALITY_COLOR, raidMarkerDataUrl, RAID_MARKER_NAMES } from './icons';
 import { svgIcon } from './ui_icons';
 import { walletUiEnabled, wocBalance, onWalletUiChange } from './wallet_balance';
+import { renderPlayerCardCanvas, cardCanvasToBlob, type PlayerCardData, type PlayerCardStat } from './player_card';
+import { cardHostingAvailable, publishCard, fetchReferralInfo, type PublishedCard } from './player_card_share';
+import { holderTierForBalance } from './holder_tier';
 import { Keybinds, BIND_ACTIONS, BIND_CATEGORIES, isReservedCode, keyLabel } from '../game/keybinds';
 import { Settings, GameSettings, BoolSettingKey, NumericSettingKey, SETTING_RANGES, clickMoveButtonLabel, normalizeClickMoveButton } from '../game/settings';
 import { isPhoneTouchDevice } from '../game/mobile_controls';
@@ -321,6 +324,7 @@ export class Hud {
   private lastHudSlowAt = 0;
   private charPreview: CharacterPreview | null = null;
   private charPreviewCanvas: HTMLCanvasElement | null = null;
+  private cardModalEl: HTMLElement | null = null;
   // current typeahead state: which input, its results, and the keyboard-
   // highlighted row (-1 = none), so Enter/Arrow keys can pick a suggestion
   private socialSuggest: { field: string; items: { name: string; cls: string; level: number }[]; index: number } = { field: '', items: [], index: -1 };
@@ -3712,8 +3716,11 @@ export class Hud {
     </div>`;
     html += this.talentSummaryHtml();
     html += this.progressionHtml(p.level);
+    const shareGlyph = `<svg class="pc-share-ico" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M18 16.1a3 3 0 0 0-2.3 1.1l-6.7-3.9a3 3 0 0 0 0-2.6l6.7-3.9A3 3 0 1 0 15 4l-6.7 3.9a3 3 0 1 0 0 8.2L15 20a3 3 0 1 0 3-3.9z"/></svg>`;
+    html += `<div class="pc-share-row"><button type="button" class="btn pc-share-btn" data-act="share-card">${shareGlyph}<span>Share Player Card</span></button></div>`;
     el.innerHTML = html;
     el.querySelector('[data-act="prestige"]')?.addEventListener('click', () => this.openPrestigeDialog());
+    el.querySelector('[data-act="share-card"]')?.addEventListener('click', () => { audio.click(); void this.openPlayerCard(); });
     const col = el.querySelector('#equip-col')!;
     const slots: { key: EquipSlot; name: string }[] = [
       { key: 'mainhand', name: itemSlotName('mainhand') },
@@ -3775,6 +3782,245 @@ export class Hud {
       });
       row.appendChild(b);
     }
+  }
+
+  // -------------------------------------------------------------------------
+  // Shareable player card. Captures a crisp close-up of the character from the
+  // character-window preview, composites it with the player's stats, gear, and
+  // $WOC holder badge, and offers share/download/publish actions. Hosting a
+  // public card link is online-only (requires the injected uploader); offline
+  // play still gets download + native share.
+  // -------------------------------------------------------------------------
+
+  private async openPlayerCard(): Promise<void> {
+    // The button lives in the character window, so the preview already exists;
+    // create it defensively in case that ever changes.
+    if (!this.charPreview) this.renderCharPreview();
+    const preview = this.charPreview;
+    if (!preview) return;
+    const characterImage = preview.captureCloseup();
+
+    this.cardModalEl?.remove();
+    const back = document.createElement('div');
+    back.className = 'modal-backdrop';
+    back.id = 'player-card-modal';
+    back.innerHTML = `<div class="window panel pc-modal">`
+      + `<div class="panel-title"><span>Player Card</span><span class="x-btn" data-close>${svgIcon('close')}</span></div>`
+      + `<div class="pc-preview pc-loading">Forging your card…</div>`
+      + `<div class="pc-actions"></div>`
+      + `<div class="pc-link" hidden><span class="pc-link-label">Your referral link — anyone who joins through it is credited to you:</span>`
+      + `<input class="pc-link-input" type="text" readonly aria-label="Your referral link"></div>`
+      + `<div class="pc-status" aria-live="polite"></div>`
+      + `</div>`;
+    document.body.appendChild(back);
+    this.cardModalEl = back;
+    const close = () => { back.remove(); if (this.cardModalEl === back) this.cardModalEl = null; };
+    back.addEventListener('click', (e) => { if (e.target === back) close(); });
+    back.querySelector('[data-close]')?.addEventListener('click', () => { audio.click(); close(); });
+
+    const status = back.querySelector('.pc-status') as HTMLElement;
+    const setStatus = (msg: string) => { status.textContent = msg; };
+
+    // Referral info is online-only (null offline); it enriches the footer.
+    const referral = await fetchReferralInfo();
+    if (this.cardModalEl !== back) return; // modal closed while awaiting
+    const data = this.buildPlayerCardData(characterImage, referral);
+    const canvas = await renderPlayerCardCanvas(data);
+    if (this.cardModalEl !== back) return;
+
+    const previewBox = back.querySelector('.pc-preview') as HTMLElement;
+    previewBox.classList.remove('pc-loading');
+    previewBox.innerHTML = '';
+    canvas.classList.add('pc-card-canvas');
+    previewBox.appendChild(canvas);
+
+    this.wireCardActions(back, canvas, data, setStatus);
+  }
+
+  private wireCardActions(
+    back: HTMLElement,
+    canvas: HTMLCanvasElement,
+    data: PlayerCardData,
+    setStatus: (msg: string) => void,
+  ): void {
+    const actions = back.querySelector('.pc-actions') as HTMLElement;
+    const linkRow = back.querySelector('.pc-link') as HTMLElement;
+    const linkInput = back.querySelector('.pc-link-input') as HTMLInputElement;
+    const fileName = `${(data.referralHandle || 'player').replace(/[^a-z0-9-]/g, '')}-woc-card.png`;
+    const mkBtn = (label: string, cls = ''): HTMLButtonElement => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'btn' + (cls ? ` ${cls}` : '');
+      b.textContent = label;
+      actions.appendChild(b);
+      return b;
+    };
+    const errMsg = (err: unknown) => (err instanceof Error ? err.message : 'Something went wrong.');
+
+    // Publish-once: hosting a public card is needed for X / copy-link; cache the
+    // result so repeated actions don't re-upload. On success the player's
+    // referral link is revealed so it's tangible (and selectable as a fallback).
+    let published: PublishedCard | null = null;
+    const publishOnce = async (): Promise<PublishedCard> => {
+      if (published) return published;
+      setStatus('Publishing card…');
+      published = await publishCard(await cardCanvasToBlob(canvas));
+      linkInput.value = published.url;
+      linkRow.hidden = false;
+      setStatus('Card published — share your referral link below.');
+      return published;
+    };
+
+    if (cardHostingAvailable()) {
+      const xb = mkBtn('Share to X', 'cd-ok');
+      xb.addEventListener('click', async () => {
+        audio.click();
+        xb.disabled = true;
+        try {
+          const pub = await publishOnce();
+          const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(this.cardShareText(data))}&url=${encodeURIComponent(pub.url)}`;
+          window.open(intent, '_blank', 'noopener,noreferrer');
+        } catch (err) {
+          setStatus(errMsg(err));
+        } finally {
+          xb.disabled = false;
+        }
+      });
+
+      const cb = mkBtn('Copy Referral Link');
+      cb.addEventListener('click', async () => {
+        audio.click();
+        cb.disabled = true;
+        try {
+          const pub = await publishOnce();
+          await navigator.clipboard.writeText(pub.url);
+          linkInput.select();
+          setStatus('Referral link copied — share it anywhere.');
+        } catch (err) {
+          setStatus(errMsg(err));
+        } finally {
+          cb.disabled = false;
+        }
+      });
+    }
+
+    const dl = mkBtn('Download');
+    dl.addEventListener('click', async () => {
+      audio.click();
+      const blob = await cardCanvasToBlob(canvas);
+      const href = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = href;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(href), 4000);
+      setStatus('Card downloaded.');
+    });
+
+    // Native share (mobile): share the PNG file, plus the hosted link when one
+    // is available. navigator.canShare with files is the capability gate.
+    const nav = navigator as Navigator & { canShare?: (d?: ShareData) => boolean };
+    if (typeof nav.canShare === 'function') {
+      const sb = mkBtn('Share…');
+      sb.addEventListener('click', async () => {
+        audio.click();
+        sb.disabled = true;
+        try {
+          const file = new File([await cardCanvasToBlob(canvas)], fileName, { type: 'image/png' });
+          const payload: ShareData = { files: [file], title: 'World of Claudecraft', text: this.cardShareText(data) };
+          // Attach the hosted link when hosting is available; if publishing
+          // fails, fall back to sharing just the image file.
+          if (cardHostingAvailable()) {
+            try { payload.url = (await publishOnce()).url; } catch { /* share file-only */ }
+          }
+          if (nav.canShare!(payload)) await nav.share!(payload);
+          else if (nav.canShare!({ files: [file] })) await nav.share!({ files: [file] });
+          else setStatus('Sharing is not supported on this device.');
+        } catch (err) {
+          if (!(err instanceof Error && err.name === 'AbortError')) setStatus(errMsg(err));
+        } finally {
+          sb.disabled = false;
+        }
+      });
+    }
+  }
+
+  private cardShareText(data: PlayerCardData): string {
+    const tier = holderTierForBalance(data.balance);
+    const tierBit = tier ? `, ${tier.name}-rank $WOC holder` : '';
+    // The URL X appends to this text is the player's card page — it unfurls the
+    // card image and credits the referral when a recruit joins through it.
+    return `I'm forging my legend in World of Claudecraft — Level ${data.level} ${data.className}${tierBit}. Join my realm:`;
+  }
+
+  private buildPlayerCardData(characterImage: string, referral: { count: number; slug: string | null } | null): PlayerCardData {
+    const sim = this.sim;
+    const p = sim.player;
+    const cls = sim.cfg.playerClass;
+    const classColor = '#' + (p.color & 0xffffff).toString(16).padStart(6, '0');
+    const num = (n: number) => formatNumber(n, { maximumFractionDigits: 0 });
+    const pct = (n: number) => `${formatNumber(n * 100, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`;
+
+    const wpn = sim.equipment.mainhand ? ITEMS[sim.equipment.mainhand] : null;
+    const dps = wpn?.weapon
+      ? ((wpn.weapon.min + wpn.weapon.max) / 2 + (p.attackPower / 14) * wpn.weapon.speed) / wpn.weapon.speed
+      : 0;
+
+    const primaryStats: PlayerCardStat[] = [
+      { label: t('itemUi.stats.str'), value: num(p.stats.str) },
+      { label: t('itemUi.stats.agi'), value: num(p.stats.agi) },
+      { label: t('itemUi.stats.sta'), value: num(p.stats.sta) },
+      { label: t('itemUi.stats.int'), value: num(p.stats.int) },
+      { label: t('itemUi.stats.spi'), value: num(p.stats.spi) },
+      { label: t('itemUi.stats.armor'), value: num(p.stats.armor) },
+    ];
+    const combatStats: PlayerCardStat[] = [
+      { label: t('itemUi.stats.attackPower'), value: num(p.attackPower) },
+      { label: t('itemUi.stats.dps'), value: formatNumber(dps, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) },
+      { label: t('itemUi.stats.critChance'), value: pct(p.critChance) },
+      { label: t('itemUi.stats.dodge'), value: pct(p.dodgeChance) },
+    ];
+    const rating = sim.arenaInfo?.rating ?? null;
+    if (rating !== null) combatStats.push({ label: 'Arena', value: num(rating) });
+    if (sim.prestigeRank > 0) combatStats.push({ label: 'Prestige', value: num(sim.prestigeRank) });
+
+    const slots: EquipSlot[] = ['mainhand', 'chest', 'legs', 'feet'];
+    const gear = slots.map((slot) => {
+      const id = sim.equipment[slot];
+      const item = id ? ITEMS[id] : null;
+      return {
+        slot: itemSlotName(slot),
+        name: item ? itemDisplayName(item) : t('itemUi.equipment.empty'),
+        color: item ? (QUALITY_COLOR[item.quality ?? 'common'] ?? '#cfc3a0') : '#7c7058',
+      };
+    });
+
+    return {
+      name: p.name,
+      className: classDisplayName(cls),
+      classColor,
+      level: p.level,
+      realm: sim.realm,
+      characterImage,
+      primaryStats,
+      combatStats,
+      gear,
+      arenaRating: rating,
+      virtualLevel: null,
+      prestigeRank: sim.prestigeRank,
+      balance: wocBalance(),
+      referralHandle: referral?.slug ?? this.cardSlug(p.name),
+      referralCount: referral?.count ?? null,
+      siteUrl: location.host,
+    };
+  }
+
+  // Client-side mirror of the server's slugify (server/player_card.ts) — used
+  // only for the footer handle preview before the card is published.
+  private cardSlug(name: string): string {
+    return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40);
   }
 
   // -------------------------------------------------------------------------

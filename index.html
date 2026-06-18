@@ -898,6 +898,29 @@
   #confirm-dialog .cd-actions { display: flex; justify-content: flex-end; gap: 8px; }
   #confirm-dialog .cd-ok { background: linear-gradient(#8a6a26, #5a4413 55%, #473409); color: #ffe6a8; }
 
+  /* player card: char-window entry button + share modal */
+  .pc-share-row { margin-top: 10px; display: flex; justify-content: center; }
+  .pc-share-btn { display: inline-flex; align-items: center; gap: 7px; }
+  .pc-share-ico { flex: none; }
+  #player-card-modal { z-index: 320; }
+  #player-card-modal .pc-modal { width: min(680px, 96vw); max-height: calc(100vh - 32px);
+    padding: 16px; display: flex; flex-direction: column; }
+  #player-card-modal .pc-preview { margin: 12px 0; min-height: 200px; display: flex;
+    align-items: center; justify-content: center; overflow: auto; }
+  #player-card-modal .pc-preview.pc-loading { color: #c8b888; font-size: 13px; font-style: italic; }
+  #player-card-modal .pc-card-canvas { width: 100%; height: auto; display: block; border-radius: 8px;
+    box-shadow: 0 8px 28px rgba(0,0,0,.55); }
+  #player-card-modal .pc-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+  #player-card-modal .pc-actions .btn { min-width: 110px; }
+  #player-card-modal .pc-actions .cd-ok { background: linear-gradient(#8a6a26, #5a4413 55%, #473409); color: #ffe6a8; }
+  #player-card-modal .pc-link { margin-top: 12px; }
+  #player-card-modal .pc-link[hidden] { display: none; }
+  #player-card-modal .pc-link-label { display: block; font-size: 11.5px; color: #c8b888; margin-bottom: 4px; }
+  #player-card-modal .pc-link-input { width: 100%; box-sizing: border-box; padding: 8px 10px; font-size: 12.5px;
+    color: var(--gold); background: #120d07; border: 1px solid #463a1c; border-radius: 5px; font-family: var(--ui-font); }
+  #player-card-modal .pc-status { margin-top: 10px; min-height: 16px; font-size: 12px;
+    color: #c8b888; text-align: center; }
+
   /* vendor */
   #vendor-window { width: 400px; }
   .vendor-item { display: flex; gap: 8px; align-items: center; width: 100%; padding: 5px; border: 0; border-radius: 4px; cursor: pointer; background: transparent; color: inherit; font-family: var(--ui-font); text-align: left; }
