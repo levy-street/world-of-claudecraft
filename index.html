@@ -5538,6 +5538,37 @@
   }
   .cs-title { text-align: left; margin: 0; }
 
+  /* Devs portal entry — links logged-in players to the companion dashboard where
+     their GitHub contributions to World of ClaudeCraft level up their character. */
+  .cs-devs-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    align-self: flex-start;
+    min-height: 34px;
+    padding: 0 14px;
+    border-radius: 8px;
+    border: 1px solid rgba(245, 197, 66, 0.45);
+    background: linear-gradient(180deg, rgba(245, 197, 66, 0.12), rgba(245, 197, 66, 0.04));
+    color: #f5d27a;
+    font-family: var(--title-font);
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .cs-devs-btn:hover,
+  .cs-devs-btn:focus-visible {
+    border-color: rgba(245, 197, 66, 0.9);
+    background: linear-gradient(180deg, rgba(245, 197, 66, 0.2), rgba(245, 197, 66, 0.08));
+    color: #fff;
+    box-shadow: 0 0 14px rgba(245, 197, 66, 0.3);
+    outline: none;
+  }
+  .cs-devs-icon { width: 16px; height: 16px; display: block; }
+
   /* Realm dropdown — left-aligned, sits above the roster */
   .cs-realm-switch { position: relative; }
   .cs-realm-btn {
@@ -6508,6 +6539,10 @@
               </button>
               <div id="cs-realm-menu" class="cs-realm-menu" role="listbox" data-i18n-aria="auth.realmList" aria-label="Realm List" hidden></div>
             </div>
+            <a class="cs-devs-btn" id="btn-devs-portal" href="https://devs.worldofclaudecraft.com" target="_blank" rel="noopener noreferrer" data-i18n-title="auth.devsTooltip" title="Open the Devs portal — your GitHub contributions level up your character">
+              <svg class="cs-devs-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M8 9l-4 3 4 3M16 9l4 3-4 3M13 6l-2 12"/></svg>
+              <span data-i18n="auth.devs">Devs</span>
+            </a>
           </header>
           <div class="cs-body">
             <!-- Left: full-height character roster -->

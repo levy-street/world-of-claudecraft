@@ -11815,6 +11815,8 @@ export const en = {
     enterWorld: "Enter World",
     offlineCharacter: "Offline Character",
     create: "Create",
+    devs: "Devs",
+    devsTooltip: "Open the Devs portal — your GitHub contributions level up your character",
   },
   classes: {
     warrior: "Warrior",

@@ -251,7 +251,9 @@ export const en: EnTranslations = {
     "characterNamePlaceholder": "Character name",
     "enterWorld": "Enter World",
     "offlineCharacter": "Offline Character",
-    "create": "Create"
+    "create": "Create",
+    "devs": "Devs",
+    "devsTooltip": "Open the Devs portal — your GitHub contributions level up your character"
   },
   "classes": {
     "warrior": "Warrior",
@@ -4299,7 +4301,9 @@ export const es: EnTranslations = {
     "characterNamePlaceholder": "Nombre del personaje",
     "enterWorld": "Entrar al Mundo",
     "offlineCharacter": "Personaje en Solitario",
-    "create": "Crear"
+    "create": "Crear",
+    "devs": "Devs",
+    "devsTooltip": "Open the Devs portal — your GitHub contributions level up your character"
   },
   "classes": {
     "warrior": "Guerrero",
@@ -8347,7 +8351,9 @@ export const es_ES: EnTranslations = {
     "characterNamePlaceholder": "Nombre del personaje",
     "enterWorld": "Entrar al mundo",
     "offlineCharacter": "Personaje en solitario",
-    "create": "Crear"
+    "create": "Crear",
+    "devs": "Devs",
+    "devsTooltip": "Open the Devs portal — your GitHub contributions level up your character"
   },
   "classes": {
     "warrior": "Guerrero",
@@ -12395,7 +12401,9 @@ export const fr_FR: EnTranslations = {
     "characterNamePlaceholder": "Nom du personnage",
     "enterWorld": "Entrer dans le monde",
     "offlineCharacter": "Personnage hors ligne",
-    "create": "Créer"
+    "create": "Créer",
+    "devs": "Devs",
+    "devsTooltip": "Open the Devs portal — your GitHub contributions level up your character"
   },
   "classes": {
     "warrior": "Guerrier",
@@ -16443,7 +16451,9 @@ export const fr_CA: EnTranslations = {
     "characterNamePlaceholder": "Nom du personnage",
     "enterWorld": "Entrer dans le monde",
     "offlineCharacter": "Personnage hors ligne",
-    "create": "Créer"
+    "create": "Créer",
+    "devs": "Devs",
+    "devsTooltip": "Open the Devs portal — your GitHub contributions level up your character"
   },
   "classes": {
     "warrior": "Guerrier",
@@ -20491,7 +20501,9 @@ export const en_CA: EnTranslations = {
     "characterNamePlaceholder": "Character name",
     "enterWorld": "Enter World",
     "offlineCharacter": "Offline Character",
-    "create": "Create"
+    "create": "Create",
+    "devs": "Devs",
+    "devsTooltip": "Open the Devs portal — your GitHub contributions level up your character"
   },
   "classes": {
     "warrior": "Warrior",
@@ -24539,7 +24551,9 @@ export const it_IT: EnTranslations = {
     "characterNamePlaceholder": "Nome del personaggio",
     "enterWorld": "Entra nel mondo",
     "offlineCharacter": "Personaggio offline",
-    "create": "Crea"
+    "create": "Crea",
+    "devs": "Devs",
+    "devsTooltip": "Open the Devs portal — your GitHub contributions level up your character"
   },
   "classes": {
     "warrior": "Guerriero",
@@ -28587,7 +28601,9 @@ export const de_DE: EnTranslations = {
     "characterNamePlaceholder": "Charaktername",
     "enterWorld": "Welt betreten",
     "offlineCharacter": "Offline-Charakter",
-    "create": "Erstellen"
+    "create": "Erstellen",
+    "devs": "Devs",
+    "devsTooltip": "Open the Devs portal — your GitHub contributions level up your character"
   },
   "classes": {
     "warrior": "Krieger",
@@ -32635,7 +32651,9 @@ export const zh_CN: EnTranslations = {
     "characterNamePlaceholder": "输入角色名称",
     "enterWorld": "进入世界",
     "offlineCharacter": "单机角色",
-    "create": "创建"
+    "create": "创建",
+    "devs": "Devs",
+    "devsTooltip": "Open the Devs portal — your GitHub contributions level up your character"
   },
   "classes": {
     "warrior": "战士",
@@ -36683,7 +36701,9 @@ export const zh_TW: EnTranslations = {
     "characterNamePlaceholder": "輸入角色名稱",
     "enterWorld": "進入世界",
     "offlineCharacter": "單機角色",
-    "create": "建立"
+    "create": "建立",
+    "devs": "Devs",
+    "devsTooltip": "Open the Devs portal — your GitHub contributions level up your character"
   },
   "classes": {
     "warrior": "戰士",
@@ -40731,7 +40751,9 @@ export const ko_KR: EnTranslations = {
     "characterNamePlaceholder": "캐릭터 이름",
     "enterWorld": "세계 입장",
     "offlineCharacter": "오프라인 캐릭터",
-    "create": "생성"
+    "create": "생성",
+    "devs": "Devs",
+    "devsTooltip": "Open the Devs portal — your GitHub contributions level up your character"
   },
   "classes": {
     "warrior": "전사",
@@ -44779,7 +44801,9 @@ export const ja_JP: EnTranslations = {
     "characterNamePlaceholder": "キャラクター名",
     "enterWorld": "世界に入る",
     "offlineCharacter": "オフラインキャラクター",
-    "create": "作成"
+    "create": "作成",
+    "devs": "Devs",
+    "devsTooltip": "Open the Devs portal — your GitHub contributions level up your character"
   },
   "classes": {
     "warrior": "戦士",
@@ -48827,7 +48851,9 @@ export const pt_BR: EnTranslations = {
     "characterNamePlaceholder": "Nome do personagem",
     "enterWorld": "Entrar no mundo",
     "offlineCharacter": "Personagem offline",
-    "create": "Criar"
+    "create": "Criar",
+    "devs": "Devs",
+    "devsTooltip": "Open the Devs portal — your GitHub contributions level up your character"
   },
   "classes": {
     "warrior": "Guerreiro",
@@ -52875,7 +52901,9 @@ export const ru_RU: EnTranslations = {
     "characterNamePlaceholder": "Имя персонажа",
     "enterWorld": "Войти в мир",
     "offlineCharacter": "Персонаж вне сети",
-    "create": "Создать"
+    "create": "Создать",
+    "devs": "Devs",
+    "devsTooltip": "Open the Devs portal — your GitHub contributions level up your character"
   },
   "classes": {
     "warrior": "Воин",
@@ -56700,6 +56728,8 @@ export const translations = {
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "auth.devs",
+    "auth.devsTooltip",
     "entities.abilities.aspect_of_the_monkey.description",
     "entities.abilities.aspect_of_the_monkey.name",
     "entities.abilities.commanding_shout.description",
@@ -56754,6 +56784,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.ifYouEquip"
   ],
   "es_ES": [
+    "auth.devs",
+    "auth.devsTooltip",
     "entities.abilities.aspect_of_the_monkey.description",
     "entities.abilities.aspect_of_the_monkey.name",
     "entities.abilities.commanding_shout.description",
@@ -56808,6 +56840,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.ifYouEquip"
   ],
   "fr_FR": [
+    "auth.devs",
+    "auth.devsTooltip",
     "entities.abilities.aspect_of_the_monkey.description",
     "entities.abilities.aspect_of_the_monkey.name",
     "entities.abilities.commanding_shout.description",
@@ -56862,6 +56896,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.ifYouEquip"
   ],
   "fr_CA": [
+    "auth.devs",
+    "auth.devsTooltip",
     "entities.abilities.aspect_of_the_monkey.description",
     "entities.abilities.aspect_of_the_monkey.name",
     "entities.abilities.commanding_shout.description",
@@ -56917,6 +56953,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "auth.devs",
+    "auth.devsTooltip",
     "entities.abilities.aspect_of_the_monkey.description",
     "entities.abilities.aspect_of_the_monkey.name",
     "entities.abilities.commanding_shout.description",
@@ -56971,6 +57009,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.ifYouEquip"
   ],
   "de_DE": [
+    "auth.devs",
+    "auth.devsTooltip",
     "entities.abilities.aspect_of_the_monkey.description",
     "entities.abilities.aspect_of_the_monkey.name",
     "entities.abilities.commanding_shout.description",
@@ -57025,6 +57065,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.ifYouEquip"
   ],
   "zh_CN": [
+    "auth.devs",
+    "auth.devsTooltip",
     "entities.abilities.aspect_of_the_monkey.description",
     "entities.abilities.aspect_of_the_monkey.name",
     "entities.abilities.commanding_shout.description",
@@ -57079,6 +57121,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.ifYouEquip"
   ],
   "zh_TW": [
+    "auth.devs",
+    "auth.devsTooltip",
     "entities.abilities.aspect_of_the_monkey.description",
     "entities.abilities.aspect_of_the_monkey.name",
     "entities.abilities.commanding_shout.description",
@@ -57133,6 +57177,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.ifYouEquip"
   ],
   "ko_KR": [
+    "auth.devs",
+    "auth.devsTooltip",
     "entities.abilities.aspect_of_the_monkey.description",
     "entities.abilities.aspect_of_the_monkey.name",
     "entities.abilities.commanding_shout.description",
@@ -57187,6 +57233,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.ifYouEquip"
   ],
   "ja_JP": [
+    "auth.devs",
+    "auth.devsTooltip",
     "entities.abilities.aspect_of_the_monkey.description",
     "entities.abilities.aspect_of_the_monkey.name",
     "entities.abilities.commanding_shout.description",
@@ -57241,6 +57289,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.ifYouEquip"
   ],
   "pt_BR": [
+    "auth.devs",
+    "auth.devsTooltip",
     "entities.abilities.aspect_of_the_monkey.description",
     "entities.abilities.aspect_of_the_monkey.name",
     "entities.abilities.commanding_shout.description",
@@ -57295,6 +57345,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.ifYouEquip"
   ],
   "ru_RU": [
+    "auth.devs",
+    "auth.devsTooltip",
     "entities.abilities.aspect_of_the_monkey.description",
     "entities.abilities.aspect_of_the_monkey.name",
     "entities.abilities.commanding_shout.description",
@@ -57592,7 +57644,9 @@ export const en_XA: EnTranslations = {
     "characterNamePlaceholder": "[Çĥáŕáçţéŕ ñáɱé]",
     "enterWorld": "[Éñţéŕ Ŵóŕļð]",
     "offlineCharacter": "[Óƒƒļíñé Çĥáŕáçţéŕ]",
-    "create": "[Çŕéáţé]"
+    "create": "[Çŕéáţé]",
+    "devs": "[Ðéʋš]",
+    "devsTooltip": "[Óþéñ ţĥé Ðéʋš þóŕţáļ — ýóúŕ ĜíţĤúƀ çóñţŕíƀúţíóñš ļéʋéļ úþ ýóúŕ çĥáŕáçţéŕ]"
   },
   "classes": {
     "warrior": "[Ŵáŕŕíóŕ]",
