@@ -19,6 +19,7 @@ import {
   hashPassword, verifyPassword, newToken, validUsernameShape, offensiveName, validPassword, normalizeCharName,
 } from './auth';
 import { json, readBody, isUniqueViolation } from './http_util';
+import { handleDevsApi } from './devs_api';
 import { requestIp, rateLimited, authThrottled, recordAuthFailure, clearAuthFailures } from './ratelimit';
 import { verifyTurnstile } from './turnstile';
 import { handleAdminApi } from './admin';
@@ -359,6 +360,11 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const token = newToken();
       await saveToken(token, account.id);
       return json(res, 200, { token, username: account.username });
+    }
+    if (url.startsWith('/api/devs/')) {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleDevsApi(url, req, res, accountId);
     }
     if (url === '/api/characters') {
       const accountId = await bearerActiveAccount(req, res);

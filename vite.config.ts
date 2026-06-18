@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -59,7 +60,10 @@ function linksAliasPlugin() {
 
 export default defineConfig({
   base: '/',
-  plugins: [linksAliasPlugin()],
+  // The Devs portal is a native React-in-Vite app (src/devs/**); the rest of the
+  // client is vanilla TS + Three.js. Scope the React transform to .tsx so the
+  // game entry is untouched.
+  plugins: [react({ include: '**/*.tsx' }), linksAliasPlugin()],
   define: {
     __APP_VERSION__: JSON.stringify(appVersion),
     __APP_BUILD_ID__: JSON.stringify(appBuildId.slice(0, 12)),

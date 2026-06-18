@@ -3413,21 +3413,22 @@ function wireStartScreens(): void {
     void loadNews();
   });
   setupNavBtn(navBtnDownload, '#download-view');
-  // Devs portal — the companion dashboard (GitHub contributions -> character
-  // progression + $WOC), embedded inside the platform shell rather than linked
-  // out to a separate site. Served same-origin at /devs by default (route that
-  // path to the deployed dashboard); override the location at runtime via
-  // window.__DEVS_PORTAL_URL__ for non-default hosting. The iframe is loaded
-  // lazily on first open so it costs nothing until a player visits the tab.
-  const DEVS_PORTAL_URL = (window as unknown as { __DEVS_PORTAL_URL__?: string }).__DEVS_PORTAL_URL__ ?? '/devs';
-  let devsPortalLoaded = false;
+  // Devs portal — a native React-in-Vite app (src/devs/**), part of this repo,
+  // that turns GitHub contributions into in-game progression + $WOC. It mounts
+  // into #devs-portal-root and talks to the WOC server's /api/devs/* routes with
+  // the player's session token. Dynamically imported on first open so React
+  // ships in its own chunk and costs nothing during normal play.
+  let devsPortalMounted = false;
   setupNavBtn(navBtnDevs, '#devs-view', () => {
-    if (!devsPortalLoaded) {
-      const frame = $('#devs-portal-frame') as HTMLIFrameElement | null;
-      if (frame && !frame.getAttribute('src')) frame.setAttribute('src', DEVS_PORTAL_URL);
-      devsPortalLoaded = true;
-    }
     switchMainView('#devs-view');
+    if (devsPortalMounted) return;
+    devsPortalMounted = true;
+    const root = $('#devs-portal-root');
+    if (root) {
+      void import('./devs/mount').then(({ mountDevsPortal }) => {
+        mountDevsPortal(root as HTMLElement, { getToken: () => api.token, base: api.base });
+      }).catch((err) => console.error('Devs portal failed to load:', err));
+    }
   });
   setupNavBtn(navBtnLogin, '#hero-view', () => {
     show('#login-panel');
