@@ -163,6 +163,9 @@ const DEFAULT_EMOTE_WHEEL: OverheadEmoteId[] = ['wave', 'laugh', 'question', 'ch
 // yards past a zone boundary before the crossing banner/welcome commits
 const ZONE_BANNER_DEADBAND = 5;
 const IGNORED_CHAT_NAMES_KEY = 'woc_ignored_chat_names';
+const BAGS_HEIGHT_KEY = 'woc_bags_height';
+const BAGS_MIN_HEIGHT = 112;
+const BAGS_VIEWPORT_MARGIN = 8;
 const BIND_CATEGORY_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   Movement: 'hud.keybinds.categories.movement',
   Targeting: 'hud.keybinds.categories.targeting',
@@ -358,6 +361,7 @@ export class Hud {
     this.meters = new Meters(sim);
     this.bindLogTabs();
     this.initWindowManagement();
+    this.restoreBagHeight();
     this.emoteWheelSlots = this.loadEmoteWheelSlots();
     this.loadSlotMap();
     this.buildActionBar();
@@ -679,6 +683,76 @@ export class Hud {
     el.style.right = 'auto';
     el.style.bottom = 'auto';
     el.style.transform = 'none';
+  }
+
+  private restoreBagHeight(): void {
+    let stored: number | null = null;
+    try {
+      const raw = localStorage.getItem(BAGS_HEIGHT_KEY);
+      if (raw !== null) stored = Number(raw);
+    } catch { /* storage unavailable */ }
+    if (stored === null || !Number.isFinite(stored) || stored <= 0) return;
+    this.applyBagHeight($('#bags'), stored);
+  }
+
+  private bagHeightBounds(el: HTMLElement): { min: number; max: number } {
+    const rect = el.getBoundingClientRect();
+    const bottom = rect.height > 0
+      ? Math.min(window.innerHeight - BAGS_VIEWPORT_MARGIN, rect.bottom)
+      : window.innerHeight - BAGS_VIEWPORT_MARGIN;
+    const max = Math.max(1, Math.round(bottom - BAGS_VIEWPORT_MARGIN));
+    return { min: Math.min(BAGS_MIN_HEIGHT, max), max };
+  }
+
+  private applyBagHeight(el: HTMLElement, height: number, persist = false): void {
+    const { min, max } = this.bagHeightBounds(el);
+    const clamped = Math.round(Math.max(min, Math.min(max, height)));
+    el.style.setProperty('--bags-user-height', `${clamped}px`);
+    el.classList.add('bag-user-sized');
+    if (persist) {
+      try { localStorage.setItem(BAGS_HEIGHT_KEY, String(clamped)); } catch { /* storage unavailable */ }
+    }
+  }
+
+  private bindBagResizeHandle(el: HTMLElement): void {
+    const handle = el.querySelector<HTMLElement>('.bag-resize-handle');
+    if (!handle) return;
+
+    let resize: { pointerId: number; startY: number; startHeight: number } | null = null;
+    const anchorBottom = () => {
+      const rect = el.getBoundingClientRect();
+      el.style.top = 'auto';
+      el.style.bottom = `${Math.max(BAGS_VIEWPORT_MARGIN, window.innerHeight - rect.bottom)}px`;
+      return rect;
+    };
+    const finishResize = (ev: PointerEvent) => {
+      if (!resize || resize.pointerId !== ev.pointerId) return;
+      resize = null;
+      el.classList.remove('bag-resizing');
+      try { handle.releasePointerCapture(ev.pointerId); } catch { /* capture already released */ }
+      const height = el.getBoundingClientRect().height;
+      this.applyBagHeight(el, height, true);
+    };
+
+    handle.addEventListener('pointerdown', (ev) => {
+      if (ev.button !== 0 || document.body.classList.contains('mobile-touch')) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      this.hideTooltip();
+      this.bringWindowToFront(el);
+      const rect = anchorBottom();
+      resize = { pointerId: ev.pointerId, startY: ev.clientY, startHeight: rect.height };
+      el.classList.add('bag-resizing');
+      handle.setPointerCapture(ev.pointerId);
+    });
+    handle.addEventListener('pointermove', (ev) => {
+      if (!resize || resize.pointerId !== ev.pointerId) return;
+      ev.preventDefault();
+      this.applyBagHeight(el, resize.startHeight - (ev.clientY - resize.startY));
+    });
+    handle.addEventListener('pointerup', finishResize);
+    handle.addEventListener('pointercancel', finishResize);
+    handle.addEventListener('lostpointercapture', finishResize);
   }
 
   private topmostOpenWindow(): HTMLElement | null {
@@ -3952,7 +4026,7 @@ export class Hud {
 
   toggleBags(): void {
     const el = $('#bags');
-    if (el.style.display !== 'none') { el.style.display = 'none'; this.hideTooltip(); audio.bagClose(); this.cancelPetFeed(); return; }
+    if (this.isWindowVisible(el)) { el.style.display = 'none'; this.hideTooltip(); audio.bagClose(); this.cancelPetFeed(); return; }
     this.closeOtherWindows('#bags');
     this.renderBags();
     el.style.display = 'flex';
@@ -3974,7 +4048,14 @@ export class Hud {
   renderBags(): void {
     const el = $('#bags');
     const sim = this.sim;
-    el.innerHTML = `<div class="panel-title"><span>${esc(t('itemUi.bags.title'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('itemUi.bags.close'))}">${svgIcon('close')}</button></div>`;
+    const previousGrid = el.querySelector<HTMLElement>('.bag-grid');
+    const previousScrollRange = previousGrid
+      ? Math.max(0, previousGrid.scrollHeight - previousGrid.clientHeight)
+      : 0;
+    const previousScrollProgress = previousGrid && previousScrollRange > 0
+      ? Math.min(1, Math.max(0, previousGrid.scrollTop / previousScrollRange))
+      : 0;
+    el.innerHTML = `<div class="bag-resize-handle" aria-hidden="true"></div><div class="panel-title"><span>${esc(t('itemUi.bags.title'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('itemUi.bags.close'))}">${svgIcon('close')}</button></div>`;
     const grid = document.createElement('div');
     grid.className = 'bag-grid';
     if (sim.inventory.length === 0) {
@@ -4054,6 +4135,9 @@ export class Hud {
     money.className = 'money';
     money.innerHTML = this.moneyHtml(sim.copper);
     el.appendChild(money);
+    const nextScrollRange = Math.max(0, grid.scrollHeight - grid.clientHeight);
+    grid.scrollTop = previousScrollProgress * nextScrollRange;
+    this.bindBagResizeHandle(el);
     el.querySelector('[data-close]')?.addEventListener('click', () => {
       if (this.vendorOpen && document.body.classList.contains('mobile-touch')) {
         this.closeVendor();

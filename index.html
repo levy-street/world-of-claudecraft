@@ -950,22 +950,48 @@
   .vendor-empty { padding: 5px; font-size: 11px; color: #887c5c; }
   .vendor-hint { font-size: 11px; color: #c8b888; margin-top: 8px; border-top: 1px solid #463a1c; padding-top: 6px; }
 
-  /* bags — centred in the bottom gap between the action cluster and micro-menu */
+  /* bags: center-right by default, then freely draggable and resizable */
   #bags {
-    --bags-bar-half: 306px;
-    --bags-gap: 12px;
-    --bags-micro-r: calc(16px + 34px + var(--bags-gap));
-    --bags-slot-w: max(180px, calc(100vw - 50% - var(--bags-bar-half) - var(--bags-gap) - var(--bags-micro-r)));
-    left: calc((100% + 50% + var(--bags-bar-half) + var(--bags-gap) - var(--bags-micro-r)) / 2);
+    left: 72%;
     right: auto;
-    bottom: 6px;
-    top: auto;
-    width: min(310px, var(--bags-slot-w));
-    transform: translateX(-50%);
-    max-height: calc(100vh - 18px);
+    top: 50%;
+    bottom: auto;
+    width: min(310px, calc(100vw - 32px));
+    height: min(300px, calc(100vh - 32px));
+    min-height: min(220px, calc(100vh - 32px));
+    transform: translate(-50%, -50%);
+    max-height: calc(100vh - 32px);
     overflow: hidden;
     flex-direction: column;
   }
+  #bags.bag-user-sized {
+    height: min(var(--bags-user-height), calc(100vh - 16px));
+    min-height: min(112px, calc(100vh - 16px));
+  }
+  #bags.bag-resizing { cursor: ns-resize; }
+  #bags .bag-resize-handle {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 48px;
+    height: 12px;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9a8250;
+    cursor: ns-resize;
+    touch-action: none;
+    z-index: 2;
+  }
+  #bags .bag-resize-handle::before {
+    content: "";
+    width: 26px;
+    height: 3px;
+    border-top: 1px solid currentColor;
+    border-bottom: 1px solid currentColor;
+  }
+  #bags .bag-resize-handle:hover { color: var(--gold); }
   #bags .panel-title { flex: none; }
   #bags .bag-grid { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
   #bags .money { flex: none; }
@@ -4420,6 +4446,8 @@
     bottom: calc(72px + env(safe-area-inset-bottom));
     width: auto;
     transform: none;
+    height: auto;
+    min-height: 0;
     max-height: none;
     box-sizing: border-box;
     overflow: hidden;
@@ -4427,6 +4455,9 @@
   }
   body.mobile-touch #bags .bag-grid {
     min-height: 150px;
+  }
+  body.mobile-touch #bags .bag-resize-handle {
+    display: none;
   }
   body.mobile-touch .vendor-item,
   body.mobile-touch .bag-item,

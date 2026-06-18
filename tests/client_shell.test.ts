@@ -71,6 +71,12 @@ describe('client HTML shell', () => {
     expect(html).toContain('body.mobile-touch.game-active *::-webkit-scrollbar:horizontal {\n    height: 0;\n    display: none;');
   });
 
+  it('preserves bag scroll progress when inventory updates redraw the list', () => {
+    expect(hudTs).toContain("const previousGrid = el.querySelector<HTMLElement>('.bag-grid');");
+    expect(hudTs).toContain('previousGrid.scrollTop / previousScrollRange');
+    expect(hudTs).toContain('grid.scrollTop = previousScrollProgress * nextScrollRange;');
+  });
+
   it('suppresses mobile in-game text selection and touch callouts without blocking inputs', () => {
     expect(html).toContain('body.mobile-touch.game-active #mobile-controls *,\n  body.mobile-touch.game-active #bottom-bar,');
     expect(html).toContain('body.mobile-touch.game-active .mobile-btn {\n    user-select: none;\n    -webkit-user-select: none;\n    -webkit-touch-callout: none;');
@@ -293,6 +299,13 @@ describe('client HTML shell', () => {
     expect(html).toContain('body.mobile-touch #bags .bag-grid {\n    min-height: 150px;');
     expect(html).not.toContain('body.mobile-touch #bags {\n    position: fixed;\n    left: 10px;\n    right: 10px;\n    bottom: 10px;');
     expect(html).not.toContain('max-height: calc(38vh - 20px);');
+  });
+
+  it('opens desktop Bags at a useful center-right size', () => {
+    expect(html).toContain('left: 72%;\n    right: auto;\n    top: 50%;\n    bottom: auto;');
+    expect(html).toContain('height: min(300px, calc(100vh - 32px));');
+    expect(html).toContain('min-height: min(220px, calc(100vh - 32px));');
+    expect(html).toContain('transform: translate(-50%, -50%);');
   });
 
   it('combines Trader and Bags into a mobile split-pane modal', () => {
