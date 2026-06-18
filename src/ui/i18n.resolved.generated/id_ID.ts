@@ -1528,6 +1528,7 @@ export const id_ID: EnTranslations = {
     "wiki": "Wiki",
     "news": "Berita",
     "download": "Unduh",
+    "devs": "Devs",
     "loginRegister": "Masuk/Daftar",
     "account": "Akun",
     "logout": "Keluar",
@@ -1574,6 +1575,9 @@ export const id_ID: EnTranslations = {
   "download": {
     "title": "Unduh Peluncur Desktop",
     "desc": "Dapatkan peluncur mandiri untuk performa optimal dan permainan layar penuh."
+  },
+  "devs": {
+    "loading": "Loading the Devs portal…"
   },
   "comingSoon": {
     "placeholder": "Segera Hadir...",

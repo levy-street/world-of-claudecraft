@@ -118,6 +118,7 @@ export const en = {
     wiki: 'Wiki',
     news: 'News',
     download: 'Download',
+    devs: 'Devs',
     loginRegister: 'Login/Register',
     account: 'Account',
     logout: 'Logout',
@@ -164,6 +165,9 @@ export const en = {
   download: {
     title: 'Download Desktop Launcher',
     desc: 'Get the standalone launcher for optimized performance and full-screen play.',
+  },
+  devs: {
+    loading: 'Loading the Devs portal…',
   },
   comingSoon: {
     placeholder: 'Coming Soon...',

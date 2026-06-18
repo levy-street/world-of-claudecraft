@@ -1528,6 +1528,7 @@ export const ru_RU: EnTranslations = {
     "wiki": "Вики",
     "news": "Новости",
     "download": "Скачать",
+    "devs": "Devs",
     "loginRegister": "Войти / Зарегистрироваться",
     "account": "Аккаунт",
     "logout": "Выйти",
@@ -1574,6 +1575,9 @@ export const ru_RU: EnTranslations = {
   "download": {
     "title": "Скачать загрузчик для ПК",
     "desc": "Загрузите отдельный клиент для оптимальной производительности и игры на весь экран."
+  },
+  "devs": {
+    "loading": "Loading the Devs portal…"
   },
   "comingSoon": {
     "placeholder": "Скоро...",

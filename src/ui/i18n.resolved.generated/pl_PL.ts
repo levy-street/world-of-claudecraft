@@ -1528,6 +1528,7 @@ export const pl_PL: EnTranslations = {
     "wiki": "Wiki",
     "news": "Aktualności",
     "download": "Pobierz",
+    "devs": "Devs",
     "loginRegister": "Zaloguj/Zarejestruj",
     "account": "Konto",
     "logout": "Wyloguj",
@@ -1574,6 +1575,9 @@ export const pl_PL: EnTranslations = {
   "download": {
     "title": "Pobierz launcher na komputer",
     "desc": "Pobierz samodzielny launcher dla zoptymalizowanej wydajności i gry na pełnym ekranie."
+  },
+  "devs": {
+    "loading": "Loading the Devs portal…"
   },
   "comingSoon": {
     "placeholder": "Już wkrótce...",

@@ -1528,6 +1528,7 @@ export const nl_NL: EnTranslations = {
     "wiki": "Wiki",
     "news": "Nieuws",
     "download": "Downloaden",
+    "devs": "Devs",
     "loginRegister": "Inloggen/Registreren",
     "account": "Account",
     "logout": "Uitloggen",
@@ -1574,6 +1575,9 @@ export const nl_NL: EnTranslations = {
   "download": {
     "title": "Desktop-launcher downloaden",
     "desc": "Download de losse launcher voor optimale prestaties en schermvullend spelen."
+  },
+  "devs": {
+    "loading": "Loading the Devs portal…"
   },
   "comingSoon": {
     "placeholder": "Binnenkort beschikbaar...",

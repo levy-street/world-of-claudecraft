@@ -2574,7 +2574,14 @@ const hoverTimeouts: Record<string, number | null> = {
 };
 
 function switchMainView(targetId: string): void {
-  const views = ['#hero-view', '#highscores-view', '#news-view', '#download-view', '#account-view'];
+  const views = [
+    '#hero-view',
+    '#highscores-view',
+    '#news-view',
+    '#download-view',
+    '#devs-view',
+    '#account-view',
+  ];
   const currentViewId = views.find((id) => {
     const el = $(id);
     return el && !el.hasAttribute('hidden');
@@ -2587,6 +2594,7 @@ function switchMainView(targetId: string): void {
     '#highscores-view': 'nav-btn-highscores',
     '#news-view': 'nav-btn-news',
     '#download-view': 'nav-btn-download',
+    '#devs-view': 'nav-btn-devs',
     '#account-view': 'nav-btn-account',
   };
 
@@ -6050,6 +6058,7 @@ function wireStartScreens(): void {
   const navBtnWiki = $('#nav-btn-wiki');
   const navBtnNews = $('#nav-btn-news');
   const navBtnDownload = $('#nav-btn-download');
+  const navBtnDevs = $('#nav-btn-devs');
   const navBtnLogin = $('#nav-btn-login');
 
   const deleteConfirmInput = $('#delete-character-confirm') as HTMLInputElement;
@@ -6142,6 +6151,22 @@ function wireStartScreens(): void {
     void loadNews();
   });
   setupNavBtn(navBtnDownload, '#download-view');
+  // Devs portal — the companion dashboard (GitHub contributions -> character
+  // progression + $WOC), embedded inside the platform shell rather than linked
+  // out to a separate site. Served same-origin at /devs by default (route that
+  // path to the deployed dashboard); override the location at runtime via
+  // window.__DEVS_PORTAL_URL__ for non-default hosting. The iframe is loaded
+  // lazily on first open so it costs nothing until a player visits the tab.
+  const DEVS_PORTAL_URL = (window as unknown as { __DEVS_PORTAL_URL__?: string }).__DEVS_PORTAL_URL__ ?? '/devs';
+  let devsPortalLoaded = false;
+  setupNavBtn(navBtnDevs, '#devs-view', () => {
+    if (!devsPortalLoaded) {
+      const frame = $('#devs-portal-frame') as HTMLIFrameElement | null;
+      if (frame && !frame.getAttribute('src')) frame.setAttribute('src', DEVS_PORTAL_URL);
+      devsPortalLoaded = true;
+    }
+    switchMainView('#devs-view');
+  });
   setupNavBtn(navBtnLogin, '#hero-view', () => {
     show('#login-panel');
   });

@@ -1528,6 +1528,7 @@ export const zh_CN: EnTranslations = {
     "wiki": "百科指南",
     "news": "新闻资讯",
     "download": "下载客户端",
+    "devs": "Devs",
     "loginRegister": "登录/注册",
     "account": "账户",
     "logout": "退出登录",
@@ -1574,6 +1575,9 @@ export const zh_CN: EnTranslations = {
   "download": {
     "title": "下载电脑版启动器",
     "desc": "获取独立启动器，以获得更优化的性能和全屏游戏体验。"
+  },
+  "devs": {
+    "loading": "Loading the Devs portal…"
   },
   "comingSoon": {
     "placeholder": "敬请期待...",

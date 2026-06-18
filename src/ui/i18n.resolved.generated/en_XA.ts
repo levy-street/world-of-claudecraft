@@ -1528,6 +1528,7 @@ export const en_XA: EnTranslations = {
     "wiki": "[Ŵíķí]",
     "news": "[Ñéŵš]",
     "download": "[Ðóŵñļóáð]",
+    "devs": "[Ðéʋš]",
     "loginRegister": "[Ļóĝíñ/Ŕéĝíšţéŕ]",
     "account": "[Áççóúñţ]",
     "logout": "[Ļóĝóúţ]",
@@ -1574,6 +1575,9 @@ export const en_XA: EnTranslations = {
   "download": {
     "title": "[Ðóŵñļóáð Ðéšķţóþ Ļáúñçĥéŕ]",
     "desc": "[Ĝéţ ţĥé šţáñðáļóñé ļáúñçĥéŕ ƒóŕ óþţíɱížéð þéŕƒóŕɱáñçé áñð ƒúļļ-šçŕééñ þļáý.]"
+  },
+  "devs": {
+    "loading": "[Ļóáðíñĝ ţĥé Ðéʋš þóŕţáļ…]"
   },
   "comingSoon": {
     "placeholder": "[Çóɱíñĝ Šóóñ...]",

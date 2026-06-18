@@ -1528,6 +1528,7 @@ export const tr_TR: EnTranslations = {
     "wiki": "Wiki",
     "news": "Haberler",
     "download": "İndir",
+    "devs": "Devs",
     "loginRegister": "Giriş/Kayıt",
     "account": "Hesap",
     "logout": "Çıkış Yap",
@@ -1574,6 +1575,9 @@ export const tr_TR: EnTranslations = {
   "download": {
     "title": "Masaüstü Başlatıcısını İndir",
     "desc": "Optimize edilmiş performans ve tam ekran oyun için bağımsız başlatıcıyı edinin."
+  },
+  "devs": {
+    "loading": "Loading the Devs portal…"
   },
   "comingSoon": {
     "placeholder": "Yakında...",

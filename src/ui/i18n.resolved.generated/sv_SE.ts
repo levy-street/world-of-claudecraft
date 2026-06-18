@@ -1528,6 +1528,7 @@ export const sv_SE: EnTranslations = {
     "wiki": "Wiki",
     "news": "Nyheter",
     "download": "Ladda ner",
+    "devs": "Devs",
     "loginRegister": "Logga in/Registrera",
     "account": "Konto",
     "logout": "Logga ut",
@@ -1574,6 +1575,9 @@ export const sv_SE: EnTranslations = {
   "download": {
     "title": "Ladda ner skrivbordsstartaren",
     "desc": "Hämta den fristående startaren för optimerad prestanda och spel i helskärm."
+  },
+  "devs": {
+    "loading": "Loading the Devs portal…"
   },
   "comingSoon": {
     "placeholder": "Kommer snart...",

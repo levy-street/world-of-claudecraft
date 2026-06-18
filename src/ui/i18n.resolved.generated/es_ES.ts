@@ -1528,6 +1528,7 @@ export const es_ES: EnTranslations = {
     "wiki": "Wiki",
     "news": "Noticias",
     "download": "Descargar",
+    "devs": "Devs",
     "loginRegister": "Iniciar sesión/Registrarse",
     "account": "Cuenta",
     "logout": "Cerrar sesión",
@@ -1574,6 +1575,9 @@ export const es_ES: EnTranslations = {
   "download": {
     "title": "Descargar lanzador de escritorio",
     "desc": "Consigue el lanzador independiente para un rendimiento optimizado y juego a pantalla completa."
+  },
+  "devs": {
+    "loading": "Loading the Devs portal…"
   },
   "comingSoon": {
     "placeholder": "Próximamente...",

@@ -1528,6 +1528,7 @@ export const zh_TW: EnTranslations = {
     "wiki": "百科指南",
     "news": "最新消息",
     "download": "下載客戶端",
+    "devs": "Devs",
     "loginRegister": "登入/註冊",
     "account": "帳號",
     "logout": "登出",
@@ -1574,6 +1575,9 @@ export const zh_TW: EnTranslations = {
   "download": {
     "title": "下載電腦版啟動器",
     "desc": "獲取獨立啟動器，以獲得更優化的效能和全螢幕遊戲體驗。"
+  },
+  "devs": {
+    "loading": "Loading the Devs portal…"
   },
   "comingSoon": {
     "placeholder": "敬請期待...",

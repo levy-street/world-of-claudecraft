@@ -765,6 +765,44 @@
     transform: translateY(8px);
   }
 
+  /* Devs portal - the companion dashboard embedded inside the platform shell. */
+  #devs-view {
+    padding: 0 16px 24px;
+  }
+  .devs-portal-shell {
+    position: relative;
+    width: 100%;
+    max-width: min(1400px, 96vw);
+    margin: 0 auto;
+    height: min(82vh, 1100px);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(245, 197, 66, 0.28);
+    background: #0b0b12;
+    box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.55);
+  }
+  .devs-portal-frame {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+    background: transparent;
+  }
+  .devs-portal-loading {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #cbb46a;
+    font-family: var(--title-font, serif);
+    letter-spacing: 0.06em;
+    font-size: 15px;
+  }
+
   /* Account portal (logged-in "Account" nav tab) */
   .account-portal {
     width: 100%;

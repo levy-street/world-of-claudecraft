@@ -1528,6 +1528,7 @@ export const vi_VN: EnTranslations = {
     "wiki": "Wiki",
     "news": "Tin Tức",
     "download": "Tải Về",
+    "devs": "Devs",
     "loginRegister": "Đăng Nhập/Đăng Ký",
     "account": "Tài Khoản",
     "logout": "Đăng Xuất",
@@ -1574,6 +1575,9 @@ export const vi_VN: EnTranslations = {
   "download": {
     "title": "Tải Trình Khởi Chạy Trên Máy Tính",
     "desc": "Tải trình khởi chạy độc lập để có hiệu năng tối ưu và chơi toàn màn hình."
+  },
+  "devs": {
+    "loading": "Loading the Devs portal…"
   },
   "comingSoon": {
     "placeholder": "Sắp Ra Mắt...",
