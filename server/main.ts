@@ -40,6 +40,7 @@ import {
 } from './auth';
 import { BUG_DESCRIPTION_MAX, BugReportRateLimitError, createBugReport } from './bug_report_db';
 import { characterSheet, type SheetRank } from './character_sheet';
+import { handleDevsApi } from './devs_api';
 import {
   accountAndScopeForToken,
   accountById,
@@ -736,6 +737,11 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const accountId = await bearerReadAccount(req, res);
       if (accountId === null) return;
       return json(res, 200, characterListPayload(await listCharacters(accountId)));
+    }
+    if (url.startsWith('/api/devs/')) {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleDevsApi(url, req, res, accountId);
     }
     if (url === '/api/characters') {
       const accountId = await bearerActiveAccount(req, res);

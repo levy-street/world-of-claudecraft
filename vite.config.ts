@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { svelteTesting } from '@testing-library/svelte/vite';
+import react from '@vitejs/plugin-react';
 import { browserslistToTargets } from 'lightningcss';
 import { defineConfig } from 'vite';
 import { loadBrowserslistFloors } from './scripts/browserslist_targets.mjs';
@@ -154,8 +155,12 @@ function i18nModulepreloadPlugin() {
 export default defineConfig({
   base: '/',
   // The Svelte plugin only transforms the standalone admin entry. The testing
-  // plugin is scoped to Vitest so it cannot affect production client builds.
+  // plugin is scoped to Vitest so it cannot affect production client builds. The
+  // Devs portal is a native React-in-Vite app (src/devs/**); the rest of the
+  // client is vanilla TS + Three.js, so the React transform is scoped to .tsx to
+  // leave the game entry untouched.
   plugins: [
+    react({ include: '**/*.tsx' }),
     svelte(),
     ...(process.env.VITEST ? [svelteTesting()] : []),
     staticPageAliasPlugin(),

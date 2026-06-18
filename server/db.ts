@@ -415,6 +415,21 @@ CREATE TABLE IF NOT EXISTS referrals (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS referrals_referrer ON referrals(referrer_account_id);
+-- Devs portal: link a GitHub identity (contributions -> in-game progression) and
+-- a Solana wallet (for $WOC balance / rewards) to a player account.
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS github_username TEXT;
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS solana_address TEXT;
+-- Cached contribution score per linked account, refreshed when a player loads
+-- their Devs profile. Lets the leaderboard rank without re-hitting GitHub.
+CREATE TABLE IF NOT EXISTS devs_contribution_score (
+  account_id INT PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,
+  github_username TEXT NOT NULL,
+  points INT NOT NULL DEFAULT 0,
+  level INT NOT NULL DEFAULT 1,
+  prs_merged INT NOT NULL DEFAULT 0,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS devs_contribution_score_points ON devs_contribution_score(points DESC);
 `;
 
 export async function ensureSchema(): Promise<void> {
