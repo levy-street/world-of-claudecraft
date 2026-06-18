@@ -1521,6 +1521,12 @@ async function main(): Promise<void> {
     }
     const session = result;
     console.log(`+ ${character.name} (${character.class}) joined — ${game.clients.size} online`);
+    // Award any out-of-game XP grants (Devs-portal contribution rewards) through
+    // the sim now that the character is loaded. Best-effort + non-blocking: a DB
+    // hiccup here must never break the player's join.
+    void game.applyPendingXpGrants(character.id, session.pid)
+      .then((xp) => { if (xp > 0) console.log(`  ↳ applied ${xp} contribution XP to ${character.name}`); })
+      .catch((err) => console.error('failed to apply character grants:', err));
     ws.on('message', (data) => {
       game.handleMessage(session, String(data));
     });

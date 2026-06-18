@@ -189,6 +189,16 @@ export function rewardsEnabled(): boolean {
   return rewardRateBaseUnits() > ZERO && process.env.SOLANA_TREASURY_KEYPAIR != null;
 }
 
+// The keystone: GitHub contributions level up your in-game character. Each
+// contribution point grants this much character XP (configurable; default 25).
+export function xpPerPoint(): number {
+  const n = Number(process.env.DEVS_XP_PER_POINT?.trim());
+  return Number.isFinite(n) && n > 0 ? Math.trunc(n) : 25;
+}
+export function contributionXpFor(points: number): number {
+  return Math.max(0, Math.trunc(points)) * xpPerPoint();
+}
+
 export function computeClaimable(points: number, claimedBaseUnits: bigint): bigint {
   const earned = BigInt(Math.max(0, Math.trunc(points))) * rewardRateBaseUnits();
   const claimable = earned - claimedBaseUnits;

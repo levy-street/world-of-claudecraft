@@ -44,6 +44,7 @@ import {
   saveCharacterAndMarketState,
   saveCharacterState,
   saveMarketState,
+  takePendingXpGrants,
   walletForAccount,
 } from './db';
 import { IpBlockList } from './ip_block';
@@ -1200,6 +1201,18 @@ export class GameServer {
       console.error('holder-tier refresh failed:', err),
     );
     return session;
+  }
+
+  // Apply any out-of-game XP grants (e.g. Devs-portal contribution rewards) to a
+  // freshly-joined character through the sim's own grantXp, so leveling, XP
+  // overflow, and rested XP behave exactly like in-game XP. Returns XP awarded.
+  async applyPendingXpGrants(characterId: number, pid: number): Promise<number> {
+    const total = await takePendingXpGrants(characterId);
+    if (total > 0) {
+      const meta = this.sim.meta(pid);
+      if (meta) this.sim.grantXp(total, meta);
+    }
+    return total;
   }
 
   // Load the player's block list, send their friends/ignore/guild panel, and

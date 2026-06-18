@@ -32,6 +32,7 @@ export interface DevsProfile {
   contribution: ContributionScore | { error: string } | null;
   woc: WocBalance | { error: string; address: string } | null;
   rewards: RewardsInfo;
+  characterXp: { perPoint: number; total: number; justGranted: number };
 }
 
 export interface RewardsInfo {
