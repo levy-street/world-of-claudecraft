@@ -66,6 +66,17 @@ player adds it to their GitHub **bio**, `verify` reads the public profile via th
 GitHub API and confirms the code. Only **verified** links earn points / board
 spots, and a handle can be verified by exactly one account (first to prove wins).
 
+### Contributions → character XP (the keystone)
+
+Each contribution point grants `DEVS_XP_PER_POINT` of **real in-game character
+XP**. When a verified contributor loads their profile, the portal writes the
+*delta* since last time to `character_grants` (idempotent via a `granted_xp`
+ledger), targeting their lead character. The game server applies pending grants
+**on character load** through the sim's own `grantXp()` — so leveling, XP
+overflow, and rested XP behave exactly like in-game XP — and stamps them applied
+in a row-locked step so they never double-apply. Grants are never written to
+`characters.state` directly while a player is online (the sim owns it).
+
 ### $WOC rewards (GATED — real money)
 
 `claimable = contribution_points × WOC_REWARD_RATE_BASE_UNITS − already_claimed`.
@@ -82,6 +93,7 @@ unless both a treasury keypair and a positive rate are configured.
 |---|---|---|
 | `DEVS_GITHUB_REPO` | `levy-street/world-of-claudecraft` | Repo whose contributions count. |
 | `GITHUB_TOKEN` | — | Lifts GitHub API rate limits (recommended; unauthenticated search is throttled). |
+| `DEVS_XP_PER_POINT` | `25` | In-game character XP granted per contribution point. |
 | `WOC_MINT` | `3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth` | $WOC mint (Token-2022, 6 decimals). |
 | `SOLANA_RPC_URL` | mainnet-beta | RPC for balance reads + transfers. |
 | `WOC_REWARD_RATE_BASE_UNITS` | `0` (off) | Base units of $WOC per contribution point. |
