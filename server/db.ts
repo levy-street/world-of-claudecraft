@@ -183,6 +183,32 @@ CREATE TABLE IF NOT EXISTS wallet_link_challenges (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS wallet_link_challenges_account ON wallet_link_challenges(account_id);
+-- Shareable player cards (docs/prd/woc/player-card.md). One card per character;
+-- the PNG is composited client-side and stored here as bytes so any realm
+-- process (all share this database) can serve /p/<slug> and the OG image. slug
+-- is globally unique and is the public, referral-friendly handle.
+CREATE TABLE IF NOT EXISTS player_cards (
+  character_id INT PRIMARY KEY REFERENCES characters(id) ON DELETE CASCADE,
+  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  slug TEXT NOT NULL UNIQUE,
+  png BYTEA NOT NULL,
+  title TEXT NOT NULL DEFAULT '',
+  description TEXT NOT NULL DEFAULT '',
+  realm TEXT NOT NULL DEFAULT '${REALM_SQL_DEFAULT}',
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS player_cards_account ON player_cards(account_id);
+-- Referral capture: when a new account registers via someone's card link
+-- (?ref=<slug>) we record who referred whom, once per referee. Reward payout is
+-- intentionally out of scope here — this just captures the relationship so it
+-- can be synced to rewards later.
+CREATE TABLE IF NOT EXISTS referrals (
+  referee_account_id INT PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,
+  referrer_account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  slug TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS referrals_referrer ON referrals(referrer_account_id);
 `;
 
 export async function ensureSchema(): Promise<void> {
@@ -359,6 +385,96 @@ export async function linkWalletToAccount(accountId: number, pubkey: string): Pr
 
 export async function unlinkWallet(accountId: number): Promise<void> {
   await pool.query('DELETE FROM wallet_links WHERE account_id = $1', [accountId]);
+}
+
+// ── Shareable player cards + referrals ─────────────────────────────────────
+
+export interface PlayerCardRow {
+  characterId: number;
+  accountId: number;
+  png: Buffer;
+  title: string;
+  description: string;
+}
+
+// True when `slug` is free, or already owned by `exceptCharacterId` (so a
+// character can re-publish under its own existing slug). Lets the handler pick a
+// collision-free slug before the upsert.
+export async function slugAvailable(slug: string, exceptCharacterId: number): Promise<boolean> {
+  const res = await pool.query('SELECT character_id FROM player_cards WHERE slug = $1', [slug]);
+  const owner = res.rows[0]?.character_id;
+  return owner === undefined || owner === exceptCharacterId;
+}
+
+export async function upsertPlayerCard(card: {
+  characterId: number;
+  accountId: number;
+  slug: string;
+  png: Buffer;
+  title: string;
+  description: string;
+}): Promise<void> {
+  await pool.query(
+    `INSERT INTO player_cards (character_id, account_id, slug, png, title, description, realm, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, now())
+     ON CONFLICT (character_id)
+     DO UPDATE SET slug = EXCLUDED.slug, png = EXCLUDED.png, title = EXCLUDED.title,
+                   description = EXCLUDED.description, updated_at = now()`,
+    [card.characterId, card.accountId, card.slug, card.png, card.title, card.description, REALM],
+  );
+}
+
+export async function getPlayerCardBySlug(slug: string): Promise<PlayerCardRow | null> {
+  const res = await pool.query(
+    'SELECT character_id, account_id, png, title, description FROM player_cards WHERE slug = $1',
+    [slug],
+  );
+  const row = res.rows[0];
+  if (!row) return null;
+  return {
+    characterId: Number(row.character_id),
+    accountId: Number(row.account_id),
+    png: row.png as Buffer,
+    title: row.title ?? '',
+    description: row.description ?? '',
+  };
+}
+
+// The account that owns a card slug — i.e. the referrer credited when someone
+// signs up through their link.
+export async function accountForSlug(slug: string): Promise<number | null> {
+  const res = await pool.query('SELECT account_id FROM player_cards WHERE slug = $1', [slug]);
+  return res.rows[0]?.account_id ?? null;
+}
+
+// Record that `referee` joined via `referrer`'s `slug`. Idempotent: only the
+// first referral for a given referee is kept (PK on referee_account_id).
+export async function recordReferral(refereeAccountId: number, referrerAccountId: number, slug: string): Promise<void> {
+  await pool.query(
+    `INSERT INTO referrals (referee_account_id, referrer_account_id, slug)
+     VALUES ($1, $2, $3)
+     ON CONFLICT (referee_account_id) DO NOTHING`,
+    [refereeAccountId, referrerAccountId, slug],
+  );
+}
+
+export async function referralCountForAccount(accountId: number): Promise<number> {
+  const res = await pool.query(
+    'SELECT count(*)::int AS n FROM referrals WHERE referrer_account_id = $1',
+    [accountId],
+  );
+  return res.rows[0]?.n ?? 0;
+}
+
+// This account's published-card slug, if any (one slug per card; an account can
+// have several characters, so return the most recently updated card's slug for
+// referral display).
+export async function primarySlugForAccount(accountId: number): Promise<string | null> {
+  const res = await pool.query(
+    'SELECT slug FROM player_cards WHERE account_id = $1 ORDER BY updated_at DESC LIMIT 1',
+    [accountId],
+  );
+  return res.rows[0]?.slug ?? null;
 }
 
 export async function moderationStatusForAccount(accountId: number): Promise<AccountModerationStatus> {

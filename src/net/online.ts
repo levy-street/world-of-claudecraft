@@ -124,8 +124,8 @@ export class Api {
     return data;
   }
 
-  async register(username: string, password: string, turnstileToken = ''): Promise<void> {
-    const data = await this.post('/api/register', { username, password, turnstileToken });
+  async register(username: string, password: string, turnstileToken = '', ref = ''): Promise<void> {
+    const data = await this.post('/api/register', { username, password, turnstileToken, ref });
     this.token = data.token;
     this.username = data.username;
   }
@@ -195,6 +195,35 @@ export class Api {
 
   async unlinkWallet(): Promise<void> {
     await this.delete('/api/wallet/link', {});
+  }
+
+  // ── Shareable player card + referrals ──────────────────────────────────────
+  // Publish (or replace) this character's card PNG; returns the public page path
+  // and the referral slug. The body is the raw PNG, so this bypasses the JSON
+  // `post` helper.
+  async uploadCard(characterId: number, png: Blob): Promise<{ url: string; ref: string }> {
+    const res = await fetch(`${this.base}/api/card?character=${characterId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'image/png',
+        ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}),
+      },
+      body: png,
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error ?? `card upload failed (${res.status})`);
+    return { url: data.url, ref: data.ref };
+  }
+
+  // The account's referral count + published-card slug (null before first
+  // publish). Best-effort: returns zeros rather than throwing on error.
+  async referralStats(): Promise<{ count: number; slug: string | null }> {
+    try {
+      const data = await this.get('/api/referrals');
+      return { count: data.count ?? 0, slug: data.slug ?? null };
+    } catch {
+      return { count: 0, slug: null };
+    }
   }
 }
 

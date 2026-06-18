@@ -7,6 +7,7 @@ import {
   listCharacters, getCharacter, createCharacterCapped, deleteCharacter, closeOrphanSessions,
   pruneChatLogs, searchCharacters, characterCountsByRealm, moderationStatusForAccount, renameCharacter,
   findCharacterReportTargetByName, topArenaRatings, topLifetimeXp, chatMuteStatusForAccount,
+  referralCountForAccount, primarySlugForAccount,
 } from './db';
 import { virtualLevel } from '../src/sim/types';
 import { Sim } from '../src/sim/sim';
@@ -22,6 +23,7 @@ import { json, readBody, isUniqueViolation } from './http_util';
 import { requestIp, rateLimited, authThrottled, recordAuthFailure, clearAuthFailures } from './ratelimit';
 import { verifyTurnstile } from './turnstile';
 import { handleWalletChallenge, handleWalletLink, handleWalletGet, handleWalletUnlink } from './wallet';
+import { handleCardUpload, handleCardRoutes, captureReferral } from './player_card';
 import { handleAdminApi } from './admin';
 import { GameServer } from './game';
 import { REALM, REALM_DIRECTORY, REALM_ORIGINS } from './realm';
@@ -252,6 +254,9 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         username: account.username,
         ...requestMetadata(req),
       }).catch((err) => console.error('suspicious registration report failed:', err));
+      // Capture the referral when this account signed up via a card link
+      // (?ref=<slug>). Best-effort: never block or fail registration on it.
+      void captureReferral(account.id, body.ref).catch((err) => console.error('referral capture failed:', err));
       return json(res, 200, { token, username: account.username });
     }
     if (req.method === 'POST' && url === '/api/login') {
@@ -450,6 +455,21 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       if (accountId === null) return;
       return handleWalletGet(req, res, accountId);
     }
+    // Shareable player card: publish (PNG body) + referral stats for the card.
+    if (req.method === 'POST' && url === '/api/card') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleCardUpload(req, res, accountId);
+    }
+    if (req.method === 'GET' && url === '/api/referrals') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      const [count, slug] = await Promise.all([
+        referralCountForAccount(accountId),
+        primarySlugForAccount(accountId),
+      ]);
+      return json(res, 200, { count, slug });
+    }
     json(res, 404, { error: 'unknown endpoint' });
   } catch (err: any) {
     console.error('api error:', err);
@@ -500,6 +520,7 @@ async function main(): Promise<void> {
     if (req.method === 'OPTIONS' && isApi) { res.writeHead(204); res.end(); return; }
     if (url.startsWith('/admin/api/')) void handleAdminApi(req, res, game);
     else if (url.startsWith('/api/')) void handleApi(req, res);
+    else if (req.method === 'GET' && url.startsWith('/p/')) void handleCardRoutes(req, res);
     else serveStatic(req, res);
   });
 
