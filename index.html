@@ -137,8 +137,9 @@
     --scrollbar-track: rgba(10, 10, 15, 0.7);
     --scrollbar-thumb-hover: #7c6233;
     --scrollbar-border: #7c6233;
-    --app-vw: 100vw;
-    --app-vh: 100vh;
+    /* Default 100% (not 100vw): first paint before JS viewport sync must not overflow right on mobile, where 100vw excludes scrollbar/safe-area. Overwritten with exact px once main.ts boots. */
+    --app-vw: 100%;
+    --app-vh: 100%;
     /* Shared with src/game/cursors.ts — keep hotspots in sync. */
     --cursor-hand: url('./ui/cursors/hand-default.png') 12 2, default;
     --cursor-sword: url('./ui/cursors/attack-sword.png') 4 4, pointer;
