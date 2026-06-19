@@ -43,7 +43,7 @@ import { svgIcon } from './ui_icons';
 import { walletUiEnabled, wocBalance, onWalletUiChange } from './wallet_balance';
 import { renderPlayerCardCanvas, cardCanvasToBlob, CARD_POSES, type PlayerCardData, type PlayerCardStat } from './player_card';
 import { cardHostingAvailable, publishCard, fetchReferralInfo, fetchStanding, type PublishedCard, type CharacterStanding } from './player_card_share';
-import { holderTierForBalance } from './holder_tier';
+import { holderTierForBalance, HOLDER_TIERS, holderTierBadgeDataUrl } from './holder_tier';
 import { Keybinds, BIND_ACTIONS, BIND_CATEGORIES, isReservedCode, keyLabel } from '../game/keybinds';
 import { Settings, GameSettings, BoolSettingKey, NumericSettingKey, SETTING_RANGES, clickMoveButtonLabel, normalizeClickMoveButton } from '../game/settings';
 import { isPhoneTouchDevice } from '../game/mobile_controls';
@@ -6966,6 +6966,16 @@ export class Hud {
     const className = classDisplayName(cls);
     const el = $('#inspect-window');
     this.closeOtherWindows('#inspect-window');
+    // $WOC holder-tier flair — cosmetic badge for a connected/holder wallet,
+    // broadcast per-entity via the `ht` identity field (server-set). Shown only
+    // when the inspected player has a tier (> 0).
+    const tierDef = (e.holderTier ?? 0) > 0 ? HOLDER_TIERS.find((tt) => tt.index === e.holderTier) : undefined;
+    const holderHtml = tierDef
+      ? `<div class="inspect-holder">` +
+        `<img class="inspect-holder-badge" src="${holderTierBadgeDataUrl(tierDef)}" alt="" draggable="false">` +
+        `<div class="inspect-holder-name">${esc(tierDef.name)} <span class="inspect-holder-sub">$WOC holder</span></div>` +
+        `</div>`
+      : '';
     el.innerHTML =
       `<div class="panel-title"><span>${esc(t('character.profile'))}</span>` +
       `<button type="button" class="x-btn" data-close aria-label="${esc(t('character.closeProfile'))}">${svgIcon('close')}</button></div>` +
@@ -6973,6 +6983,7 @@ export class Hud {
       portraitChipHtml({ cls, skin: e.skin ?? 0, name: e.name, variant: 'lg' }) +
       `<div class="inspect-name">${esc(e.name)}</div>` +
       `<div class="inspect-meta">${esc(t('itemUi.equipment.levelClass', { level: formatNumber(e.level, { maximumFractionDigits: 0 }), className }))}</div>` +
+      holderHtml +
       `</div>`;
     hydratePortraits(el);
     el.querySelector('[data-close]')?.addEventListener('click', () => { el.style.display = 'none'; });

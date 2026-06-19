@@ -6369,6 +6369,13 @@
   .inspect-card .portrait-chip { width: 132px; height: 132px; }
   .inspect-name { font-family: var(--title-font); font-size: 20px; color: #f0ead8; }
   .inspect-meta { font-size: 13px; color: var(--color-text-muted); }
+  /* $WOC holder-tier flair badge in the inspect/profile window */
+  .inspect-holder { display: inline-flex; align-items: center; gap: 8px; margin-top: 6px;
+    padding: 5px 12px 5px 6px; border: 1px solid var(--color-border-default);
+    border-radius: 999px; background: rgba(11, 11, 18, 0.55); }
+  .inspect-holder-badge { width: 30px; height: 30px; display: block; filter: drop-shadow(0 1px 2px #000); }
+  .inspect-holder-name { font-family: var(--title-font); font-size: 14px; color: #f0ead8; }
+  .inspect-holder-sub { font-size: 11px; color: var(--color-text-muted); margin-left: 2px; }
 
   @media (min-width: 900px) {
     /* Both screens share the same split so the right showcase panel is
