@@ -218,6 +218,27 @@ export class Api {
       return [];
     }
   }
+
+  // ── Non-custodial wallet linking (Reown / Solana) ──────────────────────────
+  // Step 1: ask the server for the exact message to sign for this address.
+  async walletLinkChallenge(address: string): Promise<{ nonce: string; message: string }> {
+    return this.post('/api/wallet/link/challenge', { address });
+  }
+
+  // Step 2: submit the wallet's signature; server verifies + persists the link.
+  async linkWallet(address: string, signature: string, nonce: string): Promise<{ pubkey: string }> {
+    return this.post('/api/wallet/link', { address, signature, nonce });
+  }
+
+  // Current account's linked wallet (null when none).
+  async linkedWallet(): Promise<{ pubkey: string; linkedAt: string } | null> {
+    const data = await this.get('/api/wallet');
+    return data.wallet ?? null;
+  }
+
+  async unlinkWallet(): Promise<void> {
+    await this.delete('/api/wallet/link', {});
+  }
 }
 
 // ---------------------------------------------------------------------------

@@ -40,6 +40,7 @@ import { voice } from '../game/voice';
 import { music, musicZoneForLocation } from '../game/music';
 import { iconDataUrl, iconCanvas, QUALITY_COLOR, raidMarkerDataUrl, RAID_MARKER_NAMES } from './icons';
 import { svgIcon } from './ui_icons';
+import { walletUiEnabled, wocBalance, onWalletUiChange } from './wallet_balance';
 import { Keybinds, BIND_ACTIONS, BIND_CATEGORIES, isReservedCode, keyLabel } from '../game/keybinds';
 import { Settings, GameSettings, BoolSettingKey, NumericSettingKey, SETTING_RANGES, clickMoveButtonLabel, normalizeClickMoveButton } from '../game/settings';
 import { isPhoneTouchDevice } from '../game/mobile_controls';
@@ -489,6 +490,8 @@ export class Hud {
     this.refreshKeybindLabels();
     this.buildXpTicks();
     document.addEventListener('woc:languagechange', () => this.refreshLocalizedDynamicUi());
+    // re-render the bag footer when the connected wallet's $WOC balance changes
+    onWalletUiChange(() => { if ($('#bags').style.display === 'block') this.renderBags(); });
     $('#pf-name').textContent = sim.player.name;
     this.drawPlayerFramePortrait();
     // Character GLBs preload after the HUD mounts; once the real 3D portraits are
@@ -1342,6 +1345,16 @@ export class Hud {
     if (parts.silver > 0 || parts.gold > 0) html += coin(parts.silver, 's', 'itemUi.money.silver');
     html += coin(parts.copper, 'c', 'itemUi.money.copper');
     return `<span class="money-inline" aria-label="${esc(formatLocalizedMoney(copper, 'long'))}">${html}</span>`;
+  }
+
+  // The connected wallet's $WOC balance, shown left of the coins in the bag.
+  // Empty unless the feature is enabled AND a wallet is connected (balance set).
+  private wocBalanceHtml(): string {
+    if (!walletUiEnabled()) return '';
+    const bal = wocBalance();
+    if (bal === null) return '';
+    const amount = formatNumber(bal, { maximumFractionDigits: 2 });
+    return `<span class="woc-balance" title="Linked Solana wallet $WOC balance"><span class="woc-coin" aria-hidden="true"></span>${esc(amount)} $WOC</span>`;
   }
 
   attachTooltip(el: HTMLElement, html: () => string): void {
@@ -5071,7 +5084,7 @@ export class Hud {
     el.appendChild(grid);
     const money = document.createElement('div');
     money.className = 'money';
-    money.innerHTML = this.moneyHtml(sim.copper);
+    money.innerHTML = `${this.wocBalanceHtml()}${this.moneyHtml(sim.copper)}`;
     el.appendChild(money);
     el.querySelector('[data-close]')?.addEventListener('click', () => {
       if (this.vendorOpen && document.body.classList.contains('mobile-touch')) {

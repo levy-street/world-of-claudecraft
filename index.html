@@ -1141,7 +1141,11 @@
   }
   #bags .panel-title { flex: none; }
   #bags .bag-grid { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
-  #bags .money { flex: none; }
+  #bags .money { flex: none; display: flex; align-items: center; gap: 10px; }
+  /* coins stay right-aligned whether or not the $WOC chip is present */
+  #bags .money .money-inline { margin-left: auto; }
+  .woc-balance { display: inline-flex; align-items: center; gap: 5px; color: var(--gold-dim); font-weight: 600; white-space: nowrap; }
+  .woc-coin { display: inline-block; width: 11px; height: 11px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #c9a3ff, #6b3fa0); box-shadow: 0 0 4px rgba(150, 90, 230, 0.5); }
   .bag-grid { display: flex; flex-direction: column; gap: 2px; }
   .bag-item { display: flex; gap: 8px; align-items: center; width: 100%; font-size: 12px; padding: 3px 4px; border: 0; border-radius: 3px; cursor: var(--cursor-point); background: transparent; color: inherit; font-family: var(--ui-font); text-align: left; }
   .bag-item:hover { background: #ffffff12; }
@@ -1937,6 +1941,89 @@
     outline: none;
   }
   .donate-cta svg { width: 16px; height: 16px; display: block; }
+
+  /* Connect-wallet CTA — outlined gold to sit beside (not compete with) the
+     filled Donate button. Turns blue when a wallet is connected and green once
+     the wallet is verified-linked to the account. */
+  .wallet-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--gold-dim);
+    background: rgba(11, 11, 18, 0.55);
+    color: var(--gold);
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: border-color var(--transition-speed) var(--transition-ease),
+                box-shadow var(--transition-speed) var(--transition-ease),
+                color var(--transition-speed) var(--transition-ease);
+  }
+  .wallet-cta:hover,
+  .wallet-cta:focus-visible {
+    border-color: var(--gold);
+    box-shadow: 0 0 12px var(--color-primary-glow);
+    outline: none;
+  }
+  .wallet-cta svg { width: 16px; height: 16px; display: block; }
+  .wallet-cta.is-connected { color: var(--color-text-light); border-color: var(--color-mana); }
+  .wallet-cta.is-linked { color: var(--color-text-success); border-color: var(--color-text-success); }
+  .wallet-cta.is-connected #wallet-label,
+  .wallet-cta.is-linked #wallet-label {
+    font-family: 'SFMono-Regular', ui-monospace, 'Courier New', monospace;
+    font-size: 12px;
+    letter-spacing: 0;
+  }
+  .wallet-cta.busy { opacity: 0.6; pointer-events: none; }
+
+  /* Wallet row inside the (logged-in) character-select panel — the account
+     context where linking actually belongs. */
+  .cs-wallet {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(199, 148, 26, 0.18);
+  }
+  .cs-wallet-label {
+    font-family: var(--font-heading);
+    color: var(--gold-dim);
+    font-size: 13px;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+  }
+  .cs-wallet-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+  /* Secondary wallet controls (Switch / Sign out) — only shown when connected. */
+  .wallet-mini {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border-default);
+    background: rgba(11, 11, 18, 0.55);
+    color: var(--color-text-muted);
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color var(--transition-speed) var(--transition-ease),
+                border-color var(--transition-speed) var(--transition-ease);
+  }
+  .wallet-mini svg { width: 14px; height: 14px; display: block; }
+  .wallet-mini:hover,
+  .wallet-mini:focus-visible { color: var(--color-text-light); border-color: var(--gold-dim); outline: none; }
+  #btn-wallet-signout:hover,
+  #btn-wallet-signout:focus-visible { color: var(--color-text-error); border-color: var(--color-text-error); }
+  .wallet-mini[hidden] { display: none; }
 
   /* Footer donate link keeps the social-link shape but warms up on hover. */
   .footer-lang-row { display: flex; justify-content: center; }
@@ -7123,6 +7210,23 @@
                 <svg class="cs-realm-caret" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 10l5 5 5-5z"/></svg>
               </button>
               <div id="cs-realm-menu" class="cs-realm-menu" role="listbox" data-i18n-aria="auth.realmList" aria-label="Realm List" hidden></div>
+            </div>
+            <div class="cs-wallet">
+              <span class="cs-wallet-label">$WOC Wallet</span>
+              <div class="cs-wallet-actions">
+                <button type="button" class="wallet-cta" id="btn-wallet" title="Link your Solana wallet" aria-label="Connect your Solana wallet">
+                  <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h13a1 1 0 0 1 1 1v2"></path><path d="M3 7v10a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-3"></path><path d="M21 11h-4a2 2 0 0 0 0 4h4a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1Z"></path></svg>
+                  <span id="wallet-label">Connect Wallet</span>
+                </button>
+                <button type="button" class="wallet-mini" id="btn-wallet-switch" title="Connect a different wallet" hidden>
+                  <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+                  <span>Switch</span>
+                </button>
+                <button type="button" class="wallet-mini" id="btn-wallet-signout" title="Disconnect this wallet" hidden>
+                  <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                  <span>Sign out</span>
+                </button>
+              </div>
             </div>
           </header>
           <div class="cs-body">

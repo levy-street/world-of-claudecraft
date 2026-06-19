@@ -163,6 +163,27 @@ CREATE TABLE IF NOT EXISTS chat_violations (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS chat_violations_account ON chat_violations(account_id, created_at DESC);
+-- Non-custodial Solana wallet links (PRD: docs/prd/woc/wallet-link.md). One
+-- wallet per account (account_id is the PK) and one account per wallet (pubkey
+-- is UNIQUE). The server never holds keys; ownership is proven by a signed
+-- challenge (see wallet_link_challenges) and this table is just the mirror.
+CREATE TABLE IF NOT EXISTS wallet_links (
+  account_id INT PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,
+  pubkey TEXT NOT NULL UNIQUE,
+  linked_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+-- Single-use, short-lived sign-to-link challenges. The full message the wallet
+-- must sign is stored server-side so the client cannot choose what gets signed;
+-- consuming a challenge deletes it (replay protection).
+CREATE TABLE IF NOT EXISTS wallet_link_challenges (
+  nonce TEXT PRIMARY KEY,
+  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  address TEXT NOT NULL,
+  message TEXT NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS wallet_link_challenges_account ON wallet_link_challenges(account_id);
 `;
 
 export async function ensureSchema(): Promise<void> {
@@ -326,6 +347,79 @@ export async function accountForToken(token: string): Promise<number | null> {
     [token],
   );
   return res.rows[0]?.account_id ?? null;
+}
+
+// ── Non-custodial Solana wallet links ──────────────────────────────────────
+
+export interface WalletLinkRow {
+  account_id: number;
+  pubkey: string;
+  linked_at: string;
+}
+
+export async function createWalletChallenge(
+  nonce: string,
+  accountId: number,
+  address: string,
+  message: string,
+  ttlMinutes = 10,
+): Promise<void> {
+  await pool.query(
+    `INSERT INTO wallet_link_challenges (nonce, account_id, address, message, expires_at)
+     VALUES ($1, $2, $3, $4, now() + ($5 || ' minutes')::interval)`,
+    [nonce, accountId, address, message, String(ttlMinutes)],
+  );
+}
+
+// Atomically consume a challenge: returns the stored address+message if the
+// nonce belongs to this account and is unexpired, deleting the row so a
+// signature can never be replayed against it twice.
+export async function consumeWalletChallenge(
+  nonce: string,
+  accountId: number,
+): Promise<{ address: string; message: string } | null> {
+  const res = await pool.query(
+    `DELETE FROM wallet_link_challenges
+     WHERE nonce = $1 AND account_id = $2 AND expires_at > now()
+     RETURNING address, message`,
+    [nonce, accountId],
+  );
+  return res.rows[0] ?? null;
+}
+
+export async function pruneWalletChallenges(): Promise<void> {
+  await pool.query('DELETE FROM wallet_link_challenges WHERE expires_at <= now()');
+}
+
+export async function walletForAccount(accountId: number): Promise<WalletLinkRow | null> {
+  const res = await pool.query(
+    'SELECT account_id, pubkey, linked_at FROM wallet_links WHERE account_id = $1',
+    [accountId],
+  );
+  return res.rows[0] ?? null;
+}
+
+export async function accountForWallet(pubkey: string): Promise<number | null> {
+  const res = await pool.query('SELECT account_id FROM wallet_links WHERE pubkey = $1', [pubkey]);
+  return res.rows[0]?.account_id ?? null;
+}
+
+// One wallet per account (account_id PK) and one account per wallet (pubkey
+// UNIQUE). Upserts the caller's link; returns false when the wallet is already
+// owned by a different account so the handler can surface a 409.
+export async function linkWalletToAccount(accountId: number, pubkey: string): Promise<boolean> {
+  const owner = await accountForWallet(pubkey);
+  if (owner !== null && owner !== accountId) return false;
+  await pool.query(
+    `INSERT INTO wallet_links (account_id, pubkey) VALUES ($1, $2)
+     ON CONFLICT (account_id) DO UPDATE SET pubkey = EXCLUDED.pubkey, linked_at = now()`,
+    [accountId, pubkey],
+  );
+  return true;
+}
+
+export async function unlinkWallet(accountId: number): Promise<void> {
+  await pool.query('DELETE FROM wallet_links WHERE account_id = $1', [accountId]);
 }
 
 export async function moderationStatusForAccount(accountId: number): Promise<AccountModerationStatus> {

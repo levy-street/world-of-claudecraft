@@ -21,6 +21,7 @@ import {
 import { json, readBody, isUniqueViolation } from './http_util';
 import { requestIp, rateLimited, authThrottled, recordAuthFailure, clearAuthFailures } from './ratelimit';
 import { verifyTurnstile } from './turnstile';
+import { handleWalletChallenge, handleWalletLink, handleWalletGet, handleWalletUnlink } from './wallet';
 import { handleAdminApi } from './admin';
 import { handleInternalApi } from './internal';
 import { GameServer } from './game';
@@ -523,6 +524,27 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const limit = Math.max(1, Math.min(RELEASES_SIZE, Number(params.get('limit')) || RELEASES_SIZE));
       const entries = await getReleases();
       return json(res, 200, { repo: GITHUB_REPO, releases: entries.slice(0, limit) });
+    }
+    // Non-custodial Solana wallet linking — all account-scoped.
+    if (req.method === 'POST' && url === '/api/wallet/link/challenge') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleWalletChallenge(req, res, accountId);
+    }
+    if (req.method === 'POST' && url === '/api/wallet/link') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleWalletLink(req, res, accountId);
+    }
+    if (req.method === 'DELETE' && url === '/api/wallet/link') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleWalletUnlink(req, res, accountId);
+    }
+    if (req.method === 'GET' && url === '/api/wallet') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleWalletGet(req, res, accountId);
     }
     json(res, 404, { error: 'unknown endpoint' });
   } catch (err: any) {
