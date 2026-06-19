@@ -71,6 +71,7 @@ import {
 // the feature is enabled + used.
 import type { WalletOption } from './net/wallet';
 import { assetsReady } from './render/assets/preload';
+import { registerCreatorSkins } from './render/characters/assets';
 import { CharacterPreview } from './render/characters';
 import { skinCount } from './render/characters/manifest';
 import { playerPortraitDataUrl } from './render/characters/portrait';
@@ -2388,6 +2389,10 @@ async function startOffline(playerClass: PlayerClass, name: string, skin = 0): P
 // ---------------------------------------------------------------------------
 
 const api = new Api();
+// Load the public creator-skin registry so the renderer can resolve any
+// cosmeticSkinId it sees to a CDN atlas. Global + best-effort: until it resolves
+// (or if the marketplace is empty) entities render their numeric skin fallback.
+void api.creatorSkins().then((skins) => registerCreatorSkins(skins));
 
 // Referral capture: a visitor who arrives from a shared player card link
 // (?ref=<slug>) carries the referrer's slug into registration. Read it once at
