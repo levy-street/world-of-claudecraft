@@ -59,6 +59,7 @@ import {
   getAccountsCount,
   getCharacter,
   getCharacterById,
+  getCreatorSkin,
   guildNameForCharacter,
   isAdminAccount,
   lifetimeXpRankForCharacter,
@@ -86,6 +87,7 @@ import {
   topLifetimeXp,
   touchLogin,
   updatePasswordHash,
+  walletForAccount,
 } from './db';
 import { emailAccountCreated } from './email';
 import { GameServer } from './game';
@@ -93,6 +95,7 @@ import { isUniqueViolation, json, readBody } from './http_util';
 import { handleInternalApi } from './internal';
 import { isConnectionRefused } from './ip_block';
 import { pruneExpiredBlockedIps } from './ip_block_db';
+import { marketplaceEnabled, quotePurchase, registrySkins, verifyPurchase } from './marketplace';
 import {
   cleanReportReason,
   createPlayerReport,
@@ -1296,6 +1299,47 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         primarySlugForAccount(accountId),
       ]);
       return json(res, 200, { count, slug });
+    }
+    // Creator skins marketplace. The registry is public cosmetic metadata; quote
+    // + buy are account-scoped and require a linked Solana wallet (the payer).
+    if (req.method === 'GET' && url === '/api/skins/registry') {
+      return json(res, 200, { skins: await registrySkins() });
+    }
+    if (req.method === 'POST' && url.startsWith('/api/marketplace/skins/') && url.endsWith('/quote')) {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (!marketplaceEnabled()) return json(res, 503, { error: 'marketplace unavailable' });
+      const skinId = decodeURIComponent(url.slice('/api/marketplace/skins/'.length, -'/quote'.length));
+      const skin = await getCreatorSkin(skinId);
+      if (!skin || skin.status !== 'live') return json(res, 404, { error: 'skin not for sale' });
+      const wallet = await walletForAccount(accountId);
+      if (!wallet) return json(res, 400, { error: 'link a Solana wallet first' });
+      const quote = await quotePurchase(skin, accountId);
+      return json(res, 200, {
+        quoteId: quote.quoteId,
+        skinId: quote.skinId,
+        mint: quote.mint,
+        memo: quote.quoteId,
+        creator: { owner: quote.creatorOwner, amount: quote.creatorUsdc.toString() },
+        burn: { owner: quote.burnOwner, amount: quote.burnUsdc.toString() },
+        gross: (quote.creatorUsdc + quote.burnUsdc).toString(),
+        expiresAt: quote.expiresAt,
+      });
+    }
+    if (req.method === 'POST' && url === '/api/marketplace/buy') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (!marketplaceEnabled()) return json(res, 503, { error: 'marketplace unavailable' });
+      const body = await readBody(req);
+      const quoteId = typeof body.quoteId === 'string' ? body.quoteId : '';
+      const signature = typeof body.signature === 'string' ? body.signature : '';
+      if (!quoteId || !signature) return json(res, 400, { error: 'quoteId and signature required' });
+      const wallet = await walletForAccount(accountId);
+      if (!wallet) return json(res, 400, { error: 'link a Solana wallet first' });
+      const result = await verifyPurchase({ quoteId, signature, buyerAccountId: accountId, buyerWallet: wallet.pubkey });
+      if (!result.ok) return json(res, 400, { error: result.reason });
+      game.applyCreatorSkinGrant(accountId, result.skinId);
+      return json(res, 200, { ok: true, skinId: result.skinId });
     }
     json(res, 404, { error: 'unknown endpoint' });
   } catch (err: any) {
