@@ -24,8 +24,8 @@ const SEGMENTS_PER_ZONE = 180; // ~2u vertex spacing — enough for the foam ban
 // so it does not pay network/decode/upload cost for water detail.
 const WATER_TEX: Record<string, THREE.Texture> = {};
 function kickWaterTex(key: string, file: string): void {
-  registerPreload(loadTexture(`/textures/water/${file}`, { repeat: true }).then((tex) => {
-    tex.anisotropy = 4;
+  // anisotropy clamped to the device max inside loadTexture (was set unclamped here)
+  registerPreload(loadTexture(`/textures/water/${file}`, { repeat: true, aniso: 4 }).then((tex) => {
     WATER_TEX[key] = tex;
     return tex;
   }));

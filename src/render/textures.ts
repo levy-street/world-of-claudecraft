@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { anisotropic } from './gfx';
 
 // Procedurally generated canvas textures — no external assets.
 
@@ -12,6 +13,9 @@ function makeCanvas(size: number, draw: (ctx: CanvasRenderingContext2D, size: nu
   tex.wrapS = THREE.RepeatWrapping;
   tex.wrapT = THREE.RepeatWrapping;
   tex.colorSpace = THREE.SRGBColorSpace;
+  // these are all tiling surface textures (CanvasTexture mipmaps by default) —
+  // clamped anisotropy removes grazing-angle shimmer; tier-gated to skip low
+  anisotropic(tex);
   return tex;
 }
 

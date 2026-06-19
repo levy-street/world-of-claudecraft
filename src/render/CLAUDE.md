@@ -60,11 +60,12 @@ collision/movement.
 
 ## Performance discipline — this runs at frame rate
 - Three.js is **pinned at r0.165**; post uses `three/examples/jsm/postprocessing/*`
-  (EffectComposer→RenderPass/N8AO→UnrealBloom→OutputPass→Grade) plus the `n8ao`
-  package (SSAO). The `postprocessing` dep in `package.json` is n8ao's peer
-  dependency — not imported directly, so don't remove it as "unused." Don't bump
-  Three or swap the chain casually — shaders here patch r165 chunks via
-  `onBeforeCompile`.
+  (EffectComposer→RenderPass/N8AO→UnrealBloom→OutputPass→SMAA→Grade) plus the
+  `n8ao` package (SSAO). SMAA runs only on the AO path (which carries no MSAA)
+  and sits before Grade so film grain lands after AA. The `postprocessing` dep in
+  `package.json` is n8ao's peer dependency — not imported directly, so don't
+  remove it as "unused." Don't bump Three or swap the chain casually — shaders
+  here patch r165 chunks via `onBeforeCompile`.
 - Reuse, don't allocate: instancing for repeats, merge one-offs per
   (material × z-band), share materials via `surfaceMat`, distance-cull/LOD in
   `sync` (see the `*_RANGE_SQ` constants). No per-frame `new THREE.*` in hot paths

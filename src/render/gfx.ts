@@ -186,11 +186,44 @@ export function isWeakIntegratedGpu(name: string | undefined): boolean {
 // building any scene content.
 export let GFX: GfxSettings = settingsFor(tierFromHints(runtimeHints(), false), runtimeHints());
 
+// Device max anisotropic-filtering samples, resolved once the GL context exists
+// (initGfxTier). 0 = not yet resolved: boot-time texture preloads (terrain/water)
+// run BEFORE the Renderer is constructed, so anisotropic() must NOT clamp against
+// a stale value then — it falls back to the requested level, which GL itself
+// clamps to the hardware max on upload (see anisotropyLevel).
+export let maxAnisotropy = 0;
+
 export function initGfxTier(webgl: THREE.WebGLRenderer): GfxTier {
   const hints = { ...runtimeHints(), gpuRenderer: rendererName(webgl) };
   const tier = tierFromHints(hints, isSoftwareGL(webgl));
   GFX = settingsFor(tier, hints);
+  try {
+    maxAnisotropy = webgl.capabilities.getMaxAnisotropy();
+  } catch {
+    maxAnisotropy = 0;
+  }
   return tier;
+}
+
+// Pure anisotropy-level decision (no GL/texture state) — unit-testable and
+// independent of init ordering:
+//   - low tier pays nothing (1)
+//   - once the GL max is known (>0), clamp the request to it
+//   - before it is known (max === 0, e.g. boot preload runs pre-initGfxTier),
+//     use the request as-is — GL clamps it to the hardware limit on upload, so
+//     this never over-spends. (The old per-site code set raw values the same way.)
+export function anisotropyLevel(tier: GfxTier, max: number, requested: number): number {
+  if (tier === 'low') return 1;
+  return max > 0 ? Math.min(requested, max) : requested;
+}
+
+// Anisotropic filtering for repeat-wrapped / mipmapped surfaces (terrain splat,
+// water normals, tiling canvas textures) — kills the grazing-angle shimmer the
+// anti-tiling craft otherwise leaves on the table. Returns the texture so callers
+// can chain; set needsUpdate yourself if the texture is already uploaded.
+export function anisotropic<T extends THREE.Texture>(tex: T, requested = 8): T {
+  tex.anisotropy = anisotropyLevel(GFX.tier, maxAnisotropy, requested);
+  return tex;
 }
 
 // One clock uniform shared by every onBeforeCompile shader (wind, water,

@@ -37,8 +37,10 @@ const ALBEDO_ANISOTROPY = 8;
 const NORMAL_ANISOTROPY = 4;
 
 function kickTerrainTex(key: string, file: string, srgb: boolean): void {
-  registerPreload(loadTexture(`/textures/terrain/${file}`, { srgb, repeat: true }).then((tex) => {
-    tex.anisotropy = srgb ? ALBEDO_ANISOTROPY : NORMAL_ANISOTROPY;
+  // anisotropy clamped to the device max inside loadTexture (was set unclamped here)
+  registerPreload(loadTexture(`/textures/terrain/${file}`, {
+    srgb, repeat: true, aniso: srgb ? ALBEDO_ANISOTROPY : NORMAL_ANISOTROPY,
+  }).then((tex) => {
     TERRAIN_TEX[key] = tex;
     return tex;
   }));

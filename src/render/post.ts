@@ -4,22 +4,26 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
+import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js';
 import { N8AOPass } from 'n8ao';
 import { GFX, sharedUniforms } from './gfx';
 
 // Post chain: RenderPass -> N8AO (high: half-res Low, ultra: full-res Medium)
 // -> UnrealBloom -> OutputPass (ACES tonemap + sRGB, reads
-// renderer.toneMapping) -> GradePass (display space lift/gamma/gain,
-// saturation, vignette, faint animated grain).
+// renderer.toneMapping) -> SMAA (edge AA on the AO path) -> GradePass (display
+// space lift/gamma/gain, saturation, vignette, faint animated grain).
 //
 // N8AO replaced three's GTAOPass: better denoise at lower sample counts, and
 // cheap enough (half-res) to run on the high tier where GTAO was ultra-only.
 // It sits mid-chain so its autosetGamma leaves the buffer linear for bloom.
 //
 // AA: when N8AO is active it renders the scene into its own non-MSAA beauty
-// target, so geometry AA comes from bloom/grade softening + pixel ratio (the
-// composer target therefore skips MSAA storage — pure waste otherwise). The
-// no-AO fallback path keeps MSAA on the composer target.
+// target, so the composer target carries no MSAA — geometry edges would crawl
+// (worst at renderScale<1). A single cheap, temporal-free SMAA pass on the
+// tonemapped LDR image (after OutputPass) restores edge AA. It sits BEFORE the
+// grade so the grade's film grain is applied AFTER anti-aliasing — grain is
+// high-frequency by design and must not be averaged/smeared by the edge filter.
+// The no-AO fallback path keeps MSAA on the composer target and skips SMAA.
 
 const BLOOM_STRENGTH = 0.32; // subtle — fires/portals glow, sky must not blow out
 const BLOOM_RADIUS = 0.55;
@@ -62,6 +66,7 @@ export interface PostPipeline {
   composer: EffectComposer;
   bloom: UnrealBloomPass;
   ao: N8AOPass | null;
+  smaa: SMAAPass | null;
   grade: ShaderPass;
   setSize(width: number, height: number): void;
   render(): void;
@@ -124,6 +129,17 @@ export function buildComposer(
   composer.addPass(bloom);
   composer.addPass(new OutputPass());
 
+  // SMAA only on the AO path: that path carries no MSAA on the composer target
+  // (samples are gated off above when GFX.ao), so it is the only path with no
+  // true geometry AA. MSAA-when-not-AO and SMAA-when-AO are two halves of ONE
+  // decision — keep them gated on the same `GFX.ao` so a future tier can never
+  // end up with neither. The MSAA fallback already resolves edges → no SMAA there.
+  let smaa: SMAAPass | null = null;
+  if (GFX.ao) {
+    smaa = new SMAAPass(size.x, size.y); // resized with the chain via composer.setSize
+    composer.addPass(smaa);
+  }
+
   const grade = new ShaderPass(GradeShader);
   grade.uniforms.uTime = sharedUniforms.uTime; // shared clock drives the grain
   composer.addPass(grade);
@@ -139,6 +155,7 @@ export function buildComposer(
     composer,
     bloom,
     ao,
+    smaa,
     grade,
     setSize(width: number, height: number): void {
       composer.setSize(width, height); // also resizes every pass (N8AO, bloom)

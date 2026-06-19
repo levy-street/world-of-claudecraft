@@ -7,6 +7,7 @@ import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { assetUrl } from './media';
 import { assetLoadStarted, recordAssetLoad } from './stats';
+import { anisotropic } from '../gfx';
 
 let gltfLoader: GLTFLoader | null = null;
 const gltfCache = new Map<string, Promise<GLTF>>();
@@ -111,10 +112,18 @@ export function loadHdr(url: string): Promise<THREE.DataTexture> {
   return p;
 }
 
-/** Plain image texture (terrain splats, water normals, VFX sprites). */
-export function loadTexture(url: string, opts: { srgb?: boolean; repeat?: boolean } = {}): Promise<THREE.Texture> {
+/** Plain image texture (terrain splats, water normals, VFX sprites).
+ *  `aniso` requests capability-clamped anisotropic filtering (defaults to 8 for
+ *  repeat-wrapped surfaces — they alias worst at grazing angles; 1 otherwise).
+ *  Pass aniso: 1 explicitly for mip-less sprite atlases that don't want it. */
+export function loadTexture(
+  url: string,
+  opts: { srgb?: boolean; repeat?: boolean; aniso?: number } = {},
+): Promise<THREE.Texture> {
   const resolved = assetUrl(url);
-  const key = `${resolved}|${opts.srgb ? 's' : 'l'}|${opts.repeat ? 'r' : 'c'}`;
+  // one source for both the cache key and the applied value — must not desync
+  const aniso = opts.aniso ?? (opts.repeat ? 8 : 1);
+  const key = `${resolved}|${opts.srgb ? 's' : 'l'}|${opts.repeat ? 'r' : 'c'}|a${aniso}`;
   let p = texCache.get(key);
   if (!p) {
     const startedAt = assetLoadStarted();
@@ -122,6 +131,7 @@ export function loadTexture(url: string, opts: { srgb?: boolean; repeat?: boolea
       new THREE.TextureLoader().load(resolved, (tex) => {
         if (opts.srgb) tex.colorSpace = THREE.SRGBColorSpace;
         if (opts.repeat) tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+        anisotropic(tex, aniso);
         recordAssetLoad('texture', resolved, startedAt);
         resolve(tex);
       }, undefined, () => {
