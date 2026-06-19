@@ -30,3 +30,28 @@ export interface IWorldCosmetics {
   claimEventSkin(skin: number): void;
   unequipMechChroma(chromaId: string): void;
 }
+
+// Normalize an untrusted/persisted cosmetics blob to the AccountCosmetics shape:
+// every field a deduped array of non-empty strings. The single source of truth
+// for this shape, shared by the server (server/db.ts) and the client
+// (src/net/online.ts) so the two can never drift as fields are added.
+export function normalizeAccountCosmetics(value: unknown): AccountCosmetics {
+  const src = value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
+  return {
+    completedQuestIds: uniqueStrings(src.completedQuestIds),
+    mechChromaIds: uniqueStrings(src.mechChromaIds),
+    ownedCreatorSkinIds: uniqueStrings(src.ownedCreatorSkinIds),
+  };
+}
+
+function uniqueStrings(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const item of value) {
+    if (typeof item !== 'string' || item.length === 0 || seen.has(item)) continue;
+    seen.add(item);
+    out.push(item);
+  }
+  return out;
+}

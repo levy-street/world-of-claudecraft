@@ -56,6 +56,16 @@ describe('cosmetic skin carrier — sim core', () => {
     expect(sim.entities.get(pid)!.cosmeticSkinId).toBeNull();
   });
 
+  it('caps the overlay id length at the sim setter — 64 kept, 65 dropped', () => {
+    const sim = makeSim();
+    const pid = sim.primaryId;
+    const id64 = 'a'.repeat(64);
+    sim.setPlayerSkin(pid, 0, 'class', id64);
+    expect(sim.entities.get(pid)!.cosmeticSkinId).toBe(id64);
+    sim.setPlayerSkin(pid, 0, 'class', 'b'.repeat(65));
+    expect(sim.entities.get(pid)!.cosmeticSkinId).toBeNull();
+  });
+
   it('cosmetic-only: recalcPlayerStats output is invariant under every skin permutation', () => {
     const sim = makeSim('mage');
     const pid = sim.primaryId;
@@ -345,6 +355,19 @@ describe('creator-skin equip gate (server-authoritative)', () => {
 
     changeSkin({ skin: 0, catalog: 'class', csk: huge });
     expect(server.sim.entities.get(session.pid)!.cosmeticSkinId).toBeNull();
+  });
+
+  it('rejects an empty-string overlay even if it is "owned"', () => {
+    session.accountCosmetics = { ...session.accountCosmetics, ownedCreatorSkinIds: [''] };
+    changeSkin({ skin: 0, catalog: 'class', csk: '' });
+    expect(server.sim.entities.get(session.pid)!.cosmeticSkinId).toBeNull();
+  });
+
+  it('accepts an owned overlay id at the exact 64-char boundary', () => {
+    const id64 = 'c'.repeat(64);
+    session.accountCosmetics = { ...session.accountCosmetics, ownedCreatorSkinIds: [id64] };
+    changeSkin({ skin: 0, catalog: 'class', csk: id64 });
+    expect(server.sim.entities.get(session.pid)!.cosmeticSkinId).toBe(id64);
   });
 
   it('keeps an owned overlay across a mech-chroma equip the account owns', () => {

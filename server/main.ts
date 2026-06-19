@@ -1308,6 +1308,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     if (req.method === 'POST' && url.startsWith('/api/marketplace/skins/') && url.endsWith('/quote')) {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
+      if (rateLimited(req)) return json(res, 429, { error: 'too many requests' });
       if (!marketplaceEnabled()) return json(res, 503, { error: 'marketplace unavailable' });
       const skinId = decodeURIComponent(url.slice('/api/marketplace/skins/'.length, -'/quote'.length));
       const skin = await getCreatorSkin(skinId);
@@ -1329,6 +1330,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     if (req.method === 'POST' && url === '/api/marketplace/buy') {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
+      if (rateLimited(req)) return json(res, 429, { error: 'too many requests' });
       if (!marketplaceEnabled()) return json(res, 503, { error: 'marketplace unavailable' });
       const body = await readBody(req);
       const quoteId = typeof body.quoteId === 'string' ? body.quoteId : '';
