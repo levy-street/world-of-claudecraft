@@ -637,6 +637,7 @@ export class Hud {
   private optionsHooks: OptionsHooks | null = null;
   private reportHooks: ReportHooks | null = null;
   private bugReportHooks: BugReportHooks | null = null;
+  private openMarketplaceHook: (() => void) | null = null;
   // Soft swear terms from the server (online only), masked in chat when the
   // player's "Filter Profanity" setting is on. Fed by main.ts from ClientWorld.
   private profanityWords: string[] = [];
@@ -2709,6 +2710,7 @@ export class Hud {
     world: () => this.sim,
     options: () => this.optionsHooks,
     bugReport: () => this.bugReportHooks,
+    marketplace: () => this.openMarketplaceHook,
     keybinds: () => this.keybinds,
     slotActionName: (slot) => {
       const ability = this.abilityForSlot(slot);
@@ -10387,6 +10389,12 @@ export class Hud {
   // option (the offline browser world has no server to receive reports).
   attachBugReporting(hooks: BugReportHooks): void {
     this.bugReportHooks = hooks;
+  }
+
+  // Wired by main.ts only when online: opens the creator-skins marketplace
+  // overlay. Gates whether the Game Menu shows the entry at all.
+  attachMarketplace(open: () => void): void {
+    this.openMarketplaceHook = open;
   }
 
   get optionsOpen(): boolean {

@@ -1519,6 +1519,19 @@ export const fr_CA: EnTranslations = {
       "vanguard_chrome": "Avant-garde chrome"
     }
   },
+  "marketplace": {
+    "title": "Creator Skins",
+    "subtitle": "Player-made cosmetics, paid in USDC. 70% goes to the creator; 30% buys and burns $WOC.",
+    "loading": "Loading skins…",
+    "empty": "No creator skins are for sale yet.",
+    "buy": "Buy",
+    "price": "{price}",
+    "connectFirst": "Connect a wallet to buy.",
+    "purchasing": "Purchasing…",
+    "owned": "Owned — equipped",
+    "failed": "Purchase failed",
+    "close": "Close"
+  },
   "nav": {
     "home": "Accueil",
     "play": "Jouer",

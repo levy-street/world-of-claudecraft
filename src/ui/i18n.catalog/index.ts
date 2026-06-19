@@ -109,6 +109,20 @@ export const en = {
       vanguard_chrome: 'Vanguard Chrome',
     },
   },
+  // Creator skins marketplace overlay (buy player-made cosmetics with USDC).
+  marketplace: {
+    title: "Creator Skins",
+    subtitle: "Player-made cosmetics, paid in USDC. 70% goes to the creator; 30% buys and burns $WOC.",
+    loading: "Loading skins…",
+    empty: "No creator skins are for sale yet.",
+    buy: "Buy",
+    price: "{price}",
+    connectFirst: "Connect a wallet to buy.",
+    purchasing: "Purchasing…",
+    owned: "Owned — equipped",
+    failed: "Purchase failed",
+    close: "Close",
+  },
   nav: {
     home: 'Home',
     play: 'Play',

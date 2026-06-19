@@ -205,6 +205,7 @@ export type OptionsPanelId =
 
 export type OptionsMenuAction =
   | { kind: 'goto'; view: OptionsPanelId }
+  | { kind: 'marketplace' }
   | { kind: 'logout' }
   | { kind: 'close' };
 
@@ -213,9 +214,12 @@ export interface OptionsMenuEntry {
   action: OptionsMenuAction;
 }
 
-/** The main Esc-menu button list. The "Report a Bug" row is online-only (it needs
- *  an authoritative server to receive the report). */
-export function buildOptionsMenu(opts: { bugReportAvailable: boolean }): OptionsMenuEntry[] {
+/** The main Esc-menu button list. The "Report a Bug" and "Creator Skins" rows are
+ *  online-only (they need an authoritative server / wallet, wired by main.ts). */
+export function buildOptionsMenu(opts: {
+  bugReportAvailable: boolean;
+  marketplaceAvailable: boolean;
+}): OptionsMenuEntry[] {
   const entries: OptionsMenuEntry[] = [
     { labelKey: 'hud.options.keyBindings', action: { kind: 'goto', view: 'keybinds' } },
     { labelKey: 'hudChrome.controller.title', action: { kind: 'goto', view: 'controller' } },
@@ -229,6 +233,8 @@ export function buildOptionsMenu(opts: { bugReportAvailable: boolean }): Options
       labelKey: 'hudChrome.bugReport.menuButton',
       action: { kind: 'goto', view: 'bugreport' },
     });
+  if (opts.marketplaceAvailable)
+    entries.push({ labelKey: 'marketplace.title', action: { kind: 'marketplace' } });
   entries.push({ labelKey: 'hud.options.logout', action: { kind: 'logout' } });
   entries.push({ labelKey: 'hud.options.returnToGame', action: { kind: 'close' } });
   return entries;

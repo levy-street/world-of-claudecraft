@@ -175,6 +175,8 @@ export interface OptionsWindowDeps {
   options(): OptionsHooks | null;
   /** The bug-report seam (online only; its presence gates the Report a Bug row). */
   bugReport(): BugReportHooks | null;
+  /** The creator-skins marketplace opener (online only; its presence gates the row). */
+  marketplace(): (() => void) | null;
   /** The keybind store (read labels, rebind, reset). */
   keybinds(): Keybinds;
   /** Display name for an action-bar slot's bound ability or item, or null when empty. */
@@ -325,7 +327,10 @@ export class OptionsWindow {
     el.innerHTML = this.panelTitle(t('hud.options.gameMenu'));
     const list = document.createElement('div');
     list.className = 'opt-list';
-    for (const entry of buildOptionsMenu({ bugReportAvailable: this.deps.bugReport() !== null })) {
+    for (const entry of buildOptionsMenu({
+      bugReportAvailable: this.deps.bugReport() !== null,
+      marketplaceAvailable: this.deps.marketplace() !== null,
+    })) {
       const b = document.createElement('button');
       b.className = 'btn opt-btn';
       b.textContent = t(entry.labelKey);
@@ -336,6 +341,10 @@ export class OptionsWindow {
           this.view = a.view;
           this.keybindNote = '';
           this.render();
+        } else if (a.kind === 'marketplace') {
+          const open = this.deps.marketplace();
+          this.close();
+          open?.();
         } else if (a.kind === 'logout') {
           this.deps.options()?.logout();
         } else {
