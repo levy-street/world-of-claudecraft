@@ -168,6 +168,21 @@ export function isAuthError(err: unknown): boolean {
   return err instanceof ApiError && (err.status === 401 || err.status === 403);
 }
 
+// A creator-skin purchase quote from the server: the fixed 70/30 split legs (in
+// USDC base-unit strings) the client builds its payment transaction from, plus
+// the memo (== quoteId) that binds the tx to this quote. Structurally a
+// superset of the wallet's SplitPaymentQuote, so it can be passed straight in.
+export interface MarketplaceQuoteResponse {
+  quoteId: string;
+  skinId: string;
+  mint: string;
+  memo: string;
+  creator: { owner: string; amount: string };
+  burn: { owner: string; amount: string };
+  gross: string;
+  expiresAt: string;
+}
+
 export class Api {
   private static readonly SESSION_KEY = 'woc_session';
   token: string | null = null;
@@ -494,6 +509,19 @@ export class Api {
     } catch {
       return [];
     }
+  }
+
+  // Request a purchase quote for a creator skin (account-scoped; needs a linked
+  // wallet). Returns the split legs + memo the client builds the payment tx from.
+  async quoteSkin(skinId: string): Promise<MarketplaceQuoteResponse> {
+    return this.post(`/api/marketplace/skins/${encodeURIComponent(skinId)}/quote`, {});
+  }
+
+  // Submit a finalized split-payment signature to redeem a quote: the server
+  // verifies it on-chain and grants the skin. Throws (with the server reason) on
+  // any verification failure.
+  async buySkin(quoteId: string, signature: string): Promise<{ ok: true; skinId: string }> {
+    return this.post('/api/marketplace/buy', { quoteId, signature });
   }
 
   // News & Updates feed for the home page, mirrored from GitHub Releases by the

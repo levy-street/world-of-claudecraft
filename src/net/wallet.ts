@@ -1,3 +1,4 @@
+import './wallet-polyfill';
 // Non-custodial Solana wallet connection through Wallet Standard. The
 // account↔wallet *link* is performed by the server after the wallet signs a
 // challenge (see src/net/online.ts + server/wallet.ts).
@@ -16,8 +17,12 @@ import {
   type StandardEventsFeature,
 } from '@wallet-standard/features';
 import { isSolanaChain } from '@solana/wallet-standard-chains';
-import { SolanaSignMessage, type SolanaSignMessageFeature } from '@solana/wallet-standard-features';
+import {
+  SolanaSignMessage, type SolanaSignMessageFeature,
+  SolanaSignAndSendTransaction, type SolanaSignAndSendTransactionFeature,
+} from '@solana/wallet-standard-features';
 import bs58 from 'bs58';
+import { Connection, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
 
 export interface WalletState {
   address: string | null;
@@ -379,4 +384,101 @@ export async function fetchWocBalance(owner: string, fresh = false): Promise<num
     console.error('[wallet] $WOC balance read failed', err);
     return null;
   }
+}
+
+
+// ── Marketplace split payment ────────────────────────────────────────────────
+// Build + sign + send the single atomic USDC transaction a creator-skin purchase
+// requires: 70% to the creator + 30% to the burn vault + a memo (the quote id).
+// Instructions are built on @solana/web3.js; the connected wallet signs and sends
+// via the Wallet Standard SolanaSignAndSendTransaction feature. The server
+// verifies the resulting on-chain balance deltas, so what matters is that the
+// transfers actually land. The payment network is the marketplace/devnet cluster
+// (RPC + chain from env); the USDC mint + recipient owners + exact amounts come
+// from the server-issued quote.
+const MARKET_RPC = String(import.meta.env.VITE_MARKETPLACE_RPC_URL ?? import.meta.env.VITE_SOLANA_RPC_URL ?? 'https://api.mainnet-beta.solana.com').trim();
+const MARKET_CHAIN = String(import.meta.env.VITE_MARKETPLACE_CHAIN ?? 'solana:devnet').trim();
+const TOKEN_PROGRAM = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
+const ASSOCIATED_TOKEN_PROGRAM = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL');
+const MEMO_PROGRAM = new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr');
+const USDC_DECIMALS = 6;
+
+let paymentConnection: Connection | null = null;
+function getPaymentConnection(): Connection {
+  if (!paymentConnection) paymentConnection = new Connection(MARKET_RPC, 'confirmed');
+  return paymentConnection;
+}
+
+// The deterministic Associated Token Account for (owner, mint) under the legacy
+// SPL Token program. The buyer tx never creates these (creator + burn vault must
+// already hold a USDC ATA; an onboarding precondition), matching the server
+// verifier's exactly-two-transfers expectation.
+function associatedTokenAccount(owner: PublicKey, mint: PublicKey): PublicKey {
+  return PublicKey.findProgramAddressSync(
+    [owner.toBuffer(), TOKEN_PROGRAM.toBuffer(), mint.toBuffer()],
+    ASSOCIATED_TOKEN_PROGRAM,
+  )[0];
+}
+
+// SPL Token `TransferChecked` (tag 12): u8 tag + u64 amount(LE) + u8 decimals.
+function transferCheckedIx(source: PublicKey, mint: PublicKey, dest: PublicKey, owner: PublicKey, amount: bigint, decimals: number): TransactionInstruction {
+  const data = Buffer.alloc(10);
+  data.writeUInt8(12, 0);
+  data.writeBigUInt64LE(amount, 1);
+  data.writeUInt8(decimals, 9);
+  return new TransactionInstruction({
+    programId: TOKEN_PROGRAM,
+    keys: [
+      { pubkey: source, isSigner: false, isWritable: true },
+      { pubkey: mint, isSigner: false, isWritable: false },
+      { pubkey: dest, isSigner: false, isWritable: true },
+      { pubkey: owner, isSigner: true, isWritable: false },
+    ],
+    data,
+  });
+}
+
+function memoInstruction(memo: string): TransactionInstruction {
+  return new TransactionInstruction({ programId: MEMO_PROGRAM, keys: [], data: Buffer.from(memo, 'utf8') });
+}
+
+// The split-payment legs from a server quote; amounts are USDC base-unit strings.
+export interface SplitPaymentQuote {
+  mint: string;
+  memo: string;
+  creator: { owner: string; amount: string };
+  burn: { owner: string; amount: string };
+}
+
+/**
+ * Build + sign + send the buyer's atomic 70/30 USDC split payment via the
+ * connected wallet, then wait for finalization (the commitment the server
+ * verifies at) and return the signature to hand to /api/marketplace/buy.
+ */
+export async function signAndSendSplitPayment(q: SplitPaymentQuote): Promise<string> {
+  const wallet = selectedWallet;
+  const account = selectedAccount;
+  if (!wallet || !account) throw new Error('connect a wallet first');
+  if (!(SolanaSignAndSendTransaction in wallet.features)) throw new Error('the connected wallet cannot send transactions');
+  const sendFeature = (wallet.features as SolanaSignAndSendTransactionFeature)[SolanaSignAndSendTransaction];
+  const chain = account.chains.find((c) => c === MARKET_CHAIN) ?? account.chains.find(isSolanaChain);
+  if (!chain) throw new Error('the connected wallet has no Solana chain for the marketplace');
+
+  const mint = new PublicKey(q.mint);
+  const buyerPk = new PublicKey(account.address);
+  const buyerAta = associatedTokenAccount(buyerPk, mint);
+  const conn = getPaymentConnection();
+  const { blockhash, lastValidBlockHeight } = await conn.getLatestBlockhash('finalized');
+  const tx = new Transaction({ feePayer: buyerPk, blockhash, lastValidBlockHeight }).add(
+    transferCheckedIx(buyerAta, mint, associatedTokenAccount(new PublicKey(q.creator.owner), mint), buyerPk, BigInt(q.creator.amount), USDC_DECIMALS),
+    transferCheckedIx(buyerAta, mint, associatedTokenAccount(new PublicKey(q.burn.owner), mint), buyerPk, BigInt(q.burn.amount), USDC_DECIMALS),
+    memoInstruction(q.memo),
+  );
+  const wire = tx.serialize({ requireAllSignatures: false, verifySignatures: false });
+  const results = await sendFeature.signAndSendTransaction({ account, chain, transaction: new Uint8Array(wire) });
+  const result = results[0];
+  if (!result || !(result.signature instanceof Uint8Array)) throw new Error('the wallet returned no transaction signature');
+  const signature = bs58.encode(result.signature);
+  await conn.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, 'finalized');
+  return signature;
 }
