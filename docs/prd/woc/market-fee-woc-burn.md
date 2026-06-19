@@ -1,6 +1,10 @@
 # Feature Stub — Market fee in $WOC + burn
 
 > 🚧 **STATUS: STUB — opening discussion.** This is a *feature stub*, not an implementation. It exists to open a focused discussion thread around the **Market fee in $WOC + burn** `$WOC` flywheel mechanic before any code is written.
+>
+> 🚩 **See the flagship spec:** [`creator-skins-marketplace.md`](./creator-skins-marketplace.md) — a fuller PRD for a **Creator Skins Marketplace** (creators sell cosmetics for **USDC**; a fixed **70/30** split sends 70% to the creator and uses 30% to **market-buy `$WOC` on Jupiter and SPL-burn it**). This stub and the marketplace are the same **"real economic activity → `$WOC` burn"** family and share one on-chain burn ledger (`burn_batches.source`). The marketplace is the **revenue-backed** sibling (every dollar burned is backed by a dollar a buyer paid); this copper-fee burn is the in-game-activity sibling.
+>
+> ℹ️ **Branch note:** the marketplace PRD's `file:line` hook points are grounded against **`feature/eliza-agents`** (which carries the current cosmetic-skin system + the landed `server/solana.ts` / `server/billing.ts` / `bridge/` web3 stubs). This PR's branch is an older `main` fork point that predates them — so the line anchors below (and in the flagship doc) won't match this branch verbatim. Implementation base is an open decision (see the flagship's §12).
 
 | | |
 |---|---|
