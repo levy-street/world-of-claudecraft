@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { randomBytes, scrypt, timingSafeEqual } from 'node:crypto';
-import { RegExpMatcher, englishDataset, englishRecommendedTransformers } from 'obscenity';
+import { RegExpMatcher, englishDataset, englishRecommendedTransformers, parseRawPattern } from 'obscenity';
+import naughtyWords from 'naughty-words';
 
 const SCRYPT_N = 16384, SCRYPT_R = 8, SCRYPT_P = 1, KEYLEN = 64;
 
@@ -46,8 +47,36 @@ const CONFUSABLE_CHARS: Record<string, string> = {
   '8': 'b',
 };
 
+// The "usual" global banned/curse/naughty-word coverage: layer the multilingual
+// LDNOOBW list (naughty-words) on top of obscenity's curated English dataset.
+// We add LDNOOBW single Latin-script words (≥4 chars; the shorter English slurs
+// are already in englishDataset) as extra blacklist patterns, and keep
+// englishDataset's whitelist plus a curated allowlist so the classic
+// Scunthorpe-style false positives ("Scunthorpe", "Therapist", "Cockburn", …)
+// still pass. Matching runs through the recommended transformers, so leetspeak
+// and confusables are normalized before comparison. This is the one hardened
+// gate every player-visible name passes (accounts, characters, guilds, and —
+// in the SNS PR — subdomain labels), important because player-owned names can't
+// be reclaimed on-chain after the fact.
+const LDNOOBW_LANGS = ['en', 'de', 'es', 'fr', 'it', 'pt'];
+const LDNOOBW_EXTRA_TERMS = Array.from(
+  new Set(LDNOOBW_LANGS.flatMap((lang) => naughtyWords[lang] ?? [])),
+).filter((term): term is string => typeof term === 'string' && /^[a-z]{4,}$/.test(term));
+// Legitimate names/words that contain a banned substring — kept matchable.
+const NAME_ALLOWLIST = [
+  'scunthorpe', 'penistone', 'clitheroe', 'lightwater', 'cockburn', 'cockerel', 'peacock',
+  'babcock', 'hancock', 'woodcock', 'hitchcock', 'shuttlecock', 'therapist', 'therapy',
+  'sexton', 'sextet', 'sextant', 'essex', 'sussex', 'middlesex', 'wessex', 'analyst',
+  'analysis', 'assassin', 'assemble', 'assembly', 'assess', 'asset', 'assign', 'assist',
+  'cumberland', 'cumulus', 'document', 'dickens', 'dickinson', 'dixon',
+];
+const baseDataset = englishDataset.build();
 const profanityMatcher = new RegExpMatcher({
-  ...englishDataset.build(),
+  blacklistedTerms: [
+    ...baseDataset.blacklistedTerms,
+    ...LDNOOBW_EXTRA_TERMS.map((term, i) => ({ id: 1_000_000 + i, pattern: parseRawPattern(term) })),
+  ],
+  whitelistedTerms: [...(baseDataset.whitelistedTerms ?? []), ...NAME_ALLOWLIST],
   ...englishRecommendedTransformers,
 });
 

@@ -83,6 +83,7 @@ export interface SocialDb {
   // create the guild and seat its leader in one transaction, so a racing or
   // duplicate create packet can never orphan a leaderless guild
   createGuildWithLeader(name: string, leaderId: number): Promise<{ guildId: number } | { error: 'name_taken' | 'already_in_guild' }>;
+  renameGuild(guildId: number, newName: string): Promise<{ ok: true } | { error: 'name_taken' | 'not_found' }>;
   deleteGuild(id: number): Promise<void>;
   guildMembership(charId: number): Promise<{ guildId: number; guildName: string; rank: GuildRank } | null>;
   // seat a member atomically, enforcing the cap under concurrent accepts
@@ -317,6 +318,40 @@ export class SocialService {
     }
     this.info(actor.characterId, `You found the guild <${name}>! You are its Guild Master.`, '#40ff7f');
     this.push(actor.characterId);
+  }
+
+  // Read-only: the guild a character leads, for the paid-rename gate. Returns the
+  // guild id + current name + whether this character is the Guild Master.
+  async guildLeaderInfo(characterId: number): Promise<{ guildId: number; name: string; isLeader: boolean } | null> {
+    const membership = await this.db.guildMembership(characterId);
+    if (!membership) return null;
+    return { guildId: membership.guildId, name: membership.guildName, isLeader: membership.rank === 'leader' };
+  }
+
+  // Rename a guild on behalf of its leader. Result-returning (no session error
+  // side-effects) so the $WOC-paid REST flow can map it to HTTP; on success it
+  // still broadcasts + refreshes the guild panel for any online members. The
+  // leader may be offline (this is a character-management action), so we drive
+  // everything off the character id, not a live session.
+  async renameGuildAsLeader(
+    characterId: number,
+    rawName: string,
+  ): Promise<{ ok: true; guildId: number; oldName: string; name: string } | { ok: false; error: 'not_in_guild' | 'not_leader' | 'bad_name' | 'name_taken' }> {
+    const name = validateGuildName(rawName);
+    if (!name) return { ok: false, error: 'bad_name' };
+    const membership = await this.db.guildMembership(characterId);
+    if (!membership) return { ok: false, error: 'not_in_guild' };
+    if (membership.rank !== 'leader') return { ok: false, error: 'not_leader' };
+    const result = await this.db.renameGuild(membership.guildId, name);
+    if ('error' in result) {
+      // 'not_found' shouldn't happen (we just read the membership) — treat as taken-safe.
+      return { ok: false, error: result.error === 'name_taken' ? 'name_taken' : 'not_in_guild' };
+    }
+    await this.broadcastGuild(membership.guildId, [
+      { type: 'log', text: `The guild has been renamed to <${name}>.`, color: '#ffd100' },
+    ]);
+    await this.pushGuild(membership.guildId);
+    return { ok: true, guildId: membership.guildId, oldName: membership.guildName, name };
   }
 
   async guildInvite(actor: SocialActor, name: string): Promise<void> {

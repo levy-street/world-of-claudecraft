@@ -220,6 +220,52 @@ CREATE TABLE IF NOT EXISTS referrals (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS referrals_referrer ON referrals(referrer_account_id);
+-- $WOC payment receipts (PRD: docs/prd/woc/rename-vanity-names.md). One row per
+-- consumed on-chain payment; tx_sig UNIQUE is the replay guard — a signature can
+-- settle exactly one action, so a confirmed payment can never be redeemed twice.
+-- Pure audit + idempotency: the server never holds keys or funds.
+CREATE TABLE IF NOT EXISTS woc_payments (
+  id BIGSERIAL PRIMARY KEY,
+  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  tx_sig TEXT NOT NULL UNIQUE,
+  amount_base BIGINT NOT NULL,
+  burned_base BIGINT NOT NULL DEFAULT 0,
+  mint TEXT NOT NULL,
+  reference TEXT NOT NULL DEFAULT '',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS woc_payments_account ON woc_payments(account_id, created_at DESC);
+-- Short-lived, single-use $WOC payment quotes. A quote authorizes one identity
+-- action (rename/reserve) at a fixed price; the client pays on-chain with the
+-- quote id as the tx memo, then redeems it. Stored server-side so the client
+-- cannot change what a payment buys; consuming the quote deletes the row.
+CREATE TABLE IF NOT EXISTS woc_quotes (
+  quote_id TEXT PRIMARY KEY,
+  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  kind TEXT NOT NULL,
+  payload JSONB NOT NULL DEFAULT '{}'::jsonb,
+  price_base BIGINT NOT NULL,
+  mint TEXT NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS woc_quotes_account ON woc_quotes(account_id);
+-- Vanity name reservations: pay $WOC to hold a name you are not yet using.
+-- Realm-scoped and case-insensitively unique while active; an expiry releases it
+-- so a name can't be squatted forever. status: 'active' | 'released'.
+CREATE TABLE IF NOT EXISTS name_reservations (
+  id BIGSERIAL PRIMARY KEY,
+  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  realm TEXT NOT NULL DEFAULT '${REALM_SQL_DEFAULT}',
+  name TEXT NOT NULL,
+  kind TEXT NOT NULL DEFAULT 'character',
+  status TEXT NOT NULL DEFAULT 'active',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  expires_at TIMESTAMPTZ
+);
+CREATE UNIQUE INDEX IF NOT EXISTS name_reservations_active
+  ON name_reservations(realm, lower(name)) WHERE status = 'active';
+CREATE INDEX IF NOT EXISTS name_reservations_account ON name_reservations(account_id);
 `;
 
 export async function ensureSchema(): Promise<void> {
@@ -464,6 +510,134 @@ export async function linkWalletToAccount(accountId: number, pubkey: string): Pr
 
 export async function unlinkWallet(accountId: number): Promise<void> {
   await pool.query('DELETE FROM wallet_links WHERE account_id = $1', [accountId]);
+}
+
+// ── $WOC payments / quotes / vanity reservations ───────────────────────────
+// BIGINT columns are read/written as decimal strings: $WOC base-unit amounts can
+// exceed Number.MAX_SAFE_INTEGER, so callers pass bigints and we bind String(…).
+
+export interface WocQuoteRow {
+  quote_id: string;
+  account_id: number;
+  kind: string;
+  payload: any;
+  price_base: string;
+  mint: string;
+  expires_at: string;
+}
+
+export async function createWocQuote(row: {
+  quoteId: string;
+  accountId: number;
+  kind: string;
+  payload: unknown;
+  priceBase: bigint;
+  mint: string;
+  ttlMinutes: number;
+}): Promise<void> {
+  await pool.query(
+    `INSERT INTO woc_quotes (quote_id, account_id, kind, payload, price_base, mint, expires_at)
+     VALUES ($1, $2, $3, $4, $5, $6, now() + ($7 || ' minutes')::interval)`,
+    [row.quoteId, row.accountId, row.kind, JSON.stringify(row.payload ?? {}), String(row.priceBase), row.mint, String(row.ttlMinutes)],
+  );
+}
+
+// Read a quote non-destructively: returned when it belongs to the account and is
+// unexpired. The confirm flow verifies payment BEFORE deleting the quote so a
+// too-early/too-late confirm never strands an already-burned payment; the
+// woc_payments tx_sig UNIQUE is the real single-settlement guard, and the quote
+// is deleted (deleteWocQuote) only after a successful, recorded settlement.
+export async function getWocQuote(quoteId: string, accountId: number): Promise<WocQuoteRow | null> {
+  const res = await pool.query(
+    `SELECT quote_id, account_id, kind, payload, price_base, mint, expires_at
+     FROM woc_quotes WHERE quote_id = $1 AND account_id = $2 AND expires_at > now()`,
+    [quoteId, accountId],
+  );
+  return res.rows[0] ?? null;
+}
+
+export async function deleteWocQuote(quoteId: string): Promise<void> {
+  await pool.query('DELETE FROM woc_quotes WHERE quote_id = $1', [quoteId]);
+}
+
+export async function pruneWocQuotes(): Promise<void> {
+  await pool.query('DELETE FROM woc_quotes WHERE expires_at <= now()');
+}
+
+// Record a consumed on-chain payment. Returns null when the tx_sig was already
+// recorded (UNIQUE replay guard) so the caller rejects a double-spend.
+export async function recordWocPayment(row: {
+  accountId: number;
+  txSig: string;
+  amountBase: bigint;
+  burnedBase: bigint;
+  mint: string;
+  reference: string;
+}): Promise<{ id: number } | null> {
+  try {
+    const res = await pool.query(
+      `INSERT INTO woc_payments (account_id, tx_sig, amount_base, burned_base, mint, reference)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
+      [row.accountId, row.txSig, String(row.amountBase), String(row.burnedBase), row.mint, row.reference],
+    );
+    return { id: Number(res.rows[0].id) };
+  } catch (err) {
+    if (isUniqueViolation(err)) return null;
+    throw err;
+  }
+}
+
+export interface NameReservationRow {
+  id: number;
+  account_id: number;
+  name: string;
+  kind: string;
+  expires_at: string | null;
+}
+
+// Reserve a name for an account (realm-scoped, expiring). Returns null when an
+// active reservation for that name already exists (partial UNIQUE index races to
+// 23505) so the handler can surface "already reserved".
+export async function reserveName(
+  accountId: number,
+  name: string,
+  kind: string,
+  ttlDays: number,
+): Promise<NameReservationRow | null> {
+  try {
+    const res = await pool.query(
+      `INSERT INTO name_reservations (account_id, realm, name, kind, expires_at)
+       VALUES ($1, $2, $3, $4, now() + ($5 || ' days')::interval)
+       RETURNING id, account_id, name, kind, expires_at`,
+      [accountId, REALM, name, kind, String(ttlDays)],
+    );
+    return res.rows[0] ?? null;
+  } catch (err) {
+    if (isUniqueViolation(err)) return null;
+    throw err;
+  }
+}
+
+// The account holding an active, unexpired reservation for `name` (realm-scoped),
+// or null. Lets a rename/create allow a reserved name only for its reserver.
+export async function activeReservationHolder(name: string): Promise<number | null> {
+  const res = await pool.query(
+    `SELECT account_id FROM name_reservations
+     WHERE realm = $1 AND lower(name) = lower($2) AND status = 'active'
+       AND (expires_at IS NULL OR expires_at > now())
+     LIMIT 1`,
+    [REALM, name],
+  );
+  return res.rows[0]?.account_id ?? null;
+}
+
+export async function countActiveReservations(accountId: number): Promise<number> {
+  const res = await pool.query(
+    `SELECT count(*)::int AS n FROM name_reservations
+     WHERE account_id = $1 AND status = 'active' AND (expires_at IS NULL OR expires_at > now())`,
+    [accountId],
+  );
+  return res.rows[0]?.n ?? 0;
 }
 
 // ── Shareable player cards + referrals ─────────────────────────────────────

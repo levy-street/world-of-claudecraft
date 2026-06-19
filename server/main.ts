@@ -7,7 +7,7 @@ import {
   listCharacters, getCharacter, createCharacterCapped, deleteCharacter, closeOrphanSessions,
   pruneChatLogs, searchCharacters, characterCountsByRealm, moderationStatusForAccount, renameCharacter,
   findCharacterReportTargetByName, topArenaRatings, topLifetimeXp, chatMuteStatusForAccount, loadAccountCosmetics,
-  referralCountForAccount, primarySlugForAccount, lifetimeXpStanding,
+  referralCountForAccount, primarySlugForAccount, lifetimeXpStanding, activeReservationHolder,
 } from './db';
 import { virtualLevel } from '../src/sim/types';
 import { Sim } from '../src/sim/sim';
@@ -23,6 +23,9 @@ import { json, readBody, isUniqueViolation } from './http_util';
 import { requestIp, rateLimited, authThrottled, recordAuthFailure, clearAuthFailures } from './ratelimit';
 import { verifyTurnstile } from './turnstile';
 import { handleWalletChallenge, handleWalletLink, handleWalletGet, handleWalletUnlink } from './wallet';
+import { handleIdentityQuote, handleIdentityConfirm, registerIdentityActions } from './identity';
+import { makeIdentityActions } from './identity_actions';
+import { validateGuildName } from './social';
 import { handleCardUpload, handleCardRoutes, captureReferral } from './player_card';
 import { handleAdminApi } from './admin';
 import { handleInternalApi } from './internal';
@@ -47,6 +50,18 @@ const TURNSTILE_SECRET = process.env.TURNSTILE_SECRET ?? '';
 const MAX_WS_PER_IP_HARD = Number(process.env.MAX_WS_PER_IP_HARD ?? '20');
 
 const game = new GameServer();
+
+// $WOC-paid identity actions (rename/reserve) — bridge the payment flow to the
+// live game (online check + guild leadership/rename) without leaking the socket
+// layer into the payment module.
+registerIdentityActions(
+  makeIdentityActions({
+    isCharacterOnline: (characterId) => [...game.clients.values()].some((s) => s.characterId === characterId),
+    guildLeaderInfo: (characterId) => game.social.guildLeaderInfo(characterId),
+    renameGuildAsLeader: (characterId, newName) => game.social.renameGuildAsLeader(characterId, newName),
+    validateGuildName,
+  }),
+);
 
 function initialCharacterState(cls: PlayerClass, name: string, skin: number): import('../src/sim/sim').CharacterState {
   const sim = new Sim({ seed: 20061, playerClass: cls, playerName: name });
@@ -417,6 +432,19 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       if (name === null) return json(res, 400, { error: 'invalid character name (2-16 letters)' });
       if (offensiveName(name)) return json(res, 400, { error: 'character name is not allowed' });
       const characterId = Number(renameMatch[1]);
+      const character = await getCharacter(accountId, characterId);
+      if (!character) return json(res, 404, { error: 'character not found' });
+      // This endpoint serves only the FREE, moderator-required rename (clearing
+      // force_rename). A voluntary rename is a $WOC sink — route it through
+      // POST /api/identity/quote + /confirm instead, so it can't be done for free
+      // here. (402 Payment Required signals the client to start the paid flow.)
+      if (!character.force_rename) {
+        return json(res, 402, { error: 'voluntary renames cost $WOC — use /api/identity/quote', paid: true });
+      }
+      // A reserved name is takeable only by the account that reserved it — even
+      // on the free remediation path, a player can't grab someone else's name.
+      const holder = await activeReservationHolder(name);
+      if (holder !== null && holder !== accountId) return json(res, 409, { error: 'that name is reserved' });
       // A rename mutates the DB name and clears force_rename, but a live
       // ClientSession keeps its own copy of the name (used by reports, chat and
       // /api/status). Renaming an online character desyncs that copy and — worse
@@ -558,6 +586,17 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
       return handleWalletGet(req, res, accountId);
+    }
+    // $WOC-paid identity actions: quote a burn price, then redeem the signature.
+    if (req.method === 'POST' && url === '/api/identity/quote') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleIdentityQuote(req, res, accountId);
+    }
+    if (req.method === 'POST' && url === '/api/identity/confirm') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleIdentityConfirm(req, res, accountId);
     }
     // Shareable player card: publish (PNG body) + referral stats for the card.
     if (req.method === 'POST' && url === '/api/card') {

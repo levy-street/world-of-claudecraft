@@ -56,6 +56,14 @@ class FakeDb implements SocialDb {
     this.members.set(leaderId, { guildId: id, rank: 'leader' });
     return { guildId: id };
   }
+  async renameGuild(guildId: number, newName: string): Promise<{ ok: true } | { error: 'name_taken' | 'not_found' }> {
+    if (!this.guilds.has(guildId)) return { error: 'not_found' };
+    if ([...this.guilds].some(([gid, n]) => gid !== guildId && n.toLowerCase() === newName.toLowerCase())) {
+      return { error: 'name_taken' };
+    }
+    this.guilds.set(guildId, newName);
+    return { ok: true };
+  }
   async deleteGuild(id: number): Promise<void> {
     this.guilds.delete(id);
     for (const [cid, m] of [...this.members]) if (m.guildId === id) this.members.delete(cid);
@@ -300,6 +308,43 @@ describe('guilds', () => {
     expect(snap.guild?.name).toBe('Iron Vanguard');
     expect(snap.guild?.rank).toBe('leader');
     expect(snap.guild?.members.map((m) => m.name)).toEqual(['Aleph']);
+  });
+
+  describe('renameGuildAsLeader (paid $WOC rename path)', () => {
+    it('lets the Guild Master rename the guild', async () => {
+      await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+      const r = await h.svc.renameGuildAsLeader(1, 'Golden Vanguard');
+      expect(r).toMatchObject({ ok: true, oldName: 'Iron Vanguard', name: 'Golden Vanguard' });
+      expect((await h.svc.snapshot(1)).guild?.name).toBe('Golden Vanguard');
+    });
+
+    it('refuses a non-leader member', async () => {
+      await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+      await h.svc.guildInvite(h.actor(1), 'Bet');
+      await h.svc.guildAccept(h.actor(2));
+      const r = await h.svc.renameGuildAsLeader(2, 'Golden Vanguard');
+      expect(r).toEqual({ ok: false, error: 'not_leader' });
+      expect((await h.svc.snapshot(1)).guild?.name).toBe('Iron Vanguard');
+    });
+
+    it('refuses a character with no guild', async () => {
+      const r = await h.svc.renameGuildAsLeader(3, 'Golden Vanguard');
+      expect(r).toEqual({ ok: false, error: 'not_in_guild' });
+    });
+
+    it('rejects an invalid guild name without touching the guild', async () => {
+      await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+      const r = await h.svc.renameGuildAsLeader(1, 'x');
+      expect(r).toEqual({ ok: false, error: 'bad_name' });
+      expect((await h.svc.snapshot(1)).guild?.name).toBe('Iron Vanguard');
+    });
+
+    it('rejects a name already taken by another guild', async () => {
+      await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+      await h.svc.guildCreate(h.actor(2), 'Silver Phalanx');
+      const r = await h.svc.renameGuildAsLeader(1, 'Silver Phalanx');
+      expect(r).toEqual({ ok: false, error: 'name_taken' });
+    });
   });
 
   it('refreshes guildmates\' panels when a member comes online, even non-friends (#100)', async () => {
