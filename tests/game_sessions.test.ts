@@ -178,6 +178,41 @@ describe('GameServer sessions', () => {
     expect((server as any).sessionByCharacterId(101)).toBe(rejoined);
   });
 
+  it('retries failed disconnect saves before releasing the character for rejoin', async () => {
+    vi.useFakeTimers();
+    vi.mocked(saveCharacterState).mockReset();
+    vi.mocked(saveCharacterState)
+      .mockRejectedValueOnce(new Error('temporary database outage'))
+      .mockRejectedValueOnce(new Error('temporary database outage'))
+      .mockResolvedValueOnce(undefined);
+
+    try {
+      const server = new GameServer();
+      const session = expectJoined(server.join(fakeWs(), 11, 101, 'Indexa', 'warrior', null));
+      const leaving = server.leave(session, 'test');
+
+      await vi.waitFor(() => {
+        expect(saveCharacterState).toHaveBeenCalledTimes(1);
+      });
+      expect(server.join(fakeWs(), 12, 101, 'Indexa', 'warrior', null)).toEqual({
+        error: 'character already in world',
+      });
+
+      await vi.runOnlyPendingTimersAsync();
+      await vi.waitFor(() => {
+        expect(saveCharacterState).toHaveBeenCalledTimes(2);
+      });
+
+      await vi.runOnlyPendingTimersAsync();
+      await leaving;
+
+      expect(saveCharacterState).toHaveBeenCalledTimes(3);
+      expect((server as any).sessionByCharacterId(101)).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('serializes overlapping saves for one character so an older write cannot land last', async () => {
     vi.mocked(saveCharacterState).mockReset();
     vi.mocked(saveCharacterState).mockResolvedValue(undefined);
