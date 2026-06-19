@@ -27,6 +27,9 @@ import {
   handleEmailUnsubscribe,
   verifyLoginTwoFactor,
 } from './account';
+import { handleIdentityConfirm, handleIdentityQuote, registerIdentityActions } from './identity';
+import { makeIdentityActions } from './identity_actions';
+import { validateGuildName } from './social';
 import { handleAdminApi } from './admin';
 import { currentSitePresenceUsers, recordSitePresenceSample } from './admin_db';
 import {
@@ -44,6 +47,7 @@ import {
   accountAndScopeForToken,
   accountById,
   accountForToken,
+  activeReservationHolder,
   type CharacterRow,
   characterCountForAccount,
   characterCountsByRealm,
@@ -191,6 +195,19 @@ const MAX_WS_PER_IP_HARD = Number(process.env.MAX_WS_PER_IP_HARD ?? '20');
 const BLOCKED_IP_REFRESH_MS = 60_000;
 
 const game = new GameServer();
+
+// $WOC-paid identity actions (rename/reserve): bridge the payment flow to the
+// live game (online check + guild leadership/rename) without leaking the socket
+// layer into the payment module.
+registerIdentityActions(
+  makeIdentityActions({
+    isCharacterOnline: (characterId) =>
+      [...game.clients.values()].some((s) => s.characterId === characterId),
+    guildLeaderInfo: (characterId) => game.social.guildLeaderInfo(characterId),
+    renameGuildAsLeader: (characterId, newName) => game.social.renameGuildAsLeader(characterId, newName),
+    validateGuildName,
+  }),
+);
 
 function initialCharacterState(
   cls: PlayerClass,
@@ -877,15 +894,17 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const characterId = Number(renameMatch[1]);
       const character = await getCharacter(accountId, characterId);
       if (!character) return json(res, 404, { error: 'character not found' });
-      // A rename is a moderator-sanctioned action: the character-select UI only
-      // shows the rename control when a moderator has set force_rename. The UI is
-      // not a security boundary, so gate here too: a normal owner hitting this
-      // route directly must not be able to rename an un-flagged character. (The
-      // UPDATE in renameCharacter re-checks the flag race-free; this returns a
-      // clear 403 instead of a misleading 404.)
+      // This endpoint serves only the FREE, moderator-required rename (clearing
+      // force_rename). A voluntary rename is a $WOC sink: route it through
+      // POST /api/identity/quote + /confirm instead, so it can't be done for free
+      // here. (402 Payment Required signals the client to start the paid flow.)
       if (!character.force_rename) {
-        return json(res, 403, { error: 'character rename is not permitted' });
+        return json(res, 402, { error: 'voluntary renames cost $WOC, use /api/identity/quote', paid: true });
       }
+      // A reserved name is takeable only by the account that reserved it: even
+      // on the free remediation path, a player can't grab someone else's name.
+      const holder = await activeReservationHolder(name);
+      if (holder !== null && holder !== accountId) return json(res, 409, { error: 'that name is reserved' });
       // A rename mutates the DB name and clears force_rename, but a live
       // ClientSession keeps its own copy of the name (used by reports, chat and
       // /api/status). Renaming an online character desyncs that copy and — worse
@@ -1257,7 +1276,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       if (accountId === null) return;
       return handleWalletGet(req, res, accountId);
     }
-    // $WOC balance proxy — keeps the Solana RPC endpoint (and any key in it)
+    // $WOC balance proxy: keeps the Solana RPC endpoint (and any key in it)
     // server-side so it never ships in the client bundle. Public (on-chain
     // balances are public) but narrow + IP rate-limited + per-wallet cached.
     if (req.method === 'GET' && url === '/api/woc/balance') {
@@ -1268,6 +1287,17 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       // `fresh=1` is parsed AFTER the IP rate-limit above, so it can't be used to hammer the RPC.
       const { owner, fresh } = parseWocBalanceQuery(req.url ?? '');
       return handleWocBalance(res, owner, fresh);
+    }
+    // $WOC-paid identity actions: quote a burn price, then redeem the signature.
+    if (req.method === 'POST' && url === '/api/identity/quote') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleIdentityQuote(req, res, accountId);
+    }
+    if (req.method === 'POST' && url === '/api/identity/confirm') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleIdentityConfirm(req, res, accountId);
     }
     // Shareable player card: publish (PNG body) + referral stats for the card.
     if (req.method === 'POST' && url === '/api/card') {
