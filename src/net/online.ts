@@ -51,6 +51,7 @@ import {
   type LeaderboardPage,
   type LockpickView,
   type MarketInfo,
+  normalizeAccountCosmetics,
   type OverheadEmoteId,
   type PartyInfo,
   type PresenceStatus,
@@ -75,20 +76,6 @@ export interface CharacterSummary {
   playtimeSeconds?: number;
 }
 
-function stringList(value: unknown): string[] {
-  return Array.isArray(value)
-    ? value.filter((item): item is string => typeof item === 'string')
-    : [];
-}
-
-function normalizeAccountCosmetics(value: unknown): AccountCosmetics {
-  const src = value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
-  return {
-    completedQuestIds: stringList(src.completedQuestIds),
-    mechChromaIds: stringList(src.mechChromaIds),
-    ownedCreatorSkinIds: stringList(src.ownedCreatorSkinIds),
-  };
-}
 
 export function buildWebSocketUrl(protocol: string, host: string): string {
   const proto = protocol === 'https:' ? 'wss' : 'ws';

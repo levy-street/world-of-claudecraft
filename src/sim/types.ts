@@ -253,6 +253,11 @@ export const EQUIP_SLOTS: readonly EquipSlot[] = [
 ];
 
 export type SkinCatalog = 'class' | 'mech';
+// Max length of an opaque creator-skin id (Entity.cosmeticSkinId). A UUID fits
+// well under this; the cap keeps the field cheap on the wire and bounds the
+// state an unowned/forged id could occupy. Enforced at both the server equip
+// gate and the sim setter.
+export const MAX_COSMETIC_SKIN_ID_LEN = 64;
 
 export type ItemUse =
   | { type: 'fishing' }

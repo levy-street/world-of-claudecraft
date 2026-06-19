@@ -69,17 +69,18 @@ function statusEl(card: HTMLElement): HTMLElement {
 async function onBuy(skin: CreatorSkinRegistryEntry, card: HTMLElement, button: HTMLButtonElement): Promise<void> {
   if (!hooks) return;
   const status = statusEl(card);
-  if (!hooks.isWalletConnected()) {
-    status.textContent = t('marketplace.connectFirst');
-    await hooks.connectWallet();
-    if (!hooks.isWalletConnected()) return;
-  }
   button.disabled = true;
-  status.textContent = t('marketplace.purchasing');
   try {
+    if (!hooks.isWalletConnected()) {
+      status.textContent = t('marketplace.connectFirst');
+      await hooks.connectWallet();
+      if (!hooks.isWalletConnected()) { button.disabled = false; return; }
+    }
+    status.textContent = t('marketplace.purchasing');
     await hooks.purchase(skin);
     status.textContent = t('marketplace.owned');
     button.textContent = t('marketplace.owned');
+    // leave the button disabled — the skin is now owned + equipped
   } catch (err) {
     const detail = err instanceof Error && err.message ? `: ${err.message}` : '';
     status.textContent = `${t('marketplace.failed')}${detail}`.slice(0, 120);

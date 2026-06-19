@@ -1,8 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
-  splitAmounts, validateSplitPayment, verifyPurchase,
+  splitAmounts, validateSplitPayment, verifyPurchase, registrySkins, quotePurchase,
   type SplitVerifyReason,
 } from '../server/marketplace';
+import type { CreatorSkinRow } from '../server/db';
 import {
   parseSplitPayment, SPL_TOKEN_PROGRAM, SPL_TOKEN_2022_PROGRAM,
   type RawConfirmedTransaction,
@@ -74,6 +75,14 @@ describe('splitAmounts — fixed 70/30, price-independent, no lost base unit', (
   it('gives the creator exactly 70% to the base unit at scale', () => {
     expect(splitAmounts(10_000_000n).creator).toBe(7_000_000n);
   });
+
+  it('at a zero price returns a zero split (no division surprise)', () => {
+    expect(splitAmounts(0n)).toEqual({ creator: 0n, burn: 0n });
+  });
+
+  it('at 1 base unit the creator floors to 0 and all dust burns', () => {
+    expect(splitAmounts(1n)).toEqual({ creator: 0n, burn: 1n });
+  });
 });
 
 describe('parseSplitPayment — pure reduction of a confirmed tx', () => {
@@ -111,6 +120,64 @@ describe('parseSplitPayment — pure reduction of a confirmed tx', () => {
   it('omits zero-net deltas (an account touched but unchanged)', () => {
     const tx = makeTx({ balances: [{ owner: BUYER, pre: '5', post: '5' }] });
     expect(parseSplitPayment(tx, USDC).usdcDeltas.has(BUYER)).toBe(false);
+  });
+
+  it('sums a delta across multiple USDC accounts owned by the same wallet', () => {
+    const tx = makeTx({ feePayer: BUYER, memo: 'q_abc', balances: [
+      { owner: BUYER, pre: '10000000', post: '0' },
+      { owner: CREATOR, pre: '0', post: '3500000' },
+      { owner: CREATOR, pre: '0', post: '3500000' }, // a second ATA — must aggregate to 7M
+      { owner: VAULT, pre: '0', post: '3000000' },
+    ] });
+    const parsed = parseSplitPayment(tx, USDC);
+    expect(parsed.usdcDeltas.get(CREATOR)).toBe(7_000_000n);
+    expect(validateSplitPayment(parsed, quote(), BUYER)).toBe('ok');
+  });
+
+  it('reads the first memo instruction and ignores any later one', () => {
+    const tx = goodTx('q_abc');
+    tx.transaction.message.instructions.push({ program: 'spl-memo', parsed: 'a_second_memo' });
+    expect(parseSplitPayment(tx, USDC).memo).toBe('q_abc');
+  });
+});
+
+function creatorSkinRow(over: Partial<CreatorSkinRow> = {}): CreatorSkinRow {
+  return {
+    id: 'skin_1', creatorAccountId: 7, creatorWallet: CREATOR, name: 'Dragonscale',
+    description: 'Scaled plate', skinCatalog: 'class', fallbackSkin: 0, targetClass: 'warrior',
+    assetUrl: 'https://cdn.example/skin_1.png', emissiveUrl: null, priceUsdc: 10_000_000n,
+    status: 'live', sha256: null, ...over,
+  };
+}
+
+describe('registrySkins — public projection', () => {
+  afterEach(() => vi.clearAllMocks());
+
+  it('maps live rows to public metadata (price as string) and drops internal fields', async () => {
+    db.listLiveCreatorSkins.mockResolvedValueOnce([creatorSkinRow()]);
+    const skins = await registrySkins();
+    expect(skins).toEqual([{
+      id: 'skin_1', name: 'Dragonscale', description: 'Scaled plate', skinCatalog: 'class',
+      fallbackSkin: 0, targetClass: 'warrior', assetUrl: 'https://cdn.example/skin_1.png',
+      emissiveUrl: null, priceUsdc: '10000000',
+    }]);
+    // the creator wallet, account id, status, and sha are NOT exposed publicly
+    expect(skins[0]).not.toHaveProperty('creatorWallet');
+    expect(skins[0]).not.toHaveProperty('status');
+  });
+});
+
+describe('quotePurchase — split + persisted binding', () => {
+  afterEach(() => vi.clearAllMocks());
+
+  it('splits the skin price 70/30 onto the creator wallet and persists the quote', async () => {
+    const quoteRow = await quotePurchase(creatorSkinRow(), 42);
+    expect(quoteRow.creatorUsdc).toBe(7_000_000n);
+    expect(quoteRow.burnUsdc).toBe(3_000_000n);
+    expect(quoteRow.creatorOwner).toBe(CREATOR);
+    expect(quoteRow.skinId).toBe('skin_1');
+    expect(quoteRow.buyerAccountId).toBe(42);
+    expect(db.createMarketplaceQuote).toHaveBeenCalledWith(quoteRow);
   });
 });
 
@@ -196,7 +263,7 @@ const db = vi.hoisted(() => ({
   recordOnchainPayment: vi.fn(async () => true),
   recordMarketplaceSale: vi.fn(async () => {}),
   grantAccountCreatorSkin: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [], ownedCreatorSkinIds: ['skin_1'] })),
-  listLiveCreatorSkins: vi.fn(async () => []),
+  listLiveCreatorSkins: vi.fn(async (): Promise<CreatorSkinRow[]> => []),
   createMarketplaceQuote: vi.fn(async () => {}),
 }));
 vi.mock('../server/db', () => db);

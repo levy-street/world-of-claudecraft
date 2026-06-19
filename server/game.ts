@@ -16,6 +16,7 @@ import {
   EQUIP_SLOTS,
   type EquipSlot,
   emptyMoveInput,
+  MAX_COSMETIC_SKIN_ID_LEN,
   RUN_SPEED,
   type SimEvent,
 } from '../src/sim/types';
@@ -1902,7 +1903,7 @@ export class GameServer {
           // owns; a forged, unowned, or oversized id is dropped to null (the
           // built-in skin below still applies). Ownership is the authoritative
           // gate — equipping can never grant a cosmetic, only select an owned one.
-          const requested = typeof msg.csk === 'string' && msg.csk.length > 0 && msg.csk.length <= 64 ? msg.csk : null;
+          const requested = typeof msg.csk === 'string' && msg.csk.length > 0 && msg.csk.length <= MAX_COSMETIC_SKIN_ID_LEN ? msg.csk : null;
           const overlay = requested && session.accountCosmetics.ownedCreatorSkinIds.includes(requested) ? requested : null;
           if (msg.catalog === 'mech') {
             const idx = Math.max(0, Math.floor(msg.skin));

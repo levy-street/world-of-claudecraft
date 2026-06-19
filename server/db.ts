@@ -3,6 +3,7 @@ import { LEADERBOARD_MAX } from '../src/sim/leaderboard_page';
 import { sanitizeRemovedZone1Content } from '../src/sim/removed_zone1_content';
 import type { CharacterState, MarketSave } from '../src/sim/sim';
 import type { ArenaFormat, PlayerClass } from '../src/sim/types';
+import { normalizeAccountCosmetics } from '../src/world_api';
 import { seedChatFilterDefaults } from './chat_filter_db';
 import type { ChatLogRow } from './chat_log';
 import { isUniqueViolation } from './http_util';
@@ -430,7 +431,7 @@ CREATE TABLE IF NOT EXISTS creator_skins (
   target_class TEXT,
   asset_url TEXT NOT NULL,
   emissive_url TEXT,
-  price_usdc BIGINT NOT NULL,
+  price_usdc BIGINT NOT NULL CHECK (price_usdc > 0),
   status TEXT NOT NULL DEFAULT 'draft',
   sha256 TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -546,26 +547,10 @@ export interface AccountCosmetics {
   ownedCreatorSkinIds: string[];
 }
 
-function uniqueStrings(value: unknown): string[] {
-  if (!Array.isArray(value)) return [];
-  const out: string[] = [];
-  const seen = new Set<string>();
-  for (const item of value) {
-    if (typeof item !== 'string' || item.length === 0 || seen.has(item)) continue;
-    seen.add(item);
-    out.push(item);
-  }
-  return out;
-}
-
-export function normalizeAccountCosmetics(value: unknown): AccountCosmetics {
-  const src = value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
-  return {
-    completedQuestIds: uniqueStrings(src.completedQuestIds),
-    mechChromaIds: uniqueStrings(src.mechChromaIds),
-    ownedCreatorSkinIds: uniqueStrings(src.ownedCreatorSkinIds),
-  };
-}
+// The cosmetics-blob normalizer is shared with the client; it lives in
+// world_api.ts (the seam both sides import) so the two can't drift. Re-exported
+// here so existing `from './db'` importers keep working.
+export { normalizeAccountCosmetics };
 
 export async function loadAccountCosmetics(accountId: number): Promise<AccountCosmetics> {
   const res = await pool.query('SELECT cosmetics FROM accounts WHERE id = $1', [accountId]);
