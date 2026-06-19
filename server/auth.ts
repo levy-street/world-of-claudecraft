@@ -1,4 +1,4 @@
-import { randomBytes, scrypt, timingSafeEqual } from 'node:crypto';
+import { createHash, randomBytes, scrypt, timingSafeEqual } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { englishDataset, englishRecommendedTransformers, RegExpMatcher } from 'obscenity';
 
@@ -32,6 +32,17 @@ export function verifyPassword(password: string, stored: string): Promise<boolea
 
 export function newToken(): string {
   return randomBytes(32).toString('hex');
+}
+
+// Session tokens are stored HASHED at rest, never in plaintext. A token is a
+// 256-bit CSPRNG value (newToken), so a fast unsalted SHA-256 is sufficient:
+// there is nothing to brute-force and no per-row salt is needed (lookup is by
+// value, so the hash must be deterministic). The raw token is returned to the
+// client exactly once; only its digest is persisted, so a leaked auth_tokens
+// table yields irreversible hashes rather than live bearer tokens. Used by
+// saveToken/accountForToken in server/db.ts.
+export function hashToken(token: string): string {
+  return createHash('sha256').update(token).digest('hex');
 }
 
 const CONFUSABLE_CHARS: Record<string, string> = {

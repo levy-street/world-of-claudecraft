@@ -3,6 +3,7 @@ import { LEADERBOARD_MAX } from '../src/sim/leaderboard_page';
 import { sanitizeRemovedZone1Content } from '../src/sim/removed_zone1_content';
 import type { CharacterState, MailSave, MarketSave } from '../src/sim/sim';
 import type { ArenaFormat, PlayerClass } from '../src/sim/types';
+import { hashToken } from './auth';
 import { seedChatFilterDefaults } from './chat_filter_db';
 import type { ChatLogRow } from './chat_log';
 import { DISCORD_SCHEMA } from './discord_db';
@@ -72,6 +73,9 @@ CREATE TABLE IF NOT EXISTS accounts (
   last_login TIMESTAMPTZ
 );
 CREATE TABLE IF NOT EXISTS auth_tokens (
+  -- Stores the SHA-256 hash of the bearer token (hex), never the raw token.
+  -- Every read and write hashes the token via hashToken() in auth.ts; the
+  -- plaintext token is returned to the client once and is never persisted.
   token TEXT PRIMARY KEY,
   account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -875,17 +879,20 @@ export async function saveToken(
   scope: TokenScope = 'full',
   label: string | null = null,
 ): Promise<void> {
+  // Persist only the hash — see hashToken() in auth.ts. The caller keeps the
+  // raw token to hand back to the client.
   await pool.query(
     `INSERT INTO auth_tokens (token, account_id, expires_at, scope, label)
      VALUES ($1, $2, now() + ($3 || ' hours')::interval, $4, $5)`,
-    [token, accountId, String(ttlHours), scope, label],
+    [hashToken(token), accountId, String(ttlHours), scope, label],
   );
 }
 
 export async function accountForToken(token: string): Promise<number | null> {
+  // Look up by the hash of the presented token; the table never holds plaintext.
   const res = await pool.query(
     'SELECT account_id FROM auth_tokens WHERE token = $1 AND expires_at > now()',
-    [token],
+    [hashToken(token)],
   );
   return res.rows[0]?.account_id ?? null;
 }
@@ -899,7 +906,7 @@ export async function accountAndScopeForToken(
 ): Promise<{ accountId: number; scope: TokenScope } | null> {
   const res = await pool.query(
     'SELECT account_id, scope FROM auth_tokens WHERE token = $1 AND expires_at > now()',
-    [token],
+    [hashToken(token)],
   );
   const row = res.rows[0];
   if (!row) return null;
@@ -969,7 +976,7 @@ export async function revokeTokensExcept(
   if (keepToken) {
     await pool.query('DELETE FROM auth_tokens WHERE account_id = $1 AND token <> $2', [
       accountId,
-      keepToken,
+      hashToken(keepToken),
     ]);
   } else {
     await pool.query('DELETE FROM auth_tokens WHERE account_id = $1', [accountId]);
@@ -977,7 +984,7 @@ export async function revokeTokensExcept(
 }
 
 export async function revokeToken(token: string): Promise<void> {
-  await pool.query('DELETE FROM auth_tokens WHERE token = $1', [token]);
+  await pool.query('DELETE FROM auth_tokens WHERE token = $1', [hashToken(token)]);
 }
 
 // Revoke a read-scoped token by value (OAuth/RFC-7009 revocation, companion
@@ -985,7 +992,7 @@ export async function revokeToken(token: string): Promise<void> {
 // never be deleted through this path. Returns true if a row was removed.
 export async function revokeReadToken(token: string): Promise<boolean> {
   const res = await pool.query(`DELETE FROM auth_tokens WHERE token = $1 AND scope = 'read'`, [
-    token,
+    hashToken(token),
   ]);
   return (res.rowCount ?? 0) > 0;
 }
