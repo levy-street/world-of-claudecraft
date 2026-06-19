@@ -4182,7 +4182,7 @@ export class Sim {
     // amount drawn down, so the effective award is up to 2x while the pool lasts.
     let restedBonus = 0;
     if (opts?.fromKill && p.level < MAX_LEVEL && meta.restedXp > 0) {
-      restedBonus = Math.min(meta.restedXp, amount);
+      restedBonus = Math.min(Math.floor(meta.restedXp), amount);
       meta.restedXp -= restedBonus;
       amount += restedBonus;
     }

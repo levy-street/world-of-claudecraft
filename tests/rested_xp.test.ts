@@ -73,6 +73,20 @@ describe('rested XP — consumption', () => {
     expect(meta.restedXp).toBe(0);
   });
 
+  it('keeps lifetime XP integral when consuming fractional rested XP', () => {
+    const sim = makeSim();
+    const meta = sim.meta(sim.playerId)!;
+    meta.restedXp = 48.00625;
+
+    sim.grantXp(100, meta, { fromKill: true });
+    const state = sim.serializeCharacter(sim.playerId)!;
+
+    expect(state.lifetimeXp).toBe(148);
+    expect(Number.isInteger(state.lifetimeXp)).toBe(true);
+    expect(() => BigInt(String(state.lifetimeXp))).not.toThrow();
+    expect(meta.restedXp).toBeCloseTo(0.00625, 5);
+  });
+
   it('does NOT consume rested XP for non-kill awards (e.g. quests)', () => {
     const sim = makeSim();
     const meta = sim.meta(sim.playerId)!;
