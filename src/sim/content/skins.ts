@@ -106,7 +106,7 @@ export function mechChromaSkinIndex(chromaId: string): number {
 }
 
 export function mechChromaItemId(chromaId: string): string | null {
-  return chromaId === ALDRIC_MECH_CHROMA_ID ? ALDRIC_MECH_CHROMA_ITEM_ID : null;
+  return MECH_CHROMAS.some((chroma) => chroma.id === chromaId) ? `${chromaId}_armor_plate` : null;
 }
 
 export function rankAllowsMechChroma(granted: SkinRank, skin: number): boolean {

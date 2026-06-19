@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
 import {
-  EVENT_SKIN_TIERS, EVENT_SKIN_TOKEN_ID, MECH_CHROMAS, SKIN_COUNTS, SKIN_RANK_ROLL_WEIGHTS, SKIN_RANKS, rankAllowsSkin, rollSkinRank,
+  EVENT_SKIN_TIERS, EVENT_SKIN_TOKEN_ID, MECH_CHROMAS, SKIN_COUNTS, SKIN_RANK_ROLL_WEIGHTS, SKIN_RANKS, mechChromaItemId, rankAllowsSkin, rollSkinRank,
 } from '../src/sim/content/skins';
 import { SKINS } from '../src/render/characters/manifest';
 import type { PlayerClass, SimEvent, SkinRank } from '../src/sim/types';
@@ -128,7 +128,7 @@ describe('cosmetic skin-select event', () => {
     expect(sim.countItem('amber_crimson_armor_plate')).toBe(0);
   });
 
-  it('returns a market-listable specific mech cosmetic item when unequipped', () => {
+  it('returns a non-vendorable, non-discardable, non-marketable mech cosmetic item when unequipped', () => {
     const sim = new Sim({ seed: 1, playerClass: 'shaman', playerName: 'Seller' });
     const merchant = [...sim.entities.values()].find((e) => e.kind === 'npc' && e.templateId === 'the_merchant');
     if (!merchant) throw new Error('merchant not found');
@@ -146,12 +146,26 @@ describe('cosmetic skin-select event', () => {
 
     sim.marketList('amber_crimson_armor_plate', 1, 100);
 
-    expect(sim.countItem('amber_crimson_armor_plate')).toBe(0);
-    expect(sim.marketListings.some((listing) => (
-      listing.itemId === 'amber_crimson_armor_plate'
-      && listing.sellerKey === 'Seller'
-      && listing.price === 100
-    ))).toBe(true);
+    expect(sim.countItem('amber_crimson_armor_plate')).toBe(1);
+    expect(sim.marketListings.some((listing) => listing.itemId === 'amber_crimson_armor_plate')).toBe(false);
+  });
+
+  it('returns and reuses a specific item for every mech chroma', () => {
+    for (const chroma of MECH_CHROMAS) {
+      const itemId = mechChromaItemId(chroma.id);
+      expect(itemId, chroma.id).toBeTruthy();
+
+      const sim = new Sim({ seed: 1, playerClass: 'shaman', playerName: `Mech-${chroma.id}` });
+      sim.accountCosmetics = { completedQuestIds: [], mechChromaIds: [chroma.id] };
+      expect((sim as any).unequipMechChroma(chroma.id)).toBe(true);
+      expect(sim.accountCosmetics.mechChromaIds).not.toContain(chroma.id);
+      expect(sim.countItem(itemId!)).toBe(1);
+
+      sim.useItem(itemId!);
+
+      expect(sim.accountCosmetics.mechChromaIds).toContain(chroma.id);
+      expect(sim.countItem(itemId!)).toBe(0);
+    }
   });
 
   it('can equip a mech cosmetic as the active live appearance catalog', () => {

@@ -3027,6 +3027,48 @@ export const it_IT: EnTranslations = {
       },
       "amber_crimson_armor_plate": {
         "name": "Ambra cremisi"
+      },
+      "crimson_amber_armor_plate": {
+        "name": "Cremisi ambra"
+      },
+      "cyan_magenta_armor_plate": {
+        "name": "Ciano magenta"
+      },
+      "magenta_cyan_armor_plate": {
+        "name": "Magenta ciano"
+      },
+      "orange_steel_armor_plate": {
+        "name": "Arancio acciaio"
+      },
+      "steel_orange_armor_plate": {
+        "name": "Acciaio arancio"
+      },
+      "forest_pink_armor_plate": {
+        "name": "Foresta rosa"
+      },
+      "pink_forest_armor_plate": {
+        "name": "Rosa foresta"
+      },
+      "amethyst_silver_armor_plate": {
+        "name": "Ametista argento"
+      },
+      "ivory_copper_armor_plate": {
+        "name": "Avorio rame"
+      },
+      "onyx_gold_armor_plate": {
+        "name": "Onice oro"
+      },
+      "imperial_crimson_armor_plate": {
+        "name": "Cremisi imperiale"
+      },
+      "imperial_gold_armor_plate": {
+        "name": "Oro imperiale"
+      },
+      "vanguard_azure_armor_plate": {
+        "name": "Avanguardia azzurro"
+      },
+      "vanguard_chrome_armor_plate": {
+        "name": "Avanguardia cromo"
       }
     },
     "mobs": {

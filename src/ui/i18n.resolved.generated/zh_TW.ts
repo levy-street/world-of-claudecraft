@@ -3027,6 +3027,48 @@ export const zh_TW: EnTranslations = {
       },
       "amber_crimson_armor_plate": {
         "name": "琥珀緋紅"
+      },
+      "crimson_amber_armor_plate": {
+        "name": "緋紅琥珀"
+      },
+      "cyan_magenta_armor_plate": {
+        "name": "青藍洋紅"
+      },
+      "magenta_cyan_armor_plate": {
+        "name": "洋紅青藍"
+      },
+      "orange_steel_armor_plate": {
+        "name": "橙橘鋼鐵"
+      },
+      "steel_orange_armor_plate": {
+        "name": "鋼鐵橙橘"
+      },
+      "forest_pink_armor_plate": {
+        "name": "森綠粉紅"
+      },
+      "pink_forest_armor_plate": {
+        "name": "粉紅森綠"
+      },
+      "amethyst_silver_armor_plate": {
+        "name": "紫晶銀白"
+      },
+      "ivory_copper_armor_plate": {
+        "name": "象牙紫銅"
+      },
+      "onyx_gold_armor_plate": {
+        "name": "黑曜金黃"
+      },
+      "imperial_crimson_armor_plate": {
+        "name": "帝王緋紅"
+      },
+      "imperial_gold_armor_plate": {
+        "name": "帝王金黃"
+      },
+      "vanguard_azure_armor_plate": {
+        "name": "先鋒蔚藍"
+      },
+      "vanguard_chrome_armor_plate": {
+        "name": "先鋒鉻銀"
       }
     },
     "mobs": {

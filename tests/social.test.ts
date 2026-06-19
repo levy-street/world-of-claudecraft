@@ -629,6 +629,25 @@ describe('trading', () => {
     sim.tradeSetOffer([{ itemId: 'boar_hide', count: 2 }], 0, a);
     expect(sim.tradeFor(a)!.offerA.items.length).toBe(0);
   });
+
+  it('mech chroma plates can be traded directly', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('mage', 'Bet');
+    teleport(sim, a, 0, -40);
+    teleport(sim, b, 3, -40);
+    sim.addItem('vanguard_chrome_armor_plate', 1, a);
+
+    sim.tradeRequest(b, a);
+    sim.tradeAccept(b);
+    sim.tradeSetOffer([{ itemId: 'vanguard_chrome_armor_plate', count: 1 }], 0, a);
+    sim.tradeConfirm(a);
+    sim.tradeConfirm(b);
+
+    expect(sim.tradeFor(a)).toBe(null);
+    expect(sim.countItem('vanguard_chrome_armor_plate', a)).toBe(0);
+    expect(sim.countItem('vanguard_chrome_armor_plate', b)).toBe(1);
+  });
 });
 
 describe('the Hollow Crypt', () => {

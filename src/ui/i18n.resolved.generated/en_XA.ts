@@ -3027,6 +3027,48 @@ export const en_XA: EnTranslations = {
       },
       "amber_crimson_armor_plate": {
         "name": "[Áɱƀéŕ Çŕíɱšóñ]"
+      },
+      "crimson_amber_armor_plate": {
+        "name": "[Çŕíɱšóñ Áɱƀéŕ]"
+      },
+      "cyan_magenta_armor_plate": {
+        "name": "[Çýáñ Ɱáĝéñţá]"
+      },
+      "magenta_cyan_armor_plate": {
+        "name": "[Ɱáĝéñţá Çýáñ]"
+      },
+      "orange_steel_armor_plate": {
+        "name": "[Óŕáñĝé Šţééļ]"
+      },
+      "steel_orange_armor_plate": {
+        "name": "[Šţééļ Óŕáñĝé]"
+      },
+      "forest_pink_armor_plate": {
+        "name": "[Ƒóŕéšţ Þíñķ]"
+      },
+      "pink_forest_armor_plate": {
+        "name": "[Þíñķ Ƒóŕéšţ]"
+      },
+      "amethyst_silver_armor_plate": {
+        "name": "[Áɱéţĥýšţ Šíļʋéŕ]"
+      },
+      "ivory_copper_armor_plate": {
+        "name": "[Íʋóŕý Çóþþéŕ]"
+      },
+      "onyx_gold_armor_plate": {
+        "name": "[Óñýẋ Ĝóļð]"
+      },
+      "imperial_crimson_armor_plate": {
+        "name": "[Íɱþéŕíáļ Çŕíɱšóñ]"
+      },
+      "imperial_gold_armor_plate": {
+        "name": "[Íɱþéŕíáļ Ĝóļð]"
+      },
+      "vanguard_azure_armor_plate": {
+        "name": "[Ʋáñĝúáŕð Ážúŕé]"
+      },
+      "vanguard_chrome_armor_plate": {
+        "name": "[Ʋáñĝúáŕð Çĥŕóɱé]"
       }
     },
     "mobs": {

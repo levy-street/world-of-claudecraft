@@ -3027,6 +3027,48 @@ export const ko_KR: EnTranslations = {
       },
       "amber_crimson_armor_plate": {
         "name": "호박 진홍"
+      },
+      "crimson_amber_armor_plate": {
+        "name": "진홍 호박빛"
+      },
+      "cyan_magenta_armor_plate": {
+        "name": "청록 자홍"
+      },
+      "magenta_cyan_armor_plate": {
+        "name": "자홍 청록"
+      },
+      "orange_steel_armor_plate": {
+        "name": "주황 강철"
+      },
+      "steel_orange_armor_plate": {
+        "name": "강철 주황"
+      },
+      "forest_pink_armor_plate": {
+        "name": "숲빛 분홍"
+      },
+      "pink_forest_armor_plate": {
+        "name": "분홍 숲빛"
+      },
+      "amethyst_silver_armor_plate": {
+        "name": "자수정 은빛"
+      },
+      "ivory_copper_armor_plate": {
+        "name": "상아 구릿빛"
+      },
+      "onyx_gold_armor_plate": {
+        "name": "흑요석 황금"
+      },
+      "imperial_crimson_armor_plate": {
+        "name": "황실 진홍"
+      },
+      "imperial_gold_armor_plate": {
+        "name": "황실 황금"
+      },
+      "vanguard_azure_armor_plate": {
+        "name": "선봉대 하늘빛"
+      },
+      "vanguard_chrome_armor_plate": {
+        "name": "선봉대 크롬"
       }
     },
     "mobs": {

@@ -3027,6 +3027,48 @@ export const ru_RU: EnTranslations = {
       },
       "amber_crimson_armor_plate": {
         "name": "Янтарно-багровый"
+      },
+      "crimson_amber_armor_plate": {
+        "name": "Багрово-янтарный"
+      },
+      "cyan_magenta_armor_plate": {
+        "name": "Лазурно-пурпурный"
+      },
+      "magenta_cyan_armor_plate": {
+        "name": "Пурпурно-лазурный"
+      },
+      "orange_steel_armor_plate": {
+        "name": "Оранжево-стальной"
+      },
+      "steel_orange_armor_plate": {
+        "name": "Стально-оранжевый"
+      },
+      "forest_pink_armor_plate": {
+        "name": "Лесно-розовый"
+      },
+      "pink_forest_armor_plate": {
+        "name": "Розово-лесной"
+      },
+      "amethyst_silver_armor_plate": {
+        "name": "Аметистово-серебряный"
+      },
+      "ivory_copper_armor_plate": {
+        "name": "Слоново-медный"
+      },
+      "onyx_gold_armor_plate": {
+        "name": "Ониксово-золотой"
+      },
+      "imperial_crimson_armor_plate": {
+        "name": "Имперский багровый"
+      },
+      "imperial_gold_armor_plate": {
+        "name": "Имперский золотой"
+      },
+      "vanguard_azure_armor_plate": {
+        "name": "Лазурный авангард"
+      },
+      "vanguard_chrome_armor_plate": {
+        "name": "Хромированный авангард"
       }
     },
     "mobs": {

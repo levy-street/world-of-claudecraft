@@ -3027,6 +3027,48 @@ export const ja_JP: EnTranslations = {
       },
       "amber_crimson_armor_plate": {
         "name": "琥珀の深紅"
+      },
+      "crimson_amber_armor_plate": {
+        "name": "クリムゾンアンバー"
+      },
+      "cyan_magenta_armor_plate": {
+        "name": "シアンマゼンタ"
+      },
+      "magenta_cyan_armor_plate": {
+        "name": "マゼンタシアン"
+      },
+      "orange_steel_armor_plate": {
+        "name": "オレンジスチール"
+      },
+      "steel_orange_armor_plate": {
+        "name": "スチールオレンジ"
+      },
+      "forest_pink_armor_plate": {
+        "name": "フォレストピンク"
+      },
+      "pink_forest_armor_plate": {
+        "name": "ピンクフォレスト"
+      },
+      "amethyst_silver_armor_plate": {
+        "name": "アメジストシルバー"
+      },
+      "ivory_copper_armor_plate": {
+        "name": "アイボリーカッパー"
+      },
+      "onyx_gold_armor_plate": {
+        "name": "オニキスゴールド"
+      },
+      "imperial_crimson_armor_plate": {
+        "name": "インペリアルクリムゾン"
+      },
+      "imperial_gold_armor_plate": {
+        "name": "インペリアルゴールド"
+      },
+      "vanguard_azure_armor_plate": {
+        "name": "ヴァンガードアズール"
+      },
+      "vanguard_chrome_armor_plate": {
+        "name": "ヴァンガードクローム"
       }
     },
     "mobs": {
