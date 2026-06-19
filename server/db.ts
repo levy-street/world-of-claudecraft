@@ -415,6 +415,68 @@ CREATE TABLE IF NOT EXISTS referrals (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS referrals_referrer ON referrals(referrer_account_id);
+-- Creator skins marketplace (docs/prd/woc/creator-skins-marketplace.md). The
+-- opaque id the sim carries as Entity.cosmeticSkinId is creator_skins.id. Phase
+-- 1 is curated: rows are seeded 'live' by an operator; the open submission +
+-- moderation pipeline is a later phase. price_usdc is in USDC base units (6dp).
+CREATE TABLE IF NOT EXISTS creator_skins (
+  id TEXT PRIMARY KEY,
+  creator_account_id INT REFERENCES accounts(id) ON DELETE SET NULL,
+  creator_wallet TEXT NOT NULL,
+  name TEXT NOT NULL,
+  description TEXT NOT NULL DEFAULT '',
+  skin_catalog TEXT NOT NULL DEFAULT 'class',
+  fallback_skin INT NOT NULL DEFAULT 0,
+  target_class TEXT,
+  asset_url TEXT NOT NULL,
+  emissive_url TEXT,
+  price_usdc BIGINT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'draft',
+  sha256 TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS creator_skins_status ON creator_skins(status);
+CREATE INDEX IF NOT EXISTS creator_skins_creator ON creator_skins(creator_account_id);
+-- A pending purchase quote binds an on-chain split tx to one buyer + skin +
+-- exact leg amounts, so verification can reject quote substitution. Short-lived.
+CREATE TABLE IF NOT EXISTS marketplace_quotes (
+  quote_id TEXT PRIMARY KEY,
+  skin_id TEXT NOT NULL REFERENCES creator_skins(id) ON DELETE CASCADE,
+  buyer_account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  creator_owner TEXT NOT NULL,
+  burn_owner TEXT NOT NULL,
+  creator_usdc BIGINT NOT NULL,
+  burn_usdc BIGINT NOT NULL,
+  mint TEXT NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS marketplace_quotes_expires ON marketplace_quotes(expires_at);
+-- Inbound on-chain payments; the replay guard for every verified purchase
+-- (one settled sale per signature).
+CREATE TABLE IF NOT EXISTS onchain_payments (
+  tx_sig TEXT PRIMARY KEY,
+  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  reference TEXT NOT NULL,
+  amount BIGINT NOT NULL,
+  mint TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+-- Business-level marketplace sales: one row per settled, verified purchase.
+CREATE TABLE IF NOT EXISTS marketplace_sales (
+  id BIGSERIAL PRIMARY KEY,
+  skin_id TEXT NOT NULL REFERENCES creator_skins(id),
+  buyer_account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  quote_id TEXT NOT NULL,
+  gross_usdc BIGINT NOT NULL,
+  creator_usdc BIGINT NOT NULL,
+  burn_usdc BIGINT NOT NULL,
+  pay_tx_sig TEXT NOT NULL UNIQUE REFERENCES onchain_payments(tx_sig),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS marketplace_sales_buyer ON marketplace_sales(buyer_account_id);
+CREATE INDEX IF NOT EXISTS marketplace_sales_skin ON marketplace_sales(skin_id);
 `;
 
 export async function ensureSchema(): Promise<void> {
@@ -2085,4 +2147,153 @@ export async function pruneChatLogs(retentionDays: number): Promise<number> {
     [String(Math.floor(retentionDays))],
   );
   return res.rowCount ?? 0;
+}
+
+// --------------------------------------------------------------------------
+// Creator skins marketplace
+// --------------------------------------------------------------------------
+
+export interface CreatorSkinRow {
+  id: string;
+  creatorAccountId: number | null;
+  creatorWallet: string;
+  name: string;
+  description: string;
+  skinCatalog: 'class' | 'mech';
+  fallbackSkin: number;
+  targetClass: string | null;
+  assetUrl: string;
+  emissiveUrl: string | null;
+  priceUsdc: bigint;
+  status: 'draft' | 'review' | 'live' | 'rejected' | 'delisted' | 'removed';
+  sha256: string | null;
+}
+
+export interface MarketplaceQuoteRow {
+  quoteId: string;
+  skinId: string;
+  buyerAccountId: number;
+  creatorOwner: string;
+  burnOwner: string;
+  creatorUsdc: bigint;
+  burnUsdc: bigint;
+  mint: string;
+  expiresAt: string;
+}
+
+function mapCreatorSkin(row: Record<string, unknown>): CreatorSkinRow {
+  return {
+    id: row.id as string,
+    creatorAccountId: row.creator_account_id === null ? null : Number(row.creator_account_id),
+    creatorWallet: row.creator_wallet as string,
+    name: row.name as string,
+    description: row.description as string,
+    skinCatalog: row.skin_catalog === 'mech' ? 'mech' : 'class',
+    fallbackSkin: Number(row.fallback_skin),
+    targetClass: (row.target_class as string | null) ?? null,
+    assetUrl: row.asset_url as string,
+    emissiveUrl: (row.emissive_url as string | null) ?? null,
+    priceUsdc: BigInt(row.price_usdc as string),
+    status: row.status as CreatorSkinRow['status'],
+    sha256: (row.sha256 as string | null) ?? null,
+  };
+}
+
+export async function listLiveCreatorSkins(): Promise<CreatorSkinRow[]> {
+  const res = await pool.query(`SELECT * FROM creator_skins WHERE status = 'live' ORDER BY created_at`);
+  return res.rows.map(mapCreatorSkin);
+}
+
+export async function getCreatorSkin(id: string): Promise<CreatorSkinRow | null> {
+  const res = await pool.query('SELECT * FROM creator_skins WHERE id = $1', [id]);
+  return res.rows[0] ? mapCreatorSkin(res.rows[0]) : null;
+}
+
+// Seed / curate a creator skin (Phase 1 operator path; the open submission +
+// moderation pipeline is a later phase). Upserts by id so re-seeding is safe.
+export async function upsertCreatorSkin(row: CreatorSkinRow): Promise<void> {
+  await pool.query(
+    `INSERT INTO creator_skins
+       (id, creator_account_id, creator_wallet, name, description, skin_catalog,
+        fallback_skin, target_class, asset_url, emissive_url, price_usdc, status, sha256, updated_at)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13, now())
+     ON CONFLICT (id) DO UPDATE SET
+       creator_account_id = EXCLUDED.creator_account_id,
+       creator_wallet = EXCLUDED.creator_wallet,
+       name = EXCLUDED.name,
+       description = EXCLUDED.description,
+       skin_catalog = EXCLUDED.skin_catalog,
+       fallback_skin = EXCLUDED.fallback_skin,
+       target_class = EXCLUDED.target_class,
+       asset_url = EXCLUDED.asset_url,
+       emissive_url = EXCLUDED.emissive_url,
+       price_usdc = EXCLUDED.price_usdc,
+       status = EXCLUDED.status,
+       sha256 = EXCLUDED.sha256,
+       updated_at = now()`,
+    [
+      row.id, row.creatorAccountId, row.creatorWallet, row.name, row.description, row.skinCatalog,
+      row.fallbackSkin, row.targetClass, row.assetUrl, row.emissiveUrl, row.priceUsdc.toString(), row.status, row.sha256,
+    ],
+  );
+}
+
+export async function createMarketplaceQuote(q: MarketplaceQuoteRow): Promise<void> {
+  await pool.query(
+    `INSERT INTO marketplace_quotes
+       (quote_id, skin_id, buyer_account_id, creator_owner, burn_owner, creator_usdc, burn_usdc, mint, expires_at)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
+    [q.quoteId, q.skinId, q.buyerAccountId, q.creatorOwner, q.burnOwner, q.creatorUsdc.toString(), q.burnUsdc.toString(), q.mint, q.expiresAt],
+  );
+}
+
+export async function getMarketplaceQuote(quoteId: string): Promise<MarketplaceQuoteRow | null> {
+  const res = await pool.query('SELECT * FROM marketplace_quotes WHERE quote_id = $1', [quoteId]);
+  const row = res.rows[0];
+  if (!row) return null;
+  return {
+    quoteId: row.quote_id,
+    skinId: row.skin_id,
+    buyerAccountId: Number(row.buyer_account_id),
+    creatorOwner: row.creator_owner,
+    burnOwner: row.burn_owner,
+    creatorUsdc: BigInt(row.creator_usdc),
+    burnUsdc: BigInt(row.burn_usdc),
+    mint: row.mint,
+    expiresAt: row.expires_at instanceof Date ? row.expires_at.toISOString() : String(row.expires_at),
+  };
+}
+
+export async function deleteMarketplaceQuote(quoteId: string): Promise<void> {
+  await pool.query('DELETE FROM marketplace_quotes WHERE quote_id = $1', [quoteId]);
+}
+
+export async function pruneMarketplaceQuotes(): Promise<void> {
+  await pool.query('DELETE FROM marketplace_quotes WHERE expires_at <= now()');
+}
+
+/**
+ * Record an inbound on-chain payment. The PRIMARY KEY on tx_sig is the replay
+ * guard: returns true if this signature was newly recorded, false if it was
+ * already consumed (a replay) — verification keys idempotency off this.
+ */
+export async function recordOnchainPayment(txSig: string, accountId: number, reference: string, amount: bigint, mint: string): Promise<boolean> {
+  const res = await pool.query(
+    `INSERT INTO onchain_payments (tx_sig, account_id, reference, amount, mint)
+     VALUES ($1,$2,$3,$4,$5) ON CONFLICT (tx_sig) DO NOTHING`,
+    [txSig, accountId, reference, amount.toString(), mint],
+  );
+  return (res.rowCount ?? 0) === 1;
+}
+
+export async function recordMarketplaceSale(s: {
+  skinId: string; buyerAccountId: number; quoteId: string;
+  grossUsdc: bigint; creatorUsdc: bigint; burnUsdc: bigint; payTxSig: string;
+}): Promise<void> {
+  await pool.query(
+    `INSERT INTO marketplace_sales
+       (skin_id, buyer_account_id, quote_id, gross_usdc, creator_usdc, burn_usdc, pay_tx_sig)
+     VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+    [s.skinId, s.buyerAccountId, s.quoteId, s.grossUsdc.toString(), s.creatorUsdc.toString(), s.burnUsdc.toString(), s.payTxSig],
+  );
 }
