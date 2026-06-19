@@ -9,7 +9,13 @@ import './wallet-polyfill';
 import { createAppKit } from '@reown/appkit';
 import { solana, solanaDevnet } from '@reown/appkit/networks';
 import { SolanaAdapter } from '@reown/appkit-adapter-solana';
-import { Connection, PublicKey } from '@solana/web3.js';
+import { Connection, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
+import {
+  getAssociatedTokenAddressSync,
+  createBurnCheckedInstruction,
+  createTransferCheckedInstruction,
+  createAssociatedTokenAccountIdempotentInstruction,
+} from '@solana/spl-token';
 import bs58 from 'bs58';
 
 export interface WalletState {
@@ -17,10 +23,19 @@ export interface WalletState {
   isConnected: boolean;
 }
 
-// The Solana provider AppKit hands back exposes raw message signing.
+// The Solana provider AppKit hands back. Message signing is always present;
+// transaction signing/sending varies by wallet, so both are optional and we
+// feature-detect (prefer signTransaction so WE submit to the $WOC mainnet RPC,
+// independent of whichever network the wallet UI happens to be set to).
 interface SolanaSignProvider {
   signMessage(message: Uint8Array): Promise<Uint8Array>;
+  signTransaction?(tx: Transaction): Promise<Transaction>;
+  signAndSendTransaction?(tx: Transaction): Promise<{ signature: string }>;
 }
+
+// SPL Memo program (v2). The burn tx carries the quoteId as a memo so the server
+// can bind the on-chain payment to the account + action it quoted.
+const MEMO_PROGRAM_ID = new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr');
 
 const PROJECT_ID = String(import.meta.env.VITE_REOWN_PROJECT_ID ?? '').trim();
 
@@ -117,4 +132,74 @@ export async function fetchWocBalance(owner: string): Promise<number | null> {
     console.error('[wallet] $WOC balance read failed', err);
     return null;
   }
+}
+
+// ── $WOC payments (burn) ─────────────────────────────────────────────────────
+// What the server's /api/identity/quote hands back. Amounts are base-unit
+// decimal strings (they can exceed Number.MAX_SAFE_INTEGER), parsed to BigInt
+// here. `memo` MUST be included verbatim in the tx so the server can match it.
+export interface WocBurnQuote {
+  mint: string;
+  decimals: number;
+  amountBase: string;
+  burnBase: string;
+  treasuryBase: string;
+  treasury: string | null;
+  memo: string;
+}
+
+/**
+ * Build, sign, and submit the $WOC payment for an identity quote: burn the
+ * burn-portion, transfer the treasury-portion (if any), and attach the quote's
+ * memo — one transaction. Returns the confirmed signature, which the caller
+ * hands to /api/identity/confirm. The wallet only signs; we submit to the $WOC
+ * mainnet RPC so the burn lands there regardless of the wallet's selected
+ * network.
+ */
+export async function payWocBurn(quote: WocBurnQuote): Promise<string> {
+  const provider = initWallet().getProvider<SolanaSignProvider>('solana');
+  const address = currentWallet().address;
+  if (!provider || !address) throw new Error('connect a wallet first');
+
+  const owner = new PublicKey(address);
+  const mint = new PublicKey(quote.mint);
+  const ownerAta = getAssociatedTokenAddressSync(mint, owner);
+  const burnBase = BigInt(quote.burnBase);
+  const treasuryBase = BigInt(quote.treasuryBase);
+
+  const ixs: TransactionInstruction[] = [];
+  if (burnBase > 0n) {
+    ixs.push(createBurnCheckedInstruction(ownerAta, mint, owner, burnBase, quote.decimals));
+  }
+  if (treasuryBase > 0n && quote.treasury) {
+    const treasury = new PublicKey(quote.treasury);
+    const treasuryAta = getAssociatedTokenAddressSync(mint, treasury);
+    // Create the treasury's $WOC token account if it doesn't exist yet (no-op
+    // when it already does); the payer funds the rent.
+    ixs.push(createAssociatedTokenAccountIdempotentInstruction(owner, treasuryAta, treasury, mint));
+    ixs.push(createTransferCheckedInstruction(ownerAta, mint, treasuryAta, owner, treasuryBase, quote.decimals));
+  }
+  // Memo last: binds this payment to the server-issued quote.
+  ixs.push(new TransactionInstruction({ programId: MEMO_PROGRAM_ID, keys: [], data: Buffer.from(quote.memo, 'utf8') }));
+
+  const connection = getConnection();
+  const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');
+  const tx = new Transaction({ feePayer: owner, blockhash, lastValidBlockHeight });
+  tx.add(...ixs);
+
+  // Prefer signTransaction → our own submit (forces the $WOC mainnet RPC). Fall
+  // back to the wallet's signAndSendTransaction if that's all it exposes.
+  let signature: string;
+  if (provider.signTransaction) {
+    const signed = await provider.signTransaction(tx);
+    signature = await connection.sendRawTransaction(signed.serialize());
+  } else if (provider.signAndSendTransaction) {
+    ({ signature } = await provider.signAndSendTransaction(tx));
+  } else {
+    throw new Error('this wallet cannot sign transactions');
+  }
+  // Wait for confirmation so the follow-up /confirm doesn't immediately 409 on
+  // an unfinalized tx (the server still independently re-verifies finality).
+  await connection.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, 'confirmed');
+  return signature;
 }
