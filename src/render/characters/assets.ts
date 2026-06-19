@@ -24,6 +24,7 @@ import {
   visibleAttachmentsForGraphics,
   visualAssetUrlForGraphics,
 } from './manifest';
+import type { CreatorSkinRegistryEntry } from '../../world_api';
 
 const DEFAULT_TINT_STRENGTH = 0.4;
 
@@ -388,6 +389,90 @@ export function mechAssetsReady(): boolean {
     skinsReady &&
     (SKIN_EMISSIVE.player_mech ?? []).every((url) => !url || skinEmisTexByUrl.has(url))
   );
+}
+
+// --- Creator skins (marketplace UGC) ---------------------------------------
+// Unlike the compiled-in SKINS, creator-skin atlases are discovered at runtime
+// from /api/skins/registry and fetched from a CDN by an opaque cosmeticSkinId
+// (Entity.cosmeticSkinId). The renderer calls ensureCreatorSkin(id) when it
+// sees one, then creatorSkinTexture(id) to apply it (falling back to the
+// numeric skin on a miss). A bounded LRU over the URL->texture cache disposes
+// cold atlases — the one place skin textures are freed — so cycling through
+// many creator skins in a session can't grow VRAM without limit.
+const CREATOR_SKIN_MAX = 24; // resident distinct creator atlases (~16-21 MB each at 2048²)
+const creatorSkinRegistry = new Map<string, CreatorSkinRegistryEntry>();
+const creatorSkinTexByUrl = new Map<string, THREE.Texture>();
+const creatorSkinInflight = new Map<string, Promise<void>>();
+const creatorSkinLru: string[] = []; // texture URLs, most-recently-used last
+
+export function registerCreatorSkins(entries: CreatorSkinRegistryEntry[]): void {
+  for (const e of entries) creatorSkinRegistry.set(e.id, e);
+}
+
+export function creatorSkinRegistryEntry(id: string): CreatorSkinRegistryEntry | null {
+  return creatorSkinRegistry.get(id) ?? null;
+}
+
+function touchCreatorUrl(url: string): void {
+  const i = creatorSkinLru.indexOf(url);
+  if (i >= 0) creatorSkinLru.splice(i, 1);
+  creatorSkinLru.push(url);
+}
+
+function evictCreatorSkins(): void {
+  while (creatorSkinLru.length > CREATOR_SKIN_MAX) {
+    const url = creatorSkinLru.shift();
+    if (url === undefined) break;
+    const tex = creatorSkinTexByUrl.get(url);
+    if (tex) tex.dispose();
+    creatorSkinTexByUrl.delete(url);
+  }
+}
+
+// Memoized per-URL load: short-circuits when already cached, dedupes in-flight
+// loads, and clears the in-flight entry on settle so a later (post-eviction)
+// re-request reloads rather than resolving against a disposed texture.
+function loadCreatorUrl(url: string): Promise<void> {
+  touchCreatorUrl(url);
+  if (creatorSkinTexByUrl.has(url)) return Promise.resolve();
+  const inflight = creatorSkinInflight.get(url);
+  if (inflight) return inflight;
+  const p = loadSkinTexInto(url, creatorSkinTexByUrl).then(() => {
+    creatorSkinInflight.delete(url);
+    touchCreatorUrl(url);
+    evictCreatorSkins();
+  });
+  creatorSkinInflight.set(url, p);
+  return p;
+}
+
+/** Ensure a creator skin's body atlas (and, on standard tier, its emissive) is
+ *  loaded. Memoized + idempotent; resolves immediately for an unknown id (the
+ *  caller then renders the numeric-skin fallback). */
+export function ensureCreatorSkin(id: string): Promise<void> {
+  const entry = creatorSkinRegistry.get(id);
+  if (!entry) return Promise.resolve();
+  const jobs = [loadCreatorUrl(entry.assetUrl)];
+  if (entry.emissiveUrl && GFX.standardMaterials) jobs.push(loadCreatorUrl(entry.emissiveUrl));
+  return Promise.all(jobs).then(() => undefined);
+}
+
+/** The loaded body texture for a creator skin id, or null if unknown / not yet
+ *  loaded. Touches the LRU so an in-view skin stays resident. */
+export function creatorSkinTexture(id: string): THREE.Texture | null {
+  const entry = creatorSkinRegistry.get(id);
+  if (!entry) return null;
+  const tex = creatorSkinTexByUrl.get(entry.assetUrl);
+  if (tex) touchCreatorUrl(entry.assetUrl);
+  return tex ?? null;
+}
+
+/** The loaded emissive (glow) map for a creator skin id, or null (no emissive /
+ *  not loaded / low tier). */
+export function creatorSkinEmissive(id: string): THREE.Texture | null {
+  const entry = creatorSkinRegistry.get(id);
+  if (!entry || !entry.emissiveUrl) return null;
+  return creatorSkinTexByUrl.get(entry.emissiveUrl) ?? null;
 }
 
 function resolvedGltf(url: string): GLTF {

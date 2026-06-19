@@ -38,6 +38,7 @@ import {
   type ArenaInfo,
   type CharacterSearchResult,
   type ClientCommand,
+  type CreatorSkinRegistryEntry,
   type DelveCompanionInfo,
   type DelveDailyInfo,
   type DelveRunInfo,
@@ -476,6 +477,20 @@ export class Api {
         `/api/leaderboard?scope=${scope}&metric=lifetimeXp&limit=${limit}`,
       );
       return data.leaders ?? [];
+    } catch {
+      return [];
+    }
+  }
+
+  // Public creator-skin registry: cosmetic metadata for every live marketplace
+  // skin, used by the renderer to resolve an opaque cosmeticSkinId to a CDN
+  // atlas. Not realm-scoped (creator skins are global) — read from the page origin.
+  async creatorSkins(): Promise<CreatorSkinRegistryEntry[]> {
+    try {
+      const res = await fetch('/api/skins/registry');
+      if (!res.ok) return [];
+      const data = await res.json();
+      return data.skins ?? [];
     } catch {
       return [];
     }

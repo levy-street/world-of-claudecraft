@@ -5,6 +5,22 @@ export interface AccountCosmetics {
   ownedCreatorSkinIds: string[];
 }
 
+// Public cosmetic metadata for one marketplace creator skin (from GET
+// /api/skins/registry). The renderer resolves an entity's opaque cosmeticSkinId
+// to assetUrl through this; the marketplace UI uses name/price. Deliberately
+// carries no ownership or creator wallet — it is world-public.
+export interface CreatorSkinRegistryEntry {
+  id: string;
+  name: string;
+  description: string;
+  skinCatalog: 'class' | 'mech';
+  fallbackSkin: number;
+  targetClass: string | null;
+  assetUrl: string;
+  emissiveUrl: string | null;
+  priceUsdc: string; // USDC base units (6 decimals) as a string
+}
+
 export interface IWorldCosmetics {
   accountCosmetics: AccountCosmetics;
   changeSkin(skin: number, catalog?: 'class' | 'mech', cosmeticSkinId?: string | null): void;
