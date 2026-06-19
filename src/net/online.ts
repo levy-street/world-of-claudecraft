@@ -242,9 +242,8 @@ export class Api {
 
   // ── Shareable player card + referrals ──────────────────────────────────────
   // Publish (or replace) this character's card PNG; returns the public page path
-  // and the referral slug. The body is the raw PNG, so this bypasses the JSON
-  // `post` helper.
-  async uploadCard(characterId: number, png: Blob): Promise<{ url: string; ref: string }> {
+  // The body is the raw PNG, so this bypasses the JSON `post` helper.
+  async uploadCard(characterId: number, png: Blob): Promise<{ url: string }> {
     const res = await fetch(`${this.base}/api/card?character=${characterId}`, {
       method: 'POST',
       headers: {
@@ -255,7 +254,7 @@ export class Api {
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error ?? `card upload failed (${res.status})`);
-    return { url: data.url, ref: data.ref };
+    return { url: data.url };
   }
 
   // The account's referral count + published-card slug (null before first
@@ -633,6 +632,7 @@ export class ClientWorld implements IWorld {
         e.skin = w.sk ?? 0;
         e.skinCatalog = w.cat === 'mech' ? 'mech' : 'class';
         e.holderTier = w.ht ?? 0; // $WOC holder-tier flair (cosmetic, server-set)
+        e.holderBalance = typeof w.hb === 'number' ? w.hb : undefined; // exact $WOC, for inspect
         e.scale = w.sc ?? 1;
         e.color = w.c ?? 0xffffff;
         e.dungeonId = w.dgn ?? null;

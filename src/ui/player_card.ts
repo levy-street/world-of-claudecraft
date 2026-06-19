@@ -36,8 +36,6 @@ export interface PlayerCardData {
   /** Attack power, DPS, crit, dodge, etc. */
   combatStats: PlayerCardStat[];
   gear: PlayerCardGear[];
-  arenaRating: number | null;
-  prestigeRank: number;
   /** Realm percentile by lifetime XP (e.g. 3 = top 3%), or null to hide it. */
   topPercent: number | null;
   /** Connected wallet's $WOC balance (null when no wallet). Drives the badge. */
@@ -86,9 +84,10 @@ export const CARD_POSES: readonly CardPose[] = [
   { id: 'victory', label: 'Victory', clips: ['Cheer', 'Jump_Idle', 'Idle'], fraction: 0.5 },
 ];
 
-/** Human-readable $WOC amount: whole tokens with thousands separators. */
+/** Human-readable $WOC amount: whole tokens with thousands separators. The card
+ *  is an English-branded share image, so it formats in en-US regardless of locale. */
 function formatWoc(n: number): string {
-  return (n >= 1 ? Math.round(n) : n).toLocaleString('en-US', { maximumFractionDigits: n >= 1 ? 0 : 2 });
+  return n.toLocaleString('en-US', { maximumFractionDigits: n >= 1 ? 0 : 2 });
 }
 
 function loadImage(src: string): Promise<HTMLImageElement> {

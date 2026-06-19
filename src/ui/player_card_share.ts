@@ -7,12 +7,11 @@
 // play, or before world entry) the HUD falls back to download / native share
 // only, with no hosted link.
 
-/** Result of publishing a card: an absolute page URL and the referral slug. */
+/** Result of publishing a card. The card page itself embeds the `?ref=` CTA
+ *  server-side, so clients share this URL directly. */
 export interface PublishedCard {
-  /** Absolute URL of the public card page (carries no ?ref itself). */
+  /** Absolute URL of the public card page. */
   url: string;
-  /** The player's referral slug, appended as ?ref=<slug> to invite links. */
-  ref: string;
 }
 
 export type CardUploader = (png: Blob) => Promise<PublishedCard>;
@@ -55,7 +54,7 @@ export function cardHostingAvailable(): boolean {
   return uploader !== null;
 }
 
-/** Publish the card PNG; resolves to its hosted URL + referral slug. */
+/** Publish the card PNG; resolves to its hosted page URL. */
 export function publishCard(png: Blob): Promise<PublishedCard> {
   if (!uploader) throw new Error('card hosting is unavailable in this session');
   return uploader(png);

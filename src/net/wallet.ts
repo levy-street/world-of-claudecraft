@@ -28,11 +28,6 @@ type AppKitInstance = ReturnType<typeof createAppKit>;
 let appkit: AppKitInstance | null = null;
 const listeners = new Set<(state: WalletState) => void>();
 
-/** Whether a Reown project id is configured (set VITE_REOWN_PROJECT_ID). */
-export function walletConfigured(): boolean {
-  return PROJECT_ID.length > 0;
-}
-
 export function initWallet(): AppKitInstance {
   if (appkit) return appkit;
   if (!PROJECT_ID) {

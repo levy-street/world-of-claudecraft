@@ -114,6 +114,11 @@ export function holderTierForBalance(balance: number | null): HolderTier | null 
   return tier;
 }
 
+/** The rung at a 1-based index (1-10), or undefined for 0/out-of-range. */
+export function holderTierByIndex(index: number): HolderTier | undefined {
+  return index >= 1 && index <= HOLDER_TIERS.length ? HOLDER_TIERS[index - 1] : undefined;
+}
+
 /** This rung's share of max supply, as a fraction in [0, 1]. */
 export function tierSupplyShare(tier: HolderTier): number {
   return tier.threshold / WOC_MAX_SUPPLY;

@@ -120,7 +120,10 @@ export async function handleCardRoutes(req: http.IncomingMessage, res: http.Serv
   try {
     const path = (req.url ?? '').split('?')[0];
     const m = /^\/p\/([^/]+)(\/card\.png)?\/?$/.exec(path);
-    const slug = m ? decodeURIComponent(m[1]).toLowerCase() : '';
+    // A malformed percent-escape (e.g. /p/%E0) makes decodeURIComponent throw a
+    // URIError — that's an unparseable URL (404), not a server fault (500).
+    let slug = '';
+    try { slug = m ? decodeURIComponent(m[1]).toLowerCase() : ''; } catch { slug = ''; }
     if (!m || !isValidSlug(slug)) {
       res.writeHead(404, { 'Content-Type': 'text/plain' });
       res.end('not found');

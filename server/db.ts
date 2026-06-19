@@ -1,4 +1,5 @@
 import { Pool } from 'pg';
+import { isUniqueViolation } from './http_util';
 import type { CharacterState, MarketSave } from '../src/sim/sim';
 import type { ArenaFormat, PlayerClass } from '../src/sim/types';
 import type { ChatLogRow } from './chat_log';
@@ -445,11 +446,19 @@ export async function accountForWallet(pubkey: string): Promise<number | null> {
 export async function linkWalletToAccount(accountId: number, pubkey: string): Promise<boolean> {
   const owner = await accountForWallet(pubkey);
   if (owner !== null && owner !== accountId) return false;
-  await pool.query(
-    `INSERT INTO wallet_links (account_id, pubkey) VALUES ($1, $2)
-     ON CONFLICT (account_id) DO UPDATE SET pubkey = EXCLUDED.pubkey, linked_at = now()`,
-    [accountId, pubkey],
-  );
+  try {
+    await pool.query(
+      `INSERT INTO wallet_links (account_id, pubkey) VALUES ($1, $2)
+       ON CONFLICT (account_id) DO UPDATE SET pubkey = EXCLUDED.pubkey, linked_at = now()`,
+      [accountId, pubkey],
+    );
+  } catch (err) {
+    // TOCTOU: another account claimed this pubkey between the check above and
+    // here. The pubkey column is UNIQUE (not the ON CONFLICT target), so that
+    // races to a 23505 — treat it as "already owned" (→ 409), not a 500.
+    if (isUniqueViolation(err)) return false;
+    throw err;
+  }
   return true;
 }
 

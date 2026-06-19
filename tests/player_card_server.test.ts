@@ -285,11 +285,40 @@ describe('GET /p/<slug>', () => {
     expect(res.statusCode).toBe(404);
   });
 
+  it('404s card.png for an unknown slug without serving image bytes', async () => {
+    cardRows = []; // getPlayerCardBySlug finds nothing
+    const res = makeRes();
+    await handleCardRoutes(makeGetReq('/p/ghost/card.png'), res);
+    expect(res.statusCode).toBe(404);
+    expect(String(res.headers['Content-Type'])).toContain('text/plain');
+    expect(res.body).toBe('not found');
+    expect(res.headers['Content-Type']).not.toBe('image/png');
+    // a card-lookup query DID run (the slug was valid), but nothing was served
+    expect(dbMock.query.mock.calls.some((c) =>
+      String(c[0]).includes('SELECT character_id, account_id, png, title, description FROM player_cards'))).toBe(true);
+  });
+
   it('404s an invalid slug without touching the database', async () => {
     const res = makeRes();
     await handleCardRoutes(makeGetReq('/p/..%2f..%2fetc'), res);
     expect(res.statusCode).toBe(404);
     expect(dbMock.query).not.toHaveBeenCalled();
+  });
+
+  // Regression: a malformed percent-escape makes decodeURIComponent THROW a
+  // URIError. That's an unparseable slug → 404 (NOT a 500 server fault), and we
+  // must never reach the card-lookup query with it.
+  it('404s a malformed percent-escape (decodeURIComponent throws) without a 500 or db lookup', async () => {
+    for (const url of ['/p/%E0%A4', '/p/%', '/p/%E0%A4/card.png', '/p/%ZZ']) {
+      dbMock.query.mockClear();
+      const res = makeRes();
+      await handleCardRoutes(makeGetReq(url), res);
+      expect(res.statusCode).toBe(404);
+      expect(res.statusCode).not.toBe(500);
+      expect(String(res.headers['Content-Type'])).toContain('text/plain');
+      expect(res.body).toBe('not found');
+      expect(dbMock.query).not.toHaveBeenCalled();
+    }
   });
 });
 

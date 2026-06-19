@@ -20,7 +20,7 @@ const SOLANA_RPC_URL = (process.env.SOLANA_RPC_URL ?? process.env.VITE_SOLANA_RP
 // window is plenty and keeps us well under public-RPC rate limits.
 const CACHE_TTL_MS = 5 * 60 * 1000;
 
-interface TierEntry { tier: number; at: number; }
+interface TierEntry { tier: number; balance: number; at: number; }
 const cache = new Map<string, TierEntry>();
 
 /**
@@ -60,16 +60,18 @@ export async function fetchWocBalance(pubkey: string): Promise<number | null> {
 }
 
 /**
- * Cached holder-tier index (0 = none, 1-10) for a wallet. Re-fetches at most once
- * per TTL; on a failed refresh, keeps the cached value (or 0 if never fetched).
+ * Cached holder tier + exact balance for a wallet. Re-fetches at most once per
+ * TTL; on a failed refresh keeps the last known {tier, balance} (or {0, 0} if
+ * never fetched). One read backs both the tier and the precise balance the
+ * server broadcasts in the holder-tier identity payload.
  */
-export async function holderTierForPubkey(pubkey: string): Promise<number> {
+export async function holderInfoForPubkey(pubkey: string): Promise<{ tier: number; balance: number }> {
   const now = Date.now();
   const hit = cache.get(pubkey);
-  if (hit && now - hit.at < CACHE_TTL_MS) return hit.tier;
+  if (hit && now - hit.at < CACHE_TTL_MS) return { tier: hit.tier, balance: hit.balance };
   const balance = await fetchWocBalance(pubkey);
-  if (balance === null) return hit?.tier ?? 0; // keep last known tier on failure
+  if (balance === null) return hit ? { tier: hit.tier, balance: hit.balance } : { tier: 0, balance: 0 };
   const tier = holderTierForBalance(balance)?.index ?? 0;
-  cache.set(pubkey, { tier, at: now });
-  return tier;
+  cache.set(pubkey, { tier, balance, at: now });
+  return { tier, balance };
 }

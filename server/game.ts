@@ -10,7 +10,7 @@ import {
   grantAccountMechChroma, markAccountQuestComplete, revokeAccountMechChroma, saveCharacterState, openPlaySession, closePlaySession,
   insertChatLogs, pool, loadMarketState, saveMarketState, walletForAccount,
 } from './db';
-import { holderTierForPubkey } from './woc_balance';
+import { holderInfoForPubkey } from './woc_balance';
 import type { AccountChatMuteStatus, AccountCosmetics, RequestMetadata } from './db';
 import { ChatFilter } from './chat_filter';
 import { loadChatFilterState, applyChatStrike, recordChatViolation } from './chat_filter_db';
@@ -209,6 +209,7 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.skinCatalog === 'mech') out.cat = 'mech';
   if (e.skin) out.sk = e.skin;
   if (e.holderTier) out.ht = e.holderTier; // $WOC holder-tier flair (cosmetic)
+  if (e.holderBalance) out.hb = Math.round(e.holderBalance); // exact $WOC, for inspect
   if (e.dungeonId) out.dgn = e.dungeonId;
   if (e.objectItemId) out.obj = e.objectItemId;
   if (e.scale !== 1) out.sc = e.scale;
@@ -528,7 +529,7 @@ export class GameServer {
       }
     }, 50);
     // Refresh every online player's $WOC holder-tier flair off the 20 Hz loop:
-    // an RPC call per wallet (cached for minutes inside holderTierForPubkey) has
+    // an RPC call per wallet (cached for minutes inside holderInfoForPubkey) has
     // no place in the tick. Catches mid-session balance changes.
     this.holderTierInterval = setInterval(() => { void this.refreshAllHolderTiers(); }, HOLDER_TIER_REFRESH_MS);
   }
@@ -543,14 +544,15 @@ export class GameServer {
   private async refreshHolderTier(session: ClientSession): Promise<void> {
     if (this.devTierPids.has(session.pid)) return; // dev override pinned this pid
     const wallet = await walletForAccount(session.accountId);
-    const tier = wallet ? await holderTierForPubkey(wallet.pubkey) : 0;
+    const { tier, balance } = wallet ? await holderInfoForPubkey(wallet.pubkey) : { tier: 0, balance: 0 };
     // The player may have left during the await; only apply if still the live
     // session for this pid.
     if (this.clients.get(session.pid) !== session) return;
     const e = this.sim.entities.get(session.pid);
-    if (e && (e.holderTier ?? 0) !== tier) {
+    if (e && ((e.holderTier ?? 0) !== tier || (e.holderBalance ?? 0) !== balance)) {
       e.holderTier = tier; // identity diff re-broadcasts it to nearby players
-      console.log(`[woc] ${session.name} holder tier → ${tier}`);
+      e.holderBalance = balance;
+      console.log(`[woc] ${session.name} holder tier → ${tier} (${balance} $WOC)`);
     }
   }
 
@@ -1678,7 +1680,11 @@ export class GameServer {
     if (process.env.ALLOW_DEV_COMMANDS === '1' && /^\/woctier\b/.test(text)) {
       const n = Math.max(0, Math.min(10, parseInt(text.split(/\s+/)[1] ?? '', 10) || 0));
       const e = this.sim.entities.get(pid);
-      if (e) e.holderTier = n;
+      if (e) {
+        e.holderTier = n;
+        // Demo balance so the inspect readout shows a plausible amount for the tier.
+        e.holderBalance = n > 0 ? 10 ** (n - 1) : 0;
+      }
       this.devTierPids.add(pid); // keep the chain refresh from clobbering it
       this.broadcastSystem(`[dev] ${session.name} $WOC holder tier → ${n}`);
       return null;

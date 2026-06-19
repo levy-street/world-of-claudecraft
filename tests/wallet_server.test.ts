@@ -135,6 +135,68 @@ describe('POST /api/wallet/link', () => {
     expect(dbMock.query.mock.calls.some((c) => String(c[0]).includes('INSERT INTO wallet_links'))).toBe(false);
   });
 
+  it('returns 409 (not 500) on the TOCTOU race: pre-check passes but the INSERT hits a unique violation', async () => {
+    // The ownership pre-check (SELECT ... WHERE pubkey) passes — no row — but
+    // between that read and the INSERT another account claims the pubkey, so the
+    // UNIQUE index races to a Postgres 23505. linkWalletToAccount must swallow
+    // that into `false`, and the handler must surface 409, never a 500.
+    const w = makeWallet();
+    const message = 'm';
+    challengeRows = [{ address: w.address, message }];
+    // Re-route only the INSERT branch to reject; keep the rest of the default
+    // routing (notably the pubkey pre-check returning NO rows ⇒ check passes).
+    dbMock.query.mockImplementation((sql: string) => {
+      const s = String(sql).replace(/\s+/g, ' ').trim();
+      if (s.includes('DELETE FROM wallet_link_challenges WHERE nonce')) return Promise.resolve({ rows: challengeRows });
+      if (s.includes('DELETE FROM wallet_link_challenges WHERE expires_at')) return Promise.resolve({ rows: [] });
+      if (s.includes('INSERT INTO wallet_link_challenges')) return Promise.resolve({ rows: [] });
+      if (s.includes('SELECT account_id FROM wallet_links WHERE pubkey')) return Promise.resolve({ rows: [] }); // pre-check passes
+      if (s.includes('INSERT INTO wallet_links')) return Promise.reject(Object.assign(new Error('duplicate key value violates unique constraint "wallet_links_pubkey_key"'), { code: '23505' }));
+      if (s.includes('SELECT account_id, pubkey, linked_at FROM wallet_links')) return Promise.resolve({ rows: walletRows });
+      if (s.includes('DELETE FROM wallet_links WHERE account_id')) return Promise.resolve({ rows: [] });
+      return Promise.resolve({ rows: [] });
+    });
+    const { status, data } = await call(handleWalletLink, { address: w.address, signature: sign(message, w.priv), nonce: 'n1' }, 1);
+    expect(status).toBe(409);
+    expect(data.error).toMatch(/another account/i);
+    // the pre-check found nothing, so the INSERT was genuinely attempted (the race path)
+    expect(dbMock.query.mock.calls.some((c) => String(c[0]).includes('INSERT INTO wallet_links'))).toBe(true);
+  });
+
+  it('trims surrounding whitespace on the address and still links', async () => {
+    const w = makeWallet();
+    const message = 'link challenge message';
+    challengeRows = [{ address: w.address, message }]; // challenge stored the canonical (trimmed) address
+    ownerRows = [];
+    const { status, data } = await call(
+      handleWalletLink,
+      { address: `  ${w.address}\n`, signature: sign(message, w.priv), nonce: 'n1' },
+      1,
+    );
+    expect(status).toBe(200);
+    expect(data).toEqual({ pubkey: w.address, linked: true });
+    // the trimmed address — not the padded input — is what gets persisted
+    const insert = dbMock.query.mock.calls.find((c) => String(c[0]).includes('INSERT INTO wallet_links'));
+    expect(insert?.[1]).toEqual([1, w.address]);
+  });
+
+  it('rejects a valid signature scoped to another account (consume returns null) with 400', async () => {
+    // The signature is valid, but the nonce belongs to a different account, so
+    // consumeWalletChallenge (DELETE ... WHERE nonce = $1 AND account_id = $2)
+    // matches no row → null → the handler must 400, never reach the link step.
+    const w = makeWallet();
+    const message = 'm';
+    challengeRows = []; // account-scoped consume finds nothing for this caller
+    const { status, data } = await call(
+      handleWalletLink,
+      { address: w.address, signature: sign(message, w.priv), nonce: 'n1' },
+      7,
+    );
+    expect(status).toBe(400);
+    expect(data.error).toMatch(/expired or already used/i);
+    expect(dbMock.query.mock.calls.some((c) => String(c[0]).includes('INSERT INTO wallet_links'))).toBe(false);
+  });
+
   it('rejects missing fields with 400', async () => {
     const { status } = await call(handleWalletLink, { address: '', signature: '', nonce: '' });
     expect(status).toBe(400);

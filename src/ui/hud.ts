@@ -43,7 +43,7 @@ import { svgIcon } from './ui_icons';
 import { walletUiEnabled, wocBalance, onWalletUiChange } from './wallet_balance';
 import { renderPlayerCardCanvas, cardCanvasToBlob, CARD_POSES, type PlayerCardData, type PlayerCardStat } from './player_card';
 import { cardHostingAvailable, publishCard, fetchReferralInfo, fetchStanding, type PublishedCard, type CharacterStanding } from './player_card_share';
-import { holderTierForBalance, HOLDER_TIERS, holderTierBadgeDataUrl } from './holder_tier';
+import { holderTierForBalance, holderTierByIndex, holderTierBadgeDataUrl } from './holder_tier';
 import { Keybinds, BIND_ACTIONS, BIND_CATEGORIES, isReservedCode, keyLabel } from '../game/keybinds';
 import { Settings, GameSettings, BoolSettingKey, NumericSettingKey, SETTING_RANGES, clickMoveButtonLabel, normalizeClickMoveButton } from '../game/settings';
 import { isPhoneTouchDevice } from '../game/mobile_controls';
@@ -6014,8 +6014,6 @@ export class Hud {
       primaryStats,
       combatStats,
       gear,
-      arenaRating: rating,
-      prestigeRank: sim.prestigeRank,
       topPercent,
       balance: wocBalance(),
       referralHandle: referral?.slug ?? this.cardSlug(p.name),
@@ -6967,14 +6965,17 @@ export class Hud {
     const el = $('#inspect-window');
     this.closeOtherWindows('#inspect-window');
     // $WOC holder-tier flair — cosmetic badge for a connected/holder wallet,
-    // broadcast per-entity via the `ht` identity field (server-set). Shown only
-    // when the inspected player has a tier (> 0).
-    const tierDef = (e.holderTier ?? 0) > 0 ? HOLDER_TIERS.find((tt) => tt.index === e.holderTier) : undefined;
+    // broadcast per-entity via the `ht`/`hb` identity fields (server-set). Shown
+    // only when the inspected player has a tier (> 0); the exact balance rides
+    // along in `hb` and reads out beneath the rung name when present.
+    const tierDef = holderTierByIndex(e.holderTier ?? 0);
     const holderHtml = tierDef
       ? `<div class="inspect-holder">` +
         `<img class="inspect-holder-badge" src="${holderTierBadgeDataUrl(tierDef)}" alt="" draggable="false">` +
-        `<div class="inspect-holder-name">${esc(tierDef.name)} <span class="inspect-holder-sub">$WOC holder</span></div>` +
-        `</div>`
+        `<div class="inspect-holder-text">` +
+        `<div class="inspect-holder-name">${esc(tierDef.name)}</div>` +
+        `<div class="inspect-holder-sub">${e.holderBalance ? `${esc(formatNumber(e.holderBalance, { maximumFractionDigits: 0 }))} $WOC` : '$WOC holder'}</div>` +
+        `</div></div>`
       : '';
     el.innerHTML =
       `<div class="panel-title"><span>${esc(t('character.profile'))}</span>` +

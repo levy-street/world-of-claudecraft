@@ -2042,7 +2042,7 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
   // the referral provider feeds the card footer. Both are cleared on disconnect.
   setCardUploader(async (png) => {
     const r = await api.uploadCard(c.id, png);
-    return { url: new URL(r.url, api.base || location.origin).href, ref: r.ref };
+    return { url: new URL(r.url, api.base || location.origin).href };
   });
   setReferralProvider(() => api.referralStats());
   setStandingProvider(() => api.characterStanding(c.id));
@@ -2792,7 +2792,7 @@ function loadWallet(): Promise<typeof import('./net/wallet')> {
 }
 
 const shortenAddress = (a: string): string => `${a.slice(0, 4)}…${a.slice(-4)}`;
-const formatWoc = (n: number): string => n.toLocaleString(undefined, { maximumFractionDigits: 2 });
+const formatWoc = (n: number): string => formatNumber(n, { maximumFractionDigits: 2 });
 
 function updateWalletButton(): void {
   // mirror the balance into the HUD store so the bag footer stays in sync
