@@ -52,7 +52,11 @@ describe('GameServer sessions', () => {
     const server = new GameServer();
     const session = expectJoined(
       server.join(fakeWs(), 11, 101, 'Lockedout', 'warrior', null, false, {
-        accountCosmetics: { completedQuestIds: ['q_aldrics_fallen_star'], mechChromaIds: [] },
+        accountCosmetics: {
+          completedQuestIds: ['q_aldrics_fallen_star'],
+          mechChromaIds: [],
+          ownedCreatorSkinIds: [],
+        },
       }),
     );
 
@@ -122,7 +126,11 @@ describe('GameServer sessions', () => {
     const server = new GameServer();
     const allowed = expectJoined(
       server.join(fakeWs(), 11, 101, 'Mechwearer', 'shaman', null, false, {
-        accountCosmetics: { completedQuestIds: [], mechChromaIds: ['amber_crimson'] },
+        accountCosmetics: {
+          completedQuestIds: [],
+          mechChromaIds: ['amber_crimson'],
+          ownedCreatorSkinIds: [],
+        },
       }),
     );
     const blocked = expectJoined(server.join(fakeWs(), 12, 102, 'Blockedmech', 'shaman', null));
@@ -143,7 +151,11 @@ describe('GameServer sessions', () => {
   it('unequips a mech chroma from every live character on the account and returns its item', () => {
     revokeAccountMechChroma.mockClear();
     const server = new GameServer();
-    const cosmetics = { completedQuestIds: [], mechChromaIds: ['amber_crimson'] };
+    const cosmetics = {
+      completedQuestIds: [],
+      mechChromaIds: ['amber_crimson'],
+      ownedCreatorSkinIds: [],
+    };
     const first = expectJoined(
       server.join(fakeWs(), 11, 101, 'Mechone', 'shaman', null, false, {
         accountCosmetics: cosmetics,

@@ -156,7 +156,7 @@ describe('cosmetic skin-select event', () => {
       expect(itemId, chroma.id).toBeTruthy();
 
       const sim = new Sim({ seed: 1, playerClass: 'shaman', playerName: `Mech-${chroma.id}` });
-      sim.accountCosmetics = { completedQuestIds: [], mechChromaIds: [chroma.id] };
+      sim.accountCosmetics = { completedQuestIds: [], mechChromaIds: [chroma.id], ownedCreatorSkinIds: [] };
       expect((sim as any).unequipMechChroma(chroma.id)).toBe(true);
       expect(sim.accountCosmetics.mechChromaIds).not.toContain(chroma.id);
       expect(sim.countItem(itemId!)).toBe(1);

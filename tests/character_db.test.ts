@@ -201,6 +201,7 @@ describe('account cosmetics', () => {
     await expect(loadAccountCosmetics(7)).resolves.toEqual({
       completedQuestIds: ['q_aldrics_fallen_star'],
       mechChromaIds: ['amber_crimson', 'onyx_gold'],
+      ownedCreatorSkinIds: [],
     });
 
     expect(dbMock.query.mock.calls[0][0]).toContain('cosmetics');
@@ -215,13 +216,14 @@ describe('account cosmetics', () => {
     await expect(markAccountQuestComplete(7, 'q_aldrics_fallen_star')).resolves.toEqual({
       completedQuestIds: ['q_aldrics_fallen_star'],
       mechChromaIds: ['onyx_gold'],
+      ownedCreatorSkinIds: [],
     });
 
     const [sql, params] = dbMock.query.mock.calls[1];
     expect(sql).toMatch(/UPDATE accounts/);
     expect(sql).toMatch(/cosmetics/);
     expect(params[0]).toBe(7);
-    expect(params[1]).toEqual({ completedQuestIds: ['q_aldrics_fallen_star'], mechChromaIds: ['onyx_gold'] });
+    expect(params[1]).toEqual({ completedQuestIds: ['q_aldrics_fallen_star'], mechChromaIds: ['onyx_gold'], ownedCreatorSkinIds: [] });
   });
 
   it('persists mech chroma unlocks without replacing account quest lockouts', async () => {
@@ -232,6 +234,7 @@ describe('account cosmetics', () => {
     await expect(grantAccountMechChroma(7, 'amber_crimson')).resolves.toEqual({
       completedQuestIds: ['q_aldrics_fallen_star'],
       mechChromaIds: ['amber_crimson'],
+      ownedCreatorSkinIds: [],
     });
   });
 
@@ -243,11 +246,12 @@ describe('account cosmetics', () => {
     await expect(revokeAccountMechChroma(7, 'amber_crimson')).resolves.toEqual({
       completedQuestIds: ['q_aldrics_fallen_star'],
       mechChromaIds: ['onyx_gold'],
+      ownedCreatorSkinIds: [],
     });
 
     const [sql, params] = dbMock.query.mock.calls[1];
     expect(sql).toMatch(/UPDATE accounts/);
-    expect(params[1]).toEqual({ completedQuestIds: ['q_aldrics_fallen_star'], mechChromaIds: ['onyx_gold'] });
+    expect(params[1]).toEqual({ completedQuestIds: ['q_aldrics_fallen_star'], mechChromaIds: ['onyx_gold'], ownedCreatorSkinIds: [] });
   });
 });
 

@@ -478,6 +478,10 @@ export interface RequestMetadata {
 export interface AccountCosmetics {
   completedQuestIds: string[];
   mechChromaIds: string[];
+  // Marketplace creator-skin ids the account owns (purchased) and may equip.
+  // The opaque ids the sim carries as Entity.cosmeticSkinId; ownership is the
+  // server-authoritative gate on equipping one.
+  ownedCreatorSkinIds: string[];
 }
 
 function uniqueStrings(value: unknown): string[] {
@@ -497,6 +501,7 @@ export function normalizeAccountCosmetics(value: unknown): AccountCosmetics {
   return {
     completedQuestIds: uniqueStrings(src.completedQuestIds),
     mechChromaIds: uniqueStrings(src.mechChromaIds),
+    ownedCreatorSkinIds: uniqueStrings(src.ownedCreatorSkinIds),
   };
 }
 
@@ -545,6 +550,20 @@ export async function revokeAccountMechChroma(
   const cosmetics = await loadAccountCosmetics(accountId);
   const mechChromaIds = cosmetics.mechChromaIds.filter((id) => id !== chromaId);
   return saveAccountCosmetics(accountId, { ...cosmetics, mechChromaIds });
+}
+
+export async function grantAccountCreatorSkin(accountId: number, skinId: string): Promise<AccountCosmetics> {
+  const cosmetics = await loadAccountCosmetics(accountId);
+  const ownedCreatorSkinIds = cosmetics.ownedCreatorSkinIds.includes(skinId)
+    ? cosmetics.ownedCreatorSkinIds
+    : [...cosmetics.ownedCreatorSkinIds, skinId];
+  return saveAccountCosmetics(accountId, { ...cosmetics, ownedCreatorSkinIds });
+}
+
+export async function revokeAccountCreatorSkin(accountId: number, skinId: string): Promise<AccountCosmetics> {
+  const cosmetics = await loadAccountCosmetics(accountId);
+  const ownedCreatorSkinIds = cosmetics.ownedCreatorSkinIds.filter((id) => id !== skinId);
+  return saveAccountCosmetics(accountId, { ...cosmetics, ownedCreatorSkinIds });
 }
 
 function cleanMetadataText(value: string | null | undefined, max: number): string | null {
