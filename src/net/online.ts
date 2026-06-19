@@ -715,6 +715,7 @@ function blankEntity(id: number): Entity {
     color: 0xffffff,
     skinCatalog: 'class',
     skin: 0,
+    cosmeticSkinId: null,
     mainhandItemId: null,
     guild: '',
   };
@@ -1113,6 +1114,7 @@ export class ClientWorld implements IWorld {
         e.skin = w.sk ?? 0;
         e.mainhandItemId = w.mh ?? null; // equipped mainhand → held weapon model (render-only)
         e.skinCatalog = w.cat === 'mech' ? 'mech' : 'class';
+        e.cosmeticSkinId = w.csk ?? null; // opaque creator-skin overlay id (cosmetic, server-set)
         e.holderTier = w.ht ?? 0; // $WOC holder-tier flair (cosmetic, server-set)
         e.holderBalance = typeof w.hb === 'number' ? w.hb : undefined; // exact $WOC, for inspect
         e.scale = w.sc ?? 1;
