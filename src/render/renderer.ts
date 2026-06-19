@@ -37,6 +37,7 @@ import { shouldRenderStealthGhost } from './stealth';
 import { t } from '../ui/i18n';
 import { tEntity } from '../ui/entity_i18n';
 import { raidMarkerDataUrl } from '../ui/icons';
+import { HOLDER_TIERS, holderTierBadgeDataUrl } from '../ui/holder_tier';
 import { isProjectedNameplateAnchorVisible, nameplateScreenTransform } from './nameplate_projection';
 import { comboPipsFor, COMBO_PIP_MAX } from './nameplate_combo';
 import { stepCameraOcclusion, type CameraOcclusionState } from './camera_collision';
@@ -156,6 +157,8 @@ interface EntityView {
   nameplateSig: string;
   nameplateHpWidth: string;
   comboSig: string; // cheap-diff for the combo pip row
+  tierEl: HTMLImageElement; // $WOC holder-tier flair badge (other players)
+  tierValue: number; // last-applied holderTier, to diff cheaply
   sparkle?: THREE.Sprite; // ground objects
   objectMesh?: THREE.Object3D;
   portal?: THREE.Mesh; // dungeon door swirl
@@ -1047,6 +1050,10 @@ export class Renderer {
     }
     const marker = document.createElement('div');
     marker.className = 'np-marker';
+    const tierEl = document.createElement('img');
+    tierEl.className = 'np-tier';
+    tierEl.alt = '';
+    tierEl.style.display = 'none';
     const nameEl = document.createElement('div');
     nameEl.className = 'np-name';
     nameEl.textContent = e.kind === 'object' ? objectDisplayName(e) : e.name;
@@ -1064,7 +1071,7 @@ export class Renderer {
     const castLabel = document.createElement('div');
     castLabel.className = 'np-castlabel';
     castBar.append(castFill, castLabel);
-    np.append(emoteEl, raidMark, comboRow, marker, nameEl, hpBar, castBar);
+    np.append(emoteEl, raidMark, comboRow, marker, tierEl, nameEl, hpBar, castBar);
     this.nameplateLayer.appendChild(np);
 
     // object views gate their own casters; character shadows live in visual
@@ -1072,8 +1079,8 @@ export class Renderer {
     if (!visual) collectCasters(group, objectCasters);
     this.views.set(e.id, {
       group, visual, visualKey: visual ? visualKeyFor(e) : null, sheepVisual: null, bearVisual: null, catVisual: null, height, clickTarget,
-      nameplate: np, nameEl, hpBar, hpFill, emoteEl, emoteIconEl, emoteLabelEl, markerEl: marker, raidMarkEl: raidMark, comboRow, comboPips, castBar, castFill, castLabel, sparkle, objectMesh, portal,
-      nameplateDisplay: 'none', nameplateTransform: '', nameplateSig: '', nameplateHpWidth: '', comboSig: '',
+      nameplate: np, nameEl, hpBar, hpFill, emoteEl, emoteIconEl, emoteLabelEl, markerEl: marker, raidMarkEl: raidMark, comboRow, comboPips, castBar, castFill, castLabel, tierEl, sparkle, objectMesh, portal,
+      nameplateDisplay: 'none', nameplateTransform: '', nameplateSig: '', nameplateHpWidth: '', comboSig: '', tierValue: 0,
       objectCasters, shadowOn: true, isFar: false, lastOverheadEmoteKey: null,
       lastX: e.pos.x, lastZ: e.pos.z, skin: e.skin, liveScale: e.scale,
       loco: newLocoTrack(),
@@ -1930,6 +1937,8 @@ export class Renderer {
         const hpDisplay = e.dead || isSelf ? 'none' : '';
         this.setNameplateStatic(v, `player|${e.name}|${nameDisplay}|${hpDisplay}|${opacity}`, e.name, '#7fb8ff', hpDisplay, '', 'np-marker', opacity);
         v.nameEl.style.display = nameDisplay;
+        // $WOC holder-tier flair, shown on OTHER players (own nameplate is hidden).
+        this.setNameplateTier(v, isSelf ? 0 : (e.holderTier ?? 0));
         this.setNameplateHp(v, e);
       } else if (e.kind === 'npc') {
         const npcName = npcDisplayName(e.templateId);
@@ -1990,6 +1999,22 @@ export class Renderer {
     v.markerEl.textContent = marker;
     v.markerEl.className = markerClass;
     v.nameplate.style.opacity = opacity;
+  }
+
+  // Show/hide the $WOC holder-tier badge on a player's nameplate. Cheap-diffed
+  // on the tier value so the badge image is only rebuilt when the tier changes.
+  private setNameplateTier(v: EntityView, tier: number): void {
+    if (tier === v.tierValue) return;
+    v.tierValue = tier;
+    const def = tier > 0 ? HOLDER_TIERS.find((t) => t.index === tier) : undefined;
+    if (def) {
+      v.tierEl.src = holderTierBadgeDataUrl(def, 32);
+      v.tierEl.title = `${def.name} — $WOC holder`;
+      v.tierEl.style.display = '';
+    } else {
+      v.tierEl.removeAttribute('src');
+      v.tierEl.style.display = 'none';
+    }
   }
 
   private setNameplateHp(v: EntityView, e: Entity): void {

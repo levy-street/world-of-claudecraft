@@ -11,6 +11,15 @@ try {
 } catch {
   // .env is optional; production usually injects DATABASE_URL directly.
 }
+try {
+  // Local-dev convenience: also load .env.local so the server can reuse the
+  // client's VITE_* values (e.g. the Solana RPC + $WOC mint) for the in-world
+  // holder-tier reads. Existing keys from .env are not overwritten. In
+  // production these come from real env vars (SOLANA_RPC_URL / WOC_MINT).
+  process.loadEnvFile?.('.env.local');
+} catch {
+  // .env.local is optional.
+}
 
 export const DATABASE_URL =
   process.env.DATABASE_URL ?? (() => {
@@ -163,6 +172,53 @@ CREATE TABLE IF NOT EXISTS chat_violations (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS chat_violations_account ON chat_violations(account_id, created_at DESC);
+-- Non-custodial Solana wallet links (PRD: docs/prd/woc/wallet-link.md). One
+-- wallet per account (account_id is the PK) and one account per wallet (pubkey
+-- is UNIQUE). The server never holds keys; ownership is proven by a signed
+-- challenge (see wallet_link_challenges) and this table is just the mirror.
+CREATE TABLE IF NOT EXISTS wallet_links (
+  account_id INT PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,
+  pubkey TEXT NOT NULL UNIQUE,
+  linked_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+-- Single-use, short-lived sign-to-link challenges. The full message the wallet
+-- must sign is stored server-side so the client cannot choose what gets signed;
+-- consuming a challenge deletes it (replay protection).
+CREATE TABLE IF NOT EXISTS wallet_link_challenges (
+  nonce TEXT PRIMARY KEY,
+  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  address TEXT NOT NULL,
+  message TEXT NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS wallet_link_challenges_account ON wallet_link_challenges(account_id);
+-- Shareable player cards (docs/prd/woc/player-card.md). One card per character;
+-- the PNG is composited client-side and stored here as bytes so any realm
+-- process (all share this database) can serve /p/<slug> and the OG image. slug
+-- is globally unique and is the public, referral-friendly handle.
+CREATE TABLE IF NOT EXISTS player_cards (
+  character_id INT PRIMARY KEY REFERENCES characters(id) ON DELETE CASCADE,
+  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  slug TEXT NOT NULL UNIQUE,
+  png BYTEA NOT NULL,
+  title TEXT NOT NULL DEFAULT '',
+  description TEXT NOT NULL DEFAULT '',
+  realm TEXT NOT NULL DEFAULT '${REALM_SQL_DEFAULT}',
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS player_cards_account ON player_cards(account_id);
+-- Referral capture: when a new account registers via someone's card link
+-- (?ref=<slug>) we record who referred whom, once per referee. Reward payout is
+-- intentionally out of scope here — this just captures the relationship so it
+-- can be synced to rewards later.
+CREATE TABLE IF NOT EXISTS referrals (
+  referee_account_id INT PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,
+  referrer_account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  slug TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS referrals_referrer ON referrals(referrer_account_id);
 `;
 
 export async function ensureSchema(): Promise<void> {
@@ -326,6 +382,202 @@ export async function accountForToken(token: string): Promise<number | null> {
     [token],
   );
   return res.rows[0]?.account_id ?? null;
+}
+
+// ── Non-custodial Solana wallet links ──────────────────────────────────────
+
+export interface WalletLinkRow {
+  account_id: number;
+  pubkey: string;
+  linked_at: string;
+}
+
+export async function createWalletChallenge(
+  nonce: string,
+  accountId: number,
+  address: string,
+  message: string,
+  ttlMinutes = 10,
+): Promise<void> {
+  await pool.query(
+    `INSERT INTO wallet_link_challenges (nonce, account_id, address, message, expires_at)
+     VALUES ($1, $2, $3, $4, now() + ($5 || ' minutes')::interval)`,
+    [nonce, accountId, address, message, String(ttlMinutes)],
+  );
+}
+
+// Atomically consume a challenge: returns the stored address+message if the
+// nonce belongs to this account and is unexpired, deleting the row so a
+// signature can never be replayed against it twice.
+export async function consumeWalletChallenge(
+  nonce: string,
+  accountId: number,
+): Promise<{ address: string; message: string } | null> {
+  const res = await pool.query(
+    `DELETE FROM wallet_link_challenges
+     WHERE nonce = $1 AND account_id = $2 AND expires_at > now()
+     RETURNING address, message`,
+    [nonce, accountId],
+  );
+  return res.rows[0] ?? null;
+}
+
+export async function pruneWalletChallenges(): Promise<void> {
+  await pool.query('DELETE FROM wallet_link_challenges WHERE expires_at <= now()');
+}
+
+export async function walletForAccount(accountId: number): Promise<WalletLinkRow | null> {
+  const res = await pool.query(
+    'SELECT account_id, pubkey, linked_at FROM wallet_links WHERE account_id = $1',
+    [accountId],
+  );
+  return res.rows[0] ?? null;
+}
+
+export async function accountForWallet(pubkey: string): Promise<number | null> {
+  const res = await pool.query('SELECT account_id FROM wallet_links WHERE pubkey = $1', [pubkey]);
+  return res.rows[0]?.account_id ?? null;
+}
+
+// One wallet per account (account_id PK) and one account per wallet (pubkey
+// UNIQUE). Upserts the caller's link; returns false when the wallet is already
+// owned by a different account so the handler can surface a 409.
+export async function linkWalletToAccount(accountId: number, pubkey: string): Promise<boolean> {
+  const owner = await accountForWallet(pubkey);
+  if (owner !== null && owner !== accountId) return false;
+  await pool.query(
+    `INSERT INTO wallet_links (account_id, pubkey) VALUES ($1, $2)
+     ON CONFLICT (account_id) DO UPDATE SET pubkey = EXCLUDED.pubkey, linked_at = now()`,
+    [accountId, pubkey],
+  );
+  return true;
+}
+
+export async function unlinkWallet(accountId: number): Promise<void> {
+  await pool.query('DELETE FROM wallet_links WHERE account_id = $1', [accountId]);
+}
+
+// ── Shareable player cards + referrals ─────────────────────────────────────
+
+export interface PlayerCardRow {
+  characterId: number;
+  accountId: number;
+  png: Buffer;
+  title: string;
+  description: string;
+}
+
+// True when `slug` is free, or already owned by `exceptCharacterId` (so a
+// character can re-publish under its own existing slug). Lets the handler pick a
+// collision-free slug before the upsert.
+export async function slugAvailable(slug: string, exceptCharacterId: number): Promise<boolean> {
+  const res = await pool.query('SELECT character_id FROM player_cards WHERE slug = $1', [slug]);
+  const owner = res.rows[0]?.character_id;
+  return owner === undefined || owner === exceptCharacterId;
+}
+
+export async function upsertPlayerCard(card: {
+  characterId: number;
+  accountId: number;
+  slug: string;
+  png: Buffer;
+  title: string;
+  description: string;
+}): Promise<void> {
+  await pool.query(
+    `INSERT INTO player_cards (character_id, account_id, slug, png, title, description, realm, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, now())
+     ON CONFLICT (character_id)
+     DO UPDATE SET slug = EXCLUDED.slug, png = EXCLUDED.png, title = EXCLUDED.title,
+                   description = EXCLUDED.description, updated_at = now()`,
+    [card.characterId, card.accountId, card.slug, card.png, card.title, card.description, REALM],
+  );
+}
+
+export async function getPlayerCardBySlug(slug: string): Promise<PlayerCardRow | null> {
+  const res = await pool.query(
+    'SELECT character_id, account_id, png, title, description FROM player_cards WHERE slug = $1',
+    [slug],
+  );
+  const row = res.rows[0];
+  if (!row) return null;
+  return {
+    characterId: Number(row.character_id),
+    accountId: Number(row.account_id),
+    png: row.png as Buffer,
+    title: row.title ?? '',
+    description: row.description ?? '',
+  };
+}
+
+// Metadata-only read for the OG-unfurl HTML page, which doesn't need the (up to
+// ~4 MB) PNG bytes — keeps getPlayerCardBySlug's heavy SELECT for the image route.
+export async function getPlayerCardMetaBySlug(slug: string): Promise<{ title: string; description: string } | null> {
+  const res = await pool.query('SELECT title, description FROM player_cards WHERE slug = $1', [slug]);
+  const row = res.rows[0];
+  return row ? { title: row.title ?? '', description: row.description ?? '' } : null;
+}
+
+// The account that owns a card slug — i.e. the referrer credited when someone
+// signs up through their link.
+export async function accountForSlug(slug: string): Promise<number | null> {
+  const res = await pool.query('SELECT account_id FROM player_cards WHERE slug = $1', [slug]);
+  return res.rows[0]?.account_id ?? null;
+}
+
+// Record that `referee` joined via `referrer`'s `slug`. Idempotent: only the
+// first referral for a given referee is kept (PK on referee_account_id).
+export async function recordReferral(refereeAccountId: number, referrerAccountId: number, slug: string): Promise<void> {
+  await pool.query(
+    `INSERT INTO referrals (referee_account_id, referrer_account_id, slug)
+     VALUES ($1, $2, $3)
+     ON CONFLICT (referee_account_id) DO NOTHING`,
+    [refereeAccountId, referrerAccountId, slug],
+  );
+}
+
+export async function referralCountForAccount(accountId: number): Promise<number> {
+  const res = await pool.query(
+    'SELECT count(*)::int AS n FROM referrals WHERE referrer_account_id = $1',
+    [accountId],
+  );
+  return res.rows[0]?.n ?? 0;
+}
+
+// This account's published-card slug, if any (one slug per card; an account can
+// have several characters, so return the most recently updated card's slug for
+// referral display).
+export async function primarySlugForAccount(accountId: number): Promise<string | null> {
+  const res = await pool.query(
+    'SELECT slug FROM player_cards WHERE account_id = $1 ORDER BY updated_at DESC LIMIT 1',
+    [accountId],
+  );
+  return res.rows[0]?.slug ?? null;
+}
+
+// Where a character ranks among all characters on its realm by lifetime XP (the
+// canonical progression metric — encodes level plus post-cap overflow), for the
+// player card's "Top N%" flex. Ownership + realm are enforced via the caller's
+// account; returns null when the character isn't the caller's. rank is 1-based
+// (1 = highest lifetime XP on the realm); total is the realm population.
+export async function lifetimeXpStanding(
+  accountId: number,
+  characterId: number,
+): Promise<{ rank: number; total: number } | null> {
+  // One round-trip: the `own` subquery yields this character's lifetime XP (and
+  // gates ownership/realm — no rows ⇒ not the caller's ⇒ null). The count-ahead
+  // is bounded by the characters_lifetime_xp index (realm, lifetimeXp DESC).
+  const res = await pool.query(
+    `SELECT
+       (SELECT count(*) FROM characters
+         WHERE realm = $1 AND COALESCE((state->>'lifetimeXp')::bigint, 0) > own.xp)::int AS ahead,
+       (SELECT count(*) FROM characters WHERE realm = $1)::int AS total
+     FROM (SELECT COALESCE((state->>'lifetimeXp')::bigint, 0) AS xp
+             FROM characters WHERE id = $2 AND account_id = $3 AND realm = $1) own`,
+    [REALM, characterId, accountId],
+  );
+  if ((res.rowCount ?? 0) === 0) return null; // character isn't the caller's
+  return { rank: (res.rows[0]?.ahead ?? 0) + 1, total: res.rows[0]?.total ?? 0 };
 }
 
 export async function moderationStatusForAccount(accountId: number): Promise<AccountModerationStatus> {

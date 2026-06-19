@@ -906,6 +906,10 @@ export interface Entity {
   color: number;
   skinCatalog: SkinCatalog; // player appearance catalog: class texture set or cosmetic body.
   skin: number; // player appearance: index into SKINS[visualKey]; 0 = default. synced in identity fields.
+  // $WOC holder-tier flair (cosmetic): 0/undefined = none, 1-10 = Ember…Sovereign.
+  // Set server-side from the player's connected-wallet balance and synced in
+  // identity fields like skin. The sim never reads it (no gameplay effect).
+  holderTier?: number;
 }
 
 // `pid` (when present) marks a personal event that should only be delivered to

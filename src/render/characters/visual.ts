@@ -251,6 +251,64 @@ export class CharacterVisual {
   }
 
   // -------------------------------------------------------------------------
+  // Static posing (player-card capture). poseFreeze() locks the rig on a chosen
+  // clip's frame so an offscreen render captures a deliberate pose instead of
+  // whatever idle frame happens to be up; clearPose() resumes the idle loop.
+  // -------------------------------------------------------------------------
+
+  /**
+   * Pose the rig on the first available clip from `candidates`, frozen at
+   * `fraction` (0..1) of that clip's duration, and hold it paused. Returns the
+   * chosen clip name, or null if none of the candidates exist on this model.
+   * Only contributes the chosen action (others are stopped) so the frame is
+   * clean. Pair with clearPose() to return to the idle loop.
+   */
+  poseFreeze(candidates: readonly string[], fraction: number): string | null {
+    let chosen: THREE.AnimationAction | null = null;
+    let name: string | null = null;
+    for (const c of candidates) {
+      const a = this.action(c);
+      if (a) { chosen = a; name = c; break; }
+    }
+    if (!chosen) return null;
+    for (const a of this.actions.values()) if (a !== chosen) a.stop();
+    chosen.stop();
+    chosen.reset();
+    chosen.setLoop(THREE.LoopOnce, 1);
+    chosen.clampWhenFinished = true;
+    chosen.timeScale = 1;
+    chosen.setEffectiveWeight(1);
+    chosen.play();
+    const dur = chosen.getClip().duration;
+    chosen.time = dur > 0 ? Math.max(0, Math.min(dur - 1e-3, dur * fraction)) : 0;
+    chosen.paused = true; // hold the frame
+    this.current = chosen;
+    this.currentIsOneShot = true;
+    this.currentOneShotIsEmote = false;
+    this.mixer.update(0);
+    return name;
+  }
+
+  /** Resume the looping idle after poseFreeze() so the live preview isn't stuck. */
+  clearPose(): void {
+    this.currentIsOneShot = false;
+    this.currentOneShotIsEmote = false;
+    this.baseState = 'idle';
+    const idle = this.action(this.def.clips.idle);
+    if (!idle) return;
+    for (const a of this.actions.values()) if (a !== idle) a.stop();
+    idle.reset();
+    idle.setLoop(THREE.LoopRepeat, Infinity);
+    idle.clampWhenFinished = false;
+    idle.timeScale = 1;
+    idle.paused = false;
+    idle.setEffectiveWeight(1);
+    idle.play();
+    this.current = idle;
+    this.mixer.update(0);
+  }
+
+  // -------------------------------------------------------------------------
   // LOD / shadow plumbing (memoized — called every frame by the renderer)
   // -------------------------------------------------------------------------
 

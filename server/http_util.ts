@@ -43,3 +43,39 @@ export function readBody(req: http.IncomingMessage): Promise<any> {
     req.on('error', reject);
   });
 }
+
+// Read a raw binary request body into a Buffer, capped at `maxBytes`. JSON
+// bodies go through readBody (64 KB); this exists for the player-card PNG
+// upload, which is far larger than that cap but still bounded. As with
+// readBody, exceeding the cap destroys the socket so a client can't stream
+// unbounded data into memory.
+export function readBinaryBody(req: http.IncomingMessage, maxBytes: number): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    let size = 0;
+    let aborted = false;
+    req.on('data', (c: Buffer) => {
+      if (aborted) return;
+      size += c.length;
+      if (size > maxBytes) {
+        aborted = true;
+        req.destroy();
+        reject(new Error('body too large'));
+        return;
+      }
+      chunks.push(c);
+    });
+    req.on('end', () => {
+      if (aborted) return;
+      resolve(Buffer.concat(chunks));
+    });
+    req.on('error', reject);
+  });
+}
+
+// The 8-byte PNG signature. Card uploads must be real PNGs (the card page sets
+// Content-Type: image/png), so reject anything else before it is stored.
+const PNG_MAGIC = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+export function isPng(buf: Buffer): boolean {
+  return buf.length > PNG_MAGIC.length && buf.subarray(0, 8).equals(PNG_MAGIC);
+}

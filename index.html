@@ -462,7 +462,10 @@
   .nameplate { position: absolute; left: 0; top: 0; text-align: center; pointer-events: none;
     text-shadow: 1px 1px 2px #000; white-space: nowrap; will-change: transform; }
   .nameplate.has-emote { z-index: 30; }
-  .np-name { font-size: 12px; font-weight: bold; font-family: var(--title-font); letter-spacing: 0.3px; }
+  .np-name { font-size: 12px; font-weight: bold; font-family: var(--title-font); letter-spacing: 0.3px; display: inline-block; vertical-align: middle; }
+  /* $WOC holder-tier flair badge, inline to the left of a player's name */
+  .np-tier { display: inline-block; width: 15px; height: 15px; vertical-align: middle; margin-right: 3px;
+    filter: drop-shadow(0 1px 1px #000); }
   .np-hpbar { width: 78px; height: 6px; background: #2a0000; border: 1px solid #000; margin: 1px auto 0; border-radius: 2px; }
   .np-hpfill { height: 100%; background: linear-gradient(#48e060, #1d7a32); border-radius: 2px; }
   .np-castbar { position: relative; width: 78px; height: 8px; background: #1a1205; border: 1px solid #000;
@@ -1113,6 +1116,32 @@
   #confirm-dialog .cd-actions { display: flex; justify-content: flex-end; gap: 8px; }
   #confirm-dialog .cd-ok { background: linear-gradient(#8a6a26, #5a4413 55%, #473409); color: #ffe6a8; }
 
+  /* player card: char-window entry button + share modal */
+  .pc-share-row { margin-top: 10px; display: flex; justify-content: center; }
+  .pc-share-btn { display: inline-flex; align-items: center; gap: 7px; }
+  .pc-share-ico { flex: none; }
+  #player-card-modal { z-index: 320; }
+  #player-card-modal .pc-modal { width: min(680px, 96vw); max-height: calc(100vh - 32px);
+    padding: 16px; display: flex; flex-direction: column; }
+  #player-card-modal .pc-preview { margin: 12px 0; min-height: 200px; display: flex;
+    align-items: center; justify-content: center; overflow: auto; }
+  #player-card-modal .pc-preview.pc-loading { color: #c8b888; font-size: 13px; font-style: italic; }
+  #player-card-modal .pc-card-canvas { width: 100%; height: auto; display: block; border-radius: 8px;
+    box-shadow: 0 8px 28px rgba(0,0,0,.55); }
+  #player-card-modal .pc-poses { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 10px; }
+  #player-card-modal .pc-pose { min-width: 84px; padding: 5px 12px; font-size: 12px; opacity: 0.72; }
+  #player-card-modal .pc-pose.sel { opacity: 1; border-color: var(--gold); color: var(--gold); }
+  #player-card-modal .pc-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+  #player-card-modal .pc-actions .btn { min-width: 110px; }
+  #player-card-modal .pc-actions .cd-ok { background: linear-gradient(#8a6a26, #5a4413 55%, #473409); color: #ffe6a8; }
+  #player-card-modal .pc-link { margin-top: 12px; }
+  #player-card-modal .pc-link[hidden] { display: none; }
+  #player-card-modal .pc-link-label { display: block; font-size: 11.5px; color: #c8b888; margin-bottom: 4px; }
+  #player-card-modal .pc-link-input { width: 100%; box-sizing: border-box; padding: 8px 10px; font-size: 12.5px;
+    color: var(--gold); background: #120d07; border: 1px solid #463a1c; border-radius: 5px; font-family: var(--ui-font); }
+  #player-card-modal .pc-status { margin-top: 10px; min-height: 16px; font-size: 12px;
+    color: #c8b888; text-align: center; }
+
   /* vendor */
   #vendor-window { width: 400px; }
   .vendor-item { display: flex; gap: 8px; align-items: center; width: 100%; padding: 5px; border: 0; border-radius: 4px; cursor: var(--cursor-point); background: transparent; color: inherit; font-family: var(--ui-font); text-align: left; }
@@ -1141,7 +1170,11 @@
   }
   #bags .panel-title { flex: none; }
   #bags .bag-grid { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
-  #bags .money { flex: none; }
+  #bags .money { flex: none; display: flex; align-items: center; gap: 10px; }
+  /* coins stay right-aligned whether or not the $WOC chip is present */
+  #bags .money .money-inline { margin-left: auto; }
+  .woc-balance { display: inline-flex; align-items: center; gap: 5px; color: var(--gold-dim); font-weight: 600; white-space: nowrap; }
+  .woc-coin { display: inline-block; width: 11px; height: 11px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #c9a3ff, #6b3fa0); box-shadow: 0 0 4px rgba(150, 90, 230, 0.5); }
   .bag-grid { display: flex; flex-direction: column; gap: 2px; }
   .bag-item { display: flex; gap: 8px; align-items: center; width: 100%; font-size: 12px; padding: 3px 4px; border: 0; border-radius: 3px; cursor: var(--cursor-point); background: transparent; color: inherit; font-family: var(--ui-font); text-align: left; }
   .bag-item:hover { background: #ffffff12; }
@@ -1937,6 +1970,89 @@
     outline: none;
   }
   .donate-cta svg { width: 16px; height: 16px; display: block; }
+
+  /* Connect-wallet CTA — outlined gold to sit beside (not compete with) the
+     filled Donate button. Turns blue when a wallet is connected and green once
+     the wallet is verified-linked to the account. */
+  .wallet-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--gold-dim);
+    background: rgba(11, 11, 18, 0.55);
+    color: var(--gold);
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: border-color var(--transition-speed) var(--transition-ease),
+                box-shadow var(--transition-speed) var(--transition-ease),
+                color var(--transition-speed) var(--transition-ease);
+  }
+  .wallet-cta:hover,
+  .wallet-cta:focus-visible {
+    border-color: var(--gold);
+    box-shadow: 0 0 12px var(--color-primary-glow);
+    outline: none;
+  }
+  .wallet-cta svg { width: 16px; height: 16px; display: block; }
+  .wallet-cta.is-connected { color: var(--color-text-light); border-color: var(--color-mana); }
+  .wallet-cta.is-linked { color: var(--color-text-success); border-color: var(--color-text-success); }
+  .wallet-cta.is-connected #wallet-label,
+  .wallet-cta.is-linked #wallet-label {
+    font-family: 'SFMono-Regular', ui-monospace, 'Courier New', monospace;
+    font-size: 12px;
+    letter-spacing: 0;
+  }
+  .wallet-cta.busy { opacity: 0.6; pointer-events: none; }
+
+  /* Wallet row inside the (logged-in) character-select panel — the account
+     context where linking actually belongs. */
+  .cs-wallet {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(199, 148, 26, 0.18);
+  }
+  .cs-wallet-label {
+    font-family: var(--font-heading);
+    color: var(--gold-dim);
+    font-size: 13px;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+  }
+  .cs-wallet-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+  /* Secondary wallet controls (Switch / Sign out) — only shown when connected. */
+  .wallet-mini {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border-default);
+    background: rgba(11, 11, 18, 0.55);
+    color: var(--color-text-muted);
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color var(--transition-speed) var(--transition-ease),
+                border-color var(--transition-speed) var(--transition-ease);
+  }
+  .wallet-mini svg { width: 14px; height: 14px; display: block; }
+  .wallet-mini:hover,
+  .wallet-mini:focus-visible { color: var(--color-text-light); border-color: var(--gold-dim); outline: none; }
+  #btn-wallet-signout:hover,
+  #btn-wallet-signout:focus-visible { color: var(--color-text-error); border-color: var(--color-text-error); }
+  .wallet-mini[hidden] { display: none; }
 
   /* Footer donate link keeps the social-link shape but warms up on hover. */
   .footer-lang-row { display: flex; justify-content: center; }
@@ -7116,13 +7232,32 @@
         <div id="charselect-panel" class="panel charselect-screen" hidden>
           <header class="cs-head">
             <h2 class="auth-title cs-title"><span data-i18n="auth.characters">Characters:</span> <span id="charselect-user" class="gold"></span></h2>
-            <div class="cs-realm-switch">
-              <button type="button" id="btn-change-realm" class="cs-realm-btn" aria-haspopup="listbox" aria-expanded="false" data-i18n-aria="auth.changeRealm" aria-label="Change Realm">
-                <span class="cs-realm-caption" data-i18n="auth.realm">Realm</span>
-                <span id="charselect-realm" class="cs-realm-name"></span>
-                <svg class="cs-realm-caret" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 10l5 5 5-5z"/></svg>
-              </button>
-              <div id="cs-realm-menu" class="cs-realm-menu" role="listbox" data-i18n-aria="auth.realmList" aria-label="Realm List" hidden></div>
+            <div class="cs-head-row">
+              <div class="cs-realm-switch">
+                <button type="button" id="btn-change-realm" class="cs-realm-btn" aria-haspopup="listbox" aria-expanded="false" data-i18n-aria="auth.changeRealm" aria-label="Change Realm">
+                  <span class="cs-realm-caption" data-i18n="auth.realm">Realm</span>
+                  <span id="charselect-realm" class="cs-realm-name"></span>
+                  <svg class="cs-realm-caret" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 10l5 5 5-5z"/></svg>
+                </button>
+                <div id="cs-realm-menu" class="cs-realm-menu" role="listbox" data-i18n-aria="auth.realmList" aria-label="Realm List" hidden></div>
+              </div>
+              <div class="cs-wallet cs-wallet-group">
+                <span class="cs-wallet-label">$WOC Wallet</span>
+                <div class="cs-wallet-actions">
+                  <button type="button" class="wallet-cta" id="btn-wallet" title="Link your Solana wallet" aria-label="Connect your Solana wallet">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h13a1 1 0 0 1 1 1v2"></path><path d="M3 7v10a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-3"></path><path d="M21 11h-4a2 2 0 0 0 0 4h4a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1Z"></path></svg>
+                    <span id="wallet-label">Connect Wallet</span>
+                  </button>
+                  <button type="button" class="wallet-mini" id="btn-wallet-switch" title="Connect a different wallet" hidden>
+                    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+                    <span>Switch</span>
+                  </button>
+                  <button type="button" class="wallet-mini" id="btn-wallet-signout" title="Disconnect this wallet" hidden>
+                    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    <span>Sign out</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </header>
           <div class="cs-body">

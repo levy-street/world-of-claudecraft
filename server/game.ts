@@ -8,8 +8,9 @@ import { zoneAt, DUNGEONS } from '../src/sim/data';
 import { MECH_CHROMAS, mechChromaItemId, mechChromaSkinIndex } from '../src/sim/content/skins';
 import {
   grantAccountMechChroma, markAccountQuestComplete, revokeAccountMechChroma, saveCharacterState, openPlaySession, closePlaySession,
-  insertChatLogs, pool, loadMarketState, saveMarketState,
+  insertChatLogs, pool, loadMarketState, saveMarketState, walletForAccount,
 } from './db';
+import { holderTierForPubkey } from './woc_balance';
 import type { AccountChatMuteStatus, AccountCosmetics, RequestMetadata } from './db';
 import { ChatFilter } from './chat_filter';
 import { loadChatFilterState, applyChatStrike, recordChatViolation } from './chat_filter_db';
@@ -79,6 +80,11 @@ const ANTIBOT_ENFORCE = process.env.ANTIBOT_ENFORCE === '1';
 const STALE_INPUT_SECONDS = 0.75;
 // Exponential moving average weight for the per-tick duration stat.
 const TICK_EMA_ALPHA = 0.05;
+
+// How often to refresh online players' $WOC holder-tier flair from chain. Each
+// wallet read is additionally cached for minutes in woc_balance.ts, so this is
+// the upper bound on how stale an in-world badge can be.
+const HOLDER_TIER_REFRESH_MS = 120_000;
 
 export interface ClientSession {
   ws: WebSocket;
@@ -202,6 +208,7 @@ function identityFields(e: Entity): Record<string, unknown> {
   const out: Record<string, unknown> = { k: e.kind, tid: e.templateId, nm: e.name, lv: e.level };
   if (e.skinCatalog === 'mech') out.cat = 'mech';
   if (e.skin) out.sk = e.skin;
+  if (e.holderTier) out.ht = e.holderTier; // $WOC holder-tier flair (cosmetic)
   if (e.dungeonId) out.dgn = e.dungeonId;
   if (e.objectItemId) out.obj = e.objectItemId;
   if (e.scale !== 1) out.sc = e.scale;
@@ -343,6 +350,11 @@ export class GameServer {
   private wireCache = new Map<number, EntityWireCache>();
   private lastWireSweepTick = 0;
   private interval: NodeJS.Timeout | null = null;
+  private holderTierInterval: NodeJS.Timeout | null = null;
+  private holderTierRefreshing = false; // overlap guard for the refresh cycle
+  // pids whose holder tier was forced via the dev /woctier command — the chain
+  // refresh leaves them alone so the override sticks during testing (dev only).
+  private devTierPids = new Set<number>();
   private saveTimer = 0;
   private socialPosTimer = 0;
   private saveAllInFlight: Promise<void> | null = null;
@@ -515,10 +527,42 @@ export class GameServer {
         void this.saveMarket();
       }
     }, 50);
+    // Refresh every online player's $WOC holder-tier flair off the 20 Hz loop:
+    // an RPC call per wallet (cached for minutes inside holderTierForPubkey) has
+    // no place in the tick. Catches mid-session balance changes.
+    this.holderTierInterval = setInterval(() => { void this.refreshAllHolderTiers(); }, HOLDER_TIER_REFRESH_MS);
   }
 
   stop(): void {
     if (this.interval) clearInterval(this.interval);
+    if (this.holderTierInterval) clearInterval(this.holderTierInterval);
+  }
+
+  // Update one player's holder-tier flair from their linked wallet's $WOC
+  // balance. Best-effort and guarded against the player leaving mid-fetch.
+  private async refreshHolderTier(session: ClientSession): Promise<void> {
+    if (this.devTierPids.has(session.pid)) return; // dev override pinned this pid
+    const wallet = await walletForAccount(session.accountId);
+    const tier = wallet ? await holderTierForPubkey(wallet.pubkey) : 0;
+    // The player may have left during the await; only apply if still the live
+    // session for this pid.
+    if (this.clients.get(session.pid) !== session) return;
+    const e = this.sim.entities.get(session.pid);
+    if (e && (e.holderTier ?? 0) !== tier) {
+      e.holderTier = tier; // identity diff re-broadcasts it to nearby players
+      console.log(`[woc] ${session.name} holder tier → ${tier}`);
+    }
+  }
+
+  private async refreshAllHolderTiers(): Promise<void> {
+    if (this.holderTierRefreshing) return; // a slow cycle (RPC) must not pile up
+    this.holderTierRefreshing = true;
+    try {
+      await Promise.all([...this.clients.values()].map((session) =>
+        this.refreshHolderTier(session).catch((err) => console.error('holder-tier refresh failed:', err))));
+    } finally {
+      this.holderTierRefreshing = false;
+    }
   }
 
   // -------------------------------------------------------------------------
@@ -732,6 +776,9 @@ export class GameServer {
     // broadcast it to everyone (and likewise don't broadcast departures below).
     this.send(session, { t: 'events', list: [{ type: 'log', text: `${name} has entered World of ClaudeCraft.`, color: '#ffd100' }] });
     void this.initSocial(session);
+    // Stamp the $WOC holder-tier flair (best-effort: a balance read must never
+    // affect joining the world).
+    void this.refreshHolderTier(session).catch((err) => console.error('holder-tier refresh failed:', err));
     return session;
   }
 
@@ -759,6 +806,7 @@ export class GameServer {
       else this.ipSessionCounts.set(session.ip, prev - 1);
       this.refreshMultiIpEvidence(session.ip);
     }
+    this.devTierPids.delete(session.pid);
     this.social.forget(session.characterId);
     // delete from clients first so friends see them as offline in the notice
     void this.social.announcePresence({ characterId: session.characterId, name: session.name }, false)
@@ -1623,6 +1671,18 @@ export class GameServer {
   private routeRememberedChat(session: ClientSession, rawText: string, pid: number): import('../src/sim/sim').SentChat | null {
     const text = rawText.trim();
     if (!text) return null;
+    // Dev-only: force this character's $WOC holder-tier flair so the in-world
+    // nameplate badge can be exercised without a funded linked wallet. Gated by
+    // ALLOW_DEV_COMMANDS (never set in production). Reset on the next balance
+    // refresh or rejoin.
+    if (process.env.ALLOW_DEV_COMMANDS === '1' && /^\/woctier\b/.test(text)) {
+      const n = Math.max(0, Math.min(10, parseInt(text.split(/\s+/)[1] ?? '', 10) || 0));
+      const e = this.sim.entities.get(pid);
+      if (e) e.holderTier = n;
+      this.devTierPids.add(pid); // keep the chain refresh from clobbering it
+      this.broadcastSystem(`[dev] ${session.name} $WOC holder tier → ${n}`);
+      return null;
+    }
     if (!text.startsWith('/')) {
       const body = text;
       if (!body.trim()) return null;

@@ -154,8 +154,8 @@ export class Api {
     return data;
   }
 
-  async register(username: string, password: string, turnstileToken = ''): Promise<void> {
-    const data = await this.post('/api/register', { username, password, turnstileToken });
+  async register(username: string, password: string, turnstileToken = '', ref = ''): Promise<void> {
+    const data = await this.post('/api/register', { username, password, turnstileToken, ref });
     this.token = data.token;
     this.username = data.username;
   }
@@ -216,6 +216,68 @@ export class Api {
       return data.releases ?? [];
     } catch {
       return [];
+    }
+  }
+
+  // ── Non-custodial wallet linking (Reown / Solana) ──────────────────────────
+  // Step 1: ask the server for the exact message to sign for this address.
+  async walletLinkChallenge(address: string): Promise<{ nonce: string; message: string }> {
+    return this.post('/api/wallet/link/challenge', { address });
+  }
+
+  // Step 2: submit the wallet's signature; server verifies + persists the link.
+  async linkWallet(address: string, signature: string, nonce: string): Promise<{ pubkey: string }> {
+    return this.post('/api/wallet/link', { address, signature, nonce });
+  }
+
+  // Current account's linked wallet (null when none).
+  async linkedWallet(): Promise<{ pubkey: string; linkedAt: string } | null> {
+    const data = await this.get('/api/wallet');
+    return data.wallet ?? null;
+  }
+
+  async unlinkWallet(): Promise<void> {
+    await this.delete('/api/wallet/link', {});
+  }
+
+  // ── Shareable player card + referrals ──────────────────────────────────────
+  // Publish (or replace) this character's card PNG; returns the public page path
+  // and the referral slug. The body is the raw PNG, so this bypasses the JSON
+  // `post` helper.
+  async uploadCard(characterId: number, png: Blob): Promise<{ url: string; ref: string }> {
+    const res = await fetch(`${this.base}/api/card?character=${characterId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'image/png',
+        ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}),
+      },
+      body: png,
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error ?? `card upload failed (${res.status})`);
+    return { url: data.url, ref: data.ref };
+  }
+
+  // The account's referral count + published-card slug (null before first
+  // publish). Best-effort: returns zeros rather than throwing on error.
+  async referralStats(): Promise<{ count: number; slug: string | null }> {
+    try {
+      const data = await this.get('/api/referrals');
+      return { count: data.count ?? 0, slug: data.slug ?? null };
+    } catch {
+      return { count: 0, slug: null };
+    }
+  }
+
+  // A character's realm standing by lifetime XP (rank 1 = highest), for the
+  // card's "Top N%" flex. Best-effort: null on error so the card still renders.
+  async characterStanding(characterId: number): Promise<{ rank: number; total: number } | null> {
+    try {
+      const data = await this.get(`/api/characters/${characterId}/standing`);
+      if (typeof data.rank === 'number' && typeof data.total === 'number') return { rank: data.rank, total: data.total };
+      return null;
+    } catch {
+      return null;
     }
   }
 }
@@ -570,6 +632,7 @@ export class ClientWorld implements IWorld {
         e.level = w.lv;
         e.skin = w.sk ?? 0;
         e.skinCatalog = w.cat === 'mech' ? 'mech' : 'class';
+        e.holderTier = w.ht ?? 0; // $WOC holder-tier flair (cosmetic, server-set)
         e.scale = w.sc ?? 1;
         e.color = w.c ?? 0xffffff;
         e.dungeonId = w.dgn ?? null;
