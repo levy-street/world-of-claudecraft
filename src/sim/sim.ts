@@ -603,6 +603,9 @@ export interface PlayerMeta {
   name: string;
   skin: number; // appearance index into the render SKINS[player_<cls>]; persisted, synced
   skinCatalog: SkinCatalog;
+  // Opaque creator-skin id (marketplace UGC); persisted + synced like `skin`.
+  // null = none. The sim never interprets it (see Entity.cosmeticSkinId).
+  cosmeticSkinId: string | null;
   // Cosmetic skin-select event: the rank rolled when the event token was used,
   // pending a lock-in. Set on use, cleared on claim. Persisted so the reward
   // survives reconnect; re-using the token re-shows the same rank (no reroll).
@@ -751,6 +754,8 @@ export interface CharacterState {
   pet?: PetState | null;
   skin?: number; // appearance index (JSONB; optional so pre-skin saves load as 0)
   skinCatalog?: SkinCatalog;
+  // Opaque creator-skin id (JSONB; optional so pre-marketplace saves load as null).
+  cosmeticSkinId?: string | null;
   // Pending skin-select event rank (JSONB; optional so older saves load as null).
   pendingSkinRank?: SkinRank | null;
   pendingSkinCatalog?: SkinCatalog | null;
@@ -1134,6 +1139,7 @@ export class Sim {
       name,
       skin: savedState?.skin ?? 0,
       skinCatalog: savedState?.skinCatalog === 'mech' ? 'mech' : 'class',
+      cosmeticSkinId: savedState?.cosmeticSkinId ?? null,
       pendingSkinRank: savedState?.pendingSkinRank ?? null,
       pendingSkinCatalog: savedState?.pendingSkinCatalog ?? null,
       pendingSkinItemId: savedState?.pendingSkinItemId ?? null,
@@ -1181,6 +1187,7 @@ export class Sim {
     this.players.set(player.id, meta);
     player.skinCatalog = meta.skinCatalog;
     player.skin = meta.skin; // mirror onto the entity so the renderer + wire can read it
+    player.cosmeticSkinId = meta.cosmeticSkinId; // mirror the creator-skin overlay likewise
     if (this.primaryId === -1) this.primaryId = player.id;
 
     if (savedState) {
@@ -1394,6 +1401,7 @@ export class Sim {
       pet: this.serializePet(pid),
       skin: meta.skin,
       skinCatalog: meta.skinCatalog,
+      cosmeticSkinId: meta.cosmeticSkinId,
       pendingSkinRank: meta.pendingSkinRank,
       pendingSkinCatalog: meta.pendingSkinCatalog,
       pendingSkinItemId: meta.pendingSkinItemId,
@@ -1413,16 +1421,27 @@ export class Sim {
   /** Set a player's appearance skin (meta + entity). Bounded; the renderer
    *  falls back to the default for an unknown index. Used by creation, the
    *  in-game changer, and the server's changeSkin command. */
-  setPlayerSkin(pid: number, skin: number, catalog: SkinCatalog = 'class'): boolean {
+  // Set a player's appearance. `skin`/`catalog` are the built-in numeric
+  // appearance (clamped). `cosmeticSkinId` is the opaque marketplace creator-skin
+  // overlay: a string the sim stores + syncs but never interprets, or null to
+  // clear it (selecting a built-in class/mech skin clears any creator overlay).
+  // This method ONLY writes appearance fields — it never touches stats
+  // (`recalcPlayerStats` does not read skin/skinCatalog/cosmeticSkinId), so a
+  // skin can never affect power. Ownership of `cosmeticSkinId` is validated by
+  // the caller (server-side) before this runs; the sim trusts the resolved id.
+  setPlayerSkin(pid: number, skin: number, catalog: SkinCatalog = 'class', cosmeticSkinId: string | null = null): boolean {
     const meta = this.players.get(pid);
     const e = this.entities.get(pid);
     if (!meta || !e) return false;
     const maxSkin = catalog === 'mech' ? MECH_CHROMAS.length - 1 : 7;
     const idx = Math.max(0, Math.min(maxSkin, Math.floor(skin)));
+    const overlay = cosmeticSkinId && cosmeticSkinId.length > 0 ? cosmeticSkinId : null;
     meta.skin = idx;
     meta.skinCatalog = catalog;
+    meta.cosmeticSkinId = overlay;
     e.skin = idx;
     e.skinCatalog = catalog;
+    e.cosmeticSkinId = overlay;
     return true;
   }
 
