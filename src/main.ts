@@ -72,6 +72,7 @@ import {
 import type { WalletOption } from './net/wallet';
 import { assetsReady } from './render/assets/preload';
 import { registerCreatorSkins } from './render/characters/assets';
+import { attachMarketplace as attachMarketplaceHooks, openMarketplace } from './ui/marketplace';
 import { CharacterPreview } from './render/characters';
 import { skinCount } from './render/characters/manifest';
 import { playerPortraitDataUrl } from './render/characters/portrait';
@@ -1555,6 +1556,22 @@ async function startGame(
           meta: payload.meta,
         }),
     });
+    // Creator skins marketplace (online only — needs the server + a wallet). The
+    // overlay (src/ui) talks only through these hooks; the buy orchestration
+    // (quote -> sign+send split tx -> verify -> equip) spans net + wallet + world.
+    attachMarketplaceHooks({
+      listSkins: () => api.creatorSkins(),
+      isWalletConnected: () => (walletMod ? walletMod.currentWallet().isConnected : false),
+      connectWallet: async () => { await (await loadWallet()).openWalletModal(); },
+      purchase: async (skin) => {
+        const wallet = await loadWallet();
+        const quote = await api.quoteSkin(skin.id);
+        const signature = await wallet.signAndSendSplitPayment(quote);
+        await api.buySkin(quote.quoteId, signature);
+        online.changeSkin(skin.fallbackSkin, skin.skinCatalog, skin.id);
+      },
+    });
+    hud.attachMarketplace(() => { void openMarketplace(); });
   }
   function interactKey(): void {
     const p = world.player;

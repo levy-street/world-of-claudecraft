@@ -205,6 +205,7 @@ export type OptionsPanelId =
 
 export type OptionsMenuAction =
   | { kind: 'goto'; view: OptionsPanelId }
+  | { kind: 'marketplace' }
   | { kind: 'logout' }
   | { kind: 'close' };
 
@@ -215,7 +216,10 @@ export interface OptionsMenuEntry {
 
 /** The main Esc-menu button list. The "Report a Bug" row is online-only (it needs
  *  an authoritative server to receive the report). */
-export function buildOptionsMenu(opts: { bugReportAvailable: boolean }): OptionsMenuEntry[] {
+export function buildOptionsMenu(opts: {
+  bugReportAvailable: boolean;
+  marketplaceAvailable: boolean;
+}): OptionsMenuEntry[] {
   const entries: OptionsMenuEntry[] = [
     { labelKey: 'hud.options.keyBindings', action: { kind: 'goto', view: 'keybinds' } },
     { labelKey: 'hudChrome.controller.title', action: { kind: 'goto', view: 'controller' } },
@@ -224,6 +228,8 @@ export function buildOptionsMenu(opts: { bugReportAvailable: boolean }): Options
     { labelKey: 'hud.options.audio', action: { kind: 'goto', view: 'audio' } },
     { labelKey: 'hudChrome.perf.title', action: { kind: 'goto', view: 'performance' } },
   ];
+  if (opts.marketplaceAvailable)
+    entries.push({ labelKey: 'marketplace.title', action: { kind: 'marketplace' } });
   if (opts.bugReportAvailable)
     entries.push({
       labelKey: 'hudChrome.bugReport.menuButton',
