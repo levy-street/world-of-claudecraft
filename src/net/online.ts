@@ -85,6 +85,7 @@ function normalizeAccountCosmetics(value: unknown): AccountCosmetics {
   return {
     completedQuestIds: stringList(src.completedQuestIds),
     mechChromaIds: stringList(src.mechChromaIds),
+    ownedCreatorSkinIds: stringList(src.ownedCreatorSkinIds),
   };
 }
 
@@ -738,7 +739,11 @@ export class ClientWorld implements IWorld {
   copper = 0;
   // --- IWorldCosmetics: account cosmetics (completed-quest + mech-chroma ids),
   // mirrored from snapshot self. ---
-  accountCosmetics: AccountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
+  accountCosmetics: AccountCosmetics = {
+    completedQuestIds: [],
+    mechChromaIds: [],
+    ownedCreatorSkinIds: [],
+  };
   // --- IWorldProgressionXp: XP + post-cap progression scalars + unlocked
   // milestones, mirrored from snapshot self. ---
   xp = 0;
@@ -1555,17 +1560,29 @@ export class ClientWorld implements IWorld {
   // --- IWorldCosmetics: skin + mech-chroma equips. Optimistic local nudge, then
   // the snake_case cmd (change_skin/claim_event_skin/unequip_mech_chroma); the
   // server re-validates and the self-snapshot reconciles. ---
-  changeSkin(skin: number, catalog: 'class' | 'mech' = 'class'): void {
+  changeSkin(
+    skin: number,
+    catalog: 'class' | 'mech' = 'class',
+    cosmeticSkinId: string | null = null,
+  ): void {
     const idx =
       catalog === 'mech'
         ? Math.max(0, Math.floor(skin))
         : Math.max(0, Math.min(7, Math.floor(skin)));
+    const overlay = cosmeticSkinId && cosmeticSkinId.length > 0 ? cosmeticSkinId : null;
     const p = this.entities.get(this.playerId);
     if (p) {
       p.skin = idx;
       p.skinCatalog = catalog;
+      // Optimistic: the server re-validates ownership and clears this on the
+      // next identity snapshot if the account does not own the overlay.
+      p.cosmeticSkinId = overlay;
     }
-    this.cmd({ cmd: 'change_skin', skin: idx, catalog });
+    // Only carry `csk` when equipping an overlay; its absence means "no overlay"
+    // (the server clears any existing one), keeping built-in skin changes terse.
+    const payload: Record<string, unknown> = { cmd: 'change_skin', skin: idx, catalog };
+    if (overlay) payload.csk = overlay;
+    this.cmd(payload);
   }
   claimEventSkin(skin: number): void {
     const idx = Math.max(0, Math.floor(skin));

@@ -17,6 +17,7 @@ import { GameServer, ClientSession } from '../server/game';
 import { ClientWorld } from '../src/net/online';
 import { Sim } from '../src/sim/sim';
 import { recalcPlayerStats } from '../src/sim/entity';
+import { MECH_CHROMAS } from '../src/sim/content/skins';
 import { type PlayerClass } from '../src/sim/types';
 
 // ---------------------------------------------------------------------------
@@ -297,5 +298,66 @@ describe('creator-skin identity broadcast round-trip', () => {
     expect(wire).toBeDefined();
     expect(wire.k).toBe('player'); // identity re-sent => full record
     expect(wire.csk).toBe('creator_late');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Equip gate: equipping a creator overlay is server-authoritative — gated on
+// account ownership, never granted by the act of equipping.
+// ---------------------------------------------------------------------------
+describe('creator-skin equip gate (server-authoritative)', () => {
+  let server: GameServer;
+  let fc: FakeClient;
+  let session: ClientSession;
+
+  beforeEach(() => {
+    server = new GameServer();
+    fc = fakeWs();
+    session = joinServer(server, fc, 1, 'Buyer');
+  });
+
+  const changeSkin = (msg: Record<string, unknown>) =>
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'change_skin', ...msg }));
+
+  it('applies an owned creator overlay and clears it when a built-in skin is reselected', () => {
+    session.accountCosmetics = { ...session.accountCosmetics, ownedCreatorSkinIds: ['creator_owned'] };
+
+    changeSkin({ skin: 0, catalog: 'class', csk: 'creator_owned' });
+    expect(server.sim.entities.get(session.pid)!.cosmeticSkinId).toBe('creator_owned');
+
+    // selecting a built-in class skin (no csk) clears the overlay
+    changeSkin({ skin: 3, catalog: 'class' });
+    expect(server.sim.entities.get(session.pid)!.cosmeticSkinId).toBeNull();
+    expect(server.sim.entities.get(session.pid)!.skin).toBe(3);
+  });
+
+  it('rejects an unowned overlay (forged id) yet still applies the built-in skin', () => {
+    expect(session.accountCosmetics.ownedCreatorSkinIds).toEqual([]);
+
+    changeSkin({ skin: 2, catalog: 'class', csk: 'creator_not_owned' });
+    expect(server.sim.entities.get(session.pid)!.cosmeticSkinId).toBeNull();
+    expect(server.sim.entities.get(session.pid)!.skin).toBe(2);
+  });
+
+  it('rejects an oversized overlay id (> 64 chars) even if it were somehow owned', () => {
+    const huge = 'x'.repeat(65);
+    session.accountCosmetics = { ...session.accountCosmetics, ownedCreatorSkinIds: [huge] };
+
+    changeSkin({ skin: 0, catalog: 'class', csk: huge });
+    expect(server.sim.entities.get(session.pid)!.cosmeticSkinId).toBeNull();
+  });
+
+  it('keeps an owned overlay across a mech-chroma equip the account owns', () => {
+    // own both a creator overlay and a mech chroma, then equip the mech body
+    session.accountCosmetics = {
+      ...session.accountCosmetics,
+      mechChromaIds: [MECH_CHROMAS[1].id],
+      ownedCreatorSkinIds: ['creator_owned'],
+    };
+    changeSkin({ skin: 1, catalog: 'mech', csk: 'creator_owned' });
+    const e = server.sim.entities.get(session.pid)!;
+    expect(e.skinCatalog).toBe('mech');
+    expect(e.skin).toBe(1);
+    expect(e.cosmeticSkinId).toBe('creator_owned');
   });
 });

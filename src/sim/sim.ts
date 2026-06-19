@@ -853,7 +853,11 @@ export class Sim {
   // social systems
   // parties / partyByPid / partyInvites / nextPartyId moved to the PartyMachine
   // (src/sim/social/party.ts, session A1); reached via `this.party`.
-  accountCosmetics: AccountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
+  accountCosmetics: AccountCosmetics = {
+    completedQuestIds: [],
+    mechChromaIds: [],
+    ownedCreatorSkinIds: [],
+  };
   private nextLootRollId = 1;
   private pendingLootRolls = new Map<number, PendingLootRoll>();
   trades = new Map<number, TradeSession>(); // pid -> shared session (both pids point at it)
@@ -1445,8 +1449,11 @@ export class Sim {
     return true;
   }
 
-  changeSkin(skin: number, catalog: SkinCatalog = 'class'): void {
-    this.setPlayerSkin(this.primaryId, skin, catalog);
+  changeSkin(skin: number, catalog: SkinCatalog = 'class', cosmeticSkinId: string | null = null): void {
+    // Offline/single-player self-grants: there is no marketplace ownership to
+    // gate against here. Online, the server validates ownership before calling
+    // setPlayerSkin (see GameServer's change_skin handler).
+    this.setPlayerSkin(this.primaryId, skin, catalog, cosmeticSkinId);
   }
 
   /** Set a player's guild name (online only) so it rides the entity wire and

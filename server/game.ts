@@ -990,6 +990,7 @@ export class GameServer {
     return {
       completedQuestIds: [...new Set([...a.completedQuestIds, ...b.completedQuestIds])],
       mechChromaIds: [...new Set([...a.mechChromaIds, ...b.mechChromaIds])],
+      ownedCreatorSkinIds: [...new Set([...a.ownedCreatorSkinIds, ...b.ownedCreatorSkinIds])],
     };
   }
 
@@ -998,7 +999,7 @@ export class GameServer {
     cosmetics: AccountCosmetics,
   ): AccountCosmetics {
     const merged = this.mergeAccountCosmetics(
-      this.accountCosmeticsByAccount.get(accountId) ?? { completedQuestIds: [], mechChromaIds: [] },
+      this.accountCosmeticsByAccount.get(accountId) ?? { completedQuestIds: [], mechChromaIds: [], ownedCreatorSkinIds: [] },
       cosmetics,
     );
     this.accountCosmeticsByAccount.set(accountId, merged);
@@ -1019,6 +1020,7 @@ export class GameServer {
     const exact = {
       completedQuestIds: [...new Set(cosmetics.completedQuestIds)],
       mechChromaIds: [...new Set(cosmetics.mechChromaIds)],
+      ownedCreatorSkinIds: [...new Set(cosmetics.ownedCreatorSkinIds)],
     };
     this.accountCosmeticsByAccount.set(accountId, exact);
     for (const live of this.clients.values()) {
@@ -1112,7 +1114,7 @@ export class GameServer {
     }
     const accountCosmetics = this.rememberAccountCosmetics(
       accountId,
-      meta.accountCosmetics ?? { completedQuestIds: [], mechChromaIds: [] },
+      meta.accountCosmetics ?? { completedQuestIds: [], mechChromaIds: [], ownedCreatorSkinIds: [] },
     );
     this.applyAccountQuestLockouts(pid, accountCosmetics);
     const sessionIp = meta.ip ?? '';
@@ -1887,14 +1889,20 @@ export class GameServer {
         break;
       case 'change_skin':
         if (typeof msg.skin === 'number') {
+          // The creator-skin overlay must be a bounded id the account actually
+          // owns; a forged, unowned, or oversized id is dropped to null (the
+          // built-in skin below still applies). Ownership is the authoritative
+          // gate — equipping can never grant a cosmetic, only select an owned one.
+          const requested = typeof msg.csk === 'string' && msg.csk.length > 0 && msg.csk.length <= 64 ? msg.csk : null;
+          const overlay = requested && session.accountCosmetics.ownedCreatorSkinIds.includes(requested) ? requested : null;
           if (msg.catalog === 'mech') {
             const idx = Math.max(0, Math.floor(msg.skin));
             const chroma = MECH_CHROMAS[idx];
             if (chroma && session.accountCosmetics.mechChromaIds.includes(chroma.id)) {
-              sim.setPlayerSkin(pid, idx, 'mech');
+              sim.setPlayerSkin(pid, idx, 'mech', overlay);
             }
           } else {
-            sim.setPlayerSkin(pid, msg.skin, 'class');
+            sim.setPlayerSkin(pid, msg.skin, 'class', overlay);
           }
         }
         break;
