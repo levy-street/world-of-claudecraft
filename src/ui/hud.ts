@@ -2615,6 +2615,13 @@ export class Hud {
       ctx.stroke();
       ctx.restore();
     }
+    // Party members (class-colored), friends (green), and guild members (blue),
+    // plotted anywhere in this zone from their live positions. Party members are
+    // drawn last so a partied friend/guild-mate shows in their class color, and
+    // the social pass skips anyone already shown as a party member.
+    const party = this.sim.partyInfo;
+    const partyNames = new Set<string>();
+    if (party) for (const m of party.members) if (m.pid !== p.id) partyNames.add(m.name);
     // friends (green) and guild members (blue), plotted anywhere in this zone
     // from the live positions the server streams for online allies. socialInfo
     // is null offline, so this is online-only.
@@ -2627,6 +2634,7 @@ export class Hud {
       const drawn = new Set<number>();
       const plotAlly = (m: FriendInfo, color: string) => {
         if (!m.online || m.x === undefined || m.z === undefined || m.name === selfName || drawn.has(m.id)) return;
+        if (partyNames.has(m.name)) return; // shown as a class-colored party marker below
         if (m.z < zone.zMin || m.z >= zone.zMax || m.x > WORLD_MAX_X) return;
         drawn.add(m.id);
         const { mx, my } = toMap(m.x, m.z);
@@ -2642,6 +2650,35 @@ export class Hud {
       };
       for (const f of social.friends) plotAlly(f, '#4ade80'); // friends green (win ties)
       if (social.guild) for (const m of social.guild.members) plotAlly(m, '#60a5fa');
+    }
+    // Party members: class-colored discs matching the minimap (gray if dead, with
+    // a bright inner pip so they pop against terrain). partyInfo carries live
+    // positions for every member, so this works the same online and offline.
+    if (party) {
+      ctx.lineWidth = 3;
+      ctx.font = 'bold 11px Georgia';
+      ctx.textAlign = 'center';
+      for (const m of party.members) {
+        if (m.pid === p.id) continue;
+        if (m.z < zone.zMin || m.z >= zone.zMax || m.x > WORLD_MAX_X) continue;
+        const { mx, my } = toMap(m.x, m.z);
+        const color = m.dead ? '#9a9a9a' : classCss(m.cls);
+        ctx.fillStyle = color;
+        ctx.strokeStyle = '#000';
+        ctx.beginPath();
+        ctx.arc(mx, my, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        if (!m.dead) { // bright inner pip, matching the minimap
+          ctx.fillStyle = '#ffffffcc';
+          ctx.beginPath();
+          ctx.arc(mx, my, 1.6, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.fillStyle = color;
+        ctx.strokeText(m.name, mx, my - 8);
+        ctx.fillText(m.name, mx, my - 8);
+      }
     }
   }
 
