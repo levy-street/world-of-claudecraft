@@ -94,19 +94,19 @@ describe('parseSplitPayment — pure reduction of a confirmed tx', () => {
     expect(parsed.feePayer).toBe(BUYER);
     expect(parsed.memo).toBe('q_abc');
     expect(parsed.usesToken2022ForMint).toBe(false);
-    expect(parsed.usdcDeltas.get(BUYER)).toBe(-10_000_000n);
-    expect(parsed.usdcDeltas.get(CREATOR)).toBe(7_000_000n);
-    expect(parsed.usdcDeltas.get(VAULT)).toBe(3_000_000n);
+    expect(parsed.tokenDeltas.get(BUYER)).toBe(-10_000_000n);
+    expect(parsed.tokenDeltas.get(CREATOR)).toBe(7_000_000n);
+    expect(parsed.tokenDeltas.get(VAULT)).toBe(3_000_000n);
   });
 
   it('treats an ATA absent from preTokenBalances as starting at zero', () => {
     const tx = makeTx({ balances: [{ owner: CREATOR, post: '7000000' }] });
-    expect(parseSplitPayment(tx, USDC).usdcDeltas.get(CREATOR)).toBe(7_000_000n);
+    expect(parseSplitPayment(tx, USDC).tokenDeltas.get(CREATOR)).toBe(7_000_000n);
   });
 
   it('ignores balances on other mints', () => {
     const tx = makeTx({ balances: [{ owner: CREATOR, pre: '0', post: '500', mint: 'OtherMint1111111111111111111111111111111111' }] });
-    expect(parseSplitPayment(tx, USDC).usdcDeltas.size).toBe(0);
+    expect(parseSplitPayment(tx, USDC).tokenDeltas.size).toBe(0);
   });
 
   it('flags the USDC mint being carried under Token-2022', () => {
@@ -121,7 +121,7 @@ describe('parseSplitPayment — pure reduction of a confirmed tx', () => {
 
   it('omits zero-net deltas (an account touched but unchanged)', () => {
     const tx = makeTx({ balances: [{ owner: BUYER, pre: '5', post: '5' }] });
-    expect(parseSplitPayment(tx, USDC).usdcDeltas.has(BUYER)).toBe(false);
+    expect(parseSplitPayment(tx, USDC).tokenDeltas.has(BUYER)).toBe(false);
   });
 
   it('sums a delta across multiple USDC accounts owned by the same wallet', () => {
@@ -132,7 +132,7 @@ describe('parseSplitPayment — pure reduction of a confirmed tx', () => {
       { owner: VAULT, pre: '0', post: '3000000' },
     ] });
     const parsed = parseSplitPayment(tx, USDC);
-    expect(parsed.usdcDeltas.get(CREATOR)).toBe(7_000_000n);
+    expect(parsed.tokenDeltas.get(CREATOR)).toBe(7_000_000n);
     expect(validateSplitPayment(parsed, quote(), BUYER)).toBe('ok');
   });
 

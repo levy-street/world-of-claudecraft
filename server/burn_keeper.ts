@@ -239,6 +239,10 @@ export function buildProductionDeps(): { exec: BurnExecutor; store: BurnStore } 
     vaultUsdcBalance: () => vaultTokenBalance(BURN_VAULT, USDC_MINT),
 
     async quote(inUsdc) {
+      // slippageBps is the binding slippage cap: Jupiter bakes it into the quote's
+      // otherAmountThreshold, which signSwap passes straight to /swap, so the
+      // on-chain swap instruction REVERTS if it would receive less. The cap is
+      // enforced by the chain, not by us trusting the quoted out-amount.
       const url = `${JUPITER_API}/quote?inputMint=${USDC_MINT}&outputMint=${WOC_MINT}&amount=${inUsdc.toString()}&slippageBps=${policy.maxSlippageBps.toString()}&swapMode=ExactIn`;
       const res = await fetch(url, { signal: AbortSignal.timeout(10_000) });
       if (!res.ok) return null;
@@ -248,6 +252,8 @@ export function buildProductionDeps(): { exec: BurnExecutor; store: BurnStore } 
     },
 
     async signSwap(quoteRaw) {
+      // Hand the FULL quote back to /swap so its otherAmountThreshold (the
+      // slippageBps cap above) rides into the on-chain instruction unchanged.
       const res = await fetch(`${JUPITER_API}/swap`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -272,7 +278,7 @@ export function buildProductionDeps(): { exec: BurnExecutor; store: BurnStore } 
       const tx = await fetchFinalizedTransaction(swapSignature);
       if (!tx) return 0n;
       // parseSplitPayment is mint-generic — the delta map is for the passed mint.
-      const delta = parseSplitPayment(tx, WOC_MINT).usdcDeltas.get(BURN_VAULT) ?? 0n;
+      const delta = parseSplitPayment(tx, WOC_MINT).tokenDeltas.get(BURN_VAULT) ?? 0n;
       return delta > 0n ? delta : 0n;
     },
 
