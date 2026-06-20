@@ -386,17 +386,21 @@ export async function fetchWocBalance(owner: string, fresh = false): Promise<num
   }
 }
 
-
 // ── Marketplace split payment ────────────────────────────────────────────────
 // Build + sign + send the single atomic USDC transaction a creator-skin purchase
 // requires: 70% to the creator + 30% to the burn vault + a memo (the quote id).
 // Instructions are built on @solana/web3.js; the connected wallet signs and sends
 // via the Wallet Standard SolanaSignAndSendTransaction feature. The server
 // verifies the resulting on-chain balance deltas, so what matters is that the
-// transfers actually land. The payment network is the marketplace/devnet cluster
-// (RPC + chain from env); the USDC mint + recipient owners + exact amounts come
+// transfers actually land. The USDC mint + recipient owners + exact amounts come
 // from the server-issued quote.
-const MARKET_RPC = String(import.meta.env.VITE_MARKETPLACE_RPC_URL ?? import.meta.env.VITE_SOLANA_RPC_URL ?? 'https://api.mainnet-beta.solana.com').trim();
+//
+// RPC and chain MUST be the same cluster — a blockhash fetched from one cluster
+// is invalid when the tx is broadcast on another ("blockhash not found"). Both
+// default to devnet (Phase 1); prod sets both env vars to its launch cluster.
+// VITE_SOLANA_RPC_URL (the mainnet $WOC-balance RPC) is deliberately NOT a
+// fallback here, so a misconfigured build can't silently mix clusters.
+const MARKET_RPC = String(import.meta.env.VITE_MARKETPLACE_RPC_URL ?? 'https://api.devnet.solana.com').trim();
 const MARKET_CHAIN = String(import.meta.env.VITE_MARKETPLACE_CHAIN ?? 'solana:devnet').trim();
 const TOKEN_PROGRAM = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
 const ASSOCIATED_TOKEN_PROGRAM = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL');
@@ -452,8 +456,9 @@ export interface SplitPaymentQuote {
 
 /**
  * Build + sign + send the buyer's atomic 70/30 USDC split payment via the
- * connected wallet, then wait for finalization (the commitment the server
- * verifies at) and return the signature to hand to /api/marketplace/buy.
+ * connected wallet, then wait for the transaction to FINALIZE (the commitment
+ * the server verifies against) before returning the signature to hand to
+ * /api/marketplace/buy.
  */
 export async function signAndSendSplitPayment(q: SplitPaymentQuote): Promise<string> {
   const wallet = selectedWallet;
@@ -468,7 +473,10 @@ export async function signAndSendSplitPayment(q: SplitPaymentQuote): Promise<str
   const buyerPk = new PublicKey(account.address);
   const buyerAta = associatedTokenAccount(buyerPk, mint);
   const conn = getPaymentConnection();
-  const { blockhash, lastValidBlockHeight } = await conn.getLatestBlockhash('finalized');
+  // Default ('confirmed') commitment — a 'finalized' blockhash is ~32 slots old
+  // and would halve the tx's validity window before the wallet even signs. The
+  // confirmation below still waits for 'finalized' (what the server verifies).
+  const { blockhash, lastValidBlockHeight } = await conn.getLatestBlockhash();
   const tx = new Transaction({ feePayer: buyerPk, blockhash, lastValidBlockHeight }).add(
     transferCheckedIx(buyerAta, mint, associatedTokenAccount(new PublicKey(q.creator.owner), mint), buyerPk, BigInt(q.creator.amount), USDC_DECIMALS),
     transferCheckedIx(buyerAta, mint, associatedTokenAccount(new PublicKey(q.burn.owner), mint), buyerPk, BigInt(q.burn.amount), USDC_DECIMALS),

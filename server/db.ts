@@ -599,20 +599,6 @@ export async function revokeAccountMechChroma(
   return saveAccountCosmetics(accountId, { ...cosmetics, mechChromaIds });
 }
 
-export async function grantAccountCreatorSkin(accountId: number, skinId: string): Promise<AccountCosmetics> {
-  const cosmetics = await loadAccountCosmetics(accountId);
-  const ownedCreatorSkinIds = cosmetics.ownedCreatorSkinIds.includes(skinId)
-    ? cosmetics.ownedCreatorSkinIds
-    : [...cosmetics.ownedCreatorSkinIds, skinId];
-  return saveAccountCosmetics(accountId, { ...cosmetics, ownedCreatorSkinIds });
-}
-
-export async function revokeAccountCreatorSkin(accountId: number, skinId: string): Promise<AccountCosmetics> {
-  const cosmetics = await loadAccountCosmetics(accountId);
-  const ownedCreatorSkinIds = cosmetics.ownedCreatorSkinIds.filter((id) => id !== skinId);
-  return saveAccountCosmetics(accountId, { ...cosmetics, ownedCreatorSkinIds });
-}
-
 function cleanMetadataText(value: string | null | undefined, max: number): string | null {
   const text = typeof value === 'string' ? value.trim() : '';
   return text ? text.slice(0, max) : null;
@@ -2262,23 +2248,49 @@ export async function pruneMarketplaceQuotes(): Promise<void> {
  * guard: returns true if this signature was newly recorded, false if it was
  * already consumed (a replay) — verification keys idempotency off this.
  */
-export async function recordOnchainPayment(txSig: string, accountId: number, reference: string, amount: bigint, mint: string): Promise<boolean> {
-  const res = await pool.query(
-    `INSERT INTO onchain_payments (tx_sig, account_id, reference, amount, mint)
-     VALUES ($1,$2,$3,$4,$5) ON CONFLICT (tx_sig) DO NOTHING`,
-    [txSig, accountId, reference, amount.toString(), mint],
-  );
-  return (res.rowCount ?? 0) === 1;
-}
-
-export async function recordMarketplaceSale(s: {
-  skinId: string; buyerAccountId: number; quoteId: string;
-  grossUsdc: bigint; creatorUsdc: bigint; burnUsdc: bigint; payTxSig: string;
-}): Promise<void> {
-  await pool.query(
-    `INSERT INTO marketplace_sales
-       (skin_id, buyer_account_id, quote_id, gross_usdc, creator_usdc, burn_usdc, pay_tx_sig)
-     VALUES ($1,$2,$3,$4,$5,$6,$7)`,
-    [s.skinId, s.buyerAccountId, s.quoteId, s.grossUsdc.toString(), s.creatorUsdc.toString(), s.burnUsdc.toString(), s.payTxSig],
-  );
+/**
+ * Atomically redeem a verified purchase: consume the payment signature (the
+ * replay guard), record the sale, grant the skin, and delete the quote — all in
+ * ONE transaction. Either the signature is consumed AND the skin granted, or
+ * neither (a mid-way failure rolls back), so a paid buyer can never be stranded
+ * with a consumed signature and no cosmetic. Returns false if the signature was
+ * already consumed (ON CONFLICT) — i.e. a replay.
+ */
+export async function redeemPurchase(p: {
+  txSig: string; accountId: number; quoteId: string; mint: string; skinId: string;
+  grossUsdc: bigint; creatorUsdc: bigint; burnUsdc: bigint;
+}): Promise<boolean> {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const ins = await client.query(
+      `INSERT INTO onchain_payments (tx_sig, account_id, reference, amount, mint)
+       VALUES ($1,$2,$3,$4,$5) ON CONFLICT (tx_sig) DO NOTHING`,
+      [p.txSig, p.accountId, p.quoteId, p.grossUsdc.toString(), p.mint],
+    );
+    if ((ins.rowCount ?? 0) === 0) { await client.query('ROLLBACK'); return false; }
+    await client.query(
+      `INSERT INTO marketplace_sales
+         (skin_id, buyer_account_id, quote_id, gross_usdc, creator_usdc, burn_usdc, pay_tx_sig)
+       VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+      [p.skinId, p.accountId, p.quoteId, p.grossUsdc.toString(), p.creatorUsdc.toString(), p.burnUsdc.toString(), p.txSig],
+    );
+    // Grant ownership on the same row lock (read-modify-write under the tx).
+    const cur = await client.query('SELECT cosmetics FROM accounts WHERE id = $1 FOR UPDATE', [p.accountId]);
+    const cosmetics = normalizeAccountCosmetics(cur.rows[0]?.cosmetics);
+    if (!cosmetics.ownedCreatorSkinIds.includes(p.skinId)) {
+      await client.query('UPDATE accounts SET cosmetics = $2 WHERE id = $1', [
+        p.accountId,
+        { ...cosmetics, ownedCreatorSkinIds: [...cosmetics.ownedCreatorSkinIds, p.skinId] },
+      ]);
+    }
+    await client.query('DELETE FROM marketplace_quotes WHERE quote_id = $1', [p.quoteId]);
+    await client.query('COMMIT');
+    return true;
+  } catch (e) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw e;
+  } finally {
+    client.release();
+  }
 }

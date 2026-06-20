@@ -12,7 +12,9 @@ import type { MarketplaceQuoteRow } from '../server/db';
 
 const USDC = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v';
 const BUYER = 'Buyer1111111111111111111111111111111111111';
-const CREATOR = 'Creator111111111111111111111111111111111111';
+// A real, valid base58-32 pubkey: quotePurchase now runs isSolanaAddress() on
+// the creator wallet, so this stands in as a well-formed payout address.
+const CREATOR = 'So11111111111111111111111111111111111111112';
 const VAULT = 'Vault11111111111111111111111111111111111111';
 
 interface Bal { owner: string; pre?: string; post?: string; mint?: string; programId?: string }
@@ -179,6 +181,12 @@ describe('quotePurchase — split + persisted binding', () => {
     expect(quoteRow.buyerAccountId).toBe(42);
     expect(db.createMarketplaceQuote).toHaveBeenCalledWith(quoteRow);
   });
+
+  it('rejects a skin whose payout wallet is malformed (fails fast, persists nothing)', async () => {
+    await expect(quotePurchase(creatorSkinRow({ creatorWallet: 'not-a-real-wallet' }), 42)).rejects.toThrow();
+    await expect(quotePurchase(creatorSkinRow({ creatorWallet: '' }), 42)).rejects.toThrow();
+    expect(db.createMarketplaceQuote).not.toHaveBeenCalled();
+  });
 });
 
 describe('validateSplitPayment — exhaustive accept + reject matrix', () => {
@@ -260,9 +268,7 @@ describe('validateSplitPayment — exhaustive accept + reject matrix', () => {
 const db = vi.hoisted(() => ({
   getMarketplaceQuote: vi.fn(),
   deleteMarketplaceQuote: vi.fn(async () => {}),
-  recordOnchainPayment: vi.fn(async () => true),
-  recordMarketplaceSale: vi.fn(async () => {}),
-  grantAccountCreatorSkin: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [], ownedCreatorSkinIds: ['skin_1'] })),
+  redeemPurchase: vi.fn(async () => true),
   listLiveCreatorSkins: vi.fn(async (): Promise<CreatorSkinRow[]> => []),
   createMarketplaceQuote: vi.fn(async () => {}),
 }));
@@ -279,19 +285,19 @@ describe('verifyPurchase — orchestration over the real validator', () => {
 
   const params = { quoteId: 'q_abc', signature: 'sig_xyz', buyerAccountId: 42, buyerWallet: BUYER };
 
-  it('records the payment + sale and grants the skin on a valid purchase', async () => {
+  it('redeems atomically with the exact split and grants the skin on a valid purchase', async () => {
     db.getMarketplaceQuote.mockResolvedValueOnce(quote());
     rpc.fetchFinalizedTransaction.mockResolvedValueOnce(goodTx());
 
     const result = await verifyPurchase(params);
 
     expect(result).toEqual({ ok: true, skinId: 'skin_1' });
-    expect(db.recordOnchainPayment).toHaveBeenCalledWith('sig_xyz', 42, 'q_abc', 10_000_000n, USDC);
-    expect(db.recordMarketplaceSale).toHaveBeenCalledWith(expect.objectContaining({
-      skinId: 'skin_1', buyerAccountId: 42, grossUsdc: 10_000_000n, creatorUsdc: 7_000_000n, burnUsdc: 3_000_000n, payTxSig: 'sig_xyz',
-    }));
-    expect(db.grantAccountCreatorSkin).toHaveBeenCalledWith(42, 'skin_1');
-    expect(db.deleteMarketplaceQuote).toHaveBeenCalledWith('q_abc');
+    // One atomic redeem call carries the exact split + binding (inspect the data).
+    expect(db.redeemPurchase).toHaveBeenCalledTimes(1);
+    expect(db.redeemPurchase).toHaveBeenCalledWith({
+      txSig: 'sig_xyz', accountId: 42, quoteId: 'q_abc', mint: USDC, skinId: 'skin_1',
+      grossUsdc: 10_000_000n, creatorUsdc: 7_000_000n, burnUsdc: 3_000_000n,
+    });
   });
 
   it('rejects an unknown quote without touching the chain', async () => {
@@ -304,36 +310,34 @@ describe('verifyPurchase — orchestration over the real validator', () => {
     db.getMarketplaceQuote.mockResolvedValueOnce(quote({ expiresAt: new Date(Date.now() - 1000).toISOString() }));
     expect(await verifyPurchase(params)).toEqual({ ok: false, reason: 'quote_expired' });
     expect(db.deleteMarketplaceQuote).toHaveBeenCalledWith('q_abc');
-    expect(db.recordOnchainPayment).not.toHaveBeenCalled();
+    expect(db.redeemPurchase).not.toHaveBeenCalled();
   });
 
   it('rejects a quote issued to a different buyer account', async () => {
     db.getMarketplaceQuote.mockResolvedValueOnce(quote({ buyerAccountId: 99 }));
     expect(await verifyPurchase(params)).toEqual({ ok: false, reason: 'quote_buyer_mismatch' });
+    expect(db.redeemPurchase).not.toHaveBeenCalled();
   });
 
   it('rejects when the transaction is not finalized / unknown', async () => {
     db.getMarketplaceQuote.mockResolvedValueOnce(quote());
     rpc.fetchFinalizedTransaction.mockResolvedValueOnce(null);
     expect(await verifyPurchase(params)).toEqual({ ok: false, reason: 'tx_not_finalized' });
-    expect(db.recordOnchainPayment).not.toHaveBeenCalled();
+    expect(db.redeemPurchase).not.toHaveBeenCalled();
   });
 
-  it('surfaces the validator reason and never records on an invalid tx', async () => {
+  it('surfaces the validator reason and never redeems on an invalid tx', async () => {
     db.getMarketplaceQuote.mockResolvedValueOnce(quote());
     rpc.fetchFinalizedTransaction.mockResolvedValueOnce(goodTx('wrong_memo'));
     expect(await verifyPurchase(params)).toEqual({ ok: false, reason: 'memo_mismatch' });
-    expect(db.recordOnchainPayment).not.toHaveBeenCalled();
-    expect(db.grantAccountCreatorSkin).not.toHaveBeenCalled();
+    expect(db.redeemPurchase).not.toHaveBeenCalled();
   });
 
-  it('treats a replayed signature as already redeemed (no second grant)', async () => {
+  it('treats a replayed signature as already redeemed (redeemPurchase returns false)', async () => {
     db.getMarketplaceQuote.mockResolvedValueOnce(quote());
     rpc.fetchFinalizedTransaction.mockResolvedValueOnce(goodTx());
-    db.recordOnchainPayment.mockResolvedValueOnce(false); // PK conflict => already consumed
+    db.redeemPurchase.mockResolvedValueOnce(false); // signature already consumed
 
     expect(await verifyPurchase(params)).toEqual({ ok: false, reason: 'already_redeemed' });
-    expect(db.recordMarketplaceSale).not.toHaveBeenCalled();
-    expect(db.grantAccountCreatorSkin).not.toHaveBeenCalled();
   });
 });

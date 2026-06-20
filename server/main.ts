@@ -73,6 +73,7 @@ import {
   primarySlugForAccount,
   pruneChatLogs,
   pruneClientPerfReports,
+  pruneMarketplaceQuotes,
   reclaimDeactivatedName,
   referralCountForAccount,
   renameCharacter,
@@ -1395,6 +1396,11 @@ async function main(): Promise<void> {
       );
       void pruneExpiredOAuthGrants(pool).catch((err) =>
         console.error('oauth grant prune failed:', err),
+      );
+      // Reap expired marketplace quotes (verifyPurchase only deletes on access, so
+      // unbought quotes would otherwise accrue unbounded).
+      void pruneMarketplaceQuotes().catch((err) =>
+        console.error('marketplace quote prune failed:', err),
       );
     },
     24 * 3600 * 1000,

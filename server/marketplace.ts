@@ -16,7 +16,7 @@ import { parseSplitPayment, fetchFinalizedTransaction, type ParsedSplitPayment }
 import {
   type CreatorSkinRow, type MarketplaceQuoteRow,
   createMarketplaceQuote, getMarketplaceQuote, deleteMarketplaceQuote,
-  recordOnchainPayment, recordMarketplaceSale, grantAccountCreatorSkin, listLiveCreatorSkins,
+  redeemPurchase, listLiveCreatorSkins,
 } from './db';
 
 const USDC_MINT = (process.env.USDC_MINT ?? process.env.VITE_USDC_MINT ?? 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v').trim();
@@ -52,6 +52,10 @@ export function splitAmounts(priceUsdc: bigint): { creator: bigint; burn: bigint
  * The memo the client must embed is the quoteId.
  */
 export async function quotePurchase(skin: CreatorSkinRow, buyerAccountId: number): Promise<MarketplaceQuoteRow> {
+  // Fail fast on malformed curated data (symmetric to the BURN_VAULT check in
+  // marketplaceEnabled) rather than issuing an unbackable quote that only fails
+  // at verify-time, far from the seed-data root cause.
+  if (!isSolanaAddress(skin.creatorWallet)) throw new Error(`creator skin ${skin.id} has an invalid payout wallet`);
   const { creator, burn } = splitAmounts(skin.priceUsdc);
   const quote: MarketplaceQuoteRow = {
     quoteId: randomBytes(16).toString('hex'),
@@ -136,23 +140,22 @@ export async function verifyPurchase(params: { quoteId: string; signature: strin
   const reason = validateSplitPayment(parsed, quote, params.buyerWallet);
   if (reason !== 'ok') return { ok: false, reason };
 
-  const gross = quote.creatorUsdc + quote.burnUsdc;
-  // Replay guard: the signature's PRIMARY KEY insert is the atomic redeem-once
-  // gate. A second submission of the same finalized tx finds it consumed.
-  const fresh = await recordOnchainPayment(params.signature, params.buyerAccountId, params.quoteId, gross, quote.mint);
-  if (!fresh) return { ok: false, reason: 'already_redeemed' };
-
-  await recordMarketplaceSale({
-    skinId: quote.skinId,
-    buyerAccountId: params.buyerAccountId,
+  // Consume the signature, record the sale, grant the skin, and drop the quote in
+  // ONE transaction (redeemPurchase). The signature's PRIMARY KEY is the
+  // redeem-once gate; a replay (already-consumed signature) returns false. Doing
+  // it atomically means a mid-way failure can't strand a paid buyer with a
+  // consumed signature and no cosmetic.
+  const granted = await redeemPurchase({
+    txSig: params.signature,
+    accountId: params.buyerAccountId,
     quoteId: params.quoteId,
-    grossUsdc: gross,
+    mint: quote.mint,
+    skinId: quote.skinId,
+    grossUsdc: quote.creatorUsdc + quote.burnUsdc,
     creatorUsdc: quote.creatorUsdc,
     burnUsdc: quote.burnUsdc,
-    payTxSig: params.signature,
   });
-  await grantAccountCreatorSkin(params.buyerAccountId, quote.skinId);
-  await deleteMarketplaceQuote(params.quoteId);
+  if (!granted) return { ok: false, reason: 'already_redeemed' };
   return { ok: true, skinId: quote.skinId };
 }
 

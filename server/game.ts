@@ -1020,7 +1020,7 @@ export class GameServer {
   // Grant a purchased creator skin to an account: merge it into the live
   // cosmetics so the equip gate accepts it immediately for any connected
   // session. The durable grant is written separately by the marketplace
-  // (verifyPurchase -> grantAccountCreatorSkin); this only refreshes in-memory
+  // (verifyPurchase -> redeemPurchase); this only refreshes in-memory
   // state so an online buyer can equip without reconnecting.
   applyCreatorSkinGrant(accountId: number, skinId: string): void {
     this.updateLiveAccountCosmetics(accountId, { completedQuestIds: [], mechChromaIds: [], ownedCreatorSkinIds: [skinId] });

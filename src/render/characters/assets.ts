@@ -430,18 +430,17 @@ function evictCreatorSkins(): void {
 }
 
 // Memoized per-URL load: short-circuits when already cached, dedupes in-flight
-// loads, and clears the in-flight entry on settle so a later (post-eviction)
-// re-request reloads rather than resolving against a disposed texture.
+// loads, and clears the in-flight entry on settle (resolve OR reject) so a
+// failed (CDN 404 / decode error) or post-eviction load can be retried rather
+// than staying cached as a permanently-rejected promise.
 function loadCreatorUrl(url: string): Promise<void> {
   touchCreatorUrl(url);
   if (creatorSkinTexByUrl.has(url)) return Promise.resolve();
   const inflight = creatorSkinInflight.get(url);
   if (inflight) return inflight;
-  const p = loadSkinTexInto(url, creatorSkinTexByUrl).then(() => {
-    creatorSkinInflight.delete(url);
-    touchCreatorUrl(url);
-    evictCreatorSkins();
-  });
+  const p = loadSkinTexInto(url, creatorSkinTexByUrl)
+    .then(() => { touchCreatorUrl(url); evictCreatorSkins(); })
+    .finally(() => { creatorSkinInflight.delete(url); });
   creatorSkinInflight.set(url, p);
   return p;
 }

@@ -14,7 +14,7 @@ vi.mock('pg', () => ({
 
 import {
   createAccount, createCharacterCapped, deleteCharacter, grantAccountMechChroma, loadAccountCosmetics,
-  markAccountQuestComplete, openPlaySession, reclaimDeactivatedName, renameCharacter, revokeAccountMechChroma, touchLogin,
+  markAccountQuestComplete, openPlaySession, reclaimDeactivatedName, redeemPurchase, renameCharacter, revokeAccountMechChroma, touchLogin,
 } from '../server/db';
 import { REALM } from '../server/realm';
 
@@ -315,6 +315,72 @@ describe('createCharacterCapped', () => {
 
     expect(client.query.mock.calls.map((c) => c[0])).toContain('ROLLBACK');
     expect(client.query.mock.calls.map((c) => c[0])).not.toContain('COMMIT');
+    expect(client.release).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('redeemPurchase — atomic redeem-once + grant', () => {
+  const params = {
+    txSig: 'sig_abc', accountId: 42, quoteId: 'q_1', mint: 'MintXyz', skinId: 'skin_1',
+    grossUsdc: 10_000_000n, creatorUsdc: 7_000_000n, burnUsdc: 3_000_000n,
+  };
+  const sqls = (client: { query: ReturnType<typeof vi.fn> }) => client.query.mock.calls.map((c) => String(c[0]).trim().split('\n')[0]);
+
+  it('commits payment + sale + grant + quote-delete in one transaction and grants the skin', async () => {
+    const client = clientStub();
+    client.query
+      .mockResolvedValueOnce({}) // BEGIN
+      .mockResolvedValueOnce({ rowCount: 1 }) // INSERT onchain_payments (fresh)
+      .mockResolvedValueOnce({}) // INSERT marketplace_sales
+      .mockResolvedValueOnce({ rows: [{ cosmetics: { completedQuestIds: [], mechChromaIds: [], ownedCreatorSkinIds: [] } }] }) // SELECT FOR UPDATE
+      .mockResolvedValueOnce({}) // UPDATE accounts cosmetics
+      .mockResolvedValueOnce({}) // DELETE quote
+      .mockResolvedValueOnce({}); // COMMIT
+    dbMock.connect.mockResolvedValueOnce(client);
+
+    await expect(redeemPurchase(params)).resolves.toBe(true);
+
+    const order = sqls(client);
+    expect(order[0]).toBe('BEGIN');
+    expect(order).toContain('COMMIT');
+    expect(order).not.toContain('ROLLBACK');
+    // The grant writes the new skin id into the account's owned set (inspect data).
+    const update = client.query.mock.calls.find((c) => /UPDATE accounts SET cosmetics/.test(String(c[0])));
+    expect(update).toBeDefined();
+    expect((update![1][1] as { ownedCreatorSkinIds: string[] }).ownedCreatorSkinIds).toContain('skin_1');
+    expect(client.release).toHaveBeenCalledTimes(1);
+  });
+
+  it('returns false and rolls back when the signature is already consumed (replay)', async () => {
+    const client = clientStub();
+    client.query
+      .mockResolvedValueOnce({}) // BEGIN
+      .mockResolvedValueOnce({ rowCount: 0 }); // INSERT onchain_payments hit ON CONFLICT
+    dbMock.connect.mockResolvedValueOnce(client);
+
+    await expect(redeemPurchase(params)).resolves.toBe(false);
+
+    const order = sqls(client);
+    expect(order).toContain('ROLLBACK');
+    expect(order).not.toContain('COMMIT');
+    // It must NOT have recorded a sale or granted anything after the conflict.
+    expect(client.query.mock.calls.some((c) => /marketplace_sales|UPDATE accounts/.test(String(c[0])))).toBe(false);
+    expect(client.release).toHaveBeenCalledTimes(1);
+  });
+
+  it('rolls back and rethrows if a downstream write fails — signature is NOT consumed', async () => {
+    const client = clientStub();
+    client.query
+      .mockResolvedValueOnce({}) // BEGIN
+      .mockResolvedValueOnce({ rowCount: 1 }) // INSERT onchain_payments (fresh)
+      .mockRejectedValueOnce(new Error('sale insert failed')); // INSERT marketplace_sales throws
+    dbMock.connect.mockResolvedValueOnce(client);
+
+    await expect(redeemPurchase(params)).rejects.toThrow('sale insert failed');
+
+    const order = sqls(client);
+    expect(order).toContain('ROLLBACK');
+    expect(order).not.toContain('COMMIT');
     expect(client.release).toHaveBeenCalledTimes(1);
   });
 });
