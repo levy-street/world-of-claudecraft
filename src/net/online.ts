@@ -170,6 +170,18 @@ export interface MarketplaceQuoteResponse {
   expiresAt: string;
 }
 
+// The public buy-and-burn ledger (all amounts base-unit strings — bigints aren't
+// JSON-serialisable).
+export interface BurnLedgerResponse {
+  cumulativeWocBurned: string;
+  cumulativeUsdcIn: string;
+  batches: Array<{
+    batchId: string; source: string;
+    usdcIn: string; wocBought: string; wocBurned: string;
+    buyTxSig: string | null; burnTxSig: string | null; executedAt: string | null;
+  }>;
+}
+
 export class Api {
   private static readonly SESSION_KEY = 'woc_session';
   token: string | null = null;
@@ -495,6 +507,19 @@ export class Api {
       return data.skins ?? [];
     } catch {
       return [];
+    }
+  }
+
+  // Public, factual buy-and-burn ledger: cumulative $WOC burned + recent batches
+  // (amounts as base-unit strings, explorer-verifiable tx sigs). Page-origin,
+  // best-effort — degrades to empty so a transparency widget can simply omit it.
+  async burnLedger(limit = 50): Promise<BurnLedgerResponse> {
+    try {
+      const res = await fetch(`/api/marketplace/burn-ledger?limit=${limit}`);
+      if (!res.ok) return { cumulativeWocBurned: '0', cumulativeUsdcIn: '0', batches: [] };
+      return await res.json();
+    } catch {
+      return { cumulativeWocBurned: '0', cumulativeUsdcIn: '0', batches: [] };
     }
   }
 

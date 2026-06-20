@@ -478,6 +478,27 @@ CREATE TABLE IF NOT EXISTS marketplace_sales (
 );
 CREATE INDEX IF NOT EXISTS marketplace_sales_buyer ON marketplace_sales(buyer_account_id);
 CREATE INDEX IF NOT EXISTS marketplace_sales_skin ON marketplace_sales(skin_id);
+-- Buy-and-burn ledger (Phase 2 keeper). One row per batch: USDC drained from the
+-- burn vault, swapped to $WOC on a DEX, then SPL-burned. The public ledger reads
+-- these. batch_id is a durable idempotency key written BEFORE signing, and the
+-- buy/burn signatures are recorded so a crash recovers by querying the chain for
+-- the signature — never by re-reading balances (which could double-swap).
+CREATE TABLE IF NOT EXISTS burn_batches (
+  batch_id    TEXT PRIMARY KEY,
+  source      TEXT NOT NULL DEFAULT 'marketplace',
+  usdc_in     BIGINT NOT NULL,
+  woc_bought  BIGINT NOT NULL DEFAULT 0,
+  woc_burned  BIGINT NOT NULL DEFAULT 0,
+  buy_tx_sig  TEXT UNIQUE,
+  burn_tx_sig TEXT UNIQUE,
+  status      TEXT NOT NULL DEFAULT 'swapping'
+              CHECK (status IN ('swapping','swapped','burning','burned','failed')),
+  fail_reason TEXT,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  executed_at TIMESTAMPTZ
+);
+CREATE INDEX IF NOT EXISTS burn_batches_status ON burn_batches(status);
+CREATE INDEX IF NOT EXISTS burn_batches_executed ON burn_batches(executed_at DESC);
 `;
 
 export async function ensureSchema(): Promise<void> {
@@ -2293,4 +2314,110 @@ export async function redeemPurchase(p: {
   } finally {
     client.release();
   }
+}
+
+// --------------------------------------------------------------------------
+// Buy-and-burn ledger (Phase 2 keeper)
+// --------------------------------------------------------------------------
+
+export interface BurnBatchRow {
+  batchId: string;
+  source: string;
+  usdcIn: bigint;
+  wocBought: bigint;
+  wocBurned: bigint;
+  buyTxSig: string | null;
+  burnTxSig: string | null;
+  status: 'swapping' | 'swapped' | 'burning' | 'burned' | 'failed';
+  failReason: string | null;
+  createdAt: string;
+  executedAt: string | null;
+}
+
+function mapBurnBatch(row: Record<string, unknown>): BurnBatchRow {
+  return {
+    batchId: row.batch_id as string,
+    source: row.source as string,
+    usdcIn: BigInt(row.usdc_in as string),
+    wocBought: BigInt(row.woc_bought as string),
+    wocBurned: BigInt(row.woc_burned as string),
+    buyTxSig: (row.buy_tx_sig as string | null) ?? null,
+    burnTxSig: (row.burn_tx_sig as string | null) ?? null,
+    status: row.status as BurnBatchRow['status'],
+    failReason: (row.fail_reason as string | null) ?? null,
+    createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : String(row.created_at),
+    executedAt: row.executed_at == null ? null : (row.executed_at instanceof Date ? row.executed_at.toISOString() : String(row.executed_at)),
+  };
+}
+
+// Open the batch by recording its durable intent + the pre-signed swap signature
+// BEFORE the swap is broadcast. Returns false if buy_tx_sig collides (the same
+// signed swap was already opened — idempotent on a retried cycle).
+export async function createBurnBatch(b: { batchId: string; source: string; usdcIn: bigint; buyTxSig: string }): Promise<boolean> {
+  const res = await pool.query(
+    `INSERT INTO burn_batches (batch_id, source, usdc_in, buy_tx_sig, status)
+     VALUES ($1,$2,$3,$4,'swapping') ON CONFLICT DO NOTHING`,
+    [b.batchId, b.source, b.usdcIn.toString(), b.buyTxSig],
+  );
+  return (res.rowCount ?? 0) === 1;
+}
+
+export async function markBatchSwapped(batchId: string, wocBought: bigint): Promise<void> {
+  await pool.query(
+    `UPDATE burn_batches SET status = 'swapped', woc_bought = $2 WHERE batch_id = $1`,
+    [batchId, wocBought.toString()],
+  );
+}
+
+export async function markBatchBurning(batchId: string, burnTxSig: string): Promise<void> {
+  await pool.query(
+    `UPDATE burn_batches SET status = 'burning', burn_tx_sig = $2 WHERE batch_id = $1`,
+    [batchId, burnTxSig],
+  );
+}
+
+export async function markBatchBurned(batchId: string, wocBurned: bigint): Promise<void> {
+  await pool.query(
+    `UPDATE burn_batches SET status = 'burned', woc_burned = $2, executed_at = now() WHERE batch_id = $1`,
+    [batchId, wocBurned.toString()],
+  );
+}
+
+export async function markBatchFailed(batchId: string, reason: string): Promise<void> {
+  await pool.query(
+    `UPDATE burn_batches SET status = 'failed', fail_reason = $2, executed_at = now() WHERE batch_id = $1`,
+    [batchId, reason.slice(0, 500)],
+  );
+}
+
+// In-flight batches (anything not terminal) for crash recovery, oldest first.
+export async function openBurnBatches(): Promise<BurnBatchRow[]> {
+  const res = await pool.query(
+    `SELECT * FROM burn_batches WHERE status IN ('swapping','swapped','burning') ORDER BY created_at`,
+  );
+  return res.rows.map(mapBurnBatch);
+}
+
+// Timestamp of the most recent completed burn (drives the batch cadence).
+export async function lastBurnAt(): Promise<number | null> {
+  const res = await pool.query(`SELECT MAX(executed_at) AS at FROM burn_batches WHERE status = 'burned'`);
+  const at = res.rows[0]?.at;
+  return at == null ? null : new Date(at).getTime();
+}
+
+// Public, factual burn ledger: completed burns + running cumulative total.
+export async function burnLedger(limit = 100): Promise<{ batches: BurnBatchRow[]; cumulativeWocBurned: bigint; cumulativeUsdcIn: bigint }> {
+  const lim = Math.max(1, Math.min(500, Math.floor(limit)));
+  const rows = await pool.query(
+    `SELECT * FROM burn_batches WHERE status = 'burned' ORDER BY executed_at DESC LIMIT $1`,
+    [lim],
+  );
+  const totals = await pool.query(
+    `SELECT COALESCE(SUM(woc_burned),0) AS woc, COALESCE(SUM(usdc_in),0) AS usdc FROM burn_batches WHERE status = 'burned'`,
+  );
+  return {
+    batches: rows.rows.map(mapBurnBatch),
+    cumulativeWocBurned: BigInt(totals.rows[0]?.woc ?? 0),
+    cumulativeUsdcIn: BigInt(totals.rows[0]?.usdc ?? 0),
+  };
 }

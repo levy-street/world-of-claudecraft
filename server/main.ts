@@ -39,11 +39,13 @@ import {
   verifyPassword,
 } from './auth';
 import { BUG_DESCRIPTION_MAX, BugReportRateLimitError, createBugReport } from './bug_report_db';
+import { buildBurnKeeper } from './burn_keeper';
 import { characterSheet, type SheetRank } from './character_sheet';
 import {
   accountAndScopeForToken,
   accountById,
   accountForToken,
+  burnLedger,
   type CharacterRow,
   characterCountForAccount,
   characterCountsByRealm,
@@ -181,6 +183,10 @@ const STATIC_PAGE_ALIASES = new Map([
 ]);
 // How long chat logs are kept (0 = forever); pruned at boot and daily.
 const CHAT_LOG_RETENTION_DAYS = Number(process.env.CHAT_LOG_RETENTION_DAYS ?? 90);
+// How often the buy-and-burn keeper ticks. The keeper's own policy decides
+// whether a tick actually swaps (threshold/cadence); ticking more often just
+// reacts promptly once the cadence elapses. Default 5 min.
+const KEEPER_TICK_MS = Number(process.env.BURN_KEEPER_TICK_MS ?? 5 * 60 * 1000);
 // Client performance reports are operational telemetry, not permanent records.
 // Keep enough history for tuning runs while bounding table growth.
 const PERF_REPORT_RETENTION_DAYS = Number(process.env.PERF_REPORT_RETENTION_DAYS ?? 14);
@@ -1306,6 +1312,21 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     if (req.method === 'GET' && url === '/api/skins/registry') {
       return json(res, 200, { skins: await registrySkins() });
     }
+    // Public, factual buy-and-burn ledger — completed burns + cumulative totals.
+    // No editorializing (PRD §8.2): raw amounts + explorer-verifiable tx sigs only.
+    if (req.method === 'GET' && url === '/api/marketplace/burn-ledger') {
+      const limit = Number(new URLSearchParams((req.url ?? '').split('?')[1] ?? '').get('limit')) || 100;
+      const ledger = await burnLedger(limit);
+      return json(res, 200, {
+        cumulativeWocBurned: ledger.cumulativeWocBurned.toString(),
+        cumulativeUsdcIn: ledger.cumulativeUsdcIn.toString(),
+        batches: ledger.batches.map((b) => ({
+          batchId: b.batchId, source: b.source,
+          usdcIn: b.usdcIn.toString(), wocBought: b.wocBought.toString(), wocBurned: b.wocBurned.toString(),
+          buyTxSig: b.buyTxSig, burnTxSig: b.burnTxSig, executedAt: b.executedAt,
+        })),
+      });
+    }
     if (req.method === 'POST' && url.startsWith('/api/marketplace/skins/') && url.endsWith('/quote')) {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
@@ -1418,6 +1439,18 @@ async function main(): Promise<void> {
       .then(() => game.disconnectBlockedSessions('Connection to the server was lost.'))
       .catch((err) => console.error('blocked IP refresh failed:', err));
   }, BLOCKED_IP_REFRESH_MS).unref();
+  // Buy-and-burn keeper: drain the marketplace burn vault (USDC -> $WOC -> SPL
+  // burn) on a cadence. runCycle recovers any in-flight batch first, so the boot
+  // call resolves a crash mid-burn before any new work. No-op unless configured
+  // (MARKETPLACE_BURN_VAULT + its signing secret).
+  const burnKeeper = buildBurnKeeper();
+  if (burnKeeper) {
+    const tick = () =>
+      void burnKeeper.runCycle().catch((err) => console.error('burn keeper cycle failed:', err));
+    tick();
+    setInterval(tick, KEEPER_TICK_MS).unref();
+    console.log('buy-and-burn keeper enabled');
+  }
   // keep both leaderboard caches warm so the first viewer never waits on the
   // query and it never recomputes per request (PR-3)
   const warmLeaderboards = () => {
