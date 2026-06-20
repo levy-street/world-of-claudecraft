@@ -62,7 +62,7 @@ export interface ParsedSplitPayment {
   memo: string | null;
   usesToken2022ForMint: boolean;
   // owner pubkey -> net USDC change in base units (post - pre). Positive = received.
-  usdcDeltas: Map<string, bigint>;
+  tokenDeltas: Map<string, bigint>;
 }
 
 function pubkeyOf(key: { pubkey: string } | string): string {
@@ -103,10 +103,10 @@ export function parseSplitPayment(tx: RawConfirmedTransaction, usdcMint: string)
   accumulate(pre, tx.meta?.preTokenBalances);
   accumulate(post, tx.meta?.postTokenBalances);
 
-  const usdcDeltas = new Map<string, bigint>();
+  const tokenDeltas = new Map<string, bigint>();
   for (const owner of new Set([...pre.keys(), ...post.keys()])) {
     const delta = (post.get(owner) ?? 0n) - (pre.get(owner) ?? 0n);
-    if (delta !== 0n) usdcDeltas.set(owner, delta);
+    if (delta !== 0n) tokenDeltas.set(owner, delta);
   }
 
   return {
@@ -114,7 +114,7 @@ export function parseSplitPayment(tx: RawConfirmedTransaction, usdcMint: string)
     feePayer,
     memo,
     usesToken2022ForMint,
-    usdcDeltas,
+    tokenDeltas,
   };
 }
 

@@ -100,7 +100,7 @@ export function validateSplitPayment(parsed: ParsedSplitPayment, quote: Marketpl
   if (quote.creatorOwner === quote.burnOwner || quote.creatorOwner === buyerWallet || quote.burnOwner === buyerWallet) {
     return 'owners_not_distinct';
   }
-  const d = parsed.usdcDeltas;
+  const d = parsed.tokenDeltas;
   if ((d.get(quote.creatorOwner) ?? 0n) !== quote.creatorUsdc) return 'creator_amount';
   if ((d.get(quote.burnOwner) ?? 0n) !== quote.burnUsdc) return 'burn_amount';
   // The buyer's own wallet must fund the whole gross and nothing more (no extra

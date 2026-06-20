@@ -53,8 +53,3 @@ export function planTwapChunks(amount: bigint, policy: BurnPolicy): bigint[] {
   }
   return chunks;
 }
-
-/** The on-chain minimum-out floor for a swap from a quoted out-amount + ceiling. */
-export function minOut(quotedOut: bigint, maxSlippageBps: bigint): bigint {
-  return (quotedOut * (10_000n - maxSlippageBps)) / 10_000n;
-}

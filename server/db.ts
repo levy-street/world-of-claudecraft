@@ -2352,7 +2352,10 @@ function mapBurnBatch(row: Record<string, unknown>): BurnBatchRow {
 
 // Open the batch by recording its durable intent + the pre-signed swap signature
 // BEFORE the swap is broadcast. Returns false if buy_tx_sig collides (the same
-// signed swap was already opened — idempotent on a retried cycle).
+// signed swap was already opened — idempotent on a retried/recovered cycle).
+// A target-less `ON CONFLICT DO NOTHING` is deliberate: it arbitrates over EVERY
+// unique constraint (the batch_id PK AND the buy_tx_sig UNIQUE), so the buy_tx_sig
+// replay is caught as a no-op (rowCount 0) — don't narrow it to one target.
 export async function createBurnBatch(b: { batchId: string; source: string; usdcIn: bigint; buyTxSig: string }): Promise<boolean> {
   const res = await pool.query(
     `INSERT INTO burn_batches (batch_id, source, usdc_in, buy_tx_sig, status)

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { shouldRunBatch, planTwapChunks, minOut, DEFAULT_BURN_POLICY, type BurnPolicy } from '../server/burn_policy';
+import { shouldRunBatch, planTwapChunks, DEFAULT_BURN_POLICY, type BurnPolicy } from '../server/burn_policy';
 
 const P: BurnPolicy = DEFAULT_BURN_POLICY;
 const usdc = (d: number) => BigInt(Math.round(d * 1_000_000));
@@ -45,14 +45,5 @@ describe('planTwapChunks — split large pools, conserve the total', () => {
   it('returns nothing for a non-positive amount', () => {
     expect(planTwapChunks(0n, P)).toEqual([]);
     expect(planTwapChunks(-5n, P)).toEqual([]);
-  });
-});
-
-describe('minOut — slippage floor', () => {
-  it('applies the bps ceiling (1% off 1,000,000 = 990,000)', () => {
-    expect(minOut(1_000_000n, 100n)).toBe(990_000n);
-  });
-  it('is the identity at zero slippage', () => {
-    expect(minOut(12_345n, 0n)).toBe(12_345n);
   });
 });
