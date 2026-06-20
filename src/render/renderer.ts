@@ -3905,7 +3905,7 @@ export class Renderer {
           v.visual.setCreatorSkin(csk, e.skin);
           void ensureCreatorSkin(csk).then(() => {
             if (v.visual && v.creatorSkinId === csk) v.visual.setCreatorSkin(csk, e.skin);
-          });
+          }).catch(() => {}); // a failed CDN load leaves the numeric fallback; never an unhandled rejection
         } else {
           v.visual.setSkin(e.skin);
         }
