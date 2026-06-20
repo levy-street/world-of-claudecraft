@@ -1520,17 +1520,17 @@ export const zh_CN: EnTranslations = {
     }
   },
   "marketplace": {
-    "title": "Creator Skins",
-    "subtitle": "Player-made cosmetics, paid in USDC. 70% goes to the creator; 30% buys and burns $WOC.",
-    "loading": "Loading skins…",
-    "empty": "No creator skins are for sale yet.",
+    "title": "创作者皮肤",
+    "subtitle": "玩家制作的外观，使用 USDC 购买。70% 归创作者；30% 用于买入并销毁 $WOC。",
+    "loading": "正在加载皮肤…",
+    "empty": "暂无在售的创作者皮肤。",
     "buy": "Buy",
     "price": "{price}",
-    "connectFirst": "Connect a wallet to buy.",
-    "purchasing": "Purchasing…",
-    "owned": "Owned — equipped",
-    "failed": "Purchase failed",
-    "close": "Close"
+    "connectFirst": "请先连接钱包以购买。",
+    "purchasing": "购买中…",
+    "owned": "已拥有 — 已装备",
+    "failed": "购买失败",
+    "close": "关闭"
   },
   "nav": {
     "home": "首页",

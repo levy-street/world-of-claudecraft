@@ -1520,17 +1520,17 @@ export const ko_KR: EnTranslations = {
     }
   },
   "marketplace": {
-    "title": "Creator Skins",
-    "subtitle": "Player-made cosmetics, paid in USDC. 70% goes to the creator; 30% buys and burns $WOC.",
-    "loading": "Loading skins…",
-    "empty": "No creator skins are for sale yet.",
+    "title": "크리에이터 스킨",
+    "subtitle": "플레이어가 제작한 외형. USDC로 구매합니다. 70%는 크리에이터에게, 30%는 $WOC를 매수해 소각합니다.",
+    "loading": "스킨 불러오는 중…",
+    "empty": "판매 중인 크리에이터 스킨이 아직 없습니다.",
     "buy": "Buy",
     "price": "{price}",
-    "connectFirst": "Connect a wallet to buy.",
-    "purchasing": "Purchasing…",
-    "owned": "Owned — equipped",
-    "failed": "Purchase failed",
-    "close": "Close"
+    "connectFirst": "구매하려면 지갑을 연결하세요.",
+    "purchasing": "구매 중…",
+    "owned": "보유함 — 장착됨",
+    "failed": "구매 실패",
+    "close": "닫기"
   },
   "nav": {
     "home": "홈",

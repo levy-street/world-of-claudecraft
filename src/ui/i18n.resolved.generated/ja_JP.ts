@@ -1520,17 +1520,17 @@ export const ja_JP: EnTranslations = {
     }
   },
   "marketplace": {
-    "title": "Creator Skins",
-    "subtitle": "Player-made cosmetics, paid in USDC. 70% goes to the creator; 30% buys and burns $WOC.",
-    "loading": "Loading skins…",
-    "empty": "No creator skins are for sale yet.",
+    "title": "クリエイタースキン",
+    "subtitle": "プレイヤー制作のコスメ。USDC で購入。70% はクリエイターへ、30% で $WOC を買い戻して焼却します。",
+    "loading": "スキンを読み込み中…",
+    "empty": "販売中のクリエイタースキンはまだありません。",
     "buy": "Buy",
     "price": "{price}",
-    "connectFirst": "Connect a wallet to buy.",
-    "purchasing": "Purchasing…",
-    "owned": "Owned — equipped",
-    "failed": "Purchase failed",
-    "close": "Close"
+    "connectFirst": "購入するにはウォレットを接続してください。",
+    "purchasing": "購入中…",
+    "owned": "所有済み — 装備しました",
+    "failed": "購入に失敗しました",
+    "close": "閉じる"
   },
   "nav": {
     "home": "ホーム",
