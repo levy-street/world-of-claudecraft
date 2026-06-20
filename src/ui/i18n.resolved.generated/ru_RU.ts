@@ -1520,17 +1520,17 @@ export const ru_RU: EnTranslations = {
     }
   },
   "marketplace": {
-    "title": "Creator Skins",
-    "subtitle": "Player-made cosmetics, paid in USDC. 70% goes to the creator; 30% buys and burns $WOC.",
-    "loading": "Loading skins…",
-    "empty": "No creator skins are for sale yet.",
+    "title": "Скины от авторов",
+    "subtitle": "Косметика от игроков, оплата в USDC. 70% — автору; 30% выкупает и сжигает $WOC.",
+    "loading": "Загрузка скинов…",
+    "empty": "Пока нет скинов от авторов в продаже.",
     "buy": "Buy",
     "price": "{price}",
-    "connectFirst": "Connect a wallet to buy.",
-    "purchasing": "Purchasing…",
-    "owned": "Owned — equipped",
-    "failed": "Purchase failed",
-    "close": "Close"
+    "connectFirst": "Подключите кошелёк для покупки.",
+    "purchasing": "Покупка…",
+    "owned": "Куплено — надето",
+    "failed": "Покупка не удалась",
+    "close": "Закрыть"
   },
   "nav": {
     "home": "Главная",

@@ -127,58 +127,22 @@ export const pending: Record<string, readonly string[]> = {
   "zh_CN": [
     "hudChrome.abilityScaling.bonus",
     "marketplace.buy",
-    "marketplace.close",
-    "marketplace.connectFirst",
-    "marketplace.empty",
-    "marketplace.failed",
-    "marketplace.loading",
-    "marketplace.owned",
-    "marketplace.price",
-    "marketplace.purchasing",
-    "marketplace.subtitle",
-    "marketplace.title"
+    "marketplace.price"
   ],
   "zh_TW": [
     "hudChrome.abilityScaling.bonus",
     "marketplace.buy",
-    "marketplace.close",
-    "marketplace.connectFirst",
-    "marketplace.empty",
-    "marketplace.failed",
-    "marketplace.loading",
-    "marketplace.owned",
-    "marketplace.price",
-    "marketplace.purchasing",
-    "marketplace.subtitle",
-    "marketplace.title"
+    "marketplace.price"
   ],
   "ko_KR": [
     "hudChrome.abilityScaling.bonus",
     "marketplace.buy",
-    "marketplace.close",
-    "marketplace.connectFirst",
-    "marketplace.empty",
-    "marketplace.failed",
-    "marketplace.loading",
-    "marketplace.owned",
-    "marketplace.price",
-    "marketplace.purchasing",
-    "marketplace.subtitle",
-    "marketplace.title"
+    "marketplace.price"
   ],
   "ja_JP": [
     "hudChrome.abilityScaling.bonus",
     "marketplace.buy",
-    "marketplace.close",
-    "marketplace.connectFirst",
-    "marketplace.empty",
-    "marketplace.failed",
-    "marketplace.loading",
-    "marketplace.owned",
-    "marketplace.price",
-    "marketplace.purchasing",
-    "marketplace.subtitle",
-    "marketplace.title"
+    "marketplace.price"
   ],
   "pt_BR": [
     "hud.combat.floatingResist",
@@ -202,16 +166,7 @@ export const pending: Record<string, readonly string[]> = {
   "ru_RU": [
     "hudChrome.abilityScaling.bonus",
     "marketplace.buy",
-    "marketplace.close",
-    "marketplace.connectFirst",
-    "marketplace.empty",
-    "marketplace.failed",
-    "marketplace.loading",
-    "marketplace.owned",
-    "marketplace.price",
-    "marketplace.purchasing",
-    "marketplace.subtitle",
-    "marketplace.title"
+    "marketplace.price"
   ],
   "nl_NL": [
     "hud.combat.floatingResist",
