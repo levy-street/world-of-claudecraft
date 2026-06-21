@@ -152,6 +152,70 @@ describe('parseSplitPayment — pure reduction of a confirmed tx', () => {
     tx.transaction.message.instructions.push({ program: 'spl-memo', parsed: 'a_second_memo' });
     expect(parseSplitPayment(tx, USDC).memo).toBe('q_abc');
   });
+
+  it('treats empty accountKeys as a null fee payer (no throw)', () => {
+    const tx: RawConfirmedTransaction = {
+      meta: { err: null, preTokenBalances: [], postTokenBalances: [] },
+      transaction: { message: { accountKeys: [], instructions: [] } },
+    };
+    const parsed = parseSplitPayment(tx, USDC);
+    expect(parsed.feePayer).toBeNull();
+    expect(parsed.succeeded).toBe(true);
+    expect(parsed.tokenDeltas.size).toBe(0);
+  });
+
+  it('reads a bare-string accountKeys[0] as the fee payer', () => {
+    const tx: RawConfirmedTransaction = {
+      meta: { err: null, preTokenBalances: [], postTokenBalances: [] },
+      transaction: { message: { accountKeys: [BUYER], instructions: [] } }, // string, not {pubkey}
+    };
+    expect(parseSplitPayment(tx, USDC).feePayer).toBe(BUYER);
+  });
+
+  it('reads a memo carried via a MEMO program id (not program:"spl-memo")', () => {
+    const tx: RawConfirmedTransaction = {
+      meta: { err: null, preTokenBalances: [], postTokenBalances: [] },
+      transaction: { message: { accountKeys: [{ pubkey: BUYER }], instructions: [
+        { programId: 'MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr', parsed: 'q_via_programid' },
+      ] } },
+    };
+    expect(parseSplitPayment(tx, USDC).memo).toBe('q_via_programid');
+  });
+
+  it('ignores a memo instruction whose parsed payload is not a string', () => {
+    const tx: RawConfirmedTransaction = {
+      meta: { err: null, preTokenBalances: [], postTokenBalances: [] },
+      transaction: { message: { accountKeys: [{ pubkey: BUYER }], instructions: [{ program: 'spl-memo', parsed: { not: 'a string' } }] } },
+    };
+    expect(parseSplitPayment(tx, USDC).memo).toBeNull();
+  });
+
+  it('marks meta:null as not succeeded with empty deltas', () => {
+    const tx: RawConfirmedTransaction = { meta: null, transaction: { message: { accountKeys: [{ pubkey: BUYER }], instructions: [] } } };
+    const parsed = parseSplitPayment(tx, USDC);
+    expect(parsed.succeeded).toBe(false);
+    expect(parsed.tokenDeltas.size).toBe(0);
+  });
+
+  it('skips rows missing owner or amount', () => {
+    const tx = makeTx({ balances: [{ owner: CREATOR, post: '7000000' }] });
+    // Corrupt the row: drop owner on one, amount on another — both must be ignored.
+    (tx.meta!.postTokenBalances as Array<Record<string, unknown>>).push({ mint: USDC, programId: SPL_TOKEN_PROGRAM, uiTokenAmount: { amount: '5' } }); // no owner
+    (tx.meta!.postTokenBalances as Array<Record<string, unknown>>).push({ owner: VAULT, mint: USDC, programId: SPL_TOKEN_PROGRAM, uiTokenAmount: {} }); // no amount
+    const parsed = parseSplitPayment(tx, USDC);
+    expect(parsed.tokenDeltas.get(CREATOR)).toBe(7_000_000n);
+    expect(parsed.tokenDeltas.has(VAULT)).toBe(false);
+  });
+
+  it('reports a drained account (present in pre, absent in post) as a negative delta', () => {
+    const tx = makeTx({ balances: [{ owner: BUYER, pre: '5000000' }] }); // pre only -> post defaults 0
+    expect(parseSplitPayment(tx, USDC).tokenDeltas.get(BUYER)).toBe(-5_000_000n);
+  });
+
+  it('does NOT flag Token-2022 when it is on a DIFFERENT mint than the configured one', () => {
+    const tx = makeTx({ balances: [{ owner: CREATOR, pre: '0', post: '7000000', mint: 'Other1111111111111111111111111111111111111', programId: SPL_TOKEN_2022_PROGRAM }] });
+    expect(parseSplitPayment(tx, USDC).usesToken2022ForMint).toBe(false);
+  });
 });
 
 function creatorSkinRow(over: Partial<CreatorSkinRow> = {}): CreatorSkinRow {
@@ -270,6 +334,49 @@ describe('validateSplitPayment — exhaustive accept + reject matrix', () => {
       { owner: VAULT, pre: '0', post: '3000000' }, { owner: 'Mule1111111111111111111111111111111111111', pre: '0', post: '1' },
     ] });
     expect(check(tx)).toBe('extra_recipient');
+  });
+
+  it('rejects the other two distinctness violations (creator==burn, burn==buyer)', () => {
+    expect(check(goodTx(), quote({ creatorOwner: VAULT }))).toBe('owners_not_distinct'); // creator === burn
+    expect(check(goodTx(), quote({ burnOwner: BUYER }))).toBe('owners_not_distinct'); // burn === buyer
+  });
+
+  it('rejects when the creator leg is missing entirely (no row → 0 != quoted)', () => {
+    const tx = makeTx({ feePayer: BUYER, memo: 'q_abc', balances: [
+      { owner: BUYER, pre: '3000000', post: '0' }, { owner: VAULT, pre: '0', post: '3000000' }, // no creator row at all
+    ] });
+    expect(check(tx)).toBe('creator_amount');
+  });
+
+  it('rejects an OVER-paid burn leg, not just a short one', () => {
+    const tx = makeTx({ feePayer: BUYER, memo: 'q_abc', balances: [
+      { owner: BUYER, pre: '10000000', post: '0' }, { owner: CREATOR, pre: '0', post: '7000000' }, { owner: VAULT, pre: '0', post: '3000001' },
+    ] });
+    expect(check(tx)).toBe('burn_amount');
+  });
+
+  it('rejects when the buyer is debited LESS than gross, and when the buyer leg is absent', () => {
+    const under = makeTx({ feePayer: BUYER, memo: 'q_abc', balances: [
+      { owner: BUYER, pre: '9000000', post: '0' }, { owner: CREATOR, pre: '0', post: '7000000' }, { owner: VAULT, pre: '0', post: '3000000' },
+    ] });
+    expect(check(under)).toBe('buyer_amount'); // -9M != -(7M+3M)
+    const absent = makeTx({ feePayer: BUYER, memo: 'q_abc', balances: [
+      { owner: CREATOR, pre: '0', post: '7000000' }, { owner: VAULT, pre: '0', post: '3000000' }, // buyer never debited (funded elsewhere)
+    ] });
+    expect(check(absent)).toBe('buyer_amount');
+  });
+
+  it('IGNORES a third party that SPENDS USDC (negative delta) on an otherwise-correct split', () => {
+    const tx = makeTx({ feePayer: BUYER, memo: 'q_abc', balances: [
+      { owner: BUYER, pre: '10000000', post: '0' }, { owner: CREATOR, pre: '0', post: '7000000' },
+      { owner: VAULT, pre: '0', post: '3000000' }, { owner: 'Spender11111111111111111111111111111111111', pre: '5000000', post: '0' }, // -5M, ignored
+    ] });
+    expect(check(tx)).toBe('ok');
+  });
+
+  it('accepts a zero-price split (every leg nets zero, no rows)', () => {
+    const tx = makeTx({ feePayer: BUYER, memo: 'q_abc', balances: [] });
+    expect(check(tx, quote({ creatorUsdc: 0n, burnUsdc: 0n }))).toBe('ok');
   });
 });
 

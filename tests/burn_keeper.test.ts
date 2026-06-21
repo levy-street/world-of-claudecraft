@@ -42,14 +42,14 @@ function fakeStore() {
 }
 
 function fakeExec(over: {
-  usdc?: bigint; outWoc?: bigint; received?: bigint;
-  confirm?: (sig: string) => Confirm; quoteNull?: boolean;
+  usdc?: bigint; received?: bigint;
+  confirm?: (sig: string) => Confirm; quoteNull?: boolean; quoteFailAt?: number;
 } = {}) {
-  let swapN = 0; let burnN = 0;
+  let swapN = 0; let burnN = 0; let quoteN = 0;
   const calls = { quote: [] as bigint[], swapSends: [] as string[], burnSends: [] as string[], signBurn: [] as bigint[] };
   const exec: BurnExecutor = {
     vaultUsdcBalance: async () => over.usdc ?? 0n,
-    quote: async (inUsdc) => { calls.quote.push(inUsdc); return over.quoteNull ? null : { outWoc: over.outWoc ?? 1000n, raw: { in: inUsdc.toString() } }; },
+    quote: async (inUsdc) => { calls.quote.push(inUsdc); quoteN++; return (over.quoteNull || quoteN === over.quoteFailAt) ? null : { raw: { in: inUsdc.toString() } }; },
     signSwap: async () => { const signature = `swap${++swapN}`; return { signature, send: async () => { calls.swapSends.push(signature); } }; },
     confirm: async (sig) => (over.confirm ? over.confirm(sig) : 'confirmed'),
     wocReceived: async () => over.received ?? 700n,
@@ -133,6 +133,48 @@ describe('BurnKeeper.runCycle — swap → burn', () => {
     expect(calls.swapSends).toHaveLength(0);
     expect(calls.signBurn).toHaveLength(0);
   });
+
+  it('fails the batch when the swap confirms but delivers zero $WOC (no burn)', async () => {
+    const store = fakeStore();
+    const { exec, calls } = fakeExec({ usdc: usdc(300), received: 0n }); // confirmed, but nothing received
+    await keeper(exec, store).runCycle();
+    const batch = [...store.batches.values()][0];
+    expect(batch.status).toBe('failed');
+    expect(batch.failReason).toBe('swap confirmed but no $WOC received');
+    expect(calls.signBurn).toHaveLength(0);
+    expect(calls.swapSends).toHaveLength(1);
+  });
+
+  it('leaves the batch in-flight ("burning") when the burn broadcasts but does not confirm', async () => {
+    const store = fakeStore();
+    const { exec, calls } = fakeExec({ usdc: usdc(300), received: 700n, confirm: (s) => (s.startsWith('burn') ? 'unknown' : 'confirmed') });
+    await keeper(exec, store).runCycle();
+    const batch = [...store.batches.values()][0];
+    expect(batch.status).toBe('burning');
+    expect(batch.burnTxSig).toBe('burn1');
+    expect(batch.wocBought).toBe(700n);
+    expect(batch.wocBurned).toBe(0n); // markBurned never ran; recovery re-checks next cycle
+    expect(calls.burnSends).toHaveLength(1);
+  });
+
+  it('stops the TWAP sequence at the first failing chunk, leaving the rest for next cycle', async () => {
+    const store = fakeStore();
+    const { exec, calls } = fakeExec({ usdc: usdc(1075), received: 700n, quoteFailAt: 2 }); // chunk 2 has no route
+    await keeper(exec, store).runCycle();
+    expect(calls.quote).toEqual([usdc(250), usdc(250)]); // attempted chunk 1 + 2, then broke (3-5 never quoted)
+    expect(calls.swapSends).toHaveLength(1); // only chunk 1 swapped
+    expect(calls.burnSends).toHaveLength(1);
+    expect([...store.batches.values()].filter((b) => b.status === 'burned')).toHaveLength(1);
+  });
+
+  it('idempotency also halts the TWAP loop: a colliding first chunk stops before later chunks', async () => {
+    const store = fakeStore();
+    store.createBatch = async () => false;
+    const { exec, calls } = fakeExec({ usdc: usdc(1075) });
+    await keeper(exec, store).runCycle();
+    expect(calls.quote).toEqual([usdc(250)]); // only the first chunk was even quoted
+    expect(calls.swapSends).toHaveLength(0);
+  });
 });
 
 describe('BurnKeeper.recover — finish in-flight batches by recorded signature', () => {
@@ -213,5 +255,41 @@ describe('BurnKeeper.recover — finish in-flight batches by recorded signature'
     const { exec } = fakeExec({ confirm: () => 'unknown' });
     await keeper(exec, store).recover();
     expect(store.batches.get('f')!.status).toBe('swapping'); // retried next cycle, not failed
+  });
+
+  it('re-issues a burn for a "swapped" batch but leaves it "burning" when that burn does not confirm', async () => {
+    const store = fakeStore();
+    store.seed({ batchId: 'sw', status: 'swapped', wocBought: 500n });
+    const { exec, calls } = fakeExec({ confirm: () => 'unknown' });
+    await keeper(exec, store).recover();
+    expect(calls.signBurn).toEqual([500n]);
+    expect(calls.burnSends).toHaveLength(1);
+    expect(store.batches.get('sw')!.status).toBe('burning');
+    expect(store.batches.get('sw')!.wocBurned).toBe(0n); // not marked burned until it confirms
+  });
+
+  it('no-ops a "burning" batch that has no recorded burn signature (nothing to re-check)', async () => {
+    const store = fakeStore();
+    store.seed({ batchId: 'nb', status: 'burning', burnTxSig: null, wocBought: 500n, createdAt: new Date(NOW - 20 * 60 * 1000).toISOString() });
+    const { exec, calls } = fakeExec({ confirm: () => 'confirmed' });
+    await keeper(exec, store).recover();
+    expect(calls.signBurn).toHaveLength(0); // the b.burnTxSig guard skips the whole arm
+    expect(store.batches.get('nb')!.status).toBe('burning'); // untouched
+  });
+
+  it('resolves multiple mixed-status open batches in one pass without cross-contamination', async () => {
+    const store = fakeStore();
+    store.seed({ batchId: 'x', status: 'swapping', buyTxSig: 'sA', createdAt: new Date(NOW - 1000).toISOString() });
+    store.seed({ batchId: 'y', status: 'swapped', wocBought: 500n, createdAt: new Date(NOW - 900).toISOString() });
+    store.seed({ batchId: 'z', status: 'burning', burnTxSig: 'bC', wocBought: 333n, createdAt: new Date(NOW - 800).toISOString() });
+    const { exec, calls } = fakeExec({ confirm: () => 'confirmed', received: 640n });
+    await keeper(exec, store).recover();
+    expect(store.batches.get('x')!.status).toBe('burned');
+    expect(store.batches.get('x')!.wocBurned).toBe(640n); // its own swap delta
+    expect(store.batches.get('y')!.status).toBe('burned');
+    expect(store.batches.get('y')!.wocBurned).toBe(500n); // its own wocBought
+    expect(store.batches.get('z')!.status).toBe('burned');
+    expect(store.batches.get('z')!.wocBurned).toBe(333n); // already-confirmed burn, no re-issue
+    expect(calls.signBurn).toEqual([640n, 500n]); // burned x + y; z was already in 'burning' with a confirmed sig
   });
 });

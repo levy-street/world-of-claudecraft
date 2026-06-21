@@ -67,7 +67,7 @@ type ConfirmResult = 'confirmed' | 'failed' | 'unknown';
 // testable with a fake and the only key-holding code is the production wiring.
 export interface BurnExecutor {
   vaultUsdcBalance(): Promise<bigint>;
-  quote(inUsdc: bigint): Promise<{ outWoc: bigint; raw: unknown } | null>;
+  quote(inUsdc: bigint): Promise<{ raw: unknown } | null>;
   signSwap(quoteRaw: unknown): Promise<{ signature: string; send(): Promise<void> }>;
   confirm(signature: string): Promise<ConfirmResult>;
   wocReceived(swapSignature: string): Promise<bigint>;
@@ -257,8 +257,9 @@ export function buildProductionDeps(): { exec: BurnExecutor; store: BurnStore } 
       const res = await fetch(url, { signal: AbortSignal.timeout(10_000) });
       if (!res.ok) return null;
       const data = (await res.json()) as { outAmount?: string; routePlan?: unknown[] };
-      if (!data.outAmount || !(data.routePlan?.length)) return null; // no route
-      return { outWoc: BigInt(data.outAmount), raw: data };
+      if (!data.outAmount || !(data.routePlan?.length)) return null; // no route / no quoted output
+      return { raw: data }; // the full quote (incl. outAmount + slippage threshold) rides into /swap
+
     },
 
     async signSwap(quoteRaw) {

@@ -409,10 +409,6 @@ export function registerCreatorSkins(entries: CreatorSkinRegistryEntry[]): void 
   for (const e of entries) creatorSkinRegistry.set(e.id, e);
 }
 
-export function creatorSkinRegistryEntry(id: string): CreatorSkinRegistryEntry | null {
-  return creatorSkinRegistry.get(id) ?? null;
-}
-
 function touchCreatorUrl(url: string): void {
   const i = creatorSkinLru.indexOf(url);
   if (i >= 0) creatorSkinLru.splice(i, 1);

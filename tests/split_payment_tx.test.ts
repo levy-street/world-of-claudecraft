@@ -96,4 +96,47 @@ describe('buildSplitPaymentTransaction — the buyer 70/30 split payment', () =>
     expect(tx.instructions[0].data.readBigUInt64LE(1)).toBe(699_999_993n);
     expect(tx.instructions[1].data.readBigUInt64LE(1)).toBe(300_000_007n);
   });
+
+  it('encodes zero-amount legs cleanly (degenerate / free skin) without dropping them', () => {
+    const tx = build(quote({ creator: { owner: CREATOR, amount: '0' }, burn: { owner: VAULT, amount: '0' } }));
+    expect(tx.instructions).toHaveLength(3);
+    expect(tx.instructions[0].data.readBigUInt64LE(1)).toBe(0n);
+    expect(tx.instructions[1].data.readBigUInt64LE(1)).toBe(0n);
+    expect(tx.instructions[0].data[0]).toBe(12); // still a TransferChecked
+  });
+
+  it('carries the full u64 maximum amount with no precision loss', () => {
+    const max = (2n ** 64n - 1n).toString();
+    const tx = build(quote({ creator: { owner: CREATOR, amount: max }, burn: { owner: VAULT, amount: '1' } }));
+    expect(tx.instructions[0].data.readBigUInt64LE(1)).toBe(18_446_744_073_709_551_615n);
+  });
+
+  it('threads lastValidBlockHeight onto the transaction (the wallet confirm strategy needs it)', () => {
+    expect(buildSplitPaymentTransaction(quote(), BUYER, BLOCKHASH, 9999).lastValidBlockHeight).toBe(9999);
+  });
+
+  it('faithfully encodes a multi-byte UTF-8 memo and an empty memo by BYTE length', () => {
+    const uni = build(quote({ memo: 'q_✓_💀' })).instructions[2];
+    expect(uni.data.toString('utf8')).toBe('q_✓_💀');
+    expect(uni.data.length).toBe(Buffer.byteLength('q_✓_💀', 'utf8')); // bytes, not 5 chars
+    expect(build(quote({ memo: '' })).instructions[2].data.length).toBe(0);
+  });
+
+  it('FAILS LOUDLY on an out-of-range u64 amount rather than truncating', () => {
+    expect(() => build(quote({ creator: { owner: CREATOR, amount: (2n ** 64n).toString() }, burn: { owner: VAULT, amount: '1' } }))).toThrow();
+  });
+
+  it('rejects a malformed / non-integer amount string (no silent coercion)', () => {
+    // BigInt('') is 0n (covered by the zero-amount case); 'abc' and '7.5' must throw.
+    for (const bad of ['abc', '7.5', '12.0', '7,000']) {
+      expect(() => build(quote({ creator: { owner: CREATOR, amount: bad }, burn: { owner: VAULT, amount: '1' } }))).toThrow();
+    }
+  });
+
+  it('rejects an invalid base58 pubkey in any field before producing a half-formed tx', () => {
+    expect(() => build(quote({ mint: 'not-base58!' }))).toThrow();
+    expect(() => build(quote({ creator: { owner: '0OIl', amount: '7000000' } }))).toThrow(); // base58-illegal chars
+    expect(() => build(quote({ burn: { owner: '', amount: '3000000' } }))).toThrow();
+    expect(() => buildSplitPaymentTransaction(quote(), 'not-a-pubkey!', BLOCKHASH, 1)).toThrow();
+  });
 });

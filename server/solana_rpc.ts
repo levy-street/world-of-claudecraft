@@ -30,7 +30,7 @@ export async function solanaRpc<T>(method: string, params: unknown[], timeoutMs 
   });
   if (!res.ok) return null;
   const data = (await res.json()) as { result?: T; error?: unknown };
-  if (data.error || data.result === undefined || data.result === null) return null;
+  if (data.error || data.result == null) return null;
   return data.result;
 }
 

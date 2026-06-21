@@ -1440,7 +1440,7 @@ export class Sim {
     if (!meta || !e) return false;
     const maxSkin = catalog === 'mech' ? MECH_CHROMAS.length - 1 : 7;
     const idx = Math.max(0, Math.min(maxSkin, Math.floor(skin)));
-    const overlay = cosmeticSkinId && cosmeticSkinId.length > 0 && cosmeticSkinId.length <= MAX_COSMETIC_SKIN_ID_LEN ? cosmeticSkinId : null;
+    const overlay = cosmeticSkinId && cosmeticSkinId.length <= MAX_COSMETIC_SKIN_ID_LEN ? cosmeticSkinId : null;
     meta.skin = idx;
     meta.skinCatalog = catalog;
     meta.cosmeticSkinId = overlay;

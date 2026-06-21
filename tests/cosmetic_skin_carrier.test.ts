@@ -66,6 +66,23 @@ describe('cosmetic skin carrier — sim core', () => {
     expect(sim.entities.get(pid)!.cosmeticSkinId).toBeNull();
   });
 
+  it('setPlayerSkin on an unknown pid is a no-op that returns false', () => {
+    const sim = makeSim();
+    const before = sim.entities.size;
+    expect(sim.setPlayerSkin(999_999, 0, 'class', 'creator_x')).toBe(false);
+    expect(sim.entities.size).toBe(before); // no entity conjured for a missing player
+  });
+
+  it('clamps a mech skin index above range while keeping the owned overlay', () => {
+    const sim = makeSim();
+    const pid = sim.primaryId;
+    sim.setPlayerSkin(pid, 999, 'mech', 'creator_keep'); // 999 >> MECH_CHROMAS range
+    const e = sim.entities.get(pid)!;
+    expect(e.skinCatalog).toBe('mech');
+    expect(e.skin).toBe(MECH_CHROMAS.length - 1); // clamped, not 999
+    expect(e.cosmeticSkinId).toBe('creator_keep');
+  });
+
   it('cosmetic-only: recalcPlayerStats output is invariant under every skin permutation', () => {
     const sim = makeSim('mage');
     const pid = sim.primaryId;
@@ -260,6 +277,14 @@ describe('creator-skin identity broadcast round-trip', () => {
     (client as any).applySnapshot(snap);
     const decoded = client.entities.get(other.pid)!;
     expect(decoded.cosmeticSkinId).toBe('creator_aurora');
+
+    // DELTA INVARIANT: a later LITE record (identity fields omitted) must NOT wipe
+    // the previously-decoded csk — absence means "unchanged", not "cleared".
+    const lite = JSON.parse(JSON.stringify(snap));
+    const rec = lite.ents.find((e: any) => e.id === other.pid);
+    for (const k of ['k', 'tid', 'nm', 'lv', 'csk']) delete rec[k]; // strip identity → lite update
+    (client as any).applySnapshot(lite);
+    expect(client.entities.get(other.pid)!.cosmeticSkinId).toBe('creator_aurora'); // preserved
   });
 
   it('decodes csk into cosmeticSkinId on a raw full wire record', () => {
@@ -382,5 +407,24 @@ describe('creator-skin equip gate (server-authoritative)', () => {
     expect(e.skinCatalog).toBe('mech');
     expect(e.skin).toBe(1);
     expect(e.cosmeticSkinId).toBe('creator_owned');
+  });
+
+  it('drops the whole command when skin is not a number (no overlay applied even if owned)', () => {
+    session.accountCosmetics = { ...session.accountCosmetics, ownedCreatorSkinIds: ['creator_owned'] };
+    changeSkin({ skin: '2', catalog: 'class', csk: 'creator_owned' }); // string skin -> rejected by the type guard
+    const e = server.sim.entities.get(session.pid)!;
+    expect(e.skin).toBe(0); // unchanged default
+    expect(e.cosmeticSkinId).toBeNull();
+  });
+
+  it('a live applyCreatorSkinGrant opens the equip gate without a reconnect', () => {
+    changeSkin({ skin: 0, catalog: 'class', csk: 'creator_new' }); // not owned yet -> rejected
+    expect(server.sim.entities.get(session.pid)!.cosmeticSkinId).toBeNull();
+
+    server.applyCreatorSkinGrant(session.accountId, 'creator_new'); // the post-purchase grant
+    expect(session.accountCosmetics.ownedCreatorSkinIds).toContain('creator_new');
+
+    changeSkin({ skin: 0, catalog: 'class', csk: 'creator_new' }); // now it applies
+    expect(server.sim.entities.get(session.pid)!.cosmeticSkinId).toBe('creator_new');
   });
 });
