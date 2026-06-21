@@ -72,3 +72,90 @@ describe('internal api', () => {
     expect(res.body.data.remainingSeconds).toBe(540);
   });
 });
+
+describe('internal api — $WOC season ops', () => {
+  const previousSecret = process.env.WOC_OPS_SECRET;
+  const game = { startRestartCountdown: vi.fn() } as any;
+  const fakeSeasonOps = () => ({ openSeason: vi.fn(async () => {}), closeSeason: vi.fn(async () => {}) });
+
+  afterEach(() => {
+    if (previousSecret === undefined) delete process.env.WOC_OPS_SECRET;
+    else process.env.WOC_OPS_SECRET = previousSecret;
+    vi.clearAllMocks();
+  });
+
+  function seasonReq(url: string, secret?: string) {
+    const req: any = new EventEmitter();
+    req.method = 'POST';
+    req.url = url;
+    req.headers = secret ? { 'x-woc-ops-secret': secret } : {};
+    return req;
+  }
+  // readBody attaches its stream listeners synchronously inside handleInternalApi
+  // (before the await suspends), so feeding the body right after the call works.
+  async function call(req: any, res: any, ops: any, body?: unknown): Promise<void> {
+    const p = handleInternalApi(req, res, game, ops);
+    if (body !== undefined) { req.emit('data', Buffer.from(JSON.stringify(body))); req.emit('end'); }
+    await p;
+  }
+
+  it('404s the season endpoint when season ops are not wired in', async () => {
+    process.env.WOC_OPS_SECRET = 'ops';
+    const res = fakeRes();
+    await call(seasonReq('/internal/woc/season/open', 'ops'), res, undefined);
+    expect(res.statusCode).toBe(404);
+  });
+
+  it('404s when WOC_OPS_SECRET is not configured', async () => {
+    delete process.env.WOC_OPS_SECRET;
+    const res = fakeRes();
+    await call(seasonReq('/internal/woc/season/open', 'ops'), res, fakeSeasonOps());
+    expect(res.statusCode).toBe(404);
+  });
+
+  it('401s on a wrong ops secret', async () => {
+    process.env.WOC_OPS_SECRET = 'ops';
+    const ops = fakeSeasonOps();
+    const res = fakeRes();
+    await call(seasonReq('/internal/woc/season/open', 'wrong'), res, ops);
+    expect(res.statusCode).toBe(401);
+    expect(ops.openSeason).not.toHaveBeenCalled();
+  });
+
+  it('opens a season with a valid secret + body', async () => {
+    process.env.WOC_OPS_SECRET = 'ops';
+    const ops = fakeSeasonOps();
+    const res = fakeRes();
+    await call(seasonReq('/internal/woc/season/open', 'ops'), res, ops, { seasonId: 4, label: 'S4', endsAt: '2026-07-01T00:00:00.000Z' });
+    expect(res.statusCode).toBe(200);
+    expect(res.body.data.seasonId).toBe(4);
+    expect(ops.openSeason).toHaveBeenCalledWith({ seasonId: 4, label: 'S4', endsAt: '2026-07-01T00:00:00.000Z' });
+  });
+
+  it('rejects a non-integer seasonId with 400 (no DB write)', async () => {
+    process.env.WOC_OPS_SECRET = 'ops';
+    const ops = fakeSeasonOps();
+    const res = fakeRes();
+    await call(seasonReq('/internal/woc/season/open', 'ops'), res, ops, { label: 'no id' });
+    expect(res.statusCode).toBe(400);
+    expect(ops.openSeason).not.toHaveBeenCalled();
+  });
+
+  it('rejects a malformed endsAt with 400', async () => {
+    process.env.WOC_OPS_SECRET = 'ops';
+    const ops = fakeSeasonOps();
+    const res = fakeRes();
+    await call(seasonReq('/internal/woc/season/open', 'ops'), res, ops, { seasonId: 1, endsAt: 'not-a-date' });
+    expect(res.statusCode).toBe(400);
+    expect(ops.openSeason).not.toHaveBeenCalled();
+  });
+
+  it('closes a season with a valid secret + body', async () => {
+    process.env.WOC_OPS_SECRET = 'ops';
+    const ops = fakeSeasonOps();
+    const res = fakeRes();
+    await call(seasonReq('/internal/woc/season/close', 'ops'), res, ops, { seasonId: 4 });
+    expect(res.statusCode).toBe(200);
+    expect(ops.closeSeason).toHaveBeenCalledWith(4);
+  });
+});

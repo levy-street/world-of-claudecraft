@@ -88,6 +88,7 @@ import {
   updatePasswordHash,
 } from './db';
 import { emailAccountCreated } from './email';
+import { activeSeasonStatus, closeSeason, openSeason } from './flow_ledger_db';
 import { GameServer } from './game';
 import { isUniqueViolation, json, readBody } from './http_util';
 import { handleInternalApi } from './internal';
@@ -146,12 +147,18 @@ import {
   webLoginEnforced,
 } from './web_login_guard';
 import { handleWocBalance, parseWocBalanceQuery } from './woc_balance';
+import { WOC_DECIMALS } from './woc_config';
 import { bufferHandshakeMessages } from './ws_buffer';
 
 const PORT = Number(process.env.PORT ?? 8787);
 // How often the buyback keeper ticks. Its own policy decides whether a tick does
 // anything (threshold / cadence / fee floor), so this is just the poll interval.
 const PAYOUT_KEEPER_TICK_MS = Number(process.env.BUYBACK_KEEPER_TICK_MS ?? 5 * 60 * 1000);
+// /api/woc/season is public and polled by every client; cache the (cheap) read
+// briefly so the route can't be used to hammer the DB. Season + pool change
+// slowly, so a few seconds of staleness is fine.
+const WOC_SEASON_TTL_MS = 5000;
+let wocSeasonCache: { at: number; body: { season: Awaited<ReturnType<typeof activeSeasonStatus>>; decimals: number } } | null = null;
 const STATIC_DIR = path.join(__dirname, '..', 'dist');
 // DEPRECATED: the standalone community MediaWiki is being retired in favour of the
 // curated in-app guide, which now serves at /wiki. This constant and its (now removed)
@@ -1274,6 +1281,16 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const { owner, fresh } = parseWocBalanceQuery(req.url ?? '');
       return handleWocBalance(res, owner, fresh);
     }
+    // Public read of the current $WOC reward season + its pool (verified sinks −
+    // emissions = $WOC available to pay out this season). Derived from
+    // on-chain-verified flows; { season: null } when no season is open.
+    if (req.method === 'GET' && url === '/api/woc/season') {
+      const now = Date.now();
+      if (!wocSeasonCache || now - wocSeasonCache.at >= WOC_SEASON_TTL_MS) {
+        wocSeasonCache = { at: now, body: { season: await activeSeasonStatus(), decimals: WOC_DECIMALS } };
+      }
+      return json(res, 200, wocSeasonCache.body);
+    }
     // Shareable player card: publish (PNG body) + referral stats for the card.
     if (req.method === 'POST' && url === '/api/card') {
       recordUsageMetric('card.publish.request');
@@ -1430,7 +1447,8 @@ async function main(): Promise<void> {
       res.end();
       return;
     }
-    if (url.startsWith('/internal/')) void handleInternalApi(req, res, game);
+    if (url.startsWith('/internal/'))
+      void handleInternalApi(req, res, game, { openSeason, closeSeason });
     else if (url.startsWith('/admin/api/')) void handleAdminApi(req, res, game);
     else if (url.startsWith('/api/')) void handleApi(req, res);
     else if (url.startsWith('/oauth/')) void handleOAuth(req, res);

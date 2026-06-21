@@ -720,6 +720,26 @@ export const tr_TR: EnTranslations = {
     "nameplate": {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
+    },
+    "wocSeason": {
+      "menu": "$WOC Season",
+      "title": "$WOC Reward Season",
+      "subtitle": "Treasury-funded payouts to top players",
+      "close": "Close",
+      "none": "No reward season is active right now.",
+      "noneHint": "A season opens once arena rake and buybacks begin funding the pool.",
+      "statusActive": "Active",
+      "statusEnded": "Ended",
+      "endsIn": "Ends in",
+      "endsInValue": "{days}d {hours}h {minutes}m",
+      "ended": "This season has ended.",
+      "openEnded": "Open-ended",
+      "poolLabel": "Reward pool available",
+      "wocUnit": "$WOC",
+      "emittedLabel": "{pct}% of the pool paid out so far",
+      "sinkLabel": "Funded",
+      "emissionLabel": "Paid out",
+      "invariant": "Payouts can never exceed what the season took in: buy > sell, enforced on-chain."
     }
   },
   "guide": {

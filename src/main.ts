@@ -150,6 +150,7 @@ import {
   setWocBalance,
   shouldDisconnectUnverifiedWallet,
 } from './ui/wallet_balance';
+import { setWocSeason, setWocSeasonUiEnabled } from './ui/woc_season';
 import { formatXp } from './ui/xp_bar';
 import type { IWorld, LeaderboardEntry } from './world_api';
 
@@ -5152,6 +5153,7 @@ async function switchWallet(): Promise<void> {
 
 function wireWallet(): void {
   setWalletUiEnabled(WALLET_ENABLED);
+  setWocSeasonUiEnabled(WALLET_ENABLED);
   // Feature-gate: when explicitly disabled, remove the wallet row entirely and
   // never download the wallet chunk.
   if (!WALLET_ENABLED) {
@@ -5186,6 +5188,13 @@ function wireWallet(): void {
   // init so a persisted connection is reflected on the character screen.
   loadWallet()
     .then((wallet) => {
+      // Poll the global $WOC reward season + pool (independent of any wallet
+      // connection) and push it to the season panel (see ui/woc_season.ts).
+      const refreshSeason = (): void => {
+        void wallet.fetchWocSeason().then(setWocSeason);
+      };
+      refreshSeason();
+      window.setInterval(refreshSeason, 60_000);
       wallet.onWalletChange((state) => {
         if (state.address) void refreshWocBalance(state.address);
         else connectedWocBalance = null;

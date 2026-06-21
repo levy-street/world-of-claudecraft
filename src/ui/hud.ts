@@ -276,6 +276,8 @@ import {
   wocBalanceVerified,
 } from './wallet_balance';
 import { makeWindowFocus } from './window_focus';
+import { currentSeasonView, onWocSeasonChange, wocSeasonUiEnabled } from './woc_season';
+import { wocSeasonPanelHtml } from './woc_season_panel';
 import { formatXp, xpBarView } from './xp_bar';
 import { XpBarPainter } from './xp_bar_painter';
 
@@ -990,6 +992,14 @@ export class Hud {
       if ($('#bags').style.display !== 'none') this.renderBags();
       this.recomposeOpenCard?.();
     });
+    // Show the $WOC season menu button only when the wallet feature is on, and
+    // live-refresh the panel when a new /api/woc/season payload arrives.
+    this.syncWocSeasonButton();
+    onWocSeasonChange(() => {
+      this.syncWocSeasonButton();
+      const el = $('#woc-season-window');
+      if (el.style.display === 'block') this.renderWocSeason();
+    });
     $('#pf-name').textContent = sim.player.name;
     this.drawPlayerFramePortrait();
     // Character GLBs preload after the HUD mounts; once the real 3D portraits are
@@ -1233,6 +1243,7 @@ export class Hud {
     $('#mm-options')?.addEventListener('click', () => this.toggleOptionsMenu());
     $('#mm-arena').addEventListener('click', () => this.toggleArena());
     $('#mm-leaderboard').addEventListener('click', () => this.toggleLeaderboard());
+    document.querySelector('#mm-woc-season')?.addEventListener('click', () => this.toggleWocSeason());
     const emoteBtn = $('#mm-emote');
     emoteBtn.addEventListener('click', (ev) => {
       ev.preventDefault();
@@ -9597,6 +9608,27 @@ export class Hud {
   // which consumes the paged leaderboard() and owns the page index + focus.
   toggleLeaderboard(): void {
     this.leaderboardWindow.toggle();
+  }
+
+  // $WOC reward-season panel: a read-only view of the on-chain flow-ledger season
+  // + its pool. Data is pushed in by main.ts via setWocSeason (see woc_season.ts).
+  private syncWocSeasonButton(): void {
+    const btn = document.querySelector<HTMLElement>('#mm-woc-season');
+    if (btn) btn.style.display = wocSeasonUiEnabled() ? '' : 'none';
+  }
+
+  toggleWocSeason(): void {
+    const el = $('#woc-season-window');
+    if (el.style.display === 'block') { el.style.display = 'none'; this.hideTooltip(); return; }
+    this.closeOtherWindows('#woc-season-window');
+    el.style.display = 'block';
+    this.renderWocSeason();
+  }
+
+  private renderWocSeason(): void {
+    const el = $('#woc-season-window');
+    el.innerHTML = wocSeasonPanelHtml(currentSeasonView(Date.now()));
+    el.querySelector('[data-close]')?.addEventListener('click', () => { el.style.display = 'none'; });
   }
 
   // -------------------------------------------------------------------------

@@ -17,7 +17,7 @@ if (PG_TEST_URL) process.env.DATABASE_URL = PG_TEST_URL;
 else process.env.DATABASE_URL ??= 'postgres://skip:skip@127.0.0.1:1/skip';
 
 const { pool, ensureSchema } = await import('../server/db');
-const { PgFlowLedgerDb } = await import('../server/flow_ledger_db');
+const { PgFlowLedgerDb, activeSeasonStatus, openSeason, closeSeason } = await import('../server/flow_ledger_db');
 const { FlowLedger } = await import('../server/flow_ledger');
 
 const db = new PgFlowLedgerDb();
@@ -132,5 +132,41 @@ describe.skipIf(!PG_TEST_URL)('PgFlowLedgerDb (real Postgres)', () => {
     await ledger.creditInflow(sink(1, 1000n, 's1-in'));
     const cross = await ledger.emit(emit(2, 500n, 's2-out'));
     expect(cross).toMatchObject({ ok: false, reason: 'budget_exceeded' });
+  });
+
+  // ── season status read + open/close (backs GET /api/woc/season) ──
+  it('activeSeasonStatus is null when no season is open', async () => {
+    expect(await activeSeasonStatus()).toBeNull();
+  });
+
+  it('openSeason activates a season (pool 0) and the status reflects real sinks/emissions', async () => {
+    await openSeason({ seasonId: 5, label: 'S5', endsAt: '2099-01-01T00:00:00.000Z' });
+    expect(await activeSeasonStatus()).toMatchObject({
+      seasonId: 5, label: 'S5', status: 'active', endsAt: '2099-01-01T00:00:00.000Z',
+      sinkBase: '0', emissionBase: '0', poolBase: '0',
+    });
+    await ledger.creditInflow(sink(5, 1000n, 'in-5'));
+    await ledger.emit(emit(5, 400n, 'out-5'));
+    expect(await activeSeasonStatus()).toMatchObject({ sinkBase: '1000', emissionBase: '400', poolBase: '600' });
+  });
+
+  it('activeSeasonStatus returns the most recently opened active season', async () => {
+    await openSeason({ seasonId: 1, label: 'S1' });
+    await openSeason({ seasonId: 2, label: 'S2' });
+    expect((await activeSeasonStatus())?.seasonId).toBe(2);
+  });
+
+  it('closeSeason removes a season from active', async () => {
+    await openSeason({ seasonId: 9, label: 'S9' });
+    expect((await activeSeasonStatus())?.seasonId).toBe(9);
+    await closeSeason(9);
+    expect(await activeSeasonStatus()).toBeNull();
+  });
+
+  it('openSeason re-opens a closed season (ON CONFLICT) — updates label/ends_at, clears closed', async () => {
+    await openSeason({ seasonId: 3, label: 'old' });
+    await closeSeason(3);
+    await openSeason({ seasonId: 3, label: 'new', endsAt: '2099-06-01T00:00:00.000Z' });
+    expect(await activeSeasonStatus()).toMatchObject({ seasonId: 3, label: 'new', status: 'active', endsAt: '2099-06-01T00:00:00.000Z' });
   });
 });
