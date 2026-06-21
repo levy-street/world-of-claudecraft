@@ -1477,6 +1477,7 @@ export const QUALITY_COLOR: Record<string, string> = {
   uncommon: '#1eff00',
   rare: '#0070dd',
   epic: '#a335ee',
+  legendary: '#ff8000',
 };
 
 // ---------------------------------------------------------------------------

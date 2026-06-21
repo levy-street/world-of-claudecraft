@@ -29,7 +29,8 @@ const MOB_IDS = [
   'grand_necromancer_velkhar', 'korzul_the_gravewyrm', 'bog_bloat',
   'fallen_captain_aldren', 'corrupted_priest_malric', 'deathstalker_voss',
   'vision_aldren_warrior', 'vision_malric_mage', 'vision_deathstalker_voss',
-  'bound_guardian',
+  'bound_guardian', 'nythraxis_skeleton_warrior',
+  'nythraxis_scourge_of_thornpeak',
   // Brightwood Glade wildlife pack
   'brightwood_hare', 'glade_fox', 'spotted_fawn', 'meadow_crane', 'thornpelt_badger',
   'dawnmane_doe', 'bramble_lynx', 'brightwood_stag', 'grovetusk_boar', 'sunhide_bear',
@@ -42,6 +43,7 @@ const NPC_IDS = [
   'provisioner_hale', 'herbalist_yara', 'scout_maren', 'captain_thessaly',
   'brother_aldric_highwatch', 'scout_maren_highwatch', 'quartermaster_bree', 'armorer_hode',
   'loremaster_caddis', 'ranger_elwyn',
+  'brother_aldric_raid', // dynamically-spawned raid turn-in NPC (Crypt of Nythraxis)
 ] as const;
 
 const QUEST_IDS = [
@@ -58,7 +60,7 @@ const QUEST_IDS = [
   'q_necromancers', 'q_revenants', 'q_revenant_vanguard', 'q_wyrm_sigils',
   'q_breaking_the_seal', 'q_voice_below', 'q_sanctum_gate', 'q_korgath', 'q_velkhar',
   'q_gravewyrm', 'q_the_codfather', 'q_nythraxis_restless_dead', 'q_nythraxis_graves',
-  'q_nythraxis_sealed_crypt', 'q_nythraxis_bound_guardian',
+  'q_nythraxis_sealed_crypt', 'q_nythraxis_bound_guardian', 'q_nythraxis_scourges_end',
   'q_brightwood_thinning', 'q_brightwood_monarch',
   'q_ledger_first_duty', 'q_ledger_teeth', 'q_ledger_reedwater', 'q_ledger_silk',
   'q_ledger_brood', 'q_ledger_deepvermin', 'q_ledger_toll', 'q_ledger_vigil',
@@ -66,7 +68,7 @@ const QUEST_IDS = [
 ] as const;
 
 const ZONE_IDS = ['eastbrook_vale', 'mirefen_marsh', 'thornpeak_heights'] as const;
-const DUNGEON_IDS = ['hollow_crypt', 'sunken_bastion', 'gravewyrm_sanctum', 'nythraxis_crypt'] as const;
+const DUNGEON_IDS = ['hollow_crypt', 'sunken_bastion', 'gravewyrm_sanctum', 'nythraxis_crypt', 'nythraxis_boss_arena'] as const;
 
 type MobId = typeof MOB_IDS[number];
 type NpcId = typeof NPC_IDS[number];

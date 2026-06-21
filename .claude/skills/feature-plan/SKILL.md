@@ -7,7 +7,7 @@ user-invocable: true
 
 # Feature Plan: Multi-Phase Implementation Planning (Opus 4.8)
 
-Break a large feature into a phased implementation plan designed for multiple Claude Code sessions. Every phase runs as its own fresh session and uses **Opus 4.8 at max effort** (`ultracode` where the phase warrants deterministic multi-agent orchestration). The whole point is to **save context per phase**: the orchestrator delegates reading and fan-out to subagents and keeps only conclusions, so each session stays sharp.
+Break a large feature into a phased implementation plan designed for multiple Claude Code sessions. Every phase runs as its own fresh session and uses **Opus 4.8 at xhigh effort** (`ultracode` where the phase warrants deterministic multi-agent orchestration). The whole point is to **save context per phase**: the orchestrator delegates reading and fan-out to subagents and keeps only conclusions, so each session stays sharp.
 
 The user will provide a feature description either inline (e.g., `/feature-plan add a guild bank`) or you will ask them to describe it.
 
@@ -153,12 +153,12 @@ Prefer many small phases over fewer large ones. A phase that tries to do too muc
 7. The final QA phase closes the packet: once it passes, it offers **Packet teardown** (below), deleting `docs/{feature-name}/` only on explicit user confirmation so the PR does not ship the planning scaffolding.
 
 **Team Workflow section (include at top of plan):**
-Every phase runs on **Opus 4.8 at max effort** (1m context variant where the file load demands it; `ultracode` for batch-heavy phases). Include this standard workflow:
+Every phase runs on **Opus 4.8 at xhigh effort** (1m context variant where the file load demands it; `ultracode` for batch-heavy phases). Include this standard workflow:
 1. **Step 0 - Pre-flight**: Verify `git status` is clean (and that no concurrent session is mid-change in your files). Scan your Claude Code memory (the `MEMORY.md` index and any entries matching the phase domain), if you use it.
 2. **Step 1 - Load Context**: Spawn an Explore agent to read planning docs and relevant source files. The main agent does NOT read large docs directly. The Explore agent returns a focused summary.
 3. **Step 2 - Choose Orchestration + Execute**: Pick the lightest tool from the Orchestration Toolbox. Default: parallel Agent fan-out, one agent per vertical slice (give each ONLY the Explore summary, not raw planning docs). For batch-heavy/audit/content-sweep phases, run an `ultracode` Workflow (pipeline + adversarial-verify) instead. Use `isolation: "worktree"` only when agents mutate overlapping files in parallel.
 4. **Step 3 - Validation + Multi-Agent Review Dispatch**:
-   - Run validation (see the matrix in `state.md`): `npx tsc --noEmit`; `npx vitest run tests/<affected>.ts` (or `npm test` for broad changes). If any player-visible text was added or an emit changed, run `npx vitest run tests/localization_fixes.test.ts` (the S3 i18n drift guard). If the wire protocol / snapshots changed, run `npx vitest run tests/snapshots.test.ts tests/env_protocol.test.ts tests/bandwidth.test.ts`. If assets changed, `npm run asset:budget`. Before a big merge, mirror CI: `npm test && npx tsc --noEmit && npm run build:env && npm run build:server && npm run build`.
+   - Run validation (see the matrix in `state.md`): `npx tsc --noEmit`; `npx vitest run tests/<affected>.ts` (or `npm test` for broad changes). If `src/sim/` changed, run `npx vitest run tests/architecture.test.ts` (the sim-purity guard: no render/ui/game/net/three imports, no DOM globals, no nondeterminism). If any player-visible text was added or an emit changed, run `npx vitest run tests/localization_fixes.test.ts` (the S3 i18n drift guard). If the wire protocol / snapshots changed, run `npx vitest run tests/snapshots.test.ts tests/env_protocol.test.ts tests/bandwidth.test.ts`. If assets changed, `npm run asset:budget`. Before a big merge, mirror CI: `npm test && npx tsc --noEmit && npm run build:env && npm run build:server && npm run build`.
    - Spawn review agents using the **Review Dispatch Matrix** below. Spawn ONLY the agents
      whose surface this change actually touches. Most phases trigger one or two, not all
      four; a docs/test-only change triggers none. (Each agent also self-gates and exits
@@ -192,6 +192,7 @@ The starter prompts suggest a default split (sim + server + client + tests), but
 
 **Code Hygiene section (include in Team Workflow):**
 Every phase must enforce:
+- **Module-first**: new self-contained behavior goes in its own focused module behind an existing seam (`IWorld`, a `src/sim/content/` record, a `src/render/<thing>.ts`), not appended to a monolith (`sim.ts`, `hud.ts`, `renderer.ts`). Do not split a monolith for line count. Fix bugs test-first. See the `extract-and-test` skill and the root Modularity section.
 - **New code gets tests**: Every new ability, system, command, `IWorld` member, server endpoint, query, and behavior gets unit tests. Sim: combat math, abilities, AI, economy. Server: command dispatch, persistence, snapshots. Net: wire round-trip. UI: data transforms, frame logic. E2E (`scripts/*.mjs`): user flows where applicable. If you wrote it, test it.
 - **Determinism tests**: For sim changes, assert same-seed-same-result; never introduce `Math.random` / `Date.now` / `performance.now` into `src/sim/`.
 - **Test maintenance**: Update/remove tests when modifying existing code. When placeholder content is replaced with real content, update the tests. Never leave orphaned or broken tests.
@@ -206,7 +207,7 @@ Every phase must enforce:
 ```
 This is Phase N of the {Feature Name} feature: {Phase Title}.
 
-Model: Opus 4.8, max effort, 1m context variant where the file load demands it.
+Model: Opus 4.8, xhigh effort (reserve max for genuinely frontier problems), 1m context variant where the file load demands it.
 Harness: Claude Code.
 ULTRACODE: add the keyword `ultracode` to this prompt if this phase is batch-heavy
 (content sweeps across many tables, many-locale i18n additions, exhaustive audit) so you
@@ -319,7 +320,7 @@ STOPPING RULES:
 ```
 This is Phase N QA of the {Feature Name} feature: Verify {Phase Title}.
 
-Model: Opus 4.8, max effort, 1m context variant where the file load demands it.
+Model: Opus 4.8, xhigh effort (reserve max for genuinely frontier problems), 1m context variant where the file load demands it.
 Harness: Claude Code.
 ULTRACODE: for a large or high-risk phase, add `ultracode` so you can run an
 adversarial-verify Workflow (each finding independently confirmed by a skeptic agent

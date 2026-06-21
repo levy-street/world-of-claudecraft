@@ -11,22 +11,22 @@ takes `private sim: IWorld`). New data/action a draw path needs → extend
 `IWorld` first (see src CLAUDE.md), never reach into `Sim`/`ClientWorld`.
 
 ## Module split
-`renderer.ts` (~1230) is the orchestrator: scene/camera/lights, the
+`renderer.ts` is the orchestrator: scene/camera/lights, the
 `views: Map<id, EntityView>` that maps world entities → meshes+nameplates, and
-`sync(alpha, dt, facingOverride)` — the per-frame entry called from `main.ts`.
+`sync(alpha, dt, renderFacingOverride, selfAlphaLead?)` is the per-frame entry called from `main.ts`.
 The subsystems each export a `build*()` returning a `*View` and are owned by the
 renderer:
 
 | File | Builds |
 |---|---|
-| `terrain.ts` (~590) | chunked LOD terrain + PBR splat shading |
-| `props.ts` (~700) | buildings/structures/objects from CC0 GLBs (instanced/merged) |
-| `foliage.ts` (~870) | trees/rocks/dressing (instanced) + player-centred grass ring |
-| `water.ts` · `sky.ts` (~280) | per-zone water planes · HDRI sky dome + clouds |
-| `vfx.ts` (~480) | pooled `THREE.Points` spell/impact particles (Kenney atlas) |
-| `dungeon.ts` (~640) | instanced KayKit interiors from `sim/dungeon_layout.ts` |
-| `post.ts` (~150) | post chain (see below) |
-| `gfx.ts`, `textures.ts`, `locomotion.ts`, `stealth.ts` | shared helpers (below) |
+| `terrain.ts` | chunked LOD terrain + PBR splat shading |
+| `props.ts` | buildings/structures/objects from CC0 GLBs (instanced/merged) |
+| `foliage.ts` | trees/rocks/dressing (instanced) + player-centred grass ring |
+| `water.ts` · `sky.ts` | per-zone water planes · HDRI sky dome + clouds |
+| `vfx.ts` | pooled `THREE.Points` spell/impact particles (Kenney atlas) |
+| `dungeon.ts` | instanced KayKit interiors from `sim/dungeon_layout.ts` |
+| `post.ts` | post chain (see below) |
+| `gfx.ts`, `textures.ts`, `render_budget.ts`, `locomotion.ts`, `stealth.ts` | shared helpers (below) |
 
 ## gfx.ts — the shared core (read this before touching any subsystem)
 - **`GFX` quality tiers** (`low`/`medium`/`high`/`ultra`). Every tier-dependent knob lives
@@ -41,7 +41,7 @@ renderer:
   the one sun every consumer (key light, shadows, sky glow, water glints) reads.
 
 ## Procedural-everything
-- **Textures:** `textures.ts` (~1130) builds canvas textures at runtime (no image
+- **Textures:** `textures.ts` builds canvas textures at runtime (no image
   files). Add an `export function xTexture()` using the `makeCanvas` helper; its
   module-local `rnd()` keeps generation deterministic — don't use `Math.random`.
 - **VFX:** add an effect to `vfx.ts` (emit into the pooled particle cloud; HDR
@@ -90,6 +90,10 @@ collision/movement.
   (material × z-band), share materials via `surfaceMat`, distance-cull/LOD in
   `sync` (see the `*_RANGE_SQ` constants). No per-frame `new THREE.*` in hot paths
   — reuse the `tmpV` scratch vectors / scratch arrays already in `renderer.ts`.
+- **`render_budget.ts` is the renderer's adaptive-budget core** (tier-driven frame
+  budget + telemetry, keyed off `gfx.ts` quality bands). `renderer.ts` owns it,
+  degrades against it, and pushes the resulting grass/foliage/vfx quality levels into
+  those subsystems. Consult it rather than reinventing a frame-level budget.
 
 ## Never do
 - **Never mutate the world from here** (no writing entity/sim fields).

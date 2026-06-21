@@ -16,6 +16,8 @@ const abilityStringsEn = {
       title: "Spellbook",
       classSubtitle: "{className} abilities",
       close: "Close spellbook",
+      resetBar: "Reset bar",
+      resetBarAria: "Reset the current action bar to its default abilities",
       trainableAtLevel: "Trainable at level {level}",
       learnAtLevel: "You will learn this at level {level}.",
       knownAbilityAria: "{name}, rank {rank}. {summary}",
@@ -547,8 +549,12 @@ export const abilityStrings = {
   },
 };
 
-abilityStrings.es_ES = abilityStrings.es;
-abilityStrings.fr_CA = abilityStrings.fr_FR;
+// These inline non-English objects are legacy (pre-i18n.locales split) and unused
+// at runtime — the build resolves non-English from src/ui/i18n.locales/<lang>.ts.
+// New English-only keys are intentionally not back-filled here, so the dialect
+// copies are asserted to the English shape rather than requiring completeness.
+abilityStrings.es_ES = abilityStrings.es as typeof abilityStringsEn;
+abilityStrings.fr_CA = abilityStrings.fr_FR as typeof abilityStringsEn;
 
 
 type AbilityEntityTranslation = { name: string; description: string };

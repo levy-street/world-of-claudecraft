@@ -45,6 +45,10 @@ export interface DungeonLayout {
   stubs: WallStub[];
   /** boss dais — walkable, deliberately NO collider */
   dais: { x: number; z: number; r: number };
+  /** Optional room width override for oversized rooms. Defaults to the classic crypt width. */
+  wallX?: number;
+  endWallHw?: number;
+  floorHalfX?: number;
 }
 
 function grid(zFrom: number, zTo: number, zStep: number, xs: readonly number[]): GridPoint[] {
@@ -89,6 +93,33 @@ export const SANCTUM_LAYOUT: DungeonLayout = (() => {
     tombs: [],
     stubs,
     dais: { x: 0, z: 146, r: 11.5 },
+  };
+})();
+
+// Nythraxis' Abandoned Crypt raid room: a long dark nave ending in one large
+// fighting arena. It stays within the shared wall-width contract, but leaves the
+// central floor open so ten players can spread, stack, and reach three wardstones.
+export const NYTHRAXIS_LAYOUT: DungeonLayout = (() => {
+  const pillars: GridPoint[] = [];
+  for (const z of [18, 38, 60, 82, 106]) {
+    for (const x of [-90, -45, 45, 90]) pillars.push({ x, z });
+  }
+  return {
+    zMin: -19,
+    zMax: 126,
+    sideWallZ: 53.5,
+    sideWallHd: 73,
+    wallX: 230,
+    endWallHw: 231,
+    floorHalfX: 228,
+    pillars,
+    tombs: [
+      { x: -210, z: 20 }, { x: 210, z: 20 },
+      { x: -210, z: 42 }, { x: 210, z: 42 },
+      { x: -210, z: 64 }, { x: 210, z: 64 },
+    ],
+    stubs: [],
+    dais: { x: 0, z: 96, r: 13.5 },
   };
 })();
 
@@ -164,13 +195,15 @@ export const ARENA_SPAWNS_B_2v2 = [
 /** Interior collision set for a layout, in instance-local coordinates. */
 export function layoutColliders(layout: DungeonLayout): Collider[] {
   const out: Collider[] = [];
+  const wallX = layout.wallX ?? DUNGEON_WALL_X;
+  const endWallHw = layout.endWallHw ?? DUNGEON_END_WALL_HW;
   // side walls
-  for (const sx of [-DUNGEON_WALL_X, DUNGEON_WALL_X]) {
+  for (const sx of [-wallX, wallX]) {
     out.push({ type: 'obb', x: sx, z: layout.sideWallZ, hw: DUNGEON_WALL_HW, hd: layout.sideWallHd, rot: 0 });
   }
   // back wall, then front wall (entrance porch: chase cam fits inside)
-  out.push({ type: 'obb', x: 0, z: layout.zMax, hw: DUNGEON_END_WALL_HW, hd: DUNGEON_WALL_HW, rot: 0 });
-  out.push({ type: 'obb', x: 0, z: layout.zMin, hw: DUNGEON_END_WALL_HW, hd: DUNGEON_WALL_HW, rot: 0 });
+  out.push({ type: 'obb', x: 0, z: layout.zMax, hw: endWallHw, hd: DUNGEON_WALL_HW, rot: 0 });
+  out.push({ type: 'obb', x: 0, z: layout.zMin, hw: endWallHw, hd: DUNGEON_WALL_HW, rot: 0 });
   // chamber waists
   for (const s of layout.stubs) out.push({ type: 'obb', x: s.x, z: s.z, hw: s.hw, hd: s.hd, rot: 0 });
   // pillar obstacles

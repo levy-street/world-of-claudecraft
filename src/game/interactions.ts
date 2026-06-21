@@ -100,7 +100,7 @@ export function handlePickedEntity(
         hud.openQuestDialog(id);
       }
       else hud.showError(t('questUi.errors.tooFar'));
-    } else if ((e.kind === 'mob' && !e.dead && e.hostile) || isActivePvpOpponent(world, e)) {
+    } else if (isActivePvpOpponent(world, e)) {
       world.startAutoAttack();
     }
   } else if (button === 0) {

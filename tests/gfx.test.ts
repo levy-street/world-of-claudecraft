@@ -15,6 +15,12 @@ const desktop: GfxRuntimeHints = {
 };
 
 describe('graphics tier resolution', () => {
+  it('resolves initial renderer startup with no persisted preset to ultra graphics', () => {
+    expect(desktop.graphicsPreset).toBeUndefined();
+    expect(graphicsPresetLabel(desktop.graphicsPreset)).toBe('ultra');
+    expect(tierFromHints(desktop, false)).toBe('ultra');
+  });
+
   it('honors explicit URL tier overrides', () => {
     expect(forcedTierFromSearch('?lowgfx')).toBe('low');
     expect(forcedTierFromSearch('?gfx=low')).toBe('low');
@@ -32,11 +38,11 @@ describe('graphics tier resolution', () => {
     expect(isConstrainedBrowser(desktop)).toBe(false);
   });
 
-  it('defaults missing or legacy presets to low while preserving forced high', () => {
-    expect(tierFromHints(desktop, false)).toBe('low');
+  it('defaults missing presets to ultra while preserving legacy low and forced high', () => {
+    expect(tierFromHints(desktop, false)).toBe('ultra');
     expect(tierFromHints({ ...desktop, graphicsPreset: 0 }, false)).toBe('low');
-    expect(tierFromHints(desktop, true)).toBe('low');
-    expect(tierFromHints({ ...desktop, maxTouchPoints: 1, coarsePointer: true }, false)).toBe('low');
+    expect(tierFromHints(desktop, true)).toBe('ultra');
+    expect(tierFromHints({ ...desktop, maxTouchPoints: 1, coarsePointer: true }, false)).toBe('ultra');
     expect(tierFromHints({ ...desktop, search: '?gfx=high', maxTouchPoints: 1, coarsePointer: true }, false)).toBe('high');
     expect(tierFromHints({ ...desktop, search: '?gfx=ultra' }, true)).toBe('ultra');
   });
@@ -51,7 +57,7 @@ describe('graphics tier resolution', () => {
   });
 
   it('labels presets and runs the budget governor unless Ultra or URL-forced', () => {
-    expect(graphicsPresetLabel(undefined)).toBe('low');
+    expect(graphicsPresetLabel(undefined)).toBe('ultra');
     expect(graphicsPresetLabel(0)).toBe('low');
     expect(graphicsPresetLabel(1)).toBe('low');
     expect(graphicsPresetLabel(2)).toBe('medium');
@@ -59,7 +65,7 @@ describe('graphics tier resolution', () => {
     expect(graphicsPresetLabel(4)).toBe('ultra');
     expect(graphicsPresetLabel(5)).toBe('advanced');
     expect(shouldUseAutoGovernor({ search: '', graphicsPreset: 0 })).toBe(true);
-    expect(shouldUseAutoGovernor({ search: '', graphicsPreset: undefined })).toBe(true);
+    expect(shouldUseAutoGovernor({ search: '', graphicsPreset: undefined })).toBe(false);
     expect(shouldUseAutoGovernor({ search: '', graphicsPreset: 1 })).toBe(true);
     expect(shouldUseAutoGovernor({ search: '', graphicsPreset: 2 })).toBe(true);
     expect(shouldUseAutoGovernor({ search: '', graphicsPreset: 3 })).toBe(true);
@@ -160,10 +166,10 @@ describe('graphics tier resolution', () => {
     expect(GFX_BUCKET_BANDS.ultra.foliage.baseline).toBeGreaterThan(GFX_BUCKET_BANDS.high.foliage.baseline);
   });
 
-  it('treats older Intel integrated GPUs as constrained in auto mode', () => {
+  it('detects older Intel integrated GPUs without overriding the ultra default', () => {
     expect(isWeakIntegratedGpu('ANGLE (Intel, ANGLE Metal Renderer: Intel(R) Iris(TM) Plus Graphics 655)')).toBe(true);
     expect(isWeakIntegratedGpu('ANGLE (Apple, ANGLE Metal Renderer: Apple M2)')).toBe(false);
-    expect(tierFromHints({ ...desktop, gpuRenderer: 'ANGLE (Intel, Intel(R) Iris(TM) Plus Graphics 655)' }, false)).toBe('low');
+    expect(tierFromHints({ ...desktop, gpuRenderer: 'ANGLE (Intel, Intel(R) Iris(TM) Plus Graphics 655)' }, false)).toBe('ultra');
   });
 
   it('keeps masked double-sided vegetation off the transparent blended path', () => {

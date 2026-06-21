@@ -406,8 +406,21 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
       'q_zealots', 'q_cult_orders', 'q_necromancers', 'q_wyrm_sigils', 'q_breaking_the_seal',
       'q_voice_below', 'q_sanctum_gate', 'q_velkhar', 'q_gravewyrm',
       'q_nythraxis_restless_dead', 'q_nythraxis_graves', 'q_nythraxis_sealed_crypt',
-      'q_nythraxis_bound_guardian',
+      'q_nythraxis_bound_guardian', 'q_nythraxis_scourges_end',
     ],
+    greeting: 'From a chapel yard in the Vale to the roof of the world... the trail we have followed ends here. I can feel the mountain listening.',
+  },
+  // Spawned dynamically inside the Crypt of Nythraxis encounter (see
+  // spawnNythraxisAldric in sim.ts); `dynamic` keeps the world loader from
+  // surface-placing him while still letting the client mirror him as a quest
+  // turn-in NPC. pos/facing are unused — the encounter sets his position.
+  brother_aldric_raid: {
+    id: 'brother_aldric_raid', name: 'Brother Aldric', title: 'Priest of the Vale',
+    pos: { x: 0, z: 0 }, facing: 0, color: 0xd7d0b4,
+    questIds: ['q_nythraxis_scourges_end'],
+    dynamic: true,
+    // Shares the Highwatch Aldric's name/title/greeting so all three entity
+    // strings reuse his existing 13-locale translations (no new untranslated copy).
     greeting: 'From a chapel yard in the Vale to the roof of the world... the trail we have followed ends here. I can feel the mountain listening.',
   },
   scout_maren_highwatch: {
@@ -727,7 +740,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     id: 'q_nythraxis_bound_guardian', name: 'The Bound Guardian',
     giverNpcId: 'brother_aldric_highwatch', turnInNpcId: 'brother_aldric_highwatch',
     text: 'Voss wrote that the survivors sealed the King\'s Signet behind an ancient guardian, so no one could reach the tomb of Nythraxis by accident or ambition. Take the Crypt Keystone to the ritual circle on the flat ground east of the abandoned crypt and south-east of the western grave. Use it there, break the guardian, and bring back the signet.',
-    completionText: 'The three relics tell the same story: Aldren fought to defend his king, Malric broke the boundary of death, and Voss tried to stop what followed. The seal is weakening, and this signet is the key to Nythraxis\'s tomb. You are now attuned to enter The Crypt of Nythraxis.',
+    completionText: 'The three relics tell the same story: Aldren fought to defend his king, Malric broke the boundary of death, and Voss tried to stop what followed. The seal is weakening, and this signet is the key to Nythraxis\'s tomb. You are now attuned to enter The Crypt of Nythraxis. Return to the abandoned crypt, unlock the royal door, and face Nythraxis before the old king\'s rage spills beyond Thornpeak.',
     objectives: [
       { type: 'interact', targetObjectItemId: 'crypt_ritual_circle', count: 1, label: 'Crypt Keystone used at the ritual circle' },
       { type: 'kill', targetMobId: 'bound_guardian', count: 1, label: 'The Bound Guardian defeated' },
@@ -736,6 +749,17 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     xpReward: 5200, copperReward: 3500,
     itemRewards: { warrior: 'kings_signet', mage: 'kings_signet', rogue: 'kings_signet' },
     requiresQuest: 'q_nythraxis_sealed_crypt', minLevel: 20, suggestedPlayers: 5,
+  },
+  q_nythraxis_scourges_end: {
+    id: 'q_nythraxis_scourges_end', name: 'Scourge\'s End',
+    giverNpcId: 'brother_aldric_highwatch', turnInNpcId: 'brother_aldric_highwatch',
+    turnInNpcIds: ['brother_aldric_highwatch', 'brother_aldric_raid'],
+    text: 'The signet has opened the way, $N, but an open tomb is not a victory. Nythraxis was a king once, and the ruin beneath Thornpeak is still bound to his will. Enter the crypt with allies you trust. Break the deathless crown before its command reaches the battlefield above.',
+    completionText: 'Then the crown is silent at last. Thornpeak will still carry its dead, but no king below it will call them to war again. You have ended what Aldren, Malric, and Voss could only contain.',
+    objectives: [{ type: 'kill', targetMobId: 'nythraxis_scourge_of_thornpeak', count: 1, label: 'Nythraxis slain' }],
+    xpReward: 0, copperReward: 25000,
+    itemRewards: {},
+    requiresQuest: 'q_nythraxis_bound_guardian', minLevel: 20, suggestedPlayers: 10,
   },
 };
 
@@ -746,7 +770,7 @@ export const ZONE3_QUEST_ORDER = [
   'q_necromancers', 'q_revenants', 'q_revenant_vanguard', 'q_wyrm_sigils', 'q_breaking_the_seal',
   'q_voice_below', 'q_sanctum_gate', 'q_korgath', 'q_velkhar', 'q_gravewyrm',
   'q_nythraxis_restless_dead', 'q_nythraxis_graves', 'q_nythraxis_sealed_crypt',
-  'q_nythraxis_bound_guardian',
+  'q_nythraxis_bound_guardian', 'q_nythraxis_scourges_end',
 ];
 
 // ---------------------------------------------------------------------------
@@ -1064,6 +1088,46 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   wyrmshadow_talongrips: {
     id: 'wyrmshadow_talongrips', name: 'Wyrmshadow Talongrips', kind: 'armor', slot: 'gloves', quality: 'epic',
     stats: { armor: 110, agi: 10, sta: 5 }, sellValue: 9000, requiredClass: ['rogue', 'hunter'],
+  },
+  deathless_heartwood: {
+    id: 'deathless_heartwood', name: 'Heartwood of the Deathless Crown', kind: 'weapon', slot: 'mainhand', quality: 'legendary',
+    weapon: { min: 42, max: 68, speed: 3.2 }, stats: { agi: 24, sta: 18, int: 20 }, sellValue: 25000, requiredClass: ['druid'],
+  },
+  kingsbane_last_oath: {
+    id: 'kingsbane_last_oath', name: 'Kingsbane, Last Oath of Thornpeak', kind: 'weapon', slot: 'mainhand', quality: 'legendary',
+    weapon: { min: 46, max: 74, speed: 2.8 }, stats: { str: 24, sta: 20 }, sellValue: 25000, requiredClass: ['warrior', 'paladin'],
+  },
+  crownforged_dreadhelm: {
+    id: 'crownforged_dreadhelm', name: 'Crownforged Dreadhelm', kind: 'armor', slot: 'helmet', quality: 'epic',
+    stats: { armor: 310, str: 12, sta: 14 }, sellValue: 12000, requiredClass: ['warrior', 'paladin'],
+  },
+  crownforged_warspaulders: {
+    id: 'crownforged_warspaulders', name: 'Crownforged Warspaulders', kind: 'armor', slot: 'shoulder', quality: 'epic',
+    stats: { armor: 260, str: 10, sta: 12 }, sellValue: 12000, requiredClass: ['warrior', 'paladin'],
+  },
+  nighttalon_crown: {
+    id: 'nighttalon_crown', name: 'Nighttalon Crown', kind: 'armor', slot: 'helmet', quality: 'epic',
+    stats: { armor: 190, agi: 16, sta: 10 }, sellValue: 12000, requiredClass: ['rogue', 'hunter', 'druid'],
+  },
+  nighttalon_shoulderguards: {
+    id: 'nighttalon_shoulderguards', name: 'Nighttalon Shoulderguards', kind: 'armor', slot: 'shoulder', quality: 'epic',
+    stats: { armor: 165, agi: 14, sta: 9 }, sellValue: 12000, requiredClass: ['rogue', 'hunter', 'druid'],
+  },
+  soulflame_cowl: {
+    id: 'soulflame_cowl', name: 'Soulflame Cowl', kind: 'armor', slot: 'helmet', quality: 'epic',
+    stats: { armor: 105, int: 17, sta: 10 }, sellValue: 12000, requiredClass: ['mage', 'priest', 'warlock', 'druid'],
+  },
+  soulflame_mantle: {
+    id: 'soulflame_mantle', name: 'Soulflame Mantle', kind: 'armor', slot: 'shoulder', quality: 'epic',
+    stats: { armor: 92, int: 15, sta: 9 }, sellValue: 12000, requiredClass: ['mage', 'priest', 'warlock', 'druid'],
+  },
+  stormcallers_crown: {
+    id: 'stormcallers_crown', name: "Stormcaller's Crown", kind: 'armor', slot: 'helmet', quality: 'epic',
+    stats: { armor: 225, int: 16, sta: 12 }, sellValue: 12000, requiredClass: ['shaman'],
+  },
+  stormcallers_spaulders: {
+    id: 'stormcallers_spaulders', name: "Stormcaller's Spaulders", kind: 'armor', slot: 'shoulder', quality: 'epic',
+    stats: { armor: 190, int: 14, sta: 11 }, sellValue: 12000, requiredClass: ['shaman'],
   },
   // --- vendor food & drink (Quartermaster Bree) ---
   trail_hardtack: {

@@ -232,8 +232,110 @@ export const en: EnTranslations = {
       "showWalletOnCharacterScreen": "Show Wallet on Character Screen",
       "showWalletOnPlayerCard": "Show Wallet on Player Card"
     },
+    "perf": {
+      "title": "Performance Overlay",
+      "enable": "Show Performance Overlay",
+      "description": "Choose which stats to show, where the overlay sits, and how it looks.",
+      "sectionPosition": "Position",
+      "sectionAppearance": "Appearance",
+      "sectionStats": "Stats",
+      "positionX": "Horizontal",
+      "positionY": "Vertical",
+      "resetPosition": "Reset Position",
+      "dragHint": "Drag the overlay to move it, or use the sliders below.",
+      "opacity": "Background Opacity",
+      "solidBg": "Solid Background",
+      "fontScale": "Text Size",
+      "textColor": "Text Color",
+      "bgColor": "Background Color",
+      "colorTheme": "Color Theme",
+      "graph": "Frame-Time Graph",
+      "thresholds": "Color-Coded Warnings",
+      "presetsLabel": "Quick Presets",
+      "presetMinimal": "Minimal",
+      "presetStandard": "Standard",
+      "presetEverything": "Everything",
+      "groups": {
+        "frame": "Frame & Timing",
+        "network": "Network",
+        "renderer": "Renderer",
+        "system": "System"
+      },
+      "labels": {
+        "fps": "FPS",
+        "frameTime": "Frame Time",
+        "fps1Low": "1% Low",
+        "fps01Low": "0.1% Low",
+        "ping": "Ping",
+        "jitter": "Jitter",
+        "snapshot": "Snapshot Rate",
+        "connection": "Connection",
+        "drawCalls": "Draw Calls",
+        "triangles": "Triangles",
+        "geometries": "Geometries",
+        "textures": "Textures",
+        "programs": "Shaders",
+        "renderScale": "Render Scale",
+        "gpu": "GPU",
+        "memory": "Memory",
+        "hitches": "Hitches",
+        "entities": "Entities"
+      },
+      "themes": {
+        "gold": "Gold",
+        "frost": "Frost",
+        "ember": "Ember",
+        "jade": "Jade",
+        "crimson": "Crimson",
+        "mono": "Mono"
+      },
+      "units": {
+        "ms": "{value} ms",
+        "mb": "{value} MB",
+        "memPair": "{used} / {limit} MB",
+        "hz": "{value} Hz"
+      },
+      "badges": {
+        "backgrounded": "Backgrounded",
+        "offline": "Offline"
+      }
+    },
     "playerCard": {
       "showWalletBadge": "Show wallet badge"
+    },
+    "statInfo": {
+      "fromYour": "From your {value} {stat}:",
+      "desc": {
+        "str": "Increases your attack power, so your weapon strikes land harder.",
+        "agi": "Sharpens your reflexes and aim, improving several of your combat stats.",
+        "sta": "Toughens your body, raising your maximum health and how quickly you recover health while resting.",
+        "int": "Expands a spellcaster's mana pool and improves their chance to land a spell critical strike.",
+        "spi": "Quickens how fast a spellcaster's mana returns while resting, out of combat.",
+        "armor": "Softens incoming physical blows. The reduction is greater against lower-level attackers and is capped at 75%.",
+        "attackPower": "Powers your weapon attacks. Every 14 attack power adds 1 damage per second.",
+        "dps": "Your estimated weapon damage per second, combining your weapon's damage and speed with your attack power.",
+        "critChance": "Your chance for an attack to strike critically, dealing double damage.",
+        "dodge": "Your chance to completely avoid an incoming melee attack, taking no damage."
+      },
+      "effects": {
+        "attackPower": "+{value} Attack Power",
+        "rangedAttackPower": "+{value} Ranged Attack Power",
+        "critPct": "+{value}% Critical Strike",
+        "dodgePct": "+{value}% Dodge",
+        "armor": "+{value} Armor",
+        "maxHealth": "+{value} Maximum Health",
+        "maxMana": "+{value} Maximum Mana",
+        "spellCritPct": "+{value}% Spell Critical Strike",
+        "healthRegen": "About {value} health every 5 sec while resting",
+        "manaRegen": "About {value} mana every 5 sec while resting",
+        "damageReduction": "Damage reduction against a level {level} attacker: {value}%",
+        "dpsFromAp": "Adds {value} damage per second to your attacks"
+      },
+      "notes": {
+        "minorForClass": "Of little benefit to your class.",
+        "baseChance": "Includes a 5% base chance shared by all adventurers.",
+        "dpsApprox": "An estimate, it excludes critical strikes and ability damage."
+      }
     },
     "talents": {
       "defaultBuildName": "Build {n}"
@@ -285,13 +387,56 @@ export const en: EnTranslations = {
       "emittedLabel": "{pct}% of the pool paid out so far",
       "sinkLabel": "Funded",
       "emissionLabel": "Paid out",
-      "invariant": "Payouts can never exceed what the season took in — buy > sell, enforced on-chain.",
+      "invariant": "Payouts can never exceed what the season took in: buy > sell, enforced on-chain.",
       "standingsTitle": "Projected top earners",
       "colRank": "#",
       "colPlayer": "Player",
       "colRating": "Rating",
       "colReward": "Reward ($WOC)",
       "projectedNote": "Projected from the current pool + arena ranking; final payouts settle at season close."
+    },
+    "account": {
+      "title": "Account",
+      "loggedOutPrompt": "Log in to manage your account.",
+      "memberSince": "Member since {date}",
+      "sectionSettings": "Account Settings",
+      "sectionWallet": "$WOC Wallet",
+      "sectionCharacters": "Characters",
+      "sectionDanger": "Danger Zone",
+      "changePassword": "Change Password",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "confirmNewPassword": "Confirm new password",
+      "savePassword": "Update Password",
+      "passwordChanged": "Password updated. Other devices have been signed out.",
+      "errCurrentRequired": "Enter your current password.",
+      "errPasswordShort": "New password must be at least 6 characters.",
+      "errPasswordLong": "New password must be at most 128 characters.",
+      "errPasswordUnchanged": "New password must be different from the current one.",
+      "errPasswordConfirm": "New passwords do not match.",
+      "emailLabel": "Email (optional)",
+      "emailHint": "Used only for account recovery. We never send marketing email.",
+      "saveEmail": "Save Email",
+      "emailSaved": "Email saved.",
+      "errEmailInvalid": "Enter a valid email address.",
+      "errCurrentPassword": "Your current password is incorrect.",
+      "errUsernameMatch": "That username does not match your account.",
+      "errPasswordIncorrect": "Your password is incorrect.",
+      "errCharactersOnline": "Log out all of your characters before deactivating.",
+      "deactivatedLocked": "This account has been deactivated. Contact an admin to restore it.",
+      "charactersSummary": "Manage your characters and enter the world.",
+      "charactersCount": "Characters: {count}",
+      "goToCharacters": "View Characters",
+      "walletSummary": "Verify a Solana wallet to show holder flair on your player card.",
+      "manageWallet": "Manage Wallet",
+      "deactivate": "Deactivate Account",
+      "deactivateWarning": "Deactivation locks your account and signs you out everywhere. Contact an admin to restore it. Confirm by re-entering your username and password.",
+      "confirmUsername": "Type your username to confirm",
+      "confirmPassword": "Password",
+      "deactivateConfirm": "Deactivate My Account",
+      "deactivated": "Your account has been deactivated.",
+      "logOut": "Log Out",
+      "logOutSummary": "Sign out of this device."
     }
   },
   "skinEvent": {
@@ -336,6 +481,8 @@ export const en: EnTranslations = {
     "news": "News",
     "download": "Download",
     "loginRegister": "Login/Register",
+    "account": "Account",
+    "logout": "Logout",
     "donate": "Donate"
   },
   "stats": {
@@ -1230,6 +1377,7 @@ export const en: EnTranslations = {
         "unignoreChat": "Unignore Chat",
         "report": "Report Player",
         "removeParty": "Remove from Party",
+        "convertToRaid": "Convert to raid",
         "cancel": "Cancel"
       }
     },
@@ -1448,6 +1596,12 @@ export const en: EnTranslations = {
       "guildTab": "Guild",
       "ignoreTab": "Ignore",
       "leaveParty": "Leave Party",
+      "raidTab": "Raid",
+      "raidEmpty": "Convert a party to a raid to manage raid groups here.",
+      "raidGroupEmpty": "No players in this group.",
+      "raidGroupTitle": "Group {position} ({count}/5)",
+      "raidMoveToGroup": "Move to group {position}",
+      "raidLeader": "Raid Leader",
       "offlineEmpty": "Friends, guilds, and ignore lists are available in online play.",
       "friendsEmpty": "No friends yet. Search for someone by name below.",
       "ignoreEmpty": "Your ignore list is empty.",
@@ -1548,6 +1702,8 @@ export const en: EnTranslations = {
       "title": "Spellbook",
       "classSubtitle": "{className} abilities",
       "close": "Close spellbook",
+      "resetBar": "Reset bar",
+      "resetBarAria": "Reset the current action bar to its default abilities",
       "trainableAtLevel": "Trainable at level {level}",
       "learnAtLevel": "You will learn this at level {level}.",
       "knownAbilityAria": "{name}, rank {rank}. {summary}",
@@ -1683,7 +1839,8 @@ export const en: EnTranslations = {
       "common": "Common",
       "uncommon": "Uncommon",
       "rare": "Rare",
-      "epic": "Epic"
+      "epic": "Epic",
+      "legendary": "Legendary"
     },
     "kind": {
       "weapon": "Weapon",
@@ -1860,6 +2017,16 @@ export const en: EnTranslations = {
     "loot": {
       "takeAll": "Take All",
       "close": "Close loot"
+    },
+    "lootRoll": {
+      "title": "Roll for loot",
+      "need": "Need",
+      "greed": "Greed",
+      "pass": "Pass",
+      "needAria": "Need for {item}",
+      "greedAria": "Greed for {item}",
+      "passAria": "Pass on {item}",
+      "everyonePassed": "Everyone passed on {item}."
     }
   },
   "entities": {
@@ -3380,6 +3547,36 @@ export const en: EnTranslations = {
       "event_skin_token": {
         "name": "Mysterious Cosmetic Cache"
       },
+      "deathless_heartwood": {
+        "name": "Heartwood of the Deathless Crown"
+      },
+      "kingsbane_last_oath": {
+        "name": "Kingsbane, Last Oath of Thornpeak"
+      },
+      "crownforged_dreadhelm": {
+        "name": "Crownforged Dreadhelm"
+      },
+      "crownforged_warspaulders": {
+        "name": "Crownforged Warspaulders"
+      },
+      "nighttalon_crown": {
+        "name": "Nighttalon Crown"
+      },
+      "nighttalon_shoulderguards": {
+        "name": "Nighttalon Shoulderguards"
+      },
+      "soulflame_cowl": {
+        "name": "Soulflame Cowl"
+      },
+      "soulflame_mantle": {
+        "name": "Soulflame Mantle"
+      },
+      "stormcallers_crown": {
+        "name": "Stormcaller's Crown"
+      },
+      "stormcallers_spaulders": {
+        "name": "Stormcaller's Spaulders"
+      },
       "unknown_alien_weaponry": {
         "name": "Unknown Alien Weaponry"
       },
@@ -3594,6 +3791,12 @@ export const en: EnTranslations = {
       },
       "bound_guardian": {
         "name": "The Bound Guardian"
+      },
+      "nythraxis_skeleton_warrior": {
+        "name": "Risen Royal Guard"
+      },
+      "nythraxis_scourge_of_thornpeak": {
+        "name": "Nythraxis, Scourge of Thornpeak"
       },
       "brightwood_hare": {
         "name": "Brightwood Hare"
@@ -3846,6 +4049,11 @@ export const en: EnTranslations = {
         "name": "Ranger Elwyn",
         "title": "Glade Warden",
         "greeting": "Quiet, {className} - the glade is calm today, and I mean to keep it that way."
+      },
+      "brother_aldric_raid": {
+        "name": "Brother Aldric",
+        "title": "Priest of the Vale",
+        "greeting": "From a chapel yard in the Vale to the roof of the world... the trail we have followed ends here. I can feel the mountain listening."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -4573,7 +4781,7 @@ export const en: EnTranslations = {
       "q_nythraxis_bound_guardian": {
         "title": "The Bound Guardian",
         "text": "Voss wrote that the survivors sealed the King's Signet behind an ancient guardian, so no one could reach the tomb of Nythraxis by accident or ambition. Take the Crypt Keystone to the ritual circle on the flat ground east of the abandoned crypt and south-east of the western grave. Use it there, break the guardian, and bring back the signet.",
-        "completion": "The three relics tell the same story: Aldren fought to defend his king, Malric broke the boundary of death, and Voss tried to stop what followed. The seal is weakening, and this signet is the key to Nythraxis's tomb. You are now attuned to enter The Crypt of Nythraxis.",
+        "completion": "The three relics tell the same story: Aldren fought to defend his king, Malric broke the boundary of death, and Voss tried to stop what followed. The seal is weakening, and this signet is the key to Nythraxis's tomb. You are now attuned to enter The Crypt of Nythraxis. Return to the abandoned crypt, unlock the royal door, and face Nythraxis before the old king's rage spills beyond Thornpeak.",
         "objectives": {
           "0": {
             "label": "Crypt Keystone used at the ritual circle"
@@ -4583,6 +4791,16 @@ export const en: EnTranslations = {
           },
           "2": {
             "label": "King's Signet"
+          }
+        }
+      },
+      "q_nythraxis_scourges_end": {
+        "title": "Scourge's End",
+        "text": "The signet has opened the way, {playerName}, but an open tomb is not a victory. Nythraxis was a king once, and the ruin beneath Thornpeak is still bound to his will. Enter the crypt with allies you trust. Break the deathless crown before its command reaches the battlefield above.",
+        "completion": "Then the crown is silent at last. Thornpeak will still carry its dead, but no king below it will call them to war again. You have ended what Aldren, Malric, and Voss could only contain.",
+        "objectives": {
+          "0": {
+            "label": "Nythraxis slain"
           }
         }
       },
@@ -4918,8 +5136,13 @@ export const en: EnTranslations = {
       },
       "nythraxis_crypt": {
         "name": "Abandoned Crypt",
-        "enterText": "You descend into the abandoned crypt beneath the forgotten ruins of Thornpeak.",
-        "leaveText": "You climb back out of the abandoned crypt into the mountain wind."
+        "enterText": "You cross the threshold of the Abandoned Crypt.",
+        "leaveText": "You return to the cold air of Thornpeak."
+      },
+      "nythraxis_boss_arena": {
+        "name": "Nythraxis Raid Arena",
+        "enterText": "You pass through the sealed royal door.",
+        "leaveText": "You return to the cold air of Thornpeak."
       },
       "drowned_temple": {
         "name": "The Drowned Temple",

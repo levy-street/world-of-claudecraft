@@ -190,6 +190,15 @@ export interface Decoration {
   biome: BiomeId;
 }
 
+const DECORATION_EXCLUSION_RADIUS = 1.2;
+const DECORATION_EXCLUSIONS = [
+  { x: 2.456450840458274, z: 211.33819991815835 },
+];
+
+function isExcludedDecoration(x: number, z: number): boolean {
+  return DECORATION_EXCLUSIONS.some((p) => Math.hypot(x - p.x, z - p.z) < DECORATION_EXCLUSION_RADIUS);
+}
+
 export function zoneBiomeAt(z: number): BiomeId {
   for (const zone of ZONES) {
     if (z < zone.zMax) return zone.biome;
@@ -220,6 +229,7 @@ export function generateDecorations(seed: number): Decoration[] {
       const ox = (hash2(Math.round(gx), Math.round(gz), seed + 57) - 0.5) * step;
       const oz = (hash2(Math.round(gx), Math.round(gz), seed + 91) - 0.5) * step;
       const x = gx + ox, z = gz + oz;
+      if (isExcludedDecoration(x, z)) continue;
       let inHub = false;
       for (const zone of ZONES) {
         const dx = x - zone.hub.x, dz = z - zone.hub.z;

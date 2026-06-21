@@ -80,6 +80,18 @@
   .word-del:hover { color: #f55; }
   .word-add { display: flex; gap: 6px; margin-top: 8px; }
   .word-add input { flex: 1; }
+  .ip-add { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+  .ip-add .ip-add-ip, .ip-add .ip-add-reason { flex: 1; min-width: 140px; }
+  .ip-add-expiry { display: flex; align-items: center; gap: 4px; font-size: 13px; color: #c9b27a; }
+  .ip-block .ip-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 4px 0; }
+  .ip-block code { background: #100d0b; padding: 2px 6px; border-radius: 3px; }
+  #blocked-ips table { width: 100%; table-layout: fixed; }
+  #blocked-ips th, #blocked-ips td { white-space: normal; overflow-wrap: anywhere; word-break: break-word; vertical-align: top; }
+  #blocked-ips th:nth-child(1), #blocked-ips td:nth-child(1) { width: 130px; }
+  #blocked-ips th:nth-child(3), #blocked-ips td:nth-child(3) { width: 150px; }
+  #blocked-ips th:nth-child(4), #blocked-ips td:nth-child(4) { width: 90px; }
+  #blocked-ips th:nth-child(5), #blocked-ips td:nth-child(5) { width: 150px; }
+  #blocked-ips th:nth-child(6), #blocked-ips td:nth-child(6) { width: 90px; }
   .cf-config { display: flex; flex-direction: column; gap: 8px; max-width: 460px; }
   .cf-config label { display: flex; flex-direction: column; gap: 3px; font-size: 13px; color: #c9b27a; }
   .chat-mod-status { margin: 6px 0; }
@@ -144,10 +156,12 @@
   .mod-report-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 6px 12px; font-size: 12px; color: #c9b27a; }
   .mod-details { margin: 10px 0; padding: 10px; background: #0d0d14; border: 1px solid #2a2414; border-radius: 4px; white-space: pre-wrap; }
   .mod-actions, .mod-account-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 10px 0; }
-  .mod-actions button, .mod-account-actions button {
+  .mod-actions button, .mod-account-actions button, .ip-block button, .ip-add button, #blocked-ips table button {
     padding: 5px 10px; background: #1a1410; color: #c9b27a; border: 1px solid #463a1c; border-radius: 3px; cursor: pointer;
   }
-  .mod-actions button:hover, .mod-account-actions button:hover { color: #fff; border-color: var(--gold-dim); }
+  .mod-actions button:hover, .mod-account-actions button:hover, .ip-block button:hover, .ip-add button:hover, #blocked-ips table button:hover { color: #fff; border-color: var(--gold-dim); }
+  .ip-block .danger, .ip-add .danger { border-color: #b34a3a; color: #ff7a5e; }
+  .ip-block .danger:hover, .ip-add .danger:hover { border-color: #ff7a5e; color: #fff; }
   .mod-account-actions input { padding: 6px 8px; background: #11111a; border: 1px solid var(--border); border-radius: 4px; color: var(--text); }
   .account-admin-controls {
     align-items: stretch;
@@ -240,6 +254,7 @@
       <button class="admin-tab" data-admin-page="usage" data-i18n="nav.usage">Usage</button>
       <button class="admin-tab" data-admin-page="moderation" data-i18n="nav.moderation">Moderation</button>
       <button class="admin-tab" data-admin-page="chat-filter" data-i18n="nav.chatFilter">Chat Filter</button>
+      <button class="admin-tab" data-admin-page="blocked-ips" data-i18n="nav.blockedIps">Blocked IPs</button>
     </nav>
 
     <main id="page-overview" class="admin-page active">
@@ -286,6 +301,13 @@
     <main id="page-chat-filter" class="admin-page">
       <section>
         <div id="chat-filter"></div>
+      </section>
+    </main>
+
+    <main id="page-blocked-ips" class="admin-page">
+      <section class="panel">
+        <div class="panel-title"><span data-i18n="blockedIps.title">Blocked IPs</span> <span class="hint" data-i18n="blockedIps.hint">connections from these addresses are refused</span></div>
+        <div id="blocked-ips"></div>
       </section>
     </main>
   </div>

@@ -8,7 +8,7 @@ import {
 } from '../sim/content/talents';
 import { mechChromaItemId, mechChromaSkinIndex } from '../sim/content/skins';
 import {
-  Entity, EquipSlot, InvSlot, MoveInput, PlayerClass, QuestProgress, QuestState, SimEvent,
+  Entity, EquipSlot, InvSlot, LootRollChoice, MoveInput, PlayerClass, QuestProgress, QuestState, SimEvent,
   emptyMoveInput,
 } from '../sim/types';
 import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
@@ -80,7 +80,30 @@ export interface ReleaseEntry {
   publishedAt: string; // ISO 8601
 }
 
+export interface AccountInfo {
+  username: string;
+  email: string;
+  createdAt: string;
+  characterCount: number;
+}
+
+// Carries the HTTP status alongside the server's error text so callers can
+// distinguish an auth failure (401/403 → clear the stored session) from a
+// transient 5xx/network blip (keep the token; the session may still be valid).
+export class ApiError extends Error {
+  constructor(message: string, readonly status: number) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
+
+/** True for an auth-class failure where a stored token should be discarded. */
+export function isAuthError(err: unknown): boolean {
+  return err instanceof ApiError && (err.status === 401 || err.status === 403);
+}
+
 export class Api {
+  private static readonly SESSION_KEY = 'woc_session';
   token: string | null = null;
   username: string | null = null;
   realm: string | null = null;
@@ -127,7 +150,7 @@ export class Api {
       body: JSON.stringify(body),
     });
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data.error ?? `request failed (${res.status})`);
+    if (!res.ok) throw new ApiError(data.error ?? `request failed (${res.status})`, res.status);
     return data;
   }
 
@@ -136,7 +159,7 @@ export class Api {
       headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
     });
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data.error ?? `request failed (${res.status})`);
+    if (!res.ok) throw new ApiError(data.error ?? `request failed (${res.status})`, res.status);
     return data;
   }
 
@@ -150,7 +173,7 @@ export class Api {
       body: JSON.stringify(body),
     });
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data.error ?? `request failed (${res.status})`);
+    if (!res.ok) throw new ApiError(data.error ?? `request failed (${res.status})`, res.status);
     return data;
   }
 
@@ -164,6 +187,69 @@ export class Api {
     const data = await this.post('/api/login', { username, password, turnstileToken });
     this.token = data.token;
     this.username = data.username;
+  }
+
+  // ── Persistent session (home-page account portal) ──────────────────────────
+  // The bearer token + username are cached in localStorage so a reload restores
+  // the logged-in nav state. The token is always re-validated server-side via
+  // getAccount() before it is trusted; a 401 there means the caller should clear.
+  saveSession(): void {
+    if (!this.token || !this.username) return;
+    try {
+      localStorage.setItem(Api.SESSION_KEY, JSON.stringify({ token: this.token, username: this.username }));
+    } catch { /* storage may be unavailable (private mode); session stays in-memory */ }
+  }
+
+  restoreSession(): boolean {
+    try {
+      const raw = localStorage.getItem(Api.SESSION_KEY);
+      if (!raw) return false;
+      const data = JSON.parse(raw) as { token?: unknown; username?: unknown };
+      if (typeof data.token !== 'string' || typeof data.username !== 'string') return false;
+      this.token = data.token;
+      this.username = data.username;
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  clearSession(): void {
+    this.token = null;
+    this.username = null;
+    try { localStorage.removeItem(Api.SESSION_KEY); } catch { /* ignore */ }
+  }
+
+  // Account-wide self-service (whoami / password / email / deactivate) routes
+  // through this.base, i.e. the currently-selected realm origin. This is correct
+  // for the single-origin deploy (every realm shares one accounts DB, so the
+  // account locks DB-wide regardless of which realm process serves the request).
+  // MULTI-REALM ASSUMPTION: in a cross-origin multi-realm deploy the deactivate
+  // online-check + forced-disconnect would only see THIS realm's live sessions;
+  // characters live on other realm processes would not be torn down immediately
+  // (they still lose auth at the DB on the next token check). Routing these
+  // account-wide calls to a canonical account origin needs a new client/server
+  // seam (the client has no realm directory today) — deferred to multi-realm
+  // rollout. See server/realm.ts REALM_DIRECTORY / REALM_ORIGINS.
+  async getAccount(): Promise<AccountInfo> {
+    return this.get('/api/account');
+  }
+
+  async changePassword(current: string, next: string): Promise<void> {
+    await this.post('/api/account/password', { current, next });
+  }
+
+  async logout(): Promise<void> {
+    await this.post('/api/account/logout', {});
+  }
+
+  async setEmail(email: string): Promise<string> {
+    const data = await this.post('/api/account/email', { email });
+    return typeof data.email === 'string' ? data.email : '';
+  }
+
+  async deactivateAccount(username: string, password: string): Promise<void> {
+    await this.post('/api/account/deactivate', { username, password });
   }
 
   async characters(): Promise<CharacterSummary[]> {
@@ -328,7 +414,7 @@ function blankEntity(id: number): Entity {
     spawnPos: { x: 0, y: 0, z: 0 }, leashAnchor: null, evadeStall: 0, fleeTimer: 0, fleeReturnTimer: 0, hasFled: false, wanderTarget: null, wanderTimer: 0,
     aggroTargetId: null, respawnTimer: 0, corpseTimer: 0, lootable: false, loot: null,
     xpValue: 0, questIds: [], vendorItems: [], objectItemId: null, dungeonId: null,
-    dead: false, scale: 1, color: 0xffffff, skinCatalog: 'class', skin: 0,
+    dead: false, scale: 1, color: 0xffffff, skinCatalog: 'class', skin: 0, guild: '',
   };
 }
 
@@ -640,6 +726,7 @@ export class ClientWorld implements IWorld {
         e.color = w.c ?? 0xffffff;
         e.dungeonId = w.dgn ?? null;
         e.objectItemId = w.obj ?? null;
+        e.guild = w.gd ?? '';
         if (e.kind === 'npc') {
           const def = NPCS[e.templateId];
           e.questIds = def ? [...def.questIds] : [];
@@ -842,12 +929,36 @@ export class ClientWorld implements IWorld {
     return v;
   }
 
+  // Refuse a hostile-target cast at an already-dead target: near-monotonic +
+  // locally authoritative state, so it only drops casts the server would reject
+  // anyway. The exception is a same-id revive (graveyard release, Fiesta respawn)
+  // that flips a known-dead target back to alive without clearing attackers'
+  // targetId — there the client can drop one hostile cast for a snapshot+RTT and
+  // self-heals on the next GCD. (Mob respawn clears attackers' targetId, so it
+  // has no such window.)
+  private deadTargetCast(def: ResolvedAbility['def'] | undefined): boolean {
+    if (!def || !def.requiresTarget || def.targetType === 'friendly') return false;
+    const tid = this.player.targetId;
+    const target = tid !== null ? this.entities.get(tid) : undefined;
+    return !!target && target.dead;
+  }
+
   castAbility(abilityId: string): void {
+    if (this.deadTargetCast(this.known.find((k) => k.def.id === abilityId)?.def)) {
+      this.eventQueue.push({ type: 'error', text: 'You have no target.', reason: 'target_dead' });
+      return;
+    }
     this.cmd({ cmd: 'cast', ability: abilityId });
   }
+
   castAbilityBySlot(slot: number): void {
+    if (this.deadTargetCast(this.known[slot]?.def)) {
+      this.eventQueue.push({ type: 'error', text: 'You have no target.', reason: 'target_dead' });
+      return;
+    }
     this.cmd({ cmd: 'castSlot', slot });
   }
+
   targetEntity(id: number | null): void {
     // optimistic local update for snappy UI
     const p = this.entities.get(this.playerId);
@@ -880,6 +991,9 @@ export class ClientWorld implements IWorld {
   }
   lootCorpse(id: number): void {
     this.cmd({ cmd: 'loot', id });
+  }
+  submitLootRoll(rollId: number, choice: LootRollChoice): void {
+    this.cmd({ cmd: 'lootRoll', rollId, choice });
   }
   pickUpObject(id: number): void {
     this.cmd({ cmd: 'pickup', id });
@@ -1007,6 +1121,12 @@ export class ClientWorld implements IWorld {
   }
   partyKick(targetPid: number): void {
     this.cmd({ cmd: 'pkick', id: targetPid });
+  }
+  convertPartyToRaid(): void {
+    this.cmd({ cmd: 'praid' });
+  }
+  moveRaidMember(targetPid: number, group: 1 | 2): void {
+    this.cmd({ cmd: 'pmoveRaid', id: targetPid, group });
   }
   // raid/target markers
   markerFor(entityId: number): number | null {

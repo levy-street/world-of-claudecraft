@@ -232,8 +232,110 @@ export const ru_RU: EnTranslations = {
       "showWalletOnCharacterScreen": "Показывать кошелек на экране персонажей",
       "showWalletOnPlayerCard": "Показывать кошелек на карточке игрока"
     },
+    "perf": {
+      "title": "Оверлей производительности",
+      "enable": "Показывать оверлей производительности",
+      "description": "Выберите, какие показатели отображать, где разместить оверлей и как он выглядит.",
+      "sectionPosition": "Положение",
+      "sectionAppearance": "Внешний вид",
+      "sectionStats": "Показатели",
+      "positionX": "По горизонтали",
+      "positionY": "По вертикали",
+      "resetPosition": "Сбросить положение",
+      "dragHint": "Перетащите оверлей, чтобы переместить его, или используйте ползунки ниже.",
+      "opacity": "Прозрачность фона",
+      "solidBg": "Сплошной фон",
+      "fontScale": "Размер текста",
+      "textColor": "Цвет текста",
+      "bgColor": "Цвет фона",
+      "colorTheme": "Цветовая тема",
+      "graph": "График времени кадра",
+      "thresholds": "Цветовая индикация",
+      "presetsLabel": "Готовые наборы",
+      "presetMinimal": "Минимум",
+      "presetStandard": "Стандарт",
+      "presetEverything": "Всё",
+      "groups": {
+        "frame": "Кадры и время",
+        "network": "Сеть",
+        "renderer": "Рендер",
+        "system": "Система"
+      },
+      "labels": {
+        "fps": "FPS",
+        "frameTime": "Время кадра",
+        "fps1Low": "1% мин.",
+        "fps01Low": "0,1% мин.",
+        "ping": "Пинг",
+        "jitter": "Джиттер",
+        "snapshot": "Частота снимков",
+        "connection": "Соединение",
+        "drawCalls": "Вызовы отрисовки",
+        "triangles": "Треугольники",
+        "geometries": "Геометрия",
+        "textures": "Текстуры",
+        "programs": "Шейдеры",
+        "renderScale": "Масштаб рендера",
+        "gpu": "GPU",
+        "memory": "Память",
+        "hitches": "Подвисания",
+        "entities": "Объекты"
+      },
+      "themes": {
+        "gold": "Золото",
+        "frost": "Иней",
+        "ember": "Жар",
+        "jade": "Нефрит",
+        "crimson": "Багрянец",
+        "mono": "Моно"
+      },
+      "units": {
+        "ms": "{value} мс",
+        "mb": "{value} МБ",
+        "memPair": "{used} / {limit} МБ",
+        "hz": "{value} Гц"
+      },
+      "badges": {
+        "backgrounded": "В фоне",
+        "offline": "Не в сети"
+      }
+    },
     "playerCard": {
       "showWalletBadge": "Показывать значок кошелька"
+    },
+    "statInfo": {
+      "fromYour": "От вашей характеристики ({value} {stat}):",
+      "desc": {
+        "str": "Увеличивает силу атаки, благодаря чему удары вашим оружием бьют сильнее.",
+        "agi": "Обостряет реакцию и меткость, улучшая сразу несколько ваших боевых характеристик.",
+        "sta": "Закаляет ваше тело, повышая максимальное здоровье и скорость его восстановления во время отдыха.",
+        "int": "Увеличивает запас маны заклинателя и повышает его шанс нанести критический удар заклинанием.",
+        "spi": "Ускоряет восстановление маны заклинателя во время отдыха вне боя.",
+        "armor": "Смягчает входящие физические удары. Снижение урона тем больше, чем ниже уровень атакующего, и не превышает 75%.",
+        "attackPower": "Усиливает атаки вашим оружием. Каждые 14 ед. силы атаки добавляют 1 ед. урона в секунду.",
+        "dps": "Приблизительный урон вашего оружия в секунду с учетом урона и скорости оружия, а также вашей силы атаки.",
+        "critChance": "Ваш шанс нанести критический удар, наносящий двойной урон.",
+        "dodge": "Ваш шанс полностью уклониться от входящей атаки в ближнем бою, не получив урона."
+      },
+      "effects": {
+        "attackPower": "+{value} к силе атаки",
+        "rangedAttackPower": "+{value} к силе атаки в дальнем бою",
+        "critPct": "+{value}% к шансу критического удара",
+        "dodgePct": "+{value}% к уклонению",
+        "armor": "+{value} к броне",
+        "maxHealth": "+{value} к максимальному здоровью",
+        "maxMana": "+{value} к максимальному запасу маны",
+        "spellCritPct": "+{value}% к шансу критического удара заклинанием",
+        "healthRegen": "Около {value} ед. здоровья каждые 5 сек. во время отдыха",
+        "manaRegen": "Около {value} ед. маны каждые 5 сек. во время отдыха",
+        "damageReduction": "Снижение урона от атакующего {level} уровня: {value}%",
+        "dpsFromAp": "Добавляет {value} ед. урона в секунду к вашим атакам"
+      },
+      "notes": {
+        "minorForClass": "Малополезно для вашего класса.",
+        "baseChance": "Включает базовый шанс 5%, общий для всех искателей приключений.",
+        "dpsApprox": "Это приблизительная оценка, не учитывающая критические удары и урон от способностей."
+      }
     },
     "talents": {
       "defaultBuildName": "Билд {n}"
@@ -285,13 +387,56 @@ export const ru_RU: EnTranslations = {
       "emittedLabel": "{pct}% of the pool paid out so far",
       "sinkLabel": "Funded",
       "emissionLabel": "Paid out",
-      "invariant": "Payouts can never exceed what the season took in — buy > sell, enforced on-chain.",
+      "invariant": "Payouts can never exceed what the season took in: buy > sell, enforced on-chain.",
       "standingsTitle": "Projected top earners",
       "colRank": "#",
       "colPlayer": "Player",
       "colRating": "Rating",
       "colReward": "Reward ($WOC)",
       "projectedNote": "Projected from the current pool + arena ranking; final payouts settle at season close."
+    },
+    "account": {
+      "title": "Аккаунт",
+      "loggedOutPrompt": "Войдите, чтобы управлять аккаунтом.",
+      "memberSince": "Дата регистрации: {date}",
+      "sectionSettings": "Настройки аккаунта",
+      "sectionWallet": "Кошелёк $WOC",
+      "sectionCharacters": "Персонажи",
+      "sectionDanger": "Опасная зона",
+      "changePassword": "Сменить пароль",
+      "currentPassword": "Текущий пароль",
+      "newPassword": "Новый пароль",
+      "confirmNewPassword": "Подтвердите новый пароль",
+      "savePassword": "Обновить пароль",
+      "passwordChanged": "Пароль обновлён. На других устройствах выполнен выход.",
+      "errCurrentRequired": "Введите текущий пароль.",
+      "errPasswordShort": "Новый пароль должен содержать не менее 6 символов.",
+      "errPasswordLong": "Новый пароль должен содержать не более 128 символов.",
+      "errPasswordUnchanged": "Новый пароль должен отличаться от текущего.",
+      "errPasswordConfirm": "Новые пароли не совпадают.",
+      "emailLabel": "Эл. почта (необязательно)",
+      "emailHint": "Используется только для восстановления аккаунта. Мы не рассылаем рекламные письма.",
+      "saveEmail": "Сохранить почту",
+      "emailSaved": "Почта сохранена.",
+      "errEmailInvalid": "Введите корректный адрес эл. почты.",
+      "errCurrentPassword": "Текущий пароль неверен.",
+      "errUsernameMatch": "Это имя пользователя не совпадает с вашим аккаунтом.",
+      "errPasswordIncorrect": "Неверный пароль.",
+      "errCharactersOnline": "Выйдите из всех персонажей перед деактивацией.",
+      "deactivatedLocked": "Этот аккаунт деактивирован. Для восстановления обратитесь к администратору.",
+      "charactersSummary": "Управляйте персонажами и входите в мир.",
+      "charactersCount": "Персонажей: {count}",
+      "goToCharacters": "Показать персонажей",
+      "walletSummary": "Подтвердите кошелёк Solana, чтобы показать знак держателя на карточке игрока.",
+      "manageWallet": "Управление кошельком",
+      "deactivate": "Деактивировать аккаунт",
+      "deactivateWarning": "Деактивация заблокирует ваш аккаунт и выполнит выход на всех устройствах. Для восстановления обратитесь к администратору. Подтвердите, повторно введя имя пользователя и пароль.",
+      "confirmUsername": "Введите имя пользователя для подтверждения",
+      "confirmPassword": "Пароль",
+      "deactivateConfirm": "Деактивировать мой аккаунт",
+      "deactivated": "Ваш аккаунт деактивирован.",
+      "logOut": "Выйти",
+      "logOutSummary": "Выйти на этом устройстве."
     }
   },
   "skinEvent": {
@@ -336,6 +481,8 @@ export const ru_RU: EnTranslations = {
     "news": "Новости",
     "download": "Скачать",
     "loginRegister": "Войти / Зарегистрироваться",
+    "account": "Аккаунт",
+    "logout": "Выйти",
     "donate": "Пожертвовать"
   },
   "stats": {
@@ -529,36 +676,36 @@ export const ru_RU: EnTranslations = {
         "flavor": "Рынок чувствует ваше движение: 1% предложения."
       },
       "tidelord": {
-        "name": "Tidelord",
-        "flavor": "The tide answers your call: 2% of supply."
+        "name": "Повелитель приливов",
+        "flavor": "Прилив отвечает на ваш зов: 2% предложения."
       },
       "stormcaller": {
-        "name": "Stormcaller",
-        "flavor": "Storms gather at your name: 3% of supply."
+        "name": "Призыватель бурь",
+        "flavor": "Бури собираются на ваше имя: 3% предложения."
       },
       "krakencrown": {
-        "name": "Krakencrown",
-        "flavor": "Crowned by the deep: 4% of supply."
+        "name": "Кракенова корона",
+        "flavor": "Глубины венчают вас короной: 4% предложения."
       },
       "titanforged": {
-        "name": "Titanforged",
-        "flavor": "Forged among titans: 5% of supply."
+        "name": "Титанокованный",
+        "flavor": "Выкован среди титанов: 5% предложения."
       },
       "starhoard": {
-        "name": "Starhoard",
-        "flavor": "A hoard that bends starlight: 6% of supply."
+        "name": "Звездный клад",
+        "flavor": "Клад, изгибающий звездный свет: 6% предложения."
       },
       "voidwarden": {
-        "name": "Voidwarden",
-        "flavor": "Keeper at the void's edge: 7% of supply."
+        "name": "Страж пустоты",
+        "flavor": "Хранитель у края пустоты: 7% предложения."
       },
       "realmshaper": {
-        "name": "Realmshaper",
-        "flavor": "You reshape the realm: 8% of supply."
+        "name": "Творец пределов",
+        "flavor": "Вы меняете облик мира: 8% предложения."
       },
       "worldforger": {
-        "name": "Worldforger",
-        "flavor": "Forging a world of your own: 9% of supply."
+        "name": "Кователь миров",
+        "flavor": "Куете собственный мир: 9% предложения."
       },
       "worldbearer": {
         "name": "Носитель мира",
@@ -1230,6 +1377,7 @@ export const ru_RU: EnTranslations = {
         "unignoreChat": "Убрать игнор чата",
         "report": "Пожаловаться на игрока",
         "removeParty": "Удалить из группы",
+        "convertToRaid": "Преобразовать в рейд",
         "cancel": "Отмена"
       }
     },
@@ -1448,6 +1596,12 @@ export const ru_RU: EnTranslations = {
       "guildTab": "Гильдия",
       "ignoreTab": "Игнор",
       "leaveParty": "Покинуть группу",
+      "raidTab": "Рейд",
+      "raidEmpty": "Преобразуйте группу в рейд, чтобы управлять рейдовыми группами здесь.",
+      "raidGroupEmpty": "В этой группе нет игроков.",
+      "raidGroupTitle": "Группа {position} ({count}/5)",
+      "raidMoveToGroup": "Переместить в группу {position}",
+      "raidLeader": "Лидер рейда",
       "offlineEmpty": "Друзья, гильдии и списки игнорирования доступны в онлайн-игре.",
       "friendsEmpty": "Друзей пока нет. Найдите игрока по имени ниже.",
       "ignoreEmpty": "Ваш список игнорирования пуст.",
@@ -1548,6 +1702,8 @@ export const ru_RU: EnTranslations = {
       "title": "Книга заклинаний",
       "classSubtitle": "Способности: {className}",
       "close": "Закрыть книгу заклинаний",
+      "resetBar": "Сбросить панель",
+      "resetBarAria": "Сбросить текущую панель действий до стандартных способностей",
       "trainableAtLevel": "Можно обучиться на уровне {level}",
       "learnAtLevel": "Вы изучите это на уровне {level}.",
       "knownAbilityAria": "{name}, ранг {rank}. {summary}",
@@ -1683,7 +1839,8 @@ export const ru_RU: EnTranslations = {
       "common": "Обычное",
       "uncommon": "Необычное",
       "rare": "Редкое",
-      "epic": "Эпическое"
+      "epic": "Эпическое",
+      "legendary": "Легендарное"
     },
     "kind": {
       "weapon": "Оружие",
@@ -1860,6 +2017,16 @@ export const ru_RU: EnTranslations = {
     "loot": {
       "takeAll": "Взять все",
       "close": "Закрыть добычу"
+    },
+    "lootRoll": {
+      "title": "Бросок за добычу",
+      "need": "Нужно",
+      "greed": "Жадность",
+      "pass": "Пас",
+      "needAria": "Нужно: {item}",
+      "greedAria": "Жадность: {item}",
+      "passAria": "Пас: {item}",
+      "everyonePassed": "Все отказались от {item}."
     }
   },
   "entities": {
@@ -3380,6 +3547,36 @@ export const ru_RU: EnTranslations = {
       "event_skin_token": {
         "name": "Загадочный косметический тайник"
       },
+      "deathless_heartwood": {
+        "name": "Сердцевина бессмертной короны"
+      },
+      "kingsbane_last_oath": {
+        "name": "Цареубийца, последняя клятва Торнпика"
+      },
+      "crownforged_dreadhelm": {
+        "name": "Короннокованый шлем ужаса"
+      },
+      "crownforged_warspaulders": {
+        "name": "Короннокованые боевые наплечники"
+      },
+      "nighttalon_crown": {
+        "name": "Корона Ночного Когтя"
+      },
+      "nighttalon_shoulderguards": {
+        "name": "Наплечные стражи Ночного Когтя"
+      },
+      "soulflame_cowl": {
+        "name": "Клобук Пламени души"
+      },
+      "soulflame_mantle": {
+        "name": "Оплечье Пламени души"
+      },
+      "stormcallers_crown": {
+        "name": "Корона призывателя бурь"
+      },
+      "stormcallers_spaulders": {
+        "name": "Наплечники призывателя бурь"
+      },
       "unknown_alien_weaponry": {
         "name": "Неизвестное инопланетное вооружение"
       },
@@ -3594,6 +3791,12 @@ export const ru_RU: EnTranslations = {
       },
       "bound_guardian": {
         "name": "Связанный страж"
+      },
+      "nythraxis_skeleton_warrior": {
+        "name": "Восставший королевский страж"
+      },
+      "nythraxis_scourge_of_thornpeak": {
+        "name": "Нитраксис, Бич Торнпика"
       },
       "brightwood_hare": {
         "name": "Заяц Брайтвуда"
@@ -3846,6 +4049,11 @@ export const ru_RU: EnTranslations = {
         "name": "Следопыт Элвин",
         "title": "Хранитель поляны",
         "greeting": "Тише, {className} - поляна сегодня спокойна, и я намерен такой её сохранить."
+      },
+      "brother_aldric_raid": {
+        "name": "Брат Алдрик",
+        "title": "Жрец долины",
+        "greeting": "От кладбища часовни до крыши мира... след заканчивается здесь. Я чувствую, как гора слушает."
       },
       "tidewatcher_ondrel": {
         "name": "Ондрел Вейн",
@@ -4586,6 +4794,16 @@ export const ru_RU: EnTranslations = {
           }
         }
       },
+      "q_nythraxis_scourges_end": {
+        "title": "Конец Плети",
+        "text": "Перстень открыл путь, {playerName}, но открытая гробница еще не победа. Нитраксис когда-то был королем, и руины под Торнпиком все еще связаны его волей. Войдите в крипту с союзниками, которым доверяете. Сломайте бессмертную корону, пока ее приказ не достиг поля битвы наверху.",
+        "completion": "Теперь корона наконец молчит. Торнпик все еще будет хранить своих мертвых, но ни один король под горой больше не призовет их на войну. Вы завершили то, что Олдрен, Малрик и Восс смогли лишь сдержать.",
+        "objectives": {
+          "0": {
+            "label": "Нитраксис побежден"
+          }
+        }
+      },
       "q_brightwood_thinning": {
         "title": "Поредение поляны",
         "text": "Поляна Брайтвуда заполонена, {playerName}. Терновые рыси плодятся быстрее, чем я успеваю их выбивать, а стада вытаптывают то немногое, что осталось на выпас. Убей 8 терновых рысей и принеси мне 6 шкур поляны, чтобы я мог судить о здоровье остальных.",
@@ -4919,6 +5137,11 @@ export const ru_RU: EnTranslations = {
       "nythraxis_crypt": {
         "name": "Заброшенный склеп",
         "enterText": "Вы переступаете порог заброшенного склепа.",
+        "leaveText": "Вы возвращаетесь в холодный воздух Терновых высот."
+      },
+      "nythraxis_boss_arena": {
+        "name": "Рейдовая арена Нитраксиса",
+        "enterText": "Вы проходите через запечатанную королевскую дверь.",
         "leaveText": "Вы возвращаетесь в холодный воздух Терновых высот."
       },
       "drowned_temple": {

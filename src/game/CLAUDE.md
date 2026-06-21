@@ -19,6 +19,9 @@ command calls**. Everything here is DOM/WebAudio-only and runs in `main.ts`.
 | `music.ts` | `MusicDirector` (`music` singleton) — procedural zone/combat soundtrack. |
 | `sfx.ts` / `voice.ts` | `sfx` / `voice` singletons — play pre-rendered clips from `public/audio/` (spatial 3D SFX + NPC voice lines) via their `*_manifest.generated.ts`. |
 | `settings.ts` | `Settings` — persisted Esc-menu options. |
+| `click_move.ts` / `pointer_pick.ts` / `camera_follow.ts` | pure, DOM-free input/camera math extracted from the render loop so they unit-test in isolation |
+| `perf_doctor.ts` | pure perf-snapshot analyzer producing `PerfSuggestion[]` (no DOM); `perf_reporter.ts` is the telemetry reporter; `perf.ts` is the overlay/trace harness |
+| `cursors.ts` | hover-cursor PNGs |
 
 ## Local invariants
 - **Never mutate sim state directly.** `input.ts` only records intent and fires
@@ -48,15 +51,19 @@ command calls**. Everything here is DOM/WebAudio-only and runs in `main.ts`.
   **static** mobile button labels (move/camera/attack/autorun/jump…) live in
   `index.html` via `data-i18n`, not here. Classify by render sink: an
   `aria-label`/`title`/`textContent` set to readable text is in scope too. **One
-  carve-out:** `perf.ts`'s overlay/doctor text (titles, `aria-label`s, suggestion
-  bodies) is a `?perf`/`woc_perf`-gated developer diagnostic, so it stays English
-  like `console.*`. No money/number/date formatting lives in this directory, so
+  carve-out:** the perf overlay/doctor/reporter text
+  (`perf.ts`/`perf_doctor.ts`/`perf_reporter.ts`) is a `?perf`/`woc_perf`-gated
+  developer diagnostic, so it stays English like `console.*`. No money/number/date formatting lives in this directory, so
   there are no format helpers to call; voice/SFX clips are language-agnostic assets
   (the localized dialogue is resolved elsewhere). Add new English keys to
   `src/ui/i18n.catalog/` (never the locale overlays); the maintainer batch-fills
   locales at release.
 
 ## Adding things
+When new input/camera/perf logic gets non-trivial, extract the pure math here (the
+`click_move`/`pointer_pick`/`perf_doctor` pattern) and unit-test it, rather than
+growing `input.ts`.
+
 - **A new keybind/action:** add one entry to `BIND_ACTIONS` in `keybinds.ts`
   (`kind: 'held'` for movement polled in `readMoveInput`, else `'edge'`). For an
   edge action, extend `InputCallbacks.onUiKey`'s union and add a `case` in
@@ -65,7 +72,8 @@ command calls**. Everything here is DOM/WebAudio-only and runs in `main.ts`.
 - **A new SFX:** add a method to `GameAudio` composed from the private `tone()`
   /`noise()` primitives; call it from `main.ts`/HUD via the `audio` singleton.
 - **A new music cue/zone:** add a `MusicZone`, a `composeX()` theme, register it
-  in `init()`'s `themes` map, and drive it from `music.update(zone, inCombat)`.
+  in the `buildMusicThemes()` map (music.ts), and drive it from
+  `music.update(zone, inCombat)`.
 
 ## Never
 - Never read `localStorage`/`window`/`AudioContext` from a constructor without a

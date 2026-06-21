@@ -45,6 +45,12 @@ vi.mock('../server/chat_filter_db', () => ({
   resetChatStrikes: vi.fn(),
   updateFilterConfig: vi.fn(),
 }));
+vi.mock('../server/ip_block_db', () => ({
+  addBlockedIp: vi.fn(async () => '1.2.3.4'),
+  removeBlockedIp: vi.fn(async () => true),
+  listBlockedIps: vi.fn(async () => []),
+  cleanIp: (v: unknown) => (typeof v === 'string' ? v.trim() : ''),
+}));
 
 import { handleAdminApi, parsePageParams } from '../server/admin';
 import { accountForToken, isAdminAccount, findAccount } from '../server/db';
@@ -54,6 +60,7 @@ import {
   addFilterWord, chatModerationForAccount, getFilterConfig, liftChatMute, listFilterWords,
   removeFilterWord, resetChatStrikes, updateFilterConfig,
 } from '../server/chat_filter_db';
+import { addBlockedIp, removeBlockedIp } from '../server/ip_block_db';
 
 const VALID_TOKEN = 'a'.repeat(64);
 
@@ -94,6 +101,9 @@ const fakeGame: any = {
   reloadChatFilter: vi.fn(async () => {}),
   liftChatMuteLive: vi.fn(),
   resetChatStrikesLive: vi.fn(),
+  isIpBlocked: vi.fn(() => false),
+  reloadBlockedIps: vi.fn(async () => {}),
+  disconnectByIp: vi.fn(),
 };
 
 beforeEach(() => {
@@ -260,7 +270,7 @@ describe('admin api auth', () => {
     vi.mocked(accountDetail).mockResolvedValue({
       id: 9, username: 'badactor', createdAt: '', lastLogin: null, isAdmin: false,
       bannedAt: null, suspendedUntil: null, moderationReason: '',
-      chatMutedUntil: null, chatMuteReason: '', chatStrikes: 0,
+      chatMutedUntil: null, chatMuteReason: '', chatStrikes: 0, lastLoginIp: null,
       playtimeSeconds: 0, characters: [], recentSessions: [],
     });
     vi.mocked(moderationReportsForAccount).mockResolvedValue([]);
@@ -519,7 +529,7 @@ describe('admin api chat filter', () => {
     vi.mocked(accountDetail).mockResolvedValue({
       id: 9, username: 'badactor', createdAt: '', lastLogin: null, isAdmin: false,
       bannedAt: null, suspendedUntil: null, moderationReason: '',
-      chatMutedUntil: null, chatMuteReason: '', chatStrikes: 0,
+      chatMutedUntil: null, chatMuteReason: '', chatStrikes: 0, lastLoginIp: null,
       playtimeSeconds: 0, characters: [], recentSessions: [],
     });
     vi.mocked(moderationReportsForAccount).mockResolvedValue([]);
@@ -561,5 +571,72 @@ describe('escapeLike', () => {
     expect(escapeLike('a_b')).toBe('a\\_b');
     expect(escapeLike('back\\slash')).toBe('back\\\\slash');
     expect(escapeLike('plain')).toBe('plain');
+  });
+});
+
+describe('blocked-ips admin route', () => {
+  beforeEach(() => {
+    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(isAdminAccount).mockResolvedValue(true);
+  });
+
+  it('blocks an IP, reloads the cache and kicks live sessions on it', async () => {
+    const res = fakeRes();
+    await handleAdminApi(
+      fakeReq({ method: 'POST', token: VALID_TOKEN, url: '/admin/api/blocked-ips', body: { ip: '1.2.3.4', reason: 'bot' } }),
+      res,
+      fakeGame,
+    );
+    expect(res.statusCode).toBe(200);
+    expect(addBlockedIp).toHaveBeenCalled();
+    expect(fakeGame.reloadBlockedIps).toHaveBeenCalled();
+    expect(fakeGame.disconnectByIp).toHaveBeenCalledWith('1.2.3.4', expect.any(String));
+  });
+
+  it('returns 400 when blocking with a past expiry (addBlockedIp throws)', async () => {
+    vi.mocked(addBlockedIp).mockRejectedValueOnce(new Error('block expiry must be in the future'));
+    const res = fakeRes();
+    await handleAdminApi(
+      fakeReq({ method: 'POST', token: VALID_TOKEN, url: '/admin/api/blocked-ips', body: { ip: '1.2.3.4', expiresAt: '2000-01-01T00:00:00Z' } }),
+      res,
+      fakeGame,
+    );
+    expect(res.statusCode).toBe(400);
+    expect(fakeGame.disconnectByIp).not.toHaveBeenCalled();
+  });
+
+  it('unblocks an IP and reloads the cache', async () => {
+    vi.mocked(removeBlockedIp).mockResolvedValue(true);
+    const res = fakeRes();
+    await handleAdminApi(
+      fakeReq({ method: 'POST', token: VALID_TOKEN, url: '/admin/api/blocked-ips/delete', body: { ip: '1.2.3.4' } }),
+      res,
+      fakeGame,
+    );
+    expect(res.statusCode).toBe(200);
+    expect(removeBlockedIp).toHaveBeenCalledWith('1.2.3.4', 7);
+    expect(fakeGame.reloadBlockedIps).toHaveBeenCalled();
+  });
+
+  it('returns 404 when unblocking an IP that is not blocked', async () => {
+    vi.mocked(removeBlockedIp).mockResolvedValue(false);
+    const res = fakeRes();
+    await handleAdminApi(
+      fakeReq({ method: 'POST', token: VALID_TOKEN, url: '/admin/api/blocked-ips/delete', body: { ip: '1.2.3.4' } }),
+      res,
+      fakeGame,
+    );
+    expect(res.statusCode).toBe(404);
+  });
+
+  it('returns 400 when unblocking with an invalid IP', async () => {
+    const res = fakeRes();
+    await handleAdminApi(
+      fakeReq({ method: 'POST', token: VALID_TOKEN, url: '/admin/api/blocked-ips/delete', body: { ip: '' } }),
+      res,
+      fakeGame,
+    );
+    expect(res.statusCode).toBe(400);
+    expect(removeBlockedIp).not.toHaveBeenCalled();
   });
 });

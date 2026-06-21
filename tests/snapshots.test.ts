@@ -11,9 +11,10 @@ vi.mock('../server/db', () => ({
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
 }));
 
-import { GameServer, ClientSession } from '../server/game';
+import { GameServer, ClientSession, wireEntity } from '../server/game';
 import { saveCharacterState } from '../server/db';
 import { ClientWorld } from '../src/net/online';
+import { Sim } from '../src/sim/sim';
 import { DT, type PlayerClass } from '../src/sim/types';
 
 const DELTA_KEYS = ['inv', 'buyback', 'equip', 'qlog', 'qdone', 'cds', 'stats', 'weapon', 'party', 'trade', 'duel'];
@@ -786,5 +787,36 @@ describe('client-side delta merge', () => {
     (client as any).applySnapshot(lastSnap(fc.sent));
     expect(client.inventory).not.toBe(invRef);
     expect(client.inventory.some((s) => s.itemId === 'baked_bread')).toBe(true);
+  });
+});
+
+// Guild name rides the identity wire (terse key `gd`) so nearby players' plates
+// can show "<Guild>" under the name. setPlayerGuild is the server's only writer;
+// offline/headless never call it, so the field stays ''.
+describe('guild nameplate wire', () => {
+  it('carries the guild name through wireEntity only when set', () => {
+    const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Thaldrin');
+
+    expect(wireEntity(sim.entities.get(pid)!).gd).toBeUndefined();
+
+    sim.setPlayerGuild(pid, 'Silver Hand');
+    expect(wireEntity(sim.entities.get(pid)!).gd).toBe('Silver Hand');
+
+    // leaving the guild clears the field, so the line disappears for viewers
+    sim.setPlayerGuild(pid, '');
+    expect(wireEntity(sim.entities.get(pid)!).gd).toBeUndefined();
+  });
+
+  it('restores entity.guild on the client from a full record', () => {
+    const client = bareClient(99);
+    const base = { id: 7, k: 'player', tid: 'warrior', nm: 'Brae', lv: 5, x: 0, y: 0, z: 0, f: 0, hp: 100, mhp: 100 };
+
+    (client as any).applySnapshot({ t: 'snap', ents: [{ ...base, gd: 'Silver Hand' }] });
+    expect(client.entities.get(7)!.guild).toBe('Silver Hand');
+
+    // a later full record without `gd` means "no guild" → reset to ''
+    (client as any).applySnapshot({ t: 'snap', ents: [base] });
+    expect(client.entities.get(7)!.guild).toBe('');
   });
 });

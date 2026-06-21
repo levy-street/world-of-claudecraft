@@ -11,13 +11,17 @@ under `public/`. Run manually (not part of `npm run build`):
 
 - **`specs/*.json`** declare *what* to build — `{ items: [{ src, out, type, … }] }`.
   `src` is usually under `tmp/asset_src` (raw packs, gitignored); `out` is relative
-  to `public/`. Specs: `characters`, `dungeon`, `props`, `textures`, `lookdev`, `foliage`.
+  to `public/`. Specs: `characters`, `characters_v2`, `skeletons_v2`, `dungeon`,
+  `props`, `textures`, `lookdev`, `asset_bits`, `foliage`.
 - **`build_assets.mjs`** processes each item with `@gltf-transform` + `meshoptimizer`
   + `sharp`: `resample → prune → dedup → (textureCompress) → meshopt`. Types:
   `character`/`static` are geometry-safe (never join/flatten/**simplify** — would
   corrupt rigs/hard edges); `copy` is a byte-for-byte copy (HDRIs, plain textures).
   Clip names (`Armature|Idle`) are stripped to the last `|` segment + deduped;
-  `keepClips`/`renameClips`/`maxTex` are optional per item.
+  `keepClips`/`renameClips`/`maxTex`/`addClipsFrom`/`attachMeshes` are optional per
+  item. An item may use bulk `srcDir`/`outDir` (one item per `.gltf`/`.glb` in the
+  folder) instead of `src`/`out`, a top-level `defaults` block merges into every item
+  (item keys win), and `--shard i/n` processes only every n-th expanded item.
 - **`build_foliage.mjs`** is a superset for `foliage.json`: adds `weld + simplify`
   (target `ratio`), strips constant-white `COLOR_0`, and hue-rotates leaf textures
   via `recolor` rules. Use this only for foliage.

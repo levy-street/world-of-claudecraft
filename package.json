@@ -25,14 +25,15 @@
     "bench": "npm run build:env && node dist-env/env_server.cjs --bench",
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose down",
-    "build:server": "esbuild server/main.ts --bundle --platform=node --format=cjs --external:pg-native --external:bufferutil --external:utf-8-validate --outfile=dist-server/server.cjs",
+    "build:server": "node scripts/build_server.mjs",
     "server": "npm run build:server && node dist-server/server.cjs",
     "realms": "npm run build:server && node scripts/dev-realms.mjs",
     "admin:grant": "node scripts/grant_admin.mjs",
     "voices:gen": "node scripts/gen_npc_voices.mjs",
     "voices:lines": "node scripts/gen_npc_lines.mjs",
     "sfx:gen": "node scripts/gen_sfx.mjs",
-    "wiki:seed": "node scripts/mediawiki/build_seed.mjs"
+    "wiki:seed": "node scripts/mediawiki/build_seed.mjs",
+    "sim:nythraxis-matrix": "tsx scripts/nythraxis_matrix.ts"
   },
   "dependencies": {
     "@noble/curves": "^1.9.7",
@@ -58,6 +59,7 @@
     "@types/ws": "^8.18.1",
     "esbuild": "^0.28.1",
     "puppeteer-core": "^25.1.0",
+    "tsx": "^4.22.4",
     "typescript": "^5.5.0",
     "vite": "^8.0.16",
     "vitest": "^4.1.8"

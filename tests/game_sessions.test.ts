@@ -34,9 +34,6 @@ function expectJoined(result: ClientSession | { error: string }): ClientSession 
   return result;
 }
 
-const SOFT = 5; // MAX_WS_PER_IP_SOFT default
-const hasMultiIp = (s: ClientSession) => s.bot.evidence.some(e => e.kind === 'multi_ip');
-
 describe('GameServer sessions', () => {
   it('applies account-wide quest lockouts when a character joins', () => {
     const server = new GameServer();
@@ -299,41 +296,61 @@ describe('GameServer sessions', () => {
     expectJoined(server.join(fakeWs(), 30, 303, 'Gmcc', 'warrior', null, true));
     expect((server as any).sessionByCharacterId(303)).not.toBeNull();
   });
-});
 
-describe('multi_ip evidence lifecycle', () => {
-  // Distinct account/character ids per session so the per-account cap never rejects.
-  const joinIp = (server: GameServer, id: number, ip: string): ClientSession =>
-    expectJoined(server.join(fakeWs(), id, id, `Bot${id}`, 'warrior', null, false, { ip }));
-
-  it('flags every session on the IP once the soft threshold is exceeded — not just the last joiner', () => {
+  // The per-IP session count backs the hard connection cap (countIpSessions in
+  // main.ts). It is bookkeeping no other test now drives, so pin it directly.
+  it('tracks per-IP session counts across join/leave and deletes the entry at zero', async () => {
+    vi.mocked(saveCharacterState).mockResolvedValue(undefined);
     const server = new GameServer();
     const ip = '203.0.113.7';
-    const sessions: ClientSession[] = [];
-    for (let i = 1; i <= SOFT; i++) sessions.push(joinIp(server, i, ip));
-    expect(sessions.some(hasMultiIp)).toBe(false);   // at the threshold: none yet
+    expect(server.countIpSessions(ip)).toBe(0);
 
-    sessions.push(joinIp(server, SOFT + 1, ip));      // crosses it
-    expect(sessions.every(hasMultiIp)).toBe(true);    // ALL flagged, including the first joiner
+    const a = expectJoined(server.join(fakeWs(), 41, 401, 'Ipone', 'warrior', null, false, { ip }));
+    expect(server.countIpSessions(ip)).toBe(1);
+    const b = expectJoined(server.join(fakeWs(), 42, 402, 'Iptwo', 'mage', null, false, { ip }));
+    expect(server.countIpSessions(ip)).toBe(2);
+
+    await server.leave(a, 'test');
+    expect(server.countIpSessions(ip)).toBe(1);
+    expect((server as any).ipSessionCounts.has(ip)).toBe(true);
+
+    await server.leave(b, 'test');
+    expect(server.countIpSessions(ip)).toBe(0);
+    // deleted at zero so a churning IP cannot leak map entries
+    expect((server as any).ipSessionCounts.has(ip)).toBe(false);
   });
 
-  it('clears multi_ip from the remaining sessions once the IP drops back to the threshold', async () => {
+  it('decrements a per-IP count only once when leave runs twice (kick then socket close)', async () => {
+    // A kick that both closes the socket and calls leave() must not
+    // double-decrement, or the count would drift below the live total and
+    // weaken the hard cap. leave() is guarded by session.left, so it is idempotent.
+    vi.mocked(saveCharacterState).mockResolvedValue(undefined);
     const server = new GameServer();
     const ip = '203.0.113.8';
-    const sessions: ClientSession[] = [];
-    for (let i = 1; i <= SOFT + 1; i++) sessions.push(joinIp(server, i, ip));
-    expect(sessions.every(hasMultiIp)).toBe(true);
+    const a = expectJoined(server.join(fakeWs(), 43, 403, 'Ipsolo', 'warrior', null, false, { ip }));
+    const b = expectJoined(server.join(fakeWs(), 44, 404, 'Ipkick', 'rogue', null, false, { ip }));
+    expect(server.countIpSessions(ip)).toBe(2);
 
-    await server.leave(sessions[0], 'test');          // back down to the threshold
-    expect(sessions.slice(1).some(hasMultiIp)).toBe(false);
+    await server.leave(b, 'kick');
+    await server.leave(b, 'socket close'); // second call is a no-op
+    expect(server.countIpSessions(ip)).toBe(1);
+
+    await server.leave(a, 'test');
+    expect(server.countIpSessions(ip)).toBe(0);
   });
 
-  it('does not flag a session on a different IP', () => {
+  it('keeps per-IP session counts independent across different IPs', async () => {
+    vi.mocked(saveCharacterState).mockResolvedValue(undefined);
     const server = new GameServer();
-    const crowded: ClientSession[] = [];
-    for (let i = 1; i <= SOFT + 1; i++) crowded.push(joinIp(server, i, '203.0.113.9'));
-    const lonely = joinIp(server, 99, '198.51.100.1');
-    expect(crowded.every(hasMultiIp)).toBe(true);
-    expect(hasMultiIp(lonely)).toBe(false);
+    const ip1 = '198.51.100.1';
+    const ip2 = '198.51.100.2';
+    const a = expectJoined(server.join(fakeWs(), 45, 405, 'Neta', 'warrior', null, false, { ip: ip1 }));
+    expectJoined(server.join(fakeWs(), 46, 406, 'Netb', 'mage', null, false, { ip: ip2 }));
+    expect(server.countIpSessions(ip1)).toBe(1);
+    expect(server.countIpSessions(ip2)).toBe(1);
+
+    await server.leave(a, 'test');
+    expect(server.countIpSessions(ip1)).toBe(0);
+    expect(server.countIpSessions(ip2)).toBe(1);
   });
 });

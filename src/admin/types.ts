@@ -126,6 +126,7 @@ export interface AccountDetail {
   chatMutedUntil: string | null;
   chatMuteReason: string;
   chatStrikes: number;
+  lastLoginIp: string | null;
   playtimeSeconds: number;
   characters: {
     id: number;
@@ -144,6 +145,7 @@ export interface AccountDetail {
     startedAt: string;
     endedAt: string | null;
     seconds: number;
+    ip: string | null;
   }[];
 }
 
@@ -203,6 +205,20 @@ export interface ModerationAccountDetail {
   account: AccountDetail;
   reports: ReportDetail[];
   chat: ChatModerationDetail;
+  blockedIps: string[];
+}
+
+export interface BlockedIpRow {
+  id: number;
+  ip: string;
+  reason: string;
+  createdAt: string;
+  expiresAt: string | null;
+  createdByUsername: string | null;
+}
+
+export interface BlockedIpsData {
+  rows: BlockedIpRow[];
 }
 
 export interface FilterWord {

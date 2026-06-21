@@ -457,6 +457,7 @@ export interface AccountDetail {
   chatMutedUntil: string | null;
   chatMuteReason: string;
   chatStrikes: number;
+  lastLoginIp: string | null;
   playtimeSeconds: number;
   characters: {
     id: number;
@@ -475,6 +476,7 @@ export interface AccountDetail {
     startedAt: string;
     endedAt: string | null;
     seconds: number;
+    ip: string | null;
   }[];
 }
 
@@ -486,6 +488,7 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
               chat_muted_until,
               COALESCE(chat_mute_reason, '') AS chat_mute_reason,
               COALESCE(chat_strikes, 0) AS chat_strikes,
+              last_login_ip,
               COALESCE((SELECT sum(EXTRACT(EPOCH FROM (COALESCE(s.ended_at, now()) - s.started_at)))
                         FROM play_sessions s WHERE s.account_id = accounts.id), 0)::bigint AS playtime_seconds
        FROM accounts WHERE id = $1`,
@@ -500,7 +503,7 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
       [accountId],
     ),
     pool.query(
-      `SELECT id, character_name, started_at, ended_at,
+      `SELECT id, character_name, started_at, ended_at, ip_address,
               EXTRACT(EPOCH FROM (COALESCE(ended_at, now()) - started_at))::bigint AS seconds
        FROM play_sessions WHERE account_id = $1 ORDER BY started_at DESC LIMIT 20`,
       [accountId],
@@ -520,6 +523,7 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
     chatMutedUntil: a.chat_muted_until,
     chatMuteReason: a.chat_mute_reason,
     chatStrikes: Number(a.chat_strikes ?? 0),
+    lastLoginIp: a.last_login_ip ?? null,
     playtimeSeconds: Number(a.playtime_seconds),
     characters: characters.rows.map((c) => ({
       id: c.id,
@@ -538,6 +542,7 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
       startedAt: s.started_at,
       endedAt: s.ended_at,
       seconds: Number(s.seconds),
+      ip: s.ip_address ?? null,
     })),
   };
 }

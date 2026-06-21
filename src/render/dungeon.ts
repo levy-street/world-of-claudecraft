@@ -10,6 +10,7 @@
 //   Sunken Bastion (interior 'crypt',  origin x 1500 band) - teal flame, cargo/banners fortress
 //   Gravewyrm Sanctum (interior 'sanctum')                 - green ritual fire, necromantic
 //   Drowned Temple (interior 'temple')                     - pale moon-violet, drowned reliquaries
+//   Abandoned Crypt raid (interior 'nythraxis')            - dark violet soul wards
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
@@ -19,7 +20,7 @@ import { sharedUniforms } from './gfx';
 import { instanceOrigin } from '../sim/data';
 import {
   ARENA_LAYOUT, CRYPT_LAYOUT, SANCTUM_LAYOUT, TEMPLE_LAYOUT, DUNGEON_WALL_X, TOMB_HD,
-  DUNGEON_END_WALL_HW, DUNGEON_WALL_HEIGHT, DUNGEON_WALL_HW,
+  DUNGEON_END_WALL_HW, DUNGEON_WALL_HEIGHT, DUNGEON_WALL_HW, NYTHRAXIS_LAYOUT,
   DungeonLayout, GridPoint, WallStub,
 } from '../sim/dungeon_layout';
 
@@ -35,7 +36,12 @@ const FLOOR_CELL = 4; // kit floor tiles are 4x4 at MODULE_SCALE 1
 const FLOOR_Y = -0.05; // tile tops sit 0.05 above origin; sink so tops land at y=0
 const PILLAR_XZ_SCALE = 1.3; // 1.5u kit pillar -> ~1.95u footprint (collider r=1)
 
-type Variant = 'crypt' | 'bastion' | 'sanctum' | 'temple' | 'arena';
+export type DungeonInteriorVariant = 'crypt' | 'bastion' | 'sanctum' | 'temple' | 'arena' | 'nythraxis';
+type Variant = DungeonInteriorVariant;
+
+export function dungeonDaisHasRaisedPlatform(variant: DungeonInteriorVariant): boolean {
+  return variant !== 'arena' && variant !== 'nythraxis';
+}
 
 interface TorchColors {
   flame: number;
@@ -51,6 +57,7 @@ const TORCH_COLORS: Record<Variant, TorchColors> = {
   temple: { flame: 0xd9c9ff, emissive: 0x6a4fd0, light: 0xb79cff },
   // the Ashen Coliseum burns warm — amber braziers ringing the fighting sands
   arena: { flame: 0xffb24a, emissive: 0xcc5a14, light: 0xff9a3c },
+  nythraxis: { flame: 0x8f5cff, emissive: 0x4b1c9a, light: 0x7b4dff },
 };
 
 // The Drowned Temple is flooded — a translucent, self-animating water sheet
@@ -378,7 +385,8 @@ export class DungeonInteriors {
     await ensureDungeonAssets();
     const layout = interior === 'sanctum' ? SANCTUM_LAYOUT
       : interior === 'temple' ? TEMPLE_LAYOUT
-        : interior === 'arena' ? ARENA_LAYOUT : CRYPT_LAYOUT;
+        : interior === 'arena' ? ARENA_LAYOUT
+          : interior === 'nythraxis' ? NYTHRAXIS_LAYOUT : CRYPT_LAYOUT;
     const variant = this.variantFor(interior, ox);
     const group = new THREE.Group();
     const p = new Placements();
@@ -527,6 +535,7 @@ export class DungeonInteriors {
   // (instanceOrigin in sim/data.ts: 900 + index*600) says which dungeon.
   private variantFor(interior: string, ox: number): Variant {
     if (interior === 'arena') return 'arena';
+    if (interior === 'nythraxis') return 'nythraxis';
     if (interior === 'sanctum') return 'sanctum';
     if (interior === 'temple') return 'temple';
     const bastionX = instanceOrigin(1, 0).x;
@@ -573,14 +582,16 @@ export class DungeonInteriors {
 
   private pendingArenaWalls(layout: DungeonLayout, ox: number, oz: number): PendingArenaWalls {
     const topY = DUNGEON_WALL_HEIGHT;
+    const wallX = layout.wallX ?? DUNGEON_WALL_X;
+    const endWallHw = layout.endWallHw ?? DUNGEON_END_WALL_HW;
     const wall = (footprint: ArenaWallFootprint): PendingArenaWall => ({
       placements: new Placements(),
       footprint,
     });
-    const left = wall({ x: ox - DUNGEON_WALL_X, z: oz + layout.sideWallZ, hw: DUNGEON_WALL_HW, hd: layout.sideWallHd, topY });
-    const right = wall({ x: ox + DUNGEON_WALL_X, z: oz + layout.sideWallZ, hw: DUNGEON_WALL_HW, hd: layout.sideWallHd, topY });
-    const front = wall({ x: ox, z: oz + layout.zMin, hw: DUNGEON_END_WALL_HW, hd: DUNGEON_WALL_HW, topY });
-    const back = wall({ x: ox, z: oz + layout.zMax, hw: DUNGEON_END_WALL_HW, hd: DUNGEON_WALL_HW, topY });
+    const left = wall({ x: ox - wallX, z: oz + layout.sideWallZ, hw: DUNGEON_WALL_HW, hd: layout.sideWallHd, topY });
+    const right = wall({ x: ox + wallX, z: oz + layout.sideWallZ, hw: DUNGEON_WALL_HW, hd: layout.sideWallHd, topY });
+    const front = wall({ x: ox, z: oz + layout.zMin, hw: endWallHw, hd: DUNGEON_WALL_HW, topY });
+    const back = wall({ x: ox, z: oz + layout.zMax, hw: endWallHw, hd: DUNGEON_WALL_HW, topY });
     return {
       left,
       right,
@@ -678,8 +689,9 @@ export class DungeonInteriors {
   // 4u tile grid covering the room (x -24..24, z just past both end walls)
   private placeFloor(p: Placements, layout: DungeonLayout, variant: Variant): void {
     const quarter = Math.PI / 2;
+    const floorHalfX = layout.floorHalfX ?? 22;
     for (let z = layout.zMin - 2; z <= layout.zMax + 2; z += FLOOR_CELL) {
-      for (let x = -22; x <= 22; x += FLOOR_CELL) {
+      for (let x = -floorHalfX; x <= floorHalfX; x += FLOOR_CELL) {
         let kind = this.floorKind(variant, hash2(x * 1.31, z));
         if (kind === 'grate' && Math.abs(x) < 4) kind = 'floor_tile_large'; // keep pits off the walk aisle
         if (kind === 'grate') {
@@ -749,21 +761,23 @@ export class DungeonInteriors {
     arenaWalls?: PendingArenaWalls,
   ): void {
     const bannerEvery = variant === 'crypt' ? 4 : 3;
+    const wallX = layout.wallX ?? DUNGEON_WALL_X;
+    const endWallHw = layout.endWallHw ?? DUNGEON_END_WALL_HW;
     for (const side of [-1, 1]) {
       const target = arenaWalls ? (side < 0 ? arenaWalls.left.placements : arenaWalls.right.placements) : p;
       const ry = side < 0 ? Math.PI / 2 : -Math.PI / 2; // detail + banners face the room
       let i = 0;
       for (let z = layout.zMin; z <= layout.zMax + 2; z += 8, i++) {
         const kind = this.wallKind(variant, hash2(side * 13.7, z));
-        target.add(kind, side * DUNGEON_WALL_X, 0, z, ry, MODULE_SCALE);
+        target.add(kind, side * wallX, 0, z, ry, MODULE_SCALE);
         if (i % bannerEvery === 2 && kind !== 'wall_archedwindow_gated') {
-          target.add(this.bannerKind(variant, hash2(z, side * 7.3)), side * DUNGEON_WALL_X, 0, z, ry, MODULE_SCALE);
+          target.add(this.bannerKind(variant, hash2(z, side * 7.3)), side * wallX, 0, z, ry, MODULE_SCALE);
         }
       }
     }
     for (const end of [{ z: layout.zMin, ry: 0 }, { z: layout.zMax, ry: Math.PI }]) {
       const target = arenaWalls ? (end.z === layout.zMin ? arenaWalls.front.placements : arenaWalls.back.placements) : p;
-      for (let x = -20; x <= 20; x += 8) {
+      for (let x = -endWallHw + 4; x <= endWallHw - 4; x += 8) {
         const kind = this.wallKind(variant, hash2(x, end.z * 3.1));
         target.add(kind, x, 0, end.z, end.ry, MODULE_SCALE);
       }
@@ -890,10 +904,10 @@ export class DungeonInteriors {
   // walkable — deliberately NO collider, matching the layout contract).
   private placeDais(group: THREE.Group, p: Placements, layout: DungeonLayout, variant: Variant): void {
     const d = layout.dais;
-    // the arena keeps a flat fighting floor: no raised platform or rim clutter,
-    // just a warm light pool burned into the centre of the sands
-    if (variant === 'arena') {
-      this.addTorchGlow(group, d.x, d.z, TORCH_COLORS.arena.light, 0.07, 2.4);
+    // The arena and Nythraxis raid keep flat fighting floors: no raised platform
+    // or rim clutter to visually disagree with the walkable sim collision.
+    if (!dungeonDaisHasRaisedPlatform(variant)) {
+      this.addTorchGlow(group, d.x, d.z, TORCH_COLORS[variant].light, 0.07, 2.4);
       return;
     }
     const quarter = Math.PI / 2;
@@ -986,7 +1000,7 @@ export class DungeonInteriors {
       p.add('rubble_half', x < 0 ? -22 : 22, 0, z, x < 0 ? 0 : Math.PI, 1.1);
     }
 
-    const wallEdge = DUNGEON_WALL_X - 1.6; // just proud of the wall face
+    const wallEdge = (layout.wallX ?? DUNGEON_WALL_X) - 1.6; // just proud of the wall face
     if (variant === 'crypt') {
       for (let z = layout.zMin + 26; z < layout.zMax - 8; z += 19) {
         for (const side of [-1, 1]) {

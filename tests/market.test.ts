@@ -307,4 +307,37 @@ describe('the World Market — the Merchant', () => {
     const ids = sim2.marketListings.map((l) => l.id);
     expect(new Set(ids).size).toBe(ids.length); // no id collisions
   });
+
+  it('always wires a seller their own listings even when the market overflows the wire cap', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    standAtMerchant(sim, seller);
+
+    // The seller fills all 12 of their slots. Their item name ('wolf_fang')
+    // sorts late in the alphabet on purpose.
+    sim.addItem('wolf_fang', 12, seller);
+    for (let i = 0; i < 12; i++) sim.marketList('wolf_fang', 1, 100 + i, seller);
+
+    // Flood the shared market with 200 other-seller listings whose names sort
+    // first, pushing the seller's own goods well past MARKET_WIRE_LIMIT (120).
+    const internals = sim as unknown as { marketListings: Array<Record<string, unknown>>; nextListingId: number };
+    for (let i = 0; i < 200; i++) {
+      internals.marketListings.push({
+        id: internals.nextListingId++,
+        sellerKey: `Other${i}`, sellerName: `Other${i}`,
+        itemId: 'aaa_filler', count: 1, price: 50,
+        expiresAt: sim.time + 1000, house: false,
+      });
+    }
+
+    const info = sim.marketInfoFor(seller)!;
+    // The "X / 12" slot count the SELL tab shows.
+    expect(info.myListingCount).toBe(12);
+    // Every one of the seller's own listings must be present in the wired set,
+    // so the count never claims more than the player can actually see.
+    const mineWired = info.listings.filter((l) => l.mine).length;
+    expect(mineWired).toBe(info.myListingCount);
+    // The wire cap is still respected overall.
+    expect(info.listings.length).toBeLessThanOrEqual(120);
+  });
 });

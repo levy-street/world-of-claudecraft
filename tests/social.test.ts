@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
 import { ALL_CLASSES, MAX_LEVEL, dist2d } from '../src/sim/types';
-import { CLASSES, MOBS, abilitiesKnownAt, instanceOrigin, CRYPT_SPAWNS } from '../src/sim/data';
+import { CLASSES, MOBS, abilitiesKnownAt, instanceOrigin, CRYPT_SPAWNS, DUNGEON_X_THRESHOLD, dungeonAt } from '../src/sim/data';
 import { groundHeight } from '../src/sim/world';
 
 function makeWorld() {
@@ -19,6 +19,17 @@ function face(sim: Sim, pid: number, targetId: number) {
   const e = sim.entities.get(pid)!;
   const t = sim.entities.get(targetId)!;
   e.facing = Math.atan2(t.pos.x - e.pos.x, t.pos.z - e.pos.z);
+}
+
+function fillPartyToFive(sim: Sim, leader: number): number[] {
+  const added: number[] = [];
+  while ((sim.partyOf(leader)?.members.length ?? 1) < 5) {
+    const pid = sim.addPlayer('priest', `RaidFill${added.length}`);
+    sim.partyInvite(pid, leader);
+    sim.partyAccept(pid);
+    added.push(pid);
+  }
+  return added;
 }
 
 function nearestMob(sim: Sim, templateId: string, from: { x: number; z: number } = { x: 0, z: 0 }) {
@@ -335,6 +346,62 @@ describe('parties', () => {
     const info = sim.partyInfo!.members.find((m) => m.pid === b)!;
     expect(info.x).toBeCloseTo(17, 3);
     expect(info.z).toBeCloseTo(-23, 3);
+  });
+
+  it('converts a party to a two-group raid with a ten player cap', () => {
+    const sim = makeWorld();
+    const leader = sim.addPlayer('warrior', 'Leader');
+    const pids = Array.from({ length: 10 }, (_, i) => sim.addPlayer('priest', `Raid${i}`));
+    for (const pid of pids.slice(0, 3)) {
+      sim.partyInvite(pid, leader);
+      sim.partyAccept(pid);
+    }
+    sim.convertPartyToRaid(leader);
+    expect(sim.partyOf(leader)?.raid).toBe(false);
+    sim.partyInvite(pids[3], leader);
+    sim.partyAccept(pids[3]);
+    sim.convertPartyToRaid(leader);
+    for (const pid of pids.slice(4, 9)) {
+      sim.partyInvite(pid, leader);
+      sim.partyAccept(pid);
+    }
+    const party = sim.partyOf(leader)!;
+    expect(party.raid).toBe(true);
+    expect(party.members).toHaveLength(10);
+    expect(party.members.filter((pid) => party.raidGroups.get(pid) === 1)).toHaveLength(5);
+    expect(party.members.filter((pid) => party.raidGroups.get(pid) === 2)).toHaveLength(5);
+
+    sim.partyInvite(pids[9], leader);
+    sim.partyAccept(pids[9]);
+    expect(sim.partyOf(pids[9])).toBeNull();
+    expect(party.members).toHaveLength(10);
+  });
+
+  it('only the raid leader can move members between raid groups', () => {
+    const { sim, a, b } = makeDuo();
+    const [c] = fillPartyToFive(sim, a);
+    sim.convertPartyToRaid(a);
+    sim.moveRaidMember(c, 2, b);
+    expect(sim.partyOf(a)?.raidGroups.get(c)).toBe(1);
+    sim.moveRaidMember(c, 2, a);
+    expect(sim.partyOf(a)?.raidGroups.get(c)).toBe(2);
+    expect(sim.partyInfo?.raid).toBe(true);
+    expect(sim.partyInfo?.members.find((m) => m.pid === c)?.group).toBe(2);
+  });
+
+  it('blocks raid groups from standard dungeons while requiring raid groups for Nythraxis entry', () => {
+    const sim = makeWorld();
+    const leader = sim.addPlayer('warrior', 'Leader');
+    sim.players.get(leader)!.questsDone.add('q_nythraxis_bound_guardian');
+    sim.enterDungeon('nythraxis_boss_arena', leader);
+    expect(sim.entities.get(leader)!.pos.x).toBeLessThan(DUNGEON_X_THRESHOLD);
+
+    fillPartyToFive(sim, leader);
+    sim.convertPartyToRaid(leader);
+    sim.enterDungeon('sunken_bastion', leader);
+    expect(sim.entities.get(leader)!.pos.x).toBeLessThan(DUNGEON_X_THRESHOLD);
+    sim.enterDungeon('nythraxis_boss_arena', leader);
+    expect(dungeonAt(sim.entities.get(leader)!.pos.x)?.id).toBe('nythraxis_boss_arena');
   });
 
   it('party members share kill xp with the group bonus and quest credit', () => {

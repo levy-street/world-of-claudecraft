@@ -2,7 +2,7 @@ import { generateDecorations, groundHeight } from './world';
 import {
   DUNGEON_X_THRESHOLD, INSTANCE_SLOT_COUNT, PROPS, arenaOriginAt, dungeonAt, instanceOrigin, isArenaPos,
 } from './data';
-import { ARENA_LAYOUT, CRYPT_LAYOUT, SANCTUM_LAYOUT, TEMPLE_LAYOUT, layoutColliders } from './dungeon_layout';
+import { ARENA_LAYOUT, CRYPT_LAYOUT, NYTHRAXIS_LAYOUT, SANCTUM_LAYOUT, TEMPLE_LAYOUT, layoutColliders } from './dungeon_layout';
 
 // Static world collision. Prop placement comes from the per-zone content
 // modules (merged into PROPS by sim/data.ts): the renderer builds its meshes
@@ -135,12 +135,14 @@ const CRYPT_COLLIDERS: Collider[] = layoutColliders(CRYPT_LAYOUT);
 const SANCTUM_COLLIDERS: Collider[] = layoutColliders(SANCTUM_LAYOUT);
 const TEMPLE_COLLIDERS: Collider[] = layoutColliders(TEMPLE_LAYOUT);
 const ARENA_COLLIDERS: Collider[] = layoutColliders(ARENA_LAYOUT);
+const NYTHRAXIS_COLLIDERS: Collider[] = layoutColliders(NYTHRAXIS_LAYOUT);
 
 // Interior collider sets keyed by DungeonDef.interior.
 const INTERIOR_COLLIDERS: Record<string, Collider[]> = {
   crypt: CRYPT_COLLIDERS,
   sanctum: SANCTUM_COLLIDERS,
   temple: TEMPLE_COLLIDERS,
+  nythraxis: NYTHRAXIS_COLLIDERS,
 };
 
 // ---------------------------------------------------------------------------

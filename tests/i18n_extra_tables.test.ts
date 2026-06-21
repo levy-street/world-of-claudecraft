@@ -126,7 +126,9 @@ describe("sim/server EXTRA localization tables (untracked by the registry)", () 
 // host-locale toLocale*() or an ad-hoc Intl constructed outside the helper modules.
 // ---------------------------------------------------------------------------
 function walk(dir: string, out: string[] = []): string[] {
+  const skipDirs = new Set(["i18n.resolved.generated"]);
   for (const name of readdirSync(dir)) {
+    if (skipDirs.has(name)) continue;
     const p = path.join(dir, name);
     const st = statSync(p);
     if (st.isDirectory()) walk(p, out);

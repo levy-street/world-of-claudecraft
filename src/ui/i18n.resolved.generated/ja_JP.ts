@@ -232,8 +232,110 @@ export const ja_JP: EnTranslations = {
       "showWalletOnCharacterScreen": "キャラクター画面にウォレットを表示",
       "showWalletOnPlayerCard": "プレイヤーカードにウォレットを表示"
     },
+    "perf": {
+      "title": "パフォーマンスオーバーレイ",
+      "enable": "パフォーマンスオーバーレイを表示",
+      "description": "表示する統計、オーバーレイの位置、外観を設定します。",
+      "sectionPosition": "位置",
+      "sectionAppearance": "外観",
+      "sectionStats": "統計",
+      "positionX": "横位置",
+      "positionY": "縦位置",
+      "resetPosition": "位置をリセット",
+      "dragHint": "オーバーレイをドラッグするか、下のスライダーで移動します。",
+      "opacity": "背景の不透明度",
+      "solidBg": "不透明な背景",
+      "fontScale": "文字サイズ",
+      "textColor": "文字色",
+      "bgColor": "背景色",
+      "colorTheme": "カラーテーマ",
+      "graph": "フレームタイムグラフ",
+      "thresholds": "警告の色分け表示",
+      "presetsLabel": "クイックプリセット",
+      "presetMinimal": "最小限",
+      "presetStandard": "標準",
+      "presetEverything": "すべて",
+      "groups": {
+        "frame": "フレームとタイミング",
+        "network": "ネットワーク",
+        "renderer": "レンダラー",
+        "system": "システム"
+      },
+      "labels": {
+        "fps": "FPS",
+        "frameTime": "フレームタイム",
+        "fps1Low": "下位1%",
+        "fps01Low": "下位0.1%",
+        "ping": "Ping",
+        "jitter": "ジッター",
+        "snapshot": "スナップショットレート",
+        "connection": "接続",
+        "drawCalls": "ドローコール",
+        "triangles": "三角形",
+        "geometries": "ジオメトリ",
+        "textures": "テクスチャ",
+        "programs": "シェーダー",
+        "renderScale": "レンダースケール",
+        "gpu": "GPU",
+        "memory": "メモリ",
+        "hitches": "カクつき",
+        "entities": "エンティティ"
+      },
+      "themes": {
+        "gold": "ゴールド",
+        "frost": "フロスト",
+        "ember": "エンバー",
+        "jade": "ジェイド",
+        "crimson": "クリムゾン",
+        "mono": "モノクロ"
+      },
+      "units": {
+        "ms": "{value} ms",
+        "mb": "{value} MB",
+        "memPair": "{used} / {limit} MB",
+        "hz": "{value} Hz"
+      },
+      "badges": {
+        "backgrounded": "バックグラウンド",
+        "offline": "オフライン"
+      }
+    },
     "playerCard": {
       "showWalletBadge": "ウォレットバッジを表示"
+    },
+    "statInfo": {
+      "fromYour": "あなたの{stat}{value}による効果:",
+      "desc": {
+        "str": "攻撃力を上昇させ、武器による攻撃の威力を高めます。",
+        "agi": "反射神経と狙いを鋭くし、複数の戦闘ステータスを向上させます。",
+        "sta": "肉体を強化し、最大体力と休憩中の体力回復速度を高めます。",
+        "int": "術者の最大マナを増やし、呪文のクリティカル発生率を向上させます。",
+        "spi": "戦闘外で休憩している間の、術者のマナ回復速度を速めます。",
+        "armor": "物理攻撃のダメージを軽減します。軽減量は格下の攻撃者に対してより大きくなり、上限は75%です。",
+        "attackPower": "武器による攻撃を強化します。攻撃力14ごとに秒間ダメージが1上昇します。",
+        "dps": "武器のダメージと速度に攻撃力を組み合わせて算出した、推定の秒間ダメージです。",
+        "critChance": "攻撃がクリティカルとなり、ダメージが2倍になる確率です。",
+        "dodge": "迫り来る近接攻撃を完全に回避し、ダメージを受けない確率です。"
+      },
+      "effects": {
+        "attackPower": "攻撃力 +{value}",
+        "rangedAttackPower": "遠隔攻撃力 +{value}",
+        "critPct": "クリティカル +{value}%",
+        "dodgePct": "回避 +{value}%",
+        "armor": "防御力 +{value}",
+        "maxHealth": "最大体力 +{value}",
+        "maxMana": "最大マナ +{value}",
+        "spellCritPct": "呪文クリティカル +{value}%",
+        "healthRegen": "休憩中、5秒ごとに体力が約{value}回復",
+        "manaRegen": "休憩中、5秒ごとにマナが約{value}回復",
+        "damageReduction": "レベル{level}の攻撃者に対するダメージ軽減: {value}%",
+        "dpsFromAp": "攻撃の秒間ダメージを{value}上昇させます"
+      },
+      "notes": {
+        "minorForClass": "あなたのクラスにはほとんど効果がありません。",
+        "baseChance": "全ての冒険者が共有する5%の基本確率を含みます。",
+        "dpsApprox": "推定値であり、クリティカルやアビリティによるダメージは含みません。"
+      }
     },
     "talents": {
       "defaultBuildName": "ビルド {n}"
@@ -285,13 +387,56 @@ export const ja_JP: EnTranslations = {
       "emittedLabel": "{pct}% of the pool paid out so far",
       "sinkLabel": "Funded",
       "emissionLabel": "Paid out",
-      "invariant": "Payouts can never exceed what the season took in — buy > sell, enforced on-chain.",
+      "invariant": "Payouts can never exceed what the season took in: buy > sell, enforced on-chain.",
       "standingsTitle": "Projected top earners",
       "colRank": "#",
       "colPlayer": "Player",
       "colRating": "Rating",
       "colReward": "Reward ($WOC)",
       "projectedNote": "Projected from the current pool + arena ranking; final payouts settle at season close."
+    },
+    "account": {
+      "title": "アカウント",
+      "loggedOutPrompt": "アカウントを管理するにはログインしてください。",
+      "memberSince": "登録日：{date}",
+      "sectionSettings": "アカウント設定",
+      "sectionWallet": "$WOC ウォレット",
+      "sectionCharacters": "キャラクター",
+      "sectionDanger": "危険な操作",
+      "changePassword": "パスワードの変更",
+      "currentPassword": "現在のパスワード",
+      "newPassword": "新しいパスワード",
+      "confirmNewPassword": "新しいパスワードを確認",
+      "savePassword": "パスワードを更新",
+      "passwordChanged": "パスワードを更新しました。他のデバイスからログアウトされました。",
+      "errCurrentRequired": "現在のパスワードを入力してください。",
+      "errPasswordShort": "新しいパスワードは6文字以上にしてください。",
+      "errPasswordLong": "新しいパスワードは128文字以内にしてください。",
+      "errPasswordUnchanged": "新しいパスワードは現在のものと異なる必要があります。",
+      "errPasswordConfirm": "新しいパスワードが一致しません。",
+      "emailLabel": "メールアドレス（任意）",
+      "emailHint": "アカウント復旧にのみ使用します。宣伝メールは一切送信しません。",
+      "saveEmail": "メールを保存",
+      "emailSaved": "メールを保存しました。",
+      "errEmailInvalid": "有効なメールアドレスを入力してください。",
+      "errCurrentPassword": "現在のパスワードが正しくありません。",
+      "errUsernameMatch": "そのユーザー名はアカウントと一致しません。",
+      "errPasswordIncorrect": "パスワードが正しくありません。",
+      "errCharactersOnline": "無効化する前にすべてのキャラクターからログアウトしてください。",
+      "deactivatedLocked": "このアカウントは無効化されています。復元するには管理者に連絡してください。",
+      "charactersSummary": "キャラクターを管理してワールドに入りましょう。",
+      "charactersCount": "キャラクター：{count}",
+      "goToCharacters": "キャラクターを表示",
+      "walletSummary": "Solana ウォレットを認証してプレイヤーカードに保有者バッジを表示します。",
+      "manageWallet": "ウォレットを管理",
+      "deactivate": "アカウントを無効化",
+      "deactivateWarning": "無効化するとアカウントがロックされ、すべてのデバイスからログアウトされます。復元するには管理者に連絡してください。ユーザー名とパスワードを再入力して確認してください。",
+      "confirmUsername": "確認のためユーザー名を入力",
+      "confirmPassword": "パスワード",
+      "deactivateConfirm": "アカウントを無効化する",
+      "deactivated": "アカウントが無効化されました。",
+      "logOut": "ログアウト",
+      "logOutSummary": "このデバイスからログアウトします。"
     }
   },
   "skinEvent": {
@@ -336,6 +481,8 @@ export const ja_JP: EnTranslations = {
     "news": "ニュース",
     "download": "ダウンロード",
     "loginRegister": "ログイン/登録",
+    "account": "アカウント",
+    "logout": "ログアウト",
     "donate": "寄付"
   },
   "stats": {
@@ -529,36 +676,36 @@ export const ja_JP: EnTranslations = {
         "flavor": "あなたが動けば市場が感じ取ります: 供給量の 1%。"
       },
       "tidelord": {
-        "name": "Tidelord",
-        "flavor": "The tide answers your call: 2% of supply."
+        "name": "潮の君主",
+        "flavor": "潮があなたの呼び声に応えます: 供給量の 2%。"
       },
       "stormcaller": {
-        "name": "Stormcaller",
-        "flavor": "Storms gather at your name: 3% of supply."
+        "name": "嵐呼び",
+        "flavor": "あなたの名に嵐が集います: 供給量の 3%。"
       },
       "krakencrown": {
-        "name": "Krakencrown",
-        "flavor": "Crowned by the deep: 4% of supply."
+        "name": "クラーケンの冠",
+        "flavor": "深海に冠を授けられています: 供給量の 4%。"
       },
       "titanforged": {
-        "name": "Titanforged",
-        "flavor": "Forged among titans: 5% of supply."
+        "name": "タイタン鍛造",
+        "flavor": "タイタンたちの間で鍛えられました: 供給量の 5%。"
       },
       "starhoard": {
-        "name": "Starhoard",
-        "flavor": "A hoard that bends starlight: 6% of supply."
+        "name": "星の秘蔵",
+        "flavor": "星光を曲げるほどの宝庫です: 供給量の 6%。"
       },
       "voidwarden": {
-        "name": "Voidwarden",
-        "flavor": "Keeper at the void's edge: 7% of supply."
+        "name": "虚空の番人",
+        "flavor": "虚空の縁を守っています: 供給量の 7%。"
       },
       "realmshaper": {
-        "name": "Realmshaper",
-        "flavor": "You reshape the realm: 8% of supply."
+        "name": "領域形成者",
+        "flavor": "あなたは領域を作り変えます: 供給量の 8%。"
       },
       "worldforger": {
-        "name": "Worldforger",
-        "flavor": "Forging a world of your own: 9% of supply."
+        "name": "世界鍛造者",
+        "flavor": "自分だけの世界を鍛えています: 供給量の 9%。"
       },
       "worldbearer": {
         "name": "世界を担う者",
@@ -1230,6 +1377,7 @@ export const ja_JP: EnTranslations = {
         "unignoreChat": "チャット無視解除",
         "report": "プレイヤーを通報",
         "removeParty": "パーティから外す",
+        "convertToRaid": "レイドに変換",
         "cancel": "キャンセル"
       }
     },
@@ -1448,6 +1596,12 @@ export const ja_JP: EnTranslations = {
       "guildTab": "ギルド",
       "ignoreTab": "無視",
       "leaveParty": "パーティを抜ける",
+      "raidTab": "レイド",
+      "raidEmpty": "パーティをレイドに変換すると、ここでレイドグループを管理できます。",
+      "raidGroupEmpty": "このグループにプレイヤーはいません。",
+      "raidGroupTitle": "グループ {position} ({count}/5)",
+      "raidMoveToGroup": "グループ {position} に移動",
+      "raidLeader": "レイドリーダー",
       "offlineEmpty": "フレンド、ギルド、無視リストはオンラインプレイで利用できます。",
       "friendsEmpty": "フレンドはまだいません。下で名前を検索してください。",
       "ignoreEmpty": "無視リストは空です。",
@@ -1548,6 +1702,8 @@ export const ja_JP: EnTranslations = {
       "title": "魔法書",
       "classSubtitle": "{className}の能力",
       "close": "魔法書を閉じる",
+      "resetBar": "バーをリセット",
+      "resetBarAria": "現在のアクションバーを初期の能力にリセット",
       "trainableAtLevel": "レベル{level}で習得可能",
       "learnAtLevel": "レベル{level}で習得します。",
       "knownAbilityAria": "{name}、ランク{rank}。{summary}",
@@ -1683,7 +1839,8 @@ export const ja_JP: EnTranslations = {
       "common": "一般",
       "uncommon": "良質",
       "rare": "レア",
-      "epic": "エピック"
+      "epic": "エピック",
+      "legendary": "伝説"
     },
     "kind": {
       "weapon": "武器",
@@ -1860,6 +2017,16 @@ export const ja_JP: EnTranslations = {
     "loot": {
       "takeAll": "すべて取る",
       "close": "戦利品を閉じる"
+    },
+    "lootRoll": {
+      "title": "戦利品ロール",
+      "need": "必要",
+      "greed": "強欲",
+      "pass": "パス",
+      "needAria": "{item}を必要",
+      "greedAria": "{item}を強欲",
+      "passAria": "{item}をパス",
+      "everyonePassed": "全員が{item}をパスしました。"
     }
   },
   "entities": {
@@ -3380,6 +3547,36 @@ export const ja_JP: EnTranslations = {
       "event_skin_token": {
         "name": "謎めいた装いの宝箱"
       },
+      "deathless_heartwood": {
+        "name": "不死王冠の心材"
+      },
+      "kingsbane_last_oath": {
+        "name": "キングスベイン、ソーンピーク最後の誓い"
+      },
+      "crownforged_dreadhelm": {
+        "name": "冠鍛えの恐怖兜"
+      },
+      "crownforged_warspaulders": {
+        "name": "冠鍛えの戦肩当て"
+      },
+      "nighttalon_crown": {
+        "name": "夜爪の冠"
+      },
+      "nighttalon_shoulderguards": {
+        "name": "夜爪の肩守り"
+      },
+      "soulflame_cowl": {
+        "name": "魂炎の頭巾"
+      },
+      "soulflame_mantle": {
+        "name": "魂炎のマント"
+      },
+      "stormcallers_crown": {
+        "name": "嵐呼びの冠"
+      },
+      "stormcallers_spaulders": {
+        "name": "嵐呼びの肩当て"
+      },
       "unknown_alien_weaponry": {
         "name": "未知の異星武装"
       },
@@ -3594,6 +3791,12 @@ export const ja_JP: EnTranslations = {
       },
       "bound_guardian": {
         "name": "縛られし守護者"
+      },
+      "nythraxis_skeleton_warrior": {
+        "name": "蘇った王家の衛兵"
+      },
+      "nythraxis_scourge_of_thornpeak": {
+        "name": "ナイスラクシス、ソーンピークの災厄"
       },
       "brightwood_hare": {
         "name": "ブライトウッドの野ウサギ"
@@ -3846,6 +4049,11 @@ export const ja_JP: EnTranslations = {
         "name": "レンジャー・エルウィン",
         "title": "林間の守り手",
         "greeting": "静かに、{className}。今日の林間は穏やかだ。私はこのまま保つつもりでね。"
+      },
+      "brother_aldric_raid": {
+        "name": "アルドリック修道士",
+        "title": "谷の司祭",
+        "greeting": "礼拝堂の墓地から世界の屋根まで... 足跡はここで終わります。山が耳を澄ませているのを感じます。"
       },
       "tidewatcher_ondrel": {
         "name": "オンドレル・ヴェイン",
@@ -4573,7 +4781,7 @@ export const ja_JP: EnTranslations = {
       "q_nythraxis_bound_guardian": {
         "title": "縛られし守護者",
         "text": "ヴォスは、生存者たちが偶然や野心でニスラクシスの墓に辿り着く者を防ぐため、王の印章指輪を古代の守護者の奥に封じたと記しています。墓所の要石を、廃棄された墓所の東、西の墓の南東にある平地の儀式陣へ持っていってください。そこで使い、守護者を破り、指輪を持ち帰ってください。",
-        "completion": "三つの遺物は同じ物語を語っています。オルドレンは王を守るために戦い、マルリックは死の境界を破り、ヴォスはその後に起きたことを止めようとしました。封印は弱まり、この指輪こそニスラクシスの墓への鍵です。あなたは今、ニスラクシスの墓所へ入るための調律を終えました。",
+        "completion": "三つの遺物は同じ物語を語っています。アルドレンは王を守るために戦い、マルリックは死の境界を破り、ヴォスはその後に起きたことを止めようとしました。封印は弱まり、この指輪こそニスラクシスの墓への鍵です。あなたは今、ニスラクシスの墓所へ入るための調律を終えました。廃れた墓所へ戻り、王家の扉を開き、古き王の怒りがソーンピークの外へ溢れる前にニスラクシスと対峙してください。",
         "objectives": {
           "0": {
             "label": "儀式の円で地下墓所の要石を使用"
@@ -4583,6 +4791,16 @@ export const ja_JP: EnTranslations = {
           },
           "2": {
             "label": "王の印章指輪"
+          }
+        }
+      },
+      "q_nythraxis_scourges_end": {
+        "title": "災厄の終わり",
+        "text": "印章指輪が道を開きました、{playerName}。しかし開かれた墓は勝利ではありません。ニスラクシスはかつて王であり、ソーンピークの地下の廃墟はいまも彼の意志に縛られています。信頼できる仲間とともに墓所へ入り、不死の王冠の命令が上の戦場へ届く前に打ち砕いてください。",
+        "completion": "これで王冠はついに沈黙しました。ソーンピークはなお死者を抱えるでしょうが、山の下の王が彼らを再び戦へ呼ぶことはありません。あなたは、アルドレン、マルリック、そしてヴォスが封じることしかできなかったものを終わらせました。",
+        "objectives": {
+          "0": {
+            "label": "ニスラクシスを撃破"
           }
         }
       },
@@ -4919,6 +5137,11 @@ export const ja_JP: EnTranslations = {
       "nythraxis_crypt": {
         "name": "放棄された地下墓所",
         "enterText": "放棄された地下墓所の敷居を越えます。",
+        "leaveText": "ソーンピークの冷たい空気へ戻ります。"
+      },
+      "nythraxis_boss_arena": {
+        "name": "ナイスラクシスのレイドアリーナ",
+        "enterText": "封印された王家の扉を通り抜けます。",
         "leaveText": "ソーンピークの冷たい空気へ戻ります。"
       },
       "drowned_temple": {

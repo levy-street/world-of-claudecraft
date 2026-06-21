@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { ALL_CLASSES, type Entity, type SimEvent } from '../sim/types';
+import { ALL_CLASSES, isQuestTurnInNpc, type Entity, type SimEvent } from '../sim/types';
 import { OVERHEAD_EMOTES, type IWorld } from '../world_api';
 import { groundHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 import {
@@ -46,6 +46,8 @@ import { comboPipsFor, COMBO_PIP_MAX } from './nameplate_combo';
 import { stepCameraOcclusion, type CameraOcclusionState } from './camera_collision';
 import { castBarState } from './cast_bar';
 import { isMobThreateningViewer } from './nameplate_threat';
+import { characterSoulRendActive } from './character_effects';
+import { FRIENDLY, isFriendlyPet, isOwnedPetHostile, mobNameColor } from './reaction';
 
 const NAMEPLATE_RANGE = 55;
 const NAMEPLATE_RANGE_SQ = NAMEPLATE_RANGE * NAMEPLATE_RANGE;
@@ -362,6 +364,7 @@ interface EntityView {
   clickTarget: THREE.Object3D;
   nameplate: HTMLDivElement;
   nameEl: HTMLDivElement;
+  guildEl: HTMLDivElement; // <Guild> tag under the name (players only)
   hpBar: HTMLDivElement;
   hpFill: HTMLDivElement;
   emoteEl: HTMLDivElement;
@@ -1127,6 +1130,7 @@ export class Renderer {
     height: number;
     calls: number;
     triangles: number;
+    geometries: number;
     textures: number;
     programs: number;
     views: number;
@@ -1173,6 +1177,7 @@ export class Renderer {
       height: this.viewport.height,
       calls: info.render.calls,
       triangles: info.render.triangles,
+      geometries: info.memory.geometries,
       textures: info.memory.textures,
       programs: info.programs?.length ?? 0,
       views: this.views.size,
@@ -2111,6 +2116,7 @@ export class Renderer {
     switch (ev.type) {
       case 'spellfx':
         if (ev.fx === 'projectile') this.vfx.projectile(ev.sourceId, ev.targetId, ev.school);
+        else if (ev.fx === 'beam') this.vfx.beam(ev.sourceId, ev.targetId, ev.school);
         else if (ev.fx === 'tick') this.vfx.tick(ev.targetId, ev.school);
         else this.vfx.nova(ev.targetId, ev.school);
         break;
@@ -2484,12 +2490,16 @@ export class Renderer {
     const nameEl = document.createElement('div');
     nameEl.className = 'np-name';
     nameEl.textContent = e.kind === 'object' ? objectDisplayName(e) : e.name;
+    // guild tag under the name (players in a guild); hidden until set
+    const guildEl = document.createElement('div');
+    guildEl.className = 'np-guild';
+    guildEl.style.display = 'none';
     const hpBar = document.createElement('div');
     hpBar.className = 'np-hpbar';
     const hpFill = document.createElement('div');
     hpFill.className = 'np-hpfill';
     hpBar.appendChild(hpFill);
-    // overhead cast bar — hidden until the entity starts casting/channeling
+    // overhead cast bar: hidden until the entity starts casting/channeling
     const castBar = document.createElement('div');
     castBar.className = 'np-castbar';
     castBar.style.display = 'none';
@@ -2498,7 +2508,7 @@ export class Renderer {
     const castLabel = document.createElement('div');
     castLabel.className = 'np-castlabel';
     castBar.append(castFill, castLabel);
-    np.append(emoteEl, raidMark, comboRow, marker, tierEl, nameEl, hpBar, castBar);
+    np.append(emoteEl, raidMark, comboRow, marker, tierEl, nameEl, guildEl, hpBar, castBar);
     this.nameplateLayer.appendChild(np);
 
     // object views gate their own casters; character shadows live in visual
@@ -2506,7 +2516,7 @@ export class Renderer {
     if (!visual) collectCasters(group, objectCasters);
     this.views.set(e.id, {
       group, visual, visualKey: visual ? visualKeyFor(e) : null, visualPoolKey, sheepVisual: null, bearVisual: null, catVisual: null, travelVisual: null, height, clickTarget,
-      nameplate: np, nameEl, hpBar, hpFill, emoteEl, emoteIconEl, emoteLabelEl, markerEl: marker, raidMarkEl: raidMark, comboRow, comboPips, castBar, castFill, castLabel, tierEl, sparkle, objectMesh, objectPoolKey, portal,
+      nameplate: np, nameEl, guildEl, hpBar, hpFill, emoteEl, emoteIconEl, emoteLabelEl, markerEl: marker, raidMarkEl: raidMark, comboRow, comboPips, castBar, castFill, castLabel, tierEl, sparkle, objectMesh, objectPoolKey, portal,
       nameplateDisplay: 'none', nameplateTransform: '', nameplateSig: '', nameplateHpWidth: '', comboSig: '', tierValue: 0,
       objectCasters, shadowOn: true, isFar: false, lastOverheadEmoteKey: null,
       lastX: e.pos.x, lastZ: e.pos.z, skin: e.skin, liveScale: e.scale,
@@ -2561,7 +2571,18 @@ export class Renderer {
   }
 
   private isHostileSelectionTarget(target: Entity): boolean {
-    if (target.kind === 'mob') return target.hostile;
+    // A controlled pet inherits its owner's reaction (a player's pet is hostile
+    // only in PvP), so route mobs through the owner-aware helper; everything
+    // else falls back to the player-vs-player verdict.
+    if (target.kind === 'mob') {
+      return target.ownerId !== null
+        ? isOwnedPetHostile(target, this.sim.entities, (p) => this.isHostilePlayer(p))
+        : target.hostile;
+    }
+    return this.isHostilePlayer(target);
+  }
+
+  private isHostilePlayer(target: Entity): boolean {
     if (target.kind !== 'player' || target.dead || target.id === this.sim.playerId) return false;
     if (this.sim.duelInfo?.state === 'active' && this.sim.duelInfo.otherPid === target.id) return true;
     const match = this.sim.arenaInfo?.match;
@@ -2577,7 +2598,7 @@ export class Renderer {
   // ---------------------------------------------------------------------
 
   private builtInteriors = new Set<string>();
-  private fogState: 'outdoor' | 'dungeon' | 'temple' | 'underwater' = 'outdoor';
+  private fogState: 'outdoor' | 'dungeon' | 'temple' | 'nythraxis' | 'underwater' = 'outdoor';
 
   private buildInterior(interior: string, ox: number, oz: number): void {
     this.dungeons ??= new DungeonInteriors(this.scene, this.lowGfx, this.flames, this.fireLights);
@@ -2632,9 +2653,12 @@ export class Renderer {
     }
     // the Drowned Temple reads as submerged: a teal murk instead of the
     // crypt's near-black, so its flooded halls feel underwater, not just dark
-    const inTemple = inside && !isArenaPos(px) && dungeonAt(px)?.interior === 'temple';
+    const interior = inside && !isArenaPos(px) ? dungeonAt(px)?.interior : null;
+    const inTemple = interior === 'temple';
+    const inNythraxis = interior === 'nythraxis';
     const desired = inTemple ? 'temple'
-      : inside ? 'dungeon'
+      : inNythraxis ? 'nythraxis'
+        : inside ? 'dungeon'
         : camY < WATER_LEVEL - 0.05 ? 'underwater' : 'outdoor';
     const fog = this.scene.fog as THREE.Fog;
     if (desired !== this.fogState) {
@@ -2647,6 +2671,12 @@ export class Renderer {
         fog.color.setHex(0x0a3a44);
         fog.near = 12;
         fog.far = 78;
+      } else if (desired === 'nythraxis') {
+        // the raid arena is huge (±230) — push the murk back so ~50yd reads
+        // clear (linear-fog midpoint (near+far)/2 = 50), not the old ~30
+        fog.color.setHex(0x020106);
+        fog.near = 20;
+        fog.far = 80;
       } else if (desired === 'underwater') {
         fog.color.setHex(0x17506e);
         fog.near = 2;
@@ -2661,7 +2691,7 @@ export class Renderer {
       // underground so the torch point lights own the scene; restore outside.
       // The rim glow cranks up instead — silhouettes must split from the murk.
       if (!this.lowGfx) {
-        const underground = desired === 'dungeon' || desired === 'temple';
+        const underground = desired === 'dungeon' || desired === 'temple' || desired === 'nythraxis';
         this.sun.intensity = underground ? DUNGEON_SUN_INTENSITY : SUN_INTENSITY;
         this.hemi.intensity = underground ? DUNGEON_HEMI_INTENSITY : HEMI_INTENSITY;
         this.scene.environmentIntensity = underground ? DUNGEON_ENV_INTENSITY : this.envOutdoorIntensity;
@@ -2857,6 +2887,11 @@ export class Renderer {
           v.sparkle.scale.set(pulse, pulse, 1);
           v.sparkle.material.rotation = this.time * 0.8;
         }
+        if (vis
+          && (e.objectItemId === 'bastion_ward_stone' || e.objectItemId === 'soulshard_pillar')
+          && e.auras.some((a) => a.id === 'nythraxis_wardstone_lit')) {
+          this.vfx.castSparkle(e.id, 'arcane', dt * 2.6);
+        }
         if (v.portal && vis) {
           v.portal.rotation.z = this.time * 1.4;
           (v.portal.material as THREE.MeshBasicMaterial).opacity = 0.45 + Math.sin(this.time * 2.2 + e.id) * 0.15;
@@ -2875,10 +2910,13 @@ export class Renderer {
       // rig, click proxy, and any form visual grow/shrink together.
       if (e.scale !== v.liveScale) { v.liveScale = e.scale; v.group.scale.setScalar(e.scale); }
 
-      // swimming pose: prone at the surface (derived here — the sim is unaware)
+      // swimming pose: prone at the surface (derived here — the sim is unaware).
+      // The cheap feet-depth test gates the expensive terrain-noise sample: an
+      // entity whose feet are above the swim line can't be swimming, so the vast
+      // majority (everyone on land) skip groundHeight() entirely each frame.
       const swimming = !e.dead
-        && groundHeight(e.pos.x, e.pos.z, this.sim.cfg.seed) < WATER_LEVEL - 0.8
-        && e.pos.y <= WATER_LEVEL - 0.5;
+        && e.pos.y <= WATER_LEVEL - 0.5
+        && groundHeight(e.pos.x, e.pos.z, this.sim.cfg.seed) < WATER_LEVEL - 0.8;
 
       // lazy form visuals, swapped by visibility like the old sheep/bear rigs
       if (polyed && !v.sheepVisual) {
@@ -2907,6 +2945,7 @@ export class Renderer {
             : travel && v.travelVisual ? v.travelVisual : v.visual;
       const ghost = ghostWolf || shouldRenderStealthGhost(this.sim.playerId, e) || e.templateId.startsWith('vision_');
       active.setGhost(ghost);
+      active.setSoulRend(characterSoulRendActive(e));
       v.visual.root.visible = active === v.visual;
       // distant rigs swap to the single-draw baked idle-pose mesh
       v.visual.setFar(v.isFar && active === v.visual);
@@ -3000,6 +3039,9 @@ export class Renderer {
 
       if (st.casting) {
         this.vfx.castSparkle(e.id, e.castingAbility === 'demon_heal' ? 'shadow' : ABILITIES[e.castingAbility!]?.school ?? 'arcane', dt);
+      }
+      if (e.auras.some((a) => a.id === 'nythraxis_soul_rend')) {
+        this.vfx.castSparkle(e.id, 'shadow', dt * 3.2);
       }
       if (swimming) this.vfx.swimRipple(v.group.position, moving ? dt * 3 : dt);
     }
@@ -3363,6 +3405,9 @@ export class Renderer {
       const hidden = (isSelf && !hasOverheadEmote) || d2 > NAMEPLATE_RANGE_SQ
         || (e.dead && !e.lootable && e.kind === 'mob')
         || (e.kind === 'object' && !isDoor)
+        // the sealed royal door inside the crypt carries no floating label —
+        // it reads as part of the back wall, not a portal billboard
+        || (isDoor && e.dungeonId === 'nythraxis_boss_arena')
         || (!this.showNameplates && e.kind === 'mob' && !e.dead);
       if (hidden) {
         if (v.nameplateDisplay !== 'none') {
@@ -3432,17 +3477,21 @@ export class Renderer {
         const objName = objectDisplayName(e);
         this.setNameplateStatic(v, `object|${objName}`, objName, '#c084ff', 'none', '', 'np-marker', '1');
       } else if (e.kind === 'player') {
-        // other players: friendly blue with an hp bar
+        // other players: friendly blue with an hp bar; <Guild> tag under the name.
+        // Self has no overhead nameplate, so its guild line stays hidden too.
         const opacity = e.auras.some((a) => a.kind === 'stealth') ? '0.55' : '1';
         const nameDisplay = isSelf ? 'none' : '';
         const hpDisplay = e.dead || isSelf ? 'none' : '';
-        this.setNameplateStatic(v, `player|${e.name}|${nameDisplay}|${hpDisplay}|${opacity}`, e.name, '#7fb8ff', hpDisplay, '', 'np-marker', opacity);
+        const guild = isSelf ? '' : e.guild;
+        this.setNameplateStatic(v, `player|${e.name}|${guild}|${nameDisplay}|${hpDisplay}|${opacity}`, e.name, '#7fb8ff', hpDisplay, '', 'np-marker', opacity, '', guild);
         v.nameEl.style.display = nameDisplay;
         // $WOC holder-tier flair, shown on OTHER players (own nameplate is hidden).
         this.setNameplateTier(v, isSelf ? 0 : (e.holderTier ?? 0));
         this.setNameplateHp(v, e);
-      } else if (e.kind === 'npc') {
-        const npcName = npcDisplayName(e.templateId);
+      } else if (e.kind === 'npc' || (!e.hostile && e.questIds.length > 0)) {
+        const npcName = e.kind === 'npc'
+          ? npcDisplayName(e.templateId)
+          : tEntity({ kind: 'mob', id: e.templateId, field: 'name' });
         let marker = '';
         let cls = '';
         // role-aware: '!' only at the quest's giver, '?' only at its turn-in
@@ -3451,18 +3500,21 @@ export class Renderer {
           const quest = QUESTS[qid];
           if (!quest) continue;
           const st = sim.questState(qid);
-          if (st === 'ready' && quest.turnInNpcId === e.templateId) { marker = '?'; cls = 'ready'; break; }
+          if (st === 'ready' && isQuestTurnInNpc(quest, e.templateId)) { marker = '?'; cls = 'ready'; break; }
           if (st === 'available' && quest.giverNpcId === e.templateId) { marker = '!'; cls = 'avail'; }
-          else if (st === 'active' && quest.turnInNpcId === e.templateId && !marker) { marker = '?'; cls = 'active'; }
+          else if (st === 'active' && isQuestTurnInNpc(quest, e.templateId) && !marker) { marker = '?'; cls = 'active'; }
         }
         const markerClass = cls ? `np-marker ${cls}` : 'np-marker';
-        this.setNameplateStatic(v, `npc|${npcName}|${marker}|${markerClass}`, npcName, '#9fdc7f', 'none', marker, markerClass, '1');
+        this.setNameplateStatic(v, `npc|${npcName}|${marker}|${markerClass}`, npcName, FRIENDLY, 'none', marker, markerClass, '1');
       } else {
         const diff = e.level - p.level;
         const template = MOBS[e.templateId];
         const elite = !!template?.elite;
         const boss = !!template?.boss;
-        const color = e.dead ? '#999' : diff >= 3 ? '#ff4444' : diff >= 1 ? '#ffaa33' : diff >= -2 ? '#ffe97a' : diff >= -5 ? '#7fdc4f' : '#9d9d9d';
+        // A friendly controlled pet reads as friendly green; wild mobs keep the
+        // classic level-difference ("con") color.
+        const friendlyPet = isFriendlyPet(e, this.sim.entities, (pl) => this.isHostilePlayer(pl));
+        const color = mobNameColor(diff, e.dead, friendlyPet);
         const mobName = e.ownerId !== null ? e.name : mobDisplayName(e.templateId);
         const name = e.dead ? t('worldContent.corpseName', { name: mobName }) : `[${e.level}${elite ? '+' : ''}] ${mobName}`;
         const hpDisplay = e.dead ? 'none' : '';
@@ -3489,6 +3541,7 @@ export class Renderer {
     markerClass: string,
     opacity: string,
     frame = '',
+    guild = '',
   ): void {
     if (sig === v.nameplateSig) return;
     v.nameplateSig = sig;
@@ -3500,6 +3553,13 @@ export class Renderer {
     v.markerEl.textContent = marker;
     v.markerEl.className = markerClass;
     v.nameplate.style.opacity = opacity;
+    // guild tag rides in the sig (players only); empty for every other kind
+    if (guild) {
+      v.guildEl.textContent = `<${guild}>`;
+      v.guildEl.style.display = '';
+    } else {
+      v.guildEl.style.display = 'none';
+    }
   }
 
   // Show/hide the $WOC holder-tier badge on a player's nameplate. Cheap-diffed

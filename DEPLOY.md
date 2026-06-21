@@ -142,8 +142,18 @@ For off-box safety, sync the directory to S3 occasionally:
   emit stable absolute Open Graph URLs.
 - **Never** set `ALLOW_DEV_COMMANDS=1` in production: it enables the
   level/teleport cheats used by the test bots.
-- Health check: `curl -s localhost:8787/api/status` on the box returns
-  `{"ok":true,"players_online":N,...}`.
+- **Bot detector (implementation)**: the open-source tree ships with a no-op stub
+  (`server/bot_detector/stub.ts`). Detection hooks are wired in, but they observe
+  nothing and never act. To bundle the real behavioral detector, clone the private
+  `bot_detector` repo into `private/bot_detector` **before** `npm run build` (or
+  `npm run build:server`). That directory is not part of the public checkout. At
+  build time, confirm which implementation was picked:
+  `[build:server] bot detector: stub (no-op)` vs `… bot detector: private`.
+- **Anti-bot runtime knobs**: `MAX_WS_PER_IP_HARD` (default `20`) caps simultaneous
+  WebSocket connections per source IP; extra connections are refused at the
+  handshake. `ANTIBOT_ENFORCE=1` lets the detector act on its findings (e.g. kick);
+  when unset, detection is observe-only. With the no-op stub, enforcement has no
+  effect regardless of this flag.
 - Logs: `sudo docker compose -f /opt/eastbrook/docker-compose.yml logs -f game`.
 - If the instance ever feels tight, stop → change instance type →
   start. Everything lives in Docker plus one EBS volume, so nothing

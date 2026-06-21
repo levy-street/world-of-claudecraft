@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
 import { ACTIONS, encodeObs } from '../src/sim/obs';
 import { Entity, SimEvent, dist2d } from '../src/sim/types';
-import { CLASSES, CRYPT_DOOR_POS, DUNGEON_LIST, DUNGEON_X_THRESHOLD, ITEMS, LAKE, MOBS, NPCS, QUESTS, instanceOrigin, zoneAt, zoneWelcomeText } from '../src/sim/data';
+import { CLASSES, CRYPT_DOOR_POS, DUNGEON_LIST, DUNGEON_X_THRESHOLD, ITEMS, LAKE, MOBS, NPCS, QUESTS, dungeonAt, instanceOrigin, zoneAt, zoneWelcomeText } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { generateDecorations, groundHeight, WATER_LEVEL } from '../src/sim/world';
 import { cameraOcclusion, isBlocked, lineOfSightClear, resolvePosition } from '../src/sim/colliders';
@@ -31,6 +31,15 @@ function placeEntity(sim: Sim, e: Entity, x: number, z: number) {
 
 function faceTarget(actor: Entity, target: Entity) {
   actor.facing = Math.atan2(target.pos.x - actor.pos.x, target.pos.z - actor.pos.z);
+}
+
+function formRaid(sim: Sim) {
+  while ((sim.partyOf(sim.playerId)?.members.length ?? 1) < 5) {
+    const pid = sim.addPlayer('priest', `RaidFill${sim.players.size}`);
+    sim.partyInvite(pid);
+    sim.partyAccept(pid);
+  }
+  sim.convertPartyToRaid();
 }
 
 describe('quest lifecycle', () => {
@@ -143,6 +152,10 @@ describe('collision & terrain', () => {
     const open = resolvePosition(SEED, 0, -40, 0.5); // open road
     expect(open.x).toBe(0);
     expect(open.z).toBe(-40);
+  });
+
+  it('keeps the Fenbridge south approach clear of generated rock blockers', () => {
+    expect(isBlocked(SEED, 2, 212, 0.5)).toBe(false);
   });
 
   it('camera ghosts through village buildings (hidden instead of pulling in)', () => {
@@ -413,8 +426,9 @@ describe('dungeon instance placement and targetability', () => {
   it('places every dungeon entry and mob spawn on unblocked instance ground', () => {
     for (const dungeon of DUNGEON_LIST) {
       const sim = makeSim();
-      if (dungeon.id === 'nythraxis_crypt') {
-        sim.questLog.set('q_nythraxis_sealed_crypt', { questId: 'q_nythraxis_sealed_crypt', counts: [0, 0, 0], state: 'active' });
+      if (dungeon.id === 'nythraxis_boss_arena') {
+        sim.players.get(sim.playerId)!.questsDone.add('q_nythraxis_bound_guardian');
+        formRaid(sim);
       }
       sim.enterDungeon(dungeon.id);
       const p = sim.player;
@@ -422,7 +436,7 @@ describe('dungeon instance placement and targetability', () => {
       expect(isBlocked(SEED, p.pos.x, p.pos.z, 0.5), `${dungeon.id} entry spawned in geometry`).toBe(false);
 
       const mobs = [...sim.entities.values()].filter((e) => e.kind === 'mob' && e.spawnPos.x > DUNGEON_X_THRESHOLD);
-      const objects = [...sim.entities.values()].filter((e) => e.kind === 'object' && e.objectItemId && e.pos.x > DUNGEON_X_THRESHOLD);
+      const objects = [...sim.entities.values()].filter((e) => e.kind === 'object' && (e.objectItemId || e.templateId === 'dungeon_door') && e.pos.x > DUNGEON_X_THRESHOLD);
       expect(mobs.length + objects.length, `${dungeon.id} spawned no instance encounters`).toBeGreaterThan(0);
       for (const mob of mobs) {
         expect(mob.hostile, `${dungeon.id} ${mob.name} is not hostile`).toBe(true);
@@ -558,7 +572,7 @@ describe('boss loot and encounter resets', () => {
     expect(mob.loot).toBeNull();
   });
 
-  it('poor and common corpse drops are randomly awarded among nearby party members', () => {
+  it('poor and common corpse drops open need-greed rolls among nearby party members', () => {
     const sim = makeSim();
     const a = sim.playerId;
     const b = sim.addPlayer('mage', 'Bert');
@@ -576,20 +590,16 @@ describe('boss loot and encounter resets', () => {
     sim.events.length = 0;
     sim.lootCorpse(mob.id, a);
 
-    const poorTotal =
-      sim.countItem('wolf_fang', a) +
-      sim.countItem('wolf_fang', b);
-    const commonTotal =
-      sim.countItem('raw_mirror_trout', a) +
-      sim.countItem('raw_mirror_trout', b);
-    expect(poorTotal).toBe(1);
-    expect(commonTotal).toBe(1);
-    expect(sim.events.some((e) => e.type === 'loot' && e.text.includes('wins Cracked Wolf Fang'))).toBe(true);
-    expect(sim.events.some((e) => e.type === 'loot' && e.text.includes('wins Raw Mirror Trout'))).toBe(true);
+    expect(sim.countItem('wolf_fang', a) + sim.countItem('wolf_fang', b)).toBe(0);
+    expect(sim.countItem('raw_mirror_trout', a) + sim.countItem('raw_mirror_trout', b)).toBe(0);
+    const prompts = sim.events.filter((e) => e.type === 'lootRoll');
+    expect(prompts).toHaveLength(4);
+    expect(prompts.filter((e) => e.itemId === 'wolf_fang')).toHaveLength(2);
+    expect(prompts.filter((e) => e.itemId === 'raw_mirror_trout')).toHaveLength(2);
     expect(mob.loot).toBeNull();
   });
 
-  it('uncommon and better corpse drops are rolled among nearby party members', () => {
+  it('uncommon and better corpse drops open need-greed rolls among nearby party members', () => {
     const sim = makeSim();
     const a = sim.playerId;
     const b = sim.addPlayer('mage', 'Bert');
@@ -607,12 +617,214 @@ describe('boss loot and encounter resets', () => {
     sim.events.length = 0;
     sim.lootCorpse(mob.id, a);
 
-    const total =
-      sim.countItem('greyjaw_hide_boots', a) +
-      sim.countItem('greyjaw_hide_boots', b);
-    expect(total).toBe(1);
-    expect(sim.events.some((e) => e.type === 'loot' && e.text.includes('wins Greyjaw Hide Boots'))).toBe(true);
+    expect(sim.countItem('greyjaw_hide_boots', a) + sim.countItem('greyjaw_hide_boots', b)).toBe(0);
+    const prompts = sim.events.filter((e) => e.type === 'lootRoll');
+    expect(prompts).toHaveLength(2);
+    expect(prompts.every((e) => e.itemId === 'greyjaw_hide_boots')).toBe(true);
     expect(mob.loot).toBeNull();
+  });
+
+  it('opens a need-greed roll instead of auto-awarding grouped item drops', () => {
+    const sim = makeSim();
+    const a = sim.playerId;
+    const b = sim.addPlayer('mage', 'Bert');
+    sim.partyInvite(b, a);
+    sim.partyAccept(b);
+    teleportTo(sim, 20, 20, a);
+    teleportTo(sim, 21, 20, b);
+    const mob = createMob(990102, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
+    mob.dead = true;
+    mob.lootable = true;
+    mob.tappedById = a;
+    mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
+    sim.entities.set(mob.id, mob);
+
+    sim.events.length = 0;
+    sim.lootCorpse(mob.id, a);
+
+    expect(sim.countItem('greyjaw_hide_boots', a)).toBe(0);
+    expect(sim.countItem('greyjaw_hide_boots', b)).toBe(0);
+    const prompts = sim.events.filter((e) => e.type === 'lootRoll');
+    expect(prompts).toHaveLength(2);
+    expect(prompts.every((e) => e.itemId === 'greyjaw_hide_boots')).toBe(true);
+    expect(mob.loot).toBeNull();
+  });
+
+  it('awards need over greed regardless of the greed roll number', () => {
+    const sim = makeSim();
+    const a = sim.playerId;
+    const b = sim.addPlayer('mage', 'Bert');
+    sim.partyInvite(b, a);
+    sim.partyAccept(b);
+    teleportTo(sim, 20, 20, a);
+    teleportTo(sim, 21, 20, b);
+    const mob = createMob(990103, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
+    mob.dead = true;
+    mob.lootable = true;
+    mob.tappedById = a;
+    mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
+    sim.entities.set(mob.id, mob);
+
+    const rng = (sim as any).rng;
+    const realInt = rng.int.bind(rng);
+    const rolls = [1, 100];
+    rng.int = (min: number, max: number) => (min === 1 && max === 100 ? rolls.shift()! : realInt(min, max));
+
+    sim.events.length = 0;
+    sim.lootCorpse(mob.id, a);
+    const rollId = sim.events.find((e) => e.type === 'lootRoll')!.rollId;
+    sim.submitLootRoll(rollId, 'need', a);
+    sim.submitLootRoll(rollId, 'greed', b);
+
+    expect(sim.countItem('greyjaw_hide_boots', a)).toBe(1);
+    expect(sim.countItem('greyjaw_hide_boots', b)).toBe(0);
+    expect(sim.events.some((e) => e.type === 'loot' && e.text.includes('wins Greyjaw Hide Boots'))).toBe(true);
+  });
+
+  it('excludes players who pass on a need-greed roll', () => {
+    const sim = makeSim();
+    const a = sim.playerId;
+    const b = sim.addPlayer('mage', 'Bert');
+    sim.partyInvite(b, a);
+    sim.partyAccept(b);
+    teleportTo(sim, 20, 20, a);
+    teleportTo(sim, 21, 20, b);
+    const mob = createMob(990104, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
+    mob.dead = true;
+    mob.lootable = true;
+    mob.tappedById = a;
+    mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
+    sim.entities.set(mob.id, mob);
+
+    sim.events.length = 0;
+    sim.lootCorpse(mob.id, a);
+    const rollId = sim.events.find((e) => e.type === 'lootRoll')!.rollId;
+    sim.submitLootRoll(rollId, 'pass', a);
+    sim.submitLootRoll(rollId, 'greed', b);
+
+    expect(sim.countItem('greyjaw_hide_boots', a)).toBe(0);
+    expect(sim.countItem('greyjaw_hide_boots', b)).toBe(1);
+  });
+
+  it('treats unanswered need-greed rolls as pass at timeout', () => {
+    const sim = makeSim();
+    const a = sim.playerId;
+    const b = sim.addPlayer('mage', 'Bert');
+    sim.partyInvite(b, a);
+    sim.partyAccept(b);
+    teleportTo(sim, 20, 20, a);
+    teleportTo(sim, 21, 20, b);
+    const mob = createMob(990105, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
+    mob.dead = true;
+    mob.lootable = true;
+    mob.tappedById = a;
+    mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
+    sim.entities.set(mob.id, mob);
+
+    sim.events.length = 0;
+    sim.lootCorpse(mob.id, a);
+    const events: SimEvent[] = [];
+    for (let i = 0; i < 31 * 20; i++) events.push(...sim.tick());
+
+    expect(sim.countItem('greyjaw_hide_boots', a)).toBe(0);
+    expect(sim.countItem('greyjaw_hide_boots', b)).toBe(0);
+    expect(events.some((e) => e.type === 'loot' && e.text === 'Everyone passed on Greyjaw Hide Boots.')).toBe(true);
+  });
+
+  it('returns all-passed need-greed loot to the corpse as open loot', () => {
+    const sim = makeSim();
+    const a = sim.playerId;
+    const b = sim.addPlayer('mage', 'Bert');
+    sim.partyInvite(b, a);
+    sim.partyAccept(b);
+    teleportTo(sim, 20, 20, a);
+    teleportTo(sim, 21, 20, b);
+    const mob = createMob(990106, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
+    mob.dead = true;
+    mob.lootable = true;
+    mob.tappedById = a;
+    mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
+    sim.entities.set(mob.id, mob);
+
+    sim.events.length = 0;
+    sim.lootCorpse(mob.id, a);
+    const rollId = sim.events.find((e) => e.type === 'lootRoll')!.rollId;
+    sim.submitLootRoll(rollId, 'pass', a);
+    sim.submitLootRoll(rollId, 'pass', b);
+
+    expect(sim.countItem('greyjaw_hide_boots', a)).toBe(0);
+    expect(sim.countItem('greyjaw_hide_boots', b)).toBe(0);
+    expect(mob.lootable).toBe(true);
+    expect(mob.loot?.items).toEqual([{ itemId: 'greyjaw_hide_boots', count: 1, openToAll: true }]);
+
+    sim.events.length = 0;
+    sim.lootCorpse(mob.id, b);
+
+    expect(sim.countItem('greyjaw_hide_boots', b)).toBe(1);
+    expect(mob.loot).toBeNull();
+    expect(sim.events.some((e) => e.type === 'lootRoll')).toBe(false);
+  });
+
+  it('lets any player loot an all-passed need-greed item without starting another roll', () => {
+    const sim = makeSim();
+    const a = sim.playerId;
+    const b = sim.addPlayer('mage', 'Bert');
+    const c = sim.addPlayer('rogue', 'Cyra');
+    sim.partyInvite(b, a);
+    sim.partyAccept(b);
+    teleportTo(sim, 20, 20, a);
+    teleportTo(sim, 21, 20, b);
+    teleportTo(sim, 22, 20, c);
+    const mob = createMob(990107, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
+    mob.dead = true;
+    mob.lootable = true;
+    mob.tappedById = a;
+    mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
+    sim.entities.set(mob.id, mob);
+
+    sim.events.length = 0;
+    sim.lootCorpse(mob.id, a);
+    const rollId = sim.events.find((e) => e.type === 'lootRoll')!.rollId;
+    sim.submitLootRoll(rollId, 'pass', a);
+    sim.submitLootRoll(rollId, 'pass', b);
+
+    sim.events.length = 0;
+    sim.lootCorpse(mob.id, c);
+
+    expect(sim.countItem('greyjaw_hide_boots', c)).toBe(1);
+    expect(sim.countItem('greyjaw_hide_boots', a)).toBe(0);
+    expect(sim.countItem('greyjaw_hide_boots', b)).toBe(0);
+    expect(sim.events.some((e) => e.type === 'error' && e.text.includes("permission"))).toBe(false);
+    expect(sim.events.some((e) => e.type === 'lootRoll')).toBe(false);
+  });
+
+  it('returns timed-out need-greed loot to the corpse for whoever loots next', () => {
+    const sim = makeSim();
+    const a = sim.playerId;
+    const b = sim.addPlayer('mage', 'Bert');
+    sim.partyInvite(b, a);
+    sim.partyAccept(b);
+    teleportTo(sim, 20, 20, a);
+    teleportTo(sim, 21, 20, b);
+    const mob = createMob(990108, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
+    mob.dead = true;
+    mob.lootable = true;
+    mob.tappedById = a;
+    mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
+    sim.entities.set(mob.id, mob);
+
+    sim.events.length = 0;
+    sim.lootCorpse(mob.id, a);
+    for (let i = 0; i < 31 * 20; i++) sim.tick();
+
+    expect(mob.loot?.items).toEqual([{ itemId: 'greyjaw_hide_boots', count: 1, openToAll: true }]);
+
+    sim.events.length = 0;
+    sim.lootCorpse(mob.id, a);
+
+    expect(sim.countItem('greyjaw_hide_boots', a)).toBe(1);
+    expect(mob.loot).toBeNull();
+    expect(sim.events.some((e) => e.type === 'lootRoll')).toBe(false);
   });
 
   it('quest drops stay on the corpse as personal loot for every eligible nearby party member', () => {
@@ -793,19 +1005,50 @@ describe('quest npc roles', () => {
     expect(QUESTS).not.toHaveProperty('q_nythraxis_deathless_king');
   });
 
+  it('restores the Crypt Keystone when reaccepting the Bound Guardian quest', () => {
+    const sim = makeSim();
+    sim.player.level = 20;
+    const aldric = [...sim.entities.values()].find((e) => e.templateId === 'brother_aldric_highwatch')!;
+    teleportTo(sim, aldric.pos.x + 2, aldric.pos.z);
+    sim.questLog.set('q_nythraxis_sealed_crypt', { questId: 'q_nythraxis_sealed_crypt', counts: [3, 1, 1], state: 'ready' });
+    sim.turnInQuest('q_nythraxis_sealed_crypt');
+    expect(sim.countItem('crypt_keystone')).toBe(1);
+
+    sim.removeItem('crypt_keystone', 1);
+    expect(sim.countItem('crypt_keystone')).toBe(0);
+    sim.acceptQuest('q_nythraxis_bound_guardian');
+    expect(sim.questState('q_nythraxis_bound_guardian')).toBe('active');
+    expect(sim.countItem('crypt_keystone')).toBe(1);
+
+    sim.removeItem('crypt_keystone', 1);
+    sim.abandonQuest('q_nythraxis_bound_guardian');
+    sim.acceptQuest('q_nythraxis_bound_guardian');
+    expect(sim.countItem('crypt_keystone')).toBe(1);
+  });
+
   it('gates the sealed crypt and grave visions behind Nythraxis quests', () => {
     const sim = makeSim();
     const crypt = DUNGEON_LIST.find((d) => d.id === 'nythraxis_crypt')!;
+    const bossArena = DUNGEON_LIST.find((d) => d.id === 'nythraxis_boss_arena')!;
 
-    sim.enterDungeon(crypt.id);
-    expect(sim.player.pos.x).toBeLessThan(DUNGEON_X_THRESHOLD);
-
-    sim.questLog.set('q_nythraxis_sealed_crypt', { questId: 'q_nythraxis_sealed_crypt', counts: [0, 0, 0], state: 'active' });
     sim.enterDungeon(crypt.id);
     expect(sim.player.pos.x).toBeGreaterThan(DUNGEON_X_THRESHOLD);
+    const outerCryptPos = { ...sim.player.pos };
+    sim.enterDungeon(bossArena.id);
+    expect(dist2d(sim.player.pos, outerCryptPos)).toBeLessThan(0.1);
+
+    sim.questLog.set('q_nythraxis_sealed_crypt', { questId: 'q_nythraxis_sealed_crypt', counts: [0, 0, 0], state: 'active' });
+    formRaid(sim);
+    sim.enterDungeon(bossArena.id);
+    expect(dist2d(sim.player.pos, outerCryptPos)).toBeLessThan(0.1);
+
+    sim.questLog.delete('q_nythraxis_sealed_crypt');
+    sim.players.get(sim.playerId)!.questsDone.add('q_nythraxis_bound_guardian');
+    formRaid(sim);
+    sim.enterDungeon(bossArena.id);
+    expect(dungeonAt(sim.player.pos.x)?.id).toBe('nythraxis_boss_arena');
 
     teleportTo(sim, 0, 660);
-    sim.questLog.delete('q_nythraxis_sealed_crypt');
     const grave = [...sim.entities.values()].find((e) => e.kind === 'object' && e.objectItemId === 'grave_sir_aldren')!;
     teleportTo(sim, grave.pos.x, grave.pos.z);
     sim.pickUpObject(grave.id);
@@ -862,6 +1105,8 @@ describe('quest npc roles', () => {
     expect(guardian).toBeTruthy();
     expect(guardian).toMatchObject({ hostile: true, aiState: 'chase', aggroTargetId: sim.player.id });
 
+    sim.player.maxHp = 100000;
+    sim.player.hp = sim.player.maxHp;
     guardian!.hp = Math.floor(guardian!.maxHp * 0.49);
     sim.tick();
 
@@ -872,6 +1117,28 @@ describe('quest npc roles', () => {
       expect(['chase', 'attack']).toContain(boneguard.aiState);
       expect(boneguard.aggroTargetId).toBe(sim.player.id);
     }
+  });
+
+  it('despawns Varkas Boneguards after 60 seconds without damage and resets on damage taken', () => {
+    const sim = makeSim();
+    const boneguard = createMob(909900, MOBS.varkas_boneguard, 19, { x: 0, y: 0, z: 0 });
+    boneguard.maxHp = 1000;
+    boneguard.hp = 1000;
+    (sim as unknown as { addEntity(e: Entity): void }).addEntity(boneguard);
+
+    for (let i = 0; i < 59 * 20; i++) sim.tick();
+    expect(sim.entities.has(boneguard.id)).toBe(true);
+
+    (sim as unknown as {
+      dealDamage(source: Entity, target: Entity, amount: number, crit: boolean, school: string, ability: string | null, kind: 'hit', noRage?: boolean): void;
+    }).dealDamage(sim.player, boneguard, 5, false, 'physical', 'Test Strike', 'hit', true);
+    expect(boneguard.damageIdleDespawnTimer).toBe(60);
+
+    for (let i = 0; i < 59 * 20; i++) sim.tick();
+    expect(sim.entities.has(boneguard.id)).toBe(true);
+
+    for (let i = 0; i < 2 * 20; i++) sim.tick();
+    expect(sim.entities.has(boneguard.id)).toBe(false);
   });
 
   it('shares Nythraxis ritual circle progress with nearby party members', () => {
@@ -1236,6 +1503,46 @@ describe('spell visuals', () => {
 
     expect(events.some((e) => e.type === 'spellfx' && e.targetId === mob.id)).toBe(false);
     expect(events.some((e) => e.type === 'damage' && e.ability === 'Auto Shot')).toBe(false);
+  });
+});
+
+describe('mob auto attacks against moving targets', () => {
+  function damageTimesFrom(events: SimEvent[], sourceId: number, targetId: number): boolean {
+    return events.some((e) => e.type === 'damage' && e.sourceId === sourceId && e.targetId === targetId);
+  }
+
+  it('continues landing melee swings after the target moves around melee range', () => {
+    const sim = makeSim();
+    const p = sim.player;
+    p.maxHp = 1_000_000;
+    p.hp = p.maxHp;
+    const wolf = [...sim.entities.values()].find((e) => e.kind === 'mob' && e.templateId === 'forest_wolf' && !e.dead)!;
+    wolf.maxHp = 1_000_000;
+    wolf.hp = wolf.maxHp;
+    teleportTo(sim, wolf.pos.x, wolf.pos.z + 2.5);
+    wolf.aiState = 'attack';
+    wolf.aggroTargetId = p.id;
+    wolf.inCombat = true;
+    wolf.swingTimer = 0;
+    wolf.threat.set(p.id, 1000);
+
+    const hitTimes: number[] = [];
+    for (let i = 0; i < 20 * 20; i++) {
+      const t = i / 20;
+      if (t > 2) {
+        const oldPos = { ...p.pos };
+        const angle = (t - 2) * 1.6;
+        p.pos.x = wolf.spawnPos.x + Math.sin(angle) * 8;
+        p.pos.z = wolf.spawnPos.z + Math.cos(angle) * 8;
+        p.pos.y = groundHeight(p.pos.x, p.pos.z, sim.cfg.seed);
+        p.prevPos = oldPos;
+      }
+      const events = sim.tick();
+      if (damageTimesFrom(events, wolf.id, p.id)) hitTimes.push(i / 20);
+    }
+
+    expect(hitTimes.length).toBeGreaterThanOrEqual(6);
+    expect(hitTimes.at(-1)).toBeGreaterThan(15);
   });
 });
 

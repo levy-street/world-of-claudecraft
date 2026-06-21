@@ -16,6 +16,9 @@ src/admin/i18n.resolved.generated/*.tmp
 # Its committed audit trail lives in the small src/ui/i18n.status.summary.json (tracked).
 src/ui/i18n.status.json
 
+# private extensions (e.g. bot-detector)
+private/
+
 # test artifacts & screenshots
 tmp/
 .codex-research/

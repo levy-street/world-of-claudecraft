@@ -2,6 +2,11 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
+const playHtml = readFileSync(new URL('../play.html', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
+const privacyHtml = readFileSync(new URL('../public/privacy.html', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
+const termsHtml = readFileSync(new URL('../public/terms.html', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
+const viteConfig = readFileSync(new URL('../vite.config.ts', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
+const serverMain = readFileSync(new URL('../server/main.ts', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
 const mainTs = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
 const hudTs = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
 const mobileControlsTs = readFileSync(new URL('../src/game/mobile_controls.ts', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
@@ -38,6 +43,43 @@ describe('client HTML shell', () => {
     expect(liveHtml).not.toContain('id="chat-input"');
   });
 
+  it('keeps the Account nav tab hidden unless a session is restored', () => {
+    expect(html).toContain('<li class="nav-item" id="nav-item-account" hidden>');
+    expect(html).toContain('<li class="nav-item" id="nav-item-logout" hidden>');
+    expect(mainTs).toContain('if (api.restoreSession()) {');
+    expect(mainTs).toContain('} else {\n    enterLoggedOutChrome();\n  }');
+  });
+
+  it('shows a logged-in Logout nav item next to Account', () => {
+    expect(html).toContain('id="nav-btn-account"');
+    expect(html).toContain('id="nav-btn-logout"');
+    expect(html.indexOf('id="nav-btn-account"')).toBeLessThan(html.indexOf('id="nav-btn-logout"'));
+    expect(html).toContain('data-i18n="nav.logout"');
+    expect(mainTs).toContain("const loggedInNavItems = ['#nav-item-account', '#nav-item-logout'];");
+    expect(mainTs).toContain('function logoutAccount(): void {');
+    expect(mainTs).toContain('void api.logout().finally(finish);');
+    expect(mainTs).toContain('api.clearSession();');
+    expect(mainTs).toContain("setupNavBtn($('#nav-btn-logout'), '#hero-view', logoutAccount);");
+  });
+
+  it('requires users to confirm a new account password', () => {
+    expect(html).toContain('id="account-confirm-pass"');
+    expect(mainTs).toContain("const confirm = ($('#account-confirm-pass') as HTMLInputElement).value;");
+    expect(mainTs).toContain('validatePasswordChange(current, next, confirm)');
+  });
+
+  it('routes logged-in play navigation to the realm and character flow', () => {
+    expect(mainTs).toContain('const goToLoggedInPlay = () => {');
+    expect(mainTs).toContain('void enterRealmFlow().catch((err) => {');
+    expect(mainTs).toContain('api.clearSession();');
+    expect(mainTs).toContain('const enterOnlinePlayFlow = () => {');
+    expect(mainTs).toContain('if (api.token) {');
+    expect(mainTs).toContain('goToLoggedInPlay();');
+    expect(mainTs).toContain('setupNavBtn(navBtnPlay, \'#hero-view\', enterOnlinePlayFlow);');
+    expect(mainTs).toContain('const handleOnlineSelect = () => {');
+    expect(mainTs).toContain("show('#login-panel');");
+  });
+
   it('ships crawlable SEO metadata and sitemap hints', () => {
     expect(html).toContain('<meta name="robots" content="index, follow, max-image-preview:large" />');
     expect(html).toContain('<link rel="canonical" href="https://worldofclaudecraft.com/" />');
@@ -50,6 +92,32 @@ describe('client HTML shell', () => {
     expect(robotsTxt).toContain('Sitemap: https://worldofclaudecraft.com/sitemap.xml');
     expect(sitemapXml).toContain('<loc>https://worldofclaudecraft.com/</loc>');
     expect(sitemapXml).toContain('<loc>https://worldofclaudecraft.com/links</loc>');
+    expect(sitemapXml).toContain('<loc>https://worldofclaudecraft.com/play</loc>');
+    expect(playHtml).toContain('<link rel="canonical" href="https://worldofclaudecraft.com/play" />');
+    expect(playHtml).toContain('<meta property="og:url" content="https://worldofclaudecraft.com/play" />');
+    expect(playHtml).toContain('"url": "https://worldofclaudecraft.com/play"');
+    expect(sitemapXml).toContain('<loc>https://worldofclaudecraft.com/privacy</loc>');
+    expect(sitemapXml).toContain('<loc>https://worldofclaudecraft.com/terms</loc>');
+    expect(privacyHtml).toContain('<link rel="canonical" href="https://worldofclaudecraft.com/privacy" />');
+    expect(privacyHtml).toContain('<h1>Privacy Policy</h1>');
+    expect(termsHtml).toContain('<link rel="canonical" href="https://worldofclaudecraft.com/terms" />');
+    expect(termsHtml).toContain('<h1>Terms and Conditions</h1>');
+    expect(html).toContain('href="/terms" class="footer-link" data-i18n="footer.terms"');
+    expect(html).toContain('href="/privacy" class="footer-link" data-i18n="footer.privacy"');
+    expect(viteConfig).toContain("['/privacy', '/privacy.html']");
+    expect(viteConfig).toContain("['/terms', '/terms.html']");
+    expect(serverMain).toContain("['/privacy', '/privacy.html']");
+    expect(serverMain).toContain("['/terms', '/terms.html']");
+  });
+
+  it('loads Meta Pixel outside local development and tracks level 5', () => {
+    expect(html).toContain('https://connect.facebook.net/en_US/fbevents.js');
+    expect(html).toContain("fbq('init', '1692101265042180');");
+    expect(html).toContain("fbq('track', 'PageView');");
+    expect(html).toContain('https://www.facebook.com/tr?id=1692101265042180&ev=PageView&noscript=1');
+    expect(html).toContain("if (!['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)) {");
+    expect(hudTs).toContain("fbq('trackCustom', eventName, data ?? {});");
+    expect(hudTs).toContain("if (ev.level === 5) trackMetaPixel('ReachedLevel5', { level: ev.level });");
   });
 
   it('offers the quest log in the mobile controls drawer', () => {
@@ -181,6 +249,20 @@ describe('client HTML shell', () => {
     expect(html).toContain('body.mobile-touch .footer-lang-row {\n    width: 100%;\n    flex-direction: column;\n    align-items: center;');
     expect(html).not.toContain('body.mobile-touch .homepage-header {\n    display: flex;\n    position: relative;');
     expect(mainTs).not.toContain("visualViewport?.addEventListener('scroll', syncAppViewport)");
+  });
+
+  it('lets HUD windows scroll by touch on iOS (Bag / Market)', () => {
+    // The HUD overlay must permit one-finger panning so scroll containers
+    // inside it can scroll on iOS — `touch-action: none` here would block them
+    // (Safari intersects touch-action down the ancestor chain, so a child's
+    // own pan-y cannot re-enable it). pan-x pan-y still blocks pinch-zoom.
+    expect(html).toContain('body.mobile-touch #ui { touch-action: pan-x pan-y; }');
+    expect(html).not.toContain('body.mobile-touch #ui { touch-action: none; }');
+    // Scrollable lists get iOS momentum + scroll isolation.
+    expect(html).toContain('#bags .bag-grid { flex: 1 1 auto; min-height: 0; overflow-y: auto;\n    touch-action: pan-y; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }');
+    expect(html).toContain('#market-body { overflow-y: auto; flex: 1; min-height: 0; padding-right: 2px;\n    touch-action: pan-y; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }');
+    // The world canvas still suppresses panning so camera drag is unaffected.
+    expect(html).toContain('body.mobile-touch #game-canvas { touch-action: none; }');
   });
 
   it('places news release metadata below the heading on mobile', () => {
@@ -331,16 +413,38 @@ describe('client HTML shell', () => {
     expect(html).toContain('body.mobile-touch .action-btn.mobile-drag-source');
   });
 
-  it('falls back to the normal hotbar when a form hotbar has no saved spells', () => {
+  it('seeds druid form bars with the form kit, and only clones normal for rogue stealth', () => {
+    expect(hudTs).toContain('if (this.isFormKitBar()) {');
+    expect(hudTs).toContain('if (this.seedFormBarIfNeeded(parsed)) return;');
+    expect(hudTs).toContain('buildDefaultFormBar(this.formKitAbilityIds(this.activeHotbarForm), Hud.BAR_ABILITY_SLOTS)');
     expect(hudTs).toContain('const emptyFormMap = this.activeHotbarForm !== \'normal\' && parsed.every((action) => action === null);');
     expect(hudTs).toContain("localStorage.getItem(this.slotMapKey('normal'))");
     expect(hudTs).not.toContain('this.loadedSlotMapFromStorage = stored || this.activeHotbarForm !== \'normal\';');
+  });
+
+  it('migrates a pre-existing form bar at most once via a per-form seeded marker', () => {
+    expect(hudTs).toContain('_seeded');
+    expect(hudTs).toContain('shouldSeedFormBar(parsed, normalActions, false)');
+  });
+
+  it('only auto-places abilities that belong on the active form bar', () => {
+    expect(hudTs).toContain('if (this.shouldAutoPlaceOnForm(id, this.activeHotbarForm)) autoPlaceAbilityIds.add(id);');
   });
 
   it('keeps the active druid form toggle on its form action bar', () => {
     expect(hudTs).toContain("if (this.activeHotbarForm === 'bear') return 'bear_form';");
     expect(hudTs).toContain("if (this.activeHotbarForm === 'cat') return 'cat_form';");
     expect(hudTs).toContain('if (formToggle && knownAbilityIds.includes(formToggle)) autoPlaceAbilityIds.add(formToggle);');
+  });
+
+  it('offers a reset-to-default action bar button in the spellbook, only for classes with form bars', () => {
+    expect(hudTs).toContain('data-reset-bar');
+    expect(hudTs).toContain('this.resetActiveFormBarToDefault()');
+    expect(hudTs).toContain("t('abilityUi.spellbook.resetBar')");
+    expect(html).toContain('.spellbook-reset {');
+    expect(html).toContain('body.mobile-touch #spellbook .spellbook-reset {');
+    expect(hudTs).toContain('const resetBtnHtml = this.classHasFormBars()');
+    expect(hudTs).toContain('return classHasFormBars(this.sim.cfg.playerClass);');
   });
 
   it('shows mobile spellbook add and remove controls for the spell bar', () => {

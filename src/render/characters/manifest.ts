@@ -73,6 +73,11 @@ export interface VisualDef {
    *  instead — e.g. the cosmetic-only Combat Mech, loaded via preloadMechAssets()
    *  when the skin-select preview opens, so it never bloats every client's boot. */
   lazyPreload?: boolean;
+  /** Post-load orientation fixups for weapon/prop nodes baked INTO a creature
+   *  GLB at the wrong angle (some KayKit handslot weapons ship without the grip
+   *  flip the standalone weapon files carry). Node name as authored in the GLB;
+   *  applied as a local-space rotation (radians) after the bind transform. */
+  weaponFix?: { node: string; rotX?: number; rotY?: number; rotZ?: number }[];
 }
 
 // ---------------------------------------------------------------------------
@@ -465,6 +470,9 @@ export const VISUALS: Record<string, VisualDef> = {
   skel_golem: {
     url: `${ENEMIES}/skeleton_golem.glb`, height: 3.4,
     clips: skeletonLargeClips(['2H_Melee_Attack_Chop', '1H_Melee_Attack_Chop']),
+    // the baked golem axe ships without the 180° grip flip the rig expects, so
+    // the blade faces backwards; spin it about its handle (local Y) to face out.
+    weaponFix: [{ node: 'Skeleton_Golem_Axe', rotY: Math.PI }],
     tint: 'entity', tintStrength: 0.25,
   },
 
@@ -587,6 +595,9 @@ const MOB_KEYS: Record<string, string> = {
   bastion_revenant: 'skel_warrior',
   knight_commander_olen: 'skel_warrior',
   sanctum_boneguard: 'skel_warrior',
+  nythraxis_scourge_of_thornpeak: 'skel_golem',
+  nythraxis_skeleton_warrior: 'skel_warrior',
+  brother_aldric_raid: 'npc_aldric',
   hollow_acolyte: 'skel_mage',
   sexton_marrow: 'skel_mage',
   morthen: 'skel_boss',

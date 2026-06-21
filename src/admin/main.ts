@@ -3,11 +3,11 @@ import { barChart, chartPanel } from './charts';
 import { escapeHtml, fmtBytes, fmtDate, fmtDuration } from './format';
 import { classLabel, t, localizeAdminError, ensureAdminLocaleLoaded, adminLanguage } from './i18n';
 import {
-  renderAccountDetail, renderAccountsTable, renderCharactersTable, renderChatFilter,
+  renderAccountDetail, renderAccountsTable, renderBlockedIps, renderCharactersTable, renderChatFilter,
   renderModerationDetail, renderModerationQueue, renderOnlineTable, renderPager, renderProviderUsage,
 } from './tables';
 import type {
-  AccountDetail, AccountRow, Activity, CharacterRow, ChatFilterData, LivePlayer,
+  AccountDetail, AccountRow, Activity, BlockedIpsData, CharacterRow, ChatFilterData, LivePlayer,
   ModerationAccountDetail, ModerationQueueRow, Overview, Paginated,
 } from './types';
 
@@ -32,8 +32,11 @@ const accountsState: TableState = { page: 1, search: '', sort: 'id', dir: 'desc'
 const charactersState: TableState = { page: 1, search: '', sort: 'level', dir: 'desc' };
 let liveTimer: number | null = null;
 let activityTimer: number | null = null;
-type AdminPage = 'overview' | 'usage' | 'moderation' | 'chat-filter';
+type AdminPage = 'overview' | 'usage' | 'moderation' | 'chat-filter' | 'blocked-ips';
 let activePage: AdminPage = 'overview';
+// Re-fetched when returning to the Moderation tab: its blocked-IP badges can be
+// changed from the Blocked IPs tab and would otherwise show stale.
+let openModerationAccountId: number | null = null;
 let pendingModerationAction: { endpoint: string; body: unknown; accountId: number; source: 'account' | 'moderation' } | null = null;
 
 // ---------------------------------------------------------------------------
@@ -84,8 +87,12 @@ function showPage(page: AdminPage): void {
   document.querySelectorAll<HTMLElement>('.admin-page').forEach((el) => {
     el.classList.toggle('active', el.id === `page-${page}`);
   });
-  if (page === 'moderation') void refreshModeration();
+  if (page === 'moderation') {
+    void refreshModeration();
+    if (openModerationAccountId !== null) void openModerationAccount(openModerationAccountId);
+  }
   if (page === 'chat-filter') void refreshChatFilter();
+  if (page === 'blocked-ips') void refreshBlockedIps();
 }
 
 async function refreshChatFilter(): Promise<void> {
@@ -94,6 +101,15 @@ async function refreshChatFilter(): Promise<void> {
     $('chat-filter').innerHTML = renderChatFilter(data);
   } catch (err) {
     if (!handleAuthFailure(err)) $('chat-filter').innerHTML = `<div class="empty">${t('chatFilter.loadFailed')}</div>`;
+  }
+}
+
+async function refreshBlockedIps(): Promise<void> {
+  try {
+    const data = await apiGet<BlockedIpsData>('/admin/api/blocked-ips');
+    $('blocked-ips').innerHTML = renderBlockedIps(data);
+  } catch (err) {
+    if (!handleAuthFailure(err)) $('blocked-ips').innerHTML = `<div class="empty">${t('blockedIps.loadFailed')}</div>`;
   }
 }
 
@@ -213,6 +229,7 @@ async function refreshOpenAccountDetail(accountId: number): Promise<void> {
 }
 
 async function openModerationAccount(accountId: number): Promise<void> {
+  openModerationAccountId = accountId;
   $('moderation-detail').innerHTML = `<div class="empty">${t('report.loading')}</div>`;
   try {
     const detail = await apiGet<ModerationAccountDetail>(`/admin/api/moderation/accounts/${accountId}`);
@@ -327,6 +344,36 @@ function handleModerationActionClick(e: Event, source: 'account' | 'moderation')
       source,
       confirmEl,
     });
+    return true;
+  }
+  // Handled before the actionWrap guard below: the IP buttons sit outside it.
+  // Banning is confirmed; unblocking is reversible and applies directly.
+  const banIpBtn = target.closest('button[data-ban-ip]') as HTMLButtonElement | null;
+  if (banIpBtn) {
+    const ip = banIpBtn.dataset.banIp ?? '';
+    const expiresAt = blockExpiryIso(banIpBtn.dataset.banDuration ?? '');
+    showModerationConfirm({
+      title: t('blockedIps.confirmBanTitle'),
+      rows: [
+        { label: t('blockedIps.colIp'), value: ip },
+        { label: t('dialog.action'), value: banIpBtn.textContent?.trim() ?? t('blockedIps.banIp') },
+        { label: t('dialog.reason'), value: note || '—' },
+        { label: '⚠', value: t('blockedIps.sharedIpWarning') },
+      ],
+      endpoint: '/admin/api/blocked-ips',
+      body: { ip, reason: note, expiresAt },
+      accountId,
+      source,
+      confirmEl,
+      danger: true,
+    });
+    return true;
+  }
+  const unblockIpBtn = target.closest('button[data-unblock-ip]') as HTMLButtonElement | null;
+  if (unblockIpBtn) {
+    void apiPost('/admin/api/blocked-ips/delete', { ip: unblockIpBtn.dataset.unblockIp })
+      .then(() => { if (source === 'account') void refreshOpenAccountDetail(accountId); else void openModerationAccount(accountId); })
+      .catch((err: unknown) => { if (!handleAuthFailure(err)) window.alert(err instanceof Error ? localizeAdminError(err.message) : t('alert.actionFailed')); });
     return true;
   }
   if (!actionWrap) return false;
@@ -490,10 +537,11 @@ function wireEvents(): void {
   $('admin-tabs').addEventListener('click', (e) => {
     const tab = (e.target as HTMLElement).closest<HTMLButtonElement>('.admin-tab');
     const page = tab?.dataset.adminPage;
-    if (page === 'overview' || page === 'usage' || page === 'moderation' || page === 'chat-filter') showPage(page);
+    if (page === 'overview' || page === 'usage' || page === 'moderation' || page === 'chat-filter' || page === 'blocked-ips') showPage(page);
   });
 
   wireChatFilterEvents();
+  wireBlockedIpsEvents();
 
   let searchTimer: number | null = null;
   $('account-search').addEventListener('input', (e) => {
@@ -618,6 +666,40 @@ function wireChatFilterEvents(): void {
         .then(() => refreshChatFilter())
         .catch((err: unknown) => chatFilterError(err, 'alert.saveConfigFailed'));
     }
+  });
+}
+
+// '' (forever) → undefined; otherwise now + N days as ISO.
+function blockExpiryIso(duration: string): string | undefined {
+  const days: Record<string, number> = { '1d': 1, '7d': 7, '30d': 30 };
+  const n = days[duration];
+  return n ? new Date(Date.now() + n * 86_400_000).toISOString() : undefined;
+}
+
+function wireBlockedIpsEvents(): void {
+  const blockedError = (err: unknown, fallbackKey: string): void => {
+    if (!handleAuthFailure(err)) window.alert(err instanceof Error ? localizeAdminError(err.message) : t(fallbackKey));
+  };
+  $('blocked-ips').addEventListener('submit', (e) => {
+    const form = (e.target as HTMLElement).closest('form.ip-add') as HTMLFormElement | null;
+    if (!form) return;
+    e.preventDefault();
+    const ip = (form.querySelector('.ip-add-ip') as HTMLInputElement | null)?.value.trim() ?? '';
+    const reason = (form.querySelector('.ip-add-reason') as HTMLInputElement | null)?.value.trim() ?? '';
+    const duration = (form.querySelector('.ip-add-expiry-select') as HTMLSelectElement | null)?.value ?? '';
+    if (!ip) return;
+    if (!window.confirm(`${t('blockedIps.confirmBlock', { ip })}\n\n${t('blockedIps.sharedIpWarning')} ${t('blockedIps.expiryHint')}`)) return;
+    const expiresAt = blockExpiryIso(duration);
+    void apiPost('/admin/api/blocked-ips', { ip, reason, expiresAt })
+      .then(() => refreshBlockedIps())
+      .catch((err: unknown) => blockedError(err, 'blockedIps.addFailed'));
+  });
+  $('blocked-ips').addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest('button[data-unblock-ip]') as HTMLButtonElement | null;
+    if (!btn) return;
+    void apiPost('/admin/api/blocked-ips/delete', { ip: btn.dataset.unblockIp })
+      .then(() => refreshBlockedIps())
+      .catch((err: unknown) => blockedError(err, 'blockedIps.removeFailed'));
   });
 }
 

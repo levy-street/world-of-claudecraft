@@ -18,6 +18,15 @@ function simClass(cls: 'warrior' | 'mage' | 'rogue' | 'druid' | 'hunter' | 'prie
   return cls;
 }
 
+function summonImp(sim: Sim): Entity {
+  sim.player.resource = sim.player.maxResource;
+  sim.castAbility('summon_imp');
+  for (let i = 0; i < 20 * 6; i++) sim.tick();
+  const imp = sim.petOf(sim.playerId);
+  if (!imp) throw new Error('expected summoned imp');
+  return imp;
+}
+
 function nearestMob(sim: Sim, templateId?: string, from?: Entity): Entity {
   const p = from ?? sim.player;
   let best: Entity | null = null;
@@ -97,6 +106,32 @@ describe('threat from damage', () => {
     expect(wolf.threat.get(sim.playerId)).toBeCloseTo(100 * RIGHTEOUS_FURY_THREAT_MULT + 1, 5);
     hit(sim, sim.player, wolf, 100, 'physical');
     expect(wolf.threat.get(sim.playerId)).toBeCloseTo(100 * RIGHTEOUS_FURY_THREAT_MULT + 101, 5);
+  });
+
+  it('consecration burns the ground every 2 seconds from 0s to 8s and generates holy threat each pulse', () => {
+    const sim = makeSim('paladin');
+    sim.setPlayerLevel(20);
+    const wolf = nearestMob(sim, 'forest_wolf');
+    beefUp(wolf);
+    teleport(sim, sim.player, wolf.pos.x, wolf.pos.z + 2);
+    sim.player.resource = sim.player.maxResource;
+    sim.castAbility('righteous_fury');
+    sim.tick();
+    sim.player.gcdRemaining = 0;
+    sim.castAbility('consecration');
+
+    const damageEvents: number[] = [];
+    for (let i = 0; i < 20 * 10; i++) {
+      for (const event of sim.tick()) {
+        if (event.type === 'damage' && event.ability === 'Consecration' && event.targetId === wolf.id && event.amount > 0) {
+          damageEvents.push(event.amount);
+        }
+      }
+    }
+
+    expect(damageEvents).toHaveLength(5);
+    expect(damageEvents.reduce((sum, amount) => sum + amount, 0)).toBeGreaterThanOrEqual(28 * 5);
+    expect(wolf.threat.get(sim.playerId) ?? 0).toBeGreaterThan(28 * 5 * RIGHTEOUS_FURY_THREAT_MULT);
   });
 
   it('classic flat threat values resolve per rank (heroic strike 20/39)', () => {
@@ -682,6 +717,37 @@ describe('hunter pets', () => {
     expect(events).toBeTruthy();
   });
 
+  it('pet taunts do not force bosses onto the pet', () => {
+    const { sim, wolf: pet } = tamedSetup();
+    sim.players.get(sim.playerId)!.questsDone.add('q_nythraxis_bound_guardian');
+    while ((sim.partyOf(sim.playerId)?.members.length ?? 1) < 5) {
+      const fill = sim.addPlayer('priest', `RaidFill${sim.players.size}`);
+      sim.partyInvite(fill);
+      sim.partyAccept(fill);
+    }
+    sim.convertPartyToRaid();
+    sim.enterDungeon('nythraxis_boss_arena');
+    const boss = [...sim.entities.values()].find((e) =>
+      e.kind === 'mob' && e.templateId === 'nythraxis_scourge_of_thornpeak' && !e.dead)!;
+    const tankId = sim.addPlayer('warrior', 'Tank');
+    const tank = sim.entities.get(tankId)!;
+    teleport(sim, tank, boss.pos.x + 3, boss.pos.z);
+    teleport(sim, sim.player, boss.pos.x + 8, boss.pos.z);
+    teleport(sim, pet, boss.pos.x + 2, boss.pos.z);
+    boss.inCombat = true;
+    boss.aiState = 'attack';
+    boss.aggroTargetId = tank.id;
+    boss.threat.set(tank.id, 1000);
+    sim.targetEntity(boss.id);
+
+    sim.petTaunt();
+
+    expect(boss.threat.get(pet.id)).toBeGreaterThan(0);
+    expect(boss.forcedTargetId).not.toBe(pet.id);
+    expect(boss.aggroTargetId).toBe(tank.id);
+    expect(pet.petTauntTimer).toBe(10);
+  });
+
   it('hunter aspects apply to the active pet', () => {
     const { sim, wolf: pet } = tamedSetup();
     const apBefore = (sim as any).effectiveAttackPower(pet);
@@ -774,20 +840,22 @@ describe('druid forms', () => {
     expect(sim.player.resource).toBeLessThanOrEqual(manaBefore);
   });
 
-  // Issue #298: bear should grant +65% armor and +15 AP, cat should raise AP.
+  // Issue #298: bear should grant armor, stamina, and +15 AP; cat should raise AP.
   // These apply in recalcPlayerStats; the bug the reporter hit was the missing
   // cat-form *visual* (renderer), but lock the stat math so it can't regress.
-  it('bear form raises armor +65% and attack power +15', () => {
+  it('bear form raises armor, maximum health, and attack power', () => {
     const sim = makeSim('druid');
     sim.setPlayerLevel(20);
     sim.tick();
     const armorBefore = sim.player.stats.armor;
+    const hpBefore = sim.player.maxHp;
     const apBefore = sim.player.attackPower;
     sim.castAbility('bear_form');
     sim.tick();
     expect(sim.player.auras.some((a) => a.kind === 'form_bear')).toBe(true);
-    expect(sim.player.stats.armor).toBe(Math.round(armorBefore * 1.65));
-    expect(sim.player.attackPower).toBe(apBefore + 15);
+    expect(sim.player.stats.armor).toBeGreaterThanOrEqual(Math.round(armorBefore * 1.9));
+    expect(sim.player.maxHp).toBeGreaterThan(hpBefore);
+    expect(sim.player.attackPower).toBeGreaterThan(apBefore + 15);
   });
 
   it('wolf form raises attack power', () => {
@@ -1055,6 +1123,22 @@ describe('social aggro pull radius (#102)', () => {
 });
 
 describe('caster wand auto-attack (#94)', () => {
+  it('does not aggro a hostile mob when melee auto-attack is started out of range', () => {
+    const sim = makeSim('warrior');
+    sim.setPlayerLevel(10);
+    const wolf = nearestMob(sim, 'forest_wolf');
+    teleport(sim, sim.player, wolf.pos.x + 35, wolf.pos.z);
+    sim.targetEntity(wolf.id);
+
+    sim.startAutoAttack(sim.playerId);
+
+    expect(sim.player.autoAttack).toBe(true);
+    expect(wolf.aiState).toBe('idle');
+    expect(wolf.aggroTargetId).toBeNull();
+    expect(wolf.threat.get(sim.playerId)).toBeUndefined();
+    expect(sim.player.inCombat).toBe(false);
+  });
+
   it('a mage auto-attacks at range instead of running into melee', () => {
     const sim = makeSim('mage');
     sim.setPlayerLevel(10);
@@ -1161,7 +1245,7 @@ describe('shaman travel and shock mechanics', () => {
     sim.startAutoAttack();
     expect(sim.player.auras.some((a) => a.id === 'ghost_wolf')).toBe(true);
 
-    teleport(sim, sim.player, wolf.pos.x + 20, wolf.pos.z);
+    teleport(sim, sim.player, wolf.pos.x + 35, wolf.pos.z);
     sim.targetEntity(wolf.id);
     sim.player.facing = Math.atan2(wolf.pos.x - sim.player.pos.x, wolf.pos.z - sim.player.pos.z);
     sim.startAutoAttack();
@@ -1213,7 +1297,7 @@ describe('shaman travel and shock mechanics', () => {
     beefUp(wolf);
     wolf.level = sim.player.level;
     wolf.weapon = { min: 10, max: 10, speed: 2 };
-    teleport(sim, sim.player, wolf.pos.x + 20, wolf.pos.z);
+    teleport(sim, sim.player, wolf.pos.x + 35, wolf.pos.z);
     sim.targetEntity(wolf.id);
     sim.player.facing = Math.atan2(wolf.pos.x - sim.player.pos.x, wolf.pos.z - sim.player.pos.z);
     sim.player.resource = sim.player.maxResource;
@@ -1329,39 +1413,32 @@ describe('shaman travel and shock mechanics', () => {
 describe('warlock demon summons', () => {
   it('Summon Imp creates a ranged demon that casts Firebolt', () => {
     const sim = makeSim('warlock');
-    sim.player.resource = sim.player.maxResource;
-    sim.castAbility('summon_imp');
-    for (let i = 0; i < 20 * 5; i++) sim.tick();
 
-    const imp = sim.petOf(sim.playerId);
-    expect(imp).toBeTruthy();
-    expect(imp!.templateId).toBe('imp');
-    expect(imp!.name).toBe('Imp');
-    expect(imp!.ownerId).toBe(sim.playerId);
-    expect(imp!.hostile).toBe(false);
+    const imp = summonImp(sim);
+    expect(imp.templateId).toBe('imp');
+    expect(imp.name).toBe('Imp');
+    expect(imp.ownerId).toBe(sim.playerId);
+    expect(imp.hostile).toBe(false);
 
     const wolf = nearestMob(sim, 'forest_wolf');
     beefUp(wolf);
     teleport(sim, sim.player, wolf.pos.x + 14, wolf.pos.z);
-    teleport(sim, imp!, wolf.pos.x + 12, wolf.pos.z);
+    teleport(sim, imp, wolf.pos.x + 12, wolf.pos.z);
     sim.targetEntity(wolf.id);
     sim.petAttack();
 
     let firebolt = false;
     for (let i = 0; i < 20 * 4 && !firebolt; i++) {
       const events = sim.tick();
-      firebolt = events.some((e) => e.type === 'damage' && (e as any).sourceId === imp!.id && (e as any).school === 'fire' && (e as any).amount > 0);
+      firebolt = events.some((e) => e.type === 'damage' && (e as any).sourceId === imp.id && (e as any).school === 'fire' && (e as any).amount > 0);
     }
     expect(firebolt).toBe(true);
-    expect(wolf.threat.has(imp!.id)).toBe(true);
+    expect(wolf.threat.has(imp.id)).toBe(true);
   });
 
   it('warlocks heal demons with mana instead of food and cannot abandon them', () => {
     const sim = makeSim('warlock');
-    sim.player.resource = sim.player.maxResource;
-    sim.castAbility('summon_imp');
-    for (let i = 0; i < 20 * 5; i++) sim.tick();
-    const demon = sim.petOf(sim.playerId)!;
+    const demon = summonImp(sim);
     demon.hp = Math.max(1, demon.maxHp - 50);
     sim.addItem('baked_bread', 1);
 
@@ -1389,10 +1466,7 @@ describe('warlock demon summons', () => {
   it('Summon Voidwalker replaces the imp with a tank demon that Growls', () => {
     const sim = makeSim('warlock');
     sim.setPlayerLevel(10);
-    sim.player.resource = sim.player.maxResource;
-    sim.castAbility('summon_imp');
-    for (let i = 0; i < 20 * 5; i++) sim.tick();
-    const imp = sim.petOf(sim.playerId)!;
+    const imp = summonImp(sim);
 
     sim.player.resource = sim.player.maxResource;
     sim.castAbility('summon_voidwalker');
@@ -1419,10 +1493,7 @@ describe('warlock demon summons', () => {
 
   it('recasting the same demon unsummons it', () => {
     const sim = makeSim('warlock');
-    sim.player.resource = sim.player.maxResource;
-    sim.castAbility('summon_imp');
-    for (let i = 0; i < 20 * 5; i++) sim.tick();
-    const demon = sim.petOf(sim.playerId)!;
+    const demon = summonImp(sim);
     expect(demon.templateId).toBe('imp');
 
     sim.player.resource = sim.player.maxResource;
@@ -1435,10 +1506,7 @@ describe('warlock demon summons', () => {
 
   it('recasting a dead demon resummons it instead of dismissing', () => {
     const sim = makeSim('warlock');
-    sim.player.resource = sim.player.maxResource;
-    sim.castAbility('summon_imp');
-    for (let i = 0; i < 20 * 5; i++) sim.tick();
-    const deadDemon = sim.petOf(sim.playerId)!;
+    const deadDemon = summonImp(sim);
     deadDemon.dead = true;
     deadDemon.hp = 0;
     deadDemon.aiState = 'dead';

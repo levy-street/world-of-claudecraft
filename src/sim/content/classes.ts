@@ -745,7 +745,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'consecration', name: 'Consecration', class: 'paladin', learnLevel: 18,
     cost: 60, castTime: 0, cooldown: 8, range: 0, school: 'holy',
     requiresTarget: false,
-    effects: [{ type: 'aoeDamage', min: 28, max: 34, radius: 8 }],
+    effects: [{ type: 'groundAoE', min: 28, max: 34, radius: 8, duration: 10, interval: 2 }],
     description: 'Consecrates the ground beneath you, searing nearby enemies for $d Holy damage.',
   },
   righteous_fury: {

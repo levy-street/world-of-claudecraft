@@ -232,8 +232,110 @@ export const pt_BR: EnTranslations = {
       "showWalletOnCharacterScreen": "Mostrar carteira na tela de personagens",
       "showWalletOnPlayerCard": "Mostrar carteira no cartão de jogador"
     },
+    "perf": {
+      "title": "Sobreposição de Desempenho",
+      "enable": "Mostrar Sobreposição de Desempenho",
+      "description": "Escolha quais estatísticas exibir, onde a sobreposição fica e como ela aparece.",
+      "sectionPosition": "Posição",
+      "sectionAppearance": "Aparência",
+      "sectionStats": "Estatísticas",
+      "positionX": "Horizontal",
+      "positionY": "Vertical",
+      "resetPosition": "Redefinir Posição",
+      "dragHint": "Arraste a sobreposição para movê-la ou use os controles deslizantes abaixo.",
+      "opacity": "Opacidade do Fundo",
+      "solidBg": "Fundo Sólido",
+      "fontScale": "Tamanho do Texto",
+      "textColor": "Cor do Texto",
+      "bgColor": "Cor do Fundo",
+      "colorTheme": "Tema de Cores",
+      "graph": "Gráfico de Tempo de Quadro",
+      "thresholds": "Avisos por Cores",
+      "presetsLabel": "Predefinições Rápidas",
+      "presetMinimal": "Mínimo",
+      "presetStandard": "Padrão",
+      "presetEverything": "Tudo",
+      "groups": {
+        "frame": "Quadro e Tempo",
+        "network": "Rede",
+        "renderer": "Renderizador",
+        "system": "Sistema"
+      },
+      "labels": {
+        "fps": "FPS",
+        "frameTime": "Tempo de Quadro",
+        "fps1Low": "1% Mín.",
+        "fps01Low": "0,1% Mín.",
+        "ping": "Ping",
+        "jitter": "Jitter",
+        "snapshot": "Taxa de Snapshot",
+        "connection": "Conexão",
+        "drawCalls": "Chamadas de Desenho",
+        "triangles": "Triângulos",
+        "geometries": "Geometrias",
+        "textures": "Texturas",
+        "programs": "Shaders",
+        "renderScale": "Escala de Renderização",
+        "gpu": "GPU",
+        "memory": "Memória",
+        "hitches": "Travamentos",
+        "entities": "Entidades"
+      },
+      "themes": {
+        "gold": "Ouro",
+        "frost": "Gélido",
+        "ember": "Brasa",
+        "jade": "Jade",
+        "crimson": "Carmesim",
+        "mono": "Mono"
+      },
+      "units": {
+        "ms": "{value} ms",
+        "mb": "{value} MB",
+        "memPair": "{used} / {limit} MB",
+        "hz": "{value} Hz"
+      },
+      "badges": {
+        "backgrounded": "Em segundo plano",
+        "offline": "Offline"
+      }
+    },
     "playerCard": {
       "showWalletBadge": "Mostrar selo da carteira"
+    },
+    "statInfo": {
+      "fromYour": "Do seu {value} de {stat}:",
+      "desc": {
+        "str": "Aumenta seu poder de ataque, de modo que seus golpes com armas atinjam com mais força.",
+        "agi": "Aguça seus reflexos e sua mira, melhorando vários dos seus atributos de combate.",
+        "sta": "Enrijece seu corpo, aumentando sua vida máxima e a rapidez com que você recupera vida ao descansar.",
+        "int": "Amplia a reserva de mana de um conjurador e melhora sua chance de aplicar um acerto crítico com magias.",
+        "spi": "Acelera a rapidez com que a mana de um conjurador retorna ao descansar, fora de combate.",
+        "armor": "Suaviza os golpes físicos recebidos. A redução é maior contra atacantes de nível inferior e tem limite de 75%.",
+        "attackPower": "Potencializa seus ataques com armas. A cada 14 de poder de ataque, adiciona 1 de dano por segundo.",
+        "dps": "Seu dano por segundo estimado com armas, combinando o dano e a velocidade da sua arma com seu poder de ataque.",
+        "critChance": "Sua chance de um ataque atingir criticamente, causando dano dobrado.",
+        "dodge": "Sua chance de esquivar completamente de um ataque corpo a corpo recebido, sem sofrer dano."
+      },
+      "effects": {
+        "attackPower": "+{value} de Poder de ataque",
+        "rangedAttackPower": "+{value} de Poder de ataque a distância",
+        "critPct": "+{value}% de Acerto crítico",
+        "dodgePct": "+{value}% de Esquiva",
+        "armor": "+{value} de Armadura",
+        "maxHealth": "+{value} de Vida máxima",
+        "maxMana": "+{value} de Mana máxima",
+        "spellCritPct": "+{value}% de Acerto crítico com magias",
+        "healthRegen": "Cerca de {value} de vida a cada 5 seg ao descansar",
+        "manaRegen": "Cerca de {value} de mana a cada 5 seg ao descansar",
+        "damageReduction": "Redução de dano contra um atacante de nível {level}: {value}%",
+        "dpsFromAp": "Adiciona {value} de dano por segundo aos seus ataques"
+      },
+      "notes": {
+        "minorForClass": "De pouco benefício para a sua classe.",
+        "baseChance": "Inclui uma chance base de 5% compartilhada por todos os aventureiros.",
+        "dpsApprox": "Uma estimativa, que exclui acertos críticos e dano de habilidades."
+      }
     },
     "talents": {
       "defaultBuildName": "Build {n}"
@@ -285,13 +387,56 @@ export const pt_BR: EnTranslations = {
       "emittedLabel": "{pct}% of the pool paid out so far",
       "sinkLabel": "Funded",
       "emissionLabel": "Paid out",
-      "invariant": "Payouts can never exceed what the season took in — buy > sell, enforced on-chain.",
+      "invariant": "Payouts can never exceed what the season took in: buy > sell, enforced on-chain.",
       "standingsTitle": "Projected top earners",
       "colRank": "#",
       "colPlayer": "Player",
       "colRating": "Rating",
       "colReward": "Reward ($WOC)",
       "projectedNote": "Projected from the current pool + arena ranking; final payouts settle at season close."
+    },
+    "account": {
+      "title": "Conta",
+      "loggedOutPrompt": "Entre para gerenciar sua conta.",
+      "memberSince": "Membro desde {date}",
+      "sectionSettings": "Configurações da conta",
+      "sectionWallet": "Carteira $WOC",
+      "sectionCharacters": "Personagens",
+      "sectionDanger": "Zona de perigo",
+      "changePassword": "Alterar senha",
+      "currentPassword": "Senha atual",
+      "newPassword": "Nova senha",
+      "confirmNewPassword": "Confirmar nova senha",
+      "savePassword": "Atualizar senha",
+      "passwordChanged": "Senha atualizada. Os outros dispositivos foram desconectados.",
+      "errCurrentRequired": "Digite sua senha atual.",
+      "errPasswordShort": "A nova senha deve ter pelo menos 6 caracteres.",
+      "errPasswordLong": "A nova senha deve ter no máximo 128 caracteres.",
+      "errPasswordUnchanged": "A nova senha deve ser diferente da atual.",
+      "errPasswordConfirm": "As novas senhas não coincidem.",
+      "emailLabel": "Email (opcional)",
+      "emailHint": "Usado apenas para recuperação de conta. Nunca enviamos email de marketing.",
+      "saveEmail": "Salvar email",
+      "emailSaved": "Email salvo.",
+      "errEmailInvalid": "Digite um endereço de email válido.",
+      "errCurrentPassword": "Sua senha atual está incorreta.",
+      "errUsernameMatch": "Esse nome de usuário não corresponde à sua conta.",
+      "errPasswordIncorrect": "Sua senha está incorreta.",
+      "errCharactersOnline": "Desconecte todos os seus personagens antes de desativar.",
+      "deactivatedLocked": "Esta conta foi desativada. Contate um administrador para restaurá-la.",
+      "charactersSummary": "Gerencie seus personagens e entre no mundo.",
+      "charactersCount": "Personagens: {count}",
+      "goToCharacters": "Ver personagens",
+      "walletSummary": "Verifique uma carteira Solana para exibir o destaque de titular no seu cartão de jogador.",
+      "manageWallet": "Gerenciar carteira",
+      "deactivate": "Desativar conta",
+      "deactivateWarning": "A desativação bloqueia sua conta e desconecta você em todos os lugares. Contate um administrador para restaurá-la. Confirme digitando novamente seu nome de usuário e senha.",
+      "confirmUsername": "Digite seu nome de usuário para confirmar",
+      "confirmPassword": "Senha",
+      "deactivateConfirm": "Desativar minha conta",
+      "deactivated": "Sua conta foi desativada.",
+      "logOut": "Sair",
+      "logOutSummary": "Sair deste dispositivo."
     }
   },
   "skinEvent": {
@@ -336,6 +481,8 @@ export const pt_BR: EnTranslations = {
     "news": "Notícias",
     "download": "Baixar",
     "loginRegister": "Entrar/Registrar",
+    "account": "Conta",
+    "logout": "Sair",
     "donate": "Doar"
   },
   "stats": {
@@ -529,36 +676,36 @@ export const pt_BR: EnTranslations = {
         "flavor": "Os mercados sentem seus movimentos: 1% do suprimento."
       },
       "tidelord": {
-        "name": "Tidelord",
-        "flavor": "The tide answers your call: 2% of supply."
+        "name": "Senhor das marés",
+        "flavor": "A maré responde ao seu chamado: 2% do suprimento."
       },
       "stormcaller": {
-        "name": "Stormcaller",
-        "flavor": "Storms gather at your name: 3% of supply."
+        "name": "Conjurador de tempestades",
+        "flavor": "As tempestades se reúnem ao seu nome: 3% do suprimento."
       },
       "krakencrown": {
-        "name": "Krakencrown",
-        "flavor": "Crowned by the deep: 4% of supply."
+        "name": "Coroa do kraken",
+        "flavor": "Coroado pelas profundezas: 4% do suprimento."
       },
       "titanforged": {
-        "name": "Titanforged",
-        "flavor": "Forged among titans: 5% of supply."
+        "name": "Forjado entre titãs",
+        "flavor": "Forjado entre titãs: 5% do suprimento."
       },
       "starhoard": {
-        "name": "Starhoard",
-        "flavor": "A hoard that bends starlight: 6% of supply."
+        "name": "Tesouro estelar",
+        "flavor": "Um tesouro que entorta a luz das estrelas: 6% do suprimento."
       },
       "voidwarden": {
-        "name": "Voidwarden",
-        "flavor": "Keeper at the void's edge: 7% of supply."
+        "name": "Guardião do vazio",
+        "flavor": "Vigia à beira do vazio: 7% do suprimento."
       },
       "realmshaper": {
-        "name": "Realmshaper",
-        "flavor": "You reshape the realm: 8% of supply."
+        "name": "Moldador do reino",
+        "flavor": "Você remodela o reino: 8% do suprimento."
       },
       "worldforger": {
-        "name": "Worldforger",
-        "flavor": "Forging a world of your own: 9% of supply."
+        "name": "Forjador de mundos",
+        "flavor": "Você forja um mundo só seu: 9% do suprimento."
       },
       "worldbearer": {
         "name": "Portador do mundo",
@@ -1230,6 +1377,7 @@ export const pt_BR: EnTranslations = {
         "unignoreChat": "Parar de ignorar chat",
         "report": "Denunciar jogador",
         "removeParty": "Remover do grupo",
+        "convertToRaid": "Converter em raide",
         "cancel": "Cancelar"
       }
     },
@@ -1448,6 +1596,12 @@ export const pt_BR: EnTranslations = {
       "guildTab": "Guilda",
       "ignoreTab": "Ignorar",
       "leaveParty": "Sair do grupo",
+      "raidTab": "Raide",
+      "raidEmpty": "Converta um grupo em raide para gerenciar os grupos de raide aqui.",
+      "raidGroupEmpty": "Nenhum jogador neste grupo.",
+      "raidGroupTitle": "Grupo {position} ({count}/5)",
+      "raidMoveToGroup": "Mover para o grupo {position}",
+      "raidLeader": "Líder de raide",
       "offlineEmpty": "Amigos, guildas e listas de ignorados ficam disponíveis no jogo online.",
       "friendsEmpty": "Você ainda não tem amigos. Busque alguém pelo nome abaixo.",
       "ignoreEmpty": "Sua lista de ignorados está vazia.",
@@ -1548,6 +1702,8 @@ export const pt_BR: EnTranslations = {
       "title": "Livro de feitiços",
       "classSubtitle": "Habilidades de {className}",
       "close": "Fechar livro de feitiços",
+      "resetBar": "Redefinir barra",
+      "resetBarAria": "Redefinir a barra de ação atual para suas habilidades padrão",
       "trainableAtLevel": "Treinável no nível {level}",
       "learnAtLevel": "Você aprenderá isto no nível {level}.",
       "knownAbilityAria": "{name}, grau {rank}. {summary}",
@@ -1683,7 +1839,8 @@ export const pt_BR: EnTranslations = {
       "common": "Comum",
       "uncommon": "Incomum",
       "rare": "Raro",
-      "epic": "Épico"
+      "epic": "Épico",
+      "legendary": "Lendário"
     },
     "kind": {
       "weapon": "Arma",
@@ -1860,6 +2017,16 @@ export const pt_BR: EnTranslations = {
     "loot": {
       "takeAll": "Pegar tudo",
       "close": "Fechar saque"
+    },
+    "lootRoll": {
+      "title": "Rolagem de saque",
+      "need": "Necessidade",
+      "greed": "Ganância",
+      "pass": "Passar",
+      "needAria": "Necessidade por {item}",
+      "greedAria": "Ganância por {item}",
+      "passAria": "Passar em {item}",
+      "everyonePassed": "Todos passaram em {item}."
     }
   },
   "entities": {
@@ -3380,6 +3547,36 @@ export const pt_BR: EnTranslations = {
       "event_skin_token": {
         "name": "Baú cosmético misterioso"
       },
+      "deathless_heartwood": {
+        "name": "Cerne da Coroa Imortal"
+      },
+      "kingsbane_last_oath": {
+        "name": "Flagelo dos Reis, último juramento de Thornpeak"
+      },
+      "crownforged_dreadhelm": {
+        "name": "Elmo aterrador Forjacoroa"
+      },
+      "crownforged_warspaulders": {
+        "name": "Espaldares de guerra Forjacoroa"
+      },
+      "nighttalon_crown": {
+        "name": "Coroa Garra Noturna"
+      },
+      "nighttalon_shoulderguards": {
+        "name": "Guarda-ombros Garra Noturna"
+      },
+      "soulflame_cowl": {
+        "name": "Capuz Chama d'Alma"
+      },
+      "soulflame_mantle": {
+        "name": "Manto Chama d'Alma"
+      },
+      "stormcallers_crown": {
+        "name": "Coroa do Chamatormenta"
+      },
+      "stormcallers_spaulders": {
+        "name": "Espaldares do Chamatormenta"
+      },
       "unknown_alien_weaponry": {
         "name": "Armamento alienígena desconhecido"
       },
@@ -3594,6 +3791,12 @@ export const pt_BR: EnTranslations = {
       },
       "bound_guardian": {
         "name": "Guardião Vinculado"
+      },
+      "nythraxis_skeleton_warrior": {
+        "name": "Guarda real reerguido"
+      },
+      "nythraxis_scourge_of_thornpeak": {
+        "name": "Nythraxis, Flagelo de Thornpeak"
       },
       "brightwood_hare": {
         "name": "Lebre de Brightwood"
@@ -3846,6 +4049,11 @@ export const pt_BR: EnTranslations = {
         "name": "Patrulheiro Elwyn",
         "title": "Guardião da Clareira",
         "greeting": "Silêncio, {className} - a clareira está calma hoje, e pretendo mantê-la assim."
+      },
+      "brother_aldric_raid": {
+        "name": "Irmão Aldric",
+        "title": "Sacerdote do Vale",
+        "greeting": "Do cemitério da capela ao teto do mundo... a trilha termina aqui. Sinto a montanha ouvindo."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -4572,8 +4780,8 @@ export const pt_BR: EnTranslations = {
       },
       "q_nythraxis_bound_guardian": {
         "title": "O Guardião Vinculado",
-        "text": "Voss escreveu que os sobreviventes selaram o Anel-sinete do rei atrás de um guardião antigo, para que ninguém chegasse à tumba de Nythraxis por acidente ou ambição. Leve a Pedra-chave da cripta ao círculo ritual no terreno plano a leste da cripta abandonada e a sudeste da tumba oeste. Use-a ali, quebre o guardião e traga o anel.",
-        "completion": "As três relíquias contam a mesma história: Aldren lutou para defender seu rei, Malric rompeu a fronteira da morte e Voss tentou impedir o que veio depois. O selo está enfraquecendo, e este anel é a chave da tumba de Nythraxis. Agora você está sintonizado para entrar na Cripta de Nythraxis.",
+        "text": "Voss escreveu que os sobreviventes selaram o Anel-sinete do rei atras de um guardiao antigo, para que ninguem chegasse a tumba de Nythraxis por acidente ou ambicao. Leve a Pedra-chave da cripta ao circulo ritual no terreno plano a leste da cripta abandonada e a sudeste da tumba oeste. Use-a ali, quebre o guardiao e traga o anel.",
+        "completion": "As tres reliquias contam a mesma historia: Aldren lutou para defender seu rei, Malric rompeu a fronteira da morte e Voss tentou impedir o que veio depois. O selo esta enfraquecendo, e este anel e a chave da tumba de Nythraxis. Agora voce esta sintonizado para entrar na Cripta de Nythraxis. Volte a cripta abandonada, destranque a porta real e enfrente Nythraxis antes que a furia do velho rei transborde por Thornpeak.",
         "objectives": {
           "0": {
             "label": "Pedra-chave usada no círculo ritual"
@@ -4583,6 +4791,16 @@ export const pt_BR: EnTranslations = {
           },
           "2": {
             "label": "Anel-sinete do rei"
+          }
+        }
+      },
+      "q_nythraxis_scourges_end": {
+        "title": "O fim do Flagelo",
+        "text": "O anel-sinete abriu o caminho, {playerName}, mas uma tumba aberta nao e uma vitoria. Nythraxis ja foi rei, e a ruina sob Thornpeak ainda esta presa a vontade dele. Entre na cripta com aliados em quem confia. Quebre a coroa imortal antes que sua ordem alcance o campo de batalha acima.",
+        "completion": "Entao a coroa finalmente se cala. Thornpeak ainda carregara seus mortos, mas nenhum rei sob a montanha voltara a chama-los para a guerra. Voce terminou aquilo que Aldren, Malric e Voss so conseguiram conter.",
+        "objectives": {
+          "0": {
+            "label": "Nythraxis derrotado"
           }
         }
       },
@@ -4919,6 +5137,11 @@ export const pt_BR: EnTranslations = {
       "nythraxis_crypt": {
         "name": "Cripta abandonada",
         "enterText": "Você cruza o limiar da cripta abandonada.",
+        "leaveText": "Você retorna ao ar frio de Thornpeak."
+      },
+      "nythraxis_boss_arena": {
+        "name": "Arena de raide de Nythraxis",
+        "enterText": "Você atravessa a porta real selada.",
         "leaveText": "Você retorna ao ar frio de Thornpeak."
       },
       "drowned_temple": {

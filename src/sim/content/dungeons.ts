@@ -209,6 +209,54 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.8, color: 0x3d5c45,
   },
+
+  // ---- Abandoned Crypt raid encounter (10-player, Nythraxis) ----
+  nythraxis_skeleton_warrior: {
+    id: 'nythraxis_skeleton_warrior', name: 'Risen Royal Guard', minLevel: 20, maxLevel: 20, family: 'undead',
+    elite: true, ccImmune: true,
+    hpBase: 150, hpPerLevel: 28, dmgBase: 26, dmgPerLevel: 5.6, attackSpeed: 2.2,
+    armorPerLevel: 24, moveSpeed: 10, aggroRadius: 14,
+    loot: [],
+    scale: 1.25, color: 0xc7c0b2,
+  },
+  // Brother Aldric is now a dynamically-spawned NPC (see NPCS.brother_aldric_raid
+  // in zone3.ts and spawnNythraxisAldric in sim.ts), not a mob.
+  nythraxis_scourge_of_thornpeak: {
+    id: 'nythraxis_scourge_of_thornpeak', name: 'Nythraxis, Scourge of Thornpeak', minLevel: 20, maxLevel: 20, family: 'undead',
+    elite: true, boss: true, ccImmune: true,
+    hpBase: 51239 / 2.3, hpPerLevel: 0, dmgBase: 54, dmgPerLevel: 11.4, attackSpeed: 2.6,
+    armorPerLevel: 42, moveSpeed: 10.5, aggroRadius: 22,
+    loot: [
+      { copper: 150000, chance: 1 },
+      { itemId: 'deathless_heartwood', chance: 0.03, rollGroup: 'nythraxis_drop_1' },
+      { itemId: 'crownforged_dreadhelm', chance: 0.17, rollGroup: 'nythraxis_drop_1' },
+      { itemId: 'nighttalon_crown', chance: 0.16, rollGroup: 'nythraxis_drop_1' },
+      { itemId: 'soulflame_cowl', chance: 0.16, rollGroup: 'nythraxis_drop_1' },
+      { itemId: 'stormcallers_crown', chance: 0.16, rollGroup: 'nythraxis_drop_1' },
+      { itemId: 'nighttalon_shoulderguards', chance: 0.16, rollGroup: 'nythraxis_drop_1' },
+      { itemId: 'soulflame_mantle', chance: 0.16, rollGroup: 'nythraxis_drop_1' },
+      { itemId: 'kingsbane_last_oath', chance: 0.03, rollGroup: 'nythraxis_drop_2' },
+      { itemId: 'crownforged_warspaulders', chance: 0.17, rollGroup: 'nythraxis_drop_2' },
+      { itemId: 'nighttalon_shoulderguards', chance: 0.16, rollGroup: 'nythraxis_drop_2' },
+      { itemId: 'soulflame_mantle', chance: 0.16, rollGroup: 'nythraxis_drop_2' },
+      { itemId: 'crownforged_dreadhelm', chance: 0.16, rollGroup: 'nythraxis_drop_2' },
+      { itemId: 'nighttalon_crown', chance: 0.16, rollGroup: 'nythraxis_drop_2' },
+      { itemId: 'stormcallers_spaulders', chance: 0.16, rollGroup: 'nythraxis_drop_2' },
+      { itemId: 'crownforged_dreadhelm', chance: 0.17, rollGroup: 'nythraxis_drop_3' },
+      { itemId: 'nighttalon_crown', chance: 0.17, rollGroup: 'nythraxis_drop_3' },
+      { itemId: 'soulflame_cowl', chance: 0.17, rollGroup: 'nythraxis_drop_3' },
+      { itemId: 'stormcallers_crown', chance: 0.17, rollGroup: 'nythraxis_drop_3' },
+      { itemId: 'nighttalon_shoulderguards', chance: 0.16, rollGroup: 'nythraxis_drop_3' },
+      { itemId: 'soulflame_mantle', chance: 0.16, rollGroup: 'nythraxis_drop_3' },
+      { itemId: 'soulflame_mantle', chance: 0.17, rollGroup: 'nythraxis_drop_4' },
+      { itemId: 'crownforged_warspaulders', chance: 0.17, rollGroup: 'nythraxis_drop_4' },
+      { itemId: 'nighttalon_shoulderguards', chance: 0.17, rollGroup: 'nythraxis_drop_4' },
+      { itemId: 'stormcallers_spaulders', chance: 0.17, rollGroup: 'nythraxis_drop_4' },
+      { itemId: 'crownforged_dreadhelm', chance: 0.16, rollGroup: 'nythraxis_drop_4' },
+      { itemId: 'nighttalon_crown', chance: 0.16, rollGroup: 'nythraxis_drop_4' },
+    ],
+    scale: 3.1, color: 0x221b2d,
+  },
 };
 
 // Trash packs of 2 elites (spaced beyond social-aggro range so groups can
@@ -274,6 +322,10 @@ const SANCTUM_SPAWN_LIST: DungeonSpawn[] = [
   { mobId: 'sanctum_drakonid', x: 5, z: 144 },
 ];
 
+const NYTHRAXIS_RAID_SPAWN_LIST: DungeonSpawn[] = [
+  { mobId: 'nythraxis_scourge_of_thornpeak', x: 0, z: 96 },
+];
+
 export const DUNGEON_DEFS: Record<string, DungeonDef> = {
   hollow_crypt: {
     id: 'hollow_crypt',
@@ -323,13 +375,47 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     exitOffset: { x: 0, z: -6 },
     spawns: [],
     objects: [
+      // The three attunement relics: interacting raises the guardian undead
+      // (fallen_captain_aldren/corrupted_priest_malric/deathstalker_voss) that
+      // drop the keystone halves + diary — see activateNythraxisRelic in sim.ts.
+      // Spread down the nave so they read as the crypt's quest interactables.
+      // (The Royal Graves live in the overworld for q_nythraxis_graves; they do
+      // not belong inside the crypt, where that quest is already complete.)
       { itemId: 'captains_crest', name: 'Crypt Keystone Upper', x: -7, z: 28 },
       { itemId: 'priests_sigil', name: 'Crypt Keystone Lower', x: 0, z: 52 },
       { itemId: 'royal_seal', name: 'Ancient Diary', x: 7, z: 76 },
+      // Sealed royal door to the raid: flush-centre on the crypt back wall.
+      // Back wall collider spans z 111-113 (centre 112, hd 1); sit the door just
+      // in front of its inner face so it reads as set into the wall but stays
+      // interactable (isBlocked r=0.5 needs centre z <= 110.5).
+      { itemId: '', name: 'Sealed Royal Door', x: 0, z: 110.4, templateId: 'dungeon_door', dungeonId: 'nythraxis_boss_arena' },
     ],
     interior: 'crypt',
     suggestedPlayers: 1,
-    enterText: 'You descend into the abandoned crypt beneath the forgotten ruins of Thornpeak.',
-    leaveText: 'You climb back out of the abandoned crypt into the mountain wind.',
+    enterText: 'You cross the threshold of the Abandoned Crypt.',
+    leaveText: 'You return to the cold air of Thornpeak.',
+  },
+  nythraxis_boss_arena: {
+    id: 'nythraxis_boss_arena',
+    name: 'Nythraxis Raid Arena',
+    index: 5,
+    doorPos: { x: -152, z: 610 },
+    overworldDoor: false,
+    entry: { x: 0, z: 4 },
+    exitOffset: { x: 0, z: -6 },
+    spawns: NYTHRAXIS_RAID_SPAWN_LIST,
+    objects: [
+      // Three soul wardstones in a wide forward triangle in front of the boss
+      // (spawn 0,96), well clear of his body so all three read distinctly and
+      // raiders must split to channel them. Kept within the encounter's
+      // wardstone search radius (see nythraxisWardstones in sim.ts).
+      { itemId: 'bastion_ward_stone', name: 'Left Wardstone', x: -40, z: 79 },
+      { itemId: 'bastion_ward_stone', name: 'Right Wardstone', x: 40, z: 79 },
+      { itemId: 'bastion_ward_stone', name: 'Threshold Wardstone', x: 0, z: 63 },
+    ],
+    interior: 'nythraxis',
+    suggestedPlayers: 10,
+    enterText: 'You pass through the sealed royal door.',
+    leaveText: 'You return to the cold air of Thornpeak.',
   },
 };

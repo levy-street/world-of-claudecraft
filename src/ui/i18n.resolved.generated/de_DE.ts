@@ -232,8 +232,110 @@ export const de_DE: EnTranslations = {
       "showWalletOnCharacterScreen": "Wallet auf dem Charakterbildschirm anzeigen",
       "showWalletOnPlayerCard": "Wallet auf der Spielerkarte anzeigen"
     },
+    "perf": {
+      "title": "Leistungsanzeige",
+      "enable": "Leistungsanzeige anzeigen",
+      "description": "Wähle, welche Werte angezeigt werden, wo die Anzeige sitzt und wie sie aussieht.",
+      "sectionPosition": "Position",
+      "sectionAppearance": "Darstellung",
+      "sectionStats": "Werte",
+      "positionX": "Horizontal",
+      "positionY": "Vertikal",
+      "resetPosition": "Position zurücksetzen",
+      "dragHint": "Ziehe die Anzeige zum Verschieben oder nutze die Regler unten.",
+      "opacity": "Hintergrunddeckkraft",
+      "solidBg": "Undurchsichtiger Hintergrund",
+      "fontScale": "Textgröße",
+      "textColor": "Textfarbe",
+      "bgColor": "Hintergrundfarbe",
+      "colorTheme": "Farbschema",
+      "graph": "Frame-Zeit-Diagramm",
+      "thresholds": "Farbcodierte Warnungen",
+      "presetsLabel": "Schnellvorgaben",
+      "presetMinimal": "Minimal",
+      "presetStandard": "Standard",
+      "presetEverything": "Alles",
+      "groups": {
+        "frame": "Frames & Zeit",
+        "network": "Netzwerk",
+        "renderer": "Renderer",
+        "system": "System"
+      },
+      "labels": {
+        "fps": "FPS",
+        "frameTime": "Frame-Zeit",
+        "fps1Low": "1 % Min.",
+        "fps01Low": "0,1 % Min.",
+        "ping": "Ping",
+        "jitter": "Jitter",
+        "snapshot": "Snapshot-Rate",
+        "connection": "Verbindung",
+        "drawCalls": "Draw Calls",
+        "triangles": "Dreiecke",
+        "geometries": "Geometrien",
+        "textures": "Texturen",
+        "programs": "Shader",
+        "renderScale": "Renderskalierung",
+        "gpu": "GPU",
+        "memory": "Speicher",
+        "hitches": "Ruckler",
+        "entities": "Entitäten"
+      },
+      "themes": {
+        "gold": "Gold",
+        "frost": "Frost",
+        "ember": "Glut",
+        "jade": "Jade",
+        "crimson": "Karmesin",
+        "mono": "Mono"
+      },
+      "units": {
+        "ms": "{value} ms",
+        "mb": "{value} MB",
+        "memPair": "{used} / {limit} MB",
+        "hz": "{value} Hz"
+      },
+      "badges": {
+        "backgrounded": "Im Hintergrund",
+        "offline": "Offline"
+      }
+    },
     "playerCard": {
       "showWalletBadge": "Wallet-Abzeichen anzeigen"
+    },
+    "statInfo": {
+      "fromYour": "Von deinen {value} Punkten {stat}:",
+      "desc": {
+        "str": "Erhöht deine Angriffskraft, sodass deine Waffenschläge härter treffen.",
+        "agi": "Schärft Reflexe und Zielsicherheit und verbessert mehrere deiner Kampfwerte.",
+        "sta": "Stärkt deinen Körper, erhöht deine maximale Gesundheit und wie schnell du beim Ausruhen Gesundheit wiederherstellst.",
+        "int": "Vergrößert den Manavorrat eines Zauberwirkers und verbessert seine Chance auf einen kritischen Zaubertreffer.",
+        "spi": "Beschleunigt, wie schnell das Mana eines Zauberwirkers außerhalb des Kampfes beim Ausruhen zurückkehrt.",
+        "armor": "Mildert eingehende physische Schläge ab. Die Verringerung fällt gegen Angreifer niedrigerer Stufe stärker aus und ist auf 75% begrenzt.",
+        "attackPower": "Verstärkt deine Waffenangriffe. Je 14 Angriffskraft fügen 1 Schaden pro Sekunde hinzu.",
+        "dps": "Dein geschätzter Waffenschaden pro Sekunde, der Schaden und Geschwindigkeit deiner Waffe mit deiner Angriffskraft verbindet.",
+        "critChance": "Deine Chance, dass ein Angriff kritisch trifft und doppelten Schaden verursacht.",
+        "dodge": "Deine Chance, einem eingehenden Nahkampfangriff vollständig auszuweichen und keinen Schaden zu erleiden."
+      },
+      "effects": {
+        "attackPower": "+{value} Angriffskraft",
+        "rangedAttackPower": "+{value} Fernkampfangriffskraft",
+        "critPct": "+{value}% kritischer Treffer",
+        "dodgePct": "+{value}% Ausweichen",
+        "armor": "+{value} Rüstung",
+        "maxHealth": "+{value} maximale Gesundheit",
+        "maxMana": "+{value} maximales Mana",
+        "spellCritPct": "+{value}% kritischer Zaubertreffer",
+        "healthRegen": "Etwa {value} Gesundheit alle 5 Sek. beim Ausruhen",
+        "manaRegen": "Etwa {value} Mana alle 5 Sek. beim Ausruhen",
+        "damageReduction": "Schadensverringerung gegen einen Angreifer der Stufe {level}: {value}%",
+        "dpsFromAp": "Fügt deinen Angriffen {value} Schaden pro Sekunde hinzu"
+      },
+      "notes": {
+        "minorForClass": "Für deine Klasse von geringem Nutzen.",
+        "baseChance": "Beinhaltet eine Grundchance von 5%, die allen Abenteurern gemein ist.",
+        "dpsApprox": "Ein Schätzwert, kritische Treffer und Fähigkeitsschaden sind ausgenommen."
+      }
     },
     "talents": {
       "defaultBuildName": "Build {n}"
@@ -285,13 +387,56 @@ export const de_DE: EnTranslations = {
       "emittedLabel": "{pct}% of the pool paid out so far",
       "sinkLabel": "Funded",
       "emissionLabel": "Paid out",
-      "invariant": "Payouts can never exceed what the season took in — buy > sell, enforced on-chain.",
+      "invariant": "Payouts can never exceed what the season took in: buy > sell, enforced on-chain.",
       "standingsTitle": "Projected top earners",
       "colRank": "#",
       "colPlayer": "Player",
       "colRating": "Rating",
       "colReward": "Reward ($WOC)",
       "projectedNote": "Projected from the current pool + arena ranking; final payouts settle at season close."
+    },
+    "account": {
+      "title": "Konto",
+      "loggedOutPrompt": "Meldet Euch an, um Euer Konto zu verwalten.",
+      "memberSince": "Mitglied seit {date}",
+      "sectionSettings": "Kontoeinstellungen",
+      "sectionWallet": "$WOC-Wallet",
+      "sectionCharacters": "Charaktere",
+      "sectionDanger": "Gefahrenzone",
+      "changePassword": "Passwort ändern",
+      "currentPassword": "Aktuelles Passwort",
+      "newPassword": "Neues Passwort",
+      "confirmNewPassword": "Neues Passwort bestätigen",
+      "savePassword": "Passwort aktualisieren",
+      "passwordChanged": "Passwort aktualisiert. Andere Geräte wurden abgemeldet.",
+      "errCurrentRequired": "Gebt Euer aktuelles Passwort ein.",
+      "errPasswordShort": "Das neue Passwort muss mindestens 6 Zeichen lang sein.",
+      "errPasswordLong": "Das neue Passwort darf höchstens 128 Zeichen lang sein.",
+      "errPasswordUnchanged": "Das neue Passwort muss sich vom aktuellen unterscheiden.",
+      "errPasswordConfirm": "Die neuen Passwörter stimmen nicht überein.",
+      "emailLabel": "E-Mail (optional)",
+      "emailHint": "Wird nur zur Kontowiederherstellung verwendet. Wir versenden niemals Werbe-E-Mails.",
+      "saveEmail": "E-Mail speichern",
+      "emailSaved": "E-Mail gespeichert.",
+      "errEmailInvalid": "Gebt eine gültige E-Mail-Adresse ein.",
+      "errCurrentPassword": "Euer aktuelles Passwort ist falsch.",
+      "errUsernameMatch": "Dieser Benutzername stimmt nicht mit Eurem Konto überein.",
+      "errPasswordIncorrect": "Euer Passwort ist falsch.",
+      "errCharactersOnline": "Meldet alle Eure Charaktere ab, bevor Ihr das Konto deaktiviert.",
+      "deactivatedLocked": "Dieses Konto wurde deaktiviert. Wendet Euch an einen Administrator, um es wiederherzustellen.",
+      "charactersSummary": "Verwaltet Eure Charaktere und betretet die Welt.",
+      "charactersCount": "Charaktere: {count}",
+      "goToCharacters": "Charaktere anzeigen",
+      "walletSummary": "Verifiziert ein Solana-Wallet, um Inhaber-Flair auf Eurer Spielerkarte anzuzeigen.",
+      "manageWallet": "Wallet verwalten",
+      "deactivate": "Konto deaktivieren",
+      "deactivateWarning": "Die Deaktivierung sperrt Euer Konto und meldet Euch überall ab. Wendet Euch an einen Administrator, um es wiederherzustellen. Bestätigt durch erneute Eingabe von Benutzernamen und Passwort.",
+      "confirmUsername": "Gebt zur Bestätigung Euren Benutzernamen ein",
+      "confirmPassword": "Passwort",
+      "deactivateConfirm": "Mein Konto deaktivieren",
+      "deactivated": "Euer Konto wurde deaktiviert.",
+      "logOut": "Abmelden",
+      "logOutSummary": "Von diesem Gerät abmelden."
     }
   },
   "skinEvent": {
@@ -336,6 +481,8 @@ export const de_DE: EnTranslations = {
     "news": "Neuigkeiten",
     "download": "Herunterladen",
     "loginRegister": "Einloggen/Registrieren",
+    "account": "Konto",
+    "logout": "Ausloggen",
     "donate": "Spenden"
   },
   "stats": {
@@ -529,36 +676,36 @@ export const de_DE: EnTranslations = {
         "flavor": "Die Märkte spüren Eure Bewegungen: 1 % des Angebots."
       },
       "tidelord": {
-        "name": "Tidelord",
-        "flavor": "The tide answers your call: 2% of supply."
+        "name": "Gezeitenfürst",
+        "flavor": "Die Gezeit folgt Eurem Ruf: 2 % des Angebots."
       },
       "stormcaller": {
-        "name": "Stormcaller",
-        "flavor": "Storms gather at your name: 3% of supply."
+        "name": "Sturmrufer",
+        "flavor": "Stürme sammeln sich bei Eurem Namen: 3 % des Angebots."
       },
       "krakencrown": {
-        "name": "Krakencrown",
-        "flavor": "Crowned by the deep: 4% of supply."
+        "name": "Krakenkrone",
+        "flavor": "Von der Tiefe gekrönt: 4 % des Angebots."
       },
       "titanforged": {
-        "name": "Titanforged",
-        "flavor": "Forged among titans: 5% of supply."
+        "name": "Titangeschmiedet",
+        "flavor": "Unter Titanen geschmiedet: 5 % des Angebots."
       },
       "starhoard": {
-        "name": "Starhoard",
-        "flavor": "A hoard that bends starlight: 6% of supply."
+        "name": "Sternenhort",
+        "flavor": "Ein Hort, der das Sternenlicht beugt: 6 % des Angebots."
       },
       "voidwarden": {
-        "name": "Voidwarden",
-        "flavor": "Keeper at the void's edge: 7% of supply."
+        "name": "Leerenwächter",
+        "flavor": "Wächter am Rand der Leere: 7 % des Angebots."
       },
       "realmshaper": {
-        "name": "Realmshaper",
-        "flavor": "You reshape the realm: 8% of supply."
+        "name": "Reichsformer",
+        "flavor": "Ihr formt das Reich neu: 8 % des Angebots."
       },
       "worldforger": {
-        "name": "Worldforger",
-        "flavor": "Forging a world of your own: 9% of supply."
+        "name": "Weltenschmied",
+        "flavor": "Ihr schmiedet Eure eigene Welt: 9 % des Angebots."
       },
       "worldbearer": {
         "name": "Weltensträger",
@@ -1230,6 +1377,7 @@ export const de_DE: EnTranslations = {
         "unignoreChat": "Chat nicht mehr ignorieren",
         "report": "Spieler melden",
         "removeParty": "Aus Gruppe entfernen",
+        "convertToRaid": "In Schlachtzug umwandeln",
         "cancel": "Abbrechen"
       }
     },
@@ -1448,6 +1596,12 @@ export const de_DE: EnTranslations = {
       "guildTab": "Gilde",
       "ignoreTab": "Ignorieren",
       "leaveParty": "Gruppe verlassen",
+      "raidTab": "Schlachtzug",
+      "raidEmpty": "Wandelt eine Gruppe in einen Schlachtzug um, um hier Schlachtzugsgruppen zu verwalten.",
+      "raidGroupEmpty": "Keine Spieler in dieser Gruppe.",
+      "raidGroupTitle": "Gruppe {position} ({count}/5)",
+      "raidMoveToGroup": "In Gruppe {position} verschieben",
+      "raidLeader": "Schlachtzugsleiter",
       "offlineEmpty": "Freunde, Gilden und Ignorierlisten sind im Onlinespiel verfügbar.",
       "friendsEmpty": "Noch keine Freunde. Sucht unten jemanden nach Namen.",
       "ignoreEmpty": "Eure Ignorierliste ist leer.",
@@ -1548,6 +1702,8 @@ export const de_DE: EnTranslations = {
       "title": "Zauberbuch",
       "classSubtitle": "Fähigkeiten: {className}",
       "close": "Zauberbuch schließen",
+      "resetBar": "Leiste zurücksetzen",
+      "resetBarAria": "Aktuelle Aktionsleiste auf Standardfähigkeiten zurücksetzen",
       "trainableAtLevel": "Ab Stufe {level} erlernbar",
       "learnAtLevel": "Ihr lernt dies auf Stufe {level}.",
       "knownAbilityAria": "{name}, Rang {rank}. {summary}",
@@ -1683,7 +1839,8 @@ export const de_DE: EnTranslations = {
       "common": "Gewöhnlich",
       "uncommon": "Ungewöhnlich",
       "rare": "Selten",
-      "epic": "Episch"
+      "epic": "Episch",
+      "legendary": "Legendär"
     },
     "kind": {
       "weapon": "Waffe",
@@ -1860,6 +2017,16 @@ export const de_DE: EnTranslations = {
     "loot": {
       "takeAll": "Alles nehmen",
       "close": "Beute schließen"
+    },
+    "lootRoll": {
+      "title": "Um Beute würfeln",
+      "need": "Bedarf",
+      "greed": "Gier",
+      "pass": "Passen",
+      "needAria": "Bedarf für {item}",
+      "greedAria": "Gier für {item}",
+      "passAria": "Bei {item} passen",
+      "everyonePassed": "Alle passen bei {item}."
     }
   },
   "entities": {
@@ -3380,6 +3547,36 @@ export const de_DE: EnTranslations = {
       "event_skin_token": {
         "name": "Geheimnisvolle Kosmetiktruhe"
       },
+      "deathless_heartwood": {
+        "name": "Herzholz der todlosen Krone"
+      },
+      "kingsbane_last_oath": {
+        "name": "Königsbann, letzter Eid von Thornpeak"
+      },
+      "crownforged_dreadhelm": {
+        "name": "Kronengeschmiedeter Schreckenshelm"
+      },
+      "crownforged_warspaulders": {
+        "name": "Kronengeschmiedete Kriegsschultern"
+      },
+      "nighttalon_crown": {
+        "name": "Nachtklauenkrone"
+      },
+      "nighttalon_shoulderguards": {
+        "name": "Nachtklauen-Schulterschützer"
+      },
+      "soulflame_cowl": {
+        "name": "Seelenflammenkapuze"
+      },
+      "soulflame_mantle": {
+        "name": "Seelenflammenmantel"
+      },
+      "stormcallers_crown": {
+        "name": "Krone des Sturmrufers"
+      },
+      "stormcallers_spaulders": {
+        "name": "Schulterplatten des Sturmrufers"
+      },
       "unknown_alien_weaponry": {
         "name": "Unbekannte Alien-Waffen"
       },
@@ -3594,6 +3791,12 @@ export const de_DE: EnTranslations = {
       },
       "bound_guardian": {
         "name": "Gebundener Wächter"
+      },
+      "nythraxis_skeleton_warrior": {
+        "name": "Auferstandene Koenigswache"
+      },
+      "nythraxis_scourge_of_thornpeak": {
+        "name": "Nythraxis, Geissel von Thornpeak"
       },
       "brightwood_hare": {
         "name": "Hellholz-Hase"
@@ -3846,6 +4049,11 @@ export const de_DE: EnTranslations = {
         "name": "Waldläufer Elwyn",
         "title": "Hüter der Lichtung",
         "greeting": "Ruhig, {className} - die Lichtung ist heute friedlich, und das gedenke ich so zu erhalten."
+      },
+      "brother_aldric_raid": {
+        "name": "Bruder Aldric",
+        "title": "Priester des Tals",
+        "greeting": "Vom Kapellenhof im Tal bis zum Dach der Welt... die Spur endet hier. Ich spüre, wie der Berg lauscht."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -4572,8 +4780,8 @@ export const de_DE: EnTranslations = {
       },
       "q_nythraxis_bound_guardian": {
         "title": "Der Gebundene Wächter",
-        "text": "Voss schrieb, dass die Überlebenden den Siegelring des Königs hinter einem uralten Wächter versiegelten, damit niemand Nythraxis Grab durch Zufall oder Ehrgeiz erreicht. Bring den Kryptenschlüssel zum Ritualkreis auf dem flachen Boden östlich der verlassenen Krypta und südöstlich des westlichen Grabes. Benutze ihn dort, brich den Wächter und bring den Ring zurück.",
-        "completion": "Die drei Relikte erzählen dieselbe Geschichte: Aldren kämpfte, um seinen König zu verteidigen, Malric durchbrach die Grenze des Todes, und Voss versuchte aufzuhalten, was folgte. Das Siegel wird schwächer, und dieser Ring ist der Schlüssel zu Nythraxis Grab. Du bist nun eingestimmt, die Krypta von Nythraxis zu betreten.",
+        "text": "Voss schrieb, dass die Uberlebenden den Siegelring des Konigs hinter einem uralten Wachter versiegelten, damit niemand Nythraxis Grab durch Zufall oder Ehrgeiz erreicht. Bring den Kryptenschlussel zum Ritualkreis auf dem flachen Boden ostlich der verlassenen Krypta und sudostlich des westlichen Grabes. Benutze ihn dort, brich den Wachter und bring den Ring zuruck.",
+        "completion": "Die drei Relikte erzahlen dieselbe Geschichte: Aldren kampfte, um seinen Konig zu verteidigen, Malric durchbrach die Grenze des Todes, und Voss versuchte aufzuhalten, was folgte. Das Siegel wird schwacher, und dieser Ring ist der Schlussel zu Nythraxis Grab. Du bist nun eingestimmt, die Krypta von Nythraxis zu betreten. Kehrt zur verlassenen Krypta zuruck, offnet die konigliche Tur und stellt Euch Nythraxis, bevor der Zorn des alten Konigs uber Thornpeak hinausbricht.",
         "objectives": {
           "0": {
             "label": "Schlüsselstein am Ritualkreis benutzt"
@@ -4583,6 +4791,16 @@ export const de_DE: EnTranslations = {
           },
           "2": {
             "label": "Siegelring des Königs"
+          }
+        }
+      },
+      "q_nythraxis_scourges_end": {
+        "title": "Das Ende der Geissel",
+        "text": "Der Siegelring hat den Weg geoeffnet, {playerName}, doch ein offenes Grab ist kein Sieg. Nythraxis war einst ein Koenig, und die Ruine unter Thornpeak bleibt an seinen Willen gebunden. Betretet die Krypta mit Verbuendeten, denen Ihr vertraut. Brecht die todlose Krone, bevor ihr Befehl das Schlachtfeld darueber erreicht.",
+        "completion": "Dann schweigt die Krone endlich. Thornpeak wird seine Toten weiter tragen, doch kein Koenig unter dem Berg wird sie je wieder in den Krieg rufen. Ihr habt beendet, was Aldren, Malric und Voss nur eindämmen konnten.",
+        "objectives": {
+          "0": {
+            "label": "Nythraxis besiegt"
           }
         }
       },
@@ -4920,6 +5138,11 @@ export const de_DE: EnTranslations = {
         "name": "Verlassene Krypta",
         "enterText": "Du überschreitest die Schwelle der verlassenen Krypta.",
         "leaveText": "Du trittst wieder in die kalte Luft von Thornpeak."
+      },
+      "nythraxis_boss_arena": {
+        "name": "Nythraxis-Schlachtzugsarena",
+        "enterText": "Ihr durchschreitet die versiegelte königliche Tür.",
+        "leaveText": "Ihr kehrt in die kalte Luft von Thornpeak zurück."
       },
       "drowned_temple": {
         "name": "Der Ertränkte Tempel",

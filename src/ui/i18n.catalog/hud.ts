@@ -218,6 +218,7 @@ const hudStringsEn = {
         unignoreChat: "Unignore Chat",
         report: "Report Player",
         removeParty: "Remove from Party",
+        convertToRaid: "Convert to raid",
         cancel: "Cancel",
       },
     },

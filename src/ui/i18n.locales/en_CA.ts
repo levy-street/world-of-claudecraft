@@ -11,6 +11,10 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const en_CA: Partial<Record<TranslationKey, string>> = {
+  "hudChrome.perf.textColor": "Text Colour",
+  "hudChrome.perf.bgColor": "Background Colour",
+  "hudChrome.perf.colorTheme": "Colour Theme",
+  "hudChrome.perf.thresholds": "Colour-Coded Warnings",
   "classDetails.labels.armor": "Armour",
   "classDetails.lore.paladin": "Paladins are holy crusaders who support allies with blessings, heal wounds with Holy Light, and protect the weak in heavy armour.",
   "classDetails.lore.druid": "Druids channel nature, healing wounds, entangling foes, and shifting into animal forms for defence or damage.",
@@ -19,4 +23,6 @@ export const en_CA: Partial<Record<TranslationKey, string>> = {
   "itemUi.kind.armor": "Armour",
   "itemUi.stats.armor": "Armour",
   "itemUi.tooltip.armorStat": "{value} Armour",
+  // Stat tooltips keep the en prose; only the Armor -> Armour spelling diverges.
+  "hudChrome.statInfo.effects.armor": "+{value} Armour",
 };

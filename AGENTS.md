@@ -23,19 +23,19 @@ Any non-Claude coding agent (Codex and similar) can treat this file as root proj
 ## Core Engineering Rules
 
 - Keep TypeScript strict and avoid `any` casts.
-- Prefer editing existing files over adding new files unless a new file is clearly required.
+- Module-first for new behavior: prefer a new, focused, testable module behind an existing seam (`IWorld`, a `src/sim/content/` record, a `src/render/<thing>.ts`) over appending a block of logic to a large file. Do not split a monolith just to hit a line count. See the Modularity section in `CLAUDE.md`.
 - Use standard ES modules and relative imports.
 - Do not add placeholder code or TODO-driven implementations.
 - Do not import Tailwind or new UI frameworks.
 - For external library/API usage, fetch current docs with Context7 or official docs when available.
-- Do not use the em dash character in UI copy or developer docs.
+- Do not use em dashes, en dashes, or emojis anywhere: code, comments, docs, commits, PR text, or player copy. Use commas, colons, parentheses, or "to" for ranges.
 - Do not use raw emojis for in-game UI icons.
 
 ## Simulation Rules
 
 - Never mutate simulation state directly from rendering, UI, or client glue code.
 - All state mutations must happen through simulation actions/ticks.
-- Use seeded RNG from `src/sim/rng.ts`; never use `Math.random()` in simulation logic.
+- Use seeded RNG from `src/sim/rng.ts`; never `Math.random()`, `Date.now()`, or `performance.now()` in `src/sim/`. `tests/architecture.test.ts` enforces sim purity (no DOM or render/ui/game/net/three imports, no nondeterminism).
 - Maintain classic-era-MMO-style stat formulas and deterministic combat behavior.
 - Use existing collision, spatial, and pathfinding helpers.
 
@@ -62,9 +62,9 @@ Any non-Claude coding agent (Codex and similar) can treat this file as root proj
 
 ## Localization Rules
 
-- All player-facing strings must live in `src/ui/i18n.ts` and render through `t(key)`: add the key to the `en` object first, then a real translation in every other locale.
-- Every new key must be translated across all supported locales: `en`, `es`, `es_ES`, `fr_FR`, `fr_CA`, `en_CA`, `it_IT`, `de_DE`, `zh_CN`, `zh_TW`, `ko_KR`, `ja_JP`, `pt_BR`, and `ru_RU`. This printed list is illustrative and can go stale: the authoritative set is `Object.keys(translations)` / `supportedLanguages` in `src/ui/i18n.ts` (line around 11746). Author against the code, never against this list.
-- Do not satisfy coverage with copied English strings, placeholder markers, empty strings, `// TODO`, or machine-looking literal output. There is no temporary-English exemption: a user-facing string ships only when it is fully translated in every locale.
+- All player-facing strings render through `t(key)`. Add the English key to the matching per-domain module under `src/ui/i18n.catalog/<domain>.ts` (new HUD chrome goes in `hud_chrome.ts`). `src/ui/i18n.ts` is the thin runtime (`t`, formatters, locale resolution) and imports the generated `en`; you do not author strings there.
+- Per-PR, English-only is correct: the PR-tier gate permits it. Contributors add ENGLISH only; the maintainer batch-fills the 13 non-English locales before release via the `src/ui/i18n.locales/<lang>.ts` overlays (do not hand-edit those overlays). Completeness is enforced by the release-tier gate, not per-PR. The authoritative locale set is `supportedLanguages` (derived from the generated `SUPPORTED_LANGUAGES`); author against the code, never a printed list. See `docs/i18n-scaling/translation-workflow.md`.
+- Do not fake coverage with placeholder markers, empty strings, `// TODO`, or machine-looking output, and never put English copy or a placeholder into a non-English overlay as a stand-in translation.
 - The final rendered text, however it is assembled, must come from `t()`. The following are defects when the result is user-facing: string concatenation, template-literal English parts, English default function parameters (`title = 'Notice'`), optional fallbacks like `value ?? 'English'`, English-valued lookup or enum maps (`const LABELS = {...}`), any non-`t()` wrapper, and passing English literals to `setAttribute('aria-label'|'title'|'placeholder'|'alt', ...)`, to `el.title` / `el.alt` / `document.title`, or to native `confirm` / `prompt` / `alert`.
 - All user-facing numbers, money, percentages, units, dates, and times must go through the locale-aware helpers (`formatNumber`, `formatDateTime`, `formatMoney`, `languageTag`, or `Intl` with the player SupportedLanguage). Never raw `String(n)`, default-locale `toLocaleString()`, hard-coded separators, or `n + 'g'`-style concatenation.
 - Classify a string by its actual render sink, not by the statement it sits in. If any code path can render it to a person it is player-facing, even when it originates in a `throw`, `catch`, or `console.*`. If one string feeds both a log and the UI, split it: a translated `t()` key for the user, a separate English literal for the log.
@@ -74,24 +74,12 @@ Any non-Claude coding agent (Codex and similar) can treat this file as root proj
 - Emojis and language-neutral symbols need no translation entry and may appear inline or stand alone as decoration, but must never replace a required translation: the accessible name behind an emoji control is still a translated `t()` key. This is about translation coverage only and does not override the separate no-raw-emoji-as-in-game-icon rule.
 - Enforcement gap to own yourself: every locale is typed `: typeof en`, so `tsc` catches a missing or renamed key but cannot see a hard-coded literal that never became a key, nor a new sim/server English emit that lacks a matcher entry. Both compile clean and ship English to a translated player. No human reviewer reliably catches this, so route every player-facing string through `t()` (or the matcher) at creation time.
 
-## Localization Phase Packet
-
-For work on the game-wide localization feature:
-
-1. Read `docs/security-update/packet_rules.md`.
-2. Read `docs/security-update/state.md`.
-3. Read `docs/security-update/progress.md`.
-4. Read only the current phase prompt and its QA prompt as needed.
-5. Implement exactly one phase per fresh Codex session, followed by its matching QA phase in a fresh session.
-6. Do not mark a phase complete without validation evidence.
-7. Keep `GEMINI.md` and `docs/security-update/` unstaged unless the user explicitly asks otherwise.
-
 ## Verification Commands
 
 Use the smallest validation set that gives confidence for the change. Common commands:
 
 ```bash
-npm run test
+npm test
 npm run build
 node scripts/homepage_verify.mjs
 node scripts/seo_audit.mjs
@@ -107,6 +95,5 @@ Browser or visual UI changes should be verified with a running dev server and br
 
 - Do not commit unless the user explicitly asks.
 - If committing, stage only files relevant to the requested change.
-- Commit format: `<type>: <short description>` with a detailed body.
+- Commit format: `<type>(scope): <short description>` with a detailed body (matches root `CLAUDE.md`).
 - Do not add `GEMINI.md` to `.gitignore`.
-- Do not commit local-only planning docs under `docs/security-update/` unless the user explicitly changes that policy.

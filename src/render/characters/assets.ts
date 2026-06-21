@@ -348,6 +348,15 @@ export function assembleModel(def: VisualDef): THREE.Object3D {
     if (!bone) continue; // manifest/bone mismatch — ship without the prop
     attachProp(root, bone, att);
   }
+  // Re-orient mis-baked built-in weapon nodes (e.g. the golem axe) in place.
+  for (const fix of def.weaponFix ?? []) {
+    const node = root.getObjectByName(fix.node)
+      ?? root.getObjectByName(fix.node.replace(/[[\].:/]/g, ''));
+    if (!node) continue;
+    if (fix.rotX) node.rotateX(fix.rotX);
+    if (fix.rotY) node.rotateY(fix.rotY);
+    if (fix.rotZ) node.rotateZ(fix.rotZ);
+  }
   return root;
 }
 

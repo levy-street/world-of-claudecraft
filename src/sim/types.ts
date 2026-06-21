@@ -135,6 +135,7 @@ export interface ItemDef {
   use?: ItemUse;
   sellValue: number; // copper (vendor buys at this)
   buyValue?: number; // copper (vendor sells at this)
+  armorType?: 'cloth' | 'leather' | 'mail';
   questId?: string;
   noVendorSell?: boolean;
   noDiscard?: boolean;
@@ -153,7 +154,7 @@ export interface ItemDef {
   // `aura` is a flavor name shown in the buff frame; `value` is the stat amount,
   // `duration` the buff length in seconds. Folds through the normal aura/stat path.
   elixir?: { aura: string; kind: AuraKind; value: number; duration: number };
-  quality?: 'poor' | 'common' | 'uncommon' | 'rare' | 'epic'; // gray/white/green/blue/purple name colors
+  quality?: 'poor' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'; // gray/white/green/blue/purple/orange name colors
   requiredClass?: PlayerClass[];
 }
 
@@ -165,6 +166,8 @@ export interface InvSlot {
 export interface LootSlot extends InvSlot {
   // Quest corpse loot can be personal: each listed player can take one copy.
   personalFor?: number[];
+  // Need/greed loot that everyone passed on becomes free-for-all corpse loot.
+  openToAll?: boolean;
 }
 
 export interface CorpseLoot {
@@ -173,7 +176,8 @@ export interface CorpseLoot {
 }
 
 export type CurrencyLootStrategy = 'looter-takes-all' | 'fair-split';
-export type ItemLootStrategy = 'looter-takes-all' | 'random';
+export type LootRollChoice = 'need' | 'greed' | 'pass';
+export type ItemLootStrategy = 'looter-takes-all' | 'need-greed';
 
 export interface LootStrategies {
   currency: CurrencyLootStrategy;
@@ -183,8 +187,8 @@ export interface LootStrategies {
 
 export const DEFAULT_PARTY_LOOT_STRATEGIES: LootStrategies = {
   currency: 'fair-split',
-  commonItems: 'random',
-  premiumItems: 'random',
+  commonItems: 'need-greed',
+  premiumItems: 'need-greed',
 };
 
 export interface LootEntry {
@@ -563,6 +567,7 @@ export type AbilityEffect =
   | { type: 'incapacitate'; duration: number } // gouge: breaks on damage
   | { type: 'polymorph'; duration: number } // sheep: breaks on damage, target heals
   | { type: 'aoeDamage'; min: number; max: number; radius: number }
+  | { type: 'groundAoE'; min: number; max: number; radius: number; duration: number; interval: number }
   | { type: 'aoeAttackSpeed'; mult: number; duration: number; radius: number } // thunder clap rider
   | { type: 'aoeAttackPower'; amount: number; duration: number; radius: number } // demoralizing roar/shout
   | { type: 'aoeRoot'; duration: number; radius: number; min: number; max: number }
@@ -637,6 +642,11 @@ export interface NpcDef {
   // (auction house) instead of a fixed vendor stock.
   market?: boolean;
   greeting: string;
+  // Registered but not surface-placed at world init. The owning system spawns
+  // the entity on demand (e.g. the Nythraxis encounter walks Brother Aldric in
+  // mid-fight). Keeping the def in NPCS lets the online client reconstruct its
+  // questIds and treat it as a turn-in NPC.
+  dynamic?: boolean;
 }
 
 export interface CampDef {
@@ -664,6 +674,8 @@ export interface DungeonObjectSpawn {
   name: string;
   x: number; // relative to instance origin
   z: number;
+  templateId?: 'dungeon_door' | 'dungeon_exit';
+  dungeonId?: string;
 }
 
 export interface DungeonDef {
@@ -671,11 +683,12 @@ export interface DungeonDef {
   name: string;
   index: number; // x-band for instance origins; must be unique
   doorPos: { x: number; z: number }; // overworld entrance portal
+  overworldDoor?: boolean; // false for rooms only reached by internal instance doors
   entry: { x: number; z: number }; // player arrival point (instance-local)
   exitOffset: { x: number; z: number }; // exit portal (instance-local)
   spawns: DungeonSpawn[];
   objects?: DungeonObjectSpawn[];
-  interior: 'crypt' | 'sanctum' | 'temple'; // renderer + collider interior builder key
+  interior: 'crypt' | 'sanctum' | 'temple' | 'nythraxis'; // renderer + collider interior builder key
   suggestedPlayers: number;
   enterText: string;
   leaveText: string;
@@ -746,6 +759,7 @@ export interface QuestDef {
   name: string;
   giverNpcId: string;
   turnInNpcId: string;
+  turnInNpcIds?: string[];
   text: string;
   completionText: string;
   objectives: QuestObjective[];
@@ -756,6 +770,14 @@ export interface QuestDef {
   minLevel?: number;
   retired?: boolean; // remains finishable if already accepted, but cannot be newly accepted
   suggestedPlayers?: number; // group quests ("Suggested players: 5")
+}
+
+export function questTurnInNpcIds(quest: QuestDef): readonly string[] {
+  return quest.turnInNpcIds && quest.turnInNpcIds.length > 0 ? quest.turnInNpcIds : [quest.turnInNpcId];
+}
+
+export function isQuestTurnInNpc(quest: QuestDef, templateId: string): boolean {
+  return questTurnInNpcIds(quest).includes(templateId);
 }
 
 export type QuestState = 'unavailable' | 'available' | 'active' | 'ready' | 'done';
@@ -789,6 +811,7 @@ export interface Entity {
   templateId: string; // mob/npc template id, or class for player
   name: string;
   level: number;
+  guild: string;
   pos: Vec3;
   prevPos: Vec3; // for render interpolation
   facing: number; // radians, 0 = +Z
@@ -878,6 +901,7 @@ export interface Entity {
   summonedIds: number[]; // live adds this boss summoned; despawned on reset
   enraged: boolean; // enrage mechanic active
   healedThisPull: boolean; // desperation self-heal already used this pull
+  nythraxis?: NythraxisEncounterState; // sim-only state for the Nythraxis raid encounter
   spawnPos: Vec3;
   leashAnchor: Vec3 | null; // refreshed by hostile player/pet actions; spawnPos remains the true home
   evadeStall: number; // seconds an evading mob has failed to get closer to home; snaps it home if it can't path back (e.g. across water)
@@ -893,6 +917,7 @@ export interface Entity {
   respawnTimer: number;
   corpseTimer: number;
   despawnTimer?: number;
+  damageIdleDespawnTimer?: number;
   lootable: boolean;
   loot: CorpseLoot | null;
   xpValue: number;
@@ -917,6 +942,49 @@ export interface Entity {
   holderBalance?: number;
 }
 
+export interface NythraxisWardChannel {
+  objectId: number;
+  playerId: number | null;
+  remaining: number;
+  complete: boolean;
+}
+
+export interface NythraxisSoulRendMark {
+  playerId: number;
+  remaining: number;
+}
+
+export interface NythraxisDialogueCue {
+  at: number;
+  speaker: 'nythraxis' | 'aldric';
+  text: string;
+}
+
+export interface NythraxisEncounterState {
+  phase: 1 | 'transition' | 2 | 'dead';
+  introSpoken: boolean;
+  transitionStarted: boolean;
+  transitionTimer: number;
+  transitionCues: NythraxisDialogueCue[];
+  transitionReleased: boolean;
+  dialogueBusyUntil?: number;
+  dialogueToken?: number;
+  gravebreakerTimer: number;
+  gravebreakerCasts?: number;
+  raiseFallenTimer: number;
+  soulRendTimer: number;
+  soulRendMarks: NythraxisSoulRendMark[];
+  soulRendLockout: number;
+  deathlessTimer: number;
+  deathlessCastRemaining: number;
+  deathlessStunRemaining: number;
+  wardChannels: NythraxisWardChannel[];
+  finalStand: boolean;
+  deathSpoken: boolean;
+}
+
+export type ErrorReason = 'target_dead';
+
 // `pid` (when present) marks a personal event that should only be delivered to
 // that player entity's owner; events without pid are world-visible.
 export type SimEvent = { pid?: number } & (
@@ -931,7 +999,8 @@ export type SimEvent = { pid?: number } & (
   | { type: 'milestoneUnlocked'; milestoneId: string }
   | { type: 'learnAbility'; abilityId: string; rank: number }
   | { type: 'loot'; text: string }
-  | { type: 'error'; text: string }
+  | { type: 'lootRoll'; rollId: number; itemId: string; itemName: string; quality: ItemDef['quality']; expiresAt: number }
+  | { type: 'error'; text: string; reason?: ErrorReason }
   | { type: 'questAccepted'; questId: string }
   | { type: 'questProgress'; questId: string; text: string }
   | { type: 'questReady'; questId: string }
@@ -981,8 +1050,8 @@ export type SimEvent = { pid?: number } & (
   // Whether it's "mine" is decided client-side (entityId === local player).
   | { type: 'fiestaPowerup'; entityId: number; defId: string; glow: number; duration: number }
   | { type: 'heal2'; sourceId: number; targetId: number; amount: number; crit: boolean; ability: string }
-  // visual-only cue for the renderer: spell projectiles, dot ticks, aoe novas
-  | { type: 'spellfx'; sourceId: number; targetId: number; school: string; fx: 'projectile' | 'tick' | 'nova' }
+  // visual-only cue for the renderer: spell projectiles, channel beams, dot ticks, aoe novas
+  | { type: 'spellfx'; sourceId: number; targetId: number; school: string; fx: 'projectile' | 'beam' | 'tick' | 'nova' }
   // entityId (when set) anchors the log to that entity so the server only
   // delivers it to nearby players; anchorless logs broadcast server-wide
   | { type: 'log'; text: string; color?: string; entityId?: number }
@@ -1010,6 +1079,7 @@ export interface SimConfig {
   playerName?: string;
   noPlayer?: boolean; // multiplayer server: start with an empty world and addPlayer() later
   devCommands?: boolean; // local dev: /dev level|tp|give chat cheats
+  lockoutNowMs?: () => number; // host wall-clock for persisted raid lockouts
 }
 
 export function emptyMoveInput(): MoveInput {

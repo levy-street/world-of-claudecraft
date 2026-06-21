@@ -55,6 +55,28 @@ describe('overhead cast bar', () => {
     expect(unknown.label).toBe('made_up_spell');
   });
 
+  it('carries custom raid mechanic cast ids for renderer localization', () => {
+    const rage = castBarState(caster({
+      castingAbility: 'nythraxis_deathless_rage',
+      castRemaining: 5,
+      castTotal: 10,
+    }));
+    expect(rage.visible).toBe(true);
+    expect(rage.channel).toBe(false);
+    expect(rage.fill).toBeCloseTo(0.5);
+    expect(rage.label).toBe('nythraxis_deathless_rage');
+
+    const ward = castBarState(caster({
+      castingAbility: 'nythraxis_ward_channel',
+      channeling: true,
+      castRemaining: 3,
+      castTotal: 5,
+    }));
+    expect(ward.channel).toBe(true);
+    expect(ward.fill).toBeCloseTo(0.6);
+    expect(ward.label).toBe('nythraxis_ward_channel');
+  });
+
   it('clamps the fill fraction to 0..1 against transient overshoot', () => {
     expect(castBarState(caster({ castRemaining: 9, castTotal: 2.5 })).fill).toBe(0);
     expect(castBarState(caster({ castRemaining: -1, castTotal: 2.5 })).fill).toBe(1);

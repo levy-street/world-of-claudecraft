@@ -14,6 +14,14 @@ function installStorage(): void {
 beforeEach(() => installStorage());
 
 describe('Settings', () => {
+  it('defaults fresh sessions and initial logins to the ultra graphics preset', () => {
+    const s = new Settings();
+
+    expect(localStorage.getItem('woc_settings')).toBeNull();
+    expect(SETTING_RANGES.graphicsPreset.def).toBe(4);
+    expect(s.get('graphicsPreset')).toBe(4);
+  });
+
   it('starts at the documented defaults (camera calmer than the old 1.0)', () => {
     const s = new Settings();
     expect(s.get('cameraSpeed')).toBe(SETTING_RANGES.cameraSpeed.def);

@@ -232,8 +232,110 @@ export const ko_KR: EnTranslations = {
       "showWalletOnCharacterScreen": "캐릭터 화면에 지갑 표시",
       "showWalletOnPlayerCard": "플레이어 카드에 지갑 표시"
     },
+    "perf": {
+      "title": "성능 오버레이",
+      "enable": "성능 오버레이 표시",
+      "description": "표시할 통계, 오버레이 위치, 모양을 선택하세요.",
+      "sectionPosition": "위치",
+      "sectionAppearance": "모양",
+      "sectionStats": "통계",
+      "positionX": "가로",
+      "positionY": "세로",
+      "resetPosition": "위치 초기화",
+      "dragHint": "오버레이를 드래그하여 옮기거나 아래 슬라이더를 사용하세요.",
+      "opacity": "배경 투명도",
+      "solidBg": "불투명 배경",
+      "fontScale": "글자 크기",
+      "textColor": "글자 색상",
+      "bgColor": "배경 색상",
+      "colorTheme": "색상 테마",
+      "graph": "프레임 시간 그래프",
+      "thresholds": "색상별 경고",
+      "presetsLabel": "빠른 설정",
+      "presetMinimal": "간소",
+      "presetStandard": "표준",
+      "presetEverything": "전체",
+      "groups": {
+        "frame": "프레임 및 시간",
+        "network": "네트워크",
+        "renderer": "렌더러",
+        "system": "시스템"
+      },
+      "labels": {
+        "fps": "FPS",
+        "frameTime": "프레임 시간",
+        "fps1Low": "1% 최저",
+        "fps01Low": "0.1% 최저",
+        "ping": "핑",
+        "jitter": "지터",
+        "snapshot": "스냅샷 전송률",
+        "connection": "연결",
+        "drawCalls": "드로우 콜",
+        "triangles": "삼각형",
+        "geometries": "지오메트리",
+        "textures": "텍스처",
+        "programs": "셰이더",
+        "renderScale": "렌더링 배율",
+        "gpu": "GPU",
+        "memory": "메모리",
+        "hitches": "버벅임",
+        "entities": "개체"
+      },
+      "themes": {
+        "gold": "황금",
+        "frost": "서리",
+        "ember": "잔불",
+        "jade": "비취",
+        "crimson": "진홍",
+        "mono": "단색"
+      },
+      "units": {
+        "ms": "{value} ms",
+        "mb": "{value} MB",
+        "memPair": "{used} / {limit} MB",
+        "hz": "{value} Hz"
+      },
+      "badges": {
+        "backgrounded": "백그라운드",
+        "offline": "오프라인"
+      }
+    },
     "playerCard": {
       "showWalletBadge": "지갑 배지 표시"
+    },
+    "statInfo": {
+      "fromYour": "당신의 {value} {stat}에서:",
+      "desc": {
+        "str": "전투력을 증가시켜 무기 공격이 더 강하게 적중하도록 합니다.",
+        "agi": "반사 신경과 조준 능력을 예리하게 하여 여러 전투 능력치를 향상시킵니다.",
+        "sta": "신체를 강인하게 하여 최대 생명력과 휴식 중 생명력 회복 속도를 높입니다.",
+        "int": "시전자의 마나 총량을 늘리고 주문 치명타율을 향상시킵니다.",
+        "spi": "비전투 중 휴식할 때 시전자의 마나가 회복되는 속도를 빠르게 합니다.",
+        "armor": "들어오는 물리 공격을 완화합니다. 낮은 레벨의 공격자에게 더 큰 효과를 발휘하며, 최대 75%까지 적용됩니다.",
+        "attackPower": "무기 공격을 강화합니다. 전투력 14당 초당 피해 1이 추가됩니다.",
+        "dps": "무기의 피해와 속도, 전투력을 종합한 예상 무기 초당 피해입니다.",
+        "critChance": "공격이 치명적으로 적중하여 두 배의 피해를 입힐 확률입니다.",
+        "dodge": "들어오는 근접 공격을 완전히 피해 피해를 전혀 입지 않을 확률입니다."
+      },
+      "effects": {
+        "attackPower": "+{value} 전투력",
+        "rangedAttackPower": "+{value} 원거리 전투력",
+        "critPct": "+{value}% 치명타",
+        "dodgePct": "+{value}% 회피",
+        "armor": "+{value} 방어도",
+        "maxHealth": "+{value} 최대 생명력",
+        "maxMana": "+{value} 최대 마나",
+        "spellCritPct": "+{value}% 주문 치명타",
+        "healthRegen": "휴식 중 5초마다 약 {value} 생명력 회복",
+        "manaRegen": "휴식 중 5초마다 약 {value} 마나 회복",
+        "damageReduction": "{level} 레벨 공격자에 대한 피해 감소: {value}%",
+        "dpsFromAp": "공격에 초당 피해 {value} 추가"
+      },
+      "notes": {
+        "minorForClass": "당신의 직업에는 거의 도움이 되지 않습니다.",
+        "baseChance": "모든 모험가가 공유하는 5%의 기본 확률이 포함되어 있습니다.",
+        "dpsApprox": "추정치이며, 치명타와 기술 피해는 제외됩니다."
+      }
     },
     "talents": {
       "defaultBuildName": "빌드 {n}"
@@ -285,13 +387,56 @@ export const ko_KR: EnTranslations = {
       "emittedLabel": "{pct}% of the pool paid out so far",
       "sinkLabel": "Funded",
       "emissionLabel": "Paid out",
-      "invariant": "Payouts can never exceed what the season took in — buy > sell, enforced on-chain.",
+      "invariant": "Payouts can never exceed what the season took in: buy > sell, enforced on-chain.",
       "standingsTitle": "Projected top earners",
       "colRank": "#",
       "colPlayer": "Player",
       "colRating": "Rating",
       "colReward": "Reward ($WOC)",
       "projectedNote": "Projected from the current pool + arena ranking; final payouts settle at season close."
+    },
+    "account": {
+      "title": "계정",
+      "loggedOutPrompt": "계정을 관리하려면 로그인하세요.",
+      "memberSince": "가입일: {date}",
+      "sectionSettings": "계정 설정",
+      "sectionWallet": "$WOC 지갑",
+      "sectionCharacters": "캐릭터",
+      "sectionDanger": "위험 구역",
+      "changePassword": "비밀번호 변경",
+      "currentPassword": "현재 비밀번호",
+      "newPassword": "새 비밀번호",
+      "confirmNewPassword": "새 비밀번호 확인",
+      "savePassword": "비밀번호 업데이트",
+      "passwordChanged": "비밀번호가 업데이트되었습니다. 다른 기기에서 로그아웃되었습니다.",
+      "errCurrentRequired": "현재 비밀번호를 입력하세요.",
+      "errPasswordShort": "새 비밀번호는 6자 이상이어야 합니다.",
+      "errPasswordLong": "새 비밀번호는 128자 이하여야 합니다.",
+      "errPasswordUnchanged": "새 비밀번호는 현재 비밀번호와 달라야 합니다.",
+      "errPasswordConfirm": "새 비밀번호가 서로 일치하지 않습니다.",
+      "emailLabel": "이메일(선택 사항)",
+      "emailHint": "계정 복구에만 사용됩니다. 마케팅 이메일은 보내지 않습니다.",
+      "saveEmail": "이메일 저장",
+      "emailSaved": "이메일이 저장되었습니다.",
+      "errEmailInvalid": "유효한 이메일 주소를 입력하세요.",
+      "errCurrentPassword": "현재 비밀번호가 올바르지 않습니다.",
+      "errUsernameMatch": "해당 사용자 이름이 계정과 일치하지 않습니다.",
+      "errPasswordIncorrect": "비밀번호가 올바르지 않습니다.",
+      "errCharactersOnline": "비활성화하기 전에 모든 캐릭터에서 로그아웃하세요.",
+      "deactivatedLocked": "이 계정은 비활성화되었습니다. 복원하려면 관리자에게 문의하세요.",
+      "charactersSummary": "캐릭터를 관리하고 월드에 입장하세요.",
+      "charactersCount": "캐릭터: {count}",
+      "goToCharacters": "캐릭터 보기",
+      "walletSummary": "Solana 지갑을 인증하여 플레이어 카드에 보유자 표식을 표시하세요.",
+      "manageWallet": "지갑 관리",
+      "deactivate": "계정 비활성화",
+      "deactivateWarning": "비활성화하면 계정이 잠기고 모든 기기에서 로그아웃됩니다. 복원하려면 관리자에게 문의하세요. 사용자 이름과 비밀번호를 다시 입력하여 확인하세요.",
+      "confirmUsername": "확인을 위해 사용자 이름을 입력하세요",
+      "confirmPassword": "비밀번호",
+      "deactivateConfirm": "내 계정 비활성화",
+      "deactivated": "계정이 비활성화되었습니다.",
+      "logOut": "로그아웃",
+      "logOutSummary": "이 기기에서 로그아웃합니다."
     }
   },
   "skinEvent": {
@@ -336,6 +481,8 @@ export const ko_KR: EnTranslations = {
     "news": "새소식",
     "download": "다운로드",
     "loginRegister": "로그인/회원가입",
+    "account": "계정",
+    "logout": "로그아웃",
     "donate": "후원"
   },
   "stats": {
@@ -529,36 +676,36 @@ export const ko_KR: EnTranslations = {
         "flavor": "당신이 움직이면 시장이 느낍니다: 공급량의 1%."
       },
       "tidelord": {
-        "name": "Tidelord",
-        "flavor": "The tide answers your call: 2% of supply."
+        "name": "파도 군주",
+        "flavor": "파도가 당신의 부름에 응답합니다: 공급량의 2%."
       },
       "stormcaller": {
-        "name": "Stormcaller",
-        "flavor": "Storms gather at your name: 3% of supply."
+        "name": "폭풍소환자",
+        "flavor": "당신의 이름에 폭풍이 모입니다: 공급량의 3%."
       },
       "krakencrown": {
-        "name": "Krakencrown",
-        "flavor": "Crowned by the deep: 4% of supply."
+        "name": "크라켄 왕관",
+        "flavor": "심연이 당신에게 관을 씌웁니다: 공급량의 4%."
       },
       "titanforged": {
-        "name": "Titanforged",
-        "flavor": "Forged among titans: 5% of supply."
+        "name": "티탄벼림",
+        "flavor": "티탄들 사이에서 벼려졌습니다: 공급량의 5%."
       },
       "starhoard": {
-        "name": "Starhoard",
-        "flavor": "A hoard that bends starlight: 6% of supply."
+        "name": "별 보물고",
+        "flavor": "별빛을 휘게 하는 보물고입니다: 공급량의 6%."
       },
       "voidwarden": {
-        "name": "Voidwarden",
-        "flavor": "Keeper at the void's edge: 7% of supply."
+        "name": "공허 파수꾼",
+        "flavor": "공허의 끝을 지킵니다: 공급량의 7%."
       },
       "realmshaper": {
-        "name": "Realmshaper",
-        "flavor": "You reshape the realm: 8% of supply."
+        "name": "영역 조형자",
+        "flavor": "당신은 영역을 다시 빚습니다: 공급량의 8%."
       },
       "worldforger": {
-        "name": "Worldforger",
-        "flavor": "Forging a world of your own: 9% of supply."
+        "name": "세계 대장장이",
+        "flavor": "당신만의 세계를 벼립니다: 공급량의 9%."
       },
       "worldbearer": {
         "name": "세계 운반자",
@@ -1230,6 +1377,7 @@ export const ko_KR: EnTranslations = {
         "unignoreChat": "채팅 차단 해제",
         "report": "플레이어 신고",
         "removeParty": "파티에서 제거",
+        "convertToRaid": "공격대로 전환",
         "cancel": "취소"
       }
     },
@@ -1448,6 +1596,12 @@ export const ko_KR: EnTranslations = {
       "guildTab": "길드",
       "ignoreTab": "차단",
       "leaveParty": "파티 떠나기",
+      "raidTab": "공격대",
+      "raidEmpty": "파티를 공격대로 전환하면 여기에서 공격대 조를 관리할 수 있습니다.",
+      "raidGroupEmpty": "이 조에는 플레이어가 없습니다.",
+      "raidGroupTitle": "{position}조 ({count}/5)",
+      "raidMoveToGroup": "{position}조로 이동",
+      "raidLeader": "공격대장",
       "offlineEmpty": "친구, 길드, 차단 목록은 온라인 플레이에서 사용할 수 있습니다.",
       "friendsEmpty": "아직 친구가 없습니다. 아래에서 이름으로 검색하세요.",
       "ignoreEmpty": "차단 목록이 비어 있습니다.",
@@ -1548,6 +1702,8 @@ export const ko_KR: EnTranslations = {
       "title": "마법책",
       "classSubtitle": "{className} 능력",
       "close": "마법책 닫기",
+      "resetBar": "단축바 초기화",
+      "resetBarAria": "현재 행동 단축바를 기본 능력으로 초기화",
       "trainableAtLevel": "{level}레벨에 훈련 가능",
       "learnAtLevel": "{level}레벨에 배웁니다.",
       "knownAbilityAria": "{name}, {rank} 등급. {summary}",
@@ -1683,7 +1839,8 @@ export const ko_KR: EnTranslations = {
       "common": "일반",
       "uncommon": "고급",
       "rare": "희귀",
-      "epic": "영웅"
+      "epic": "영웅",
+      "legendary": "전설"
     },
     "kind": {
       "weapon": "무기",
@@ -1860,6 +2017,16 @@ export const ko_KR: EnTranslations = {
     "loot": {
       "takeAll": "모두 가져가기",
       "close": "전리품 닫기"
+    },
+    "lootRoll": {
+      "title": "전리품 주사위",
+      "need": "필요",
+      "greed": "탐욕",
+      "pass": "포기",
+      "needAria": "{item} 필요",
+      "greedAria": "{item} 탐욕",
+      "passAria": "{item} 포기",
+      "everyonePassed": "모두 {item}을(를) 포기했습니다."
     }
   },
   "entities": {
@@ -3380,6 +3547,36 @@ export const ko_KR: EnTranslations = {
       "event_skin_token": {
         "name": "신비한 외형 상자"
       },
+      "deathless_heartwood": {
+        "name": "죽지 않는 왕관의 심재"
+      },
+      "kingsbane_last_oath": {
+        "name": "왕살해자, 손피크의 마지막 맹세"
+      },
+      "crownforged_dreadhelm": {
+        "name": "왕관벼림 공포투구"
+      },
+      "crownforged_warspaulders": {
+        "name": "왕관벼림 전쟁 어깨갑옷"
+      },
+      "nighttalon_crown": {
+        "name": "밤발톱 왕관"
+      },
+      "nighttalon_shoulderguards": {
+        "name": "밤발톱 어깨수호대"
+      },
+      "soulflame_cowl": {
+        "name": "영혼불꽃 두건"
+      },
+      "soulflame_mantle": {
+        "name": "영혼불꽃 어깨덮개"
+      },
+      "stormcallers_crown": {
+        "name": "폭풍소환사의 관"
+      },
+      "stormcallers_spaulders": {
+        "name": "폭풍소환사의 어깨갑옷"
+      },
       "unknown_alien_weaponry": {
         "name": "알 수 없는 외계 무기"
       },
@@ -3594,6 +3791,12 @@ export const ko_KR: EnTranslations = {
       },
       "bound_guardian": {
         "name": "속박된 수호자"
+      },
+      "nythraxis_skeleton_warrior": {
+        "name": "되살아난 왕실 근위병"
+      },
+      "nythraxis_scourge_of_thornpeak": {
+        "name": "나이트락시스, 손피크의 재앙"
       },
       "brightwood_hare": {
         "name": "브라이트우드 산토끼"
@@ -3846,6 +4049,11 @@ export const ko_KR: EnTranslations = {
         "name": "순찰병 엘윈",
         "title": "숲의 수호인",
         "greeting": "조용히 하게, {className} - 오늘 숲은 고요하고, 나는 그대로 지킬 생각이네."
+      },
+      "brother_aldric_raid": {
+        "name": "알드릭 수사",
+        "title": "계곡의 사제",
+        "greeting": "예배당 묘지에서 세상의 지붕까지... 흔적은 여기서 끝납니다. 산이 듣고 있음을 느낍니다."
       },
       "tidewatcher_ondrel": {
         "name": "온드렐 베인",
@@ -4586,6 +4794,16 @@ export const ko_KR: EnTranslations = {
           }
         }
       },
+      "q_nythraxis_scourges_end": {
+        "title": "스컬지의 끝",
+        "text": "인장 반지가 길을 열었습니다, {playerName}. 하지만 열린 무덤이 승리는 아닙니다. 니트락시스는 한때 왕이었고, 손피크 아래의 폐허는 아직도 그의 의지에 묶여 있습니다. 믿을 수 있는 동료들과 함께 묘실로 들어가십시오. 그 죽지 않는 왕관의 명령이 위의 전장에 닿기 전에 부수어야 합니다.",
+        "completion": "마침내 왕관이 침묵했습니다. 손피크는 여전히 죽은 이들을 품겠지만, 산 아래의 어떤 왕도 다시 그들을 전쟁으로 부르지 못할 것입니다. 당신은 알드렌과 말릭, 보스가 겨우 억눌렀던 일을 끝냈습니다.",
+        "objectives": {
+          "0": {
+            "label": "니트락시스 처치"
+          }
+        }
+      },
       "q_brightwood_thinning": {
         "title": "숲 솎아내기",
         "text": "브라이트우드 숲이 들끓고 있네, {playerName}. 가시덤불 살쾡이는 내가 솎아내는 속도보다 빨리 번식하고, 무리는 얼마 남지 않은 풀밭마저 짓밟고 있어. 가시덤불 살쾡이 8마리를 처치하고 숲속 가죽 6장을 가져오게. 나머지 무리의 상태를 가늠해 보겠네.",
@@ -4919,6 +5137,11 @@ export const ko_KR: EnTranslations = {
       "nythraxis_crypt": {
         "name": "버려진 납골당",
         "enterText": "버려진 납골당의 문턱을 넘습니다.",
+        "leaveText": "Thornpeak의 차가운 공기 속으로 돌아옵니다."
+      },
+      "nythraxis_boss_arena": {
+        "name": "니트락시스 공격대 투기장",
+        "enterText": "봉인된 왕실 문을 지나갑니다.",
         "leaveText": "Thornpeak의 차가운 공기 속으로 돌아옵니다."
       },
       "drowned_temple": {

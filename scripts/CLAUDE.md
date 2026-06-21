@@ -6,8 +6,11 @@
 # scripts/
 
 Standalone Node ESM (`.mjs`) tooling — **not** compiled by vite/esbuild and **not**
-TypeScript. Run a script directly: `node scripts/<name>.mjs`. Only a few are wired
-into npm: `build` (manifest), `realms` (`dev-realms.mjs`), `admin:grant` (`grant_admin.mjs`).
+TypeScript. Run a script directly: `node scripts/<name>.mjs`. Several are wired
+into npm, e.g. `build` (manifest), `realms` (`dev-realms.mjs`), `admin:grant`
+(`grant_admin.mjs`), the i18n pipeline (`i18n:build`/`i18n:admin`/`i18n:scan`,
+aliased `i18n:gen`, plus `i18n:hash`), and asset generators. Many more run directly
+via `node scripts/<name>.mjs`.
 
 ## What runs where
 - **Browser scripts** use `puppeteer-core` + `browser_path.mjs` and need `npm run dev`
@@ -34,7 +37,8 @@ into npm: `build` (manifest), `realms` (`dev-realms.mjs`), `admin:grant` (`grant
 | SEO / homepage / i18n | `homepage_verify.mjs`, `seo_audit.mjs`, `localization_e2e.mjs` (locale-matrix homepage E2E) | dev (+ server) |
 | i18n pipeline | `i18n_build.mjs`+`i18n_admin_build.mjs` (resolved tables), `i18n_scan.mjs` (status registry), `i18n_resolved_hash.mjs` (game-table SHA gate); seed `i18n_blocked_seed.mjs` owns `V07_SLASH`/`COPIED_ALLOW_IDS`; `i18n_pseudo.mjs` (en_XA dev pseudo-locale), `i18n_modulepreload.mjs` (lazy-locale boot modulepreload) | `i18n:gen`; SHA via `i18n:hash` |
 | Data export | `export_loot_spreadsheet.mjs` (esbuild-bundles `src/sim` → loot sheet in `docs/`) | — |
-| Admin / dev utils | `grant_admin.mjs`, `create_gm.mjs`, `dev-realms.mjs` | `DATABASE_URL` |
+| Admin / dev utils | `grant_admin.mjs`, `create_gm.mjs` | `DATABASE_URL` |
+| Local realms | `dev-realms.mjs` (launches built server processes) | built server (`npm run realms`) |
 | Helper | `browser_path.mjs` (resolves Chrome/Edge/Chromium; override `BROWSER_PATH=`) | — |
 
 ## Conventions (verifiable patterns to copy)
@@ -54,9 +58,10 @@ into npm: `build` (manifest), `realms` (`dev-realms.mjs`), `admin:grant` (`grant
 
 ## Never
 - These are raw `.mjs` run directly by Node, not part of the vite/esbuild build; keep
-  deps Node-only (`ws`, `pg`, `puppeteer-core`). Most never touch `src/` — the one
-  exception is `export_loot_spreadsheet.mjs`, which runs `esbuild` itself to bundle the
-  `src/sim` data, so do that (don't `import` the TS sources raw) if a script truly needs them.
+  deps Node-only (`ws`, `pg`, `puppeteer-core`). Most never touch `src/`. Several scripts
+  that need sim or i18n data bundle the TS with `esbuild` themselves (e.g.
+  `export_loot_spreadsheet.mjs` and the `i18n_*` builders); follow that pattern and never
+  `import` the TS sources raw.
 - Don't hand-edit `src/render/assets/manifest.generated.ts` — regenerate via
   `build_media_manifest.mjs generate` (`npm run build` does this).
 - Don't hand-edit the generated i18n artifacts: `src/ui/i18n.resolved.generated/` +

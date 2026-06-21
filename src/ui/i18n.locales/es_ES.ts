@@ -11,6 +11,9 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const es_ES: Partial<Record<TranslationKey, string>> = {
+  // Stat tooltips inherit the es base: none of these keys needs a genuine Iberian
+  // divergence (es already uses "hechizos" and neutral wording), so per the
+  // divergence-only policy es_ES carries no hudChrome.statInfo.* overrides.
   "hudChrome.emotes.question": "¿Tío?",
   "nav.loginRegister": "Iniciar sesión/Registrarse",
   "stats.playersOnline": "Jugadores en línea",

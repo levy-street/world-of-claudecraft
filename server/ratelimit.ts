@@ -1,4 +1,5 @@
 import * as http from 'node:http';
+import * as net from 'node:net';
 
 // Simple in-memory rate limiter (per client IP, sliding minute window).
 //
@@ -29,9 +30,17 @@ function backstopTargetSize(): number {
   return Math.max(0, MAX_TRACKED_IPS - BACKSTOP_EVICT_BATCH);
 }
 
-function normalizeIp(ip: string): string {
-  if (ip.startsWith('::ffff:')) return ip.slice('::ffff:'.length);
-  return ip;
+// Canonicalize so the connect side (requestIp) and the stored side (cleanIp)
+// agree by construction: lowercase, drop the IPv4-mapped prefix, and compress
+// IPv6 via the WHATWG serializer (gated on net.isIP so only a valid literal
+// reaches new URL). Anything net.isIP rejects passes through unchanged.
+export function normalizeIp(ip: string): string {
+  let s = ip.toLowerCase();
+  if (s.startsWith('::ffff:')) s = s.slice('::ffff:'.length);
+  if (net.isIP(s) === 6) {
+    try { return new URL(`http://[${s}]`).hostname.slice(1, -1); } catch { return s; }
+  }
+  return s;
 }
 
 // loopback, RFC1918, link-local, IPv6 ULA — the only sources our reverse

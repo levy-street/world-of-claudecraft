@@ -50,7 +50,8 @@ cross-reference it; do not invent costs/levels/damage.
 
 ## How to add quest / mobs / camps / dungeon / item
 - **Quest:** add to `ZONE{N}_QUESTS` (`giverNpcId`, `turnInNpcId`, `text`,
-  `objectives[]` of `{type:'kill',targetMobId}` or `{type:'collect',itemId}`,
+  `objectives[]` of `{type:'kill',targetMobId}`, `{type:'collect',itemId}`, or
+  `{type:'interact',targetObjectItemId}`,
   `xpReward`, `copperReward`, `itemRewards` keyed by class, optional `requiresQuest`,
   `minLevel`, `suggestedPlayers`), list its id in the giver NPC's `questIds`, and add
   it to `ZONE{N}_QUEST_ORDER`. `$N`/`$C` in text are runtime substitutions (player
@@ -111,9 +112,11 @@ guard `tests/localization_fixes.test.ts` enforces it):
   8 in `talents_classic.ts`). `validateTalentTree` runs at import and **throws on a
   malformed tree** (dup ids, bad prereqs, cycles, unreachable gates) — a broken tree
   won't load.
-- Build strings (`exportBuild`/`importBuild`, base64), loadouts (`SavedLoadout`,
-  `MAX_LOADOUTS`), dormant-node detection, and respec all live here. Allocation is
-  **server-authoritative**: `validateAllocation` re-checks on apply regardless of UI.
+- Build strings (`exportBuild`/`importBuild`, base64), the loadout type
+  (`SavedLoadout`, `MAX_LOADOUTS`), and dormant-node detection live here; the respec
+  and loadout save/delete operations are Sim methods (`respec`/`saveLoadout`/
+  `deleteLoadout` in `sim.ts`). Allocation is **server-authoritative**:
+  `validateAllocation` re-checks on apply regardless of UI.
 
 ## Never do here
 - Never put combat/sim behavior in a content file — it stays declarative data.

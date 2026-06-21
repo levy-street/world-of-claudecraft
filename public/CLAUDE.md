@@ -14,7 +14,7 @@ are the imported KayKit/Quaternius/Kenney models plus PBR/HDRI/sprite/audio asse
 |---|---|---|
 | `models/chars/players` | 9 playable-class `.glb` (knight, mage, rogue, barbarian…) + `Mech/` | GLB |
 | `models/chars/enemies` | 7 enemy `.glb` (skeletons, necromancer, golem) | GLB |
-| `models/creatures` | 23 animated creature `.glb` (wolf, dragon, goblin…) | GLB |
+| `models/creatures` | animated creature `.glb` models (wolf, dragon, goblin…) | GLB |
 | `models/dungeon` | 378 modular dungeon `.glb` (walls, pillars, torches, chests, banners…) | GLB |
 | `models/foliage` | 23 nature `.glb` (trees, bushes, rocks, mushrooms) | GLB |
 | `models/props` | 38 village/prop `.glb` (anvil, barrel, blacksmith, well…) | GLB |

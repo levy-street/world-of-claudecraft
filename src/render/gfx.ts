@@ -7,7 +7,7 @@ import * as THREE from 'three';
 //   1. '?lowgfx' (legacy flag) or '?gfx=low'  -> low
 //   2. '?gfx=medium' / '?gfx=high' / '?gfx=ultra' -> that tier, EVEN on software GL
 //      (headless screenshot verification: stills render slowly but correctly)
-//   3. otherwise: persisted graphics preset, with missing/legacy values -> low
+//   3. otherwise: persisted graphics preset, with missing values -> ultra
 
 export type GfxTier = 'low' | 'medium' | 'high' | 'ultra';
 export const GFX_CONFIG_VERSION = 14;
@@ -105,6 +105,7 @@ const PRESET_MEDIUM = 2;
 const PRESET_HIGH = 3;
 const PRESET_ULTRA = 4;
 const PRESET_ADVANCED = 5;
+const DEFAULT_PRESET = PRESET_ULTRA;
 
 export const GFX_BUDGETS: Record<GfxTier, GfxRuntimeBudget> = {
   low: {
@@ -242,7 +243,7 @@ function bucketBaselines(bands: GfxBucketBands): GfxBucketLevels {
 }
 
 export function graphicsPresetLabel(value: number | undefined): 'low' | 'medium' | 'high' | 'ultra' | 'advanced' {
-  switch (Math.round(value ?? PRESET_LOW)) {
+  switch (Math.round(value ?? DEFAULT_PRESET)) {
     case PRESET_LOW: return 'low';
     case PRESET_MEDIUM: return 'medium';
     case PRESET_HIGH: return 'high';
@@ -376,7 +377,7 @@ export function isConstrainedBrowser(hints: GfxRuntimeHints): boolean {
 export function tierFromHints(hints: GfxRuntimeHints, softwareGl: boolean): GfxTier {
   const forced = forcedTierFromSearch(hints.search);
   if (forced) return forced;
-  switch (Math.round(hints.graphicsPreset ?? PRESET_LOW)) {
+  switch (Math.round(hints.graphicsPreset ?? DEFAULT_PRESET)) {
     case PRESET_LOW: return 'low';
     case PRESET_MEDIUM: return 'medium';
     case PRESET_HIGH: return 'high';
