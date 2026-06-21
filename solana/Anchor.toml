@@ -1,0 +1,21 @@
+[toolchain]
+
+[features]
+resolver = true
+skip-lint = false
+
+[programs.localnet]
+realm_stake_escrow = "6Dg85JcaHyJqzewtaYzJCjNgX1s64QPqSuATYD2Tukjj"
+
+[programs.devnet]
+realm_stake_escrow = "6Dg85JcaHyJqzewtaYzJCjNgX1s64QPqSuATYD2Tukjj"
+
+[registry]
+url = "https://api.apr.dev"
+
+[provider]
+cluster = "devnet"
+wallet = "~/.config/solana/id.json"
+
+[scripts]
+test = "echo 'integration lives in the node vitest suite (tests/realm_stake_devnet.integration.test.ts)'"
