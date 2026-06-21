@@ -4,6 +4,7 @@ import type { PlayerClass } from '../../sim/types';
 import { trackWebGLContext } from '../context_release';
 import type { WeaponLayoutOverride } from './manifest';
 import { CharacterVisual } from './visual';
+import type { SkinDesignSpec } from '../../world_api';
 
 const PREVIEW_ANIM_STATE = {
   speed: 0,
@@ -25,6 +26,8 @@ export class CharacterPreview {
   private characterGroup: THREE.Group;
   private currentVisual: CharacterVisual | null = null;
   private currentSkin = 0;
+  private currentCreatorSkinId: string | null = null; // listed creator skin overlay (registry id)
+  private currentDesign: SkinDesignSpec | null = null; // ad-hoc designer preview spec
   private clock = new THREE.Clock();
   private animationFrameId: number | null = null;
   private resizeObserver: ResizeObserver | null = null;
@@ -122,6 +125,9 @@ export class CharacterPreview {
         weaponOverride,
       );
       this.characterGroup.add(this.currentVisual.root);
+      // Re-apply any active creator/design overlay so it survives a model swap.
+      if (this.currentDesign) this.currentVisual.setDesignSkin(this.currentDesign, this.currentSkin);
+      else if (this.currentCreatorSkinId) this.currentVisual.setCreatorSkin(this.currentCreatorSkinId, this.currentSkin);
 
       // Reset rotation of group so new character faces forward but holds any user offset if preferred.
       // Resetting Y rotation is cleanest for transitions.
@@ -131,10 +137,29 @@ export class CharacterPreview {
     }
   }
 
-  /** Swap the previewed skin (alternate body texture); persists across setClass. */
+  /** Swap the previewed skin (alternate body texture); persists across setClass.
+   *  Selecting a numeric skin clears any creator/design overlay. */
   setSkin(skinIndex: number): void {
     this.currentSkin = skinIndex;
+    this.currentCreatorSkinId = null;
+    this.currentDesign = null;
     this.currentVisual?.setSkin(skinIndex);
+  }
+
+  /** Preview a listed creator skin (registry id) on the turntable. */
+  setCreatorSkin(id: string, fallbackIndex = 0): void {
+    this.currentCreatorSkinId = id;
+    this.currentDesign = null;
+    this.currentSkin = fallbackIndex;
+    this.currentVisual?.setCreatorSkin(id, fallbackIndex);
+  }
+
+  /** Live-preview an ad-hoc design spec (the in-browser designer). */
+  setDesignSkin(spec: SkinDesignSpec, fallbackIndex = 0): void {
+    this.currentDesign = spec;
+    this.currentCreatorSkinId = null;
+    this.currentSkin = fallbackIndex;
+    this.currentVisual?.setDesignSkin(spec, fallbackIndex);
   }
 
   /** Dynamically shift the canvas to a new container */

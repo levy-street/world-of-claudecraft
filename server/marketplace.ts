@@ -13,10 +13,12 @@
 import { randomBytes } from 'node:crypto';
 import { isSolanaAddress } from './wallet_link';
 import { parseSplitPayment, fetchFinalizedTransaction, type ParsedSplitPayment } from './solana_rpc';
+import { normalizeDesignSpec, type SkinDesignSpec } from '../src/world_api';
 import {
   type CreatorSkinRow, type MarketplaceQuoteRow,
   createMarketplaceQuote, getMarketplaceQuote, deleteMarketplaceQuote,
   redeemPurchase, listLiveCreatorSkins,
+  upsertCreatorSkin, countLiveCreatorSkinsByAccount,
 } from './db';
 
 const USDC_MINT = (process.env.USDC_MINT ?? process.env.VITE_USDC_MINT ?? 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v').trim();
@@ -172,7 +174,15 @@ export interface RegistrySkin {
   targetClass: string | null;
   assetUrl: string;
   emissiveUrl: string | null;
+  design: SkinDesignSpec | null;
+  creator: string; // short public attribution (no full wallet / PII)
   priceUsdc: string;
+}
+
+/** Public creator attribution: a short, abbreviated wallet — never the full
+ *  address or any account PII. */
+function creatorLabel(wallet: string): string {
+  return wallet.length > 9 ? `${wallet.slice(0, 4)}…${wallet.slice(-4)}` : wallet;
 }
 
 export async function registrySkins(): Promise<RegistrySkin[]> {
@@ -186,6 +196,64 @@ export async function registrySkins(): Promise<RegistrySkin[]> {
     targetClass: r.targetClass,
     assetUrl: r.assetUrl,
     emissiveUrl: r.emissiveUrl,
+    design: r.design,
+    creator: creatorLabel(r.creatorWallet),
     priceUsdc: r.priceUsdc.toString(),
   }));
+}
+
+// --- Creator self-serve listing (the in-browser designer "Sell" path) -------
+// A creator submits a procedural design + name + price; we list it 'live'
+// immediately (instant-live policy) under the creator's own linked wallet as
+// the 70% payout destination. No file upload — the design IS the asset. Bounded
+// per-account to deter spam.
+export const MAX_LISTINGS_PER_ACCOUNT = 24;
+export const MIN_LISTING_PRICE = 500_000n; //  $0.50 (USDC base units)
+export const MAX_LISTING_PRICE = 10_000_000_000n; // $10,000
+const NAME_MAX = 40;
+const DESC_MAX = 200;
+
+export interface ListingInput {
+  name: string;
+  description: string;
+  priceUsdc: bigint;
+  design: unknown; // untrusted; validated via normalizeDesignSpec
+  targetClass: string | null;
+}
+
+export type ListingResult =
+  | { ok: true; id: string }
+  | { ok: false; reason: string };
+
+export async function createListing(input: ListingInput, creatorAccountId: number, creatorWallet: string): Promise<ListingResult> {
+  if (!isSolanaAddress(creatorWallet)) return { ok: false, reason: 'invalid_wallet' };
+  const name = input.name.trim();
+  if (name.length < 1 || name.length > NAME_MAX) return { ok: false, reason: 'invalid_name' };
+  const description = input.description.trim();
+  if (description.length > DESC_MAX) return { ok: false, reason: 'invalid_description' };
+  if (input.priceUsdc < MIN_LISTING_PRICE || input.priceUsdc > MAX_LISTING_PRICE) return { ok: false, reason: 'invalid_price' };
+  const design = normalizeDesignSpec(input.design);
+  if (!design) return { ok: false, reason: 'invalid_design' };
+  if (await countLiveCreatorSkinsByAccount(creatorAccountId) >= MAX_LISTINGS_PER_ACCOUNT) {
+    return { ok: false, reason: 'too_many_listings' };
+  }
+  const id = `cs_${randomBytes(12).toString('hex')}`;
+  const row: CreatorSkinRow = {
+    id,
+    creatorAccountId,
+    creatorWallet,
+    name,
+    description,
+    skinCatalog: 'class',
+    fallbackSkin: 0,
+    targetClass: input.targetClass,
+    assetUrl: 'procedural', // sentinel — `design` is the real source
+    emissiveUrl: null,
+    design,
+    priceUsdc: input.priceUsdc,
+    status: 'live', // instant-live policy
+    sha256: null,
+  };
+  await upsertCreatorSkin(row);
+  return { ok: true, id };
 }

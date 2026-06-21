@@ -1111,6 +1111,9 @@ export interface NpcDef {
   // The Merchant: talking to this NPC opens the player-driven World Market
   // (auction house) instead of a fixed vendor stock.
   market?: boolean;
+  // The Skin Artisan billboard: talking to this NPC opens the Creator Skins
+  // marketplace (buy/sell player-designed USDC cosmetics).
+  creatorMarket?: boolean;
   greeting: string;
   // Registered but not surface-placed at world init. The owning system spawns
   // the entity on demand (e.g. the Nythraxis encounter walks Brother Aldric in

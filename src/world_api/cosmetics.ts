@@ -30,10 +30,65 @@ function uniqueStrings(value: unknown): string[] {
   return out;
 }
 
+// A creator skin authored in the in-browser designer: a tiny, deterministic
+// spec (two colours + a pattern + optional glow) that EVERY client rebuilds into
+// the same body-atlas texture procedurally — so a "skin" needs no hosted image.
+// The same builder drives the designer's live preview and the in-world renderer,
+// guaranteeing they match. Host-agnostic (no DOM/Three) so the server can
+// validate a submitted spec; the canvas builder lives in render/characters/skin_design.ts.
+export type SkinPattern = 'solid' | 'scales' | 'stripes' | 'diamond' | 'hex' | 'spots' | 'runes';
+export const SKIN_PATTERNS: readonly SkinPattern[] = [
+  'solid',
+  'scales',
+  'stripes',
+  'diamond',
+  'hex',
+  'spots',
+  'runes',
+];
+
+export interface SkinDesignSpec {
+  primary: string; // '#rrggbb' — dominant body colour
+  secondary: string; // '#rrggbb' — pattern / trim colour
+  pattern: SkinPattern;
+  emissive: string | null; // '#rrggbb' glow colour, or null for no glow
+}
+
+const SKIN_HEX6 = /^#[0-9a-f]{6}$/i;
+
+/** Normalize an untrusted design blob to a valid SkinDesignSpec, or null if it
+ *  isn't a usable design (so the skin falls back to its assetUrl/numeric skin).
+ *  Shared by the server (listing validation) and the client (designer). */
+export function normalizeDesignSpec(value: unknown): SkinDesignSpec | null {
+  if (!value || typeof value !== 'object') return null;
+  const src = value as Record<string, unknown>;
+  const pattern = SKIN_PATTERNS.includes(src.pattern as SkinPattern)
+    ? (src.pattern as SkinPattern)
+    : null;
+  if (!pattern || typeof src.primary !== 'string' || !SKIN_HEX6.test(src.primary)) return null;
+  const hex = (v: unknown, fb: string): string =>
+    typeof v === 'string' && SKIN_HEX6.test(v) ? v.toLowerCase() : fb;
+  return {
+    primary: hex(src.primary, '#888888'),
+    secondary: hex(src.secondary, '#444444'),
+    pattern,
+    emissive:
+      typeof src.emissive === 'string' && SKIN_HEX6.test(src.emissive)
+        ? src.emissive.toLowerCase()
+        : null,
+  };
+}
+
+/** The designer's starting point (an emerald dragon-scale look). */
+export function defaultDesignSpec(): SkinDesignSpec {
+  return { primary: '#2e8b57', secondary: '#0b3d2e', pattern: 'scales', emissive: null };
+}
+
 // Public cosmetic metadata for one marketplace creator skin (from GET
 // /api/skins/registry). The renderer resolves an entity's opaque cosmeticSkinId
-// to assetUrl through this; the marketplace UI uses name/price. Deliberately
-// carries no ownership or creator wallet — it is world-public.
+// to a texture through this — `design` (procedural) when present, else assetUrl.
+// The marketplace UI uses name/price. Deliberately carries no ownership or
+// creator wallet — it is world-public.
 export interface CreatorSkinRegistryEntry {
   id: string;
   name: string;
@@ -43,6 +98,8 @@ export interface CreatorSkinRegistryEntry {
   targetClass: string | null;
   assetUrl: string;
   emissiveUrl: string | null;
+  design: SkinDesignSpec | null; // procedural design; takes precedence over assetUrl
+  creator: string; // creator display label (account username or short wallet) — public attribution
   priceUsdc: string; // USDC base units (6 decimals) as a string
 }
 

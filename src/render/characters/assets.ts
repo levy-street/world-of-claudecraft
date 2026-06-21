@@ -24,7 +24,8 @@ import {
   visibleAttachmentsForGraphics,
   visualAssetUrlForGraphics,
 } from './manifest';
-import type { CreatorSkinRegistryEntry } from '../../world_api';
+import type { CreatorSkinRegistryEntry, SkinDesignSpec } from '../../world_api';
+import { buildSkinCanvas, buildSkinEmissiveCanvas, designHash } from './skin_design';
 
 const DEFAULT_TINT_STRENGTH = 0.4;
 
@@ -447,27 +448,85 @@ function loadCreatorUrl(url: string): Promise<void> {
 export function ensureCreatorSkin(id: string): Promise<void> {
   const entry = creatorSkinRegistry.get(id);
   if (!entry) return Promise.resolve();
+  // Procedural designer skins build synchronously from the spec — no fetch.
+  if (entry.design) { designSkinTexture(entry.design); return Promise.resolve(); }
   const jobs = [loadCreatorUrl(entry.assetUrl)];
   if (entry.emissiveUrl && GFX.standardMaterials) jobs.push(loadCreatorUrl(entry.emissiveUrl));
   return Promise.all(jobs).then(() => undefined);
 }
 
-/** The loaded body texture for a creator skin id, or null if unknown / not yet
- *  loaded. Touches the LRU so an in-view skin stays resident. */
+/** The body texture for a creator skin id, or null if unknown / not yet loaded.
+ *  Designer skins build procedurally from the spec; URL skins resolve from the
+ *  fetched-atlas cache (touching the LRU so an in-view skin stays resident). */
 export function creatorSkinTexture(id: string): THREE.Texture | null {
   const entry = creatorSkinRegistry.get(id);
   if (!entry) return null;
+  if (entry.design) return designSkinTexture(entry.design);
   const tex = creatorSkinTexByUrl.get(entry.assetUrl);
   if (tex) touchCreatorUrl(entry.assetUrl);
   return tex ?? null;
 }
 
-/** The loaded emissive (glow) map for a creator skin id, or null (no emissive /
- *  not loaded / low tier). */
+/** The emissive (glow) map for a creator skin id, or null (no emissive / not
+ *  loaded / low tier). */
 export function creatorSkinEmissive(id: string): THREE.Texture | null {
   const entry = creatorSkinRegistry.get(id);
-  if (!entry || !entry.emissiveUrl) return null;
+  if (!entry) return null;
+  if (entry.design) return designSkinEmissiveTex(entry.design);
+  if (!entry.emissiveUrl) return null;
   return creatorSkinTexByUrl.get(entry.emissiveUrl) ?? null;
+}
+
+// --- Procedural designer skins (SkinDesignSpec) ----------------------------
+// Built on the client from the spec (no fetch); cached by design hash under the
+// same bounded budget as the URL atlas cache. designSkinTexture also drives the
+// designer's live preview (CharacterVisual.setDesignSkin) before a skin is listed.
+const designTexByHash = new Map<string, THREE.Texture>();
+const designEmisByHash = new Map<string, THREE.Texture>();
+const designLru: string[] = [];
+
+function texFromCanvas(cv: HTMLCanvasElement): THREE.Texture {
+  const t = new THREE.CanvasTexture(cv);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.flipY = false;
+  t.needsUpdate = true;
+  return t;
+}
+
+function touchDesign(hash: string): void {
+  const i = designLru.indexOf(hash);
+  if (i >= 0) designLru.splice(i, 1);
+  designLru.push(hash);
+  while (designLru.length > CREATOR_SKIN_MAX) {
+    const h = designLru.shift();
+    if (h === undefined) break;
+    designTexByHash.get(h)?.dispose();
+    designEmisByHash.get(h)?.dispose();
+    designTexByHash.delete(h);
+    designEmisByHash.delete(h);
+  }
+}
+
+export function designSkinTexture(spec: SkinDesignSpec): THREE.Texture {
+  const h = designHash(spec);
+  let t = designTexByHash.get(h);
+  if (!t) { t = texFromCanvas(buildSkinCanvas(spec)); designTexByHash.set(h, t); }
+  touchDesign(h);
+  return t;
+}
+
+export function designSkinEmissiveTex(spec: SkinDesignSpec): THREE.Texture | null {
+  if (!spec.emissive) return null;
+  const h = designHash(spec);
+  let t = designEmisByHash.get(h);
+  if (!t) {
+    const cv = buildSkinEmissiveCanvas(spec);
+    if (!cv) return null;
+    t = texFromCanvas(cv);
+    designEmisByHash.set(h, t);
+  }
+  touchDesign(h);
+  return t;
 }
 
 function resolvedGltf(url: string): GLTF {
