@@ -593,6 +593,9 @@ export const ko_KR: EnTranslations = {
     "renameRequired": "이름 변경 필요",
     "delete": "삭제",
     "rename": "이름 변경",
+    "renamePaidButton": "Pay {amount} $WOC & Rename",
+    "renamePriceHint": "A voluntary rename burns {amount} $WOC.",
+    "renameCancel": "Cancel",
     "newNamePlaceholder": "새 캐릭터 이름",
     "tabCharacters": "캐릭터",
     "tabCreate": "생성",
@@ -600,6 +603,18 @@ export const ko_KR: EnTranslations = {
     "viewProfile": "프로필 보기",
     "profile": "프로필",
     "closeProfile": "프로필 닫기"
+  },
+  "woc": {
+    "linkWalletFirst": "Connect and link a Solana wallet to pay with $WOC.",
+    "quoting": "Preparing your $WOC payment…",
+    "approveBurn": "Approve the {amount} $WOC burn in your wallet…",
+    "confirming": "Confirming the burn on-chain…",
+    "finalizing": "Waiting for Solana finalization…",
+    "confirmFailed": "The $WOC payment could not be verified.",
+    "finalizeTimeout": "Timed out waiting for finalization. If $WOC was burned, reopen and retry — the payment settles once it finalizes.",
+    "renameSuccess": "Renamed to {name}.",
+    "guildRenameSuccess": "Guild renamed to {name}.",
+    "reserveSuccess": "Reserved the name {name}."
   },
   "deleteCharacter": {
     "title": "캐릭터 삭제",

@@ -32,6 +32,16 @@ import {
   type WocPriceKey,
 } from './woc_config';
 
+// GET /api/identity/prices — public: the human-readable $WOC price of each paid
+// action, so the client can show the cost before the player commits to a quote.
+export function handleIdentityPrices(res: http.ServerResponse): void {
+  json(res, 200, {
+    rename_character: wocPriceHuman('rename_character'),
+    rename_guild: wocPriceHuman('rename_guild'),
+    reserve_name: wocPriceHuman('reserve_name'),
+  });
+}
+
 export type IdentityKind = 'rename_character' | 'rename_guild' | 'reserve_name';
 const KINDS: IdentityKind[] = ['rename_character', 'rename_guild', 'reserve_name'];
 

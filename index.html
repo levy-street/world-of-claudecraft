@@ -3236,6 +3236,43 @@
     border-radius: 4px;
     color: #e8d8a8;
   }
+  /* Inline "pay $WOC to rename" editor, appended below a character row. */
+  .char-row { flex-wrap: wrap; }
+  .paid-rename-editor {
+    flex: 1 0 100%;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(78, 61, 29, 0.35);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .paid-rename-editor .paid-rename-input {
+    width: 100%;
+    max-width: 260px;
+    padding: 7px 9px;
+    background: #101018;
+    border: 1px solid #4a3d1d;
+    border-radius: 4px;
+    color: #e8d8a8;
+    font-size: 13px;
+  }
+  .paid-rename-editor .paid-rename-hint {
+    color: var(--color-text-muted);
+    font-size: 11.5px;
+  }
+  .paid-rename-editor .paid-rename-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .paid-rename-editor .paid-rename-status {
+    color: #ffbf66;
+    font-size: 11.5px;
+    min-height: 14px;
+  }
+  .paid-rename-editor .paid-rename-status:empty { display: none; }
   .char-create {
     margin-top: 14px;
     border-top: 1px solid rgba(78, 61, 29, 0.3);
