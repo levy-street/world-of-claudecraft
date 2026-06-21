@@ -1,0 +1,20 @@
+[toolchain]
+
+[features]
+resolver = true
+skip-lint = false
+
+[programs.localnet]
+woc_escrow = "Fn4LMsV7akGX9KXwYv4uh2v8nM2uqgaAxhKrsYYbZqcJ"
+
+[programs.devnet]
+woc_escrow = "Fn4LMsV7akGX9KXwYv4uh2v8nM2uqgaAxhKrsYYbZqcJ"
+
+[registry]
+url = "https://api.apr.dev"
+
+[provider]
+cluster = "devnet"
+wallet = "~/.config/solana/id.json"
+
+[scripts]
