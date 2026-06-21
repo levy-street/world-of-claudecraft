@@ -76,7 +76,6 @@ export interface CharacterSummary {
   playtimeSeconds?: number;
 }
 
-
 export function buildWebSocketUrl(protocol: string, host: string): string {
   const proto = protocol === 'https:' ? 'wss' : 'ws';
   return `${proto}://${host}/ws`;

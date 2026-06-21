@@ -512,6 +512,7 @@ export async function signAndSendSplitPayment(q: SplitPaymentQuote): Promise<str
   // courtesy (so the immediate /buy usually succeeds first try) but return the
   // signature either way; the server is the authority — it re-fetches the finalized
   // tx itself, and the caller retries /buy until it does.
-  await conn.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, 'finalized').catch(() => {});
+  await conn.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, 'finalized')
+    .catch((err) => { console.warn('marketplace: local confirmation did not complete; server will re-verify the finalized tx', err); });
   return signature;
 }

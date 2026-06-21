@@ -2260,7 +2260,7 @@ export async function getMarketplaceQuote(quoteId: string): Promise<MarketplaceQ
     creatorUsdc: BigInt(row.creator_usdc),
     burnUsdc: BigInt(row.burn_usdc),
     mint: row.mint,
-    expiresAt: row.expires_at instanceof Date ? row.expires_at.toISOString() : String(row.expires_at),
+    expiresAt: iso(row.expires_at),
   };
 }
 
@@ -2272,11 +2272,6 @@ export async function pruneMarketplaceQuotes(): Promise<void> {
   await pool.query('DELETE FROM marketplace_quotes WHERE expires_at <= now()');
 }
 
-/**
- * Record an inbound on-chain payment. The PRIMARY KEY on tx_sig is the replay
- * guard: returns true if this signature was newly recorded, false if it was
- * already consumed (a replay) — verification keys idempotency off this.
- */
 /**
  * Atomically redeem a verified purchase: consume the payment signature (the
  * replay guard), record the sale, grant the skin, and delete the quote — all in
@@ -2348,6 +2343,10 @@ export interface BurnBatchRow {
   executedAt: string | null;
 }
 
+// A Postgres timestamptz arrives as a JS Date (pg) or already a string; normalize to ISO.
+function iso(v: unknown): string { return v instanceof Date ? v.toISOString() : String(v); }
+function isoOrNull(v: unknown): string | null { return v == null ? null : iso(v); }
+
 function mapBurnBatch(row: Record<string, unknown>): BurnBatchRow {
   return {
     batchId: row.batch_id as string,
@@ -2359,9 +2358,9 @@ function mapBurnBatch(row: Record<string, unknown>): BurnBatchRow {
     burnTxSig: (row.burn_tx_sig as string | null) ?? null,
     status: row.status as BurnBatchRow['status'],
     failReason: (row.fail_reason as string | null) ?? null,
-    createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : String(row.created_at),
-    burnBroadcastAt: row.burn_broadcast_at == null ? null : (row.burn_broadcast_at instanceof Date ? row.burn_broadcast_at.toISOString() : String(row.burn_broadcast_at)),
-    executedAt: row.executed_at == null ? null : (row.executed_at instanceof Date ? row.executed_at.toISOString() : String(row.executed_at)),
+    createdAt: iso(row.created_at),
+    burnBroadcastAt: isoOrNull(row.burn_broadcast_at),
+    executedAt: isoOrNull(row.executed_at),
   };
 }
 
