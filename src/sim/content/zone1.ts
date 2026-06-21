@@ -512,6 +512,14 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     greeting:
       'Welcome to the World Market, $C. Buy from every adventurer in the realm — or set out your own wares and let coin find you.',
   },
+  skin_artisan: {
+    id: 'skin_artisan', name: 'Pip the Skin Artisan', title: 'Creator Skins Billboard',
+    // a stall on the west side of the square, beside the Merchant, facing the approach
+    pos: { x: -5, z: 9 }, facing: Math.PI * 0.85, color: 0x2e8b57,
+    questIds: [],
+    creatorMarket: true,
+    greeting: 'Fancy a new look, $C? Browse cosmetic skins crafted by players — or design your own and sell it. Paid in USDC; a slice buys and burns $WOC.',
+  },
   marshal_redbrook: {
     id: 'marshal_redbrook',
     name: 'Marshal Redbrook',

@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { CharacterVisual } from './visual';
+import { creatorSkinTexture } from './assets';
 import { assetsReady } from '../assets/preload';
 import { PlayerClass } from '../../sim/types';
 import { trackWebGLContext } from '../context_release';
@@ -90,25 +91,34 @@ function ensureRig(): void {
  * GLBs are not preloaded yet. Cached after the first render. Callers should
  * fall back to a class crest while null and upgrade via {@link onPortraitsReady}.
  */
-export function playerPortraitDataUrl(cls: PlayerClass, skin = 0): string | null {
-  return visualPortraitDataUrl(`player_${cls}`, skin);
+export function playerPortraitDataUrl(cls: PlayerClass, skin = 0, creatorSkinId: string | null = null): string | null {
+  return visualPortraitDataUrl(`player_${cls}`, skin, creatorSkinId);
 }
 
 /**
  * As {@link playerPortraitDataUrl} but for any visual key (e.g. `player_mech`),
  * so cosmetic-only bodies can be previewed as swatch thumbnails. The asset must
  * already be loaded (callers preload first); returns null until then.
+ *
+ * `creatorSkinId` overlays a marketplace creator skin (procedural designer skins
+ * build synchronously; URL atlases need {@link ensureCreatorSkin} first or fall
+ * back to the numeric skin) so portraits match the equipped in-world look.
  */
-export function visualPortraitDataUrl(visualKey: string, skin = 0): string | null {
-  const key = `${visualKey}:${skin}`;
+export function visualPortraitDataUrl(visualKey: string, skin = 0, creatorSkinId: string | null = null): string | null {
+  const key = creatorSkinId ? `${visualKey}:${skin}:${creatorSkinId}` : `${visualKey}:${skin}`;
   const cached = cache.get(key);
   if (cached) return cached;
   if (!assetsAreReady) return null;
+  // Don't bake (and cache) a creator-skin portrait until its texture is resolved,
+  // else a fallback-numeric capture would be cached under the creator key. The
+  // caller ensures the atlas then re-draws (procedural designer skins are instant).
+  if (creatorSkinId && !creatorSkinTexture(creatorSkinId)) return null;
 
   let visual: CharacterVisual | null = null;
   try {
     ensureRig();
     visual = new CharacterVisual(visualKey, 0xffffff, skin);
+    if (creatorSkinId) visual.setCreatorSkin(creatorSkinId, skin);
     mount!.add(visual.root);
     mount!.rotation.y = 0;
     // Settle the rig into a stable idle frame before measuring/capturing.

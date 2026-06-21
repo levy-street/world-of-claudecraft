@@ -99,7 +99,7 @@ import { isUniqueViolation, json, readBody } from './http_util';
 import { handleInternalApi } from './internal';
 import { isConnectionRefused } from './ip_block';
 import { pruneExpiredBlockedIps } from './ip_block_db';
-import { marketplaceEnabled, quotePurchase, registrySkins, verifyPurchase } from './marketplace';
+import { createListing, marketplaceEnabled, quotePurchase, registrySkins, verifyPurchase } from './marketplace';
 import {
   cleanReportReason,
   createPlayerReport,
@@ -201,6 +201,7 @@ function cachedPublicRead(key: string, produce: () => Promise<unknown>): Promise
   if (hit && Date.now() - hit.at < PUBLIC_READ_TTL_MS) return Promise.resolve(hit.body);
   return produce().then((body) => { publicReadCache.set(key, { at: Date.now(), body }); return body; });
 }
+function invalidatePublicRead(key: string): void { publicReadCache.delete(key); }
 // Client performance reports are operational telemetry, not permanent records.
 // Keep enough history for tuning runs while bounding table growth.
 const PERF_REPORT_RETENTION_DAYS = Number(process.env.PERF_REPORT_RETENTION_DAYS ?? 14);
@@ -1381,6 +1382,31 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       if (!result.ok) return json(res, 400, { error: result.reason });
       game.applyCreatorSkinGrant(accountId, result.skinId);
       return json(res, 200, { ok: true, skinId: result.skinId });
+    }
+    // Creator self-serve listing (the in-browser designer "Sell" path). Lists a
+    // procedural design 'live' under the creator's own linked wallet (the 70%
+    // payout dest), grants the creator their own creation, and freshens the
+    // public registry cache so it shows immediately.
+    if (req.method === 'POST' && url === '/api/marketplace/skins') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (rateLimited(req)) return json(res, 429, { error: 'too many requests' });
+      const wallet = await walletForAccount(accountId);
+      if (!wallet) return json(res, 400, { error: 'link a Solana wallet first' });
+      const body = await readBody(req);
+      let priceUsdc: bigint;
+      try { priceUsdc = BigInt(String(body.priceUsdc ?? '')); } catch { return json(res, 400, { error: 'invalid_price' }); }
+      const result = await createListing({
+        name: typeof body.name === 'string' ? body.name : '',
+        description: typeof body.description === 'string' ? body.description : '',
+        priceUsdc,
+        design: body.design,
+        targetClass: typeof body.targetClass === 'string' ? body.targetClass : null,
+      }, accountId, wallet.pubkey);
+      if (!result.ok) return json(res, 400, { error: result.reason });
+      invalidatePublicRead('registry');
+      game.applyCreatorSkinGrant(accountId, result.id);
+      return json(res, 200, { ok: true, id: result.id });
     }
     json(res, 404, { error: 'unknown endpoint' });
   } catch (err: any) {

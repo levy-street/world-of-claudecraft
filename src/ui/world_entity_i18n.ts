@@ -85,6 +85,7 @@ const MOB_IDS = [
 
 const NPC_IDS = [
   'the_merchant',
+  'skin_artisan',
   'marshal_redbrook',
   'trader_wilkes',
   'apothecary_lin',

@@ -4,7 +4,7 @@
 // mid-distance band. All geometry/materials are shared caches — dispose()
 // only releases mixer bindings.
 import * as THREE from 'three';
-import type { OverheadEmoteId } from '../../world_api';
+import type { OverheadEmoteId, SkinDesignSpec } from '../../world_api';
 import { GFX } from '../gfx';
 import {
   type AnimState,
@@ -17,6 +17,8 @@ import {
   assembleModel,
   creatorSkinEmissive,
   creatorSkinTexture,
+  designSkinEmissiveTex,
+  designSkinTexture,
   ensureSkinTexture,
   prepareVisual,
   setHeldWeapon,
@@ -25,6 +27,7 @@ import {
   tintedFarMaterials,
 } from './assets';
 import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
+import { designHash } from './skin_design';
 
 export type { AnimState, BaseState } from './anim_state';
 
@@ -459,6 +462,19 @@ export class CharacterVisual {
     this.skinIndex = fallbackIndex;
     const emis = GFX.standardMaterials ? creatorSkinEmissive(id) : null;
     applyMaterials(this.model, this.def, this.entityColor, tex, emis);
+    this.resnapshotMaterials();
+  }
+
+  /** Apply an ad-hoc procedural design spec (the in-browser designer's live
+   *  preview, before the skin is listed). Built synchronously from the spec —
+   *  identical to what every client renders once the skin is in the registry. */
+  setDesignSkin(spec: SkinDesignSpec, fallbackIndex: number): void {
+    const id = `design:${designHash(spec)}`;
+    if (id === this.creatorSkinId) return;
+    this.creatorSkinId = id;
+    this.skinIndex = fallbackIndex;
+    const emis = GFX.standardMaterials ? designSkinEmissiveTex(spec) : null;
+    applyMaterials(this.model, this.def, this.entityColor, designSkinTexture(spec), emis);
     this.resnapshotMaterials();
   }
 

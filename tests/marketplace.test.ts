@@ -1,8 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   splitAmounts, validateSplitPayment, verifyPurchase, registrySkins, quotePurchase,
+  createListing, MAX_LISTINGS_PER_ACCOUNT,
   type SplitVerifyReason,
 } from '../server/marketplace';
+import type { SkinDesignSpec } from '../src/world_api';
 import type { CreatorSkinRow } from '../server/db';
 import {
   parseSplitPayment, SPL_TOKEN_PROGRAM, SPL_TOKEN_2022_PROGRAM,
@@ -222,7 +224,7 @@ function creatorSkinRow(over: Partial<CreatorSkinRow> = {}): CreatorSkinRow {
   return {
     id: 'skin_1', creatorAccountId: 7, creatorWallet: CREATOR, name: 'Dragonscale',
     description: 'Scaled plate', skinCatalog: 'class', fallbackSkin: 0, targetClass: 'warrior',
-    assetUrl: 'https://cdn.example/skin_1.png', emissiveUrl: null, priceUsdc: 10_000_000n,
+    assetUrl: 'https://cdn.example/skin_1.png', emissiveUrl: null, design: null, priceUsdc: 10_000_000n,
     status: 'live', sha256: null, ...over,
   };
 }
@@ -236,11 +238,13 @@ describe('registrySkins — public projection', () => {
     expect(skins).toEqual([{
       id: 'skin_1', name: 'Dragonscale', description: 'Scaled plate', skinCatalog: 'class',
       fallbackSkin: 0, targetClass: 'warrior', assetUrl: 'https://cdn.example/skin_1.png',
-      emissiveUrl: null, priceUsdc: '10000000',
+      emissiveUrl: null, design: null, creator: `${CREATOR.slice(0, 4)}…${CREATOR.slice(-4)}`,
+      priceUsdc: '10000000',
     }]);
-    // the creator wallet, account id, status, and sha are NOT exposed publicly
+    // the FULL creator wallet, account id, status, and sha are NOT exposed publicly
     expect(skins[0]).not.toHaveProperty('creatorWallet');
     expect(skins[0]).not.toHaveProperty('status');
+    expect(skins[0].creator).not.toBe(CREATOR); // only an abbreviated label
   });
 });
 
@@ -389,6 +393,8 @@ const db = vi.hoisted(() => ({
   redeemPurchase: vi.fn(async () => true),
   listLiveCreatorSkins: vi.fn(async (): Promise<CreatorSkinRow[]> => []),
   createMarketplaceQuote: vi.fn(async () => {}),
+  upsertCreatorSkin: vi.fn(async () => {}),
+  countLiveCreatorSkinsByAccount: vi.fn(async () => 0),
 }));
 vi.mock('../server/db', () => db);
 
@@ -457,5 +463,51 @@ describe('verifyPurchase — orchestration over the real validator', () => {
     db.redeemPurchase.mockResolvedValueOnce(false); // signature already consumed
 
     expect(await verifyPurchase(params)).toEqual({ ok: false, reason: 'already_redeemed' });
+  });
+});
+
+// createListing — the in-browser-designer "Sell" path. Validates name/price/
+// design + the per-account cap, and lists 'live' under the creator's own wallet.
+describe('createListing — creator self-serve listing', () => {
+  afterEach(() => vi.clearAllMocks());
+  const DESIGN: SkinDesignSpec = { primary: '#2e8b57', secondary: '#0b3d2e', pattern: 'scales', emissive: null };
+  const base = { name: 'Emerald Dragonscale', description: 'Shimmering scales', priceUsdc: 10_000_000n, design: DESIGN, targetClass: null };
+
+  it('lists a valid design live under the creator wallet and returns an id', async () => {
+    const res = await createListing(base, 7, CREATOR);
+    expect(res.ok).toBe(true);
+    if (!res.ok) return;
+    expect(res.id).toMatch(/^cs_[0-9a-f]+$/);
+    expect(db.upsertCreatorSkin).toHaveBeenCalledTimes(1);
+    const row = db.upsertCreatorSkin.mock.calls[0][0] as CreatorSkinRow;
+    expect(row).toMatchObject({
+      id: res.id, creatorAccountId: 7, creatorWallet: CREATOR, status: 'live',
+      assetUrl: 'procedural', skinCatalog: 'class', fallbackSkin: 0, priceUsdc: 10_000_000n,
+    });
+    expect(row.design).toEqual(DESIGN);
+  });
+
+  it('rejects a malformed payout wallet, missing name, out-of-range price, and bad design (persists nothing)', async () => {
+    expect(await createListing(base, 7, 'not-a-wallet')).toEqual({ ok: false, reason: 'invalid_wallet' });
+    expect(await createListing({ ...base, name: '  ' }, 7, CREATOR)).toEqual({ ok: false, reason: 'invalid_name' });
+    expect(await createListing({ ...base, priceUsdc: 1n }, 7, CREATOR)).toEqual({ ok: false, reason: 'invalid_price' });
+    expect(await createListing({ ...base, priceUsdc: 99_000_000_000n }, 7, CREATOR)).toEqual({ ok: false, reason: 'invalid_price' });
+    expect(await createListing({ ...base, design: { pattern: 'nope' } }, 7, CREATOR)).toEqual({ ok: false, reason: 'invalid_design' });
+    expect(db.upsertCreatorSkin).not.toHaveBeenCalled();
+  });
+
+  it('enforces the per-account live-listing cap', async () => {
+    db.countLiveCreatorSkinsByAccount.mockResolvedValueOnce(MAX_LISTINGS_PER_ACCOUNT);
+    expect(await createListing(base, 7, CREATOR)).toEqual({ ok: false, reason: 'too_many_listings' });
+    expect(db.upsertCreatorSkin).not.toHaveBeenCalled();
+  });
+
+  it('trims name/description and normalizes the design (drops unknown fields)', async () => {
+    const res = await createListing({ ...base, name: '  Frost  ', description: '  cold  ', design: { ...DESIGN, junk: 1 } as unknown }, 9, CREATOR);
+    expect(res.ok).toBe(true);
+    const row = db.upsertCreatorSkin.mock.calls[0][0] as CreatorSkinRow;
+    expect(row.name).toBe('Frost');
+    expect(row.description).toBe('cold');
+    expect(row.design).toEqual(DESIGN); // junk field stripped by normalizeDesignSpec
   });
 });

@@ -535,6 +535,13 @@ export class Api {
     return this.post('/api/marketplace/buy', { quoteId, signature });
   }
 
+  // List a player-designed (procedural) skin for sale (account-scoped; needs a
+  // linked wallet — the 70% payout dest). Returns the new skin id. Throws (with
+  // the server reason) on validation failure.
+  async createSkin(listing: { name: string; description: string; priceUsdc: string; design: unknown; targetClass: string | null }): Promise<{ ok: true; id: string }> {
+    return this.post('/api/marketplace/skins', listing);
+  }
+
   // News & Updates feed for the home page, mirrored from GitHub Releases by the
   // server. Not realm-scoped — always read from the page's own origin.
   async releases(limit = 20): Promise<ReleaseEntry[]> {

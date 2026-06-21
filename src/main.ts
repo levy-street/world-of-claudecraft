@@ -1559,10 +1559,19 @@ async function startGame(
     // Creator skins marketplace (online only — needs the server + a wallet). The
     // overlay (src/ui) talks only through these hooks; the buy orchestration
     // (quote -> sign+send split tx -> verify -> equip) spans net + wallet + world.
+    // Locally mark a creator skin owned so the marketplace shows Equip (the
+    // server is authoritative — this is just the client's display set).
+    const markOwned = (id: string): void => {
+      if (!online.accountCosmetics.ownedCreatorSkinIds.includes(id)) {
+        online.accountCosmetics.ownedCreatorSkinIds.push(id);
+      }
+    };
     attachMarketplaceHooks({
       listSkins: () => api.creatorSkins(),
+      ownedSkinIds: () => online.accountCosmetics.ownedCreatorSkinIds,
       isWalletConnected: () => (walletMod ? walletMod.currentWallet().isConnected : false),
       connectWallet: async () => { await (await loadWallet()).openWalletModal(); },
+      equip: (skin) => online.changeSkin(skin.fallbackSkin, skin.skinCatalog, skin.id),
       purchase: async (skin) => {
         const wallet = await loadWallet();
         const quote = await api.quoteSkin(skin.id);
@@ -1582,7 +1591,15 @@ async function startGame(
             throw err;
           }
         }
+        markOwned(skin.id);
         online.changeSkin(skin.fallbackSkin, skin.skinCatalog, skin.id);
+      },
+      createListing: async (listing) => {
+        const { id } = await api.createSkin(listing);
+        // Refresh the renderer registry (so the new procedural design renders) and
+        // mark it owned — the server grants the creator their own creation.
+        registerCreatorSkins(await api.creatorSkins());
+        markOwned(id);
       },
     });
     hud.attachMarketplace(() => { void openMarketplace(); });
