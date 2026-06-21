@@ -16,7 +16,7 @@
 // The same test runs against devnet by pointing REALM_ESCROW_RPC at devnet.
 
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir, homedir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -53,7 +53,12 @@ function ataFor(owner: PublicKey, mint: PublicKey): PublicKey {
 run('realm_stake_escrow on a live validator', () => {
   const conn = new Connection(RPC as string, 'confirmed');
   const tmp = mkdtempSync(join(tmpdir(), 'woc-escrow-'));
-  const actor = Keypair.generate();
+  // On a local validator we generate + airdrop the actor; on devnet (no faucet)
+  // set REALM_TEST_FUNDER to a funded keypair file and it is used directly.
+  const FUNDER = process.env.REALM_TEST_FUNDER;
+  const actor = FUNDER
+    ? Keypair.fromSecretKey(Uint8Array.from(JSON.parse(readFileSync(FUNDER, 'utf8'))))
+    : Keypair.generate();
   const mintKp = Keypair.generate();
   const actorFile = join(tmp, 'actor.json');
   const mintFile = join(tmp, 'mint.json');
@@ -74,9 +79,11 @@ run('realm_stake_escrow on a live validator', () => {
   beforeAll(async () => {
     writeFileSync(actorFile, JSON.stringify(Array.from(actor.secretKey)));
     writeFileSync(mintFile, JSON.stringify(Array.from(mintKp.secretKey)));
-    // Fund the actor (fee payer + mint authority + staker).
-    const sig = await conn.requestAirdrop(actor.publicKey, 5_000_000_000);
-    await conn.confirmTransaction(sig, 'confirmed');
+    // Fund the actor (fee payer + mint authority + staker). On devnet the actor
+    // is the pre-funded REALM_TEST_FUNDER, so skip the (rate-limited) faucet.
+    if (!FUNDER) {
+      await conn.confirmTransaction(await conn.requestAirdrop(actor.publicKey, 5_000_000_000), 'confirmed');
+    }
     // Create the 6-decimal mock $WOC mint with the actor as authority, the
     // actor's ATA, and mint MINTED to it (the stake source).
     spl(['create-token', mintFile, '--decimals', String(DECIMALS), '--fee-payer', actorFile, '--mint-authority', actor.publicKey.toBase58()]);

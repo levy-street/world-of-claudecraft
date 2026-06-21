@@ -12,7 +12,7 @@
 //   SOLANA_BIN=<...> npx vitest run tests/realm_provision.localnet.test.ts
 
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { homedir, tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { beforeAll, afterAll, describe, expect, it } from 'vitest';
@@ -39,7 +39,11 @@ run('stake-to-provision against real Postgres + validator', () => {
   // are visible; the verify path waits for the lock to finalize separately.
   const conn = new Connection(RPC as string, 'confirmed');
   const tmp = mkdtempSync(join(tmpdir(), 'woc-provision-'));
-  const staker = Keypair.generate();
+  // Local validator: generate + airdrop. Devnet (no faucet): REALM_TEST_FUNDER.
+  const FUNDER = process.env.REALM_TEST_FUNDER;
+  const staker = FUNDER
+    ? Keypair.fromSecretKey(Uint8Array.from(JSON.parse(readFileSync(FUNDER, 'utf8'))))
+    : Keypair.generate();
   const mintKp = Keypair.generate();
   const stakerFile = join(tmp, 'staker.json');
   const mintFile = join(tmp, 'mint.json');
@@ -67,7 +71,9 @@ run('stake-to-provision against real Postgres + validator', () => {
 
     writeFileSync(stakerFile, JSON.stringify(Array.from(staker.secretKey)));
     writeFileSync(mintFile, JSON.stringify(Array.from(mintKp.secretKey)));
-    await conn.confirmTransaction(await conn.requestAirdrop(staker.publicKey, 5_000_000_000), 'confirmed');
+    if (!FUNDER) {
+      await conn.confirmTransaction(await conn.requestAirdrop(staker.publicKey, 5_000_000_000), 'confirmed');
+    }
     spl(['create-token', mintFile, '--decimals', String(DECIMALS), '--fee-payer', stakerFile, '--mint-authority', staker.publicKey.toBase58()]);
     spl(['create-account', mint.toBase58(), '--fee-payer', stakerFile, '--owner', staker.publicKey.toBase58()]);
     spl(['mint', mint.toBase58(), String(MINTED / 10n ** BigInt(DECIMALS)), '--mint-authority', stakerFile, '--fee-payer', stakerFile, '--recipient-owner', staker.publicKey.toBase58()]);
