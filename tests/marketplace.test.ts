@@ -114,6 +114,17 @@ describe('parseSplitPayment — pure reduction of a confirmed tx', () => {
     expect(parseSplitPayment(tx, USDC).usesToken2022ForMint).toBe(true);
   });
 
+  it('fails closed: a configured-mint row that OMITS programId is treated as non-legacy', () => {
+    // Some RPCs omit programId on token balances; never default a missing field to
+    // "legacy" — that would silently accept a hook/fee mint if USDC_MINT were ever
+    // misconfigured to Token-2022. Build the row directly (makeTx defaults programId).
+    const tx: RawConfirmedTransaction = {
+      meta: { err: null, preTokenBalances: [], postTokenBalances: [{ owner: CREATOR, mint: USDC, uiTokenAmount: { amount: '7000000' } }] },
+      transaction: { message: { accountKeys: [{ pubkey: BUYER }], instructions: [] } },
+    };
+    expect(parseSplitPayment(tx, USDC).usesToken2022ForMint).toBe(true);
+  });
+
   it('marks a failed transaction (meta.err set) as not succeeded', () => {
     const tx = makeTx({ err: { InstructionError: [0, 'Custom'] }, balances: [] });
     expect(parseSplitPayment(tx, USDC).succeeded).toBe(false);

@@ -486,8 +486,12 @@ export async function signAndSendSplitPayment(q: SplitPaymentQuote): Promise<str
   if (!wallet || !account) throw new Error('connect a wallet first');
   if (!(SolanaSignAndSendTransaction in wallet.features)) throw new Error('the connected wallet cannot send transactions');
   const sendFeature = (wallet.features as SolanaSignAndSendTransactionFeature)[SolanaSignAndSendTransaction];
-  const chain = account.chains.find((c) => c === MARKET_CHAIN) ?? account.chains.find(isSolanaChain);
-  if (!chain) throw new Error('the connected wallet has no Solana chain for the marketplace');
+  // Require the EXACT marketplace cluster — the send chain must match the cluster
+  // the blockhash came from (MARKET_RPC). Never fall back to another Solana chain:
+  // a devnet-blockhash tx asked to send on mainnet (or vice-versa) just fails
+  // confusingly. A clear "switch networks" error is the right outcome.
+  const chain = account.chains.find((c) => c === MARKET_CHAIN);
+  if (!chain) throw new Error(`connect your wallet to ${MARKET_CHAIN} to buy — it is on a different network`);
 
   const conn = getPaymentConnection();
   // Default ('confirmed') commitment — a 'finalized' blockhash is ~32 slots old
@@ -500,6 +504,14 @@ export async function signAndSendSplitPayment(q: SplitPaymentQuote): Promise<str
   const result = results[0];
   if (!result || !(result.signature instanceof Uint8Array)) throw new Error('the wallet returned no transaction signature');
   const signature = bs58.encode(result.signature);
-  await conn.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, 'finalized');
+  // Once the wallet has broadcast, the payment may land regardless of what our
+  // local poll sees. confirmTransaction's blockhash strategy REJECTS on
+  // lastValidBlockHeight expiry (or a transient RPC/websocket error) even when the
+  // tx finalizes a few slots later — so a throw here must NOT discard the signature,
+  // or the buyer is charged with no way to redeem. We await finalization as a
+  // courtesy (so the immediate /buy usually succeeds first try) but return the
+  // signature either way; the server is the authority — it re-fetches the finalized
+  // tx itself, and the caller retries /buy until it does.
+  await conn.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, 'finalized').catch(() => {});
   return signature;
 }

@@ -1567,7 +1567,21 @@ async function startGame(
         const wallet = await loadWallet();
         const quote = await api.quoteSkin(skin.id);
         const signature = await wallet.signAndSendSplitPayment(quote);
-        await api.buySkin(quote.quoteId, signature);
+        // The payment is broadcast + irreversible. The server independently fetches
+        // the finalized tx, so if it hasn't observed finalization yet, retry rather
+        // than abandon a paid purchase. (Local confirmation may have lagged.)
+        for (let attempt = 0; ; attempt++) {
+          try {
+            await api.buySkin(quote.quoteId, signature);
+            break;
+          } catch (err) {
+            if (attempt < 5 && /tx_not_finalized/.test(String(err))) {
+              await new Promise((r) => setTimeout(r, 3000));
+              continue;
+            }
+            throw err;
+          }
+        }
         online.changeSkin(skin.fallbackSkin, skin.skinCatalog, skin.id);
       },
     });

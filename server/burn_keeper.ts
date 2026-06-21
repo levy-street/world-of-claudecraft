@@ -15,7 +15,7 @@ import bs58 from 'bs58';
 import { randomBytes } from 'node:crypto';
 import { isSolanaAddress } from './wallet_link';
 import { DEFAULT_BURN_POLICY, planTwapChunks, shouldRunBatch, type BurnPolicy } from './burn_policy';
-import { parseSplitPayment, fetchFinalizedTransaction, solanaRpc, SOLANA_RPC_URL, SPL_TOKEN_PROGRAM } from './solana_rpc';
+import { parseSplitPayment, fetchFinalizedTransaction, signatureStatus, solanaRpc, SOLANA_RPC_URL, SPL_TOKEN_PROGRAM } from './solana_rpc';
 import {
   createBurnBatch, markBatchSwapped, markBatchBurning, markBatchBurned, markBatchFailed,
   openBurnBatches, lastBurnAt, type BurnBatchRow,
@@ -160,7 +160,11 @@ export class BurnKeeper {
         const conf = await this.exec.confirm(b.buyTxSig);
         if (conf === 'confirmed') await this.completeSwapped(b.batchId, b.buyTxSig);
         else if (conf === 'failed') await this.store.markFailed(b.batchId, 'swap reverted (slippage / route)');
-        else if (this.isStale(b)) await this.store.markFailed(b.batchId, 'swap never landed (stale)');
+        // Stale + still 'unknown': do NOT blindly fail — the swap may have landed but
+        // be momentarily unreadable. Route through completeSwapped, which measures the
+        // $WOC actually received: >0 burns it (recovered, never stranded); 0 fails the
+        // batch and leaves the USDC in the vault for the next cycle.
+        else if (this.isStale(b)) await this.completeSwapped(b.batchId, b.buyTxSig);
       } else if (b.status === 'swapped') {
         await this.burn(b.batchId, b.wocBought);
       } else if (b.status === 'burning' && b.burnTxSig) {
@@ -171,8 +175,13 @@ export class BurnKeeper {
     }
   }
 
+  // Staleness is measured from the broadcast of the phase's OWN transaction: the
+  // swap (created_at) for a 'swapping' batch, the burn (burn_broadcast_at) for a
+  // 'burning' one. Timing 'burning' from created_at would make a batch whose swap
+  // confirmed slowly look instantly stale and trigger a premature re-burn.
   private isStale(b: BurnBatchRow): boolean {
-    return this.opts.now() - new Date(b.createdAt).getTime() > this.opts.staleMs;
+    const since = b.status === 'burning' && b.burnBroadcastAt ? b.burnBroadcastAt : b.createdAt;
+    return this.opts.now() - new Date(since).getTime() > this.opts.staleMs;
   }
 }
 
@@ -269,11 +278,10 @@ export function buildProductionDeps(): { exec: BurnExecutor; store: BurnStore } 
       return { signature, send: async () => { await conn.sendRawTransaction(tx.serialize(), { skipPreflight: false, maxRetries: 5 }); } };
     },
 
-    async confirm(signature) {
-      const tx = await fetchFinalizedTransaction(signature);
-      if (!tx) return 'unknown';
-      return tx.meta && tx.meta.err == null ? 'confirmed' : 'failed';
-    },
+    // getSignatureStatuses(searchTransactionHistory) — recognizes a finalized tx
+    // even when it is old / getTransaction lags, so a landed swap or burn is never
+    // mistaken for "never landed" and written off (which would strand funds).
+    confirm: signatureStatus,
 
     async wocReceived(swapSignature) {
       const tx = await fetchFinalizedTransaction(swapSignature);

@@ -469,7 +469,11 @@ CREATE TABLE IF NOT EXISTS marketplace_sales (
   id BIGSERIAL PRIMARY KEY,
   skin_id TEXT NOT NULL REFERENCES creator_skins(id),
   buyer_account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
-  quote_id TEXT NOT NULL,
+  -- One sale per quote. With only the per-signature guard, a buyer who broadcasts
+  -- two valid payments for the same quote (distinct sigs) and races two /buy calls
+  -- could record two sales for one quote; this UNIQUE makes the second redeem fail
+  -- cleanly (23505 -> already_redeemed) instead of double-charging into two rows.
+  quote_id TEXT NOT NULL UNIQUE,
   gross_usdc BIGINT NOT NULL,
   creator_usdc BIGINT NOT NULL,
   burn_usdc BIGINT NOT NULL,
@@ -495,6 +499,10 @@ CREATE TABLE IF NOT EXISTS burn_batches (
               CHECK (status IN ('swapping','swapped','burning','burned','failed')),
   fail_reason TEXT,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  -- When the burn tx was broadcast. Burning-phase staleness is measured from THIS,
+  -- not created_at (= swap time), so a slow swap can't make the burn look instantly
+  -- stale and trigger a premature re-issue.
+  burn_broadcast_at TIMESTAMPTZ,
   executed_at TIMESTAMPTZ
 );
 CREATE INDEX IF NOT EXISTS burn_batches_status ON burn_batches(status);
@@ -2310,6 +2318,11 @@ export async function redeemPurchase(p: {
     return true;
   } catch (e) {
     await client.query('ROLLBACK').catch(() => {});
+    // A unique violation here can only be marketplace_sales.quote_id: a second valid
+    // payment for the same quote (distinct signature) racing this redeem. The
+    // per-signature gate already passed, so this is the same-quote double-pay — treat
+    // it as already-redeemed (one grant, one sale) rather than a 500.
+    if ((e as { code?: string })?.code === '23505') return false;
     throw e;
   } finally {
     client.release();
@@ -2331,6 +2344,7 @@ export interface BurnBatchRow {
   status: 'swapping' | 'swapped' | 'burning' | 'burned' | 'failed';
   failReason: string | null;
   createdAt: string;
+  burnBroadcastAt: string | null;
   executedAt: string | null;
 }
 
@@ -2346,6 +2360,7 @@ function mapBurnBatch(row: Record<string, unknown>): BurnBatchRow {
     status: row.status as BurnBatchRow['status'],
     failReason: (row.fail_reason as string | null) ?? null,
     createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : String(row.created_at),
+    burnBroadcastAt: row.burn_broadcast_at == null ? null : (row.burn_broadcast_at instanceof Date ? row.burn_broadcast_at.toISOString() : String(row.burn_broadcast_at)),
     executedAt: row.executed_at == null ? null : (row.executed_at instanceof Date ? row.executed_at.toISOString() : String(row.executed_at)),
   };
 }
@@ -2374,7 +2389,7 @@ export async function markBatchSwapped(batchId: string, wocBought: bigint): Prom
 
 export async function markBatchBurning(batchId: string, burnTxSig: string): Promise<void> {
   await pool.query(
-    `UPDATE burn_batches SET status = 'burning', burn_tx_sig = $2 WHERE batch_id = $1`,
+    `UPDATE burn_batches SET status = 'burning', burn_tx_sig = $2, burn_broadcast_at = now() WHERE batch_id = $1`,
     [batchId, burnTxSig],
   );
 }
@@ -2423,4 +2438,28 @@ export async function burnLedger(limit = 100): Promise<{ batches: BurnBatchRow[]
     cumulativeWocBurned: BigInt(totals.rows[0]?.woc ?? 0),
     cumulativeUsdcIn: BigInt(totals.rows[0]?.usdc ?? 0),
   };
+}
+
+// Cross-process mutual exclusion for the buy-and-burn keeper. Deployment is
+// process-per-realm sharing ONE DATABASE_URL + ONE burn vault, so the keeper's
+// "only one batch in flight at a time" guarantee needs a global lock — not just
+// per-process state. Holds a SESSION-level pg_try_advisory_lock on a dedicated
+// connection for the duration of the cycle; if another process already holds it,
+// returns null (this tick is skipped) so two processes never sign independent
+// swaps against the same vault. (Same advisory-lock mechanism ensureSchema uses
+// for concurrent boots; a distinct key.)
+const BURN_KEEPER_LOCK_KEY = 0x57_4f_43_02; // "WOC\x02"
+export async function withBurnKeeperLock<T>(fn: () => Promise<T>): Promise<T | null> {
+  const client = await pool.connect();
+  try {
+    const res = await client.query('SELECT pg_try_advisory_lock($1) AS locked', [BURN_KEEPER_LOCK_KEY]);
+    if (!res.rows[0]?.locked) return null;
+    try {
+      return await fn();
+    } finally {
+      await client.query('SELECT pg_advisory_unlock($1)', [BURN_KEEPER_LOCK_KEY]);
+    }
+  } finally {
+    client.release();
+  }
 }

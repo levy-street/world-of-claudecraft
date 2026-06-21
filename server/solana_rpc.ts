@@ -100,7 +100,11 @@ export function parseSplitPayment(tx: RawConfirmedTransaction, usdcMint: string)
     if (!rows) return;
     for (const row of rows) {
       if (row.mint !== usdcMint || typeof row.owner !== 'string' || typeof row.uiTokenAmount?.amount !== 'string') continue;
-      if (row.programId === SPL_TOKEN_2022_PROGRAM) usesToken2022ForMint = true;
+      // Fail closed: the configured mint MUST be carried by the legacy SPL Token
+      // program. Anything else on this mint — Token-2022 (transfer hooks/fees can
+      // make sent != received) OR a row that omits programId — is rejected, rather
+      // than trusting an optional field and defaulting to "legacy".
+      if (row.programId !== SPL_TOKEN_PROGRAM) usesToken2022ForMint = true;
       into.set(row.owner, (into.get(row.owner) ?? 0n) + BigInt(row.uiTokenAmount.amount));
     }
   };
@@ -133,4 +137,23 @@ export async function fetchFinalizedTransaction(signature: string): Promise<RawC
     signature,
     { commitment: 'finalized', encoding: 'jsonParsed', maxSupportedTransactionVersion: 0 },
   ]);
+}
+
+/**
+ * Did a signature land, and how? Uses getSignatureStatuses with
+ * searchTransactionHistory, so a FINALIZED transaction is recognized even when it
+ * is old or `getTransaction` is lagging/pruned — unlike a getTransaction==null
+ * check, which conflates "didn't land" with "this node can't see it". A Solana tx,
+ * once landed, is permanent, so 'unknown' here means genuinely not found in history.
+ *   'confirmed' = landed + finalized + no error · 'failed' = landed but reverted
+ *   'unknown'   = not found in history, or seen but not yet finalized
+ */
+export async function signatureStatus(signature: string): Promise<'confirmed' | 'failed' | 'unknown'> {
+  const res = await solanaRpc<{ value: Array<{ confirmationStatus?: string; err: unknown } | null> }>(
+    'getSignatureStatuses', [[signature], { searchTransactionHistory: true }],
+  );
+  const status = res?.value?.[0];
+  if (!status) return 'unknown';
+  if (status.err != null) return 'failed';
+  return status.confirmationStatus === 'finalized' ? 'confirmed' : 'unknown';
 }
