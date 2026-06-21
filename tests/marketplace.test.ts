@@ -4,7 +4,7 @@ import {
   createListing, MAX_LISTINGS_PER_ACCOUNT,
   type SplitVerifyReason,
 } from '../server/marketplace';
-import type { SkinDesignSpec } from '../src/world_api';
+import { normalizeDesignSpec, defaultDesignSpec, SKIN_PATTERNS, type SkinDesignSpec } from '../src/world_api';
 import type { CreatorSkinRow } from '../server/db';
 import {
   parseSplitPayment, SPL_TOKEN_PROGRAM, SPL_TOKEN_2022_PROGRAM,
@@ -470,7 +470,7 @@ describe('verifyPurchase — orchestration over the real validator', () => {
 // design + the per-account cap, and lists 'live' under the creator's own wallet.
 describe('createListing — creator self-serve listing', () => {
   afterEach(() => vi.clearAllMocks());
-  const DESIGN: SkinDesignSpec = { primary: '#2e8b57', secondary: '#0b3d2e', pattern: 'scales', emissive: null };
+  const DESIGN: SkinDesignSpec = { primary: '#2e8b57', secondary: '#0b3d2e', accent: '#caa84b', pattern: 'scales', finish: 'satin', density: 'medium', emissive: null };
   const base = { name: 'Emerald Dragonscale', description: 'Shimmering scales', priceUsdc: 10_000_000n, design: DESIGN, targetClass: null };
 
   it('lists a valid design live under the creator wallet and returns an id', async () => {
@@ -509,5 +509,53 @@ describe('createListing — creator self-serve listing', () => {
     expect(row.name).toBe('Frost');
     expect(row.description).toBe('cold');
     expect(row.design).toEqual(DESIGN); // junk field stripped by normalizeDesignSpec
+  });
+});
+
+// normalizeDesignSpec — the shared (client designer + server listing) validator.
+// Pure, no DOM; exercised directly. Covers the richer accent/finish/density
+// fields, backward-compat with legacy specs, and hostile/garbage input.
+describe('normalizeDesignSpec — validation, defaults, backward-compat', () => {
+  it('accepts a full spec and lowercases hex', () => {
+    const spec = normalizeDesignSpec({ primary: '#2E8B57', secondary: '#0B3D2E', accent: '#CAA84B', pattern: 'scales', finish: 'metallic', density: 'high', emissive: '#39FF88' });
+    expect(spec).toEqual({ primary: '#2e8b57', secondary: '#0b3d2e', accent: '#caa84b', pattern: 'scales', finish: 'metallic', density: 'high', emissive: '#39ff88' });
+  });
+
+  it('back-fills accent/finish/density on a legacy 4-field spec (no data migration needed)', () => {
+    const spec = normalizeDesignSpec({ primary: '#112233', secondary: '#445566', pattern: 'hex', emissive: null });
+    expect(spec).toEqual({ primary: '#112233', secondary: '#445566', accent: '#445566', pattern: 'hex', finish: 'satin', density: 'medium', emissive: null });
+  });
+
+  it('defaults an invalid finish/density to satin/medium and a bad accent to secondary', () => {
+    const spec = normalizeDesignSpec({ primary: '#112233', secondary: '#445566', accent: 'nope', pattern: 'spots', finish: 'chrome', density: 'ultra' });
+    expect(spec).toMatchObject({ accent: '#445566', finish: 'satin', density: 'medium' });
+  });
+
+  it('rejects (null) a missing/invalid primary, an unknown pattern, and a non-object', () => {
+    expect(normalizeDesignSpec({ secondary: '#445566', pattern: 'scales' })).toBeNull();      // no primary
+    expect(normalizeDesignSpec({ primary: 'red', pattern: 'scales' })).toBeNull();             // bad primary hex
+    expect(normalizeDesignSpec({ primary: '#112233', pattern: 'tartan' })).toBeNull();         // unknown pattern
+    expect(normalizeDesignSpec({ primary: '#112233' })).toBeNull();                            // no pattern
+    expect(normalizeDesignSpec(null)).toBeNull();
+    expect(normalizeDesignSpec('#112233')).toBeNull();
+    expect(normalizeDesignSpec(42)).toBeNull();
+  });
+
+  it('drops an invalid emissive to null (no glow) but keeps a valid one', () => {
+    expect(normalizeDesignSpec({ primary: '#112233', pattern: 'solid', emissive: 'bright' })!.emissive).toBeNull();
+    expect(normalizeDesignSpec({ primary: '#112233', pattern: 'solid', emissive: '#abcdef' })!.emissive).toBe('#abcdef');
+  });
+
+  it('accepts every declared pattern, including the two new ones', () => {
+    for (const pattern of SKIN_PATTERNS) {
+      expect(normalizeDesignSpec({ primary: '#112233', pattern })!.pattern).toBe(pattern);
+    }
+    expect(SKIN_PATTERNS).toContain('chevron');
+    expect(SKIN_PATTERNS).toContain('weave');
+  });
+
+  it('defaultDesignSpec() is itself a valid, stable spec (round-trips through normalize)', () => {
+    const d = defaultDesignSpec();
+    expect(normalizeDesignSpec(d)).toEqual(d);
   });
 });

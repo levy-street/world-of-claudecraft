@@ -10,10 +10,12 @@
 // presentation, not world state.
 import { t, formatNumber } from './i18n';
 import {
-  type CreatorSkinRegistryEntry, type SkinDesignSpec, type SkinPattern,
-  SKIN_PATTERNS, defaultDesignSpec,
+  type CreatorSkinRegistryEntry, type SkinDesignSpec, type SkinPattern, type SkinFinish, type SkinDensity,
+  SKIN_PATTERNS, SKIN_FINISHES, SKIN_DENSITIES, defaultDesignSpec,
 } from '../world_api';
+import type { PlayerClass } from '../sim/types';
 import { designSwatchDataUrl } from '../render/characters/skin_design';
+import { CharacterPreview } from '../render/characters';
 
 export interface MarketplaceListing {
   name: string;
@@ -39,12 +41,23 @@ export interface MarketplaceHooks {
   equip(skin: CreatorSkinRegistryEntry): void;
   // List a freshly-designed skin for sale (instant-live). Throws on failure.
   createListing(listing: MarketplaceListing): Promise<void>;
+  // The viewer's class, so the designer previews the skin on their own body.
+  playerClass(): PlayerClass;
 }
 
 let hooks: MarketplaceHooks | null = null;
 let overlay: HTMLDivElement | null = null;
 let activeTab: 'browse' | 'create' = 'browse';
 let design: SkinDesignSpec = defaultDesignSpec();
+// The designer's live 3D turntable. Created on the Create tab, torn down when the
+// overlay closes or the tab switches away, so its WebGL render loop never runs idle.
+let designerPreview: CharacterPreview | null = null;
+let designerCanvas: HTMLCanvasElement | null = null;
+
+function destroyDesignerPreview(): void {
+  if (designerPreview) { designerPreview.destroy(); designerPreview = null; }
+  if (designerCanvas) { designerCanvas.remove(); designerCanvas = null; }
+}
 
 export function attachMarketplace(h: MarketplaceHooks): void {
   hooks = h;
@@ -69,6 +82,7 @@ function formatUsdc(baseUnits: string): string {
 }
 
 function close(): void {
+  destroyDesignerPreview();
   if (!overlay) return;
   overlay.classList.remove('open');
   overlay.style.display = 'none';
@@ -88,6 +102,12 @@ function ensureOverlay(): HTMLDivElement {
 
 function patternLabel(p: SkinPattern): string {
   return t(`marketplace.patterns.${p}` as 'marketplace.patterns.solid');
+}
+function finishLabel(f: SkinFinish): string {
+  return t(`marketplace.finishes.${f}` as 'marketplace.finishes.matte');
+}
+function densityLabel(d: SkinDensity): string {
+  return t(`marketplace.densities.${d}` as 'marketplace.densities.low');
 }
 
 // ---------------------------------------------------------------------------
@@ -144,18 +164,34 @@ function buildCard(skin: CreatorSkinRegistryEntry, isOwned: boolean): HTMLElemen
     (skin.description ? `<div class="market-card-desc">${esc(skin.description)}</div>` : '') +
     `<div class="market-card-price">${esc(formatUsdc(skin.priceUsdc))}</div>` +
     `<div class="market-card-status" role="status" aria-live="polite"></div>`;
+  // One button, one click handler, closure-tracked ownership: a successful buy
+  // flips `owned` so the next click equips — no second listener (which would
+  // re-fire the buy), no element churn.
   const button = document.createElement('button');
   button.type = 'button';
   button.className = 'btn market-buy-btn';
-  if (isOwned) {
-    button.textContent = t('marketplace.equip');
-    button.setAttribute('aria-label', `${t('marketplace.equip')} ${skin.name}`);
-    button.addEventListener('click', () => onEquip(skin, card, button));
-  } else {
-    button.textContent = t('marketplace.buy');
-    button.setAttribute('aria-label', `${t('marketplace.buy')} ${skin.name} — ${formatUsdc(skin.priceUsdc)}`);
-    button.addEventListener('click', () => { void onBuy(skin, card, button); });
-  }
+  let owned = isOwned;
+  const refresh = (): void => {
+    button.textContent = owned ? t('marketplace.equip') : t('marketplace.buy');
+    button.setAttribute('aria-label', owned
+      ? `${t('marketplace.equip')} ${skin.name}`
+      : `${t('marketplace.buy')} ${skin.name} — ${formatUsdc(skin.priceUsdc)}`);
+  };
+  button.addEventListener('click', () => {
+    if (owned) { onEquip(skin, card, button); return; }
+    void onBuy(skin, card, button).then((bought) => {
+      if (!bought) return;
+      owned = true;
+      refresh();
+      if (!card.querySelector('.market-owned-badge')) {
+        const badge = document.createElement('span');
+        badge.className = 'market-owned-badge';
+        badge.textContent = t('marketplace.ownedBadge');
+        card.querySelector('.market-thumb-wrap')?.appendChild(badge);
+      }
+    });
+  });
+  refresh();
   card.appendChild(button);
   return card;
 }
@@ -166,37 +202,34 @@ function statusEl(card: HTMLElement): HTMLElement {
 
 function onEquip(skin: CreatorSkinRegistryEntry, card: HTMLElement, button: HTMLButtonElement): void {
   if (!hooks) return;
-  try {
-    hooks.equip(skin);
-    statusEl(card).textContent = t('marketplace.equipped');
-    button.textContent = t('marketplace.equipped');
-  } catch {
-    statusEl(card).textContent = t('marketplace.equipFailed');
-  }
+  hooks.equip(skin);
+  statusEl(card).textContent = t('marketplace.equipped');
+  button.textContent = t('marketplace.equipped');
 }
 
-async function onBuy(skin: CreatorSkinRegistryEntry, card: HTMLElement, button: HTMLButtonElement): Promise<void> {
-  if (!hooks) return;
+// Returns true once the skin is bought (so the card can flip to Equip). The
+// try/catch is load-bearing: purchase spans wallet + network + chain and throws
+// human-readable failures that must land on the card's status line.
+async function onBuy(skin: CreatorSkinRegistryEntry, card: HTMLElement, button: HTMLButtonElement): Promise<boolean> {
+  if (!hooks) return false;
   const status = statusEl(card);
   button.disabled = true;
   try {
     if (!hooks.isWalletConnected()) {
       status.textContent = t('marketplace.connectFirst');
       await hooks.connectWallet();
-      if (!hooks.isWalletConnected()) { button.disabled = false; return; }
+      if (!hooks.isWalletConnected()) { button.disabled = false; return false; }
     }
     status.textContent = t('marketplace.purchasing');
     await hooks.purchase(skin);
     status.textContent = t('marketplace.owned');
-    button.textContent = t('marketplace.equipped');
     button.disabled = false;
-    // future clicks just re-equip the now-owned skin
-    button.replaceWith(button); // no-op keeps reference; handler below
-    button.onclick = () => onEquip(skin, card, button);
+    return true;
   } catch (err) {
     const detail = err instanceof Error && err.message ? `: ${err.message}` : '';
     status.textContent = `${t('marketplace.failed')}${detail}`.slice(0, 140);
     button.disabled = false;
+    return false;
   }
 }
 
@@ -205,18 +238,21 @@ async function onBuy(skin: CreatorSkinRegistryEntry, card: HTMLElement, button: 
 // ---------------------------------------------------------------------------
 
 function renderCreate(content: HTMLElement): void {
-  const patternOpts = SKIN_PATTERNS
-    .map((p) => `<option value="${p}"${p === design.pattern ? ' selected' : ''}>${esc(patternLabel(p))}</option>`)
-    .join('');
+  destroyDesignerPreview(); // a fresh turntable per Create-tab mount
+  const opts = <T extends string>(vals: readonly T[], cur: T, label: (v: T) => string): string =>
+    vals.map((v) => `<option value="${v}"${v === cur ? ' selected' : ''}>${esc(label(v))}</option>`).join('');
   content.innerHTML =
     `<div class="market-create">` +
     `<div class="market-design">` +
-    `<div class="market-preview"><img class="market-preview-swatch" alt=""><div class="market-preview-label">${esc(t('marketplace.preview'))}</div></div>` +
+    `<div class="market-preview"><div class="market-preview-3d"></div><img class="market-preview-swatch" alt="" title="${esc(t('marketplace.preview'))}"><div class="market-preview-label">${esc(t('marketplace.preview'))}</div></div>` +
     `<div class="market-controls">` +
     `<p class="market-design-intro">${esc(t('marketplace.designIntro'))}</p>` +
     `<label class="market-field"><span>${esc(t('marketplace.baseColor'))}</span><input type="color" class="d-primary" value="${design.primary}"></label>` +
     `<label class="market-field"><span>${esc(t('marketplace.patternColor'))}</span><input type="color" class="d-secondary" value="${design.secondary}"></label>` +
-    `<label class="market-field"><span>${esc(t('marketplace.pattern'))}</span><select class="d-pattern">${patternOpts}</select></label>` +
+    `<label class="market-field"><span>${esc(t('marketplace.accentColor'))}</span><input type="color" class="d-accent" value="${design.accent}"></label>` +
+    `<label class="market-field"><span>${esc(t('marketplace.pattern'))}</span><select class="d-pattern">${opts(SKIN_PATTERNS, design.pattern, patternLabel)}</select></label>` +
+    `<label class="market-field"><span>${esc(t('marketplace.finishLabel'))}</span><select class="d-finish">${opts(SKIN_FINISHES, design.finish, finishLabel)}</select></label>` +
+    `<label class="market-field"><span>${esc(t('marketplace.densityLabel'))}</span><select class="d-density">${opts(SKIN_DENSITIES, design.density, densityLabel)}</select></label>` +
     `<label class="market-field market-check"><input type="checkbox" class="d-glow-on"${design.emissive ? ' checked' : ''}><span>${esc(t('marketplace.glow'))}</span></label>` +
     `<label class="market-field d-glow-color-field"><span>${esc(t('marketplace.glowColor'))}</span><input type="color" class="d-glow" value="${design.emissive ?? '#39ff88'}"></label>` +
     `<button type="button" class="btn market-randomize">${esc(t('marketplace.randomize'))}</button>` +
@@ -230,33 +266,52 @@ function renderCreate(content: HTMLElement): void {
     `<button type="button" class="btn market-list-btn">${esc(t('marketplace.list'))}</button>` +
     `</div></div>`;
 
-  const swatch = content.querySelector('.market-preview-swatch') as HTMLImageElement;
-  const primary = content.querySelector('.d-primary') as HTMLInputElement;
-  const secondary = content.querySelector('.d-secondary') as HTMLInputElement;
-  const pattern = content.querySelector('.d-pattern') as HTMLSelectElement;
-  const glowOn = content.querySelector('.d-glow-on') as HTMLInputElement;
-  const glow = content.querySelector('.d-glow') as HTMLInputElement;
-  const glowField = content.querySelector('.d-glow-color-field') as HTMLElement;
-  const status = content.querySelector('.market-list-status') as HTMLElement;
-  const listBtn = content.querySelector('.market-list-btn') as HTMLButtonElement;
+  const $ = <T extends HTMLElement>(sel: string): T => content.querySelector(sel) as T;
+  const swatch = $<HTMLImageElement>('.market-preview-swatch');
+  const primary = $<HTMLInputElement>('.d-primary');
+  const secondary = $<HTMLInputElement>('.d-secondary');
+  const accent = $<HTMLInputElement>('.d-accent');
+  const pattern = $<HTMLSelectElement>('.d-pattern');
+  const finish = $<HTMLSelectElement>('.d-finish');
+  const density = $<HTMLSelectElement>('.d-density');
+  const glowOn = $<HTMLInputElement>('.d-glow-on');
+  const glow = $<HTMLInputElement>('.d-glow');
+  const glowField = $<HTMLElement>('.d-glow-color-field');
+  const status = $<HTMLElement>('.market-list-status');
+  const listBtn = $<HTMLButtonElement>('.market-list-btn');
+
+  // Live 3D turntable: the design on the viewer's own class model.
+  const host = $<HTMLElement>('.market-preview-3d');
+  designerCanvas = document.createElement('canvas');
+  host.appendChild(designerCanvas);
+  designerPreview = new CharacterPreview(host, designerCanvas);
+  designerPreview.setClass(hooks!.playerClass());
 
   const sync = (): void => {
     design = {
       primary: primary.value,
       secondary: secondary.value,
+      accent: accent.value,
       pattern: pattern.value as SkinPattern,
+      finish: finish.value as SkinFinish,
+      density: density.value as SkinDensity,
       emissive: glowOn.checked ? glow.value : null,
     };
     glowField.style.display = glowOn.checked ? '' : 'none';
-    swatch.src = designSwatchDataUrl(design, 240);
+    swatch.src = designSwatchDataUrl(design, 120);
+    designerPreview?.setDesignSkin(design);
   };
-  for (const el of [primary, secondary, pattern, glowOn, glow]) el.addEventListener('input', sync);
+  for (const el of [primary, secondary, accent, pattern, finish, density, glowOn, glow]) el.addEventListener('input', sync);
 
   content.querySelector('.market-randomize')?.addEventListener('click', () => {
     const rndHex = (): string => '#' + Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0');
+    const pick = <T,>(a: readonly T[]): T => a[Math.floor(Math.random() * a.length)];
     primary.value = rndHex();
     secondary.value = rndHex();
-    pattern.value = SKIN_PATTERNS[Math.floor(Math.random() * SKIN_PATTERNS.length)];
+    accent.value = rndHex();
+    pattern.value = pick(SKIN_PATTERNS);
+    finish.value = pick(SKIN_FINISHES);
+    density.value = pick(SKIN_DENSITIES);
     sync();
   });
 
@@ -301,7 +356,7 @@ function setTab(tab: 'browse' | 'create', content: HTMLElement, skins: CreatorSk
     el.classList.toggle('sel', on);
     el.setAttribute('aria-selected', on ? 'true' : 'false');
   });
-  if (tab === 'browse') renderBrowse(content, skins);
+  if (tab === 'browse') { destroyDesignerPreview(); renderBrowse(content, skins); }
   else renderCreate(content);
 }
 

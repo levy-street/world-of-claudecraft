@@ -1601,6 +1601,7 @@ async function startGame(
         registerCreatorSkins(await api.creatorSkins());
         markOwned(id);
       },
+      playerClass: () => world.cfg.playerClass,
     });
     hud.attachMarketplace(() => { void openMarketplace(); });
   }

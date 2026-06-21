@@ -1539,14 +1539,25 @@ export const en_XA: EnTranslations = {
     "equip": "[Éɋúíþ]",
     "equipped": "[Éɋúíþþéð]",
     "ownedBadge": "[Óŵñéð]",
-    "equipping": "[Éɋúíþþíñĝ…]",
-    "equipFailed": "[Çóúļð ñóţ éɋúíþ]",
     "noResults": "[Ñó šķíñš ɱáţçĥ ýóúŕ šéáŕçĥ.]",
     "designTitle": "[Ðéšíĝñ ýóúŕ šķíñ]",
     "designIntro": "[Ŕéçóļóŕ áñð þáţţéŕñ á ƀóðý — íţ ŕéñðéŕš ţĥé šáɱé ƒóŕ éʋéŕýóñé, ñó ƒíļéš ţó úþļóáð.]",
     "baseColor": "[Ɓášé çóļóŕ]",
     "patternColor": "[Þáţţéŕñ çóļóŕ]",
+    "accentColor": "[Áççéñţ çóļóŕ]",
     "pattern": "[Þáţţéŕñ]",
+    "finishLabel": "[Ƒíñíšĥ]",
+    "densityLabel": "[Ðéñšíţý]",
+    "finishes": {
+      "matte": "[Ɱáţţé]",
+      "satin": "[Šáţíñ]",
+      "metallic": "[Ɱéţáļļíç]"
+    },
+    "densities": {
+      "low": "[Šþáŕšé]",
+      "medium": "[Ñóŕɱáļ]",
+      "high": "[Ðéñšé]"
+    },
     "glow": "[Ĝļóŵ]",
     "glowColor": "[Ĝļóŵ çóļóŕ]",
     "noGlow": "[Ñó ĝļóŵ]",

@@ -36,7 +36,16 @@ function uniqueStrings(value: unknown): string[] {
 // The same builder drives the designer's live preview and the in-world renderer,
 // guaranteeing they match. Host-agnostic (no DOM/Three) so the server can
 // validate a submitted spec; the canvas builder lives in render/characters/skin_design.ts.
-export type SkinPattern = 'solid' | 'scales' | 'stripes' | 'diamond' | 'hex' | 'spots' | 'runes';
+export type SkinPattern =
+  | 'solid'
+  | 'scales'
+  | 'stripes'
+  | 'diamond'
+  | 'hex'
+  | 'spots'
+  | 'runes'
+  | 'chevron'
+  | 'weave';
 export const SKIN_PATTERNS: readonly SkinPattern[] = [
   'solid',
   'scales',
@@ -45,12 +54,26 @@ export const SKIN_PATTERNS: readonly SkinPattern[] = [
   'hex',
   'spots',
   'runes',
+  'chevron',
+  'weave',
 ];
 
+// Surface finish — baked into the atlas as a sheen/highlight (no material-pipeline
+// change): matte (flat), satin (soft top light), metallic (hard diagonal glint).
+export type SkinFinish = 'matte' | 'satin' | 'metallic';
+export const SKIN_FINISHES: readonly SkinFinish[] = ['matte', 'satin', 'metallic'];
+
+// Pattern density — how tightly the motif repeats across the body.
+export type SkinDensity = 'low' | 'medium' | 'high';
+export const SKIN_DENSITIES: readonly SkinDensity[] = ['low', 'medium', 'high'];
+
 export interface SkinDesignSpec {
-  primary: string; // '#rrggbb' — dominant body colour
-  secondary: string; // '#rrggbb' — pattern / trim colour
+  primary: string; // '#rrggbb' — dominant body colour (upper body / base)
+  secondary: string; // '#rrggbb' — pattern colour + darkened lower-body shade
+  accent: string; // '#rrggbb' — trim bands + pattern edge highlight
   pattern: SkinPattern;
+  finish: SkinFinish;
+  density: SkinDensity;
   emissive: string | null; // '#rrggbb' glow colour, or null for no glow
 }
 
@@ -58,7 +81,9 @@ const SKIN_HEX6 = /^#[0-9a-f]{6}$/i;
 
 /** Normalize an untrusted design blob to a valid SkinDesignSpec, or null if it
  *  isn't a usable design (so the skin falls back to its assetUrl/numeric skin).
- *  Shared by the server (listing validation) and the client (designer). */
+ *  Shared by the server (listing validation) and the client (designer). The
+ *  richer fields (accent/finish/density) default sensibly, so a legacy spec that
+ *  carries only primary/secondary/pattern/emissive still normalizes + renders. */
 export function normalizeDesignSpec(value: unknown): SkinDesignSpec | null {
   if (!value || typeof value !== 'object') return null;
   const src = value as Record<string, unknown>;
@@ -68,10 +93,15 @@ export function normalizeDesignSpec(value: unknown): SkinDesignSpec | null {
   if (!pattern || typeof src.primary !== 'string' || !SKIN_HEX6.test(src.primary)) return null;
   const hex = (v: unknown, fb: string): string =>
     typeof v === 'string' && SKIN_HEX6.test(v) ? v.toLowerCase() : fb;
+  const oneOf = <T extends string>(v: unknown, set: readonly T[], fb: T): T =>
+    set.includes(v as T) ? (v as T) : fb;
   return {
     primary: hex(src.primary, '#888888'),
     secondary: hex(src.secondary, '#444444'),
+    accent: hex(src.accent, hex(src.secondary, '#caa84b')),
     pattern,
+    finish: oneOf(src.finish, SKIN_FINISHES, 'satin'),
+    density: oneOf(src.density, SKIN_DENSITIES, 'medium'),
     emissive:
       typeof src.emissive === 'string' && SKIN_HEX6.test(src.emissive)
         ? src.emissive.toLowerCase()
@@ -81,7 +111,15 @@ export function normalizeDesignSpec(value: unknown): SkinDesignSpec | null {
 
 /** The designer's starting point (an emerald dragon-scale look). */
 export function defaultDesignSpec(): SkinDesignSpec {
-  return { primary: '#2e8b57', secondary: '#0b3d2e', pattern: 'scales', emissive: null };
+  return {
+    primary: '#2e8b57',
+    secondary: '#0b3d2e',
+    accent: '#caa84b',
+    pattern: 'scales',
+    finish: 'satin',
+    density: 'medium',
+    emissive: null,
+  };
 }
 
 // Public cosmetic metadata for one marketplace creator skin (from GET

@@ -5147,9 +5147,15 @@
   .market-create { display: flex; flex-direction: column; gap: 18px; }
   .market-design { display: flex; gap: 18px; flex-wrap: wrap; }
   .market-preview { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .market-preview-3d {
+    width: 240px; height: 300px; max-width: 62vw; border-radius: 14px; border: 1px solid #57471f;
+    background: radial-gradient(120% 90% at 50% 18%, #20242c, #0c0a06 76%);
+    box-shadow: 0 6px 22px #00000066; overflow: hidden;
+  }
+  .market-preview-3d canvas { width: 100% !important; height: 100% !important; display: block; cursor: grab; }
   .market-preview-swatch {
-    width: 240px; height: 240px; max-width: 60vw; border-radius: 14px; border: 1px solid #57471f;
-    background: #0c0a06; box-shadow: 0 6px 22px #00000066; image-rendering: auto;
+    width: 120px; height: 120px; border-radius: 10px; border: 1px solid #57471f;
+    background: #0c0a06; image-rendering: auto;
   }
   .market-preview-label { color: #9b927a; font-size: 12px; }
   .market-controls { flex: 1 1 260px; display: flex; flex-direction: column; gap: 10px; min-width: 240px; }
@@ -5177,7 +5183,7 @@
   .market-list-btn { align-self: flex-start; min-height: 42px; padding: 0 22px; }
   @media (max-width: 560px) {
     .market-design { flex-direction: column; align-items: center; }
-    .market-preview-swatch { width: 200px; height: 200px; }
+    .market-preview-3d { width: 200px; height: 260px; }
   }
   .se-wheel-stage {
     position: relative;

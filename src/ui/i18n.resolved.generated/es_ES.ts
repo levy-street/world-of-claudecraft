@@ -1539,14 +1539,25 @@ export const es_ES: EnTranslations = {
     "equip": "Equip",
     "equipped": "Equipped",
     "ownedBadge": "Owned",
-    "equipping": "Equipping…",
-    "equipFailed": "Could not equip",
     "noResults": "No skins match your search.",
     "designTitle": "Design your skin",
     "designIntro": "Recolor and pattern a body — it renders the same for everyone, no files to upload.",
     "baseColor": "Base color",
     "patternColor": "Pattern color",
+    "accentColor": "Accent color",
     "pattern": "Pattern",
+    "finishLabel": "Finish",
+    "densityLabel": "Density",
+    "finishes": {
+      "matte": "Matte",
+      "satin": "Satin",
+      "metallic": "Metallic"
+    },
+    "densities": {
+      "low": "Sparse",
+      "medium": "Normal",
+      "high": "Dense"
+    },
     "glow": "Glow",
     "glowColor": "Glow color",
     "noGlow": "No glow",
