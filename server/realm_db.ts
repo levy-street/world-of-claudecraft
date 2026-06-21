@@ -14,7 +14,6 @@ import type { Pool, PoolClient } from 'pg';
 import {
   REALM,
   REALM_TYPE,
-  DEFAULT_REALM_NAME,
   resolveRealmType,
   worldSeedForRealm,
   isRealmStatus,
@@ -302,7 +301,3 @@ export async function countOwnedRealms(db: Queryable, accountId: number): Promis
   );
   return Number(res.rows[0]?.n ?? 0);
 }
-
-// Re-export the canonical default name so callers don't reach past this module
-// into realm.ts for it when working with the registry.
-export { DEFAULT_REALM_NAME };
