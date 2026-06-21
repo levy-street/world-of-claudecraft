@@ -27,8 +27,6 @@ export function resolveRealmType(raw: string | undefined): RealmType {
   return (REALM_TYPES as readonly string[]).includes(t) ? (t as RealmType) : 'Normal';
 }
 
-export const REALM_TYPE_LIST: readonly RealmType[] = REALM_TYPES;
-
 // This process's own realm type (used for the single-realm default directory).
 export const REALM_TYPE: RealmType = resolveRealmType(process.env.REALM_TYPE);
 
@@ -110,7 +108,7 @@ export const REALM_PUBLIC_ORIGIN = CONFIGURED_PUBLIC_ORIGIN || publicOriginForRe
 // while its unstake timelock runs, `lapsed` if frozen for a ToS violation
 // (gameplay frozen, funds untouched), and `closed` once decommissioned.
 export type RealmStatus = 'provisioning' | 'active' | 'decommissioning' | 'lapsed' | 'closed';
-export const REALM_STATUSES: readonly RealmStatus[] = [
+const REALM_STATUSES: readonly RealmStatus[] = [
   'provisioning',
   'active',
   'decommissioning',
@@ -126,11 +124,6 @@ export function isRealmStatus(raw: string): raw is RealmStatus {
 // and `builder` are invited so a guild can collectively run a realm (moderate
 // chat, spend customization budget) without ever sharing the stake wallet.
 export type RealmRole = 'owner' | 'moderator' | 'builder';
-export const REALM_ROLES: readonly RealmRole[] = ['owner', 'moderator', 'builder'];
-
-export function isRealmRole(raw: string): raw is RealmRole {
-  return (REALM_ROLES as readonly string[]).includes(raw);
-}
 
 // The canonical world seed of the single-shard default realm. Historically this
 // was hard-coded in server/game.ts and src/main.ts (World of ClaudeCraft is a

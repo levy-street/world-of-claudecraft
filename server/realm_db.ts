@@ -115,12 +115,33 @@ function rowToRealm(r: Record<string, unknown>): RealmRow {
   };
 }
 
-// Upsert this process's env realm as an `active` registry row on boot, so the
-// default single-shard deployment is a registry of one and the realm-list
-// screen is DB-backed from the first request. Idempotent and race-safe: it runs
-// on the ensureSchema() client under the shared advisory lock, and the
-// case-insensitive active-name index makes a concurrent insert a no-op. The env
-// realm is a system realm (no owner, tier 0) and keeps the canonical world seed.
+// Project a row to the directory summary. Composes from rowToRealm so the two
+// mappers can never silently diverge if the realms schema changes.
+function rowToRealmSummary(r: Record<string, unknown>): DbRealmSummary {
+  const full = rowToRealm(r);
+  return {
+    realmId: full.realmId,
+    name: full.name,
+    type: full.type,
+    originUrl: full.originUrl,
+    status: full.status,
+    ownerAccountId: full.ownerAccountId,
+    tier: full.tier,
+  };
+}
+
+/**
+ * Register this process's env realm as an `active` row on boot, so even a
+ * single-shard deployment is a registry of one and `/api/realms` is DB-backed
+ * from the first request.
+ *
+ * MUST run on the `ensureSchema()` client under its `pg_advisory_xact_lock`.
+ * The NOT EXISTS predicate is the readable contract for "seed only when
+ * missing", but the `realms_active_name` partial unique index is the actual
+ * defense against duplicates; the lock is what makes concurrent realm boots
+ * safe. Calling this outside the lock risks a 23505 unique violation when
+ * two processes race the seed.
+ */
 export async function seedDefaultRealm(client: Queryable): Promise<void> {
   await client.query(
     `INSERT INTO realms (name, type, status, world_seed, origin_url, provisioned_at)
@@ -134,19 +155,13 @@ export async function seedDefaultRealm(client: Queryable): Promise<void> {
 // directory by mergeRealmDirectory). 'closed' realms are excluded; everything
 // else is shown so a newer client can render provisioning/decommissioning state.
 export async function listRealmsForDirectory(db: Queryable): Promise<DbRealmSummary[]> {
+  // Full column list (not just the summary fields) so rowToRealmSummary can
+  // compose from rowToRealm honestly — otherwise the intermediate RealmRow
+  // would coerce missing fields to NaN/undefined.
   const res = await db.query(
-    `SELECT realm_id, name, type, origin_url, status, owner_account_id, tier
-       FROM realms WHERE status <> 'closed' ORDER BY created_at ASC`,
+    `SELECT ${REALM_COLS} FROM realms WHERE status <> 'closed' ORDER BY created_at ASC`,
   );
-  return res.rows.map((r: Record<string, unknown>) => ({
-    realmId: Number(r.realm_id),
-    name: String(r.name),
-    type: resolveRealmType(String(r.type)),
-    originUrl: String(r.origin_url),
-    status: isRealmStatus(String(r.status)) ? (String(r.status) as RealmStatus) : 'active',
-    ownerAccountId: r.owner_account_id == null ? null : Number(r.owner_account_id),
-    tier: Number(r.tier),
-  }));
+  return res.rows.map(rowToRealmSummary);
 }
 
 export async function getRealmById(db: Queryable, realmId: number): Promise<RealmRow | null> {
@@ -278,6 +293,11 @@ export async function listRealmRoles(db: Queryable, realmId: number): Promise<Re
 // Every role an account holds on a realm, owner included. owner is read off the
 // realms row (the authoritative owner), unioned with the delegated roles, so a
 // caller can authorize "can this account customize/moderate this realm?".
+//
+// UNION (not UNION ALL) is load-bearing: an owner who is also a delegated
+// 'builder' should see ['owner','builder'], not ['owner','owner','builder'].
+// Do NOT swap to UNION ALL — it duplicates rows and any role-set check that
+// uses size or .has() will quietly break authorization.
 export async function rolesForAccountOnRealm(
   db: Queryable,
   realmId: number,
