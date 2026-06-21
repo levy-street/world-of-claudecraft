@@ -7,6 +7,7 @@ import { SOCIAL_SCHEMA } from './social_db';
 import { FLOW_LEDGER_SCHEMA } from './flow_ledger_db';
 import { BUYBACK_BATCHES_SCHEMA } from './payout_db';
 import { seedChatFilterDefaults } from './chat_filter_db';
+import { REALM_SCHEMA, seedDefaultRealm } from './realm_db';
 import { REALM } from './realm';
 
 try {
@@ -306,9 +307,16 @@ export async function ensureSchema(): Promise<void> {
     await client.query(SOCIAL_SCHEMA);
     await client.query(FLOW_LEDGER_SCHEMA);
     await client.query(BUYBACK_BATCHES_SCHEMA);
+    // The realm registry (#475) depends on accounts(id), so it is applied after
+    // the core SCHEMA.
+    await client.query(REALM_SCHEMA);
     // Seed the chat-filter word lists + config on first boot only (idempotent).
     // Runs under the same advisory lock so concurrent realm boots don't race.
     await seedChatFilterDefaults(client);
+    // Register this process's env realm as an `active` registry row so the
+    // realm-list screen is DB-backed from the first request (idempotent,
+    // race-safe under the same lock).
+    await seedDefaultRealm(client);
     await client.query('COMMIT');
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
