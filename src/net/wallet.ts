@@ -203,3 +203,23 @@ export async function payWocBurn(quote: WocBurnQuote): Promise<string> {
   await connection.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, 'confirmed');
   return signature;
 }
+
+/**
+ * Sign and submit a server-built, already-partial-signed transaction (base64) —
+ * used for the atomic burn + SNS subdomain mint, where the execution wallet has
+ * pre-signed the createSubdomain/transferSubdomain instructions and the player
+ * adds the remaining signature (fee payer + burn authority). Returns the
+ * confirmed signature for /api/subdomain/confirm.
+ */
+export async function signAndSubmitServerTx(txBase64: string): Promise<string> {
+  const provider = initWallet().getProvider<SolanaSignProvider>('solana');
+  if (!provider?.signTransaction) throw new Error('this wallet cannot sign transactions');
+  const tx = Transaction.from(Buffer.from(txBase64, 'base64'));
+  const connection = getConnection();
+  const signed = await provider.signTransaction(tx);
+  const signature = await connection.sendRawTransaction(signed.serialize());
+  const blockhash = tx.recentBlockhash!;
+  const lastValidBlockHeight = tx.lastValidBlockHeight ?? (await connection.getBlockHeight()) + 150;
+  await connection.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, 'confirmed');
+  return signature;
+}
