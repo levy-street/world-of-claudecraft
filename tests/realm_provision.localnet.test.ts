@@ -37,7 +37,9 @@ run('stake-to-provision against real Postgres + validator', () => {
 
   // Send + simulate at 'confirmed' so freshly-created setup accounts (mint, ATA)
   // are visible; the verify path waits for the lock to finalize separately.
-  const conn = new Connection(RPC as string, 'confirmed');
+  // describe.skip still runs this body during collection, so default the URL
+  // when unset (the connection is only used inside the gated test bodies).
+  const conn = new Connection(RPC ?? 'http://127.0.0.1:8899', 'confirmed');
   const tmp = mkdtempSync(join(tmpdir(), 'woc-provision-'));
   // Local validator: generate + airdrop. Devnet (no faucet): REALM_TEST_FUNDER.
   const FUNDER = process.env.REALM_TEST_FUNDER;

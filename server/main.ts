@@ -9,6 +9,7 @@ import {
   findCharacterReportTargetByName, topArenaRatings, topLifetimeXp, chatMuteStatusForAccount, loadAccountCosmetics,
   referralCountForAccount, primarySlugForAccount, lifetimeXpStanding, isAdminAccount,
   accountById, characterCountForAccount, updatePasswordHash, revokeTokensExcept, setAccountEmail, setAccountDeactivated,
+  walletForAccount,
 } from './db';
 import { virtualLevel } from '../src/sim/types';
 import { Sim } from '../src/sim/sim';
@@ -35,8 +36,14 @@ import { isConnectionRefused } from './ip_block';
 import { handleInternalApi } from './internal';
 import { handlePerfReport } from './perf_report';
 import { GameServer } from './game';
-import { REALM, REALM_DIRECTORY, REALM_ORIGINS, mergeRealmDirectory } from './realm';
+import { REALM, REALM_DIRECTORY, REALM_ORIGINS, mergeRealmDirectory, resolveRealmType } from './realm';
 import { listRealmsForDirectory } from './realm_db';
+import {
+  prepareProvisionQuote,
+  confirmProvisionQuote,
+  requestRealmDecommission,
+  finalizeRealmRelease,
+} from './realm_provision';
 import { webLoginEnforced, isWebClientRequest } from './web_login_guard';
 import { cacheControlFor, etagFor, isNotModified } from './static_cache';
 import { recordUsageCacheEvent, recordUsageMetric, setUsageCacheSize } from './provider_usage';
@@ -542,6 +549,50 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       // name/url/type; the extra realmId/status/owned/tier fields are additive.
       const realms = mergeRealmDirectory(REALM_DIRECTORY, await listRealmsForDirectory(pool));
       return json(res, 200, { current: REALM, realms, characters });
+    }
+    // Stake-to-provision (#475). Quote: validate name + cap + tier and reserve a
+    // provisioning realm; the client then locks `amount` $WOC into the returned
+    // escrow vault and posts the finalized signature back to confirm.
+    if (req.method === 'POST' && url === '/api/realms/quote') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      const wallet = await walletForAccount(accountId);
+      if (!wallet) return json(res, 400, { error: 'link a wallet first' });
+      const body = await readBody(req);
+      const name = typeof body.name === 'string' ? body.name : '';
+      const type = resolveRealmType(typeof body.type === 'string' ? body.type : 'Normal');
+      const amount = typeof body.amount === 'string' ? body.amount : '';
+      if (!/^[0-9]+$/.test(amount)) return json(res, 400, { error: 'invalid_amount' });
+      const result = await prepareProvisionQuote(pool, { accountId, ownerWallet: wallet.pubkey, name, type, amountBase: BigInt(amount) });
+      if (!result.ok) return json(res, result.status, { error: result.error });
+      return json(res, 200, result);
+    }
+    if (req.method === 'POST' && url === '/api/realms/confirm') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      const body = await readBody(req);
+      const quoteId = typeof body.quoteId === 'string' ? body.quoteId : '';
+      const lockSig = typeof body.lockSig === 'string' ? body.lockSig : '';
+      if (!quoteId || !lockSig) return json(res, 400, { error: 'missing_quoteId_or_lockSig' });
+      const result = await confirmProvisionQuote(pool, { accountId, quoteId, lockSig });
+      if (!result.ok) return json(res, result.status, { error: result.error });
+      return json(res, 200, result);
+    }
+    const realmDecommissionMatch = /^\/api\/realms\/(\d+)\/decommission$/.exec(url);
+    if (req.method === 'POST' && realmDecommissionMatch) {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      const result = await requestRealmDecommission(pool, { accountId, realmId: Number(realmDecommissionMatch[1]) });
+      if (!result.ok) return json(res, result.status, { error: result.error });
+      return json(res, 200, result);
+    }
+    const realmReleaseMatch = /^\/api\/realms\/(\d+)\/release$/.exec(url);
+    if (req.method === 'POST' && realmReleaseMatch) {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      const result = await finalizeRealmRelease(pool, { accountId, realmId: Number(realmReleaseMatch[1]) });
+      if (!result.ok) return json(res, result.status, { error: result.error });
+      return json(res, 200, result);
     }
     if (req.method === 'GET' && url === '/api/search') {
       const accountId = await bearerAccount(req);

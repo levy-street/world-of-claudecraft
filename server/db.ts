@@ -9,6 +9,7 @@ import { BUYBACK_BATCHES_SCHEMA } from './payout_db';
 import { seedChatFilterDefaults } from './chat_filter_db';
 import { REALM_SCHEMA, seedDefaultRealm } from './realm_db';
 import { REALM_STAKE_SCHEMA } from './realm_stake_db';
+import { REALM_QUOTE_SCHEMA } from './realm_quote_db';
 import { REALM } from './realm';
 
 try {
@@ -312,6 +313,7 @@ export async function ensureSchema(): Promise<void> {
     // the core SCHEMA. realm_stakes references realms(realm_id), so it follows.
     await client.query(REALM_SCHEMA);
     await client.query(REALM_STAKE_SCHEMA);
+    await client.query(REALM_QUOTE_SCHEMA);
     // Seed the chat-filter word lists + config on first boot only (idempotent).
     // Runs under the same advisory lock so concurrent realm boots don't race.
     await seedChatFilterDefaults(client);

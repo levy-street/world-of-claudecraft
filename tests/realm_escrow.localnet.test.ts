@@ -51,7 +51,9 @@ function ataFor(owner: PublicKey, mint: PublicKey): PublicKey {
 }
 
 run('realm_stake_escrow on a live validator', () => {
-  const conn = new Connection(RPC as string, 'confirmed');
+  // describe.skip still runs this body during collection, so default the URL
+  // when unset (the connection is only used inside the gated test bodies).
+  const conn = new Connection(RPC ?? 'http://127.0.0.1:8899', 'confirmed');
   const tmp = mkdtempSync(join(tmpdir(), 'woc-escrow-'));
   // On a local validator we generate + airdrop the actor; on devnet (no faucet)
   // set REALM_TEST_FUNDER to a funded keypair file and it is used directly.

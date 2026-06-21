@@ -1,15 +1,59 @@
-// Stake-to-provision (#475): verify a finalized on-chain stake lock, then record
-// the realm + stake. Reuses the proven finalized-tx verify core (solana_tx) and
-// the escrow PDA derivation (realm_escrow). The staked $WOC moves into the
-// non-custodial escrow vault, which this confirms; the realm then flips active
-// and the stake is recorded in the ledger-quarantined realm_stakes table.
+// Stake-to-provision orchestration (#475): the server side of founding a realm.
+// Issues a provision quote (name + cap + supply/tier validation), verifies the
+// finalized on-chain stake lock, records it (ledger-quarantined) and brings the
+// realm online, and runs the decommission + release-finalize lifecycle. Reuses
+// the proven finalized-tx verify core (solana_tx), the escrow PDA derivation
+// (realm_escrow), and the registry/stake/quote persistence. No SQL here; this is
+// the logic module main.ts calls.
 
+import { randomUUID } from 'node:crypto';
 import type { Pool } from 'pg';
 import { PublicKey } from '@solana/web3.js';
 import { getFinalizedTx, ownerCreditedBase, ownerSpentBase, txSucceeded, usesToken2022 } from './solana_tx';
-import { realmStakePda, realmVaultAddress } from './realm_escrow';
-import { activateRealm, addRealmRole } from './realm_db';
-import { insertStake, type RealmStakeRow } from './realm_stake_db';
+import { solanaRpc } from './solana_rpc';
+import { WOC_MINT } from './woc_config';
+import { offensiveName } from './auth';
+import { isUniqueViolation } from './http_util';
+import { resolveRealm, type RealmType } from './realm';
+import { REALM_ESCROW_PROGRAM_ID, realmStakePda, realmVaultAddress } from './realm_escrow';
+import {
+  activateRealm,
+  addRealmRole,
+  countOwnedRealms,
+  createProvisioningRealm,
+  getLiveRealmByName,
+  getRealmById,
+  requestDecommission,
+  setRealmStatus,
+} from './realm_db';
+import { getActiveStakeByRealm, insertStake, setStakeReleased, setStakeReleasing, type RealmStakeRow } from './realm_stake_db';
+import {
+  countOpenQuotesForAccount,
+  createRealmQuote,
+  deleteRealmQuote,
+  getRealmQuote,
+  reclaimExpiredProvisioning,
+} from './realm_quote_db';
+import { minStakeBase, tierForStake } from './realm_tiers';
+
+function intEnv(key: string, def: number, min: number, max: number): number {
+  const v = Number.parseInt(process.env[key] ?? '', 10);
+  return Number.isFinite(v) && v >= min && v <= max ? v : def;
+}
+
+// Max live realms (plus open quotes) per account: anti name-squatting. With a
+// whale-tier stake this is also naturally throttled by capital.
+const MAX_REALMS_PER_ACCOUNT = intEnv('REALM_MAX_PER_ACCOUNT', 3, 1, 1000);
+// How long a provision quote stays valid for the client to lock + confirm.
+const QUOTE_TTL_MS = intEnv('REALM_QUOTE_TTL_MINUTES', 15, 1, 1440) * 60_000;
+// The off-chain decommission timelock the UI shows. The on-chain RealmStake
+// unlock_eligible_slot set by the program is authoritative for the release.
+const UNSTAKE_TIMELOCK_MS = intEnv('REALM_UNSTAKE_TIMELOCK_SECONDS', 259_200, 0, 31_536_000) * 1000;
+
+export type Result<T> = ({ ok: true } & T) | { ok: false; status: number; error: string };
+function fail(status: number, error: string): { ok: false; status: number; error: string } {
+  return { ok: false, status, error };
+}
 
 export type StakeVerdict = { ok: true; amountBase: bigint } | { ok: false; reason: string };
 
@@ -45,7 +89,7 @@ export async function verifyStakeLock(args: {
 // Record a verified stake and bring its realm online, atomically: flip the realm
 // active, insert the (ledger-quarantined) stake row, and grant the owner role.
 // The realm_stakes UNIQUE(lock_tx_sig) is the replay guard, so a re-confirmed
-// signature throws 23505 and the transaction rolls back (no double-provision).
+// lock rolls back the whole transaction.
 export async function recordProvisionedStake(
   pool: Pool,
   s: {
@@ -84,4 +128,186 @@ export async function recordProvisionedStake(
   } finally {
     client.release();
   }
+}
+
+// Total $WOC supply in base units, read on chain. Drives the percent-of-supply
+// tier thresholds. null on a read failure (the quote route returns 503).
+export async function getMintSupplyBase(mint: string): Promise<bigint | null> {
+  const res = await solanaRpc<{ value: { amount: string } }>('getTokenSupply', [mint, { commitment: 'confirmed' }]);
+  const amount = res?.value?.amount;
+  if (typeof amount !== 'string' || !/^[0-9]+$/.test(amount)) return null;
+  return BigInt(amount);
+}
+
+export interface ProvisionQuote {
+  quoteId: string;
+  realmId: number;
+  name: string;
+  type: RealmType;
+  tier: number;
+  amountBase: string;
+  mint: string;
+  programId: string;
+  stakePda: string;
+  vault: string;
+  expiresAt: string;
+}
+
+// Issue a provision quote: validate the name (charset, profanity, uniqueness)
+// and the per-account cap, read supply, require at least the bronze (1%) stake,
+// derive the tier, create the realm in 'provisioning', and pin the quote. The
+// client locks exactly amountBase into the returned vault, then calls confirm.
+export async function prepareProvisionQuote(
+  pool: Pool,
+  args: { accountId: number; ownerWallet: string; name: string; type: RealmType; amountBase: bigint },
+): Promise<Result<ProvisionQuote>> {
+  await reclaimExpiredProvisioning(pool);
+
+  const name = args.name.trim();
+  if (!name || resolveRealm(name) !== name) return fail(400, 'invalid_realm_name');
+  if (offensiveName(name)) return fail(400, 'realm_name_not_allowed');
+  if (await getLiveRealmByName(pool, name)) return fail(409, 'realm_name_taken');
+
+  const owned = await countOwnedRealms(pool, args.accountId);
+  const open = await countOpenQuotesForAccount(pool, args.accountId);
+  if (owned + open >= MAX_REALMS_PER_ACCOUNT) return fail(409, 'realm_cap_reached');
+
+  const supply = await getMintSupplyBase(WOC_MINT);
+  if (supply === null) return fail(503, 'supply_unavailable');
+  if (args.amountBase < minStakeBase(supply)) return fail(400, 'stake_below_minimum');
+  const tier = tierForStake(args.amountBase, supply);
+
+  let realmId: number;
+  try {
+    const realm = await createProvisioningRealm(pool, {
+      name,
+      type: args.type,
+      ownerAccountId: args.accountId,
+      tier,
+    });
+    realmId = realm.realmId;
+  } catch (err) {
+    if (isUniqueViolation(err)) return fail(409, 'realm_name_taken'); // lost a name race
+    throw err;
+  }
+
+  const quoteId = randomUUID();
+  const expiresAt = new Date(Date.now() + QUOTE_TTL_MS);
+  await createRealmQuote(pool, {
+    quoteId,
+    accountId: args.accountId,
+    realmId,
+    ownerWallet: args.ownerWallet,
+    amountBase: args.amountBase,
+    tier,
+    mint: WOC_MINT,
+    expiresAt,
+  });
+
+  const stakePda = realmStakePda(realmId);
+  const vault = realmVaultAddress(stakePda, new PublicKey(WOC_MINT));
+  return {
+    ok: true,
+    quoteId,
+    realmId,
+    name,
+    type: args.type,
+    tier,
+    amountBase: args.amountBase.toString(),
+    mint: WOC_MINT,
+    programId: REALM_ESCROW_PROGRAM_ID.toBase58(),
+    stakePda: stakePda.toBase58(),
+    vault: vault.toBase58(),
+    expiresAt: expiresAt.toISOString(),
+  };
+}
+
+// Redeem a quote with the finalized lock signature: verify the lock matches the
+// quote, then record the stake + activate the realm + grant the owner role.
+export async function confirmProvisionQuote(
+  pool: Pool,
+  args: { accountId: number; quoteId: string; lockSig: string },
+): Promise<Result<{ realmId: number; tier: number }>> {
+  const quote = await getRealmQuote(pool, args.quoteId);
+  if (!quote) return fail(404, 'quote_not_found');
+  if (quote.accountId !== args.accountId) return fail(403, 'not_your_quote');
+  if (quote.expiresAt.getTime() <= Date.now()) return fail(410, 'quote_expired');
+
+  const verdict = await verifyStakeLock({
+    lockSig: args.lockSig,
+    realmId: quote.realmId,
+    stakerWallet: quote.ownerWallet,
+    mint: quote.mint,
+    expectedAmount: quote.amountBase,
+  });
+  if (!verdict.ok) return fail(400, verdict.reason);
+
+  try {
+    await recordProvisionedStake(pool, {
+      realmId: quote.realmId,
+      accountId: quote.accountId,
+      stakerWallet: quote.ownerWallet,
+      mint: quote.mint,
+      amountBase: quote.amountBase,
+      tier: quote.tier,
+      lockTxSig: args.lockSig,
+    });
+  } catch (err) {
+    if (isUniqueViolation(err)) return fail(409, 'stake_already_recorded');
+    throw err;
+  }
+  await deleteRealmQuote(pool, args.quoteId);
+  return { ok: true, realmId: quote.realmId, tier: quote.tier };
+}
+
+// Owner begins decommissioning: mark the realm decommissioning + the stake
+// releasing, and return the (UI) release-eligible time. The owner separately
+// signs the on-chain request_decommission + release.
+export async function requestRealmDecommission(
+  pool: Pool,
+  args: { accountId: number; realmId: number },
+): Promise<Result<{ realmId: number; releaseEligibleAt: string }>> {
+  const realm = await getRealmById(pool, args.realmId);
+  if (!realm || realm.status === 'closed') return fail(404, 'realm_not_found');
+  if (realm.ownerAccountId !== args.accountId) return fail(403, 'not_realm_owner');
+  if (realm.status !== 'active') return fail(409, 'realm_not_active');
+
+  const eligibleAt = new Date(Date.now() + UNSTAKE_TIMELOCK_MS);
+  const updated = await requestDecommission(pool, args.realmId, eligibleAt);
+  if (!updated) return fail(409, 'realm_not_active');
+  const stake = await getActiveStakeByRealm(pool, args.realmId);
+  if (stake) await setStakeReleasing(pool, stake.stakeId);
+  return { ok: true, realmId: args.realmId, releaseEligibleAt: eligibleAt.toISOString() };
+}
+
+// True if the on-chain RealmStake PDA no longer exists (the program closes it in
+// release). A read failure returns false (do not assume released).
+async function isStakeAccountClosed(realmId: number): Promise<boolean> {
+  const pda = realmStakePda(realmId).toBase58();
+  const res = await solanaRpc<{ value: unknown | null }>('getAccountInfo', [
+    pda,
+    { encoding: 'base64', commitment: 'finalized' },
+  ]);
+  if (res === null) return false;
+  return res.value === null;
+}
+
+// Reconcile the DB after the owner's on-chain release closed the escrow PDA:
+// mark the stake released and close the realm (frees the name). Confirms the PDA
+// is actually gone on chain before doing so.
+export async function finalizeRealmRelease(
+  pool: Pool,
+  args: { accountId: number; realmId: number },
+): Promise<Result<{ realmId: number }>> {
+  const realm = await getRealmById(pool, args.realmId);
+  if (!realm || realm.status === 'closed') return fail(404, 'realm_not_found');
+  if (realm.ownerAccountId !== args.accountId) return fail(403, 'not_realm_owner');
+  if (realm.status !== 'decommissioning') return fail(409, 'realm_not_decommissioning');
+
+  if (!(await isStakeAccountClosed(args.realmId))) return fail(409, 'stake_not_released_onchain');
+
+  const stake = await getActiveStakeByRealm(pool, args.realmId);
+  if (stake) await setStakeReleased(pool, stake.stakeId, `pda-closed:${realmStakePda(args.realmId).toBase58()}`);
+  await setRealmStatus(pool, args.realmId, 'closed');
+  return { ok: true, realmId: args.realmId };
 }
