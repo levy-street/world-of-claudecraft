@@ -596,6 +596,9 @@ export const en_XA: EnTranslations = {
     "renamePaidButton": "[Þáý {amount} $ŴÓÇ & Ŕéñáɱé]",
     "renamePriceHint": "[Á ʋóļúñţáŕý ŕéñáɱé ƀúŕñš {amount} $ŴÓÇ.]",
     "renameCancel": "[Çáñçéļ]",
+    "mintSolName": "[Ĝéţ .šóļ ñáɱé]",
+    "mintSolButton": "[Ɓúŕñ {amount} $ŴÓÇ & Ɱíñţ]",
+    "mintSolHint": "[Ɱíñţ á þļáýéŕ-óŵñéð ‹ñáɱé›.ŵóŕļðóƒçļáúðéçŕáƒţ.šóļ ƒóŕ {amount} $ŴÓÇ — ýóúŕš óñ-çĥáíñ.]",
     "newNamePlaceholder": "[Ñéŵ çĥáŕáçţéŕ ñáɱé]",
     "tabCharacters": "[Çĥáŕáçţéŕš]",
     "tabCreate": "[Çŕéáţé]",
@@ -613,6 +616,7 @@ export const en_XA: EnTranslations = {
     "confirmFailed": "[Ţĥé $ŴÓÇ þáýɱéñţ çóúļð ñóţ ƀé ʋéŕíƒíéð.]",
     "finalizeTimeout": "[Ţíɱéð óúţ ŵáíţíñĝ ƒóŕ ƒíñáļížáţíóñ. Íƒ $ŴÓÇ ŵáš ƀúŕñéð, ŕéóþéñ áñð ŕéţŕý — ţĥé þáýɱéñţ šéţţļéš óñçé íţ ƒíñáļížéš.]",
     "renameSuccess": "[Ŕéñáɱéð ţó {name}.]",
+    "mintSuccess": "[Ɱíñţéð {domain} — íţ'š ýóúŕš óñ-çĥáíñ.]",
     "guildRenameSuccess": "[Ĝúíļð ŕéñáɱéð ţó {name}.]",
     "reserveSuccess": "[Ŕéšéŕʋéð ţĥé ñáɱé {name}.]"
   },
