@@ -55,6 +55,16 @@ describe('worldSeedForRealm', () => {
   it('is case-insensitive (realm names are unique case-insensitively)', () => {
     expect(worldSeedForRealm('Ironforge')).toBe(worldSeedForRealm('ironforge'));
   });
+
+  it('produces in-range seeds for long names', () => {
+    // resolveRealm caps the name at 24 chars; even at the limit the hash stays
+    // in the 31-bit positive integer range.
+    const long = 'A'.repeat(24);
+    const seed = worldSeedForRealm(long);
+    expect(Number.isInteger(seed)).toBe(true);
+    expect(seed).toBeGreaterThan(0);
+    expect(seed).toBeLessThan(0x7fff_ffff);
+  });
 });
 
 describe('mergeRealmDirectory', () => {
@@ -112,6 +122,39 @@ describe('mergeRealmDirectory', () => {
     expect(out).toHaveLength(2);
     // the env entry absorbs the registry id rather than producing a duplicate
     expect(out[0]).toMatchObject({ name: 'Claudemoon', realmId: 3, owned: true });
+  });
+
+  it('handles an empty env directory (DB-only deployment)', () => {
+    const out = mergeRealmDirectory([], [
+      dbRealm({ name: 'Mograine', realmId: 1, ownerAccountId: 7, tier: 3, originUrl: 'https://mograine.example.com' }),
+    ]);
+    expect(out).toHaveLength(1);
+    expect(out[0]).toMatchObject({ name: 'Mograine', url: 'https://mograine.example.com', owned: true });
+  });
+
+  it('handles empty DB summaries (env-only deployment, the default)', () => {
+    const out = mergeRealmDirectory(env, []);
+    // every env entry surfaces with realmId=null (no registry row yet)
+    expect(out.every((e) => e.realmId === null)).toBe(true);
+    expect(out.map((e) => e.name)).toEqual(['Claudemoon', 'Ironforge']);
+  });
+
+  it('returns an empty directory when both inputs are empty', () => {
+    expect(mergeRealmDirectory([], [])).toEqual([]);
+  });
+
+  it('hides DB realms that are merely closed (named freed for re-provisioning)', () => {
+    const out = mergeRealmDirectory(env, [dbRealm({ name: 'Recycled', realmId: 9, status: 'closed', ownerAccountId: 1 })]);
+    expect(out.map((e) => e.name)).toEqual(['Claudemoon', 'Ironforge']);
+  });
+
+  it('treats an env entry with a duplicate registry row case-insensitively even at the second position', () => {
+    const dupEnv = [...env, { name: 'Claudemoon', url: 'https://dup.example.com', type: 'Normal' as const }];
+    const out = mergeRealmDirectory(dupEnv, []);
+    // the second duplicate env entry is skipped — output length stays at the
+    // canonical env size, not the duplicate-inflated size
+    expect(out).toHaveLength(2);
+    expect(out.filter((e) => e.name.toLowerCase() === 'claudemoon')).toHaveLength(1);
   });
 });
 
