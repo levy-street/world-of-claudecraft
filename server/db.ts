@@ -4,6 +4,7 @@ import type { CharacterState, MarketSave } from '../src/sim/sim';
 import type { ArenaFormat, PlayerClass } from '../src/sim/types';
 import type { ChatLogRow } from './chat_log';
 import { SOCIAL_SCHEMA } from './social_db';
+import { FLOW_LEDGER_SCHEMA } from './flow_ledger_db';
 import { seedChatFilterDefaults } from './chat_filter_db';
 import { REALM } from './realm';
 
@@ -283,6 +284,7 @@ export async function ensureSchema(): Promise<void> {
     await client.query('SELECT pg_advisory_xact_lock($1)', [0x57_4f_43_01]); // "WOC\x01"
     await client.query(SCHEMA);
     await client.query(SOCIAL_SCHEMA);
+    await client.query(FLOW_LEDGER_SCHEMA);
     // Seed the chat-filter word lists + config on first boot only (idempotent).
     // Runs under the same advisory lock so concurrent realm boots don't race.
     await seedChatFilterDefaults(client);
