@@ -2382,6 +2382,9 @@ export const pt_BR: EnTranslations = {
     "renameRequired": "renomeação necessária",
     "delete": "Excluir",
     "rename": "Renomear",
+    "renamePaidButton": "Pay {amount} $WOC & Rename",
+    "renamePriceHint": "A voluntary rename burns {amount} $WOC.",
+    "renameCancel": "Cancel",
     "newNamePlaceholder": "Novo nome do personagem",
     "tabCharacters": "Personagens",
     "tabCreate": "Criar",
@@ -2396,6 +2399,18 @@ export const pt_BR: EnTranslations = {
     "sortName": "Nome",
     "sortRecent": "Jogados recentemente",
     "sortPlaytime": "Tempo de jogo"
+  },
+  "woc": {
+    "linkWalletFirst": "Connect and link a Solana wallet to pay with $WOC.",
+    "quoting": "Preparing your $WOC payment…",
+    "approveBurn": "Approve the {amount} $WOC burn in your wallet…",
+    "confirming": "Confirming the burn on-chain…",
+    "finalizing": "Waiting for Solana finalization…",
+    "confirmFailed": "The $WOC payment could not be verified.",
+    "finalizeTimeout": "Timed out waiting for finalization. If $WOC was burned, reopen and retry — the payment settles once it finalizes.",
+    "renameSuccess": "Renamed to {name}.",
+    "guildRenameSuccess": "Guild renamed to {name}.",
+    "reserveSuccess": "Reserved the name {name}."
   },
   "deleteCharacter": {
     "title": "Excluir personagem",

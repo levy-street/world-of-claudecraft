@@ -149,7 +149,7 @@ export interface AccountInfo {
 }
 
 // Carries the HTTP status alongside the server's error text so callers can
-// distinguish an auth failure (401/403 → clear the stored session) from a
+// distinguish an auth failure (401/403, clear the stored session) from a
 // transient 5xx/network blip (keep the token; the session may still be valid).
 export class ApiError extends Error {
   constructor(
@@ -164,6 +164,23 @@ export class ApiError extends Error {
 /** True for an auth-class failure where a stored token should be discarded. */
 export function isAuthError(err: unknown): boolean {
   return err instanceof ApiError && (err.status === 401 || err.status === 403);
+}
+
+// A server-issued $WOC payment quote (POST /api/identity/quote). Amounts are
+// base-unit decimal strings; priceWoc is the human-readable figure for display.
+export interface WocIdentityQuote {
+  quoteId: string;
+  memo: string;
+  mint: string;
+  decimals: number;
+  amountBase: string;
+  burnBase: string;
+  treasuryBase: string;
+  treasury: string | null;
+  burnBps: number;
+  priceWoc: number;
+  payer: string;
+  expiresAt: number;
 }
 
 export class Api {
@@ -512,6 +529,31 @@ export class Api {
 
   async unlinkWallet(): Promise<void> {
     await this.delete('/api/wallet/link', {});
+  }
+
+  // ── $WOC paid identity actions (rename / guild rename / vanity reserve) ─────
+  // Public per-action prices in human-readable $WOC, for showing the cost up front.
+  async identityPrices(): Promise<{ rename_character: number; rename_guild: number; reserve_name: number }> {
+    return this.get('/api/identity/prices');
+  }
+
+  // Quote a burn price for an action. `body.kind` is one of
+  // 'rename_character' | 'rename_guild' | 'reserve_name'.
+  async identityQuote(body: { kind: string; characterId?: number; name: string }): Promise<WocIdentityQuote> {
+    return this.post('/api/identity/quote', body);
+  }
+
+  // Redeem a paid quote with the on-chain signature. Reads the response directly
+  // (not through post()) because the caller needs the status + `reason` to drive
+  // the "wait for finalization" retry — post() collapses those into a message.
+  async identityConfirm(quoteId: string, signature: string): Promise<{ ok: boolean; status: number; reason?: string; data: any }> {
+    const res = await fetch(this.base + '/api/identity/confirm', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}) },
+      body: JSON.stringify({ quoteId, signature }),
+    });
+    const data = await res.json().catch(() => ({}));
+    return { ok: res.ok, status: res.status, reason: data.reason, data };
   }
 
   // ── Shareable player card + referrals ──────────────────────────────────────

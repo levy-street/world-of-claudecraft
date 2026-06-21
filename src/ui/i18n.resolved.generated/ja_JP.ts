@@ -2382,6 +2382,9 @@ export const ja_JP: EnTranslations = {
     "renameRequired": "名前変更が必要",
     "delete": "削除",
     "rename": "名前変更",
+    "renamePaidButton": "Pay {amount} $WOC & Rename",
+    "renamePriceHint": "A voluntary rename burns {amount} $WOC.",
+    "renameCancel": "Cancel",
     "newNamePlaceholder": "新しいキャラクター名",
     "tabCharacters": "キャラクター",
     "tabCreate": "作成",
@@ -2396,6 +2399,18 @@ export const ja_JP: EnTranslations = {
     "sortName": "名前",
     "sortRecent": "最近プレイ",
     "sortPlaytime": "プレイ時間"
+  },
+  "woc": {
+    "linkWalletFirst": "Connect and link a Solana wallet to pay with $WOC.",
+    "quoting": "Preparing your $WOC payment…",
+    "approveBurn": "Approve the {amount} $WOC burn in your wallet…",
+    "confirming": "Confirming the burn on-chain…",
+    "finalizing": "Waiting for Solana finalization…",
+    "confirmFailed": "The $WOC payment could not be verified.",
+    "finalizeTimeout": "Timed out waiting for finalization. If $WOC was burned, reopen and retry — the payment settles once it finalizes.",
+    "renameSuccess": "Renamed to {name}.",
+    "guildRenameSuccess": "Guild renamed to {name}.",
+    "reserveSuccess": "Reserved the name {name}."
   },
   "deleteCharacter": {
     "title": "キャラクターを削除",

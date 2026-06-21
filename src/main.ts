@@ -3491,7 +3491,62 @@ function openDeleteCharacterDialog(character: CharacterSummary): void {
   input.focus();
 }
 
+// Cached human-readable $WOC price of a voluntary character rename, fetched once
+// for the character-select buttons. Display-only; the authoritative price comes
+// from the quote at pay time, so a failed prefetch just hides the figure.
+let renameCharacterPriceWoc: number | null = null;
+function ensureIdentityPrices(): void {
+  if (renameCharacterPriceWoc !== null) return;
+  api.identityPrices().then((p) => { renameCharacterPriceWoc = p.rename_character; }).catch(() => {});
+}
+
+// Inline "pay $WOC to rename" editor appended to a character row on the
+// character-select screen. Drives the quote → burn → confirm flow and refreshes
+// the list on success.
+function openPaidRenameEditor(row: HTMLElement, c: { id: number; name: string }): void {
+  if (row.querySelector('.paid-rename-editor')) return; // already open on this row
+  const priceLabel = renameCharacterPriceWoc !== null ? formatWoc(renameCharacterPriceWoc) : '—';
+  const editor = document.createElement('div');
+  editor.className = 'paid-rename-editor';
+  editor.innerHTML = `
+    <input class="paid-rename-input" maxlength="16" autocomplete="off"
+      placeholder="${escapeHtml(t('character.newNamePlaceholder'))}"
+      aria-label="${escapeHtml(t('character.newNamePlaceholder'))}" />
+    <div class="paid-rename-hint">${escapeHtml(t('character.renamePriceHint', { amount: priceLabel }))}</div>
+    <div class="paid-rename-actions">
+      <button class="btn paid-rename-cancel" type="button">${escapeHtml(t('character.renameCancel'))}</button>
+      <button class="btn btn-primary paid-rename-confirm" type="button">${escapeHtml(t('character.renamePaidButton', { amount: priceLabel }))}</button>
+    </div>
+    <div class="paid-rename-status" role="status" aria-live="polite"></div>`;
+  row.appendChild(editor);
+  const input = editor.querySelector('.paid-rename-input') as HTMLInputElement;
+  const status = editor.querySelector('.paid-rename-status') as HTMLElement;
+  const confirmBtn = editor.querySelector('.paid-rename-confirm') as HTMLButtonElement;
+  input.focus();
+  editor.querySelector('.paid-rename-cancel')!.addEventListener('click', (e) => {
+    e.stopPropagation();
+    editor.remove();
+  });
+  confirmBtn.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    const name = input.value.trim();
+    if (!name) { input.focus(); return; }
+    confirmBtn.disabled = true;
+    input.disabled = true;
+    try {
+      await payWocIdentity({ kind: 'rename_character', characterId: c.id, name }, (m) => { status.textContent = m; });
+      status.textContent = t('woc.renameSuccess', { name });
+      await refreshCharacters();
+    } catch (err) {
+      status.textContent = userFacingApiError(err);
+      confirmBtn.disabled = false;
+      input.disabled = false;
+    }
+  });
+}
+
 async function refreshCharacters(): Promise<void> {
+  if (WALLET_ENABLED) ensureIdentityPrices();
   if (api.realm) $('#charselect-realm').textContent = api.realm;
   updateSortButtonLabel();
   const listEl = $('#char-list');
@@ -3533,7 +3588,7 @@ async function refreshCharacters(): Promise<void> {
             ? `<input class="rename-input" placeholder="${escapeHtml(t('character.newNamePlaceholder'))}" maxlength="16" /><span class="char-actions"><button class="btn btn-danger delete-char-btn" ${c.online ? 'disabled' : ''}>${escapeHtml(t('character.delete'))}</button><button class="btn rename-btn">${escapeHtml(t('character.rename'))}</button></span>`
             : c.online
               ? `<span class="char-actions"><button class="btn btn-danger delete-char-btn" disabled title="${escapeHtml(t('character.inWorldHint'))}">${escapeHtml(t('character.delete'))}</button><button class="btn take-over-btn" title="${escapeHtml(t('character.takeOverConfirm'))}" aria-label="${escapeHtml(t('character.takeOverConfirm'))}">${escapeHtml(t('character.takeOver'))}</button></span>`
-              : `<span class="char-actions"><button class="btn btn-danger delete-char-btn">${escapeHtml(t('character.delete'))}</button><button class="btn enter-world-btn">${escapeHtml(t('auth.enterWorld'))}</button></span>`
+              : `<span class="char-actions"><button class="btn btn-danger delete-char-btn">${escapeHtml(t('character.delete'))}</button>${WALLET_ENABLED ? `<button class="btn paid-rename-btn" type="button">${escapeHtml(t('character.rename'))}</button>` : ''}<button class="btn enter-world-btn">${escapeHtml(t('auth.enterWorld'))}</button></span>`
         }`;
 
       row.querySelector('.delete-char-btn')?.addEventListener('click', (e) => {
@@ -3579,6 +3634,10 @@ async function refreshCharacters(): Promise<void> {
           }
         });
       } else {
+        row.querySelector('.paid-rename-btn')?.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openPaidRenameEditor(row, c);
+        });
         row.querySelector('.enter-world-btn')?.addEventListener('click', (e) => {
           e.stopPropagation();
           void enterWorld(c, e.currentTarget as HTMLButtonElement);
@@ -5112,6 +5171,54 @@ async function startWalletVerifyFlow(forcePicker = false): Promise<void> {
     console.error('[wallet] open modal failed', err);
     flashWalletError(t('wallet.verifyFailed'));
   }
+}
+
+// Ensure this account has a linked Solana wallet to pay with $WOC — connecting
+// and signing-to-link as needed. Returns the linked pubkey, or null if the user
+// backed out at any step.
+async function ensureWalletLinked(): Promise<string | null> {
+  const wallet = await loadWallet();
+  let state = wallet.currentWallet();
+  if (!state.isConnected || !state.address) {
+    await wallet.openWalletModal();
+    state = wallet.currentWallet();
+    if (!state.isConnected || !state.address) return null;
+  }
+  if (linkedWalletPubkey !== state.address) {
+    await runWalletLink(state.address);
+    if (linkedWalletPubkey !== state.address) return null;
+  }
+  return state.address;
+}
+
+// Full $WOC identity payment: ensure wallet → quote → burn → confirm, polling
+// confirm until Solana finalization lands. `onStatus` surfaces progress to the
+// caller's UI. Resolves with the applied-action body; throws on failure.
+async function payWocIdentity(
+  body: { kind: string; characterId?: number; name: string },
+  onStatus: (msg: string) => void,
+): Promise<any> {
+  const linked = await ensureWalletLinked();
+  if (!linked) throw new Error(t('woc.linkWalletFirst'));
+  onStatus(t('woc.quoting'));
+  const quote = await api.identityQuote(body);
+  const wallet = await loadWallet();
+  onStatus(t('woc.approveBurn', { amount: formatWoc(quote.priceWoc) }));
+  const signature = await wallet.payWocBurn(quote);
+  onStatus(t('woc.confirming'));
+  // payWocBurn already waited for 'confirmed'; the server requires 'finalized',
+  // so poll confirm (it returns reason:'not_finalized' until then).
+  for (let attempt = 0; attempt < 24; attempt++) {
+    const r = await api.identityConfirm(quote.quoteId, signature);
+    if (r.ok) {
+      void refreshWocBalance(linked);
+      return r.data;
+    }
+    if (r.reason !== 'not_finalized') throw new Error(r.data?.error ?? t('woc.confirmFailed'));
+    onStatus(t('woc.finalizing'));
+    await new Promise((resolve) => window.setTimeout(resolve, 2500));
+  }
+  throw new Error(t('woc.finalizeTimeout'));
 }
 
 async function onWalletButtonClick(): Promise<void> {

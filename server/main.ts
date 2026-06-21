@@ -27,7 +27,12 @@ import {
   handleEmailUnsubscribe,
   verifyLoginTwoFactor,
 } from './account';
-import { handleIdentityConfirm, handleIdentityQuote, registerIdentityActions } from './identity';
+import {
+  handleIdentityConfirm,
+  handleIdentityPrices,
+  handleIdentityQuote,
+  registerIdentityActions,
+} from './identity';
 import { makeIdentityActions } from './identity_actions';
 import { validateGuildName } from './social';
 import { handleAdminApi } from './admin';
@@ -1289,6 +1294,9 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       return handleWocBalance(res, owner, fresh);
     }
     // $WOC-paid identity actions: quote a burn price, then redeem the signature.
+    if (req.method === 'GET' && url === '/api/identity/prices') {
+      return handleIdentityPrices(res);
+    }
     if (req.method === 'POST' && url === '/api/identity/quote') {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;

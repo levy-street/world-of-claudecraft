@@ -2382,6 +2382,9 @@ export const zh_CN: EnTranslations = {
     "renameRequired": "需要改名",
     "delete": "删除",
     "rename": "改名",
+    "renamePaidButton": "Pay {amount} $WOC & Rename",
+    "renamePriceHint": "A voluntary rename burns {amount} $WOC.",
+    "renameCancel": "Cancel",
     "newNamePlaceholder": "新角色名称",
     "tabCharacters": "角色",
     "tabCreate": "创建",
@@ -2396,6 +2399,18 @@ export const zh_CN: EnTranslations = {
     "sortName": "名称",
     "sortRecent": "最近游玩",
     "sortPlaytime": "游戏时长"
+  },
+  "woc": {
+    "linkWalletFirst": "Connect and link a Solana wallet to pay with $WOC.",
+    "quoting": "Preparing your $WOC payment…",
+    "approveBurn": "Approve the {amount} $WOC burn in your wallet…",
+    "confirming": "Confirming the burn on-chain…",
+    "finalizing": "Waiting for Solana finalization…",
+    "confirmFailed": "The $WOC payment could not be verified.",
+    "finalizeTimeout": "Timed out waiting for finalization. If $WOC was burned, reopen and retry — the payment settles once it finalizes.",
+    "renameSuccess": "Renamed to {name}.",
+    "guildRenameSuccess": "Guild renamed to {name}.",
+    "reserveSuccess": "Reserved the name {name}."
   },
   "deleteCharacter": {
     "title": "删除角色",
