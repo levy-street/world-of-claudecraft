@@ -101,6 +101,8 @@ import {
 import { createNativeAttestationChallenge, verifyNativeAttestation } from './native_attestation';
 import { handleOAuth, seedOAuthClients } from './oauth';
 import { pruneExpiredOAuthGrants } from './oauth_db';
+import { withPayoutKeeperLock } from './payout_db';
+import { buildPayoutKeeper } from './payout_keeper';
 import { handlePerfReport } from './perf_report';
 import {
   captureReferral,
@@ -147,6 +149,9 @@ import { handleWocBalance, parseWocBalanceQuery } from './woc_balance';
 import { bufferHandshakeMessages } from './ws_buffer';
 
 const PORT = Number(process.env.PORT ?? 8787);
+// How often the buyback keeper ticks. Its own policy decides whether a tick does
+// anything (threshold / cadence / fee floor), so this is just the poll interval.
+const PAYOUT_KEEPER_TICK_MS = Number(process.env.BUYBACK_KEEPER_TICK_MS ?? 5 * 60 * 1000);
 const STATIC_DIR = path.join(__dirname, '..', 'dist');
 // DEPRECATED: the standalone community MediaWiki is being retired in favour of the
 // curated in-app guide, which now serves at /wiki. This constant and its (now removed)
@@ -1378,6 +1383,36 @@ async function main(): Promise<void> {
   };
   warmLeaderboards();
   setInterval(warmLeaderboards, LEADERBOARD_TTL_MS).unref();
+
+  // Buyback keeper: drain the marketplace USDC vault on a cadence — swap to $WOC,
+  // then BURN it (deflationary) or TOP UP the #480 reward pool (recorded as a
+  // verified buyback inflow on the flow ledger). runCycle recovers any in-flight
+  // batch first, so the boot call resolves a crash mid-settle before new work.
+  // No-op unless configured (BUYBACK_VAULT + its signing secret; top_up also needs
+  // REWARD_POOL_VAULT + BUYBACK_SEASON_ID).
+  const payoutKeeper = buildPayoutKeeper();
+  if (payoutKeeper) {
+    // Two layers of mutual exclusion so the vault is never swapped twice at once:
+    // (1) keeperBusy — in-process single-flight, so a slow cycle can't overlap its
+    //     own next interval tick; (2) withPayoutKeeperLock — a cross-process
+    //     Postgres advisory lock, so sibling realm processes sharing this vault +
+    //     DB don't each run a cycle. Either layer alone leaves a double-swap window.
+    let keeperBusy = false;
+    const tick = async () => {
+      if (keeperBusy) return;
+      keeperBusy = true;
+      try {
+        await withPayoutKeeperLock(() => payoutKeeper.runCycle());
+      } catch (err) {
+        console.error('buyback keeper cycle failed:', err);
+      } finally {
+        keeperBusy = false;
+      }
+    };
+    void tick();
+    setInterval(() => void tick(), PAYOUT_KEEPER_TICK_MS).unref();
+    console.log('buyback keeper enabled');
+  }
   console.log('database ready');
 
   const server = http.createServer((req, res) => {

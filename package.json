@@ -68,6 +68,7 @@
     "@noble/curves": "^1.9.7",
     "@solana/wallet-standard-chains": "^1.1.2",
     "@solana/wallet-standard-features": "^1.4.0",
+    "@solana/web3.js": "^1.98.4",
     "@wallet-standard/app": "^1.1.1",
     "@wallet-standard/base": "^1.1.1",
     "@wallet-standard/features": "^1.1.1",
