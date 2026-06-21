@@ -285,7 +285,13 @@ export const fr_CA: EnTranslations = {
       "emittedLabel": "{pct}% of the pool paid out so far",
       "sinkLabel": "Funded",
       "emissionLabel": "Paid out",
-      "invariant": "Payouts can never exceed what the season took in — buy > sell, enforced on-chain."
+      "invariant": "Payouts can never exceed what the season took in — buy > sell, enforced on-chain.",
+      "standingsTitle": "Projected top earners",
+      "colRank": "#",
+      "colPlayer": "Player",
+      "colRating": "Rating",
+      "colReward": "Reward ($WOC)",
+      "projectedNote": "Projected from the current pool + arena ranking; final payouts settle at season close."
     }
   },
   "skinEvent": {

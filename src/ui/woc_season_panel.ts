@@ -4,7 +4,7 @@
 // in plain Node without a DOM. hud.ts sets `el.innerHTML = wocSeasonPanelHtml(view)`
 // and wires the [data-close] click.
 import { t, formatNumber } from './i18n';
-import type { SeasonView } from './woc_season';
+import type { SeasonStandingView, SeasonView } from './woc_season';
 
 // Local HTML escape — the panel interpolates the server-supplied season label, so
 // it must be escaped (the ui/ rule: never innerHTML raw server text).
@@ -17,6 +17,24 @@ function titleBar(): string {
   return `<div class="panel-title"><span>${t('hudChrome.wocSeason.title')} `
     + `<span class="ws-sub">${t('hudChrome.wocSeason.subtitle')}</span></span>`
     + `<button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.wocSeason.close'))}">✕</button></div>`;
+}
+
+// Projected top-earners table: the realm's top arena players and the $WOC each
+// would receive from the current pool if the season closed now.
+function standingsHtml(rows: SeasonStandingView[]): string {
+  const head = `<div class="ws-st-row ws-st-head">`
+    + `<span class="ws-st-rank">${t('hudChrome.wocSeason.colRank')}</span>`
+    + `<span class="ws-st-name">${t('hudChrome.wocSeason.colPlayer')}</span>`
+    + `<span class="ws-st-rating">${t('hudChrome.wocSeason.colRating')}</span>`
+    + `<span class="ws-st-reward">${t('hudChrome.wocSeason.colReward')}</span></div>`;
+  const body = rows.map((r) =>
+    `<div class="ws-st-row"><span class="ws-st-rank">${r.rank}</span>`
+    + `<span class="ws-st-name">${esc(r.name)}</span>`
+    + `<span class="ws-st-rating">${formatNumber(r.rating)}</span>`
+    + `<span class="ws-st-reward">${esc(r.rewardWoc)}</span></div>`).join('');
+  return `<div class="ws-standings"><div class="ws-st-title">${t('hudChrome.wocSeason.standingsTitle')}</div>`
+    + head + body
+    + `<div class="ws-st-note">${t('hudChrome.wocSeason.projectedNote')}</div></div>`;
 }
 
 /** The window's inner HTML for the given view (pure; safe for unit tests). */
@@ -63,5 +81,6 @@ export function wocSeasonPanelHtml(view: SeasonView): string {
     + `<span class="ws-total"><span class="ws-total-k">${t('hudChrome.wocSeason.emissionLabel')}</span> <b>${esc(view.emissionWoc)}</b></span>`
     + `</div>`
     + `<div class="ws-invariant">${t('hudChrome.wocSeason.invariant')}</div>`
+    + (view.standings.length > 0 ? standingsHtml(view.standings) : '')
     + `</div>`;
 }

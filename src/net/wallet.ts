@@ -396,8 +396,15 @@ export interface WocSeasonInfo {
   emissionBase: string;
   poolBase: string;
 }
+export interface WocSeasonStanding {
+  rank: number;
+  name: string;
+  rating: number;
+  rewardBase: string; // base-unit decimal string
+}
 export interface WocSeasonResponse {
   season: WocSeasonInfo | null;
+  standings: WocSeasonStanding[];
   decimals: number;
 }
 

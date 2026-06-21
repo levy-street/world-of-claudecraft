@@ -9,6 +9,7 @@ import type { SeasonView } from '../src/ui/woc_season';
 const base: SeasonView = {
   state: 'active', seasonId: 1, label: 'Season 1', poolWoc: '2700', sinkWoc: '4200',
   emissionWoc: '1500', emittedPct: 35.71, countdown: { days: 3, hours: 6, minutes: 30, totalMs: 1 },
+  standings: [],
 };
 
 describe('wocSeasonPanelHtml', () => {
@@ -51,5 +52,28 @@ describe('wocSeasonPanelHtml', () => {
     const html = wocSeasonPanelHtml({ ...base, label: '<img src=x onerror=alert(1)>' });
     expect(html).not.toContain('<img src=x');
     expect(html).toContain('&lt;img src=x onerror=alert(1)&gt;');
+  });
+
+  it('omits the standings table when there are no standings', () => {
+    expect(wocSeasonPanelHtml(base)).not.toContain('ws-standings');
+  });
+
+  it('renders the projected top-earners table with rank/name/rating/reward', () => {
+    const html = wocSeasonPanelHtml({ ...base, standings: [
+      { rank: 1, name: 'Ada', rating: 1999, rewardWoc: '810' },
+      { rank: 2, name: 'Bo', rating: 1888, rewardWoc: '540' },
+    ] });
+    expect(html).toContain('ws-standings');
+    expect(html).toContain('Projected top earners');
+    expect(html).toContain('>Ada<');
+    expect(html).toContain('>810<');   // rank 1 reward
+    expect(html).toContain('>Bo<');
+    expect(html).toContain('>540<');
+  });
+
+  it('escapes standing player names', () => {
+    const html = wocSeasonPanelHtml({ ...base, standings: [{ rank: 1, name: '<b>x</b>', rating: 1500, rewardWoc: '10' }] });
+    expect(html).not.toContain('<b>x</b>');
+    expect(html).toContain('&lt;b&gt;x&lt;/b&gt;');
   });
 });

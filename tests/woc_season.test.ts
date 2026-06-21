@@ -8,8 +8,9 @@ import {
 } from '../src/ui/woc_season';
 
 const NOW = Date.parse('2026-06-21T00:00:00.000Z');
-const season = (over: Partial<WocSeasonPayload['season'] & object> = {}): WocSeasonPayload => ({
+const season = (over: Partial<NonNullable<WocSeasonPayload['season']>> = {}, standings: WocSeasonPayload['standings'] = []): WocSeasonPayload => ({
   decimals: 6,
+  standings,
   season: {
     seasonId: 1, label: 'Season 1', status: 'active', openedAt: '2026-06-01T00:00:00.000Z',
     endsAt: null, sinkBase: '0', emissionBase: '0', poolBase: '0', ...over,
@@ -34,9 +35,22 @@ describe('baseToWoc (exact, no float rounding)', () => {
 });
 
 describe('formatSeasonView', () => {
-  it('returns the none state for a null payload or a null season', () => {
+  it('returns the none state (and empty standings) for a null payload or a null season', () => {
     expect(formatSeasonView(null, NOW).state).toBe('none');
-    expect(formatSeasonView({ season: null, decimals: 6 }, NOW).state).toBe('none');
+    const v = formatSeasonView({ season: null, standings: [], decimals: 6 }, NOW);
+    expect(v.state).toBe('none');
+    expect(v.standings).toEqual([]);
+  });
+
+  it('maps projected standings to exact $WOC reward strings, preserving order', () => {
+    const v = formatSeasonView(season({ poolBase: '2700000000' }, [
+      { rank: 1, name: 'Ada', rating: 1999, rewardBase: '810000000' },
+      { rank: 2, name: 'Bo', rating: 1888, rewardBase: '540000000' },
+    ]), NOW);
+    expect(v.standings).toEqual([
+      { rank: 1, name: 'Ada', rating: 1999, rewardWoc: '810' },
+      { rank: 2, name: 'Bo', rating: 1888, rewardWoc: '540' },
+    ]);
   });
 
   it('derives pool/sink/emission as exact $WOC and the emitted percentage', () => {
