@@ -284,6 +284,18 @@ CREATE TABLE IF NOT EXISTS sns_subdomains (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS sns_subdomains_account ON sns_subdomains(account_id);
+-- Buyback-and-burn ledger (PRD: docs/prd/woc/character-marketplace.md). Each row
+-- is one keeper cycle: USDC fees swapped to $WOC and burned, fully auditable —
+-- every swap + burn signature is recorded so the public transparency counter is
+-- backed by on-chain proof, never a self-reported number.
+CREATE TABLE IF NOT EXISTS woc_burn_batches (
+  id BIGSERIAL PRIMARY KEY,
+  usdc_in_base BIGINT NOT NULL,
+  woc_out_base BIGINT NOT NULL,
+  swap_sig TEXT NOT NULL,
+  burn_sig TEXT NOT NULL UNIQUE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
 `;
 
 export async function ensureSchema(): Promise<void> {
@@ -710,6 +722,38 @@ export async function characterByBoundDomain(fullDomain: string): Promise<Charac
     [fullDomain, REALM],
   );
   return res.rows[0] ?? null;
+}
+
+// ── Buyback-and-burn ledger ────────────────────────────────────────────────
+
+export async function recordBurnBatch(row: {
+  usdcInBase: bigint;
+  wocOutBase: bigint;
+  swapSig: string;
+  burnSig: string;
+}): Promise<{ id: number } | null> {
+  try {
+    const res = await pool.query(
+      `INSERT INTO woc_burn_batches (usdc_in_base, woc_out_base, swap_sig, burn_sig)
+       VALUES ($1, $2, $3, $4) RETURNING id`,
+      [String(row.usdcInBase), String(row.wocOutBase), row.swapSig, row.burnSig],
+    );
+    return { id: Number(res.rows[0].id) };
+  } catch (err) {
+    if (isUniqueViolation(err)) return null; // burn_sig already recorded
+    throw err;
+  }
+}
+
+// Lifetime totals for the public transparency counter (base units, as strings to
+// survive Number precision).
+export async function buybackTotals(): Promise<{ usdcInBase: string; wocBurnedBase: string; batches: number }> {
+  const res = await pool.query(
+    `SELECT COALESCE(SUM(usdc_in_base), 0)::text AS usdc, COALESCE(SUM(woc_out_base), 0)::text AS woc, count(*)::int AS n
+     FROM woc_burn_batches`,
+  );
+  const row = res.rows[0];
+  return { usdcInBase: row?.usdc ?? '0', wocBurnedBase: row?.woc ?? '0', batches: row?.n ?? 0 };
 }
 
 // Reassign a bound character to a new account (a completed on-chain transfer).

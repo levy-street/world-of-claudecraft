@@ -40,6 +40,23 @@ export const SNS_PARENT_DOMAIN = (process.env.SNS_PARENT_DOMAIN ?? 'worldofclaud
 // signer unavailable (mint paths refuse rather than using a bogus key).
 export const EXECUTION_WALLET_SECRET = (process.env.EXECUTION_WALLET_SECRET ?? '').trim();
 
+// ── Buyback-and-burn engine (PR #736 / #798 / #469 shared core) ──────────────
+// A keeper batches USDC accrued from marketplace fees, swaps it to $WOC on a DEX
+// aggregator (Jupiter), and burns the proceeds. Off by default; the keeper wallet
+// is the only custodial seam and holds nothing but in-flight fee USDC + a little
+// SOL. Never promise price/return — this is protocol-owned deflation, not yield.
+export const BUYBACK_ENABLED = boolEnv(process.env.BUYBACK_ENABLED, false);
+// base58 secret of the keeper wallet that custodies the fee vault USDC, executes
+// the swap, and signs the burn. Store via KMS/secret manager; never commit.
+export const BUYBACK_KEEPER_SECRET = (process.env.BUYBACK_KEEPER_SECRET ?? '').trim();
+// Don't swap dust: only run once at least this much USDC (human units) is pooled.
+export const BUYBACK_MIN_BATCH_USDC = numEnv(process.env.BUYBACK_MIN_BATCH_USDC, 50);
+// Max acceptable slippage on the USDC→$WOC swap, in basis points (default 1%).
+export const BUYBACK_SLIPPAGE_BPS = clampInt(process.env.BUYBACK_SLIPPAGE_BPS, 100, 1, 5000);
+export const JUPITER_API = (process.env.JUPITER_API ?? 'https://quote-api.jup.ag').replace(/\/$/, '');
+// USDC has 6 decimals on Solana.
+export const USDC_DECIMALS = 6;
+
 function boolEnv(v: string | undefined, dflt: boolean): boolean {
   if (v === undefined) return dflt;
   return /^(1|true|yes|on)$/i.test(v.trim());

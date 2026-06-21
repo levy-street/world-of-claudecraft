@@ -27,8 +27,9 @@ import { handleIdentityQuote, handleIdentityConfirm, handleIdentityPrices, regis
 import { makeIdentityActions } from './identity_actions';
 import { handleSubdomainQuote, handleSubdomainConfirm } from './subdomain_mint';
 import { handleCharacterClaim, registerClaimHooks, accountControlsBoundCharacter } from './character_claim';
-import { CHARACTER_TRADEABLE } from './woc_config';
-import { getCharacterAnyAccount } from './db';
+import { CHARACTER_TRADEABLE, WOC_DECIMALS, USDC_DECIMALS } from './woc_config';
+import { getCharacterAnyAccount, buybackTotals } from './db';
+import { runBuybackBurn, buybackReady } from './buyback';
 import { validateGuildName } from './social';
 import { handleCardUpload, handleCardRoutes, captureReferral } from './player_card';
 import { handleAdminApi } from './admin';
@@ -616,6 +617,11 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     if (req.method === 'GET' && url === '/api/identity/prices') {
       return handleIdentityPrices(res);
     }
+    // Public buyback-and-burn transparency: lifetime USDC recycled + $WOC burned.
+    if (req.method === 'GET' && url === '/api/buyback/stats') {
+      const totals = await buybackTotals();
+      return json(res, 200, { ...totals, wocDecimals: WOC_DECIMALS, usdcDecimals: USDC_DECIMALS });
+    }
     if (req.method === 'POST' && url === '/api/identity/quote') {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
@@ -685,6 +691,16 @@ async function main(): Promise<void> {
   setInterval(() => {
     void pruneChatLogs(CHAT_LOG_RETENTION_DAYS).catch((err) => console.error('chat log prune failed:', err));
   }, 24 * 3600 * 1000).unref();
+  // Buyback-and-burn keeper cadence (off unless BUYBACK_ENABLED + keeper set).
+  // Fixed interval, no discretionary timing — every cycle is on-chain + logged.
+  if (buybackReady()) {
+    const intervalMs = Number(process.env.BUYBACK_INTERVAL_MS ?? 6 * 3600 * 1000);
+    setInterval(() => {
+      void runBuybackBurn()
+        .then((r) => console.log('[buyback]', r.status))
+        .catch((err) => console.error('[buyback] cycle failed:', err));
+    }, intervalMs).unref();
+  }
   // keep both leaderboard caches warm so the first viewer never waits on the
   // query and it never recomputes per request (PR-3)
   const warmLeaderboards = () => {
