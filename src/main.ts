@@ -13,6 +13,7 @@ import { activePvpOpponentIds, handlePickedEntity, hoverCursorKind, isAttackable
 import { clickMoveShouldCancel, clickMoveShouldWalk, clickMoveStep, distance2d, latencyAdjustedStopDistance, stepAngleToward } from './game/click_move';
 import { Api, ClientWorld, CharacterSummary, type ReleaseEntry } from './net/online';
 import { setWalletDisplayAvailable, setWocBalance, setWalletUiEnabled, resolveWocBalanceUpdate } from './ui/wallet_balance';
+import { setWocSeason, setWocSeasonUiEnabled } from './ui/woc_season';
 import { absolutePublishedCardUrl, setCardUploader, setReferralProvider, setStandingProvider } from './ui/player_card_share';
 // The wallet module is loaded lazily via dynamic import() in the wallet
 // controller below, so it stays out of the main entry chunk and only loads when
@@ -3471,6 +3472,7 @@ async function switchWallet(): Promise<void> {
 
 function wireWallet(): void {
   setWalletUiEnabled(WALLET_ENABLED);
+  setWocSeasonUiEnabled(WALLET_ENABLED);
   syncWalletCharacterScreenVisibility();
   const btn = document.getElementById('btn-wallet');
   if (!btn) return;
@@ -3491,6 +3493,11 @@ function wireWallet(): void {
   // Load the wallet chunk (separate async bundle), then subscribe to changes and
   // init so a persisted connection is reflected on the character screen.
   loadWallet().then((wallet) => {
+    // Poll the global $WOC reward season + pool (independent of any wallet
+    // connection) and push it to the season panel (see ui/woc_season.ts).
+    const refreshSeason = (): void => { void wallet.fetchWocSeason().then(setWocSeason); };
+    refreshSeason();
+    window.setInterval(refreshSeason, 60_000);
     wallet.onWalletChange((state) => {
       if (state.address) void refreshWocBalance(state.address);
       else connectedWocBalance = null;

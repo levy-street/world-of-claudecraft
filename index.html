@@ -1005,6 +1005,33 @@
 
   /* lifetime-XP leaderboard panel (modeled on the quest-log window) */
   #leaderboard-window { width: 480px; }
+
+  /* $WOC reward-season panel (woc_season_panel.ts) */
+  #woc-season-window { width: 420px; }
+  #woc-season-window .ws-sub { color: #998d6a; font-size: 11px; font-weight: 400; }
+  .ws-body { margin-top: 10px; display: flex; flex-direction: column; gap: 12px; }
+  .ws-body-empty { gap: 6px; padding: 14px 4px; text-align: center; }
+  .ws-empty { font-size: 13px; color: #d8cfa6; }
+  .ws-empty-hint { font-size: 11px; color: #8d8262; }
+  .ws-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .ws-name { font-size: 15px; font-weight: 600; color: #e7dcb4; }
+  .ws-status { font-size: 10px; text-transform: uppercase; letter-spacing: .08em; padding: 2px 9px; border-radius: 10px; border: 1px solid transparent; }
+  .ws-status-active { color: #7bd88f; border-color: #2f6b3d; background: #173021; }
+  .ws-status-ended { color: #b9ac82; border-color: #4a4633; background: #211f17; }
+  .ws-timing { font-size: 12px; color: #b9ac82; }
+  .ws-timing-value { color: #e7dcb4; font-weight: 600; }
+  .ws-timing-ended, .ws-timing-open { color: #8d8262; font-style: italic; }
+  .ws-pool { text-align: center; padding: 8px 0; border-top: 1px solid #322c1d; border-bottom: 1px solid #322c1d; }
+  .ws-pool-label { font-size: 11px; color: #998d6a; text-transform: uppercase; letter-spacing: .05em; }
+  .ws-pool-amt { font-size: 30px; font-weight: 800; color: #f2d98a; margin-top: 4px; }
+  .ws-pool-amt .ws-unit { font-size: 14px; font-weight: 600; color: #b9ac82; }
+  .ws-bar { height: 8px; border-radius: 5px; background: #221d12; overflow: hidden; border: 1px solid #322c1d; }
+  .ws-bar-fill { height: 100%; background: linear-gradient(90deg, #c9a13b, #f2d98a); }
+  .ws-bar-cap { font-size: 11px; color: #998d6a; text-align: center; }
+  .ws-totals { display: flex; justify-content: space-between; font-size: 12px; color: #b9ac82; }
+  .ws-total-k { color: #8d8262; }
+  .ws-total b { color: #e7dcb4; }
+  .ws-invariant { font-size: 11px; color: #8d8262; text-align: center; line-height: 1.5; border-top: 1px solid #322c1d; padding-top: 10px; }
   .lb-body { margin-top: 8px; max-height: 56vh; overflow-y: auto; }
   .lb-loading, .lb-empty { font-size: 12px; color: #b9ac82; padding: 10px 4px; text-align: center; }
   .lb-row { display: grid; grid-template-columns: 44px 1fr 44px 48px 96px; align-items: center; gap: 6px; padding: 4px 8px; font-size: 12px; border-radius: 3px; }
@@ -7266,6 +7293,7 @@
     </div>
     <div id="arena-window" class="window panel"></div>
     <div id="leaderboard-window" class="window panel"></div>
+    <div id="woc-season-window" class="window panel"></div>
     <div id="market-window" class="window panel"></div>
     <div id="arena-status"></div>
     <div id="options-menu" class="window panel"></div>
@@ -7281,6 +7309,7 @@
       <button class="micro-btn" id="mm-bag" data-i18n-title="itemUi.bags.title" data-i18n-aria="itemUi.bags.title" title="Bags" aria-label="Bags" data-icon="bags"><span class="keybind">b</span></button>
       <button class="micro-btn" id="mm-arena" data-i18n-title="hud.keybinds.actions.arena" data-i18n-aria="hud.keybinds.actions.arena" title="Arena (Ashen Coliseum)" aria-label="Arena (Ashen Coliseum)" data-icon="arena"><span class="keybind">g</span></button>
       <button class="micro-btn" id="mm-leaderboard" data-i18n-title="game.leaderboard.title" data-i18n-aria="game.leaderboard.title" title="Leaderboard" aria-label="Leaderboard" data-icon="leaderboard"><span class="keybind">k</span></button>
+      <button class="micro-btn" id="mm-woc-season" data-i18n-title="hudChrome.wocSeason.menu" data-i18n-aria="hudChrome.wocSeason.menu" title="$WOC Season" aria-label="$WOC Season" data-icon="crown"></button>
       <button class="micro-btn" id="mm-emote" data-i18n-aria="hudChrome.emoteWheel.label" aria-label="Emotes" data-icon="emote"><span class="keybind">x</span></button>
       <button class="micro-btn" id="mm-music" data-i18n-title="hud.options.music" data-i18n-aria="hud.options.music" title="Music" aria-label="Music" data-icon="music"></button>
       <button class="micro-btn" id="mm-social" data-i18n-title="hud.keybinds.actions.social" data-i18n-aria="hud.keybinds.actions.social" title="Friends &amp; Guild" aria-label="Friends &amp; Guild" data-icon="social"><span class="keybind">o</span></button>

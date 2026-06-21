@@ -380,3 +380,34 @@ export async function fetchWocBalance(owner: string, fresh = false): Promise<num
     return null;
   }
 }
+
+// ── $WOC reward season ────────────────────────────────────────────────────────
+// Read of the server's flow-ledger season state (GET /api/woc/season): the
+// current reward season + its pool (verified sinks − emissions). Public + cheap.
+// The shape is kept structurally identical to ui/woc_season.ts `WocSeasonPayload`
+// (the wire contract); main.ts pushes the result into that UI state holder.
+export interface WocSeasonInfo {
+  seasonId: number;
+  label: string;
+  status: 'active' | 'closed' | 'finalized';
+  openedAt: string;
+  endsAt: string | null;
+  sinkBase: string;
+  emissionBase: string;
+  poolBase: string;
+}
+export interface WocSeasonResponse {
+  season: WocSeasonInfo | null;
+  decimals: number;
+}
+
+export async function fetchWocSeason(): Promise<WocSeasonResponse | null> {
+  try {
+    const res = await fetch('/api/woc/season');
+    if (!res.ok) return null;
+    return (await res.json()) as WocSeasonResponse;
+  } catch (err) {
+    console.error('[wallet] $WOC season read failed', err);
+    return null;
+  }
+}

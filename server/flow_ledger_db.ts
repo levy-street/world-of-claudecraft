@@ -22,8 +22,10 @@ CREATE TABLE IF NOT EXISTS woc_seasons (
   label      TEXT NOT NULL DEFAULT '',
   status     TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active','closed','finalized')),
   opened_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  ends_at    TIMESTAMPTZ,
   closed_at  TIMESTAMPTZ
 );
+ALTER TABLE woc_seasons ADD COLUMN IF NOT EXISTS ends_at TIMESTAMPTZ;
 
 CREATE TABLE IF NOT EXISTS woc_flow_ledger (
   entry_id    BIGSERIAL PRIMARY KEY,
@@ -164,4 +166,72 @@ export class PgFlowLedgerDb implements FlowLedgerDb {
       client.release();
     }
   }
+}
+
+function toIso(v: unknown): string | null {
+  if (v == null) return null;
+  return v instanceof Date ? v.toISOString() : String(v);
+}
+
+// Public read model for the active reward season + its pool. `poolBase` is the
+// flow-ledger headroom (verified sinks − emissions): the $WOC currently available
+// to pay out this season. All amounts are base-unit decimal strings.
+export interface WocSeasonStatus {
+  seasonId: number;
+  label: string;
+  status: 'active' | 'closed' | 'finalized';
+  openedAt: string;
+  endsAt: string | null;
+  sinkBase: string;
+  emissionBase: string;
+  poolBase: string;
+}
+
+// The current reward season (the most recently opened still-active one) plus its
+// pool totals, or null when no season is open. Read-only; safe to expose publicly
+// (everything here is derived from on-chain-verified flows).
+export async function activeSeasonStatus(): Promise<WocSeasonStatus | null> {
+  // At most one season is active in normal operation (a roll closes the old
+  // before opening the new); if several are somehow active, the most recently
+  // opened wins, with season_id as a stable tiebreak.
+  const s = await pool.query(
+    `SELECT season_id, label, status, opened_at, ends_at
+       FROM woc_seasons WHERE status = 'active' ORDER BY opened_at DESC, season_id DESC LIMIT 1`,
+  );
+  if (s.rowCount === 0) return null;
+  const row = s.rows[0];
+  const agg = await pool.query(
+    `SELECT COALESCE(SUM(amount_base) FILTER (WHERE direction='in'), 0)::text  AS sink,
+            COALESCE(SUM(amount_base) FILTER (WHERE direction='out'), 0)::text AS emission
+       FROM woc_flow_ledger WHERE season_id = $1`,
+    [row.season_id],
+  );
+  const sink = bigintOf(agg.rows[0]?.sink ?? '0');
+  const emission = bigintOf(agg.rows[0]?.emission ?? '0');
+  return {
+    seasonId: Number(row.season_id),
+    label: row.label as string,
+    status: row.status as WocSeasonStatus['status'],
+    openedAt: toIso(row.opened_at) ?? '',
+    endsAt: toIso(row.ends_at),
+    sinkBase: sink.toString(),
+    emissionBase: emission.toString(),
+    poolBase: (sink - emission).toString(),
+  };
+}
+
+// Ops: open (or re-open) a season with an optional end time, and close one. Used
+// by the secret-gated /internal/woc/season endpoints and by the #479/#480
+// season-roll jobs. Idempotent.
+export async function openSeason(p: { seasonId: number; label?: string; endsAt?: string | null }): Promise<void> {
+  await pool.query(
+    `INSERT INTO woc_seasons (season_id, label, status, ends_at)
+     VALUES ($1, $2, 'active', $3)
+     ON CONFLICT (season_id) DO UPDATE SET label = EXCLUDED.label, status = 'active', ends_at = EXCLUDED.ends_at, closed_at = NULL`,
+    [p.seasonId, p.label ?? '', p.endsAt ?? null],
+  );
+}
+
+export async function closeSeason(seasonId: number): Promise<void> {
+  await pool.query(`UPDATE woc_seasons SET status = 'closed', closed_at = now() WHERE season_id = $1`, [seasonId]);
 }
