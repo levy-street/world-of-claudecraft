@@ -1,0 +1,58 @@
+<svg viewBox="0 0 860 452" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica, Arial, sans-serif" role="img">
+  <title>Feature status</title>
+  <desc>What is shipped and verified, what was hardened, and what remains pending on a funded or deployed environment.</desc>
+  <rect x="0" y="0" width="860" height="452" rx="14" fill="#FBFAF7" stroke="#E5E2D9"/>
+  <text x="40" y="48" font-size="23" font-weight="500" fill="#2C2C2A">Where it's at</text>
+
+  <g font-size="13">
+    <rect x="40" y="64" width="168" height="30" rx="15" fill="#EAF3DE" stroke="#3B6D11"/>
+    <text x="124" y="84" font-size="13" font-weight="500" fill="#173404" text-anchor="middle">2572 tests passing</text>
+    <rect x="218" y="64" width="158" height="30" rx="15" fill="#E1F5EE" stroke="#0F6E56"/>
+    <text x="297" y="84" font-size="13" font-weight="500" fill="#04342C" text-anchor="middle">verified on devnet</text>
+    <rect x="386" y="64" width="196" height="30" rx="15" fill="#E6F1FB" stroke="#185FA5"/>
+    <text x="484" y="84" font-size="13" font-weight="500" fill="#0C447C" text-anchor="middle">PR #739 ready for review</text>
+  </g>
+
+  <!-- Column 1: shipped -->
+  <text x="40" y="132" font-size="15" font-weight="500" fill="#04342C">Shipped &amp; verified</text>
+  <line x1="40" y1="142" x2="288" y2="142" stroke="#9FE1CB" stroke-width="2"/>
+  <g font-size="12.5" fill="#2C2C2A">
+    <text x="40" y="168"><tspan fill="#0F6E56" font-weight="500">✓ </tspan>Phase 1: USDC purchase + grant</text>
+    <text x="40" y="194"><tspan fill="#0F6E56" font-weight="500">✓ </tspan>Opaque cosmetic-id carrier</text>
+    <text x="40" y="220"><tspan fill="#0F6E56" font-weight="500">✓ </tspan>On-chain split verify (70/30)</text>
+    <text x="40" y="246"><tspan fill="#0F6E56" font-weight="500">✓ </tspan>Atomic, replay-guarded redeem</text>
+    <text x="40" y="272"><tspan fill="#0F6E56" font-weight="500">✓ </tspan>Phase 2: buy-and-burn keeper</text>
+    <text x="40" y="298"><tspan fill="#0F6E56" font-weight="500">✓ </tspan>Public burn ledger</text>
+    <text x="40" y="324"><tspan fill="#0F6E56" font-weight="500">✓ </tspan>Devnet end-to-end (REST + grant)</text>
+  </g>
+
+  <!-- Column 2: hardened -->
+  <text x="312" y="132" font-size="15" font-weight="500" fill="#0C447C">Hardened</text>
+  <line x1="312" y1="142" x2="560" y2="142" stroke="#B5D4F4" stroke-width="2"/>
+  <g font-size="12.5" fill="#2C2C2A">
+    <text x="312" y="168"><tspan fill="#185FA5" font-weight="500">✓ </tspan>2 adversarial review rounds</text>
+    <text x="312" y="194"><tspan fill="#185FA5" font-weight="500">✓ </tspan>Keeper concurrency lock</text>
+    <text x="312" y="220"><tspan fill="#185FA5" font-weight="500">✓ </tspan>Crash-recovery by signature</text>
+    <text x="312" y="246"><tspan fill="#185FA5" font-weight="500">✓ </tspan>Same-quote double-charge guard</text>
+    <text x="312" y="272"><tspan fill="#185FA5" font-weight="500">✓ </tspan>Token-2022 fail-closed</text>
+    <text x="312" y="298"><tspan fill="#185FA5" font-weight="500">✓ </tspan>+66 edge / error / output tests</text>
+    <text x="312" y="324"><tspan fill="#185FA5" font-weight="500">✓ </tspan>Quality + LARP pass</text>
+  </g>
+
+  <!-- Column 3: pending -->
+  <text x="600" y="132" font-size="15" font-weight="500" fill="#854F0B">Pending — needs env</text>
+  <line x1="600" y1="142" x2="820" y2="142" stroke="#FAC775" stroke-width="2"/>
+  <g font-size="12.5" fill="#2C2C2A">
+    <text x="600" y="168"><tspan fill="#BA7517" font-weight="500">○ </tspan>Mainnet keeper smoke burn</text>
+    <text x="618" y="188" font-size="11" fill="#5F5E5A">(Jupiter is mainnet-only)</text>
+    <text x="600" y="214"><tspan fill="#BA7517" font-weight="500">○ </tspan>Browser skin render</text>
+    <text x="618" y="234" font-size="11" fill="#5F5E5A">(needs a WebGL browser)</text>
+    <text x="600" y="260"><tspan fill="#BA7517" font-weight="500">○ </tspan>Locale translations</text>
+    <text x="618" y="280" font-size="11" fill="#5F5E5A">(maintainer release batch-fill)</text>
+  </g>
+
+  <line x1="40" y1="360" x2="820" y2="360" stroke="#E5E2D9" stroke-width="1"/>
+  <text x="40" y="388" font-size="13" font-weight="500" fill="#2C2C2A">Next step to go live:</text>
+  <text x="40" y="410" font-size="12.5" fill="#444441">run scripts/burn-keeper-preflight.mjs (read-only, no funds) → fund the vault → mainnet runbook.</text>
+  <text x="40" y="432" font-size="12" fill="#5F5E5A">Marketplace is off until MARKETPLACE_BURN_VAULT is set; the keeper is off until its signing secret is set.</text>
+</svg>
