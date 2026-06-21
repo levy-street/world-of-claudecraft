@@ -189,27 +189,29 @@ export function mergeRealmDirectory(
   env: readonly RealmEntry[],
   db: readonly DbRealmSummary[],
 ): DirectoryEntry[] {
+  const byName = new Map<string, DbRealmSummary>();
+  for (const r of db) byName.set(r.name.toLowerCase(), r);
+
   const out: DirectoryEntry[] = [];
   const seen = new Set<string>();
   for (const e of env) {
     const key = e.name.toLowerCase();
     if (seen.has(key)) continue;
     seen.add(key);
-    const row = db.find((r) => r.name.toLowerCase() === key);
+    const row = byName.get(key);
     out.push({
       name: e.name,
       url: e.url,
       type: e.type,
       realmId: row?.realmId ?? null,
       status: row?.status ?? 'active',
-      owned: row ? row.ownerAccountId != null : false,
+      owned: row != null && row.ownerAccountId != null,
       tier: row?.tier ?? 0,
     });
   }
   for (const r of db) {
     const key = r.name.toLowerCase();
-    if (seen.has(key)) continue;
-    if (r.status !== 'active') continue;
+    if (seen.has(key) || r.status !== 'active') continue;
     seen.add(key);
     out.push({
       name: r.name,
