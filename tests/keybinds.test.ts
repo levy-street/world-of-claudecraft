@@ -93,8 +93,27 @@ describe('Keybinds defaults', () => {
     expect(kb.actionForCode('Equal')).toBe('slot11');
     expect(kb.actionForCode('KeyH')).toBe('targetFriendly');
     expect(kb.actionForCode('KeyJ')).toBe('targetFriendlyNext');
+    expect(kb.actionForCode('KeyY')).toBe('meters'); // moved off KeyH (collided with targetFriendly)
     expect(kb.actionForCode('KeyU')).toBe('discord');
     expect(kb.actionForCode('KeyZ')).toBe(null);
+  });
+
+  it('has no duplicate default code across non-shared actions', () => {
+    // A code on two non-shared actions makes the later one (in BIND_ACTIONS order)
+    // unreachable from its default: actionForCode returns the first match. This
+    // shipped once: meters and targetFriendly both defaulted to KeyH, so the
+    // Damage Meters key did nothing. Guard every default, not just that pair.
+    const seen = new Map<string, string>();
+    const dupes: string[] = [];
+    for (const a of BIND_ACTIONS) {
+      if (actionAllowsShared(a.id)) continue; // attackMove intentionally shares turnLeft's key
+      for (const code of a.defaults) {
+        const owner = seen.get(code);
+        if (owner) dupes.push(`${code}: ${owner} & ${a.id}`);
+        else seen.set(code, a.id);
+      }
+    }
+    expect(dupes).toEqual([]);
   });
 
   it('exposes primary/secondary codes and labels', () => {
@@ -233,7 +252,7 @@ describe('persistence', () => {
     expect(kb.actionForCode('KeyH')).toBe('targetFriendly');
     expect(kb.actionForCode('Enter')).toBe('chat');
     expect(kb.actionForCode('Equal')).toBe('slot11');
-    expect(kb.actionForCode('KeyY')).toBe(null);
+    expect(kb.actionForCode('KeyY')).toBe('meters'); // missing from the save, keeps its default
   });
 
   it('drops a retained default that a stored binding already claimed', () => {
@@ -286,7 +305,7 @@ describe('per-character scope', () => {
     // Bob never inherits Alice's change; he starts from defaults.
     expect(bob.actionForCode('KeyZ')).toBe(null);
     expect(bob.codeAt('jump', 0)).toBe('Space');
-    bob.bind('jump', 0, 'KeyY'); // also unbound by default
+    bob.bind('jump', 0, 'KeyY'); // KeyY now defaults to meters; rebinding steals it
     // Reloading each scope reads back only its own profile.
     expect(new Keybinds('char:alice').actionForCode('KeyZ')).toBe('jump');
     expect(new Keybinds('char:bob').actionForCode('KeyY')).toBe('jump');
