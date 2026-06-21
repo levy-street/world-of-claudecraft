@@ -64,6 +64,7 @@
     "sim:nythraxis-matrix": "tsx scripts/nythraxis_matrix.ts"
   },
   "dependencies": {
+    "@bonfida/spl-name-service": "^3.0.23",
     "@capacitor/live-updates": "^0.5.0",
     "@noble/curves": "^1.9.7",
     "@reown/appkit": "^1.8.21",

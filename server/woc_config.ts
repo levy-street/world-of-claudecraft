@@ -24,6 +24,27 @@ export const USDC_MINT = (
   process.env.USDC_MINT ?? 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
 ).trim();
 
+// ── SNS subdomains + tradeable characters (PR #735) ──────────────────────────
+// All of the subdomain/tradeable surface is gated behind these flags and stays
+// OFF until the project controls SNS_PARENT_DOMAIN and funds the execution
+// wallet. SNS_ENABLED turns on minting; CHARACTER_TRADEABLE additionally makes
+// a bound character's controller follow on-chain subdomain ownership.
+export const SNS_ENABLED = boolEnv(process.env.SNS_ENABLED, false);
+export const CHARACTER_TRADEABLE = boolEnv(process.env.CHARACTER_TRADEABLE, false);
+// The project-owned parent domain that subdomains are minted under (no trailing
+// .sol needed; normalized to bare label list by sns.ts).
+export const SNS_PARENT_DOMAIN = (process.env.SNS_PARENT_DOMAIN ?? 'worldofclaudecraft.sol').trim();
+// base58-encoded secret key of the execution wallet that owns SNS_PARENT_DOMAIN
+// and co-signs subdomain creation/transfer. The one custodial seam — store it
+// encrypted at rest (KMS/SecretVault), never in git. Empty in dev keeps the
+// signer unavailable (mint paths refuse rather than using a bogus key).
+export const EXECUTION_WALLET_SECRET = (process.env.EXECUTION_WALLET_SECRET ?? '').trim();
+
+function boolEnv(v: string | undefined, dflt: boolean): boolean {
+  if (v === undefined) return dflt;
+  return /^(1|true|yes|on)$/i.test(v.trim());
+}
+
 // $WOC token decimals. Most SPL/pump tokens use 6; override if the canonical
 // mint differs. Used to convert human prices → base units and to build the
 // client-side burnChecked instruction (which is decimal-checked on-chain).
