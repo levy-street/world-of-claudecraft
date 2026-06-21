@@ -91,6 +91,7 @@ import {
   touchLogin,
   updatePasswordHash,
   walletForAccount,
+  withBurnKeeperLock,
 } from './db';
 import { emailAccountCreated } from './email';
 import { GameServer } from './game';
@@ -187,6 +188,19 @@ const CHAT_LOG_RETENTION_DAYS = Number(process.env.CHAT_LOG_RETENTION_DAYS ?? 90
 // whether a tick actually swaps (threshold/cadence); ticking more often just
 // reacts promptly once the cadence elapses. Default 5 min.
 const KEEPER_TICK_MS = Number(process.env.BURN_KEEPER_TICK_MS ?? 5 * 60 * 1000);
+
+// The public marketplace reads (skin registry, burn ledger) are identical across
+// callers and change rarely (registry on curation, ledger on keeper ticks). Serve
+// from a short TTL cache so unbounded anonymous traffic can't put DB-query load on
+// the realm's Postgres pool — the query runs at most once per window per key.
+// (Same compute-once/serve-from-memory shape as the leaderboard + releases caches.)
+const PUBLIC_READ_TTL_MS = 30_000;
+const publicReadCache = new Map<string, { at: number; body: unknown }>();
+function cachedPublicRead(key: string, produce: () => Promise<unknown>): Promise<unknown> {
+  const hit = publicReadCache.get(key);
+  if (hit && Date.now() - hit.at < PUBLIC_READ_TTL_MS) return Promise.resolve(hit.body);
+  return produce().then((body) => { publicReadCache.set(key, { at: Date.now(), body }); return body; });
+}
 // Client performance reports are operational telemetry, not permanent records.
 // Keep enough history for tuning runs while bounding table growth.
 const PERF_REPORT_RETENTION_DAYS = Number(process.env.PERF_REPORT_RETENTION_DAYS ?? 14);
@@ -1310,22 +1324,25 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     // Creator skins marketplace. The registry is public cosmetic metadata; quote
     // + buy are account-scoped and require a linked Solana wallet (the payer).
     if (req.method === 'GET' && url === '/api/skins/registry') {
-      return json(res, 200, { skins: await registrySkins() });
+      return json(res, 200, await cachedPublicRead('registry', async () => ({ skins: await registrySkins() })));
     }
     // Public, factual buy-and-burn ledger — completed burns + cumulative totals.
     // No editorializing (PRD §8.2): raw amounts + explorer-verifiable tx sigs only.
     if (req.method === 'GET' && url === '/api/marketplace/burn-ledger') {
-      const limit = Number(new URLSearchParams((req.url ?? '').split('?')[1] ?? '').get('limit')) || 100;
-      const ledger = await burnLedger(limit);
-      return json(res, 200, {
-        cumulativeWocBurned: ledger.cumulativeWocBurned.toString(),
-        cumulativeUsdcIn: ledger.cumulativeUsdcIn.toString(),
-        batches: ledger.batches.map((b) => ({
-          batchId: b.batchId, source: b.source,
-          usdcIn: b.usdcIn.toString(), wocBought: b.wocBought.toString(), wocBurned: b.wocBurned.toString(),
-          buyTxSig: b.buyTxSig, burnTxSig: b.burnTxSig, executedAt: b.executedAt,
-        })),
+      const limit = Math.max(1, Math.min(500, Math.floor(Number(new URLSearchParams((req.url ?? '').split('?')[1] ?? '').get('limit')) || 100)));
+      const body = await cachedPublicRead(`burn-ledger:${limit}`, async () => {
+        const ledger = await burnLedger(limit);
+        return {
+          cumulativeWocBurned: ledger.cumulativeWocBurned.toString(),
+          cumulativeUsdcIn: ledger.cumulativeUsdcIn.toString(),
+          batches: ledger.batches.map((b) => ({
+            batchId: b.batchId, source: b.source,
+            usdcIn: b.usdcIn.toString(), wocBought: b.wocBought.toString(), wocBurned: b.wocBurned.toString(),
+            buyTxSig: b.buyTxSig, burnTxSig: b.burnTxSig, executedAt: b.executedAt,
+          })),
+        };
       });
+      return json(res, 200, body);
     }
     if (req.method === 'POST' && url.startsWith('/api/marketplace/skins/') && url.endsWith('/quote')) {
       const accountId = await bearerActiveAccount(req, res);
@@ -1445,10 +1462,25 @@ async function main(): Promise<void> {
   // (MARKETPLACE_BURN_VAULT + its signing secret).
   const burnKeeper = buildBurnKeeper();
   if (burnKeeper) {
-    const tick = () =>
-      void burnKeeper.runCycle().catch((err) => console.error('burn keeper cycle failed:', err));
-    tick();
-    setInterval(tick, KEEPER_TICK_MS).unref();
+    // Two layers of mutual exclusion so the vault is never swapped twice at once:
+    // (1) keeperBusy — in-process single-flight, so a slow cycle can't overlap its
+    //     own next interval tick; (2) withBurnKeeperLock — a cross-process Postgres
+    //     advisory lock, so sibling realm processes sharing this vault + DB don't
+    //     each run a cycle. Either layer alone leaves a double-swap window open.
+    let keeperBusy = false;
+    const tick = async () => {
+      if (keeperBusy) return;
+      keeperBusy = true;
+      try {
+        await withBurnKeeperLock(() => burnKeeper.runCycle());
+      } catch (err) {
+        console.error('burn keeper cycle failed:', err);
+      } finally {
+        keeperBusy = false;
+      }
+    };
+    void tick();
+    setInterval(() => void tick(), KEEPER_TICK_MS).unref();
     console.log('buy-and-burn keeper enabled');
   }
   // keep both leaderboard caches warm so the first viewer never waits on the

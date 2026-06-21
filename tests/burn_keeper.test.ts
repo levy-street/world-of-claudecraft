@@ -20,7 +20,7 @@ function fakeStore() {
   const seed = (b: Partial<BurnBatchRow> & { batchId: string; status: BurnBatchRow['status'] }) => {
     batches.set(b.batchId, {
       source: 'marketplace', usdcIn: 0n, wocBought: 0n, wocBurned: 0n, buyTxSig: null, burnTxSig: null,
-      failReason: null, createdAt: new Date(NOW).toISOString(), executedAt: null, ...b,
+      failReason: null, createdAt: new Date(NOW).toISOString(), burnBroadcastAt: null, executedAt: null, ...b,
     });
   };
   const store: BurnStore & { batches: Map<string, BurnBatchRow>; setLast(t: number): void } = {
@@ -32,7 +32,7 @@ function fakeStore() {
       return true;
     },
     async markSwapped(id, woc) { const b = batches.get(id)!; b.status = 'swapped'; b.wocBought = woc; },
-    async markBurning(id, sig) { const b = batches.get(id)!; b.status = 'burning'; b.burnTxSig = sig; },
+    async markBurning(id, sig) { const b = batches.get(id)!; b.status = 'burning'; b.burnTxSig = sig; b.burnBroadcastAt = new Date(NOW).toISOString(); },
     async markBurned(id, woc) { const b = batches.get(id)!; b.status = 'burned'; b.wocBurned = woc; last = NOW; },
     async markFailed(id, reason) { const b = batches.get(id)!; b.status = 'failed'; b.failReason = reason; },
     async openBatches() { return [...batches.values()].filter((b) => ['swapping', 'swapped', 'burning'].includes(b.status)); },
@@ -175,12 +175,36 @@ describe('BurnKeeper.recover — finish in-flight batches by recorded signature'
     expect(store.batches.get('z')!.status).toBe('burned');
   });
 
-  it('fails a stale swap that never confirmed (cannot wedge forever)', async () => {
+  it('fails a stale swap that truly never landed — no $WOC received (cannot wedge forever)', async () => {
     const store = fakeStore();
     store.seed({ batchId: 's', status: 'swapping', buyTxSig: 'swapStale', createdAt: new Date(NOW - 20 * 60 * 1000).toISOString() });
-    const { exec } = fakeExec({ confirm: () => 'unknown' });
+    const { exec, calls } = fakeExec({ confirm: () => 'unknown', received: 0n });
     await keeper(exec, store).recover();
-    expect(store.batches.get('s')!.status).toBe('failed');
+    expect(store.batches.get('s')!.status).toBe('failed'); // USDC stays in the vault for the next cycle
+    expect(calls.signBurn).toHaveLength(0);
+  });
+
+  it('RECOVERS a stale swap that actually landed — burns the received $WOC, never strands it', async () => {
+    const store = fakeStore();
+    store.seed({ batchId: 's2', status: 'swapping', buyTxSig: 'swapLanded', createdAt: new Date(NOW - 20 * 60 * 1000).toISOString() });
+    // The swap signature stays unreadable ('unknown'), but the $WOC delta is
+    // measurable; the follow-on burn confirms normally.
+    const { exec, calls } = fakeExec({ confirm: (s) => (s.startsWith('burn') ? 'confirmed' : 'unknown'), received: 640n });
+    await keeper(exec, store).recover();
+    expect(store.batches.get('s2')!.status).toBe('burned');
+    expect(store.batches.get('s2')!.wocBurned).toBe(640n);
+    expect(calls.signBurn).toEqual([640n]);
+  });
+
+  it('times burning-staleness from burn broadcast, not swap creation (no premature re-burn)', async () => {
+    const store = fakeStore();
+    // Swap created long ago, but the burn was broadcast just now: NOT stale yet.
+    store.seed({ batchId: 'bb', status: 'burning', burnTxSig: 'burnFresh', wocBought: 500n,
+      createdAt: new Date(NOW - 30 * 60 * 1000).toISOString(), burnBroadcastAt: new Date(NOW - 60 * 1000).toISOString() });
+    const { exec, calls } = fakeExec({ confirm: () => 'unknown' });
+    await keeper(exec, store).recover();
+    expect(store.batches.get('bb')!.status).toBe('burning'); // left in flight, NOT re-burned
+    expect(calls.signBurn).toHaveLength(0);
   });
 
   it('leaves a fresh unconfirmed swap in-flight (not yet stale)', async () => {

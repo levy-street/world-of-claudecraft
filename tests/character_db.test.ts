@@ -383,4 +383,22 @@ describe('redeemPurchase — atomic redeem-once + grant', () => {
     expect(order).not.toContain('COMMIT');
     expect(client.release).toHaveBeenCalledTimes(1);
   });
+
+  it('returns false (not throw) on a quote_id unique violation — concurrent same-quote second redeem', async () => {
+    const client = clientStub();
+    const dup = Object.assign(new Error('duplicate key value violates unique constraint "marketplace_sales_quote_id_key"'), { code: '23505' });
+    client.query
+      .mockResolvedValueOnce({}) // BEGIN
+      .mockResolvedValueOnce({ rowCount: 1 }) // INSERT onchain_payments (fresh signature)
+      .mockRejectedValueOnce(dup); // INSERT marketplace_sales -> quote_id already sold
+    dbMock.connect.mockResolvedValueOnce(client);
+
+    await expect(redeemPurchase(params)).resolves.toBe(false); // already_redeemed, not a 500
+
+    const order = sqls(client);
+    expect(order).toContain('ROLLBACK');
+    expect(order).not.toContain('COMMIT');
+    expect(client.query.mock.calls.some((c) => /UPDATE accounts/.test(String(c[0])))).toBe(false); // no grant
+    expect(client.release).toHaveBeenCalledTimes(1);
+  });
 });
