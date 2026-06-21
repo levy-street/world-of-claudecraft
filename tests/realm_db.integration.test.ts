@@ -24,6 +24,7 @@ run('realm_db against real Postgres', () => {
   let db: typeof import('../server/db');
   let realm: typeof import('../server/realm');
   let realmDb: typeof import('../server/realm_db');
+  let stakeDb: typeof import('../server/realm_stake_db');
   let ownerId: number;
   let modId: number;
 
@@ -31,8 +32,9 @@ run('realm_db against real Postgres', () => {
     db = await import('../server/db');
     realm = await import('../server/realm');
     realmDb = await import('../server/realm_db');
+    stakeDb = await import('../server/realm_stake_db');
     // Clean slate so the suite is deterministic on a reused database.
-    await db.pool.query('DROP TABLE IF EXISTS realm_roles, realms CASCADE');
+    await db.pool.query('DROP TABLE IF EXISTS realm_stakes, realm_roles, realms CASCADE');
     // The REAL boot path: applies SCHEMA + SOCIAL_SCHEMA + REALM_SCHEMA, then
     // seeds this process's env realm. If any DDL is invalid this throws here.
     await db.ensureSchema();
@@ -192,5 +194,85 @@ run('realm_db against real Postgres', () => {
     await db.pool.query('DELETE FROM realms WHERE realm_id = $1', [r.realmId]);
     const orphans = await db.pool.query('SELECT 1 FROM realm_roles WHERE realm_id = $1', [r.realmId]);
     expect(orphans.rowCount).toBe(0);
+  });
+
+  it('records a stake with a replay guard, bigint amounts, and a lifecycle', async () => {
+    const r = await realmDb.createProvisioningRealm(db.pool, {
+      name: 'Mal Ganis',
+      type: 'PvP',
+      ownerAccountId: ownerId,
+      tier: 3,
+    });
+    // A whale-scale stake: 1e17 base units, well beyond Number.MAX_SAFE_INTEGER.
+    const amount = 100_000_000_000_000_000n;
+    expect(amount).toBeGreaterThan(BigInt(Number.MAX_SAFE_INTEGER));
+
+    const stake = await stakeDb.insertStake(db.pool, {
+      realmId: r.realmId,
+      accountId: ownerId,
+      ownerWallet: 'OWNERwa11et',
+      pda: 'StakePDA',
+      vault: 'VaultATA',
+      mint: 'MockWocMint',
+      amountBase: amount,
+      tier: 3,
+      lockTxSig: 'locksig_abc',
+    });
+    expect(typeof stake.amountBase).toBe('bigint');
+    expect(stake.amountBase).toBe(amount); // full bigint round-trips, no precision loss
+    expect(stake.status).toBe('locked');
+    expect((await stakeDb.getActiveStakeByRealm(db.pool, r.realmId))?.amountBase).toBe(amount);
+
+    // Replay guard: a second confirm reusing the finalized tx is rejected.
+    const { isUniqueViolation } = await import('../server/http_util');
+    let dup: unknown;
+    await stakeDb
+      .insertStake(db.pool, {
+        realmId: r.realmId,
+        accountId: ownerId,
+        ownerWallet: 'OWNERwa11et',
+        pda: 'StakePDA',
+        vault: 'VaultATA',
+        mint: 'MockWocMint',
+        amountBase: amount,
+        tier: 3,
+        lockTxSig: 'locksig_abc',
+      })
+      .catch((e) => {
+        dup = e;
+      });
+    expect(isUniqueViolation(dup)).toBe(true);
+
+    // Lifecycle: locked -> releasing -> released.
+    expect((await stakeDb.setStakeReleasing(db.pool, stake.stakeId))?.status).toBe('releasing');
+    const released = await stakeDb.setStakeReleased(db.pool, stake.stakeId, 'releasesig_xyz');
+    expect(released?.status).toBe('released');
+    expect(released?.releaseTxSig).toBe('releasesig_xyz');
+    expect(await stakeDb.getActiveStakeByRealm(db.pool, r.realmId)).toBeNull();
+  });
+
+  it('QUARANTINE: a stake never writes to woc_flow_ledger', async () => {
+    const before = await db.pool.query('SELECT count(*)::int AS n FROM woc_flow_ledger');
+    const r = await realmDb.createProvisioningRealm(db.pool, {
+      name: 'Quarantine Realm',
+      type: 'Normal',
+      ownerAccountId: ownerId,
+      tier: 1,
+    });
+    await stakeDb.insertStake(db.pool, {
+      realmId: r.realmId,
+      accountId: ownerId,
+      ownerWallet: 'W',
+      pda: 'P',
+      vault: 'V',
+      mint: 'M',
+      amountBase: 50_000_000n,
+      tier: 1,
+      lockTxSig: 'qsig_1',
+    });
+    const after = await db.pool.query('SELECT count(*)::int AS n FROM woc_flow_ledger');
+    // The stake principal lives only in realm_stakes plus the escrow PDA; it adds
+    // nothing to the emission-headroom ledger. This is the load-bearing invariant.
+    expect(after.rows[0].n).toBe(before.rows[0].n);
   });
 });
