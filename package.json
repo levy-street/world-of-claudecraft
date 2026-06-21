@@ -35,6 +35,7 @@
     "wiki:seed": "node scripts/mediawiki/build_seed.mjs"
   },
   "dependencies": {
+    "@bonfida/spl-name-service": "^3.0.23",
     "@noble/curves": "^1.9.7",
     "@reown/appkit": "^1.8.21",
     "@reown/appkit-adapter-solana": "^1.8.21",
