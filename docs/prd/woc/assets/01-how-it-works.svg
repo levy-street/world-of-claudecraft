@@ -1,0 +1,54 @@
+<svg viewBox="0 0 860 470" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica, Arial, sans-serif" role="img">
+  <title>How a creator-skin purchase works</title>
+  <desc>Buyer pays USDC, the server verifies the on-chain split, 70 percent goes to the creator and 30 percent to the burn vault, which the keeper swaps to WOC and burns.</desc>
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#5F5E5A"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="860" height="470" rx="14" fill="#FBFAF7" stroke="#E5E2D9"/>
+  <text x="40" y="48" font-size="23" font-weight="500" fill="#2C2C2A">Creator skins marketplace — how a purchase works</text>
+  <text x="40" y="74" font-size="14" fill="#5F5E5A">Non-custodial. The server never moves funds — it verifies the on-chain split, then grants the skin. Same 70 / 30 at any price.</text>
+
+  <!-- Buyer -->
+  <rect x="40" y="205" width="158" height="96" rx="10" fill="#F1EFE8" stroke="#888780"/>
+  <text x="119" y="244" font-size="16" font-weight="500" fill="#2C2C2A" text-anchor="middle">Buyer wallet</text>
+  <text x="119" y="268" font-size="13" fill="#444441" text-anchor="middle">pays 10 USDC</text>
+  <text x="119" y="287" font-size="12" fill="#5F5E5A" text-anchor="middle">1 atomic tx + memo</text>
+
+  <!-- Verify -->
+  <rect x="250" y="205" width="170" height="96" rx="10" fill="#E6F1FB" stroke="#185FA5"/>
+  <text x="335" y="240" font-size="16" font-weight="500" fill="#0C447C" text-anchor="middle">Server verifies</text>
+  <text x="335" y="263" font-size="12.5" fill="#185FA5" text-anchor="middle">finalized tx on-chain</text>
+  <text x="335" y="281" font-size="12.5" fill="#185FA5" text-anchor="middle">exact split, memo-bound</text>
+
+  <!-- Creator (top branch) -->
+  <rect x="486" y="96" width="172" height="82" rx="10" fill="#E1F5EE" stroke="#0F6E56"/>
+  <text x="572" y="129" font-size="16" font-weight="500" fill="#04342C" text-anchor="middle">Creator — 70%</text>
+  <text x="572" y="153" font-size="13" fill="#0F6E56" text-anchor="middle">+7 USDC, paid directly</text>
+
+  <!-- Burn vault (bottom branch) -->
+  <rect x="486" y="328" width="172" height="82" rx="10" fill="#FAECE7" stroke="#993C1D"/>
+  <text x="572" y="361" font-size="16" font-weight="500" fill="#4A1B0C" text-anchor="middle">Burn vault — 30%</text>
+  <text x="572" y="385" font-size="13" fill="#993C1D" text-anchor="middle">+3 USDC accrues</text>
+
+  <!-- Keeper -->
+  <rect x="694" y="316" width="148" height="106" rx="10" fill="#EEEDFE" stroke="#534AB7"/>
+  <text x="768" y="349" font-size="16" font-weight="500" fill="#26215C" text-anchor="middle">Keeper</text>
+  <text x="768" y="372" font-size="12" fill="#3C3489" text-anchor="middle">USDC → $WOC</text>
+  <text x="768" y="389" font-size="12" fill="#3C3489" text-anchor="middle">on Jupiter, then</text>
+  <text x="768" y="406" font-size="12.5" font-weight="500" fill="#26215C" text-anchor="middle">burns $WOC</text>
+
+  <!-- arrows -->
+  <line x1="200" y1="253" x2="246" y2="253" stroke="#5F5E5A" stroke-width="2" marker-end="url(#ar)"/>
+  <path d="M422 232 C455 210 455 160 484 140" fill="none" stroke="#5F5E5A" stroke-width="2" marker-end="url(#ar)"/>
+  <path d="M422 274 C455 296 455 346 484 366" fill="none" stroke="#5F5E5A" stroke-width="2" marker-end="url(#ar)"/>
+  <line x1="660" y1="369" x2="690" y2="369" stroke="#5F5E5A" stroke-width="2" marker-end="url(#ar)"/>
+
+  <text x="445" y="190" font-size="11" fill="#0F6E56" text-anchor="middle">70%</text>
+  <text x="445" y="320" font-size="11" fill="#993C1D" text-anchor="middle">30%</text>
+
+  <rect x="40" y="424" width="200" height="26" rx="13" fill="#EAF3DE" stroke="#3B6D11"/>
+  <text x="140" y="441" font-size="12.5" font-weight="500" fill="#173404" text-anchor="middle">verified live on devnet</text>
+  <text x="260" y="441" font-size="12.5" fill="#5F5E5A">burnChecked is a true $WOC supply burn — not a transfer to a dead address.</text>
+</svg>
