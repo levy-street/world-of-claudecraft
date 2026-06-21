@@ -795,5 +795,11 @@ export const hudChromeStrings = {
     sinkLabel: 'Funded',
     emissionLabel: 'Paid out',
     invariant: 'Payouts can never exceed what the season took in: buy > sell, enforced on-chain.',
+    standingsTitle: 'Projected top earners',
+    colRank: '#',
+    colPlayer: 'Player',
+    colRating: 'Rating',
+    colReward: 'Reward ($WOC)',
+    projectedNote: 'Projected from the current pool + arena ranking; final payouts settle at season close.',
   },
 };

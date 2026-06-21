@@ -23,9 +23,25 @@ export interface WocSeasonInfo {
   emissionBase: string;
   poolBase: string;
 }
+// A projected per-player reward standing (kept structurally identical to
+// net/wallet.ts WocSeasonStanding — the wire contract).
+export interface WocSeasonStanding {
+  rank: number;
+  name: string;
+  rating: number;
+  rewardBase: string;
+}
 export interface WocSeasonPayload {
   season: WocSeasonInfo | null;
+  standings: WocSeasonStanding[];
   decimals: number;
+}
+
+export interface SeasonStandingView {
+  rank: number;
+  name: string;
+  rating: number;
+  rewardWoc: string; // exact human-readable projected reward
 }
 
 export interface SeasonView {
@@ -37,6 +53,7 @@ export interface SeasonView {
   emissionWoc: string;
   emittedPct: number; // 0..100, share of verified sinks already emitted
   countdown: { days: number; hours: number; minutes: number; totalMs: number } | null;
+  standings: SeasonStandingView[]; // projected top-N rewards (empty when no season)
 }
 
 function toBig(base: string): bigint {
@@ -68,7 +85,7 @@ const clampPct = (n: number): number => Math.max(0, Math.min(100, n));
  * time has passed, presents as 'ended' (no countdown).
  */
 export function formatSeasonView(payload: WocSeasonPayload | null, nowMs: number): SeasonView {
-  const none: SeasonView = { state: 'none', seasonId: null, label: '', poolWoc: '0', sinkWoc: '0', emissionWoc: '0', emittedPct: 0, countdown: null };
+  const none: SeasonView = { state: 'none', seasonId: null, label: '', poolWoc: '0', sinkWoc: '0', emissionWoc: '0', emittedPct: 0, countdown: null, standings: [] };
   if (!payload || !payload.season) return none;
   const s = payload.season;
   const d = payload.decimals;
@@ -97,6 +114,7 @@ export function formatSeasonView(payload: WocSeasonPayload | null, nowMs: number
     emissionWoc: baseToWoc(s.emissionBase, d),
     emittedPct,
     countdown,
+    standings: (payload.standings ?? []).map((st) => ({ rank: st.rank, name: st.name, rating: st.rating, rewardWoc: baseToWoc(st.rewardBase, d) })),
   };
 }
 

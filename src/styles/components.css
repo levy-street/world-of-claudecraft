@@ -1190,6 +1190,15 @@
   .ws-total-k { color: #8d8262; }
   .ws-total b { color: #e7dcb4; }
   .ws-invariant { font-size: 11px; color: #8d8262; text-align: center; line-height: 1.5; border-top: 1px solid #322c1d; padding-top: 10px; }
+  .ws-standings { border-top: 1px solid #322c1d; padding-top: 10px; }
+  .ws-st-title { font-size: 11px; color: #998d6a; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+  .ws-st-row { display: grid; grid-template-columns: 26px 1fr 52px 92px; align-items: center; gap: 6px; padding: 3px 4px; font-size: 12px; }
+  .ws-st-head { color: #8d8262; font-size: 10px; text-transform: uppercase; letter-spacing: .04em; border-bottom: 1px solid #2a2519; }
+  .ws-st-rank { color: #b9ac82; text-align: center; }
+  .ws-st-name { color: #e7dcb4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ws-st-rating { color: #b9ac82; text-align: right; }
+  .ws-st-reward { color: #f2d98a; text-align: right; font-weight: 600; }
+  .ws-st-note { font-size: 10px; color: #6f6650; margin-top: 8px; line-height: 1.4; }
   .lb-body {
     margin-top: 8px;
     max-height: 56vh;
