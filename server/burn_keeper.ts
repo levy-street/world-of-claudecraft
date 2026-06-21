@@ -15,7 +15,7 @@ import bs58 from 'bs58';
 import { randomBytes } from 'node:crypto';
 import { isSolanaAddress } from './wallet_link';
 import { DEFAULT_BURN_POLICY, planTwapChunks, shouldRunBatch, type BurnPolicy } from './burn_policy';
-import { parseSplitPayment, fetchFinalizedTransaction, solanaRpc, SPL_TOKEN_PROGRAM } from './solana_rpc';
+import { parseSplitPayment, fetchFinalizedTransaction, solanaRpc, SOLANA_RPC_URL, SPL_TOKEN_PROGRAM } from './solana_rpc';
 import {
   createBurnBatch, markBatchSwapped, markBatchBurning, markBatchBurned, markBatchFailed,
   openBurnBatches, lastBurnAt, type BurnBatchRow,
@@ -25,9 +25,6 @@ const BURN_VAULT = (process.env.MARKETPLACE_BURN_VAULT ?? '').trim();
 const BURN_VAULT_SECRET = (process.env.MARKETPLACE_BURN_VAULT_SECRET ?? '').trim();
 const USDC_MINT = (process.env.USDC_MINT ?? process.env.VITE_USDC_MINT ?? 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v').trim();
 const WOC_MINT = (process.env.WOC_MINT ?? process.env.VITE_WOC_MINT ?? '3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth').trim();
-// Jupiter is mainnet-only — the burn cluster RPC is separate from the devnet
-// payment RPC and from the mainnet $WOC-balance RPC.
-const BURN_RPC_URL = (process.env.BURN_RPC_URL ?? process.env.SOLANA_RPC_URL ?? 'https://api.mainnet-beta.solana.com').trim();
 const JUPITER_API = (process.env.JUPITER_API ?? 'https://quote-api.jup.ag/v6').trim();
 const SPL_ATA_PROGRAM = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL');
 const TOKEN_PROGRAM = new PublicKey(SPL_TOKEN_PROGRAM);
@@ -184,12 +181,13 @@ export class BurnKeeper {
 // The ONLY code that touches the burn-vault key.
 // --------------------------------------------------------------------------
 
-function associatedTokenAccount(owner: PublicKey, mint: PublicKey): PublicKey {
+// Exported for the encoding test (tests/burn_keeper_encoding.test.ts) — pure, no I/O.
+export function associatedTokenAccount(owner: PublicKey, mint: PublicKey): PublicKey {
   return PublicKey.findProgramAddressSync([owner.toBuffer(), TOKEN_PROGRAM.toBuffer(), mint.toBuffer()], SPL_ATA_PROGRAM)[0];
 }
 
 // SPL Token `BurnChecked` (tag 15): u8 tag + u64 amount(LE) + u8 decimals.
-function burnCheckedIx(ata: PublicKey, mint: PublicKey, authority: PublicKey, amount: bigint, decimals: number): TransactionInstruction {
+export function burnCheckedIx(ata: PublicKey, mint: PublicKey, authority: PublicKey, amount: bigint, decimals: number): TransactionInstruction {
   const data = Buffer.alloc(10);
   data.writeUInt8(15, 0);
   data.writeBigUInt64LE(amount, 1);
@@ -232,7 +230,10 @@ export function buildProductionDeps(): { exec: BurnExecutor; store: BurnStore } 
   if (vault.publicKey.toBase58() !== BURN_VAULT) {
     throw new Error('MARKETPLACE_BURN_VAULT_SECRET does not match MARKETPLACE_BURN_VAULT');
   }
-  const conn = new Connection(BURN_RPC_URL, 'confirmed');
+  // One RPC for the whole keeper: reads go through solana_rpc.ts (SOLANA_RPC_URL)
+  // and the broadcast/blockhash Connection uses the SAME URL, so a confirm can
+  // never look at a different cluster than where the swap was sent.
+  const conn = new Connection(SOLANA_RPC_URL, 'confirmed');
   const policy = envPolicy();
 
   const exec: BurnExecutor = {

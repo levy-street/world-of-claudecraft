@@ -455,6 +455,26 @@ export interface SplitPaymentQuote {
 }
 
 /**
+ * Build the buyer's atomic 70/30 USDC split-payment transaction from a server
+ * quote: two SPL `TransferChecked` legs (creator + burn vault) funded from the
+ * buyer's ATA, plus a memo binding the quote id. PURE + deterministic (no wallet,
+ * no network) — exactly the shape server `validateSplitPayment` checks — so it is
+ * unit-tested in isolation (tests/split_payment_tx.test.ts). The buyer is the sole
+ * signing authority and funds both legs; recipient ATAs are NOT created here (an
+ * onboarding precondition, mirrored by the verifier's exactly-two-transfers rule).
+ */
+export function buildSplitPaymentTransaction(q: SplitPaymentQuote, buyer: string, blockhash: string, lastValidBlockHeight: number): Transaction {
+  const mint = new PublicKey(q.mint);
+  const buyerPk = new PublicKey(buyer);
+  const buyerAta = associatedTokenAccount(buyerPk, mint);
+  return new Transaction({ feePayer: buyerPk, blockhash, lastValidBlockHeight }).add(
+    transferCheckedIx(buyerAta, mint, associatedTokenAccount(new PublicKey(q.creator.owner), mint), buyerPk, BigInt(q.creator.amount), USDC_DECIMALS),
+    transferCheckedIx(buyerAta, mint, associatedTokenAccount(new PublicKey(q.burn.owner), mint), buyerPk, BigInt(q.burn.amount), USDC_DECIMALS),
+    memoInstruction(q.memo),
+  );
+}
+
+/**
  * Build + sign + send the buyer's atomic 70/30 USDC split payment via the
  * connected wallet, then wait for the transaction to FINALIZE (the commitment
  * the server verifies against) before returning the signature to hand to
@@ -469,19 +489,12 @@ export async function signAndSendSplitPayment(q: SplitPaymentQuote): Promise<str
   const chain = account.chains.find((c) => c === MARKET_CHAIN) ?? account.chains.find(isSolanaChain);
   if (!chain) throw new Error('the connected wallet has no Solana chain for the marketplace');
 
-  const mint = new PublicKey(q.mint);
-  const buyerPk = new PublicKey(account.address);
-  const buyerAta = associatedTokenAccount(buyerPk, mint);
   const conn = getPaymentConnection();
   // Default ('confirmed') commitment — a 'finalized' blockhash is ~32 slots old
   // and would halve the tx's validity window before the wallet even signs. The
   // confirmation below still waits for 'finalized' (what the server verifies).
   const { blockhash, lastValidBlockHeight } = await conn.getLatestBlockhash();
-  const tx = new Transaction({ feePayer: buyerPk, blockhash, lastValidBlockHeight }).add(
-    transferCheckedIx(buyerAta, mint, associatedTokenAccount(new PublicKey(q.creator.owner), mint), buyerPk, BigInt(q.creator.amount), USDC_DECIMALS),
-    transferCheckedIx(buyerAta, mint, associatedTokenAccount(new PublicKey(q.burn.owner), mint), buyerPk, BigInt(q.burn.amount), USDC_DECIMALS),
-    memoInstruction(q.memo),
-  );
+  const tx = buildSplitPaymentTransaction(q, account.address, blockhash, lastValidBlockHeight);
   const wire = tx.serialize({ requireAllSignatures: false, verifySignatures: false });
   const results = await sendFeature.signAndSendTransaction({ account, chain, transaction: new Uint8Array(wire) });
   const result = results[0];

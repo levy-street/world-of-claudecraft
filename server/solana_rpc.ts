@@ -8,7 +8,11 @@
 // unit-testable against fixture getTransaction responses, with the network call
 // (fetchFinalizedTransaction) kept thin and separate.
 
-const SOLANA_RPC_URL = (process.env.SOLANA_RPC_URL ?? process.env.VITE_SOLANA_RPC_URL ?? 'https://api.mainnet-beta.solana.com').trim();
+// The single server-side Solana RPC. Every server read (purchase-payment verify
+// AND the buy-and-burn keeper's reads/broadcast) resolves against this one URL,
+// so they can never diverge onto different clusters. Must point at the cluster
+// payments + swaps actually settle on (mainnet in production).
+export const SOLANA_RPC_URL = (process.env.SOLANA_RPC_URL ?? process.env.VITE_SOLANA_RPC_URL ?? 'https://api.mainnet-beta.solana.com').trim();
 
 // The two SPL token programs. We accept ONLY the legacy program; a Token-2022
 // account can carry transfer hooks / fees that make "amount sent" != "amount
