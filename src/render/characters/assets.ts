@@ -24,7 +24,7 @@ import {
   visibleAttachmentsForGraphics,
   visualAssetUrlForGraphics,
 } from './manifest';
-import type { CreatorSkinRegistryEntry, SkinDesignSpec } from '../../world_api';
+import { normalizeDesignSpec, type CreatorSkinRegistryEntry, type SkinDesignSpec } from '../../world_api';
 import { buildSkinCanvas, buildSkinEmissiveCanvas, designHash } from './skin_design';
 
 const DEFAULT_TINT_STRENGTH = 0.4;
@@ -407,7 +407,13 @@ const creatorSkinInflight = new Map<string, Promise<void>>();
 const creatorSkinLru: string[] = []; // texture URLs, most-recently-used last
 
 export function registerCreatorSkins(entries: CreatorSkinRegistryEntry[]): void {
-  for (const e of entries) creatorSkinRegistry.set(e.id, e);
+  for (const e of entries) {
+    // Normalize the design defensively: a registry entry may carry a legacy or
+    // partial spec (older DB row / older server) and the procedural builder
+    // assumes a complete spec. normalizeDesignSpec back-fills the richer fields
+    // (or returns null → the entry falls back to assetUrl/numeric skin).
+    creatorSkinRegistry.set(e.id, e.design ? { ...e, design: normalizeDesignSpec(e.design) } : e);
+  }
 }
 
 function touchCreatorUrl(url: string): void {

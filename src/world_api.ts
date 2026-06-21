@@ -75,12 +75,16 @@ export {
   defaultDesignSpec,
   normalizeAccountCosmetics,
   normalizeDesignSpec,
+  SKIN_DENSITIES,
+  SKIN_FINISHES,
   SKIN_PATTERNS,
 } from './world_api/cosmetics';
 export type {
   AccountCosmetics,
   CreatorSkinRegistryEntry,
+  SkinDensity,
   SkinDesignSpec,
+  SkinFinish,
   SkinPattern,
 } from './world_api/cosmetics';
 export type {
