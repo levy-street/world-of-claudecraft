@@ -42,19 +42,25 @@ import { recordUsageCacheEvent, recordUsageMetric, setUsageCacheSize } from './p
 import { buildPayoutKeeper } from './payout_keeper';
 import { withPayoutKeeperLock } from './payout_db';
 import { activeSeasonStatus, openSeason, closeSeason } from './flow_ledger_db';
-import { projectSeasonRewards, rewardTierBpsFromEnv } from './reward_tiers';
+import { rewardTierBpsFromEnv } from './reward_tiers';
+import { SeasonBodyCache } from './woc_season_api';
 import { WOC_DECIMALS } from './woc_config';
 
 const PORT = Number(process.env.PORT ?? 8787);
 // How often the buyback keeper ticks. Its own policy decides whether a tick does
 // anything (threshold / cadence / fee floor), so this is just the poll interval.
 const PAYOUT_KEEPER_TICK_MS = Number(process.env.BUYBACK_KEEPER_TICK_MS ?? 5 * 60 * 1000);
-// /api/woc/season is public and polled by every client; cache the (cheap) read
-// briefly so the route can't be used to hammer the DB. Season + pool change
-// slowly, so a few seconds of staleness is fine.
-const WOC_SEASON_TTL_MS = 5000;
-interface SeasonStanding { rank: number; name: string; rating: number; rewardBase: string }
-let wocSeasonCache: { at: number; body: { season: Awaited<ReturnType<typeof activeSeasonStatus>>; standings: SeasonStanding[]; decimals: number } } | null = null;
+// /api/woc/season is public and polled by every client; SeasonBodyCache keeps the
+// (cheap) read off the DB hot path with a short TTL. Season + pool change slowly,
+// so a few seconds of staleness is fine.
+const seasonBody = new SeasonBodyCache({
+  fetchSeason: activeSeasonStatus,
+  fetchLadder: (limit) => topArenaRatings(limit, '1v1'),
+  tierBps: rewardTierBpsFromEnv,
+  decimals: WOC_DECIMALS,
+  now: () => Date.now(),
+  ttlMs: 5000,
+});
 const STATIC_DIR = path.join(__dirname, '..', 'dist');
 const WIKI_URL = process.env.WIKI_URL ?? 'http://localhost:8080/wiki/index.php/Main_Page';
 // Pretty URLs that serve standalone static HTML pages.
@@ -689,22 +695,11 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     // emissions = $WOC available to pay out this season). Derived from
     // on-chain-verified flows; { season: null } when no season is open.
     if (req.method === 'GET' && url === '/api/woc/season') {
-      const now = Date.now();
-      if (!wocSeasonCache || now - wocSeasonCache.at >= WOC_SEASON_TTL_MS) {
-        const season = await activeSeasonStatus();
-        // Projected per-player rewards: split the pool across this realm's top
-        // arena-1v1 ladder by the tier schedule (a projection of "if the season
-        // closed now"; the actual payout at close is the deferred escrow path).
-        let standings: SeasonStanding[] = [];
-        if (season) {
-          const tierBps = rewardTierBpsFromEnv();
-          const ladder = await topArenaRatings(tierBps.length, '1v1');
-          standings = projectSeasonRewards(BigInt(season.poolBase), ladder.map((r) => ({ name: r.name, rating: r.rating })), tierBps)
-            .map((s) => ({ rank: s.rank, name: s.name, rating: s.rating, rewardBase: s.rewardBase.toString() }));
-        }
-        wocSeasonCache = { at: now, body: { season, standings, decimals: WOC_DECIMALS } };
-      }
-      return json(res, 200, wocSeasonCache.body);
+      // Season + pool, plus the projected per-player rewards (the realm's top
+      // arena-1v1 ladder split by the tier schedule: a projection of "if the
+      // season closed now"; the actual payout at close is the deferred escrow
+      // path). Built + short-TTL-cached by seasonBody (woc_season_api.ts).
+      return json(res, 200, await seasonBody.get());
     }
     // Shareable player card: publish (PNG body) + referral stats for the card.
     if (req.method === 'POST' && url === '/api/card') {
