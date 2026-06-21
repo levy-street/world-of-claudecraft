@@ -5,11 +5,12 @@
 // unproven. This drives them against a live database via the REAL boot path
 // (ensureSchema), asserting on the actual rows returned.
 //
-// Gated on PG_TEST_URL so CI (no Postgres) skips it. Run locally with e.g.
+// Gated on PG_TEST_URL so CI (no Postgres) skips it. It resets the shared DB, so
+// run the realm DB-integration tests sequentially against one Postgres:
 //   docker run -d --rm -e POSTGRES_PASSWORD=test -e POSTGRES_USER=test \
 //     -e POSTGRES_DB=test -p 5544:5432 postgres:16-alpine
 //   PG_TEST_URL=postgres://test:test@127.0.0.1:5544/test \
-//     npx vitest run tests/realm_db.integration.test.ts
+//     npx vitest run --no-file-parallelism tests/realm_*.integration.test.ts
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 

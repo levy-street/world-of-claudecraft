@@ -154,6 +154,34 @@ export async function getRealmById(db: Queryable, realmId: number): Promise<Real
   return res.rows[0] ? rowToRealm(res.rows[0]) : null;
 }
 
+// Realm ids in a given lifecycle status, oldest first. Used by the periodic
+// reconciler to find realms stuck in a transitional state.
+export async function listRealmIdsByStatus(db: Queryable, status: RealmStatus): Promise<number[]> {
+  const res = await db.query(`SELECT realm_id FROM realms WHERE status = $1 ORDER BY created_at ASC`, [status]);
+  return res.rows.map((r: Record<string, unknown>) => Number(r.realm_id));
+}
+
+// Boot-time drift guard. ensureSchema uses CREATE TABLE IF NOT EXISTS, which is a
+// no-op against a pre-existing table that is missing a newer column, so a drifted
+// schema would otherwise start silently and only fail at query time. Assert the
+// columns the realm code depends on exist, and fail fast at boot if not.
+const REQUIRED_REALM_COLUMNS: Record<string, readonly string[]> = {
+  realms: ['realm_id', 'name', 'status', 'owner_account_id', 'tier', 'world_seed', 'release_eligible_at'],
+  realm_stakes: ['stake_id', 'realm_id', 'amount_base', 'lock_tx_sig', 'status'],
+  realm_quotes: ['quote_id', 'realm_id', 'amount_base', 'expires_at'],
+};
+
+export async function assertRealmSchema(db: Queryable): Promise<void> {
+  for (const [table, cols] of Object.entries(REQUIRED_REALM_COLUMNS)) {
+    const res = await db.query('SELECT column_name FROM information_schema.columns WHERE table_name = $1', [table]);
+    const have = new Set(res.rows.map((r: Record<string, unknown>) => String(r.column_name)));
+    const missing = cols.filter((c) => !have.has(c));
+    if (missing.length > 0) {
+      throw new Error(`realm schema drift: table "${table}" is missing column(s): ${missing.join(', ')}`);
+    }
+  }
+}
+
 // The live (non-closed) realm with this name, if any. The name is the scoping
 // key shared with characters/guilds, so this is how a connection resolves the
 // realm it is operating in.

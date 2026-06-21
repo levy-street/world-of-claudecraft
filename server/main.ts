@@ -43,6 +43,7 @@ import {
   confirmProvisionQuote,
   requestRealmDecommission,
   finalizeRealmRelease,
+  reconcileRealmLifecycle,
 } from './realm_provision';
 import { webLoginEnforced, isWebClientRequest } from './web_login_guard';
 import { cacheControlFor, etagFor, isNotModified } from './static_cache';
@@ -556,13 +557,19 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     if (req.method === 'POST' && url === '/api/realms/quote') {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
+      // Quote hits the external Solana RPC (supply read); rate-limit so an authed
+      // account cannot use it as an RPC amplifier.
+      if (rateLimited(req)) return json(res, 429, { error: 'too many requests, slow down' });
       const wallet = await walletForAccount(accountId);
       if (!wallet) return json(res, 400, { error: 'link a wallet first' });
       const body = await readBody(req);
       const name = typeof body.name === 'string' ? body.name : '';
       const type = resolveRealmType(typeof body.type === 'string' ? body.type : 'Normal');
       const amount = typeof body.amount === 'string' ? body.amount : '';
-      if (!/^[0-9]+$/.test(amount)) return json(res, 400, { error: 'invalid_amount' });
+      // Bound the length before BigInt parse: a 78-digit cap dwarfs total $WOC
+      // base-unit supply (~15 digits) yet blocks a pathological multi-KB digit
+      // string forcing a slow BigInt parse.
+      if (!/^[0-9]+$/.test(amount) || amount.length > 78) return json(res, 400, { error: 'invalid_amount' });
       const result = await prepareProvisionQuote(pool, { accountId, ownerWallet: wallet.pubkey, name, type, amountBase: BigInt(amount) });
       if (!result.ok) return json(res, result.status, { error: result.error });
       return json(res, 200, result);
@@ -590,6 +597,8 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     if (req.method === 'POST' && realmReleaseMatch) {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
+      // Release hits the external Solana RPC (PDA-closed check); rate-limit it.
+      if (rateLimited(req)) return json(res, 429, { error: 'too many requests, slow down' });
       const result = await finalizeRealmRelease(pool, { accountId, realmId: Number(realmReleaseMatch[1]) });
       if (!result.ok) return json(res, result.status, { error: result.error });
       return json(res, 200, result);
@@ -814,12 +823,18 @@ async function main(): Promise<void> {
   if (pruned > 0) console.log(`pruned ${pruned} chat log row(s) older than ${CHAT_LOG_RETENTION_DAYS} days`);
   const prunedPerfReports = await pruneClientPerfReports(PERF_REPORT_RETENTION_DAYS);
   if (prunedPerfReports > 0) console.log(`pruned ${prunedPerfReports} client perf report row(s) older than ${PERF_REPORT_RETENTION_DAYS} days`);
+  // Reclaim abandoned provisioning + finalize already-released decommissioning
+  // realms so neither deadlocks the per-account realm cap (#475).
+  const reconciled = await reconcileRealmLifecycle(pool);
+  if (reconciled.reclaimed > 0 || reconciled.finalized > 0)
+    console.log(`realm lifecycle: reclaimed ${reconciled.reclaimed} provisioning, finalized ${reconciled.finalized} decommissioning`);
   await game.loadMarket();
   await game.loadChatFilter();
   await game.loadBlockedIps();
   setInterval(() => {
     void pruneChatLogs(CHAT_LOG_RETENTION_DAYS).catch((err) => console.error('chat log prune failed:', err));
     void pruneClientPerfReports(PERF_REPORT_RETENTION_DAYS).catch((err) => console.error('perf report prune failed:', err));
+    void reconcileRealmLifecycle(pool).catch((err) => console.error('realm lifecycle reconcile failed:', err));
   }, 24 * 3600 * 1000).unref();
   setInterval(() => {
     void pruneExpiredBlockedIps().catch((err) => console.error('blocked IP prune failed:', err));

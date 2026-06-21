@@ -98,12 +98,14 @@ export async function countOpenQuotesForAccount(db: Queryable, accountId: number
 
 // Reclaim abandoned provisioning: close any provisioning realm whose quote has
 // expired (the lock never confirmed), then delete expired quotes. Frees the name
-// and the per-account cap slot. Called opportunistically before issuing a quote.
-export async function reclaimExpiredProvisioning(db: Queryable): Promise<void> {
-  await db.query(
+// and the per-account cap slot. Called opportunistically before issuing a quote
+// and from the periodic reconciler. Returns how many provisioning realms closed.
+export async function reclaimExpiredProvisioning(db: Queryable): Promise<number> {
+  const closed = await db.query(
     `UPDATE realms SET status = 'closed'
       WHERE status = 'provisioning'
         AND realm_id IN (SELECT realm_id FROM realm_quotes WHERE expires_at <= now())`,
   );
   await db.query('DELETE FROM realm_quotes WHERE expires_at <= now()');
+  return closed.rowCount ?? 0;
 }

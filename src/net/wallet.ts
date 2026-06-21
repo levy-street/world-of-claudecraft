@@ -376,11 +376,13 @@ export async function signMessageBase58(message: string): Promise<string> {
 }
 
 // ── Stake-to-provision: lock $WOC into the realm escrow (#475) ───────────────
-// The cluster the realm_stake_escrow program + $WOC live on. Devnet during
-// testing; set VITE_REALM_RPC_URL + VITE_REALM_CHAIN for another cluster. RPC
-// and chain MUST be the same cluster (a blockhash from one is invalid on another).
-const REALM_RPC_URL = (import.meta.env.VITE_REALM_RPC_URL ?? 'https://api.devnet.solana.com').trim();
-const REALM_CHAIN = (import.meta.env.VITE_REALM_CHAIN ?? 'solana:devnet').trim() as `solana:${string}`;
+// The cluster the realm_stake_escrow program + $WOC live on. Defaults to mainnet
+// (mirroring the server's SOLANA_RPC_URL) so a production build never silently
+// targets a testnet; set VITE_REALM_RPC_URL + VITE_REALM_CHAIN for devnet
+// testing. RPC and chain MUST be the same cluster (a blockhash from one is
+// invalid on another).
+const REALM_RPC_URL = (import.meta.env.VITE_REALM_RPC_URL ?? 'https://api.mainnet-beta.solana.com').trim();
+const REALM_CHAIN = (import.meta.env.VITE_REALM_CHAIN ?? 'solana:mainnet').trim() as `solana:${string}`;
 
 export interface RealmLockQuote {
   programId: string;
@@ -425,6 +427,7 @@ export async function signAndSendRealmLock(quote: RealmLockQuote): Promise<strin
     chain: REALM_CHAIN,
     transaction: new Uint8Array(wire),
   });
+  if (!result || !(result.signature instanceof Uint8Array)) throw new Error('wallet returned an invalid signature');
   return bs58.encode(result.signature);
 }
 

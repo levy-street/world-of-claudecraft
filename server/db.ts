@@ -7,7 +7,7 @@ import { SOCIAL_SCHEMA } from './social_db';
 import { FLOW_LEDGER_SCHEMA } from './flow_ledger_db';
 import { BUYBACK_BATCHES_SCHEMA } from './payout_db';
 import { seedChatFilterDefaults } from './chat_filter_db';
-import { REALM_SCHEMA, seedDefaultRealm } from './realm_db';
+import { REALM_SCHEMA, seedDefaultRealm, assertRealmSchema } from './realm_db';
 import { REALM_STAKE_SCHEMA } from './realm_stake_db';
 import { REALM_QUOTE_SCHEMA } from './realm_quote_db';
 import { REALM } from './realm';
@@ -314,6 +314,9 @@ export async function ensureSchema(): Promise<void> {
     await client.query(REALM_SCHEMA);
     await client.query(REALM_STAKE_SCHEMA);
     await client.query(REALM_QUOTE_SCHEMA);
+    // Fail fast at boot on realm schema drift (CREATE IF NOT EXISTS is a no-op
+    // against a pre-existing table missing a newer column).
+    await assertRealmSchema(client);
     // Seed the chat-filter word lists + config on first boot only (idempotent).
     // Runs under the same advisory lock so concurrent realm boots don't race.
     await seedChatFilterDefaults(client);

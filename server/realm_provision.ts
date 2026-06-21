@@ -23,6 +23,7 @@ import {
   createProvisioningRealm,
   getLiveRealmByName,
   getRealmById,
+  listRealmIdsByStatus,
   requestDecommission,
   setRealmStatus,
 } from './realm_db';
@@ -45,7 +46,9 @@ function intEnv(key: string, def: number, min: number, max: number): number {
 // whale-tier stake this is also naturally throttled by capital.
 const MAX_REALMS_PER_ACCOUNT = intEnv('REALM_MAX_PER_ACCOUNT', 3, 1, 1000);
 // How long a provision quote stays valid for the client to lock + confirm.
-const QUOTE_TTL_MS = intEnv('REALM_QUOTE_TTL_MINUTES', 15, 1, 1440) * 60_000;
+// Generous headroom over the on-chain lock + finalization + the verify RPC so a
+// timely confirm never races quote expiry.
+const QUOTE_TTL_MS = intEnv('REALM_QUOTE_TTL_MINUTES', 30, 1, 1440) * 60_000;
 // The off-chain decommission timelock the UI shows. The on-chain RealmStake
 // unlock_eligible_slot set by the program is authoritative for the release.
 const UNSTAKE_TIMELOCK_MS = intEnv('REALM_UNSTAKE_TIMELOCK_SECONDS', 259_200, 0, 31_536_000) * 1000;
@@ -132,11 +135,21 @@ export async function recordProvisionedStake(
 
 // Total $WOC supply in base units, read on chain. Drives the percent-of-supply
 // tier thresholds. null on a read failure (the quote route returns 503).
+const SUPPLY_CACHE_MS = intEnv('REALM_SUPPLY_CACHE_SECONDS', 15, 0, 3600) * 1000;
+const supplyCache = new Map<string, { at: number; value: bigint }>();
+
 export async function getMintSupplyBase(mint: string): Promise<bigint | null> {
+  const hit = supplyCache.get(mint);
+  if (hit && Date.now() - hit.at < SUPPLY_CACHE_MS) return hit.value;
   const res = await solanaRpc<{ value: { amount: string } }>('getTokenSupply', [mint, { commitment: 'confirmed' }]);
   const amount = res?.value?.amount;
-  if (typeof amount !== 'string' || !/^[0-9]+$/.test(amount)) return null;
-  return BigInt(amount);
+  if (typeof amount !== 'string' || !/^[0-9]+$/.test(amount)) {
+    console.error(`realm: $WOC supply read failed for mint ${mint} (rpc returned ${res === null ? 'null' : 'unexpected shape'})`);
+    return null;
+  }
+  const value = BigInt(amount);
+  supplyCache.set(mint, { at: Date.now(), value });
+  return value;
 }
 
 export interface ProvisionQuote {
@@ -161,11 +174,12 @@ export async function prepareProvisionQuote(
   pool: Pool,
   args: { accountId: number; ownerWallet: string; name: string; type: RealmType; amountBase: bigint },
 ): Promise<Result<ProvisionQuote>> {
-  await reclaimExpiredProvisioning(pool);
-
+  // Cheap, no-DB name checks first so a bad name short-circuits before any query.
   const name = args.name.trim();
   if (!name || resolveRealm(name) !== name) return fail(400, 'invalid_realm_name');
   if (offensiveName(name)) return fail(400, 'realm_name_not_allowed');
+
+  await reclaimExpiredProvisioning(pool); // free expired names before uniqueness + cap
   if (await getLiveRealmByName(pool, name)) return fail(409, 'realm_name_taken');
 
   const owned = await countOwnedRealms(pool, args.accountId);
@@ -253,7 +267,12 @@ export async function confirmProvisionQuote(
       lockTxSig: args.lockSig,
     });
   } catch (err) {
-    if (isUniqueViolation(err)) return fail(409, 'stake_already_recorded');
+    // The lock signature was already recorded (replay guard). Consume the quote
+    // so it cannot be re-confirmed with another lock against this realm.
+    if (isUniqueViolation(err)) {
+      await deleteRealmQuote(pool, args.quoteId);
+      return fail(409, 'stake_already_recorded');
+    }
     throw err;
   }
   await deleteRealmQuote(pool, args.quoteId);
@@ -269,7 +288,10 @@ export async function requestRealmDecommission(
 ): Promise<Result<{ realmId: number; releaseEligibleAt: string }>> {
   const realm = await getRealmById(pool, args.realmId);
   if (!realm || realm.status === 'closed') return fail(404, 'realm_not_found');
-  if (realm.ownerAccountId !== args.accountId) return fail(403, 'not_realm_owner');
+  if (realm.ownerAccountId !== args.accountId) {
+    console.warn(`realm: account ${args.accountId} tried to decommission realm ${args.realmId} it does not own`);
+    return fail(403, 'not_realm_owner');
+  }
   if (realm.status !== 'active') return fail(409, 'realm_not_active');
 
   const eligibleAt = new Date(Date.now() + UNSTAKE_TIMELOCK_MS);
@@ -288,7 +310,13 @@ async function isStakeAccountClosed(realmId: number): Promise<boolean> {
     pda,
     { encoding: 'base64', commitment: 'finalized' },
   ]);
-  if (res === null) return false;
+  if (res === null) {
+    // Transient RPC failure: do not assume released (the caller returns a
+    // retryable 409), but log it so it is not indistinguishable from a real
+    // not-yet-released state.
+    console.error(`realm: PDA-closed read failed for realm ${realmId} (rpc null); treating as not released`);
+    return false;
+  }
   return res.value === null;
 }
 
@@ -304,10 +332,40 @@ export async function finalizeRealmRelease(
   if (realm.ownerAccountId !== args.accountId) return fail(403, 'not_realm_owner');
   if (realm.status !== 'decommissioning') return fail(409, 'realm_not_decommissioning');
 
+  // Enforce the server-advertised migration window before closing the realm.
+  // The on-chain program enforces its own release timelock independently; this
+  // makes the DB-side window real too, and the two cannot silently diverge.
+  if (!realm.releaseEligibleAt || realm.releaseEligibleAt.getTime() > Date.now()) {
+    return fail(409, 'timelock_not_elapsed');
+  }
+
   if (!(await isStakeAccountClosed(args.realmId))) return fail(409, 'stake_not_released_onchain');
 
   const stake = await getActiveStakeByRealm(pool, args.realmId);
   if (stake) await setStakeReleased(pool, stake.stakeId, `pda-closed:${realmStakePda(args.realmId).toBase58()}`);
   await setRealmStatus(pool, args.realmId, 'closed');
   return { ok: true, realmId: args.realmId };
+}
+
+// Periodic lifecycle reconciliation (boot + daily, see server/main.ts). Runs
+// independently of any user request so abandoned realms never deadlock the
+// per-account cap: (1) close provisioning realms whose quote expired without a
+// confirmed lock, freeing the name + slot; (2) finalize decommissioning realms
+// whose owner already released on chain (the escrow PDA is closed) but never
+// called /release, so they do not stay stuck counting against the cap. Returns
+// counts for logging. Never force-closes a realm whose stake is still on chain.
+export async function reconcileRealmLifecycle(pool: Pool): Promise<{ reclaimed: number; finalized: number }> {
+  const reclaimed = await reclaimExpiredProvisioning(pool);
+  let finalized = 0;
+  for (const realmId of await listRealmIdsByStatus(pool, 'decommissioning')) {
+    const realm = await getRealmById(pool, realmId);
+    if (!realm || realm.status !== 'decommissioning') continue;
+    if (realm.releaseEligibleAt && realm.releaseEligibleAt.getTime() > Date.now()) continue;
+    if (!(await isStakeAccountClosed(realmId))) continue; // stake still escrowed; leave it
+    const stake = await getActiveStakeByRealm(pool, realmId);
+    if (stake) await setStakeReleased(pool, stake.stakeId, `pda-closed:${realmStakePda(realmId).toBase58()}`);
+    await setRealmStatus(pool, realmId, 'closed');
+    finalized += 1;
+  }
+  return { reclaimed, finalized };
 }
