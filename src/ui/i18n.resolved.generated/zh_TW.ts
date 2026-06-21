@@ -2385,6 +2385,9 @@ export const zh_TW: EnTranslations = {
     "renamePaidButton": "Pay {amount} $WOC & Rename",
     "renamePriceHint": "A voluntary rename burns {amount} $WOC.",
     "renameCancel": "Cancel",
+    "mintSolName": "Get .sol name",
+    "mintSolButton": "Burn {amount} $WOC & Mint",
+    "mintSolHint": "Mint a player-owned ‹name›.worldofclaudecraft.sol for {amount} $WOC — yours on-chain.",
     "newNamePlaceholder": "新角色名稱",
     "tabCharacters": "角色",
     "tabCreate": "建立",
@@ -2409,6 +2412,7 @@ export const zh_TW: EnTranslations = {
     "confirmFailed": "The $WOC payment could not be verified.",
     "finalizeTimeout": "Timed out waiting for finalization. If $WOC was burned, reopen and retry — the payment settles once it finalizes.",
     "renameSuccess": "Renamed to {name}.",
+    "mintSuccess": "Minted {domain} — it's yours on-chain.",
     "guildRenameSuccess": "Guild renamed to {name}.",
     "reserveSuccess": "Reserved the name {name}."
   },

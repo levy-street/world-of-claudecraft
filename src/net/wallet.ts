@@ -4,6 +4,13 @@
 //
 // Lives in src/net/ and is never imported by src/sim/: the deterministic core
 // stays free of network/wallet dependencies.
+//
+// Wallet connection is Wallet Standard; on-chain burns/transfers (payWocBurn,
+// signAndSubmitServerTx) build the transaction with @solana/web3.js and have the
+// connected wallet sign it via the SolanaSignTransaction feature, then submit
+// through our own RPC so $WOC lands on mainnet regardless of the wallet's
+// selected network.
+import './wallet-polyfill';
 import { getWallets, type Wallets } from '@wallet-standard/app';
 import type { Wallet, WalletAccount, WalletIcon } from '@wallet-standard/base';
 import {
@@ -16,7 +23,25 @@ import {
   type StandardEventsFeature,
 } from '@wallet-standard/features';
 import { isSolanaChain } from '@solana/wallet-standard-chains';
-import { SolanaSignMessage, type SolanaSignMessageFeature } from '@solana/wallet-standard-features';
+import {
+  SolanaSignMessage,
+  type SolanaSignMessageFeature,
+  SolanaSignTransaction,
+  type SolanaSignTransactionFeature,
+} from '@solana/wallet-standard-features';
+import {
+  Connection,
+  PublicKey,
+  Transaction,
+  TransactionInstruction,
+} from '@solana/web3.js';
+import {
+  createAssociatedTokenAccountIdempotentInstruction,
+  createBurnCheckedInstruction,
+  createTransferCheckedInstruction,
+  getAssociatedTokenAddressSync,
+} from '@solana/spl-token';
+import { Buffer } from 'buffer';
 import bs58 from 'bs58';
 
 export interface WalletState {
@@ -379,4 +404,140 @@ export async function fetchWocBalance(owner: string, fresh = false): Promise<num
     console.error('[wallet] $WOC balance read failed', err);
     return null;
   }
+}
+
+// ── On-chain $WOC payments (burn + server-built tx) ──────────────────────────
+// The connected wallet only SIGNS (Wallet Standard SolanaSignTransaction); we
+// submit the signed transaction to the $WOC mainnet RPC ourselves so the burn
+// lands there regardless of which network the wallet UI happens to be set to.
+const SOLANA_RPC = String(
+  import.meta.env.VITE_SOLANA_RPC_URL ?? 'https://api.mainnet-beta.solana.com',
+).trim();
+// SPL Memo program (v2). A burn tx carries the quoteId as a memo so the server
+// can bind the on-chain payment to the account + action it quoted.
+const MEMO_PROGRAM_ID = new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr');
+
+let connection: Connection | null = null;
+function getConnection(): Connection {
+  if (!connection) connection = new Connection(SOLANA_RPC, 'confirmed');
+  return connection;
+}
+
+// Resolve the chain identifier the wallet should sign for. The transaction is
+// always built for $WOC mainnet, so prefer the account's mainnet chain.
+function solanaSignChain(): `solana:${string}` {
+  const chain = selectedAccount?.chains.find(isSolanaChain);
+  return (chain as `solana:${string}` | undefined) ?? 'solana:mainnet';
+}
+
+function hasSignTransactionFeature(
+  wallet: Wallet,
+): wallet is Wallet & SolanaSignTransactionFeature {
+  return SolanaSignTransaction in wallet.features;
+}
+
+/**
+ * Sign a built (legacy) transaction with the connected wallet via the Wallet
+ * Standard SolanaSignTransaction feature and return the signed wire bytes. The
+ * wallet does not submit; the caller broadcasts through our RPC.
+ */
+async function signTransactionBytes(tx: Transaction): Promise<Uint8Array> {
+  const wallet = selectedWallet;
+  const account = selectedAccount;
+  if (!wallet || !account) throw new Error('connect a wallet first');
+  if (!hasSignTransactionFeature(wallet)) throw new Error('this wallet cannot sign transactions');
+  const feature = wallet.features[SolanaSignTransaction] as SolanaSignTransactionFeature[typeof SolanaSignTransaction];
+  const wire = tx.serialize({ requireAllSignatures: false, verifySignatures: false });
+  const [result] = await feature.signTransaction({
+    account,
+    transaction: new Uint8Array(wire),
+    chain: solanaSignChain(),
+  });
+  if (!result?.signedTransaction) throw new Error('wallet returned no signed transaction');
+  return result.signedTransaction;
+}
+
+// What the server's /api/identity/quote hands back. Amounts are base-unit
+// decimal strings (they can exceed Number.MAX_SAFE_INTEGER), parsed to BigInt
+// here. `memo` MUST be included verbatim in the tx so the server can match it.
+export interface WocBurnQuote {
+  mint: string;
+  decimals: number;
+  amountBase: string;
+  burnBase: string;
+  treasuryBase: string;
+  treasury: string | null;
+  memo: string;
+}
+
+/**
+ * Build, sign, and submit the $WOC payment for an identity quote: burn the
+ * burn-portion, transfer the treasury-portion (if any), and attach the quote's
+ * memo, in one transaction. Returns the confirmed signature, which the caller
+ * hands to /api/identity/confirm. The wallet only signs; we submit to the $WOC
+ * mainnet RPC so the burn lands there regardless of the wallet's selected
+ * network.
+ */
+export async function payWocBurn(quote: WocBurnQuote): Promise<string> {
+  const address = currentWallet().address;
+  if (!address) throw new Error('connect a wallet first');
+
+  const owner = new PublicKey(address);
+  const mint = new PublicKey(quote.mint);
+  const ownerAta = getAssociatedTokenAddressSync(mint, owner);
+  const burnBase = BigInt(quote.burnBase);
+  const treasuryBase = BigInt(quote.treasuryBase);
+
+  const ixs: TransactionInstruction[] = [];
+  if (burnBase > 0n) {
+    ixs.push(createBurnCheckedInstruction(ownerAta, mint, owner, burnBase, quote.decimals));
+  }
+  if (treasuryBase > 0n && quote.treasury) {
+    const treasury = new PublicKey(quote.treasury);
+    const treasuryAta = getAssociatedTokenAddressSync(mint, treasury);
+    // Create the treasury's $WOC token account if it doesn't exist yet (no-op
+    // when it already does); the payer funds the rent.
+    ixs.push(createAssociatedTokenAccountIdempotentInstruction(owner, treasuryAta, treasury, mint));
+    ixs.push(
+      createTransferCheckedInstruction(ownerAta, mint, treasuryAta, owner, treasuryBase, quote.decimals),
+    );
+  }
+  // Memo last: binds this payment to the server-issued quote.
+  ixs.push(
+    new TransactionInstruction({
+      programId: MEMO_PROGRAM_ID,
+      keys: [],
+      data: Buffer.from(quote.memo, 'utf8'),
+    }),
+  );
+
+  const conn = getConnection();
+  const { blockhash, lastValidBlockHeight } = await conn.getLatestBlockhash('finalized');
+  const tx = new Transaction({ feePayer: owner, blockhash, lastValidBlockHeight });
+  tx.add(...ixs);
+
+  const signed = await signTransactionBytes(tx);
+  const signature = await conn.sendRawTransaction(signed);
+  // Wait for confirmation so the follow-up /confirm doesn't immediately 409 on
+  // an unfinalized tx (the server still independently re-verifies finality).
+  await conn.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, 'confirmed');
+  return signature;
+}
+
+/**
+ * Sign and submit a server-built, already-partial-signed transaction (base64),
+ * used for the atomic burn + SNS subdomain mint where the execution wallet has
+ * pre-signed the createSubdomain/transferSubdomain instructions and the player
+ * adds the remaining signature (fee payer + burn authority). Returns the
+ * confirmed signature for /api/subdomain/confirm.
+ */
+export async function signAndSubmitServerTx(txBase64: string): Promise<string> {
+  const tx = Transaction.from(Buffer.from(txBase64, 'base64'));
+  const conn = getConnection();
+  const signed = await signTransactionBytes(tx);
+  const signature = await conn.sendRawTransaction(signed);
+  const blockhash = tx.recentBlockhash!;
+  const lastValidBlockHeight = tx.lastValidBlockHeight ?? (await conn.getBlockHeight()) + 150;
+  await conn.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, 'confirmed');
+  return signature;
 }

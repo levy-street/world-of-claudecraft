@@ -547,7 +547,31 @@ export class Api {
   // (not through post()) because the caller needs the status + `reason` to drive
   // the "wait for finalization" retry — post() collapses those into a message.
   async identityConfirm(quoteId: string, signature: string): Promise<{ ok: boolean; status: number; reason?: string; data: any }> {
-    const res = await fetch(this.base + '/api/identity/confirm', {
+    return this.confirmRaw('/api/identity/confirm', quoteId, signature);
+  }
+
+  // ── SNS subdomain mint + tradeable-character claim (PR #735) ────────────────
+  // Quote the atomic burn + subdomain mint; returns a server-built, partial-signed
+  // transaction (base64) for the player to sign + submit.
+  async subdomainQuote(body: { characterId: number; name: string }): Promise<{
+    quoteId: string; txBase64: string; label: string; fullDomain: string; priceWoc: number; payer: string; expiresAt: number;
+  }> {
+    return this.post('/api/subdomain/quote', body);
+  }
+
+  async subdomainConfirm(quoteId: string, signature: string): Promise<{ ok: boolean; status: number; reason?: string; data: any }> {
+    return this.confirmRaw('/api/subdomain/confirm', quoteId, signature);
+  }
+
+  // Claim a tradeable character whose subdomain your linked wallet now owns.
+  async claimCharacter(characterId: number): Promise<any> {
+    return this.post(`/api/characters/${characterId}/claim`, {});
+  }
+
+  // Shared confirm helper: surfaces status + `reason` so callers can poll for
+  // 'not_finalized' without post() collapsing the response into a message.
+  private async confirmRaw(path: string, quoteId: string, signature: string): Promise<{ ok: boolean; status: number; reason?: string; data: any }> {
+    const res = await fetch(this.base + path, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}) },
       body: JSON.stringify({ quoteId, signature }),

@@ -3545,6 +3545,52 @@ function openPaidRenameEditor(row: HTMLElement, c: { id: number; name: string })
   });
 }
 
+// Inline "mint a player-owned .sol subdomain" editor (PR #735). Burns $WOC and
+// mints ‹label›.worldofclaudecraft.sol to the player's wallet in one tx, then
+// binds the character to it.
+function openMintSubdomainEditor(row: HTMLElement, c: { id: number; name: string }): void {
+  if (row.querySelector('.paid-rename-editor')) return;
+  const priceLabel = renameCharacterPriceWoc !== null ? formatWoc(renameCharacterPriceWoc) : '—';
+  const editor = document.createElement('div');
+  editor.className = 'paid-rename-editor';
+  editor.innerHTML = `
+    <input class="paid-rename-input" maxlength="16" autocomplete="off"
+      value="${escapeHtml(c.name)}"
+      placeholder="${escapeHtml(t('character.newNamePlaceholder'))}"
+      aria-label="${escapeHtml(t('character.newNamePlaceholder'))}" />
+    <div class="paid-rename-hint">${escapeHtml(t('character.mintSolHint', { amount: priceLabel }))}</div>
+    <div class="paid-rename-actions">
+      <button class="btn paid-rename-cancel" type="button">${escapeHtml(t('character.renameCancel'))}</button>
+      <button class="btn btn-primary paid-rename-confirm" type="button">${escapeHtml(t('character.mintSolButton', { amount: priceLabel }))}</button>
+    </div>
+    <div class="paid-rename-status" role="status" aria-live="polite"></div>`;
+  row.appendChild(editor);
+  const input = editor.querySelector('.paid-rename-input') as HTMLInputElement;
+  const status = editor.querySelector('.paid-rename-status') as HTMLElement;
+  const confirmBtn = editor.querySelector('.paid-rename-confirm') as HTMLButtonElement;
+  input.focus();
+  editor.querySelector('.paid-rename-cancel')!.addEventListener('click', (e) => {
+    e.stopPropagation();
+    editor.remove();
+  });
+  confirmBtn.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    const name = input.value.trim();
+    if (!name) { input.focus(); return; }
+    confirmBtn.disabled = true;
+    input.disabled = true;
+    try {
+      const result = await mintSubdomain(c.id, name, (m) => { status.textContent = m; });
+      status.textContent = t('woc.mintSuccess', { domain: result.fullDomain });
+      await refreshCharacters();
+    } catch (err) {
+      status.textContent = userFacingApiError(err);
+      confirmBtn.disabled = false;
+      input.disabled = false;
+    }
+  });
+}
+
 async function refreshCharacters(): Promise<void> {
   if (WALLET_ENABLED) ensureIdentityPrices();
   if (api.realm) $('#charselect-realm').textContent = api.realm;
@@ -3588,7 +3634,7 @@ async function refreshCharacters(): Promise<void> {
             ? `<input class="rename-input" placeholder="${escapeHtml(t('character.newNamePlaceholder'))}" maxlength="16" /><span class="char-actions"><button class="btn btn-danger delete-char-btn" ${c.online ? 'disabled' : ''}>${escapeHtml(t('character.delete'))}</button><button class="btn rename-btn">${escapeHtml(t('character.rename'))}</button></span>`
             : c.online
               ? `<span class="char-actions"><button class="btn btn-danger delete-char-btn" disabled title="${escapeHtml(t('character.inWorldHint'))}">${escapeHtml(t('character.delete'))}</button><button class="btn take-over-btn" title="${escapeHtml(t('character.takeOverConfirm'))}" aria-label="${escapeHtml(t('character.takeOverConfirm'))}">${escapeHtml(t('character.takeOver'))}</button></span>`
-              : `<span class="char-actions"><button class="btn btn-danger delete-char-btn">${escapeHtml(t('character.delete'))}</button>${WALLET_ENABLED ? `<button class="btn paid-rename-btn" type="button">${escapeHtml(t('character.rename'))}</button>` : ''}<button class="btn enter-world-btn">${escapeHtml(t('auth.enterWorld'))}</button></span>`
+              : `<span class="char-actions"><button class="btn btn-danger delete-char-btn">${escapeHtml(t('character.delete'))}</button>${WALLET_ENABLED ? `<button class="btn paid-rename-btn" type="button">${escapeHtml(t('character.rename'))}</button>` : ''}${SNS_UI_ENABLED ? `<button class="btn mint-sol-btn" type="button">${escapeHtml(t('character.mintSolName'))}</button>` : ''}<button class="btn enter-world-btn">${escapeHtml(t('auth.enterWorld'))}</button></span>`
         }`;
 
       row.querySelector('.delete-char-btn')?.addEventListener('click', (e) => {
@@ -3637,6 +3683,10 @@ async function refreshCharacters(): Promise<void> {
         row.querySelector('.paid-rename-btn')?.addEventListener('click', (e) => {
           e.stopPropagation();
           openPaidRenameEditor(row, c);
+        });
+        row.querySelector('.mint-sol-btn')?.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openMintSubdomainEditor(row, c);
         });
         row.querySelector('.enter-world-btn')?.addEventListener('click', (e) => {
           e.stopPropagation();
@@ -4551,6 +4601,11 @@ let walletHiddenNoticeTimeout: number | null = null;
 // const WALLET_ENABLED = !NATIVE_APP && String(import.meta.env.VITE_WALLET_DISABLED ?? '').trim() !== '1';
 const WALLET_ENABLED =
   !NATIVE_APP && String(import.meta.env.VITE_WALLET_DISABLED ?? '').trim() !== '1';
+// SNS subdomain minting UI is shown only when both the wallet is enabled and the
+// deploy advertises SNS support (VITE_SNS_ENABLED), mirroring the server's
+// SNS_ENABLED gate so players never see a mint button the server will refuse.
+const SNS_UI_ENABLED =
+  WALLET_ENABLED && /^(1|true|yes|on)$/i.test(String(import.meta.env.VITE_SNS_ENABLED ?? '').trim());
 
 function walletCharacterScreenVisible(): boolean {
   try {
@@ -5215,6 +5270,36 @@ async function payWocIdentity(
       return r.data;
     }
     if (r.reason !== 'not_finalized') throw new Error(r.data?.error ?? t('woc.confirmFailed'));
+    onStatus(t('woc.finalizing'));
+    await new Promise((resolve) => window.setTimeout(resolve, 2500));
+  }
+  throw new Error(t('woc.finalizeTimeout'));
+}
+
+// Atomic burn + SNS subdomain mint: ensure wallet → quote (server-built tx) →
+// sign+submit → confirm, polling until finalization. Returns the bound result.
+async function mintSubdomain(
+  characterId: number,
+  name: string,
+  onStatus: (msg: string) => void,
+): Promise<any> {
+  const linked = await ensureWalletLinked();
+  if (!linked) throw new Error(t('woc.linkWalletFirst'));
+  onStatus(t('woc.quoting'));
+  const quote = await api.subdomainQuote({ characterId, name });
+  const wallet = await loadWallet();
+  onStatus(t('woc.approveBurn', { amount: formatWoc(quote.priceWoc) }));
+  const signature = await wallet.signAndSubmitServerTx(quote.txBase64);
+  onStatus(t('woc.confirming'));
+  for (let attempt = 0; attempt < 24; attempt++) {
+    const r = await api.subdomainConfirm(quote.quoteId, signature);
+    if (r.ok) {
+      void refreshWocBalance(linked);
+      return r.data;
+    }
+    if (r.reason !== 'not_finalized' && r.reason !== 'subdomain_not_minted') {
+      throw new Error(r.data?.error ?? t('woc.confirmFailed'));
+    }
     onStatus(t('woc.finalizing'));
     await new Promise((resolve) => window.setTimeout(resolve, 2500));
   }

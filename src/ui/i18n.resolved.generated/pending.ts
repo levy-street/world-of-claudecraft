@@ -10,6 +10,9 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "character.mintSolButton",
+    "character.mintSolHint",
+    "character.mintSolName",
     "character.renameCancel",
     "character.renamePaidButton",
     "character.renamePriceHint",
@@ -20,11 +23,15 @@ export const pending: Record<string, readonly string[]> = {
     "woc.finalizing",
     "woc.guildRenameSuccess",
     "woc.linkWalletFirst",
+    "woc.mintSuccess",
     "woc.quoting",
     "woc.renameSuccess",
     "woc.reserveSuccess"
   ],
   "es_ES": [
+    "character.mintSolButton",
+    "character.mintSolHint",
+    "character.mintSolName",
     "character.renameCancel",
     "character.renamePaidButton",
     "character.renamePriceHint",
@@ -35,11 +42,15 @@ export const pending: Record<string, readonly string[]> = {
     "woc.finalizing",
     "woc.guildRenameSuccess",
     "woc.linkWalletFirst",
+    "woc.mintSuccess",
     "woc.quoting",
     "woc.renameSuccess",
     "woc.reserveSuccess"
   ],
   "fr_FR": [
+    "character.mintSolButton",
+    "character.mintSolHint",
+    "character.mintSolName",
     "character.renameCancel",
     "character.renamePaidButton",
     "character.renamePriceHint",
@@ -50,11 +61,15 @@ export const pending: Record<string, readonly string[]> = {
     "woc.finalizing",
     "woc.guildRenameSuccess",
     "woc.linkWalletFirst",
+    "woc.mintSuccess",
     "woc.quoting",
     "woc.renameSuccess",
     "woc.reserveSuccess"
   ],
   "fr_CA": [
+    "character.mintSolButton",
+    "character.mintSolHint",
+    "character.mintSolName",
     "character.renameCancel",
     "character.renamePaidButton",
     "character.renamePriceHint",
@@ -65,12 +80,16 @@ export const pending: Record<string, readonly string[]> = {
     "woc.finalizing",
     "woc.guildRenameSuccess",
     "woc.linkWalletFirst",
+    "woc.mintSuccess",
     "woc.quoting",
     "woc.renameSuccess",
     "woc.reserveSuccess"
   ],
   "en_CA": [],
   "it_IT": [
+    "character.mintSolButton",
+    "character.mintSolHint",
+    "character.mintSolName",
     "character.renameCancel",
     "character.renamePaidButton",
     "character.renamePriceHint",
@@ -81,11 +100,15 @@ export const pending: Record<string, readonly string[]> = {
     "woc.finalizing",
     "woc.guildRenameSuccess",
     "woc.linkWalletFirst",
+    "woc.mintSuccess",
     "woc.quoting",
     "woc.renameSuccess",
     "woc.reserveSuccess"
   ],
   "de_DE": [
+    "character.mintSolButton",
+    "character.mintSolHint",
+    "character.mintSolName",
     "character.renameCancel",
     "character.renamePaidButton",
     "character.renamePriceHint",
@@ -96,11 +119,15 @@ export const pending: Record<string, readonly string[]> = {
     "woc.finalizing",
     "woc.guildRenameSuccess",
     "woc.linkWalletFirst",
+    "woc.mintSuccess",
     "woc.quoting",
     "woc.renameSuccess",
     "woc.reserveSuccess"
   ],
   "zh_CN": [
+    "character.mintSolButton",
+    "character.mintSolHint",
+    "character.mintSolName",
     "character.renameCancel",
     "character.renamePaidButton",
     "character.renamePriceHint",
@@ -111,11 +138,15 @@ export const pending: Record<string, readonly string[]> = {
     "woc.finalizing",
     "woc.guildRenameSuccess",
     "woc.linkWalletFirst",
+    "woc.mintSuccess",
     "woc.quoting",
     "woc.renameSuccess",
     "woc.reserveSuccess"
   ],
   "zh_TW": [
+    "character.mintSolButton",
+    "character.mintSolHint",
+    "character.mintSolName",
     "character.renameCancel",
     "character.renamePaidButton",
     "character.renamePriceHint",
@@ -126,11 +157,15 @@ export const pending: Record<string, readonly string[]> = {
     "woc.finalizing",
     "woc.guildRenameSuccess",
     "woc.linkWalletFirst",
+    "woc.mintSuccess",
     "woc.quoting",
     "woc.renameSuccess",
     "woc.reserveSuccess"
   ],
   "ko_KR": [
+    "character.mintSolButton",
+    "character.mintSolHint",
+    "character.mintSolName",
     "character.renameCancel",
     "character.renamePaidButton",
     "character.renamePriceHint",
@@ -141,11 +176,15 @@ export const pending: Record<string, readonly string[]> = {
     "woc.finalizing",
     "woc.guildRenameSuccess",
     "woc.linkWalletFirst",
+    "woc.mintSuccess",
     "woc.quoting",
     "woc.renameSuccess",
     "woc.reserveSuccess"
   ],
   "ja_JP": [
+    "character.mintSolButton",
+    "character.mintSolHint",
+    "character.mintSolName",
     "character.renameCancel",
     "character.renamePaidButton",
     "character.renamePriceHint",
@@ -156,11 +195,15 @@ export const pending: Record<string, readonly string[]> = {
     "woc.finalizing",
     "woc.guildRenameSuccess",
     "woc.linkWalletFirst",
+    "woc.mintSuccess",
     "woc.quoting",
     "woc.renameSuccess",
     "woc.reserveSuccess"
   ],
   "pt_BR": [
+    "character.mintSolButton",
+    "character.mintSolHint",
+    "character.mintSolName",
     "character.renameCancel",
     "character.renamePaidButton",
     "character.renamePriceHint",
@@ -171,11 +214,15 @@ export const pending: Record<string, readonly string[]> = {
     "woc.finalizing",
     "woc.guildRenameSuccess",
     "woc.linkWalletFirst",
+    "woc.mintSuccess",
     "woc.quoting",
     "woc.renameSuccess",
     "woc.reserveSuccess"
   ],
   "ru_RU": [
+    "character.mintSolButton",
+    "character.mintSolHint",
+    "character.mintSolName",
     "character.renameCancel",
     "character.renamePaidButton",
     "character.renamePriceHint",
@@ -186,6 +233,7 @@ export const pending: Record<string, readonly string[]> = {
     "woc.finalizing",
     "woc.guildRenameSuccess",
     "woc.linkWalletFirst",
+    "woc.mintSuccess",
     "woc.quoting",
     "woc.renameSuccess",
     "woc.reserveSuccess"
