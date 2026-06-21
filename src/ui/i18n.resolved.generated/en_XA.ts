@@ -593,6 +593,9 @@ export const en_XA: EnTranslations = {
     "renameRequired": "[ŕéñáɱé ŕéɋúíŕéð]",
     "delete": "[Ðéļéţé]",
     "rename": "[Ŕéñáɱé]",
+    "renamePaidButton": "[Þáý {amount} $ŴÓÇ & Ŕéñáɱé]",
+    "renamePriceHint": "[Á ʋóļúñţáŕý ŕéñáɱé ƀúŕñš {amount} $ŴÓÇ.]",
+    "renameCancel": "[Çáñçéļ]",
     "newNamePlaceholder": "[Ñéŵ çĥáŕáçţéŕ ñáɱé]",
     "tabCharacters": "[Çĥáŕáçţéŕš]",
     "tabCreate": "[Çŕéáţé]",
@@ -600,6 +603,18 @@ export const en_XA: EnTranslations = {
     "viewProfile": "[Ʋíéŵ Þŕóƒíļé]",
     "profile": "[Þŕóƒíļé]",
     "closeProfile": "[Çļóšé þŕóƒíļé]"
+  },
+  "woc": {
+    "linkWalletFirst": "[Çóññéçţ áñð ļíñķ á Šóļáñá ŵáļļéţ ţó þáý ŵíţĥ $ŴÓÇ.]",
+    "quoting": "[Þŕéþáŕíñĝ ýóúŕ $ŴÓÇ þáýɱéñţ…]",
+    "approveBurn": "[Áþþŕóʋé ţĥé {amount} $ŴÓÇ ƀúŕñ íñ ýóúŕ ŵáļļéţ…]",
+    "confirming": "[Çóñƒíŕɱíñĝ ţĥé ƀúŕñ óñ-çĥáíñ…]",
+    "finalizing": "[Ŵáíţíñĝ ƒóŕ Šóļáñá ƒíñáļížáţíóñ…]",
+    "confirmFailed": "[Ţĥé $ŴÓÇ þáýɱéñţ çóúļð ñóţ ƀé ʋéŕíƒíéð.]",
+    "finalizeTimeout": "[Ţíɱéð óúţ ŵáíţíñĝ ƒóŕ ƒíñáļížáţíóñ. Íƒ $ŴÓÇ ŵáš ƀúŕñéð, ŕéóþéñ áñð ŕéţŕý — ţĥé þáýɱéñţ šéţţļéš óñçé íţ ƒíñáļížéš.]",
+    "renameSuccess": "[Ŕéñáɱéð ţó {name}.]",
+    "guildRenameSuccess": "[Ĝúíļð ŕéñáɱéð ţó {name}.]",
+    "reserveSuccess": "[Ŕéšéŕʋéð ţĥé ñáɱé {name}.]"
   },
   "deleteCharacter": {
     "title": "[Ðéļéţé Çĥáŕáçţéŕ]",

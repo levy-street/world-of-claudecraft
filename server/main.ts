@@ -23,7 +23,7 @@ import { json, readBody, isUniqueViolation } from './http_util';
 import { requestIp, rateLimited, authThrottled, recordAuthFailure, clearAuthFailures } from './ratelimit';
 import { verifyTurnstile } from './turnstile';
 import { handleWalletChallenge, handleWalletLink, handleWalletGet, handleWalletUnlink } from './wallet';
-import { handleIdentityQuote, handleIdentityConfirm, registerIdentityActions } from './identity';
+import { handleIdentityQuote, handleIdentityConfirm, handleIdentityPrices, registerIdentityActions } from './identity';
 import { makeIdentityActions } from './identity_actions';
 import { validateGuildName } from './social';
 import { handleCardUpload, handleCardRoutes, captureReferral } from './player_card';
@@ -588,6 +588,9 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       return handleWalletGet(req, res, accountId);
     }
     // $WOC-paid identity actions: quote a burn price, then redeem the signature.
+    if (req.method === 'GET' && url === '/api/identity/prices') {
+      return handleIdentityPrices(res);
+    }
     if (req.method === 'POST' && url === '/api/identity/quote') {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
