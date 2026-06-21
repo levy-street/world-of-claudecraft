@@ -29,7 +29,8 @@ import { handleAdminApi } from './admin';
 import { handleInternalApi } from './internal';
 import { handlePerfReport } from './perf_report';
 import { GameServer } from './game';
-import { REALM, REALM_DIRECTORY, REALM_ORIGINS } from './realm';
+import { REALM, REALM_DIRECTORY, REALM_ORIGINS, mergeRealmDirectory } from './realm';
+import { listRealmsForDirectory } from './realm_db';
 import { webLoginEnforced, isWebClientRequest } from './web_login_guard';
 import { cacheControlFor, etagFor, isNotModified } from './static_cache';
 import { recordUsageCacheEvent, recordUsageMetric, setUsageCacheSize } from './provider_usage';
@@ -475,7 +476,12 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       // characters the account has on each realm (for the realm-list screen)
       const accountId = await bearerAccount(req);
       const characters = accountId !== null ? await characterCountsByRealm(accountId) : {};
-      return json(res, 200, { current: REALM, realms: REALM_DIRECTORY, characters });
+      // Merge the operator-pinned env directory with player-provisioned registry
+      // realms (#475). Env entries stay canonical and come first; active
+      // registry realms not pinned in env follow. Existing clients read
+      // name/url/type; the extra realmId/status/owned/tier fields are additive.
+      const realms = mergeRealmDirectory(REALM_DIRECTORY, await listRealmsForDirectory(pool));
+      return json(res, 200, { current: REALM, realms, characters });
     }
     if (req.method === 'GET' && url === '/api/search') {
       const accountId = await bearerAccount(req);
