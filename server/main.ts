@@ -25,6 +25,10 @@ import { verifyTurnstile } from './turnstile';
 import { handleWalletChallenge, handleWalletLink, handleWalletGet, handleWalletUnlink } from './wallet';
 import { handleIdentityQuote, handleIdentityConfirm, handleIdentityPrices, registerIdentityActions } from './identity';
 import { makeIdentityActions } from './identity_actions';
+import { handleSubdomainQuote, handleSubdomainConfirm } from './subdomain_mint';
+import { handleCharacterClaim, registerClaimHooks, accountControlsBoundCharacter } from './character_claim';
+import { CHARACTER_TRADEABLE } from './woc_config';
+import { getCharacterAnyAccount } from './db';
 import { validateGuildName } from './social';
 import { handleCardUpload, handleCardRoutes, captureReferral } from './player_card';
 import { handleAdminApi } from './admin';
@@ -62,6 +66,21 @@ registerIdentityActions(
     validateGuildName,
   }),
 );
+
+// Tradeable-character claim effects: kick the prior owner's live session and
+// detach the character from its guild before the account reassignment.
+registerClaimHooks({
+  isCharacterOnline: (characterId) => [...game.clients.values()].some((s) => s.characterId === characterId),
+  disconnectCharacter: (characterId, reason) => {
+    const session = [...game.clients.values()].find((s) => s.characterId === characterId);
+    if (session) game.disconnectAccount(session.accountId, reason);
+  },
+  leaveGuildOnTransfer: async (characterId) => {
+    const session = [...game.clients.values()].find((s) => s.characterId === characterId);
+    const name = session?.name ?? (await getCharacterAnyAccount(characterId))?.name ?? '';
+    await game.social.guildLeave({ characterId, name });
+  },
+});
 
 function initialCharacterState(cls: PlayerClass, name: string, skin: number): import('../src/sim/sim').CharacterState {
   const sim = new Sim({ seed: 20061, playerClass: cls, playerName: name });
@@ -416,7 +435,13 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     }
     const delMatch = /^\/api\/characters\/(\d+)$/.exec(url);
     const renameMatch = /^\/api\/characters\/(\d+)\/rename$/.exec(url);
+    const claimMatch = /^\/api\/characters\/(\d+)\/claim$/.exec(url);
     const standingMatch = /^\/api\/characters\/(\d+)\/standing$/.exec(url);
+    if (req.method === 'POST' && claimMatch) {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleCharacterClaim(req, res, accountId, Number(claimMatch[1]));
+    }
     if (req.method === 'GET' && standingMatch) {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
@@ -601,6 +626,17 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       if (accountId === null) return;
       return handleIdentityConfirm(req, res, accountId);
     }
+    // Atomic $WOC-burn + player-owned SNS subdomain mint (flag-gated).
+    if (req.method === 'POST' && url === '/api/subdomain/quote') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleSubdomainQuote(req, res, accountId);
+    }
+    if (req.method === 'POST' && url === '/api/subdomain/confirm') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleSubdomainConfirm(req, res, accountId);
+    }
     // Shareable player card: publish (PNG body) + referral stats for the card.
     if (req.method === 'POST' && url === '/api/card') {
       const accountId = await bearerActiveAccount(req, res);
@@ -723,6 +759,14 @@ async function main(): Promise<void> {
     }
     if (character.force_rename) {
       ws.send(JSON.stringify({ t: 'error', error: 'This character must be renamed before entering the world.' }));
+      ws.close();
+      return;
+    }
+    // Tradeable-character gate: a bound character can only enter the world while
+    // the account's linked wallet still controls its subdomain on-chain. If the
+    // name was sold/transferred, the new owner must claim it first.
+    if (CHARACTER_TRADEABLE && character.bound_domain && !(await accountControlsBoundCharacter(accountId, character.bound_domain))) {
+      ws.send(JSON.stringify({ t: 'error', error: 'This character was transferred to a new owner and must be re-claimed.' }));
       ws.close();
       return;
     }
