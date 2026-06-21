@@ -139,6 +139,13 @@ export class FlowLedger {
     return this.db.seasonHeadroom(seasonId);
   }
 
+  // Inflows and emissions gate on season status ASYMMETRICALLY, by design:
+  // creditInflow rejects a non-active season (no NEW sinks once collection
+  // closes), but emit (below) deliberately ignores season status — end-of-season
+  // settlement (#479/#480) pays out AFTER a season closes, and per-match #478
+  // payouts happen mid-season. WHEN to pay is the settlement caller's lifecycle
+  // decision; the ledger's only invariant is "emissions <= verified sinks".
+
   /** Credit a verified sink (buy/lock/burn pressure) to a season. */
   async creditInflow(input: FlowEntryInput): Promise<InflowResult> {
     if (directionOf(input.source) !== 'in') return { ok: false, reason: 'wrong_direction' };
@@ -151,6 +158,8 @@ export class FlowLedger {
    * Attempt an emission. Returns ok=false reason='budget_exceeded' when the
    * payout would exceed verified sinks — the buy>sell invariant refusing to
    * over-emit. Never throws on a budget rejection; callers must check `.ok`.
+   * Does NOT gate on season status (see creditInflow) — settlement timing is the
+   * caller's call; replay safety comes from the UNIQUE tx_sig in the DB layer.
    */
   async emit(input: FlowEntryInput): Promise<EmitResult> {
     if (directionOf(input.source) !== 'out') {

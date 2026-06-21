@@ -7,6 +7,13 @@
 // environment. The PARSING is a pure function (parseSplitPayment) so it is fully
 // unit-testable against fixture getTransaction responses, with the network call
 // (fetchFinalizedTransaction) kept thin and separate.
+//
+// NOTE — deliberate overlap with solana_tx.ts: that module (getFinalizedTx +
+// owner-delta/burn/memo helpers) is the #734 verify core, kept BYTE-IDENTICAL to
+// PR #734 so it stays the upstream of record and merges cleanly. This module is
+// the skins-marketplace RPC reader the buyback keeper reuses. They look redundant
+// (both fetch a finalized tx and reduce token deltas) but are kept separate ON
+// PURPOSE — do NOT merge them, or one of the two upstreams gets a merge war.
 
 // The single server-side Solana RPC. Every server read (purchase-payment verify
 // AND the buy-and-burn keeper's reads/broadcast) resolves against this one URL,

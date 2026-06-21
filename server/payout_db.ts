@@ -163,28 +163,3 @@ export async function withPayoutKeeperLock<T>(fn: () => Promise<T>): Promise<T |
     client.release();
   }
 }
-
-// Public transparency ledger: completed batches + cumulative totals, split by mode
-// (burned vs topped-up). Read by an ops/admin surface; never under hot load.
-export async function buybackLedger(limit = 100): Promise<{
-  batches: PayoutBatchRow[];
-  cumulativeWocBurned: bigint;
-  cumulativeWocToppedUp: bigint;
-  cumulativeUsdcIn: bigint;
-}> {
-  const batches = await pool.query(`SELECT * FROM buyback_batches WHERE status = 'settled' ORDER BY executed_at DESC LIMIT $1`, [limit]);
-  const totals = await pool.query(
-    `SELECT
-       COALESCE(SUM(woc_settled) FILTER (WHERE mode='burn'),0)::text   AS burned,
-       COALESCE(SUM(woc_settled) FILTER (WHERE mode='top_up'),0)::text AS topped_up,
-       COALESCE(SUM(usdc_in),0)::text                                  AS usdc
-     FROM buyback_batches WHERE status = 'settled'`,
-  );
-  const t = totals.rows[0] ?? {};
-  return {
-    batches: batches.rows.map(mapBatch),
-    cumulativeWocBurned: BigInt((t.burned as string) ?? '0'),
-    cumulativeWocToppedUp: BigInt((t.topped_up as string) ?? '0'),
-    cumulativeUsdcIn: BigInt((t.usdc as string) ?? '0'),
-  };
-}
