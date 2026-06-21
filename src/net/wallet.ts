@@ -16,8 +16,15 @@ import {
   type StandardEventsFeature,
 } from '@wallet-standard/features';
 import { isSolanaChain } from '@solana/wallet-standard-chains';
-import { SolanaSignMessage, type SolanaSignMessageFeature } from '@solana/wallet-standard-features';
+import {
+  SolanaSignMessage,
+  SolanaSignAndSendTransaction,
+  type SolanaSignMessageFeature,
+  type SolanaSignAndSendTransactionFeature,
+} from '@solana/wallet-standard-features';
+import { Connection, PublicKey, Transaction } from '@solana/web3.js';
 import bs58 from 'bs58';
+import { buildRealmLockIx, ownerTokenAccount } from './realm_escrow';
 
 export interface WalletState {
   address: string | null;
@@ -37,6 +44,7 @@ type ConnectApi = StandardConnectFeature[typeof StandardConnect];
 type DisconnectApi = StandardDisconnectFeature[typeof StandardDisconnect];
 type EventsApi = StandardEventsFeature[typeof StandardEvents];
 type SignMessageApi = SolanaSignMessageFeature[typeof SolanaSignMessage];
+type SignAndSendApi = SolanaSignAndSendTransactionFeature[typeof SolanaSignAndSendTransaction];
 
 class WalletSelectionCancelled extends Error {
   constructor() {
@@ -117,6 +125,13 @@ function eventsFeature(wallet: Wallet): EventsApi | null {
 
 function signMessageFeature(wallet: CompatibleWallet): SignMessageApi {
   return wallet.features[SolanaSignMessage] as SignMessageApi;
+}
+
+// SolanaSignAndSendTransaction is optional (not part of CompatibleWallet, which
+// only requires connect + sign-message), so resolve it dynamically.
+function signAndSendFeature(wallet: CompatibleWallet): SignAndSendApi | null {
+  const feature = (wallet.features as Record<string, unknown>)[SolanaSignAndSendTransaction];
+  return feature ? (feature as SignAndSendApi) : null;
 }
 
 function accountSupportsSolanaSignMessage(account: WalletAccount): boolean {
@@ -357,6 +372,59 @@ export async function signMessageBase58(message: string): Promise<string> {
   const result = results[0];
   if (!result || !(result.signature instanceof Uint8Array)) throw new Error('wallet returned an invalid signature');
   if (!bytesEqual(result.signedMessage, messageBytes)) throw new Error('wallet modified the message before signing');
+  return bs58.encode(result.signature);
+}
+
+// ── Stake-to-provision: lock $WOC into the realm escrow (#475) ───────────────
+// The cluster the realm_stake_escrow program + $WOC live on. Devnet during
+// testing; set VITE_REALM_RPC_URL + VITE_REALM_CHAIN for another cluster. RPC
+// and chain MUST be the same cluster (a blockhash from one is invalid on another).
+const REALM_RPC_URL = (import.meta.env.VITE_REALM_RPC_URL ?? 'https://api.devnet.solana.com').trim();
+const REALM_CHAIN = (import.meta.env.VITE_REALM_CHAIN ?? 'solana:devnet').trim() as `solana:${string}`;
+
+export interface RealmLockQuote {
+  programId: string;
+  realmId: number;
+  mint: string;
+  amountBase: string;
+}
+
+// Lock the quoted $WOC into the realm escrow vault: build the lock transaction
+// the program will verify, have the connected wallet sign and send it on the
+// realm cluster, and return the signature for POST /api/realms/confirm. The
+// instruction is built by the shared encoder (src/net/realm_escrow.ts), which a
+// test pins byte-identical to the server's verified builder.
+export async function signAndSendRealmLock(quote: RealmLockQuote): Promise<string> {
+  const wallet = selectedWallet;
+  const account = selectedAccount;
+  if (!wallet || !account) throw new Error('connect a wallet first');
+  const feature = signAndSendFeature(wallet);
+  if (!feature) throw new Error('this wallet cannot sign and send transactions');
+
+  const staker = new PublicKey(account.address);
+  const mint = new PublicKey(quote.mint);
+  const ix = buildRealmLockIx({
+    programId: new PublicKey(quote.programId),
+    staker,
+    realmId: BigInt(quote.realmId),
+    amount: BigInt(quote.amountBase),
+    mint,
+    stakerToken: ownerTokenAccount(staker, mint),
+  });
+
+  const connection = new Connection(REALM_RPC_URL, 'confirmed');
+  const { blockhash } = await connection.getLatestBlockhash('confirmed');
+  const tx = new Transaction();
+  tx.feePayer = staker;
+  tx.recentBlockhash = blockhash;
+  tx.add(ix);
+  const wire = tx.serialize({ requireAllSignatures: false, verifySignatures: false });
+
+  const [result] = await feature.signAndSendTransaction({
+    account,
+    chain: REALM_CHAIN,
+    transaction: new Uint8Array(wire),
+  });
   return bs58.encode(result.signature);
 }
 
