@@ -179,6 +179,9 @@ export const en_XA: EnTranslations = {
       "collapseHint": "[Çóļļáþšé ɋúéšţ ţŕáçķéŕ]",
       "expandHint": "[Éẋþáñð ɋúéšţ ţŕáçķéŕ]"
     },
+    "questWaypoint": {
+      "distance": "[{value} ýðš]"
+    },
     "chatTimestamps": {
       "show": "[Šĥóŵ Çĥáţ Ţíɱéšţáɱþš]",
       "format": "[Ţíɱéšţáɱþ Ƒóŕɱáţ]",

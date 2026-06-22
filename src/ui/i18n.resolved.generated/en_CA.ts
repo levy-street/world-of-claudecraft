@@ -179,6 +179,9 @@ export const en_CA: EnTranslations = {
       "collapseHint": "Collapse quest tracker",
       "expandHint": "Expand quest tracker"
     },
+    "questWaypoint": {
+      "distance": "{value} yds"
+    },
     "chatTimestamps": {
       "show": "Show Chat Timestamps",
       "format": "Timestamp Format",

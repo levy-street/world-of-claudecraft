@@ -179,6 +179,9 @@ export const pt_BR: EnTranslations = {
       "collapseHint": "Recolher missões",
       "expandHint": "Expandir missões"
     },
+    "questWaypoint": {
+      "distance": "{value} yds"
+    },
     "chatTimestamps": {
       "show": "Mostrar horário no chat",
       "format": "Formato do horário",

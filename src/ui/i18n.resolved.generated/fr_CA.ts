@@ -179,6 +179,9 @@ export const fr_CA: EnTranslations = {
       "collapseHint": "Réduire le suivi des quêtes",
       "expandHint": "Développer le suivi des quêtes"
     },
+    "questWaypoint": {
+      "distance": "{value} yds"
+    },
     "chatTimestamps": {
       "show": "Afficher l'horodatage de la discussion",
       "format": "Format de l'horodatage",

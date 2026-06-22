@@ -34,6 +34,14 @@ describe('questTrackerView', () => {
     expect(v.quests[1].objectives.map((o) => o.done)).toEqual([true, true]); // 6/6, 4/4
   });
 
+  it('exposes each quest id so the tracker can open the log to it', () => {
+    // The #quest-tracker click handler reads data-quest-id off each rendered
+    // quest button and passes it to openQuestLogTo, so the view must carry the
+    // quest id (in order) for every expanded row.
+    const v = questTrackerView(QUESTS, false);
+    expect(v.quests.map((q) => q.id)).toEqual(['warden', 'webwood']);
+  });
+
   it('collapsed: header only, but keeps the quest count', () => {
     const v = questTrackerView(QUESTS, true);
     expect(v.visible).toBe(true);
@@ -50,6 +58,17 @@ describe('questTrackerView', () => {
   it('treats an objective with a zero total as done (0 >= 0)', () => {
     const v = questTrackerView([{ id: 'x', title: 'X', complete: false, objectives: [{ label: 'o', current: 0, total: 0 }] }], false);
     expect(v.quests[0].objectives[0].done).toBe(true);
+  });
+
+  it('marks only the focused quest row as focused', () => {
+    const v = questTrackerView(QUESTS, false, 'webwood');
+    expect(v.quests.map((q) => q.focused)).toEqual([false, true]);
+  });
+
+  it('focuses no row when the focused id is null, undefined, or not tracked', () => {
+    expect(questTrackerView(QUESTS, false).quests.every((q) => !q.focused)).toBe(true);
+    expect(questTrackerView(QUESTS, false, null).quests.every((q) => !q.focused)).toBe(true);
+    expect(questTrackerView(QUESTS, false, 'gone').quests.every((q) => !q.focused)).toBe(true);
   });
 
   it('does not mutate the caller input and returns distinct copies', () => {

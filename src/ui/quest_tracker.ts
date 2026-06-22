@@ -33,6 +33,9 @@ export interface QuestTrackerQuestRow {
   id: string;
   title: string;
   complete: boolean;
+  /** The player's focused quest: highlighted in the tracker and pointed at by the
+   *  on-screen waypoint. At most one row is focused. */
+  focused: boolean;
   objectives: QuestTrackerObjectiveRow[];
 }
 
@@ -48,8 +51,14 @@ export interface QuestTrackerView {
 
 /** Build the tracker view from the tracked quests + the collapse preference.
  *  Collapsed renders the header only (with the quest count); expanded renders
- *  every quest and objective, with each objective's done state computed. */
-export function questTrackerView(quests: readonly TrackedQuest[], collapsed: boolean): QuestTrackerView {
+ *  every quest and objective, with each objective's done state computed.
+ *  `focusedQuestId` marks the focused row (the one the waypoint points at), if
+ *  any of the tracked quests matches. */
+export function questTrackerView(
+  quests: readonly TrackedQuest[],
+  collapsed: boolean,
+  focusedQuestId?: string | null,
+): QuestTrackerView {
   const count = quests.length;
   if (count === 0) return { visible: false, collapsed, count: 0, quests: [] };
   if (collapsed) return { visible: true, collapsed: true, count, quests: [] };
@@ -57,6 +66,7 @@ export function questTrackerView(quests: readonly TrackedQuest[], collapsed: boo
     id: q.id,
     title: q.title,
     complete: q.complete,
+    focused: !!focusedQuestId && q.id === focusedQuestId,
     objectives: q.objectives.map((o) => ({ ...o, done: o.current >= o.total })),
   }));
   return { visible: true, collapsed: false, count, quests: questRows };
