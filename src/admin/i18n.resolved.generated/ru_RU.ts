@@ -231,7 +231,7 @@ export const ru_RU: AdminTranslations = {
   "error.moderationExpiryFuture": "срок окончания блокировки должен быть в будущем",
   "error.characterNotFound": "персонаж не найден",
   "alert.customExpiryFuture": "Выберите срок окончания в будущем.",
-  "zone.eastbrook_vale": "Истврукская долина",
+  "zone.eastbrook_vale": "Истбрукская долина",
   "zone.mirefen_marsh": "Мирефенская топь",
   "zone.thornpeak_heights": "Терновые высоты",
   "dungeon.hollow_crypt": "Пустая крипта",

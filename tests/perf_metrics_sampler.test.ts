@@ -25,6 +25,7 @@ function makeDeps(over: Partial<SamplerDeps> = {}): SamplerDeps {
     getEntityCount: () => 37,
     getEchoMs: () => 0,
     getJitterMs: () => 0,
+    getApm: () => 0,
     // Inject env probes so the test is deterministic + browser-free.
     readMemory: () => null,
     readConnectionType: () => null,

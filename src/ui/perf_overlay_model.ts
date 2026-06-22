@@ -24,7 +24,8 @@ export type PerfMetricKey =
   | 'fps' | 'frameTime' | 'fps1Low' | 'fps01Low'
   | 'ping' | 'jitter' | 'snapshot' | 'connection'
   | 'drawCalls' | 'triangles' | 'geometries' | 'textures' | 'programs' | 'renderScale' | 'gpu'
-  | 'memory' | 'hitches' | 'entities';
+  | 'memory' | 'hitches' | 'entities'
+  | 'apm';
 
 /** A throttled, raw snapshot of every measurable signal. Fields are nullable so
  *  an unsupported source (e.g. performance.memory off Chromium, ping while
@@ -56,6 +57,8 @@ export interface MetricsSample {
   memoryLimitMb: number | null;
   hitches: number | null;
   entities: number | null;
+  // input / session
+  apm: number;
   backgrounded: boolean;
 }
 
@@ -313,6 +316,12 @@ export const METRIC_REGISTRY: readonly MetricDef[] = [
     read: (s) => (s.entities == null ? null : { kind: 'int', v: s.entities }),
     severity: () => NONE,
   },
+  // --- Input / session ---
+  {
+    key: 'apm', labelKey: 'hudChrome.perf.labels.apm', group: 'input', defaultOn: false,
+    read: (s) => ({ kind: 'int', v: s.apm }),
+    severity: () => NONE,
+  },
 ];
 
 export const PERF_METRIC_KEYS: readonly PerfMetricKey[] = METRIC_REGISTRY.map((d) => d.key);
@@ -321,7 +330,7 @@ export const PERF_METRIC_KEYS: readonly PerfMetricKey[] = METRIC_REGISTRY.map((d
 // Metric groups (categorize the Stats toggles + the overlay's render bands)
 // ---------------------------------------------------------------------------
 
-export type PerfMetricGroup = 'frame' | 'network' | 'renderer' | 'system';
+export type PerfMetricGroup = 'frame' | 'network' | 'renderer' | 'system' | 'input';
 
 export interface PerfMetricGroupDef {
   id: PerfMetricGroup;
@@ -335,6 +344,7 @@ export const PERF_METRIC_GROUPS: readonly PerfMetricGroupDef[] = [
   { id: 'network', labelKey: 'hudChrome.perf.groups.network' },
   { id: 'renderer', labelKey: 'hudChrome.perf.groups.renderer' },
   { id: 'system', labelKey: 'hudChrome.perf.groups.system' },
+  { id: 'input', labelKey: 'hudChrome.perf.groups.input' },
 ];
 
 /** A single metric's toggle-chip descriptor (key + its short label key). */

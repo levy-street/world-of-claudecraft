@@ -51,6 +51,10 @@ i18n catalog/matchers/gates (`localization_fixes`, `localization_coverage`, `i18
 fails on a render/ui/game/net/three import, a DOM global, or a `Math.random`/`Date.now`/
 `performance.now`, so the host-agnostic and determinism invariants are enforced, not just
 documented. Run it after any `src/sim/` change.
+`malware_scan.test.ts` is the release-gate backstop: it imports the signature catalog from
+`scripts/malware_scan.mjs` and asserts each rule still fires on a planted sample, stays quiet
+on the repo's real wallet/auth/RNG-seed code, and that the working tree has zero high-severity
+findings (so a planted drainer/backdoor breaks `npm test`). Run it after touching the scanner.
 
 ## i18n gates live here (don't produce strings — enforce them)
 The i18n tripwires the root CLAUDE.md names are this directory's files; run them after

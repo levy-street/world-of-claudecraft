@@ -196,7 +196,7 @@ export const zh_TW: AdminTranslations = {
   "auth.loginFailed": "登入失敗 — 伺服器是否在執行？",
   "common.unknown": "未知",
   "detail.since": "自 {value}",
-  "detail.suspendedUntil": "暫停至 {value}",
+  "detail.suspendedUntil": "停權至 {value}",
   "detail.accountNum": "帳戶 #{id}",
   "detail.started": "開始",
   "detail.lengthHours": "{count} 小時",

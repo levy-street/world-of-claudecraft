@@ -282,6 +282,7 @@ export interface IWorld {
   pickUpObject(id: number): void;
   acceptQuest(questId: string): void;
   turnInQuest(questId: string): void;
+  reportTelemetry(kind: string, data: Record<string, number>): void;
   abandonQuest(questId: string): void;
   equipItem(itemId: string): void;
   unequipItem(slot: EquipSlot): void;

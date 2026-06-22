@@ -60,6 +60,15 @@ jobs:
       - name: Verify committed i18n artifacts are fresh
         run: git diff --exit-code -- src/ui/i18n.resolved.generated src/admin/i18n.resolved.generated src/ui/i18n.status.summary.json
 
+      # Release-gate malicious-code scan. The flagger is high-recall (most hits are
+      # expected dev-tooling false positives), so this uses --gate: it fails only on
+      # a HIGH-severity signature that survives the path-aware priors (a wallet
+      # drainer, a hardcoded-credential auth bypass, an exfil channel, a planted
+      # instruction-file injection). tests/malware_scan.test.ts asserts the same
+      # inside `npm test`; this just surfaces it sooner and more legibly.
+      - name: Malicious-code gate
+        run: npm run security:gate
+
       - name: Run tests (PR tier)
         run: npm test
 
@@ -106,6 +115,12 @@ jobs:
       # diffed; the test suite also enforces this, this just surfaces it sooner.
       - name: Verify committed i18n artifacts are fresh
         run: git diff --exit-code -- src/ui/i18n.resolved.generated src/admin/i18n.resolved.generated src/ui/i18n.status.summary.json
+
+      # Release-gate malicious-code scan (see the PR-gate job for the rationale).
+      # --gate fails only on a HIGH-severity signature surviving the path-aware
+      # priors; the full agent-judged pass is the `release-malware-audit` skill.
+      - name: Malicious-code gate
+        run: npm run security:gate
 
       - name: Run tests (release tier - 14-locale + empty-pending)
         run: npm test

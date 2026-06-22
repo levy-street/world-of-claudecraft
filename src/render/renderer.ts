@@ -626,6 +626,17 @@ export class Renderer {
   private tmpV = new THREE.Vector3();
   private viewCandidates: ViewCandidate[] = [];
   private tmpV2 = new THREE.Vector3();
+  // Manual frustum cull for characters. Their skinned meshes keep
+  // frustumCulled=false (a skinned mesh's bind-pose bounds don't follow the
+  // animated pose, so Three's own cull pops visible rigs out), which means an
+  // off-screen rig otherwise issues its draws every frame. We instead cull at
+  // the group level from the rig's real world position + a generous radius.
+  // Gated to shadowless tiers so a culled off-screen caster can never drop a
+  // shadow that was actually visible in-frame.
+  private cullFrustum = new THREE.Frustum();
+  private cullViewProj = new THREE.Matrix4();
+  private cullSphere = new THREE.Sphere();
+  private cullCharacters = false;
   private selfRenderPosition = new THREE.Vector3();
   private selfRenderPositionReady = false;
   private cameraLookAt = new THREE.Vector3();
@@ -815,6 +826,8 @@ export class Renderer {
     this.scene.add(sun);
     this.scene.add(sun.target);
     this.sun = sun;
+    // characters can self-cull only where they cast no sun shadow (low/lean tier)
+    this.cullCharacters = !sun.castShadow;
     this.sunDir.copy(SUN_DIR);
 
     // visible sun disc + bloom halo
@@ -2890,6 +2903,14 @@ export class Renderer {
     // frame parity for distance-tiered mixer throttling
     this.frameIdx = (this.frameIdx + 1) & 0xffff;
 
+    // world-space view frustum for the per-character cull below. Built from last
+    // frame's camera (it's repositioned after this loop); the one-frame lag is
+    // absorbed by the generous per-rig cull radius.
+    if (this.cullCharacters) {
+      this.cullViewProj.multiplyMatrices(this.camera.projectionMatrix, this.camera.matrixWorldInverse);
+      this.cullFrustum.setFromProjectionMatrix(this.cullViewProj);
+    }
+
     for (const [id, v] of this.views) {
       const e = sim.entities.get(id);
       if (!e) continue;
@@ -2981,6 +3002,16 @@ export class Renderer {
 
       this.updateBaseVisual(e, v);
       if (!v.visual) continue;
+
+      // off-screen rigs still need their pose/audio updated, but not their draws.
+      // Decide visibility now from the real world position; applied at the end so
+      // the rest of the per-entity work (animation, footstep audio) is unaffected.
+      let charOnScreen = true;
+      if (this.cullCharacters && id !== p.id) {
+        this.cullSphere.center.set(x, y + v.height * 0.5 * e.scale, z);
+        this.cullSphere.radius = (v.height * 0.7 + 1.5) * e.scale;
+        charOnScreen = this.cullFrustum.intersectsSphere(this.cullSphere);
+      }
 
       // live skin swap — appearance changed (in-game changer or a multiplayer peer)
       if (e.skin !== v.skin) { v.skin = e.skin; v.visual.setSkin(e.skin); }
@@ -3123,6 +3154,9 @@ export class Renderer {
         this.vfx.castSparkle(e.id, 'shadow', dt * 3.2);
       }
       if (swimming) this.vfx.swimRipple(v.group.position, moving ? dt * 3 : dt);
+
+      // skip the draw for off-screen rigs (pose/audio above already ran)
+      if (!charOnScreen) v.group.visible = false;
     }
 
     // selection ring

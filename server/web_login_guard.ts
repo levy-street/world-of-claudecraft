@@ -7,6 +7,11 @@ export const NATIVE_APP_ORIGINS = new Set([
   'https://localhost',
 ]);
 
+export function isNativeAppRequest(req: Pick<IncomingMessage, 'headers'>): boolean {
+  const origin = req.headers.origin;
+  return typeof origin === 'string' && NATIVE_APP_ORIGINS.has(origin);
+}
+
 // Anti-bot: programmatic clients (curl, headless scripts, multibox farms) call
 // /api/login and /api/register directly with no browser Origin header. A real
 // same-origin browser POST always sends an Origin equal to the page's origin, so

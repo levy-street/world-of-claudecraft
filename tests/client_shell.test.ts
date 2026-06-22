@@ -238,7 +238,7 @@ describe('client HTML shell', () => {
   });
 
   it('keeps desktop community links open after HUD clicks', () => {
-    expect(mainTs).toContain('communityMenu.open = !(NATIVE_APP || isPhoneTouchDevice());');
+    expect(mainTs).toContain('communityMenu.open = !(NATIVE_APP || useTouchInterface());');
     expect(hudTs).toContain("document.body.classList.contains('mobile-touch') && communityMenu?.open");
   });
 

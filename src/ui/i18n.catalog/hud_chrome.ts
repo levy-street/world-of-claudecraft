@@ -130,6 +130,13 @@ export const hudChromeStrings = {
     browserEffectsReduced: "Reduced",
     browserEffectsMinimal: "Minimal",
     browserEffectsNote: "Auto tones down heavy CSS effects (blur, glow, background motion) based on your browser and device. Lower it manually if the interface feels sluggish.",
+    // Interface Mode control (Graphics panel): desktop keyboard/mouse vs the
+    // on-screen touch controls. Auto detects the device; the rest force one.
+    interfaceMode: "Interface Mode",
+    interfaceModeAuto: "Auto",
+    interfaceModeDesktop: "Desktop",
+    interfaceModeTouch: "Touch",
+    interfaceModeNote: "Auto picks desktop or touch controls from your device. Choose Desktop to force keyboard and mouse (useful on a tablet with a keyboard), or Touch for the on-screen controls.",
     // Audio panel toggle for the per-footfall step clips (off by default).
     footstepSounds: "Footstep Sounds",
     // Toggle for the OSRS-style click-feedback marker: entity targets and
@@ -192,6 +199,7 @@ export const hudChromeStrings = {
       network: "Network",
       renderer: "Renderer",
       system: "System",
+      input: "Input",
     },
     // Short metric labels shown in the overlay's left column and the Stats toggles.
     labels: {
@@ -213,6 +221,7 @@ export const hudChromeStrings = {
       memory: "Memory",
       hitches: "Hitches",
       entities: "Entities",
+      apm: "APM",
     },
     // Color-theme preset names (also the swatches' accessible names).
     themes: {

@@ -3,6 +3,7 @@ import {
   CHAT_LONG_PRESS_MS,
   clampJoystickOrigin,
   HAPTICS_STORE_KEY,
+  interfaceModeFromSetting,
   isChatLongPress,
   isPhoneTouchDevice,
   isRecenterDoubleTap,
@@ -12,8 +13,11 @@ import {
   MobileControls,
   pinchZoomDelta,
   RECENTER_DOUBLE_TAP_MS,
+  resolveTouchInterface,
   saveHapticsEnabled,
+  setInterfaceMode,
   triggerHaptic,
+  useTouchInterface,
 } from '../src/game/mobile_controls';
 import type { Input, TouchMoveInput } from '../src/game/input';
 
@@ -48,7 +52,7 @@ describe('mapJoystickVector', () => {
 });
 
 describe('isPhoneTouchDevice', () => {
-  it('uses touch capability without requiring phone viewport dimensions', () => {
+  it('detects a touch-primary device: a coarse primary pointer that cannot hover', () => {
     const queries: string[] = [];
     const win = {
       matchMedia: (q: string) => {
@@ -56,20 +60,77 @@ describe('isPhoneTouchDevice', () => {
         return { matches: true };
       },
     } as unknown as Window;
-    const nav = { maxTouchPoints: 0 } as Navigator;
-    expect(isPhoneTouchDevice(win, nav)).toBe(true);
+    expect(isPhoneTouchDevice(win)).toBe(true);
+    // Keyed off the PRIMARY pointer (coarse + can't hover, or coarse on a phone-
+    // sized viewport), not "any pointer is coarse" or a raw touch-point count, so
+    // a desktop with a touch-capable peripheral stays desktop.
     expect(queries[0]).toContain('pointer: coarse');
-    expect(queries[0]).toContain('any-pointer: coarse');
-    expect(queries[0]).not.toContain('max-width');
-    expect(queries[0]).not.toContain('max-height');
+    expect(queries[0]).toContain('hover: none');
+    expect(queries[0]).toContain('max-width');
+    expect(queries[0]).not.toContain('any-pointer');
   });
 
-  it('treats devices with touch points as touch controls devices', () => {
+  it('keeps touch-only phones that misreport hover (Chromium/Samsung quirk) via the viewport net', () => {
+    // Samsung (and some OnePlus) phones self-report a hovering virtual mouse, so
+    // (hover: none) is false even on a genuine touch-only phone. The coarse-pointer
+    // + small-viewport clauses recover them; assert the query carries that net so a
+    // coarse primary pointer on a phone-sized screen still resolves to the touch UI.
+    const queries: string[] = [];
+    const win = {
+      matchMedia: (q: string) => { queries.push(q); return { matches: true }; },
+    } as unknown as Window;
+    isPhoneTouchDevice(win);
+    expect(queries[0]).toContain('(pointer: coarse) and (max-width: 940px)');
+    expect(queries[0]).toContain('(pointer: coarse) and (max-height: 760px)');
+  });
+
+  it('treats a mouse/trackpad desktop as non-phone (fine primary pointer that hovers)', () => {
     const win = {
       matchMedia: () => ({ matches: false }),
     } as unknown as Window;
-    const nav = { maxTouchPoints: 5 } as Navigator;
-    expect(isPhoneTouchDevice(win, nav)).toBe(true);
+    expect(isPhoneTouchDevice(win)).toBe(false);
+  });
+
+  it('ignores touch/pen capability on a non-touchscreen laptop (regression)', () => {
+    // A Windows laptop with a precision touchpad or pen digitizer reports
+    // navigator.maxTouchPoints > 0 and (any-pointer: coarse), yet its PRIMARY
+    // pointer is a fine, hovering mouse on a large viewport, so none of the
+    // coarse-primary-pointer clauses match and it stays on the desktop UI.
+    const win = {
+      matchMedia: () => ({ matches: false }),
+    } as unknown as Window;
+    expect(isPhoneTouchDevice(win)).toBe(false);
+  });
+});
+
+describe('interface mode override', () => {
+  afterEach(() => setInterfaceMode('auto'));
+
+  it('maps the numeric interfaceMode setting (0 Auto, 1 Desktop, 2 Touch)', () => {
+    expect(interfaceModeFromSetting(0)).toBe('auto');
+    expect(interfaceModeFromSetting(1)).toBe('desktop');
+    expect(interfaceModeFromSetting(2)).toBe('touch');
+  });
+
+  it('auto defers to device detection; explicit modes override it', () => {
+    expect(resolveTouchInterface('auto', true)).toBe(true);
+    expect(resolveTouchInterface('auto', false)).toBe(false);
+    // A tablet (auto-detected as touch) whose player picked Desktop stays desktop.
+    expect(resolveTouchInterface('desktop', true)).toBe(false);
+    // A desktop whose player picked Touch gets the on-screen controls.
+    expect(resolveTouchInterface('touch', false)).toBe(true);
+  });
+
+  it('useTouchInterface combines the persisted override with detection', () => {
+    const touchWin = { matchMedia: () => ({ matches: true }) } as unknown as Window;
+    const desktopWin = { matchMedia: () => ({ matches: false }) } as unknown as Window;
+    setInterfaceMode('auto');
+    expect(useTouchInterface(touchWin)).toBe(true);
+    expect(useTouchInterface(desktopWin)).toBe(false);
+    setInterfaceMode('desktop');
+    expect(useTouchInterface(touchWin)).toBe(false);
+    setInterfaceMode('touch');
+    expect(useTouchInterface(desktopWin)).toBe(true);
   });
 });
 

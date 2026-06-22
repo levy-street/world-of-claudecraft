@@ -9,8 +9,9 @@ Standalone Node ESM (`.mjs`) tooling — **not** compiled by vite/esbuild and **
 TypeScript. Run a script directly: `node scripts/<name>.mjs`. Several are wired
 into npm, e.g. `build` (manifest), `realms` (`dev-realms.mjs`), `admin:grant`
 (`grant_admin.mjs`), the i18n pipeline (`i18n:build`/`i18n:admin`/`i18n:scan`,
-aliased `i18n:gen`, plus `i18n:hash`), and asset generators. Many more run directly
-via `node scripts/<name>.mjs`.
+aliased `i18n:gen`, plus `i18n:hash`), the malicious-code release gate
+(`security:scan` flagger / `security:gate` high-only, `malware_scan.mjs`), and asset
+generators. Many more run directly via `node scripts/<name>.mjs`.
 
 ## What runs where
 - **Browser scripts** use `puppeteer-core` + `browser_path.mjs` and need `npm run dev`
@@ -32,7 +33,7 @@ via `node scripts/<name>.mjs`.
 | Browser E2E (offline) | `smoke_browser.mjs`, `smoke_mage.mjs`, `smoke_rogue.mjs`, `check_directions.mjs` | dev |
 | MP E2E (browser) | `mp_browser.mjs`, `mp_combat_visibility.mjs`, `market_mp_e2e.mjs` | dev + server |
 | MP integration (ws) | `mp_integration.mjs`, `chat_e2e.mjs`, `chat_log_persistence.mjs`, `social_e2e.mjs`, `crypt_raid.mjs` | server (+`ALLOW_DEV_COMMANDS=1` for raid) |
-| Security | `ws_security_e2e.mjs` | server |
+| Security | `ws_security_e2e.mjs` (server), `malware_scan.mjs` (release-gate malicious-code flagger over the whole tree; `security:scan` / `security:gate`, exits 1 on findings, exports `RULES`/`scanText` for `tests/malware_scan.test.ts`) | server / — |
 | Screenshot tours | `visual_tour.mjs`, `arena_visual.mjs`, `market_visual.mjs`, `social_visual.mjs`, `tour_expansion.mjs` | dev (some + server) |
 | SEO / homepage / i18n | `homepage_verify.mjs`, `seo_audit.mjs`, `localization_e2e.mjs` (locale-matrix homepage E2E) | dev (+ server) |
 | i18n pipeline | `i18n_build.mjs`+`i18n_admin_build.mjs` (resolved tables), `i18n_scan.mjs` (status registry), `i18n_resolved_hash.mjs` (game-table SHA gate); seed `i18n_blocked_seed.mjs` owns `V07_SLASH`/`COPIED_ALLOW_IDS`; `i18n_pseudo.mjs` (en_XA dev pseudo-locale), `i18n_modulepreload.mjs` (lazy-locale boot modulepreload) | `i18n:gen`; SHA via `i18n:hash` |

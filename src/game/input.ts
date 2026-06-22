@@ -14,6 +14,12 @@ const BASE_LOOK_SENS = 0.0045;
 const TOUCH_LOOK_YAW_RATE = 3.2;
 const TOUCH_LOOK_PITCH_RATE = 2.2;
 const TOUCH_JUMP_LATCH_MS = 220;
+// A keyboard jump press is latched the same way a touch tap is: a fast spacebar
+// tap can be pressed and released entirely between two 20Hz input samples (or
+// sim-tick gaps), so reading the raw key-held state silently drops it. Holding
+// the value above one full input/tick window (50ms) guarantees a grounded tick
+// observes the jump. Held jumps are unaffected (the key stays physically down).
+const KEY_JUMP_LATCH_MS = 150;
 const CAMERA_DRAG_START_DISTANCE = 18;
 const CAMERA_DRAG_START_MS = 140;
 
@@ -132,6 +138,7 @@ export class Input {
   // alongside the touch joystick. The gamepad polls each frame (gamepad.ts).
   private gamepadMove: TouchMoveInput = { forward: false, back: false, strafeLeft: false, strafeRight: false };
   private touchJumpUntil = 0;
+  private keyJumpUntil = 0;
   private touchLookActive = false;
   private touchLookVector = { x: 0, y: 0 };
   // multiplier on the touch look (camera joystick) rate; setTouchLookSpeed
@@ -542,6 +549,9 @@ export class Input {
       }
       this.keys.add(e.code);
       if (action === 'forward' || action === 'back') this.autorun = false;
+      // Latch a jump press (e.repeat is filtered above, so this is the real
+      // edge) so a fast tap survives until a grounded movement tick samples it.
+      if (action === 'jump') this.keyJumpUntil = Math.max(this.keyJumpUntil, performance.now() + KEY_JUMP_LATCH_MS);
       this.noteIntent('move');
       return;
     }
@@ -677,7 +687,8 @@ export class Input {
     const forward = held('forward') || bothButtons || this.autorun || this.touchMove.forward || this.gamepadMove.forward;
     const back = held('back') || this.touchMove.back || this.gamepadMove.back;
     // Jump is not a WASD key, so it keeps working in Attack Move mode.
-    const jump = this.keybinds.codesForAction('jump').some((c) => this.keys.has(c)) || performance.now() <= this.touchJumpUntil;
+    const jump = this.keybinds.codesForAction('jump').some((c) => this.keys.has(c))
+      || performance.now() <= this.touchJumpUntil || performance.now() <= this.keyJumpUntil;
 
     if (this.mouseCameraEnabled) {
       return {

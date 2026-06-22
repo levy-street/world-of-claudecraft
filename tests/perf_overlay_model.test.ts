@@ -12,7 +12,7 @@ function sample(over: Partial<MetricsSample> = {}): MetricsSample {
     fps: 60, frameTimeMs: 16.6, fps1Low: 50, fps01Low: 40, frameSamples: [16, 17, 16, 18, 15],
     online: true, connected: true, pingMs: 40, jitterMs: 5, snapshotHz: 20, connectionType: '4g',
     drawCalls: 300, triangles: 1_200_000, geometries: 80, textures: 50, programs: 20, renderScale: 1, gpu: 'Test GPU',
-    memoryUsedMb: 400, memoryLimitMb: 2048, hitches: 0, entities: 12, backgrounded: false,
+    memoryUsedMb: 400, memoryLimitMb: 2048, hitches: 0, entities: 12, apm: 30, backgrounded: false,
     ...over,
   };
 }
@@ -45,6 +45,13 @@ describe('perf overlay metric registry', () => {
     expect(minimal.fps).toBe(true);
     expect(minimal.frameTime).toBe(false);
     expect(Object.values(allMetrics()).every(Boolean)).toBe(true);
+  });
+
+  it('renders the APM metric (input group) as an integer, off by default', () => {
+    expect(defaultMetricsMap().apm).toBe(false);
+    const apm = METRIC_REGISTRY.find((d) => d.key === 'apm');
+    expect(apm?.group).toBe('input');
+    expect(apm?.read(sample({ apm: 42 }))).toEqual({ kind: 'int', v: 42 });
   });
 });
 

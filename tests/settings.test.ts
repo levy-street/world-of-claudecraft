@@ -40,6 +40,9 @@ describe('Settings', () => {
     expect(s.get('cameraFov')).toBe(60); // unchanged from the shipped look by default
     expect(s.get('mouseCamera')).toBe(false);
     expect(s.get('joystickDeadzone')).toBe(SETTING_RANGES.joystickDeadzone.def);
+    // Interface Mode defaults to Auto (0): detect desktop vs touch from the device.
+    expect(s.get('interfaceMode')).toBe(SETTING_RANGES.interfaceMode.def);
+    expect(s.get('interfaceMode')).toBe(0);
   });
 
   it('clamps the touch joystick deadzone to its bounds', () => {
@@ -66,6 +69,10 @@ describe('Settings', () => {
     expect(s.set('effectsQuality', 99)).toBe(SETTING_RANGES.effectsQuality.max);
     expect(s.set('shadowQuality', -1)).toBe(SETTING_RANGES.shadowQuality.min);
     expect(s.set('fullscreen', -1)).toBe(0);
+    // Interface Mode (0 Auto, 1 Desktop, 2 Touch) clamps to its 0..2 bounds.
+    expect(s.set('interfaceMode', 99)).toBe(SETTING_RANGES.interfaceMode.max);
+    expect(s.set('interfaceMode', -1)).toBe(SETTING_RANGES.interfaceMode.min);
+    expect(s.set('interfaceMode', 1)).toBe(1);
   });
 
   it('clamps touch opacity to its 0.3–1.0 bounds and defaults to fully opaque', () => {

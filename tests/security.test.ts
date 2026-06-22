@@ -64,6 +64,16 @@ describe('websocket authentication', () => {
       t: 'auth',
       token: 'a'.repeat(64),
       character: 42,
+      clientSeed: '',
+    });
+  });
+
+  it('carries the client seed when one is supplied', () => {
+    expect(buildWebSocketAuthMessage('a'.repeat(64), 42, 'seed-123')).toEqual({
+      t: 'auth',
+      token: 'a'.repeat(64),
+      character: 42,
+      clientSeed: 'seed-123',
     });
   });
 });

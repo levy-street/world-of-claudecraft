@@ -187,7 +187,12 @@ describe('activePvpOpponentIds', () => {
 });
 
 describe('handlePickedEntity', () => {
-  it('targets hostile mobs on right-click without starting auto-attack', () => {
+  it('targets and starts auto-attack on a hostile mob on right-click', () => {
+    // Right-clicking an enemy targets AND begins auto-attack, the classic-MMO
+    // convention the attack ability tooltip documents ("Right-clicking an enemy
+    // also attacks."). Camera right-drag never reaches here: clickPickFromMouseGesture
+    // rejects a right-button gesture that moved past the drag threshold, so this
+    // fires only on a deliberate right-click, never on a camera rotation.
     const player = stubEntity({ id: 1, kind: 'player' });
     const mob = stubEntity({ id: 2, kind: 'mob', hostile: true, pos: { x: 3, y: 0, z: 0 } });
     let targetId: number | null = null;
@@ -214,7 +219,7 @@ describe('handlePickedEntity', () => {
     handlePickedEntity(world, hud, 2, 2, 10, 20);
 
     expect(targetId).toBe(2);
-    expect(attacks).toBe(0);
+    expect(attacks).toBe(1);
   });
 
   it('starts auto-attack when right-clicking an active duel opponent', () => {

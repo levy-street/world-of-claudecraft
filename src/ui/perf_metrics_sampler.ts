@@ -47,6 +47,8 @@ export interface SamplerDeps {
   /** Smoothed input-echo RTT (ms); <=0 means not yet measured (ping/jitter hidden). */
   getEchoMs: () => number;
   getJitterMs: () => number;
+  /** Player-input edges in the trailing 60 s. */
+  getApm: () => number;
   // Environment probes — injectable so tests need no browser globals. Each
   // defaults to the real browser source, returning null where unsupported.
   readMemory?: () => { usedMb: number; limitMb: number | null } | null;
@@ -109,6 +111,7 @@ export function createMetricsSampler(deps: SamplerDeps): () => MetricsSample {
       memoryLimitMb: mem ? mem.limitMb : null,
       hitches: deps.meter.hitches(),
       entities: deps.getEntityCount(),
+      apm: deps.getApm(),
       backgrounded: isBackgrounded(),
     };
   };

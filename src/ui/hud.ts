@@ -65,7 +65,7 @@ import { Keybinds, BIND_ACTIONS, BIND_CATEGORIES, isReservedCode, keyLabel } fro
 import { GAMEPAD_BUTTON_LABELS, GAMEPAD_NONE } from '../game/gamepad_map';
 import { Settings, GameSettings, BoolSettingKey, NumericSettingKey, SETTING_RANGES, normalizeClickMoveButton } from '../game/settings';
 import { PerfOverlaySettingsPanel, type PerfOverlayHooks, type PerfSettingsHost } from './perf_overlay_settings';
-import { isPhoneTouchDevice } from '../game/mobile_controls';
+import { useTouchInterface, isNativeAppShell } from '../game/mobile_controls';
 import { chatPlayerContextActions } from './player_context_menu';
 import {
   MARKET_ARMOR_TYPE_FILTERS,
@@ -562,6 +562,7 @@ export class Hud {
   private openQuestDetailId: string | null = null;
   private selectedQuestLogId: string | null = null;
   private questDialogReturnFocus: HTMLElement | null = null;
+  private questDialogOpenedAtMs = 0;
   private questLogReturnFocus: HTMLElement | null = null;
   // Focused-quest waypoint. The focused quest id persists in its own
   // localStorage key (Settings only stores numbers/booleans) and is cleared when
@@ -5287,6 +5288,7 @@ export class Hud {
   openQuestDialog(npcId: number): void {
     const npc = this.sim.entities.get(npcId);
     if (!npc || npc.kind !== 'npc') return;
+    this.questDialogOpenedAtMs = performance.now();
     if ($('#quest-dialog').style.display !== 'block') this.questDialogReturnFocus = this.currentFocusableElement();
     this.closeOtherWindows('#quest-dialog');
     // Voice the greeting only on the initial open — renderGossip also runs when
@@ -5409,14 +5411,22 @@ export class Hud {
       btn.className = 'btn';
       btn.type = 'button';
       btn.textContent = t('questUi.dialog.accept');
-      btn.addEventListener('click', () => { this.sim.acceptQuest(questId); this.renderGossip(npc); });
+      btn.addEventListener('click', () => {
+        this.sim.acceptQuest(questId);
+        this.sim.reportTelemetry('quest_accept', { timeMs: performance.now() - this.questDialogOpenedAtMs });
+        this.renderGossip(npc);
+      });
       el.appendChild(btn);
     } else if (state === 'ready') {
       const btn = document.createElement('button');
       btn.className = 'btn';
       btn.type = 'button';
       btn.textContent = t('questUi.dialog.completeQuest');
-      btn.addEventListener('click', () => { this.sim.turnInQuest(questId); this.renderGossip(npc); });
+      btn.addEventListener('click', () => {
+        this.sim.turnInQuest(questId);
+        this.sim.reportTelemetry('quest_turnin', { timeMs: performance.now() - this.questDialogOpenedAtMs });
+        this.renderGossip(npc);
+      });
       el.appendChild(btn);
     }
     const back = document.createElement('button');
@@ -9688,27 +9698,42 @@ export class Hud {
     fxNote.className = 'set-note';
     fxNote.textContent = t('hudChrome.options.browserEffectsNote');
     body.appendChild(fxNote);
+    // Desktop keyboard/mouse vs the on-screen touch controls. Auto detects the
+    // device; Desktop/Touch force one (e.g. a tablet with a keyboard picks
+    // Desktop). Re-render so the touch-only sliders below show/hide to match.
+    // Hidden in the native app shell, which forces the touch UI regardless.
+    if (!isNativeAppShell()) {
+      this.settingChoice(body, t('hudChrome.options.interfaceMode'), 'interfaceMode', [
+        { value: 0, label: t('hudChrome.options.interfaceModeAuto') },
+        { value: 1, label: t('hudChrome.options.interfaceModeDesktop') },
+        { value: 2, label: t('hudChrome.options.interfaceModeTouch') },
+      ], () => this.renderGraphics());
+      const interfaceNote = document.createElement('div');
+      interfaceNote.className = 'set-note';
+      interfaceNote.textContent = t('hudChrome.options.interfaceModeNote');
+      body.appendChild(interfaceNote);
+    }
     this.settingSlider(body, t('hud.options.cameraSpeed'), 'cameraSpeed');
     // Camera Speed only scales mouselook; on touch the camera joystick has its
     // own rate, so phones get a dedicated sensitivity slider here.
-    if (isPhoneTouchDevice()) this.settingSlider(body, t('hud.options.touchLookSpeed'), 'touchLookSpeed');
+    if (useTouchInterface()) this.settingSlider(body, t('hud.options.touchLookSpeed'), 'touchLookSpeed');
     this.settingSlider(body, t('hud.options.brightness'), 'brightness');
     this.settingSlider(body, t('hud.options.fieldOfView'), 'cameraFov', { fmt: (v) => `${formatNumber(Math.round(v), { maximumFractionDigits: 0 })}°`, step: 1 });
     this.settingSlider(body, t('hud.options.renderQuality'), 'renderScale');
     this.settingToggle(body, t('hud.options.fullscreen'), 'fullscreen');
     this.settingToggle(body, t('game.settings.showOverflowXp'), 'showOverflowXp');
     // Touch-only: lets phone players dim the on-screen joysticks + buttons.
-    if (isPhoneTouchDevice()) this.settingSlider(body, t('hud.options.touchOpacity'), 'touchOpacity');
+    if (useTouchInterface()) this.settingSlider(body, t('hud.options.touchOpacity'), 'touchOpacity');
     this.settingToggle(body, t('game.settings.weather'), 'weather');
     // Touch-only: lets phone players size the on-screen joysticks to their hands.
-    if (isPhoneTouchDevice()) this.settingSlider(body, t('hud.options.joystickSize'), 'joystickScale');
+    if (useTouchInterface()) this.settingSlider(body, t('hud.options.joystickSize'), 'joystickScale');
     // Touch-only: lets phone players size the on-screen action buttons to taste.
-    if (isPhoneTouchDevice()) this.settingSlider(body, t('hud.options.buttonSize'), 'actionButtonScale');
+    if (useTouchInterface()) this.settingSlider(body, t('hud.options.buttonSize'), 'actionButtonScale');
     // Touch-only: a larger deadzone resists accidental drift from a resting
     // thumb on the move stick; only meaningful with on-screen controls.
-    if (isPhoneTouchDevice()) this.settingSlider(body, t('hud.options.joystickDeadzone'), 'joystickDeadzone');
+    if (useTouchInterface()) this.settingSlider(body, t('hud.options.joystickDeadzone'), 'joystickDeadzone');
     // Touch-only: flips the vertical axis of the on-screen camera joystick + swipe-look.
-    if (isPhoneTouchDevice()) this.settingBoolToggle(body, t('hud.options.invertLook'), 'touchInvertLook');
+    if (useTouchInterface()) this.settingBoolToggle(body, t('hud.options.invertLook'), 'touchInvertLook');
     const note = document.createElement('div');
     note.className = 'set-note';
     note.textContent = t('hud.options.graphicsNote');

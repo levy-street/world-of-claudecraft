@@ -57,7 +57,7 @@ export const pt_BR: AdminTranslations = {
   "usage.cacheColEntries": "Entradas",
   "usage.cacheColHitRate": "Taxa de acerto",
   "usage.cacheColHits": "Acertos",
-  "usage.cacheColMisses": "Erros",
+  "usage.cacheColMisses": "Faltas",
   "usage.cacheColStale": "Obsoletos",
   "usage.cacheColStores": "Gravações",
   "usage.cacheColFailures": "Falhas",

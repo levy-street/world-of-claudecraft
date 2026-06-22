@@ -1,0 +1,1621 @@
+/* World of ClaudeCraft Guide (/guide). A curated, branded docs surface kept simple in
+   the spirit of kintara.gg, reinterpreted in the game's dark-fantasy design language.
+   Hand-written custom properties only (this repo has no CSS build pipeline). Tokens
+   mirror the in-game HUD palette (gold on near-black glass, Cinzel/Alegreya) plus the
+   parchment reading set from the community wiki theme. Mobile-first, WCAG AA.
+   Spacing and borders use CSS logical properties so RTL locales mirror without rework. */
+
+/* ------------------------------------------------------------------ tokens */
+:root {
+  /* Dark chrome palette (header, footer, hero, controls). */
+  --g-gold: #ffd100;
+  --g-gold-dim: #c8a838;
+  --g-bg: #08080d;
+  --g-bg-2: #0d0d15;
+  --g-panel: linear-gradient(170deg, #15151fF2 0%, #0b0b12F2 60%, #08080dF2 100%);
+  --g-border: #6f5a2a;
+  --g-border-soft: #2a2418;
+  --g-text: #f0ebd8;
+  --g-text-dim: #c9be98;
+  --g-text-muted: #9a8f6c;
+  --g-focus: #ffe98a;
+
+  /* Ink-on-gold foreground (CTA, skip link, step counters): dark text on the gold fill. */
+  --g-on-gold: #1a1405;
+
+  /* Role + accent colors, aligned with the in-game unit palette. Always paired with a
+     text label, never color-only. */
+  --g-role-tank: #7ab8ff;
+  --g-role-healer: #7fdc8f;
+  --g-role-dps: #ff9b7a;
+  --g-rare: #6ea8ff;
+
+  /* Hover/active washes: one source for the repeated alpha overlays, including the
+     tinted callout fills so a theme tweak is one line. */
+  --g-wash: #ffffff0f;
+  --g-wash-soft: #ffffff0a;
+  --g-wash-gold: #ffd1000f;
+  --g-wash-gold-strong: #ffd1001a;
+  --g-wash-note: #7ab8ff12;
+  --g-wash-warn: #e8b84b14;
+
+  /* Typography (loaded by guide.html). */
+  --g-font-display: 'Cinzel', 'Palatino Linotype', Palatino, Georgia, serif;
+  --g-font-ui: 'Alegreya Sans', 'Segoe UI', system-ui, 'Helvetica Neue', sans-serif;
+  --g-font-serif: 'Alegreya', 'Palatino Linotype', Palatino, Georgia, serif;
+
+  /* Spacing scale (2xs to 3xl) with the in-between steps, so paddings and gaps route
+     through the scale instead of ad-hoc pixels. 2xl (32) closes the old 24 to 40 gap
+     and 3xl (48) names the large rhythm step. */
+  --g-2xs: 2px;
+  --g-xs: 4px;
+  --g-xs2: 6px;
+  --g-sm: 8px;
+  --g-sm2: 12px;
+  --g-md: 16px;
+  --g-lg: 24px;
+  --g-2xl: 32px;
+  --g-xl: 40px;
+  --g-3xl: 48px;
+
+  /* Radii. */
+  --g-radius-sm: 4px;
+  --g-radius: 8px;
+  --g-radius-lg: 14px;
+  --g-radius-pill: 999px;
+
+  /* Control + touch sizing. Every tappable target is at least --g-touch tall.
+     Two heights only: --g-control-h for primary actions, --g-control-h-sm for compact
+     controls (it rises to the touch floor under pointer: coarse, below). --g-chip-h
+     names the tall chooser-chip / class-chip cell so it is not a bare 56px. */
+  --g-touch: 44px;
+  --g-control-h: 44px;
+  --g-control-h-sm: 38px;
+  --g-chip-h: 56px;
+
+  /* Control + label padding. One source for the inline insets so buttons, selects,
+     chips, and pills route their padding through the scale instead of each picking
+     its own px. */
+  --g-pad-control: var(--g-md);
+  --g-pad-pill-y: var(--g-2xs);
+  --g-pad-pill-x: var(--g-sm2);
+
+  /* Type scale. Discrete sizes map every rule onto one ladder; the fluid steps carry
+     their own clamp so headings scale with the viewport from one definition. The scale
+     is bumped for readability: body resolves to --g-text-md (18px) and nothing
+     player-facing drops below 12px (the 11px floor is decorative bands only). */
+  --g-text-3xs: 11px;
+  --g-text-2xs: 12px;
+  --g-text-xs: 13px;
+  --g-text-sm: 14px;
+  --g-text-base: 16px;
+  --g-text-md: 18px;
+  --g-text-lead: 18px;
+  --g-text-lg: 18px;
+  --g-text-xl: 20px;
+  --g-text-fluid-lead: clamp(16px, 2.2vw, 20px);
+  --g-text-fluid-h2: clamp(20px, 2.2vw, 26px);
+  --g-text-fluid-section: clamp(22px, 3vw, 30px);
+  --g-text-fluid-h1: clamp(26px, 3.2vw, 40px);
+  --g-text-fluid-hero: clamp(34px, 6vw, 64px);
+
+  /* Line heights. */
+  --g-leading-tight: 1.05;
+  --g-leading-snug: 1.15;
+  --g-leading-normal: 1.6;
+
+  /* Border widths (accent rails; the default hairline stays a literal 1px). */
+  --g-bw-accent: 3px;
+  --g-bw-rail: 4px;
+
+  /* Elevation. */
+  --g-shadow-cta: 0 2px 10px #00000055, inset 0 1px 0 #ffffff66;
+  --g-shadow-cta-hover: 0 4px 16px #00000066, inset 0 1px 0 #ffffff88;
+  --g-shadow-pop: 0 10px 30px #00000066;
+
+  /* Stacking order: one ladder for every fixed/sticky/floating layer. */
+  --g-z-header: 100;
+  --g-z-pop: 120;
+  --g-z-skip: 200;
+
+  /* Biome accents (south to north): green vale, teal marsh, cold-blue peaks. Always
+     paired with the zone name, never the only signal. */
+  --g-zone-vale: #7fae5a;
+  --g-zone-marsh: #4f9e8c;
+  --g-zone-peaks: #7fa8d8;
+
+  /* Warning accent for caution callouts. */
+  --g-warn: #e8b84b;
+
+  /* Layout + motion. */
+  --g-maxw: 1180px;
+  --g-maxw-section: 1080px;
+  --g-maxw-bestiary: 860px;
+  --g-maxw-narrow: 720px;
+  --g-maxw-map: 540px;
+  --g-maxw-hero: 640px;
+  --g-prose: 72ch;
+  --g-header-h: 60px;
+  --g-brand-h: 44px;
+  --g-motion: 480ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  --g-motion-fast: 150ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* ------------------------------------------------------------------- base */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body.guide-body {
+  margin: 0;
+  min-height: 100vh;
+  overflow-x: clip;
+  background:
+    radial-gradient(1200px 600px at 50% -10%, #15131d 0%, transparent 60%),
+    var(--g-bg);
+  color: var(--g-text);
+  font-family: var(--g-font-ui);
+  font-size: var(--g-text-md);
+  line-height: var(--g-leading-normal);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+#guide-app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+a { color: var(--g-gold-dim); text-decoration: none; }
+a:hover { color: var(--g-gold); text-decoration: underline; }
+
+img { max-width: 100%; height: auto; }
+
+/* Universal focus ring (never removed without replacement). */
+:focus-visible {
+  outline: 2px solid var(--g-focus);
+  outline-offset: 2px;
+  border-radius: var(--g-radius-sm);
+}
+
+/* Skip link: first focusable element, visible on focus. */
+.guide-skip {
+  position: fixed;
+  inset-block-start: -120px;
+  inset-inline-start: var(--g-md);
+  z-index: var(--g-z-skip);
+  padding: var(--g-sm) var(--g-md);
+  background: var(--g-gold);
+  color: var(--g-on-gold);
+  font-weight: 700;
+  border-radius: var(--g-radius);
+  transition: inset-block-start var(--g-motion);
+}
+.guide-skip:focus { inset-block-start: var(--g-sm); text-decoration: none; }
+
+/* ----------------------------------------------------------------- header */
+.guide-header {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: var(--g-z-header);
+  background: rgba(8, 8, 13, 0.86);
+  border-block-end: 1px solid var(--g-border-soft);
+}
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .guide-header {
+    background: rgba(8, 8, 13, 0.62);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+  }
+}
+
+.guide-header-inner {
+  max-width: var(--g-maxw);
+  margin-inline: auto;
+  min-height: var(--g-header-h);
+  padding-inline: var(--g-md);
+  display: flex;
+  align-items: center;
+  gap: var(--g-md);
+}
+
+.guide-brand {
+  display: flex;
+  align-items: center;
+  flex: none;
+  color: var(--g-text);
+  margin-inline-end: auto;
+}
+.guide-brand:hover { text-decoration: none; }
+.guide-brand-logo {
+  display: block;
+  height: var(--g-brand-h);
+  width: auto;
+}
+.guide-primary-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--g-lg);
+}
+.guide-nav-list {
+  display: flex;
+  align-items: center;
+  gap: var(--g-lg);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.guide-nav-link {
+  color: var(--g-text-dim);
+  font-weight: 600;
+  font-size: var(--g-text-base);
+  padding-block: var(--g-xs2);
+  border-block-end: 2px solid transparent;
+  white-space: nowrap;
+}
+.guide-nav-link:hover { color: var(--g-text); text-decoration: none; }
+.guide-nav-link.is-active {
+  color: var(--g-gold);
+  border-block-end-color: var(--g-gold);
+}
+
+.guide-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--g-md);
+}
+
+/* Language picker. */
+.guide-lang { display: flex; align-items: center; gap: var(--g-xs); }
+.guide-lang-label {
+  font-size: var(--g-text-2xs);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--g-text-muted);
+}
+.guide-lang-select {
+  background: var(--g-bg-2);
+  color: var(--g-text);
+  border: 1px solid var(--g-border-soft);
+  border-radius: var(--g-radius);
+  padding: var(--g-xs2) var(--g-sm);
+  font-family: var(--g-font-ui);
+  font-size: var(--g-text-base);
+  min-height: var(--g-control-h-sm);
+  cursor: pointer;
+}
+.guide-lang-select:hover { border-color: var(--g-border); }
+
+/* Primary call to action. */
+.guide-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--g-sm);
+  min-height: var(--g-control-h);
+  padding-inline: var(--g-lg);
+  background: linear-gradient(180deg, #ffef9e 0%, var(--g-gold) 100%);
+  color: var(--g-on-gold);
+  font-family: var(--g-font-display);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: var(--g-text-base);
+  border: 1px solid var(--g-gold-dim);
+  border-radius: var(--g-radius);
+  box-shadow: var(--g-shadow-cta);
+  transition: filter var(--g-motion), box-shadow var(--g-motion);
+}
+/* One hover for every solid CTA (header, footer, hero): the gold fill lifts to a brighter
+   gradient with a stronger glow. Uses an explicit gradient, not filter:brightness, so the
+   change reads clearly and is identical everywhere. */
+.guide-cta:hover {
+  background: linear-gradient(180deg, #fff7d1 0%, #ffe24a 100%);
+  box-shadow: var(--g-shadow-cta-hover);
+  text-decoration: none;
+}
+/* The CTA is a link, so pin its dark-on-gold text across every link state. Without this
+   the generic a:hover (gold text) and the footer-links color both win on specificity and
+   wash the label out against the gold fill. */
+.guide-cta:link,
+.guide-cta:visited,
+.guide-cta:hover,
+.guide-cta:focus { color: var(--g-on-gold); }
+.guide-cta-sm { min-height: var(--g-control-h-sm); padding-inline: var(--g-md); font-size: var(--g-text-sm); }
+.guide-cta-ghost {
+  background: transparent;
+  color: var(--g-gold);
+  border-color: var(--g-border);
+  box-shadow: none;
+}
+/* Ghost variant keeps gold text on every state (these come after the solid rules above so
+   they win for an element carrying both classes). */
+.guide-cta-ghost:link,
+.guide-cta-ghost:visited,
+.guide-cta-ghost:hover,
+.guide-cta-ghost:focus { color: var(--g-gold); }
+.guide-cta-ghost:hover { background: var(--g-wash-gold); }
+
+/* Hamburger toggle (mobile only). */
+.guide-menu-toggle {
+  display: none;
+  width: var(--g-touch);
+  height: var(--g-touch);
+  align-items: center;
+  justify-content: center;
+  background: var(--g-bg-2);
+  border: 1px solid var(--g-border-soft);
+  border-radius: var(--g-radius);
+  cursor: pointer;
+}
+.guide-menu-bars,
+.guide-menu-bars::before,
+.guide-menu-bars::after {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--g-text);
+  position: relative;
+}
+.guide-menu-bars::before,
+.guide-menu-bars::after { content: ""; position: absolute; inset-inline-start: 0; }
+.guide-menu-bars::before { inset-block-start: -6px; }
+.guide-menu-bars::after { inset-block-start: 6px; }
+
+/* ----------------------------------------------------------------- layout */
+.guide-layout {
+  flex: 1;
+  width: 100%;
+  max-width: var(--g-maxw);
+  margin-inline: auto;
+  padding-inline: var(--g-md);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--g-lg);
+}
+body.guide-has-sidebar .guide-layout {
+  grid-template-columns: 264px minmax(0, 1fr);
+}
+
+/* ---------------------------------------------------------------- sidebar */
+.guide-sidebar {
+  align-self: start;
+  position: sticky;
+  inset-block-start: calc(var(--g-header-h) + var(--g-md));
+  max-height: calc(100dvh - var(--g-header-h) - var(--g-lg));
+  overflow-y: auto;
+  padding-block: var(--g-lg);
+  padding-inline-end: var(--g-sm);
+}
+.guide-sidebar[hidden] { display: none; }
+.guide-side-group { margin-block-end: var(--g-lg); }
+.guide-side-heading {
+  margin: 0 0 var(--g-sm);
+  font-family: var(--g-font-ui);
+  font-size: var(--g-text-2xs);
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--g-text-muted);
+}
+.guide-side-group ul { margin: 0; padding: 0; list-style: none; }
+.guide-side-link {
+  display: block;
+  padding: var(--g-xs2) var(--g-sm);
+  color: var(--g-text-dim);
+  font-size: var(--g-text-base);
+  border-inline-start: 2px solid transparent;
+  border-radius: 0 var(--g-radius) var(--g-radius) 0;
+}
+.guide-side-link:hover { color: var(--g-text); background: var(--g-wash); text-decoration: none; }
+.guide-side-link.is-active {
+  color: var(--g-gold);
+  border-inline-start-color: var(--g-gold);
+  background: var(--g-wash-gold);
+}
+.guide-topics-toggle { display: none; }
+
+/* ------------------------------------------------------------------- main */
+.guide-main {
+  min-width: 0;
+  padding-block: var(--g-lg) var(--g-xl);
+}
+.guide-main:focus { outline: none; }
+
+.guide-article { max-width: var(--g-prose); }
+.guide-article h1 {
+  font-family: var(--g-font-display);
+  font-weight: 700;
+  font-size: var(--g-text-fluid-h1);
+  line-height: var(--g-leading-snug);
+  letter-spacing: 0.01em;
+  margin: 0 0 var(--g-md);
+  color: var(--g-text);
+}
+.guide-article h2 {
+  font-family: var(--g-font-display);
+  font-size: var(--g-text-fluid-h2);
+  margin: var(--g-xl) 0 var(--g-sm);
+  color: var(--g-gold-dim);
+}
+.guide-article p { margin: 0 0 var(--g-md); }
+.guide-lead { font-size: var(--g-text-lead); color: var(--g-text-dim); }
+.guide-placeholder, .guide-notfound { padding-block-start: var(--g-md); }
+.guide-article h3 { font-family: var(--g-font-display); color: var(--g-text); font-size: var(--g-text-lg); margin: 0 0 var(--g-xs); }
+.guide-block { margin-block-start: var(--g-xl); }
+
+/* numbered "first 15 minutes" steps */
+.guide-steps { list-style: none; counter-reset: step; padding: 0; margin: 0; display: grid; gap: var(--g-md); }
+.guide-steps li { counter-increment: step; position: relative; padding-inline-start: var(--g-3xl); min-height: var(--g-2xl); }
+.guide-steps li::before {
+  content: counter(step);
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block-start: 0;
+  width: var(--g-2xl);
+  height: var(--g-2xl);
+  display: grid;
+  place-items: center;
+  background: var(--g-gold);
+  color: var(--g-on-gold);
+  border-radius: 50%;
+  font-family: var(--g-font-display);
+  font-weight: 700;
+}
+.guide-steps li p { margin: 0; color: var(--g-text-dim); }
+
+/* basics cards */
+.guide-basics { display: grid; gap: var(--g-md); grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.guide-basic { background: var(--g-bg-2); border: 1px solid var(--g-border-soft); border-radius: var(--g-radius); padding: var(--g-md); }
+.guide-basic p { margin: 0; color: var(--g-text-dim); }
+
+.guide-callout {
+  margin-block-start: var(--g-lg);
+  padding: var(--g-md);
+  border-inline-start: var(--g-bw-accent) solid var(--g-gold);
+  background: var(--g-wash-gold);
+  border-radius: 0 var(--g-radius) var(--g-radius) 0;
+  color: var(--g-text-dim);
+}
+
+/* controls reference table */
+.guide-keytable { width: 100%; border-collapse: collapse; }
+.guide-keytable th {
+  text-align: start;
+  font-size: var(--g-text-2xs);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--g-text-muted);
+  padding: var(--g-xs) var(--g-sm);
+  border-block-end: 1px solid var(--g-border-soft);
+}
+.guide-keytable td { padding: var(--g-sm); border-block-end: 1px solid var(--g-border-soft); color: var(--g-text-dim); }
+.guide-keys { white-space: nowrap; }
+.guide-article kbd {
+  display: inline-block;
+  min-width: 22px;
+  text-align: center;
+  padding: 2px 6px;
+  margin-inline-end: 2px;
+  background: var(--g-bg);
+  border: 1px solid var(--g-border);
+  border-block-end-width: 2px;
+  border-radius: var(--g-radius-sm);
+  font-family: var(--g-font-ui);
+  font-size: var(--g-text-xs);
+  color: var(--g-text);
+}
+
+/* glossary */
+.guide-glossary { margin-block-start: var(--g-lg); }
+.guide-term { padding-block: var(--g-sm); border-block-end: 1px solid var(--g-border-soft); }
+.guide-term dt { font-family: var(--g-font-display); color: var(--g-gold-dim); font-weight: 700; margin-block-end: var(--g-2xs); }
+.guide-term dd { margin: 0; color: var(--g-text-dim); }
+
+/* opt-in disclosure (spoilers / walkthroughs) */
+.guide-reveal { border: 1px solid var(--g-border-soft); border-radius: var(--g-radius); margin-block: var(--g-md); background: var(--g-bg-2); }
+.guide-reveal summary { cursor: pointer; padding: var(--g-md); font-family: var(--g-font-display); font-weight: 600; color: var(--g-text); min-height: var(--g-control-h); display: flex; align-items: center; }
+.guide-reveal summary:hover { color: var(--g-gold); }
+.guide-reveal-body { padding: 0 var(--g-md) var(--g-md); color: var(--g-text-dim); }
+
+/* --------------------------------------------------------- classes (Phase 03) */
+/* role + resource badges; never color-only, each carries a text label */
+.guide-badges { display: inline-flex; flex-wrap: wrap; gap: var(--g-xs2); align-items: center; }
+.guide-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--g-pad-pill-y) var(--g-pad-pill-x);
+  border-radius: var(--g-radius-pill);
+  font-size: var(--g-text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1px solid currentColor;
+}
+.guide-role-tank { color: var(--g-role-tank); }
+.guide-role-healer { color: var(--g-role-healer); }
+.guide-role-dps { color: var(--g-role-dps); }
+.guide-badge-resource { color: var(--g-text-dim); }
+
+/* classes index grid */
+.guide-class-cards {
+  display: grid;
+  gap: var(--g-md);
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  margin-block-start: var(--g-lg);
+}
+.guide-class-card {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: var(--g-xs) var(--g-md);
+  align-items: center;
+  padding: var(--g-md);
+  background: var(--g-bg-2);
+  border: 1px solid var(--g-border-soft);
+  border-block-start: var(--g-bw-accent) solid var(--class-color, var(--g-gold));
+  border-radius: var(--g-radius-lg);
+  color: var(--g-text);
+}
+.guide-class-card:hover { border-color: var(--class-color, var(--g-gold)); text-decoration: none; }
+.guide-class-crest { grid-row: 1 / span 3; width: 64px; height: 64px; align-self: start; }
+.guide-class-card-name { font-family: var(--g-font-display); font-size: var(--g-text-lg); font-weight: 700; color: var(--g-text); min-width: 0; overflow-wrap: anywhere; }
+.guide-class-card-hook { grid-column: 2; margin: 0; color: var(--g-text-dim); font-size: var(--g-text-base); min-width: 0; }
+
+/* class detail page */
+.guide-class-hero {
+  display: flex;
+  align-items: center;
+  gap: var(--g-md);
+  margin-block: var(--g-sm) var(--g-md);
+  padding-block-end: var(--g-md);
+  border-block-end: 1px solid var(--g-border-soft);
+}
+.guide-class-hero-crest { width: 96px; height: 96px; flex: none; }
+.guide-class-hero { flex-wrap: wrap; }
+.guide-class-portrait { width: min(260px, 100%); flex: none; }
+.guide-class-portrait .guide-viewer { margin: 0; }
+.guide-class-hero-name { margin: 0 0 var(--g-xs); color: var(--class-color, var(--g-gold)); }
+
+.guide-spec-list { list-style: none; padding: 0; margin: var(--g-md) 0 0; display: grid; gap: var(--g-sm); }
+.guide-spec {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--g-md);
+  padding: var(--g-sm) var(--g-md);
+  background: var(--g-bg-2);
+  border: 1px solid var(--g-border-soft);
+  border-radius: var(--g-radius);
+}
+.guide-spec-name { font-family: var(--g-font-display); font-weight: 600; }
+
+.guide-ability-strip {
+  list-style: none;
+  padding: 0;
+  margin: var(--g-md) 0 0;
+  display: grid;
+  gap: var(--g-md);
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+}
+.guide-ability { display: flex; flex-direction: column; align-items: start; text-align: center; gap: var(--g-xs); min-width: 0; }
+.guide-ability-icon { width: 48px; height: 48px; border-radius: var(--g-radius); border: 1px solid var(--g-border); }
+.guide-ability-name { font-size: var(--g-text-xs); color: var(--g-text-dim); overflow-wrap: anywhere; }
+
+/* ------------------------------------------------- bestiary / world / dungeons (Phase 04) */
+.guide-bestiary { max-width: var(--g-maxw-bestiary); }
+.guide-family { margin-block-start: var(--g-xl); }
+.guide-family-head { display: flex; align-items: center; gap: var(--g-md); }
+.guide-family-crest { width: 56px; height: 56px; flex: none; }
+.guide-family-name { margin: 0 0 var(--g-2xs); font-family: var(--g-font-display); font-size: var(--g-text-xl); color: var(--g-gold-dim); min-width: 0; overflow-wrap: anywhere; }
+.guide-family-desc { margin: 0; color: var(--g-text-dim); }
+.guide-creatures {
+  list-style: none;
+  padding: 0;
+  margin: var(--g-md) 0 0;
+  display: grid;
+  gap: var(--g-xs);
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+.guide-creature {
+  display: flex;
+  align-items: center;
+  gap: var(--g-sm);
+  padding: var(--g-sm);
+  background: var(--g-bg-2);
+  border: 1px solid var(--g-border-soft);
+  border-radius: var(--g-radius);
+}
+.guide-creature-info { display: flex; flex-direction: column; gap: var(--g-2xs); min-width: 0; flex: 1; }
+.guide-creature-name { color: var(--g-text); font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+.guide-creature-band { color: var(--g-text-muted); font-size: var(--g-text-xs); }
+.guide-badge-rare {
+  margin-inline-start: var(--g-xs2);
+  padding: var(--g-pad-pill-y) var(--g-pad-pill-x);
+  border-radius: var(--g-radius-pill);
+  font-size: var(--g-text-3xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--g-rare);
+  border: 1px solid currentColor;
+}
+
+/* world zone hub line */
+.guide-zone-hub { margin: var(--g-sm) 0 0; color: var(--g-text-muted); font-size: var(--g-text-sm); }
+.guide-zone-hub span { color: var(--g-text-dim); font-weight: 700; }
+
+/* dungeon teaser cards */
+.guide-dungeon-grid { display: grid; gap: var(--g-md); margin-block-start: var(--g-md); grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.guide-dungeon-card {
+  background: var(--g-bg-2);
+  border: 1px solid var(--g-border-soft);
+  border-radius: var(--g-radius-lg);
+  padding: var(--g-lg);
+}
+.guide-dungeon-card p { margin: 0; color: var(--g-text-dim); }
+.guide-dungeon-raid { border-color: var(--g-border); background: linear-gradient(170deg, #1a1410 0%, var(--g-bg-2) 70%); }
+.guide-dungeon-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--g-sm); margin-block-end: var(--g-sm); }
+.guide-dungeon-name { margin: 0; font-family: var(--g-font-display); font-size: var(--g-text-lg); color: var(--g-text); min-width: 0; overflow-wrap: anywhere; }
+.guide-badge-level { color: var(--g-gold-dim); white-space: nowrap; }
+
+/* -------------------------------------------------------------------- hero */
+/* Full-bleed cinematic hero over the game's loading art (kintara-style: one backdrop
+   carries the mood, sparse foreground). The breakout reaches the viewport edges; body
+   overflow-x: clip prevents a scrollbar. */
+.guide-hero {
+  position: relative;
+  width: 100vw;
+  margin-inline: calc(50% - 50vw);
+  min-height: min(78svh, 640px);
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: var(--g-xl) var(--g-md);
+  overflow: hidden;
+  isolation: isolate;
+}
+.guide-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(180deg, rgba(8, 8, 13, 0.5) 0%, rgba(8, 8, 13, 0.78) 62%, var(--g-bg) 100%),
+    url('/loading-screen.jpg') center / cover no-repeat;
+}
+.guide-hero-inner { max-width: var(--g-maxw-hero); }
+
+/* home main starts flush under the header so the hero touches it */
+body[data-guide-route="home"] .guide-main { padding-block-start: 0; }
+
+/* --------------------------------------------------------- landing sections */
+.guide-section {
+  max-width: var(--g-maxw-section);
+  margin-inline: auto;
+  padding-block: var(--g-xl);
+}
+.guide-section-h {
+  font-family: var(--g-font-display);
+  font-size: var(--g-text-fluid-section);
+  text-align: center;
+  margin: 0 0 var(--g-sm);
+  color: var(--g-text);
+}
+.guide-section-sub {
+  text-align: center;
+  color: var(--g-text-dim);
+  max-width: 54ch;
+  margin: 0 auto var(--g-lg);
+}
+.guide-section-more { text-align: center; margin-block-start: var(--g-lg); }
+.guide-section-more a { font-weight: 700; }
+
+.guide-pillars,
+.guide-zone-grid,
+.guide-group-grid {
+  display: grid;
+  gap: var(--g-md);
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+.guide-pillar,
+.guide-group-card {
+  background: var(--g-panel);
+  border: 1px solid var(--g-border-soft);
+  border-radius: var(--g-radius-lg);
+  padding: var(--g-lg);
+}
+.guide-pillar h3,
+.guide-group-card h3 {
+  font-family: var(--g-font-display);
+  color: var(--g-gold-dim);
+  margin: 0 0 var(--g-sm);
+  font-size: var(--g-text-lg);
+}
+.guide-pillar p,
+.guide-group-card p { margin: 0; color: var(--g-text-dim); }
+
+/* class chooser chips (class-color accent; real crests arrive on the Classes pages) */
+.guide-class-grid {
+  display: grid;
+  gap: var(--g-sm);
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+.guide-class-chip {
+  display: flex;
+  align-items: center;
+  min-height: var(--g-chip-h);
+  padding: var(--g-md);
+  background: var(--g-bg-2);
+  border: 1px solid var(--g-border-soft);
+  border-inline-start: var(--g-bw-rail) solid var(--class-color, var(--g-gold));
+  border-radius: var(--g-radius);
+  color: var(--g-text);
+  font-family: var(--g-font-display);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.guide-class-chip:hover {
+  border-color: var(--class-color, var(--g-gold));
+  background: var(--g-wash);
+  text-decoration: none;
+}
+
+/* zone cards */
+.guide-zone-card {
+  display: block;
+  border: 1px solid var(--g-border-soft);
+  border-radius: var(--g-radius-lg);
+  overflow: hidden;
+  background: var(--g-bg-2);
+  color: var(--g-text);
+}
+.guide-zone-card:hover { border-color: var(--g-border); text-decoration: none; }
+.guide-zone-body { padding: var(--g-lg); }
+.guide-zone-band {
+  display: inline-block;
+  font-size: var(--g-text-2xs);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--g-gold-dim);
+  margin-block-end: var(--g-xs);
+}
+.guide-zone-name {
+  font-family: var(--g-font-display);
+  margin: 0 0 var(--g-xs);
+  font-size: var(--g-text-xl);
+  color: var(--g-text);
+  overflow-wrap: anywhere;
+}
+.guide-zone-blurb { margin: 0; color: var(--g-text-dim); }
+/* per-biome accent (south to north): green vale, teal marsh, cold-blue peaks */
+.guide-zone-vale { border-block-start: var(--g-bw-accent) solid var(--g-zone-vale); }
+.guide-zone-marsh { border-block-start: var(--g-bw-accent) solid var(--g-zone-marsh); }
+.guide-zone-peaks { border-block-start: var(--g-bw-accent) solid var(--g-zone-peaks); }
+
+/* FAQ disclosures */
+.guide-faq { max-width: var(--g-maxw-narrow); margin-inline: auto; }
+.guide-faq-item {
+  border: 1px solid var(--g-border-soft);
+  border-radius: var(--g-radius);
+  margin-block-end: var(--g-sm);
+  background: var(--g-bg-2);
+}
+.guide-faq-item summary {
+  cursor: pointer;
+  padding: var(--g-md);
+  font-family: var(--g-font-display);
+  font-weight: 600;
+  color: var(--g-text);
+  min-height: var(--g-control-h);
+  display: flex;
+  align-items: center;
+}
+.guide-faq-item summary:hover { color: var(--g-gold); }
+.guide-faq-item p { margin: 0; padding: 0 var(--g-md) var(--g-md); color: var(--g-text-dim); }
+
+/* community */
+.guide-community { text-align: center; }
+.guide-community-cta { display: flex; flex-wrap: wrap; gap: var(--g-md); justify-content: center; }
+.guide-eyebrow {
+  margin: 0 0 var(--g-sm);
+  font-size: var(--g-text-xs);
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--g-gold-dim);
+}
+.guide-hero-title {
+  font-family: var(--g-font-display);
+  font-weight: 700;
+  font-size: var(--g-text-fluid-hero);
+  line-height: var(--g-leading-tight);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  margin: 0 0 var(--g-md);
+  color: var(--g-gold);
+  text-shadow: 0 2px 24px #ffd10022, 0 1px 2px #000;
+}
+.guide-hero-sub {
+  font-family: var(--g-font-serif);
+  font-size: var(--g-text-fluid-lead);
+  color: var(--g-text-dim);
+  margin: 0 auto var(--g-lg);
+  max-width: 30em;
+}
+.guide-hero-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--g-md);
+  justify-content: center;
+}
+
+/* ----------------------------------------------------------------- footer */
+.guide-footer {
+  border-block-start: 1px solid var(--g-border-soft);
+  background: var(--g-bg-2);
+}
+.guide-footer-inner {
+  max-width: var(--g-maxw);
+  margin-inline: auto;
+  padding: var(--g-xl) var(--g-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--g-md);
+  text-align: center;
+}
+.guide-footer-blurb { max-width: 52ch; color: var(--g-text-dim); margin: 0; }
+.guide-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--g-md);
+  align-items: center;
+  justify-content: center;
+}
+/* Exclude the CTA: it is styled by .guide-cta so the footer link color must not bleed in
+   (otherwise the footer Play button label washes out and its hover diverges from the rest). */
+.guide-footer-links a:not(.guide-cta) { color: var(--g-text-dim); font-size: var(--g-text-base); }
+.guide-footer-links a:not(.guide-cta):hover { color: var(--g-gold); }
+.guide-footer-rights { color: var(--g-text-muted); font-size: var(--g-text-sm); margin: 0; }
+
+/* -------------------------------------------------------------- responsive */
+@media (max-width: 880px) {
+  body.guide-has-sidebar .guide-layout { grid-template-columns: minmax(0, 1fr); }
+  .guide-sidebar {
+    position: static;
+    max-height: none;
+    overflow: visible;
+    padding-block: var(--g-md);
+    border-block-end: 1px solid var(--g-border-soft);
+  }
+  .guide-topics-toggle {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--g-control-h);
+    padding-inline: var(--g-md);
+    background: var(--g-bg-2);
+    color: var(--g-text);
+    border: 1px solid var(--g-border-soft);
+    border-radius: var(--g-radius);
+    font-family: var(--g-font-ui);
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .guide-sidebar-nav { display: none; margin-block-start: var(--g-md); }
+  .guide-sidebar.topics-open .guide-sidebar-nav { display: block; }
+}
+
+@media (max-width: 1024px) {
+  .guide-menu-toggle { display: inline-flex; }
+  .guide-primary-nav {
+    position: absolute;
+    inset-block-start: var(--g-header-h);
+    inset-inline: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: var(--g-sm) var(--g-md) var(--g-md);
+    background: rgba(8, 8, 13, 0.97);
+    border-block-end: 1px solid var(--g-border-soft);
+    display: none;
+  }
+  .guide-primary-nav.is-open { display: flex; }
+  .guide-nav-list { flex-direction: column; align-items: stretch; gap: 0; }
+  .guide-nav-link { padding-block: var(--g-sm2); border-block-end: 1px solid var(--g-border-soft); }
+  .guide-nav-link.is-active { border-block-end-color: var(--g-border-soft); padding-inline-start: var(--g-sm); }
+  .guide-nav-actions { flex-direction: column; align-items: stretch; gap: var(--g-sm); padding-block-start: var(--g-sm); }
+  .guide-lang { justify-content: space-between; }
+  .guide-cta { width: 100%; }
+}
+
+/* --------------------------------------------------------- user preferences */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
+
+@media (prefers-contrast: more) {
+  :root { --g-text-dim: #f0ebd8; --g-text-muted: #d8cda3; --g-border-soft: #6f5a2a; }
+  .guide-nav-link { color: var(--g-text); }
+}
+
+/* ============================================================ shared primitives
+   Reusable building blocks consumed across pages via the ui.ts helpers, so spacing,
+   sizing, and touch targets stay consistent. Feature-specific styles live in their
+   own fenced sections below. */
+
+/* Horizontal scroll wrapper for wide tables on narrow screens (keytable, etc.),
+   so nothing is clipped by the body overflow-x: clip. */
+.guide-table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* Callout variants. The base .guide-callout is the gold "tip"; these recolor it. */
+.guide-callout-title { display: block; font-family: var(--g-font-display); font-weight: 700; color: var(--g-text); margin-block-end: var(--g-2xs); }
+.guide-callout-note { border-inline-start-color: var(--g-role-tank); background: var(--g-wash-note); }
+.guide-callout-warn { border-inline-start-color: var(--g-warn); background: var(--g-wash-warn); }
+
+/* Related-links block at the foot of a page (cross-linking). */
+.guide-related { margin-block-start: var(--g-xl); padding-block-start: var(--g-md); border-block-start: 1px solid var(--g-border-soft); }
+.guide-related-h { font-size: var(--g-text-2xs); font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--g-text-muted); margin: 0 0 var(--g-sm); }
+.guide-related-list { display: flex; flex-wrap: wrap; gap: var(--g-sm); margin: 0; padding: 0; list-style: none; }
+.guide-related-list a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--g-control-h-sm);
+  padding-inline: var(--g-pad-control);
+  background: var(--g-bg-2);
+  border: 1px solid var(--g-border-soft);
+  border-radius: var(--g-radius-pill);
+  color: var(--g-text-dim);
+  font-size: var(--g-text-sm);
+  font-weight: 600;
+}
+.guide-related-list a:hover { color: var(--g-gold); border-color: var(--g-border); text-decoration: none; }
+
+/* Coarse-pointer touch floor: every interactive control reaches the 44px target on
+   touch devices, even where its desktop size is smaller. Bumping --g-control-h-sm to
+   the touch size lifts every compact control (selects, chips, related links, gear
+   slots, search input) from one place; the listed selectors are the ones whose floor
+   is a min-height rather than the control token. */
+@media (pointer: coarse) {
+  :root { --g-control-h-sm: var(--g-touch); }
+  .guide-side-link,
+  a.guide-poi { min-height: var(--g-touch); }
+  .guide-side-link { display: flex; align-items: center; }
+}
+
+/* ===================================================== class chooser + class page */
+/* Chooser: facet filters over the nine class cards (role, style, resource, complexity). */
+.guide-chooser {
+  margin-block: var(--g-lg);
+  padding: var(--g-md);
+  background: var(--g-bg-2);
+  border: 1px solid var(--g-border-soft);
+  border-radius: var(--g-radius-lg);
+}
+.guide-chooser-h { font-family: var(--g-font-display); font-size: var(--g-text-lg); margin: 0 0 var(--g-2xs); color: var(--g-text); }
+.guide-chooser-sub { margin: 0 0 var(--g-md); color: var(--g-text-dim); font-size: var(--g-text-base); }
+.guide-chooser-filters { display: flex; flex-wrap: wrap; gap: var(--g-md) var(--g-lg); align-items: flex-end; }
+.guide-filter-group { display: flex; flex-direction: column; gap: var(--g-xs); }
+.guide-filter-group-toggle { flex-direction: row; align-items: center; gap: var(--g-sm); margin-inline-start: auto; }
+.guide-filter-label { font-size: var(--g-text-2xs); font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--g-text-muted); }
+.guide-chips { display: flex; flex-wrap: wrap; gap: var(--g-xs2); }
+.guide-chip {
+  min-height: var(--g-control-h-sm);
+  padding-inline: var(--g-pad-control);
+  background: var(--g-bg);
+  color: var(--g-text-dim);
+  border: 1px solid var(--g-border-soft);
+  border-radius: var(--g-radius-pill);
+  font-family: var(--g-font-ui);
+  font-size: var(--g-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: color var(--g-motion), border-color var(--g-motion), background var(--g-motion);
+}
+.guide-chip:hover { color: var(--g-text); border-color: var(--g-border); }
+.guide-chip[aria-pressed="true"] { color: var(--g-on-gold); background: var(--g-gold); border-color: var(--g-gold-dim); }
+.guide-chooser-clear {
+  min-height: var(--g-control-h-sm);
+  padding-inline: var(--g-pad-control);
+  background: transparent;
+  color: var(--g-text-muted);
+  border: 1px solid transparent;
+  border-radius: var(--g-radius-pill);
+  font-family: var(--g-font-ui);
+  font-size: var(--g-text-sm);
+  cursor: pointer;
+}
+.guide-chooser-clear:hover { color: var(--g-text); text-decoration: underline; }
+.guide-chooser-count { margin: var(--g-md) 0 0; color: var(--g-text-muted); font-size: var(--g-text-sm); }
+.guide-chooser-none { margin-block-start: var(--g-md); color: var(--g-text-dim); }
+
+/* Card description clamped so cards stay even with the 1-2 sentence canonical lore. */
+.guide-class-card-hook {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Qualitative "feel" tags. */
+.guide-tags { display: flex; flex-wrap: wrap; gap: var(--g-xs2); margin-block-start: var(--g-sm); }
+.guide-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--g-pad-pill-y) var(--g-pad-pill-x);
+  border-radius: var(--g-radius-pill);
+  font-size: var(--g-text-xs);
+  font-weight: 600;
+  color: var(--g-text-dim);
+  background: var(--g-bg-2);
+  border: 1px solid var(--g-border-soft);
+}
+.guide-tag-first { color: var(--g-gold-dim); border-color: var(--g-border); }
+.guide-tag-cx-high { color: var(--g-role-dps); }
+
+/* Class facts row (armor / weapons / resource). */
+.guide-class-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--g-md) var(--g-xl);
+  margin: var(--g-md) 0 0;
+  padding: var(--g-md) 0 0;
+  border-block-start: 1px solid var(--g-border-soft);
+}
+.guide-fact { margin: 0; }
+.guide-fact dt { font-size: var(--g-text-2xs); font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--g-text-muted); }
+.guide-fact dd { margin: var(--g-2xs) 0 0; color: var(--g-text); font-weight: 600; }
+
+.guide-class-hero-text { min-width: 0; }
+
+/* Signature kit: icon + name + one-liner cards. */
+.guide-kit {
+  list-style: none;
+  padding: 0;
+  margin: var(--g-md) 0 0;
+  display: grid;
+  gap: var(--g-sm);
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+.guide-kit-item {
+  display: flex;
+  gap: var(--g-sm);
+  align-items: flex-start;
+  padding: var(--g-sm);
+  background: var(--g-bg-2);
+  border: 1px solid var(--g-border-soft);
+  border-radius: var(--g-radius);
+}
+.guide-kit-item .guide-ability-icon { flex: none; }
+.guide-kit-text { min-width: 0; display: flex; flex-direction: column; gap: var(--g-2xs); }
+.guide-kit-name { font-family: var(--g-font-display); font-weight: 600; color: var(--g-text); min-width: 0; overflow-wrap: anywhere; }
+.guide-kit-line { color: var(--g-text-dim); font-size: var(--g-text-sm); }
+
+/* Specialization cards. */
+.guide-spec-card {
+  display: flex;
+  gap: var(--g-md);
+  align-items: flex-start;
+  padding: var(--g-md);
+  background: var(--g-bg-2);
+  border: 1px solid var(--g-border-soft);
+  border-radius: var(--g-radius);
+}
+.guide-spec-icon { width: 40px; height: 40px; flex: none; border-radius: var(--g-radius-sm); border: 1px solid var(--g-border); }
+.guide-spec-body { min-width: 0; }
+.guide-spec-head { display: flex; align-items: center; gap: var(--g-sm); flex-wrap: wrap; }
+.guide-spec-name { font-family: var(--g-font-display); font-weight: 700; font-size: var(--g-text-md); color: var(--g-text); min-width: 0; overflow-wrap: anywhere; }
+.guide-spec-desc { margin: var(--g-xs) 0 0; color: var(--g-text-dim); }
+.guide-spec-mastery { margin: var(--g-xs) 0 0; color: var(--g-text-muted); font-size: var(--g-text-sm); }
+.guide-spec-mastery span { font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; font-size: var(--g-text-2xs); color: var(--g-gold-dim); margin-inline-end: var(--g-2xs); }
+
+/* Warlock demon roster. */
+.guide-pet-list {
+  list-style: none;
+  padding: 0;
+  margin: var(--g-md) 0 0;
+  display: grid;
+  gap: var(--g-sm);
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+.guide-pet {
+  padding: var(--g-sm) var(--g-md);
+  background: var(--g-bg-2);
+  border: 1px solid var(--g-border-soft);
+  border-radius: var(--g-radius);
+}
+.guide-pet-name { display: block; font-family: var(--g-font-display); font-weight: 600; color: var(--g-text); min-width: 0; overflow-wrap: anywhere; }
+.guide-pet-line { display: block; margin-block-start: var(--g-2xs); color: var(--g-text-dim); font-size: var(--g-text-sm); }
+
+@media (pointer: coarse) {
+  .guide-chip, .guide-chooser-clear { min-height: var(--g-touch); }
+}
+
+/* ============================================================ world map + zones */
+.guide-worldmap-wrap { margin-block: var(--g-lg) var(--g-xl); }
+.guide-worldmap-h { font-family: var(--g-font-display); font-size: var(--g-text-fluid-h2); color: var(--g-gold-dim); margin: 0 0 var(--g-2xs); }
+.guide-worldmap-sub { margin: 0 0 var(--g-md); color: var(--g-text-dim); max-width: var(--g-prose); }
+.guide-worldmap { display: flex; flex-direction: column; gap: var(--g-sm); max-width: var(--g-maxw-map); }
+.guide-worldmap-zone {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: var(--g-2xs) var(--g-md);
+  padding: var(--g-md);
+  background: var(--g-bg-2);
+  border: 1px solid var(--g-border-soft);
+  border-inline-start: var(--g-bw-rail) solid var(--g-border);
+  border-radius: var(--g-radius);
+  color: var(--g-text);
+}
+.guide-worldmap-zone:hover { border-color: var(--g-border); background: var(--g-wash); text-decoration: none; }
+.guide-worldmap-band { grid-column: 1; font-size: var(--g-text-2xs); font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--g-gold-dim); }
+.guide-worldmap-name { grid-column: 1; font-family: var(--g-font-display); font-weight: 700; font-size: var(--g-text-lg); min-width: 0; overflow-wrap: anywhere; }
+.guide-worldmap-hub { grid-column: 2; grid-row: 1 / span 2; align-self: center; color: var(--g-text-muted); font-size: var(--g-text-sm); }
+/* Map rail accents reuse the biome colors as a left border. */
+.guide-worldmap-zone.guide-zone-vale { border-inline-start-color: var(--g-zone-vale); border-block-start-color: var(--g-border-soft); }
+.guide-worldmap-zone.guide-zone-marsh { border-inline-start-color: var(--g-zone-marsh); border-block-start-color: var(--g-border-soft); }
+.guide-worldmap-zone.guide-zone-peaks { border-inline-start-color: var(--g-zone-peaks); border-block-start-color: var(--g-border-soft); }
+
+/* Detail zone cards (wider than the home teasers, with places + residents). */
+.guide-zone-grid-detail { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+.guide-zone-detail { margin-block-start: var(--g-md); }
+.guide-zone-subh { font-size: var(--g-text-2xs); font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--g-text-muted); margin: 0 0 var(--g-xs); }
+.guide-poi-list { display: flex; flex-wrap: wrap; gap: var(--g-xs2); margin: 0; padding: 0; list-style: none; }
+.guide-poi {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  padding: var(--g-pad-pill-y) var(--g-pad-pill-x);
+  background: var(--g-bg);
+  border: 1px solid var(--g-border-soft);
+  border-radius: var(--g-radius-pill);
+  font-size: var(--g-text-sm);
+  color: var(--g-text-dim);
+  overflow-wrap: anywhere;
+}
+a.guide-poi:hover { color: var(--g-gold); border-color: var(--g-border); text-decoration: none; }
+
+.guide-dungeon-meta { margin: 0 0 var(--g-sm); color: var(--g-text-muted); font-size: var(--g-text-sm); }
+
+/* ============================================================ talents + wish pages */
+.guide-talents-classes { display: grid; gap: var(--g-lg); margin-block-start: var(--g-md); }
+.guide-talents-class { padding-block-start: var(--g-sm); }
+.guide-talents-class-h {
+  display: flex;
+  align-items: center;
+  gap: var(--g-sm);
+  margin: 0 0 var(--g-sm);
+  font-family: var(--g-font-display);
+  font-size: var(--g-text-xl);
+  color: var(--g-text);
+}
+.guide-talents-class-h a { color: var(--g-text); }
+.guide-talents-class-h a:hover { color: var(--g-gold); text-decoration: none; }
+.guide-talents-crest { width: 40px; height: 40px; flex: none; }
+
+/* "Things I wish I knew" cards. */
+.guide-wish-list { display: grid; gap: var(--g-md); margin-block-start: var(--g-md); }
+.guide-wish-item {
+  padding: var(--g-md) var(--g-lg);
+  background: var(--g-bg-2);
+  border: 1px solid var(--g-border-soft);
+  border-inline-start: var(--g-bw-accent) solid var(--g-gold);
+  border-radius: 0 var(--g-radius) var(--g-radius) 0;
+}
+.guide-wish-title { font-family: var(--g-font-display); font-size: var(--g-text-lg); color: var(--g-text); margin: 0 0 var(--g-2xs); }
+.guide-wish-item p { margin: 0; color: var(--g-text-dim); }
+
+/* ============================================================ navigation aids */
+/* Breadcrumb trail above the article. */
+.guide-breadcrumb { margin-block-end: var(--g-md); }
+.guide-breadcrumb ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--g-2xs) var(--g-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--g-text-sm);
+  color: var(--g-text-muted);
+}
+.guide-breadcrumb li { display: inline-flex; align-items: center; gap: var(--g-sm); }
+.guide-breadcrumb li + li::before { content: "/"; color: var(--g-border); }
+.guide-breadcrumb a { color: var(--g-text-dim); }
+.guide-breadcrumb a:hover { color: var(--g-gold); }
+.guide-breadcrumb [aria-current="page"] { color: var(--g-text); }
+
+/* On-this-page contents with scrollspy. */
+.guide-toc {
+  margin-block: var(--g-md) var(--g-lg);
+  padding: var(--g-md);
+  background: var(--g-bg-2);
+  border: 1px solid var(--g-border-soft);
+  border-radius: var(--g-radius);
+}
+.guide-toc-h { display: block; font-size: var(--g-text-2xs); font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--g-text-muted); margin-block-end: var(--g-sm); }
+.guide-toc ul { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--g-2xs); }
+.guide-toc a {
+  display: block;
+  padding: var(--g-2xs) var(--g-sm);
+  color: var(--g-text-dim);
+  font-size: var(--g-text-base);
+  border-inline-start: 2px solid transparent;
+  border-radius: 0 var(--g-radius-sm) var(--g-radius-sm) 0;
+}
+.guide-toc a:hover { color: var(--g-text); background: var(--g-wash); text-decoration: none; }
+.guide-toc a.is-active { color: var(--g-gold); border-inline-start-color: var(--g-gold); background: var(--g-wash-gold); }
+
+/* Previous / next sequence below the article. */
+.guide-seq {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--g-md);
+  margin-block-start: var(--g-xl);
+  padding-block-start: var(--g-md);
+  border-block-start: 1px solid var(--g-border-soft);
+}
+.guide-seq-link {
+  display: flex;
+  flex-direction: column;
+  gap: var(--g-2xs);
+  min-width: 0;
+  min-height: var(--g-touch);
+  padding: var(--g-sm) var(--g-md);
+  background: var(--g-bg-2);
+  border: 1px solid var(--g-border-soft);
+  border-radius: var(--g-radius);
+  color: var(--g-text);
+}
+.guide-seq-link:hover { border-color: var(--g-border); background: var(--g-wash); text-decoration: none; }
+.guide-seq-next { text-align: end; }
+.guide-seq-dir { font-size: var(--g-text-2xs); font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--g-text-muted); }
+.guide-seq-name { font-family: var(--g-font-display); font-weight: 600; color: var(--g-text); min-width: 0; overflow-wrap: anywhere; }
+.guide-seq-spacer { display: block; }
+
+/* ============================================================ header search */
+.guide-search { position: relative; display: flex; align-items: center; }
+.guide-search-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+.guide-search-input {
+  width: 180px;
+  max-width: 100%;
+  min-height: var(--g-control-h-sm);
+  padding: var(--g-xs2) var(--g-sm);
+  background: var(--g-bg-2);
+  color: var(--g-text);
+  border: 1px solid var(--g-border-soft);
+  border-radius: var(--g-radius);
+  font-family: var(--g-font-ui);
+  font-size: var(--g-text-base);
+}
+.guide-search-input::placeholder { color: var(--g-text-muted); }
+.guide-search-input:hover { border-color: var(--g-border); }
+.guide-search-results {
+  position: absolute;
+  inset-block-start: calc(100% + var(--g-xs));
+  inset-inline-end: 0;
+  z-index: var(--g-z-pop);
+  width: min(320px, 86vw);
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: var(--g-xs);
+  background: var(--g-bg-2);
+  border: 1px solid var(--g-border);
+  border-radius: var(--g-radius);
+  box-shadow: var(--g-shadow-pop);
+}
+.guide-search-opt {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--g-sm);
+  padding: var(--g-sm);
+  border-radius: var(--g-radius-sm);
+  color: var(--g-text);
+}
+.guide-search-opt:hover,
+.guide-search-opt.is-active { background: var(--g-wash); text-decoration: none; }
+.guide-search-opt.is-active { outline: 1px solid var(--g-border); }
+.guide-search-opt-label { font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+.guide-search-opt-type { flex: none; font-size: var(--g-text-2xs); text-transform: uppercase; letter-spacing: 0.08em; color: var(--g-text-muted); }
+.guide-search-empty { margin: 0; padding: var(--g-sm); color: var(--g-text-muted); font-size: var(--g-text-base); }
+
+@media (pointer: coarse) {
+  .guide-search-input { min-height: var(--g-touch); font-size: var(--g-text-md); }
+  .guide-search-opt { min-height: var(--g-touch); }
+  .guide-toc a { min-height: var(--g-touch); display: flex; align-items: center; }
+  .guide-nav-link { min-height: var(--g-touch); display: inline-flex; align-items: center; }
+}
+@media (max-width: 1024px) {
+  .guide-search { width: 100%; }
+  .guide-search-input { width: 100%; }
+  .guide-search-results { inset-inline: 0; width: auto; }
+}
+
+/* ====================================================== interactive 3D model viewer
+   An inline turntable that loads one game model on demand. State is driven by the
+   figure's data-state (idle | loading | ready | error | nowebgl); the 2D poster is the
+   graceful fallback for the pre-load, error, and no-WebGL cases. */
+.guide-viewer { margin: var(--g-md) 0 0; }
+.guide-viewer-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(120% 85% at 50% 10%, #1b1b28 0%, transparent 72%),
+    var(--g-bg-2);
+  border: 1px solid var(--g-border-soft);
+  border-radius: var(--g-radius-lg);
+  overflow: hidden;
+}
+.guide-viewer-feature .guide-viewer-stage { aspect-ratio: 1 / 1; }
+.guide-viewer-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: grab;
+  touch-action: pan-y; /* vertical page scroll still works; horizontal drag rotates */
+}
+.guide-viewer-canvas:active { cursor: grabbing; }
+.guide-viewer-poster {
+  width: auto;
+  max-width: 60%;
+  max-height: 60%;
+  opacity: 0.92;
+}
+.guide-viewer-load {
+  position: absolute;
+  inset-block-end: var(--g-md);
+  inset-inline-start: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--g-sm);
+  min-height: var(--g-control-h);
+  padding-inline: var(--g-md);
+  background: linear-gradient(180deg, #ffef9e 0%, var(--g-gold) 100%);
+  color: var(--g-on-gold);
+  font-family: var(--g-font-display);
+  font-weight: 700;
+  font-size: var(--g-text-sm);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid var(--g-gold-dim);
+  border-radius: var(--g-radius);
+  box-shadow: var(--g-shadow-cta);
+  cursor: pointer;
+}
+.guide-viewer-load:hover { filter: brightness(1.06); }
+.guide-viewer-load:disabled { cursor: default; opacity: 0.7; }
+.guide-viewer-load-icon {
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--g-on-gold);
+  border-radius: 2px;
+  transform: rotate(45deg);
+}
+.guide-viewer-status {
+  position: absolute;
+  inset-block-end: var(--g-md);
+  margin: 0;
+  padding: var(--g-xs) var(--g-md);
+  max-width: 86%;
+  text-align: center;
+  font-size: var(--g-text-sm);
+  color: var(--g-text-dim);
+  background: rgba(8, 8, 13, 0.72);
+  border-radius: var(--g-radius-pill);
+}
+.guide-viewer-status-loading,
+.guide-viewer-status-error { display: none; }
+.guide-viewer-hint {
+  margin: var(--g-xs) 0 0;
+  text-align: center;
+  font-size: var(--g-text-xs);
+  color: var(--g-text-muted);
+}
+
+/* State machine: default (idle) shows poster + load; the rest is layered on by state. */
+.guide-viewer-status { display: none; }
+.guide-viewer-hint { display: none; }
+.guide-viewer[data-state="loading"] .guide-viewer-load { display: none; }
+.guide-viewer[data-state="loading"] .guide-viewer-status { display: block; }
+.guide-viewer[data-state="loading"] .guide-viewer-status-loading { display: inline; }
+.guide-viewer[data-state="loading"] .guide-viewer-poster { opacity: 0.45; }
+.guide-viewer[data-state="ready"] .guide-viewer-poster,
+.guide-viewer[data-state="ready"] .guide-viewer-load { display: none; }
+.guide-viewer[data-state="ready"] .guide-viewer-hint { display: block; }
+.guide-viewer[data-state="error"] .guide-viewer-status { display: block; }
+.guide-viewer[data-state="error"] .guide-viewer-status-error { display: inline; }
+.guide-viewer[data-state="nowebgl"] .guide-viewer-load { display: none; }
+
+/* Compact thumb variant: a small square turntable cell for dense lists (bestiary). */
+.guide-viewer-thumb { margin: 0; flex: none; }
+.guide-viewer-thumb .guide-viewer-stage {
+  width: 88px;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--g-radius);
+}
+.guide-viewer-thumb .guide-viewer-load {
+  inset: 0;
+  inset-inline-start: 0;
+  transform: none;
+  width: 100%;
+  min-height: 100%;
+  padding: 0;
+  gap: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  color: var(--g-gold);
+}
+.guide-viewer-thumb .guide-viewer-load:hover { filter: none; background: var(--g-wash-gold); }
+.guide-viewer-thumb .guide-viewer-load-icon { width: 16px; height: 16px; border-color: var(--g-gold); }
+.guide-viewer-thumb .guide-viewer-load-text { display: none; }
+.guide-viewer-thumb .guide-viewer-status { font-size: var(--g-text-2xs); inset-block-end: var(--g-2xs); padding: var(--g-2xs) var(--g-xs); }
+.guide-viewer-thumb .guide-viewer-status-error { display: none; } /* too small for prose; poster returns on error */
+.guide-viewer-thumb[data-state="error"] .guide-viewer-status { display: none; }
+.guide-viewer-thumb[data-state="error"] .guide-viewer-load { display: inline-flex; }
+.guide-viewer-thumb .guide-viewer-hint { display: none !important; }
+
+.guide-pet .guide-viewer { margin: 0 0 var(--g-sm); }
+
+/* ====================================================== 3D model gallery (/guide/models) */
+.guide-gallery { display: grid; gap: var(--g-lg); grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 760px) {
+  .guide-gallery { grid-template-columns: 260px minmax(0, 1fr); align-items: start; }
+}
+.guide-gallery-picker {
+  display: grid;
+  gap: var(--g-lg);
+}
+.guide-gallery-group-h {
+  margin: 0 0 var(--g-sm);
+  font-size: var(--g-text-2xs);
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--g-text-muted);
+}
+.guide-gallery-options {
+  display: grid;
+  gap: var(--g-xs2);
+  grid-template-columns: repeat(auto-fill, minmax(116px, 1fr));
+}
+.guide-gallery-opt {
+  display: flex;
+  align-items: center;
+  gap: var(--g-sm);
+  min-height: var(--g-control-h);
+  padding: var(--g-xs2) var(--g-sm);
+  background: var(--g-bg-2);
+  color: var(--g-text-dim);
+  border: 1px solid var(--g-border-soft);
+  border-inline-start: var(--g-bw-rail) solid var(--opt-color, var(--g-border));
+  border-radius: var(--g-radius);
+  font-family: var(--g-font-ui);
+  font-weight: 600;
+  font-size: var(--g-text-sm);
+  cursor: pointer;
+  text-align: start;
+}
+.guide-gallery-opt:hover { color: var(--g-text); background: var(--g-wash); }
+.guide-gallery-opt[aria-pressed="true"] {
+  color: var(--g-text);
+  border-color: var(--opt-color, var(--g-gold));
+  background: var(--g-wash-gold);
+}
+.guide-gallery-opt img { width: 28px; height: 28px; flex: none; }
+.guide-gallery-opt-name { min-width: 0; overflow-wrap: anywhere; }
+.guide-gallery-viewer { position: sticky; inset-block-start: calc(var(--g-header-h) + var(--g-md)); }
+.guide-gallery-stage { aspect-ratio: 1 / 1; }
+.guide-gallery-fallback { margin: 0; padding: var(--g-lg); max-width: 36ch; text-align: center; color: var(--g-text-dim); }
+
+/* ====================================================== content lists (social, gear) */
+/* A plain definition-style list: a bold lead-in term followed by its description. */
+.guide-list { margin: var(--g-sm) 0 0; padding-inline-start: var(--g-lg); display: grid; gap: var(--g-xs); }
+.guide-list li { color: var(--g-text-dim); }
+.guide-list strong { color: var(--g-text); }
+
+/* ====================================================== lore blocks (ui.ts helpers)
+   Pull quotes (hub greetings, in-world voices), "who you will meet" character rows, and
+   the titled story-beat cards used by the World, Quests, Dungeons, and Arena pages. */
+
+/* Pull quote with a speaker line. */
+.guide-quote {
+  margin: var(--g-md) 0 0;
+  padding: var(--g-sm) var(--g-md);
+  border-inline-start: var(--g-bw-rail) solid var(--g-gold-dim);
+  background: var(--g-wash-gold);
+  border-radius: 0 var(--g-radius) var(--g-radius) 0;
+}
+.guide-quote blockquote {
+  margin: 0;
+  font-family: var(--g-font-serif);
+  font-style: italic;
+  font-size: var(--g-text-md);
+  color: var(--g-text);
+}
+.guide-quote figcaption {
+  margin-block-start: var(--g-xs);
+  font-size: var(--g-text-sm);
+  font-weight: 600;
+  color: var(--g-text-muted);
+}
+
+/* "Who you will meet" character rows. */
+.guide-figures { display: grid; gap: var(--g-md); margin-block-start: var(--g-md); }
+.guide-figure {
+  padding: var(--g-md);
+  background: var(--g-bg-2);
+  border: 1px solid var(--g-border-soft);
+  border-radius: var(--g-radius);
+}
+.guide-figure-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--g-xs2) var(--g-sm); margin-block-end: var(--g-xs); }
+.guide-figure-name { font-family: var(--g-font-display); font-weight: 700; font-size: var(--g-text-md); color: var(--g-text); min-width: 0; overflow-wrap: anywhere; }
+.guide-figure-role { font-size: var(--g-text-2xs); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--g-gold-dim); }
+.guide-figure-line { margin: 0; color: var(--g-text-dim); }
+
+/* Titled story-beat cards (saga rungs, quest types, augment waves). */
+.guide-beat-grid { display: grid; gap: var(--g-md); margin-block-start: var(--g-md); grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.guide-beat {
+  padding: var(--g-md);
+  background: var(--g-bg-2);
+  border: 1px solid var(--g-border-soft);
+  border-radius: var(--g-radius);
+}
+.guide-beat-h { margin: 0 0 var(--g-xs); font-family: var(--g-font-display); font-size: var(--g-text-lg); color: var(--g-gold-dim); }
+.guide-beat p { margin: 0; color: var(--g-text-dim); }
+
+/* Spoiler-safe creature flavor line on a bestiary card. */
+.guide-creature-flavor { margin-block-start: var(--g-2xs); color: var(--g-text-muted); font-size: var(--g-text-xs); line-height: var(--g-leading-snug); }
+.guide-creature-flavor-label { font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--g-gold-dim); margin-inline-end: var(--g-2xs); }
+
+/* Per-zone "notable places" prose under the POI chips. */
+.guide-zone-places-note { margin: var(--g-sm) 0 0; color: var(--g-text-dim); font-size: var(--g-text-sm); }
+
+/* Gear: equip-slot chips and the quality-tier swatch list. */
+.guide-gear-slots { display: flex; flex-wrap: wrap; gap: var(--g-xs2); margin: var(--g-sm) 0 0; padding: 0; list-style: none; }
+.guide-gear-slots li {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--g-control-h-sm);
+  padding-inline: var(--g-sm);
+  background: var(--g-bg-2);
+  border: 1px solid var(--g-border-soft);
+  border-radius: var(--g-radius-pill);
+  color: var(--g-text-dim);
+  font-size: var(--g-text-sm);
+  font-weight: 600;
+}
+.guide-gear-qualities { display: grid; gap: var(--g-xs); margin: var(--g-sm) 0; padding: 0; list-style: none; }
+.guide-gear-quality { display: flex; align-items: center; gap: var(--g-sm); color: var(--g-text); }
+.guide-gear-swatch { width: 16px; height: 16px; flex: none; border-radius: var(--g-radius-sm); border: 1px solid #00000066; }
+.guide-gallery-caption {
+  margin: var(--g-sm) 0 0;
+  text-align: center;
+  font-family: var(--g-font-display);
+  font-size: var(--g-text-lg);
+  color: var(--g-text);
+}
+@media (pointer: coarse) {
+  .guide-gallery-opt { min-height: var(--g-touch); }
+}

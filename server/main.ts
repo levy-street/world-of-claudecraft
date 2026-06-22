@@ -37,12 +37,16 @@ import { handleInternalApi } from './internal';
 import { handlePerfReport } from './perf_report';
 import { GameServer } from './game';
 import { REALM, REALM_DIRECTORY, REALM_ORIGINS } from './realm';
-import { webLoginEnforced, isWebClientRequest, NATIVE_APP_ORIGINS } from './web_login_guard';
+import { webLoginEnforced, isWebClientRequest, isNativeAppRequest, NATIVE_APP_ORIGINS } from './web_login_guard';
+import { createNativeAttestationChallenge, verifyNativeAttestation } from './native_attestation';
 import { cacheControlFor, etagFor, isNotModified } from './static_cache';
 import { recordUsageCacheEvent, recordUsageMetric, setUsageCacheSize } from './provider_usage';
 
 const PORT = Number(process.env.PORT ?? 8787);
 const STATIC_DIR = path.join(__dirname, '..', 'dist');
+// DEPRECATED: the standalone community MediaWiki is being retired in favour of the
+// curated in-app guide, which now serves at /wiki. This constant and its (now removed)
+// /wiki -> MediaWiki redirect are dead and slated for deletion in a follow-up ticket.
 const WIKI_URL = process.env.WIKI_URL ?? 'http://localhost:8080/wiki/index.php/Main_Page';
 // Pretty URLs that serve standalone static HTML pages.
 const STATIC_PAGE_ALIASES = new Map([
@@ -64,6 +68,8 @@ const STATIC_PAGE_ALIASES = new Map([
   ['/data-deletion/', '/data-deletion.html'],
   ['/support', '/support.html'],
   ['/support/', '/support.html'],
+  ['/wiki', '/guide.html'],
+  ['/wiki/', '/guide.html'],
 ]);
 // How long chat logs are kept (0 = forever); pruned at boot and daily.
 const CHAT_LOG_RETENTION_DAYS = Number(process.env.CHAT_LOG_RETENTION_DAYS ?? 90);
@@ -255,6 +261,7 @@ function requestMetadata(req: http.IncomingMessage): { ip: string; userAgent: st
 // client-supplied token must verify. The English error is matched to a t() key
 // by userFacingApiError() in src/main.ts — keep the two strings in sync.
 async function passesTurnstile(req: http.IncomingMessage, body: Record<string, unknown>): Promise<boolean> {
+  if (isNativeAppRequest(req)) return verifyNativeAttestation(req, body.nativeAttestation);
   if (!TURNSTILE_SECRET) return true;
   return verifyTurnstile(String(body.turnstileToken ?? ''), TURNSTILE_SECRET, requestIp(req));
 }
@@ -277,13 +284,12 @@ function isAdminRequest(req: http.IncomingMessage): boolean {
 }
 
 function serveStatic(req: http.IncomingMessage, res: http.ServerResponse): void {
-  const shell = isAdminRequest(req) ? 'admin.html' : 'index.html';
   let urlPath = (req.url ?? '/').split('?')[0];
-  if (urlPath === '/wiki' || urlPath === '/wiki/' || urlPath.startsWith('/wiki/')) {
-    res.writeHead(302, { Location: WIKI_URL });
-    res.end();
-    return;
-  }
+  // The curated Guide is the site wiki: a client-routed SPA served at /wiki with its
+  // own shell, so deep paths (/wiki/classes/...) fall back to guide.html rather than the
+  // game's index.html. (It previously 302'd to a standalone MediaWiki; that is retired.)
+  const isGuide = urlPath === '/wiki' || urlPath.startsWith('/wiki/');
+  const shell = isGuide ? 'guide.html' : isAdminRequest(req) ? 'admin.html' : 'index.html';
   // Pretty-URL aliases for standalone static pages.
   urlPath = STATIC_PAGE_ALIASES.get(urlPath) ?? urlPath;
   if (urlPath === '/' || urlPath === '/admin' || urlPath === '/admin/') urlPath = `/${shell}`;
@@ -362,6 +368,11 @@ const REQUIRE_WEB_LOGIN = webLoginEnforced();
 async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
   const url = (req.url ?? '').split('?')[0];
   try {
+    if (req.method === 'POST' && url === '/api/native-attestation/challenge') {
+      const body = await readBody(req);
+      const action = typeof body.action === 'string' ? body.action : 'auth';
+      return json(res, 200, createNativeAttestationChallenge(req, action));
+    }
     if (REQUIRE_WEB_LOGIN && req.method === 'POST' && (url === '/api/register' || url === '/api/login') && !isWebClientRequest(req)) {
       return json(res, 403, { error: 'logins are only allowed from the game client' });
     }
@@ -881,6 +892,7 @@ async function main(): Promise<void> {
 
     const token = typeof msg.token === 'string' ? msg.token : '';
     const characterId = Number(msg.character ?? 'NaN');
+    const clientSeed = typeof msg.clientSeed === 'string' ? msg.clientSeed : '';
     const accountId = await accountForToken(token);
     if (accountId === null || !Number.isFinite(characterId)) {
       ws.send(JSON.stringify({ t: 'error', error: 'not authenticated' }));
@@ -930,6 +942,7 @@ async function main(): Promise<void> {
         chatStrikes: status.chatStrikes,
         accountCosmetics,
         isAdmin,
+        clientSeed,
       },
     );
     if ('error' in result) {

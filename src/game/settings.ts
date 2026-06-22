@@ -44,6 +44,12 @@ export const SETTING_RANGES = {
   // button in Key Bindings so click-to-move's trigger is remappable without
   // pretending mouse buttons are keyboard codes.
   clickToMoveButton: { min: 0, max: 2, def: 0 },
+  // Which control interface to present: 0 = Auto (detect desktop vs touch from
+  // the device), 1 = Desktop (force keyboard/mouse, hide the on-screen controls),
+  // 2 = Touch (force the on-screen joysticks/buttons). Lets a tablet driven by a
+  // keyboard+mouse pick the desktop UI, and a touch-capable desktop opt into the
+  // on-screen controls. Read by useTouchInterface in mobile_controls.ts.
+  interfaceMode: { min: 0, max: 2, def: 0 },
   // touch-only: scales the camera (look) joystick turn/pitch rate. The Camera
   // Speed slider only scales mouselook, so before this phones had no way to
   // tune look sensitivity; surfaced in Graphics only on phone touch devices.

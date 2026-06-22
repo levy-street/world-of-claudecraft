@@ -100,7 +100,11 @@ export function handlePickedEntity(
         hud.openQuestDialog(id);
       }
       else hud.showError(t('questUi.errors.tooFar'));
-    } else if (isActivePvpOpponent(world, e)) {
+    } else if ((e.kind === 'mob' && !e.dead && e.hostile) || isActivePvpOpponent(world, e)) {
+      // Right-click a hostile mob (or an active PvP opponent) to start auto-attack,
+      // the classic-MMO convention the attack tooltip promises. A camera right-drag
+      // can't reach this: clickPickFromMouseGesture drops a right gesture past the
+      // drag threshold, so only a deliberate right-click attacks.
       world.startAutoAttack();
     }
   } else if (button === 0) {

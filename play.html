@@ -1168,6 +1168,9 @@
   /* report dialog: dropdown drops downward (dialog sits high), full width */
   #report-window .ui-dd { display: block; }
   #report-window .ui-dd-menu { bottom: auto; top: calc(100% + 4px); }
+  /* options language picker: it is the first row of the Interface panel, so the
+     default upward menu clips off the panel top; drop it downward instead. */
+  .set-lang-select .ui-dd-menu { bottom: auto; top: calc(100% + 4px); }
   /* Choice-node option flyout */
   .tal-choice-pop { position: fixed; z-index: 90; width: 252px; background: #1a140a; border: 1px solid var(--gold); border-radius: 6px; box-shadow: 0 10px 24px #000c, inset 0 0 0 1px #ffd10022; padding: 5px; }
   .tal-choice-pop::before { content: ""; position: absolute; left: var(--tal-choice-caret-left, 50%); top: -6px; width: 10px; height: 10px; background: #1a140a; border-left: 1px solid var(--gold); border-top: 1px solid var(--gold); transform: translateX(-50%) rotate(45deg); }
@@ -7622,59 +7625,6 @@
           <p class="skeleton-desc" data-i18n="game.leaderboard.globalSubtitle">Top champions across all realms</p>
           <div id="hs-leaderboard" class="hs-leaderboard" aria-live="polite">
             <div class="hs-loading" data-i18n="game.leaderboard.loading">Loading rankings…</div>
-          </div>
-        </div>
-      </section>
-
-      <section id="wiki-view" class="view-section" hidden aria-hidden="true">
-        <div class="parchment-panel skeleton-panel wiki-container-layout">
-          <div class="wiki-guide-intro">
-            <div class="skeleton-icon-wrapper">
-              <svg viewBox="0 0 24 24" class="skeleton-svg-icon" aria-hidden="true">
-                <path fill="currentColor" d="M19 2H6c-1.2 0-2 .9-2 2v16c0 1.1.9 2 2 2h13c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2m-1 18H6V4h12v16zM8 6h8v2H8V6zm0 4h8v2H8v-2zm0 4h5v2H8v-2z"/>
-              </svg>
-            </div>
-            <h2 class="skeleton-title" data-i18n="wiki.title">Game Wiki & Guide</h2>
-            <p class="skeleton-desc" data-i18n="wiki.desc">Discover the secrets of the realm, class guides, and strategies.</p>
-            <a class="btn wiki-cta" href="/wiki" target="_blank" rel="noopener noreferrer" data-i18n="wiki.cta">Browse the Wiki</a>
-          </div>
-          
-          <div class="wiki-controls-guide">
-            <h3 class="controls-guide-title" data-i18n="controls.title">Controls Guide</h3>
-            <div class="controls-guide-content">
-              <div class="control-group">
-                <h4 data-i18n="controls.movement">Movement</h4>
-                <div class="control-row"><span class="key-combo"><kbd class="keycap">W</kbd><kbd class="keycap">A</kbd><kbd class="keycap">S</kbd><kbd class="keycap">D</kbd></span> <span data-i18n="controls.moveTurn">Move / Turn</span></div>
-                <div class="control-row"><span class="key-combo"><kbd class="keycap">Q</kbd><kbd class="keycap">E</kbd></span> <span data-i18n="controls.strafe">Strafe Left/Right</span></div>
-                <div class="control-row"><kbd class="keycap">Space</kbd> <span data-i18n="controls.jump">Jump</span></div>
-                <div class="control-row"><kbd class="keycap">R</kbd> <span data-i18n="controls.autorun">Toggle Autorun</span></div>
-              </div>
-              <div class="control-group">
-                <h4 data-i18n="controls.combat">Combat & Interaction</h4>
-                <div class="control-row"><kbd class="keycap">Tab</kbd> <span data-i18n="controls.target">Target Enemy</span></div>
-                <div class="control-row"><span class="key-combo"><kbd class="keycap">1</kbd>–<kbd class="keycap">9</kbd> <kbd class="keycap">0</kbd></span> <span data-i18n="controls.spells">Cast Spells</span></div>
-                <div class="control-row"><kbd class="keycap">F</kbd> <span data-i18n="controls.interact">Interact / Loot</span></div>
-                <div class="control-row"><kbd class="keycap">V</kbd> <span data-i18n="controls.nameplates">Toggle Nameplates</span></div>
-              </div>
-              <div class="control-group">
-                <h4 data-i18n="controls.camera">Camera & Mouse</h4>
-                <div class="control-row"><span data-i18n="controls.rightDrag">Right-Drag</span> <span data-i18n="controls.mouselook">Mouselook</span></div>
-                <div class="control-row"><span data-i18n="controls.leftDrag">Left-Drag</span> <span data-i18n="controls.orbit">Orbit Camera</span></div>
-                <div class="control-row"><span data-i18n="controls.mouseWheel">Mouse Wheel</span> <span data-i18n="controls.zoom">Zoom</span></div>
-              </div>
-              <div class="control-group">
-                <h4 data-i18n="controls.interfaces">Interfaces</h4>
-                <div class="control-row"><kbd class="keycap">C</kbd> <span data-i18n="controls.charPane">Character Pane</span></div>
-                <div class="control-row"><kbd class="keycap">P</kbd> <span data-i18n="controls.spellbook">Spellbook</span></div>
-                <div class="control-row"><kbd class="keycap">N</kbd> <span data-i18n="game.talents.title">Talents</span></div>
-                <div class="control-row"><kbd class="keycap">L</kbd> <span data-i18n="controls.questLog">Quest Log</span></div>
-                <div class="control-row"><kbd class="keycap">M</kbd> <span data-i18n="controls.worldMap">World Map</span></div>
-                <div class="control-row"><kbd class="keycap">B</kbd> <span data-i18n="controls.bags">Bags Inventory</span></div>
-                <div class="control-row"><kbd class="keycap">X</kbd> <span data-i18n="controls.emoteWheel">Hold Emote Wheel</span></div>
-                <div class="control-row"><kbd class="keycap">O</kbd> <span data-i18n="controls.friends">Friends & Guild</span></div>
-                <div class="control-row"><kbd class="keycap">Enter</kbd> <span data-i18n="controls.chat">Open Chat</span></div>
-              </div>
-            </div>
           </div>
         </div>
       </section>

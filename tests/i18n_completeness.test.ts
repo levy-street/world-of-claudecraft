@@ -101,6 +101,10 @@ describe("i18n whole-catalog completeness", () => {
       "footer.githubLink",       // repository URL
       "fiesta.bracket",          // "Fiesta" event brand
       "serverUnavailable.logoAlt", // "World of ClaudeCraft" logo alt text - brand
+      "guide.brand",             // "World of ClaudeCraft" - brand (Guide)
+      "guide.brandShort",        // "ClaudeCraft" - brand (Guide)
+      "guide.home.title",        // "World of ClaudeCraft" - brand (Guide hero)
+      "guide.footer.rights",     // "World of ClaudeCraft" - brand (Guide footer)
     ]);
     const wordy = (v: string) => /[a-z]{4,}/.test(v.replace(/\{[^}]*\}/g, ""));
     const nonLatin: SupportedLanguage[] = ["zh_CN", "zh_TW", "ja_JP", "ko_KR", "ru_RU"];

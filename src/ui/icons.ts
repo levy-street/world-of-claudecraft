@@ -1855,7 +1855,10 @@ export function iconDataUrl(kind: IconKind, id: string, size: number = DEFAULT_I
     const img = weaponIconUrl(id);
     if (img) return img;
   }
-  if (kind === 'ability') {
+  // Abilities, and auras that carry a real ability id (a DoT/buff applied by that
+  // ability), share the same image-based skill art. abilityImageUrl returns null
+  // for generic aura_<kind> ids, so those still fall through to the procedural recipe.
+  if (kind === 'ability' || kind === 'aura') {
     const img = abilityImageUrl(id);
     if (img) return img;
   }

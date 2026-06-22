@@ -487,6 +487,40 @@ describe('Input movement is not cancelled by a camera drag', () => {
     expect(input.readMoveInput().forward).toBe(false);
   });
 });
+describe('keyboard jump latch', () => {
+  // A spacebar tap can be physically pressed and released entirely inside one
+  // 50ms server-input window (or sim-tick gap), so the instantaneous key-held
+  // read used to silently drop it: "every now and then jump stops working".
+  // A keydown must latch the jump briefly, exactly like triggerTouchJump.
+  it('latches a quick Space tap so a read after keyup still sees the jump', () => {
+    const { input, windowListeners } = makeInput();
+    const now = vi.spyOn(performance, 'now');
+    now.mockReturnValue(1000);
+    windowListeners.get('keydown')!({ code: 'Space', repeat: false, preventDefault: () => {} });
+    windowListeners.get('keyup')!({ code: 'Space' }); // released almost immediately
+    now.mockReturnValue(1010);
+    expect(input.readMoveInput().jump).toBe(true);   // still inside the latch window
+    now.mockReturnValue(1140);
+    expect(input.readMoveInput().jump).toBe(true);
+    now.mockReturnValue(1200);
+    expect(input.readMoveInput().jump).toBe(false);  // latch expired
+    now.mockRestore();
+  });
+
+  it('a held Space keeps jumping past the latch window', () => {
+    const { input, windowListeners } = makeInput();
+    const now = vi.spyOn(performance, 'now');
+    now.mockReturnValue(1000);
+    windowListeners.get('keydown')!({ code: 'Space', repeat: false, preventDefault: () => {} });
+    now.mockReturnValue(5000); // long past any latch, key still physically held
+    expect(input.readMoveInput().jump).toBe(true);
+    windowListeners.get('keyup')!({ code: 'Space' });
+    now.mockReturnValue(5200); // released and latch expired
+    expect(input.readMoveInput().jump).toBe(false);
+    now.mockRestore();
+  });
+});
+
 describe('touch jump', () => {
   it('jump is off until the touch button arms it', () => {
     const { input } = makeInput();
