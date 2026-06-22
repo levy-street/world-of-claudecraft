@@ -32,6 +32,7 @@ import { esc } from './esc';
 import { formatClockTime } from './clock';
 import { formatMinimapCoords } from './coords';
 import { compassView, type CardinalId } from './compass';
+import { questWaypointTargetFor, screenArrowDeg, waypointDistance } from './quest_waypoint';
 import { clampMinimapZoom, nextMinimapZoom, isMinMinimapZoom, isMaxMinimapZoom, minimapZoomValue, MINIMAP_ZOOM_DEFAULT } from './minimap_zoom';
 import { getUiScale } from './ui_scale';
 import { restView } from './rest_indicator';
@@ -106,6 +107,10 @@ import {
   parseHotbarAction, parseHotbarActions,
   placeAbilityOnSlot, placeItemOnSlot, shouldSeedFormBar, swapHotbarSlots, syncHotbarActions,
 } from './hotbar';
+
+// World height (above the player's feet) at which the focused-quest arrow floats,
+// so it clears the character's head with a clear gap without blocking the view.
+const WAYPOINT_ARROW_HEIGHT = 4.3;
 
 // hooks main wires after Input exists (the options menu drives input, audio,
 // graphics, and logout, all of which live outside the HUD). PerfOverlayHooks
@@ -548,6 +553,16 @@ export class Hud {
   private selectedQuestLogId: string | null = null;
   private questDialogReturnFocus: HTMLElement | null = null;
   private questLogReturnFocus: HTMLElement | null = null;
+  // Focused-quest waypoint. The focused quest id persists in its own
+  // localStorage key (Settings only stores numbers/booleans) and is cleared when
+  // that quest leaves the log. A touch long-press mirrors the right-click toggle;
+  // its trailing click is suppressed so it does not also open the quest log.
+  private focusedQuestId: string | null = null;
+  private questTrackerLongPress: { pointerId: number; questId: string; startX: number; startY: number; timer: number } | null = null;
+  private suppressNextQuestTrackerClick = false;
+  private waypointArrowEl: HTMLElement | null = null;
+  private waypointArrowGlyph: HTMLElement | null = null;
+  private waypointArrowDist: HTMLElement | null = null;
   private lastPortraitTarget = -999;
   // swing timer: the period is captured from the reset edge (swingTimer jumping
   // up), so the bar tracks real swing speed including haste / ranged weapons.
@@ -772,6 +787,9 @@ export class Hud {
     // quest (the classic-MMO affordance, matching the L keybind / minimap button).
     $('#quest-tracker').addEventListener('click', (e) => {
       const target = e.target as HTMLElement;
+      // A touch long-press that just toggled focus leaves a trailing click; drop it
+      // so the quest log does not also open.
+      if (this.suppressNextQuestTrackerClick) { this.suppressNextQuestTrackerClick = false; return; }
       if (target.closest('.qt-header')) { this.toggleQuestTrackerCollapsed(); return; }
       const quest = target.closest('.qt-quest') as HTMLElement | null;
       if (quest?.dataset.questId) this.openQuestLogTo(quest.dataset.questId);
@@ -795,6 +813,55 @@ export class Hud {
         else if (quest?.dataset.questId) this.openQuestLogTo(quest.dataset.questId);
       }
     });
+    // Restore the persisted focused quest (its own localStorage key; cleared when
+    // the quest leaves the log by updateQuestTracker).
+    try { this.focusedQuestId = localStorage.getItem('woc_focused_quest') || null; } catch { /* storage unavailable */ }
+    // Right-click (or the keyboard context-menu key, which fires contextmenu on
+    // the focused row) toggles a tracked quest as the focused quest; right-click
+    // it again to clear. preventDefault keeps the browser menu off the overlay.
+    $('#quest-tracker').addEventListener('contextmenu', (e) => {
+      const quest = (e.target as HTMLElement).closest('.qt-quest') as HTMLElement | null;
+      if (!quest?.dataset.questId) return;
+      e.preventDefault();
+      // Many touch browsers synthesize contextmenu on a long-press; the pointer
+      // long-press path (pending, or just fired so the suppress flag is set)
+      // already owns that gesture, so ignore it here to avoid a double toggle.
+      if (this.questTrackerLongPress || this.suppressNextQuestTrackerClick) return;
+      this.toggleFocusedQuest(quest.dataset.questId);
+    });
+    // Touch long-press is the right-click equivalent. Hold a quest row still for
+    // ~500ms to toggle focus; the trailing click is suppressed so the log does
+    // not also open. Movement past a small threshold or an early lift cancels it.
+    $('#quest-tracker').addEventListener('pointerdown', (e) => {
+      if (e.pointerType !== 'touch') return;
+      const quest = (e.target as HTMLElement).closest('.qt-quest') as HTMLElement | null;
+      if (!quest?.dataset.questId) return;
+      // Drop any stale suppress flag from a prior long-press whose trailing click
+      // never arrived (some touch stacks emit none), so this tap is not swallowed.
+      this.suppressNextQuestTrackerClick = false;
+      this.clearQuestTrackerLongPress();
+      const questId = quest.dataset.questId;
+      this.questTrackerLongPress = {
+        pointerId: e.pointerId, questId, startX: e.clientX, startY: e.clientY,
+        timer: window.setTimeout(() => {
+          const lp = this.questTrackerLongPress;
+          if (!lp || lp.pointerId !== e.pointerId) return;
+          this.questTrackerLongPress = null;
+          this.suppressNextQuestTrackerClick = true;
+          this.toggleFocusedQuest(questId);
+        }, 500),
+      };
+    });
+    $('#quest-tracker').addEventListener('pointermove', (e) => {
+      const lp = this.questTrackerLongPress;
+      if (!lp || lp.pointerId !== e.pointerId) return;
+      if (Math.hypot(e.clientX - lp.startX, e.clientY - lp.startY) > 9) this.clearQuestTrackerLongPress();
+    });
+    const endQuestTrackerLongPress = (e: PointerEvent) => {
+      if (this.questTrackerLongPress?.pointerId === e.pointerId) this.clearQuestTrackerLongPress();
+    };
+    $('#quest-tracker').addEventListener('pointerup', endQuestTrackerLongPress);
+    $('#quest-tracker').addEventListener('pointercancel', endQuestTrackerLongPress);
     $('#mm-map').addEventListener('click', () => this.toggleMap());
     $('#map-close').addEventListener('click', () => { $('#map-window').style.display = 'none'; });
     const mapCanvas = $('#map-canvas') as unknown as HTMLCanvasElement;
@@ -3015,6 +3082,9 @@ export class Hud {
     }
     this.arenaMatchSeen = inArenaMatch;
     if (fastHud) { this.updateMinimap(); this.updateClock(); this.updateMinimapCoords(); this.updateCompass(); }
+    // Every frame (not throttled): the head-anchored quest arrow must track the
+    // player and camera smoothly as they move and turn.
+    this.updateQuestWaypoint();
     if (slowHud && $('#social-window').classList.contains('open')) {
       const struct = this.socialStructSig();
       if (struct !== this.lastSocialStruct) {
@@ -3117,7 +3187,15 @@ export class Hud {
       settings.set('questTrackerCollapsed', false);
       collapsed = false;
     }
-    const html = this.questTrackerHtml(questTrackerView(quests, collapsed));
+    // Drop a stale focus once its quest leaves the log (turned in / abandoned),
+    // so the highlight and the on-screen arrow clear with it. Guard on size>0 so a
+    // localStorage-restored focus is not wiped online before the first snapshot
+    // populates questLog (when the log is empty there is nothing to point at anyway).
+    if (this.focusedQuestId && this.sim.questLog.size > 0 && !this.sim.questLog.has(this.focusedQuestId)) {
+      this.focusedQuestId = null;
+      this.saveFocusedQuest();
+    }
+    const html = this.questTrackerHtml(questTrackerView(quests, collapsed, this.focusedQuestId));
     if (el.innerHTML !== html) el.innerHTML = html;
   }
 
@@ -3142,17 +3220,18 @@ export class Hud {
       + `<span class="qt-chevron" aria-hidden="true">${chevron}</span>`
       + `<span class="qt-h-label">${esc(t('questUi.tracker.title'))}</span>${count}</button>`;
     // Each quest is a <button>: a left-click (or keyboard activation) opens the
-    // quest log focused on that quest. The delegated #quest-tracker listeners
-    // (see the event-binding constructor) route it to openQuestLogTo; the button
-    // re-enables pointer events over the otherwise click-through overlay. Its
-    // accessible name is the quest title + objective text it already contains.
+    // quest log focused on that quest; right-click / long-press toggles it as the
+    // focused quest. The delegated #quest-tracker listeners (see the event-binding
+    // constructor) route both; the button re-enables pointer events over the
+    // otherwise click-through overlay. Its accessible name is the quest title +
+    // objective text it already contains; aria-current marks the focused row.
     let rows = '';
     for (const q of view.quests) {
       let body = `<div class="qt-title">${esc(q.title)}${q.complete ? ` <span class="quest-complete">(${esc(t('questUi.tracker.complete'))})</span>` : ''}</div>`;
       for (const o of q.objectives) {
         body += `<div class="qt-obj${o.done ? ' done' : ''}">- ${esc(this.questProgressText(o.label, o.current, o.total))}</div>`;
       }
-      rows += `<button type="button" class="qt-quest" data-quest-id="${esc(q.id)}">${body}</button>`;
+      rows += `<button type="button" class="qt-quest${q.focused ? ' focused' : ''}" data-quest-id="${esc(q.id)}"${q.focused ? ' aria-current="true"' : ''}>${body}</button>`;
     }
     return `${html}<div id="qt-list">${rows}</div>`;
   }
@@ -3168,6 +3247,73 @@ export class Hud {
     audio.click();
     this.updateQuestTracker();
     if (refocus) ($('#quest-tracker').querySelector('.qt-header') as HTMLElement | null)?.focus();
+  }
+
+  private clearQuestTrackerLongPress(): void {
+    if (this.questTrackerLongPress) window.clearTimeout(this.questTrackerLongPress.timer);
+    this.questTrackerLongPress = null;
+  }
+
+  private saveFocusedQuest(): void {
+    try {
+      if (this.focusedQuestId) localStorage.setItem('woc_focused_quest', this.focusedQuestId);
+      else localStorage.removeItem('woc_focused_quest');
+    } catch { /* storage unavailable */ }
+  }
+
+  /** Toggle a tracked quest as the focused quest (right-click / long-press): set
+   *  it, or clear it if it was already focused. Persists the choice and refreshes
+   *  the tracker highlight + on-screen waypoint immediately. */
+  private toggleFocusedQuest(questId: string): void {
+    if (!this.sim.questLog.has(questId)) return;
+    this.focusedQuestId = this.focusedQuestId === questId ? null : questId;
+    this.saveFocusedQuest();
+    audio.click();
+    this.updateQuestTracker();
+    this.updateQuestWaypoint();
+  }
+
+  /** Drive the focused-quest arrow each frame: derive the target world point from
+   *  the focused quest's progress, anchor the arrow above the player's head, and
+   *  rotate it to point toward the target with the distance underneath. No focus or
+   *  unresolvable target hides it. */
+  private updateQuestWaypoint(): void {
+    const focusId = this.focusedQuestId;
+    const progress = focusId ? this.sim.questLog.get(focusId) : undefined;
+    const target = progress && focusId
+      ? questWaypointTargetFor(progress, this.sim.questState(focusId), this.sim.player.pos)
+      : null;
+
+    if (!this.waypointArrowEl) {
+      this.waypointArrowEl = $('#quest-waypoint');
+      this.waypointArrowGlyph = this.waypointArrowEl.querySelector('.qw-arrow') as HTMLElement;
+      this.waypointArrowDist = this.waypointArrowEl.querySelector('.qw-dist') as HTMLElement;
+    }
+    const root = this.waypointArrowEl;
+    if (!target) { root.style.display = 'none'; return; }
+
+    const p = this.sim.player.pos;
+    // Anchor above the player's head (a fixed world height, so it tracks the player
+    // and scales with the camera) and project to the screen.
+    const base = this.renderer.worldToScreen(p.x, p.y + WAYPOINT_ARROW_HEIGHT, p.z);
+    if (base.behind || !Number.isFinite(base.x) || !Number.isFinite(base.y)) { root.style.display = 'none'; return; }
+    // Heading: project a point a few yards toward the target at the same height; its
+    // on-screen offset from the anchor is the direction to aim the arrow, so it
+    // re-points correctly as the player moves and the camera turns.
+    let dx = target.x - p.x;
+    let dz = target.z - p.z;
+    const len = Math.hypot(dx, dz) || 1;
+    const tip = this.renderer.worldToScreen(p.x + (dx / len) * 4, p.y + WAYPOINT_ARROW_HEIGHT, p.z + (dz / len) * 4);
+    const scale = getUiScale();
+    // worldToScreen px are in the unzoomed viewport; #ui is scaled, so divide into
+    // author space (matching the floating-combat-text path).
+    root.style.display = 'flex';
+    root.style.left = `${base.x / scale}px`;
+    root.style.top = `${base.y / scale}px`;
+    this.waypointArrowGlyph!.style.transform = `rotate(${screenArrowDeg(base, tip)}deg)`;
+    this.waypointArrowDist!.textContent = t('hudChrome.questWaypoint.distance', {
+      value: formatNumber(Math.round(waypointDistance(p, target)), { maximumFractionDigits: 0, useGrouping: false }),
+    });
   }
 
   // -------------------------------------------------------------------------

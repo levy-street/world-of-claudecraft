@@ -179,6 +179,9 @@ export const de_DE: EnTranslations = {
       "collapseHint": "Quests einklappen",
       "expandHint": "Quests ausklappen"
     },
+    "questWaypoint": {
+      "distance": "{value} yds"
+    },
     "chatTimestamps": {
       "show": "Chat-Zeitstempel anzeigen",
       "format": "Zeitstempelformat",

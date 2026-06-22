@@ -60,6 +60,17 @@ describe('questTrackerView', () => {
     expect(v.quests[0].objectives[0].done).toBe(true);
   });
 
+  it('marks only the focused quest row as focused', () => {
+    const v = questTrackerView(QUESTS, false, 'webwood');
+    expect(v.quests.map((q) => q.focused)).toEqual([false, true]);
+  });
+
+  it('focuses no row when the focused id is null, undefined, or not tracked', () => {
+    expect(questTrackerView(QUESTS, false).quests.every((q) => !q.focused)).toBe(true);
+    expect(questTrackerView(QUESTS, false, null).quests.every((q) => !q.focused)).toBe(true);
+    expect(questTrackerView(QUESTS, false, 'gone').quests.every((q) => !q.focused)).toBe(true);
+  });
+
   it('does not mutate the caller input and returns distinct copies', () => {
     const input: TrackedQuest[] = [{ id: 'a', title: 'A', complete: false, objectives: [{ label: 'o', current: 1, total: 2 }] }];
     const snapshot = JSON.stringify(input);

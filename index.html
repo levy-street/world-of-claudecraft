@@ -980,11 +980,27 @@
     border: 0; padding: 8px 0 0; margin: 0; color: inherit; font: inherit; cursor: pointer; pointer-events: auto; }
   #quest-tracker .qt-quest:hover .qt-title { color: #fff; }
   #quest-tracker .qt-quest:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 2px; }
+  /* The focused quest (set by right-click / long-press): a subtle gold wash plus a
+     gold title. Background-only so toggling focus never shifts the row layout. */
+  #quest-tracker .qt-quest.focused { background: rgba(255, 207, 90, 0.10); border-radius: 3px; }
+  #quest-tracker .qt-quest.focused .qt-title { color: var(--gold); }
   #quest-tracker .qt-title { font-weight: bold; font-family: var(--title-font); }
   #quest-tracker .qt-obj { color: #e8e0c8; font-size: 11px; margin-left: 8px; }
   #quest-tracker .qt-obj.done,
   .qd-obj.done,
   .quest-complete { color: var(--color-text-success); }
+  /* Focused-quest arrow: floats above the player's head and rotates to point
+     toward the focused quest's objective, with the distance underneath. left/top
+     are set per-frame from the player's projected head point (in #ui author space);
+     decorative chrome (aria-hidden) since the tracker row announces the focused
+     state. The glyph points up at 0deg and is rotated by the screen heading; the
+     widget is hidden whenever no quest is focused. */
+  #quest-waypoint { position: absolute; display: none; flex-direction: column; align-items: center;
+    gap: 1px; pointer-events: none; transform: translate(-50%, -100%); z-index: 6; }
+  #quest-waypoint .qw-arrow { transform-origin: 50% 50%; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.7)); }
+  #quest-waypoint .qw-arrow path { fill: var(--gold); stroke: rgba(0,0,0,0.65); stroke-width: 1.5; stroke-linejoin: round; }
+  #quest-waypoint .qw-dist { font-size: 13px; font-weight: bold; color: var(--gold);
+    font-family: var(--title-font); white-space: nowrap; text-shadow: 0 1px 3px rgba(0,0,0,0.95); }
 
   /* ---------- combat meters ---------- */
   #meters-window { width: 240px; padding: 8px 10px; display: none; align-self: flex-end; margin-bottom: 6px; text-align: left; }
@@ -8032,6 +8048,7 @@
     </div>
 
     <div id="quest-tracker"></div>
+    <div id="quest-waypoint" aria-hidden="true"><svg class="qw-arrow" viewBox="0 0 40 40" width="40" height="40"><path d="M20 3 L34 35 L20 27 L6 35 Z"/></svg><span class="qw-dist"></span></div>
 
     <div id="bottom-bar">
       <div id="actionbar-row">

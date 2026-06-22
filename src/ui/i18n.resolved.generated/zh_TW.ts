@@ -179,6 +179,9 @@ export const zh_TW: EnTranslations = {
       "collapseHint": "收合任務追蹤器",
       "expandHint": "展開任務追蹤器"
     },
+    "questWaypoint": {
+      "distance": "{value} yds"
+    },
     "chatTimestamps": {
       "show": "顯示聊天時間戳記",
       "format": "時間戳記格式",

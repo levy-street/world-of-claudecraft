@@ -179,6 +179,9 @@ export const ru_RU: EnTranslations = {
       "collapseHint": "Свернуть трекер заданий",
       "expandHint": "Развернуть трекер заданий"
     },
+    "questWaypoint": {
+      "distance": "{value} yds"
+    },
     "chatTimestamps": {
       "show": "Показывать время в чате",
       "format": "Формат времени",

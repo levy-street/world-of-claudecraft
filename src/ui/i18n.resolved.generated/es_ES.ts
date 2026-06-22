@@ -179,6 +179,9 @@ export const es_ES: EnTranslations = {
       "collapseHint": "Contraer el seguimiento de misiones",
       "expandHint": "Expandir el seguimiento de misiones"
     },
+    "questWaypoint": {
+      "distance": "{value} yds"
+    },
     "chatTimestamps": {
       "show": "Mostrar hora en el chat",
       "format": "Formato de hora",

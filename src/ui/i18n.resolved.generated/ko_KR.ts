@@ -179,6 +179,9 @@ export const ko_KR: EnTranslations = {
       "collapseHint": "퀘스트 추적기 접기",
       "expandHint": "퀘스트 추적기 펼치기"
     },
+    "questWaypoint": {
+      "distance": "{value} yds"
+    },
     "chatTimestamps": {
       "show": "채팅 시각 표시",
       "format": "시각 표시 형식",

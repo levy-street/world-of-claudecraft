@@ -42,6 +42,12 @@ export const hudChromeStrings = {
     collapseHint: "Collapse quest tracker",
     expandHint: "Expand quest tracker",
   },
+  // Focused-quest arrow: the distance readout under the on-screen arrow pointing
+  // toward the focused quest's objective. The digits go through formatNumber; this
+  // key carries only the (localizable) unit, like the perf.units.* / meters.* strings.
+  questWaypoint: {
+    distance: "{value} yds",
+  },
   chatTimestamps: {
     show: "Show Chat Timestamps",
     format: "Timestamp Format",
