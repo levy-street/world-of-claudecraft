@@ -11,7 +11,7 @@ import type { Pool } from 'pg';
 import { PublicKey } from '@solana/web3.js';
 import { getFinalizedTx, ownerCreditedBase, ownerSpentBase, txSucceeded, usesToken2022 } from './solana_tx';
 import { solanaRpc } from './solana_rpc';
-import { WOC_MINT } from './woc_config';
+import { WOC_MINT, WOC_DECIMALS } from './woc_config';
 import { offensiveName } from './auth';
 import { isUniqueViolation } from './http_util';
 import { resolveRealm, type RealmType } from './realm';
@@ -35,7 +35,7 @@ import {
   getRealmQuote,
   reclaimExpiredProvisioning,
 } from './realm_quote_db';
-import { minStakeBase, tierForStake } from './realm_tiers';
+import { minStakeBase, tierForStake, TIER_BPS, tierThreshold } from './realm_tiers';
 
 function intEnv(key: string, def: number, min: number, max: number): number {
   const v = Number.parseInt(process.env[key] ?? '', 10);
@@ -150,6 +150,46 @@ export async function getMintSupplyBase(mint: string): Promise<bigint | null> {
   const value = BigInt(amount);
   supplyCache.set(mint, { at: Date.now(), value });
   return value;
+}
+
+export interface RealmTierOption {
+  tier: number; // 1 bronze, 2 silver, 3 gold
+  name: 'bronze' | 'silver' | 'gold';
+  bps: number; // basis points of supply this tier locks
+  amountBase: string; // base-unit stake required at the current supply
+}
+
+export interface RealmTiersInfo {
+  mint: string;
+  decimals: number;
+  supplyBase: string;
+  timelockSeconds: number; // stake-release timelock the founding UI quotes to the player
+  maxPerAccount: number; // realm cap per account, so the UI can explain the limit
+  tiers: RealmTierOption[];
+}
+
+// Display data for the founding UI: the live $WOC supply and the base-unit stake
+// each tier costs against it, so the client renders the price of a realm without
+// re-deriving the threshold math. Reuses the cached supply read; returns null
+// when the supply RPC is unavailable (the route then 503s, like a quote does).
+export async function realmTiersInfo(): Promise<RealmTiersInfo | null> {
+  const supply = await getMintSupplyBase(WOC_MINT);
+  if (supply === null) return null;
+  const order: RealmTierOption['name'][] = ['bronze', 'silver', 'gold'];
+  const tiers = order.map((name, i) => ({
+    tier: i + 1,
+    name,
+    bps: TIER_BPS[name],
+    amountBase: tierThreshold(TIER_BPS[name], supply).toString(),
+  }));
+  return {
+    mint: WOC_MINT,
+    decimals: WOC_DECIMALS,
+    supplyBase: supply.toString(),
+    timelockSeconds: Math.floor(UNSTAKE_TIMELOCK_MS / 1000),
+    maxPerAccount: MAX_REALMS_PER_ACCOUNT,
+    tiers,
+  };
 }
 
 export interface ProvisionQuote {

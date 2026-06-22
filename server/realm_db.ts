@@ -149,6 +149,19 @@ export async function listRealmsForDirectory(db: Queryable): Promise<DbRealmSumm
   }));
 }
 
+// All of an account's realms (any non-closed status), newest first, for the
+// operator dashboard. Unlike the active-only directory view this includes
+// provisioning and decommissioning realms so the owner can finish founding or
+// finalize a close from the dashboard.
+export async function listRealmsForOwner(db: Queryable, accountId: number): Promise<RealmRow[]> {
+  const res = await db.query(
+    `SELECT ${REALM_COLS} FROM realms WHERE owner_account_id = $1 AND status <> 'closed'
+       ORDER BY created_at DESC, realm_id DESC`,
+    [accountId],
+  );
+  return res.rows.map(rowToRealm);
+}
+
 export async function getRealmById(db: Queryable, realmId: number): Promise<RealmRow | null> {
   const res = await db.query(`SELECT ${REALM_COLS} FROM realms WHERE realm_id = $1`, [realmId]);
   return res.rows[0] ? rowToRealm(res.rows[0]) : null;

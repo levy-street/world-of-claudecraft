@@ -20,6 +20,88 @@ export const ru_RU: EnTranslations = {
     "rp": "Ролевой",
     "rpPvp": "Ролевой-PvP"
   },
+  "realmOp": {
+    "open": "Found a Realm",
+    "panelTitle": "Realm Operator",
+    "back": "Back",
+    "found": {
+      "title": "Found a Realm",
+      "subtitle": "Stake $WOC into a non-custodial escrow to provision and operate your own realm.",
+      "nameLabel": "Realm name",
+      "namePlaceholder": "Name your realm",
+      "typeLabel": "Realm type",
+      "tierLabel": "Stake tier",
+      "tierHint": "A larger stake unlocks a higher tier: more players, more customization budget, and operator payout rails.",
+      "supplyNote": "Each tier is priced as a share of the live $WOC supply.",
+      "tiersUnavailable": "Live tier pricing is unavailable right now. Try again shortly.",
+      "submit": "Stake and Found",
+      "submitConnect": "Connect Wallet to Found",
+      "stakingNote": "You sign one transaction locking {amount} $WOC into escrow. Recover it any time after a {days}-day timelock by decommissioning.",
+      "nameTaken": "Pick a different name; that one is taken."
+    },
+    "tier": {
+      "bronze": "Bronze",
+      "silver": "Silver",
+      "gold": "Gold",
+      "cost": "{amount} $WOC",
+      "share": "{pct}% of supply"
+    },
+    "mine": {
+      "title": "My Realms",
+      "loading": "Loading your realms...",
+      "empty": "You do not operate any realms yet. Found one above to get started.",
+      "tier": "{tier} tier",
+      "decommission": "Decommission",
+      "release": "Finalize Close",
+      "enter": "Enter",
+      "eligible": "Stake releasable {date}",
+      "releaseHint": "Release your stake on chain, then finalize to close the realm and free its name.",
+      "decommissionConfirm": "Decommission {name}? This takes the realm offline and starts the {days}-day stake-release timelock."
+    },
+    "status": {
+      "active": "Active",
+      "provisioning": "Provisioning",
+      "decommissioning": "Decommissioning"
+    },
+    "flow": {
+      "connecting": "Connecting your wallet...",
+      "quoting": "Reserving your realm...",
+      "locking": "Approve the stake in your wallet...",
+      "confirming": "Verifying your stake on chain...",
+      "founded": "{name} is live. Welcome, operator.",
+      "decommissioning": "Starting decommission...",
+      "releasing": "Finalizing close...",
+      "released": "Realm closed. The name is free again."
+    },
+    "err": {
+      "invalid_realm_name": "That realm name is not allowed. Use letters, numbers, spaces, or hyphens.",
+      "realm_name_not_allowed": "That realm name is not allowed.",
+      "realm_name_taken": "That realm name is already taken.",
+      "realm_cap_reached": "You have reached the maximum number of realms per account.",
+      "stake_below_minimum": "That stake is below the minimum tier. Choose a higher tier.",
+      "supply_unavailable": "The $WOC supply is temporarily unavailable. Try again shortly.",
+      "invalid_amount": "That stake amount is invalid. Choose a tier and try again.",
+      "link_wallet": "Link a wallet to your account first.",
+      "wallet_mismatch": "Connect the wallet you linked to your account.",
+      "quote_expired": "Your quote expired. Start again.",
+      "quote_not_found": "Your quote was not found. Start again.",
+      "not_your_quote": "That quote belongs to another account.",
+      "stake_already_recorded": "That stake was already recorded.",
+      "tx_not_finalized": "Your stake is not finalized yet. Try confirming again in a moment.",
+      "tx_failed": "The stake transaction failed on chain.",
+      "token_2022": "This $WOC mint is not supported for staking.",
+      "wrong_vault_amount": "The locked amount does not match your quote.",
+      "wrong_payer": "The stake must be signed by your linked wallet.",
+      "not_realm_owner": "You do not operate that realm.",
+      "realm_not_found": "That realm no longer exists.",
+      "realm_not_active": "That realm is not active.",
+      "realm_not_decommissioning": "That realm is not decommissioning.",
+      "timelock_not_elapsed": "The stake timelock has not elapsed yet.",
+      "stake_not_released_onchain": "Release your stake on chain first, then finalize.",
+      "rate_limited": "Too many requests. Slow down and try again.",
+      "generic": "Something went wrong. Try again."
+    }
+  },
   "game": {
     "xp": {
       "suffix": "опыт",

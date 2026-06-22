@@ -12,6 +12,7 @@ import { itemStrings, itemNames } from './items';
 import { mergeStrings, mergeEntities, mergeExtra } from './merge';
 import { gameStrings } from './game';
 import { hudChromeStrings } from './hud_chrome';
+import { realmOperatorStrings } from './realm';
 
 // Re-export the catalog public surface (every name the old i18n.en.ts exported).
 export { shellStrings } from './shell';
@@ -43,6 +44,7 @@ export type Leaves<T, D extends number = 5> = [D] extends [never]
 export const en = {
   meta: { builtOn: "Built {date}" },
   realmTypes: { normal: "Normal", pvp: "PvP", rp: "RP", rpPvp: "RP-PvP" },
+  realmOp: realmOperatorStrings,
   game: gameStrings,
   hudChrome: hudChromeStrings,
   // Cosmetic skin-select event overlay. Rarity names reuse itemUi.quality.*.

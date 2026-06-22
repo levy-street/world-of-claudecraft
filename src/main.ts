@@ -15,7 +15,8 @@ import { voice } from './game/voice';
 import { sfx } from './game/sfx';
 import { activePvpOpponentIds, handlePickedEntity, hoverCursorKind, isAttackableEntity } from './game/interactions';
 import { clickMoveShouldCancel, clickMoveShouldWalk, clickMoveStep, distance2d, latencyAdjustedStopDistance, stepAngleToward } from './game/click_move';
-import { Api, isAuthError, ClientWorld, CharacterSummary, type ReleaseEntry } from './net/online';
+import { Api, isAuthError, ClientWorld, CharacterSummary, type ReleaseEntry, type OwnedRealm, type ProvisionQuote } from './net/online';
+import { RealmOperator } from './ui/realm_operator';
 import { setWalletDisplayAvailable, setWocBalance, setWalletUiEnabled, resolveWocBalanceUpdate } from './ui/wallet_balance';
 import { setWocSeason, setWocSeasonUiEnabled } from './ui/woc_season';
 import {
@@ -1773,7 +1774,7 @@ function show(el: string): void {
     }
   }
 
-  const panels = ['#mode-select', '#login-panel', '#realm-panel', '#charselect-panel', '#charcreate-panel', '#offline-select'];
+  const panels = ['#mode-select', '#login-panel', '#realm-panel', '#realm-operator-panel', '#charselect-panel', '#charcreate-panel', '#offline-select'];
   document.body.dataset.startPanel = el.slice(1);
 
   // Find currently visible panel
@@ -3643,6 +3644,70 @@ async function switchWallet(): Promise<void> {
   await startWalletVerifyFlow(true);
 }
 
+// --- Realm operator panel (#475: found a realm + manage owned realms) ---------
+// Ensure a connected + verified wallet matching the account link, so a founding
+// quote (server-pinned to the linked wallet) and its lock can be signed. Returns
+// the linked pubkey when ready, or null if the player cancelled the wallet
+// prompt; throws Error('wallet_mismatch') if a different wallet is connected.
+async function ensureRealmWalletReady(): Promise<string | null> {
+  if (!api.token) throw new Error(t('realmOp.err.link_wallet'));
+  const wallet = await loadWallet();
+  // Already linked: make sure that exact wallet is connected so the lock signs.
+  if (linkedWalletPubkey) {
+    let cur = wallet.currentWallet();
+    if (cur.isConnected && cur.address === linkedWalletPubkey) return linkedWalletPubkey;
+    try {
+      await wallet.openWalletModal();
+    } catch (err) {
+      if (wallet.isWalletSelectionCancelled(err)) return null;
+      throw err instanceof Error ? err : new Error(t('realmOp.err.generic'));
+    }
+    cur = wallet.currentWallet();
+    if (!cur.isConnected || !cur.address) return null; // cancelled at the picker
+    if (cur.address !== linkedWalletPubkey) throw new Error('wallet_mismatch');
+    return linkedWalletPubkey;
+  }
+  // Not linked yet: run the existing connect + verify (link) flow, which sets
+  // linkedWalletPubkey on success and surfaces its own errors on the wallet button.
+  await startWalletVerifyFlow(false);
+  return linkedWalletPubkey;
+}
+
+// Sign + send the on-chain $WOC lock for a quote. Returns the lock signature, or
+// null if the player rejected/cancelled in their wallet.
+async function signRealmLock(quote: ProvisionQuote): Promise<string | null> {
+  const wallet = await loadWallet();
+  try {
+    return await wallet.signAndSendRealmLock({
+      programId: quote.programId,
+      realmId: quote.realmId,
+      mint: quote.mint,
+      amountBase: quote.amountBase,
+    });
+  } catch (err) {
+    if (wallet.isWalletSelectionCancelled(err)) return null;
+    throw err instanceof Error ? err : new Error(t('realmOp.err.generic'));
+  }
+}
+
+let realmOperator: RealmOperator | null = null;
+function openRealmOperator(): void {
+  show('#realm-operator-panel');
+  const userEl = document.getElementById('realm-operator-user');
+  if (userEl) userEl.textContent = api.username ?? '';
+  if (!realmOperator) {
+    realmOperator = new RealmOperator($('#realm-operator-body') as HTMLElement, {
+      api,
+      linkedWallet: () => linkedWalletPubkey,
+      ensureWalletReady: ensureRealmWalletReady,
+      signLock: signRealmLock,
+      enterRealm: (realm: OwnedRealm) => selectRealm({ name: realm.name, url: realm.url, type: realm.type }),
+      close: () => showRealmList(),
+    });
+  }
+  void realmOperator.open();
+}
+
 function wireWallet(): void {
   setWalletUiEnabled(WALLET_ENABLED);
   setWocSeasonUiEnabled(WALLET_ENABLED);
@@ -4157,6 +4222,11 @@ function wireStartScreens(): void {
     show('#mode-select');
   });
   $('#btn-realm-back').addEventListener('click', () => show('#mode-select'));
+  // Found a Realm (#475): stake $WOC to provision a realm + manage owned realms.
+  // Hidden when the wallet feature is off, since founding needs an on-chain stake.
+  ($('#btn-realm-found') as HTMLElement).hidden = !WALLET_ENABLED;
+  $('#btn-realm-found').addEventListener('click', () => openRealmOperator());
+  $('#btn-realm-operator-back').addEventListener('click', () => showRealmList());
   // Change Realm is now an inline dropdown on the character-select screen.
   $('#btn-change-realm').addEventListener('click', (e) => {
     e.stopPropagation();

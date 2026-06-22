@@ -37,13 +37,14 @@ import { handleInternalApi } from './internal';
 import { handlePerfReport } from './perf_report';
 import { GameServer } from './game';
 import { REALM, REALM_DIRECTORY, REALM_ORIGINS, mergeRealmDirectory, resolveRealmType } from './realm';
-import { listRealmsForDirectory } from './realm_db';
+import { listRealmsForDirectory, listRealmsForOwner } from './realm_db';
 import {
   prepareProvisionQuote,
   confirmProvisionQuote,
   requestRealmDecommission,
   finalizeRealmRelease,
   reconcileRealmLifecycle,
+  realmTiersInfo,
 } from './realm_provision';
 import { webLoginEnforced, isWebClientRequest } from './web_login_guard';
 import { cacheControlFor, etagFor, isNotModified } from './static_cache';
@@ -550,6 +551,36 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       // name/url/type; the extra realmId/status/owned/tier fields are additive.
       const realms = mergeRealmDirectory(REALM_DIRECTORY, await listRealmsForDirectory(pool));
       return json(res, 200, { current: REALM, realms, characters });
+    }
+    // The signed-in account's own realms in every non-closed state, for the
+    // operator dashboard. Distinct from GET /api/realms (the active-only picker):
+    // this also returns provisioning/decommissioning realms so the owner can
+    // finish founding or finalize a close. Owner-scoped, no chain read.
+    if (req.method === 'GET' && url === '/api/realms/mine') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      const realms = (await listRealmsForOwner(pool, accountId)).map((r) => ({
+        realmId: r.realmId,
+        name: r.name,
+        type: r.type,
+        status: r.status,
+        tier: r.tier,
+        url: r.originUrl,
+        releaseEligibleAt: r.releaseEligibleAt ? r.releaseEligibleAt.toISOString() : null,
+      }));
+      return json(res, 200, { realms });
+    }
+    // Tier price list for the founding UI: the live $WOC supply and the base-unit
+    // stake each tier (bronze/silver/gold) costs against it. Authed (the founding
+    // screen is post-login) and rate-limited, since it reads the supply RPC; the
+    // read is supply-cached so a burst mostly hits the cache.
+    if (req.method === 'GET' && url === '/api/realms/tiers') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (rateLimited(req)) return json(res, 429, { error: 'too many requests, slow down' });
+      const info = await realmTiersInfo();
+      if (!info) return json(res, 503, { error: 'supply_unavailable' });
+      return json(res, 200, info);
     }
     // Stake-to-provision (#475). Quote: validate name + cap + tier and reserve a
     // provisioning realm; the client then locks `amount` $WOC into the returned

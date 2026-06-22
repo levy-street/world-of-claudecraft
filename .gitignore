@@ -45,3 +45,4 @@ Thumbs.db
 .claude/*
 !.claude/skills/
 !.claude/agents/
+.gstack/

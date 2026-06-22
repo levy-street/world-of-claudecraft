@@ -4546,6 +4546,56 @@
   .realm-pop.offline { color: #888; }
   .realm-meta { display: contents; }
 
+  /* ---------- realm operator (#475: found a realm + my realms) ---------- */
+  #realm-operator-panel { width: 100%; max-width: 560px; }
+  #realm-operator-body { margin: 6px 0 10px; }
+  .ro { display: flex; flex-direction: column; gap: 18px; max-height: 64vh; overflow-y: auto; padding-right: 2px; }
+  .ro-h { font-family: var(--title-font); font-size: 15px; color: var(--gold); margin: 0 0 6px;
+    border-bottom: 1px solid #463a1c; padding-bottom: 6px; }
+  .ro-sub { font-size: 12px; color: #b6a983; margin: 0 0 12px; line-height: 1.45; }
+  .ro-hint { font-size: 11px; color: #998d6a; margin: 6px 0 0; line-height: 1.4; }
+  .ro-hint-muted { color: #6f664d; }
+  .ro-field { margin-bottom: 12px; }
+  .ro-label { display: block; font-family: var(--title-font); font-size: 12px; color: #c9b27a; margin-bottom: 5px; }
+  .ro-input { width: 100%; box-sizing: border-box; background: #0d0d14; color: #f0ead8;
+    border: 1px solid #463a1c; border-radius: 5px; padding: 10px 11px; font-size: 14px; outline: none; }
+  .ro-input:focus-visible { border-color: var(--gold); box-shadow: 0 0 0 2px #c9a24033; }
+  .ro-select { cursor: var(--cursor-point); appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, #c9b27a 50%), linear-gradient(135deg, #c9b27a 50%, transparent 50%);
+    background-position: calc(100% - 18px) center, calc(100% - 13px) center; background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat; padding-right: 34px; }
+  .ro-tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 4px; }
+  .ro-tier { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; min-height: 64px;
+    background: linear-gradient(#1c1812, #14110b); border: 1px solid #463a1c; border-radius: 6px;
+    padding: 9px 10px; cursor: var(--cursor-point); text-align: left; color: #e7dcc0; }
+  .ro-tier:hover { border-color: #6e5a2c; background: linear-gradient(#241f16, #18140d); }
+  .ro-tier:focus-visible { outline: none; border-color: var(--gold); box-shadow: 0 0 0 2px #c9a24033; }
+  .ro-tier-on { border-color: var(--gold); background: linear-gradient(#2a2436, #161220); box-shadow: inset 0 0 0 1px #c9a24055; }
+  .ro-tier-name { font-family: var(--title-font); font-size: 13px; color: #f0ead8; }
+  .ro-tier-cost { font-size: 12px; color: #ffd100; font-weight: 600; }
+  .ro-tier-share { font-size: 10px; color: #998d6a; }
+  .ro-stake-note { font-size: 12px; color: #b6a983; margin: 4px 0 12px; line-height: 1.45; min-height: 1.2em; }
+  .ro-submit { width: 100%; min-height: 44px; }
+  .ro-status { font-size: 12px; margin: 8px 0 0; min-height: 1.1em; line-height: 1.4; }
+  .ro-status-info { color: #b6a983; }
+  .ro-status-error { color: #ff8a6a; }
+  .ro-status-success { color: #6fe08a; }
+  .ro-mine-list { display: flex; flex-direction: column; gap: 8px; }
+  .ro-empty { font-size: 12px; color: #887c5c; padding: 6px 2px; }
+  .ro-realm { background: #ffffff08; border: 1px solid #2a2418; border-radius: 6px; padding: 10px 12px; }
+  .ro-realm-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .ro-realm-name { font-family: var(--title-font); font-size: 15px; color: #f0ead8; }
+  .ro-badge { font-size: 10px; font-family: var(--title-font); border-radius: 3px; padding: 1px 7px;
+    border: 1px solid #463a1c; color: #c9b27a; white-space: nowrap; }
+  .ro-badge-active { color: #46d246; border-color: #2f5a22; }
+  .ro-badge-provisioning { color: #ffd100; border-color: #6e5a2c; }
+  .ro-badge-decommissioning { color: #ff9030; border-color: #6e3c1c; }
+  .ro-realm-meta { font-size: 11px; color: #998d6a; margin-top: 3px; }
+  .ro-realm-note { font-size: 11px; color: #b6a983; margin: 6px 0 0; line-height: 1.4; }
+  .ro-realm-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 9px; }
+  .ro-realm-actions .btn { min-height: 40px; padding: 7px 14px; font-size: 12px; }
+  @media (max-width: 480px) { .ro-tiers { grid-template-columns: 1fr; } }
+
   /* ---------- chat ---------- */
   #chat-input { position: absolute; left: 12px; bottom: 204px; width: 370px; display: none; z-index: 25;
     background: #0d0d14ee; color: #e8e8e8; border: 2px solid var(--border); outline: 1px solid #000;
@@ -8008,6 +8058,15 @@
           <div id="realm-list"><div class="realm-loading" data-i18n="auth.loadingRealms">Loading realms...</div></div>
           <div class="auth-actions auth-actions-split">
             <button type="button" class="btn btn-secondary" id="btn-realm-back" data-i18n="auth.back">Back</button>
+            <button type="button" class="btn btn-primary" id="btn-realm-found" data-i18n="realmOp.open">Found a Realm</button>
+          </div>
+        </div>
+
+        <div id="realm-operator-panel" class="panel auth-panel auth-panel-premium" hidden>
+          <h2 class="auth-title"><span data-i18n="realmOp.panelTitle">Realm Operator</span> <span id="realm-operator-user" class="cs-realm"></span></h2>
+          <div id="realm-operator-body"></div>
+          <div class="auth-actions auth-actions-split">
+            <button type="button" class="btn btn-secondary" id="btn-realm-operator-back" data-i18n="realmOp.back">Back</button>
           </div>
         </div>
 

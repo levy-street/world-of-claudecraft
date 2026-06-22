@@ -252,6 +252,30 @@ run('realm_db against real Postgres', () => {
     expect(await stakeDb.getActiveStakeByRealm(db.pool, r.realmId)).toBeNull();
   });
 
+  it('lists an owner\'s realms across non-closed states (newest first), excluding strangers and closed', async () => {
+    const owner = (await db.createAccount(`lro_${Date.now()}`, 'h')).id;
+    const stranger = (await db.createAccount(`lrs_${Date.now()}`, 'h')).id;
+
+    // Created oldest -> newest: provisioning, then active, then decommissioning.
+    const prov = await realmDb.createProvisioningRealm(db.pool, { name: `LRO Prov ${owner}`, type: 'Normal', ownerAccountId: owner, tier: 1 });
+    const act = await realmDb.createProvisioningRealm(db.pool, { name: `LRO Active ${owner}`, type: 'PvP', ownerAccountId: owner, tier: 2 });
+    await realmDb.activateRealm(db.pool, act.realmId);
+    const dec = await realmDb.createProvisioningRealm(db.pool, { name: `LRO Dec ${owner}`, type: 'RP', ownerAccountId: owner, tier: 3 });
+    await realmDb.activateRealm(db.pool, dec.realmId);
+    await realmDb.requestDecommission(db.pool, dec.realmId, new Date('2026-08-01T00:00:00Z'));
+    // A closed realm is freed for re-provisioning and must drop out of the dashboard.
+    const closed = await realmDb.createProvisioningRealm(db.pool, { name: `LRO Closed ${owner}`, type: 'Normal', ownerAccountId: owner, tier: 1 });
+    await realmDb.setRealmStatus(db.pool, closed.realmId, 'closed');
+    // A stranger's realm must never appear in this owner's list.
+    await realmDb.createProvisioningRealm(db.pool, { name: `LRO Stranger ${stranger}`, type: 'Normal', ownerAccountId: stranger, tier: 1 });
+
+    const mine = await realmDb.listRealmsForOwner(db.pool, owner);
+    expect(mine.map((r) => r.realmId)).toEqual([dec.realmId, act.realmId, prov.realmId]); // newest first
+    expect(mine.map((r) => r.status)).toEqual(['decommissioning', 'active', 'provisioning']);
+    expect(mine.every((r) => r.ownerAccountId === owner)).toBe(true);
+    expect(mine.find((r) => r.realmId === dec.realmId)?.releaseEligibleAt?.toISOString()).toBe('2026-08-01T00:00:00.000Z');
+  });
+
   it('QUARANTINE: a stake never writes to woc_flow_ledger', async () => {
     const before = await db.pool.query('SELECT count(*)::int AS n FROM woc_flow_ledger');
     const r = await realmDb.createProvisioningRealm(db.pool, {

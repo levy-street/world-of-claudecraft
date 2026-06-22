@@ -56,16 +56,71 @@ export function buildWebSocketAuthMessage(token: string, characterId: number): {
 
 export type RealmType = 'Normal' | 'PvP' | 'RP' | 'RP-PvP';
 
+export type RealmStatus = 'active' | 'provisioning' | 'decommissioning' | 'closed';
+
 export interface RealmEntry {
   name: string;
   url: string;
   type: RealmType;
+  // Additive registry fields (#475). Absent on env-only / legacy servers, so the
+  // realm-list screen treats them as optional and falls back to env behavior.
+  realmId?: number | null;
+  status?: RealmStatus;
+  owned?: boolean; // true when the signed-in account owns this realm
+  tier?: number; // 0 env/none, 1 bronze, 2 silver, 3 gold
 }
 
 export interface RealmDirectory {
   current: string;
   realms: RealmEntry[];
   characters: Record<string, number>; // realm name -> how many characters you have
+}
+
+// One stake tier as priced against the live $WOC supply (GET /api/realms/tiers),
+// for the founding screen's tier picker.
+export interface RealmTierOption {
+  tier: number; // 1 bronze, 2 silver, 3 gold
+  name: 'bronze' | 'silver' | 'gold';
+  bps: number; // basis points of supply this tier locks
+  amountBase: string; // base-unit stake required at the current supply
+}
+
+export interface RealmTiersInfo {
+  mint: string;
+  decimals: number;
+  supplyBase: string;
+  timelockSeconds: number; // stake-release timelock the founding UI quotes the player
+  maxPerAccount: number; // realm cap per account
+  tiers: RealmTierOption[];
+}
+
+// One of the signed-in account's own realms (GET /api/realms/mine), in any
+// non-closed state, for the operator dashboard.
+export interface OwnedRealm {
+  realmId: number;
+  name: string;
+  type: RealmType;
+  status: RealmStatus;
+  tier: number;
+  url: string; // origin to enter; '' means the page origin (single-shard)
+  releaseEligibleAt: string | null; // ISO 8601 once decommissioning, else null
+}
+
+// A signed provision quote (POST /api/realms/quote). The client locks exactly
+// amountBase $WOC of `mint` into `vault` (the escrow PDA's token account) under
+// `programId`, then posts the finalized signature back to confirm.
+export interface ProvisionQuote {
+  quoteId: string;
+  realmId: number;
+  name: string;
+  type: RealmType;
+  tier: number;
+  amountBase: string;
+  mint: string;
+  programId: string;
+  stakePda: string;
+  vault: string;
+  expiresAt: string;
 }
 
 // A published GitHub release, as surfaced by the server's /api/releases proxy
@@ -138,6 +193,43 @@ export class Api {
     } catch {
       return { online: false, players: 0 };
     }
+  }
+
+  // ── Stake-to-provision (#475) ───────────────────────────────────────────────
+  // These are account-level actions (like getAccount) and route through
+  // this.base; the server is the source of truth and surfaces typed `error`
+  // codes that the founding UI maps to localized copy.
+
+  // Live $WOC supply + the per-tier stake price, for the founding tier picker.
+  realmTiers(): Promise<RealmTiersInfo> {
+    return this.get('/api/realms/tiers');
+  }
+
+  // The account's own realms in every non-closed state, for the operator dashboard.
+  async myRealms(): Promise<OwnedRealm[]> {
+    const d = await this.get('/api/realms/mine');
+    return d.realms ?? [];
+  }
+
+  // Reserve a provisioning realm and return the escrow target. `amount` is the
+  // base-unit stake (a decimal string, since it can exceed Number.MAX_SAFE_INTEGER).
+  quoteRealm(name: string, type: RealmType, amount: string): Promise<ProvisionQuote> {
+    return this.post('/api/realms/quote', { name, type, amount });
+  }
+
+  // Confirm a quote with the finalized on-chain lock signature; activates the realm.
+  confirmRealm(quoteId: string, lockSig: string): Promise<{ realmId: number; tier: number }> {
+    return this.post('/api/realms/confirm', { quoteId, lockSig });
+  }
+
+  // Owner begins decommissioning; returns when the on-chain stake can be released.
+  decommissionRealm(realmId: number): Promise<{ realmId: number; releaseEligibleAt: string }> {
+    return this.post(`/api/realms/${realmId}/decommission`, {});
+  }
+
+  // Finalize the close after the owner released the stake on chain (PDA gone).
+  releaseRealm(realmId: number): Promise<{ realmId: number }> {
+    return this.post(`/api/realms/${realmId}/release`, {});
   }
 
   private async post(path: string, body: unknown): Promise<any> {
