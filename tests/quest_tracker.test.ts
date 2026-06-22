@@ -34,6 +34,14 @@ describe('questTrackerView', () => {
     expect(v.quests[1].objectives.map((o) => o.done)).toEqual([true, true]); // 6/6, 4/4
   });
 
+  it('exposes each quest id so the tracker can open the log to it', () => {
+    // The #quest-tracker click handler reads data-quest-id off each rendered
+    // quest button and passes it to openQuestLogTo, so the view must carry the
+    // quest id (in order) for every expanded row.
+    const v = questTrackerView(QUESTS, false);
+    expect(v.quests.map((q) => q.id)).toEqual(['warden', 'webwood']);
+  });
+
   it('collapsed: header only, but keeps the quest count', () => {
     const v = questTrackerView(QUESTS, true);
     expect(v.visible).toBe(true);

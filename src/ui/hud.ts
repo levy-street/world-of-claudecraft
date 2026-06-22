@@ -765,24 +765,34 @@ export class Hud {
     $('#mm-spell').addEventListener('click', () => this.toggleSpellbook());
     $('#mm-talents')?.addEventListener('click', () => this.toggleTalents());
     $('#mm-quest').addEventListener('click', () => this.toggleQuestLog());
-    // Collapse/expand the on-screen quest tracker by clicking its header. The
-    // overlay is click-through (pointer-events:none) except the header button, so
-    // delegate on the stable container (the header is rebuilt on each render).
+    // Quest tracker clicks. The overlay is click-through (pointer-events:none)
+    // except its buttons (the header and each quest row), so delegate on the
+    // stable container since both are rebuilt on each render. The header button
+    // toggles collapse; clicking a quest row opens the quest log focused on that
+    // quest (the classic-MMO affordance, matching the L keybind / minimap button).
     $('#quest-tracker').addEventListener('click', (e) => {
-      if ((e.target as HTMLElement).closest('.qt-header')) this.toggleQuestTrackerCollapsed();
+      const target = e.target as HTMLElement;
+      if (target.closest('.qt-header')) { this.toggleQuestTrackerCollapsed(); return; }
+      const quest = target.closest('.qt-quest') as HTMLElement | null;
+      if (quest?.dataset.questId) this.openQuestLogTo(quest.dataset.questId);
     });
     // Keyboard activation: handle Enter/Space here and stop the event before it
     // bubbles to the window-level game keybinds (Enter is bound to Open Chat,
     // Space is preventDefault'd for jump), which would otherwise hijack the
-    // focused header button's native activation. The tracker is a non-modal
-    // overlay, so canUseGameKeys() stays true and those binds fire while it has
-    // focus; stopping propagation here keeps the toggle reachable by keyboard.
+    // focused button's native activation. The tracker is a non-modal overlay, so
+    // canUseGameKeys() stays true and those binds fire while it has focus;
+    // stopping propagation here keeps the header toggle and quest rows reachable
+    // by keyboard.
     $('#quest-tracker').addEventListener('keydown', (e) => {
-      if (!(e.target as HTMLElement).closest('.qt-header')) return;
-      if (e.key === 'Enter' || e.key === ' ' || e.code === 'Space') {
+      const target = e.target as HTMLElement;
+      const header = target.closest('.qt-header');
+      const quest = target.closest('.qt-quest') as HTMLElement | null;
+      if (!header && !quest) return;
+      if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         e.stopPropagation();
-        this.toggleQuestTrackerCollapsed();
+        if (header) this.toggleQuestTrackerCollapsed();
+        else if (quest?.dataset.questId) this.openQuestLogTo(quest.dataset.questId);
       }
     });
     $('#mm-map').addEventListener('click', () => this.toggleMap());
@@ -3131,12 +3141,18 @@ export class Hud {
     let html = `<button type="button" class="qt-header" aria-expanded="${!view.collapsed}" aria-controls="qt-list" title="${hint}">`
       + `<span class="qt-chevron" aria-hidden="true">${chevron}</span>`
       + `<span class="qt-h-label">${esc(t('questUi.tracker.title'))}</span>${count}</button>`;
+    // Each quest is a <button>: a left-click (or keyboard activation) opens the
+    // quest log focused on that quest. The delegated #quest-tracker listeners
+    // (see the event-binding constructor) route it to openQuestLogTo; the button
+    // re-enables pointer events over the otherwise click-through overlay. Its
+    // accessible name is the quest title + objective text it already contains.
     let rows = '';
     for (const q of view.quests) {
-      rows += `<div class="qt-title">${esc(q.title)}${q.complete ? ` <span class="quest-complete">(${esc(t('questUi.tracker.complete'))})</span>` : ''}</div>`;
+      let body = `<div class="qt-title">${esc(q.title)}${q.complete ? ` <span class="quest-complete">(${esc(t('questUi.tracker.complete'))})</span>` : ''}</div>`;
       for (const o of q.objectives) {
-        rows += `<div class="qt-obj${o.done ? ' done' : ''}">- ${esc(this.questProgressText(o.label, o.current, o.total))}</div>`;
+        body += `<div class="qt-obj${o.done ? ' done' : ''}">- ${esc(this.questProgressText(o.label, o.current, o.total))}</div>`;
       }
+      rows += `<button type="button" class="qt-quest" data-quest-id="${esc(q.id)}">${body}</button>`;
     }
     return `${html}<div id="qt-list">${rows}</div>`;
   }
@@ -8005,12 +8021,26 @@ export class Hud {
     el.style.display = 'block';
   }
 
+  /** Open the quest log focused on a specific tracked quest. Used when a quest in
+   *  the #quest-tracker overlay is left-clicked (or keyboard-activated): select
+   *  that quest, then open the log. If the log is already open, just re-render
+   *  with the new selection rather than toggling it shut. */
+  private openQuestLogTo(questId: string): void {
+    if (this.sim.questLog.has(questId)) this.selectedQuestLogId = questId;
+    if ($('#quest-log-window').style.display === 'block') { this.renderQuestLog(); return; }
+    this.toggleQuestLog();
+  }
+
   private closeQuestLog(restoreFocus = true): void {
     $('#quest-log-window').style.display = 'none';
     this.hideTooltip();
     const target = this.questLogReturnFocus;
     this.questLogReturnFocus = null;
-    if (restoreFocus) this.restoreFocus(target);
+    // Fall back to the minimap quest-log button when the original focus target is
+    // gone: opening the log from a tracker quest row captures that row's button,
+    // which updateQuestTracker's innerHTML rebuild can detach, so without a stable
+    // fallback focus would drop to <body> on close.
+    if (restoreFocus) this.restoreFocus(target, $('#mm-quest'));
   }
 
   renderQuestLog(): void {
