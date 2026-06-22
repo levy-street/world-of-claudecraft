@@ -478,6 +478,26 @@ export function matchmakeArena1v1(ctx: SimContext): void {
   }
 }
 
+// Server-driven 1v1 bout between two SPECIFIC players: the #478 wagered match,
+// started once both have staked on-chain. Bypasses the open matchmaker so the
+// two staked players face exactly each other. Returns false if it cannot start
+// this tick (a player is missing, dead, or already in a bout, or no arena slot
+// is free) so the caller retries. The staking/payout is tracked entirely
+// server-side; the bout itself is an ordinary ranked 1v1 and its outcome rides
+// out on the normal `arenaEnd` event (won/draw), which the server settles on.
+export function startWageredArena1v1(ctx: SimContext, pidA: number, pidB: number): boolean {
+  if (pidA === pidB) return false;
+  for (const pid of [pidA, pidB]) {
+    const e = ctx.entities.get(pid);
+    if (!e || e.dead || !ctx.players.get(pid) || ctx.arenaMatches.has(pid)) return false;
+  }
+  if (freeArenaSlot(ctx) === null) return false;
+  arenaDequeue(ctx, pidA);
+  arenaDequeue(ctx, pidB);
+  startArenaMatch(ctx, '1v1', [pidA], [pidB]);
+  return true;
+}
+
 export function pruneTeamQueue(ctx: SimContext, fmt: '2v2' | 'fiesta'): void {
   const keep = (unit: ArenaQueueUnit) =>
     unit.pids.every((id) => {

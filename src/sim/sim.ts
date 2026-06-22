@@ -4722,6 +4722,14 @@ export class Sim {
     arenaMod.updateArena(this.ctx);
   }
 
+  // Server-driven wagered 1v1 (#478): start a bout between two specific staked
+  // players, bypassing the open matchmaker. Public facade for the server's arena
+  // wager service; thin delegate into social/arena.ts. Returns false if it cannot
+  // start this tick so the caller retries.
+  startWageredArena1v1(pidA: number, pidB: number): boolean {
+    return arenaMod.startWageredArena1v1(this.ctx, pidA, pidB);
+  }
+
   // A3: createFiestaState (FiestaState factory + per-match sub-Rng seed) moved to
   // social/fiesta.ts. Thin delegate keeps the ctx.createFiestaState seam binding
   // (consumed by the moved arena startArenaMatch) resolving into the module.

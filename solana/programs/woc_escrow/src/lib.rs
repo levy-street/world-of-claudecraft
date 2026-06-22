@@ -164,6 +164,61 @@ pub mod woc_escrow {
         Ok(())
     }
 
+    /// Refund both stakes on a drawn bout: each player gets their original stake
+    /// back (no rake, since neither won), then the vault closes. Settler only,
+    /// Locked only. This is the only Locked exit other than settle, so a drawn
+    /// pot can never be stranded.
+    pub fn refund_match(ctx: Context<RefundMatch>, match_id: u64) -> Result<()> {
+        let (stake, bump) = {
+            let m = &ctx.accounts.match_account;
+            require!(m.status == MatchStatus::Locked, EscrowError::NotLocked);
+            (m.stake, m.bump)
+        };
+
+        let id = match_id.to_le_bytes();
+        let seeds: &[&[u8]] = &[b"match", id.as_ref(), &[bump]];
+        let signer: &[&[&[u8]]] = &[seeds];
+
+        token::transfer(
+            CpiContext::new_with_signer(
+                ctx.accounts.token_program.to_account_info(),
+                Transfer {
+                    from: ctx.accounts.vault.to_account_info(),
+                    to: ctx.accounts.creator_token.to_account_info(),
+                    authority: ctx.accounts.match_account.to_account_info(),
+                },
+                signer,
+            ),
+            stake,
+        )?;
+        token::transfer(
+            CpiContext::new_with_signer(
+                ctx.accounts.token_program.to_account_info(),
+                Transfer {
+                    from: ctx.accounts.vault.to_account_info(),
+                    to: ctx.accounts.opponent_token.to_account_info(),
+                    authority: ctx.accounts.match_account.to_account_info(),
+                },
+                signer,
+            ),
+            stake,
+        )?;
+
+        token::close_account(CpiContext::new_with_signer(
+            ctx.accounts.token_program.to_account_info(),
+            CloseAccount {
+                account: ctx.accounts.vault.to_account_info(),
+                destination: ctx.accounts.creator.to_account_info(),
+                authority: ctx.accounts.match_account.to_account_info(),
+            },
+            signer,
+        ))?;
+
+        ctx.accounts.match_account.status = MatchStatus::Refunded;
+        emit!(MatchRefunded { match_id, each: stake });
+        Ok(())
+    }
+
     /// Refund the creator if no opponent ever joined. Creator only, Open only.
     pub fn cancel_match(ctx: Context<CancelMatch>, match_id: u64) -> Result<()> {
         require!(ctx.accounts.match_account.status == MatchStatus::Open, EscrowError::NotOpen);
@@ -456,6 +511,50 @@ pub struct CancelMatch<'info> {
     pub token_program: Program<'info, Token>,
 }
 
+#[derive(Accounts)]
+#[instruction(match_id: u64)]
+pub struct RefundMatch<'info> {
+    // The settler binds via has_one, as in settle: only the realm server key can
+    // declare a draw and trigger the refund.
+    pub settler: Signer<'info>,
+
+    /// CHECK: rent destination only, pinned to the creator recorded on the match.
+    #[account(mut, address = match_account.creator)]
+    pub creator: UncheckedAccount<'info>,
+
+    #[account(
+        mut,
+        close = creator,
+        has_one = settler @ EscrowError::Unauthorized,
+        seeds = [b"match", match_id.to_le_bytes().as_ref()],
+        bump = match_account.bump
+    )]
+    pub match_account: Account<'info, Match>,
+
+    #[account(
+        mut,
+        associated_token::mint = match_account.mint,
+        associated_token::authority = match_account
+    )]
+    pub vault: Account<'info, TokenAccount>,
+
+    #[account(
+        mut,
+        constraint = creator_token.mint == match_account.mint @ EscrowError::WrongMint,
+        constraint = creator_token.owner == match_account.creator @ EscrowError::Unauthorized
+    )]
+    pub creator_token: Account<'info, TokenAccount>,
+
+    #[account(
+        mut,
+        constraint = opponent_token.mint == match_account.mint @ EscrowError::WrongMint,
+        constraint = opponent_token.owner == match_account.opponent @ EscrowError::Unauthorized
+    )]
+    pub opponent_token: Account<'info, TokenAccount>,
+
+    pub token_program: Program<'info, Token>,
+}
+
 // ----- distribution accounts -----
 
 #[derive(Accounts)]
@@ -598,6 +697,7 @@ pub enum MatchStatus {
     Locked,
     Settled,
     Cancelled,
+    Refunded,
 }
 
 #[account]
@@ -648,6 +748,12 @@ pub struct MatchSettled {
 pub struct MatchCancelled {
     pub match_id: u64,
     pub refunded: u64,
+}
+
+#[event]
+pub struct MatchRefunded {
+    pub match_id: u64,
+    pub each: u64,
 }
 
 #[event]
