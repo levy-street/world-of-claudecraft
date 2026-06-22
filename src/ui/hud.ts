@@ -788,7 +788,7 @@ export class Hud {
       const header = target.closest('.qt-header');
       const quest = target.closest('.qt-quest') as HTMLElement | null;
       if (!header && !quest) return;
-      if (e.key === 'Enter' || e.key === ' ' || e.code === 'Space') {
+      if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         e.stopPropagation();
         if (header) this.toggleQuestTrackerCollapsed();

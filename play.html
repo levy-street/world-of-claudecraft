@@ -819,12 +819,15 @@
   @media (pointer: coarse) { #quest-tracker .qt-header, #quest-tracker .qt-quest { min-height: 40px; } }
   /* Each tracked quest is a <button>: clicking it opens the quest log focused on
      that quest. Native button chrome is reset so it keeps the plain tracker look,
-     and pointer events are re-enabled over the otherwise click-through overlay. */
+     and pointer events are re-enabled over the otherwise click-through overlay.
+     The inter-row gap is the button's own top padding rather than a title
+     margin: a top margin on the first child collapses out of the borderless,
+     zero-padding button, leaving a dead click-through strip between rows. */
   #quest-tracker .qt-quest { display: block; width: 100%; text-align: left; background: none;
-    border: 0; padding: 0; margin: 0; color: inherit; font: inherit; cursor: pointer; pointer-events: auto; }
+    border: 0; padding: 8px 0 0; margin: 0; color: inherit; font: inherit; cursor: pointer; pointer-events: auto; }
   #quest-tracker .qt-quest:hover .qt-title { color: #fff; }
   #quest-tracker .qt-quest:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 2px; }
-  #quest-tracker .qt-title { font-weight: bold; margin-top: 8px; font-family: var(--title-font); }
+  #quest-tracker .qt-title { font-weight: bold; font-family: var(--title-font); }
   #quest-tracker .qt-obj { color: #e8e0c8; font-size: 11px; margin-left: 8px; }
   #quest-tracker .qt-obj.done,
   .qd-obj.done,
