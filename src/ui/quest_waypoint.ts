@@ -191,6 +191,14 @@ export interface ScreenPoint {
   y: number;
 }
 
+/** A projected screen point that also reports whether it fell behind the camera.
+ *  `behind` (or a non-finite coordinate) means the perspective divide mirrored it,
+ *  so its position is unreliable for a heading. Mirrors the renderer's
+ *  `worldToScreen` return shape so the consumer passes it straight through. */
+export interface ScreenProbe extends ScreenPoint {
+  behind: boolean;
+}
+
 /** The rotation (degrees, clockwise, normalised to [0,360)) for an UP-pointing
  *  arrow glyph anchored at `from` to aim toward `to` in screen space (y down). 0
  *  keeps the glyph pointing up (target straight ahead/up), 90 right, 180 down, 270
@@ -200,4 +208,20 @@ export function screenArrowDeg(from: ScreenPoint, to: ScreenPoint): number {
   // up = (0,-1) which is atan2(-1,0) = -90deg; add 90 so straight-up aim is 0deg.
   const deg = (Math.atan2(to.y - from.y, to.x - from.x) * 180) / Math.PI + 90;
   return ((deg % 360) + 360) % 360;
+}
+
+function usableProbe(p: ScreenProbe): boolean {
+  return !p.behind && Number.isFinite(p.x) && Number.isFinite(p.y);
+}
+
+/** Pick the arrow heading from `base` given two probes a short step toward and
+ *  away from the target. Prefers the toward probe; when it is behind the camera
+ *  (the projection mirrors it, which would point the arrow ~180deg the wrong way
+ *  exactly when the target is behind the player) it falls back to the away probe,
+ *  which is then in front, and flips the heading 180deg. Returns null when neither
+ *  probe is usable (both behind / non-finite) so the caller hides the arrow. */
+export function arrowHeadingDeg(base: ScreenPoint, toward: ScreenProbe, away: ScreenProbe): number | null {
+  if (usableProbe(toward)) return screenArrowDeg(base, toward);
+  if (usableProbe(away)) return (screenArrowDeg(base, away) + 180) % 360;
+  return null;
 }

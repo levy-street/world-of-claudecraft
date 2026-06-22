@@ -32,7 +32,7 @@ import { esc } from './esc';
 import { formatClockTime } from './clock';
 import { formatMinimapCoords } from './coords';
 import { compassView, type CardinalId } from './compass';
-import { questWaypointTargetFor, screenArrowDeg, waypointDistance } from './quest_waypoint';
+import { arrowHeadingDeg, questWaypointTargetFor, waypointDistance } from './quest_waypoint';
 import { clampMinimapZoom, nextMinimapZoom, isMinMinimapZoom, isMaxMinimapZoom, minimapZoomValue, MINIMAP_ZOOM_DEFAULT } from './minimap_zoom';
 import { getUiScale } from './ui_scale';
 import { restView } from './rest_indicator';
@@ -111,6 +111,12 @@ import {
 // World height (above the player's feet) at which the focused-quest arrow floats,
 // so it clears the character's head with a clear gap without blocking the view.
 const WAYPOINT_ARROW_HEIGHT = 4.3;
+// Yards toward (and away from) the target the heading probe points are placed: the
+// arrow's screen direction is the offset of the toward-probe from the head anchor.
+const WAYPOINT_HEADING_PROBE_YD = 4;
+// Below this planar distance the player is effectively on the objective, so the
+// direction is meaningless (the probes collapse onto the anchor); hide the arrow.
+const WAYPOINT_ARRIVE_YD = 0.5;
 
 // hooks main wires after Input exists (the options menu drives input, audio,
 // graphics, and logout, all of which live outside the HUD). PerfOverlayHooks
@@ -833,12 +839,16 @@ export class Hud {
     // ~500ms to toggle focus; the trailing click is suppressed so the log does
     // not also open. Movement past a small threshold or an early lift cancels it.
     $('#quest-tracker').addEventListener('pointerdown', (e) => {
+      // A fresh pointer interaction invalidates any pending trailing-click
+      // suppression left by a prior long-press whose synthetic click never arrived
+      // (some touch stacks emit none). The suppressed click can only immediately
+      // follow the long-press, never after a new pointerdown, so clearing here for
+      // every pointer type and target stops a stale flag swallowing a later tap, a
+      // header tap (collapse), or a mouse right-click toggle.
+      this.suppressNextQuestTrackerClick = false;
       if (e.pointerType !== 'touch') return;
       const quest = (e.target as HTMLElement).closest('.qt-quest') as HTMLElement | null;
       if (!quest?.dataset.questId) return;
-      // Drop any stale suppress flag from a prior long-press whose trailing click
-      // never arrived (some touch stacks emit none), so this tap is not swallowed.
-      this.suppressNextQuestTrackerClick = false;
       this.clearQuestTrackerLongPress();
       const questId = quest.dataset.questId;
       this.questTrackerLongPress = {
@@ -3297,22 +3307,34 @@ export class Hud {
     // and scales with the camera) and project to the screen.
     const base = this.renderer.worldToScreen(p.x, p.y + WAYPOINT_ARROW_HEIGHT, p.z);
     if (base.behind || !Number.isFinite(base.x) || !Number.isFinite(base.y)) { root.style.display = 'none'; return; }
-    // Heading: project a point a few yards toward the target at the same height; its
-    // on-screen offset from the anchor is the direction to aim the arrow, so it
-    // re-points correctly as the player moves and the camera turns.
-    let dx = target.x - p.x;
-    let dz = target.z - p.z;
-    const len = Math.hypot(dx, dz) || 1;
-    const tip = this.renderer.worldToScreen(p.x + (dx / len) * 4, p.y + WAYPOINT_ARROW_HEIGHT, p.z + (dz / len) * 4);
+    // Standing essentially on the objective: no meaningful direction, so hide it.
+    const dist = waypointDistance(p, target);
+    if (dist < WAYPOINT_ARRIVE_YD) { root.style.display = 'none'; return; }
+    // Heading: project points a few yards toward and away from the target at the
+    // same height; the toward-probe's on-screen offset from the anchor is the
+    // direction to aim the arrow, so it re-points as the player moves and the
+    // camera turns. arrowHeadingDeg falls back to the away-probe (then in front)
+    // and flips 180deg when the toward-probe is behind the camera.
+    const ux = (target.x - p.x) / dist;
+    const uz = (target.z - p.z) / dist;
+    const ay = p.y + WAYPOINT_ARROW_HEIGHT;
+    const fx = ux * WAYPOINT_HEADING_PROBE_YD;
+    const fz = uz * WAYPOINT_HEADING_PROBE_YD;
+    const deg = arrowHeadingDeg(
+      base,
+      this.renderer.worldToScreen(p.x + fx, ay, p.z + fz),
+      this.renderer.worldToScreen(p.x - fx, ay, p.z - fz),
+    );
+    if (deg === null) { root.style.display = 'none'; return; }
     const scale = getUiScale();
     // worldToScreen px are in the unzoomed viewport; #ui is scaled, so divide into
     // author space (matching the floating-combat-text path).
     root.style.display = 'flex';
     root.style.left = `${base.x / scale}px`;
     root.style.top = `${base.y / scale}px`;
-    this.waypointArrowGlyph!.style.transform = `rotate(${screenArrowDeg(base, tip)}deg)`;
+    this.waypointArrowGlyph!.style.transform = `rotate(${deg}deg)`;
     this.waypointArrowDist!.textContent = t('hudChrome.questWaypoint.distance', {
-      value: formatNumber(Math.round(waypointDistance(p, target)), { maximumFractionDigits: 0, useGrouping: false }),
+      value: formatNumber(Math.round(dist), { maximumFractionDigits: 0, useGrouping: false }),
     });
   }
 

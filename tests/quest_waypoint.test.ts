@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
+  arrowHeadingDeg,
   buildMobDropIndex,
   questWaypointTarget,
   screenArrowDeg,
@@ -177,5 +178,31 @@ describe('screenArrowDeg', () => {
 describe('waypointDistance', () => {
   it('measures planar (x,z) distance in yards', () => {
     expect(waypointDistance({ x: 0, z: 0 }, { x: 3, z: 4 })).toBe(5);
+  });
+});
+
+describe('arrowHeadingDeg', () => {
+  const BASE = { x: 100, y: 100 };
+  const front = (x: number, y: number) => ({ x, y, behind: false });
+  const behind = (x: number, y: number) => ({ x, y, behind: true });
+
+  it('uses the toward probe when it is in front of the camera', () => {
+    // toward probe to the right -> 90deg; away probe is ignored.
+    expect(arrowHeadingDeg(BASE, front(200, 100), behind(0, 100))).toBeCloseTo(90);
+  });
+
+  it('falls back to the away probe + 180deg when the toward probe is behind', () => {
+    // The target is behind the camera so its projection mirrors to the LEFT
+    // (270deg); the away probe (in front, to the right) gives 90deg, +180 = 270.
+    expect(arrowHeadingDeg(BASE, behind(0, 100), front(200, 100))).toBeCloseTo(270);
+  });
+
+  it('treats a non-finite toward probe as unusable and uses the away probe', () => {
+    expect(arrowHeadingDeg(BASE, front(NaN, 100), front(100, 200))).toBeCloseTo(0); // away down(180)+180=360->0
+  });
+
+  it('returns null when neither probe is usable', () => {
+    expect(arrowHeadingDeg(BASE, behind(200, 100), behind(0, 100))).toBeNull();
+    expect(arrowHeadingDeg(BASE, front(NaN, 100), front(100, Infinity))).toBeNull();
   });
 });
