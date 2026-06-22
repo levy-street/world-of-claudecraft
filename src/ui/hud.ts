@@ -32,7 +32,7 @@ import { esc } from './esc';
 import { formatClockTime } from './clock';
 import { formatMinimapCoords } from './coords';
 import { compassView, type CardinalId } from './compass';
-import { arrowHeadingDeg, questWaypointTargetFor, waypointDistance } from './quest_waypoint';
+import { arrowHeadingDeg, questWaypointTargetFor, waypointDistance, type WaypointPos } from './quest_waypoint';
 import { clampMinimapZoom, nextMinimapZoom, isMinMinimapZoom, isMaxMinimapZoom, minimapZoomValue, MINIMAP_ZOOM_DEFAULT } from './minimap_zoom';
 import { getUiScale } from './ui_scale';
 import { restView } from './rest_indicator';
@@ -117,6 +117,10 @@ const WAYPOINT_HEADING_PROBE_YD = 4;
 // Below this planar distance the player is effectively on the objective, so the
 // direction is meaningless (the probes collapse onto the anchor); hide the arrow.
 const WAYPOINT_ARRIVE_YD = 0.5;
+// Re-resolve the focused-quest target (a scan of the camps/objects tables) only
+// after the player has moved at least this far, since that scan picks the nearest
+// camp/object and the answer is stable until the player travels a meaningful gap.
+const WAYPOINT_RESOLVE_MOVE_YD = 4;
 
 // hooks main wires after Input exists (the options menu drives input, audio,
 // graphics, and logout, all of which live outside the HUD). PerfOverlayHooks
@@ -569,6 +573,17 @@ export class Hud {
   private waypointArrowEl: HTMLElement | null = null;
   private waypointArrowGlyph: HTMLElement | null = null;
   private waypointArrowDist: HTMLElement | null = null;
+  // Cached target resolution: questWaypointTargetFor scans the camps/objects
+  // tables, but the result only changes when the focused quest, its state, or the
+  // nearest camp/object (i.e. the player has travelled) changes. The arrow is then
+  // projected from the cached target every frame for smooth tracking.
+  private waypointTarget: WaypointPos | null = null;
+  private waypointResolveSig = '';
+  private waypointResolveX = 0;
+  private waypointResolveZ = 0;
+  // Last rounded yard value written to the distance label, so the t()/formatNumber
+  // text is only rebuilt when the displayed number actually changes, not per frame.
+  private waypointDistRounded = -1;
   private lastPortraitTarget = -999;
   // swing timer: the period is captured from the reset edge (swingTimer jumping
   // up), so the bar tracks real swing speed including haste / ranged weapons.
@@ -2004,6 +2019,8 @@ export class Hud {
   private refreshLocalizedDynamicUi(): void {
     this.refreshKeybindLabels();
     this.updateQuestTracker();
+    // Force the cached waypoint distance text to rebuild in the new locale next frame.
+    this.waypointDistRounded = -1;
     const log = $('#quest-log-window');
     if (log.style.display === 'block') this.renderQuestLog();
     if ($('#bags').style.display === 'block') this.renderBags();
@@ -3288,21 +3305,33 @@ export class Hud {
    *  rotate it to point toward the target with the distance underneath. No focus or
    *  unresolvable target hides it. */
   private updateQuestWaypoint(): void {
-    const focusId = this.focusedQuestId;
-    const progress = focusId ? this.sim.questLog.get(focusId) : undefined;
-    const target = progress && focusId
-      ? questWaypointTargetFor(progress, this.sim.questState(focusId), this.sim.player.pos)
-      : null;
-
     if (!this.waypointArrowEl) {
       this.waypointArrowEl = $('#quest-waypoint');
       this.waypointArrowGlyph = this.waypointArrowEl.querySelector('.qw-arrow') as HTMLElement;
       this.waypointArrowDist = this.waypointArrowEl.querySelector('.qw-dist') as HTMLElement;
     }
     const root = this.waypointArrowEl;
+
+    const focusId = this.focusedQuestId;
+    const progress = focusId ? this.sim.questLog.get(focusId) : undefined;
+    const p = this.sim.player.pos;
+    // Resolve the target lazily (see field comment): re-run the camps/objects scan
+    // only when the focused quest / its resolved state / progress changes, or after
+    // the player has moved far enough that a different camp/object may be nearest.
+    const state = progress && focusId ? this.sim.questState(focusId) : undefined;
+    const sig = progress && focusId ? `${focusId}|${state}|${progress.state}|${progress.counts.join(',')}` : '';
+    const movedSq = (p.x - this.waypointResolveX) ** 2 + (p.z - this.waypointResolveZ) ** 2;
+    if (sig !== this.waypointResolveSig || movedSq > WAYPOINT_RESOLVE_MOVE_YD * WAYPOINT_RESOLVE_MOVE_YD) {
+      this.waypointResolveSig = sig;
+      this.waypointResolveX = p.x;
+      this.waypointResolveZ = p.z;
+      this.waypointTarget = progress && focusId && state
+        ? questWaypointTargetFor(progress, state, p)
+        : null;
+    }
+    const target = this.waypointTarget;
     if (!target) { root.style.display = 'none'; return; }
 
-    const p = this.sim.player.pos;
     // Anchor above the player's head (a fixed world height, so it tracks the player
     // and scales with the camera) and project to the screen.
     const base = this.renderer.worldToScreen(p.x, p.y + WAYPOINT_ARROW_HEIGHT, p.z);
@@ -3333,9 +3362,15 @@ export class Hud {
     root.style.left = `${base.x / scale}px`;
     root.style.top = `${base.y / scale}px`;
     this.waypointArrowGlyph!.style.transform = `rotate(${deg}deg)`;
-    this.waypointArrowDist!.textContent = t('hudChrome.questWaypoint.distance', {
-      value: formatNumber(Math.round(dist), { maximumFractionDigits: 0, useGrouping: false }),
-    });
+    // Only rebuild the localized text when the rounded yard value changes; position
+    // and rotation still update every frame above for smooth tracking.
+    const rounded = Math.round(dist);
+    if (rounded !== this.waypointDistRounded) {
+      this.waypointDistRounded = rounded;
+      this.waypointArrowDist!.textContent = t('hudChrome.questWaypoint.distance', {
+        value: formatNumber(rounded, { maximumFractionDigits: 0, useGrouping: false }),
+      });
+    }
   }
 
   // -------------------------------------------------------------------------
