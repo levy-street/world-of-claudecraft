@@ -131,6 +131,17 @@ export interface AffiliateInfo {
   referredCount: number;
 }
 
+// The XP + gold commission an account has earned from the players it referred
+// (GET /api/referral/summary), pending (not yet credited to a live character) +
+// lifetime, plus how many players it has referred.
+export interface ReferralSummary {
+  pendingXp: number;
+  pendingCopper: number;
+  lifetimeXp: number;
+  lifetimeCopper: number;
+  referredCount: number;
+}
+
 // One realm an account referred as an affiliate (GET /api/affiliate/realms).
 export interface AffiliateRealm {
   realmId: number;
@@ -246,6 +257,11 @@ export class Api {
   async affiliateRealms(): Promise<AffiliateRealm[]> {
     const d = await this.get('/api/affiliate/realms');
     return d.realms ?? [];
+  }
+
+  // The XP + gold commission this account has earned from referred players.
+  referralSummary(): Promise<ReferralSummary> {
+    return this.get('/api/referral/summary');
   }
 
   // Confirm a quote with the finalized on-chain lock signature; activates the realm.

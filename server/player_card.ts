@@ -20,9 +20,11 @@ import {
   getPlayerCardMetaBySlug,
   accountForSlug,
   recordReferral,
+  pool,
 } from './db';
 import { REALM_PUBLIC_ORIGIN } from './realm';
 import { recordUsageMetric } from './provider_usage';
+import { accountForAffiliateCode } from './affiliate_db';
 
 // A composited card is ~1200×630 @2× PNG - comfortably under this bound, which
 // is generous enough to never reject a legitimate upload yet caps memory.
@@ -627,13 +629,22 @@ function missingCardHtml(origin: string, locale: PublicCardLocale): string {
 </body></html>`;
 }
 
-// Record a referral when a brand-new account registered via ?ref=<slug>. Safe to
-// call with any untrusted `ref`: invalid slugs, unknown slugs, and self-referrals
-// are silently ignored.
+// Record a referral when a brand-new account registered via ?ref=<code>. The code
+// is the UNIFIED referral identity: it resolves as either an affiliate code
+// (case-sensitive base64url, the realm 15% + the player referral both key off it)
+// or a legacy card slug. Safe with any untrusted `ref`: unknown codes and
+// self-referrals are silently ignored.
 export async function captureReferral(refereeAccountId: number, ref: unknown): Promise<void> {
-  const slug = typeof ref === 'string' ? ref.trim().toLowerCase() : '';
-  if (!isValidSlug(slug)) return;
-  const referrer = await accountForSlug(slug);
+  const raw = typeof ref === 'string' ? ref.trim() : '';
+  // Only a plausibly-valid code (affiliate base64url or a card slug, which is a
+  // subset) is worth a lookup; anything else is ignored without touching the DB.
+  if (!/^[A-Za-z0-9_-]{1,64}$/.test(raw)) return;
+  // Affiliate code first (exact), then the lowercased card slug.
+  let referrer = await accountForAffiliateCode(pool, raw);
+  if (referrer === null) {
+    const slug = raw.toLowerCase();
+    if (isValidSlug(slug)) referrer = await accountForSlug(slug);
+  }
   if (referrer === null || referrer === refereeAccountId) return;
-  await recordReferral(refereeAccountId, referrer, slug);
+  await recordReferral(refereeAccountId, referrer, raw.slice(0, 64));
 }

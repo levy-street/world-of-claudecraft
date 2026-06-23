@@ -22,6 +22,9 @@ Server env (no `VITE_` prefix):
 | `REALM_TIER_BRONZE_BPS` / `_SILVER_BPS` / `_GOLD_BPS` | 100 / 500 / 1000 | Stake tiers as bps of supply (1% / 5% / 10%). |
 | `REALM_SUPPLY_CACHE_SECONDS` | 15 | TTL of the in-process $WOC-supply cache (caps the supply RPC). |
 | `REALM_AFFILIATE_BPS` | 1500 (15%) | Affiliate commission as bps of a referred realm's revenue (drawn from the operator's share). Capped at 5000. |
+| `REFERRAL_BONUS_DAYS` | 30 | Window (days from signup) in which a referred player's earnings are bonused. 0 disables the bonus. |
+| `REFERRAL_REFEREE_BPS` | 1000 (10%) | The referred player's XP + gold welcome boost on their own earnings, in bps. |
+| `REFERRAL_REFERRER_BPS` | 500 (5%) | The referrer's XP + gold commission on their referred players' earnings, in bps. |
 
 Client env (`VITE_`-prefixed, baked at build time):
 
@@ -79,13 +82,34 @@ Salespeople recruit realm founders with an affiliate link and earn `REALM_AFFILI
   wallet, on the same rail as the operator payout. To disable the program, set
   `REALM_AFFILIATE_BPS=0`; existing attributions remain but accrue nothing.
 
+## Referral XP + gold bonus (unified with the affiliate link)
+
+The affiliate code is the single referral identity: registering via `?ref=<code>`
+(or a legacy card slug) records the relationship in `referrals`, and founding via
+`?aff=<code>` records the realm affiliate. On top of the realm 15%, a referred
+player's first-30-days earnings are bonused on BOTH sides, minted server-side
+(never taken from anyone):
+
+- Referred player: +`REFERRAL_REFEREE_BPS` (10%) on the XP and gold they earn.
+- Referrer: +`REFERRAL_REFERRER_BPS` (5%) of those same earnings.
+
+Mechanism (no sim change, RL core untouched): the reconciler reads the referred
+character's monotonic `counters.xpGained` + `counters.lootCopper`, and on each
+leave bonuses the NEW earnings since a per-character checkpoint (`referral_progress`)
+within the window. The referee boost is granted via `sim.grantBonus` (the checkpoint
+advances past the granted XP so it is never re-counted); the referrer's cut accrues
+to `referral_rewards` (pending + lifetime) and is granted to their live character on
+their next login (claim-on-join). Anti-abuse: first-touch + no self-referral, the
+30-day window, %-of-REAL-earnings (a fake referee who never plays earns nothing),
+and the existing bot detection. Set `REFERRAL_BONUS_DAYS=0` to disable.
+
 ## Rollback
 
 The tables are additive (`realms`, `realm_stakes`, `realm_quotes`, plus
 `realm_affiliates` and `affiliate_codes`) and are created via `ensureSchema`. To
 roll the feature back, stop issuing quotes (remove the routes / set
 `REALM_MAX_PER_ACCOUNT=0` is not supported, so gate at the proxy) and
-`DROP TABLE realm_affiliates, affiliate_codes, realm_quotes, realm_stakes, realms CASCADE;`. Existing
+`DROP TABLE referral_progress, referral_rewards, realm_affiliates, affiliate_codes, realm_quotes, realm_stakes, realms CASCADE;`. Existing
 on-chain stakes are unaffected and remain owner-recoverable via the program. The
 default env realm is re-seeded on the next boot. `assertRealmSchema` fails the
 boot fast if a realm table drifts (a required column is missing).

@@ -4455,6 +4455,19 @@ export class Sim {
     if (p.level >= MAX_LEVEL) meta.xp = 0;
   }
 
+  // A server-authoritative external reward (referral bonus, promotions): XP routes
+  // through grantXp so the player can level from it (it re-counts in xpGained,
+  // which the server's referral checkpoint advances past so the bonus is never
+  // re-counted); copper is credited to the balance only and does NOT touch the
+  // lootCopper earned counter (so it too is never re-counted). Server-only: never
+  // called in the deterministic replay, so it cannot affect sim determinism.
+  grantBonus(meta: PlayerMeta, xp: number, copper: number): void {
+    const x = Math.max(0, Math.floor(xp));
+    const c = Math.max(0, Math.floor(copper));
+    if (x > 0) this.grantXp(x, meta);
+    if (c > 0) meta.copper += c;
+  }
+
   // Add to the monotonic lifetime counter, emitting cosmetic virtual-level-up
   // events past the cap and unlocking any newly crossed milestones. Cheap: one
   // add plus an O(log n) table lookup, never touched on the per-tick hot path.

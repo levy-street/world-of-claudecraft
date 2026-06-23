@@ -5,9 +5,9 @@
 // rails land (#477). Self-contained, like realm_operator: it renders into a
 // host-provided container and reaches the server only through the injected Api.
 
-import { t, formatNumber } from './i18n';
+import { t, formatNumber, formatMoney } from './i18n';
 import { esc } from './esc';
-import type { Api, AffiliateRealm } from '../net/online';
+import type { Api, AffiliateRealm, ReferralSummary } from '../net/online';
 import { TYPE_LABEL, STATUS_LABEL, tierWord } from './realm_operator';
 
 export interface RealmAffiliateHost {
@@ -22,6 +22,7 @@ export class RealmAffiliate {
   private readonly host: RealmAffiliateHost;
   private code = '';
   private realms: AffiliateRealm[] = [];
+  private summary: ReferralSummary | null = null;
 
   constructor(root: HTMLElement, host: RealmAffiliateHost) {
     this.root = root;
@@ -31,11 +32,17 @@ export class RealmAffiliate {
   async open(): Promise<void> {
     this.code = '';
     this.realms = [];
+    this.summary = null;
     this.root.innerHTML = `<p class="ro-hint">${esc(t('realmOp.affiliate.loading'))}</p>`;
     try {
-      const [info, realms] = await Promise.all([this.host.api.affiliateInfo(), this.host.api.affiliateRealms()]);
+      const [info, realms, summary] = await Promise.all([
+        this.host.api.affiliateInfo(),
+        this.host.api.affiliateRealms(),
+        this.host.api.referralSummary(),
+      ]);
       this.code = info.code;
       this.realms = realms;
+      this.summary = summary;
     } catch {
       this.root.innerHTML = `<p class="ro-hint ro-hint-muted">${esc(t('realmOp.affiliate.unavailable'))}</p>`;
       return;
@@ -65,11 +72,21 @@ export class RealmAffiliate {
               <button id="ra-copy" class="btn btn-secondary ra-copy" type="button">${esc(t('realmOp.affiliate.copy'))}</button>
             </div>
           </div>
-          <p class="ro-hint ro-hint-badge">${esc(t('realmOp.affiliate.earningsSoon'))}</p>
+          <div class="ro-aff-bonus">
+            <span class="ro-label">${esc(t('realmOp.affiliate.bonusTitle'))}</span>
+            <p class="ro-hint ro-hint-badge">${esc(t('realmOp.affiliate.bonusReferee'))}</p>
+            <p class="ro-hint ro-hint-badge">${esc(t('realmOp.affiliate.bonusReferrer'))}</p>
+            <p class="ro-hint ro-hint-muted">${esc(t('realmOp.affiliate.bonusRealm'))}</p>
+          </div>
+        </section>
+        <section class="ro-mine" aria-labelledby="ra-rewards-h">
+          <h3 id="ra-rewards-h" class="ro-h">${esc(t('realmOp.affiliate.rewardsTitle'))}</h3>
+          ${this.rewardsHtml()}
         </section>
         <section class="ro-mine" aria-labelledby="ra-mine-h">
           <h3 id="ra-mine-h" class="ro-h">${esc(t('realmOp.affiliate.referredTitle'))}</h3>
           <p class="ro-hint">${esc(countLine)}</p>
+          <p class="ro-hint ro-hint-muted">${esc(t('realmOp.affiliate.earningsSoon'))}</p>
           <div class="ro-mine-list">${count === 0
             ? `<p class="ro-empty">${esc(t('realmOp.affiliate.empty'))}</p>`
             : this.realms.map((r) => this.realmRowHtml(r)).join('')}</div>
@@ -78,6 +95,18 @@ export class RealmAffiliate {
 
     const copyBtn = this.root.querySelector('#ra-copy') as HTMLButtonElement;
     copyBtn.addEventListener('click', () => void this.copyLink(copyBtn));
+  }
+
+  private rewardsHtml(): string {
+    const s = this.summary;
+    const nothing = !s || (s.referredCount === 0 && s.pendingXp === 0 && s.pendingCopper === 0 && s.lifetimeXp === 0 && s.lifetimeCopper === 0);
+    if (nothing) return `<p class="ro-empty">${esc(t('realmOp.affiliate.rewardsEmpty'))}</p>`;
+    const lines = [`<p class="ro-hint">${esc(t('realmOp.affiliate.rewardsReferred', { count: formatNumber(s!.referredCount) }))}</p>`];
+    if (s!.pendingXp > 0 || s!.pendingCopper > 0) {
+      lines.push(`<p class="ro-reward-pending">${esc(t('realmOp.affiliate.rewardsPending', { xp: formatNumber(s!.pendingXp), gold: formatMoney(s!.pendingCopper) }))}</p>`);
+    }
+    lines.push(`<p class="ro-hint ro-hint-muted">${esc(t('realmOp.affiliate.rewardsLifetime', { xp: formatNumber(s!.lifetimeXp), gold: formatMoney(s!.lifetimeCopper) }))}</p>`);
+    return lines.join('');
   }
 
   private realmRowHtml(r: AffiliateRealm): string {

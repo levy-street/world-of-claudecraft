@@ -10,6 +10,10 @@ import {
   grantAccountMechChroma, markAccountQuestComplete, revokeAccountMechChroma, saveCharacterState, openPlaySession, closePlaySession,
   insertChatLogs, pool, loadMarketState, saveMarketState, walletForAccount,
 } from './db';
+import {
+  referrerForReferee, getReferralProgress, setReferralProgress, accrueReferralReward, claimReferralRewards,
+} from './referral_db';
+import { reconcileReferral, withinReferralWindow } from './referral_bonus';
 import { holderInfoForPubkey } from './woc_balance';
 import type { AccountChatMuteStatus, AccountCosmetics, RequestMetadata } from './db';
 import { ChatFilter } from './chat_filter';
@@ -116,6 +120,10 @@ export interface ClientSession {
   lastWhisperFrom: string | null;
   // last explicit channel this player sent to; plain text follows it.
   rememberedChat: RememberedChat;
+  // Referral status for the 30-day earnings bonus (#475), loaded async after join.
+  // undefined until loaded, null when this account was not referred. When set, the
+  // session's earnings since the last checkpoint are bonused on leave.
+  referral?: { referrerAccountId: number; referredAtMs: number } | null;
   // last client input sequence processed; echoed in snapshots for latency telemetry
   lastInputSeq: number;
   // sim time of the last movement input frame, used to clear stale held input
@@ -736,6 +744,10 @@ export class GameServer {
     this.ipSessionCounts.set(sessionIp, (this.ipSessionCounts.get(sessionIp) ?? 0) + 1);
     this.clients.set(pid, session);
     this.sessionsByCharacterId.set(characterId, session);
+    // Referral program (#475): load whether this account was referred (for the
+    // 30-day earnings bonus on leave) and credit any commission it has earned as a
+    // referrer. Best-effort, off the join hot path.
+    void this.loadReferralStatus(session);
     this.peakOnline = Math.max(this.peakOnline, this.clients.size);
     openPlaySession(accountId, characterId, name, meta)
       .then((id) => {
@@ -804,6 +816,9 @@ export class GameServer {
     if (session.dbSessionId !== null) {
       void closePlaySession(session.dbSessionId).catch((err) => console.error('failed to close play session:', err));
     }
+    // Apply the referral earnings bonus for this session BEFORE the final save, so
+    // the boosted XP/gold is persisted (the character is still live in the sim).
+    await this.reconcileReferralBonus(session);
     await this.saveCharacterOnLeave(session);
     this.sessionsByCharacterId.delete(session.characterId);
     this.sim.removePlayer(session.pid);
@@ -828,6 +843,51 @@ export class GameServer {
         console.error(`save on leave failed for ${session.name}; retrying in ${retryMs}ms:`, err);
         await delay(retryMs);
       }
+    }
+  }
+
+  // Load this account's referral status (#475): whether it was referred (for the
+  // 30-day earnings bonus on leave) and any commission it has earned as a referrer,
+  // which is granted to the live character now. Best-effort; logged, not fatal.
+  private async loadReferralStatus(session: ClientSession): Promise<void> {
+    try {
+      const rel = await referrerForReferee(pool, session.accountId);
+      session.referral = rel ? { referrerAccountId: rel.referrerAccountId, referredAtMs: rel.referredAt.getTime() } : null;
+      const pending = await claimReferralRewards(pool, session.accountId);
+      if (pending.xp <= 0 && pending.copper <= 0) return;
+      const meta = this.clients.get(session.pid) === session ? this.sim.meta(session.pid) : null;
+      if (meta) this.sim.grantBonus(meta, pending.xp, pending.copper);
+      // Player left between the claim and the grant: re-bank so the commission is not lost.
+      else await accrueReferralReward(pool, session.accountId, pending.xp, pending.copper);
+    } catch (err) {
+      console.error('referral status load failed:', err);
+    }
+  }
+
+  // Apply the referred player's earnings bonus for this session: bonus the referee's
+  // XP/gold and accrue the referrer's commission on the NEW earnings (counters since
+  // the last checkpoint), within the 30-day window. Called on leave before the final
+  // save, so the boosted state persists; the checkpoint advances past the granted
+  // referee XP so the bonus is never re-counted.
+  private async reconcileReferralBonus(session: ClientSession): Promise<void> {
+    const ref = session.referral;
+    if (!ref) return;
+    const meta = this.sim.meta(session.pid);
+    if (!meta) return;
+    try {
+      const cp = await getReferralProgress(pool, session.characterId);
+      const r = reconcileReferral({
+        xpGained: meta.counters.xpGained,
+        lootCopper: meta.counters.lootCopper,
+        lastXpGained: cp?.xpGained ?? 0,
+        lastLootCopper: cp?.lootCopper ?? 0,
+        withinWindow: withinReferralWindow(ref.referredAtMs, Date.now()),
+      });
+      if (r.refereeXp > 0 || r.refereeCopper > 0) this.sim.grantBonus(meta, r.refereeXp, r.refereeCopper);
+      if (r.referrerXp > 0 || r.referrerCopper > 0) await accrueReferralReward(pool, ref.referrerAccountId, r.referrerXp, r.referrerCopper);
+      await setReferralProgress(pool, session.characterId, r.newLastXpGained, r.newLastLootCopper);
+    } catch (err) {
+      console.error('referral bonus reconcile failed:', err);
     }
   }
 

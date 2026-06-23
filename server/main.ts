@@ -40,6 +40,7 @@ import { GameServer } from './game';
 import { REALM, REALM_DIRECTORY, REALM_ORIGINS, mergeRealmDirectory, resolveRealmType } from './realm';
 import { listRealmsForDirectory, listRealmsForOwner } from './realm_db';
 import { getOrCreateAffiliateCode, affiliateRealmCount, listRealmsByAffiliate } from './affiliate_db';
+import { referralRewardSummary } from './referral_db';
 import {
   prepareProvisionQuote,
   confirmProvisionQuote,
@@ -583,6 +584,15 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         affiliateRealmCount(pool, accountId),
       ]);
       return json(res, 200, { code, referredCount });
+    }
+    // Referral rewards summary (#475): the XP + gold commission this account has
+    // earned from the players it referred (pending + lifetime), plus how many
+    // players it has referred. Owner-scoped, no chain read.
+    if (req.method === 'GET' && url === '/api/referral/summary') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      const s = await referralRewardSummary(pool, accountId);
+      return json(res, 200, s);
     }
     // The realms an account has referred as an affiliate, with the commission bps,
     // for the affiliate dashboard. Owner-scoped, no chain read.
