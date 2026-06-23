@@ -11,8 +11,21 @@
 // a player key. The only key it controls is the realm settler, used only to name
 // the winner / declare a draw. A stake that does not land within the timeout
 // cancels the pairing (the staker reclaims via cancel_match).
-import type { PublicKey } from '@solana/web3.js';
+import { PublicKey } from '@solana/web3.js';
 import type { ArenaEscrow } from './arena_escrow';
+
+// Durable persistence seam (server/arena_wager_db.ts in production, an in-memory
+// fake in tests). Every state transition is written through so a process restart
+// can recover: a match locked on-chain but forgotten in memory would otherwise
+// strand the pot. Phase strings match WagerPhase exactly.
+export interface WagerStore {
+  insert(m: {
+    matchId: bigint; creatorPid: number; opponentPid: number;
+    creatorWallet: string; opponentWallet: string; stakeBase: bigint; rakeBps: number;
+  }): Promise<void>;
+  recordStake(matchId: bigint, role: 'open' | 'join', signature: string): Promise<void>;
+  setPhase(matchId: bigint, phase: WagerPhase, settleSig?: string): Promise<void>;
+}
 
 export type WagerPhase = 'awaiting_stakes' | 'in_bout' | 'settling' | 'settled' | 'refunded' | 'cancelled';
 
@@ -53,11 +66,15 @@ export interface ArenaWagerDeps {
   now: () => number;
   /** How long both players have to land their stakes before the pairing is cancelled. */
   stakeTimeoutMs: number;
-  /** Monotonic on-chain match id allocator. */
-  nextMatchId: () => bigint;
+  /** Monotonic, persisted match-id allocator (one sequence shared across realms). */
+  nextMatchId: () => Promise<bigint>;
   /** Stake bounds (base units), inclusive. Floor blocks dust-spam; ceiling blocks a whale pot starving the season budget. */
   minStakeBase: bigint;
   maxStakeBase: bigint;
+  /** The burn rake recorded with each match (for audit/recovery); must match the escrow's rake. */
+  rakeBps: number;
+  /** Durable persistence of every match transition (recovery after a restart). */
+  store: WagerStore;
 }
 
 /** Why an enqueue was refused, so the WS layer can tell the client. */
@@ -101,7 +118,7 @@ export class ArenaWagerCoordinator {
   }
 
   private async pair(creator: WagerParticipant, opponent: WagerParticipant): Promise<void> {
-    const matchId = this.deps.nextMatchId();
+    const matchId = await this.deps.nextMatchId();
     const key = matchId.toString();
     const m: MatchState = {
       matchId, creator, opponent, stakeBase: creator.stakeBase, phase: 'awaiting_stakes',
@@ -110,6 +127,14 @@ export class ArenaWagerCoordinator {
     this.matches.set(key, m);
     this.pidToMatch.set(creator.pid, key);
     this.pidToMatch.set(opponent.pid, key);
+
+    // Persist BEFORE handing out the stake txs, so a stake that lands on-chain
+    // before a crash is always recoverable from the durable store.
+    await this.deps.store.insert({
+      matchId, creatorPid: creator.pid, opponentPid: opponent.pid,
+      creatorWallet: creator.wallet.toBase58(), opponentWallet: opponent.wallet.toBase58(),
+      stakeBase: creator.stakeBase, rakeBps: this.deps.rakeBps,
+    });
 
     const openTx = await this.deps.escrow.buildOpenTx({ matchId, creator: creator.wallet, stakeBase: creator.stakeBase });
     const joinTx = await this.deps.escrow.buildJoinTx({ matchId, opponent: opponent.wallet });
@@ -125,13 +150,16 @@ export class ArenaWagerCoordinator {
   async onStakeSubmitted(pid: number, matchId: string, signature: string): Promise<void> {
     const m = this.matches.get(matchId);
     if (!m || m.phase !== 'awaiting_stakes') return;
-    if (pid === m.creator.pid) m.openSig = signature;
-    else if (pid === m.opponent.pid) m.joinSig = signature;
-    else return;
+    const role = pid === m.creator.pid ? 'open' : pid === m.opponent.pid ? 'join' : null;
+    if (!role) return;
+    if (role === 'open') m.openSig = signature;
+    else m.joinSig = signature;
+    await this.deps.store.recordStake(m.matchId, role, signature);
     if (!m.openSig || !m.joinSig) return;
     if (!(await this.deps.escrow.bothStaked({ matchId: m.matchId }))) return;
     if (!this.deps.startBout(m.creator.pid, m.opponent.pid)) return; // no arena slot yet; retried when the next stake report or poll re-checks
     m.phase = 'in_bout';
+    await this.deps.store.setPhase(m.matchId, 'in_bout');
     this.broadcastPhase(m);
   }
 
@@ -146,12 +174,14 @@ export class ArenaWagerCoordinator {
     const m = this.matches.get(key);
     if (!m || m.phase !== 'in_bout') return;
     m.phase = 'settling';
+    await this.deps.store.setPhase(m.matchId, 'settling');
     this.broadcastPhase(m);
     const ref = { matchId: m.matchId, creator: m.creator.wallet, opponent: m.opponent.wallet, stakeBase: m.stakeBase };
 
     if (draw) {
       const r = await this.deps.escrow.refundDraw(ref);
       m.phase = 'refunded';
+      await this.deps.store.setPhase(m.matchId, 'refunded', r.signature);
       for (const part of [m.creator, m.opponent]) {
         this.deps.notify(part.pid, { t: 'wager_result', matchId: key, outcome: 'draw', signature: r.signature, payoutBase: m.stakeBase.toString(), burnBase: '0' });
       }
@@ -164,6 +194,7 @@ export class ArenaWagerCoordinator {
     const winnerWallet = winnerPid === m.creator.pid ? m.creator.wallet : m.opponent.wallet;
     const r = await this.deps.escrow.settle(ref, winnerWallet, m.openSig!, m.joinSig!);
     m.phase = 'settled';
+    await this.deps.store.setPhase(m.matchId, 'settled', r.signature);
     for (const part of [m.creator, m.opponent]) {
       this.deps.notify(part.pid, {
         t: 'wager_result', matchId: key,
@@ -187,6 +218,7 @@ export class ArenaWagerCoordinator {
     for (const m of [...this.matches.values()]) {
       if (m.phase !== 'awaiting_stakes' || now - m.pairedAtMs < this.deps.stakeTimeoutMs) continue;
       m.phase = 'cancelled';
+      await this.deps.store.setPhase(m.matchId, 'cancelled');
       const cancelTxB64 = m.openSig
         ? serializeUnsigned(await this.deps.escrow.buildCancelTx({ matchId: m.matchId, creator: m.creator.wallet }))
         : undefined;
@@ -215,4 +247,41 @@ export class ArenaWagerCoordinator {
 /** Base64 of an unsigned transaction's message-bearing serialization for the client to sign. */
 function serializeUnsigned(tx: { serialize: (opts: { requireAllSignatures: boolean }) => Buffer }): string {
   return tx.serialize({ requireAllSignatures: false }).toString('base64');
+}
+
+/**
+ * Boot recovery for matches that were mid-flight when the process stopped (from
+ * store.recoverableLockedMatches: phase in_bout or settling). Reconciles each
+ * against the chain: a match still Locked on-chain is refunded to both players
+ * (its bout outcome did not survive the restart), and one already resolved on-chain
+ * (the settle landed and closed the PDA before the phase was persisted) is just
+ * closed out in the store. The on-chain refund_match safely no-ops on a non-Locked
+ * match, but checking status first avoids a doomed transaction. Returns the counts.
+ */
+export async function recoverLockedMatches(
+  escrow: ArenaEscrow,
+  store: Pick<WagerStore, 'setPhase'>,
+  rows: { matchId: bigint; creatorWallet: string; opponentWallet: string; stakeBase: bigint }[],
+): Promise<{ refunded: number; reconciled: number }> {
+  let refunded = 0;
+  let reconciled = 0;
+  for (const row of rows) {
+    const status = await escrow.matchStatus(row.matchId);
+    if (status === 1) { // MatchStatus::Locked (lib.rs): both staked, never settled
+      const { signature } = await escrow.refundDraw({
+        matchId: row.matchId,
+        creator: new PublicKey(row.creatorWallet),
+        opponent: new PublicKey(row.opponentWallet),
+        stakeBase: row.stakeBase,
+      });
+      await store.setPhase(row.matchId, 'refunded', signature);
+      refunded++;
+    } else {
+      // Already resolved on-chain before the crash (the PDA is closed or was never
+      // locked): the money is correct, so just close out the durable record.
+      await store.setPhase(row.matchId, 'settled');
+      reconciled++;
+    }
+  }
+  return { refunded, reconciled };
 }

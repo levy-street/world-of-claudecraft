@@ -5,7 +5,7 @@
 // idempotency) is exercised end to end without a chain or a server.
 import { describe, it, expect, vi } from 'vitest';
 import { Keypair, PublicKey } from '@solana/web3.js';
-import { ArenaWagerCoordinator, type WagerClientMsg } from '../server/arena_wager';
+import { ArenaWagerCoordinator, recoverLockedMatches, type WagerClientMsg, type WagerStore } from '../server/arena_wager';
 import type { ArenaEscrow } from '../server/arena_escrow';
 
 const fakeTx = () => ({ serialize: () => Buffer.from('faketx') });
@@ -13,6 +13,7 @@ const fakeTx = () => ({ serialize: () => Buffer.from('faketx') });
 class FakeEscrow {
   bothStakedResult = true;
   startable = true;
+  matchStatusResult: number | null = 1; // Locked
   settleResult = { signature: 'settle-sig', potBase: 200_000_000n, payoutBase: 190_000_000n, burnBase: 10_000_000n, headroomBase: 10_000_000n };
   refundResult = { signature: 'refund-sig' };
   calls: { fn: string; arg: any }[] = [];
@@ -20,12 +21,21 @@ class FakeEscrow {
   async buildJoinTx(a: any) { this.calls.push({ fn: 'join', arg: a }); return fakeTx() as any; }
   async buildCancelTx(a: any) { this.calls.push({ fn: 'cancel', arg: a }); return fakeTx() as any; }
   async bothStaked(a: any) { this.calls.push({ fn: 'bothStaked', arg: a }); return this.bothStakedResult; }
+  async matchStatus(matchId: bigint) { this.calls.push({ fn: 'matchStatus', arg: matchId }); return this.matchStatusResult; }
   async settle(ref: any, winner: PublicKey) { this.calls.push({ fn: 'settle', arg: { ref, winner: winner.toBase58() } }); return this.settleResult; }
   async refundDraw(ref: any) { this.calls.push({ fn: 'refund', arg: ref }); return this.refundResult; }
 }
 
+class FakeStore {
+  calls: { fn: string; args: any[] }[] = [];
+  async insert(m: any) { this.calls.push({ fn: 'insert', args: [m] }); }
+  async recordStake(matchId: bigint, role: string, sig: string) { this.calls.push({ fn: 'recordStake', args: [matchId, role, sig] }); }
+  async setPhase(matchId: bigint, phase: string, sig?: string) { this.calls.push({ fn: 'setPhase', args: [matchId, phase, sig] }); }
+}
+
 function setup(stakeTimeoutMs = 30_000) {
   const escrow = new FakeEscrow();
+  const store = new FakeStore();
   const sent: { pid: number; msg: WagerClientMsg }[] = [];
   const startBout = vi.fn(() => escrow.startable);
   let clock = 1_000_000;
@@ -36,14 +46,17 @@ function setup(stakeTimeoutMs = 30_000) {
     notify: (pid, msg) => sent.push({ pid, msg }),
     now: () => clock,
     stakeTimeoutMs,
-    nextMatchId: () => nextId++,
+    nextMatchId: async () => nextId++,
     minStakeBase: 1_000_000n,
     maxStakeBase: 1_000_000_000_000n,
+    rakeBps: 500,
+    store: store as unknown as WagerStore,
   });
   const creator = { pid: 1, wallet: Keypair.generate().publicKey, stakeBase: 100_000_000n };
   const opponent = { pid: 2, wallet: Keypair.generate().publicKey, stakeBase: 100_000_000n };
-  return { coord, escrow, sent, startBout, creator, opponent, advance: (ms: number) => { clock += ms; } };
+  return { coord, escrow, store, sent, startBout, creator, opponent, advance: (ms: number) => { clock += ms; } };
 }
+const phasesSet = (store: FakeStore) => store.calls.filter((c) => c.fn === 'setPhase').map((c) => c.args[1]);
 const msgsFor = (sent: { pid: number; msg: WagerClientMsg }[], pid: number) => sent.filter((s) => s.pid === pid).map((s) => s.msg);
 
 describe('ArenaWagerCoordinator pairing', () => {
@@ -194,5 +207,60 @@ describe('ArenaWagerCoordinator settlement', () => {
     await coord.onBoutEnd(1, true, false);
     await coord.onBoutEnd(2, false, false); // second event for the same match
     expect(escrow.calls.filter((c) => c.fn === 'settle')).toHaveLength(1);
+  });
+});
+
+describe('ArenaWagerCoordinator durability', () => {
+  async function paired() {
+    const ctx = setup();
+    await ctx.coord.enqueue({ pid: 1, wallet: Keypair.generate().publicKey, stakeBase: 100_000_000n });
+    await ctx.coord.enqueue({ pid: 2, wallet: Keypair.generate().publicKey, stakeBase: 100_000_000n });
+    const matchId = (msgsFor(ctx.sent, 1)[0] as any).matchId as string;
+    return { ...ctx, matchId };
+  }
+
+  it('persists the match on pair, both stakes, and the in_bout -> settling -> settled transitions', async () => {
+    const { coord, store, matchId } = await paired();
+    expect(store.calls.filter((c) => c.fn === 'insert')).toHaveLength(1);
+    await coord.onStakeSubmitted(1, matchId, 'open-sig');
+    await coord.onStakeSubmitted(2, matchId, 'join-sig');
+    expect(store.calls.filter((c) => c.fn === 'recordStake').map((c) => c.args[1])).toEqual(['open', 'join']);
+    await coord.onBoutEnd(1, true, false);
+    expect(phasesSet(store)).toEqual(['in_bout', 'settling', 'settled']);
+  });
+
+  it('persists settling -> refunded on a draw', async () => {
+    const { coord, store, matchId } = await paired();
+    await coord.onStakeSubmitted(1, matchId, 'open-sig');
+    await coord.onStakeSubmitted(2, matchId, 'join-sig');
+    await coord.onBoutEnd(1, false, true);
+    expect(phasesSet(store)).toEqual(['in_bout', 'settling', 'refunded']);
+  });
+});
+
+describe('recoverLockedMatches (boot recovery)', () => {
+  const row = (matchId: bigint) => ({
+    matchId, creatorWallet: Keypair.generate().publicKey.toBase58(),
+    opponentWallet: Keypair.generate().publicKey.toBase58(), stakeBase: 100_000_000n,
+  });
+
+  it('refunds a match still Locked on-chain and marks it refunded', async () => {
+    const escrow = new FakeEscrow();
+    escrow.matchStatusResult = 1; // Locked
+    const store = new FakeStore();
+    const r = await recoverLockedMatches(escrow as unknown as ArenaEscrow, store as unknown as WagerStore, [row(7n)]);
+    expect(r).toEqual({ refunded: 1, reconciled: 0 });
+    expect(escrow.calls.some((c) => c.fn === 'refund')).toBe(true);
+    expect(store.calls).toContainEqual({ fn: 'setPhase', args: [7n, 'refunded', 'refund-sig'] });
+  });
+
+  it('reconciles (no refund) a match already resolved on-chain with a closed PDA', async () => {
+    const escrow = new FakeEscrow();
+    escrow.matchStatusResult = null; // account closed => already settled/refunded
+    const store = new FakeStore();
+    const r = await recoverLockedMatches(escrow as unknown as ArenaEscrow, store as unknown as WagerStore, [row(8n)]);
+    expect(r).toEqual({ refunded: 0, reconciled: 1 });
+    expect(escrow.calls.some((c) => c.fn === 'refund')).toBe(false);
+    expect(store.calls).toContainEqual({ fn: 'setPhase', args: [8n, 'settled', undefined] });
   });
 });
