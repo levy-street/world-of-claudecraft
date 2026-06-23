@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   splitAmounts, validateSplitPayment, verifyPurchase, registrySkins, quotePurchase,
-  createListing, MAX_LISTINGS_PER_ACCOUNT,
+  createListing, MAX_LISTINGS_PER_ACCOUNT, hostingDecision,
   type SplitVerifyReason,
 } from '../server/marketplace';
 import { normalizeDesignSpec, defaultDesignSpec, SKIN_PATTERNS, type SkinDesignSpec } from '../src/world_api';
@@ -225,6 +225,7 @@ function creatorSkinRow(over: Partial<CreatorSkinRow> = {}): CreatorSkinRow {
     id: 'skin_1', creatorAccountId: 7, creatorWallet: CREATOR, name: 'Dragonscale',
     description: 'Scaled plate', skinCatalog: 'class', fallbackSkin: 0, targetClass: 'warrior',
     assetUrl: 'https://cdn.example/skin_1.png', emissiveUrl: null, design: null, priceUsdc: 10_000_000n,
+    source: 'design', originUrl: null, ipfsCid: null, reviewStatus: 'approved', overflowHidden: false,
     status: 'live', sha256: null, ...over,
   };
 }
@@ -557,5 +558,34 @@ describe('normalizeDesignSpec — validation, defaults, backward-compat', () => 
   it('defaultDesignSpec() is itself a valid, stable spec (round-trips through normalize)', () => {
     const d = defaultDesignSpec();
     expect(normalizeDesignSpec(d)).toEqual(d);
+  });
+});
+
+// hostingDecision — the image-mode quota + review gate (pure; the security-
+// critical "hold N $WOC → host M skins" + trusted-creator instant-live policy).
+describe('hostingDecision — hosted quota + review gate', () => {
+  it('hosted: denies once usage hits the tier quota, allows below it', () => {
+    // coppercrest (tier 3) → 2 hosted slots
+    expect(hostingDecision({ source: 'hosted', tierIndex: 3, trusted: false, currentHosted: 1 }))
+      .toMatchObject({ allowed: true, quota: 2, used: 1 });
+    expect(hostingDecision({ source: 'hosted', tierIndex: 3, trusted: false, currentHosted: 2 }))
+      .toMatchObject({ allowed: false, reason: 'hosted_quota_exceeded', quota: 2 });
+  });
+  it('hosted: tier 0 (no/under-floor wallet) has zero quota — always denied', () => {
+    expect(hostingDecision({ source: 'hosted', tierIndex: 0, trusted: true, currentHosted: 0 }))
+      .toMatchObject({ allowed: false, reason: 'hosted_quota_exceeded', quota: 0 });
+  });
+  it('self_hosted: free — never quota-denied, regardless of tier/usage', () => {
+    const d = hostingDecision({ source: 'self_hosted', tierIndex: 0, trusted: false, currentHosted: 999 });
+    expect(d.allowed).toBe(true);
+  });
+  it('review status: pending unless the creator is trusted (then instant-live)', () => {
+    expect(hostingDecision({ source: 'self_hosted', tierIndex: 0, trusted: false, currentHosted: 0 }).reviewStatus).toBe('pending');
+    expect(hostingDecision({ source: 'self_hosted', tierIndex: 0, trusted: true, currentHosted: 0 }).reviewStatus).toBe('approved');
+    expect(hostingDecision({ source: 'hosted', tierIndex: 7, trusted: true, currentHosted: 0 }).reviewStatus).toBe('approved');
+  });
+  it('whale tier grants a large quota', () => {
+    expect(hostingDecision({ source: 'hosted', tierIndex: 7, trusted: false, currentHosted: 79 }).allowed).toBe(true);
+    expect(hostingDecision({ source: 'hosted', tierIndex: 7, trusted: false, currentHosted: 80 }).allowed).toBe(false);
   });
 });

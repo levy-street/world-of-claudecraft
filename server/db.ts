@@ -443,6 +443,30 @@ CREATE INDEX IF NOT EXISTS creator_skins_creator ON creator_skins(creator_accoun
 -- + optional glow) instead of a hosted atlas; every client rebuilds the texture
 -- from it. Added post-hoc so existing deployments migrate without a drop.
 ALTER TABLE creator_skins ADD COLUMN IF NOT EXISTS design_spec JSONB;
+-- Creator-supplied image skins (docs/prd/woc/creator-skin-uploads.md). source
+-- distinguishes the procedural designer from the two image modes. self_hosted:
+-- origin_url is the creator's external URL (SERVER-ONLY, never in the public
+-- registry); we proxy it. hosted: ipfs_cid is the Pinata pin. review_status
+-- gates sale until an operator (or a trusted creator's instant-live) approves;
+-- overflow_hidden parks a hosted skin that fell past its tier quota.
+ALTER TABLE creator_skins ADD COLUMN IF NOT EXISTS source TEXT NOT NULL DEFAULT 'design';
+ALTER TABLE creator_skins ADD COLUMN IF NOT EXISTS origin_url TEXT;
+ALTER TABLE creator_skins ADD COLUMN IF NOT EXISTS ipfs_cid TEXT;
+ALTER TABLE creator_skins ADD COLUMN IF NOT EXISTS review_status TEXT NOT NULL DEFAULT 'approved';
+ALTER TABLE creator_skins ADD COLUMN IF NOT EXISTS overflow_hidden BOOLEAN NOT NULL DEFAULT false;
+CREATE INDEX IF NOT EXISTS creator_skins_source ON creator_skins(source);
+-- Per-creator moderation trust: approved-listing tally + ToS strikes drive the
+-- "trusted creator" badge (instant-live uploads). first_listing_at anchors the
+-- account-age requirement (cheaper than joining accounts for every quota check).
+CREATE TABLE IF NOT EXISTS creator_trust (
+  account_id INT PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,
+  approved_count INT NOT NULL DEFAULT 0,
+  strikes INT NOT NULL DEFAULT 0,
+  last_strike_at TIMESTAMPTZ,
+  trusted BOOLEAN NOT NULL DEFAULT false,
+  first_listing_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
 -- A pending purchase quote binds an on-chain split tx to one buyer + skin +
 -- exact leg amounts, so verification can reject quote substitution. Short-lived.
 CREATE TABLE IF NOT EXISTS marketplace_quotes (
@@ -2169,6 +2193,11 @@ export interface CreatorSkinRow {
   assetUrl: string;
   emissiveUrl: string | null;
   design: SkinDesignSpec | null; // procedural designer spec; takes precedence over assetUrl
+  source: 'design' | 'self_hosted' | 'hosted';
+  originUrl: string | null; // self_hosted only; SERVER-ONLY, never serialized to clients
+  ipfsCid: string | null; // hosted only; Pinata pin
+  reviewStatus: 'pending' | 'approved' | 'rejected';
+  overflowHidden: boolean; // hosted skin parked past its tier quota
   priceUsdc: bigint;
   status: 'draft' | 'review' | 'live' | 'rejected' | 'delisted' | 'removed';
   sha256: string | null;
@@ -2199,6 +2228,11 @@ function mapCreatorSkin(row: Record<string, unknown>): CreatorSkinRow {
     assetUrl: row.asset_url as string,
     emissiveUrl: (row.emissive_url as string | null) ?? null,
     design: normalizeDesignSpec(row.design_spec),
+    source: ((row.source as string) === 'self_hosted' || (row.source as string) === 'hosted') ? (row.source as 'self_hosted' | 'hosted') : 'design',
+    originUrl: (row.origin_url as string | null) ?? null,
+    ipfsCid: (row.ipfs_cid as string | null) ?? null,
+    reviewStatus: ((row.review_status as string) === 'pending' || (row.review_status as string) === 'rejected') ? (row.review_status as 'pending' | 'rejected') : 'approved',
+    overflowHidden: row.overflow_hidden === true,
     priceUsdc: BigInt(row.price_usdc as string),
     status: row.status as CreatorSkinRow['status'],
     sha256: (row.sha256 as string | null) ?? null,
@@ -2206,7 +2240,11 @@ function mapCreatorSkin(row: Record<string, unknown>): CreatorSkinRow {
 }
 
 export async function listLiveCreatorSkins(): Promise<CreatorSkinRow[]> {
-  const res = await pool.query(`SELECT * FROM creator_skins WHERE status = 'live' ORDER BY created_at`);
+  const res = await pool.query(
+    `SELECT * FROM creator_skins
+      WHERE status = 'live' AND review_status = 'approved' AND overflow_hidden = false
+      ORDER BY created_at`,
+  );
   return res.rows.map(mapCreatorSkin);
 }
 
@@ -2221,8 +2259,9 @@ export async function upsertCreatorSkin(row: CreatorSkinRow): Promise<void> {
   await pool.query(
     `INSERT INTO creator_skins
        (id, creator_account_id, creator_wallet, name, description, skin_catalog,
-        fallback_skin, target_class, asset_url, emissive_url, price_usdc, status, sha256, design_spec, updated_at)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14, now())
+        fallback_skin, target_class, asset_url, emissive_url, price_usdc, status, sha256, design_spec,
+        source, origin_url, ipfs_cid, review_status, overflow_hidden, updated_at)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19, now())
      ON CONFLICT (id) DO UPDATE SET
        creator_account_id = EXCLUDED.creator_account_id,
        creator_wallet = EXCLUDED.creator_wallet,
@@ -2237,11 +2276,17 @@ export async function upsertCreatorSkin(row: CreatorSkinRow): Promise<void> {
        status = EXCLUDED.status,
        sha256 = EXCLUDED.sha256,
        design_spec = EXCLUDED.design_spec,
+       source = EXCLUDED.source,
+       origin_url = EXCLUDED.origin_url,
+       ipfs_cid = EXCLUDED.ipfs_cid,
+       review_status = EXCLUDED.review_status,
+       overflow_hidden = EXCLUDED.overflow_hidden,
        updated_at = now()`,
     [
       row.id, row.creatorAccountId, row.creatorWallet, row.name, row.description, row.skinCatalog,
       row.fallbackSkin, row.targetClass, row.assetUrl, row.emissiveUrl, row.priceUsdc.toString(), row.status, row.sha256,
       row.design ? JSON.stringify(row.design) : null,
+      row.source, row.originUrl, row.ipfsCid, row.reviewStatus, row.overflowHidden,
     ],
   );
 }
@@ -2253,6 +2298,118 @@ export async function countLiveCreatorSkinsByAccount(accountId: number): Promise
     [accountId],
   );
   return Number(res.rows[0]?.n ?? 0);
+}
+
+/** Hosted (IPFS-pinned) skins an account holds against its $WOC quota: every
+ *  not-removed hosted row (pending + approved, including overflow-hidden), so a
+ *  pending upload holds a slot and a tier drop is measured against real usage. */
+export async function countHostedSkinsByAccount(accountId: number): Promise<number> {
+  const res = await pool.query(
+    `SELECT count(*)::int AS n FROM creator_skins
+      WHERE creator_account_id = $1 AND source = 'hosted' AND status <> 'removed'`,
+    [accountId],
+  );
+  return Number(res.rows[0]?.n ?? 0);
+}
+
+export interface CreatorTrustRow {
+  approvedCount: number;
+  strikes: number;
+  lastStrikeAt: string | null;
+  trusted: boolean;
+  firstListingAt: string;
+}
+
+/** A creator's moderation-trust record (defaults for an account with no listings yet). */
+export async function getCreatorTrust(accountId: number): Promise<CreatorTrustRow> {
+  const res = await pool.query(
+    `SELECT approved_count, strikes, last_strike_at, trusted, first_listing_at
+       FROM creator_trust WHERE account_id = $1`,
+    [accountId],
+  );
+  const r = res.rows[0];
+  if (!r) return { approvedCount: 0, strikes: 0, lastStrikeAt: null, trusted: false, firstListingAt: new Date().toISOString() };
+  return {
+    approvedCount: Number(r.approved_count),
+    strikes: Number(r.strikes),
+    lastStrikeAt: isoOrNull(r.last_strike_at),
+    trusted: r.trusted === true,
+    firstListingAt: isoOrNull(r.first_listing_at) ?? new Date().toISOString(),
+  };
+}
+
+/** Ensure a trust row exists (records first_listing_at on first listing). */
+export async function ensureCreatorTrust(accountId: number): Promise<void> {
+  await pool.query(
+    `INSERT INTO creator_trust (account_id) VALUES ($1) ON CONFLICT (account_id) DO NOTHING`,
+    [accountId],
+  );
+}
+
+/** Set the persisted trusted flag (recomputed from approvals/tier/age/strikes). */
+export async function setCreatorTrusted(accountId: number, trusted: boolean): Promise<void> {
+  await pool.query(
+    `UPDATE creator_trust SET trusted = $2, updated_at = now() WHERE account_id = $1`,
+    [accountId, trusted],
+  );
+}
+
+/** Increment the approved-listing tally (on an operator/auto approval). */
+export async function bumpApprovedListings(accountId: number): Promise<void> {
+  await pool.query(
+    `INSERT INTO creator_trust (account_id, approved_count) VALUES ($1, 1)
+       ON CONFLICT (account_id) DO UPDATE SET approved_count = creator_trust.approved_count + 1, updated_at = now()`,
+    [accountId],
+  );
+}
+
+/** Record a ToS strike and clear trust (a removed/violating skin). */
+export async function recordCreatorStrike(accountId: number): Promise<void> {
+  await pool.query(
+    `INSERT INTO creator_trust (account_id, strikes, last_strike_at, trusted) VALUES ($1, 1, now(), false)
+       ON CONFLICT (account_id) DO UPDATE SET
+         strikes = creator_trust.strikes + 1, last_strike_at = now(), trusted = false, updated_at = now()`,
+    [accountId],
+  );
+}
+
+/** Set a skin's review status (operator approve/reject). Returns the row, or null if unknown. */
+export async function setCreatorSkinReview(id: string, reviewStatus: 'approved' | 'rejected'): Promise<CreatorSkinRow | null> {
+  const res = await pool.query(
+    `UPDATE creator_skins SET review_status = $2, updated_at = now() WHERE id = $1 RETURNING *`,
+    [id, reviewStatus],
+  );
+  return res.rows[0] ? mapCreatorSkin(res.rows[0]) : null;
+}
+
+/** Image skins awaiting operator review (oldest first). */
+export async function listCreatorSkinsForReview(limit = 100): Promise<CreatorSkinRow[]> {
+  const res = await pool.query(
+    `SELECT * FROM creator_skins
+      WHERE review_status = 'pending' AND source IN ('self_hosted', 'hosted') AND status <> 'removed'
+      ORDER BY created_at LIMIT $1`,
+    [Math.max(1, Math.min(500, Math.floor(limit)))],
+  );
+  return res.rows.map(mapCreatorSkin);
+}
+
+/** A creator's own hosted skins, newest first (for overflow-quota enforcement). */
+export async function listHostedSkinsByAccount(accountId: number): Promise<CreatorSkinRow[]> {
+  const res = await pool.query(
+    `SELECT * FROM creator_skins
+      WHERE creator_account_id = $1 AND source = 'hosted' AND status <> 'removed'
+      ORDER BY created_at DESC`,
+    [accountId],
+  );
+  return res.rows.map(mapCreatorSkin);
+}
+
+/** Park/unpark a hosted skin past its tier quota (overflow hide / restore). */
+export async function setCreatorSkinOverflowHidden(id: string, hidden: boolean): Promise<void> {
+  await pool.query(
+    `UPDATE creator_skins SET overflow_hidden = $2, updated_at = now() WHERE id = $1`,
+    [id, hidden],
+  );
 }
 
 export async function createMarketplaceQuote(q: MarketplaceQuoteRow): Promise<void> {

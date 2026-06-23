@@ -14,6 +14,7 @@ import { randomBytes } from 'node:crypto';
 import { isSolanaAddress } from './wallet_link';
 import { parseSplitPayment, fetchFinalizedTransaction, type ParsedSplitPayment } from './solana_rpc';
 import { normalizeDesignSpec, type SkinDesignSpec } from '../src/world_api';
+import { hostedSlotQuota } from './creator_quota';
 import {
   type CreatorSkinRow, type MarketplaceQuoteRow,
   createMarketplaceQuote, getMarketplaceQuote, deleteMarketplaceQuote,
@@ -250,10 +251,45 @@ export async function createListing(input: ListingInput, creatorAccountId: numbe
     assetUrl: 'procedural', // sentinel — `design` is the real source
     emissiveUrl: null,
     design,
+    source: 'design',
+    originUrl: null,
+    ipfsCid: null,
+    reviewStatus: 'approved', // procedural designs are instant-live (no arbitrary image to moderate)
+    overflowHidden: false,
     priceUsdc: input.priceUsdc,
     status: 'live', // instant-live policy
     sha256: null,
   };
   await upsertCreatorSkin(row);
   return { ok: true, id };
+}
+
+// --- Hosting quota + review gate (the image-mode decision) ------------------
+// Pure: given the creator's $WOC holder tier, trust, and current hosted usage,
+// decide whether a HOSTED upload is allowed and whether it lists instant-live or
+// goes to the review queue. Self-hosted is free (quota not applied) but still
+// review-gated. Kept pure so the security-critical policy is unit-tested without
+// a DB/RPC. Consumers map a denial reason to an HTTP error.
+export type HostingDenyReason = 'hosted_quota_exceeded';
+export interface HostingDecision {
+  allowed: boolean;
+  reason?: HostingDenyReason;
+  reviewStatus: 'pending' | 'approved';
+  quota: number;
+  used: number;
+}
+
+export function hostingDecision(params: {
+  source: 'self_hosted' | 'hosted';
+  tierIndex: number;
+  trusted: boolean;
+  currentHosted: number;
+}): HostingDecision {
+  const quota = hostedSlotQuota(params.tierIndex);
+  // A trusted creator's image listings skip the review queue (instant-live).
+  const reviewStatus: 'pending' | 'approved' = params.trusted ? 'approved' : 'pending';
+  if (params.source === 'hosted' && params.currentHosted >= quota) {
+    return { allowed: false, reason: 'hosted_quota_exceeded', reviewStatus, quota, used: params.currentHosted };
+  }
+  return { allowed: true, reviewStatus, quota, used: params.currentHosted };
 }
