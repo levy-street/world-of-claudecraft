@@ -48,6 +48,7 @@ import { sfx } from '../game/sfx';
 import { voice } from '../game/voice';
 import { music, musicZoneForLocation, shouldResetMusicForDungeonEntry } from '../game/music';
 import { iconDataUrl, QUALITY_COLOR, raidMarkerDataUrl, RAID_MARKER_NAMES } from './icons';
+import { PET_ATTACK_ICON, PET_TAUNT_ICON, PET_STANCE_ICONS, petHealIcon } from './pet_bar_icons';
 import { overworldDungeonPortals } from './map_dungeon_portals';
 import { UnitPortraitPainter } from './unit_portrait_painter';
 import { crestIdForEntity } from './unit_portrait';
@@ -2631,14 +2632,14 @@ export class Hud {
       this.attachTooltip(btn, () => tooltip);
       parent.appendChild(btn);
     };
-    addButton(commands, 'attack', t('hud.pet.attack'), petTooltip(t('hud.pet.petAttackTitle'), t('hud.pet.petAttackDesc')), () => this.sim.petAttack());
-    addButton(commands, 'growl', t('hud.pet.taunt'), petTooltip(t('hud.pet.petTauntTitle'), t('hud.pet.petTauntDesc')), () => this.sim.petTaunt(), { cooldownText: cd > 0 ? `${cd}` : undefined });
+    addButton(commands, PET_ATTACK_ICON, t('hud.pet.attack'), petTooltip(t('hud.pet.petAttackTitle'), t('hud.pet.petAttackDesc')), () => this.sim.petAttack());
+    addButton(commands, PET_TAUNT_ICON, t('hud.pet.taunt'), petTooltip(t('hud.pet.petTauntTitle'), t('hud.pet.petTauntDesc')), () => this.sim.petTaunt(), { cooldownText: cd > 0 ? `${cd}` : undefined });
     if (ownerClass === 'warlock') {
-      addButton(commands, 'drain_life', t('hud.pet.healDemon'), petTooltip(t('hud.pet.healDemon'), t('hud.pet.healDemonDesc')), () => {
+      addButton(commands, petHealIcon(ownerClass), t('hud.pet.healDemon'), petTooltip(t('hud.pet.healDemon'), t('hud.pet.healDemonDesc')), () => {
         this.sim.healPet();
       });
     } else {
-      addButton(commands, 'rejuvenation', t('hud.pet.healPet'), petTooltip(t('hud.pet.healPet'), t('hud.pet.healPetDesc')), () => {
+      addButton(commands, petHealIcon(ownerClass), t('hud.pet.healPet'), petTooltip(t('hud.pet.healPet'), t('hud.pet.healPetDesc')), () => {
         // Toggle: a second click cancels the pending feed instead of trapping
         // the player in food-selection mode.
         if (this.pendingPetFeed) { this.cancelPetFeed(); return; }
@@ -2656,7 +2657,7 @@ export class Hud {
       { mode: 'defensive', labelKey: PET_MODE_LABEL_KEYS.defensive, descKey: PET_MODE_DESC_KEYS.defensive },
       { mode: 'aggressive', labelKey: PET_MODE_LABEL_KEYS.aggressive, descKey: PET_MODE_DESC_KEYS.aggressive },
     ];
-    const modeIcons: Record<PetMode, string> = { passive: 'prowl', defensive: 'defensive_stance', aggressive: 'rapid_fire' };
+    const modeIcons = PET_STANCE_ICONS;
     addButton(stances, modeIcons[mode], petModeLabel(mode), petTooltip(`${t('hud.pet.stanceTitle')}: ${petModeLabel(mode)}`, t('hud.pet.stanceDesc')), () => {
       this.petModeMenuOpen = !this.petModeMenuOpen;
       this.lastPetBarSig = '';

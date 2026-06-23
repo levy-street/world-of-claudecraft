@@ -1228,6 +1228,12 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   aspect_of_the_cheetah: r('nature', 'leafGreen', ['boot', { p: 'paw', ...BR }], ['motion']),
   aimed_shot: r('steel', 'steel', ['crosshair', { p: 'arrow', ...BR }]),
   rapid_fire: r('fury', 'steel', ['arrow'], ['motion']),
+  // pet bar (not class abilities): drawn on the Hunter/Warlock pet command bar.
+  // Kept distinct from every class ability icon so a pet action never duplicates
+  // a skill the owner also has on their own action bar (see pet_bar_icons.ts).
+  feed_pet: r('food', 'ember', ['meat'], ['glow']),
+  mend_demon: r('shadow', 'venom', ['heart', { p: 'droplet', ...BR }], ['glow']),
+  pet_aggressive: r('fury', 'blood', ['fang'], ['motion']),
   // priest
   heal: r('holy', 'holyGold', ['cross'], ['sparkle']),
   flash_heal: r('holy', 'holyGold', ['cross'], ['motion']),
