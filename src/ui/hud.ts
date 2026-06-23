@@ -342,6 +342,7 @@ import {
 } from './wallet_balance';
 import { makeWindowFocus } from './window_focus';
 import { installWindowResize, markResizableWindow } from './window_resize';
+import { isWindowOpen } from './window_toggle';
 import { formatXp, xpBarView } from './xp_bar';
 import { XpBarPainter } from './xp_bar_painter';
 
@@ -6715,7 +6716,7 @@ export class Hud {
 
   toggleMap(): void {
     const el = $('#map-window');
-    if (el.style.display === 'block') {
+    if (isWindowOpen(el.style.display)) {
       el.style.display = 'none';
       return;
     }
@@ -9657,7 +9658,7 @@ export class Hud {
 
   toggleBags(): void {
     const el = $('#bags');
-    if (el.style.display !== 'none') {
+    if (isWindowOpen(el.style.display)) {
       // Close through the painter so focus returns to the opener (WCAG 2.4.3); close()
       // owns the hide + tooltip + pet-feed teardown, so keep only the audio cue here.
       audio.bagClose();
