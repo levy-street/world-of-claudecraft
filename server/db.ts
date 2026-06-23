@@ -3,6 +3,7 @@ import { LEADERBOARD_MAX } from '../src/sim/leaderboard_page';
 import { sanitizeRemovedZone1Content } from '../src/sim/removed_zone1_content';
 import type { CharacterState, MarketSave } from '../src/sim/sim';
 import type { ArenaFormat, PlayerClass } from '../src/sim/types';
+import { WAGER_MATCH_SCHEMA } from './arena_wager_db';
 import { seedChatFilterDefaults } from './chat_filter_db';
 import type { ChatLogRow } from './chat_log';
 import { FLOW_LEDGER_SCHEMA } from './flow_ledger_db';
@@ -434,6 +435,7 @@ export async function ensureSchema(): Promise<void> {
     await client.query(OAUTH_SCHEMA);
     await client.query(FLOW_LEDGER_SCHEMA);
     await client.query(BUYBACK_BATCHES_SCHEMA);
+    await client.query(WAGER_MATCH_SCHEMA);
     // Seed the chat-filter word lists + config on first boot only (idempotent).
     // Runs under the same advisory lock so concurrent realm boots don't race.
     await seedChatFilterDefaults(client);
