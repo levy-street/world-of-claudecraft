@@ -46,3 +46,9 @@ Thumbs.db
 .claude/*
 !.claude/skills/
 !.claude/agents/
+
+# .codex/: mirror .claude/ for Codex-local config, tracking shared skills/agents/config.
+.codex/*
+!.codex/skills/
+!.codex/agents/
+!.codex/config.toml
