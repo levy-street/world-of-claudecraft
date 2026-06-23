@@ -544,13 +544,11 @@ async function serveCardPage(req: http.IncomingMessage, res: http.ServerResponse
     res.end(missingCardHtml(origin, requestLocale(req)));
     return;
   }
-  // Version the og:image URL by the card's last-publish time so a re-published
-  // card (e.g. after a level-up) busts social/browser image caches that key on
-  // the otherwise-stable /p/<slug>/card.png URL and would keep serving the old PNG.
-  const parsedVersion = card.updatedAt ? Date.parse(card.updatedAt) : NaN;
-  const version = Number.isFinite(parsedVersion) ? parsedVersion : 0;
+  // Version the og:image URL by the card's last-publish time (epoch ms) so a
+  // re-published card (e.g. after a level-up) busts social/browser image caches
+  // that key on the otherwise-stable /p/<slug>/card.png URL and serve the old PNG.
   res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=120' });
-  res.end(cardPageHtml({ slug, title: card.title, description: card.description, locale: normalizePublicCardLocale(card.locale), origin, version }));
+  res.end(cardPageHtml({ slug, title: card.title, description: card.description, locale: normalizePublicCardLocale(card.locale), origin, version: card.updatedAt }));
 }
 
 function cardPageHtml(opts: { slug: string; title: string; description: string; locale: PublicCardLocale; origin: string; version: number }): string {

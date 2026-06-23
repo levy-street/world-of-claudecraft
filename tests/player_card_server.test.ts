@@ -253,7 +253,7 @@ describe('POST /api/card', () => {
 
   it('falls back to the saved level when the reported level is absent or invalid', async () => {
     characterRows = [{ id: 5, account_id: 1, name: 'Sir Test', class: 'paladin', level: 12 }];
-    for (const url of ['/api/card?character=5', '/api/card?character=5&level=0', '/api/card?character=5&level=abc', '/api/card?character=5&level=1.5']) {
+    for (const url of ['/api/card?character=5', '/api/card?character=5&level=0', '/api/card?character=5&level=-3', '/api/card?character=5&level=abc', '/api/card?character=5&level=1.5']) {
       dbMock.query.mockClear();
       slugRows = [];
       const { status } = await callUpload(url, validCardPng);
@@ -261,6 +261,33 @@ describe('POST /api/card', () => {
       const insert = dbMock.query.mock.calls.find((c) => String(c[0]).includes('INSERT INTO player_cards'));
       expect(insert?.[1][4]).toBe('Sir Test - Level 12 Paladin');
     }
+  });
+
+  it('prefers the JSONB state.level over the denormalized column when no level is reported', async () => {
+    // The column can lag state by an autosave window; state.level is the fresher
+    // server-side value, so it wins over the column when the client sends nothing.
+    characterRows = [{ id: 5, account_id: 1, name: 'Sir Test', class: 'paladin', level: 12, state: { level: 14 } }];
+    slugRows = [];
+    const { status } = await callUpload('/api/card?character=5', validCardPng);
+    expect(status).toBe(200);
+    const insert = dbMock.query.mock.calls.find((c) => String(c[0]).includes('INSERT INTO player_cards'));
+    expect(insert?.[1][4]).toBe('Sir Test - Level 14 Paladin');
+  });
+
+  it('accepts a level at the upper bound but rejects one past it', async () => {
+    characterRows = [{ id: 5, account_id: 1, name: 'Sir Test', class: 'paladin', level: 12 }];
+    slugRows = [];
+    const atBound = await callUpload('/api/card?character=5&level=1000', validCardPng);
+    expect(atBound.status).toBe(200);
+    expect(dbMock.query.mock.calls.find((c) => String(c[0]).includes('INSERT INTO player_cards'))?.[1][4])
+      .toBe('Sir Test - Level 1000 Paladin');
+
+    dbMock.query.mockClear();
+    slugRows = [];
+    const pastBound = await callUpload('/api/card?character=5&level=1001', validCardPng);
+    expect(pastBound.status).toBe(200);
+    expect(dbMock.query.mock.calls.find((c) => String(c[0]).includes('INSERT INTO player_cards'))?.[1][4])
+      .toBe('Sir Test - Level 12 Paladin');
   });
 
   it('stores localized public-page metadata using the upload locale', async () => {
@@ -436,6 +463,17 @@ describe('GET /p/<slug>', () => {
     expect(html).toContain('desc &amp; more');
     expect(html).not.toContain('<b>A "Quote"');
     expect(res.headers['Cache-Control']).toBe('public, max-age=120');
+  });
+
+  it('serves a bare (unversioned) og:image when the card has no updated_at', async () => {
+    // No timestamp (e.g. a legacy row) means no cache-buster: the URL stays the
+    // plain /card.png with no ?v=, which is exactly the no-version code path.
+    cardRows = [{ character_id: 5, account_id: 1, png: validCardPng, title: 't', description: 'd', locale: 'en' }];
+    const res = makeRes();
+    await handleCardRoutes(makeGetReq('/p/sir-test'), res);
+    const html = String(res.body);
+    expect(html).toContain('property="og:image" content="http://realm.example/p/sir-test/card.png"');
+    expect(html).not.toContain('card.png?v=');
   });
 
   it('cache-busts the og:image with the card updated_at so a re-published card is re-fetched', async () => {
