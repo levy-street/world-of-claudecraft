@@ -4556,6 +4556,13 @@
   .ro-hint { font-size: 11px; color: #998d6a; margin: 6px 0 0; line-height: 1.4; }
   .ro-hint-muted { color: #6f664d; }
   .ro-hint-badge { color: #6fe08a; }
+  #realm-affiliate-panel { width: 100%; max-width: 560px; }
+  #realm-affiliate-body { margin: 6px 0 10px; }
+  .ro-aff-note { font-size: 12px; color: #c9a240; margin: 0 0 12px; line-height: 1.45;
+    border-left: 2px solid #6e5a2c; padding-left: 9px; }
+  .ra-link-row { display: flex; gap: 8px; align-items: stretch; }
+  .ra-link { flex: 1; min-width: 0; font-family: var(--mono-font, monospace); font-size: 13px; }
+  .ra-copy { min-height: 44px; white-space: nowrap; flex-shrink: 0; }
   .ro-field { margin-bottom: 12px; }
   .ro-label { display: block; font-family: var(--title-font); font-size: 12px; color: #c9b27a; margin-bottom: 5px; }
   .ro-input { width: 100%; box-sizing: border-box; background: #0d0d14; color: #f0ead8;
@@ -8059,7 +8066,16 @@
           <div id="realm-list"><div class="realm-loading" data-i18n="auth.loadingRealms">Loading realms...</div></div>
           <div class="auth-actions auth-actions-split">
             <button type="button" class="btn btn-secondary" id="btn-realm-back" data-i18n="auth.back">Back</button>
+            <button type="button" class="btn btn-secondary" id="btn-realm-affiliate" data-i18n="realmOp.affiliate.open">Affiliate Program</button>
             <button type="button" class="btn btn-primary" id="btn-realm-found" data-i18n="realmOp.open">Found a Realm</button>
+          </div>
+        </div>
+
+        <div id="realm-affiliate-panel" class="panel auth-panel auth-panel-premium" hidden>
+          <h2 class="auth-title"><span data-i18n="realmOp.affiliate.title">Affiliate Program</span> <span id="realm-affiliate-user" class="cs-realm"></span></h2>
+          <div id="realm-affiliate-body"></div>
+          <div class="auth-actions auth-actions-split">
+            <button type="button" class="btn btn-secondary" id="btn-realm-affiliate-back" data-i18n="realmOp.back">Back</button>
           </div>
         </div>
 

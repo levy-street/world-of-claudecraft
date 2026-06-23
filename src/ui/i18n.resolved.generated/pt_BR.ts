@@ -34,6 +34,7 @@ export const pt_BR: EnTranslations = {
       "tierHint": "A larger stake unlocks a higher tier: more players, more customization budget, and operator payout rails.",
       "supplyNote": "Each tier is priced as a share of the live $WOC supply.",
       "badgeNote": "Your staked $WOC keeps counting toward your holder badge, so founding a realm never lowers your tier.",
+      "affiliateNote": "Referred by an affiliate. They earn a 15% commission on this realm's revenue.",
       "tiersUnavailable": "Live tier pricing is unavailable right now. Try again shortly.",
       "submit": "Stake and Found",
       "submitConnect": "Connect Wallet to Found",
@@ -63,6 +64,22 @@ export const pt_BR: EnTranslations = {
       "active": "Active",
       "provisioning": "Provisioning",
       "decommissioning": "Decommissioning"
+    },
+    "affiliate": {
+      "open": "Affiliate Program",
+      "title": "Affiliate Program",
+      "subtitle": "Share your link. When someone founds a realm through it, you earn a 15% commission on that realm's revenue, paid in USDC.",
+      "yourLink": "Your affiliate link",
+      "copy": "Copy link",
+      "copied": "Copied",
+      "loading": "Loading your affiliate stats...",
+      "referredTitle": "Realms you referred",
+      "referredCount": "{count} active referred realm",
+      "referredCountPlural": "{count} active referred realms",
+      "empty": "No referred realms yet. Share your link to start earning.",
+      "commission": "{pct}% commission",
+      "earningsSoon": "USDC commissions start paying out when in-realm revenue goes live.",
+      "unavailable": "Affiliate stats are unavailable right now. Try again shortly."
     },
     "flow": {
       "connecting": "Connecting your wallet...",

@@ -37,6 +37,7 @@ import {
 } from './realm_quote_db';
 import { minStakeBase, tierForStake, TIER_BPS, tierThreshold } from './realm_tiers';
 import { invalidateWalletHoldings } from './realm_stake_holdings';
+import { accountForAffiliateCode, setRealmAffiliate } from './affiliate_db';
 
 function intEnv(key: string, def: number, min: number, max: number): number {
   const v = Number.parseInt(process.env[key] ?? '', 10);
@@ -53,6 +54,10 @@ const QUOTE_TTL_MS = intEnv('REALM_QUOTE_TTL_MINUTES', 30, 1, 1440) * 60_000;
 // The off-chain decommission timelock the UI shows. The on-chain RealmStake
 // unlock_eligible_slot set by the program is authoritative for the release.
 const UNSTAKE_TIMELOCK_MS = intEnv('REALM_UNSTAKE_TIMELOCK_SECONDS', 259_200, 0, 31_536_000) * 1000;
+// The affiliate commission, in basis points of a referred realm's revenue, paid
+// to the salesperson whose link got it founded (drawn from the operator's share).
+// Default 1500 = 15%. Capped at 5000 (50%) as a sanity bound.
+const AFFILIATE_BPS = intEnv('REALM_AFFILIATE_BPS', 1500, 0, 5000);
 
 export type Result<T> = ({ ok: true } & T) | { ok: false; status: number; error: string };
 function fail(status: number, error: string): { ok: false; status: number; error: string } {
@@ -205,6 +210,7 @@ export interface ProvisionQuote {
   stakePda: string;
   vault: string;
   expiresAt: string;
+  affiliateApplied: boolean; // true when a valid affiliate link was attributed to this realm
 }
 
 // Issue a provision quote: validate the name (charset, profanity, uniqueness)
@@ -213,7 +219,7 @@ export interface ProvisionQuote {
 // client locks exactly amountBase into the returned vault, then calls confirm.
 export async function prepareProvisionQuote(
   pool: Pool,
-  args: { accountId: number; ownerWallet: string; name: string; type: RealmType; amountBase: bigint },
+  args: { accountId: number; ownerWallet: string; name: string; type: RealmType; amountBase: bigint; affiliateCode?: string },
 ): Promise<Result<ProvisionQuote>> {
   // Cheap, no-DB name checks first so a bad name short-circuits before any query.
   const name = args.name.trim();
@@ -246,6 +252,20 @@ export async function prepareProvisionQuote(
     throw err;
   }
 
+  // Affiliate attribution (#475): if the founder arrived via a salesperson's
+  // affiliate link, credit that affiliate with AFFILIATE_BPS of this realm's
+  // revenue (paid from the operator's share when the #477 revenue rails land).
+  // First-touch, never a self-referral. Best-effort: an unknown code or a
+  // self-referral simply attaches no affiliate; founding never fails on it.
+  let affiliateApplied = false;
+  if (args.affiliateCode) {
+    const affiliateAccountId = await accountForAffiliateCode(pool, args.affiliateCode);
+    if (affiliateAccountId !== null && affiliateAccountId !== args.accountId) {
+      await setRealmAffiliate(pool, { realmId, affiliateAccountId, bps: AFFILIATE_BPS });
+      affiliateApplied = true;
+    }
+  }
+
   const quoteId = randomUUID();
   const expiresAt = new Date(Date.now() + QUOTE_TTL_MS);
   await createRealmQuote(pool, {
@@ -274,6 +294,7 @@ export async function prepareProvisionQuote(
     stakePda: stakePda.toBase58(),
     vault: vault.toBase58(),
     expiresAt: expiresAt.toISOString(),
+    affiliateApplied,
   };
 }
 

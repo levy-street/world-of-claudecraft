@@ -10,6 +10,7 @@ import { seedChatFilterDefaults } from './chat_filter_db';
 import { REALM_SCHEMA, seedDefaultRealm, assertRealmSchema } from './realm_db';
 import { REALM_STAKE_SCHEMA } from './realm_stake_db';
 import { REALM_QUOTE_SCHEMA } from './realm_quote_db';
+import { AFFILIATE_SCHEMA } from './affiliate_db';
 import { REALM } from './realm';
 
 try {
@@ -314,6 +315,7 @@ export async function ensureSchema(): Promise<void> {
     await client.query(REALM_SCHEMA);
     await client.query(REALM_STAKE_SCHEMA);
     await client.query(REALM_QUOTE_SCHEMA);
+    await client.query(AFFILIATE_SCHEMA); // affiliate_codes + realm_affiliates (references realms + accounts)
     // Fail fast at boot on realm schema drift (CREATE IF NOT EXISTS is a no-op
     // against a pre-existing table missing a newer column).
     await assertRealmSchema(client);

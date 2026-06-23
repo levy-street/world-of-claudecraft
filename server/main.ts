@@ -39,6 +39,7 @@ import { handlePerfReport } from './perf_report';
 import { GameServer } from './game';
 import { REALM, REALM_DIRECTORY, REALM_ORIGINS, mergeRealmDirectory, resolveRealmType } from './realm';
 import { listRealmsForDirectory, listRealmsForOwner } from './realm_db';
+import { getOrCreateAffiliateCode, affiliateRealmCount, listRealmsByAffiliate } from './affiliate_db';
 import {
   prepareProvisionQuote,
   confirmProvisionQuote,
@@ -571,6 +572,34 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       }));
       return json(res, 200, { realms });
     }
+    // Affiliate program (#475): the account's stable affiliate code (created on
+    // first call) so the client can build its /?aff= link, plus a live count of
+    // the realms it has referred.
+    if (req.method === 'GET' && url === '/api/affiliate/me') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      const [code, referredCount] = await Promise.all([
+        getOrCreateAffiliateCode(pool, accountId),
+        affiliateRealmCount(pool, accountId),
+      ]);
+      return json(res, 200, { code, referredCount });
+    }
+    // The realms an account has referred as an affiliate, with the commission bps,
+    // for the affiliate dashboard. Owner-scoped, no chain read.
+    if (req.method === 'GET' && url === '/api/affiliate/realms') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      const realms = (await listRealmsByAffiliate(pool, accountId)).map((r) => ({
+        realmId: r.realmId,
+        name: r.name,
+        type: r.type,
+        status: r.status,
+        tier: r.tier,
+        bps: r.bps,
+        attributedAt: r.attributedAt.toISOString(),
+      }));
+      return json(res, 200, { realms });
+    }
     // Tier price list for the founding UI: the live $WOC supply and the base-unit
     // stake each tier (bronze/silver/gold) costs against it. Authed (the founding
     // screen is post-login) and rate-limited, since it reads the supply RPC; the
@@ -602,7 +631,12 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       // base-unit supply (~15 digits) yet blocks a pathological multi-KB digit
       // string forcing a slow BigInt parse.
       if (!/^[0-9]+$/.test(amount) || amount.length > 78) return json(res, 400, { error: 'invalid_amount' });
-      const result = await prepareProvisionQuote(pool, { accountId, ownerWallet: wallet.pubkey, name, type, amountBase: BigInt(amount) });
+      // Optional affiliate code from the founder's ?aff= link. Bounded so an
+      // unknown/oversized value can't be used to probe; resolution is best-effort
+      // server-side (an unknown code simply attaches no affiliate).
+      const affRaw = typeof body.affiliateCode === 'string' ? body.affiliateCode.trim() : '';
+      const affiliateCode = affRaw.length > 0 && affRaw.length <= 64 ? affRaw : undefined;
+      const result = await prepareProvisionQuote(pool, { accountId, ownerWallet: wallet.pubkey, name, type, amountBase: BigInt(amount), affiliateCode });
       if (!result.ok) return json(res, result.status, { error: result.error });
       return json(res, 200, result);
     }

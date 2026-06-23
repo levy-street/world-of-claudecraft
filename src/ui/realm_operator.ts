@@ -37,13 +37,17 @@ export interface RealmOperatorHost {
   // Sign + send the on-chain $WOC lock for a quote. Resolves to the lock
   // signature, or null if the player cancelled. Throws Error(localized) on failure.
   signLock(quote: ProvisionQuote): Promise<string | null>;
+  // The affiliate code captured from a ?aff= link, or null. Sent with the quote so
+  // a referred realm credits the salesperson; the panel shows a note when present.
+  affiliateCode(): string | null;
   // Enter a realm the operator owns (reuses the realm-list selection flow).
   enterRealm(realm: OwnedRealm): void;
   // Close the panel (return to the realm list).
   close(): void;
 }
 
-const TYPE_LABEL: Record<RealmType, TranslationKey> = {
+// Shared realm label maps (also consumed by the affiliate panel).
+export const TYPE_LABEL: Record<RealmType, TranslationKey> = {
   Normal: 'realmTypes.normal',
   PvP: 'realmTypes.pvp',
   RP: 'realmTypes.rp',
@@ -56,7 +60,7 @@ const TIER_LABEL: Record<RealmTierOption['name'], TranslationKey> = {
   gold: 'realmOp.tier.gold',
 };
 
-const STATUS_LABEL: Record<string, TranslationKey> = {
+export const STATUS_LABEL: Record<string, TranslationKey> = {
   active: 'realmOp.status.active',
   provisioning: 'realmOp.status.provisioning',
   decommissioning: 'realmOp.status.decommissioning',
@@ -162,6 +166,7 @@ export class RealmOperator {
         <section class="ro-found" aria-labelledby="ro-found-h">
           <h3 id="ro-found-h" class="ro-h">${esc(t('realmOp.found.title'))}</h3>
           <p class="ro-sub">${esc(t('realmOp.found.subtitle'))}</p>
+          ${this.host.affiliateCode() ? `<p class="ro-aff-note">${esc(t('realmOp.found.affiliateNote'))}</p>` : ''}
           <div class="ro-field">
             <label class="ro-label" for="ro-name">${esc(t('realmOp.found.nameLabel'))}</label>
             <input id="ro-name" class="ro-input" type="text" maxlength="24" autocomplete="off"
@@ -303,7 +308,7 @@ export class RealmOperator {
 
       this.setStatus(t('realmOp.flow.quoting'), 'info');
       const type = (this.typeSelect.value as RealmType) || 'Normal';
-      const quote = await this.host.api.quoteRealm(name, type, tier.amountBase);
+      const quote = await this.host.api.quoteRealm(name, type, tier.amountBase, this.host.affiliateCode() ?? undefined);
 
       this.setStatus(t('realmOp.flow.locking'), 'info');
       const lockSig = await this.host.signLock(quote);

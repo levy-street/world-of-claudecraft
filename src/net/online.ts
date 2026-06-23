@@ -121,6 +121,25 @@ export interface ProvisionQuote {
   stakePda: string;
   vault: string;
   expiresAt: string;
+  affiliateApplied: boolean; // true when a valid affiliate link was credited to this realm
+}
+
+// The signed-in account's affiliate identity (GET /api/affiliate/me): a stable
+// code for building the /?aff= link, plus how many realms it has referred.
+export interface AffiliateInfo {
+  code: string;
+  referredCount: number;
+}
+
+// One realm an account referred as an affiliate (GET /api/affiliate/realms).
+export interface AffiliateRealm {
+  realmId: number;
+  name: string;
+  type: RealmType;
+  status: RealmStatus;
+  tier: number;
+  bps: number; // commission in basis points (1500 = 15%)
+  attributedAt: string; // ISO 8601
 }
 
 // A published GitHub release, as surfaced by the server's /api/releases proxy
@@ -213,8 +232,20 @@ export class Api {
 
   // Reserve a provisioning realm and return the escrow target. `amount` is the
   // base-unit stake (a decimal string, since it can exceed Number.MAX_SAFE_INTEGER).
-  quoteRealm(name: string, type: RealmType, amount: string): Promise<ProvisionQuote> {
-    return this.post('/api/realms/quote', { name, type, amount });
+  // `affiliateCode` (from a captured ?aff= link) credits the referring salesperson.
+  quoteRealm(name: string, type: RealmType, amount: string, affiliateCode?: string): Promise<ProvisionQuote> {
+    return this.post('/api/realms/quote', { name, type, amount, affiliateCode });
+  }
+
+  // The account's affiliate code + referred-realm count (code created on first call).
+  affiliateInfo(): Promise<AffiliateInfo> {
+    return this.get('/api/affiliate/me');
+  }
+
+  // The realms this account has referred as an affiliate, with commission bps.
+  async affiliateRealms(): Promise<AffiliateRealm[]> {
+    const d = await this.get('/api/affiliate/realms');
+    return d.realms ?? [];
   }
 
   // Confirm a quote with the finalized on-chain lock signature; activates the realm.

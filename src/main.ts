@@ -17,6 +17,7 @@ import { activePvpOpponentIds, handlePickedEntity, hoverCursorKind, isAttackable
 import { clickMoveShouldCancel, clickMoveShouldWalk, clickMoveStep, distance2d, latencyAdjustedStopDistance, stepAngleToward } from './game/click_move';
 import { Api, isAuthError, ClientWorld, CharacterSummary, type ReleaseEntry, type OwnedRealm, type ProvisionQuote } from './net/online';
 import { RealmOperator } from './ui/realm_operator';
+import { RealmAffiliate } from './ui/realm_affiliate';
 import { setWalletDisplayAvailable, setWocBalance, setWalletUiEnabled, resolveWocBalanceUpdate } from './ui/wallet_balance';
 import { setWocSeason, setWocSeasonUiEnabled } from './ui/woc_season';
 import {
@@ -1510,6 +1511,22 @@ const REFERRAL_SLUG = (() => {
   return /^[a-z0-9][a-z0-9-]{0,63}$/.test(slug) ? slug : '';
 })();
 
+// (?aff=<code>) carries a salesperson's affiliate code into realm founding, so a
+// realm they get founded credits them a 15% revenue commission. Read once at load
+// and persisted to localStorage so it survives the login/registration hop and any
+// browsing before the player founds; a fresh ?aff= wins, else the last stored one.
+const AFF_KEY = 'woc_aff';
+const AFFILIATE_CODE = (() => {
+  const raw = (new URLSearchParams(location.search).get('aff') ?? '').trim();
+  const fresh = /^[A-Za-z0-9_-]{1,64}$/.test(raw) ? raw : '';
+  try {
+    if (fresh) localStorage.setItem(AFF_KEY, fresh);
+    return fresh || (localStorage.getItem(AFF_KEY) ?? '');
+  } catch {
+    return fresh;
+  }
+})();
+
 let activeTransitionTimeout: number | null = null;
 let activeTransitionCleanup: (() => void) | null = null;
 let characterPreview: CharacterPreview | null = null;
@@ -1774,7 +1791,7 @@ function show(el: string): void {
     }
   }
 
-  const panels = ['#mode-select', '#login-panel', '#realm-panel', '#realm-operator-panel', '#charselect-panel', '#charcreate-panel', '#offline-select'];
+  const panels = ['#mode-select', '#login-panel', '#realm-panel', '#realm-operator-panel', '#realm-affiliate-panel', '#charselect-panel', '#charcreate-panel', '#offline-select'];
   document.body.dataset.startPanel = el.slice(1);
 
   // Find currently visible panel
@@ -3701,11 +3718,27 @@ function openRealmOperator(): void {
       linkedWallet: () => linkedWalletPubkey,
       ensureWalletReady: ensureRealmWalletReady,
       signLock: signRealmLock,
+      affiliateCode: () => AFFILIATE_CODE || null,
       enterRealm: (realm: OwnedRealm) => selectRealm({ name: realm.name, url: realm.url, type: realm.type }),
       close: () => showRealmList(),
     });
   }
   void realmOperator.open();
+}
+
+let realmAffiliate: RealmAffiliate | null = null;
+function openRealmAffiliate(): void {
+  show('#realm-affiliate-panel');
+  const userEl = document.getElementById('realm-affiliate-user');
+  if (userEl) userEl.textContent = api.username ?? '';
+  if (!realmAffiliate) {
+    realmAffiliate = new RealmAffiliate($('#realm-affiliate-body') as HTMLElement, {
+      api,
+      origin: () => location.origin,
+      close: () => showRealmList(),
+    });
+  }
+  void realmAffiliate.open();
 }
 
 function wireWallet(): void {
@@ -4227,6 +4260,11 @@ function wireStartScreens(): void {
   ($('#btn-realm-found') as HTMLElement).hidden = !WALLET_ENABLED;
   $('#btn-realm-found').addEventListener('click', () => openRealmOperator());
   $('#btn-realm-operator-back').addEventListener('click', () => showRealmList());
+  // Affiliate program: any account can grab a link + see referred realms. Needs
+  // the wallet feature (founding, and the USDC payout, are on-chain).
+  ($('#btn-realm-affiliate') as HTMLElement).hidden = !WALLET_ENABLED;
+  $('#btn-realm-affiliate').addEventListener('click', () => openRealmAffiliate());
+  $('#btn-realm-affiliate-back').addEventListener('click', () => showRealmList());
   // Change Realm is now an inline dropdown on the character-select screen.
   $('#btn-change-realm').addEventListener('click', (e) => {
     e.stopPropagation();
