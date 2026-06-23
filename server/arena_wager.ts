@@ -29,7 +29,9 @@ export type WagerClientMsg =
   | { t: 'wager_match'; matchId: string; role: 'creator' | 'opponent'; stakeBase: string; unsignedTxB64: string }
   | { t: 'wager_phase'; matchId: string; phase: WagerPhase }
   | { t: 'wager_result'; matchId: string; outcome: 'won' | 'lost' | 'draw'; signature: string; payoutBase: string; burnBase: string }
-  | { t: 'wager_cancelled'; matchId: string; reason: 'stake_timeout' | 'opponent_left' };
+  // cancelTxB64 is present for a creator who already staked: the unsigned
+  // cancel_match tx for them to sign and reclaim their stake.
+  | { t: 'wager_cancelled'; matchId: string; reason: 'stake_timeout' | 'opponent_left'; cancelTxB64?: string };
 
 interface MatchState {
   matchId: bigint;
@@ -53,7 +55,14 @@ export interface ArenaWagerDeps {
   stakeTimeoutMs: number;
   /** Monotonic on-chain match id allocator. */
   nextMatchId: () => bigint;
+  /** Stake bounds (base units), inclusive. Floor blocks dust-spam; ceiling blocks a whale pot starving the season budget. */
+  minStakeBase: bigint;
+  maxStakeBase: bigint;
 }
+
+/** Why an enqueue was refused, so the WS layer can tell the client. */
+export type EnqueueReason = 'stake_below_min' | 'stake_above_max' | 'already_queued';
+export type EnqueueResult = { ok: true; queued: boolean } | { ok: false; reason: EnqueueReason };
 
 export class ArenaWagerCoordinator {
   private readonly queue: WagerParticipant[] = [];
@@ -62,16 +71,27 @@ export class ArenaWagerCoordinator {
 
   constructor(private readonly deps: ArenaWagerDeps) {}
 
-  /** Queue a player for a wagered 1v1 at `stakeBase`. Pairs with the first equal-stake waiter. */
-  async enqueue(p: WagerParticipant): Promise<void> {
-    if (this.pidToMatch.has(p.pid) || this.queue.some((q) => q.pid === p.pid)) return;
-    const partnerIdx = this.queue.findIndex((q) => q.stakeBase === p.stakeBase);
+  /**
+   * Queue a player for a wagered 1v1 at `stakeBase`. Enforces the stake bounds and
+   * pairs with the first equal-stake waiter whose WALLET differs (a same-wallet
+   * pairing is one person matching themselves to move/launder tokens, so it is
+   * never made). Returns whether the player was queued or immediately paired, or a
+   * refusal reason. The holder / hold-to-queue gate is applied by the WS layer
+   * before calling this (it owns the balance read).
+   */
+  async enqueue(p: WagerParticipant): Promise<EnqueueResult> {
+    if (p.stakeBase < this.deps.minStakeBase) return { ok: false, reason: 'stake_below_min' };
+    if (p.stakeBase > this.deps.maxStakeBase) return { ok: false, reason: 'stake_above_max' };
+    if (this.pidToMatch.has(p.pid) || this.queue.some((q) => q.pid === p.pid)) return { ok: false, reason: 'already_queued' };
+
+    const partnerIdx = this.queue.findIndex((q) => q.stakeBase === p.stakeBase && !q.wallet.equals(p.wallet));
     if (partnerIdx < 0) {
       this.queue.push(p);
-      return;
+      return { ok: true, queued: true };
     }
     const partner = this.queue.splice(partnerIdx, 1)[0];
     await this.pair(partner, p);
+    return { ok: true, queued: false };
   }
 
   /** Remove a player from the queue (no effect once they are in a match). */
@@ -109,7 +129,7 @@ export class ArenaWagerCoordinator {
     else if (pid === m.opponent.pid) m.joinSig = signature;
     else return;
     if (!m.openSig || !m.joinSig) return;
-    if (!(await this.deps.escrow.bothStaked({ matchId: m.matchId, stakeBase: m.stakeBase }))) return;
+    if (!(await this.deps.escrow.bothStaked({ matchId: m.matchId }))) return;
     if (!this.deps.startBout(m.creator.pid, m.opponent.pid)) return; // no arena slot yet; retried when the next stake report or poll re-checks
     m.phase = 'in_bout';
     this.broadcastPhase(m);
@@ -154,17 +174,25 @@ export class ArenaWagerCoordinator {
     this.finish(m);
   }
 
-  /** Drive stake timeouts; call once per server loop tick with the current time. */
-  poll(): void {
+  /**
+   * Drive stake timeouts; call once per server loop tick. A pairing that has not
+   * fully staked within stakeTimeoutMs is cancelled. Only the creator can have a
+   * lone stake at this point (the opponent cannot join before the creator opens),
+   * so if the creator already staked we hand them the unsigned cancel_match tx to
+   * sign and reclaim their stake; the opponent who never staked has nothing to
+   * reclaim.
+   */
+  async poll(): Promise<void> {
     const now = this.deps.now();
     for (const m of [...this.matches.values()]) {
-      if (m.phase === 'awaiting_stakes' && now - m.pairedAtMs >= this.deps.stakeTimeoutMs) {
-        m.phase = 'cancelled';
-        for (const part of [m.creator, m.opponent]) {
-          this.deps.notify(part.pid, { t: 'wager_cancelled', matchId: m.matchId.toString(), reason: 'stake_timeout' });
-        }
-        this.finish(m);
-      }
+      if (m.phase !== 'awaiting_stakes' || now - m.pairedAtMs < this.deps.stakeTimeoutMs) continue;
+      m.phase = 'cancelled';
+      const cancelTxB64 = m.openSig
+        ? serializeUnsigned(await this.deps.escrow.buildCancelTx({ matchId: m.matchId, creator: m.creator.wallet }))
+        : undefined;
+      this.deps.notify(m.creator.pid, { t: 'wager_cancelled', matchId: m.matchId.toString(), reason: 'stake_timeout', cancelTxB64 });
+      this.deps.notify(m.opponent.pid, { t: 'wager_cancelled', matchId: m.matchId.toString(), reason: 'stake_timeout' });
+      this.finish(m);
     }
   }
 

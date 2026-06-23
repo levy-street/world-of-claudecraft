@@ -169,11 +169,17 @@ pub mod woc_escrow {
     /// Locked only. This is the only Locked exit other than settle, so a drawn
     /// pot can never be stranded.
     pub fn refund_match(ctx: Context<RefundMatch>, match_id: u64) -> Result<()> {
-        let (stake, bump) = {
+        let (stake, bump, vault_amount) = {
             let m = &ctx.accounts.match_account;
             require!(m.status == MatchStatus::Locked, EscrowError::NotLocked);
-            (m.stake, m.bump)
+            (m.stake, m.bump, ctx.accounts.vault.amount)
         };
+
+        // Drain the FULL vault so close_account cannot be wedged by a stray transfer
+        // into the (open) vault ATA: the opponent gets exactly their stake, the
+        // creator gets the rest (their stake plus any residual). In the normal case
+        // (vault holds exactly 2 * stake) this refunds each their stake.
+        let creator_refund = vault_amount.saturating_sub(stake);
 
         let id = match_id.to_le_bytes();
         let seeds: &[&[u8]] = &[b"match", id.as_ref(), &[bump]];
@@ -189,7 +195,7 @@ pub mod woc_escrow {
                 },
                 signer,
             ),
-            stake,
+            creator_refund,
         )?;
         token::transfer(
             CpiContext::new_with_signer(

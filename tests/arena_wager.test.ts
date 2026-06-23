@@ -18,6 +18,7 @@ class FakeEscrow {
   calls: { fn: string; arg: any }[] = [];
   async buildOpenTx(a: any) { this.calls.push({ fn: 'open', arg: a }); return fakeTx() as any; }
   async buildJoinTx(a: any) { this.calls.push({ fn: 'join', arg: a }); return fakeTx() as any; }
+  async buildCancelTx(a: any) { this.calls.push({ fn: 'cancel', arg: a }); return fakeTx() as any; }
   async bothStaked(a: any) { this.calls.push({ fn: 'bothStaked', arg: a }); return this.bothStakedResult; }
   async settle(ref: any, winner: PublicKey) { this.calls.push({ fn: 'settle', arg: { ref, winner: winner.toBase58() } }); return this.settleResult; }
   async refundDraw(ref: any) { this.calls.push({ fn: 'refund', arg: ref }); return this.refundResult; }
@@ -36,6 +37,8 @@ function setup(stakeTimeoutMs = 30_000) {
     now: () => clock,
     stakeTimeoutMs,
     nextMatchId: () => nextId++,
+    minStakeBase: 1_000_000n,
+    maxStakeBase: 1_000_000_000_000n,
   });
   const creator = { pid: 1, wallet: Keypair.generate().publicKey, stakeBase: 100_000_000n };
   const opponent = { pid: 2, wallet: Keypair.generate().publicKey, stakeBase: 100_000_000n };
@@ -102,13 +105,50 @@ describe('ArenaWagerCoordinator stake handshake', () => {
     expect(coord.phaseOf(matchId)).toBe('awaiting_stakes');
   });
 
-  it('cancels the pairing and notifies both when stakes time out', async () => {
+  it('cancels on timeout and hands the staked creator a cancel_match tx to reclaim', async () => {
     const { coord, sent, matchId, advance } = await paired(30_000);
-    await coord.onStakeSubmitted(1, matchId, 'open-sig'); // only creator staked
+    await coord.onStakeSubmitted(1, matchId, 'open-sig'); // only the creator staked
     advance(30_000);
-    coord.poll();
+    await coord.poll();
     expect(coord.phaseOf(matchId)).toBe('cancelled');
-    expect(sent.filter((s) => s.msg.t === 'wager_cancelled' && (s.msg as any).reason === 'stake_timeout')).toHaveLength(2);
+    const cancels = sent.filter((s) => s.msg.t === 'wager_cancelled');
+    expect(cancels).toHaveLength(2);
+    const creatorMsg = cancels.find((s) => s.pid === 1)!.msg as any;
+    const oppMsg = cancels.find((s) => s.pid === 2)!.msg as any;
+    expect(creatorMsg.cancelTxB64).toBe(Buffer.from('faketx').toString('base64')); // staked creator can reclaim
+    expect(oppMsg.cancelTxB64).toBeUndefined(); // opponent never staked, nothing to reclaim
+  });
+
+  it('does not hand a cancel tx when neither player staked before timeout', async () => {
+    const { coord, sent, matchId, advance } = await paired(30_000);
+    advance(30_000);
+    await coord.poll();
+    const cancels = sent.filter((s) => s.msg.t === 'wager_cancelled');
+    expect(cancels.every((s) => (s.msg as any).cancelTxB64 === undefined)).toBe(true);
+  });
+});
+
+describe('ArenaWagerCoordinator enqueue guards', () => {
+  it('refuses a stake below the floor or above the ceiling (no pairing attempted)', async () => {
+    const { coord, sent } = setup();
+    expect(await coord.enqueue({ pid: 1, wallet: Keypair.generate().publicKey, stakeBase: 0n })).toEqual({ ok: false, reason: 'stake_below_min' });
+    expect(await coord.enqueue({ pid: 2, wallet: Keypair.generate().publicKey, stakeBase: 9_999_999_999_999n })).toEqual({ ok: false, reason: 'stake_above_max' });
+    expect(sent.length).toBe(0);
+  });
+  it('refuses a duplicate enqueue of the same pid', async () => {
+    const { coord, creator } = setup();
+    expect((await coord.enqueue(creator)).ok).toBe(true);
+    expect(await coord.enqueue(creator)).toEqual({ ok: false, reason: 'already_queued' });
+  });
+  it('never self-matches two pids that share one wallet, but does pair a distinct-wallet third party', async () => {
+    const { coord, sent } = setup();
+    const shared = Keypair.generate().publicKey;
+    await coord.enqueue({ pid: 1, wallet: shared, stakeBase: 100_000_000n });
+    const sameWallet = await coord.enqueue({ pid: 2, wallet: shared, stakeBase: 100_000_000n }); // one person, two pids
+    expect(sameWallet).toEqual({ ok: true, queued: true }); // queued, NOT paired against itself
+    expect(sent.filter((s) => s.msg.t === 'wager_match')).toHaveLength(0);
+    await coord.enqueue({ pid: 3, wallet: Keypair.generate().publicKey, stakeBase: 100_000_000n }); // genuine third party
+    expect(sent.filter((s) => s.msg.t === 'wager_match')).toHaveLength(2); // pairs with the first waiter
   });
 });
 

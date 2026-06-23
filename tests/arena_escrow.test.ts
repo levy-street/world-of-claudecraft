@@ -39,12 +39,19 @@ class MemFlowDb implements FlowLedgerDb {
 
 class FakeConnection {
   sent: { ixData: Buffer; feePayer: string }[] = [];
-  vaultAmount: bigint | null = null; // null => account does not exist
+  vaultAmount: bigint | null = null; // null => vault account does not exist
+  matchStatusByte: number | null = null; // null => match account does not exist
   private n = 0;
   async getLatestBlockhash() { return { blockhash: '11111111111111111111111111111111', lastValidBlockHeight: 1000 }; }
   async getParsedAccountInfo(_pk: PublicKey) {
     if (this.vaultAmount === null) return { value: null };
     return { value: { data: { parsed: { info: { tokenAmount: { amount: this.vaultAmount.toString() } } } } } };
+  }
+  async getAccountInfo(_pk: PublicKey) {
+    if (this.matchStatusByte === null) return null;
+    const data = Buffer.alloc(156);
+    data[154] = this.matchStatusByte; // Match.status byte
+    return { data };
   }
   async sendTransaction(tx: any) {
     this.sent.push({ ixData: tx.instructions[0].data, feePayer: tx.feePayer.toBase58() });
@@ -97,21 +104,32 @@ describe('ArenaEscrow stake-transaction building', () => {
   });
 });
 
-describe('ArenaEscrow stake detection (boundary)', () => {
-  it('reads 0 when the vault account does not exist yet', async () => {
+describe('ArenaEscrow stake detection', () => {
+  it('vaultBalanceBase reads 0 when the vault account does not exist, else parses the amount', async () => {
     const { escrow, conn } = setup();
     conn.vaultAmount = null;
     expect(await escrow.vaultBalanceBase(1n)).toBe(0n);
-    expect(await escrow.bothStaked({ matchId: 1n, stakeBase: STAKE })).toBe(false);
+    conn.vaultAmount = 1_234n;
+    expect(await escrow.vaultBalanceBase(1n)).toBe(1_234n);
   });
-  it('bothStaked is false at exactly one stake, true at exactly the full pot', async () => {
+  it('bothStaked reads the on-chain Match.status, not the vault balance (no donation can fake it)', async () => {
     const { escrow, conn } = setup();
-    conn.vaultAmount = STAKE; // only creator staked
-    expect(await escrow.bothStaked({ matchId: 1n, stakeBase: STAKE })).toBe(false);
-    conn.vaultAmount = 2n * STAKE - 1n; // one base unit short
-    expect(await escrow.bothStaked({ matchId: 1n, stakeBase: STAKE })).toBe(false);
-    conn.vaultAmount = 2n * STAKE; // both staked
-    expect(await escrow.bothStaked({ matchId: 1n, stakeBase: STAKE })).toBe(true);
+    conn.vaultAmount = 2n * STAKE; // a donated/funded vault must NOT, by itself, count as both-staked
+    conn.matchStatusByte = null; // match account missing
+    expect(await escrow.bothStaked({ matchId: 1n })).toBe(false);
+    conn.matchStatusByte = 0; // Open (only the creator has staked)
+    expect(await escrow.bothStaked({ matchId: 1n })).toBe(false);
+    conn.matchStatusByte = 1; // Locked (the program flipped it on a real join)
+    expect(await escrow.bothStaked({ matchId: 1n })).toBe(true);
+    conn.matchStatusByte = 2; // Settled is not "awaiting the bout"
+    expect(await escrow.bothStaked({ matchId: 1n })).toBe(false);
+  });
+  it('matchStatus reads the status byte at the documented offset', async () => {
+    const { escrow, conn } = setup();
+    conn.matchStatusByte = 1;
+    expect(await escrow.matchStatus(1n)).toBe(1);
+    conn.matchStatusByte = null;
+    expect(await escrow.matchStatus(1n)).toBe(null);
   });
 });
 

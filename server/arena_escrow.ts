@@ -17,6 +17,14 @@ import {
 } from './woc_escrow_client';
 import type { FlowLedger } from './flow_ledger';
 
+// Byte offset of Match.status in the on-chain account: 8 (Anchor discriminator)
+// + 8 (match_id) + 32*4 (mint, creator, opponent, settler) + 8 (stake) + 2
+// (rake_bps) = 154. Mirrors the Match field order in
+// solana/programs/woc_escrow/src/lib.rs; a layout change there must change this.
+const MATCH_STATUS_OFFSET = 154;
+// MatchStatus discriminants (lib.rs): Open=0, Locked=1, Settled=2, Cancelled=3, Refunded=4.
+const MATCH_STATUS_LOCKED = 1;
+
 export interface ArenaEscrowConfig {
   connection: Connection;
   programId: PublicKey;
@@ -80,9 +88,20 @@ export class ArenaEscrow {
     return BigInt(data.parsed.info.tokenAmount.amount);
   }
 
-  /** True once both players have staked (vault holds the full 2x pot). */
-  async bothStaked(m: Pick<MatchRef, 'matchId' | 'stakeBase'>): Promise<boolean> {
-    return (await this.vaultBalanceBase(m.matchId)) >= m.stakeBase * 2n;
+  /** The on-chain Match.status byte, or null if the match account does not exist. */
+  async matchStatus(matchId: bigint): Promise<number | null> {
+    const info = await this.cfg.connection.getAccountInfo(matchPda(this.cfg.programId, matchId));
+    return info ? info.data[MATCH_STATUS_OFFSET] : null;
+  }
+
+  /**
+   * True once BOTH players have genuinely staked. Reads the program's Match.status
+   * (the program flips it to Locked only inside join_match, after a real second
+   * stake) rather than the vault balance: anyone can transfer into the vault ATA,
+   * so a balance check could be faked by a donation into starting an unfair bout.
+   */
+  async bothStaked(m: Pick<MatchRef, 'matchId'>): Promise<boolean> {
+    return (await this.matchStatus(m.matchId)) === MATCH_STATUS_LOCKED;
   }
 
   /**

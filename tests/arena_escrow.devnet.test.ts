@@ -67,7 +67,7 @@ const tokenAmount = async (conn: Connection, owner: PublicKey) => BigInt((await 
     const joinSig = await conn.sendRawTransaction(joinTx.serialize());
     await conn.confirmTransaction(joinSig, 'confirmed');
 
-    expect(await escrow.bothStaked({ matchId, stakeBase })).toBe(true);
+    expect(await escrow.bothStaked({ matchId })).toBe(true);
 
     const r = await escrow.settle(ref, creator.publicKey, openSig, joinSig);
     expect(r.potBase).toBe(20_000_000n);
