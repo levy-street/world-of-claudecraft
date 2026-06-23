@@ -25,7 +25,8 @@ import { json, readBody, isUniqueViolation } from './http_util';
 import { requestIp, rateLimited, authThrottled, recordAuthFailure, clearAuthFailures, cardUploadRateLimited, wocBalanceRateLimited } from './ratelimit';
 import { verifyTurnstile } from './turnstile';
 import { handleWalletChallenge, handleWalletLink, handleWalletGet, handleWalletUnlink } from './wallet';
-import { handleWocBalance, parseWocBalanceQuery } from './woc_balance';
+import { handleWocBalance, parseWocBalanceQuery, setEscrowedWocSource } from './woc_balance';
+import { escrowedWocForWallet } from './realm_stake_holdings';
 import {
   handleAccountWhoami, handleAccountChangePassword, handleAccountLogout, handleAccountSetEmail, handleAccountDeactivate,
 } from './account';
@@ -848,6 +849,10 @@ async function main(): Promise<void> {
     }
   }
   await ensureSchema();
+  // Count a wallet's escrowed realm stakes toward its holder-tier badge, so
+  // founding a realm (locking $WOC into the escrow vault, which the balance RPC
+  // cannot see) does not drop the player's badge (#475).
+  setEscrowedWocSource(escrowedWocForWallet);
   const orphans = await closeOrphanSessions();
   if (orphans > 0) console.log(`closed ${orphans} orphaned play session(s) from a previous run`);
   const pruned = await pruneChatLogs(CHAT_LOG_RETENTION_DAYS);

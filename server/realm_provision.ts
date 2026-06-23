@@ -36,6 +36,7 @@ import {
   reclaimExpiredProvisioning,
 } from './realm_quote_db';
 import { minStakeBase, tierForStake, TIER_BPS, tierThreshold } from './realm_tiers';
+import { invalidateWalletHoldings } from './realm_stake_holdings';
 
 function intEnv(key: string, def: number, min: number, max: number): number {
   const v = Number.parseInt(process.env[key] ?? '', 10);
@@ -316,6 +317,9 @@ export async function confirmProvisionQuote(
     throw err;
   }
   await deleteRealmQuote(pool, args.quoteId);
+  // The wallet just moved its stake into the escrow vault; refresh its holdings
+  // caches so the holder-tier badge counts the escrowed $WOC right away (#475).
+  invalidateWalletHoldings(quote.ownerWallet);
   return { ok: true, realmId: quote.realmId, tier: quote.tier };
 }
 
@@ -384,6 +388,10 @@ export async function finalizeRealmRelease(
   const stake = await getActiveStakeByRealm(pool, args.realmId);
   if (stake) await setStakeReleased(pool, stake.stakeId, `pda-closed:${realmStakePda(args.realmId).toBase58()}`);
   await setRealmStatus(pool, args.realmId, 'closed');
+  // The stake left escrow and returned to the wallet; refresh its holdings caches
+  // so the badge re-reads (the released stake no longer counts as escrow, and the
+  // returned $WOC is now visible to the balance RPC, so the tier is unchanged).
+  if (stake) invalidateWalletHoldings(stake.ownerWallet);
   return { ok: true, realmId: args.realmId };
 }
 

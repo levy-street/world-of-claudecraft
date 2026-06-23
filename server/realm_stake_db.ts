@@ -41,6 +41,10 @@ CREATE TABLE IF NOT EXISTS realm_stakes (
 );
 CREATE INDEX IF NOT EXISTS realm_stakes_realm ON realm_stakes(realm_id);
 CREATE INDEX IF NOT EXISTS realm_stakes_account ON realm_stakes(account_id);
+-- Backs the holder-tier badge's per-wallet escrowed-$WOC sum (stakedBaseForWallet),
+-- read for every online player on the holder-tier refresh. Partial to the rows
+-- that count (a released stake's tokens are back in the wallet).
+CREATE INDEX IF NOT EXISTS realm_stakes_owner_active ON realm_stakes(owner_wallet) WHERE status <> 'released';
 `;
 
 export interface RealmStakeRow {
@@ -117,6 +121,22 @@ export async function getActiveStakeByRealm(db: Queryable, realmId: number): Pro
     [realmId],
   );
   return res.rows[0] ? toRow(res.rows[0]) : null;
+}
+
+// The wallet's total escrowed $WOC across all its non-released realm stakes, in
+// base units. Drives the holder-tier badge: a stake's principal sits in a
+// program-owned vault that getTokenAccountsByOwner cannot see, but it is still
+// the holder's committed $WOC, so it must count toward the badge (otherwise
+// founding a realm would drop the badge the moment the player commits the most
+// $WOC). 'released' stakes are excluded: their tokens are back in the wallet and
+// the balance RPC sees them again, so counting them would double-count.
+export async function stakedBaseForWallet(db: Queryable, ownerWallet: string): Promise<bigint> {
+  const res = await db.query(
+    `SELECT COALESCE(SUM(amount_base), 0)::text AS total
+       FROM realm_stakes WHERE owner_wallet = $1 AND status <> 'released'`,
+    [ownerWallet],
+  );
+  return BigInt(res.rows[0].total as string);
 }
 
 // Lookup by the lock signature, used to detect a replayed confirm before insert.

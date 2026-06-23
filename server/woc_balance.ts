@@ -177,6 +177,17 @@ export async function fetchWocBalance(pubkey: string): Promise<number | null> {
 }
 
 /**
+ * Drop a wallet's cached balance so the next read re-fetches from chain. Called
+ * when a realm stake moves $WOC in or out of the wallet, so the holder-tier badge
+ * does not show a stale balance (and, paired with the escrow cache invalidation,
+ * the badge never dips while the two caches re-sync).
+ */
+export function invalidateWocBalance(pubkey: string): void {
+  cache.delete(pubkey);
+  setUsageCacheSize('woc.balance', cache.size, WOC_BALANCE_CACHE_MAX_ENTRIES);
+}
+
+/**
  * Cached $WOC balance for a wallet. Re-fetches at most once per TTL; on a failed
  * refresh keeps the last known balance, or null when the wallet has never been
  * read successfully (so callers can omit the figure). One per-wallet cache backs
@@ -207,15 +218,44 @@ export async function cachedWocBalance(pubkey: string, fresh = false): Promise<n
   return balance;
 }
 
+// Escrowed $WOC the wallet has locked to found realms, in whole $WOC. Injected
+// (default 0) so this module stays the pure RPC + arithmetic unit it has been and
+// the existing tests need no DB; server/main.ts wires the DB-backed realm-stake
+// source at boot. Staked $WOC sits in a program-owned vault the balance RPC
+// cannot see, but it is still the holder's committed $WOC, so the badge must
+// count it: otherwise founding a realm with a whale stake would drop the badge.
+let escrowedWocSource: (pubkey: string) => Promise<number> = async () => 0;
+
+export function setEscrowedWocSource(source: (pubkey: string) => Promise<number>): void {
+  escrowedWocSource = source;
+}
+
+/** Reset the escrowed-$WOC source to the default (none). For test isolation. */
+export function resetEscrowedWocSourceForTests(): void {
+  escrowedWocSource = async () => 0;
+}
+
 /**
- * Cached holder tier + exact balance for a wallet. The tier is derived from the
- * (cached) balance; {0, 0} when the wallet has never been read successfully. This
- * backs the `ht`/`hb` holder-tier identity payload the server broadcasts.
+ * Pure holder-tier resolution from a wallet balance plus escrowed (staked) $WOC.
+ * The tier is derived from the SUM, so staking does not drop the badge. Returns
+ * {0, 0} only when the wallet has never been read successfully AND nothing is
+ * escrowed; an escrow-only holder (RPC down, or wallet emptied into a stake) still
+ * keeps the badge. Unit-tested directly (no IO).
+ */
+export function holderInfoFromParts(walletBalance: number | null, escrowed: number): { tier: number; balance: number } {
+  if (walletBalance === null && escrowed <= 0) return { tier: 0, balance: 0 };
+  const balance = (walletBalance ?? 0) + Math.max(0, escrowed);
+  return { tier: holderTierIndexForBalance(balance), balance };
+}
+
+/**
+ * Cached holder tier + exact balance for a wallet, counting both the wallet's
+ * $WOC and the $WOC it has escrowed to found realms. Backs the `ht`/`hb`
+ * holder-tier identity payload the server broadcasts.
  */
 export async function holderInfoForPubkey(pubkey: string): Promise<{ tier: number; balance: number }> {
-  const balance = await cachedWocBalance(pubkey);
-  if (balance === null) return { tier: 0, balance: 0 };
-  return { tier: holderTierIndexForBalance(balance), balance };
+  const [walletBalance, escrowed] = await Promise.all([cachedWocBalance(pubkey), escrowedWocSource(pubkey)]);
+  return holderInfoFromParts(walletBalance, escrowed);
 }
 
 /**

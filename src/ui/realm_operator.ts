@@ -180,6 +180,7 @@ export class RealmOperator {
             </div>
             <p class="ro-hint">${esc(t('realmOp.found.tierHint'))}</p>
             <p class="ro-hint ro-hint-muted">${esc(t('realmOp.found.supplyNote'))}</p>
+            <p class="ro-hint ro-hint-badge">${esc(t('realmOp.found.badgeNote'))}</p>
           </div>
           <p id="ro-stake-note" class="ro-stake-note"></p>
           <button id="ro-submit" class="btn btn-primary ro-submit" type="button" disabled>

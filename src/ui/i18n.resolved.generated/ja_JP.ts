@@ -33,6 +33,7 @@ export const ja_JP: EnTranslations = {
       "tierLabel": "Stake tier",
       "tierHint": "A larger stake unlocks a higher tier: more players, more customization budget, and operator payout rails.",
       "supplyNote": "Each tier is priced as a share of the live $WOC supply.",
+      "badgeNote": "Your staked $WOC keeps counting toward your holder badge, so founding a realm never lowers your tier.",
       "tiersUnavailable": "Live tier pricing is unavailable right now. Try again shortly.",
       "submit": "Stake and Found",
       "submitConnect": "Connect Wallet to Found",

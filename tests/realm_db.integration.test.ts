@@ -276,6 +276,33 @@ run('realm_db against real Postgres', () => {
     expect(mine.find((r) => r.realmId === dec.realmId)?.releaseEligibleAt?.toISOString()).toBe('2026-08-01T00:00:00.000Z');
   });
 
+  it('sums a wallet\'s non-released escrowed stake for the holder badge (stakedBaseForWallet)', async () => {
+    const wallet = `HBWALLET_${Date.now()}`;
+    const mk = async (name: string, tier: number, amountBase: bigint, sig: string) => {
+      const r = await realmDb.createProvisioningRealm(db.pool, { name, type: 'Normal', ownerAccountId: ownerId, tier });
+      return stakeDb.insertStake(db.pool, {
+        realmId: r.realmId, accountId: ownerId, ownerWallet: wallet, pda: `P_${sig}`, vault: `V_${sig}`,
+        mint: 'M', amountBase, tier, lockTxSig: sig,
+      });
+    };
+    // 10M $WOC (1e13 base) locked, 50M (5e13) releasing, 100M (1e14) released.
+    await mk(`HB Locked ${wallet}`, 1, 10_000_000_000_000n, `hb_lock_${wallet}`);
+    const releasing = await mk(`HB Releasing ${wallet}`, 2, 50_000_000_000_000n, `hb_releasing_${wallet}`);
+    const released = await mk(`HB Released ${wallet}`, 3, 100_000_000_000_000n, `hb_released_${wallet}`);
+    await stakeDb.setStakeReleasing(db.pool, releasing.stakeId);
+    await stakeDb.setStakeReleased(db.pool, released.stakeId, `hb_rel_${wallet}`);
+
+    // locked + releasing count (still escrowed on chain); released is excluded
+    // (those tokens are back in the wallet and the balance RPC sees them).
+    expect(await stakeDb.stakedBaseForWallet(db.pool, wallet)).toBe(60_000_000_000_000n);
+    expect(await stakeDb.stakedBaseForWallet(db.pool, 'NOBODY_HAS_THIS_WALLET')).toBe(0n);
+
+    // the cached whole-$WOC reader converts at the mint decimals (6): 6e13 -> 60M
+    const { escrowedWocForWallet, resetEscrowedWocCacheForTests } = await import('../server/realm_stake_holdings');
+    resetEscrowedWocCacheForTests();
+    expect(await escrowedWocForWallet(wallet)).toBe(60_000_000);
+  });
+
   it('QUARANTINE: a stake never writes to woc_flow_ledger', async () => {
     const before = await db.pool.query('SELECT count(*)::int AS n FROM woc_flow_ledger');
     const r = await realmDb.createProvisioningRealm(db.pool, {
