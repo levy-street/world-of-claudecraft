@@ -2412,6 +2412,11 @@ export async function setCreatorSkinOverflowHidden(id: string, hidden: boolean):
   );
 }
 
+/** Set a skin's sale status (e.g. 'removed' on an admin takedown). */
+export async function setCreatorSkinStatus(id: string, status: CreatorSkinRow['status']): Promise<void> {
+  await pool.query(`UPDATE creator_skins SET status = $2, updated_at = now() WHERE id = $1`, [id, status]);
+}
+
 export async function createMarketplaceQuote(q: MarketplaceQuoteRow): Promise<void> {
   await pool.query(
     `INSERT INTO marketplace_quotes

@@ -14,12 +14,17 @@ import { randomBytes } from 'node:crypto';
 import { isSolanaAddress } from './wallet_link';
 import { parseSplitPayment, fetchFinalizedTransaction, type ParsedSplitPayment } from './solana_rpc';
 import { normalizeDesignSpec, type SkinDesignSpec } from '../src/world_api';
-import { hostedSlotQuota } from './creator_quota';
+import { hostedSlotQuota, isTrustedCreator, TRUST_STRIKE_WINDOW_DAYS } from './creator_quota';
+import { holderInfoForPubkey } from './woc_balance';
+import { fetchRemoteImage, validateSkinPng } from './skin_assets';
+import { pinFileToIPFS, unpinFromIPFS, pinataEnabled } from './pinata';
 import {
   type CreatorSkinRow, type MarketplaceQuoteRow,
   createMarketplaceQuote, getMarketplaceQuote, deleteMarketplaceQuote,
-  redeemPurchase, listLiveCreatorSkins,
-  upsertCreatorSkin, countLiveCreatorSkinsByAccount,
+  redeemPurchase, listLiveCreatorSkins, getCreatorSkin, walletForAccount,
+  upsertCreatorSkin, countLiveCreatorSkinsByAccount, countHostedSkinsByAccount,
+  ensureCreatorTrust, getCreatorTrust, listHostedSkinsByAccount, setCreatorSkinOverflowHidden,
+  setCreatorSkinReview, setCreatorSkinStatus, setCreatorTrusted, bumpApprovedListings, recordCreatorStrike,
 } from './db';
 
 const USDC_MINT = (process.env.USDC_MINT ?? process.env.VITE_USDC_MINT ?? 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v').trim();
@@ -292,4 +297,152 @@ export function hostingDecision(params: {
     return { allowed: false, reason: 'hosted_quota_exceeded', reviewStatus, quota, used: params.currentHosted };
   }
   return { allowed: true, reviewStatus, quota, used: params.currentHosted };
+}
+
+// Shared name/description/price validation for every listing mode.
+export function validateListingMeta(input: { name: string; description: string; priceUsdc: bigint }):
+  { ok: true; name: string; description: string } | { ok: false; reason: string } {
+  const name = input.name.trim();
+  if (name.length < 1 || name.length > NAME_MAX) return { ok: false, reason: 'invalid_name' };
+  const description = input.description.trim();
+  if (description.length > DESC_MAX) return { ok: false, reason: 'invalid_description' };
+  if (input.priceUsdc < MIN_LISTING_PRICE || input.priceUsdc > MAX_LISTING_PRICE) return { ok: false, reason: 'invalid_price' };
+  return { ok: true, name, description };
+}
+
+const DAY_MS = 86_400_000;
+
+/** Whether a creator's image uploads skip review (instant-live), from their
+ *  persisted trust record + current holder tier. Tenure is measured from
+ *  first_listing_at; a strike inside the window revokes. */
+export async function evaluateCreatorTrust(creatorAccountId: number, tierIndex: number): Promise<boolean> {
+  const t = await getCreatorTrust(creatorAccountId);
+  const ageDays = (Date.now() - new Date(t.firstListingAt).getTime()) / DAY_MS;
+  const recentStrikes = t.lastStrikeAt && Date.now() - new Date(t.lastStrikeAt).getTime() <= TRUST_STRIKE_WINDOW_DAYS * DAY_MS ? t.strikes : 0;
+  return isTrustedCreator({ approvedCount: t.approvedCount, tierIndex, accountAgeDays: ageDays, recentStrikes });
+}
+
+export type ImageListingOutcome = { ok: true; id: string; reviewStatus: 'pending' | 'approved' } | { ok: false; reason: string };
+
+// Build a CreatorSkinRow for an image-mode listing. assetUrl is the opaque proxy
+// route — the origin URL / CID never leaves the server through the registry.
+function imageRow(
+  id: string, creatorAccountId: number, creatorWallet: string,
+  meta: { name: string; description: string }, targetClass: string | null,
+  fields: { source: 'self_hosted' | 'hosted'; originUrl: string | null; ipfsCid: string | null; reviewStatus: 'pending' | 'approved'; sha256: string },
+  priceUsdc: bigint,
+): CreatorSkinRow {
+  return {
+    id, creatorAccountId, creatorWallet, name: meta.name, description: meta.description,
+    skinCatalog: 'class', fallbackSkin: 0, targetClass,
+    assetUrl: `/api/skins/${id}/atlas.png`, emissiveUrl: null, design: null,
+    source: fields.source, originUrl: fields.originUrl, ipfsCid: fields.ipfsCid,
+    reviewStatus: fields.reviewStatus, overflowHidden: false,
+    priceUsdc, status: 'live', sha256: fields.sha256,
+  };
+}
+
+async function tierForWallet(wallet: string): Promise<number> {
+  return (await holderInfoForPubkey(wallet)).tier;
+}
+
+/** List a self-hosted skin (free): fetch + validate the creator's URL (SSRF-safe,
+ *  origin stored server-only), then list pending review unless the creator is trusted. */
+export async function createSelfHostedListing(
+  input: { name: string; description: string; priceUsdc: bigint; targetClass: string | null; originUrl: string },
+  creatorAccountId: number, creatorWallet: string,
+): Promise<ImageListingOutcome> {
+  if (!isSolanaAddress(creatorWallet)) return { ok: false, reason: 'invalid_wallet' };
+  const meta = validateListingMeta(input);
+  if (!meta.ok) return meta;
+  if (await countLiveCreatorSkinsByAccount(creatorAccountId) >= MAX_LISTINGS_PER_ACCOUNT) return { ok: false, reason: 'too_many_listings' };
+  // The fetch throws SSRF/transport reasons; map them to a clean listing failure.
+  let bytes: Buffer;
+  try { bytes = await fetchRemoteImage(input.originUrl); }
+  catch (err) { return { ok: false, reason: err instanceof Error ? err.message : 'fetch_failed' }; }
+  const png = validateSkinPng(bytes);
+  if (!png.ok) return { ok: false, reason: png.reason };
+  await ensureCreatorTrust(creatorAccountId);
+  const tierIndex = await tierForWallet(creatorWallet);
+  const reviewStatus = hostingDecision({ source: 'self_hosted', tierIndex, trusted: await evaluateCreatorTrust(creatorAccountId, tierIndex), currentHosted: 0 }).reviewStatus;
+  const id = `cs_${randomBytes(12).toString('hex')}`;
+  await upsertCreatorSkin(imageRow(id, creatorAccountId, creatorWallet, meta, input.targetClass,
+    { source: 'self_hosted', originUrl: input.originUrl, ipfsCid: null, reviewStatus, sha256: png.sha256 }, input.priceUsdc));
+  return { ok: true, id, reviewStatus };
+}
+
+/** List a hosted skin: validate the uploaded PNG, enforce the $WOC hosted quota,
+ *  pin to IPFS, then list pending review unless the creator is trusted. */
+export async function createHostedListing(
+  input: { name: string; description: string; priceUsdc: bigint; targetClass: string | null; bytes: Buffer },
+  creatorAccountId: number, creatorWallet: string,
+): Promise<ImageListingOutcome> {
+  if (!pinataEnabled()) return { ok: false, reason: 'hosting_unavailable' };
+  if (!isSolanaAddress(creatorWallet)) return { ok: false, reason: 'invalid_wallet' };
+  const meta = validateListingMeta(input);
+  if (!meta.ok) return meta;
+  const png = validateSkinPng(input.bytes);
+  if (!png.ok) return { ok: false, reason: png.reason };
+  await ensureCreatorTrust(creatorAccountId);
+  const tierIndex = await tierForWallet(creatorWallet);
+  const trusted = await evaluateCreatorTrust(creatorAccountId, tierIndex);
+  const decision = hostingDecision({ source: 'hosted', tierIndex, trusted, currentHosted: await countHostedSkinsByAccount(creatorAccountId) });
+  if (!decision.allowed) return { ok: false, reason: decision.reason ?? 'hosted_quota_exceeded' };
+  const cid = await pinFileToIPFS(input.bytes, meta.name);
+  const id = `cs_${randomBytes(12).toString('hex')}`;
+  await upsertCreatorSkin(imageRow(id, creatorAccountId, creatorWallet, meta, input.targetClass,
+    { source: 'hosted', originUrl: null, ipfsCid: cid, reviewStatus: decision.reviewStatus, sha256: png.sha256 }, input.priceUsdc));
+  return { ok: true, id, reviewStatus: decision.reviewStatus };
+}
+
+// --- Moderation (operator review queue + trust accrual) ---------------------
+
+/** Recompute + persist a creator's trusted badge from their record + current tier. */
+export async function recomputeCreatorTrust(creatorAccountId: number): Promise<boolean> {
+  const wallet = await walletForAccount(creatorAccountId);
+  const tierIndex = wallet ? (await holderInfoForPubkey(wallet.pubkey)).tier : 0;
+  const trusted = await evaluateCreatorTrust(creatorAccountId, tierIndex);
+  await setCreatorTrusted(creatorAccountId, trusted);
+  return trusted;
+}
+
+export type ReviewOutcome = { ok: true; reviewStatus: 'approved' | 'rejected' } | { ok: false; reason: string };
+
+/** Operator review of an image listing. Approve credits the creator's approved
+ *  tally + recomputes their trusted badge; reject hides it from sale. */
+export async function reviewListing(skinId: string, decision: 'approve' | 'reject'): Promise<ReviewOutcome> {
+  const skin = await getCreatorSkin(skinId);
+  if (!skin) return { ok: false, reason: 'not_found' };
+  if (skin.source === 'design') return { ok: false, reason: 'not_reviewable' };
+  if (decision === 'approve') {
+    await setCreatorSkinReview(skinId, 'approved');
+    if (skin.creatorAccountId !== null) { await bumpApprovedListings(skin.creatorAccountId); await recomputeCreatorTrust(skin.creatorAccountId); }
+    return { ok: true, reviewStatus: 'approved' };
+  }
+  await setCreatorSkinReview(skinId, 'rejected');
+  return { ok: true, reviewStatus: 'rejected' };
+}
+
+/** Operator takedown: remove from sale, record a creator strike (revokes trust),
+ *  and unpin a hosted skin to stop paying for it. */
+export async function removeListing(skinId: string): Promise<{ ok: boolean; reason?: string }> {
+  const skin = await getCreatorSkin(skinId);
+  if (!skin) return { ok: false, reason: 'not_found' };
+  await setCreatorSkinStatus(skinId, 'removed');
+  if (skin.creatorAccountId !== null) { await recordCreatorStrike(skin.creatorAccountId); await recomputeCreatorTrust(skin.creatorAccountId); }
+  if (skin.source === 'hosted' && skin.ipfsCid) await unpinFromIPFS(skin.ipfsCid);
+  return { ok: true };
+}
+
+/** Recompute a creator's hosted overflow against their current quota: keep the
+ *  oldest `quota`, park the newest beyond it (restore on top-up). Idempotent. */
+export async function enforceHostedQuota(creatorAccountId: number, tierIndex: number): Promise<number> {
+  const quota = hostedSlotQuota(tierIndex);
+  const rows = await listHostedSkinsByAccount(creatorAccountId); // newest first
+  const overflow = Math.max(0, rows.length - quota);
+  for (let i = 0; i < rows.length; i++) {
+    const shouldHide = i < overflow; // the newest `overflow` are parked
+    if (rows[i].overflowHidden !== shouldHide) await setCreatorSkinOverflowHidden(rows[i].id, shouldHide);
+  }
+  return overflow;
 }

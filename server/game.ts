@@ -29,6 +29,7 @@ import type {
   SessionRuntimeSnapshot,
   SuspiciousPlayer,
 } from './bot_detector/contract';
+import { enforceHostedQuota } from './marketplace';
 import { ChatFilter } from './chat_filter';
 import { applyChatStrike, loadChatFilterState, recordChatViolation } from './chat_filter_db';
 import { ChatLogger } from './chat_log';
@@ -882,10 +883,18 @@ export class GameServer {
     // session for this pid.
     if (this.clients.get(session.pid) !== session) return;
     const e = this.sim.entities.get(session.pid);
-    if (e && ((e.holderTier ?? 0) !== tier || (e.holderBalance ?? 0) !== balance)) {
+    if (!e) return;
+    const prevTier = e.holderTier ?? 0;
+    if (prevTier !== tier || (e.holderBalance ?? 0) !== balance) {
       e.holderTier = tier; // identity diff re-broadcasts it to nearby players
       e.holderBalance = balance;
-      console.log(`[woc] ${session.name} holder tier → ${tier} (${balance} $WOC)`);
+      console.log(`[woc] ${session.name} holder tier -> ${tier} (${balance} $WOC)`);
+    }
+    // A tier change can move the creator's hosted-skin quota: park the newest
+    // over-quota hosted skins, or restore them on a top-up. Tier change is the
+    // only event that shifts the quota (uploads are quota-checked at creation).
+    if (prevTier !== tier) {
+      void enforceHostedQuota(session.accountId, tier).catch((err) => console.error('hosted-quota enforce failed:', err));
     }
   }
 

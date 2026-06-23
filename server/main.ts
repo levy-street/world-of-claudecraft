@@ -41,6 +41,7 @@ import {
 import { BUG_DESCRIPTION_MAX, BugReportRateLimitError, createBugReport } from './bug_report_db';
 import { buildBurnKeeper } from './burn_keeper';
 import { characterSheet, type SheetRank } from './character_sheet';
+import { hostedSlotQuota } from './creator_quota';
 import {
   accountAndScopeForToken,
   accountById,
@@ -51,6 +52,7 @@ import {
   characterCountsByRealm,
   chatMuteStatusForAccount,
   closeOrphanSessions,
+  countHostedSkinsByAccount,
   createAccount,
   createCharacterCapped,
   createCompanionToken,
@@ -95,11 +97,20 @@ import {
 } from './db';
 import { emailAccountCreated } from './email';
 import { GameServer } from './game';
-import { isUniqueViolation, json, readBody } from './http_util';
+import { isUniqueViolation, json, readBinaryBody, readBody } from './http_util';
 import { handleInternalApi } from './internal';
 import { isConnectionRefused } from './ip_block';
 import { pruneExpiredBlockedIps } from './ip_block_db';
-import { createListing, marketplaceEnabled, quotePurchase, registrySkins, verifyPurchase } from './marketplace';
+import {
+  createHostedListing,
+  createListing,
+  createSelfHostedListing,
+  evaluateCreatorTrust,
+  marketplaceEnabled,
+  quotePurchase,
+  registrySkins,
+  verifyPurchase,
+} from './marketplace';
 import {
   cleanReportReason,
   createPlayerReport,
@@ -109,6 +120,7 @@ import { createNativeAttestationChallenge, verifyNativeAttestation } from './nat
 import { handleOAuth, seedOAuthClients } from './oauth';
 import { pruneExpiredOAuthGrants } from './oauth_db';
 import { handlePerfReport } from './perf_report';
+import { ipfsGatewayUrl, pinataEnabled } from './pinata';
 import {
   captureReferral,
   cardUploadContentLengthTooLarge,
@@ -136,6 +148,7 @@ import {
 } from './realm';
 import { resolveReportTarget } from './report_target';
 import { handleSitePresenceHeartbeat } from './site_presence';
+import { loadAtlasBytes, MAX_SKIN_BYTES } from './skin_assets';
 import { cacheControlFor, etagFor, isNotModified } from './static_cache';
 import { verifyTurnstile } from './turnstile';
 import {
@@ -150,7 +163,7 @@ import {
   NATIVE_APP_ORIGINS,
   webLoginEnforced,
 } from './web_login_guard';
-import { handleWocBalance, parseWocBalanceQuery } from './woc_balance';
+import { handleWocBalance, holderInfoForPubkey, parseWocBalanceQuery } from './woc_balance';
 import { bufferHandshakeMessages } from './ws_buffer';
 
 const PORT = Number(process.env.PORT ?? 8787);
@@ -1327,6 +1340,40 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     if (req.method === 'GET' && url === '/api/skins/registry') {
       return json(res, 200, await cachedPublicRead('registry', async () => ({ skins: await registrySkins() })));
     }
+    // Opaque atlas proxy for image skins (self-hosted + hosted). The origin URL /
+    // IPFS CID never reach the client; we stream the bytes. Rejected/removed skins
+    // 404; owners of a delisted/overflow-hidden skin still render (only sale is gated).
+    if (req.method === 'GET' && url.startsWith('/api/skins/') && url.endsWith('/atlas.png')) {
+      const id = decodeURIComponent(url.slice('/api/skins/'.length, -'/atlas.png'.length));
+      const skin = await getCreatorSkin(id);
+      if (!skin || skin.source === 'design' || skin.reviewStatus === 'rejected' || skin.status === 'removed') {
+        return json(res, 404, { error: 'not found' });
+      }
+      const bytes = await loadAtlasBytes({
+        key: skin.sha256 ?? skin.ipfsCid ?? skin.id,
+        originUrl: skin.source === 'self_hosted' ? skin.originUrl : null,
+        gatewayUrl: skin.source === 'hosted' && skin.ipfsCid ? ipfsGatewayUrl(skin.ipfsCid) : null,
+      }).catch(() => null);
+      if (!bytes) return json(res, 502, { error: 'atlas unavailable' });
+      res.writeHead(200, { 'Content-Type': 'image/png', 'Content-Length': bytes.length, 'Cache-Control': 'public, max-age=300' });
+      res.end(bytes);
+      return;
+    }
+    // The viewer's hosting quota: tier, slots, usage, and trusted-creator badge —
+    // drives the designer's quota meter + Upload availability.
+    if (req.method === 'GET' && url === '/api/skins/quota') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      const wallet = await walletForAccount(accountId);
+      const tier = wallet ? (await holderInfoForPubkey(wallet.pubkey)).tier : 0;
+      const quota = hostedSlotQuota(tier);
+      const used = await countHostedSkinsByAccount(accountId);
+      return json(res, 200, {
+        tier, quota, used, remaining: Math.max(0, quota - used),
+        trusted: await evaluateCreatorTrust(accountId, tier),
+        hostingEnabled: pinataEnabled(), selfHostedFree: true,
+      });
+    }
     // Public, factual buy-and-burn ledger — completed burns + cumulative totals.
     // No editorializing (PRD §8.2): raw amounts + explorer-verifiable tx sigs only.
     if (req.method === 'GET' && url === '/api/marketplace/burn-ledger') {
@@ -1396,17 +1443,46 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const body = await readBody(req);
       let priceUsdc: bigint;
       try { priceUsdc = BigInt(String(body.priceUsdc ?? '')); } catch { return json(res, 400, { error: 'invalid_price' }); }
-      const result = await createListing({
-        name: typeof body.name === 'string' ? body.name : '',
-        description: typeof body.description === 'string' ? body.description : '',
-        priceUsdc,
-        design: body.design,
-        targetClass: typeof body.targetClass === 'string' ? body.targetClass : null,
-      }, accountId, wallet.pubkey);
+      const name = typeof body.name === 'string' ? body.name : '';
+      const description = typeof body.description === 'string' ? body.description : '';
+      const targetClass = typeof body.targetClass === 'string' ? body.targetClass : null;
+      if (body.source === 'self_hosted') {
+        const originUrl = typeof body.originUrl === 'string' ? body.originUrl : '';
+        const r = await createSelfHostedListing({ name, description, priceUsdc, targetClass, originUrl }, accountId, wallet.pubkey);
+        if (!r.ok) return json(res, 400, { error: r.reason });
+        invalidatePublicRead('registry');
+        game.applyCreatorSkinGrant(accountId, r.id); // creators own (and may preview) their own creation
+        return json(res, 200, { ok: true, id: r.id, reviewStatus: r.reviewStatus });
+      }
+      const result = await createListing({ name, description, priceUsdc, design: body.design, targetClass }, accountId, wallet.pubkey);
       if (!result.ok) return json(res, 400, { error: result.reason });
       invalidatePublicRead('registry');
       game.applyCreatorSkinGrant(accountId, result.id);
       return json(res, 200, { ok: true, id: result.id });
+    }
+    // Hosted (IPFS) upload: raw PNG body, metadata in the query string. Quota +
+    // review gated inside createHostedListing; pinned to IPFS via Pinata.
+    if (req.method === 'POST' && url === '/api/skins/upload') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (rateLimited(req)) return json(res, 429, { error: 'too many requests' });
+      if (!pinataEnabled()) return json(res, 503, { error: 'hosting_unavailable' });
+      const wallet = await walletForAccount(accountId);
+      if (!wallet) return json(res, 400, { error: 'link a Solana wallet first' });
+      if (Number(req.headers['content-length'] ?? '0') > MAX_SKIN_BYTES) return json(res, 413, { error: 'too_large' });
+      const q = new URLSearchParams((req.url ?? '').split('?')[1] ?? '');
+      let priceUsdc: bigint;
+      try { priceUsdc = BigInt(q.get('priceUsdc') ?? ''); } catch { return json(res, 400, { error: 'invalid_price' }); }
+      let bytes: Buffer;
+      try { bytes = await readBinaryBody(req, MAX_SKIN_BYTES); } catch { return json(res, 413, { error: 'too_large' }); }
+      const r = await createHostedListing({
+        name: q.get('name') ?? '', description: q.get('description') ?? '', priceUsdc,
+        targetClass: q.get('targetClass'), bytes,
+      }, accountId, wallet.pubkey);
+      if (!r.ok) return json(res, 400, { error: r.reason });
+      invalidatePublicRead('registry');
+      game.applyCreatorSkinGrant(accountId, r.id);
+      return json(res, 200, { ok: true, id: r.id, reviewStatus: r.reviewStatus });
     }
     json(res, 404, { error: 'unknown endpoint' });
   } catch (err: any) {
