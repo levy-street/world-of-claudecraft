@@ -9,6 +9,7 @@ import { parseMoveInputFrame } from '../src/sim/move_input';
 import type { PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
 import { stealthDetectionRadius, threatEntries } from '../src/sim/threat';
+import { MOUNT_LIST, mountTierForBalance } from '../src/sim/content/mounts';
 import {
   DT,
   dist2d,
@@ -40,6 +41,7 @@ import {
   markAccountQuestComplete,
   openPlaySession,
   pool,
+  recordMountTrial,
   revokeAccountMechChroma,
   saveCharacterAndMarketState,
   saveCharacterState,
@@ -442,6 +444,7 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.holderTier) out.ht = e.holderTier; // $WOC holder-tier flair (cosmetic)
   if (e.holderBalance) out.hb = Math.round(e.holderBalance); // exact $WOC, for inspect
   if (e.guild) out.gd = e.guild;
+  if (e.mountTier) out.mte = e.mountTier; // highest $WOC mount rung this player qualifies for
   if (e.dungeonId) out.dgn = e.dungeonId;
   if (e.objectItemId) out.obj = e.objectItemId;
   if (e.scale !== 1) out.sc = e.scale;
@@ -470,6 +473,9 @@ function dynamicFields(e: Entity): Record<string, unknown> {
     if (e.channeling) out.chan = 1;
   }
   if (e.sitting || e.eating || e.drinking) out.sit = 1;
+  // $WOC holder mount (conditional dynamic): present only while mounted, so an
+  // absent `mt` cleanly means dismounted (the renderer removes the steed).
+  if (e.mountId) out.mt = e.mountId;
   if (e.aggroTargetId !== null) out.aggro = e.aggroTargetId;
   if (e.tappedById !== null) out.tap = e.tappedById;
   if (e.ownerId !== null) out.own = e.ownerId;
@@ -829,6 +835,7 @@ export class GameServer {
         lap('tick');
         this.routeEvents(events);
         lap('events');
+        this.persistCourseFinishes(events);
         this.runAntibotTick();
         lap('antibot');
         acc -= DT;
@@ -880,10 +887,15 @@ export class GameServer {
     // session for this pid.
     if (this.clients.get(session.pid) !== session) return;
     const e = this.sim.entities.get(session.pid);
-    if (e && ((e.holderTier ?? 0) !== tier || (e.holderBalance ?? 0) !== balance)) {
+    const mountTier = mountTierForBalance(balance);
+    if (e && ((e.holderTier ?? 0) !== tier || (e.holderBalance ?? 0) !== balance || (e.mountTier ?? 0) !== mountTier)) {
       e.holderTier = tier; // identity diff re-broadcasts it to nearby players
       e.holderBalance = balance;
-      console.log(`[woc] ${session.name} holder tier → ${tier} (${balance} $WOC)`);
+      e.mountTier = mountTier; // gates summon + rides identity as `mte`
+      // If holdings fell below the rung of the steed they're currently riding,
+      // throw them off (a lower mount they still qualify for is left alone).
+      this.sim.enforceMountEligibility(session.pid);
+      console.log(`[woc] ${session.name} holder tier → ${tier}, mount tier → ${mountTier} (${balance} $WOC)`);
     }
   }
 
@@ -1086,6 +1098,7 @@ export class GameServer {
         chatStrikes?: number;
         isAdmin?: boolean;
         clientSeed?: string;
+        mountTrialBests?: Record<string, number>;
       } = {},
   ): ClientSession | { error: string } {
     if (this.sessionsByCharacterId.has(characterId)) return { error: 'character already in world' };
@@ -1101,7 +1114,7 @@ export class GameServer {
         return { error: 'too many characters on this account are already in the world' };
       }
     }
-    const pid = this.sim.addPlayer(cls, name, { state: state ?? undefined, characterId });
+    const pid = this.sim.addPlayer(cls, name, { state: state ?? undefined, characterId, mountTrialBests: meta.mountTrialBests });
     if (isGm) {
       // GM characters: invulnerable, and always at the level cap (the row is
       // created without state, so the first join levels them up)
@@ -2031,6 +2044,27 @@ export class GameServer {
       case 'clearMarker':
         if (typeof msg.id === 'number') sim.clearMarker(msg.id, pid);
         break;
+      // $WOC holder travel mounts. summonMount re-validates the requested id
+      // against the server-set eligibility tier (e.mountTier), so a forged id or a
+      // mount above the wallet's holdings is silently rejected inside the Sim.
+      case 'summon_mount': if (typeof msg.mount === 'string') sim.summonMount(msg.mount, pid); break;
+      case 'dismiss_mount': sim.dismissMount(pid); break;
+      // Mount-activity courses. startCourse re-validates flyer-only + eligibility
+      // inside the Sim, so a forged id / ground mount is rejected server-side.
+      case 'start_course': if (typeof msg.course === 'string') sim.startCourse(msg.course, pid); break;
+      case 'abort_course': sim.abortCourse(pid); break;
+      case 'start_race': if (typeof msg.course === 'string') sim.startRace(msg.course, pid); break;
+      case 'mint_charter': if (typeof msg.mount === 'string') sim.mintCharter(msg.mount, pid); break;
+      case 'wager_propose':
+        if (typeof msg.course === 'string' && typeof msg.ante === 'number' && Number.isFinite(msg.ante) && msg.ante > 0
+            && (msg.charter === null || typeof msg.charter === 'string')) {
+          sim.proposeWagerRace(msg.course, Math.floor(msg.ante), msg.charter ?? null, pid);
+        }
+        break;
+      case 'wager_join': sim.wagerJoin(pid); break;
+      case 'wager_decline': sim.wagerDecline(pid); break;
+      case 'wager_leave': sim.wagerLeave(pid); break;
+      case 'wager_launch': sim.launchWagerRace(pid); break;
       // hunter pets
       case 'pet_abandon':
         sim.abandonPet(pid);
@@ -2594,6 +2628,21 @@ export class GameServer {
     // are tiny (a handful of numbers), so the per-tick diff is negligible.
     maybe('stats', p.stats);
     maybe('weapon', p.weapon);
+    // $WOC mount/course/race/wager self-state stays per-tick (maybe() only writes a
+    // changed value): mtc/crun/race/wag change every tick while a summon/run/race is
+    // live, so gating them would lag the cast bar and race panel; tpb/eam change
+    // rarely but are tiny, so the change-gate already makes them free between edits.
+    maybe(
+      'mtc',
+      meta.mountCast
+        ? { id: meta.mountCast.id, rem: round2(meta.mountCast.remaining), tot: round2(meta.mountCast.total) }
+        : null,
+    );
+    maybe('crun', meta.courseRun);
+    maybe('tpb', meta.mountTrialBests);
+    maybe('race', this.sim.raceInfoFor(session.pid));
+    maybe('wag', this.sim.wagerInfoFor(session.pid));
+    maybe('eam', [...meta.earnedMounts]);
     // Heavy, rarely-changing fields: building + stringifying these every tick for
     // every player is the dominant avoidable broadcast cost. Skip them unless a
     // heavy command/event marked this session dirty, or its staggered safety
@@ -2691,6 +2740,19 @@ export class GameServer {
     return { otherPid, otherName: this.sim.meta(otherPid)?.name ?? '?', state: d.state };
   }
 
+  // Persist Skytrial finishes to mount_trial_records for the realm leaderboard.
+  // Server-authoritative: the time is the sim's measured elapsedTicks, never a
+  // client number. The sim already updated the in-session best (sent as `tpb`).
+  private persistCourseFinishes(events: SimEvent[]): void {
+    for (const ev of events) {
+      if (ev.type !== 'courseFinish' || ev.pid === undefined) continue;
+      const session = this.clients.get(ev.pid);
+      if (!session) continue;
+      void recordMountTrial(session.characterId, ev.courseId, ev.elapsedTicks)
+        .catch((err) => console.error('mount-trial record failed:', err));
+    }
+  }
+
   private routeEvents(events: SimEvent[]): void {
     if (events.length === 0 || this.clients.size === 0) return;
     const eventTime = Date.now();
@@ -2775,6 +2837,29 @@ export class GameServer {
       }
       this.devTierPids.add(pid); // keep the chain refresh from clobbering it
       this.broadcastSystem(`[dev] ${session.name} $WOC holder tier → ${n}`);
+      return null;
+    }
+    // Dev-only: force this character's $WOC mount eligibility tier (0-11) so the
+    // mount window + rideable steeds can be exercised without a funded wallet.
+    // Pins via devTierPids so the balance-refresh chain won't clobber it. If the
+    // new tier is below the steed currently ridden, enforce dismounts them.
+    if (process.env.ALLOW_DEV_COMMANDS === '1' && /^\/wocmount\b/.test(text)) {
+      const n = Math.max(0, Math.min(MOUNT_LIST.length, parseInt(text.split(/\s+/)[1] ?? '', 10) || 0));
+      const e = this.sim.entities.get(pid);
+      if (e) {
+        e.mountTier = n;
+        this.sim.enforceMountEligibility(pid);
+      }
+      this.devTierPids.add(pid);
+      this.broadcastSystem(`[dev] ${session.name} $WOC mount tier → ${n}`);
+      return null;
+    }
+    // Dev-only: permanently grant an EARNED mount (as if a Charter were redeemed),
+    // so the non-$WOC earned track can be exercised without minting/trading.
+    if (process.env.ALLOW_DEV_COMMANDS === '1' && /^\/wocearn\b/.test(text)) {
+      const mountId = text.split(/\s+/)[1] ?? '';
+      const ok = this.sim.grantEarnedMount(mountId, pid);
+      this.broadcastSystem(`[dev] ${session.name} ${ok ? 'earned mount' : 'could not earn'} → ${mountId}`);
       return null;
     }
     if (!text.startsWith('/')) {

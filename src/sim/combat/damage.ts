@@ -22,6 +22,7 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
+import { isFlyingMount } from '../content/mounts';
 import { DELVES, GROUP_XP_BONUS, MOBS } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
@@ -75,12 +76,26 @@ export function dealDamage(
 ): void {
   if (target.dead) return;
   if (target.gm) return; // GM characters are invulnerable — every damage path funnels here
+  // Airborne $WOC flyers shrug off wild-mob damage (incl. AoE/ground hazards):
+  // mobs-only immunity, so player/pet (PvP) hits still land and matter.
+  if (
+    isFlyingMount(target.mountId) &&
+    source !== null &&
+    source.kind === 'mob' &&
+    source.ownerId === null
+  )
+    return;
   // A mob that broke leash (or a pet freed to the wild) is in 'evade': it has
   // dropped its hate table and walks home without fighting back, healing to
   // full only on arrival. Classic mechanics make it immune while it retreats,
   // so it can't be chipped down — or killed outright — for a risk-free kill.
   if (target.kind === 'mob' && target.aiState === 'evade') return;
   amount = Math.max(0, amount);
+
+  // Any damage that lands throws a mounted rider, including sourceless hits
+  // (falling, environmental, reflected) that never reach the enterCombat call
+  // below, so "take damage dismounts" holds even off the combat path.
+  if (amount > 0 && target.mountId !== undefined) ctx.dismount(target);
 
   // Defensive Stance, classic: deal 10% less, take 10% less (and +30% threat below)
   if (
@@ -473,6 +488,7 @@ function reflectSpellWard(
 export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): void {
   e.dead = true;
   e.hp = 0;
+  if (e.mountId !== undefined) ctx.dismount(e);
   ctx.clearNonPlayerStatAuras(e);
   e.auras = [];
   e.ccDr.clear();

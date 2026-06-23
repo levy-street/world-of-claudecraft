@@ -20,6 +20,7 @@ import type { Ante, PickAction } from '../sim/lockpick';
 import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import { computeQuestState, type ResolvedAbility } from '../sim/sim';
 import {
+  type CourseRunState,
   type Entity,
   type EquipSlot,
   emptyMoveInput,
@@ -50,12 +51,15 @@ import {
   type LeaderboardPage,
   type LockpickView,
   type MarketInfo,
+  type MountTrialLeaderEntry,
   type OverheadEmoteId,
   type PartyInfo,
   type PresenceStatus,
+  type RaceInfo,
   type RaidLockout,
   type SocialInfo,
   type TradeInfo,
+  type WagerInfo,
 } from '../world_api';
 
 // ---------------------------------------------------------------------------
@@ -800,6 +804,24 @@ export class ClientWorld implements IWorld {
   inventory: InvSlot[] = [];
   vendorBuyback: InvSlot[] = [];
   equipment: Partial<Record<EquipSlot, string>> = {};
+  // $WOC holder mount summon-in-progress, mirrored from snapshot self (`mtc`) for
+  // the HUD's summon cast bar. Active mount + eligibility ride on the player
+  // Entity (mountId/mountTier), decoded in applyWire like skin/holderTier.
+  mountCast: { id: string; remaining: number; total: number } | null = null;
+  // Active mount-course run, mirrored from snapshot self (`crun`); drives the HUD
+  // course timer/gate overlay. Null when idle.
+  courseRun: CourseRunState | null = null;
+  // This character's best Skytrial run per course (ticks), mirrored from self
+  // (`tpb`); for the launcher's per-course best + "new best" feedback.
+  mountTrialBests: Record<string, number> = {};
+  // Live multi-racer race state, mirrored from self (`race`); drives the HUD race
+  // panel. Null when not racing.
+  raceInfo: RaceInfo | null = null;
+  // Live soft-currency wager lobby/pot state, mirrored from self (`wag`); drives
+  // the HUD wager panel. Null when not in a wager.
+  wagerInfo: WagerInfo | null = null;
+  // Permanently earned (Charter-redeemed) mount ids, mirrored from self (`eam`).
+  earnedMounts: string[] = [];
   copper = 0;
   // --- IWorldCosmetics: account cosmetics (completed-quest + mech-chroma ids),
   // mirrored from snapshot self. ---
@@ -1181,6 +1203,7 @@ export class ClientWorld implements IWorld {
         e.skinCatalog = w.cat === 'mech' ? 'mech' : 'class';
         e.holderTier = w.ht ?? 0; // $WOC holder-tier flair (cosmetic, server-set)
         e.holderBalance = typeof w.hb === 'number' ? w.hb : undefined; // exact $WOC, for inspect
+        e.mountTier = w.mte ?? 0; // highest $WOC mount rung this player qualifies for (0-11)
         e.scale = w.sc ?? 1;
         e.color = w.c ?? 0xffffff;
         e.dungeonId = w.dgn ?? null;
@@ -1265,6 +1288,9 @@ export class ClientWorld implements IWorld {
       e.petTauntTimer = w.pt ?? 0;
       e.petAutoTaunt = !!w.pa;
       e.petManualTauntPending = false;
+      // $WOC holder mount (dynamic, conditional): absent ⇒ dismounted. The
+      // renderer attaches/removes the steed from this id (src/render/characters/mount.ts).
+      e.mountId = typeof w.mt === 'string' ? w.mt : undefined;
       e.threat = new Map(w.thr ?? []);
       e.auras = (w.auras ?? []).map((a: any) => ({
         id: a.id,
@@ -1341,6 +1367,18 @@ export class ClientWorld implements IWorld {
       e.drinking = s.drk
         ? { itemId: '', kind: 'drink', hpPer2s: 0, manaPer2s: 0, remaining: s.drk.remaining }
         : null;
+      // $WOC mount summon-in-progress (self-only, delta-sent: present while a
+      // summon cast runs, a final null when it ends, omitted otherwise). Guard on
+      // `undefined` per the delta invariant — an absent field means "unchanged".
+      if (s.mtc !== undefined) {
+        this.mountCast = s.mtc ? { id: s.mtc.id, remaining: s.mtc.rem, total: s.mtc.tot } : null;
+      }
+      // Active course run (delta-sent: present while running + a final null).
+      if (s.crun !== undefined) this.courseRun = s.crun ?? null;
+      if (s.tpb !== undefined) this.mountTrialBests = s.tpb ?? {};
+      if (s.race !== undefined) this.raceInfo = s.race ?? null;
+      if (s.wag !== undefined) this.wagerInfo = s.wag ?? null;
+      if (s.eam !== undefined) this.earnedMounts = s.eam ?? [];
       // IWorldProgressionXp facet (W7) self-decode: xp/lxp/rxp/prk ride every
       // self-frame (?? 0); milestones is delta-guarded (omitted keeps the prior
       // mirror). Terse keys (lxp->lifetimeXp, rxp->restedXp, prk->prestigeRank,
@@ -1635,6 +1673,40 @@ export class ClientWorld implements IWorld {
     const idx = Math.max(0, Math.floor(skin));
     this.cmd({ cmd: 'claim_event_skin', skin: idx });
   }
+  summonMount(mountId: string): void {
+    // No optimism on summon: the cast bar + final mounted state are
+    // server-authoritative (the server re-validates the wallet balance).
+    this.cmd({ cmd: 'summon_mount', mount: mountId });
+  }
+  dismissMount(): void {
+    // Clear the local summon bar at once (self-only state); the active mount
+    // itself is driven off the authoritative snapshot to avoid a re-mount flicker
+    // if a snapshot generated before the server processed this still carries `mt`.
+    this.mountCast = null;
+    this.cmd({ cmd: 'dismiss_mount' });
+  }
+  startCourse(courseId: string): void {
+    // Server-authoritative (re-validates flyer-only + eligibility); the run state
+    // arrives back on the next self snapshot as `crun`.
+    this.cmd({ cmd: 'start_course', course: courseId });
+  }
+  abortCourse(): void {
+    this.courseRun = null; // optimistic clear; the snapshot confirms
+    this.cmd({ cmd: 'abort_course' });
+  }
+  mintCharter(mountId: string): void {
+    this.cmd({ cmd: 'mint_charter', mount: mountId });
+  }
+  startRace(courseId: string): void {
+    this.cmd({ cmd: 'start_race', course: courseId });
+  }
+  proposeWagerRace(courseId: string, anteCopper: number, anteCharterId: string | null): void {
+    this.cmd({ cmd: 'wager_propose', course: courseId, ante: anteCopper, charter: anteCharterId });
+  }
+  wagerJoin(): void { this.cmd({ cmd: 'wager_join' }); }
+  wagerDecline(): void { this.cmd({ cmd: 'wager_decline' }); }
+  wagerLeave(): void { this.cmd({ cmd: 'wager_leave' }); }
+  launchWagerRace(): void { this.cmd({ cmd: 'wager_launch' }); }
   unequipMechChroma(chromaId: string): void {
     const itemId = mechChromaItemId(chromaId);
     const skin = mechChromaSkinIndex(chromaId);
@@ -1974,6 +2046,15 @@ export class ClientWorld implements IWorld {
       };
     } catch {
       return empty;
+    }
+  }
+  async mountTrialLeaderboard(trackId: string): Promise<MountTrialLeaderEntry[]> {
+    try {
+      const res = await fetch(`${this.base}/api/leaderboard/mount-trial?trackId=${encodeURIComponent(trackId)}`);
+      if (!res.ok) return [];
+      return (await res.json()).leaders ?? [];
+    } catch {
+      return [];
     }
   }
   prestige(): void {

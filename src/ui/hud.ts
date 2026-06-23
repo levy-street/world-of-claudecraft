@@ -33,6 +33,8 @@ import {
 } from '../sim/content/skins';
 import { FIRST_TALENT_LEVEL, type TalentAllocation, talentsFor } from '../sim/content/talents';
 import type { ZoneDef } from '../sim/data';
+import { MOUNT_LIST, MOUNTS, isCharterEligible, type MountDef } from '../sim/content/mounts';
+import { COURSE_LIST, courseDef, courseTotalGates } from '../sim/content/courses';
 import {
   ABILITIES,
   CLASSES,
@@ -89,6 +91,7 @@ import {
   virtualLevel,
   xpUntilNextPrestige,
 } from '../sim/types';
+import { terrainHeight, WATER_LEVEL } from '../sim/world';
 import {
   type DelveRunInfo,
   type IWorld,
@@ -739,6 +742,24 @@ export class Hud {
   private targetCastbarFillEl = this.targetCastbarEl.querySelector('.fill') as HTMLElement;
   private targetCastbarLabelEl = this.targetCastbarEl.querySelector('.label') as HTMLElement;
   private targetCastbarTimerEl = this.targetCastbarEl.querySelector('.timer') as HTMLElement;
+  // $WOC holder-mount state, diffed each frame: a summon-complete/dismount edge
+  // banners + live-refreshes the open mount window; a tier change re-locks rows.
+  private lastMountId: string | null = null;
+  private lastMountTier = 0;
+  // Mount-course HUD: a local stopwatch (the official time is server-measured),
+  // armed when the run's clock starts (startTick crosses 0), plus the brief
+  // post-finish hold and the last-rendered key for cheap transition detection.
+  private courseHudEl = $('#course-hud');
+  private courseTimerStartMs = 0;
+  private courseTimerRunning = false;
+  private courseFinishHoldUntil = 0;
+  private lastCourseSig = '';
+  // Multi-racer race panel: track the last state to hold the result briefly.
+  private raceHudEl = $('#race-hud');
+  private lastRaceState: string | null = null;
+  private raceDoneHideAt = 0;
+  private wagerHudEl = $('#wager-hud');
+  private lastWagerSig = '';
   private actionbarEl = $('#actionbar');
   private xpFillEl = $('#xpbar .fill');
   private xpLabelEl = $('#xpbar .label');
@@ -1128,6 +1149,8 @@ export class Hud {
     $('#mm-char').addEventListener('click', () => this.toggleChar());
     $('#mm-spell').addEventListener('click', () => this.toggleSpellbook());
     $('#mm-talents')?.addEventListener('click', () => this.toggleTalents());
+    $('#mm-mount')?.addEventListener('click', () => this.toggleMounts());
+    this.courseHudEl.querySelector('.ch-abort')?.addEventListener('click', () => { this.sim.abortCourse(); audio.click(); });
     $('#mm-quest').addEventListener('click', () => this.toggleQuestLog());
     // Collapse/expand the on-screen quest tracker by clicking its header. The
     // overlay is click-through (pointer-events:none) except the header button, so
@@ -2402,7 +2425,15 @@ export class Hud {
       label: this.castbarLabelEl,
       timer: this.castbarTimerEl,
     },
-    { resolveCastLabel: (s) => castDisplayName(s.label), clearOnHide: true },
+    {
+      // The $WOC mount summon rides the same bar with a `mount:<id>` discriminator
+      // (the only label that is not a raw ability id), localized to the summon text.
+      resolveCastLabel: (s) =>
+        s.label.startsWith('mount:')
+          ? t('hud.mounts.summoning', { name: mountDisplayName(s.label.slice(6)) })
+          : castDisplayName(s.label),
+      clearOnHide: true,
+    },
   );
   private readonly targetCastBarPainter = new CastBarPainter(
     this.writerFacet,
@@ -3893,6 +3924,7 @@ export class Hud {
       ['#mm-char', 'char', 'hud.keybinds.actions.char'],
       ['#mm-spell', 'spellbook', 'abilityUi.spellbook.title'],
       ['#mm-talents', 'talents', 'game.talents.title'],
+      ['#mm-mount', 'mounts', 'hud.mounts.title'],
       ['#mm-quest', 'questlog', 'questUi.log.title'],
       ['#mm-map', 'map', 'hud.core.mobileMap'],
       ['#mm-bag', 'bags', 'itemUi.bags.title'],
@@ -4447,12 +4479,40 @@ export class Hud {
     }
 
     // cast bar: the player instance localizes the cast id (castDisplayName), layers
-    // the player-only eat/drink overlay (consumeBarState), and clears on hide.
-    this.playerCastBarPainter.paint({
-      cast: castBarState(p),
-      castRemaining: p.castRemaining,
-      consume: consumeBarState(p.eating, p.drinking),
-    });
+    // the player-only eat/drink overlay (consumeBarState), and clears on hide. The
+    // $WOC holder mount summon rides the same bar (a filling cast, no channel) via a
+    // synthetic `mount:<id>` cast state, shown only when no ability cast is in flight.
+    const mc = this.sim.mountCast;
+    if (!p.castingAbility && mc) {
+      const fill = 1 - mc.remaining / Math.max(0.01, mc.total);
+      this.playerCastBarPainter.paint({
+        cast: { visible: true, channel: false, fill, label: `mount:${mc.id}`, fishing: false },
+        castRemaining: mc.remaining,
+      });
+    } else {
+      this.playerCastBarPainter.paint({
+        cast: castBarState(p),
+        castRemaining: p.castRemaining,
+        consume: consumeBarState(p.eating, p.drinking),
+      });
+    }
+
+    // $WOC holder mount: react to summon-complete / dismount / eligibility edges.
+    // A fresh steed banners; any change re-renders an open mount window so the
+    // Active/Summon/Dismount controls and locked rows stay live.
+    const curMountId = p.mountId ?? null;
+    const curMountTier = p.mountTier ?? 0;
+    if (curMountId !== this.lastMountId || curMountTier !== this.lastMountTier) {
+      if (curMountId && curMountId !== this.lastMountId) {
+        this.showBanner(t('hud.mounts.summonedBanner', { name: mountDisplayName(curMountId) }));
+      }
+      this.lastMountId = curMountId;
+      this.lastMountTier = curMountTier;
+      if ($('#mount-window').style.display === 'block') this.renderMounts();
+    }
+    this.updateCourseHud();
+    this.updateRaceHud();
+    this.updateWagerHud();
 
     // swing timer: fills between melee/ranged auto-attack swings. swingTimer
     // counts DOWN to 0 (ready); swing_timer.ts recovers the full interval from the
@@ -6025,6 +6085,33 @@ export class Hud {
           break; // logged by sim
         case 'comboPoint':
           break;
+        // Mount-course cues. The overlay/timer is state-driven (updateCourseHud);
+        // these add the audio/banner feel. (Finish is celebrated in updateCourseHud.)
+        case 'courseStart': audio.click(); break;
+        case 'courseCheckpoint': audio.click(); break;
+        case 'courseFinish': break; // handled (audio + overlay) in updateCourseHud
+        case 'courseFail':
+          this.showBanner(t(ev.reason === 'dismounted' ? 'hud.course.failed' : 'hud.course.aborted'));
+          break;
+        // Race cues; the panel itself is state-driven (updateRaceHud).
+        case 'raceCountdown': break;
+        case 'raceGo': audio.click(); break;
+        case 'raceFinish': break;
+        case 'raceResult':
+          if (ev.place === 1) audio.levelUp(); // won — the panel shows the placement
+          break;
+        case 'mountCharterMinted':
+          this.showBanner(t('hud.mounts.mintedBanner', { name: mountDisplayName(ev.mountId) }));
+          audio.coin();
+          if ($('#mount-window').style.display === 'block') this.renderMounts();
+          if ($('#bags').style.display !== 'none') this.renderBags();
+          break;
+        case 'mountEarned':
+          this.showBanner(t('hud.mounts.earnedBanner', { name: mountDisplayName(ev.mountId) }));
+          audio.levelUp();
+          if ($('#mount-window').style.display === 'block') this.renderMounts();
+          if ($('#bags').style.display !== 'none') this.renderBags();
+          break;
         case 'loot': {
           this.log(this.localizeLootText(ev.text), '#7fdc4f');
           if (
@@ -6317,6 +6404,23 @@ export class Hud {
             () => this.sim.duelDecline(),
           );
           break;
+        case 'wagerInvite': {
+          audio.duelChallenge();
+          const key = ev.anteCharterId ? 'hud.wager.inviteCharter' : 'hud.wager.inviteGold';
+          this.showPrompt(t(key, { name: `<b>${esc(ev.fromName)}</b>`, money: formatLocalizedMoney(ev.anteCopper) }),
+            t('hud.wager.accept'), () => this.sim.wagerJoin(), () => this.sim.wagerDecline());
+          break;
+        }
+        case 'wagerSettled':
+          if (ev.cancelled) this.showBanner(t('hud.wager.refunded'));
+          else if (ev.won) {
+            this.showBanner(ev.charters > 0
+              ? t('hud.wager.wonCharter', { money: formatLocalizedMoney(ev.copper), count: formatNumber(ev.charters) })
+              : t('hud.wager.won', { money: formatLocalizedMoney(ev.copper) }));
+            audio.levelUp();
+          } else this.showBanner(t('hud.wager.lost'));
+          break;
+        case 'wagerExpired': break; // the invite prompt auto-dismisses on its own timer
         case 'duelCountdown':
           this.showBanner(t('hud.system.duelCountdown', { seconds: ev.seconds }));
           audio.duelCountdownTick();
@@ -9611,6 +9715,440 @@ export class Hud {
   }
 
   // -------------------------------------------------------------------------
+  // $WOC holder travel mounts (bound to 'Y'). Holding a share of supply unlocks
+  // rideable ground steeds (a classic move-speed boost). The window lists every
+  // rung with its unlock threshold + speed; unlocked rungs Summon, the active
+  // one Dismounts. Eligibility (player.mountTier) and the active steed
+  // (player.mountId) are server-authoritative — every summon is re-validated
+  // server-side, so the pre-flight checks here are courtesy feedback only.
+  // -------------------------------------------------------------------------
+
+  toggleMounts(): void {
+    const el = $('#mount-window');
+    if (el.style.display === 'block') { el.style.display = 'none'; this.hideTooltip(); return; }
+    this.closeOtherWindows('#mount-window');
+    this.renderMounts();
+    el.style.display = 'block';
+  }
+
+  renderMounts(): void {
+    const el = $('#mount-window');
+    const p = this.sim.player;
+    const eligible = p.mountTier ?? 0;
+    const earned = new Set(this.sim.earnedMounts);
+    const activeId = p.mountId ?? null;
+    const total = MOUNT_LIST.length;
+    const unlocked = Math.max(0, Math.min(eligible, total));
+    const fmt0 = (n: number) => formatNumber(n, { maximumFractionDigits: 0 });
+    const pctOf = (share: number) => `${formatNumber(share * 100, { maximumFractionDigits: 1 })}%`;
+    el.setAttribute('aria-label', t('hud.mounts.title'));
+    el.innerHTML = `<div class="panel-title"><span>${esc(t('hud.mounts.title'))} <span class="mount-subtitle">${esc(t('hud.mounts.subtitle'))}</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.mounts.close'))}">${svgIcon('close')}</button></div>`;
+
+    const summary = document.createElement('div');
+    summary.className = 'mount-summary';
+    if (eligible <= 0) {
+      summary.textContent = t('hud.mounts.noWallet', { amount: fmt0(MOUNT_LIST[0].threshold) });
+    } else {
+      let line = t('hud.mounts.qualifyHeader', { count: fmt0(unlocked), total: fmt0(total) });
+      if (typeof p.holderBalance === 'number' && p.holderBalance > 0) {
+        line += ' ' + t('hud.mounts.holdingHint', { amount: fmt0(Math.floor(p.holderBalance)) });
+      }
+      summary.textContent = line;
+    }
+    el.appendChild(summary);
+
+    const list = document.createElement('div');
+    list.className = 'mount-list';
+    list.setAttribute('role', 'list');
+    el.appendChild(list);
+
+    for (const m of MOUNT_LIST) {
+      const heldByWallet = eligible >= m.tier;
+      const isEarned = earned.has(m.id);
+      const isUnlocked = heldByWallet || isEarned; // two-track: holdings OR a redeemed Charter
+      const isActive = activeId === m.id;
+      const canMint = heldByWallet && isCharterEligible(m.id); // only holders strike deeds
+      const row = document.createElement('div');
+      row.className = 'mount-row' + (isUnlocked ? '' : ' locked') + (isActive ? ' active' : '');
+      row.setAttribute('role', 'listitem');
+      const tintHex = `#${m.tint.toString(16).padStart(6, '0')}`;
+      const speedPct = Math.round((m.speedMult - 1) * 100);
+      const meta = isUnlocked
+        ? `<span class="mount-speed">${esc(t('hud.mounts.speed', { percent: fmt0(speedPct) }))}</span><span class="mount-dot">·</span><span class="mount-share">${esc(t('hud.mounts.supplyShare', { percent: pctOf(m.supplyShare) }))}</span>`
+        : `<span class="mount-locktag">${svgIcon('lock')} ${esc(t('hud.mounts.unlockAt', { amount: fmt0(m.threshold) }))}</span><span class="mount-dot">·</span><span class="mount-share">${esc(pctOf(m.supplyShare))}</span>`;
+      row.innerHTML =
+        `<span class="mount-swatch" style="--mount-tint:${tintHex}">${svgIcon('mount')}</span>` +
+        `<div class="mount-text">` +
+        `<div class="mount-name">${esc(m.name)}` +
+        `${m.flying ? `<span class="mount-fly-tag">${esc(t('hud.mounts.flies'))}</span>` : ''}` +
+        `${isEarned ? `<span class="mount-owned-tag">${esc(t('hud.mounts.owned'))}</span>` : ''}` +
+        `${isActive ? `<span class="mount-active-tag">${esc(t('hud.mounts.riding'))}</span>` : ''}</div>` +
+        `<div class="mount-flavor">${esc(m.flavor)}</div>` +
+        `<div class="mount-meta">${meta}</div>` +
+        `</div>`;
+      if (isUnlocked) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'mount-action' + (isActive ? ' is-dismount' : '');
+        btn.textContent = isActive ? t('hud.mounts.dismount') : t('hud.mounts.summon');
+        btn.setAttribute('aria-label', isActive
+          ? t('hud.mounts.dismountAria', { name: m.name })
+          : t('hud.mounts.summonAria', { name: m.name }));
+        btn.addEventListener('pointerdown', (e) => e.stopPropagation());
+        btn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); this.onMountAction(m, isActive); });
+        row.appendChild(btn);
+        row.setAttribute('aria-label', isActive
+          ? t('hud.mounts.activeAria', { name: m.name })
+          : t('hud.mounts.cardAria', { name: m.name, flavor: m.flavor }));
+      } else {
+        row.setAttribute('aria-label', t('hud.mounts.lockedAria', { name: m.name, amount: fmt0(m.threshold) }));
+      }
+      // Holders can strike a tradeable Mount Charter for any mount their holdings
+      // cover (the dragon excepted) — sold for gold so non-$WOC players can earn it.
+      if (canMint) {
+        const mintBtn = document.createElement('button');
+        mintBtn.type = 'button';
+        mintBtn.className = 'mount-action is-mint';
+        mintBtn.textContent = t('hud.mounts.mint');
+        mintBtn.title = t('hud.mounts.mintHint');
+        mintBtn.setAttribute('aria-label', t('hud.mounts.mintAria', { name: m.name }));
+        mintBtn.addEventListener('pointerdown', (e) => e.stopPropagation());
+        mintBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); this.sim.mintCharter(m.id); audio.click(); });
+        row.appendChild(mintBtn);
+      }
+      list.appendChild(row);
+    }
+
+    // Skytrials — fly a timed ring course (flying mount required).
+    const onFlyer = !!(p.mountId && MOUNTS[p.mountId]?.flying);
+    const secTitle = document.createElement('div');
+    secTitle.className = 'mount-section-title';
+    secTitle.innerHTML = `<span>${esc(t('hud.course.skytrials'))}</span><span class="sub">${esc(t('hud.course.skytrialsHint'))}</span>`;
+    el.appendChild(secTitle);
+    if (!onFlyer) {
+      const note = document.createElement('div');
+      note.className = 'course-locked';
+      note.textContent = t('hud.course.needFlyer');
+      el.appendChild(note);
+    } else {
+      const bests = this.sim.mountTrialBests;
+      for (const c of COURSE_LIST) {
+        const item = document.createElement('div');
+        item.className = 'course-item';
+        const crow = document.createElement('div');
+        crow.className = 'course-row';
+        const lapsText = c.laps > 1 ? t('hud.course.laps', { count: fmt0(c.laps) }) : t('hud.course.onePass');
+        const myBest = bests[c.id];
+        const bestBit = myBest !== undefined
+          ? `<span class="mount-dot">·</span><span class="course-best">${esc(t('hud.course.best', { time: formatRunTime(myBest / 20) }))}</span>`
+          : '';
+        crow.innerHTML =
+          `<div class="course-text"><div class="course-name">${esc(c.name)}</div>` +
+          `<div class="course-meta"><span class="fly">${esc(t('hud.mounts.flies'))}</span><span class="mount-dot">·</span>` +
+          `<span>${esc(lapsText)}</span><span class="mount-dot">·</span><span>${esc(t('hud.course.par', { time: formatRunTime(c.parTicks / 20) }))}</span>${bestBit}</div></div>`;
+        const boardBtn = document.createElement('button');
+        boardBtn.type = 'button';
+        boardBtn.className = 'mount-action is-dismount course-board-btn';
+        boardBtn.textContent = t('hud.course.board');
+        boardBtn.addEventListener('pointerdown', (e) => e.stopPropagation());
+        const board = document.createElement('div');
+        board.className = 'course-board';
+        board.hidden = true;
+        boardBtn.addEventListener('click', (e) => {
+          e.preventDefault(); e.stopPropagation();
+          audio.click();
+          if (!board.hidden) { board.hidden = true; return; }
+          void this.renderCourseBoard(c, board);
+        });
+        const raceBtn = document.createElement('button');
+        raceBtn.type = 'button';
+        raceBtn.className = 'mount-action is-dismount';
+        raceBtn.textContent = t('hud.course.race');
+        raceBtn.title = t('hud.course.racePartyHint');
+        raceBtn.setAttribute('aria-label', `${t('hud.course.race')} — ${c.name}`);
+        raceBtn.addEventListener('pointerdown', (e) => e.stopPropagation());
+        raceBtn.addEventListener('click', (e) => {
+          e.preventDefault(); e.stopPropagation();
+          this.sim.startRace(c.id); // races the player's party (or solo)
+          audio.click();
+          el.style.display = 'none';
+          this.hideTooltip();
+        });
+        const wagerBtn = document.createElement('button');
+        wagerBtn.type = 'button';
+        wagerBtn.className = 'mount-action is-mint';
+        wagerBtn.textContent = t('hud.wager.start');
+        wagerBtn.setAttribute('aria-label', `${t('hud.wager.start')} — ${c.name}`);
+        wagerBtn.addEventListener('pointerdown', (e) => e.stopPropagation());
+        wagerBtn.addEventListener('click', (e) => {
+          e.preventDefault(); e.stopPropagation();
+          el.style.display = 'none';
+          this.hideTooltip();
+          this.openWagerSetup(c.id);
+        });
+        const cbtn = document.createElement('button');
+        cbtn.type = 'button';
+        cbtn.className = 'mount-action';
+        cbtn.textContent = t('hud.course.start');
+        cbtn.setAttribute('aria-label', `${t('hud.course.start')} — ${c.name}`);
+        cbtn.addEventListener('pointerdown', (e) => e.stopPropagation());
+        cbtn.addEventListener('click', (e) => {
+          e.preventDefault(); e.stopPropagation();
+          this.sim.startCourse(c.id);
+          audio.click();
+          el.style.display = 'none'; // close so the rider can fly the course
+          this.hideTooltip();
+        });
+        crow.appendChild(boardBtn);
+        crow.appendChild(raceBtn);
+        crow.appendChild(wagerBtn);
+        crow.appendChild(cbtn);
+        item.appendChild(crow);
+        item.appendChild(board);
+        el.appendChild(item);
+      }
+    }
+
+    el.querySelector('[data-close]')?.addEventListener('click', () => { el.style.display = 'none'; this.hideTooltip(); });
+  }
+
+  private onMountAction(m: MountDef, active: boolean): void {
+    if (active) {
+      this.sim.dismissMount();
+      audio.click();
+      this.renderMounts();
+      return;
+    }
+    const p = this.sim.player;
+    // Courtesy pre-flight cues; the sim re-checks all of these authoritatively.
+    if (p.dead) { this.showError(t('hud.mounts.cantDead')); return; }
+    if (p.inCombat) { this.showError(t('hud.mounts.cantInCombat')); return; }
+    if (this.playerLikelySwimming(p)) { this.showError(t('hud.mounts.cantSwimming')); return; }
+    if ((p.mountTier ?? 0) < m.tier) { this.showError(t('hud.mounts.notEligible')); return; }
+    this.sim.summonMount(m.id);
+    audio.click();
+  }
+
+  // Host-side Wager Race setup: pick the gold ante (+ optionally stake a Mount
+  // Charter you own), then open the lobby. The sim re-validates everything.
+  private openWagerSetup(courseId: string): void {
+    const el = $('#wager-setup');
+    const ownedCharter = this.sim.inventory.find((s) => s.itemId.startsWith('charter_') && s.count > 0)?.itemId ?? null;
+    this.setText(el.querySelector('.ws-title') as HTMLElement, t('hud.wager.title'));
+    this.setText(el.querySelector('.ws-label') as HTMLElement, t('hud.wager.antePrompt'));
+    const charterRow = el.querySelector('.ws-charter') as HTMLElement;
+    const charterCb = el.querySelector('#ws-charter-cb') as HTMLInputElement;
+    charterCb.checked = false;
+    charterRow.hidden = ownedCharter === null;
+    if (ownedCharter) this.setText(charterRow.querySelector('span') as HTMLElement, t('hud.wager.stakeCharter'));
+    // Re-wire the static buttons fresh each open (avoids stacking stale closures).
+    const openBtn = (el.querySelector('#ws-open') as HTMLButtonElement);
+    const cancelBtn = (el.querySelector('#ws-cancel') as HTMLButtonElement);
+    const freshOpen = openBtn.cloneNode(true) as HTMLButtonElement;
+    const freshCancel = cancelBtn.cloneNode(true) as HTMLButtonElement;
+    freshOpen.textContent = t('hud.wager.open');
+    freshCancel.textContent = t('hud.wager.cancel');
+    openBtn.replaceWith(freshOpen);
+    cancelBtn.replaceWith(freshCancel);
+    const close = (): void => { el.hidden = true; };
+    freshOpen.addEventListener('click', () => {
+      const ante = Math.floor(Number((el.querySelector('#ws-ante') as HTMLInputElement).value));
+      if (!Number.isFinite(ante) || ante < 1) return;
+      this.sim.proposeWagerRace(courseId, ante, charterCb.checked && ownedCharter ? ownedCharter : null);
+      audio.click();
+      close();
+    });
+    freshCancel.addEventListener('click', close);
+    el.hidden = false;
+    (el.querySelector('#ws-ante') as HTMLInputElement).focus();
+  }
+
+  // Presentation-side swimming probe mirroring the renderer's derivation (the
+  // sim's isSwimming isn't on the IWorld seam). Used only for the early "can't
+  // mount while swimming" cue — the sim is the real authority.
+  private playerLikelySwimming(p: Entity): boolean {
+    return terrainHeight(p.pos.x, p.pos.z, this.sim.cfg.seed) < WATER_LEVEL - 0.8
+      && p.pos.y <= WATER_LEVEL - 0.5;
+  }
+
+  // -------------------------------------------------------------------------
+  // Mount-course run overlay (timer + ring/lap progress). Driven by the
+  // server-authoritative courseRun state; the live timer is a local stopwatch
+  // armed when the run's clock starts (the official result is courseRun
+  // elapsedTicks, set by the sim). Rings are drawn by the renderer.
+  // -------------------------------------------------------------------------
+
+  private updateCourseHud(): void {
+    const el = this.courseHudEl;
+    const run = this.sim.courseRun;
+    const now = performance.now();
+
+    if (!run) {
+      this.courseTimerRunning = false;
+      if (!el.hidden) { el.hidden = true; el.classList.remove('finished'); this.lastCourseSig = ''; }
+      return;
+    }
+    const def = courseDef(run.courseId);
+    if (!def) return;
+
+    if (run.state === 'active') {
+      el.hidden = false;
+      el.classList.remove('finished');
+      // arm the local stopwatch the instant the clock starts (first ring crossed)
+      if (run.startTick > 0 && !this.courseTimerRunning) { this.courseTimerRunning = true; this.courseTimerStartMs = now; }
+      if (run.startTick <= 0) this.courseTimerRunning = false;
+      const elapsed = this.courseTimerRunning ? (now - this.courseTimerStartMs) / 1000 : 0;
+      const total = courseTotalGates(def);
+      const passed = run.lap * def.checkpoints.length + run.nextCheckpoint;
+      const sub = run.startTick <= 0
+        ? t('hud.course.starting')
+        : def.laps > 1
+          ? `${t('hud.course.gate', { n: formatNumber(Math.min(passed + 1, total)), total: formatNumber(total) })} · ${t('hud.course.lap', { n: formatNumber(run.lap + 1), total: formatNumber(def.laps) })}`
+          : t('hud.course.gate', { n: formatNumber(Math.min(passed + 1, total)), total: formatNumber(total) });
+      this.setText(el.querySelector('.ch-name') as HTMLElement, def.name);
+      this.setText(el.querySelector('.ch-time') as HTMLElement, formatRunTime(elapsed));
+      this.setText(el.querySelector('.ch-sub') as HTMLElement, sub);
+      this.setText(el.querySelector('.ch-abort') as HTMLElement, t('hud.course.give_up'));
+      this.lastCourseSig = `active:${run.courseId}`;
+      return;
+    }
+
+    if (run.state === 'done') {
+      const sig = `done:${run.courseId}:${run.elapsedTicks}`;
+      if (sig !== this.lastCourseSig) {
+        // first frame of the finish: hold the banner ~5.5s and play the cue
+        this.lastCourseSig = sig;
+        this.courseFinishHoldUntil = now + 5500;
+        this.courseTimerRunning = false;
+        audio.levelUp();
+      }
+      if (now > this.courseFinishHoldUntil) { el.hidden = true; el.classList.remove('finished'); return; }
+      el.hidden = false;
+      el.classList.add('finished');
+      const seconds = run.elapsedTicks / 20;
+      const par = def.parTicks / 20;
+      const delta = par - seconds;
+      const best = this.sim.mountTrialBests[run.courseId];
+      const isNewBest = best !== undefined && run.elapsedTicks <= best;
+      const parBit = delta >= 0
+        ? t('hud.course.beatPar', { time: formatRunTime(delta) })
+        : t('hud.course.offPar', { time: formatRunTime(-delta) });
+      this.setText(el.querySelector('.ch-name') as HTMLElement, `${def.name} — ${t('hud.course.finish')}`);
+      this.setText(el.querySelector('.ch-time') as HTMLElement, formatRunTime(seconds));
+      this.setText(el.querySelector('.ch-sub') as HTMLElement, isNewBest ? `${t('hud.course.newBest')} · ${parBit}` : parBit);
+      return;
+    }
+
+    // failed (rarely seen — the server usually nulls the run on fail)
+    el.hidden = true;
+    this.courseTimerRunning = false;
+  }
+
+  // Multi-racer race panel — countdown, then live ring-progress bars per racer,
+  // then final placement. Driven entirely by the server-authoritative raceInfo.
+  private updateRaceHud(): void {
+    const el = this.raceHudEl;
+    const info = this.sim.raceInfo;
+    if (!info) {
+      if (!el.hidden) el.hidden = true;
+      this.lastRaceState = null;
+      return;
+    }
+    const now = performance.now();
+    if (info.state === 'done') {
+      if (this.lastRaceState !== 'done') { this.lastRaceState = 'done'; this.raceDoneHideAt = now + 6000; }
+      if (now > this.raceDoneHideAt) { el.hidden = true; return; }
+    } else {
+      this.lastRaceState = info.state;
+    }
+    el.hidden = false;
+    const def = courseDef(info.courseId);
+    let title: string;
+    if (info.state === 'countdown') {
+      title = info.countdown > 0 ? `${t('hud.course.getReady')} ${formatNumber(info.countdown)}` : t('hud.course.go');
+    } else if (info.state === 'active') {
+      title = `${def?.name ?? ''} — ${t('hud.course.racing')}`;
+    } else {
+      const me = info.participants.find((pp) => pp.me);
+      title = me && me.place > 0
+        ? t('hud.course.placeOf', { place: formatNumber(me.place), total: formatNumber(info.participants.length) })
+        : t('hud.course.dnf');
+    }
+    this.setText(el.querySelector('.rh-title') as HTMLElement, title);
+    (el.querySelector('.rh-list') as HTMLElement).innerHTML = info.participants.map((pp) => {
+      const status = pp.dnf ? t('hud.course.dnf') : pp.done ? `#${pp.place}` : `${pp.gate}/${pp.total}`;
+      const frac = pp.total > 0 ? Math.min(1, pp.gate / pp.total) : 0;
+      return `<div class="rh-row${pp.me ? ' me' : ''}${pp.done ? ' done' : ''}${pp.dnf ? ' dnf' : ''}">`
+        + `<span class="rh-name">${esc(pp.name)}</span>`
+        + `<span class="rh-bar"><span class="rh-fill" style="width:${(frac * 100).toFixed(0)}%"></span></span>`
+        + `<span class="rh-status">${esc(status)}</span></div>`;
+    }).join('');
+  }
+
+  // The Wager Race lobby panel — members + live pot + host/joiner actions. Shown
+  // while in a lobby that hasn't launched; once launched, the race panel takes
+  // over. Rebuilt only on change (a signature) so the buttons keep their handlers.
+  private updateWagerHud(): void {
+    const el = this.wagerHudEl;
+    const info = this.sim.wagerInfo;
+    if (!info || info.launched) {
+      if (!el.hidden) { el.hidden = true; this.lastWagerSig = ''; }
+      return;
+    }
+    const sig = `${info.lobbyId}|${info.potCopper}|${info.potCharters}|${info.isHost}|${info.members.length}|${info.members.map((m) => m.pid).join(',')}`;
+    if (sig === this.lastWagerSig) return;
+    this.lastWagerSig = sig;
+    el.hidden = false;
+    this.setText(el.querySelector('.wh-title') as HTMLElement, t('hud.wager.title'));
+    this.setText(el.querySelector('.wh-pot') as HTMLElement, info.potCharters > 0
+      ? t('hud.wager.potCharter', { money: formatLocalizedMoney(info.potCopper), count: formatNumber(info.potCharters) })
+      : t('hud.wager.pot', { money: formatLocalizedMoney(info.potCopper) }));
+    const myId = this.sim.player?.id;
+    (el.querySelector('.wh-list') as HTMLElement).innerHTML = info.members.map((m) =>
+      `<div class="wh-row${m.pid === info.hostPid ? ' host' : ''}${m.pid === myId ? ' me' : ''}">`
+      + `<span class="wh-dot"></span><span class="wh-name">${esc(m.name)}</span></div>`).join('');
+    const actions = el.querySelector('.wh-actions') as HTMLElement;
+    actions.innerHTML = '';
+    if (info.isHost) {
+      const launch = document.createElement('button');
+      launch.textContent = info.members.length < 2 ? t('hud.wager.waiting') : t('hud.wager.launch');
+      launch.disabled = info.members.length < 2;
+      launch.addEventListener('click', () => { this.sim.launchWagerRace(); audio.click(); });
+      const cancel = document.createElement('button');
+      cancel.className = 'is-sub';
+      cancel.textContent = t('hud.wager.cancel');
+      cancel.addEventListener('click', () => { this.sim.wagerLeave(); audio.click(); });
+      actions.append(launch, cancel);
+    } else {
+      const leave = document.createElement('button');
+      leave.className = 'is-sub';
+      leave.textContent = t('hud.wager.leave');
+      leave.addEventListener('click', () => { this.sim.wagerLeave(); audio.click(); });
+      actions.append(leave);
+    }
+  }
+
+  // Fetch + render a course's realm time-trial leaderboard inline (the player's
+  // own row highlighted). Offline returns no entries.
+  private async renderCourseBoard(course: { id: string; name: string }, boardEl: HTMLElement): Promise<void> {
+    boardEl.hidden = false;
+    boardEl.innerHTML = `<div class="cb-status">${esc(t('hud.course.loadingBoard'))}</div>`;
+    const entries = await this.sim.mountTrialLeaderboard(course.id);
+    if (entries.length === 0) {
+      boardEl.innerHTML = `<div class="cb-status">${esc(t('hud.course.noTimes'))}</div>`;
+      return;
+    }
+    const myName = this.sim.player?.name;
+    boardEl.innerHTML = entries.map((e) => {
+      const me = e.name === myName;
+      return `<div class="cb-row${me ? ' me' : ''}">`
+        + `<span class="cb-rank">${esc(String(e.rank))}</span>`
+        + `<span class="cb-name">${esc(e.name)}${me ? ` <span class="cb-you">${esc(t('hud.course.you'))}</span>` : ''}</span>`
+        + `<span class="cb-time">${esc(formatRunTime(e.ticks / 20))}</span></div>`;
+    }).join('');
+  }
+
+  // -------------------------------------------------------------------------
   // Talents & Specializations panel (bound to 'N'). The interactive staged-edit
   // window (tree, spec tabs, loadout footer) lives in TalentsWindow; Hud stays the
   // coordinator (closeOtherWindows needs its private window state). The staged build
@@ -10489,6 +11027,23 @@ function abilityDisplayDescription(def: AbilityDef, damageText: string): string 
     field: 'description',
     values: { damage: damageText },
   });
+}
+
+// $WOC mount proper name. Like the holder-tier rung names (src/ui/holder_tier.ts),
+// these are English proper nouns held in sim content; the unknown-id fallback keeps
+// a stale/forged id from rendering blank.
+function mountDisplayName(id: string): string {
+  return MOUNTS[id]?.name ?? id;
+}
+
+// Course timer display: "12.3s" under a minute, "1:05.2" beyond. A fixed numeric
+// format (not translatable copy) for the run clock.
+function formatRunTime(seconds: number): string {
+  const s = Math.max(0, seconds);
+  if (s < 60) return `${s.toFixed(1)}s`;
+  const m = Math.floor(s / 60);
+  const rem = s - m * 60;
+  return `${m}:${rem < 10 ? '0' : ''}${rem.toFixed(1)}`;
 }
 
 function itemDisplayNameFromSource(name: string): string {

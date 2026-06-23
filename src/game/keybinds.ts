@@ -164,6 +164,7 @@ export const BIND_ACTIONS: BindAction[] = [
     defaults: ['KeyV'],
   },
   { id: 'talents', label: 'Talents', category: 'Interface', kind: 'edge', defaults: ['KeyN'] },
+  { id: 'mounts', label: 'Mounts', category: 'Interface', kind: 'edge', defaults: ['KeyY'] },
   { id: 'meters', label: 'Damage Meters', category: 'Interface', kind: 'edge', defaults: ['KeyH'] },
   {
     id: 'social',

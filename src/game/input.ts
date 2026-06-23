@@ -46,6 +46,7 @@ export interface InputCallbacks {
       | 'char'
       | 'spellbook'
       | 'talents'
+      | 'mounts'
       | 'questlog'
       | 'map'
       | 'nameplates'
@@ -718,6 +719,9 @@ export class Input {
         return;
       case 'talents':
         this.cb.onUiKey('talents');
+        return;
+      case 'mounts':
+        this.cb.onUiKey('mounts');
         return;
       case 'questlog':
         this.cb.onUiKey('questlog');

@@ -178,6 +178,9 @@ export function castAbility(ctx: SimContext, abilityId: string, pid?: number): v
   if (!res || p.dead) return;
   meta.lastActiveTick = ctx.tickCount; // a cast attempt is a deliberate action
   const ability = res.def;
+  // You can't act from the saddle: pressing an ability throws you off first
+  // (classic), then the ability resolves on foot.
+  if (p.mountId !== undefined) ctx.dismount(p);
   if (isStunned(p)) {
     ctx.error(p.id, 'You are stunned!');
     return;

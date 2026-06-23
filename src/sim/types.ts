@@ -1444,6 +1444,19 @@ export interface Entity {
   // Exact $WOC balance backing the tier, for the inspect-profile readout. Rides
   // alongside holderTier in identity fields; like it, the sim never reads it.
   holderBalance?: number;
+  // $WOC holder travel mount. `mountId` is the currently-summoned mount (a key
+  // into MOUNTS, src/sim/content/mounts.ts) or undefined when dismounted. It is
+  // broadcast like `skin`, but — unlike the cosmetic holder fields — the sim DOES
+  // read it: a mounted, out-of-combat player gets a classic ground move-speed
+  // boost (moveSpeedMult). Set by summonMount; cleared by dismount (on
+  // combat/damage/an ability cast/entering water/death/a dungeon, or when
+  // holdings fall below the rung). `mountTier` is the highest mount rung the
+  // player currently qualifies for (0 = none, 1-11), set server-side from the
+  // connected wallet's live $WOC balance and broadcast in identity fields; the
+  // sim reads it to gate which mounts may be summoned. Offline (no wallet) it is
+  // undefined ⇒ 0 ⇒ no mounts, which is correct: mounts are an online holder perk.
+  mountId?: string;
+  mountTier?: number;
 }
 
 export interface NythraxisWardChannel {

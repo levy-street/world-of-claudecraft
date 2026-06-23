@@ -94,6 +94,7 @@ export interface MobileControlCallbacks {
   onBags(): void;
   onSpellbook(): void;
   onTalents(): void;
+  onMounts(): void;
   onMap(): void;
   onLeaderboard(): void;
   /** Toggle world nameplates; returns the new on/off state to sync the button glow. */
@@ -337,6 +338,7 @@ export class MobileControls {
     this.bindButton('mobile-bags', () => this.callbacks.onBags());
     this.bindButton('mobile-spellbook', () => this.callbacks.onSpellbook());
     this.bindButton('mobile-talents', () => this.callbacks.onTalents());
+    this.bindButton('mobile-mount', () => this.callbacks.onMounts());
     this.bindButton('mobile-map', () => this.callbacks.onMap());
     this.bindButton('mobile-leaderboard', () => this.callbacks.onLeaderboard());
     const nameplatesBtn = document.getElementById('mobile-nameplates');

@@ -1068,6 +1068,9 @@ async function startGame(
           case 'talents':
             hud.toggleTalents();
             break;
+          case 'mounts':
+            hud.toggleMounts();
+            break;
           case 'meters':
             hud.toggleMeters();
             break;
@@ -1121,6 +1124,7 @@ async function startGame(
     onBags: () => hud.toggleBags(),
     onSpellbook: () => hud.toggleSpellbook(),
     onTalents: () => hud.toggleTalents(),
+    onMounts: () => hud.toggleMounts(),
     onMap: () => hud.toggleMap(),
     onLeaderboard: () => hud.toggleLeaderboard(),
     onNameplates: () => (renderer.showNameplates = !renderer.showNameplates),

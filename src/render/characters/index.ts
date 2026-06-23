@@ -9,6 +9,7 @@ import { CharacterVisual } from './visual';
 export { CharacterPreview } from './preview';
 export type { AnimState } from './visual';
 export { CharacterVisual } from './visual';
+export { MountVisual, createMountVisual } from './mount';
 
 /** Build the visual for an entity (or an explicit shapeshift/polymorph form key). */
 export function createCharacterVisual(

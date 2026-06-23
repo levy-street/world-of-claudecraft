@@ -3,6 +3,10 @@ import type {
   DelveCompanionInfo,
   DelveRunInfo,
   LockpickView,
+  MountTrialLeaderEntry,
+  RaceInfo,
+  RaceParticipant,
+  WagerInfo,
 } from '../world_api';
 import { lineOfSightClear, resolveMovement, resolvePosition } from './colliders';
 import { auraAffectsStats, removeCancelableAura } from './combat/aura_cancel';
@@ -95,6 +99,7 @@ import {
   NPCS,
   PLAYER_START,
   QUESTS,
+  WORLD_SIZE,
   zoneAt,
 } from './data';
 import * as companionMod from './delves/companion';
@@ -253,6 +258,8 @@ import {
   type AuraKind,
   angleTo,
   armorReduction,
+  type CourseDef,
+  type CourseRunState,
   type CrowdControlDrCategory,
   DELVE_COMPANION_HEAL_INTERVAL,
   type DelveDef,
@@ -293,17 +300,47 @@ import {
   type SimEvent,
   type SkinCatalog,
   type SkinRank,
+  TICK_RATE,
   TURN_SPEED,
   type Vec3,
   virtualLevel,
   xpToReachLevel,
 } from './types';
 import { groundHeight, WATER_LEVEL } from './world';
+import { MOUNTS, mountUnlockedAtTier, isFlyingMount, mountForTier, canSummonMount, isCharterEligible } from './content/mounts';
+import { COURSES, courseTotalGates } from './content/courses';
 
 // TRIVIAL_LEVEL_GAP moved to mob/targeting.ts (used only by isTrivialTo).
 // CORPSE_DURATION moved to combat/damage.ts (C1; used only by the death path).
 // LEASH_DISTANCE / DUNGEON_LEASH_DISTANCE moved to types.ts (M2; shared with mob/locomotion.ts).
 // EVADE_SPEED_MULT / EVADE_STALL_TIMEOUT moved to mob/locomotion.ts (M2; slice-only).
+// $WOC holder mounts: the classic summon cast. Standing still for this long
+// completes the summon; any translational movement, combat, damage, an ability
+// cast, or entering water cancels it (updateMountCast). Matches the vanilla
+// ground-mount cast time.
+const MOUNT_SUMMON_CAST_TIME = 1.5;
+// $WOC flying mounts (5% of supply and up): a weightless flight movement model.
+// Hold jump to climb; release to drift down to a low hover that skims terrain and
+// water (so you never touch down or swim). Soars over props — no ground collision.
+const FLIGHT_HOVER_CLEARANCE = 2.6; // resting altitude above ground/water surface
+const FLIGHT_CLIMB_SPEED = 11; // yd/s ascent while holding jump (and on takeoff)
+const FLIGHT_SINK_SPEED = 5; // yd/s gentle descent toward the hover when not climbing
+const FLIGHT_MAX_ALTITUDE = 55; // ceiling above the local surface, so you can clear peaks
+// Inside a course run, every flyer is NORMALIZED to this one speed multiplier
+// (between the 2.1× and 2.5× tier range) so races/time-trials measure piloting
+// skill, not $WOC holdings — keeping earned-mount riders competitive.
+const COURSE_FLIGHT_MULT = 2.3;
+// Multi-racer race timing: the pre-GO countdown (racers hover frozen at the
+// start), and how long a finished race lingers for its result panel.
+const RACE_COUNTDOWN_TICKS = 3 * TICK_RATE;
+const RACE_CLEANUP_TICKS = 8 * TICK_RATE;
+// Soft-currency Wager Races: a host opens a staked race, others opt in (and only
+// then are charged), the winner takes the whole pot. TTLs mirror the social-invite
+// windows; the ante is uniform so the pot is trivially conserved.
+const WAGER_INVITE_TTL = 30; // seconds an open invite stands before it lapses
+const WAGER_LOBBY_TTL = 120; // seconds the host has to fill + launch before auto-refund
+const WAGER_INVITE_RANGE = 30; // yards — nearby flyers the host may invite (duel range)
+const WAGER_MIN_ANTE = 1; // copper — no zero-stake wagers (mirrors MARKET_MIN_PRICE)
 // Heading offsets (radians) a mob tries when its straight path is blocked, so it
 // can slide around a prop instead of pinning on it. Desired heading (0) first;
 // only evaluated past the first entry when that straight step is obstructed.
@@ -688,6 +725,23 @@ export interface PlayerMeta {
   companionUpgrades: Record<string, number>;
   delveLoreUnlocked: Set<string>;
   delveDaily: { date: string; firstClearXp: Set<string>; markClears: number };
+  // $WOC holder mount summon-in-progress (the classic ~1.5s mount cast). Session
+  // -only, never persisted; cancelled by movement/combat/damage/an ability
+  // cast/swimming/death. On completion it sets the entity's mountId. Surfaced to
+  // the owner via the self snapshot (`mtc`) so the HUD can draw the summon bar.
+  mountCast: { id: string; remaining: number; total: number } | null;
+  // Active mount-course run (hoop / time-trial / race). Session-only; the sim
+  // advances it each tick (pass-through + timing) and surfaces it to the owner via
+  // the self snapshot so the HUD can draw the course timer/splits.
+  courseRun: CourseRunState | null;
+  // Best Skytrial run per course id, in ticks. Loaded at join from the server's
+  // records (empty offline); the source of truth is the mount_trial_records
+  // table. Drives "new best" feedback + the per-course best in the launcher.
+  mountTrialBests: Record<string, number>;
+  // Permanently earned mounts (Charter redemptions). The second ownership track:
+  // summonable regardless of $WOC holdings, never downgraded. Persisted in
+  // CharacterState.earnedMounts.
+  earnedMounts: Set<string>;
 }
 
 // Away-from-keyboard / do-not-disturb presence. `afk` still delivers whispers
@@ -760,6 +814,10 @@ export interface CharacterState {
   companionUpgrades?: Record<string, number>;
   delveLoreUnlocked?: string[];
   delveDaily?: { date: string; firstClearXp: string[]; markClears: number };
+  // Permanently EARNED mounts (the second ownership track): mount ids redeemed
+  // from a Mount Charter (won/bought by non-$WOC players). Unlike holdings-derived
+  // access these never lapse. JSONB; optional so pre-Charter saves load cleanly.
+  earnedMounts?: string[];
 }
 
 export interface PetState {
@@ -807,6 +865,54 @@ function freshCounters(): RewardCounters {
 // cast-toggle predicates (isFormToggle/isToggleBuff/isStealthToggle/preservesStealth/
 // isShamanShock/ignoresDamagePushback) live in combat/casting_lifecycle.ts (C4a).
 
+// Does the 3D segment a→b pass within `r` of the sphere centred at (cx,cy,cz)?
+// Used for course checkpoint pass-through: a tier-11 flyer crosses several yards
+// per 0.05 s tick, so testing only the current point would tunnel a thin ring.
+// Closest-point-on-segment distance; pure + deterministic (no RNG).
+function segmentHitsSphere(a: Vec3, b: Vec3, cx: number, cy: number, cz: number, r: number): boolean {
+  const abx = b.x - a.x, aby = b.y - a.y, abz = b.z - a.z;
+  const acx = cx - a.x, acy = cy - a.y, acz = cz - a.z;
+  const ab2 = abx * abx + aby * aby + abz * abz;
+  let t = ab2 > 0 ? (acx * abx + acy * aby + acz * abz) / ab2 : 0;
+  t = t < 0 ? 0 : t > 1 ? 1 : t;
+  const dx = cx - (a.x + abx * t), dy = cy - (a.y + aby * t), dz = cz - (a.z + abz * t);
+  return dx * dx + dy * dy + dz * dz <= r * r;
+}
+
+// An in-progress multi-racer race: players running the same course on a
+// synchronized countdown→GO, placed by finish order. Internal to the sim; the
+// client sees a projected RaceInfo (raceInfoFor).
+interface Race {
+  id: number;
+  courseId: string;
+  participants: number[]; // pids, in join order
+  state: 'countdown' | 'active' | 'done';
+  countdownRemaining: number; // ticks until GO
+  goTick: number; // tickCount at GO
+  finishOrder: number[]; // pids in finish order = placement
+  dnf: Set<number>; // pids that dropped out (lost flight / left)
+  doneTick: number; // tickCount the race ended, for the lingering result panel
+  wagerLobbyId?: number; // set on a wager race; payout reads that lobby's stake ledger
+}
+
+// A pre-race staking pen for a Wager Race. The host opens it (staking immediately,
+// since proposing IS consent); invitees opt in via wagerJoin (the ONLY place a
+// non-host is charged). The ante is uniform, so `stakes` is just the set of pids
+// who paid in — pot = stakes.size × anteCopper (+ one Charter each if anteCharterId).
+// On settle the pot drains exactly once (guarded by `settled`) to the winner, or
+// refunds every staker if the race produced no finisher / was cancelled.
+interface WagerLobby {
+  id: number;
+  hostPid: number;
+  courseId: string;
+  anteCopper: number;
+  anteCharterId: string | null; // a charter_<mountId> item, or null for a gold-only wager
+  stakes: Set<number>; // pids who escrowed the ante (host + accepted joiners) — the consent ledger
+  expires: number; // this.time + WAGER_LOBBY_TTL, until launched
+  raceId: number | null; // set on launch; ties the lobby to its Race
+  settled: boolean; // pot drained exactly once (payout OR refund)
+}
+
 export class Sim {
   cfg: Required<Omit<SimConfig, 'noPlayer'>>;
   rng: Rng;
@@ -838,6 +944,12 @@ export class Sim {
   private engagedPids = new Set<number>();
   primaryId = -1; // the local/RL player in single-player contexts
   nextId = 1;
+  private races: Race[] = [];
+  private nextRaceId = 1;
+  private wagerLobbies = new Map<number, WagerLobby>(); // lobbyId -> lobby
+  private wagerByPid = new Map<number, number>(); // pid -> lobbyId (host + every staker; one lobby per player)
+  private wagerInvites = new Map<number, { fromPid: number; lobbyId: number; expires: number }>(); // invitee pid -> offer
+  private nextWagerId = 1;
   events: SimEvent[] = [];
   // Owned by E1 (entity_roster drains it); stays on Sim because N1/M3 schedule into
   // it. Exposed as a live view via SimContext.
@@ -1093,7 +1205,12 @@ export class Sim {
   addPlayer(
     cls: PlayerClass,
     name: string,
-    opts?: { autoEquip?: boolean; state?: CharacterState; characterId?: number },
+    opts?: {
+      autoEquip?: boolean;
+      state?: CharacterState;
+      characterId?: number;
+      mountTrialBests?: Record<string, number>;
+    },
   ): number {
     const savedState = opts?.state ? sanitizeRemovedZone1Content(opts.state).state : undefined;
     // Characters saved inside a dungeon instance rejoin at its entrance —
@@ -1177,6 +1294,10 @@ export class Sim {
       companionUpgrades: {},
       delveLoreUnlocked: new Set(),
       delveDaily: { date: '', firstClearXp: new Set(), markClears: 0 },
+      mountCast: null,
+      courseRun: null,
+      mountTrialBests: opts?.mountTrialBests ? { ...opts.mountTrialBests } : {},
+      earnedMounts: new Set(opts?.state?.earnedMounts ?? []),
     };
     this.players.set(player.id, meta);
     player.skinCatalog = meta.skinCatalog;
@@ -1300,6 +1421,19 @@ export class Sim {
     this.party.partyInvites.delete(pid);
     this.tradeInvites.delete(pid);
     this.duelInvites.delete(pid);
+    // Wager cleanup: drop any pending offer; refund an un-launched stake (cancel the
+    // whole lobby if they hosted it). A LAUNCHED stake stays in the pot — the race
+    // DNFs the gone player and settleWagerRace still pays the field, so the leaver
+    // simply forfeits (no copper created or stranded).
+    this.wagerInvites.delete(pid);
+    const wagerLobbyId = this.wagerByPid.get(pid);
+    if (wagerLobbyId !== undefined) {
+      const lobby = this.wagerLobbies.get(wagerLobbyId);
+      if (lobby && lobby.raceId === null && !lobby.settled) {
+        if (lobby.hostPid === pid) { this.refundWagerLobby(lobby); this.wagerLobbies.delete(lobby.id); }
+        else this.returnStake(lobby, pid);
+      }
+    }
     // mobs forget the leaving player; persistent hunter pets are serialized
     // with the character and removed from the live world instead of released
     const pet = this.petOf(pid, true);
@@ -1406,6 +1540,7 @@ export class Sim {
         firstClearXp: [...meta.delveDaily.firstClearXp],
         markClears: meta.delveDaily.markClears,
       },
+      earnedMounts: [...meta.earnedMounts],
     };
     return sanitizeRemovedZone1Content(state).state;
   }
@@ -1436,6 +1571,448 @@ export class Sim {
   setPlayerGuild(pid: number, guild: string): void {
     const e = this.entities.get(pid);
     if (e) e.guild = guild;
+  }
+
+  // -------------------------------------------------------------------------
+  // $WOC holder travel mounts. Server-authoritative: eligibility (`mountTier`)
+  // is set server-side from the connected wallet's live balance, so a client
+  // cannot summon a mount it does not hold. Summoning begins a short cast that
+  // any movement/combat/damage cancels (updateMountCast); the rule resolves
+  // entirely here in the Sim. All player-facing messaging is derived client-side
+  // from the resulting state change — the sim stays string-free (no i18n debt).
+  // -------------------------------------------------------------------------
+
+  /** Begin (or, while already mounted, instantly swap to) the holder mount `id`.
+   *  Returns true when the request was accepted (a cast started or a swap
+   *  applied), false when rejected (unknown id, not eligible, dead, in combat,
+   *  swimming, mid-cast, or already on exactly this mount). The server validates
+   *  nothing extra — this method is the single authority. */
+  summonMount(mountId: string, pid?: number): boolean {
+    const r = this.resolve(pid);
+    if (!r) return false;
+    const { meta, e: p } = r;
+    if (p.dead) return false;
+    if (!MOUNTS[mountId]) return false;
+    if (!canSummonMount(mountId, p.mountTier ?? 0, meta.earnedMounts)) return false; // holder OR earned
+    if (p.inCombat) return false;
+    if (this.isSwimming(p)) return false;
+    if (p.castingAbility) return false;
+    // Already astride this exact mount and not re-casting: nothing to do.
+    if (p.mountId === mountId && !meta.mountCast) return false;
+    if (p.sitting) this.standUp(p);
+    // Already mounted on a different steed: swap in the saddle, no re-cast.
+    if (p.mountId) {
+      p.mountId = mountId;
+      meta.mountCast = null;
+      return true;
+    }
+    // Fresh summon from the ground: begin the classic mount cast.
+    meta.mountCast = { id: mountId, remaining: MOUNT_SUMMON_CAST_TIME, total: MOUNT_SUMMON_CAST_TIME };
+    return true;
+  }
+
+  /** Explicit player dismount (or cancel an in-progress summon). */
+  dismissMount(pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    this.dismount(r.e);
+  }
+
+  /** Clear any active mount AND any in-progress summon cast for `e`. Safe to call
+   *  on any entity (no-op for non-players / the unmounted); the dismount triggers
+   *  (combat, damage, casting, swimming, death, dungeon entry, holdings drop) all
+   *  funnel through here. */
+  private dismount(e: Entity): void {
+    if (e.kind === 'player') {
+      const meta = this.players.get(e.id);
+      if (meta) meta.mountCast = null;
+    }
+    if (e.mountId !== undefined) e.mountId = undefined;
+  }
+
+  /** Force-dismount a player whose holdings no longer cover their active mount.
+   *  Called by the server after a balance refresh lowers `mountTier`. Leaves a
+   *  lower-but-still-eligible mount alone. */
+  enforceMountEligibility(pid: number): void {
+    const e = this.entities.get(pid);
+    const meta = this.players.get(pid);
+    if (!e || !meta || e.mountId === undefined) return;
+    // Earned (Charter) mounts are permanent — holdings never touch them. Otherwise
+    // a holdings drop below this steed's rung gracefully DOWNGRADES to the best
+    // mount the rider still covers (holder rung or any earned one), dismounting
+    // only when nothing remains.
+    if (canSummonMount(e.mountId, e.mountTier ?? 0, meta.earnedMounts)) return;
+    const lesser = mountForTier(e.mountTier ?? 0);
+    if (lesser) e.mountId = lesser.id;
+    else {
+      // no holder rung left, but a flyer/ground mount may still be earned
+      const fallback = [...meta.earnedMounts][0];
+      if (fallback) e.mountId = fallback;
+      else this.dismount(e);
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Mount Charters — the EARNED ownership track. Holders mint tradeable deeds for
+  // mounts their holdings cover; the deeds change hands for gold on the World
+  // Market; a non-$WOC buyer redeems one for a PERMANENT mount that holdings can
+  // never revoke. Only the tier-11 dragon has no Charter (isCharterEligible).
+  // -------------------------------------------------------------------------
+
+  /** Permanently grant `mountId` on the earned track (Charter redemption or an
+   *  operator grant). Idempotent; rejects unknown / holder-only (dragon) ids.
+   *  Returns true when it newly added the mount. */
+  grantEarnedMount(mountId: string, pid?: number): boolean {
+    const r = this.resolve(pid);
+    if (!r || !isCharterEligible(mountId) || r.meta.earnedMounts.has(mountId)) return false;
+    r.meta.earnedMounts.add(mountId);
+    this.emit({ type: 'mountEarned', mountId, pid: r.e.id });
+    return true;
+  }
+
+  /** Redeem a Mount Charter from the bags: grant the mount and consume the deed. */
+  private redeemMountCharter(meta: PlayerMeta, itemId: string, mountId: string): void {
+    if (meta.earnedMounts.has(mountId)) { this.error(meta.entityId, 'You already own that mount.'); return; }
+    if (!isCharterEligible(mountId)) { this.error(meta.entityId, 'That Charter is void.'); return; }
+    this.removeItem(itemId, 1, meta.entityId);
+    meta.earnedMounts.add(mountId);
+    this.emit({ type: 'mountEarned', mountId, pid: meta.entityId });
+  }
+
+  /** Mint a tradeable Charter for a mount the wallet currently covers (holder
+   *  track only — you can't re-mint a mount you merely bought). The struck deed
+   *  lands in the bags to redeem or sell. Returns true on success. */
+  mintCharter(mountId: string, pid?: number): boolean {
+    const r = this.resolve(pid);
+    if (!r) return false;
+    const { meta, e: p } = r;
+    if (!isCharterEligible(mountId)) { this.error(meta.entityId, 'No Charter can be struck for that mount.'); return false; }
+    if (!mountUnlockedAtTier(mountId, p.mountTier ?? 0)) { this.error(meta.entityId, 'Your holdings do not cover that mount.'); return false; }
+    const itemId = `charter_${mountId}`;
+    if (!ITEMS[itemId]) return false;
+    this.addItem(itemId, 1, meta.entityId);
+    this.emit({ type: 'mountCharterMinted', mountId, itemId, pid: meta.entityId });
+    return true;
+  }
+
+  /** Advance an in-progress mount summon: cancel it on movement/combat/damage/an
+   *  ability cast/entering water/death; complete it (set mountId) when the cast
+   *  elapses, re-checking eligibility in case holdings changed mid-cast. */
+  private updateMountCast(p: Entity, meta: PlayerMeta): void {
+    const mc = meta.mountCast;
+    if (!mc) return;
+    const inp = meta.moveInput;
+    const movedThisTick = inp.forward || inp.back || inp.strafeLeft || inp.strafeRight || inp.jump;
+    if (movedThisTick || p.inCombat || p.castingAbility || p.dead || this.isSwimming(p)) {
+      meta.mountCast = null;
+      return;
+    }
+    mc.remaining -= DT;
+    if (mc.remaining <= 0) {
+      meta.mountCast = null;
+      if (canSummonMount(mc.id, p.mountTier ?? 0, meta.earnedMounts)) p.mountId = mc.id;
+    }
+  }
+
+  /** Weightless flight for $WOC flying mounts (5%+ of supply). Horizontal motion
+   *  at the steed's flight speed with no prop collision; vertical control via
+   *  jump (climb) with a gentle auto-sink to a low hover over the local surface,
+   *  so you skim terrain and water without touching down. `mx`/`mz` are the local
+   *  movement input (z forward, x strafe-right) already read by the caller. */
+  private updateFlightMovement(p: Entity, meta: PlayerMeta, mx: number, mz: number): void {
+    if (p.sitting) this.standUp(p);
+    // Frozen at the start line during a race countdown (hover in place until GO).
+    const frozen = meta.courseRun?.state === 'countdown';
+    if (!frozen && (mx !== 0 || mz !== 0) && !isRooted(p)) {
+      const len = Math.hypot(mx, mz);
+      const fx = mx / len, fz = mz / len;
+      // Normalize speed during a course run (skill, not holdings); else the
+      // steed's own tier speed.
+      const speed = meta.courseRun?.state === 'active'
+        ? RUN_SPEED * COURSE_FLIGHT_MULT
+        : RUN_SPEED * this.moveSpeedMult(p);
+      const sin = Math.sin(p.facing), cos = Math.cos(p.facing);
+      const wx = fz * sin - fx * cos;
+      const wz = fz * cos + fx * sin;
+      const bound = WORLD_SIZE / 2 - 2; // stay inside the world rim
+      p.pos.x = Math.max(-bound, Math.min(bound, p.pos.x + wx * speed * DT));
+      p.pos.z = Math.max(-bound, Math.min(bound, p.pos.z + wz * speed * DT));
+    }
+    // Altitude: rise onto the hover at takeoff, climb while jump is held, else
+    // drift down — but never below the hover clearance (no landing/swimming) nor
+    // above the ceiling (so the world still bounds you).
+    const surface = Math.max(groundHeight(p.pos.x, p.pos.z, this.cfg.seed), WATER_LEVEL);
+    const floor = surface + FLIGHT_HOVER_CLEARANCE;
+    const ceiling = surface + FLIGHT_MAX_ALTITUDE;
+    if (p.pos.y < floor) p.pos.y = Math.min(floor, p.pos.y + FLIGHT_CLIMB_SPEED * DT);
+    else if (meta.moveInput.jump) p.pos.y = Math.min(ceiling, p.pos.y + FLIGHT_CLIMB_SPEED * DT);
+    else p.pos.y = Math.max(floor, p.pos.y - FLIGHT_SINK_SPEED * DT);
+    // Weightless: cancel any carried velocity and never report grounded so the
+    // ground branch's gravity kicks in the instant the rider is dismounted.
+    p.onGround = false;
+    p.vx = 0; p.vz = 0; p.vy = 0;
+    p.jumping = false;
+    p.fallStartY = p.pos.y;
+  }
+
+  // -------------------------------------------------------------------------
+  // Mount-activity COURSES (shared substrate: hoop minigame / time-trial / race).
+  // A run is an ordered set of 3D checkpoint spheres; the sim times it on the
+  // integer tick clock and detects pass-through by segment-vs-sphere so a fast
+  // flyer can't tunnel a thin ring in one tick. Server-authoritative: the timer
+  // is the sim's measured tick delta, never a client-reported number.
+  // -------------------------------------------------------------------------
+
+  /** Begin a course run. Server-authoritative gates: the course must exist, the
+   *  rider must be on a flying mount for a flyingOnly course (feature 5), and no
+   *  run may already be in progress. Returns true when the run started. */
+  startCourse(courseId: string, pid?: number): boolean {
+    const r = this.resolve(pid);
+    if (!r) return false;
+    const { meta, e: p } = r;
+    if (p.dead) return false;
+    const def = COURSES[courseId];
+    if (!def) return false;
+    if (def.flyingOnly && !isFlyingMount(p.mountId)) return false; // ground mounts ineligible
+    if (meta.courseRun && meta.courseRun.state === 'active') return false; // already running
+    // Place the rider just behind the first gate, facing it, at the gate's
+    // altitude — so a run starts cleanly without a cross-map flight to find it.
+    const c0 = def.checkpoints[0];
+    const c1 = def.checkpoints[1 % def.checkpoints.length];
+    const ax = c0.x - c1.x, az = c0.z - c1.z;
+    const al = Math.hypot(ax, az) || 1;
+    p.pos = { x: c0.x + (ax / al) * 8, y: c0.y, z: c0.z + (az / al) * 8 };
+    p.prevPos = { ...p.pos };
+    p.facing = Math.atan2(c0.x - p.pos.x, c0.z - p.pos.z); // face gate 0 (f → (sin,cos))
+    this.rebucket(p);
+    meta.courseRun = {
+      courseId,
+      startTick: -1, // armed; the clock starts when the first gate is crossed
+      nextCheckpoint: 0,
+      lap: 0,
+      splits: [],
+      state: 'active',
+      elapsedTicks: 0,
+    };
+    this.emit({ type: 'courseStart', courseId, pid: p.id });
+    return true;
+  }
+
+  /** Abandon the active run (player bailed). */
+  abortCourse(pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r || !r.meta.courseRun || r.meta.courseRun.state !== 'active') return;
+    const courseId = r.meta.courseRun.courseId;
+    r.meta.courseRun = null;
+    this.emit({ type: 'courseFail', courseId, reason: 'aborted', pid: r.e.id });
+  }
+
+  /** Advance an active course run for one tick: fail it if the rider lost flight,
+   *  else test the prev→cur segment against the next checkpoint sphere (ordered),
+   *  advancing the cursor / lap and finishing on the last gate. */
+  private updateCourseRun(p: Entity, meta: PlayerMeta): void {
+    const run = meta.courseRun;
+    if (!run || run.state !== 'active') return;
+    const def = COURSES[run.courseId];
+    if (!def) { meta.courseRun = null; return; }
+    // Losing flight (dismount / downgrade to a ground mount / death) voids a
+    // flyingOnly run — you can't finish on foot.
+    if (def.flyingOnly && !isFlyingMount(p.mountId)) {
+      run.state = 'failed';
+      this.emit({ type: 'courseFail', courseId: def.id, reason: 'dismounted', pid: p.id });
+      meta.courseRun = null;
+      return;
+    }
+    const gate = def.checkpoints[run.nextCheckpoint];
+    if (!segmentHitsSphere(p.prevPos, p.pos, gate.x, gate.y, gate.z, gate.radius)) return;
+
+    // Solo time-trials start the clock on the first gate (the start line); a race
+    // clock is GO-based (set in updateRaces), so don't override it here.
+    if (run.raceId === undefined && run.splits.length === 0) run.startTick = this.tickCount;
+    run.splits.push(this.tickCount);
+    run.nextCheckpoint++;
+    if (run.nextCheckpoint >= def.checkpoints.length) {
+      run.nextCheckpoint = 0;
+      run.lap++;
+    }
+    if (run.lap >= def.laps) {
+      run.state = 'done';
+      run.elapsedTicks = this.tickCount - run.startTick;
+      // Solo runs feed the time-trial leaderboard + a "new best" flag; race runs
+      // resolve through updateRaces (placement + raceFinish), not the solo board,
+      // so a synchronized-start race time never pollutes the time-trial board.
+      if (run.raceId === undefined) {
+        const prev = meta.mountTrialBests[def.id];
+        if (prev === undefined || run.elapsedTicks < prev) meta.mountTrialBests[def.id] = run.elapsedTicks;
+        this.emit({ type: 'courseFinish', courseId: def.id, elapsedTicks: run.elapsedTicks, pid: p.id });
+        // Credit any active Skyward-Trials quest objective for this course (solo
+        // runs only — a race finish has a synchronized clock and doesn't count).
+        this.creditQuestCourse(def.id, run.elapsedTicks, meta);
+      }
+    } else {
+      this.emit({
+        type: 'courseCheckpoint', courseId: def.id,
+        index: run.splits.length, total: courseTotalGates(def),
+        lap: run.lap, laps: def.laps, atTick: this.tickCount, pid: p.id,
+      });
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Multi-racer RACES. A leader starts a race for their party (or solo); every
+  // eligible flyer is staged at the start, held through a synchronized countdown,
+  // released together on GO, and placed by finish order over the course substrate.
+  // Race times never feed the solo time-trial board (different start conditions).
+  // -------------------------------------------------------------------------
+
+  /** Start a race for `pid`'s party (or just `pid` solo). Returns true when a race
+   *  formed. Every racer must be on a flying mount (for a flyingOnly course) and
+   *  free of another run; ineligible party members are simply left out. */
+  startRace(courseId: string, pid?: number): boolean {
+    const r = this.resolve(pid);
+    if (!r) return false;
+    const def = COURSES[courseId];
+    if (!def) return false;
+    const party = this.partyOf(r.e.id);
+    const candidates = party ? [...party.members] : [r.e.id];
+    const racers: number[] = [];
+    for (const id of candidates) {
+      const e = this.entities.get(id);
+      const m = this.players.get(id);
+      if (!e || !m || e.dead) continue;
+      if (def.flyingOnly && !isFlyingMount(e.mountId)) continue;
+      if (m.courseRun && (m.courseRun.state === 'active' || m.courseRun.state === 'countdown')) continue; // busy
+      racers.push(id);
+    }
+    if (racers.length === 0) return false;
+
+    const race: Race = {
+      id: this.nextRaceId++, courseId, participants: racers, state: 'countdown',
+      countdownRemaining: RACE_COUNTDOWN_TICKS, goTick: -1, finishOrder: [], dnf: new Set(), doneTick: 0,
+    };
+    this.races.push(race);
+    this.stageRace(race, def);
+    return true;
+  }
+
+  /** Stage a race's participants in side-by-side lanes just behind gate 0, arm each
+   *  rider's countdown courseRun, and fire raceCountdown. Shared by startRace and
+   *  launchWagerRace so wager and party races run one identical code path. */
+  private stageRace(race: Race, def: CourseDef): void {
+    const c0 = def.checkpoints[0];
+    const c1 = def.checkpoints[1 % def.checkpoints.length];
+    const ax = c0.x - c1.x, az = c0.z - c1.z;
+    const al = Math.hypot(ax, az) || 1;
+    const ux = ax / al, uz = az / al; // unit vector behind gate 0
+    const lx = -uz, lz = ux; // perpendicular (lane offset)
+    for (let i = 0; i < race.participants.length; i++) {
+      const e = this.entities.get(race.participants[i])!;
+      const meta = this.players.get(race.participants[i])!;
+      const lane = i - (race.participants.length - 1) / 2;
+      e.pos = { x: c0.x + ux * 9 + lx * lane * 3.2, y: c0.y, z: c0.z + uz * 9 + lz * lane * 3.2 };
+      e.prevPos = { ...e.pos };
+      e.facing = Math.atan2(c0.x - e.pos.x, c0.z - e.pos.z);
+      this.rebucket(e);
+      meta.courseRun = { courseId: race.courseId, startTick: -1, nextCheckpoint: 0, lap: 0, splits: [], state: 'countdown', elapsedTicks: 0, raceId: race.id };
+      this.emit({ type: 'raceCountdown', raceId: race.id, courseId: race.courseId, seconds: Math.ceil(RACE_COUNTDOWN_TICKS / TICK_RATE), pid: race.participants[i] });
+    }
+  }
+
+  /** Advance every race: run the countdown, release on GO (synchronized clocks),
+   *  record placement as racers finish/drop, end + clean up. Called once per tick
+   *  AFTER the per-player loop, so this tick's course-run finishes are visible. */
+  private updateRaces(): void {
+    for (let i = this.races.length - 1; i >= 0; i--) {
+      const race = this.races[i];
+      if (race.state === 'countdown') {
+        race.countdownRemaining -= 1;
+        if (race.countdownRemaining <= 0) {
+          race.state = 'active';
+          race.goTick = this.tickCount;
+          for (const id of race.participants) {
+            const meta = this.players.get(id);
+            if (!meta || meta.courseRun?.raceId !== race.id) { race.dnf.add(id); continue; }
+            meta.courseRun.state = 'active';
+            meta.courseRun.startTick = this.tickCount; // every clock starts at GO
+            this.emit({ type: 'raceGo', raceId: race.id, courseId: race.courseId, pid: id });
+          }
+        }
+        continue;
+      }
+      if (race.state === 'active') {
+        for (const id of race.participants) {
+          if (race.finishOrder.includes(id) || race.dnf.has(id)) continue;
+          const meta = this.players.get(id);
+          if (!meta || meta.courseRun?.raceId !== race.id || meta.courseRun.state === 'failed') {
+            race.dnf.add(id);
+            if (meta && meta.courseRun?.raceId === race.id) meta.courseRun = null;
+            continue;
+          }
+          if (meta.courseRun.state === 'done') {
+            race.finishOrder.push(id);
+            this.emit({
+              type: 'raceFinish', raceId: race.id, courseId: race.courseId,
+              place: race.finishOrder.length, total: race.participants.length,
+              elapsedTicks: meta.courseRun.elapsedTicks, pid: id,
+            });
+          }
+        }
+        if (race.finishOrder.length + race.dnf.size >= race.participants.length) {
+          race.state = 'done';
+          race.doneTick = this.tickCount;
+          // Pay out the pot (winner-takes-all, or refund on no finisher) BEFORE the
+          // result events, so the wagerSettled cue lands with the placement.
+          if (race.wagerLobbyId !== undefined) this.settleWagerRace(race);
+          for (const id of race.participants) {
+            const place = race.finishOrder.indexOf(id) + 1; // 0 = DNF
+            this.emit({ type: 'raceResult', raceId: race.id, courseId: race.courseId, place, total: race.participants.length, pid: id });
+          }
+        }
+        continue;
+      }
+      // done: linger for the result panel, then drop and clear the runs.
+      if (this.tickCount - race.doneTick >= RACE_CLEANUP_TICKS) {
+        for (const id of race.participants) {
+          const meta = this.players.get(id);
+          if (meta && meta.courseRun?.raceId === race.id) meta.courseRun = null;
+        }
+        // Tear down the settled wager lobby once its race is dropped.
+        if (race.wagerLobbyId !== undefined) {
+          const lb = this.wagerLobbies.get(race.wagerLobbyId);
+          if (lb) { for (const pid of lb.stakes) this.wagerByPid.delete(pid); this.wagerLobbies.delete(race.wagerLobbyId); }
+        }
+        this.races.splice(i, 1);
+      }
+    }
+  }
+
+  /** Project the race containing `pid` into the client-facing RaceInfo (leaders /
+   *  finishers first), or null when the player isn't in a race. */
+  raceInfoFor(pid: number): RaceInfo | null {
+    const race = this.races.find((rc) => rc.participants.includes(pid));
+    if (!race) return null;
+    const def = COURSES[race.courseId];
+    const total = def ? courseTotalGates(def) : 0;
+    const lapGates = def ? def.checkpoints.length : 1;
+    const participants: RaceParticipant[] = race.participants.map((id) => {
+      const e = this.entities.get(id);
+      const m = this.players.get(id);
+      const run = m && m.courseRun?.raceId === race.id ? m.courseRun : null;
+      const place = race.finishOrder.indexOf(id) + 1;
+      const dnf = race.dnf.has(id);
+      const gate = place > 0 ? total : run ? Math.min(run.lap * lapGates + run.nextCheckpoint, total) : 0;
+      return { pid: id, name: e?.name ?? '', gate, total, place: place > 0 ? place : 0, done: place > 0, dnf, me: id === pid };
+    });
+    participants.sort((a, b) => {
+      if (a.done !== b.done) return a.done ? -1 : 1;
+      if (a.done && b.done) return a.place - b.place;
+      if (a.dnf !== b.dnf) return a.dnf ? 1 : -1;
+      return b.gate - a.gate;
+    });
+    return {
+      raceId: race.id, courseId: race.courseId, state: race.state,
+      countdown: Math.ceil(Math.max(0, race.countdownRemaining) / TICK_RATE), participants,
+    };
   }
 
   /** Cosmetic skin-select event: rolls a rarity rank (once) and emits the
@@ -1551,6 +2128,236 @@ export class Sim {
   }
   get moveInput(): MoveInput {
     return this.primary.moveInput;
+  }
+  get mountCast(): { id: string; remaining: number; total: number } | null {
+    return this.primary.mountCast;
+  }
+  get courseRun(): CourseRunState | null {
+    return this.primary.courseRun;
+  }
+  get mountTrialBests(): Record<string, number> {
+    return this.primary.mountTrialBests;
+  }
+  get raceInfo(): RaceInfo | null {
+    return this.raceInfoFor(this.primaryId);
+  }
+  get earnedMounts(): string[] {
+    return [...this.primary.earnedMounts];
+  }
+  get wagerInfo(): WagerInfo | null {
+    return this.wagerInfoFor(this.primaryId);
+  }
+
+  // -------------------------------------------------------------------------
+  // Soft-currency Wager Races. A host stakes in-game gold (+ an optional Mount
+  // Charter) and opens a race; nearby/party flyers OPT IN (the only point they
+  // are charged); the winner takes the whole pot. No real money / $WOC — the pot
+  // is pure meta.copper + charter items, fully escrowed and conserved.
+  // -------------------------------------------------------------------------
+
+  private wagerPot(lobby: WagerLobby): { copper: number; charters: number } {
+    return { copper: lobby.stakes.size * lobby.anteCopper, charters: lobby.anteCharterId ? lobby.stakes.size : 0 };
+  }
+
+  /** Pull one uniform ante (gold + optional Charter) from `pid` into `lobby`'s
+   *  escrow ledger. Caller has already checked affordability. */
+  private escrowWager(lobby: WagerLobby, pid: number): void {
+    const meta = this.players.get(pid)!;
+    meta.copper -= lobby.anteCopper;
+    if (lobby.anteCharterId) this.removeItem(lobby.anteCharterId, 1, pid);
+    lobby.stakes.add(pid);
+    this.wagerByPid.set(pid, lobby.id);
+  }
+
+  /** Return one staker's ante (consent withdrawn / refund) and drop them from the
+   *  ledger. Safe to call only before the pot is paid out. */
+  private returnStake(lobby: WagerLobby, pid: number): void {
+    const meta = this.players.get(pid);
+    if (meta) {
+      meta.copper += lobby.anteCopper;
+      if (lobby.anteCharterId) this.addItem(lobby.anteCharterId, 1, pid);
+    }
+    lobby.stakes.delete(pid);
+    this.wagerByPid.delete(pid);
+  }
+
+  /** Refund every remaining staker and mark the lobby settled (drained once). */
+  private refundWagerLobby(lobby: WagerLobby): void {
+    if (lobby.settled) return;
+    for (const pid of [...lobby.stakes]) {
+      const meta = this.players.get(pid);
+      if (meta) {
+        meta.copper += lobby.anteCopper;
+        if (lobby.anteCharterId) this.addItem(lobby.anteCharterId, 1, pid);
+      }
+      this.wagerByPid.delete(pid);
+      this.emit({ type: 'wagerSettled', won: false, copper: 0, charters: 0, charterId: lobby.anteCharterId, cancelled: true, pid });
+    }
+    lobby.stakes.clear();
+    lobby.settled = true;
+  }
+
+  private wagerAnteOk(meta: PlayerMeta, anteCopper: number, anteCharterId: string | null): boolean {
+    return meta.copper >= anteCopper && (anteCharterId === null || this.countItem(anteCharterId, meta.entityId) >= 1);
+  }
+
+  /** Host opens a staked race: validate + escrow the host's own ante (proposing IS
+   *  consent), then invite party members and nearby flyers to opt in. */
+  proposeWagerRace(courseId: string, anteCopper: number, anteCharterId: string | null, pid?: number): boolean {
+    const r = this.resolve(pid);
+    if (!r) return false;
+    const { meta, e } = r;
+    const def = COURSES[courseId];
+    if (!def || !def.flyingOnly) { this.error(meta.entityId, 'That course cannot be wagered.'); return false; }
+    if (e.dead || !isFlyingMount(e.mountId)) { this.error(meta.entityId, 'You must be on a flying mount to wager.'); return false; }
+    if (this.wagerByPid.has(meta.entityId)) { this.error(meta.entityId, 'You are already in a wager.'); return false; }
+    if (!Number.isFinite(anteCopper) || anteCopper < WAGER_MIN_ANTE) { this.error(meta.entityId, 'Name a wager of at least 1 copper.'); return false; }
+    const ante = Math.floor(anteCopper);
+    if (anteCharterId !== null && !isCharterEligible(anteCharterId.replace(/^charter_/, ''))) { this.error(meta.entityId, 'That cannot be staked as a wager.'); return false; }
+    if (!this.wagerAnteOk(meta, ante, anteCharterId)) { this.error(meta.entityId, 'You cannot cover that wager.'); return false; }
+
+    const lobby: WagerLobby = {
+      id: this.nextWagerId++, hostPid: meta.entityId, courseId, anteCopper: ante, anteCharterId,
+      stakes: new Set(), expires: this.time + WAGER_LOBBY_TTL, raceId: null, settled: false,
+    };
+    this.wagerLobbies.set(lobby.id, lobby);
+    this.escrowWager(lobby, meta.entityId); // the host consents by proposing
+
+    // Invite party members + nearby flyers who are free and uninvited.
+    const party = this.partyOf(e.id);
+    const seen = new Set<number>([meta.entityId]);
+    const candidates: number[] = party ? party.members.filter((m) => m !== meta.entityId) : [];
+    for (const other of this.players.values()) {
+      const oe = this.entities.get(other.entityId);
+      if (!oe || seen.has(other.entityId)) continue;
+      if (dist2d(e.pos, oe.pos) <= WAGER_INVITE_RANGE) candidates.push(other.entityId);
+    }
+    for (const targetPid of candidates) {
+      if (seen.has(targetPid)) continue;
+      seen.add(targetPid);
+      const te = this.entities.get(targetPid);
+      const tm = this.players.get(targetPid);
+      if (!te || !tm || te.dead || !isFlyingMount(te.mountId)) continue;
+      if (this.wagerByPid.has(targetPid) || this.hasPendingSocialInvite(targetPid)) continue;
+      this.wagerInvites.set(targetPid, { fromPid: meta.entityId, lobbyId: lobby.id, expires: this.time + WAGER_INVITE_TTL });
+      this.emit({ type: 'wagerInvite', fromPid: meta.entityId, fromName: meta.name, courseId, anteCopper: ante, anteCharterId, pid: targetPid });
+    }
+    return true;
+  }
+
+  /** Opt in to a wager — the ONLY place a non-host is charged. Re-validates at
+   *  accept time (the offer may be stale). */
+  wagerJoin(pid?: number): boolean {
+    const r = this.resolve(pid);
+    if (!r) return false;
+    const { meta, e } = r;
+    const invite = this.wagerInvites.get(meta.entityId);
+    if (!invite || invite.expires < this.time) { this.error(meta.entityId, 'That wager offer has expired.'); return false; }
+    this.wagerInvites.delete(meta.entityId);
+    const lobby = this.wagerLobbies.get(invite.lobbyId);
+    if (!lobby || lobby.raceId !== null || lobby.settled) { this.error(meta.entityId, 'That wager is no longer open.'); return false; }
+    if (this.wagerByPid.has(meta.entityId)) { this.error(meta.entityId, 'You are already in a wager.'); return false; }
+    if (e.dead || !isFlyingMount(e.mountId)) { this.error(meta.entityId, 'You must be on a flying mount to wager.'); return false; }
+    if (!this.wagerAnteOk(meta, lobby.anteCopper, lobby.anteCharterId)) { this.error(meta.entityId, 'You cannot cover that wager.'); return false; }
+    this.escrowWager(lobby, meta.entityId);
+    return true;
+  }
+
+  /** Decline a wager offer — nothing was charged, just drop the invite. */
+  wagerDecline(pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    this.wagerInvites.delete(r.meta.entityId);
+  }
+
+  /** Leave a wager before launch (consent withdrawn ⇒ stake refunded). The host
+   *  leaving cancels the whole lobby and refunds everyone. No-op once racing. */
+  wagerLeave(pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    const lobbyId = this.wagerByPid.get(r.meta.entityId);
+    const lobby = lobbyId !== undefined ? this.wagerLobbies.get(lobbyId) : undefined;
+    if (!lobby || lobby.settled || lobby.raceId !== null) return; // can't leave once the race is staged
+    if (lobby.hostPid === r.meta.entityId) { this.refundWagerLobby(lobby); return; }
+    this.returnStake(lobby, r.meta.entityId);
+    this.emit({ type: 'wagerSettled', won: false, copper: 0, charters: 0, charterId: lobby.anteCharterId, cancelled: true, pid: r.meta.entityId });
+  }
+
+  /** Host launches the race for the opted-in stakers; needs ≥2. */
+  launchWagerRace(pid?: number): boolean {
+    const r = this.resolve(pid);
+    if (!r) return false;
+    const lobbyId = this.wagerByPid.get(r.meta.entityId);
+    const lobby = lobbyId !== undefined ? this.wagerLobbies.get(lobbyId) : undefined;
+    if (!lobby || lobby.settled || lobby.raceId !== null) return false;
+    if (lobby.hostPid !== r.meta.entityId) { this.error(r.meta.entityId, 'Only the host can launch the wager.'); return false; }
+    const def = COURSES[lobby.courseId];
+    if (!def) { this.refundWagerLobby(lobby); return false; }
+    // Only still-eligible stakers race; refund anyone who lapsed (keeps the pot conserved).
+    const racers: number[] = [];
+    for (const id of [...lobby.stakes]) {
+      const e = this.entities.get(id);
+      const m = this.players.get(id);
+      const busy = m?.courseRun && (m.courseRun.state === 'active' || m.courseRun.state === 'countdown');
+      if (!e || !m || e.dead || !isFlyingMount(e.mountId) || busy) { this.returnStake(lobby, id); continue; }
+      racers.push(id);
+    }
+    if (racers.length < 2) { this.refundWagerLobby(lobby); return false; }
+
+    const race: Race = {
+      id: this.nextRaceId++, courseId: lobby.courseId, participants: racers, state: 'countdown',
+      countdownRemaining: RACE_COUNTDOWN_TICKS, goTick: -1, finishOrder: [], dnf: new Set(), doneTick: 0,
+      wagerLobbyId: lobby.id,
+    };
+    this.races.push(race);
+    lobby.raceId = race.id;
+    lobby.expires = this.time + WAGER_LOBBY_TTL; // don't let the lobby TTL fire mid-race
+    this.stageRace(race, def);
+    return true;
+  }
+
+  /** Settle a finished wager race: the winner takes the whole pot; no finisher
+   *  refunds everyone. Guarded by `settled` so the result-panel linger can't
+   *  re-pay. Called from updateRaces on the 'done' transition. */
+  private settleWagerRace(race: Race): void {
+    const lobby = race.wagerLobbyId !== undefined ? this.wagerLobbies.get(race.wagerLobbyId) : undefined;
+    if (!lobby || lobby.settled) return;
+    const winnerPid = race.finishOrder[0];
+    if (winnerPid === undefined) { this.refundWagerLobby(lobby); return; } // everyone DNF
+    const { copper, charters } = this.wagerPot(lobby);
+    const winnerMeta = this.players.get(winnerPid);
+    if (winnerMeta) {
+      winnerMeta.copper += copper;
+      for (let i = 0; i < charters; i++) this.addItem(lobby.anteCharterId!, 1, winnerPid);
+    }
+    for (const pid of lobby.stakes) {
+      this.wagerByPid.delete(pid);
+      this.emit(pid === winnerPid
+        ? { type: 'wagerSettled', won: true, copper, charters, charterId: lobby.anteCharterId, cancelled: false, pid }
+        : { type: 'wagerSettled', won: false, copper: 0, charters: 0, charterId: lobby.anteCharterId, cancelled: false, pid });
+    }
+    lobby.settled = true;
+  }
+
+  /** Project the wager lobby `pid` is in into the client-facing WagerInfo. */
+  wagerInfoFor(pid: number): WagerInfo | null {
+    const lobbyId = this.wagerByPid.get(pid);
+    if (lobbyId === undefined) return null;
+    const lobby = this.wagerLobbies.get(lobbyId);
+    if (!lobby) return null;
+    const { copper, charters } = this.wagerPot(lobby);
+    return {
+      lobbyId: lobby.id, hostPid: lobby.hostPid, isHost: lobby.hostPid === pid,
+      courseId: lobby.courseId, anteCopper: lobby.anteCopper, anteCharterId: lobby.anteCharterId,
+      launched: lobby.raceId !== null, potCopper: copper, potCharters: charters,
+      members: [...lobby.stakes].map((id) => ({ pid: id, name: this.players.get(id)?.name ?? '' })),
+    };
+  }
+
+  // Offline play has no leaderboard (single player, no server); the online
+  // ClientWorld fetches it over REST.
+  mountTrialLeaderboard(_trackId: string): Promise<MountTrialLeaderEntry[]> {
+    return Promise.resolve([]);
   }
   get inventory(): InvSlot[] {
     return this.primary.inventory;
@@ -2087,6 +2894,7 @@ export class Sim {
       tameError: sim.tameError.bind(sim),
       standUp: sim.standUp.bind(sim),
       breakGhostWolf: sim.breakGhostWolf.bind(sim),
+      dismount: sim.dismount.bind(sim),
       startAutoAttack: sim.startAutoAttack.bind(sim),
       revivePet: sim.revivePet.bind(sim),
       completeFishing: sim.completeFishing.bind(sim),
@@ -2124,6 +2932,8 @@ export class Sim {
       unlockMechChromaFromItem: (meta, itemId, chromaId) =>
         sim.unlockMechChromaFromItem(meta, itemId, chromaId),
       openSkinSelect: (meta, catalog, itemId) => sim.openSkinSelect(meta, catalog, itemId),
+      redeemMountCharter: (meta, itemId, mountId) =>
+        sim.redeemMountCharter(meta, itemId, mountId),
       isSwimming: (e) => sim.isSwimming(e),
       // Interaction (W3): the moved interaction.interact dispatches into the quest-NPC
       // surface that STAYS on Sim (W4 owns talkToNpc / interactNpcForQuests /
@@ -2314,6 +3124,8 @@ export class Sim {
       if (!p) continue;
       if (!p.dead) {
         this.updatePlayerMovement(p, meta);
+        this.updateCourseRun(p, meta); // pass-through uses the just-moved prev→pos segment
+        this.updateMountCast(p, meta);
         this.updateDoorTriggers(p);
         this.updateCasting(p, meta);
         this.updatePlayerAutoAttack(p, meta);
@@ -2369,6 +3181,8 @@ export class Sim {
 
     this.updateDuels();
     this.updateArena();
+    this.updateRaces();
+    this.updateWagerLobbies();
     this.updateTradesAndInvites();
     this.updateLootRolls();
     this.updateInstances();
@@ -2455,6 +3269,14 @@ export class Sim {
     if (e.kind === 'player') {
       const ms = this.players.get(e.id)?.fiestaSpecial.moveSpeedPct;
       if (ms) speed += ms;
+    }
+    // $WOC holder travel mount: a classic ground-mount boost while mounted and
+    // out of combat (combat/damage dismounts, but guard regardless). The mount is
+    // the dominant travel source — take the max so it never stacks on top of
+    // other speed buffs into pay-to-win territory; a slow still scales it down.
+    if (e.mountId && !e.inCombat) {
+      const m = MOUNTS[e.mountId];
+      if (m) speed = Math.max(speed, m.speedMult);
     }
     return slow * speed;
   }
@@ -2699,9 +3521,18 @@ export class Sim {
     const wantsMove = mx !== 0 || mz !== 0 || inp.jump;
     if (wantsMove && p.sitting) this.standUp(p);
 
+    // $WOC flying mount: a weightless flight branch (lift off, soar over
+    // terrain/water, no prop collision). Bypasses gravity, ground collision, and
+    // the swim-dismount below entirely. Dismounting up here lets gravity resume —
+    // the ground branch then takes over and the rider falls.
+    if (isFlyingMount(p.mountId)) { this.updateFlightMovement(p, meta, mx, mz); return; }
+
     const hasMoveInput = mx !== 0 || mz !== 0;
     const moving = hasMoveInput && !isRooted(p);
     const swimming = this.isSwimming(p);
+    // Mounts don't swim — entering deep water throws the rider. (The summon cast
+    // is cancelled separately in updateMountCast.)
+    if (p.mountId && swimming) this.dismount(p);
     let wishX = 0,
       wishZ = 0,
       wishSpeed = 0;
@@ -3356,10 +4187,17 @@ export class Sim {
   }
 
   private enterCombat(a: Entity, b: Entity): void {
+    // Airborne $WOC flyers are non-combatants — neither party enters combat (so the
+    // rider is never dismounted by a path mob). Gate BEFORE the inCombat/dismount
+    // below, or it would dismount the very flyer it's meant to protect.
+    if (isFlyingMount(a.mountId) || isFlyingMount(b.mountId)) return;
     a.combatTimer = 0;
     b.combatTimer = 0;
     a.inCombat = true;
     b.inCombat = true;
+    // Combat throws you from a holder mount — whether you struck or were struck.
+    if (a.mountId !== undefined) this.dismount(a);
+    if (b.mountId !== undefined) this.dismount(b);
     // players and their pets pull wild mobs; pets never run wild-mob AI
     const aAttacker = a.kind === 'player' || (a.kind === 'mob' && a.ownerId !== null);
     if (b.kind === 'mob' && b.ownerId === null && !b.dead && aAttacker && b.aiState !== 'evade') {
@@ -4436,6 +5274,38 @@ export class Sim {
   // finalizeQuestAccept call ctx.onInventoryChangedForQuests, and interactNpcForQuests
   // plus the N1 crypt interactObjectForQuests call ctx.checkQuestReady.
 
+  // Credit 'finish_course' objectives when a Skytrial/circuit is completed solo.
+  // A par-time gate (obj.parTicks) only credits a run that finished fast enough,
+  // so a "beat the clock" quest is a real skill gate, not a participation trophy.
+  // Stays on Sim (mount-course owned): the course-run completion path is the lone
+  // caller; it reaches the moved quest-ready check via this.ctx.checkQuestReady.
+  private creditQuestCourse(courseId: string, elapsedTicks: number, meta: PlayerMeta): void {
+    for (const qp of meta.questLog.values()) {
+      if (qp.state !== 'active') continue;
+      const quest = QUESTS[qp.questId];
+      let changed = false;
+      quest.objectives.forEach((obj, i) => {
+        if (
+          obj.type === 'finish_course' &&
+          obj.courseId === courseId &&
+          qp.counts[i] < obj.count &&
+          (obj.parTicks === undefined || elapsedTicks <= obj.parTicks)
+        ) {
+          qp.counts[i]++;
+          changed = true;
+          meta.counters.questProgress++;
+          this.emit({
+            type: 'questProgress',
+            questId: qp.questId,
+            text: `${obj.label}: ${qp.counts[i]}/${obj.count}`,
+            pid: meta.entityId,
+          });
+        }
+      });
+      if (changed) this.ctx.checkQuestReady(qp, meta);
+    }
+  }
+
   // -------------------------------------------------------------------------
   // Player death / respawn
   // -------------------------------------------------------------------------
@@ -4533,7 +5403,19 @@ export class Sim {
   }
 
   private hasPendingSocialInvite(targetPid: number): boolean {
-    return this.party.hasPendingSocialInvite(targetPid);
+    // party/trade/duel invites are checked by the moved party machine; the $WOC
+    // wager invite lives on Sim (its lobby is mount-owned), so OR it in here.
+    return this.party.hasPendingSocialInvite(targetPid) || this.hasActiveWagerInvite(targetPid);
+  }
+
+  private hasActiveWagerInvite(targetPid: number): boolean {
+    const invite = this.wagerInvites.get(targetPid);
+    if (!invite) return false;
+    if (invite.expires < this.time) {
+      this.wagerInvites.delete(targetPid);
+      return false;
+    }
+    return true;
   }
 
   private entityInDungeon(e: Entity, dungeonId: string): boolean {
@@ -5038,6 +5920,26 @@ export class Sim {
   // verbatim to social/trade.ts; partyInvites/duelInvites route through ctx.
   private updateTradesAndInvites(): void {
     tradeMod.updateTradesAndInvites(this.ctx);
+  }
+
+  // $WOC wager invite/lobby expiry. The party/trade/duel invite sweep moved into
+  // social/trade.ts, but the wager invite + the never-launched-lobby auto-refund are
+  // mount-owned, so they sweep here, called from tick() right after updateRaces().
+  private updateWagerLobbies(): void {
+    // wager invites expire too, but notify the invitee so the prompt closes.
+    for (const [pid, invite] of this.wagerInvites) {
+      if (invite.expires < this.time) {
+        this.wagerInvites.delete(pid);
+        this.emit({ type: 'wagerExpired', pid });
+      }
+    }
+    // a wager lobby that's never launched auto-cancels at its TTL, refunding all.
+    for (const lobby of [...this.wagerLobbies.values()]) {
+      if (lobby.raceId === null && !lobby.settled && lobby.expires < this.time) {
+        this.refundWagerLobby(lobby);
+        this.wagerLobbies.delete(lobby.id);
+      }
+    }
   }
 
   // -------------------------------------------------------------------------

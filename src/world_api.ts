@@ -55,6 +55,7 @@ import type { IWorldInteraction } from './world_api/interaction';
 import type { IWorldInventory } from './world_api/inventory';
 import type { IWorldLoot } from './world_api/loot';
 import type { IWorldMarket } from './world_api/market';
+import type { IWorldMounts } from './world_api/mounts';
 import type { IWorldParty } from './world_api/party';
 import type { IWorldPet } from './world_api/pet';
 import type { IWorldProgressionXp } from './world_api/progression_xp';
@@ -90,6 +91,13 @@ export type {
 } from './world_api/duel_arena';
 export type { RaidLockout } from './world_api/dungeons';
 export type { MarketInfo, MarketListingView } from './world_api/market';
+export type {
+  MountTrialLeaderEntry,
+  RaceInfo,
+  RaceParticipant,
+  WagerInfo,
+  WagerMember,
+} from './world_api/mounts';
 export type { PartyInfo, PartyMemberInfo } from './world_api/party';
 export type { LeaderboardEntry } from './world_api/progression_xp';
 export type {
@@ -126,6 +134,7 @@ export interface IWorld
     IWorldMarket,
     IWorldDungeons,
     IWorldDelves,
+    IWorldMounts,
     IWorldTelemetry {}
 
 // ---------------------------------------------------------------------------
@@ -256,6 +265,17 @@ export const COMMAND_NAMES = [
   'lockpick_abort',
   'collect_delve_chest_loot',
   'telemetry',
+  'summon_mount',
+  'dismiss_mount',
+  'start_course',
+  'abort_course',
+  'mint_charter',
+  'start_race',
+  'wager_propose',
+  'wager_join',
+  'wager_decline',
+  'wager_leave',
+  'wager_launch',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch

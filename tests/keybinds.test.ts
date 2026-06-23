@@ -227,7 +227,8 @@ describe('persistence', () => {
     expect(kb.actionForCode('KeyH')).toBe('targetFriendly');
     expect(kb.actionForCode('Enter')).toBe('chat');
     expect(kb.actionForCode('Equal')).toBe('slot11');
-    expect(kb.actionForCode('KeyY')).toBe(null);
+    expect(kb.actionForCode('KeyY')).toBe('mounts'); // $WOC holder mount window
+    expect(kb.actionForCode('KeyZ')).toBe(null); // still unbound by default
   });
 
   it('drops a retained default that a stored binding already claimed', () => {

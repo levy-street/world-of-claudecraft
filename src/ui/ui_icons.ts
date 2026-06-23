@@ -17,7 +17,7 @@ export type UiIconName =
   // game-icons.net
   | 'arena' | 'questlog' | 'crown' | 'target' | 'menu' | 'spellbook' | 'bags'
   | 'map' | 'leaderboard' | 'character' | 'social' | 'attack' | 'market'
-  | 'chat' | 'interact' | 'emote'
+  | 'chat' | 'interact' | 'emote' | 'mount'
   // hand-authored geometrics
   | 'close' | 'prev' | 'next' | 'more' | 'meters'
   | 'whisper' | 'music' | 'talents' | 'skull' | 'jump' | 'autorun' | 'nameplates' | 'vibrate' | 'lock';
@@ -52,6 +52,9 @@ const ICONS: Record<UiIconName, string> = {
   // hand-authored: a unit nameplate — name bar over a health bar, with a
   // downward pointer aimed at the unit it floats above.
   nameplates: '<path d="M88 132h336v68H88zM88 220h336v56H88zM236 296h40l-20 34z"/>',
+  // hand-authored: a horseshoe (downward-opening arch + two nail holes) — reads
+  // as "mount/steed" without needing a fiddly horse-head outline.
+  mount: '<path d="M156 412V236a100 100 0 0 1 200 0v176" stroke="currentColor" stroke-width="46" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="156" cy="392" r="13"/><circle cx="356" cy="392" r="13"/>',
   whisper: '<path fill-rule="evenodd" d="M48 112h416a16 16 0 0 1 16 16v256a16 16 0 0 1-16 16H48a16 16 0 0 1-16-16V128a16 16 0 0 1 16-16zM72 152 256 292 440 152z"/>',
   music: '<path d="M158 374a54 54 0 1 0 108 0 54 54 0 1 0-108 0M260 128h22v246h-22zM282 122c46 16 70 58 46 98 12-32-6-62-46-74z"/>',
   talents: '<path d="M256 138v104M256 242l-96 86M256 242l96 86" stroke="currentColor" stroke-width="28" fill="none" stroke-linecap="round"/><circle cx="256" cy="116" r="44"/><circle cx="150" cy="352" r="44"/><circle cx="362" cy="352" r="44"/>',
