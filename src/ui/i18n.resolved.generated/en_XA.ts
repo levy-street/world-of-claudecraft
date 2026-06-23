@@ -2597,6 +2597,25 @@ export const en_XA: EnTranslations = {
       "activeAria": "[{name} — çúŕŕéñţļý áçţíʋé]",
       "cardAria": "[{name}: {flavor}]"
     },
+    "course": {
+      "skytrials": "[Šķýţŕíáļš]",
+      "skytrialsHint": "[Ƒļý á ţíɱéð ŕíñĝ çóúŕšé óñ á ƒļýíñĝ ɱóúñţ.]",
+      "needFlyer": "[Šúɱɱóñ á ƒļýíñĝ ɱóúñţ ţó ƒļý Šķýţŕíáļš.]",
+      "start": "[Ƒļý]",
+      "give_up": "[Ĝíʋé úþ]",
+      "par": "[Þáŕ {time}]",
+      "laps": "[{count} ļáþš]",
+      "onePass": "[1 ļáþ]",
+      "starting": "[Ƒļý ţĥŕóúĝĥ ţĥé ƒíŕšţ ŕíñĝ ţó šţáŕţ ţĥé çļóçķ]",
+      "gate": "[Ŕíñĝ {n}/{total}]",
+      "lap": "[Ļáþ {n}/{total}]",
+      "time": "[Ţíɱé]",
+      "finish": "[Ƒíñíšĥ!]",
+      "beatPar": "[Ɓéáţ þáŕ ƀý {time}]",
+      "offPar": "[{time} óƒƒ þáŕ]",
+      "failed": "[Ŕúñ éñðéð — ýóú ļéƒţ ýóúŕ ɱóúñţ]",
+      "aborted": "[Ŕúñ áƀáñðóñéð]"
+    },
     "options": {
       "gameMenu": "[Ĝáɱé Ɱéñú]",
       "keyBindings": "[Ķéý Ɓíñðíñĝš]",

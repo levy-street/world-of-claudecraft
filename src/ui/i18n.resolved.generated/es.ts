@@ -2597,6 +2597,25 @@ export const es: EnTranslations = {
       "activeAria": "{name} — currently active",
       "cardAria": "{name}: {flavor}"
     },
+    "course": {
+      "skytrials": "Skytrials",
+      "skytrialsHint": "Fly a timed ring course on a flying mount.",
+      "needFlyer": "Summon a flying mount to fly Skytrials.",
+      "start": "Fly",
+      "give_up": "Give up",
+      "par": "Par {time}",
+      "laps": "{count} laps",
+      "onePass": "1 lap",
+      "starting": "Fly through the first ring to start the clock",
+      "gate": "Ring {n}/{total}",
+      "lap": "Lap {n}/{total}",
+      "time": "Time",
+      "finish": "Finish!",
+      "beatPar": "Beat par by {time}",
+      "offPar": "{time} off par",
+      "failed": "Run ended — you left your mount",
+      "aborted": "Run abandoned"
+    },
     "options": {
       "gameMenu": "Menú del juego",
       "keyBindings": "Atajos de teclado",

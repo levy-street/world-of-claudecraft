@@ -63,7 +63,7 @@ describe('course substrate — pass-through, ordering, timing', () => {
     const { sim, p } = makeFlyer();
     const def = COURSES.skytrial_vale;
     expect(sim.startCourse('skytrial_vale')).toBe(true);
-    const startTick = sim.courseRun!.startTick;
+    expect(sim.courseRun!.startTick).toBe(-1); // armed; clock not yet running
 
     const finishes: Extract<SimEvent, { type: 'courseFinish' }>[] = [];
     for (const gate of def.checkpoints) {
@@ -75,10 +75,13 @@ describe('course substrate — pass-through, ordering, timing', () => {
     expect(finishes[0].courseId).toBe('skytrial_vale');
     expect(finishes[0].elapsedTicks).toBeGreaterThan(0);
     expect(finishes[0].elapsedTicks).toBe(sim.courseRun!.elapsedTicks);
-    // elapsed = last gate tick − start tick, on the integer clock
     expect(sim.courseRun!.state).toBe('done');
     expect(sim.courseRun!.splits.length).toBe(courseTotalGates(def));
-    expect(finishes[0].elapsedTicks).toBe(sim.courseRun!.splits[sim.courseRun!.splits.length - 1] - startTick);
+    // clock = last gate tick − FIRST gate tick (the start line), integer ticks
+    expect(sim.courseRun!.startTick).toBe(sim.courseRun!.splits[0]);
+    expect(finishes[0].elapsedTicks).toBe(
+      sim.courseRun!.splits[sim.courseRun!.splits.length - 1] - sim.courseRun!.splits[0],
+    );
   });
 
   it('enforces gate order — flying through a later gate first does not advance', () => {
