@@ -233,7 +233,8 @@ export const en_CA: EnTranslations = {
     },
     "hotbar": {
       "add": "Add {name} to the action bar",
-      "remove": "Remove {name} from the action bar"
+      "remove": "Remove {name} from the action bar",
+      "full": "Action bar full, free a slot first"
     },
     "tutorial": {
       "moveBodyTouch": "Use the movement stick to move and drag the screen to look around. Take a few steps to begin.",

@@ -3193,6 +3193,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.perSecondRow': '{total}（{rate}）',
   'hudChrome.meters.seconds': '{s}秒',
   'hudChrome.hotbar.add': '{name} をアクションバーに追加',
+  'hudChrome.hotbar.full': 'アクションバーがいっぱいです。先にスロットを空けてください',
   'hudChrome.hotbar.remove': '{name} をアクションバーから削除',
   'hudChrome.mobile.autorun': 'オートラン',
   'hudChrome.mobile.haptics': '振動',

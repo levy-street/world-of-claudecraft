@@ -3062,6 +3062,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.perSecondRow': '{total}（{rate}）',
   'hudChrome.meters.seconds': '{s}秒',
   'hudChrome.hotbar.add': '將 {name} 加入動作列',
+  'hudChrome.hotbar.full': '動作列已滿，請先空出一個格子',
   'hudChrome.hotbar.remove': '從動作列移除 {name}',
   'hudChrome.mobile.autorun': '自動奔跑',
   'hudChrome.mobile.haptics': '觸覺回饋',

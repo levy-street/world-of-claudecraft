@@ -2786,11 +2786,14 @@ export class Hud {
         btn.textContent = onBar ? '-' : '+';
         btn.classList.toggle('remove', onBar);
         const name = abilityDisplayName(ABILITIES[id]);
-        btn.setAttribute('aria-label', onBar
-          ? t('hudChrome.hotbar.remove', { name })
-          : t('hudChrome.hotbar.add', { name }));
+        // A disabled button shows no tooltip and takes no tap, so when the bar is
+        // full the reason rides on the aria-label (screen readers) instead.
+        const full = !onBar && this.firstEmptyHotbarIndex() === -1;
+        btn.setAttribute('aria-label', full
+          ? t('hudChrome.hotbar.full')
+          : onBar ? t('hudChrome.hotbar.remove', { name }) : t('hudChrome.hotbar.add', { name }));
         btn.setAttribute('aria-pressed', onBar ? 'true' : 'false');
-        btn.disabled = !onBar && this.firstEmptyHotbarIndex() === -1;
+        btn.disabled = full;
       });
   }
 
@@ -7827,11 +7830,14 @@ export class Hud {
         toggle.type = 'button';
         toggle.className = 'bag-hotbar-toggle' + (onBar ? ' remove' : '');
         toggle.textContent = onBar ? '-' : '+';
-        toggle.setAttribute('aria-label', onBar
-          ? t('hudChrome.hotbar.remove', { name: itemName })
-          : t('hudChrome.hotbar.add', { name: itemName }));
+        // When the bar is full the control is disabled; a disabled button shows no
+        // tooltip and takes no tap, so the reason rides on the aria-label instead.
+        const full = !onBar && this.firstEmptyHotbarIndex() === -1;
+        toggle.setAttribute('aria-label', full
+          ? t('hudChrome.hotbar.full')
+          : onBar ? t('hudChrome.hotbar.remove', { name: itemName }) : t('hudChrome.hotbar.add', { name: itemName }));
         toggle.setAttribute('aria-pressed', onBar ? 'true' : 'false');
-        toggle.disabled = !onBar && this.firstEmptyHotbarIndex() === -1;
+        toggle.disabled = full;
         toggle.addEventListener('pointerdown', (ev) => ev.stopPropagation());
         toggle.addEventListener('click', (ev) => {
           ev.preventDefault();
@@ -9681,11 +9687,14 @@ export class Hud {
         toggle.className = `spell-hotbar-toggle${onBar ? ' remove' : ''}`;
         toggle.dataset.abilityId = known.def.id;
         toggle.textContent = onBar ? '-' : '+';
-        toggle.setAttribute('aria-label', onBar
-          ? t('hudChrome.hotbar.remove', { name })
-          : t('hudChrome.hotbar.add', { name }));
+        // When the bar is full the control is disabled; a disabled button shows no
+        // tooltip and takes no tap, so the reason rides on the aria-label instead.
+        const full = !onBar && this.firstEmptyHotbarIndex() === -1;
+        toggle.setAttribute('aria-label', full
+          ? t('hudChrome.hotbar.full')
+          : onBar ? t('hudChrome.hotbar.remove', { name }) : t('hudChrome.hotbar.add', { name }));
         toggle.setAttribute('aria-pressed', onBar ? 'true' : 'false');
-        toggle.disabled = !onBar && this.firstEmptyHotbarIndex() === -1;
+        toggle.disabled = full;
         toggle.addEventListener('pointerdown', (ev) => ev.stopPropagation());
         toggle.addEventListener('click', (ev) => {
           ev.preventDefault();

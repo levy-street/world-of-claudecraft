@@ -233,7 +233,8 @@ export const ja_JP: EnTranslations = {
     },
     "hotbar": {
       "add": "{name} をアクションバーに追加",
-      "remove": "{name} をアクションバーから削除"
+      "remove": "{name} をアクションバーから削除",
+      "full": "アクションバーがいっぱいです。先にスロットを空けてください"
     },
     "tutorial": {
       "moveBodyTouch": "移動スティックで移動し、画面をドラッグして周囲を見回します。数歩進んで始めましょう。",

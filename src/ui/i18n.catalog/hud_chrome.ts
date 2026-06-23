@@ -103,6 +103,10 @@ export const hudChromeStrings = {
   hotbar: {
     add: 'Add {name} to the action bar',
     remove: 'Remove {name} from the action bar',
+    // Accessible name when the +/- control is disabled because every action-bar
+    // slot is taken (a disabled button shows no tooltip, so the reason rides on
+    // the aria-label for screen readers).
+    full: 'Action bar full, free a slot first',
   },
   // New-adventurer tutorial copy for the touch interface. The default tutorial
   // bodies (hud.tutorial.*Body) reference keyboard/mouse ("W/A/S/D", "press F"),

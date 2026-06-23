@@ -3194,6 +3194,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.perSecondRow': '{total} ({rate})',
   'hudChrome.meters.seconds': '{s}초',
   'hudChrome.hotbar.add': '{name}을(를) 행동 단축바에 추가',
+  'hudChrome.hotbar.full': '행동 단축바가 가득 찼습니다. 먼저 슬롯을 비우세요',
   'hudChrome.hotbar.remove': '{name}을(를) 행동 단축바에서 제거',
   'hudChrome.mobile.autorun': '자동 달리기',
   'hudChrome.mobile.haptics': '진동',

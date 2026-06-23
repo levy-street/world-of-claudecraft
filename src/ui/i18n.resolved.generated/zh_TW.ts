@@ -233,7 +233,8 @@ export const zh_TW: EnTranslations = {
     },
     "hotbar": {
       "add": "將 {name} 加入動作列",
-      "remove": "從動作列移除 {name}"
+      "remove": "從動作列移除 {name}",
+      "full": "動作列已滿，請先空出一個格子"
     },
     "tutorial": {
       "moveBodyTouch": "使用搖桿移動，拖曳螢幕環顧四周。先走幾步開始吧。",

@@ -233,7 +233,8 @@ export const it_IT: EnTranslations = {
     },
     "hotbar": {
       "add": "Add {name} to the action bar",
-      "remove": "Remove {name} from the action bar"
+      "remove": "Remove {name} from the action bar",
+      "full": "Action bar full, free a slot first"
     },
     "tutorial": {
       "moveBodyTouch": "Usa il joystick di movimento per muoverti e trascina lo schermo per guardarti intorno. Fai qualche passo per iniziare.",

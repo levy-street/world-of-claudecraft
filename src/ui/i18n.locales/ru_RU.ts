@@ -3240,6 +3240,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.perSecondRow': '{total} ({rate})',
   'hudChrome.meters.seconds': '{s} сек.',
   'hudChrome.hotbar.add': 'Добавить {name} на панель действий',
+  'hudChrome.hotbar.full': 'Панель действий заполнена, сначала освободите слот',
   'hudChrome.hotbar.remove': 'Убрать {name} с панели действий',
   'hudChrome.mobile.autorun': 'Автобег',
   'hudChrome.mobile.haptics': 'Вибрация',

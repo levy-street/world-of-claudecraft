@@ -233,7 +233,8 @@ export const ko_KR: EnTranslations = {
     },
     "hotbar": {
       "add": "{name}을(를) 행동 단축바에 추가",
-      "remove": "{name}을(를) 행동 단축바에서 제거"
+      "remove": "{name}을(를) 행동 단축바에서 제거",
+      "full": "행동 단축바가 가득 찼습니다. 먼저 슬롯을 비우세요"
     },
     "tutorial": {
       "moveBodyTouch": "이동 스틱으로 이동하고 화면을 끌어 주위를 둘러보세요. 몇 걸음 움직여 시작하세요.",

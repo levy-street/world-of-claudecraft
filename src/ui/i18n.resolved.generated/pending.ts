@@ -11,27 +11,33 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "hudChrome.hotbar.add",
+    "hudChrome.hotbar.full",
     "hudChrome.hotbar.remove"
   ],
   "es_ES": [
     "hudChrome.hotbar.add",
+    "hudChrome.hotbar.full",
     "hudChrome.hotbar.remove"
   ],
   "fr_FR": [
     "hudChrome.hotbar.add",
+    "hudChrome.hotbar.full",
     "hudChrome.hotbar.remove"
   ],
   "fr_CA": [
     "hudChrome.hotbar.add",
+    "hudChrome.hotbar.full",
     "hudChrome.hotbar.remove"
   ],
   "en_CA": [],
   "it_IT": [
     "hudChrome.hotbar.add",
+    "hudChrome.hotbar.full",
     "hudChrome.hotbar.remove"
   ],
   "de_DE": [
     "hudChrome.hotbar.add",
+    "hudChrome.hotbar.full",
     "hudChrome.hotbar.remove"
   ],
   "zh_CN": [],
@@ -40,6 +46,7 @@ export const pending: Record<string, readonly string[]> = {
   "ja_JP": [],
   "pt_BR": [
     "hudChrome.hotbar.add",
+    "hudChrome.hotbar.full",
     "hudChrome.hotbar.remove"
   ],
   "ru_RU": []
