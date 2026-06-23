@@ -16,17 +16,17 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // Mirrors src/sim/content/mounts.ts (kept here so the page needs no app import).
 const MOUNTS = [
-  { tier: 1, id: 'ashmane', name: 'Ashmane Courser', share: 0.1, threshold: 1_000_000, speed: 60 },
-  { tier: 2, id: 'emberhoof', name: 'Emberhoof Charger', share: 1, threshold: 10_000_000, speed: 100 },
-  { tier: 3, id: 'bronzeflank', name: 'Bronzeflank Destrier', share: 2, threshold: 20_000_000, speed: 100 },
-  { tier: 4, id: 'silvermane', name: 'Silvermane Stallion', share: 3, threshold: 30_000_000, speed: 100 },
-  { tier: 5, id: 'stormhoof', name: 'Stormhoof Charger', share: 4, threshold: 40_000_000, speed: 100 },
-  { tier: 6, id: 'goldcrest', name: 'Goldcrest Warhorse', share: 5, threshold: 50_000_000, speed: 100 },
-  { tier: 7, id: 'verdant', name: 'Verdant Wildhart', share: 6, threshold: 60_000_000, speed: 100 },
-  { tier: 8, id: 'voidstrider', name: 'Voidstrider', share: 7, threshold: 70_000_000, speed: 100 },
-  { tier: 9, id: 'celestial', name: 'Celestial Charger', share: 8, threshold: 80_000_000, speed: 100 },
-  { tier: 10, id: 'worldbearer', name: "Worldbearer's Behemoth", share: 9, threshold: 90_000_000, speed: 100 },
-  { tier: 11, id: 'sovereign', name: 'Sovereign Dreadsteed', share: 10, threshold: 100_000_000, speed: 100 },
+  { tier: 1, id: 'ashmane', name: 'Ashmane Courser', share: 0.1, threshold: 1_000_000, speed: 60, fly: false },
+  { tier: 2, id: 'emberhoof', name: 'Emberhoof Charger', share: 1, threshold: 10_000_000, speed: 100, fly: false },
+  { tier: 3, id: 'bronzeflank', name: 'Bronzeflank Destrier', share: 2, threshold: 20_000_000, speed: 100, fly: false },
+  { tier: 4, id: 'silvermane', name: 'Silvermane Stallion', share: 3, threshold: 30_000_000, speed: 100, fly: false },
+  { tier: 5, id: 'stormhoof', name: 'Stormhoof Charger', share: 4, threshold: 40_000_000, speed: 100, fly: false },
+  { tier: 6, id: 'goldcrest', name: 'Goldcrest Skystrider', share: 5, threshold: 50_000_000, speed: 110, fly: true },
+  { tier: 7, id: 'verdant', name: 'Verdant Wildwing', share: 6, threshold: 60_000_000, speed: 118, fly: true },
+  { tier: 8, id: 'voidstrider', name: 'Voidwing Strider', share: 7, threshold: 70_000_000, speed: 126, fly: true },
+  { tier: 9, id: 'celestial', name: 'Celestial Seraph', share: 8, threshold: 80_000_000, speed: 134, fly: true },
+  { tier: 10, id: 'worldbearer', name: "Worldbearer's Roc", share: 9, threshold: 90_000_000, speed: 142, fly: true },
+  { tier: 11, id: 'sovereign', name: 'Sovereign Dreadwyrm', share: 10, threshold: 100_000_000, speed: 150, fly: true },
 ];
 
 const browser = await puppeteer.launch({
@@ -93,13 +93,18 @@ for (const m of MOUNTS) {
     const p = g.sim.player;
     p.inCombat = false;
     p.mountId = m.id; // renderer attaches the steed + lifts the rider next frame
+    g.input.camDist = m.fly ? 7.6 : 5.6; // flyers need room for their wingspan
+    g.input.camPitch = m.fly ? 0.24 : 0.16;
     const fmt = (n) => n.toLocaleString('en-US');
     document.getElementById('__mountcap').innerHTML =
-      `<div style="font-size:26px;font-weight:700">Tier ${m.tier} · ${m.name}</div>`
+      `<div style="font-size:26px;font-weight:700">Tier ${m.tier} · ${m.name}`
+      + `${m.fly ? ' <span style="color:#9fe6ff">✦ Flying</span>' : ''}</div>`
       + `<div style="font-size:15px;color:#cdbf98;margin-top:5px">`
       + `${m.share}% of supply · ${fmt(m.threshold)} $WOC · +${m.speed}% speed</div>`;
   }, m);
-  await sleep(650); // a few render frames: attach, gait, settle
+  // Flyers auto-lift to a hover (wings out, legs tucked); give them a touch
+  // longer to rise and beat their wings before the shutter.
+  await sleep(m.fly ? 1000 : 650);
   const num = String(m.tier).padStart(2, '0');
   await page.screenshot({ path: `${OUT}/${num}-${m.id}.png` });
   console.log(`shot tier ${m.tier}: ${m.name} -> ${OUT}/${num}-${m.id}.png`);

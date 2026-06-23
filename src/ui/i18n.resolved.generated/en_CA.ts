@@ -2578,6 +2578,7 @@ export const en_CA: EnTranslations = {
       "dismount": "Dismount",
       "summoning": "Summoning {name}…",
       "riding": "Riding",
+      "flies": "Flies",
       "locked": "Locked",
       "speed": "+{percent}% speed",
       "unlockAt": "Unlocks at {amount} $WOC",

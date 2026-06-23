@@ -285,6 +285,66 @@ describe('flight (5%+ steeds soar)', () => {
   });
 });
 
+describe('flight (5%+ steeds soar)', () => {
+  // Pacify the roster so flying near a camp can't aggro → combat → dismount.
+  const pacify = (sim: Sim) => {
+    for (const e of sim.entities.values()) {
+      if (e.kind === 'mob') { e.hostile = false; e.aggroTargetId = null; e.targetId = null; e.aiState = 'idle'; }
+    }
+  };
+
+  it('lifts the rider off the ground and soars horizontally without touching down', () => {
+    const { sim, p } = makeRider();
+    p.mountTier = 11;
+    pacify(sim);
+    const groundY = terrainHeight(p.pos.x, p.pos.z, sim.cfg.seed);
+    summonAndComplete(sim, 'goldcrest'); // tier 6 — the first flying rung (5%)
+    expect(p.mountId).toBe('goldcrest');
+    for (let i = 0; i < 20; i++) sim.tick(); // rise onto the hover
+    expect(p.pos.y).toBeGreaterThan(groundY + 1.5);
+    expect(p.onGround).toBe(false);
+
+    const x0 = p.pos.x, z0 = p.pos.z;
+    sim.moveInput.forward = true;
+    for (let i = 0; i < 20; i++) sim.tick();
+    sim.moveInput.forward = false;
+    expect(Math.hypot(p.pos.x - x0, p.pos.z - z0)).toBeGreaterThan(5);
+    expect(p.mountId).toBe('goldcrest'); // never dismounted mid-flight
+  });
+
+  it('climbs while jump is held and settles back toward the hover on release', () => {
+    const { sim, p } = makeRider();
+    p.mountTier = 11;
+    pacify(sim);
+    summonAndComplete(sim, 'sovereign'); // the 10% dreadwyrm
+    for (let i = 0; i < 12; i++) sim.tick();
+    const hoverY = p.pos.y;
+    sim.moveInput.jump = true;
+    for (let i = 0; i < 30; i++) sim.tick();
+    sim.moveInput.jump = false;
+    expect(p.pos.y).toBeGreaterThan(hoverY + 3); // gained real altitude
+
+    for (let i = 0; i < 80; i++) sim.tick(); // drift back down
+    sim.moveInput.jump = false;
+    expect(p.pos.y).toBeLessThan(hoverY + 1);
+  });
+
+  it('restores gravity when dismounted in the air (the rider falls)', () => {
+    const { sim, p } = makeRider();
+    p.mountTier = 11;
+    pacify(sim);
+    summonAndComplete(sim, 'sovereign');
+    sim.moveInput.jump = true;
+    for (let i = 0; i < 25; i++) sim.tick(); // climb up
+    sim.moveInput.jump = false;
+    const airY = p.pos.y;
+    sim.dismissMount();
+    expect(p.mountId).toBeUndefined();
+    for (let i = 0; i < 10; i++) sim.tick();
+    expect(p.pos.y).toBeLessThan(airY); // gravity took over — falling
+  });
+});
+
 describe('determinism', () => {
   it('produces the same mounted state from the same inputs', () => {
     const run = () => {
