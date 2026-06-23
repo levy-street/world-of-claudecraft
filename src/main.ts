@@ -1601,6 +1601,17 @@ async function startGame(
         registerCreatorSkins(await api.creatorSkins());
         markOwned(id);
       },
+      selfHostSkin: async (listing) => {
+        const { id } = await api.createSelfHostedSkin(listing);
+        registerCreatorSkins(await api.creatorSkins());
+        markOwned(id);
+      },
+      uploadSkin: async (meta, png) => {
+        const { id } = await api.uploadHostedSkin(meta, png);
+        registerCreatorSkins(await api.creatorSkins());
+        markOwned(id);
+      },
+      fetchQuota: () => api.skinQuota(),
       playerClass: () => world.cfg.playerClass,
     });
     hud.attachMarketplace(() => { void openMarketplace(); });

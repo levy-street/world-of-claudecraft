@@ -8,7 +8,7 @@ const db = vi.hoisted(() => ({
   redeemPurchase: vi.fn(), listLiveCreatorSkins: vi.fn(async () => []),
   getCreatorSkin: vi.fn(async (_id: string) => null as unknown),
   walletForAccount: vi.fn(async (_a: number) => ({ pubkey: 'So11111111111111111111111111111111111111112' })),
-  upsertCreatorSkin: vi.fn(async () => {}),
+  upsertCreatorSkin: vi.fn(async (_row: unknown) => {}),
   countLiveCreatorSkinsByAccount: vi.fn(async () => 0),
   countHostedSkinsByAccount: vi.fn(async () => 0),
   ensureCreatorTrust: vi.fn(async () => {}),

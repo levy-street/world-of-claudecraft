@@ -5886,6 +5886,20 @@
   .market-payout-hint { color: #9be8b6; font-size: 12px; }
   .market-list-status { min-height: 1.1em; }
   .market-list-btn { align-self: flex-start; min-height: 42px; padding: 0 22px; }
+  /* Create sub-mode switcher (Design / Upload / Self-host) */
+  .market-cmodes { display: flex; gap: 6px; margin-bottom: 14px; }
+  .market-cmode {
+    appearance: none; cursor: pointer; font: inherit; font-size: 13px; font-weight: 600;
+    color: #b6ad95; background: #14110b; border: 1px solid #4a3d22; border-radius: 8px;
+    padding: 8px 14px; min-height: 40px;
+  }
+  .market-cmode:hover { color: #f0e6cf; }
+  .market-cmode.sel { color: #15120c; background: #d8b15a; border-color: #d8b15a; }
+  .market-cmode:focus-visible { outline: 2px solid #f3d489; outline-offset: 2px; }
+  .market-imagemode { display: flex; flex-direction: column; gap: 10px; max-width: 460px; }
+  .market-quota { color: #9be8b6; font-size: 12.5px; padding: 8px 10px; background: #12100a; border: 1px solid #2f4f3a; border-radius: 8px; }
+  .market-quota-warn { color: #e8b96b; border-color: #5a4720; }
+  .market-imagemode input[type="file"] { color: #e7dcc1; font-size: 13px; }
   @media (max-width: 560px) {
     .market-design { flex-direction: column; align-items: center; }
     .market-preview-3d { width: 200px; height: 260px; }

@@ -218,7 +218,7 @@ export interface OptionsMenuEntry {
  *  an authoritative server to receive the report). */
 export function buildOptionsMenu(opts: {
   bugReportAvailable: boolean;
-  marketplaceAvailable: boolean;
+  marketplaceAvailable?: boolean;
 }): OptionsMenuEntry[] {
   const entries: OptionsMenuEntry[] = [
     { labelKey: 'hud.options.keyBindings', action: { kind: 'goto', view: 'keybinds' } },

@@ -542,6 +542,34 @@ export class Api {
     return this.post('/api/marketplace/skins', listing);
   }
 
+  // List a self-hosted skin (free): the server proxies the origin URL behind an
+  // opaque atlas route. Returns the new id + whether it's pending review.
+  async createSelfHostedSkin(listing: { name: string; description: string; priceUsdc: string; originUrl: string; targetClass: string | null }): Promise<{ ok: true; id: string; reviewStatus: 'pending' | 'approved' }> {
+    return this.post('/api/marketplace/skins', { ...listing, source: 'self_hosted' });
+  }
+
+  // Upload a hosted skin (raw PNG body; metadata in the query string). $WOC-quota
+  // gated server-side. Throws (with the server reason) on quota/validation failure.
+  async uploadHostedSkin(meta: { name: string; description: string; priceUsdc: string; targetClass: string | null }, png: Uint8Array): Promise<{ ok: true; id: string; reviewStatus: 'pending' | 'approved' }> {
+    const q = new URLSearchParams({ name: meta.name, description: meta.description, priceUsdc: meta.priceUsdc });
+    if (meta.targetClass) q.set('targetClass', meta.targetClass);
+    const res = await fetch(`/api/skins/upload?${q.toString()}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'image/png', ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}) },
+      body: png as BodyInit,
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data?.error ?? `request failed (${res.status})`);
+    return data;
+  }
+
+  // The viewer's hosting quota (tier, slots, usage, trusted badge) for the designer.
+  async skinQuota(): Promise<{ tier: number; quota: number; used: number; remaining: number; trusted: boolean; hostingEnabled: boolean; selfHostedFree: boolean }> {
+    const res = await fetch('/api/skins/quota', { headers: this.token ? { Authorization: `Bearer ${this.token}` } : {} });
+    if (!res.ok) return { tier: 0, quota: 0, used: 0, remaining: 0, trusted: false, hostingEnabled: false, selfHostedFree: true };
+    return res.json();
+  }
+
   // News & Updates feed for the home page, mirrored from GitHub Releases by the
   // server. Not realm-scoped — always read from the page's own origin.
   async releases(limit = 20): Promise<ReleaseEntry[]> {
@@ -1641,7 +1669,11 @@ export class ClientWorld implements IWorld {
     }
     // Only carry `csk` when equipping an overlay; its absence means "no overlay"
     // (the server clears any existing one), keeping built-in skin changes terse.
-    const payload: Record<string, unknown> = { cmd: 'change_skin', skin: idx, catalog };
+    const payload: { cmd: ClientCommand } & Record<string, unknown> = {
+      cmd: 'change_skin',
+      skin: idx,
+      catalog,
+    };
     if (overlay) payload.csk = overlay;
     this.cmd(payload);
   }
