@@ -162,12 +162,14 @@ import {
   holderTierForBalance,
 } from './holder_tier';
 import {
+  addItemToFirstFreeSlot,
   buildDefaultFormBar,
   classHasFormBars,
   clearHotbarSlot,
   encodeHotbarAction,
   HOTBAR_ACTION_MIME,
   type HotbarAction,
+  hotbarActionsEqual,
   parseHotbarAction,
   parseHotbarActions,
   placeAbilityOnSlot,
@@ -2749,6 +2751,31 @@ export class Hud {
     return true;
   }
 
+  private hotbarIndexForItem(itemId: string): number {
+    return this.hotbarActions.findIndex(
+      (action) => action?.type === 'item' && action.id === itemId,
+    );
+  }
+
+  // Tap-to-add an item shortcut (potion/food/drink/fishing) to the bar. This is
+  // the touch counterpart to the desktop drag from the bags window: phones have
+  // no HTML5 drag, so without it items could never reach the bar on mobile.
+  private addItemToHotbar(itemId: string): boolean {
+    const next = addItemToFirstFreeSlot(this.hotbarActions, itemId);
+    if (hotbarActionsEqual(next, this.hotbarActions)) return false;
+    this.hotbarActions = next;
+    this.saveSlotMap();
+    return true;
+  }
+
+  private removeItemFromHotbar(itemId: string): boolean {
+    const target = this.hotbarIndexForItem(itemId);
+    if (target === -1) return false;
+    this.hotbarActions = clearHotbarSlot(this.hotbarActions, target);
+    this.saveSlotMap();
+    return true;
+  }
+
   private refreshSpellbookHotbarControls(): void {
     document
       .querySelectorAll<HTMLButtonElement>('#spellbook .spell-hotbar-toggle')
@@ -2758,6 +2785,10 @@ export class Hud {
         const onBar = this.hotbarIndexForAbility(id) !== -1;
         btn.textContent = onBar ? '-' : '+';
         btn.classList.toggle('remove', onBar);
+        const name = abilityDisplayName(ABILITIES[id]);
+        btn.setAttribute('aria-label', onBar
+          ? t('hudChrome.hotbar.remove', { name })
+          : t('hudChrome.hotbar.add', { name }));
         btn.setAttribute('aria-pressed', onBar ? 'true' : 'false');
         btn.disabled = !onBar && this.firstEmptyHotbarIndex() === -1;
       });
@@ -3096,7 +3127,9 @@ export class Hud {
   private bindMobileActionDrag(btn: HTMLButtonElement, slot: number): void {
     btn.addEventListener('pointerdown', (e) => {
       if (!document.body.classList.contains('mobile-touch') || e.pointerType !== 'touch') return;
-      if (this.actionForSlot(slot)?.type !== 'ability') return;
+      // Any placed action can be long-press reordered (ability or item shortcut);
+      // an empty slot has nothing to drag.
+      if (!this.actionForSlot(slot)) return;
       this.clearMobileHotbarDrag();
       const sourceIndex = slot - 1;
       const drag: MobileHotbarDrag = {
@@ -7740,7 +7773,11 @@ export class Hud {
         ev.preventDefault();
         this.sellBagItem(s, ev);
       });
-      if (!this.tradeOpen && !this.vendorOpen && this.isHotbarItemId(s.itemId)) {
+      // Hotbar-eligible items (potions/food/drink/fishing) can go on the action
+      // bar. Desktop drags them from here; mobile has no HTML5 drag, so it gets a
+      // tap-to-add "+/-" toggle instead (built below), mirroring the spellbook.
+      const hotbarEligible = !this.tradeOpen && !this.vendorOpen && this.isHotbarItemId(s.itemId);
+      if (hotbarEligible) {
         row.draggable = true;
         row.addEventListener('dragstart', (e) => {
           const action = { type: 'item' as const, id: s.itemId };
@@ -7779,7 +7816,39 @@ export class Hud {
         else if (item.use) extra = `<div class="tt-sub">${esc(t('itemUi.tooltip.clickUse'))}</div>`;
         return this.itemTooltip(item) + extra;
       });
-      grid.appendChild(row);
+      if (hotbarEligible) {
+        // The toggle is a sibling button (not nested in the .bag-item button,
+        // which would be invalid HTML); the .bag-slot wrapper lays them out as a
+        // row. Shown only on touch (CSS), so desktop keeps the drag affordance.
+        const slot = document.createElement('div');
+        slot.className = 'bag-slot';
+        const onBar = this.hotbarIndexForItem(s.itemId) !== -1;
+        const toggle = document.createElement('button');
+        toggle.type = 'button';
+        toggle.className = 'bag-hotbar-toggle' + (onBar ? ' remove' : '');
+        toggle.textContent = onBar ? '-' : '+';
+        toggle.setAttribute('aria-label', onBar
+          ? t('hudChrome.hotbar.remove', { name: itemName })
+          : t('hudChrome.hotbar.add', { name: itemName }));
+        toggle.setAttribute('aria-pressed', onBar ? 'true' : 'false');
+        toggle.disabled = !onBar && this.firstEmptyHotbarIndex() === -1;
+        toggle.addEventListener('pointerdown', (ev) => ev.stopPropagation());
+        toggle.addEventListener('click', (ev) => {
+          ev.preventDefault();
+          ev.stopPropagation();
+          const changed = this.hotbarIndexForItem(s.itemId) !== -1
+            ? this.removeItemFromHotbar(s.itemId)
+            : this.addItemToHotbar(s.itemId);
+          if (!changed) return;
+          audio.click();
+          this.renderBags();
+        });
+        slot.appendChild(row);
+        slot.appendChild(toggle);
+        grid.appendChild(slot);
+      } else {
+        grid.appendChild(row);
+      }
     }
   }
 
@@ -9612,7 +9681,9 @@ export class Hud {
         toggle.className = `spell-hotbar-toggle${onBar ? ' remove' : ''}`;
         toggle.dataset.abilityId = known.def.id;
         toggle.textContent = onBar ? '-' : '+';
-        toggle.setAttribute('aria-label', `${name} ${onBar ? '-' : '+'}`);
+        toggle.setAttribute('aria-label', onBar
+          ? t('hudChrome.hotbar.remove', { name })
+          : t('hudChrome.hotbar.add', { name }));
         toggle.setAttribute('aria-pressed', onBar ? 'true' : 'false');
         toggle.disabled = !onBar && this.firstEmptyHotbarIndex() === -1;
         toggle.addEventListener('pointerdown', (ev) => ev.stopPropagation());

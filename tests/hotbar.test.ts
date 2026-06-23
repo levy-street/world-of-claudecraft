@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { CLASSES } from '../src/sim/content/classes';
 import {
-  buildDefaultFormBar, classHasFormBars, clearHotbarSlot, hotbarActionsEqual, parseHotbarActions,
-  placeAbilityOnSlot, placeItemOnSlot, shouldSeedFormBar, syncHotbarActions,
+  addItemToFirstFreeSlot, buildDefaultFormBar, classHasFormBars, clearHotbarSlot, hotbarActionsEqual,
+  parseHotbarActions, placeAbilityOnSlot, placeItemOnSlot, shouldSeedFormBar, syncHotbarActions,
 } from '../src/ui/hotbar';
 
 const abilityIds = new Set(['fireball', 'frost_armor', 'arcane_intellect', 'polymorph', 'shared_id']);
@@ -117,6 +117,50 @@ describe('hotbar action placement', () => {
       { type: 'ability', id: 'polymorph' },
     ]);
     expect(synced.changed).toBe(true);
+  });
+
+  it('adds an item shortcut (e.g. a potion) to the first empty slot via tap-to-add', () => {
+    const slots = [
+      { type: 'ability' as const, id: 'fireball' },
+      null,
+      null,
+    ];
+
+    const next = addItemToFirstFreeSlot(slots, 'baked_bread');
+
+    expect(next).toEqual([
+      { type: 'ability', id: 'fireball' },
+      { type: 'item', id: 'baked_bread' },
+      null,
+    ]);
+    expect(slots).toEqual([
+      { type: 'ability', id: 'fireball' },
+      null,
+      null,
+    ]);
+  });
+
+  it('does not duplicate an item shortcut already on the bar', () => {
+    const slots = [
+      { type: 'item' as const, id: 'baked_bread' },
+      null,
+    ];
+
+    const next = addItemToFirstFreeSlot(slots, 'baked_bread');
+
+    expect(next).toEqual(slots);
+    expect(hotbarActionsEqual(next, slots)).toBe(true);
+  });
+
+  it('leaves a full bar unchanged when adding an item shortcut', () => {
+    const slots = [
+      { type: 'ability' as const, id: 'fireball' },
+      { type: 'ability' as const, id: 'frost_armor' },
+    ];
+
+    const next = addItemToFirstFreeSlot(slots, 'baked_bread');
+
+    expect(next).toEqual(slots);
   });
 
   it('places the mage overflow spell onto a full non-Attack action bar', () => {

@@ -231,6 +231,10 @@ export const en: EnTranslations = {
       "hapticsOff": "Haptics Off",
       "toggleHaptics": "Toggle haptics"
     },
+    "hotbar": {
+      "add": "Add {name} to the action bar",
+      "remove": "Remove {name} from the action bar"
+    },
     "tutorial": {
       "moveBodyTouch": "Use the movement stick to move and drag the screen to look around. Take a few steps to begin.",
       "talkBodyTouch": "Stand close to Marshal Redbrook and tap the Use button to speak, then accept his task.",

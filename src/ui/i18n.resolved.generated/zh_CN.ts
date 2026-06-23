@@ -231,6 +231,10 @@ export const zh_CN: EnTranslations = {
       "hapticsOff": "震动反馈：关",
       "toggleHaptics": "切换震动反馈"
     },
+    "hotbar": {
+      "add": "将 {name} 添加到动作条",
+      "remove": "从动作条移除 {name}"
+    },
     "tutorial": {
       "moveBodyTouch": "使用摇杆移动，拖动屏幕环顾四周。先走几步开始吧。",
       "talkBodyTouch": "靠近雷德布鲁克元帅并点击“使用”按钮与他交谈，然后接受他的任务。",

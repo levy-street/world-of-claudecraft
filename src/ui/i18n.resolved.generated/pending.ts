@@ -9,17 +9,38 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.hotbar.add",
+    "hudChrome.hotbar.remove"
+  ],
+  "es_ES": [
+    "hudChrome.hotbar.add",
+    "hudChrome.hotbar.remove"
+  ],
+  "fr_FR": [
+    "hudChrome.hotbar.add",
+    "hudChrome.hotbar.remove"
+  ],
+  "fr_CA": [
+    "hudChrome.hotbar.add",
+    "hudChrome.hotbar.remove"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.hotbar.add",
+    "hudChrome.hotbar.remove"
+  ],
+  "de_DE": [
+    "hudChrome.hotbar.add",
+    "hudChrome.hotbar.remove"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.hotbar.add",
+    "hudChrome.hotbar.remove"
+  ],
   "ru_RU": []
 };

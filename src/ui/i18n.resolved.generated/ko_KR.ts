@@ -231,6 +231,10 @@ export const ko_KR: EnTranslations = {
       "hapticsOff": "진동 꺼짐",
       "toggleHaptics": "진동 전환"
     },
+    "hotbar": {
+      "add": "{name}을(를) 행동 단축바에 추가",
+      "remove": "{name}을(를) 행동 단축바에서 제거"
+    },
     "tutorial": {
       "moveBodyTouch": "이동 스틱으로 이동하고 화면을 끌어 주위를 둘러보세요. 몇 걸음 움직여 시작하세요.",
       "talkBodyTouch": "레드브룩 원수에게 다가가 사용 버튼을 눌러 대화한 뒤 임무를 수락하세요.",

@@ -96,6 +96,14 @@ export const hudChromeStrings = {
     hapticsOff: 'Haptics Off',
     toggleHaptics: 'Toggle haptics',
   },
+  // Accessible names for the "+/-" controls that add or remove an action-bar
+  // entry: the spellbook ability toggle and the bags item-shortcut toggle. The
+  // touch counterpart to the desktop drag affordance ({name} is the ability or
+  // item display name).
+  hotbar: {
+    add: 'Add {name} to the action bar',
+    remove: 'Remove {name} from the action bar',
+  },
   // New-adventurer tutorial copy for the touch interface. The default tutorial
   // bodies (hud.tutorial.*Body) reference keyboard/mouse ("W/A/S/D", "press F"),
   // which is wrong on a phone whose only controls are the on-screen sticks and

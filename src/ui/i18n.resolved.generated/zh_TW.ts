@@ -231,6 +231,10 @@ export const zh_TW: EnTranslations = {
       "hapticsOff": "觸覺回饋已關閉",
       "toggleHaptics": "切換觸覺回饋"
     },
+    "hotbar": {
+      "add": "將 {name} 加入動作列",
+      "remove": "從動作列移除 {name}"
+    },
     "tutorial": {
       "moveBodyTouch": "使用搖桿移動，拖曳螢幕環顧四周。先走幾步開始吧。",
       "talkBodyTouch": "靠近雷德布魯克元帥並點按「使用」按鈕與他交談，然後接受他的任務。",

@@ -231,6 +231,10 @@ export const es: EnTranslations = {
       "hapticsOff": "Vibración desactivada",
       "toggleHaptics": "Alternar vibración"
     },
+    "hotbar": {
+      "add": "Add {name} to the action bar",
+      "remove": "Remove {name} from the action bar"
+    },
     "tutorial": {
       "moveBodyTouch": "Usa el joystick de movimiento para moverte y arrastra la pantalla para mirar alrededor. Da unos pasos para empezar.",
       "talkBodyTouch": "Acércate al mariscal Redbrook y toca el botón Usar para hablar; luego acepta su tarea.",

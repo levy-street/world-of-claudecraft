@@ -741,14 +741,24 @@ describe('client HTML shell', () => {
   });
 
   it('shows mobile spellbook add and remove controls for the spell bar', () => {
-    expect(html).toContain('.spell-hotbar-toggle { display: none; }');
+    expect(html).toContain('.spell-hotbar-toggle, .bag-hotbar-toggle { display: none; }');
     expect(html).toContain(
-      'body.mobile-touch #spellbook .spell-hotbar-toggle {\n    min-width: 40px;\n    min-height: 40px;',
+      'body.mobile-touch #spellbook .spell-hotbar-toggle,\n  body.mobile-touch #bags .bag-hotbar-toggle {\n    min-width: 40px;\n    min-height: 40px;',
     );
     expect(html).toContain('body.mobile-touch #spellbook .spell-hotbar-toggle.remove');
     expect(hudTs).toMatch(/toggle\.className = [`']spell-hotbar-toggle/);
     expect(hudTs).toContain('this.removeAbilityFromHotbar(known.def.id)');
     expect(hudTs).toContain('this.addAbilityToHotbar(known.def.id)');
+  });
+
+  it('shows mobile add and remove controls for hotbar-eligible bag items', () => {
+    // touch-only +/- toggle, mirroring the spellbook control (desktop keeps drag)
+    expect(html).toContain('body.mobile-touch #bags .bag-hotbar-toggle.remove');
+    expect(html).toContain('.bag-slot .bag-item { flex: 1 1 auto;');
+    expect(hudTs).toContain("toggle.className = 'bag-hotbar-toggle'");
+    expect(hudTs).toContain('this.addItemToHotbar(s.itemId)');
+    expect(hudTs).toContain('this.removeItemFromHotbar(s.itemId)');
+    expect(hudTs).toContain("t('hudChrome.hotbar.add'");
   });
 
   it('sizes the mobile Bags window as a usable modal', () => {

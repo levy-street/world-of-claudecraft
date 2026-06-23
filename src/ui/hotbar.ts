@@ -78,6 +78,20 @@ export function placeItemOnSlot(
   return next;
 }
 
+// Place an item shortcut on the first empty slot, unless the item is already on
+// the bar. Items (unlike abilities) are not auto-deduped by placeItemOnSlot, so
+// the tap-to-add control guards against duplicates here. Returns an unchanged
+// copy when the item is already present or the bar is full (no empty slot).
+export function addItemToFirstFreeSlot(
+  actions: readonly HotbarAction[],
+  itemId: string,
+): HotbarAction[] {
+  if (actions.some((action) => action?.type === 'item' && action.id === itemId)) return actions.slice();
+  const empty = actions.indexOf(null);
+  if (empty === -1) return actions.slice();
+  return placeItemOnSlot(actions, itemId, empty);
+}
+
 export function swapHotbarSlots(
   actions: readonly HotbarAction[],
   sourceIndex: number,
