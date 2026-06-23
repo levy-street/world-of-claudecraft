@@ -259,7 +259,10 @@ export type ItemUse =
   | { type: 'mechChroma'; chromaId: string }
   // Opens the client-side event skin-select overlay. The server rolls a rank on
   // use (see Sim.openSkinSelect) and the player locks one in via claimEventSkin.
-  | { type: 'skinSelect'; catalog?: SkinCatalog };
+  | { type: 'skinSelect'; catalog?: SkinCatalog }
+  // A Mount Charter: redeeming it permanently grants `mountId` (the earned
+  // ownership track) and consumes the deed. See Sim.useItem / grantEarnedMount.
+  | { type: 'mountCharter'; mountId: string };
 
 // Rarity ranks for the cosmetic skin-select event, ordered low → high. A rolled
 // rank unlocks its own tier and every tier below it (epic unlocks rare+uncommon).
@@ -1228,11 +1231,15 @@ export function emptyZoneProps(): ZonePropsDef {
 }
 
 export interface QuestObjective {
-  type: 'kill' | 'collect' | 'interact';
+  type: 'kill' | 'collect' | 'interact' | 'finish_course';
   targetMobId?: string; // for kill
   itemId?: string; // for collect
   targetObjectItemId?: string; // for interactable ground objects
   targetNpcId?: string; // for interactable NPC objectives
+  courseId?: string; // for finish_course: the Skytrial/circuit that must be completed
+  // for finish_course: an optional time gate (ticks) — only a run finishing in
+  // <= parTicks credits the objective. Omitted ⇒ any completion credits.
+  parTicks?: number;
   count: number;
   label: string;
 }
@@ -1459,6 +1466,50 @@ export interface Entity {
   mountTier?: number;
 }
 
+// ---------------------------------------------------------------------------
+// Mount activity "Courses" — the shared substrate under the hoop minigame, the
+// solo time-trial, and (later) multi-party racing. A course is an ordered set of
+// 3D checkpoint spheres a flyer passes through; the sim times the run on the
+// integer tick clock and detects pass-through by segment-vs-sphere (a tier-11
+// flyer crosses several yards per 0.05 s tick, so a point-in-sphere test would
+// tunnel). Content lives in src/sim/content/courses.ts.
+// ---------------------------------------------------------------------------
+export interface Checkpoint {
+  x: number;
+  y: number; // 3D — flight maintains a true p.pos.y, so altitude is load-bearing
+  z: number;
+  radius: number; // pass-through sphere radius, yards
+}
+
+export type CourseKind = 'hoop' | 'race' | 'trial';
+
+export interface CourseDef {
+  id: string;
+  name: string;
+  kind: CourseKind;
+  checkpoints: Checkpoint[]; // ordered; index = required pass order
+  /** Only flying mounts may run it (gates ground mounts out — feature 5). */
+  flyingOnly: boolean;
+  /** Number of times the checkpoint loop must be flown (1 = single pass). */
+  laps: number;
+  /** Target time in TICKS (×1/20 s), shown as the "par" to beat. */
+  parTicks: number;
+}
+
+/** Per-player in-progress run state (lives on PlayerMeta; never persisted). */
+export interface CourseRunState {
+  courseId: string;
+  startTick: number; // sim.tickCount when the clock starts (first gate, or the GO of a race)
+  nextCheckpoint: number; // ordered-gate cursor into the current lap
+  lap: number; // 0-based
+  splits: number[]; // tickCount at each checkpoint pass (for live splits)
+  // 'countdown' is the pre-GO hold of a race (movement frozen, clock not running);
+  // solo runs skip it and go straight to 'active'.
+  state: 'countdown' | 'active' | 'done' | 'failed';
+  elapsedTicks: number; // filled on 'done'
+  raceId?: number; // set when this run is part of a synchronized race
+}
+
 export interface NythraxisWardChannel {
   objectId: number;
   playerId: number | null;
@@ -1523,6 +1574,27 @@ export type SimEvent = { pid?: number } & (
   // level past the cap, and unlocking a cosmetic lifetime-XP milestone
   | { type: 'virtualLevelUp'; level: number }
   | { type: 'milestoneUnlocked'; milestoneId: string }
+  // Mount course runs (hoop / trial / race). All personal (carry `pid`); the
+  // client renders timers/banners from the ids + tick numbers (no sim strings).
+  | { type: 'courseStart'; courseId: string }
+  | { type: 'courseCheckpoint'; courseId: string; index: number; total: number; lap: number; laps: number; atTick: number }
+  | { type: 'courseFinish'; courseId: string; elapsedTicks: number }
+  | { type: 'courseFail'; courseId: string; reason: 'dismounted' | 'aborted' }
+  // Multi-racer (party) races over the same course. Personal events (carry `pid`).
+  | { type: 'raceCountdown'; raceId: number; courseId: string; seconds: number }
+  | { type: 'raceGo'; raceId: number; courseId: string }
+  | { type: 'raceFinish'; raceId: number; courseId: string; place: number; total: number; elapsedTicks: number }
+  | { type: 'raceResult'; raceId: number; courseId: string; place: number; total: number }
+  // Mount Charter economy (personal). `minted`: a holder struck a tradeable deed;
+  // `earned`: a deed was redeemed into a permanent mount on the earned track.
+  | { type: 'mountCharterMinted'; mountId: string; itemId: string }
+  | { type: 'mountEarned'; mountId: string }
+  // Soft-currency PvP Wager Races (personal). The stake is in-game gold + an
+  // optional Mount Charter — no real money. `wagerInvite` opens the accept/decline
+  // prompt; `wagerSettled` reports the outcome (won the pot / forfeit / refunded).
+  | { type: 'wagerInvite'; fromPid: number; fromName: string; courseId: string; anteCopper: number; anteCharterId: string | null }
+  | { type: 'wagerSettled'; won: boolean; copper: number; charters: number; charterId: string | null; cancelled: boolean }
+  | { type: 'wagerExpired' }
   | { type: 'learnAbility'; abilityId: string; rank: number }
   | { type: 'loot'; text: string }
   | {
