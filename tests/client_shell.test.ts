@@ -759,6 +759,10 @@ describe('client HTML shell', () => {
     expect(hudTs).toContain('this.addItemToHotbar(s.itemId)');
     expect(hudTs).toContain('this.removeItemFromHotbar(s.itemId)');
     expect(hudTs).toContain("t('hudChrome.hotbar.add'");
+    // full bar: tappable-but-dimmed control + toast, not a silent disabled button
+    expect(html).toContain('body.mobile-touch #bags .bag-hotbar-toggle.is-full');
+    expect(hudTs).toContain("this.showError(t('hudChrome.hotbar.full'))");
+    expect(hudTs).toContain("toggle.classList.toggle('is-full', full)");
   });
 
   it('sizes the mobile Bags window as a usable modal', () => {
