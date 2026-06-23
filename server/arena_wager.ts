@@ -44,7 +44,9 @@ export type WagerClientMsg =
   | { t: 'wager_result'; matchId: string; outcome: 'won' | 'lost' | 'draw'; signature: string; payoutBase: string; burnBase: string }
   // cancelTxB64 is present for a creator who already staked: the unsigned
   // cancel_match tx for them to sign and reclaim their stake.
-  | { t: 'wager_cancelled'; matchId: string; reason: 'stake_timeout' | 'opponent_left'; cancelTxB64?: string };
+  | { t: 'wager_cancelled'; matchId: string; reason: 'stake_timeout' | 'opponent_left'; cancelTxB64?: string }
+  // A queue request was refused before any pairing (gate or validation failure).
+  | { t: 'wager_error'; reason: string };
 
 interface MatchState {
   matchId: bigint;
