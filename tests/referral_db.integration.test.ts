@@ -64,6 +64,26 @@ run('referral_db against real Postgres', () => {
     expect(await refDb.referrerForReferee(db.pool, orphan)).toBeNull();
   });
 
+  it('resolves a referral by the (unique) character name, case-insensitively and with spaces', async () => {
+    // Character names are globally unique; delete-first keeps the test idempotent.
+    await db.pool.query("DELETE FROM characters WHERE name IN ('Thrandara', 'Sir Galahad')");
+    const refA = await newAccount('charrefa');
+    await db.pool.query("INSERT INTO characters (account_id, name, class, level) VALUES ($1, 'Thrandara', 'mage', 12)", [refA]);
+    expect(await db.accountForCharacterName('THRANDARA')).toBe(refA); // case-insensitive
+    expect(await db.primaryCharacterName(refA)).toBe('Thrandara');
+
+    const refeeA = await newAccount('charrefeea');
+    await card.captureReferral(refeeA, 'thrandara'); // lowercased name still resolves
+    expect((await refDb.referrerForReferee(db.pool, refeeA))?.referrerAccountId).toBe(refA);
+
+    // a name with a space (Sir Galahad) round-trips through the link too
+    const refB = await newAccount('charrefb');
+    await db.pool.query("INSERT INTO characters (account_id, name, class, level) VALUES ($1, 'Sir Galahad', 'warrior', 5)", [refB]);
+    const refeeB = await newAccount('charrefeeb');
+    await card.captureReferral(refeeB, 'Sir Galahad');
+    expect((await refDb.referrerForReferee(db.pool, refeeB))?.referrerAccountId).toBe(refB);
+  });
+
   it('checkpoints a character\'s earned counters (upsert round-trip)', async () => {
     expect(await refDb.getReferralProgress(db.pool, charId)).toBeNull();
     await refDb.setReferralProgress(db.pool, charId, 1000, 500);

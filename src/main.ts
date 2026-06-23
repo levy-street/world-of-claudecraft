@@ -1502,23 +1502,19 @@ async function startOffline(playerClass: PlayerClass, name: string, skin = 0): P
 
 const api = new Api();
 
-// Referral capture: a visitor who arrives from a shared player card link
-// (?ref=<slug>) carries the referrer's slug into registration. Read it once at
-// load and sanitise it to the server's slug shape so a junk param is dropped.
-const REFERRAL_SLUG = (() => {
-  const raw = new URLSearchParams(location.search).get('ref') ?? '';
-  const slug = raw.trim().toLowerCase();
-  return /^[a-z0-9][a-z0-9-]{0,63}$/.test(slug) ? slug : '';
-})();
-
-// (?aff=<code>) carries a salesperson's affiliate code into realm founding, so a
-// realm they get founded credits them a 15% revenue commission. Read once at load
-// and persisted to localStorage so it survives the login/registration hop and any
-// browsing before the player founds; a fresh ?aff= wins, else the last stored one.
+// Unified referral capture (#475): one code drives BOTH the player referral
+// (registration) and the realm affiliate (founding). A visitor arriving from a
+// shared link (?ref=<characterName> primarily, ?aff=<code> as a back-compat alias)
+// carries the referrer's handle, which the server resolves as a character name, an
+// affiliate code, or a card slug. Read once at load and persisted to localStorage
+// so it survives the login/registration hop and any browsing before founding; a
+// fresh param wins, else the last stored one. The charset is the union of the
+// character-name, affiliate-code, and slug shapes (rejects junk like ?ref=../evil).
 const AFF_KEY = 'woc_aff';
-const AFFILIATE_CODE = (() => {
-  const raw = (new URLSearchParams(location.search).get('aff') ?? '').trim();
-  const fresh = /^[A-Za-z0-9_-]{1,64}$/.test(raw) ? raw : '';
+const REFERRAL_CODE = (() => {
+  const params = new URLSearchParams(location.search);
+  const raw = (params.get('ref') ?? params.get('aff') ?? '').trim();
+  const fresh = /^[A-Za-z0-9 '_-]{1,64}$/.test(raw) ? raw : '';
   try {
     if (fresh) localStorage.setItem(AFF_KEY, fresh);
     return fresh || (localStorage.getItem(AFF_KEY) ?? '');
@@ -3718,7 +3714,7 @@ function openRealmOperator(): void {
       linkedWallet: () => linkedWalletPubkey,
       ensureWalletReady: ensureRealmWalletReady,
       signLock: signRealmLock,
-      affiliateCode: () => AFFILIATE_CODE || null,
+      affiliateCode: () => REFERRAL_CODE || null,
       enterRealm: (realm: OwnedRealm) => selectRealm({ name: realm.name, url: realm.url, type: realm.type }),
       close: () => showRealmList(),
     });
@@ -4148,7 +4144,7 @@ function wireStartScreens(): void {
     }
     try {
       if (mode === 'login') await api.login(username, password, token);
-      else await api.register(username, password, token, REFERRAL_SLUG);
+      else await api.register(username, password, token, REFERRAL_CODE);
     } catch (err) {
       // Auth itself failed (bad credentials, taken username, Turnstile reject…).
       // The token is single-use, so refresh the widget for the next attempt.

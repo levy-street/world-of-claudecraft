@@ -18,13 +18,11 @@ import {
   upsertPlayerCard,
   getPlayerCardBySlug,
   getPlayerCardMetaBySlug,
-  accountForSlug,
   recordReferral,
-  pool,
+  resolveReferralAccount,
 } from './db';
 import { REALM_PUBLIC_ORIGIN } from './realm';
 import { recordUsageMetric } from './provider_usage';
-import { accountForAffiliateCode } from './affiliate_db';
 
 // A composited card is ~1200×630 @2× PNG - comfortably under this bound, which
 // is generous enough to never reject a legitimate upload yet caps memory.
@@ -533,14 +531,16 @@ async function serveCardPage(req: http.IncomingMessage, res: http.ServerResponse
     return;
   }
   res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=120' });
-  res.end(cardPageHtml({ slug, title: card.title, description: card.description, locale: normalizePublicCardLocale(card.locale), origin }));
+  res.end(cardPageHtml({ slug, characterName: card.characterName, title: card.title, description: card.description, locale: normalizePublicCardLocale(card.locale), origin }));
 }
 
-function cardPageHtml(opts: { slug: string; title: string; description: string; locale: PublicCardLocale; origin: string }): string {
-  const { slug, title, description, locale, origin } = opts;
+function cardPageHtml(opts: { slug: string; characterName: string; title: string; description: string; locale: PublicCardLocale; origin: string }): string {
+  const { slug, characterName, title, description, locale, origin } = opts;
   const pagePath = `/p/${encodeURIComponent(slug)}`;
   const imagePath = `${pagePath}/card.png`;
-  const playPath = `/?ref=${encodeURIComponent(slug)}`;
+  // Referral link is the character's (globally unique) name when available, the
+  // slug otherwise. resolveReferralAccount accepts either.
+  const playPath = `/?ref=${encodeURIComponent(characterName || slug)}`;
   const pageUrl = `${origin}${pagePath}`;
   const imageUrl = `${origin}${imagePath}`;
   const copy = publicCardCopy(locale);
@@ -635,16 +635,10 @@ function missingCardHtml(origin: string, locale: PublicCardLocale): string {
 // or a legacy card slug. Safe with any untrusted `ref`: unknown codes and
 // self-referrals are silently ignored.
 export async function captureReferral(refereeAccountId: number, ref: unknown): Promise<void> {
-  const raw = typeof ref === 'string' ? ref.trim() : '';
-  // Only a plausibly-valid code (affiliate base64url or a card slug, which is a
-  // subset) is worth a lookup; anything else is ignored without touching the DB.
-  if (!/^[A-Za-z0-9_-]{1,64}$/.test(raw)) return;
-  // Affiliate code first (exact), then the lowercased card slug.
-  let referrer = await accountForAffiliateCode(pool, raw);
-  if (referrer === null) {
-    const slug = raw.toLowerCase();
-    if (isValidSlug(slug)) referrer = await accountForSlug(slug);
-  }
+  // The code resolves as a character name (the shareable handle), an affiliate
+  // code, or a card slug; garbage/empty is rejected before any query.
+  const referrer = await resolveReferralAccount(ref);
   if (referrer === null || referrer === refereeAccountId) return;
-  await recordReferral(refereeAccountId, referrer, raw.slice(0, 64));
+  const raw = (typeof ref === 'string' ? ref.trim() : '').slice(0, 64);
+  await recordReferral(refereeAccountId, referrer, raw);
 }

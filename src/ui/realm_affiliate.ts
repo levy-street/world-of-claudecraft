@@ -21,6 +21,7 @@ export class RealmAffiliate {
   private readonly root: HTMLElement;
   private readonly host: RealmAffiliateHost;
   private code = '';
+  private handle = ''; // the shareable referral handle: character name, else the code
   private realms: AffiliateRealm[] = [];
   private summary: ReferralSummary | null = null;
 
@@ -41,6 +42,7 @@ export class RealmAffiliate {
         this.host.api.referralSummary(),
       ]);
       this.code = info.code;
+      this.handle = info.referralName || info.code;
       this.realms = realms;
       this.summary = summary;
     } catch {
@@ -51,7 +53,9 @@ export class RealmAffiliate {
   }
 
   private get link(): string {
-    return `${this.host.origin()}/?aff=${encodeURIComponent(this.code)}`;
+    // The shareable link is the character name (?ref=Thrall); the server resolves
+    // a name, an affiliate code, or a card slug all to the same referrer.
+    return `${this.host.origin()}/?ref=${encodeURIComponent(this.handle)}`;
   }
 
   private render(): void {
@@ -138,7 +142,8 @@ export class RealmAffiliate {
   }
 }
 
-// Re-exported so a test can build the same link string the panel renders.
-export function affiliateLink(origin: string, code: string): string {
-  return `${origin}/?aff=${encodeURIComponent(code)}`;
+// Re-exported so a test can build the same link string the panel renders. The
+// handle is the referrer's character name (or the affiliate code as a fallback).
+export function referralLink(origin: string, handle: string): string {
+  return `${origin}/?ref=${encodeURIComponent(handle)}`;
 }

@@ -3,7 +3,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { WebSocketServer, WebSocket } from 'ws';
 import {
-  ensureSchema, pool, createAccount, findAccount, getAccountsCount, touchLogin, saveToken, accountForToken,
+  ensureSchema, pool, createAccount, findAccount, getAccountsCount, touchLogin, saveToken, accountForToken, primaryCharacterName,
   listCharacters, getCharacter, createCharacterCapped, deleteCharacter, closeOrphanSessions,
   pruneChatLogs, pruneClientPerfReports, searchCharacters, characterCountsByRealm, moderationStatusForAccount, renameCharacter,
   findCharacterReportTargetByName, topArenaRatings, topLifetimeXp, chatMuteStatusForAccount, loadAccountCosmetics,
@@ -579,11 +579,14 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     if (req.method === 'GET' && url === '/api/affiliate/me') {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
-      const [code, referredCount] = await Promise.all([
+      const [code, referredCount, referralName] = await Promise.all([
         getOrCreateAffiliateCode(pool, accountId),
         affiliateRealmCount(pool, accountId),
+        primaryCharacterName(accountId),
       ]);
-      return json(res, 200, { code, referredCount });
+      // referralName (the account's headline character name) is the human-readable
+      // referral handle; the random code is the fallback before any character exists.
+      return json(res, 200, { code, referredCount, referralName });
     }
     // Referral rewards summary (#475): the XP + gold commission this account has
     // earned from the players it referred (pending + lifetime), plus how many

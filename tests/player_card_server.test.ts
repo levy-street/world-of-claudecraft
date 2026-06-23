@@ -141,7 +141,7 @@ beforeEach(() => {
       return Promise.resolve({ rows: [] });
     }
     if (s.includes('SELECT character_id, account_id, png, title, description')) return Promise.resolve({ rows: cardRows });
-    if (s.includes('SELECT title, description, locale')) return Promise.resolve({ rows: cardRows }); // metadata-only OG page read
+    if (s.includes('c.name AS character_name')) return Promise.resolve({ rows: cardRows }); // metadata-only OG page read (joins the character name)
     if (s.includes('SELECT account_id FROM player_cards WHERE slug')) return Promise.resolve({ rows: accountForSlugRows });
     if (s.includes('INSERT INTO referrals')) return Promise.resolve({ rows: [] });
     return Promise.resolve({ rows: [] });
@@ -583,7 +583,7 @@ describe('GET /p/<slug>', () => {
   it('returns 500 when the card metadata lookup throws', async () => {
     dbMock.query.mockImplementation((sql: string) => {
       const s = String(sql).replace(/\s+/g, ' ');
-      if (s.includes('SELECT title, description, locale')) return Promise.reject(new Error('db down'));
+      if (s.includes('c.name AS character_name')) return Promise.reject(new Error('db down'));
       return Promise.resolve({ rows: [] });
     });
     const res = makeRes();

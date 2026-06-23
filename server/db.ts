@@ -10,7 +10,7 @@ import { seedChatFilterDefaults } from './chat_filter_db';
 import { REALM_SCHEMA, seedDefaultRealm, assertRealmSchema } from './realm_db';
 import { REALM_STAKE_SCHEMA } from './realm_stake_db';
 import { REALM_QUOTE_SCHEMA } from './realm_quote_db';
-import { AFFILIATE_SCHEMA } from './affiliate_db';
+import { AFFILIATE_SCHEMA, accountForAffiliateCode } from './affiliate_db';
 import { REFERRAL_REWARDS_SCHEMA } from './referral_db';
 import { REALM } from './realm';
 
@@ -676,10 +676,19 @@ export async function getPlayerCardBySlug(slug: string): Promise<PlayerCardRow |
 
 // Metadata-only read for the OG-unfurl HTML page, which doesn't need the (up to
 // ~4 MB) PNG bytes — keeps getPlayerCardBySlug's heavy SELECT for the image route.
-export async function getPlayerCardMetaBySlug(slug: string): Promise<{ title: string; description: string; locale: string } | null> {
-  const res = await pool.query('SELECT title, description, locale FROM player_cards WHERE slug = $1', [slug]);
+export async function getPlayerCardMetaBySlug(
+  slug: string,
+): Promise<{ title: string; description: string; locale: string; characterName: string } | null> {
+  const res = await pool.query(
+    `SELECT pc.title, pc.description, pc.locale, c.name AS character_name
+       FROM player_cards pc JOIN characters c ON c.id = pc.character_id
+      WHERE pc.slug = $1`,
+    [slug],
+  );
   const row = res.rows[0];
-  return row ? { title: row.title ?? '', description: row.description ?? '', locale: row.locale ?? 'en' } : null;
+  return row
+    ? { title: row.title ?? '', description: row.description ?? '', locale: row.locale ?? 'en', characterName: row.character_name ?? '' }
+    : null;
 }
 
 // The account that owns a card slug — i.e. the referrer credited when someone
@@ -687,6 +696,42 @@ export async function getPlayerCardMetaBySlug(slug: string): Promise<{ title: st
 export async function accountForSlug(slug: string): Promise<number | null> {
   const res = await pool.query('SELECT account_id FROM player_cards WHERE slug = $1', [slug]);
   return res.rows[0]?.account_id ?? null;
+}
+
+// The account that owns a character, by the character's (globally unique) name,
+// case-insensitive. Character names are the human-readable referral handle.
+export async function accountForCharacterName(name: string): Promise<number | null> {
+  const res = await pool.query('SELECT account_id FROM characters WHERE lower(name) = lower($1) LIMIT 1', [name]);
+  return res.rows[0]?.account_id ?? null;
+}
+
+// An account's headline character name (highest level, then newest) for building
+// its referral link. Null when the account has no characters yet.
+export async function primaryCharacterName(accountId: number): Promise<string | null> {
+  const res = await pool.query(
+    'SELECT name FROM characters WHERE account_id = $1 ORDER BY level DESC, id ASC LIMIT 1',
+    [accountId],
+  );
+  return res.rows[0]?.name ?? null;
+}
+
+// Resolve a referral code to the referring account. The code is, in priority: a
+// character name (the shareable, unique handle), then an affiliate code (random,
+// back-compat), then a card slug (legacy). Case-insensitive. A code that matches
+// none of the allowed shapes is rejected before any query.
+export async function resolveReferralAccount(code: unknown): Promise<number | null> {
+  const raw = typeof code === 'string' ? code.trim() : '';
+  // Union of the character-name, affiliate-code, and slug charsets; rejects junk
+  // (e.g. path traversal) without touching the DB.
+  if (!/^[A-Za-z0-9 '_-]{1,64}$/.test(raw)) return null;
+  const name = raw.replace(/\s+/g, ' '); // canonical character-name whitespace
+  const byName = await accountForCharacterName(name);
+  if (byName !== null) return byName;
+  const byAffiliate = await accountForAffiliateCode(pool, raw);
+  if (byAffiliate !== null) return byAffiliate;
+  const slug = raw.toLowerCase();
+  if (/^[a-z0-9][a-z0-9-]{0,63}$/.test(slug)) return accountForSlug(slug);
+  return null;
 }
 
 // Record that `referee` joined via `referrer`'s `slug`. Idempotent: only the

@@ -129,6 +129,7 @@ export interface ProvisionQuote {
 export interface AffiliateInfo {
   code: string;
   referredCount: number;
+  referralName: string | null; // the account's headline character name (the shareable handle)
 }
 
 // The XP + gold commission an account has earned from the players it referred

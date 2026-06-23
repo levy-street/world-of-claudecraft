@@ -37,7 +37,8 @@ import {
 } from './realm_quote_db';
 import { minStakeBase, tierForStake, TIER_BPS, tierThreshold } from './realm_tiers';
 import { invalidateWalletHoldings } from './realm_stake_holdings';
-import { accountForAffiliateCode, setRealmAffiliate } from './affiliate_db';
+import { setRealmAffiliate } from './affiliate_db';
+import { resolveReferralAccount } from './db';
 
 function intEnv(key: string, def: number, min: number, max: number): number {
   const v = Number.parseInt(process.env[key] ?? '', 10);
@@ -259,7 +260,7 @@ export async function prepareProvisionQuote(
   // self-referral simply attaches no affiliate; founding never fails on it.
   let affiliateApplied = false;
   if (args.affiliateCode) {
-    const affiliateAccountId = await accountForAffiliateCode(pool, args.affiliateCode);
+    const affiliateAccountId = await resolveReferralAccount(args.affiliateCode);
     if (affiliateAccountId !== null && affiliateAccountId !== args.accountId) {
       await setRealmAffiliate(pool, { realmId, affiliateAccountId, bps: AFFILIATE_BPS });
       affiliateApplied = true;
