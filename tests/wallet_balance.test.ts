@@ -3,6 +3,7 @@ import {
   resolveWocBalanceUpdate,
   setWalletDisplayAvailable,
   setWocBalance,
+  shouldDisconnectUnverifiedWallet,
   verifiedWocBalance,
   walletDisplayAvailable,
   wocBalance,
@@ -81,5 +82,43 @@ describe('resolveWocBalanceUpdate (refresh apply/skip decision)', () => {
     expect(resolveWocBalanceUpdate({
       address: CONNECTED, fresh: false, balance: null, currentAddress: CONNECTED, linkedAddress: null,
     })).toEqual({ apply: true, setLinked: false });
+  });
+});
+
+describe('shouldDisconnectUnverifiedWallet (auto-reconnect reap decision)', () => {
+  const base = {
+    connectedAddress: 'WALLET_A',
+    linkedPubkey: null as string | null,
+    verifyPending: false,
+    verifyInProgress: false,
+    linkStatusPending: false,
+  };
+
+  it('disconnects an idle, connected, non-linked wallet', () => {
+    expect(shouldDisconnectUnverifiedWallet(base)).toBe(true);
+  });
+
+  it('keeps the wallet when nothing is connected', () => {
+    expect(shouldDisconnectUnverifiedWallet({ ...base, connectedAddress: null })).toBe(false);
+  });
+
+  it('keeps the wallet that matches the account-linked pubkey', () => {
+    expect(shouldDisconnectUnverifiedWallet({ ...base, linkedPubkey: 'WALLET_A' })).toBe(false);
+  });
+
+  it('keeps a wallet while a verify flow is mid-flight', () => {
+    expect(shouldDisconnectUnverifiedWallet({ ...base, verifyPending: true })).toBe(false);
+    expect(shouldDisconnectUnverifiedWallet({ ...base, verifyInProgress: true })).toBe(false);
+  });
+
+  // Regression: on a restored session the wallet auto-reconnects BEFORE the linked
+  // status has loaded. Reaping it there forced a re-sign on every reload even though
+  // the account-to-wallet link is durable server-side.
+  it('keeps a connected wallet while the link status is still loading', () => {
+    expect(shouldDisconnectUnverifiedWallet({ ...base, linkStatusPending: true })).toBe(false);
+  });
+
+  it('disconnects a wallet that differs from the linked one once status is known', () => {
+    expect(shouldDisconnectUnverifiedWallet({ ...base, connectedAddress: 'WALLET_B', linkedPubkey: 'WALLET_A' })).toBe(true);
   });
 });

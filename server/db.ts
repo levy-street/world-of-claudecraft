@@ -673,10 +673,15 @@ export async function getPlayerCardBySlug(slug: string): Promise<PlayerCardRow |
 
 // Metadata-only read for the OG-unfurl HTML page, which doesn't need the (up to
 // ~4 MB) PNG bytes — keeps getPlayerCardBySlug's heavy SELECT for the image route.
-export async function getPlayerCardMetaBySlug(slug: string): Promise<{ title: string; description: string; locale: string } | null> {
-  const res = await pool.query('SELECT title, description, locale FROM player_cards WHERE slug = $1', [slug]);
+export async function getPlayerCardMetaBySlug(slug: string): Promise<{ title: string; description: string; locale: string; updatedAt: string | null } | null> {
+  const res = await pool.query('SELECT title, description, locale, updated_at FROM player_cards WHERE slug = $1', [slug]);
   const row = res.rows[0];
-  return row ? { title: row.title ?? '', description: row.description ?? '', locale: row.locale ?? 'en' } : null;
+  if (!row) return null;
+  // `updated_at` (a per-publish timestamp) becomes the og:image cache-buster so a
+  // re-published card's new PNG is re-fetched by social/browser caches instead of
+  // serving the stale one. pg hands back a Date for TIMESTAMPTZ; normalize to ISO.
+  const updatedAt = row.updated_at != null ? new Date(row.updated_at).toISOString() : null;
+  return { title: row.title ?? '', description: row.description ?? '', locale: row.locale ?? 'en', updatedAt };
 }
 
 // The account that owns a card slug — i.e. the referrer credited when someone

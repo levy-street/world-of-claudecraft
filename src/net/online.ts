@@ -367,8 +367,11 @@ export class Api {
   // realm-relative public page path; main.ts normalizes it to an absolute URL
   // before injecting it into the share UI.
   // The body is the raw PNG, so this bypasses the JSON `post` helper.
-  async uploadCard(characterId: number, png: Blob, lang = 'en'): Promise<{ url: string }> {
+  async uploadCard(characterId: number, png: Blob, lang = 'en', level?: number): Promise<{ url: string }> {
     const params = new URLSearchParams({ character: String(characterId), lang });
+    // The composited PNG is drawn from the live level; send it so the hosted
+    // card's title matches the image rather than a possibly-stale saved level.
+    if (typeof level === 'number' && Number.isFinite(level)) params.set('level', String(Math.round(level)));
     const res = await fetch(`${this.base}/api/card?${params.toString()}`, {
       method: 'POST',
       headers: {

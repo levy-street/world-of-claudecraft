@@ -240,6 +240,29 @@ describe('POST /api/card', () => {
     expect(insert?.[1][6]).toBe('en'); // locale
   });
 
+  it('uses the client-reported live level for the title (matches the PNG, not the stale column)', async () => {
+    // The composited PNG is drawn from the live level; the column may lag a level-up
+    // by an autosave. The client passes its level so the hosted title stays in sync.
+    characterRows = [{ id: 5, account_id: 1, name: 'Sir Test', class: 'paladin', level: 12, state: { level: 12 } }];
+    slugRows = [];
+    const { status } = await callUpload('/api/card?character=5&level=16', validCardPng);
+    expect(status).toBe(200);
+    const insert = dbMock.query.mock.calls.find((c) => String(c[0]).includes('INSERT INTO player_cards'));
+    expect(insert?.[1][4]).toBe('Sir Test - Level 16 Paladin');
+  });
+
+  it('falls back to the saved level when the reported level is absent or invalid', async () => {
+    characterRows = [{ id: 5, account_id: 1, name: 'Sir Test', class: 'paladin', level: 12 }];
+    for (const url of ['/api/card?character=5', '/api/card?character=5&level=0', '/api/card?character=5&level=abc', '/api/card?character=5&level=1.5']) {
+      dbMock.query.mockClear();
+      slugRows = [];
+      const { status } = await callUpload(url, validCardPng);
+      expect(status).toBe(200);
+      const insert = dbMock.query.mock.calls.find((c) => String(c[0]).includes('INSERT INTO player_cards'));
+      expect(insert?.[1][4]).toBe('Sir Test - Level 12 Paladin');
+    }
+  });
+
   it('stores localized public-page metadata using the upload locale', async () => {
     characterRows = [{ id: 5, account_id: 1, name: 'Sir Test', class: 'paladin', level: 12 }];
     slugRows = [];
@@ -413,6 +436,23 @@ describe('GET /p/<slug>', () => {
     expect(html).toContain('desc &amp; more');
     expect(html).not.toContain('<b>A "Quote"');
     expect(res.headers['Cache-Control']).toBe('public, max-age=120');
+  });
+
+  it('cache-busts the og:image with the card updated_at so a re-published card is re-fetched', async () => {
+    // Without a version query, X/Discord/browsers keep serving the cached PNG for
+    // the stable /p/<slug>/card.png URL even after a level-up re-publish.
+    const updatedAt = '2026-06-23T19:33:14.000Z';
+    const v = Date.parse(updatedAt);
+    cardRows = [{ character_id: 5, account_id: 1, png: validCardPng, title: 't', description: 'd', locale: 'en', updated_at: updatedAt }];
+    const res = makeRes();
+    await handleCardRoutes(makeGetReq('/p/sir-test'), res);
+    const html = String(res.body);
+    expect(html).toContain(`property="og:image" content="http://realm.example/p/sir-test/card.png?v=${v}"`);
+    expect(html).toContain(`name="twitter:image" content="http://realm.example/p/sir-test/card.png?v=${v}"`);
+    expect(html).toContain(`src="/p/sir-test/card.png?v=${v}"`);
+    // the canonical/page URL itself is never versioned
+    expect(html).toContain('<link rel="canonical" href="http://realm.example/p/sir-test">');
+    expect(html).toContain('property="og:url" content="http://realm.example/p/sir-test"');
   });
 
   it('renders localized server-side public card copy from the stored card locale', async () => {

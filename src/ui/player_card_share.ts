@@ -27,7 +27,13 @@ export interface PublishedCard {
   url: AbsoluteUrl;
 }
 
-export type CardUploader = (png: Blob) => Promise<PublishedCard>;
+/** Card details the uploader needs so the hosted page matches the composited PNG. */
+export interface PublishedCardMeta {
+  /** The character level drawn on the PNG (live), used for the hosted card title. */
+  level: number;
+}
+
+export type CardUploader = (png: Blob, meta: PublishedCardMeta) => Promise<PublishedCard>;
 
 /** Referral count + the player's published-card slug (null before first publish). */
 export interface ReferralInfo {
@@ -68,9 +74,9 @@ export function cardHostingAvailable(): boolean {
 }
 
 /** Publish the card PNG; resolves to its hosted page URL. */
-export function publishCard(png: Blob): Promise<PublishedCard> {
+export function publishCard(png: Blob, meta: PublishedCardMeta): Promise<PublishedCard> {
   if (!uploader) throw new Error('card hosting is unavailable in this session');
-  return uploader(png);
+  return uploader(png, meta);
 }
 
 /** Referral stats for the card footer, or null when unavailable (offline). */

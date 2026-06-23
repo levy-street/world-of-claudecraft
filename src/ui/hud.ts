@@ -6988,7 +6988,7 @@ export class Hud {
       if (state.published) return state.published;
       if (!state.canvas) throw new Error(t('playerCard.statusStillRendering'));
       setStatus(t('playerCard.statusPublishing'));
-      const pub = await publishCard(await cardCanvasToUploadBlob(state.canvas));
+      const pub = await publishCard(await cardCanvasToUploadBlob(state.canvas), { level: state.data?.level ?? this.sim.player.level });
       state.published = pub;
       linkInput.value = pub.url;
       linkRow.hidden = false;

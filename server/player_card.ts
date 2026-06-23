@@ -34,6 +34,10 @@ const CARD_PNG_DIMENSIONS = [
 const MAX_CARD_DECODED_BYTES = (2400 * 4 + 1) * 1260;
 const MAX_SLUG_LENGTH = 64;
 const MAX_SLUG_ATTEMPTS = 25;
+// Upper bound for a client-reported card level used only in the cosmetic OG
+// title. The sim caps levels far below this; the generous ceiling just rejects
+// absurd/garbage values without coupling this module to the sim's MAX_LEVEL.
+const MAX_CARD_LEVEL = 1000;
 const DEFAULT_PRODUCTION_PUBLIC_ORIGIN = 'https://worldofclaudecraft.com';
 const TRUSTED_PUBLIC_HOST_ORIGINS = new Map([
   ['worldofclaudecraft.com', DEFAULT_PRODUCTION_PUBLIC_ORIGIN],
@@ -426,6 +430,10 @@ export async function handleCardUpload(
   const params = new URLSearchParams((req.url ?? '').split('?')[1] ?? '');
   const characterId = Number(params.get('character'));
   const locale = normalizePublicCardLocale(params.get('lang'));
+  // The client composites the PNG from its LIVE level; pass that level through so
+  // the stored title matches the image. The persisted column lags by up to one
+  // autosave (30s), which is what made a freshly-shared card show the old level.
+  const reportedLevel = Number(params.get('level'));
   if (!Number.isInteger(characterId) || characterId <= 0) {
     recordUsageMetric('card.publish.rejected');
     return json(res, 400, { error: 'character id is required' });
@@ -455,8 +463,14 @@ export async function handleCardUpload(
 
   const base = slugify(character.name) || `player-${characterId}`;
   const copy = PUBLIC_CARD_COPY[locale];
+  // Live client level (validated) wins; otherwise the freshest server-side level
+  // (the JSONB state, then the denormalized column) so the title is never staler
+  // than the last save.
+  const level = Number.isInteger(reportedLevel) && reportedLevel >= 1 && reportedLevel <= MAX_CARD_LEVEL
+    ? reportedLevel
+    : (character.state?.level ?? character.level);
   const levelClass = interpolate(copy.levelClass, {
-    level: character.level,
+    level,
     className: classDisplay(character.class, locale),
   });
   const title = `${character.name} - ${levelClass}`;
@@ -530,14 +544,20 @@ async function serveCardPage(req: http.IncomingMessage, res: http.ServerResponse
     res.end(missingCardHtml(origin, requestLocale(req)));
     return;
   }
+  // Version the og:image URL by the card's last-publish time so a re-published
+  // card (e.g. after a level-up) busts social/browser image caches that key on
+  // the otherwise-stable /p/<slug>/card.png URL and would keep serving the old PNG.
+  const parsedVersion = card.updatedAt ? Date.parse(card.updatedAt) : NaN;
+  const version = Number.isFinite(parsedVersion) ? parsedVersion : 0;
   res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=120' });
-  res.end(cardPageHtml({ slug, title: card.title, description: card.description, locale: normalizePublicCardLocale(card.locale), origin }));
+  res.end(cardPageHtml({ slug, title: card.title, description: card.description, locale: normalizePublicCardLocale(card.locale), origin, version }));
 }
 
-function cardPageHtml(opts: { slug: string; title: string; description: string; locale: PublicCardLocale; origin: string }): string {
-  const { slug, title, description, locale, origin } = opts;
+function cardPageHtml(opts: { slug: string; title: string; description: string; locale: PublicCardLocale; origin: string; version: number }): string {
+  const { slug, title, description, locale, origin, version } = opts;
   const pagePath = `/p/${encodeURIComponent(slug)}`;
-  const imagePath = `${pagePath}/card.png`;
+  const imageQuery = version > 0 ? `?v=${version}` : '';
+  const imagePath = `${pagePath}/card.png${imageQuery}`;
   const playPath = `/?ref=${encodeURIComponent(slug)}`;
   const pageUrl = `${origin}${pagePath}`;
   const imageUrl = `${origin}${imagePath}`;
