@@ -883,6 +883,7 @@ export class GameServer {
   async bootArenaWager(): Promise<void> {
     this.arenaWager = await buildArenaWagerService(
       (a, b) => this.sim.startWageredArena1v1(a, b),
+      (pid) => this.sim.meta(pid)?.arenaRating ?? 1500, // ARENA_BASE_RATING (sim.ts)
       (pid, msg) => {
         const s = this.clients.get(pid);
         if (s) this.send(s, { t: 'wager', payload: msg });

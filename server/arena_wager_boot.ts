@@ -39,6 +39,7 @@ function bigEnv(name: string, fallback: bigint): bigint {
  */
 export async function buildArenaWagerService(
   startBout: (creatorPid: number, opponentPid: number) => boolean,
+  ratingFor: (pid: number) => number,
   sendToPid: (pid: number, msg: WagerClientMsg) => void,
 ): Promise<ArenaWagerService | null> {
   if (process.env.WOC_ARENA_WAGER_ENABLED !== '1') return null;
@@ -66,6 +67,7 @@ export async function buildArenaWagerService(
     nextMatchId: allocateWagerMatchId,
     minStakeBase: bigEnv('WOC_ARENA_MIN_STAKE_BASE', 1_000_000n),
     maxStakeBase: bigEnv('WOC_ARENA_MAX_STAKE_BASE', 1_000_000_000_000n),
+    maxRatingGap: intEnv('WOC_ARENA_MAX_RATING_GAP', 300),
     rakeBps, store,
   });
 
@@ -74,6 +76,7 @@ export async function buildArenaWagerService(
     walletFor: async (accountId) => (await walletForAccount(accountId))?.pubkey ?? null,
     holderInfoFor: holderInfoForPubkey,
     minHolderTier: intEnv('WOC_ARENA_MIN_HOLDER_TIER', 1),
+    ratingFor,
     // Pinned to the boot-time season: refuse queues once it closes (a realm restart
     // re-pins to the next season). Stakes always record against the season they
     // were taken under.

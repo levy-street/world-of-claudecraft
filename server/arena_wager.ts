@@ -33,6 +33,7 @@ export interface WagerParticipant {
   pid: number;
   wallet: PublicKey;
   stakeBase: bigint;
+  rating: number; // arena 1v1 Elo, for rating-band pairing (anti-smurf)
 }
 
 // Messages the coordinator emits to a player's client (delivered by the injected
@@ -73,6 +74,8 @@ export interface ArenaWagerDeps {
   /** Stake bounds (base units), inclusive. Floor blocks dust-spam; ceiling blocks a whale pot starving the season budget. */
   minStakeBase: bigint;
   maxStakeBase: bigint;
+  /** Max Elo gap between paired wagerers: keeps a strong player / smurf from farming much weaker stakers. */
+  maxRatingGap: number;
   /** The burn rake recorded with each match (for audit/recovery); must match the escrow's rake. */
   rakeBps: number;
   /** Durable persistence of every match transition (recovery after a restart). */
@@ -103,7 +106,10 @@ export class ArenaWagerCoordinator {
     if (p.stakeBase > this.deps.maxStakeBase) return { ok: false, reason: 'stake_above_max' };
     if (this.pidToMatch.has(p.pid) || this.queue.some((q) => q.pid === p.pid)) return { ok: false, reason: 'already_queued' };
 
-    const partnerIdx = this.queue.findIndex((q) => q.stakeBase === p.stakeBase && !q.wallet.equals(p.wallet));
+    const partnerIdx = this.queue.findIndex((q) =>
+      q.stakeBase === p.stakeBase
+      && !q.wallet.equals(p.wallet)
+      && Math.abs(q.rating - p.rating) <= this.deps.maxRatingGap);
     if (partnerIdx < 0) {
       this.queue.push(p);
       return { ok: true, queued: true };

@@ -33,6 +33,7 @@ function setup(over: Partial<ArenaWagerServiceDeps> = {}) {
     walletFor: async () => WALLET,
     holderInfoFor: async () => ({ tier: 3, balance: 1000 }),
     minHolderTier: 1,
+    ratingFor: () => 1700,
     seasonActive: async () => true,
     escrow: escrow as unknown as ArenaEscrow,
     store,
@@ -83,7 +84,7 @@ describe('ArenaWagerService.handleQueue gate', () => {
     await service.handleQueue(sess, '100000000');
     expect(sent.filter((s) => s.msg.t === 'wager_error')).toHaveLength(0);
     const call = coord.calls.find((c) => c.fn === 'enqueue')!;
-    expect(call.args[0]).toMatchObject({ pid: 7, stakeBase: 100_000_000n });
+    expect(call.args[0]).toMatchObject({ pid: 7, stakeBase: 100_000_000n, rating: 1700 });
     expect((call.args[0].wallet as PublicKey).toBase58()).toBe(WALLET);
   });
   it('surfaces a coordinator enqueue refusal as a wager_error', async () => {

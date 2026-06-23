@@ -29,6 +29,8 @@ export interface ArenaWagerServiceDeps {
   holderInfoFor: (pubkey: string) => Promise<{ tier: number; balance: number }>;
   /** Minimum holder tier required to enter a wagered match (anti-churn-and-dump). */
   minHolderTier: number;
+  /** The player's arena 1v1 Elo, for rating-band pairing. */
+  ratingFor: (pid: number) => number;
   /** Whether the pinned reward season is still active (stakes must record against it). */
   seasonActive: () => Promise<boolean>;
   escrow: ArenaEscrow;
@@ -62,7 +64,7 @@ export class ArenaWagerService {
     if (!wallet) return fail('Link a verified $WOC wallet to wager.');
     const { tier } = await this.d.holderInfoFor(wallet);
     if (tier < this.d.minHolderTier) return fail('You need to hold more $WOC to enter wagered matches.');
-    const r = await this.d.coordinator.enqueue({ pid: session.pid, wallet: new PublicKey(wallet), stakeBase });
+    const r = await this.d.coordinator.enqueue({ pid: session.pid, wallet: new PublicKey(wallet), stakeBase, rating: this.d.ratingFor(session.pid) });
     if (!r.ok) fail(ENQUEUE_REASON_TEXT[r.reason]);
   }
 

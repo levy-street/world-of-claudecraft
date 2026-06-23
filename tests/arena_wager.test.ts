@@ -33,7 +33,7 @@ class FakeStore {
   async setPhase(matchId: bigint, phase: string, sig?: string) { this.calls.push({ fn: 'setPhase', args: [matchId, phase, sig] }); }
 }
 
-function setup(stakeTimeoutMs = 30_000) {
+function setup(stakeTimeoutMs = 30_000, maxRatingGap = 10_000) {
   const escrow = new FakeEscrow();
   const store = new FakeStore();
   const sent: { pid: number; msg: WagerClientMsg }[] = [];
@@ -49,11 +49,12 @@ function setup(stakeTimeoutMs = 30_000) {
     nextMatchId: async () => nextId++,
     minStakeBase: 1_000_000n,
     maxStakeBase: 1_000_000_000_000n,
+    maxRatingGap,
     rakeBps: 500,
     store: store as unknown as WagerStore,
   });
-  const creator = { pid: 1, wallet: Keypair.generate().publicKey, stakeBase: 100_000_000n };
-  const opponent = { pid: 2, wallet: Keypair.generate().publicKey, stakeBase: 100_000_000n };
+  const creator = { pid: 1, wallet: Keypair.generate().publicKey, stakeBase: 100_000_000n, rating: 1500 };
+  const opponent = { pid: 2, wallet: Keypair.generate().publicKey, stakeBase: 100_000_000n, rating: 1500 };
   return { coord, escrow, store, sent, startBout, creator, opponent, advance: (ms: number) => { clock += ms; } };
 }
 const phasesSet = (store: FakeStore) => store.calls.filter((c) => c.fn === 'setPhase').map((c) => c.args[1]);
@@ -85,7 +86,7 @@ describe('ArenaWagerCoordinator pairing', () => {
     const { coord, sent, creator } = setup();
     await coord.enqueue(creator);
     await coord.enqueue(creator);
-    await coord.enqueue({ pid: 2, wallet: Keypair.generate().publicKey, stakeBase: 100_000_000n });
+    await coord.enqueue({ pid: 2, wallet: Keypair.generate().publicKey, stakeBase: 100_000_000n, rating: 1500 });
     // Exactly one pairing happened (2 wager_match messages), not a self-pair.
     expect(sent.filter((s) => s.msg.t === 'wager_match')).toHaveLength(2);
   });
@@ -144,8 +145,8 @@ describe('ArenaWagerCoordinator stake handshake', () => {
 describe('ArenaWagerCoordinator enqueue guards', () => {
   it('refuses a stake below the floor or above the ceiling (no pairing attempted)', async () => {
     const { coord, sent } = setup();
-    expect(await coord.enqueue({ pid: 1, wallet: Keypair.generate().publicKey, stakeBase: 0n })).toEqual({ ok: false, reason: 'stake_below_min' });
-    expect(await coord.enqueue({ pid: 2, wallet: Keypair.generate().publicKey, stakeBase: 9_999_999_999_999n })).toEqual({ ok: false, reason: 'stake_above_max' });
+    expect(await coord.enqueue({ pid: 1, wallet: Keypair.generate().publicKey, stakeBase: 0n, rating: 1500 })).toEqual({ ok: false, reason: 'stake_below_min' });
+    expect(await coord.enqueue({ pid: 2, wallet: Keypair.generate().publicKey, stakeBase: 9_999_999_999_999n, rating: 1500 })).toEqual({ ok: false, reason: 'stake_above_max' });
     expect(sent.length).toBe(0);
   });
   it('refuses a duplicate enqueue of the same pid', async () => {
@@ -156,12 +157,22 @@ describe('ArenaWagerCoordinator enqueue guards', () => {
   it('never self-matches two pids that share one wallet, but does pair a distinct-wallet third party', async () => {
     const { coord, sent } = setup();
     const shared = Keypair.generate().publicKey;
-    await coord.enqueue({ pid: 1, wallet: shared, stakeBase: 100_000_000n });
-    const sameWallet = await coord.enqueue({ pid: 2, wallet: shared, stakeBase: 100_000_000n }); // one person, two pids
+    await coord.enqueue({ pid: 1, wallet: shared, stakeBase: 100_000_000n, rating: 1500 });
+    const sameWallet = await coord.enqueue({ pid: 2, wallet: shared, stakeBase: 100_000_000n, rating: 1500 }); // one person, two pids
     expect(sameWallet).toEqual({ ok: true, queued: true }); // queued, NOT paired against itself
     expect(sent.filter((s) => s.msg.t === 'wager_match')).toHaveLength(0);
-    await coord.enqueue({ pid: 3, wallet: Keypair.generate().publicKey, stakeBase: 100_000_000n }); // genuine third party
+    await coord.enqueue({ pid: 3, wallet: Keypair.generate().publicKey, stakeBase: 100_000_000n, rating: 1500 }); // genuine third party
     expect(sent.filter((s) => s.msg.t === 'wager_match')).toHaveLength(2); // pairs with the first waiter
+  });
+  it('does not pair players whose Elo differs by more than the band, but does within it', async () => {
+    const { coord, sent } = setup(30_000, 200); // tight 200-point rating band
+    await coord.enqueue({ pid: 1, wallet: Keypair.generate().publicKey, stakeBase: 100_000_000n, rating: 1500 });
+    const farApart = await coord.enqueue({ pid: 2, wallet: Keypair.generate().publicKey, stakeBase: 100_000_000n, rating: 1900 }); // 400 gap > 200
+    expect(farApart).toEqual({ ok: true, queued: true }); // queued, not paired against a much weaker/stronger player
+    expect(sent.filter((s) => s.msg.t === 'wager_match')).toHaveLength(0);
+    const within = await coord.enqueue({ pid: 3, wallet: Keypair.generate().publicKey, stakeBase: 100_000_000n, rating: 1650 }); // 150 from pid1
+    expect(within).toEqual({ ok: true, queued: false }); // pairs with pid1 (within band)
+    expect(sent.filter((s) => s.msg.t === 'wager_match')).toHaveLength(2);
   });
 });
 
@@ -213,8 +224,8 @@ describe('ArenaWagerCoordinator settlement', () => {
 describe('ArenaWagerCoordinator durability', () => {
   async function paired() {
     const ctx = setup();
-    await ctx.coord.enqueue({ pid: 1, wallet: Keypair.generate().publicKey, stakeBase: 100_000_000n });
-    await ctx.coord.enqueue({ pid: 2, wallet: Keypair.generate().publicKey, stakeBase: 100_000_000n });
+    await ctx.coord.enqueue({ pid: 1, wallet: Keypair.generate().publicKey, stakeBase: 100_000_000n, rating: 1500 });
+    await ctx.coord.enqueue({ pid: 2, wallet: Keypair.generate().publicKey, stakeBase: 100_000_000n, rating: 1500 });
     const matchId = (msgsFor(ctx.sent, 1)[0] as any).matchId as string;
     return { ...ctx, matchId };
   }
