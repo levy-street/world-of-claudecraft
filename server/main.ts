@@ -1365,6 +1365,7 @@ async function main(): Promise<void> {
   await game.loadMarket();
   await game.loadChatFilter();
   await game.loadBlockedIps();
+  await game.bootArenaWager();
   void game.recordOnlineSnapshot();
   void currentSitePresenceUsers()
     .then((count) => recordSitePresenceSample(count))

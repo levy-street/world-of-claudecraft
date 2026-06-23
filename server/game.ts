@@ -21,6 +21,8 @@ import {
 } from '../src/sim/types';
 import { type CommandName, isOverheadEmoteId } from '../src/world_api';
 import { recordOnlineSample } from './admin_db';
+import { buildArenaWagerService } from './arena_wager_boot';
+import { ArenaWagerService } from './arena_wager_service';
 import { offensiveName } from './auth';
 import type {
   BotDetector,
@@ -668,6 +670,10 @@ export class GameServer {
   // Throttle for the optional over-budget stutter log (PERF_TICK_LOG=1).
   private lastPerfLogTick = 0;
   private readonly ipSessionCounts = new Map<string, number>();
+  // #478 wagered arena. Null unless WOC_ARENA_WAGER_ENABLED is configured (see
+  // bootArenaWager). All escrow/coordinator logic lives in the service.
+  private arenaWager: ArenaWagerService | null = null;
+  private wagerPollInterval: ReturnType<typeof setInterval> | null = null;
 
   constructor() {
     this.sim = new Sim({
@@ -828,6 +834,7 @@ export class GameServer {
         const events = this.sim.tick();
         lap('tick');
         this.routeEvents(events);
+        if (this.arenaWager) this.handleWagerArenaEnds(events);
         lap('events');
         this.runAntibotTick();
         lap('antibot');
@@ -861,11 +868,46 @@ export class GameServer {
     this.holderTierInterval = setInterval(() => {
       void this.refreshAllHolderTiers();
     }, HOLDER_TIER_REFRESH_MS);
+    // Drive wager stake-timeouts off the 20 Hz loop (light: an in-memory scan, plus
+    // a blockhash fetch only when a pairing actually times out).
+    if (this.arenaWager) {
+      this.wagerPollInterval = setInterval(() => {
+        void this.arenaWager!.poll().catch((e) => console.error('[wager] poll failed:', e));
+      }, 2_000);
+    }
+  }
+
+  // Construct the #478 wager service from env (no-op unless WOC_ARENA_WAGER_ENABLED),
+  // then recover any pot a previous crash left locked on-chain. Call after
+  // ensureSchema (the season + match store must be queryable) and before start().
+  async bootArenaWager(): Promise<void> {
+    this.arenaWager = await buildArenaWagerService(
+      (a, b) => this.sim.startWageredArena1v1(a, b),
+      (pid, msg) => {
+        const s = this.clients.get(pid);
+        if (s) this.send(s, { t: 'wager', payload: msg });
+      },
+    );
+    if (!this.arenaWager) return;
+    const r = await this.arenaWager.recoverOnBoot();
+    console.log(`[wager] arena wager enabled; boot recovery: ${r.refunded} refunded, ${r.reconciled} reconciled, ${r.staleCancelled} stale cancelled`);
+  }
+
+  // Bridge the sim's arenaEnd events into the wager coordinator so a finished
+  // wagered bout settles (or refunds a draw). onBoutEnd is idempotent, so the two
+  // per-player arenaEnd events for one match settle it exactly once.
+  private handleWagerArenaEnds(events: SimEvent[]): void {
+    for (const ev of events) {
+      if (ev.type !== 'arenaEnd' || ev.pid === undefined) continue;
+      const pid = ev.pid;
+      this.arenaWager!.onArenaEnd(pid, ev.won, ev.draw).catch((e) => console.error('[wager] settle failed for pid', pid, e));
+    }
   }
 
   stop(): void {
     if (this.interval) clearInterval(this.interval);
     if (this.holderTierInterval) clearInterval(this.holderTierInterval);
+    if (this.wagerPollInterval) clearInterval(this.wagerPollInterval);
   }
 
   // Update one player's holder-tier flair from their linked wallet's $WOC
@@ -1251,6 +1293,7 @@ export class GameServer {
     }
     void this.recordOnlineSnapshot();
     this.devTierPids.delete(session.pid);
+    this.arenaWager?.onLeave(session.pid);
     this.social.forget(session.characterId);
     // delete from clients first so friends see them as offline in the notice
     void this.social
@@ -1872,6 +1915,19 @@ export class GameServer {
       case 'buy':
         if (typeof msg.npc === 'number' && typeof msg.item === 'string')
           sim.buyItem(msg.npc, msg.item, pid);
+        break;
+      // #478 wagered arena (no-op unless the wager service is configured). The
+      // service validates every field + gates on wallet/holder/season.
+      case 'wager_queue':
+        this.arenaWager?.handleQueue(session, msg.stake).catch((e) => console.error('[wager] queue failed:', e));
+        break;
+      case 'wager_staked':
+        this.arenaWager
+          ?.handleStaked(session, msg.matchId, msg.signature)
+          .catch((e) => console.error('[wager] stake report failed:', e));
+        break;
+      case 'wager_cancel':
+        this.arenaWager?.handleCancel(session);
         break;
       case 'sell':
         if (typeof msg.item === 'string') {
