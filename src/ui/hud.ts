@@ -1197,7 +1197,7 @@ export class Hud {
     // re-render the bag footer (and re-composite an open player card) when the
     // connected wallet's $WOC balance changes
     onWalletUiChange(() => {
-      if ($('#bags').style.display !== 'none') this.renderBags();
+      if (isWindowOpen($('#bags').style.display)) this.renderBags();
       this.recomposeOpenCard?.();
     });
     $('#pf-name').textContent = sim.player.name;
@@ -3919,7 +3919,7 @@ export class Hud {
     this.targetFrameMover?.relocalize();
     this.playerFrameMover?.relocalize();
     if (this.questlogWindow.isOpen) this.questlogWindow.render();
-    if ($('#bags').style.display !== 'none') this.renderBags();
+    if (isWindowOpen($('#bags').style.display)) this.renderBags();
     if (this.openVendorNpcId !== null && $('#vendor-window').style.display === 'block')
       this.renderVendor();
     if (this.marketWindow.isOpen) this.marketWindow.render();
