@@ -205,6 +205,7 @@ import {
   encodeHotbarAction,
   HOTBAR_ACTION_MIME,
   type HotbarAction,
+  hotbarItemIndex,
   parseHotbarAction,
   parseHotbarActions,
   placeAbilityOnSlot,
@@ -212,6 +213,7 @@ import {
   shouldSeedFormBar,
   swapHotbarSlots,
   syncHotbarActions,
+  toggleHotbarItem,
 } from './hotbar';
 import {
   formatMoney as formatLocalizedMoney,
@@ -3203,6 +3205,21 @@ export class Hud {
       this.dragAction = action ? { action, sourceIndex: null } : null;
     },
     clearActionDropTargets: () => this.clearActionDropTargets(),
+    // Touch-path action-bar assign for usable items (drag-and-drop is desktop-only),
+    // mirroring the spellbook's mobile ability toggle. The hotbar layout stays HUD
+    // state, so the painter reads/mutates it through these closures.
+    itemOnBar: (itemId) => hotbarItemIndex(this.hotbarActions, itemId) !== -1,
+    hasFreeHotbarSlot: () => this.firstEmptyHotbarIndex() !== -1,
+    toggleItemOnBar: (itemId) => {
+      const next = toggleHotbarItem(this.hotbarActions, itemId);
+      if (!next.changed) return false;
+      this.hotbarActions = next.actions;
+      this.saveSlotMap();
+      // Keep the spellbook's ability +/- disabled-states in sync (a filled/freed
+      // slot changes whether abilities can still be added).
+      this.spellbookWindow.refreshHotbarControls();
+      return true;
+    },
   });
   // World Market window painter (market_view.ts core + market_window.ts painter).
   // It composes the shared presentation bag (icon/money/tooltip) and owns the

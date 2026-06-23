@@ -78,6 +78,32 @@ export function placeItemOnSlot(
   return next;
 }
 
+// First slot index holding the given item, or -1. Mirrors the ability lookup so
+// the bags +/- toggle can show whether a usable item is already on the bar.
+export function hotbarItemIndex(actions: readonly HotbarAction[], itemId: string): number {
+  return actions.findIndex((action) => action?.type === 'item' && action.id === itemId);
+}
+
+// Toggle a usable item on the action bar: if it is already assigned, clear every
+// slot that holds it; otherwise place it in the first empty slot. Returns the
+// (possibly unchanged) layout plus whether it changed, so a full bar with the
+// item absent is a no-op. This is the touch path equivalent of the spellbook's
+// ability +/- toggle, since drag-and-drop is unavailable on mobile.
+export function toggleHotbarItem(
+  actions: readonly HotbarAction[],
+  itemId: string,
+): { actions: HotbarAction[]; changed: boolean } {
+  if (hotbarItemIndex(actions, itemId) !== -1) {
+    const next = actions.map((action) =>
+      action?.type === 'item' && action.id === itemId ? null : action,
+    );
+    return { actions: next, changed: true };
+  }
+  const empty = actions.indexOf(null);
+  if (empty === -1) return { actions: actions.slice(), changed: false };
+  return { actions: placeItemOnSlot(actions, itemId, empty), changed: true };
+}
+
 export function swapHotbarSlots(
   actions: readonly HotbarAction[],
   sourceIndex: number,

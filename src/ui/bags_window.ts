@@ -132,6 +132,13 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   isHotbarItemId(itemId: string): boolean;
   setDragAction(action: { type: 'item'; id: string } | null): void;
   clearActionDropTargets(): void;
+  // Touch-path action-bar assign for usable items (the +/- toggle mirrors the
+  // spellbook's mobile ability toggle; drag-and-drop above is desktop-only). The
+  // hotbar layout is HUD state, so the painter reads/mutates it through these.
+  itemOnBar(itemId: string): boolean;
+  hasFreeHotbarSlot(): boolean;
+  /** Toggle the item on the action bar; returns whether the layout changed. */
+  toggleItemOnBar(itemId: string): boolean;
 }
 
 export class BagsWindow {
@@ -467,6 +474,11 @@ export class BagsWindow {
         ev.preventDefault();
         this.sellBagItem(s, ev);
       });
+      // Desktop assigns usable items to the action bar by drag-and-drop; touch has no
+      // drag, so hotbar-eligible items also get a +/- toggle (hidden on desktop via
+      // CSS), mirroring the spellbook's mobile ability toggle. Built as a sibling of
+      // the row and wrapped in a .bag-row when present.
+      let assignToggle: HTMLButtonElement | null = null;
       if (!this.deps.tradeOpen() && !this.deps.vendorOpen() && this.deps.isHotbarItemId(s.itemId)) {
         row.draggable = true;
         row.addEventListener('dragstart', (e) => {
@@ -480,6 +492,28 @@ export class BagsWindow {
           this.deps.setDragAction(null);
           this.deps.clearActionDropTargets();
         });
+        const onBar = this.deps.itemOnBar(s.itemId);
+        assignToggle = document.createElement('button');
+        assignToggle.type = 'button';
+        assignToggle.className = `item-hotbar-toggle${onBar ? ' remove' : ''}`;
+        assignToggle.dataset.itemId = s.itemId;
+        assignToggle.textContent = onBar ? '-' : '+';
+        assignToggle.setAttribute(
+          'aria-label',
+          t(onBar ? 'hudChrome.spellbook.removeFromBarAria' : 'hudChrome.spellbook.addToBarAria', {
+            name: itemName,
+          }),
+        );
+        assignToggle.setAttribute('aria-pressed', onBar ? 'true' : 'false');
+        assignToggle.disabled = !onBar && !this.deps.hasFreeHotbarSlot();
+        assignToggle.addEventListener('pointerdown', (ev) => ev.stopPropagation());
+        assignToggle.addEventListener('click', (ev) => {
+          ev.preventDefault();
+          ev.stopPropagation();
+          if (!this.deps.toggleItemOnBar(s.itemId)) return;
+          audio.click();
+          this.render();
+        });
       }
       this.deps.attachTooltip(row, () => {
         const key = bagTooltipHintKey(item, this.bagMode());
@@ -489,7 +523,15 @@ export class BagsWindow {
           : '';
         return this.deps.itemTooltip(item) + extra + link;
       });
-      grid.appendChild(row);
+      if (assignToggle) {
+        const rowWrap = document.createElement('div');
+        rowWrap.className = 'bag-row';
+        rowWrap.appendChild(row);
+        rowWrap.appendChild(assignToggle);
+        grid.appendChild(rowWrap);
+      } else {
+        grid.appendChild(row);
+      }
     }
     // Free-slot squares (unfiltered view only): the classic empty sockets that
     // make the remaining capacity visible at a glance. Decorative, not focusable.

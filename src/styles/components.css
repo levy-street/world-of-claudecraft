@@ -1053,6 +1053,19 @@
   .spell-hotbar-toggle {
     display: none;
   }
+  .item-hotbar-toggle {
+    display: none;
+  }
+  .bag-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .bag-row .bag-item {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: auto;
+  }
   .panel-title-actions {
     display: flex;
     align-items: center;

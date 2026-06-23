@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { CLASSES } from '../src/sim/content/classes';
 import {
-  buildDefaultFormBar, classHasFormBars, clearHotbarSlot, hotbarActionsEqual, parseHotbarActions,
-  placeAbilityOnSlot, placeItemOnSlot, shouldSeedFormBar, syncHotbarActions,
+  buildDefaultFormBar, classHasFormBars, clearHotbarSlot, hotbarActionsEqual, hotbarItemIndex,
+  parseHotbarActions, placeAbilityOnSlot, placeItemOnSlot, shouldSeedFormBar, syncHotbarActions,
+  toggleHotbarItem,
 } from '../src/ui/hotbar';
 
 const abilityIds = new Set(['fireball', 'frost_armor', 'arcane_intellect', 'polymorph', 'shared_id']);
@@ -304,5 +305,61 @@ describe('hotbar slot sync', () => {
       null,
       { type: 'ability', id: 'blink' },
     ]);
+  });
+});
+
+describe('item hotbar toggle (mobile assign path)', () => {
+  it('reports the first slot holding an item, or -1', () => {
+    const slots = [
+      { type: 'ability' as const, id: 'fireball' },
+      { type: 'item' as const, id: 'health_potion' },
+      { type: 'item' as const, id: 'mana_potion' },
+    ];
+
+    expect(hotbarItemIndex(slots, 'mana_potion')).toBe(2);
+    expect(hotbarItemIndex(slots, 'health_potion')).toBe(1);
+    expect(hotbarItemIndex(slots, 'baked_bread')).toBe(-1);
+    // an ability with the same id must not count as the item being on the bar
+    expect(hotbarItemIndex(slots, 'fireball')).toBe(-1);
+  });
+
+  it('assigns an absent item to the first empty slot', () => {
+    const slots = [{ type: 'ability' as const, id: 'fireball' }, null, null];
+
+    expect(toggleHotbarItem(slots, 'health_potion')).toEqual({
+      actions: [{ type: 'ability', id: 'fireball' }, { type: 'item', id: 'health_potion' }, null],
+      changed: true,
+    });
+  });
+
+  it('removes an item from every slot that holds it', () => {
+    const slots = [
+      { type: 'item' as const, id: 'health_potion' },
+      { type: 'ability' as const, id: 'fireball' },
+      { type: 'item' as const, id: 'health_potion' },
+    ];
+
+    expect(toggleHotbarItem(slots, 'health_potion')).toEqual({
+      actions: [null, { type: 'ability', id: 'fireball' }, null],
+      changed: true,
+    });
+  });
+
+  it('is a no-op when the bar is full and the item is absent', () => {
+    const slots = [
+      { type: 'ability' as const, id: 'fireball' },
+      { type: 'item' as const, id: 'mana_potion' },
+    ];
+
+    expect(toggleHotbarItem(slots, 'health_potion')).toEqual({ actions: slots, changed: false });
+  });
+
+  it('does not mutate the input layout', () => {
+    const slots = [{ type: 'ability' as const, id: 'fireball' }, null];
+    const snapshot = JSON.parse(JSON.stringify(slots));
+
+    toggleHotbarItem(slots, 'health_potion');
+
+    expect(slots).toEqual(snapshot);
   });
 });
