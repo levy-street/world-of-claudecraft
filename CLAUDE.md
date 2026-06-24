@@ -91,6 +91,12 @@ See `README.md` for the full host/develop/play guide and the classic-fidelity ch
     matcher rules): `src/ui/CLAUDE.md` and `docs/i18n-scaling/translation-workflow.md`.
 - **Never set `ALLOW_DEV_COMMANDS=1` in production** (it enables level/teleport/item cheats).
 - **Never commit `.env` or secrets.**
+- **Devnet Solana deploys use `SOLANA_DEVNET_DEPLOYER`.** The devnet deployer +
+  upgrade authority is the base58-encoded keypair secret in `SOLANA_DEVNET_DEPLOYER`
+  in `.env.local` (gitignored). Decode it to a temp keypair file and pass it as the
+  `--keypair` (fee payer + upgrade authority) for `solana program deploy ... --url devnet`;
+  never print or commit the secret, and delete the temp keypair after use. Mainnet
+  deploys are out of scope for any automated step.
 
 ## Conventions
 - **ESM + TypeScript `strict`** everywhere. 2-space indent; match the surrounding file.
