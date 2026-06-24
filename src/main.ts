@@ -68,6 +68,7 @@ import {
   type ReleaseEntry,
 } from './net/online';
 import { parseAmountToBase } from './net/wallet_amount';
+import { solscanTxUrl } from './net/explorer';
 // The wallet module is loaded lazily via dynamic import() in the wallet
 // controller below, so it stays out of the main entry chunk and only loads when
 // the feature is enabled + used.
@@ -5597,7 +5598,7 @@ function openWalletPanel(): void {
       const label = WALLET_CURRENCIES.find((c) => c.key === currency)!.label;
       feedbackBox.className = 'wp-feedback ok';
       feedbackBox.innerHTML = `Sent ${escapeHtml(amount)} ${escapeHtml(label)} to ${escapeHtml(resolved.name)}. `
-        + `<a href="https://solscan.io/tx/${encodeURIComponent(signature)}" target="_blank" rel="noopener noreferrer">View transaction ↗</a>`;
+        + `<a href="${escapeHtml(solscanTxUrl(signature, import.meta.env.VITE_SOLANA_RPC_URL))}" target="_blank" rel="noopener noreferrer">View transaction ↗</a>`;
       amountInput.value = '';
       if (connectedAddress) { void refreshWocBalance(connectedAddress); void loadBalances(connectedAddress); }
     } catch (err: any) {
@@ -5861,7 +5862,7 @@ function openWalletPanel(): void {
       let action = '';
       if (j.status === 'open' && j.role === 'helper') action = `<button type="button" class="btn wp-job-btn" data-accept="${escapeHtml(j.jobId)}">Accept job</button>`;
       else if (j.status === 'open' && j.role === 'payer') action = `<button type="button" class="btn wp-job-btn" data-cancel="${escapeHtml(j.jobId)}">Cancel &amp; refund</button>`;
-      else if (j.settleSig) action = `<a class="wp-job-link" href="https://solscan.io/tx/${encodeURIComponent(j.settleSig)}" target="_blank" rel="noopener noreferrer">View payout ↗</a>`;
+      else if (j.settleSig) action = `<a class="wp-job-link" href="${escapeHtml(solscanTxUrl(j.settleSig, import.meta.env.VITE_SOLANA_RPC_URL))}" target="_blank" rel="noopener noreferrer">View payout ↗</a>`;
       return `<div class="wp-job">
         <div class="wp-job-head">${head}<span class="wp-job-amt">${escapeHtml(amt)}</span></div>
         <div class="wp-job-goal">${escapeHtml(j.milestoneText)}</div>
