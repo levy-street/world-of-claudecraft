@@ -2614,7 +2614,14 @@ export const en_XA: EnTranslations = {
       "beatPar": "[Ɓéáţ þáŕ ƀý {time}]",
       "offPar": "[{time} óƒƒ þáŕ]",
       "failed": "[Ŕúñ éñðéð — ýóú ļéƒţ ýóúŕ ɱóúñţ]",
-      "aborted": "[Ŕúñ áƀáñðóñéð]"
+      "aborted": "[Ŕúñ áƀáñðóñéð]",
+      "best": "[Ɓéšţ {time}]",
+      "newBest": "[Ñéŵ ƀéšţ!]",
+      "board": "[Ɓóáŕð]",
+      "boardTitle": "[{name} — ţóþ ţíɱéš]",
+      "noTimes": "[Ñó ţíɱéš ýéţ — ƀé ţĥé ƒíŕšţ.]",
+      "loadingBoard": "[Ļóáðíñĝ…]",
+      "you": "[(ýóú)]"
     },
     "options": {
       "gameMenu": "[Ĝáɱé Ɱéñú]",

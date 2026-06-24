@@ -109,6 +109,41 @@ describe('course substrate — pass-through, ordering, timing', () => {
   });
 });
 
+describe('course substrate — best-time tracking', () => {
+  // Run a whole course, optionally idling `idlePerGate` ticks before each gate
+  // (away from the rings) so the run takes longer — a controllable finish time.
+  function runCourse(sim: Sim, p: { pos: { x: number; y: number; z: number } }, courseId: string, idlePerGate: number) {
+    sim.startCourse(courseId);
+    const def = COURSES[courseId];
+    for (let lap = 0; lap < def.laps; lap++) {
+      for (const gate of def.checkpoints) {
+        for (let i = 0; i < idlePerGate; i++) { p.pos.x = -120; p.pos.y = 40; p.pos.z = -120; sim.tick(); }
+        flyThroughGate(sim, p, gate);
+      }
+    }
+  }
+
+  it('keeps the best (lowest) time — a faster run wins, a slower one is ignored', () => {
+    const { sim, p } = makeFlyer();
+    runCourse(sim, p, 'skytrial_vale', 3);
+    const first = sim.mountTrialBests['skytrial_vale'];
+    expect(first).toBeGreaterThan(0);
+
+    runCourse(sim, p, 'skytrial_vale', 6); // slower
+    expect(sim.mountTrialBests['skytrial_vale']).toBe(first);
+
+    runCourse(sim, p, 'skytrial_vale', 0); // faster
+    expect(sim.mountTrialBests['skytrial_vale']).toBeLessThan(first);
+  });
+
+  it('seeds the session bests from join-loaded records', () => {
+    const sim = new Sim({ seed: 3, playerClass: 'warrior', autoEquip: true });
+    const pid = sim.addPlayer('mage', 'Veteran', { mountTrialBests: { skytrial_vale: 412 } });
+    const meta = (sim as unknown as { players: Map<number, { mountTrialBests: Record<string, number> }> }).players.get(pid)!;
+    expect(meta.mountTrialBests.skytrial_vale).toBe(412);
+  });
+});
+
 describe('course substrate — failure paths', () => {
   it('fails the run when the rider loses flight mid-course', () => {
     const { sim, p } = makeFlyer();

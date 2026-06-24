@@ -2614,7 +2614,14 @@ export const pt_BR: EnTranslations = {
       "beatPar": "Beat par by {time}",
       "offPar": "{time} off par",
       "failed": "Run ended — you left your mount",
-      "aborted": "Run abandoned"
+      "aborted": "Run abandoned",
+      "best": "Best {time}",
+      "newBest": "New best!",
+      "board": "Board",
+      "boardTitle": "{name} — top times",
+      "noTimes": "No times yet — be the first.",
+      "loadingBoard": "Loading…",
+      "you": "(you)"
     },
     "options": {
       "gameMenu": "Menu do jogo",
