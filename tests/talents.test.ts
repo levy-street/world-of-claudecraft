@@ -442,6 +442,18 @@ describe('Sim integration — loadouts & build strings', () => {
     expect(sim.known.some((k) => k.def.id === 'mortal_strike')).toBe(true);     // restored spec granted its signature
   });
 
+  it('persists the full two-bar layout without truncating the second bar', () => {
+    const sim = warriorAtCap();
+    // 23 ability slots: bar 1 (indices 0..10) + the optional second bar (11..22).
+    // Distinct markers make a dropped tail visible; saveLoadout does not validate ids.
+    const bar = Array.from({ length: 23 }, (_, i) => `ab${i}`);
+    expect(sim.saveLoadout('Full', bar)).toBe(0);
+    expect(sim.loadouts[0].bar).toEqual(bar);
+    // the positions the legacy 16-slot cap dropped (second bar slots 6..12).
+    expect(sim.loadouts[0].bar[16]).toBe('ab16');
+    expect(sim.loadouts[0].bar[22]).toBe('ab22');
+  });
+
   it('locks loadout switching in combat', () => {
     const sim = warriorAtCap();
     sim.applyTalents(alloc({ spec: 'arms' }));

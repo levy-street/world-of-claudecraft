@@ -138,6 +138,10 @@ export interface SavedLoadout {
 }
 
 export const MAX_LOADOUTS = 10;
+// Upper bound on a saved loadout's action-bar array: the client's two 12-slot
+// action bars (bar 1 + the optional second bar). Bounds the persisted array
+// without the sim needing to know the client's exact slot layout.
+export const MAX_LOADOUT_BAR_SLOTS = 24;
 
 export interface ResolvedAbilityMod {
   dmgPct: number;
