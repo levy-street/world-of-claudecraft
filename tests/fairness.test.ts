@@ -8,6 +8,7 @@ import {
   spinDigest,
   unitFromDigest,
   deriveOutcomeUnit,
+  packUnit,
 } from '../server/fairness';
 
 describe('generateDailySeed', () => {
@@ -99,5 +100,24 @@ describe('deriveOutcomeUnit', () => {
   it('domain separation: the spin digest differs from a bare seed hash', () => {
     const bare = createHash('sha256').update(seed).digest();
     expect(spinDigest(seed, 0, 0, '').equals(bare)).toBe(false);
+  });
+});
+
+describe('packUnit', () => {
+  const seed = Buffer.alloc(32, 5);
+
+  it('is deterministic, in [0, 1), and independent per index / txSig / account', () => {
+    const base = packUnit(seed, 1, 'burnSig', 0);
+    expect(packUnit(seed, 1, 'burnSig', 0)).toBe(base);
+    expect(base).toBeGreaterThanOrEqual(0);
+    expect(base).toBeLessThan(1);
+    expect(packUnit(seed, 1, 'burnSig', 1)).not.toBe(base);
+    expect(packUnit(seed, 1, 'otherSig', 0)).not.toBe(base);
+    expect(packUnit(seed, 2, 'burnSig', 0)).not.toBe(base);
+  });
+
+  it('is domain-separated from a spin unit on the same inputs', () => {
+    // pack uses txSig as the bound entropy and "pack" tag; spin uses "spin".
+    expect(packUnit(seed, 1, 'shared', 0)).not.toBe(deriveOutcomeUnit(seed, 1, 0, 'shared'));
   });
 });

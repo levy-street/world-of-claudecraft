@@ -120,6 +120,14 @@ suite('PgEngagementDb (real Postgres)', () => {
     ).rejects.toThrow('unique_violation: pack_openings.tx_sig');
   });
 
+  it('listPendingSpins returns only pending rows, oldest first, within the limit', async () => {
+    const pending = await db.listPendingSpins(100);
+    expect(pending.length).toBeGreaterThan(0);
+    expect(pending.every((s) => s.status === 'pending')).toBe(true);
+    for (let i = 1; i < pending.length; i++) expect(pending[i].id).toBeGreaterThan(pending[i - 1].id);
+    expect((await db.listPendingSpins(1)).length).toBe(1);
+  });
+
   it('EngagementService end-to-end on real Postgres: claim, settle, reveal, open', async () => {
     const seed = Buffer.alloc(32, 5);
     const cfg = parseEngagementConfig({});

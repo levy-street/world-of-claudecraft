@@ -58,6 +58,8 @@ export interface EngagementDb {
   getSpin(id: number): Promise<SpinRow | null>;
   markSpinSettled(id: number, settleSig: string): Promise<void>;
   markSpinFailed(id: number): Promise<void>;
+  /** Pending spins awaiting on-chain settlement, oldest first (keeper batch). */
+  listPendingSpins(limit: number): Promise<SpinRow[]>;
 
   // ----- daily streak -----
   getStreak(accountId: number): Promise<StreakRow>;
@@ -241,6 +243,15 @@ export class PgEngagementDb implements EngagementDb {
 
   async markSpinFailed(id: number): Promise<void> {
     await this.pool.query(`UPDATE spins SET status = 'failed' WHERE id = $1 AND realm = $2`, [id, this.realm]);
+  }
+
+  async listPendingSpins(limit: number): Promise<SpinRow[]> {
+    const { rows } = await this.pool.query(
+      `SELECT id, account_id, utc_day, day_nonce, client_seed, prize_key, lamports, status, settle_sig
+       FROM spins WHERE realm = $1 AND status = 'pending' ORDER BY id ASC LIMIT $2`,
+      [this.realm, limit],
+    );
+    return rows.map(mapSpin);
   }
 
   async getStreak(accountId: number): Promise<StreakRow> {

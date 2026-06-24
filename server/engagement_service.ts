@@ -10,6 +10,7 @@ import {
   commitFor,
   generateDailySeed,
   deriveOutcomeUnit,
+  packUnit,
 } from './fairness';
 import {
   DEFAULT_PRIZE_TABLE,
@@ -127,6 +128,13 @@ export class EngagementService {
     return { spin, prize };
   }
 
+  /** Read-only spin state for an account on a UTC day (drives /api/spin/status). */
+  async spinStatus(accountId: number, utcDay?: number): Promise<{ utcDay: number; alreadySpun: boolean; spin: SpinRow | null }> {
+    const day = utcDay ?? this.today();
+    const spin = await this.db.getSpinForDay(accountId, day);
+    return { utcDay: day, alreadySpun: spin !== null, spin };
+  }
+
   /**
    * Record that a spin's on-chain payout settled. Idempotent: re-settling with
    * the same signature returns the settled row; a different signature for an
@@ -197,6 +205,30 @@ export class EngagementService {
     };
     const openingId = await this.db.recordPackOpening(input);
     return { openingId, result };
+  }
+
+  /**
+   * Open a pack with server-derived provably fair rolls. The units are derived
+   * from the committed daily seed plus the burn signature, so the contents are
+   * fixed the moment the burn lands and are recomputable from the revealed seed.
+   * The caller has already verified the burn on-chain. One extra unit is derived
+   * for a possible pity pick.
+   */
+  async openPackFair(opts: {
+    accountId: number;
+    packId: string;
+    txSig: string;
+    policy: PackPowerPolicy;
+    utcDay?: number;
+  }): Promise<PackOpenResult> {
+    const pack = PACKS_BY_ID[opts.packId];
+    if (!pack) throw new Error('no_such_pack');
+    const utcDay = opts.utcDay ?? this.today();
+    const commit = await this.ensureDailyCommit(utcDay);
+    const seed = Buffer.from(commit.seedHex, 'hex');
+    const units: number[] = [];
+    for (let i = 0; i < pack.rolls + 1; i++) units.push(packUnit(seed, opts.accountId, opts.txSig, i));
+    return this.openPack({ accountId: opts.accountId, packId: opts.packId, txSig: opts.txSig, policy: opts.policy, units });
   }
 
   /** Reveal the secret seed for a closed day so outcomes can be audited. */

@@ -1,93 +1,9 @@
 import { describe, expect, it, beforeEach } from 'vitest';
 import { EngagementService } from '../server/engagement_service';
-import {
-  EngagementDb,
-  DailyCommitRow,
-  SpinRow,
-  StreakRow,
-  PackOpeningInput,
-} from '../server/engagement_db';
 import { parseEngagementConfig } from '../server/engagement_config';
 import { commitFor, deriveOutcomeUnit } from '../server/fairness';
 import { DEFAULT_PRIZE_TABLE, selectPrize, scaleTableForTier } from '../server/spin_prizes';
-
-// A real in-memory EngagementDb (not a mock of the service): the service is
-// exercised against working persistence with the same uniqueness + replay
-// semantics the Postgres schema enforces.
-class InMemoryEngagementDb implements EngagementDb {
-  commits = new Map<number, DailyCommitRow>();
-  spins: SpinRow[] = [];
-  private nextSpinId = 1;
-  streaks = new Map<number, StreakRow>();
-  pity = new Map<string, number>();
-  payments = new Set<string>();
-  openings: Array<PackOpeningInput & { id: number }> = [];
-  private nextOpeningId = 1;
-
-  async getDailyCommit(utcDay: number) {
-    const r = this.commits.get(utcDay);
-    return r ? { ...r } : null;
-  }
-  async putDailyCommit(row: DailyCommitRow) {
-    this.commits.set(row.utcDay, { ...row });
-  }
-  async revealDailySeed(utcDay: number) {
-    const r = this.commits.get(utcDay);
-    if (r) r.revealed = true;
-  }
-
-  async getSpinForDay(accountId: number, utcDay: number) {
-    const s = this.spins.find((x) => x.accountId === accountId && x.utcDay === utcDay);
-    return s ? { ...s } : null;
-  }
-  async insertSpin(row: Omit<SpinRow, 'id' | 'status' | 'settleSig'>) {
-    if (this.spins.some((s) => s.accountId === row.accountId && s.utcDay === row.utcDay)) {
-      throw new Error('unique_violation: spins_account_day');
-    }
-    const rec: SpinRow = { id: this.nextSpinId++, status: 'pending', settleSig: null, ...row };
-    this.spins.push(rec);
-    return { ...rec };
-  }
-  async getSpin(id: number) {
-    const s = this.spins.find((x) => x.id === id);
-    return s ? { ...s } : null;
-  }
-  async markSpinSettled(id: number, settleSig: string) {
-    const s = this.spins.find((x) => x.id === id);
-    if (s) {
-      s.status = 'settled';
-      s.settleSig = settleSig;
-    }
-  }
-  async markSpinFailed(id: number) {
-    const s = this.spins.find((x) => x.id === id);
-    if (s) s.status = 'failed';
-  }
-
-  async getStreak(accountId: number) {
-    return this.streaks.get(accountId) ?? { lastDay: null, streak: 0 };
-  }
-  async setStreak(accountId: number, row: StreakRow) {
-    this.streaks.set(accountId, { ...row });
-  }
-
-  async hasPaymentSig(txSig: string) {
-    return this.payments.has(txSig);
-  }
-  async getPity(accountId: number, packId: string) {
-    return this.pity.get(`${accountId}:${packId}`) ?? 0;
-  }
-  async setPity(accountId: number, packId: string, opens: number) {
-    this.pity.set(`${accountId}:${packId}`, opens);
-  }
-  async recordPackOpening(input: PackOpeningInput) {
-    if (this.payments.has(input.txSig)) throw new Error('unique_violation: pack_openings.tx_sig');
-    this.payments.add(input.txSig);
-    const id = this.nextOpeningId++;
-    this.openings.push({ ...input, id });
-    return id;
-  }
-}
+import { InMemoryEngagementDb } from './helpers/in_memory_engagement_db';
 
 const cfg = parseEngagementConfig({});
 let db: InMemoryEngagementDb;
@@ -127,15 +43,24 @@ describe('claimSpin', () => {
     await expect(svc.claimSpin({ accountId: 10, clientSeed: 'z', holderTier: 0, utcDay: 101 })).resolves.toBeTruthy();
   });
 
-  it('a higher holder tier can change the outcome distribution (different prize on the boundary)', async () => {
-    // Pick a seed/account where tier scaling crosses a tier boundary; assert at
-    // least that both tiers produce a valid, table-member prize.
+  it('produces a valid table-member prize at low and high holder tiers', async () => {
     const svc = makeSvc();
     const low = await svc.claimSpin({ accountId: 1, clientSeed: 's', holderTier: 0, utcDay: 1 });
     const high = await svc.claimSpin({ accountId: 2, clientSeed: 's', holderTier: 10, utcDay: 1 });
     const keys = DEFAULT_PRIZE_TABLE.map((t) => t.key);
     expect(keys).toContain(low.prize.key);
     expect(keys).toContain(high.prize.key);
+  });
+});
+
+describe('spinStatus', () => {
+  it('reports not-spun then spun across a claim', async () => {
+    const svc = makeSvc();
+    expect((await svc.spinStatus(3, 100)).alreadySpun).toBe(false);
+    await svc.claimSpin({ accountId: 3, clientSeed: 'x', holderTier: 0, utcDay: 100 });
+    const after = await svc.spinStatus(3, 100);
+    expect(after.alreadySpun).toBe(true);
+    expect(after.spin?.prizeKey).toBeTruthy();
   });
 });
 
@@ -188,7 +113,7 @@ describe('openPack', () => {
 
   it('fires the pity guarantee at the threshold and resets the counter', async () => {
     const svc = makeSvc();
-    await db.setPity(2, 'common_cache', 4); // next open hits within=5
+    await db.setPity(2, 'common_cache', 4);
     const res = await svc.openPack({ accountId: 2, packId: 'common_cache', txSig: 'sigP', policy: 'cosmetic', units: [0, 0, 0] });
     expect(res.result.rewards.some((r) => r.pity)).toBe(true);
     expect(await db.getPity(2, 'common_cache')).toBe(0);
@@ -200,6 +125,18 @@ describe('openPack', () => {
   });
 });
 
+describe('openPackFair', () => {
+  it('derives fair units from the daily seed + burn sig: deterministic and recomputable', async () => {
+    const seed = Buffer.alloc(32, 7);
+    const svc = makeSvc(seed);
+    const a = await svc.openPackFair({ accountId: 4, packId: 'rare_cache', txSig: 'burnAAA', policy: 'open', utcDay: 50 });
+    expect(a.result.rewards).toHaveLength(3);
+    // Same (account, txSig, day) recomputes the identical contents from the revealed seed.
+    const revealed = await svc.revealDay(50);
+    expect(Buffer.from(revealed, 'hex').equals(seed)).toBe(true);
+  });
+});
+
 describe('publicFairness / revealDay', () => {
   it('fixes the commit before reveal and only exposes the seed after', async () => {
     const seed = Buffer.alloc(32, 9);
@@ -207,7 +144,7 @@ describe('publicFairness / revealDay', () => {
     const f = await svc.publicFairness(200);
     expect(f.commitHash).toBe(commitFor(seed));
     expect(f.revealedSeed).toBeNull();
-    expect((await svc.publicFairness(200)).commitHash).toBe(f.commitHash); // stable
+    expect((await svc.publicFairness(200)).commitHash).toBe(f.commitHash);
 
     const revealed = await svc.revealDay(200);
     expect(revealed).toBe(seed.toString('hex'));

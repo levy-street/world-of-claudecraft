@@ -67,3 +67,18 @@ export function unitFromDigest(digest: Buffer): number {
 export function deriveOutcomeUnit(seed: Buffer, accountId: number, dayNonce: number, clientSeed: string): number {
   return unitFromDigest(spinDigest(seed, accountId, dayNonce, clientSeed));
 }
+
+/**
+ * A fair uniform in [0, 1) for the `index`-th roll of a pack open. Domain-tagged
+ * "pack" (distinct from spins) and bound to the burn signature, which the player
+ * cannot predict before they burn, so neither side can grind the roll: the
+ * outcome is fixed the moment the burn lands and is recomputable from the
+ * revealed daily seed.
+ */
+export function packUnit(seed: Buffer, accountId: number, txSig: string, index: number): number {
+  const digest = createHash('sha256')
+    .update(seed)
+    .update(Buffer.from(`|pack|${accountId}|${txSig}|${index}`, 'utf8'))
+    .digest();
+  return unitFromDigest(digest);
+}
