@@ -21,7 +21,7 @@
 use anchor_lang::prelude::*;
 use anchor_lang::system_program;
 
-declare_id!("SP1Nvau1111111111111111111111111111111111111");
+declare_id!("9TPiQxpBkjUoxKtkqH1qQrG92aUaKQJj96uyZddAwRZ9");
 
 #[program]
 pub mod woc_spin_vault {

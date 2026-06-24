@@ -82,3 +82,7 @@ discord_bot_info.txt
 
 # bot build output
 dist-bot/
+
+.gstack/
+target/
+**/*-keypair.json

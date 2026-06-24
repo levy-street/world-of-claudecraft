@@ -106,6 +106,17 @@ See `README.md` for the full host/develop/play guide and the classic-fidelity ch
 - **Never set `ALLOW_DEV_COMMANDS=1` in production** (it enables level/teleport/item cheats).
 - **Never commit `.env` or secrets.**
 
+## Solana programs (devnet deploy)
+On-chain programs live in `programs/<name>` (Anchor 0.30.1). To build and deploy a
+program to **devnet**, use the **`SOLANA_DEVNET_DEPLOYER`** base58 secret in
+`.env.local` as the fee payer and upgrade authority. It is the one devnet deploy
+key: keep it in `.env.local` (gitignored), write it to a temp keypair JSON for the
+CLI, and never commit it or print its value. Workflow: `solana config set --url
+devnet`, `anchor build`, `anchor keys sync` (aligns `declare_id!`), `anchor deploy`.
+Drive instructions with the IDL-free encoders in `server/*_client.ts` (e.g.
+`woc_spin_vault_client.ts`), not a generated client. Devnet only here; a mainnet
+deploy uses a KMS-held key, never this one.
+
 ## Conventions
 - **ESM + TypeScript `strict`** everywhere. 2-space indent; match the surrounding file.
 - **Keep the dependency set tiny.** Don't add packages without a clear need. (Svelte
