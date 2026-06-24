@@ -1,0 +1,34 @@
+{
+  "program": "5X39bYGeHPSeNipQGrZRk1siKdgDXXSqhBkpWDTTQzm8",
+  "mint": "HxbSVGZojMfz2SPvdJY5T8QcbYBFjddLCpV9RbDspY44",
+  "links": [
+    {
+      "label": "fund settler (SOL)",
+      "url": "https://solscan.io/tx/4WPGbs6mURAJsuQPCjRcWwUc7JwLp6bryQjLLs4q6HHJa7S7KjkAd4TjR9fhPeKKbHwEae1gJjq4NJe3A8NV7S7T?cluster=devnet"
+    },
+    {
+      "label": "open (deposit 100)",
+      "url": "https://solscan.io/tx/5gESqW73FMNU2GUKG837QUXCbTrr51H57ZDk4GvzKH4pm4CZPF9SUb4w66xxhQ69SscDSXANLCthUknrXSrdhQib?cluster=devnet"
+    },
+    {
+      "label": "release → helper",
+      "url": "https://solscan.io/tx/o1FtkW2EScGonCzF6T9w3SULVsaZkBvBT58jNwt5pVuovx5fUV6q44qhZLZaUjzMauDYsdCNoVTHaVKuVEJuWHB?cluster=devnet"
+    },
+    {
+      "label": "open (deposit 50)",
+      "url": "https://solscan.io/tx/3nBq7e7igLQGYHLG4ajNCjBxBxsKFsBjiDkEmp4wLyykyMWSMyAcNLnoDseNjg7xtxJvnEVYgsLJdzU4j7MtHKkK?cluster=devnet"
+    },
+    {
+      "label": "refund → payer",
+      "url": "https://solscan.io/tx/4w4b1tjCUu7dp6Gq4UvfKngzbUap4N3KAzBhzD4jxxGWsUCXLyzthRX3g2C6GpB1Ttqe4ZC97kGr5GLzoRENaSXf?cluster=devnet"
+    },
+    {
+      "label": "SOL tip → helper",
+      "url": "https://solscan.io/tx/37VDTG458p7qA21nmp4qPNweW99WTWTF1vK5Susy5T9wS1zsWUCUpHYRMDNNxH9c7mkcigUvGXMrn7KYShMRQRaW?cluster=devnet"
+    },
+    {
+      "label": "SPL tip → helper",
+      "url": "https://solscan.io/tx/2aR1SRkqPA5dfQNQYQb1tCz7DfpvKBXWYQgdNmnr2PJvBXCVnAZmj6VD3qsd4rdY6mT4S6eyW5QwMCtaagnacG5R?cluster=devnet"
+    }
+  ]
+}
