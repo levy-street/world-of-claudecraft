@@ -5,7 +5,7 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-job_escrow = "EhKKSxsKzPXK2Sc3QZcLBgQsQbtjuRYvG95SfK871trX"
+job_escrow = "5X39bYGeHPSeNipQGrZRk1siKdgDXXSqhBkpWDTTQzm8"
 
 [registry]
 url = "https://api.apr.dev"

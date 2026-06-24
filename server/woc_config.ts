@@ -50,7 +50,7 @@ export const JOBS_ENABLED = boolEnv(process.env.JOBS_ENABLED, false);
 // The deployed job_escrow program id (replace the build-time placeholder via
 // `anchor keys sync` after deploy).
 export const JOB_ESCROW_PROGRAM_ID = (
-  process.env.JOB_ESCROW_PROGRAM_ID ?? 'EhKKSxsKzPXK2Sc3QZcLBgQsQbtjuRYvG95SfK871trX'
+  process.env.JOB_ESCROW_PROGRAM_ID ?? '5X39bYGeHPSeNipQGrZRk1siKdgDXXSqhBkpWDTTQzm8'
 ).trim();
 // base58 (or JSON byte array) secret of the settler key. Store via KMS; never in
 // git. Empty in dev keeps the settler unavailable (release/refund refuse rather

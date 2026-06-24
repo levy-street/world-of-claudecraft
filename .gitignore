@@ -68,3 +68,6 @@ postgres/
 pr-assets-2fa
 
 .vite/
+
+# Rust / Anchor build artifacts
+target/

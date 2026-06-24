@@ -226,6 +226,27 @@ correct.
   <file>`, `npm test`, `npm run build`, `tests/architecture.test.ts`, the S3 i18n guard
   `tests/localization_fixes.test.ts`), never on "looks done."
 
+## Devnet deploy — the `job_escrow` Anchor program
+The job-contract escrow (`programs/job-escrow`) deploys to Solana devnet using the
+deployer keypair in **`.env.local` (`SOLANA_DEVNET_DEPLOYER=`, base58)** as the
+fee-payer / upgrade authority. **Rule: always deploy to devnet with that key — never
+commit it, never use a different/ad-hoc remote key.**
+
+Build needs the modern Solana platform-tools (edition2024). The bundled
+`cargo-build-sbf` (v1.52 / rustc 1.89) compiles fine, but Anchor's `cargo metadata`
+preflight runs on the host toolchain — pin that to a ≥1.85 cargo and skip the IDL
+(anchor-syn 0.30.1 uses a removed `proc_macro2` API):
+```
+RUSTUP_TOOLCHAIN=stable anchor build --no-idl     # or: cd programs/job-escrow && RUSTUP_TOOLCHAIN=stable cargo-build-sbf
+```
+The committed `programs/job-escrow/Cargo.lock` pins the working resolution. Deploy:
+```
+solana program deploy programs/job-escrow/target/deploy/job_escrow.so \
+  --program-id <program-keypair.json> --keypair <SOLANA_DEVNET_DEPLOYER file> --url devnet
+```
+The deployed program id is `JOB_ESCROW_PROGRAM_ID` (also `declare_id!` + `Anchor.toml`).
+A 254 KB upgradeable program needs ~2 SOL of devnet funds on the deployer.
+
 ## Pointers
 `README.md` (host/develop/play + fidelity checklist) · `DEPLOY.md` (production) ·
 `CREDITS.md` (asset licenses) · `docs/design/` (design docs) · `docs/prd/` (feature specs).

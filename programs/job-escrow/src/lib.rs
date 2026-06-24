@@ -16,7 +16,7 @@ use anchor_lang::prelude::*;
 use anchor_spl::associated_token::AssociatedToken;
 use anchor_spl::token::{self, CloseAccount, Mint, Token, TokenAccount, Transfer};
 
-declare_id!("EhKKSxsKzPXK2Sc3QZcLBgQsQbtjuRYvG95SfK871trX");
+declare_id!("5X39bYGeHPSeNipQGrZRk1siKdgDXXSqhBkpWDTTQzm8");
 
 #[program]
 pub mod job_escrow {
