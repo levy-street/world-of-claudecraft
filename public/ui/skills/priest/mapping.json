@@ -1,0 +1,62 @@
+{
+  "class": "priest",
+  "license": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+  "iconSize": 128,
+  "sourcePack": "tmp/asset_src/priest-skill-icons (CraftPix premium)",
+  "runtimeDir": "public/ui/skills/priest",
+  "abilities": [
+    {
+      "abilityId": "smite",
+      "sourceFile": "13.png",
+      "output": "smite.png"
+    },
+    {
+      "abilityId": "lesser_heal",
+      "sourceFile": "30.png",
+      "output": "lesser_heal.png"
+    },
+    {
+      "abilityId": "power_word_fortitude",
+      "sourceFile": "50.png",
+      "output": "power_word_fortitude.png"
+    },
+    {
+      "abilityId": "power_word_shield",
+      "sourceFile": "3.png",
+      "output": "power_word_shield.png"
+    },
+    {
+      "abilityId": "renew",
+      "sourceFile": "25.png",
+      "output": "renew.png"
+    },
+    {
+      "abilityId": "mind_blast",
+      "sourceFile": "35.png",
+      "output": "mind_blast.png"
+    },
+    {
+      "abilityId": "heal",
+      "sourceFile": "24.png",
+      "output": "heal.png"
+    },
+    {
+      "abilityId": "flash_heal",
+      "sourceFile": "48.png",
+      "output": "flash_heal.png"
+    },
+    {
+      "abilityId": "shadow_word_pain",
+      "sourcePack": "generic-skill100",
+      "sourceFile": "skill icon 9.png",
+      "output": "shadow_word_pain.png"
+    },
+    {
+      "abilityId": "mind_flay",
+      "sourcePack": "_Missing_Priest",
+      "sourceFile": "8.png",
+      "output": "mind_flay.png"
+    }
+  ],
+  "deferredStayProcedural": {}
+}

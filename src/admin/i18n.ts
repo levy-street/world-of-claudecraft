@@ -181,6 +181,10 @@ const ADMIN_ERROR_KEYS: Record<string, string> = {
   "word is empty after normalization": "error.wordEmptyAfterNormalization",
   "word not found": "error.wordNotFound",
   "chat mute expiry must be in the future": "error.chatMuteExpiryFuture",
+  "a valid ip address is required": "error.invalidIp",
+  "block expiry must be in the future": "error.blockExpiryFuture",
+  "failed to block ip": "error.blockFailed",
+  "ip not found": "error.blockNotFound",
 };
 export function localizeAdminError(message: string): string {
   const key = ADMIN_ERROR_KEYS[message.trim().toLowerCase()];

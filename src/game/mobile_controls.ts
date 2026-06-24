@@ -1,7 +1,20 @@
 import type { Input, TouchMoveInput } from './input';
 import { t } from '../ui/i18n';
 
-export const PHONE_TOUCH_QUERY = '(pointer: coarse) and (max-width: 940px), (pointer: coarse) and (max-height: 760px)';
+// Detects a genuinely touch-primary device (a phone or a hand-held tablet). The
+// primary test is a coarse primary pointer that cannot hover -- deliberately
+// narrower than "(any-pointer: coarse)" or navigator.maxTouchPoints, which both
+// fire on ordinary desktops/laptops that merely expose a touch-capable peripheral
+// (a precision touchpad, a pen/Wacom digitizer, or a touchscreen used alongside a
+// mouse) and would otherwise boot those machines straight into the mobile UI.
+//
+// The two phone-form-factor clauses are a safety net for a Chromium quirk:
+// Samsung (and some OnePlus) phones self-report a virtual hovering mouse, so
+// "(hover: none)" is false on a genuine touch-only Samsung phone. A coarse
+// PRIMARY pointer on a phone-sized viewport recovers those without re-matching
+// any desktop -- a desktop's primary pointer is fine, so none of these
+// "(pointer: coarse) and ..." clauses fire there regardless of viewport size.
+export const PHONE_TOUCH_QUERY = '(pointer: coarse) and (hover: none), (pointer: coarse) and (max-width: 940px), (pointer: coarse) and (max-height: 760px)';
 const DEADZONE = 0.22;
 const CAMERA_SENSITIVITY = 0.8;
 const SWIPE_LOOK_DEADZONE_PX = 6;
@@ -109,6 +122,45 @@ export function isPhoneTouchDevice(win: Pick<Window, 'matchMedia'> = window): bo
   return win.matchMedia(PHONE_TOUCH_QUERY).matches;
 }
 
+// Player-chosen interface override (Options > Graphics > Interface Mode). 'auto'
+// keeps the device auto-detection above; 'desktop'/'touch' force one interface
+// regardless, so a tablet driven by a keyboard+mouse can pick the desktop UI and
+// a desktop user can opt into the on-screen controls.
+export type InterfaceMode = 'auto' | 'desktop' | 'touch';
+
+/** Map the numeric interfaceMode setting (0 Auto, 1 Desktop, 2 Touch) to its mode. */
+export function interfaceModeFromSetting(value: number): InterfaceMode {
+  return value >= 2 ? 'touch' : value >= 1 ? 'desktop' : 'auto';
+}
+
+/** Resolve whether to present the touch interface: an explicit override wins,
+ *  'auto' falls back to what the device auto-detection reported. */
+export function resolveTouchInterface(mode: InterfaceMode, autoDetected: boolean): boolean {
+  if (mode === 'desktop') return false;
+  if (mode === 'touch') return true;
+  return autoDetected;
+}
+
+let interfaceOverride: InterfaceMode = 'auto';
+
+/** main.ts pushes the persisted interfaceMode setting here at boot + on change. */
+export function setInterfaceMode(mode: InterfaceMode): void {
+  interfaceOverride = mode;
+}
+
+/** Whether the on-screen touch interface should be shown for this player: their
+ *  explicit override, else the device auto-detection. The native-app shell still
+ *  forces touch on top of this (see isNativeAppShell call sites). */
+export function useTouchInterface(win: Pick<Window, 'matchMedia'> = window): boolean {
+  return resolveTouchInterface(interfaceOverride, isPhoneTouchDevice(win));
+}
+
+/** True inside the packaged native mobile app (VITE_NATIVE_APP build), which
+ *  forces the touch UI regardless of the Interface Mode override. */
+export function isNativeAppShell(): boolean {
+  return typeof document !== 'undefined' && document.body.classList.contains('native-app');
+}
+
 export interface OriginBounds { left: number; top: number; right: number; bottom: number; }
 
 /**
@@ -183,11 +235,17 @@ export class MobileControls {
     this.moveDeadzone = deadzone;
   }
 
+  /** Re-evaluate touch-interface activation after the player changes the
+   *  Interface Mode setting (main.ts calls setInterfaceMode first). Safe before start(). */
+  refreshInterfaceMode(): void {
+    this.setActive(useTouchInterface() || isNativeAppShell());
+  }
+
   start(): void {
     if (!this.root || !this.moveJoystick || !this.moveStick || !this.cameraJoystick || !this.cameraStick) return;
     this.mq = window.matchMedia(PHONE_TOUCH_QUERY);
-    this.setActive(this.mq.matches);
-    this.mq.addEventListener?.('change', (e) => this.setActive(e.matches));
+    this.setActive(useTouchInterface() || isNativeAppShell());
+    this.mq.addEventListener?.('change', () => this.setActive(useTouchInterface() || isNativeAppShell()));
 
     // The move joystick floats: the pointer lifecycle lives on the lower-left
     // capture zone (so a thumb can land anywhere), while the joystick element is
@@ -435,10 +493,13 @@ export class MobileControls {
     if (document.body.classList.contains('mobile-chat-open')) {
       this.callbacks.onChat();
     } else {
-      const input = document.getElementById('chat-input') as HTMLInputElement | null;
+      const input = document.getElementById('chat-input') as HTMLTextAreaElement | null;
       if (input) {
         input.value = '';
         input.style.display = 'none';
+        // clear the autosized height so the next open starts at one line
+        input.style.height = '';
+        input.style.overflowY = '';
         input.blur();
       }
     }

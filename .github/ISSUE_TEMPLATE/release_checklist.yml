@@ -1,0 +1,52 @@
+name: Release checklist
+description: Track the steps to cut and ship a new release (web + iOS + Android)
+title: "Release vX.Y.Z"
+labels: ["release"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this checklist to cut a release. Fill in the version below, then work
+        through the boxes. See `docs/mobile-store-release.md` for the store details.
+  - type: input
+    id: version
+    attributes:
+      label: Target version
+      description: The semver this release will ship as.
+      placeholder: 0.15.0
+    validations:
+      required: true
+  - type: checkboxes
+    attributes:
+      label: Bump the version
+      description: >
+        One command updates package.json, android/app/build.gradle
+        (versionName + versionCode) and the iOS project (MARKETING_VERSION +
+        CURRENT_PROJECT_VERSION) in a single commit and tag. Do not edit these by hand.
+      options:
+        - label: Ran `npm version <X.Y.Z>` (or `npm version minor`/`patch`/`major`) and pushed the resulting commit and tag.
+          required: false
+        - label: Confirmed all three manifests show the new version and the native build numbers incremented.
+          required: false
+  - type: checkboxes
+    attributes:
+      label: Verify
+      options:
+        - label: "`npm test` passes."
+          required: false
+        - label: "`npm run build` succeeds."
+          required: false
+        - label: Ran the release malware-audit gate.
+          required: false
+  - type: checkboxes
+    attributes:
+      label: Ship
+      options:
+        - label: Web deploy is live (see `DEPLOY.md`).
+          required: false
+        - label: "iOS archive built via `npm run native:open:ios` and submitted to App Store Connect."
+          required: false
+        - label: "Android bundle built via `npm run native:open:android` and submitted to Play Console."
+          required: false
+        - label: Release notes added under `docs/release-notes/`.
+          required: false

@@ -16,6 +16,10 @@ src/admin/i18n.resolved.generated/*.tmp
 # Its committed audit trail lives in the small src/ui/i18n.status.summary.json (tracked).
 src/ui/i18n.status.json
 
+# private extensions (e.g. bot-detector)
+private/*
+!private/.dockerkeep
+
 # test artifacts & screenshots
 tmp/
 .codex-research/
@@ -33,12 +37,23 @@ __pycache__/
 .env
 .env.*
 !.env.example
+# Meshy asset-gen tooling embeds an API key, never commit it
+scripts/generate_treasure_chest.mjs
 
 # editor & OS noise
 .DS_Store
 Thumbs.db
 *.log
+.idea/
 # .claude/: keep personal/local config out of git, but track the shared skills & agents
 .claude/*
 !.claude/skills/
 !.claude/agents/
+.cursor/
+
+# local SDK/tooling dump (extracted command-line tools, not project source)
+postgres/
+
+pr-assets-2fa
+
+.vite/

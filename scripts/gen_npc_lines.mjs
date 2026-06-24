@@ -19,6 +19,7 @@ import * as esbuild from 'esbuild';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { voiceIdFor } from './voices/npc_voice_prompts.mjs';
+import { EXTRA_LINES } from './voices/extra_lines.mjs';
 
 const API = 'https://api.elevenlabs.io';
 const TTS_MODEL = 'eleven_multilingual_v2'; // quality model — generation is one-time
@@ -114,6 +115,8 @@ for (const q of Object.values(QUESTS)) {
   if (q.text) lines.push({ key: `quest__${q.id}__offer`, text: q.text, voiceNpc: voiceIdFor(q.giverNpcId) });
   if (q.completionText) lines.push({ key: `quest__${q.id}__complete`, text: q.completionText, voiceNpc: voiceIdFor(q.turnInNpcId) });
 }
+// Encounter dialogue (yells/bubbles) that isn't on an NpcDef/QuestDef.
+for (const e of EXTRA_LINES) lines.push({ key: e.key, text: e.text, voiceNpc: e.voiceNpc });
 
 const publicPathFor = (line) => `/audio/voice/${line.voiceNpc}/${line.key}.mp3`;
 const diskPathFor = (line) => path.join(voiceDir, line.voiceNpc, `${line.key}.mp3`);

@@ -1,7 +1,7 @@
 import { escapeHtml, fmtCopper, fmtDate, fmtDuration, fmtNumber, fmtPercent, fmtRelative } from './format';
 import { classLabel, zoneLabel, t } from './i18n';
 import type {
-  AccountDetail, AccountRow, CharacterRow, ChatFilterData, ChatModeratedAccount,
+  AccountDetail, AccountRow, BlockedIpsData, BlockedIpRow, BugReportRow, CharacterRow, ChatFilterData, ChatModeratedAccount,
   ChatModerationDetail, FilterWord, LivePlayer, ModerationAccountDetail, ModerationQueueRow,
   ProviderUsageCache, ProviderUsageSnapshot,
 } from './types';
@@ -316,8 +316,53 @@ export function renderModerationDetail(d: ModerationAccountDetail): string {
       ${moderationAccountButtons}
     </div>
     <div id="mod-confirm" class="mod-confirm"></div>
+    ${renderIpBlockSection(d)}
     <h4>${t('report.openReports')}</h4>
     ${reports || `<div class="empty">${t('report.noOpenReports')}</div>`}
+  </div>`;
+}
+
+// Surfaces an account's recent IPs and their block status so a moderator can see
+// at a glance why a player can't connect.
+const MAX_KNOWN_IPS = 5;
+
+function renderIpBlockSection(d: ModerationAccountDetail): string {
+  const blocked = new Set(d.blockedIps);
+  const ips: string[] = [];
+  const seen = new Set<string>();
+  // Newest-first (last login, then recent sessions DESC), capped.
+  const add = (ip: string | null) => {
+    if (ip && !seen.has(ip) && ips.length < MAX_KNOWN_IPS) { seen.add(ip); ips.push(ip); }
+  };
+  add(d.account.lastLoginIp);
+  for (const s of d.account.recentSessions) add(s.ip);
+  // Surface this account's blocked IPs even past the cap, so Unblock stays reachable.
+  for (const ip of d.blockedIps) {
+    if (!seen.has(ip)) { seen.add(ip); ips.push(ip); }
+  }
+  const rows = ips.length === 0
+    ? `<div class="empty">${t('blockedIps.noKnownIps')}</div>`
+    : ips.map((ip, i) => {
+        const isBlocked = blocked.has(ip);
+        const label = i === 0 ? ` <span class="hint">${t('blockedIps.lastIp')}</span>` : '';
+        const badge = isBlocked ? ` <span class="badge bad">${t('blockedIps.blockedBadge')}</span>` : '';
+        // Admins can't be locked out, so don't offer to ban their IP; Unblock
+        // stays in case it was blocked from elsewhere.
+        const banButtons = [
+          { duration: '1d', label: t('blockedIps.ban24h') },
+          { duration: '30d', label: t('blockedIps.ban30d') },
+          { duration: '', label: t('blockedIps.banForever') },
+        ].map((b) => `<button data-ban-ip="${escapeHtml(ip)}" data-ban-duration="${b.duration}" class="danger">${b.label}</button>`).join('');
+        const action = isBlocked
+          ? `<button data-unblock-ip="${escapeHtml(ip)}">${t('blockedIps.unblock')}</button>`
+          : d.account.isAdmin
+            ? `<span class="hint">${t('blockedIps.adminProtected')}</span>`
+            : banButtons;
+        return `<div class="ip-row"><code>${escapeHtml(ip)}</code>${label}${badge} ${action}</div>`;
+      }).join('');
+  return `<div class="panel ip-block">
+    <div class="panel-title">${t('blockedIps.accountSectionTitle')}</div>
+    ${rows}
   </div>`;
 }
 
@@ -391,6 +436,56 @@ export function renderChatFilter(data: ChatFilterData): string {
     </div>`;
 }
 
+export function renderBlockedIps(data: BlockedIpsData): string {
+  const addForm = `<div class="panel">
+    <div class="panel-title">${t('blockedIps.addTitle')}</div>
+    <form class="ip-add">
+      <input class="ip-add-ip" placeholder="${t('blockedIps.ipPlaceholder')}" maxlength="128" />
+      <input class="ip-add-reason" placeholder="${t('blockedIps.reasonPlaceholder')}" maxlength="500" />
+      <label class="ip-add-expiry">${t('blockedIps.expiresLabel')}
+        <select class="ip-add-expiry-select">
+          <option value="">${t('blockedIps.expiresForever')}</option>
+          <option value="1d">${t('blockedIps.expires1d')}</option>
+          <option value="7d">${t('blockedIps.expires1w')}</option>
+          <option value="30d">${t('blockedIps.expires1m')}</option>
+        </select>
+      </label>
+      <button>${t('blockedIps.add')}</button>
+    </form>
+  </div>`;
+  return `${addForm}<div class="panel">
+    <div class="panel-title">${t('blockedIps.listTitle')}</div>
+    ${renderBlockedIpsTable(data.rows)}
+  </div>`;
+}
+
+function renderBlockedIpsTable(rows: BlockedIpRow[]): string {
+  if (rows.length === 0) return `<div class="empty">${t('blockedIps.empty')}</div>`;
+  const now = Date.now();
+  const body = rows.map((r) => {
+    const expired = r.expiresAt !== null && new Date(r.expiresAt).getTime() <= now;
+    const expiry = r.expiresAt === null
+      ? `<span class="badge">${t('blockedIps.permanent')}</span>`
+      : `<span class="badge ${expired ? 'bad' : 'warn'}">${fmtDate(r.expiresAt)}</span>`;
+    return `<tr>
+      <td><code>${escapeHtml(r.ip)}</code></td>
+      <td>${escapeHtml(r.reason || '—')}</td>
+      <td>${expiry}</td>
+      <td>${escapeHtml(r.createdByUsername ?? t('common.unknown'))}</td>
+      <td>${fmtDate(r.createdAt)}</td>
+      <td><button data-unblock-ip="${escapeHtml(r.ip)}">${t('blockedIps.remove')}</button></td>
+    </tr>`;
+  }).join('');
+  return `<table><thead><tr>
+    <th>${t('blockedIps.colIp')}</th>
+    <th>${t('blockedIps.colReason')}</th>
+    <th>${t('blockedIps.colExpires')}</th>
+    <th>${t('blockedIps.colCreatedBy')}</th>
+    <th>${t('blockedIps.colCreatedAt')}</th>
+    <th>${t('detail.colActions')}</th>
+  </tr></thead><tbody>${body}</tbody></table>`;
+}
+
 function renderChatModeratedAccounts(accounts: ChatModeratedAccount[]): string {
   if (accounts.length === 0) return `<div class="empty">${t('chatFilter.noModeratedAccounts')}</div>`;
   const rows = accounts.map((a) => {
@@ -423,4 +518,33 @@ function statusBadge(status: string, suspendedUntil: string | null): string {
   if (status === 'banned') return `<span class="badge bad">${t('accounts.badgeBanned')}</span>`;
   if (status === 'suspended') return `<span class="badge warn">${t('detail.suspendedUntil', { value: fmtDate(suspendedUntil) })}</span>`;
   return `<span class="badge">${t('detail.statusActive')}</span>`;
+}
+
+export function renderBugReportsTable(rows: BugReportRow[]): string {
+  if (rows.length === 0) return `<div class="empty">${t('bugReports.empty')}</div>`;
+  const body = rows.map((r) => {
+    const coords = `${fmtNumber(r.pos_x)}, ${fmtNumber(r.pos_y)}, ${fmtNumber(r.pos_z)}`;
+    // The list omits the screenshot bytes; offer a button that fetches the one
+    // report's screenshot on demand (see showBugScreenshot in main.ts).
+    const shot = r.has_screenshot
+      ? `<button class="btn-link" data-bug-shot="${r.id}">${t('bugReports.viewScreenshot')}</button>`
+      : `<span class="text-dim">${t('bugReports.noScreenshot')}</span>`;
+    const meta = `<details><summary>${t('bugReports.colMeta')}</summary><pre class="bug-meta">${escapeHtml(JSON.stringify(r.meta ?? {}, null, 2))}</pre></details>`;
+    return `<tr>
+      <td>${fmtRelative(r.created_at)}</td>
+      <td>${escapeHtml(r.realm) || '-'}</td>
+      <td>${escapeHtml(r.character_name) || '-'}</td>
+      <td>${escapeHtml(coords)}</td>
+      <td class="bug-desc-cell">${escapeHtml(r.description)}</td>
+      <td><span class="badge">${escapeHtml(r.status)}</span></td>
+      <td>${meta}</td>
+      <td>${shot}</td>
+    </tr>`;
+  });
+  return `<div class="table-scroll"><table>
+    <thead><tr>
+      <th>${t('bugReports.colWhen')}</th><th>${t('bugReports.colRealm')}</th><th>${t('bugReports.colCharacter')}</th><th>${t('bugReports.colPosition')}</th><th>${t('bugReports.colDescription')}</th><th>${t('bugReports.colStatus')}</th><th>${t('bugReports.colMeta')}</th><th>${t('bugReports.colScreenshot')}</th>
+    </tr></thead>
+    <tbody>${body.join('')}</tbody>
+  </table></div>`;
 }

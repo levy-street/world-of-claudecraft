@@ -7,7 +7,7 @@
 
 export type MusicZone =
   | 'town_eastbrook' | 'town_fenbridge' | 'town_highwatch'
-  | 'vale' | 'marsh' | 'peaks'
+  | 'vale' | 'vale_legacy' | 'marsh' | 'peaks'
   | 'dungeon_hollow_crypt' | 'dungeon_sunken_bastion' | 'dungeon_gravewyrm_sanctum';
 
 const TOWN_MUSIC: Record<string, MusicZone> = {
@@ -16,11 +16,23 @@ const TOWN_MUSIC: Record<string, MusicZone> = {
   thornpeak_heights: 'town_highwatch',
 };
 
+const ZONE_MUSIC: Partial<Record<string, MusicZone>> = {
+  thornpeak_heights: 'vale_legacy',
+};
+
 const DUNGEON_MUSIC: Record<string, MusicZone> = {
   hollow_crypt: 'dungeon_hollow_crypt',
   sunken_bastion: 'dungeon_sunken_bastion',
   gravewyrm_sanctum: 'dungeon_gravewyrm_sanctum',
 };
+
+export function dungeonMusicZoneForDungeon(dungeonId: string): MusicZone {
+  return DUNGEON_MUSIC[dungeonId] ?? 'dungeon_hollow_crypt';
+}
+
+export function shouldResetMusicForDungeonEntry(previousDungeonId: string | null, nextDungeonId: string | null): boolean {
+  return nextDungeonId !== null && previousDungeonId !== nextDungeonId;
+}
 
 /** Pick the soundtrack layer from world position context. */
 export function musicZoneForLocation(
@@ -30,9 +42,9 @@ export function musicZoneForLocation(
   inDungeon: boolean,
   dungeonId: string | null = null,
 ): MusicZone {
-  if (inDungeon) return (dungeonId && DUNGEON_MUSIC[dungeonId]) || 'dungeon_hollow_crypt';
+  if (inDungeon) return dungeonId ? dungeonMusicZoneForDungeon(dungeonId) : 'dungeon_hollow_crypt';
   if (inHub) return TOWN_MUSIC[zoneId] ?? biome;
-  return biome;
+  return ZONE_MUSIC[zoneId] ?? biome;
 }
 
 type Inst = 'strings' | 'flute' | 'harp' | 'horn' | 'choir' | 'bell' | 'timpani' | 'bass' | 'stacc' | 'pad'
@@ -292,6 +304,41 @@ function composeVale(): Theme {
   return { bpm: 92, bars: 16, events: ev };
 }
 
+function composeLegacyVale(): Theme {
+  const ev: NoteEvent[] = [];
+  // Original Eastbrook Vale wilderness theme from before the per-zone soundtrack expansion.
+  const Am = { root: 57, minor: true }, C = { root: 60 }, G = { root: 55 };
+  const Em = { root: 52, minor: true }, Dmaj = { root: 62 }, F = { root: 53 };
+  const chords: ChordDef[] = [Am, Am, C, G, Am, Em, G, Am, Am, C, Dmaj, Am, F, C, Em, Am];
+
+  chords.forEach((c, bar) => {
+    const b0 = bar * 4;
+    const t = triad(c);
+    if (bar % 2 === 0) {
+      pushNote(ev, b0, c.root - 24, 8.4, 0.4, 'strings');
+      pushNote(ev, b0, c.root - 17, 8.4, 0.26, 'strings');
+    }
+    for (const n of t) pushNote(ev, b0, n - 12, 4.05, 0.16, 'choir');
+    pushNote(ev, b0, c.root - 12, 1.5, 0.3, 'bass');
+    if (bar % 4 === 1) pushNote(ev, b0 + 2, c.root - 5, 1.8, 0.24, 'bass');
+    if (bar % 4 === 3) pushNote(ev, b0 + 2.5, c.root - 10, 1.4, 0.22, 'bass');
+    if (bar % 4 === 2) {
+      [t[2], t[0] + 12, t[1] + 12].forEach((n, i) => pushNote(ev, b0 + 1 + i * 0.5, n, 0.5, 0.2, 'harp'));
+    }
+  });
+
+  const motifs: [number, Phrase][] = [
+    [4, [[0, 69, 1], [1, 71, 1], [2, 72, 1.5], [3.5, 71, 0.5], [4, 67, 2], [6, 64, 2]]],
+    [20, [[0, 76, 1.5], [1.5, 74, 0.5], [2, 72, 1], [3, 71, 1], [4, 69, 3]]],
+    [36, [[0, 72, 1], [1, 74, 1], [2, 76, 1.5], [3.5, 74, 0.5], [4, 72, 1], [5, 69, 1], [6, 71, 3]]],
+    [52, [[0, 69, 1], [1, 72, 1], [2, 71, 1], [3, 67, 1], [4, 69, 4]]],
+  ];
+  for (const [start, ph] of motifs) pushPhrase(ev, start, ph, 0.26, 'flute');
+
+  ev.sort((a, b) => a.beat - b.beat);
+  return { bpm: 66, bars: 16, events: ev };
+}
+
 function composeMarsh(): Theme {
   const ev: NoteEvent[] = [];
   // E aeolian swamp: darker but still old-school, with croaky reed and wood clicks.
@@ -499,6 +546,7 @@ const STORAGE_KEY = 'ev_music_on';
 //   town_fenbridge  3 → F
 //   town_highwatch  9 → B (B minor)
 //   vale  7 → A (vale is A dorian)
+//   vale_legacy 7 → A (original vale is A dorian)
 //   marsh 2 → E (marsh is E aeolian)
 //   peaks 5 → G (peaks is rooted on G in bare fifths)
 //   dungeon_hollow_crypt      0 → D phrygian
@@ -509,6 +557,7 @@ const COMBAT_TRANSPOSE: Record<MusicZone, number> = {
   town_fenbridge: 3,
   town_highwatch: 9,
   vale: 7,
+  vale_legacy: 7,
   marsh: 2,
   peaks: 5,
   dungeon_hollow_crypt: 0,
@@ -522,6 +571,7 @@ function buildMusicThemes(): Record<string, Theme> {
     town_fenbridge: composeTownFenbridge(),
     town_highwatch: composeTownHighwatch(),
     vale: composeVale(),
+    vale_legacy: composeLegacyVale(),
     marsh: composeMarsh(),
     peaks: composePeaks(),
     dungeon_hollow_crypt: composeDungeonHollowCrypt(),
@@ -1008,6 +1058,11 @@ export class MusicDirector {
   private master: GainNode | null = null;
   private reverb: ConvolverNode | null = null;
   private reverbSend: GainNode | null = null;
+  private bossGain: GainNode | null = null;
+  private bossBuffer: AudioBuffer | null = null;
+  private bossSource: AudioBufferSourceNode | null = null;
+  private bossElement: HTMLAudioElement | null = null;
+  private bossLoading = false;
   private layers: Record<string, Layer> = {};
   private timer: number | undefined;
   // null until the first update() so the initial state always applies
@@ -1016,15 +1071,116 @@ export class MusicDirector {
   private _enabled = (typeof localStorage === 'undefined') ? true : localStorage.getItem(STORAGE_KEY) !== '0';
   private _vol = 1; // 0..1 volume, set from the settings menu
   private _menuPaused = false; // temporary mute while the game menu is open
+  // Boss-fight override: a looped file track routed through the same AudioContext
+  // that user gestures already unlock for the procedural soundtrack.
+  private bossActive = false;
 
   get enabled(): boolean {
     return this._enabled;
   }
 
-  // master gain target given the enabled flag and volume (base level 0.15)
+  // master gain target given the enabled flag and volume (base level 0.15).
+  // The dedicated Nythraxis track owns the mix while active.
   private masterTarget(): number {
-    if (!this._enabled || this._menuPaused) return 0;
+    if (!this._enabled || this._menuPaused || this.bossActive) return 0;
     return 0.15 * this._vol;
+  }
+
+  /** Engage/disengage the dedicated boss-fight loop. Idempotent; called every
+   *  frame by the HUD. Ducks the procedural score while active. */
+  setBossCombat(on: boolean): void {
+    if (on === this.bossActive) {
+      if (on) this.applyBossPlayback();
+      return;
+    }
+    this.bossActive = on;
+    if (on) this.ensureBossBuffer();
+    if (!on) this.stopBossSource();
+    this.applyBossPlayback();
+    if (this.ctx && this.master) this.master.gain.setTargetAtTime(this.masterTarget(), this.ctx.currentTime, on ? 0.4 : 0.7);
+  }
+
+  resetForDungeonEntry(dungeonId: string | null): void {
+    if (!dungeonId) return;
+    const zone = dungeonMusicZoneForDungeon(dungeonId);
+    const layer = this.layers[zone];
+    if (layer) {
+      layer.anchor = this.ctx?.currentTime ?? 0;
+      layer.nextIdx = -1;
+      layer.loopCount = 0;
+    }
+    if (this.bossElement) {
+      try { this.bossElement.currentTime = 0; } catch { /* browser may reject seeking before metadata */ }
+    }
+    this.stopBossSource();
+  }
+
+  private applyBossPlayback(): void {
+    if (!this.ctx || !this.bossGain) return;
+    const target = this.bossActive && this._enabled && !this._menuPaused ? 0.6 * this._vol : 0;
+    this.bossGain.gain.setTargetAtTime(target, this.ctx.currentTime, target > 0 ? 0.25 : 0.12);
+    if (target > 0) {
+      void this.ctx.resume?.();
+      const element = this.ensureBossElement();
+      if (element) {
+        element.volume = target;
+        void element.play().catch(() => {
+          this.ensureBossBuffer();
+          this.startBossSource();
+        });
+        this.stopBossSource();
+      } else {
+        this.ensureBossBuffer();
+        this.startBossSource();
+      }
+    }
+    else {
+      if (this.bossElement) this.bossElement.pause();
+      this.stopBossSource();
+    }
+  }
+
+  private ensureBossElement(): HTMLAudioElement | null {
+    if (this.bossElement) return this.bossElement;
+    if (typeof Audio !== 'function') return null;
+    const el = new Audio('/audio/dungeon-boss-fight.mp3');
+    el.loop = true;
+    el.preload = 'auto';
+    this.bossElement = el;
+    return el;
+  }
+
+  private ensureBossBuffer(): void {
+    const ctx = this.ctx;
+    if (!ctx || this.bossBuffer || this.bossLoading || typeof fetch !== 'function') return;
+    this.bossLoading = true;
+    void fetch('/audio/dungeon-boss-fight.mp3')
+      .then((res) => res.arrayBuffer())
+      .then((bytes) => ctx.decodeAudioData(bytes))
+      .then((buffer) => {
+        this.bossBuffer = buffer;
+        this.bossLoading = false;
+        this.applyBossPlayback();
+      })
+      .catch(() => { this.bossLoading = false; });
+  }
+
+  private startBossSource(): void {
+    const ctx = this.ctx;
+    if (!ctx || !this.bossGain || !this.bossBuffer || this.bossSource) return;
+    const src = ctx.createBufferSource();
+    src.buffer = this.bossBuffer;
+    src.loop = true;
+    src.connect(this.bossGain);
+    src.start();
+    this.bossSource = src;
+  }
+
+  private stopBossSource(): void {
+    if (!this.bossSource) return;
+    try { this.bossSource.stop(); } catch { /* already stopped */ }
+    this.bossSource.disconnect();
+    this.bossSource = null;
   }
 
   /** Set music volume (0..1). Safe before init(); applied to the master gain. */
@@ -1033,6 +1189,7 @@ export class MusicDirector {
     if (this.ctx && this.master) {
       this.master.gain.setTargetAtTime(this.masterTarget(), this.ctx.currentTime, 0.2);
     }
+    this.applyBossPlayback();
   }
 
   get volume(): number {
@@ -1058,6 +1215,9 @@ export class MusicDirector {
     compressor.release.value = 0.25;
     this.master.connect(compressor);
     compressor.connect(ctx.destination);
+    this.bossGain = ctx.createGain();
+    this.bossGain.gain.value = 0;
+    this.bossGain.connect(compressor);
 
     // generated hall impulse response
     const seconds = 2.6;
@@ -1095,6 +1255,7 @@ export class MusicDirector {
     if (this.ctx && this.master) {
       this.master.gain.setTargetAtTime(this.masterTarget(), this.ctx.currentTime, 0.3);
     }
+    this.applyBossPlayback();
   }
 
   /** Fade out while the game menu is open; does not change the music toggle. */
@@ -1106,6 +1267,7 @@ export class MusicDirector {
     if (this.master) {
       this.master.gain.setTargetAtTime(0, this.ctx.currentTime, 0.2);
     }
+    this.applyBossPlayback();
   }
 
   /** Restore playback after closing the game menu. */
@@ -1117,6 +1279,7 @@ export class MusicDirector {
     if (this.master) {
       this.master.gain.setTargetAtTime(this.masterTarget(), this.ctx.currentTime, 0.35);
     }
+    this.applyBossPlayback();
   }
 
   // called every frame by the HUD; cheap unless the state changed

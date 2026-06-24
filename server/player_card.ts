@@ -11,18 +11,18 @@
 // shared link resolves no matter which realm serves the request. Referral
 // capture only records the relationship; reward payout is out of scope.
 import type http from 'node:http';
-import { json, readBinaryBody, parsePngInfo, isUniqueViolation } from './http_util';
 import {
+  accountForSlug,
   getCharacter,
-  slugAvailable,
-  upsertPlayerCard,
   getPlayerCardBySlug,
   getPlayerCardMetaBySlug,
-  accountForSlug,
   recordReferral,
+  slugAvailable,
+  upsertPlayerCard,
 } from './db';
-import { REALM_PUBLIC_ORIGIN } from './realm';
+import { isUniqueViolation, json, parsePngInfo, readBinaryBody } from './http_util';
 import { recordUsageMetric } from './provider_usage';
+import { REALM_PUBLIC_ORIGIN } from './realm';
 
 // A composited card is ~1200×630 @2× PNG - comfortably under this bound, which
 // is generous enough to never reject a legitimate upload yet caps memory.
@@ -50,12 +50,33 @@ const CARD_PAGE_NOT_FOUND_HEADERS = {
 } as const;
 
 export const PUBLIC_CARD_LOCALES = [
-  'en', 'es', 'es_ES', 'fr_FR', 'fr_CA', 'en_CA', 'it_IT', 'de_DE',
-  'zh_CN', 'zh_TW', 'ko_KR', 'ja_JP', 'pt_BR', 'ru_RU',
+  'en',
+  'es',
+  'es_ES',
+  'fr_FR',
+  'fr_CA',
+  'en_CA',
+  'it_IT',
+  'de_DE',
+  'zh_CN',
+  'zh_TW',
+  'ko_KR',
+  'ja_JP',
+  'pt_BR',
+  'ru_RU',
 ] as const;
-export type PublicCardLocale = typeof PUBLIC_CARD_LOCALES[number];
+export type PublicCardLocale = (typeof PUBLIC_CARD_LOCALES)[number];
 
-type PlayerClassKey = 'warrior' | 'paladin' | 'hunter' | 'rogue' | 'priest' | 'shaman' | 'mage' | 'warlock' | 'druid';
+type PlayerClassKey =
+  | 'warrior'
+  | 'paladin'
+  | 'hunter'
+  | 'rogue'
+  | 'priest'
+  | 'shaman'
+  | 'mage'
+  | 'warlock'
+  | 'druid';
 
 interface PublicCardCopy {
   gameName: string;
@@ -71,8 +92,15 @@ interface PublicCardCopy {
 }
 
 const EN_CLASSES: Record<PlayerClassKey, string> = {
-  warrior: 'Warrior', paladin: 'Paladin', hunter: 'Hunter', rogue: 'Rogue', priest: 'Priest',
-  shaman: 'Shaman', mage: 'Mage', warlock: 'Warlock', druid: 'Druid',
+  warrior: 'Warrior',
+  paladin: 'Paladin',
+  hunter: 'Hunter',
+  rogue: 'Rogue',
+  priest: 'Priest',
+  shaman: 'Shaman',
+  mage: 'Mage',
+  warlock: 'Warlock',
+  druid: 'Druid',
 };
 
 export const PUBLIC_CARD_COPY: Record<PublicCardLocale, PublicCardCopy> = {
@@ -99,8 +127,15 @@ export const PUBLIC_CARD_COPY: Record<PublicCardLocale, PublicCardCopy> = {
     missingDescription: 'Puede haberse retirado o no haber existido nunca.',
     missingCta: 'Entrar en World of Claudecraft',
     classes: {
-      warrior: 'Guerrero', paladin: 'Paladín', hunter: 'Cazador', rogue: 'Pícaro', priest: 'Sacerdote',
-      shaman: 'Chamán', mage: 'Mago', warlock: 'Brujo', druid: 'Druida',
+      warrior: 'Guerrero',
+      paladin: 'Paladín',
+      hunter: 'Cazador',
+      rogue: 'Pícaro',
+      priest: 'Sacerdote',
+      shaman: 'Chamán',
+      mage: 'Mago',
+      warlock: 'Brujo',
+      druid: 'Druida',
     },
   },
   es_ES: {
@@ -114,8 +149,15 @@ export const PUBLIC_CARD_COPY: Record<PublicCardLocale, PublicCardCopy> = {
     missingDescription: 'Puede haberse retirado o no haber existido nunca.',
     missingCta: 'Entrar en World of Claudecraft',
     classes: {
-      warrior: 'Guerrero', paladin: 'Paladín', hunter: 'Cazador', rogue: 'Pícaro', priest: 'Sacerdote',
-      shaman: 'Chamán', mage: 'Mago', warlock: 'Brujo', druid: 'Druida',
+      warrior: 'Guerrero',
+      paladin: 'Paladín',
+      hunter: 'Cazador',
+      rogue: 'Pícaro',
+      priest: 'Sacerdote',
+      shaman: 'Chamán',
+      mage: 'Mago',
+      warlock: 'Brujo',
+      druid: 'Druida',
     },
   },
   fr_FR: {
@@ -125,12 +167,19 @@ export const PUBLIC_CARD_COPY: Record<PublicCardLocale, PublicCardCopy> = {
     description: '{name} forge sa légende dans World of Claudecraft. Rejoignez le royaume.',
     cta: 'Forgez votre légende',
     missingTitle: 'Carte introuvable',
-    missingHeading: 'Cette carte n\'est plus disponible.',
-    missingDescription: 'Elle a peut-être été retirée ou n\'a jamais existé.',
+    missingHeading: "Cette carte n'est plus disponible.",
+    missingDescription: "Elle a peut-être été retirée ou n'a jamais existé.",
     missingCta: 'Entrer dans World of Claudecraft',
     classes: {
-      warrior: 'Guerrier', paladin: 'Paladin', hunter: 'Chasseur', rogue: 'Voleur', priest: 'Prêtre',
-      shaman: 'Chaman', mage: 'Mage', warlock: 'Démoniste', druid: 'Druide',
+      warrior: 'Guerrier',
+      paladin: 'Paladin',
+      hunter: 'Chasseur',
+      rogue: 'Voleur',
+      priest: 'Prêtre',
+      shaman: 'Chaman',
+      mage: 'Mage',
+      warlock: 'Démoniste',
+      druid: 'Druide',
     },
   },
   fr_CA: {
@@ -140,12 +189,19 @@ export const PUBLIC_CARD_COPY: Record<PublicCardLocale, PublicCardCopy> = {
     description: '{name} forge sa légende dans World of Claudecraft. Rejoignez le royaume.',
     cta: 'Forgez votre légende',
     missingTitle: 'Carte introuvable',
-    missingHeading: 'Cette carte n\'est plus disponible.',
-    missingDescription: 'Elle a peut-être été retirée ou n\'a jamais existé.',
+    missingHeading: "Cette carte n'est plus disponible.",
+    missingDescription: "Elle a peut-être été retirée ou n'a jamais existé.",
     missingCta: 'Entrer dans World of Claudecraft',
     classes: {
-      warrior: 'Guerrier', paladin: 'Paladin', hunter: 'Chasseur', rogue: 'Voleur', priest: 'Prêtre',
-      shaman: 'Chaman', mage: 'Mage', warlock: 'Démoniste', druid: 'Druide',
+      warrior: 'Guerrier',
+      paladin: 'Paladin',
+      hunter: 'Chasseur',
+      rogue: 'Voleur',
+      priest: 'Prêtre',
+      shaman: 'Chaman',
+      mage: 'Mage',
+      warlock: 'Démoniste',
+      druid: 'Druide',
     },
   },
   en_CA: {
@@ -171,8 +227,15 @@ export const PUBLIC_CARD_COPY: Record<PublicCardLocale, PublicCardCopy> = {
     missingDescription: 'Potrebbe essere stata ritirata o non essere mai esistita.',
     missingCta: 'Entra in World of Claudecraft',
     classes: {
-      warrior: 'Guerriero', paladin: 'Paladino', hunter: 'Cacciatore', rogue: 'Ladro', priest: 'Sacerdote',
-      shaman: 'Sciamano', mage: 'Mago', warlock: 'Stregone', druid: 'Druido',
+      warrior: 'Guerriero',
+      paladin: 'Paladino',
+      hunter: 'Cacciatore',
+      rogue: 'Ladro',
+      priest: 'Sacerdote',
+      shaman: 'Sciamano',
+      mage: 'Mago',
+      warlock: 'Stregone',
+      druid: 'Druido',
     },
   },
   de_DE: {
@@ -186,8 +249,15 @@ export const PUBLIC_CARD_COPY: Record<PublicCardLocale, PublicCardCopy> = {
     missingDescription: 'Sie wurde vielleicht entfernt oder hat nie existiert.',
     missingCta: 'World of Claudecraft betreten',
     classes: {
-      warrior: 'Krieger', paladin: 'Paladin', hunter: 'Jäger', rogue: 'Schurke', priest: 'Priester',
-      shaman: 'Schamane', mage: 'Magier', warlock: 'Hexenmeister', druid: 'Druide',
+      warrior: 'Krieger',
+      paladin: 'Paladin',
+      hunter: 'Jäger',
+      rogue: 'Schurke',
+      priest: 'Priester',
+      shaman: 'Schamane',
+      mage: 'Magier',
+      warlock: 'Hexenmeister',
+      druid: 'Druide',
     },
   },
   zh_CN: {
@@ -201,8 +271,15 @@ export const PUBLIC_CARD_COPY: Record<PublicCardLocale, PublicCardCopy> = {
     missingDescription: '它可能已被撤下，或从未存在。',
     missingCta: '进入 World of Claudecraft',
     classes: {
-      warrior: '战士', paladin: '圣骑士', hunter: '猎人', rogue: '潜行者', priest: '牧师',
-      shaman: '萨满祭司', mage: '法师', warlock: '术士', druid: '德鲁伊',
+      warrior: '战士',
+      paladin: '圣骑士',
+      hunter: '猎人',
+      rogue: '潜行者',
+      priest: '牧师',
+      shaman: '萨满祭司',
+      mage: '法师',
+      warlock: '术士',
+      druid: '德鲁伊',
     },
   },
   zh_TW: {
@@ -216,23 +293,38 @@ export const PUBLIC_CARD_COPY: Record<PublicCardLocale, PublicCardCopy> = {
     missingDescription: '它可能已被移除，或從未存在。',
     missingCta: '進入 World of Claudecraft',
     classes: {
-      warrior: '戰士', paladin: '聖騎士', hunter: '獵人', rogue: '潛行者', priest: '牧師',
-      shaman: '薩滿', mage: '法師', warlock: '術士', druid: '德魯伊',
+      warrior: '戰士',
+      paladin: '聖騎士',
+      hunter: '獵人',
+      rogue: '潛行者',
+      priest: '牧師',
+      shaman: '薩滿',
+      mage: '法師',
+      warlock: '術士',
+      druid: '德魯伊',
     },
   },
   ko_KR: {
     gameName: 'World of Claudecraft',
     unknownClass: '모험가',
     levelClass: '{level}레벨 {className}',
-    description: '{name}님이 World of Claudecraft에서 전설을 만들어 가고 있습니다. 세계에 합류하세요.',
+    description:
+      '{name}님이 World of Claudecraft에서 전설을 만들어 가고 있습니다. 세계에 합류하세요.',
     cta: '나만의 전설 만들기',
     missingTitle: '카드를 찾을 수 없음',
     missingHeading: '이 카드는 더 이상 사용할 수 없습니다.',
     missingDescription: '삭제되었거나 존재한 적이 없을 수 있습니다.',
     missingCta: 'World of Claudecraft 입장',
     classes: {
-      warrior: '전사', paladin: '성기사', hunter: '사냥꾼', rogue: '도적', priest: '사제',
-      shaman: '주술사', mage: '마법사', warlock: '흑마법사', druid: '드루이드',
+      warrior: '전사',
+      paladin: '성기사',
+      hunter: '사냥꾼',
+      rogue: '도적',
+      priest: '사제',
+      shaman: '주술사',
+      mage: '마법사',
+      warlock: '흑마법사',
+      druid: '드루이드',
     },
   },
   ja_JP: {
@@ -246,8 +338,15 @@ export const PUBLIC_CARD_COPY: Record<PublicCardLocale, PublicCardCopy> = {
     missingDescription: '削除されたか、存在しなかった可能性があります。',
     missingCta: 'World of Claudecraft に入る',
     classes: {
-      warrior: '戦士', paladin: 'パラディン', hunter: 'ハンター', rogue: 'ローグ', priest: 'プリースト',
-      shaman: 'シャーマン', mage: 'メイジ', warlock: 'ウォーロック', druid: 'ドルイド',
+      warrior: '戦士',
+      paladin: 'パラディン',
+      hunter: 'ハンター',
+      rogue: 'ローグ',
+      priest: 'プリースト',
+      shaman: 'シャーマン',
+      mage: 'メイジ',
+      warlock: 'ウォーロック',
+      druid: 'ドルイド',
     },
   },
   pt_BR: {
@@ -261,8 +360,15 @@ export const PUBLIC_CARD_COPY: Record<PublicCardLocale, PublicCardCopy> = {
     missingDescription: 'Ele pode ter sido removido ou nunca ter existido.',
     missingCta: 'Entrar em World of Claudecraft',
     classes: {
-      warrior: 'Guerreiro', paladin: 'Paladino', hunter: 'Caçador', rogue: 'Ladino', priest: 'Sacerdote',
-      shaman: 'Xamã', mage: 'Mago', warlock: 'Bruxo', druid: 'Druida',
+      warrior: 'Guerreiro',
+      paladin: 'Paladino',
+      hunter: 'Caçador',
+      rogue: 'Ladino',
+      priest: 'Sacerdote',
+      shaman: 'Xamã',
+      mage: 'Mago',
+      warlock: 'Bruxo',
+      druid: 'Druida',
     },
   },
   ru_RU: {
@@ -276,13 +382,22 @@ export const PUBLIC_CARD_COPY: Record<PublicCardLocale, PublicCardCopy> = {
     missingDescription: 'Она могла быть удалена или никогда не существовала.',
     missingCta: 'Войти в World of Claudecraft',
     classes: {
-      warrior: 'Воин', paladin: 'Паладин', hunter: 'Охотник', rogue: 'Разбойник', priest: 'Жрец',
-      shaman: 'Шаман', mage: 'Маг', warlock: 'Чернокнижник', druid: 'Друид',
+      warrior: 'Воин',
+      paladin: 'Паладин',
+      hunter: 'Охотник',
+      rogue: 'Разбойник',
+      priest: 'Жрец',
+      shaman: 'Шаман',
+      mage: 'Маг',
+      warlock: 'Чернокнижник',
+      druid: 'Друид',
     },
   },
 };
 
-const PUBLIC_CARD_LOCALE_BY_LOWER = new Map(PUBLIC_CARD_LOCALES.map((locale) => [locale.toLowerCase(), locale]));
+const PUBLIC_CARD_LOCALE_BY_LOWER = new Map(
+  PUBLIC_CARD_LOCALES.map((locale) => [locale.toLowerCase(), locale]),
+);
 
 export function normalizePublicCardLocale(raw: unknown): PublicCardLocale {
   if (typeof raw !== 'string') return 'en';
@@ -315,9 +430,10 @@ function publicCardLanguageTag(locale: PublicCardLocale): string {
 }
 
 function localeFromAcceptLanguage(raw: string | string[] | undefined): PublicCardLocale {
-  const header = Array.isArray(raw) ? raw[0] ?? '' : raw ?? '';
+  const header = Array.isArray(raw) ? (raw[0] ?? '') : (raw ?? '');
   if (!header) return 'en';
-  const choices = header.split(',')
+  const choices = header
+    .split(',')
     .map((part, index) => {
       const [tagPart, ...params] = part.trim().split(';');
       const qParam = params.find((param) => param.trim().toLowerCase().startsWith('q='));
@@ -342,9 +458,7 @@ function interpolate(template: string, values: Record<string, string | number>):
 
 function classDisplay(cls: string, locale: PublicCardLocale): string {
   const copy = PUBLIC_CARD_COPY[locale];
-  return Object.prototype.hasOwnProperty.call(copy.classes, cls)
-    ? copy.classes[cls as PlayerClassKey]
-    : copy.unknownClass;
+  return Object.hasOwn(copy.classes, cls) ? copy.classes[cls as PlayerClassKey] : copy.unknownClass;
 }
 
 // Build a URL/file-safe slug from a character name. Lowercased, non-alphanumerics
@@ -388,7 +502,7 @@ function escapeHtml(s: string): string {
 }
 
 function firstHeaderValue(value: string | string[] | undefined): string {
-  return (Array.isArray(value) ? value[0] ?? '' : value ?? '').split(',')[0].trim();
+  return (Array.isArray(value) ? (value[0] ?? '') : (value ?? '')).split(',')[0].trim();
 }
 
 function trustedPublicOriginFromHost(req: http.IncomingMessage): string {
@@ -399,11 +513,15 @@ function trustedPublicOriginFromHost(req: http.IncomingMessage): string {
 
 function requestOrigin(req: http.IncomingMessage): string {
   if (REALM_PUBLIC_ORIGIN) return REALM_PUBLIC_ORIGIN;
-  if (process.env.NODE_ENV === 'production') return trustedPublicOriginFromHost(req) || DEFAULT_PRODUCTION_PUBLIC_ORIGIN;
+  if (process.env.NODE_ENV === 'production')
+    return trustedPublicOriginFromHost(req) || DEFAULT_PRODUCTION_PUBLIC_ORIGIN;
   const fwd = firstHeaderValue(req.headers['x-forwarded-proto']).toLowerCase();
-  const proto = fwd === 'http' || fwd === 'https'
-    ? fwd
-    : ((req.socket as { encrypted?: boolean }).encrypted ? 'https' : 'http');
+  const proto =
+    fwd === 'http' || fwd === 'https'
+      ? fwd
+      : (req.socket as { encrypted?: boolean }).encrypted
+        ? 'https'
+        : 'http';
   const host = firstHeaderValue(req.headers.host) || 'localhost';
   return `${proto}://${host}`;
 }
@@ -422,6 +540,7 @@ export async function handleCardUpload(
   req: http.IncomingMessage,
   res: http.ServerResponse,
   accountId: number,
+  liveLevelForCharacter?: (characterId: number) => number | null,
 ): Promise<void> {
   const params = new URLSearchParams((req.url ?? '').split('?')[1] ?? '');
   const characterId = Number(params.get('character'));
@@ -446,17 +565,29 @@ export async function handleCardUpload(
   } catch (err) {
     const tooLarge = err instanceof Error && err.message === 'body too large';
     recordUsageMetric('card.publish.rejected');
-    return json(res, tooLarge ? 413 : 400, { error: tooLarge ? 'image too large' : 'could not read image' });
+    return json(res, tooLarge ? 413 : 400, {
+      error: tooLarge ? 'image too large' : 'could not read image',
+    });
   }
-  if (!parsePngInfo(png, { allowedDimensions: CARD_PNG_DIMENSIONS, maxDecodedBytes: MAX_CARD_DECODED_BYTES })) {
+  if (
+    !parsePngInfo(png, {
+      allowedDimensions: CARD_PNG_DIMENSIONS,
+      maxDecodedBytes: MAX_CARD_DECODED_BYTES,
+    })
+  ) {
     recordUsageMetric('card.publish.rejected');
     return json(res, 400, { error: 'expected a PNG image' });
   }
 
   const base = slugify(character.name) || `player-${characterId}`;
   const copy = PUBLIC_CARD_COPY[locale];
+  // Server-side state owns level metadata. Prefer the live authoritative Sim
+  // level for online characters, then persisted JSONB state, then the column.
+  // The uploaded PNG is client-composed, but public title/OG claims must never
+  // trust query parameters.
+  const level = liveLevelForCharacter?.(characterId) ?? character.state?.level ?? character.level;
   const levelClass = interpolate(copy.levelClass, {
-    level: character.level,
+    level,
     className: classDisplay(character.class, locale),
   });
   const title = `${character.name} - ${levelClass}`;
@@ -470,7 +601,15 @@ export async function handleCardUpload(
     const candidate = cardSlugCandidate(base, characterId, attempt);
     if (!(await slugAvailable(candidate, characterId))) continue;
     try {
-      await upsertPlayerCard({ characterId, accountId, slug: candidate, png, title, description, locale });
+      await upsertPlayerCard({
+        characterId,
+        accountId,
+        slug: candidate,
+        png,
+        title,
+        description,
+        locale,
+      });
       slug = candidate;
       break;
     } catch (err) {
@@ -482,14 +621,21 @@ export async function handleCardUpload(
 }
 
 // GET /p/<slug>  and  GET /p/<slug>/card.png
-export async function handleCardRoutes(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
+export async function handleCardRoutes(
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+): Promise<void> {
   try {
     const path = (req.url ?? '').split('?')[0];
     const m = /^\/p\/([^/]+)(\/card\.png)?\/?$/.exec(path);
     // A malformed percent-escape (e.g. /p/%E0) makes decodeURIComponent throw a
     // URIError - that's an unparseable URL (404), not a server fault (500).
     let slug = '';
-    try { slug = m ? decodeURIComponent(m[1]).toLowerCase() : ''; } catch { slug = ''; }
+    try {
+      slug = m ? decodeURIComponent(m[1]).toLowerCase() : '';
+    } catch {
+      slug = '';
+    }
     if (!m || !isValidSlug(slug)) {
       res.writeHead(404, CARD_NOT_FOUND_HEADERS);
       res.end('not found');
@@ -521,7 +667,11 @@ async function serveCardImage(res: http.ServerResponse, slug: string): Promise<v
   res.end(card.png);
 }
 
-async function serveCardPage(req: http.IncomingMessage, res: http.ServerResponse, slug: string): Promise<void> {
+async function serveCardPage(
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+  slug: string,
+): Promise<void> {
   // Metadata-only read - the HTML page never needs the (up to ~4 MB) PNG bytes.
   const card = await getPlayerCardMetaBySlug(slug);
   const origin = requestOrigin(req);
@@ -530,14 +680,37 @@ async function serveCardPage(req: http.IncomingMessage, res: http.ServerResponse
     res.end(missingCardHtml(origin, requestLocale(req)));
     return;
   }
-  res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=120' });
-  res.end(cardPageHtml({ slug, title: card.title, description: card.description, locale: normalizePublicCardLocale(card.locale), origin }));
+  // Version the og:image URL by the card's last-publish time (epoch ms) so a
+  // re-published card (e.g. after a level-up) busts social/browser image caches
+  // that key on the otherwise-stable /p/<slug>/card.png URL and serve the old PNG.
+  res.writeHead(200, {
+    'Content-Type': 'text/html; charset=utf-8',
+    'Cache-Control': 'public, max-age=120',
+  });
+  res.end(
+    cardPageHtml({
+      slug,
+      title: card.title,
+      description: card.description,
+      locale: normalizePublicCardLocale(card.locale),
+      origin,
+      version: card.updatedAt,
+    }),
+  );
 }
 
-function cardPageHtml(opts: { slug: string; title: string; description: string; locale: PublicCardLocale; origin: string }): string {
-  const { slug, title, description, locale, origin } = opts;
+function cardPageHtml(opts: {
+  slug: string;
+  title: string;
+  description: string;
+  locale: PublicCardLocale;
+  origin: string;
+  version: number;
+}): string {
+  const { slug, title, description, locale, origin, version } = opts;
   const pagePath = `/p/${encodeURIComponent(slug)}`;
-  const imagePath = `${pagePath}/card.png`;
+  const imageQuery = version > 0 ? `?v=${version}` : '';
+  const imagePath = `${pagePath}/card.png${imageQuery}`;
   const playPath = `/?ref=${encodeURIComponent(slug)}`;
   const pageUrl = `${origin}${pagePath}`;
   const imageUrl = `${origin}${imagePath}`;

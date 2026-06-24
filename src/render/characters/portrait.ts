@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { CharacterVisual } from './visual';
 import { assetsReady } from '../assets/preload';
 import { PlayerClass } from '../../sim/types';
+import { trackWebGLContext } from '../context_release';
 
 // ---------------------------------------------------------------------------
 // Portrait factory — a 2D "profile photo" rendered from the real 3D character
@@ -64,6 +65,8 @@ function ensureRig(): void {
   renderer.setPixelRatio(1);
   renderer.setSize(PORTRAIT_SIZE, PORTRAIT_SIZE, false);
   renderer.shadowMap.enabled = false;
+  // Hand this offscreen context back on page teardown (see context_release.ts).
+  trackWebGLContext(renderer);
 
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(CAM_FOV, 1, 0.1, 100);

@@ -1,4 +1,5 @@
 import { pool } from './db';
+import { REALM } from './realm';
 
 // Read-side queries for the admin dashboard. All inputs are parameterized;
 // sort columns are whitelisted before they reach SQL.
@@ -8,28 +9,68 @@ export interface OverviewCounts {
   characters: number;
   accountsToday: number;
   accountsWeek: number;
+  accountsMonth: number;
   sessionsToday: number;
   activeAccountsToday: number;
+  activeAccountsWeek: number;
+  activeAccountsMonth: number;
+  returningAccountsToday: number;
+  avgPlaytimeSeconds: number;
+  peakOnlineToday: number;
+  peakOnlineAllTime: number;
+  siteUsersNow: number;
 }
 
 export async function overviewCounts(): Promise<OverviewCounts> {
-  const res = await pool.query(`
+  const res = await pool.query(
+    `
     SELECT
-      (SELECT count(*) FROM accounts)::int                                              AS accounts,
-      (SELECT count(*) FROM characters)::int                                            AS characters,
-      (SELECT count(*) FROM accounts WHERE created_at > now() - interval '1 day')::int  AS accounts_today,
-      (SELECT count(*) FROM accounts WHERE created_at > now() - interval '7 days')::int AS accounts_week,
-      (SELECT count(*) FROM play_sessions WHERE started_at > now() - interval '1 day')::int                  AS sessions_today,
-      (SELECT count(DISTINCT account_id) FROM play_sessions WHERE started_at > now() - interval '1 day')::int AS active_accounts_today
-  `);
+      (SELECT count(*) FROM accounts)::int                                               AS accounts,
+      (SELECT count(*) FROM characters)::int                                             AS characters,
+      (SELECT count(*) FROM accounts WHERE created_at > now() - interval '1 day')::int   AS accounts_today,
+      (SELECT count(*) FROM accounts WHERE created_at > now() - interval '7 days')::int  AS accounts_week,
+      (SELECT count(*) FROM accounts WHERE created_at > now() - interval '30 days')::int AS accounts_month,
+      (SELECT count(*) FROM play_sessions WHERE started_at > now() - interval '1 day')::int AS sessions_today,
+      (SELECT count(DISTINCT account_id) FROM play_sessions
+        WHERE started_at <= now() AND COALESCE(ended_at, now()) > now() - interval '1 day')::int AS active_accounts_today,
+      (SELECT count(DISTINCT account_id) FROM play_sessions
+        WHERE started_at <= now() AND COALESCE(ended_at, now()) > now() - interval '7 days')::int AS active_accounts_week,
+      (SELECT count(DISTINCT account_id) FROM play_sessions
+        WHERE started_at <= now() AND COALESCE(ended_at, now()) > now() - interval '30 days')::int AS active_accounts_month,
+      (SELECT count(DISTINCT ps.account_id) FROM play_sessions ps
+        JOIN accounts a ON a.id = ps.account_id
+        WHERE a.created_at <= now() - interval '1 day'
+          AND ps.started_at <= now()
+          AND COALESCE(ps.ended_at, now()) > now() - interval '1 day')::int AS returning_accounts_today,
+      COALESCE((
+        SELECT sum(EXTRACT(EPOCH FROM (COALESCE(ended_at, now()) - started_at))) / NULLIF((SELECT count(*) FROM accounts), 0)
+        FROM play_sessions
+      ), 0)::bigint AS avg_playtime_seconds,
+      COALESCE((SELECT max(online_players) FROM admin_online_samples
+        WHERE realm = $1 AND sampled_at > now() - interval '1 day'), 0)::int AS peak_online_today,
+      COALESCE((SELECT max(online_players) FROM admin_online_samples
+        WHERE realm = $1), 0)::int AS peak_online_all_time,
+      (SELECT count(*) FROM site_presence_sessions
+        WHERE last_seen_at > now() - interval '2 minutes')::int AS site_users_now
+  `,
+    [REALM],
+  );
   const r = res.rows[0];
   return {
     accounts: r.accounts,
     characters: r.characters,
     accountsToday: r.accounts_today,
     accountsWeek: r.accounts_week,
+    accountsMonth: r.accounts_month,
     sessionsToday: r.sessions_today,
     activeAccountsToday: r.active_accounts_today,
+    activeAccountsWeek: r.active_accounts_week,
+    activeAccountsMonth: r.active_accounts_month,
+    returningAccountsToday: r.returning_accounts_today,
+    avgPlaytimeSeconds: Number(r.avg_playtime_seconds),
+    peakOnlineToday: r.peak_online_today,
+    peakOnlineAllTime: r.peak_online_all_time,
+    siteUsersNow: r.site_users_now,
   };
 }
 
@@ -93,6 +134,137 @@ export async function levelDistribution(): Promise<BucketCount[]> {
     `SELECT level::text AS key, count(*)::int AS count FROM characters GROUP BY level ORDER BY level`,
   );
   return res.rows;
+}
+
+export async function recordOnlineSample(
+  onlinePlayers: number,
+  onlineAccounts: number,
+): Promise<void> {
+  await pool.query(
+    `INSERT INTO admin_online_samples (realm, online_players, online_accounts)
+     VALUES ($1, $2, $3)`,
+    [REALM, Math.max(0, Math.floor(onlinePlayers)), Math.max(0, Math.floor(onlineAccounts))],
+  );
+}
+
+export interface SitePresenceInput {
+  visitorId: string;
+  page: string;
+  ipHash: string;
+  userAgentHash: string;
+}
+
+export async function recordSitePresence(input: SitePresenceInput): Promise<void> {
+  await pool.query(
+    `INSERT INTO site_presence_sessions (visitor_id, page, ip_hash, user_agent_hash)
+     VALUES ($1, $2, $3, $4)
+     ON CONFLICT (visitor_id) DO UPDATE SET
+       page = EXCLUDED.page,
+       last_seen_at = now(),
+       ip_hash = EXCLUDED.ip_hash,
+       user_agent_hash = EXCLUDED.user_agent_hash`,
+    [input.visitorId, input.page, input.ipHash, input.userAgentHash],
+  );
+}
+
+export async function currentSitePresenceUsers(): Promise<number> {
+  const res = await pool.query(
+    `SELECT count(*)::int AS count
+     FROM site_presence_sessions
+     WHERE last_seen_at > now() - interval '2 minutes'`,
+  );
+  return Number(res.rows[0]?.count ?? 0);
+}
+
+export async function recordSitePresenceSample(activeVisitors: number): Promise<void> {
+  await pool.query(
+    `INSERT INTO admin_site_presence_samples (active_visitors)
+     VALUES ($1)`,
+    [Math.max(0, Math.floor(activeVisitors))],
+  );
+}
+
+export type OnlineHistoryRange = '24h' | '7d' | '30d';
+export type OnlineHistoryBucket = 'hour' | 'day';
+
+export interface OnlineHistoryPoint {
+  bucketStart: string;
+  avgPlayers: number;
+  peakPlayers: number;
+  avgAccounts: number;
+  peakAccounts: number;
+  avgSiteUsers: number;
+  peakSiteUsers: number;
+}
+
+export interface OnlineHistory {
+  range: OnlineHistoryRange;
+  bucket: OnlineHistoryBucket;
+  points: OnlineHistoryPoint[];
+}
+
+const ONLINE_HISTORY_RANGES: Record<
+  OnlineHistoryRange,
+  { interval: string; bucket: OnlineHistoryBucket }
+> = {
+  '24h': { interval: '24 hours', bucket: 'hour' },
+  '7d': { interval: '7 days', bucket: 'day' },
+  '30d': { interval: '30 days', bucket: 'day' },
+};
+
+function cleanOnlineHistoryRange(range: string): OnlineHistoryRange {
+  return range === '24h' || range === '7d' || range === '30d' ? range : '30d';
+}
+
+export async function onlineHistory(rangeInput: string): Promise<OnlineHistory> {
+  const range = cleanOnlineHistoryRange(rangeInput);
+  const config = ONLINE_HISTORY_RANGES[range];
+  const res = await pool.query(
+    `SELECT
+       COALESCE(bucket_start, site_bucket_start) AS bucket_start,
+       COALESCE(avg_players, 0) AS avg_players,
+       COALESCE(peak_players, 0) AS peak_players,
+       COALESCE(avg_accounts, 0) AS avg_accounts,
+       COALESCE(peak_accounts, 0) AS peak_accounts,
+       COALESCE(avg_site_users, 0) AS avg_site_users,
+       COALESCE(peak_site_users, 0) AS peak_site_users
+     FROM (
+       SELECT
+         date_trunc('${config.bucket}', sampled_at) AS bucket_start,
+         round(avg(online_players)::numeric, 2) AS avg_players,
+         max(online_players)::int AS peak_players,
+         round(avg(online_accounts)::numeric, 2) AS avg_accounts,
+         max(online_accounts)::int AS peak_accounts
+       FROM admin_online_samples
+       WHERE realm = $1
+         AND sampled_at > now() - $2::interval
+       GROUP BY 1
+     ) online
+     FULL OUTER JOIN (
+       SELECT
+         date_trunc('${config.bucket}', sampled_at) AS site_bucket_start,
+         round(avg(active_visitors)::numeric, 2) AS avg_site_users,
+         max(active_visitors)::int AS peak_site_users
+       FROM admin_site_presence_samples
+       WHERE sampled_at > now() - $2::interval
+       GROUP BY 1
+     ) site ON site.site_bucket_start = online.bucket_start
+     ORDER BY bucket_start`,
+    [REALM, config.interval],
+  );
+  return {
+    range,
+    bucket: config.bucket,
+    points: res.rows.map((r) => ({
+      bucketStart: r.bucket_start,
+      avgPlayers: Number(r.avg_players),
+      peakPlayers: Number(r.peak_players),
+      avgAccounts: Number(r.avg_accounts),
+      peakAccounts: Number(r.peak_accounts),
+      avgSiteUsers: Number(r.avg_site_users),
+      peakSiteUsers: Number(r.peak_site_users),
+    })),
+  };
 }
 
 export interface PerfAggregate {
@@ -206,7 +378,12 @@ async function perfAggregate(hours: number): Promise<PerfAggregate> {
   return perfAggregateFromRow(res.rows[0] ?? {});
 }
 
-async function perfBuckets(column: string, hours: number, limit: number, worstFirst = false): Promise<PerfBucket[]> {
+async function perfBuckets(
+  column: string,
+  hours: number,
+  limit: number,
+  worstFirst = false,
+): Promise<PerfBucket[]> {
   const order = worstFirst ? 'p95_frame_ms DESC, sample_count DESC' : 'sample_count DESC, key ASC';
   const res = await pool.query(
     `SELECT
@@ -230,15 +407,17 @@ async function perfBuckets(column: string, hours: number, limit: number, worstFi
 
 export async function clientPerfSummary(hoursInput = 24): Promise<PerfSummary> {
   const hours = cleanHours(hoursInput);
-  const [totals, byPreset, byGpu, byBrowser, byOs, byScenario, worstGpuBuckets] = await Promise.all([
-    perfAggregate(hours),
-    perfBuckets('graphics_preset', hours, 20),
-    perfBuckets('gl_renderer_bucket', hours, 50),
-    perfBuckets('browser_family', hours, 20),
-    perfBuckets('os_family', hours, 20),
-    perfBuckets('zone_or_scenario', hours, 30),
-    perfBuckets('gl_renderer_bucket', hours, 20, true),
-  ]);
+  const [totals, byPreset, byGpu, byBrowser, byOs, byScenario, worstGpuBuckets] = await Promise.all(
+    [
+      perfAggregate(hours),
+      perfBuckets('graphics_preset', hours, 20),
+      perfBuckets('gl_renderer_bucket', hours, 50),
+      perfBuckets('browser_family', hours, 20),
+      perfBuckets('os_family', hours, 20),
+      perfBuckets('zone_or_scenario', hours, 30),
+      perfBuckets('gl_renderer_bucket', hours, 20, true),
+    ],
+  );
   return {
     hours,
     generatedAt: new Date().toISOString(),
@@ -252,7 +431,11 @@ export async function clientPerfSummary(hoursInput = 24): Promise<PerfSummary> {
   };
 }
 
-export async function clientPerfRaw(hoursInput = 24, limitInput = 100, beforeIdInput?: number): Promise<PerfRawRow[]> {
+export async function clientPerfRaw(
+  hoursInput = 24,
+  limitInput = 100,
+  beforeIdInput?: number,
+): Promise<PerfRawRow[]> {
   const hours = cleanHours(hoursInput);
   const limit = cleanPerfLimit(limitInput);
   const beforeId = cleanBeforeId(beforeIdInput);
@@ -341,7 +524,11 @@ export interface Paginated<T> {
   limit: number;
 }
 
-export async function listAccounts(search: string, page: number, limit: number): Promise<Paginated<AdminAccountRow>> {
+export async function listAccounts(
+  search: string,
+  page: number,
+  limit: number,
+): Promise<Paginated<AdminAccountRow>> {
   const pattern = search ? `%${escapeLike(search)}%` : '%';
   const offset = (page - 1) * limit;
   const [rows, total] = await Promise.all([
@@ -457,6 +644,7 @@ export interface AccountDetail {
   chatMutedUntil: string | null;
   chatMuteReason: string;
   chatStrikes: number;
+  lastLoginIp: string | null;
   playtimeSeconds: number;
   characters: {
     id: number;
@@ -475,6 +663,7 @@ export interface AccountDetail {
     startedAt: string;
     endedAt: string | null;
     seconds: number;
+    ip: string | null;
   }[];
 }
 
@@ -486,6 +675,7 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
               chat_muted_until,
               COALESCE(chat_mute_reason, '') AS chat_mute_reason,
               COALESCE(chat_strikes, 0) AS chat_strikes,
+              last_login_ip,
               COALESCE((SELECT sum(EXTRACT(EPOCH FROM (COALESCE(s.ended_at, now()) - s.started_at)))
                         FROM play_sessions s WHERE s.account_id = accounts.id), 0)::bigint AS playtime_seconds
        FROM accounts WHERE id = $1`,
@@ -500,7 +690,7 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
       [accountId],
     ),
     pool.query(
-      `SELECT id, character_name, started_at, ended_at,
+      `SELECT id, character_name, started_at, ended_at, ip_address,
               EXTRACT(EPOCH FROM (COALESCE(ended_at, now()) - started_at))::bigint AS seconds
        FROM play_sessions WHERE account_id = $1 ORDER BY started_at DESC LIMIT 20`,
       [accountId],
@@ -520,6 +710,7 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
     chatMutedUntil: a.chat_muted_until,
     chatMuteReason: a.chat_mute_reason,
     chatStrikes: Number(a.chat_strikes ?? 0),
+    lastLoginIp: a.last_login_ip ?? null,
     playtimeSeconds: Number(a.playtime_seconds),
     characters: characters.rows.map((c) => ({
       id: c.id,
@@ -528,7 +719,10 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
       level: c.level,
       copper: Number(c.copper),
       xp: Number(c.xp),
-      pos: c.pos && typeof c.pos.x === 'number' && typeof c.pos.z === 'number' ? { x: c.pos.x, z: c.pos.z } : null,
+      pos:
+        c.pos && typeof c.pos.x === 'number' && typeof c.pos.z === 'number'
+          ? { x: c.pos.x, z: c.pos.z }
+          : null,
       createdAt: c.created_at,
       updatedAt: c.updated_at,
     })),
@@ -538,6 +732,7 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
       startedAt: s.started_at,
       endedAt: s.ended_at,
       seconds: Number(s.seconds),
+      ip: s.ip_address ?? null,
     })),
   };
 }

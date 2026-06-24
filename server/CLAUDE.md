@@ -11,20 +11,24 @@ persists to Postgres, and serves the built client. esbuild-bundled for Node via
 ## Key files
 | File | Role |
 |---|---|
-| `main.ts` (~740) | HTTP server + route table, REST `/api/*`, WS `/ws` upgrade + auth handshake, boot/shutdown, leaderboard cache |
-| `game.ts` (~1880) | `GameServer`: owns the `Sim`, the 50 ms loop, interest-scoped snapshots, command dispatch, chat. **Largest file** |
-| `db.ts` (~720) | `pg` pool, `SCHEMA` DDL, all character/account/token/world-state queries |
-| `auth.ts` (~140) | scrypt hashing, `newToken`, name/password validators (`obscenity` profanity) |
+| `main.ts` | HTTP server + route table, REST `/api/*`, WS `/ws` upgrade + auth handshake, boot/shutdown, leaderboard cache |
+| `game.ts` | `GameServer`: owns the `Sim`, the 50 ms loop, interest-scoped snapshots, command dispatch, chat. **Largest file** |
+| `db.ts` | `pg` pool, `SCHEMA` DDL, all character/account/token/world-state queries |
+| `auth.ts` | scrypt hashing, `newToken`, name/password validators (`obscenity` profanity) |
 | `social.ts`/`social_db.ts` | friends/guilds/blocks/presence — logic / SQL |
 | `admin.ts`/`admin_db.ts`, `moderation_db.ts` | admin API + dashboard reads / moderation writes |
 | `chat_filter.ts`/`chat_filter_db.ts` | host-agnostic profanity/slur filter (soft cosmetic + hard server-enforced tiers) / admin word-list SQL |
-| `antibot.ts`/`antibot_db.ts` | behavioral bot-scoring evidence + escalation / automated-report SQL |
+| `bot_detector/contract.ts` / `stub.ts` | `BotDetector` seam (`#bot-detector`): the contract interface / the no-op stub used when the private clone is absent |
 | `turnstile.ts`, `web_login_guard.ts` | Cloudflare Turnstile siteverify / auth-endpoint Origin guard (anti-bot) |
-| `realm.ts` (~73) | `REALM`, `REALM_DIRECTORY`, `REALM_ORIGINS` from `REALM_NAME`/`REALMS` env |
-| `ratelimit.ts` (~260) | per-IP sliding-window limiter + `X-Forwarded-For` resolution |
+| `realm.ts` | `REALM`, `REALM_DIRECTORY`, `REALM_ORIGINS` from `REALM_NAME`/`REALMS` env |
+| `ratelimit.ts` | per-IP sliding-window limiter + `X-Forwarded-For` resolution |
 | `internal.ts` | secret-gated `/internal/*` ops endpoints (e.g. restart-countdown trigger) |
 | `ws_buffer.ts` | buffers in-flight WS frames during the async auth handshake, then replays them |
 | `chat_log.ts`, `http_util.ts`, `static_cache.ts`, `report_target.ts` | batched chat logging, JSON/body helpers, ETag caching, report-target resolution |
+| `wallet.ts` / `wallet_link.ts` | non-custodial Solana wallet linking: `wallet.ts` is the DB+HTTP shell, `wallet_link.ts` is pure IO-free challenge/ed25519/address helpers (unit-testable without a DB) |
+| `woc_balance.ts` | the sole Solana RPC reader: holder-tier flair and connected-wallet balance, cached |
+| `player_card.ts` | shareable player-card PNGs, Open Graph unfurl, referral capture |
+| `perf_report.ts` / `provider_usage.ts` | rate-limited client perf-report ingestion / process-local provider and usage telemetry for the admin dashboard |
 
 ## Invariants — YOU MUST keep these
 - **Trust nothing from the client.** Movement intent + `cmd`s arrive over WS;
@@ -39,6 +43,7 @@ persists to Postgres, and serves the built client. esbuild-bundled for Node via
 - **SQL lives only in `db.ts` and `*_db.ts`.** Logic modules (`game.ts`,
   `social.ts`, `admin.ts`) carry zero raw SQL — `SocialService` talks to a
   `SocialDb` interface so tests use an in-memory fake. Don't inline `pool.query` in a logic module.
+  `wallet_link.ts` (pure, IO-free, unit-testable without a DB) versus `wallet.ts` (DB+HTTP shell) is the canonical IO/pure split to copy, mirroring `chat_filter.ts`/`chat_filter_db.ts` and `SocialService`/`SocialDb`.
 - **`ALLOW_DEV_COMMANDS=1` gates `dev_level`/`dev_teleport`/`dev_give`** — dev/E2E only, **never prod**.
 
 ## Persistence model

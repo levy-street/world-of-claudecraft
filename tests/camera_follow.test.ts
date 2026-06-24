@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cameraIsManual, updateFollowCameraYaw, wrapAngle } from '../src/game/camera_follow';
+import { cameraFollowShouldSettle, cameraIsManual, updateFollowCameraYaw, wrapAngle } from '../src/game/camera_follow';
 
 describe('camera follow', () => {
   it('wraps angles to the shortest signed turn', () => {
@@ -78,6 +78,17 @@ describe('camera follow', () => {
     expect(next.camYaw).toBeLessThan(1.2);
     expect(next.camYaw).toBeGreaterThan(0);
     expect(next.camYaw).toBeGreaterThan(1.0);
+  });
+
+  it('treats keyboard turning as active follow movement', () => {
+    expect(cameraFollowShouldSettle({
+      forward: false,
+      back: false,
+      strafeLeft: false,
+      strafeRight: false,
+      turnLeft: true,
+      turnRight: false,
+    }, false)).toBe(true);
   });
 
   it('does not auto-follow while the camera drives the facing (mouse-camera move)', () => {

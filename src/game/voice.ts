@@ -39,14 +39,14 @@ class GameVoice {
   }
 
   /** Play the clip for a line key, if one exists and voice-over is enabled. */
-  play(lineKey: string): void {
+  play(lineKey: string, opts?: { gain?: number }): void {
     if (!this.enabled) return;
     const src = VOICE_LINES[lineKey];
     if (!src) return;
     this.stop();
     if (!this.el) this.el = new Audio();
     this.el.src = src;
-    this.el.volume = this.vol * VOICE_BASE_GAIN;
+    this.el.volume = Math.min(1, this.vol * VOICE_BASE_GAIN * (opts?.gain ?? 1));
     // Autoplay restrictions / a missing file reject the promise — ignore, the
     // dialogue text is the source of truth and audio is an enhancement.
     void this.el.play().catch(() => { /* no-op */ });

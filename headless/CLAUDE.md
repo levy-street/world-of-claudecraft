@@ -28,7 +28,11 @@ per line via `node:readline`). Not a socket / WS / HTTP. The Python client in
 - `obs` is a plain `number[]` of length `obsSize()` (query it, never hardcode —
   it scales with content, e.g. `QUEST_ORDER.length`). `action` is an int index
   into `ACTIONS`. Bad JSON / unknown cmd / thrown error → `{error: "..."}`.
-- `player_class` is `"warrior" | "mage"` only (default `warrior`).
+- `player_class` is any of the 9 `PlayerClass` values in `ALL_CLASSES` (default
+  `warrior`); an unknown class is rejected with `{error: "invalid player_class: ..."}`.
+  The obs/action space is identical for every class (`obs_size`/`num_actions` are
+  class-agnostic; ability slots pad to the largest kit), so switching `player_class`
+  never changes a trained config's vector shape.
 
 ## Episode framing (this file's job)
 - **`step`**: `applyAction` once, then `sim.tick()` × `frameSkip` (default 5 →

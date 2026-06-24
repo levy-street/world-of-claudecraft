@@ -13,7 +13,7 @@ function fakeWorld(): IWorld {
   return {
     entities,
     player: entities.get(1),
-    partyInfo: { leader: 1, members: [{ pid: 2, name: 'Pal', cls: 'priest' }] },
+    partyInfo: { leader: 1, raid: false, members: [{ pid: 2, name: 'Pal', cls: 'priest', group: 1 }] },
   } as unknown as IWorld;
 }
 

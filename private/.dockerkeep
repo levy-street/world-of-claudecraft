@@ -1,0 +1,2 @@
+This directory is copied into Docker builds so deploy-time private extensions can
+be bundled when present. Keep the real private contents git-ignored.

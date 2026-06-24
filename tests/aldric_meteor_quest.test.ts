@@ -21,7 +21,9 @@ function teleportTo(sim: Sim, x: number, z: number): void {
 }
 
 function standAtMerchant(sim: Sim): void {
-  const merchant = [...sim.entities.values()].find((e): e is Entity => e.kind === 'npc' && e.templateId === 'the_merchant');
+  const merchant = [...sim.entities.values()].find(
+    (e): e is Entity => e.kind === 'npc' && e.templateId === 'the_merchant',
+  );
   if (!merchant) throw new Error('merchant not found');
   teleportTo(sim, merchant.pos.x, merchant.pos.z);
 }
@@ -47,25 +49,38 @@ describe('Brother Aldric fallen star quest', () => {
     expect(ITEMS[REWARD_ITEM_ID]?.noMarketList).toBe(true);
     expect(ITEMS[RETURNED_CHROMA_ITEM_ID]?.name).toBe('Amber Crimson');
     expect(ITEMS[RETURNED_CHROMA_ITEM_ID]?.quality).toBe('uncommon');
-    expect(ITEMS[RETURNED_CHROMA_ITEM_ID]?.use).toEqual({ type: 'mechChroma', chromaId: 'amber_crimson' });
+    expect(ITEMS[RETURNED_CHROMA_ITEM_ID]?.use).toEqual({
+      type: 'mechChroma',
+      chromaId: 'amber_crimson',
+    });
     expect(questRewardItemId(quest, 'warrior')).toBe(REWARD_ITEM_ID);
 
     const meteorObjectDef = GROUND_OBJECTS.find((obj) => obj.itemId === METEOR_ITEM_ID);
     expect(meteorObjectDef).toBeTruthy();
-    expect(meteorObjectDef!.positions.some((pos) => Math.hypot(pos.x - 152, pos.z - 294) <= 8)).toBe(true);
+    expect(
+      meteorObjectDef!.positions.some((pos) => Math.hypot(pos.x - 152, pos.z - 294) <= 8),
+    ).toBe(true);
 
-    const sim = new Sim({ seed: 20061, playerClass: 'warrior', playerName: 'Reuben', autoEquip: false });
+    const sim = new Sim({
+      seed: 20061,
+      playerClass: 'warrior',
+      playerName: 'Reuben',
+      autoEquip: false,
+    });
     sim.player.level = 8;
 
-    const aldric = [...sim.entities.values()].find((e) => e.kind === 'npc' && e.templateId === 'brother_aldric_fen');
+    const aldric = [...sim.entities.values()].find(
+      (e) => e.kind === 'npc' && e.templateId === 'brother_aldric_fen',
+    );
     expect(aldric).toBeTruthy();
     teleportTo(sim, aldric!.pos.x + 1, aldric!.pos.z);
 
     sim.questLog.set(QUEST_ID, { questId: QUEST_ID, counts: [0], state: 'active' });
     expect(sim.questState(QUEST_ID)).toBe('active');
 
-    const meteorObject = [...sim.entities.values()]
-      .find((e) => e.kind === 'object' && e.objectItemId === METEOR_ITEM_ID);
+    const meteorObject = [...sim.entities.values()].find(
+      (e) => e.kind === 'object' && e.objectItemId === METEOR_ITEM_ID,
+    );
     expect(meteorObject).toBeTruthy();
     teleportTo(sim, meteorObject!.pos.x + 1, meteorObject!.pos.z);
 
@@ -99,8 +114,15 @@ describe('Brother Aldric fallen star quest', () => {
     expect(QUESTS[QUEST_ID].minLevel).toBe(5);
     expect(QUESTS[QUEST_ID]).toMatchObject({ retired: true });
 
-    const sim = new Sim({ seed: 20061, playerClass: 'warrior', playerName: 'Reuben', autoEquip: false });
-    const aldric = [...sim.entities.values()].find((e) => e.kind === 'npc' && e.templateId === 'brother_aldric_fen');
+    const sim = new Sim({
+      seed: 20061,
+      playerClass: 'warrior',
+      playerName: 'Reuben',
+      autoEquip: false,
+    });
+    const aldric = [...sim.entities.values()].find(
+      (e) => e.kind === 'npc' && e.templateId === 'brother_aldric_fen',
+    );
     expect(aldric).toBeTruthy();
     teleportTo(sim, aldric!.pos.x + 1, aldric!.pos.z);
 
@@ -137,7 +159,7 @@ describe('Brother Aldric fallen star quest', () => {
 
     sim.marketList(REWARD_ITEM_ID, 1, 100);
     expect(sim.countItem(REWARD_ITEM_ID)).toBe(1);
-    expect(sim.marketListings.find((l) => l.itemId === REWARD_ITEM_ID && l.sellerKey === 'Seller')).toBeUndefined();
+    expect(sim.marketListings.find((l) => l.itemId === REWARD_ITEM_ID)).toBeUndefined();
 
     const buyer = sim.addPlayer('mage', 'Buyer');
     teleportTo(sim, sim.player.pos.x + 1, sim.player.pos.z);
@@ -147,6 +169,8 @@ describe('Brother Aldric fallen star quest', () => {
     sim.tradeRequest(buyer);
     sim.tradeAccept(buyer);
     sim.tradeSetOffer([{ itemId: REWARD_ITEM_ID, count: 1 }], 0);
-    expect(sim.tradeFor(sim.playerId)?.offerA.items).toEqual([{ itemId: REWARD_ITEM_ID, count: 1 }]);
+    expect(sim.tradeFor(sim.playerId)?.offerA.items).toEqual([
+      { itemId: REWARD_ITEM_ID, count: 1 },
+    ]);
   });
 });

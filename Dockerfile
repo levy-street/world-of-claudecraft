@@ -5,12 +5,16 @@ FROM node:22-alpine AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
-COPY tsconfig.json vite.config.ts index.html admin.html ./
+COPY tsconfig.json vite.config.ts index.html admin.html play.html guide.html ./
 COPY src ./src
 COPY server ./server
 COPY headless ./headless
 COPY scripts ./scripts
 COPY public ./public
+# Optional private extensions live under ./private. Public checkouts contain only
+# a placeholder, so builds still fall back to public stubs; deploys can clone the
+# private bot detector into private/bot_detector before this Docker build.
+COPY private ./private
 # Public client config is inlined into the bundle at build time (Vite reads
 # VITE_* from the environment). Empty defaults keep optional UI disabled:
 # Turnstile widget off. Passed through from compose build args.

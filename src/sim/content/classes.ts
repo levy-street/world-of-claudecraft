@@ -745,7 +745,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'consecration', name: 'Consecration', class: 'paladin', learnLevel: 18,
     cost: 60, castTime: 0, cooldown: 8, range: 0, school: 'holy',
     requiresTarget: false,
-    effects: [{ type: 'aoeDamage', min: 28, max: 34, radius: 8 }],
+    effects: [{ type: 'groundAoE', min: 28, max: 34, radius: 8, duration: 10, interval: 2 }],
     description: 'Consecrates the ground beneath you, searing nearby enemies for $d Holy damage.',
   },
   righteous_fury: {
@@ -1448,7 +1448,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 30, castTime: 0, cooldown: 0, range: 0, school: 'nature',
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'form_travel', value: 1.4, duration: 3600 }],
-    description: 'Instantly shift into a swift travel form, increasing movement speed by 40%. You cannot use other abilities while shifted, but can shift in or out of combat — ideal for escaping.',
+    description: 'Instantly shift into a swift travel form, increasing movement speed by 40%. You cannot use other abilities while shifted, but can shift in or out of combat, ideal for escaping.',
   },
   enrage: {
     id: 'enrage', name: 'Enrage', class: 'druid', learnLevel: 16,

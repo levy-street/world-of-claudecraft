@@ -1,6 +1,6 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Readable } from 'node:stream';
 import { deflateSync } from 'node:zlib';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Same DB-test pattern as wallet_server.test.ts: stub DATABASE_URL + mock pg so
 // db.ts loads and every pool.query is a spy we route by SQL. Drives the REAL
@@ -13,14 +13,23 @@ const dbMock = vi.hoisted(() => {
   return { query: vi.fn() };
 });
 vi.mock('pg', () => ({
-  Pool: vi.fn(function Pool() { return { query: dbMock.query }; }),
+  Pool: vi.fn(function Pool() {
+    return { query: dbMock.query };
+  }),
 }));
 
-import {
-  handleCardUpload, handleCardRoutes, captureReferral, slugify, isValidSlug, MAX_CARD_BYTES,
-  PUBLIC_CARD_COPY, PUBLIC_CARD_LOCALES, normalizePublicCardLocale,
-} from '../server/player_card';
 import { lifetimeXpStanding } from '../server/db';
+import {
+  captureReferral,
+  handleCardRoutes,
+  handleCardUpload,
+  isValidSlug,
+  MAX_CARD_BYTES,
+  normalizePublicCardLocale,
+  PUBLIC_CARD_COPY,
+  PUBLIC_CARD_LOCALES,
+  slugify,
+} from '../server/player_card';
 import { publicOriginForRealm, resolvePublicOrigin } from '../server/realm';
 
 const PNG_MAGIC = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
@@ -30,7 +39,7 @@ const TEST_CRC32_TABLE = (() => {
   const table = new Uint32Array(256);
   for (let n = 0; n < table.length; n++) {
     let c = n;
-    for (let k = 0; k < 8; k++) c = (c & 1) ? (0xedb88320 ^ (c >>> 1)) : (c >>> 1);
+    for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
     table[n] = c >>> 0;
   }
   return table;
@@ -61,7 +70,12 @@ function makePng(width: number, height: number): Buffer {
   ihdr[11] = 0; // adaptive filtering
   ihdr[12] = 0; // no interlace
   const raw = Buffer.alloc((width * 4 + 1) * height);
-  return Buffer.concat([PNG_MAGIC, pngChunk('IHDR', ihdr), pngChunk('IDAT', deflateSync(raw)), pngChunk('IEND')]);
+  return Buffer.concat([
+    PNG_MAGIC,
+    pngChunk('IHDR', ihdr),
+    pngChunk('IDAT', deflateSync(raw)),
+    pngChunk('IEND'),
+  ]);
 }
 const validCardPng = makePng(2400, 1260);
 
@@ -73,7 +87,10 @@ function makeBinaryReq(url: string, body: Buffer): any {
   req.socket = {};
   return req;
 }
-function makeUnreadableBinaryReq(url: string, headers: Record<string, string> = {}): { req: any; wasRead: () => boolean } {
+function makeUnreadableBinaryReq(
+  url: string,
+  headers: Record<string, string> = {},
+): { req: any; wasRead: () => boolean } {
   let read = false;
   const req: any = new Readable({
     read() {
@@ -86,7 +103,10 @@ function makeUnreadableBinaryReq(url: string, headers: Record<string, string> = 
   req.socket = {};
   return { req, wasRead: () => read };
 }
-function makeGetReq(url: string, opts: { headers?: Record<string, unknown>; socket?: unknown } = {}): any {
+function makeGetReq(
+  url: string,
+  opts: { headers?: Record<string, unknown>; socket?: unknown } = {},
+): any {
   const req: any = Readable.from([]);
   req.method = 'GET';
   req.url = url;
@@ -97,7 +117,11 @@ function makeGetReq(url: string, opts: { headers?: Record<string, unknown>; sock
 // A binary request whose body read fails with a non-size error (stream error),
 // to exercise the upload's 'could not read image' (400) branch.
 function makeErrorBinaryReq(url: string): any {
-  const req: any = new Readable({ read() { this.destroy(new Error('stream boom')); } });
+  const req: any = new Readable({
+    read() {
+      this.destroy(new Error('stream boom'));
+    },
+  });
   req.url = url;
   req.headers = { host: 'realm.example' };
   req.socket = {};
@@ -108,15 +132,22 @@ function makeRes(): any {
     statusCode: 0,
     headers: {} as Record<string, unknown>,
     body: '' as string | Buffer,
-    writeHead(status: number, headers?: Record<string, unknown>) { this.statusCode = status; if (headers) this.headers = headers; return this; },
-    end(data?: string | Buffer) { this.body = data ?? ''; return this; },
+    writeHead(status: number, headers?: Record<string, unknown>) {
+      this.statusCode = status;
+      if (headers) this.headers = headers;
+      return this;
+    },
+    end(data?: string | Buffer) {
+      this.body = data ?? '';
+      return this;
+    },
   };
 }
 
 // per-test DB state, routed by SQL
 let characterRows: any[] = [];
 let slugRows: any[] | ((slug: string) => any[]) = []; // SELECT character_id FROM player_cards WHERE slug
-let cardRows: any[] = [];          // getPlayerCardBySlug
+let cardRows: any[] = []; // getPlayerCardBySlug
 let accountForSlugRows: any[] = [];
 let upsertThrows: Error | null = null;
 // lifetimeXpStanding is now a single query (ahead + total via an `own` subquery
@@ -124,13 +155,19 @@ let upsertThrows: Error | null = null;
 let standingCountRows: any[] = [];
 
 beforeEach(() => {
-  characterRows = []; slugRows = []; cardRows = []; accountForSlugRows = []; upsertThrows = null;
+  characterRows = [];
+  slugRows = [];
+  cardRows = [];
+  accountForSlugRows = [];
+  upsertThrows = null;
   standingCountRows = [];
   dbMock.query.mockReset();
   dbMock.query.mockImplementation((sql: string, params?: unknown[]) => {
     const s = String(sql).replace(/\s+/g, ' ').trim();
-    if (s.includes('AS ahead')) return Promise.resolve({ rows: standingCountRows, rowCount: standingCountRows.length });
-    if (s.includes('SELECT id, account_id, name, class, level, state')) return Promise.resolve({ rows: characterRows });
+    if (s.includes('AS ahead'))
+      return Promise.resolve({ rows: standingCountRows, rowCount: standingCountRows.length });
+    if (s.includes('SELECT id, account_id, name, class, level, state'))
+      return Promise.resolve({ rows: characterRows });
     if (s.includes('SELECT character_id FROM player_cards WHERE slug')) {
       const slug = String(params?.[0] ?? '');
       const rows = typeof slugRows === 'function' ? slugRows(slug) : slugRows;
@@ -140,17 +177,24 @@ beforeEach(() => {
       if (upsertThrows) return Promise.reject(upsertThrows);
       return Promise.resolve({ rows: [] });
     }
-    if (s.includes('SELECT character_id, account_id, png, title, description')) return Promise.resolve({ rows: cardRows });
+    if (s.includes('SELECT character_id, account_id, png, title, description'))
+      return Promise.resolve({ rows: cardRows });
     if (s.includes('SELECT title, description, locale')) return Promise.resolve({ rows: cardRows }); // metadata-only OG page read
-    if (s.includes('SELECT account_id FROM player_cards WHERE slug')) return Promise.resolve({ rows: accountForSlugRows });
+    if (s.includes('SELECT account_id FROM player_cards WHERE slug'))
+      return Promise.resolve({ rows: accountForSlugRows });
     if (s.includes('INSERT INTO referrals')) return Promise.resolve({ rows: [] });
     return Promise.resolve({ rows: [] });
   });
 });
 
-async function callUpload(url: string, body: Buffer, accountId = 1) {
+async function callUpload(
+  url: string,
+  body: Buffer,
+  accountId = 1,
+  liveLevelForCharacter?: (characterId: number) => number | null,
+) {
   const res = makeRes();
-  await handleCardUpload(makeBinaryReq(url, body), res, accountId);
+  await handleCardUpload(makeBinaryReq(url, body), res, accountId, liveLevelForCharacter);
   return { status: res.statusCode, data: res.body ? JSON.parse(String(res.body)) : {} };
 }
 
@@ -213,13 +257,17 @@ describe('public card origin config', () => {
   });
 
   it('selects the matching trusted realm origin', () => {
-    expect(publicOriginForRealm('Ironforge', [
-      { name: 'Claudemoon', url: 'https://claudemoon.example.com', type: 'Normal' },
-      { name: 'Ironforge', url: 'https://ironforge.example.com', type: 'PvP' },
-    ])).toBe('https://ironforge.example.com');
-    expect(publicOriginForRealm('Missing', [
-      { name: 'Claudemoon', url: 'https://claudemoon.example.com', type: 'Normal' },
-    ])).toBe('');
+    expect(
+      publicOriginForRealm('Ironforge', [
+        { name: 'Claudemoon', url: 'https://claudemoon.example.com', type: 'Normal' },
+        { name: 'Ironforge', url: 'https://ironforge.example.com', type: 'PvP' },
+      ]),
+    ).toBe('https://ironforge.example.com');
+    expect(
+      publicOriginForRealm('Missing', [
+        { name: 'Claudemoon', url: 'https://claudemoon.example.com', type: 'Normal' },
+      ]),
+    ).toBe('');
   });
 });
 
@@ -230,8 +278,10 @@ describe('POST /api/card', () => {
     const { status, data } = await callUpload('/api/card?character=5', validCardPng);
     expect(status).toBe(200);
     expect(data).toEqual({ url: '/p/sir-test', ref: 'sir-test' });
-    const insert = dbMock.query.mock.calls.find((c) => String(c[0]).includes('INSERT INTO player_cards'));
-    expect(insert?.[1][0]).toBe(5);        // character_id
+    const insert = dbMock.query.mock.calls.find((c) =>
+      String(c[0]).includes('INSERT INTO player_cards'),
+    );
+    expect(insert?.[1][0]).toBe(5); // character_id
     expect(insert?.[1][2]).toBe('sir-test'); // slug
     const storedPng = insert?.[1][3];
     expect(Buffer.isBuffer(storedPng)).toBe(true); // png bytes
@@ -240,12 +290,113 @@ describe('POST /api/card', () => {
     expect(insert?.[1][6]).toBe('en'); // locale
   });
 
+  it('ignores client-reported levels and uses server-side character state for metadata', async () => {
+    characterRows = [
+      { id: 5, account_id: 1, name: 'Sir Test', class: 'paladin', level: 12, state: { level: 12 } },
+    ];
+    slugRows = [];
+    const { status } = await callUpload('/api/card?character=5&level=16', validCardPng);
+    expect(status).toBe(200);
+    const insert = dbMock.query.mock.calls.find((c) =>
+      String(c[0]).includes('INSERT INTO player_cards'),
+    );
+    expect(insert?.[1][4]).toBe('Sir Test - Level 12 Paladin');
+  });
+
+  it('uses the saved level when level query params are absent or forged', async () => {
+    characterRows = [{ id: 5, account_id: 1, name: 'Sir Test', class: 'paladin', level: 12 }];
+    for (const url of [
+      '/api/card?character=5',
+      '/api/card?character=5&level=0',
+      '/api/card?character=5&level=-3',
+      '/api/card?character=5&level=abc',
+      '/api/card?character=5&level=1.5',
+      '/api/card?character=5&level=999',
+    ]) {
+      dbMock.query.mockClear();
+      slugRows = [];
+      const { status } = await callUpload(url, validCardPng);
+      expect(status).toBe(200);
+      const insert = dbMock.query.mock.calls.find((c) =>
+        String(c[0]).includes('INSERT INTO player_cards'),
+      );
+      expect(insert?.[1][4]).toBe('Sir Test - Level 12 Paladin');
+    }
+  });
+
+  it('prefers the JSONB state.level over the denormalized column when no level is reported', async () => {
+    // The column can lag state by an autosave window; state.level is the fresher
+    // server-side value, so it wins over the column when the client sends nothing.
+    characterRows = [
+      { id: 5, account_id: 1, name: 'Sir Test', class: 'paladin', level: 12, state: { level: 14 } },
+    ];
+    slugRows = [];
+    const { status } = await callUpload('/api/card?character=5', validCardPng);
+    expect(status).toBe(200);
+    const insert = dbMock.query.mock.calls.find((c) =>
+      String(c[0]).includes('INSERT INTO player_cards'),
+    );
+    expect(insert?.[1][4]).toBe('Sir Test - Level 14 Paladin');
+  });
+
+  it('prefers the live in-session level over persisted state', async () => {
+    characterRows = [
+      { id: 5, account_id: 1, name: 'Sir Test', class: 'paladin', level: 12, state: { level: 14 } },
+    ];
+    slugRows = [];
+    const { status } = await callUpload('/api/card?character=5', validCardPng, 1, (id) =>
+      id === 5 ? 15 : null,
+    );
+    expect(status).toBe(200);
+    const insert = dbMock.query.mock.calls.find((c) =>
+      String(c[0]).includes('INSERT INTO player_cards'),
+    );
+    expect(insert?.[1][4]).toBe('Sir Test - Level 15 Paladin');
+  });
+
+  it('falls back to persisted state when the character is not online', async () => {
+    characterRows = [
+      { id: 5, account_id: 1, name: 'Sir Test', class: 'paladin', level: 12, state: { level: 14 } },
+    ];
+    slugRows = [];
+    const { status } = await callUpload('/api/card?character=5', validCardPng, 1, () => null);
+    expect(status).toBe(200);
+    const insert = dbMock.query.mock.calls.find((c) =>
+      String(c[0]).includes('INSERT INTO player_cards'),
+    );
+    expect(insert?.[1][4]).toBe('Sir Test - Level 14 Paladin');
+  });
+
+  it('does not allow bounded-looking level query params to change metadata', async () => {
+    characterRows = [{ id: 5, account_id: 1, name: 'Sir Test', class: 'paladin', level: 12 }];
+    slugRows = [];
+    const atBound = await callUpload('/api/card?character=5&level=1000', validCardPng);
+    expect(atBound.status).toBe(200);
+    expect(
+      dbMock.query.mock.calls.find((c) =>
+        String(c[0]).includes('INSERT INTO player_cards'),
+      )?.[1][4],
+    ).toBe('Sir Test - Level 12 Paladin');
+
+    dbMock.query.mockClear();
+    slugRows = [];
+    const pastBound = await callUpload('/api/card?character=5&level=1001', validCardPng);
+    expect(pastBound.status).toBe(200);
+    expect(
+      dbMock.query.mock.calls.find((c) =>
+        String(c[0]).includes('INSERT INTO player_cards'),
+      )?.[1][4],
+    ).toBe('Sir Test - Level 12 Paladin');
+  });
+
   it('stores localized public-page metadata using the upload locale', async () => {
     characterRows = [{ id: 5, account_id: 1, name: 'Sir Test', class: 'paladin', level: 12 }];
     slugRows = [];
     const { status } = await callUpload('/api/card?character=5&lang=es-ES', validCardPng);
     expect(status).toBe(200);
-    const insert = dbMock.query.mock.calls.find((c) => String(c[0]).includes('INSERT INTO player_cards'));
+    const insert = dbMock.query.mock.calls.find((c) =>
+      String(c[0]).includes('INSERT INTO player_cards'),
+    );
     expect(insert?.[1][4]).toBe('Sir Test - Nivel 12 Paladín');
     expect(insert?.[1][5]).toContain('Sir Test está forjando una leyenda');
     expect(insert?.[1][6]).toBe('es_ES');
@@ -253,7 +404,7 @@ describe('POST /api/card', () => {
 
   it('falls back to a character-id-suffixed slug when the name slug is taken', async () => {
     characterRows = [{ id: 5, account_id: 1, name: 'Sir Test', class: 'paladin', level: 12 }];
-    slugRows = (slug) => slug === 'sir-test' ? [{ character_id: 999 }] : [];
+    slugRows = (slug) => (slug === 'sir-test' ? [{ character_id: 999 }] : []);
     const { status, data } = await callUpload('/api/card?character=5', validCardPng);
     expect(status).toBe(200);
     expect(data.ref).toBe('sir-test-5');
@@ -269,7 +420,9 @@ describe('POST /api/card', () => {
     const { status, data } = await callUpload('/api/card?character=5', validCardPng);
     expect(status).toBe(200);
     expect(data).toEqual({ url: '/p/sir-test-5-2', ref: 'sir-test-5-2' });
-    const insert = dbMock.query.mock.calls.find((c) => String(c[0]).includes('INSERT INTO player_cards'));
+    const insert = dbMock.query.mock.calls.find((c) =>
+      String(c[0]).includes('INSERT INTO player_cards'),
+    );
     expect(insert?.[1][2]).toBe('sir-test-5-2');
   });
 
@@ -279,10 +432,15 @@ describe('POST /api/card', () => {
     let first = true;
     dbMock.query.mockImplementation((sql: string) => {
       const s = String(sql).replace(/\s+/g, ' ').trim();
-      if (s.includes('SELECT id, account_id, name, class, level, state')) return Promise.resolve({ rows: characterRows });
-      if (s.includes('SELECT character_id FROM player_cards WHERE slug')) return Promise.resolve({ rows: [] });
+      if (s.includes('SELECT id, account_id, name, class, level, state'))
+        return Promise.resolve({ rows: characterRows });
+      if (s.includes('SELECT character_id FROM player_cards WHERE slug'))
+        return Promise.resolve({ rows: [] });
       if (s.includes('INSERT INTO player_cards')) {
-        if (first) { first = false; return Promise.reject(Object.assign(new Error('dup'), { code: '23505' })); }
+        if (first) {
+          first = false;
+          return Promise.reject(Object.assign(new Error('dup'), { code: '23505' }));
+        }
         return Promise.resolve({ rows: [] });
       }
       return Promise.resolve({ rows: [] });
@@ -298,8 +456,10 @@ describe('POST /api/card', () => {
     let failuresLeft = 2;
     dbMock.query.mockImplementation((sql: string) => {
       const s = String(sql).replace(/\s+/g, ' ').trim();
-      if (s.includes('SELECT id, account_id, name, class, level, state')) return Promise.resolve({ rows: characterRows });
-      if (s.includes('SELECT character_id FROM player_cards WHERE slug')) return Promise.resolve({ rows: [] });
+      if (s.includes('SELECT id, account_id, name, class, level, state'))
+        return Promise.resolve({ rows: characterRows });
+      if (s.includes('SELECT character_id FROM player_cards WHERE slug'))
+        return Promise.resolve({ rows: [] });
       if (s.includes('INSERT INTO player_cards')) {
         if (failuresLeft > 0) {
           failuresLeft--;
@@ -340,7 +500,9 @@ describe('POST /api/card', () => {
     characterRows = [{ id: 5, account_id: 1, name: 'Sir Test', class: 'paladin', level: 12 }];
     const { status } = await callUpload('/api/card?character=5', Buffer.from('not a png'));
     expect(status).toBe(400);
-    expect(dbMock.query.mock.calls.some((c) => String(c[0]).includes('INSERT INTO player_cards'))).toBe(false);
+    expect(
+      dbMock.query.mock.calls.some((c) => String(c[0]).includes('INSERT INTO player_cards')),
+    ).toBe(false);
   });
 
   it('rejects a fake magic-header PNG with 400', async () => {
@@ -348,14 +510,18 @@ describe('POST /api/card', () => {
     const { status, data } = await callUpload('/api/card?character=5', fakeMagicHeaderPng);
     expect(status).toBe(400);
     expect(data.error).toBe('expected a PNG image');
-    expect(dbMock.query.mock.calls.some((c) => String(c[0]).includes('INSERT INTO player_cards'))).toBe(false);
+    expect(
+      dbMock.query.mock.calls.some((c) => String(c[0]).includes('INSERT INTO player_cards')),
+    ).toBe(false);
   });
 
   it('rejects a structurally valid PNG with unexpected dimensions', async () => {
     characterRows = [{ id: 5, account_id: 1, name: 'Sir Test', class: 'paladin', level: 12 }];
     const { status } = await callUpload('/api/card?character=5', makePng(32, 32));
     expect(status).toBe(400);
-    expect(dbMock.query.mock.calls.some((c) => String(c[0]).includes('INSERT INTO player_cards'))).toBe(false);
+    expect(
+      dbMock.query.mock.calls.some((c) => String(c[0]).includes('INSERT INTO player_cards')),
+    ).toBe(false);
   });
 
   it('rejects an oversized body with 413 and stores nothing', async () => {
@@ -363,7 +529,9 @@ describe('POST /api/card', () => {
     const huge = Buffer.concat([PNG_MAGIC, Buffer.alloc(4 * 1024 * 1024 + 1)]); // > MAX_CARD_BYTES (4 MB)
     const { status } = await callUpload('/api/card?character=5', huge);
     expect(status).toBe(413);
-    expect(dbMock.query.mock.calls.some((c) => String(c[0]).includes('INSERT INTO player_cards'))).toBe(false);
+    expect(
+      dbMock.query.mock.calls.some((c) => String(c[0]).includes('INSERT INTO player_cards')),
+    ).toBe(false);
   });
 
   it('rejects an oversized Content-Length before reading the body or looking up a character', async () => {
@@ -386,25 +554,44 @@ describe('POST /api/card', () => {
   });
 
   it('rejects a non-integer / non-positive character id with 400 and no lookup', async () => {
-    for (const url of ['/api/card?character=abc', '/api/card?character=0', '/api/card?character=-5', '/api/card?character=1.5']) {
+    for (const url of [
+      '/api/card?character=abc',
+      '/api/card?character=0',
+      '/api/card?character=-5',
+      '/api/card?character=1.5',
+    ]) {
       dbMock.query.mockClear();
       const { status } = await callUpload(url, validCardPng);
       expect(status).toBe(400);
-      expect(dbMock.query.mock.calls.some((c) => String(c[0]).includes('SELECT id, account_id, name, class, level, state'))).toBe(false);
+      expect(
+        dbMock.query.mock.calls.some((c) =>
+          String(c[0]).includes('SELECT id, account_id, name, class, level, state'),
+        ),
+      ).toBe(false);
     }
   });
 });
 
 describe('GET /p/<slug>', () => {
   it('serves an OG page with escaped meta + the og:image', async () => {
-    cardRows = [{ character_id: 5, account_id: 1, png: validCardPng, title: 'A "Quote" <b>', description: 'desc & more' }];
+    cardRows = [
+      {
+        character_id: 5,
+        account_id: 1,
+        png: validCardPng,
+        title: 'A "Quote" <b>',
+        description: 'desc & more',
+      },
+    ];
     const res = makeRes();
     await handleCardRoutes(makeGetReq('/p/sir-test'), res);
     expect(res.statusCode).toBe(200);
     expect(String(res.headers['Content-Type'])).toContain('text/html');
     const html = String(res.body);
     expect(html).toContain('<link rel="canonical" href="http://realm.example/p/sir-test">');
-    expect(html).toContain('property="og:image" content="http://realm.example/p/sir-test/card.png"');
+    expect(html).toContain(
+      'property="og:image" content="http://realm.example/p/sir-test/card.png"',
+    );
     expect(html).toContain('name="twitter:card" content="summary_large_image"');
     expect(html).toContain('src="/p/sir-test/card.png"');
     expect(html).toContain('href="/?ref=sir-test"');
@@ -415,8 +602,70 @@ describe('GET /p/<slug>', () => {
     expect(res.headers['Cache-Control']).toBe('public, max-age=120');
   });
 
+  it('serves a bare (unversioned) og:image when the card has no updated_at', async () => {
+    // No timestamp (e.g. a legacy row) means no cache-buster: the URL stays the
+    // plain /card.png with no ?v=, which is exactly the no-version code path.
+    cardRows = [
+      {
+        character_id: 5,
+        account_id: 1,
+        png: validCardPng,
+        title: 't',
+        description: 'd',
+        locale: 'en',
+      },
+    ];
+    const res = makeRes();
+    await handleCardRoutes(makeGetReq('/p/sir-test'), res);
+    const html = String(res.body);
+    expect(html).toContain(
+      'property="og:image" content="http://realm.example/p/sir-test/card.png"',
+    );
+    expect(html).not.toContain('card.png?v=');
+  });
+
+  it('cache-busts the og:image with the card updated_at so a re-published card is re-fetched', async () => {
+    // Without a version query, X/Discord/browsers keep serving the cached PNG for
+    // the stable /p/<slug>/card.png URL even after a level-up re-publish.
+    const updatedAt = '2026-06-23T19:33:14.000Z';
+    const v = Date.parse(updatedAt);
+    cardRows = [
+      {
+        character_id: 5,
+        account_id: 1,
+        png: validCardPng,
+        title: 't',
+        description: 'd',
+        locale: 'en',
+        updated_at: updatedAt,
+      },
+    ];
+    const res = makeRes();
+    await handleCardRoutes(makeGetReq('/p/sir-test'), res);
+    const html = String(res.body);
+    expect(html).toContain(
+      `property="og:image" content="http://realm.example/p/sir-test/card.png?v=${v}"`,
+    );
+    expect(html).toContain(
+      `name="twitter:image" content="http://realm.example/p/sir-test/card.png?v=${v}"`,
+    );
+    expect(html).toContain(`src="/p/sir-test/card.png?v=${v}"`);
+    // the canonical/page URL itself is never versioned
+    expect(html).toContain('<link rel="canonical" href="http://realm.example/p/sir-test">');
+    expect(html).toContain('property="og:url" content="http://realm.example/p/sir-test"');
+  });
+
   it('renders localized server-side public card copy from the stored card locale', async () => {
-    cardRows = [{ character_id: 5, account_id: 1, png: validCardPng, title: 't', description: 'd', locale: 'es_ES' }];
+    cardRows = [
+      {
+        character_id: 5,
+        account_id: 1,
+        png: validCardPng,
+        title: 't',
+        description: 'd',
+        locale: 'es_ES',
+      },
+    ];
     const res = makeRes();
     await handleCardRoutes(makeGetReq('/p/sir-test'), res);
     const html = String(res.body);
@@ -441,7 +690,9 @@ describe('GET /p/<slug>', () => {
 
   it('has public card wrapper copy for every supported card locale', async () => {
     for (const locale of PUBLIC_CARD_LOCALES) {
-      cardRows = [{ character_id: 5, account_id: 1, png: validCardPng, title: 't', description: 'd', locale }];
+      cardRows = [
+        { character_id: 5, account_id: 1, png: validCardPng, title: 't', description: 'd', locale },
+      ];
       const res = makeRes();
       await handleCardRoutes(makeGetReq('/p/sir-test'), res);
       const html = String(res.body);
@@ -461,9 +712,12 @@ describe('GET /p/<slug>', () => {
   it('uses Accept-Language for missing public card pages when no lang query is present', async () => {
     cardRows = [];
     const res = makeRes();
-    await handleCardRoutes(makeGetReq('/p/nope', {
-      headers: { 'accept-language': 'de-DE;q=0.9,fr-CA;q=0.8,en;q=0.1' },
-    }), res);
+    await handleCardRoutes(
+      makeGetReq('/p/nope', {
+        headers: { 'accept-language': 'de-DE;q=0.9,fr-CA;q=0.8,en;q=0.1' },
+      }),
+      res,
+    );
     const html = String(res.body);
     expect(res.statusCode).toBe(404);
     expect(html).toContain('<html lang="de-DE">');
@@ -471,7 +725,15 @@ describe('GET /p/<slug>', () => {
   });
 
   it('HTML-escapes an apostrophe in the title', async () => {
-    cardRows = [{ character_id: 5, account_id: 1, png: validCardPng, title: "D'Argath the Bold", description: 'd' }];
+    cardRows = [
+      {
+        character_id: 5,
+        account_id: 1,
+        png: validCardPng,
+        title: "D'Argath the Bold",
+        description: 'd',
+      },
+    ];
     const res = makeRes();
     await handleCardRoutes(makeGetReq('/p/sir-test'), res);
     const html = String(res.body);
@@ -480,53 +742,87 @@ describe('GET /p/<slug>', () => {
   });
 
   it('builds an https origin from x-forwarded-proto (Caddy/proxy)', async () => {
-    cardRows = [{ character_id: 5, account_id: 1, png: validCardPng, title: 't', description: 'd' }];
+    cardRows = [
+      { character_id: 5, account_id: 1, png: validCardPng, title: 't', description: 'd' },
+    ];
     const res = makeRes();
-    await handleCardRoutes(makeGetReq('/p/sir-test', { headers: { 'x-forwarded-proto': 'https' } }), res);
+    await handleCardRoutes(
+      makeGetReq('/p/sir-test', { headers: { 'x-forwarded-proto': 'https' } }),
+      res,
+    );
     const html = String(res.body);
-    expect(html).toContain('property="og:image" content="https://realm.example/p/sir-test/card.png"');
+    expect(html).toContain(
+      'property="og:image" content="https://realm.example/p/sir-test/card.png"',
+    );
     expect(html).toContain('src="/p/sir-test/card.png"');
     expect(html).toContain('href="/?ref=sir-test"');
   });
 
   it('builds an https origin from an encrypted socket', async () => {
-    cardRows = [{ character_id: 5, account_id: 1, png: validCardPng, title: 't', description: 'd' }];
+    cardRows = [
+      { character_id: 5, account_id: 1, png: validCardPng, title: 't', description: 'd' },
+    ];
     const res = makeRes();
     await handleCardRoutes(makeGetReq('/p/sir-test', { socket: { encrypted: true } }), res);
-    expect(String(res.body)).toContain('property="og:url" content="https://realm.example/p/sir-test"');
+    expect(String(res.body)).toContain(
+      'property="og:url" content="https://realm.example/p/sir-test"',
+    );
   });
 
   it('uses PUBLIC_ORIGIN for canonical URLs instead of hostile Host and forwarded proto', async () => {
-    await withReloadedCardRoutes({ PUBLIC_ORIGIN: 'https://cards.example.com/' }, async (routes) => {
-      cardRows = [{ character_id: 5, account_id: 1, png: validCardPng, title: 't', description: 'd' }];
-      const res = makeRes();
-      await routes(makeGetReq('/p/sir-test', {
-        headers: { host: 'evil.example', 'x-forwarded-proto': 'javascript' },
-      }), res);
-      const html = String(res.body);
-      expect(res.statusCode).toBe(200);
-      expect(html).toContain('<link rel="canonical" href="https://cards.example.com/p/sir-test">');
-      expect(html).toContain('property="og:url" content="https://cards.example.com/p/sir-test"');
-      expect(html).toContain('property="og:image" content="https://cards.example.com/p/sir-test/card.png"');
-      expect(html).toContain('src="/p/sir-test/card.png"');
-      expect(html).toContain('href="/?ref=sir-test"');
-      expect(html).not.toContain('evil.example');
-      expect(html).not.toContain('javascript://');
-    });
+    await withReloadedCardRoutes(
+      { PUBLIC_ORIGIN: 'https://cards.example.com/' },
+      async (routes) => {
+        cardRows = [
+          { character_id: 5, account_id: 1, png: validCardPng, title: 't', description: 'd' },
+        ];
+        const res = makeRes();
+        await routes(
+          makeGetReq('/p/sir-test', {
+            headers: { host: 'evil.example', 'x-forwarded-proto': 'javascript' },
+          }),
+          res,
+        );
+        const html = String(res.body);
+        expect(res.statusCode).toBe(200);
+        expect(html).toContain(
+          '<link rel="canonical" href="https://cards.example.com/p/sir-test">',
+        );
+        expect(html).toContain('property="og:url" content="https://cards.example.com/p/sir-test"');
+        expect(html).toContain(
+          'property="og:image" content="https://cards.example.com/p/sir-test/card.png"',
+        );
+        expect(html).toContain('src="/p/sir-test/card.png"');
+        expect(html).toContain('href="/?ref=sir-test"');
+        expect(html).not.toContain('evil.example');
+        expect(html).not.toContain('javascript://');
+      },
+    );
   });
 
   it('uses a stable production origin instead of hostile headers when no public origin is configured', async () => {
     await withReloadedCardRoutes({ NODE_ENV: 'production' }, async (routes) => {
-      cardRows = [{ character_id: 5, account_id: 1, png: validCardPng, title: 't', description: 'd' }];
+      cardRows = [
+        { character_id: 5, account_id: 1, png: validCardPng, title: 't', description: 'd' },
+      ];
       const res = makeRes();
-      await routes(makeGetReq('/p/sir-test', {
-        headers: { host: 'evil.example', 'x-forwarded-proto': 'javascript' },
-      }), res);
+      await routes(
+        makeGetReq('/p/sir-test', {
+          headers: { host: 'evil.example', 'x-forwarded-proto': 'javascript' },
+        }),
+        res,
+      );
       const html = String(res.body);
       expect(res.statusCode).toBe(200);
-      expect(html).toContain('<link rel="canonical" href="https://worldofclaudecraft.com/p/sir-test">');
-      expect(html).toContain('property="og:url" content="https://worldofclaudecraft.com/p/sir-test"');
-      expect(html).toContain('property="og:image" content="https://worldofclaudecraft.com/p/sir-test/card.png"');
+      expect(html).toContain(
+        '<link rel="canonical" href="https://worldofclaudecraft.com/p/sir-test">',
+      );
+      expect(html).toContain(
+        'property="og:url" content="https://worldofclaudecraft.com/p/sir-test"',
+      );
+      expect(html).toContain(
+        'property="og:image" content="https://worldofclaudecraft.com/p/sir-test/card.png"',
+      );
       expect(html).toContain('src="/p/sir-test/card.png"');
       expect(html).toContain('href="/?ref=sir-test"');
       expect(html).not.toContain('evil.example');
@@ -536,44 +832,72 @@ describe('GET /p/<slug>', () => {
 
   it('uses the trusted dev host in production mode instead of the production fallback', async () => {
     await withReloadedCardRoutes({ NODE_ENV: 'production' }, async (routes) => {
-      cardRows = [{ character_id: 5, account_id: 1, png: validCardPng, title: 't', description: 'd' }];
+      cardRows = [
+        { character_id: 5, account_id: 1, png: validCardPng, title: 't', description: 'd' },
+      ];
       const res = makeRes();
-      await routes(makeGetReq('/p/sir-test', {
-        headers: { host: 'dev.worldofclaudecraft.com', 'x-forwarded-proto': 'https' },
-      }), res);
+      await routes(
+        makeGetReq('/p/sir-test', {
+          headers: { host: 'dev.worldofclaudecraft.com', 'x-forwarded-proto': 'https' },
+        }),
+        res,
+      );
       const html = String(res.body);
       expect(res.statusCode).toBe(200);
-      expect(html).toContain('<link rel="canonical" href="https://dev.worldofclaudecraft.com/p/sir-test">');
-      expect(html).toContain('property="og:url" content="https://dev.worldofclaudecraft.com/p/sir-test"');
-      expect(html).toContain('property="og:image" content="https://dev.worldofclaudecraft.com/p/sir-test/card.png"');
+      expect(html).toContain(
+        '<link rel="canonical" href="https://dev.worldofclaudecraft.com/p/sir-test">',
+      );
+      expect(html).toContain(
+        'property="og:url" content="https://dev.worldofclaudecraft.com/p/sir-test"',
+      );
+      expect(html).toContain(
+        'property="og:image" content="https://dev.worldofclaudecraft.com/p/sir-test/card.png"',
+      );
       expect(html).toContain('src="/p/sir-test/card.png"');
       expect(html).toContain('href="/?ref=sir-test"');
     });
   });
 
   it('uses the matching REALMS origin for canonical URLs instead of hostile headers', async () => {
-    await withReloadedCardRoutes({
-      REALM_NAME: 'Ironforge',
-      REALMS: 'Claudemoon=https://claudemoon.example.com=Normal,Ironforge=https://ironforge.example.com=PvP',
-    }, async (routes) => {
-      cardRows = [{ character_id: 5, account_id: 1, png: validCardPng, title: 't', description: 'd' }];
-      const res = makeRes();
-      await routes(makeGetReq('/p/sir-test', {
-        headers: { host: 'evil.example', 'x-forwarded-proto': 'http' },
-      }), res);
-      const html = String(res.body);
-      expect(res.statusCode).toBe(200);
-      expect(html).toContain('<link rel="canonical" href="https://ironforge.example.com/p/sir-test">');
-      expect(html).toContain('property="og:url" content="https://ironforge.example.com/p/sir-test"');
-      expect(html).toContain('property="og:image" content="https://ironforge.example.com/p/sir-test/card.png"');
-      expect(html).toContain('src="/p/sir-test/card.png"');
-      expect(html).toContain('href="/?ref=sir-test"');
-      expect(html).not.toContain('evil.example');
-    });
+    await withReloadedCardRoutes(
+      {
+        REALM_NAME: 'Ironforge',
+        REALMS:
+          'Claudemoon=https://claudemoon.example.com=Normal,Ironforge=https://ironforge.example.com=PvP',
+      },
+      async (routes) => {
+        cardRows = [
+          { character_id: 5, account_id: 1, png: validCardPng, title: 't', description: 'd' },
+        ];
+        const res = makeRes();
+        await routes(
+          makeGetReq('/p/sir-test', {
+            headers: { host: 'evil.example', 'x-forwarded-proto': 'http' },
+          }),
+          res,
+        );
+        const html = String(res.body);
+        expect(res.statusCode).toBe(200);
+        expect(html).toContain(
+          '<link rel="canonical" href="https://ironforge.example.com/p/sir-test">',
+        );
+        expect(html).toContain(
+          'property="og:url" content="https://ironforge.example.com/p/sir-test"',
+        );
+        expect(html).toContain(
+          'property="og:image" content="https://ironforge.example.com/p/sir-test/card.png"',
+        );
+        expect(html).toContain('src="/p/sir-test/card.png"');
+        expect(html).toContain('href="/?ref=sir-test"');
+        expect(html).not.toContain('evil.example');
+      },
+    );
   });
 
   it('serves the OG page with a trailing slash', async () => {
-    cardRows = [{ character_id: 5, account_id: 1, png: validCardPng, title: 't', description: 'd' }];
+    cardRows = [
+      { character_id: 5, account_id: 1, png: validCardPng, title: 't', description: 'd' },
+    ];
     const res = makeRes();
     await handleCardRoutes(makeGetReq('/p/sir-test/'), res);
     expect(res.statusCode).toBe(200);
@@ -583,7 +907,8 @@ describe('GET /p/<slug>', () => {
   it('returns 500 when the card metadata lookup throws', async () => {
     dbMock.query.mockImplementation((sql: string) => {
       const s = String(sql).replace(/\s+/g, ' ');
-      if (s.includes('SELECT title, description, locale')) return Promise.reject(new Error('db down'));
+      if (s.includes('SELECT title, description, locale'))
+        return Promise.reject(new Error('db down'));
       return Promise.resolve({ rows: [] });
     });
     const res = makeRes();
@@ -592,7 +917,9 @@ describe('GET /p/<slug>', () => {
   });
 
   it('serves the PNG bytes with image/png', async () => {
-    cardRows = [{ character_id: 5, account_id: 1, png: validCardPng, title: 't', description: 'd' }];
+    cardRows = [
+      { character_id: 5, account_id: 1, png: validCardPng, title: 't', description: 'd' },
+    ];
     const res = makeRes();
     await handleCardRoutes(makeGetReq('/p/sir-test/card.png'), res);
     expect(res.statusCode).toBe(200);
@@ -621,8 +948,13 @@ describe('GET /p/<slug>', () => {
     expect(res.body).toBe('not found');
     expect(res.headers['Content-Type']).not.toBe('image/png');
     // a card-lookup query DID run (the slug was valid), but nothing was served
-    expect(dbMock.query.mock.calls.some((c) =>
-      String(c[0]).includes('SELECT character_id, account_id, png, title, description, locale FROM player_cards'))).toBe(true);
+    expect(
+      dbMock.query.mock.calls.some((c) =>
+        String(c[0]).includes(
+          'SELECT character_id, account_id, png, title, description, locale FROM player_cards',
+        ),
+      ),
+    ).toBe(true);
   });
 
   it('404s an invalid slug without touching the database', async () => {
@@ -658,7 +990,9 @@ describe('lifetimeXpStanding', () => {
     const sql = String(dbMock.query.mock.calls[0]?.[0]).replace(/\s+/g, ' ').trim();
     expect(sql).toContain("WHERE realm = $1 AND ((state->>'lifetimeXp')::bigint) > own.xp");
     expect(sql).toContain("FROM (SELECT COALESCE(((state->>'lifetimeXp')::bigint), 0) AS xp");
-    expect(sql).not.toContain("WHERE realm = $1 AND COALESCE((state->>'lifetimeXp')::bigint, 0) > own.xp");
+    expect(sql).not.toContain(
+      "WHERE realm = $1 AND COALESCE((state->>'lifetimeXp')::bigint, 0) > own.xp",
+    );
   });
 
   it('returns 1-based rank + realm total for an owned character', async () => {
@@ -699,13 +1033,17 @@ describe('captureReferral', () => {
   it('ignores a self-referral', async () => {
     accountForSlugRows = [{ account_id: 42 }];
     await captureReferral(42, 'sir-test');
-    expect(dbMock.query.mock.calls.some((c) => String(c[0]).includes('INSERT INTO referrals'))).toBe(false);
+    expect(
+      dbMock.query.mock.calls.some((c) => String(c[0]).includes('INSERT INTO referrals')),
+    ).toBe(false);
   });
 
   it('ignores an unknown slug', async () => {
     accountForSlugRows = [];
     await captureReferral(42, 'ghost');
-    expect(dbMock.query.mock.calls.some((c) => String(c[0]).includes('INSERT INTO referrals'))).toBe(false);
+    expect(
+      dbMock.query.mock.calls.some((c) => String(c[0]).includes('INSERT INTO referrals')),
+    ).toBe(false);
   });
 
   it('ignores an invalid/empty ref without querying', async () => {

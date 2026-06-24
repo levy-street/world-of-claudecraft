@@ -1,0 +1,171 @@
+{
+  "class": "druid",
+  "license": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+  "iconSize": 128,
+  "sourcePack": "tmp/asset_src/druid-skill-game-icons (CraftPix premium)",
+  "runtimeDir": "public/ui/skills/druid",
+  "abilities": [
+    {
+      "abilityId": "wrath",
+      "sourceFile": "49.png",
+      "output": "wrath.png"
+    },
+    {
+      "abilityId": "healing_touch",
+      "sourceFile": "2.png",
+      "output": "healing_touch.png"
+    },
+    {
+      "abilityId": "mark_of_the_wild",
+      "sourceFile": "4.png",
+      "output": "mark_of_the_wild.png"
+    },
+    {
+      "abilityId": "rejuvenation",
+      "sourceFile": "50.png",
+      "output": "rejuvenation.png"
+    },
+    {
+      "abilityId": "thorns",
+      "sourceFile": "17.png",
+      "output": "thorns.png"
+    },
+    {
+      "abilityId": "entangling_roots",
+      "sourceFile": "18.png",
+      "output": "entangling_roots.png"
+    },
+    {
+      "abilityId": "bear_form",
+      "sourceFile": "13.png",
+      "output": "bear_form.png"
+    },
+    {
+      "abilityId": "maul",
+      "sourceFile": "9.png",
+      "output": "maul.png"
+    },
+    {
+      "abilityId": "growl",
+      "sourceFile": "42.png",
+      "output": "growl.png"
+    },
+    {
+      "abilityId": "cat_form",
+      "sourceFile": "44.png",
+      "output": "cat_form.png"
+    },
+    {
+      "abilityId": "prowl",
+      "sourceFile": "41.png",
+      "output": "prowl.png"
+    },
+    {
+      "abilityId": "rake",
+      "sourceFile": "10.png",
+      "output": "rake.png"
+    },
+    {
+      "abilityId": "claw",
+      "sourceFile": "46.png",
+      "output": "claw.png"
+    },
+    {
+      "abilityId": "regrowth",
+      "sourceFile": "16.png",
+      "output": "regrowth.png"
+    },
+    {
+      "abilityId": "ferocious_bite",
+      "sourceFile": "22.png",
+      "output": "ferocious_bite.png"
+    },
+    {
+      "abilityId": "barkskin",
+      "sourceFile": "24.png",
+      "output": "barkskin.png"
+    },
+    {
+      "abilityId": "swipe",
+      "sourceFile": "1.png",
+      "output": "swipe.png"
+    },
+    {
+      "abilityId": "starfire",
+      "sourceFile": "11.png",
+      "output": "starfire.png"
+    },
+    {
+      "abilityId": "travel_form",
+      "sourceFile": "30.png",
+      "output": "travel_form.png"
+    },
+    {
+      "abilityId": "enrage",
+      "sourceFile": "39.png",
+      "output": "enrage.png"
+    },
+    {
+      "abilityId": "bash",
+      "sourceFile": "29.png",
+      "output": "bash.png"
+    },
+    {
+      "abilityId": "faerie_fire",
+      "sourceFile": "5.png",
+      "output": "faerie_fire.png"
+    },
+    {
+      "abilityId": "dash",
+      "sourceFile": "31.png",
+      "output": "dash.png"
+    },
+    {
+      "abilityId": "tigers_fury",
+      "sourceFile": "38.png",
+      "output": "tigers_fury.png"
+    },
+    {
+      "abilityId": "rip",
+      "sourceFile": "32.png",
+      "output": "rip.png"
+    },
+    {
+      "abilityId": "moonfire",
+      "sourcePack": "generic-skill100",
+      "sourceFile": "skill icon 13.png",
+      "output": "moonfire.png"
+    },
+    {
+      "abilityId": "demoralizing_roar",
+      "sourcePack": "generic-rpg100",
+      "sourceFile": "skill 6.png",
+      "output": "demoralizing_roar.png"
+    },
+    {
+      "abilityId": "insect_swarm",
+      "sourcePack": "generic-rpg100",
+      "sourceFile": "skill 71.png",
+      "output": "insect_swarm.png"
+    },
+    {
+      "abilityId": "bear_charge",
+      "sourcePack": "_Missing_Icons_Druid",
+      "sourceFile": "skill 54.png",
+      "output": "bear_charge.png"
+    },
+    {
+      "abilityId": "hibernate",
+      "sourcePack": "_Missing_Icons_Druid",
+      "sourceFile": "skill 7.png",
+      "output": "hibernate.png"
+    },
+    {
+      "abilityId": "pounce",
+      "sourcePack": "_Missing_Icons_Druid",
+      "sourceFile": "skill 37.png",
+      "output": "pounce.png"
+    }
+  ],
+  "deferredStayProcedural": {}
+}

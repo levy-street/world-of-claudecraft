@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock the db layer so no Postgres is needed; snapshot logic is under test.
 vi.mock('../server/db', () => ({
@@ -7,16 +7,33 @@ vi.mock('../server/db', () => ({
   openPlaySession: vi.fn(async () => 1),
   closePlaySession: vi.fn(async () => {}),
   insertChatLogs: vi.fn(async () => {}),
+  walletForAccount: vi.fn(async () => null),
   markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
 }));
 
-import { GameServer, ClientSession } from '../server/game';
 import { saveCharacterState } from '../server/db';
+import { type ClientSession, GameServer, wireEntity } from '../server/game';
 import { ClientWorld } from '../src/net/online';
+import { DELVES } from '../src/sim/data';
+import { Sim } from '../src/sim/sim';
 import { DT, type PlayerClass } from '../src/sim/types';
+import { terrainHeight } from '../src/sim/world';
 
-const DELTA_KEYS = ['inv', 'buyback', 'equip', 'qlog', 'qdone', 'cds', 'stats', 'weapon', 'party', 'trade', 'duel'];
+const DELTA_KEYS = [
+  'inv',
+  'buyback',
+  'equip',
+  'qlog',
+  'qdone',
+  'lockouts',
+  'cds',
+  'stats',
+  'weapon',
+  'party',
+  'trade',
+  'duel',
+];
 
 interface FakeClient {
   sent: any[];
@@ -35,7 +52,13 @@ function lastSnap(sent: any[]): any {
   return null;
 }
 
-function joinServer(server: GameServer, fc: FakeClient, characterId: number, name: string, cls: PlayerClass = 'warrior'): ClientSession {
+function joinServer(
+  server: GameServer,
+  fc: FakeClient,
+  characterId: number,
+  name: string,
+  cls: PlayerClass = 'warrior',
+): ClientSession {
   const session = server.join(fc.ws, characterId, characterId, name, cls, null);
   if ('error' in session) throw new Error(session.error);
   session.blockListLoaded = true;
@@ -44,7 +67,7 @@ function joinServer(server: GameServer, fc: FakeClient, characterId: number, nam
 
 function eventTexts(sent: any[]): string[] {
   return sent
-    .flatMap((msg) => msg.t === 'events' ? msg.list : [])
+    .flatMap((msg) => (msg.t === 'events' ? msg.list : []))
     .filter((ev) => ev.type === 'log' || ev.type === 'error')
     .map((ev) => ev.text);
 }
@@ -75,6 +98,7 @@ function bareClient(pid: number): ClientWorld {
   c.duelInfo = null;
   c.lastSnapAt = 0;
   c.snapInterval = 50;
+  c.missingSince = new Map();
   c.pendingFacingDelta = 0;
   c.connected = true;
   c.eventQueue = [];
@@ -87,6 +111,45 @@ function bareClient(pid: number): ClientWorld {
   c.inputEchoSamples = [];
   return c;
 }
+
+describe('raid lockouts over the wire', () => {
+  it('ships a granted lockout in self.lockouts and ClientWorld mirrors it end to end', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Locked');
+    const sim = (server as any).sim;
+    const meta = sim.players.get(session.pid);
+    const until = Date.now() + 5 * 60 * 60 * 1000;
+    meta.raidLockouts.set('nythraxis_boss_arena', until);
+
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.lockouts).toEqual({ nythraxis_boss_arena: until });
+
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(snap);
+    const out = client.raidLockouts();
+    expect(out.map((l) => l.id)).toEqual(['nythraxis_boss_arena']);
+    expect(out[0].msRemaining).toBeGreaterThan(5 * 60 * 60 * 1000 - 5000);
+  });
+
+  it('clears the client lockout once the server-side entry has expired', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Expiring');
+    const sim = (server as any).sim;
+    const meta = sim.players.get(session.pid);
+    meta.raidLockouts.set('nythraxis_boss_arena', Date.now() - 1000); // already past
+
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.lockouts).toEqual({}); // server filters to future-only
+
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(snap);
+    expect(client.raidLockouts()).toEqual([]);
+  });
+});
 
 describe('delta snapshots', () => {
   let server: GameServer;
@@ -116,7 +179,10 @@ describe('delta snapshots', () => {
     const server = new GameServer();
     const fc = fakeWs();
     const joined = server.join(fc.ws, 1, 1, 'Cosmetic', 'warrior', null, false, {
-      accountCosmetics: { completedQuestIds: ['q_aldrics_fallen_star'], mechChromaIds: ['amber_crimson'] },
+      accountCosmetics: {
+        completedQuestIds: ['q_aldrics_fallen_star'],
+        mechChromaIds: ['amber_crimson'],
+      },
     });
     if ('error' in joined) throw new Error(joined.error);
     const session = joined;
@@ -180,6 +246,31 @@ describe('delta snapshots', () => {
     expect(client.player.swingTimer).toBeCloseTo(1.7, 1);
   });
 
+  it('includes live aura and movement diagnostics in admin online rows', () => {
+    const druidServer = new GameServer();
+    const fc = fakeWs();
+    const druid = joinServer(druidServer, fc, 10, 'Newkali', 'druid');
+    const player = druidServer.sim.entities.get(druid.pid)!;
+    druidServer.sim.setPlayerLevel(20, druid.pid);
+    player.resource = player.maxResource;
+
+    druidServer.sim.castAbility('travel_form', druid.pid);
+    druidServer.sim.tick();
+
+    const row = druidServer.liveSessions().find((p) => p.characterId === 10)!;
+    expect(row.moveSpeedMultiplier).toBeCloseTo(1.4);
+    expect(row.runSpeed).toBeCloseTo(9.8);
+    expect(row.swimming).toBe(false);
+    expect(row.auras).toContainEqual(
+      expect.objectContaining({
+        id: 'travel_form',
+        name: 'Travel Form',
+        kind: 'form_travel',
+        value: 1.4,
+      }),
+    );
+  });
+
   it('sell command forwards bounded stack quantities', () => {
     const player = server.sim.entities.get(session.pid)!;
     const vendor = [...server.sim.entities.values()].find((e) => e.templateId === 'trader_wilkes')!;
@@ -187,12 +278,18 @@ describe('delta snapshots', () => {
     player.prevPos = { ...player.pos };
     server.sim.addItem('wolf_fang', 5, session.pid);
 
-    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'sell', item: 'wolf_fang', count: 3 }));
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'sell', item: 'wolf_fang', count: 3 }),
+    );
 
     expect(server.sim.meta(session.pid)?.copper).toBe(12);
     expect(server.sim.countItem('wolf_fang', session.pid)).toBe(2);
 
-    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'sell', item: 'wolf_fang', count: 99 }));
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'sell', item: 'wolf_fang', count: 99 }),
+    );
 
     expect(server.sim.meta(session.pid)?.copper).toBe(20);
     expect(server.sim.countItem('wolf_fang', session.pid)).toBe(0);
@@ -205,7 +302,10 @@ describe('delta snapshots', () => {
     broadcast(server);
     fc.sent.length = 0;
 
-    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'discard', item: 'widow_venom_sac', count: 2 }));
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'discard', item: 'widow_venom_sac', count: 2 }),
+    );
     broadcast(server);
 
     expect(server.sim.countItem('widow_venom_sac', session.pid)).toBe(4);
@@ -229,7 +329,19 @@ describe('delta snapshots', () => {
 
   it('turns echoed input acks into client latency samples', () => {
     const client = bareClient(1);
-    const first = { id: 1, k: 'player', tid: 'player', nm: 'Testa', lv: 1, x: 0, y: 0, z: 0, f: 0, hp: 100, mhp: 100 };
+    const first = {
+      id: 1,
+      k: 'player',
+      tid: 'player',
+      nm: 'Testa',
+      lv: 1,
+      x: 0,
+      y: 0,
+      z: 0,
+      f: 0,
+      hp: 100,
+      mhp: 100,
+    };
     (client as any).pendingInputSeqSentAt.set(1, 100);
     (client as any).pendingInputSeqSentAt.set(2, 140);
 
@@ -248,12 +360,33 @@ describe('delta snapshots', () => {
   it('snaps a dead mob to its respawn pose instead of interpolating from the corpse', () => {
     const client = bareClient(1);
     const corpse = {
-      id: 99, k: 'mob', tid: 'forest_wolf', nm: 'Forest Wolf', lv: 1,
-      x: 0, y: 0, z: 0, f: 0, hp: 0, mhp: 45, dead: true, h: true,
+      id: 99,
+      k: 'mob',
+      tid: 'forest_wolf',
+      nm: 'Forest Wolf',
+      lv: 1,
+      x: 0,
+      y: 0,
+      z: 0,
+      f: 0,
+      hp: 0,
+      mhp: 45,
+      dead: true,
+      h: true,
     };
     const respawned = {
-      id: 99, tid: 'forest_wolf', nm: 'Forest Wolf', lv: 1,
-      x: 10, y: 0, z: 0, f: 0, hp: 45, mhp: 45, dead: false, h: true,
+      id: 99,
+      tid: 'forest_wolf',
+      nm: 'Forest Wolf',
+      lv: 1,
+      x: 10,
+      y: 0,
+      z: 0,
+      f: 0,
+      hp: 45,
+      mhp: 45,
+      dead: false,
+      h: true,
     };
 
     const oldPerf = (globalThis as any).performance;
@@ -298,7 +431,10 @@ describe('delta snapshots', () => {
     expect(client.consumeInventoryChanged()).toBe(true);
 
     fc.sent.length = 0;
-    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'sell', item: 'apprentice_staff' }));
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'sell', item: 'apprentice_staff' }),
+    );
     broadcast(server);
     const snap = lastSnap(fc.sent);
     expect(snap.self).toHaveProperty('buyback');
@@ -317,7 +453,10 @@ describe('delta snapshots', () => {
     // unknown quest: the sim rejects it and quest state does not change, but
     // the next snapshot must still carry quest fields so stale client UI
     // converges back to the server's truth
-    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'accept', quest: 'no_such_quest' }));
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'accept', quest: 'no_such_quest' }),
+    );
     broadcast(server);
     const snap = lastSnap(fc.sent);
     expect(snap.self).toHaveProperty('qlog');
@@ -353,6 +492,55 @@ describe('delta snapshots', () => {
     expect(snapOld.self).not.toHaveProperty('inv');
     // both players spawn together, so each sees the other in ents
     expect(snapNew.ents.some((e: any) => e.id === session.pid)).toBe(true);
+  });
+});
+
+describe('raid party wire', () => {
+  let server: GameServer;
+  let fcLeader: FakeClient;
+  let leader: ClientSession;
+  let fcMember: FakeClient;
+  let member: ClientSession;
+
+  beforeEach(() => {
+    server = new GameServer();
+    fcLeader = fakeWs();
+    leader = joinServer(server, fcLeader, 1, 'Leada');
+    fcMember = fakeWs();
+    member = joinServer(server, fcMember, 2, 'Memba');
+    // Form a party, then mark it a raid and split into two subgroups. The
+    // convert-to-raid command gates on a full five-player party, so we set the
+    // raid state directly: this test pins the WIRE serialization, not that gate.
+    const sim = server.sim;
+    sim.partyInvite(member.pid, leader.pid);
+    sim.partyAccept(member.pid);
+    const party = (sim as any).partyOf(leader.pid);
+    party.raid = true;
+    party.raidGroups.set(member.pid, 2);
+  });
+
+  it('self.party wire carries the raid flag and per-member subgroup', () => {
+    broadcast(server);
+    const snap = lastSnap(fcLeader.sent);
+    expect(snap.self.party).not.toBeNull();
+    // The raid flag must survive the wire so the HUD renders the raid roster.
+    expect(snap.self.party.raid).toBe(true);
+    // Every member must carry its subgroup so the social panel can bucket them.
+    for (const m of snap.self.party.members) {
+      expect(m, `member ${m.pid} missing group`).toHaveProperty('group');
+    }
+    const memberGroup = snap.self.party.members.find((m: any) => m.pid === member.pid)?.group;
+    expect(memberGroup).toBe(2);
+  });
+
+  it('online ClientWorld mirrors raid roster from the wire', () => {
+    broadcast(server);
+    const snap = lastSnap(fcLeader.sent);
+    const client = bareClient(leader.pid);
+    (client as any).applySnapshot(snap);
+    expect(client.partyInfo).not.toBeNull();
+    expect(client.partyInfo?.raid).toBe(true);
+    expect(client.partyInfo?.members.find((m) => m.pid === member.pid)?.group).toBe(2);
   });
 });
 
@@ -434,11 +622,14 @@ describe('online movement input lifetime', () => {
     const fc = fakeWs();
     const session = joinServer(server, fc, 1, 'Spinner');
 
-    server.handleMessage(session, JSON.stringify({
-      t: 'input',
-      seq: 1,
-      mi: { f: 0, b: 0, tl: 1, tr: 0, sl: 0, sr: 0, j: 0 },
-    }));
+    server.handleMessage(
+      session,
+      JSON.stringify({
+        t: 'input',
+        seq: 1,
+        mi: { f: 0, b: 0, tl: 1, tr: 0, sl: 0, sr: 0, j: 0 },
+      }),
+    );
     const meta = server.sim.meta(session.pid)!;
     expect(meta.moveInput.turnLeft).toBe(true);
 
@@ -464,12 +655,14 @@ describe('chat moderation', () => {
     }
     (server as any).routeEvents(server.sim.tick());
 
-    const events = fc.sent.flatMap((msg) => msg.t === 'events' ? msg.list : []);
+    const events = fc.sent.flatMap((msg) => (msg.t === 'events' ? msg.list : []));
     expect(events.filter((ev) => ev.type === 'chat')).toHaveLength(5);
-    expect(events).toContainEqual(expect.objectContaining({
-      type: 'error',
-      text: 'You are sending messages too quickly. Slow down.',
-    }));
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        type: 'error',
+        text: 'You are sending messages too quickly. Slow down.',
+      }),
+    );
   });
 
   it('locks chat for 20 seconds after repeated over-limit messages', () => {
@@ -483,58 +676,87 @@ describe('chat moderation', () => {
     }
     (server as any).routeEvents(server.sim.tick());
 
-    const events = fc.sent.flatMap((msg) => msg.t === 'events' ? msg.list : []);
+    const events = fc.sent.flatMap((msg) => (msg.t === 'events' ? msg.list : []));
     expect(events.filter((ev) => ev.type === 'chat')).toHaveLength(5);
-    expect(events).toContainEqual(expect.objectContaining({
-      type: 'error',
-      text: 'Chat locked for 20s because you are sending messages too quickly.',
-    }));
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        type: 'error',
+        text: 'Chat locked for 20s because you are sending messages too quickly.',
+      }),
+    );
   });
 
   it('blocks hard-word (slur) messages and escalates warning -> mute', () => {
     const server = new GameServer();
-    server.chatFilter.load({ soft: [], hard: ['slurword'], config: { warningsBeforeMute: 1, muteLadderSeconds: [600] } });
+    server.chatFilter.load({
+      soft: [],
+      hard: ['slurword'],
+      config: { warningsBeforeMute: 1, muteLadderSeconds: [600] },
+    });
     const fc = fakeWs();
     const session = joinServer(server, fc, 1, 'Testa');
 
     // First offense: blocked entirely + warning; it never becomes a chat event.
     fc.sent.length = 0;
-    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'chat', text: 'you are a slurword' }));
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'chat', text: 'you are a slurword' }),
+    );
     (server as any).routeEvents(server.sim.tick());
-    let events = fc.sent.flatMap((msg) => msg.t === 'events' ? msg.list : []);
+    let events = fc.sent.flatMap((msg) => (msg.t === 'events' ? msg.list : []));
     expect(events.some((ev) => ev.type === 'chat')).toBe(false);
-    expect(events).toContainEqual(expect.objectContaining({ type: 'error', text: expect.stringContaining('Warning') }));
+    expect(events).toContainEqual(
+      expect.objectContaining({ type: 'error', text: expect.stringContaining('Warning') }),
+    );
 
     // Second offense: escalates to a timed mute.
     fc.sent.length = 0;
-    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'chat', text: 'slurword strikes again' }));
-    events = fc.sent.flatMap((msg) => msg.t === 'events' ? msg.list : []);
-    expect(events).toContainEqual(expect.objectContaining({ type: 'error', text: expect.stringContaining('muted') }));
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'chat', text: 'slurword strikes again' }),
+    );
+    events = fc.sent.flatMap((msg) => (msg.t === 'events' ? msg.list : []));
+    expect(events).toContainEqual(
+      expect.objectContaining({ type: 'error', text: expect.stringContaining('muted') }),
+    );
 
     // Now muted: even a clean message is dropped until the mute expires.
     fc.sent.length = 0;
-    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'chat', text: 'hello everyone' }));
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'chat', text: 'hello everyone' }),
+    );
     (server as any).routeEvents(server.sim.tick());
-    events = fc.sent.flatMap((msg) => msg.t === 'events' ? msg.list : []);
+    events = fc.sent.flatMap((msg) => (msg.t === 'events' ? msg.list : []));
     expect(events.some((ev) => ev.type === 'chat')).toBe(false);
-    expect(events).toContainEqual(expect.objectContaining({ type: 'error', text: expect.stringContaining('muted') }));
+    expect(events).toContainEqual(
+      expect.objectContaining({ type: 'error', text: expect.stringContaining('muted') }),
+    );
   });
 
   it('leaves soft (cosmetic) words untouched server-side — clients mask them', () => {
     const server = new GameServer();
-    server.chatFilter.load({ soft: ['darn'], hard: [], config: { warningsBeforeMute: 1, muteLadderSeconds: [600] } });
+    server.chatFilter.load({
+      soft: ['darn'],
+      hard: [],
+      config: { warningsBeforeMute: 1, muteLadderSeconds: [600] },
+    });
     const fc = fakeWs();
     const session = joinServer(server, fc, 1, 'Testa');
     fc.sent.length = 0;
     server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'chat', text: 'oh darn it' }));
     (server as any).routeEvents(server.sim.tick());
-    const events = fc.sent.flatMap((msg) => msg.t === 'events' ? msg.list : []);
+    const events = fc.sent.flatMap((msg) => (msg.t === 'events' ? msg.list : []));
     expect(events).toContainEqual(expect.objectContaining({ type: 'chat', text: 'oh darn it' }));
   });
 
   it('ships the soft word list to clients in the hello payload', () => {
     const server = new GameServer();
-    server.chatFilter.load({ soft: ['darn', 'heck'], hard: ['slurword'], config: { warningsBeforeMute: 1, muteLadderSeconds: [600] } });
+    server.chatFilter.load({
+      soft: ['darn', 'heck'],
+      hard: ['slurword'],
+      config: { warningsBeforeMute: 1, muteLadderSeconds: [600] },
+    });
     const fc = fakeWs();
     joinServer(server, fc, 1, 'Testa');
     const hello = fc.sent.find((msg) => msg.t === 'hello');
@@ -542,7 +764,6 @@ describe('chat moderation', () => {
     // Hard words are enforcement-only and must never be shipped to the client.
     expect(JSON.stringify(hello)).not.toContain('slurword');
   });
-
 });
 
 describe('autosaves', () => {
@@ -656,7 +877,9 @@ describe('/who command', () => {
 
     server.handleMessage(self, JSON.stringify({ t: 'cmd', cmd: 'chat', text: '/who' }));
 
-    expect(eventTexts(fc.sent)).toContain('Your ignore list is still loading. Try /who again in a moment.');
+    expect(eventTexts(fc.sent)).toContain(
+      'Your ignore list is still loading. Try /who again in a moment.',
+    );
   });
 
   it('omits players whose own ignore list is still loading', () => {
@@ -680,7 +903,10 @@ describe('client-side delta merge', () => {
   it('does not apply optimistic quest accept or completion state', () => {
     const client = bareClient(1);
     const sent: any[] = [];
-    (client as any).ws = { readyState: 1, send: (payload: string) => sent.push(JSON.parse(payload)) };
+    (client as any).ws = {
+      readyState: 1,
+      send: (payload: string) => sent.push(JSON.parse(payload)),
+    };
     const oldWebSocket = (globalThis as any).WebSocket;
     (globalThis as any).WebSocket = { OPEN: 1 };
     try {
@@ -704,13 +930,26 @@ describe('client-side delta merge', () => {
   it('flushes changed movement immediately without resending unchanged frames', () => {
     const client = bareClient(1);
     const sent: any[] = [];
-    (client as any).ws = { readyState: 1, send: (payload: string) => sent.push(JSON.parse(payload)) };
+    (client as any).ws = {
+      readyState: 1,
+      send: (payload: string) => sent.push(JSON.parse(payload)),
+    };
     const oldWebSocket = (globalThis as any).WebSocket;
     (globalThis as any).WebSocket = { OPEN: 1 };
     try {
-      Object.assign(client.moveInput, { forward: true, back: false, turnLeft: false, turnRight: false, strafeLeft: false, strafeRight: false, jump: false });
+      Object.assign(client.moveInput, {
+        forward: true,
+        back: false,
+        turnLeft: false,
+        turnRight: false,
+        strafeLeft: false,
+        strafeRight: false,
+        jump: false,
+      });
       expect(client.flushInput(100)).toBe(true);
-      expect(sent).toEqual([{ t: 'input', seq: 1, mi: { f: 1, b: 0, tl: 0, tr: 0, sl: 0, sr: 0, j: 0 } }]);
+      expect(sent).toEqual([
+        { t: 'input', seq: 1, mi: { f: 1, b: 0, tl: 0, tr: 0, sl: 0, sr: 0, j: 0 } },
+      ]);
 
       expect(client.flushInput(105)).toBe(false);
       expect(sent).toHaveLength(1);
@@ -720,17 +959,63 @@ describe('client-side delta merge', () => {
       expect(sent).toHaveLength(1);
 
       expect(client.flushInput(120)).toBe(true);
-      expect(sent.at(-1)).toEqual({ t: 'input', seq: 2, mi: { f: 0, b: 0, tl: 0, tr: 0, sl: 0, sr: 1, j: 0 } });
+      expect(sent.at(-1)).toEqual({
+        t: 'input',
+        seq: 2,
+        mi: { f: 0, b: 0, tl: 0, tr: 0, sl: 0, sr: 1, j: 0 },
+      });
     } finally {
       (globalThis as any).WebSocket = oldWebSocket;
     }
   });
 
+  it('reconstructs stacking-debuff stack counts from the wire (Sunder Armor)', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({
+      ents: [
+        {
+          id: 2,
+          k: 'mob',
+          tid: 'wolf',
+          nm: 'Wolf',
+          lv: 3,
+          x: 0,
+          y: 0,
+          z: 0,
+          f: 0,
+          hp: 40,
+          mhp: 40,
+          auras: [
+            {
+              id: 'sunder_armor',
+              name: 'Sunder Armor',
+              kind: 'sunder',
+              rem: 30,
+              dur: 30,
+              stacks: 3,
+            },
+          ],
+        },
+      ],
+    });
+    const aura = client.entities.get(2)?.auras.find((a) => a.kind === 'sunder');
+    expect(aura?.stacks, 'client should mirror the wire stack count').toBe(3);
+  });
+
   it('snaps the interpolation anchor on a teleport but tweens normal moves', () => {
     const client = bareClient(1);
     const ent = (x: number, z: number) => ({
-      id: 2, k: 'mob', tid: 'wolf', nm: 'Wolf', lv: 3,
-      x, y: 0, z, f: 0, hp: 40, mhp: 40,
+      id: 2,
+      k: 'mob',
+      tid: 'wolf',
+      nm: 'Wolf',
+      lv: 3,
+      x,
+      y: 0,
+      z,
+      f: 0,
+      hp: 40,
+      mhp: 40,
     });
     const apply = (x: number, z: number) => (client as any).applySnapshot({ ents: [ent(x, z)] });
 
@@ -786,5 +1071,425 @@ describe('client-side delta merge', () => {
     (client as any).applySnapshot(lastSnap(fc.sent));
     expect(client.inventory).not.toBe(invRef);
     expect(client.inventory.some((s) => s.itemId === 'baked_bread')).toBe(true);
+  });
+});
+
+describe('despawn grace (anti-flicker)', () => {
+  // A full ("first sight") wire record carrying identity, so applyWire creates
+  // the entity rather than skipping it as a half-initialized lite ghost.
+  function fullWire(id: number, x: number, z: number, extra: Record<string, unknown> = {}) {
+    return {
+      id,
+      k: 'player',
+      tid: 'warrior',
+      nm: `E${id}`,
+      lv: 1,
+      x,
+      y: 0,
+      z,
+      f: 0,
+      hp: 100,
+      mhp: 100,
+      ...extra,
+    };
+  }
+  function snap(self: any, ents: any[], keep: number[] = []) {
+    return { t: 'snap', tick: 1, time: 0, self, ents, keep };
+  }
+
+  let clock = 0;
+
+  beforeEach(() => {
+    clock = 1000;
+    vi.spyOn(performance, 'now').mockImplementation(() => clock);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('retains a far entity briefly missing from a snapshot, then drops it after the grace window', () => {
+    const c = bareClient(1);
+    const self = () => fullWire(1, 0, 0);
+
+    // Establish: self plus a far entity riding the interest boundary (~95yd).
+    (c as any).applySnapshot(snap(self(), [fullWire(2, 95, 0)]));
+    expect(c.entities.has(2)).toBe(true);
+
+    // Boundary churn: it drops out of the next snapshot. Held, not deleted.
+    clock += 50;
+    (c as any).applySnapshot(snap(self(), []));
+    expect(c.entities.has(2)).toBe(true);
+
+    // Still gone, but within the grace window: still retained.
+    clock += 200;
+    (c as any).applySnapshot(snap(self(), []));
+    expect(c.entities.has(2)).toBe(true);
+
+    // Gone past the grace window: now really removed.
+    clock += 600;
+    (c as any).applySnapshot(snap(self(), []));
+    expect(c.entities.has(2)).toBe(false);
+  });
+
+  it('clears the grace timer when the entity reappears (no flicker on re-entry)', () => {
+    const c = bareClient(1);
+    const self = () => fullWire(1, 0, 0);
+    const ent2 = c.entities; // ref to the live map
+
+    (c as any).applySnapshot(snap(self(), [fullWire(2, 95, 0)]));
+    const created = ent2.get(2);
+
+    clock += 50;
+    (c as any).applySnapshot(snap(self(), [])); // briefly missing
+    clock += 50;
+    (c as any).applySnapshot(snap(self(), [fullWire(2, 96, 0)])); // back
+    // Same entity object retained the whole time — the renderer never tore down
+    // and rebuilt its view, so no visible flash.
+    expect(ent2.get(2)).toBe(created);
+
+    // Marker cleared, so a later miss starts a fresh grace window rather than
+    // counting from the earlier one.
+    clock += 5000;
+    (c as any).applySnapshot(snap(self(), []));
+    expect(c.entities.has(2)).toBe(true);
+  });
+
+  it('treats a `keep`-listed entity as present (tier-throttle is never "missing")', () => {
+    const c = bareClient(1);
+    const self = () => fullWire(1, 0, 0);
+
+    (c as any).applySnapshot(snap(self(), [fullWire(2, 95, 0)]));
+    expect(c.entities.has(2)).toBe(true);
+
+    // First a genuine omission so the grace timer is actually armed — without
+    // this the `missingSince.has(2)` assertion below would be trivially false
+    // and never exercise the keep-clears-timer path.
+    clock += 50;
+    (c as any).applySnapshot(snap(self(), []));
+    expect(c.entities.has(2)).toBe(true);
+    expect((c as any).missingSince.has(2)).toBe(true);
+
+    // Now a distance-tier-throttled snapshot omits it from `ents` but lists it
+    // in `keep`, so it counts as seen — retained, and the armed grace timer is
+    // cleared.
+    clock += 50;
+    (c as any).applySnapshot(snap(self(), [], [2]));
+    expect(c.entities.has(2)).toBe(true);
+    expect((c as any).missingSince.has(2)).toBe(false);
+
+    // Because the timer was cleared, a genuine later miss starts a fresh grace
+    // window (held now, not deleted as if it had been missing since the throttle).
+    clock += 5000;
+    (c as any).applySnapshot(snap(self(), []));
+    expect(c.entities.has(2)).toBe(true);
+  });
+
+  it('drops a close-range disappearance immediately (preserves instant stealth-vanish)', () => {
+    const c = bareClient(1);
+    const self = () => fullWire(1, 0, 0);
+
+    (c as any).applySnapshot(snap(self(), [fullWire(2, 10, 0)]));
+    expect(c.entities.has(2)).toBe(true);
+
+    // A nearby enemy going stealth stops being observable and is omitted. It
+    // must vanish at once — no grace for close-range disappearances.
+    clock += 50;
+    (c as any).applySnapshot(snap(self(), []));
+    expect(c.entities.has(2)).toBe(false);
+  });
+});
+
+// Guild name rides the identity wire (terse key `gd`) so nearby players' plates
+// can show "<Guild>" under the name. setPlayerGuild is the server's only writer;
+// offline/headless never call it, so the field stays ''.
+describe('guild nameplate wire', () => {
+  it('carries the guild name through wireEntity only when set', () => {
+    const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Thaldrin');
+
+    expect(wireEntity(sim.entities.get(pid)!).gd).toBeUndefined();
+
+    sim.setPlayerGuild(pid, 'Silver Hand');
+    expect(wireEntity(sim.entities.get(pid)!).gd).toBe('Silver Hand');
+
+    // leaving the guild clears the field, so the line disappears for viewers
+    sim.setPlayerGuild(pid, '');
+    expect(wireEntity(sim.entities.get(pid)!).gd).toBeUndefined();
+  });
+
+  it('restores entity.guild on the client from a full record', () => {
+    const client = bareClient(99);
+    const base = {
+      id: 7,
+      k: 'player',
+      tid: 'warrior',
+      nm: 'Brae',
+      lv: 5,
+      x: 0,
+      y: 0,
+      z: 0,
+      f: 0,
+      hp: 100,
+      mhp: 100,
+    };
+
+    (client as any).applySnapshot({ t: 'snap', ents: [{ ...base, gd: 'Silver Hand' }] });
+    expect(client.entities.get(7)?.guild).toBe('Silver Hand');
+
+    // a later full record without `gd` means "no guild" → reset to ''
+    (client as any).applySnapshot({ t: 'snap', ents: [base] });
+    expect(client.entities.get(7)?.guild).toBe('');
+  });
+});
+
+// Equipped mainhand item id rides the identity wire (terse key `mh`) so the
+// renderer can show each player's held weapon model. Recomputed in
+// recalcPlayerStats; the renderer maps it to a GLB (ITEM_WEAPON_VARIANTS).
+describe('held weapon wire (mainhandItemId)', () => {
+  it('carries the equipped mainhand item through wireEntity', () => {
+    const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Thaldrin');
+    const e = sim.entities.get(pid)!;
+    // a fresh warrior starts holding its class startWeapon
+    expect(e.mainhandItemId).toBe('worn_sword');
+    expect(wireEntity(e).mh).toBe('worn_sword');
+  });
+
+  it('restores entity.mainhandItemId on the client from a full record', () => {
+    const client = bareClient(99);
+    const base = {
+      id: 7,
+      k: 'player',
+      tid: 'warrior',
+      nm: 'Brae',
+      lv: 5,
+      x: 0,
+      y: 0,
+      z: 0,
+      f: 0,
+      hp: 100,
+      mhp: 100,
+    };
+
+    (client as any).applySnapshot({ t: 'snap', ents: [{ ...base, mh: 'zealotsbane_blade' }] });
+    expect(client.entities.get(7)?.mainhandItemId).toBe('zealotsbane_blade');
+
+    // a later full record without `mh` means "no equipped weapon" → reset to null
+    (client as any).applySnapshot({ t: 'snap', ents: [base] });
+    expect(client.entities.get(7)?.mainhandItemId).toBeNull();
+  });
+});
+
+describe('delve self-state mirrors over the wire', () => {
+  let server: GameServer;
+  let fc: FakeClient;
+  let session: ClientSession;
+
+  beforeEach(() => {
+    server = new GameServer();
+    fc = fakeWs();
+    session = joinServer(server, fc, 1, 'Delver');
+  });
+
+  function enterDelveOnServer(): void {
+    const sim = server.sim;
+    sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel);
+    const door = DELVES.collapsed_reliquary.doorPos;
+    const p = sim.entities.get(session.pid)!;
+    p.pos.x = door.x;
+    p.pos.z = door.z;
+    p.pos.y = terrainHeight(door.x, door.z, sim.cfg.seed);
+    p.prevPos = { ...p.pos };
+    sim.enterDelve('collapsed_reliquary', 'normal', session.pid);
+  }
+
+  it('geo-gates companion_upgrade and enter_delve to the board NPC door', () => {
+    const sim = server.sim;
+    sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel);
+    const meta = sim.meta(session.pid)!;
+    meta.companionUpgrades.companion_tessa = 1;
+    meta.delveMarks = 100;
+    const p = sim.entities.get(session.pid)!;
+    const door = DELVES.collapsed_reliquary.doorPos;
+    const place = (x: number, z: number) => {
+      p.pos.x = x;
+      p.pos.z = z;
+      p.pos.y = terrainHeight(x, z, sim.cfg.seed);
+      p.prevPos = { ...p.pos };
+    };
+    // Far from Brother Halven: the upgrade command is rejected (rank unchanged)...
+    place(door.x + 200, door.z);
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'companion_upgrade', companionId: 'companion_tessa' }),
+    );
+    expect(meta.companionUpgrades.companion_tessa).toBe(1);
+    // ...and enter_delve does not claim a run from across the world.
+    server.handleMessage(
+      session,
+      JSON.stringify({
+        t: 'cmd',
+        cmd: 'enter_delve',
+        delveId: 'collapsed_reliquary',
+        tierId: 'normal',
+      }),
+    );
+    expect(sim.delveRunForPlayer(session.pid)).toBeNull();
+    // Standing on the board door: the upgrade goes through.
+    place(door.x, door.z);
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'companion_upgrade', companionId: 'companion_tessa' }),
+    );
+    expect(meta.companionUpgrades.companion_tessa).toBe(2);
+  });
+
+  it('sends drun + dcompanion on entering a delve and the client mirrors them', () => {
+    enterDelveOnServer();
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self).toHaveProperty('drun');
+    expect(snap.self).toHaveProperty('dcompanion');
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(snap);
+    expect(client.delveRun).not.toBeNull();
+    expect(client.companionState?.companionId).toBe('companion_tessa');
+  });
+
+  it('mirrors delveMarks + delveClears + delveDaily to the client when they change', () => {
+    enterDelveOnServer();
+    broadcast(server);
+    fc.sent.length = 0;
+    server.sim.meta(session.pid)!.delveMarks = 5;
+    const meta = server.sim.meta(session.pid)!;
+    meta.delveClears['collapsed_reliquary:heroic'] = 1;
+    meta.delveDaily.markClears = 2;
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.dmarks).toBe(5);
+    expect(snap.self.dclears['collapsed_reliquary:heroic']).toBe(1);
+    expect(snap.self.delveDaily.markClears).toBe(2);
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(snap);
+    expect(client.delveMarks).toBe(5);
+    expect(client.delveClears['collapsed_reliquary:heroic']).toBe(1);
+    // the shop view resolves the heroic-gated rare as unlocked off the mirror
+    expect(
+      client.delveShopOffers('collapsed_reliquary').find((o: any) => o.requiresHeroicClear)
+        ?.unlocked,
+    ).toBe(true);
+    expect(client.delveDaily.markClears).toBe(2);
+  });
+
+  it('does NOT resend drun on an unchanged delve-less first/second tick', () => {
+    // Outside a delve, drun is null and must be omitted after the first send.
+    broadcast(server);
+    fc.sent.length = 0;
+    server.sim.tick();
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self).not.toHaveProperty('drun');
+  });
+
+  it('clears drun + dcompanion (value to null) on leaving a delve and the client mirror follows', () => {
+    enterDelveOnServer();
+    broadcast(server);
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(lastSnap(fc.sent));
+    expect(client.delveRun).not.toBeNull();
+    fc.sent.length = 0;
+    server.sim.leaveDelve(session.pid);
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.drun).toBeNull();
+    expect(snap.self.dcompanion).toBeNull();
+    (client as any).applySnapshot(snap);
+    expect(client.delveRun).toBeNull();
+    expect(client.companionState).toBeNull();
+  });
+});
+
+describe('lockpick view rebuilds from events on the online client', () => {
+  function sessionEvent(sid: string, col: number, visible: any[]) {
+    return {
+      type: 'lockpickSession',
+      sessionId: sid,
+      objectId: 77,
+      w: 11,
+      h: 6,
+      col,
+      row: 2,
+      page: 1,
+      pageCount: 1,
+      tries: 1,
+      triesTotal: 1,
+      lootTier: 'premium',
+      allowed: ['hardSet', 'set', 'steady', 'ease', 'drop'],
+      visible,
+      stepTimeoutMs: 20000,
+    };
+  }
+  function feed(client: ClientWorld, ev: any) {
+    (client as any).onMessage(JSON.stringify({ t: 'events', list: [ev] }));
+  }
+
+  it('builds on session, advances on step, ignores foreign sessions, clears on end', () => {
+    const client = bareClient(1);
+    (client as any).lockpickState = null;
+    const v0 = [{ col: 0, row: 2, kind: 'channel' }];
+    feed(client, sessionEvent('s1', 0, v0));
+    expect(client.lockpickState).not.toBeNull();
+    expect(client.lockpickState?.sessionId).toBe('s1');
+    expect(client.lockpickState?.lootTier).toBe('premium');
+    expect(client.lockpickState?.visible).toEqual(v0);
+
+    // Step advances col + visible, leaves identity fields (w/h/lootTier) intact.
+    const v1 = [{ col: 1, row: 3, kind: 'channel' }];
+    feed(client, {
+      type: 'lockpickStep',
+      sessionId: 's1',
+      col: 1,
+      row: 3,
+      page: 1,
+      pageCount: 1,
+      tries: 1,
+      triesTotal: 1,
+      result: 'advanced',
+      visible: v1,
+    });
+    expect(client.lockpickState?.col).toBe(1);
+    expect(client.lockpickState?.visible).toEqual(v1);
+    expect(client.lockpickState?.w).toBe(11);
+    expect(client.lockpickState?.lootTier).toBe('premium');
+
+    // A step for a different session must not mutate the active view.
+    feed(client, {
+      type: 'lockpickStep',
+      sessionId: 'OTHER',
+      col: 9,
+      row: 9,
+      page: 1,
+      pageCount: 1,
+      tries: 1,
+      triesTotal: 1,
+      result: 'advanced',
+      visible: [],
+    });
+    expect(client.lockpickState?.col).toBe(1);
+
+    // End for the active session clears it; events still reach the HUD queue.
+    feed(client, { type: 'lockpickEnd', sessionId: 's1', outcome: 'success', lootTier: 'premium' });
+    expect(client.lockpickState).toBeNull();
+    expect(client.drainEvents().length).toBeGreaterThan(0);
+  });
+
+  it('does not clear the view on a foreign lockpickEnd', () => {
+    const client = bareClient(1);
+    (client as any).lockpickState = null;
+    feed(client, sessionEvent('s2', 0, []));
+    feed(client, { type: 'lockpickEnd', sessionId: 'OTHER', outcome: 'fail' });
+    expect(client.lockpickState).not.toBeNull();
+    expect(client.lockpickState?.sessionId).toBe('s2');
   });
 });

@@ -4,8 +4,9 @@
 // plus one tight portrait per beast so the new models are clearly visible.
 //
 // Needs `npm run dev` on :5173 (override with GAME_URL). Writes PNGs to tmp/.
-import puppeteer from 'puppeteer-core';
+
 import fs from 'node:fs';
+import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH } from './browser_path.mjs';
 
 const URL = process.env.GAME_URL ?? 'http://localhost:5173';
@@ -15,11 +16,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 // templateId -> expected model. Order = left→right in the group row.
 const BEASTS = [
   { id: 'glade_fox', label: 'Glade Fox', model: 'fox.glb' },
-  { id: 'brightwood_hare', label: 'Brightwood Hare', model: 'fox.glb (small)' },
   { id: 'thornpelt_badger', label: 'Thornpelt Badger', model: 'fox.glb (small)' },
-  { id: 'brightwood_stag', label: 'Brightwood Stag', model: 'stag.glb' },
   { id: 'spotted_fawn', label: 'Spotted Fawn', model: 'stag.glb' },
-  { id: 'sunhide_bear', label: 'Sunhide Bear', model: 'yetialt.glb (brown)' },
   { id: 'grovetusk_boar', label: 'Grovetusk Boar', model: 'wild_boar.glb' },
   { id: 'bog_bloat', label: 'Bog Bloat', model: 'frog.glb' },
 ];
@@ -27,13 +25,20 @@ const BEASTS = [
 const browser = await puppeteer.launch({
   executablePath: BROWSER_PATH,
   headless: 'new',
-  args: ['--window-size=1600,1000', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--no-sandbox'],
+  args: [
+    '--window-size=1600,1000',
+    '--use-angle=swiftshader',
+    '--enable-unsafe-swiftshader',
+    '--no-sandbox',
+  ],
   defaultViewport: { width: 1600, height: 1000 },
 });
 const page = await browser.newPage();
 const errors = [];
-page.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
-page.on('console', (m) => { if (m.type() === 'error') errors.push('CONSOLE: ' + m.text()); });
+page.on('pageerror', (e) => errors.push(`PAGEERROR: ${e.message}`));
+page.on('console', (m) => {
+  if (m.type() === 'error') errors.push(`CONSOLE: ${m.text()}`);
+});
 
 await page.goto(URL, { waitUntil: 'networkidle0', timeout: 30000 });
 await page.evaluate(() => document.querySelector('#btn-offline').click());
@@ -48,13 +53,22 @@ await page.evaluate((BEASTS) => {
   const g = window.__game;
   const sim = g.sim;
   const p = sim.player;
-  p.gm = true; p.maxHp = 99999; p.hp = 99999; p.maxMp = 99999; p.mp = 99999;
+  p.gm = true;
+  p.maxHp = 99999;
+  p.hp = 99999;
+  p.maxMp = 99999;
+  p.mp = 99999;
   p.facing = 0;
-  g.input.camYaw = 0; g.input.camPitch = 0.18;
+  g.input.camYaw = 0;
+  g.input.camPitch = 0.18;
 
   const pool = [...sim.entities.values()]
     .filter((e) => e.kind === 'mob' && !e.dead)
-    .sort((a, b) => Math.hypot(a.pos.x - p.pos.x, a.pos.z - p.pos.z) - Math.hypot(b.pos.x - p.pos.x, b.pos.z - p.pos.z))
+    .sort(
+      (a, b) =>
+        Math.hypot(a.pos.x - p.pos.x, a.pos.z - p.pos.z) -
+        Math.hypot(b.pos.x - p.pos.x, b.pos.z - p.pos.z),
+    )
     .slice(0, BEASTS.length);
   // remember the entity ids so every later step drives the same beasts
   window.__beastIds = pool.map((e) => e.id);
@@ -63,7 +77,8 @@ await page.evaluate((BEASTS) => {
     const b = BEASTS[i];
     e.templateId = b.id;
     e.name = b.label;
-    e.hostile = false; e.dead = false;
+    e.hostile = false;
+    e.dead = false;
   }
 }, BEASTS);
 
@@ -81,7 +96,9 @@ await page.evaluate(() => {
     e.prevPos = { ...e.pos };
     e.facing = Math.PI;
     e.scale = 1.4;
-    e.spawnPos = { ...e.pos }; e.wanderTarget = null; e.wanderTimer = 999;
+    e.spawnPos = { ...e.pos };
+    e.wanderTarget = null;
+    e.wanderTimer = 999;
   });
 });
 await sleep(2500);
@@ -103,17 +120,25 @@ for (let i = 0; i < BEASTS.length; i++) {
       if (j === idx) {
         // off to the right of the player so the avatar doesn't occlude it,
         // scaled up and held still for a clean portrait.
-        e.pos.x = p.pos.x + 3.2; e.pos.z = p.pos.z + 5;
-        e.prevPos = { ...e.pos }; e.facing = Math.PI * 0.5; // side-on profile
-        e.scale = 1.6;
-        e.spawnPos = { ...e.pos }; e.wanderTarget = null; e.wanderTimer = 999;
-      } else {
-        e.pos.x = p.pos.x + 300; e.pos.z = p.pos.z + 300;
+        e.pos.x = p.pos.x + 3.2;
+        e.pos.z = p.pos.z + 5;
         e.prevPos = { ...e.pos };
-        e.spawnPos = { ...e.pos }; e.wanderTarget = null;
+        e.facing = Math.PI * 0.5; // side-on profile
+        e.scale = 1.6;
+        e.spawnPos = { ...e.pos };
+        e.wanderTarget = null;
+        e.wanderTimer = 999;
+      } else {
+        e.pos.x = p.pos.x + 300;
+        e.pos.z = p.pos.z + 300;
+        e.prevPos = { ...e.pos };
+        e.spawnPos = { ...e.pos };
+        e.wanderTarget = null;
       }
     });
-    g.input.camYaw = 0; g.input.camPitch = 0.04; g.input.camDist = 9;
+    g.input.camYaw = 0;
+    g.input.camPitch = 0.04;
+    g.input.camDist = 9;
     const e = sim.entities.get(ids[idx]);
     return e ? { tid: e.templateId, name: e.name } : null;
   }, i);
@@ -124,6 +149,6 @@ for (let i = 0; i < BEASTS.length; i++) {
   console.log(`shot ${b.label.padEnd(20)} -> ${b.model.padEnd(22)} ${path}`);
 }
 
-if (errors.length) console.log('PAGE ERRORS:\n' + errors.join('\n'));
+if (errors.length) console.log(`PAGE ERRORS:\n${errors.join('\n')}`);
 console.log('done -> tmp/beasts_row.png + tmp/beast_<id>.png');
 await browser.close();

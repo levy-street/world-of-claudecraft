@@ -98,6 +98,7 @@ Please run these locally. They're the same checks CI runs:
 ```bash
 npm test                    # Vitest suite
 npx tsc --noEmit            # TypeScript typecheck (the project is strict)
+npm run security:gate       # malicious-code release gate (high-severity signatures; also asserted by npm test)
 npm run build               # production client build
 ```
 

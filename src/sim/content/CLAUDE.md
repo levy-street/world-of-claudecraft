@@ -50,7 +50,8 @@ cross-reference it; do not invent costs/levels/damage.
 
 ## How to add quest / mobs / camps / dungeon / item
 - **Quest:** add to `ZONE{N}_QUESTS` (`giverNpcId`, `turnInNpcId`, `text`,
-  `objectives[]` of `{type:'kill',targetMobId}` or `{type:'collect',itemId}`,
+  `objectives[]` of `{type:'kill',targetMobId}`, `{type:'collect',itemId}`, or
+  `{type:'interact',targetObjectItemId}`,
   `xpReward`, `copperReward`, `itemRewards` keyed by class, optional `requiresQuest`,
   `minLevel`, `suggestedPlayers`), list its id in the giver NPC's `questIds`, and add
   it to `ZONE{N}_QUEST_ORDER`. `$N`/`$C` in text are runtime substitutions (player
@@ -96,6 +97,18 @@ guard `tests/localization_fixes.test.ts` enforces it):
   copy; don't hand-build money/number strings as gameplay data — the engine formats
   those for display.
 
+## This data also feeds the public Guide/wiki
+The Guide at `/wiki` (`src/guide/`) is generated from THIS directory, so player-facing
+content you add here should reach it in the same change:
+- After adding or renaming a class, ability, talent, zone, dungeon, mob, or warlock pet,
+  run `npm run wiki:content` and commit the regenerated `src/guide/content.generated.ts`.
+  It also runs in `pretest`/`build`, and `tests/guide.test.ts` fails CI if the committed
+  file is stale, so a forgotten regen is caught.
+- Only spoiler-safe, high-level facts surface (names, roles, level bands, signature kits,
+  POI labels): no balance numbers, mechanics, loot, the raid boss, or encounter scripts.
+- A brand-new content TYPE or system needs more than a regen (a generator change, a Guide
+  page, route, and `guide.*` prose). See `src/guide/CLAUDE.md` for that contract.
+
 ## Talents framework (`talents.ts`)
 - **Flat-precompute invariant:** an allocation is resolved **once** via
   `computeTalentModifiers` into a flat `TalentModifiers` (stats / per-ability mods /
@@ -111,9 +124,11 @@ guard `tests/localization_fixes.test.ts` enforces it):
   8 in `talents_classic.ts`). `validateTalentTree` runs at import and **throws on a
   malformed tree** (dup ids, bad prereqs, cycles, unreachable gates) — a broken tree
   won't load.
-- Build strings (`exportBuild`/`importBuild`, base64), loadouts (`SavedLoadout`,
-  `MAX_LOADOUTS`), dormant-node detection, and respec all live here. Allocation is
-  **server-authoritative**: `validateAllocation` re-checks on apply regardless of UI.
+- Build strings (`exportBuild`/`importBuild`, base64), the loadout type
+  (`SavedLoadout`, `MAX_LOADOUTS`), and dormant-node detection live here; the respec
+  and loadout save/delete operations are Sim methods (`respec`/`saveLoadout`/
+  `deleteLoadout` in `sim.ts`). Allocation is **server-authoritative**:
+  `validateAllocation` re-checks on apply regardless of UI.
 
 ## Never do here
 - Never put combat/sim behavior in a content file — it stays declarative data.

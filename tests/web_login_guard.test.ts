@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isWebClientRequest, webLoginEnforced } from '../server/web_login_guard';
+import { isNativeAppRequest, isWebClientRequest, webLoginEnforced } from '../server/web_login_guard';
 
 const req = (headers: Record<string, string>) => ({ headers }) as any;
 
@@ -29,6 +29,21 @@ describe('web login guard (anti-bot)', () => {
       isWebClientRequest(req({ origin: 'https://play.example.com' }), { WEB_ORIGINS: 'https://play.example.com' } as any),
     ).toBe(true);
     expect(isWebClientRequest(req({ origin: 'http://localhost:5173', host: '127.0.0.1:8787' }))).toBe(true);
+  });
+
+  it('accepts Capacitor native app origins', () => {
+    expect(isWebClientRequest(req({ origin: 'capacitor://localhost', host: 'worldofclaudecraft.com' }))).toBe(true);
+    expect(isWebClientRequest(req({ origin: 'http://localhost', host: 'worldofclaudecraft.com' }))).toBe(true);
+    expect(isWebClientRequest(req({ origin: 'https://localhost', host: 'worldofclaudecraft.com' }))).toBe(true);
+  });
+
+  it('identifies native app origins for Turnstile bypass', () => {
+    expect(isNativeAppRequest(req({ origin: 'capacitor://localhost', host: 'worldofclaudecraft.com' }))).toBe(true);
+    expect(isNativeAppRequest(req({ origin: 'http://localhost', host: 'worldofclaudecraft.com' }))).toBe(true);
+    expect(isNativeAppRequest(req({ origin: 'https://localhost', host: 'worldofclaudecraft.com' }))).toBe(true);
+    expect(isNativeAppRequest(req({ origin: 'https://worldofclaudecraft.com', host: 'worldofclaudecraft.com' }))).toBe(false);
+    expect(isNativeAppRequest(req({ origin: 'https://evil.example.com', host: 'worldofclaudecraft.com' }))).toBe(false);
+    expect(isNativeAppRequest(req({ host: 'worldofclaudecraft.com' }))).toBe(false);
   });
 
   it('rejects a foreign origin', () => {

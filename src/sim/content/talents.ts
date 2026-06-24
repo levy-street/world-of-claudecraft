@@ -11,11 +11,17 @@
 // ---------------------------------------------------------------------------
 
 import { MAX_LEVEL, type PlayerClass } from '../types';
-import { WARRIOR_TALENTS } from './talents_warrior';
 import {
-  DRUID_TALENTS, HUNTER_TALENTS, MAGE_TALENTS, PALADIN_TALENTS, PRIEST_TALENTS,
-  ROGUE_TALENTS, SHAMAN_TALENTS, WARLOCK_TALENTS,
+  DRUID_TALENTS,
+  HUNTER_TALENTS,
+  MAGE_TALENTS,
+  PALADIN_TALENTS,
+  PRIEST_TALENTS,
+  ROGUE_TALENTS,
+  SHAMAN_TALENTS,
+  WARLOCK_TALENTS,
 } from './talents_classic';
+import { WARRIOR_TALENTS } from './talents_warrior';
 
 export type TalentTree = 'class' | 'spec';
 export type TalentKind = 'passive' | 'active' | 'choice';
@@ -25,31 +31,39 @@ export type Role = 'tank' | 'healer' | 'dps';
 // `*Pct` fields are fractional multipliers (0.05 = +5%). All consumed by
 // recalcPlayerStats (entity.ts).
 export interface StatModEffect {
-  str?: number; agi?: number; sta?: number; int?: number; spi?: number; armor?: number;
-  ap?: number;       // flat attack power
-  crit?: number;     // additive crit chance (0.02 = +2%)
-  dodge?: number;    // additive dodge chance
-  apPct?: number; staPct?: number; armorPct?: number; maxHpPct?: number;
+  str?: number;
+  agi?: number;
+  sta?: number;
+  int?: number;
+  spi?: number;
+  armor?: number;
+  ap?: number; // flat attack power
+  crit?: number; // additive crit chance (0.02 = +2%)
+  dodge?: number; // additive dodge chance
+  apPct?: number;
+  staPct?: number;
+  armorPct?: number;
+  maxHpPct?: number;
 }
 
 // Per-ability combat modifier. Baked into the resolved ability's effects/cost/
 // cooldown/cast when `known` is built, so runEffects only ever reads flat values.
 export interface AbilityModEffect {
   ability: string;
-  dmgPct?: number;        // +0.10 = +10% to this ability's damage/heal effects
-  flatDmg?: number;       // flat add to the primary damage/bonus
-  costPct?: number;       // -0.20 = 20% cheaper
-  cooldownPct?: number;   // -0.50 = half cooldown
-  castPct?: number;       // -0.50 = half cast time
+  dmgPct?: number; // +0.10 = +10% to this ability's damage/heal effects
+  flatDmg?: number; // flat add to the primary damage/bonus
+  costPct?: number; // -0.20 = 20% cheaper
+  cooldownPct?: number; // -0.50 = half cooldown
+  castPct?: number; // -0.50 = half cast time
 }
 
 // Mastery-style global multipliers, applied to whole damage/heal schools when
 // `known` is built (and to player threat in the Sim).
 export interface GlobalModEffect {
-  meleeDmgPct?: number;   // physical ability damage
-  spellDmgPct?: number;   // magic ability damage
-  healPct?: number;       // healing done
-  threatPct?: number;     // bonus threat (tank role)
+  meleeDmgPct?: number; // physical ability damage
+  spellDmgPct?: number; // magic ability damage
+  healPct?: number; // healing done
+  threatPct?: number; // bonus threat (tank role)
 }
 
 export interface TalentEffect {
@@ -60,22 +74,28 @@ export interface TalentEffect {
 }
 
 export interface TalentChoiceOption {
-  id: string; name: string; description: string; icon: string;
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
   effect: TalentEffect;
 }
 
 export interface TalentNode {
   id: string;
   tree: TalentTree;
-  specId?: string;            // spec-tree nodes only: the spec they belong to
+  specId?: string; // spec-tree nodes only: the spec they belong to
   kind: TalentKind;
   maxRank: number;
-  requires?: string[];        // connection prerequisites (node ids, same tree)
-  pointsGate?: number;        // cumulative points spent above this row to unlock
-  choices?: TalentChoiceOption[];   // kind === 'choice' (pick one)
-  effect?: TalentEffect;      // kind === 'passive' | 'active'
-  icon: string; name: string; description: string;
-  row: number; col: number;
+  requires?: string[]; // connection prerequisites (node ids, same tree)
+  pointsGate?: number; // cumulative points spent above this row to unlock
+  choices?: TalentChoiceOption[]; // kind === 'choice' (pick one)
+  effect?: TalentEffect; // kind === 'passive' | 'active'
+  icon: string;
+  name: string;
+  description: string;
+  row: number;
+  col: number;
 }
 
 export interface SpecDef {
@@ -85,13 +105,13 @@ export interface SpecDef {
   role: Role;
   icon: string;
   description: string;
-  signature: string;          // ability id granted on spec selection
+  signature: string; // ability id granted on spec selection
   mastery: { name: string; description: string; effect: TalentEffect };
 }
 
 export interface ClassTalents {
   class: PlayerClass;
-  nodes: TalentNode[];        // both trees; spec nodes carry `specId`
+  nodes: TalentNode[]; // both trees; spec nodes carry `specId`
   specs: SpecDef[];
 }
 
@@ -99,8 +119,8 @@ export interface ClassTalents {
 // through build strings.
 export interface TalentAllocation {
   spec: string | null;
-  ranks: Record<string, number>;       // nodeId -> ranks spent
-  choices: Record<string, string>;     // choice nodeId -> chosen option id
+  ranks: Record<string, number>; // nodeId -> ranks spent
+  choices: Record<string, string>; // choice nodeId -> chosen option id
 }
 
 export function emptyAllocation(): TalentAllocation {
@@ -114,13 +134,17 @@ export function cloneAllocation(a: TalentAllocation): TalentAllocation {
 export interface SavedLoadout {
   name: string;
   alloc: TalentAllocation;
-  bar: (string | null)[];     // action-bar ability ids (per-build hotbar)
+  bar: (string | null)[]; // action-bar ability ids (per-build hotbar)
 }
 
 export const MAX_LOADOUTS = 10;
 
 export interface ResolvedAbilityMod {
-  dmgPct: number; flatDmg: number; costPct: number; cooldownPct: number; castPct: number;
+  dmgPct: number;
+  flatDmg: number;
+  costPct: number;
+  cooldownPct: number;
+  castPct: number;
 }
 
 // The flat precomputed struct read by the hot paths.
@@ -189,6 +213,36 @@ function pointsSpentInTree(ct: ClassTalents, alloc: TalentAllocation, tree: Tale
   return n;
 }
 
+// Human-readable specialization label for a saved allocation. Uses the chosen
+// spec's display name when one is set, otherwise derives the dominant spec tree
+// (the spec with the most points spent). Returns null when no spec points are
+// spent and none is chosen. Shared by the character sheet / public profile so
+// spec display matches the in-game /talents readout.
+export function specLabel(
+  cls: PlayerClass,
+  alloc: TalentAllocation | undefined | null,
+): string | null {
+  const ct = talentsFor(cls);
+  if (!ct || !alloc) return null;
+  if (alloc.spec) return ct.specs.find((s) => s.id === alloc.spec)?.name ?? null;
+  const byId = nodeIndex(ct);
+  const pointsBySpec = new Map<string, number>();
+  for (const id in alloc.ranks) {
+    const node = byId.get(id);
+    if (!node || node.tree === 'class' || !node.specId) continue;
+    pointsBySpec.set(node.specId, (pointsBySpec.get(node.specId) ?? 0) + alloc.ranks[id]);
+  }
+  let bestId: string | null = null;
+  let best = 0;
+  for (const [specId, pts] of pointsBySpec) {
+    if (pts > best) {
+      best = pts;
+      bestId = specId;
+    }
+  }
+  return bestId ? (ct.specs.find((s) => s.id === bestId)?.name ?? null) : null;
+}
+
 // Points spent in `node`'s tree on nodes strictly above its row — what a
 // pointsGate is measured against (avoids the self-reference paradox).
 function pointsAboveRow(ct: ClassTalents, alloc: TalentAllocation, node: TalentNode): number {
@@ -218,8 +272,10 @@ export function validateTalentTree(ct: ClassTalents): string[] {
     if (idx.has(n.id)) errs.push(`duplicate node id "${n.id}"`);
     idx.set(n.id, n);
     if (n.maxRank < 1) errs.push(`node "${n.id}" maxRank must be >= 1`);
-    if (typeof n.row !== 'number' || typeof n.col !== 'number') errs.push(`node "${n.id}" missing layout`);
-    if (n.tree === 'spec' && (!n.specId || !specIds.has(n.specId))) errs.push(`spec node "${n.id}" has invalid specId`);
+    if (typeof n.row !== 'number' || typeof n.col !== 'number')
+      errs.push(`node "${n.id}" missing layout`);
+    if (n.tree === 'spec' && (!n.specId || !specIds.has(n.specId)))
+      errs.push(`spec node "${n.id}" has invalid specId`);
     if (n.tree === 'class' && n.specId) errs.push(`class node "${n.id}" must not carry a specId`);
     if (n.kind === 'choice') {
       if (n.maxRank !== 1) errs.push(`choice node "${n.id}" must be single-rank`);
@@ -227,7 +283,10 @@ export function validateTalentTree(ct: ClassTalents): string[] {
     } else if (!n.effect) {
       errs.push(`node "${n.id}" (${n.kind}) has no effect`);
     }
-    if (n.pointsGate !== undefined && (n.pointsGate < 0 || n.pointsGate > talentPointsAtLevel(MAX_LEVEL))) {
+    if (
+      n.pointsGate !== undefined &&
+      (n.pointsGate < 0 || n.pointsGate > talentPointsAtLevel(MAX_LEVEL))
+    ) {
       errs.push(`node "${n.id}" pointsGate ${n.pointsGate} is unreachable`);
     }
   }
@@ -236,14 +295,20 @@ export function validateTalentTree(ct: ClassTalents): string[] {
   for (const n of ct.nodes) {
     for (const req of n.requires ?? []) {
       const r = idx.get(req);
-      if (!r) { errs.push(`node "${n.id}" requires missing node "${req}"`); continue; }
-      if (r.tree !== n.tree || r.specId !== n.specId) errs.push(`node "${n.id}" requires "${req}" from a different tree`);
+      if (!r) {
+        errs.push(`node "${n.id}" requires missing node "${req}"`);
+        continue;
+      }
+      if (r.tree !== n.tree || r.specId !== n.specId)
+        errs.push(`node "${n.id}" requires "${req}" from a different tree`);
       if (r.row >= n.row) errs.push(`node "${n.id}" requires "${req}" which is not above it`);
     }
   }
 
   // cycle detection over the requires DAG
-  const WHITE = 0, GRAY = 1, BLACK = 2;
+  const WHITE = 0,
+    GRAY = 1,
+    BLACK = 2;
   const color = new Map<string, number>();
   const visit = (id: string): boolean => {
     color.set(id, GRAY);
@@ -256,7 +321,10 @@ export function validateTalentTree(ct: ClassTalents): string[] {
     return false;
   };
   for (const n of ct.nodes) {
-    if ((color.get(n.id) ?? WHITE) === WHITE && visit(n.id)) { errs.push(`cycle detected at "${n.id}"`); break; }
+    if ((color.get(n.id) ?? WHITE) === WHITE && visit(n.id)) {
+      errs.push(`cycle detected at "${n.id}"`);
+      break;
+    }
   }
 
   // specs reference real signature/mastery
@@ -281,9 +349,16 @@ export function validateTalentTree(ct: ClassTalents): string[] {
 // build-string import, and the UI's apply-enable check.
 // ---------------------------------------------------------------------------
 
-export interface AllocCheck { ok: boolean; reason?: string; }
+export interface AllocCheck {
+  ok: boolean;
+  reason?: string;
+}
 
-export function validateAllocation(cls: PlayerClass, alloc: TalentAllocation, availablePoints: number): AllocCheck {
+export function validateAllocation(
+  cls: PlayerClass,
+  alloc: TalentAllocation,
+  availablePoints: number,
+): AllocCheck {
   const ct = talentsFor(cls);
   if (!ct) return { ok: false, reason: 'no talent tree for class' };
   const idx = nodeIndex(ct);
@@ -306,7 +381,8 @@ export function validateAllocation(cls: PlayerClass, alloc: TalentAllocation, av
       return { ok: false, reason: `"${node.name}" needs a valid choice` };
     }
     for (const req of node.requires ?? []) {
-      if ((alloc.ranks[req] ?? 0) <= 0) return { ok: false, reason: `"${node.name}" requires "${idx.get(req)?.name ?? req}"` };
+      if ((alloc.ranks[req] ?? 0) <= 0)
+        return { ok: false, reason: `"${node.name}" requires "${idx.get(req)?.name ?? req}"` };
     }
     if (node.pointsGate && pointsAboveRow(ct, alloc, node) < node.pointsGate) {
       return { ok: false, reason: `"${node.name}" needs ${node.pointsGate} points spent above it` };
@@ -328,8 +404,14 @@ export function dormantNodes(cls: PlayerClass, alloc: TalentAllocation): Set<str
   for (const id in alloc.ranks) {
     if (alloc.ranks[id] <= 0) continue;
     const node = idx.get(id);
-    if (!node) { out.add(id); continue; }
-    if (node.tree === 'spec' && node.specId !== alloc.spec) { out.add(id); continue; }
+    if (!node) {
+      out.add(id);
+      continue;
+    }
+    if (node.tree === 'spec' && node.specId !== alloc.spec) {
+      out.add(id);
+      continue;
+    }
     let dormant = false;
     for (const req of node.requires ?? []) if ((alloc.ranks[req] ?? 0) <= 0) dormant = true;
     if (node.pointsGate && pointsAboveRow(ct, alloc, node) < node.pointsGate) dormant = true;
@@ -344,7 +426,21 @@ export function dormantNodes(cls: PlayerClass, alloc: TalentAllocation): Set<str
 // ---------------------------------------------------------------------------
 
 function zeroStats(): Required<StatModEffect> {
-  return { str: 0, agi: 0, sta: 0, int: 0, spi: 0, armor: 0, ap: 0, crit: 0, dodge: 0, apPct: 0, staPct: 0, armorPct: 0, maxHpPct: 0 };
+  return {
+    str: 0,
+    agi: 0,
+    sta: 0,
+    int: 0,
+    spi: 0,
+    armor: 0,
+    ap: 0,
+    crit: 0,
+    dodge: 0,
+    apPct: 0,
+    staPct: 0,
+    armorPct: 0,
+    maxHpPct: 0,
+  };
 }
 function zeroGlobal(): Required<GlobalModEffect> {
   return { meleeDmgPct: 0, spellDmgPct: 0, healPct: 0, threatPct: 0 };
@@ -354,28 +450,53 @@ function zeroAbilityMod(): ResolvedAbilityMod {
 }
 
 export function emptyModifiers(): TalentModifiers {
-  return { spec: null, role: null, stats: zeroStats(), abilities: {}, global: zeroGlobal(), grants: [] };
+  return {
+    spec: null,
+    role: null,
+    stats: zeroStats(),
+    abilities: {},
+    global: zeroGlobal(),
+    grants: [],
+  };
 }
 
 function accumulate(mods: TalentModifiers, eff: TalentEffect | undefined, mult: number): void {
   if (!eff) return;
   if (eff.stats) {
-    const s = mods.stats, e = eff.stats;
-    s.str += (e.str ?? 0) * mult; s.agi += (e.agi ?? 0) * mult; s.sta += (e.sta ?? 0) * mult;
-    s.int += (e.int ?? 0) * mult; s.spi += (e.spi ?? 0) * mult; s.armor += (e.armor ?? 0) * mult;
-    s.ap += (e.ap ?? 0) * mult; s.crit += (e.crit ?? 0) * mult; s.dodge += (e.dodge ?? 0) * mult;
-    s.apPct += (e.apPct ?? 0) * mult; s.staPct += (e.staPct ?? 0) * mult;
-    s.armorPct += (e.armorPct ?? 0) * mult; s.maxHpPct += (e.maxHpPct ?? 0) * mult;
+    const s = mods.stats,
+      e = eff.stats;
+    s.str += (e.str ?? 0) * mult;
+    s.agi += (e.agi ?? 0) * mult;
+    s.sta += (e.sta ?? 0) * mult;
+    s.int += (e.int ?? 0) * mult;
+    s.spi += (e.spi ?? 0) * mult;
+    s.armor += (e.armor ?? 0) * mult;
+    s.ap += (e.ap ?? 0) * mult;
+    s.crit += (e.crit ?? 0) * mult;
+    s.dodge += (e.dodge ?? 0) * mult;
+    s.apPct += (e.apPct ?? 0) * mult;
+    s.staPct += (e.staPct ?? 0) * mult;
+    s.armorPct += (e.armorPct ?? 0) * mult;
+    s.maxHpPct += (e.maxHpPct ?? 0) * mult;
   }
   if (eff.global) {
-    const g = mods.global, e = eff.global;
-    g.meleeDmgPct += (e.meleeDmgPct ?? 0) * mult; g.spellDmgPct += (e.spellDmgPct ?? 0) * mult;
-    g.healPct += (e.healPct ?? 0) * mult; g.threatPct += (e.threatPct ?? 0) * mult;
+    const g = mods.global,
+      e = eff.global;
+    g.meleeDmgPct += (e.meleeDmgPct ?? 0) * mult;
+    g.spellDmgPct += (e.spellDmgPct ?? 0) * mult;
+    g.healPct += (e.healPct ?? 0) * mult;
+    g.threatPct += (e.threatPct ?? 0) * mult;
   }
   for (const am of eff.ability ?? []) {
-    const cur = mods.abilities[am.ability] ?? (mods.abilities[am.ability] = zeroAbilityMod());
-    cur.dmgPct += (am.dmgPct ?? 0) * mult; cur.flatDmg += (am.flatDmg ?? 0) * mult;
-    cur.costPct += (am.costPct ?? 0) * mult; cur.cooldownPct += (am.cooldownPct ?? 0) * mult;
+    let cur = mods.abilities[am.ability];
+    if (!cur) {
+      cur = zeroAbilityMod();
+      mods.abilities[am.ability] = cur;
+    }
+    cur.dmgPct += (am.dmgPct ?? 0) * mult;
+    cur.flatDmg += (am.flatDmg ?? 0) * mult;
+    cur.costPct += (am.costPct ?? 0) * mult;
+    cur.cooldownPct += (am.cooldownPct ?? 0) * mult;
     cur.castPct += (am.castPct ?? 0) * mult;
   }
   if (eff.grant) mods.grants.push({ ability: eff.grant.ability, rank: eff.grant.rank ?? 1 });
@@ -407,14 +528,20 @@ export function defaultBuild(cls: PlayerClass, points: number): TalentAllocation
         if (!opt) break;
         alloc.choices[node.id] = opt.id;
         alloc.ranks[node.id] = 1;
-        if (validateAllocation(cls, alloc, points).ok) { spent++; break; }
+        if (validateAllocation(cls, alloc, points).ok) {
+          spent++;
+          break;
+        }
         delete alloc.ranks[node.id];
         delete alloc.choices[node.id];
         break;
       }
       if (cur >= node.maxRank) break;
       alloc.ranks[node.id] = cur + 1;
-      if (validateAllocation(cls, alloc, points).ok) { spent++; continue; }
+      if (validateAllocation(cls, alloc, points).ok) {
+        spent++;
+        continue;
+      }
       if (cur === 0) delete alloc.ranks[node.id];
       else alloc.ranks[node.id] = cur;
       break;
@@ -429,12 +556,12 @@ export function computeTalentModifiers(cls: PlayerClass, alloc: TalentAllocation
   if (!ct) return mods;
   const idx = nodeIndex(ct);
 
-  const spec = alloc.spec ? ct.specs.find((s) => s.id === alloc.spec) ?? null : null;
+  const spec = alloc.spec ? (ct.specs.find((s) => s.id === alloc.spec) ?? null) : null;
   if (spec) {
     mods.spec = spec.id;
     mods.role = spec.role;
-    mods.grants.push({ ability: spec.signature, rank: 1 });    // signature ability
-    accumulate(mods, spec.mastery.effect, 1);                  // Mastery passive
+    mods.grants.push({ ability: spec.signature, rank: 1 }); // signature ability
+    accumulate(mods, spec.mastery.effect, 1); // Mastery passive
   }
 
   for (const id in alloc.ranks) {
@@ -442,7 +569,7 @@ export function computeTalentModifiers(cls: PlayerClass, alloc: TalentAllocation
     if (rank <= 0) continue;
     const node = idx.get(id);
     if (!node) continue;
-    if (node.tree === 'spec' && node.specId !== mods.spec) continue;  // dormant: ignore
+    if (node.tree === 'spec' && node.specId !== mods.spec) continue; // dormant: ignore
     if (node.kind === 'choice') {
       const opt = node.choices?.find((c) => c.id === alloc.choices[id]);
       if (opt) accumulate(mods, opt.effect, 1);
@@ -471,7 +598,13 @@ function b64decode(s: string): string {
 }
 
 export function exportBuild(cls: PlayerClass, alloc: TalentAllocation): string {
-  const payload = { v: TALENT_BUILD_VERSION, c: cls, s: alloc.spec, r: alloc.ranks, h: alloc.choices };
+  const payload = {
+    v: TALENT_BUILD_VERSION,
+    c: cls,
+    s: alloc.spec,
+    r: alloc.ranks,
+    h: alloc.choices,
+  };
   return b64encode(JSON.stringify(payload));
 }
 
@@ -481,17 +614,30 @@ export type BuildImport =
 
 export function importBuild(str: string): BuildImport {
   let payload: any;
-  try { payload = JSON.parse(b64decode(str.trim())); } catch { return { ok: false, reason: 'malformed build string' }; }
-  if (!payload || typeof payload !== 'object') return { ok: false, reason: 'malformed build string' };
-  if (payload.v !== TALENT_BUILD_VERSION) return { ok: false, reason: 'incompatible build version' };
-  if (typeof payload.c !== 'string' || !hasTalents(payload.c)) return { ok: false, reason: 'unknown class build' };
+  try {
+    payload = JSON.parse(b64decode(str.trim()));
+  } catch {
+    return { ok: false, reason: 'malformed build string' };
+  }
+  if (!payload || typeof payload !== 'object')
+    return { ok: false, reason: 'malformed build string' };
+  if (payload.v !== TALENT_BUILD_VERSION)
+    return { ok: false, reason: 'incompatible build version' };
+  if (typeof payload.c !== 'string' || !hasTalents(payload.c))
+    return { ok: false, reason: 'unknown class build' };
   const ranks: Record<string, number> = {};
   if (payload.r && typeof payload.r === 'object') {
-    for (const k in payload.r) { const v = payload.r[k]; if (typeof v === 'number' && v > 0) ranks[k] = Math.floor(v); }
+    for (const k in payload.r) {
+      const v = payload.r[k];
+      if (typeof v === 'number' && v > 0) ranks[k] = Math.floor(v);
+    }
   }
   const choices: Record<string, string> = {};
   if (payload.h && typeof payload.h === 'object') {
-    for (const k in payload.h) { const v = payload.h[k]; if (typeof v === 'string') choices[k] = v; }
+    for (const k in payload.h) {
+      const v = payload.h[k];
+      if (typeof v === 'string') choices[k] = v;
+    }
   }
   const spec = typeof payload.s === 'string' ? payload.s : null;
   return { ok: true, cls: payload.c, alloc: { spec, ranks, choices } };

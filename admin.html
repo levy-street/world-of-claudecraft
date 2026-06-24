@@ -80,6 +80,18 @@
   .word-del:hover { color: #f55; }
   .word-add { display: flex; gap: 6px; margin-top: 8px; }
   .word-add input { flex: 1; }
+  .ip-add { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+  .ip-add .ip-add-ip, .ip-add .ip-add-reason { flex: 1; min-width: 140px; }
+  .ip-add-expiry { display: flex; align-items: center; gap: 4px; font-size: 13px; color: #c9b27a; }
+  .ip-block .ip-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 4px 0; }
+  .ip-block code { background: #100d0b; padding: 2px 6px; border-radius: 3px; }
+  #blocked-ips table { width: 100%; table-layout: fixed; }
+  #blocked-ips th, #blocked-ips td { white-space: normal; overflow-wrap: anywhere; word-break: break-word; vertical-align: top; }
+  #blocked-ips th:nth-child(1), #blocked-ips td:nth-child(1) { width: 130px; }
+  #blocked-ips th:nth-child(3), #blocked-ips td:nth-child(3) { width: 150px; }
+  #blocked-ips th:nth-child(4), #blocked-ips td:nth-child(4) { width: 90px; }
+  #blocked-ips th:nth-child(5), #blocked-ips td:nth-child(5) { width: 150px; }
+  #blocked-ips th:nth-child(6), #blocked-ips td:nth-child(6) { width: 90px; }
   .cf-config { display: flex; flex-direction: column; gap: 8px; max-width: 460px; }
   .cf-config label { display: flex; flex-direction: column; gap: 3px; font-size: 13px; color: #c9b27a; }
   .chat-mod-status { margin: 6px 0; }
@@ -104,6 +116,13 @@
   .usage-section + .usage-section { margin-top: 14px; }
   .usage-section h4 { font-family: var(--title-font); color: var(--gold-dim); margin-bottom: 6px; font-size: 13px; }
   .empty { color: var(--text-dim); padding: 14px 8px; font-style: italic; }
+  .text-dim { color: var(--text-dim); }
+  .bug-desc-cell { white-space: normal; max-width: 420px; }
+  .btn-link { background: none; border: none; color: var(--gold); cursor: pointer; font: inherit; padding: 0; text-decoration: underline; }
+  .btn-link:hover { color: #fff; }
+  .bug-meta { margin: 4px 0 0; max-width: 420px; max-height: 220px; overflow: auto; white-space: pre-wrap; word-break: break-all; font-size: 11px; color: var(--text-dim); }
+  .bug-shot-overlay { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.85); cursor: zoom-out; padding: 24px; }
+  .bug-shot-overlay img { max-width: 100%; max-height: 100%; border: 1px solid #463a1c; border-radius: 3px; }
   .badge { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 11px; border: 1px solid var(--gold-dim); color: var(--gold); }
   .badge.warn { border-color: #c98c36; color: #ffbf66; }
   .badge.bad { border-color: #b34a3a; color: #ff7a5e; }
@@ -136,7 +155,14 @@
   .chart svg { width: 100%; height: auto; display: block; }
   .chart .bar { fill: #c8a838; }
   .chart .bar:hover { fill: #ffd100; }
+  .chart .line { fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+  .chart .line.primary { stroke: #ffd100; }
+  .chart .line.secondary { stroke: #8cc7ff; stroke-width: 2; opacity: .9; }
+  .chart .line-hit { fill: transparent; stroke: transparent; }
   .chart .axis { fill: var(--text-dim); font-size: 9px; }
+  .range-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 10px; }
+  .range-tab { min-height: 32px; border: 1px solid #4a3920; background: #1a130d; color: var(--text); border-radius: 6px; padding: 6px 10px; cursor: pointer; }
+  .range-tab.active { color: var(--gold); border-color: var(--gold-dim); background: #241a0e; }
 
   /* ---------- moderation ---------- */
   #moderation-detail { margin-top: 12px; }
@@ -144,10 +170,12 @@
   .mod-report-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 6px 12px; font-size: 12px; color: #c9b27a; }
   .mod-details { margin: 10px 0; padding: 10px; background: #0d0d14; border: 1px solid #2a2414; border-radius: 4px; white-space: pre-wrap; }
   .mod-actions, .mod-account-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 10px 0; }
-  .mod-actions button, .mod-account-actions button {
+  .mod-actions button, .mod-account-actions button, .ip-block button, .ip-add button, #blocked-ips table button {
     padding: 5px 10px; background: #1a1410; color: #c9b27a; border: 1px solid #463a1c; border-radius: 3px; cursor: pointer;
   }
-  .mod-actions button:hover, .mod-account-actions button:hover { color: #fff; border-color: var(--gold-dim); }
+  .mod-actions button:hover, .mod-account-actions button:hover, .ip-block button:hover, .ip-add button:hover, #blocked-ips table button:hover { color: #fff; border-color: var(--gold-dim); }
+  .ip-block .danger, .ip-add .danger { border-color: #b34a3a; color: #ff7a5e; }
+  .ip-block .danger:hover, .ip-add .danger:hover { border-color: #ff7a5e; color: #fff; }
   .mod-account-actions input { padding: 6px 8px; background: #11111a; border: 1px solid var(--border); border-radius: 4px; color: var(--text); }
   .account-admin-controls {
     align-items: stretch;
@@ -169,6 +197,27 @@
   .account-custom-expiry { width: 190px; }
   #mod-reason { min-width: 300px; flex: 1 1 300px; }
   #mod-custom-expiry { width: 190px; }
+
+  /* MMO-themed native controls (operators are users too): drop the cramped native
+     number steppers and recolor the datetime-local calendar picker to match the
+     gold-on-dark admin theme instead of the default light browser chrome. */
+  input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; appearance: none; margin: 0; }
+  input[type="datetime-local"], input[type="date"], input[type="time"] {
+    background: #11111a; border: 1px solid var(--border); border-radius: 4px;
+    color: var(--text); padding: 6px 8px; color-scheme: dark;
+  }
+  input[type="datetime-local"]:focus, input[type="date"]:focus, input[type="time"]:focus {
+    outline: none; border-color: var(--gold-dim); box-shadow: 0 0 0 1px var(--gold-dim);
+  }
+  input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+  input[type="date"]::-webkit-calendar-picker-indicator,
+  input[type="time"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    /* tint the default dark glyph toward gold so it reads on the dark field */
+    filter: invert(72%) sepia(60%) saturate(450%) hue-rotate(2deg) brightness(95%);
+  }
   .mod-confirm { display: none; margin: 10px 0; padding: 10px; border: 1px solid #8a6f2d; border-radius: 4px; background: #171207; }
   .mod-confirm.show { display: block; }
   .mod-confirm h4 { font-family: var(--title-font); color: var(--gold); margin-bottom: 6px; }
@@ -232,14 +281,16 @@
   <div id="app">
     <header>
       <h1 data-i18n="app.title">World of ClaudeCraft - Admin</h1>
-      <div class="who"><span data-i18n="auth.signedInAs">signed in as</span> <span id="who-name"></span><button id="logout" data-i18n="auth.signOut">Sign out</button></div>
+      <div class="who"><span data-i18n="auth.signedInAs">signed in as</span> <span id="who-name"></span><button type="button" id="logout" data-i18n="auth.signOut">Sign out</button></div>
     </header>
 
     <nav id="admin-tabs">
-      <button class="admin-tab active" data-admin-page="overview" data-i18n="nav.overview">Overview</button>
-      <button class="admin-tab" data-admin-page="usage" data-i18n="nav.usage">Usage</button>
-      <button class="admin-tab" data-admin-page="moderation" data-i18n="nav.moderation">Moderation</button>
-      <button class="admin-tab" data-admin-page="chat-filter" data-i18n="nav.chatFilter">Chat Filter</button>
+      <button type="button" class="admin-tab active" data-admin-page="overview" data-i18n="nav.overview">Overview</button>
+      <button type="button" class="admin-tab" data-admin-page="usage" data-i18n="nav.usage">Usage</button>
+      <button type="button" class="admin-tab" data-admin-page="moderation" data-i18n="nav.moderation">Moderation</button>
+      <button type="button" class="admin-tab" data-admin-page="chat-filter" data-i18n="nav.chatFilter">Chat Filter</button>
+      <button type="button" class="admin-tab" data-admin-page="blocked-ips" data-i18n="nav.blockedIps">Blocked IPs</button>
+      <button type="button" class="admin-tab" data-admin-page="bug-reports" data-i18n="nav.bugReports">Bug Reports</button>
     </nav>
 
     <main id="page-overview" class="admin-page active">
@@ -286,6 +337,21 @@
     <main id="page-chat-filter" class="admin-page">
       <section>
         <div id="chat-filter"></div>
+      </section>
+    </main>
+
+    <main id="page-blocked-ips" class="admin-page">
+      <section class="panel">
+        <div class="panel-title"><span data-i18n="blockedIps.title">Blocked IPs</span> <span class="hint" data-i18n="blockedIps.hint">connections from these addresses are refused</span></div>
+        <div id="blocked-ips"></div>
+      </section>
+    </main>
+
+    <main id="page-bug-reports" class="admin-page">
+      <section class="panel">
+        <div class="panel-title"><span data-i18n="bugReports.title">Bug Reports</span> <span class="hint" data-i18n="bugReports.hint">newest first</span></div>
+        <div id="bug-reports"></div>
+        <div class="controls"><div class="pager" id="bug-reports-pager"></div></div>
       </section>
     </main>
   </div>

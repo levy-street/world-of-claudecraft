@@ -85,6 +85,8 @@ Skip if no `src/sim/` files are in scope.
 - Time-based logic scales by `DT` (1/20) and advances on `tick()`; no wall-clock reads.
 - The import invariant holds: `src/sim/` imports nothing from `render/`, `ui/`, `game/`,
   `net/`, and has no DOM/Three.js imports (it must run unchanged in Node).
+- `npx vitest run tests/architecture.test.ts` passes (the automated guard for the import,
+  DOM-global, and nondeterminism rules above; run it for any `src/sim/` change).
 - A same-seed-same-result determinism test exists or is updated for the new logic.
 
 ### 2. Three-Host / IWorld Parity

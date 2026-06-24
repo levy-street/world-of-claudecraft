@@ -14,7 +14,7 @@ vi.mock('pg', () => ({
 
 import {
   createAccount, createCharacterCapped, deleteCharacter, grantAccountMechChroma, loadAccountCosmetics,
-  markAccountQuestComplete, openPlaySession, revokeAccountMechChroma, touchLogin,
+  markAccountQuestComplete, openPlaySession, reclaimDeactivatedName, renameCharacter, revokeAccountMechChroma, touchLogin,
 } from '../server/db';
 import { REALM } from '../server/realm';
 
@@ -48,6 +48,107 @@ describe('deleteCharacter', () => {
 
     dbMock.query.mockResolvedValueOnce({ rowCount: 1 } as any);
     expect(await deleteCharacter(7, 42)).toBe(true);
+  });
+});
+
+describe('renameCharacter', () => {
+  // A rename is a moderator-driven action: the admin "Force name change" sets
+  // force_rename, and the rename must be allowed ONLY while that flag is set.
+  // The UI only shows a rename control when force_rename is set, but the server
+  // is authoritative, so the gate must live in the UPDATE itself (a normal owner
+  // calling the API directly must not be able to rename a non-flagged character).
+  it('gates the UPDATE on force_rename so an un-flagged character cannot be renamed', async () => {
+    dbMock.query.mockResolvedValueOnce({ rows: [], rowCount: 0 } as any);
+
+    await renameCharacter(7, 42, 'Newname');
+
+    const [sql, params] = dbMock.query.mock.calls[0];
+    expect(sql).toMatch(/UPDATE characters/i);
+    expect(sql).toMatch(/force_rename\s*=\s*TRUE/i);
+    // still scoped to the owning account, the id, and the current realm
+    expect(params).toEqual(expect.arrayContaining([42, 7, 'Newname', REALM]));
+  });
+
+  it('returns the updated row on success and null when no row matched the gate', async () => {
+    dbMock.query.mockResolvedValueOnce({
+      rows: [{ id: 42, account_id: 7, name: 'Newname', class: 'mage', level: 5, state: null, is_gm: false, force_rename: false }],
+      rowCount: 1,
+    } as any);
+    expect((await renameCharacter(7, 42, 'Newname'))?.name).toBe('Newname');
+
+    dbMock.query.mockResolvedValueOnce({ rows: [], rowCount: 0 } as any);
+    expect(await renameCharacter(7, 42, 'Newname')).toBeNull();
+  });
+});
+
+describe('reclaimDeactivatedName', () => {
+  // A character name held only by a deactivated ("invalid") account must be
+  // reclaimable: classic MMOs free the names of deactivated/deleted accounts.
+  // The orphaned character is archived (suffixed name + force_rename) so its row
+  // stays valid and the original owner is force-renamed if they ever reactivate.
+  it('archives the orphaned character and reports success when the holder is deactivated', async () => {
+    const client = clientStub();
+    dbMock.connect.mockResolvedValue(client as any);
+    client.query
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // BEGIN
+      .mockResolvedValueOnce({ rows: [{ id: 99, name: 'SturdyStubs', deactivated_at: '2026-01-01T00:00:00Z', banned_at: null }], rowCount: 1 } as any) // holder lookup
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // archive-name clash check: free
+      .mockResolvedValueOnce({ rows: [], rowCount: 1 } as any) // UPDATE
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // COMMIT
+
+    await expect(reclaimDeactivatedName('SturdyStubs')).resolves.toBe(true);
+
+    const calls = client.query.mock.calls;
+    expect(calls[0][0]).toBe('BEGIN');
+    expect(calls[1][0]).toMatch(/deactivated_at/);
+    expect(calls[1][0]).toMatch(/FOR UPDATE/);
+    expect(calls[1][1]).toEqual([REALM, 'SturdyStubs']);
+    const updateCall = calls.find((c) => /UPDATE characters/i.test(c[0]));
+    expect(updateCall).toBeDefined();
+    expect(updateCall![0]).toMatch(/force_rename\s*=\s*TRUE/i);
+    expect(updateCall![1][0]).toBe(99); // scoped to the orphaned character id
+    expect(updateCall![1][1]).toBe('SturdyStubsa'); // archival placeholder
+    expect(calls.map((c) => c[0])).toContain('COMMIT');
+    expect(client.release).toHaveBeenCalledTimes(1);
+  });
+
+  it('does nothing and reports false when the name is held by a live account', async () => {
+    const client = clientStub();
+    dbMock.connect.mockResolvedValue(client as any);
+    client.query
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // BEGIN
+      .mockResolvedValueOnce({ rows: [{ id: 99, name: 'SturdyStubs', deactivated_at: null, banned_at: null }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // ROLLBACK
+
+    await expect(reclaimDeactivatedName('SturdyStubs')).resolves.toBe(false);
+    const verbs = client.query.mock.calls.map((c) => c[0]);
+    expect(verbs).not.toContain('COMMIT');
+    expect(verbs).toContain('ROLLBACK');
+    expect(verbs.some((s) => /UPDATE characters/i.test(s))).toBe(false);
+  });
+
+  it('does nothing when the name is not held at all', async () => {
+    const client = clientStub();
+    dbMock.connect.mockResolvedValue(client as any);
+    client.query
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // BEGIN
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // no holder
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // ROLLBACK
+
+    await expect(reclaimDeactivatedName('Nobody')).resolves.toBe(false);
+    expect(client.query.mock.calls.map((c) => c[0])).not.toContain('COMMIT');
+  });
+
+  it('leaves a banned account\'s name reserved even when the account is deactivated', async () => {
+    const client = clientStub();
+    dbMock.connect.mockResolvedValue(client as any);
+    client.query
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // BEGIN
+      .mockResolvedValueOnce({ rows: [{ id: 99, name: 'SturdyStubs', deactivated_at: '2026-01-01T00:00:00Z', banned_at: '2026-01-01T00:00:00Z' }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // ROLLBACK
+
+    await expect(reclaimDeactivatedName('SturdyStubs')).resolves.toBe(false);
+    expect(client.query.mock.calls.map((c) => c[0]).some((s) => /UPDATE characters/i.test(s))).toBe(false);
   });
 });
 

@@ -12,7 +12,7 @@ vi.mock('../server/db', () => ({
 
 import { ChatLogger, type ChatLogRow } from '../server/chat_log';
 import { GameServer } from '../server/game';
-import { Sim } from '../src/sim/sim';
+import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
 
 function row(message: string, channel = 'say'): ChatLogRow {
   return { accountId: 1, characterId: 2, characterName: 'Zyx', channel, message };
@@ -76,11 +76,11 @@ describe('sent chat normalization', () => {
     expect(throttled).toBe(true);
   });
 
-  it('caps captured messages at 200 characters like Sim.chat', () => {
+  it('caps captured messages at MAX_CHAT_MESSAGE_LEN characters like Sim.chat', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');
     const sent = sim.chat('x'.repeat(500), a);
-    expect(sent?.message.length).toBe(200);
+    expect(sent?.message.length).toBe(MAX_CHAT_MESSAGE_LEN);
   });
 });
 

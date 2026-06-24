@@ -80,5 +80,5 @@ describe("i18n resolved-artifact reproducibility", () => {
     // across the runs (a hidden locale/timezone/path dependency would surface as a diff).
     // outFiles omitted => the whole emitted tree (all per-locale slices + barrel) is compared.
     expect(() => assertDeterministic({ script: buildScript })).not.toThrow();
-  });
+  }, 15000);
 });

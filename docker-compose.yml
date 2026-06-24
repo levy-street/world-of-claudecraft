@@ -46,6 +46,19 @@ services:
       CHAT_CENSOR_FILE: ${CHAT_CENSOR_FILE:-}
       # Runtime: server-side Turnstile verification (see .env.example). Empty → gate off.
       TURNSTILE_SECRET: ${TURNSTILE_SECRET:-}
+      # Runtime: native app attestation for iOS DeviceCheck and Google Play Integrity.
+      # Secrets are read from .env on the host and passed through to the container.
+      NATIVE_ATTESTATION_REQUIRED: ${NATIVE_ATTESTATION_REQUIRED:-}
+      GOOGLE_PLAY_INTEGRITY_SERVICE_ACCOUNT_JSON: ${GOOGLE_PLAY_INTEGRITY_SERVICE_ACCOUNT_JSON:-}
+      GOOGLE_PLAY_INTEGRITY_SIGNING_PEM: ${GOOGLE_PLAY_INTEGRITY_SIGNING_PEM:-}
+      GOOGLE_PLAY_INTEGRITY_PACKAGE_NAME: ${GOOGLE_PLAY_INTEGRITY_PACKAGE_NAME:-com.worldofclaudecraft}
+      GOOGLE_PLAY_INTEGRITY_CERT_DIGESTS: ${GOOGLE_PLAY_INTEGRITY_CERT_DIGESTS:-}
+      GOOGLE_PLAY_INTEGRITY_DEVICE_VERDICT: ${GOOGLE_PLAY_INTEGRITY_DEVICE_VERDICT:-MEETS_DEVICE_INTEGRITY}
+      APPLE_TEAM_ID: ${APPLE_TEAM_ID:-}
+      APPLE_BUNDLE_ID: ${APPLE_BUNDLE_ID:-com.worldofclaudecraft}
+      APPLE_DEVICECHECK_KEY_ID: ${APPLE_DEVICECHECK_KEY_ID:-}
+      APPLE_DEVICECHECK_SIGNING_PEM: ${APPLE_DEVICECHECK_SIGNING_PEM:-}
+      APPLE_DEVICECHECK_ENV: ${APPLE_DEVICECHECK_ENV:-production}
       # Runtime: protects the loopback-only deploy countdown endpoint.
       RESTART_COUNTDOWN_SECRET: ${RESTART_COUNTDOWN_SECRET:-}
     # loopback-only: the TLS reverse proxy (Caddy) is the public entrance

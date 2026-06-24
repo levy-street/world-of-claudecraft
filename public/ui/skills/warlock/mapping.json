@@ -1,0 +1,116 @@
+{
+  "class": "warlock",
+  "license": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+  "iconSize": 128,
+  "sourcePacks": [
+    "tmp/asset_src/warlock-skill-icons",
+    "tmp/asset_src/demon-skill-icons (summons + life_tap/searing_pain)"
+  ],
+  "runtimeDir": "public/ui/skills/warlock",
+  "abilities": [
+    {
+      "abilityId": "shadow_bolt",
+      "sourcePack": "warlock",
+      "sourceFile": "15.png",
+      "output": "shadow_bolt.png"
+    },
+    {
+      "abilityId": "demon_skin",
+      "sourcePack": "warlock",
+      "sourceFile": "43.png",
+      "output": "demon_skin.png"
+    },
+    {
+      "abilityId": "immolate",
+      "sourcePack": "warlock",
+      "sourceFile": "4.png",
+      "output": "immolate.png"
+    },
+    {
+      "abilityId": "corruption",
+      "sourcePack": "warlock",
+      "sourceFile": "12.png",
+      "output": "corruption.png"
+    },
+    {
+      "abilityId": "curse_of_agony",
+      "sourcePack": "warlock",
+      "sourceFile": "38.png",
+      "output": "curse_of_agony.png"
+    },
+    {
+      "abilityId": "drain_life",
+      "sourcePack": "warlock",
+      "sourceFile": "14.png",
+      "output": "drain_life.png"
+    },
+    {
+      "abilityId": "fear",
+      "sourcePack": "warlock",
+      "sourceFile": "28.png",
+      "output": "fear.png"
+    },
+    {
+      "abilityId": "shadowburn",
+      "sourcePack": "warlock",
+      "sourceFile": "33.png",
+      "output": "shadowburn.png"
+    },
+    {
+      "abilityId": "summon_imp",
+      "sourcePack": "Summon_Imp_Warlock",
+      "sourceFile": "11.png",
+      "output": "summon_imp.png",
+      "note": "replaced generic demon face with a proper imp"
+    },
+    {
+      "abilityId": "summon_voidwalker",
+      "sourcePack": "warlock",
+      "sourceFile": "36.png",
+      "output": "summon_voidwalker.png"
+    },
+    {
+      "abilityId": "summon_succubus",
+      "sourcePack": "warlock",
+      "sourceFile": "48.png",
+      "output": "summon_succubus.png"
+    },
+    {
+      "abilityId": "summon_felhunter",
+      "sourcePack": "demon",
+      "sourceFile": "19.png",
+      "output": "summon_felhunter.png"
+    },
+    {
+      "abilityId": "summon_felguard",
+      "sourcePack": "demon",
+      "sourceFile": "25.png",
+      "output": "summon_felguard.png"
+    },
+    {
+      "abilityId": "summon_infernal",
+      "sourcePack": "demon",
+      "sourceFile": "48.png",
+      "output": "summon_infernal.png"
+    },
+    {
+      "abilityId": "summon_doomguard",
+      "sourcePack": "demon",
+      "sourceFile": "1.png",
+      "output": "summon_doomguard.png"
+    },
+    {
+      "abilityId": "life_tap",
+      "sourcePack": "demon",
+      "sourceFile": "44.png",
+      "output": "life_tap.png"
+    },
+    {
+      "abilityId": "searing_pain",
+      "sourcePack": "demon",
+      "sourceFile": "12.png",
+      "output": "searing_pain.png"
+    }
+  ],
+  "deferredStayProcedural": {}
+}

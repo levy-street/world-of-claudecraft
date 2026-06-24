@@ -308,6 +308,27 @@ export class Vfx {
     });
   }
 
+  beam(sourceId: number, targetId: number, school: string): void {
+    const from = this.anchor(sourceId, 0.62);
+    const to = this.anchor(targetId, 0.55);
+    if (!from || !to) return;
+    const color = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffffff).multiplyScalar(hdr(1.9));
+    const dir = to.clone().sub(from);
+    const len = dir.length();
+    if (len <= 0.001) return;
+    dir.multiplyScalar(1 / len);
+    const steps = Math.min(30, Math.max(8, Math.ceil(len / 1.25)));
+    for (let i = 0; i <= steps; i++) {
+      const f = i / steps;
+      const jitter = (Math.random() - 0.5) * 0.18;
+      const x = from.x + (to.x - from.x) * f + (Math.random() - 0.5) * 0.12;
+      const y = from.y + (to.y - from.y) * f + jitter;
+      const z = from.z + (to.z - from.z) * f + (Math.random() - 0.5) * 0.12;
+      this.spawn(x, y, z, -dir.x * 0.8, 0.08, -dir.z * 0.8, color, 0.34, 0.18, 0, SPR.glowCore);
+    }
+    this.spawn(to.x, to.y, to.z, 0, 0.2, 0, color, 0.9, 0.2, 0, SPR.magicRune);
+  }
+
   burst(at: THREE.Vector3, school: string, count = 18, power = 1): void {
     const c = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffffff).multiplyScalar(hdr(1.6));
     const isFire = school === 'fire';

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
-import { SimEvent, Entity } from '../src/sim/types';
+import type { Entity, SimEvent } from '../src/sim/types';
 
 function makeWorld() {
   return new Sim({ seed: 42, playerClass: 'hunter', noPlayer: true });
@@ -40,9 +40,18 @@ describe('/pettaunt command', () => {
     const pet = givePet(sim, a);
     pet.petTauntTimer = 0;
     sim.chat('/growl', a);
-    expect(errorTexts(sim.tick())).toContain(
-      `Your pet's Growl is ready — it will taunt its target on the next melee swing.`,
-    );
+    expect(errorTexts(sim.tick())).toContain(`Your pet's Growl is ready. Auto-taunt is off.`);
+  });
+
+  it('reports when Growl autocast is enabled', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('hunter', 'Aleph');
+    sim.tick();
+    const pet = givePet(sim, a);
+    pet.petTauntTimer = 0;
+    sim.setPetAutoTaunt(true, a);
+    sim.chat('/growl', a);
+    expect(errorTexts(sim.tick())).toContain(`Your pet's Growl is ready. Auto-taunt is on.`);
   });
 
   it('reports remaining cooldown rounded up while Growl recharges', () => {
@@ -53,7 +62,7 @@ describe('/pettaunt command', () => {
     pet.petTauntTimer = 4.2;
     sim.chat('/petgrowl', a);
     expect(errorTexts(sim.tick())).toContain(
-      `Your pet's Growl is on cooldown — ready in 5s.`,
+      `Your pet's Growl is on cooldown. Auto-taunt is off. Ready in 5s.`,
     );
   });
 });

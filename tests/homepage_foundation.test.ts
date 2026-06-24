@@ -9,7 +9,7 @@ vi.hoisted(() => {
 
 import { pool, getAccountsCount } from "../server/db";
 import { t, setLanguage, getLanguage, ensureLocaleLoaded } from "../src/ui/i18n";
-import { Api } from "../src/net/online";
+import { Api, apiUrl } from "../src/net/online";
 
 describe("i18n Translation Foundation", () => {
   beforeEach(() => {
@@ -187,5 +187,16 @@ describe("Api.projectStats", () => {
 
     const api = new Api();
     await expect(api.projectStats()).rejects.toThrow("Internal Server Error");
+  });
+});
+
+describe("Api URL helpers", () => {
+  it("keeps browser builds same-origin when no base is configured", () => {
+    expect(apiUrl("/api/status")).toBe("/api/status");
+  });
+
+  it("resolves native or realm calls against an absolute origin", () => {
+    expect(apiUrl("/api/status", "https://worldofclaudecraft.com/")).toBe("https://worldofclaudecraft.com/api/status");
+    expect(apiUrl("https://realm.example.com/api/status", "https://worldofclaudecraft.com")).toBe("https://realm.example.com/api/status");
   });
 });

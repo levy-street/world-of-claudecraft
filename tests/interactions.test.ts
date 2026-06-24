@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { activePvpOpponentIds, handlePickedEntity, hoverCursorKind, isAttackableEntity, isAttackHoverTarget } from '../src/game/interactions';
+import {
+  activePvpOpponentIds,
+  handlePickedEntity,
+  hoverCursorKind,
+  isAttackableEntity,
+  isAttackHoverTarget,
+} from '../src/game/interactions';
 import type { Entity } from '../src/sim/types';
 
 function stubEntity(partial: Partial<Entity> & Pick<Entity, 'id' | 'kind'>): Entity {
@@ -126,10 +132,10 @@ describe('activePvpOpponentIds', () => {
         standings: {
           '1v1': { rating: 1500, wins: 0, losses: 0 },
           '2v2': { rating: 1500, wins: 0, losses: 0 },
-          'fiesta': { rating: 1500, wins: 0, losses: 0 },
+          fiesta: { rating: 1500, wins: 0, losses: 0 },
         },
         ladder: [],
-        ladders: { '1v1': [], '2v2': [], 'fiesta': [] },
+        ladders: { '1v1': [], '2v2': [], fiesta: [] },
         match: {
           oppPid: 3,
           oppName: 'Arena Rival',
@@ -165,10 +171,10 @@ describe('activePvpOpponentIds', () => {
         standings: {
           '1v1': { rating: 1500, wins: 0, losses: 0 },
           '2v2': { rating: 1500, wins: 0, losses: 0 },
-          'fiesta': { rating: 1500, wins: 0, losses: 0 },
+          fiesta: { rating: 1500, wins: 0, losses: 0 },
         },
         ladder: [],
-        ladders: { '1v1': [], '2v2': [], 'fiesta': [] },
+        ladders: { '1v1': [], '2v2': [], fiesta: [] },
         match: {
           oppPid: 3,
           oppName: 'Arena Rival',
@@ -187,6 +193,49 @@ describe('activePvpOpponentIds', () => {
 });
 
 describe('handlePickedEntity', () => {
+  it('targets and starts auto-attack on a hostile mob on right-click', () => {
+    // Right-clicking an enemy targets AND begins auto-attack, the classic-MMO
+    // convention the attack ability tooltip documents ("Right-clicking an enemy
+    // also attacks."). Camera right-drag never reaches here: clickPickFromMouseGesture
+    // rejects a right-button gesture that moved past the drag threshold, so this
+    // fires only on a deliberate right-click, never on a camera rotation.
+    const player = stubEntity({ id: 1, kind: 'player' });
+    const mob = stubEntity({ id: 2, kind: 'mob', hostile: true, pos: { x: 3, y: 0, z: 0 } });
+    let targetId: number | null = null;
+    let attacks = 0;
+    const world: any = {
+      playerId: 1,
+      player,
+      entities: new Map([
+        [1, player],
+        [2, mob],
+      ]),
+      duelInfo: null,
+      arenaInfo: null,
+      targetEntity: (id: number | null) => {
+        targetId = id;
+      },
+      enterDungeon: () => {},
+      leaveDungeon: () => {},
+      pickUpObject: () => {},
+      startAutoAttack: () => {
+        attacks++;
+      },
+    };
+    const hud = {
+      openLoot: () => {},
+      openQuestDialog: () => {},
+      openDelveBoard: () => {},
+      showError: () => {},
+      closeContextMenu: () => {},
+    };
+
+    handlePickedEntity(world, hud, 2, 2, 10, 20);
+
+    expect(targetId).toBe(2);
+    expect(attacks).toBe(1);
+  });
+
   it('starts auto-attack when right-clicking an active duel opponent', () => {
     const player = stubEntity({ id: 1, kind: 'player' });
     const opponent = stubEntity({ id: 2, kind: 'player', pos: { x: 3, y: 0, z: 0 } });
@@ -195,18 +244,26 @@ describe('handlePickedEntity', () => {
     const world: any = {
       playerId: 1,
       player,
-      entities: new Map([[1, player], [2, opponent]]),
+      entities: new Map([
+        [1, player],
+        [2, opponent],
+      ]),
       duelInfo: { otherPid: 2, otherName: 'Bet', state: 'active' },
       arenaInfo: null,
-      targetEntity: (id: number | null) => { targetId = id; },
+      targetEntity: (id: number | null) => {
+        targetId = id;
+      },
       enterDungeon: () => {},
       leaveDungeon: () => {},
       pickUpObject: () => {},
-      startAutoAttack: () => { attacks++; },
+      startAutoAttack: () => {
+        attacks++;
+      },
     };
     const hud = {
       openLoot: () => {},
       openQuestDialog: () => {},
+      openDelveBoard: () => {},
       showError: () => {},
       closeContextMenu: () => {},
     };

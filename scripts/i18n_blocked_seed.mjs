@@ -69,7 +69,19 @@ export const COPIED_ALLOW_IDS = [
   "admin::pt_BR::chatMod.status",
   "admin::de_DE::class.paladin",
   "admin::fr_FR::class.paladin",
-  "admin::fr_CA::class.paladin"
+  "admin::fr_CA::class.paladin",
+  // Bug-report admin table columns (v0.13.0). These header words are true cognates
+  // / borrowed terms that are legitimately byte-identical to English in the locale,
+  // matching how the moderation/report/online columns above are already handled.
+  "admin::fr_FR::bugReports.colPosition",
+  "admin::fr_FR::bugReports.colDescription",
+  "admin::fr_CA::bugReports.colPosition",
+  "admin::fr_CA::bugReports.colDescription",
+  "admin::de_DE::bugReports.colPosition",
+  "admin::de_DE::bugReports.colStatus",
+  "admin::de_DE::bugReports.colMeta",
+  "admin::de_DE::bugReports.colScreenshot",
+  "admin::pt_BR::bugReports.colStatus"
 ];
 
 export const V07_SLASH = [

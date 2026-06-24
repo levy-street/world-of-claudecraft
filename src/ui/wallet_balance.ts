@@ -90,7 +90,39 @@ export function resolveWocBalanceUpdate(opts: {
   linkedAddress: string | null;
 }): WocBalanceUpdate {
   const { address, fresh, balance, currentAddress, linkedAddress } = opts;
-  if (currentAddress !== address && linkedAddress !== address) return { apply: false, setLinked: false };
+  if (currentAddress !== address && linkedAddress !== address)
+    return { apply: false, setLinked: false };
   if (fresh && balance === null) return { apply: false, setLinked: false };
   return { apply: true, setLinked: linkedAddress === address };
+}
+
+/**
+ * Decide whether a merely-connected browser wallet should be disconnected as
+ * "unverified" when the app is idle. Pure so main.ts's auto-reconnect handling is
+ * unit-testable without a DOM.
+ *
+ * A connected wallet is KEPT (not disconnected) when:
+ *  - nothing is connected (nothing to do);
+ *  - a verify flow is mid-flight (`verifyPending`/`verifyInProgress`), since it is
+ *    about to be linked;
+ *  - the account's link status hasn't loaded yet (`linkStatusPending`): this is
+ *    the boot/reload window. Disconnecting here is the bug that forced a re-sign on
+ *    every reload even though the link is durable server-side: the wallet
+ *    auto-reconnects before we've learned it is the linked one;
+ *  - it already matches the account-linked pubkey (it IS verified).
+ * Otherwise it is an unverified, idle, non-linked wallet and should be dropped.
+ */
+export function shouldDisconnectUnverifiedWallet(opts: {
+  connectedAddress: string | null;
+  linkedPubkey: string | null;
+  verifyPending: boolean;
+  verifyInProgress: boolean;
+  linkStatusPending: boolean;
+}): boolean {
+  const { connectedAddress, linkedPubkey, verifyPending, verifyInProgress, linkStatusPending } =
+    opts;
+  if (!connectedAddress) return false;
+  if (verifyPending || verifyInProgress || linkStatusPending) return false;
+  if (connectedAddress === linkedPubkey) return false;
+  return true;
 }

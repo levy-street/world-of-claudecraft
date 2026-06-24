@@ -10,15 +10,15 @@ aggro/leash, parties, duels, arena, trade, market, dungeon instances, terrain,
 and the RL observation surface. Same code runs offline / on the server / headless.
 
 ## Key files
-- **`sim.ts`** (~10k lines) — the whole simulation. `class Sim`; one `tick()` does everything. See the nav map below.
-- **`types.ts`** (~1.2k) — ALL shared types AND the global tuning constants + vanilla formulas (`TICK_RATE`, `DT`, `GCD`, ranges, `XP_TABLE`, hit/armor/rage math, post-cap `virtualLevel`/prestige). Plus the `SimEvent` union and the `Entity` shape.
+- **`sim.ts`** — the whole simulation. `class Sim`; one `tick()` does everything. See the nav map below.
+- **`types.ts`** — ALL shared types AND the global tuning constants + vanilla formulas (`TICK_RATE`, `DT`, `GCD`, ranges, `XP_TABLE`, hit/armor/rage math, post-cap `virtualLevel`/prestige). Plus the `SimEvent` union and the `Entity` shape.
 - `data.ts` — merges `content/*` into the flat tables (`ABILITIES`, `MOBS`, `NPCS`, `QUESTS`, `ITEMS`, `CAMPS`, `DUNGEONS`) and owns world-layout consts (`WORLD_SIZE`, `instanceOrigin`, `arenaOrigin`, `zoneAt`, `dungeonAt`).
 - `entity.ts` — `createPlayer/createMob/createNpc/createGroundObject` + `recalcPlayerStats` (the ONE place derived stats are computed from class/level/gear/auras/talent `mods`).
 - `rng.ts` — `class Rng` (mulberry32) + stateless `hash2/noise2/fbm2` for terrain.
 - `world.ts` — `groundHeight`/`terrainHeight` (pure fn of x,z,seed), `WATER_LEVEL`, `generateDecorations`. **Renderer samples the same fns** — keep them identical.
 - `colliders.ts` — `resolvePosition` (static collision + slide); reads `PROPS` and the dungeon/arena layouts.
 - `dungeon_layout.ts` — plain-number interior layouts; single source for BOTH render geometry and `colliders.ts` interior sets.
-- `pathfind.ts` — local A* (`findPath`), used for warrior Charge.
+- `pathfind.ts` — local A* (`findPath`); the player-tuned wrapper `findPlayerPath` (body radius, climb, swim) is what warrior Charge calls via `findChargePath`.
 - `threat.ts` — vanilla hate-table math (`addThreat`, `threatModifier`, taunt, stealth detection).
 - `spatial.ts` — `SpatialGrid` entity hash for radius queries; re-bucketed at end of tick.
 - `obs.ts` — RL surface: `ACTIONS`/`applyAction`/`encodeObs`/`obsSize`. Consumed by `headless/` + `python/` (see those dirs).
@@ -31,9 +31,11 @@ and the RL observation surface. Same code runs offline / on the server / headles
 ## sim.ts navigation map (banner-comment regions, in order)
 Entity roster (add/remove/teleport) · Players join/leave/persistence · **Back-compat accessors** (`player`/`inventory`/`xp`/… delegate to the primary player; per-player state lives in `PlayerMeta`, not the `Entity`) · Talents · **Main tick** (`tick()`, under the `// Main tick` banner) · Player movement · Regen/timers/auras · Casting/channeling/abilities · Hunter pets · Auto-attack/melee · Damage/death (`dealDamage`) · Mob AI · Targeting · Inventory/items/vendor · Interaction (loot/quest NPCs/objects) · Quests · Player death/respawn · Hostility · Parties · Duels · Arena (Elo) · Trading · World Market (auction house) · Dungeons/instances.
 
+`sim.ts` is large by necessity (one deterministic tick), but a self-contained subsystem that grows its own state and helpers can be lifted into a sibling pure module the way `threat.ts`/`spatial.ts`/`pathfind.ts` already are; mirror that pure-core pattern rather than splitting just to cut line count.
+
 ## Tuning constants — change numbers THERE, not inline
 - Global gameplay/formulas: top of **`types.ts`** (`MELEE_RANGE`, `GCD`, `XP_TABLE`, rage/hit/armor fns, …).
-- Sim-internal knobs: the `const` block atop **`sim.ts`** (starts ~L45: `LEASH_DISTANCE`, `MELEE_ARC`, `GRAVITY`, `PARTY_*`, `ARENA_*`, `MARKET_*`, `CHARGE_*`, `PET_*`, swim/climb, …). Edit the named const; don't hardcode magic numbers in methods.
+- Sim-internal knobs: the `const` block atop **`sim.ts`** (`LEASH_DISTANCE`, `MELEE_ARC`, `GRAVITY`, `PARTY_*`, `ARENA_*`, `MARKET_*`, `CHARGE_*`, `PET_*`, swim/climb, …). Edit the named const; don't hardcode magic numbers in methods.
 
 ## Talking to the outside
 - Output is the **`SimEvent`** union (`types.ts`). Code calls `this.emit(ev)`; `tick()` returns the drained `SimEvent[]`. An event with `pid` is personal (delivered only to that player's owner); without `pid` it's world-visible.

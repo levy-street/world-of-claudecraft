@@ -4,32 +4,103 @@
 // merges those records into the flat tables the rest of the engine consumes,
 // and owns the world-layout constants.
 
+import { BASE_ITEMS, FISHING_RARE_ID, FISHING_TABLES } from './content/items';
 import type {
-  CampDef, DungeonDef, GroundObjectDef, ItemDef, MobTemplate, NpcDef,
-  PlayerClass, QuestDef, QuestState, ZoneDef, ZonePropsDef,
+  CampDef,
+  DelveDef,
+  DelveModuleDef,
+  DungeonDef,
+  GroundObjectDef,
+  ItemDef,
+  MobTemplate,
+  NpcDef,
+  PlayerClass,
+  QuestDef,
+  QuestState,
+  ZoneDef,
+  ZonePropsDef,
 } from './types';
-import { BASE_ITEMS, FISHING_TABLES, FISHING_RARE_ID } from './content/items';
-export { FISHING_TABLES, FISHING_RARE_ID };
+
 export type { FishingEntry } from './content/items';
+export { FISHING_RARE_ID, FISHING_TABLES };
+
 import {
-  GRAVEYARD_POS, LAKE, TOWN_RADIUS, ZONE1_CAMPS, ZONE1_CHAPEL_CAMPS, ZONE1_MOBS, ZONE1_NPCS, ZONE1_OBJECTS,
-  ZONE1_PROPS, ZONE1_QUESTS, ZONE1_QUEST_ORDER, ZONE1_ROADS, ZONE1_ZONE,
-} from './content/zone1';
-import {
-  DEEPFEN_SHALLOWS_LAKE, ZONE2_CAMPS, ZONE2_ITEMS, ZONE2_MOBS, ZONE2_NPCS, ZONE2_OBJECTS, ZONE2_PROPS,
-  ZONE2_QUESTS, ZONE2_QUEST_ORDER, ZONE2_ROADS, ZONE2_ZONE,
-} from './content/zone2';
-import {
-  ZONE3_CAMPS, ZONE3_ITEMS, ZONE3_MOBS, ZONE3_NPCS, ZONE3_OBJECTS, ZONE3_PROPS,
-  ZONE3_QUESTS, ZONE3_QUEST_ORDER, ZONE3_ROADS, ZONE3_ZONE,
-} from './content/zone3';
+  BROTHER_HALVEN,
+  COLLAPSED_RELIQUARY_DELVE,
+  COLLAPSED_RELIQUARY_MODULES,
+  DELVE_MOBS,
+} from './content/delves';
 import { DUNGEON_DEFS, DUNGEON_MOBS } from './content/dungeons';
-import { WARLOCK_PET_MOBS } from './content/warlock_pets';
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
 import {
-  TEMPLE_CAMPS, TEMPLE_DUNGEON_DEFS, TEMPLE_DUNGEON_MOBS, TEMPLE_ITEMS, TEMPLE_MOBS,
-  TEMPLE_NPCS, TEMPLE_OBJECTS, TEMPLE_PROPS, TEMPLE_QUEST_ORDER, TEMPLE_QUESTS,
+  TEMPLE_CAMPS,
+  TEMPLE_DUNGEON_DEFS,
+  TEMPLE_DUNGEON_MOBS,
+  TEMPLE_ITEMS,
+  TEMPLE_MOBS,
+  TEMPLE_NPCS,
+  TEMPLE_OBJECTS,
+  TEMPLE_PROPS,
+  TEMPLE_QUEST_ORDER,
+  TEMPLE_QUESTS,
 } from './content/temple';
+import { WARLOCK_PET_MOBS } from './content/warlock_pets';
+import {
+  GRAVEYARD_POS,
+  LAKE,
+  TOWN_RADIUS,
+  ZONE1_CAMPS,
+  ZONE1_CHAPEL_CAMPS,
+  ZONE1_MOBS,
+  ZONE1_NPCS,
+  ZONE1_OBJECTS,
+  ZONE1_PROPS,
+  ZONE1_QUEST_ORDER,
+  ZONE1_QUESTS,
+  ZONE1_ROADS,
+  ZONE1_ZONE,
+} from './content/zone1';
+import {
+  DEEPFEN_SHALLOWS_LAKE,
+  ZONE2_CAMPS,
+  ZONE2_ITEMS,
+  ZONE2_MOBS,
+  ZONE2_NPCS,
+  ZONE2_OBJECTS,
+  ZONE2_PROPS,
+  ZONE2_QUEST_ORDER,
+  ZONE2_QUESTS,
+  ZONE2_ROADS,
+  ZONE2_ZONE,
+} from './content/zone2';
+import {
+  ZONE3_CAMPS,
+  ZONE3_ITEMS,
+  ZONE3_MOBS,
+  ZONE3_NPCS,
+  ZONE3_OBJECTS,
+  ZONE3_PROPS,
+  ZONE3_QUEST_ORDER,
+  ZONE3_QUESTS,
+  ZONE3_ROADS,
+  ZONE3_ZONE,
+} from './content/zone3';
+import { DUNGEON_WALL_HW } from './dungeon_layout';
+
+export type { DelveShopEntry, DelveShopGate, DelveShopOffer } from './content/delves';
+// Delve affix/companion catalogs are consumed by the Sim delve engine; re-export
+// them here so sim.ts imports the whole delve data surface from one module.
+export {
+  COMPANION_UPGRADE_COSTS,
+  DELVE_AFFIXES,
+  DELVE_COMPANIONS,
+  DELVE_SHOPS,
+  delveShopGateUnlocked,
+  resolveDelveShopOffers,
+} from './content/delves';
+
+import { DELVE_ITEMS } from './content/delves/items';
+import { DELVE_MODULE_LAYOUTS, type DelveModuleId, delveModuleSpan } from './delve_layout';
 
 function mergeItems(...parts: Record<string, ItemDef>[]): Record<string, ItemDef> {
   const merged = Object.assign({}, ...parts);
@@ -41,34 +112,64 @@ function mergeItems(...parts: Record<string, ItemDef>[]): Record<string, ItemDef
   return merged;
 }
 
-export { CLASSES, ABILITIES, abilitiesKnownAt } from './content/classes';
 export type { ClassDef } from './content/classes';
+export { ABILITIES, abilitiesKnownAt, CLASSES } from './content/classes';
 // Re-export content shapes so existing `from './data'` imports keep working.
 export type {
-  BiomeId, CampDef, DungeonDef, DungeonSpawn, GroundObjectDef, NpcDef, ZoneDef, ZonePropsDef,
+  BiomeId,
+  CampDef,
+  DelveDef,
+  DungeonDef,
+  DungeonSpawn,
+  GroundObjectDef,
+  NpcDef,
+  ZoneDef,
+  ZonePropsDef,
 } from './types';
 
 // ---------------------------------------------------------------------------
 // Merged content tables
 // ---------------------------------------------------------------------------
 
-export const ITEMS: Record<string, ItemDef> = mergeItems(BASE_ITEMS, ZONE2_ITEMS, ZONE3_ITEMS, TEMPLE_ITEMS);
+export const ITEMS: Record<string, ItemDef> = mergeItems(
+  BASE_ITEMS,
+  ZONE2_ITEMS,
+  ZONE3_ITEMS,
+  TEMPLE_ITEMS,
+  DELVE_ITEMS,
+);
 
 export const MOBS: Record<string, MobTemplate> = {
-  ...ZONE1_MOBS, ...ZONE2_MOBS, ...ZONE3_MOBS, ...DUNGEON_MOBS,
-  ...WARLOCK_PET_MOBS, ...TEMPLE_MOBS, ...TEMPLE_DUNGEON_MOBS,
+  ...ZONE1_MOBS,
+  ...ZONE2_MOBS,
+  ...ZONE3_MOBS,
+  ...DUNGEON_MOBS,
+  ...WARLOCK_PET_MOBS,
+  ...TEMPLE_MOBS,
+  ...TEMPLE_DUNGEON_MOBS,
+  ...DELVE_MOBS,
 };
 
 export const NPCS: Record<string, NpcDef> = {
-  ...ZONE1_NPCS, ...ZONE2_NPCS, ...ZONE3_NPCS, ...TEMPLE_NPCS,
+  ...ZONE1_NPCS,
+  ...ZONE2_NPCS,
+  ...ZONE3_NPCS,
+  ...TEMPLE_NPCS,
+  brother_halven: BROTHER_HALVEN,
 };
 
 export const QUESTS: Record<string, QuestDef> = {
-  ...ZONE1_QUESTS, ...ZONE2_QUESTS, ...ZONE3_QUESTS, ...TEMPLE_QUESTS,
+  ...ZONE1_QUESTS,
+  ...ZONE2_QUESTS,
+  ...ZONE3_QUESTS,
+  ...TEMPLE_QUESTS,
 };
 
 export const QUEST_ORDER: string[] = [
-  ...ZONE1_QUEST_ORDER, ...ZONE2_QUEST_ORDER, ...ZONE3_QUEST_ORDER, ...TEMPLE_QUEST_ORDER,
+  ...ZONE1_QUEST_ORDER,
+  ...ZONE2_QUEST_ORDER,
+  ...ZONE3_QUEST_ORDER,
+  ...TEMPLE_QUEST_ORDER,
 ];
 
 // Camps spawn in array order, each drawing world-gen RNG, so an entry inserted
@@ -76,15 +177,29 @@ export const QUEST_ORDER: string[] = [
 // (ZONE1_CHAPEL_CAMPS) and the Eastbrook rare Grix are appended LAST so every
 // existing zone camp keeps its exact draw order (determinism).
 export const CAMPS: CampDef[] = [
-  ...ZONE1_CAMPS, ...ZONE2_CAMPS, ...ZONE3_CAMPS, ...TEMPLE_CAMPS, ...ZONE1_CHAPEL_CAMPS,
+  ...ZONE1_CAMPS,
+  ...ZONE2_CAMPS,
+  ...ZONE3_CAMPS,
+  ...TEMPLE_CAMPS,
+  ...ZONE1_CHAPEL_CAMPS,
   { mobId: 'grix_the_tunnelking', center: { x: -95, z: -78 }, radius: 4, count: 1 },
 ];
 
-export const GROUND_OBJECTS: GroundObjectDef[] = [...ZONE1_OBJECTS, ...ZONE2_OBJECTS, ...ZONE3_OBJECTS, ...TEMPLE_OBJECTS];
+export const GROUND_OBJECTS: GroundObjectDef[] = [
+  ...ZONE1_OBJECTS,
+  ...ZONE2_OBJECTS,
+  ...ZONE3_OBJECTS,
+  ...TEMPLE_OBJECTS,
+];
 
 export const ROADS: { x: number; z: number }[][] = [...ZONE1_ROADS, ...ZONE2_ROADS, ...ZONE3_ROADS];
 
-export const PROPS: ZonePropsDef = mergeProps([ZONE1_PROPS, ZONE2_PROPS, ZONE3_PROPS, TEMPLE_PROPS]);
+export const PROPS: ZonePropsDef = mergeProps([
+  ZONE1_PROPS,
+  ZONE2_PROPS,
+  ZONE3_PROPS,
+  TEMPLE_PROPS,
+]);
 
 function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
   return {
@@ -100,14 +215,23 @@ function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
     ruinRings: sets.flatMap((s) => s.ruinRings),
     fences: sets.flatMap((s) => s.fences),
     graveyards: sets.flatMap((s) => s.graveyards),
+    // optional per-zone field, was being dropped here, so the delve entrance
+    // marker (name slab + arch) never reached the renderer (props.ts)
+    delveMarkers: sets.flatMap((s) => s.delveMarkers ?? []),
   };
 }
 
 // Quest reward fallback by archetype: classes without an explicit entry use these.
 export const REWARD_ARCHETYPE: Record<PlayerClass, PlayerClass> = {
-  warrior: 'warrior', paladin: 'warrior', shaman: 'warrior',
-  rogue: 'rogue', hunter: 'rogue',
-  mage: 'mage', priest: 'mage', warlock: 'mage', druid: 'mage',
+  warrior: 'warrior',
+  paladin: 'warrior',
+  shaman: 'warrior',
+  rogue: 'rogue',
+  hunter: 'rogue',
+  mage: 'mage',
+  priest: 'mage',
+  warlock: 'mage',
+  druid: 'mage',
 };
 
 // Resolve the item a quest awards a given class: a class-specific reward if the
@@ -120,7 +244,6 @@ export function questRewardItem(quest: QuestDef, cls: PlayerClass): string | und
 }
 
 export const questRewardItemId = questRewardItem;
-
 
 // Vanilla group XP multipliers by party size (1-5).
 export const GROUP_XP_BONUS = [1, 1, 1.166, 1.3, 1.43];
@@ -150,15 +273,17 @@ export function zoneAt(z: number): ZoneDef {
   return ZONES[ZONES.length - 1];
 }
 
-export function zoneWelcomeText(zone: ZoneDef, questState: (questId: string) => QuestState): string | null {
+export function zoneWelcomeText(
+  zone: ZoneDef,
+  questState: (questId: string) => QuestState,
+): string | null {
   if (zone.welcomeQuestId && questState(zone.welcomeQuestId) !== 'available') return null;
   return zone.welcome;
 }
 
 // Legacy single-zone exports (zone 1) — still referenced by tests and the
 // starter-town logic.
-export { GRAVEYARD_POS, LAKE, TOWN_RADIUS };
-export { DEEPFEN_SHALLOWS_LAKE };
+export { DEEPFEN_SHALLOWS_LAKE, GRAVEYARD_POS, LAKE, TOWN_RADIUS };
 export const ZONE_NAME = ZONE1_ZONE.name;
 
 // ---------------------------------------------------------------------------
@@ -198,7 +323,7 @@ export function dungeonAt(x: number): DungeonDef | null {
 // ---------------------------------------------------------------------------
 
 export const ARENA_X = 4200; // arena instances share this x; slots stack along z
-export const ARENA_X_MIN = 4000; // x at/after this = an arena instance, not a dungeon
+export const ARENA_X_MIN = ARENA_X; // x at/after this = an arena instance, not a dungeon
 export const ARENA_SLOT_COUNT = 4; // concurrent 1v1 matches the world can host
 const ARENA_Z0 = -1250;
 const ARENA_SLOT_SPACING = 120; // > the pit footprint (~44yd) so slots never overlap
@@ -208,17 +333,21 @@ export function arenaOrigin(slot: number): { x: number; z: number } {
 }
 
 export function isArenaPos(x: number): boolean {
-  return x >= ARENA_X_MIN;
+  return x >= ARENA_X_MIN && x < DELVE_BAND_X_MIN;
 }
 
 // Nearest arena instance origin to a far-off position, matched by z-band (the
 // x is shared across slots). Mirrors how the dungeon collider resolver maps a
 // position back to its instance slot.
 export function arenaOriginAt(z: number): { x: number; z: number; slot: number } {
-  let best = 0, bestD = Infinity;
+  let best = 0,
+    bestD = Infinity;
   for (let i = 0; i < ARENA_SLOT_COUNT; i++) {
     const d = Math.abs(z - arenaOrigin(i).z);
-    if (d < bestD) { bestD = d; best = i; }
+    if (d < bestD) {
+      bestD = d;
+      best = i;
+    }
   }
   const o = arenaOrigin(best);
   return { x: o.x, z: o.z, slot: best };
@@ -229,3 +358,168 @@ export const CRYPT_DOOR_POS = DUNGEONS.hollow_crypt.doorPos;
 export const CRYPT_ENTRY = DUNGEONS.hollow_crypt.entry;
 export const CRYPT_EXIT_OFFSET = DUNGEONS.hollow_crypt.exitOffset;
 export const CRYPT_SPAWNS = DUNGEONS.hollow_crypt.spawns;
+
+// ---------------------------------------------------------------------------
+// Delves, private party instances past the arena x-band (see docs/prd/delves.md).
+// DELVE_X_MIN must stay above ARENA_X_MIN (4000) and ARENA_X (4200).
+// ---------------------------------------------------------------------------
+
+// 4800 sits clear of the v0.10.0 layout: dungeons end at ARENA_X_MIN (4000) and
+// the arena pit is centred at ARENA_X (4200, ~±22u footprint). The delve band's
+// west edge (DELVE_BAND_X_MIN = 4773) leaves a comfortable margin past the arena.
+export const DELVE_X_MIN = 4800;
+// Each delve room is centred at DELVE_X_MIN + index*600. Delve modules use wider
+// side walls than the base crypt kit: the side-wall centre is at instance-local
+// |x| = DELVE_WALL_X (25, mirror of delve_layout.ts WALL_X) and the collider's
+// outer face sits 1u beyond that (|x| = 26), i.e. world-x = DELVE_X_MIN - 26 =
+// 4774 for slot 0. We set the band edge 1u further west again (4773) so
+// isDelvePos covers the ENTIRE room footprint, including the west wall face,
+// and the west half is never misclassified as arena. Still >500u clear of ARENA_X.
+const DELVE_WALL_X = 25; // mirror of delve_layout.ts WALL_X (delve side-wall centre)
+export const DELVE_BAND_X_MIN = DELVE_X_MIN - (DELVE_WALL_X + DUNGEON_WALL_HW + 1);
+export const DELVE_SLOT_COUNT = 6;
+export const DELVE_MODULE_GAP = 16;
+export const DELVE_MODULE_Z_START = 8;
+const DELVE_Z0 = -1250;
+const DELVE_SLOT_SPACING = 620; // covers 110u×4 rooms + 16u×3 gaps + 40u margin ≈ 536u
+
+export function delveOrigin(delveIndex: number, slot: number): { x: number; z: number } {
+  return { x: DELVE_X_MIN + delveIndex * 600, z: DELVE_Z0 + slot * DELVE_SLOT_SPACING };
+}
+
+export function isDelvePos(x: number): boolean {
+  return x >= DELVE_BAND_X_MIN;
+}
+
+export function delveAt(x: number): DelveDef | null {
+  if (!isDelvePos(x)) return null;
+  const index = Math.round((x - DELVE_X_MIN) / 600);
+  return DELVE_LIST.find((d) => d.index === index) ?? null;
+}
+
+export const DELVES: Record<string, DelveDef> = {
+  [COLLAPSED_RELIQUARY_DELVE.id]: COLLAPSED_RELIQUARY_DELVE,
+};
+export const DELVE_LIST: DelveDef[] = Object.values(DELVES).sort((a, b) => a.index - b.index);
+export const DELVE_MODULES: Record<string, DelveModuleDef> = {
+  ...COLLAPSED_RELIQUARY_MODULES,
+};
+
+function delveModuleFootprint(moduleId: string): number {
+  const mod = DELVE_MODULES[moduleId];
+  const layoutId = (mod?.layout ?? moduleId) as DelveModuleId;
+  if (DELVE_MODULE_LAYOUTS[layoutId]) return delveModuleSpan(layoutId);
+  return mod?.length ?? 50;
+}
+
+/** World-z offset of a delve module within its instance slot (matches Sim). */
+export function delveModuleZOffset(modules: readonly string[], moduleIndex: number): number {
+  let z = DELVE_MODULE_Z_START;
+  for (let i = 0; i < moduleIndex; i++) {
+    z += delveModuleFootprint(modules[i]) + DELVE_MODULE_GAP;
+  }
+  return z;
+}
+
+/** Relative-z extent of a full module chain from the slot door (matches renderer gate). */
+export function delveModuleStackEndRelZ(modules: readonly string[], margin = 40): number {
+  if (modules.length === 0) return DELVE_MODULE_Z_START + 80 + margin;
+  const lastId = modules[modules.length - 1];
+  const layoutId = (DELVE_MODULES[lastId]?.layout ?? lastId) as DelveModuleId;
+  const layout = DELVE_MODULE_LAYOUTS[layoutId];
+  return delveModuleZOffset(modules, modules.length - 1) + (layout?.zMax ?? 91) + margin;
+}
+
+/** Pick the instance slot whose stacked module band contains world-z. */
+export function delveSlotAt(delveIndex: number, z: number, modules: readonly string[]): number {
+  const mods = modules.length > 0 ? modules : ['reliquary_sunken_ossuary'];
+  const stackEnd = delveModuleStackEndRelZ(mods);
+  const zMin = DELVE_MODULE_Z_START - 30;
+  for (let i = 0; i < DELVE_SLOT_COUNT; i++) {
+    const o = delveOrigin(delveIndex, i);
+    const relZ = z - o.z;
+    if (relZ >= zMin && relZ <= stackEnd) return i;
+  }
+  let best = 0;
+  let bestD = Infinity;
+  for (let i = 0; i < DELVE_SLOT_COUNT; i++) {
+    const o = delveOrigin(delveIndex, i);
+    const d = Math.abs(z - o.z);
+    if (d < bestD) {
+      bestD = d;
+      best = i;
+    }
+  }
+  return best;
+}
+
+// Memoized: the default chain is a pure function of the static DELVES table, and
+// callers (collision/camera fallback) hit it per-frame inside the delve band, so
+// cache one frozen array per delve id instead of reallocating each call.
+const DEFAULT_DELVE_MODULES = new Map<string, readonly string[]>();
+
+/** Default module chain for a delve when no active run is available. */
+export function defaultDelveModules(delveId: string): readonly string[] {
+  const cached = DEFAULT_DELVE_MODULES.get(delveId);
+  if (cached) return cached;
+  const delve = DELVES[delveId];
+  const chain = delve
+    ? Object.freeze([
+        ...delve.modules.slice(0, delve.moduleCount[0] ?? delve.modules.length),
+        delve.finaleModuleId,
+      ])
+    : Object.freeze(['reliquary_sunken_ossuary']);
+  DEFAULT_DELVE_MODULES.set(delveId, chain);
+  return chain;
+}
+
+/** Map world position to the active delve module band (instance-local coords). */
+export function delveModuleLocal(
+  x: number,
+  z: number,
+  modules: readonly string[],
+): {
+  ox: number;
+  oz: number;
+  moduleIndex: number;
+  moduleId: string;
+  localX: number;
+  localZ: number;
+} {
+  const delve = delveAt(x);
+  const index = delve?.index ?? Math.round((x - DELVE_X_MIN) / 600);
+  const mods =
+    modules.length > 0
+      ? modules
+      : delve
+        ? defaultDelveModules(delve.id)
+        : ['reliquary_sunken_ossuary'];
+  const slot = delveOrigin(index, delveSlotAt(index, z, mods));
+  const ox = slot.x;
+  const slotOz = slot.z;
+  const relZ = z - slotOz;
+  let zCursor = DELVE_MODULE_Z_START;
+  for (let i = 0; i < mods.length; i++) {
+    const len = delveModuleFootprint(mods[i]);
+    if (relZ < zCursor + len || i === mods.length - 1) {
+      return {
+        ox,
+        oz: slotOz + zCursor,
+        moduleIndex: i,
+        moduleId: mods[i],
+        localX: x - ox,
+        localZ: relZ - zCursor,
+      };
+    }
+    zCursor += len + DELVE_MODULE_GAP;
+  }
+  const last = mods[mods.length - 1];
+  return {
+    ox,
+    oz: slotOz + zCursor,
+    moduleIndex: mods.length - 1,
+    moduleId: last,
+    localX: x - ox,
+    localZ: relZ - zCursor,
+  };
+}

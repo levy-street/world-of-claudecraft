@@ -14,8 +14,8 @@
 import * as readline from 'node:readline';
 import { Sim, RewardCounters } from '../src/sim/sim';
 import { ACTIONS, NUM_ACTIONS, applyAction, encodeObs, obsSize } from '../src/sim/obs';
-import { MAX_LEVEL } from '../src/sim/types';
-import { MAX_INPUT_LINE_LENGTH, validateAction } from './protocol';
+import { ALL_CLASSES, MAX_LEVEL, PlayerClass } from '../src/sim/types';
+import { MAX_INPUT_LINE_LENGTH, validateAction, validatePlayerClass } from './protocol';
 
 interface EnvConfig {
   frameSkip: number; // sim ticks per env step (20 ticks = 1 second)
@@ -57,11 +57,11 @@ const DEFAULT_CONFIG: EnvConfig = {
 class Env {
   sim: Sim | null = null;
   config: EnvConfig = DEFAULT_CONFIG;
-  playerClass: 'warrior' | 'mage' = 'warrior';
+  playerClass: PlayerClass = 'warrior';
   stepCount = 0;
   prev: RewardCounters | null = null;
 
-  reset(seed: number, playerClass: 'warrior' | 'mage', cfg: Partial<EnvConfig> & { rewards?: Partial<EnvConfig['rewards']> }): object {
+  reset(seed: number, playerClass: PlayerClass, cfg: Partial<EnvConfig> & { rewards?: Partial<EnvConfig['rewards']> }): object {
     this.config = {
       ...DEFAULT_CONFIG,
       ...cfg,
@@ -172,7 +172,14 @@ function serve(): void {
           send({ obs_size: obsSize(), num_actions: NUM_ACTIONS, actions: ACTIONS, max_level: MAX_LEVEL });
           break;
         case 'reset':
-          send(env.reset(msg.seed ?? 0, msg.player_class ?? 'warrior', msg.config ?? {}));
+          {
+            const playerClass = validatePlayerClass(msg.player_class ?? 'warrior');
+            if (playerClass === null) {
+              send({ error: `invalid player_class: expected one of ${ALL_CLASSES.join(', ')}` });
+              break;
+            }
+            send(env.reset(msg.seed ?? 0, playerClass, msg.config ?? {}));
+          }
           break;
         case 'step':
           {

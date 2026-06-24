@@ -50,31 +50,68 @@ held to these — verify in mobile portrait *and* landscape before calling UI wo
   of list/rail/chip items (motion-sickness trigger); text contrast ≥4.5:1 (≥3:1 large).
   Accessible names are still `t()` keys (see i18n below).
 
-## hud.ts (~8270 — one class `Hud`) — navigation map
-Every region is fenced by a `// ----` banner. `update()` (~L2148) is the per-frame
-entry; `onEvent` paths feed log/FCT/audio/banners (~L3412). Jump by banner:
-| Region | ~line |
-|---|---|
-| Fields / constructor / `OptionsHooks`,`ReportHooks` | 303–630 |
-| Chat tabs / emote wheel | 859 / 1052 |
-| Portraits (canvas paint lives in `unit_portrait*`), icons, tooltips, money | 1280 |
-| Action bar (`slotMap`, `BAR_ABILITY_SLOTS`, click/keybind dispatch) | 1570 |
-| Frame update (unit/target/combat state) | 2129 |
-| Minimap & world map (`toggleMap`, zone band) | 2567 |
-| Ashen Coliseum arena panel (`toggleArena`) | 2853 |
-| Events → log / FCT / audio / banners | 3287 |
-| 2v2 Fiesta HUD (score, respawn, augment picks) | 4141 |
-| Quest dialog (gossip) · Loot · Vendor | 4378 / 4586 / 4629 |
-| World Market (auction house: browse/sell/collect) | 4726 |
-| Bags · Character window · Spellbook | 4960 / 5198 / 5976 |
-| Confirm dialog + in-app text-input modal (replaces native `prompt`) | 5792 / 5809 |
-| Talents & Specializations panel ('N', staged-edit + loadouts) | 6067 |
-| Quest log · Party frames · Player context menu | 6443 / 6533 / 6587 |
-| Social panel (friends/guild/ignore, online) | 6928 |
-| Prompts (party/trade/duel) · Trade window | 7248 / 7270 |
-| Options menu (Esc) + keybind rebinding | 7370 |
+## hud.ts navigation map (one class `Hud`)
+Every region is fenced by a `// ----` banner, so jump by grepping the banner (or the
+named method) rather than a line number. `update()` is the per-frame entry;
+`handleEvents(events)` feeds log/FCT/audio/banners (`onEvent` is a method on the
+`meters` helper, not `Hud`). Regions in file order:
+| Region |
+|---|
+| Fields / constructor / `OptionsHooks`,`ReportHooks` |
+| Chat tabs / emote wheel |
+| Portraits (canvas paint lives in `unit_portrait*`), icons, tooltips, money |
+| Action bar (`hotbarActions`, `slotMapKey`, `BAR_ABILITY_SLOTS`, click/keybind dispatch) |
+| Frame update (unit/target/combat state) |
+| Minimap & world map (`toggleMap`, zone band) |
+| Ashen Coliseum arena panel (`toggleArena`) |
+| Events → log / FCT / audio / banners |
+| 2v2 Fiesta HUD (score, respawn, augment picks) |
+| Quest dialog (gossip) · Loot · Vendor |
+| World Market (auction house: browse/sell/collect) |
+| Bags · Character window · Spellbook |
+| Confirm dialog + in-app text-input modal (replaces native `prompt`) |
+| Talents & Specializations panel ('N', staged-edit + loadouts) |
+| Quest log · Party frames · Player context menu |
+| Social panel (friends/guild/ignore, online) |
+| Prompts (party/trade/duel) · Trade window |
+| Options menu (Esc) + keybind rebinding |
 Toggle/open methods (`toggleBags`, `openVendor`, `openContextMenu`, …) are the
 public surface `main.ts`/input call.
+
+**New self-contained windows go in their own module, not a new banner section.**
+`hud.ts` is the worst monolith to grow: a new window or panel that does not need `Hud`'s
+private per-frame state belongs in its own `src/ui/` module the HUD composes (the
+direction the HUD modularization is heading; see the root Modularity section). The pure
+painters (`unit_portrait*`, `xp_bar.ts`) are the template: a host-agnostic core a Vitest
+drives directly, plus a thin DOM/canvas consumer.
+
+### Extracting a HUD window (the recipe)
+`hud.ts` is one `Hud` class touched by nearly every PR; that is the merge-conflict tax
+this recipe pays down. Migrate one window at a time, on the rule of three, never as a
+big-bang split. **Reference: the Vendor window (`vendor_view.ts` + `vendor_window.ts`,
+the first window migrated this way), copy its shape for the next one.**
+
+The split has three parts:
+1. **Pure view model** (`<window>_view.ts`): a DOM-free, i18n-free `build<Window>View(...)`
+   that takes the raw world inputs and returns the structure the window draws (which rows,
+   which prices, which flags). This is the only part with branching logic worth testing in
+   isolation. Unit-test it directly in `tests/<window>_view.test.ts` (no DOM): see
+   `tests/vendor_view.test.ts`. For sim-derived data add `expect(build()).toEqual(build())`.
+2. **Thin consumer** (`<window>_window.ts`): a `render<Window>(el, ...view, deps)` that paints
+   the panel and wires clicks. It imports `t`/`esc`/`svgIcon`/formatters directly but takes
+   `Hud`'s shared painters (`itemIcon`, `moneyHtml`, `itemTooltip`, `attachTooltip`,
+   `hideTooltip`) and the action callbacks (`onBuy`, `onClose`, …) as an injected `deps`
+   object. It owns no state and never imports `Hud`.
+3. **Hud stays the orchestrator.** Keep the `open<Window>`/`close<Window>` methods in `Hud`:
+   cross-window coordination (`closeOtherWindows`, bag re-centring, mobile teardown, body
+   classes) needs `Hud`'s private state and does not belong in the module. The per-render
+   method (e.g. `renderVendor`) shrinks to: resolve the entity, build the view, call the
+   module with `deps`.
+
+Keep the diff a move-plus-import, not a rewrite (root `extract-and-test` skill). Reuse
+existing `t()` keys where the markup is unchanged (a pure extraction adds no i18n keys;
+Vendor added none). All interpolated names still pass through `esc()`. For item-name
+display, import the shared `itemDisplayName` from `entity_i18n.ts` rather than re-copying it.
 
 ## i18n - IMPORTANT (sparse-overlay model; contributors add ENGLISH ONLY)
 The locale data is split across files. Touch the right one:
@@ -105,10 +142,21 @@ The locale data is split across files. Touch the right one:
   surface). `setLanguage` is synchronous and does NOT load — `main.ts` awaits
   `ensureLocaleLoaded` before localized paint and before each picker switch.
 
+**Merge conflicts in the committed generated artifacts** (`i18n.status.summary.json`
+is the usual one; also `i18n.resolved.sha256` and any `i18n.resolved.generated/` slice)
+are **never hand-resolved**. Take either side to clear the markers, then run
+`npm run i18n:gen` (build + admin + scan) to regenerate every committed artifact from
+the merged source-of-truth (the `i18n.catalog/` modules + `i18n.locales/` overlays) and
+`git add` the result. The output is deterministic, so a second `npm run i18n:gen` must
+leave the tree clean — that idempotency is your proof the resolution is right (and the CI
+i18n:gen freshness step checks the same thing). A rising `pending` count after merging a
+`release/**` branch into a feature branch is expected (its new content is not yet
+translated) and is fine at the PR-tier gate.
+
 `t(key)` **throws on an untracked key in dev/test**, renders English for a `pending`
 key on **non-release builds only**, and **hard-fails a pending key on a release build**
 (`isReleaseBuild()` = `I18N_RELEASE=1` or `import.meta.env.PROD`). The HUD is fully
-localized (~750 `t()` calls in hud.ts); prefer `t()` for new user-facing strings.
+localized; prefer `t()` for new user-facing strings.
 
 **Contributor workflow (add a player-visible string): add ENGLISH ONLY:**
 1. Add the key to `en` (the matching `i18n.catalog/<domain>.ts` module) and render it
@@ -167,7 +215,7 @@ names + narratives (its `.en` slice spreads into the catalog); `entity_i18n.ts`
 titles/descriptions. A new world/talent name belongs in `world_entity_i18n.ts` (or the
 talent source), with the translations living in the overlays like any other key.
 
-## icons.ts (~1720) — procedural, no image files
+## icons.ts — procedural, no image files
 Icons are composed on a canvas at runtime and cached as PNG data URLs — there are
 **no icon image assets**. Public API: `iconDataUrl(kind, id, size)` where `kind`
 is `'ability' | 'item' | 'aura' | 'crest'`; plus `QUALITY_COLOR`.
@@ -187,7 +235,7 @@ ask for: presentation/domain logic lifted out of `hud.ts` into a small,
 host-agnostic module a Vitest test imports directly, with the DOM/canvas side kept
 thin. Follow this shape for new/updated features whose logic is worth reusing or
 unit-testing.
-- **unit_portrait.ts** (~54) / **unit_portrait_painter.ts** (~86): the circular
+- **unit_portrait.ts** / **unit_portrait_painter.ts**: the circular
   player/target-frame portrait. The pure core (`unit_portrait.ts`, DOM-free,
   unit-tested in `tests/unit_portrait.test.ts`) holds the geometry + crest-id
   resolution: HiDPI backing-store sizing (`portraitBackingPx`), crest
@@ -196,13 +244,36 @@ unit-testing.
   consumer: DPR-aware canvas backing store, crest/headshot blit, decoded-image
   cache. Player and target frames share one implementation; `hud.ts` only routes
   the framed unit to it. Screenshot harness: `scripts/target_frame_visual.mjs`.
-- **xp_bar.ts** (~83) — pure `xpBarView()`, no DOM (snapshot-tested). Shows the
+- **xp_bar.ts** — pure `xpBarView()`, no DOM (snapshot-tested). Shows the
   post-cap **virtual level** `Lv 20 (+N)` + lifetime total when overflow is on;
   classic "MAX LEVEL" when off. See `virtualLevelProgress` in `sim/types`.
-- **meters.ts** (~345) — DPS/HPS/threat meters, encounter-segmented; threat reads
+- **meters.ts** — DPS/HPS/threat meters, encounter-segmented; threat reads
   the mob's real `entity.threat` hate table. Uses `performance.now()` (UI timing
   only — fine here; that ban is sim-only).
-- **player_context_menu.ts** (~48) — pure `chatPlayerContextActions()` returning
+- **vendor_view.ts** / **vendor_window.ts**: the merchant vendor window, and the
+  first full window migrated out of `hud.ts` by the "Extracting a HUD window"
+  recipe above. The pure **view** (`vendor_view.ts`, DOM/i18n-free,
+  unit-tested in `tests/vendor_view.test.ts`) is `buildVendorView`, which decides
+  the sellable goods rows (item exists + has a buyValue) and the redeemable buyback
+  rows (item exists + count > 0) with prices. The thin **consumer**
+  (`vendor_window.ts`, `renderVendorWindow`) paints `#vendor-window` from that view
+  and takes `Hud`'s shared painters plus the buy/buyback/close callbacks as injected
+  `deps`. `Hud` keeps `openVendor`/`closeVendor` (cross-window orchestration);
+  `renderVendor` is now a thin bridge.
+- **player_context_menu.ts** — pure `chatPlayerContextActions()` returning
   whisper/invite/friend/ignore/report actions for the right-click-player menu.
-- **auth_utils.ts** (~96) — login/char-select form helpers: password toggle, ARIA
+- **auth_utils.ts** — login/char-select form helpers: password toggle, ARIA
   validity sync, `validateCharacterName` (mirrors the server regex).
+- **stat_tooltip.ts** / **stat_tooltip_view.ts**: the character-screen (C panel)
+  stat hover tooltips. The pure **core** (`stat_tooltip.ts`, DOM/i18n-free,
+  reconciled against `recalcPlayerStats` in `tests/stat_tooltip.test.ts`) builds the
+  structured `StatTooltipModel` (which class-aware effect lines a stat contributes
+  and their live values) and exposes `weaponDps`. The pure **view**
+  (`stat_tooltip_view.ts`, unit-tested in `tests/stat_tooltip_view.test.ts`) turns a
+  model into the floating tooltip HTML, the visually-hidden aria breakdown, and the
+  focusable `statCellHtml` markup, taking i18n + `formatNumber` as an injected
+  `StatTooltipI18n` so it never imports the runtime. `hud.ts` is the thin consumer:
+  `statModel()` bridges the live sim to the core, then it hands the model to the view.
+- **esc.ts**: the one canonical HTML escaper (`esc`) for innerHTML / attribute
+  interpolation, shared by `hud.ts`, `portrait_chip.ts`, and the small view modules
+  (the src/ui rule "all HTML interpolation goes through `esc()`"); escapes `& < > " '`.

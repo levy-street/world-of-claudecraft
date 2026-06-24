@@ -1,7 +1,10 @@
 # Asset Credits
 
 Bundled third-party art assets are CC0 (public domain dedication) except the
-three.js water normal maps (MIT). Attribution is provided as a courtesy.
+three.js water normal maps (MIT) and the CraftPix skill-icon packs. The CraftPix
+icon packs were **purchased by the Levy Street account (callum@levystreet.com)**
+and are used under the CraftPix premium royalty-free license. Attribution is
+provided as a courtesy.
 
 | Assets | Author | Source | License |
 |---|---|---|---|
@@ -19,8 +22,10 @@ three.js water normal maps (MIT). Attribution is provided as a courtesy.
 | HDRI environment maps (kloofendal_48d_partly_cloudy_puresky, belfast_open_field, kiara_1_dawn, dikhololo_night) | Poly Haven | https://polyhaven.com | CC0 1.0 |
 | Water normal maps (waternormals.jpg, Water_1/2_M_Normal.jpg) | three.js authors | https://github.com/mrdoob/three.js (r165, examples/textures) | MIT |
 | Biome backdrop panoramas (vale_backdrop.webp, marsh_backdrop.webp, peaks_backdrop.webp and 4K variants) | World of ClaudeCraft | Project-generated procedural painterly sky panorama art | Project asset |
+| Class ability icons (`public/ui/skills/<class>/*.png` — all 9 classes: paladin, hunter, priest, warlock, rogue, warrior, mage, druid, shaman; source packs paladin/archer/priest/warlock/thief/warrior/berserker/demon/druid/pyromancer/cryomancer/aeromancer/lightning-mage/earth-magician/100-rpg-skill-icons/100-skill-icons-pack-for-rpg + per-ability fill sets; all 152 abilities across the 9 classes covered) | CraftPix | https://craftpix.net | CraftPix premium (royalty-free commercial) — purchased by Levy Street account (callum@levystreet.com) |
 
 Assets were optimized for shipping (animation clip pruning, meshopt compression,
 texture resizing) via `scripts/assets/build_assets.mjs`; raw packs are not
-committed. License texts: https://creativecommons.org/publicdomain/zero/1.0/
-and https://github.com/mrdoob/three.js/blob/r165/LICENSE.
+committed. License texts: https://creativecommons.org/publicdomain/zero/1.0/ ,
+https://github.com/mrdoob/three.js/blob/r165/LICENSE , and
+https://craftpix.net/file-licenses/ (CraftPix).

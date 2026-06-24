@@ -99,6 +99,14 @@ type NavigatorWithBackdropHints = Navigator & {
   readonly webkitConnection?: NetworkInformationLike;
 };
 
+/** Typed read of the Save-Data client hint (the user asked to conserve data). */
+export function navigatorSaveData(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  const nav = navigator as NavigatorWithBackdropHints;
+  const connection = nav.connection ?? nav.mozConnection ?? nav.webkitConnection;
+  return !!connection?.saveData;
+}
+
 function shouldUseLiteBackdrop(): boolean {
   if (typeof location !== 'undefined') {
     const params = new URLSearchParams(location.search);

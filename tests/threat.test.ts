@@ -1,21 +1,43 @@
 // Classic threat mechanics + the class kit that drives them (stances/forms,
 // stealth, pets).
 import { describe, expect, it } from 'vitest';
-import { Sim } from '../src/sim/sim';
-import { dist2d } from '../src/sim/types';
-import type { Entity } from '../src/sim/types';
-import {
-  BEAR_FORM_THREAT_MULT, DEFENSIVE_STANCE_THREAT_MULT, RIGHTEOUS_FURY_THREAT_MULT,
-} from '../src/sim/threat';
-import { terrainHeight } from '../src/sim/world';
 import { abilitiesKnownAt } from '../src/sim/data';
+import { Sim } from '../src/sim/sim';
+import {
+  BEAR_FORM_THREAT_MULT,
+  DEFENSIVE_STANCE_THREAT_MULT,
+  RIGHTEOUS_FURY_THREAT_MULT,
+} from '../src/sim/threat';
+import type { Entity } from '../src/sim/types';
+import { dist2d } from '../src/sim/types';
+import { terrainHeight } from '../src/sim/world';
 
 function makeSim(cls: Parameters<typeof simClass>[0] = 'warrior', seed = 42) {
   return new Sim({ seed, playerClass: cls, autoEquip: true });
 }
 // type helper only — keeps makeSim's signature honest without importing PlayerClass
-function simClass(cls: 'warrior' | 'mage' | 'rogue' | 'druid' | 'hunter' | 'priest' | 'paladin' | 'shaman' | 'warlock') {
+function simClass(
+  cls:
+    | 'warrior'
+    | 'mage'
+    | 'rogue'
+    | 'druid'
+    | 'hunter'
+    | 'priest'
+    | 'paladin'
+    | 'shaman'
+    | 'warlock',
+) {
   return cls;
+}
+
+function summonImp(sim: Sim): Entity {
+  sim.player.resource = sim.player.maxResource;
+  sim.castAbility('summon_imp');
+  for (let i = 0; i < 20 * 6; i++) sim.tick();
+  const imp = sim.petOf(sim.playerId);
+  if (!imp) throw new Error('expected summoned imp');
+  return imp;
 }
 
 function nearestMob(sim: Sim, templateId?: string, from?: Entity): Entity {
@@ -26,7 +48,10 @@ function nearestMob(sim: Sim, templateId?: string, from?: Entity): Entity {
     if (e.kind !== 'mob' || e.dead || e.ownerId !== null) continue;
     if (templateId && e.templateId !== templateId) continue;
     const d = dist2d(p.pos, e.pos);
-    if (d < bestD) { bestD = d; best = e; }
+    if (d < bestD) {
+      bestD = d;
+      best = e;
+    }
   }
   return best!;
 }
@@ -99,6 +124,37 @@ describe('threat from damage', () => {
     expect(wolf.threat.get(sim.playerId)).toBeCloseTo(100 * RIGHTEOUS_FURY_THREAT_MULT + 101, 5);
   });
 
+  it('consecration burns the ground every 2 seconds from 0s to 8s and generates holy threat each pulse', () => {
+    const sim = makeSim('paladin');
+    sim.setPlayerLevel(20);
+    const wolf = nearestMob(sim, 'forest_wolf');
+    beefUp(wolf);
+    teleport(sim, sim.player, wolf.pos.x, wolf.pos.z + 2);
+    sim.player.resource = sim.player.maxResource;
+    sim.castAbility('righteous_fury');
+    sim.tick();
+    sim.player.gcdRemaining = 0;
+    sim.castAbility('consecration');
+
+    const damageEvents: number[] = [];
+    for (let i = 0; i < 20 * 10; i++) {
+      for (const event of sim.tick()) {
+        if (
+          event.type === 'damage' &&
+          event.ability === 'Consecration' &&
+          event.targetId === wolf.id &&
+          event.amount > 0
+        ) {
+          damageEvents.push(event.amount);
+        }
+      }
+    }
+
+    expect(damageEvents).toHaveLength(5);
+    expect(damageEvents.reduce((sum, amount) => sum + amount, 0)).toBeGreaterThanOrEqual(28 * 5);
+    expect(wolf.threat.get(sim.playerId) ?? 0).toBeGreaterThan(28 * 5 * RIGHTEOUS_FURY_THREAT_MULT);
+  });
+
   it('classic flat threat values resolve per rank (heroic strike 20/39)', () => {
     const sim = makeSim('warrior');
     expect(sim.resolvedAbility('heroic_strike')!.threatFlat).toBe(20);
@@ -148,7 +204,10 @@ describe('healing threat', () => {
     hit(sim, tank, wolfA, 50);
     let wolfB: Entity | null = null;
     for (const e of sim.entities.values()) {
-      if (e.kind === 'mob' && !e.dead && e.templateId === 'forest_wolf' && e.id !== wolfA.id) { wolfB = e; break; }
+      if (e.kind === 'mob' && !e.dead && e.templateId === 'forest_wolf' && e.id !== wolfA.id) {
+        wolfB = e;
+        break;
+      }
     }
     beefUp(wolfB!);
     hit(sim, tank, wolfB!, 50);
@@ -449,7 +508,11 @@ describe('hunter pets', () => {
     expect(wolf.id).not.toBe(originalWolfId);
     expect(sim.entities.has(originalWolfId)).toBe(false);
     for (let i = 0; i < 20 * 61; i++) sim.tick();
-    expect([...sim.entities.values()].some((e) => e.kind === 'mob' && e.ownerId === null && e.templateId === 'forest_wolf')).toBe(true);
+    expect(
+      [...sim.entities.values()].some(
+        (e) => e.kind === 'mob' && e.ownerId === null && e.templateId === 'forest_wolf',
+      ),
+    ).toBe(true);
   });
 
   it('friendly target spells can affect controlled pets', () => {
@@ -501,7 +564,7 @@ describe('hunter pets', () => {
     expect(sim.petOf(sim.playerId, true)).toBe(null);
   });
 
-  it('the pet assists against attackers, growls, and builds its own threat', () => {
+  it('the pet assists against attackers and builds its own threat with Growl autocast off', () => {
     const { sim, wolf: pet } = tamedSetup();
     const boar = nearestMob(sim, 'wild_boar');
     teleport(sim, sim.player, boar.pos.x + 4, boar.pos.z);
@@ -514,10 +577,30 @@ describe('hunter pets', () => {
     }
     expect(pet.aggroTargetId).toBe(boar.id);
     expect(petThreat).toBeGreaterThan(0);
-    expect(boar.aggroTargetId).toBe(pet.id);
-    expect(boar.forcedTargetTimer).toBeGreaterThan(0);
+    expect(boar.forcedTargetId).not.toBe(pet.id);
+    expect(boar.forcedTargetTimer).toBe(0);
     // pet damage taps for the owner
     expect(boar.tappedById).toBe(sim.playerId);
+  });
+
+  it('right-click autocast state lets a pet Growl whenever the cooldown is ready', () => {
+    const { sim, wolf: pet } = tamedSetup();
+    const boar = nearestMob(sim, 'wild_boar');
+    teleport(sim, sim.player, boar.pos.x + 4, boar.pos.z);
+    teleport(sim, pet, boar.pos.x + 5, boar.pos.z);
+    hit(sim, sim.player, boar, 5);
+
+    for (let i = 0; i < 20 * 5; i++) sim.tick();
+    expect(boar.forcedTargetId).not.toBe(pet.id);
+
+    sim.setPetAutoTaunt(true);
+    expect(pet.petAutoTaunt).toBe(true);
+    for (let i = 0; i < 20 * 5 && boar.forcedTargetId !== pet.id; i++) sim.tick();
+    expect(boar.forcedTargetId).toBe(pet.id);
+    expect(pet.petTauntTimer).toBeGreaterThan(0);
+
+    sim.setPetAutoTaunt(false);
+    expect(pet.petAutoTaunt).toBe(false);
   });
 
   it('keeps the owner in combat while their pet tanks a mob', () => {
@@ -613,11 +696,18 @@ describe('hunter pets', () => {
   it('pet name and dead state persist through character serialization', () => {
     const { sim, wolf } = tamedSetup();
     sim.renamePet('Barkley');
+    sim.setPetAutoTaunt(true);
     expect(wolf.name).toBe('Barkley');
     (sim as any).dealDamage(null, wolf, wolf.hp, false, 'physical', 'test', 'hit');
     expect(wolf.dead).toBe(true);
     const state = sim.serializeCharacter(sim.playerId)!;
-    expect(state.pet).toMatchObject({ templateId: 'forest_wolf', name: 'Barkley', level: wolf.level, dead: true });
+    expect(state.pet).toMatchObject({
+      templateId: 'forest_wolf',
+      name: 'Barkley',
+      level: wolf.level,
+      dead: true,
+      autoTaunt: true,
+    });
 
     const restored = new Sim({ seed: 42, playerClass: 'hunter', noPlayer: true, autoEquip: true });
     const pid = restored.addPlayer('hunter', 'Hunter', { state });
@@ -625,6 +715,7 @@ describe('hunter pets', () => {
     expect(pet).toBeTruthy();
     expect(pet.name).toBe('Barkley');
     expect(pet.dead).toBe(true);
+    expect(pet.petAutoTaunt).toBe(true);
     expect(pet.ownerId).toBe(pid);
 
     restored.entities.get(pid)!.resource = restored.entities.get(pid)!.maxResource;
@@ -666,8 +757,10 @@ describe('hunter pets', () => {
     sim.petTaunt();
     expect(pet.aggroTargetId).toBe(boar.id);
     expect(boar.forcedTargetId).not.toBe(pet.id);
+    expect(pet.petManualTauntPending).toBe(true);
     for (let i = 0; i < 20 * 2 && boar.forcedTargetId !== pet.id; i++) sim.tick();
     expect(boar.forcedTargetId).toBe(pet.id);
+    expect(pet.petManualTauntPending).toBe(false);
 
     pet.petTauntTimer = 0;
     boar.forcedTargetId = null;
@@ -680,6 +773,38 @@ describe('hunter pets', () => {
     sim.petTaunt();
     expect(sim.tick().some((e) => e.type === 'error' && /not ready/.test(e.text))).toBe(true);
     expect(events).toBeTruthy();
+  });
+
+  it('pet taunts do not force bosses onto the pet', () => {
+    const { sim, wolf: pet } = tamedSetup();
+    sim.players.get(sim.playerId)!.questsDone.add('q_nythraxis_bound_guardian');
+    while ((sim.partyOf(sim.playerId)?.members.length ?? 1) < 5) {
+      const fill = sim.addPlayer('priest', `RaidFill${sim.players.size}`);
+      sim.partyInvite(fill);
+      sim.partyAccept(fill);
+    }
+    sim.convertPartyToRaid();
+    sim.enterDungeon('nythraxis_boss_arena');
+    const boss = [...sim.entities.values()].find(
+      (e) => e.kind === 'mob' && e.templateId === 'nythraxis_scourge_of_thornpeak' && !e.dead,
+    )!;
+    const tankId = sim.addPlayer('warrior', 'Tank');
+    const tank = sim.entities.get(tankId)!;
+    teleport(sim, tank, boss.pos.x + 3, boss.pos.z);
+    teleport(sim, sim.player, boss.pos.x + 8, boss.pos.z);
+    teleport(sim, pet, boss.pos.x + 2, boss.pos.z);
+    boss.inCombat = true;
+    boss.aiState = 'attack';
+    boss.aggroTargetId = tank.id;
+    boss.threat.set(tank.id, 1000);
+    sim.targetEntity(boss.id);
+
+    sim.petTaunt();
+
+    expect(boss.threat.get(pet.id)).toBeGreaterThan(0);
+    expect(boss.forcedTargetId).not.toBe(pet.id);
+    expect(boss.aggroTargetId).toBe(tank.id);
+    expect(pet.petTauntTimer).toBe(10);
   });
 
   it('hunter aspects apply to the active pet', () => {
@@ -774,20 +899,22 @@ describe('druid forms', () => {
     expect(sim.player.resource).toBeLessThanOrEqual(manaBefore);
   });
 
-  // Issue #298: bear should grant +65% armor and +15 AP, cat should raise AP.
+  // Issue #298: bear should grant armor, stamina, and +15 AP; cat should raise AP.
   // These apply in recalcPlayerStats; the bug the reporter hit was the missing
   // cat-form *visual* (renderer), but lock the stat math so it can't regress.
-  it('bear form raises armor +65% and attack power +15', () => {
+  it('bear form raises armor, maximum health, and attack power', () => {
     const sim = makeSim('druid');
     sim.setPlayerLevel(20);
     sim.tick();
     const armorBefore = sim.player.stats.armor;
+    const hpBefore = sim.player.maxHp;
     const apBefore = sim.player.attackPower;
     sim.castAbility('bear_form');
     sim.tick();
     expect(sim.player.auras.some((a) => a.kind === 'form_bear')).toBe(true);
-    expect(sim.player.stats.armor).toBe(Math.round(armorBefore * 1.65));
-    expect(sim.player.attackPower).toBe(apBefore + 15);
+    expect(sim.player.stats.armor).toBeGreaterThanOrEqual(Math.round(armorBefore * 1.9));
+    expect(sim.player.maxHp).toBeGreaterThan(hpBefore);
+    expect(sim.player.attackPower).toBeGreaterThan(apBefore + 15);
   });
 
   it('wolf form raises attack power', () => {
@@ -937,7 +1064,9 @@ describe('druid forms', () => {
   it('wolf form gains agility/AP and supports prowl into rake bleed opener', () => {
     const sim = makeSim('druid');
     sim.setPlayerLevel(12);
-    expect(sim.known.map((k) => k.def.id)).toEqual(expect.arrayContaining(['cat_form', 'prowl', 'rake']));
+    expect(sim.known.map((k) => k.def.id)).toEqual(
+      expect.arrayContaining(['cat_form', 'prowl', 'rake']),
+    );
     const agiBefore = sim.player.stats.agi;
     const apBefore = sim.player.attackPower;
     sim.castAbility('cat_form');
@@ -1034,7 +1163,10 @@ describe('social aggro pull radius (#102)', () => {
   it('a murloc does not chain-pull a same-family neighbour 13yd away', () => {
     const sim = makeSim();
     const [a, b] = twoMurlocs(sim);
-    for (const m of [a, b]) { m.aiState = 'idle'; m.hostile = true; }
+    for (const m of [a, b]) {
+      m.aiState = 'idle';
+      m.hostile = true;
+    }
     teleport(sim, b, a.pos.x + 13, a.pos.z); // beyond the tuned murloc radius
     teleport(sim, sim.player, a.pos.x + 2, a.pos.z);
     (sim as any).grid.refresh(sim.entities.values());
@@ -1045,7 +1177,10 @@ describe('social aggro pull radius (#102)', () => {
   it('a murloc still pulls a neighbour within the tuned radius', () => {
     const sim = makeSim();
     const [a, b] = twoMurlocs(sim);
-    for (const m of [a, b]) { m.aiState = 'idle'; m.hostile = true; }
+    for (const m of [a, b]) {
+      m.aiState = 'idle';
+      m.hostile = true;
+    }
     teleport(sim, b, a.pos.x + 7, a.pos.z); // inside the murloc radius
     teleport(sim, sim.player, a.pos.x + 2, a.pos.z);
     (sim as any).grid.refresh(sim.entities.values());
@@ -1055,6 +1190,22 @@ describe('social aggro pull radius (#102)', () => {
 });
 
 describe('caster wand auto-attack (#94)', () => {
+  it('does not aggro a hostile mob when melee auto-attack is started out of range', () => {
+    const sim = makeSim('warrior');
+    sim.setPlayerLevel(10);
+    const wolf = nearestMob(sim, 'forest_wolf');
+    teleport(sim, sim.player, wolf.pos.x + 35, wolf.pos.z);
+    sim.targetEntity(wolf.id);
+
+    sim.startAutoAttack(sim.playerId);
+
+    expect(sim.player.autoAttack).toBe(true);
+    expect(wolf.aiState).toBe('idle');
+    expect(wolf.aggroTargetId).toBeNull();
+    expect(wolf.threat.get(sim.playerId)).toBeUndefined();
+    expect(sim.player.inCombat).toBe(false);
+  });
+
   it('a mage auto-attacks at range instead of running into melee', () => {
     const sim = makeSim('mage');
     sim.setPlayerLevel(10);
@@ -1069,7 +1220,15 @@ describe('caster wand auto-attack (#94)', () => {
     let sawWand = false;
     for (let i = 0; i < 20 * 5 && !sawWand; i++) {
       const events = sim.tick();
-      if (events.some((e) => e.type === 'damage' && (e as any).ability === 'Wand' && (e as any).sourceId === sim.playerId)) sawWand = true;
+      if (
+        events.some(
+          (e) =>
+            e.type === 'damage' &&
+            (e as any).ability === 'Wand' &&
+            (e as any).sourceId === sim.playerId,
+        )
+      )
+        sawWand = true;
     }
 
     expect(sawWand).toBe(true);
@@ -1117,7 +1276,11 @@ describe('shaman travel and shock mechanics', () => {
     sim.player.gcdRemaining = 0;
     sim.events = [];
     sim.castAbility('frost_shock');
-    expect(sim.events).toContainEqual({ type: 'error', text: 'That ability is not ready yet.', pid: sim.player.id });
+    expect(sim.events).toContainEqual({
+      type: 'error',
+      text: 'That ability is not ready yet.',
+      pid: sim.player.id,
+    });
   });
 
   it('Ghost Wolf toggles speed and survives damage events', () => {
@@ -1128,7 +1291,9 @@ describe('shaman travel and shock mechanics', () => {
     sim.castAbility('ghost_wolf');
     for (let i = 0; i < 20 * 3; i++) sim.tick();
 
-    expect(sim.player.auras.some((a) => a.id === 'ghost_wolf' && a.kind === 'buff_speed')).toBe(true);
+    expect(sim.player.auras.some((a) => a.id === 'ghost_wolf' && a.kind === 'buff_speed')).toBe(
+      true,
+    );
     expect((sim as any).moveSpeedMult(sim.player)).toBeCloseTo(1.4, 5);
 
     sim.castAbility('ghost_wolf');
@@ -1161,7 +1326,7 @@ describe('shaman travel and shock mechanics', () => {
     sim.startAutoAttack();
     expect(sim.player.auras.some((a) => a.id === 'ghost_wolf')).toBe(true);
 
-    teleport(sim, sim.player, wolf.pos.x + 20, wolf.pos.z);
+    teleport(sim, sim.player, wolf.pos.x + 35, wolf.pos.z);
     sim.targetEntity(wolf.id);
     sim.player.facing = Math.atan2(wolf.pos.x - sim.player.pos.x, wolf.pos.z - sim.player.pos.z);
     sim.startAutoAttack();
@@ -1213,7 +1378,7 @@ describe('shaman travel and shock mechanics', () => {
     beefUp(wolf);
     wolf.level = sim.player.level;
     wolf.weapon = { min: 10, max: 10, speed: 2 };
-    teleport(sim, sim.player, wolf.pos.x + 20, wolf.pos.z);
+    teleport(sim, sim.player, wolf.pos.x + 35, wolf.pos.z);
     sim.targetEntity(wolf.id);
     sim.player.facing = Math.atan2(wolf.pos.x - sim.player.pos.x, wolf.pos.z - sim.player.pos.z);
     sim.player.resource = sim.player.maxResource;
@@ -1329,39 +1494,38 @@ describe('shaman travel and shock mechanics', () => {
 describe('warlock demon summons', () => {
   it('Summon Imp creates a ranged demon that casts Firebolt', () => {
     const sim = makeSim('warlock');
-    sim.player.resource = sim.player.maxResource;
-    sim.castAbility('summon_imp');
-    for (let i = 0; i < 20 * 5; i++) sim.tick();
 
-    const imp = sim.petOf(sim.playerId);
-    expect(imp).toBeTruthy();
-    expect(imp!.templateId).toBe('imp');
-    expect(imp!.name).toBe('Imp');
-    expect(imp!.ownerId).toBe(sim.playerId);
-    expect(imp!.hostile).toBe(false);
+    const imp = summonImp(sim);
+    expect(imp.templateId).toBe('imp');
+    expect(imp.name).toBe('Imp');
+    expect(imp.ownerId).toBe(sim.playerId);
+    expect(imp.hostile).toBe(false);
 
     const wolf = nearestMob(sim, 'forest_wolf');
     beefUp(wolf);
     teleport(sim, sim.player, wolf.pos.x + 14, wolf.pos.z);
-    teleport(sim, imp!, wolf.pos.x + 12, wolf.pos.z);
+    teleport(sim, imp, wolf.pos.x + 12, wolf.pos.z);
     sim.targetEntity(wolf.id);
     sim.petAttack();
 
     let firebolt = false;
     for (let i = 0; i < 20 * 4 && !firebolt; i++) {
       const events = sim.tick();
-      firebolt = events.some((e) => e.type === 'damage' && (e as any).sourceId === imp!.id && (e as any).school === 'fire' && (e as any).amount > 0);
+      firebolt = events.some(
+        (e) =>
+          e.type === 'damage' &&
+          (e as any).sourceId === imp.id &&
+          (e as any).school === 'fire' &&
+          (e as any).amount > 0,
+      );
     }
     expect(firebolt).toBe(true);
-    expect(wolf.threat.has(imp!.id)).toBe(true);
+    expect(wolf.threat.has(imp.id)).toBe(true);
   });
 
   it('warlocks heal demons with mana instead of food and cannot abandon them', () => {
     const sim = makeSim('warlock');
-    sim.player.resource = sim.player.maxResource;
-    sim.castAbility('summon_imp');
-    for (let i = 0; i < 20 * 5; i++) sim.tick();
-    const demon = sim.petOf(sim.playerId)!;
+    const demon = summonImp(sim);
     demon.hp = Math.max(1, demon.maxHp - 50);
     sim.addItem('baked_bread', 1);
 
@@ -1374,7 +1538,9 @@ describe('warlock demon summons', () => {
     expect(sim.player.resource).toBeLessThan(manaBefore);
     expect(sim.player.castingAbility).toBe('demon_heal');
     expect(sim.player.channeling).toBe(true);
-    expect(sim.events.some((e) => e.type === 'castStart' && (e as any).ability === 'demon_heal')).toBe(true);
+    expect(
+      sim.events.some((e) => e.type === 'castStart' && (e as any).ability === 'demon_heal'),
+    ).toBe(true);
     expect(demon.auras.some((a) => a.id === 'demon_heal')).toBe(false);
     const hpBeforeHeal = demon.hp;
     for (let i = 0; i < 20 * 6 && sim.player.castingAbility; i++) sim.tick();
@@ -1389,10 +1555,7 @@ describe('warlock demon summons', () => {
   it('Summon Voidwalker replaces the imp with a tank demon that Growls', () => {
     const sim = makeSim('warlock');
     sim.setPlayerLevel(10);
-    sim.player.resource = sim.player.maxResource;
-    sim.castAbility('summon_imp');
-    for (let i = 0; i < 20 * 5; i++) sim.tick();
-    const imp = sim.petOf(sim.playerId)!;
+    const imp = summonImp(sim);
 
     sim.player.resource = sim.player.maxResource;
     sim.castAbility('summon_voidwalker');
@@ -1413,16 +1576,18 @@ describe('warlock demon summons', () => {
     sim.petAttack();
     for (let i = 0; i < 20; i++) sim.tick();
 
+    expect(wolf.forcedTargetId).not.toBe(voidwalker.id);
+    expect(voidwalker.petTauntTimer).toBe(0);
+
+    sim.setPetAutoTaunt(true);
+    for (let i = 0; i < 20 && wolf.forcedTargetId !== voidwalker.id; i++) sim.tick();
     expect(wolf.forcedTargetId).toBe(voidwalker.id);
     expect(voidwalker.petTauntTimer).toBeGreaterThan(0);
   });
 
   it('recasting the same demon unsummons it', () => {
     const sim = makeSim('warlock');
-    sim.player.resource = sim.player.maxResource;
-    sim.castAbility('summon_imp');
-    for (let i = 0; i < 20 * 5; i++) sim.tick();
-    const demon = sim.petOf(sim.playerId)!;
+    const demon = summonImp(sim);
     expect(demon.templateId).toBe('imp');
 
     sim.player.resource = sim.player.maxResource;
@@ -1435,10 +1600,7 @@ describe('warlock demon summons', () => {
 
   it('recasting a dead demon resummons it instead of dismissing', () => {
     const sim = makeSim('warlock');
-    sim.player.resource = sim.player.maxResource;
-    sim.castAbility('summon_imp');
-    for (let i = 0; i < 20 * 5; i++) sim.tick();
-    const deadDemon = sim.petOf(sim.playerId)!;
+    const deadDemon = summonImp(sim);
     deadDemon.dead = true;
     deadDemon.hp = 0;
     deadDemon.aiState = 'dead';
