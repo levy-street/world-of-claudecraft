@@ -40,6 +40,26 @@ export const SNS_PARENT_DOMAIN = (process.env.SNS_PARENT_DOMAIN ?? 'worldofclaud
 // signer unavailable (mint paths refuse rather than using a bogus key).
 export const EXECUTION_WALLET_SECRET = (process.env.EXECUTION_WALLET_SECRET ?? '').trim();
 
+// ── Player job-contract escrow ("paid bodyguard") ────────────────────────────
+// A payer locks an SPL reward (WOC/USDC) in the on-chain job_escrow program; the
+// server is the settler/oracle that releases it to the helper on completion or
+// refunds the payer. Gated OFF until the program is deployed and the settler key
+// is funded + configured. The settler is the only custodial seam, and it can move
+// escrow ONLY to the helper or back to the payer — never elsewhere.
+export const JOBS_ENABLED = boolEnv(process.env.JOBS_ENABLED, false);
+// The deployed job_escrow program id (replace the build-time placeholder via
+// `anchor keys sync` after deploy).
+export const JOB_ESCROW_PROGRAM_ID = (
+  process.env.JOB_ESCROW_PROGRAM_ID ?? 'EhKKSxsKzPXK2Sc3QZcLBgQsQbtjuRYvG95SfK871trX'
+).trim();
+// base58 (or JSON byte array) secret of the settler key. Store via KMS; never in
+// git. Empty in dev keeps the settler unavailable (release/refund refuse rather
+// than using a bogus key).
+export const JOB_ESCROW_SETTLER_SECRET = (process.env.JOB_ESCROW_SETTLER_SECRET ?? '').trim();
+// How long a posted job stays open before it auto-refunds (the deadline the
+// milestone engine enforces), in seconds. Default 7 days.
+export const JOB_MAX_DURATION_SECONDS = clampInt(process.env.JOB_MAX_DURATION_SECONDS, 7 * 24 * 3600, 60, 30 * 24 * 3600);
+
 // ── Buyback-and-burn engine (PR #736 / #798 / #469 shared core) ──────────────
 // A keeper batches USDC accrued from marketplace fees, swaps it to $WOC on a DEX
 // aggregator (Jupiter), and burns the proceeds. Off by default; the keeper wallet
