@@ -6,6 +6,7 @@ import {
   safeClickUrl,
   ctaLabel,
   attribution,
+  hubLogo,
 } from '../src/ui/sponsored_slot';
 
 const ad = (over: Partial<SponsoredAd>): SponsoredAd => ({
@@ -75,5 +76,15 @@ describe('attribution', () => {
   it('names the advertiser, falling back when unnamed', () => {
     expect(attribution(ad({ advertiser: 'Aurora Wallet' }))).toBe('Sponsored by Aurora Wallet');
     expect(attribution(ad({ advertiser: '  ' }))).toBe('Sponsored');
+  });
+});
+
+describe('hubLogo', () => {
+  const FALLBACK = '/woc-logo.png';
+  it('uses the sponsor logo when present, else the default brand mark', () => {
+    expect(hubLogo(ad({ logoUrl: '/api/ads/creative/7' }), FALLBACK)).toBe('/api/ads/creative/7');
+    expect(hubLogo(ad({ logoUrl: undefined }), FALLBACK)).toBe(FALLBACK);
+    expect(hubLogo(ad({ logoUrl: '   ' }), FALLBACK)).toBe(FALLBACK);
+    expect(hubLogo(null, FALLBACK)).toBe(FALLBACK); // no sponsor live
   });
 });

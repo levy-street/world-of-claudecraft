@@ -13,7 +13,7 @@ import {
   fitsLabel,
 } from '../src/ui/spin_wheel_core';
 import { revealOrder, topRarity, Rarity } from '../src/ui/pack_reveal_core';
-import { SponsoredAd, activeSponsor, safeClickUrl, ctaLabel, attribution } from '../src/ui/sponsored_slot';
+import { SponsoredAd, activeSponsor, safeClickUrl, ctaLabel, attribution, hubLogo } from '../src/ui/sponsored_slot';
 
 // ---- data mirrored from server/spin_prizes.ts (DEFAULT_PRIZE_TABLE) ----
 interface Prize { key: string; sol: number; weight: number; color: string; }
@@ -47,11 +47,23 @@ const RARE_CACHE_RIP: Reward[] = [
   { name: 'Keen Dirk', rarity: 'uncommon', kind: 'gear' },
 ];
 
+// The default World of ClaudeCraft brand mark in the spinner hub.
+const DEFAULT_LOGO = './woc-logo.png';
+// A sample uploaded sponsor logo (data URI so the demo is self-contained). In
+// production this is the advertiser's served logo, e.g. /api/ads/creative/:id.
+const AURORA_LOGO = 'data:image/svg+xml,' + encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">' +
+  '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1f9e86"/><stop offset="1" stop-color="#2f7fe0"/></linearGradient></defs>' +
+  '<rect width="100" height="100" rx="22" fill="url(#g)"/>' +
+  '<path d="M50 22 L72 78 H59 L54.5 65 H45.5 L41 78 H28 Z M47.5 54 H52.5 L50 46 Z" fill="#ffffff"/></svg>',
+);
+
 // Sample bookings for the 'daily_spin' placement. In production these come from
 // the ad-marketplace: adService.getForPlacement('daily_spin') -> ActiveAd[], which
-// has the identical shape (advertiser, text->headline, cta, clickUrl, endSec).
+// has the identical shape (advertiser, text->headline, cta, clickUrl, logoUrl,
+// endSec). Aurora has uploaded a logo; Drift has not (so its spin shows the WoC mark).
 const SPONSORS: SponsoredAd[] = [
-  { placementId: 'daily_spin', advertiser: 'Aurora Wallet', headline: 'The fastest self-custody Solana wallet', cta: 'Get the app', clickUrl: 'https://example.com/aurora', kind: 'text', endSec: Number.MAX_SAFE_INTEGER },
+  { placementId: 'daily_spin', advertiser: 'Aurora Wallet', headline: 'The fastest self-custody Solana wallet', cta: 'Get the app', clickUrl: 'https://example.com/aurora', kind: 'image', logoUrl: AURORA_LOGO, endSec: Number.MAX_SAFE_INTEGER },
   { placementId: 'daily_spin', advertiser: 'Drift Protocol', headline: 'Trade Solana perps, zero gas', cta: 'Start trading', clickUrl: 'https://example.com/drift', kind: 'text', endSec: Number.MAX_SAFE_INTEGER },
 ];
 
@@ -71,6 +83,25 @@ function rand(): number {
 
 // ---- spinner wheel (canvas, drawn from the shipped wheel core) ----
 let rotation = 0; // in turns
+
+// The hub logo (WoC by default, sponsor logo when one is booked). Loaded async;
+// the wheel shows the "WOC" text mark until the image is ready, then redraws.
+let hubImg: HTMLImageElement | null = null;
+let hubLogoUrl = '';
+function setHubLogo(url: string): void {
+  if (url === hubLogoUrl) return;
+  hubLogoUrl = url;
+  hubImg = null;
+  drawWheel();
+  const img = new Image();
+  img.onload = () => {
+    if (hubLogoUrl === url) {
+      hubImg = img;
+      drawWheel();
+    }
+  };
+  img.src = url;
+}
 
 function drawWheel(): void {
   const c = $('wheel') as HTMLCanvasElement;
@@ -107,13 +138,26 @@ function drawWheel(): void {
     }
   }
   ctx.restore();
-  // hub
-  ctx.beginPath(); ctx.arc(mid, mid, Math.round(size * 0.075), 0, TAU);
-  ctx.fillStyle = '#1c1610'; ctx.fill();
+  // hub: sponsor logo when booked with one, else the WoC brand mark, clipped to a
+  // circle. Drawn after restore so it stays upright while the wheel spins; "WOC"
+  // text shows until the image loads.
+  const hubR = Math.round(size * 0.15);
+  ctx.save();
+  ctx.beginPath(); ctx.arc(mid, mid, hubR, 0, TAU); ctx.closePath();
+  ctx.fillStyle = '#120d07'; ctx.fill();
+  if (hubImg && hubImg.complete && hubImg.naturalWidth > 0) {
+    ctx.clip();
+    const d = hubR * 2;
+    ctx.drawImage(hubImg, mid - hubR, mid - hubR, d, d);
+  } else {
+    ctx.fillStyle = '#caa24a';
+    ctx.font = `700 ${Math.round(size * 0.045)}px "Trebuchet MS", sans-serif`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('WOC', mid, mid);
+  }
+  ctx.restore();
+  ctx.beginPath(); ctx.arc(mid, mid, hubR, 0, TAU);
   ctx.strokeStyle = '#caa24a'; ctx.lineWidth = 3; ctx.stroke();
-  ctx.fillStyle = '#caa24a'; ctx.font = `700 ${Math.round(size * 0.04)}px "Trebuchet MS", sans-serif`;
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText('WOC', mid, mid);
 }
 
 function renderLegend(): void {
@@ -202,8 +246,18 @@ function renderTasks(): void {
 
 // ---- sponsored slot (ad-marketplace 'daily_spin' placement) ----
 let bonusSpins = 0;
+
+// Live rotation by default; `?sponsor=aurora|drift|none` forces one for demos.
+function pickSponsor(): SponsoredAd | null {
+  const force = new URLSearchParams(location.search).get('sponsor');
+  if (force === 'none') return null;
+  if (force) return SPONSORS.find((s) => s.advertiser.toLowerCase().startsWith(force.toLowerCase())) ?? null;
+  return activeSponsor(SPONSORS, 'daily_spin', Math.floor(Date.now() / 1000));
+}
+
 function renderSponsor(): void {
-  const ad = activeSponsor(SPONSORS, 'daily_spin', Math.floor(Date.now() / 1000));
+  const ad = pickSponsor();
+  setHubLogo(hubLogo(ad, DEFAULT_LOGO)); // sponsor logo if booked, else the WoC mark
   const banner = $('sponsorBanner');
   const line = $('sponsorLine');
   if (!ad) { banner.classList.add('hidden'); line.classList.add('hidden'); return; }

@@ -18,8 +18,10 @@ export interface SponsoredAd {
   /** External destination; only http(s) is rendered (see safeClickUrl). */
   clickUrl: string;
   kind: AdKind;
-  /** For image creatives: the served image URL (e.g. /api/ads/creative/:id). */
+  /** For image creatives: the served banner image URL (e.g. /api/ads/creative/:id). */
   imageUrl?: string;
+  /** The advertiser's square logo URL for the spinner hub, if they uploaded one. */
+  logoUrl?: string;
   /** Unix seconds when this booking ends; past bookings are never shown. */
   endSec: number;
 }
@@ -78,4 +80,14 @@ export function ctaLabel(cta: string, max = 28): string {
 export function attribution(ad: SponsoredAd): string {
   const name = ad.advertiser.trim();
   return name ? `Sponsored by ${name}` : 'Sponsored';
+}
+
+/**
+ * The logo to show in the spinner hub: the active sponsor's uploaded logo when
+ * present, otherwise the default (World of ClaudeCraft) logo. `ad` is null when no
+ * sponsor is live, so the hub always falls back to the brand mark.
+ */
+export function hubLogo(ad: SponsoredAd | null, fallbackUrl: string): string {
+  const url = ad?.logoUrl?.trim();
+  return url ? url : fallbackUrl;
 }
