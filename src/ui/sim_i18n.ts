@@ -177,6 +177,10 @@ const petEnTable = {
   'error.noLivingPet': 'You have no living pet.',
   'error.petNeedsHostileTarget': 'Your pet needs a hostile target.',
   'error.petTauntNotReady': 'Pet taunt is not ready.',
+  'petGrowl.ready': "Your pet's Growl is ready. {autoState}",
+  'petGrowl.cooldown': "Your pet's Growl is on cooldown. {autoState} Ready in {seconds}s.",
+  'petGrowl.autoOn': 'Auto-taunt is on.',
+  'petGrowl.autoOff': 'Auto-taunt is off.',
   'error.huntersFeedPets': 'Only hunters can feed pets.',
   'error.petFoodOnly': 'Your pet can only eat food.',
   'error.petFullHealth': 'Your pet is already at full health.',
@@ -2189,6 +2193,10 @@ const PET_DICT_EN: Record<PetSimMessageKey, string> = {
   'error.noLivingPet': 'You have no living pet.',
   'error.petNeedsHostileTarget': 'Your pet needs a hostile target.',
   'error.petTauntNotReady': 'Pet taunt is not ready.',
+  'petGrowl.ready': "Your pet's Growl is ready. {autoState}",
+  'petGrowl.cooldown': "Your pet's Growl is on cooldown. {autoState} Ready in {seconds}s.",
+  'petGrowl.autoOn': 'Auto-taunt is on.',
+  'petGrowl.autoOff': 'Auto-taunt is off.',
   'error.huntersFeedPets': 'Only hunters can feed pets.',
   'error.petFoodOnly': 'Your pet can only eat food.',
   'error.petFullHealth': 'Your pet is already at full health.',
@@ -2227,6 +2235,11 @@ const PET_DICT_ES: Record<PetSimMessageKey, string> = {
   'error.noLivingPet': 'No tienes una mascota viva.',
   'error.petNeedsHostileTarget': 'Tu mascota necesita un objetivo hostil.',
   'error.petTauntNotReady': 'La provocación de mascota no está lista.',
+  'petGrowl.ready': 'El Gruñido de tu mascota está listo. {autoState}',
+  'petGrowl.cooldown':
+    'El Gruñido de tu mascota está en reutilización. {autoState} Listo en {seconds}s.',
+  'petGrowl.autoOn': 'Provocación automática activada.',
+  'petGrowl.autoOff': 'Provocación automática desactivada.',
   'error.huntersFeedPets': 'Solo los cazadores pueden alimentar mascotas.',
   'error.petFoodOnly': 'Tu mascota solo puede comer comida.',
   'error.petFullHealth': 'Tu mascota ya tiene la salud al máximo.',
@@ -2265,6 +2278,11 @@ const PET_DICT_FR: Record<PetSimMessageKey, string> = {
   'error.noLivingPet': "Vous n'avez pas de familier vivant.",
   'error.petNeedsHostileTarget': "Votre familier a besoin d'une cible hostile.",
   'error.petTauntNotReady': "La provocation du familier n'est pas prête.",
+  'petGrowl.ready': 'Le Grondement de votre familier est prêt. {autoState}',
+  'petGrowl.cooldown':
+    'Le Grondement de votre familier est en recharge. {autoState} Prêt dans {seconds}s.',
+  'petGrowl.autoOn': 'Provocation automatique activée.',
+  'petGrowl.autoOff': 'Provocation automatique désactivée.',
   'error.huntersFeedPets': 'Seuls les chasseurs peuvent nourrir des familiers.',
   'error.petFoodOnly': 'Votre familier ne peut manger que de la nourriture.',
   'error.petFullHealth': 'Votre familier a déjà tous ses points de vie.',
@@ -2303,6 +2321,11 @@ const PET_DICT_IT: Record<PetSimMessageKey, string> = {
   'error.noLivingPet': 'Non hai una mascotte viva.',
   'error.petNeedsHostileTarget': 'La tua mascotte ha bisogno di un bersaglio ostile.',
   'error.petTauntNotReady': 'La provocazione della mascotte non è pronta.',
+  'petGrowl.ready': 'Il Ringhio della tua mascotte è pronto. {autoState}',
+  'petGrowl.cooldown':
+    'Il Ringhio della tua mascotte è in recupero. {autoState} Pronto tra {seconds}s.',
+  'petGrowl.autoOn': 'Provocazione automatica attiva.',
+  'petGrowl.autoOff': 'Provocazione automatica disattiva.',
   'error.huntersFeedPets': 'Solo i cacciatori possono nutrire mascotte.',
   'error.petFoodOnly': 'La tua mascotte può mangiare solo cibo.',
   'error.petFullHealth': 'La tua mascotte ha già la salute al massimo.',
@@ -2341,6 +2364,11 @@ const PET_DICT_DE: Record<PetSimMessageKey, string> = {
   'error.noLivingPet': 'Du hast kein lebendes Begleittier.',
   'error.petNeedsHostileTarget': 'Dein Begleiter braucht ein feindliches Ziel.',
   'error.petTauntNotReady': 'Der Begleiterspott ist noch nicht bereit.',
+  'petGrowl.ready': 'Knurren deines Begleiters ist bereit. {autoState}',
+  'petGrowl.cooldown':
+    'Knurren deines Begleiters hat Abklingzeit. {autoState} Bereit in {seconds}s.',
+  'petGrowl.autoOn': 'Automatischer Spott ist aktiviert.',
+  'petGrowl.autoOff': 'Automatischer Spott ist deaktiviert.',
   'error.huntersFeedPets': 'Nur Jäger können Begleiter füttern.',
   'error.petFoodOnly': 'Dein Begleiter kann nur Nahrung fressen.',
   'error.petFullHealth': 'Dein Begleiter hat bereits volle Gesundheit.',
@@ -2377,6 +2405,10 @@ const PET_DICT_ZH_CN: Record<PetSimMessageKey, string> = {
   'error.noLivingPet': '你没有活着的宠物。',
   'error.petNeedsHostileTarget': '你的宠物需要一个敌对目标。',
   'error.petTauntNotReady': '宠物嘲讽尚未就绪。',
+  'petGrowl.ready': '宠物低吼已就绪。{autoState}',
+  'petGrowl.cooldown': '宠物低吼正在冷却。{autoState} {seconds}s 后就绪。',
+  'petGrowl.autoOn': '自动嘲讽已开启。',
+  'petGrowl.autoOff': '自动嘲讽已关闭。',
   'error.huntersFeedPets': '只有猎人可以喂养宠物。',
   'error.petFoodOnly': '你的宠物只能吃食物。',
   'error.petFullHealth': '你的宠物生命值已满。',
@@ -2413,6 +2445,10 @@ const PET_DICT_ZH_TW: Record<PetSimMessageKey, string> = {
   'error.noLivingPet': '你沒有活著的寵物。',
   'error.petNeedsHostileTarget': '你的寵物需要一個敵對目標。',
   'error.petTauntNotReady': '寵物嘲諷尚未就緒。',
+  'petGrowl.ready': '寵物低吼已就緒。{autoState}',
+  'petGrowl.cooldown': '寵物低吼正在冷卻。{autoState} {seconds}s 後就緒。',
+  'petGrowl.autoOn': '自動嘲諷已開啟。',
+  'petGrowl.autoOff': '自動嘲諷已關閉。',
   'error.huntersFeedPets': '只有獵人可以餵養寵物。',
   'error.petFoodOnly': '你的寵物只能吃食物。',
   'error.petFullHealth': '你的寵物生命值已滿。',
@@ -2450,6 +2486,11 @@ const PET_DICT_KO: Record<PetSimMessageKey, string> = {
   'error.noLivingPet': '살아 있는 소환수가 없습니다.',
   'error.petNeedsHostileTarget': '소환수에게 적대적인 대상이 필요합니다.',
   'error.petTauntNotReady': '소환수 도발이 아직 준비되지 않았습니다.',
+  'petGrowl.ready': '소환수의 포효가 준비되었습니다. {autoState}',
+  'petGrowl.cooldown':
+    '소환수의 포효가 재사용 대기 중입니다. {autoState} {seconds}s 후 준비됩니다.',
+  'petGrowl.autoOn': '자동 도발이 켜졌습니다.',
+  'petGrowl.autoOff': '자동 도발이 꺼졌습니다.',
   'error.huntersFeedPets': '사냥꾼만 소환수에게 먹이를 줄 수 있습니다.',
   'error.petFoodOnly': '소환수는 음식만 먹을 수 있습니다.',
   'error.petFullHealth': '소환수의 생명력이 이미 가득 찼습니다.',
@@ -2487,6 +2528,10 @@ const PET_DICT_JA: Record<PetSimMessageKey, string> = {
   'error.noLivingPet': '生きているペットがいません。',
   'error.petNeedsHostileTarget': 'ペットには敵対的な対象が必要です。',
   'error.petTauntNotReady': 'ペットの挑発はまだ準備できていません。',
+  'petGrowl.ready': 'ペットのグロウルは準備完了です。{autoState}',
+  'petGrowl.cooldown': 'ペットのグロウルはクールダウン中です。{autoState} {seconds}s後に準備完了。',
+  'petGrowl.autoOn': '自動挑発はオンです。',
+  'petGrowl.autoOff': '自動挑発はオフです。',
   'error.huntersFeedPets': 'ハンターだけがペットに餌を与えられます。',
   'error.petFoodOnly': 'ペットは食べ物だけを食べられます。',
   'error.petFullHealth': 'ペットの体力はすでに最大です。',
@@ -2525,6 +2570,10 @@ const PET_DICT_PT: Record<PetSimMessageKey, string> = {
   'error.noLivingPet': 'Você não tem um mascote vivo.',
   'error.petNeedsHostileTarget': 'Seu mascote precisa de um alvo hostil.',
   'error.petTauntNotReady': 'A provocação do mascote não está pronta.',
+  'petGrowl.ready': 'O Rosnar do seu mascote está pronto. {autoState}',
+  'petGrowl.cooldown': 'O Rosnar do seu mascote está em recarga. {autoState} Pronto em {seconds}s.',
+  'petGrowl.autoOn': 'Provocação automática ativada.',
+  'petGrowl.autoOff': 'Provocação automática desativada.',
   'error.huntersFeedPets': 'Somente caçadores podem alimentar mascotes.',
   'error.petFoodOnly': 'Seu mascote só pode comer comida.',
   'error.petFullHealth': 'Seu mascote já está com a vida cheia.',
@@ -2563,6 +2612,10 @@ const PET_DICT_RU: Record<PetSimMessageKey, string> = {
   'error.noLivingPet': 'У вас нет живого питомца.',
   'error.petNeedsHostileTarget': 'Вашему питомцу нужна враждебная цель.',
   'error.petTauntNotReady': 'Провокация питомца ещё не готова.',
+  'petGrowl.ready': 'Рык вашего питомца готов. {autoState}',
+  'petGrowl.cooldown': 'Рык вашего питомца восстанавливается. {autoState} Готово через {seconds}с.',
+  'petGrowl.autoOn': 'Автопровокация включена.',
+  'petGrowl.autoOff': 'Автопровокация выключена.',
   'error.huntersFeedPets': 'Только охотники могут кормить питомцев.',
   'error.petFoodOnly': 'Ваш питомец может есть только пищу.',
   'error.petFullHealth': 'У вашего питомца уже полное здоровье.',
@@ -2657,6 +2710,11 @@ function locPetMode(mode: string): string {
     return tSim(`petMode.${normalized}` as PetSimMessageKey);
   }
   return mode;
+}
+function locPetGrowlAutoState(state: string): string {
+  if (state === 'Auto-taunt is on.') return tSim('petGrowl.autoOn');
+  if (state === 'Auto-taunt is off.') return tSim('petGrowl.autoOff');
+  return state;
 }
 
 // Flavor aura names (not abilities, not talents) shown in the buff frame / combat log.
@@ -3864,6 +3922,18 @@ const RULES: Rule[] = [
   {
     re: /^(.+) answers your summons\.$/,
     build: (m) => tSim('log.petAnswersSummons', { name: locMob(m[1]) }),
+  },
+  {
+    re: /^Your pet's Growl is ready\. (Auto-taunt is (?:on|off)\.)$/,
+    build: (m) => tSim('petGrowl.ready', { autoState: locPetGrowlAutoState(m[1]) }),
+  },
+  {
+    re: /^Your pet's Growl is on cooldown\. (Auto-taunt is (?:on|off)\.) Ready in (\d+)s\.$/,
+    build: (m) =>
+      tSim('petGrowl.cooldown', {
+        autoState: locPetGrowlAutoState(m[1]),
+        seconds: formatNumber(Number(m[2]), { maximumFractionDigits: 0, useGrouping: false }),
+      }),
   },
   { re: /^You abandon (.+)\.$/, build: (m) => tSim('log.abandonPet', { name: locMob(m[1]) }) },
   { re: /^Your pet is now named (.+)\.$/, build: (m) => tSim('log.petRenamed', { name: m[1] }) },

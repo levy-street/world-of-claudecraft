@@ -284,6 +284,7 @@ function dynamicFields(e: Entity): Record<string, unknown> {
   if (e.ownerId !== null) {
     out.pm = e.petMode;
     out.pt = round2(e.petTauntTimer);
+    if (e.petAutoTaunt) out.pa = 1;
   }
   // top hate-table entries so the party threat meter shows real numbers
   if (e.kind === 'mob' && !e.dead && e.threat.size > 0) out.thr = threatEntries(e, 8);
@@ -1612,6 +1613,9 @@ export class GameServer {
         break;
       case 'pet_taunt':
         sim.petTaunt(pid);
+        break;
+      case 'pet_auto_taunt':
+        if (typeof msg.enabled === 'boolean') sim.setPetAutoTaunt(msg.enabled, pid);
         break;
       case 'pet_feed':
         if (typeof msg.item === 'string') sim.feedPet(msg.item, pid);

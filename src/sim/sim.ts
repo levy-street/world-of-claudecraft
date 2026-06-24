@@ -863,6 +863,7 @@ export interface PetState {
   hp: number;
   dead: boolean;
   mode?: PetMode;
+  autoTaunt?: boolean;
 }
 
 const PET_NAME_RE = /^[A-Za-z][A-Za-z '-]{1,15}$/;
@@ -4317,6 +4318,7 @@ export class Sim {
       hp: pet.dead ? 0 : Math.max(1, Math.min(pet.maxHp, pet.hp)),
       dead: pet.dead,
       mode: pet.petMode,
+      autoTaunt: pet.petAutoTaunt,
     };
   }
 
@@ -4330,6 +4332,8 @@ export class Sim {
     pet.ownerId = owner.id;
     pet.petMode = state.mode ?? 'defensive';
     pet.petTauntTimer = 0;
+    pet.petAutoTaunt = state.autoTaunt ?? false;
+    pet.petManualTauntPending = false;
     pet.hostile = false;
     pet.aiState = state.dead ? 'dead' : 'idle';
     pet.aggroTargetId = null;
@@ -4402,6 +4406,8 @@ export class Sim {
     pet.ownerId = p.id;
     pet.petMode = 'defensive';
     pet.petTauntTimer = 0;
+    pet.petAutoTaunt = false;
+    pet.petManualTauntPending = false;
     pet.hostile = false;
     pet.aiState = 'idle';
     pet.aggroTargetId = null;
@@ -4491,6 +4497,8 @@ export class Sim {
     pet.ownerId = owner.id;
     pet.petMode = 'defensive';
     pet.petTauntTimer = 0;
+    pet.petAutoTaunt = false;
+    pet.petManualTauntPending = false;
     pet.hostile = false;
     pet.aiState = 'idle';
     pet.aggroTargetId = null;
@@ -4658,8 +4666,12 @@ export class Sim {
     pet.aggroTargetId = target.id;
     pet.inCombat = true;
     addThreat(target, pet.id, 1);
-    if (dist2d(pet.pos, target.pos) > PET_TAUNT_RANGE) return;
+    if (dist2d(pet.pos, target.pos) > PET_TAUNT_RANGE) {
+      pet.petManualTauntPending = true;
+      return;
+    }
     this.applyTaunt(pet, target);
+    pet.petManualTauntPending = false;
     pet.petTauntTimer = PET_GROWL_INTERVAL;
   }
 
@@ -4798,8 +4810,25 @@ export class Sim {
       pet.aggroTargetId = null;
       pet.inCombat = false;
       pet.autoAttack = false;
+      pet.petManualTauntPending = false;
     }
     this.emit({ type: 'log', text: `${pet.name} is now ${mode}.`, color: '#ffd100', pid: r.e.id });
+  }
+
+  setPetAutoTaunt(enabled: boolean, pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    if (!isPetClass(r.meta.cls)) {
+      this.error(r.e.id, 'Only pet classes can command pets.');
+      return;
+    }
+    r.meta.lastActiveTick = this.tickCount; // commanding the pet is a deliberate action
+    const pet = this.petOf(r.e.id, true);
+    if (!pet) {
+      this.error(r.e.id, 'You have no pet.');
+      return;
+    }
+    pet.petAutoTaunt = enabled;
   }
 
   /** Remove a summoned demon from the world entirely, scrubbing any references
@@ -7808,6 +7837,7 @@ export class Sim {
     if (!target && !owner.dead) target = this.petPickTarget(pet, owner);
     pet.aggroTargetId = target?.id ?? null;
     pet.inCombat = target !== null;
+    if (!target) pet.petManualTauntPending = false;
 
     if (target) {
       // ranged demon (imp) holds its distance and hurls bolts; melee pets close
@@ -7826,8 +7856,14 @@ export class Sim {
         pet.swingTimer = Math.max(0, pet.swingTimer - DT);
       } else {
         pet.facing = angleTo(pet.pos, target.pos);
-        if (target.kind === 'mob' && !ranged && pet.petTauntTimer <= 0) {
+        if (
+          target.kind === 'mob' &&
+          !ranged &&
+          pet.petTauntTimer <= 0 &&
+          (pet.petAutoTaunt || pet.petManualTauntPending)
+        ) {
           this.applyTaunt(pet, target);
+          pet.petManualTauntPending = false;
           pet.petTauntTimer = PET_GROWL_INTERVAL;
         }
         pet.swingTimer -= DT;
@@ -14819,18 +14855,21 @@ export class Sim {
         : ' It should be a safe landing.';
     return `You are falling — ${height}yd above the ground.${danger}`;
   }
-  // Self-only readout of the controlled pet's Growl (taunt) cooldown. Reads
-  // only the live pet Entity's petTauntTimer (the same field updatePet counts
-  // down at sim.ts ~2770 and resets to PET_GROWL_INTERVAL after each growl), so
-  // it stays truthful without any new state. Distinct from /pet (vitals) and
-  // /cooldowns (the player's own ability map, which never holds this timer).
+  // Self-only readout of the controlled pet's Growl cooldown and autocast state.
+  // Distinct from /pet (vitals) and /cooldowns (the player's own ability map,
+  // which never holds this timer).
   private petTauntReadout(owner: Entity): string {
     const pet = this.petOf(owner.id);
     if (!pet) return 'You do not have a pet.';
     if (pet.petTauntTimer <= 0) {
-      return `Your pet's Growl is ready — it will taunt its target on the next melee swing.`;
+      return pet.petAutoTaunt
+        ? `Your pet's Growl is ready. Auto-taunt is on.`
+        : `Your pet's Growl is ready. Auto-taunt is off.`;
     }
-    return `Your pet's Growl is on cooldown — ready in ${Math.ceil(pet.petTauntTimer)}s.`;
+    const seconds = Math.ceil(pet.petTauntTimer);
+    return pet.petAutoTaunt
+      ? `Your pet's Growl is on cooldown. Auto-taunt is on. Ready in ${seconds}s.`
+      : `Your pet's Growl is on cooldown. Auto-taunt is off. Ready in ${seconds}s.`;
   }
   // Druid forms park the mana bar in savedMana and run on rage/energy instead
   // (entity.ts:126-130). That parked pool has no in-game UI — the bar shows the

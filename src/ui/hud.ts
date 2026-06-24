@@ -3217,8 +3217,9 @@ export class Hud {
     }
     const mode = pet.petMode ?? 'defensive';
     const cd = Math.ceil(Math.max(0, pet.petTauntTimer));
+    const autoTaunt = pet.petAutoTaunt === true;
     const ownerClass = this.sim.cfg.playerClass;
-    const sig = `${pet.id}:${ownerClass}:${mode}:${cd}:${this.pendingPetFeed ? 'feed' : ''}:${this.petModeMenuOpen ? 'modes' : ''}`;
+    const sig = `${pet.id}:${ownerClass}:${mode}:${cd}:${autoTaunt ? 'auto' : 'manual'}:${this.pendingPetFeed ? 'feed' : ''}:${this.petModeMenuOpen ? 'modes' : ''}`;
     bar.style.display = 'flex';
     if (sig === this.lastPetBarSig) return;
     this.lastPetBarSig = sig;
@@ -3237,13 +3238,21 @@ export class Hud {
       title: string,
       tooltip: string,
       onClick: () => void,
-      opts: { active?: boolean; cooldownText?: string } = {},
+      opts: {
+        active?: boolean;
+        autocast?: boolean;
+        cooldownText?: string;
+        onContextMenu?: () => void;
+      } = {},
     ) => {
       const btn = document.createElement('button');
       btn.className = 'pet-btn';
       if (opts.active) btn.classList.add('active');
+      if (opts.autocast) btn.classList.add('autocast');
       if (opts.cooldownText) btn.classList.add('cooldown');
       btn.title = title;
+      btn.setAttribute('aria-label', title);
+      if (opts.active || opts.autocast) btn.setAttribute('aria-pressed', 'true');
       const icon = document.createElement('span');
       icon.className = 'icon-label';
       icon.style.backgroundImage = `url(${iconDataUrl('ability', iconId)})`;
@@ -3259,6 +3268,13 @@ export class Hud {
         audio.click();
         onClick();
       });
+      if (opts.onContextMenu) {
+        btn.addEventListener('contextmenu', (event) => {
+          event.preventDefault();
+          audio.click();
+          opts.onContextMenu?.();
+        });
+      }
       this.attachTooltip(btn, () => tooltip);
       parent.appendChild(btn);
     };
@@ -3275,7 +3291,14 @@ export class Hud {
       t('hud.pet.taunt'),
       petTooltip(t('hud.pet.petTauntTitle'), t('hud.pet.petTauntDesc')),
       () => this.sim.petTaunt(),
-      { cooldownText: cd > 0 ? `${cd}` : undefined },
+      {
+        autocast: autoTaunt,
+        cooldownText: cd > 0 ? `${cd}` : undefined,
+        onContextMenu: () => {
+          this.sim.setPetAutoTaunt(!autoTaunt);
+          this.lastPetBarSig = '';
+        },
+      },
     );
     if (ownerClass === 'warlock') {
       addButton(
