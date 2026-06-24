@@ -6,6 +6,7 @@ import type { ArenaFormat, PlayerClass } from '../src/sim/types';
 import { seedChatFilterDefaults } from './chat_filter_db';
 import type { ChatLogRow } from './chat_log';
 import { isUniqueViolation } from './http_util';
+import { JOBS_SCHEMA } from './jobs_db';
 import { OAUTH_SCHEMA } from './oauth_db';
 import { REALM } from './realm';
 import { chooseArchiveName } from './reclaim_name';
@@ -519,6 +520,7 @@ export async function ensureSchema(): Promise<void> {
     await client.query(SCHEMA);
     await client.query(SOCIAL_SCHEMA);
     await client.query(OAUTH_SCHEMA);
+    await client.query(JOBS_SCHEMA);
     // Seed the chat-filter word lists + config on first boot only (idempotent).
     // Runs under the same advisory lock so concurrent realm boots don't race.
     await seedChatFilterDefaults(client);
@@ -1220,6 +1222,28 @@ export async function walletForCharacterName(name: string): Promise<{ name: stri
   );
   const row = res.rows[0];
   return row ? { name: row.name, pubkey: row.pubkey } : null;
+}
+
+// Like walletForCharacterName, but returns the full party (account + character
+// ids) needed to register a job-contract counterparty. Realm-scoped, exact name,
+// and only resolves when that account has a verified linked wallet (the JOIN).
+export async function jobPartyByCharacterName(
+  name: string,
+): Promise<{ accountId: number; characterId: number; name: string; wallet: string } | null> {
+  const term = name.trim();
+  if (!term) return null;
+  const res = await pool.query(
+    `SELECT c.account_id AS account_id, c.id AS character_id, c.name AS name, w.pubkey AS wallet
+       FROM characters c
+       JOIN wallet_links w ON w.account_id = c.account_id
+      WHERE c.realm = $1 AND lower(c.name) = lower($2)
+      LIMIT 1`,
+    [REALM, term],
+  );
+  const row = res.rows[0];
+  return row
+    ? { accountId: Number(row.account_id), characterId: Number(row.character_id), name: row.name, wallet: row.wallet }
+    : null;
 }
 
 // One wallet per account (account_id PK) and one account per wallet (pubkey

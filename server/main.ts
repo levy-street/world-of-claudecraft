@@ -33,6 +33,13 @@ import {
   handleIdentityQuote,
   registerIdentityActions,
 } from './identity';
+import {
+  handleJobAccept,
+  handleJobCancel,
+  handleJobConfirm,
+  handleJobList,
+  handleJobQuote,
+} from './jobs_api';
 import { makeIdentityActions } from './identity_actions';
 import { handleSubdomainQuote, handleSubdomainConfirm } from './subdomain_mint';
 import { handleCharacterClaim, registerClaimHooks, accountControlsBoundCharacter } from './character_claim';
@@ -1360,6 +1367,27 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const { owner, fresh } = parseWocBalanceQuery(req.url ?? '');
       return handleWocBalance(res, owner, fresh);
     }
+    // Player job contracts ("paid bodyguard"): post + escrow, confirm deposit,
+    // accept, cancel, and list. Settlement is automatic (server oracle).
+    if (req.method === 'POST' && url === '/api/jobs/quote') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleJobQuote(req, res, accountId, game.jobs);
+    }
+    const jobActionMatch = /^\/api\/jobs\/(\d+)\/(confirm|accept|cancel)$/.exec(url);
+    if (req.method === 'POST' && jobActionMatch) {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      const jobId = BigInt(jobActionMatch[1]);
+      if (jobActionMatch[2] === 'confirm') return handleJobConfirm(req, res, accountId, game.jobs, jobId);
+      if (jobActionMatch[2] === 'accept') return handleJobAccept(req, res, accountId, game.jobs, jobId);
+      return handleJobCancel(req, res, accountId, game.jobs, jobId);
+    }
+    if (req.method === 'GET' && url === '/api/jobs') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleJobList(req, res, accountId, game.jobs);
+    }
     // $WOC-paid identity actions: quote a burn price, then redeem the signature.
     if (req.method === 'GET' && url === '/api/identity/prices') {
       return handleIdentityPrices(res);
@@ -1456,6 +1484,7 @@ async function main(): Promise<void> {
   await game.loadMarket();
   await game.loadChatFilter();
   await game.loadBlockedIps();
+  await game.loadJobs();
   void game.recordOnlineSnapshot();
   void currentSitePresenceUsers()
     .then((count) => recordSitePresenceSample(count))

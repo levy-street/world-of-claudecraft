@@ -12,13 +12,17 @@
 // SUBJECT = the payer's character (the one being helped/escorted/levelled). For
 // every milestone the helper must be present (grouped with the subject) at the
 // moment of completion, so payment only ever follows actual help.
+//
+// All time is WALL-CLOCK unix SECONDS (not sim ticks), so the deadline and the
+// survive timer survive a server restart (the sim tick counter resets on reboot;
+// wall time does not).
 
 export type JobMilestone =
   | { kind: 'reach_level'; target: number }       // subject reaches >= target level
   | { kind: 'clear_dungeon'; dungeonId: string }  // subject's party clears the dungeon
   | { kind: 'complete_quest'; questId: string }   // subject turns in the agreed quest
   | { kind: 'escort'; x: number; z: number; radius: number } // subject reaches a place alive
-  | { kind: 'survive'; durationTicks: number };   // subject survives N ticks with the helper
+  | { kind: 'survive'; durationSec: number };     // subject survives N seconds with the helper
 
 export type JobStatus = 'pending' | 'completed' | 'voided';
 
@@ -31,7 +35,7 @@ const VOID_ON_DEATH: ReadonlySet<JobMilestone['kind']> = new Set(['escort', 'sur
 // authoritative Sim. `helperPresent` folds together party membership / proximity
 // (the server decides what "present" means; the engine just consumes the flag).
 export interface JobObservation {
-  tick: number;                       // current sim tick (monotonic, 20/sec)
+  nowSec: number;                     // current wall-clock time, unix seconds
   subjectLevel: number;
   subjectAlive: boolean;
   subjectDiedThisTick: boolean;
@@ -46,17 +50,17 @@ export interface JobObservation {
 // settled job.
 export interface JobProgress {
   status: JobStatus;
-  startedTick: number | null;         // 'survive': when the protected window began
+  startedSec: number | null;          // 'survive': when the protected window began
   reason?: string;                    // why it voided / completed (audit + UI)
 }
 
 export function initialProgress(): JobProgress {
-  return { status: 'pending', startedTick: null };
+  return { status: 'pending', startedSec: null };
 }
 
 export interface JobConfig {
   milestone: JobMilestone;
-  deadlineTick: number;               // hard expiry: still pending at/after ⇒ refund
+  deadlineSec: number;                // hard expiry: still pending at/after ⇒ refund
   requireHelperPresent: boolean;      // default true — the helper must earn it
 }
 
@@ -70,7 +74,7 @@ export function stepJob(cfg: JobConfig, prev: JobProgress, obs: JobObservation):
   if (prev.status !== 'pending') return prev;
 
   // Hard deadline → refund the payer.
-  if (obs.tick >= cfg.deadlineTick) return { ...prev, status: 'voided', reason: 'expired' };
+  if (obs.nowSec >= cfg.deadlineSec) return { ...prev, status: 'voided', reason: 'expired' };
 
   const m = cfg.milestone;
   // Death fails the protective jobs outright (the helper failed to keep them alive).
@@ -102,11 +106,46 @@ export function stepJob(cfg: JobConfig, prev: JobProgress, obs: JobObservation):
       // The protected timer only runs while the helper is present and the subject
       // is alive; if the helper leaves (or the subject is down), the clock resets
       // so a job can't be passively completed during the helper's absence.
-      if (!helperOk || !obs.subjectAlive) return { ...prev, startedTick: null };
-      const startedTick = prev.startedTick ?? obs.tick;
-      if (obs.tick - startedTick >= m.durationTicks) return { ...complete, startedTick };
-      return { ...prev, startedTick };
+      if (!helperOk || !obs.subjectAlive) return { ...prev, startedSec: null };
+      const startedSec = prev.startedSec ?? obs.nowSec;
+      if (obs.nowSec - startedSec >= m.durationSec) return { ...complete, startedSec };
+      return { ...prev, startedSec };
     }
+  }
+}
+
+/**
+ * Validate + normalize an untrusted milestone payload (REST input) into a typed
+ * JobMilestone, or null if malformed / out of bounds. Structural + range checks
+ * only; existence of a quest/dungeon id is checked by the caller (which has the
+ * content tables) — this module stays sim-free.
+ */
+export function parseMilestone(raw: unknown): JobMilestone | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const m = raw as Record<string, unknown>;
+  switch (m.kind) {
+    case 'reach_level': {
+      const target = Number(m.target);
+      return Number.isInteger(target) && target >= 2 && target <= 60 ? { kind: 'reach_level', target } : null;
+    }
+    case 'clear_dungeon':
+      return typeof m.dungeonId === 'string' && m.dungeonId.length > 0 && m.dungeonId.length <= 64
+        ? { kind: 'clear_dungeon', dungeonId: m.dungeonId } : null;
+    case 'complete_quest':
+      return typeof m.questId === 'string' && m.questId.length > 0 && m.questId.length <= 64
+        ? { kind: 'complete_quest', questId: m.questId } : null;
+    case 'escort': {
+      const x = Number(m.x), z = Number(m.z), radius = Number(m.radius);
+      return Number.isFinite(x) && Number.isFinite(z) && Number.isFinite(radius) && radius >= 2 && radius <= 50
+        ? { kind: 'escort', x, z, radius } : null;
+    }
+    case 'survive': {
+      const durationSec = Number(m.durationSec);
+      return Number.isInteger(durationSec) && durationSec >= 30 && durationSec <= 86400
+        ? { kind: 'survive', durationSec } : null;
+    }
+    default:
+      return null;
   }
 }
 
@@ -117,6 +156,6 @@ export function describeMilestone(m: JobMilestone): string {
     case 'clear_dungeon': return `Clear ${m.dungeonId}`;
     case 'complete_quest': return `Complete quest ${m.questId}`;
     case 'escort': return `Escort to (${m.x}, ${m.z})`;
-    case 'survive': return `Survive ${Math.round(m.durationTicks / 20)}s together`;
+    case 'survive': return `Survive ${m.durationSec}s together`;
   }
 }

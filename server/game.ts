@@ -52,6 +52,15 @@ import { IpBlockList } from './ip_block';
 import { loadActiveBlockedIps } from './ip_block_db';
 import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
 import { REALM } from './realm';
+import {
+  JobContractService,
+  type JobEscrowOps,
+  type JobObservationSource,
+  type JobRecord,
+} from './job_contracts';
+import * as jobEscrow from './job_escrow';
+import type { JobObservation } from './job_milestone';
+import { jobsDb } from './jobs_db';
 import { createSerialWriter } from './serial_writer';
 import type { Presence, PresenceStatus, SocialActor, SocialTransport } from './social';
 import { SocialService } from './social';
@@ -674,6 +683,17 @@ export class GameServer {
   // Throttle for the optional over-budget stutter log (PERF_TICK_LOG=1).
   private lastPerfLogTick = 0;
   private readonly ipSessionCounts = new Map<string, number>();
+  // Player job-contract escrow ("paid bodyguard"). The service owns the lifecycle
+  // + milestone adjudication; this server is its observation source + the tick that
+  // drives it. Public so the REST layer (main.ts) can post/confirm/accept jobs.
+  readonly jobs: JobContractService;
+  // Per-tick job signals, recomputed from the sim events each tick before the job
+  // evaluator runs, then read by observe(). Wall-clock seconds (not sim ticks) so
+  // deadlines + the survive timer survive a restart.
+  private jobNowSec = 0;
+  private readonly jobDeaths = new Set<number>();            // subject pids that died this tick
+  private readonly jobQuestsByPid = new Map<number, string[]>(); // pid → quests turned in this tick
+  private readonly jobBossDungeons = new Set<string>();      // dungeons whose boss died this tick
 
   constructor() {
     this.sim = new Sim({
@@ -684,6 +704,65 @@ export class GameServer {
       lockoutNowMs: () => Date.now(),
     });
     this.social = new SocialService(this.socialDb, this.socialTransport());
+    const escrowOps: JobEscrowOps = {
+      buildOpenTransaction: jobEscrow.buildOpenTransaction,
+      verifyDeposit: jobEscrow.verifyDeposit,
+      releaseJob: jobEscrow.releaseJob,
+      refundJob: jobEscrow.refundJob,
+      jobAccountExists: jobEscrow.jobAccountExists,
+    };
+    this.jobs = new JobContractService(jobsDb, escrowOps, this, REALM);
+  }
+
+  /** Reload funded, non-terminal job contracts at boot (resumes the watcher). */
+  async loadJobs(): Promise<void> {
+    await this.jobs.loadActive();
+  }
+
+  // JobObservationSource: build the milestone observation for a job's subject
+  // (the payer's character) from the live sim, or null when the subject is
+  // offline — an offline subject simply makes no progress, with no penalty.
+  observe(job: JobRecord): JobObservation | null {
+    const subjectSession = this.sessionsByCharacterId.get(job.payer.characterId);
+    if (!subjectSession) return null;
+    const subject = this.sim.entities.get(subjectSession.pid);
+    if (!subject) return null;
+    const helperPid = this.sessionsByCharacterId.get(job.helper.characterId)?.pid;
+    const party = this.sim.partyOf(subjectSession.pid);
+    const helperPresent = helperPid !== undefined && (party?.members.includes(helperPid) ?? false);
+    return {
+      nowSec: this.jobNowSec,
+      subjectLevel: subject.level,
+      subjectAlive: !subject.dead,
+      subjectDiedThisTick: this.jobDeaths.has(subjectSession.pid),
+      subjectPos: { x: subject.pos.x, z: subject.pos.z },
+      helperPresent,
+      questTurnIns: this.jobQuestsByPid.get(subjectSession.pid) ?? [],
+      dungeonClears: subject.dungeonId && this.jobBossDungeons.has(subject.dungeonId) ? [subject.dungeonId] : [],
+    };
+  }
+
+  // Recompute this tick's job signals from the sim events, then run one milestone
+  // evaluation pass. Cheap per tick (a handful of comparisons per active job);
+  // the expensive chain release/refund only fires on a state transition.
+  private evaluateJobs(events: SimEvent[]): void {
+    this.jobNowSec = Date.now() / 1000;
+    this.jobDeaths.clear();
+    this.jobQuestsByPid.clear();
+    this.jobBossDungeons.clear();
+    for (const ev of events) {
+      if (ev.type === 'playerDeath' && ev.pid !== undefined) {
+        this.jobDeaths.add(ev.pid);
+      } else if (ev.type === 'questDone' && ev.pid !== undefined) {
+        const list = this.jobQuestsByPid.get(ev.pid) ?? [];
+        list.push(ev.questId);
+        this.jobQuestsByPid.set(ev.pid, list);
+      } else if (ev.type === 'death') {
+        const dead = this.sim.entities.get(ev.entityId);
+        if (dead && MOBS[dead.templateId]?.boss && dead.dungeonId) this.jobBossDungeons.add(dead.dungeonId);
+      }
+    }
+    this.jobs.evaluateTick(this.jobNowSec);
   }
 
   // Returns the number of currently active WS sessions from the given IP.
@@ -836,6 +915,7 @@ export class GameServer {
         this.routeEvents(events);
         lap('events');
         this.persistCourseFinishes(events);
+        this.evaluateJobs(events);
         this.runAntibotTick();
         lap('antibot');
         acc -= DT;

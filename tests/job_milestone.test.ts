@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import {
-  stepJob, initialProgress, describeMilestone,
+  stepJob, initialProgress, describeMilestone, parseMilestone,
   type JobConfig, type JobObservation, type JobProgress,
 } from '../server/job_milestone';
 
 // A baseline observation: subject alive, helper present, nothing happening.
-// Each test overrides only the fields it cares about.
+// Each test overrides only the fields it cares about. Time is wall-clock seconds.
 function obs(over: Partial<JobObservation> = {}): JobObservation {
   return {
-    tick: 100,
+    nowSec: 1000,
     subjectLevel: 1,
     subjectAlive: true,
     subjectDiedThisTick: false,
@@ -22,12 +22,11 @@ function obs(over: Partial<JobObservation> = {}): JobObservation {
 
 const cfg = (over: Partial<JobConfig>): JobConfig => ({
   milestone: { kind: 'reach_level', target: 10 },
-  deadlineTick: 1_000_000,
+  deadlineSec: 10_000_000,
   requireHelperPresent: true,
   ...over,
 });
 
-// Drive a sequence of observations through the engine, returning final progress.
 function run(c: JobConfig, observations: JobObservation[], start: JobProgress = initialProgress()): JobProgress {
   return observations.reduce((p, o) => stepJob(c, p, o), start);
 }
@@ -89,40 +88,39 @@ describe('escort', () => {
 });
 
 describe('survive', () => {
-  const c = cfg({ milestone: { kind: 'survive', durationTicks: 100 } });
+  const c = cfg({ milestone: { kind: 'survive', durationSec: 100 } });
   it('completes after the full duration with the helper present', () => {
-    const p1 = stepJob(c, initialProgress(), obs({ tick: 200 })); // timer starts at 200
+    const p1 = stepJob(c, initialProgress(), obs({ nowSec: 2000 })); // timer starts at 2000
     expect(p1.status).toBe('pending');
-    expect(p1.startedTick).toBe(200);
-    const p2 = stepJob(c, p1, obs({ tick: 300 })); // 100 ticks later
+    expect(p1.startedSec).toBe(2000);
+    const p2 = stepJob(c, p1, obs({ nowSec: 2100 })); // 100s later
     expect(p2.status).toBe('completed');
   });
   it('resets the timer if the helper leaves, so absence is not rewarded', () => {
-    const p1 = stepJob(c, initialProgress(), obs({ tick: 200 }));
-    const p2 = stepJob(c, p1, obs({ tick: 250, helperPresent: false })); // helper bails → reset
-    expect(p2.startedTick).toBeNull();
-    const p3 = stepJob(c, p2, obs({ tick: 260 })); // timer restarts at 260
-    expect(p3.startedTick).toBe(260);
-    expect(stepJob(c, p3, obs({ tick: 300 })).status).toBe('pending'); // only 40 ticks in
+    const p1 = stepJob(c, initialProgress(), obs({ nowSec: 2000 }));
+    const p2 = stepJob(c, p1, obs({ nowSec: 2050, helperPresent: false })); // helper bails → reset
+    expect(p2.startedSec).toBeNull();
+    const p3 = stepJob(c, p2, obs({ nowSec: 2060 })); // timer restarts at 2060
+    expect(p3.startedSec).toBe(2060);
+    expect(stepJob(c, p3, obs({ nowSec: 2100 })).status).toBe('pending'); // only 40s in
   });
   it('voids if the subject dies during the window', () => {
-    const p1 = stepJob(c, initialProgress(), obs({ tick: 200 }));
-    expect(stepJob(c, p1, obs({ tick: 250, subjectDiedThisTick: true })).status).toBe('voided');
+    const p1 = stepJob(c, initialProgress(), obs({ nowSec: 2000 }));
+    expect(stepJob(c, p1, obs({ nowSec: 2050, subjectDiedThisTick: true })).status).toBe('voided');
   });
 });
 
 describe('deadline and terminal stickiness', () => {
   it('voids (refund) when the deadline passes while still pending', () => {
-    const c = cfg({ milestone: { kind: 'reach_level', target: 10 }, deadlineTick: 500 });
-    expect(stepJob(c, initialProgress(), obs({ tick: 500, subjectLevel: 1 })).reason).toBe('expired');
-    expect(stepJob(c, initialProgress(), obs({ tick: 500, subjectLevel: 1 })).status).toBe('voided');
+    const c = cfg({ milestone: { kind: 'reach_level', target: 10 }, deadlineSec: 5000 });
+    expect(stepJob(c, initialProgress(), obs({ nowSec: 5000, subjectLevel: 1 })).reason).toBe('expired');
+    expect(stepJob(c, initialProgress(), obs({ nowSec: 5000, subjectLevel: 1 })).status).toBe('voided');
   });
   it('a completed job is never re-evaluated (late events cannot flip it)', () => {
-    const c = cfg({ milestone: { kind: 'reach_level', target: 10 }, deadlineTick: 500 });
+    const c = cfg({ milestone: { kind: 'reach_level', target: 10 }, deadlineSec: 5000 });
     const completed = stepJob(c, initialProgress(), obs({ subjectLevel: 10 }));
     expect(completed.status).toBe('completed');
-    // A later death + past deadline must not change the settled outcome.
-    const after = run(c, [obs({ tick: 600, subjectDiedThisTick: true }), obs({ tick: 999 })], completed);
+    const after = run(c, [obs({ nowSec: 6000, subjectDiedThisTick: true }), obs({ nowSec: 9999 })], completed);
     expect(after.status).toBe('completed');
   });
   it('a voided job stays voided', () => {
@@ -143,6 +141,25 @@ describe('requireHelperPresent = false', () => {
 describe('describeMilestone', () => {
   it('summarises each milestone kind', () => {
     expect(describeMilestone({ kind: 'reach_level', target: 10 })).toMatch(/level 10/);
-    expect(describeMilestone({ kind: 'survive', durationTicks: 200 })).toMatch(/10s/); // 200 ticks / 20 = 10s
+    expect(describeMilestone({ kind: 'survive', durationSec: 120 })).toMatch(/120s/);
+  });
+});
+
+describe('parseMilestone (untrusted input)', () => {
+  it('accepts well-formed milestones of each kind', () => {
+    expect(parseMilestone({ kind: 'reach_level', target: 10 })).toEqual({ kind: 'reach_level', target: 10 });
+    expect(parseMilestone({ kind: 'clear_dungeon', dungeonId: 'hollow_crypt' })).toEqual({ kind: 'clear_dungeon', dungeonId: 'hollow_crypt' });
+    expect(parseMilestone({ kind: 'complete_quest', questId: 'q1' })).toEqual({ kind: 'complete_quest', questId: 'q1' });
+    expect(parseMilestone({ kind: 'escort', x: 1, z: 2, radius: 5 })).toEqual({ kind: 'escort', x: 1, z: 2, radius: 5 });
+    expect(parseMilestone({ kind: 'survive', durationSec: 300 })).toEqual({ kind: 'survive', durationSec: 300 });
+  });
+  it('rejects malformed / out-of-bounds input', () => {
+    expect(parseMilestone(null)).toBeNull();
+    expect(parseMilestone({ kind: 'nope' })).toBeNull();
+    expect(parseMilestone({ kind: 'reach_level', target: 1 })).toBeNull();   // below min
+    expect(parseMilestone({ kind: 'reach_level', target: 1.5 })).toBeNull(); // non-integer
+    expect(parseMilestone({ kind: 'survive', durationSec: 5 })).toBeNull();  // too short
+    expect(parseMilestone({ kind: 'escort', x: 1, z: 2, radius: 999 })).toBeNull(); // radius too big
+    expect(parseMilestone({ kind: 'complete_quest', questId: '' })).toBeNull();
   });
 });

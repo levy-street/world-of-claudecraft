@@ -97,6 +97,17 @@ export function jobPda(jobId: bigint): PublicKey {
   return PublicKey.findProgramAddressSync([Buffer.from('job'), u64le(jobId)], PROGRAM_ID)[0];
 }
 
+/**
+ * Whether the job's on-chain account still exists. release()/refund() close it,
+ * so `false` means the escrow has already been settled — used for idempotent
+ * crash recovery (don't double-settle if the server died after the chain op but
+ * before persisting the result).
+ */
+export async function jobAccountExists(jobId: bigint): Promise<boolean> {
+  const info = await connection().getAccountInfo(jobPda(jobId), 'confirmed');
+  return info !== null;
+}
+
 /** The escrow vault (the job PDA's associated token account for the mint). */
 function vaultFor(job: PublicKey, mint: PublicKey): PublicKey {
   return getAssociatedTokenAddressSync(mint, job, true);

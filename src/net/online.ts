@@ -187,6 +187,25 @@ export interface WocIdentityQuote {
   expiresAt: number;
 }
 
+// A player job contract ("paid bodyguard") as surfaced to the client's Jobs list.
+export interface JobSummary {
+  jobId: string;
+  role: 'payer' | 'helper';
+  payerName: string;
+  helperName: string;
+  currency: string;
+  amountBase: string;
+  amount: number;
+  milestone: { kind: string } & Record<string, unknown>;
+  milestoneText: string;
+  status: 'pending_deposit' | 'open' | 'active' | 'released' | 'refunded';
+  progress: 'pending' | 'completed' | 'voided';
+  reason: string | null;
+  deadlineSec: number;
+  depositSig: string | null;
+  settleSig: string | null;
+}
+
 export class Api {
   private static readonly SESSION_KEY = 'woc_session';
   token: string | null = null;
@@ -551,6 +570,40 @@ export class Api {
       return typeof data?.pubkey === 'string' ? { name: data.name ?? q, pubkey: data.pubkey } : null;
     } catch {
       return null;
+    }
+  }
+
+  // ── Player job contracts ("paid bodyguard") ────────────────────────────────
+  // Post a job: returns the unsigned escrow-deposit transaction (base64) for the
+  // payer to sign + submit, plus the assigned job id.
+  async jobQuote(body: {
+    characterId: number; helperName: string; currency: string; amount: number; milestone: unknown;
+  }): Promise<{ jobId: string; txBase64: string; jobPda: string; amountBase: string; mint: string; currency: string; deadlineSec: number }> {
+    return this.post('/api/jobs/quote', body);
+  }
+
+  // Confirm the deposit landed (server verifies on-chain), opening the job.
+  async jobConfirm(jobId: string, signature: string): Promise<{ status: string }> {
+    return this.post(`/api/jobs/${jobId}/confirm`, { signature });
+  }
+
+  // The helper accepts an offered job; the server begins tracking the milestone.
+  async jobAccept(jobId: string): Promise<{ status: string }> {
+    return this.post(`/api/jobs/${jobId}/accept`, {});
+  }
+
+  // The payer cancels an unaccepted job → refund.
+  async jobCancel(jobId: string): Promise<{ status: string }> {
+    return this.post(`/api/jobs/${jobId}/cancel`, {});
+  }
+
+  // Jobs this character posted or was hired for (newest first). Best-effort.
+  async jobs(characterId: number): Promise<JobSummary[]> {
+    try {
+      const data = await this.get(`/api/jobs?characterId=${encodeURIComponent(String(characterId))}`);
+      return Array.isArray(data.jobs) ? data.jobs : [];
+    } catch {
+      return [];
     }
   }
 
