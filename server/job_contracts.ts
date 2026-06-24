@@ -54,7 +54,7 @@ export interface JobsDb {
 
 export interface JobEscrowOps {
   buildOpenTransaction(args: { jobId: bigint; payer: string; helper: string; mint: string; amountBase: bigint }): Promise<{ txBase64: string; jobPda: string; vault: string }>;
-  verifyDeposit(args: { signature: string; jobId: bigint; payer: string; mint: string; amountBase: bigint }): Promise<boolean>;
+  verifyDeposit(args: { signature: string; jobId: bigint; payer: string; helper: string; mint: string; amountBase: bigint }): Promise<boolean>;
   releaseJob(args: { jobId: bigint; payer: string; helper: string; mint: string }): Promise<string>;
   refundJob(args: { jobId: bigint; payer: string; mint: string }): Promise<string>;
   jobAccountExists(jobId: bigint): Promise<boolean>;
@@ -156,6 +156,7 @@ export class JobContractService {
       signature,
       jobId,
       payer: job.payer.wallet,
+      helper: job.helper.wallet,
       mint: job.mint,
       amountBase: job.amountBase,
     });

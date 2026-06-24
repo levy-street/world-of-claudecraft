@@ -693,7 +693,6 @@ export class GameServer {
   private jobNowSec = 0;
   private readonly jobDeaths = new Set<number>();            // subject pids that died this tick
   private readonly jobQuestsByPid = new Map<number, string[]>(); // pid → quests turned in this tick
-  private readonly jobBossDungeons = new Set<string>();      // dungeons whose boss died this tick
 
   constructor() {
     this.sim = new Sim({
@@ -730,6 +729,15 @@ export class GameServer {
     const helperPid = this.sessionsByCharacterId.get(job.helper.characterId)?.pid;
     const party = this.sim.partyOf(subjectSession.pid);
     const helperPresent = helperPid !== undefined && (party?.members.includes(helperPid) ?? false);
+    // Dungeon clear: the SUBJECT'S OWN instance (keyed by their party/solo key, so
+    // another party clearing a concurrent copy can't credit them) has every mob
+    // dead. A removed mob (despawned on death) counts as cleared; an unspawned /
+    // empty instance (length 0) does not, so entering can't auto-complete it.
+    const inst = this.sim.instanceForPlayer(subjectSession.pid);
+    const dungeonClears = inst && inst.mobIds.length > 0
+      && inst.mobIds.every((id) => { const m = this.sim.entities.get(id); return !m || m.dead; })
+      ? [inst.dungeonId]
+      : [];
     return {
       nowSec: this.jobNowSec,
       subjectLevel: subject.level,
@@ -738,7 +746,7 @@ export class GameServer {
       subjectPos: { x: subject.pos.x, z: subject.pos.z },
       helperPresent,
       questTurnIns: this.jobQuestsByPid.get(subjectSession.pid) ?? [],
-      dungeonClears: subject.dungeonId && this.jobBossDungeons.has(subject.dungeonId) ? [subject.dungeonId] : [],
+      dungeonClears,
     };
   }
 
@@ -749,7 +757,6 @@ export class GameServer {
     this.jobNowSec = Date.now() / 1000;
     this.jobDeaths.clear();
     this.jobQuestsByPid.clear();
-    this.jobBossDungeons.clear();
     for (const ev of events) {
       if (ev.type === 'playerDeath' && ev.pid !== undefined) {
         this.jobDeaths.add(ev.pid);
@@ -757,9 +764,6 @@ export class GameServer {
         const list = this.jobQuestsByPid.get(ev.pid) ?? [];
         list.push(ev.questId);
         this.jobQuestsByPid.set(ev.pid, list);
-      } else if (ev.type === 'death') {
-        const dead = this.sim.entities.get(ev.entityId);
-        if (dead && MOBS[dead.templateId]?.boss && dead.dungeonId) this.jobBossDungeons.add(dead.dungeonId);
       }
     }
     this.jobs.evaluateTick(this.jobNowSec);

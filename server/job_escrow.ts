@@ -169,7 +169,7 @@ export async function buildOpenTransaction(args: OpenArgs): Promise<{ txBase64: 
  * succeeded, it isn't a Token-2022 look-alike, the payer spent at least the
  * reward, the job PDA exists under our program, and the vault holds the amount.
  */
-export async function verifyDeposit(args: { signature: string; jobId: bigint; payer: string; mint: string; amountBase: bigint }): Promise<boolean> {
+export async function verifyDeposit(args: { signature: string; jobId: bigint; payer: string; helper: string; mint: string; amountBase: bigint }): Promise<boolean> {
   const tx = await getFinalizedTx(args.signature);
   if (!tx || !txSucceeded(tx)) return false;
   if (usesToken2022(tx, args.mint)) return false;
@@ -179,9 +179,37 @@ export async function verifyDeposit(args: { signature: string; jobId: bigint; pa
   const info = await connection().getAccountInfo(job, 'finalized');
   if (!info || !info.owner.equals(PROGRAM_ID)) return false;
 
+  // Assert the on-chain Job's terms are exactly the ones the server intended.
+  // Without this, a client could ignore the server-built tx and craft their own
+  // open() at the same (server-assigned) PDA with a different settler/helper —
+  // the server could then never release/refund, stranding/griefing the helper.
+  // Binding to the recorded settler (= ours), helper, mint, and amount closes that.
+  const decoded = decodeJobAccount(info.data);
+  if (!decoded) return false;
+  if (!decoded.settler.equals(settlerKeypair().publicKey)) return false;
+  if (!decoded.payer.equals(new PublicKey(args.payer))) return false;
+  if (!decoded.helper.equals(new PublicKey(args.helper))) return false;
+  if (!decoded.mint.equals(new PublicKey(args.mint))) return false;
+  if (decoded.amount !== args.amountBase) return false;
+
   const vault = vaultFor(job, new PublicKey(args.mint));
   const bal = await connection().getTokenAccountBalance(vault, 'finalized').catch(() => null);
   return !!bal && BigInt(bal.value.amount) >= args.amountBase;
+}
+
+// Decode the Anchor `Job` account: 8-byte discriminator, then job_id u64, payer,
+// helper, mint pubkeys, amount u64, settler, vault pubkeys, bump u8 — matching
+// programs/job-escrow/src/lib.rs. Returns null if the buffer is too short.
+function decodeJobAccount(data: Buffer): { payer: PublicKey; helper: PublicKey; mint: PublicKey; amount: bigint; settler: PublicKey; vault: PublicKey } | null {
+  if (data.length < 8 + 8 + 32 + 32 + 32 + 8 + 32 + 32 + 1) return null;
+  let o = 8 + 8; // skip discriminator + job_id
+  const payer = new PublicKey(data.subarray(o, o + 32)); o += 32;
+  const helper = new PublicKey(data.subarray(o, o + 32)); o += 32;
+  const mint = new PublicKey(data.subarray(o, o + 32)); o += 32;
+  const amount = data.readBigUInt64LE(o); o += 8;
+  const settler = new PublicKey(data.subarray(o, o + 32)); o += 32;
+  const vault = new PublicKey(data.subarray(o, o + 32));
+  return { payer, helper, mint, amount, settler, vault };
 }
 
 async function signAndSendSettler(ixs: TransactionInstruction[]): Promise<string> {

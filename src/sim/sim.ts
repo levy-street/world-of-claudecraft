@@ -6013,6 +6013,17 @@ export class Sim {
     return instanceOriginOfImpl(inst);
   }
 
+  /**
+   * The dungeon instance a player is currently running: the specific slot their
+   * party/solo key claimed, or null. Read-only; the server's job-contract
+   * adjudication uses it to credit a dungeon clear to the RIGHT instance (not to
+   * anyone standing in another party's concurrent copy of the same dungeon).
+   */
+  instanceForPlayer(pid: number): InstanceSlot | null {
+    const key = this.instanceKeyFor(pid);
+    return this.instances.find((i) => i.partyKey === key) ?? null;
+  }
+
   // Lazily built on first updateDoorTriggers, then appended on dungeon_door spawn
   // (entity_roster.addEntityToRoster). Stays Sim-owned; reached via ctx.dungeonDoorIds.
   private dungeonDoorIds: number[] | null = null;
