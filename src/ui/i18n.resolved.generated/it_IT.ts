@@ -2621,7 +2621,14 @@ export const it_IT: EnTranslations = {
       "boardTitle": "{name} — top times",
       "noTimes": "No times yet — be the first.",
       "loadingBoard": "Loading…",
-      "you": "(you)"
+      "you": "(you)",
+      "race": "Race",
+      "racePartyHint": "Race your party — first through the rings wins.",
+      "getReady": "Get ready",
+      "go": "GO!",
+      "dnf": "DNF",
+      "placeOf": "#{place} of {total}",
+      "racing": "Racing"
     },
     "options": {
       "gameMenu": "Menu di gioco",

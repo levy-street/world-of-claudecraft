@@ -2621,7 +2621,14 @@ export const en_XA: EnTranslations = {
       "boardTitle": "[{name} — ţóþ ţíɱéš]",
       "noTimes": "[Ñó ţíɱéš ýéţ — ƀé ţĥé ƒíŕšţ.]",
       "loadingBoard": "[Ļóáðíñĝ…]",
-      "you": "[(ýóú)]"
+      "you": "[(ýóú)]",
+      "race": "[Ŕáçé]",
+      "racePartyHint": "[Ŕáçé ýóúŕ þáŕţý — ƒíŕšţ ţĥŕóúĝĥ ţĥé ŕíñĝš ŵíñš.]",
+      "getReady": "[Ĝéţ ŕéáðý]",
+      "go": "[ĜÓ!]",
+      "dnf": "[ÐÑƑ]",
+      "placeOf": "[#{place} óƒ {total}]",
+      "racing": "[Ŕáçíñĝ]"
     },
     "options": {
       "gameMenu": "[Ĝáɱé Ɱéñú]",
