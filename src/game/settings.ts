@@ -102,6 +102,10 @@ export const SETTING_RANGES = {
   // fixed-px frame/label/button grows together — the global "fonts too small"
   // remedy that the per-element tooltip/chat/fct scales can't cover. 1.0 = stock.
   uiScale: { min: 0.85, max: 1.4, def: 1 },
+  // Resizes just the action bar buttons (both bars) via CSS zoom on the bars, so
+  // players can shrink the hotbar without touching the rest of the HUD. 1.0 =
+  // stock; down to 0.4 for a very compact bar, up to 1.4 for bigger touch targets.
+  actionBarScale: { min: 0.4, max: 1.4, def: 1 },
 } as const;
 
 export const BOOL_SETTINGS = {

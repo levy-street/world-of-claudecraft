@@ -274,6 +274,18 @@ export const ja_JP: EnTranslations = {
       "targetFriendly": "最も近い味方をターゲット",
       "targetFriendlyNext": "味方ターゲットを順に切り替え"
     },
+    "actionBar": {
+      "secondBar": "第2アクションバー",
+      "barScale": "アクションバーのサイズ",
+      "editKeys": "アクションバーのキーを編集",
+      "bindModeTitle": "アクションバーのキー設定",
+      "bindModeHint": "スロットをクリックし、割り当てたいキーを押します。終わったら「完了」をクリックします。",
+      "bindReset": "リセット",
+      "bindResetConfirmTitle": "アクションバーのキーをリセットしますか？",
+      "bindResetConfirmBody": "1本目のバーは既定のキーに戻り、2本目のバーは未設定になります。この操作は取り消せません。",
+      "bindCancel": "キャンセル",
+      "bindDone": "完了"
+    },
     "options": {
       "clickMoveLeft": "左クリック",
       "clickMoveRight": "右クリック",

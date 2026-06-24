@@ -27,9 +27,11 @@ export interface BindAction {
   allowShared?: boolean;
 }
 
-export const ACTION_BAR_SLOTS = 12; // slot 0 is Attack, 1..11 the ability bar
+export const ACTION_BAR_SLOTS = 24; // slot 0 = Attack, 1..11 = bar 1, 12..23 = optional bar 2 (unbound by default)
 
-const SLOT_DEFAULTS = [
+// Default keys for bar 1 (slots 0..11). The optional second bar (slots 12..23)
+// ships unbound: players assign its keys via the on-bar key-bindings mode.
+const SLOT_DEFAULTS: (string | null)[] = [
   'Digit1',
   'Digit2',
   'Digit3',
@@ -185,15 +187,20 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'held',
     defaults: ['KeyX'],
   },
-  // Action bar (slot 0 = Attack)
-  ...SLOT_DEFAULTS.map(
-    (code, i): BindAction => ({
-      id: `slot${i}`,
-      label: i === 0 ? 'Attack' : `Action Bar ${i + 1}`,
-      category: 'Action Bar',
-      kind: 'edge',
-      defaults: [code],
-    }),
+  // Action bar (slot 0 = Attack; slots 12..23 are the optional second bar,
+  // unbound by default until the player assigns keys in key-bindings mode)
+  ...Array.from(
+    { length: ACTION_BAR_SLOTS },
+    (_, i): BindAction => {
+      const code = SLOT_DEFAULTS[i] ?? null;
+      return {
+        id: `slot${i}`,
+        label: i === 0 ? 'Attack' : `Action Bar ${i + 1}`,
+        category: 'Action Bar',
+        kind: 'edge',
+        defaults: code ? [code] : [],
+      };
+    },
   ),
 ];
 
@@ -523,6 +530,33 @@ export class Keybinds {
 
   reset(): void {
     this.map = this.defaults();
+    this.save();
+  }
+
+  /**
+   * Reset only the action-bar slot bindings, leaving movement, camera, and
+   * interface binds untouched. Bar 1 (slots 0..11) returns to its game defaults;
+   * the optional second bar (slots 12..23) returns to unbound. Used by the on-bar
+   * key-bindings mode's Reset control. The one-code-per-action invariant is kept:
+   * a slot default reclaimed here is stripped from any other (non-shared) action.
+   */
+  resetSlots(): void {
+    const slotIds = new Set<string>();
+    const defaults = new Set<string>();
+    for (let i = 0; i < ACTION_BAR_SLOTS; i++) {
+      const id = `slot${i}`;
+      slotIds.add(id);
+      const def = SLOT_DEFAULTS[i] ?? null;
+      this.map.set(id, [def, null]);
+      if (def) defaults.add(def);
+    }
+    for (const [id, codes] of this.map) {
+      if (slotIds.has(id) || actionAllowsShared(id)) continue;
+      for (let i = 0; i < codes.length; i++) {
+        const c = codes[i];
+        if (c !== null && defaults.has(c)) codes[i] = null;
+      }
+    }
     this.save();
   }
 }

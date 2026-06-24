@@ -1387,6 +1387,9 @@ async function startGame(
       case 'uiScale':
         document.documentElement.style.setProperty('--ui-scale', String(v));
         break;
+      case 'actionBarScale':
+        document.documentElement.style.setProperty('--action-bar-scale', String(v));
+        break;
     }
   }
   // apply persisted settings to the freshly-built subsystems

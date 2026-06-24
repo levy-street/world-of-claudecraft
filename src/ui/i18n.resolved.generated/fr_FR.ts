@@ -274,6 +274,18 @@ export const fr_FR: EnTranslations = {
       "targetFriendly": "Cibler l'allié le plus proche",
       "targetFriendlyNext": "Changer de cible alliée"
     },
+    "actionBar": {
+      "secondBar": "Second action bar",
+      "barScale": "Action bar size",
+      "editKeys": "Edit action bar keys",
+      "bindModeTitle": "Action bar key bindings",
+      "bindModeHint": "Click a slot, then press a key to bind it. Click Done when finished.",
+      "bindReset": "Reset",
+      "bindResetConfirmTitle": "Reset action bar keys?",
+      "bindResetConfirmBody": "The first bar returns to its default keys and the second bar becomes unbound. This cannot be undone.",
+      "bindCancel": "Cancel",
+      "bindDone": "Done"
+    },
     "options": {
       "clickMoveLeft": "Clic gauche",
       "clickMoveRight": "Clic droit",

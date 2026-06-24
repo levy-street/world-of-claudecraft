@@ -274,6 +274,18 @@ export const ko_KR: EnTranslations = {
       "targetFriendly": "가장 가까운 아군 대상 지정",
       "targetFriendlyNext": "아군 대상 순환"
     },
+    "actionBar": {
+      "secondBar": "두 번째 행동 단축바",
+      "barScale": "행동 단축바 크기",
+      "editKeys": "행동 단축바 키 편집",
+      "bindModeTitle": "행동 단축바 키 설정",
+      "bindModeHint": "칸을 클릭한 다음 지정할 키를 누르세요. 끝나면 \"완료\"를 클릭하세요.",
+      "bindReset": "초기화",
+      "bindResetConfirmTitle": "행동 단축바 키를 초기화할까요?",
+      "bindResetConfirmBody": "첫 번째 단축바는 기본 키로 돌아가고 두 번째 단축바는 미지정 상태가 됩니다. 이 작업은 되돌릴 수 없습니다.",
+      "bindCancel": "취소",
+      "bindDone": "완료"
+    },
     "options": {
       "clickMoveLeft": "왼쪽 클릭",
       "clickMoveRight": "오른쪽 클릭",

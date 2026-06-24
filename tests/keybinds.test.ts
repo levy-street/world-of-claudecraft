@@ -55,10 +55,16 @@ describe('registry', () => {
     expect(actionKind('nope')).toBe(null);
   });
 
-  it('covers the expected categories and 12 action-bar slots', () => {
+  it('covers the expected categories and 24 action-bar slots (bar 1 + optional bar 2)', () => {
     expect(BIND_CATEGORIES).toContain('Movement');
     expect(BIND_CATEGORIES).toContain('Action Bar');
-    expect(BIND_ACTIONS.filter((a) => a.category === 'Action Bar').length).toBe(12);
+    const slots = BIND_ACTIONS.filter((a) => a.category === 'Action Bar');
+    expect(slots.length).toBe(24);
+    // Bar 1 (slots 0..11) keeps its vanilla default key; bar 2 (slots 12..23)
+    // ships unbound until the player assigns keys in key-bindings mode.
+    expect(slots.find((a) => a.id === 'slot11')?.defaults).toEqual(['Equal']);
+    expect(slots.find((a) => a.id === 'slot12')?.defaults).toEqual([]);
+    expect(slots.find((a) => a.id === 'slot23')?.defaults).toEqual([]);
   });
 });
 
@@ -82,10 +88,14 @@ describe('Keybinds defaults', () => {
     expect(kb.actionForCode('KeyB')).toBe('bags');
     expect(kb.actionForCode('KeyX')).toBe('emoteWheel');
     expect(kb.actionForCode('Digit1')).toBe('slot0'); // Attack
-    expect(kb.actionForCode('Equal')).toBe('slot11');
+    expect(kb.actionForCode('Equal')).toBe('slot11'); // last bar 1 slot
     expect(kb.actionForCode('KeyH')).toBe('targetFriendly');
     expect(kb.actionForCode('KeyJ')).toBe('targetFriendlyNext');
     expect(kb.actionForCode('KeyZ')).toBe(null);
+    // bar 2 (slots 12..23) ships with no keys bound
+    expect(kb.codeAt('slot12', 0)).toBe(null);
+    expect(kb.codeAt('slot23', 0)).toBe(null);
+    expect(kb.primaryLabel('slot12')).toBe('');
   });
 
   it('exposes primary/secondary codes and labels', () => {
@@ -95,6 +105,42 @@ describe('Keybinds defaults', () => {
     expect(kb.codesForAction('forward')).toEqual(['KeyW', 'ArrowUp']);
     expect(kb.primaryLabel('slot0')).toBe('1');
     expect(kb.labelAt('forward', 1)).toBe('↑');
+  });
+});
+
+describe('resetSlots', () => {
+  it('restores bar 1 defaults, clears bar 2, and leaves other binds untouched', () => {
+    const kb = new Keybinds();
+    // diverge from defaults: rebind a bar 1 slot, bind a bar 2 slot, rebind movement
+    kb.bind('slot1', 0, 'KeyP');
+    kb.bind('slot12', 0, 'KeyV');
+    kb.bind('forward', 0, 'KeyT');
+    expect(kb.actionForCode('KeyT')).toBe('forward');
+
+    kb.resetSlots();
+
+    // bar 1 back to defaults
+    expect(kb.codeAt('slot1', 0)).toBe('Digit2');
+    expect(kb.actionForCode('KeyP')).toBe(null);
+    // bar 2 back to unbound
+    expect(kb.codeAt('slot12', 0)).toBe(null);
+    expect(kb.actionForCode('KeyV')).toBe(null);
+    // non-slot binds untouched
+    expect(kb.codeAt('forward', 0)).toBe('KeyT');
+  });
+
+  it('strips a reclaimed slot default from a non-slot action that stole it', () => {
+    const kb = new Keybinds();
+    // steal slot1's default key (Digit2) onto another action
+    kb.bind('bags', 0, 'Digit2');
+    expect(kb.actionForCode('Digit2')).toBe('bags');
+
+    kb.resetSlots();
+
+    // the slot reclaims its default; the thief loses the duplicate
+    expect(kb.codeAt('slot1', 0)).toBe('Digit2');
+    expect(kb.actionForCode('Digit2')).toBe('slot1');
+    expect(kb.codeAt('bags', 0)).toBe(null);
   });
 });
 

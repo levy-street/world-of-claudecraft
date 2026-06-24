@@ -1,6 +1,7 @@
 import { audio } from '../game/audio';
 import { GAMEPAD_BUTTON_LABELS, GAMEPAD_NONE } from '../game/gamepad_map';
 import {
+  ACTION_BAR_SLOTS,
   BIND_ACTIONS,
   BIND_CATEGORIES,
   isReservedCode,
@@ -691,7 +692,8 @@ function yellVoiceKey(text: string): string {
 }
 
 export class Hud {
-  private static readonly BAR_ABILITY_SLOTS = 11; // bar slots 1..11; slot 0 is the fixed Attack toggle
+  private static readonly BAR_ABILITY_SLOTS = ACTION_BAR_SLOTS - 1; // ability slots 1..N (slot 0 is the fixed Attack toggle); bar 1 = slots 1..11, optional bar 2 = slots 12..23
+  private static readonly BAR1_ABILITY_SLOTS = 11; // bar 1 ability slots (indices 0..10); the optional bar 2 adds indices 11..22
   private static readonly PET_AUTOCAST_TOUCH_HOLD_MS = 2000;
   private static ddSeq = 0; // monotonic id source for buildDropdown listbox/option ARIA wiring
   private static readonly FORM_TOGGLE_IDS = new Set(['bear_form', 'cat_form', 'travel_form']); // shift toggles, castable in any form
@@ -714,6 +716,11 @@ export class Hud {
   private dragUnequipSlot: EquipSlot | null = null;
   private mobileHotbarDrag: MobileHotbarDrag | null = null;
   private suppressNextActionClick = false;
+  // Optional second action bar (slots 12..23): opt-in, off by default, persisted
+  // per character. The on-bar key-bindings mode rebinds slots directly on the bar.
+  private secondBarEnabled = false;
+  private bindMode = false;
+  private bindModeBar: HTMLElement | null = null;
   private optionsHooks: OptionsHooks | null = null;
   private reportHooks: ReportHooks | null = null;
   private bugReportHooks: BugReportHooks | null = null;
@@ -1039,7 +1046,9 @@ export class Hud {
     this.initWindowManagement();
     this.emoteWheelSlots = this.loadEmoteWheelSlots();
     this.loadSlotMap();
+    this.loadSecondBarEnabled();
     this.buildActionBar();
+    this.applySecondBarVisibility();
     this.refreshKeybindLabels();
     this.buildXpTicks();
     document.addEventListener('woc:languagechange', () => this.refreshLocalizedDynamicUi());
@@ -2842,8 +2851,18 @@ export class Hud {
     }
   }
 
+  // Ability-slot count currently in play: bar 1 alone, or both bars when the
+  // second bar is enabled. Adds/auto-place stay within the visible bars.
+  private effectiveBarSlots(): number {
+    return this.secondBarEnabled ? Hud.BAR_ABILITY_SLOTS : Hud.BAR1_ABILITY_SLOTS;
+  }
+
   private firstEmptyHotbarIndex(): number {
-    return this.hotbarActions.indexOf(null);
+    const limit = this.effectiveBarSlots();
+    for (let i = 0; i < limit; i++) {
+      if (this.hotbarActions[i] == null) return i;
+    }
+    return -1;
   }
 
   private hotbarIndexForAbility(abilityId: string): number {
@@ -2943,12 +2962,12 @@ export class Hud {
   }
 
   private actionForSlot(barSlot: number): HotbarAction {
-    // barSlot 1..11
+    // barSlot 1..23 (bar 1 = 1..11, optional bar 2 = 12..23)
     return this.hotbarActions[barSlot - 1] ?? null;
   }
 
   abilityForSlot(barSlot: number): ResolvedAbility | null {
-    // barSlot 1..11
+    // barSlot 1..23 (bar 1 = 1..11, optional bar 2 = 12..23)
     const action = this.actionForSlot(barSlot);
     return action?.type === 'ability'
       ? (this.sim.known.find((k) => k.def.id === action.id) ?? null)
@@ -3029,7 +3048,10 @@ export class Hud {
 
   private buildActionBar(): void {
     const bar = $('#actionbar');
-    for (let i = 0; i < 12; i++) {
+    const bar2 = $('#actionbar-2');
+    for (let i = 0; i < ACTION_BAR_SLOTS; i++) {
+      // Slots 0..11 fill bar 1; slots 12..23 fill the optional second bar.
+      const container = i <= Hud.BAR1_ABILITY_SLOTS ? bar : bar2;
       const btn = document.createElement('button');
       btn.className = 'action-btn empty';
       const label = document.createElement('span');
@@ -3052,6 +3074,12 @@ export class Hud {
         if (this.suppressNextActionClick) {
           this.suppressNextActionClick = false;
           btn.blur();
+          return;
+        }
+        // In key-bindings mode, a click selects the slot and captures the next
+        // key for it instead of casting.
+        if (this.bindMode) {
+          this.beginSlotCapture(slot, btn);
           return;
         }
         // On touch, the click that ends a long-press peek inspects the slot
@@ -3173,7 +3201,7 @@ export class Hud {
           this.hideTooltip();
         });
       }
-      bar.appendChild(btn);
+      container.appendChild(btn);
       this.abilityButtons.push({
         btn,
         label,
@@ -3187,7 +3215,7 @@ export class Hud {
   }
 
   private clearActionDropTargets(): void {
-    document.querySelectorAll('#actionbar .drop-target').forEach((el) => {
+    document.querySelectorAll('#actionbar .drop-target, #actionbar-2 .drop-target').forEach((el) => {
       el.classList.remove('drop-target');
     });
   }
@@ -3207,9 +3235,11 @@ export class Hud {
     if (drag) window.clearTimeout(drag.timer);
     this.mobileHotbarDrag = null;
     document.body.classList.remove('mobile-hotbar-dragging');
-    document.querySelectorAll('#actionbar .mobile-drag-source').forEach((el) => {
-      el.classList.remove('mobile-drag-source');
-    });
+    document
+      .querySelectorAll('#actionbar .mobile-drag-source, #actionbar-2 .mobile-drag-source')
+      .forEach((el) => {
+        el.classList.remove('mobile-drag-source');
+      });
     this.clearActionDropTargets();
   }
 
@@ -3310,6 +3340,155 @@ export class Hud {
       if (keyEl) keyEl.textContent = key.toLowerCase();
       btn.setAttribute('aria-label', key ? `${label} (${key})` : label);
     }
+  }
+
+  // -------------------------------------------------------------------------
+  // Second action bar + on-bar key-bindings mode
+  // -------------------------------------------------------------------------
+
+  // The second bar's enabled flag is per character (like the slot map), so a
+  // tank can run two bars while an alt keeps a single bar.
+  private secondBarKey(): string {
+    return `woc_actionbar2_${this.sim.cfg.playerClass}_${this.sim.player.name}`;
+  }
+
+  private loadSecondBarEnabled(): void {
+    try {
+      this.secondBarEnabled = localStorage.getItem(this.secondBarKey()) === '1';
+    } catch {
+      this.secondBarEnabled = false;
+    }
+  }
+
+  isSecondBarEnabled(): boolean {
+    return this.secondBarEnabled;
+  }
+
+  private applySecondBarVisibility(): void {
+    document.body.classList.toggle('secondbar-on', this.secondBarEnabled);
+  }
+
+  setSecondBarEnabled(on: boolean): void {
+    this.secondBarEnabled = on;
+    try {
+      localStorage.setItem(this.secondBarKey(), on ? '1' : '0');
+    } catch {
+      /* storage unavailable */
+    }
+    if (!on) {
+      // Disabling the bar dismisses its spells back to the pool so they show "+"
+      // in the spellbook again instead of being stranded on a hidden bar.
+      for (let i = Hud.BAR1_ABILITY_SLOTS; i < Hud.BAR_ABILITY_SLOTS; i++) {
+        this.hotbarActions = clearHotbarSlot(this.hotbarActions, i);
+      }
+      this.saveSlotMap();
+      if ($('#spellbook').style.display === 'block') this.refreshSpellbookHotbarControls();
+      // Never strand the player in bind mode on slots they can no longer see.
+      if (this.bindMode) this.exitBindMode();
+    }
+    this.applySecondBarVisibility();
+  }
+
+  // The second-bar on/off toggle, styled like the other Key Bindings toggles.
+  // (Per-character localStorage, not a global Setting, so it can't reuse
+  // settingToggleKeybind which is bound to GameSettings keys.)
+  private appendSecondBarToggle(parent: HTMLElement): void {
+    const row = document.createElement('div');
+    row.className = 'kb-row kb-toggle-row';
+    const name = document.createElement('span');
+    name.className = 'kb-name';
+    name.textContent = t('hudChrome.actionBar.secondBar');
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'btn kb-key kb-toggle';
+    const sync = () => {
+      const on = this.secondBarEnabled;
+      toggle.textContent = on ? t('hud.options.on') : t('hud.options.off');
+      toggle.classList.toggle('off', !on);
+      toggle.setAttribute('aria-pressed', on ? 'true' : 'false');
+      toggle.setAttribute('aria-label', t('hudChrome.actionBar.secondBar'));
+    };
+    sync();
+    toggle.addEventListener('click', () => {
+      audio.click();
+      this.setSecondBarEnabled(!this.secondBarEnabled);
+      sync();
+    });
+    row.append(name, toggle);
+    parent.appendChild(row);
+  }
+
+  // Enter the on-bar key-bindings mode: clicking a slot selects it and the next
+  // key press binds it (replaces the old per-slot rows in the Key Bindings menu).
+  enterBindMode(): void {
+    if (this.bindMode) return;
+    this.bindMode = true;
+    document.body.classList.add('bind-mode');
+    const stack = document.getElementById('actionbar-stack');
+    if (stack && !this.bindModeBar) {
+      const bar = document.createElement('div');
+      bar.id = 'bind-mode-bar';
+      bar.className = 'panel';
+      bar.setAttribute('role', 'region');
+      bar.setAttribute('aria-label', t('hudChrome.actionBar.bindModeTitle'));
+      const info = document.createElement('span');
+      info.className = 'bind-mode-info';
+      info.textContent = t('hudChrome.actionBar.bindModeHint');
+      const reset = document.createElement('button');
+      reset.className = 'btn';
+      reset.textContent = t('hudChrome.actionBar.bindReset');
+      reset.addEventListener('click', () => {
+        audio.click();
+        this.confirmDialog(
+          t('hudChrome.actionBar.bindResetConfirmTitle'),
+          t('hudChrome.actionBar.bindResetConfirmBody'),
+          t('hudChrome.actionBar.bindReset'),
+          t('hudChrome.actionBar.bindCancel'),
+          () => {
+            this.keybinds.resetSlots();
+            this.refreshKeybindLabels();
+          },
+        );
+      });
+      const done = document.createElement('button');
+      done.className = 'btn';
+      done.textContent = t('hudChrome.actionBar.bindDone');
+      done.addEventListener('click', () => {
+        audio.click();
+        this.exitBindMode();
+      });
+      bar.append(info, reset, done);
+      stack.insertBefore(bar, document.getElementById('actionbar-2'));
+      this.bindModeBar = bar;
+    }
+  }
+
+  exitBindMode(): void {
+    if (!this.bindMode) return;
+    this.bindMode = false;
+    document.body.classList.remove('bind-mode');
+    document
+      .querySelectorAll('.action-btn.binding-selected')
+      .forEach((el) => el.classList.remove('binding-selected'));
+    this.bindModeBar?.remove();
+    this.bindModeBar = null;
+  }
+
+  // Select a slot in bind mode and capture the next key combo for it.
+  private beginSlotCapture(slot: number, btn: HTMLButtonElement): void {
+    if (!this.optionsHooks) return;
+    audio.click();
+    document
+      .querySelectorAll('.action-btn.binding-selected')
+      .forEach((el) => el.classList.remove('binding-selected'));
+    btn.classList.add('binding-selected');
+    this.optionsHooks.captureKey((code) => {
+      btn.classList.remove('binding-selected');
+      if (code !== null) {
+        this.keybinds.bind(`slot${slot}`, 0, code);
+        this.refreshKeybindLabels();
+      }
+    });
   }
 
   private buildXpTicks(): void {
@@ -13501,6 +13680,7 @@ export class Hud {
     this.languageSelect(body);
     this.renderThemeControls(body);
     this.settingSlider(body, t('hudChrome.options.uiScale'), 'uiScale');
+    this.settingSlider(body, t('hudChrome.actionBar.barScale'), 'actionBarScale');
     this.settingSlider(body, t('hud.options.hudOpacity'), 'hudOpacity');
     this.settingSlider(body, t('hud.options.tooltipScale'), 'tooltipScale');
     this.settingSlider(body, t('hud.options.fctScale'), 'fctScale');
@@ -13840,6 +14020,7 @@ export class Hud {
     this.settingToggleKeybind(el, t('hud.keybinds.actions.attackMove'), 'attackMove');
     this.settingToggleKeybind(el, t('hud.options.leftHandedTouch'), 'leftHandedTouch');
     this.settingToggleKeybind(el, t('hud.options.filterProfanity'), 'filterProfanity');
+    this.appendSecondBarToggle(el);
     const note = document.createElement('div');
     note.className = 'kb-note';
     note.textContent = this.keybindNote || t('hud.options.keybindHelpMouseCamera');
@@ -13850,6 +14031,9 @@ export class Hud {
     // is on; otherwise hide its row so it can't shadow Turn Left's A in the list.
     const attackMoveOn = !!this.optionsHooks?.settings.get('attackMove');
     for (const category of BIND_CATEGORIES) {
+      // Action-bar slot keys are no longer rebound here: they use the on-bar
+      // key-bindings mode (the "Edit action bar keys" button below).
+      if (category === 'Action Bar') continue;
       const visible = BIND_ACTIONS.filter(
         (a) => a.category === category && (a.id !== 'attackMove' || attackMoveOn),
       );
@@ -13902,6 +14086,20 @@ export class Hud {
       cols.appendChild(col);
     }
     el.appendChild(cols);
+    // Action-bar slot keys are bound directly on the bar: this closes Options and
+    // enters key-bindings mode. Touch devices have no keys to bind, so the entry
+    // is hidden there (slots stay tap-to-cast).
+    let editBar: HTMLButtonElement | null = null;
+    if (!useTouchInterface()) {
+      editBar = document.createElement('button');
+      editBar.className = 'btn';
+      editBar.textContent = t('hudChrome.actionBar.editKeys');
+      editBar.addEventListener('click', () => {
+        audio.click();
+        this.closeOptions();
+        this.enterBindMode();
+      });
+    }
     const reset = document.createElement('button');
     reset.className = 'btn';
     reset.textContent = t('hud.options.resetToDefaults');
@@ -13922,7 +14120,8 @@ export class Hud {
       this.capturingKey = null;
       this.renderOptions();
     });
-    el.append(reset, back);
+    if (editBar) el.append(editBar, reset, back);
+    else el.append(reset, back);
     el.querySelector('[data-close]')?.addEventListener('click', () => this.closeOptions());
   }
 

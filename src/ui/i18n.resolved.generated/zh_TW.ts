@@ -274,6 +274,18 @@ export const zh_TW: EnTranslations = {
       "targetFriendly": "選取最近友方",
       "targetFriendlyNext": "切換友方目標"
     },
+    "actionBar": {
+      "secondBar": "第二動作列",
+      "barScale": "動作列大小",
+      "editKeys": "編輯動作列按鍵",
+      "bindModeTitle": "動作列按鍵設定",
+      "bindModeHint": "點擊一個格子，然後按下要綁定的按鍵。完成後點擊「完成」。",
+      "bindReset": "重設",
+      "bindResetConfirmTitle": "重設動作列按鍵？",
+      "bindResetConfirmBody": "第一條動作列恢復為預設按鍵，第二條動作列變為未綁定。此操作無法復原。",
+      "bindCancel": "取消",
+      "bindDone": "完成"
+    },
     "options": {
       "clickMoveLeft": "左鍵",
       "clickMoveRight": "右鍵",

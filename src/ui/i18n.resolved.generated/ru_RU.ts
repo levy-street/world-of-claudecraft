@@ -274,6 +274,18 @@ export const ru_RU: EnTranslations = {
       "targetFriendly": "Ближайший союзник",
       "targetFriendlyNext": "Следующий союзник"
     },
+    "actionBar": {
+      "secondBar": "Вторая панель действий",
+      "barScale": "Размер панели действий",
+      "editKeys": "Настроить клавиши панели действий",
+      "bindModeTitle": "Назначение клавиш панели действий",
+      "bindModeHint": "Нажмите на ячейку, затем нажмите клавишу для назначения. По завершении нажмите «Готово».",
+      "bindReset": "Сбросить",
+      "bindResetConfirmTitle": "Сбросить клавиши панели действий?",
+      "bindResetConfirmBody": "Первая панель вернётся к клавишам по умолчанию, а вторая станет без назначений. Это действие нельзя отменить.",
+      "bindCancel": "Отмена",
+      "bindDone": "Готово"
+    },
     "options": {
       "clickMoveLeft": "Левая кнопка",
       "clickMoveRight": "Правая кнопка",

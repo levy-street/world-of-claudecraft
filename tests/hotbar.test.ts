@@ -28,6 +28,18 @@ describe('hotbar action parsing', () => {
     ]);
   });
 
+  it('pads a shorter (pre-second-bar) saved layout up to the requested slot count', () => {
+    // A character saved on the 11-ability-slot build loads into the 23-slot
+    // layout (bar 1 + the new bar 2); the missing tail slots fill with null.
+    const stored = ['fireball', 'frost_armor'];
+    const actions = parseHotbarActions(stored, 23, abilityExists, itemExists);
+
+    expect(actions).toHaveLength(23);
+    expect(actions[0]).toEqual({ type: 'ability', id: 'fireball' });
+    expect(actions[1]).toEqual({ type: 'ability', id: 'frost_armor' });
+    expect(actions.slice(2).every((a) => a === null)).toBe(true);
+  });
+
   it('keeps item and ability actions distinct even when ids overlap', () => {
     const actions = parseHotbarActions(
       [{ type: 'ability', id: 'shared_id' }, { type: 'item', id: 'shared_id' }],

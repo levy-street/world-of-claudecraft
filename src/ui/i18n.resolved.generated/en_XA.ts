@@ -274,6 +274,18 @@ export const en_XA: EnTranslations = {
       "targetFriendly": "[Ţáŕĝéţ Ñéáŕéšţ Ƒŕíéñðļý]",
       "targetFriendlyNext": "[Çýçļé Ƒŕíéñðļý Ţáŕĝéţ]"
     },
+    "actionBar": {
+      "secondBar": "[Šéçóñð áçţíóñ ƀáŕ]",
+      "barScale": "[Áçţíóñ ƀáŕ šížé]",
+      "editKeys": "[Éðíţ áçţíóñ ƀáŕ ķéýš]",
+      "bindModeTitle": "[Áçţíóñ ƀáŕ ķéý ƀíñðíñĝš]",
+      "bindModeHint": "[Çļíçķ á šļóţ, ţĥéñ þŕéšš á ķéý ţó ƀíñð íţ. Çļíçķ Ðóñé ŵĥéñ ƒíñíšĥéð.]",
+      "bindReset": "[Ŕéšéţ]",
+      "bindResetConfirmTitle": "[Ŕéšéţ áçţíóñ ƀáŕ ķéýš?]",
+      "bindResetConfirmBody": "[Ţĥé ƒíŕšţ ƀáŕ ŕéţúŕñš ţó íţš ðéƒáúļţ ķéýš áñð ţĥé šéçóñð ƀáŕ ƀéçóɱéš úñƀóúñð. Ţĥíš çáññóţ ƀé úñðóñé.]",
+      "bindCancel": "[Çáñçéļ]",
+      "bindDone": "[Ðóñé]"
+    },
     "options": {
       "clickMoveLeft": "[Ļéƒţ Çļíçķ]",
       "clickMoveRight": "[Ŕíĝĥţ Çļíçķ]",

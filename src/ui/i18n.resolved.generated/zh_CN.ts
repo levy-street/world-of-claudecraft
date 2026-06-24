@@ -274,6 +274,18 @@ export const zh_CN: EnTranslations = {
       "targetFriendly": "选中最近友方",
       "targetFriendlyNext": "切换友方目标"
     },
+    "actionBar": {
+      "secondBar": "第二动作条",
+      "barScale": "动作条大小",
+      "editKeys": "编辑动作条按键",
+      "bindModeTitle": "动作条按键绑定",
+      "bindModeHint": "点击一个格子，然后按下要绑定的按键。完成后点击“完成”。",
+      "bindReset": "重置",
+      "bindResetConfirmTitle": "重置动作条按键？",
+      "bindResetConfirmBody": "第一条动作条恢复为默认按键，第二条动作条变为未绑定。此操作无法撤销。",
+      "bindCancel": "取消",
+      "bindDone": "完成"
+    },
     "options": {
       "clickMoveLeft": "左键",
       "clickMoveRight": "右键",

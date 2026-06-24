@@ -274,6 +274,18 @@ export const it_IT: EnTranslations = {
       "targetFriendly": "Bersaglia l'amico più vicino",
       "targetFriendlyNext": "Scorri i bersagli amici"
     },
+    "actionBar": {
+      "secondBar": "Second action bar",
+      "barScale": "Action bar size",
+      "editKeys": "Edit action bar keys",
+      "bindModeTitle": "Action bar key bindings",
+      "bindModeHint": "Click a slot, then press a key to bind it. Click Done when finished.",
+      "bindReset": "Reset",
+      "bindResetConfirmTitle": "Reset action bar keys?",
+      "bindResetConfirmBody": "The first bar returns to its default keys and the second bar becomes unbound. This cannot be undone.",
+      "bindCancel": "Cancel",
+      "bindDone": "Done"
+    },
     "options": {
       "clickMoveLeft": "Clic sinistro",
       "clickMoveRight": "Clic destro",

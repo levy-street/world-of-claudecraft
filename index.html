@@ -894,7 +894,24 @@
   .pet-btn.cooldown.autocast { filter: grayscale(.45) brightness(.78); }
   .pet-btn .cdtext { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
     font-size: 13px; color: var(--gold); text-shadow: 1px 1px 2px #000; font-weight: bold; pointer-events: none; }
-  #actionbar { display: flex; gap: 4px; padding: 6px; }
+  /* Hug the buttons and center, so the dark panel never stretches full width and
+     the bar's box scales with the buttons (the action-bar zoom below). The stack's
+     align-items:stretch would otherwise force the bar to the column width. */
+  #actionbar { display: flex; gap: 4px; padding: 6px; width: fit-content; max-width: 100%; margin-inline: auto; }
+  /* Optional second action bar: hidden until the player enables it; bar 1 stays
+     bottom-anchored and bar 2 stacks directly above it. */
+  #actionbar-2 { display: none; gap: 4px; padding: 6px; width: fit-content; max-width: 100%; margin-inline: auto; }
+  body.secondbar-on #actionbar-2 { display: flex; }
+  /* Action Bar Size (--action-bar-scale, actionBarScale setting): zoom each bar so
+     the buttons, gaps and keycaps scale together and the bar's box shrinks/grows
+     with them (desktop + mobile). Default 1 leaves the base size unchanged. */
+  #actionbar, #actionbar-2 { zoom: var(--action-bar-scale, 1); }
+  /* On-bar key-bindings mode: a temporary banner above the bars, slots become
+     click-to-select-then-press-a-key targets. */
+  #bind-mode-bar { display: flex; align-items: center; gap: 8px; padding: 6px 10px; margin-bottom: 4px; }
+  #bind-mode-bar .bind-mode-info { flex: 1; font-size: 13px; color: var(--gold); }
+  body.bind-mode #actionbar .action-btn, body.bind-mode #actionbar-2 .action-btn { cursor: cell; }
+  body.bind-mode .action-btn.binding-selected { outline: 2px solid var(--gold); outline-offset: 1px; }
   .action-btn { width: 46px; height: 46px; position: relative; border: 2px solid #4a3d1d; border-radius: 6px;
     background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f); color: #fff; cursor: var(--cursor-point);
     font-family: var(--title-font); text-shadow: 1px 1px 2px #000;
@@ -6074,8 +6091,12 @@
     flex-wrap: nowrap;
     gap: 4px;
     padding: 4px;
-    width: 100%;
+    /* Hug the buttons (max 12) instead of stretching the whole band, like the
+       desktop bar; cap at the band width and scroll only if they overflow. */
+    width: fit-content;
     max-width: 100%;
+    /* Center the bar in the stack (auto margins center a flex item). */
+    margin-inline: auto;
     min-height: 50px;
     box-sizing: border-box;
     overflow-x: auto;
@@ -6086,6 +6107,25 @@
     background: linear-gradient(170deg, #15151fc8, #08080dd8);
   }
   body.mobile-touch #actionbar.many-spells { grid-template-columns: none; }
+  /* Second bar mirrors the main bar's touch layout (scrollable row); visibility
+     stays governed by body.secondbar-on so it never shows when disabled. */
+  body.mobile-touch #actionbar-2 {
+    flex-wrap: nowrap;
+    gap: 4px;
+    padding: 4px;
+    width: fit-content;
+    max-width: 100%;
+    margin-inline: auto;
+    min-height: 50px;
+    box-sizing: border-box;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+    background: linear-gradient(170deg, #15151fc8, #08080dd8);
+  }
+  body.mobile-touch.mobile-hotbar-dragging #actionbar-2 { touch-action: none; }
   body.mobile-touch .action-btn { width: 42px; height: 42px; flex: 0 0 42px; border-radius: 7px; }
   body.mobile-touch.mobile-hotbar-dragging #actionbar { touch-action: none; }
   body.mobile-touch .action-btn.mobile-drag-source {
@@ -6096,8 +6136,11 @@
   body.mobile-touch .action-btn .icon-label { border-radius: 6px; }
   body.mobile-touch .action-btn .cd-text { font-size: 13px; }
   body.mobile-touch .action-btn .keybind { display: none; }
-  body.mobile-touch .action-btn:first-child { display: none; }
-  body.mobile-touch .action-btn.empty { display: none; }
+  /* Hide the Attack toggle (slot 0) on bar 1 only: mobile has a dedicated attack
+     button. Scoped to #actionbar so it never hides the second bar's first slot. */
+  body.mobile-touch #actionbar .action-btn:first-child { display: none; }
+  /* Keep empty slots visible so each bar stays at its full fixed width (and never
+     collapses when its spells are removed); show placeholder slots like desktop. */
   body.mobile-touch #community-hud {
     right: max(8px, env(safe-area-inset-right));
     top: calc(max(8px, env(safe-area-inset-top)) + 158px);
@@ -8377,6 +8420,7 @@
           </div>
           <div id="petbar" class="panel"></div>
           <div id="xpbar"><div class="fill"></div><div class="rested"></div><div class="ticks"></div><div class="label"></div></div>
+          <div id="actionbar-2" class="panel"></div>
           <div id="actionbar" class="panel"></div>
         </div>
         <div id="meters-window" class="panel">
