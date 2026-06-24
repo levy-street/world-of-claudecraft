@@ -5,8 +5,10 @@ import {
   discriminator,
   configPda,
   receiptPda,
+  walletRegistryPda,
   initializeIx,
   configureIx,
+  registerWalletIx,
   fundIx,
   payoutIx,
   withdrawIx,
@@ -96,11 +98,12 @@ describe('fundIx', () => {
 });
 
 describe('payoutIx', () => {
-  it('orders [settler(signer,w), config(w), receipt(w), winner(w), system] and encodes day/account/amount', () => {
+  it('orders [settler(signer,w), config(w), registry(r), receipt(w), winner(w), system] and encodes day/account/amount', () => {
     const ix = payoutIx({ programId: PROGRAM, settler: SETTLER, winner: WINNER, day: 20628n, accountId: 4242n, amount: 1_000_000n });
     expect(ix.keys).toEqual([
       { pubkey: SETTLER, isSigner: true, isWritable: true },
       { pubkey: configPda(PROGRAM), isSigner: false, isWritable: true },
+      { pubkey: walletRegistryPda(PROGRAM, 4242n), isSigner: false, isWritable: false },
       { pubkey: receiptPda(PROGRAM, 20628n, 4242n), isSigner: false, isWritable: true },
       { pubkey: WINNER, isSigner: false, isWritable: true },
       { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
@@ -110,6 +113,32 @@ describe('payoutIx', () => {
     expect(ix.data.readBigUInt64LE(16)).toBe(4242n);
     expect(ix.data.readBigUInt64LE(24)).toBe(1_000_000n);
     expect(ix.data).toHaveLength(8 + 24);
+  });
+});
+
+describe('walletRegistryPda', () => {
+  it('binds account_id as a little-endian u64 seed under "wallet"', () => {
+    const accLe = Buffer.alloc(8);
+    accLe.writeBigUInt64LE(4242n);
+    const [expected] = PublicKey.findProgramAddressSync([Buffer.from('wallet'), accLe], PROGRAM);
+    expect(walletRegistryPda(PROGRAM, 4242n).equals(expected)).toBe(true);
+    expect(walletRegistryPda(PROGRAM, 1n).equals(walletRegistryPda(PROGRAM, 2n))).toBe(false);
+  });
+});
+
+describe('registerWalletIx', () => {
+  it('orders [authority(signer,w), config(r), registry(w), system] and encodes account + wallet', () => {
+    const ix = registerWalletIx({ programId: PROGRAM, authority: A, accountId: 4242n, wallet: WINNER });
+    expect(ix.keys).toEqual([
+      { pubkey: A, isSigner: true, isWritable: true },
+      { pubkey: configPda(PROGRAM), isSigner: false, isWritable: false },
+      { pubkey: walletRegistryPda(PROGRAM, 4242n), isSigner: false, isWritable: true },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ]);
+    expect(ix.data.subarray(0, 8)).toEqual(expectedDisc('register_wallet'));
+    expect(ix.data.readBigUInt64LE(8)).toBe(4242n);
+    expect(ix.data.subarray(16, 48)).toEqual(WINNER.toBuffer());
+    expect(ix.data).toHaveLength(8 + 8 + 32);
   });
 });
 

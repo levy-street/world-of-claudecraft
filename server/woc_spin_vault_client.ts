@@ -47,6 +47,11 @@ export function receiptPda(programId: PublicKey, day: bigint, accountId: bigint)
   )[0];
 }
 
+/** The per-account payout-wallet registry PDA (seeds "wallet" + account_id u64 le). */
+export function walletRegistryPda(programId: PublicKey, accountId: bigint): PublicKey {
+  return PublicKey.findProgramAddressSync([Buffer.from('wallet'), u64(accountId)], programId)[0];
+}
+
 // ----- instructions -----
 
 export interface InitializeParams {
@@ -82,6 +87,25 @@ export function configureIx(p: ConfigureParams): TransactionInstruction {
   });
 }
 
+export interface RegisterWalletParams {
+  programId: PublicKey;
+  authority: PublicKey; // signs; pinned on-chain to config.authority
+  accountId: bigint; // the player's account id
+  wallet: PublicKey; // the verified payout wallet to bind to the account
+}
+export function registerWalletIx(p: RegisterWalletParams): TransactionInstruction {
+  return new TransactionInstruction({
+    programId: p.programId,
+    keys: [
+      acc(p.authority, true, true),
+      acc(configPda(p.programId), false, false),
+      acc(walletRegistryPda(p.programId, p.accountId), false, true),
+      acc(SystemProgram.programId, false, false),
+    ],
+    data: Buffer.concat([discriminator('register_wallet'), u64(p.accountId), p.wallet.toBuffer()]),
+  });
+}
+
 export interface FundParams {
   programId: PublicKey;
   funder: PublicKey; // signs; sends SOL into the vault
@@ -102,9 +126,9 @@ export function fundIx(p: FundParams): TransactionInstruction {
 export interface PayoutParams {
   programId: PublicKey;
   settler: PublicKey; // signs; pinned on-chain to config.settler
-  winner: PublicKey; // the spin's linked wallet; receives the SOL
+  winner: PublicKey; // must equal the account's registered wallet (program-checked)
   day: bigint; // UTC day index
-  accountId: bigint; // the spinning account's id (binds the replay receipt)
+  accountId: bigint; // the spinning account's id (binds the receipt + registry)
   amount: bigint; // lamports to pay (program caps it)
 }
 export function payoutIx(p: PayoutParams): TransactionInstruction {
@@ -113,6 +137,7 @@ export function payoutIx(p: PayoutParams): TransactionInstruction {
     keys: [
       acc(p.settler, true, true),
       acc(configPda(p.programId), false, true),
+      acc(walletRegistryPda(p.programId, p.accountId), false, false),
       acc(receiptPda(p.programId, p.day, p.accountId), false, true),
       acc(p.winner, false, true),
       acc(SystemProgram.programId, false, false),

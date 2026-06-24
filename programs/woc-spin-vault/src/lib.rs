@@ -3,11 +3,15 @@
 //! Trust-minimized custody + payout for the holder spinner's SOL-dust prizes
 //! (docs/prd/woc/daily-engagement-gacha.md). The treasury funds a single
 //! program-owned vault PDA; a settler key (the server keeper) may release
-//! lamports from it ONLY to a declared winner, ONLY up to a configured
-//! per-payout cap, and ONLY once per (utc_day, account) spin. The settler never
-//! custodies funds, cannot pay itself, and cannot exceed the cap: the worst a
-//! compromised settler can do is drain the vault in cap-sized increments to real
-//! winners, which the daily budget plus the cap bound.
+//! lamports from it ONLY up to a configured per-payout cap, ONLY once per
+//! (utc_day, account_id) spin, and ONLY to that account's AUTHORITY-registered
+//! wallet. Registration is gated to the authority (a separate cold treasury
+//! key), not the settler, so a compromised settler cannot pay itself or any
+//! arbitrary address: it can only release a capped, single-settlement payout to a
+//! real player's pre-registered wallet. The worst it can do is over-pay a real,
+//! registered player, bounded on-chain by the per-payout cap and the vault
+//! balance; the daily budget is an off-chain keeper ceiling, not an on-chain
+//! invariant.
 //!
 //! Money randomness stays off-chain: the outcome is decided by the provably fair
 //! commit-reveal in server/fairness.ts (the daily commit is published before any
@@ -46,6 +50,20 @@ pub mod woc_spin_vault {
         cfg.settler = settler;
         cfg.max_payout = max_payout;
         cfg.paused = paused;
+        Ok(())
+    }
+
+    /// Authority only: bind `account_id` to the on-chain `wallet` that may receive
+    /// its spin payouts (mirrors the off-chain wallet_links link, which the
+    /// authority has verified). payout checks the winner against this registry, so
+    /// the settler can never pay an unregistered address. Re-callable to follow a
+    /// re-link; gating it to the authority (not the settler) is what makes the
+    /// payout destination un-forgeable by a compromised settler.
+    pub fn register_wallet(ctx: Context<RegisterWallet>, account_id: u64, wallet: Pubkey) -> Result<()> {
+        let reg = &mut ctx.accounts.registry;
+        reg.account_id = account_id;
+        reg.wallet = wallet;
+        reg.bump = ctx.bumps.registry;
         Ok(())
     }
 
@@ -149,6 +167,28 @@ pub struct Configure<'info> {
 }
 
 #[derive(Accounts)]
+#[instruction(account_id: u64)]
+pub struct RegisterWallet<'info> {
+    #[account(mut)]
+    pub authority: Signer<'info>,
+    #[account(
+        seeds = [b"spin_vault"],
+        bump = config.bump,
+        has_one = authority @ VaultError::NotAuthority,
+    )]
+    pub config: Account<'info, VaultConfig>,
+    #[account(
+        init_if_needed,
+        payer = authority,
+        space = 8 + WalletRegistry::SIZE,
+        seeds = [b"wallet", account_id.to_le_bytes().as_ref()],
+        bump,
+    )]
+    pub registry: Account<'info, WalletRegistry>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
 pub struct Fund<'info> {
     #[account(mut)]
     pub funder: Signer<'info>,
@@ -169,6 +209,13 @@ pub struct Payout<'info> {
         has_one = settler @ VaultError::NotSettler,
     )]
     pub config: Account<'info, VaultConfig>,
+    /// The account's authority-registered payout wallet, bound by its PDA seeds to
+    /// account_id. Must already exist (payout to an unregistered account fails).
+    #[account(
+        seeds = [b"wallet", account_id.to_le_bytes().as_ref()],
+        bump = registry.bump,
+    )]
+    pub registry: Account<'info, WalletRegistry>,
     #[account(
         init,
         payer = settler,
@@ -177,9 +224,10 @@ pub struct Payout<'info> {
         bump,
     )]
     pub receipt: Account<'info, SpinReceipt>,
-    /// CHECK: the winning player's wallet; lamports are credited here. The server
-    /// pins this to the spin's linked wallet and the program only moves SOL to it.
-    #[account(mut)]
+    /// CHECK: the winning player's wallet; lamports are credited here. Pinned
+    /// on-chain to the account's registered wallet, so a compromised settler
+    /// cannot redirect the payout to itself or any other address.
+    #[account(mut, address = registry.wallet @ VaultError::WrongWinner)]
     pub winner: UncheckedAccount<'info>,
     pub system_program: Program<'info, System>,
 }
@@ -226,6 +274,17 @@ impl SpinReceipt {
     pub const SIZE: usize = 8 + 8 + 32 + 8 + 8 + 1;
 }
 
+#[account]
+pub struct WalletRegistry {
+    pub account_id: u64,
+    pub wallet: Pubkey,
+    pub bump: u8,
+}
+
+impl WalletRegistry {
+    pub const SIZE: usize = 8 + 32 + 1;
+}
+
 #[event]
 pub struct Funded {
     pub funder: Pubkey,
@@ -256,4 +315,6 @@ pub enum VaultError {
     NotSettler,
     #[msg("only the configured authority may do this")]
     NotAuthority,
+    #[msg("winner does not match the account's registered wallet")]
+    WrongWinner,
 }
