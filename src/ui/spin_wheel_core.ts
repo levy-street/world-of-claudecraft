@@ -43,6 +43,21 @@ export function wheelSegments(items: readonly WheelInput[]): WheelSegment[] {
   return segments;
 }
 
+/** A segment's selection probability (its share of the wheel), in [0, 1]. */
+export function segmentProbability(segment: WheelSegment): number {
+  return segment.endFraction - segment.startFraction;
+}
+
+/**
+ * Whether a segment is angularly wide enough to carry a legible on-wheel label.
+ * Thin slices (a 0.1% jackpot) physically cannot hold text, so the consumer skips
+ * the on-wheel label for those and relies on the legend instead. `minFraction`
+ * defaults to 7% of the wheel.
+ */
+export function fitsLabel(segment: WheelSegment, minFraction = 0.07): boolean {
+  return segmentProbability(segment) >= minFraction;
+}
+
 /** The wheel fraction currently under the fixed top pointer after `rotationTurns`. */
 export function pointerFractionAfter(rotationTurns: number): number {
   const f = rotationTurns % 1;

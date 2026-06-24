@@ -2,21 +2,30 @@
 // cores (src/ui/spin_wheel_core, src/ui/pack_reveal_core) with prize/pack data
 // mirroring server/spin_prizes + server/packs. esbuild-bundled into a page so the
 // spinner wheel + pack-rip reveal can be rendered and screenshotted in a browser.
-// This is the feature's UI rendering real logic + data; wiring it into the live
-// multiplayer HUD (IWorld + hud.ts) is the remaining browser-verified glue.
-import { wheelSegments, landingRotation, pointerFractionAfter, segmentAtFraction, WheelSegment } from '../src/ui/spin_wheel_core';
+// Wiring this into the live multiplayer HUD (IWorld + hud.ts) is the remaining
+// browser-verified glue.
+import {
+  wheelSegments,
+  landingRotation,
+  pointerFractionAfter,
+  segmentAtFraction,
+  segmentProbability,
+  fitsLabel,
+} from '../src/ui/spin_wheel_core';
 import { revealOrder, topRarity, Rarity } from '../src/ui/pack_reveal_core';
 
 // ---- data mirrored from server/spin_prizes.ts (DEFAULT_PRIZE_TABLE) ----
-interface Prize { key: string; label: string; sol: number; weight: number; color: string; }
+interface Prize { key: string; sol: number; weight: number; color: string; }
 const PRIZES: Prize[] = [
-  { key: 'none', label: 'No win', sol: 0, weight: 600, color: '#4a4640' },
-  { key: 'dust_s', label: '0.0005 SOL', sol: 0.0005, weight: 250, color: '#9a6b3f' },
-  { key: 'dust_m', label: '0.001 SOL', sol: 0.001, weight: 100, color: '#9fb2c9' },
-  { key: 'dust_l', label: '0.005 SOL', sol: 0.005, weight: 40, color: '#1f9e86' },
-  { key: 'shard', label: '0.02 SOL', sol: 0.02, weight: 9, color: '#2f7fe0' },
-  { key: 'jackpot', label: '0.1 SOL', sol: 0.1, weight: 1, color: '#ffc23c' },
+  { key: 'none', sol: 0, weight: 600, color: '#4a4640' },
+  { key: 'dust_s', sol: 0.0005, weight: 250, color: '#9a6b3f' },
+  { key: 'dust_m', sol: 0.001, weight: 100, color: '#9fb2c9' },
+  { key: 'dust_l', sol: 0.005, weight: 40, color: '#1f9e86' },
+  { key: 'shard', sol: 0.02, weight: 9, color: '#2f7fe0' },
+  { key: 'jackpot', sol: 0.1, weight: 1, color: '#ffc23c' },
 ];
+const prizeOf = new Map(PRIZES.map((p) => [p.key, p]));
+const prizeLabel = (p: Prize) => (p.sol > 0 ? `${p.sol} SOL` : 'No win');
 
 const RARITY_COLOR: Record<Rarity, string> = {
   poor: '#9d9d9d', common: '#e9e4d6', uncommon: '#1eff00', rare: '#3a8bff', epic: '#c44dff', legendary: '#ff8000',
@@ -30,7 +39,6 @@ const PACKS: PackCard[] = [
   { id: 'prismatic_cache', name: 'Prismatic Cache', priceWoc: 5000, rolls: 3, tint: '#c44dff' },
 ];
 
-// A representative rare_cache rip (cosmetic-policy eligible rewards).
 interface Reward { name: string; rarity: Rarity; kind: string; }
 const RARE_CACHE_RIP: Reward[] = [
   { name: "Warlord's Might (Arena buff)", rarity: 'rare', kind: 'buff' },
@@ -38,147 +46,163 @@ const RARE_CACHE_RIP: Reward[] = [
   { name: 'Keen Dirk', rarity: 'uncommon', kind: 'gear' },
 ];
 
-const $ = (id: string) => document.getElementById(id)!;
-const rng = mulberry32(0xC0FFEE);
-function mulberry32(seed: number) {
-  let a = seed >>> 0;
-  return () => {
-    a |= 0; a = (a + 0x6D2B79F5) | 0;
-    let t = Math.imul(a ^ (a >>> 15), 1 | a);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
+const $ = (id: string) => document.getElementById(id) as HTMLElement;
+const TAU = Math.PI * 2;
+const segments = wheelSegments(PRIZES.map((p) => ({ key: p.key, weight: p.weight })));
+
+// Deterministic PRNG so the demo is reproducible (the real outcome is server-side).
+let seed = 0xc0ffee >>> 0;
+function rand(): number {
+  seed = (seed + 0x6d2b79f5) | 0;
+  let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 }
 
-// ---- spinner wheel (canvas, drawn from the shipped wheelSegments) ----
-const segments: WheelSegment[] = wheelSegments(PRIZES.map((p) => ({ key: p.key, weight: p.weight })));
-const TAU = Math.PI * 2;
+// ---- spinner wheel (canvas, drawn from the shipped wheel core) ----
 let rotation = 0; // in turns
 
-function drawWheel() {
+function drawWheel(): void {
   const c = $('wheel') as HTMLCanvasElement;
-  const ctx = c.getContext('2d')!;
-  const dpr = window.devicePixelRatio || 1;
-  const size = 340;
+  const ctx = c.getContext('2d');
+  if (!ctx) return;
+  const wrap = c.parentElement as HTMLElement;
+  const size = Math.max(220, Math.min(360, Math.floor(wrap.clientWidth)));
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
   c.width = size * dpr; c.height = size * dpr;
   c.style.width = `${size}px`; c.style.height = `${size}px`;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  const cx = size / 2, cy = size / 2, r = size / 2 - 8;
+  const mid = size / 2, r = mid - 6;
   ctx.clearRect(0, 0, size, size);
   ctx.save();
-  ctx.translate(cx, cy);
-  // rotation: turns -> radians, negative so the top pointer reads pointerFraction.
+  ctx.translate(mid, mid);
   ctx.rotate(-rotation * TAU);
-  segments.forEach((seg, i) => {
-    const prize = PRIZES[i];
+  for (const seg of segments) {
+    const p = prizeOf.get(seg.key)!;
     const a0 = seg.startFraction * TAU - Math.PI / 2;
     const a1 = seg.endFraction * TAU - Math.PI / 2;
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.arc(0, 0, r, a0, a1);
-    ctx.closePath();
-    ctx.fillStyle = prize.color;
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(20,14,8,0.7)'; ctx.lineWidth = 2; ctx.stroke();
-    // label
-    const mid = (a0 + a1) / 2;
-    ctx.save();
-    ctx.rotate(mid);
-    ctx.translate(r * 0.62, 0);
-    ctx.rotate(Math.PI / 2);
-    ctx.fillStyle = prize.sol > 0 ? '#15110b' : '#cfc8b8';
-    ctx.font = '600 12px "Trebuchet MS", system-ui, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText(prize.sol > 0 ? prize.label : '—', 0, 0);
-    ctx.restore();
-  });
+    ctx.beginPath(); ctx.moveTo(0, 0); ctx.arc(0, 0, r, a0, a1); ctx.closePath();
+    ctx.fillStyle = p.color; ctx.fill();
+    ctx.strokeStyle = 'rgba(18,12,6,.65)'; ctx.lineWidth = 1.5; ctx.stroke();
+    // Only label slices wide enough to read; the legend covers the thin ones.
+    if (fitsLabel(seg)) {
+      const angle = (a0 + a1) / 2;
+      ctx.save();
+      ctx.rotate(angle); ctx.translate(r * 0.6, 0); ctx.rotate(Math.PI / 2);
+      ctx.fillStyle = p.sol > 0 ? '#16110a' : '#d8d0bd';
+      ctx.font = `700 ${Math.round(size * 0.04)}px "Trebuchet MS", sans-serif`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(p.sol > 0 ? String(p.sol) : 'No win', 0, 0);
+      ctx.restore();
+    }
+  }
   ctx.restore();
   // hub
-  ctx.beginPath(); ctx.arc(cx, cy, 26, 0, TAU);
+  ctx.beginPath(); ctx.arc(mid, mid, Math.round(size * 0.075), 0, TAU);
   ctx.fillStyle = '#1c1610'; ctx.fill();
   ctx.strokeStyle = '#caa24a'; ctx.lineWidth = 3; ctx.stroke();
-  ctx.fillStyle = '#caa24a'; ctx.font = '700 13px "Trebuchet MS", sans-serif'; ctx.textAlign = 'center';
-  ctx.fillText('WOC', cx, cy + 4);
+  ctx.fillStyle = '#caa24a'; ctx.font = `700 ${Math.round(size * 0.04)}px "Trebuchet MS", sans-serif`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('WOC', mid, mid);
+}
+
+function renderLegend(): void {
+  $('legend').innerHTML = segments
+    .map((seg) => {
+      const p = prizeOf.get(seg.key)!;
+      const pct = segmentProbability(seg) * 100;
+      return `<div class="leg"><span class="sw" style="background:${p.color}"></span>` +
+        `<span class="leg-label">${prizeLabel(p)}</span>` +
+        `<span class="leg-odds">${pct < 1 ? pct.toFixed(2) : pct.toFixed(0)}%</span></div>`;
+    })
+    .join('');
 }
 
 let spinning = false;
-function spin() {
+function spin(): void {
   if (spinning) return;
   spinning = true;
   $('spinResult').textContent = '';
   $('spinBtn').setAttribute('disabled', 'true');
-  // pick a prize by weight using a fresh draw, then land on it via the shipped math.
   const total = PRIZES.reduce((s, p) => s + p.weight, 0);
-  let t = rng() * total, idx = 0;
-  for (let i = 0; i < PRIZES.length; i++) { t -= PRIZES[i].weight; if (t < 0) { idx = i; break; } }
-  const prize = PRIZES[idx];
-  const target = landingRotation(segments, prize.key, 6, rng() * 2 - 1);
+  let pick = rand() * total;
+  let chosen = PRIZES[0];
+  for (const p of PRIZES) { pick -= p.weight; if (pick < 0) { chosen = p; break; } }
+  const target = landingRotation(segments, chosen.key, 6, rand() * 2 - 1);
   const start = rotation;
-  const dur = 4200;
   const t0 = performance.now();
   const ease = (x: number) => 1 - Math.pow(1 - x, 3);
-  function frame(now: number) {
-    const k = Math.min(1, (now - t0) / dur);
+  function frame(now: number): void {
+    const k = Math.min(1, (now - t0) / 4200);
     rotation = start + (target - start) * ease(k);
     drawWheel();
     if (k < 1) { requestAnimationFrame(frame); return; }
-    // verify against the shipped segment lookup
-    const landed = segmentAtFraction(segments, pointerFractionAfter(rotation));
-    const won = PRIZES.find((p) => p.key === landed.key)!;
-    const el = $('spinResult');
-    if (won.sol > 0) { el.innerHTML = `<span class="win">You won ${won.label}!</span> Settling on-chain from the vault…`; }
-    else { el.innerHTML = `<span class="muted">No win today. Streak kept. Come back tomorrow.</span>`; }
+    const landed = prizeOf.get(segmentAtFraction(segments, pointerFractionAfter(rotation)).key)!;
+    $('spinResult').innerHTML = landed.sol > 0
+      ? `<span class="win">You won ${prizeLabel(landed)}!</span> Settling on-chain from the vault.`
+      : `<span class="muted">No win today. Streak kept, come back tomorrow.</span>`;
     spinning = false;
     $('spinBtn').removeAttribute('disabled');
   }
   requestAnimationFrame(frame);
 }
 
-// ---- pack rip (uses the shipped revealOrder + topRarity) ----
-function renderPacks() {
-  $('packCards').innerHTML = PACKS.map((p) => `
-    <div class="pack" style="--tint:${p.tint}">
-      <div class="pack-name">${p.name}</div>
-      <div class="pack-rolls">${p.rolls} rewards</div>
-      <button class="burn" data-pack="${p.id}">Burn ${p.priceWoc.toLocaleString()} $WOC</button>
-    </div>`).join('');
-  document.querySelectorAll('.burn').forEach((b) => b.addEventListener('click', () => ripRare()));
+// ---- pack ripping (uses the shipped revealOrder + topRarity) ----
+function renderPacks(): void {
+  $('packCards').innerHTML = PACKS.map((p) =>
+    `<div class="pack" style="--tint:${p.tint}">` +
+    `<div class="pack-name">${p.name}</div>` +
+    `<div class="pack-rolls">${p.rolls} rewards</div>` +
+    `<button class="burn" data-pack="${p.id}">Burn ${p.priceWoc.toLocaleString()} $WOC</button></div>`,
+  ).join('');
+  document.querySelectorAll<HTMLButtonElement>('.burn').forEach((b) => b.addEventListener('click', ripRare));
 }
 
-function ripRare() {
-  const ordered = revealOrder(RARE_CACHE_RIP); // lowest rarity first, big pull last
-  const top = topRarity(RARE_CACHE_RIP)!;
-  const slots = $('ripReveal');
-  slots.innerHTML = '';
-  slots.classList.remove('hidden');
-  $('ripHeadline').textContent = `Rare Cache ripped — best pull: ${top.toUpperCase()}`;
-  $('ripHeadline').style.color = RARITY_COLOR[top];
+function ripRare(): void {
+  const ordered = revealOrder(RARE_CACHE_RIP); // lowest rarity first, biggest pull last
+  const best = topRarity(RARE_CACHE_RIP)!;
+  const reveal = $('ripReveal');
+  reveal.innerHTML = '';
+  reveal.classList.remove('hidden');
+  $('ripHeadline').textContent = `Rare Cache ripped, best pull: ${best.toUpperCase()}`;
+  $('ripHeadline').style.color = RARITY_COLOR[best];
   ordered.forEach((rw, i) => {
     const card = document.createElement('div');
     card.className = 'reward';
     card.style.setProperty('--rc', RARITY_COLOR[rw.rarity]);
-    card.style.animationDelay = `${i * 260}ms`;
-    card.innerHTML = `<div class="reward-kind">${rw.kind}</div><div class="reward-name">${rw.name}</div><div class="reward-rarity">${rw.rarity}</div>`;
-    slots.appendChild(card);
+    card.style.animationDelay = `${i * 240}ms`;
+    card.innerHTML = `<div class="reward-kind">${rw.kind}</div>` +
+      `<div class="reward-name">${rw.name}</div>` +
+      `<div class="reward-rarity">${rw.rarity}</div>`;
+    reveal.appendChild(card);
   });
 }
 
-// ---- daily tasks / streak ----
-function renderTasks() {
+// ---- daily tasks ----
+function renderTasks(): void {
   const tasks = [
     { t: 'Log in today', done: true },
     { t: 'Clear a dungeon', done: true },
     { t: 'Win an Arena match', done: false },
   ];
-  $('taskList').innerHTML = tasks.map((x) => `
-    <li class="${x.done ? 'done' : ''}"><span class="check"></span>${x.t}</li>`).join('');
+  $('taskList').innerHTML = tasks
+    .map((x) => `<li class="${x.done ? 'done' : ''}"><span class="check"></span>${x.t}</li>`)
+    .join('');
 }
 
-function init() {
+function init(): void {
   drawWheel();
+  renderLegend();
   renderPacks();
   renderTasks();
   $('spinBtn').addEventListener('click', spin);
+  // Keep the wheel crisp + correctly sized across viewport changes.
+  let raf = 0;
+  window.addEventListener('resize', () => {
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(drawWheel);
+  });
 }
+
 if (document.readyState !== 'loading') init();
 else document.addEventListener('DOMContentLoaded', init);

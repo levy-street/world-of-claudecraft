@@ -4,6 +4,8 @@ import {
   pointerFractionAfter,
   segmentAtFraction,
   landingRotation,
+  segmentProbability,
+  fitsLabel,
   WheelInput,
 } from '../src/ui/spin_wheel_core';
 
@@ -69,5 +71,33 @@ describe('landingRotation', () => {
 
   it('throws for a key not on the wheel', () => {
     expect(() => landingRotation(segs, 'nope', 3)).toThrow(/no segment/);
+  });
+});
+
+describe('segmentProbability', () => {
+  const segs = wheelSegments(ITEMS);
+  it('equals the weight share and sums to 1 across the wheel', () => {
+    const total = ITEMS.reduce((s, i) => s + i.weight, 0);
+    segs.forEach((seg, i) => expect(segmentProbability(seg)).toBeCloseTo(ITEMS[i].weight / total, 12));
+    expect(segs.reduce((s, seg) => s + segmentProbability(seg), 0)).toBeCloseTo(1, 12);
+  });
+});
+
+describe('fitsLabel', () => {
+  const segs = wheelSegments(ITEMS);
+  it('keeps labels on wide slices and drops them on thin ones (default 7%)', () => {
+    const fit = (key: string) => fitsLabel(segs.find((s) => s.key === key)!);
+    expect(fit('none')).toBe(true); // 60%
+    expect(fit('dust_s')).toBe(true); // 25%
+    expect(fit('dust_m')).toBe(true); // 10%
+    expect(fit('dust_l')).toBe(false); // 4%
+    expect(fit('shard')).toBe(false); // 0.9%
+    expect(fit('jackpot')).toBe(false); // 0.1%
+  });
+
+  it('honors a custom minimum at the boundary', () => {
+    const dustL = segs.find((s) => s.key === 'dust_l')!; // exactly 0.04
+    expect(fitsLabel(dustL, 0.04)).toBe(true);
+    expect(fitsLabel(dustL, 0.0401)).toBe(false);
   });
 });

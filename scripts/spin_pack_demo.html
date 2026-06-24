@@ -18,14 +18,14 @@
       radial-gradient(1200px 600px at 50% -10%, #241a0e 0%, transparent 60%),
       linear-gradient(160deg, var(--bg1), var(--bg0));
   }
-  .frame { max-width:1120px; margin:0 auto; padding:28px 24px 48px; }
+  .frame { max-width:1060px; margin:0 auto; padding:26px 22px 44px; }
   header { text-align:center; margin-bottom:22px; }
   header h1 {
     font-size:30px; margin:0 0 4px; letter-spacing:.5px;
     color:var(--gold-bright); text-shadow:0 2px 0 #2a1d09, 0 0 18px rgba(202,162,74,.35);
   }
   header p { margin:0; color:var(--muted); font-size:14px; }
-  .grid { display:grid; grid-template-columns:380px 1fr; gap:22px; }
+  .grid { display:grid; grid-template-columns:minmax(340px,380px) 1fr; gap:20px; align-items:start; }
   .panel {
     background:linear-gradient(180deg, var(--panel2), var(--panel));
     border:1px solid var(--border); border-radius:14px; box-shadow:var(--shadow);
@@ -38,12 +38,17 @@
   }
   .badge { font-size:11px; color:#caa24a; border:1px solid var(--border-lt); border-radius:999px; padding:2px 9px; }
   /* spinner */
-  .wheel-wrap { position:relative; width:340px; height:340px; margin:4px auto 6px; }
-  #wheel { display:block; border-radius:50%; box-shadow:0 0 0 6px #120d07, 0 0 0 8px var(--gold), 0 10px 30px rgba(0,0,0,.6); }
-  .pointer { position:absolute; top:-6px; left:50%; transform:translateX(-50%);
+  .wheel-wrap { position:relative; width:100%; max-width:336px; aspect-ratio:1; margin:2px auto 14px; }
+  #wheel { display:block; margin:0 auto; border-radius:50%; box-shadow:0 0 0 6px #120d07, 0 0 0 8px var(--gold), 0 10px 30px rgba(0,0,0,.6); }
+  .pointer { position:absolute; top:-4px; left:50%; transform:translateX(-50%);
     width:0;height:0;border-left:13px solid transparent;border-right:13px solid transparent;
     border-top:22px solid var(--gold-bright); filter:drop-shadow(0 2px 2px rgba(0,0,0,.6)); z-index:2; }
-  .gate { text-align:center; font-size:13px; color:var(--muted); margin:6px 0 12px; }
+  .legend { display:grid; grid-template-columns:1fr 1fr; gap:7px 16px; margin:0 6px 14px; }
+  .leg { display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--ink); }
+  .leg .sw { width:13px; height:13px; border-radius:3px; border:1px solid rgba(0,0,0,.4); flex:0 0 auto; }
+  .leg .leg-label { flex:1 1 auto; white-space:nowrap; }
+  .leg .leg-odds { color:var(--muted); font-variant-numeric:tabular-nums; }
+  .gate { text-align:center; font-size:13px; color:var(--muted); margin:4px 0 12px; }
   .gate b { color:var(--ink); }
   .spin-btn {
     display:block; width:100%; padding:13px; font-size:16px; font-weight:700; letter-spacing:.5px;
@@ -96,8 +101,9 @@
   .streak .keys { margin-left:auto; font-weight:700; color:var(--gold-bright); }
   .col { display:flex; flex-direction:column; gap:22px; }
   @media (max-width:780px) {
-    .grid { grid-template-columns:1fr; }
-    .wheel-wrap, #wheel { width:300px; height:300px; }
+    .frame { padding:18px 14px 32px; }
+    .grid { grid-template-columns:1fr; gap:16px; }
+    .wheel-wrap { max-width:300px; }
     .pack-cards, .rip-reveal { grid-template-columns:1fr; }
     .spin-btn, .burn { min-height:44px; }
   }
@@ -114,8 +120,9 @@
         <h2>Daily Spinner <span class="badge">provably fair</span></h2>
         <div class="wheel-wrap">
           <div class="pointer"></div>
-          <canvas id="wheel" width="340" height="340"></canvas>
+          <canvas id="wheel"></canvas>
         </div>
+        <div class="legend" id="legend"></div>
         <div class="gate">Eligible: <b>holds 1,250 $WOC</b> (min 1,000) · 1 free spin / day</div>
         <button class="spin-btn" id="spinBtn">SPIN</button>
         <div id="spinResult"></div>
