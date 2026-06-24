@@ -2250,12 +2250,34 @@
     color: var(--gold-dim);
     font-weight: 600;
     white-space: nowrap;
+    background: #1a140a66;
+    border: 1px solid #4b3d1d;
+    border-radius: 5px;
+    padding: 4px 9px;
+    min-height: 28px;
+    font-family: inherit;
+    font-size: inherit;
+    cursor: var(--cursor-point);
+    transition: border-color var(--transition-speed), color var(--transition-speed),
+      background var(--transition-speed);
   }
   .woc-balance.is-preview {
     color: #b8a66f;
   }
   .woc-balance.is-verified {
     color: var(--color-text-success);
+  }
+  .woc-balance:hover {
+    color: var(--gold);
+    border-color: var(--gold);
+    background: #2c241066;
+  }
+  .woc-balance:focus-visible {
+    outline: 3px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  body.mobile-touch .woc-balance {
+    min-height: 40px;
   }
   .woc-coin {
     display: inline-block;
@@ -4131,4 +4153,74 @@
     outline-offset: -4px;
     box-shadow: 0 0 14px rgba(202, 164, 114, 0.5);
   }
+
+  /* ---------- wallet / send-tokens panel (clicked from the bag balance) ---------- */
+  #wallet-panel { width: 340px; max-width: calc(100vw - 24px); z-index: 70; }
+  #wallet-panel .wp-status { display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: var(--color-text-muted);
+    background: #1a140a66; border: 1px solid #3c3118; border-radius: 5px; padding: 7px 9px; margin: 4px 0 12px; }
+  #wallet-panel .wp-status .wp-dot { width: 8px; height: 8px; border-radius: 50%; background: #6b6253; flex: none; }
+  #wallet-panel.is-connected .wp-status .wp-dot { background: #4ade80; box-shadow: 0 0 5px #4ade8088; }
+  #wallet-panel .wp-status code { color: #cdbf94; font-size: 11px; }
+  #wallet-panel .wp-status .wp-connect { margin: 0 0 0 auto; padding: 3px 10px; font-size: 11px; }
+  #wallet-panel .wp-section-label { font-family: var(--title-font); color: var(--gold); font-size: 12px; letter-spacing: 0.3px; margin: 0 0 7px; }
+  #wallet-panel .wp-row { margin-bottom: 11px; }
+  #wallet-panel .wp-row > label { display: block; font-size: 11px; color: var(--color-text-muted); margin-bottom: 4px; }
+  #wallet-panel .wp-cur { display: flex; gap: 6px; }
+  #wallet-panel .wp-cur button { flex: 1; padding: 7px 0; min-height: 36px; font-family: var(--title-font); font-size: 12px;
+    color: #cdbf94; background: #14100a; border: 1px solid #4b3d1d; border-radius: 5px; cursor: var(--cursor-point);
+    transition: border-color var(--transition-speed), color var(--transition-speed), background var(--transition-speed); }
+  #wallet-panel .wp-cur button:hover { border-color: #8f7025; color: #ffe6a8; }
+  #wallet-panel .wp-cur button.sel { color: #ffe6a8; border-color: var(--gold); background: #2c2410; box-shadow: inset 0 0 0 1px #ffd10022; }
+  #wallet-panel .wp-cur button:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: 2px; }
+  #wallet-panel .wp-amount { display: flex; gap: 6px; align-items: stretch; }
+  #wallet-panel .wp-amount .cd-input { flex: 1; }
+  #wallet-panel .wp-amount .wp-max { margin: 0; padding: 0 12px; white-space: nowrap; }
+  #wallet-panel .wp-bal { font-size: 11px; color: var(--color-text-muted); margin-top: 4px; }
+  #wallet-panel .wp-bal b { color: #cdbf94; font-weight: 600; }
+  #wallet-panel .wp-bal.over { color: var(--color-text-error); }
+  #wallet-panel .wp-bal.over b { color: var(--color-text-error); }
+  #wallet-panel .wp-resolve { min-height: 16px; font-size: 11px; margin-top: 5px; display: flex; align-items: center; gap: 6px; }
+  #wallet-panel .wp-resolve.ok { color: #4ade80; }
+  #wallet-panel .wp-resolve.bad { color: var(--color-text-error); }
+  #wallet-panel .wp-resolve.pending { color: var(--color-text-muted); }
+  #wallet-panel .wp-resolve code { color: inherit; opacity: 0.85; }
+  #wallet-panel .wp-note { font-size: 10.5px; line-height: 1.5; color: var(--color-text-muted); margin: 2px 0 12px; }
+  #wallet-panel .wp-send { width: 100%; margin: 0; padding: 9px 0; min-height: 42px; background: linear-gradient(#8a6a26, #5a4413 55%, #473409); color: #ffe6a8; }
+  #wallet-panel .wp-feedback { min-height: 16px; font-size: 11.5px; margin-top: 9px; line-height: 1.5; overflow-wrap: anywhere; }
+  #wallet-panel .wp-feedback.ok { color: #4ade80; }
+  #wallet-panel .wp-feedback.bad { color: var(--color-text-error); }
+  #wallet-panel .wp-feedback a { color: var(--gold); }
+  #wallet-panel .panel-title { cursor: default; } /* not draggable, unlike HUD windows */
+  body.mobile-touch #wallet-panel .wp-cur button,
+  body.mobile-touch #wallet-panel .wp-connect { min-height: 40px; }
+  /* tabs */
+  #wallet-panel .wp-tabs { display: flex; gap: 4px; margin: 4px 0 12px; border-bottom: 1px solid #3c3118; }
+  #wallet-panel .wp-tab { flex: 1; padding: 7px 0; min-height: 34px; font-family: var(--title-font); font-size: 12px;
+    color: #b6ad8c; background: transparent; border: 0; border-bottom: 2px solid transparent; cursor: var(--cursor-point);
+    transition: color var(--transition-speed), border-color var(--transition-speed); }
+  #wallet-panel .wp-tab:hover { color: #ffe6a8; }
+  #wallet-panel .wp-tab.sel { color: var(--gold); border-bottom-color: var(--gold); }
+  #wallet-panel .wp-tab:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: -3px; }
+  body.mobile-touch #wallet-panel .wp-tab { min-height: 40px; }
+  /* hire goal selector wraps (5 options) */
+  #wallet-panel .wp-goals { flex-wrap: wrap; }
+  #wallet-panel .wp-goals button { flex: 1 1 28%; }
+  #wallet-panel select.cd-input { width: 100%; box-sizing: border-box; appearance: none; cursor: var(--cursor-point); }
+  #wallet-panel .wp-capture { margin: 0 0 4px; }
+  #wallet-panel .wp-hint { font-size: 11px; color: var(--color-text-muted); line-height: 1.45; margin-top: 4px; }
+  #wallet-panel .wp-online-only { font-size: 12px; color: var(--color-text-muted); padding: 14px 4px; text-align: center; }
+  /* jobs list */
+  #wallet-panel .wp-jobs-empty { font-size: 12px; color: var(--color-text-muted); padding: 14px 4px; text-align: center; }
+  #wallet-panel .wp-job { border: 1px solid #3c3118; border-radius: 6px; padding: 9px 10px; margin-bottom: 8px; background: #1a140a55; }
+  #wallet-panel .wp-job-head { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; font-size: 12.5px; color: #e8dcb0; }
+  #wallet-panel .wp-job-head b { color: var(--gold); }
+  #wallet-panel .wp-job-amt { flex: none; font-weight: 600; color: var(--gold-dim); white-space: nowrap; }
+  #wallet-panel .wp-job-goal { font-size: 11.5px; color: #cfc6a8; margin: 3px 0; }
+  #wallet-panel .wp-job-status { font-size: 11px; color: var(--color-text-muted); }
+  #wallet-panel .wp-job-status.s-active { color: #ffe6a8; }
+  #wallet-panel .wp-job-status.s-released { color: #4ade80; }
+  #wallet-panel .wp-job-status.s-refunded { color: #d98a8a; }
+  #wallet-panel .wp-job-btn { margin: 7px 0 0; padding: 5px 12px; font-size: 11.5px; min-height: 34px; }
+  body.mobile-touch #wallet-panel .wp-job-btn { min-height: 40px; }
+  #wallet-panel .wp-job-link { display: inline-block; margin-top: 6px; font-size: 11px; color: var(--gold); }
 }

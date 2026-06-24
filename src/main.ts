@@ -63,6 +63,7 @@ import {
   type CharacterSummary,
   ClientWorld,
   isAuthError,
+  type JobSummary,
   NATIVE_APP,
   type ReleaseEntry,
 } from './net/online';
@@ -815,6 +816,7 @@ async function startGame(
   // builds its scene synchronously, so everything must be resolved first.
   // The loading screen covers the gap - not a silent black screen.
   enterLoadingState(t('loading.world'));
+  activeOnline = online; // null offline; powers the wallet panel's Hire + Jobs tabs
   document.body.classList.add('game-active');
   // We've left the start screen for the world, so pause + release the landing
   // trailer: it's hidden now, and a decoding background video just wastes CPU/GPU
@@ -3808,6 +3810,8 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
   world.onDisconnect = (reason) => {
     clearInterval(poll);
     clearCardProviders();
+    activeOnline = null;
+    closeWalletPanel();
     fatalOverlay(userFacingApiError(reason));
   };
 }
@@ -4604,6 +4608,10 @@ let walletHiddenNoticeTimeout: number | null = null;
 // refresh it live while it's open.
 let walletPanelEl: HTMLElement | null = null;
 let walletPanelOnWalletChange: (() => void) | null = null;
+// The live online session (when in an online world), so the wallet panel's Hire
+// + Jobs tabs know the active character and that the server is reachable. Null
+// offline / at the character screen.
+let activeOnline: ClientWorld | null = null;
 
 // Feature flag: Wallet Standard support needs no project id. Keep an escape
 // hatch for deploys that want to hide the wallet UI entirely. Native app builds
@@ -5370,6 +5378,22 @@ const WALLET_CURRENCIES: { key: TransferCurrency; label: string }[] = [
 const CURRENCY_DECIMALS: Record<TransferCurrency, number> = { WOC: 6, SOL: 9, USDC: 6 };
 const BALANCE_DISPLAY_DIGITS: Record<TransferCurrency, number> = { WOC: 2, SOL: 6, USDC: 2 };
 
+// Job-contract escrow ("paid bodyguard") only escrows SPL tokens (WOC/USDC), and
+// pays out automatically when the server confirms one of these goals.
+type HireCurrency = 'WOC' | 'USDC';
+const HIRE_CURRENCIES: { key: HireCurrency; label: string }[] = [
+  { key: 'WOC', label: '$WOC' },
+  { key: 'USDC', label: 'USDC' },
+];
+type GoalKind = 'reach_level' | 'clear_dungeon' | 'complete_quest' | 'survive' | 'escort';
+const GOAL_TYPES: { key: GoalKind; label: string }[] = [
+  { key: 'reach_level', label: 'Reach level' },
+  { key: 'clear_dungeon', label: 'Clear raid' },
+  { key: 'complete_quest', label: 'Quest' },
+  { key: 'survive', label: 'Bodyguard' },
+  { key: 'escort', label: 'Escort' },
+];
+
 function closeWalletPanel(): void {
   walletPanelEl?.remove();
   walletPanelEl = null;
@@ -5393,18 +5417,60 @@ function openWalletPanel(): void {
   el.id = 'wallet-panel';
   el.className = 'window panel';
   el.style.display = 'block';
+  // Hire-tab state (its own resolve / currency / goal, independent of Send).
+  let hCurrency: HireCurrency = 'WOC';
+  let hResolved: { name: string; pubkey: string } | null = null;
+  let hResolveSeq = 0;
+  let hDebounce: number | undefined;
+  let posting = false;
+  let goalKind: GoalKind = 'reach_level';
+  let escortDest: { x: number; z: number } | null = null;
+
   el.innerHTML = `
     <div class="panel-title"><span>Wallet</span><button type="button" class="x-btn" data-close aria-label="Close">✕</button></div>
     <div class="wp-status"><span class="wp-dot" aria-hidden="true"></span><span class="wp-status-text">Wallet not connected</span><button type="button" class="btn wp-connect" data-connect>Connect</button></div>
-    <div class="wp-section-label">Send to a player</div>
-    <div class="wp-row"><label>Currency</label><div class="wp-cur">${
-      WALLET_CURRENCIES.map((c) => `<button type="button" data-cur="${c.key}"${c.key === currency ? ' class="sel"' : ''} aria-pressed="${c.key === currency}">${escapeHtml(c.label)}</button>`).join('')
-    }</div></div>
-    <div class="wp-row"><label for="wp-recipient">Player name</label><input id="wp-recipient" class="cd-input" type="text" autocomplete="off" spellcheck="false" placeholder="Who are you sending to?"><div class="wp-resolve" data-resolve aria-live="polite"></div></div>
-    <div class="wp-row"><label for="wp-amount">Amount</label><div class="wp-amount"><input id="wp-amount" class="cd-input" type="text" inputmode="decimal" autocomplete="off" placeholder="0.0"><button type="button" class="btn wp-max" data-max>Max</button></div><div class="wp-bal" data-bal>Balance: —</div></div>
-    <div class="wp-note">Sent directly wallet-to-wallet on Solana. Non-custodial — the game never holds your funds. Network fees apply.</div>
-    <button type="button" class="btn wp-send" data-send disabled>Send</button>
-    <div class="wp-feedback" data-feedback aria-live="polite"></div>`;
+    <div class="wp-tabs" role="tablist">
+      <button type="button" class="wp-tab sel" data-tab="send" role="tab" aria-selected="true">Send</button>
+      <button type="button" class="wp-tab" data-tab="hire" role="tab" aria-selected="false">Hire</button>
+      <button type="button" class="wp-tab" data-tab="jobs" role="tab" aria-selected="false">Jobs</button>
+    </div>
+
+    <div class="wp-body" data-body="send">
+      <div class="wp-section-label">Send to a player</div>
+      <div class="wp-row"><label>Currency</label><div class="wp-cur">${
+        WALLET_CURRENCIES.map((c) => `<button type="button" data-cur="${c.key}"${c.key === currency ? ' class="sel"' : ''} aria-pressed="${c.key === currency}">${escapeHtml(c.label)}</button>`).join('')
+      }</div></div>
+      <div class="wp-row"><label for="wp-recipient">Player name</label><input id="wp-recipient" class="cd-input" type="text" autocomplete="off" spellcheck="false" placeholder="Who are you sending to?"><div class="wp-resolve" data-resolve aria-live="polite"></div></div>
+      <div class="wp-row"><label for="wp-amount">Amount</label><div class="wp-amount"><input id="wp-amount" class="cd-input" type="text" inputmode="decimal" autocomplete="off" placeholder="0.0"><button type="button" class="btn wp-max" data-max>Max</button></div><div class="wp-bal" data-bal>Balance: —</div></div>
+      <div class="wp-note">Sent directly wallet-to-wallet on Solana. Non-custodial — the game never holds your funds. Network fees apply.</div>
+      <button type="button" class="btn wp-send" data-send disabled>Send</button>
+      <div class="wp-feedback" data-feedback aria-live="polite"></div>
+    </div>
+
+    <div class="wp-body" data-body="hire" hidden>
+      <div class="wp-section-label">Hire a helper</div>
+      <div class="wp-online-only" data-h-offline hidden>Enter the world online to hire a helper.</div>
+      <div data-h-form>
+        <div class="wp-row"><label for="wp-h-name">Player name</label><input id="wp-h-name" class="cd-input" type="text" autocomplete="off" spellcheck="false" placeholder="Who will help you?"><div class="wp-resolve" data-h-resolve aria-live="polite"></div></div>
+        <div class="wp-row"><label>Reward currency</label><div class="wp-cur" data-h-cur>${
+          HIRE_CURRENCIES.map((c) => `<button type="button" data-hcur="${c.key}"${c.key === hCurrency ? ' class="sel"' : ''} aria-pressed="${c.key === hCurrency}">${escapeHtml(c.label)}</button>`).join('')
+        }</div></div>
+        <div class="wp-row"><label for="wp-h-amount">Reward</label><div class="wp-amount"><input id="wp-h-amount" class="cd-input" type="text" inputmode="decimal" autocomplete="off" placeholder="0.0"></div><div class="wp-bal" data-h-bal>Balance: —</div></div>
+        <div class="wp-row"><label>Goal — paid when the server confirms it</label><div class="wp-cur wp-goals" data-h-goal>${
+          GOAL_TYPES.map((g) => `<button type="button" data-goal="${g.key}"${g.key === goalKind ? ' class="sel"' : ''} aria-pressed="${g.key === goalKind}">${escapeHtml(g.label)}</button>`).join('')
+        }</div></div>
+        <div class="wp-row" data-h-params></div>
+        <div class="wp-note">The reward is locked in on-chain escrow and released to the helper automatically when the server confirms the goal — or refunded to you if it isn't met before the deadline.</div>
+        <button type="button" class="btn wp-send" data-h-post disabled>Post &amp; Lock Reward</button>
+        <div class="wp-feedback" data-h-feedback aria-live="polite"></div>
+      </div>
+    </div>
+
+    <div class="wp-body" data-body="jobs" hidden>
+      <div class="wp-section-label">Your jobs</div>
+      <div data-jobs-list><div class="wp-jobs-empty">Loading…</div></div>
+      <div class="wp-feedback" data-jobs-msg aria-live="polite"></div>
+    </div>`;
   document.body.appendChild(el);
   walletPanelEl = el;
 
@@ -5455,6 +5521,7 @@ function openWalletPanel(): void {
         if (walletPanelEl !== el || connectedAddress !== address) return; // stale (closed/switched)
         balances[c.key] = b;
         if (c.key === currency) updateBalanceDisplay();
+        if (c.key === hCurrency) updateHireBalance();
       });
     }
   };
@@ -5571,6 +5638,265 @@ function openWalletPanel(): void {
   sendBtn.addEventListener('click', () => { void doSend(); });
   el.addEventListener('keydown', (e) => { if ((e as KeyboardEvent).key === 'Escape') { e.preventDefault(); closeWalletPanel(); } });
 
+  // ── Hire tab ───────────────────────────────────────────────────────────────
+  const hNameInput = $$<HTMLInputElement>('#wp-h-name');
+  const hAmountInput = $$<HTMLInputElement>('#wp-h-amount');
+  const hResolveBox = $$('[data-h-resolve]');
+  const hFeedback = $$('[data-h-feedback]');
+  const hParams = $$('[data-h-params]');
+  const postBtn = $$<HTMLButtonElement>('[data-h-post]');
+
+  const hAmountValid = (): boolean => {
+    const a = hAmountInput.value.trim();
+    if (!a) return false;
+    try { parseAmountToBase(a, CURRENCY_DECIMALS[hCurrency]); return true; } catch { return false; }
+  };
+
+  // Read the currently-built milestone from the goal params, or null if invalid.
+  const readGoal = (): Record<string, unknown> | null => {
+    switch (goalKind) {
+      case 'reach_level': {
+        const target = Number($$<HTMLInputElement>('#wp-g-level')?.value);
+        return Number.isInteger(target) && target >= 2 && target <= 20 ? { kind: 'reach_level', target } : null;
+      }
+      case 'clear_dungeon': {
+        const dungeonId = $$<HTMLSelectElement>('#wp-g-dungeon')?.value ?? '';
+        return dungeonId ? { kind: 'clear_dungeon', dungeonId } : null;
+      }
+      case 'complete_quest': {
+        const questId = $$<HTMLSelectElement>('#wp-g-quest')?.value ?? '';
+        return questId ? { kind: 'complete_quest', questId } : null;
+      }
+      case 'survive': {
+        const minutes = Number($$<HTMLInputElement>('#wp-g-minutes')?.value);
+        return Number.isFinite(minutes) && minutes >= 1 && minutes <= 1440 ? { kind: 'survive', durationSec: Math.round(minutes * 60) } : null;
+      }
+      case 'escort':
+        return escortDest ? { kind: 'escort', x: escortDest.x, z: escortDest.z, radius: 8 } : null;
+    }
+  };
+
+  const updatePostButton = (): void => {
+    postBtn.disabled = posting || !connectedAddress || !hResolved || !activeOnline || !hAmountValid() || !readGoal();
+    postBtn.textContent = posting ? 'Posting…' : 'Post & Lock Reward';
+  };
+
+  const updateHireBalance = (): void => {
+    const box = $$('[data-h-bal]');
+    const label = HIRE_CURRENCIES.find((c) => c.key === hCurrency)!.label;
+    if (!connectedAddress) { box.textContent = 'Connect a wallet to see your balance.'; return; }
+    const b = balances[hCurrency];
+    box.innerHTML = b === undefined ? 'Balance: …'
+      : b === null ? 'Balance: unavailable'
+      : `Balance: <b>${escapeHtml(formatNumber(b, { maximumFractionDigits: BALANCE_DISPLAY_DIGITS[hCurrency] }))} ${escapeHtml(label)}</b>`;
+  };
+
+  const renderGoalParams = (): void => {
+    switch (goalKind) {
+      case 'reach_level':
+        hParams.innerHTML = '<label for="wp-g-level">Target level</label><input id="wp-g-level" class="cd-input" type="number" min="2" max="20" placeholder="2–20">';
+        break;
+      case 'clear_dungeon':
+        hParams.innerHTML = `<label for="wp-g-dungeon">Raid / dungeon</label><select id="wp-g-dungeon" class="cd-input">${
+          DUNGEON_LIST.map((d) => `<option value="${escapeHtml(d.id)}">${escapeHtml(d.name)}</option>`).join('')
+        }</select>`;
+        break;
+      case 'complete_quest': {
+        const ids = activeOnline ? [...activeOnline.questLog.keys()] : [];
+        hParams.innerHTML = ids.length
+          ? `<label for="wp-g-quest">Quest (one you're on)</label><select id="wp-g-quest" class="cd-input">${
+              ids.map((id) => `<option value="${escapeHtml(id)}">${escapeHtml(QUESTS[id]?.name ?? id)}</option>`).join('')
+            }</select>`
+          : '<div class="wp-hint">You have no active quests to hire help for — pick one up first.</div>';
+        break;
+      }
+      case 'survive':
+        hParams.innerHTML = '<label for="wp-g-minutes">Protect me for (minutes)</label><input id="wp-g-minutes" class="cd-input" type="number" min="1" max="1440" placeholder="e.g. 10">';
+        break;
+      case 'escort': {
+        const at = escortDest ? `Destination set: (${escortDest.x}, ${escortDest.z})` : 'No destination set yet.';
+        hParams.innerHTML = '<label>Escort destination</label><button type="button" class="btn wp-capture" data-h-capture>Use my current spot</button>'
+          + `<div class="wp-hint" data-escort-readout>${escapeHtml(at)}</div>`;
+        $$('[data-h-capture]').addEventListener('click', () => {
+          if (!activeOnline) return;
+          const p = activeOnline.player.pos;
+          escortDest = { x: Math.round(p.x), z: Math.round(p.z) };
+          $$('[data-escort-readout]').textContent = `Destination (${escortDest.x}, ${escortDest.z}) — travel off, then have your guard bring you back here.`;
+          updatePostButton();
+        });
+        break;
+      }
+    }
+    hParams.querySelectorAll('input, select').forEach((n) => {
+      n.addEventListener('input', updatePostButton);
+      n.addEventListener('change', updatePostButton);
+    });
+    updatePostButton();
+  };
+
+  const doHireResolve = (raw: string): void => {
+    const q = raw.trim();
+    hResolved = null;
+    updatePostButton();
+    if (!q) { hResolveBox.className = 'wp-resolve'; hResolveBox.textContent = ''; return; }
+    if (!api.token) { hResolveBox.className = 'wp-resolve bad'; hResolveBox.textContent = 'Enter a realm online to hire a player.'; return; }
+    hResolveBox.className = 'wp-resolve pending';
+    hResolveBox.textContent = 'Looking up player…';
+    const seq = ++hResolveSeq;
+    void api.resolveRecipient(q).then((r) => {
+      if (walletPanelEl !== el || seq !== hResolveSeq) return;
+      if (r) {
+        hResolved = r;
+        hResolveBox.className = 'wp-resolve ok';
+        hResolveBox.innerHTML = `✓ ${escapeHtml(r.name)} · <code>${escapeHtml(shortenAddress(r.pubkey))}</code>`;
+      } else {
+        hResolveBox.className = 'wp-resolve bad';
+        hResolveBox.textContent = 'No player by that name has a verified wallet.';
+      }
+      updatePostButton();
+    });
+  };
+
+  const doPost = async (): Promise<void> => {
+    if (posting || !connectedAddress || !hResolved || !activeOnline) return;
+    const goal = readGoal();
+    const amount = hAmountInput.value.trim();
+    if (!goal) { hFeedback.className = 'wp-feedback bad'; hFeedback.textContent = 'Set a valid goal first.'; return; }
+    posting = true;
+    updatePostButton();
+    hFeedback.className = 'wp-feedback';
+    hFeedback.textContent = 'Preparing the escrow…';
+    try {
+      const quote = await api.jobQuote({ characterId: activeOnline.characterId, helperName: hResolved.name, currency: hCurrency, amount: Number(amount), milestone: goal });
+      hFeedback.textContent = 'Approve the reward deposit in your wallet…';
+      const wallet = await loadWallet();
+      const signature = await wallet.signAndSubmitServerTx(quote.txBase64);
+      hFeedback.textContent = 'Locking the reward on-chain…';
+      let confirmed = false;
+      for (let attempt = 0; attempt < 24 && !confirmed; attempt++) {
+        try {
+          await api.jobConfirm(quote.jobId, signature);
+          confirmed = true;
+        } catch (err: any) {
+          const msg = String(err?.message ?? '');
+          if (/retry|finaliz|confirm/i.test(msg)) {
+            hFeedback.textContent = 'Waiting for finalization…';
+            await new Promise((r) => window.setTimeout(r, 2500));
+          } else {
+            throw err;
+          }
+        }
+      }
+      if (!confirmed) throw new Error('Timed out confirming the deposit. If the reward was locked it will settle once it finalizes.');
+      hFeedback.className = 'wp-feedback ok';
+      hFeedback.innerHTML = `Job posted — ${escapeHtml(formatNumber(Number(amount), { maximumFractionDigits: 4 }))} ${escapeHtml(hCurrency)} locked in escrow for ${escapeHtml(hResolved.name)}.`;
+      hAmountInput.value = '';
+      if (connectedAddress) { void refreshWocBalance(connectedAddress); void loadBalances(connectedAddress); }
+    } catch (err: any) {
+      hFeedback.className = 'wp-feedback bad';
+      hFeedback.textContent = err?.message ? `Failed: ${err.message}` : 'Failed to post the job.';
+    } finally {
+      posting = false;
+      updatePostButton();
+    }
+  };
+
+  const syncHireOnline = (): void => {
+    const online = !!activeOnline && !!api.token;
+    $$<HTMLElement>('[data-h-offline]').hidden = online;
+    $$<HTMLElement>('[data-h-form]').hidden = !online;
+    updateHireBalance();
+  };
+
+  hNameInput.addEventListener('input', () => {
+    if (hDebounce !== undefined) window.clearTimeout(hDebounce);
+    const value = hNameInput.value;
+    hDebounce = window.setTimeout(() => doHireResolve(value), 350);
+  });
+  hAmountInput.addEventListener('input', updatePostButton);
+  el.querySelectorAll<HTMLElement>('[data-hcur]').forEach((b) => b.addEventListener('click', () => {
+    hCurrency = (b.dataset.hcur as HireCurrency) ?? 'WOC';
+    el.querySelectorAll<HTMLElement>('[data-hcur]').forEach((x) => {
+      const on = x === b; x.classList.toggle('sel', on); x.setAttribute('aria-pressed', String(on));
+    });
+    updateHireBalance();
+    updatePostButton();
+  }));
+  el.querySelectorAll<HTMLElement>('[data-goal]').forEach((b) => b.addEventListener('click', () => {
+    goalKind = (b.dataset.goal as GoalKind) ?? 'reach_level';
+    el.querySelectorAll<HTMLElement>('[data-goal]').forEach((x) => {
+      const on = x === b; x.classList.toggle('sel', on); x.setAttribute('aria-pressed', String(on));
+    });
+    escortDest = null;
+    renderGoalParams();
+  }));
+  postBtn.addEventListener('click', () => { void doPost(); });
+
+  // ── Jobs tab ───────────────────────────────────────────────────────────────
+  const jobStatusText = (j: JobSummary): string => {
+    switch (j.status) {
+      case 'pending_deposit': return 'Awaiting your deposit';
+      case 'open': return j.role === 'helper' ? 'Offered to you — accept to begin' : 'Open — waiting for the helper to accept';
+      case 'active': return 'In progress';
+      case 'released': return 'Completed — helper paid ✓';
+      case 'refunded':
+        return j.reason === 'expired' ? 'Expired — refunded'
+          : j.reason === 'subject_died' ? 'Failed (you died) — refunded'
+          : j.reason === 'cancelled' ? 'Cancelled — refunded'
+          : 'Refunded';
+    }
+  };
+
+  const renderJobs = async (): Promise<void> => {
+    const list = $$('[data-jobs-list]');
+    $$('[data-jobs-msg]').textContent = '';
+    if (!activeOnline || !api.token) { list.innerHTML = '<div class="wp-jobs-empty">Enter the world online to manage jobs.</div>'; return; }
+    list.innerHTML = '<div class="wp-jobs-empty">Loading…</div>';
+    const jobs = await api.jobs(activeOnline.characterId);
+    if (walletPanelEl !== el) return;
+    if (!jobs.length) { list.innerHTML = '<div class="wp-jobs-empty">No jobs yet. Use the Hire tab to pay a player for help.</div>'; return; }
+    list.innerHTML = jobs.map((j) => {
+      const head = j.role === 'payer' ? `You hired <b>${escapeHtml(j.helperName)}</b>` : `<b>${escapeHtml(j.payerName)}</b> hired you`;
+      const amt = `${formatNumber(j.amount, { maximumFractionDigits: 4 })} ${j.currency}`;
+      let action = '';
+      if (j.status === 'open' && j.role === 'helper') action = `<button type="button" class="btn wp-job-btn" data-accept="${escapeHtml(j.jobId)}">Accept job</button>`;
+      else if (j.status === 'open' && j.role === 'payer') action = `<button type="button" class="btn wp-job-btn" data-cancel="${escapeHtml(j.jobId)}">Cancel &amp; refund</button>`;
+      else if (j.settleSig) action = `<a class="wp-job-link" href="https://solscan.io/tx/${encodeURIComponent(j.settleSig)}" target="_blank" rel="noopener noreferrer">View payout ↗</a>`;
+      return `<div class="wp-job">
+        <div class="wp-job-head">${head}<span class="wp-job-amt">${escapeHtml(amt)}</span></div>
+        <div class="wp-job-goal">${escapeHtml(j.milestoneText)}</div>
+        <div class="wp-job-status s-${escapeHtml(j.status)}">${escapeHtml(jobStatusText(j))}</div>
+        ${action}
+      </div>`;
+    }).join('');
+    list.querySelectorAll<HTMLElement>('[data-accept]').forEach((b) => b.addEventListener('click', () => void jobAction(b.dataset.accept ?? '', 'accept')));
+    list.querySelectorAll<HTMLElement>('[data-cancel]').forEach((b) => b.addEventListener('click', () => void jobAction(b.dataset.cancel ?? '', 'cancel')));
+  };
+
+  const jobAction = async (jobId: string, kind: 'accept' | 'cancel'): Promise<void> => {
+    if (!jobId) return;
+    try {
+      if (kind === 'accept') await api.jobAccept(jobId); else await api.jobCancel(jobId);
+      await renderJobs();
+    } catch (err: any) {
+      const msg = $$('[data-jobs-msg]');
+      msg.className = 'wp-feedback bad';
+      msg.textContent = err?.message ? `Failed: ${err.message}` : 'Action failed.';
+    }
+  };
+
+  // ── tab switching ──────────────────────────────────────────────────────────
+  const showTab = (name: string): void => {
+    el.querySelectorAll<HTMLElement>('[data-tab]').forEach((t) => {
+      const on = t.dataset.tab === name; t.classList.toggle('sel', on); t.setAttribute('aria-selected', String(on));
+    });
+    el.querySelectorAll<HTMLElement>('[data-body]').forEach((b) => { b.hidden = b.dataset.body !== name; });
+    if (name === 'hire') syncHireOnline();
+    if (name === 'jobs') void renderJobs();
+  };
+  el.querySelectorAll<HTMLElement>('[data-tab]').forEach((t) => t.addEventListener('click', () => { audio.click(); showTab(t.dataset.tab ?? 'send'); }));
+
+  renderGoalParams();
   recipientInput.focus();
   void refreshConnected();
 }
