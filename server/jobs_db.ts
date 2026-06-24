@@ -110,6 +110,14 @@ export const jobsDb: JobsDb = {
     return res.rows.map(rowToRecord);
   },
 
+  async listPendingJobs(realm: string): Promise<JobRecord[]> {
+    const res = await pool.query(
+      "SELECT * FROM job_contracts WHERE realm = $1 AND status = 'pending_deposit' ORDER BY created_at",
+      [realm],
+    );
+    return res.rows.map(rowToRecord);
+  },
+
   async listJobsForCharacter(characterId: number, limit = 25): Promise<JobRecord[]> {
     const res = await pool.query(
       `SELECT * FROM job_contracts

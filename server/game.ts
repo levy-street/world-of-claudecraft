@@ -286,6 +286,8 @@ const HEAVY_SELF_EVENTS = new Set<string>([
 // freshness floor; keeping this loop at/under that TTL means a token change shows
 // on the in-world badge within ~one cache window of it landing on chain.
 const HOLDER_TIER_REFRESH_MS = 60_000;
+// How often to sweep for funded-but-unconfirmed job deposits to recover.
+const JOB_RECONCILE_MS = 180_000;
 
 export interface ClientSession {
   ws: WebSocket;
@@ -634,6 +636,8 @@ export class GameServer {
   private lastWireSweepTick = 0;
   private interval: NodeJS.Timeout | null = null;
   private holderTierInterval: NodeJS.Timeout | null = null;
+  private jobReconcileInterval: NodeJS.Timeout | null = null;
+  private jobReconcileInFlight = false; // overlap guard for the reconcile sweep
   private holderTierRefreshing = false; // overlap guard for the refresh cycle
   // pids whose holder tier was forced via the dev /woctier command — the chain
   // refresh leaves them alone so the override sticks during testing (dev only).
@@ -706,16 +710,46 @@ export class GameServer {
     const escrowOps: JobEscrowOps = {
       buildOpenTransaction: jobEscrow.buildOpenTransaction,
       verifyDeposit: jobEscrow.verifyDeposit,
+      verifyJobState: jobEscrow.verifyJobState,
       releaseJob: jobEscrow.releaseJob,
       refundJob: jobEscrow.refundJob,
       jobAccountExists: jobEscrow.jobAccountExists,
     };
-    this.jobs = new JobContractService(jobsDb, escrowOps, this, REALM);
+    this.jobs = new JobContractService(jobsDb, escrowOps, this, REALM, (job, outcome) => this.notifyJobParties(job, outcome));
   }
 
-  /** Reload funded, non-terminal job contracts at boot (resumes the watcher). */
+  /**
+   * Reload funded, non-terminal job contracts at boot (resumes the watcher) and
+   * recover any deposit that funded on-chain but was never confirmed (so its
+   * locked reward can't be stranded).
+   */
   async loadJobs(): Promise<void> {
     await this.jobs.loadActive();
+    await this.jobs.reconcilePending();
+  }
+
+  // Tell the (online) payer + helper a job settled. Bypasses routeEvents and
+  // sends a system log line straight to each party's socket.
+  private notifyJobParties(job: JobRecord, outcome: 'released' | 'refunded'): void {
+    const { decimals } = jobEscrow.escrowCurrencyInfo(job.currency as jobEscrow.EscrowCurrency);
+    const amount = (Number(job.amountBase) / 10 ** decimals).toLocaleString('en-US', { maximumFractionDigits: 4 });
+    const cur = job.currency;
+    if (outcome === 'released') {
+      this.notifyCharacter(job.payer.characterId, `Job complete — ${amount} ${cur} paid to ${job.helper.name}.`, '#7CFC9A');
+      this.notifyCharacter(job.helper.characterId, `You earned ${amount} ${cur} from ${job.payer.name} for your help!`, '#7CFC9A');
+    } else {
+      const why = job.progress.reason === 'expired' ? 'expired'
+        : job.progress.reason === 'subject_died' ? 'failed (the client fell)'
+        : job.progress.reason === 'cancelled' ? 'was cancelled'
+        : 'ended';
+      this.notifyCharacter(job.payer.characterId, `Job ${why} — ${amount} ${cur} refunded to you.`, '#f0c060');
+      this.notifyCharacter(job.helper.characterId, `${job.payer.name}'s job ${why} — no payout.`, '#f0c060');
+    }
+  }
+
+  private notifyCharacter(characterId: number, text: string, color: string): void {
+    const session = this.sessionByCharacterId(characterId);
+    if (session) this.send(session, { t: 'events', list: [{ type: 'log', text, color }] });
   }
 
   // JobObservationSource: build the milestone observation for a job's subject
@@ -952,11 +986,25 @@ export class GameServer {
     this.holderTierInterval = setInterval(() => {
       void this.refreshAllHolderTiers();
     }, HOLDER_TIER_REFRESH_MS);
+    // Sweep for funded-but-unconfirmed job deposits (payer signed then dropped
+    // off before /confirm), so their locked reward is opened + can settle. Off
+    // the tick: it makes RPC calls per pending job.
+    this.jobReconcileInterval = setInterval(() => {
+      if (this.jobReconcileInFlight) return;
+      this.jobReconcileInFlight = true;
+      void this.jobs
+        .reconcilePending()
+        .catch((err) => console.error('job reconcile failed:', err))
+        .finally(() => {
+          this.jobReconcileInFlight = false;
+        });
+    }, JOB_RECONCILE_MS);
   }
 
   stop(): void {
     if (this.interval) clearInterval(this.interval);
     if (this.holderTierInterval) clearInterval(this.holderTierInterval);
+    if (this.jobReconcileInterval) clearInterval(this.jobReconcileInterval);
   }
 
   // Update one player's holder-tier flair from their linked wallet's $WOC

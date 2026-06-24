@@ -49,12 +49,14 @@ export interface JobsDb {
   getJob(jobId: bigint): Promise<JobRecord | null>;
   updateJob(jobId: bigint, patch: Partial<Pick<JobRecord, 'status' | 'progress' | 'depositSig' | 'settleSig'>>): Promise<void>;
   listActiveJobs(realm: string): Promise<JobRecord[]>;
+  listPendingJobs(realm: string): Promise<JobRecord[]>;
   listJobsForCharacter(characterId: number, limit?: number): Promise<JobRecord[]>;
 }
 
 export interface JobEscrowOps {
   buildOpenTransaction(args: { jobId: bigint; payer: string; helper: string; mint: string; amountBase: bigint }): Promise<{ txBase64: string; jobPda: string; vault: string }>;
   verifyDeposit(args: { signature: string; jobId: bigint; payer: string; helper: string; mint: string; amountBase: bigint }): Promise<boolean>;
+  verifyJobState(jobId: bigint, terms: { payer: string; helper: string; mint: string; amountBase: bigint }): Promise<boolean>;
   releaseJob(args: { jobId: bigint; payer: string; helper: string; mint: string }): Promise<string>;
   refundJob(args: { jobId: bigint; payer: string; mint: string }): Promise<string>;
   jobAccountExists(jobId: bigint): Promise<boolean>;
@@ -64,6 +66,10 @@ export interface JobEscrowOps {
 export interface JobObservationSource {
   observe(job: JobRecord): JobObservation | null;
 }
+
+/** Notified when a job reaches a terminal on-chain state, so the host can tell
+ *  the (online) players. Fired after the DB is updated. */
+export type JobSettledHook = (job: JobRecord, outcome: 'released' | 'refunded') => void;
 
 export interface CreateJobInput {
   payer: JobParty;
@@ -88,6 +94,7 @@ export class JobContractService {
     private readonly escrow: JobEscrowOps,
     private readonly source: JobObservationSource,
     private readonly realm: string,
+    private readonly onSettled?: JobSettledHook,
   ) {}
 
   /** Reload funded, non-terminal jobs at boot so the evaluator + recovery resume. */
@@ -95,6 +102,28 @@ export class JobContractService {
     this.activeJobs.clear();
     for (const job of await this.db.listActiveJobs(this.realm)) {
       this.activeJobs.set(key(job.jobId), job);
+    }
+  }
+
+  /**
+   * Recover jobs that funded on-chain but were never confirmed (the payer signed
+   * the deposit, then closed the tab before /confirm landed). Their reward is
+   * locked in the vault, so we must open them — otherwise the funds are stranded
+   * (only the settler can move them, and a never-tracked job never settles). Runs
+   * at boot and on an interval. Only opens a job whose on-chain terms match the
+   * record (verifyJobState rejects a mismatched settler), so it can't be tricked.
+   */
+  async reconcilePending(): Promise<void> {
+    for (const job of await this.db.listPendingJobs(this.realm)) {
+      const k = key(job.jobId);
+      if (this.activeJobs.has(k) || this.settling.has(k)) continue;
+      const funded = await this.escrow.verifyJobState(job.jobId, {
+        payer: job.payer.wallet, helper: job.helper.wallet, mint: job.mint, amountBase: job.amountBase,
+      });
+      if (!funded) continue; // deposit hasn't landed (or terms mismatch) — leave it pending
+      job.status = 'open';
+      await this.db.updateJob(job.jobId, { status: 'open' });
+      this.activeJobs.set(k, job);
     }
   }
 
@@ -271,6 +300,7 @@ export class JobContractService {
       job.status = terminal;
       job.settleSig = signature;
       await this.db.updateJob(job.jobId, { status: terminal, progress: job.progress, settleSig: signature });
+      this.onSettled?.(job, terminal);
     } catch (err) {
       console.error(`[jobs] ${kind} failed for job ${job.jobId}; will retry:`, err);
       this.activeJobs.set(k, job); // retry next tick

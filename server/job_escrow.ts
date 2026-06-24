@@ -174,27 +174,35 @@ export async function verifyDeposit(args: { signature: string; jobId: bigint; pa
   if (!tx || !txSucceeded(tx)) return false;
   if (usesToken2022(tx, args.mint)) return false;
   if (ownerSpentBase(tx, args.payer, args.mint) < args.amountBase) return false;
+  return verifyJobState(args.jobId, args);
+}
 
-  const job = jobPda(args.jobId);
+export interface JobTerms { payer: string; helper: string; mint: string; amountBase: bigint }
+
+/**
+ * Confirm the on-chain escrow for `jobId` exists under our program, was opened on
+ * EXACTLY the server's terms, and the vault holds the reward — without needing a
+ * deposit tx signature. Asserting the recorded settler (== ours), payer, helper,
+ * mint, and amount is what stops a client from crafting their own open() at the
+ * server-assigned PDA with a different settler (which would leave the helper
+ * unpayable). Used by both confirmDeposit and the reconcile sweep.
+ */
+export async function verifyJobState(jobId: bigint, terms: JobTerms): Promise<boolean> {
+  const job = jobPda(jobId);
   const info = await connection().getAccountInfo(job, 'finalized');
   if (!info || !info.owner.equals(PROGRAM_ID)) return false;
 
-  // Assert the on-chain Job's terms are exactly the ones the server intended.
-  // Without this, a client could ignore the server-built tx and craft their own
-  // open() at the same (server-assigned) PDA with a different settler/helper —
-  // the server could then never release/refund, stranding/griefing the helper.
-  // Binding to the recorded settler (= ours), helper, mint, and amount closes that.
   const decoded = decodeJobAccount(info.data);
   if (!decoded) return false;
   if (!decoded.settler.equals(settlerKeypair().publicKey)) return false;
-  if (!decoded.payer.equals(new PublicKey(args.payer))) return false;
-  if (!decoded.helper.equals(new PublicKey(args.helper))) return false;
-  if (!decoded.mint.equals(new PublicKey(args.mint))) return false;
-  if (decoded.amount !== args.amountBase) return false;
+  if (!decoded.payer.equals(new PublicKey(terms.payer))) return false;
+  if (!decoded.helper.equals(new PublicKey(terms.helper))) return false;
+  if (!decoded.mint.equals(new PublicKey(terms.mint))) return false;
+  if (decoded.amount !== terms.amountBase) return false;
 
-  const vault = vaultFor(job, new PublicKey(args.mint));
+  const vault = vaultFor(job, new PublicKey(terms.mint));
   const bal = await connection().getTokenAccountBalance(vault, 'finalized').catch(() => null);
-  return !!bal && BigInt(bal.value.amount) >= args.amountBase;
+  return !!bal && BigInt(bal.value.amount) >= terms.amountBase;
 }
 
 // Decode the Anchor `Job` account: 8-byte discriminator, then job_id u64, payer,

@@ -20,6 +20,9 @@ class FakeDb implements JobsDb {
   async listActiveJobs(realm: string) {
     return [...this.jobs.values()].filter((j) => j.realm === realm && (j.status === 'open' || j.status === 'active'));
   }
+  async listPendingJobs(realm: string) {
+    return [...this.jobs.values()].filter((j) => j.realm === realm && j.status === 'pending_deposit');
+  }
   async listJobsForCharacter(cid: number) {
     return [...this.jobs.values()].filter((j) => j.payer.characterId === cid || j.helper.characterId === cid);
   }
@@ -29,12 +32,14 @@ class FakeEscrow implements JobEscrowOps {
   released: bigint[] = [];
   refunded: bigint[] = [];
   verifyResult = true;
+  jobStateOk = true;      // does the on-chain Job exist on our exact terms?
   exists = true;          // does the on-chain job account still exist?
   failReleaseTimes = 0;   // simulate transient RPC failures
   async buildOpenTransaction(a: { jobId: bigint }) {
     return { txBase64: `TX_${a.jobId}`, jobPda: `PDA_${a.jobId}`, vault: `VAULT_${a.jobId}` };
   }
   async verifyDeposit() { return this.verifyResult; }
+  async verifyJobState() { return this.jobStateOk; }
   async releaseJob(a: { jobId: bigint }) {
     if (this.failReleaseTimes > 0) { this.failReleaseTimes--; throw new Error('rpc down'); }
     this.released.push(a.jobId);
@@ -225,5 +230,42 @@ describe('settlement robustness', () => {
     await svc2.loadActive();
     expect(svc2.trackedCount()).toBe(1);
     void jobId;
+  });
+});
+
+describe('reconcile abandoned deposits', () => {
+  it('opens a funded-but-unconfirmed deposit so its escrow can settle (no stranding)', async () => {
+    const { svc, db, escrow } = setup();
+    const { jobId } = await svc.createQuote(input()); // pending_deposit, payer dropped before /confirm
+    escrow.jobStateOk = true; // the reward DID land on-chain on our terms
+    await svc.reconcilePending();
+    expect((await db.getJob(jobId))!.status).toBe('open');
+    expect(svc.trackedCount()).toBe(1);
+  });
+
+  it('leaves a job pending when the deposit has not landed (or terms mismatch)', async () => {
+    const { svc, db, escrow } = setup();
+    const { jobId } = await svc.createQuote(input());
+    escrow.jobStateOk = false;
+    await svc.reconcilePending();
+    expect((await db.getJob(jobId))!.status).toBe('pending_deposit');
+    expect(svc.trackedCount()).toBe(0);
+  });
+});
+
+describe('settled hook', () => {
+  it('fires once with the outcome when a job releases', async () => {
+    const db = new FakeDb();
+    const escrow = new FakeEscrow();
+    const source = new FakeSource();
+    const settled: Array<{ id: bigint; outcome: string }> = [];
+    const svc = new JobContractService(db, escrow, source, 'TestRealm', (job, outcome) => settled.push({ id: job.jobId, outcome }));
+    const { jobId } = await svc.createQuote(input());
+    await svc.confirmDeposit(jobId, 'SIG', payer.accountId);
+    await svc.accept(jobId, helper.accountId);
+    source.obs = obs({ subjectLevel: 10 });
+    svc.evaluateTick(1000);
+    await flush();
+    expect(settled).toEqual([{ id: jobId, outcome: 'released' }]);
   });
 });
