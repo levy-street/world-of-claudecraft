@@ -17,6 +17,7 @@ import {
   pruneWalletChallenges,
   linkWalletToAccount,
   walletForAccount,
+  walletForCharacterName,
   unlinkWallet,
 } from './db';
 
@@ -110,4 +111,23 @@ export async function handleWalletUnlink(
 ): Promise<void> {
   await unlinkWallet(accountId);
   return json(res, 200, { unlinked: true });
+}
+
+// GET /api/wallet/resolve?name=<player>  → { name, pubkey } | 404
+// Resolves an in-game player name to the verified Solana wallet linked to that
+// player's account, so another player can send them tokens directly. Only
+// returns an address when the named player has a *verified* (signed-link)
+// wallet — the address is a public key and is required to build the
+// non-custodial transfer client-side. Auth-gated (any logged-in player may
+// look up a recipient), realm-scoped, exact name match.
+export async function handleWalletResolve(
+  _req: http.IncomingMessage,
+  res: http.ServerResponse,
+  name: string,
+): Promise<void> {
+  const trimmed = name.trim();
+  if (!trimmed) return json(res, 400, { error: 'a player name is required' });
+  const row = await walletForCharacterName(trimmed);
+  if (!row) return json(res, 404, { error: 'no player by that name has a verified wallet' });
+  return json(res, 200, { name: row.name, pubkey: row.pubkey });
 }

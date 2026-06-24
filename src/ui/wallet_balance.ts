@@ -126,3 +126,19 @@ export function shouldDisconnectUnverifiedWallet(opts: {
   if (connectedAddress === linkedPubkey) return false;
   return true;
 }
+
+// Open-panel bridge. Clicking the bag's balance must open the wallet/send panel,
+// but that panel (the wallet + @solana/web3.js + the REST Api) lives in main.ts,
+// and src/ui must not import src/net. So main.ts registers the opener here and the
+// HUD calls requestWalletPanel(), mirroring the onWalletUiChange seam above.
+let panelOpener: (() => void) | null = null;
+
+/** main.ts registers the wallet-panel opener (it owns the wallet + Api glue). */
+export function onWalletPanelRequest(cb: () => void): void {
+  panelOpener = cb;
+}
+
+/** The bag's balance chip calls this to open the wallet/send panel. */
+export function requestWalletPanel(): void {
+  panelOpener?.();
+}

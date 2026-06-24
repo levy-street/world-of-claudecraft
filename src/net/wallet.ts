@@ -5,11 +5,11 @@
 // Lives in src/net/ and is never imported by src/sim/: the deterministic core
 // stays free of network/wallet dependencies.
 //
-// Wallet connection is Wallet Standard; on-chain burns/transfers (payWocBurn,
-// signAndSubmitServerTx) build the transaction with @solana/web3.js and have the
-// connected wallet sign it via the SolanaSignTransaction feature, then submit
-// through our own RPC so $WOC lands on mainnet regardless of the wallet's
-// selected network.
+// Wallet connection is Wallet Standard; on-chain transfers/burns (sendTokens,
+// payWocBurn, signAndSubmitServerTx) build the transaction with @solana/web3.js
+// and have the connected wallet sign it via the SolanaSignTransaction feature,
+// then submit through our own RPC so $WOC lands on mainnet regardless of the
+// wallet's selected network.
 import './wallet-polyfill';
 import { getWallets, type Wallets } from '@wallet-standard/app';
 import type { Wallet, WalletAccount, WalletIcon } from '@wallet-standard/base';
@@ -31,7 +31,9 @@ import {
 } from '@solana/wallet-standard-features';
 import {
   Connection,
+  LAMPORTS_PER_SOL,
   PublicKey,
+  SystemProgram,
   Transaction,
   TransactionInstruction,
 } from '@solana/web3.js';
@@ -43,6 +45,7 @@ import {
 } from '@solana/spl-token';
 import { Buffer } from 'buffer';
 import bs58 from 'bs58';
+import { parseAmountToBase } from './wallet_amount';
 
 export interface WalletState {
   address: string | null;
@@ -406,10 +409,16 @@ export async function fetchWocBalance(owner: string, fresh = false): Promise<num
   }
 }
 
-// ── On-chain $WOC payments (burn + server-built tx) ──────────────────────────
-// The connected wallet only SIGNS (Wallet Standard SolanaSignTransaction); we
-// submit the signed transaction to the $WOC mainnet RPC ourselves so the burn
-// lands there regardless of which network the wallet UI happens to be set to.
+// ── On-chain transfers + burns (player economy) ──────────────────────────────
+// The connected wallet only SIGNS; we submit the signed transaction to the $WOC
+// mainnet RPC ourselves so the transfer/burn lands there regardless of which
+// network the wallet UI happens to be set to. The $WOC SPL mint and the RPC
+// endpoint are overridable via env; defaults are the published mainnet values.
+const WOC_MINT = String(import.meta.env.VITE_WOC_MINT ?? '3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth').trim();
+const USDC_MINT = String(
+  import.meta.env.VITE_USDC_MINT ?? 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+).trim();
+const WOC_DECIMALS = Number(import.meta.env.VITE_WOC_DECIMALS ?? 6) || 6;
 const SOLANA_RPC = String(
   import.meta.env.VITE_SOLANA_RPC_URL ?? 'https://api.mainnet-beta.solana.com',
 ).trim();
@@ -457,6 +466,99 @@ async function signTransactionBytes(tx: Transaction): Promise<Uint8Array> {
   return result.signedTransaction;
 }
 
+export type TransferCurrency = 'WOC' | 'SOL' | 'USDC';
+
+interface CurrencyInfo {
+  label: string;
+  decimals: number;
+  mint: string | null;
+}
+// `mint: null` marks the native SOL path (System transfer); the others are SPL.
+const CURRENCIES: Record<TransferCurrency, CurrencyInfo> = {
+  WOC: { label: '$WOC', decimals: WOC_DECIMALS, mint: WOC_MINT },
+  SOL: { label: 'SOL', decimals: 9, mint: null },
+  USDC: { label: 'USDC', decimals: 6, mint: USDC_MINT },
+};
+
+/** Display label + decimal precision for a sendable currency (for the UI). */
+export function currencyInfo(currency: TransferCurrency): { label: string; decimals: number } {
+  const c = CURRENCIES[currency];
+  return { label: c.label, decimals: c.decimals };
+}
+
+/**
+ * Read the connected wallet's balance for a sendable currency (uiAmount), or
+ * null on RPC failure so the UI can omit it. SOL is the native lamport balance;
+ * SPL currencies sum across the owner's token accounts for the mint.
+ */
+export async function fetchBalance(currency: TransferCurrency, owner: string): Promise<number | null> {
+  try {
+    const ownerKey = new PublicKey(owner);
+    const info = CURRENCIES[currency];
+    if (!info.mint) {
+      const lamports = await getConnection().getBalance(ownerKey, 'confirmed');
+      return lamports / LAMPORTS_PER_SOL;
+    }
+    const res = await getConnection().getParsedTokenAccountsByOwner(ownerKey, {
+      mint: new PublicKey(info.mint),
+    });
+    let total = 0;
+    for (const { account } of res.value) {
+      const amount = account.data.parsed?.info?.tokenAmount?.uiAmount;
+      if (typeof amount === 'number') total += amount;
+    }
+    return total;
+  } catch (err) {
+    console.error(`[wallet] ${currency} balance read failed`, err);
+    return null;
+  }
+}
+
+/**
+ * Send `amount` (human units) of `currency` from the connected wallet to
+ * `recipient`, directly on-chain and non-custodially. SOL is a System transfer;
+ * SPL currencies create the recipient's associated token account if it doesn't
+ * exist yet (the sender funds the rent) and use transferChecked. The wallet only
+ * signs; we submit to the $WOC mainnet RPC. Returns the confirmed signature.
+ */
+export async function sendTokens(
+  currency: TransferCurrency,
+  recipient: string,
+  amount: string,
+): Promise<string> {
+  const address = currentWallet().address;
+  if (!address) throw new Error('connect a wallet first');
+
+  const owner = new PublicKey(address);
+  const to = new PublicKey(recipient);
+  const info = CURRENCIES[currency];
+  const base = parseAmountToBase(amount, info.decimals);
+
+  const ixs: TransactionInstruction[] = [];
+  if (!info.mint) {
+    ixs.push(SystemProgram.transfer({ fromPubkey: owner, toPubkey: to, lamports: base }));
+  } else {
+    const mint = new PublicKey(info.mint);
+    const ownerAta = getAssociatedTokenAddressSync(mint, owner);
+    const toAta = getAssociatedTokenAddressSync(mint, to);
+    // Create the recipient's token account if it doesn't exist (no-op when it
+    // does); the sender funds the rent. Then the checked transfer.
+    ixs.push(createAssociatedTokenAccountIdempotentInstruction(owner, toAta, to, mint));
+    ixs.push(createTransferCheckedInstruction(ownerAta, mint, toAta, owner, base, info.decimals));
+  }
+
+  const conn = getConnection();
+  const { blockhash, lastValidBlockHeight } = await conn.getLatestBlockhash('finalized');
+  const tx = new Transaction({ feePayer: owner, blockhash, lastValidBlockHeight });
+  tx.add(...ixs);
+
+  const signed = await signTransactionBytes(tx);
+  const signature = await conn.sendRawTransaction(signed);
+  await conn.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, 'confirmed');
+  return signature;
+}
+
+// ── $WOC payments (burn) ─────────────────────────────────────────────────────
 // What the server's /api/identity/quote hands back. Amounts are base-unit
 // decimal strings (they can exceed Number.MAX_SAFE_INTEGER), parsed to BigInt
 // here. `memo` MUST be included verbatim in the tx so the server can match it.
@@ -527,9 +629,8 @@ export async function payWocBurn(quote: WocBurnQuote): Promise<string> {
 /**
  * Sign and submit a server-built, already-partial-signed transaction (base64),
  * used for the atomic burn + SNS subdomain mint where the execution wallet has
- * pre-signed the createSubdomain/transferSubdomain instructions and the player
- * adds the remaining signature (fee payer + burn authority). Returns the
- * confirmed signature for /api/subdomain/confirm.
+ * pre-signed some instructions and the player adds the remaining signature.
+ * Returns the confirmed signature for /api/subdomain/confirm.
  */
 export async function signAndSubmitServerTx(txBase64: string): Promise<string> {
   const tx = Transaction.from(Buffer.from(txBase64, 'base64'));

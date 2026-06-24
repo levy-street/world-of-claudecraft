@@ -66,6 +66,7 @@ import {
   NATIVE_APP,
   type ReleaseEntry,
 } from './net/online';
+import { parseAmountToBase } from './net/wallet_amount';
 // The wallet module is loaded lazily via dynamic import() in the wallet
 // controller below, so it stays out of the main entry chunk and only loads when
 // the feature is enabled + used.
@@ -144,6 +145,7 @@ import {
 import { UiEffectsApplier } from './ui/ui_effects_applier';
 import { hydrateIcons } from './ui/ui_icons';
 import {
+  onWalletPanelRequest,
   resolveWocBalanceUpdate,
   setWalletDisplayAvailable,
   setWalletUiEnabled,
@@ -4597,6 +4599,11 @@ let walletVerifyTimeout: number | null = null;
 let walletVerifyModalUnsubscribe: (() => void) | null = null;
 let walletFlowStatus: 'connect' | 'sign' | 'verify' | null = null;
 let walletHiddenNoticeTimeout: number | null = null;
+// The wallet/send panel (opened by clicking the bag balance). Held at module
+// scope so it can be toggled and so the global wallet-change subscription can
+// refresh it live while it's open.
+let walletPanelEl: HTMLElement | null = null;
+let walletPanelOnWalletChange: (() => void) | null = null;
 
 // Feature flag: Wallet Standard support needs no project id. Keep an escape
 // hatch for deploys that want to hide the wallet UI entirely. Native app builds
@@ -5346,6 +5353,228 @@ async function switchWallet(): Promise<void> {
   await startWalletVerifyFlow(true);
 }
 
+// ── Wallet / send-tokens panel (opened from the bag balance) ────────────────
+// Send $WOC / SOL / USDC directly to another player. You type a player name; it
+// resolves (debounced) against the server, which returns the recipient's wallet
+// ONLY if that player has a verified linked wallet. The transfer is built,
+// signed, and submitted client-side (non-custodial) by src/net/wallet.
+
+type TransferCurrency = 'WOC' | 'SOL' | 'USDC';
+const WALLET_CURRENCIES: { key: TransferCurrency; label: string }[] = [
+  { key: 'WOC', label: '$WOC' },
+  { key: 'SOL', label: 'SOL' },
+  { key: 'USDC', label: 'USDC' },
+];
+// Max precision per currency (matches the on-chain decimals) for the Max button,
+// and the friendlier digit count for displaying a balance.
+const CURRENCY_DECIMALS: Record<TransferCurrency, number> = { WOC: 6, SOL: 9, USDC: 6 };
+const BALANCE_DISPLAY_DIGITS: Record<TransferCurrency, number> = { WOC: 2, SOL: 6, USDC: 2 };
+
+function closeWalletPanel(): void {
+  walletPanelEl?.remove();
+  walletPanelEl = null;
+  walletPanelOnWalletChange = null;
+}
+
+function openWalletPanel(): void {
+  if (!WALLET_ENABLED) return;
+  if (walletPanelEl) { closeWalletPanel(); return; } // toggle off if already open
+
+  let currency: TransferCurrency = 'WOC';
+  let connectedAddress: string | null = null;
+  let resolved: { name: string; pubkey: string } | null = null;
+  let resolveSeq = 0;
+  let debounceTimer: number | undefined;
+  let sending = false;
+  // undefined = not yet loaded, null = RPC failed, number = uiAmount
+  const balances: Partial<Record<TransferCurrency, number | null>> = {};
+
+  const el = document.createElement('div');
+  el.id = 'wallet-panel';
+  el.className = 'window panel';
+  el.style.display = 'block';
+  el.innerHTML = `
+    <div class="panel-title"><span>Wallet</span><button type="button" class="x-btn" data-close aria-label="Close">✕</button></div>
+    <div class="wp-status"><span class="wp-dot" aria-hidden="true"></span><span class="wp-status-text">Wallet not connected</span><button type="button" class="btn wp-connect" data-connect>Connect</button></div>
+    <div class="wp-section-label">Send to a player</div>
+    <div class="wp-row"><label>Currency</label><div class="wp-cur">${
+      WALLET_CURRENCIES.map((c) => `<button type="button" data-cur="${c.key}"${c.key === currency ? ' class="sel"' : ''} aria-pressed="${c.key === currency}">${escapeHtml(c.label)}</button>`).join('')
+    }</div></div>
+    <div class="wp-row"><label for="wp-recipient">Player name</label><input id="wp-recipient" class="cd-input" type="text" autocomplete="off" spellcheck="false" placeholder="Who are you sending to?"><div class="wp-resolve" data-resolve aria-live="polite"></div></div>
+    <div class="wp-row"><label for="wp-amount">Amount</label><div class="wp-amount"><input id="wp-amount" class="cd-input" type="text" inputmode="decimal" autocomplete="off" placeholder="0.0"><button type="button" class="btn wp-max" data-max>Max</button></div><div class="wp-bal" data-bal>Balance: —</div></div>
+    <div class="wp-note">Sent directly wallet-to-wallet on Solana. Non-custodial — the game never holds your funds. Network fees apply.</div>
+    <button type="button" class="btn wp-send" data-send disabled>Send</button>
+    <div class="wp-feedback" data-feedback aria-live="polite"></div>`;
+  document.body.appendChild(el);
+  walletPanelEl = el;
+
+  const $$ = <T extends HTMLElement = HTMLElement>(sel: string): T => el.querySelector(sel) as T;
+  const recipientInput = $$<HTMLInputElement>('#wp-recipient');
+  const amountInput = $$<HTMLInputElement>('#wp-amount');
+  const resolveBox = $$('[data-resolve]');
+  const feedbackBox = $$('[data-feedback]');
+  const sendBtn = $$<HTMLButtonElement>('[data-send]');
+
+  // A typed amount is valid when it parses to a positive base-unit value at the
+  // currency's precision (same check the send path uses), so the button can't
+  // arm on junk like "1e5" or over-precise input.
+  const amountIsValid = (): boolean => {
+    const amt = amountInput.value.trim();
+    if (!amt) return false;
+    try { parseAmountToBase(amt, CURRENCY_DECIMALS[currency]); return true; } catch { return false; }
+  };
+
+  // Whether the typed amount exceeds the (known) balance. Unknown balance ⇒ not
+  // blocked here; the on-chain transfer is the final authority either way.
+  const overBalance = (): boolean => {
+    const b = balances[currency];
+    return typeof b === 'number' && amountIsValid() && Number(amountInput.value.trim()) > b;
+  };
+
+  const updateSendButton = (): void => {
+    sendBtn.disabled = sending || !connectedAddress || !resolved || !amountIsValid() || overBalance();
+    sendBtn.textContent = sending ? 'Sending…' : 'Send';
+  };
+
+  const updateBalanceDisplay = (): void => {
+    const box = $$('[data-bal]');
+    const label = WALLET_CURRENCIES.find((c) => c.key === currency)!.label;
+    if (!connectedAddress) { box.textContent = 'Connect a wallet to see your balance.'; box.classList.remove('over'); return; }
+    const b = balances[currency];
+    const over = overBalance();
+    box.classList.toggle('over', over);
+    box.innerHTML = b === undefined ? 'Balance: …'
+      : b === null ? 'Balance: unavailable'
+      : `Balance: <b>${escapeHtml(formatNumber(b, { maximumFractionDigits: BALANCE_DISPLAY_DIGITS[currency] }))} ${escapeHtml(label)}</b>${over ? ' — exceeds balance' : ''}`;
+  };
+
+  const loadBalances = async (address: string): Promise<void> => {
+    const wallet = await loadWallet();
+    for (const c of WALLET_CURRENCIES) {
+      void wallet.fetchBalance(c.key, address).then((b) => {
+        if (walletPanelEl !== el || connectedAddress !== address) return; // stale (closed/switched)
+        balances[c.key] = b;
+        if (c.key === currency) updateBalanceDisplay();
+      });
+    }
+  };
+
+  const setStatus = (html: string, connected: boolean): void => {
+    el.classList.toggle('is-connected', connected);
+    $$('.wp-status-text').innerHTML = html;
+    $$<HTMLElement>('[data-connect]').hidden = connected;
+  };
+
+  const refreshConnected = async (): Promise<void> => {
+    const wallet = await loadWallet();
+    wallet.initWallet();
+    const { address, isConnected } = wallet.currentWallet();
+    connectedAddress = isConnected && address ? address : null;
+    if (connectedAddress) {
+      const linked = linkedWalletPubkey === connectedAddress ? ' · <span style="color:#4ade80">linked ✓</span>' : '';
+      setStatus(`Connected <code>${escapeHtml(shortenAddress(connectedAddress))}</code>${linked}`, true);
+      void loadBalances(connectedAddress);
+    } else {
+      setStatus('Wallet not connected', false);
+    }
+    updateBalanceDisplay();
+    updateSendButton();
+  };
+  // Live-refresh while open when the wallet connects/disconnects/switches.
+  walletPanelOnWalletChange = () => { void refreshConnected(); };
+
+  const doResolve = (raw: string): void => {
+    const q = raw.trim();
+    resolved = null;
+    updateSendButton();
+    if (!q) { resolveBox.className = 'wp-resolve'; resolveBox.textContent = ''; return; }
+    if (!api.token) { resolveBox.className = 'wp-resolve bad'; resolveBox.textContent = 'Log in and enter a realm to send to players.'; return; }
+    resolveBox.className = 'wp-resolve pending';
+    resolveBox.textContent = 'Looking up player…';
+    const seq = ++resolveSeq;
+    void api.resolveRecipient(q).then((r) => {
+      if (walletPanelEl !== el || seq !== resolveSeq) return; // stale response
+      if (r) {
+        resolved = r;
+        const self = connectedAddress && r.pubkey === connectedAddress ? ' (this is your own wallet)' : '';
+        resolveBox.className = 'wp-resolve ok';
+        resolveBox.innerHTML = `✓ ${escapeHtml(r.name)} · <code>${escapeHtml(shortenAddress(r.pubkey))}</code>${escapeHtml(self)}`;
+      } else {
+        resolveBox.className = 'wp-resolve bad';
+        resolveBox.textContent = 'No player by that name has a verified wallet.';
+      }
+      updateSendButton();
+    });
+  };
+
+  const setMax = (): void => {
+    const b = balances[currency];
+    if (typeof b !== 'number' || b <= 0) return;
+    // Leave a little SOL for the network fee (SPL fees are paid in SOL, not the token).
+    const usable = currency === 'SOL' ? Math.max(0, b - 0.001) : b;
+    amountInput.value = usable.toFixed(CURRENCY_DECIMALS[currency]).replace(/\.?0+$/, '') || '0';
+    updateBalanceDisplay();
+    updateSendButton();
+  };
+
+  const doSend = async (): Promise<void> => {
+    if (sending || !connectedAddress || !resolved) return;
+    const amount = amountInput.value.trim();
+    sending = true;
+    updateSendButton();
+    feedbackBox.className = 'wp-feedback';
+    feedbackBox.textContent = 'Approve the transfer in your wallet…';
+    try {
+      const wallet = await loadWallet();
+      const signature = await wallet.sendTokens(currency, resolved.pubkey, amount);
+      const label = WALLET_CURRENCIES.find((c) => c.key === currency)!.label;
+      feedbackBox.className = 'wp-feedback ok';
+      feedbackBox.innerHTML = `Sent ${escapeHtml(amount)} ${escapeHtml(label)} to ${escapeHtml(resolved.name)}. `
+        + `<a href="https://solscan.io/tx/${encodeURIComponent(signature)}" target="_blank" rel="noopener noreferrer">View transaction ↗</a>`;
+      amountInput.value = '';
+      if (connectedAddress) { void refreshWocBalance(connectedAddress); void loadBalances(connectedAddress); }
+    } catch (err: any) {
+      feedbackBox.className = 'wp-feedback bad';
+      feedbackBox.textContent = err?.message ? `Send failed: ${err.message}` : 'Send failed.';
+    } finally {
+      sending = false;
+      updateSendButton();
+    }
+  };
+
+  // Wire events
+  $$('[data-close]').addEventListener('click', () => { audio.click(); closeWalletPanel(); });
+  $$('[data-connect]').addEventListener('click', () => {
+    void (async () => {
+      const wallet = await loadWallet();
+      await wallet.openWalletModal();
+      await refreshConnected();
+    })();
+  });
+  el.querySelectorAll<HTMLElement>('[data-cur]').forEach((b) => b.addEventListener('click', () => {
+    currency = (b.dataset.cur as TransferCurrency) ?? 'WOC';
+    el.querySelectorAll<HTMLElement>('[data-cur]').forEach((x) => {
+      const on = x === b;
+      x.classList.toggle('sel', on);
+      x.setAttribute('aria-pressed', String(on));
+    });
+    updateBalanceDisplay();
+    updateSendButton();
+  }));
+  recipientInput.addEventListener('input', () => {
+    if (debounceTimer !== undefined) window.clearTimeout(debounceTimer);
+    const value = recipientInput.value;
+    debounceTimer = window.setTimeout(() => doResolve(value), 350);
+  });
+  amountInput.addEventListener('input', () => { updateBalanceDisplay(); updateSendButton(); });
+  $$('[data-max]').addEventListener('click', setMax);
+  sendBtn.addEventListener('click', () => { void doSend(); });
+  el.addEventListener('keydown', (e) => { if ((e as KeyboardEvent).key === 'Escape') { e.preventDefault(); closeWalletPanel(); } });
+
+  recipientInput.focus();
+  void refreshConnected();
+}
+
 function wireWallet(): void {
   setWalletUiEnabled(WALLET_ENABLED);
   // Feature-gate: when explicitly disabled, remove the wallet row entirely and
@@ -5358,6 +5587,9 @@ function wireWallet(): void {
     return;
   }
   syncWalletCharacterScreenVisibility();
+  // The bag's balance chip opens the wallet/send panel (the bag lives in the
+  // HUD, which can't reach the wallet/Api glue, so it signals through the store).
+  onWalletPanelRequest(() => openWalletPanel());
   const btn = document.getElementById('btn-wallet');
   if (!btn) return;
   // These async actions are fire-and-forget from the click, so attach a .catch:
@@ -5388,6 +5620,7 @@ function wireWallet(): void {
         if (state.address && walletVerifyPending) void completeWalletVerifyFlow(state.address);
         else if (state.address) void disconnectUnverifiedWalletIfIdle();
         updateWalletButton();
+        walletPanelOnWalletChange?.(); // live-refresh the send panel if it's open
       });
       wallet.initWallet();
       updateWalletButton();

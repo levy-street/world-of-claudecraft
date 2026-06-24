@@ -96,6 +96,8 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   world(): IWorld;
   /** Localized $WOC on-chain balance markup for the money footer. */
   wocBalanceHtml(): string;
+  /** Open the wallet/send panel (the money footer's $WOC balance chip is a button). */
+  onWalletClick(): void;
   hideTooltip(): void;
   cancelPetFeed(): void;
   // Non-modal focus capture/return (WCAG 2.4.3). Bags rides alongside vendor / trade /
@@ -192,6 +194,9 @@ export class BagsWindow {
     const moneyRow = document.createElement('div');
     moneyRow.className = 'money';
     moneyRow.innerHTML = `${this.deps.wocBalanceHtml()}${this.deps.moneyHtml(world.copper)}`;
+    moneyRow.querySelector('[data-wallet]')?.addEventListener('click', () => {
+      this.deps.onWalletClick();
+    });
     el.appendChild(moneyRow);
     el.querySelector('[data-close]')?.addEventListener('click', () => {
       if (this.deps.vendorOpen() && document.body.classList.contains('mobile-touch')) {

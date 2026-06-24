@@ -1201,6 +1201,27 @@ export async function accountForWallet(pubkey: string): Promise<number | null> {
   return res.rows[0]?.account_id ?? null;
 }
 
+// Resolve an in-game player (by exact, realm-scoped character name) to the
+// verified Solana wallet linked to that character's account — for sending
+// $WOC / SOL / USDC directly to them. Returns null when no character by that
+// name exists on this realm, or its account has not linked a wallet. The JOIN
+// is what enforces "verified wallet only": a name with no wallet_links row
+// yields no result. Case-insensitive, like the other name lookups here.
+export async function walletForCharacterName(name: string): Promise<{ name: string; pubkey: string } | null> {
+  const term = name.trim();
+  if (!term) return null;
+  const res = await pool.query(
+    `SELECT c.name AS name, w.pubkey AS pubkey
+       FROM characters c
+       JOIN wallet_links w ON w.account_id = c.account_id
+      WHERE c.realm = $1 AND lower(c.name) = lower($2)
+      LIMIT 1`,
+    [REALM, term],
+  );
+  const row = res.rows[0];
+  return row ? { name: row.name, pubkey: row.pubkey } : null;
+}
+
 // One wallet per account (account_id PK) and one account per wallet (pubkey
 // UNIQUE). Upserts the caller's link; returns false when the wallet is already
 // owned by a different account so the handler can surface a 409.

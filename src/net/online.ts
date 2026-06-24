@@ -535,6 +535,25 @@ export class Api {
     await this.delete('/api/wallet/link', {});
   }
 
+  // Resolve an in-game player name to the verified Solana wallet linked to their
+  // account, for sending tokens directly. Returns null when the player doesn't
+  // exist or has no verified wallet (so the send UI can show "not found"). The
+  // canonical-cased name is echoed back for display.
+  async resolveRecipient(name: string): Promise<{ name: string; pubkey: string } | null> {
+    const q = name.trim();
+    if (!q) return null;
+    try {
+      const res = await fetch(`${this.base}/api/wallet/resolve?name=${encodeURIComponent(q)}`, {
+        headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return typeof data?.pubkey === 'string' ? { name: data.name ?? q, pubkey: data.pubkey } : null;
+    } catch {
+      return null;
+    }
+  }
+
   // ── $WOC paid identity actions (rename / guild rename / vanity reserve) ─────
   // Public per-action prices in human-readable $WOC, for showing the cost up front.
   async identityPrices(): Promise<{ rename_character: number; rename_guild: number; reserve_name: number }> {

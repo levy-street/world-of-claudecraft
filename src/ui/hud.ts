@@ -272,6 +272,7 @@ import { renderVendorWindow } from './vendor_window';
 import { nextVoicedYell, type VoicedYellState, voicedYellGain } from './voice_events';
 import {
   onWalletUiChange,
+  requestWalletPanel,
   verifiedWocBalance,
   walletDisplayAvailable,
   walletUiEnabled,
@@ -2618,6 +2619,7 @@ export class Hud {
     root: () => $('#bags'),
     world: () => this.sim,
     wocBalanceHtml: () => this.wocBalanceHtml(),
+    onWalletClick: () => { audio.click(); requestWalletPanel(); },
     hideTooltip: () => this.hideTooltip(),
     cancelPetFeed: () => this.cancelPetFeed(),
     // Non-trapping focus capture/return (bags is a non-modal companion of vendor /
@@ -2870,7 +2872,8 @@ export class Hud {
     return `<span class="money-inline" aria-label="${esc(formatLocalizedMoney(copper, 'long'))}">${html}</span>`;
   }
 
-  // The connected wallet's $WOC balance, shown left of the coins in the bag.
+  // The connected wallet's $WOC balance, shown left of the coins in the bag, as a
+  // button that opens the wallet/send panel (the click is wired in renderBags()).
   // Unlinked balances are a local preview; verified balances belong to the
   // account-linked wallet and may drive public holder claims elsewhere.
   private wocBalanceHtml(): string {
@@ -2884,7 +2887,7 @@ export class Hud {
     const aria = verified
       ? t('wallet.balanceAria', { balance })
       : t('wallet.balancePreviewAria', { balance });
-    return `<span class="woc-balance ${verified ? 'is-verified' : 'is-preview'}" title="${esc(title)}" aria-label="${esc(aria)}"><span class="woc-coin" aria-hidden="true"></span>${esc(balance)}</span>`;
+    return `<button type="button" class="woc-balance ${verified ? 'is-verified' : 'is-preview'}" data-wallet title="${esc(title)}" aria-label="${esc(aria)}"><span class="woc-coin" aria-hidden="true"></span>${esc(balance)}</button>`;
   }
 
   // One-line aura effect summary HTML for the buff/debuff tooltip: the pure descriptor
@@ -2903,7 +2906,6 @@ export class Hud {
       values.school = t(`hudChrome.auraEffect.school.${effect.school}` as TranslationKey);
     }
     return `<div class="tt-effect">${esc(t(effect.key as TranslationKey, values))}</div>`;
-  }
 
   attachTooltip(el: HTMLElement, html: () => string): void {
     let touchTimer: number | undefined;

@@ -151,6 +151,7 @@ import {
   handleWalletChallenge,
   handleWalletGet,
   handleWalletLink,
+  handleWalletResolve,
   handleWalletUnlink,
 } from './wallet';
 import {
@@ -1339,6 +1340,13 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
       return handleWalletGet(req, res, accountId);
+    }
+    // Resolve a player name to their verified linked wallet, for sending tokens.
+    if (req.method === 'GET' && url === '/api/wallet/resolve') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      const name = new URL(req.url ?? '/', 'http://localhost').searchParams.get('name') ?? '';
+      return handleWalletResolve(req, res, name);
     }
     // $WOC balance proxy: keeps the Solana RPC endpoint (and any key in it)
     // server-side so it never ships in the client bundle. Public (on-chain
