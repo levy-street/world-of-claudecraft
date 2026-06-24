@@ -47,6 +47,7 @@ import type { IWorldInteraction } from '../src/world_api/interaction';
 import type { IWorldInventory } from '../src/world_api/inventory';
 import type { IWorldLoot } from '../src/world_api/loot';
 import type { IWorldMarket } from '../src/world_api/market';
+import type { IWorldMounts } from '../src/world_api/mounts';
 import type { IWorldParty } from '../src/world_api/party';
 import type { IWorldPet } from '../src/world_api/pet';
 import type { IWorldProgressionXp } from '../src/world_api/progression_xp';
@@ -221,6 +222,25 @@ export const IWORLD_MEMBERS = [
   { name: 'saveLoadout', kind: 'method' },
   { name: 'switchLoadout', kind: 'method' },
   { name: 'deleteLoadout', kind: 'method' },
+  // --- $WOC holder travel mounts, courses, charters, wager races (IWorldMounts) ---
+  { name: 'mountCast', kind: 'data' },
+  { name: 'summonMount', kind: 'method' },
+  { name: 'dismissMount', kind: 'method' },
+  { name: 'courseRun', kind: 'data' },
+  { name: 'startCourse', kind: 'method' },
+  { name: 'abortCourse', kind: 'method' },
+  { name: 'mountTrialBests', kind: 'data' },
+  { name: 'mountTrialLeaderboard', kind: 'method' }, // async
+  { name: 'raceInfo', kind: 'data' },
+  { name: 'startRace', kind: 'method' },
+  { name: 'earnedMounts', kind: 'data' },
+  { name: 'mintCharter', kind: 'method' },
+  { name: 'wagerInfo', kind: 'data' },
+  { name: 'proposeWagerRace', kind: 'method' },
+  { name: 'wagerJoin', kind: 'method' },
+  { name: 'wagerDecline', kind: 'method' },
+  { name: 'wagerLeave', kind: 'method' },
+  { name: 'launchWagerRace', kind: 'method' },
 ] as const satisfies readonly IWorldMember[];
 
 const DATA_MEMBERS = IWORLD_MEMBERS.filter((m) => m.kind === 'data');
@@ -322,9 +342,9 @@ beforeAll(() => {
 
 describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => {
   it('pins total / data / method counts', () => {
-    expect(IWORLD_MEMBERS.length).toBe(145);
-    expect(DATA_MEMBERS.length).toBe(36);
-    expect(METHOD_MEMBERS.length).toBe(109);
+    expect(IWORLD_MEMBERS.length).toBe(163);
+    expect(DATA_MEMBERS.length).toBe(42);
+    expect(METHOD_MEMBERS.length).toBe(121);
   });
 
   it('has no duplicate member names', () => {
@@ -334,10 +354,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
 
   // Sorted-name `toEqual` snapshots: a dropped, renamed, or kind-flipped member reddens
   // these deliberately, forcing a reviewed edit. NOT length-only.
-  it('the full sorted member set is exactly the pinned 143', () => {
+  it('the full sorted member set is exactly the pinned 163', () => {
     expect(IWORLD_MEMBERS.map((m) => m.name).sort()).toEqual([
       'abandonPet',
       'abandonQuest',
+      'abortCourse',
       'acceptLinkedQuest',
       'acceptQuest',
       'accountCosmetics',
@@ -368,6 +389,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'convertPartyToRaid',
       'convertRaidToParty',
       'copper',
+      'courseRun',
       'deleteLoadout',
       'delveBuyShopItem',
       'delveDaily',
@@ -376,10 +398,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'delveRun',
       'delveShopOffers',
       'discardItem',
+      'dismissMount',
       'duelAccept',
       'duelDecline',
       'duelInfo',
       'duelRequest',
+      'earnedMounts',
       'enterDelve',
       'enterDungeon',
       'entities',
@@ -403,6 +427,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'interact',
       'inventory',
       'known',
+      'launchWagerRace',
       'leaderboard',
       'leaveDelve',
       'leaveDungeon',
@@ -420,6 +445,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketInfo',
       'marketList',
       'marketSearch',
+      'mintCharter',
+      'mountCast',
+      'mountTrialBests',
+      'mountTrialLeaderboard',
       'moveInput',
       'moveRaidMember',
       'partyAccept',
@@ -436,9 +465,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'playerId',
       'prestige',
       'prestigeRank',
+      'proposeWagerRace',
       'questLog',
       'questState',
       'questsDone',
+      'raceInfo',
       'raidLockouts',
       'realm',
       'releaseSpirit',
@@ -458,8 +489,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setSpec',
       'socialInfo',
       'startAutoAttack',
+      'startCourse',
+      'startRace',
       'stopAutoAttack',
       'submitLootRoll',
+      'summonMount',
       'switchLoadout',
       'tabTarget',
       'talentPoints',
@@ -480,11 +514,15 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'unlockedMilestones',
       'useItem',
       'vendorBuyback',
+      'wagerDecline',
+      'wagerInfo',
+      'wagerJoin',
+      'wagerLeave',
       'xp',
     ]);
   });
 
-  it('the sorted data-kind set is exactly the pinned 36', () => {
+  it('the sorted data-kind set is exactly the pinned 42', () => {
     expect(DATA_MEMBERS.map((m) => m.name).sort()).toEqual([
       'accountCosmetics',
       'activeLoadout',
@@ -493,10 +531,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'companionState',
       'companionUpgrades',
       'copper',
+      'courseRun',
       'delveDaily',
       'delveMarks',
       'delveRun',
       'duelInfo',
+      'earnedMounts',
       'entities',
       'equipment',
       'inventory',
@@ -505,6 +545,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'loadouts',
       'lockpickState',
       'marketInfo',
+      'mountCast',
+      'mountTrialBests',
       'moveInput',
       'partyInfo',
       'player',
@@ -512,6 +554,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'prestigeRank',
       'questLog',
       'questsDone',
+      'raceInfo',
       'realm',
       'restedXp',
       'socialInfo',
@@ -521,14 +564,16 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'tradeInfo',
       'unlockedMilestones',
       'vendorBuyback',
+      'wagerInfo',
       'xp',
     ]);
   });
 
-  it('the sorted method-kind set is exactly the pinned 107', () => {
+  it('the sorted method-kind set is exactly the pinned 121', () => {
     expect(METHOD_MEMBERS.map((m) => m.name).sort()).toEqual([
       'abandonPet',
       'abandonQuest',
+      'abortCourse',
       'acceptLinkedQuest',
       'acceptQuest',
       'activeLootRolls',
@@ -557,6 +602,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'delveInteract',
       'delveShopOffers',
       'discardItem',
+      'dismissMount',
       'duelAccept',
       'duelDecline',
       'duelRequest',
@@ -579,6 +625,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'guildTransfer',
       'healPet',
       'interact',
+      'launchWagerRace',
       'leaderboard',
       'leaveDelve',
       'leaveDungeon',
@@ -592,6 +639,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketCollect',
       'marketList',
       'marketSearch',
+      'mintCharter',
+      'mountTrialLeaderboard',
       'moveRaidMember',
       'partyAccept',
       'partyDecline',
@@ -603,6 +652,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'pickUpObject',
       'playEmote',
       'prestige',
+      'proposeWagerRace',
       'questState',
       'raidLockouts',
       'releaseSpirit',
@@ -620,8 +670,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setPetMode',
       'setSpec',
       'startAutoAttack',
+      'startCourse',
+      'startRace',
       'stopAutoAttack',
       'submitLootRoll',
+      'summonMount',
       'switchLoadout',
       'tabTarget',
       'talentPoints',
@@ -636,6 +689,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'unequipItem',
       'unequipMechChroma',
       'useItem',
+      'wagerDecline',
+      'wagerJoin',
+      'wagerLeave',
     ]);
   });
 });
@@ -930,7 +986,29 @@ type _ExhaustTelemetry = AssertNever<
   Exclude<keyof IWorldTelemetry, (typeof FACET_TELEMETRY)[number]>
 >;
 
-// The 20-facet partition, keyed by facet for legible failure messages.
+const FACET_MOUNTS = [
+  'mountCast',
+  'summonMount',
+  'dismissMount',
+  'courseRun',
+  'startCourse',
+  'abortCourse',
+  'mountTrialBests',
+  'mountTrialLeaderboard',
+  'raceInfo',
+  'startRace',
+  'earnedMounts',
+  'mintCharter',
+  'wagerInfo',
+  'proposeWagerRace',
+  'wagerJoin',
+  'wagerDecline',
+  'wagerLeave',
+  'launchWagerRace',
+] as const satisfies readonly (keyof IWorldMounts)[];
+type _ExhaustMounts = AssertNever<Exclude<keyof IWorldMounts, (typeof FACET_MOUNTS)[number]>>;
+
+// The 21-facet partition, keyed by facet for legible failure messages.
 const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   entityRoster: FACET_ENTITY_ROSTER,
   combat: FACET_COMBAT,
@@ -951,12 +1029,13 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   market: FACET_MARKET,
   dungeons: FACET_DUNGEONS,
   delves: FACET_DELVES,
+  mounts: FACET_MOUNTS,
   telemetry: FACET_TELEMETRY,
 };
 
-describe('W1: aggregate IWorld member set equals the disjoint union of the 20 facets', () => {
-  it('pins the facet count at 20', () => {
-    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(20);
+describe('W1: aggregate IWorld member set equals the disjoint union of the 21 facets', () => {
+  it('pins the facet count at 21', () => {
+    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(21);
   });
 
   it('each facet array is non-empty and internally duplicate-free', () => {
@@ -966,7 +1045,7 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the 20 fa
     }
   });
 
-  it('the 20 facet arrays are pairwise disjoint (no member filed in two facets)', () => {
+  it('the 21 facet arrays are pairwise disjoint (no member filed in two facets)', () => {
     const entries = Object.entries(FACET_MEMBER_ARRAYS);
     const overlaps: string[] = [];
     for (let i = 0; i < entries.length; i++) {
@@ -982,10 +1061,10 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the 20 fa
     expect(overlaps, `members filed in more than one facet:\n${overlaps.join('\n')}`).toEqual([]);
   });
 
-  it('the union of the 20 facets equals the pinned 143-member IWORLD_MEMBERS set', () => {
+  it('the union of the 21 facets equals the pinned 163-member IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(145);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(145);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(163);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(163);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

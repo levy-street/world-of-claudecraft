@@ -2551,6 +2551,106 @@ export const fr_FR: EnTranslations = {
       "mapCanvasLabel": "Carte",
       "mapSummary": "Carte de {zone}."
     },
+    "mounts": {
+      "title": "Montures",
+      "subtitle": "Destriers de voyage $WOC",
+      "close": "Fermer les montures",
+      "summon": "Invoquer",
+      "dismount": "Descendre",
+      "summoning": "Invocation de {name}…",
+      "riding": "En selle",
+      "flies": "Vole",
+      "locked": "Verrouillée",
+      "speed": "+{percent}% de vitesse",
+      "unlockAt": "Se déverrouille à {amount} $WOC",
+      "supplyShare": "{percent} de l'offre",
+      "qualifyHeader": "Vous remplissez les conditions pour {count} montures de voyage sur {total}.",
+      "holdingHint": "Vous détenez {amount} $WOC.",
+      "noWallet": "Détenez au moins {amount} $WOC — 0.1% de l'offre — sur un portefeuille lié pour mériter votre première monture de voyage.",
+      "cantInCombat": "Vous ne pouvez pas monter en combat.",
+      "cantSwimming": "Vous ne pouvez pas monter en nageant.",
+      "cantDead": "Vous ne pouvez pas monter une fois mort.",
+      "notEligible": "Vos avoirs en $WOC n'atteignent pas encore ce destrier.",
+      "summonedBanner": "Vous invoquez {name}.",
+      "summonAria": "Invoquer {name}",
+      "dismountAria": "Descendre de {name}",
+      "lockedAria": "{name} — verrouillée ; se déverrouille à {amount} $WOC",
+      "activeAria": "{name} — actuellement active",
+      "cardAria": "{name} : {flavor}",
+      "owned": "Possédée",
+      "mint": "Frapper une Charte",
+      "mintHint": "Frappez une Charte échangeable pour cette monture — vendez-la contre de l'or pour qu'un non-détenteur puisse la mériter.",
+      "mintAria": "Frapper une Charte échangeable pour {name}",
+      "mintedBanner": "Vous frappez une Charte pour {name}.",
+      "earnedBanner": "Vous avez mérité {name} — elle est vôtre à jamais.",
+      "alreadyOwnErr": "Vous possédez déjà cette monture.",
+      "charterVoidErr": "Cette Charte est nulle.",
+      "noCharterErr": "Aucune Charte ne peut être frappée pour cette monture.",
+      "holdingsShortErr": "Vos avoirs ne couvrent pas cette monture."
+    },
+    "course": {
+      "skytrials": "Épreuves célestes",
+      "skytrialsHint": "Survolez un parcours d'anneaux chronométré sur une monture volante.",
+      "needFlyer": "Invoquez une monture volante pour disputer les Épreuves célestes.",
+      "start": "Voler",
+      "give_up": "Abandonner",
+      "par": "Référence {time}",
+      "laps": "{count} tours",
+      "onePass": "1 tour",
+      "starting": "Franchissez le premier anneau pour lancer le chronomètre",
+      "gate": "Anneau {n}/{total}",
+      "lap": "Tour {n}/{total}",
+      "time": "Temps",
+      "finish": "Arrivée !",
+      "beatPar": "Référence battue de {time}",
+      "offPar": "{time} de plus que la référence",
+      "failed": "Course terminée — vous avez quitté votre monture",
+      "aborted": "Course abandonnée",
+      "best": "Meilleur {time}",
+      "newBest": "Nouveau record !",
+      "board": "Classement",
+      "boardTitle": "{name} — meilleurs temps",
+      "noTimes": "Aucun temps encore — soyez le premier.",
+      "loadingBoard": "Chargement…",
+      "you": "(vous)",
+      "race": "Course",
+      "racePartyHint": "Affrontez votre groupe — le premier à franchir les anneaux l'emporte.",
+      "getReady": "Préparez-vous",
+      "go": "PARTEZ !",
+      "dnf": "NT",
+      "placeOf": "#{place} sur {total}",
+      "racing": "Course en cours"
+    },
+    "wager": {
+      "start": "Course pariée",
+      "title": "Course pariée",
+      "inviteGold": "{name} ouvre une Course pariée — misez {money} pour entrer. Suivre la mise ?",
+      "inviteCharter": "{name} ouvre une Course pariée — misez {money} + une Charte de monture. Suivre la mise ?",
+      "accept": "Suivre la mise",
+      "pot": "Cagnotte {money}",
+      "potCharter": "Cagnotte {money} + {count}× Charte",
+      "racers": "Concurrents ({count})",
+      "launch": "Lancer la course",
+      "cancel": "Annuler",
+      "leave": "Quitter",
+      "waiting": "En attente d'un adversaire pour suivre la mise…",
+      "won": "Vous remportez le pari — {money} !",
+      "wonCharter": "Vous remportez le pari — {money} + {count}× Charte !",
+      "lost": "Vous avez perdu le pari.",
+      "refunded": "Pari annulé — votre mise vous est rendue.",
+      "antePrompt": "Combien d'or miser sur cette course ? (en cuivre)",
+      "open": "Ouvrir un pari",
+      "stakeCharter": "Miser aussi une Charte de monture (le vainqueur l'emporte)",
+      "errCourse": "Cette course ne peut faire l'objet d'un pari.",
+      "errFlyer": "Vous devez être sur une monture volante pour parier.",
+      "errBusy": "Vous êtes déjà engagé dans un pari.",
+      "errAnte": "Annoncez un pari d'au moins 1 cuivre.",
+      "errStake": "Cela ne peut être misé dans un pari.",
+      "errAfford": "Vous ne pouvez pas couvrir ce pari.",
+      "errExpired": "Cette offre de pari a expiré.",
+      "errGone": "Ce pari n'est plus ouvert.",
+      "errHost": "Seul l'hôte peut lancer le pari."
+    },
     "options": {
       "gameMenu": "Menu du jeu",
       "keyBindings": "Raccourcis clavier",
@@ -4537,6 +4637,36 @@ export const fr_FR: EnTranslations = {
       "monarch_crown_helm": {
         "name": "Couronne du Monarque"
       },
+      "charter_ashmane": {
+        "name": "Charte : Coursier Crincendre"
+      },
+      "charter_emberhoof": {
+        "name": "Charte : Chargeur Sabot-de-Braise"
+      },
+      "charter_bronzeflank": {
+        "name": "Charte : Destrier Flancbronze"
+      },
+      "charter_silvermane": {
+        "name": "Charte : Étalon Crinargent"
+      },
+      "charter_stormhoof": {
+        "name": "Charte : Chargeur Sabot-d'Orage"
+      },
+      "charter_goldcrest": {
+        "name": "Charte : Arpenteur du Ciel Crête-d'Or"
+      },
+      "charter_verdant": {
+        "name": "Charte : Aile-Sauvage Verdoyante"
+      },
+      "charter_voidstrider": {
+        "name": "Charte : Arpenteur Aile-du-Vide"
+      },
+      "charter_celestial": {
+        "name": "Charte : Séraphin Céleste"
+      },
+      "charter_worldbearer": {
+        "name": "Charte : Roc du Porte-Monde"
+      },
       "bristleback_maul": {
         "name": "Maillet Bristleback"
       },
@@ -5430,6 +5560,11 @@ export const fr_FR: EnTranslations = {
         "name": "Ondrel Vane",
         "title": "Veille-marées",
         "greeting": "Le lac boit le clair de lune, {className}, et rend les noyés. J'ai surveillé cette porte trente nuits durant — et cette nuit, elle est ouverte."
+      },
+      "skytrial_master": {
+        "name": "Maître du Ciel Vael",
+        "title": "Gardien des Épreuves célestes",
+        "greeting": "Le ciel est une route que peu osent emprunter, {className}. Méritez-la, et elle vous portera."
       }
     },
     "quests": {
@@ -6245,6 +6380,36 @@ export const fr_FR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Pataugeur de Lac-miroitant tué"
+          }
+        }
+      },
+      "q_skyward_first_flight": {
+        "title": "Premier envol",
+        "text": "Vous tenez assez bien un destrier ailé au sol, {playerName} — il est temps de le faire monter. Survolez l'Épreuve céleste du Val : huit anneaux en une seule boucle. Ne courez pas encore après le chronomètre. Restez simplement en l'air et enfilez chaque anneau.",
+        "completion": "Vous n'êtes pas tombé. C'est plus que la plupart ne réussissent à leur première boucle. Le ciel se souvient de ceux qui reviennent.",
+        "objectives": {
+          "0": {
+            "label": "Épreuve céleste du Val accomplie"
+          }
+        }
+      },
+      "q_skyward_time_trial": {
+        "title": "Battre le chronomètre",
+        "text": "À présent, faites-le avec intention. Survolez de nouveau l'Épreuve céleste du Val, {playerName}, mais terminez avant que le sable ne s'écoule. Une ligne nette à travers chaque anneau, pas un souffle de gâché. De la précision, pas de la panique.",
+        "completion": "Une ligne nette, d'anneau en anneau. Vous ne chevauchez plus le ciel — vous le volez.",
+        "objectives": {
+          "0": {
+            "label": "Épreuve céleste du Val survolée sous le temps de référence"
+          }
+        }
+      },
+      "q_skyward_ascendant": {
+        "title": "Ascendant",
+        "text": "Une épreuve demeure, {playerName} : le Circuit du Val. Trois tours du grand anneau, volés sous le temps de référence — nulle chance, rien que l'art. Maîtrisez-le et le ciel ouvert sera vôtre, d'un bord à l'autre.",
+        "completion": "Vers le ciel et sans faille. Le ciel est vôtre désormais, {playerName}. Prenez cette charte — un destrier des airs, mérité et non acheté, pour vous porter où que vous vouliez aller.",
+        "objectives": {
+          "0": {
+            "label": "Circuit du Val survolé sous le temps de référence"
           }
         }
       }

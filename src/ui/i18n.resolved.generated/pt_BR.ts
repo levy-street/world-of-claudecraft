@@ -2551,6 +2551,106 @@ export const pt_BR: EnTranslations = {
       "mapCanvasLabel": "Mapa",
       "mapSummary": "Mapa de {zone}."
     },
+    "mounts": {
+      "title": "Montarias",
+      "subtitle": "Corcéis de Viagem $WOC",
+      "close": "Fechar montarias",
+      "summon": "Invocar",
+      "dismount": "Desmontar",
+      "summoning": "Invocando {name}…",
+      "riding": "Montado",
+      "flies": "Voa",
+      "locked": "Bloqueada",
+      "speed": "+{percent}% de velocidade",
+      "unlockAt": "Desbloqueia com {amount} $WOC",
+      "supplyShare": "{percent} do suprimento",
+      "qualifyHeader": "Você se qualifica para {count} de {total} montarias de viagem.",
+      "holdingHint": "Guardando {amount} $WOC.",
+      "noWallet": "Guarde ao menos {amount} $WOC — 0.1% do suprimento — em uma carteira vinculada para conquistar sua primeira montaria de viagem.",
+      "cantInCombat": "Você não pode montar em combate.",
+      "cantSwimming": "Você não pode montar enquanto nada.",
+      "cantDead": "Você não pode montar enquanto morto.",
+      "notEligible": "Seu saldo de $WOC ainda não alcança esse corcel.",
+      "summonedBanner": "Você invoca {name}.",
+      "summonAria": "Invocar {name}",
+      "dismountAria": "Desmontar {name}",
+      "lockedAria": "{name} — bloqueada; desbloqueia com {amount} $WOC",
+      "activeAria": "{name} — ativa no momento",
+      "cardAria": "{name}: {flavor}",
+      "owned": "Conquistada",
+      "mint": "Cunhar Carta",
+      "mintHint": "Cunhe uma Carta negociável para esta montaria — venda-a por ouro para que um não titular possa conquistá-la.",
+      "mintAria": "Cunhar uma Carta negociável para {name}",
+      "mintedBanner": "Você cunha uma Carta para {name}.",
+      "earnedBanner": "Você conquistou {name} — é sua para sempre.",
+      "alreadyOwnErr": "Você já possui essa montaria.",
+      "charterVoidErr": "Essa Carta é nula.",
+      "noCharterErr": "Nenhuma Carta pode ser cunhada para essa montaria.",
+      "holdingsShortErr": "Seu saldo não cobre essa montaria."
+    },
+    "course": {
+      "skytrials": "Provas Celestes",
+      "skytrialsHint": "Voe um percurso cronometrado de aros em uma montaria voadora.",
+      "needFlyer": "Invoque uma montaria voadora para voar as Provas Celestes.",
+      "start": "Voar",
+      "give_up": "Desistir",
+      "par": "Par {time}",
+      "laps": "{count} voltas",
+      "onePass": "1 volta",
+      "starting": "Atravesse o primeiro aro para iniciar o relógio",
+      "gate": "Aro {n}/{total}",
+      "lap": "Volta {n}/{total}",
+      "time": "Tempo",
+      "finish": "Concluído!",
+      "beatPar": "Superou o par em {time}",
+      "offPar": "{time} acima do par",
+      "failed": "Corrida encerrada — você deixou sua montaria",
+      "aborted": "Corrida abandonada",
+      "best": "Recorde {time}",
+      "newBest": "Novo recorde!",
+      "board": "Placar",
+      "boardTitle": "{name} — melhores tempos",
+      "noTimes": "Nenhum tempo ainda — seja o primeiro.",
+      "loadingBoard": "Carregando…",
+      "you": "(você)",
+      "race": "Corrida",
+      "racePartyHint": "Dispute com seu grupo — o primeiro a cruzar os aros vence.",
+      "getReady": "Prepare-se",
+      "go": "JÁ!",
+      "dnf": "NÃO TERMINOU",
+      "placeOf": "#{place} de {total}",
+      "racing": "Em corrida"
+    },
+    "wager": {
+      "start": "Corrida Apostada",
+      "title": "Corrida Apostada",
+      "inviteGold": "{name} abre uma Corrida Apostada — aposte {money} para entrar. Você cobre?",
+      "inviteCharter": "{name} abre uma Corrida Apostada — aposte {money} + uma Carta de Montaria. Você cobre?",
+      "accept": "Cobrir Aposta",
+      "pot": "Pote {money}",
+      "potCharter": "Pote {money} + {count}× Carta",
+      "racers": "Corredores ({count})",
+      "launch": "Largar Corrida",
+      "cancel": "Cancelar",
+      "leave": "Sair",
+      "waiting": "Aguardando um desafiante cobrir a aposta…",
+      "won": "Você vence a aposta — {money}!",
+      "wonCharter": "Você vence a aposta — {money} + {count}× Carta!",
+      "lost": "Você perdeu a aposta.",
+      "refunded": "Aposta cancelada — sua quantia é devolvida.",
+      "antePrompt": "Apostar quanto ouro nesta corrida? (em cobre)",
+      "open": "Abrir Aposta",
+      "stakeCharter": "Aposte também uma Carta de Montaria (o vencedor leva)",
+      "errCourse": "Esse percurso não pode ser apostado.",
+      "errFlyer": "Você precisa estar em uma montaria voadora para apostar.",
+      "errBusy": "Você já está em uma aposta.",
+      "errAnte": "Defina uma aposta de ao menos 1 cobre.",
+      "errStake": "Isso não pode ser apostado.",
+      "errAfford": "Você não pode cobrir essa aposta.",
+      "errExpired": "Essa oferta de aposta expirou.",
+      "errGone": "Essa aposta não está mais aberta.",
+      "errHost": "Apenas o anfitrião pode largar a aposta."
+    },
     "options": {
       "gameMenu": "Menu do jogo",
       "keyBindings": "Atalhos de teclado",
@@ -4537,6 +4637,36 @@ export const pt_BR: EnTranslations = {
       "monarch_crown_helm": {
         "name": "Coroa do Monarca"
       },
+      "charter_ashmane": {
+        "name": "Carta: Corcel Crina-de-Cinza"
+      },
+      "charter_emberhoof": {
+        "name": "Carta: Investidor Casco-de-Brasa"
+      },
+      "charter_bronzeflank": {
+        "name": "Carta: Ginete Flanco-de-Bronze"
+      },
+      "charter_silvermane": {
+        "name": "Carta: Garanhão Crina-de-Prata"
+      },
+      "charter_stormhoof": {
+        "name": "Carta: Investidor Casco-de-Tempestade"
+      },
+      "charter_goldcrest": {
+        "name": "Carta: Andarilho-do-Céu Crista-Dourada"
+      },
+      "charter_verdant": {
+        "name": "Carta: Asa-Selvagem Verdejante"
+      },
+      "charter_voidstrider": {
+        "name": "Carta: Caminhante Asa-do-Vazio"
+      },
+      "charter_celestial": {
+        "name": "Carta: Serafim Celestial"
+      },
+      "charter_worldbearer": {
+        "name": "Carta: Roc do Porta-Mundos"
+      },
       "bristleback_maul": {
         "name": "Malho Bristleback"
       },
@@ -5430,6 +5560,11 @@ export const pt_BR: EnTranslations = {
         "name": "Ondrel Vane",
         "title": "Vigia das Marés",
         "greeting": "O lago bebe o luar, {className}, e devolve os afogados. Vigio aquele portão há trinta noites — e esta noite ele está aberto."
+      },
+      "skytrial_master": {
+        "name": "Mestre-do-Céu Vael",
+        "title": "Guardião das Provas Celestes",
+        "greeting": "O céu é uma estrada que poucos ousam trilhar, {className}. Conquiste-o, e ele o carregará."
       }
     },
     "quests": {
@@ -6245,6 +6380,36 @@ export const pt_BR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Vadeador de Glimmermere abatido"
+          }
+        }
+      },
+      "q_skyward_first_flight": {
+        "title": "Primeiro Voo",
+        "text": "Você monta bem um corcel alado em terra firme, {playerName} — agora leve-o ao alto. Voe a Prova Celeste do Vale: oito aros em uma única passagem em curva. Não persiga o relógio ainda. Apenas mantenha-se no ar e atravesse cada aro.",
+        "completion": "Você não caiu. Isso é mais do que a maioria consegue na primeira volta. O céu lembra quem sempre retorna.",
+        "objectives": {
+          "0": {
+            "label": "Prova Celeste do Vale concluída"
+          }
+        }
+      },
+      "q_skyward_time_trial": {
+        "title": "Vença o Relógio",
+        "text": "Agora faça com propósito. Voe a Prova Celeste do Vale de novo, {playerName}, mas conclua antes que a areia se esgote. Uma linha limpa por cada aro, sem desperdiçar ar. Precisão, não pânico.",
+        "completion": "Uma linha limpa, de aro em aro. Você não está mais cavalgando o céu — está voando-o.",
+        "objectives": {
+          "0": {
+            "label": "Prova Celeste do Vale voada abaixo do tempo-padrão"
+          }
+        }
+      },
+      "q_skyward_ascendant": {
+        "title": "Ascendente",
+        "text": "Resta uma prova, {playerName}: o Circuito do Vale. Três voltas do aro longo, voadas abaixo do tempo-padrão — sem sorte, apenas perícia. Domine-o e o céu aberto é seu para reivindicar, de borda a borda.",
+        "completion": "Celeste e inquebrantável. O céu é seu agora, {playerName}. Tome esta carta — um corcel do ar, conquistado e não comprado, para carregá-lo aonde quer que pretenda ir.",
+        "objectives": {
+          "0": {
+            "label": "Circuito do Vale voado abaixo do tempo-padrão"
           }
         }
       }

@@ -4131,4 +4131,152 @@
     outline-offset: -4px;
     box-shadow: 0 0 14px rgba(202, 164, 114, 0.5);
   }
+
+  /* ---------- $WOC holder travel mounts, courses, races, wagers ---------- */
+  #mount-window { width: 460px; max-width: calc(100vw - 24px); }
+  .mount-subtitle { color: var(--color-text-muted); font-size: 11px; }
+  .mount-summary { font-size: 12px; color: var(--color-text-muted); line-height: 1.4;
+    padding: 4px 2px 8px; margin-bottom: 6px; border-bottom: 1px solid #463a1c; }
+  .mount-list { display: flex; flex-direction: column; gap: 4px; max-height: min(60vh, 460px); overflow-y: auto; }
+  .mount-row { display: flex; gap: 10px; min-height: 56px; padding: 7px 8px; border-radius: 5px;
+    align-items: center; border: 1px solid transparent; background: #ffffff06; }
+  .mount-row:hover { background: #ffffff10; }
+  .mount-row:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: 2px; }
+  .mount-row.active { border-color: #b8902f; background: var(--color-primary-glow, #b8902f1a);
+    box-shadow: inset 0 0 14px #b8902f22; }
+  .mount-row.locked { opacity: 0.7; }
+  .mount-row.locked .mount-swatch { filter: grayscale(0.85) brightness(0.6); }
+  .mount-row.locked .mount-name { color: var(--color-text-muted); }
+  .mount-swatch { width: 40px; height: 40px; flex: none; display: grid; place-items: center;
+    border-radius: 6px; background: #15151f; border: 2px solid #4a3d1d; color: var(--mount-tint, #cbb472); }
+  .mount-swatch .ui-icon { width: 24px; height: 24px; }
+  .mount-text { min-width: 0; flex: 1; }
+  .mount-name { font-size: 14px; color: #fff; font-family: var(--title-font);
+    display: flex; gap: 7px; align-items: center; flex-wrap: wrap; }
+  .mount-active-tag { font-family: inherit; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase;
+    color: #1c140a; background: #d9b24a; border-radius: 999px; padding: 1px 7px; }
+  .mount-fly-tag { font-family: inherit; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase;
+    color: #07212e; background: linear-gradient(#9fe6ff, #5fc3f0); border-radius: 999px; padding: 1px 7px; }
+  .mount-owned-tag { font-family: inherit; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase;
+    color: #16240f; background: linear-gradient(#b9e89a, #8fd06a); border-radius: 999px; padding: 1px 7px; }
+  .mount-flavor { font-size: 11px; color: var(--color-text-muted); margin-top: 1px; overflow-wrap: anywhere; }
+  .mount-meta { font-size: 11px; color: var(--color-text-muted); margin-top: 3px;
+    display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .mount-meta .mount-speed { color: #8fd6a8; }
+  .mount-meta .mount-dot { opacity: 0.5; }
+  .mount-locktag { display: inline-flex; align-items: center; gap: 4px; }
+  .mount-locktag .ui-icon { width: 12px; height: 12px; }
+  .mount-action { flex: none; min-width: 84px; min-height: 40px; padding: 0 14px; border-radius: 5px;
+    font-family: var(--title-font); font-size: 13px; cursor: pointer; color: #1c140a;
+    background: linear-gradient(#e8c768, #c79a35); border: 1px solid #8a6a1e; }
+  .mount-action:hover { background: linear-gradient(#f3d57c, #d3a73e); }
+  .mount-action:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: 2px; }
+  .mount-action.is-dismount { color: #f4e6c8; background: #2a2118; border-color: #6a5524; }
+  .mount-action.is-dismount:hover { background: #352a1d; }
+  .mount-action.is-mint { min-width: 96px; color: #102219; background: linear-gradient(#9fe0b6, #5fb585); border-color: #2f6b48; }
+  .mount-action.is-mint:hover { background: linear-gradient(#b2ecc6, #6cc492); }
+
+  /* Skytrials list inside the mount window */
+  .mount-section-title { margin: 12px 2px 6px; font-family: var(--title-font); font-size: 13px; color: #cbb472;
+    border-top: 1px solid #463a1c; padding-top: 10px; display: flex; align-items: baseline; gap: 8px; }
+  .mount-section-title .sub { font-family: inherit; font-size: 11px; color: var(--color-text-muted); }
+  .course-row { display: flex; gap: 10px; align-items: center; padding: 7px 8px; border-radius: 5px; background: #ffffff06; }
+  .course-row + .course-row { margin-top: 4px; }
+  .course-row .course-text { flex: 1; min-width: 0; }
+  .course-row .course-name { font-family: var(--title-font); font-size: 13px; color: #fff; }
+  .course-row .course-meta { font-size: 11px; color: var(--color-text-muted); margin-top: 2px;
+    display: flex; gap: 6px; flex-wrap: wrap; }
+  .course-row .course-meta .fly { color: #9fe6ff; }
+  .course-locked { font-size: 11px; color: var(--color-text-muted); padding: 6px 2px; }
+  .course-item + .course-item { margin-top: 4px; }
+  .course-row .course-best { color: #8fd6a8; }
+  .course-board-btn { min-width: 64px; }
+  .course-board { margin: 2px 0 6px; padding: 6px 8px; background: #00000033; border-radius: 5px;
+    border: 1px solid #2a2a36; }
+  .course-board .cb-status { font-size: 11px; color: var(--color-text-muted); padding: 2px 0; }
+  .cb-row { display: flex; align-items: baseline; gap: 8px; font-size: 12px; padding: 2px 0; }
+  .cb-row.me { color: #ffd24a; }
+  .cb-row .cb-rank { width: 26px; text-align: right; color: var(--color-text-muted); font-variant-numeric: tabular-nums; }
+  .cb-row.me .cb-rank { color: #ffd24a; }
+  .cb-row .cb-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cb-row .cb-you { color: #9fe6ff; font-size: 10px; }
+  .cb-row .cb-time { font-variant-numeric: tabular-nums; color: #cdbf98; }
+  .cb-row.me .cb-time { color: #ffd24a; }
+
+  /* In-world course run overlay (timer + ring/lap progress) */
+  #course-hud { position: fixed; top: 84px; left: 50%; transform: translateX(-50%); z-index: 60;
+    min-width: 220px; text-align: center; pointer-events: none;
+    font-family: var(--title-font); color: #f6ecd2;
+    background: rgba(12,14,20,0.6); border: 1px solid rgba(95,195,240,0.45); border-radius: 12px;
+    padding: 10px 18px 12px; box-shadow: 0 4px 18px rgba(0,0,0,0.45); }
+  #course-hud[hidden] { display: none; }
+  #course-hud.finished { border-color: rgba(216,178,74,0.7); box-shadow: 0 0 22px rgba(216,178,74,0.3); }
+  #course-hud .ch-name { font-size: 13px; color: #9fe6ff; letter-spacing: 0.04em; }
+  #course-hud.finished .ch-name { color: #ffd24a; }
+  #course-hud .ch-time { font-size: 30px; font-variant-numeric: tabular-nums; line-height: 1.05; margin: 2px 0; }
+  #course-hud .ch-sub { font-size: 12px; color: #cdbf98; }
+  #course-hud .ch-abort { pointer-events: auto; margin-top: 8px; min-height: 32px; padding: 0 14px; cursor: pointer;
+    font-family: inherit; font-size: 12px; color: #f4e6c8; background: #2a2118; border: 1px solid #6a5524; border-radius: 5px; }
+  #course-hud .ch-abort:hover { background: #352a1d; }
+  #course-hud.finished .ch-abort { display: none; }
+
+  /* In-world multi-racer race panel (participants + live ring progress) */
+  #race-hud { position: fixed; top: 84px; right: 16px; z-index: 60; width: 232px;
+    font-family: var(--title-font); color: #f6ecd2; pointer-events: none;
+    background: rgba(12,14,20,0.62); border: 1px solid rgba(159,230,255,0.45); border-radius: 12px;
+    padding: 10px 12px 12px; box-shadow: 0 4px 18px rgba(0,0,0,0.45); }
+  #race-hud[hidden] { display: none; }
+  #race-hud .rh-title { text-align: center; font-size: 16px; color: #9fe6ff; margin-bottom: 8px; }
+  #race-hud .rh-list { display: flex; flex-direction: column; gap: 5px; }
+  .rh-row { display: flex; align-items: center; gap: 7px; font-size: 12px; }
+  .rh-row.me .rh-name { color: #ffd24a; }
+  .rh-row.dnf { opacity: 0.55; }
+  .rh-row .rh-name { width: 64px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rh-row .rh-bar { flex: 1; height: 7px; border-radius: 4px; background: #ffffff14; overflow: hidden; }
+  .rh-row .rh-fill { display: block; height: 100%; background: linear-gradient(90deg,#5fc3f0,#9fe6ff); transition: width 0.15s linear; }
+  .rh-row.me .rh-fill { background: linear-gradient(90deg,#d3a73e,#ffd24a); }
+  .rh-row.done .rh-fill { background: #8fd6a8; }
+  .rh-row .rh-status { width: 34px; text-align: right; font-variant-numeric: tabular-nums; color: #cdbf98; }
+  .rh-row.me .rh-status { color: #ffd24a; }
+
+  /* Soft-currency Wager Race lobby panel (members + pot + host/joiner actions) */
+  #wager-hud { position: fixed; top: 84px; right: 16px; z-index: 61; width: 236px;
+    font-family: var(--title-font); color: #f6ecd2;
+    background: rgba(16,13,10,0.74); border: 1px solid rgba(214,167,62,0.55); border-radius: 12px;
+    padding: 10px 12px 12px; box-shadow: 0 4px 18px rgba(0,0,0,0.5); }
+  #wager-hud[hidden] { display: none; }
+  #wager-hud .wh-title { text-align: center; font-size: 16px; color: #ffd24a; margin-bottom: 3px; }
+  #wager-hud .wh-pot { text-align: center; font-size: 13px; color: #f3d57c; margin-bottom: 8px; }
+  #wager-hud .wh-list { display: flex; flex-direction: column; gap: 4px; margin-bottom: 9px; }
+  .wh-row { display: flex; align-items: center; gap: 7px; font-size: 12px; }
+  .wh-row .wh-dot { width: 6px; height: 6px; border-radius: 50%; background: #8fd6a8; flex: none; }
+  .wh-row.host .wh-dot { background: #ffd24a; }
+  .wh-row .wh-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .wh-row.me .wh-name { color: #ffd24a; }
+  #wager-hud .wh-actions { display: flex; gap: 6px; }
+  #wager-hud .wh-actions button { flex: 1; min-height: 34px; border-radius: 5px; cursor: pointer;
+    font-family: var(--title-font); font-size: 12px; color: #1c140a;
+    background: linear-gradient(#e8c768, #c79a35); border: 1px solid #8a6a1e; }
+  #wager-hud .wh-actions button:hover { background: linear-gradient(#f3d57c, #d3a73e); }
+  #wager-hud .wh-actions button:disabled { opacity: 0.45; cursor: default; }
+  #wager-hud .wh-actions button.is-sub { color: #f4e6c8; background: #2a2118; border-color: #6a5524; }
+  #wager-hud .wh-actions button.is-sub:hover { background: #352a1d; }
+
+  /* Wager Race setup modal (host picks the ante before opening the lobby) */
+  #wager-setup { position: fixed; inset: 0; z-index: 120; display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.55); }
+  #wager-setup[hidden] { display: none; }
+  #wager-setup .ws-card { width: 320px; max-width: 92vw; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
+  #wager-setup .ws-title { font-family: var(--title-font); font-size: 17px; color: #ffd24a; text-align: center; }
+  #wager-setup .ws-label { font-size: 13px; color: var(--color-text-muted); }
+  #wager-setup #ws-ante { width: 100%; font-size: 16px; padding: 8px 10px; border-radius: 5px;
+    border: 1px solid #6a5524; background: #1a1510; color: #f6ecd2; }
+  #wager-setup .ws-charter { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #d6c79b; cursor: pointer; }
+  #wager-setup .ws-charter input { width: 18px; height: 18px; }
+  #wager-setup .ws-actions { display: flex; gap: 8px; margin-top: 4px; }
+  #wager-setup .ws-actions button { flex: 1; min-height: 40px; border-radius: 5px; cursor: pointer;
+    font-family: var(--title-font); font-size: 13px; color: #1c140a;
+    background: linear-gradient(#e8c768, #c79a35); border: 1px solid #8a6a1e; }
+  #wager-setup .ws-actions button:hover { background: linear-gradient(#f3d57c, #d3a73e); }
+  #wager-setup .ws-actions button.is-sub { color: #f4e6c8; background: #2a2118; border-color: #6a5524; }
 }

@@ -2551,6 +2551,106 @@ export const ja_JP: EnTranslations = {
       "mapCanvasLabel": "マップ",
       "mapSummary": "{zone}のマップ。"
     },
+    "mounts": {
+      "title": "マウント",
+      "subtitle": "$WOC 旅の駿馬",
+      "close": "マウントを閉じる",
+      "summon": "召喚",
+      "dismount": "降りる",
+      "summoning": "{name}を召喚中…",
+      "riding": "騎乗中",
+      "flies": "飛行可能",
+      "locked": "未解放",
+      "speed": "+{percent}% 速度",
+      "unlockAt": "{amount} $WOC で解放",
+      "supplyShare": "総供給量の{percent}",
+      "qualifyHeader": "あなたは{total}体中{count}体の旅マウントの資格を満たしています。",
+      "holdingHint": "{amount} $WOC を保有中。",
+      "noWallet": "連携した財布で少なくとも{amount} $WOC、総供給量の0.1%を保有して、最初の旅マウントを手に入れましょう。",
+      "cantInCombat": "戦闘中は騎乗できません。",
+      "cantSwimming": "水泳中は騎乗できません。",
+      "cantDead": "死亡中は騎乗できません。",
+      "notEligible": "あなたの $WOC 保有量はまだその駿馬に届きません。",
+      "summonedBanner": "{name}を召喚した。",
+      "summonAria": "{name}を召喚",
+      "dismountAria": "{name}から降りる",
+      "lockedAria": "{name} — 未解放。{amount} $WOC で解放",
+      "activeAria": "{name} — 現在使用中",
+      "cardAria": "{name}: {flavor}",
+      "owned": "所有済み",
+      "mint": "チャーターを発行",
+      "mintHint": "このマウントの取引可能なチャーターを打ち出す — ゴールドで売れば、非保有者がそれを手に入れられます。",
+      "mintAria": "{name}の取引可能なチャーターを発行",
+      "mintedBanner": "{name}のチャーターを打ち出した。",
+      "earnedBanner": "{name}を獲得した — 永久にあなたのものだ。",
+      "alreadyOwnErr": "そのマウントはすでに所有しています。",
+      "charterVoidErr": "そのチャーターは無効です。",
+      "noCharterErr": "そのマウントにはチャーターを打ち出せません。",
+      "holdingsShortErr": "あなたの保有量ではそのマウントに届きません。"
+    },
+    "course": {
+      "skytrials": "スカイトライアル",
+      "skytrialsHint": "飛行マウントでタイム制のリングコースを飛びます。",
+      "needFlyer": "スカイトライアルを飛ぶには飛行マウントを召喚してください。",
+      "start": "飛ぶ",
+      "give_up": "あきらめる",
+      "par": "基準タイム {time}",
+      "laps": "{count}周",
+      "onePass": "1周",
+      "starting": "最初のリングを通り抜けて計測を開始",
+      "gate": "リング {n}/{total}",
+      "lap": "ラップ {n}/{total}",
+      "time": "タイム",
+      "finish": "フィニッシュ！",
+      "beatPar": "基準タイムを {time}短縮",
+      "offPar": "基準タイムから {time} 遅れ",
+      "failed": "走行終了 — マウントを離れました",
+      "aborted": "走行を放棄しました",
+      "best": "ベスト {time}",
+      "newBest": "自己ベスト更新！",
+      "board": "ボード",
+      "boardTitle": "{name} — トップタイム",
+      "noTimes": "まだ記録がありません — 最初の一人になろう。",
+      "loadingBoard": "読み込み中…",
+      "you": "(あなた)",
+      "race": "レース",
+      "racePartyHint": "パーティと競争 — 最初にリングを抜けた者が勝つ。",
+      "getReady": "準備せよ",
+      "go": "GO!",
+      "dnf": "リタイア",
+      "placeOf": "{total}人中 #{place}位",
+      "racing": "レース中"
+    },
+    "wager": {
+      "start": "賭けレース",
+      "title": "賭けレース",
+      "inviteGold": "{name}が賭けレースを開いた — 参加には{money}を賭ける。応じるか？",
+      "inviteCharter": "{name}が賭けレースを開いた — {money}＋マウントチャーターを賭ける。応じるか？",
+      "accept": "賭けに応じる",
+      "pot": "賞金 {money}",
+      "potCharter": "賞金{money}＋チャーター{count}×",
+      "racers": "レーサー（{count}）",
+      "launch": "レース開始",
+      "cancel": "キャンセル",
+      "leave": "退出",
+      "waiting": "賭けに応じる挑戦者を待っています…",
+      "won": "賭けに勝った — {money}！",
+      "wonCharter": "賭けに勝った — {money}＋チャーター{count}×！",
+      "lost": "賭けに負けた。",
+      "refunded": "賭けは取りやめ — あなたの賭け金は返還された。",
+      "antePrompt": "このレースにゴールドをいくら賭けますか？（カッパー単位）",
+      "open": "賭けを開く",
+      "stakeCharter": "マウントチャーターも賭ける（勝者が獲得）",
+      "errCourse": "そのコースでは賭けられません。",
+      "errFlyer": "賭けるには飛行マウントに乗っていなければなりません。",
+      "errBusy": "あなたはすでに賭けの最中です。",
+      "errAnte": "少なくとも1カッパーの賭けを指定してください。",
+      "errStake": "それは賭けに出せません。",
+      "errAfford": "その賭けを賄えません。",
+      "errExpired": "その賭けの申し出は期限切れです。",
+      "errGone": "その賭けはもう開かれていません。",
+      "errHost": "賭けを開始できるのはホストのみです。"
+    },
     "options": {
       "gameMenu": "ゲームメニュー",
       "keyBindings": "キー設定",
@@ -4537,6 +4637,36 @@ export const ja_JP: EnTranslations = {
       "monarch_crown_helm": {
         "name": "君主の王冠"
       },
+      "charter_ashmane": {
+        "name": "チャーター：灰鬣の駿馬アッシュメイン"
+      },
+      "charter_emberhoof": {
+        "name": "チャーター：燃蹄の軍馬エンバーフーフ"
+      },
+      "charter_bronzeflank": {
+        "name": "チャーター：青銅脇の戦馬ブロンズフランク"
+      },
+      "charter_silvermane": {
+        "name": "チャーター：銀鬣の牡馬シルバーメイン"
+      },
+      "charter_stormhoof": {
+        "name": "チャーター：嵐蹄の軍馬ストームフーフ"
+      },
+      "charter_goldcrest": {
+        "name": "チャーター：金冠の天駆けゴールドクレスト"
+      },
+      "charter_verdant": {
+        "name": "チャーター：翠緑の野翼ヴァーダント"
+      },
+      "charter_voidstrider": {
+        "name": "チャーター：虚空翼の闊歩者ヴォイドウィング"
+      },
+      "charter_celestial": {
+        "name": "チャーター：天上の熾天セレスティアル"
+      },
+      "charter_worldbearer": {
+        "name": "チャーター：世界を背負う大鷲ワールドベアラー"
+      },
       "bristleback_maul": {
         "name": "ブリストルバックの大槌"
       },
@@ -5430,6 +5560,11 @@ export const ja_JP: EnTranslations = {
         "name": "オンドレル・ヴェイン",
         "title": "潮見の番人",
         "greeting": "この沼は月光を飲み干し、{className}よ、溺れし者を吐き返すのだ。私はあの門を三十夜も見張ってきた——そして今宵、門は開いている。"
+      },
+      "skytrial_master": {
+        "name": "スカイマスター・ヴァエル",
+        "title": "スカイトライアルの守護者",
+        "greeting": "空とは、あえて歩もうとする者の少ない道だ、{className}よ。それを勝ち取れば、空がお前を運んでくれる。"
       }
     },
     "quests": {
@@ -6245,6 +6380,36 @@ export const ja_JP: EnTranslations = {
         "objectives": {
           "0": {
             "label": "煌めき沼の渡り手を討伐した"
+          }
+        }
+      },
+      "q_skyward_first_flight": {
+        "title": "初飛行",
+        "text": "お前は地上では翼ある駿馬をそれなりに乗りこなしている、{playerName}よ — さあ、それを空へ上げてみせろ。ヴェイル・スカイトライアルを飛ぶのだ。ひと巡りの周回で八つのリングを抜ける。まだタイムを追うな。ただ空に留まり、すべてのリングを糸のように通り抜けよ。",
+        "completion": "落ちなかったな。初めての周回でそれをやり遂げる者はそう多くない。空は、何度も戻ってくる者を覚えている。",
+        "objectives": {
+          "0": {
+            "label": "ヴェイル・スカイトライアル完走"
+          }
+        }
+      },
+      "q_skyward_time_trial": {
+        "title": "時計を打ち破れ",
+        "text": "今度は意志をもってやり遂げろ。もう一度ヴェイル・スカイトライアルを飛ぶのだ、{playerName}よ。だが砂が尽きる前に飛び終えよ。すべてのリングを貫く一筋の澄んだ軌道、無駄な空気は一切なし。慌てるな、精密にやれ。",
+        "completion": "リングからリングへ、一筋の澄んだ軌道。お前はもう空に乗っているのではない — 空を飛んでいるのだ。",
+        "objectives": {
+          "0": {
+            "label": "ヴェイル・スカイトライアルを規定タイム以内で飛行"
+          }
+        }
+      },
+      "q_skyward_ascendant": {
+        "title": "天翔ける者",
+        "text": "残る試練はただ一つ、{playerName}よ。ヴェイル・サーキットだ。長きリングを三周、規定タイム以内で飛び切れ — 運ではなく、ただ技だけで。それを極めれば、果てから果てまで、広き空はお前のものだ。",
+        "completion": "天高く、揺るぎなく。空は今やお前のものだ、{playerName}よ。このチャーターを取れ — 買ったのではなく勝ち取った空の駿馬、お前が目指すどこへでもお前を運ぶだろう。",
+        "objectives": {
+          "0": {
+            "label": "ヴェイル・サーキットを規定タイム以内で飛行"
           }
         }
       }

@@ -81,6 +81,19 @@ CREATE INDEX IF NOT EXISTS characters_lifetime_xp
   ON characters (realm, ${LIFETIME_XP_EXPR} DESC);
 CREATE INDEX IF NOT EXISTS characters_lifetime_xp_global
   ON characters (${LIFETIME_XP_EXPR} DESC);
+-- Mount Skytrial best times: one row per (character, track) holding the best
+-- (lowest) run in integer sim ticks. Denormalized out of characters.state so the
+-- realm-scoped per-track leaderboard is a single indexed ascending sort.
+CREATE TABLE IF NOT EXISTS mount_trial_records (
+  character_id INT NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
+  realm TEXT NOT NULL DEFAULT '${REALM_SQL_DEFAULT}',
+  track_id TEXT NOT NULL,
+  best_ticks INT NOT NULL,
+  completed_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (character_id, track_id)
+);
+CREATE INDEX IF NOT EXISTS mount_trial_records_board
+  ON mount_trial_records (realm, track_id, best_ticks ASC);
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS is_admin BOOLEAN NOT NULL DEFAULT FALSE;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS suspended_until TIMESTAMPTZ;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS banned_at TIMESTAMPTZ;
@@ -1959,6 +1972,56 @@ export async function pruneClientPerfReports(retentionDays: number): Promise<num
     [String(days)],
   );
   return res.rowCount ?? 0;
+}
+
+// ---------------------------------------------------------------------------
+// Mount Skytrial leaderboards. Best times are server-authoritative (recorded
+// from the sim's measured tick count on courseFinish, never a client number).
+// ---------------------------------------------------------------------------
+
+export interface MountTrialLeaderRow {
+  name: string;
+  class: string;
+  level: number;
+  bestTicks: number;
+}
+
+/** A character's persisted best times, by track id (loaded at join so the sim
+ *  knows their PBs for live "new best" feedback). */
+export async function loadMountTrialTimes(characterId: number): Promise<Record<string, number>> {
+  const res = await pool.query('SELECT track_id, best_ticks FROM mount_trial_records WHERE character_id = $1', [characterId]);
+  const out: Record<string, number> = {};
+  for (const r of res.rows) out[r.track_id as string] = Number(r.best_ticks);
+  return out;
+}
+
+/** Record a finished run; keeps only the better (lower) time. Returns the stored
+ *  best and whether this run improved it (a new personal best). */
+export async function recordMountTrial(characterId: number, trackId: string, ticks: number): Promise<{ best: number; improved: boolean }> {
+  const cur = await pool.query('SELECT best_ticks FROM mount_trial_records WHERE character_id = $1 AND track_id = $2', [characterId, trackId]);
+  const prev = cur.rows[0] !== undefined ? Number(cur.rows[0].best_ticks) : undefined;
+  if (prev !== undefined && prev <= ticks) return { best: prev, improved: false };
+  await pool.query(
+    `INSERT INTO mount_trial_records (character_id, realm, track_id, best_ticks, completed_at)
+     VALUES ($1, $2, $3, $4, now())
+     ON CONFLICT (character_id, track_id) DO UPDATE SET best_ticks = EXCLUDED.best_ticks, completed_at = EXCLUDED.completed_at`,
+    [characterId, REALM, trackId, Math.round(ticks)],
+  );
+  return { best: Math.round(ticks), improved: true };
+}
+
+/** The realm's fastest runs of a track, best first. */
+export async function topMountTrialTimes(trackId: string, limit = 100): Promise<MountTrialLeaderRow[]> {
+  const cap = Math.max(1, Math.min(100, limit));
+  const res = await pool.query(
+    `SELECT c.name, c.class, c.level, r.best_ticks
+       FROM mount_trial_records r JOIN characters c ON c.id = r.character_id
+      WHERE r.realm = $1 AND r.track_id = $2
+      ORDER BY r.best_ticks ASC, c.name ASC
+      LIMIT $3`,
+    [REALM, trackId, cap],
+  );
+  return res.rows.map((r) => ({ name: r.name, class: r.class, level: r.level, bestTicks: Number(r.best_ticks) }));
 }
 
 // ---------------------------------------------------------------------------

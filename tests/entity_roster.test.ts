@@ -288,6 +288,8 @@ function makeCtx() {
     startFishing: vi.fn(),
     unlockMechChromaFromItem: vi.fn(),
     openSkinSelect: vi.fn(),
+    dismount: vi.fn(),
+    redeemMountCharter: vi.fn(),
     isSwimming: vi.fn(() => false),
     // W3 interaction: the two still-on-Sim quest-NPC delegates the moved interact dispatches to.
     talkToNpc: vi.fn(),

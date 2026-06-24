@@ -23,6 +23,7 @@
 // sibling targeting module are imported directly (already pure); everything that
 // touches not-yet-extracted Sim state routes through the seam.
 
+import { isFlyingMount } from '../content/mounts';
 import { DUNGEON_X_THRESHOLD, MOBS } from '../data';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
 import type { SimContext } from '../sim_context';
@@ -189,6 +190,9 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       let detectedD = Infinity;
       ctx.playerGrid.forEachInRadius(mob.pos.x, mob.pos.z, 25, (e, d2) => {
         if (e.dead) return;
+        // Airborne $WOC flyers are above the fray: wild mobs never detect them,
+        // so travel over hostile ground can't pull aggro / dismount the rider.
+        if (isFlyingMount(e.mountId)) return;
         if (isTrivialTo(mob, e)) return;
         let radius = Math.max(4, Math.min(20, template.aggroRadius + (mob.level - e.level) * 1.5));
         radius *= ctx.delveDetectMult(e);

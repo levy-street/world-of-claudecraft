@@ -2551,6 +2551,106 @@ export const it_IT: EnTranslations = {
       "mapCanvasLabel": "Mappa",
       "mapSummary": "Mappa di {zone}."
     },
+    "mounts": {
+      "title": "Cavalcature",
+      "subtitle": "Destrieri da viaggio $WOC",
+      "close": "Chiudi cavalcature",
+      "summon": "Evoca",
+      "dismount": "Smonta",
+      "summoning": "Evocazione di {name}…",
+      "riding": "In sella",
+      "flies": "Vola",
+      "locked": "Bloccata",
+      "speed": "+{percent}% velocità",
+      "unlockAt": "Si sblocca a {amount} $WOC",
+      "supplyShare": "{percent} dell'offerta",
+      "qualifyHeader": "Hai diritto a {count} cavalcature da viaggio su {total}.",
+      "holdingHint": "Detieni {amount} $WOC.",
+      "noWallet": "Detieni almeno {amount} $WOC, lo 0.1% dell'offerta, su un portafoglio collegato per guadagnare la tua prima cavalcatura da viaggio.",
+      "cantInCombat": "Non puoi montare in combattimento.",
+      "cantSwimming": "Non puoi montare mentre nuoti.",
+      "cantDead": "Non puoi montare da morto.",
+      "notEligible": "Le tue $WOC non bastano ancora per quel destriero.",
+      "summonedBanner": "Evochi {name}.",
+      "summonAria": "Evoca {name}",
+      "dismountAria": "Smonta {name}",
+      "lockedAria": "{name} — bloccata; si sblocca a {amount} $WOC",
+      "activeAria": "{name} — attualmente attiva",
+      "cardAria": "{name}: {flavor}",
+      "owned": "Posseduta",
+      "mint": "Conia Patente",
+      "mintHint": "Conia una Patente commerciabile per questa cavalcatura: vendila per oro così un non detentore può guadagnarsela.",
+      "mintAria": "Conia una Patente commerciabile per {name}",
+      "mintedBanner": "Coni una Patente per {name}.",
+      "earnedBanner": "Hai guadagnato {name}: è tua per sempre.",
+      "alreadyOwnErr": "Possiedi già quella cavalcatura.",
+      "charterVoidErr": "Quella Patente è nulla.",
+      "noCharterErr": "Non si può coniare alcuna Patente per quella cavalcatura.",
+      "holdingsShortErr": "Le tue disponibilità non coprono quella cavalcatura."
+    },
+    "course": {
+      "skytrials": "Prove del cielo",
+      "skytrialsHint": "Vola un percorso di anelli a tempo su una cavalcatura alata.",
+      "needFlyer": "Evoca una cavalcatura alata per affrontare le Prove del cielo.",
+      "start": "Vola",
+      "give_up": "Rinuncia",
+      "par": "Riferimento {time}",
+      "laps": "{count} giri",
+      "onePass": "1 giro",
+      "starting": "Attraversa il primo anello per avviare il cronometro",
+      "gate": "Anello {n}/{total}",
+      "lap": "Giro {n}/{total}",
+      "time": "Tempo",
+      "finish": "Traguardo!",
+      "beatPar": "Riferimento battuto di {time}",
+      "offPar": "{time} dal riferimento",
+      "failed": "Prova interrotta: hai lasciato la cavalcatura",
+      "aborted": "Prova abbandonata",
+      "best": "Migliore {time}",
+      "newBest": "Nuovo record!",
+      "board": "Classifica",
+      "boardTitle": "{name} — tempi migliori",
+      "noTimes": "Nessun tempo ancora: sii il primo.",
+      "loadingBoard": "Caricamento…",
+      "you": "(tu)",
+      "race": "Gara",
+      "racePartyHint": "Sfida il tuo gruppo: vince chi attraversa per primo gli anelli.",
+      "getReady": "Preparati",
+      "go": "VIA!",
+      "dnf": "NTC",
+      "placeOf": "#{place} di {total}",
+      "racing": "In gara"
+    },
+    "wager": {
+      "start": "Gara con posta",
+      "title": "Gara con posta",
+      "inviteGold": "{name} apre una Gara con posta: punta {money} per entrare. Pareggi?",
+      "inviteCharter": "{name} apre una Gara con posta: punta {money} + una Patente di cavalcatura. Pareggi?",
+      "accept": "Pareggia la posta",
+      "pot": "Montepremi {money}",
+      "potCharter": "Piatto {money} + {count}× Patente",
+      "racers": "Concorrenti ({count})",
+      "launch": "Avvia la gara",
+      "cancel": "Annulla",
+      "leave": "Esci",
+      "waiting": "In attesa che uno sfidante pareggi la posta…",
+      "won": "Vinci la scommessa: {money}!",
+      "wonCharter": "Vinci la scommessa: {money} + {count}× Patente!",
+      "lost": "Hai perso la scommessa.",
+      "refunded": "Scommessa revocata: la tua posta ti viene restituita.",
+      "antePrompt": "Quanto oro punti su questa gara? (in rame)",
+      "open": "Apri scommessa",
+      "stakeCharter": "Punta anche una Patente di cavalcatura (il vincitore la prende)",
+      "errCourse": "Su quel percorso non si può scommettere.",
+      "errFlyer": "Devi essere su una cavalcatura alata per scommettere.",
+      "errBusy": "Sei già in una scommessa.",
+      "errAnte": "Indica una posta di almeno 1 rame.",
+      "errStake": "Quello non può essere puntato come posta.",
+      "errAfford": "Non puoi coprire quella posta.",
+      "errExpired": "Quell'offerta di scommessa è scaduta.",
+      "errGone": "Quella scommessa non è più aperta.",
+      "errHost": "Solo l'organizzatore può avviare la scommessa."
+    },
     "options": {
       "gameMenu": "Menu di gioco",
       "keyBindings": "Comandi da tastiera",
@@ -4537,6 +4637,36 @@ export const it_IT: EnTranslations = {
       "monarch_crown_helm": {
         "name": "Corona del Monarca"
       },
+      "charter_ashmane": {
+        "name": "Patente: Corsiere Crincenere"
+      },
+      "charter_emberhoof": {
+        "name": "Patente: Caricatore Zoccolobrace"
+      },
+      "charter_bronzeflank": {
+        "name": "Patente: Destriero Fiancobronzo"
+      },
+      "charter_silvermane": {
+        "name": "Patente: Stallone Crinargento"
+      },
+      "charter_stormhoof": {
+        "name": "Patente: Caricatore Zoccolotempesta"
+      },
+      "charter_goldcrest": {
+        "name": "Patente: Solcacieli Crestadoro"
+      },
+      "charter_verdant": {
+        "name": "Patente: Aliselva Verdeggiante"
+      },
+      "charter_voidstrider": {
+        "name": "Patente: Falcata Aladelvuoto"
+      },
+      "charter_celestial": {
+        "name": "Patente: Serafino Celeste"
+      },
+      "charter_worldbearer": {
+        "name": "Patente: Roc del Portamondi"
+      },
       "bristleback_maul": {
         "name": "Maglio Bristleback"
       },
@@ -5430,6 +5560,11 @@ export const it_IT: EnTranslations = {
         "name": "Ondrel Vane",
         "title": "Guardamarea",
         "greeting": "Lo stagno beve la luce della luna, {className}, e restituisce gli annegati. Sorveglio quel cancello da trenta notti, e stanotte è aperto."
+      },
+      "skytrial_master": {
+        "name": "Maestro del cielo Vael",
+        "title": "Guardiano delle Prove del cielo",
+        "greeting": "Il cielo è una via che in pochi osano percorrere, {className}. Guadàgnatela, ed essa ti porterà."
       }
     },
     "quests": {
@@ -6245,6 +6380,36 @@ export const it_IT: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Guadatore di Glimmermere ucciso"
+          }
+        }
+      },
+      "q_skyward_first_flight": {
+        "title": "Primo volo",
+        "text": "A terra cavalchi un destriero alato abbastanza bene, {playerName}: ora portalo in alto. Vola la Prova del cielo della Valle: otto anelli in un'unica passata ad anello. Non inseguire ancora il cronometro. Resta solo in volo e infila ogni anello.",
+        "completion": "Non sei caduto. È più di quanto riescano a fare i più al primo giro. Il cielo ricorda chi continua a tornare.",
+        "objectives": {
+          "0": {
+            "label": "Prova del cielo della Valle completata"
+          }
+        }
+      },
+      "q_skyward_time_trial": {
+        "title": "Batti il tempo",
+        "text": "Ora fallo con intenzione. Vola di nuovo la Prova del cielo della Valle, {playerName}, ma termina prima che la sabbia si esaurisca. Una linea pulita attraverso ogni anello, senz'aria sprecata. Precisione, non panico.",
+        "completion": "Una linea pulita, da anello ad anello. Non cavalchi più il cielo: lo voli.",
+        "objectives": {
+          "0": {
+            "label": "Prova del cielo della Valle volata sotto il limite"
+          }
+        }
+      },
+      "q_skyward_ascendant": {
+        "title": "Ascendente",
+        "text": "Resta una sola prova, {playerName}: il Circuito della Valle. Tre giri del grande anello, volati sotto il limite: nessuna fortuna, solo maestria. Padroneggialo e il cielo aperto sarà tuo da rivendicare, da un capo all'altro.",
+        "completion": "Ascendente e indomito. Il cielo è tuo, ora, {playerName}. Prendi questa patente: un destriero dell'aria, guadagnato e non comprato, per portarti ovunque tu intenda andare.",
+        "objectives": {
+          "0": {
+            "label": "Circuito della Valle volato sotto il limite"
           }
         }
       }

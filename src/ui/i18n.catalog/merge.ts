@@ -3823,6 +3823,38 @@ const mergeExtraEn = {
   },
 };
 
+// Skyward Trials questline — ENGLISH-ONLY entity source (NPC + 3 quests), spread
+// into the `en` catalog by index.ts. Kept separate from the dense per-locale
+// mergeExtra so an English-only PR needs no non-English blocks: the build
+// English-fills every locale's resolved table (marked `pending` until the
+// maintainer translates at release). $C/$N in zone data map to {className}/
+// {playerName} here, the catalog convention tEntity resolves.
+export const mergeSkywardEn = {
+  npcs: {
+    skytrial_master: { name: "Skymaster Vael", title: "Warden of the Skytrials", greeting: "The sky is a road few dare to walk, {className}. Earn it, and it carries you." },
+  },
+  quests: {
+    q_skyward_first_flight: {
+      title: "First Flight",
+      text: "You sit a winged steed well enough on the ground, {playerName} — now take it up. Fly the Vale Skytrial: eight rings in one looping pass. Do not chase the clock yet. Just stay aloft and thread every ring.",
+      completion: "You did not fall. That is more than most manage on a first loop. The sky remembers who keeps coming back.",
+      objectives: { 0: { label: "Vale Skytrial completed" } },
+    },
+    q_skyward_time_trial: {
+      title: "Beat the Clock",
+      text: "Now do it with intent. Fly the Vale Skytrial again, {playerName}, but finish before the sand runs out. A clean line through every ring, no wasted air. Precision, not panic.",
+      completion: "A clean line, ring to ring. You are not riding the sky any longer — you are flying it.",
+      objectives: { 0: { label: "Vale Skytrial flown under par" } },
+    },
+    q_skyward_ascendant: {
+      title: "Ascendant",
+      text: "One trial remains, {playerName}: the Vale Circuit. Three laps of the long ring, flown under par — no luck, only craft. Master it and the open sky is yours to claim, from rim to rim.",
+      completion: "Skyward and unbroken. The sky is yours now, {playerName}. Take this charter — a steed of the air, earned and not bought, to carry you wherever you mean to go.",
+      objectives: { 0: { label: "Vale Circuit flown under par" } },
+    },
+  },
+};
+
 export const mergeExtra = {
   en: mergeExtraEn,
   es: {

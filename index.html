@@ -252,6 +252,23 @@
 
     <div id="castbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" data-i18n-aria="hudChrome.castBar.playerAria" aria-label="Your Cast Bar"><div class="fill"></div><div class="label"></div><div class="timer"></div></div>
     <div id="swingbar" aria-hidden="true"><div class="fill"></div><div class="label"></div></div>
+    <div id="course-hud" hidden>
+      <div class="ch-name"></div>
+      <div class="ch-time"></div>
+      <div class="ch-sub"></div>
+      <button class="ch-abort" type="button"></button>
+    </div>
+    <div id="race-hud" hidden>
+      <div class="rh-title"></div>
+      <div class="rh-list"></div>
+    </div>
+
+    <div id="wager-hud" hidden>
+      <div class="wh-title"></div>
+      <div class="wh-pot"></div>
+      <div class="wh-list"></div>
+      <div class="wh-actions"></div>
+    </div>
 
     <div id="minimap-wrap">
       <div id="zone-label" data-i18n="entities.zones.eastbrook_vale.name">Eastbrook Vale</div>
@@ -366,6 +383,19 @@
     <div id="inspect-window" class="window panel"></div>
     <div id="spellbook" class="window panel"></div>
     <div id="talents-window" class="window panel"></div>
+    <div id="mount-window" class="window panel"></div>
+    <div id="wager-setup" hidden>
+      <div class="ws-card panel">
+        <div class="ws-title"></div>
+        <label class="ws-label" for="ws-ante"></label>
+        <input id="ws-ante" type="number" min="1" step="1" value="10000" />
+        <label class="ws-charter" hidden><input id="ws-charter-cb" type="checkbox" /> <span></span></label>
+        <div class="ws-actions">
+          <button id="ws-open" type="button"></button>
+          <button id="ws-cancel" class="is-sub" type="button"></button>
+        </div>
+      </div>
+    </div>
     <div id="quest-log-window" class="window panel"></div>
     <div id="vendor-window" class="window panel"></div>
     <div id="map-window" class="window panel">
@@ -389,6 +419,7 @@
       <button type="button" class="micro-btn" id="mm-char" data-i18n-title="hud.keybinds.actions.char" data-i18n-aria="hud.keybinds.actions.char" title="Character" aria-label="Character" data-icon="character"><span class="keybind">c</span></button>
       <button type="button" class="micro-btn" id="mm-spell" data-i18n-title="abilityUi.spellbook.title" data-i18n-aria="abilityUi.spellbook.title" title="Spellbook" aria-label="Spellbook" data-icon="spellbook"><span class="keybind">p</span></button>
       <button type="button" class="micro-btn" id="mm-talents" data-i18n-title="game.talents.title" data-i18n-aria="game.talents.title" title="Talents" aria-label="Talents" data-icon="talents"><span class="keybind">n</span></button>
+      <button type="button" class="micro-btn" id="mm-mount" data-i18n-title="hud.mounts.title" data-i18n-aria="hud.mounts.title" title="Mounts" aria-label="Mounts" data-icon="mount"><span class="keybind">y</span></button>
       <button type="button" class="micro-btn" id="mm-quest" data-i18n-title="questUi.log.title" data-i18n-aria="questUi.log.title" title="Quest Log" aria-label="Quest Log" data-icon="questlog"><span class="keybind">l</span></button>
       <button type="button" class="micro-btn" id="mm-map" data-i18n-title="hud.keybinds.actions.map" data-i18n-aria="hud.keybinds.actions.map" title="World Map" aria-label="World Map" data-icon="map"><span class="keybind">m</span></button>
       <button type="button" class="micro-btn" id="mm-bag" data-i18n-title="itemUi.bags.title" data-i18n-aria="itemUi.bags.title" title="Bags" aria-label="Bags" data-icon="bags"><span class="keybind">b</span></button>
@@ -1105,6 +1136,7 @@
           <button type="button" class="mobile-btn" id="mobile-bags" data-i18n-title="hud.keybinds.actions.bags" data-i18n-aria="hud.keybinds.actions.bags" title="Bags" aria-label="Bags" data-icon="bags"><span class="mobile-label" data-i18n="hud.keybinds.actions.bags">Bags</span></button>
           <button type="button" class="mobile-btn" id="mobile-spellbook" data-i18n-title="abilityUi.spellbook.title" data-i18n-aria="abilityUi.spellbook.title" title="Spellbook" aria-label="Spellbook" data-icon="spellbook"><span class="mobile-label" data-i18n="abilityUi.spellbook.title">Spellbook</span></button>
           <button type="button" class="mobile-btn" id="mobile-talents" data-i18n-title="game.talents.title" data-i18n-aria="game.talents.title" title="Talents" aria-label="Talents" data-icon="talents"><span class="mobile-label" data-i18n="game.talents.title">Talents</span></button>
+          <button type="button" class="mobile-btn" id="mobile-mount" data-i18n-title="hud.mounts.title" data-i18n-aria="hud.mounts.title" title="Mounts" aria-label="Mounts" data-icon="mount"><span class="mobile-label" data-i18n="hud.mounts.title">Mounts</span></button>
           <button type="button" class="mobile-btn" id="mobile-map" data-i18n-title="hud.keybinds.actions.map" data-i18n-aria="hud.keybinds.actions.map" title="World Map" aria-label="World Map" data-icon="map"><span class="mobile-label" data-i18n="hud.core.mobileMap">Map</span></button>
           <button type="button" class="mobile-btn" id="mobile-leaderboard" data-i18n-title="game.leaderboard.title" data-i18n-aria="game.leaderboard.title" title="Leaderboard" aria-label="Leaderboard" data-icon="leaderboard"><span class="mobile-label" data-i18n="hudChrome.mobile.leaderboard">Ranks</span></button>
           <button type="button" class="mobile-btn active" id="mobile-nameplates" data-i18n-title="hud.keybinds.actions.nameplates" data-i18n-aria="hud.keybinds.actions.nameplates" title="Toggle nameplates" aria-label="Toggle nameplates" data-icon="nameplates"><span class="mobile-label" data-i18n="hudChrome.mobile.nameplates">Names</span></button>

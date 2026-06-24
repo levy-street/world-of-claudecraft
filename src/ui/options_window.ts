@@ -139,6 +139,7 @@ const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   interact: 'hud.keybinds.actions.interact',
   char: 'hud.keybinds.actions.char',
   spellbook: 'hud.keybinds.actions.spellbook',
+  mounts: 'hud.mounts.title',
   questlog: 'hud.keybinds.actions.questlog',
   map: 'hud.keybinds.actions.map',
   bags: 'hud.keybinds.actions.bags',

@@ -1,4 +1,5 @@
 import type { ItemDef, PlayerClass } from '../types';
+import { MOUNT_LIST, isCharterEligible } from './mounts';
 
 // Archetype groups for class-locked rewards (REWARD_ARCHETYPE hands warrior
 // rewards to paladins/shamans etc., so the lock must admit the whole group).
@@ -6,11 +7,29 @@ const WAR: PlayerClass[] = ['warrior', 'paladin', 'shaman'];
 const MAG: PlayerClass[] = ['mage', 'priest', 'warlock', 'druid'];
 const ROG: PlayerClass[] = ['rogue', 'hunter'];
 
+// Mount Charters — one tradeable deed per Charter-eligible mount (everything but
+// the holder-only tier-11 dragon). Redeeming one (useItem) permanently grants
+// that mount to a non-$WOC player; they're minted by holders and changed hands
+// for gold on the World Market. Generated from the mount ladder so the deed set
+// can never drift from the mounts it grants.
+const MOUNT_CHARTERS: Record<string, ItemDef> = Object.fromEntries(
+  MOUNT_LIST.filter((m) => isCharterEligible(m.id)).map((m): [string, ItemDef] => [
+    `charter_${m.id}`,
+    {
+      id: `charter_${m.id}`, name: `Charter: ${m.name}`, kind: 'tool',
+      quality: m.flying ? 'epic' : 'rare',
+      use: { type: 'mountCharter', mountId: m.id },
+      sellValue: 0, noVendorSell: true, // not a vendor good — traded for gold on the market
+    },
+  ]),
+);
+
 // ---------------------------------------------------------------------------
 // Items
 // ---------------------------------------------------------------------------
 
 export const BASE_ITEMS: Record<string, ItemDef> = {
+  ...MOUNT_CHARTERS,
   // --- starting gear ---
   worn_sword: {
     id: 'worn_sword',

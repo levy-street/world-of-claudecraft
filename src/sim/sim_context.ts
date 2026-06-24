@@ -462,6 +462,11 @@ export interface SimContextCallbacks {
   tameError(p: Entity, target: Entity): string | null;
   standUp(p: Entity): void;
   breakGhostWolf(e: Entity): void;
+  // $WOC mounts: throw a rider off their active mount (no-op for the unmounted /
+  // non-players). Shared because several foreign hot paths force a dismount: an
+  // ability cast (casting_lifecycle), combat engage, taking damage, and entering
+  // water/instances. The body stays on Sim.
+  dismount(e: Entity): void;
   startAutoAttack(pid?: number): void;
   revivePet(pid?: number): void;
   completeFishing(p: Entity, meta: PlayerMeta): void;
@@ -531,6 +536,9 @@ export interface SimContextCallbacks {
     chromaId: string,
   ): ItemUseResult | undefined;
   openSkinSelect(meta: PlayerMeta, catalog: SkinCatalog, itemId: string): void;
+  // $WOC Mount Charter redemption (the `mountCharter` useItem branch): grants the
+  // mount on the earned track and consumes the deed. Body stays on Sim.
+  redeemMountCharter(meta: PlayerMeta, itemId: string, mountId: string): void;
   isSwimming(e: Entity): boolean;
 
   // W3 interaction (src/sim/interaction.ts): the moved `interact` dispatcher fans into
@@ -851,6 +859,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     tameError: host.tameError,
     standUp: host.standUp,
     breakGhostWolf: host.breakGhostWolf,
+    dismount: host.dismount,
     startAutoAttack: host.startAutoAttack,
     revivePet: host.revivePet,
     completeFishing: host.completeFishing,
@@ -871,6 +880,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     startFishing: host.startFishing,
     unlockMechChromaFromItem: host.unlockMechChromaFromItem,
     openSkinSelect: host.openSkinSelect,
+    redeemMountCharter: host.redeemMountCharter,
     isSwimming: host.isSwimming,
     // W3 interaction: the two still-on-Sim quest-NPC delegates the moved interact dispatches to.
     talkToNpc: host.talkToNpc,

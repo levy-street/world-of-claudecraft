@@ -2551,6 +2551,106 @@ export const es_ES: EnTranslations = {
       "mapCanvasLabel": "Mapa",
       "mapSummary": "Mapa de {zone}."
     },
+    "mounts": {
+      "title": "Monturas",
+      "subtitle": "Corceles de viaje de $WOC",
+      "close": "Cerrar monturas",
+      "summon": "Invocar",
+      "dismount": "Desmontar",
+      "summoning": "Invocando a {name}…",
+      "riding": "Cabalgando",
+      "flies": "Vuela",
+      "locked": "Bloqueada",
+      "speed": "+{percent}% de velocidad",
+      "unlockAt": "Se desbloquea con {amount} $WOC",
+      "supplyShare": "{percent} del suministro",
+      "qualifyHeader": "Calificas para {count} de {total} monturas de viaje.",
+      "holdingHint": "Posees {amount} $WOC.",
+      "noWallet": "Conserva al menos {amount} $WOC — el 0.1% del suministro — en una cartera vinculada para ganar tu primera montura de viaje.",
+      "cantInCombat": "No puedes montar en combate.",
+      "cantSwimming": "No puedes montar mientras nadas.",
+      "cantDead": "No puedes montar mientras estás muerto.",
+      "notEligible": "Tus reservas de $WOC aún no alcanzan ese corcel.",
+      "summonedBanner": "Invocas a {name}.",
+      "summonAria": "Invocar a {name}",
+      "dismountAria": "Desmontar de {name}",
+      "lockedAria": "{name} — bloqueada; se desbloquea con {amount} $WOC",
+      "activeAria": "{name} — activa ahora mismo",
+      "cardAria": "{name}: {flavor}",
+      "owned": "En posesión",
+      "mint": "Acuñar patente",
+      "mintHint": "Acuña una patente comerciable de esta montura — véndela por oro para que un no titular pueda ganarla.",
+      "mintAria": "Acuñar una patente comerciable de {name}",
+      "mintedBanner": "Acuñas una patente de {name}.",
+      "earnedBanner": "Has ganado a {name} — es tuya para siempre.",
+      "alreadyOwnErr": "Ya posees esa montura.",
+      "charterVoidErr": "Esa patente es nula.",
+      "noCharterErr": "No se puede acuñar ninguna patente para esa montura.",
+      "holdingsShortErr": "Tus reservas no cubren esa montura."
+    },
+    "course": {
+      "skytrials": "Pruebas del Cielo",
+      "skytrialsHint": "Vuela un circuito de anillos cronometrado en una montura voladora.",
+      "needFlyer": "Invoca una montura voladora para volar las Pruebas del Cielo.",
+      "start": "Volar",
+      "give_up": "Rendirse",
+      "par": "Par {time}",
+      "laps": "{count} vueltas",
+      "onePass": "1 vuelta",
+      "starting": "Cruza el primer anillo para poner en marcha el cronómetro",
+      "gate": "Anillo {n}/{total}",
+      "lap": "Vuelta {n}/{total}",
+      "time": "Tiempo",
+      "finish": "¡Meta!",
+      "beatPar": "Superas el par por {time}",
+      "offPar": "{time} sobre el par",
+      "failed": "Intento terminado — abandonaste tu montura",
+      "aborted": "Intento abandonado",
+      "best": "Récord {time}",
+      "newBest": "¡Nuevo récord!",
+      "board": "Clasificación",
+      "boardTitle": "{name} — mejores tiempos",
+      "noTimes": "Aún no hay tiempos — sé el primero.",
+      "loadingBoard": "Cargando…",
+      "you": "(tú)",
+      "race": "Carrera",
+      "racePartyHint": "Compite contra tu grupo — el primero en cruzar los anillos gana.",
+      "getReady": "Prepárate",
+      "go": "¡YA!",
+      "dnf": "Sin terminar",
+      "placeOf": "#{place} de {total}",
+      "racing": "En carrera"
+    },
+    "wager": {
+      "start": "Carrera de apuesta",
+      "title": "Carrera de apuesta",
+      "inviteGold": "{name} abre una Carrera de apuesta — apuesta {money} para entrar. ¿La igualas?",
+      "inviteCharter": "{name} abre una Carrera de apuesta — apuesta {money} + una Patente de montura. ¿La igualas?",
+      "accept": "Igualar apuesta",
+      "pot": "Bote {money}",
+      "potCharter": "Bote {money} + {count}× Patente",
+      "racers": "Corredores ({count})",
+      "launch": "Iniciar carrera",
+      "cancel": "Cancelar",
+      "leave": "Salir",
+      "waiting": "Esperando a que un rival iguale la apuesta…",
+      "won": "¡Ganas la apuesta — {money}!",
+      "wonCharter": "¡Ganas la apuesta — {money} + {count}× Patente!",
+      "lost": "Perdiste la apuesta.",
+      "refunded": "Apuesta cancelada — tu apuesta te es devuelta.",
+      "antePrompt": "¿Cuánto oro apuestas en esta carrera? (en cobre)",
+      "open": "Abrir apuesta",
+      "stakeCharter": "Apuesta también una Patente de montura (el ganador se la lleva)",
+      "errCourse": "No se puede apostar en ese circuito.",
+      "errFlyer": "Debes ir en una montura voladora para apostar.",
+      "errBusy": "Ya estás en una apuesta.",
+      "errAnte": "Fija una apuesta de al menos 1 de cobre.",
+      "errStake": "Eso no se puede poner en juego como apuesta.",
+      "errAfford": "No puedes cubrir esa apuesta.",
+      "errExpired": "Esa oferta de apuesta ha caducado.",
+      "errGone": "Esa apuesta ya no está abierta.",
+      "errHost": "Solo el anfitrión puede iniciar la apuesta."
+    },
     "options": {
       "gameMenu": "Menú del juego",
       "keyBindings": "Atajos de teclado",
@@ -4537,6 +4637,36 @@ export const es_ES: EnTranslations = {
       "monarch_crown_helm": {
         "name": "Corona del Monarca"
       },
+      "charter_ashmane": {
+        "name": "Patente: Trotón Crincenizas"
+      },
+      "charter_emberhoof": {
+        "name": "Patente: Cargador Cascobrasa"
+      },
+      "charter_bronzeflank": {
+        "name": "Patente: Destrero Flancobronce"
+      },
+      "charter_silvermane": {
+        "name": "Patente: Semental Crinplata"
+      },
+      "charter_stormhoof": {
+        "name": "Patente: Cargador Cascotormenta"
+      },
+      "charter_goldcrest": {
+        "name": "Patente: Surcacielos Crestadorada"
+      },
+      "charter_verdant": {
+        "name": "Patente: Alasalvaje Verdeante"
+      },
+      "charter_voidstrider": {
+        "name": "Patente: Zancador Alavacío"
+      },
+      "charter_celestial": {
+        "name": "Patente: Serafín Celestial"
+      },
+      "charter_worldbearer": {
+        "name": "Patente: Roc del Portamundos"
+      },
       "bristleback_maul": {
         "name": "Maza Bristleback"
       },
@@ -5430,6 +5560,11 @@ export const es_ES: EnTranslations = {
         "name": "Ondrel Vane",
         "title": "Vigía de la Marea",
         "greeting": "El lago bebe la luz de la luna, {className}, y devuelve a los ahogados. He vigilado esa puerta durante treinta noches... y esta noche está abierta."
+      },
+      "skytrial_master": {
+        "name": "Cielomaestre Vael",
+        "title": "Custodio de las Pruebas del Cielo",
+        "greeting": "El cielo es un camino que pocos se atreven a recorrer, {className}. Gánatelo, y te llevará."
       }
     },
     "quests": {
@@ -6245,6 +6380,36 @@ export const es_ES: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Vadeador de Glimmermere abatido"
+          }
+        }
+      },
+      "q_skyward_first_flight": {
+        "title": "Primer vuelo",
+        "text": "Montas bastante bien un corcel alado en tierra, {playerName} — ahora elévalo. Vuela la Prueba del Cielo del Valle: ocho anillos en una sola pasada en bucle. Aún no persigas el cronómetro. Solo mantente en el aire y enhebra cada anillo.",
+        "completion": "No caíste. Eso es más de lo que logran muchos en su primer bucle. El cielo recuerda a quienes vuelven una y otra vez.",
+        "objectives": {
+          "0": {
+            "label": "Prueba del Cielo del Valle completada"
+          }
+        }
+      },
+      "q_skyward_time_trial": {
+        "title": "Vence al reloj",
+        "text": "Ahora hazlo con intención. Vuela de nuevo la Prueba del Cielo del Valle, {playerName}, pero termina antes de que se agote la arena. Una línea limpia por cada anillo, sin aire desperdiciado. Precisión, no pánico.",
+        "completion": "Una línea limpia, de anillo en anillo. Ya no cabalgas el cielo — lo vuelas.",
+        "objectives": {
+          "0": {
+            "label": "Prueba del Cielo del Valle volada bajo el límite"
+          }
+        }
+      },
+      "q_skyward_ascendant": {
+        "title": "Ascendente",
+        "text": "Queda una prueba, {playerName}: el Circuito del Valle. Tres vueltas al anillo largo, voladas bajo el límite — sin suerte, solo destreza. Domínalo y el cielo abierto será tuyo para reclamarlo, de borde a borde.",
+        "completion": "Hacia el cielo e indómito. El cielo es tuyo ahora, {playerName}. Toma esta patente — un corcel del aire, ganado y no comprado, para llevarte adonde quieras ir.",
+        "objectives": {
+          "0": {
+            "label": "Circuito del Valle volado bajo el límite"
           }
         }
       }

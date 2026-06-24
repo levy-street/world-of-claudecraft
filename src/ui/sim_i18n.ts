@@ -3911,6 +3911,21 @@ const RULES: Rule[] = [
     re: /^That item cannot be listed on the World Market\.$/,
     build: () => t('itemUi.tooltip.cannotMarket'),
   },
+  // Mount Charter economy errors (sim-emitted via this.error).
+  { re: /^You already own that mount\.$/, build: () => t('hud.mounts.alreadyOwnErr') },
+  { re: /^That Charter is void\.$/, build: () => t('hud.mounts.charterVoidErr') },
+  { re: /^No Charter can be struck for that mount\.$/, build: () => t('hud.mounts.noCharterErr') },
+  { re: /^Your holdings do not cover that mount\.$/, build: () => t('hud.mounts.holdingsShortErr') },
+  // Wager Race rejection errors (sim-emitted via this.error).
+  { re: /^That course cannot be wagered\.$/, build: () => t('hud.wager.errCourse') },
+  { re: /^You must be on a flying mount to wager\.$/, build: () => t('hud.wager.errFlyer') },
+  { re: /^You are already in a wager\.$/, build: () => t('hud.wager.errBusy') },
+  { re: /^Name a wager of at least 1 copper\.$/, build: () => t('hud.wager.errAnte') },
+  { re: /^That cannot be staked as a wager\.$/, build: () => t('hud.wager.errStake') },
+  { re: /^You cannot cover that wager\.$/, build: () => t('hud.wager.errAfford') },
+  { re: /^That wager offer has expired\.$/, build: () => t('hud.wager.errExpired') },
+  { re: /^That wager is no longer open\.$/, build: () => t('hud.wager.errGone') },
+  { re: /^Only the host can launch the wager\.$/, build: () => t('hud.wager.errHost') },
   { re: /^(.+) awakens!$/, build: (m) => tQuestExtra('awakens', { name: locMob(m[1]) }) },
   {
     re: /^Fallen Captain Aldren yells, "None shall disturb the king's rest! For Thornpeak!"$/,

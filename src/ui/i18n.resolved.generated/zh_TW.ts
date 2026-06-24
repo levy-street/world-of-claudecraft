@@ -2551,6 +2551,106 @@ export const zh_TW: EnTranslations = {
       "mapCanvasLabel": "地圖",
       "mapSummary": "{zone}的地圖。"
     },
+    "mounts": {
+      "title": "坐騎",
+      "subtitle": "$WOC 旅行坐騎",
+      "close": "關閉坐騎",
+      "summon": "召喚",
+      "dismount": "下騎",
+      "summoning": "正在召喚{name}…",
+      "riding": "騎乘中",
+      "flies": "可飛行",
+      "locked": "未解鎖",
+      "speed": "+{percent}% 速度",
+      "unlockAt": "持有 {amount} $WOC 即解鎖",
+      "supplyShare": "供應量的 {percent}",
+      "qualifyHeader": "你符合 {total} 匹旅行坐騎中的 {count} 匹資格。",
+      "holdingHint": "持有 {amount} $WOC。",
+      "noWallet": "在綁定錢包上至少持有 {amount} $WOC（供應量的 0.1%），以贏得你的第一匹旅行坐騎。",
+      "cantInCombat": "戰鬥中無法騎乘。",
+      "cantSwimming": "游泳時無法騎乘。",
+      "cantDead": "死亡時無法騎乘。",
+      "notEligible": "你的 $WOC 持有量尚未達到那匹戰駒。",
+      "summonedBanner": "你召喚了{name}。",
+      "summonAria": "召喚{name}",
+      "dismountAria": "從{name}下騎",
+      "lockedAria": "{name} — 未解鎖；持有 {amount} $WOC 即解鎖",
+      "activeAria": "{name} — 目前使用中",
+      "cardAria": "{name}：{flavor}",
+      "owned": "已擁有",
+      "mint": "鑄造憑證",
+      "mintHint": "為這匹坐騎鑄造一份可交易的憑證 — 賣出換取金幣，讓非持有者也能贏得牠。",
+      "mintAria": "為{name}鑄造一份可交易的憑證",
+      "mintedBanner": "你為{name}鑄造了一份憑證。",
+      "earnedBanner": "你已贏得{name} — 牠永遠屬於你。",
+      "alreadyOwnErr": "你已擁有那匹坐騎。",
+      "charterVoidErr": "那份憑證已作廢。",
+      "noCharterErr": "那匹坐騎無法鑄造憑證。",
+      "holdingsShortErr": "你的持有量不足以涵蓋那匹坐騎。"
+    },
+    "course": {
+      "skytrials": "天試",
+      "skytrialsHint": "騎乘飛行坐騎，飛越計時的光環賽道。",
+      "needFlyer": "召喚一匹飛行坐騎以挑戰天試。",
+      "start": "起飛",
+      "give_up": "放棄",
+      "par": "基準 {time}",
+      "laps": "{count} 圈",
+      "onePass": "1 圈",
+      "starting": "飛越第一個光環以開始計時",
+      "gate": "光環 {n}/{total}",
+      "lap": "第 {n}/{total} 圈",
+      "time": "時間",
+      "finish": "完成！",
+      "beatPar": "快於基準 {time}",
+      "offPar": "慢於基準 {time}",
+      "failed": "挑戰結束 — 你離開了坐騎",
+      "aborted": "挑戰放棄",
+      "best": "最佳 {time}",
+      "newBest": "最佳紀錄！",
+      "board": "排行榜",
+      "boardTitle": "{name} — 最佳時間",
+      "noTimes": "尚無紀錄 — 成為第一人。",
+      "loadingBoard": "載入中…",
+      "you": "（你）",
+      "race": "競速",
+      "racePartyHint": "與你的隊伍競速 — 率先穿越光環者勝出。",
+      "getReady": "準備就緒",
+      "go": "出發！",
+      "dnf": "未完成",
+      "placeOf": "第 {place} 名／共 {total} 名",
+      "racing": "競速中"
+    },
+    "wager": {
+      "start": "賭注競速",
+      "title": "賭注競速",
+      "inviteGold": "{name}開設了一場賭注競速 — 下注 {money} 即可加入。要應戰嗎？",
+      "inviteCharter": "{name}開設了一場賭注競速 — 下注 {money} 加一份坐騎憑證即可加入。要應戰嗎？",
+      "accept": "應下賭注",
+      "pot": "彩池 {money}",
+      "potCharter": "彩池 {money} + {count}× 憑證",
+      "racers": "參賽者（{count}）",
+      "launch": "發動競速",
+      "cancel": "取消",
+      "leave": "離開",
+      "waiting": "等待挑戰者跟注…",
+      "won": "你贏得賭注 — {money}！",
+      "wonCharter": "你贏得賭注 — {money} + {count}× 憑證！",
+      "lost": "你輸掉了賭注。",
+      "refunded": "賭注取消 — 你的注金已退還。",
+      "antePrompt": "這場競速要下注多少金幣？（以銅幣計）",
+      "open": "開設賭注",
+      "stakeCharter": "同時押上一份坐騎憑證（贏家全拿）",
+      "errCourse": "那條賽道無法下注。",
+      "errFlyer": "你必須騎乘飛行坐騎才能下注。",
+      "errBusy": "你已身處一場賭注之中。",
+      "errAnte": "下注至少 1 銅幣。",
+      "errStake": "那無法作為賭注押上。",
+      "errAfford": "你無法支付那筆賭注。",
+      "errExpired": "那份賭注邀約已過期。",
+      "errGone": "那場賭注已不再開放。",
+      "errHost": "只有主辦者能發動賭注。"
+    },
     "options": {
       "gameMenu": "遊戲選單",
       "keyBindings": "按鍵設定",
@@ -4537,6 +4637,36 @@ export const zh_TW: EnTranslations = {
       "monarch_crown_helm": {
         "name": "君主之冠"
       },
+      "charter_ashmane": {
+        "name": "憑證：灰鬃疾行駒"
+      },
+      "charter_emberhoof": {
+        "name": "憑證：燼蹄衝鋒駒"
+      },
+      "charter_bronzeflank": {
+        "name": "憑證：銅脅戰駒"
+      },
+      "charter_silvermane": {
+        "name": "憑證：銀鬃駿馬"
+      },
+      "charter_stormhoof": {
+        "name": "憑證：暴蹄衝鋒駒"
+      },
+      "charter_goldcrest": {
+        "name": "憑證：金冠掠空駒"
+      },
+      "charter_verdant": {
+        "name": "憑證：碧翠野翼"
+      },
+      "charter_voidstrider": {
+        "name": "憑證：虛翼行者"
+      },
+      "charter_celestial": {
+        "name": "憑證：天界熾天使"
+      },
+      "charter_worldbearer": {
+        "name": "憑證：負世巨鵬"
+      },
       "bristleback_maul": {
         "name": "硬鬃重槌"
       },
@@ -5430,6 +5560,11 @@ export const zh_TW: EnTranslations = {
         "name": "翁德瑞爾·韋恩",
         "title": "守潮者",
         "greeting": "湖水飲盡了月光，{className}，再將溺者吐還。我已守望那道門三十夜——而今夜，它開了。"
+      },
+      "skytrial_master": {
+        "name": "天空大師維爾",
+        "title": "天試守護者",
+        "greeting": "天空是條少有人敢踏上的路，{className}。贏得它，它便會承載你。"
       }
     },
     "quests": {
@@ -6245,6 +6380,36 @@ export const zh_TW: EnTranslations = {
         "objectives": {
           "0": {
             "label": "微光湖涉者已被擊殺"
+          }
+        }
+      },
+      "q_skyward_first_flight": {
+        "title": "初次飛行",
+        "text": "你在地面上騎著有翼戰駒已夠穩了，{playerName} — 現在讓牠升空。飛越谷地天試：一趟環繞的飛行，八個光環。先別追逐計時，只要保持滯空，穿過每一個光環。",
+        "completion": "你沒有墜落。在第一趟環繞就能做到這點的人不多。天空記得那些不斷回來的人。",
+        "objectives": {
+          "0": {
+            "label": "完成谷地天試"
+          }
+        }
+      },
+      "q_skyward_time_trial": {
+        "title": "與時間賽跑",
+        "text": "現在帶著意圖再來一次。再飛一趟谷地天試，{playerName}，但要在沙漏流盡前完成。乾淨俐落地穿過每一個光環，不浪費一絲氣流。要精準，別慌亂。",
+        "completion": "一氣呵成，環環相扣。你不再只是駕馭天空 — 你正在飛翔。",
+        "objectives": {
+          "0": {
+            "label": "於標準時間內飛完谷地天試"
+          }
+        }
+      },
+      "q_skyward_ascendant": {
+        "title": "登天者",
+        "text": "只剩一項試煉，{playerName}：谷地環道。繞行長環三圈，於標準時間內飛完 — 不靠運氣，只憑技藝。征服它，廣闊天空便任你縱橫，從天際的一端到另一端。",
+        "completion": "登天而不折。如今天空屬於你了，{playerName}。收下這份憑證 — 一匹御風的戰駒，憑本事贏來而非買來，載你前往任何你心之所向的地方。",
+        "objectives": {
+          "0": {
+            "label": "於標準時間內飛完谷地環道"
           }
         }
       }

@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { coerceFxTier, nameplateIntervalSec } from '../game/ui_tier_knobs';
 import { cameraOcclusion } from '../sim/colliders';
+import { COURSES } from '../sim/content/courses';
 import {
   ABILITIES,
   ARENA_SLOT_COUNT,
@@ -28,7 +29,7 @@ import {
 } from '../sim/data';
 import type { DelveModuleId } from '../sim/delve_layout';
 import type { BiomeId } from '../sim/types';
-import { ALL_CLASSES, type Entity, type SimEvent } from '../sim/types';
+import { ALL_CLASSES, type CourseDef, type Entity, type SimEvent } from '../sim/types';
 import { groundHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
@@ -37,7 +38,7 @@ import type { SpatialAudioSink, Surface } from './audio_sink';
 import { type BirdsView, buildBirds } from './birds';
 import { type CameraOcclusionState, stepCameraOcclusion } from './camera_collision';
 import { characterSoulRendActive } from './character_effects';
-import { type AnimState, type CharacterVisual, createCharacterVisual } from './characters';
+import { type AnimState, type CharacterVisual, createCharacterVisual, type MountVisual, createMountVisual } from './characters';
 import { mechAssetsReady, preloadMechAssets } from './characters/assets';
 import { skinCount, visualKeyFor } from './characters/manifest';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
@@ -457,6 +458,8 @@ export interface EntityView {
   bearVisual: CharacterVisual | null; // druid bear form, built lazily
   catVisual: CharacterVisual | null; // druid cat form, built lazily
   travelVisual: CharacterVisual | null; // druid travel form (chicken-cow), built lazily
+  mount: MountVisual | null; // $WOC holder travel steed, built when entity.mountId is set
+  mountId: string | null; // last-rendered mount id, diffed each frame for live summon/dismount/swap
   skin: number; // last-rendered appearance skin — diffed each frame for live swaps
   mainhandItemId: string | null; // last-rendered equipped weapon — diffed for live held-weapon swaps
   /** unscaled height — nameplate/vfx anchor reads height * e.scale */
@@ -670,6 +673,12 @@ export class Renderer {
   camera: THREE.PerspectiveCamera;
   webgl: THREE.WebGLRenderer;
   views = new Map<number, EntityView>();
+  // Mount-activity course rings (procedural tori at the active course's
+  // checkpoints; the next gate glows gold). Built lazily for the active course.
+  private courseRingsGroup = new THREE.Group();
+  private courseRingsFor: string | null = null;
+  private courseRings: THREE.Mesh[] = [];
+  private courseRingGeom: THREE.TorusGeometry | null = null;
   nameplateLayer: HTMLDivElement;
   // Travel-form speed-illusion overlay (presentation only; see travel_speed_fx*).
   private travelSpeedFx: TravelSpeedFxPainter;
@@ -1135,6 +1144,8 @@ export class Renderer {
     this.foliage = buildFoliage(this.sim.cfg.seed);
     setRenderCategory(this.foliage.group, 'foliage');
     this.scene.add(this.foliage.group);
+    this.courseRingsGroup.visible = false;
+    this.scene.add(this.courseRingsGroup);
     this.fish = buildFish(this.sim.cfg.seed);
     setRenderCategory(this.fish.group, 'fish');
     this.scene.add(this.fish.group);
@@ -2737,6 +2748,55 @@ export class Renderer {
     this.vfx.nova(entityId, school);
   }
 
+  // Mount-activity course rings: procedural tori at the active course's
+  // checkpoints, the hole of each aimed at the next gate so you fly straight
+  // through. The next gate to clear glows gold and pulses; the rest sit cyan.
+  private buildCourseRings(def: CourseDef): void {
+    for (const m of this.courseRings) { this.courseRingsGroup.remove(m); (m.material as THREE.Material).dispose(); }
+    this.courseRings.length = 0;
+    if (!this.courseRingGeom) this.courseRingGeom = new THREE.TorusGeometry(3.4, 0.42, 10, 28);
+    const pts = def.checkpoints;
+    for (let i = 0; i < pts.length; i++) {
+      const c = pts[i];
+      const next = pts[(i + 1) % pts.length];
+      const mat = new THREE.MeshStandardMaterial({
+        color: 0x5fc3f0, emissive: 0x2a6fa0, emissiveIntensity: 1.0,
+        roughness: 0.4, metalness: 0.1, transparent: true, opacity: 0.82,
+      });
+      const ring = new THREE.Mesh(this.courseRingGeom, mat);
+      ring.position.set(c.x, c.y, c.z);
+      ring.lookAt(next.x, next.y, next.z); // torus hole (local +Z) points down the line
+      this.courseRings.push(ring);
+      this.courseRingsGroup.add(ring);
+    }
+    this.courseRingsFor = def.id;
+  }
+
+  private updateCourseRings(_dt: number): void {
+    const run = this.sim.courseRun;
+    if (!run || run.state !== 'active') {
+      if (this.courseRingsGroup.visible) this.courseRingsGroup.visible = false;
+      return;
+    }
+    const def = COURSES[run.courseId];
+    if (!def) { this.courseRingsGroup.visible = false; return; }
+    if (this.courseRingsFor !== def.id) this.buildCourseRings(def);
+    this.courseRingsGroup.visible = true;
+    const pulse = 1.5 + Math.sin(this.time * 4) * 0.6;
+    const scale = 1 + Math.sin(this.time * 4) * 0.06;
+    for (let i = 0; i < this.courseRings.length; i++) {
+      const ring = this.courseRings[i];
+      const mat = ring.material as THREE.MeshStandardMaterial;
+      if (i === run.nextCheckpoint) {
+        mat.color.setHex(0xffd24a); mat.emissive.setHex(0xc79a35); mat.emissiveIntensity = pulse; mat.opacity = 1;
+        ring.scale.setScalar(scale);
+      } else {
+        mat.color.setHex(0x5fc3f0); mat.emissive.setHex(0x2a6fa0); mat.emissiveIntensity = 1.0; mat.opacity = 0.82;
+        ring.scale.setScalar(1);
+      }
+    }
+  }
+
   // The shrinking hazard-ring wall. Built once on first use, then positioned and
   // scaled to the live ring each frame; hidden whenever no Fiesta bout is active.
   private updateFiestaRing(dt: number): void {
@@ -3190,6 +3250,8 @@ export class Renderer {
       bearVisual: null,
       catVisual: null,
       travelVisual: null,
+      mount: null,
+      mountId: null,
       height,
       clickTarget,
       nameplate: np,
@@ -3591,6 +3653,7 @@ export class Renderer {
       v.bearVisual?.dispose();
       v.catVisual?.dispose();
       v.travelVisual?.dispose();
+      v.mount?.dispose(); // releases the steed's per-instance geometries
     } else {
       if (v.objectPoolKey && v.objectMesh instanceof THREE.Group) {
         this.storePooledObject(v.objectPoolKey, { group: v.objectMesh, height: v.height });
@@ -3809,6 +3872,7 @@ export class Renderer {
           v.bearVisual?.setShadow(wantFormShadow);
           v.catVisual?.setShadow(wantFormShadow);
           v.travelVisual?.setShadow(wantFormShadow);
+          v.mount?.setShadow(wantShadow);
         } else if (wantShadow !== v.shadowOn) {
           v.shadowOn = wantShadow;
           for (const caster of v.objectCasters) (caster as THREE.Mesh).castShadow = wantShadow;
@@ -3988,10 +4052,32 @@ export class Renderer {
         !swimming &&
         (!e.onGround ||
           (e.kind === 'player' && ay - groundHeight(ax, az, this.sim.cfg.seed) > AIRBORNE_EPS));
+      // $WOC holder travel mount: attach / detach / swap the procedural steed and
+      // lift the rider onto the saddle. A mounted rider is forced to a standing
+      // idle pose (below) so their legs don't pump mid-air while the steed gaits.
+      const mounted = e.mountId != null && !visuallyDead && !swimming;
+      const wantMountId = mounted ? e.mountId! : null;
+      if (wantMountId !== v.mountId) {
+        if (v.mount) {
+          v.mount.dispose();
+          v.mount = null;
+        }
+        v.mountId = wantMountId;
+        if (wantMountId) {
+          const mv = createMountVisual(wantMountId);
+          if (mv) {
+            v.group.add(mv.root);
+            v.mount = mv;
+          }
+        }
+        v.visual.root.position.y = v.mount ? v.mount.riderLift : 0;
+      }
+      // Reuse the preallocated scratch (no per-frame AnimState garbage). A mounted
+      // rider is pinned to a still standing pose so the legs don't pump in the air.
       const st = this.animScratch;
-      st.speed = loco.speed;
-      st.moving = moving;
-      st.airborne = airborne;
+      st.speed = mounted ? 0 : loco.speed;
+      st.moving = mounted ? false : moving;
+      st.airborne = mounted ? false : airborne;
       st.backwards = loco.backwards;
       st.reverseBackpedal = ghostWolf;
       st.dead = visuallyDead;
@@ -4017,7 +4103,7 @@ export class Renderer {
             v.stepAccum = 0;
             sink.movement('swim', ax, ay, az, isSelf);
           }
-        } else if (moving && !airborne) {
+        } else if (moving && !airborne && !mounted) {
           v.stepAccum += loco.speed * dt;
           const stride = loco.speed >= FOOT_RUN_SPEED ? FOOT_STRIDE_RUN : FOOT_STRIDE_WALK;
           if (v.stepAccum >= stride) {
@@ -4047,6 +4133,8 @@ export class Renderer {
         else if (d2 > ENTITY_SHADOW_RANGE_SQ) animate = ((this.frameIdx + e.id) & 1) === 0;
       }
       active.update(dt, st, animate);
+      // gait the steed off the rider's real travel speed (the lifted rider idles)
+      if (v.mount && animate) v.mount.update(dt, loco.speed);
 
       const emoteId =
         e.kind === 'player' && e.overheadEmoteId && !e.dead ? e.overheadEmoteId : null;
@@ -4205,6 +4293,7 @@ export class Renderer {
     this.waterView.update(this.time);
     worldStart = markWorldPhase('water', worldStart);
     this.vfx.update(dt);
+    this.updateCourseRings(dt);
     this.updateFiestaRing(dt);
     this.updateFiestaPowerups(dt);
     this.tickFiestaGlows(dt);
