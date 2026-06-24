@@ -13,6 +13,7 @@ import {
   fitsLabel,
 } from '../src/ui/spin_wheel_core';
 import { revealOrder, topRarity, Rarity } from '../src/ui/pack_reveal_core';
+import { SponsoredAd, activeSponsor, safeClickUrl, ctaLabel, attribution } from '../src/ui/sponsored_slot';
 
 // ---- data mirrored from server/spin_prizes.ts (DEFAULT_PRIZE_TABLE) ----
 interface Prize { key: string; sol: number; weight: number; color: string; }
@@ -46,7 +47,16 @@ const RARE_CACHE_RIP: Reward[] = [
   { name: 'Keen Dirk', rarity: 'uncommon', kind: 'gear' },
 ];
 
+// Sample bookings for the 'daily_spin' placement. In production these come from
+// the ad-marketplace: adService.getForPlacement('daily_spin') -> ActiveAd[], which
+// has the identical shape (advertiser, text->headline, cta, clickUrl, endSec).
+const SPONSORS: SponsoredAd[] = [
+  { placementId: 'daily_spin', advertiser: 'Aurora Wallet', headline: 'The fastest self-custody Solana wallet', cta: 'Get the app', clickUrl: 'https://example.com/aurora', kind: 'text', endSec: Number.MAX_SAFE_INTEGER },
+  { placementId: 'daily_spin', advertiser: 'Drift Protocol', headline: 'Trade Solana perps, zero gas', cta: 'Start trading', clickUrl: 'https://example.com/drift', kind: 'text', endSec: Number.MAX_SAFE_INTEGER },
+];
+
 const $ = (id: string) => document.getElementById(id) as HTMLElement;
+const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 const TAU = Math.PI * 2;
 const segments = wheelSegments(PRIZES.map((p) => ({ key: p.key, weight: p.weight })));
 
@@ -190,11 +200,39 @@ function renderTasks(): void {
     .join('');
 }
 
+// ---- sponsored slot (ad-marketplace 'daily_spin' placement) ----
+let bonusSpins = 0;
+function renderSponsor(): void {
+  const ad = activeSponsor(SPONSORS, 'daily_spin', Math.floor(Date.now() / 1000));
+  const banner = $('sponsorBanner');
+  const line = $('sponsorLine');
+  if (!ad) { banner.classList.add('hidden'); line.classList.add('hidden'); return; }
+  const href = safeClickUrl(ad.clickUrl);
+  const ctaHtml = href
+    ? `<a class="ad-cta" href="${esc(href)}" target="_blank" rel="noopener noreferrer">${esc(ctaLabel(ad.cta))}</a>`
+    : '';
+  banner.classList.remove('hidden');
+  banner.innerHTML =
+    `<span class="ad-tag">Sponsored</span>` +
+    `<div class="ad-body"><b>${esc(ad.advertiser)}</b><span>${esc(ad.headline)}</span></div>` +
+    ctaHtml;
+  line.classList.remove('hidden');
+  line.innerHTML = `${esc(attribution(ad))} &middot; <button class="bonus-chip" id="bonusChip">+1 bonus spin</button>`;
+  const chip = $('bonusChip') as HTMLButtonElement;
+  chip.addEventListener('click', () => {
+    bonusSpins += 1;
+    chip.disabled = true;
+    chip.textContent = 'Bonus spin unlocked';
+    $('spinResult').innerHTML = `<span class="win">+1 sponsored spin</span> from ${esc(ad.advertiser)} (${bonusSpins} banked). Spin again.`;
+  });
+}
+
 function init(): void {
   drawWheel();
   renderLegend();
   renderPacks();
   renderTasks();
+  renderSponsor();
   $('spinBtn').addEventListener('click', spin);
   // Keep the wheel crisp + correctly sized across viewport changes.
   let raf = 0;
