@@ -86,3 +86,4 @@ dist-bot/
 .gstack/
 target/
 **/*-keypair.json
+scripts/spin_pack_demo.bundle.js

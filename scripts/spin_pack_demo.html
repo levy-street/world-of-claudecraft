@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>World of ClaudeCraft: Daily Rewards</title>
+<style>
+  :root {
+    --bg0:#0d0b08; --bg1:#16120c; --panel:#1d1810; --panel2:#241d12;
+    --gold:#caa24a; --gold-bright:#ffd97a; --ink:#e8e0cd; --muted:#9a8f78;
+    --border:#3a2e1a; --border-lt:#5a4827; --green:#1eff00; --shadow:0 8px 28px rgba(0,0,0,.55);
+  }
+  * { box-sizing:border-box; }
+  body {
+    margin:0; min-height:100vh; color:var(--ink);
+    font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;
+    background:
+      radial-gradient(1200px 600px at 50% -10%, #241a0e 0%, transparent 60%),
+      linear-gradient(160deg, var(--bg1), var(--bg0));
+  }
+  .frame { max-width:1120px; margin:0 auto; padding:28px 24px 48px; }
+  header { text-align:center; margin-bottom:22px; }
+  header h1 {
+    font-size:30px; margin:0 0 4px; letter-spacing:.5px;
+    color:var(--gold-bright); text-shadow:0 2px 0 #2a1d09, 0 0 18px rgba(202,162,74,.35);
+  }
+  header p { margin:0; color:var(--muted); font-size:14px; }
+  .grid { display:grid; grid-template-columns:380px 1fr; gap:22px; }
+  .panel {
+    background:linear-gradient(180deg, var(--panel2), var(--panel));
+    border:1px solid var(--border); border-radius:14px; box-shadow:var(--shadow);
+    padding:18px 18px 20px;
+  }
+  .panel h2 {
+    margin:0 0 14px; font-size:16px; letter-spacing:.4px; color:var(--gold);
+    display:flex; align-items:center; gap:8px;
+    border-bottom:1px solid var(--border); padding-bottom:10px;
+  }
+  .badge { font-size:11px; color:#caa24a; border:1px solid var(--border-lt); border-radius:999px; padding:2px 9px; }
+  /* spinner */
+  .wheel-wrap { position:relative; width:340px; height:340px; margin:4px auto 6px; }
+  #wheel { display:block; border-radius:50%; box-shadow:0 0 0 6px #120d07, 0 0 0 8px var(--gold), 0 10px 30px rgba(0,0,0,.6); }
+  .pointer { position:absolute; top:-6px; left:50%; transform:translateX(-50%);
+    width:0;height:0;border-left:13px solid transparent;border-right:13px solid transparent;
+    border-top:22px solid var(--gold-bright); filter:drop-shadow(0 2px 2px rgba(0,0,0,.6)); z-index:2; }
+  .gate { text-align:center; font-size:13px; color:var(--muted); margin:6px 0 12px; }
+  .gate b { color:var(--ink); }
+  .spin-btn {
+    display:block; width:100%; padding:13px; font-size:16px; font-weight:700; letter-spacing:.5px;
+    color:#1b1304; cursor:pointer; border:1px solid #7a5e1f; border-radius:10px;
+    background:linear-gradient(180deg, var(--gold-bright), var(--gold));
+    box-shadow:0 3px 0 #6f5417, inset 0 1px 0 rgba(255,255,255,.4);
+  }
+  .spin-btn:disabled { filter:grayscale(.5) brightness(.8); cursor:default; }
+  #spinResult { min-height:22px; text-align:center; margin-top:12px; font-size:14px; color:var(--muted); }
+  #spinResult .win { color:var(--gold-bright); font-weight:700; }
+  .fairness { text-align:center; font-size:11px; color:#6f6650; margin-top:10px; }
+  .fairness code { color:#8a7c5c; }
+  /* packs */
+  .pack-cards { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:6px; }
+  .pack {
+    border:1px solid var(--border); border-top:3px solid var(--tint); border-radius:11px;
+    background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(0,0,0,.15)); padding:14px 12px; text-align:center;
+  }
+  .pack-name { font-weight:700; color:var(--ink); margin-bottom:2px; }
+  .pack-rolls { font-size:12px; color:var(--muted); margin-bottom:11px; }
+  .burn {
+    width:100%; padding:9px; font-size:12px; font-weight:700; cursor:pointer; color:var(--ink);
+    border:1px solid var(--border-lt); border-radius:8px; background:rgba(40,30,12,.7);
+  }
+  .burn:hover { border-color:var(--gold); color:var(--gold-bright); }
+  #ripHeadline { text-align:center; font-weight:700; margin:16px 0 10px; font-size:15px; }
+  .rip-reveal { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .rip-reveal.hidden { display:none; }
+  .reward {
+    border:1px solid var(--rc); border-radius:11px; padding:14px 10px; text-align:center; min-height:104px;
+    background:radial-gradient(120px 80px at 50% 0%, color-mix(in srgb, var(--rc) 22%, transparent), transparent 70%), rgba(0,0,0,.25);
+    box-shadow:0 0 16px color-mix(in srgb, var(--rc) 35%, transparent);
+    opacity:0; transform:translateY(10px) scale(.96); animation:pop .42s ease forwards;
+  }
+  @keyframes pop { to { opacity:1; transform:none; } }
+  .reward-kind { font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); }
+  .reward-name { margin:8px 0; font-weight:700; color:var(--ink); font-size:13px; line-height:1.25; }
+  .reward-rarity { font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--rc); font-weight:700; }
+  /* tasks */
+  .tasks { margin-top:18px; }
+  #taskList { list-style:none; padding:0; margin:0 0 14px; }
+  #taskList li { display:flex; align-items:center; gap:10px; padding:9px 4px; border-bottom:1px solid rgba(90,72,39,.25); font-size:14px; color:var(--ink); }
+  #taskList li.done { color:var(--muted); }
+  #taskList .check { width:20px; height:20px; border-radius:6px; border:1px solid var(--border-lt); display:grid; place-items:center; }
+  #taskList li.done .check::after { content:''; width:6px; height:11px; border:solid var(--green); border-width:0 2px 2px 0; transform:rotate(45deg) translateY(-1px); }
+  .streak { display:flex; align-items:center; gap:12px; }
+  .streak .dots { display:flex; gap:6px; }
+  .streak .dot { width:18px; height:18px; border-radius:50%; background:#2a2114; border:1px solid var(--border-lt); }
+  .streak .dot.on { background:linear-gradient(180deg,var(--gold-bright),var(--gold)); box-shadow:0 0 8px rgba(202,162,74,.6); }
+  .streak .keys { margin-left:auto; font-weight:700; color:var(--gold-bright); }
+  .col { display:flex; flex-direction:column; gap:22px; }
+  @media (max-width:780px) {
+    .grid { grid-template-columns:1fr; }
+    .wheel-wrap, #wheel { width:300px; height:300px; }
+    .pack-cards, .rip-reveal { grid-template-columns:1fr; }
+    .spin-btn, .burn { min-height:44px; }
+  }
+</style>
+</head>
+<body>
+  <div class="frame">
+    <header>
+      <h1>Daily Rewards</h1>
+      <p>World of ClaudeCraft: hold $WOC, spin for SOL, rip packs, keep your streak</p>
+    </header>
+    <div class="grid">
+      <section class="panel">
+        <h2>Daily Spinner <span class="badge">provably fair</span></h2>
+        <div class="wheel-wrap">
+          <div class="pointer"></div>
+          <canvas id="wheel" width="340" height="340"></canvas>
+        </div>
+        <div class="gate">Eligible: <b>holds 1,250 $WOC</b> (min 1,000) · 1 free spin / day</div>
+        <button class="spin-btn" id="spinBtn">SPIN</button>
+        <div id="spinResult"></div>
+        <div class="fairness">daily commit <code>sha256(seed)=9f3a…b71c</code> · revealed at reset</div>
+      </section>
+      <div class="col">
+        <section class="panel">
+          <h2>Pack Ripping <span class="badge">burn $WOC</span></h2>
+          <div class="pack-cards" id="packCards"></div>
+          <div id="ripHeadline"></div>
+          <div class="rip-reveal hidden" id="ripReveal"></div>
+        </section>
+        <section class="panel tasks">
+          <h2>Daily Tasks <span class="badge">streak rewards</span></h2>
+          <ul id="taskList"></ul>
+          <div class="streak">
+            <div class="dots">
+              <span class="dot on"></span><span class="dot on"></span><span class="dot on"></span>
+              <span class="dot on"></span><span class="dot on"></span><span class="dot"></span><span class="dot"></span>
+            </div>
+            <span>5-day streak</span>
+            <span class="keys">8 keys</span>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+  <script src="./spin_pack_demo.bundle.js"></script>
+</body>
+</html>
