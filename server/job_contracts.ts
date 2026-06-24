@@ -51,6 +51,7 @@ export interface JobsDb {
   listActiveJobs(realm: string): Promise<JobRecord[]>;
   listPendingJobs(realm: string): Promise<JobRecord[]>;
   listJobsForCharacter(characterId: number, limit?: number): Promise<JobRecord[]>;
+  deleteJob(jobId: bigint): Promise<void>;
 }
 
 export interface JobEscrowOps {
@@ -113,17 +114,27 @@ export class JobContractService {
    * at boot and on an interval. Only opens a job whose on-chain terms match the
    * record (verifyJobState rejects a mismatched settler), so it can't be tricked.
    */
-  async reconcilePending(): Promise<void> {
+  async reconcilePending(nowSec: number, pendingTtlSec: number): Promise<void> {
     for (const job of await this.db.listPendingJobs(this.realm)) {
       const k = key(job.jobId);
       if (this.activeJobs.has(k) || this.settling.has(k)) continue;
       const funded = await this.escrow.verifyJobState(job.jobId, {
         payer: job.payer.wallet, helper: job.helper.wallet, mint: job.mint, amountBase: job.amountBase,
       });
-      if (!funded) continue; // deposit hasn't landed (or terms mismatch) — leave it pending
-      job.status = 'open';
-      await this.db.updateJob(job.jobId, { status: 'open' });
-      this.activeJobs.set(k, job);
+      if (funded) {
+        job.status = 'open';
+        await this.db.updateJob(job.jobId, { status: 'open' });
+        this.activeJobs.set(k, job);
+        continue;
+      }
+      // Not funded. Prune only an OLD quote that has no on-chain escrow at all —
+      // an abandoned post the payer never signed. The age gate (well past
+      // finalization) + the "no account exists" check guarantee we never delete a
+      // row whose deposit is merely in-flight or whose vault holds real funds.
+      const createdSec = job.createdAt ? Date.parse(job.createdAt) / 1000 : nowSec;
+      if (nowSec - createdSec > pendingTtlSec && !(await this.escrow.jobAccountExists(job.jobId))) {
+        await this.db.deleteJob(job.jobId);
+      }
     }
   }
 

@@ -127,4 +127,8 @@ export const jobsDb: JobsDb = {
     );
     return res.rows.map(rowToRecord);
   },
+
+  async deleteJob(jobId: bigint): Promise<void> {
+    await pool.query('DELETE FROM job_contracts WHERE job_id = $1', [String(jobId)]);
+  },
 };

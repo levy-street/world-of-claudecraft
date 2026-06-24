@@ -72,7 +72,11 @@ once accepted, only the milestone or deadline can settle it (no griefing).
   finalizes the record — never double-pays.
 - **Reconcile sweep** (boot + every 3 min): recovers deposits that funded
   on-chain but were never `confirm`ed (the payer closed the tab) by opening them,
-  so their locked reward can settle instead of being stranded.
+  so their locked reward can settle instead of being stranded. The same sweep
+  prunes *abandoned* quotes — `pending_deposit` rows older than
+  `JOB_PENDING_TTL_SECONDS` with **no** on-chain escrow (the payer never signed)
+  — so the table can't grow unbounded. It never prunes a row that still has funds
+  on-chain.
 
 ## Code map
 

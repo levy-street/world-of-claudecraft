@@ -59,6 +59,11 @@ export const JOB_ESCROW_SETTLER_SECRET = (process.env.JOB_ESCROW_SETTLER_SECRET 
 // How long a posted job stays open before it auto-refunds (the deadline the
 // milestone engine enforces), in seconds. Default 7 days.
 export const JOB_MAX_DURATION_SECONDS = clampInt(process.env.JOB_MAX_DURATION_SECONDS, 7 * 24 * 3600, 60, 30 * 24 * 3600);
+// How long an unconfirmed quote (pending_deposit) lingers before it's pruned —
+// only ever pruned when NO on-chain escrow exists for it (an abandoned quote the
+// payer never signed). Generous default (1h) so any in-flight deposit finalizes
+// first. Bounds the table against quote spam / abandoned posts.
+export const JOB_PENDING_TTL_SECONDS = clampInt(process.env.JOB_PENDING_TTL_SECONDS, 3600, 300, 7 * 24 * 3600);
 
 // ── Buyback-and-burn engine (PR #736 / #798 / #469 shared core) ──────────────
 // A keeper batches USDC accrued from marketplace fees, swaps it to $WOC on a DEX

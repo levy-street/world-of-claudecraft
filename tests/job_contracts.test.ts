@@ -26,6 +26,7 @@ class FakeDb implements JobsDb {
   async listJobsForCharacter(cid: number) {
     return [...this.jobs.values()].filter((j) => j.payer.characterId === cid || j.helper.characterId === cid);
   }
+  async deleteJob(id: bigint) { this.jobs.delete(id.toString()); }
 }
 
 class FakeEscrow implements JobEscrowOps {
@@ -234,22 +235,46 @@ describe('settlement robustness', () => {
 });
 
 describe('reconcile abandoned deposits', () => {
+  const NOW = 1_000_000;
+  const TTL = 3600;
+
   it('opens a funded-but-unconfirmed deposit so its escrow can settle (no stranding)', async () => {
     const { svc, db, escrow } = setup();
     const { jobId } = await svc.createQuote(input()); // pending_deposit, payer dropped before /confirm
     escrow.jobStateOk = true; // the reward DID land on-chain on our terms
-    await svc.reconcilePending();
+    await svc.reconcilePending(NOW, TTL);
     expect((await db.getJob(jobId))!.status).toBe('open');
     expect(svc.trackedCount()).toBe(1);
   });
 
-  it('leaves a job pending when the deposit has not landed (or terms mismatch)', async () => {
+  it('leaves a recent unfunded job pending (deposit may still be in flight)', async () => {
     const { svc, db, escrow } = setup();
     const { jobId } = await svc.createQuote(input());
     escrow.jobStateOk = false;
-    await svc.reconcilePending();
+    db.jobs.get(jobId.toString())!.createdAt = new Date(NOW * 1000).toISOString(); // just created
+    await svc.reconcilePending(NOW, TTL);
     expect((await db.getJob(jobId))!.status).toBe('pending_deposit');
     expect(svc.trackedCount()).toBe(0);
+  });
+
+  it('prunes an OLD unfunded quote with no on-chain escrow (bounds the table)', async () => {
+    const { svc, db, escrow } = setup();
+    const { jobId } = await svc.createQuote(input());
+    escrow.jobStateOk = false;
+    escrow.exists = false; // no on-chain account ever existed
+    db.jobs.get(jobId.toString())!.createdAt = new Date((NOW - TTL - 10) * 1000).toISOString(); // stale
+    await svc.reconcilePending(NOW, TTL);
+    expect(await db.getJob(jobId)).toBeNull(); // deleted
+  });
+
+  it('NEVER prunes an old row that still has on-chain escrow (funds at stake)', async () => {
+    const { svc, db, escrow } = setup();
+    const { jobId } = await svc.createQuote(input());
+    escrow.jobStateOk = false; // terms mismatch, say — but the account/funds exist
+    escrow.exists = true;
+    db.jobs.get(jobId.toString())!.createdAt = new Date((NOW - TTL - 10) * 1000).toISOString();
+    await svc.reconcilePending(NOW, TTL);
+    expect(await db.getJob(jobId)).not.toBeNull(); // kept — never delete with funds on-chain
   });
 });
 

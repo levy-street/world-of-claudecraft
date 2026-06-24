@@ -22,6 +22,7 @@ import {
 } from '../src/sim/types';
 import { type CommandName, isOverheadEmoteId } from '../src/world_api';
 import { recordOnlineSample } from './admin_db';
+import { JOB_PENDING_TTL_SECONDS } from './woc_config';
 import { offensiveName } from './auth';
 import type {
   BotDetector,
@@ -725,7 +726,7 @@ export class GameServer {
    */
   async loadJobs(): Promise<void> {
     await this.jobs.loadActive();
-    await this.jobs.reconcilePending();
+    await this.jobs.reconcilePending(Date.now() / 1000, JOB_PENDING_TTL_SECONDS);
   }
 
   // Tell the (online) payer + helper a job settled. Bypasses routeEvents and
@@ -993,7 +994,7 @@ export class GameServer {
       if (this.jobReconcileInFlight) return;
       this.jobReconcileInFlight = true;
       void this.jobs
-        .reconcilePending()
+        .reconcilePending(Date.now() / 1000, JOB_PENDING_TTL_SECONDS)
         .catch((err) => console.error('job reconcile failed:', err))
         .finally(() => {
           this.jobReconcileInFlight = false;
