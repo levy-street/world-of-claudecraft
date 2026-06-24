@@ -106,6 +106,21 @@ Tests: `tests/job_milestone.test.ts`, `tests/job_contracts.test.ts`,
 
 The feature is inert until both the flag and the settler key are set.
 
+## Devnet verification (live)
+
+The program is deployed to **devnet** at
+`5X39bYGeHPSeNipQGrZRk1siKdgDXXSqhBkpWDTTQzm8` (upgradeable; authority = the
+`SOLANA_DEVNET_DEPLOYER`). `scripts/job_escrow_devnet_e2e.mjs` exercised every
+transaction type against it on-chain — **escrow open (deposit), release (the
+helper received exactly the locked amount, verified), refund (returned to the
+payer), a native SOL tip, and an SPL token tip** — all `Success` / `Finalized`.
+
+Solscan (devnet) links for each tx: `docs/screenshots/jobs/devnet-tx-links.json`.
+Explorer screenshots (Solscan is Cloudflare-walled for headless capture, so these
+are the official Solana Explorer for the same signatures):
+`docs/screenshots/jobs/tx-*.png`. Re-run with `node scripts/job_escrow_devnet_e2e.mjs`
+(needs the deployer funded) then `node scripts/job_devnet_tx_shots.mjs`.
+
 ## Scope note
 
 Escrowed rewards are **WOC and USDC** (SPL tokens). Native SOL is supported for
