@@ -121,6 +121,19 @@ See `README.md` for the full host/develop/play guide and the classic-fidelity ch
 - **Commits:** Conventional Commits with a scope — `feat(talents): …`, `fix(net): …`,
   `test(sim): …`. Branches: `feature/<slug>`, `fix/<slug>`.
 
+## Solana on-chain (`programs/`) — devnet deploys
+The `programs/` Anchor workspace (e.g. `character-market`, the listing escrow + 70/30
+USDC split) deploys to **devnet** for validation before any mainnet decision.
+- **Deployer key:** use **`SOLANA_DEVNET_DEPLOYER`** from `.env.local` — a base58-encoded
+  64-byte keypair secret. Materialize it to a temp keypair JSON for the `solana`/`anchor`
+  CLIs, deploy, then delete the temp file. **Never commit `.env.local`, the decoded key,
+  or any keypair JSON** (keep them `.gitignore`d); never print the full secret.
+- **Cluster:** devnet only here — RPC `https://api.devnet.solana.com`. Devnet SOL is free
+  (`solana airdrop`). Devnet ≠ real money; never point these at mainnet without explicit sign-off.
+- Build `anchor build` (or `cargo build-sbf`); deploy `solana program deploy`; verify each tx
+  at `https://solscan.io/tx/<sig>?cluster=devnet`. Devnet integration tests live in
+  `programs/character-market/tests/devnet.mjs`.
+
 ## Testing & verification
 - Logic/unit: Vitest (`tests/`). Add or update tests when you change sim or server behavior.
 - E2E/visual: `scripts/*.mjs` drive real browsers via `puppeteer-core` and need
