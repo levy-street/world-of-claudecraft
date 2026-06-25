@@ -9,8 +9,9 @@ vi.mock('../server/solana_das', () => das);
 import {
   evmSelector, encodeUint256, decodeAddressWord, decodeAbiString, resolveAssetUri,
   nftOwnership, ownsNft, nftMetadata, resetNftOwnershipCacheForTests,
-  CRYPTOPUNKS_NATIVE, WRAPPED_PUNKS, type NftCollectionRef, type EthCallOutcome,
+  CRYPTOPUNKS_NATIVE, WRAPPED_PUNKS, type NftCollectionRef,
 } from '../server/nft_ownership';
+import type { EthCallOutcome } from '../server/eth_rpc';
 
 const addrWord = (addr: string): string => `0x${'0'.repeat(24)}${addr.toLowerCase().replace(/^0x/, '')}`;
 const ok = (data: string): EthCallOutcome => ({ kind: 'ok', data });

@@ -2,27 +2,28 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock the db layer (no Postgres) + the on-chain ownership reader; the lost-on-sell
 // sweep + force-unequip logic on the real GameServer is under test.
+/* eslint-disable @typescript-eslint/no-explicit-any */
 const db = vi.hoisted(() => ({
-  pool: { query: vi.fn(async () => ({ rows: [] })) },
-  saveCharacterState: vi.fn(async () => {}),
-  openPlaySession: vi.fn(async () => 1),
-  closePlaySession: vi.fn(async () => {}),
-  insertChatLogs: vi.fn(async () => {}),
-  walletForAccount: vi.fn(async () => null as { pubkey: string } | null),
-  markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
-  grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
-  revokeAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
-  loadMarketState: vi.fn(async () => null),
-  saveMarketState: vi.fn(async () => {}),
+  pool: { query: vi.fn(async (): Promise<any> => ({ rows: [] })) },
+  saveCharacterState: vi.fn(async (): Promise<void> => {}),
+  openPlaySession: vi.fn(async (): Promise<number> => 1),
+  closePlaySession: vi.fn(async (): Promise<void> => {}),
+  insertChatLogs: vi.fn(async (): Promise<void> => {}),
+  walletForAccount: vi.fn(async (): Promise<any> => null),
+  markAccountQuestComplete: vi.fn(async (): Promise<any> => ({ completedQuestIds: [], mechChromaIds: [] })),
+  grantAccountMechChroma: vi.fn(async (): Promise<any> => ({ completedQuestIds: [], mechChromaIds: [] })),
+  revokeAccountMechChroma: vi.fn(async (): Promise<any> => ({ completedQuestIds: [], mechChromaIds: [] })),
+  loadMarketState: vi.fn(async (): Promise<any> => null),
+  saveMarketState: vi.fn(async (): Promise<void> => {}),
   // NFT grant ledger + allow-list + EVM wallet:
-  evmWalletForAccount: vi.fn(async () => ({ address: '0x' + '1'.repeat(40) })),
-  getNftCollection: vi.fn(async () => ({ chain: 'ethereum', contract: '0xc', name: 'C', standard: 'erc721', profileId: 'bayc', licenseBasis: '', enabled: true })),
-  grantNftSkin: vi.fn(async () => {}),
-  revokeNftSkin: vi.fn(async () => true),
-  touchNftGrant: vi.fn(async () => {}),
-  listNftGrantsForAccount: vi.fn(async () => [] as Array<{ skinId: string; chain: string; contract: string; tokenId: string; revoked: boolean }>),
+  evmWalletForAccount: vi.fn(async (): Promise<any> => ({ address: '0x' + '1'.repeat(40) })),
+  getNftCollection: vi.fn(async (): Promise<any> => ({ chain: 'ethereum', contract: '0xc', name: 'C', standard: 'erc721', profileId: 'bayc', licenseBasis: '', enabled: true })),
+  grantNftSkin: vi.fn(async (): Promise<void> => {}),
+  revokeNftSkin: vi.fn(async (): Promise<boolean> => true),
+  touchNftGrant: vi.fn(async (): Promise<void> => {}),
+  listNftGrantsForAccount: vi.fn(async (): Promise<any[]> => []),
 }));
-const own = vi.hoisted(() => ({ ownsNft: vi.fn(async () => true as boolean | null) }));
+const own = vi.hoisted(() => ({ ownsNft: vi.fn(async (): Promise<boolean | null> => true) }));
 vi.mock('../server/db', () => db);
 vi.mock('../server/nft_ownership', () => own);
 
@@ -39,7 +40,7 @@ const GRANT = { skinId: SKIN, chain: 'ethereum', contract: '0xc', tokenId: '1', 
 
 function joinWithEquippedNftSkin(server: GameServer): { session: ClientSession; entity: any } {
   const fc = fakeWs();
-  const session = server.join(fc.ws, 7, 7, 'Ape', 'warrior' as PlayerClass, null);
+  const session = server.join(fc.ws as never, 7, 7, 'Ape', 'warrior' as PlayerClass, null);
   if ('error' in session) throw new Error(session.error);
   session.blockListLoaded = true;
   // Grant + equip the NFT skin (as a successful claim + change_skin would).
