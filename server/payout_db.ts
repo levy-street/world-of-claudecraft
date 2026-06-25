@@ -144,20 +144,53 @@ export async function lastSettleAt(): Promise<number | null> {
   return at == null ? null : new Date(at as string).getTime();
 }
 
+// Source-scoped variants of the two recovery/cadence reads. The buyback_batches
+// table is multi-tenant by `source` (the marketplace keeper and the realm-buyback
+// keepers each own a different vault). A keeper MUST only recover and pace off its
+// OWN source, or it would try to settle another vault's batch with the wrong key.
+export async function openBuybackBatchesBySource(source: string): Promise<PayoutBatchRow[]> {
+  const res = await pool.query(
+    `SELECT * FROM buyback_batches WHERE status IN ('swapping','swapped','settling') AND source = $1 ORDER BY created_at`,
+    [source],
+  );
+  return res.rows.map(mapBatch);
+}
+
+export async function lastSettleAtBySource(source: string): Promise<number | null> {
+  const res = await pool.query(
+    `SELECT MAX(executed_at) AS at FROM buyback_batches WHERE status = 'settled' AND source = $1`,
+    [source],
+  );
+  const at = res.rows[0]?.at;
+  return at == null ? null : new Date(at as string).getTime();
+}
+
 // Cross-process single-flight for the keeper: sibling realm processes share one
 // vault + DB, so a Postgres session advisory lock ensures only one process runs a
 // cycle at a time (returns null for the losers). Distinct key from the schema
 // lock (0x574f4301) and the skins burn-keeper lock (0x574f4302).
 const PAYOUT_KEEPER_LOCK_KEY = 0x57_4f_43_03; // "WOC\x03"
 export async function withPayoutKeeperLock<T>(fn: () => Promise<T>): Promise<T | null> {
+  return withAdvisoryLock(PAYOUT_KEEPER_LOCK_KEY, fn);
+}
+
+// The realm-buyback keeper owns a DIFFERENT vault than the marketplace keeper, so
+// it takes a distinct lock: the two can run concurrently (different vaults, source-
+// scoped batches), but sibling realm processes sharing the realm vault must not.
+const REALM_BUYBACK_KEEPER_LOCK_KEY = 0x57_4f_43_04; // "WOC\x04"
+export async function withRealmBuybackKeeperLock<T>(fn: () => Promise<T>): Promise<T | null> {
+  return withAdvisoryLock(REALM_BUYBACK_KEEPER_LOCK_KEY, fn);
+}
+
+async function withAdvisoryLock<T>(key: number, fn: () => Promise<T>): Promise<T | null> {
   const client = await pool.connect();
   try {
-    const res = await client.query('SELECT pg_try_advisory_lock($1) AS locked', [PAYOUT_KEEPER_LOCK_KEY]);
+    const res = await client.query('SELECT pg_try_advisory_lock($1) AS locked', [key]);
     if (!res.rows[0]?.locked) return null;
     try {
       return await fn();
     } finally {
-      await client.query('SELECT pg_advisory_unlock($1)', [PAYOUT_KEEPER_LOCK_KEY]);
+      await client.query('SELECT pg_advisory_unlock($1)', [key]);
     }
   } finally {
     client.release();

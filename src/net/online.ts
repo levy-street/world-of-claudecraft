@@ -104,6 +104,11 @@ export interface OwnedRealm {
   tier: number;
   url: string; // origin to enter; '' means the page origin (single-shard)
   releaseEligibleAt: string | null; // ISO 8601 once decommissioning, else null
+  // Buy-path $WOC bond (absent/null for staked realms). bondBase is the $WOC the
+  // owner must keep holding; bondGraceUntil is set (ISO 8601) while the wallet is
+  // below the bond, the deadline to top up before the realm lapses.
+  bondBase?: string | null;
+  bondGraceUntil?: string | null;
 }
 
 // A signed provision quote (POST /api/realms/quote). The client locks exactly
@@ -122,6 +127,65 @@ export interface ProvisionQuote {
   vault: string;
   expiresAt: string;
   affiliateApplied: boolean; // true when a valid affiliate link was credited to this realm
+}
+
+// One payable currency for the buy path (GET /api/realms/buy/info).
+export interface RealmBuyCurrencyInfo {
+  key: 'USDC' | 'SOL';
+  mint: string;
+  decimals: number;
+  native: boolean;
+}
+
+// One tier's live buy price (GET /api/realms/buy/info): the SOL + USDC market value
+// of the tier's $WOC threshold. A price is null when no DEX route is available.
+export interface RealmBuyTierOption {
+  tier: number; // 1 bronze, 2 silver, 3 gold
+  name: 'bronze' | 'silver' | 'gold';
+  bps: number;
+  wocBase: string; // the $WOC-equivalent the price is the market value of
+  bondBase: string; // the ongoing $WOC the owner must keep holding (0 if bonds off)
+  prices: Record<'USDC' | 'SOL', string | null>;
+}
+
+// The "buy a realm" price list + split + recipient addresses (GET /api/realms/buy/info).
+export interface RealmBuyInfo {
+  wocMint: string;
+  wocDecimals: number;
+  supplyBase: string;
+  treasuryBps: number; // share to the treasury (the rest is buyback+burn)
+  treasury: string;
+  buybackVault: string;
+  maxPerAccount: number;
+  bondBps: number; // ongoing $WOC hold requirement as bps of the tier threshold (0 = off)
+  currencies: RealmBuyCurrencyInfo[];
+  tiers: RealmBuyTierOption[];
+}
+
+// A signed buy quote (POST /api/realms/buy/quote). The client pays treasuryBase to
+// `treasury` and buybackBase to `buybackVault` (in `currency`) in one transaction
+// tagged with `memo`, then posts the finalized signature to /buy/confirm.
+export interface RealmBuyQuoteResponse {
+  quoteId: string;
+  realmId: number;
+  name: string;
+  type: RealmType;
+  tier: number;
+  tierName: string;
+  currency: 'USDC' | 'SOL';
+  native: boolean;
+  currencyMint: string;
+  currencyDecimals: number;
+  totalBase: string;
+  treasuryBase: string;
+  buybackBase: string;
+  treasury: string;
+  buybackVault: string;
+  wocBase: string;
+  bondBase: string; // the ongoing $WOC the owner must keep holding (0 if bonds off)
+  memo: string;
+  expiresAt: string;
+  affiliateApplied: boolean;
 }
 
 // The signed-in account's affiliate identity (GET /api/affiliate/me): a stable
@@ -236,6 +300,29 @@ export class Api {
     return this.get('/api/realms/tiers');
   }
 
+  // Live SOL + USDC price of each tier (the market value of its $WOC threshold),
+  // plus the treasury/buyback split, for the "buy a realm" path.
+  realmBuyInfo(): Promise<RealmBuyInfo> {
+    return this.get('/api/realms/buy/info');
+  }
+
+  // Reserve a provisioning realm and return the exact SOL/USDC legs to pay. `tier`
+  // is 1/2/3 (bronze/silver/gold); `currency` is 'SOL' | 'USDC'.
+  quoteRealmBuy(
+    name: string,
+    type: RealmType,
+    tier: number,
+    currency: string,
+    affiliateCode?: string,
+  ): Promise<RealmBuyQuoteResponse> {
+    return this.post('/api/realms/buy/quote', { name, type, tier, currency, affiliateCode });
+  }
+
+  // Confirm a buy quote with the finalized split-payment signature; activates the realm.
+  confirmRealmBuy(quoteId: string, paySig: string): Promise<{ realmId: number; tier: number }> {
+    return this.post('/api/realms/buy/confirm', { quoteId, paySig });
+  }
+
   // The account's own realms in every non-closed state, for the operator dashboard.
   async myRealms(): Promise<OwnedRealm[]> {
     const d = await this.get('/api/realms/mine');
@@ -270,8 +357,10 @@ export class Api {
     return this.post('/api/realms/confirm', { quoteId, lockSig });
   }
 
-  // Owner begins decommissioning; returns when the on-chain stake can be released.
-  decommissionRealm(realmId: number): Promise<{ realmId: number; releaseEligibleAt: string }> {
+  // Owner begins decommissioning. For a staked realm this returns when the on-chain
+  // stake can be released; for a BOUGHT realm (no recoverable stake) the server
+  // closes it immediately and returns `closed: true`.
+  decommissionRealm(realmId: number): Promise<{ realmId: number; releaseEligibleAt: string; closed?: boolean }> {
     return this.post(`/api/realms/${realmId}/decommission`, {});
   }
 

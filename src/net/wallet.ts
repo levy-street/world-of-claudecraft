@@ -25,6 +25,7 @@ import {
 import { Connection, PublicKey, Transaction } from '@solana/web3.js';
 import bs58 from 'bs58';
 import { buildRealmLockIx, ownerTokenAccount } from './realm_escrow';
+import { buildRealmPurchaseInstructions } from './realm_buy';
 
 export interface WalletState {
   address: string | null;
@@ -420,6 +421,61 @@ export async function signAndSendRealmLock(quote: RealmLockQuote): Promise<strin
   tx.feePayer = staker;
   tx.recentBlockhash = blockhash;
   tx.add(ix);
+  const wire = tx.serialize({ requireAllSignatures: false, verifySignatures: false });
+
+  const [result] = await feature.signAndSendTransaction({
+    account,
+    chain: REALM_CHAIN,
+    transaction: new Uint8Array(wire),
+  });
+  if (!result || !(result.signature instanceof Uint8Array)) throw new Error('wallet returned an invalid signature');
+  return bs58.encode(result.signature);
+}
+
+// ── Buy a realm: pay the SOL/USDC split (#475) ───────────────────────────────
+// The server-quoted purchase: the two legs (treasury + buyback vault), the
+// currency, and the quoteId memo. Amounts are base-unit decimal strings.
+export interface RealmBuyQuote {
+  native: boolean; // SOL (System transfers) vs USDC (SPL transfers)
+  currencyMint: string;
+  currencyDecimals: number;
+  treasury: string;
+  buybackVault: string;
+  treasuryBase: string;
+  buybackBase: string;
+  memo: string; // == quoteId
+}
+
+// Sign + send the split payment for a realm purchase, returning the signature for
+// POST /api/realms/buy/confirm. The instruction set is built by the shared pure
+// builder (src/net/realm_buy.ts); this only attaches a recent blockhash + fee payer
+// and hands it to the wallet, exactly like signAndSendRealmLock.
+export async function signAndSendRealmPurchase(quote: RealmBuyQuote): Promise<string> {
+  const wallet = selectedWallet;
+  const account = selectedAccount;
+  if (!wallet || !account) throw new Error('connect a wallet first');
+  const feature = signAndSendFeature(wallet);
+  if (!feature) throw new Error('this wallet cannot sign and send transactions');
+
+  const buyer = new PublicKey(account.address);
+  const ixs = buildRealmPurchaseInstructions({
+    buyer,
+    native: quote.native,
+    currencyMint: new PublicKey(quote.currencyMint),
+    currencyDecimals: quote.currencyDecimals,
+    treasury: new PublicKey(quote.treasury),
+    buybackVault: new PublicKey(quote.buybackVault),
+    treasuryBase: BigInt(quote.treasuryBase),
+    buybackBase: BigInt(quote.buybackBase),
+    memo: quote.memo,
+  });
+
+  const connection = new Connection(REALM_RPC_URL, 'confirmed');
+  const { blockhash } = await connection.getLatestBlockhash('confirmed');
+  const tx = new Transaction();
+  tx.feePayer = buyer;
+  tx.recentBlockhash = blockhash;
+  for (const ix of ixs) tx.add(ix);
   const wire = tx.serialize({ requireAllSignatures: false, verifySignatures: false });
 
   const [result] = await feature.signAndSendTransaction({

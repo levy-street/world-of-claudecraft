@@ -182,6 +182,9 @@ const REQUIRED_REALM_COLUMNS: Record<string, readonly string[]> = {
   realms: ['realm_id', 'name', 'status', 'owner_account_id', 'tier', 'world_seed', 'release_eligible_at'],
   realm_stakes: ['stake_id', 'realm_id', 'amount_base', 'lock_tx_sig', 'status'],
   realm_quotes: ['quote_id', 'realm_id', 'amount_base', 'expires_at'],
+  realm_buy_quotes: ['quote_id', 'realm_id', 'currency', 'total_base', 'treasury_base', 'buyback_base', 'bond_base', 'expires_at'],
+  realm_purchases: ['purchase_id', 'realm_id', 'currency', 'total_base', 'treasury_base', 'buyback_base', 'pay_tx_sig'],
+  realm_bonds: ['realm_id', 'account_id', 'bond_base', 'grace_until'],
 };
 
 export async function assertRealmSchema(db: Queryable): Promise<void> {

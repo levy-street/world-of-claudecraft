@@ -15,7 +15,7 @@ import { voice } from './game/voice';
 import { sfx } from './game/sfx';
 import { activePvpOpponentIds, handlePickedEntity, hoverCursorKind, isAttackableEntity } from './game/interactions';
 import { clickMoveShouldCancel, clickMoveShouldWalk, clickMoveStep, distance2d, latencyAdjustedStopDistance, stepAngleToward } from './game/click_move';
-import { Api, isAuthError, ClientWorld, CharacterSummary, type ReleaseEntry, type OwnedRealm, type ProvisionQuote } from './net/online';
+import { Api, isAuthError, ClientWorld, CharacterSummary, type ReleaseEntry, type OwnedRealm, type ProvisionQuote, type RealmBuyQuoteResponse } from './net/online';
 import { RealmOperator } from './ui/realm_operator';
 import { RealmAffiliate } from './ui/realm_affiliate';
 import { setWalletDisplayAvailable, setWocBalance, setWalletUiEnabled, resolveWocBalanceUpdate } from './ui/wallet_balance';
@@ -3703,6 +3703,28 @@ async function signRealmLock(quote: ProvisionQuote): Promise<string | null> {
   }
 }
 
+// Sign + send the SOL/USDC split payment for a buy quote. Returns the payment
+// signature, or null if the player rejected/cancelled in their wallet. Mirrors
+// signRealmLock for the "buy with SOL or USDC" path.
+async function signRealmPurchase(quote: RealmBuyQuoteResponse): Promise<string | null> {
+  const wallet = await loadWallet();
+  try {
+    return await wallet.signAndSendRealmPurchase({
+      native: quote.native,
+      currencyMint: quote.currencyMint,
+      currencyDecimals: quote.currencyDecimals,
+      treasury: quote.treasury,
+      buybackVault: quote.buybackVault,
+      treasuryBase: quote.treasuryBase,
+      buybackBase: quote.buybackBase,
+      memo: quote.memo,
+    });
+  } catch (err) {
+    if (wallet.isWalletSelectionCancelled(err)) return null;
+    throw err instanceof Error ? err : new Error(t('realmOp.err.generic'));
+  }
+}
+
 let realmOperator: RealmOperator | null = null;
 function openRealmOperator(): void {
   show('#realm-operator-panel');
@@ -3714,6 +3736,7 @@ function openRealmOperator(): void {
       linkedWallet: () => linkedWalletPubkey,
       ensureWalletReady: ensureRealmWalletReady,
       signLock: signRealmLock,
+      signPurchase: signRealmPurchase,
       affiliateCode: () => REFERRAL_CODE || null,
       enterRealm: (realm: OwnedRealm) => selectRealm({ name: realm.name, url: realm.url, type: realm.type }),
       close: () => showRealmList(),

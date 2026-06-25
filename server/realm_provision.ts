@@ -35,6 +35,8 @@ import {
   getRealmQuote,
   reclaimExpiredProvisioning,
 } from './realm_quote_db';
+import { reclaimExpiredBuyProvisioning, realmWasPurchased } from './realm_buy_db';
+import { reconcileBonds } from './realm_bond';
 import { minStakeBase, tierForStake, TIER_BPS, tierThreshold } from './realm_tiers';
 import { invalidateWalletHoldings } from './realm_stake_holdings';
 import { setRealmAffiliate } from './affiliate_db';
@@ -345,13 +347,14 @@ export async function confirmProvisionQuote(
   return { ok: true, realmId: quote.realmId, tier: quote.tier };
 }
 
-// Owner begins decommissioning: mark the realm decommissioning + the stake
-// releasing, and return the (UI) release-eligible time. The owner separately
-// signs the on-chain request_decommission + release.
+// Owner begins decommissioning. A STAKED realm enters the unstake timelock (the
+// owner then signs the on-chain request_decommission + release); a BOUGHT realm
+// (acquired with SOL/USDC, no escrowed principal) has nothing to return, so it is
+// closed immediately. The two are distinguished by whether an active stake exists.
 export async function requestRealmDecommission(
   pool: Pool,
   args: { accountId: number; realmId: number },
-): Promise<Result<{ realmId: number; releaseEligibleAt: string }>> {
+): Promise<Result<{ realmId: number; releaseEligibleAt: string; closed?: boolean }>> {
   const realm = await getRealmById(pool, args.realmId);
   if (!realm || realm.status === 'closed') return fail(404, 'realm_not_found');
   if (realm.ownerAccountId !== args.accountId) {
@@ -360,11 +363,23 @@ export async function requestRealmDecommission(
   }
   if (realm.status !== 'active') return fail(409, 'realm_not_active');
 
+  // A BOUGHT realm (a realm_purchases row, or simply no escrowed stake) has nothing
+  // to release, so close it directly. realmWasPurchased is the positive signal;
+  // `!stake` is the belt-and-suspenders fallback for any stakeless active realm.
+  const stake = await getActiveStakeByRealm(pool, args.realmId);
+  if ((await realmWasPurchased(pool, args.realmId)) || !stake) {
+    // Close directly (frees the name + the per-account cap slot). releaseEligibleAt
+    // is "now" since there is no timelock.
+    const closedAt = new Date();
+    const updated = await setRealmStatus(pool, args.realmId, 'closed');
+    if (!updated) return fail(409, 'realm_not_active');
+    return { ok: true, realmId: args.realmId, releaseEligibleAt: closedAt.toISOString(), closed: true };
+  }
+
   const eligibleAt = new Date(Date.now() + UNSTAKE_TIMELOCK_MS);
   const updated = await requestDecommission(pool, args.realmId, eligibleAt);
   if (!updated) return fail(409, 'realm_not_active');
-  const stake = await getActiveStakeByRealm(pool, args.realmId);
-  if (stake) await setStakeReleasing(pool, stake.stakeId);
+  await setStakeReleasing(pool, stake.stakeId);
   return { ok: true, realmId: args.realmId, releaseEligibleAt: eligibleAt.toISOString() };
 }
 
@@ -424,8 +439,15 @@ export async function finalizeRealmRelease(
 // whose owner already released on chain (the escrow PDA is closed) but never
 // called /release, so they do not stay stuck counting against the cap. Returns
 // counts for logging. Never force-closes a realm whose stake is still on chain.
-export async function reconcileRealmLifecycle(pool: Pool): Promise<{ reclaimed: number; finalized: number }> {
-  const reclaimed = await reclaimExpiredProvisioning(pool);
+export async function reconcileRealmLifecycle(
+  pool: Pool,
+): Promise<{ reclaimed: number; finalized: number; bondLapsed: number }> {
+  // Reclaim abandoned provisioning from BOTH acquisition paths (expired stake
+  // quotes and expired buy quotes) so neither leaves a realm stuck.
+  const reclaimed = (await reclaimExpiredProvisioning(pool)) + (await reclaimExpiredBuyProvisioning(pool));
+  // Enforce the ongoing $WOC bond on bought realms (skin in the game): start/clear
+  // grace windows and lapse realms whose owner's wallet stayed below the bond.
+  const bond = await reconcileBonds(pool);
   let finalized = 0;
   for (const realmId of await listRealmIdsByStatus(pool, 'decommissioning')) {
     const realm = await getRealmById(pool, realmId);
@@ -437,5 +459,5 @@ export async function reconcileRealmLifecycle(pool: Pool): Promise<{ reclaimed: 
     await setRealmStatus(pool, realmId, 'closed');
     finalized += 1;
   }
-  return { reclaimed, finalized };
+  return { reclaimed, finalized, bondLapsed: bond.lapsed };
 }

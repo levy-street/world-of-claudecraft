@@ -77,6 +77,8 @@ describe('ERR_KEYS server-code coverage', () => {
     // decommission + release
     'not_realm_owner', 'realm_not_found', 'realm_not_active', 'realm_not_decommissioning',
     'timelock_not_elapsed', 'stake_not_released_onchain',
+    // buy/quote ongoing-$WOC-bond precheck
+    'bond_required',
     // route-level rate limit
     'too many requests, slow down',
   ];

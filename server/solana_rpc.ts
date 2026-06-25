@@ -48,6 +48,11 @@ export interface RawConfirmedTransaction {
     err: unknown;
     preTokenBalances?: RawTokenBalance[];
     postTokenBalances?: RawTokenBalance[];
+    // Native SOL lamport balances per account index (positional, aligned with
+    // message.accountKeys). Present on every jsonParsed getTransaction response;
+    // read for the SOL-rail purchase split (parseNativePayment).
+    preBalances?: number[];
+    postBalances?: number[];
   } | null;
   transaction: {
     message: {
@@ -80,6 +85,17 @@ function pubkeyOf(key: { pubkey: string } | string): string {
   return typeof key === 'string' ? key : key.pubkey;
 }
 
+// The first SPL-memo instruction's string payload, or null. jsonParsed renders a
+// memo program's data as the raw string in `parsed`. Shared by the token-split and
+// native-SOL parsers so a quoteId memo binds a payment to its quote either way.
+function extractMemo(instructions: Array<{ program?: string; programId?: string; parsed?: unknown }>): string | null {
+  for (const ix of instructions) {
+    const isMemo = ix.program === 'spl-memo' || (ix.programId !== undefined && MEMO_PROGRAMS.has(ix.programId));
+    if (isMemo && typeof ix.parsed === 'string') return ix.parsed;
+  }
+  return null;
+}
+
 /**
  * Reduce a confirmed jsonParsed transaction to its USDC ownership deltas + memo
  * + fee payer. PURE — no I/O. `usdcMint` is the mint we measure deltas for;
@@ -91,14 +107,7 @@ export function parseSplitPayment(tx: RawConfirmedTransaction, usdcMint: string)
   const message = tx.transaction.message;
   const feePayer = message.accountKeys.length > 0 ? pubkeyOf(message.accountKeys[0]) : null;
 
-  let memo: string | null = null;
-  for (const ix of message.instructions) {
-    const isMemo = ix.program === 'spl-memo' || (ix.programId !== undefined && MEMO_PROGRAMS.has(ix.programId));
-    if (isMemo && typeof ix.parsed === 'string') {
-      memo = ix.parsed;
-      break;
-    }
-  }
+  const memo = extractMemo(message.instructions);
 
   const pre = new Map<string, bigint>();
   const post = new Map<string, bigint>();
@@ -126,6 +135,49 @@ export function parseSplitPayment(tx: RawConfirmedTransaction, usdcMint: string)
     memo,
     usesToken2022ForMint,
     tokenDeltas,
+  };
+}
+
+// A confirmed transaction reduced to its NATIVE SOL movement: did it succeed, who
+// paid the fee, what memo it carried, and the net lamport change per account. The
+// SOL-rail purchase split is verified against this (treasury + buyback legs).
+export interface ParsedNativePayment {
+  succeeded: boolean;
+  feePayer: string | null;
+  memo: string | null;
+  // account pubkey -> net lamport change (post - pre). Positive = received.
+  lamportDeltas: Map<string, bigint>;
+}
+
+/**
+ * Reduce a confirmed jsonParsed transaction to its native-SOL lamport deltas +
+ * memo + fee payer. PURE, no I/O. preBalances/postBalances are positional with
+ * accountKeys, so the delta for key i is post[i] - pre[i]. The fee payer's own
+ * delta also absorbs the transaction fee, so a payer check should bind identity
+ * (feePayer) and verify the RECIPIENT legs, not the payer's exact debit.
+ */
+export function parseNativePayment(tx: RawConfirmedTransaction): ParsedNativePayment {
+  const message = tx.transaction.message;
+  const keys = message.accountKeys.map(pubkeyOf);
+  const feePayer = keys.length > 0 ? keys[0] : null;
+  const pre = tx.meta?.preBalances ?? [];
+  const post = tx.meta?.postBalances ?? [];
+
+  const lamportDeltas = new Map<string, bigint>();
+  for (let i = 0; i < keys.length; i++) {
+    const before = typeof pre[i] === 'number' ? BigInt(Math.trunc(pre[i])) : 0n;
+    const after = typeof post[i] === 'number' ? BigInt(Math.trunc(post[i])) : 0n;
+    const delta = after - before;
+    // accountKeys are unique within a tx, but guard against a malformed dup by
+    // summing rather than overwriting.
+    if (delta !== 0n) lamportDeltas.set(keys[i], (lamportDeltas.get(keys[i]) ?? 0n) + delta);
+  }
+
+  return {
+    succeeded: tx.meta != null && tx.meta.err == null,
+    feePayer,
+    memo: extractMemo(message.instructions),
+    lamportDeltas,
   };
 }
 

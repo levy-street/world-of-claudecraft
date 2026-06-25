@@ -4586,6 +4586,21 @@
   .ro-tier-cost { font-size: 12px; color: #ffd100; font-weight: 600; }
   .ro-tier-share { font-size: 10px; color: #998d6a; }
   .ro-stake-note { font-size: 12px; color: #b6a983; margin: 4px 0 12px; line-height: 1.45; min-height: 1.2em; }
+  .ro-method { display: flex; gap: 8px; margin-top: 4px; }
+  .ro-method-tab { flex: 1; min-height: 44px; padding: 9px 10px; font-family: var(--title-font); font-size: 13px;
+    background: linear-gradient(#1c1812, #14110b); border: 1px solid #463a1c; border-radius: 6px;
+    color: #e7dcc0; cursor: var(--cursor-point); text-align: center; }
+  .ro-method-tab:hover { border-color: #6e5a2c; background: linear-gradient(#241f16, #18140d); }
+  .ro-method-tab:focus-visible { outline: none; border-color: var(--gold); box-shadow: 0 0 0 2px #c9a24033; }
+  .ro-method-tab.ro-method-on { border-color: var(--gold); background: linear-gradient(#2a2436, #161220);
+    box-shadow: inset 0 0 0 1px #c9a24055; color: #f0ead8; }
+  .ro-method-tab[disabled] { opacity: 0.4; cursor: default; }
+  .ro-buy-note { margin: 4px 0 12px; }
+  .ro-buy-line { font-size: 12px; color: #b6a983; margin: 4px 0 0; line-height: 1.45; }
+  .ro-buy-line.ro-buy-final { color: #ff9030; }
+  .ro-buy-line.ro-buy-bond { color: #e7dcc0; border-left: 2px solid var(--gold-dim);
+    padding-left: 8px; margin-top: 8px; }
+  .ro-buy-line.ro-buy-bond.ro-hint-muted { color: #b6a983; margin-top: 2px; }
   .ro-submit { width: 100%; min-height: 44px; }
   .ro-status { font-size: 12px; margin: 8px 0 0; min-height: 1.1em; line-height: 1.4; }
   .ro-status-info { color: #b6a983; }
@@ -4603,6 +4618,8 @@
   .ro-badge-decommissioning { color: #ff9030; border-color: #6e3c1c; }
   .ro-realm-meta { font-size: 11px; color: #998d6a; margin-top: 3px; }
   .ro-realm-note { font-size: 11px; color: #b6a983; margin: 6px 0 0; line-height: 1.4; }
+  .ro-realm-note.ro-realm-bond-warn { color: #ffb27a; background: #ff903014; border: 1px solid #6e3c1c;
+    border-radius: 4px; padding: 7px 9px; font-size: 12px; font-weight: 600; }
   .ro-realm-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 9px; }
   .ro-realm-actions .btn { min-height: 40px; padding: 7px 14px; font-size: 12px; }
   @media (max-width: 480px) { .ro-tiers { grid-template-columns: 1fr; } }

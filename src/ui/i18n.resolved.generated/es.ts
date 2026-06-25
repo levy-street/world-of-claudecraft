@@ -39,14 +39,35 @@ export const es: EnTranslations = {
       "submit": "Stake and Found",
       "submitConnect": "Connect Wallet to Found",
       "stakingNote": "You sign one transaction locking {amount} $WOC into escrow. Recover it any time after a {days}-day timelock by decommissioning.",
-      "nameTaken": "Pick a different name; that one is taken."
+      "nameTaken": "Pick a different name; that one is taken.",
+      "methodLabel": "Payment method",
+      "methodStake": "Stake $WOC",
+      "methodStakeHint": "Lock $WOC into escrow. Returned in full when you decommission.",
+      "methodBuy": "Buy with SOL or USDC",
+      "methodBuyHint": "Pay once in SOL or USDC. Final purchase, no stake to recover."
     },
     "tier": {
       "bronze": "Bronze",
       "silver": "Silver",
       "gold": "Gold",
       "cost": "{amount} $WOC",
-      "share": "{pct}% of supply"
+      "share": "{pct}% of supply",
+      "price": "{amount} {currency}",
+      "priceUnavailable": "No price"
+    },
+    "buy": {
+      "currencyLabel": "Pay with",
+      "currencySol": "SOL",
+      "currencyUsdc": "USDC",
+      "currencyUnavailable": "{currency} is unavailable right now (no swap route).",
+      "splitNote": "{treasuryPct}% of your payment funds the treasury. The rest buys back and burns $WOC.",
+      "finalNote": "A purchase is final and non-refundable. Unlike a stake, it is not returned when you decommission.",
+      "unavailable": "Buying a realm is unavailable right now. Stake $WOC to found one instead.",
+      "submit": "Buy and Found",
+      "submitConnect": "Connect Wallet to Buy",
+      "note": "You sign one transaction paying {amount} {currency} to found this realm. The realm activates immediately.",
+      "bondNote": "Also hold {amount} $WOC, kept in your linked wallet for the realm's life or the realm lapses.",
+      "bondWhy": "This ongoing bond is separate from the {currency} you pay: it keeps your skin in the game while you operate the realm."
     },
     "mine": {
       "title": "My Realms",
@@ -58,7 +79,9 @@ export const es: EnTranslations = {
       "enter": "Enter",
       "eligible": "Stake releasable {date}",
       "releaseHint": "Release your stake on chain, then finalize to close the realm and free its name.",
-      "decommissionConfirm": "Decommission {name}? This takes the realm offline and starts the {days}-day stake-release timelock."
+      "decommissionConfirm": "Decommission {name}? This takes the realm offline and starts the {days}-day stake-release timelock.",
+      "bondInfo": "Bond: hold {amount} $WOC in your linked wallet.",
+      "bondWarning": "Bond below requirement. Hold {amount} $WOC and top up before {date} or this realm lapses."
     },
     "status": {
       "active": "Active",
@@ -95,10 +118,13 @@ export const es: EnTranslations = {
       "quoting": "Reserving your realm...",
       "locking": "Approve the stake in your wallet...",
       "confirming": "Verifying your stake on chain...",
-      "founded": "{name} is live. Welcome, operator.",
+      "paying": "Approve the payment in your wallet...",
+      "confirmingBuy": "Verifying your payment on chain...",
       "decommissioning": "Starting decommission...",
       "releasing": "Finalizing close...",
-      "released": "Realm closed. The name is free again."
+      "released": "Realm closed. The name is free again.",
+      "closed": "Realm closed. The name is free again.",
+      "founded": "{name} is live. Welcome, operator."
     },
     "err": {
       "invalid_realm_name": "That realm name is not allowed. Use letters, numbers, spaces, or hyphens.",
@@ -126,6 +152,18 @@ export const es: EnTranslations = {
       "timelock_not_elapsed": "The stake timelock has not elapsed yet.",
       "stake_not_released_onchain": "Release your stake on chain first, then finalize.",
       "rate_limited": "Too many requests. Slow down and try again.",
+      "buy_unavailable": "Buying a realm is unavailable right now. Stake $WOC to found one instead.",
+      "invalid_currency": "Pick SOL or USDC and try again.",
+      "invalid_tier": "Pick a tier and try again.",
+      "price_unavailable": "Live pricing is unavailable right now. Try again shortly.",
+      "payment_already_recorded": "That payment was already recorded.",
+      "bad_signature": "That payment signature is not valid. Start again.",
+      "legs_collide": "The payment could not be verified. Start again.",
+      "not_finalized": "Your payment is not finalized yet. Try confirming again in a moment.",
+      "memo_mismatch": "That payment does not match your quote. Start again.",
+      "treasury_short": "The amount paid does not match your quote.",
+      "buyback_short": "The amount paid does not match your quote.",
+      "bond_required": "You must hold {amount} $WOC in your linked wallet to buy this tier. Top up and try again.",
       "generic": "Something went wrong. Try again."
     }
   },

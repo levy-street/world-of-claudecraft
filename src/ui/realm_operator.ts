@@ -17,10 +17,18 @@ import type {
   Api,
   OwnedRealm,
   ProvisionQuote,
+  RealmBuyInfo,
+  RealmBuyQuoteResponse,
+  RealmBuyTierOption,
   RealmTierOption,
   RealmTiersInfo,
   RealmType,
 } from '../net/online';
+
+// The payment method the founding screen is currently set to.
+export type PayMethod = 'stake' | 'buy';
+// The currency the buy path pays in.
+export type BuyCurrency = 'SOL' | 'USDC';
 
 // The glue the panel needs from main.ts: the online client plus the wallet/link
 // flow it already owns. Keeping this an interface lets the panel stay free of
@@ -37,6 +45,10 @@ export interface RealmOperatorHost {
   // Sign + send the on-chain $WOC lock for a quote. Resolves to the lock
   // signature, or null if the player cancelled. Throws Error(localized) on failure.
   signLock(quote: ProvisionQuote): Promise<string | null>;
+  // Sign + send the SOL/USDC split payment for a buy quote. Resolves to the
+  // payment signature, or null if the player cancelled. Throws Error(localized) on
+  // failure. Mirrors signLock for the "buy with SOL or USDC" path.
+  signPurchase(quote: RealmBuyQuoteResponse): Promise<string | null>;
   // The affiliate code captured from a ?aff= link, or null. Sent with the quote so
   // a referred realm credits the salesperson; the panel shows a note when present.
   affiliateCode(): string | null;
@@ -91,6 +103,22 @@ export const ERR_KEYS = {
   realm_not_decommissioning: 'realmOp.err.realm_not_decommissioning',
   timelock_not_elapsed: 'realmOp.err.timelock_not_elapsed',
   stake_not_released_onchain: 'realmOp.err.stake_not_released_onchain',
+  // Buy-with-SOL/USDC path (server/realm_buy.ts): prepare + confirm + payment-verdict codes.
+  buy_unavailable: 'realmOp.err.buy_unavailable',
+  invalid_currency: 'realmOp.err.invalid_currency',
+  invalid_tier: 'realmOp.err.invalid_tier',
+  price_unavailable: 'realmOp.err.price_unavailable',
+  payment_already_recorded: 'realmOp.err.payment_already_recorded',
+  bad_signature: 'realmOp.err.bad_signature',
+  legs_collide: 'realmOp.err.legs_collide',
+  not_finalized: 'realmOp.err.not_finalized',
+  memo_mismatch: 'realmOp.err.memo_mismatch',
+  treasury_short: 'realmOp.err.treasury_short',
+  buyback_short: 'realmOp.err.buyback_short',
+  // Ongoing $WOC bond (buy path): the buyer's wallet does not currently hold the
+  // tier's bond. The buy() catch renders this with the bond amount spliced in; the
+  // mapping here keeps it covered and gives messageForError a (placeholder) fallback.
+  bond_required: 'realmOp.err.bond_required',
   'link a wallet first': 'realmOp.err.link_wallet',
   'too many requests, slow down': 'realmOp.err.rate_limited',
 } satisfies Record<string, TranslationKey>;
@@ -118,6 +146,17 @@ export function formatTokens(amountBase: string, decimals: number): string {
   return formatNumber(Number(whole));
 }
 
+// Fractional display of a currency amount for the buy path. Unlike a whale-tier
+// $WOC stake (formatTokens floors to whole tokens), a SOL/USDC price needs its
+// fractional part shown. Realistic realm prices stay well within Number range, so
+// scaling the base-unit string by the currency decimals before formatNumber is
+// exact enough for display; formatNumber applies locale grouping + min/max
+// fraction digits (capped at the mint's own precision).
+export function formatAmount(amountBase: string, decimals: number): string {
+  const value = Number(BigInt(amountBase)) / 10 ** decimals;
+  return formatNumber(value, { maximumFractionDigits: Math.min(decimals, 6) });
+}
+
 export class RealmOperator {
   private readonly root: HTMLElement;
   private readonly host: RealmOperatorHost;
@@ -128,11 +167,23 @@ export class RealmOperator {
   private confirmingId: number | null = null; // realm pending a decommission confirm
   private busy = false;
 
+  // Buy-with-SOL/USDC path (#475). The price list loads alongside the stake tiers;
+  // `buyInfo` stays null when the server reports buying is unconfigured (HTTP 503),
+  // in which case the method toggle hides the buy option entirely.
+  private payMethod: PayMethod = 'stake';
+  private buyInfo: RealmBuyInfo | null = null;
+  private buyAvailable = false; // false until realmBuyInfo() succeeds with a usable price list
+  private selectedCurrency: BuyCurrency = 'USDC';
+
   // Cached element refs (set in render()).
   private nameInput!: HTMLInputElement;
   private typeSelect!: HTMLSelectElement;
+  private methodBox!: HTMLElement;
+  private currencyField!: HTMLElement;
+  private currencyBox!: HTMLElement;
   private tiersBox!: HTMLElement;
   private stakeNote!: HTMLElement;
+  private buyNote!: HTMLElement;
   private submitBtn!: HTMLButtonElement;
   private statusEl!: HTMLElement;
   private mineList!: HTMLElement;
@@ -151,8 +202,12 @@ export class RealmOperator {
     this.confirmingId = null;
     this.busy = false;
     this.owned = [];
+    this.payMethod = 'stake';
+    this.buyInfo = null;
+    this.buyAvailable = false;
+    this.selectedCurrency = 'USDC';
     this.render();
-    await Promise.all([this.loadTiers(), this.loadOwned()]);
+    await Promise.all([this.loadTiers(), this.loadBuyInfo(), this.loadOwned()]);
   }
 
   private get timelockDays(): number {
@@ -179,6 +234,15 @@ export class RealmOperator {
             </select>
           </div>
           <div class="ro-field">
+            <span class="ro-label" id="ro-method-label">${esc(t('realmOp.found.methodLabel'))}</span>
+            <div id="ro-method" class="ro-method" role="group" aria-labelledby="ro-method-label"></div>
+            <p id="ro-method-hint" class="ro-hint"></p>
+          </div>
+          <div id="ro-currency-field" class="ro-field" hidden>
+            <span class="ro-label" id="ro-currency-label">${esc(t('realmOp.buy.currencyLabel'))}</span>
+            <div id="ro-currency" class="ro-method" role="group" aria-labelledby="ro-currency-label"></div>
+          </div>
+          <div class="ro-field">
             <span class="ro-label" id="ro-tier-label">${esc(t('realmOp.found.tierLabel'))}</span>
             <div id="ro-tiers" class="ro-tiers" role="group" aria-labelledby="ro-tier-label">
               <p class="ro-hint">${esc(t('realmOp.mine.loading'))}</p>
@@ -188,6 +252,7 @@ export class RealmOperator {
             <p class="ro-hint ro-hint-badge">${esc(t('realmOp.found.badgeNote'))}</p>
           </div>
           <p id="ro-stake-note" class="ro-stake-note"></p>
+          <div id="ro-buy-note" class="ro-buy-note" hidden></div>
           <button id="ro-submit" class="btn btn-primary ro-submit" type="button" disabled>
             ${esc(t('realmOp.found.submit'))}
           </button>
@@ -204,8 +269,12 @@ export class RealmOperator {
 
     this.nameInput = this.root.querySelector('#ro-name') as HTMLInputElement;
     this.typeSelect = this.root.querySelector('#ro-type') as HTMLSelectElement;
+    this.methodBox = this.root.querySelector('#ro-method') as HTMLElement;
+    this.currencyField = this.root.querySelector('#ro-currency-field') as HTMLElement;
+    this.currencyBox = this.root.querySelector('#ro-currency') as HTMLElement;
     this.tiersBox = this.root.querySelector('#ro-tiers') as HTMLElement;
     this.stakeNote = this.root.querySelector('#ro-stake-note') as HTMLElement;
+    this.buyNote = this.root.querySelector('#ro-buy-note') as HTMLElement;
     this.submitBtn = this.root.querySelector('#ro-submit') as HTMLButtonElement;
     this.statusEl = this.root.querySelector('#ro-status') as HTMLElement;
     this.mineList = this.root.querySelector('#ro-mine-list') as HTMLElement;
@@ -217,6 +286,7 @@ export class RealmOperator {
     });
     this.submitBtn.addEventListener('click', () => void this.found());
     this.mineList.addEventListener('click', (e) => this.onMineClick(e));
+    this.renderMethod();
     this.updateSubmit();
   }
 
@@ -231,15 +301,131 @@ export class RealmOperator {
     this.renderTiers();
   }
 
+  // Load the buy price list. A 503 (buy_unavailable) or any failure leaves
+  // buyAvailable false, so the method toggle simply omits the buy option and the
+  // stake flow is untouched. An empty currency/tier list is treated the same way.
+  private async loadBuyInfo(): Promise<void> {
+    let info: RealmBuyInfo | null = null;
+    try {
+      info = await this.host.api.realmBuyInfo();
+    } catch {
+      info = null;
+    }
+    if (!info || info.currencies.length === 0 || info.tiers.length === 0) {
+      this.buyInfo = null;
+      this.buyAvailable = false;
+    } else {
+      this.buyInfo = info;
+      this.buyAvailable = true;
+      // Default to USDC when it has a route, else the first priced currency.
+      const usable = info.currencies.find((c) => this.currencyHasAnyPrice(c.key));
+      if (usable) this.selectedCurrency = usable.key;
+    }
+    this.renderMethod();
+    if (this.payMethod === 'buy') this.renderTiers();
+  }
+
+  // The radio-style payment-method toggle (always shows stake; shows buy only when
+  // the server priced it). Re-rendered whenever buy availability changes.
+  private renderMethod(): void {
+    const tab = (method: PayMethod, label: TranslationKey) => {
+      const on = this.payMethod === method;
+      return `<button class="ro-method-tab" type="button" role="radio" aria-checked="${on ? 'true' : 'false'}"
+        data-method="${method}">${esc(t(label))}</button>`;
+    };
+    let html = tab('stake', 'realmOp.found.methodStake');
+    if (this.buyAvailable) html += tab('buy', 'realmOp.found.methodBuy');
+    this.methodBox.innerHTML = html;
+    for (const btn of Array.from(this.methodBox.querySelectorAll<HTMLButtonElement>('.ro-method-tab'))) {
+      btn.classList.toggle('ro-method-on', btn.dataset.method === this.payMethod);
+      btn.addEventListener('click', () => this.selectMethod(btn.dataset.method as PayMethod));
+    }
+    const hint = this.root.querySelector('#ro-method-hint') as HTMLElement | null;
+    if (hint) hint.textContent = t(this.payMethod === 'buy' ? 'realmOp.found.methodBuyHint' : 'realmOp.found.methodStakeHint');
+    this.renderCurrencies();
+  }
+
+  // Switch payment method: re-price the tier picker, swap the notes, keep the
+  // currently selected tier (the same 1/2/3 picks apply to both paths).
+  private selectMethod(method: PayMethod): void {
+    if (method === 'buy' && !this.buyAvailable) return;
+    if (method === this.payMethod) return;
+    this.payMethod = method;
+    this.renderMethod();
+    this.renderTiers();
+    this.setStatus('', 'info');
+    this.updateSubmit();
+  }
+
+  // The SOL / USDC toggle, only shown on the buy path. A currency with no DEX route
+  // (null price at every tier) is rendered disabled.
+  private renderCurrencies(): void {
+    const info = this.buyInfo;
+    const show = this.payMethod === 'buy' && this.buyAvailable && info !== null;
+    this.currencyField.hidden = !show;
+    if (!show || !info) {
+      this.currencyBox.innerHTML = '';
+      return;
+    }
+    this.currencyBox.innerHTML = info.currencies
+      .map((c) => {
+        const on = this.selectedCurrency === c.key;
+        const priced = this.currencyHasAnyPrice(c.key);
+        const label = t(c.key === 'SOL' ? 'realmOp.buy.currencySol' : 'realmOp.buy.currencyUsdc');
+        return `<button class="ro-method-tab" type="button" role="radio" aria-checked="${on ? 'true' : 'false'}"
+          data-currency="${esc(c.key)}"${priced ? '' : ' disabled'}>${esc(label)}</button>`;
+      })
+      .join('');
+    for (const btn of Array.from(this.currencyBox.querySelectorAll<HTMLButtonElement>('.ro-method-tab'))) {
+      btn.classList.toggle('ro-method-on', btn.dataset.currency === this.selectedCurrency);
+      btn.addEventListener('click', () => this.selectCurrency(btn.dataset.currency as BuyCurrency));
+    }
+  }
+
+  private selectCurrency(currency: BuyCurrency): void {
+    if (currency === this.selectedCurrency) return;
+    if (!this.currencyHasAnyPrice(currency)) return;
+    this.selectedCurrency = currency;
+    this.renderCurrencies();
+    this.renderTiers();
+    this.setStatus('', 'info');
+    this.updateSubmit();
+  }
+
+  // True when the buy price list has a non-null price for this currency at any tier.
+  private currencyHasAnyPrice(currency: BuyCurrency): boolean {
+    return this.buyInfo?.tiers.some((tier) => tier.prices[currency] !== null) ?? false;
+  }
+
+  private buyTierFor(tierNum: number): RealmBuyTierOption | null {
+    return this.buyInfo?.tiers.find((x) => x.tier === tierNum) ?? null;
+  }
+
+  // The decimals of the currently selected buy currency, for formatting prices.
+  private currencyDecimals(): number {
+    return this.buyInfo?.currencies.find((c) => c.key === this.selectedCurrency)?.decimals ?? 0;
+  }
+
   private renderTiers(): void {
     const info = this.tiersInfo;
     if (!info) return;
+    const buying = this.payMethod === 'buy' && this.buyAvailable && this.buyInfo !== null;
+    const decimals = this.currencyDecimals();
     this.tiersBox.innerHTML = info.tiers
       .map((tier) => {
-        const cost = t('realmOp.tier.cost', { amount: formatTokens(tier.amountBase, info.decimals) });
+        let cost: string;
+        if (buying) {
+          const price = this.buyTierFor(tier.tier)?.prices[this.selectedCurrency] ?? null;
+          cost = price === null
+            ? t('realmOp.tier.priceUnavailable')
+            : t('realmOp.tier.price', { amount: formatAmount(price, decimals), currency: this.selectedCurrency });
+        } else {
+          cost = t('realmOp.tier.cost', { amount: formatTokens(tier.amountBase, info.decimals) });
+        }
         const share = t('realmOp.tier.share', { pct: formatNumber(tier.bps / 100) });
+        const unbuyable = buying && (this.buyTierFor(tier.tier)?.prices[this.selectedCurrency] ?? null) === null;
         return `
-          <button class="ro-tier" type="button" aria-pressed="false" data-tier="${tier.tier}">
+          <button class="ro-tier" type="button" aria-pressed="false" data-tier="${tier.tier}"${unbuyable ? ' disabled' : ''}>
             <span class="ro-tier-name">${esc(t(TIER_LABEL[tier.name]))}</span>
             <span class="ro-tier-cost">${esc(cost)}</span>
             <span class="ro-tier-share">${esc(share)}</span>
@@ -249,36 +435,105 @@ export class RealmOperator {
     for (const btn of Array.from(this.tiersBox.querySelectorAll<HTMLButtonElement>('.ro-tier'))) {
       btn.addEventListener('click', () => this.selectTier(Number(btn.dataset.tier)));
     }
+    // Re-applying the highlight + note keeps the picked tier visible across a
+    // method/currency swap; clear it if the pick is no longer buyable.
+    if (this.selectedTier) {
+      const stillValid = !buying
+        || (this.buyTierFor(this.selectedTier.tier)?.prices[this.selectedCurrency] ?? null) !== null;
+      if (stillValid) this.applyTierSelection(this.selectedTier.tier);
+      else this.clearTierSelection();
+    } else {
+      this.refreshTierNote();
+    }
   }
 
   private selectTier(tierNum: number): void {
     const info = this.tiersInfo;
     if (!info) return;
     this.selectedTier = info.tiers.find((x) => x.tier === tierNum) ?? null;
+    this.applyTierSelection(tierNum);
+    this.setStatus('', 'info');
+    this.updateSubmit();
+  }
+
+  // Paint the selected-tier highlight and the matching stake/buy note.
+  private applyTierSelection(tierNum: number): void {
     for (const btn of Array.from(this.tiersBox.querySelectorAll<HTMLButtonElement>('.ro-tier'))) {
       const on = Number(btn.dataset.tier) === tierNum;
       btn.setAttribute('aria-pressed', on ? 'true' : 'false');
       btn.classList.toggle('ro-tier-on', on);
     }
-    if (this.selectedTier) {
+    this.refreshTierNote();
+  }
+
+  private clearTierSelection(): void {
+    this.selectedTier = null;
+    for (const btn of Array.from(this.tiersBox.querySelectorAll<HTMLButtonElement>('.ro-tier'))) {
+      btn.setAttribute('aria-pressed', 'false');
+      btn.classList.remove('ro-tier-on');
+    }
+    this.refreshTierNote();
+    this.updateSubmit();
+  }
+
+  // Swap the stake note / buy note (split + final-purchase warning) to match the
+  // current method and the selected tier.
+  private refreshTierNote(): void {
+    const buying = this.payMethod === 'buy' && this.buyAvailable && this.buyInfo !== null;
+    const tiersInfo = this.tiersInfo;
+    this.stakeNote.hidden = buying;
+    this.buyNote.hidden = !buying;
+    if (buying && this.buyInfo) {
+      this.buyNote.innerHTML = this.buyNoteHtml();
+    } else if (this.selectedTier && tiersInfo) {
       this.stakeNote.textContent = t('realmOp.found.stakingNote', {
-        amount: formatTokens(this.selectedTier.amountBase, info.decimals),
+        amount: formatTokens(this.selectedTier.amountBase, tiersInfo.decimals),
         days: this.timelockDays,
       });
+    } else {
+      this.stakeNote.textContent = '';
     }
-    this.setStatus('', 'info');
-    this.updateSubmit();
+  }
+
+  // The buy-path explainer: the per-tier payment line (when a tier is picked), the
+  // treasury/buyback split, the ongoing $WOC bond (when bonds are enabled), and the
+  // final/non-refundable warning.
+  private buyNoteHtml(): string {
+    const info = this.buyInfo;
+    if (!info) return '';
+    const lines: string[] = [];
+    const tier = this.selectedTier ? this.buyTierFor(this.selectedTier.tier) : null;
+    const price = tier?.prices[this.selectedCurrency] ?? null;
+    if (price !== null) {
+      const amount = formatAmount(price, this.currencyDecimals());
+      lines.push(`<p class="ro-buy-line">${esc(t('realmOp.buy.note', { amount, currency: this.selectedCurrency }))}</p>`);
+    }
+    const split = t('realmOp.buy.splitNote', { treasuryPct: formatNumber(info.treasuryBps / 100) });
+    lines.push(`<p class="ro-buy-line ro-hint-muted">${esc(split)}</p>`);
+    // The ongoing $WOC bond, kept visually distinct from the one-time SOL/USDC price
+    // so a buyer reads it as a held requirement, not part of the payment. Only when
+    // bonds are enabled (bondBps > 0) and a tier is picked, so the amount is concrete.
+    if (info.bondBps > 0 && tier) {
+      const bond = formatTokens(tier.bondBase, info.wocDecimals);
+      lines.push(`<p class="ro-buy-line ro-buy-bond">${esc(t('realmOp.buy.bondNote', { amount: bond }))}</p>`);
+      lines.push(`<p class="ro-buy-line ro-buy-bond ro-hint-muted">${esc(t('realmOp.buy.bondWhy', { currency: this.selectedCurrency }))}</p>`);
+    }
+    lines.push(`<p class="ro-buy-line ro-buy-final">${esc(t('realmOp.buy.finalNote'))}</p>`);
+    return lines.join('');
   }
 
   private updateSubmit(): void {
     const linked = this.host.linkedWallet() !== null;
-    const ready = !this.busy && this.nameInput.value.trim().length > 0 && this.selectedTier !== null;
+    const buying = this.payMethod === 'buy' && this.buyAvailable && this.buyInfo !== null;
+    // The buy path also needs the selected tier to be priced in the chosen currency.
+    const tierOk = this.selectedTier !== null
+      && (!buying || (this.buyTierFor(this.selectedTier.tier)?.prices[this.selectedCurrency] ?? null) !== null);
+    const ready = !this.busy && this.nameInput.value.trim().length > 0 && tierOk;
     this.submitBtn.disabled = !ready;
-    this.submitBtn.textContent = this.busy
-      ? t('realmOp.flow.quoting')
-      : linked
-        ? t('realmOp.found.submit')
-        : t('realmOp.found.submitConnect');
+    const submitKey: TranslationKey = buying
+      ? (linked ? 'realmOp.buy.submit' : 'realmOp.buy.submitConnect')
+      : (linked ? 'realmOp.found.submit' : 'realmOp.found.submitConnect');
+    this.submitBtn.textContent = this.busy ? t('realmOp.flow.quoting') : t(submitKey);
     this.nameInput.disabled = this.busy;
     this.typeSelect.disabled = this.busy;
   }
@@ -293,13 +548,18 @@ export class RealmOperator {
     this.updateSubmit();
   }
 
-  // The founding flow: ensure a verified wallet, reserve a quote, lock the stake
-  // on chain, then confirm. Each step surfaces its own status line; a thrown
-  // failure (or a cancelled wallet prompt) stops the flow cleanly.
+  // The founding flow: ensure a verified wallet, reserve a quote, settle the
+  // payment on chain (stake lock or SOL/USDC split), then confirm. Each step
+  // surfaces its own status line; a thrown failure (or a cancelled wallet prompt)
+  // stops the flow cleanly. Dispatches by the selected payment method.
   private async found(): Promise<void> {
     const name = this.nameInput.value.trim();
     const tier = this.selectedTier;
     if (!name || !tier || this.busy) return;
+    if (this.payMethod === 'buy' && this.buyAvailable) {
+      await this.buy(name, tier);
+      return;
+    }
     this.setBusy(true);
     try {
       this.setStatus(t('realmOp.flow.connecting'), 'info');
@@ -325,6 +585,60 @@ export class RealmOperator {
     } finally {
       this.setBusy(false);
     }
+  }
+
+  // The buy flow: ensure a verified wallet, reserve a buy quote in the chosen
+  // currency, pay the SOL/USDC split on chain, then confirm. Mirrors the stake
+  // flow step for step (and carries the same affiliate code), but pays once rather
+  // than locking a recoverable stake.
+  private async buy(name: string, tier: RealmTierOption): Promise<void> {
+    this.setBusy(true);
+    try {
+      this.setStatus(t('realmOp.flow.connecting'), 'info');
+      const wallet = await this.host.ensureWalletReady();
+      if (!wallet) return; // cancelled at the wallet prompt
+
+      this.setStatus(t('realmOp.flow.quoting'), 'info');
+      const type = (this.typeSelect.value as RealmType) || 'Normal';
+      const quote = await this.host.api.quoteRealmBuy(
+        name,
+        type,
+        tier.tier,
+        this.selectedCurrency,
+        this.host.affiliateCode() ?? undefined,
+      );
+
+      this.setStatus(t('realmOp.flow.paying'), 'info');
+      const paySig = await this.host.signPurchase(quote);
+      if (!paySig) return; // cancelled in the wallet
+
+      this.setStatus(t('realmOp.flow.confirmingBuy'), 'info');
+      await this.host.api.confirmRealmBuy(quote.quoteId, paySig);
+
+      this.setStatus(t('realmOp.flow.founded', { name: quote.name }), 'success');
+      this.nameInput.value = '';
+      await this.loadOwned();
+    } catch (err) {
+      this.setStatus(this.buyErrorMessage(err, tier), 'error');
+    } finally {
+      this.setBusy(false);
+    }
+  }
+
+  // Buy-path error copy: the only buy error that needs a value spliced in is
+  // bond_required (the wallet does not hold the tier's ongoing $WOC bond), which the
+  // generic messageForError cannot fill. Render it with the picked tier's bond
+  // amount; everything else falls through to the shared mapping.
+  private buyErrorMessage(err: unknown, tier: RealmTierOption): string {
+    if (err instanceof ApiError && err.message === 'bond_required' && this.buyInfo) {
+      const buyTier = this.buyTierFor(tier.tier);
+      if (buyTier) {
+        return t('realmOp.err.bond_required', {
+          amount: formatTokens(buyTier.bondBase, this.buyInfo.wocDecimals),
+        });
+      }
+    }
+    return messageForError(err);
   }
 
   private async loadOwned(): Promise<void> {
@@ -359,6 +673,7 @@ export class RealmOperator {
       extra = `<p class="ro-realm-note">${esc(when)}</p>
         <p class="ro-realm-note ro-hint-muted">${esc(t('realmOp.mine.releaseHint'))}</p>`;
     }
+    extra += this.bondNoteHtml(r);
 
     let actions = '';
     if (confirming) {
@@ -394,6 +709,23 @@ export class RealmOperator {
       </div>`;
   }
 
+  // The bond row for an owned bought realm. A realm with bondGraceUntil set is BELOW
+  // its bond right now: show a prominent warning with the top-up deadline. A bonded
+  // realm in good standing gets a calm, subtle info line. Staked realms (no bondBase)
+  // render nothing. $WOC decimals come from the buy info or the stake-tier info, which
+  // describe the same $WOC mint as the bond.
+  private bondNoteHtml(r: OwnedRealm): string {
+    if (r.bondBase == null) return '';
+    const decimals = this.buyInfo?.wocDecimals ?? this.tiersInfo?.decimals;
+    if (decimals == null) return '';
+    const amount = formatTokens(r.bondBase, decimals);
+    if (r.bondGraceUntil) {
+      const date = formatDateTime(new Date(r.bondGraceUntil));
+      return `<p class="ro-realm-note ro-realm-bond-warn" role="alert">${esc(t('realmOp.mine.bondWarning', { amount, date }))}</p>`;
+    }
+    return `<p class="ro-realm-note ro-hint-muted">${esc(t('realmOp.mine.bondInfo', { amount }))}</p>`;
+  }
+
   private onMineClick(e: Event): void {
     const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('.ro-act');
     if (!btn) return;
@@ -425,9 +757,13 @@ export class RealmOperator {
     this.confirmingId = null;
     this.setMineStatus(t('realmOp.flow.decommissioning'), 'info');
     try {
-      await this.host.api.decommissionRealm(realm.realmId);
+      // A BOUGHT realm has no recoverable stake: the server closes it immediately
+      // and returns closed:true, so it drops out of the list with no on-chain
+      // release/finalize step. A staked realm enters the decommissioning timelock
+      // and surfaces the finalize-close path via loadOwned() as before.
+      const res = await this.host.api.decommissionRealm(realm.realmId);
       await this.loadOwned();
-      this.setMineStatus('', 'info');
+      this.setMineStatus(res.closed === true ? t('realmOp.flow.closed') : '', res.closed === true ? 'success' : 'info');
     } catch (err) {
       this.setMineStatus(messageForError(err), 'error');
     }

@@ -49,11 +49,14 @@ import {
   reconcileRealmLifecycle,
   realmTiersInfo,
 } from './realm_provision';
+import { realmBuyInfo, prepareBuyQuote, confirmBuyQuote } from './realm_buy';
+import { bondsForRealms } from './realm_buy_db';
 import { webLoginEnforced, isWebClientRequest } from './web_login_guard';
 import { cacheControlFor, etagFor, isNotModified } from './static_cache';
 import { recordUsageCacheEvent, recordUsageMetric, setUsageCacheSize } from './provider_usage';
 import { buildPayoutKeeper } from './payout_keeper';
-import { withPayoutKeeperLock } from './payout_db';
+import { buildRealmBuybackKeepers } from './realm_buyback_keeper';
+import { withPayoutKeeperLock, withRealmBuybackKeeperLock } from './payout_db';
 import { activeSeasonStatus, openSeason, closeSeason } from './flow_ledger_db';
 import { rewardTierBpsFromEnv } from './reward_tiers';
 import { SeasonBodyCache } from './woc_season_api';
@@ -562,15 +565,24 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     if (req.method === 'GET' && url === '/api/realms/mine') {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
-      const realms = (await listRealmsForOwner(pool, accountId)).map((r) => ({
-        realmId: r.realmId,
-        name: r.name,
-        type: r.type,
-        status: r.status,
-        tier: r.tier,
-        url: r.originUrl,
-        releaseEligibleAt: r.releaseEligibleAt ? r.releaseEligibleAt.toISOString() : null,
-      }));
+      const owned = await listRealmsForOwner(pool, accountId);
+      // Attach the $WOC bond status (buy path) so the dashboard can warn the owner
+      // to top up before a lapse. Absent for staked realms.
+      const bonds = await bondsForRealms(pool, owned.map((r) => r.realmId));
+      const realms = owned.map((r) => {
+        const bond = bonds.get(r.realmId);
+        return {
+          realmId: r.realmId,
+          name: r.name,
+          type: r.type,
+          status: r.status,
+          tier: r.tier,
+          url: r.originUrl,
+          releaseEligibleAt: r.releaseEligibleAt ? r.releaseEligibleAt.toISOString() : null,
+          bondBase: bond ? bond.bondBase.toString() : null,
+          bondGraceUntil: bond?.graceUntil ? bond.graceUntil.toISOString() : null,
+        };
+      });
       return json(res, 200, { realms });
     }
     // Affiliate program (#475): the account's stable affiliate code (created on
@@ -661,6 +673,58 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const lockSig = typeof body.lockSig === 'string' ? body.lockSig : '';
       if (!quoteId || !lockSig) return json(res, 400, { error: 'missing_quoteId_or_lockSig' });
       const result = await confirmProvisionQuote(pool, { accountId, quoteId, lockSig });
+      if (!result.ok) return json(res, result.status, { error: result.error });
+      return json(res, 200, result);
+    }
+    // Buy-a-realm (#475): acquire a realm outright with SOL/USDC instead of staking
+    // $WOC. The price list shows each tier's live SOL + USDC market value (the value
+    // of the tier's $WOC threshold). Authed + rate-limited (it reads the supply RPC
+    // and Jupiter), and supply/price cached so a burst mostly hits cache.
+    if (req.method === 'GET' && url === '/api/realms/buy/info') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (rateLimited(req)) return json(res, 429, { error: 'too many requests, slow down' });
+      const info = await realmBuyInfo();
+      if (!info) return json(res, 503, { error: 'buy_unavailable' });
+      return json(res, 200, info);
+    }
+    // Buy quote: validate name + cap + tier + currency, price the tier, reserve a
+    // provisioning realm, and pin the exact 70/30 legs the client pays in one tx.
+    if (req.method === 'POST' && url === '/api/realms/buy/quote') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (rateLimited(req)) return json(res, 429, { error: 'too many requests, slow down' });
+      const wallet = await walletForAccount(accountId);
+      if (!wallet) return json(res, 400, { error: 'link a wallet first' });
+      const body = await readBody(req);
+      const name = typeof body.name === 'string' ? body.name : '';
+      const type = resolveRealmType(typeof body.type === 'string' ? body.type : 'Normal');
+      const tier = Number(body.tier);
+      const currency = typeof body.currency === 'string' ? body.currency : '';
+      const affRaw = typeof body.affiliateCode === 'string' ? body.affiliateCode.trim() : '';
+      const affiliateCode = affRaw.length > 0 && affRaw.length <= 64 ? affRaw : undefined;
+      const result = await prepareBuyQuote(pool, {
+        accountId,
+        buyerWallet: wallet.pubkey,
+        name,
+        type,
+        tier,
+        currency,
+        affiliateCode,
+      });
+      if (!result.ok) return json(res, result.status, { error: result.error });
+      return json(res, 200, result);
+    }
+    // Buy confirm: verify the finalized split payment matches the quote, then record
+    // the (final, non-refundable) purchase and bring the realm online.
+    if (req.method === 'POST' && url === '/api/realms/buy/confirm') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      const body = await readBody(req);
+      const quoteId = typeof body.quoteId === 'string' ? body.quoteId : '';
+      const paySig = typeof body.paySig === 'string' ? body.paySig : '';
+      if (!quoteId || !paySig) return json(res, 400, { error: 'missing_quoteId_or_paySig' });
+      const result = await confirmBuyQuote(pool, { accountId, quoteId, paySig });
       if (!result.ok) return json(res, result.status, { error: result.error });
       return json(res, 200, result);
     }
@@ -909,8 +973,8 @@ async function main(): Promise<void> {
   // Reclaim abandoned provisioning + finalize already-released decommissioning
   // realms so neither deadlocks the per-account realm cap (#475).
   const reconciled = await reconcileRealmLifecycle(pool);
-  if (reconciled.reclaimed > 0 || reconciled.finalized > 0)
-    console.log(`realm lifecycle: reclaimed ${reconciled.reclaimed} provisioning, finalized ${reconciled.finalized} decommissioning`);
+  if (reconciled.reclaimed > 0 || reconciled.finalized > 0 || reconciled.bondLapsed > 0)
+    console.log(`realm lifecycle: reclaimed ${reconciled.reclaimed} provisioning, finalized ${reconciled.finalized} decommissioning, lapsed ${reconciled.bondLapsed} on bond`);
   await game.loadMarket();
   await game.loadChatFilter();
   await game.loadBlockedIps();
@@ -962,6 +1026,31 @@ async function main(): Promise<void> {
     void tick();
     setInterval(() => void tick(), PAYOUT_KEEPER_TICK_MS).unref();
     console.log('buyback keeper enabled');
+  }
+
+  // Realm-buyback keeper (#475): drain the realm purchase vault (the 30% buyback
+  // leg of SOL/USDC realm buys), swap to $WOC, and BURN it. One keeper per enabled
+  // currency, run sequentially under a distinct advisory lock from the marketplace
+  // keeper. No-op unless a dedicated REALM_BUYBACK_VAULT + its secret are set.
+  const realmBuybackKeepers = buildRealmBuybackKeepers();
+  if (realmBuybackKeepers.length > 0) {
+    let realmKeeperBusy = false;
+    const realmTick = async () => {
+      if (realmKeeperBusy) return;
+      realmKeeperBusy = true;
+      try {
+        await withRealmBuybackKeeperLock(async () => {
+          for (const { keeper } of realmBuybackKeepers) await keeper.runCycle();
+        });
+      } catch (err) {
+        console.error('realm buyback keeper cycle failed:', err);
+      } finally {
+        realmKeeperBusy = false;
+      }
+    };
+    void realmTick();
+    setInterval(() => void realmTick(), PAYOUT_KEEPER_TICK_MS).unref();
+    console.log(`realm buyback keeper enabled (${realmBuybackKeepers.map((k) => k.label).join(', ')})`);
   }
   console.log('database ready');
 

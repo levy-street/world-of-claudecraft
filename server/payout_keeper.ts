@@ -21,7 +21,7 @@ import { DEFAULT_PAYOUT_POLICY, planTwapChunks, shouldRunBatch, type PayoutPolic
 import { parseSplitPayment, fetchFinalizedTransaction, signatureStatus, solanaRpc, SOLANA_RPC_URL, SPL_TOKEN_PROGRAM } from './solana_rpc';
 import {
   createBuybackBatch, markBatchSwapped, markBatchSettling, markBatchSettled, markBatchFailed,
-  openBuybackBatches, lastSettleAt, type PayoutBatchRow, type PayoutMode,
+  openBuybackBatchesBySource, lastSettleAtBySource, type PayoutBatchRow, type PayoutMode,
 } from './payout_db';
 import { FlowLedger } from './flow_ledger';
 import { PgFlowLedgerDb } from './flow_ledger_db';
@@ -357,8 +357,10 @@ export function buildProductionDeps(mode: PayoutMode): { exec: PayoutExecutor; s
     markSettling: markBatchSettling,
     markSettled: markBatchSettled,
     markFailed: markBatchFailed,
-    openBatches: openBuybackBatches,
-    lastSettleAt,
+    // Scope recovery + cadence to THIS keeper's source, so the realm-buyback
+    // keepers' batches in the shared table are never mistaken for marketplace ones.
+    openBatches: () => openBuybackBatchesBySource('marketplace'),
+    lastSettleAt: () => lastSettleAtBySource('marketplace'),
   };
 
   return { exec, store };
