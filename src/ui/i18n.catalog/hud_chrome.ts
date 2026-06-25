@@ -790,7 +790,7 @@ export const hudChromeStrings = {
     mintPlaceholder: 'Mint address',
     claim: 'Claim',
     claiming: 'Claiming...',
-    claimed: 'Claimed. Equip it from your skins.',
+    claimed: 'Claimed and equipped. Find it any time in the skins browser.',
     needWallet: 'Link the matching wallet first.',
     close: 'Close',
     errorNotOwner: 'That wallet does not own this token.',

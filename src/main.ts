@@ -1603,7 +1603,12 @@ async function startGame(
           claim: async (chain, contract, tokenId) => ({ id: (await api.claimNftSkin(chain, contract, tokenId)).id }),
           linkEthereum: linkEthereumWallet,
           linkSolana: linkSolanaWallet,
-          onClaimed: (id) => { markOwned(id); void api.creatorSkins().then((s) => registerCreatorSkins(s)); },
+          onClaimed: (id) => {
+            markOwned(id);
+            // Refresh the renderer registry (so the new skin resolves), then equip
+            // it: "Wear an NFT" claims AND wears in one step.
+            void api.creatorSkins().then((s) => { registerCreatorSkins(s); online.changeSkin(0, 'class', id); });
+          },
         });
       },
       equip: (skin) => online.changeSkin(skin.fallbackSkin, skin.skinCatalog, skin.id),

@@ -148,9 +148,10 @@ function renderBrowse(content: HTMLElement, skins: CreatorSkinRegistryEntry[]): 
   const draw = (filter: string): void => {
     const owned = new Set(hooks?.ownedSkinIds() ?? []);
     const q = filter.trim().toLowerCase();
-    // NFT-PFP skins are claimed (proof of ownership), not bought, so they never
-    // appear in the for-sale browse grid; they are reached via the picker.
-    const shown = skins.filter((s) => !s.nft && (!q || s.name.toLowerCase().includes(q) || s.creator.toLowerCase().includes(q)));
+    // NFT-PFP skins are claimed (proof of ownership), not bought, so an UNOWNED
+    // NFT never appears in the for-sale grid (it is reached via the picker). An
+    // OWNED NFT skin shows so it can be re-equipped like any other owned skin.
+    const shown = skins.filter((s) => (!s.nft || owned.has(s.id)) && (!q || s.name.toLowerCase().includes(q) || s.creator.toLowerCase().includes(q)));
     grid.innerHTML = '';
     if (shown.length === 0) {
       const empty = document.createElement('div');
@@ -180,7 +181,8 @@ function buildCard(skin: CreatorSkinRegistryEntry, isOwned: boolean): HTMLElemen
     `<div class="market-card-meta"><span class="market-card-creator">${esc(t('marketplace.by', { creator: skin.creator }))}</span>` +
     `<span class="market-class-badge">${klass}</span></div>` +
     (skin.description ? `<div class="market-card-desc">${esc(skin.description)}</div>` : '') +
-    `<div class="market-card-price">${esc(formatUsdc(skin.priceUsdc))}</div>` +
+    // NFT skins are claimed, not priced; show the NFT tag instead of a price.
+    (skin.nft ? `<div class="market-card-price market-card-nft">${esc(t('hudChrome.nftSkins.title'))}</div>` : `<div class="market-card-price">${esc(formatUsdc(skin.priceUsdc))}</div>`) +
     `<div class="market-card-status" role="status" aria-live="polite"></div>`;
   // One button, one click handler, closure-tracked ownership: a successful buy
   // flips `owned` so the next click equips — no second listener (which would
