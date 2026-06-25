@@ -2185,6 +2185,7 @@ export class Renderer {
     let createdViews = 0;
     let candidateViews = 0;
     let doorPrewarmGroup: THREE.Group | null = null;
+    let interiorPrewarmGroup: THREE.Group | null = null;
     let entityPrewarmGroup: THREE.Group | null = null;
     let npcPrewarmGroup: THREE.Group | null = null;
     let playerPrewarmGroup: THREE.Group | null = null;
@@ -2298,6 +2299,22 @@ export class Renderer {
           doorPrewarmGroup = this.buildDoorPrewarmGroup();
           this.scene.add(doorPrewarmGroup);
         },
+      },
+      {
+        // Compile the dungeon interior shaders (kit + Halloween-bits pack
+        // materials, the Drowned Temple water shader, torch-glow decal) at boot
+        // so first entry / nearing a dungeon door does not link them live.
+        // Assets are boot-preloaded (see dungeon.ts), so the await is resolved.
+        id: 'interiors.materials',
+        category: 'objects',
+        priority: 32,
+        required: false,
+        run: async () => {
+          this.dungeons ??= new DungeonInteriors(this.scene, this.lowGfx, this.flames, this.fireLights);
+          interiorPrewarmGroup = await this.dungeons.buildPrewarmGroup();
+          this.scene.add(interiorPrewarmGroup);
+        },
+        detail: () => `objects=${interiorPrewarmGroup?.children.length ?? 0}`,
       },
       {
         // Players are the #1 shader-compile trigger in a crowd, so build their
@@ -2486,6 +2503,7 @@ export class Renderer {
     } finally {
       this.vfx.clear();
       if (doorPrewarmGroup) this.scene.remove(doorPrewarmGroup);
+      if (interiorPrewarmGroup) this.scene.remove(interiorPrewarmGroup);
       if (entityPrewarmGroup) this.scene.remove(entityPrewarmGroup);
       if (npcPrewarmGroup) this.scene.remove(npcPrewarmGroup);
       if (playerPrewarmGroup) this.scene.remove(playerPrewarmGroup);
