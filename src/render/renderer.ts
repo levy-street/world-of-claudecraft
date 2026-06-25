@@ -2100,6 +2100,14 @@ export class Renderer {
         const built = buildGroundQuestObject(itemId, -20_000 - idx);
         this.storePooledObject(key, built);
         built.group.visible = true;
+        // Hide the object's own point light (e.g. the ritual circle glow) during
+        // the prewarm: it must not inflate numPointLights, or every material would
+        // compile for one more light than the open world's constant budget ever
+        // shows and they would all recompile on first travel. Restored in the
+        // prewarm finally so the pooled object lights normally when reused live.
+        built.group.traverse((o) => {
+          if ((o as THREE.PointLight).isPointLight) o.visible = false;
+        });
         place(built.group);
       }
     }
@@ -2533,7 +2541,15 @@ export class Renderer {
       if (entityPrewarmGroup) this.scene.remove(entityPrewarmGroup);
       if (npcPrewarmGroup) this.scene.remove(npcPrewarmGroup);
       if (playerPrewarmGroup) this.scene.remove(playerPrewarmGroup);
-      if (objectPrewarmGroup) this.scene.remove(objectPrewarmGroup);
+      if (objectPrewarmGroup) {
+        // Re-show the object lights hidden during the prewarm so the pooled objects
+        // (reused for the live ground objects) light normally. (Cast: the manifest
+        // closure assignment is invisible to TS flow analysis here.)
+        (objectPrewarmGroup as THREE.Group).traverse((o: THREE.Object3D) => {
+          if ((o as THREE.PointLight).isPointLight) o.visible = true;
+        });
+        this.scene.remove(objectPrewarmGroup);
+      }
       if (propMaterialPrewarmGroup) this.scene.remove(propMaterialPrewarmGroup);
       if (foliagePrewarmGroup) this.scene.remove(foliagePrewarmGroup);
     }
