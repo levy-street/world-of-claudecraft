@@ -4138,6 +4138,9 @@ export const ko_KR: EnTranslations = {
       "monarch_crown_helm": {
         "name": "군주의 왕관"
       },
+      "bale_of_straw": {
+        "name": "짚단"
+      },
       "bristleback_maul": {
         "name": "뻣센등뼈 철퇴"
       },
@@ -4763,6 +4766,9 @@ export const ko_KR: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "나이트락시스, 손피크의 재앙"
+      },
+      "training_dummy": {
+        "name": "훈련용 허수아비"
       },
       "ironvein_foreman": {
         "name": "철맥 감독관"

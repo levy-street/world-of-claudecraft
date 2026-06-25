@@ -4138,6 +4138,9 @@ export const zh_TW: EnTranslations = {
       "monarch_crown_helm": {
         "name": "君主之冠"
       },
+      "bale_of_straw": {
+        "name": "稻草捆"
+      },
       "bristleback_maul": {
         "name": "硬鬃重槌"
       },
@@ -4763,6 +4766,9 @@ export const zh_TW: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "尼思拉克西斯，荊峰之災"
+      },
+      "training_dummy": {
+        "name": "訓練假人"
       },
       "ironvein_foreman": {
         "name": "鐵脈工頭"

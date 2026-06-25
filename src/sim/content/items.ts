@@ -412,6 +412,13 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'poor',
     sellValue: 1,
   },
+  bale_of_straw: {
+    id: 'bale_of_straw',
+    name: 'Bale of Straw',
+    kind: 'junk',
+    quality: 'poor',
+    sellValue: 1,
+  },
   // --- fishing catches (see FISHING_TABLES below). Food heals scale with the
   // depth/level of the zone you fish in; junk just vendors for coppers. ---
   raw_river_perch: {

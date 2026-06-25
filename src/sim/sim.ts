@@ -188,6 +188,9 @@ const DUNGEON_LEASH_DISTANCE = 70;
 // attacked). Elites, rares, and bosses are never trivial.
 const TRIVIAL_LEVEL_GAP = 10;
 const CORPSE_DURATION = 60;
+// Training dummy: seconds after the last hit before it drops combat and heals
+// to full (mirrors the 5s player out-of-combat window).
+const DUMMY_RESET_SECONDS = 5;
 const EVADE_SPEED_MULT = 1.6;
 // An evading mob walks a straight line home (no pathfinding) and stalls if deep
 // water or a collider sits between it and its spawn. Since evading mobs are
@@ -5513,7 +5516,7 @@ export class Sim {
     b.inCombat = true;
     // players and their pets pull wild mobs; pets never run wild-mob AI
     const aAttacker = a.kind === 'player' || (a.kind === 'mob' && a.ownerId !== null);
-    if (b.kind === 'mob' && b.ownerId === null && !b.dead && aAttacker && b.aiState !== 'evade') {
+    if (b.kind === 'mob' && b.ownerId === null && !b.dead && aAttacker && b.aiState !== 'evade' && !MOBS[b.templateId]?.dummy) {
       if (b.aiState === 'idle') this.aggroMob(b, a, true);
       else if (b.aggroTargetId === null) b.aggroTargetId = a.id;
     }
@@ -5522,7 +5525,8 @@ export class Sim {
       a.ownerId === null &&
       !a.dead &&
       b.kind === 'player' &&
-      a.aiState === 'idle'
+      a.aiState === 'idle' &&
+      !MOBS[a.templateId]?.dummy
     ) {
       this.aggroMob(a, b, false);
     }
@@ -5579,7 +5583,13 @@ export class Sim {
       e.aiState = 'dead';
       e.corpseTimer = CORPSE_DURATION;
       e.respawnTimer =
+        template?.respawnSeconds ??
         this.cfg.respawnSeconds * (template?.respawnMult ?? (template?.rare ? 4 : 1));
+      // A fixed respawn also caps corpse decay so the mob returns on schedule
+      // whether or not its loot was taken (training dummy: 10s).
+      if (template?.respawnSeconds !== undefined) {
+        e.corpseTimer = Math.min(e.corpseTimer, template.respawnSeconds);
+      }
       e.aggroTargetId = null;
       clearThreat(e);
       if (e.ownerId !== null) {
@@ -6330,6 +6340,19 @@ export class Sim {
       mob.inCombat = false;
       mob.aggroTargetId = null;
       clearThreat(mob);
+      return;
+    }
+
+    if (MOBS[mob.templateId]?.dummy) {
+      // Training dummy: stays attackable (hostile) so it counts for damage and
+      // shows on meters, but is otherwise inert — never aggros, moves, or fights
+      // back. It drops combat and heals to full a few seconds after the last hit.
+      if (mob.combatTimer >= DUMMY_RESET_SECONDS) {
+        mob.inCombat = false;
+        mob.hp = mob.maxHp;
+      } else {
+        mob.inCombat = true;
+      }
       return;
     }
 

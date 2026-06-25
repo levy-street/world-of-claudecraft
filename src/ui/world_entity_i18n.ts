@@ -73,6 +73,7 @@ const MOB_IDS = [
   'bound_guardian',
   'nythraxis_skeleton_warrior',
   'nythraxis_scourge_of_thornpeak',
+  'training_dummy',
 ] as const;
 
 const NPC_IDS = [

@@ -4138,6 +4138,9 @@ export const fr_FR: EnTranslations = {
       "monarch_crown_helm": {
         "name": "Couronne du Monarque"
       },
+      "bale_of_straw": {
+        "name": "Botte de paille"
+      },
       "bristleback_maul": {
         "name": "Maillet Bristleback"
       },
@@ -4763,6 +4766,9 @@ export const fr_FR: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Fléau de Thornpeak"
+      },
+      "training_dummy": {
+        "name": "Mannequin d'entraînement"
       },
       "ironvein_foreman": {
         "name": "Contremaître Veinefer"

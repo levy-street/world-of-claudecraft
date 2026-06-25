@@ -4138,6 +4138,9 @@ export const ja_JP: EnTranslations = {
       "monarch_crown_helm": {
         "name": "君主の王冠"
       },
+      "bale_of_straw": {
+        "name": "藁の束"
+      },
       "bristleback_maul": {
         "name": "ブリストルバックの大槌"
       },
@@ -4763,6 +4766,9 @@ export const ja_JP: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "ナイスラクシス、ソーンピークの災厄"
+      },
+      "training_dummy": {
+        "name": "訓練用ダミー"
       },
       "ironvein_foreman": {
         "name": "鉄脈の現場監督"

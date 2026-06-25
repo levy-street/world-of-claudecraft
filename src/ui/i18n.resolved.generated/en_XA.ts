@@ -4138,6 +4138,9 @@ export const en_XA: EnTranslations = {
       "monarch_crown_helm": {
         "name": "[Ɱóñáŕçĥ'š Çŕóŵñ]"
       },
+      "bale_of_straw": {
+        "name": "[Ɓáļé óƒ Šţŕáŵ]"
+      },
       "bristleback_maul": {
         "name": "[Ɓŕíšţļéƀáçķ Ɱáúļ]"
       },
@@ -4763,6 +4766,9 @@ export const en_XA: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "[Ñýţĥŕáẋíš, Šçóúŕĝé óƒ Ţĥóŕñþéáķ]"
+      },
+      "training_dummy": {
+        "name": "[Ţŕáíñíñĝ Ðúɱɱý]"
       },
       "ironvein_foreman": {
         "name": "[Íŕóñʋéíñ Ƒóŕéɱáñ]"

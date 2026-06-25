@@ -4138,6 +4138,9 @@ export const en_CA: EnTranslations = {
       "monarch_crown_helm": {
         "name": "Monarch's Crown"
       },
+      "bale_of_straw": {
+        "name": "Bale of Straw"
+      },
       "bristleback_maul": {
         "name": "Bristleback Maul"
       },
@@ -4763,6 +4766,9 @@ export const en_CA: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Scourge of Thornpeak"
+      },
+      "training_dummy": {
+        "name": "Training Dummy"
       },
       "ironvein_foreman": {
         "name": "Ironvein Foreman"

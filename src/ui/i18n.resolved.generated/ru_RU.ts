@@ -4138,6 +4138,9 @@ export const ru_RU: EnTranslations = {
       "monarch_crown_helm": {
         "name": "Корона Монарха"
       },
+      "bale_of_straw": {
+        "name": "Тюк соломы"
+      },
       "bristleback_maul": {
         "name": "Кувалда Щетиноспина"
       },
@@ -4763,6 +4766,9 @@ export const ru_RU: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Нитраксис, Бич Торнпика"
+      },
+      "training_dummy": {
+        "name": "Тренировочный манекен"
       },
       "ironvein_foreman": {
         "name": "Прораб Железной жилы"

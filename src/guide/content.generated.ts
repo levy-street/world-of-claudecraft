@@ -1506,6 +1506,15 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "tint": "#6c3483"
       },
       {
+        "name": "Training Dummy",
+        "min": 10,
+        "max": 10,
+        "rare": false,
+        "templateId": "training_dummy",
+        "model": "mob_bandit",
+        "tint": "#6b3a32"
+      },
+      {
         "name": "Gravecaller Mender",
         "min": 11,
         "max": 12,
@@ -1794,6 +1803,22 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "height": 2.1,
     "tintStrength": 0.35
   },
+  "mob_bandit": {
+    "url": "models/chars/players/rogue_hooded.glb",
+    "idle": "Idle",
+    "height": 2.6,
+    "attach": [
+      {
+        "url": "models/weapons/dagger.glb",
+        "bone": "handslot.r"
+      },
+      {
+        "url": "models/weapons/dagger.glb",
+        "bone": "handslot.l"
+      }
+    ],
+    "tintStrength": 0.3
+  },
   "mob_wolf": {
     "url": "models/creatures/wolf.glb",
     "idle": "Idle",
@@ -1811,22 +1836,6 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "idle": "Spider_Idle",
     "height": 1.4,
     "tintStrength": 0.35
-  },
-  "mob_bandit": {
-    "url": "models/chars/players/rogue_hooded.glb",
-    "idle": "Idle",
-    "height": 2.6,
-    "attach": [
-      {
-        "url": "models/weapons/dagger.glb",
-        "bone": "handslot.r"
-      },
-      {
-        "url": "models/weapons/dagger.glb",
-        "bone": "handslot.l"
-      }
-    ],
-    "tintStrength": 0.3
   },
   "mob_murloc": {
     "url": "models/creatures/frog.glb",
