@@ -57,6 +57,7 @@ async function boot(page) {
         info = r.webgl.info;
       window.__freezes = [];
       const seenKeys = new Set((info.programs ?? []).map((p) => p.cacheKey ?? ''));
+      window.__benchBaseKeys = [...seenKeys];
       let lastT = performance.now(),
         lastProgs = info.programs?.length ?? 0;
       const loop = () => {
@@ -115,10 +116,16 @@ async function boot(page) {
 
 async function run() {
   fs.mkdirSync(path.dirname(OUT), { recursive: true });
+  // REAL_GPU=1 (with HEADED=1) drops the swiftshader override so Chrome uses the
+  // host GPU via DISPLAY/Wayland - the only way to measure real shader-link times.
+  const realGpu = process.env.REAL_GPU === '1';
+  const args = realGpu
+    ? ['--window-size=900,600', '--ignore-gpu-blocklist', '--enable-gpu-rasterization']
+    : ['--window-size=1280,720', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'];
   const browser = await puppeteer.launch({
     executablePath: BROWSER_PATH,
     headless: HEADLESS,
-    args: ['--window-size=1280,720', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
+    args,
   });
   const page = await browser.newPage();
   const errors = [];
@@ -126,6 +133,10 @@ async function run() {
   try {
     await boot(page);
     const tier = await page.evaluate(() => window.__game.perf.report().renderer?.tier);
+    const glRenderer = await page.evaluate(
+      () => window.__game.perf.report().renderer?.glRenderer ?? '?',
+    );
+    console.log(`GL renderer: ${glRenderer}`);
     const baseProgs = await page.evaluate(
       () => window.__game.renderer.webgl.info.programs?.length ?? 0,
     );
@@ -151,6 +162,7 @@ async function run() {
     }
 
     const freezes = await page.evaluate(() => window.__freezes ?? []);
+    const baseKeys = await page.evaluate(() => window.__benchBaseKeys ?? []);
 
     // Classify.
     const byClass = {};
@@ -164,12 +176,14 @@ async function run() {
     }
     const artifact = {
       tier,
+      glRenderer,
       baseProgs,
       startZ,
       endZ,
       walkMs: WALK_MS,
       totalNewPrograms: totalNew,
       byClass,
+      baseKeys,
       freezes,
       errors,
     };

@@ -1078,6 +1078,7 @@ export class Renderer {
     this.scene.add(this.birds.group);
     this.impactSite = buildImpactSite(this.sim.cfg.seed);
     this.scene.add(this.impactSite.group);
+    this.scene.add(this.impactSite.light);
     const props = buildProps(this.sim.cfg.seed, (delveId) =>
       tEntity({ kind: 'delve', id: delveId, field: 'name' }),
     );
@@ -1085,6 +1086,10 @@ export class Renderer {
     this.scene.add(props.group);
     this.flames = props.flames;
     this.fireLights = props.fireLights;
+    // The impact-site light rides the campfire point-light budget so the visible
+    // point-light count stays constant as the player travels (constant
+    // numPointLights -> materials never recompile for a light-count change).
+    this.fireLights.push(this.impactSite.light);
     this.propsView = props;
 
     // selection ring — a classic target reticle: a base ring plus four
@@ -4260,10 +4265,24 @@ export class Renderer {
         dz = entry.worldPos.z - pz;
       entry.d2 = dx * dx + dz * dz;
     }
-    const lightBudget = this.effectivePointLights || GFX.maxPointLights;
-    if (ranked.length > lightBudget) ranked.sort((a, b) => a.d2 - b.d2);
+    // Keep a CONSTANT number of point lights `visible` so numPointLights in every
+    // material's program cache key never changes as the player travels. Three counts
+    // a light into numPointLights iff `visible` (intensity is irrelevant to the
+    // count), so toggling visibility as campfires budget in/out used to recompile
+    // every nearby material 0<->maxPointLights times - the dominant open-world travel
+    // freeze. Now the nearest maxPointLights lights stay visible (one stable program
+    // per material); lights past the live budget or out of range simply contribute
+    // nothing (intensity 0). maxPointLights is the per-tier constant, so the live
+    // governor (effectivePointLights) only changes how many SHINE, not the count.
+    const visibleCount = GFX.maxPointLights;
+    const liveBudget = this.effectivePointLights || GFX.maxPointLights;
+    if (ranked.length > visibleCount) ranked.sort((a, b) => a.d2 - b.d2);
     for (let i = 0; i < ranked.length; i++) {
-      ranked[i].light.visible = i < lightBudget && ranked[i].d2 < LIGHT_BUDGET_RANGE_SQ;
+      const entry = ranked[i];
+      entry.light.visible = i < visibleCount;
+      if (i < visibleCount && !(i < liveBudget && entry.d2 < LIGHT_BUDGET_RANGE_SQ)) {
+        entry.light.intensity = 0; // counted (stable program) but dark
+      }
     }
   }
 
