@@ -1,5 +1,7 @@
 import { Pool } from 'pg';
 import { LEADERBOARD_MAX } from '../src/sim/leaderboard_page';
+import type { AldrinMembership } from './aldrin_club';
+import { ALDRIN_SCHEMA } from './aldrin_club_db';
 import { sanitizeRemovedZone1Content } from '../src/sim/removed_zone1_content';
 import type { CharacterState, MarketSave } from '../src/sim/sim';
 import type { ArenaFormat, PlayerClass } from '../src/sim/types';
@@ -430,6 +432,7 @@ export async function ensureSchema(): Promise<void> {
     await client.query(SCHEMA);
     await client.query(SOCIAL_SCHEMA);
     await client.query(OAUTH_SCHEMA);
+    await client.query(ALDRIN_SCHEMA);
     // Seed the chat-filter word lists + config on first boot only (idempotent).
     // Runs under the same advisory lock so concurrent realm boots don't race.
     await seedChatFilterDefaults(client);
@@ -478,6 +481,11 @@ export interface RequestMetadata {
 export interface AccountCosmetics {
   completedQuestIds: string[];
   mechChromaIds: string[];
+  // Aldrin Club membership (account-level subscription). null when never a member
+  // or lapsed-and-cleared; an expired record may also linger until refreshed.
+  // Server-authoritative; mirrored to the client via the cosmetics sync so the
+  // HUD can gate cosmetic/convenience/access perks. Never a source of power.
+  aldrinClub?: AldrinMembership | null;
 }
 
 function uniqueStrings(value: unknown): string[] {
@@ -497,6 +505,23 @@ export function normalizeAccountCosmetics(value: unknown): AccountCosmetics {
   return {
     completedQuestIds: uniqueStrings(src.completedQuestIds),
     mechChromaIds: uniqueStrings(src.mechChromaIds),
+    aldrinClub: normalizeAldrinMembership(src.aldrinClub),
+  };
+}
+
+function normalizeAldrinMembership(value: unknown): AldrinMembership | null {
+  if (!value || typeof value !== 'object') return null;
+  const m = value as Record<string, unknown>;
+  const since = typeof m.since === 'string' ? m.since : '';
+  const until = typeof m.until === 'string' ? m.until : '';
+  const lastMethod = m.lastMethod;
+  if (!until || !Number.isFinite(Date.parse(until))) return null;
+  if (lastMethod !== 'sol' && lastMethod !== 'usdc' && lastMethod !== 'woc' && lastMethod !== 'stripe') return null;
+  return {
+    since: since && Number.isFinite(Date.parse(since)) ? since : until,
+    until,
+    lastMethod,
+    autoRenew: m.autoRenew === true,
   };
 }
 
@@ -545,6 +570,25 @@ export async function revokeAccountMechChroma(
   const cosmetics = await loadAccountCosmetics(accountId);
   const mechChromaIds = cosmetics.mechChromaIds.filter((id) => id !== chromaId);
   return saveAccountCosmetics(accountId, { ...cosmetics, mechChromaIds });
+}
+
+/** Read just the Aldrin Club membership record (null when never a member). */
+export async function loadAldrinMembership(accountId: number): Promise<AldrinMembership | null> {
+  const cosmetics = await loadAccountCosmetics(accountId);
+  return cosmetics.aldrinClub ?? null;
+}
+
+/**
+ * Set (grant or extend) the Aldrin Club membership for an account. The caller
+ * (server/aldrin_club_http.ts) computes the new record via extendMembership after
+ * a verified payment, so this is a pure persist of the already-decided state.
+ */
+export async function setAldrinMembership(
+  accountId: number,
+  membership: AldrinMembership,
+): Promise<AccountCosmetics> {
+  const cosmetics = await loadAccountCosmetics(accountId);
+  return saveAccountCosmetics(accountId, { ...cosmetics, aldrinClub: membership });
 }
 
 function cleanMetadataText(value: string | null | undefined, max: number): string | null {

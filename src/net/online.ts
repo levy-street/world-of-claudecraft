@@ -166,6 +166,42 @@ export function isAuthError(err: unknown): boolean {
   return err instanceof ApiError && (err.status === 401 || err.status === 403);
 }
 
+// ── Aldrin Club subscription wire shapes (mirror server/aldrin_club_http.ts) ──
+export interface AldrinPerkWire {
+  id: string;
+  kind: 'cosmetic' | 'convenience' | 'access';
+}
+export interface AldrinMembershipWire {
+  active: boolean;
+  since: string;
+  until: string;
+  daysRemaining: number;
+  autoRenew: boolean;
+  lastMethod: string;
+}
+export interface AldrinStatus {
+  enabled: boolean;
+  priceUsdCents: number;
+  periodDays: number;
+  burnBps: number;
+  methods: string[];
+  perks: AldrinPerkWire[];
+  membership: AldrinMembershipWire | null;
+}
+export interface AldrinQuoteWire {
+  quoteId: string;
+  method: string;
+  mint: string | null;
+  decimals: number;
+  priceBase: string;
+  treasury: string | null;
+  buyback: string | null;
+  treasuryBase: string;
+  splitBase: string;
+  memo: string;
+  expiresAt: string;
+}
+
 export class Api {
   private static readonly SESSION_KEY = 'woc_session';
   token: string | null = null;
@@ -512,6 +548,28 @@ export class Api {
 
   async unlinkWallet(): Promise<void> {
     await this.delete('/api/wallet/link', {});
+  }
+
+  // ── Aldrin Club subscription ──────────────────────────────────────────────
+  // Membership status, price, enabled rails, and the perk catalog.
+  async aldrinStatus(): Promise<AldrinStatus> {
+    return this.get('/api/aldrin');
+  }
+
+  // Create a single-use payment quote for the chosen rail. The client builds +
+  // signs the on-chain transfer to quote.treasury / quote.buyback (or burns, for
+  // $WOC), with quote.memo as the memo, then calls aldrinConfirm with the sig.
+  async aldrinQuote(method: string): Promise<{ quote: AldrinQuoteWire; payer: string }> {
+    return this.post('/api/aldrin/quote', { method });
+  }
+
+  // Submit the signed transaction signature; the server verifies it on-chain and
+  // grants/extends membership. Returns the updated membership view.
+  async aldrinConfirm(
+    quoteId: string,
+    signature: string,
+  ): Promise<{ membership: AldrinMembershipWire | null; idempotent?: boolean }> {
+    return this.post('/api/aldrin/confirm', { quoteId, signature });
   }
 
   // ── Shareable player card + referrals ──────────────────────────────────────

@@ -127,6 +127,12 @@ import {
   REALM_DIRECTORY,
   REALM_ORIGINS,
 } from './realm';
+import {
+  handleAldrinConfirm,
+  handleAldrinQuote,
+  handleAldrinStatus,
+  handleAldrinStripeWebhook,
+} from './aldrin_club_http';
 import { resolveReportTarget } from './report_target';
 import { handleSitePresenceHeartbeat } from './site_presence';
 import { cacheControlFor, etagFor, isNotModified } from './static_cache';
@@ -1256,6 +1262,26 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
       return handleWalletGet(req, res, accountId);
+    }
+    // Aldrin Club subscription. Account-scoped status/quote/confirm; the Stripe
+    // webhook is public but verified by its Stripe-Signature, not a bearer token.
+    if (req.method === 'GET' && url === '/api/aldrin') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleAldrinStatus(req, res, accountId);
+    }
+    if (req.method === 'POST' && url === '/api/aldrin/quote') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleAldrinQuote(req, res, accountId);
+    }
+    if (req.method === 'POST' && url === '/api/aldrin/confirm') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleAldrinConfirm(req, res, accountId);
+    }
+    if (req.method === 'POST' && url === '/api/aldrin/stripe/webhook') {
+      return handleAldrinStripeWebhook(req, res);
     }
     // $WOC balance proxy — keeps the Solana RPC endpoint (and any key in it)
     // server-side so it never ships in the client bundle. Public (on-chain

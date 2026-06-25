@@ -71,7 +71,7 @@ export type { ArenaCombatant, ArenaFormat, ArenaStanding, OverheadEmoteId } from
 
 // --- facet aux-type + value re-exports (each travels with its facet file) ---
 export { isOverheadEmoteId, OVERHEAD_EMOTES } from './world_api/chat';
-export type { AccountCosmetics } from './world_api/cosmetics';
+export type { AccountCosmetics, AldrinMembershipPublic } from './world_api/cosmetics';
 export type {
   DelveCompanionInfo,
   DelveDailyInfo,
