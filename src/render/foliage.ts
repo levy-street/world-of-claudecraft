@@ -541,43 +541,61 @@ function farTreeProxyMaterial(shape: SpeciesSpec['proxyShape']): THREE.Material 
 // Compile every foliage shader program up front. The renderer streams its tree /
 // rock buckets in as the player moves, so a species (or its far-impostor) whose
 // buckets are not near spawn otherwise links its shader the first time you walk
-// into it: the open-world travel hitch. buildFoliage() runs before the prewarm and
-// has already populated materialCache with one shared material per source-material
-// name across all species, so we instantiate one mesh per cached material. A dummy
-// geo carrying uv + vertex colours reproduces the program defines (USE_MAP /
-// USE_COLOR / instancing) the live InstancedMesh buckets use, so the programs
-// dedupe by cache key. Caller adds the group to the scene before the compile pass
-// and removes it afterwards. (Grass compiles at spawn via the player-centred ring,
-// so it is intentionally not duplicated here.)
+// into it: the open-world travel hitch. We instantiate one mesh per distinct
+// foliage material using the REAL extracted geometry and the same per-mesh state
+// the live buckets use, so compileAsync links the exact program by cache key.
+// Three pitfalls matter, all learned from real-GPU freeze logging:
+//   - real geometry, not a dummy plane: the program key depends on the geometry's
+//     attributes (a normal-mapped ultra material needs TANGENTS; a dummy plane has
+//     none, so its program differs and the live bucket recompiles);
+//   - instanceColor: every live bucket tints per instance (setColorAt ->
+//     USE_INSTANCING_COLOR);
+//   - castShadow: ultra renders a shadow pass, so the depth/shadow program variant
+//     must compile too.
+// Caller adds the group to the scene before the compile pass and removes it after.
+// (Grass compiles at spawn via the player-centred ring, so it is not duplicated.)
 export function buildFoliageMaterialPrewarmGroup(): THREE.Group {
   const group = new THREE.Group();
   group.name = 'foliage-material-prewarm';
   group.position.set(0, -1000, 0); // off-screen; compileAsync ignores position
-  // Ensure the far-tree impostor materials exist (created lazily per far bucket;
-  // gated exactly like the live tree builder).
-  if (GFX.standardMaterials && !GFX.leanFoliage) {
-    for (const shape of ['pine', 'round', 'twisted', 'dead'] as const) farTreeProxyMaterial(shape);
-  }
-  const geo = withWhiteVertexColors(new THREE.PlaneGeometry(0.02, 0.02));
   const identity = new THREE.Matrix4();
   const white = new THREE.Color(1, 1, 1);
-  const add = (mat: THREE.Material): void => {
+  const seen = new Set<THREE.Material>();
+  const add = (geo: THREE.BufferGeometry, mat: THREE.Material): void => {
+    if (seen.has(mat)) return;
+    seen.add(mat);
     const im = new THREE.InstancedMesh(geo, mat, 1);
     im.setMatrixAt(0, identity);
-    // Every live foliage InstancedMesh carries a per-instance biome/leaf tint
-    // (setColorAt), which adds USE_INSTANCING_COLOR to the program. Set it here too
-    // or the prewarmed program differs from the one the live buckets need and they
-    // recompile on first sight (the residual travel hitch).
     im.setColorAt(0, white);
     im.instanceMatrix.needsUpdate = true;
     if (im.instanceColor) im.instanceColor.needsUpdate = true;
-    im.castShadow = false;
-    im.receiveShadow = false;
+    im.castShadow = true;
+    im.receiveShadow = true;
     im.frustumCulled = false;
     group.add(im);
   };
-  for (const mat of materialCache.values()) add(mat);
-  for (const mat of farTreeProxyMatCache.values()) add(mat);
+  // One mesh per material, keyed on the real per-species extracted parts so the
+  // geometry attributes (uv / normal / tangent / color) match the live buckets.
+  const speciesUrls = [
+    ...MODEL_URLS.pine,
+    ...MODEL_URLS.oak,
+    ...MODEL_URLS.twisted,
+    ...MODEL_URLS.dead,
+    ...MODEL_URLS.rock,
+    MODEL_URLS.bush[0],
+    MODEL_URLS.bushFlowers[0],
+    MODEL_URLS.fern[0],
+    MODEL_URLS.mushroom[0],
+  ];
+  for (const url of speciesUrls) {
+    for (const part of extractParts(url)) add(part.geometry, part.material);
+  }
+  // Far-tree impostors (gated exactly like the live tree builder).
+  if (GFX.standardMaterials && !GFX.leanFoliage) {
+    for (const shape of ['pine', 'round', 'twisted', 'dead'] as const) {
+      add(farTreeProxyGeo(shape), farTreeProxyMaterial(shape));
+    }
+  }
   return group;
 }
 
