@@ -222,6 +222,24 @@ export const ko_KR: EnTranslations = {
     "rest": {
       "resting": "휴식 중"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
+    "unitFrame": {
+      "playerLabel": "내 캐릭터",
+      "targetLabel": "내 대상",
+      "targetAnnounce": "대상: {name}",
+      "partyLabel": "내 파티",
+      "partyGroup": "{n}번 그룹",
+      "durationUnitSeconds": "초"
+    },
+    "character": {
+      "modelPreview": "캐릭터 모델 미리보기"
+    },
+    "skipLinks": {
+      "mainHud": "메인 HUD로 건너뛰기",
+      "chat": "채팅으로 건너뛰기"
+    },
     "mobile": {
       "autorun": "자동 달리기",
       "jump": "점프",
@@ -243,6 +261,13 @@ export const ko_KR: EnTranslations = {
       "coordinates": "좌표",
       "heading": "방향",
       "minimapZoom": "미니맵 확대/축소"
+    },
+    "castBar": {
+      "playerAria": "내 시전 막대",
+      "targetAria": "대상 시전 막대"
+    },
+    "leaderboard": {
+      "close": "닫기"
     },
     "raidLockout": {
       "title": "공격대 잠금",
@@ -295,7 +320,10 @@ export const ko_KR: EnTranslations = {
       "showWalletOnCharacterScreen": "캐릭터 화면에 지갑 표시",
       "showWalletOnPlayerCard": "플레이어 카드에 지갑 표시",
       "uiScale": "UI 배율",
-      "highContrastBackground": "고대비 배경"
+      "highContrastBackground": "고대비 배경",
+      "showItemLevel": "아이템 레벨 표시",
+      "itemLevelLine": "아이템 레벨 {level}",
+      "itemScoreLine": "점수 {score}"
     },
     "controller": {
       "title": "컨트롤러",
@@ -425,6 +453,10 @@ export const ko_KR: EnTranslations = {
     },
     "tips": {
       "joinChannels": "팁: /join world 또는 /join lfg를 입력하면 서버 전역의 플레이어와 대화할 수 있습니다."
+    },
+    "itemSet": {
+      "header": "{name} ({have}/{total})",
+      "bonusLine": "({pieces}) {bonus}"
     },
     "questShare": {
       "notShareable": "이 퀘스트는 공유할 수 없습니다.",
@@ -562,6 +594,26 @@ export const ko_KR: EnTranslations = {
       "exportDone": "데이터가 다운로드되었습니다. 확인 메일을 보내드렸습니다.",
       "exportFailed": "데이터를 내보낼 수 없습니다. 잠시 후 다시 시도하세요."
     },
+    "masterLoot": {
+      "title": "분배 담당",
+      "enableLabel": "분배 담당",
+      "enableAria": "분배 담당 사용",
+      "looterLabel": "분배 담당자",
+      "leaderOption": "파티장",
+      "thresholdLabel": "품질 기준",
+      "thresholdUncommon": "고급 이상",
+      "thresholdRare": "희귀 이상",
+      "thresholdEpic": "영웅 이상",
+      "assignPrompt": "{item} 분배",
+      "assignAria": "{item}을(를) {name}에게 분배",
+      "rollButton": "주사위",
+      "selectAll": "전체 선택",
+      "methodMaster": "전리품 방식이 분배 담당으로 설정되었습니다. 분배 담당자: {name}.",
+      "methodGroup": "전리품 방식이 파티 분배로 설정되었습니다.",
+      "assigned": "{looter}님이 {item}을(를) {target}에게 분배했습니다.",
+      "unassigned": "{item}이(가) 분배되지 않아 모두가 획득할 수 있습니다.",
+      "leaderOnly": "파티장만 전리품 방식을 변경할 수 있습니다."
+    },
     "bags": {
       "filterGroupAria": "가방을 분류별로 필터링",
       "filterAll": "전체",
@@ -583,6 +635,91 @@ export const ko_KR: EnTranslations = {
       "notRaid": "현재 파티는 공격대가 아닙니다.",
       "leaderOnly": "공격대장만 파티로 전환할 수 있습니다.",
       "tooLarge": "인원이 5명을 초과하는 공격대는 파티로 다시 전환할 수 없습니다."
+    },
+    "itemArmorType": {
+      "cloth": "천",
+      "leather": "가죽",
+      "mail": "사슬"
+    },
+    "auraEffect": {
+      "dot": "{interval}초마다 {value}의 {school} 피해를 입힙니다",
+      "hot": "{interval}초마다 생명력을 {value} 회복합니다",
+      "absorb": "{value}의 피해를 흡수합니다",
+      "healAbsorb": "들어오는 치유를 {value}만큼 흡수합니다",
+      "thorns": "공격자에게 {value}의 {school} 피해를 입힙니다",
+      "slow": "이동 속도를 {pct}% 감소시킵니다",
+      "speed": "이동 속도를 {pct}% 증가시킵니다",
+      "attackSpeedSlow": "공격 속도를 {pct}% 늦춥니다",
+      "attackSpeedFast": "공격 속도를 {pct}% 증가시킵니다",
+      "haste": "공격 속도와 시전 속도를 {pct}% 증가시킵니다",
+      "tongues": "시전 시간을 {pct}% 증가시킵니다",
+      "increase": {
+        "ap": "공격력을 {value} 증가시킵니다",
+        "armor": "방어도를 {value} 증가시킵니다",
+        "int": "지능을 {value} 증가시킵니다",
+        "agi": "민첩성을 {value} 증가시킵니다",
+        "sta": "체력을 {value} 증가시킵니다",
+        "spi": "정신력을 {value} 증가시킵니다",
+        "allStats": "모든 능력치를 {value} 증가시킵니다"
+      },
+      "reduce": {
+        "ap": "공격력을 {value} 감소시킵니다",
+        "armor": "방어도를 {value} 감소시킵니다",
+        "int": "지능을 {value} 감소시킵니다",
+        "agi": "민첩성을 {value} 감소시킵니다",
+        "sta": "체력을 {value} 감소시킵니다",
+        "spi": "정신력을 {value} 감소시킵니다",
+        "allStats": "모든 능력치를 {value} 감소시킵니다"
+      },
+      "dodge": "회피 확률을 {pct}% 증가시킵니다",
+      "dodgeReduce": "회피 확률을 {pct}% 감소시킵니다",
+      "armorFlat": "방어도를 {value} 감소시킵니다",
+      "armorFlatStacks": "방어도를 {value} 감소시킵니다 ({stacks}중첩)",
+      "mortalWound": "받는 치유량을 {pct}% 감소시킵니다",
+      "vulnerability": "받는 피해를 {pct}% 증가시킵니다",
+      "physVuln": "받는 물리 피해를 {pct}% 증가시킵니다",
+      "spellVuln": "받는 마법 피해를 {pct}% 증가시킵니다",
+      "critVuln": "치명타로 적중될 확률을 {pct}% 증가시킵니다",
+      "costTax": "기술 소모량을 {pct}% 증가시킵니다",
+      "stun": "기절: 행동할 수 없습니다",
+      "root": "속박: 이동할 수 없습니다",
+      "incapacitate": "무력화: 행동할 수 없습니다",
+      "polymorph": "변이: 행동할 수 없습니다",
+      "hex": "입히는 피해와 치유를 {pct}% 감소시킵니다",
+      "blind": "실명: 행동할 수 없습니다",
+      "silence": "침묵: 주문을 시전할 수 없습니다",
+      "disarm": "무장 해제: 무기 공격을 사용할 수 없습니다",
+      "lockout": "주문 계열이 봉인되었습니다",
+      "imbue": "무기에 추가 효과가 부여되었습니다",
+      "imbueRange": "무기 부여: 심판 시 {min}에서 {max}의 추가 피해",
+      "stealth": "은폐 상태, 이동 속도가 {pct}% 감소합니다",
+      "formBear": "곰 변신: 생명력과 방어도 증가",
+      "formCat": "표범 변신: 근접 피해와 기력",
+      "formTravel": "여행 변신: 이동 속도가 {pct}% 증가합니다",
+      "defensiveStance": "방어 태세: 받는 피해 감소, 위협 수준 증가",
+      "righteousFury": "정의의 격노: 신성 피해로 인한 위협 수준이 크게 증가합니다",
+      "scale": "크기가 {pct}% 증가합니다",
+      "jump": "도약 높이가 {pct}% 증가합니다",
+      "school": {
+        "physical": "물리",
+        "fire": "화염",
+        "frost": "냉기",
+        "arcane": "비전",
+        "shadow": "암흑",
+        "holy": "신성",
+        "nature": "자연"
+      }
+    },
+    "loot": {
+      "chestTitle": "상자"
+    },
+    "spellbook": {
+      "addToBarAria": "{name}을(를) 행동 단축바에 추가",
+      "removeFromBarAria": "{name}을(를) 행동 단축바에서 제거"
+    },
+    "nameplate": {
+      "mob": "[{level}] {name}",
+      "mobElite": "[{level}+] {name}"
     },
     "nftSkins": {
       "title": "Wear an NFT",
@@ -1408,17 +1545,17 @@ export const ko_KR: EnTranslations = {
     }
   },
   "marketplace": {
-    "title": "Creator Skins",
-    "subtitle": "Player-made cosmetics, paid in USDC. 70% goes to the creator; 30% buys and burns $WOC.",
-    "loading": "Loading skins…",
-    "empty": "No creator skins are for sale yet. Be the first — open Create & Sell.",
+    "title": "크리에이터 스킨",
+    "subtitle": "플레이어가 제작한 외형. USDC로 구매합니다. 70%는 크리에이터에게, 30%는 $WOC를 매수해 소각합니다.",
+    "loading": "스킨 불러오는 중…",
+    "empty": "판매 중인 크리에이터 스킨이 아직 없습니다.",
     "buy": "Buy",
     "price": "{price}",
-    "connectFirst": "Connect a wallet to buy.",
-    "purchasing": "Purchasing…",
-    "owned": "Owned — equipped",
-    "failed": "Purchase failed",
-    "close": "Close",
+    "connectFirst": "구매하려면 지갑을 연결하세요.",
+    "purchasing": "구매 중…",
+    "owned": "보유함 — 장착됨",
+    "failed": "구매 실패",
+    "close": "닫기",
     "tabBrowse": "Browse",
     "tabCreate": "Create & Sell",
     "search": "Search skins",
@@ -1899,7 +2036,7 @@ export const ko_KR: EnTranslations = {
     "tries": "시도 {count}회",
     "triesOne": "시도 1회",
     "perMove": "이동당 {seconds}초",
-    "seconds": "{seconds}s",
+    "seconds": "{seconds}초",
     "boardTitle": "열쇠공의 길: {tier} 상자",
     "closeAria": "닫기",
     "withdrawAria": "물러나기",
@@ -2256,7 +2393,7 @@ export const ko_KR: EnTranslations = {
     "applicationCategory": "게임",
     "operatingSystem": "웹 브라우저",
     "officialLabel": "World of ClaudeCraft 공식 웹사이트",
-    "officialBody": "worldofclaudecraft.com은 Claudemoon 렐름의 공식 무료 브라우저 MMO입니다. 지속 캐릭터로 온라인 플레이를 하거나, 오프라인에서 혼자 탐험하고, wiki를 읽고, 이 사이트에서 검증된 커뮤니티 링크를 확인하세요."
+    "officialBody": "worldofclaudecraft.com은 Claudemoon 렐름의 공식 무료 브라우저 MMO입니다. 지속 캐릭터로 온라인 플레이를 하거나, 오프라인에서 혼자 탐험하고, 위키를 읽고, 이 사이트에서 검증된 커뮤니티 링크를 확인하세요."
   },
   "a11y": {
     "goHome": "홈으로 이동",
@@ -2512,7 +2649,9 @@ export const ko_KR: EnTranslations = {
       "mobileMap": "지도",
       "closeMap": "지도 닫기",
       "zoomIn": "확대",
-      "zoomOut": "축소"
+      "zoomOut": "축소",
+      "mapCanvasLabel": "지도",
+      "mapSummary": "{zone}의 지도."
     },
     "options": {
       "gameMenu": "게임 메뉴",
@@ -2713,6 +2852,7 @@ export const ko_KR: EnTranslations = {
     "combat": {
       "floatingMiss": "빗나감",
       "floatingDodge": "회피",
+      "floatingResist": "저항",
       "cannotMove": "이동 불가!",
       "attack": "공격",
       "damageDone": "{ability}이 {target}에게 {amount}의 피해를 입혔습니다.",
@@ -2721,6 +2861,7 @@ export const ko_KR: EnTranslations = {
       "damageTakenCrit": "{source}에게 치명타로 {amount}의 피해를 받았습니다.",
       "miss": "{ability}이 {target}에게 빗나갔습니다.",
       "dodged": "{target}이 {ability}을 회피했습니다.",
+      "resisted": "{target}이 {ability}을 저항했습니다.",
       "healSelf": "{ability}이 자신을 {amount}만큼 치유했습니다.",
       "healSelfCrit": "{ability}이 자신을 치명타 치유로 {amount}만큼 회복했습니다.",
       "healOther": "{ability}이 {target}을 {amount}만큼 치유했습니다.",
@@ -3451,7 +3592,7 @@ export const ko_KR: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "비전 화살",
-        "description": "적에게 비전 화살을 발사하여 3초 동안 매초 8의 비전 피해를 입힙니다."
+        "description": "적에게 비전 화살을 발사하여 3초 동안 매초 {damage}의 비전 피해를 입힙니다."
       },
       "polymorph": {
         "name": "변이",
@@ -3515,7 +3656,7 @@ export const ko_KR: EnTranslations = {
       },
       "stealth": {
         "name": "은신",
-        "description": "그림자 속에 몸을 숨깁니다. 적이 거의 알아차리지 못하지만 이동 속도가 30% 감소합니다. 공격하거나 피해를 받으면 은신이 해제됩니다. 다시 시전하면 모습을 드러냅니다."
+        "description": "그림자 속에 몸을 숨깁니다. 적이 거의 알아차리지 못하지만 이동 속도가 50% 감소합니다. 공격하거나 피해를 받으면 은신이 해제됩니다. 다시 시전하면 모습을 드러냅니다."
       },
       "adrenaline_rush": {
         "name": "아드레날린 촉진",
@@ -3547,7 +3688,7 @@ export const ko_KR: EnTranslations = {
       },
       "vanish": {
         "name": "소멸",
-        "description": "시야에서 사라져 전투 중에도 은신 상태가 됩니다. 숨어 있는 동안 이동 속도가 30% 감소합니다. 최대 10초 동안 지속됩니다."
+        "description": "시야에서 사라져 전투 중에도 은신 상태가 됩니다. 숨어 있는 동안 이동 속도가 50% 감소합니다. 최대 10초 동안 지속됩니다."
       },
       "instant_poison": {
         "name": "속효성 독",
@@ -3699,7 +3840,7 @@ export const ko_KR: EnTranslations = {
       },
       "mind_flay": {
         "name": "정신의 채찍",
-        "description": "암흑 에너지로 대상의 정신을 공격해 3초 동안 매초 12의 피해를 입힙니다."
+        "description": "암흑 에너지로 대상의 정신을 공격해 3초 동안 매초 {damage}의 피해를 입힙니다."
       },
       "flash_heal": {
         "name": "순간 치유",
@@ -3775,7 +3916,7 @@ export const ko_KR: EnTranslations = {
       },
       "drain_life": {
         "name": "생명력 흡수",
-        "description": "대상의 생명력을 흡수해 5초 동안 매초 7의 생명력을 자신에게 이전합니다."
+        "description": "대상의 생명력을 흡수해 5초 동안 매초 {damage}의 생명력을 자신에게 이전합니다."
       },
       "fear": {
         "name": "공포",
@@ -3955,7 +4096,7 @@ export const ko_KR: EnTranslations = {
       },
       "prowl": {
         "name": "은신 보행",
-        "description": "늑대 변신 상태에서 은신합니다. 전투 중에는 사용할 수 없습니다."
+        "description": "늑대 변신 상태에서 은신하고 이동 속도가 50% 감소합니다. 전투 중에는 사용할 수 없습니다."
       },
       "rake": {
         "name": "할퀴기",
@@ -6356,6 +6497,43 @@ export const ko_KR: EnTranslations = {
         "name": "무너진 성물실",
         "enterText": "무너진 성물실로 내려갑니다.",
         "leaveText": "성물실 폐허의 브라더 할벤에게로 다시 올라갑니다."
+      }
+    },
+    "itemSets": {
+      "crownforged": {
+        "name": "왕관벼림 전투장비",
+        "bonus2": "전투력이 40만큼 증가합니다.",
+        "bonus3": "힘이 15, 체력이 15만큼 증가합니다."
+      },
+      "deathlord": {
+        "name": "죽음군주의 전투장비",
+        "bonus2": "전투력이 40만큼 증가합니다.",
+        "bonus3": "힘이 15, 체력이 15만큼 증가합니다."
+      },
+      "necromancers": {
+        "name": "강령술사의 의복",
+        "bonus2": "피해로 인한 시전 밀림이 50% 감소합니다.",
+        "bonus3": "시전 중 피해를 받아도 밀려나지 않습니다."
+      },
+      "nighttalon": {
+        "name": "밤발톱 가죽장비",
+        "bonus2": "전투력이 40만큼 증가합니다.",
+        "bonus3": "민첩이 15, 치명타 확률이 2% 증가합니다."
+      },
+      "soulflame": {
+        "name": "영혼불꽃 의복",
+        "bonus2": "피해로 인한 시전 밀림이 50% 감소합니다.",
+        "bonus3": "시전 중 피해를 받아도 밀려나지 않습니다."
+      },
+      "stormcallers": {
+        "name": "폭풍소환사의 의복",
+        "bonus2": "피해로 인한 시전 밀림이 50% 감소합니다.",
+        "bonus3": "시전 중 피해를 받아도 밀려나지 않습니다."
+      },
+      "wyrmshadow": {
+        "name": "고룡그림자 의복",
+        "bonus2": "전투력이 40만큼 증가합니다.",
+        "bonus3": "민첩이 15, 치명타 확률이 2% 증가합니다."
       }
     }
   },

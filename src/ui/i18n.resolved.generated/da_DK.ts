@@ -720,6 +720,31 @@ export const da_DK: EnTranslations = {
     "nameplate": {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
+    },
+    "nftSkins": {
+      "title": "Wear an NFT",
+      "intro": "Prove you own a PFP NFT to wear it: its traits shape your body look and the exact art becomes your portrait. You keep it while you hold the NFT.",
+      "connectEthereum": "Connect Ethereum wallet",
+      "connectSolana": "Connect Solana wallet",
+      "ethereumLinked": "Ethereum: {address}",
+      "solanaLinked": "Solana: {address}",
+      "notLinked": "not linked",
+      "collectionsTitle": "Supported collections",
+      "noCollections": "No collections are available yet. Check back soon.",
+      "tokenIdPlaceholder": "Token ID",
+      "mintPlaceholder": "Mint address",
+      "claim": "Claim",
+      "claiming": "Claiming...",
+      "claimed": "Claimed and equipped. Find it any time in the skins browser.",
+      "needWallet": "Link the matching wallet first.",
+      "close": "Close",
+      "errorNotOwner": "That wallet does not own this token.",
+      "errorUnverified": "Could not verify ownership right now. Try again shortly.",
+      "errorCollection": "That collection is not supported.",
+      "errorTooMany": "You have reached the NFT skin limit.",
+      "errorMetadata": "Could not read this NFT right now. Try again shortly.",
+      "errorGeneric": "Could not claim this NFT skin.",
+      "walletError": "Wallet connection failed."
     }
   },
   "guide": {

@@ -222,6 +222,24 @@ export const ru_RU: EnTranslations = {
     "rest": {
       "resting": "Отдых"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
+    "unitFrame": {
+      "playerLabel": "Ваш персонаж",
+      "targetLabel": "Ваша цель",
+      "targetAnnounce": "Цель: {name}",
+      "partyLabel": "Ваша группа",
+      "partyGroup": "Группа {n}",
+      "durationUnitSeconds": "с"
+    },
+    "character": {
+      "modelPreview": "Предпросмотр модели персонажа"
+    },
+    "skipLinks": {
+      "mainHud": "Перейти к основному интерфейсу",
+      "chat": "Перейти к чату"
+    },
     "mobile": {
       "autorun": "Автобег",
       "jump": "Прыжок",
@@ -243,6 +261,13 @@ export const ru_RU: EnTranslations = {
       "coordinates": "Координаты",
       "heading": "Направление",
       "minimapZoom": "Масштаб миникарты"
+    },
+    "castBar": {
+      "playerAria": "Ваша полоса применения",
+      "targetAria": "Полоса применения цели"
+    },
+    "leaderboard": {
+      "close": "Закрыть"
     },
     "raidLockout": {
       "title": "Блокировки рейдов",
@@ -295,7 +320,10 @@ export const ru_RU: EnTranslations = {
       "showWalletOnCharacterScreen": "Показывать кошелек на экране персонажей",
       "showWalletOnPlayerCard": "Показывать кошелек на карточке игрока",
       "uiScale": "Масштаб интерфейса",
-      "highContrastBackground": "Фон высокой контрастности"
+      "highContrastBackground": "Фон высокой контрастности",
+      "showItemLevel": "Показывать уровень предмета",
+      "itemLevelLine": "Уровень предмета {level}",
+      "itemScoreLine": "Оценка {score}"
     },
     "controller": {
       "title": "Геймпад",
@@ -425,6 +453,10 @@ export const ru_RU: EnTranslations = {
     },
     "tips": {
       "joinChannels": "Совет: введите /join world или /join lfg, чтобы общаться с игроками по всему миру."
+    },
+    "itemSet": {
+      "header": "{name} ({have}/{total})",
+      "bonusLine": "({pieces}) {bonus}"
     },
     "questShare": {
       "notShareable": "Этим заданием нельзя поделиться.",
@@ -562,6 +594,26 @@ export const ru_RU: EnTranslations = {
       "exportDone": "Ваши данные были скачаны. Мы отправили вам подтверждение по email.",
       "exportFailed": "Не удалось экспортировать ваши данные. Попробуйте снова через мгновение."
     },
+    "masterLoot": {
+      "title": "Распределение добычи",
+      "enableLabel": "Мастер добычи",
+      "enableAria": "Включить мастера добычи",
+      "looterLabel": "Мастер добычи",
+      "leaderOption": "Лидер группы",
+      "thresholdLabel": "Порог качества",
+      "thresholdUncommon": "Необычное и выше",
+      "thresholdRare": "Редкое и выше",
+      "thresholdEpic": "Эпическое и выше",
+      "assignPrompt": "Назначить {item}",
+      "assignAria": "Назначить {item} игроку {name}",
+      "rollButton": "Бросок",
+      "selectAll": "Выбрать всех",
+      "methodMaster": "Способ добычи изменён на мастера добычи. Мастер добычи: {name}.",
+      "methodGroup": "Способ добычи изменён на групповой.",
+      "assigned": "{looter} передал предмет {item} игроку {target}.",
+      "unassigned": "Предмет {item} не был назначен и доступен всем.",
+      "leaderOnly": "Только лидер группы может менять способ добычи."
+    },
     "bags": {
       "filterGroupAria": "Фильтровать сумки по категории",
       "filterAll": "Все",
@@ -583,6 +635,91 @@ export const ru_RU: EnTranslations = {
       "notRaid": "Ваша группа не является рейдом.",
       "leaderOnly": "Только лидер рейда может преобразовать рейд в группу.",
       "tooLarge": "Рейд, в котором более пяти участников, нельзя преобразовать обратно в группу."
+    },
+    "itemArmorType": {
+      "cloth": "Ткань",
+      "leather": "Кожа",
+      "mail": "Кольчуга"
+    },
+    "auraEffect": {
+      "dot": "Наносит {value} единиц урона ({school}) каждые {interval} сек",
+      "hot": "Восстанавливает {value} здоровья каждые {interval} сек",
+      "absorb": "Поглощает {value} единиц урона",
+      "healAbsorb": "Поглощает {value} единиц входящего исцеления",
+      "thorns": "Наносит {value} единиц урона ({school}) атакующим",
+      "slow": "Снижает скорость передвижения на {pct}%",
+      "speed": "Повышает скорость передвижения на {pct}%",
+      "attackSpeedSlow": "Замедляет скорость атаки на {pct}%",
+      "attackSpeedFast": "Повышает скорость атаки на {pct}%",
+      "haste": "Повышает скорость атаки и произнесения заклинаний на {pct}%",
+      "tongues": "Увеличивает время произнесения заклинаний на {pct}%",
+      "increase": {
+        "ap": "Повышает силу атаки на {value}",
+        "armor": "Повышает броню на {value}",
+        "int": "Повышает интеллект на {value}",
+        "agi": "Повышает ловкость на {value}",
+        "sta": "Повышает выносливость на {value}",
+        "spi": "Повышает дух на {value}",
+        "allStats": "Повышает все характеристики на {value}"
+      },
+      "reduce": {
+        "ap": "Снижает силу атаки на {value}",
+        "armor": "Снижает броню на {value}",
+        "int": "Снижает интеллект на {value}",
+        "agi": "Снижает ловкость на {value}",
+        "sta": "Снижает выносливость на {value}",
+        "spi": "Снижает дух на {value}",
+        "allStats": "Снижает все характеристики на {value}"
+      },
+      "dodge": "Повышает шанс уклонения на {pct}%",
+      "dodgeReduce": "Снижает шанс уклонения на {pct}%",
+      "armorFlat": "Снижает броню на {value}",
+      "armorFlatStacks": "Снижает броню на {value} ({stacks} зарядов)",
+      "mortalWound": "Снижает получаемое исцеление на {pct}%",
+      "vulnerability": "Увеличивает получаемый урон на {pct}%",
+      "physVuln": "Увеличивает получаемый физический урон на {pct}%",
+      "spellVuln": "Увеличивает получаемый магический урон на {pct}%",
+      "critVuln": "Увеличивает шанс получить критический удар на {pct}%",
+      "costTax": "Увеличивает стоимость способностей на {pct}%",
+      "stun": "Оглушение: невозможно действовать",
+      "root": "Обездвиживание: невозможно двигаться",
+      "incapacitate": "Недееспособность: невозможно действовать",
+      "polymorph": "Превращение: невозможно действовать",
+      "hex": "Снижает наносимый урон и исцеление на {pct}%",
+      "blind": "Ослепление: невозможно действовать",
+      "silence": "Немота: невозможно произносить заклинания",
+      "disarm": "Обезоруживание: невозможно использовать атаки оружием",
+      "lockout": "Школа заклинаний заблокирована",
+      "imbue": "Оружие наделено дополнительными эффектами",
+      "imbueRange": "Оружие наделено: от {min} до {max} дополнительного урона при правосудии",
+      "stealth": "Скрытность; скорость передвижения снижена на {pct}%",
+      "formBear": "Облик медведя: повышенное здоровье и броня",
+      "formCat": "Облик кошки: урон в ближнем бою и энергия",
+      "formTravel": "Походный облик: скорость передвижения повышена на {pct}%",
+      "defensiveStance": "Защитная стойка: сниженный получаемый урон, больше угрозы",
+      "righteousFury": "Праведная ярость: значительно повышенная угроза от урона Святой школы",
+      "scale": "Размер увеличен на {pct}%",
+      "jump": "Высота прыжка увеличена на {pct}%",
+      "school": {
+        "physical": "Физическая",
+        "fire": "Огонь",
+        "frost": "Лёд",
+        "arcane": "Тайная магия",
+        "shadow": "Тьма",
+        "holy": "Свет",
+        "nature": "Природа"
+      }
+    },
+    "loot": {
+      "chestTitle": "Сундук"
+    },
+    "spellbook": {
+      "addToBarAria": "Добавить {name} на панель действий",
+      "removeFromBarAria": "Убрать {name} с панели действий"
+    },
+    "nameplate": {
+      "mob": "[{level}] {name}",
+      "mobElite": "[{level}+] {name}"
     },
     "nftSkins": {
       "title": "Wear an NFT",
@@ -1408,17 +1545,17 @@ export const ru_RU: EnTranslations = {
     }
   },
   "marketplace": {
-    "title": "Creator Skins",
-    "subtitle": "Player-made cosmetics, paid in USDC. 70% goes to the creator; 30% buys and burns $WOC.",
-    "loading": "Loading skins…",
-    "empty": "No creator skins are for sale yet. Be the first — open Create & Sell.",
+    "title": "Скины от авторов",
+    "subtitle": "Косметика от игроков, оплата в USDC. 70% — автору; 30% выкупает и сжигает $WOC.",
+    "loading": "Загрузка скинов…",
+    "empty": "Пока нет скинов от авторов в продаже.",
     "buy": "Buy",
     "price": "{price}",
-    "connectFirst": "Connect a wallet to buy.",
-    "purchasing": "Purchasing…",
-    "owned": "Owned — equipped",
-    "failed": "Purchase failed",
-    "close": "Close",
+    "connectFirst": "Подключите кошелёк для покупки.",
+    "purchasing": "Покупка…",
+    "owned": "Куплено — надето",
+    "failed": "Покупка не удалась",
+    "close": "Закрыть",
     "tabBrowse": "Browse",
     "tabCreate": "Create & Sell",
     "search": "Search skins",
@@ -2512,7 +2649,9 @@ export const ru_RU: EnTranslations = {
       "mobileMap": "Карта",
       "closeMap": "Закрыть карту",
       "zoomIn": "Приблизить",
-      "zoomOut": "Отдалить"
+      "zoomOut": "Отдалить",
+      "mapCanvasLabel": "Карта",
+      "mapSummary": "Карта зоны {zone}."
     },
     "options": {
       "gameMenu": "Меню игры",
@@ -2713,6 +2852,7 @@ export const ru_RU: EnTranslations = {
     "combat": {
       "floatingMiss": "Промах",
       "floatingDodge": "Уклон",
+      "floatingResist": "Сопротивление",
       "cannotMove": "Не двигается!",
       "attack": "атака",
       "damageDone": "Ваше {ability} поражает {target} на {amount}.",
@@ -2721,6 +2861,7 @@ export const ru_RU: EnTranslations = {
       "damageTakenCrit": "{source} критически поражает вас на {amount}.",
       "miss": "Ваше {ability} промахивается по {target}.",
       "dodged": "{target} уклоняется от вашего {ability}.",
+      "resisted": "{target} сопротивляется вашему {ability}.",
       "healSelf": "Ваше {ability} исцеляет вас на {amount}.",
       "healSelfCrit": "Ваше {ability} критически исцеляет вас на {amount}.",
       "healOther": "Ваше {ability} исцеляет {target} на {amount}.",
@@ -3451,7 +3592,7 @@ export const ru_RU: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "Чародейские стрелы",
-        "description": "Выпускает в противника Чародейские стрелы, наносящие 8 ед. урона от тайной магии каждую секунду в течение 3 сек."
+        "description": "Выпускает в противника Чародейские стрелы, наносящие {damage} ед. урона от тайной магии каждую секунду в течение 3 сек."
       },
       "polymorph": {
         "name": "Превращение",
@@ -3515,7 +3656,7 @@ export const ru_RU: EnTranslations = {
       },
       "stealth": {
         "name": "Незаметность",
-        "description": "Скрывает вас в тенях: враги почти не замечают вас, но вы двигаетесь на 30% медленнее. Атака или получение урона прерывает Незаметность. Примените снова, чтобы выйти."
+        "description": "Скрывает вас в тенях: враги почти не замечают вас, но вы двигаетесь на 50% медленнее. Атака или получение урона прерывает Незаметность. Примените снова, чтобы выйти."
       },
       "adrenaline_rush": {
         "name": "Выброс адреналина",
@@ -3547,7 +3688,7 @@ export const ru_RU: EnTranslations = {
       },
       "vanish": {
         "name": "Исчезновение",
-        "description": "Исчезает из виду, входя в незаметность даже в бою. Пока вы скрыты, вы двигаетесь на 30% медленнее. Длится до 10 сек."
+        "description": "Исчезает из виду, входя в незаметность даже в бою. Пока вы скрыты, вы двигаетесь на 50% медленнее. Длится до 10 сек."
       },
       "instant_poison": {
         "name": "Быстродействующий яд",
@@ -3699,7 +3840,7 @@ export const ru_RU: EnTranslations = {
       },
       "mind_flay": {
         "name": "Пытка разума",
-        "description": "Терзает разум цели темной энергией, нанося 12 ед. урона каждую секунду в течение 3 сек."
+        "description": "Терзает разум цели темной энергией, нанося {damage} ед. урона каждую секунду в течение 3 сек."
       },
       "flash_heal": {
         "name": "Быстрое исцеление",
@@ -3775,7 +3916,7 @@ export const ru_RU: EnTranslations = {
       },
       "drain_life": {
         "name": "Похищение жизни",
-        "description": "Похищает жизнь цели, передавая вам 7 здоровья каждую секунду в течение 5 сек."
+        "description": "Похищает жизнь цели, передавая вам {damage} здоровья каждую секунду в течение 5 сек."
       },
       "fear": {
         "name": "Страх",
@@ -3955,7 +4096,7 @@ export const ru_RU: EnTranslations = {
       },
       "prowl": {
         "name": "Крадущийся хищник",
-        "description": "Переход в скрытность в облике волка. Нельзя использовать в бою."
+        "description": "Переход в скрытность в облике волка: вы двигаетесь на 50% медленнее. Нельзя использовать в бою."
       },
       "rake": {
         "name": "Раздирание",
@@ -6356,6 +6497,43 @@ export const ru_RU: EnTranslations = {
         "name": "Обрушившийся Реликварий",
         "enterText": "Вы спускаетесь в обрушившийся реликварий.",
         "leaveText": "Вы поднимаетесь обратно к Брату Хальвену у руин реликвария."
+      }
+    },
+    "itemSets": {
+      "crownforged": {
+        "name": "Боевой доспех Кованой Короны",
+        "bonus2": "Сила атаки повышается на 40.",
+        "bonus3": "Сила повышается на 15, выносливость на 15."
+      },
+      "deathlord": {
+        "name": "Боевой доспех Владыки Смерти",
+        "bonus2": "Сила атаки повышается на 40.",
+        "bonus3": "Сила повышается на 15, выносливость на 15."
+      },
+      "necromancers": {
+        "name": "Одеяние некроманта",
+        "bonus2": "Задержка произнесения от полученного урона снижена на 50%.",
+        "bonus3": "Полученный урон не задерживает произнесение заклинаний."
+      },
+      "nighttalon": {
+        "name": "Кожаный доспех Ночного Когтя",
+        "bonus2": "Сила атаки повышается на 40.",
+        "bonus3": "Ловкость повышается на 15, вероятность критического удара на 2%."
+      },
+      "soulflame": {
+        "name": "Одеяние Пламени Души",
+        "bonus2": "Задержка произнесения от полученного урона снижена на 50%.",
+        "bonus3": "Полученный урон не задерживает произнесение заклинаний."
+      },
+      "stormcallers": {
+        "name": "Одеяние Зовущего Бурю",
+        "bonus2": "Задержка произнесения от полученного урона снижена на 50%.",
+        "bonus3": "Полученный урон не задерживает произнесение заклинаний."
+      },
+      "wyrmshadow": {
+        "name": "Облачение Тени Дракона",
+        "bonus2": "Сила атаки повышается на 40.",
+        "bonus3": "Ловкость повышается на 15, вероятность критического удара на 2%."
       }
     }
   },

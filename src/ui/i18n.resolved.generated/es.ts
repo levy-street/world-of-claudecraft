@@ -222,6 +222,24 @@ export const es: EnTranslations = {
     "rest": {
       "resting": "Descansando"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
+    "unitFrame": {
+      "playerLabel": "Tu personaje",
+      "targetLabel": "Tu objetivo",
+      "targetAnnounce": "Objetivo: {name}",
+      "partyLabel": "Tu grupo",
+      "partyGroup": "Grupo {n}",
+      "durationUnitSeconds": "s"
+    },
+    "character": {
+      "modelPreview": "Vista previa del modelo del personaje"
+    },
+    "skipLinks": {
+      "mainHud": "Saltar a la interfaz principal",
+      "chat": "Saltar al chat"
+    },
     "mobile": {
       "autorun": "Carrera automática",
       "jump": "Saltar",
@@ -243,6 +261,13 @@ export const es: EnTranslations = {
       "coordinates": "Coordenadas",
       "heading": "Rumbo",
       "minimapZoom": "Zoom del minimapa"
+    },
+    "castBar": {
+      "playerAria": "Tu barra de lanzamiento",
+      "targetAria": "Barra de lanzamiento del objetivo"
+    },
+    "leaderboard": {
+      "close": "Cerrar"
     },
     "raidLockout": {
       "title": "Bloqueos de banda",
@@ -285,8 +310,8 @@ export const es: EnTranslations = {
       "browserEffectsNote": "El modo automático atenúa los efectos CSS pesados (desenfoque, brillo, movimiento de fondo) según tu navegador y dispositivo. Redúcelo manualmente si la interfaz va lenta.",
       "interfaceMode": "Modo de interfaz",
       "interfaceModeAuto": "Auto",
-      "interfaceModeDesktop": "Desktop",
-      "interfaceModeTouch": "Touch",
+      "interfaceModeDesktop": "Escritorio",
+      "interfaceModeTouch": "Táctil",
       "interfaceModeNote": "Auto elige los controles Desktop o Touch según tu dispositivo. Elige Desktop para forzar teclado y ratón (útil en una tableta con teclado), o Touch para los controles en pantalla.",
       "footstepSounds": "Sonidos de pasos",
       "clickFeedback": "Marcador de clic",
@@ -295,7 +320,10 @@ export const es: EnTranslations = {
       "showWalletOnCharacterScreen": "Mostrar cartera en la pantalla de personajes",
       "showWalletOnPlayerCard": "Mostrar cartera en la tarjeta de jugador",
       "uiScale": "Escala de la interfaz",
-      "highContrastBackground": "Fondo de alto contraste"
+      "highContrastBackground": "Fondo de alto contraste",
+      "showItemLevel": "Mostrar nivel de objeto",
+      "itemLevelLine": "Nivel de objeto {level}",
+      "itemScoreLine": "Puntuación {score}"
     },
     "controller": {
       "title": "Mando",
@@ -425,6 +453,10 @@ export const es: EnTranslations = {
     },
     "tips": {
       "joinChannels": "Consejo: escribe /join world o /join lfg para chatear con jugadores de todas partes del reino."
+    },
+    "itemSet": {
+      "header": "{name} ({have}/{total})",
+      "bonusLine": "({pieces}) {bonus}"
     },
     "questShare": {
       "notShareable": "Esta misión no se puede compartir.",
@@ -562,6 +594,26 @@ export const es: EnTranslations = {
       "exportDone": "Tus datos se descargaron. Te enviamos una confirmación por correo.",
       "exportFailed": "No se pudieron exportar tus datos. Inténtalo de nuevo en un momento."
     },
+    "masterLoot": {
+      "title": "Botin maestro",
+      "enableLabel": "Botin maestro",
+      "enableAria": "Activar botin maestro",
+      "looterLabel": "Maestro del botin",
+      "leaderOption": "Lider del grupo",
+      "thresholdLabel": "Umbral",
+      "thresholdUncommon": "Poco comun o superior",
+      "thresholdRare": "Raro o superior",
+      "thresholdEpic": "Epico o superior",
+      "assignPrompt": "Asignar {item}",
+      "assignAria": "Asignar {item} a {name}",
+      "rollButton": "Tirar",
+      "selectAll": "Elegir todos",
+      "methodMaster": "Metodo de botin cambiado a botin maestro. Maestro del botin: {name}.",
+      "methodGroup": "Metodo de botin cambiado a botin de grupo.",
+      "assigned": "{looter} asigno {item} a {target}.",
+      "unassigned": "{item} no fue asignado y queda libre para todos.",
+      "leaderOnly": "Solo el lider del grupo puede cambiar el metodo de botin."
+    },
     "bags": {
       "filterGroupAria": "Filtrar bolsas por categoría",
       "filterAll": "Todos",
@@ -583,6 +635,91 @@ export const es: EnTranslations = {
       "notRaid": "Tu grupo no es una banda.",
       "leaderOnly": "Solo el líder de la banda puede convertir la banda en grupo.",
       "tooLarge": "Una banda con más de cinco miembros no puede volver a convertirse en grupo."
+    },
+    "itemArmorType": {
+      "cloth": "Cloth",
+      "leather": "Leather",
+      "mail": "Mail"
+    },
+    "auraEffect": {
+      "dot": "Inflige {value} de daño de {school} cada {interval} s",
+      "hot": "Restaura {value} de salud cada {interval} s",
+      "absorb": "Absorbe {value} de daño",
+      "healAbsorb": "Absorbe {value} de sanación recibida",
+      "thorns": "Inflige {value} de daño de {school} a los atacantes",
+      "slow": "Reduce la velocidad de movimiento un {pct}%",
+      "speed": "Aumenta la velocidad de movimiento un {pct}%",
+      "attackSpeedSlow": "Reduce la velocidad de ataque un {pct}%",
+      "attackSpeedFast": "Aumenta la velocidad de ataque un {pct}%",
+      "haste": "Aumenta la velocidad de ataque y lanzamiento un {pct}%",
+      "tongues": "Aumenta el tiempo de lanzamiento un {pct}%",
+      "increase": {
+        "ap": "Aumenta el poder de ataque en {value}",
+        "armor": "Aumenta la armadura en {value}",
+        "int": "Aumenta el intelecto en {value}",
+        "agi": "Aumenta la agilidad en {value}",
+        "sta": "Aumenta el aguante en {value}",
+        "spi": "Aumenta el espíritu en {value}",
+        "allStats": "Aumenta todos los atributos en {value}"
+      },
+      "reduce": {
+        "ap": "Reduce el poder de ataque en {value}",
+        "armor": "Reduce la armadura en {value}",
+        "int": "Reduce el intelecto en {value}",
+        "agi": "Reduce la agilidad en {value}",
+        "sta": "Reduce el aguante en {value}",
+        "spi": "Reduce el espíritu en {value}",
+        "allStats": "Reduce todos los atributos en {value}"
+      },
+      "dodge": "Aumenta la probabilidad de esquivar un {pct}%",
+      "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
+      "armorFlat": "Reduce la armadura en {value}",
+      "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
+      "mortalWound": "Reduce la sanación recibida un {pct}%",
+      "vulnerability": "Aumenta el daño recibido un {pct}%",
+      "physVuln": "Aumenta el daño físico recibido un {pct}%",
+      "spellVuln": "Aumenta el daño mágico recibido un {pct}%",
+      "critVuln": "Aumenta la probabilidad de recibir golpes críticos un {pct}%",
+      "costTax": "Aumenta los costes de habilidades un {pct}%",
+      "stun": "Aturdido: no puede actuar",
+      "root": "Enraizado: no puede moverse",
+      "incapacitate": "Incapacitado: no puede actuar",
+      "polymorph": "Polimorfado: no puede actuar",
+      "hex": "Reduce el daño y la sanación realizados un {pct}%",
+      "blind": "Cegado: no puede actuar",
+      "silence": "Silenciado: no puede lanzar hechizos",
+      "disarm": "Desarmado: no puede usar ataques con arma",
+      "lockout": "Escuela de hechizos bloqueada",
+      "imbue": "Arma imbuida con efectos adicionales",
+      "imbueRange": "Arma imbuida: {min} a {max} de daño adicional al juzgar",
+      "stealth": "Oculto; velocidad de movimiento reducida un {pct}%",
+      "formBear": "Forma de oso: salud y armadura aumentadas",
+      "formCat": "Forma felina: daño cuerpo a cuerpo y energía",
+      "formTravel": "Forma de viaje: velocidad de movimiento aumentada un {pct}%",
+      "defensiveStance": "Actitud defensiva: daño recibido reducido, más amenaza",
+      "righteousFury": "Furia recta: amenaza de daño Sagrado muy aumentada",
+      "scale": "Tamaño aumentado un {pct}%",
+      "jump": "Altura de salto aumentada un {pct}%",
+      "school": {
+        "physical": "Físico",
+        "fire": "Fuego",
+        "frost": "Escarcha",
+        "arcane": "Arcano",
+        "shadow": "Sombras",
+        "holy": "Sagrado",
+        "nature": "Naturaleza"
+      }
+    },
+    "loot": {
+      "chestTitle": "Cofre"
+    },
+    "spellbook": {
+      "addToBarAria": "Añadir {name} a la barra de acción",
+      "removeFromBarAria": "Quitar {name} de la barra de acción"
+    },
+    "nameplate": {
+      "mob": "[{level}] {name}",
+      "mobElite": "[{level}+] {name}"
     },
     "nftSkins": {
       "title": "Wear an NFT",
@@ -2511,7 +2648,9 @@ export const es: EnTranslations = {
       "mobileMap": "Mapa",
       "closeMap": "Cerrar mapa",
       "zoomIn": "Acercar",
-      "zoomOut": "Alejar"
+      "zoomOut": "Alejar",
+      "mapCanvasLabel": "Mapa",
+      "mapSummary": "Mapa de {zone}."
     },
     "options": {
       "gameMenu": "Menú del juego",
@@ -2712,6 +2851,7 @@ export const es: EnTranslations = {
     "combat": {
       "floatingMiss": "Fallo",
       "floatingDodge": "Esquiva",
+      "floatingResist": "Resist",
       "cannotMove": "¡No puedes moverte!",
       "attack": "ataque",
       "damageDone": "Tu {ability} golpea a {target} por {amount}.",
@@ -2720,6 +2860,7 @@ export const es: EnTranslations = {
       "damageTakenCrit": "{source} te golpea críticamente por {amount}.",
       "miss": "Tu {ability} falla contra {target}.",
       "dodged": "{target} esquiva tu {ability}.",
+      "resisted": "Your {ability} is resisted by {target}.",
       "healSelf": "Tu {ability} te sana {amount}.",
       "healSelfCrit": "Tu {ability} te sana críticamente {amount}.",
       "healOther": "Tu {ability} sana a {target} por {amount}.",
@@ -3450,7 +3591,7 @@ export const es: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "Misiles Arcanos",
-        "description": "Lanza Misiles Arcanos al enemigo, causando 8 de daño Arcano cada segundo durante 3 s."
+        "description": "Lanza Misiles Arcanos al enemigo, causando {damage} de daño Arcano cada segundo durante 3 s."
       },
       "polymorph": {
         "name": "Polimorfia",
@@ -3514,7 +3655,7 @@ export const es: EnTranslations = {
       },
       "stealth": {
         "name": "Sigilo",
-        "description": "Te oculta en las sombras: los enemigos apenas te detectan, pero te mueves un 30% más lento. Atacar o recibir daño rompe Sigilo. Lánzalo de nuevo para salir."
+        "description": "Te oculta en las sombras: los enemigos apenas te detectan, pero te mueves un 50% más lento. Atacar o recibir daño rompe Sigilo. Lánzalo de nuevo para salir."
       },
       "adrenaline_rush": {
         "name": "Subidón de adrenalina",
@@ -3546,7 +3687,7 @@ export const es: EnTranslations = {
       },
       "vanish": {
         "name": "Esfumarse",
-        "description": "Desaparece de la vista, entrando en Sigilo incluso en combate. Te mueves un 30% más lento mientras estás oculto. Dura hasta 10 s."
+        "description": "Desaparece de la vista, entrando en Sigilo incluso en combate. Te mueves un 50% más lento mientras estás oculto. Dura hasta 10 s."
       },
       "instant_poison": {
         "name": "Veneno instantáneo",
@@ -3698,7 +3839,7 @@ export const es: EnTranslations = {
       },
       "mind_flay": {
         "name": "Tortura mental",
-        "description": "Asalta la mente del objetivo con energía de las Sombras e inflige 12 de daño cada segundo durante 3 s."
+        "description": "Asalta la mente del objetivo con energía de las Sombras e inflige {damage} de daño cada segundo durante 3 s."
       },
       "flash_heal": {
         "name": "Sanación relámpago",
@@ -3774,7 +3915,7 @@ export const es: EnTranslations = {
       },
       "drain_life": {
         "name": "Drenar vida",
-        "description": "Drena la vida del objetivo y te transfiere 7 de salud cada segundo durante 5 s."
+        "description": "Drena la vida del objetivo y te transfiere {damage} de salud cada segundo durante 5 s."
       },
       "fear": {
         "name": "Miedo",
@@ -3954,7 +4095,7 @@ export const es: EnTranslations = {
       },
       "prowl": {
         "name": "Acechar",
-        "description": "Entra en sigilo mientras estás en Forma de lobo. No puede usarse en combate."
+        "description": "Entra en sigilo mientras estás en Forma de lobo y te mueves un 50% más lento. No puede usarse en combate."
       },
       "rake": {
         "name": "Zarpazo",
@@ -6355,6 +6496,43 @@ export const es: EnTranslations = {
         "name": "El Relicario Hundido",
         "enterText": "Desciendes al relicario hundido.",
         "leaveText": "Subes de vuelta hasta el Hermano Halven, en la ruina del relicario."
+      }
+    },
+    "itemSets": {
+      "crownforged": {
+        "name": "Equipo de batalla Forjacorona",
+        "bonus2": "Aumenta el poder de ataque en 40.",
+        "bonus3": "Aumenta la fuerza en 15 y el aguante en 15."
+      },
+      "deathlord": {
+        "name": "Equipo de batalla del Señor de la Muerte",
+        "bonus2": "Aumenta el poder de ataque en 40.",
+        "bonus3": "Aumenta la fuerza en 15 y el aguante en 15."
+      },
+      "necromancers": {
+        "name": "Vestiduras del nigromante",
+        "bonus2": "Reduce un 50% el retroceso de lanzamiento causado por daño.",
+        "bonus3": "El daño recibido no retrasa tus lanzamientos."
+      },
+      "nighttalon": {
+        "name": "Atuendo de cuero Garra Nocturna",
+        "bonus2": "Aumenta el poder de ataque en 40.",
+        "bonus3": "Aumenta la agilidad en 15 y la probabilidad de crítico en 2%."
+      },
+      "soulflame": {
+        "name": "Vestiduras de Llama de Alma",
+        "bonus2": "Reduce un 50% el retroceso de lanzamiento causado por daño.",
+        "bonus3": "El daño recibido no retrasa tus lanzamientos."
+      },
+      "stormcallers": {
+        "name": "Vestiduras del Invocatormentas",
+        "bonus2": "Reduce un 50% el retroceso de lanzamiento causado por daño.",
+        "bonus3": "El daño recibido no retrasa tus lanzamientos."
+      },
+      "wyrmshadow": {
+        "name": "Atuendo de Sombra de Vermis",
+        "bonus2": "Aumenta el poder de ataque en 40.",
+        "bonus3": "Aumenta la agilidad en 15 y la probabilidad de crítico en 2%."
       }
     }
   },

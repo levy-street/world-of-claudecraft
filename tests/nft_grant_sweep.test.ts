@@ -53,6 +53,7 @@ function joinWithEquippedNftSkin(server: GameServer): { session: ClientSession; 
 
 beforeEach(() => {
   for (const m of Object.values(db)) (m as { mockReset?: () => void }).mockReset?.();
+  own.ownsNft.mockReset();
   db.pool.query.mockResolvedValue({ rows: [] });
   db.openPlaySession.mockResolvedValue(1);
   db.evmWalletForAccount.mockResolvedValue({ address: '0x' + '1'.repeat(40) });
@@ -108,6 +109,17 @@ describe('lost-on-sell sweep', () => {
     db.evmWalletForAccount.mockResolvedValue(null); // wallet unlinked
     await server.refreshNftGrantsForAccount(7);
     expect(db.revokeNftSkin).toHaveBeenCalledWith(7, SKIN);
+    expect(entity.cosmeticSkinId).toBeNull();
+  });
+
+  it('resweepNftGrants revokes a disabled collection immediately, no ownership read', async () => {
+    const server = new GameServer();
+    const { entity } = joinWithEquippedNftSkin(server);
+    db.listNftGrantsForAccount.mockResolvedValue([GRANT]);
+    db.getNftCollection.mockResolvedValue({ chain: 'ethereum', contract: '0xc', name: 'C', standard: 'erc721', profileId: 'bayc', licenseBasis: '', enabled: false }); // operator disabled it
+    await server.resweepNftGrants();
+    expect(db.revokeNftSkin).toHaveBeenCalledWith(7, SKIN);
+    expect(own.ownsNft).not.toHaveBeenCalled(); // disabled -> revoke without an RPC read
     expect(entity.cosmeticSkinId).toBeNull();
   });
 });

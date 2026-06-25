@@ -934,6 +934,13 @@ export class GameServer {
     }
   }
 
+  /** Re-verify all online players' NFT-skin grants now (e.g. after an operator
+   *  disables a collection, whose grants the sweep then revokes without an RPC
+   *  read). Public so the admin API can force immediate effect. */
+  async resweepNftGrants(): Promise<void> {
+    await this.refreshAllNftGrants();
+  }
+
   private async refreshAllNftGrants(): Promise<void> {
     if (this.nftGrantRefreshing) return; // a slow cycle (RPC) must not pile up
     this.nftGrantRefreshing = true;

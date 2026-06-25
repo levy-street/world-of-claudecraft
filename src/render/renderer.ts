@@ -38,7 +38,7 @@ import { type BirdsView, buildBirds } from './birds';
 import { type CameraOcclusionState, stepCameraOcclusion } from './camera_collision';
 import { characterSoulRendActive } from './character_effects';
 import { type AnimState, type CharacterVisual, createCharacterVisual } from './characters';
-import { ensureCreatorSkin, mechAssetsReady, preloadMechAssets } from './characters/assets';
+import { ensureCreatorSkin, creatorSkinPortraitUrl, mechAssetsReady, preloadMechAssets } from './characters/assets';
 import { skinCount, visualKeyFor } from './characters/manifest';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { trackWebGLContext } from './context_release';
@@ -467,6 +467,7 @@ export interface EntityView {
   /** what removeView pulls back out of clickTargets */
   clickTarget: THREE.Object3D;
   nameplate: HTMLDivElement;
+  npAvatar: HTMLDivElement; // overhead 2D PFP avatar for an equipped NFT skin (peers); hidden otherwise
   nameEl: HTMLDivElement;
   guildEl: HTMLDivElement; // <Guild> tag under the name (players only)
   hpBar: HTMLDivElement;
@@ -3138,6 +3139,12 @@ export class Renderer {
     tierEl.className = 'np-tier';
     tierEl.alt = '';
     tierEl.style.display = 'none';
+    // Overhead 2D PFP avatar for an equipped NFT-PFP skin (so peers see the exact
+    // art above the head). Painted from the registry portrait url only when the
+    // cosmetic id changes (in the skin-swap block); hidden for every other skin.
+    const avatarEl = document.createElement('div');
+    avatarEl.className = 'np-avatar';
+    avatarEl.style.cssText = 'display:none;width:30px;height:30px;margin:0 auto 2px;border-radius:50%;background-size:cover;background-position:center;border:2px solid rgba(202,168,75,0.9);box-shadow:0 1px 3px rgba(0,0,0,0.6);';
     const nameEl = document.createElement('div');
     nameEl.className = 'np-name';
     nameEl.textContent = e.kind === 'object' ? objectDisplayName(e) : e.name;
@@ -3159,7 +3166,7 @@ export class Renderer {
     const castLabel = document.createElement('div');
     castLabel.className = 'np-castlabel';
     castBar.append(castFill, castLabel);
-    np.append(emoteEl, raidMark, comboRow, marker, tierEl, nameEl, guildEl, hpBar, castBar);
+    np.append(emoteEl, raidMark, comboRow, marker, tierEl, avatarEl, nameEl, guildEl, hpBar, castBar);
     this.nameplateLayer.appendChild(np);
 
     // object views gate their own casters; character shadows live in visual
@@ -3194,6 +3201,7 @@ export class Renderer {
       height,
       clickTarget,
       nameplate: np,
+      npAvatar: avatarEl,
       nameEl,
       guildEl,
       hpBar,
@@ -3908,6 +3916,16 @@ export class Renderer {
           }).catch(() => {}); // a failed CDN load leaves the numeric fallback; never an unhandled rejection
         } else {
           v.visual.setSkin(e.skin);
+        }
+        // Overhead PFP avatar: an NFT skin resolves to a 2D portrait url; any other
+        // (or no) skin clears it. Painted only here, on the cosmetic-id change.
+        const portraitUrl = csk ? creatorSkinPortraitUrl(csk) : null;
+        if (portraitUrl) {
+          v.npAvatar.style.backgroundImage = `url("${portraitUrl}")`;
+          v.npAvatar.style.display = 'block';
+        } else {
+          v.npAvatar.style.backgroundImage = '';
+          v.npAvatar.style.display = 'none';
         }
       }
 
