@@ -63,7 +63,7 @@ export async function handleEvmWalletChallenge(
 /** Verify an EIP-1271 smart-contract-wallet signature on-chain. Returns false
  *  when the RPC is unavailable, so a smart-wallet link cannot succeed on an
  *  unverifiable read (fail-closed). */
-async function verifyContractSignature(address: string, message: string, signature: string): Promise<boolean> {
+export async function verifyContractSignature(address: string, message: string, signature: string): Promise<boolean> {
   const code = await ethGetCode(address);
   if (!code || code === '0x') return false; // not a contract (or RPC down) -> no 1271 path
   const digest = personalSignDigest(message);
