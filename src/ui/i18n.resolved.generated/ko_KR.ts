@@ -3672,7 +3672,7 @@ export const ko_KR: EnTranslations = {
       },
       "drain_life": {
         "name": "생명력 흡수",
-        "description": "대상의 생명력을 흡수해 5초 동안 매초 7의 생명력을 자신에게 이전합니다."
+        "description": "대상의 생명력을 흡수해 5초 동안 매초 {damage}의 생명력을 자신에게 이전합니다."
       },
       "fear": {
         "name": "공포",

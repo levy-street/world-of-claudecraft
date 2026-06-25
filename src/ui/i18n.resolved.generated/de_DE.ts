@@ -3672,7 +3672,7 @@ export const de_DE: EnTranslations = {
       },
       "drain_life": {
         "name": "Blutsauger",
-        "description": "Entzieht dem Ziel Leben und überträgt euch 5 Sek. lang jede Sekunde 7 Gesundheit."
+        "description": "Entzieht dem Ziel Leben und überträgt euch 5 Sek. lang jede Sekunde {damage} Gesundheit."
       },
       "fear": {
         "name": "Furcht",

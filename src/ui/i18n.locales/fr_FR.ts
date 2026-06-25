@@ -1881,7 +1881,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Maudit la cible d'agonie: {damage} points de dégâts d'Ombre en 24 s.",
   'entities.abilities.drain_life.name': 'Drain de vie',
   'entities.abilities.drain_life.description':
-    'Draine la vie de la cible et vous transfère 7 points de vie chaque seconde pendant 5 s.',
+    'Draine la vie de la cible et vous transfère {damage} points de vie chaque seconde pendant 5 s.',
   'entities.abilities.fear.name': 'Peur',
   'entities.abilities.fear.description':
     "Terrifie l'ennemi et le laisse tremblant pendant un maximum de 8 s. Tout dégât interrompt l'effet.",

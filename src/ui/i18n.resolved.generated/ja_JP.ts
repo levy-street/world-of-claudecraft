@@ -3672,7 +3672,7 @@ export const ja_JP: EnTranslations = {
       },
       "drain_life": {
         "name": "ドレインライフ",
-        "description": "対象の生命力を吸収し、5秒間、毎秒7の体力を自分に移します。"
+        "description": "対象の生命力を吸収し、5秒間、毎秒{damage}の体力を自分に移します。"
       },
       "fear": {
         "name": "フィアー",

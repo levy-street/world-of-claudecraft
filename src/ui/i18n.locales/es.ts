@@ -1868,7 +1868,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Maldice al objetivo con agonía: {damage} de daño de las Sombras durante 24 s.',
   'entities.abilities.drain_life.name': 'Drenar vida',
   'entities.abilities.drain_life.description':
-    'Drena la vida del objetivo y te transfiere 7 de salud cada segundo durante 5 s.',
+    'Drena la vida del objetivo y te transfiere {damage} de salud cada segundo durante 5 s.',
   'entities.abilities.fear.name': 'Miedo',
   'entities.abilities.fear.description':
     'Siembra terror en el enemigo y lo deja encogido durante hasta 8 s. Cualquier daño rompe el efecto.',

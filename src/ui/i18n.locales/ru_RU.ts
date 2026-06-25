@@ -1864,7 +1864,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Проклинает цель агонией: {damage} ед. урона от темной магии за 24 сек.',
   'entities.abilities.drain_life.name': 'Похищение жизни',
   'entities.abilities.drain_life.description':
-    'Похищает жизнь цели, передавая вам 7 здоровья каждую секунду в течение 5 сек.',
+    'Похищает жизнь цели, передавая вам {damage} здоровья каждую секунду в течение 5 сек.',
   'entities.abilities.fear.name': 'Страх',
   'entities.abilities.fear.description':
     'Вселяет ужас во врага, заставляя его дрожать до 8 сек. Любой урон прерывает эффект.',

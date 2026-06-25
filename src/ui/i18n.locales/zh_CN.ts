@@ -1747,7 +1747,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '以痛苦诅咒目标：在 24 秒内造成 {damage} 点暗影伤害。',
   'entities.abilities.drain_life.name': '吸取生命',
   'entities.abilities.drain_life.description':
-    '吸取目标的生命，持续 5 秒，每秒向你转移 7 点生命值。',
+    '吸取目标的生命，持续 5 秒，每秒向你转移 {damage} 点生命值。',
   'entities.abilities.fear.name': '恐惧',
   'entities.abilities.fear.description':
     '使敌人陷入恐惧并畏缩，最多持续 8 秒。任何伤害都会打破效果。',

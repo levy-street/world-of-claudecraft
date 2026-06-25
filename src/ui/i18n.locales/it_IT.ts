@@ -1858,7 +1858,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Maledice il bersaglio con agonia: {damage} danni da Ombra in 24 s.',
   'entities.abilities.drain_life.name': 'Risucchio di Vita',
   'entities.abilities.drain_life.description':
-    'Risucchia la vita del bersaglio, trasferendoti 7 salute ogni secondo per 5 s.',
+    'Risucchia la vita del bersaglio, trasferendoti {damage} salute ogni secondo per 5 s.',
   'entities.abilities.fear.name': 'Paura',
   'entities.abilities.fear.description':
     "Terrorizza il nemico, lasciandolo tremante per un massimo di 8 s. Qualsiasi danno interrompe l'effetto.",

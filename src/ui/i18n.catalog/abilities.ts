@@ -678,7 +678,7 @@ const classAbilityNamesEn = {
       ["corruption", "Corruption", "Corrupts the target, causing {damage} Shadow damage over 18 sec."],
       ["life_tap", "Life Tap", "Converts 30 health into 30 mana."],
       ["curse_of_agony", "Curse of Agony", "Curses the target with agony: {damage} Shadow damage over 24 sec."],
-      ["drain_life", "Drain Life", "Drains the target's life, transferring 7 health to you each second for 5 sec."],
+      ["drain_life", "Drain Life", "Drains the target's life, transferring {damage} health to you each second for 5 sec."],
       ["fear", "Fear", "Strikes terror into the enemy, leaving it cowering for up to 8 sec. Any damage breaks the effect."],
       ["searing_pain", "Searing Pain", "Sears the enemy with agonizing fire for {damage} Fire damage. Quick to cast."],
       ["shadowburn", "Shadowburn", "Instantly blasts the target with Shadow Flame for {damage} Shadow damage."],

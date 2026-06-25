@@ -1864,7 +1864,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Verflucht das Ziel mit Pein: {damage} Schattenschaden über 24 Sek.',
   'entities.abilities.drain_life.name': 'Blutsauger',
   'entities.abilities.drain_life.description':
-    'Entzieht dem Ziel Leben und überträgt euch 5 Sek. lang jede Sekunde 7 Gesundheit.',
+    'Entzieht dem Ziel Leben und überträgt euch 5 Sek. lang jede Sekunde {damage} Gesundheit.',
   'entities.abilities.fear.name': 'Furcht',
   'entities.abilities.fear.description':
     'Versetzt den Gegner in Schrecken und lässt ihn bis zu 8 Sek. lang kauern. Jeder Schaden bricht den Effekt.',

@@ -3672,7 +3672,7 @@ export const it_IT: EnTranslations = {
       },
       "drain_life": {
         "name": "Risucchio di Vita",
-        "description": "Risucchia la vita del bersaglio, trasferendoti 7 salute ogni secondo per 5 s."
+        "description": "Risucchia la vita del bersaglio, trasferendoti {damage} salute ogni secondo per 5 s."
       },
       "fear": {
         "name": "Paura",

@@ -1856,7 +1856,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Amaldiçoa o alvo com agonia: {damage} de dano de Sombra ao longo de 24 s.',
   'entities.abilities.drain_life.name': 'Drenar Vida',
   'entities.abilities.drain_life.description':
-    'Drena a vida do alvo, transferindo 7 de vida para você a cada segundo por 5 s.',
+    'Drena a vida do alvo, transferindo {damage} de vida para você a cada segundo por 5 s.',
   'entities.abilities.fear.name': 'Medo',
   'entities.abilities.fear.description':
     'Aterroriza o inimigo, deixando-o acuado por até 8 s. Qualquer dano quebra o efeito.',

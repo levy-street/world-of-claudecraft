@@ -1836,7 +1836,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '対象に苦痛の呪いをかけ、24秒間で {damage} の暗黒ダメージを与えます。',
   'entities.abilities.drain_life.name': 'ドレインライフ',
   'entities.abilities.drain_life.description':
-    '対象の生命力を吸収し、5秒間、毎秒7の体力を自分に移します。',
+    '対象の生命力を吸収し、5秒間、毎秒{damage}の体力を自分に移します。',
   'entities.abilities.fear.name': 'フィアー',
   'entities.abilities.fear.description':
     '敵に恐怖を刻み、最大8秒間おびえさせます。ダメージを受けると効果が切れます。',

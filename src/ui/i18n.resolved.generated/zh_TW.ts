@@ -3672,7 +3672,7 @@ export const zh_TW: EnTranslations = {
       },
       "drain_life": {
         "name": "吸取生命",
-        "description": "吸取目標的生命，持續 5 秒，每秒向你轉移 7 點生命值。"
+        "description": "吸取目標的生命，持續 5 秒，每秒向你轉移 {damage} 點生命值。"
       },
       "fear": {
         "name": "恐懼",

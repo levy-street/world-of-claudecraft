@@ -1828,7 +1828,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '대상에게 고통의 저주를 걸어 24초에 걸쳐 {damage}의 암흑 피해를 입힙니다.',
   'entities.abilities.drain_life.name': '생명력 흡수',
   'entities.abilities.drain_life.description':
-    '대상의 생명력을 흡수해 5초 동안 매초 7의 생명력을 자신에게 이전합니다.',
+    '대상의 생명력을 흡수해 5초 동안 매초 {damage}의 생명력을 자신에게 이전합니다.',
   'entities.abilities.fear.name': '공포',
   'entities.abilities.fear.description':
     '적에게 공포를 심어 최대 8초 동안 떨게 만듭니다. 피해를 받으면 효과가 해제됩니다.',

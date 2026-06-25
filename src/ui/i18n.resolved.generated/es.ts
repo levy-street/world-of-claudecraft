@@ -3672,7 +3672,7 @@ export const es: EnTranslations = {
       },
       "drain_life": {
         "name": "Drenar vida",
-        "description": "Drena la vida del objetivo y te transfiere 7 de salud cada segundo durante 5 s."
+        "description": "Drena la vida del objetivo y te transfiere {damage} de salud cada segundo durante 5 s."
       },
       "fear": {
         "name": "Miedo",
