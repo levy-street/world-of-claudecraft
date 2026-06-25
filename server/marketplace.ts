@@ -183,6 +183,8 @@ export interface RegistrySkin {
   design: SkinDesignSpec | null;
   creator: string; // short public attribution (no full wallet / PII)
   priceUsdc: string;
+  portraitUrl: string | null; // nft only: opaque 2D PFP portrait for the HUD frame + nameplate
+  nft: boolean; // true for NFT-PFP skins (claimed, not for sale); lets the browse UI filter
 }
 
 /** Public creator attribution: a short, abbreviated wallet — never the full
@@ -205,6 +207,8 @@ export async function registrySkins(): Promise<RegistrySkin[]> {
     design: r.design,
     creator: creatorLabel(r.creatorWallet),
     priceUsdc: r.priceUsdc.toString(),
+    portraitUrl: r.source === 'nft' && r.portraitSha256 ? `/api/skins/${r.id}/portrait.png` : null,
+    nft: r.source === 'nft',
   }));
 }
 

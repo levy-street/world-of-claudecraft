@@ -114,6 +114,8 @@ export interface CreatorSkinRegistryEntry {
   design: SkinDesignSpec | null; // procedural design; takes precedence over assetUrl
   creator: string; // creator display label (account username or short wallet) — public attribution
   priceUsdc: string; // USDC base units (6 decimals) as a string
+  portraitUrl: string | null; // nft only: opaque 2D PFP portrait for the HUD frame + nameplate
+  nft: boolean; // true for NFT-PFP skins (claimed, not for sale)
 }
 
 export interface IWorldCosmetics {

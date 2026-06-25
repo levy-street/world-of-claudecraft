@@ -241,12 +241,27 @@ describe('registrySkins — public projection', () => {
       id: 'skin_1', name: 'Dragonscale', description: 'Scaled plate', skinCatalog: 'class',
       fallbackSkin: 0, targetClass: 'warrior', assetUrl: 'https://cdn.example/skin_1.png',
       emissiveUrl: null, design: null, creator: `${CREATOR.slice(0, 4)}…${CREATOR.slice(-4)}`,
-      priceUsdc: '10000000',
+      priceUsdc: '10000000', portraitUrl: null, nft: false,
     }]);
     // the FULL creator wallet, account id, status, and sha are NOT exposed publicly
     expect(skins[0]).not.toHaveProperty('creatorWallet');
     expect(skins[0]).not.toHaveProperty('status');
     expect(skins[0].creator).not.toBe(CREATOR); // only an abbreviated label
+  });
+
+  it('exposes an NFT skin with a portrait url + nft flag but never its provenance', async () => {
+    db.listLiveCreatorSkins.mockResolvedValueOnce([creatorSkinRow({
+      id: 'cs_nft_x', source: 'nft', assetUrl: 'procedural',
+      design: { primary: '#d4af37', secondary: '#222222', accent: '#ffffff', pattern: 'scales', finish: 'metallic', density: 'medium', emissive: null },
+      nftChain: 'ethereum', nftContract: '0xbc4ca0', nftTokenId: '42', portraitSha256: 'deadbeef',
+    })]);
+    const [skin] = await registrySkins();
+    expect(skin.nft).toBe(true);
+    expect(skin.portraitUrl).toBe('/api/skins/cs_nft_x/portrait.png');
+    expect(skin.design?.finish).toBe('metallic');
+    expect(skin).not.toHaveProperty('nftContract');
+    expect(skin).not.toHaveProperty('nftTokenId'); // provenance never leaves the server
+    expect(JSON.stringify(skin)).not.toContain('42');
   });
 });
 

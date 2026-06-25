@@ -145,3 +145,40 @@ export async function loadAtlasBytes(opts: { key: string; originUrl?: string | n
   if (bytes) cacheAtlas(opts.key, bytes);
   return bytes;
 }
+
+// --- NFT portrait images (distinct from the body-UV atlas) ----------------------
+//
+// An NFT PFP is a square 2D portrait (PNG/JPEG/WebP/GIF), NOT a 1024² body-UV atlas,
+// so it has its own validator: sniff the magic bytes (never trust a content-type),
+// reject SVG outright (it can carry script), and cap the size. The portrait is shown
+// 2D in the unit frame + nameplate; it is proxied through our route (so a delisted
+// skin 404s) and served same-origin (no cross-origin WebGL taint).
+export const MAX_PORTRAIT_BYTES = 4 * 1024 * 1024;
+
+export type PortraitMime = 'image/png' | 'image/jpeg' | 'image/gif' | 'image/webp';
+
+/** Identify a raster image by its leading bytes, or null for anything else
+ *  (including SVG / HTML / unknown), so an executable or non-image payload can
+ *  never be served as a portrait. */
+export function sniffImageMime(buf: Buffer): PortraitMime | null {
+  if (buf.length >= 8 && buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47
+    && buf[4] === 0x0d && buf[5] === 0x0a && buf[6] === 0x1a && buf[7] === 0x0a) return 'image/png';
+  if (buf.length >= 3 && buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return 'image/jpeg';
+  if (buf.length >= 6 && buf[0] === 0x47 && buf[1] === 0x49 && buf[2] === 0x46 && buf[3] === 0x38
+    && (buf[4] === 0x37 || buf[4] === 0x39) && buf[5] === 0x61) return 'image/gif';
+  if (buf.length >= 12 && buf.toString('ascii', 0, 4) === 'RIFF' && buf.toString('ascii', 8, 12) === 'WEBP') return 'image/webp';
+  return null;
+}
+
+export type PortraitValidation =
+  | { ok: true; sha256: string; mime: PortraitMime }
+  | { ok: false; reason: 'too_large' | 'unsupported_image' };
+
+/** Validate bytes as a servable PFP portrait: a real raster image (no SVG) within
+ *  the size cap; returns its content hash (the serve-cache key) on success. */
+export function validatePortraitImage(buf: Buffer): PortraitValidation {
+  if (buf.length > MAX_PORTRAIT_BYTES) return { ok: false, reason: 'too_large' };
+  const mime = sniffImageMime(buf);
+  if (!mime) return { ok: false, reason: 'unsupported_image' };
+  return { ok: true, sha256: createHash('sha256').update(buf).digest('hex'), mime };
+}

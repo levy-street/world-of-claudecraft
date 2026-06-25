@@ -227,6 +227,13 @@ export function resolveAssetUri(uri: string): string | null {
   return null;
 }
 
+/** True when a URL points at one of our configured (trusted) gateways, so the
+ *  portrait fetch may follow redirects; arbitrary http(s) origins are SSRF-vetted
+ *  with redirects refused. */
+export function isTrustedGatewayUrl(url: string): boolean {
+  return url.startsWith(IPFS_GATEWAY) || url.startsWith(AR_GATEWAY);
+}
+
 function decodeDataJsonUri(uri: string): unknown {
   if (!uri.startsWith('data:')) return null;
   const comma = uri.indexOf(',');

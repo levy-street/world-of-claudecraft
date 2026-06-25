@@ -36,18 +36,25 @@ import { ChatLogger } from './chat_log';
 import type { AccountChatMuteStatus, AccountCosmetics, RequestMetadata } from './db';
 import {
   closePlaySession,
+  evmWalletForAccount,
+  getNftCollection,
   grantAccountMechChroma,
+  grantNftSkin,
   insertChatLogs,
+  listNftGrantsForAccount,
   loadMarketState,
   markAccountQuestComplete,
   openPlaySession,
   pool,
   revokeAccountMechChroma,
+  revokeNftSkin,
   saveCharacterAndMarketState,
   saveCharacterState,
   saveMarketState,
+  touchNftGrant,
   walletForAccount,
 } from './db';
+import { ownsNft, type NftStandard } from './nft_ownership';
 import { IpBlockList } from './ip_block';
 import { loadActiveBlockedIps } from './ip_block_db';
 import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
@@ -277,6 +284,10 @@ const HEAVY_SELF_EVENTS = new Set<string>([
 // freshness floor; keeping this loop at/under that TTL means a token change shows
 // on the in-world badge within ~one cache window of it landing on chain.
 const HOLDER_TIER_REFRESH_MS = 60_000;
+// Re-verify every online player's NFT-skin grants (lost-on-sell). NFT transfers
+// are rarer than balance moves, so a slower cadence than the holder-tier refresh
+// is fine; ownership reads are cached (NFT_OWNERSHIP_TTL_MS) under this.
+const NFT_GRANT_REFRESH_MS = 5 * 60_000;
 
 export interface ClientSession {
   ws: WebSocket;
@@ -623,6 +634,8 @@ export class GameServer {
   private interval: NodeJS.Timeout | null = null;
   private holderTierInterval: NodeJS.Timeout | null = null;
   private holderTierRefreshing = false; // overlap guard for the refresh cycle
+  private nftGrantInterval: NodeJS.Timeout | null = null;
+  private nftGrantRefreshing = false; // overlap guard for the NFT re-verify cycle
   // pids whose holder tier was forced via the dev /woctier command — the chain
   // refresh leaves them alone so the override sticks during testing (dev only).
   private devTierPids = new Set<number>();
@@ -864,11 +877,18 @@ export class GameServer {
     this.holderTierInterval = setInterval(() => {
       void this.refreshAllHolderTiers();
     }, HOLDER_TIER_REFRESH_MS);
+    // Lost-on-sell: re-verify NFT-skin ownership off the tick. Revokes (and
+    // unequips) a skin whose NFT the player no longer holds, restores one
+    // re-acquired. Reads are cached + fail-closed (an RPC outage never revokes).
+    this.nftGrantInterval = setInterval(() => {
+      void this.refreshAllNftGrants();
+    }, NFT_GRANT_REFRESH_MS);
   }
 
   stop(): void {
     if (this.interval) clearInterval(this.interval);
     if (this.holderTierInterval) clearInterval(this.holderTierInterval);
+    if (this.nftGrantInterval) clearInterval(this.nftGrantInterval);
   }
 
   // Update one player's holder-tier flair from their linked wallet's $WOC
@@ -911,6 +931,81 @@ export class GameServer {
       );
     } finally {
       this.holderTierRefreshing = false;
+    }
+  }
+
+  private async refreshAllNftGrants(): Promise<void> {
+    if (this.nftGrantRefreshing) return; // a slow cycle (RPC) must not pile up
+    this.nftGrantRefreshing = true;
+    try {
+      const accountIds = new Set([...this.clients.values()].map((s) => s.accountId));
+      await Promise.all(
+        [...accountIds].map((id) =>
+          this.refreshNftGrantsForAccount(id).catch((err) => console.error('nft-grant refresh failed:', err)),
+        ),
+      );
+    } finally {
+      this.nftGrantRefreshing = false;
+    }
+  }
+
+  // Re-verify one account's NFT-skin grants against the chain. Revokes (and
+  // force-unequips) a skin whose token the wallet no longer holds; restores one
+  // re-acquired. An UNKNOWN ownership read (RPC outage) leaves the grant as-is.
+  async refreshNftGrantsForAccount(accountId: number): Promise<void> {
+    const grants = await listNftGrantsForAccount(accountId);
+    if (grants.length === 0) return;
+    const evm = await evmWalletForAccount(accountId);
+    const sol = await walletForAccount(accountId);
+    for (const g of grants) {
+      const address = g.chain === 'ethereum' ? evm?.address ?? null : sol?.pubkey ?? null;
+      const collection = await getNftCollection(g.chain, g.contract);
+      // No linked wallet for the chain, or the collection was delisted: a live
+      // grant can no longer be verified/permitted, so revoke it.
+      if (!address || !collection || !collection.enabled) {
+        if (!g.revoked) await this.revokeNftGrant(accountId, g.skinId);
+        continue;
+      }
+      const owns = await ownsNft(
+        { chain: g.chain === 'solana' ? 'solana' : 'ethereum', contract: g.contract, standard: collection.standard as NftStandard },
+        g.tokenId,
+        address,
+      );
+      if (owns === null) {
+        await touchNftGrant(accountId, g.skinId); // unknown: fail-closed, keep as-is
+      } else if (owns && g.revoked) {
+        await grantNftSkin(accountId, g.skinId);
+        this.applyCreatorSkinGrant(accountId, g.skinId);
+      } else if (!owns && !g.revoked) {
+        await this.revokeNftGrant(accountId, g.skinId);
+      } else {
+        await touchNftGrant(accountId, g.skinId);
+      }
+    }
+  }
+
+  private async revokeNftGrant(accountId: number, skinId: string): Promise<void> {
+    await revokeNftSkin(accountId, skinId);
+    this.revokeCreatorSkinLive(accountId, skinId);
+  }
+
+  // Drop a creator/NFT skin from an account's live cosmetics and force-unequip it
+  // if currently worn (the equip gate only re-checks on change_skin, so a revoke
+  // must actively clear the overlay). Used by the lost-on-sell sweep + un-claim.
+  revokeCreatorSkinLive(accountId: number, skinId: string): void {
+    const current = this.accountCosmeticsByAccount.get(accountId);
+    if (current?.ownedCreatorSkinIds.includes(skinId)) {
+      this.replaceLiveAccountCosmetics(accountId, {
+        ...current,
+        ownedCreatorSkinIds: current.ownedCreatorSkinIds.filter((id) => id !== skinId),
+      });
+    }
+    for (const live of this.clients.values()) {
+      if (live.accountId !== accountId) continue;
+      const e = this.sim.entities.get(live.pid);
+      if (e && e.cosmeticSkinId === skinId) {
+        this.sim.setPlayerSkin(live.pid, e.skin, e.skinCatalog === 'mech' ? 'mech' : 'class', null);
+      }
     }
   }
 
@@ -1182,6 +1277,12 @@ export class GameServer {
     this.sessionsByCharacterId.set(characterId, session);
     this.peakOnline = Math.max(this.peakOnline, this.clients.size);
     void this.recordOnlineSnapshot();
+    // Lost-on-sell: re-verify this account's NFT-skin grants on login so a token
+    // sold while offline is dropped promptly (the periodic sweep would catch it
+    // within a cycle anyway). Best-effort, off the join path.
+    void this.refreshNftGrantsForAccount(accountId).catch((err) =>
+      console.error('nft-grant join refresh failed:', err),
+    );
     openPlaySession(accountId, characterId, name, meta)
       .then((id) => {
         session.dbSessionId = id;

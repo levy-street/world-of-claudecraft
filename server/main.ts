@@ -61,6 +61,7 @@ import {
   findAccount,
   findCharacterReportTargetByName,
   getAccountsCount,
+  evmWalletForAccount,
   getCharacter,
   getCharacterById,
   getCreatorSkin,
@@ -70,6 +71,7 @@ import {
   lifetimeXpStanding,
   listCharacters,
   listCompanionTokens,
+  listNftCollections,
   loadAccountCosmetics,
   moderationStatusForAccount,
   pool,
@@ -81,6 +83,7 @@ import {
   referralCountForAccount,
   renameCharacter,
   revokeCompanionToken,
+  revokeNftSkin,
   revokeTokensExcept,
   saveToken,
   scopeAllowsMutation,
@@ -117,6 +120,7 @@ import {
   createSuspiciousRegistrationReport,
 } from './moderation_db';
 import { createNativeAttestationChallenge, verifyNativeAttestation } from './native_attestation';
+import { claimNftSkin, loadNftPortrait } from './nft_skins';
 import { handleOAuth, seedOAuthClients } from './oauth';
 import { pruneExpiredOAuthGrants } from './oauth_db';
 import { handlePerfReport } from './perf_report';
@@ -148,7 +152,7 @@ import {
 } from './realm';
 import { resolveReportTarget } from './report_target';
 import { handleSitePresenceHeartbeat } from './site_presence';
-import { loadAtlasBytes, MAX_SKIN_BYTES } from './skin_assets';
+import { loadAtlasBytes, MAX_SKIN_BYTES, sniffImageMime } from './skin_assets';
 import { cacheControlFor, etagFor, isNotModified } from './static_cache';
 import { verifyTurnstile } from './turnstile';
 import {
@@ -1387,6 +1391,67 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       res.end(bytes);
       return;
     }
+    // Opaque portrait proxy for NFT-PFP skins: the exact PFP image, shown 2D in the
+    // unit frame + nameplate. The token's chain/contract/origin never reach the
+    // client; we re-sniff the bytes (reject SVG / non-image) and serve same-origin.
+    if (req.method === 'GET' && url.startsWith('/api/skins/') && url.endsWith('/portrait.png')) {
+      const id = decodeURIComponent(url.slice('/api/skins/'.length, -'/portrait.png'.length));
+      const skin = await getCreatorSkin(id);
+      if (!skin || skin.source !== 'nft' || skin.reviewStatus === 'rejected' || skin.status === 'removed') {
+        return json(res, 404, { error: 'not found' });
+      }
+      const bytes = await loadNftPortrait(skin);
+      const mime = bytes ? sniffImageMime(bytes) : null;
+      if (!bytes || !mime) return json(res, 502, { error: 'portrait unavailable' });
+      res.writeHead(200, { 'Content-Type': mime, 'Content-Length': bytes.length, 'Cache-Control': 'public, max-age=300' });
+      res.end(bytes);
+      return;
+    }
+    // NFT-PFP skins: enumerate the viewer's supported collections + linked wallets
+    // (owner-scoped, never public) so the picker can prompt for a token id.
+    if (req.method === 'GET' && url === '/api/skins/nft/eligible') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      const [collections, evm, sol] = await Promise.all([
+        listNftCollections(true),
+        evmWalletForAccount(accountId),
+        walletForAccount(accountId),
+      ]);
+      return json(res, 200, {
+        wallets: { ethereum: evm?.address ?? null, solana: sol?.pubkey ?? null },
+        collections: collections.map((c) => ({ chain: c.chain, contract: c.contract, name: c.name, standard: c.standard })),
+      });
+    }
+    // Claim an owned NFT as a skin: ownership-verified, trait-inferred, portrait-proxied.
+    if (req.method === 'POST' && url === '/api/skins/nft/claim') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (rateLimited(req)) return json(res, 429, { error: 'too many requests' });
+      const body = await readBody(req);
+      const chain = typeof body.chain === 'string' ? body.chain : '';
+      const contract = typeof body.contract === 'string' ? body.contract : '';
+      const tokenId = typeof body.tokenId === 'string' ? body.tokenId : String(body.tokenId ?? '');
+      const result = await claimNftSkin({ accountId, chain, contract, tokenId });
+      if (!result.ok) {
+        const status = result.reason === 'not_owner' ? 403
+          : result.reason === 'ownership_unverified' || result.reason === 'metadata_unavailable' ? 502
+          : 400;
+        return json(res, status, { error: result.reason });
+      }
+      invalidatePublicRead('registry');
+      game.applyCreatorSkinGrant(accountId, result.id);
+      return json(res, 200, { ok: true, id: result.id });
+    }
+    // Un-claim an NFT skin: drop the grant + force-unequip if worn. The skin row
+    // persists (re-claimable); only this account's ownership is removed.
+    if (req.method === 'DELETE' && url.startsWith('/api/skins/nft/')) {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      const id = decodeURIComponent(url.slice('/api/skins/nft/'.length));
+      await revokeNftSkin(accountId, id);
+      game.revokeCreatorSkinLive(accountId, id);
+      return json(res, 200, { unclaimed: true });
+    }
     // The viewer's hosting quota: tier, slots, usage, and trusted-creator badge —
     // drives the designer's quota meter + Upload availability.
     if (req.method === 'GET' && url === '/api/skins/quota') {
@@ -1427,7 +1492,8 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       if (!marketplaceEnabled()) return json(res, 503, { error: 'marketplace unavailable' });
       const skinId = decodeURIComponent(url.slice('/api/marketplace/skins/'.length, -'/quote'.length));
       const skin = await getCreatorSkin(skinId);
-      if (!skin || skin.status !== 'live') return json(res, 404, { error: 'skin not for sale' });
+      // NFT skins are claimed (proof of ownership), never bought; they are not for sale.
+      if (!skin || skin.status !== 'live' || skin.source === 'nft') return json(res, 404, { error: 'skin not for sale' });
       const wallet = await walletForAccount(accountId);
       if (!wallet) return json(res, 400, { error: 'link a Solana wallet first' });
       const quote = await quotePurchase(skin, accountId);
