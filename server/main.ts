@@ -120,7 +120,7 @@ import {
   createSuspiciousRegistrationReport,
 } from './moderation_db';
 import { createNativeAttestationChallenge, verifyNativeAttestation } from './native_attestation';
-import { claimNftSkin, loadNftPortrait } from './nft_skins';
+import { claimNftSkin, loadNftPortrait, seedNftCollections } from './nft_skins';
 import { handleOAuth, seedOAuthClients } from './oauth';
 import { pruneExpiredOAuthGrants } from './oauth_db';
 import { handlePerfReport } from './perf_report';
@@ -1603,6 +1603,8 @@ async function main(): Promise<void> {
   }
   await ensureSchema();
   await seedOAuthClients();
+  const seededCollections = await seedNftCollections();
+  if (seededCollections > 0) console.log(`seeded ${seededCollections} NFT skin collection(s) from NFT_COLLECTIONS`);
   const orphans = await closeOrphanSessions();
   if (orphans > 0) console.log(`closed ${orphans} orphaned play session(s) from a previous run`);
   const pruned = await pruneChatLogs(CHAT_LOG_RETENTION_DAYS);

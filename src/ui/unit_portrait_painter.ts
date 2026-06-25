@@ -12,6 +12,7 @@
 
 import { iconCanvas } from './icons';
 import { playerPortraitDataUrl } from '../render/characters/portrait';
+import { creatorSkinPortraitUrl } from '../render/characters/assets';
 import { PlayerClass } from '../sim/types';
 import { PORTRAIT_CSS_SIZE, CREST_OVERSCAN, portraitBackingPx, overscanRect } from './unit_portrait';
 
@@ -80,6 +81,10 @@ export class UnitPortraitPainter {
    *  3D portraits have finished loading. `creatorSkinId` overlays an equipped
    *  marketplace creator skin so the portrait matches the in-world avatar. */
   drawClass(canvas: HTMLCanvasElement, cls: PlayerClass, skin: number, creatorSkinId: string | null = null): void {
+    // An NFT-PFP skin shows the exact 2D portrait (its art was authored 2D); other
+    // skins render the 3D headshot of the in-world avatar.
+    const portrait = creatorSkinId ? creatorSkinPortraitUrl(creatorSkinId) : null;
+    if (portrait) { this.drawHeadshot(canvas, portrait); return; }
     const url = playerPortraitDataUrl(cls, skin, creatorSkinId);
     if (url) this.drawHeadshot(canvas, url);
     else this.drawCrest(canvas, `class_${cls}`);

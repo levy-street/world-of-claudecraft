@@ -2,29 +2,30 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock the I/O boundaries (db, ownership reader, image fetch/validate) — NOT the
 // claim orchestration or the real trait inference (designSpecForTraits stays real).
+/* eslint-disable @typescript-eslint/no-explicit-any */
 const db = vi.hoisted(() => ({
-  getNftCollection: vi.fn(),
-  getCreatorSkin: vi.fn(async () => null as unknown),
-  upsertCreatorSkin: vi.fn(async () => {}),
-  grantNftSkin: vi.fn(async () => {}),
-  listNftGrantsForAccount: vi.fn(async () => [] as Array<{ skinId: string; revoked: boolean }>),
-  evmWalletForAccount: vi.fn(async () => ({ address: '0x' + '1'.repeat(40) })),
-  walletForAccount: vi.fn(async () => ({ pubkey: 'So11111111111111111111111111111111111111112' })),
+  getNftCollection: vi.fn(async (): Promise<any> => null),
+  getCreatorSkin: vi.fn(async (): Promise<any> => null),
+  upsertCreatorSkin: vi.fn(async (_r: any): Promise<void> => {}),
+  grantNftSkin: vi.fn(async (): Promise<void> => {}),
+  listNftGrantsForAccount: vi.fn(async (): Promise<any[]> => []),
+  evmWalletForAccount: vi.fn(async (): Promise<any> => ({ address: '0x' + '1'.repeat(40) })),
+  walletForAccount: vi.fn(async (): Promise<any> => ({ pubkey: 'So11111111111111111111111111111111111111112' })),
 }));
 const own = vi.hoisted(() => ({
-  ownsNft: vi.fn(async () => true as boolean | null),
-  nftMetadata: vi.fn(async () => ({ attributes: [{ trait_type: 'Fur', value: 'Solid Gold' }], image: 'https://cdn/x.png', collection: 'c' })),
-  isTrustedGatewayUrl: vi.fn(() => false),
+  ownsNft: vi.fn(async (): Promise<boolean | null> => true),
+  nftMetadata: vi.fn(async (): Promise<any> => ({ attributes: [{ trait_type: 'Fur', value: 'Solid Gold' }], image: 'https://cdn/x.png', collection: 'c' })),
+  isTrustedGatewayUrl: vi.fn((): boolean => false),
 }));
 const assets = vi.hoisted(() => ({
-  loadAtlasBytes: vi.fn(async () => Buffer.from([1, 2, 3])),
-  validatePortraitImage: vi.fn(() => ({ ok: true, sha256: 'deadbeef', mime: 'image/png' as const })),
+  loadAtlasBytes: vi.fn(async (): Promise<Buffer | null> => Buffer.from([1, 2, 3])),
+  validatePortraitImage: vi.fn((): any => ({ ok: true, sha256: 'deadbeef', mime: 'image/png' })),
 }));
 vi.mock('../server/db', () => db);
 vi.mock('../server/nft_ownership', () => own);
 vi.mock('../server/skin_assets', () => assets);
 
-import { claimNftSkin, nftSkinId, MAX_NFT_SKINS_PER_ACCOUNT } from '../server/nft_skins';
+import { claimNftSkin, nftSkinId, MAX_NFT_SKINS_PER_ACCOUNT, parseNftCollectionsEnv } from '../server/nft_skins';
 
 const BAYC = { chain: 'ethereum', contract: '0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d', name: 'Bored Ape', standard: 'erc721', profileId: 'bayc', licenseBasis: 'yuga', enabled: true };
 const CLAIM = { accountId: 7, chain: 'ethereum', contract: '0xBC4CA0EDA7647A8AB7C2061C2E118A18A936F13D', tokenId: '42' };
@@ -118,5 +119,33 @@ describe('claimNftSkin — happy path', () => {
     const r = await claimNftSkin({ accountId: 7, chain: 'solana', contract: 'So11111111111111111111111111111111111111112', tokenId: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v' });
     expect(r.ok).toBe(true);
     expect(db.walletForAccount).toHaveBeenCalledWith(7);
+  });
+});
+
+describe('parseNftCollectionsEnv', () => {
+  it('parses + normalizes valid rows, lower-casing ETH contracts', () => {
+    const rows = parseNftCollectionsEnv(JSON.stringify([
+      { chain: 'ethereum', contract: '0xBC4CA0EDA7647A8AB7C2061C2E118A18A936F13D', name: 'BAYC', standard: 'erc721', profileId: 'bayc', licenseBasis: 'yuga' },
+      { chain: 'solana', contract: 'So11111111111111111111111111111111111111112', name: 'Mad Lads', standard: 'solana' },
+    ]));
+    expect(rows).toEqual([
+      { chain: 'ethereum', contract: '0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d', name: 'BAYC', standard: 'erc721', profileId: 'bayc', licenseBasis: 'yuga', enabled: true },
+      { chain: 'solana', contract: 'So11111111111111111111111111111111111111112', name: 'Mad Lads', standard: 'solana', profileId: 'generic', licenseBasis: '', enabled: true },
+    ]);
+  });
+  it('drops malformed entries and bad json without throwing', () => {
+    expect(parseNftCollectionsEnv(undefined)).toEqual([]);
+    expect(parseNftCollectionsEnv('not json')).toEqual([]);
+    expect(parseNftCollectionsEnv('{}')).toEqual([]);
+    expect(parseNftCollectionsEnv(JSON.stringify([
+      { chain: 'bitcoin', contract: '0xabc', standard: 'erc721' }, // bad chain
+      { chain: 'ethereum', standard: 'erc721' }, // missing contract
+      { chain: 'ethereum', contract: '0xabc', standard: 'erc1155' }, // bad standard
+    ]))).toEqual([]);
+  });
+  it('respects enabled:false', () => {
+    const [row] = parseNftCollectionsEnv(JSON.stringify([{ chain: 'ethereum', contract: '0xAbC', standard: 'cryptopunks', enabled: false }]));
+    expect(row.enabled).toBe(false);
+    expect(row.contract).toBe('0xabc');
   });
 });

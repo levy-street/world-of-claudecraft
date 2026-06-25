@@ -6,8 +6,8 @@
 import { createHash } from 'node:crypto';
 import {
   getNftCollection, getCreatorSkin, upsertCreatorSkin, grantNftSkin,
-  listNftGrantsForAccount, evmWalletForAccount, walletForAccount,
-  type CreatorSkinRow,
+  listNftGrantsForAccount, evmWalletForAccount, walletForAccount, upsertNftCollection,
+  type CreatorSkinRow, type NftCollectionRow,
 } from './db';
 import {
   ownsNft, nftMetadata, isTrustedGatewayUrl,
@@ -137,6 +137,50 @@ export async function claimNftSkin(params: {
   await upsertCreatorSkin(row);
   await grantNftSkin(params.accountId, skinId);
   return { ok: true, id: skinId };
+}
+
+// --- allow-list seeding (externalized config; the IP control) -------------------
+
+/** Parse the NFT_COLLECTIONS env (a JSON array of allow-list rows) into validated
+ *  NftCollectionRow records. Malformed entries are dropped, not thrown. Pure +
+ *  unit-tested. Lets an operator vet + enable collections via config, counsel
+ *  having signed off each licence_basis. */
+export function parseNftCollectionsEnv(raw: string | undefined): NftCollectionRow[] {
+  if (!raw) return [];
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    return [];
+  }
+  if (!Array.isArray(parsed)) return [];
+  const out: NftCollectionRow[] = [];
+  for (const item of parsed) {
+    if (!item || typeof item !== 'object') continue;
+    const r = item as Record<string, unknown>;
+    const chain = r.chain === 'ethereum' || r.chain === 'solana' ? r.chain : null;
+    const standard = r.standard === 'erc721' || r.standard === 'cryptopunks' || r.standard === 'solana' ? r.standard : null;
+    const contractRaw = typeof r.contract === 'string' ? r.contract.trim() : '';
+    if (!chain || !standard || !contractRaw) continue;
+    out.push({
+      chain,
+      contract: chain === 'ethereum' ? contractRaw.toLowerCase() : contractRaw,
+      name: typeof r.name === 'string' ? r.name : '',
+      standard,
+      profileId: typeof r.profileId === 'string' && r.profileId ? r.profileId : 'generic',
+      licenseBasis: typeof r.licenseBasis === 'string' ? r.licenseBasis : '',
+      enabled: r.enabled !== false,
+    });
+  }
+  return out;
+}
+
+/** Upsert the configured allow-list at boot. Returns how many collections were
+ *  seeded. No-op when NFT_COLLECTIONS is unset. */
+export async function seedNftCollections(raw: string | undefined = process.env.NFT_COLLECTIONS): Promise<number> {
+  const rows = parseNftCollectionsEnv(raw);
+  for (const row of rows) await upsertNftCollection(row);
+  return rows.length;
 }
 
 /** Load an NFT skin's portrait bytes for the serve route (cached by sha256), or

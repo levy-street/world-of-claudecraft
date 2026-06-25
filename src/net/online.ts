@@ -604,6 +604,42 @@ export class Api {
     await this.delete('/api/wallet/link', {});
   }
 
+  // ── Non-custodial Ethereum/EVM wallet linking (for NFT-PFP skins) ──────────
+  async evmWalletLinkChallenge(address: string): Promise<{ nonce: string; message: string }> {
+    return this.post('/api/wallet/evm/link/challenge', { address });
+  }
+
+  async linkEvmWallet(address: string, signature: string, nonce: string): Promise<{ address: string }> {
+    return this.post('/api/wallet/evm/link', { address, signature, nonce });
+  }
+
+  async linkedEvmWallet(): Promise<{ address: string; chainId: number; linkedAt: string } | null> {
+    const data = await this.get('/api/wallet/evm');
+    return data.wallet ?? null;
+  }
+
+  async unlinkEvmWallet(): Promise<void> {
+    await this.delete('/api/wallet/evm/link', {});
+  }
+
+  // ── NFT-PFP skins ──────────────────────────────────────────────────────────
+  // Supported collections + the viewer's linked wallets (for the picker).
+  async nftEligible(): Promise<{
+    wallets: { ethereum: string | null; solana: string | null };
+    collections: Array<{ chain: string; contract: string; name: string; standard: string }>;
+  }> {
+    return this.get('/api/skins/nft/eligible');
+  }
+
+  // Claim an owned NFT as a skin (ownership-verified + trait-inferred server-side).
+  async claimNftSkin(chain: string, contract: string, tokenId: string): Promise<{ ok: true; id: string }> {
+    return this.post('/api/skins/nft/claim', { chain, contract, tokenId });
+  }
+
+  async unclaimNftSkin(id: string): Promise<void> {
+    await this.delete(`/api/skins/nft/${encodeURIComponent(id)}`, {});
+  }
+
   // ── Shareable player card + referrals ──────────────────────────────────────
   // Publish (or replace) this character's card PNG. The server may return a
   // realm-relative public page path; main.ts normalizes it to an absolute URL

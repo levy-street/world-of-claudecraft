@@ -473,6 +473,12 @@ export function creatorSkinTexture(id: string): THREE.Texture | null {
   return tex ?? null;
 }
 
+/** The opaque 2D PFP portrait URL for an NFT skin id (shown 2D in the HUD unit
+ *  frame + nameplate), or null for a non-NFT / unknown skin. */
+export function creatorSkinPortraitUrl(id: string): string | null {
+  return creatorSkinRegistry.get(id)?.portraitUrl ?? null;
+}
+
 /** The emissive (glow) map for a creator skin id, or null (no emissive / not
  *  loaded / low tier). */
 export function creatorSkinEmissive(id: string): THREE.Texture | null {
