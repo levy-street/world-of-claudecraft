@@ -6,6 +6,7 @@ import {
   RECIPE_BY_ID,
   RECIPES,
 } from '../src/sim/data';
+import { ACTIONS, applyAction, encodeObs, obsSize } from '../src/sim/obs';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import {
@@ -230,6 +231,32 @@ describe('persistence + determinism', () => {
     const sim2 = newSim();
     const pid2 = sim2.addPlayer('warrior', 'Saved', { state });
     expect(sim2.professionState(pid2)).toEqual([{ id: 'herbalism', skill: 42, rankTier: 0 }]);
+  });
+
+  it('RL: craftBestAvailable + craft action + reward counter + obs exposure', () => {
+    const sim = newSim();
+    const pid = sim.primaryId;
+    sim.learnProfession('mining', pid);
+    sim.addItem('copper_ore', 6, pid);
+
+    // craftBestAvailable smelts the highest-reqSkill craftable recipe (ore -> bar).
+    sim.craftBestAvailable(pid);
+    expect(sim.countItem('copper_bar', pid)).toBeGreaterThanOrEqual(1);
+
+    // The RL 'craft' action drives the same path through applyAction.
+    const craftAction = ACTIONS.indexOf('craft' as (typeof ACTIONS)[number]);
+    expect(craftAction).toBeGreaterThan(0);
+    const barsBefore = sim.countItem('copper_bar', pid);
+    applyAction(sim, craftAction);
+    expect(sim.countItem('copper_bar', pid)).toBeGreaterThan(barsBefore);
+
+    // Skill-ups feed the reward counter the env reads.
+    expect(sim.players.get(pid)!.counters.professionSkillUps).toBeGreaterThan(0);
+
+    // The observation vector matches the advertised size and exposes the skill.
+    const obs = encodeObs(sim);
+    expect(obs).toHaveLength(obsSize());
+    expect(obs.every((v) => Number.isFinite(v))).toBe(true);
   });
 
   it('same seed + same actions gives the same harvest result', () => {

@@ -14,7 +14,7 @@
 import * as readline from 'node:readline';
 import { Sim, RewardCounters } from '../src/sim/sim';
 import { ACTIONS, NUM_ACTIONS, applyAction, encodeObs, obsSize } from '../src/sim/obs';
-import { ALL_CLASSES, MAX_LEVEL, PlayerClass } from '../src/sim/types';
+import { ALL_CLASSES, MAX_LEVEL, PlayerClass, ProfessionId } from '../src/sim/types';
 import { MAX_INPUT_LINE_LENGTH, validateAction, validatePlayerClass } from './protocol';
 
 interface EnvConfig {
@@ -22,6 +22,9 @@ interface EnvConfig {
   maxSteps: number; // truncate episode after this many steps (0 = never)
   respawnSeconds: number;
   terminateOnDeath: boolean;
+  // Professions auto-learned at reset, so an episode can exercise the full
+  // gather -> craft loop (learning is a one-time setup choice, not an RL action).
+  professions: string[];
   rewards: {
     xp: number; // per xp point
     damageDealt: number;
@@ -31,6 +34,7 @@ interface EnvConfig {
     questDone: number;
     questProgress: number;
     levelUp: number;
+    professionSkillUp: number; // per profession skill point gained
     timePenalty: number; // per step
   };
 }
@@ -41,6 +45,9 @@ const DEFAULT_CONFIG: EnvConfig = {
   maxSteps: 8000,
   respawnSeconds: 15,
   terminateOnDeath: false,
+  // Mining + Blacksmithing is one self-sufficient chain (gather ore, smelt bars,
+  // forge gear); override per reset to train other combinations.
+  professions: ['mining', 'blacksmithing'],
   rewards: {
     xp: 0.01,
     damageDealt: 0.002,
@@ -50,6 +57,7 @@ const DEFAULT_CONFIG: EnvConfig = {
     questDone: 5,
     questProgress: 0.5,
     levelUp: 2,
+    professionSkillUp: 0.3,
     timePenalty: 0,
   },
 };
@@ -74,6 +82,10 @@ class Env {
       respawnSeconds: this.config.respawnSeconds,
       autoEquip: true,
     });
+    // Auto-learn the configured professions (an unknown id is a no-op in the Sim).
+    for (const profId of this.config.professions) {
+      this.sim.learnProfession(profId as ProfessionId, this.sim.primaryId);
+    }
     this.stepCount = 0;
     this.prev = { ...this.sim.counters };
     return { obs: encodeObs(this.sim), info: this.infoDict() };
@@ -97,6 +109,7 @@ class Env {
       (c.questsCompleted - this.prev.questsCompleted) * r.questDone +
       (c.questProgress - this.prev.questProgress) * r.questProgress +
       (c.levelUps - this.prev.levelUps) * r.levelUp +
+      (c.professionSkillUps - this.prev.professionSkillUps) * r.professionSkillUp +
       r.timePenalty;
     const died = c.deaths > this.prev.deaths;
     this.prev = { ...c };

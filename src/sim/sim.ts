@@ -93,6 +93,7 @@ import {
   QUESTS,
   questRewardItemId,
   RECIPE_BY_ID,
+  RECIPES_BY_PROFESSION,
   resolveDelveShopOffers,
   ZONES,
   zoneAt,
@@ -190,6 +191,7 @@ import {
   emptyMoveInput,
   FISHING_CAST_ID,
   type HarvestNodeDef,
+  type RecipeDef,
   FISHING_CAST_TIME,
   GCD,
   INTERACT_RANGE,
@@ -759,6 +761,9 @@ export interface RewardCounters {
   questProgress: number;
   lootCopper: number;
   levelUps: number;
+  // Profession skill points gained (gathering + crafting). Lets the RL env reward
+  // running the professions loop, not just combat/quests.
+  professionSkillUps: number;
 }
 
 export interface SentChat {
@@ -1052,6 +1057,7 @@ function freshCounters(): RewardCounters {
     questProgress: 0,
     lootCopper: 0,
     levelUps: 0,
+    professionSkillUps: 0,
   };
 }
 
@@ -10400,6 +10406,7 @@ export class Sim {
     if (chance <= 0) return;
     if (this.rng.next() < chance) {
       ps.skill = Math.min(cap, ps.skill + 1);
+      meta.counters.professionSkillUps++;
       this.emit({
         type: 'professionSkill',
         profession,
@@ -10408,6 +10415,29 @@ export class Sim {
         pid: meta.entityId,
       });
     }
+  }
+
+  /** Craft the single most advanced recipe the player can currently make (skill
+   *  meets reqSkill and reagents are in the bag), preferring the highest reqSkill
+   *  so the chain naturally climbs ore -> bars -> gear. A no-op when nothing is
+   *  craftable. Exposed for the RL action space (the 'craft' action). */
+  craftBestAvailable(pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    const { meta } = r;
+    let best: RecipeDef | null = null;
+    for (const ps of meta.professions.keys()) {
+      for (const recipe of RECIPES_BY_PROFESSION[ps] ?? []) {
+        const skill = meta.professions.get(ps)?.skill ?? 0;
+        if (skill < recipe.reqSkill) continue;
+        const enough = recipe.reagents.every(
+          (rg) => this.countItem(rg.itemId, meta.entityId) >= rg.count,
+        );
+        if (!enough) continue;
+        if (!best || recipe.reqSkill > best.reqSkill) best = recipe;
+      }
+    }
+    if (best) this.craftItem(best.id, 1, meta.entityId);
   }
 
   /** Harvest a gather node (ore vein / herb). Validates the profession + skill,

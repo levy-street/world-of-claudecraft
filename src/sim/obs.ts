@@ -1,6 +1,19 @@
 import { CLASSES, ITEMS, QUESTS, QUEST_ORDER, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from './data';
 import { Sim } from './sim';
-import { Entity, GCD, angleTo, dist2d, normAngle, xpForLevel, MAX_LEVEL } from './types';
+import {
+  Entity,
+  GCD,
+  angleTo,
+  dist2d,
+  normAngle,
+  PROFESSION_SKILL_MAX,
+  xpForLevel,
+  MAX_LEVEL,
+} from './types';
+
+// Profession skills exposed to the agent (one normalized float each), in a fixed
+// order so the observation vector shape stays stable as content grows.
+const PROFESSION_OBS_IDS = ['mining', 'herbalism', 'blacksmithing', 'alchemy'] as const;
 
 // ---------------------------------------------------------------------------
 // Discrete action space for RL agents.
@@ -26,9 +39,10 @@ export const ACTIONS = [
   'attack',        // 9  start auto-attack on current target
   // abilities index the learned list in learn order: ability_1 .. ability_N
   ...Array.from({ length: ABILITY_SLOTS }, (_, i) => `ability_${i + 1}`),
-  'interact',      // loot corpse / pick up object / talk to quest npc
+  'interact',      // loot corpse / pick up object / GATHER a profession node
   'stop',          // stop moving + stop attacking
   'eat_drink',     // consume best food (or water for mana classes) from bags
+  'craft',         // craft the most advanced currently-craftable recipe (smelt -> bar -> gear)
 ] as const;
 
 export const NUM_ACTIONS = ACTIONS.length;
@@ -49,6 +63,7 @@ export function applyAction(sim: Sim, action: number): void {
     case 'target_nearest': sim.targetNearestEnemy(); break;
     case 'attack': sim.startAutoAttack(); break;
     case 'interact': sim.interact(); break;
+    case 'craft': sim.craftBestAvailable(); break;
     case 'stop': sim.stopAutoAttack(); break;
     case 'eat_drink': {
       const p = sim.player;
@@ -80,7 +95,10 @@ export function applyAction(sim: Sim, action: number): void {
 const NEARBY_MOBS = 5;
 
 export function obsSize(): number {
-  return 16 + ABILITY_SLOTS * 2 + 9 + NEARBY_MOBS * 6 + 5 + QUEST_ORDER.length * 2;
+  return (
+    16 + ABILITY_SLOTS * 2 + 9 + NEARBY_MOBS * 6 + 5 + QUEST_ORDER.length * 2 +
+    PROFESSION_OBS_IDS.length
+  );
 }
 
 export function encodeObs(sim: Sim): number[] {
@@ -190,6 +208,13 @@ export function encodeObs(sim: Sim): number[] {
     } else {
       obs.push(state === 'done' ? 1 : 0);
     }
+  }
+
+  // --- professions (4): per-profession skill, normalized; 0 if not learned ---
+  const profs = sim.professionState();
+  for (const id of PROFESSION_OBS_IDS) {
+    const skill = profs.find((pr) => pr.id === id)?.skill ?? 0;
+    obs.push(skill / PROFESSION_SKILL_MAX);
   }
 
   return obs;
