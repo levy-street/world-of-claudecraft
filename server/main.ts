@@ -158,6 +158,12 @@ import {
   handleWalletUnlink,
 } from './wallet';
 import {
+  handleEvmWalletChallenge,
+  handleEvmWalletGet,
+  handleEvmWalletLink,
+  handleEvmWalletUnlink,
+} from './wallet_evm';
+import {
   isNativeAppRequest,
   isWebClientRequest,
   NATIVE_APP_ORIGINS,
@@ -1294,6 +1300,28 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
       return handleWalletGet(req, res, accountId);
+    }
+    // Non-custodial Ethereum/EVM wallet linking (for NFT-PFP skins) — mirror of
+    // the Solana routes; independent link, an account may hold both.
+    if (req.method === 'POST' && url === '/api/wallet/evm/link/challenge') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleEvmWalletChallenge(req, res, accountId);
+    }
+    if (req.method === 'POST' && url === '/api/wallet/evm/link') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleEvmWalletLink(req, res, accountId);
+    }
+    if (req.method === 'DELETE' && url === '/api/wallet/evm/link') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleEvmWalletUnlink(req, res, accountId);
+    }
+    if (req.method === 'GET' && url === '/api/wallet/evm') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleEvmWalletGet(req, res, accountId);
     }
     // $WOC balance proxy — keeps the Solana RPC endpoint (and any key in it)
     // server-side so it never ships in the client bundle. Public (on-chain

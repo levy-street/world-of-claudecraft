@@ -226,7 +226,8 @@ function creatorSkinRow(over: Partial<CreatorSkinRow> = {}): CreatorSkinRow {
     description: 'Scaled plate', skinCatalog: 'class', fallbackSkin: 0, targetClass: 'warrior',
     assetUrl: 'https://cdn.example/skin_1.png', emissiveUrl: null, design: null, priceUsdc: 10_000_000n,
     source: 'design', originUrl: null, ipfsCid: null, reviewStatus: 'approved', overflowHidden: false,
-    status: 'live', sha256: null, ...over,
+    status: 'live', sha256: null,
+    nftChain: null, nftContract: null, nftTokenId: null, portraitSha256: null, ...over,
   };
 }
 

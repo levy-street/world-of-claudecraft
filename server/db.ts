@@ -388,6 +388,26 @@ CREATE TABLE IF NOT EXISTS wallet_link_challenges (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS wallet_link_challenges_account ON wallet_link_challenges(account_id);
+-- Non-custodial Ethereum/EVM wallet links (docs/prd/woc/nft-pfp-skins.md). Mirror
+-- of wallet_links for a second chain: one EVM wallet per account, one account per
+-- wallet, proven by an EIP-191 personal_sign over a stored single-use challenge.
+-- address is stored lower-cased. Independent of the Solana link (an account may
+-- have both).
+CREATE TABLE IF NOT EXISTS evm_wallet_links (
+  account_id INT PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,
+  address TEXT NOT NULL UNIQUE,
+  chain_id INT NOT NULL DEFAULT 1,
+  linked_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS evm_wallet_link_challenges (
+  nonce TEXT PRIMARY KEY,
+  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  address TEXT NOT NULL,
+  message TEXT NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS evm_wallet_link_challenges_account ON evm_wallet_link_challenges(account_id);
 -- Shareable player cards (docs/prd/woc/player-card.md). One card per character;
 -- the PNG is composited client-side and stored here as bytes so any realm
 -- process (all share this database) can serve /p/<slug> and the OG image. slug
@@ -455,6 +475,45 @@ ALTER TABLE creator_skins ADD COLUMN IF NOT EXISTS ipfs_cid TEXT;
 ALTER TABLE creator_skins ADD COLUMN IF NOT EXISTS review_status TEXT NOT NULL DEFAULT 'approved';
 ALTER TABLE creator_skins ADD COLUMN IF NOT EXISTS overflow_hidden BOOLEAN NOT NULL DEFAULT false;
 CREATE INDEX IF NOT EXISTS creator_skins_source ON creator_skins(source);
+-- NFT-PFP skins (docs/prd/woc/nft-pfp-skins.md). source='nft': the body look is a
+-- trait-derived design_spec and the portrait is a proxied PFP image. Provenance is
+-- the (chain, contract, token) of the real NFT; UNIQUE so one in-game skin maps to
+-- one NFT no matter how many accounts have linked it over time. portrait_sha256 is
+-- the cached portrait's content hash (the atlas-serve cache key).
+ALTER TABLE creator_skins ADD COLUMN IF NOT EXISTS nft_chain TEXT;
+ALTER TABLE creator_skins ADD COLUMN IF NOT EXISTS nft_contract TEXT;
+ALTER TABLE creator_skins ADD COLUMN IF NOT EXISTS nft_token_id TEXT;
+ALTER TABLE creator_skins ADD COLUMN IF NOT EXISTS portrait_sha256 TEXT;
+CREATE UNIQUE INDEX IF NOT EXISTS creator_skins_nft
+  ON creator_skins(nft_chain, nft_contract, nft_token_id) WHERE source = 'nft';
+-- The supported-NFT-collection allow-list: the IP control (enable a collection only
+-- after vetting its holder licence), the quality control (profile_id picks the trait
+-- profile), and the anti-abuse control (only listed contracts can be claimed).
+-- standard: 'erc721' | 'cryptopunks' | 'solana'. license_basis is a vetted note.
+CREATE TABLE IF NOT EXISTS nft_collections (
+  chain TEXT NOT NULL,
+  contract TEXT NOT NULL,
+  name TEXT NOT NULL DEFAULT '',
+  standard TEXT NOT NULL,
+  profile_id TEXT NOT NULL DEFAULT 'generic',
+  license_basis TEXT NOT NULL DEFAULT '',
+  enabled BOOLEAN NOT NULL DEFAULT true,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (chain, contract)
+);
+-- The lost-on-sell ledger: an account "wears" an NFT skin only while a live
+-- (revoked_at IS NULL) grant row exists. The continuous re-verify sweep flips
+-- revoked_at when the on-chain owner changes, and back on re-acquire. One row per
+-- (account, skin); the skin row carries the chain/contract/token to re-check.
+CREATE TABLE IF NOT EXISTS nft_grants (
+  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  skin_id TEXT NOT NULL REFERENCES creator_skins(id) ON DELETE CASCADE,
+  verified_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  last_checked_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  revoked_at TIMESTAMPTZ,
+  PRIMARY KEY (account_id, skin_id)
+);
+CREATE INDEX IF NOT EXISTS nft_grants_account ON nft_grants(account_id);
 -- Per-creator moderation trust: approved-listing tally + ToS strikes drive the
 -- "trusted creator" badge (instant-live uploads). first_listing_at anchors the
 -- account-age requirement (cheaper than joining accounts for every quota check).
@@ -1245,6 +1304,245 @@ export async function linkWalletToAccount(accountId: number, pubkey: string): Pr
 
 export async function unlinkWallet(accountId: number): Promise<void> {
   await pool.query('DELETE FROM wallet_links WHERE account_id = $1', [accountId]);
+}
+
+// ── Non-custodial Ethereum/EVM wallet links ────────────────────────────────
+// Mirror of the Solana link above for a second chain (docs/prd/woc/nft-pfp-skins.md).
+// address is always stored lower-cased.
+
+export interface EvmWalletLinkRow {
+  account_id: number;
+  address: string;
+  chain_id: number;
+  linked_at: string;
+}
+
+export async function createEvmWalletChallenge(
+  nonce: string,
+  accountId: number,
+  address: string,
+  message: string,
+  ttlMinutes = 10,
+): Promise<void> {
+  await pool.query(
+    `INSERT INTO evm_wallet_link_challenges (nonce, account_id, address, message, expires_at)
+     VALUES ($1, $2, $3, $4, now() + ($5 || ' minutes')::interval)`,
+    [nonce, accountId, address, message, String(ttlMinutes)],
+  );
+}
+
+export async function consumeEvmWalletChallenge(
+  nonce: string,
+  accountId: number,
+): Promise<{ address: string; message: string } | null> {
+  const res = await pool.query(
+    `DELETE FROM evm_wallet_link_challenges
+     WHERE nonce = $1 AND account_id = $2 AND expires_at > now()
+     RETURNING address, message`,
+    [nonce, accountId],
+  );
+  return res.rows[0] ?? null;
+}
+
+export async function pruneEvmWalletChallenges(): Promise<void> {
+  await pool.query('DELETE FROM evm_wallet_link_challenges WHERE expires_at <= now()');
+}
+
+export async function evmWalletForAccount(accountId: number): Promise<EvmWalletLinkRow | null> {
+  const res = await pool.query(
+    'SELECT account_id, address, chain_id, linked_at FROM evm_wallet_links WHERE account_id = $1',
+    [accountId],
+  );
+  return res.rows[0] ?? null;
+}
+
+export async function accountForEvmWallet(address: string): Promise<number | null> {
+  const res = await pool.query('SELECT account_id FROM evm_wallet_links WHERE address = $1', [address]);
+  return res.rows[0]?.account_id ?? null;
+}
+
+// One EVM wallet per account (account_id PK), one account per wallet (address
+// UNIQUE). Returns false when the address is already owned by a different account.
+export async function linkEvmWalletToAccount(accountId: number, address: string, chainId: number): Promise<boolean> {
+  const owner = await accountForEvmWallet(address);
+  if (owner !== null && owner !== accountId) return false;
+  try {
+    await pool.query(
+      `INSERT INTO evm_wallet_links (account_id, address, chain_id) VALUES ($1, $2, $3)
+       ON CONFLICT (account_id) DO UPDATE SET address = EXCLUDED.address, chain_id = EXCLUDED.chain_id, linked_at = now()`,
+      [accountId, address, chainId],
+    );
+  } catch (err) {
+    if (isUniqueViolation(err)) return false;
+    throw err;
+  }
+  return true;
+}
+
+export async function unlinkEvmWallet(accountId: number): Promise<void> {
+  await pool.query('DELETE FROM evm_wallet_links WHERE account_id = $1', [accountId]);
+}
+
+// ── NFT collection allow-list ──────────────────────────────────────────────
+
+export interface NftCollectionRow {
+  chain: string;
+  contract: string;
+  name: string;
+  standard: string; // 'erc721' | 'cryptopunks' | 'solana'
+  profileId: string;
+  licenseBasis: string;
+  enabled: boolean;
+}
+
+function mapNftCollection(row: Record<string, unknown>): NftCollectionRow {
+  return {
+    chain: row.chain as string,
+    contract: row.contract as string,
+    name: (row.name as string) ?? '',
+    standard: row.standard as string,
+    profileId: (row.profile_id as string) ?? 'generic',
+    licenseBasis: (row.license_basis as string) ?? '',
+    enabled: row.enabled === true,
+  };
+}
+
+export async function listNftCollections(onlyEnabled = false): Promise<NftCollectionRow[]> {
+  const res = await pool.query(
+    `SELECT * FROM nft_collections ${onlyEnabled ? 'WHERE enabled = true' : ''} ORDER BY chain, contract`,
+  );
+  return res.rows.map(mapNftCollection);
+}
+
+export async function getNftCollection(chain: string, contract: string): Promise<NftCollectionRow | null> {
+  const res = await pool.query('SELECT * FROM nft_collections WHERE chain = $1 AND contract = $2', [chain, contract]);
+  return res.rows[0] ? mapNftCollection(res.rows[0]) : null;
+}
+
+export async function upsertNftCollection(row: NftCollectionRow): Promise<void> {
+  await pool.query(
+    `INSERT INTO nft_collections (chain, contract, name, standard, profile_id, license_basis, enabled)
+     VALUES ($1,$2,$3,$4,$5,$6,$7)
+     ON CONFLICT (chain, contract) DO UPDATE SET
+       name = EXCLUDED.name, standard = EXCLUDED.standard, profile_id = EXCLUDED.profile_id,
+       license_basis = EXCLUDED.license_basis, enabled = EXCLUDED.enabled`,
+    [row.chain, row.contract, row.name, row.standard, row.profileId, row.licenseBasis, row.enabled],
+  );
+}
+
+export async function setNftCollectionEnabled(chain: string, contract: string, enabled: boolean): Promise<void> {
+  await pool.query('UPDATE nft_collections SET enabled = $3 WHERE chain = $1 AND contract = $2', [chain, contract, enabled]);
+}
+
+/** All skin ids for a now-disabled collection (so the sweep/registry can delist
+ *  them when an operator removes a collection from the allow-list). */
+export async function nftSkinIdsForCollection(chain: string, contract: string): Promise<string[]> {
+  const res = await pool.query(
+    `SELECT id FROM creator_skins WHERE source = 'nft' AND nft_chain = $1 AND nft_contract = $2`,
+    [chain, contract],
+  );
+  return res.rows.map((r) => r.id as string);
+}
+
+// ── NFT grant ledger (lost-on-sell) ────────────────────────────────────────
+
+export interface NftGrantRow {
+  skinId: string;
+  chain: string;
+  contract: string;
+  tokenId: string;
+  revoked: boolean;
+}
+
+/** Grant (or restore) an NFT skin: append the id to the account's owned set and
+ *  open a live grant row, both under one row lock. Idempotent. */
+export async function grantNftSkin(accountId: number, skinId: string): Promise<void> {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const cur = await client.query('SELECT cosmetics FROM accounts WHERE id = $1 FOR UPDATE', [accountId]);
+    const cosmetics = normalizeAccountCosmetics(cur.rows[0]?.cosmetics);
+    if (!cosmetics.ownedCreatorSkinIds.includes(skinId)) {
+      await client.query('UPDATE accounts SET cosmetics = $2 WHERE id = $1', [
+        accountId,
+        { ...cosmetics, ownedCreatorSkinIds: [...cosmetics.ownedCreatorSkinIds, skinId] },
+      ]);
+    }
+    await client.query(
+      `INSERT INTO nft_grants (account_id, skin_id) VALUES ($1, $2)
+       ON CONFLICT (account_id, skin_id) DO UPDATE SET revoked_at = NULL, verified_at = now(), last_checked_at = now()`,
+      [accountId, skinId],
+    );
+    await client.query('COMMIT');
+  } catch (e) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw e;
+  } finally {
+    client.release();
+  }
+}
+
+/** Revoke an NFT skin: drop the id from the account's owned set and mark the grant
+ *  revoked, under one row lock. Returns true if the account actually held it (so
+ *  the caller knows to force-clear a live equip). */
+export async function revokeNftSkin(accountId: number, skinId: string): Promise<boolean> {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const cur = await client.query('SELECT cosmetics FROM accounts WHERE id = $1 FOR UPDATE', [accountId]);
+    const cosmetics = normalizeAccountCosmetics(cur.rows[0]?.cosmetics);
+    const had = cosmetics.ownedCreatorSkinIds.includes(skinId);
+    if (had) {
+      await client.query('UPDATE accounts SET cosmetics = $2 WHERE id = $1', [
+        accountId,
+        { ...cosmetics, ownedCreatorSkinIds: cosmetics.ownedCreatorSkinIds.filter((id) => id !== skinId) },
+      ]);
+    }
+    await client.query(
+      'UPDATE nft_grants SET revoked_at = now(), last_checked_at = now() WHERE account_id = $1 AND skin_id = $2 AND revoked_at IS NULL',
+      [accountId, skinId],
+    );
+    await client.query('COMMIT');
+    return had;
+  } catch (e) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw e;
+  } finally {
+    client.release();
+  }
+}
+
+export async function touchNftGrant(accountId: number, skinId: string): Promise<void> {
+  await pool.query('UPDATE nft_grants SET last_checked_at = now() WHERE account_id = $1 AND skin_id = $2', [accountId, skinId]);
+}
+
+/** All NFT grants (live + revoked) for an account, joined to provenance so the
+ *  sweep can re-verify each token's owner. */
+export async function listNftGrantsForAccount(accountId: number): Promise<NftGrantRow[]> {
+  const res = await pool.query(
+    `SELECT g.skin_id, g.revoked_at, s.nft_chain, s.nft_contract, s.nft_token_id
+       FROM nft_grants g JOIN creator_skins s ON s.id = g.skin_id
+      WHERE g.account_id = $1 AND s.source = 'nft'`,
+    [accountId],
+  );
+  return res.rows
+    .filter((r) => r.nft_chain && r.nft_contract && r.nft_token_id)
+    .map((r) => ({
+      skinId: r.skin_id as string,
+      chain: r.nft_chain as string,
+      contract: r.nft_contract as string,
+      tokenId: r.nft_token_id as string,
+      revoked: r.revoked_at != null,
+    }));
+}
+
+/** Count of an account's live (non-revoked) NFT grants, for the anti-spam cap. */
+export async function countLiveNftGrantsByAccount(accountId: number): Promise<number> {
+  const res = await pool.query(
+    'SELECT count(*)::int AS n FROM nft_grants WHERE account_id = $1 AND revoked_at IS NULL',
+    [accountId],
+  );
+  return Number(res.rows[0]?.n ?? 0);
 }
 
 // ── Shareable player cards + referrals ─────────────────────────────────────
@@ -2193,7 +2491,7 @@ export interface CreatorSkinRow {
   assetUrl: string;
   emissiveUrl: string | null;
   design: SkinDesignSpec | null; // procedural designer spec; takes precedence over assetUrl
-  source: 'design' | 'self_hosted' | 'hosted';
+  source: 'design' | 'self_hosted' | 'hosted' | 'nft';
   originUrl: string | null; // self_hosted only; SERVER-ONLY, never serialized to clients
   ipfsCid: string | null; // hosted only; Pinata pin
   reviewStatus: 'pending' | 'approved' | 'rejected';
@@ -2201,7 +2499,13 @@ export interface CreatorSkinRow {
   priceUsdc: bigint;
   status: 'draft' | 'review' | 'live' | 'rejected' | 'delisted' | 'removed';
   sha256: string | null;
+  nftChain: string | null; // nft only: 'ethereum' | 'solana'
+  nftContract: string | null; // nft only: lower-cased ERC-721 address / Solana collection id; SERVER-ONLY
+  nftTokenId: string | null; // nft only: uint256 decimal / mint; SERVER-ONLY
+  portraitSha256: string | null; // nft only: cached proxied-portrait content hash
 }
+
+const SKIN_SOURCES = new Set(['design', 'self_hosted', 'hosted', 'nft']);
 
 export interface MarketplaceQuoteRow {
   quoteId: string;
@@ -2228,7 +2532,7 @@ function mapCreatorSkin(row: Record<string, unknown>): CreatorSkinRow {
     assetUrl: row.asset_url as string,
     emissiveUrl: (row.emissive_url as string | null) ?? null,
     design: normalizeDesignSpec(row.design_spec),
-    source: ((row.source as string) === 'self_hosted' || (row.source as string) === 'hosted') ? (row.source as 'self_hosted' | 'hosted') : 'design',
+    source: SKIN_SOURCES.has(row.source as string) ? (row.source as CreatorSkinRow['source']) : 'design',
     originUrl: (row.origin_url as string | null) ?? null,
     ipfsCid: (row.ipfs_cid as string | null) ?? null,
     reviewStatus: ((row.review_status as string) === 'pending' || (row.review_status as string) === 'rejected') ? (row.review_status as 'pending' | 'rejected') : 'approved',
@@ -2236,6 +2540,10 @@ function mapCreatorSkin(row: Record<string, unknown>): CreatorSkinRow {
     priceUsdc: BigInt(row.price_usdc as string),
     status: row.status as CreatorSkinRow['status'],
     sha256: (row.sha256 as string | null) ?? null,
+    nftChain: (row.nft_chain as string | null) ?? null,
+    nftContract: (row.nft_contract as string | null) ?? null,
+    nftTokenId: (row.nft_token_id as string | null) ?? null,
+    portraitSha256: (row.portrait_sha256 as string | null) ?? null,
   };
 }
 
@@ -2260,8 +2568,9 @@ export async function upsertCreatorSkin(row: CreatorSkinRow): Promise<void> {
     `INSERT INTO creator_skins
        (id, creator_account_id, creator_wallet, name, description, skin_catalog,
         fallback_skin, target_class, asset_url, emissive_url, price_usdc, status, sha256, design_spec,
-        source, origin_url, ipfs_cid, review_status, overflow_hidden, updated_at)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19, now())
+        source, origin_url, ipfs_cid, review_status, overflow_hidden,
+        nft_chain, nft_contract, nft_token_id, portrait_sha256, updated_at)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23, now())
      ON CONFLICT (id) DO UPDATE SET
        creator_account_id = EXCLUDED.creator_account_id,
        creator_wallet = EXCLUDED.creator_wallet,
@@ -2281,12 +2590,17 @@ export async function upsertCreatorSkin(row: CreatorSkinRow): Promise<void> {
        ipfs_cid = EXCLUDED.ipfs_cid,
        review_status = EXCLUDED.review_status,
        overflow_hidden = EXCLUDED.overflow_hidden,
+       nft_chain = EXCLUDED.nft_chain,
+       nft_contract = EXCLUDED.nft_contract,
+       nft_token_id = EXCLUDED.nft_token_id,
+       portrait_sha256 = EXCLUDED.portrait_sha256,
        updated_at = now()`,
     [
       row.id, row.creatorAccountId, row.creatorWallet, row.name, row.description, row.skinCatalog,
       row.fallbackSkin, row.targetClass, row.assetUrl, row.emissiveUrl, row.priceUsdc.toString(), row.status, row.sha256,
       row.design ? JSON.stringify(row.design) : null,
       row.source, row.originUrl, row.ipfsCid, row.reviewStatus, row.overflowHidden,
+      row.nftChain, row.nftContract, row.nftTokenId, row.portraitSha256,
     ],
   );
 }

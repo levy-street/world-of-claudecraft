@@ -264,6 +264,10 @@ export async function createListing(input: ListingInput, creatorAccountId: numbe
     priceUsdc: input.priceUsdc,
     status: 'live', // instant-live policy
     sha256: null,
+    nftChain: null,
+    nftContract: null,
+    nftTokenId: null,
+    portraitSha256: null,
   };
   await upsertCreatorSkin(row);
   return { ok: true, id };
@@ -339,6 +343,7 @@ function imageRow(
     source: fields.source, originUrl: fields.originUrl, ipfsCid: fields.ipfsCid,
     reviewStatus: fields.reviewStatus, overflowHidden: false,
     priceUsdc, status: 'live', sha256: fields.sha256,
+    nftChain: null, nftContract: null, nftTokenId: null, portraitSha256: null,
   };
 }
 
