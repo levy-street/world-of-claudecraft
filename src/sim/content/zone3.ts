@@ -1415,7 +1415,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'Graves of the Forgotten',
     giverNpcId: 'brother_aldric_highwatch',
     turnInNpcId: 'brother_aldric_highwatch',
-    text: 'I have seen these marks before, on three old graves around the northern battlefield. Captain Aldren lies on the eastern rise, High Priest Malric near the central broken road, and Royal Assassin Voss by the western cliff. Touch each grave and listen, $N. The dead may remember what the living forgot.',
+    text: 'I have seen these marks before, on three old graves around the northern battlefield. Captain Aldren lies on the western rise, High Priest Malric near the central broken road, and Royal Assassin Voss by the eastern cliff. Touch each grave and listen, $N. The dead may remember what the living forgot.',
     completionText:
       'Aldren remained loyal, Malric refused to accept death, and Voss saw the danger before anyone else. All three served the same forgotten king.',
     objectives: [
@@ -1449,7 +1449,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'The Abandoned Crypt',
     giverNpcId: 'brother_aldric_highwatch',
     turnInNpcId: 'brother_aldric_highwatch',
-    text: "The visions point to the abandoned crypt in the western cliff. There is an old legend that the crypt housed a king. Perhaps Thornpeak sealed him below after Malric's ritual twisted him into something deathless. Enter the crypt and see what remains inside.",
+    text: "The visions point to the abandoned crypt in the eastern cliff. There is an old legend that the crypt housed a king. Perhaps Thornpeak sealed him below after Malric's ritual twisted him into something deathless. Enter the crypt and see what remains inside.",
     completionText:
       "The keystone halves fit together, and Voss's diary names what they sealed: the signet of King Nythraxis. If the diary is true, that signet is the key to his tomb.",
     objectives: [
@@ -1468,7 +1468,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'The Bound Guardian',
     giverNpcId: 'brother_aldric_highwatch',
     turnInNpcId: 'brother_aldric_highwatch',
-    text: "Voss wrote that the survivors sealed the King's Signet behind an ancient guardian, so no one could reach the tomb of Nythraxis by accident or ambition. Take the Crypt Keystone to the ritual circle on the flat ground east of the abandoned crypt and south-east of the western grave. Use it there, break the guardian, and bring back the signet.",
+    text: "Voss wrote that the survivors sealed the King's Signet behind an ancient guardian, so no one could reach the tomb of Nythraxis by accident or ambition. Take the Crypt Keystone to the ritual circle on the flat ground west of the abandoned crypt, midway between the graves. Use it there, break the guardian, and bring back the signet.",
     completionText:
       "The three relics tell the same story: Aldren fought to defend his king, Malric broke the boundary of death, and Voss tried to stop what followed. The seal is weakening, and this signet is the key to Nythraxis's tomb. You are now attuned to enter The Crypt of Nythraxis. Return to the abandoned crypt, unlock the royal door, and face Nythraxis before the old king's rage spills beyond Thornpeak.",
     objectives: [
