@@ -49,7 +49,12 @@ import { DungeonInteriors, ensureDungeonAssets } from './dungeon';
 import { objectDisplayName } from './entity_labels';
 import { releaseSelfFacing, stepSelfFacing } from './facing_smooth';
 import { buildFish, type FishView } from './fish';
-import { buildFoliage, type FoliagePerfStats, type FoliageView } from './foliage';
+import {
+  buildFoliage,
+  buildFoliageMaterialPrewarmGroup,
+  type FoliagePerfStats,
+  type FoliageView,
+} from './foliage';
 import {
   GFX,
   type GfxBucketBands,
@@ -2191,6 +2196,7 @@ export class Renderer {
     let playerPrewarmGroup: THREE.Group | null = null;
     let objectPrewarmGroup: THREE.Group | null = null;
     let propMaterialPrewarmGroup: THREE.Group | null = null;
+    let foliagePrewarmGroup: THREE.Group | null = null;
 
     let renderPasses = 0;
     let playerPrewarmVisuals = 0;
@@ -2381,6 +2387,21 @@ export class Renderer {
         detail: () => `objects=${propMaterialPrewarmGroup?.children.length ?? 0}`,
       },
       {
+        // Compile every foliage shader (tree/rock/dressing species + far-tree
+        // impostors) at boot. The renderer streams foliage buckets in as you
+        // move, so distant-only species otherwise link their shaders mid-travel
+        // (the open-world hitch walking north out of spawn).
+        id: 'foliage.materials',
+        category: 'props',
+        priority: 46,
+        required: false,
+        run: () => {
+          foliagePrewarmGroup = buildFoliageMaterialPrewarmGroup();
+          this.scene.add(foliagePrewarmGroup);
+        },
+        detail: () => `objects=${foliagePrewarmGroup?.children.length ?? 0}`,
+      },
+      {
         id: 'textures.scene',
         category: 'world',
         priority: 50,
@@ -2509,6 +2530,7 @@ export class Renderer {
       if (playerPrewarmGroup) this.scene.remove(playerPrewarmGroup);
       if (objectPrewarmGroup) this.scene.remove(objectPrewarmGroup);
       if (propMaterialPrewarmGroup) this.scene.remove(propMaterialPrewarmGroup);
+      if (foliagePrewarmGroup) this.scene.remove(foliagePrewarmGroup);
     }
 
     const elapsed = performance.now() - started;

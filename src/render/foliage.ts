@@ -478,6 +478,42 @@ function farTreeProxyMaterial(shape: SpeciesSpec['proxyShape']): THREE.Material 
   return mat;
 }
 
+// Compile every foliage shader program up front. The renderer streams its tree /
+// rock buckets in as the player moves, so a species (or its far-impostor) whose
+// buckets are not near spawn otherwise links its shader the first time you walk
+// into it: the open-world travel hitch. buildFoliage() runs before the prewarm and
+// has already populated materialCache with one shared material per source-material
+// name across all species, so we instantiate one mesh per cached material. A dummy
+// geo carrying uv + vertex colours reproduces the program defines (USE_MAP /
+// USE_COLOR / instancing) the live InstancedMesh buckets use, so the programs
+// dedupe by cache key. Caller adds the group to the scene before the compile pass
+// and removes it afterwards. (Grass compiles at spawn via the player-centred ring,
+// so it is intentionally not duplicated here.)
+export function buildFoliageMaterialPrewarmGroup(): THREE.Group {
+  const group = new THREE.Group();
+  group.name = 'foliage-material-prewarm';
+  group.position.set(0, -1000, 0); // off-screen; compileAsync ignores position
+  // Ensure the far-tree impostor materials exist (created lazily per far bucket;
+  // gated exactly like the live tree builder).
+  if (GFX.standardMaterials && !GFX.leanFoliage) {
+    for (const shape of ['pine', 'round', 'twisted', 'dead'] as const) farTreeProxyMaterial(shape);
+  }
+  const geo = withWhiteVertexColors(new THREE.PlaneGeometry(0.02, 0.02));
+  const identity = new THREE.Matrix4();
+  const add = (mat: THREE.Material): void => {
+    const im = new THREE.InstancedMesh(geo, mat, 1);
+    im.setMatrixAt(0, identity);
+    im.instanceMatrix.needsUpdate = true;
+    im.castShadow = false;
+    im.receiveShadow = false;
+    im.frustumCulled = false;
+    group.add(im);
+  };
+  for (const mat of materialCache.values()) add(mat);
+  for (const mat of farTreeProxyMatCache.values()) add(mat);
+  return group;
+}
+
 // far-LOD stand-in for a straight trunk: an open tapered cylinder sized from
 // the bark's bounding box, drawn with the same bark material (the atlas
 // smears, but at 300+u in fog it reads as bark)
