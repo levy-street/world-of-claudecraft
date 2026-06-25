@@ -49,6 +49,9 @@ export interface MarketplaceHooks {
   fetchQuota(): Promise<{ tier: number; quota: number; used: number; remaining: number; trusted: boolean; hostingEnabled: boolean; selfHostedFree: boolean }>;
   // The viewer's class, so the designer previews the skin on their own body.
   playerClass(): PlayerClass;
+  // Open the NFT-PFP skins picker (wear an owned NFT). Optional; the entry point
+  // hides when unset.
+  openNftSkins?(): void;
 }
 
 let hooks: MarketplaceHooks | null = null;
@@ -127,18 +130,27 @@ function thumbSrc(skin: CreatorSkinRegistryEntry): string {
 }
 
 function renderBrowse(content: HTMLElement, skins: CreatorSkinRegistryEntry[]): void {
+  const nftButton = hooks?.openNftSkins
+    ? `<button type="button" class="market-nft-cta" style="min-height:40px;padding:0 14px;border-radius:6px;border:1px solid #6b5226;background:#241a14;color:#caa84b;font-weight:600;cursor:pointer">${esc(t('hudChrome.nftSkins.title'))}</button>`
+    : '';
   content.innerHTML =
     `<div class="market-browse">` +
-    `<input type="text" class="market-search" aria-label="${esc(t('marketplace.search'))}" placeholder="${esc(t('marketplace.search'))}">` +
+    `<div class="market-browse-head" style="display:flex;gap:8px;align-items:center">` +
+    `<input type="text" class="market-search" style="flex:1" aria-label="${esc(t('marketplace.search'))}" placeholder="${esc(t('marketplace.search'))}">` +
+    nftButton +
+    `</div>` +
     `<div class="market-grid" role="list"></div>` +
     `</div>`;
   const grid = content.querySelector('.market-grid') as HTMLElement;
   const search = content.querySelector('.market-search') as HTMLInputElement;
+  content.querySelector('.market-nft-cta')?.addEventListener('click', () => hooks?.openNftSkins?.());
 
   const draw = (filter: string): void => {
     const owned = new Set(hooks?.ownedSkinIds() ?? []);
     const q = filter.trim().toLowerCase();
-    const shown = skins.filter((s) => !q || s.name.toLowerCase().includes(q) || s.creator.toLowerCase().includes(q));
+    // NFT-PFP skins are claimed (proof of ownership), not bought, so they never
+    // appear in the for-sale browse grid; they are reached via the picker.
+    const shown = skins.filter((s) => !s.nft && (!q || s.name.toLowerCase().includes(q) || s.creator.toLowerCase().includes(q)));
     grid.innerHTML = '';
     if (shown.length === 0) {
       const empty = document.createElement('div');

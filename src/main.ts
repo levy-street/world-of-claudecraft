@@ -73,6 +73,8 @@ import type { WalletOption } from './net/wallet';
 import { assetsReady } from './render/assets/preload';
 import { registerCreatorSkins } from './render/characters/assets';
 import { attachMarketplace as attachMarketplaceHooks, openMarketplace } from './ui/marketplace';
+import { openNftSkinsWindow } from './ui/nft_skins_window';
+import { discoverEvmProviders, connectEvm, signEvmMessage } from './net/wallet_evm';
 import { CharacterPreview } from './render/characters';
 import { skinCount } from './render/characters/manifest';
 import { playerPortraitDataUrl } from './render/characters/portrait';
@@ -1566,11 +1568,44 @@ async function startGame(
         online.accountCosmetics.ownedCreatorSkinIds.push(id);
       }
     };
+    // Connect + sign + link an Ethereum wallet (EIP-6963 discovery -> personal_sign
+    // -> server-verified link). Returns the linked address, or null if cancelled.
+    const linkEthereumWallet = async (): Promise<string | null> => {
+      const providers = await discoverEvmProviders();
+      if (providers.length === 0) return null;
+      const provider = providers[0].provider;
+      const address = await connectEvm(provider);
+      if (!address) return null;
+      const { message, nonce } = await api.evmWalletLinkChallenge(address);
+      const signature = await signEvmMessage(provider, address, message);
+      await api.linkEvmWallet(address, signature, nonce);
+      return address;
+    };
+    // Connect + sign + link a Solana wallet via the existing Wallet Standard flow.
+    const linkSolanaWallet = async (): Promise<string | null> => {
+      const wallet = await loadWallet();
+      if (!wallet.currentWallet().isConnected) await wallet.openWalletModal();
+      const address = wallet.currentWallet().address;
+      if (!address) return null;
+      const { message, nonce } = await api.walletLinkChallenge(address);
+      const signature = await wallet.signMessageBase58(message);
+      await api.linkWallet(address, signature, nonce);
+      return address;
+    };
     attachMarketplaceHooks({
       listSkins: () => api.creatorSkins(),
       ownedSkinIds: () => online.accountCosmetics.ownedCreatorSkinIds,
       isWalletConnected: () => (walletMod ? walletMod.currentWallet().isConnected : false),
       connectWallet: async () => { await (await loadWallet()).openWalletModal(); },
+      openNftSkins: () => {
+        void openNftSkinsWindow({
+          eligible: () => api.nftEligible(),
+          claim: async (chain, contract, tokenId) => ({ id: (await api.claimNftSkin(chain, contract, tokenId)).id }),
+          linkEthereum: linkEthereumWallet,
+          linkSolana: linkSolanaWallet,
+          onClaimed: (id) => { markOwned(id); void api.creatorSkins().then((s) => registerCreatorSkins(s)); },
+        });
+      },
       equip: (skin) => online.changeSkin(skin.fallbackSkin, skin.skinCatalog, skin.id),
       purchase: async (skin) => {
         const wallet = await loadWallet();
