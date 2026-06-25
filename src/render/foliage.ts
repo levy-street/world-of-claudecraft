@@ -560,10 +560,17 @@ export function buildFoliageMaterialPrewarmGroup(): THREE.Group {
   }
   const geo = withWhiteVertexColors(new THREE.PlaneGeometry(0.02, 0.02));
   const identity = new THREE.Matrix4();
+  const white = new THREE.Color(1, 1, 1);
   const add = (mat: THREE.Material): void => {
     const im = new THREE.InstancedMesh(geo, mat, 1);
     im.setMatrixAt(0, identity);
+    // Every live foliage InstancedMesh carries a per-instance biome/leaf tint
+    // (setColorAt), which adds USE_INSTANCING_COLOR to the program. Set it here too
+    // or the prewarmed program differs from the one the live buckets need and they
+    // recompile on first sight (the residual travel hitch).
+    im.setColorAt(0, white);
     im.instanceMatrix.needsUpdate = true;
+    if (im.instanceColor) im.instanceColor.needsUpdate = true;
     im.castShadow = false;
     im.receiveShadow = false;
     im.frustumCulled = false;
