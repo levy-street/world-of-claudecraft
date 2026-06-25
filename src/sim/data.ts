@@ -101,6 +101,9 @@ export {
 
 import { DELVE_ITEMS } from './content/delves/items';
 import { DELVE_MODULE_LAYOUTS, type DelveModuleId, delveModuleSpan } from './delve_layout';
+import { HARVEST_NODES, PROFESSIONS, RECIPES } from './content/professions';
+import { PROFESSION_ITEMS } from './content/profession_items';
+import type { HarvestNodeDef, ProfessionDef, ProfessionId, RecipeDef } from './types';
 
 function mergeItems(...parts: Record<string, ItemDef>[]): Record<string, ItemDef> {
   const merged = Object.assign({}, ...parts);
@@ -137,6 +140,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   ZONE3_ITEMS,
   TEMPLE_ITEMS,
   DELVE_ITEMS,
+  PROFESSION_ITEMS,
 );
 
 export const MOBS: Record<string, MobTemplate> = {
@@ -191,6 +195,28 @@ export const GROUND_OBJECTS: GroundObjectDef[] = [
   ...ZONE3_OBJECTS,
   ...TEMPLE_OBJECTS,
 ];
+
+// Professions (gathering + crafting). The content lives in content/professions.ts
+// and content/profession_items.ts; here we re-export the tables and build O(1)
+// lookups the sim uses on the harvest/craft paths.
+export { PROFESSIONS, HARVEST_NODES, RECIPES };
+export type { HarvestNodeDef, ProfessionDef, ProfessionId, RecipeDef };
+
+export const PROFESSION_LIST: ProfessionDef[] = Object.values(PROFESSIONS);
+export const HARVEST_NODE_BY_ID: Record<string, HarvestNodeDef> = Object.fromEntries(
+  HARVEST_NODES.map((n) => [n.id, n]),
+);
+export const RECIPE_BY_ID: Record<string, RecipeDef> = Object.fromEntries(
+  RECIPES.map((r) => [r.id, r]),
+);
+// Recipe ids grouped by profession, for the crafting UI.
+export const RECIPES_BY_PROFESSION: Record<ProfessionId, RecipeDef[]> = RECIPES.reduce(
+  (acc, r) => {
+    (acc[r.profession] ??= []).push(r);
+    return acc;
+  },
+  {} as Record<ProfessionId, RecipeDef[]>,
+);
 
 export const ROADS: { x: number; z: number }[][] = [...ZONE1_ROADS, ...ZONE2_ROADS, ...ZONE3_ROADS];
 

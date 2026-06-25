@@ -14,6 +14,7 @@ import {
   EQUIP_SLOTS,
   type EquipSlot,
   emptyMoveInput,
+  type ProfessionId,
   RUN_SPEED,
   type SimEvent,
 } from '../src/sim/types';
@@ -1444,6 +1445,24 @@ export class GameServer {
       case 'pickup':
         if (typeof msg.id === 'number') sim.pickUpObject(msg.id, pid);
         break;
+      // Professions (gathering + crafting). The sim validates the id/skill/cost
+      // and is the sole authority; an unknown id is a no-op there.
+      case 'learnProfession':
+        if (typeof msg.profession === 'string')
+          sim.learnProfession(msg.profession as ProfessionId, pid);
+        break;
+      case 'abandonProfession':
+        if (typeof msg.profession === 'string')
+          sim.abandonProfession(msg.profession as ProfessionId, pid);
+        break;
+      case 'advanceProfession':
+        if (typeof msg.profession === 'string')
+          sim.advanceProfessionRank(msg.profession as ProfessionId, pid);
+        break;
+      case 'craft':
+        if (typeof msg.recipe === 'string' && typeof msg.count === 'number')
+          sim.craftItem(msg.recipe, msg.count, pid);
+        break;
       case 'accept':
         if (typeof msg.quest === 'string') {
           sim.acceptQuest(msg.quest, pid);
@@ -2188,6 +2207,7 @@ export class GameServer {
     maybe('dcomp', this.sim.companionUpgradesFor(session.pid));
     maybe('dclears', this.sim.delveClearsFor(session.pid));
     maybe('delveDaily', this.sim.delveDailyWire(session.pid));
+    maybe('profs', this.sim.professionState(session.pid));
     // talents/spec/loadouts ride the wire only when they change (PR-5: never
     // every snapshot). The client recomputes its known abilities from this.
     maybe('tal', {

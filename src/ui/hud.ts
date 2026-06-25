@@ -66,6 +66,7 @@ import {
   isDelvePos,
   MOBS,
   NPCS,
+  PROFESSIONS,
   PROPS,
   QUESTS,
   questRewardItem,
@@ -89,6 +90,7 @@ import type {
   LootRollChoice,
   PetMode,
   PlayerClass,
+  ProfessionId,
   ResourceType,
   SkinRank,
   Stats,
@@ -106,6 +108,7 @@ import {
   MAX_LEVEL,
   MELEE_RANGE,
   MILESTONES,
+  PROFESSION_RANKS,
   type SimEvent,
   virtualLevel,
   xpUntilNextPrestige,
@@ -287,6 +290,8 @@ import { TutorialOverlay } from './tutorial';
 import { svgIcon } from './ui_icons';
 import { getUiScale } from './ui_scale';
 import { crestIdForEntity } from './unit_portrait';
+import { buildProfessionsView } from './professions_view';
+import { type ProfessionsWindowDeps, renderProfessionsWindow } from './professions_window';
 import { UnitPortraitPainter } from './unit_portrait_painter';
 import { buildVendorView } from './vendor_view';
 import { renderVendorWindow } from './vendor_window';
@@ -496,7 +501,39 @@ const ITEM_KIND_LABEL_KEYS: Record<ItemDef['kind'], TranslationKey> = {
   tool: 'itemUi.kind.tool',
   potion: 'itemUi.kind.potion',
   elixir: 'itemUi.kind.elixir',
+  material: 'hudChrome.itemKind.material',
 };
+// Profession + rank display-name keys (English-only hud_chrome), resolved by id.
+const PROFESSION_NAME_KEYS: Record<ProfessionId, TranslationKey> = {
+  mining: 'hudChrome.professions.names.mining',
+  herbalism: 'hudChrome.professions.names.herbalism',
+  blacksmithing: 'hudChrome.professions.names.blacksmithing',
+  alchemy: 'hudChrome.professions.names.alchemy',
+};
+const PROFESSION_RANK_KEYS: Record<string, TranslationKey> = {
+  apprentice: 'hudChrome.professions.ranks.apprentice',
+  journeyman: 'hudChrome.professions.ranks.journeyman',
+  expert: 'hudChrome.professions.ranks.expert',
+};
+// Reverse English-name -> id maps, so the sim's English emit text (which splices
+// the raw profession/rank name) can be re-localized through the keys above.
+const PROFESSION_NAME_TO_ID: Record<string, ProfessionId> = Object.fromEntries(
+  Object.values(PROFESSIONS).map((p) => [p.name, p.id]),
+) as Record<string, ProfessionId>;
+const PROFESSION_RANK_NAME_TO_ID: Record<string, string> = Object.fromEntries(
+  PROFESSION_RANKS.map((r) => [r.name, r.id]),
+);
+function professionNameLabel(id: ProfessionId): string {
+  return t(PROFESSION_NAME_KEYS[id]);
+}
+function localizeProfessionName(english: string): string {
+  const id = PROFESSION_NAME_TO_ID[english];
+  return id ? t(PROFESSION_NAME_KEYS[id]) : english;
+}
+function localizeProfessionRank(english: string): string {
+  const id = PROFESSION_RANK_NAME_TO_ID[english];
+  return id ? t(PROFESSION_RANK_KEYS[id]) : english;
+}
 const ITEM_STAT_LABEL_KEYS: Partial<Record<keyof Stats, TranslationKey>> = {
   armor: 'itemUi.stats.armor',
   str: 'itemUi.stats.str',
@@ -1265,6 +1302,7 @@ export class Hud {
     mapCanvas.addEventListener('pointerup', endDrag);
     mapCanvas.addEventListener('pointercancel', endDrag);
     $('#mm-bag').addEventListener('click', () => this.toggleBags());
+    $('#mm-professions')?.addEventListener('click', () => this.toggleProfessions());
     // Drop an equipped piece dragged out of the paperdoll onto the bags window.
     const bagsEl = $('#bags');
     bagsEl.addEventListener('dragover', (e) => {
@@ -1606,6 +1644,9 @@ export class Hud {
         break;
       case 'vendor-window':
         this.closeVendor();
+        break;
+      case 'professions-window':
+        this.closeProfessions();
         break;
       case 'loot-window':
         this.closeLoot();
@@ -2610,6 +2651,7 @@ export class Hud {
     if ($('#bags').style.display === 'block') this.renderBags();
     if (this.openVendorNpcId !== null && $('#vendor-window').style.display === 'block')
       this.renderVendor();
+    if ($('#professions-window').style.display === 'block') this.renderProfessions();
     if (this.marketOpen) {
       this.lastMarketSig = '';
       this.renderMarket();
@@ -6206,6 +6248,25 @@ export class Hud {
           audio.levelUp();
           break;
         }
+        case 'professionLearned': {
+          const name = professionNameLabel(ev.profession);
+          this.showBanner(t('hudChrome.professions.learned', { prof: name }));
+          this.log(t('hudChrome.professions.learned', { prof: name }), '#ffd100');
+          audio.questAccept();
+          break;
+        }
+        case 'professionSkill': {
+          // skill-up: a quiet log line (no banner) so frequent gathers/crafts do
+          // not spam the screen.
+          this.log(
+            t('hudChrome.professions.skillUp', {
+              prof: professionNameLabel(ev.profession),
+              skill: this.questNumber(ev.skill),
+            }),
+            '#9fd4ff',
+          );
+          break;
+        }
         case 'learnAbility':
           break; // logged by sim
         case 'comboPoint':
@@ -6966,6 +7027,7 @@ export class Hud {
       'That quest turn-in is not nearby.': 'questUi.errors.turnInMissing',
       'Too far away.': 'questUi.errors.tooFar',
       "This quest can't be shared.": 'hudChrome.questShare.notShareable',
+      'You lack the reagents.': 'hudChrome.professions.lackReagents',
       'That item is not sold here.': 'itemUi.errors.notSoldHere',
       'Not enough money.': 'itemUi.errors.notEnoughMoney',
       'You must bring your goods to the Merchant.': 'itemUi.errors.bringGoods',
@@ -7048,6 +7110,43 @@ export class Hud {
         name: dungeonDisplayNameFromSource(busyName),
       });
     }
+    // Professions (gathering + crafting): the sim emits English with the raw
+    // profession/rank name spliced in; re-localize the sentence and the name.
+    // The number captures use (.+) not (\d+) so the S3 scanner's placeholder
+    // token (a non-numeric stand-in for ${...}) still matches the regex.
+    match = /^You need (.+) to gather this\.$/.exec(text);
+    if (match)
+      return t('hudChrome.professions.needGather', { prof: localizeProfessionName(match[1]) });
+    match = /^Your (.+) skill is too low \(requires (.+)\)\.$/.exec(text);
+    if (match)
+      return t('hudChrome.professions.skillTooLow', {
+        prof: localizeProfessionName(match[1]),
+        n: this.questNumber(Number(match[2])),
+      });
+    match = /^You have already learned (.+)\.$/.exec(text);
+    if (match)
+      return t('hudChrome.professions.alreadyLearned', { prof: localizeProfessionName(match[1]) });
+    match = /^You have not learned (.+)\.$/.exec(text);
+    if (match)
+      return t('hudChrome.professions.notLearned', { prof: localizeProfessionName(match[1]) });
+    match = /^Your (.+) is already at the highest rank\.$/.exec(text);
+    if (match)
+      return t('hudChrome.professions.maxRank', { prof: localizeProfessionName(match[1]) });
+    match = /^Raise your (.+) skill to (.+) first\.$/.exec(text);
+    if (match)
+      return t('hudChrome.professions.raiseFirst', {
+        prof: localizeProfessionName(match[1]),
+        n: this.questNumber(Number(match[2])),
+      });
+    match = /^You need (.+) to train (.+)\.$/.exec(text);
+    if (match)
+      return t('hudChrome.professions.needMoney', {
+        money: this.localizeSimMoney(match[1]),
+        rank: localizeProfessionRank(match[2]),
+      });
+    match = /^You can only learn (.+) professions\. Drop one to learn another\.$/.exec(text);
+    if (match)
+      return t('hudChrome.professions.capReachedLearn', { cap: this.questNumber(Number(match[1])) });
     const server = localizeServerText(text);
     if (server !== null) return server;
     // Sim-emitted log/error/loot text (src/sim) is English at the source; localize it
@@ -7127,6 +7226,15 @@ export class Hud {
         count: formatNumber(Number(match[2]), { maximumFractionDigits: 0 }),
       });
     }
+    // Professions: rank-up and unlearn notices (sim 'log' emits).
+    match = /^You advance to (\w+) (\w+)\.$/.exec(text);
+    if (match)
+      return t('hudChrome.professions.advanced', {
+        rank: localizeProfessionRank(match[1]),
+        prof: localizeProfessionName(match[2]),
+      });
+    match = /^You forget the ways of (.+)\.$/.exec(text);
+    if (match) return t('hudChrome.professions.forgot', { prof: localizeProfessionName(match[1]) });
     // Server-sent friends/guild/who/world messages arrive as 'log' events; fall
     // back to the shared server-message localizer (same as localizeErrorText /
     // localizeLootText) so they are not displayed in raw English.
@@ -13960,6 +14068,64 @@ export class Hud {
   private closeOtherWindows(_keep?: string | string[]): void {
     this.closeContextMenu();
     this.hideTooltip();
+  }
+
+  // ----- Professions window (gathering + crafting) --------------------------
+  toggleProfessions(): void {
+    const el = $('#professions-window');
+    if (this.isWindowVisible(el)) {
+      this.closeProfessions();
+      return;
+    }
+    this.closeContextMenu();
+    this.renderProfessions();
+    el.style.display = 'block';
+    this.syncWindowOpenState(el);
+    audio.bagOpen();
+  }
+
+  closeProfessions(): void {
+    const el = $('#professions-window');
+    el.style.display = 'none';
+    this.syncWindowOpenState(el);
+    this.hideTooltip();
+  }
+
+  private renderProfessions(): void {
+    const el = $('#professions-window');
+    const view = buildProfessionsView({
+      professions: this.sim.professions,
+      copper: this.sim.copper,
+      inventory: this.sim.inventory,
+    });
+    const deps: ProfessionsWindowDeps = {
+      itemIcon: (itemId) => {
+        const item = ITEMS[itemId];
+        return item ? this.itemIcon(item) : '';
+      },
+      itemName: (itemId) => {
+        const item = ITEMS[itemId];
+        return item ? itemDisplayName(item) : itemId;
+      },
+      itemTooltip: (item) => this.itemTooltip(item),
+      attachTooltip: (node, html) => this.attachTooltip(node, html),
+      hideTooltip: () => this.hideTooltip(),
+      moneyHtml: (copper) => this.moneyHtml(copper),
+      onLearn: (id) => this.sim.learnProfession(id),
+      onAbandon: (id) => {
+        this.confirmDialog(
+          t('hudChrome.professions.title'),
+          t('hudChrome.professions.abandonConfirm', { prof: t(PROFESSION_NAME_KEYS[id]) }),
+          t('hudChrome.professions.abandon'),
+          t('game.talents.cancel'),
+          () => this.sim.abandonProfession(id),
+        );
+      },
+      onAdvanceRank: (id) => this.sim.advanceProfessionRank(id),
+      onCraft: (recipeId, count) => this.sim.craftItem(recipeId, count),
+      onClose: () => this.closeProfessions(),
+    };
+    renderProfessionsWindow(el, view, deps);
   }
 
   // Closes the topmost UI. Returns true if something was closed.

@@ -78,6 +78,8 @@ import {
   FISHING_TABLES,
   GROUND_OBJECTS,
   GROUP_XP_BONUS,
+  HARVEST_NODE_BY_ID,
+  HARVEST_NODES,
   INSTANCE_SLOT_COUNT,
   ITEMS,
   instanceOrigin,
@@ -86,9 +88,11 @@ import {
   MOBS,
   NPCS,
   PLAYER_START,
+  PROFESSIONS,
   PROPS,
   QUESTS,
   questRewardItemId,
+  RECIPE_BY_ID,
   resolveDelveShopOffers,
   ZONES,
   zoneAt,
@@ -185,6 +189,7 @@ import {
   type ErrorReason,
   emptyMoveInput,
   FISHING_CAST_ID,
+  type HarvestNodeDef,
   FISHING_CAST_TIME,
   GCD,
   INTERACT_RANGE,
@@ -210,6 +215,13 @@ import {
   type OverheadEmoteId,
   type PetMode,
   type PlayerClass,
+  PROFESSION_PRIMARY_CAP,
+  PROFESSION_RANKS,
+  PROFESSION_SKILL_MAX,
+  type ProfessionId,
+  professionCap,
+  professionRankName,
+  professionSkillUpChance,
   type QuestDef,
   type QuestProgress,
   type QuestState,
@@ -862,6 +874,17 @@ export interface PlayerMeta {
   companionUpgrades: Record<string, number>;
   delveLoreUnlocked: Set<string>;
   delveDaily: { date: string; firstClearXp: Set<string>; markClears: number };
+  // Professions (gathering + crafting). Only learned professions appear in the
+  // map; each carries its skill (1..PROFESSION_SKILL_MAX) and rank tier (index
+  // into PROFESSION_RANKS, which caps the skill). Persisted in CharacterState.
+  professions: Map<ProfessionId, ProfessionSkill>;
+}
+
+// Per-profession progression. `skill` is the single classic-style skill track;
+// `rankTier` indexes PROFESSION_RANKS (0 = Apprentice) and bounds the skill.
+export interface ProfessionSkill {
+  skill: number;
+  rankTier: number;
 }
 
 // Away-from-keyboard / do-not-disturb presence. `afk` still delivers whispers
@@ -966,6 +989,8 @@ export interface CharacterState {
   companionUpgrades?: Record<string, number>;
   delveLoreUnlocked?: string[];
   delveDaily?: { date: string; firstClearXp: string[]; markClears: number };
+  // Professions (JSONB; optional so pre-professions saves load cleanly as none).
+  professions?: { id: ProfessionId; skill: number; rankTier: number }[];
 }
 
 export interface PetState {
@@ -1202,6 +1227,21 @@ export class Sim {
       }
     }
 
+    // Profession gather nodes (ore veins / herbs). Spawned as ground objects so
+    // they share the interact + respawn loop; the node id is the objectItemId,
+    // which pickUpObject recognizes via HARVEST_NODE_BY_ID and routes to harvest.
+    for (const node of HARVEST_NODES) {
+      for (const p of node.positions) {
+        const obj = createGroundObject(
+          this.nextId++,
+          node.id,
+          node.name,
+          this.groundPos(p.x, p.z),
+        );
+        this.addEntity(obj);
+      }
+    }
+
     // Dungeon entrances + their private instance slots
     for (const dungeon of DUNGEON_LIST) {
       if (dungeon.overworldDoor === false) {
@@ -1419,6 +1459,7 @@ export class Sim {
       companionUpgrades: {},
       delveLoreUnlocked: new Set(),
       delveDaily: { date: '', firstClearXp: new Set(), markClears: 0 },
+      professions: new Map(),
     };
     this.players.set(player.id, meta);
     player.skinCatalog = meta.skinCatalog;
@@ -1481,6 +1522,15 @@ export class Sim {
           firstClearXp: new Set(s.delveDaily.firstClearXp),
           markClears: s.delveDaily.markClears,
         };
+      }
+      if (s.professions) {
+        for (const p of s.professions) {
+          if (!PROFESSIONS[p.id]) continue; // skip professions removed since the save
+          meta.professions.set(p.id, {
+            skill: Math.max(1, Math.min(PROFESSION_SKILL_MAX, Math.floor(p.skill))),
+            rankTier: Math.max(0, Math.min(PROFESSION_RANKS.length - 1, Math.floor(p.rankTier))),
+          });
+        }
       }
     }
 
@@ -1634,6 +1684,11 @@ export class Sim {
         firstClearXp: [...meta.delveDaily.firstClearXp],
         markClears: meta.delveDaily.markClears,
       },
+      professions: [...meta.professions.entries()].map(([id, ps]) => ({
+        id,
+        skill: ps.skill,
+        rankTier: ps.rankTier,
+      })),
     };
     return sanitizeRemovedZone1Content(state).state;
   }
@@ -1812,6 +1867,11 @@ export class Sim {
   }
   get unlockedMilestones(): string[] {
     return [...this.primary.unlockedMilestones];
+  }
+  // IWorld: the local player's learned professions (skill + rank tier). The
+  // static catalog is read from sim/data; online play mirrors this via snapshot.
+  get professions(): { id: ProfessionId; skill: number; rankTier: number }[] {
+    return this.professionState(this.primaryId);
   }
   // Offline leaderboard: rank the players the local sim knows about by lifetime
   // XP. Online play overrides this with the cached, realm-scoped server query.
@@ -10267,6 +10327,15 @@ export class Sim {
     }
     if (this.tryStartNythraxisWardChannel(obj, p)) return;
     if (this.activateNythraxisRelic(obj, meta)) return;
+    // Harvest nodes (ore veins / herbs) reuse the interact command and the
+    // ground-object respawn loop, but route through the profession path instead
+    // of plain pickup. Checked before the quest/item branches because a node's
+    // objectItemId is a node id, not an ITEMS id.
+    const node = HARVEST_NODE_BY_ID[obj.objectItemId];
+    if (node) {
+      this.harvestNode(node, obj, meta);
+      return;
+    }
     if (this.interactObjectForQuests(obj, meta)) return;
     const def = ITEMS[obj.objectItemId];
     if (def?.questId) {
@@ -10294,6 +10363,190 @@ export class Sim {
     this.addItem(obj.objectItemId, 1, meta.entityId);
     obj.lootable = false;
     obj.respawnTimer = OBJECT_RESPAWN;
+  }
+
+  // ----- Professions (gathering + crafting) ---------------------------------
+  // Gathering reuses the interact/pickUpObject command (routed to harvestNode);
+  // crafting + learning are their own server-authoritative commands. Skill is
+  // the progression: a 1..PROFESSION_SKILL_MAX track per learned profession,
+  // raised by a difficulty-coloured roll (professionSkillUpChance) and capped by
+  // the rank tier trained at cost. All numbers follow the classic-era model.
+
+  /** Read-only snapshot of the player's learned professions, for IWorld/UI. */
+  professionState(pid?: number): { id: ProfessionId; skill: number; rankTier: number }[] {
+    const r = this.resolve(pid);
+    if (!r) return [];
+    return [...r.meta.professions.entries()].map(([id, ps]) => ({
+      id,
+      skill: ps.skill,
+      rankTier: ps.rankTier,
+    }));
+  }
+
+  /** Roll a single skill-up for a completed gather/craft at the given
+   *  difficulty. Bounded by the rank-tier cap and the absolute max. Emits the
+   *  cosmetic skill event on success. */
+  private rollProfessionSkillUp(
+    meta: PlayerMeta,
+    profession: ProfessionId,
+    reqSkill: number,
+    grey: number,
+  ): void {
+    const ps = meta.professions.get(profession);
+    if (!ps) return;
+    const cap = Math.min(professionCap(ps.rankTier), PROFESSION_SKILL_MAX);
+    if (ps.skill >= cap) return;
+    const chance = professionSkillUpChance(ps.skill, reqSkill, grey);
+    if (chance <= 0) return;
+    if (this.rng.next() < chance) {
+      ps.skill = Math.min(cap, ps.skill + 1);
+      this.emit({
+        type: 'professionSkill',
+        profession,
+        skill: ps.skill,
+        rankName: professionRankName(ps.rankTier),
+        pid: meta.entityId,
+      });
+    }
+  }
+
+  /** Harvest a gather node (ore vein / herb). Validates the profession + skill,
+   *  rolls yields and a skill-up, then respawns the node on its own timer. */
+  private harvestNode(node: HarvestNodeDef, obj: Entity, meta: PlayerMeta): void {
+    const profName = PROFESSIONS[node.profession].name;
+    const ps = meta.professions.get(node.profession);
+    if (!ps) {
+      this.error(meta.entityId, `You need ${profName} to gather this.`);
+      return;
+    }
+    if (ps.skill < node.reqSkill) {
+      this.error(meta.entityId, `Your ${profName} skill is too low (requires ${node.reqSkill}).`);
+      return;
+    }
+    for (const y of node.yields) {
+      if (y.chance !== undefined && this.rng.next() >= y.chance) continue;
+      const count = y.min >= y.max ? y.min : this.rng.int(y.min, y.max);
+      if (count > 0) this.addItem(y.itemId, count, meta.entityId);
+    }
+    this.rollProfessionSkillUp(meta, node.profession, node.reqSkill, node.grey);
+    obj.lootable = false;
+    obj.respawnTimer = node.respawnSec ?? OBJECT_RESPAWN;
+    meta.lastActiveTick = this.tickCount;
+  }
+
+  /** Learn a new profession (server-authoritative). Bounded by the primary cap;
+   *  starts at skill 1, Apprentice rank. */
+  learnProfession(profession: ProfessionId, pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    const { meta } = r;
+    const def = PROFESSIONS[profession];
+    if (!def) return;
+    if (meta.professions.has(profession)) {
+      this.error(meta.entityId, `You have already learned ${def.name}.`);
+      return;
+    }
+    if (meta.professions.size >= PROFESSION_PRIMARY_CAP) {
+      this.error(
+        meta.entityId,
+        `You can only learn ${PROFESSION_PRIMARY_CAP} professions. Drop one to learn another.`,
+      );
+      return;
+    }
+    meta.professions.set(profession, { skill: 1, rankTier: 0 });
+    this.emit({ type: 'professionLearned', profession, pid: meta.entityId });
+  }
+
+  /** Forget a profession (classic unlearn): the skill is lost. Frees a slot. */
+  abandonProfession(profession: ProfessionId, pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    const { meta } = r;
+    const def = PROFESSIONS[profession];
+    if (!def || !meta.professions.has(profession)) return;
+    meta.professions.delete(profession);
+    this.notice(meta.entityId, `You forget the ways of ${def.name}.`);
+  }
+
+  /** Train the next rank tier (the gold sink). Requires the current tier maxed
+   *  (skill at its cap) and the fee. Raises the skill ceiling. */
+  advanceProfessionRank(profession: ProfessionId, pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    const { meta } = r;
+    const def = PROFESSIONS[profession];
+    if (!def) return;
+    const ps = meta.professions.get(profession);
+    if (!ps) {
+      this.error(meta.entityId, `You have not learned ${def.name}.`);
+      return;
+    }
+    const nextTier = ps.rankTier + 1;
+    if (nextTier >= PROFESSION_RANKS.length) {
+      this.error(meta.entityId, `Your ${def.name} is already at the highest rank.`);
+      return;
+    }
+    const currentCap = professionCap(ps.rankTier);
+    if (ps.skill < currentCap) {
+      this.error(meta.entityId, `Raise your ${def.name} skill to ${currentCap} first.`);
+      return;
+    }
+    const tier = PROFESSION_RANKS[nextTier];
+    if (meta.copper < tier.cost) {
+      this.error(meta.entityId, `You need ${formatMoney(tier.cost)} to train ${tier.name}.`);
+      return;
+    }
+    meta.copper -= tier.cost;
+    ps.rankTier = nextTier;
+    this.notice(meta.entityId, `You advance to ${tier.name} ${def.name}.`);
+    this.emit({
+      type: 'professionSkill',
+      profession,
+      skill: ps.skill,
+      rankName: professionRankName(ps.rankTier),
+      pid: meta.entityId,
+    });
+  }
+
+  /** Craft a recipe up to `count` times (bounded). Validates the profession +
+   *  skill, consumes reagents per craft, produces the output, and rolls a
+   *  skill-up each time. Stops early when reagents run out. */
+  craftItem(recipeId: string, count: number, pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    const { meta } = r;
+    const recipe = RECIPE_BY_ID[recipeId];
+    if (!recipe) return;
+    const def = PROFESSIONS[recipe.profession];
+    const ps = meta.professions.get(recipe.profession);
+    if (!ps) {
+      this.error(meta.entityId, `You have not learned ${def.name}.`);
+      return;
+    }
+    if (ps.skill < recipe.reqSkill) {
+      this.error(
+        meta.entityId,
+        `Your ${def.name} skill is too low (requires ${recipe.reqSkill}).`,
+      );
+      return;
+    }
+    const want = Math.max(1, Math.min(Math.floor(count) || 1, 20));
+    let made = 0;
+    for (let i = 0; i < want; i++) {
+      const enough = recipe.reagents.every(
+        (rg) => this.countItem(rg.itemId, meta.entityId) >= rg.count,
+      );
+      if (!enough) break;
+      for (const rg of recipe.reagents) this.removeItem(rg.itemId, rg.count, meta.entityId);
+      this.addItem(recipe.output.itemId, recipe.output.count, meta.entityId);
+      this.rollProfessionSkillUp(meta, recipe.profession, recipe.reqSkill, recipe.grey);
+      made++;
+    }
+    if (made === 0) {
+      this.error(meta.entityId, 'You lack the reagents.');
+      return;
+    }
+    meta.lastActiveTick = this.tickCount;
   }
 
   private activateNythraxisRelic(obj: Entity, meta: PlayerMeta): boolean {

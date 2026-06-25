@@ -1708,6 +1708,43 @@
   .vendor-empty { padding: 5px; font-size: 11px; color: #887c5c; }
   .vendor-hint { font-size: 11px; color: #c8b888; margin-top: 8px; border-top: 1px solid #463a1c; padding-top: 6px; }
 
+  /* Professions window (gathering + crafting) */
+  #professions-window { width: 470px; max-height: min(660px, 85vh); display: none; overflow-y: auto; }
+  #professions-window .panel-title { display: flex; align-items: center; gap: 8px; }
+  .prof-slots { font-size: 11px; color: #cbb87a; margin-left: auto; margin-right: 8px; }
+  .prof-empty, .prof-no-recipes, .prof-gather-hint, .prof-feeds { font-size: 12px; color: #c9bda0; padding: 6px 2px; }
+  .prof-section { margin-top: 10px; padding-top: 8px; border-top: 1px solid #463a1c; }
+  .prof-head { display: flex; align-items: baseline; gap: 8px; }
+  .prof-name { font-family: var(--title-font); font-size: 14px; color: var(--gold); }
+  .prof-rank { font-size: 11px; }
+  .prof-skill { position: relative; height: 18px; margin: 6px 0; border: 1px solid #4a3c1c; border-radius: 4px; background: #1c1710; overflow: hidden; }
+  .prof-skill-fill { position: absolute; inset: 0 auto 0 0; background: linear-gradient(#caa53c, #7c5e1c); }
+  .prof-skill-label { position: relative; display: block; text-align: center; font-size: 11px; line-height: 18px; color: #fff; text-shadow: 0 1px 1px #000; }
+  .prof-actions { display: flex; gap: 8px; margin-bottom: 6px; }
+  .prof-train, .prof-abandon, .prof-learn, .prof-craft, .prof-craft-many {
+    min-height: 32px; padding: 5px 10px; border: 1px solid #6a5320; border-radius: 4px;
+    cursor: var(--cursor-point); background: linear-gradient(#8a6a26, #5a4413 55%, #473409);
+    color: #ffe6a8; font-family: var(--title-font); font-size: 12px;
+  }
+  .prof-abandon { background: linear-gradient(#6a2626, #441313 55%, #340909); color: #ffc8c8; border-color: #6a3320; }
+  .prof-train:hover:not(:disabled), .prof-abandon:hover:not(:disabled), .prof-learn:hover:not(:disabled),
+  .prof-craft:hover:not(:disabled), .prof-craft-many:hover:not(:disabled) { filter: brightness(1.12); }
+  .prof-train:disabled, .prof-craft:disabled, .prof-craft-many:disabled { opacity: .5; cursor: default; }
+  .prof-recipes-head, .prof-avail-head { margin-top: 8px; color: var(--gold); font-family: var(--title-font); font-size: 12px; }
+  .prof-recipe { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 5px 4px; border-radius: 4px; }
+  .prof-recipe:hover { background: #ffffff10; }
+  .prof-recipe-locked { opacity: .55; }
+  .prof-recipe-out { display: flex; align-items: center; gap: 6px; flex: 1 1 160px; font-size: 12px; }
+  .prof-diff-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex: none; }
+  .prof-recipe-out img { width: 24px; height: 24px; }
+  .prof-reagents { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; flex: 2 1 200px; font-size: 11px; color: #c9bda0; }
+  .prof-requires { color: #9c8e6a; }
+  .prof-reagent { display: inline-flex; align-items: center; gap: 3px; }
+  .prof-reagent img { width: 18px; height: 18px; }
+  .prof-craft-wrap { display: flex; gap: 6px; margin-left: auto; }
+  .prof-avail-row { display: flex; align-items: center; gap: 8px; padding: 5px 2px; }
+  .prof-avail-name { flex: 1; font-size: 12px; }
+
   /* bags — centred in the bottom gap between the action cluster and micro-menu */
   #bags {
     --bags-bar-half: 306px;
@@ -8420,6 +8457,7 @@
     <div id="talents-window" class="window panel"></div>
     <div id="quest-log-window" class="window panel"></div>
     <div id="vendor-window" class="window panel"></div>
+    <div id="professions-window" class="window panel"></div>
     <div id="map-window" class="window panel">
       <button type="button" class="x-btn" id="map-close" data-i18n-title="hud.core.closeMap" data-i18n-aria="hud.core.closeMap" title="Close map" aria-label="Close map" data-icon="close"></button>
       <div id="map-zoom">
@@ -8443,6 +8481,7 @@
       <button type="button" class="micro-btn" id="mm-quest" data-i18n-title="questUi.log.title" data-i18n-aria="questUi.log.title" title="Quest Log" aria-label="Quest Log" data-icon="questlog"><span class="keybind">l</span></button>
       <button type="button" class="micro-btn" id="mm-map" data-i18n-title="hud.keybinds.actions.map" data-i18n-aria="hud.keybinds.actions.map" title="World Map" aria-label="World Map" data-icon="map"><span class="keybind">m</span></button>
       <button type="button" class="micro-btn" id="mm-bag" data-i18n-title="itemUi.bags.title" data-i18n-aria="itemUi.bags.title" title="Bags" aria-label="Bags" data-icon="bags"><span class="keybind">b</span></button>
+      <button type="button" class="micro-btn" id="mm-professions" data-i18n-title="hudChrome.professions.title" data-i18n-aria="hudChrome.professions.title" title="Professions" aria-label="Professions" data-icon="professions"></button>
       <button type="button" class="micro-btn" id="mm-arena" data-i18n-title="hud.keybinds.actions.arena" data-i18n-aria="hud.keybinds.actions.arena" title="Arena (Ashen Coliseum)" aria-label="Arena (Ashen Coliseum)" data-icon="arena"><span class="keybind">g</span></button>
       <button type="button" class="micro-btn" id="mm-leaderboard" data-i18n-title="game.leaderboard.title" data-i18n-aria="game.leaderboard.title" title="Leaderboard" aria-label="Leaderboard" data-icon="leaderboard"><span class="keybind">k</span></button>
       <button type="button" class="micro-btn" id="mm-emote" data-i18n-aria="hudChrome.emoteWheel.label" aria-label="Emotes" data-icon="emote"><span class="keybind">x</span></button>

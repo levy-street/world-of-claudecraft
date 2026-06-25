@@ -26,6 +26,7 @@ import {
   type LootRollPrompt,
   type MoveInput,
   type PlayerClass,
+  type ProfessionId,
   type QuestProgress,
   type QuestState,
   type SimEvent,
@@ -751,6 +752,10 @@ export class ClientWorld implements IWorld {
   lockpickState: LockpickView | null = null;
   delveMarks = 0;
   companionUpgrades: Record<string, number> = {};
+  // Professions (gathering + crafting): the local player's learned skills,
+  // mirrored from the self-wire (`s.profs`). The static catalog (PROFESSIONS /
+  // RECIPES / HARVEST_NODES) is read from sim/data by the UI, not sent.
+  professions: { id: ProfessionId; skill: number; rankTier: number }[] = [];
   // Per-delve clears (key `${delveId}:${tierId}`), mirrored from the self-wire so
   // delveShopOffers can resolve the shop lock badge client-side.
   delveClears: Record<string, number> = {};
@@ -1272,6 +1277,7 @@ export class ClientWorld implements IWorld {
       if (s.dcomp !== undefined) this.companionUpgrades = s.dcomp ?? {};
       if (s.dclears !== undefined) this.delveClears = s.dclears ?? {};
       if (s.delveDaily !== undefined) this.delveDaily = s.delveDaily;
+      if (s.profs !== undefined) this.professions = s.profs ?? [];
       // camera follows server-side facing changes when not mouselooking
       if (prevSelfFacing !== undefined && this.mouselookFacing === null) {
         let d = e.facing - prevSelfFacing;
@@ -1412,6 +1418,18 @@ export class ClientWorld implements IWorld {
   }
   pickUpObject(id: number): void {
     this.cmd({ cmd: 'pickup', id });
+  }
+  learnProfession(profession: ProfessionId): void {
+    this.cmd({ cmd: 'learnProfession', profession });
+  }
+  abandonProfession(profession: ProfessionId): void {
+    this.cmd({ cmd: 'abandonProfession', profession });
+  }
+  advanceProfessionRank(profession: ProfessionId): void {
+    this.cmd({ cmd: 'advanceProfession', profession });
+  }
+  craftItem(recipeId: string, count: number): void {
+    this.cmd({ cmd: 'craft', recipe: recipeId, count });
   }
   acceptQuest(questId: string): void {
     if (!this.canSendCommand()) return;

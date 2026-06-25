@@ -17,6 +17,7 @@ import {
   type OverheadEmoteId,
   type PetMode,
   type PlayerClass,
+  type ProfessionId,
   type QuestProgress,
   type QuestState,
   type ResourceType,
@@ -493,6 +494,15 @@ export interface IWorld {
   // more than one page of max-level players); page is 0-based.
   leaderboard(page?: number, pageSize?: number): Promise<LeaderboardPage>;
   prestige(): void;
+  // Professions (gathering + crafting). State is server-authoritative; the
+  // learned-profession skills ride the self snapshot, the static catalog
+  // (PROFESSIONS/RECIPES/HARVEST_NODES) is read from sim/data directly by the UI.
+  // Gathering itself reuses pickUpObject (the node is a ground object).
+  professions: { id: ProfessionId; skill: number; rankTier: number }[];
+  learnProfession(profession: ProfessionId): void;
+  abandonProfession(profession: ProfessionId): void;
+  advanceProfessionRank(profession: ProfessionId): void;
+  craftItem(recipeId: string, count: number): void;
   // Talents & Specializations. State is server-authoritative; the client stages
   // edits locally and commits via applyTalents (the server re-validates).
   talents: TalentAllocation;

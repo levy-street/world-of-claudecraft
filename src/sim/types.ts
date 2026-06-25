@@ -208,7 +208,19 @@ export type SkinRank = 'uncommon' | 'rare' | 'epic';
 export interface ItemDef {
   id: string;
   name: string;
-  kind: 'weapon' | 'armor' | 'quest' | 'junk' | 'food' | 'drink' | 'tool' | 'potion' | 'elixir';
+  // 'material' is a profession reagent (ore, bar, herb): stackable, vendorable,
+  // never equippable, and the raw input/output of gathering and crafting.
+  kind:
+    | 'weapon'
+    | 'armor'
+    | 'quest'
+    | 'junk'
+    | 'food'
+    | 'drink'
+    | 'tool'
+    | 'potion'
+    | 'elixir'
+    | 'material';
   slot?: EquipSlot;
   weapon?: WeaponInfo;
   stats?: Partial<Stats>;
@@ -971,6 +983,98 @@ export interface GroundObjectDef {
   positions: { x: number; z: number }[];
 }
 
+// ---------------------------------------------------------------------------
+// Professions (gathering + crafting). The fourth classic character pillar
+// alongside class/talents/gear. Two gathering professions feed two crafting
+// ones (Mining -> Blacksmithing, Herbalism -> Alchemy); smelting ore into bars
+// is itself a Mining recipe, so one crafting path serves all of it.
+//
+// Skill is the progression: a single 1..PROFESSION_SKILL_MAX track per
+// profession, raised by performing actions whose difficulty colour (orange ->
+// yellow -> green -> grey) is computed from your skill vs the node/recipe's
+// required skill (see professionSkillUpChance / professionColor below). Rank
+// tiers (Apprentice/Journeyman/Expert) cap the skill until trained up at a
+// profession trainer (the gold sink). All numbers follow the classic-era model.
+// ---------------------------------------------------------------------------
+
+export type ProfessionId = 'mining' | 'herbalism' | 'blacksmithing' | 'alchemy';
+
+// Gathering professions harvest world nodes; crafting professions consume
+// reagents to produce items. (Mining is a gathering profession that also owns
+// smelting recipes, so it appears in both worlds — `kind` reflects its primary
+// activity: harvesting veins.)
+export type ProfessionKind = 'gathering' | 'crafting';
+
+export type ProfessionColor = 'orange' | 'yellow' | 'green' | 'grey';
+
+// Difficulty colour of a node/recipe at the given skill. Orange always grants a
+// skill point; the chance ramps linearly down to zero as skill approaches the
+// grey threshold (the canonical classic chance = (grey - skill)/(grey - req)).
+export interface ProfessionRankTier {
+  id: 'apprentice' | 'journeyman' | 'expert';
+  name: string; // English source; localized client-side
+  cap: number; // max skill this tier allows
+  cost: number; // copper to train INTO this tier (apprentice is free)
+  reqLevel: number; // character level required to train this tier
+}
+
+export interface ProfessionDef {
+  id: ProfessionId;
+  name: string; // English source; localized client-side
+  kind: ProfessionKind;
+  // Flavor line shown when learning, English source. Localized client-side.
+  blurb: string;
+  // Which gathering profession (if any) feeds this one, for UI hints. Crafting
+  // professions point at their material source; gathering professions omit it.
+  feedsFrom?: ProfessionId;
+}
+
+// One thing a harvest node can yield. count is rolled in [min,max]; an optional
+// chance (<1) makes the drop occasional (e.g. a rare gem from an ore vein).
+export interface HarvestYield {
+  itemId: string;
+  min: number;
+  max: number;
+  chance?: number; // default 1 (always)
+}
+
+// A gatherable world node (ore vein, herb). Spawned as a ground object at each
+// position; reuses the ground-object respawn loop. Harvesting requires the
+// matching profession at >= reqSkill and rolls a skill-up by difficulty colour.
+export interface HarvestNodeDef {
+  id: string; // stable node id, also the entity objectItemId
+  name: string; // English source; localized client-side
+  profession: ProfessionId; // must be a gathering profession
+  reqSkill: number; // minimum skill to harvest (orange at this skill)
+  grey: number; // skill at which it stops granting points
+  yields: HarvestYield[];
+  positions: { x: number; z: number }[];
+  respawnSec?: number; // default OBJECT_RESPAWN
+  // Procedural render hint: 'vein' (ore) or 'herb' (plant). Defaults by kind.
+  look?: 'vein' | 'herb';
+  icon?: string; // procedural icon id for the world/UI
+}
+
+export interface RecipeReagent {
+  itemId: string;
+  count: number;
+}
+
+// A crafting recipe: consume reagents, produce output, roll a skill-up. Smelting
+// (ore -> bar) is a Mining recipe; armor/weapons are Blacksmithing; potions and
+// elixirs are Alchemy. `reqSkill`/`grey` drive the same colour math as nodes.
+export interface RecipeDef {
+  id: string;
+  profession: ProfessionId;
+  reqSkill: number;
+  grey: number;
+  output: { itemId: string; count: number };
+  reagents: RecipeReagent[];
+  // If set, the player must be within INTERACT_RANGE of a prop of this kind
+  // (e.g. a forge/anvil) to craft. Undefined = craftable anywhere.
+  station?: 'forge' | 'anvil' | 'alchemy_lab';
+}
+
 export interface DungeonSpawn {
   mobId: string;
   x: number; // relative to instance origin
@@ -1346,6 +1450,11 @@ export type SimEvent = { pid?: number } & (
   // level past the cap, and unlocking a cosmetic lifetime-XP milestone
   | { type: 'virtualLevelUp'; level: number }
   | { type: 'milestoneUnlocked'; milestoneId: string }
+  // Professions: learning a profession, and a skill-point increase from a
+  // gather/craft. The client formats the visible text from the id + numbers via
+  // t(), so no free English text rides these (no sim_i18n rule needed).
+  | { type: 'professionLearned'; profession: ProfessionId }
+  | { type: 'professionSkill'; profession: ProfessionId; skill: number; rankName: string }
   | { type: 'learnAbility'; abilityId: string; rank: number }
   | { type: 'loot'; text: string }
   | {
@@ -1694,6 +1803,60 @@ export function canPrestige(level: number, lifetimeXp: number, prestigeRank: num
 export function xpUntilNextPrestige(lifetimeXp: number, prestigeRank: number): number {
   const target = xpToReachLevel(MAX_LEVEL) + (prestigeRank + 1) * PRESTIGE_XP_PER_RANK;
   return Math.max(0, target - lifetimeXp);
+}
+
+// ---------------------------------------------------------------------------
+// Profession tuning + skill math (classic-era model; see types/content above).
+// ---------------------------------------------------------------------------
+
+// Top of the single per-profession skill track (classic uses 300; compressed to
+// fit this game's level 1..20 band, three rank tiers of 75).
+export const PROFESSION_SKILL_MAX = 225;
+
+// A character may learn at most this many professions. The cap is the economic
+// engine: at two, miners sell ore to blacksmiths and herbalists sell to
+// alchemists, so the auction house has player-made supply (classic primary cap).
+export const PROFESSION_PRIMARY_CAP = 2;
+
+// Rank tiers gate the skill ceiling until trained up at the profession trainer
+// (the gold sink). Advancing requires the previous tier maxed (skill >= its cap)
+// and the fee. Apprentice is granted free on learning the profession.
+export const PROFESSION_RANKS: readonly ProfessionRankTier[] = [
+  { id: 'apprentice', name: 'Apprentice', cap: 75, cost: 0, reqLevel: 1 },
+  { id: 'journeyman', name: 'Journeyman', cap: 150, cost: 500, reqLevel: 1 },
+  { id: 'expert', name: 'Expert', cap: 225, cost: 2500, reqLevel: 1 },
+];
+
+export function professionCap(rankTier: number): number {
+  const t = Math.max(0, Math.min(PROFESSION_RANKS.length - 1, Math.floor(rankTier)));
+  return PROFESSION_RANKS[t].cap;
+}
+
+export function professionRankName(rankTier: number): string {
+  const t = Math.max(0, Math.min(PROFESSION_RANKS.length - 1, Math.floor(rankTier)));
+  return PROFESSION_RANKS[t].name;
+}
+
+// Chance (0..1) that performing a node/recipe at `skill` grants a skill point.
+// Linear ramp: 1.0 at reqSkill (orange, guaranteed) down to 0 at `grey`. Below
+// reqSkill it cannot be done (0); at/after `grey` it never grants (0). This is a
+// faithful compression of the classic piecewise orange/yellow/green/grey curve
+// onto the canonical chance = (grey - skill)/(grey - req).
+export function professionSkillUpChance(skill: number, reqSkill: number, grey: number): number {
+  if (skill < reqSkill || skill >= grey) return 0;
+  const span = Math.max(1, grey - reqSkill);
+  return Math.max(0, Math.min(1, (grey - skill) / span));
+}
+
+// Difficulty colour of a node/recipe at `skill`, for UI feedback. Mirrors the
+// classic orange (best) -> yellow -> green -> grey (no gain) banding, derived
+// from the skill-up chance so colour and odds never disagree.
+export function professionColor(skill: number, reqSkill: number, grey: number): ProfessionColor {
+  if (skill >= grey) return 'grey';
+  const chance = professionSkillUpChance(skill, reqSkill, grey);
+  if (chance >= 0.8) return 'orange';
+  if (chance >= 0.4) return 'yellow';
+  return 'green';
 }
 
 // Zero-difference band: how many levels below you a mob stops giving XP.
