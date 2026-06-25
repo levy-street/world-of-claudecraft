@@ -583,6 +583,62 @@ export const zh_CN: EnTranslations = {
       "notRaid": "你的队伍不是团队。",
       "leaderOnly": "只有团队领袖可以转换为队伍。",
       "tooLarge": "成员超过五人的团队无法转换回队伍。"
+    },
+    "itemKind": {
+      "material": "Material"
+    },
+    "professions": {
+      "title": "Professions",
+      "open": "Professions",
+      "empty": "You have not learned a profession yet.",
+      "slotsUsed": "{count} of {cap} professions learned",
+      "availableHeading": "Learn a profession",
+      "learn": "Learn",
+      "abandon": "Abandon",
+      "abandonConfirm": "Forget {prof}? Your skill will be lost.",
+      "skill": "Skill {skill} / {cap}",
+      "rankLabel": "{rank}",
+      "train": "Train {rank} ({cost})",
+      "trainMaxed": "Reach skill {cap} to train the next rank",
+      "trainTopRank": "Highest rank reached",
+      "recipesHeading": "Recipes",
+      "noRecipes": "No recipes yet. Raise your skill to learn more.",
+      "requires": "Requires:",
+      "have": "{have}/{need}",
+      "craft": "Craft",
+      "craftMany": "Craft x{count}",
+      "gatheringHint": "Gather from nodes in the world (ore veins, herbs).",
+      "feedsFrom": "Uses materials from {prof}.",
+      "color": {
+        "orange": "Orange (guaranteed skill-up)",
+        "yellow": "Yellow (good skill-up chance)",
+        "green": "Green (low skill-up chance)",
+        "grey": "Grey (no skill-up)"
+      },
+      "names": {
+        "mining": "Mining",
+        "herbalism": "Herbalism",
+        "blacksmithing": "Blacksmithing",
+        "alchemy": "Alchemy"
+      },
+      "ranks": {
+        "apprentice": "Apprentice",
+        "journeyman": "Journeyman",
+        "expert": "Expert"
+      },
+      "learned": "You have learned {prof}!",
+      "skillUp": "{prof} skill increased to {skill}.",
+      "needGather": "You need {prof} to gather this.",
+      "skillTooLow": "Your {prof} skill is too low (requires {n}).",
+      "alreadyLearned": "You have already learned {prof}.",
+      "notLearned": "You have not learned {prof}.",
+      "maxRank": "Your {prof} is already at the highest rank.",
+      "raiseFirst": "Raise your {prof} skill to {n} first.",
+      "needMoney": "You need {money} to train {rank}.",
+      "lackReagents": "You lack the reagents.",
+      "capReachedLearn": "You can only learn {cap} professions. Drop one to learn another.",
+      "advanced": "You advance to {rank} {prof}.",
+      "forgot": "You forget the ways of {prof}."
     }
   },
   "guide": {
