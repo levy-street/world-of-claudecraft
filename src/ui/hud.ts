@@ -5748,8 +5748,11 @@ export class Hud {
       ctx.font = 'bold 13px Georgia';
       ctx.fillStyle = '#ffe9a0';
     }
-    // tracked quest objective(s): a search-area ring (roaming targets) + a pin (#928)
-    const trackedId = this.selectedQuestLogId;
+    // tracked quest objective(s): a search-area ring (roaming targets) + a pin (#928).
+    // Fall back to the first active quest so a marker shows before the log is opened.
+    const trackedId = (this.selectedQuestLogId && this.sim.questLog.has(this.selectedQuestLogId))
+      ? this.selectedQuestLogId
+      : (this.sim.questLog.keys().next().value ?? null);
     const trackedCounts = trackedId ? this.sim.questLog.get(trackedId)?.counts : undefined;
     const questMarkers = trackedQuestMapMarkers(trackedId, trackedCounts, zone.zMin, zone.zMax);
     if (questMarkers.length) {
