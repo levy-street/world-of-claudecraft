@@ -214,6 +214,7 @@ import { reconcileLootRolls as computeLootRollReconcile } from './loot_roll_reco
 import { lowHealthVignette } from './low_health';
 import { lowResourceView } from './low_resource';
 import { overworldDungeonPortals } from './map_dungeon_portals';
+import { trackedQuestMapMarkers } from './map_quest_markers';
 import { type MapRegion, mapCanvasHeight, paintTerrainRows } from './map_terrain';
 import {
   filterMarketListings,
@@ -5744,6 +5745,35 @@ export class Hud {
       const dungeonName = dungeonDisplayName(portal.id);
       ctx.strokeText(dungeonName, mx, my - 9);
       ctx.fillText(dungeonName, mx, my - 9);
+      ctx.font = 'bold 13px Georgia';
+      ctx.fillStyle = '#ffe9a0';
+    }
+    // tracked quest objective(s): a search-area ring (roaming targets) + a pin (#928)
+    const trackedId = this.selectedQuestLogId;
+    const trackedCounts = trackedId ? this.sim.questLog.get(trackedId)?.counts : undefined;
+    const questMarkers = trackedQuestMapMarkers(trackedId, trackedCounts, zone.zMin, zone.zMax);
+    if (questMarkers.length) {
+      const pxPerYard = S / spanX;
+      for (const m of questMarkers) {
+        const { mx, my } = toMap(m.x, m.z);
+        if (m.radius > 0) {
+          ctx.beginPath();
+          ctx.arc(mx, my, Math.max(6, m.radius * pxPerYard), 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(255,210,80,0.15)';
+          ctx.fill();
+          ctx.strokeStyle = '#ffd24f';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        }
+        ctx.beginPath();
+        ctx.arc(mx, my, 5, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffd24f';
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 2;
+        ctx.fill();
+        ctx.stroke();
+      }
+      ctx.lineWidth = 3;
       ctx.font = 'bold 13px Georgia';
       ctx.fillStyle = '#ffe9a0';
     }
