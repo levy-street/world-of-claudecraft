@@ -448,6 +448,10 @@ export const ru_RU: EnTranslations = {
     "tips": {
       "joinChannels": "Совет: введите /join world или /join lfg, чтобы общаться с игроками по всему миру."
     },
+    "itemSet": {
+      "header": "{name} ({have}/{total})",
+      "bonusLine": "({pieces}) {bonus}"
+    },
     "questShare": {
       "notShareable": "Этим заданием нельзя поделиться.",
       "notInSharerParty": "Вы должны состоять в группе игрока {name}, чтобы принять это задание.",

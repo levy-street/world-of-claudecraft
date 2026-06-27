@@ -44,6 +44,7 @@ import {
   DUNGEON_X_THRESHOLD,
   delveAt,
   dungeonAt,
+  ITEM_SETS,
   ITEMS,
   isDelvePos,
   MOBS,
@@ -2987,9 +2988,41 @@ export class Hud {
     if (item.requiredClass && !armorTypeForItem(item) && !weaponArchetypeForItem(item)) {
       html += `<div class="tt-sub">${esc(t('itemUi.tooltip.classes', { classes: item.requiredClass.map(classDisplayName).join(', ') }))}</div>`;
     }
+    html += this.itemSetBlock(item);
     if (item.sellValue > 0)
       html += `<div class="tt-sub">${esc(t('itemUi.tooltip.sellPrice', { money: formatLocalizedMoney(item.sellValue) }))}</div>`;
     if (compare) html += this.itemCompareBlock(item);
+    return html;
+  }
+
+  // How many equipped pieces belong to the given set (read from IWorld.equipment
+  // so it is identical offline and online).
+  private equippedSetPieces(setId: string): number {
+    let n = 0;
+    for (const equippedId of Object.values(this.sim.equipment)) {
+      if (equippedId && ITEMS[equippedId]?.set === setId) n += 1;
+    }
+    return n;
+  }
+
+  // Classic tier-set block: the set name with the live (have/total) piece count,
+  // then each bonus tier - lit when its threshold is met, greyed otherwise. Set
+  // name and bonus text localize through entity_i18n (English source in
+  // content/item_sets.ts).
+  private itemSetBlock(item: ItemDef): string {
+    if (!item.set) return '';
+    const set = ITEM_SETS[item.set];
+    if (!set) return '';
+    const have = this.equippedSetPieces(set.id);
+    const total = set.bonuses.reduce((max, b) => Math.max(max, b.pieces), 0);
+    const name = tEntity({ kind: 'itemSet', id: set.id, field: 'name' });
+    let html = `<div class="tt-set-name">${esc(t('hudChrome.itemSet.header', { name, have: formatNumber(have, { maximumFractionDigits: 0 }), total: formatNumber(total, { maximumFractionDigits: 0 }) }))}</div>`;
+    for (const tier of set.bonuses) {
+      const active = have >= tier.pieces;
+      const field = tier.pieces === 2 ? 'bonus2' : 'bonus3';
+      const text = tEntity({ kind: 'itemSet', id: set.id, field });
+      html += `<div class="tt-set-bonus${active ? ' active' : ''}">${esc(t('hudChrome.itemSet.bonusLine', { pieces: formatNumber(tier.pieces, { maximumFractionDigits: 0 }), bonus: text }))}</div>`;
+    }
     return html;
   }
 

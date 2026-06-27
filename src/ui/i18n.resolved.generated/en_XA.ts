@@ -448,6 +448,10 @@ export const en_XA: EnTranslations = {
     "tips": {
       "joinChannels": "[Ţíþ: ţýþé /ĵóíñ ŵóŕļð óŕ /ĵóíñ ļƒĝ ţó çĥáţ ŵíţĥ þļáýéŕš áçŕóšš ţĥé ŕéáļɱ.]"
     },
+    "itemSet": {
+      "header": "[{name} ({have}/{total})]",
+      "bonusLine": "[({pieces}) {bonus}]"
+    },
     "questShare": {
       "notShareable": "[Ţĥíš ɋúéšţ çáñ'ţ ƀé šĥáŕéð.]",
       "notInSharerParty": "[Ýóú ɱúšţ ƀé íñ {name}'š þáŕţý ţó áççéþţ ţĥáţ ɋúéšţ.]",

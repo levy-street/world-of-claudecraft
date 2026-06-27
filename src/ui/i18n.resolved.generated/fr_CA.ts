@@ -448,6 +448,10 @@ export const fr_CA: EnTranslations = {
     "tips": {
       "joinChannels": "Conseil : tapez /join world ou /join lfg pour discuter avec les joueurs de tout le royaume."
     },
+    "itemSet": {
+      "header": "{name} ({have}/{total})",
+      "bonusLine": "({pieces}) {bonus}"
+    },
     "questShare": {
       "notShareable": "Cette quête ne peut pas être partagée.",
       "notInSharerParty": "Vous devez être dans le groupe de {name} pour accepter cette quête.",
