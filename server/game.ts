@@ -2240,8 +2240,16 @@ export class GameServer {
         if (session.isAdmin && this.moderation.handleChatCommand(session, text)) break;
         if (this.isChatMuted(session)) break;
         if (!this.consumeChatToken(session)) break;
-        if (/^\/who(?:\s|$)/i.test(text)) {
-          this.sendWhoRoster(session);
+        const whoMatch = /^\/who(?:\s+([\s\S]+))?$/i.exec(text);
+        if (whoMatch) {
+          // Optional name filter: "/who Mr" lists only players whose name
+          // contains "Mr" (case-insensitive). Strip quotes/control chars and cap
+          // the length so the echoed query stays a clean, single-line token.
+          const filter = (whoMatch[1] ?? '')
+            .trim()
+            .replace(/[" -]/g, '')
+            .slice(0, 24);
+          this.sendWhoRoster(session, filter || undefined);
           break;
         }
         // Hard-word + mute enforcement gate, applied to every channel before the
@@ -3474,7 +3482,7 @@ export class GameServer {
     return `You are muted from chat for ${minutes} more minute${minutes === 1 ? '' : 's'}.${reason}`;
   }
 
-  private sendWhoRoster(session: ClientSession): void {
+  private sendWhoRoster(session: ClientSession, filter?: string): void {
     if (!session.blockListLoaded) {
       this.send(session, {
         t: 'events',
@@ -3484,12 +3492,19 @@ export class GameServer {
       });
       return;
     }
-    const rows = this.whoRosterFor(session);
+    let rows = this.whoRosterFor(session);
+    if (filter) {
+      const q = filter.toLowerCase();
+      rows = rows.filter((row) => row.name.toLowerCase().includes(q));
+    }
     const total = rows.length;
+    const header = filter
+      ? `Who: ${total} ${total === 1 ? 'player' : 'players'} matching "${filter}" on ${REALM}.`
+      : `Who: ${total} ${total === 1 ? 'player' : 'players'} online on ${REALM}.`;
     const list: { type: 'log'; text: string; color: string }[] = [
       {
         type: 'log',
-        text: `Who: ${total} ${total === 1 ? 'player' : 'players'} online on ${REALM}.`,
+        text: header,
         color: '#7fd4ff',
       },
     ];

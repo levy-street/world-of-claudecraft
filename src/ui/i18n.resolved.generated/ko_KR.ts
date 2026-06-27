@@ -507,6 +507,12 @@ export const ko_KR: EnTranslations = {
         "few": "검색: {realm} 서버에 {count}명의 플레이어가 접속 중입니다.",
         "many": "검색: {realm} 서버에 {count}명의 플레이어가 접속 중입니다.",
         "other": "검색: {realm} 서버에 {count}명의 플레이어가 접속 중입니다."
+      },
+      "playersMatching": {
+        "one": "Who: {count} player matching \"{query}\" on {realm}.",
+        "few": "Who: {count} players matching \"{query}\" on {realm}.",
+        "many": "Who: {count} players matching \"{query}\" on {realm}.",
+        "other": "Who: {count} players matching \"{query}\" on {realm}."
       }
     },
     "bugReport": {

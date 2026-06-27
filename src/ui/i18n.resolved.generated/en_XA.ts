@@ -507,6 +507,12 @@ export const en_XA: EnTranslations = {
         "few": "[Ŵĥó: {count} þļáýéŕš óñļíñé óñ {realm}.]",
         "many": "[Ŵĥó: {count} þļáýéŕš óñļíñé óñ {realm}.]",
         "other": "[Ŵĥó: {count} þļáýéŕš óñļíñé óñ {realm}.]"
+      },
+      "playersMatching": {
+        "one": "[Ŵĥó: {count} þļáýéŕ ɱáţçĥíñĝ \"{query}\" óñ {realm}.]",
+        "few": "[Ŵĥó: {count} þļáýéŕš ɱáţçĥíñĝ \"{query}\" óñ {realm}.]",
+        "many": "[Ŵĥó: {count} þļáýéŕš ɱáţçĥíñĝ \"{query}\" óñ {realm}.]",
+        "other": "[Ŵĥó: {count} þļáýéŕš ɱáţçĥíñĝ \"{query}\" óñ {realm}.]"
       }
     },
     "bugReport": {

@@ -1915,6 +1915,15 @@ const RULES: Rule[] = [
     build: (m) =>
       tPlural('hudChrome.plurals.playersOnline', Number(m[1]), { count: m[1], realm: m[2] }),
   },
+  {
+    re: /^Who: (\d+) (?:player|players) matching "(.+)" on (.+)\.$/,
+    build: (m) =>
+      tPlural('hudChrome.plurals.playersMatching', Number(m[1]), {
+        count: m[1],
+        query: m[2],
+        realm: m[3],
+      }),
+  },
   { re: /^\.\.\.and (\d+) more\.$/, build: (m) => tServer('who.more', { count: m[1] }) },
   {
     re: /^(.+) - level (\d+) (\w+) - (.+?)(?: \(([^)]+)\))?$/,

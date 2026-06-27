@@ -516,6 +516,12 @@ export const hudChromeStrings = {
       many: 'Who: {count} players online on {realm}.',
       other: 'Who: {count} players online on {realm}.',
     },
+    playersMatching: {
+      one: 'Who: {count} player matching "{query}" on {realm}.',
+      few: 'Who: {count} players matching "{query}" on {realm}.',
+      many: 'Who: {count} players matching "{query}" on {realm}.',
+      other: 'Who: {count} players matching "{query}" on {realm}.',
+    },
   },
   // "Report a Bug" options sub-view (online only). Captures realm/character/
   // position/screenshot plus a free-text description and posts to the server.

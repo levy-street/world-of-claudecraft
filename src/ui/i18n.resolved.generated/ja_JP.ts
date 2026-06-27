@@ -507,6 +507,12 @@ export const ja_JP: EnTranslations = {
         "few": "Who：{realm}に{count}人のプレイヤーがオンラインです。",
         "many": "Who：{realm}に{count}人のプレイヤーがオンラインです。",
         "other": "Who：{realm}に{count}人のプレイヤーがオンラインです。"
+      },
+      "playersMatching": {
+        "one": "Who: {count} player matching \"{query}\" on {realm}.",
+        "few": "Who: {count} players matching \"{query}\" on {realm}.",
+        "many": "Who: {count} players matching \"{query}\" on {realm}.",
+        "other": "Who: {count} players matching \"{query}\" on {realm}."
       }
     },
     "bugReport": {
