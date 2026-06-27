@@ -58,7 +58,13 @@ import {
   zoneAt,
 } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
-import { armorTypeForItem, canEquipItem, weaponArchetypeForItem } from '../sim/equipment_rules';
+import {
+  armorTypeForItem,
+  canEquipItem,
+  equippableClasses,
+  PLAYER_CLASSES,
+  weaponArchetypeForItem,
+} from '../sim/equipment_rules';
 import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
 import type { Ante, PickAction } from '../sim/lockpick';
 import { PICK_ACTIONS } from '../sim/lockpick';
@@ -3036,8 +3042,15 @@ export class Hud {
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useManaPotion', { amount: itemNumber(item.potionMana) }))}</div>`;
     if (item.kind === 'quest')
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.questItem'))}</div>`;
-    if (item.requiredClass && !armorTypeForItem(item) && !weaponArchetypeForItem(item)) {
-      html += `<div class="tt-sub">${esc(t('itemUi.tooltip.classes', { classes: item.requiredClass.map(classDisplayName).join(', ') }))}</div>`;
+    // Surface who an item is for, before they can get it (loot rolls, vendor
+    // browsing, linked items). Show the classes that can ACTUALLY equip it,
+    // resolved through the proficiency rules (a weapon's requiredClass only
+    // names its archetype, so rogues/hunters/shamans can wield a "warrior"
+    // weapon too) - showing the raw requiredClass there would mislead. Only
+    // shown when there is a real restriction (a proper subset of all classes).
+    const eligible = equippableClasses(item);
+    if (eligible.length > 0 && eligible.length < PLAYER_CLASSES.length) {
+      html += `<div class="tt-sub tt-restrict">${esc(t('itemUi.tooltip.classes', { classes: eligible.map(classDisplayName).join(', ') }))}</div>`;
     }
     html += this.itemSetBlock(item);
     if (item.sellValue > 0)

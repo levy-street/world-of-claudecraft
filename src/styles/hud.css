@@ -2185,6 +2185,10 @@
   #tooltip .tt-row .tt-armor.tt-armor-bad {
     color: #ff5040;
   }
+  /* Class-restriction line ("Classes: Warrior, Paladin") highlighted as a usability cue. */
+  #tooltip .tt-sub.tt-restrict {
+    color: var(--color-accent);
+  }
   /* One-line aura effect summary under the tooltip title (buff/debuff hover). */
   #tooltip .tt-effect {
     color: var(--color-accent, #d4b483);

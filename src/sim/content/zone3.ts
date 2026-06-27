@@ -2414,7 +2414,9 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'legendary',
     weapon: { min: 46, max: 74, speed: 2.8 },
-    stats: { str: 24, sta: 20 },
+    // Agility is here for the rogues and hunters who can also wield it (warrior-
+    // archetype weapon: warrior/paladin/rogue/hunter/shaman are all eligible).
+    stats: { str: 24, sta: 20, agi: 24 },
     sellValue: 25000,
     requiredClass: ['warrior', 'paladin'],
   },

@@ -52,6 +52,28 @@ export function weaponArchetypeForItem(item: ItemDef): WeaponArchetype | null {
   return null;
 }
 
+// All nine player classes in the canonical paperdoll/order used for display.
+export const PLAYER_CLASSES: readonly PlayerClass[] = [
+  'warrior',
+  'paladin',
+  'hunter',
+  'rogue',
+  'priest',
+  'shaman',
+  'mage',
+  'warlock',
+  'druid',
+];
+
+// The classes that can actually equip an item, resolved through the same
+// proficiency rules as canEquipItem (archetype for weapons, armor rank for
+// armor). Used by the tooltip to tell players who an item is for. An empty or
+// full result both mean "no class restriction"; callers show the line only for
+// a proper subset.
+export function equippableClasses(item: ItemDef): PlayerClass[] {
+  return PLAYER_CLASSES.filter((cls) => canEquipItem(cls, item));
+}
+
 export function canEquipItem(cls: PlayerClass, item: ItemDef): boolean {
   const armorType = armorTypeForItem(item);
   if (armorType) return ARMOR_RANK[armorType] <= ARMOR_RANK[maxArmorTypeForClass(cls)];
