@@ -1811,7 +1811,7 @@ export class ClientWorld implements IWorld {
     if (alloc) {
       const clean = (name || 'Build').toString().slice(0, 24);
       const safeBar = Array.isArray(bar)
-        ? bar.slice(0, 16).map((b) => (typeof b === 'string' ? b : null))
+        ? bar.slice(0, 23).map((b) => (typeof b === 'string' ? b : null))
         : [];
       const saved = { name: clean, alloc: cloneAllocation(alloc), bar: safeBar };
       this.talents = cloneAllocation(alloc);

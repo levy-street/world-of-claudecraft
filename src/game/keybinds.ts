@@ -27,7 +27,8 @@ export interface BindAction {
   allowShared?: boolean;
 }
 
-export const ACTION_BAR_SLOTS = 12; // slot 0 is Attack, 1..11 the ability bar
+// slot 0 is Attack, 1..11 the primary ability bar, 12..22 the secondary bar.
+export const ACTION_BAR_SLOTS = 23;
 
 const SLOT_DEFAULTS = [
   'Digit1',
@@ -42,6 +43,20 @@ const SLOT_DEFAULTS = [
   'Digit0',
   'Minus',
   'Equal',
+  // Secondary bar (slots 12..22): defaults to the numpad so it never collides
+  // with the primary number row. Fully rebindable like any other slot, and
+  // laptops without a numpad can simply assign their own keys.
+  'Numpad1',
+  'Numpad2',
+  'Numpad3',
+  'Numpad4',
+  'Numpad5',
+  'Numpad6',
+  'Numpad7',
+  'Numpad8',
+  'Numpad9',
+  'Numpad0',
+  'NumpadDecimal',
 ];
 
 export const BIND_ACTIONS: BindAction[] = [
@@ -189,7 +204,7 @@ export const BIND_ACTIONS: BindAction[] = [
   ...SLOT_DEFAULTS.map(
     (code, i): BindAction => ({
       id: `slot${i}`,
-      label: i === 0 ? 'Attack' : `Action Bar ${i + 1}`,
+      label: i === 0 ? 'Attack' : i <= 11 ? `Action Bar ${i + 1}` : `Secondary Bar ${i - 11}`,
       category: 'Action Bar',
       kind: 'edge',
       defaults: [code],

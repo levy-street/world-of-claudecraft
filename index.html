@@ -894,7 +894,12 @@
   .pet-btn.cooldown.autocast { filter: grayscale(.45) brightness(.78); }
   .pet-btn .cdtext { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
     font-size: 13px; color: var(--gold); text-shadow: 1px 1px 2px #000; font-weight: bold; pointer-events: none; }
-  #actionbar { display: flex; gap: 4px; padding: 6px; }
+  #actionbar, #actionbar2 { display: flex; gap: 4px; padding: 6px; }
+  /* The secondary bar sits just above the primary; a touch tighter so the stack stays compact. */
+  #actionbar2 { padding-bottom: 2px; }
+  /* Mobile keeps the single compact primary bar; the secondary bar's slots stay
+     reachable via their (rebindable) keybinds. */
+  body.mobile-touch #actionbar2 { display: none; }
   .action-btn { width: 46px; height: 46px; position: relative; border: 2px solid #4a3d1d; border-radius: 6px;
     background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f); color: #fff; cursor: var(--cursor-point);
     font-family: var(--title-font); text-shadow: 1px 1px 2px #000;
@@ -8377,6 +8382,7 @@
           </div>
           <div id="petbar" class="panel"></div>
           <div id="xpbar"><div class="fill"></div><div class="rested"></div><div class="ticks"></div><div class="label"></div></div>
+          <div id="actionbar2" class="panel"></div>
           <div id="actionbar" class="panel"></div>
         </div>
         <div id="meters-window" class="panel">
