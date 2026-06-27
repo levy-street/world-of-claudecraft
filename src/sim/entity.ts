@@ -1,5 +1,5 @@
 import type { TalentModifiers } from './content/talents';
-import { CLASSES, ITEMS, MOBS, type NpcDef } from './data';
+import { aggregateSetBonuses, CLASSES, ITEMS, MOBS, type NpcDef } from './data';
 import type { Entity, EquipSlot, MobTemplate, PlayerClass, Stats, Vec3 } from './types';
 import { EQUIP_SLOTS } from './types';
 
@@ -34,6 +34,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     rangedPower: 0,
     critChance: 0.05,
     dodgeChance: 0.05,
+    castPushbackReduction: 0,
     moveSpeed: 7,
     hostile: false,
     targetId: null,
@@ -165,11 +166,14 @@ export function recalcPlayerStats(
     spi: def.baseStats.spi + def.statsPerLevel.spi * (lvl - 1),
     armor: def.baseStats.armor + def.statsPerLevel.armor * (lvl - 1),
   };
+  const setCounts = new Map<string, number>();
   for (const slot of EQUIP_SLOTS) {
     const itemId = equipment[slot];
     if (!itemId) continue;
     const item = ITEMS[itemId];
-    if (!item?.stats) continue;
+    if (!item) continue;
+    if (item.set) setCounts.set(item.set, (setCounts.get(item.set) ?? 0) + 1);
+    if (!item.stats) continue;
     s.str += item.stats.str ?? 0;
     s.agi += item.stats.agi ?? 0;
     s.sta += item.stats.sta ?? 0;
@@ -177,8 +181,17 @@ export function recalcPlayerStats(
     s.spi += item.stats.spi ?? 0;
     s.armor += item.stats.armor ?? 0;
   }
+  // Item-set bonuses from equipped pieces. Flat primary stats join the gear
+  // totals so they feed every derivation below; AP/crit/pushback fold in at
+  // their own steps (bonusAp, critChance, castPushbackReduction).
+  const setEff = aggregateSetBonuses(setCounts);
+  s.str += setEff.str;
+  s.agi += setEff.agi;
+  s.sta += setEff.sta;
+  s.int += setEff.int;
+  s.spi += setEff.spi;
   // Buff auras
-  let bonusAp = 0;
+  let bonusAp = setEff.ap;
   let bonusDodge = 0;
   let bearForm = false;
   let catForm = false;
@@ -266,7 +279,8 @@ export function recalcPlayerStats(
       ? Math.max(0, Math.round((s.agi * 2 + bonusAp) * (1 + (mods?.stats.apPct ?? 0))))
       : 0;
   // Crit: ~1% per 20 agi at low level
-  e.critChance = 0.05 + s.agi * 0.0005 + (mods?.stats.crit ?? 0);
+  e.critChance = 0.05 + s.agi * 0.0005 + (mods?.stats.crit ?? 0) + setEff.crit;
+  e.castPushbackReduction = setEff.castPushbackReduction;
   // Floored at 0: an off-balance debuff (negative buff_dodge) can drive dodge to nothing.
   e.dodgeChance = Math.max(0, 0.05 + s.agi * 0.0005 + bonusDodge);
 

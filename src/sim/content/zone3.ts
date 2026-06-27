@@ -2203,6 +2203,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   deathlord_warplate: {
     id: 'deathlord_warplate',
+    set: 'deathlord',
     name: 'Deathlord Warplate',
     kind: 'armor',
     armorType: 'mail',
@@ -2214,6 +2215,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   necromancers_starshroud: {
     id: 'necromancers_starshroud',
+    set: 'necromancers',
     name: "Necromancer's Starshroud",
     kind: 'armor',
     armorType: 'cloth',
@@ -2225,6 +2227,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   wyrmshadow_harness: {
     id: 'wyrmshadow_harness',
+    set: 'wyrmshadow',
     name: 'Wyrmshadow Harness',
     kind: 'armor',
     armorType: 'leather',
@@ -2236,6 +2239,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   deathlord_legguards: {
     id: 'deathlord_legguards',
+    set: 'deathlord',
     name: 'Deathlord Legguards',
     kind: 'armor',
     armorType: 'mail',
@@ -2247,6 +2251,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   deathlord_sabatons: {
     id: 'deathlord_sabatons',
+    set: 'deathlord',
     name: 'Deathlord Sabatons',
     kind: 'armor',
     armorType: 'mail',
@@ -2258,6 +2263,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   necromancers_soulsteps: {
     id: 'necromancers_soulsteps',
+    set: 'necromancers',
     name: "Necromancer's Soulsteps",
     kind: 'armor',
     armorType: 'cloth',
@@ -2269,6 +2275,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   necromancers_legwraps: {
     id: 'necromancers_legwraps',
+    set: 'necromancers',
     name: "Necromancer's Legwraps",
     kind: 'armor',
     armorType: 'cloth',
@@ -2280,6 +2287,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   wyrmshadow_treads: {
     id: 'wyrmshadow_treads',
+    set: 'wyrmshadow',
     name: 'Wyrmshadow Treads',
     kind: 'armor',
     armorType: 'leather',
@@ -2291,6 +2299,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   wyrmshadow_legguards: {
     id: 'wyrmshadow_legguards',
+    set: 'wyrmshadow',
     name: 'Wyrmshadow Legguards',
     kind: 'armor',
     armorType: 'leather',
@@ -2340,6 +2349,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   // shoulder≈0.75, gloves≈0.65) so they slot cleanly into each set. ---
   deathlords_dread_visage: {
     id: 'deathlords_dread_visage',
+    set: 'deathlord',
     name: "Deathlord's Dread Visage",
     kind: 'armor',
     armorType: 'mail',
@@ -2351,6 +2361,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   necromancers_soulspire_mantle: {
     id: 'necromancers_soulspire_mantle',
+    set: 'necromancers',
     name: "Necromancer's Soulspire Mantle",
     kind: 'armor',
     armorType: 'cloth',
@@ -2362,6 +2373,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   wyrmshadow_talongrips: {
     id: 'wyrmshadow_talongrips',
+    set: 'wyrmshadow',
     name: 'Wyrmshadow Talongrips',
     kind: 'armor',
     armorType: 'leather',
@@ -2395,6 +2407,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   crownforged_dreadhelm: {
     id: 'crownforged_dreadhelm',
+    set: 'crownforged',
     name: 'Crownforged Dreadhelm',
     kind: 'armor',
     armorType: 'mail',
@@ -2406,6 +2419,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   crownforged_warspaulders: {
     id: 'crownforged_warspaulders',
+    set: 'crownforged',
     name: 'Crownforged Warspaulders',
     kind: 'armor',
     armorType: 'mail',
@@ -2417,6 +2431,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   nighttalon_crown: {
     id: 'nighttalon_crown',
+    set: 'nighttalon',
     name: 'Nighttalon Crown',
     kind: 'armor',
     armorType: 'leather',
@@ -2428,6 +2443,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   nighttalon_shoulderguards: {
     id: 'nighttalon_shoulderguards',
+    set: 'nighttalon',
     name: 'Nighttalon Shoulderguards',
     kind: 'armor',
     armorType: 'leather',
@@ -2439,6 +2455,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   soulflame_cowl: {
     id: 'soulflame_cowl',
+    set: 'soulflame',
     name: 'Soulflame Cowl',
     kind: 'armor',
     armorType: 'cloth',
@@ -2450,6 +2467,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   soulflame_mantle: {
     id: 'soulflame_mantle',
+    set: 'soulflame',
     name: 'Soulflame Mantle',
     kind: 'armor',
     armorType: 'cloth',
@@ -2461,6 +2479,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   stormcallers_crown: {
     id: 'stormcallers_crown',
+    set: 'stormcallers',
     name: "Stormcaller's Crown",
     kind: 'armor',
     armorType: 'mail',
@@ -2472,6 +2491,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   stormcallers_spaulders: {
     id: 'stormcallers_spaulders',
+    set: 'stormcallers',
     name: "Stormcaller's Spaulders",
     kind: 'armor',
     armorType: 'mail',
