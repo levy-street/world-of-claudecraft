@@ -42,8 +42,20 @@ Concretely, the founder, inside the existing provision flow, can choose to:
 5. **Earn ongoing trading fees** that flow through the existing per-realm revenue
    split (operator share, global treasury, affiliate cut, $WOC buy-and-burn).
 
+Two more mechanics make the anti-rug story structural, not aspirational:
+
+6. **A share of every realm token funds the Levy Street Fund**, a transparent
+   on-chain platform portfolio that holds a slice of every realm's token and is
+   shown daos.fun-style: each holding with its amount and live value, and a total
+   AUM. The platform's upside is tied to every realm's success, in public view.
+7. **A capped founder allocation is locked in immutable vesting** (and the Levy
+   Street Fund's own bag is locked on stricter terms), so neither the founder nor
+   the platform can dump. The bulk of supply sells through the open curve.
+
 The platform's value proposition to players: "launch your clone here and you
-physically cannot rug, and we show the proof on-chain." That is the product.
+physically cannot rug, and we show the proof on-chain, the founder's tokens are
+vesting-locked, and the platform holds the bag right next to you." That is the
+product.
 
 ## 2. Decisions locked for this plan
 
@@ -222,9 +234,39 @@ a new on-chain program.** Components, each behind an existing seam:
    math (and transfer-fee accounting if ever enabled). The existing
    `usesToken2022` gate on stake / buy stays intact and hard-rejecting.
 
-9. **UI panels** (host-injected, `realm_operator.ts` template): a prelaunch /
-   token-status page, a vote panel, a presale-contribute panel, and a read-mostly
-   liquidity / lock-proof dashboard that links every commitment to Solscan.
+9. **Allocation + lock enforcement (`server/realm_token_alloc.ts`).** At launch
+   the mint factory distributes the fixed supply per the allocation table
+   (section 7): the public/curve share to the bonding curve, the liquidity share
+   to the LP, and the founder / Levy Street Fund / realm-treasury shares into
+   **immutable Jupiter Lock** vesting contracts (`cancelableBySender = false`,
+   `cancelableByRecipient = false`). A realm token does not list (status does not
+   reach `live`) until the founder lock, the levy lock, and the LP lock are all
+   on-chain and verifiable. Pure split math is unit-tested; the lock addresses are
+   persisted on `realm_tokens` for the dashboard's proof links.
+
+10. **Levy Street Fund (`server/levy_fund.ts` + `levy_fund_db.ts`).** A single
+    platform-owned **treasury wallet (PDA)** that receives the levy allocation of
+    every realm token. A valuation keeper reads its on-chain holdings and prices
+    each one (section "Levy Street Fund" below), caching a holdings snapshot for a
+    public, daos.fun-style portfolio dashboard. It is a **display-only treasury,
+    not a tradeable fund**: it never mints a fund-share token and offers no
+    pro-rata redemption (the line that would create securities / Investment
+    Company Act exposure). Its own bag is Jupiter-Lock vested on the strictest
+    schedule, under a published no-sell / governance-gated-disposal policy.
+
+11. **Portfolio valuation pipeline (`server/token_valuation.ts`).** A tiered,
+    liquidity-aware mark per mint: pre-graduation, price from the Meteora DBC
+    pool's `sqrtPrice` (and a size-aware `swapQuote` against the held balance);
+    post-graduation, Jupiter Price API v3 (batched 50 mints/call) cross-checked
+    against Birdeye / DEX Screener, with a SOL/USD reference from Pyth. Illiquid
+    or null-priced holdings are marked as such and excluded from AUM (never
+    zeroed). Reused by the Levy Street Fund dashboard and any token-balance
+    display.
+
+12. **UI panels** (host-injected, `realm_operator.ts` template): a prelaunch /
+    token-status page, a vote panel, a presale-contribute panel, a read-mostly
+    liquidity / lock-proof dashboard that links every commitment to Solscan, and
+    the public Levy Street Fund portfolio page.
 
 ### Data flows
 
@@ -245,6 +287,11 @@ a new on-chain program.** Components, each behind an existing seam:
   .../presale/confirm` with the sig to server verifies recipient-leg credits +
   fee-payer + memo, inserts the contribution with `UNIQUE(tx_sig)` to on soft cap
   met, seed the curve / Alpha Vault; on miss, refund.
+- **Allocation + locks at launch:** mint factory mints the fixed supply to the
+  public/curve share to the bonding curve, the liquidity share to the LP, and the
+  founder / Levy Street Fund / realm-treasury shares each into an immutable
+  Jupiter Lock vesting contract to lock addresses persisted on `realm_tokens` to
+  the token can reach `live` only once founder + levy + LP locks are all on-chain.
 - **Bonding curve + graduation:** traders buy against the Meteora DBC pool (quote
   SOL/USDC) to at the migration threshold the SDK auto-migrates to DAMM v2 to LP
   permanently locked / burned to status `presale` to `live` to `graduated`,
@@ -252,6 +299,12 @@ a new on-chain program.** Components, each behind an existing seam:
 - **Fee flow:** DBC `feeClaimer` PDA accrues trading fees to per-realm keeper
   claims to split to operator / global treasury / $WOC buy-and-burn per bps (with
   affiliate cut) to recorded in the revenue-share ledger.
+- **Levy Street Fund accrual + valuation:** the levy allocation of each realm
+  token lands in (or vests into) the Levy Street Fund PDA to a valuation keeper
+  enumerates the PDA's token accounts, prices each (DBC `sqrtPrice` pre-grad;
+  Jupiter v3 cross-checked post-grad; Pyth SOL/USD) to caches a holdings snapshot
+  (per-token amount, price, value, weight; total AUM in SOL + USD) to served to
+  the public portfolio dashboard. No fund-share token is ever minted.
 - **In-world display:** server resolves `realmTokenConfig(realmId)` for symbol /
   icon (cross-process via `realm_tokens`) to surfaced on `IWorld` to `hud.ts`
   re-skins copper's display. The sim never sees the mint.
@@ -289,7 +342,7 @@ only when real money buys the soft balance or power directly. So:
 - The realm-list and the realm's prelaunch page **label it "pay-to-win"** plainly
   (a `t()` string), so players opt in knowingly.
 - Power-convertibility is flag-gated and default-off platform-wide until counsel
-  sign-off + geo-screening (section 9). A token that buys gameplay advantage sits
+  sign-off + geo-screening (section 10). A token that buys gameplay advantage sits
   in the same high-reg-risk band as the wager features and the SNS-tradeable
   characters work, and inherits the same gate.
 - The canonical economy and cross-realm play are unaffected: characters and
@@ -312,9 +365,14 @@ on the liquidity dashboard with a Solscan link, not a slogan.
 3. **Founder proceeds vest.** The founder's allocation and any presale carry vest
    through **Jupiter Lock** with `cancelableBySender = false` and
    `cancelableByRecipient = false` (immutable), so the dev cannot dump on day one.
-4. **No hidden pre-allocation.** A pump.fun-style fair-launch convention: the
-   founder buys from the same curve as everyone else; the curve, not an insider
-   pre-mint, sets the price.
+4. **Pre-allocation is transparent and locked, not hidden.** This is a
+   *structured* fair launch, not a zero-allocation pump.fun launch: a founder
+   allocation, a liquidity allocation, a Levy Street Fund allocation, and a realm
+   treasury allocation all exist, and the legitimacy comes entirely from the fact
+   that **every non-public bucket is locked on-chain on an immutable schedule the
+   buyer can read on Solscan / RugCheck.** The 2026 market bar is comprehensive
+   coverage: all non-circulating supply provably locked. The bulk of supply still
+   sells through the open curve at the same price for everyone.
 5. **Anti-snipe at launch.** The DBC decaying-fee schedule (and optionally the
    Alpha Vault whitelist gated to stakers / voters) means early-block bots pay
    punitive fees and real participants get a fair entry.
@@ -330,13 +388,101 @@ on the liquidity dashboard with a Solscan link, not a slogan.
    If a realm token ever pays *rewards*, those emissions get a per-realm
    sink-bounded flow ledger so it can never pay out more than it verifiably took
    in (the existing `flow_ledger` invariant, per realm).
+9. **The platform holds the bag in public, and cannot dump it either.** The Levy
+   Street Fund's allocation of each realm token is locked on the *strictest*
+   schedule on the cap table and governed by a published no-sell / disposal
+   policy, so the platform's own bag is not an overhang waiting to drop. Its
+   holdings are displayed live (see the Levy Street Fund section), aligning the
+   platform with every realm and proving it is not quietly selling.
 
-Default allocation guidance (env-tunable, to be finalized with counsel): the bulk
-of supply to the bonding curve / public, a capped founder allocation on an
-immutable vesting schedule, a capped treasury allocation, zero supply retained
-with live mint authority.
+### Default allocation (env-tunable, counsel-reviewed before mainnet)
 
-## 8. UI: prelaunch, voting, presale, liquidity
+A fixed supply (no live mint authority after launch), split so the bulk sells
+through the open curve and every non-public bucket is immutably locked. These are
+the starting knobs, grounded in 2026 structured-fair-launch norms (public/curve
+30 to 50%+, liquidity 5 to 10%, team 10 to 20%, treasury 20 to 30%); tune per
+realm within hard caps.
+
+| Bucket | Default | Hard cap | Destination + lock |
+|---|---|---|---|
+| Public / bonding curve | 60% | n/a | Sold on the Meteora DBC curve at one price for everyone. Circulating. |
+| Liquidity | 10% | n/a | Paired into the DAMM v2 pool at graduation, LP **permanently locked / burned**. |
+| Founder | 12% | 15% | Immutable Jupiter Lock: **12-month cliff + 36-month linear** (`cancelableBySender = false`, `cancelableByRecipient = false`, `transferableBySender = false`). |
+| Levy Street Fund | 8% | 10% | Platform PDA, immutable Jupiter Lock on the **longest** schedule (12-month cliff + 48-month linear); no-sell / governance-gated disposal. |
+| Realm treasury | 10% | 15% | Realm operations (events, rewards, customization budget); vested or governance-gated, never instantly liquid. |
+
+Rationale: the founder bucket is **capped at 15%** because a higher insider
+allocation reads as rug-risk to the 2026 market regardless of vesting; credibility
+comes from the lock, not the size. At launch roughly **40% of supply is locked or
+LP-locked** (liquidity + founder + levy + treasury), which is the "large share
+locked so they cannot rug" property, while 60% floats on the open curve. A realm
+token may **not** list (`status` may not reach `live`) until the founder lock, the
+levy lock, and the LP lock are all on-chain and linkable to RugCheck / Solscan.
+The Levy Street Fund cut may optionally be supplemented by a small ongoing slice of
+trading fees, but its *primary* form is this token allocation, so the fund holds
+the actual realm tokens (the daos.fun-style portfolio of holdings).
+
+## 8. The Levy Street Fund (platform portfolio)
+
+A set share of every realm token (default 8%, see the allocation table) accrues
+to the **Levy Street Fund**: a single platform-owned treasury wallet (a PDA) that
+ends up holding a slice of every token launched on the platform, displayed
+daos.fun-style as a live portfolio of holdings with each token's amount and value.
+It aligns the platform with every realm's success and puts that alignment on a
+public page.
+
+**The one deliberate divergence from daos.fun: it is display-only, not a tradeable
+fund.** daos.fun also mints a fund-share token with pro-rata redemption of the
+underlying basket. We do **not**. The Levy Street Fund mints no share token, sells
+no claim on the portfolio, and offers no redemption. It is a transparent treasury
+whose holdings we *show*, nothing more. That distinction is the line that keeps the
+platform out of investment-company / pooled-investment-vehicle territory; crossing
+it (a tradeable claim on a managed basket of tokens) is the single largest
+securities risk in this whole design and is explicitly out of scope (section 14).
+
+**The platform cannot dump it either.** The fund's allocation of each realm token
+is locked in an immutable Jupiter Lock on the **longest schedule on the cap table**
+(12-month cliff + 48-month linear), and disposal is governed by a published policy:
+no market-selling the bag; any disposal (buy-and-burn, OTC, or LP provisioning)
+must pass a public, logged governance step. So the fund is not a hidden overhang
+waiting to drop on holders; it is a long-term, transparent, locked holder beside
+them. This directly answers the obvious objection that "a platform sitting on a big
+bag of every token is itself a rug vector."
+
+**Valuation pipeline (`server/token_valuation.ts`).** A holding's value = balance x
+price; the price source is tiered by the token's liquidity state, because no single
+feed covers the lifecycle:
+
+- **Pre-graduation (on the DBC curve, no DEX route yet):** read the Meteora DBC
+  pool's `sqrtPrice` and convert (`price = (sqrtPrice / 2^64)^2 x 10^(baseDec -
+  quoteDec)`), and publish a **size-aware** mark via `client.state.swapQuote`
+  against the fund's actual balance (realized quote-out, not instantaneous spot),
+  so a thin curve cannot inflate the mark.
+- **Post-graduation (a real route exists):** Jupiter Price API v3
+  (`https://lite-api.jup.ag/price/v3?ids=`, batched 50 mints per call) as the
+  primary USD source, cross-checked against Birdeye and DEX Screener; if they
+  diverge beyond a threshold or pool liquidity is below a floor, mark the token
+  illiquid rather than trusting the spot.
+- **SOL/USD reference:** one Pyth Hermes pull per refresh, carrying a confidence
+  band; flag holdings when the band is wide or the feed is stale.
+- **Token-2022 specifics:** read decimals from the mint under the Token-2022
+  program; if a transfer fee is ever enabled, value the net realizable amount.
+- **Anti-manipulation + honesty:** value each holding off a short rolling median
+  (or liquidity-weighted price), clamp single-refresh AUM jumps pending
+  confirmation, and **exclude** null-priced / illiquid holdings from the AUM total
+  rather than zeroing them (the bug daos.fun clones repeatedly ship). The fund's
+  AUM / NAV is the only headline number; because the fund has no share token, there
+  is no market price to confuse it with.
+
+**Data + cadence.** A valuation keeper enumerates the PDA's token accounts
+(`getParsedTokenAccountsByOwner` under the Token-2022 program, or a DAS read for
+metadata), prices them on the tiered pipeline, and writes a `levy_fund_holdings`
+snapshot (per-token amount, price USD + SOL, value, weight, source tag, confidence,
+illiquid flag; plus the AUM totals) on a cache cadence of roughly 15 to 60 seconds.
+The public dashboard reads the snapshot, never the chain directly, so it is fast and
+rate-limit-safe. SQL lives in `levy_fund_db.ts`.
+
+## 9. UI: prelaunch, voting, presale, liquidity
 
 All panels are self-contained modules injected by `main.ts` into hidden
 auth-screen panels (the `realm_operator.ts` template), with REST methods on the
@@ -354,9 +500,17 @@ auth-screen panels (the `realm_operator.ts` template), with REST methods on the
   quote to sign, and the refund terms. The sign flow reuses `src/net/wallet.ts`
   and a pure builder modeled on `src/net/realm_buy.ts`.
 - **Liquidity / lock-proof dashboard.** Read-mostly: pool address, LP-lock proof,
-  renounced-authority proof, vesting schedule, and the live RugCheck-style
-  checklist, each a Solscan link. This is the trust surface that differentiates us
-  from the rugs.
+  renounced-authority proof, founder + levy vesting schedules, and the live
+  RugCheck-style checklist, each a Solscan link. This is the trust surface that
+  differentiates us from the rugs.
+- **Levy Street Fund portfolio page (public).** The daos.fun-style holdings view,
+  reading the `levy_fund_holdings` snapshot: a header with total AUM in SOL and
+  USD (and 24h change), then one row per holding showing {realm + token logo,
+  symbol, amount, price in USD and SOL, value, percent of portfolio}, sortable by
+  value, with illiquid holdings flagged and a per-row source / confidence tag. No
+  buy / sell / redeem controls (it is display-only). Each holding links to its
+  realm and to Solscan; the fund's own lock and no-sell policy are linked at the
+  top so the page doubles as proof the platform is not dumping.
 - **Realm-list integration.** `mergeRealmDirectory` surfaces each realm's currency
   identity and (when `power`) the pay-to-win label, so players see it before they
   pick a realm.
@@ -366,7 +520,7 @@ the `quote` / `confirm` shape; all new strings are English-only catalog entries;
 server emits stable English mapped to `t()` keys client-side; the S3 localization
 guard stays green.
 
-## 9. Regulatory posture
+## 10. Regulatory posture
 
 We are a **non-custodial facilitator**, and we reduce rugs structurally rather
 than just enabling launches. The plan, not legal advice; counsel sign-off is a
@@ -382,6 +536,13 @@ gate.
   Mitigations: avoid managerial-effort / profit-promise language in all copy,
   position as a game currency, keep the facilitator (not issuer, not curator)
   posture, and gate `power` realms behind explicit sign-off.
+- **Levy Street Fund posture (the highest-risk surface).** A platform that
+  accumulates and *displays* a portfolio of tokens it helped launch must not also
+  sell a claim on that portfolio. The fund is therefore display-only: no
+  fund-share token, no redemption (section 8). This keeps it a transparent
+  treasury rather than a pooled investment vehicle. A written counsel memo on
+  Investment Company Act status and on what statements are safe on the portfolio
+  page is a precondition to enabling the page on mainnet.
 - **Geo / sanctions gating.** OFAC SDN screening plus IP geolocation excluding
   sanctioned countries and any in-scope-restricted retail jurisdiction; never
   tolerate VPN circumvention by design. Applied as middleware on the vote /
@@ -390,24 +551,25 @@ gate.
   off, until geo-screening + counsel sign-off, the same gate the wager features
   sit behind.
 
-## 10. Phased delivery (each phase shippable)
+## 11. Phased delivery (each phase shippable)
 
 | Phase | Deliverable | Depends on | Acceptance check |
 |---|---|---|---|
 | **0. Registry + identity** | `realm_tokens` table + `assertRealmSchema` extension + pure `realmTokenConfig(realmId)` + `RealmToken` types; directory surfaces per-realm currency. No chain writes. | #475 (landed) | New `*_db.ts` integration test (in-memory fake + real-DB); `assertRealmSchema` fails on a dropped column; directory merge test. |
 | **1. Launch vote (asset-only)** | `realm_vote.ts` + `realm_vote_db.ts` weighted tally, per-wallet guard, REST + vote panel + `launchpad` i18n domain. Pass flips `voting` to `presale`. | 0; `woc_balance` (exists) | Tally unit tests (weights, quorum, double-vote rejection); panel renders; S3 i18n guard green. |
 | **2. Presale (asset-only, non-custodial)** | `realm_presale.ts` + `realm_presale_db.ts` forking `realm_buy` quote/verify/confirm; SOL/USDC (+$WOC, +Stripe optional); `UNIQUE(tx_sig)`, caps, soft-cap refund; presale panel. | 1; `realm_buy` machinery (exists) | Verifier rejects wrong-amount / wrong-recipient / replayed sig; refund path test; non-custodial (no server settle key) asserted. |
-| **3. Token-2022 mint factory** | Boring fair-launch mint (metadata-only, 9dp, freeze null), server partial-sign + founder co-sign, verify + record `launch_tx_sig` UNIQUE, renounce authority; immutable founder vesting (Jupiter Lock); scoped Token-2022 verifier. Devnet dry-run. | 0; add `@solana/spl-token` | Devnet: mint created, metadata present, authorities renounced, RugCheck-clean; legacy stake/buy verifiers still reject Token-2022. |
+| **3. Token-2022 mint factory + allocation/locks** | Boring fair-launch mint (metadata-only, 9dp, freeze null), server partial-sign + founder co-sign, verify + record `launch_tx_sig` UNIQUE, renounce authority; distribute the fixed supply per the allocation table; immutable Jupiter Lock for the founder, Levy Street Fund, and realm-treasury buckets; `realm_token_alloc.ts` split math; a token may not list until founder + levy + LP locks are on-chain. Scoped Token-2022 verifier. Devnet dry-run. | 0; add `@solana/spl-token` | Devnet: mint created, metadata present, authorities renounced, locks immutable + verifiable, RugCheck-clean; split math sums to 100%; listing blocked until all locks present; legacy stake/buy verifiers still reject Token-2022. |
 | **4. Bonding curve + LP graduation** | Meteora DBC launch service: shared partner config + feeClaimer PDA, per-realm curve, auto-migrate to DAMM v2 + permanent LP lock; optional Alpha Vault; `Launchpad` abstraction with Raydium fallback. Mainnet-only liquidity. | 3 (mint), 2 (presale feeds curve); mainnet sign-off | Mainnet dry-run: curve trades, migrates at threshold, LP provably locked; status transitions persisted. |
 | **5. Fee / revenue keeper** | Source-scoped `PayoutKeeper`: buyback leg to $WOC burn or LP seed (pluggable terminal step); claims DBC fees into the revenue split with affiliate cut; lock-proof dashboard panel. | 4 (pool + feeClaimer); buyback keeper engine (exists) | Keeper drains a seeded vault end-to-end; split math + affiliate cut tests; advisory-lock no-double-spend. |
-| **6. In-world currency re-skin** | Per-realm currency symbol / icon on `IWorld`; `hud.ts` re-skins copper display; `sim_i18n` matcher; per-realm procedural icon. Sim stays pure; `cosmetic` realms keep power on soft copper, `power` realms allow verified token-to-copper credit. | 0 (resolver); parallel with 3 to 5 | `tests/architecture.test.ts` green (no mint in sim); money-display + re-localize tests; `monetization_policy` gate test. |
-| **7. Regulatory hardening + mainnet gate** | Non-custodial-facilitator ToS, OFAC + geo middleware on money routes, RugCheck/Birdeye clean-score acceptance test, pay-to-win labeling, counsel sign-off. Flag-gated default-off. | 2 to 5; legal review | Geo middleware blocks excluded IPs; flags default-off; sign-off recorded before any mainnet enablement. |
+| **6. Levy Street Fund + portfolio dashboard** | `levy_fund.ts` + `levy_fund_db.ts` + `token_valuation.ts`: the platform PDA accrues each realm's levy bucket (locked); a valuation keeper marks holdings (DBC `sqrtPrice` / `swapQuote` pre-grad, Jupiter v3 + cross-check post-grad, Pyth SOL/USD); a `levy_fund_holdings` snapshot powers a public, display-only daos.fun-style portfolio page. No fund-share token, no redemption. | 3 (levy bucket exists), 4 (graduated tokens get DEX prices) | Valuation tiers unit-tested (curve math, illiquid excluded not zeroed, divergence rejection); AUM matches a fixture wallet; dashboard renders; no buy/sell/redeem path exists; levy lock is on the longest schedule. |
+| **7. In-world currency re-skin** | Per-realm currency symbol / icon on `IWorld`; `hud.ts` re-skins copper display; `sim_i18n` matcher; per-realm procedural icon. Sim stays pure; `cosmetic` realms keep power on soft copper, `power` realms allow verified token-to-copper credit. | 0 (resolver); parallel with 3 to 6 | `tests/architecture.test.ts` green (no mint in sim); money-display + re-localize tests; `monetization_policy` gate test. |
+| **8. Regulatory hardening + mainnet gate** | Non-custodial-facilitator ToS, OFAC + geo middleware on money routes, RugCheck/Birdeye clean-score acceptance test, pay-to-win labeling, counsel memo on the Levy Street Fund (Investment Company Act) + sign-off. Flag-gated default-off. | 2 to 6; legal review | Geo middleware blocks excluded IPs; flags default-off; counsel memo + sign-off recorded before any mainnet enablement. |
 
 Phases 0 to 2 ship with no new mint and no mainnet dependency (pure registry +
-asset-only vote + asset-only presale), so the riskiest chain work (3 to 5) is
+asset-only vote + asset-only presale), so the riskiest chain work (3 to 6) is
 de-risked and sequenced behind shippable value.
 
-## 11. Risks and mitigations
+## 12. Risks and mitigations
 
 | Severity | Risk | Mitigation |
 |---|---|---|
@@ -420,15 +582,23 @@ de-risked and sequenced behind shippable value.
 | Medium | Replay / double-spend across many contributions + the launch tx. | `UNIQUE(tx_sig)` on every money row + `launch_tx_sig`; ledger-first insert before any grant; quote TTL shorter than any reservation hold. |
 | Medium | Pre-liquidity pricing gaps (Jupiter returns null with no DEX route; DEX-priced rails are mainnet-only). | Tolerate null routes (503 / disabled, existing pattern); use the bonding curve itself as the pre-graduation price; fixed-rate card model for fixed-price presale legs; keep early phases asset-only + price-tolerant. |
 | Medium | Per-mint proliferation fragments liquidity and multiplies ops; abandoned realms strand mints / LP. | Gate launches behind the stake-to-provision minimum; shared quote asset for routing; document that closed-realm mints / LP remain on-chain by design (the lock is the point); track per-mint rent. |
+| High | Levy Street Fund as a securities surface: a platform that accumulates AND sells a claim on a managed basket of tokens it launched is a likely investment company / pooled-investment vehicle. | Display-only treasury: no fund-share token, no pro-rata redemption, no managed-return claims (section 8). Counsel memo on Investment Company Act status before the page is enabled on mainnet. |
+| High | Platform-bag overhang / centralization: holding a large share of every token is itself a perceived rug and a market overhang. | Lock the levy bucket on the strictest schedule on the cap table (12mo cliff + 48mo linear); published no-sell / governance-gated disposal policy; full public transparency of the holdings; the bag is capped (default 8%, hard cap 10%). |
+| Medium | Portfolio valuation is wrong or gameable (thin-pool spot manipulation; NAV mistaken for market price; AUM under-report from null prices). | Tiered liquidity-aware marks (DBC `swapQuote` against held balance pre-grad; Jupiter v3 cross-checked with Birdeye / DEX Screener post-grad); rolling median + clamp; exclude (never zero) illiquid holdings; no fund share token means no market-vs-NAV confusion. |
 | Low | i18n catalog-domain churn red-fails `tsc`. | New strings only in a new flat English-only `launchpad` domain spread into `i18n.catalog/index.ts`; map server error codes to `t()` keys client-side; keep the S3 guard green. |
 
-## 12. Open questions and unknowns
+## 13. Open questions and unknowns
 
 - **Token utility specifics.** What exactly does a `cosmetic` realm token buy
   (which SKUs: skins, names, mounts, realm-customization budget, access passes)?
   This determines the SKU catalog but not the architecture.
-- **Default allocation split.** Founder / public-curve / treasury percentages and
-  the vesting schedule, to finalize with counsel.
+- **Default allocation split + the levy cut.** The percentages in the allocation
+  table (public-curve / liquidity / founder / Levy Street Fund / treasury) and the
+  vesting schedules are starting knobs to finalize with counsel; in particular the
+  Levy Street Fund cut (default 8%) and the founder cap (15%).
+- **Levy Street Fund extras.** Whether the levy is also fed by a small ongoing
+  slice of trading fees (on top of the token allocation), and the exact
+  governance mechanism for the no-sell / disposal policy.
 - **Quote asset per realm.** SOL by default; allow USDC and $WOC? $WOC as a quote
   asset would create direct $WOC buy pressure but fragments routing.
 - **Core convergence.** Four duplicated commerce cores exist across worktrees
@@ -443,10 +613,10 @@ de-risked and sequenced behind shippable value.
   against live repos at implementation time. Read fees / thresholds from live
   on-chain config, never hardcode.
 - **Devnet limits.** The bonding-curve / LP / graduation path cannot be validated
-  end-to-end on devnet (no AMM liquidity, dead faucet); Phases 4 to 5 need a
+  end-to-end on devnet (no AMM liquidity, dead faucet); Phases 4 to 6 need a
   funded mainnet dry-run, with a fixed-rate stub host for pre-mainnet tests.
 
-## 13. Out of scope (for this plan / first delivery)
+## 14. Out of scope (for this plan / first delivery)
 
 - A custom bonding-curve or AMM Anchor program (we integrate Meteora).
 - On-chain binding governance (off-chain weighted tally first; SPL Governance is a
@@ -454,5 +624,9 @@ de-risked and sequenced behind shippable value.
 - Token-denominated *reward emissions* (would require a per-realm sink-bounded
   flow ledger; specified as a follow-on).
 - Cross-realm token bridging / unified liquidity.
+- **A tradeable Levy Street Fund share token or pro-rata redemption of the
+  portfolio.** Deliberately excluded: the fund is a display-only treasury (section
+  8). A redeemable basket share is the securities line we do not cross in this
+  plan; revisit only with a dedicated counsel-led workstream if ever wanted.
 - The world editor (separate workstream; this plan only consumes the realm it
   produces).
