@@ -61,6 +61,43 @@ const PET_AGGRESSIVE_RANGE = 18; // aggressive pets look for idle enemies this c
 // 1200 ticks = 60s at 20Hz. Stops hunters/warlocks parking an aggressive pet to
 // farm XP/loot while AFK; the pet still DEFENDS an idle owner. Tunable.
 const PET_OWNER_IDLE_TICKS = 1200;
+// Far-leash reunite: a pet kept beyond PET_FAR_LEASH_DISTANCE from its owner for
+// PET_FAR_LEASH_SECONDS straight warps to the owner unconditionally (no route/LOS
+// check). The catch-all for a pet STRANDED when its owner teleports into a
+// dungeon/arena instance (origins sit thousands of yards off in world space),
+// where the normal heel path/teleport can't bridge the gap. Strictly beyond every
+// normal follow/leash range (PET_FOLLOW_DISTANCE 3.5, PET_LEASH 40, PET_ASSIST_RANGE
+// 50, PET_TELEPORT_DISTANCE 60) so it only fires when the pet is genuinely lost.
+const PET_FAR_LEASH_DISTANCE = 90; // yards from the owner that start the reunite timer
+const PET_FAR_LEASH_SECONDS = 15; // continuous seconds beyond it before the warp
+
+// Reunite a stranded pet. The timer accumulates while the pet is beyond
+// PET_FAR_LEASH_DISTANCE and resets the moment it is back in range; at
+// PET_FAR_LEASH_SECONDS the pet is snapped onto the owner (inheriting the owner's
+// instance) with its heel path / combat target cleared, so it cleanly resumes
+// following an owner who zoned away. Returns true on the warp tick so updatePet
+// skips the rest of this tick's AI. The heel pathfinder can never bridge an
+// instance teleport, so this is the only thing that guarantees the reunion.
+function updatePetFarLeash(ctx: SimContext, pet: Entity, owner: Entity): boolean {
+  if (dist2d(pet.pos, owner.pos) <= PET_FAR_LEASH_DISTANCE) {
+    pet.petFarTimer = 0;
+    return false;
+  }
+  pet.petFarTimer += DT;
+  if (pet.petFarTimer < PET_FAR_LEASH_SECONDS) return false;
+  pet.petFarTimer = 0;
+  pet.pos = { ...owner.pos };
+  pet.prevPos = { ...pet.pos };
+  pet.dungeonId = owner.dungeonId;
+  pet.petPath = [];
+  pet.aggroTargetId = null;
+  pet.inCombat = false;
+  pet.forcedTargetId = null;
+  pet.forcedTargetTimer = 0;
+  // Teleport: keep the spatial grid exact this tick (matches every other warp).
+  ctx.rebucket(pet);
+  return true;
+}
 
 export function updatePet(ctx: SimContext, pet: Entity): void {
   const owner = pet.ownerId !== null ? ctx.entities.get(pet.ownerId) : null;
@@ -68,6 +105,9 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
     ctx.despawnPersistentPet(pet);
     return;
   }
+  // Reunite a stranded pet before any other AI (an owner who zoned into an
+  // instance is unreachable by the heel pathfinder).
+  if (updatePetFarLeash(ctx, pet, owner)) return;
   if (ctx.isStunned(pet)) return;
   ctx.syncPetAspect(pet, owner);
   pet.petTauntTimer = Math.max(0, pet.petTauntTimer - DT);
@@ -170,6 +210,10 @@ export function petFollow(ctx: SimContext, pet: Entity, owner: Entity): void {
     if (pet.petPath.length <= 1) {
       pet.pos = { ...owner.pos };
       pet.prevPos = { ...pet.pos };
+      // Warping to heel also reunites the pet with the owner's instance: an owner
+      // who is unreachable is usually one who zoned into a dungeon/arena, so carry
+      // the dungeonId across (matches the far-leash reunite).
+      pet.dungeonId = owner.dungeonId;
       pet.petPath = [];
       // a warp is a teleport: keep the spatial grid exact this tick instead of
       // waiting for the end-of-tick refresh, so same-tick aggro/AoE queries

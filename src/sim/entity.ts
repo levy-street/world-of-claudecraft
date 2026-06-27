@@ -92,6 +92,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     petTauntTimer: 0,
     petPath: [],
     petPathCooldown: 0,
+    petFarTimer: 0,
     spawnPos: { ...pos },
     leashAnchor: null,
     evadeStall: 0,

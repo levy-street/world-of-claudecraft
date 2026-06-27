@@ -1393,6 +1393,7 @@ export interface Entity {
   petManualTauntPending?: boolean; // manual Growl command waiting until the pet reaches range
   petPath: Vec3[]; // controlled pet heel route around obstacles; consumed front-to-back (like chargePath)
   petPathCooldown: number; // seconds until this pet may recompute its heel path again
+  petFarTimer: number; // controlled pet: seconds spent beyond the far-leash distance from its owner; resets on return, triggers a reunite warp at PET_FAR_LEASH_SECONDS
   pulseTimer: number; // boss aoe pulse countdown
   stompTimer: number; // boss War Stomp stun-pulse countdown
   stoneskinTimer: number; // periodic self-absorb barrier countdown
