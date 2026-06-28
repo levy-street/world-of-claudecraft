@@ -2083,6 +2083,7 @@
   body.native-app .cs-wallet,
   body.native-app .cs-wallet-hidden-note,
   body.native-app .account-wallet-card,
+  body.native-app #performance-tip,
   body.native-app .official-site-copy {
     display: none !important;
   }

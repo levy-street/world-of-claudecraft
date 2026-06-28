@@ -3,8 +3,9 @@
 // extraction both inline <style> blocks are empty and the game CSS lives in the shared
 // src/styles/* @layer modules (loaded by both entries via the src/main.ts barrel),
 // EXCEPT the #rotate-device gate which differs per entry: index suppresses the
-// rotate overlay in-game, play shows it in portrait. Each entry loads ONLY its own
-// per-entry .extra via a <link>.
+// rotate overlay in browser web gameplay but lets the native app show it in portrait,
+// while play shows it in portrait. Each entry loads ONLY its own per-entry .extra via
+// a <link>.
 //
 // css_corpus is blind to this (it tests inline UNION modules, so empty-inline +
 // modules passes regardless) and client_shell asserts hud.mobile.css CONTENT but
@@ -47,10 +48,13 @@ describe('per-entry CSS wiring + #rotate-device gate', () => {
     expect(playHtml).not.toContain('index.extra.css');
   });
 
-  it('index.extra.css suppresses #rotate-device in-game (index side of the gate)', () => {
+  it('index.extra.css suppresses #rotate-device for web gameplay but allows native portrait', () => {
     expect(indexExtra).toMatch(/@layer index-extra\b/);
     expect(indexExtra).toMatch(
-      /body\.mobile-touch\.game-active #rotate-device\s*\{[^}]*display:\s*none\s*!important/,
+      /body\.mobile-touch\.game-active:not\(\.native-app\) #rotate-device\s*\{[^}]*display:\s*none\s*!important/,
+    );
+    expect(indexExtra).toMatch(
+      /body\.native-app\.mobile-touch\.game-active #rotate-device\s*\{[^}]*display:\s*flex/,
     );
   });
 

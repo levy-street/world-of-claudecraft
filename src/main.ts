@@ -592,6 +592,7 @@ function showMobilePreflightPrompt(): Promise<void> {
   // Deliberately the device FACT (isPhoneTouchDevice), not the Interface Mode
   // override: the "install to home screen" preflight is phone-hardware-only, so a
   // desktop forced to Touch correctly skips it.
+  if (NATIVE_APP) return Promise.resolve();
   if (!isPhoneTouchDevice()) return Promise.resolve();
   if (mobilePreflightPromptPromise) return mobilePreflightPromptPromise;
   const prompt = document.getElementById('mobile-preflight') as HTMLElement | null;
