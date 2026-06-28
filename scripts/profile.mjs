@@ -10,7 +10,9 @@
 //   ALLOW_DEV_COMMANDS=1 npm run server         # :8787  (only for the crowd scenario)
 //   node scripts/profile.mjs <scenario> [opts]
 //
-// Scenarios:  fps | tour | combat | freeze | tiers | crowd
+// Scenarios:  fps | tour | combat | freeze | tiers | crowd | walk | play
+//   play = walk + RMB camera look + jump + cast every ability (finds first-cast
+//          ability VFX compiles and camera-reveal hitches a plain walk misses)
 // Options:
 //   --tier low|medium|high|ultra   force a tier (default: auto-detect)
 //   --dpr 1|2                       device pixel ratio (default 1)
@@ -136,6 +138,14 @@ async function scenarioWalk(p) {
   return [await p.walk({ ms: Number(args.ms ?? 70000), heading: Number(args.heading ?? 0) })];
 }
 
+// Realistic play session: walk + turn the camera (RMB look) + jump + cast every
+// ability. Surfaces first-cast ability VFX compiles and camera-reveal hitches that
+// a straight `walk` (camera fixed forward, no abilities) cannot.
+async function scenarioPlay(p) {
+  await p.enter({ mode: TIER && args.mode === 'online' ? 'online' : 'offline', tier: TIER });
+  return [await p.play({ ms: Number(args.ms ?? 60000), keys: String(args.keys ?? '1234567890') })];
+}
+
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const SCENARIOS = {
   fps: scenarioFps,
@@ -145,6 +155,7 @@ const SCENARIOS = {
   tiers: scenarioTiers,
   crowd: scenarioCrowd,
   walk: scenarioWalk,
+  play: scenarioPlay,
 };
 
 function printWalk(s) {
@@ -226,7 +237,7 @@ async function main() {
 
   console.log('\n========== RESULTS ==========');
   for (const s of results) console.log(fmtRow(s));
-  if (scenario === 'walk') for (const s of results) printWalk(s);
+  if (scenario === 'walk' || scenario === 'play') for (const s of results) printWalk(s);
 
   const payload = {
     scenario,

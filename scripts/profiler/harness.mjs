@@ -451,6 +451,63 @@ export class Profiler {
     }
   }
 
+  async jump() {
+    await this.page.keyboard.press('Space');
+  }
+
+  // Right-button camera mouselook, the way a player turns to look around. The real
+  // input path reads e.movementX/Y (input.ts) to drive camYaw/camPitch, so we send
+  // PointerEvents WITH movementX set; we also nudge input.camYaw directly so the
+  // sweep is reliable even when a synthetic movementX is dropped. Turning the camera
+  // pulls newly-visible models into the frame, surfacing first-draw shader compiles
+  // and texture/geometry uploads a straight forward walk never points the camera at.
+  async lookSweep({ yaw = 1, frames = 18, dx = 16, dy = 0 } = {}) {
+    await this.page.evaluate(
+      ({ frames, dx, dy, yaw }) =>
+        new Promise((res) => {
+          const cv = document.querySelector('canvas');
+          const r = cv.getBoundingClientRect();
+          const c4 = {
+            clientX: Math.round(r.left + r.width / 2),
+            clientY: Math.round(r.top + r.height / 2),
+          };
+          const mk = (type, extra) =>
+            new PointerEvent(type, {
+              bubbles: true,
+              cancelable: true,
+              pointerId: 1,
+              pointerType: 'mouse',
+              ...c4,
+              ...extra,
+            });
+          cv.dispatchEvent(mk('pointerdown', { button: 2, buttons: 2 }));
+          let i = 0;
+          const step = () => {
+            cv.dispatchEvent(
+              mk('pointermove', { button: -1, buttons: 2, movementX: dx * yaw, movementY: dy }),
+            );
+            try {
+              window.__game.input.camYaw -= 0.06 * yaw;
+              if (dy)
+                window.__game.input.camPitch = Math.min(
+                  1.2,
+                  Math.max(-0.35, window.__game.input.camPitch + dy * 0.004),
+                );
+            } catch {
+              /* input shape differs: the PointerEvent path above still drives it */
+            }
+            if (++i < frames) requestAnimationFrame(step);
+            else {
+              window.dispatchEvent(mk('pointerup', { button: 2, buttons: 0 }));
+              res();
+            }
+          };
+          requestAnimationFrame(step);
+        }),
+      { frames, dx, dy, yaw },
+    );
+  }
+
   async _pos() {
     return this.page.evaluate(() => {
       const g = window.__game;
@@ -470,6 +527,35 @@ export class Profiler {
       p.facing = f;
       window.__game.input.camYaw = f;
     }, f);
+  }
+
+  // Acquire the nearest enemy + start auto-attacking via the IWorld API (more
+  // reliable than a Tab keypress, which needs a mob already in tab range): with a
+  // live target + in range, the ability keypresses in `play` actually CAST, so their
+  // first-use VFX shaders compile - the freeze the user hits "especially with abilities".
+  // Acquire a target + start auto-attacking through the IWorld API. NOTE: in the
+  // OFFLINE sim, targeting is driven by the input/screen path and the sim reconciles
+  // the player's target each tick, so neither tabTarget() nor writing targetId from
+  // outside reliably sticks - target-requiring abilities may not fire offline. What
+  // DOES exercise the ability pipeline here: instant/self abilities (buffs, shouts)
+  // fire on the keypress regardless, auto-target kicks in when an attack key is hit
+  // next to a mob, and `play` walks the character through mobs. For exhaustive
+  // targeted-ability coverage run `play` against an online server (`--mode online`),
+  // where the server resolves targeting. Both keep auto-attack on for swing VFX.
+  async _engage() {
+    await this.page.evaluate(() => {
+      const w = window.__game.world ?? window.__game.sim;
+      try {
+        w.tabTarget?.();
+      } catch {
+        /* no enemy in range / offline targeting path differs */
+      }
+      try {
+        w.startAutoAttack?.();
+      } catch {
+        /* ignore */
+      }
+    });
   }
 
   // Continuous on-foot traversal of the world (no teleports): walk forward for
@@ -518,6 +604,101 @@ export class Profiler {
       }
       last = pos;
       // drain new collector samples since last check, attribute, log hitches with position
+      const slice = await this.page.evaluate((from) => window.__prof.samples.slice(from), consumed);
+      consumed += slice.length;
+      const fz = attributeFreezes(slice, 8, 50);
+      for (const w of fz.worst) {
+        const e = {
+          ms: w.ms,
+          cause: w.cause,
+          x: Math.round(pos.x),
+          z: Math.round(pos.z),
+          zone: pos.zone,
+        };
+        events.push(e);
+        this.log(
+          `  FREEZE ${String(w.ms).padStart(6)}ms  ${w.cause.padEnd(13)} @ (${e.x}, ${e.z})${pos.zone ? ` ${pos.zone}` : ''}`,
+        );
+      }
+    }
+    await this.stopMove();
+    const raw = await this.page.evaluate(() => ({
+      ...window.__prof.stop(),
+      report: window.__game.perf.report(),
+      entities: window.__game.world.entities.size,
+    }));
+    const norm = normalizeReport(raw.report);
+    norm.entities = raw.entities;
+    let dist = 0;
+    for (let i = 1; i < trail.length; i++) {
+      dist += Math.hypot(trail[i].x - trail[i - 1].x, trail[i].z - trail[i - 1].z);
+    }
+    return {
+      label,
+      mode: this.mode,
+      ...norm,
+      scene: raw.scene ?? null,
+      newPrograms: raw.newPrograms ?? [],
+      frame: frameStats(raw.frames, this.targetFps),
+      freezes: attributeFreezes(raw.samples),
+      trail,
+      events,
+      distance: Math.round(dist),
+    };
+  }
+
+  // A realistic play session: walk while turning the camera (RMB mouselook),
+  // jumping, retargeting, and casting EVERY ability on a short cycle. These are the
+  // inputs a human actually uses and the ones that surface "weird" freezes a plain
+  // walk misses: first-cast ability VFX shader compiles, camera-reveal compiles as
+  // the view turns, and jump/landing hitches. Logs each freeze with position + cause.
+  async play({ ms = 60000, label = 'play', keys = '1234567890' } = {}) {
+    await this.page.evaluate((l) => {
+      window.__prof.label = l;
+      window.__game.perf.reset();
+      window.__prof.start();
+    }, label);
+    await this.setMove({ forward: true });
+    await this._engage(); // acquire nearest enemy + auto-attack so abilities actually fire
+    const t0 = performance.now();
+    let facing = 0,
+      last = await this._pos(),
+      consumed = 0,
+      stuck = 0,
+      checkpoint = 0,
+      k = 0,
+      tick = 0;
+    const events = [];
+    const trail = [];
+    while (performance.now() - t0 < ms) {
+      await this.page.keyboard.press(keys[k++ % keys.length]); // cast the next ability
+      if (tick % 2 === 0) await this.jump();
+      if (tick % 3 === 0)
+        await this.lookSweep({ yaw: tick % 6 === 0 ? 1 : -1, dy: tick % 9 === 0 ? 6 : 0 });
+      if (tick % 4 === 0) await this._engage(); // retarget (mobs die / leave range)
+      tick++;
+      await sleep(850);
+      if (tick % 3 !== 0) continue; // sample position/steer/freezes every 3rd tick (~2.5s)
+      const pos = await this._pos();
+      const moved = Math.hypot(pos.x - last.x, pos.z - last.z);
+      trail.push({
+        x: Math.round(pos.x),
+        z: Math.round(pos.z),
+        moved: Math.round(moved),
+        zone: pos.zone,
+      });
+      if (moved < 2.5) {
+        stuck++;
+        facing += 1.7 + stuck * 0.6;
+        await this._face(facing);
+      } else {
+        stuck = 0;
+        if (++checkpoint % 6 === 0) {
+          facing += (checkpoint % 12 === 0 ? -1 : 1) * 0.9;
+          await this._face(facing);
+        }
+      }
+      last = pos;
       const slice = await this.page.evaluate((from) => window.__prof.samples.slice(from), consumed);
       consumed += slice.length;
       const fz = attributeFreezes(slice, 8, 50);
