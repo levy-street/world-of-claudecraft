@@ -487,6 +487,7 @@ export interface EntityView {
   objectPoolKey: string | null;
   portal?: THREE.Mesh; // dungeon door swirl
   objectCasters: THREE.Object3D[]; // object-view shadow meshes, distance-gated
+  viewLights: THREE.PointLight[]; // point lights this view contributes to the budget
   shadowOn: boolean;
   isFar: boolean;
   // hidden until its shader programs finish linking off-thread (async-compile gate)
@@ -765,6 +766,12 @@ export class Renderer {
   private fogScratch = new THREE.Color();
   private flames: THREE.Mesh[];
   private fireLights: THREE.PointLight[];
+  // Point lights owned by entity views (e.g. the quest-object glow). These stream
+  // in/out with interest, so they are budgeted into the SAME constant count as the
+  // static fire lights - otherwise numPointLights toggles as a lit object enters or
+  // leaves view and every lit material recompiles (an open-world travel hitch).
+  private viewLights: THREE.PointLight[] = [];
+  private lightRankDirty = true; // viewLights set changed: rebuild the budget rank
   private effectivePointLights = 0;
   private propsView!: {
     update(
@@ -777,7 +784,12 @@ export class Renderer {
       fogFar: number,
     ): void;
   };
-  private lightRank: { light: THREE.PointLight; d2: number; worldPos: THREE.Vector3 }[] = [];
+  private lightRank: {
+    light: THREE.PointLight;
+    d2: number;
+    worldPos: THREE.Vector3;
+    base: number | null; // view-light base intensity (no external flicker restores it); null for fire lights
+  }[] = [];
   private doomedIds: number[] = [];
   private dungeons: DungeonInteriors | null = null;
   private envRTs = new Map<BiomeId, THREE.WebGLRenderTarget>();
@@ -3055,6 +3067,23 @@ export class Renderer {
     // object views gate their own casters; character shadows live in visual
     const objectCasters: THREE.Object3D[] = [];
     if (!visual) collectCasters(group, objectCasters);
+    // Register any point lights this view owns (e.g. the quest-object glow) into the
+    // constant point-light budget so numPointLights never changes as it streams in.
+    const viewLights: THREE.PointLight[] = [];
+    group.traverse((o) => {
+      if ((o as THREE.PointLight).isPointLight) viewLights.push(o as THREE.PointLight);
+    });
+    if (viewLights.length > 0) {
+      for (const light of viewLights) {
+        // Remember the design intensity ONCE: pooled object views are reused, and by
+        // the time one is re-taken the budget may have dimmed the light to 0, so
+        // reading it again would stick it dark. userData persists on the pooled light.
+        if (typeof light.userData.budgetBase !== 'number')
+          light.userData.budgetBase = light.intensity;
+        this.viewLights.push(light);
+      }
+      this.lightRankDirty = true;
+    }
     this.views.set(e.id, {
       group,
       visual,
@@ -3093,6 +3122,7 @@ export class Renderer {
       comboSig: '',
       tierValue: 0,
       objectCasters,
+      viewLights,
       shadowOn: true,
       isFar: false,
       compilePending: false,
@@ -3445,6 +3475,13 @@ export class Renderer {
     const v = this.views.get(id);
     if (!v) return;
     this.scene.remove(v.group);
+    if (v.viewLights.length > 0) {
+      for (const light of v.viewLights) {
+        const i = this.viewLights.indexOf(light);
+        if (i >= 0) this.viewLights.splice(i, 1);
+      }
+      this.lightRankDirty = true;
+    }
     v.nameplate.remove();
     const idx = this.clickTargets.indexOf(v.clickTarget);
     if (idx >= 0) this.clickTargets.splice(idx, 1);
@@ -4296,9 +4333,29 @@ export class Renderer {
   // allocates nothing and skips the sort while the budget isn't contended.
   private budgetFireLights(px: number, pz: number): void {
     const ranked = this.lightRank;
-    while (ranked.length < this.fireLights.length) {
-      const light = this.fireLights[ranked.length];
-      ranked.push({ light, d2: 0, worldPos: light.getWorldPosition(new THREE.Vector3()) });
+    // Rank the union of static fire lights AND entity-view lights (e.g. quest-object
+    // glows). Both must share one budget: if a view light were counted separately,
+    // numPointLights would change as it streams in/out and recompile every lit
+    // material. Rebuild only when the set changes (dirty), or when fire lights grow
+    // (dungeon interiors push to fireLights) - both rare, so the hot path just
+    // refreshes distances. View positions are cached at rebuild; lights never move.
+    const want = this.fireLights.length + this.viewLights.length;
+    if (this.lightRankDirty || ranked.length !== want) {
+      ranked.length = 0;
+      for (const light of this.fireLights) {
+        ranked.push({
+          light,
+          d2: 0,
+          worldPos: light.getWorldPosition(new THREE.Vector3()),
+          base: null,
+        });
+      }
+      for (const light of this.viewLights) {
+        const stored = light.userData.budgetBase;
+        const base = typeof stored === 'number' ? stored : light.intensity;
+        ranked.push({ light, d2: 0, worldPos: light.getWorldPosition(new THREE.Vector3()), base });
+      }
+      this.lightRankDirty = false;
     }
     for (const entry of ranked) {
       const dx = entry.worldPos.x - px,
@@ -4308,7 +4365,16 @@ export class Renderer {
     const lightBudget = this.effectivePointLights || GFX.maxPointLights;
     if (ranked.length > lightBudget) ranked.sort((a, b) => a.d2 - b.d2);
     for (let i = 0; i < ranked.length; i++) {
-      ranked[i].light.visible = i < lightBudget && ranked[i].d2 < LIGHT_BUDGET_RANGE_SQ;
+      const entry = ranked[i];
+      const counted = i < visibleCount;
+      entry.light.visible = counted;
+      const shine = counted && i < liveBudget && entry.d2 < LIGHT_BUDGET_RANGE_SQ;
+      if (entry.base !== null) {
+        // view light: no flicker pass restores it, so drive its intensity directly
+        entry.light.intensity = shine ? entry.base : 0;
+      } else if (counted && !shine) {
+        entry.light.intensity = 0; // fire light: dark now; the flicker pass relights it when it shines
+      }
     }
   }
 
