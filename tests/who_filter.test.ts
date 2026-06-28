@@ -85,3 +85,29 @@ describe('/who name filter', () => {
     expect(out).toEqual(['Who: 0 players matching "zzz" on Claudemoon.']);
   });
 });
+
+describe('/who zone filter', () => {
+  // Freshly joined players all spawn in the overworld zone "Eastbrook Vale", so
+  // a substring of that zone matches everyone, and a different zone matches no one.
+  it('matches on zone name, not just player name', () => {
+    const { server, viewer } = makeServer(ROSTER);
+    const out = who(server, viewer, 'eastbrook');
+    expect(out[0]).toBe('Who: 3 players matching "eastbrook" on Claudemoon.');
+    expect(out.some((t) => t.startsWith('Mristan'))).toBe(true);
+    expect(out.some((t) => t.startsWith('Mrglglgl'))).toBe(true);
+    expect(out.some((t) => t.startsWith('Bobbins'))).toBe(true);
+  });
+
+  it('matches a multi-word zone substring (spaces preserved)', () => {
+    const { server, viewer } = makeServer(ROSTER);
+    const out = who(server, viewer, 'eastbrook vale');
+    expect(out[0]).toBe('Who: 3 players matching "eastbrook vale" on Claudemoon.');
+    expect(out.filter((t) => t.includes(' - level ')).length).toBe(3);
+  });
+
+  it('returns zero for a zone nobody is in', () => {
+    const { server, viewer } = makeServer(ROSTER);
+    const out = who(server, viewer, 'thornpeak heights');
+    expect(out).toEqual(['Who: 0 players matching "thornpeak heights" on Claudemoon.']);
+  });
+});

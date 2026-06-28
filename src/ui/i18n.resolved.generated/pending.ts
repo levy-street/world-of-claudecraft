@@ -45,30 +45,58 @@ export const pending: Record<string, readonly string[]> = {
   "ru_RU": [],
   "nl_NL": [
     "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader"
+    "hudChrome.party.promoteLeader",
+    "hudChrome.plurals.playersMatching.few",
+    "hudChrome.plurals.playersMatching.many",
+    "hudChrome.plurals.playersMatching.one",
+    "hudChrome.plurals.playersMatching.other"
   ],
   "pl_PL": [
     "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader"
+    "hudChrome.party.promoteLeader",
+    "hudChrome.plurals.playersMatching.few",
+    "hudChrome.plurals.playersMatching.many",
+    "hudChrome.plurals.playersMatching.one",
+    "hudChrome.plurals.playersMatching.other"
   ],
   "id_ID": [
     "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader"
+    "hudChrome.party.promoteLeader",
+    "hudChrome.plurals.playersMatching.few",
+    "hudChrome.plurals.playersMatching.many",
+    "hudChrome.plurals.playersMatching.one",
+    "hudChrome.plurals.playersMatching.other"
   ],
   "tr_TR": [
     "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader"
+    "hudChrome.party.promoteLeader",
+    "hudChrome.plurals.playersMatching.few",
+    "hudChrome.plurals.playersMatching.many",
+    "hudChrome.plurals.playersMatching.one",
+    "hudChrome.plurals.playersMatching.other"
   ],
   "sv_SE": [
     "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader"
+    "hudChrome.party.promoteLeader",
+    "hudChrome.plurals.playersMatching.few",
+    "hudChrome.plurals.playersMatching.many",
+    "hudChrome.plurals.playersMatching.one",
+    "hudChrome.plurals.playersMatching.other"
   ],
   "vi_VN": [
     "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader"
+    "hudChrome.party.promoteLeader",
+    "hudChrome.plurals.playersMatching.few",
+    "hudChrome.plurals.playersMatching.many",
+    "hudChrome.plurals.playersMatching.one",
+    "hudChrome.plurals.playersMatching.other"
   ],
   "da_DK": [
     "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader"
+    "hudChrome.party.promoteLeader",
+    "hudChrome.plurals.playersMatching.few",
+    "hudChrome.plurals.playersMatching.many",
+    "hudChrome.plurals.playersMatching.one",
+    "hudChrome.plurals.playersMatching.other"
   ]
 };
