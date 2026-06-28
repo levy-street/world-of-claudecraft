@@ -53,6 +53,7 @@ import {
 import type { ZoneDef } from '../sim/data';
 import {
   ABILITIES,
+  abilitiesKnownAt,
   CLASSES,
   COMPANION_UPGRADE_COSTS,
   DELVE_AFFIXES,
@@ -206,6 +207,7 @@ import {
   tOptional,
   tPlural,
 } from './i18n';
+import { abilityIconWarmKeys, type IconWarmKey } from './icon_prewarm';
 import { iconDataUrl, QUALITY_COLOR, raidMarkerDataUrl } from './icons';
 import { itemStatDeltas } from './item_compare';
 import { PICK_ACTION_HOTKEYS } from './lockpick_panel';
@@ -833,6 +835,13 @@ export class Hud {
   // matching canceller; a clearTimeout on an idle id (or vice versa) could cancel
   // an unrelated timer that happens to share the number.
   private mapPrewarmVia: 'idle' | 'timeout' | null = null;
+  // Idle warm-list of the class's ability/aura icons (composed via iconDataUrl so
+  // they are cached before the spellbook/action bar opens or a buff first lands).
+  // No cancellation field: the class never changes mid-session, and a stale idle
+  // callback is a cheap no-op (the warm-list is exhausted).
+  private iconWarmKeys: IconWarmKey[] = [];
+  private iconWarmIdx = 0;
+  private iconWarmHandle = 0;
   // Delve schematic caches: static background (floor/pillars/tombs/dais/exit)
   // keyed by module id, redrawn only when the module changes.
   private delveSchematicBg: HTMLCanvasElement | null = null;
@@ -1313,6 +1322,7 @@ export class Hud {
     const startZoneName = zoneDisplayName(startZone.id);
     this.lastZoneId = startZone.id;
     this.prewarmMapBg(startZone.id); // render the spawn-zone map bg during idle, not on first open
+    this.prewarmAbilityIcons(); // compose the class's ability/aura icons during idle, not on window open / first buff
     this.showBanner(startZoneName);
     this.log(t('hud.core.welcomeZone', { zone: startZoneName }), '#ffd100');
     this.logZoneWelcome(startZone);
@@ -4905,6 +4915,53 @@ export class Hud {
       return;
     }
     this.scheduleMapPrewarm();
+  };
+
+  // Compose the class's ability + aura icons during idle so the spellbook / action
+  // bar (and the first buff/debuff in combat) never pay the synchronous canvas
+  // compose + PNG encode on the main thread mid-game. Mirrors the map-bg idle
+  // prewarm: sliced, idle-deadline-aware, with a setTimeout fallback.
+  private prewarmAbilityIcons(): void {
+    try {
+      const ids = abilitiesKnownAt(this.sim.cfg.playerClass, MAX_LEVEL).map((k) => k.def.id);
+      this.iconWarmKeys = abilityIconWarmKeys(ids);
+      this.iconWarmIdx = 0;
+      this.scheduleIconWarm();
+    } catch {
+      /* best-effort: never block entering the world on a prewarm */
+    }
+  }
+
+  private scheduleIconWarm(): void {
+    if (this.iconWarmIdx >= this.iconWarmKeys.length || this.iconWarmHandle) return;
+    const w = window as typeof window & {
+      requestIdleCallback?: (
+        cb: (d: { timeRemaining(): number }) => void,
+        opts?: { timeout: number },
+      ) => number;
+    };
+    if (w.requestIdleCallback) {
+      this.iconWarmHandle = w.requestIdleCallback(this.pumpIconWarm, { timeout: 4000 });
+    } else {
+      this.iconWarmHandle = window.setTimeout(() => this.pumpIconWarm(), 32);
+    }
+  }
+
+  private pumpIconWarm = (deadline?: { timeRemaining(): number }): void => {
+    this.iconWarmHandle = 0;
+    const ICONS_PER_SLICE = 4; // composing one icon is ~1-2ms; a few fit a frame
+    let n = 0;
+    while (this.iconWarmIdx < this.iconWarmKeys.length) {
+      const { kind, id } = this.iconWarmKeys[this.iconWarmIdx++];
+      try {
+        void iconDataUrl(kind, id); // caches the composited PNG; return discarded
+      } catch {
+        /* skip a missing recipe; the live path falls back the same way */
+      }
+      n++;
+      if (deadline === undefined ? n >= ICONS_PER_SLICE : deadline.timeRemaining() <= 2) break;
+    }
+    if (this.iconWarmIdx < this.iconWarmKeys.length) this.scheduleIconWarm();
   };
 
   // Refresh the minimap clock to the current real local time. Cheap to call
