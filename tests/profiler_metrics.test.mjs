@@ -63,6 +63,17 @@ describe('attributeFreezes', () => {
     expect(a.worst[0].cause).toBe('shader-compile');
   });
 
+  it('tags texture/geometry uploads as asset-upload (not shader-compile)', () => {
+    const samples = [
+      { dt: 8, programs: 50, createdViews: 0, textures: 900, geometries: 500 },
+      { dt: 90, programs: 50, createdViews: 0, textures: 912, geometries: 504 }, // +12 tex => upload
+    ];
+    const a = attributeFreezes(samples, 8, 50);
+    expect(a.byCause['asset-upload']).toBe(1);
+    expect(a.worst[0].texDelta).toBe(12);
+    expect(a.worst[0].geoDelta).toBe(4);
+  });
+
   it('ignores frames below the hitch threshold', () => {
     const samples = [
       { dt: 8, programs: 1 },

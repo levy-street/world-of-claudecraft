@@ -96,9 +96,17 @@ window.__prof = {
       'models ' + (sc.modelCount || 0) + '  shaders ' + (sc.programs || 0) + '/' + (sc.shaderVariants || 0) + 'var  tex ' + (sc.textures || 0) + '  geo ' + (sc.geometries || 0) + '\\n' +
       'draws ' + (sc.render ? sc.render.calls : 0) + '  tris ' + (sc.render ? (sc.render.triangles / 1e6).toFixed(2) : 0) + 'M';
   },
+  _progKeys() {
+    const g = window.__game;
+    const info = g && g.renderer && g.renderer.webgl && g.renderer.webgl.info;
+    const out = [];
+    if (info && info.programs) for (const pr of info.programs) if (pr && pr.cacheKey) out.push(pr.cacheKey);
+    return out;
+  },
   start() {
     this._ensureObs(); this._ensureOverlay();
     this.frames = []; this.samples = []; this._lt = 0; this.on = true; this._n = 0;
+    this._keys0 = new Set(this._progKeys()); // shader programs present at sample start
     this._last = performance.now();
     const loop = () => {
       if (!this.on) return;
@@ -108,8 +116,9 @@ window.__prof = {
       const info = g && g.renderer && g.renderer.webgl && g.renderer.webgl.info;
       const programs = info && info.programs ? info.programs.length : 0;
       const views = g && g.renderer && g.renderer.views ? g.renderer.views.size : 0;
+      const mem = info && info.memory ? info.memory : null;
       this.frames.push(dt);
-      this.samples.push({ dt, programs, createdViews: views, longTaskMs: this._lt });
+      this.samples.push({ dt, programs, createdViews: views, textures: mem ? mem.textures : 0, geometries: mem ? mem.geometries : 0, longTaskMs: this._lt });
       this._lt = 0;
       // scene inventory + overlay are heavier, so refresh ~5x/sec, not per frame
       if ((this._n++ % 12) === 0) { this._scene = this.scene(); this._paint(); }
@@ -117,7 +126,12 @@ window.__prof = {
     };
     requestAnimationFrame(loop);
   },
-  stop() { this.on = false; this._scene = this.scene(); this._paint(); return { frames: this.frames.slice(), samples: this.samples.slice(), scene: this._scene }; },
+  stop() {
+    this.on = false; this._scene = this.scene(); this._paint();
+    const k0 = this._keys0 || new Set();
+    const newPrograms = this._progKeys().filter((k) => !k0.has(k)); // shaders that linked during the window
+    return { frames: this.frames.slice(), samples: this.samples.slice(), scene: this._scene, newPrograms };
+  },
 };
 `;
 
@@ -480,6 +494,7 @@ export class Profiler {
       mode: this.mode,
       ...norm,
       scene: raw.scene ?? null, // entity-by-kind, loaded models, shader variants, tex/geo
+      newPrograms: raw.newPrograms ?? [], // shader cacheKeys that linked during the window
       frame: frameStats(raw.frames, this.targetFps),
       freezes: attributeFreezes(raw.samples),
     };

@@ -163,7 +163,12 @@ function fmtRow(s) {
   ].join('  ');
   const tris = sc.render ? (sc.render.triangles / 1e6).toFixed(2) : '?';
   const line2 = `${' '.repeat(14)}  scene: ents ${sc.entityCount ?? s.entities ?? '?'} [${kinds}]  views ${sc.viewCount ?? s.views}  models ${sc.modelCount ?? '?'}  shaders ${sc.programs ?? s.programs}/${sc.shaderVariants ?? '?'}var  tex ${sc.textures ?? '?'}  geo ${sc.geometries ?? '?'}  draws ${sc.render?.calls ?? s.calls}  tris ${tris}M`;
-  return `${line1}\n${line2}`;
+  const np = s.newPrograms ?? [];
+  const line3 = np.length
+    ? `${' '.repeat(14)}  NEW SHADERS (${np.length}) that linked this window:\n` +
+      np.map((k) => `${' '.repeat(16)}- ${String(k).replace(/\s+/g, ' ').slice(0, 160)}`).join('\n')
+    : '';
+  return [line1, line2, line3].filter(Boolean).join('\n');
 }
 
 async function main() {

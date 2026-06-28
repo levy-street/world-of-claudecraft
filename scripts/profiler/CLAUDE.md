@@ -18,8 +18,10 @@ metrics. Needs `npm run dev` (:5173); the `crowd` scenario also needs
     pre-summarised percentiles, so they reflect true perceived smoothness.
   - `attributeFreezes(samples)` — **freeze attribution**: each hitch frame is
     tagged `shader-compile` (WebGL program count rose), `view-build` (a rig was
-    created), `long-task`, or `other` (GC/upload). Turns "a 1.8s hitch" into "it
-    compiled 2 shaders".
+    created), `asset-upload` (texture/geometry streamed to the GPU), `long-task`
+    (JS/GC), or `other`. Turns "a 1.8s hitch" into "it compiled 2 shaders". The
+    sample also reports `newPrograms` (the exact shader cacheKeys that linked
+    during the window) so a residual compile is identifiable - i.e. what to prewarm.
   - `normalizeReport(report)` — flatten `window.__game.perf.report()` to a stable
     comparable set. `diffMetrics(before, after)` — A/B delta + better/worse verdict.
 - `harness.mjs` — the `Profiler` class: browser/session lifecycle + scenario

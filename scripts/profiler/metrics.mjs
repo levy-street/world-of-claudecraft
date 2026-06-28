@@ -77,19 +77,25 @@ export function attributeFreezes(samples, topN = 8, hitchMs = 50) {
     if (cur.dt < hitchMs) continue;
     const programDelta = Math.max(0, (cur.programs ?? 0) - (prev.programs ?? 0));
     const viewDelta = Math.max(0, (cur.createdViews ?? 0) - (prev.createdViews ?? 0));
+    const texDelta = Math.max(0, (cur.textures ?? 0) - (prev.textures ?? 0));
+    const geoDelta = Math.max(0, (cur.geometries ?? 0) - (prev.geometries ?? 0));
     const cause =
       programDelta > 0
-        ? 'shader-compile'
+        ? 'shader-compile' // a WebGL program linked (the worst, fully synchronous)
         : viewDelta > 0
-          ? 'view-build'
-          : cur.longTaskMs
-            ? 'long-task'
-            : 'other';
+          ? 'view-build' // a character rig was instantiated
+          : texDelta > 0 || geoDelta > 0
+            ? 'asset-upload' // texture/geometry streamed to the GPU
+            : cur.longTaskMs
+              ? 'long-task' // a main-thread long task (JS/GC)
+              : 'other';
     events.push({
       frame: i,
       ms: round(cur.dt, 1),
       programDelta,
       viewDelta,
+      texDelta,
+      geoDelta,
       longTaskMs: round(cur.longTaskMs ?? 0, 1),
       cause,
     });
