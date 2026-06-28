@@ -11,6 +11,15 @@ const DELVE_MODULE_VARIANT: Record<DelveModuleId, DungeonInteriorVariant> = {
   reliquary_bell_niche: 'delve_bell',
   reliquary_saintless_hall: 'delve_hall',
   reliquary_finale: 'delve_finale',
+  // Drowned Litany (Phase 1): reuse the reliquary dressing variants as
+  // placeholders so the modules render; Phase 2 swaps in marsh-ruin dressing.
+  litany_sluice: 'delve_ossuary',
+  litany_ledger: 'delve_bell',
+  litany_ring: 'delve_hall',
+  litany_baptistry: 'delve_ossuary',
+  litany_choir_loft: 'delve_hall',
+  litany_causeway: 'delve_bell',
+  litany_apse: 'delve_finale',
 };
 
 /** Build one delve module at a world origin (crypt KayKit kit + that module's delve layout). */

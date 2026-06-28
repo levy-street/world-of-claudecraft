@@ -10,14 +10,14 @@
     "base mobSwing (mob swings the player)",
     "rollLoot via mob death (L1, ~5876/6036)"
   ],
-  "draws": 171,
-  "drawDigest": "aaf5d249",
+  "draws": 163,
+  "drawDigest": "3a2585bb",
   "frames": [
     {
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "969c1dc9",
+      "state": "f9a3a987",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -60,7 +60,6 @@
           "id": 389,
           "kind": "player",
           "level": 1,
-          "lootFfaTimer": "Infinity",
           "maxHp": 90,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -79,7 +78,6 @@
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 5,
           "stats": {
             "agi": 20,
             "armor": 110,
@@ -101,44 +99,44 @@
       "tick": 20,
       "time": 1,
       "nextId": 391,
-      "state": "8fde0580",
-      "events": "e13dee2f",
+      "state": "805cb2d2",
+      "events": "9e171853",
       "rng": {
-        "draws": 6,
-        "digest": "93f0e12e"
+        "draws": 4,
+        "digest": "16110a33"
       }
     },
     {
       "tick": 40,
       "time": 2,
       "nextId": 391,
-      "state": "93dd6e69",
+      "state": "5a5b7cfd",
       "events": "741638a5",
       "rng": {
-        "draws": 6,
-        "digest": "93f0e12e"
+        "draws": 4,
+        "digest": "16110a33"
       }
     },
     {
       "tick": 60,
       "time": 3,
       "nextId": 391,
-      "state": "2cedb635",
-      "events": "5f90d6fb",
+      "state": "1c433ad2",
+      "events": "8dac0a7e",
       "rng": {
-        "draws": 98,
-        "digest": "92f0a886"
+        "draws": 95,
+        "digest": "a28d26f7"
       }
     },
     {
       "tick": 72,
       "time": 3.6,
       "nextId": 391,
-      "state": "d0fdbebb",
+      "state": "02e15b0f",
       "events": "9384d879",
       "rng": {
-        "draws": 153,
-        "digest": "5d6b4ea1"
+        "draws": 145,
+        "digest": "837b1a1a"
       },
       "label": "kill",
       "players": [
@@ -150,8 +148,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 7074,
-            "damageTaken": 11,
+            "damageDealt": 7073,
             "kills": 1
           },
           "delveClears": {},
@@ -178,12 +175,11 @@
           "facing": 1.570796,
           "fallStartY": 1.5,
           "fiveSecondRule": 102.6,
-          "hp": 49989,
+          "hp": 50000,
           "id": 389,
           "inCombat": true,
           "kind": "player",
           "level": 10,
-          "lootFfaTimer": "Infinity",
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -203,7 +199,6 @@
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 5,
           "stats": {
             "agi": 29,
             "armor": 236,
@@ -242,9 +237,14 @@
           },
           "level": 2,
           "loot": {
-            "copper": 10
+            "copper": 10,
+            "items": [
+              {
+                "count": 1,
+                "itemId": "wolf_fang"
+              }
+            ]
           },
-          "lootFfaTimer": 60,
           "lootRecipientIds": [
             389
           ],
@@ -285,11 +285,11 @@
       "tick": 76,
       "time": 3.8,
       "nextId": 391,
-      "state": "f788fa07",
+      "state": "5a88892d",
       "events": "741638a5",
       "rng": {
-        "draws": 171,
-        "digest": "aaf5d249"
+        "draws": 163,
+        "digest": "3a2585bb"
       },
       "label": "final",
       "players": [
@@ -301,8 +301,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 7074,
-            "damageTaken": 11,
+            "damageDealt": 7073,
             "kills": 1
           },
           "delveClears": {},
@@ -330,12 +329,11 @@
           "facing": 1.570796,
           "fallStartY": 1.5,
           "fiveSecondRule": 102.8,
-          "hp": 49989,
+          "hp": 50000,
           "id": 389,
           "inCombat": true,
           "kind": "player",
           "level": 10,
-          "lootFfaTimer": "Infinity",
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -355,7 +353,6 @@
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 5,
           "stats": {
             "agi": 29,
             "armor": 236,
@@ -394,9 +391,14 @@
           },
           "level": 2,
           "loot": {
-            "copper": 10
+            "copper": 10,
+            "items": [
+              {
+                "count": 1,
+                "itemId": "wolf_fang"
+              }
+            ]
           },
-          "lootFfaTimer": 59.8,
           "lootRecipientIds": [
             389
           ],

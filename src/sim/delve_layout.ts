@@ -8,7 +8,18 @@ export type DelveModuleId =
   | 'reliquary_sunken_ossuary'
   | 'reliquary_bell_niche'
   | 'reliquary_saintless_hall'
-  | 'reliquary_finale';
+  | 'reliquary_finale'
+  // The Drowned Litany (Mirefen Marsh, delve index 1). Phase 1 reuses the
+  // reliquary geometry as a placeholder so the delve is enterable/completable;
+  // Phase 2 swaps in irregular marsh shapes (crescent, island_cluster, ring,
+  // sinkhole, fan, y_split, asymmetric_apse).
+  | 'litany_sluice'
+  | 'litany_ledger'
+  | 'litany_ring'
+  | 'litany_baptistry'
+  | 'litany_choir_loft'
+  | 'litany_causeway'
+  | 'litany_apse';
 
 interface GridPoint {
   x: number;
@@ -149,6 +160,16 @@ export const DELVE_MODULE_LAYOUTS: Record<DelveModuleId, DungeonLayout> = {
   reliquary_bell_niche: RELIQUARY_BELL_NICHE_LAYOUT,
   reliquary_saintless_hall: RELIQUARY_SAINTLESS_HALL_LAYOUT,
   reliquary_finale: RELIQUARY_FINALE_LAYOUT,
+  // Drowned Litany placeholders (Phase 1): point at reliquary geometry until the
+  // Phase 2 irregular marsh layouts replace them. The boss room reuses the wider
+  // finale arena so Sister Nhalia's stomp ring fits.
+  litany_sluice: RELIQUARY_SUNKEN_OSSUARY_LAYOUT,
+  litany_ledger: RELIQUARY_BELL_NICHE_LAYOUT,
+  litany_ring: RELIQUARY_SAINTLESS_HALL_LAYOUT,
+  litany_baptistry: RELIQUARY_SUNKEN_OSSUARY_LAYOUT,
+  litany_choir_loft: RELIQUARY_SAINTLESS_HALL_LAYOUT,
+  litany_causeway: RELIQUARY_BELL_NICHE_LAYOUT,
+  litany_apse: RELIQUARY_FINALE_LAYOUT,
 };
 
 /** Interior collision set for a delve module, in instance-local coordinates. */

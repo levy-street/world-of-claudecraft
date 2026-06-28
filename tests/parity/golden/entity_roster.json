@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "969c1dc9",
+      "state": "f9a3a987",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -59,7 +59,6 @@
           "id": 389,
           "kind": "player",
           "level": 1,
-          "lootFfaTimer": "Infinity",
           "maxHp": 90,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -78,7 +77,6 @@
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 5,
           "stats": {
             "agi": 20,
             "armor": 110,
@@ -100,7 +98,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 392,
-      "state": "99fb614d",
+      "state": "3ada621f",
       "events": "61b9fbea",
       "rng": {
         "draws": 4,
@@ -111,7 +109,7 @@
       "tick": 4,
       "time": 0.2,
       "nextId": 392,
-      "state": "1321ca07",
+      "state": "90051645",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -122,7 +120,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 392,
-      "state": "ad07dfc3",
+      "state": "d6de9ef9",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -166,7 +164,6 @@
           "id": 389,
           "kind": "player",
           "level": 10,
-          "lootFfaTimer": "Infinity",
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -185,7 +182,6 @@
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 5,
           "stats": {
             "agi": 29,
             "armor": 236,
@@ -207,7 +203,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 392,
-      "state": "db444bdb",
+      "state": "90267911",
       "events": "61b9fbea",
       "rng": {
         "draws": 4,
@@ -251,7 +247,6 @@
           "id": 389,
           "kind": "player",
           "level": 10,
-          "lootFfaTimer": "Infinity",
           "maxHp": 432,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -270,7 +265,6 @@
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 5,
           "stats": {
             "agi": 29,
             "armor": 236,
@@ -292,7 +286,7 @@
       "tick": 6,
       "time": 0.3,
       "nextId": 392,
-      "state": "b4f1154a",
+      "state": "c35fd14a",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -303,7 +297,7 @@
       "tick": 7,
       "time": 0.35,
       "nextId": 392,
-      "state": "b03deb5f",
+      "state": "560fff9d",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -347,7 +341,6 @@
           "id": 389,
           "kind": "player",
           "level": 10,
-          "lootFfaTimer": "Infinity",
           "maxHp": 432,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -366,7 +359,6 @@
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 5,
           "stats": {
             "agi": 29,
             "armor": 236,

@@ -8,14 +8,14 @@
     "meleeSwing weaponStrike (sinister_strike via castAbility ~3736)",
     "combo points"
   ],
-  "draws": 143,
-  "drawDigest": "9dafb67b",
+  "draws": 141,
+  "drawDigest": "3d03a3d5",
   "frames": [
     {
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "c2464a3c",
+      "state": "3a1dd0d1",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -58,7 +58,6 @@
           "id": 389,
           "kind": "player",
           "level": 1,
-          "lootFfaTimer": "Infinity",
           "maxHp": 62,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -78,7 +77,6 @@
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 6,
           "stats": {
             "agi": 25,
             "armor": 104,
@@ -101,44 +99,44 @@
       "tick": 20,
       "time": 1,
       "nextId": 391,
-      "state": "caa96f4b",
-      "events": "046941dc",
+      "state": "fdf7b508",
+      "events": "fd2ddbf8",
       "rng": {
-        "draws": 9,
-        "digest": "8ecad8de"
+        "draws": 7,
+        "digest": "14806c1c"
       }
     },
     {
       "tick": 40,
       "time": 2,
       "nextId": 391,
-      "state": "33c6d348",
+      "state": "e5221559",
       "events": "731af17e",
       "rng": {
-        "draws": 15,
-        "digest": "843b3bf7"
+        "draws": 13,
+        "digest": "3fc203d8"
       }
     },
     {
       "tick": 60,
       "time": 3,
       "nextId": 391,
-      "state": "ea2c90af",
+      "state": "ab947aca",
       "events": "f2487ec0",
       "rng": {
-        "draws": 90,
-        "digest": "0f3d4b16"
+        "draws": 89,
+        "digest": "2c06bf7c"
       }
     },
     {
       "tick": 72,
       "time": 3.6,
       "nextId": 391,
-      "state": "c50fcbfb",
+      "state": "cbb391fc",
       "events": "741638a5",
       "rng": {
-        "draws": 143,
-        "digest": "9dafb67b"
+        "draws": 141,
+        "digest": "3d03a3d5"
       },
       "label": "final",
       "players": [
@@ -150,8 +148,7 @@
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 79,
-            "damageTaken": 9
+            "damageDealt": 79
           },
           "delveClears": {},
           "delveDaily": {},
@@ -181,12 +178,11 @@
           "facing": 1.570796,
           "fallStartY": 1.5,
           "fiveSecondRule": 102.6,
-          "hp": 49991,
+          "hp": 50000,
           "id": 389,
           "inCombat": true,
           "kind": "player",
           "level": 10,
-          "lootFfaTimer": "Infinity",
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -206,7 +202,6 @@
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 6,
           "stats": {
             "agi": 52,
             "armor": 230,
@@ -246,7 +241,6 @@
             "z": -2
           },
           "level": 5,
-          "lootFfaTimer": "Infinity",
           "maxHp": 9000,
           "moveSpeed": 8,
           "onGround": true,

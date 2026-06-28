@@ -4,7 +4,7 @@
   "sampleEvery": 20,
   "ticks": 0,
   "coverage": [
-    "buyItem: meta.copper - buyValue*stackSize + addItem stack at trader_wilkes (vendor proximity gate)",
+    "buyItem: meta.copper - buyValue + addItem at trader_wilkes (vendor proximity gate)",
     "equipItem empty-slot equip + recalcPlayerStats",
     "equipItem same-slot SWAP: old piece returned to bags via addItemSilent + recalc",
     "unequipItem: piece back to bags, slot emptied, recalc",
@@ -35,7 +35,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "2b4c9d4a",
+      "state": "a8706be8",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -78,7 +78,6 @@
           "id": 389,
           "kind": "player",
           "level": 1,
-          "lootFfaTimer": "Infinity",
           "maxHp": 90,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -97,7 +96,6 @@
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 5,
           "stats": {
             "agi": 20,
             "armor": 110,
@@ -119,8 +117,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "25687814",
-      "events": "7bf95546",
+      "state": "f81efbf8",
+      "events": "347c598a",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -133,7 +131,7 @@
           "arenaRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 710,
+          "copper": 910,
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
@@ -144,11 +142,11 @@
           },
           "inventory": [
             {
-              "count": 5,
+              "count": 1,
               "itemId": "baked_bread"
             },
             {
-              "count": 5,
+              "count": 1,
               "itemId": "spring_water"
             },
             {
@@ -176,7 +174,6 @@
           "id": 389,
           "kind": "player",
           "level": 1,
-          "lootFfaTimer": "Infinity",
           "maxHp": 90,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -195,7 +192,6 @@
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 5,
           "stats": {
             "agi": 20,
             "armor": 110,
@@ -217,7 +213,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "e27168f4",
+      "state": "604e7690",
       "events": "f3f760b9",
       "rng": {
         "draws": 0,
@@ -231,7 +227,7 @@
           "arenaRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 710,
+          "copper": 910,
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
@@ -243,11 +239,11 @@
           },
           "inventory": [
             {
-              "count": 5,
+              "count": 1,
               "itemId": "baked_bread"
             },
             {
-              "count": 5,
+              "count": 1,
               "itemId": "spring_water"
             },
             {
@@ -279,7 +275,6 @@
           "id": 389,
           "kind": "player",
           "level": 1,
-          "lootFfaTimer": "Infinity",
           "maxHp": 120,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -298,7 +293,6 @@
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 5,
           "stats": {
             "agi": 20,
             "armor": 158,
@@ -320,7 +314,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "ad4e9bbc",
+      "state": "2a71f29c",
       "events": "458e51dd",
       "rng": {
         "draws": 0,
@@ -334,7 +328,7 @@
           "arenaRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 710,
+          "copper": 910,
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
@@ -346,11 +340,11 @@
           },
           "inventory": [
             {
-              "count": 5,
+              "count": 1,
               "itemId": "baked_bread"
             },
             {
-              "count": 5,
+              "count": 1,
               "itemId": "spring_water"
             },
             {
@@ -382,7 +376,6 @@
           "id": 389,
           "kind": "player",
           "level": 1,
-          "lootFfaTimer": "Infinity",
           "maxHp": 110,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -401,7 +394,6 @@
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 5,
           "stats": {
             "agi": 20,
             "armor": 155,
@@ -423,7 +415,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "e1b5c116",
+      "state": "a4b31fea",
       "events": "2490dbf8",
       "rng": {
         "draws": 0,
@@ -437,7 +429,7 @@
           "arenaRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 710,
+          "copper": 910,
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
@@ -448,11 +440,11 @@
           },
           "inventory": [
             {
-              "count": 5,
+              "count": 1,
               "itemId": "baked_bread"
             },
             {
-              "count": 5,
+              "count": 1,
               "itemId": "spring_water"
             },
             {
@@ -488,7 +480,6 @@
           "id": 389,
           "kind": "player",
           "level": 1,
-          "lootFfaTimer": "Infinity",
           "maxHp": 90,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -507,7 +498,6 @@
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 5,
           "stats": {
             "agi": 20,
             "armor": 110,
@@ -529,7 +519,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "c2648e35",
+      "state": "cb6b38a4",
       "events": "fed0e7d1",
       "rng": {
         "draws": 0,
@@ -543,7 +533,7 @@
           "arenaRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 710,
+          "copper": 910,
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
@@ -553,14 +543,6 @@
             "mainhand": "worn_sword"
           },
           "inventory": [
-            {
-              "count": 4,
-              "itemId": "baked_bread"
-            },
-            {
-              "count": 4,
-              "itemId": "spring_water"
-            },
             {
               "count": 1,
               "itemId": "minor_healing_potion"
@@ -606,7 +588,6 @@
           "id": 389,
           "kind": "player",
           "level": 1,
-          "lootFfaTimer": "Infinity",
           "maxHp": 90,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -626,7 +607,6 @@
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 5,
           "stats": {
             "agi": 20,
             "armor": 110,
@@ -648,7 +628,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "8b4edb44",
+      "state": "762ec9c4",
       "events": "70823a2c",
       "rng": {
         "draws": 0,
@@ -662,7 +642,7 @@
           "arenaRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 710,
+          "copper": 910,
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
@@ -672,14 +652,6 @@
             "mainhand": "worn_sword"
           },
           "inventory": [
-            {
-              "count": 4,
-              "itemId": "baked_bread"
-            },
-            {
-              "count": 4,
-              "itemId": "spring_water"
-            },
             {
               "count": 1,
               "itemId": "cryptbone_helm"
@@ -721,7 +693,6 @@
           "id": 389,
           "kind": "player",
           "level": 1,
-          "lootFfaTimer": "Infinity",
           "maxHp": 90,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -733,7 +704,7 @@
             "y": 1.5,
             "z": 1.540014
           },
-          "potionCooldownUntil": 120,
+          "potionCooldownUntil": 60,
           "resourceType": "rage",
           "sitting": true,
           "spawnPos": {
@@ -741,7 +712,6 @@
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 5,
           "stats": {
             "agi": 20,
             "armor": 110,
@@ -763,7 +733,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "90fc65cd",
+      "state": "cfa910eb",
       "events": "41e1197e",
       "rng": {
         "draws": 0,
@@ -777,7 +747,7 @@
           "arenaRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 710,
+          "copper": 910,
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
@@ -787,14 +757,6 @@
             "mainhand": "worn_sword"
           },
           "inventory": [
-            {
-              "count": 4,
-              "itemId": "baked_bread"
-            },
-            {
-              "count": 4,
-              "itemId": "spring_water"
-            },
             {
               "count": 1,
               "itemId": "cryptbone_helm"
@@ -848,7 +810,6 @@
           "id": 389,
           "kind": "player",
           "level": 1,
-          "lootFfaTimer": "Infinity",
           "maxHp": 210,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -860,7 +821,7 @@
             "y": 1.5,
             "z": 1.540014
           },
-          "potionCooldownUntil": 120,
+          "potionCooldownUntil": 60,
           "resourceType": "rage",
           "sitting": true,
           "spawnPos": {
@@ -868,7 +829,6 @@
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 5,
           "stats": {
             "agi": 20,
             "armor": 110,
@@ -890,7 +850,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "4e877751",
+      "state": "f52bd8eb",
       "events": "059e38cc",
       "rng": {
         "draws": 0,
@@ -904,7 +864,7 @@
           "arenaRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 710,
+          "copper": 910,
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
@@ -914,14 +874,6 @@
             "mainhand": "worn_sword"
           },
           "inventory": [
-            {
-              "count": 4,
-              "itemId": "baked_bread"
-            },
-            {
-              "count": 4,
-              "itemId": "spring_water"
-            },
             {
               "count": 1,
               "itemId": "cryptbone_helm"
@@ -979,7 +931,6 @@
           "id": 389,
           "kind": "player",
           "level": 1,
-          "lootFfaTimer": "Infinity",
           "maxHp": 210,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -991,7 +942,7 @@
             "y": 1.5,
             "z": 1.540014
           },
-          "potionCooldownUntil": 120,
+          "potionCooldownUntil": 60,
           "resourceType": "rage",
           "sitting": true,
           "spawnPos": {
@@ -999,7 +950,6 @@
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 5,
           "stats": {
             "agi": 20,
             "armor": 110,
@@ -1021,7 +971,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "6b853ea0",
+      "state": "007a83c6",
       "events": "960bfa6c",
       "rng": {
         "draws": 0,
@@ -1035,7 +985,7 @@
           "arenaRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 714,
+          "copper": 914,
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
@@ -1045,14 +995,6 @@
             "mainhand": "worn_sword"
           },
           "inventory": [
-            {
-              "count": 4,
-              "itemId": "baked_bread"
-            },
-            {
-              "count": 4,
-              "itemId": "spring_water"
-            },
             {
               "count": 1,
               "itemId": "cryptbone_helm"
@@ -1116,7 +1058,6 @@
           "id": 389,
           "kind": "player",
           "level": 1,
-          "lootFfaTimer": "Infinity",
           "maxHp": 210,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -1128,7 +1069,7 @@
             "y": 1.5,
             "z": 1.540014
           },
-          "potionCooldownUntil": 120,
+          "potionCooldownUntil": 60,
           "resourceType": "rage",
           "sitting": true,
           "spawnPos": {
@@ -1136,7 +1077,6 @@
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 5,
           "stats": {
             "agi": 20,
             "armor": 110,
@@ -1158,7 +1098,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "2d0515af",
+      "state": "9b0f478f",
       "events": "f32f2351",
       "rng": {
         "draws": 0,
@@ -1172,7 +1112,7 @@
           "arenaRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 724,
+          "copper": 924,
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
@@ -1182,14 +1122,6 @@
             "mainhand": "worn_sword"
           },
           "inventory": [
-            {
-              "count": 4,
-              "itemId": "baked_bread"
-            },
-            {
-              "count": 4,
-              "itemId": "spring_water"
-            },
             {
               "count": 1,
               "itemId": "cryptbone_helm"
@@ -1253,7 +1185,6 @@
           "id": 389,
           "kind": "player",
           "level": 1,
-          "lootFfaTimer": "Infinity",
           "maxHp": 210,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -1265,7 +1196,7 @@
             "y": 1.5,
             "z": 1.540014
           },
-          "potionCooldownUntil": 120,
+          "potionCooldownUntil": 60,
           "resourceType": "rage",
           "sitting": true,
           "spawnPos": {
@@ -1273,7 +1204,6 @@
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 5,
           "stats": {
             "agi": 20,
             "armor": 110,
@@ -1295,7 +1225,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "11f4bceb",
+      "state": "73e2f03b",
       "events": "a5f485e1",
       "rng": {
         "draws": 0,
@@ -1309,7 +1239,7 @@
           "arenaRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 720,
+          "copper": 920,
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
@@ -1319,14 +1249,6 @@
             "mainhand": "worn_sword"
           },
           "inventory": [
-            {
-              "count": 4,
-              "itemId": "baked_bread"
-            },
-            {
-              "count": 4,
-              "itemId": "spring_water"
-            },
             {
               "count": 1,
               "itemId": "cryptbone_helm"
@@ -1394,7 +1316,6 @@
           "id": 389,
           "kind": "player",
           "level": 1,
-          "lootFfaTimer": "Infinity",
           "maxHp": 210,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -1406,7 +1327,7 @@
             "y": 1.5,
             "z": 1.540014
           },
-          "potionCooldownUntil": 120,
+          "potionCooldownUntil": 60,
           "resourceType": "rage",
           "sitting": true,
           "spawnPos": {
@@ -1414,7 +1335,6 @@
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 5,
           "stats": {
             "agi": 20,
             "armor": 110,
@@ -1436,7 +1356,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "11f4bceb",
+      "state": "73e2f03b",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1450,7 +1370,7 @@
           "arenaRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 720,
+          "copper": 920,
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
@@ -1460,14 +1380,6 @@
             "mainhand": "worn_sword"
           },
           "inventory": [
-            {
-              "count": 4,
-              "itemId": "baked_bread"
-            },
-            {
-              "count": 4,
-              "itemId": "spring_water"
-            },
             {
               "count": 1,
               "itemId": "cryptbone_helm"
@@ -1535,7 +1447,6 @@
           "id": 389,
           "kind": "player",
           "level": 1,
-          "lootFfaTimer": "Infinity",
           "maxHp": 210,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -1547,7 +1458,7 @@
             "y": 1.5,
             "z": 1.540014
           },
-          "potionCooldownUntil": 120,
+          "potionCooldownUntil": 60,
           "resourceType": "rage",
           "sitting": true,
           "spawnPos": {
@@ -1555,7 +1466,6 @@
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 5,
           "stats": {
             "agi": 20,
             "armor": 110,

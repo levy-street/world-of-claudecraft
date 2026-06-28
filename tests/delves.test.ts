@@ -50,6 +50,18 @@ function enterReliquary(sim: Sim, tier: 'normal' | 'heroic' = 'normal') {
   sim.enterDelve('collapsed_reliquary', tier);
 }
 
+function enterLitany(sim: Sim, tier: 'normal' | 'heroic' = 'normal') {
+  const heroicTier = DELVES.drowned_litany.tiers.find((t) => t.id === 'heroic');
+  const level =
+    tier === 'heroic'
+      ? (heroicTier?.minPlayerLevel ?? DELVES.drowned_litany.minLevel)
+      : DELVES.drowned_litany.minLevel;
+  sim.setPlayerLevel(level);
+  const door = DELVES.drowned_litany.doorPos;
+  teleport(sim, door.x, door.z);
+  sim.enterDelve('drowned_litany', tier);
+}
+
 function castAndFinish(sim: Sim, id: string) {
   sim.castAbility(id);
 
@@ -1130,6 +1142,98 @@ describe('Tessa percent-of-health heal + rank cap', () => {
     sim.companionUpgrade('companion_tessa'); // already maxed
     expect(meta.companionUpgrades.companion_tessa).toBe(3);
     expect(meta.delveMarks).toBe(92);
+  });
+});
+
+describe('The Drowned Litany (Phase 1 skeleton)', () => {
+  it('registers the delve as index 1 with a kill_boss objective at the marsh level band', () => {
+    const d = DELVES.drowned_litany;
+    expect(d).toBeDefined();
+    expect(d.index).toBe(1);
+    expect(d.objective).toBe('kill_boss');
+    expect(d.minLevel).toBe(12);
+    expect(d.boardNpcId).toBe('brother_aldric_watch');
+    expect(d.bosses).toEqual(['sister_nhalia_drowned_canticle']);
+    // Its own band: delveAt resolves index 1 at the second delve x-offset.
+    expect(delveAt(delveOrigin(1, 0).x)?.id).toBe('drowned_litany');
+  });
+
+  it('Normal has 0 affixes; Heroic has +3 enemy levels, 1 affix, and an L14 gate', () => {
+    const d = DELVES.drowned_litany;
+    const normal = d.tiers.find((t) => t.id === 'normal')!;
+    const heroic = d.tiers.find((t) => t.id === 'heroic')!;
+    expect(normal.affixCount).toBe(0);
+    expect(normal.enemyLevelBonus).toBe(0);
+    expect(heroic.affixCount).toBe(1);
+    expect(heroic.enemyLevelBonus).toBe(3);
+    expect(heroic.minPlayerLevel).toBe(14);
+  });
+
+  it('picks exactly 3 of the 6 trash modules with the boss apse always last', () => {
+    const sim = makeSim('warrior', 7);
+    enterLitany(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    expect(run.modules.length).toBe(4); // 3 trash + finale
+    expect(run.modules[run.modules.length - 1]).toBe('litany_apse');
+    const trash = run.modules.slice(0, 3);
+    expect(new Set(trash).size).toBe(3); // no duplicates
+    for (const m of trash) expect(DELVES.drowned_litany.modules).toContain(m);
+  });
+
+  it('same seed picks the same module order; different seeds can differ', () => {
+    const order = (seed: number) => {
+      const sim = makeSim('warrior', seed);
+      enterLitany(sim);
+      return [...sim.delveRunForPlayer(sim.playerId)!.modules];
+    };
+    expect(order(100)).toEqual(order(100));
+    // Across many seeds at least one differs from seed 100 (selection is seeded).
+    const base = order(100).join(',');
+    let sawDifferent = false;
+    for (let s = 101; s <= 130 && !sawDifferent; s++) sawDifferent = order(s).join(',') !== base;
+    expect(sawDifferent).toBe(true);
+  });
+
+  it('enter places the player in the delve band and auto-spawns Edda solo', () => {
+    const sim = makeSim('warrior');
+    enterLitany(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    expect(isDelvePos(sim.player.pos.x)).toBe(true);
+    expect(run.companion).toBeDefined();
+    const companion = sim.entities.get(run.companion!.entityId)!;
+    expect(companion.templateId).toBe('edda_reedhand');
+  });
+
+  it('blocks a level 13 player from Heroic but admits level 14', () => {
+    const blocked = makeSim('warrior');
+    blocked.setPlayerLevel(13);
+    const door = DELVES.drowned_litany.doorPos;
+    teleport(blocked, door.x, door.z);
+    blocked.enterDelve('drowned_litany', 'heroic');
+    expect(blocked.delveRunForPlayer(blocked.playerId)).toBeNull();
+
+    const ok = makeSim('warrior');
+    enterLitany(ok, 'heroic');
+    expect(ok.delveRunForPlayer(ok.playerId)?.tierId).toBe('heroic');
+  });
+
+  it('killing Sister Nhalia in the apse completes the objective and spawns the reward chest', () => {
+    const sim = makeSim('warrior');
+    enterLitany(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    run.bountiful = false;
+    run.modules = ['litany_apse'];
+    run.moduleIndex = 0;
+    (sim as any).spawnDelveModule(run);
+    const boss = [...sim.entities.values()].find(
+      (e) => e.templateId === 'sister_nhalia_drowned_canticle',
+    )!;
+    expect(boss).toBeDefined();
+    (sim as any).dealDamage(sim.player, boss, boss.maxHp + 1, false, 'physical', null, 'hit', true);
+    sim.tick();
+    expect(run.objective.complete).toBe(true);
+    expect(run.rewardChestId).not.toBeNull();
+    expect(isDelvePos(sim.player.pos.x)).toBe(true); // not ejected
   });
 });
 

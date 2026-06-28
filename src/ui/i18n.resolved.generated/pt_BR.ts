@@ -5530,6 +5530,33 @@ export const pt_BR: EnTranslations = {
       "acolyte_tessa": {
         "name": "Acólita Tessa"
       },
+      "drowned_cantor": {
+        "name": "Drowned Cantor"
+      },
+      "reedbound_acolyte": {
+        "name": "Reedbound Acolyte"
+      },
+      "deepfen_spearjaw": {
+        "name": "Deepfen Spearjaw"
+      },
+      "mirefen_widowling": {
+        "name": "Mirefen Widowling"
+      },
+      "grave_silt_bulwark": {
+        "name": "Grave-Silt Bulwark"
+      },
+      "sump_troll_devourer": {
+        "name": "Sump Troll Devourer"
+      },
+      "choir_thrall": {
+        "name": "Choir Thrall"
+      },
+      "sister_nhalia_drowned_canticle": {
+        "name": "Sister Nhalia, the Drowned Canticle"
+      },
+      "edda_reedhand": {
+        "name": "Edda Reedhand"
+      },
       "ironvein_foreman": {
         "name": "Capataz Veio de Ferro"
       },
@@ -5749,6 +5776,11 @@ export const pt_BR: EnTranslations = {
         "name": "Irmão Halven",
         "title": "Guardião do Relicário",
         "greeting": "O relicário lá embaixo se moveu de novo."
+      },
+      "brother_aldric_watch": {
+        "name": "Brother Aldric",
+        "title": "Fenbridge Watch",
+        "greeting": "Fenbridge hears bells under the water now. The Gravecallers are teaching the drowned to sing. Choose your tier, and I will hold the rope until you return."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -6714,6 +6746,11 @@ export const pt_BR: EnTranslations = {
         "name": "O Relicário Desmoronado",
         "enterText": "Você desce até o relicário desmoronado.",
         "leaveText": "Você sobe de volta até o Irmão Halven, na ruína do relicário."
+      },
+      "drowned_litany": {
+        "name": "The Drowned Litany",
+        "enterText": "You descend beneath Fenbridge into the drowned shrine.",
+        "leaveText": "You climb back to Brother Aldric on the Fenbridge causeway."
       }
     },
     "itemSets": {

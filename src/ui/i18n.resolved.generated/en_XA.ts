@@ -5530,6 +5530,33 @@ export const en_XA: EnTranslations = {
       "acolyte_tessa": {
         "name": "[Áçóļýţé Ţéššá]"
       },
+      "drowned_cantor": {
+        "name": "[Ðŕóŵñéð Çáñţóŕ]"
+      },
+      "reedbound_acolyte": {
+        "name": "[Ŕééðƀóúñð Áçóļýţé]"
+      },
+      "deepfen_spearjaw": {
+        "name": "[Ðééþƒéñ Šþéáŕĵáŵ]"
+      },
+      "mirefen_widowling": {
+        "name": "[Ɱíŕéƒéñ Ŵíðóŵļíñĝ]"
+      },
+      "grave_silt_bulwark": {
+        "name": "[Ĝŕáʋé-Šíļţ Ɓúļŵáŕķ]"
+      },
+      "sump_troll_devourer": {
+        "name": "[Šúɱþ Ţŕóļļ Ðéʋóúŕéŕ]"
+      },
+      "choir_thrall": {
+        "name": "[Çĥóíŕ Ţĥŕáļļ]"
+      },
+      "sister_nhalia_drowned_canticle": {
+        "name": "[Šíšţéŕ Ñĥáļíá, ţĥé Ðŕóŵñéð Çáñţíçļé]"
+      },
+      "edda_reedhand": {
+        "name": "[Éððá Ŕééðĥáñð]"
+      },
       "ironvein_foreman": {
         "name": "[Íŕóñʋéíñ Ƒóŕéɱáñ]"
       },
@@ -5749,6 +5776,11 @@ export const en_XA: EnTranslations = {
         "name": "[Ɓŕóţĥéŕ Ĥáļʋéñ]",
         "title": "[Ŕéļíɋúáŕý Ķééþéŕ]",
         "greeting": "[Ţĥé ŕéļíɋúáŕý ƀéļóŵ ĥáš šĥíƒţéð áĝáíñ.]"
+      },
+      "brother_aldric_watch": {
+        "name": "[Ɓŕóţĥéŕ Áļðŕíç]",
+        "title": "[Ƒéñƀŕíðĝé Ŵáţçĥ]",
+        "greeting": "[Ƒéñƀŕíðĝé ĥéáŕš ƀéļļš úñðéŕ ţĥé ŵáţéŕ ñóŵ. Ţĥé Ĝŕáʋéçáļļéŕš áŕé ţéáçĥíñĝ ţĥé ðŕóŵñéð ţó šíñĝ. Çĥóóšé ýóúŕ ţíéŕ, áñð Í ŵíļļ ĥóļð ţĥé ŕóþé úñţíļ ýóú ŕéţúŕñ.]"
       },
       "tidewatcher_ondrel": {
         "name": "[Óñðŕéļ Ʋáñé]",
@@ -6714,6 +6746,11 @@ export const en_XA: EnTranslations = {
         "name": "[Ţĥé Çóļļáþšéð Ŕéļíɋúáŕý]",
         "enterText": "[Ýóú ðéšçéñð íñţó ţĥé çóļļáþšéð ŕéļíɋúáŕý.]",
         "leaveText": "[Ýóú çļíɱƀ ƀáçķ ţó Ɓŕóţĥéŕ Ĥáļʋéñ áţ ţĥé ŕéļíɋúáŕý ŕúíñ.]"
+      },
+      "drowned_litany": {
+        "name": "[Ţĥé Ðŕóŵñéð Ļíţáñý]",
+        "enterText": "[Ýóú ðéšçéñð ƀéñéáţĥ Ƒéñƀŕíðĝé íñţó ţĥé ðŕóŵñéð šĥŕíñé.]",
+        "leaveText": "[Ýóú çļíɱƀ ƀáçķ ţó Ɓŕóţĥéŕ Áļðŕíç óñ ţĥé Ƒéñƀŕíðĝé çáúšéŵáý.]"
       }
     },
     "itemSets": {

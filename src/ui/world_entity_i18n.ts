@@ -81,6 +81,16 @@ const MOB_IDS = [
   'reliquary_saintless_effigy',
   'deacon_varric',
   'acolyte_tessa',
+  // Drowned Litany delve mobs (Mirefen Marsh)
+  'drowned_cantor',
+  'reedbound_acolyte',
+  'deepfen_spearjaw',
+  'mirefen_widowling',
+  'grave_silt_bulwark',
+  'sump_troll_devourer',
+  'choir_thrall',
+  'sister_nhalia_drowned_canticle',
+  'edda_reedhand',
 ] as const;
 
 const NPC_IDS = [
@@ -106,6 +116,7 @@ const NPC_IDS = [
   'auctioneer_voss', // second World Market auctioneer (Highwatch, zone 3)
   'brother_aldric_raid', // dynamically-spawned raid turn-in NPC (Crypt of Nythraxis)
   'brother_halven', // Collapsed Reliquary delve board NPC
+  'brother_aldric_watch', // Drowned Litany delve board NPC (Fenbridge Watch)
 ] as const;
 
 const QUEST_IDS = [
@@ -190,7 +201,7 @@ const DUNGEON_IDS = [
   'nythraxis_crypt',
   'nythraxis_boss_arena',
 ] as const;
-const DELVE_IDS = ['collapsed_reliquary'] as const;
+const DELVE_IDS = ['collapsed_reliquary', 'drowned_litany'] as const;
 
 type MobId = (typeof MOB_IDS)[number];
 type NpcId = (typeof NPC_IDS)[number];
