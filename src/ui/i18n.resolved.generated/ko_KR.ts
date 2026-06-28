@@ -509,10 +509,10 @@ export const ko_KR: EnTranslations = {
         "other": "검색: {realm} 서버에 {count}명의 플레이어가 접속 중입니다."
       },
       "playersMatching": {
-        "one": "Who: {count} player matching \"{query}\" on {realm}.",
-        "few": "Who: {count} players matching \"{query}\" on {realm}.",
-        "many": "Who: {count} players matching \"{query}\" on {realm}.",
-        "other": "Who: {count} players matching \"{query}\" on {realm}."
+        "one": "Who: {realm}에서 \"{query}\"와 일치하는 플레이어 {count}명.",
+        "few": "Who: {realm}에서 \"{query}\"와 일치하는 플레이어 {count}명.",
+        "many": "Who: {realm}에서 \"{query}\"와 일치하는 플레이어 {count}명.",
+        "other": "Who: {realm}에서 \"{query}\"와 일치하는 플레이어 {count}명."
       }
     },
     "bugReport": {

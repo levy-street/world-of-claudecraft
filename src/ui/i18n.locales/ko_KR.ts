@@ -3295,6 +3295,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.secondsRemaining.few': '{count}초 남음',
   'hudChrome.plurals.secondsRemaining.many': '{count}초 남음',
   'hudChrome.plurals.secondsRemaining.other': '{count}초 남음',
+  'hudChrome.plurals.playersMatching.one':
+    'Who: {realm}에서 "{query}"와 일치하는 플레이어 {count}명.',
+  'hudChrome.plurals.playersMatching.few':
+    'Who: {realm}에서 "{query}"와 일치하는 플레이어 {count}명.',
+  'hudChrome.plurals.playersMatching.many':
+    'Who: {realm}에서 "{query}"와 일치하는 플레이어 {count}명.',
+  'hudChrome.plurals.playersMatching.other':
+    'Who: {realm}에서 "{query}"와 일치하는 플레이어 {count}명.',
   'hudChrome.plurals.playersOnline.one':
     '검색: {realm} 서버에 {count}명의 플레이어가 접속 중입니다.',
   'hudChrome.plurals.playersOnline.few':

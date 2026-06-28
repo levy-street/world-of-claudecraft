@@ -507,6 +507,12 @@ export const nl_NL: EnTranslations = {
         "few": "Wie: {count} spelers online op {realm}.",
         "many": "Wie: {count} spelers online op {realm}.",
         "other": "Wie: {count} spelers online op {realm}."
+      },
+      "playersMatching": {
+        "one": "Who: {count} player matching \"{query}\" on {realm}.",
+        "few": "Who: {count} players matching \"{query}\" on {realm}.",
+        "many": "Who: {count} players matching \"{query}\" on {realm}.",
+        "other": "Who: {count} players matching \"{query}\" on {realm}."
       }
     },
     "bugReport": {

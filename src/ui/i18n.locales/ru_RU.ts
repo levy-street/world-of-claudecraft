@@ -3342,6 +3342,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.secondsRemaining.few': 'Осталось {count} сек.',
   'hudChrome.plurals.secondsRemaining.many': 'Осталось {count} сек.',
   'hudChrome.plurals.secondsRemaining.other': 'Осталось {count} сек.',
+  'hudChrome.plurals.playersMatching.one':
+    'Список игроков: на {realm} по запросу «{query}» найден {count} игрок.',
+  'hudChrome.plurals.playersMatching.few':
+    'Список игроков: на {realm} по запросу «{query}» найдено {count} игрока.',
+  'hudChrome.plurals.playersMatching.many':
+    'Список игроков: на {realm} по запросу «{query}» найдено {count} игроков.',
+  'hudChrome.plurals.playersMatching.other':
+    'Список игроков: на {realm} по запросу «{query}» найдено {count} игроков.',
   'hudChrome.plurals.playersOnline.one': 'Список игроков: на {realm} в сети {count} игрок.',
   'hudChrome.plurals.playersOnline.few': 'Список игроков: на {realm} в сети {count} игрока.',
   'hudChrome.plurals.playersOnline.many': 'Список игроков: на {realm} в сети {count} игроков.',
