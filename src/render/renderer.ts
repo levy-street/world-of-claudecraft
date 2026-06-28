@@ -4374,8 +4374,11 @@ export class Renderer {
         dz = entry.worldPos.z - pz;
       entry.d2 = dx * dx + dz * dz;
     }
-    const lightBudget = this.effectivePointLights || GFX.maxPointLights;
-    if (ranked.length > lightBudget) ranked.sort((a, b) => a.d2 - b.d2);
+    // CONSTANT visible count (numPointLights never changes -> no light-count recompiles);
+    // the live governor only changes how many SHINE, not how many are counted.
+    const visibleCount = GFX.maxPointLights;
+    const liveBudget = this.effectivePointLights || GFX.maxPointLights;
+    if (ranked.length > visibleCount) ranked.sort((a, b) => a.d2 - b.d2);
     for (let i = 0; i < ranked.length; i++) {
       const entry = ranked[i];
       const counted = i < visibleCount;
