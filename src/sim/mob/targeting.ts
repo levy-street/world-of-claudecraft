@@ -20,10 +20,11 @@
 // directly (already pure); only `entities` + the Nythraxis helpers route via the seam.
 
 import { MOBS } from '../data';
+import { combatProfileForMob } from '../mob_combat';
 import type { SimContext } from '../sim_context';
 import { addThreat, MELEE_SWITCH_MULT, RANGED_SWITCH_MULT } from '../threat';
 import type { Entity } from '../types';
-import { DT, dist2d, MELEE_RANGE } from '../types';
+import { DT, dist2d } from '../types';
 
 // Classic "trivial con" gap: a wild mob this far below the player's level stops
 // auto-aggroing from proximity. Moved with isTrivialTo (its only reader).
@@ -102,7 +103,10 @@ export function updateMobTarget(ctx: SimContext, mob: Entity): void {
       mob.threat.delete(id);
       continue;
     }
-    const inMelee = dist2d(mob.pos, e.pos) <= MELEE_RANGE * 1.2;
+    // Melee vs ranged is decided by the mob's size-scaled reach (so a challenger
+    // at a big boss's feet still counts as melee), not a flat distance.
+    const inMelee =
+      dist2d(mob.pos, e.pos) <= combatProfileForMob(mob.templateId, mob.scale).meleeRange;
     const needed = curThreat * (inMelee ? MELEE_SWITCH_MULT : RANGED_SWITCH_MULT);
     if (t > needed) {
       best = e;
