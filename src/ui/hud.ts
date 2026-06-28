@@ -4959,7 +4959,12 @@ export class Hud {
         /* skip a missing recipe; the live path falls back the same way */
       }
       n++;
-      if (deadline === undefined ? n >= ICONS_PER_SLICE : deadline.timeRemaining() <= 2) break;
+      // Cap EVERY callback to a small slice, even when the browser hands out a
+      // big idle budget (right after the loading screen it can be tens of ms):
+      // composing the whole warm-list in one callback would block a frame and
+      // stutter. Stop early too if the idle budget runs low. The reschedule paces
+      // the remainder across later idles.
+      if (n >= ICONS_PER_SLICE || (deadline !== undefined && deadline.timeRemaining() <= 2)) break;
     }
     if (this.iconWarmIdx < this.iconWarmKeys.length) this.scheduleIconWarm();
   };
