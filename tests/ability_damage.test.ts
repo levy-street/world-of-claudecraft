@@ -31,10 +31,8 @@ describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
 
   it('a pure DoT folds Spell Power across all its ticks (the total)', () => {
     const swp = known('priest', 'shadow_word_pain');
-    const eff = swp.effects.find((e) => e.type === 'dot') as {
-      duration: number;
-      interval: number;
-    } & { type: 'dot' };
+    const eff = swp.effects.find((e) => e.type === 'dot')!;
+    if (eff.type !== 'dot') throw new Error('expected dot');
     const ticks = eff.duration / eff.interval;
     expect(abilityDamageBonus(swp, eff, SC)).toBe(
       dotTickBonus(SC.spellPower, swp.def, eff.duration, eff.interval) * ticks,
@@ -48,13 +46,12 @@ describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
     expect(abilityDamageBonus(as, eff, SC)).toBe(directHitBonus(SC.rangedPower, as.def, as.castTime, false));
   });
 
-  it('a channelled spell uses the per-tick channel coefficient', () => {
+  it('a channelled directDamage (Arcane Missiles) uses the per-tick CHANNEL coefficient', () => {
     const am = known('mage', 'arcane_missiles');
     const eff = am.effects.find((e) => e.type === 'directDamage')!;
-    // arcane_missiles fires a directDamage per channel tick; its tooltip per-hit
-    // bonus is the channel coefficient share. (directDamage path returns the direct
-    // bonus; the channel-tick helper is exercised by drainTick channels below.)
-    expect(abilityDamageBonus(am, eff, SC)).toBeGreaterThanOrEqual(0);
+    // It is a per-missile channel tick, so it must use the channel coefficient, not
+    // the single-cast direct coefficient.
+    expect(abilityDamageBonus(am, eff, SC)).toBe(channelTickBonus(SC.spellPower, am.def));
   });
 
   it('a drain channel (Mind Flay) folds the per-tick channel coefficient', () => {

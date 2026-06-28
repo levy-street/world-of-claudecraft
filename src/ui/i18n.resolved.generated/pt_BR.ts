@@ -222,6 +222,9 @@ export const pt_BR: EnTranslations = {
     "rest": {
       "resting": "Descansando"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
     "mobile": {
       "autorun": "Corrida automática",
       "jump": "Pular",

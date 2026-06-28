@@ -222,6 +222,9 @@ export const en: EnTranslations = {
     "rest": {
       "resting": "Resting"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
     "mobile": {
       "autorun": "Autorun",
       "jump": "Jump",

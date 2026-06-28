@@ -222,6 +222,9 @@ export const zh_CN: EnTranslations = {
     "rest": {
       "resting": "休息中"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
     "mobile": {
       "autorun": "自动奔跑",
       "jump": "跳跃",

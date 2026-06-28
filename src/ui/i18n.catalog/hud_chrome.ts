@@ -85,6 +85,12 @@ export const hudChromeStrings = {
   rest: {
     resting: 'Resting',
   },
+  // The Spell Power / Attack Power contribution appended to an ability tooltip's
+  // base damage, e.g. "66 to 74 (+29)". Punctuation + a formatted number only (no
+  // words), so it is locale-neutral and an English-only add.
+  abilityScaling: {
+    bonus: '(+{value})',
+  },
   // On-screen / mobile control labels and their accessible names. char/bags/music
   // reuse existing keys (hud.keybinds.actions.*, hud.options.music) at the call site.
   mobile: {

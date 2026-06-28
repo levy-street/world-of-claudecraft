@@ -43,7 +43,11 @@ export function abilityDamageBonus(
   const power = abilityScalingPower(scaling, def);
   switch (eff.type) {
     case 'directDamage':
-      return directHitBonus(power, def, res.castTime, false);
+      // A channelled directDamage (Arcane Missiles) is a per-tick hit: it uses the
+      // channel coefficient in combat, not the single-cast one.
+      return def.channel
+        ? channelTickBonus(power, def)
+        : directHitBonus(power, def, res.castTime, false);
     case 'aoeDamage':
     case 'aoeRoot':
       return directHitBonus(power, def, res.castTime, true);

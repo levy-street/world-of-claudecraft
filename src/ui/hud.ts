@@ -14284,12 +14284,18 @@ function abilityRequirementLines(def: AbilityDef): string[] {
 }
 
 // Builds the `$d` damage string for an ability tooltip. When `scaling` (the live
-// character's Spell Power / Ranged AP / Attack Power) is given, the displayed
-// numbers fold in that scaling exactly as combat does, so the tooltip shows what a
-// cast will really land and updates as gear changes.
+// character's Spell Power / Ranged AP / Attack Power) is given, the BASE damage is
+// shown with the scaling contribution called out as a "(+N)" suffix, e.g.
+// "66 to 74 (+29)", so a caster sees both the base and exactly what their Spell
+// Power adds, and watches it climb as gear changes.
 function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling): string {
   const effects = res.effects;
-  const bonus = (eff: AbilityEffect) => (scaling ? abilityDamageBonus(res, eff, scaling) : 0);
+  // " (+N)" callout for the scaling contribution (Spell Power / Attack Power),
+  // omitted when there is none. Punctuation + formatted number only (no words).
+  const suffix = (eff: AbilityEffect) => {
+    const b = scaling ? abilityDamageBonus(res, eff, scaling) : 0;
+    return b > 0 ? ` ${t('hudChrome.abilityScaling.bonus', { value: formatAbilityNumber(b) })}` : '';
+  };
   const primary = effects.find(
     (eff) =>
       eff.type === 'directDamage' ||
@@ -14307,18 +14313,18 @@ function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling): stri
       case 'heal':
       case 'aoeDamage':
       case 'aoeRoot':
-      case 'drainTick': {
-        const b = bonus(primary);
-        return abilityAmountRange(primary.min + b, primary.max + b);
-      }
+      case 'drainTick':
+        return abilityAmountRange(primary.min, primary.max) + suffix(primary);
       case 'weaponDamage':
       case 'weaponStrike':
         return formatAbilityNumber(primary.bonus);
       case 'finisherDamage':
-        return t('abilityUi.tooltip.finisherDamage', {
-          base: formatAbilityNumber(primary.base + bonus(primary)),
-          perCombo: formatAbilityNumber(primary.perCombo),
-        });
+        return (
+          t('abilityUi.tooltip.finisherDamage', {
+            base: formatAbilityNumber(primary.base),
+            perCombo: formatAbilityNumber(primary.perCombo),
+          }) + suffix(primary)
+        );
     }
   }
 
@@ -14329,7 +14335,7 @@ function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling): stri
   if (!secondary) return '';
   switch (secondary.type) {
     case 'dot':
-      return formatAbilityNumber(secondary.total + bonus(secondary));
+      return formatAbilityNumber(secondary.total) + suffix(secondary);
     case 'hot':
       return formatAbilityNumber(secondary.total);
     case 'absorb':

@@ -222,6 +222,9 @@ export const ko_KR: EnTranslations = {
     "rest": {
       "resting": "휴식 중"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
     "mobile": {
       "autorun": "자동 달리기",
       "jump": "점프",

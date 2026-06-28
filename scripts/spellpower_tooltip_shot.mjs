@@ -63,11 +63,15 @@ const tip = await page.evaluate(() => {
 const sp = await page.evaluate(() => window.__game.sim.player.spellPower);
 
 await page.screenshot({ path: 'tmp/spellpower-tooltip.png' });
-// Cropped, legible shot of just the tooltip box.
+// Cropped, legible shot of just the floating tooltip box (the one carrying the
+// description prose AND the cast line).
 const clip = await page.evaluate(() => {
-  const t = [...document.querySelectorAll('div')].find(
-    (d) => /to \d+ Frost damage/.test(d.textContent || '') && d.offsetParent !== null,
-  );
+  const t = [...document.querySelectorAll('div')]
+    .filter((d) => {
+      const x = d.textContent || '';
+      return /Launches a bolt of frost/i.test(x) && /sec cast/i.test(x) && d.offsetParent !== null;
+    })
+    .sort((a, b) => a.getBoundingClientRect().height - b.getBoundingClientRect().height)[0];
   if (!t) return null;
   const r = t.getBoundingClientRect();
   return { x: Math.max(0, r.left - 8), y: Math.max(0, r.top - 8), width: Math.min(560, r.width + 16), height: r.height + 16 };

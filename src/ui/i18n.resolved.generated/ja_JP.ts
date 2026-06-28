@@ -222,6 +222,9 @@ export const ja_JP: EnTranslations = {
     "rest": {
       "resting": "休息中"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
     "mobile": {
       "autorun": "オートラン",
       "jump": "ジャンプ",

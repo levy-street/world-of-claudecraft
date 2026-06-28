@@ -222,6 +222,9 @@ export const en_XA: EnTranslations = {
     "rest": {
       "resting": "[Ŕéšţíñĝ]"
     },
+    "abilityScaling": {
+      "bonus": "[(+{value})]"
+    },
     "mobile": {
       "autorun": "[Áúţóŕúñ]",
       "jump": "[Ĵúɱþ]",
