@@ -1962,8 +1962,14 @@ export class Renderer {
   }
 
   private visualPoolKeyFor(e: Entity): string | null {
-    if (e.kind !== 'mob') return null;
-    return `mob:${e.templateId}:${e.color}:${e.scale}`;
+    if (e.kind === 'mob') return `mob:${e.templateId}:${e.color}:${e.scale}`;
+    // NPCs are skinned characters too: pool them like mobs so their Skeleton (and its
+    // bone-matrix DataTexture) survives interest churn instead of being disposed and
+    // re-uploaded every time one streams out and back into view - that dispose +
+    // re-upload cycle is the open-world "asset-upload" travel hitch (Skeleton.dispose
+    // via CharacterVisual.dispose in removeView, pinned by GPU-upload profiling).
+    if (e.kind === 'npc') return `npc:${e.templateId}:${e.skin}:${e.color}:${e.scale}`;
+    return null;
   }
 
   private takePooledVisual(key: string): CharacterVisual | null {
@@ -2978,8 +2984,14 @@ export class Renderer {
       visualPoolKey = this.visualPoolKeyFor(e);
       visual = visualPoolKey ? this.takePooledVisual(visualPoolKey) : null;
       if (!visual) {
+        // Pool MISS: build a fresh visual but KEEP its pool key so removeView returns
+        // it to the pool (which self-sizes to demand) instead of disposing it. Disposing
+        // a skinned visual frees its Skeleton's bone-matrix DataTexture; re-creating it
+        // when the entity streams back re-uploads that texture - the open-world
+        // "asset-upload" travel hitch. Before, only the few prewarm-seeded copies were
+        // ever recycled, so every mob past that count churned. Key is per-template, so
+        // the pool stays bounded by the peak simultaneous count.
         visual = createCharacterVisual(e);
-        visualPoolKey = null;
       }
       // entity scale is applied to the whole group below, so it can update live
       // (Fiesta size buffs) and also scale lazily-built form visuals for free.
