@@ -63,6 +63,8 @@ const hudStringsEn = {
       closeMap: 'Close map',
       zoomIn: 'Zoom in',
       zoomOut: 'Zoom out',
+      mapCanvasLabel: 'Map',
+      mapSummary: 'Map of {zone}.',
     },
     options: {
       gameMenu: 'Game Menu',

@@ -296,6 +296,26 @@ export function itemDisplayName(item: ItemDef): string {
   return tEntity({ kind: 'item', id: item.id, field: 'name' });
 }
 
+// Thin tEntity wrappers for the display helpers that several windows + painters each
+// re-declared (class/zone/poi/dungeon names). Mirroring itemDisplayName above, these are
+// the single shared home so hud.ts, the cold windows, and map_window_painter import one
+// definition instead of redefining it per module.
+export function classDisplayName(cls: PlayerClass): string {
+  return tEntity({ kind: 'class', id: cls, field: 'name' });
+}
+
+export function zoneDisplayName(zoneId: string): string {
+  return tEntity({ kind: 'zone', id: zoneId, field: 'name' });
+}
+
+export function zonePoiLabel(zoneId: string, poiIndex: number): string {
+  return tEntity({ kind: 'zonePoi', zoneId, poiIndex, field: 'label' });
+}
+
+export function dungeonDisplayName(dungeonId: string): string {
+  return tEntity({ kind: 'dungeon', id: dungeonId, field: 'name' });
+}
+
 export function resetEntityTranslationFallbackLog(): void {
   fallbackLog.clear();
 }

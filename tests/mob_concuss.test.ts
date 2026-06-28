@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { Sim } from '../src/sim/sim';
+import { isStunned } from '../src/sim/combat/cc';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { Sim } from '../src/sim/sim';
 
 const SEED = 5150;
 const makeSim = () => new Sim({ seed: SEED, playerClass: 'warrior' });
@@ -10,7 +11,8 @@ describe('Concussive Blow stun-on-hit affix', () => {
   it('a landed thornpeak_ogre swing can stun the victim', () => {
     const sim = makeSim();
     const p = sim.entities.get(sim.playerId)!;
-    p.maxHp = 100000; p.hp = 100000; // survive every swing so we observe the stun
+    p.maxHp = 100000;
+    p.hp = 100000; // survive every swing so we observe the stun
     const tmpl = MOBS.thornpeak_ogre;
     const saved = tmpl.concuss!.chance;
     tmpl.concuss!.chance = 1; // force the proc; misses/dodges still possible
@@ -26,7 +28,7 @@ describe('Concussive Blow stun-on-hit affix', () => {
       const a = p.auras.find((x) => x.kind === 'stun')!;
       expect(a.name).toBe('Concussive Blow');
       expect(a.duration).toBe(2);
-      expect((sim as any).isStunned(p)).toBe(true);
+      expect(isStunned(p)).toBe(true);
     } finally {
       tmpl.concuss!.chance = saved;
     }
@@ -35,7 +37,8 @@ describe('Concussive Blow stun-on-hit affix', () => {
   it('a friendly pet swing (hostile=false) never stuns', () => {
     const sim = makeSim();
     const p = sim.entities.get(sim.playerId)!;
-    p.maxHp = 100000; p.hp = 100000;
+    p.maxHp = 100000;
+    p.hp = 100000;
     const tmpl = MOBS.thornpeak_ogre;
     const saved = tmpl.concuss!.chance;
     tmpl.concuss!.chance = 1;
@@ -55,7 +58,8 @@ describe('Concussive Blow stun-on-hit affix', () => {
   it('a mob without the concuss affix applies no stun', () => {
     const sim = makeSim();
     const p = sim.entities.get(sim.playerId)!;
-    p.maxHp = 100000; p.hp = 100000;
+    p.maxHp = 100000;
+    p.hp = 100000;
     const mob = createMob(900602, MOBS.forest_wolf, 5, { x: 0, y: 0, z: 0 });
     for (let i = 0; i < 40; i++) (sim as any).mobSwing(mob, p);
     expect(p.auras.some((a) => a.kind === 'stun')).toBe(false);
@@ -64,7 +68,8 @@ describe('Concussive Blow stun-on-hit affix', () => {
   it('the refreshing stun never stacks into multiple auras', () => {
     const sim = makeSim();
     const p = sim.entities.get(sim.playerId)!;
-    p.maxHp = 100000; p.hp = 100000;
+    p.maxHp = 100000;
+    p.hp = 100000;
     const tmpl = MOBS.thornpeak_ogre;
     const saved = tmpl.concuss!.chance;
     tmpl.concuss!.chance = 1;

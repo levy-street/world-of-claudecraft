@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { updateDelveCompanion } from '../src/sim/delves/companion';
 import { Sim } from '../src/sim/sim';
 import { terrainHeight } from '../src/sim/world';
 
@@ -205,5 +206,79 @@ describe('delve companions', () => {
       if (sim.player.hp > Math.round(sim.player.maxHp * 0.5)) break;
     }
     expect(sim.player.hp).toBeGreaterThan(Math.round(sim.player.maxHp * 0.5));
+  });
+
+  // Direct module-import tests: drive the moved updateDelveCompanion(ctx, companion)
+  // straight against the live SimContext, proving src/sim/delves/companion.ts is the
+  // owner (no Sim method involved) across the heal, heel, and combat arms.
+  it('(module) heals the lowest-HP owner by the rank-scaled percent', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(10);
+    teleport(sim, 0, 0);
+    const meta = (sim as any).players.get(sim.playerId);
+    meta.companionUpgrades.companion_tessa = 2; // DELVE_COMPANION_HEAL_PCT[2] = 0.08
+    sim.enterDelve('collapsed_reliquary', 'normal');
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    const companion = sim.entities.get(run.companion!.entityId)!;
+    const p = sim.player;
+    p.hp = Math.max(1, Math.round(p.maxHp * 0.5));
+    companion.pos = { ...p.pos }; // within DELVE_COMPANION_HEAL_RANGE
+    companion.prevPos = { ...companion.pos };
+    companion.wanderTimer = 0; // heal cadence due this call
+    const before = p.hp;
+    updateDelveCompanion((sim as any).ctx, companion);
+    const expected = Math.min(p.maxHp - before, Math.round(p.maxHp * 0.08));
+    expect(expected).toBeGreaterThan(0);
+    expect(p.hp).toBe(before + expected);
+  });
+
+  it('(module) heels toward the owner when not in combat', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(10);
+    teleport(sim, 0, 0);
+    sim.enterDelve('collapsed_reliquary', 'normal');
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    const companion = sim.entities.get(run.companion!.entityId)!;
+    const p = sim.player;
+    p.targetId = null;
+    p.autoAttack = false;
+    p.inCombat = false;
+    // Drop hostile mobs so combatTarget is null and the heel arm runs.
+    for (const [id, e] of [...sim.entities]) {
+      if (e.kind === 'mob' && e.hostile) sim.entities.delete(id);
+    }
+    companion.pos = { x: p.pos.x + 10, y: p.pos.y, z: p.pos.z }; // > DELVE_COMPANION_FOLLOW (4)
+    companion.prevPos = { ...companion.pos };
+    companion.wanderTimer = 999; // keep the heal arm out of it
+    const d0 = Math.hypot(companion.pos.x - p.pos.x, companion.pos.z - p.pos.z);
+    updateDelveCompanion((sim as any).ctx, companion);
+    const d1 = Math.hypot(companion.pos.x - p.pos.x, companion.pos.z - p.pos.z);
+    expect(d1).toBeLessThan(d0); // moved toward the owner via ctx.moveToward
+  });
+
+  it('(module) acquires the owner target and swings it via mobSwing', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(10);
+    teleport(sim, 0, 0);
+    sim.enterDelve('collapsed_reliquary', 'normal');
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    run.modules = ['reliquary_sunken_ossuary'];
+    run.moduleIndex = 0;
+    (sim as any).spawnDelveModule(run);
+    const companion = sim.entities.get(run.companion!.entityId)!;
+    const mob = [...sim.entities.values()].find(
+      (e) => e.kind === 'mob' && e.hostile && e.templateId !== 'acolyte_tessa',
+    )!;
+    expect(mob).toBeDefined();
+    const hpBefore = mob.hp;
+    sim.player.targetId = mob.id; // companion prefers the owner's target
+    companion.pos = { ...mob.pos };
+    companion.prevPos = { ...companion.pos };
+    companion.swingTimer = 0;
+    for (let i = 0; i < 60; i++) {
+      updateDelveCompanion((sim as any).ctx, companion);
+      if (mob.hp < hpBefore) break;
+    }
+    expect(mob.hp).toBeLessThan(hpBefore);
   });
 });

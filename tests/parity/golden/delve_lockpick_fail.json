@@ -1,0 +1,427 @@
+{
+  "scenario": "delve_lockpick_fail",
+  "seed": 2024,
+  "sampleEvery": 10,
+  "ticks": 71,
+  "coverage": [
+    "delve run (collapsed_reliquary finale)",
+    "lockpick minigame (server-authoritative timeout jam)",
+    "tickLockpickTimeout -> lockpickStepTimeout -> lockpickBurnTry -> lockpickFail",
+    "jammed chest (attemptAvailable=false) + surface exit opens"
+  ],
+  "draws": 3,
+  "drawDigest": "ad960248",
+  "frames": [
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 389,
+      "state": "901c55a7",
+      "events": "741638a5",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "init",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "cls": "rogue",
+          "companionUpgrades": {},
+          "counters": {},
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 388,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "rusty_dagger"
+          },
+          "talents": {
+            "choices": {},
+            "ranks": {}
+          }
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 42,
+          "combatTimer": 99,
+          "critChance": 0.0625,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0625,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 62,
+          "id": 388,
+          "kind": "player",
+          "level": 1,
+          "maxHp": 62,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resource": 100,
+          "resourceType": "energy",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "stats": {
+            "agi": 25,
+            "armor": 104,
+            "int": 11,
+            "spi": 12,
+            "sta": 17,
+            "str": 17
+          },
+          "templateId": "rogue",
+          "weapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          }
+        }
+      ]
+    },
+    {
+      "tick": 10,
+      "time": 0.5,
+      "nextId": 400,
+      "state": "899b978f",
+      "events": "1edad6a3",
+      "rng": {
+        "draws": 3,
+        "digest": "ad960248"
+      }
+    },
+    {
+      "tick": 20,
+      "time": 1,
+      "nextId": 400,
+      "state": "37f1aaff",
+      "events": "741638a5",
+      "rng": {
+        "draws": 3,
+        "digest": "ad960248"
+      }
+    },
+    {
+      "tick": 30,
+      "time": 1.5,
+      "nextId": 400,
+      "state": "04515e5d",
+      "events": "741638a5",
+      "rng": {
+        "draws": 3,
+        "digest": "ad960248"
+      }
+    },
+    {
+      "tick": 40,
+      "time": 2,
+      "nextId": 400,
+      "state": "7a1ed393",
+      "events": "741638a5",
+      "rng": {
+        "draws": 3,
+        "digest": "ad960248"
+      }
+    },
+    {
+      "tick": 50,
+      "time": 2.5,
+      "nextId": 400,
+      "state": "20393b85",
+      "events": "741638a5",
+      "rng": {
+        "draws": 3,
+        "digest": "ad960248"
+      }
+    },
+    {
+      "tick": 60,
+      "time": 3,
+      "nextId": 400,
+      "state": "1d21558f",
+      "events": "741638a5",
+      "rng": {
+        "draws": 3,
+        "digest": "ad960248"
+      }
+    },
+    {
+      "tick": 69,
+      "time": 3.45,
+      "nextId": 401,
+      "state": "ebe2fedd",
+      "events": "865418c9",
+      "rng": {
+        "draws": 3,
+        "digest": "ad960248"
+      },
+      "label": "lockpick-jammed",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "cls": "rogue",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 636,
+            "kills": 1,
+            "xpGained": 198
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 388,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "rusty_dagger"
+          },
+          "lifetimeXp": 11398,
+          "talents": {
+            "choices": {},
+            "ranks": {}
+          },
+          "xp": 198
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 66,
+          "combatTimer": 3.45,
+          "critChance": 0.0715,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0715,
+          "fiveSecondRule": 102.45,
+          "hp": 50000,
+          "id": 388,
+          "inCombat": true,
+          "kind": "player",
+          "level": 7,
+          "maxHp": 50000,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 4800,
+            "z": -1176
+          },
+          "potionCooldownUntil": -1,
+          "resource": 100,
+          "resourceType": "energy",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "stats": {
+            "agi": 43,
+            "armor": 188,
+            "int": 11,
+            "spi": 12,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "rogue",
+          "weapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": 3.141593,
+          "fiveSecondRule": 99,
+          "hp": 1,
+          "id": 399,
+          "kind": "object",
+          "level": 1,
+          "lootable": true,
+          "maxHp": 1,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 4800,
+            "z": -1176
+          },
+          "potionCooldownUntil": -1,
+          "respawnTimer": -0.05,
+          "spawnPos": {
+            "x": 4800,
+            "z": -1176
+          },
+          "stats": {},
+          "templateId": "delve_locked_chest",
+          "weapon": {
+            "max": 2,
+            "min": 1,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 70,
+      "time": 3.5,
+      "nextId": 401,
+      "state": "e3203ed9",
+      "events": "741638a5",
+      "rng": {
+        "draws": 3,
+        "digest": "ad960248"
+      }
+    },
+    {
+      "tick": 71,
+      "time": 3.55,
+      "nextId": 401,
+      "state": "22f1bb2d",
+      "events": "741638a5",
+      "rng": {
+        "draws": 3,
+        "digest": "ad960248"
+      },
+      "label": "final",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "cls": "rogue",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 636,
+            "kills": 1,
+            "xpGained": 198
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 388,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "rusty_dagger"
+          },
+          "lifetimeXp": 11398,
+          "talents": {
+            "choices": {},
+            "ranks": {}
+          },
+          "xp": 198
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 66,
+          "combatTimer": 3.55,
+          "critChance": 0.0715,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0715,
+          "fiveSecondRule": 102.55,
+          "hp": 50000,
+          "id": 388,
+          "inCombat": true,
+          "kind": "player",
+          "level": 7,
+          "maxHp": 50000,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 4800,
+            "z": -1176
+          },
+          "potionCooldownUntil": -1,
+          "resource": 100,
+          "resourceType": "energy",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "stats": {
+            "agi": 43,
+            "armor": 188,
+            "int": 11,
+            "spi": 12,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "rogue",
+          "weapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": 3.141593,
+          "fiveSecondRule": 99,
+          "hp": 1,
+          "id": 399,
+          "kind": "object",
+          "level": 1,
+          "lootable": true,
+          "maxHp": 1,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 4800,
+            "z": -1176
+          },
+          "potionCooldownUntil": -1,
+          "respawnTimer": -0.05,
+          "spawnPos": {
+            "x": 4800,
+            "z": -1176
+          },
+          "stats": {},
+          "templateId": "delve_locked_chest",
+          "weapon": {
+            "max": 2,
+            "min": 1,
+            "speed": 2
+          }
+        }
+      ]
+    }
+  ]
+}

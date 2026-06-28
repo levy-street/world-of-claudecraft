@@ -1,0 +1,283 @@
+// Player auto-attack + the melee/ranged white-hit table, extracted from the Sim
+// monolith (C5). This module owns:
+//   - startAutoAttack / stopAutoAttack: the public auto-attack toggle (validate
+//     target, aggro an idle mob, enter combat).
+//   - updatePlayerAutoAttack: the per-tick driver (swing-timer decay, facing/range
+//     gates, the ranged-vs-melee branch, and queuedOnSwing consumption that feeds
+//     on-next-swing abilities like Heroic Strike / Raptor Strike into the swing).
+//   - rangedSwing: Auto Shot (hunters, 8yd dead zone) and Wand (casters, no dead
+//     zone); miss roll, crit, and armor mitigation for physical shots only.
+//   - meleeSwing: the white-hit table (single rng.next() miss -> dodge -> hit, crit,
+//     weapon imbue bonus, armor mitigation, and the thorns / spiked-hide reflect
+//     tail). Returns whether the swing connected so the effect_dispatch weaponStrike
+//     handler can gate its combo award.
+//
+// The swing sites resolve crit/dodge/miss/armor UPSTREAM and hand dealDamage an
+// already-mitigated amount; dealDamage (C1, combat/damage.ts) applies the
+// post-mitigation amp/absorb/death routing on top.
+//
+// PRIME DIRECTIVE: this is a MOVE, not a rewrite. Each function below is the former
+// `Sim` method verbatim, with `this.X` rewritten to `ctx.X` (the SimContext seam),
+// `this.{isStunned,isDisarmed,blindMissBonus}` to sibling imports from ./cc, and
+// `this.spendResource` to the sibling export from ./casting_lifecycle. Statement
+// order, branch order, the single shared rng draw order, and the in-place Entity
+// mutation (the refactor's immutability waiver) are preserved exactly so the parity
+// gate's full-state trace and rng draw-order log stay byte-identical.
+//
+// `src/sim`-pure: no DOM/Three, no Math.random/Date.now; all randomness is the shared
+// `ctx.rng` stream, drawn in the exact pre-move positions.
+
+import { CLASSES, MOBS } from '../data';
+import type { PlayerMeta } from '../sim';
+import type { SimContext } from '../sim_context';
+import { addThreat } from '../threat';
+import {
+  angleTo,
+  armorReduction,
+  DT,
+  dist2d,
+  type Entity,
+  MELEE_ARC,
+  MELEE_RANGE,
+  meleeMissChance,
+  normAngle,
+} from '../types';
+import { spendResource } from './casting_lifecycle';
+import { blindMissBonus, isDisarmed, isStunned } from './cc';
+
+export function startAutoAttack(ctx: SimContext, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const p = r.e;
+  if (p.dead) return;
+  const t = p.targetId !== null ? ctx.entities.get(p.targetId) : null;
+  if (!t || t.dead || !ctx.isHostileTo(p, t)) {
+    ctx.error(p.id, 'Invalid attack target.');
+    return;
+  }
+  if (p.sitting) ctx.standUp(p);
+  p.autoAttack = true;
+  r.meta.lastActiveTick = ctx.tickCount; // starting auto-attack is a deliberate action
+  const d = dist2d(p.pos, t.pos);
+  const ranged = CLASSES[r.meta.cls].ranged;
+  const inAutoAttackRange = ranged
+    ? d <= ranged.maxRange && d >= (ranged.wand ? 0 : ranged.minRange) && ctx.hasLineOfSight(p, t)
+    : d <= MELEE_RANGE;
+  if (
+    inAutoAttackRange &&
+    t.kind === 'mob' &&
+    t.hostile &&
+    t.ownerId === null &&
+    t.aiState !== 'evade'
+  ) {
+    if (t.aiState === 'idle') ctx.aggroMob(t, p, true);
+    else if (t.aggroTargetId === null) t.aggroTargetId = p.id;
+    addThreat(t, p.id, 1);
+    p.combatTimer = 0;
+    p.inCombat = true;
+  }
+}
+
+export function stopAutoAttack(ctx: SimContext, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (r) r.e.autoAttack = false;
+}
+
+export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
+  p.swingTimer = Math.max(0, p.swingTimer - DT);
+  if (!p.autoAttack || p.castingAbility) return;
+  const t = p.targetId !== null ? ctx.entities.get(p.targetId) : null;
+  if (!t || t.dead || !ctx.isHostileTo(p, t)) {
+    p.autoAttack = false;
+    return;
+  }
+  if (p.swingTimer > 0) return;
+  if (isStunned(p)) return;
+  if (isDisarmed(p)) return; // weapon knocked away: no auto-attack swings
+  const d = dist2d(p.pos, t.pos);
+  const facingDiff = Math.abs(normAngle(angleTo(p.pos, t.pos) - p.facing));
+  if (facingDiff > MELEE_ARC) return;
+
+  // ranged auto-attack: hunters (auto shot, dead zone inside minRange) and
+  // casters (wand-style, no dead zone so they don't run into melee — #94)
+  const ranged = CLASSES[meta.cls].ranged;
+  if (ranged && d <= ranged.maxRange && d >= (ranged.wand ? 0 : ranged.minRange)) {
+    if (!ctx.hasLineOfSight(p, t)) return;
+    ctx.breakGhostWolf(p);
+    rangedSwing(ctx, p, t, ranged);
+    p.swingTimer = ranged.speed * ctx.swingIntervalMult(p);
+    return;
+  }
+  if (d > MELEE_RANGE) return;
+  ctx.breakGhostWolf(p);
+
+  let bonus = 0;
+  let abilityName: string | null = null;
+  let threatFlat = 0;
+  let threatMult = 1;
+  if (p.queuedOnSwing) {
+    const queued = ctx.resolvedAbility(p.queuedOnSwing, p.id);
+    if (queued) {
+      const eff = queued.effects.find((e) => e.type === 'weaponDamage');
+      if (p.resource >= queued.cost && eff && eff.type === 'weaponDamage') {
+        spendResource(p, queued.cost);
+        // on-next-swing abilities (e.g. Raptor Strike) resolve here rather than
+        // in castAbility, so their cooldown must be applied on the swing too (#56)
+        if (queued.def.cooldown > 0) p.cooldowns.set(queued.def.id, queued.def.cooldown);
+        bonus = eff.bonus;
+        abilityName = queued.def.name;
+        threatFlat = queued.threatFlat;
+        threatMult = queued.threatMult;
+      }
+    }
+    p.queuedOnSwing = null;
+  }
+  meleeSwing(ctx, p, t, bonus, abilityName, { threatFlat, threatMult });
+  p.swingTimer = p.weapon.speed * ctx.swingIntervalMult(p);
+}
+
+export function rangedSwing(
+  ctx: SimContext,
+  attacker: Entity,
+  target: Entity,
+  ranged: { min: number; max: number; speed: number; wand?: boolean; school?: string },
+): void {
+  const school = ranged.wand ? (ranged.school ?? 'arcane') : 'physical';
+  const label = ranged.wand ? 'Wand' : 'Auto Shot';
+  ctx.emit({
+    type: 'spellfx',
+    sourceId: attacker.id,
+    targetId: target.id,
+    school,
+    fx: 'projectile',
+  });
+  const missChance = meleeMissChance(attacker.level, target.level) + blindMissBonus(attacker);
+  if (ctx.rng.chance(missChance)) {
+    ctx.emit({
+      type: 'damage',
+      sourceId: attacker.id,
+      targetId: target.id,
+      amount: 0,
+      crit: false,
+      school,
+      ability: label,
+      kind: 'miss',
+    });
+    ctx.enterCombat(attacker, target);
+    return;
+  }
+  let dmg = ctx.rng.range(ranged.min, ranged.max) + (attacker.rangedPower / 14) * ranged.speed;
+  // ranged white hits suffer the same higher-level crit suppression as melee
+  const critChance = Math.max(
+    0.005,
+    attacker.critChance - Math.max(0, target.level - attacker.level) * 0.002,
+  );
+  const crit = ctx.rng.chance(critChance);
+  if (crit) dmg *= 2;
+  // wand bolts are magic — armor doesn't apply; physical auto shot is mitigated
+  if (!ranged.wand) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), attacker.level);
+  ctx.dealDamage(attacker, target, Math.max(1, Math.round(dmg)), crit, school, label, 'hit');
+}
+
+// Returns true if the swing connected.
+export function meleeSwing(
+  ctx: SimContext,
+  attacker: Entity,
+  target: Entity,
+  bonus: number,
+  abilityName: string | null,
+  opts: {
+    cannotBeDodged?: boolean;
+    weaponMult?: number;
+    threatFlat?: number;
+    threatMult?: number;
+  },
+): boolean {
+  const missChance = meleeMissChance(attacker.level, target.level) + blindMissBonus(attacker);
+  const dodgeChance = opts.cannotBeDodged
+    ? 0
+    : target.kind === 'player'
+      ? target.dodgeChance
+      : 0.05 + Math.max(0, target.level - attacker.level) * 0.005;
+  const roll = ctx.rng.next();
+  if (roll < missChance) {
+    ctx.emit({
+      type: 'damage',
+      sourceId: attacker.id,
+      targetId: target.id,
+      amount: 0,
+      crit: false,
+      school: 'physical',
+      ability: abilityName,
+      kind: 'miss',
+    });
+    ctx.enterCombat(attacker, target);
+    return false;
+  }
+  if (roll < missChance + dodgeChance) {
+    ctx.emit({
+      type: 'damage',
+      sourceId: attacker.id,
+      targetId: target.id,
+      amount: 0,
+      crit: false,
+      school: 'physical',
+      ability: abilityName,
+      kind: 'dodge',
+    });
+    ctx.enterCombat(attacker, target);
+    if (attacker.kind === 'player') attacker.overpowerUntil = ctx.time + 5;
+    return false;
+  }
+  const mult = opts.weaponMult ?? 1;
+  // weapon imbues (seals, rockbiter) add flat damage to every swing
+  let imbueBonus = 0;
+  for (const a of attacker.auras) if (a.kind === 'imbue') imbueBonus += a.value;
+  let dmg =
+    (ctx.rng.range(attacker.weapon.min, attacker.weapon.max) +
+      (ctx.effectiveAttackPower(attacker) / 14) * attacker.weapon.speed) *
+      mult +
+    bonus +
+    imbueBonus;
+  const critChance = Math.max(
+    0.005,
+    attacker.critChance - Math.max(0, target.level - attacker.level) * 0.002,
+  );
+  const crit = ctx.rng.chance(critChance);
+  if (crit) dmg *= 2;
+  dmg *= 1 - armorReduction(ctx.effectiveArmor(target), attacker.level);
+  ctx.dealDamage(
+    attacker,
+    target,
+    Math.max(1, Math.round(dmg)),
+    crit,
+    'physical',
+    abilityName,
+    'hit',
+    false,
+    { flat: opts.threatFlat ?? 0, mult: opts.threatMult ?? 1 },
+  );
+  // thorns / lightning shield: melee attackers take damage back
+  if (!attacker.dead) {
+    for (const a of target.auras) {
+      if (a.kind === 'thorns') {
+        ctx.dealDamage(target, attacker, a.value, false, a.school, a.name, 'hit', true);
+      }
+    }
+    // innate "spiked hide" mobs (e.g. bristleback boars) reflect on every hit
+    const spikes = MOBS[target.templateId]?.thorns;
+    if (spikes && !attacker.dead) {
+      ctx.dealDamage(
+        target,
+        attacker,
+        spikes.value,
+        false,
+        spikes.school ?? 'physical',
+        spikes.name ?? 'Spiked Hide',
+        'hit',
+        true,
+      );
+    }
+  }
+  return true;
+}

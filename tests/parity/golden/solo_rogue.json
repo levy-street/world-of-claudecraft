@@ -1,0 +1,282 @@
+{
+  "scenario": "solo_rogue",
+  "seed": 1003,
+  "sampleEvery": 20,
+  "ticks": 72,
+  "coverage": [
+    "class:rogue",
+    "meleeSwing weaponStrike (sinister_strike via castAbility ~3736)",
+    "combo points"
+  ],
+  "draws": 141,
+  "drawDigest": "3d03a3d5",
+  "frames": [
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 389,
+      "state": "901c55a7",
+      "events": "741638a5",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "init",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "cls": "rogue",
+          "companionUpgrades": {},
+          "counters": {},
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 388,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "rusty_dagger"
+          },
+          "talents": {
+            "choices": {},
+            "ranks": {}
+          }
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 42,
+          "combatTimer": 99,
+          "critChance": 0.0625,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0625,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 62,
+          "id": 388,
+          "kind": "player",
+          "level": 1,
+          "maxHp": 62,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resource": 100,
+          "resourceType": "energy",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "stats": {
+            "agi": 25,
+            "armor": 104,
+            "int": 11,
+            "spi": 12,
+            "sta": 17,
+            "str": 17
+          },
+          "templateId": "rogue",
+          "weapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          }
+        }
+      ]
+    },
+    {
+      "tick": 20,
+      "time": 1,
+      "nextId": 390,
+      "state": "788290aa",
+      "events": "f9b79d6c",
+      "rng": {
+        "draws": 7,
+        "digest": "14806c1c"
+      }
+    },
+    {
+      "tick": 40,
+      "time": 2,
+      "nextId": 390,
+      "state": "74c1c313",
+      "events": "33a84e8d",
+      "rng": {
+        "draws": 13,
+        "digest": "3fc203d8"
+      }
+    },
+    {
+      "tick": 60,
+      "time": 3,
+      "nextId": 390,
+      "state": "746485da",
+      "events": "fd9e884b",
+      "rng": {
+        "draws": 89,
+        "digest": "2c06bf7c"
+      }
+    },
+    {
+      "tick": 72,
+      "time": 3.6,
+      "nextId": 390,
+      "state": "1faa826a",
+      "events": "741638a5",
+      "rng": {
+        "draws": 141,
+        "digest": "3d03a3d5"
+      },
+      "label": "final",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "cls": "rogue",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 79
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 388,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "rusty_dagger"
+          },
+          "lifetimeXp": 27600,
+          "talents": {
+            "choices": {},
+            "ranks": {}
+          }
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 78,
+          "autoAttack": true,
+          "combatTimer": 1.2,
+          "comboPoints": 3,
+          "comboTargetId": 389,
+          "critChance": 0.076,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.076,
+          "facing": 1.570796,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 102.6,
+          "hp": 50000,
+          "id": 388,
+          "inCombat": true,
+          "kind": "player",
+          "level": 10,
+          "maxHp": 50000,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2.5,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resource": 100,
+          "resourceType": "energy",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "stats": {
+            "agi": 52,
+            "armor": 230,
+            "int": 11,
+            "spi": 12,
+            "sta": 26,
+            "str": 26
+          },
+          "swingTimer": 0.05,
+          "targetId": 389,
+          "templateId": "rogue",
+          "weapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          }
+        },
+        {
+          "aggroTargetId": 388,
+          "aiState": "attack",
+          "combatTimer": 1.2,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": -1.570796,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 8921,
+          "id": 389,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 4,
+            "y": 1.5,
+            "z": -2
+          },
+          "level": 5,
+          "maxHp": 9000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 4,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 4,
+            "y": 1.5,
+            "z": -2
+          },
+          "stats": {
+            "armor": 40
+          },
+          "swingTimer": 0.45,
+          "tappedById": 388,
+          "targetId": 388,
+          "templateId": "forest_wolf",
+          "threat": [
+            [
+              388,
+              80
+            ]
+          ],
+          "weapon": {
+            "max": 12,
+            "min": 8,
+            "speed": 2
+          }
+        }
+      ]
+    }
+  ]
+}

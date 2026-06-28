@@ -3,7 +3,8 @@
   "vcs": {
     "enabled": true,
     "clientKind": "git",
-    "useIgnoreFile": true
+    "useIgnoreFile": true,
+    "defaultBranch": "origin/main"
   },
   "files": {
     "includes": [
@@ -16,6 +17,7 @@
       "!src/ui/i18n.resolved.generated",
       "!src/admin/i18n.resolved.generated",
       "!src/ui/i18n.status.summary.json",
+      "!tests/parity/golden",
       "!**/*.min.js"
     ]
   },
@@ -42,12 +44,25 @@
   },
   "overrides": [
     {
-      "includes": ["index.html", "play.html"],
+      "includes": ["index.html", "play.html", "guide.html"],
       "formatter": {
         "enabled": false
       },
       "linter": {
         "enabled": false
+      }
+    },
+    {
+      "includes": ["src/styles/**"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noImportantStyles": "off"
+          },
+          "style": {
+            "noDescendingSpecificity": "off"
+          }
+        }
       }
     },
     {

@@ -23,8 +23,15 @@ import { ko_KR } from './ko_KR';
 import { ja_JP } from './ja_JP';
 import { pt_BR } from './pt_BR';
 import { ru_RU } from './ru_RU';
+import { nl_NL } from './nl_NL';
+import { pl_PL } from './pl_PL';
+import { id_ID } from './id_ID';
+import { tr_TR } from './tr_TR';
+import { sv_SE } from './sv_SE';
+import { vi_VN } from './vi_VN';
+import { da_DK } from './da_DK';
 
-export { en, es, es_ES, fr_FR, fr_CA, en_CA, it_IT, de_DE, zh_CN, zh_TW, ko_KR, ja_JP, pt_BR, ru_RU };
+export { en, es, es_ES, fr_FR, fr_CA, en_CA, it_IT, de_DE, zh_CN, zh_TW, ko_KR, ja_JP, pt_BR, ru_RU, nl_NL, pl_PL, id_ID, tr_TR, sv_SE, vi_VN, da_DK };
 export { en_XA } from './en_XA';
 export { pending } from './pending';
 
@@ -43,4 +50,11 @@ export const translations = {
   ja_JP,
   pt_BR,
   ru_RU,
+  nl_NL,
+  pl_PL,
+  id_ID,
+  tr_TR,
+  sv_SE,
+  vi_VN,
+  da_DK,
 };

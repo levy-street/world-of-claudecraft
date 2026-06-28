@@ -1,0 +1,612 @@
+{
+  "scenario": "delve_lockpick",
+  "seed": 1010,
+  "sampleEvery": 10,
+  "ticks": 40,
+  "coverage": [
+    "delve run (collapsed_reliquary finale)",
+    "mobSwing delve-companion caller (~16762)",
+    "lockpick minigame (flawless solve)",
+    "reward chest + delve marks"
+  ],
+  "draws": 8,
+  "drawDigest": "20464699",
+  "frames": [
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 389,
+      "state": "901c55a7",
+      "events": "741638a5",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "init",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "cls": "rogue",
+          "companionUpgrades": {},
+          "counters": {},
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 388,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "rusty_dagger"
+          },
+          "talents": {
+            "choices": {},
+            "ranks": {}
+          }
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 42,
+          "combatTimer": 99,
+          "critChance": 0.0625,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0625,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 62,
+          "id": 388,
+          "kind": "player",
+          "level": 1,
+          "maxHp": 62,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resource": 100,
+          "resourceType": "energy",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "stats": {
+            "agi": 25,
+            "armor": 104,
+            "int": 11,
+            "spi": 12,
+            "sta": 17,
+            "str": 17
+          },
+          "templateId": "rogue",
+          "weapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          }
+        }
+      ]
+    },
+    {
+      "tick": 10,
+      "time": 0.5,
+      "nextId": 402,
+      "state": "b9e0e642",
+      "events": "f1c417ce",
+      "rng": {
+        "draws": 4,
+        "digest": "e1f30e03"
+      }
+    },
+    {
+      "tick": 20,
+      "time": 1,
+      "nextId": 402,
+      "state": "bc54508f",
+      "events": "741638a5",
+      "rng": {
+        "draws": 4,
+        "digest": "e1f30e03"
+      }
+    },
+    {
+      "tick": 30,
+      "time": 1.5,
+      "nextId": 402,
+      "state": "cdae3878",
+      "events": "3a3cdaf4",
+      "rng": {
+        "draws": 5,
+        "digest": "0d1e87b1"
+      }
+    },
+    {
+      "tick": 38,
+      "time": 1.9,
+      "nextId": 404,
+      "state": "1f58fd3c",
+      "events": "ddc6ffa8",
+      "rng": {
+        "draws": 8,
+        "digest": "20464699"
+      },
+      "label": "delve-end",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "cls": "rogue",
+          "companionUpgrades": {},
+          "copper": 21,
+          "counters": {
+            "damageDealt": 1635,
+            "kills": 1,
+            "xpGained": 898
+          },
+          "delveClears": {
+            "collapsed_reliquary:normal": 1
+          },
+          "delveDaily": {
+            "firstClearXp": [
+              "collapsed_reliquary:normal"
+            ],
+            "markClears": 1
+          },
+          "delveLoreUnlocked": [
+            "eastbrook_ledger"
+          ],
+          "delveMarks": 3,
+          "entityId": 388,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "rusty_dagger"
+          },
+          "lifetimeXp": 12098,
+          "talents": {
+            "choices": {},
+            "ranks": {}
+          },
+          "xp": 898
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 66,
+          "combatTimer": 0.4,
+          "critChance": 0.0715,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0715,
+          "fiveSecondRule": 100.9,
+          "hp": 50000,
+          "id": 388,
+          "inCombat": true,
+          "kind": "player",
+          "level": 7,
+          "maxHp": 50000,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 4800,
+            "z": -1176
+          },
+          "potionCooldownUntil": -1,
+          "resource": 100,
+          "resourceType": "energy",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "stats": {
+            "agi": 43,
+            "armor": 188,
+            "int": 11,
+            "spi": 12,
+            "sta": 23,
+            "str": 23
+          },
+          "targetId": 398,
+          "templateId": "rogue",
+          "weapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 100.9,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": -2.378458,
+          "fiveSecondRule": 99,
+          "hp": 103,
+          "id": 397,
+          "kind": "mob",
+          "level": 4,
+          "maxHp": 103,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "ownerId": 388,
+          "petMode": "defensive",
+          "pos": {
+            "x": 4800,
+            "z": -1176
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 4801.5,
+            "z": -1253
+          },
+          "stats": {
+            "armor": 24
+          },
+          "swingTimer": 1.6,
+          "templateId": "acolyte_tessa",
+          "wanderTimer": 1.1,
+          "weapon": {
+            "max": 10,
+            "min": 6,
+            "speed": 2.6
+          }
+        },
+        {
+          "aiState": "dead",
+          "corpseTimer": 59.6,
+          "critChance": 0.05,
+          "dead": true,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": -2.583314,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "id": 398,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 4798.053255,
+            "z": -1173.117019
+          },
+          "level": 9,
+          "loot": {
+            "copper": 439
+          },
+          "lootRecipientIds": [
+            388
+          ],
+          "lootable": true,
+          "maxHp": 635,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 4798.053255,
+            "z": -1173.117019
+          },
+          "potionCooldownUntil": -1,
+          "respawnTimer": 24.6,
+          "spawnPos": {
+            "x": 4800,
+            "z": -1170
+          },
+          "stats": {
+            "armor": 160
+          },
+          "stompTimer": 12,
+          "tappedById": 388,
+          "templateId": "deacon_varric",
+          "wanderTarget": {
+            "x": 4795.28058,
+            "z": -1177.556469
+          },
+          "wanderTimer": 28.55,
+          "weapon": {
+            "max": 51,
+            "min": 33,
+            "speed": 2.2
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": 3.141593,
+          "fiveSecondRule": 99,
+          "hp": 1,
+          "id": 402,
+          "kind": "object",
+          "level": 1,
+          "lootable": true,
+          "maxHp": 1,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 4800,
+            "z": -1176
+          },
+          "potionCooldownUntil": -1,
+          "respawnTimer": -0.05,
+          "spawnPos": {
+            "x": 4800,
+            "z": -1176
+          },
+          "stats": {},
+          "templateId": "delve_reward_chest",
+          "weapon": {
+            "max": 2,
+            "min": 1,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 40,
+      "time": 2,
+      "nextId": 404,
+      "state": "20da16ec",
+      "events": "741638a5",
+      "rng": {
+        "draws": 8,
+        "digest": "20464699"
+      }
+    },
+    {
+      "tick": 40,
+      "time": 2,
+      "nextId": 404,
+      "state": "20da16ec",
+      "events": "741638a5",
+      "rng": {
+        "draws": 8,
+        "digest": "20464699"
+      },
+      "label": "final",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "cls": "rogue",
+          "companionUpgrades": {},
+          "copper": 21,
+          "counters": {
+            "damageDealt": 1635,
+            "kills": 1,
+            "xpGained": 898
+          },
+          "delveClears": {
+            "collapsed_reliquary:normal": 1
+          },
+          "delveDaily": {
+            "firstClearXp": [
+              "collapsed_reliquary:normal"
+            ],
+            "markClears": 1
+          },
+          "delveLoreUnlocked": [
+            "eastbrook_ledger"
+          ],
+          "delveMarks": 3,
+          "entityId": 388,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "rusty_dagger"
+          },
+          "lifetimeXp": 12098,
+          "talents": {
+            "choices": {},
+            "ranks": {}
+          },
+          "xp": 898
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 66,
+          "combatTimer": 0.5,
+          "critChance": 0.0715,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0715,
+          "fiveSecondRule": 101,
+          "hp": 50000,
+          "id": 388,
+          "inCombat": true,
+          "kind": "player",
+          "level": 7,
+          "maxHp": 50000,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 4800,
+            "z": -1176
+          },
+          "potionCooldownUntil": -1,
+          "resource": 100,
+          "resourceType": "energy",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "stats": {
+            "agi": 43,
+            "armor": 188,
+            "int": 11,
+            "spi": 12,
+            "sta": 23,
+            "str": 23
+          },
+          "targetId": 398,
+          "templateId": "rogue",
+          "weapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 101,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": -2.378458,
+          "fiveSecondRule": 99,
+          "hp": 103,
+          "id": 397,
+          "kind": "mob",
+          "level": 4,
+          "maxHp": 103,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "ownerId": 388,
+          "petMode": "defensive",
+          "pos": {
+            "x": 4800,
+            "z": -1176
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 4801.5,
+            "z": -1253
+          },
+          "stats": {
+            "armor": 24
+          },
+          "swingTimer": 1.4,
+          "templateId": "acolyte_tessa",
+          "wanderTimer": 1,
+          "weapon": {
+            "max": 10,
+            "min": 6,
+            "speed": 2.6
+          }
+        },
+        {
+          "aiState": "dead",
+          "corpseTimer": 59.5,
+          "critChance": 0.05,
+          "dead": true,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": -2.583314,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "id": 398,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 4798.053255,
+            "z": -1173.117019
+          },
+          "level": 9,
+          "loot": {
+            "copper": 439
+          },
+          "lootRecipientIds": [
+            388
+          ],
+          "lootable": true,
+          "maxHp": 635,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 4798.053255,
+            "z": -1173.117019
+          },
+          "potionCooldownUntil": -1,
+          "respawnTimer": 24.5,
+          "spawnPos": {
+            "x": 4800,
+            "z": -1170
+          },
+          "stats": {
+            "armor": 160
+          },
+          "stompTimer": 12,
+          "tappedById": 388,
+          "templateId": "deacon_varric",
+          "wanderTarget": {
+            "x": 4795.28058,
+            "z": -1177.556469
+          },
+          "wanderTimer": 28.55,
+          "weapon": {
+            "max": 51,
+            "min": 33,
+            "speed": 2.2
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": 3.141593,
+          "fiveSecondRule": 99,
+          "hp": 1,
+          "id": 402,
+          "kind": "object",
+          "level": 1,
+          "lootable": true,
+          "maxHp": 1,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 4800,
+            "z": -1176
+          },
+          "potionCooldownUntil": -1,
+          "respawnTimer": -0.05,
+          "spawnPos": {
+            "x": 4800,
+            "z": -1176
+          },
+          "stats": {},
+          "templateId": "delve_reward_chest",
+          "weapon": {
+            "max": 2,
+            "min": 1,
+            "speed": 2
+          }
+        }
+      ]
+    }
+  ]
+}

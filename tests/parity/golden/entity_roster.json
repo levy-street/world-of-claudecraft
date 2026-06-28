@@ -1,0 +1,380 @@
+{
+  "scenario": "entity_roster",
+  "seed": 1012,
+  "sampleEvery": 2,
+  "ticks": 7,
+  "coverage": [
+    "addEntity roster + spatial grids",
+    "despawn prologue: despawnTimer + DAMAGE_IDLE_DESPAWN idle-despawn (collect-then-drop)",
+    "emitDueDelayedEvents drain (fires / guard-drops / stays-pending)",
+    "releaseSpirit outdoor graveyard respawn (full hp, ~10966)"
+  ],
+  "draws": 4,
+  "drawDigest": "7ba9533d",
+  "frames": [
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 389,
+      "state": "ddc82b87",
+      "events": "741638a5",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "init",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {},
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 388,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword"
+          },
+          "talents": {
+            "choices": {},
+            "ranks": {}
+          }
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "combatTimer": 99,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 90,
+          "id": 388,
+          "kind": "player",
+          "level": 1,
+          "maxHp": 90,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "stats": {
+            "agi": 20,
+            "armor": 110,
+            "int": 10,
+            "spi": 11,
+            "sta": 22,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 2,
+      "time": 0.1,
+      "nextId": 391,
+      "state": "951b7a6f",
+      "events": "2b429bb7",
+      "rng": {
+        "draws": 4,
+        "digest": "7ba9533d"
+      }
+    },
+    {
+      "tick": 4,
+      "time": 0.2,
+      "nextId": 391,
+      "state": "26b2421d",
+      "events": "741638a5",
+      "rng": {
+        "draws": 4,
+        "digest": "7ba9533d"
+      }
+    },
+    {
+      "tick": 5,
+      "time": 0.25,
+      "nextId": 391,
+      "state": "76e754a1",
+      "events": "741638a5",
+      "rng": {
+        "draws": 4,
+        "digest": "7ba9533d"
+      },
+      "label": "post-churn",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {},
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 388,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword"
+          },
+          "lifetimeXp": 27600,
+          "talents": {
+            "choices": {},
+            "ranks": {}
+          }
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 82,
+          "combatTimer": 99.25,
+          "critChance": 0.0645,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0645,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99.25,
+          "hp": 50000,
+          "id": 388,
+          "kind": "player",
+          "level": 10,
+          "maxHp": 50000,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "stats": {
+            "agi": 29,
+            "armor": 236,
+            "int": 10,
+            "spi": 11,
+            "sta": 40,
+            "str": 41
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 5,
+      "time": 0.25,
+      "nextId": 391,
+      "state": "66575f75",
+      "events": "2b429bb7",
+      "rng": {
+        "draws": 4,
+        "digest": "7ba9533d"
+      },
+      "label": "graveyard-release",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {},
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 388,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword"
+          },
+          "lifetimeXp": 27600,
+          "talents": {
+            "choices": {},
+            "ranks": {}
+          }
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 82,
+          "combatTimer": 99,
+          "critChance": 0.0645,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0645,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99.25,
+          "hp": 432,
+          "id": 388,
+          "kind": "player",
+          "level": 10,
+          "maxHp": 432,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -12,
+            "y": 1.500121,
+            "z": -14
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "stats": {
+            "agi": 29,
+            "armor": 236,
+            "int": 10,
+            "spi": 11,
+            "sta": 40,
+            "str": 41
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 6,
+      "time": 0.3,
+      "nextId": 391,
+      "state": "64868d76",
+      "events": "741638a5",
+      "rng": {
+        "draws": 4,
+        "digest": "7ba9533d"
+      }
+    },
+    {
+      "tick": 7,
+      "time": 0.35,
+      "nextId": 391,
+      "state": "a0a43651",
+      "events": "741638a5",
+      "rng": {
+        "draws": 4,
+        "digest": "7ba9533d"
+      },
+      "label": "final",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {},
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 388,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword"
+          },
+          "lifetimeXp": 27600,
+          "talents": {
+            "choices": {},
+            "ranks": {}
+          }
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 82,
+          "combatTimer": 99.1,
+          "critChance": 0.0645,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0645,
+          "fallStartY": 1.500121,
+          "fiveSecondRule": 99.35,
+          "hp": 432,
+          "id": 388,
+          "kind": "player",
+          "level": 10,
+          "maxHp": 432,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -12,
+            "y": 1.500121,
+            "z": -14
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "stats": {
+            "agi": 29,
+            "armor": 236,
+            "int": 10,
+            "spi": 11,
+            "sta": 40,
+            "str": 41
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    }
+  ]
+}

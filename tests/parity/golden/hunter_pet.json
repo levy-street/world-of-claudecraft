@@ -1,0 +1,396 @@
+{
+  "scenario": "hunter_pet",
+  "seed": 1005,
+  "sampleEvery": 20,
+  "ticks": 120,
+  "coverage": [
+    "class:hunter",
+    "updateRangedPetAttack friendly pet arm (~8093/8217)",
+    "updateRangedPetAttack hostile-mob arm (~6776)"
+  ],
+  "draws": 398,
+  "drawDigest": "03f85de1",
+  "frames": [
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 389,
+      "state": "723b273e",
+      "events": "741638a5",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "init",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "cls": "hunter",
+          "companionUpgrades": {},
+          "counters": {},
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 388,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "rusty_hatchet"
+          },
+          "talents": {
+            "choices": {},
+            "ranks": {}
+          }
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 39,
+          "combatTimer": 99,
+          "critChance": 0.0625,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0625,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 69,
+          "id": 388,
+          "kind": "player",
+          "level": 1,
+          "maxHp": 69,
+          "maxResource": 93,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "rangedPower": 50,
+          "resource": 93,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "stats": {
+            "agi": 25,
+            "armor": 109,
+            "int": 13,
+            "spi": 14,
+            "sta": 19,
+            "str": 14
+          },
+          "templateId": "hunter",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 20,
+      "time": 1,
+      "nextId": 392,
+      "state": "ad8d0ed4",
+      "events": "3008f6c4",
+      "rng": {
+        "draws": 6,
+        "digest": "fb26b191"
+      }
+    },
+    {
+      "tick": 40,
+      "time": 2,
+      "nextId": 392,
+      "state": "1b4e95a4",
+      "events": "741638a5",
+      "rng": {
+        "draws": 6,
+        "digest": "fb26b191"
+      }
+    },
+    {
+      "tick": 60,
+      "time": 3,
+      "nextId": 392,
+      "state": "9f57c7c6",
+      "events": "f325a859",
+      "rng": {
+        "draws": 96,
+        "digest": "ee95214e"
+      }
+    },
+    {
+      "tick": 80,
+      "time": 4,
+      "nextId": 392,
+      "state": "ad894e4e",
+      "events": "741638a5",
+      "rng": {
+        "draws": 195,
+        "digest": "795c3168"
+      }
+    },
+    {
+      "tick": 100,
+      "time": 5,
+      "nextId": 392,
+      "state": "99ee5d04",
+      "events": "f25735b6",
+      "rng": {
+        "draws": 294,
+        "digest": "98724024"
+      }
+    },
+    {
+      "tick": 120,
+      "time": 6,
+      "nextId": 392,
+      "state": "d81adad0",
+      "events": "741638a5",
+      "rng": {
+        "draws": 398,
+        "digest": "03f85de1"
+      }
+    },
+    {
+      "tick": 120,
+      "time": 6,
+      "nextId": 392,
+      "state": "d81adad0",
+      "events": "741638a5",
+      "rng": {
+        "draws": 398,
+        "digest": "03f85de1"
+      },
+      "label": "final",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "cls": "hunter",
+          "companionUpgrades": {},
+          "counters": {},
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 388,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "rusty_hatchet"
+          },
+          "lifetimeXp": 44000,
+          "talents": {
+            "choices": {},
+            "ranks": {}
+          }
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 83,
+          "autoAttack": true,
+          "combatTimer": 1.95,
+          "critChance": 0.079,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.079,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 105,
+          "hp": 50000,
+          "id": 388,
+          "inCombat": true,
+          "kind": "player",
+          "level": 12,
+          "maxHp": 50000,
+          "maxResource": 358,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "rangedPower": 116,
+          "resource": 358,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "stats": {
+            "agi": 58,
+            "armor": 263,
+            "int": 24,
+            "spi": 25,
+            "sta": 41,
+            "str": 25
+          },
+          "targetId": 390,
+          "templateId": "hunter",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.2
+          }
+        },
+        {
+          "aggroTargetId": 390,
+          "aiState": "idle",
+          "combatTimer": 1.8,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": 1.570796,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 47,
+          "id": 389,
+          "inCombat": true,
+          "kind": "mob",
+          "level": 8,
+          "maxHp": 101,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "ownerId": 388,
+          "petMode": "aggressive",
+          "pos": {
+            "x": 3,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 3,
+            "y": 1.5,
+            "z": -2
+          },
+          "stats": {
+            "armor": 35
+          },
+          "swingTimer": 0.05,
+          "templateId": "warlock_imp",
+          "weapon": {
+            "max": 9,
+            "min": 6,
+            "speed": 2
+          }
+        },
+        {
+          "aggroTargetId": 389,
+          "aiState": "attack",
+          "combatTimer": 1.8,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": -1.570796,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 49968,
+          "id": 390,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 7.8,
+            "y": 1.5,
+            "z": -2
+          },
+          "level": 8,
+          "maxHp": 50000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 7.8,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 9,
+            "y": 1.5,
+            "z": -2
+          },
+          "stats": {
+            "armor": 70
+          },
+          "swingTimer": 0.2,
+          "tappedById": 388,
+          "targetId": 388,
+          "templateId": "forest_wolf",
+          "threat": [
+            [
+              389,
+              32
+            ]
+          ],
+          "weapon": {
+            "max": 18,
+            "min": 11,
+            "speed": 2
+          }
+        },
+        {
+          "aggroTargetId": 388,
+          "aiState": "attack",
+          "combatTimer": 1.95,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": 1.570796,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 50000,
+          "id": 391,
+          "inCombat": true,
+          "kind": "mob",
+          "level": 8,
+          "maxHp": 50000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -6,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": -6,
+            "y": 1.5,
+            "z": -2
+          },
+          "stats": {
+            "armor": 35
+          },
+          "swingTimer": 0.05,
+          "targetId": 388,
+          "templateId": "warlock_imp",
+          "weapon": {
+            "max": 9,
+            "min": 6,
+            "speed": 2
+          }
+        }
+      ]
+    }
+  ]
+}

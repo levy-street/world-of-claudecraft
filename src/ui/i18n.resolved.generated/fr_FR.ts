@@ -222,6 +222,21 @@ export const fr_FR: EnTranslations = {
     "rest": {
       "resting": "Au repos"
     },
+    "unitFrame": {
+      "playerLabel": "Votre personnage",
+      "targetLabel": "Votre cible",
+      "targetAnnounce": "Cible : {name}",
+      "partyLabel": "Votre groupe",
+      "partyGroup": "Groupe {n}",
+      "durationUnitSeconds": "s"
+    },
+    "character": {
+      "modelPreview": "Aperçu du modèle du personnage"
+    },
+    "skipLinks": {
+      "mainHud": "Aller à l'interface principale",
+      "chat": "Aller à la discussion"
+    },
     "mobile": {
       "autorun": "Course automatique",
       "jump": "Sauter",
@@ -243,6 +258,13 @@ export const fr_FR: EnTranslations = {
       "coordinates": "Coordonnées",
       "heading": "Cap",
       "minimapZoom": "Zoom de la minicarte"
+    },
+    "castBar": {
+      "playerAria": "Votre barre d'incantation",
+      "targetAria": "Barre d'incantation de la cible"
+    },
+    "leaderboard": {
+      "close": "Fermer"
     },
     "raidLockout": {
       "title": "Verrous de raid",
@@ -595,6 +617,17 @@ export const fr_FR: EnTranslations = {
       "notRaid": "Votre groupe n'est pas un raid.",
       "leaderOnly": "Seul le chef de raid peut convertir en groupe.",
       "tooLarge": "Un raid de plus de cinq membres ne peut pas être reconverti en groupe."
+    },
+    "loot": {
+      "chestTitle": "Coffre"
+    },
+    "spellbook": {
+      "addToBarAria": "Ajouter {name} à la barre d'action",
+      "removeFromBarAria": "Retirer {name} de la barre d'action"
+    },
+    "nameplate": {
+      "mob": "[{level}] {name}",
+      "mobElite": "[{level}+] {name}"
     }
   },
   "guide": {
@@ -2421,7 +2454,9 @@ export const fr_FR: EnTranslations = {
       "mobileMap": "Carte",
       "closeMap": "Fermer la carte",
       "zoomIn": "Zoom avant",
-      "zoomOut": "Zoom arrière"
+      "zoomOut": "Zoom arrière",
+      "mapCanvasLabel": "Carte",
+      "mapSummary": "Carte de {zone}."
     },
     "options": {
       "gameMenu": "Menu du jeu",

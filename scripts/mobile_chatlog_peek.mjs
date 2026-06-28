@@ -5,9 +5,11 @@
 //
 // Run the Vite dev client first (npm run dev), then:
 //   GAME_URL=http://localhost:5173 node scripts/mobile_chatlog_peek.mjs
-import puppeteer from 'puppeteer-core';
+
 import fs from 'node:fs';
+import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH as EDGE } from './browser_path.mjs';
+import { enterOfflineGame } from './enter_offline_game.mjs';
 
 const URL = process.env.GAME_URL ?? 'http://localhost:5173';
 fs.mkdirSync('tmp', { recursive: true });
@@ -20,8 +22,20 @@ const browser = await puppeteer.launch({
   executablePath: EDGE,
   headless: 'new',
   protocolTimeout: 60000,
-  args: ['--no-sandbox', '--disable-setuid-sandbox', '--window-size=844,390', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
-  defaultViewport: { width: 844, height: 390, deviceScaleFactor: 2, isMobile: true, hasTouch: true },
+  args: [
+    '--no-sandbox',
+    '--disable-setuid-sandbox',
+    '--window-size=844,390',
+    '--use-angle=swiftshader',
+    '--enable-unsafe-swiftshader',
+  ],
+  defaultViewport: {
+    width: 844,
+    height: 390,
+    deviceScaleFactor: 2,
+    isMobile: true,
+    hasTouch: true,
+  },
 });
 
 const page = await browser.newPage();
@@ -32,18 +46,12 @@ await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
 await sleep(900);
 
 // Offline entry: Play Offline -> name -> class -> Enter World -> preflight.
-await page.evaluate(() => document.querySelector('#btn-offline')?.click());
-await sleep(400);
-await page.evaluate(() => {
-  const n = document.querySelector('#char-name');
-  if (n) n.value = 'Thumbwar';
-  document.querySelector('#offline-select .mini-class[data-class="warrior"]')?.click();
-});
-await sleep(200);
-await page.evaluate(() => document.querySelector('#btn-start-offline')?.click());
-await sleep(900);
+await enterOfflineGame(page, { charClass: 'warrior', charName: 'Thumbwar', settleMs: 900 });
 await page.evaluate(() => document.querySelector('#mobile-preflight-continue')?.click());
-await page.waitForFunction(() => window.__game?.world?.entities?.size > 0, { timeout: 20000, polling: 300 });
+await page.waitForFunction(() => window.__game?.world?.entities?.size > 0, {
+  timeout: 20000,
+  polling: 300,
+});
 await sleep(600);
 
 // Seed a few log lines so the peek has something to show (append straight to
@@ -72,19 +80,24 @@ const shot = (name) => page.screenshot({ path: `tmp/${name}.png` });
 
 // 1) Default play view — log stays hidden so the world is unobstructed.
 await shot('mobile_chatlog_before');
-const hiddenDefault = await page.evaluate(() => !document.body.classList.contains('mobile-chatlog-peek'));
+const hiddenDefault = await page.evaluate(
+  () => !document.body.classList.contains('mobile-chatlog-peek'),
+);
 
 // 2) Long-press the Chat button (>420ms) to toggle the read-only peek.
 const btn = await page.$('#mobile-chat');
 const box = await btn.boundingBox();
-const cx = box.x + box.width / 2, cy = box.y + box.height / 2;
+const cx = box.x + box.width / 2,
+  cy = box.y + box.height / 2;
 await page.touchscreen.touchStart(cx, cy);
 await sleep(550);
 await page.touchscreen.touchEnd();
 await sleep(400);
 
 const peeking = await page.evaluate(() => document.body.classList.contains('mobile-chatlog-peek'));
-const composerHidden = await page.evaluate(() => !document.body.classList.contains('mobile-chat-open'));
+const composerHidden = await page.evaluate(
+  () => !document.body.classList.contains('mobile-chat-open'),
+);
 await shot('mobile_chatlog_after');
 
 console.log('default log hidden:', hiddenDefault);

@@ -222,6 +222,21 @@ export const ru_RU: EnTranslations = {
     "rest": {
       "resting": "Отдых"
     },
+    "unitFrame": {
+      "playerLabel": "Ваш персонаж",
+      "targetLabel": "Ваша цель",
+      "targetAnnounce": "Цель: {name}",
+      "partyLabel": "Ваша группа",
+      "partyGroup": "Группа {n}",
+      "durationUnitSeconds": "с"
+    },
+    "character": {
+      "modelPreview": "Предпросмотр модели персонажа"
+    },
+    "skipLinks": {
+      "mainHud": "Перейти к основному интерфейсу",
+      "chat": "Перейти к чату"
+    },
     "mobile": {
       "autorun": "Автобег",
       "jump": "Прыжок",
@@ -243,6 +258,13 @@ export const ru_RU: EnTranslations = {
       "coordinates": "Координаты",
       "heading": "Направление",
       "minimapZoom": "Масштаб миникарты"
+    },
+    "castBar": {
+      "playerAria": "Ваша полоса применения",
+      "targetAria": "Полоса применения цели"
+    },
+    "leaderboard": {
+      "close": "Закрыть"
     },
     "raidLockout": {
       "title": "Блокировки рейдов",
@@ -595,6 +617,17 @@ export const ru_RU: EnTranslations = {
       "notRaid": "Ваша группа не является рейдом.",
       "leaderOnly": "Только лидер рейда может преобразовать рейд в группу.",
       "tooLarge": "Рейд, в котором более пяти участников, нельзя преобразовать обратно в группу."
+    },
+    "loot": {
+      "chestTitle": "Сундук"
+    },
+    "spellbook": {
+      "addToBarAria": "Добавить {name} на панель действий",
+      "removeFromBarAria": "Убрать {name} с панели действий"
+    },
+    "nameplate": {
+      "mob": "[{level}] {name}",
+      "mobElite": "[{level}+] {name}"
     }
   },
   "guide": {
@@ -2421,7 +2454,9 @@ export const ru_RU: EnTranslations = {
       "mobileMap": "Карта",
       "closeMap": "Закрыть карту",
       "zoomIn": "Приблизить",
-      "zoomOut": "Отдалить"
+      "zoomOut": "Отдалить",
+      "mapCanvasLabel": "Карта",
+      "mapSummary": "Карта зоны {zone}."
     },
     "options": {
       "gameMenu": "Меню игры",

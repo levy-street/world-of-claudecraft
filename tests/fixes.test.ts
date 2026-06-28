@@ -1574,7 +1574,7 @@ describe('pet heel warp', () => {
     (sim as any).grid.update(pet); // grid now buckets the pet at its far cell
 
     // unreachable owner with nothing to fight: the pet warps back to heel
-    (sim as any).updatePet(pet);
+    (sim as any).ctx.updatePet(pet);
     expect(dist2d(pet.pos, p.pos)).toBeLessThan(1);
 
     // a same-tick radius query at the warp destination must see the pet — it
@@ -1664,7 +1664,7 @@ describe('pet heel warp', () => {
     (sim as any).grid.update(pet); // grid now buckets the pet at its far cell
 
     // unreachable owner with nothing to fight: the pet warps back to heel
-    (sim as any).updatePet(pet);
+    (sim as any).ctx.updatePet(pet);
     expect(dist2d(pet.pos, p.pos)).toBeLessThan(1);
 
     // a same-tick radius query at the warp destination must see the pet — it

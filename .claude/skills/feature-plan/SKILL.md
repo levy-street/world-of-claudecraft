@@ -60,7 +60,7 @@ Hard rules (Opus 4.8 + this repo):
 
 ## Context Discipline (how each phase stays cheap)
 
-- The orchestrator (main loop) does **not** read large docs or sprawl across source files. It spawns an Explore agent that returns a focused summary. (`src/sim/sim.ts` and `src/ui/hud.ts` are each ~5k+ lines and `src/ui/i18n.ts` is ~13k lines; never read them whole in the main loop.)
+- The orchestrator (main loop) does **not** read large docs or sprawl across source files. It spawns an Explore agent that returns a focused summary. (`src/ui/hud.ts` ~10k, `src/sim/sim.ts` ~7.5k, `src/main.ts` ~6.4k; the big i18n surface is now `src/ui/i18n.catalog/*` plus the generated overlays, not `i18n.ts`; never read these whole in the main loop.)
 - Give each implementation agent ONLY the slice of context it needs (the Explore summary + its own files), never the raw planning docs.
 - Delegate web/doc lookups to a subagent (classic-era MMO formula references, a Three.js or GLB asset technique, the `pg` Postgres driver, Cloudflare Turnstile, any third-party surface); keep raw docs out of the main context.
 - For 12+ phase packets, use per-phase resume files so a fresh session resumes from a checkpoint, not from scratch.
@@ -175,6 +175,7 @@ Match the change surface to the agent. Spawn an agent ONLY when its row matches 
 | `privacy-security-review` | `server/`, `src/admin/`, `src/net/`, a deploy/secret file (Docker/compose/env/CI yml/`DEPLOY.md`), OR introduces SQL / auth / a secret / `ALLOW_DEV_COMMANDS` / a new `Math.random`\|`Date.now`\|`performance.now` in `src/sim/` | a pure `src/ui` / `src/render` / `src/game` / `src/sim/content` / docs / test change |
 | `migration-safety` | `server/db.ts`, `server/social_db.ts`, a `server/*_db.ts`, or a `characters.state` JSONB serialize/deserialize path | any diff with no DDL and no persisted-state shape change |
 | `cross-platform-sync` | `src/world_api.ts` (IWorld), `src/sim/` behavior/obs/`SimEvent`, `src/net/online.ts`, `server/game.ts` wire/dispatch, the matchers `src/ui/sim_i18n.ts`\|`src/ui/server_i18n.ts`, or the RL surface (`headless/`, `python/`) | a pure i18n *catalog* refactor (only `src/ui/i18n.ts` + locale data, `t()` keys unchanged) - `tsc` (`: typeof en`) + the resolved-equivalence test already cover it |
+| `architecture-reviewer` | a `src/sim/` change: determinism, rng draw-order, tick-phase order, the `SimContext` seam, or a move-not-rewrite relocation | a non-sim change, or a pure data/content/test change |
 | `qa-checklist` | a phase / deliverable set is COMPLETE (it self-scales via its per-category Skip rules) | per-commit / mid-phase work, or a docs/test-only change |
 
 If NO row matches (e.g. a docs-only, test-only, or comment change), spawn NO review agent.
@@ -279,6 +280,8 @@ STEP 3 - VALIDATION + MULTI-AGENT REVIEW:
     |`src/ui/server_i18n.ts`, or the RL surface (`headless/`, `python/`) changed. A pure
     i18n catalog refactor (only `src/ui/i18n.ts` + locale data, keys unchanged) is NOT in
     scope - `tsc` + the resolved-equivalence test cover it.
+  - `architecture-reviewer` - ONLY if `src/sim/` changed (determinism, rng draw-order,
+    tick-phase order, the `SimContext` seam, or a move-not-rewrite relocation).
   - `qa-checklist` - when this phase completes a deliverable set.
   - If none of the above match, spawn no review agent.
 - Prompt each agent you spawn for COVERAGE not filtering. Resume any that truncates with the
@@ -380,6 +383,8 @@ check `git diff --name-only` against the phase-start commit - do not run all fou
 - `cross-platform-sync` - ONLY if IWorld / `src/sim` behavior/obs/`SimEvent` / `ClientWorld`
   / `wireEntity` dispatch / the `sim_i18n`|`server_i18n` matchers / the RL surface changed.
   A pure i18n catalog refactor (keys unchanged) is NOT in scope.
+- `architecture-reviewer` - ONLY if `src/sim/` changed (determinism, rng draw-order,
+  tick-phase, the `SimContext` seam, or a move-not-rewrite relocation).
 - `qa-checklist` - yes (this is the phase-completion QA gate).
 Resume any review agent that truncates mid-analysis with: *"Stop reading more files. Output the full report now. No more tool calls. Format: BLOCKING / SHOULD-FIX / NICE-TO-HAVE / VERDICT."*
 
@@ -468,6 +473,7 @@ Cross-phase cheat sheet. Contains ONLY what the next session needs:
   - **ui/render**: `npx tsc --noEmit` + `npx vitest run tests/localization_fixes.test.ts` (if text) + a mobile screenshot script.
   - **headless/RL**: `npm run build:env` + `npx vitest run tests/env_protocol.test.ts` + a short `npm run bench`.
   - **full-stack / pre-merge**: `npm test && npx tsc --noEmit && npm run build:env && npm run build:server && npm run build`.
+  - **any code change (Biome / CI ratchet)**: `npm run ci:changed` (Biome on the files you changed, what the `.githooks/pre-push` floor runs). Fix formatting with a SCOPED `npx @biomejs/biome check --write <file>`, never a whole-tree `--write`.
 - Key file paths (existing + created by this feature)
 - New files created per phase
 - New `IWorld` members added per phase

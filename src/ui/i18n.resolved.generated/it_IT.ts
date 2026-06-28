@@ -222,6 +222,21 @@ export const it_IT: EnTranslations = {
     "rest": {
       "resting": "A riposo"
     },
+    "unitFrame": {
+      "playerLabel": "Il tuo personaggio",
+      "targetLabel": "Il tuo bersaglio",
+      "targetAnnounce": "Bersaglio: {name}",
+      "partyLabel": "Il tuo gruppo",
+      "partyGroup": "Gruppo {n}",
+      "durationUnitSeconds": "s"
+    },
+    "character": {
+      "modelPreview": "Anteprima del modello del personaggio"
+    },
+    "skipLinks": {
+      "mainHud": "Vai all'interfaccia principale",
+      "chat": "Vai alla chat"
+    },
     "mobile": {
       "autorun": "Corsa automatica",
       "jump": "Salta",
@@ -243,6 +258,13 @@ export const it_IT: EnTranslations = {
       "coordinates": "Coordinate",
       "heading": "Direzione",
       "minimapZoom": "Zoom minimappa"
+    },
+    "castBar": {
+      "playerAria": "La tua barra di lancio",
+      "targetAria": "Barra di lancio del bersaglio"
+    },
+    "leaderboard": {
+      "close": "Chiudi"
     },
     "raidLockout": {
       "title": "Blocchi incursione",
@@ -595,6 +617,17 @@ export const it_IT: EnTranslations = {
       "notRaid": "Il tuo gruppo non è un'incursione.",
       "leaderOnly": "Solo il capo incursione può convertire in un gruppo.",
       "tooLarge": "Un'incursione con più di cinque membri non può tornare a essere un gruppo."
+    },
+    "loot": {
+      "chestTitle": "Scrigno"
+    },
+    "spellbook": {
+      "addToBarAria": "Aggiungi {name} alla barra azioni",
+      "removeFromBarAria": "Rimuovi {name} dalla barra azioni"
+    },
+    "nameplate": {
+      "mob": "[{level}] {name}",
+      "mobElite": "[{level}+] {name}"
     }
   },
   "guide": {
@@ -2421,7 +2454,9 @@ export const it_IT: EnTranslations = {
       "mobileMap": "Mappa",
       "closeMap": "Chiudi mappa",
       "zoomIn": "Aumenta zoom",
-      "zoomOut": "Riduci zoom"
+      "zoomOut": "Riduci zoom",
+      "mapCanvasLabel": "Mappa",
+      "mapSummary": "Mappa di {zone}."
     },
     "options": {
       "gameMenu": "Menu di gioco",

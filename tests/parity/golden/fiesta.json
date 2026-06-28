@@ -1,0 +1,434 @@
+{
+  "scenario": "fiesta",
+  "seed": 1009,
+  "sampleEvery": 25,
+  "ticks": 163,
+  "coverage": [
+    "fiesta match (2v2 score mode)",
+    "cross-team takedown + respawn bench",
+    "augment wave: fiestaPickOffers + arenaAugmentPick (fiestaAugments on meta + augmentOffer/Chosen events)",
+    "multi-player meta"
+  ],
+  "draws": 608,
+  "drawDigest": "656f3686",
+  "frames": [
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 388,
+      "state": "5bc471b0",
+      "events": "741638a5",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "init",
+      "players": [],
+      "entities": []
+    },
+    {
+      "tick": 25,
+      "time": 1.25,
+      "nextId": 392,
+      "state": "e70abb30",
+      "events": "9e676dff",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      }
+    },
+    {
+      "tick": 50,
+      "time": 2.5,
+      "nextId": 392,
+      "state": "8691ba5a",
+      "events": "e0d70531",
+      "rng": {
+        "draws": 36,
+        "digest": "dbad5b7f"
+      }
+    },
+    {
+      "tick": 75,
+      "time": 3.75,
+      "nextId": 392,
+      "state": "b073b0e0",
+      "events": "33931ddd",
+      "rng": {
+        "draws": 120,
+        "digest": "3ac728b9"
+      }
+    },
+    {
+      "tick": 100,
+      "time": 5,
+      "nextId": 392,
+      "state": "4fdee7a2",
+      "events": "441cd0f5",
+      "rng": {
+        "draws": 230,
+        "digest": "25e8f179"
+      }
+    },
+    {
+      "tick": 125,
+      "time": 6.25,
+      "nextId": 392,
+      "state": "bceacd6a",
+      "events": "93890e75",
+      "rng": {
+        "draws": 384,
+        "digest": "2255bc0e"
+      }
+    },
+    {
+      "tick": 150,
+      "time": 7.5,
+      "nextId": 392,
+      "state": "e582fece",
+      "events": "741638a5",
+      "rng": {
+        "draws": 543,
+        "digest": "63905003"
+      }
+    },
+    {
+      "tick": 163,
+      "time": 8.15,
+      "nextId": 392,
+      "state": "4998f617",
+      "events": "626a472c",
+      "rng": {
+        "draws": 608,
+        "digest": "656f3686"
+      },
+      "label": "final",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {
+            "kills": 1
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 388,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword"
+          },
+          "fiestaRestore": {
+            "level": 1,
+            "talents": {
+              "choices": {},
+              "ranks": {}
+            }
+          },
+          "talents": {
+            "choices": {},
+            "ranks": {
+              "war_cruelty": 3,
+              "war_deflection": 1,
+              "war_imp_heroic_strike": 2,
+              "war_imp_thunder_clap": 2,
+              "war_toughness": 3
+            },
+            "spec": "arms"
+          }
+        },
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {},
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 389,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "fiestaRestore": {
+            "level": 1,
+            "talents": {
+              "choices": {},
+              "ranks": {}
+            }
+          },
+          "talents": {
+            "choices": {},
+            "ranks": {
+              "mag_arcane_focus": 3,
+              "mag_elemental_precision": 3,
+              "mag_flame_throwing": 2,
+              "mag_ice_shards": 1,
+              "mag_wand_specialization": 2
+            },
+            "spec": "arcane"
+          }
+        },
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "cls": "rogue",
+          "companionUpgrades": {},
+          "counters": {
+            "deaths": 1
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 390,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "rusty_dagger"
+          },
+          "fiestaAugments": [
+            "aug_fleetfoot"
+          ],
+          "fiestaRestore": {
+            "level": 1,
+            "talents": {
+              "choices": {},
+              "ranks": {}
+            }
+          },
+          "talents": {
+            "choices": {},
+            "ranks": {
+              "rog_camouflage": 2,
+              "rog_deflection": 1,
+              "rog_imp_sinister": 2,
+              "rog_lightning_reflexes": 3,
+              "rog_malice": 3
+            },
+            "spec": "assassination"
+          }
+        },
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "cls": "hunter",
+          "companionUpgrades": {},
+          "counters": {},
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 391,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "rusty_hatchet"
+          },
+          "fiestaRestore": {
+            "level": 1,
+            "talents": {
+              "choices": {},
+              "ranks": {}
+            }
+          },
+          "talents": {
+            "choices": {},
+            "ranks": {
+              "hun_deflection": 1,
+              "hun_efficiency": 2,
+              "hun_endurance_training": 3,
+              "hun_imp_hawk": 2,
+              "hun_lethal_shots": 3
+            },
+            "spec": "beast_mastery"
+          }
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 122,
+          "combatTimer": 102.1,
+          "critChance": 0.0995,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0795,
+          "fiveSecondRule": 107.15,
+          "hp": 812,
+          "id": 388,
+          "kind": "player",
+          "level": 20,
+          "maxHp": 812,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 4193,
+            "z": -1264
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "stats": {
+            "agi": 39,
+            "armor": 421,
+            "int": 10,
+            "spi": 11,
+            "sta": 60,
+            "str": 61
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 22,
+          "combatTimer": 102.1,
+          "critChance": 0.066,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fiveSecondRule": 107.15,
+          "hp": 418,
+          "id": 389,
+          "kind": "player",
+          "level": 20,
+          "maxHp": 418,
+          "maxResource": 1671,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 4207,
+            "z": -1264
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1671,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "stats": {
+            "agi": 12,
+            "armor": 133,
+            "int": 93,
+            "spi": 60,
+            "sta": 33,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 125,
+          "combatTimer": 99.05,
+          "critChance": 0.1545,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.1345,
+          "facing": 3.141593,
+          "fiveSecondRule": 107.15,
+          "hp": 510,
+          "id": 390,
+          "kind": "player",
+          "level": 20,
+          "maxHp": 510,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 4193,
+            "z": -1232
+          },
+          "potionCooldownUntil": -1,
+          "resource": 100,
+          "resourceType": "energy",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "stats": {
+            "agi": 89,
+            "armor": 384,
+            "int": 11,
+            "spi": 12,
+            "sta": 36,
+            "str": 36
+          },
+          "templateId": "rogue",
+          "weapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 141,
+          "combatTimer": 102.1,
+          "critChance": 0.121,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.101,
+          "facing": 3.141593,
+          "fiveSecondRule": 107.15,
+          "hp": 848,
+          "id": 391,
+          "kind": "player",
+          "level": 20,
+          "maxHp": 848,
+          "maxResource": 622,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 4207,
+            "z": -1232
+          },
+          "potionCooldownUntil": -1,
+          "rangedPower": 194,
+          "resource": 622,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "stats": {
+            "agi": 82,
+            "armor": 375,
+            "int": 32,
+            "spi": 33,
+            "sta": 63,
+            "str": 33
+          },
+          "templateId": "hunter",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.2
+          }
+        }
+      ]
+    }
+  ]
+}

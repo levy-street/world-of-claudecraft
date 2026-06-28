@@ -1,0 +1,13 @@
+# CSS engine floor (single source) for the Lightning CSS transformer.
+# vite.config.ts reads these explicit floors via scripts/browserslist_targets.mjs
+# and feeds them to lightningcss browserslistToTargets(), so the floor lives in
+# exactly one place and is never hand-typed as a target object.
+#
+# Floor rationale (max of the per-feature minimums, primary sourced): :has() binds
+# Firefox 121; native CSS nesting (a later-phase adopt target) binds Chrome 120 and
+# Safari 17.2; mobile Safari / WebKit is a first-class target (state.md decision 14),
+# so the iOS floor matches Safari.
+Chrome >= 120
+Firefox >= 121
+Safari >= 17.2
+iOS >= 17.2

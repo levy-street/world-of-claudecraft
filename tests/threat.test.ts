@@ -559,7 +559,7 @@ describe('hunter pets', () => {
     expect(pet.dead).toBe(true);
     expect(pet.auras).toHaveLength(0);
     expect(pet.maxHp).toBe(maxHpBefore);
-    (sim as any).respawnMob(pet);
+    (sim as any).ctx.respawnMob(pet); // respawnMob moved to mob/lifecycle.ts (M4); reach it via the seam
     expect(sim.entities.has(pet.id)).toBe(false);
     expect(sim.petOf(sim.playerId, true)).toBe(null);
   });
@@ -681,7 +681,7 @@ describe('hunter pets', () => {
     sim.targetEntity(boar.id);
     sim.player.facing = Math.atan2(boar.pos.x - sim.player.pos.x, boar.pos.z - sim.player.pos.z);
     sim.castAbility('tame_beast');
-    let events = sim.tick();
+    const events = sim.tick();
     expect(events.some((e) => e.type === 'error' && /already have a pet/.test(e.text))).toBe(true);
 
     sim.player.resource = sim.player.maxResource;
@@ -978,7 +978,7 @@ describe('druid forms', () => {
     sim.targetEntity(wolf.id);
     sim.player.facing = Math.atan2(wolf.pos.x - sim.player.pos.x, wolf.pos.z - sim.player.pos.z);
     sim.castAbility('claw');
-    let events = sim.tick();
+    const events = sim.tick();
     expect(events.some((e) => e.type === 'error' && /Wolf Form/.test(e.text))).toBe(true);
     sim.castAbility('cat_form');
     sim.tick();
@@ -1078,7 +1078,7 @@ describe('druid forms', () => {
     for (let i = 0; i < 32; i++) sim.tick();
     sim.player.resource = 100;
     sim.castAbility('rake');
-    let events = sim.tick();
+    const events = sim.tick();
     expect(events.some((e) => e.type === 'error' && /stealthed/.test(e.text))).toBe(true);
     for (let i = 0; i < 32; i++) sim.tick();
     sim.castAbility('prowl');

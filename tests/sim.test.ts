@@ -955,10 +955,10 @@ describe('food, drink, vendor', () => {
     const wilkes = [...sim.entities.values()].find((e) => e.templateId === 'trader_wilkes')!;
     teleportTo(sim, wilkes.pos.x + 2, wilkes.pos.z);
     sim.copper = 0;
-    sim.addItem('wolf_fang', 2);        // poor (gray), sellValue 4 -> 8
-    sim.addItem('bandit_bandana', 1);   // poor (gray), sellValue 6
+    sim.addItem('wolf_fang', 2); // poor (gray), sellValue 4 -> 8
+    sim.addItem('bandit_bandana', 1); // poor (gray), sellValue 6
     sim.addItem('apprentice_staff', 1); // not poor -> kept
-    sim.addItem('boar_hide', 1);        // quest item -> kept
+    sim.addItem('boar_hide', 1); // quest item -> kept
 
     sim.sellAllJunk();
 
@@ -971,7 +971,9 @@ describe('food, drink, vendor', () => {
     expect(sim.copper).toBe(14);
     // each sold gray stack is recorded for buyback
     expect(sim.vendorBuyback.some((s) => s.itemId === 'wolf_fang' && s.count === 2)).toBe(true);
-    expect(sim.vendorBuyback.some((s) => s.itemId === 'bandit_bandana' && s.count === 1)).toBe(true);
+    expect(sim.vendorBuyback.some((s) => s.itemId === 'bandit_bandana' && s.count === 1)).toBe(
+      true,
+    );
     // exactly one summary loot line (not one per stack)
     const sold = sim.events.filter((e) => e.type === 'loot' && /^Sold /.test(e.text));
     expect(sold).toHaveLength(1);
@@ -986,7 +988,11 @@ describe('food, drink, vendor', () => {
     sim.addItem('wolf_fang', 1);
     sim.sellAllJunk();
     expect(sim.countItem('wolf_fang')).toBe(1);
-    expect(sim.events).toContainEqual({ type: 'error', text: 'There is no merchant nearby.', pid: sim.player.id });
+    expect(sim.events).toContainEqual({
+      type: 'error',
+      text: 'There is no merchant nearby.',
+      pid: sim.player.id,
+    });
 
     // at the vendor with no gray items: silent no-op (button is disabled in the UI)
     teleportTo(sim, wilkes.pos.x + 2, wilkes.pos.z);
@@ -1466,13 +1472,13 @@ describe('quests', () => {
     sim.interact();
     const qp = sim.questLog.get('q_wolves')!;
     qp.counts[0] = 8;
-    (sim as any).checkQuestReady(qp, (sim as any).primary);
+    (sim as any).ctx.checkQuestReady(qp, (sim as any).primary);
     sim.interact(); // turn in wolves
     // accept bandits specifically
     sim.acceptQuest('q_bandits');
     const qb = sim.questLog.get('q_bandits')!;
     qb.counts[0] = 10;
-    (sim as any).checkQuestReady(qb, (sim as any).primary);
+    (sim as any).ctx.checkQuestReady(qb, (sim as any).primary);
     sim.turnInQuest('q_bandits');
     expect(sim.equipment.mainhand).toBe('redbrook_blade');
   });

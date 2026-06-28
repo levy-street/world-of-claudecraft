@@ -222,6 +222,21 @@ export const ko_KR: EnTranslations = {
     "rest": {
       "resting": "휴식 중"
     },
+    "unitFrame": {
+      "playerLabel": "내 캐릭터",
+      "targetLabel": "내 대상",
+      "targetAnnounce": "대상: {name}",
+      "partyLabel": "내 파티",
+      "partyGroup": "{n}번 그룹",
+      "durationUnitSeconds": "초"
+    },
+    "character": {
+      "modelPreview": "캐릭터 모델 미리보기"
+    },
+    "skipLinks": {
+      "mainHud": "메인 HUD로 건너뛰기",
+      "chat": "채팅으로 건너뛰기"
+    },
     "mobile": {
       "autorun": "자동 달리기",
       "jump": "점프",
@@ -243,6 +258,13 @@ export const ko_KR: EnTranslations = {
       "coordinates": "좌표",
       "heading": "방향",
       "minimapZoom": "미니맵 확대/축소"
+    },
+    "castBar": {
+      "playerAria": "내 시전 막대",
+      "targetAria": "대상 시전 막대"
+    },
+    "leaderboard": {
+      "close": "닫기"
     },
     "raidLockout": {
       "title": "공격대 잠금",
@@ -595,6 +617,17 @@ export const ko_KR: EnTranslations = {
       "notRaid": "현재 파티는 공격대가 아닙니다.",
       "leaderOnly": "공격대장만 파티로 전환할 수 있습니다.",
       "tooLarge": "인원이 5명을 초과하는 공격대는 파티로 다시 전환할 수 없습니다."
+    },
+    "loot": {
+      "chestTitle": "상자"
+    },
+    "spellbook": {
+      "addToBarAria": "{name}을(를) 행동 단축바에 추가",
+      "removeFromBarAria": "{name}을(를) 행동 단축바에서 제거"
+    },
+    "nameplate": {
+      "mob": "[{level}] {name}",
+      "mobElite": "[{level}+] {name}"
     }
   },
   "guide": {
@@ -1808,7 +1841,7 @@ export const ko_KR: EnTranslations = {
     "tries": "시도 {count}회",
     "triesOne": "시도 1회",
     "perMove": "이동당 {seconds}초",
-    "seconds": "{seconds}s",
+    "seconds": "{seconds}초",
     "boardTitle": "열쇠공의 길: {tier} 상자",
     "closeAria": "닫기",
     "withdrawAria": "물러나기",
@@ -2165,7 +2198,7 @@ export const ko_KR: EnTranslations = {
     "applicationCategory": "게임",
     "operatingSystem": "웹 브라우저",
     "officialLabel": "World of ClaudeCraft 공식 웹사이트",
-    "officialBody": "worldofclaudecraft.com은 Claudemoon 렐름의 공식 무료 브라우저 MMO입니다. 지속 캐릭터로 온라인 플레이를 하거나, 오프라인에서 혼자 탐험하고, wiki를 읽고, 이 사이트에서 검증된 커뮤니티 링크를 확인하세요."
+    "officialBody": "worldofclaudecraft.com은 Claudemoon 렐름의 공식 무료 브라우저 MMO입니다. 지속 캐릭터로 온라인 플레이를 하거나, 오프라인에서 혼자 탐험하고, 위키를 읽고, 이 사이트에서 검증된 커뮤니티 링크를 확인하세요."
   },
   "a11y": {
     "goHome": "홈으로 이동",
@@ -2421,7 +2454,9 @@ export const ko_KR: EnTranslations = {
       "mobileMap": "지도",
       "closeMap": "지도 닫기",
       "zoomIn": "확대",
-      "zoomOut": "축소"
+      "zoomOut": "축소",
+      "mapCanvasLabel": "지도",
+      "mapSummary": "{zone}의 지도."
     },
     "options": {
       "gameMenu": "게임 메뉴",

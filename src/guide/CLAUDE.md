@@ -5,8 +5,7 @@
 
 # src/guide/ : the public guide / site wiki
 
-A client-rendered docs SPA: the branded, spoiler-safe front-of-house that teaches the
-game and showcases the classes, bestiary, world, quests, and group content. Separate
+A client-rendered docs SPA, the spoiler-safe public front of the game. Separate
 Vite entry (`guide.html`), mounted at `GUIDE_BASE` (`/wiki`). Deep paths
 (`/wiki/classes`) fall back to `guide.html` in BOTH `vite.config.ts` and
 `server/main.ts`. The shell file is still named `guide.html` and the module tree still
@@ -40,12 +39,10 @@ localized spec/mastery prose resolves live through `src/ui/talent_i18n.ts`, not 
 here.
 
 ## i18n: English-only adds, like the rest of the client
-Every guide string is a `guide.*` `t()` key. The English source lives in
-`src/ui/i18n.catalog/guide.ts` (no per-locale blocks, so a new key compiles
-English-only). The 13 locale translations live in the `src/ui/i18n.locales/<lang>.ts`
-overlays and are filled by the maintainer at release (the maintainer-only helper
-`scripts/wiki/apply_guide_locales.mjs` batch-injects them); never hand-edit the
-overlays. Class/ability/spec NAMES stay English on purpose (proper nouns from the sim).
+Guide strings are `guide.*` `t()` keys; the English source lives in
+`src/ui/i18n.catalog/guide.ts` (no per-locale blocks, so a new key compiles English-only).
+The maintainer fills the locale overlays at release; never hand-edit them. Class/ability/
+spec NAMES stay English on purpose (proper nouns from the sim).
 
 ## Keep the wiki in sync (YOU MUST, when you add wiki-worthy content)
 The guide is the game's public reference, so new player-facing content should reach it

@@ -1,0 +1,353 @@
+{
+  "scenario": "delve_death",
+  "seed": 1013,
+  "sampleEvery": 5,
+  "ticks": 2,
+  "coverage": [
+    "releaseSpiritInDelve first death (50% hp respawn at module entry, ~16345)",
+    "releaseSpiritInDelve second death fails the run (deathsThisRun >= 2)",
+    "rebucket after delve respawn teleport"
+  ],
+  "draws": 1,
+  "drawDigest": "8d59a9d6",
+  "frames": [
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 389,
+      "state": "901c55a7",
+      "events": "741638a5",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "init",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "cls": "rogue",
+          "companionUpgrades": {},
+          "counters": {},
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 388,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "rusty_dagger"
+          },
+          "talents": {
+            "choices": {},
+            "ranks": {}
+          }
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 42,
+          "combatTimer": 99,
+          "critChance": 0.0625,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0625,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 62,
+          "id": 388,
+          "kind": "player",
+          "level": 1,
+          "maxHp": 62,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resource": 100,
+          "resourceType": "energy",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "stats": {
+            "agi": 25,
+            "armor": 104,
+            "int": 11,
+            "spi": 12,
+            "sta": 17,
+            "str": 17
+          },
+          "templateId": "rogue",
+          "weapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          }
+        }
+      ]
+    },
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 398,
+      "state": "fd7072ca",
+      "events": "38dd36be",
+      "rng": {
+        "draws": 1,
+        "digest": "8d59a9d6"
+      },
+      "label": "delve-first-release",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "cls": "rogue",
+          "companionUpgrades": {},
+          "counters": {},
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 388,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "rusty_dagger"
+          },
+          "lifetimeXp": 11200,
+          "talents": {
+            "choices": {},
+            "ranks": {}
+          }
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 66,
+          "combatTimer": 99,
+          "critChance": 0.0715,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0715,
+          "fallStartY": 2.077747,
+          "fiveSecondRule": 99,
+          "hp": 93,
+          "id": 388,
+          "kind": "player",
+          "level": 7,
+          "maxHp": 185,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 4800,
+            "z": -1253
+          },
+          "potionCooldownUntil": -1,
+          "resource": 100,
+          "resourceType": "energy",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "stats": {
+            "agi": 43,
+            "armor": 188,
+            "int": 11,
+            "spi": 12,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "rogue",
+          "weapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          }
+        }
+      ]
+    },
+    {
+      "tick": 2,
+      "time": 0.1,
+      "nextId": 398,
+      "state": "f94f7e47",
+      "events": "a92d1726",
+      "rng": {
+        "draws": 1,
+        "digest": "8d59a9d6"
+      },
+      "label": "delve-fail",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "cls": "rogue",
+          "companionUpgrades": {},
+          "counters": {},
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 388,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "rusty_dagger"
+          },
+          "lifetimeXp": 11200,
+          "talents": {
+            "choices": {},
+            "ranks": {}
+          }
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 66,
+          "combatTimer": 99.1,
+          "critChance": 0.0715,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0715,
+          "fallStartY": 2.353205,
+          "fiveSecondRule": 99.1,
+          "hp": 185,
+          "id": 388,
+          "kind": "player",
+          "level": 7,
+          "maxHp": 185,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -5,
+            "y": 2.353205,
+            "z": -56
+          },
+          "potionCooldownUntil": -1,
+          "resource": 100,
+          "resourceType": "energy",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "stats": {
+            "agi": 43,
+            "armor": 188,
+            "int": 11,
+            "spi": 12,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "rogue",
+          "weapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          }
+        }
+      ]
+    },
+    {
+      "tick": 2,
+      "time": 0.1,
+      "nextId": 398,
+      "state": "f94f7e47",
+      "events": "741638a5",
+      "rng": {
+        "draws": 1,
+        "digest": "8d59a9d6"
+      },
+      "label": "final",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "cls": "rogue",
+          "companionUpgrades": {},
+          "counters": {},
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 388,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "rusty_dagger"
+          },
+          "lifetimeXp": 11200,
+          "talents": {
+            "choices": {},
+            "ranks": {}
+          }
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 66,
+          "combatTimer": 99.1,
+          "critChance": 0.0715,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0715,
+          "fallStartY": 2.353205,
+          "fiveSecondRule": 99.1,
+          "hp": 185,
+          "id": 388,
+          "kind": "player",
+          "level": 7,
+          "maxHp": 185,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -5,
+            "y": 2.353205,
+            "z": -56
+          },
+          "potionCooldownUntil": -1,
+          "resource": 100,
+          "resourceType": "energy",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "stats": {
+            "agi": 43,
+            "armor": 188,
+            "int": 11,
+            "spi": 12,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "rogue",
+          "weapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          }
+        }
+      ]
+    }
+  ]
+}

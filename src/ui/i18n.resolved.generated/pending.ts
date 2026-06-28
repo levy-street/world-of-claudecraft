@@ -98,5 +98,89 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.editKeys",
     "hudChrome.actionBar.secondBar"
   ],
-  "ru_RU": []
+  "ru_RU": [],
+  "nl_NL": [
+    "hudChrome.actionBar.barScale",
+    "hudChrome.actionBar.bindCancel",
+    "hudChrome.actionBar.bindDone",
+    "hudChrome.actionBar.bindModeHint",
+    "hudChrome.actionBar.bindModeTitle",
+    "hudChrome.actionBar.bindReset",
+    "hudChrome.actionBar.bindResetConfirmBody",
+    "hudChrome.actionBar.bindResetConfirmTitle",
+    "hudChrome.actionBar.editKeys",
+    "hudChrome.actionBar.secondBar"
+  ],
+  "pl_PL": [
+    "hudChrome.actionBar.barScale",
+    "hudChrome.actionBar.bindCancel",
+    "hudChrome.actionBar.bindDone",
+    "hudChrome.actionBar.bindModeHint",
+    "hudChrome.actionBar.bindModeTitle",
+    "hudChrome.actionBar.bindReset",
+    "hudChrome.actionBar.bindResetConfirmBody",
+    "hudChrome.actionBar.bindResetConfirmTitle",
+    "hudChrome.actionBar.editKeys",
+    "hudChrome.actionBar.secondBar"
+  ],
+  "id_ID": [
+    "hudChrome.actionBar.barScale",
+    "hudChrome.actionBar.bindCancel",
+    "hudChrome.actionBar.bindDone",
+    "hudChrome.actionBar.bindModeHint",
+    "hudChrome.actionBar.bindModeTitle",
+    "hudChrome.actionBar.bindReset",
+    "hudChrome.actionBar.bindResetConfirmBody",
+    "hudChrome.actionBar.bindResetConfirmTitle",
+    "hudChrome.actionBar.editKeys",
+    "hudChrome.actionBar.secondBar"
+  ],
+  "tr_TR": [
+    "hudChrome.actionBar.barScale",
+    "hudChrome.actionBar.bindCancel",
+    "hudChrome.actionBar.bindDone",
+    "hudChrome.actionBar.bindModeHint",
+    "hudChrome.actionBar.bindModeTitle",
+    "hudChrome.actionBar.bindReset",
+    "hudChrome.actionBar.bindResetConfirmBody",
+    "hudChrome.actionBar.bindResetConfirmTitle",
+    "hudChrome.actionBar.editKeys",
+    "hudChrome.actionBar.secondBar"
+  ],
+  "sv_SE": [
+    "hudChrome.actionBar.barScale",
+    "hudChrome.actionBar.bindCancel",
+    "hudChrome.actionBar.bindDone",
+    "hudChrome.actionBar.bindModeHint",
+    "hudChrome.actionBar.bindModeTitle",
+    "hudChrome.actionBar.bindReset",
+    "hudChrome.actionBar.bindResetConfirmBody",
+    "hudChrome.actionBar.bindResetConfirmTitle",
+    "hudChrome.actionBar.editKeys",
+    "hudChrome.actionBar.secondBar"
+  ],
+  "vi_VN": [
+    "hudChrome.actionBar.barScale",
+    "hudChrome.actionBar.bindCancel",
+    "hudChrome.actionBar.bindDone",
+    "hudChrome.actionBar.bindModeHint",
+    "hudChrome.actionBar.bindModeTitle",
+    "hudChrome.actionBar.bindReset",
+    "hudChrome.actionBar.bindResetConfirmBody",
+    "hudChrome.actionBar.bindResetConfirmTitle",
+    "hudChrome.actionBar.editKeys",
+    "hudChrome.actionBar.secondBar"
+  ],
+  "da_DK": [
+    "hudChrome.actionBar.barScale",
+    "hudChrome.actionBar.bindCancel",
+    "hudChrome.actionBar.bindDone",
+    "hudChrome.actionBar.bindModeHint",
+    "hudChrome.actionBar.bindModeTitle",
+    "hudChrome.actionBar.bindReset",
+    "hudChrome.actionBar.bindResetConfirmBody",
+    "hudChrome.actionBar.bindResetConfirmTitle",
+    "hudChrome.actionBar.editKeys",
+    "hudChrome.actionBar.secondBar"
+  ]
 };

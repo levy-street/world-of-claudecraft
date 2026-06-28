@@ -14,6 +14,25 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const fr_FR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.loot.chestTitle': 'Coffre',
+  'hudChrome.spellbook.addToBarAria': "Ajouter {name} à la barre d'action",
+  'hudChrome.spellbook.removeFromBarAria': "Retirer {name} de la barre d'action",
+  'hudChrome.nameplate.mob': '[{level}] {name}',
+  'hudChrome.nameplate.mobElite': '[{level}+] {name}',
+  'hud.core.mapCanvasLabel': 'Carte',
+  'hud.core.mapSummary': 'Carte de {zone}.',
+  'hudChrome.castBar.playerAria': "Votre barre d'incantation",
+  'hudChrome.castBar.targetAria': "Barre d'incantation de la cible",
+  'hudChrome.character.modelPreview': 'Aperçu du modèle du personnage',
+  'hudChrome.leaderboard.close': 'Fermer',
+  'hudChrome.skipLinks.chat': 'Aller à la discussion',
+  'hudChrome.skipLinks.mainHud': "Aller à l'interface principale",
+  'hudChrome.unitFrame.durationUnitSeconds': 's',
+  'hudChrome.unitFrame.partyGroup': 'Groupe {n}',
+  'hudChrome.unitFrame.partyLabel': 'Votre groupe',
+  'hudChrome.unitFrame.playerLabel': 'Votre personnage',
+  'hudChrome.unitFrame.targetAnnounce': 'Cible : {name}',
+  'hudChrome.unitFrame.targetLabel': 'Votre cible',
   'seo.officialLabel': 'Site officiel de World of ClaudeCraft',
   'seo.officialBody':
     'worldofclaudecraft.com est le MMO gratuit officiel sur navigateur du royaume Claudemoon. Jouez en ligne avec un personnage persistant, explorez en solo hors ligne, lisez le wiki et suivez les liens communautaires vérifiés depuis ce site.',

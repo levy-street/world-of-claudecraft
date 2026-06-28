@@ -34,6 +34,7 @@ import {
   type AccountCosmetics,
   type ArenaInfo,
   type CharacterSearchResult,
+  type ClientCommand,
   type DelveCompanionInfo,
   type DelveDailyInfo,
   type DelveRunInfo,
@@ -713,15 +714,25 @@ function blankEntity(id: number): Entity {
 }
 
 export class ClientWorld implements IWorld {
+  // --- IWorldEntityRoster: roster + player reads, mirrored from snapshots. The
+  // `player` getter lives below the ctor (it reads `entities`/`playerId`). `known`
+  // is IWorldCombat-owned but rides here as a self-wire mirror field with the rest
+  // of the roster data. ---
   cfg: { seed: number; playerClass: PlayerClass };
   entities = new Map<number, Entity>();
   playerId = -1;
   moveInput: MoveInput = emptyMoveInput();
+  known: ResolvedAbility[] = [];
+  realm = '';
   inventory: InvSlot[] = [];
   vendorBuyback: InvSlot[] = [];
   equipment: Partial<Record<EquipSlot, string>> = {};
-  accountCosmetics: AccountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
   copper = 0;
+  // --- IWorldCosmetics: account cosmetics (completed-quest + mech-chroma ids),
+  // mirrored from snapshot self. ---
+  accountCosmetics: AccountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
+  // --- IWorldProgressionXp: XP + post-cap progression scalars + unlocked
+  // milestones, mirrored from snapshot self. ---
   xp = 0;
   // Post-cap progression (Max-Level XP Overflow), mirrored from snapshot self.
   lifetimeXp = 0;
@@ -729,8 +740,8 @@ export class ClientWorld implements IWorld {
   // Rested XP pool, mirrored from snapshot self.
   restedXp = 0;
   unlockedMilestones: string[] = [];
-  known: ResolvedAbility[] = [];
-  // Talents & Specializations, mirrored from snapshot self (display + staging).
+  // --- IWorldTalents: talents + spec/role + saved loadouts, mirrored from
+  // snapshot self (display + staging). ---
   talents: TalentAllocation = emptyAllocation();
   talentSpec: string | null = null;
   talentRole: Role | null = null;
@@ -738,12 +749,28 @@ export class ClientWorld implements IWorld {
   activeLoadout = -1;
   questLog = new Map<string, QuestProgress>();
   questsDone = new Set<string>();
+  // --- IWorldParty: party/raid roster, mirrored from the snapshot self (`party`).
+  // The raid-target markers ride the `markers` map below; IWorldPet keeps no mirror
+  // field (pet state lives on the owned-mob entity wire). ---
   partyInfo: PartyInfo | null = null;
+  // --- IWorldTrade: active trade-window state, mirrored from the snapshot self
+  // (`s.trade`, delta-omitted). ---
   tradeInfo: TradeInfo | null = null;
+  // --- IWorldDuelArena: duel + rated-arena state, mirrored from the snapshot self
+  // (`s.duel`/`s.arena`, delta-omitted); the live 2v2 Fiesta view rides
+  // arenaInfo.match.fiesta and its dynamics flow over the events queue. ---
   duelInfo: DuelInfo | null = null;
-  socialInfo: SocialInfo | null = null;
   arenaInfo: ArenaInfo | null = null;
+  // --- IWorldSocialGraph: persistent friends/blocks/guild, set ONLY by the
+  // `social`/`socialpos` frames (there is no `s.social` snapshot field). ---
+  socialInfo: SocialInfo | null = null;
+  // --- IWorldMarket: World Market view, mirrored from the snapshot self
+  // (`s.market`, delta-omitted). ---
   marketInfo: MarketInfo | null = null;
+  // --- IWorldDelves: active delve run + companion + marks/upgrades + daily, all
+  // mirrored from the snapshot self (delta-omitted). lockpickState is the exception:
+  // it has NO snapshot field and is rebuilt from the lockpick* events by the private
+  // applyLockpickEvent. delveClears is a NON-IWorld mirror behind delveShopOffers. ---
   delveRun: DelveRunInfo | null = null;
   companionState: DelveCompanionInfo | null = null;
   // Lockpicking: rebuilt from the lockpick* events (there is no snapshot field).
@@ -755,9 +782,10 @@ export class ClientWorld implements IWorld {
   // delveShopOffers can resolve the shop lock badge client-side.
   delveClears: Record<string, number> = {};
   delveDaily: DelveDailyInfo = { date: '', firstClearXp: [], markClears: 0 };
+  // --- IWorldParty: raid-target marker mirror, from the self-wire `marks` (markerFor
+  // reads it, no send). ---
   markers: Record<number, number> = {}; // entityId -> markerId, mirrored from the self-wire
   private lootRollPrompts: LootRollPrompt[] = []; // open need-greed rolls, mirrored from the self-wire
-  realm = '';
   // bumped whenever a fresh social snapshot lands, so an open panel re-renders
   private socialDirty = false;
   // snapshot interpolation
@@ -915,14 +943,23 @@ export class ClientWorld implements IWorld {
     return this.connected && this.ws.readyState === WebSocket.OPEN;
   }
 
-  private cmd(payload: Record<string, unknown>): void {
+  private rawCmd(payload: Record<string, unknown>): void {
     if (!this.canSendCommand()) return;
     this.ws.send(JSON.stringify({ t: 'cmd', ...payload }));
   }
 
+  // Typed IWorld command send (W0b): `cmd` must be a ClientCommand, i.e. a token
+  // from the shared COMMAND_NAMES table that is NOT dispatch-only. This is what
+  // makes "every ClientWorld send is in the server's dispatch-set" a compile-time
+  // guarantee rather than a runtime hope: a send of an unknown or dispatch-only
+  // token fails `tsc`. The raw escape hatch (devCmd) stays untyped on purpose.
+  private cmd(payload: { cmd: ClientCommand } & Record<string, unknown>): void {
+    this.rawCmd(payload);
+  }
+
   /** Raw WS command — used by dev scripts and browser console when online. */
   devCmd(payload: Record<string, unknown>): void {
-    this.cmd(payload);
+    this.rawCmd(payload);
   }
 
   private onMessage(raw: string): void {
@@ -1161,7 +1198,12 @@ export class ClientWorld implements IWorld {
         kind: a.kind,
         remaining: a.rem,
         duration: a.dur,
-        value: 0,
+        // The wire carries value only for negative-value buff_* stat-saps (sparse,
+        // server/game.ts), so the UI classifies them as debuffs identically to offline; a
+        // missing value (ordinary buffs, absorb, non-buff auras, an old server) decodes to 0
+        // as before. sourceId/school stay simplified (separate pre-existing wire reductions,
+        // not part of this change).
+        value: a.value ?? 0,
         sourceId: 0,
         school: 'physical' as const,
         stacks: a.stacks,
@@ -1219,11 +1261,19 @@ export class ClientWorld implements IWorld {
       e.drinking = s.drk
         ? { itemId: '', kind: 'drink', hpPer2s: 0, manaPer2s: 0, remaining: s.drk.remaining }
         : null;
+      // IWorldProgressionXp facet (W7) self-decode: xp/lxp/rxp/prk ride every
+      // self-frame (?? 0); milestones is delta-guarded (omitted keeps the prior
+      // mirror). Terse keys (lxp->lifetimeXp, rxp->restedXp, prk->prestigeRank,
+      // milestones->unlockedMilestones) are unchanged by the re-group.
       this.xp = s.xp ?? 0;
       this.lifetimeXp = s.lxp ?? 0;
       this.restedXp = s.rxp ?? 0;
       this.prestigeRank = s.prk ?? 0;
       if (s.milestones !== undefined) this.unlockedMilestones = s.milestones;
+      // IWorldInventory facet (W2) self-decode: copper rides every self-frame (?? 0);
+      // inv/buyback/equip are delta-guarded (a missing field keeps the prior mirror).
+      // Terse keys (inv/buyback/equip/copper) and the per-field guards are unchanged by
+      // the move; the offline counterpart is src/sim/items.ts.
       this.copper = s.copper ?? 0;
       if (s.inv !== undefined) {
         this.inventory = s.inv;
@@ -1234,6 +1284,8 @@ export class ClientWorld implements IWorld {
         this.invChanged = true;
       }
       if (s.equip !== undefined) this.equipment = s.equip;
+      // IWorldCosmetics facet (W7) self-decode: cosmetics is delta-guarded (a
+      // missing field keeps the prior mirror); normalizeAccountCosmetics rebuilds it.
       if (s.cosmetics !== undefined) {
         this.accountCosmetics = normalizeAccountCosmetics(s.cosmetics);
         this.cosmeticsChanged = true;
@@ -1243,6 +1295,9 @@ export class ClientWorld implements IWorld {
       if (s.qdone !== undefined) this.questsDone = new Set(s.qdone);
       if (s.lockouts !== undefined) this.selfLockouts = s.lockouts as Record<string, number>;
       if (s.qlog !== undefined || s.qdone !== undefined) this.pendingQuestCommands?.clear();
+      // IWorldTalents facet (W7) self-decode: tal is delta-guarded (omitted keeps
+      // the prior mirror); the known rebuild below is display-only (re-renders what
+      // the server already decided), not client authority.
       // talent state (heavy field, sent on change): mirror it, then resolve known
       // with the precomputed modifiers so granted abilities + tweaks show locally.
       if (s.tal !== undefined && s.tal) {
@@ -1259,8 +1314,14 @@ export class ClientWorld implements IWorld {
         e.level,
         computeTalentModifiers(this.cfg.playerClass, talents),
       );
+      // --- IWorldParty: party roster + raid markers, delta-omitted self-decode
+      // (keep the prior value when absent; `marks: null` clears on disband). ---
       if (s.party !== undefined) this.partyInfo = s.party;
       if (s.marks !== undefined) this.markers = s.marks ?? {}; // null = cleared (no party/disband)
+      // --- IWorldTrade / IWorldDuelArena: trade/duel/arena delta self-decode
+      // (W0a-covered; keep the prior mirror value when the field is omitted).
+      // IWorldSocialGraph.socialInfo has NO snapshot key - it is set only by the
+      // social/socialpos frames. ---
       if (s.trade !== undefined) this.tradeInfo = s.trade;
       if (s.duel !== undefined) this.duelInfo = s.duel;
       if (s.arena !== undefined) this.arenaInfo = s.arena;
@@ -1355,6 +1416,7 @@ export class ClientWorld implements IWorld {
     return !!target && target.dead;
   }
 
+  // --- IWorldCombat: ability casts, auto-attack, spirit release ---
   castAbility(abilityId: string): void {
     if (this.deadTargetCast(this.known.find((k) => k.def.id === abilityId)?.def)) {
       this.eventQueue.push({ type: 'error', text: 'You have no target.', reason: 'target_dead' });
@@ -1362,7 +1424,6 @@ export class ClientWorld implements IWorld {
     }
     this.cmd({ cmd: 'cast', ability: abilityId });
   }
-
   castAbilityBySlot(slot: number): void {
     if (this.deadTargetCast(this.known[slot]?.def)) {
       this.eventQueue.push({ type: 'error', text: 'You have no target.', reason: 'target_dead' });
@@ -1370,7 +1431,17 @@ export class ClientWorld implements IWorld {
     }
     this.cmd({ cmd: 'castSlot', slot });
   }
+  startAutoAttack(): void {
+    this.cmd({ cmd: 'attack' });
+  }
+  stopAutoAttack(): void {
+    this.cmd({ cmd: 'stopattack' });
+  }
+  releaseSpirit(): void {
+    this.cmd({ cmd: 'release' });
+  }
 
+  // --- IWorldTargeting: target selection + tab cycling ---
   targetEntity(id: number | null): void {
     // optimistic local update for snappy UI
     const p = this.entities.get(this.playerId);
@@ -1392,11 +1463,11 @@ export class ClientWorld implements IWorld {
   friendlyTabTarget(): void {
     this.cmd({ cmd: 'tabFriendly' });
   }
-  startAutoAttack(): void {
-    this.cmd({ cmd: 'attack' });
-  }
-  stopAutoAttack(): void {
-    this.cmd({ cmd: 'stopattack' });
+
+  // --- IWorldTelemetry: fire-and-forget metrics sink ---
+  reportTelemetry(kind: string, data: Record<string, number>): void {
+    if (!this.canSendCommand()) return;
+    this.cmd({ cmd: 'telemetry', kind, ...data });
   }
   interact(): void {
     this.cmd({ cmd: 'interact' });
@@ -1404,6 +1475,7 @@ export class ClientWorld implements IWorld {
   lootCorpse(id: number): void {
     this.cmd({ cmd: 'loot', id });
   }
+  // --- IWorldLoot: need-greed roll submit + HUD reconcile read ---
   submitLootRoll(rollId: number, choice: LootRollChoice): void {
     this.cmd({ cmd: 'lootRoll', rollId, choice });
   }
@@ -1423,10 +1495,6 @@ export class ClientWorld implements IWorld {
     this.pendingQuestCommands.set(questId, 'turnin');
     this.cmd({ cmd: 'turnin', quest: questId });
   }
-  reportTelemetry(kind: string, data: Record<string, number>): void {
-    if (!this.canSendCommand()) return;
-    this.cmd({ cmd: 'telemetry', kind, ...data });
-  }
   abandonQuest(questId: string): void {
     if (!this.canSendCommand()) return;
     this.questLog.delete(questId);
@@ -1436,6 +1504,9 @@ export class ClientWorld implements IWorld {
   acceptLinkedQuest(questId: string, fromPid: number): void {
     this.cmd({ cmd: 'qlinkaccept', quest: questId, from: fromPid });
   }
+  // IWorldInventory facet (W2): the eight item/vendor command senders. Each is a thin
+  // cmd() emit whose offline counterpart is the moved src/sim/items.ts body resolved on
+  // the server. The move changes no wire field or command string.
   equipItem(itemId: string): void {
     this.cmd({ cmd: 'equip', item: itemId });
   }
@@ -1460,6 +1531,9 @@ export class ClientWorld implements IWorld {
   buyBackItem(itemId: string): void {
     this.cmd({ cmd: 'buyback', item: itemId });
   }
+  // --- IWorldCosmetics: skin + mech-chroma equips. Optimistic local nudge, then
+  // the snake_case cmd (change_skin/claim_event_skin/unequip_mech_chroma); the
+  // server re-validates and the self-snapshot reconciles. ---
   changeSkin(skin: number, catalog: 'class' | 'mech' = 'class'): void {
     const idx =
       catalog === 'mech'
@@ -1500,9 +1574,6 @@ export class ClientWorld implements IWorld {
     }
     this.cmd({ cmd: 'unequip_mech_chroma', chroma: chromaId });
   }
-  releaseSpirit(): void {
-    this.cmd({ cmd: 'release' });
-  }
   chat(text: string): void {
     this.cmd({ cmd: 'chat', text });
   }
@@ -1514,6 +1585,9 @@ export class ClientWorld implements IWorld {
     }
     this.cmd({ cmd: 'emote', emote: emoteId });
   }
+  // --- IWorldPet: hunter-pet commands (snake_case wire; pet state mirrors on the
+  // owned-mob entity wire, not the self frame). setPetAutoTaunt nudges the owned mob
+  // locally before the send (sanctioned trivial-UI optimism), re-confirmed next frame. ---
   abandonPet(): void {
     this.cmd({ cmd: 'pet_abandon' });
   }
@@ -1547,6 +1621,9 @@ export class ClientWorld implements IWorld {
   setPetMode(mode: 'passive' | 'defensive' | 'aggressive'): void {
     this.cmd({ cmd: 'pet_mode', mode });
   }
+  // --- IWorldParty: party/raid commands + raid-target markers (terse wire strings;
+  // markers belong to IWorldParty, not IWorldTargeting; markerFor is a mirrored-state
+  // read, no send). ---
   // social systems
   partyInvite(targetPid: number): void {
     this.cmd({ cmd: 'pinvite', id: targetPid });
@@ -1582,6 +1659,7 @@ export class ClientWorld implements IWorld {
   clearMarker(entityId: number): void {
     this.cmd({ cmd: 'clearMarker', id: entityId });
   }
+  // --- IWorldTrade: trade-window command sends (tradeInfo is a snapshot read). ---
   tradeRequest(targetPid: number): void {
     this.cmd({ cmd: 'trade_req', id: targetPid });
   }
@@ -1597,6 +1675,8 @@ export class ClientWorld implements IWorld {
   tradeCancel(): void {
     this.cmd({ cmd: 'trade_cancel' });
   }
+  // --- IWorldDuelArena: duel + rated-arena-queue + 2v2 Fiesta augment-pick sends
+  // (duelInfo/arenaInfo are snapshot reads; fiesta dynamics ride the events queue). ---
   duelRequest(targetPid: number): void {
     this.cmd({ cmd: 'duel_req', id: targetPid });
   }
@@ -1606,7 +1686,18 @@ export class ClientWorld implements IWorld {
   duelDecline(): void {
     this.cmd({ cmd: 'duel_decline' });
   }
-  // persistent social (resolved server-side by character name)
+  arenaQueueJoin(format?: import('../world_api').ArenaFormat): void {
+    this.cmd({ cmd: 'arena_queue', format: format ?? '1v1' });
+  }
+  arenaQueueLeave(): void {
+    this.cmd({ cmd: 'arena_leave' });
+  }
+  arenaAugmentPick(augmentId: string): void {
+    this.cmd({ cmd: 'arena_augment', augment: augmentId });
+  }
+  // --- IWorldSocialGraph: persistent social command sends (resolved server-side by
+  // character name) + the REST character typeahead. socialInfo arrives via the
+  // social/socialpos frames; searchCharacters is a GET, not a cmd(). ---
   friendAdd(name: string): void {
     this.cmd({ cmd: 'friend_add', name });
   }
@@ -1662,15 +1753,8 @@ export class ClientWorld implements IWorld {
       return [];
     }
   }
-  arenaQueueJoin(format?: import('../world_api').ArenaFormat): void {
-    this.cmd({ cmd: 'arena_queue', format: format ?? '1v1' });
-  }
-  arenaQueueLeave(): void {
-    this.cmd({ cmd: 'arena_leave' });
-  }
-  arenaAugmentPick(augmentId: string): void {
-    this.cmd({ cmd: 'arena_augment', augment: augmentId });
-  }
+  // --- IWorldMarket: World Market browse/list/buy/cancel/collect command sends
+  // (snake_case wire strings). marketInfo is a snapshot read (mirror field above). ---
   marketSearch(query: string): void {
     this.cmd({ cmd: 'market_search', q: query });
   }
@@ -1686,12 +1770,34 @@ export class ClientWorld implements IWorld {
   marketCollect(): void {
     this.cmd({ cmd: 'market_collect' });
   }
+  // --- IWorldDungeons: dungeon enter/leave sends + the raid-lockout countdown read.
+  // selfLockouts mirrors the snapshot `s.lockouts`; raidLockouts derives the live
+  // countdown locally so it ticks without traffic. enter_crypt/leave_crypt are legacy
+  // dispatch-only aliases ClientWorld never sends (the enterCrypt/leaveCrypt helpers
+  // below just forward to enterDungeon/leaveDungeon). ---
   enterDungeon(dungeonId: string): void {
     this.cmd({ cmd: 'enter_dungeon', dungeon: dungeonId });
   }
   leaveDungeon(): void {
     this.cmd({ cmd: 'leave_dungeon' });
   }
+  // Raid lockouts mirrored from snapshot self as {dungeonId: expiryEpochMs}; the
+  // remaining time is derived locally so the countdown ticks down without traffic.
+  private selfLockouts: Record<string, number> = {};
+  raidLockouts(): RaidLockout[] {
+    const now = Date.now();
+    const src = this.selfLockouts ?? {};
+    const out: RaidLockout[] = [];
+    for (const id of Object.keys(src)) {
+      const msRemaining = src[id] - now;
+      if (msRemaining > 0) out.push({ id, msRemaining });
+    }
+    return out;
+  }
+  // --- IWorldDelves: delve enter/leave + interact + companion-upgrade + Marks-vendor
+  // buy + lockpick lifecycle + chest collect. delveShopOffers is a pure client read
+  // from the delveClears mirror (no command). lockpickState rides no snapshot field;
+  // the private applyLockpickEvent below rebuilds it from the lockpick* events. ---
   enterDelve(delveId: string, tierId: string): void {
     this.cmd({ cmd: 'enter_delve', delveId, tierId });
   }
@@ -1757,19 +1863,9 @@ export class ClientWorld implements IWorld {
       if (this.lockpickState?.sessionId === ev.sessionId) this.lockpickState = null;
     }
   }
-  // Raid lockouts mirrored from snapshot self as {dungeonId: expiryEpochMs}; the
-  // remaining time is derived locally so the countdown ticks down without traffic.
-  private selfLockouts: Record<string, number> = {};
-  raidLockouts(): RaidLockout[] {
-    const now = Date.now();
-    const src = this.selfLockouts ?? {};
-    const out: RaidLockout[] = [];
-    for (const id of Object.keys(src)) {
-      const msRemaining = src[id] - now;
-      if (msRemaining > 0) out.push({ id, msRemaining });
-    }
-    return out;
-  }
+  // --- IWorldProgressionXp: lifetime-XP leaderboard (REST GET, no wire command) +
+  // the opt-in prestige action (cmd 'prestige'). The XP/milestone reads ride the
+  // self-snapshot mirror fields above. ---
   async leaderboard(page = 0, pageSize = LEADERBOARD_PAGE_SIZE): Promise<LeaderboardPage> {
     const empty: LeaderboardPage = { leaders: [], page: 0, pageCount: 1, total: 0, pageSize };
     try {
@@ -1792,7 +1888,10 @@ export class ClientWorld implements IWorld {
   prestige(): void {
     this.cmd({ cmd: 'prestige' });
   }
-  // Talents & Specializations — the server re-validates every allocation.
+  // --- IWorldTalents: talentPoints is a local compute (no send); applyTalents/
+  // respec/setSpec/saveLoadout/switchLoadout/deleteLoadout send camelCase commands,
+  // saveLoadout/deleteLoadout carry sanctioned display-only local recompute.
+  // Talents & Specializations: the server re-validates every allocation. ---
   talentPoints(): { total: number; spent: number } {
     const level = this.entities.get(this.playerId)?.level ?? 1;
     return { total: talentPointsAtLevel(level), spent: pointsSpent(this.talents) };

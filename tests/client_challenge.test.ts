@@ -12,11 +12,10 @@ vi.mock('../server/db', () => ({
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
 }));
 
-import { signChallenge, verifyChallenge } from '../src/sim/client_challenge';
 import { GameServer } from '../server/game';
+import { signChallenge, verifyChallenge } from '../src/sim/client_challenge';
 
 describe('challenge helpers (shared, deterministic)', () => {
-
   it('signChallenge is deterministic and binds every field', () => {
     const base = signChallenge('nonce-1', 'answer-1', 'seed-1');
     expect(signChallenge('nonce-1', 'answer-1', 'seed-1')).toBe(base);
@@ -58,8 +57,8 @@ describe('challengeResponse server dispatch', () => {
     server.handleMessage(session as never, JSON.stringify({ t: 'cmd', ...payload }));
   }
 
-  // The case has no observable side effect in this phase (the answer is just
-  // verified, not yet rewarded); these guard that it is wired and robust — i.e.
+  // The case has no observable side effect yet (the answer is just
+  // verified, not yet rewarded); these guard that it is wired and robust, i.e.
   // not falling through to the unknown-command path, and never throwing. The
   // verification logic itself is covered by the verifyChallenge unit test above.
   it('handles a correctly-signed answer without throwing', () => {
@@ -70,7 +69,9 @@ describe('challengeResponse server dispatch', () => {
     const r = 'challengeResponse';
     const sig = signChallenge(nonce, r, 'browser-seed');
 
-    expect(() => send(server, session, { cmd: 'challengeResponse', n: nonce, r, sig })).not.toThrow();
+    expect(() =>
+      send(server, session, { cmd: 'challengeResponse', n: nonce, r, sig }),
+    ).not.toThrow();
   });
 
   it('handles a forged signature and a malformed payload without throwing', () => {
@@ -79,7 +80,14 @@ describe('challengeResponse server dispatch', () => {
     const session = join(server, fc.ws, 1, 'browser-seed');
     const forged = signChallenge('nonce-xyz', 'challengeResponse', 'someone-elses-seed');
 
-    expect(() => send(server, session, { cmd: 'challengeResponse', n: 'nonce-xyz', r: 'challengeResponse', sig: forged })).not.toThrow();
+    expect(() =>
+      send(server, session, {
+        cmd: 'challengeResponse',
+        n: 'nonce-xyz',
+        r: 'challengeResponse',
+        sig: forged,
+      }),
+    ).not.toThrow();
     expect(() => send(server, session, { cmd: 'challengeResponse', n: 1, r: 2 })).not.toThrow();
   });
 });
@@ -94,7 +102,9 @@ describe('getClientSeed (woc_seed)', () => {
     const store = new Map<string, string>();
     vi.stubGlobal('localStorage', {
       getItem: (k: string) => store.get(k) ?? null,
-      setItem: (k: string, v: string) => { store.set(k, v); },
+      setItem: (k: string, v: string) => {
+        store.set(k, v);
+      },
     });
 
     vi.resetModules();
@@ -110,8 +120,12 @@ describe('getClientSeed (woc_seed)', () => {
 
   it('falls back to a stable per-load value when storage is unavailable', async () => {
     vi.stubGlobal('localStorage', {
-      getItem: () => { throw new Error('denied'); },
-      setItem: () => { throw new Error('denied'); },
+      getItem: () => {
+        throw new Error('denied');
+      },
+      setItem: () => {
+        throw new Error('denied');
+      },
     });
 
     vi.resetModules();
