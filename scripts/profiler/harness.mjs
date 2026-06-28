@@ -363,7 +363,49 @@ export class Profiler {
       x: window.__game.world.player.pos.x,
       z: window.__game.world.player.pos.z,
     }));
+    await this._startGodMode();
     return this;
+  }
+
+  // Keep the profiled player immortal so a scenario that fights mobs (combat, play)
+  // runs uninterrupted instead of dying, releasing spirit, and teleporting to a
+  // graveyard mid-measurement. Assigning hp does NOT work (the sim re-derives/clamps
+  // it every tick, and a single multi-mob tick can burst past maxHp before any
+  // top-up, which just makes a die/revive FLICKER). Instead redefine `hp` as a getter
+  // that always reads full (maxHp) with a no-op setter: the sim's `hp -= damage`
+  // becomes a no-op and the `hp <= 0` death check can never trip. Applied at enter,
+  // before any combat, so the player simply never dies. Re-asserted at 1 Hz in case
+  // the player entity is swapped (e.g. zone change). Damage DEALT is untouched, so
+  // the combat/cast/VFX load we profile is unchanged.
+  async _startGodMode() {
+    await this.page.evaluate(() => {
+      if (window.__godTimer) return;
+      const apply = () => {
+        try {
+          const w = window.__game && (window.__game.world ?? window.__game.sim);
+          const p = w && w.player;
+          if (!p) return;
+          const d = Object.getOwnPropertyDescriptor(p, 'hp');
+          if (!d || !d.get) {
+            Object.defineProperty(p, 'hp', {
+              configurable: true,
+              enumerable: true,
+              get() {
+                return this.maxHp || 1;
+              },
+              set() {
+                /* immortal: ignore damage writes */
+              },
+            });
+          }
+          if (p.dead) p.dead = false;
+        } catch {
+          /* world not ready / sealed entity */
+        }
+      };
+      apply();
+      window.__godTimer = setInterval(apply, 1000);
+    });
   }
 
   async teleport(x, z, facing = 0) {
