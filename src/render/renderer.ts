@@ -128,6 +128,26 @@ const SPARKLE_DRAW_RANGE_SQ = 40 * 40;
 // Keep the full rig just past nameplate range so nearby characters and held
 // weapons stay readable on low while the 80u draw cap still bounds total cost.
 const ENTITY_LOD_RANGE_SQ = 58 * 58;
+
+// Crowd-adaptive character LOD. In a dense scene (capital, raid, world boss) the
+// dominant client cost is many full-articulated rigs plus their shadow passes,
+// which the frame-budget governor cannot shed (characters are non-governable).
+// Once the visible-rig count climbs past a soft knee, pull the articulated-LOD
+// and full-shadow distances in toward a floor so more of the throng collapses to
+// the single-draw far LOD + static proxy shadow. Below the knee (ordinary play,
+// a handful of rigs) the scale is exactly 1, so normal scenes are untouched.
+// FPS-first: in a crowd the frozen far-pose that shows a little sooner is a fair
+// trade for staying above 60. Distances compare squared, so scale is squared.
+const CROWD_LOD_SOFT_RIGS = 14;
+const CROWD_LOD_HARD_RIGS = 48;
+const CROWD_LOD_MIN_SCALE = 0.6;
+function crowdLodScaleSq(visibleRigs: number): number {
+  if (visibleRigs <= CROWD_LOD_SOFT_RIGS) return 1;
+  const span = CROWD_LOD_HARD_RIGS - CROWD_LOD_SOFT_RIGS;
+  const t = Math.min(1, (visibleRigs - CROWD_LOD_SOFT_RIGS) / span);
+  const scale = 1 - t * (1 - CROWD_LOD_MIN_SCALE);
+  return scale * scale;
+}
 // Feet-above-terrain margin that counts as "airborne" for the jump pose. Mirrors
 // the sim's own 0.4u grounded tolerance (sim.ts), so walking slopes doesn't trip
 // it but a jump (apex ~1.1u) does. Needed because online snapshots don't carry
@@ -759,6 +779,8 @@ export class Renderer {
   private envOutdoorIntensity = ENV_INTENSITY;
   private time = 0;
   private frameIdx = 0;
+  // Visible non-self character rigs last frame, feeding the crowd-adaptive LOD.
+  private lastVisibleRigCount = 0;
   vfx: Vfx;
   private weather: Weather;
   private weatherOn = true;
@@ -3543,6 +3565,13 @@ export class Renderer {
       this.cullFrustum.setFromProjectionMatrix(this.cullViewProj);
     }
 
+    // Crowd-adaptive LOD/shadow distances, derived from last frame's visible-rig
+    // count (the one-frame lag is imperceptible); recount as we go this frame.
+    const crowdScaleSq = crowdLodScaleSq(this.lastVisibleRigCount);
+    const lodRangeSq = ENTITY_LOD_RANGE_SQ * crowdScaleSq;
+    const shadowRangeSq = ENTITY_SHADOW_RANGE_SQ * crowdScaleSq;
+    let visibleRigCount = 0;
+
     for (const [id, v] of this.views) {
       const e = sim.entities.get(id);
       if (!e) continue;
@@ -3574,11 +3603,12 @@ export class Renderer {
         }
         v.group.visible = true; // the object branch below may re-hide loot
         // mid-distance rigs keep rendering but leave the shadow pass
-        const wantShadow = d2 < ENTITY_SHADOW_RANGE_SQ;
+        const wantShadow = d2 < shadowRangeSq;
         const inProxyBand = d2 < ENTITY_PROXY_SHADOW_RANGE_SQ;
         if (v.visual) {
+          visibleRigCount++; // crowd-density signal for next frame's adaptive LOD
           v.visual.setShadow(wantShadow);
-          v.isFar = d2 > ENTITY_LOD_RANGE_SQ;
+          v.isFar = d2 > lodRangeSq;
           // past the articulated gate the static-pose proxy carries the
           // shadow; an active form's own rig keeps casting instead
           v.visual.setProxyShadow(
@@ -3862,6 +3892,7 @@ export class Renderer {
       // skip the draw for off-screen rigs (pose/audio above already ran)
       if (!charOnScreen) v.group.visible = false;
     }
+    this.lastVisibleRigCount = visibleRigCount;
 
     // selection ring
     const target = p.targetId !== null ? sim.entities.get(p.targetId) : null;
