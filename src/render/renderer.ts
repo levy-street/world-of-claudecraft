@@ -1983,7 +1983,7 @@ export class Renderer {
     pool.push(object);
   }
 
-  private buildEntityPrewarmGroup(deadline: number): THREE.Group {
+  private buildEntityPrewarmGroup(): THREE.Group {
     const group = new THREE.Group();
     const p = this.sim.player;
     group.position.set(p.pos.x, p.pos.y, p.pos.z - 14);
@@ -2016,10 +2016,14 @@ export class Renderer {
     for (const templateId of PREWARM_MOB_TEMPLATE_IDS) build(templateId, PREWARM_MOB_POOL_COPIES);
     // Then every remaining mob whose visual MODEL hasn't been built yet — one copy,
     // so its shader program is compiled at load and never hitches in-world. Mobs that
-    // share a family model are built only once.
+    // share a family model are built only once. NOT deadline-gated: the distinct-model
+    // set is small (deduped by visualKeyFor) and is the whole point of this pass — a
+    // skipped model is a guaranteed in-world compile stall (real-GPU walk profiling
+    // caught a beast model linking ~4 programs / ~240ms when first seen north of spawn
+    // because the shared build deadline cut this loop off). The deadline still bounds
+    // the EXTRA pool copies above; one copy per model is cheap and mandatory.
     for (const templateId of Object.keys(MOBS)) {
       if (PREWARM_MOB_COMMON_IDS.has(templateId)) continue;
-      if (performance.now() >= deadline) break;
       const template = MOBS[templateId];
       if (!template) continue;
       const modelKey = visualKeyFor(
@@ -2357,7 +2361,7 @@ export class Renderer {
         priority: 35,
         required: true,
         run: () => {
-          entityPrewarmGroup = this.buildEntityPrewarmGroup(buildDeadline);
+          entityPrewarmGroup = this.buildEntityPrewarmGroup();
           this.scene.add(entityPrewarmGroup);
         },
         detail: () =>
