@@ -41,6 +41,7 @@ import {
 import { IpBlockList } from './ip_block';
 import { loadActiveBlockedIps } from './ip_block_db';
 import { REALM } from './realm';
+import { simRatesFromEnv } from './sim_rate_config';
 import type { Presence, PresenceStatus, SocialActor, SocialTransport } from './social';
 import { SocialService } from './social';
 import { PgSocialDb } from './social_db';
@@ -439,6 +440,7 @@ export class GameServer {
       noPlayer: true,
       devCommands: process.env.ALLOW_DEV_COMMANDS === '1',
       lockoutNowMs: () => Date.now(),
+      rates: simRatesFromEnv(),
     });
     this.social = new SocialService(this.socialDb, this.socialTransport());
   }

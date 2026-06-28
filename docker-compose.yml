@@ -34,6 +34,8 @@ services:
     environment:
       DATABASE_URL: postgres://eastbrook:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env. See .env.example.}@postgres:5432/eastbrook
       PORT: "8787"
+      RATE_XP: ${RATE_XP:-1}
+      RATE_DROP_MONEY: ${RATE_DROP_MONEY:-1}
       # Target the game server 302-redirects /wiki to when hit directly (not via the
       # reverse proxy). Public origin in prod; localhost fallback for local dev.
       WIKI_URL: ${WIKI_URL:-http://localhost:8080/wiki/index.php/Main_Page}

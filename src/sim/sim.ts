@@ -185,6 +185,7 @@ import {
 import { prestige as prestigeImpl, updateRested } from './progression/xp';
 import { questFallbackGrants } from './quest_fallback';
 import { sanitizeRemovedZone1Content } from './removed_zone1_content';
+import { normalizeSimRates } from './rates';
 import { Rng } from './rng';
 import { createSimContext, type SimContext, type SimContextHost } from './sim_context';
 import * as chatMod from './social/chat';
@@ -290,6 +291,7 @@ import {
   type QuestProgress,
   type QuestState,
   questTurnInNpcIds,
+  type ResolvedSimConfig,
   RUN_SPEED,
   type SimConfig,
   type SimEvent,
@@ -877,7 +879,7 @@ function freshCounters(): RewardCounters {
 // isShamanShock/ignoresDamagePushback) live in combat/casting_lifecycle.ts (C4a).
 
 export class Sim {
-  cfg: Required<Omit<SimConfig, 'noPlayer'>>;
+  cfg: ResolvedSimConfig;
   rng: Rng;
   time = 0;
   tickCount = 0;
@@ -965,6 +967,7 @@ export class Sim {
       playerName: cfg.playerName ?? 'Adventurer',
       devCommands: this.devCommands,
       lockoutNowMs: cfg.lockoutNowMs ?? (() => Math.floor(this.time * 1000)),
+      rates: normalizeSimRates(cfg.rates),
     };
     this.rng = new Rng(cfg.seed);
     // S0b seam: the shared SimContext every extracted slice routes through. Built

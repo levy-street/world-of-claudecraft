@@ -25,6 +25,7 @@
 
 import { ITEMS, MOBS, QUESTS } from '../data';
 import { formatMoney } from '../format_money';
+import { applyRate } from '../rates';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type {
@@ -153,8 +154,10 @@ export function rollLoot(
       continue;
     }
     if (!ctx.rng.chance(entry.chance)) continue;
-    if (entry.copper)
-      copper += ctx.rng.int(Math.ceil(entry.copper * 0.6), Math.ceil(entry.copper * 1.4));
+    if (entry.copper) {
+      const rolledCopper = ctx.rng.int(Math.ceil(entry.copper * 0.6), Math.ceil(entry.copper * 1.4));
+      copper += applyRate(rolledCopper, ctx.cfg.rates.dropMoney);
+    }
     if (entry.itemId) items.push({ itemId: entry.itemId, count: 1 });
   }
   if (copper > 0 || items.length > 0) {

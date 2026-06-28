@@ -1,6 +1,7 @@
 // Core shared types for the simulation. The sim layer has zero DOM/rendering deps.
 
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
+import type { SimRates } from './rates';
 
 export const TICK_RATE = 20; // sim ticks per second
 export const DT = 1 / TICK_RATE;
@@ -1589,7 +1590,12 @@ export interface SimConfig {
   noPlayer?: boolean; // multiplayer server: start with an empty world and addPlayer() later
   devCommands?: boolean; // local dev: /dev level|tp|give chat cheats
   lockoutNowMs?: () => number; // host wall-clock for persisted raid lockouts
+  rates?: Partial<SimRates>; // server tuning multipliers, normalized by Sim
 }
+
+export type ResolvedSimConfig = Required<Omit<SimConfig, 'noPlayer' | 'rates'>> & {
+  rates: SimRates;
+};
 
 export function emptyMoveInput(): MoveInput {
   return {
