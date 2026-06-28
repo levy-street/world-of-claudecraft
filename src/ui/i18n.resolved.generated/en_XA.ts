@@ -295,7 +295,10 @@ export const en_XA: EnTranslations = {
       "showWalletOnCharacterScreen": "[Šĥóŵ Ŵáļļéţ óñ Çĥáŕáçţéŕ Šçŕééñ]",
       "showWalletOnPlayerCard": "[Šĥóŵ Ŵáļļéţ óñ Þļáýéŕ Çáŕð]",
       "uiScale": "[ÚÍ Šçáļé]",
-      "highContrastBackground": "[Ĥíĝĥ-Çóñţŕášţ Ɓáçķĝŕóúñð]"
+      "highContrastBackground": "[Ĥíĝĥ-Çóñţŕášţ Ɓáçķĝŕóúñð]",
+      "showItemLevel": "[Šĥóŵ Íţéɱ Ļéʋéļ]",
+      "itemLevelLine": "[Íţéɱ Ļéʋéļ {level}]",
+      "itemScoreLine": "[Šçóŕé {score}]"
     },
     "controller": {
       "title": "[Çóñţŕóļļéŕ]",

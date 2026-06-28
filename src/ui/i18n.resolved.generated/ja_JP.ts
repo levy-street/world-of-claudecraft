@@ -295,7 +295,10 @@ export const ja_JP: EnTranslations = {
       "showWalletOnCharacterScreen": "キャラクター画面にウォレットを表示",
       "showWalletOnPlayerCard": "プレイヤーカードにウォレットを表示",
       "uiScale": "UIスケール",
-      "highContrastBackground": "高コントラスト背景"
+      "highContrastBackground": "高コントラスト背景",
+      "showItemLevel": "アイテムレベルを表示",
+      "itemLevelLine": "アイテムレベル {level}",
+      "itemScoreLine": "スコア {score}"
     },
     "controller": {
       "title": "コントローラー",

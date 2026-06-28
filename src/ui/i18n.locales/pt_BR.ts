@@ -220,6 +220,9 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.playerCard.showWalletBadge': 'Mostrar selo da carteira',
   'hudChrome.options.uiScale': 'Escala da interface',
   'hudChrome.options.highContrastBackground': 'Fundo de alto contraste',
+  'hudChrome.options.showItemLevel': 'Mostrar nível do item',
+  'hudChrome.options.itemLevelLine': 'Nível do item {level}',
+  'hudChrome.options.itemScoreLine': 'Pontuação {score}',
   'hudChrome.landing.highContrast': 'Alto contraste',
   'hudChrome.landing.highContrastAria':
     'Alternar o fundo de alto contraste: desativa o trailer em movimento para que o texto da tela inicial permaneça legível',

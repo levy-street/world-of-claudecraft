@@ -224,6 +224,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.playerCard.showWalletBadge': 'Afficher l’insigne de portefeuille',
   'hudChrome.options.uiScale': 'Échelle de l’interface',
   'hudChrome.options.highContrastBackground': 'Arrière-plan à contraste élevé',
+  'hudChrome.options.showItemLevel': "Afficher le niveau d'objet",
+  'hudChrome.options.itemLevelLine': "Niveau d'objet {level}",
+  'hudChrome.options.itemScoreLine': 'Score {score}',
   'hudChrome.landing.highContrast': 'Contraste élevé',
   'hudChrome.landing.highContrastAria':
     'Basculer l’arrière-plan à contraste élevé : désactive la bande-annonce animée pour que le texte de l’écran de démarrage reste lisible',

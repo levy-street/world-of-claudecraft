@@ -204,6 +204,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.playerCard.showWalletBadge': 'ウォレットバッジを表示',
   'hudChrome.options.uiScale': 'UIスケール',
   'hudChrome.options.highContrastBackground': '高コントラスト背景',
+  'hudChrome.options.showItemLevel': 'アイテムレベルを表示',
+  'hudChrome.options.itemLevelLine': 'アイテムレベル {level}',
+  'hudChrome.options.itemScoreLine': 'スコア {score}',
   'hudChrome.landing.highContrast': '高コントラスト',
   'hudChrome.landing.highContrastAria':
     '高コントラスト背景を切り替えます。動画トレーラーを無効にして、スタート画面のテキストを読みやすくします',

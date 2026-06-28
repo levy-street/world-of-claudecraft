@@ -295,7 +295,10 @@ export const ru_RU: EnTranslations = {
       "showWalletOnCharacterScreen": "Показывать кошелек на экране персонажей",
       "showWalletOnPlayerCard": "Показывать кошелек на карточке игрока",
       "uiScale": "Масштаб интерфейса",
-      "highContrastBackground": "Фон высокой контрастности"
+      "highContrastBackground": "Фон высокой контрастности",
+      "showItemLevel": "Показывать уровень предмета",
+      "itemLevelLine": "Уровень предмета {level}",
+      "itemScoreLine": "Оценка {score}"
     },
     "controller": {
       "title": "Геймпад",

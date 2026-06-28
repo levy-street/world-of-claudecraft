@@ -220,6 +220,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.playerCard.showWalletBadge': 'Mostra distintivo portafoglio',
   'hudChrome.options.uiScale': "Scala dell'interfaccia",
   'hudChrome.options.highContrastBackground': 'Sfondo a contrasto elevato',
+  'hudChrome.options.showItemLevel': 'Mostra livello oggetto',
+  'hudChrome.options.itemLevelLine': 'Livello oggetto {level}',
+  'hudChrome.options.itemScoreLine': 'Punteggio {score}',
   'hudChrome.landing.highContrast': 'Contrasto elevato',
   'hudChrome.landing.highContrastAria':
     'Attiva/disattiva lo sfondo a contrasto elevato: disabilita il trailer in movimento per mantenere leggibile il testo della schermata iniziale',

@@ -295,7 +295,10 @@ export const fr_CA: EnTranslations = {
       "showWalletOnCharacterScreen": "Afficher le portefeuille sur l’écran des personnages",
       "showWalletOnPlayerCard": "Afficher le portefeuille sur la carte de joueur",
       "uiScale": "Échelle de l’interface",
-      "highContrastBackground": "Arrière-plan à contraste élevé"
+      "highContrastBackground": "Arrière-plan à contraste élevé",
+      "showItemLevel": "Afficher le niveau d'objet",
+      "itemLevelLine": "Niveau d'objet {level}",
+      "itemScoreLine": "Score {score}"
     },
     "controller": {
       "title": "Manette",

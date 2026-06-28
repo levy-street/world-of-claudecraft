@@ -295,7 +295,10 @@ export const pt_BR: EnTranslations = {
       "showWalletOnCharacterScreen": "Mostrar carteira na tela de personagens",
       "showWalletOnPlayerCard": "Mostrar carteira no cartão de jogador",
       "uiScale": "Escala da interface",
-      "highContrastBackground": "Fundo de alto contraste"
+      "highContrastBackground": "Fundo de alto contraste",
+      "showItemLevel": "Mostrar nível do item",
+      "itemLevelLine": "Nível do item {level}",
+      "itemScoreLine": "Pontuação {score}"
     },
     "controller": {
       "title": "Controle",

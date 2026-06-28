@@ -78,6 +78,7 @@ import {
 } from '../sim/data';
 import { DELVE_MODULE_LAYOUTS, type DelveModuleId } from '../sim/delve_layout';
 import { armorTypeForItem, weaponArchetypeForItem } from '../sim/equipment_rules';
+import { itemLevel, itemScore } from '../sim/item_level';
 import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 import type { Ante, PickAction } from '../sim/lockpick';
 import { PICK_ACTIONS } from '../sim/lockpick';
@@ -2451,6 +2452,21 @@ export class Hud {
     )}</div>`;
     if (item.slot) {
       html += `<div class="tt-sub">${esc(itemSlotName(item.slot))}</div>`;
+    }
+    // Optional item-level readout (off by default; src/sim/item_level.ts derives it
+    // from where the item drops). Read live, so toggling it takes effect on the next
+    // hover. Equippable gear only: sourceless items (vendor/starter) have no level,
+    // and a mob-dropped quest/junk item is not gear, so it gets no item-level line.
+    if (item.slot && this.optionsHooks?.settings.get('showItemLevel')) {
+      const level = itemLevel(item);
+      if (level !== undefined) {
+        html += `<div class="tt-stat" style="color:#ffd100">${esc(
+          t('hudChrome.options.itemLevelLine', { level: itemNumber(level) }),
+        )}</div>`;
+        html += `<div class="tt-sub">${esc(
+          t('hudChrome.options.itemScoreLine', { score: itemNumber(itemScore(item), 1) }),
+        )}</div>`;
+      }
     }
     if (item.weapon) {
       const dps = (item.weapon.min + item.weapon.max) / 2 / item.weapon.speed;
@@ -13510,6 +13526,7 @@ export class Hud {
     this.settingBoolToggle(body, t('hud.options.frostedPanels'), 'frostedPanels');
     this.settingBoolToggle(body, t('hud.options.highContrastText'), 'highContrastText');
     this.settingBoolToggle(body, t('hud.options.reduceMotion'), 'reduceMotion');
+    this.settingBoolToggle(body, t('hudChrome.options.showItemLevel'), 'showItemLevel');
     this.settingBoolToggle(
       body,
       t('hudChrome.options.showWalletOnCharacterScreen'),

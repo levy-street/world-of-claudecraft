@@ -206,6 +206,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.playerCard.showWalletBadge': '지갑 배지 표시',
   'hudChrome.options.uiScale': 'UI 배율',
   'hudChrome.options.highContrastBackground': '고대비 배경',
+  'hudChrome.options.showItemLevel': '아이템 레벨 표시',
+  'hudChrome.options.itemLevelLine': '아이템 레벨 {level}',
+  'hudChrome.options.itemScoreLine': '점수 {score}',
   'hudChrome.landing.highContrast': '고대비',
   'hudChrome.landing.highContrastAria':
     '고대비 배경 전환: 움직이는 예고편을 꺼서 시작 화면 텍스트를 읽기 쉽게 유지합니다',

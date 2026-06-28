@@ -220,6 +220,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.playerCard.showWalletBadge': 'Wallet-Abzeichen anzeigen',
   'hudChrome.options.uiScale': 'UI-Skalierung',
   'hudChrome.options.highContrastBackground': 'Hintergrund mit hohem Kontrast',
+  'hudChrome.options.showItemLevel': 'Gegenstandsstufe anzeigen',
+  'hudChrome.options.itemLevelLine': 'Gegenstandsstufe {level}',
+  'hudChrome.options.itemScoreLine': 'Wertung {score}',
   'hudChrome.landing.highContrast': 'Hoher Kontrast',
   'hudChrome.landing.highContrastAria':
     'Hintergrund mit hohem Kontrast umschalten: deaktiviert den bewegten Trailer, damit der Text des Startbildschirms lesbar bleibt',

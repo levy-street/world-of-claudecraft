@@ -295,7 +295,10 @@ export const ko_KR: EnTranslations = {
       "showWalletOnCharacterScreen": "캐릭터 화면에 지갑 표시",
       "showWalletOnPlayerCard": "플레이어 카드에 지갑 표시",
       "uiScale": "UI 배율",
-      "highContrastBackground": "고대비 배경"
+      "highContrastBackground": "고대비 배경",
+      "showItemLevel": "아이템 레벨 표시",
+      "itemLevelLine": "아이템 레벨 {level}",
+      "itemScoreLine": "점수 {score}"
     },
     "controller": {
       "title": "컨트롤러",

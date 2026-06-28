@@ -205,6 +205,10 @@ export const hudChromeStrings = {
     // page's high-contrast backdrop toggle.
     uiScale: 'UI Scale',
     highContrastBackground: 'High-Contrast Background',
+    // Interface panel toggle + the item-tooltip lines it reveals (off by default).
+    showItemLevel: 'Show Item Level',
+    itemLevelLine: 'Item Level {level}',
+    itemScoreLine: 'Score {score}',
   },
   // Controller / gamepad options panel (Options > Controller). Player-facing
   // chrome, so every label is a key here; the live numbers run through

@@ -295,7 +295,10 @@ export const zh_CN: EnTranslations = {
       "showWalletOnCharacterScreen": "在角色界面显示钱包",
       "showWalletOnPlayerCard": "在玩家卡片显示钱包",
       "uiScale": "界面缩放",
-      "highContrastBackground": "高对比度背景"
+      "highContrastBackground": "高对比度背景",
+      "showItemLevel": "显示物品等级",
+      "itemLevelLine": "物品等级 {level}",
+      "itemScoreLine": "评分 {score}"
     },
     "controller": {
       "title": "手柄",
