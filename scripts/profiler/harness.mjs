@@ -488,6 +488,8 @@ export class Profiler {
     let facing = heading;
     let last = await this._pos();
     let consumed = 0;
+    let stuck = 0;
+    let checkpoint = 0;
     const events = [];
     const trail = [];
     while (performance.now() - t0 < ms) {
@@ -501,8 +503,18 @@ export class Profiler {
         zone: pos.zone,
       });
       if (moved < 2.5) {
-        facing += 1.13; // stuck against terrain/water -> rotate to find open ground
+        // stuck on terrain/water: escalate the turn each consecutive stall so it
+        // breaks free instead of hugging the same wall
+        stuck++;
+        facing += 1.7 + stuck * 0.6;
         await this._face(facing);
+      } else {
+        stuck = 0;
+        // serpentine every ~6 checkpoints so the walk roams across maps, not a line
+        if (++checkpoint % 6 === 0) {
+          facing += (checkpoint % 12 === 0 ? -1 : 1) * 0.9;
+          await this._face(facing);
+        }
       }
       last = pos;
       // drain new collector samples since last check, attribute, log hitches with position
