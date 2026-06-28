@@ -3108,7 +3108,11 @@ export class Renderer {
       wasSwimming: false,
     });
     const view = this.views.get(e.id);
-    if (view) this.gateViewOnCompile(view, group);
+    // Never gate the player's OWN view: it must be on screen immediately, its
+    // class is already prewarmed, and the self render path does not re-evaluate
+    // the compilePending flag (only the non-self loop does), so gating it would
+    // strand the player invisible. Other entities un-hide via that loop.
+    if (view && e.id !== this.sim.player.id) this.gateViewOnCompile(view, group);
   }
 
   // Generic anti-freeze layer. A freshly-streamed view links its shader programs
