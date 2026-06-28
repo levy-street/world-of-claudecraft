@@ -607,17 +607,21 @@ export function grantXp(
 ): void {
   const p = ctx.entities.get(meta.entityId);
   if (!p || amount <= 0) return;
-  amount = applyRate(amount, ctx.cfg.rates.xp);
-  if (amount <= 0) return;
   // Rested XP bonus: classic vanilla only doubles KILL xp (not quests), and
   // never past the cap (no level bar to advance). The bonus equals the rested
   // amount drawn down, so the effective award is up to 2x while the pool lasts.
+  // Server XP rates apply after the rested bonus so the rested portion is scaled
+  // without draining the rested pool faster.
+  const baseAmount = amount;
   let restedBonus = 0;
   if (opts?.fromKill && p.level < MAX_LEVEL && meta.restedXp > 0) {
-    restedBonus = Math.min(Math.floor(meta.restedXp), amount);
-    meta.restedXp -= restedBonus;
-    amount += restedBonus;
+    restedBonus = Math.min(Math.floor(meta.restedXp), baseAmount);
   }
+  const scaledBaseAmount = applyRate(baseAmount, ctx.cfg.rates.xp);
+  amount = applyRate(baseAmount + restedBonus, ctx.cfg.rates.xp);
+  if (amount <= 0) return;
+  if (restedBonus > 0) meta.restedXp -= restedBonus;
+  const scaledRestedBonus = Math.max(0, amount - scaledBaseAmount);
   // Lifetime XP accrues for EVERY award, including at the cap — this is what
   // makes post-cap progression work. It feeds the virtual level, the
   // leaderboard, and cosmetic milestones. The level bar below only advances
@@ -629,7 +633,7 @@ export function grantXp(
     type: 'xp',
     amount,
     pid: p.id,
-    ...(restedBonus > 0 ? { rested: restedBonus } : {}),
+    ...(scaledRestedBonus > 0 ? { rested: scaledRestedBonus } : {}),
   });
 
   if (p.level >= MAX_LEVEL) return; // bar frozen at cap; lifetimeXp already credited

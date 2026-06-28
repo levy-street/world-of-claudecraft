@@ -32,16 +32,20 @@ describe('sim rates', () => {
     });
   });
 
-  it('scales every XP award before rested XP is applied', () => {
+  it('scales the base and rested portions of kill XP without faster pool drain', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', rates: { xp: 2 } });
     const meta = sim.meta(sim.playerId)!;
-    meta.restedXp = 1000;
+    meta.restedXp = 50;
 
     sim.grantXp(50, meta, { fromKill: true });
 
     expect(sim.xp).toBe(200);
     expect(meta.lifetimeXp).toBe(200);
-    expect(meta.restedXp).toBe(900);
+    expect(meta.restedXp).toBe(0);
+    expect(sim.events.find((e) => e.type === 'xp')).toMatchObject({
+      amount: 200,
+      rested: 100,
+    });
   });
 
   it('scales quest-style XP at award time without mutating the displayed base reward', () => {
@@ -55,6 +59,18 @@ describe('sim rates', () => {
     expect(sim.player.level).toBe(2);
     expect(meta.xp).toBe(100);
     expect(meta.lifetimeXp).toBe(500);
+  });
+
+  it('does not consume rested XP when the XP rate suppresses the award', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', rates: { xp: 0 } });
+    const meta = sim.meta(sim.playerId)!;
+    meta.restedXp = 50;
+
+    sim.grantXp(50, meta, { fromKill: true });
+
+    expect(meta.xp).toBe(0);
+    expect(meta.lifetimeXp).toBe(0);
+    expect(meta.restedXp).toBe(50);
   });
 
   it('scales copper drops without changing the deterministic roll', () => {
