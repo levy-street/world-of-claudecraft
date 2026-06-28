@@ -889,6 +889,12 @@ export class Renderer {
       antialias: false,
       powerPreference: 'high-performance',
     });
+    // Drive info.render accounting manually: with the post composer, autoReset
+    // wipes the scene's draw-call/triangle counts on each of its fullscreen
+    // passes, so info ends a frame reading 1 call / 2 triangles (the last quad).
+    // We reset once per frame (in sync, before rendering) so the counters
+    // accumulate the whole frame - scene + shadows + post - on every tier.
+    this.webgl.info.autoReset = false;
     // Release this context promptly on page teardown so repeated logout/login
     // reloads (location.reload) don't exhaust the browser's WebGL context pool.
     trackWebGLContext(this.webgl);
@@ -4130,6 +4136,9 @@ export class Renderer {
       this.camera.position.y += shakeY;
       this.shakeTrauma = Math.max(0, this.shakeTrauma - dt * 1.8);
     }
+    // Reset once here (autoReset is off) so info.render accumulates every pass
+    // of this frame instead of being wiped by the composer's post passes.
+    this.webgl.info.reset();
     if (this.post) this.post.render();
     else this.webgl.render(this.scene, this.camera);
     if (shakeX !== 0 || shakeY !== 0) {
