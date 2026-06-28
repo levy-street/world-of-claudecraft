@@ -448,6 +448,10 @@ export const vi_VN: EnTranslations = {
     "tips": {
       "joinChannels": "Mẹo: gõ /join world hoặc /join lfg để trò chuyện với người chơi khắp realm."
     },
+    "itemSet": {
+      "header": "{name} ({have}/{total})",
+      "bonusLine": "({pieces}) {bonus}"
+    },
     "questShare": {
       "notShareable": "Nhiệm vụ này không thể chia sẻ.",
       "notInSharerParty": "Bạn phải ở trong tổ đội của {name} mới nhận được nhiệm vụ đó.",

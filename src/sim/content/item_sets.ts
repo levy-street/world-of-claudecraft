@@ -33,21 +33,45 @@ const STRENGTH_BONUSES: SetBonusTier[] = [
 ];
 const AGILITY_BONUSES: SetBonusTier[] = [
   { pieces: 2, effect: { ap: 40 }, text: 'Increases attack power by 40.' },
-  { pieces: 3, effect: { agi: 15, crit: 0.02 }, text: 'Increases Agility by 15 and critical strike chance by 2%.' },
+  {
+    pieces: 3,
+    effect: { agi: 15, crit: 0.02 },
+    text: 'Increases Agility by 15 and critical strike chance by 2%.',
+  },
 ];
 const CASTER_BONUSES: SetBonusTier[] = [
-  { pieces: 2, effect: { castPushbackReduction: 0.5 }, text: 'Reduces cast pushback from damage by 50%.' },
-  { pieces: 3, effect: { castPushbackReduction: 1 }, text: 'You cannot be pushed back while casting (immune to cast pushback from damage).' },
+  {
+    pieces: 2,
+    effect: { castPushbackReduction: 0.5 },
+    text: 'Reduces cast pushback from damage by 50%.',
+  },
+  {
+    pieces: 3,
+    effect: { castPushbackReduction: 1 },
+    text: 'You cannot be pushed back while casting (immune to cast pushback from damage).',
+  },
 ];
 
 export const ITEM_SETS: Record<string, ItemSet> = {
   [SET_DEATHLORD]: { id: SET_DEATHLORD, name: 'Deathlord Battlegear', bonuses: STRENGTH_BONUSES },
   [SET_WYRMSHADOW]: { id: SET_WYRMSHADOW, name: 'Wyrmshadow Vestments', bonuses: AGILITY_BONUSES },
-  [SET_NECROMANCERS]: { id: SET_NECROMANCERS, name: "Necromancer's Raiment", bonuses: CASTER_BONUSES },
-  [SET_CROWNFORGED]: { id: SET_CROWNFORGED, name: 'Crownforged Regalia', bonuses: STRENGTH_BONUSES },
+  [SET_NECROMANCERS]: {
+    id: SET_NECROMANCERS,
+    name: "Necromancer's Raiment",
+    bonuses: CASTER_BONUSES,
+  },
+  [SET_CROWNFORGED]: {
+    id: SET_CROWNFORGED,
+    name: 'Crownforged Regalia',
+    bonuses: STRENGTH_BONUSES,
+  },
   [SET_NIGHTTALON]: { id: SET_NIGHTTALON, name: 'Nighttalon Pelt', bonuses: AGILITY_BONUSES },
   [SET_SOULFLAME]: { id: SET_SOULFLAME, name: 'Soulflame Regalia', bonuses: CASTER_BONUSES },
-  [SET_STORMCALLERS]: { id: SET_STORMCALLERS, name: "Stormcaller's Vestments", bonuses: CASTER_BONUSES },
+  [SET_STORMCALLERS]: {
+    id: SET_STORMCALLERS,
+    name: "Stormcaller's Vestments",
+    bonuses: CASTER_BONUSES,
+  },
 };
 
 // Fully-resolved set effect: every field defaulted so callers never branch on

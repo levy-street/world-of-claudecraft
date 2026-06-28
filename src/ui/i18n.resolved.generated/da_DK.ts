@@ -448,6 +448,10 @@ export const da_DK: EnTranslations = {
     "tips": {
       "joinChannels": "Tip: skriv /join world eller /join lfg for at chatte med spillere på tværs af realmet."
     },
+    "itemSet": {
+      "header": "{name} ({have}/{total})",
+      "bonusLine": "({pieces}) {bonus}"
+    },
     "questShare": {
       "notShareable": "Denne opgave kan ikke deles.",
       "notInSharerParty": "Du skal være i {name}s gruppe for at acceptere den opgave.",

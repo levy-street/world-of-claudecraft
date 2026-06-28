@@ -21,7 +21,7 @@ import {
   tOptional,
 } from './i18n';
 
-export type EntityTranslationGroup = 'classAbility' | 'item' | 'world';
+export type EntityTranslationGroup = 'classAbility' | 'item' | 'itemSet' | 'world';
 export type EntityTranslationKind =
   | 'class'
   | 'ability'
@@ -53,7 +53,12 @@ export type EntityTranslationRequest =
   | { kind: 'class'; id: PlayerClass; field: 'name' | 'description'; values?: InterpolationValues }
   | { kind: 'ability'; id: string; field: 'name' | 'description'; values?: InterpolationValues }
   | { kind: 'item'; id: string; field: 'name'; values?: InterpolationValues }
-  | { kind: 'itemSet'; id: string; field: 'name' | 'bonus2' | 'bonus3'; values?: InterpolationValues }
+  | {
+      kind: 'itemSet';
+      id: string;
+      field: 'name' | 'bonus2' | 'bonus3';
+      values?: InterpolationValues;
+    }
   | { kind: 'mob'; id: string; field: 'name'; values?: InterpolationValues }
   | { kind: 'npc'; id: string; field: 'name' | 'title' | 'greeting'; values?: InterpolationValues }
   | {
@@ -278,9 +283,11 @@ function requestManifestEntry(request: EntityTranslationRequest): EntityTranslat
   const group: EntityTranslationGroup =
     request.kind === 'class' || request.kind === 'ability'
       ? 'classAbility'
-      : request.kind === 'item' || request.kind === 'itemSet'
-        ? 'item'
-        : 'world';
+      : request.kind === 'itemSet'
+        ? 'itemSet'
+        : request.kind === 'item'
+          ? 'item'
+          : 'world';
   return entry(
     request.kind,
     id,
@@ -397,7 +404,7 @@ export function entityTranslationManifest(): EntityTranslationManifestEntry[] {
           set.id,
           field,
           canonicalEntityText({ kind: 'itemSet', id: set.id, field }),
-          'item',
+          'itemSet',
           entityTranslationKey({ kind: 'itemSet', id: set.id, field }),
         ),
       );

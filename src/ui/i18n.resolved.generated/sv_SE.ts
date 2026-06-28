@@ -448,6 +448,10 @@ export const sv_SE: EnTranslations = {
     "tips": {
       "joinChannels": "Tips: skriv /join world eller /join lfg för att chatta med spelare över hela världen."
     },
+    "itemSet": {
+      "header": "{name} ({have}/{total})",
+      "bonusLine": "({pieces}) {bonus}"
+    },
     "questShare": {
       "notShareable": "Det här uppdraget kan inte delas.",
       "notInSharerParty": "Du måste vara i {name}s grupp för att anta det uppdraget.",

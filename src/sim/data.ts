@@ -139,8 +139,8 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   DELVE_ITEMS,
 );
 
-export { ITEM_SETS, aggregateSetBonuses } from './content/item_sets';
 export type { AggregatedSetEffect } from './content/item_sets';
+export { aggregateSetBonuses, ITEM_SETS } from './content/item_sets';
 
 export const MOBS: Record<string, MobTemplate> = {
   ...ZONE1_MOBS,

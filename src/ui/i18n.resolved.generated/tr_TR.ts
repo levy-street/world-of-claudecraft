@@ -448,6 +448,10 @@ export const tr_TR: EnTranslations = {
     "tips": {
       "joinChannels": "İpucu: Sunucu genelindeki oyuncularla sohbet etmek için /join world ya da /join lfg yaz."
     },
+    "itemSet": {
+      "header": "{name} ({have}/{total})",
+      "bonusLine": "({pieces}) {bonus}"
+    },
     "questShare": {
       "notShareable": "Bu görev paylaşılamaz.",
       "notInSharerParty": "Bu görevi kabul etmek için {name} adlı oyuncunun grubunda olmalısın.",

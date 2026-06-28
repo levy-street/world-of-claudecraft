@@ -4,8 +4,9 @@
 // (2/3)" with the 2-piece bonus lit and the 3-piece bonus still dim. Then equips
 // the third piece and re-hovers to show both bonuses active. Needs a dev server
 // (default :5173, override GAME_URL).
-import puppeteer from 'puppeteer-core';
+
 import fs from 'node:fs';
+import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH } from './browser_path.mjs';
 
 const URL = (process.env.GAME_URL ?? 'http://localhost:5173') + '/?gfx=ultra';

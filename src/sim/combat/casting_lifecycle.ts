@@ -151,7 +151,10 @@ export function pushbackCast(p: Entity): void {
   const factor = 1 - p.castPushbackReduction;
   if (factor <= 0) return;
   if (p.channeling) {
-    p.castRemaining = Math.max(0, p.castRemaining - p.castTotal * CHANNEL_PUSHBACK_FRACTION * factor);
+    p.castRemaining = Math.max(
+      0,
+      p.castRemaining - p.castTotal * CHANNEL_PUSHBACK_FRACTION * factor,
+    );
   } else {
     p.castRemaining += CAST_PUSHBACK_SEC * factor;
     p.castTotal += CAST_PUSHBACK_SEC * factor;

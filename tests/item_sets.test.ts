@@ -24,7 +24,16 @@ function statsFor(cls: PlayerClass, level: number, equipment: Record<string, str
 describe('aggregateSetBonuses (pure resolver)', () => {
   it('grants nothing below the 2-piece threshold', () => {
     const eff = aggregateSetBonuses(counts({ [SET_DEATHLORD]: 1 }));
-    expect(eff).toEqual({ str: 0, agi: 0, sta: 0, int: 0, spi: 0, ap: 0, crit: 0, castPushbackReduction: 0 });
+    expect(eff).toEqual({
+      str: 0,
+      agi: 0,
+      sta: 0,
+      int: 0,
+      spi: 0,
+      ap: 0,
+      crit: 0,
+      castPushbackReduction: 0,
+    });
   });
 
   it('strength set: 2pc grants AP, 3pc additionally grants str+sta (tiers stack)', () => {

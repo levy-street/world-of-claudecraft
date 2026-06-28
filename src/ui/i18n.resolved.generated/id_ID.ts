@@ -448,6 +448,10 @@ export const id_ID: EnTranslations = {
     "tips": {
       "joinChannels": "Tips: ketik /join world atau /join lfg untuk mengobrol dengan pemain di seluruh realm."
     },
+    "itemSet": {
+      "header": "{name} ({have}/{total})",
+      "bonusLine": "({pieces}) {bonus}"
+    },
     "questShare": {
       "notShareable": "Misi ini tidak dapat dibagikan.",
       "notInSharerParty": "Anda harus berada di rombongan {name} untuk menerima misi itu.",
