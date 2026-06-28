@@ -73,6 +73,8 @@ const CALLBACK_KEYS = [
   'onInventoryChangedForQuests',
   'checkQuestReady',
   'countItem',
+  'completeQuestForDev',
+  'completeCurrentQuestsForDev',
   // E1 entity-roster surface.
   'addEntity',
   'dropEntity',
@@ -307,6 +309,8 @@ function makeFakeHost() {
     onInventoryChangedForQuests: vi.fn(),
     checkQuestReady: vi.fn(),
     countItem: vi.fn(() => 0),
+    completeQuestForDev: vi.fn(() => false),
+    completeCurrentQuestsForDev: vi.fn(() => 0),
     lockoutNowMs: vi.fn(() => 0),
     instanceKeyFor: vi.fn(() => 'solo:0'),
     instanceOriginOf: vi.fn(() => ({ x: 0, z: 0 })),

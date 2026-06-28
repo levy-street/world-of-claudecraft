@@ -681,6 +681,30 @@ describe('delta snapshots', () => {
     expect(snap.self.qdone).toEqual([]);
   });
 
+  it('dev quest completion resyncs qlog and qdone', () => {
+    const previous = process.env.ALLOW_DEV_COMMANDS;
+    process.env.ALLOW_DEV_COMMANDS = '1';
+    try {
+      broadcast(server);
+      fc.sent.length = 0;
+
+      server.handleMessage(
+        session,
+        JSON.stringify({ t: 'cmd', cmd: 'dev_complete_quest', quest: 'q_wolves' }),
+      );
+      broadcast(server);
+
+      const snap = lastSnap(fc.sent);
+      expect(snap.self).toHaveProperty('qlog');
+      expect(snap.self).toHaveProperty('qdone');
+      expect(snap.self.qlog).toEqual([]);
+      expect(snap.self.qdone).toContain('q_wolves');
+    } finally {
+      if (previous === undefined) delete process.env.ALLOW_DEV_COMMANDS;
+      else process.env.ALLOW_DEV_COMMANDS = previous;
+    }
+  });
+
   it('each client gets full state on its own first snapshot', () => {
     broadcast(server);
     const fc2 = fakeWs();

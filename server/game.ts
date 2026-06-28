@@ -2577,6 +2577,30 @@ export class GameServer {
         }
         break;
       }
+      case 'dev_complete_quest': {
+        if (process.env.ALLOW_DEV_COMMANDS === '1' && typeof msg.quest === 'string') {
+          const beforeDone = sim.meta(pid)?.questsDone.has(msg.quest) ?? false;
+          sim.completeQuestForDev(msg.quest, pid);
+          const afterDone = sim.meta(pid)?.questsDone.has(msg.quest) ?? false;
+          if (!beforeDone && afterDone && msg.quest === ALDRIC_METEOR_QUEST_ID) {
+            this.noteAccountQuestComplete(session, msg.quest);
+          }
+          this.resyncQuests(session);
+        }
+        break;
+      }
+      case 'dev_complete_all_quests': {
+        if (process.env.ALLOW_DEV_COMMANDS === '1') {
+          const beforeDone = sim.meta(pid)?.questsDone.has(ALDRIC_METEOR_QUEST_ID) ?? false;
+          sim.completeCurrentQuestsForDev(pid);
+          const afterDone = sim.meta(pid)?.questsDone.has(ALDRIC_METEOR_QUEST_ID) ?? false;
+          if (!beforeDone && afterDone) {
+            this.noteAccountQuestComplete(session, ALDRIC_METEOR_QUEST_ID);
+          }
+          this.resyncQuests(session);
+        }
+        break;
+      }
       // dungeons ('enter_crypt'/'leave_crypt' kept as aliases for older bots)
       case 'enter_crypt':
       case 'enter_dungeon': {

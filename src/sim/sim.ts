@@ -217,6 +217,7 @@ import {
 // (online.ts) stays byte-identical.
 export { computeQuestState } from './quests/quest_commands';
 
+import { completeCurrentQuestsForDev, completeQuestForDev } from './quests/dev_quest_commands';
 import * as arenaMod from './social/arena';
 import * as duelMod from './social/duel';
 
@@ -1962,6 +1963,8 @@ export class Sim {
       onInventoryChangedForQuests: (meta) => onInventoryChangedForQuests(sim.ctx, meta),
       checkQuestReady: (qp, meta) => checkQuestReady(sim.ctx, qp, meta),
       countItem: sim.countItem.bind(sim),
+      completeQuestForDev: (questId, pid) => completeQuestForDev(sim.ctx, questId, pid),
+      completeCurrentQuestsForDev: (pid) => completeCurrentQuestsForDev(sim.ctx, pid),
       // I1 dungeon instancing now lives in instances/dungeons.ts; these route through
       // the same-named Sim delegates (foreign callers use this.X). lockoutNowMs is the
       // shared raid-lockout clock that stays on Sim (N1 also writes through it).
@@ -4456,6 +4459,14 @@ export class Sim {
 
   turnInQuest(questId: string, pid?: number): void {
     questCommands.turnInQuest(this.ctx, questId, pid);
+  }
+
+  completeQuestForDev(questId: string, pid?: number): boolean {
+    return completeQuestForDev(this.ctx, questId, pid);
+  }
+
+  completeCurrentQuestsForDev(pid?: number): number {
+    return completeCurrentQuestsForDev(this.ctx, pid);
   }
 
   // No-op in offline mode
