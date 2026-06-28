@@ -1929,8 +1929,9 @@ export class GameServer {
           // contains "Mr" (case-insensitive). Strip quotes/control chars and cap
           // the length so the echoed query stays a clean, single-line token.
           const filter = (whoMatch[1] ?? '')
+            .replace(/[\p{Cc}"]/gu, '')
             .trim()
-            .replace(/[" -]/g, '')
+            .replace(/\s+/g, ' ')
             .slice(0, 24);
           this.sendWhoRoster(session, filter || undefined);
           break;

@@ -3295,6 +3295,14 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.secondsRemaining.few': '{count} secondi rimanenti',
   'hudChrome.plurals.secondsRemaining.many': '{count} secondi rimanenti',
   'hudChrome.plurals.secondsRemaining.other': '{count} secondi rimanenti',
+  'hudChrome.plurals.playersMatching.one':
+    'Chi: {count} giocatore corrispondente a "{query}" su {realm}.',
+  'hudChrome.plurals.playersMatching.few':
+    'Chi: {count} giocatori corrispondenti a "{query}" su {realm}.',
+  'hudChrome.plurals.playersMatching.many':
+    'Chi: {count} giocatori corrispondenti a "{query}" su {realm}.',
+  'hudChrome.plurals.playersMatching.other':
+    'Chi: {count} giocatori corrispondenti a "{query}" su {realm}.',
   'hudChrome.plurals.playersOnline.one': 'Chi: {count} giocatore online su {realm}.',
   'hudChrome.plurals.playersOnline.few': 'Chi: {count} giocatori online su {realm}.',
   'hudChrome.plurals.playersOnline.many': 'Chi: {count} giocatori online su {realm}.',

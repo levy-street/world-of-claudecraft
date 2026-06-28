@@ -22,11 +22,46 @@ export const pending: Record<string, readonly string[]> = {
   "ja_JP": [],
   "pt_BR": [],
   "ru_RU": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "nl_NL": [
+    "hudChrome.plurals.playersMatching.few",
+    "hudChrome.plurals.playersMatching.many",
+    "hudChrome.plurals.playersMatching.one",
+    "hudChrome.plurals.playersMatching.other"
+  ],
+  "pl_PL": [
+    "hudChrome.plurals.playersMatching.few",
+    "hudChrome.plurals.playersMatching.many",
+    "hudChrome.plurals.playersMatching.one",
+    "hudChrome.plurals.playersMatching.other"
+  ],
+  "id_ID": [
+    "hudChrome.plurals.playersMatching.few",
+    "hudChrome.plurals.playersMatching.many",
+    "hudChrome.plurals.playersMatching.one",
+    "hudChrome.plurals.playersMatching.other"
+  ],
+  "tr_TR": [
+    "hudChrome.plurals.playersMatching.few",
+    "hudChrome.plurals.playersMatching.many",
+    "hudChrome.plurals.playersMatching.one",
+    "hudChrome.plurals.playersMatching.other"
+  ],
+  "sv_SE": [
+    "hudChrome.plurals.playersMatching.few",
+    "hudChrome.plurals.playersMatching.many",
+    "hudChrome.plurals.playersMatching.one",
+    "hudChrome.plurals.playersMatching.other"
+  ],
+  "vi_VN": [
+    "hudChrome.plurals.playersMatching.few",
+    "hudChrome.plurals.playersMatching.many",
+    "hudChrome.plurals.playersMatching.one",
+    "hudChrome.plurals.playersMatching.other"
+  ],
+  "da_DK": [
+    "hudChrome.plurals.playersMatching.few",
+    "hudChrome.plurals.playersMatching.many",
+    "hudChrome.plurals.playersMatching.one",
+    "hudChrome.plurals.playersMatching.other"
+  ]
 };

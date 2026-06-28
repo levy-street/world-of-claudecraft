@@ -496,10 +496,10 @@ export const de_DE: EnTranslations = {
         "other": "Wer: {count} Spieler online auf {realm}."
       },
       "playersMatching": {
-        "one": "Who: {count} player matching \"{query}\" on {realm}.",
-        "few": "Who: {count} players matching \"{query}\" on {realm}.",
-        "many": "Who: {count} players matching \"{query}\" on {realm}.",
-        "other": "Who: {count} players matching \"{query}\" on {realm}."
+        "one": "Wer: {count} Spieler, die auf \"{query}\" passen, auf {realm}.",
+        "few": "Wer: {count} Spieler, die auf \"{query}\" passen, auf {realm}.",
+        "many": "Wer: {count} Spieler, die auf \"{query}\" passen, auf {realm}.",
+        "other": "Wer: {count} Spieler, die auf \"{query}\" passen, auf {realm}."
       }
     },
     "bugReport": {
