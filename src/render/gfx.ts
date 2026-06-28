@@ -343,7 +343,13 @@ function settingsFor(
     // it ~1ms-class on real GPUs; ultra gets full-res Medium
     ao: tier === 'high' || tier === 'ultra',
     msaaSamples: tier === 'high' || tier === 'ultra' ? 4 : 0,
-    pixelRatioCap: tier === 'low' ? 1.48 : tier === 'medium' ? 1.48 : tier === 'high' ? 1.75 : 2.5,
+    // FPS-first DPR caps: the post composer (N8AO + bloom) is the dominant GPU
+    // cost on high/ultra and it scales with pixel count, so a high-DPI panel
+    // (Retina/4K/OS-scaled) is what craters those tiers. Capping the device pixel
+    // ratio lower spends the saved pixels on frame rate. No effect at dpr<=cap
+    // (the desktop-1x majority is untouched); on dpr=2 it renders modestly below
+    // native for a large FPS win. Ultra stays the most generous (manual-only).
+    pixelRatioCap: tier === 'low' ? 1.35 : tier === 'medium' ? 1.42 : tier === 'high' ? 1.5 : 2.0,
     shadowMap: tier === 'low' ? 2048 : tier === 'medium' ? 2560 : 4096,
     standardMaterials: tier === 'medium' || tier === 'high' || tier === 'ultra',
     lowPlus: tier === 'low',

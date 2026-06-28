@@ -187,6 +187,11 @@ describe('graphics tier resolution', () => {
     expect(ultra.msaaSamples).toBe(4);
     expect(ultra.shadowMap).toBe(high.shadowMap);
     expect(ultra.pixelRatioCap).toBeGreaterThan(high.pixelRatioCap);
+    // FPS-first DPR caps: the post composer scales with pixels, so high/ultra are
+    // capped tight enough that a high-DPI panel spends pixels on frame rate.
+    expect(high.pixelRatioCap).toBeLessThanOrEqual(1.5);
+    expect(ultra.pixelRatioCap).toBeLessThanOrEqual(2.0);
+    expect(medium.pixelRatioCap).toBeLessThanOrEqual(1.5);
     expect(GFX_BUCKET_BANDS.ultra.grass.baseline).toBeGreaterThan(
       GFX_BUCKET_BANDS.high.grass.baseline,
     );
