@@ -268,6 +268,7 @@ import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view'
 import { restView } from './rest_indicator';
 import { localizeServerText, localizeZone } from './server_i18n';
 import { localizeSimAuraName, localizeSimText } from './sim_i18n';
+import { type AbilityScaling, abilityDamageBonus } from './ability_damage';
 import { buildStatTooltip, type StatId, type StatTooltipModel, weaponDps } from './stat_tooltip';
 import { type StatTooltipI18n, statCellHtml, statTooltipHtml } from './stat_tooltip_view';
 import { nearestSubzone } from './subzone';
@@ -2631,7 +2632,12 @@ export class Hud {
 
   private abilityTooltip(res: ResolvedAbility): string {
     const a = res.def;
-    const damageText = abilityEffectText(res.effects);
+    const p = this.sim.player;
+    const damageText = abilityEffectText(res, {
+      spellPower: p.spellPower,
+      rangedPower: p.rangedPower,
+      attackPower: p.attackPower,
+    });
     let html = `<div class="tt-title">${esc(abilityDisplayName(a))}</div>`;
     html += `<div class="tt-sub">${esc(t('abilityUi.tooltip.rank', { rank: formatAbilityNumber(res.rank) }))}</div>`;
     const costLine: string[] = [];
@@ -14277,7 +14283,13 @@ function abilityRequirementLines(def: AbilityDef): string[] {
   return lines;
 }
 
-function abilityEffectText(effects: AbilityEffect[]): string {
+// Builds the `$d` damage string for an ability tooltip. When `scaling` (the live
+// character's Spell Power / Ranged AP / Attack Power) is given, the displayed
+// numbers fold in that scaling exactly as combat does, so the tooltip shows what a
+// cast will really land and updates as gear changes.
+function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling): string {
+  const effects = res.effects;
+  const bonus = (eff: AbilityEffect) => (scaling ? abilityDamageBonus(res, eff, scaling) : 0);
   const primary = effects.find(
     (eff) =>
       eff.type === 'directDamage' ||
@@ -14295,14 +14307,16 @@ function abilityEffectText(effects: AbilityEffect[]): string {
       case 'heal':
       case 'aoeDamage':
       case 'aoeRoot':
-      case 'drainTick':
-        return abilityAmountRange(primary.min, primary.max);
+      case 'drainTick': {
+        const b = bonus(primary);
+        return abilityAmountRange(primary.min + b, primary.max + b);
+      }
       case 'weaponDamage':
       case 'weaponStrike':
         return formatAbilityNumber(primary.bonus);
       case 'finisherDamage':
         return t('abilityUi.tooltip.finisherDamage', {
-          base: formatAbilityNumber(primary.base),
+          base: formatAbilityNumber(primary.base + bonus(primary)),
           perCombo: formatAbilityNumber(primary.perCombo),
         });
     }
@@ -14315,6 +14329,7 @@ function abilityEffectText(effects: AbilityEffect[]): string {
   if (!secondary) return '';
   switch (secondary.type) {
     case 'dot':
+      return formatAbilityNumber(secondary.total + bonus(secondary));
     case 'hot':
       return formatAbilityNumber(secondary.total);
     case 'absorb':
