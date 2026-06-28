@@ -811,6 +811,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   serpent_sting: {
     id: 'serpent_sting', name: 'Serpent Sting', class: 'hunter', learnLevel: 4,
     cost: 15, castTime: 0, cooldown: 0, range: 35, minRange: 8, school: 'nature',
+    scalesWith: 'ranged',
     requiresTarget: true,
     effects: [{ type: 'dot', total: 20, duration: 15, interval: 3 }],
     ranks: [
@@ -822,6 +823,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   arcane_shot: {
     id: 'arcane_shot', name: 'Arcane Shot', class: 'hunter', learnLevel: 6,
     cost: 25, castTime: 0, cooldown: 6, range: 35, minRange: 8, school: 'arcane',
+    scalesWith: 'ranged',
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 13, max: 17 }],
     ranks: [
@@ -869,6 +871,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   aimed_shot: {
     id: 'aimed_shot', name: 'Aimed Shot', class: 'hunter', learnLevel: 16,
     cost: 50, castTime: 3.0, cooldown: 6, range: 35, minRange: 8, school: 'physical',
+    scalesWith: 'ranged',
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 50, max: 62 }],
     description: 'A carefully aimed shot that deals $d damage.',

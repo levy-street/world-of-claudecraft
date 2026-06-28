@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 389,
-      "state": "ddc82b87",
+      "state": "5ac37cc7",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -77,6 +77,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 20,
             "armor": 110,
@@ -98,7 +99,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 398,
-      "state": "66d0b825",
+      "state": "18d98d03",
       "events": "d91147c9",
       "rng": {
         "draws": 4,
@@ -109,7 +110,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 398,
-      "state": "d2d6c6da",
+      "state": "6529aebc",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -120,7 +121,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 398,
-      "state": "dc095094",
+      "state": "b13ecb16",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -131,7 +132,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 398,
-      "state": "4561050b",
+      "state": "df1d30e1",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -142,7 +143,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 398,
-      "state": "25e650c2",
+      "state": "e7568100",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -153,7 +154,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 398,
-      "state": "6d08c589",
+      "state": "0a0ad993",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -164,7 +165,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 398,
-      "state": "806f6e24",
+      "state": "ffe158c6",
       "events": "1155f484",
       "rng": {
         "draws": 6,
@@ -175,7 +176,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 398,
-      "state": "22e366e4",
+      "state": "39ca119e",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -186,7 +187,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 398,
-      "state": "22e366e4",
+      "state": "39ca119e",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -248,6 +249,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 26,
             "armor": 194,
@@ -349,7 +351,7 @@
       "tick": 41,
       "time": 2.05,
       "nextId": 398,
-      "state": "ce4db225",
+      "state": "5d519d4f",
       "events": "f775654f",
       "rng": {
         "draws": 8,
@@ -413,6 +415,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 26,
             "armor": 194,
@@ -526,7 +529,7 @@
       "tick": 45,
       "time": 2.25,
       "nextId": 398,
-      "state": "6aeaf1a3",
+      "state": "2817418d",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -537,7 +540,7 @@
       "tick": 49,
       "time": 2.45,
       "nextId": 398,
-      "state": "6b8dac44",
+      "state": "4b7fb44e",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -600,6 +603,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 26,
             "armor": 194,
@@ -660,7 +664,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 398,
-      "state": "28faee79",
+      "state": "517336b9",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -671,7 +675,7 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 398,
-      "state": "23d13f84",
+      "state": "6bb12934",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -734,6 +738,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 26,
             "armor": 194,
@@ -795,7 +800,7 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 398,
-      "state": "23d13f84",
+      "state": "6bb12934",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -858,6 +863,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 26,
             "armor": 194,

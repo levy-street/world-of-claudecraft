@@ -19,6 +19,11 @@ import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
+import {
+  abilityScalingPower,
+  directHitBonus,
+  dotTickBonus,
+} from '../spell_scaling';
 import { addThreat } from '../threat';
 import type { AbilityDef, Entity } from '../types';
 import { armorReduction, meleeMissChance } from '../types';
@@ -70,6 +75,10 @@ export function runEffects(
         if (!target) break;
         const critChance = isSpell ? ctx.spellCrit(p) : p.critChance;
         let dmg = ctx.rng.range(eff.min, eff.max);
+        // Spell Power (or Ranged AP for hunter attack-spells) adds to the base
+        // before crit/armor, mirroring the melee attack-power path.
+        if (isSpell || ability.scalesWith === 'ranged')
+          dmg += directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
         const crit = ctx.rng.chance(critChance);
         if (crit) dmg *= isSpell ? 1.5 : 2;
         if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
@@ -212,7 +221,8 @@ export function runEffects(
         const seal = p.auras[sealIdx];
         p.auras.splice(sealIdx, 1);
         ctx.emit({ type: 'aura', targetId: p.id, name: seal.name, gained: false });
-        let dmg = ctx.rng.range(seal.value2 ?? 10, seal.value3 ?? 15);
+        // Judgement is an instant holy nuke; scale it with Spell Power too.
+        let dmg = ctx.rng.range(seal.value2 ?? 10, seal.value3 ?? 15) + directHitBonus(p.spellPower, ability, res.castTime);
         const crit = ctx.rng.chance(ctx.spellCrit(p));
         if (crit) dmg *= 1.5;
         ctx.dealDamage(p, target, Math.round(dmg), crit, 'holy', ability.name, 'hit');
@@ -255,13 +265,27 @@ export function runEffects(
       }
       case 'dot': {
         if (!target || target.dead) break;
+        // Snapshot Spell Power (or Ranged AP) into the per-tick value at cast time,
+        // vanilla-style: the total DoT coefficient spread across its ticks. A DoT
+        // that RIDES a direct/AoE nuke (Fireball, Pyroblast, Immolate) does NOT also
+        // scale here: the direct component already took the cast-time coefficient, so
+        // scaling the rider too would double-dip and over-reward hybrids. Only pure
+        // DoTs (Corruption, SW:P, Serpent Sting) scale through this path.
+        const hybrid = res.effects.some(
+          (e) => e.type === 'directDamage' || e.type === 'aoeDamage' || e.type === 'aoeRoot',
+        );
+        const dotBase = Math.max(1, Math.round(eff.total / (eff.duration / eff.interval)));
+        const dotSp =
+          !hybrid && (isSpell || ability.scalesWith === 'ranged')
+            ? dotTickBonus(abilityScalingPower(p, ability), ability, eff.duration, eff.interval)
+            : 0;
         ctx.applyAura(target, {
           id: ability.id,
           name: ability.name,
           kind: 'dot',
           remaining: eff.duration,
           duration: eff.duration,
-          value: Math.max(1, Math.round(eff.total / (eff.duration / eff.interval))),
+          value: dotBase + dotSp,
           tickInterval: eff.interval,
           tickTimer: eff.interval,
           sourceId: p.id,
@@ -368,9 +392,13 @@ export function runEffects(
           school: ability.school,
           fx: 'nova',
         });
+        const aoeSpBonus =
+          isSpell || ability.scalesWith === 'ranged'
+            ? directHitBonus(abilityScalingPower(p, ability), ability, res.castTime, true)
+            : 0;
         for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
           if (!ctx.hasLineOfSight(p, m)) continue;
-          let dmg = ctx.rng.range(eff.min, eff.max);
+          let dmg = ctx.rng.range(eff.min, eff.max) + aoeSpBonus;
           // Armor only mitigates physical damage, mirroring the single-target
           // path above — spell-school AoE (Arcane Explosion, Consecration) is
           // not reduced by the target's armor.
@@ -401,6 +429,8 @@ export function runEffects(
           tickTimer: eff.interval,
           school: ability.school,
           ability: ability.name,
+          // Each pulse is a spell hit; scale per tick like an AoE nuke.
+          spBonus: isSpell ? directHitBonus(abilityScalingPower(p, ability), ability, res.castTime, true) : 0,
         };
         ctx.emit({
           type: 'spellfx',
@@ -457,9 +487,10 @@ export function runEffects(
           school: ability.school,
           fx: 'nova',
         });
+        const aoeRootSp = isSpell ? directHitBonus(abilityScalingPower(p, ability), ability, res.castTime, true) : 0;
         for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
           if (!ctx.hasLineOfSight(p, m)) continue;
-          const dmg = ctx.rng.range(eff.min, eff.max);
+          const dmg = ctx.rng.range(eff.min, eff.max) + aoeRootSp;
           ctx.dealDamage(p, m, Math.round(dmg), false, ability.school, ability.name, 'hit');
           if (!m.dead && ctx.isHostileTo(p, m)) {
             ctx.applyRootAura(

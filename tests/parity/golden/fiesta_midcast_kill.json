@@ -31,7 +31,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 392,
-      "state": "e70abb30",
+      "state": "b783338b",
       "events": "202c7453",
       "rng": {
         "draws": 0,
@@ -42,7 +42,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 392,
-      "state": "8691ba5a",
+      "state": "9e614cdd",
       "events": "e0d70531",
       "rng": {
         "draws": 28,
@@ -53,7 +53,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 392,
-      "state": "b073b0e0",
+      "state": "45cef20f",
       "events": "33931ddd",
       "rng": {
         "draws": 138,
@@ -64,7 +64,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 392,
-      "state": "4fdee7a2",
+      "state": "41d0b9d5",
       "events": "441cd0f5",
       "rng": {
         "draws": 294,
@@ -75,7 +75,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 392,
-      "state": "0c707f1d",
+      "state": "a6a5ab2a",
       "events": "eedb703c",
       "rng": {
         "draws": 300,
@@ -251,6 +251,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 39,
             "armor": 421,
@@ -296,6 +297,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 47,
           "stats": {
             "agi": 12,
             "armor": 133,
@@ -345,6 +347,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 6,
           "stats": {
             "agi": 89,
             "armor": 384,
@@ -393,6 +396,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 16,
           "stats": {
             "agi": 82,
             "armor": 375,
@@ -414,7 +418,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 392,
-      "state": "80525555",
+      "state": "09a70750",
       "events": "7c7e1845",
       "rng": {
         "draws": 300,
@@ -590,6 +594,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 39,
             "armor": 421,
@@ -635,6 +640,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 47,
           "stats": {
             "agi": 12,
             "armor": 133,
@@ -682,6 +688,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 6,
           "stats": {
             "agi": 89,
             "armor": 384,
@@ -730,6 +737,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 16,
           "stats": {
             "agi": 82,
             "armor": 375,
@@ -751,7 +759,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 392,
-      "state": "8a10f0cb",
+      "state": "da30f158",
       "events": "476db89a",
       "rng": {
         "draws": 300,
@@ -929,6 +937,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 39,
             "armor": 421,
@@ -974,6 +983,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 47,
           "stats": {
             "agi": 12,
             "armor": 133,
@@ -1021,6 +1031,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 6,
           "stats": {
             "agi": 89,
             "armor": 384,
@@ -1069,6 +1080,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 16,
           "stats": {
             "agi": 82,
             "armor": 375,
@@ -1090,7 +1102,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 392,
-      "state": "e3bedb23",
+      "state": "e6dee40c",
       "events": "741638a5",
       "rng": {
         "draws": 429,
@@ -1101,7 +1113,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 392,
-      "state": "812ffebf",
+      "state": "1e8865d0",
       "events": "741638a5",
       "rng": {
         "draws": 524,
@@ -1280,6 +1292,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 39,
             "armor": 421,
@@ -1325,6 +1338,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 47,
           "stats": {
             "agi": 12,
             "armor": 133,
@@ -1373,6 +1387,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 6,
           "stats": {
             "agi": 89,
             "armor": 384,
@@ -1421,6 +1436,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 16,
           "stats": {
             "agi": 82,
             "armor": 375,
