@@ -13,6 +13,10 @@ describe('sim rates', () => {
       xp: 1,
       dropMoney: 1,
     });
+    expect(normalizeSimRates({ xp: 0.5, dropMoney: 0 })).toEqual({
+      xp: 1,
+      dropMoney: 1,
+    });
   });
 
   it('rounds scaled awards and never returns negative amounts', () => {
@@ -27,6 +31,10 @@ describe('sim rates', () => {
       dropMoney: 3,
     });
     expect(simRatesFromEnv({ RATE_XP: 'nope', RATE_DROP_MONEY: '' })).toEqual({
+      xp: 1,
+      dropMoney: 1,
+    });
+    expect(simRatesFromEnv({ RATE_XP: '0.5', RATE_DROP_MONEY: '0' })).toEqual({
       xp: 1,
       dropMoney: 1,
     });
@@ -61,16 +69,16 @@ describe('sim rates', () => {
     expect(meta.lifetimeXp).toBe(500);
   });
 
-  it('does not consume rested XP when the XP rate suppresses the award', () => {
+  it('defaults sub-1 XP rates instead of suppressing the award', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', rates: { xp: 0 } });
     const meta = sim.meta(sim.playerId)!;
     meta.restedXp = 50;
 
     sim.grantXp(50, meta, { fromKill: true });
 
-    expect(meta.xp).toBe(0);
-    expect(meta.lifetimeXp).toBe(0);
-    expect(meta.restedXp).toBe(50);
+    expect(meta.xp).toBe(100);
+    expect(meta.lifetimeXp).toBe(100);
+    expect(meta.restedXp).toBe(0);
   });
 
   it('scales copper drops without changing the deterministic roll', () => {
@@ -93,7 +101,7 @@ describe('sim rates', () => {
     const base = rolledCopper(1);
     expect(base).toBeGreaterThan(0);
     expect(rolledCopper(3)).toBe(base * 3);
-    expect(rolledCopper(0)).toBe(0);
+    expect(rolledCopper(0)).toBe(base);
   });
 
   it('keeps rate-scaled rolls deterministic for the same seed', () => {

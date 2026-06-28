@@ -8,8 +8,8 @@ export const DEFAULT_SIM_RATES: SimRates = {
   dropMoney: 1,
 };
 
-export function normalizeRate(value: number | undefined, fallback = 1): number {
-  return typeof value === 'number' && Number.isFinite(value) && value >= 0 ? value : fallback;
+export function normalizeRate(value: number | undefined, fallback = 1, min = fallback): number {
+  return typeof value === 'number' && Number.isFinite(value) && value >= min ? value : fallback;
 }
 
 export function normalizeSimRates(rates?: Partial<SimRates>): SimRates {
