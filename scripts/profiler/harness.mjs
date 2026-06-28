@@ -451,6 +451,104 @@ export class Profiler {
     }
   }
 
+  async _pos() {
+    return this.page.evaluate(() => {
+      const g = window.__game;
+      const p = g.world.player ?? g.sim.player;
+      let zone = null;
+      try {
+        zone = (g.world && g.world.zoneName) || (g.sim && g.sim.currentZoneId) || null;
+      } catch {
+        /* ignore */
+      }
+      return { x: p.pos.x, z: p.pos.z, zone };
+    });
+  }
+  async _face(f) {
+    await this.page.evaluate((f) => {
+      const p = window.__game.world.player ?? window.__game.sim.player;
+      p.facing = f;
+      window.__game.input.camYaw = f;
+    }, f);
+  }
+
+  // Continuous on-foot traversal of the world (no teleports): walk forward for
+  // `ms`, keeping the collector running the WHOLE time, steering when a collider
+  // stalls progress, and logging every hitch WITH the world position + cause as it
+  // happens. This is the realistic streaming/zone-crossing test a teleport skips.
+  async walk({ ms = 70000, label = 'walk', heading = 0 } = {}) {
+    await this.page.evaluate((l) => {
+      window.__prof.label = l;
+      window.__game.perf.reset();
+      window.__prof.start();
+    }, label);
+    await this._face(heading);
+    await this.setMove({ forward: true });
+    const t0 = performance.now();
+    let facing = heading;
+    let last = await this._pos();
+    let consumed = 0;
+    const events = [];
+    const trail = [];
+    while (performance.now() - t0 < ms) {
+      await sleep(2500);
+      const pos = await this._pos();
+      const moved = Math.hypot(pos.x - last.x, pos.z - last.z);
+      trail.push({
+        x: Math.round(pos.x),
+        z: Math.round(pos.z),
+        moved: Math.round(moved),
+        zone: pos.zone,
+      });
+      if (moved < 2.5) {
+        facing += 1.13; // stuck against terrain/water -> rotate to find open ground
+        await this._face(facing);
+      }
+      last = pos;
+      // drain new collector samples since last check, attribute, log hitches with position
+      const slice = await this.page.evaluate((from) => window.__prof.samples.slice(from), consumed);
+      consumed += slice.length;
+      const fz = attributeFreezes(slice, 8, 50);
+      for (const w of fz.worst) {
+        const e = {
+          ms: w.ms,
+          cause: w.cause,
+          x: Math.round(pos.x),
+          z: Math.round(pos.z),
+          zone: pos.zone,
+        };
+        events.push(e);
+        this.log(
+          `  FREEZE ${String(w.ms).padStart(6)}ms  ${w.cause.padEnd(13)} @ (${e.x}, ${e.z})${pos.zone ? ` ${pos.zone}` : ''}`,
+        );
+      }
+    }
+    await this.stopMove();
+    const raw = await this.page.evaluate(() => ({
+      ...window.__prof.stop(),
+      report: window.__game.perf.report(),
+      entities: window.__game.world.entities.size,
+    }));
+    const norm = normalizeReport(raw.report);
+    norm.entities = raw.entities;
+    let dist = 0;
+    for (let i = 1; i < trail.length; i++) {
+      dist += Math.hypot(trail[i].x - trail[i - 1].x, trail[i].z - trail[i - 1].z);
+    }
+    return {
+      label,
+      mode: this.mode,
+      ...norm,
+      scene: raw.scene ?? null,
+      newPrograms: raw.newPrograms ?? [],
+      frame: frameStats(raw.frames, this.targetFps),
+      freezes: attributeFreezes(raw.samples),
+      trail,
+      events,
+      distance: Math.round(dist),
+    };
+  }
+
   async setTier(tier) {
     await this.page.evaluate(COLLECTOR); /* re-enter via reload */
     this.pendingTier = tier;

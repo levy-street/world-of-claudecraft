@@ -129,6 +129,13 @@ async function scenarioCrowd(p) {
   return out;
 }
 
+// Walk continuously across the world on foot (no teleports), crossing zones, and
+// collect every freeze with its position + cause as it happens.
+async function scenarioWalk(p) {
+  await p.enter({ mode: TIER && args.mode === 'online' ? 'online' : 'offline', tier: TIER });
+  return [await p.walk({ ms: Number(args.ms ?? 70000), heading: Number(args.heading ?? 0) })];
+}
+
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const SCENARIOS = {
   fps: scenarioFps,
@@ -137,7 +144,32 @@ const SCENARIOS = {
   freeze: scenarioFreeze,
   tiers: scenarioTiers,
   crowd: scenarioCrowd,
+  walk: scenarioWalk,
 };
+
+function printWalk(s) {
+  const ev = s.events ?? [];
+  const fz = s.freezes ?? {};
+  console.log(`\n  walked ~${s.distance} units over ${s.trail?.length ?? 0} checkpoints`);
+  console.log(
+    `  total hitches (>=50ms): ${fz.hitchCount ?? 0}  worst ${fz.worstMs ?? 0}ms  by cause: ${JSON.stringify(fz.byCause ?? {})}`,
+  );
+  if (ev.length) {
+    console.log('  freezes as they happened (ms / cause / where):');
+    for (const e of ev)
+      console.log(
+        `    ${String(e.ms).padStart(6)}ms  ${e.cause.padEnd(13)} @ (${e.x}, ${e.z})${e.zone ? ` ${e.zone}` : ''}`,
+      );
+  } else {
+    console.log('  no >=50ms freezes recorded during the walk');
+  }
+  const np = s.newPrograms ?? [];
+  if (np.length) {
+    console.log(`  NEW SHADERS that linked mid-walk (${np.length}):`);
+    for (const k of np) console.log(`    - ${String(k).replace(/\s+/g, ' ').slice(0, 160)}`);
+  }
+  console.log(`  trail: ${(s.trail ?? []).map((t) => `(${t.x},${t.z})`).join(' -> ')}`);
+}
 
 function fmtRow(s) {
   const f = s.frame ?? {};
@@ -194,6 +226,7 @@ async function main() {
 
   console.log('\n========== RESULTS ==========');
   for (const s of results) console.log(fmtRow(s));
+  if (scenario === 'walk') for (const s of results) printWalk(s);
 
   const payload = {
     scenario,
