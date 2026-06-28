@@ -31,6 +31,7 @@ import {
   type WallStub,
 } from '../sim/dungeon_layout';
 import { loadGltf, releaseGltf } from './assets/loader';
+import { registerPreload } from './assets/preload';
 import { sharedUniforms } from './gfx';
 import { radialGlowTexture } from './textures';
 
