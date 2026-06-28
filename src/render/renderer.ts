@@ -109,6 +109,10 @@ const VIEW_PREWARM_MAX_MS = 12000;
 // stalls the parallel-compile queue; keep it modest, since a long hold here is
 // itself worse than the freeze it prevents.
 const PREWARM_COMPILE_MAX_MS = 10000;
+// Safety ceiling for the per-view async-compile gate: if KHR_parallel_shader_compile
+// somehow never reports a program ready, show the view anyway (degrading to the old
+// synchronous first-use compile) rather than stranding an entity invisible.
+const VIEW_COMPILE_GATE_MAX_MS = 1500;
 // Reserve at the tail of the view-build budget so the compile + final-frame
 // steps always start before the prewarm deadline (runEntry skips late entries).
 const PREWARM_BUILD_RESERVE_MS = 3000;
@@ -485,6 +489,8 @@ export interface EntityView {
   objectCasters: THREE.Object3D[]; // object-view shadow meshes, distance-gated
   shadowOn: boolean;
   isFar: boolean;
+  // hidden until its shader programs finish linking off-thread (async-compile gate)
+  compilePending: boolean;
   lastOverheadEmoteKey: string | null;
   // render-space position last frame, for true u/s locomotion speed
   lastX: number;
@@ -781,6 +787,9 @@ export class Renderer {
   private frameIdx = 0;
   // Visible non-self character rigs last frame, feeding the crowd-adaptive LOD.
   private lastVisibleRigCount = 0;
+  // KHR_parallel_shader_compile present: lets us link new programs off-thread and
+  // gate a freshly-streamed view's draw on readiness instead of stalling the frame.
+  private asyncCompileSupported = false;
   vfx: Vfx;
   private weather: Weather;
   private weatherOn = true;
@@ -892,6 +901,16 @@ export class Renderer {
     this.webgl.shadowMap.type = THREE.PCFSoftShadowMap;
     this.webgl.toneMapping = THREE.ACESFilmicToneMapping; // OutputPass reads this on the composer path
     this.webgl.toneMappingExposure = this.baseExposure;
+    // Only worth gating view draws on compileAsync when programs can link OFF the
+    // main thread; without the extension compileAsync compiles synchronously, so
+    // gating would just delay the same stall. Detected once here.
+    try {
+      this.asyncCompileSupported =
+        typeof this.webgl.compileAsync === 'function' &&
+        this.webgl.getContext().getExtension('KHR_parallel_shader_compile') !== null;
+    } catch {
+      this.asyncCompileSupported = false;
+    }
     this.camera = new THREE.PerspectiveCamera(
       CAMERA_BASE_FOV,
       this.viewport.width / this.viewport.height,
@@ -3076,6 +3095,7 @@ export class Renderer {
       objectCasters,
       shadowOn: true,
       isFar: false,
+      compilePending: false,
       lastOverheadEmoteKey: null,
       lastX: e.pos.x,
       lastZ: e.pos.z,
@@ -3087,6 +3107,34 @@ export class Renderer {
       wasAirborne: false,
       wasSwimming: false,
     });
+    const view = this.views.get(e.id);
+    if (view) this.gateViewOnCompile(view, group);
+  }
+
+  // Generic anti-freeze layer. A freshly-streamed view links its shader programs
+  // SYNCHRONOUSLY on first draw - a 50-1700ms frame stall (the open-world travel
+  // hitch). Instead link them OFF the main thread (KHR_parallel_shader_compile via
+  // compileAsync) against the live scene's exact lights + environment, and keep the
+  // view hidden until ready: it pops in a frame or two late rather than freezing.
+  // Unlike the boot prewarm this enumerates NOTHING, so new content and render-state
+  // variants the prewarm cannot anticipate (e.g. the env-map-lit material that links
+  // only when you walk into a biome) never hitch in-world. The prewarm stays a pure
+  // optimization: already-compiled spawn content resolves instantly, no pop-in.
+  private gateViewOnCompile(view: EntityView, group: THREE.Group): void {
+    if (!this.asyncCompileSupported) return;
+    view.compilePending = true;
+    group.visible = false;
+    let settled = false;
+    const clear = (): void => {
+      if (settled) return;
+      settled = true;
+      view.compilePending = false;
+    };
+    const guard = setTimeout(clear, VIEW_COMPILE_GATE_MAX_MS);
+    this.webgl
+      .compileAsync(group, this.camera, this.scene)
+      .then(clear, clear)
+      .finally(() => clearTimeout(guard));
   }
 
   /** The visual the player currently sees (form swaps hide the base rig). */
@@ -3601,7 +3649,9 @@ export class Renderer {
           v.group.visible = false;
           continue;
         }
-        v.group.visible = true; // the object branch below may re-hide loot
+        // hidden until its shaders finish linking off-thread (async-compile gate);
+        // the object branch below may still re-hide loot
+        v.group.visible = !v.compilePending;
         // mid-distance rigs keep rendering but leave the shadow pass
         const wantShadow = d2 < shadowRangeSq;
         const inProxyBand = d2 < ENTITY_PROXY_SHADOW_RANGE_SQ;
