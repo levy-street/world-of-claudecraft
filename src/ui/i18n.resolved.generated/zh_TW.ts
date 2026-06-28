@@ -3351,7 +3351,7 @@ export const zh_TW: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "秘法飛彈",
-        "description": "向敵人發射秘法飛彈，持續 3 秒，每秒造成 8 點秘法傷害。"
+        "description": "向敵人發射秘法飛彈，持續 3 秒，每秒造成 {damage} 點秘法傷害。"
       },
       "polymorph": {
         "name": "變形術",
@@ -3599,7 +3599,7 @@ export const zh_TW: EnTranslations = {
       },
       "mind_flay": {
         "name": "精神鞭笞",
-        "description": "用暗影能量攻擊目標的心靈，持續 3 秒，每秒造成 12 點傷害。"
+        "description": "用暗影能量攻擊目標的心靈，持續 3 秒，每秒造成 {damage} 點傷害。"
       },
       "flash_heal": {
         "name": "快速治療",
@@ -3675,7 +3675,7 @@ export const zh_TW: EnTranslations = {
       },
       "drain_life": {
         "name": "吸取生命",
-        "description": "吸取目標的生命，持續 5 秒，每秒向你轉移 7 點生命值。"
+        "description": "吸取目標的生命，持續 5 秒，每秒向你轉移 {damage} 點生命值。"
       },
       "fear": {
         "name": "恐懼",

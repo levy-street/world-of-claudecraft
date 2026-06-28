@@ -433,7 +433,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 14, cost: 75, effects: [{ type: 'directDamage', min: 14, max: 14 }] },
       { rank: 3, level: 20, cost: 105, effects: [{ type: 'directDamage', min: 22, max: 22 }] },
     ],
-    description: 'Launches Arcane Missiles at the enemy, causing 8 Arcane damage each second for 3 sec.',
+    description: 'Launches Arcane Missiles at the enemy, causing $d Arcane damage each second for 3 sec.',
   },
   polymorph: {
     id: 'polymorph', name: 'Polymorph', class: 'mage', learnLevel: 8,
@@ -976,7 +976,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 45, castTime: 0, channel: { duration: 3, ticks: 3 }, cooldown: 0, range: 20, school: 'shadow',
     requiresTarget: true,
     effects: [{ type: 'drainTick', min: 12, max: 12, healFrac: 0 }],
-    description: 'Assaults the target\'s mind with Shadow energy, causing 12 damage each second for 3 sec.',
+    description: 'Assaults the target\'s mind with Shadow energy, causing $d Shadow damage each second for 3 sec.',
   },
   flash_heal: {
     id: 'flash_heal', name: 'Flash Heal', class: 'priest', learnLevel: 20,
@@ -1177,7 +1177,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 14, cost: 50, effects: [{ type: 'drainTick', min: 12, max: 12, healFrac: 1 }] },
       { rank: 3, level: 20, cost: 70, effects: [{ type: 'drainTick', min: 17, max: 17, healFrac: 1 }] },
     ],
-    description: 'Drains the target\'s life, transferring 7 health to you each second for 5 sec.',
+    description: 'Drains the target\'s life, transferring $d health to you each second for 5 sec.',
   },
   fear: {
     id: 'fear', name: 'Fear', class: 'warlock', learnLevel: 14,
