@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import {
   expectedStatBudget,
+  itemFromRaid,
   itemLevel,
   itemScore,
   itemSourceLevel,
@@ -9,6 +10,7 @@ import {
   PRIMARY_STATS,
   primaryStatBudget,
   primaryStatSum,
+  RAID_ILVL_BONUS,
   resetItemLevelCache,
 } from '../src/sim/item_level';
 
@@ -143,6 +145,67 @@ describe('itemScore', () => {
     // A weapon adds dps weight, so it outscores its raw stat bonus alone.
     const blade = ITEMS.gravecaller_blade;
     expect(itemScore(blade)).toBeGreaterThan(primaryStatSum(blade));
+  });
+});
+
+describe('item level: raid tier', () => {
+  it('flags raid (10-player) drops and not dungeon (5-player) drops', () => {
+    // Nythraxis raid loot vs Korzul 5-player dungeon loot, both from level-20 bosses.
+    expect(itemFromRaid('crownforged_dreadhelm')).toBe(true);
+    expect(itemFromRaid('deathless_heartwood')).toBe(true);
+    expect(itemFromRaid('deathlord_warplate')).toBe(false);
+    expect(itemFromRaid('boneplate_vest')).toBe(false);
+  });
+
+  it('raid loot reads a tier above same-level dungeon loot', () => {
+    // Same source level (20) + same quality (epic), but the raid helmet carries the
+    // raid item-level bonus, so it is exactly RAID_ILVL_BONUS above the dungeon helmet.
+    const raidHelm = itemLevel(ITEMS.crownforged_dreadhelm)!;
+    const dungeonHelm = itemLevel(ITEMS.deathlords_dread_visage)!;
+    expect(itemSourceLevel('crownforged_dreadhelm')).toBe(20);
+    expect(itemSourceLevel('deathlords_dread_visage')).toBe(20);
+    expect(raidHelm - dungeonHelm).toBe(RAID_ILVL_BONUS);
+    // ...and therefore a strictly larger stat budget for the same slot.
+    expect(expectedStatBudget(ITEMS.crownforged_dreadhelm)!).toBeGreaterThan(
+      expectedStatBudget(ITEMS.deathlords_dread_visage)!,
+    );
+  });
+});
+
+describe('item level: every level-20 item is balanced to budget', () => {
+  it('all level-20 gear carries exactly its item-level stat budget', () => {
+    const offBudget: string[] = [];
+    let checked = 0;
+    for (const id of Object.keys(ITEMS)) {
+      const item = ITEMS[id];
+      if (!item.slot || itemSourceLevel(id) !== 20) continue;
+      checked++;
+      if (primaryStatSum(item) !== expectedStatBudget(item)) {
+        offBudget.push(`${id}: have ${primaryStatSum(item)}, want ${expectedStatBudget(item)}`);
+      }
+    }
+    expect(checked).toBeGreaterThan(30); // the full endgame set
+    expect(offBudget, offBudget.join('\n')).toEqual([]);
+  });
+
+  it('level-20 items of the same item level + slot share one budget', () => {
+    const groups = new Map<string, Set<number>>();
+    for (const id of Object.keys(ITEMS)) {
+      const item = ITEMS[id];
+      if (!item.slot || itemSourceLevel(id) !== 20) continue;
+      const key = `${itemLevel(item)}:${item.quality}:${item.slot}`;
+      if (!groups.has(key)) groups.set(key, new Set());
+      groups.get(key)!.add(primaryStatSum(item));
+    }
+    // No group may contain two different budgets.
+    const split = [...groups.entries()].filter(([, sums]) => sums.size > 1);
+    expect(split.map(([k]) => k)).toEqual([]);
+  });
+
+  it('the two legendaries are normalized to the same top-tier budget', () => {
+    expect(primaryStatSum(ITEMS.deathless_heartwood)).toBe(
+      primaryStatSum(ITEMS.kingsbane_last_oath),
+    );
   });
 });
 

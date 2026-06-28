@@ -329,7 +329,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     kind: 'armor',
     slot: 'helmet',
     quality: 'rare',
-    stats: { armor: 105, sta: 4, str: 3 },
+    stats: { armor: 105, sta: 6, str: 5 },
     sellValue: 460,
   },
   boundstone_girdle: {
@@ -338,7 +338,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     kind: 'armor',
     slot: 'waist',
     quality: 'rare',
-    stats: { armor: 60, sta: 4, str: 2 },
+    stats: { armor: 60, sta: 6, str: 3 },
     sellValue: 340,
   },
   gravewyrm_mantle: {
@@ -347,7 +347,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     kind: 'armor',
     slot: 'shoulder',
     quality: 'rare',
-    stats: { armor: 82, agi: 4, sta: 2 },
+    stats: { armor: 82, agi: 7, sta: 3 },
     sellValue: 410,
   },
   gravewyrm_gauntlets: {
@@ -356,7 +356,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     kind: 'armor',
     slot: 'gloves',
     quality: 'rare',
-    stats: { armor: 72, str: 3, sta: 2 },
+    stats: { armor: 72, str: 5, sta: 4 },
     sellValue: 390,
   },
   // --- food & drink (vendor) ---

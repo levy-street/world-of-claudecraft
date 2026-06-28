@@ -18,7 +18,7 @@
 //     power while keeping their own stat identity (a warrior plate piece stays
 //     str/sta, a mage cloth piece stays int/spi). itemScore() is the realized
 //     power (stats + armor + weapon dps) for at-a-glance comparison.
-import { MOBS, QUESTS } from './data';
+import { DUNGEONS, MOBS, QUESTS } from './data';
 import type { EquipSlot, ItemDef, Stats } from './types';
 
 // The five primary attributes an item can carry (armor is handled separately: it
@@ -39,17 +39,27 @@ export const QUALITY_ILVL_BONUS: Record<string, number> = {
 };
 
 // Share of a level's stat budget that each quality grants. Whites/greys carry no
-// primary stats (armor only), greens roughly half, blues most, purples/oranges the
-// full ladder, mirroring the existing hand-authored content (uncommon mid pieces
-// ~2-4 pts, class-neutral rares ~5-7 pts; cf. the items.ts budget comment).
+// primary stats (armor only), greens roughly half, blues most, purples the full
+// ladder, mirroring the existing hand-authored content (uncommon mid pieces ~2-4
+// pts, class-neutral rares ~5-7 pts; cf. the items.ts budget comment). Legendaries
+// are a steep jump (the two in the game are flagship BiS artifacts that should dwarf
+// epics), tuned so a capstone legendary weapon lands around its existing power.
 export const QUALITY_STAT_MULT: Record<string, number> = {
   poor: 0,
   common: 0,
   uncommon: 0.55,
   rare: 0.8,
   epic: 1.0,
-  legendary: 1.2,
+  legendary: 1.9,
 };
+
+// Raid loot is one tier above same-level 5-player dungeon loot: a 10-player raid
+// encounter confers this item-level bonus on top of the mob's character level, so
+// the raid set (Nythraxis) reads as a higher item level than the dungeon set
+// (Korzul) even though both bosses are level 20. RAID_MIN_PLAYERS is the
+// suggestedPlayers threshold that marks a dungeon as a raid.
+export const RAID_ILVL_BONUS = 3;
+export const RAID_MIN_PLAYERS = 10;
 
 // Slot weight for the stat budget: chest and main-hand carry the most, the smaller
 // slots less. Matches the slot weighting already described for armor in items.ts
@@ -73,23 +83,55 @@ export const STAT_PER_ILVL = 0.7;
 export const ARMOR_PER_POINT = 12;
 export const WEAPON_DPS_WEIGHT = 0.5;
 
-// itemId -> the level the item drops at: the top of the dropping mob's band, or the
-// hardest boss a quest-reward is gated behind. Built once, lazily, from the static
-// tables (so data.ts is fully initialized first) and memoized. Deterministic: pure
-// function of the content tables, no rng, no clock.
-let sourceIndex: Map<string, number> | null = null;
+// mobId -> the largest suggestedPlayers of any dungeon the mob spawns in (a raid
+// boss therefore reports its raid size). Lets a drop know it came from a raid
+// without a per-mob flag. Built lazily + memoized, pure over the static tables.
+let encounterIndex: Map<string, number> | null = null;
 
-function buildSourceIndex(): Map<string, number> {
+function encounterIndexOf(): Map<string, number> {
+  if (encounterIndex) return encounterIndex;
   const idx = new Map<string, number>();
-  const bump = (itemId: string | undefined, level: number | undefined): void => {
+  for (const def of Object.values(DUNGEONS)) {
+    for (const spawn of def.spawns) {
+      const prev = idx.get(spawn.mobId);
+      if (prev === undefined || def.suggestedPlayers > prev)
+        idx.set(spawn.mobId, def.suggestedPlayers);
+    }
+  }
+  encounterIndex = idx;
+  return idx;
+}
+
+function isRaidMob(mobId: string): boolean {
+  return (encounterIndexOf().get(mobId) ?? 0) >= RAID_MIN_PLAYERS;
+}
+
+// itemId -> { level, raid }: the level the item drops at (top of the dropping mob's
+// band, or the hardest boss a quest-reward is gated behind) and whether its best
+// source is a raid encounter. Built once, lazily, from the static tables (so data.ts
+// is fully initialized first) and memoized. Deterministic: pure function of the
+// content tables, no rng, no clock.
+interface ItemSource {
+  level: number;
+  raid: boolean;
+}
+let sourceIndex: Map<string, ItemSource> | null = null;
+
+function buildSourceIndex(): Map<string, ItemSource> {
+  const idx = new Map<string, ItemSource>();
+  const bump = (itemId: string | undefined, level: number | undefined, raid: boolean): void => {
     if (!itemId || level === undefined) return;
     const prev = idx.get(itemId);
-    if (prev === undefined || level > prev) idx.set(itemId, level);
+    // Highest level wins; the raid flag is OR'd so a raid source always counts.
+    if (prev === undefined || level > prev.level)
+      idx.set(itemId, { level, raid: raid || (prev?.raid ?? false) });
+    else if (raid && !prev.raid) idx.set(itemId, { ...prev, raid: true });
   };
   // Mob loot: an item is "current" at the top of the dropping mob's level band.
   for (const mob of Object.values(MOBS)) {
     if (!mob.loot) continue;
-    for (const entry of mob.loot) bump(entry.itemId, mob.maxLevel);
+    const raid = isRaidMob(mob.id);
+    for (const entry of mob.loot) bump(entry.itemId, mob.maxLevel, raid);
   }
   // Quest rewards: gated behind the quest's hardest kill objective (the boss you
   // had to beat for it), falling back to the quest's own minLevel.
@@ -98,12 +140,12 @@ function buildSourceIndex(): Map<string, number> {
       .map((o) => (o.type === 'kill' && o.targetMobId ? MOBS[o.targetMobId]?.maxLevel : undefined))
       .filter((n): n is number => typeof n === 'number');
     const level = killLevels.length ? Math.max(...killLevels) : quest.minLevel;
-    for (const itemId of Object.values(quest.itemRewards)) bump(itemId, level);
+    for (const itemId of Object.values(quest.itemRewards)) bump(itemId, level, false);
   }
   return idx;
 }
 
-function sourceIndexOf(): Map<string, number> {
+function sourceIndexOf(): Map<string, ItemSource> {
   if (!sourceIndex) sourceIndex = buildSourceIndex();
   return sourceIndex;
 }
@@ -111,16 +153,24 @@ function sourceIndexOf(): Map<string, number> {
 // The level of the content an item drops from, or undefined for items with no
 // drop/quest source (vendor stock, starter gear, junk, conjured/quest items).
 export function itemSourceLevel(itemId: string): number | undefined {
-  return sourceIndexOf().get(itemId);
+  return sourceIndexOf().get(itemId)?.level;
+}
+
+// Whether an item's best source is a 10-player raid encounter (drives the raid
+// item-level bonus). False for dungeon/world drops and quest rewards.
+export function itemFromRaid(itemId: string): boolean {
+  return sourceIndexOf().get(itemId)?.raid ?? false;
 }
 
 // The item level (tier number) shown in the tooltip, or undefined when there is no
-// derivable source (so the UI simply omits the line for sourceless items).
+// derivable source (so the UI simply omits the line for sourceless items). Adds the
+// raid bonus so raid loot reads a tier above same-level dungeon loot.
 export function itemLevel(item: ItemDef): number | undefined {
-  const src = itemSourceLevel(item.id);
+  const src = sourceIndexOf().get(item.id);
   if (src === undefined) return undefined;
   const bonus = QUALITY_ILVL_BONUS[item.quality ?? 'common'] ?? 0;
-  return Math.max(1, src + bonus);
+  const raid = src.raid ? RAID_ILVL_BONUS : 0;
+  return Math.max(1, src.level + bonus + raid);
 }
 
 // The total primary-stat points an item of this level + quality + slot should grant.
@@ -193,4 +243,5 @@ export function normalizePrimaryStats(stats: Partial<Stats>, budget: number): Pa
 // rebuild it. Not used by the running game.
 export function resetItemLevelCache(): void {
   sourceIndex = null;
+  encounterIndex = null;
 }
