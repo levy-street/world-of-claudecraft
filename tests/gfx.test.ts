@@ -1,10 +1,17 @@
-import { describe, expect, it } from 'vitest';
 import * as THREE from 'three';
+import { describe, expect, it } from 'vitest';
 import {
   configureMaskedDoubleSidedVegetationMaterial,
-  forcedTierFromSearch, graphicsPresetLabel, isConstrainedBrowser, isWeakIntegratedGpu,
-  shouldUseAutoGovernor, tierFromHints, GFX_BUDGETS, type GfxRuntimeHints,
-  GFX_BUCKET_BANDS, gfxInternalsForTest,
+  forcedTierFromSearch,
+  GFX_BUCKET_BANDS,
+  GFX_BUDGETS,
+  type GfxRuntimeHints,
+  gfxInternalsForTest,
+  graphicsPresetLabel,
+  isConstrainedBrowser,
+  isWeakIntegratedGpu,
+  shouldUseAutoGovernor,
+  tierFromHints,
 } from '../src/render/gfx';
 
 const desktop: GfxRuntimeHints = {
@@ -15,10 +22,13 @@ const desktop: GfxRuntimeHints = {
 };
 
 describe('graphics tier resolution', () => {
-  it('resolves initial renderer startup with no persisted preset to ultra graphics', () => {
+  it('defaults a player with no persisted preset to Auto detection, not ultra', () => {
     expect(desktop.graphicsPreset).toBeUndefined();
-    expect(graphicsPresetLabel(desktop.graphicsPreset)).toBe('ultra');
-    expect(tierFromHints(desktop, false)).toBe('ultra');
+    expect(graphicsPresetLabel(desktop.graphicsPreset)).toBe('auto');
+    // Unknown GPU string resolves to the safe middle; the governor adapts from there.
+    expect(tierFromHints(desktop, false)).toBe('medium');
+    // Software GL forces low even under Auto.
+    expect(tierFromHints(desktop, true)).toBe('low');
   });
 
   it('honors explicit URL tier overrides', () => {
@@ -32,18 +42,28 @@ describe('graphics tier resolution', () => {
 
   it('treats phone-class and low-memory browsers as constrained', () => {
     expect(isConstrainedBrowser({ ...desktop, maxTouchPoints: 1, coarsePointer: true })).toBe(true);
-    expect(isConstrainedBrowser({ ...desktop, maxTouchPoints: 1, narrowViewport: true })).toBe(true);
+    expect(isConstrainedBrowser({ ...desktop, maxTouchPoints: 1, narrowViewport: true })).toBe(
+      true,
+    );
     expect(isConstrainedBrowser({ ...desktop, deviceMemory: 4 })).toBe(true);
     expect(isConstrainedBrowser({ ...desktop, maxTouchPoints: 1 })).toBe(false);
     expect(isConstrainedBrowser(desktop)).toBe(false);
   });
 
-  it('defaults missing presets to ultra while preserving legacy low and forced high', () => {
-    expect(tierFromHints(desktop, false)).toBe('ultra');
-    expect(tierFromHints({ ...desktop, graphicsPreset: 0 }, false)).toBe('low');
-    expect(tierFromHints(desktop, true)).toBe('ultra');
-    expect(tierFromHints({ ...desktop, maxTouchPoints: 1, coarsePointer: true }, false)).toBe('ultra');
-    expect(tierFromHints({ ...desktop, search: '?gfx=high', maxTouchPoints: 1, coarsePointer: true }, false)).toBe('high');
+  it('auto-detects under the default/Auto preset while forced tiers always win', () => {
+    // preset 0 (Auto) auto-detects; unknown desktop GPU -> medium.
+    expect(tierFromHints({ ...desktop, graphicsPreset: 0 }, false)).toBe('medium');
+    // A phone-class pointer forces low under Auto.
+    expect(tierFromHints({ ...desktop, maxTouchPoints: 1, coarsePointer: true }, false)).toBe(
+      'low',
+    );
+    // A URL-forced tier overrides Auto, even on a phone-class device or software GL.
+    expect(
+      tierFromHints(
+        { ...desktop, search: '?gfx=high', maxTouchPoints: 1, coarsePointer: true },
+        false,
+      ),
+    ).toBe('high');
     expect(tierFromHints({ ...desktop, search: '?gfx=ultra' }, true)).toBe('ultra');
   });
 
@@ -57,15 +77,16 @@ describe('graphics tier resolution', () => {
   });
 
   it('labels presets and runs the budget governor unless Ultra or URL-forced', () => {
-    expect(graphicsPresetLabel(undefined)).toBe('ultra');
-    expect(graphicsPresetLabel(0)).toBe('low');
+    expect(graphicsPresetLabel(undefined)).toBe('auto');
+    expect(graphicsPresetLabel(0)).toBe('auto');
     expect(graphicsPresetLabel(1)).toBe('low');
     expect(graphicsPresetLabel(2)).toBe('medium');
     expect(graphicsPresetLabel(3)).toBe('high');
     expect(graphicsPresetLabel(4)).toBe('ultra');
     expect(graphicsPresetLabel(5)).toBe('advanced');
     expect(shouldUseAutoGovernor({ search: '', graphicsPreset: 0 })).toBe(true);
-    expect(shouldUseAutoGovernor({ search: '', graphicsPreset: undefined })).toBe(false);
+    // No persisted preset is now Auto, so the governor runs by default.
+    expect(shouldUseAutoGovernor({ search: '', graphicsPreset: undefined })).toBe(true);
     expect(shouldUseAutoGovernor({ search: '', graphicsPreset: 1 })).toBe(true);
     expect(shouldUseAutoGovernor({ search: '', graphicsPreset: 2 })).toBe(true);
     expect(shouldUseAutoGovernor({ search: '', graphicsPreset: 3 })).toBe(true);
@@ -76,7 +97,9 @@ describe('graphics tier resolution', () => {
     expect(shouldUseAutoGovernor({ search: '?gfx=ultra', graphicsPreset: 0 })).toBe(false);
     expect(shouldUseAutoGovernor({ search: '?gfx=ultra', graphicsPreset: 4 })).toBe(false);
     expect(shouldUseAutoGovernor({ search: '?governor=0', graphicsPreset: 1 })).toBe(false);
-    expect(shouldUseAutoGovernor({ search: '?gfx=ultra&governor=1', graphicsPreset: 0 })).toBe(true);
+    expect(shouldUseAutoGovernor({ search: '?gfx=ultra&governor=1', graphicsPreset: 0 })).toBe(
+      true,
+    );
   });
 
   it('keeps every quality tier bounded by explicit runtime budgets', () => {
@@ -93,20 +116,22 @@ describe('graphics tier resolution', () => {
 
   it('defines tunable bucket bands for every quality tier', () => {
     for (const [tier, bands] of Object.entries(GFX_BUCKET_BANDS)) {
-      expect(Object.keys(bands).sort()).toEqual([
-        'characters',
-        'foliage',
-        'grass',
-        'lighting',
-        'materials',
-        'props',
-        'resolution',
-        'ui',
-        'vfx',
-        'waterSky',
-        'weapons',
-        'worldStreaming',
-      ].sort());
+      expect(Object.keys(bands).sort()).toEqual(
+        [
+          'characters',
+          'foliage',
+          'grass',
+          'lighting',
+          'materials',
+          'props',
+          'resolution',
+          'ui',
+          'vfx',
+          'waterSky',
+          'weapons',
+          'worldStreaming',
+        ].sort(),
+      );
       for (const band of Object.values(bands)) {
         expect(band.min).toBeGreaterThanOrEqual(0);
         expect(band.max).toBeLessThanOrEqual(1);
@@ -162,21 +187,36 @@ describe('graphics tier resolution', () => {
     expect(ultra.msaaSamples).toBe(4);
     expect(ultra.shadowMap).toBe(high.shadowMap);
     expect(ultra.pixelRatioCap).toBeGreaterThan(high.pixelRatioCap);
-    expect(GFX_BUCKET_BANDS.ultra.grass.baseline).toBeGreaterThan(GFX_BUCKET_BANDS.high.grass.baseline);
-    expect(GFX_BUCKET_BANDS.ultra.foliage.baseline).toBeGreaterThan(GFX_BUCKET_BANDS.high.foliage.baseline);
+    expect(GFX_BUCKET_BANDS.ultra.grass.baseline).toBeGreaterThan(
+      GFX_BUCKET_BANDS.high.grass.baseline,
+    );
+    expect(GFX_BUCKET_BANDS.ultra.foliage.baseline).toBeGreaterThan(
+      GFX_BUCKET_BANDS.high.foliage.baseline,
+    );
   });
 
-  it('detects older Intel integrated GPUs without overriding the ultra default', () => {
-    expect(isWeakIntegratedGpu('ANGLE (Intel, ANGLE Metal Renderer: Intel(R) Iris(TM) Plus Graphics 655)')).toBe(true);
+  it('auto-detects older Intel integrated GPUs down to low under Auto', () => {
+    expect(
+      isWeakIntegratedGpu(
+        'ANGLE (Intel, ANGLE Metal Renderer: Intel(R) Iris(TM) Plus Graphics 655)',
+      ),
+    ).toBe(true);
     expect(isWeakIntegratedGpu('ANGLE (Apple, ANGLE Metal Renderer: Apple M2)')).toBe(false);
-    expect(tierFromHints({ ...desktop, gpuRenderer: 'ANGLE (Intel, Intel(R) Iris(TM) Plus Graphics 655)' }, false)).toBe('ultra');
+    expect(
+      tierFromHints(
+        { ...desktop, gpuRenderer: 'ANGLE (Intel, Intel(R) Iris(TM) Plus Graphics 655)' },
+        false,
+      ),
+    ).toBe('low');
   });
 
   it('keeps masked double-sided vegetation off the transparent blended path', () => {
-    const mat = configureMaskedDoubleSidedVegetationMaterial(new THREE.MeshBasicMaterial({
-      alphaTest: 0.3,
-      transparent: true,
-    }));
+    const mat = configureMaskedDoubleSidedVegetationMaterial(
+      new THREE.MeshBasicMaterial({
+        alphaTest: 0.3,
+        transparent: true,
+      }),
+    );
 
     expect(mat.alphaTest).toBe(0.3);
     expect(mat.side).toBe(THREE.DoubleSide);

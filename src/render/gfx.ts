@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { type AutoDetectHints, type RememberedAuto, resolveAutoTier } from './gfx_autodetect';
 
 // Quality tiers: every tier-dependent knob keys off this module instead of
 // scattered LOW_GFX ternaries.
@@ -10,7 +11,8 @@ import * as THREE from 'three';
 //   3. otherwise: persisted graphics preset, with missing values -> ultra
 
 export type GfxTier = 'low' | 'medium' | 'high' | 'ultra';
-export const GFX_CONFIG_VERSION = 14;
+// 15: Auto preset (0) becomes the default + FPS-first hardware auto-detection.
+export const GFX_CONFIG_VERSION = 15;
 
 export const GFX_BUCKET_IDS = [
   'resolution',
@@ -27,7 +29,7 @@ export const GFX_BUCKET_IDS = [
   'ui',
 ] as const;
 
-export type GfxBucketId = typeof GFX_BUCKET_IDS[number];
+export type GfxBucketId = (typeof GFX_BUCKET_IDS)[number];
 export type GfxBucketCost = 'gpu' | 'cpu' | 'mixed';
 
 export interface GfxBucketBand {
@@ -45,11 +47,16 @@ export type GfxBucketLevels = Record<GfxBucketId, number>;
 export interface GfxRuntimeHints {
   search: string;
   deviceMemory?: number;
+  hardwareConcurrency?: number;
   maxTouchPoints: number;
   coarsePointer: boolean;
   narrowViewport: boolean;
+  /** devicePixelRatio; high-DPI panels cost the Auto detector a tier rung. */
+  dpr?: number;
   gpuRenderer?: string;
   graphicsPreset?: number;
+  /** Last-session Auto sample (cross-session step-down); read from localStorage. */
+  rememberedAuto?: RememberedAuto | null;
   terrainDetail?: number;
   foliageDensity?: number;
   effectsQuality?: number;
@@ -100,12 +107,15 @@ export interface GfxRuntimeBudget {
   readonly cooldownSeconds: number;
 }
 
+const PRESET_AUTO = 0;
 const PRESET_LOW = 1;
 const PRESET_MEDIUM = 2;
 const PRESET_HIGH = 3;
 const PRESET_ULTRA = 4;
 const PRESET_ADVANCED = 5;
-const DEFAULT_PRESET = PRESET_ULTRA;
+// Auto is the default: a brand-new player (no persisted preset) is hardware
+// auto-detected (FPS-first) rather than dropped onto ultra blindly.
+const DEFAULT_PRESET = PRESET_AUTO;
 
 export const GFX_BUDGETS: Record<GfxTier, GfxRuntimeBudget> = {
   low: {
@@ -178,7 +188,14 @@ export const GFX_BUCKET_BANDS: Record<GfxTier, GfxBucketBands> = {
     vfx: { min: 0.84, baseline: 1.0, max: 1.0, roi: 0.9, cost: 'mixed', governable: true },
     characters: { min: 1.0, baseline: 1.0, max: 1.0, roi: 1.0, cost: 'mixed', governable: false },
     weapons: { min: 1.0, baseline: 1.0, max: 1.0, roi: 1.0, cost: 'mixed', governable: false },
-    worldStreaming: { min: 0.25, baseline: 0.5, max: 0.68, roi: 0.62, cost: 'cpu', governable: true },
+    worldStreaming: {
+      min: 0.25,
+      baseline: 0.5,
+      max: 0.68,
+      roi: 0.62,
+      cost: 'cpu',
+      governable: true,
+    },
     ui: { min: 0.75, baseline: 0.9, max: 1.0, roi: 0.86, cost: 'cpu', governable: false },
   },
   medium: {
@@ -192,7 +209,14 @@ export const GFX_BUCKET_BANDS: Record<GfxTier, GfxBucketBands> = {
     vfx: { min: 0.58, baseline: 0.8, max: 0.9, roi: 0.7, cost: 'mixed', governable: true },
     characters: { min: 0.86, baseline: 1.0, max: 1.0, roi: 1.0, cost: 'mixed', governable: false },
     weapons: { min: 1.0, baseline: 1.0, max: 1.0, roi: 1.0, cost: 'mixed', governable: false },
-    worldStreaming: { min: 0.42, baseline: 0.7, max: 0.82, roi: 0.62, cost: 'cpu', governable: true },
+    worldStreaming: {
+      min: 0.42,
+      baseline: 0.7,
+      max: 0.82,
+      roi: 0.62,
+      cost: 'cpu',
+      governable: true,
+    },
     ui: { min: 0.82, baseline: 1.0, max: 1.0, roi: 0.86, cost: 'cpu', governable: false },
   },
   high: {
@@ -206,7 +230,14 @@ export const GFX_BUCKET_BANDS: Record<GfxTier, GfxBucketBands> = {
     vfx: { min: 0.68, baseline: 0.92, max: 1.0, roi: 0.7, cost: 'mixed', governable: true },
     characters: { min: 0.9, baseline: 1.0, max: 1.0, roi: 1.0, cost: 'mixed', governable: false },
     weapons: { min: 1.0, baseline: 1.0, max: 1.0, roi: 1.0, cost: 'mixed', governable: false },
-    worldStreaming: { min: 0.55, baseline: 0.88, max: 1.0, roi: 0.62, cost: 'cpu', governable: true },
+    worldStreaming: {
+      min: 0.55,
+      baseline: 0.88,
+      max: 1.0,
+      roi: 0.62,
+      cost: 'cpu',
+      governable: true,
+    },
     ui: { min: 0.86, baseline: 1.0, max: 1.0, roi: 0.86, cost: 'cpu', governable: false },
   },
   ultra: {
@@ -242,18 +273,30 @@ function bucketBaselines(bands: GfxBucketBands): GfxBucketLevels {
   };
 }
 
-export function graphicsPresetLabel(value: number | undefined): 'low' | 'medium' | 'high' | 'ultra' | 'advanced' {
+export function graphicsPresetLabel(
+  value: number | undefined,
+): 'auto' | 'low' | 'medium' | 'high' | 'ultra' | 'advanced' {
   switch (Math.round(value ?? DEFAULT_PRESET)) {
-    case PRESET_LOW: return 'low';
-    case PRESET_MEDIUM: return 'medium';
-    case PRESET_HIGH: return 'high';
-    case PRESET_ULTRA: return 'ultra';
-    case PRESET_ADVANCED: return 'advanced';
-    default: return 'low';
+    case PRESET_AUTO:
+      return 'auto';
+    case PRESET_LOW:
+      return 'low';
+    case PRESET_MEDIUM:
+      return 'medium';
+    case PRESET_HIGH:
+      return 'high';
+    case PRESET_ULTRA:
+      return 'ultra';
+    case PRESET_ADVANCED:
+      return 'advanced';
+    default:
+      return 'low';
   }
 }
 
-export function shouldUseAutoGovernor(hints?: Pick<GfxRuntimeHints, 'search' | 'graphicsPreset'>): boolean {
+export function shouldUseAutoGovernor(
+  hints?: Pick<GfxRuntimeHints, 'search' | 'graphicsPreset'>,
+): boolean {
   if (!hints) return false;
   const params = new URLSearchParams(hints.search);
   const override = params.get('governor') ?? params.get('autoGovernor');
@@ -275,7 +318,16 @@ export function configureMaskedDoubleSidedVegetationMaterial<T extends THREE.Mat
 
 function settingsFor(
   tier: GfxTier,
-  hints?: Pick<GfxRuntimeHints, 'search' | 'graphicsPreset' | 'terrainDetail' | 'foliageDensity' | 'effectsQuality' | 'shadowQuality' | 'gpuRenderer'>,
+  hints?: Pick<
+    GfxRuntimeHints,
+    | 'search'
+    | 'graphicsPreset'
+    | 'terrainDetail'
+    | 'foliageDensity'
+    | 'effectsQuality'
+    | 'shadowQuality'
+    | 'gpuRenderer'
+  >,
 ): GfxSettings {
   const bucketBands = GFX_BUCKET_BANDS[tier];
   const weakIntegratedGpu = isWeakIntegratedGpu(hints?.gpuRenderer);
@@ -304,8 +356,10 @@ function settingsFor(
   };
   if (hints?.graphicsPreset === PRESET_ADVANCED) {
     if ((hints.terrainDetail ?? 1) < 0.5) settings = { ...settings, terrainSplat: false };
-    if ((hints.foliageDensity ?? 1) < 0.5) settings = { ...settings, grassRadius: 34, grassStep: 3.8 };
-    if ((hints.effectsQuality ?? 1) < 0.5) settings = { ...settings, composer: false, ao: false, msaaSamples: 0, maxPointLights: 3 };
+    if ((hints.foliageDensity ?? 1) < 0.5)
+      settings = { ...settings, grassRadius: 34, grassStep: 3.8 };
+    if ((hints.effectsQuality ?? 1) < 0.5)
+      settings = { ...settings, composer: false, ao: false, msaaSamples: 0, maxPointLights: 3 };
     if ((hints.shadowQuality ?? 1) < 0.5) settings = { ...settings, shadowMap: 1024 };
   }
   return settings;
@@ -321,7 +375,10 @@ export function forcedTierFromSearch(search: string): GfxTier | null {
 function storedNumericSetting(key: string): number | undefined {
   if (typeof localStorage === 'undefined') return undefined;
   try {
-    const raw = JSON.parse(localStorage.getItem('woc_settings') ?? 'null') as Record<string, unknown> | null;
+    const raw = JSON.parse(localStorage.getItem('woc_settings') ?? 'null') as Record<
+      string,
+      unknown
+    > | null;
     const value = raw && typeof raw === 'object' ? raw[key] : undefined;
     return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
   } catch {
@@ -336,7 +393,9 @@ function probeGpuRenderer(): string | undefined {
     const gl = canvas.getContext('webgl2') ?? canvas.getContext('webgl');
     if (!gl) return undefined;
     const dbg = gl.getExtension('WEBGL_debug_renderer_info');
-    return String(dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER));
+    return String(
+      dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER),
+    );
   } catch {
     return undefined;
   }
@@ -349,19 +408,23 @@ export function urlForcedTier(): GfxTier | null {
 }
 
 function runtimeHints(): GfxRuntimeHints {
-  const nav = typeof navigator !== 'undefined'
-    ? navigator as Navigator & { deviceMemory?: number }
-    : null;
+  const nav =
+    typeof navigator !== 'undefined' ? (navigator as Navigator & { deviceMemory?: number }) : null;
   return {
     search: typeof location !== 'undefined' ? location.search : '',
     deviceMemory: nav?.deviceMemory,
+    hardwareConcurrency: nav?.hardwareConcurrency,
     maxTouchPoints: nav?.maxTouchPoints ?? 0,
-    coarsePointer: typeof matchMedia !== 'undefined' ? matchMedia('(pointer: coarse)').matches : false,
-    narrowViewport: typeof matchMedia !== 'undefined'
-      ? (matchMedia('(max-width: 940px)').matches || matchMedia('(max-height: 760px)').matches)
-      : false,
+    coarsePointer:
+      typeof matchMedia !== 'undefined' ? matchMedia('(pointer: coarse)').matches : false,
+    narrowViewport:
+      typeof matchMedia !== 'undefined'
+        ? matchMedia('(max-width: 940px)').matches || matchMedia('(max-height: 760px)').matches
+        : false,
+    dpr: typeof devicePixelRatio !== 'undefined' ? devicePixelRatio : 1,
     gpuRenderer: probeGpuRenderer(),
     graphicsPreset: storedNumericSetting('graphicsPreset'),
+    rememberedAuto: storedRememberedAuto(),
     terrainDetail: storedNumericSetting('terrainDetail'),
     foliageDensity: storedNumericSetting('foliageDensity'),
     effectsQuality: storedNumericSetting('effectsQuality'),
@@ -369,20 +432,79 @@ function runtimeHints(): GfxRuntimeHints {
   };
 }
 
+// Cross-session Auto memory: the last session's sustained FPS for the tier it
+// actually ran, so resolveAutoTier() can start a struggling machine one rung
+// lower next launch. Stored separately from woc_settings so it never pollutes
+// the player's explicit preferences.
+const AUTOTUNE_KEY = 'woc_gfx_autotune';
+
+function storedRememberedAuto(): RememberedAuto | null {
+  if (typeof localStorage === 'undefined') return null;
+  try {
+    const raw = JSON.parse(
+      localStorage.getItem(AUTOTUNE_KEY) ?? 'null',
+    ) as Partial<RememberedAuto> | null;
+    if (!raw || typeof raw !== 'object') return null;
+    const tier = raw.tier;
+    if (tier !== 'low' && tier !== 'medium' && tier !== 'high' && tier !== 'ultra') return null;
+    if (typeof raw.v !== 'number' || typeof raw.fps !== 'number' || !Number.isFinite(raw.fps))
+      return null;
+    return { v: raw.v, tier, fps: raw.fps };
+  } catch {
+    return null;
+  }
+}
+
+/** Persist a sustained-FPS sample for the running Auto tier (called by main.ts). */
+export function persistAutoSample(tier: GfxTier, fps: number): void {
+  if (typeof localStorage === 'undefined' || !Number.isFinite(fps) || fps <= 0) return;
+  try {
+    localStorage.setItem(
+      AUTOTUNE_KEY,
+      JSON.stringify({ v: GFX_CONFIG_VERSION, tier, fps: Math.round(fps) }),
+    );
+  } catch {
+    /* storage unavailable (private mode) */
+  }
+}
+
 export function isConstrainedBrowser(hints: GfxRuntimeHints): boolean {
   if (hints.deviceMemory !== undefined && hints.deviceMemory <= 4) return true;
   return hints.maxTouchPoints > 0 && (hints.coarsePointer || hints.narrowViewport);
+}
+
+/** Map the broad runtime hints onto the Auto detector's explicit input shape. */
+export function autoHintsFrom(hints: GfxRuntimeHints, softwareGl: boolean): AutoDetectHints {
+  return {
+    gpuRenderer: hints.gpuRenderer,
+    deviceMemory: hints.deviceMemory,
+    hardwareConcurrency: hints.hardwareConcurrency,
+    mobile: hints.maxTouchPoints > 0 && (hints.coarsePointer || hints.narrowViewport),
+    dpr: hints.dpr ?? 1,
+    softwareGl,
+  };
 }
 
 export function tierFromHints(hints: GfxRuntimeHints, softwareGl: boolean): GfxTier {
   const forced = forcedTierFromSearch(hints.search);
   if (forced) return forced;
   switch (Math.round(hints.graphicsPreset ?? DEFAULT_PRESET)) {
-    case PRESET_LOW: return 'low';
-    case PRESET_MEDIUM: return 'medium';
-    case PRESET_HIGH: return 'high';
-    case PRESET_ULTRA: return 'ultra';
-    case PRESET_ADVANCED: return 'high';
+    case PRESET_AUTO:
+      return resolveAutoTier(
+        autoHintsFrom(hints, softwareGl),
+        hints.rememberedAuto ?? null,
+        GFX_CONFIG_VERSION,
+      );
+    case PRESET_LOW:
+      return 'low';
+    case PRESET_MEDIUM:
+      return 'medium';
+    case PRESET_HIGH:
+      return 'high';
+    case PRESET_ULTRA:
+      return 'ultra';
+    case PRESET_ADVANCED:
+      return 'high';
   }
   return 'low';
 }
@@ -394,7 +516,9 @@ function rendererName(webgl: THREE.WebGLRenderer): string {
   try {
     const gl = webgl.getContext();
     const dbg = gl.getExtension('WEBGL_debug_renderer_info');
-    return String(dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER));
+    return String(
+      dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER),
+    );
   } catch {
     return '';
   }
@@ -406,7 +530,12 @@ export function isSoftwareGL(webgl: THREE.WebGLRenderer): boolean {
 
 export function isWeakIntegratedGpu(name: string | undefined): boolean {
   const n = name ?? '';
-  return /intel/i.test(n) && /(iris\(tm\) plus graphics 6|iris plus graphics 6|uhd graphics 6|hd graphics 5|hd graphics 6)/i.test(n);
+  return (
+    /intel/i.test(n) &&
+    /(iris\(tm\) plus graphics 6|iris plus graphics 6|uhd graphics 6|hd graphics 5|hd graphics 6)/i.test(
+      n,
+    )
+  );
 }
 
 // Best-guess settings from the URL alone (so module-load consumers see sane
@@ -466,8 +595,11 @@ export function addRimGlow(mat: THREE.Material): void {
   mat.onBeforeCompile = (sh) => {
     sh.uniforms.uRimBoost = sharedUniforms.uRimBoost;
     sh.fragmentShader = sh.fragmentShader
-      .replace('#include <common>', `#include <common>
-      uniform float uRimBoost;`)
+      .replace(
+        '#include <common>',
+        `#include <common>
+      uniform float uRimBoost;`,
+      )
       .replace(
         '#include <emissivemap_fragment>',
         `#include <emissivemap_fragment>
@@ -495,26 +627,26 @@ export function surfaceMat(opts: SurfaceMatOpts): THREE.Material {
   if (cached) return cached;
   const mat = GFX.standardMaterials
     ? new THREE.MeshStandardMaterial({
-      color: opts.color ?? 0xffffff,
-      map: opts.map ?? null,
-      normalMap: opts.normalMap ?? null,
-      roughnessMap: opts.roughnessMap ?? null,
-      aoMap: opts.aoMap ?? null,
-      roughness: opts.roughness ?? 0.85,
-      metalness: opts.metalness ?? 0,
-      flatShading: opts.flatShading ?? false,
-      emissive: opts.emissive ?? 0x000000,
-      emissiveIntensity: opts.emissiveIntensity ?? 1,
-      side: opts.side ?? THREE.FrontSide,
-    })
+        color: opts.color ?? 0xffffff,
+        map: opts.map ?? null,
+        normalMap: opts.normalMap ?? null,
+        roughnessMap: opts.roughnessMap ?? null,
+        aoMap: opts.aoMap ?? null,
+        roughness: opts.roughness ?? 0.85,
+        metalness: opts.metalness ?? 0,
+        flatShading: opts.flatShading ?? false,
+        emissive: opts.emissive ?? 0x000000,
+        emissiveIntensity: opts.emissiveIntensity ?? 1,
+        side: opts.side ?? THREE.FrontSide,
+      })
     : new THREE.MeshLambertMaterial({
-      color: opts.color ?? 0xffffff,
-      map: opts.map ?? null,
-      flatShading: opts.flatShading ?? false,
-      emissive: opts.emissive ?? 0x000000,
-      emissiveIntensity: opts.emissiveIntensity ?? 1,
-      side: opts.side ?? THREE.FrontSide,
-    });
+        color: opts.color ?? 0xffffff,
+        map: opts.map ?? null,
+        flatShading: opts.flatShading ?? false,
+        emissive: opts.emissive ?? 0x000000,
+        emissiveIntensity: opts.emissiveIntensity ?? 1,
+        side: opts.side ?? THREE.FrontSide,
+      });
   if (opts.rim && GFX.standardMaterials) addRimGlow(mat);
   matCache.set(key, mat);
   return mat;

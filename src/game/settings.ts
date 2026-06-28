@@ -13,9 +13,14 @@ export const SETTING_RANGES = {
   // SFX by default so dialogue reads over ambient combat noise.
   voiceVolume: { min: 0, max: 1, def: 0.9 },
   brightness: { min: 0.6, max: 1.5, def: 1 },
-  // 1 low, 2 medium, 3 high, 4 ultra, 5 advanced. The renderer reads this
-  // from localStorage during startup because tier choice controls preload.
-  graphicsPreset: { min: 1, max: 5, def: 4 },
+  // 0 auto (default), 1 low, 2 medium, 3 high, 4 ultra, 5 advanced. Auto runs
+  // FPS-first hardware auto-detection (gfx.ts / gfx_autodetect.ts). The renderer
+  // reads this from localStorage during startup because tier choice controls
+  // preload.
+  graphicsPreset: { min: 0, max: 5, def: 0 },
+  // Internal migration marker (never shown in the menu). Bumping GRAPHICS_AUTO_MIGRATION
+  // force-resets every existing player to Auto once, then sticks until they choose.
+  gfxAutoMigration: { min: 0, max: 1_000_000, def: 0 },
   // Adaptive browser-effects tier for the DOM/CSS layer (distinct from the WebGL
   // graphicsPreset above). 0 = Auto: detect the engine (Chromium/WebKit/Gecko),
   // version and desktop-vs-mobile and tone down the most GPU-expensive CSS
@@ -188,13 +193,40 @@ export const BOOL_SETTINGS = {
 
 export type NumericSettingKey = keyof typeof SETTING_RANGES;
 export type BoolSettingKey = keyof typeof BOOL_SETTINGS;
-export type GameSettings = { [K in NumericSettingKey]: number } & { [K in BoolSettingKey]: boolean };
+export type GameSettings = { [K in NumericSettingKey]: number } & {
+  [K in BoolSettingKey]: boolean;
+};
 
-interface Range { min: number; max: number; def: number }
+interface Range {
+  min: number;
+  max: number;
+  def: number;
+}
 
 const STORE_KEY = 'woc_settings';
 const NUMERIC_KEYS = Object.keys(SETTING_RANGES) as NumericSettingKey[];
 const BOOL_KEYS = Object.keys(BOOL_SETTINGS) as BoolSettingKey[];
+
+// One-time graphics migration: when this is greater than a player's stored
+// `gfxAutoMigration`, their graphicsPreset is force-reset to 0 (Auto) once and
+// the marker is advanced, so the rollout reaches everyone (including players who
+// had manually pinned a tier) exactly once, silently. Bump to re-run.
+export const GRAPHICS_AUTO_MIGRATION = 1;
+
+/**
+ * Force a player onto the Auto preset once per migration epoch. Pure + mutating:
+ * returns true when it changed something (so the caller persists). Players who
+ * already ran this epoch are untouched, so a later manual tier choice sticks.
+ */
+export function applyGraphicsAutoMigration(values: {
+  graphicsPreset: number;
+  gfxAutoMigration: number;
+}): boolean {
+  if (values.gfxAutoMigration >= GRAPHICS_AUTO_MIGRATION) return false;
+  values.graphicsPreset = 0;
+  values.gfxAutoMigration = GRAPHICS_AUTO_MIGRATION;
+  return true;
+}
 
 function clampNumeric(key: NumericSettingKey, v: number): number {
   const r = SETTING_RANGES[key];
@@ -217,12 +249,18 @@ export class Settings {
 
   constructor() {
     this.values = this.load();
+    // Roll the whole player base onto Auto once; persist so it never re-fires.
+    if (applyGraphicsAutoMigration(this.values)) this.save();
   }
 
   private load(): GameSettings {
     let stored: unknown = null;
-    try { stored = JSON.parse(localStorage.getItem(STORE_KEY) ?? 'null'); } catch { /* corrupt */ }
-    const raw = stored && typeof stored === 'object' ? stored as Record<string, unknown> : {};
+    try {
+      stored = JSON.parse(localStorage.getItem(STORE_KEY) ?? 'null');
+    } catch {
+      /* corrupt */
+    }
+    const raw = stored && typeof stored === 'object' ? (stored as Record<string, unknown>) : {};
     const out = {} as GameSettings;
     for (const key of NUMERIC_KEYS) {
       const v = raw[key];
@@ -236,7 +274,11 @@ export class Settings {
   }
 
   private save(): void {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify(this.values)); } catch { /* storage unavailable */ }
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify(this.values));
+    } catch {
+      /* storage unavailable */
+    }
   }
 
   get<K extends keyof GameSettings>(key: K): GameSettings[K] {

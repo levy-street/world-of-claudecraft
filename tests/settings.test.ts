@@ -1,12 +1,23 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { clickMoveButtonLabel, normalizeClickMoveButton, Settings, SETTING_RANGES } from '../src/game/settings';
+import {
+  applyGraphicsAutoMigration,
+  clickMoveButtonLabel,
+  GRAPHICS_AUTO_MIGRATION,
+  normalizeClickMoveButton,
+  SETTING_RANGES,
+  Settings,
+} from '../src/game/settings';
 
 function installStorage(): void {
   const map = new Map<string, string>();
   (globalThis as any).localStorage = {
     getItem: (k: string) => (map.has(k) ? map.get(k)! : null),
-    setItem: (k: string, v: string) => { map.set(k, v); },
-    removeItem: (k: string) => { map.delete(k); },
+    setItem: (k: string, v: string) => {
+      map.set(k, v);
+    },
+    removeItem: (k: string) => {
+      map.delete(k);
+    },
     clear: () => map.clear(),
   };
 }
@@ -14,12 +25,38 @@ function installStorage(): void {
 beforeEach(() => installStorage());
 
 describe('Settings', () => {
-  it('defaults fresh sessions and initial logins to the ultra graphics preset', () => {
+  it('defaults fresh sessions to the Auto graphics preset and stamps the migration', () => {
     const s = new Settings();
 
-    expect(localStorage.getItem('woc_settings')).toBeNull();
-    expect(SETTING_RANGES.graphicsPreset.def).toBe(4);
-    expect(s.get('graphicsPreset')).toBe(4);
+    expect(SETTING_RANGES.graphicsPreset.def).toBe(0);
+    expect(s.get('graphicsPreset')).toBe(0);
+    // Constructing Settings runs the one-time Auto migration, which persists.
+    expect(s.get('gfxAutoMigration')).toBe(GRAPHICS_AUTO_MIGRATION);
+    expect(localStorage.getItem('woc_settings')).not.toBeNull();
+  });
+
+  it('force-resets an existing player to Auto exactly once, then respects manual choice', () => {
+    // Pre-migration save: a manually pinned ultra preset, no migration marker.
+    localStorage.setItem('woc_settings', JSON.stringify({ graphicsPreset: 4 }));
+    const s1 = new Settings();
+    expect(s1.get('graphicsPreset')).toBe(0); // forced onto Auto
+    expect(s1.get('gfxAutoMigration')).toBe(GRAPHICS_AUTO_MIGRATION);
+
+    // The player now deliberately picks ultra; it must stick across reloads.
+    s1.set('graphicsPreset', 4);
+    const s2 = new Settings();
+    expect(s2.get('graphicsPreset')).toBe(4);
+  });
+
+  it('applyGraphicsAutoMigration flips to Auto once then stays idempotent', () => {
+    const v = { graphicsPreset: 3, gfxAutoMigration: 0 };
+    expect(applyGraphicsAutoMigration(v)).toBe(true);
+    expect(v.graphicsPreset).toBe(0);
+    expect(v.gfxAutoMigration).toBe(GRAPHICS_AUTO_MIGRATION);
+    expect(applyGraphicsAutoMigration(v)).toBe(false); // already migrated this epoch
+    v.graphicsPreset = 4;
+    expect(applyGraphicsAutoMigration(v)).toBe(false); // a later manual choice is preserved
+    expect(v.graphicsPreset).toBe(4);
   });
 
   it('starts at the documented defaults (camera calmer than the old 1.0)', () => {

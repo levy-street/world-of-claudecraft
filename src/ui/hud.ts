@@ -13203,6 +13203,7 @@ export class Hud {
       t('hud.options.graphicsQuality'),
       'graphicsPreset',
       [
+        { value: 0, label: t('hud.options.graphicsPresetAuto') },
         { value: 1, label: t('hud.options.graphicsPresetLow') },
         { value: 2, label: t('hud.options.graphicsPresetMedium') },
         { value: 3, label: t('hud.options.graphicsPresetHigh') },

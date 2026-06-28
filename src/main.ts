@@ -70,7 +70,7 @@ import { CharacterPreview } from './render/characters';
 import { skinCount } from './render/characters/manifest';
 import { playerPortraitDataUrl } from './render/characters/portrait';
 import { installWebGLContextRelease } from './render/context_release';
-import { GFX } from './render/gfx';
+import { GFX, persistAutoSample } from './render/gfx';
 import { Renderer } from './render/renderer';
 import { navigatorSaveData } from './render/sky';
 import { pathCrossesFence } from './sim/colliders';
@@ -2237,6 +2237,23 @@ async function startGame(
           tokenProvider: () => api.token,
           characterIdProvider: () => online?.characterId ?? null,
         });
+        // Cross-session Auto memory: while the player is on the Auto preset, record
+        // the running tier's sustained FPS so the next launch can step a struggling
+        // machine down a rung (see gfx_autodetect.resolveAutoTier).
+        if (Math.round(settings.get('graphicsPreset')) === 0) {
+          const recordAutoSample = (): void => {
+            const r = perf.report();
+            const tier = r.renderer?.tier;
+            const fps = r.windows?.last30s?.fps ?? r.fps;
+            if (tier === 'low' || tier === 'medium' || tier === 'high' || tier === 'ultra') {
+              persistAutoSample(tier, fps);
+            }
+          };
+          window.setInterval(recordAutoSample, 20_000);
+          document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') recordAutoSample();
+          });
+        }
         (window as any).__game = {
           sim: world,
           world,
