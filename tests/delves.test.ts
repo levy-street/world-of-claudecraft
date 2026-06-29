@@ -459,14 +459,19 @@ describe('delve interactables and affixes', () => {
     }
     sim.tick();
     expect(run.exitPortalOpen).toBe(false);
-    const plate = run.objectIds
+    // Every pressure plate in the module must be triggered before the exit opens.
+    const plates = run.objectIds
       .map((id) => ({ id, state: run.objectState[id] }))
-      .find((o) => o.state?.kind === 'pressure_plate');
-    const plateEnt = sim.entities.get(plate!.id)!;
-    sim.player.pos = { ...plateEnt.pos };
-    sim.player.prevPos = { ...plateEnt.pos };
-    sim.tick();
-    expect(run.exitPortalOpen).toBe(true);
+      .filter((o) => o.state?.kind === 'pressure_plate');
+    expect(plates.length).toBeGreaterThan(1);
+    for (let i = 0; i < plates.length; i++) {
+      const plateEnt = sim.entities.get(plates[i].id)!;
+      sim.player.pos = { ...plateEnt.pos };
+      sim.player.prevPos = { ...plateEnt.pos };
+      sim.tick();
+      // Exit stays sealed until the LAST plate is stepped.
+      expect(run.exitPortalOpen).toBe(i === plates.length - 1);
+    }
   });
 
   it('restless_graves affix raises a reliquary_bonewalker a few seconds after trash dies', () => {
@@ -1489,6 +1494,98 @@ describe('The Drowned Litany (Phase 3 static Blackwater hazard)', () => {
       return hp0 - p.hp;
     };
     expect(run()).toBe(run());
+  });
+});
+
+describe('The Drowned Litany (Phase 5 room puzzles)', () => {
+  const BODY_R = 0.9;
+
+  // All delve colliders are rot:0, so circle = radius test and obb = AABB test.
+  function plateBlocked(moduleId: string, x: number, z: number): boolean {
+    for (const c of delveModuleColliders(moduleId as any)) {
+      if (c.type === 'circle') {
+        if (Math.hypot(x - c.x, z - c.z) < c.r + BODY_R) return true;
+      } else if (c.type === 'obb') {
+        if (Math.abs(x - c.x) < c.hw + BODY_R && Math.abs(z - c.z) < c.hd + BODY_R) return true;
+      }
+    }
+    return false;
+  }
+
+  // Expected puzzle plate count per the handoff Room Pool. Causeway (room 6) has
+  // no scripted puzzle: the layout is the puzzle.
+  const PLATE_COUNTS: Record<string, number> = {
+    litany_sluice: 2, // turn 2 sluice valves
+    litany_ledger: 4, // activate 4 grave tablets
+    litany_ring: 2, // light 2 corpse-candles
+    litany_baptistry: 3, // destroy 3 egg-sacs
+    litany_choir_loft: 2, // pull 2 bell ropes
+    litany_causeway: 0, // no puzzle
+  };
+
+  function plateSlots(moduleId: string) {
+    return DELVE_MODULES[moduleId].interactableSlots.filter((s) =>
+      s.variants.includes('pressure_plate'),
+    );
+  }
+
+  it('each puzzle room defines the handoff plate count (causeway has none)', () => {
+    for (const [m, count] of Object.entries(PLATE_COUNTS)) {
+      expect(plateSlots(m).length, `${m} plate count`).toBe(count);
+    }
+  });
+
+  it('every puzzle plate sits on walkable floor, clear of obstacles and hazards', () => {
+    for (const m of Object.keys(PLATE_COUNTS)) {
+      const hazards = DELVE_MODULES[m].hazards ?? [];
+      for (const slot of plateSlots(m)) {
+        expect(plateBlocked(m, slot.x, slot.z), `${m} plate (${slot.x},${slot.z}) blocked`).toBe(
+          false,
+        );
+        for (const h of hazards) {
+          const d = Math.hypot(slot.x - h.x, slot.z - h.z);
+          expect(d, `${m} plate (${slot.x},${slot.z}) inside hazard`).toBeGreaterThan(h.r + BODY_R);
+        }
+      }
+    }
+  });
+
+  it('the exit stays sealed until every puzzle plate is triggered', () => {
+    const sim = makeSim('warrior');
+    enterLitany(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    run.modules = ['litany_sluice', 'litany_apse'];
+    run.moduleIndex = 0;
+    (sim as any).spawnDelveModule(run);
+    for (const id of [...run.mobIds]) {
+      const mob = sim.entities.get(id);
+      if (mob && !mob.dead)
+        (sim as any).dealDamage(
+          sim.player,
+          mob,
+          mob.maxHp + 1,
+          false,
+          'physical',
+          null,
+          'hit',
+          true,
+        );
+    }
+    sim.tick();
+    expect(run.exitPortalOpen).toBe(false);
+    const plates = run.objectIds
+      .map((id) => ({ id, state: run.objectState[id] }))
+      .filter((o) => o.state?.kind === 'pressure_plate');
+    expect(plates.length).toBe(PLATE_COUNTS.litany_sluice);
+    for (let i = 0; i < plates.length; i++) {
+      const plateEnt = sim.entities.get(plates[i].id)!;
+      sim.player.pos = { ...plateEnt.pos };
+      sim.player.prevPos = { ...plateEnt.pos };
+      sim.tick();
+      expect(run.exitPortalOpen, `after plate ${i + 1}/${plates.length}`).toBe(
+        i === plates.length - 1,
+      );
+    }
   });
 });
 

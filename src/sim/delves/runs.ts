@@ -837,8 +837,12 @@ export function tryOpenDelveExitPortal(ctx: SimContext, run: DelveRun): void {
     return e && !e.dead;
   });
   if (liveMobs) return;
+  // Room puzzle gate: every pressure plate in the module must be triggered before
+  // the exit opens (Drowned Litany "activate N valves/tablets/candles/ropes"; the
+  // Reliquary's plated rooms already require all plates to raise the portcullis, so
+  // requiring all here is a no-op for that delve).
   const plates = run.objectIds.filter((id) => run.objectState[id]?.kind === 'pressure_plate');
-  if (plates.length > 0 && !plates.some((id) => run.objectState[id].triggered)) return;
+  if (plates.length > 0 && !plates.every((id) => run.objectState[id].triggered)) return;
   openDelveExitPortal(ctx, run);
 }
 

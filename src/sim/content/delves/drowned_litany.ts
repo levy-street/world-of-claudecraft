@@ -109,7 +109,12 @@ export const DROWNED_LITANY_MODULES: Record<string, DelveModuleDef> = {
     layout: 'litany_sluice',
     length: 110,
     spawnSets: [SLUICE_SPAWNS],
-    interactableSlots: [],
+    // Puzzle: turn 2 sluice valves (Primitive A, Click Objects). Both sit on the
+    // open arc, clear of the stub bank, the hazard pools, and the entry aisle.
+    interactableSlots: [
+      { x: -16, z: 30, variants: ['pressure_plate'] },
+      { x: 15, z: 68, variants: ['pressure_plate'] },
+    ],
     // Blackwater seeps along the open channel on the concave side of the crescent.
     hazards: [
       { x: 14, z: 13, r: 5 },
@@ -122,7 +127,14 @@ export const DROWNED_LITANY_MODULES: Record<string, DelveModuleDef> = {
     layout: 'litany_ledger',
     length: 110,
     spawnSets: [LEDGER_SPAWNS],
-    interactableSlots: [],
+    // Puzzle: activate 4 grave tablets in any order (Primitive A). One per channel
+    // between the ledger islands, all clear of the flooded channels and obstacles.
+    interactableSlots: [
+      { x: -16, z: 30, variants: ['pressure_plate'] },
+      { x: -16, z: 40, variants: ['pressure_plate'] },
+      { x: 16, z: 44, variants: ['pressure_plate'] },
+      { x: 8, z: 72, variants: ['pressure_plate'] },
+    ],
     // Flooded channels weave between the raised ledger islands.
     hazards: [
       { x: 0, z: 22, r: 5 },
@@ -136,7 +148,12 @@ export const DROWNED_LITANY_MODULES: Record<string, DelveModuleDef> = {
     layout: 'litany_ring',
     length: 110,
     spawnSets: [RING_SPAWNS],
-    interactableSlots: [],
+    // Puzzle: light 2 corpse-candles (Primitive A). One on each side lane of the
+    // loop, outside the sealed central mass and clear of the two hazard pools.
+    interactableSlots: [
+      { x: 20, z: 42, variants: ['pressure_plate'] },
+      { x: -20, z: 42, variants: ['pressure_plate'] },
+    ],
     // Blackwater pools the two side lanes that loop around the sealed centre.
     hazards: [
       { x: 18, z: 24, r: 5 },
@@ -149,7 +166,14 @@ export const DROWNED_LITANY_MODULES: Record<string, DelveModuleDef> = {
     layout: 'litany_baptistry',
     length: 110,
     spawnSets: [BAPTISTRY_SPAWNS],
-    interactableSlots: [],
+    // Puzzle: destroy 3 widow egg-sacs (Primitive B in the design; MVP reuses the
+    // Click primitive). Spaced around the pit-rim walkway, clear of the central
+    // Blackwater font and the pit pillars.
+    interactableSlots: [
+      { x: 16, z: 24, variants: ['pressure_plate'] },
+      { x: -16, z: 24, variants: ['pressure_plate'] },
+      { x: 0, z: 58, variants: ['pressure_plate'] },
+    ],
     // The drowned font itself: the central sinkhole brims with Blackwater. Players
     // orbit the rim on the walkway and must not wade through the middle.
     hazards: [{ x: 0, z: 40, r: 7 }],
@@ -160,7 +184,12 @@ export const DROWNED_LITANY_MODULES: Record<string, DelveModuleDef> = {
     layout: 'litany_choir_loft',
     length: 110,
     spawnSets: [CHOIR_LOFT_SPAWNS],
-    interactableSlots: [],
+    // Puzzle: pull 2 bell ropes (Primitive A). One at each wide flank of the fan,
+    // outside the fanning ranks and clear of the three seepage pools.
+    interactableSlots: [
+      { x: -18, z: 44, variants: ['pressure_plate'] },
+      { x: 18, z: 44, variants: ['pressure_plate'] },
+    ],
     // Seepage gathers between the fanning choir ranks.
     hazards: [
       { x: 0, z: 33, r: 5 },
