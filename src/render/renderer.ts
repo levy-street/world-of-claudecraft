@@ -742,6 +742,21 @@ export class Renderer {
   private cullViewProj = new THREE.Matrix4();
   private cullSphere = new THREE.Sphere();
   private cullCharacters = false;
+  // Scratch AnimState reused across the per-entity sync loop: CharacterVisual
+  // .update() and the pose-selection helpers only read it within the call (the
+  // preview drives a shared constant too), so one buffer avoids allocating a
+  // fresh state object per entity per frame, reducing GC churn that scales with crowd.
+  private readonly animScratch: AnimState = {
+    speed: 0,
+    moving: false,
+    airborne: false,
+    backwards: false,
+    reverseBackpedal: false,
+    dead: false,
+    casting: false,
+    swimming: false,
+    sitting: false,
+  };
   private selfRenderPosition = new THREE.Vector3();
   private selfRenderPositionReady = false;
   // Last yaw applied to the local player while the camera was driving its facing
@@ -3973,17 +3988,16 @@ export class Renderer {
         !swimming &&
         (!e.onGround ||
           (e.kind === 'player' && ay - groundHeight(ax, az, this.sim.cfg.seed) > AIRBORNE_EPS));
-      const st: AnimState = {
-        speed: loco.speed,
-        moving,
-        airborne,
-        backwards: loco.backwards,
-        reverseBackpedal: ghostWolf,
-        dead: visuallyDead,
-        casting: e.castingAbility !== null && !visuallyDead,
-        swimming,
-        sitting: e.kind === 'player' && (e.sitting || e.eating !== null || e.drinking !== null),
-      };
+      const st = this.animScratch;
+      st.speed = loco.speed;
+      st.moving = moving;
+      st.airborne = airborne;
+      st.backwards = loco.backwards;
+      st.reverseBackpedal = ghostWolf;
+      st.dead = visuallyDead;
+      st.casting = e.castingAbility !== null && !visuallyDead;
+      st.swimming = swimming;
+      st.sitting = e.kind === 'player' && (e.sitting || e.eating !== null || e.drinking !== null);
       // --- spatial movement audio (self + others) --------------------------
       // All gated by audibility (squared distance) so far entities cost nothing.
       const sink = this.audioSink;
