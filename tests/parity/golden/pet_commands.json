@@ -1391,7 +1391,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 397,
-      "state": "27c0be9f",
+      "state": "3ccadc00",
       "events": "5b636e6d",
       "rng": {
         "draws": 0,
@@ -1637,8 +1637,8 @@
           },
           "templateId": "imp",
           "weapon": {
-            "max": 28,
-            "min": 18,
+            "max": 21,
+            "min": 14,
             "speed": 2
           }
         }
@@ -1648,7 +1648,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 397,
-      "state": "ee55888c",
+      "state": "1f4502c3",
       "events": "4a181d87",
       "rng": {
         "draws": 80,
@@ -1659,7 +1659,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 397,
-      "state": "9c36a07a",
+      "state": "296a1b91",
       "events": "669474ea",
       "rng": {
         "draws": 156,
@@ -1670,7 +1670,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 397,
-      "state": "9c36a07a",
+      "state": "296a1b91",
       "events": "741638a5",
       "rng": {
         "draws": 156,
@@ -1925,8 +1925,8 @@
           },
           "templateId": "imp",
           "weapon": {
-            "max": 28,
-            "min": 18,
+            "max": 21,
+            "min": 14,
             "speed": 2
           }
         }

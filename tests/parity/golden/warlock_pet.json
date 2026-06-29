@@ -156,8 +156,8 @@
       "tick": 120,
       "time": 6,
       "nextId": 391,
-      "state": "2e5d31d1",
-      "events": "93a14dd8",
+      "state": "1b7409c2",
+      "events": "c2e31079",
       "rng": {
         "draws": 366,
         "digest": "e513d33c"
@@ -167,7 +167,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 391,
-      "state": "6313ddb3",
+      "state": "e725a1bb",
       "events": "c0b843fe",
       "rng": {
         "draws": 497,
@@ -178,8 +178,8 @@
       "tick": 160,
       "time": 8,
       "nextId": 391,
-      "state": "6aeb4e6c",
-      "events": "b38f1be8",
+      "state": "61d11366",
+      "events": "3c2ff05a",
       "rng": {
         "draws": 627,
         "digest": "308f8bef"
@@ -189,7 +189,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 391,
-      "state": "9704a8ae",
+      "state": "1049b4ba",
       "events": "c0b843fe",
       "rng": {
         "draws": 770,
@@ -200,8 +200,8 @@
       "tick": 200,
       "time": 10,
       "nextId": 391,
-      "state": "9cd3b40e",
-      "events": "fbe68081",
+      "state": "473dfddc",
+      "events": "b8b1086d",
       "rng": {
         "draws": 930,
         "digest": "01768b34"
@@ -211,7 +211,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 391,
-      "state": "73b8e774",
+      "state": "9ce58c45",
       "events": "b0d88419",
       "rng": {
         "draws": 1027,
@@ -222,7 +222,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 391,
-      "state": "b6f301c9",
+      "state": "d7e3a82a",
       "events": "741638a5",
       "rng": {
         "draws": 1027,
@@ -349,8 +349,8 @@
           "swingTimer": 0.05,
           "templateId": "voidwalker",
           "weapon": {
-            "max": 22,
-            "min": 14,
+            "max": 15,
+            "min": 10,
             "speed": 2
           }
         },
@@ -366,7 +366,7 @@
           "forcedTargetId": 389,
           "forcedTargetTimer": 3,
           "hostile": true,
-          "hp": 49934,
+          "hp": 49949,
           "id": 390,
           "inCombat": true,
           "kind": "mob",
@@ -407,7 +407,7 @@
             ],
             [
               389,
-              54
+              39
             ]
           ],
           "weapon": {
@@ -422,8 +422,8 @@
       "tick": 224,
       "time": 11.2,
       "nextId": 391,
-      "state": "05b9057a",
-      "events": "3c2ff05a",
+      "state": "7d27151d",
+      "events": "b8b1086d",
       "rng": {
         "draws": 1048,
         "digest": "cfb39eb3"
@@ -550,8 +550,8 @@
           "swingTimer": 1.85,
           "templateId": "voidwalker",
           "weapon": {
-            "max": 22,
-            "min": 14,
+            "max": 15,
+            "min": 10,
             "speed": 2
           }
         },
@@ -568,7 +568,7 @@
           "forcedTargetId": 389,
           "forcedTargetTimer": 2.8,
           "hostile": true,
-          "hp": 49921,
+          "hp": 49939,
           "id": 390,
           "inCombat": true,
           "kind": "mob",
@@ -609,7 +609,7 @@
             ],
             [
               389,
-              67
+              49
             ]
           ],
           "weapon": {
