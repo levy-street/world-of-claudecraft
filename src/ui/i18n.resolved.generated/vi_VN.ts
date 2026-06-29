@@ -318,9 +318,9 @@ export const vi_VN: EnTranslations = {
       "showWalletOnPlayerCard": "Hiện Ví Tiền Trên Thẻ Người Chơi",
       "uiScale": "Tỷ Lệ Giao Diện",
       "highContrastBackground": "Nền Tương Phản Cao",
-      "showItemLevel": "Show Item Level",
-      "itemLevelLine": "Item Level {level}",
-      "itemScoreLine": "Score {score}"
+      "showItemLevel": "Hiển Thị Cấp Vật Phẩm",
+      "itemLevelLine": "Cấp Vật Phẩm {level}",
+      "itemScoreLine": "Điểm {score}"
     },
     "controller": {
       "title": "Tay Cầm",

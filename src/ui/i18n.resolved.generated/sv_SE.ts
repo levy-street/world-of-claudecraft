@@ -318,9 +318,9 @@ export const sv_SE: EnTranslations = {
       "showWalletOnPlayerCard": "Visa plånbok på spelarkortet",
       "uiScale": "Gränssnittsskala",
       "highContrastBackground": "Bakgrund med hög kontrast",
-      "showItemLevel": "Show Item Level",
-      "itemLevelLine": "Item Level {level}",
-      "itemScoreLine": "Score {score}"
+      "showItemLevel": "Visa föremålsnivå",
+      "itemLevelLine": "Föremålsnivå {level}",
+      "itemScoreLine": "Poäng {score}"
     },
     "controller": {
       "title": "Handkontroll",

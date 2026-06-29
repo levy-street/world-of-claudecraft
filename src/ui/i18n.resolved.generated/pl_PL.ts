@@ -318,9 +318,9 @@ export const pl_PL: EnTranslations = {
       "showWalletOnPlayerCard": "Pokaż sakiewkę na karcie gracza",
       "uiScale": "Skala interfejsu",
       "highContrastBackground": "Tło o wysokim kontraście",
-      "showItemLevel": "Show Item Level",
-      "itemLevelLine": "Item Level {level}",
-      "itemScoreLine": "Score {score}"
+      "showItemLevel": "Pokaż poziom przedmiotu",
+      "itemLevelLine": "Poziom przedmiotu {level}",
+      "itemScoreLine": "Ocena {score}"
     },
     "controller": {
       "title": "Kontroler",

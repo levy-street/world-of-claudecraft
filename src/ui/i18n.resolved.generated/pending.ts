@@ -69,69 +69,48 @@ export const pending: Record<string, readonly string[]> = {
     "hud.combat.resisted",
     "hudChrome.itemArmorType.cloth",
     "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
-    "hudChrome.options.itemLevelLine",
-    "hudChrome.options.itemScoreLine",
-    "hudChrome.options.showItemLevel"
+    "hudChrome.itemArmorType.mail"
   ],
   "pl_PL": [
     "hud.combat.floatingResist",
     "hud.combat.resisted",
     "hudChrome.itemArmorType.cloth",
     "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
-    "hudChrome.options.itemLevelLine",
-    "hudChrome.options.itemScoreLine",
-    "hudChrome.options.showItemLevel"
+    "hudChrome.itemArmorType.mail"
   ],
   "id_ID": [
     "hud.combat.floatingResist",
     "hud.combat.resisted",
     "hudChrome.itemArmorType.cloth",
     "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
-    "hudChrome.options.itemLevelLine",
-    "hudChrome.options.itemScoreLine",
-    "hudChrome.options.showItemLevel"
+    "hudChrome.itemArmorType.mail"
   ],
   "tr_TR": [
     "hud.combat.floatingResist",
     "hud.combat.resisted",
     "hudChrome.itemArmorType.cloth",
     "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
-    "hudChrome.options.itemLevelLine",
-    "hudChrome.options.itemScoreLine",
-    "hudChrome.options.showItemLevel"
+    "hudChrome.itemArmorType.mail"
   ],
   "sv_SE": [
     "hud.combat.floatingResist",
     "hud.combat.resisted",
     "hudChrome.itemArmorType.cloth",
     "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
-    "hudChrome.options.itemLevelLine",
-    "hudChrome.options.itemScoreLine",
-    "hudChrome.options.showItemLevel"
+    "hudChrome.itemArmorType.mail"
   ],
   "vi_VN": [
     "hud.combat.floatingResist",
     "hud.combat.resisted",
     "hudChrome.itemArmorType.cloth",
     "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
-    "hudChrome.options.itemLevelLine",
-    "hudChrome.options.itemScoreLine",
-    "hudChrome.options.showItemLevel"
+    "hudChrome.itemArmorType.mail"
   ],
   "da_DK": [
     "hud.combat.floatingResist",
     "hud.combat.resisted",
     "hudChrome.itemArmorType.cloth",
     "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
-    "hudChrome.options.itemLevelLine",
-    "hudChrome.options.itemScoreLine",
-    "hudChrome.options.showItemLevel"
+    "hudChrome.itemArmorType.mail"
   ]
 };

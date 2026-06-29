@@ -318,9 +318,9 @@ export const id_ID: EnTranslations = {
       "showWalletOnPlayerCard": "Tampilkan Dompet di Kartu Pemain",
       "uiScale": "Skala UI",
       "highContrastBackground": "Latar Kontras Tinggi",
-      "showItemLevel": "Show Item Level",
-      "itemLevelLine": "Item Level {level}",
-      "itemScoreLine": "Score {score}"
+      "showItemLevel": "Tampilkan Level Item",
+      "itemLevelLine": "Level Item {level}",
+      "itemScoreLine": "Skor {score}"
     },
     "controller": {
       "title": "Kontroler",

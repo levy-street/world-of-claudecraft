@@ -318,8 +318,8 @@ export const da_DK: EnTranslations = {
       "showWalletOnPlayerCard": "Vis pengepung på spillerkort",
       "uiScale": "UI-skala",
       "highContrastBackground": "Baggrund med høj kontrast",
-      "showItemLevel": "Show Item Level",
-      "itemLevelLine": "Item Level {level}",
+      "showItemLevel": "Vis genstandsniveau",
+      "itemLevelLine": "Genstandsniveau {level}",
       "itemScoreLine": "Score {score}"
     },
     "controller": {

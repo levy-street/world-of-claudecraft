@@ -318,8 +318,8 @@ export const nl_NL: EnTranslations = {
       "showWalletOnPlayerCard": "Portemonnee tonen op spelerskaart",
       "uiScale": "UI-schaal",
       "highContrastBackground": "Hoog-contrastachtergrond",
-      "showItemLevel": "Show Item Level",
-      "itemLevelLine": "Item Level {level}",
+      "showItemLevel": "Itemniveau tonen",
+      "itemLevelLine": "Itemniveau {level}",
       "itemScoreLine": "Score {score}"
     },
     "controller": {

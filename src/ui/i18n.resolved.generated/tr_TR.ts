@@ -318,9 +318,9 @@ export const tr_TR: EnTranslations = {
       "showWalletOnPlayerCard": "Cüzdanı Oyuncu Kartında Göster",
       "uiScale": "Arayüz Ölçeği",
       "highContrastBackground": "Yüksek Kontrastlı Arka Plan",
-      "showItemLevel": "Show Item Level",
-      "itemLevelLine": "Item Level {level}",
-      "itemScoreLine": "Score {score}"
+      "showItemLevel": "Eşya Seviyesini Göster",
+      "itemLevelLine": "Eşya Seviyesi {level}",
+      "itemScoreLine": "Puan {score}"
     },
     "controller": {
       "title": "Oyun Kolu",
