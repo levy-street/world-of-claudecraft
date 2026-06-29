@@ -173,6 +173,17 @@ export const DELVE_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 6,
     moveSpeed: 7,
     aggroRadius: 15,
+    // Ranged hazard-maker: lobs rotwater vials that burst for nature damage near
+    // the pack (projectile telegraph). Kill or break line of sight to stop it.
+    aoePulse: {
+      min: 5,
+      max: 8,
+      radius: 5,
+      every: 5,
+      name: 'Rotwater Vials',
+      school: 'nature',
+      fx: 'projectile',
+    },
     loot: [{ copper: 9, chance: 1 }],
     scale: 0.95,
     color: 0x5b6b4a,
@@ -191,6 +202,10 @@ export const DELVE_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 5,
     moveSpeed: 8.5,
     aggroRadius: 16,
+    // Mobile skirmisher: already the fastest marsh mob, and it whips itself into a
+    // stacking frenzy the longer it stays on a target (the spearjaw's optional
+    // frenzy; a true gap-close leap is a later mechanic).
+    frenzyOnHit: { chance: 0.3, hasteMult: 1.3, duration: 6, name: 'Frenzy' },
     loot: [{ copper: 7, chance: 1 }],
     scale: 0.9,
     color: 0x3f5942,
@@ -209,6 +224,9 @@ export const DELVE_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 4,
     moveSpeed: 8,
     aggroRadius: 13,
+    // Control add: a landed bite snares the victim in marsh-silk webbing, slowing
+    // their movement so the pack can close (web_snare).
+    chillOnHit: { chance: 0.4, mult: 0.5, duration: 3, name: 'Web Snare' },
     loot: [{ copper: 6, chance: 1 }],
     scale: 0.8,
     color: 0x2e2a34,
@@ -250,6 +268,9 @@ export const DELVE_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 14,
     moveSpeed: 6,
     aggroRadius: 11,
+    // Elite bruiser: periodically cakes itself in a thick silt hide that soaks a
+    // chunk of incoming damage (the optional temporary damage reduction).
+    stoneskin: { amount: 70, every: 11, duration: 4, name: 'Silt Hide' },
     loot: [{ copper: 70, chance: 1 }],
     scale: 1.4,
     color: 0x4a5a3c,

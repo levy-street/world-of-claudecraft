@@ -1361,6 +1361,54 @@ describe('The Drowned Litany (Phase 2 marsh layouts: navigable, distinct)', () =
   });
 });
 
+describe('The Drowned Litany (Phase 4 enemy kits)', () => {
+  it('the Drowned Cantor is a priority caster (Litany Pulse aoePulse)', () => {
+    expect(MOBS.drowned_cantor.aoePulse?.name).toBe('Litany Pulse');
+  });
+
+  it('the Reedbound Acolyte lobs ranged Rotwater Vials (nature projectile pulse)', () => {
+    const m = MOBS.reedbound_acolyte;
+    expect(m.aoePulse?.name).toBe('Rotwater Vials');
+    expect(m.aoePulse?.school).toBe('nature');
+    expect(m.aoePulse?.fx).toBe('projectile');
+  });
+
+  it('the Deepfen Spearjaw is a frenzying skirmisher (fast + frenzyOnHit)', () => {
+    const m = MOBS.deepfen_spearjaw;
+    expect(m.frenzyOnHit?.name).toBe('Frenzy');
+    expect(m.frenzyOnHit?.hasteMult ?? 0).toBeGreaterThan(1);
+    expect(m.moveSpeed).toBeGreaterThanOrEqual(8);
+  });
+
+  it('the Mirefen Widowling snares with a movement slow (Web Snare chillOnHit)', () => {
+    const m = MOBS.mirefen_widowling;
+    expect(m.chillOnHit?.name).toBe('Web Snare');
+    expect(m.chillOnHit?.mult ?? 1).toBeLessThan(1); // slows movement
+  });
+
+  it('the Grave-Silt Bulwark cleaves and is a CC-immune elite', () => {
+    const m = MOBS.grave_silt_bulwark;
+    expect(m.cleave?.name).toBe('Silt Cleave');
+    expect(m.elite).toBe(true);
+    expect(m.ccImmune).toBe(true);
+  });
+
+  it('the Sump Troll Devourer is a self-shielding elite (Silt Hide stoneskin)', () => {
+    const m = MOBS.sump_troll_devourer;
+    expect(m.elite).toBe(true);
+    expect(m.stoneskin?.name).toBe('Silt Hide');
+    expect(m.stoneskin?.amount ?? 0).toBeGreaterThan(0);
+  });
+
+  it('the Choir Thrall is a fragile basic-melee swarm add', () => {
+    const m = MOBS.choir_thrall;
+    expect(m.hpBase).toBeLessThan(MOBS.drowned_cantor.hpBase);
+    expect(m.aoePulse).toBeUndefined();
+    expect(m.cleave).toBeUndefined();
+    expect(m.elite).toBeUndefined();
+  });
+});
+
 describe('The Drowned Litany (Phase 3 static Blackwater hazard)', () => {
   // World-space centre of a module's hazard zone for the active run.
   function hazardWorld(sim: Sim, moduleId: string, hazardIndex = 0) {
