@@ -57,6 +57,11 @@ import { skinCount, visualKeyFor } from './characters/manifest';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { trackWebGLContext } from './context_release';
 import { buildCritters, type CritterField } from './critters';
+import {
+  CROWD_LOD_MIN_LOD_SQ_SCALE,
+  CROWD_LOD_MIN_SHADOW_SQ_SCALE,
+  crowdLodSqScale,
+} from './crowd_lod';
 import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable } from './delve_props';
 import { DungeonInteriors, ensureDungeonAssets } from './dungeon';
@@ -811,6 +816,14 @@ export class Renderer {
   private envOutdoorIntensity = ENV_INTENSITY;
   private time = 0;
   private frameIdx = 0;
+  // Crowd-adaptive character budget (see crowd_lod.ts). `crowdRigCount` is the
+  // count of visible articulated rigs from the PREVIOUS frame, used to scale this
+  // frame's shadow/LOD ranges (one-frame lag is imperceptible and avoids a second
+  // pass). `crowdAdaptiveLod` gates it on; it stays public so a profiler can A/B
+  // it at a fixed crowd via `window.__game.renderer.crowdAdaptiveLod = false`.
+  crowdAdaptiveLod = true;
+  // visible articulated rigs last frame; read-only diagnostic (drives the scale).
+  crowdRigCount = 0;
   vfx: Vfx;
   private weather: Weather;
   private weatherOn = true;
@@ -3573,6 +3586,16 @@ export class Renderer {
     // frame parity for distance-tiered mixer throttling
     this.frameIdx = (this.frameIdx + 1) & 0xffff;
 
+    // Crowd-adaptive shadow/LOD ranges for THIS frame, from last frame's visible
+    // rig count (crowd_lod.ts). Below the soft knee both scales are 1 (no change);
+    // a dense crowd pulls the articulated-shadow and articulated-LOD ranges in so
+    // distant bodies shed only their (cosmetic) crisp shadow + smooth animation.
+    const crowdRigs = this.crowdAdaptiveLod ? this.crowdRigCount : 0;
+    const shadowRangeSq =
+      ENTITY_SHADOW_RANGE_SQ * crowdLodSqScale(crowdRigs, CROWD_LOD_MIN_SHADOW_SQ_SCALE);
+    const lodRangeSq = ENTITY_LOD_RANGE_SQ * crowdLodSqScale(crowdRigs, CROWD_LOD_MIN_LOD_SQ_SCALE);
+    let visibleRigs = 0;
+
     // world-space view frustum for the per-character cull below. Built from last
     // frame's camera (it's repositioned after this loop); the one-frame lag is
     // absorbed by the generous per-rig cull radius.
@@ -3614,12 +3637,18 @@ export class Renderer {
           continue;
         }
         v.group.visible = true; // the object branch below may re-hide loot
-        // mid-distance rigs keep rendering but leave the shadow pass
-        const wantShadow = d2 < ENTITY_SHADOW_RANGE_SQ;
+        // mid-distance rigs keep rendering but leave the shadow pass. The shadow
+        // and LOD ranges are crowd-scaled (shadowRangeSq/lodRangeSq) so a dense
+        // crowd sheds distant rigs' articulated shadow + skinning sooner.
+        const wantShadow = d2 < shadowRangeSq;
         const inProxyBand = d2 < ENTITY_PROXY_SHADOW_RANGE_SQ;
         if (v.visual) {
+          // every visible character rig (pre-LOD) is one body in the crowd; this
+          // drives next frame's crowd scale (a stable, density-based signal that
+          // does not feed back on the LOD decision it informs).
+          visibleRigs++;
           v.visual.setShadow(wantShadow);
-          v.isFar = d2 > ENTITY_LOD_RANGE_SQ;
+          v.isFar = d2 > lodRangeSq;
           // past the articulated gate the static-pose proxy carries the
           // shadow; an active form's own rig keeps casting instead
           v.visual.setProxyShadow(
@@ -3980,6 +4009,8 @@ export class Renderer {
         this.targetCone.group.visible = true;
       }
     }
+    // visible-rig tally for next frame's crowd-adaptive shadow/LOD scale
+    this.crowdRigCount = visibleRigs;
     markPhase('entities');
 
     let worldStart = performance.now();
