@@ -469,7 +469,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'pyroblast', name: 'Pyroblast', class: 'mage', learnLevel: 20,
     cost: 125, castTime: 6.0, cooldown: 0, range: 30, school: 'fire',
     requiresTarget: true,
-    effects: [{ type: 'directDamage', min: 75, max: 100 }, { type: 'dot', total: 24, duration: 12, interval: 2 }],
+    effects: [{ type: 'directDamage', min: 170, max: 225 }, { type: 'dot', total: 48, duration: 12, interval: 2 }],
     description: 'Hurls an immense fiery boulder that causes $d Fire damage plus additional damage over time.',
   },
   ice_barrier: {
@@ -1443,7 +1443,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'starfire', name: 'Starfire', class: 'druid', learnLevel: 18,
     cost: 80, castTime: 3.0, cooldown: 0, range: 30, school: 'arcane',
     requiresTarget: true,
-    effects: [{ type: 'directDamage', min: 60, max: 74 }],
+    effects: [{ type: 'directDamage', min: 80, max: 112 }],
     description: 'Calls down a bolt of stellar fire, causing $d Arcane damage.',
   },
   travel_form: {
