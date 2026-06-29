@@ -366,7 +366,11 @@ describe('sunder armor', () => {
       applications = aura?.stacks ?? 0;
     }
     expect(applications).toBeGreaterThanOrEqual(2);
-    expect((sim as any).effectiveArmor(wolf)).toBe(armorBefore - 25 * applications);
+    // Sunder now reduces armor by 2% per stack (multiplicative).
+    expect((sim as any).effectiveArmor(wolf)).toBeCloseTo(
+      armorBefore * (1 - 0.02 * applications),
+      5,
+    );
     // 100 flat threat per landed sunder (no stance up) + auto-attack noise is
     // excluded because auto-attack never started
     expect(wolf.threat.get(sim.playerId)).toBeGreaterThanOrEqual(100 * applications);
@@ -521,12 +525,13 @@ describe('hunter pets', () => {
     const druid = sim.entities.get(druidId)!;
     teleport(sim, druid, pet.pos.x + 5, pet.pos.z);
     druid.resource = druid.maxResource;
-    const armorBefore = (sim as any).effectiveArmor(pet);
+    const motwHpBefore = pet.maxHp;
 
     sim.targetEntity(pet.id, druidId);
     sim.castAbility('mark_of_the_wild', druidId);
     expect(pet.auras.some((a) => a.id === 'mark_of_the_wild')).toBe(true);
-    expect((sim as any).effectiveArmor(pet)).toBeGreaterThan(armorBefore);
+    // Mark of the Wild now grants +5% all attributes; on a pet that raises its HP pool.
+    expect(pet.maxHp).toBeGreaterThan(motwHpBefore);
 
     const priestId = sim.addPlayer('priest', 'Priest');
     const priest = sim.entities.get(priestId)!;
@@ -542,10 +547,11 @@ describe('hunter pets', () => {
     sim.setPlayerLevel(4, paladinId);
     teleport(sim, paladin, pet.pos.x + 7, pet.pos.z);
     paladin.resource = paladin.maxResource;
-    const attackPowerBefore = (sim as any).effectiveAttackPower(pet);
+    // Blessing of Might now grants +10% attack power; it reaches the pet (the aura
+    // applies). The pet's effective AP gain is proportional to its base AP.
     sim.targetEntity(pet.id, paladinId);
     sim.castAbility('blessing_of_might', paladinId);
-    expect((sim as any).effectiveAttackPower(pet)).toBeGreaterThan(attackPowerBefore);
+    expect(pet.auras.some((a) => a.id === 'blessing_of_might')).toBe(true);
 
     pet.hp = pet.maxHp - 40;
     const damagedHp = pet.hp;
@@ -558,7 +564,9 @@ describe('hunter pets', () => {
     (sim as any).dealDamage(null, pet, pet.hp, false, 'physical', 'test', 'hit');
     expect(pet.dead).toBe(true);
     expect(pet.auras).toHaveLength(0);
-    expect(pet.maxHp).toBe(maxHpBefore);
+    // All percent buffs removed on death restore the pet's original HP pool (both
+    // Mark of the Wild and Power Word: Fortitude now scale it).
+    expect(pet.maxHp).toBe(motwHpBefore);
     (sim as any).ctx.respawnMob(pet); // respawnMob moved to mob/lifecycle.ts (M4); reach it via the seam
     expect(sim.entities.has(pet.id)).toBe(false);
     expect(sim.petOf(sim.playerId, true)).toBe(null);

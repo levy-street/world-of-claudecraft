@@ -20,11 +20,16 @@ import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
-import { abilityScalingPower, directHitBonus, dotTickBonus } from '../spell_scaling';
+import {
+  abilityScalingPower,
+  directHitBonus,
+  dotTickBonus,
+  thornsReflectBonus,
+} from '../spell_scaling';
 import { stunDrCategory } from '../stun_dr';
 import { addThreat } from '../threat';
 import type { AbilityDef, Entity } from '../types';
-import { armorReduction, meleeMissChance } from '../types';
+import { armorReduction, dist2d, meleeMissChance } from '../types';
 import { exclusiveAuraConflicts } from './exclusive_aura';
 
 const CHARGE_MAX_DURATION = 3; // seconds before a blocked charge gives up
@@ -162,18 +167,26 @@ export function runEffects(
         break;
       case 'heal': {
         const healTarget = target ?? p;
-        ctx.applyHeal(p, healTarget, ctx.rng.range(eff.min, eff.max), ability.name);
+        // Heals scale with Spell Power too (vanilla "+healing"), using the same
+        // cast-time coefficient as a direct nuke. (drainTick heals already scale
+        // via their Spell-Power-boosted tick damage, so they are not handled here.)
+        const healBonus = isSpell ? directHitBonus(p.spellPower, ability, res.castTime) : 0;
+        ctx.applyHeal(p, healTarget, ctx.rng.range(eff.min, eff.max) + healBonus, ability.name);
         break;
       }
       case 'hot': {
         const hotTarget = target ?? p;
+        // HoTs scale with Spell Power per tick, snapshotted at cast (mirrors the DoT
+        // total-coefficient-over-duration model).
+        const hotBase = Math.max(1, Math.round(eff.total / (eff.duration / eff.interval)));
+        const hotSp = isSpell ? dotTickBonus(p.spellPower, ability, eff.duration, eff.interval) : 0;
         ctx.applyAura(hotTarget, {
           id: ability.id,
           name: ability.name,
           kind: 'hot',
           remaining: eff.duration,
           duration: eff.duration,
-          value: Math.max(1, Math.round(eff.total / (eff.duration / eff.interval))),
+          value: hotBase + hotSp,
           tickInterval: eff.interval,
           tickTimer: eff.interval,
           sourceId: p.id,
@@ -258,17 +271,62 @@ export function runEffects(
       case 'drainTick':
         break; // handled per channel tick
       case 'buffTarget': {
-        const buffTarget = target ?? p;
-        ctx.applyAura(buffTarget, {
+        // Thorns snapshots the caster's Spell Power into its per-hit reflect at cast
+        // time (mirroring the DoT model), on top of the flat rank value.
+        const buffValue =
+          eff.kind === 'thorns' ? eff.value + thornsReflectBonus(p.spellPower) : eff.value;
+        const applyBuff = (e: Entity) =>
+          ctx.applyAura(e, {
+            id: ability.id,
+            name: ability.name,
+            kind: eff.kind,
+            remaining: eff.duration,
+            duration: eff.duration,
+            value: buffValue,
+            sourceId: p.id,
+            school: ability.school,
+          });
+        if (eff.party) {
+          // Raid buff: apply to the explicit target (self, ally, or a controlled
+          // pet), the caster, and every living party member within the ability's
+          // range (a gathered party is everyone; stragglers miss out).
+          const party = ctx.partyOf(p.id);
+          const range = ability.range > 0 ? ability.range : 30;
+          const seen = new Set<number>();
+          const give = (e: Entity | null | undefined) => {
+            if (e && !seen.has(e.id)) {
+              seen.add(e.id);
+              applyBuff(e);
+            }
+          };
+          give(target ?? p);
+          give(p);
+          if (party) {
+            for (const pid of party.members) {
+              const member = ctx.entities.get(pid);
+              if (member && !member.dead && dist2d(p.pos, member.pos) <= range) give(member);
+            }
+          }
+        } else {
+          applyBuff(target ?? p);
+        }
+        break;
+      }
+      case 'faerieFire': {
+        // Percent armor-reduction debuff (see effectiveArmor); does not stack with
+        // Sunder Armor. value is unused (the percent is a fixed constant).
+        if (!target || target.dead) break;
+        ctx.applyAura(target, {
           id: ability.id,
           name: ability.name,
-          kind: eff.kind,
+          kind: 'faerie_fire',
           remaining: eff.duration,
           duration: eff.duration,
-          value: eff.value,
+          value: 0,
           sourceId: p.id,
           school: ability.school,
         });
+        ctx.enterCombat(p, target);
         break;
       }
       case 'dot': {
@@ -638,9 +696,12 @@ export function runEffects(
           ctx.enterCombat(p, target);
           break;
         }
+        // Expose Armor (`full`) lands all stacks at once; warrior Sunder adds one.
         const existing = target.auras.find((a) => a.kind === 'sunder');
         if (existing) {
-          existing.stacks = Math.min(eff.maxStacks, (existing.stacks ?? 1) + 1);
+          existing.stacks = eff.full
+            ? eff.maxStacks
+            : Math.min(eff.maxStacks, (existing.stacks ?? 1) + 1);
           existing.value = eff.armor;
           existing.remaining = existing.duration;
           ctx.emit({ type: 'aura', targetId: target.id, name: ability.name, gained: true });
@@ -652,7 +713,7 @@ export function runEffects(
             remaining: 30,
             duration: 30,
             value: eff.armor,
-            stacks: 1,
+            stacks: eff.full ? eff.maxStacks : 1,
             sourceId: p.id,
             school: 'physical',
           });

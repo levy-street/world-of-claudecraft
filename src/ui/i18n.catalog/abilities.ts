@@ -582,7 +582,11 @@ const classAbilityNamesEn = {
         'Heroic Strike',
         'A strong attack that increases melee damage by {damage}. Activates on your next swing.',
       ],
-      ['battle_shout', 'Battle Shout', 'Increases your attack power by 20 for 2 min.'],
+      [
+        'battle_shout',
+        'Battle Shout',
+        'A shout increasing the attack power of party members within 30 yds by 10% for 2 min.',
+      ],
       ['commanding_shout', 'Commanding Shout', 'Increases your Stamina by 6 for 2 min.'],
       [
         'demoralizing_shout',
@@ -643,7 +647,11 @@ const classAbilityNamesEn = {
         'Hurls a fiery ball that causes {damage} Fire damage plus additional damage over time.',
       ],
       ['frost_armor', 'Frost Armor', 'Encases you in frost, increasing armor by 30 for 30 min.'],
-      ['arcane_intellect', 'Arcane Intellect', 'Increases Intellect by 2 for 30 min.'],
+      [
+        'arcane_intellect',
+        'Arcane Intellect',
+        'Increases the Intellect of all party members within 30 yds by 5% for 30 min.',
+      ],
       [
         'frostbolt',
         'Frostbolt',
@@ -749,7 +757,7 @@ const classAbilityNamesEn = {
       [
         'expose_armor',
         'Expose Armor',
-        'Finishing move that exposes the target, reducing its armor. More combo points spent build into a deeper cut.',
+        'Finishing move that exposes the target, reducing its armor by 10% for 30 sec.',
       ],
       [
         'rupture',
@@ -782,7 +790,11 @@ const classAbilityNamesEn = {
         'Fills you with Holy power for 30 sec, causing each of your melee swings to deal 4 additional Holy damage. Unleash with Judgement.',
       ],
       ['holy_light', 'Holy Light', 'Heals a friendly target for {damage}.'],
-      ['devotion_aura', 'Devotion Aura', 'Increases your armor by 40 for 30 min.'],
+      [
+        'devotion_aura',
+        'Devotion Aura',
+        'Increases the armor of all party members within 30 yds by 10%.',
+      ],
       [
         'judgement',
         'Judgement',
@@ -791,7 +803,7 @@ const classAbilityNamesEn = {
       [
         'blessing_of_might',
         'Blessing of Might',
-        'Places a Blessing on a friendly target, increasing attack power by 15 for 5 min.',
+        'Blesses the party, increasing the attack power of party members within 30 yds by 10% for 30 min.',
       ],
       ['divine_protection', 'Divine Protection', 'A holy shield absorbs 50 damage for 10 sec.'],
       ['hammer_of_justice', 'Hammer of Justice', 'Stuns the target for 3 sec.'],
@@ -875,7 +887,7 @@ const classAbilityNamesEn = {
       [
         'power_word_fortitude',
         'Power Word: Fortitude',
-        "Increases the target's Stamina by 3 for 30 min.",
+        'Increases the Stamina of all party members within 30 yds by 5% for 30 min.',
       ],
       [
         'shadow_word_pain',
@@ -990,7 +1002,7 @@ const classAbilityNamesEn = {
       [
         'mark_of_the_wild',
         'Mark of the Wild',
-        'Places the Mark of the Wild on a friendly target, increasing armor by 25 for 30 min.',
+        'Places the Mark of the Wild on the party, increasing all attributes of party members within 30 yds by 5% for 30 min.',
       ],
       [
         'moonfire',
@@ -1053,7 +1065,11 @@ const classAbilityNamesEn = {
       ],
       ['enrage', 'Enrage', 'Generates 20 rage instantly. Bear Form only.'],
       ['bash', 'Bash', 'Stuns the target for 2 sec. Bear Form only.'],
-      ['faerie_fire', 'Faerie Fire', "Decreases the target's armor by 35 for 40 sec."],
+      [
+        'faerie_fire',
+        'Faerie Fire',
+        "Decreases the target's armor by 10% for 40 sec. Does not stack with Sunder Armor.",
+      ],
       [
         'hibernate',
         'Hibernate',

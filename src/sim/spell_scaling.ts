@@ -24,7 +24,14 @@ import {
   SPELL_COEFF_MAX_CAST,
   SPELL_COEFF_MIN_CAST,
   SPELL_DOT_COEFF_DURATION,
+  THORNS_SP_COEFF,
 } from './types';
+
+// Druid Thorns: the flat per-hit reflect gains this fraction of the caster's Spell
+// Power, snapshotted into the aura value at cast time (so it freezes like a DoT).
+export function thornsReflectBonus(spellPower: number): number {
+  return Math.round(Math.max(0, spellPower) * THORNS_SP_COEFF);
+}
 
 function clampCast(seconds: number): number {
   const t = seconds <= 0 ? SPELL_COEFF_MIN_CAST : seconds;

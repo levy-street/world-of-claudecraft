@@ -960,18 +960,18 @@ function applyStackPoison(
   }
 }
 
-// Apply (or refresh + stack) a corrosive armor-shred debuff on the victim.
-// Mirrors the warrior Sunder Armor stacking: one shared `sunder` slot found by
-// kind, bumped up to `maxStacks`, with its timer fully refreshed each application.
-// effectiveArmor() already subtracts value*stacks, so the victim takes more
-// physical damage from every attacker until it expires.
+// Apply (or refresh + stack) a corrosive armor-shred debuff on the victim. Uses the
+// dedicated FLAT `corrode` aura kind (one slot found by kind, bumped to `maxStacks`,
+// timer fully refreshed each application). effectiveArmor() subtracts value*stacks,
+// so the victim takes more physical damage from every attacker until it expires.
+// (Kept separate from the warrior/rogue percent `sunder` so the two never collide.)
 function applyCorrosion(
   ctx: SimContext,
   mob: Entity,
   target: Entity,
   corrode: NonNullable<MobTemplate['corrode']>,
 ): void {
-  const existing = target.auras.find((a) => a.kind === 'sunder');
+  const existing = target.auras.find((a) => a.kind === 'corrode');
   if (existing) {
     existing.stacks = Math.min(corrode.maxStacks, (existing.stacks ?? 1) + 1);
     existing.value = corrode.armor;
@@ -981,7 +981,7 @@ function applyCorrosion(
     ctx.applyAura(target, {
       id: `corrode_${mob.templateId}`,
       name: corrode.name,
-      kind: 'sunder',
+      kind: 'corrode',
       remaining: corrode.duration,
       duration: corrode.duration,
       value: corrode.armor,

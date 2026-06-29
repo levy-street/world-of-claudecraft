@@ -78,7 +78,17 @@ export function applyNonPlayerStatAura(
   direction: 1 | -1,
 ): void {
   if (target.kind === 'player') return;
-  const hpDelta = nonPlayerAuraHp(aura) * direction;
+  let hpDelta = nonPlayerAuraHp(aura) * direction;
+  // Percent stamina raid buffs (Power Word: Fortitude / Mark of the Wild) on a
+  // controlled pet scale its HP pool by the percent. Derived symmetrically so an
+  // apply/remove cycle restores the original pool exactly.
+  if (aura.kind === 'buff_sta_pct' || aura.kind === 'buff_allstats_pct') {
+    const pct = aura.value / 100;
+    hpDelta =
+      direction === 1
+        ? Math.round(target.maxHp * pct)
+        : -Math.round((target.maxHp / (1 + pct)) * pct);
+  }
   if (hpDelta === 0) return;
   const hpFrac = target.maxHp > 0 ? target.hp / target.maxHp : 1;
   target.maxHp = Math.max(1, target.maxHp + hpDelta);

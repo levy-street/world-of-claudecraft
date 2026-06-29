@@ -3402,7 +3402,7 @@ export const en_CA: EnTranslations = {
       },
       "battle_shout": {
         "name": "Battle Shout",
-        "description": "Increases your attack power by 20 for 2 min."
+        "description": "A shout increasing the attack power of party members within 30 yds by 10% for 2 min."
       },
       "commanding_shout": {
         "name": "Commanding Shout",
@@ -3470,7 +3470,7 @@ export const en_CA: EnTranslations = {
       },
       "arcane_intellect": {
         "name": "Arcane Intellect",
-        "description": "Increases Intellect by 2 for 30 min."
+        "description": "Increases the Intellect of all party members within 30 yds by 5% for 30 min."
       },
       "frostbolt": {
         "name": "Frostbolt",
@@ -3578,7 +3578,7 @@ export const en_CA: EnTranslations = {
       },
       "expose_armor": {
         "name": "Expose Armor",
-        "description": "Finishing move that exposes the target, reducing its armor. More combo points spent build into a deeper cut."
+        "description": "Finishing move that exposes the target, reducing its armor by 10% for 30 sec."
       },
       "rupture": {
         "name": "Rupture",
@@ -3610,7 +3610,7 @@ export const en_CA: EnTranslations = {
       },
       "devotion_aura": {
         "name": "Devotion Aura",
-        "description": "Increases your armor by 40 for 30 min."
+        "description": "Increases the armor of all party members within 30 yds by 10%."
       },
       "judgement": {
         "name": "Judgement",
@@ -3618,7 +3618,7 @@ export const en_CA: EnTranslations = {
       },
       "blessing_of_might": {
         "name": "Blessing of Might",
-        "description": "Places a Blessing on a friendly target, increasing attack power by 15 for 5 min."
+        "description": "Blesses the party, increasing the attack power of party members within 30 yds by 10% for 30 min."
       },
       "divine_protection": {
         "name": "Divine Protection",
@@ -3714,7 +3714,7 @@ export const en_CA: EnTranslations = {
       },
       "power_word_fortitude": {
         "name": "Power Word: Fortitude",
-        "description": "Increases the target's Stamina by 3 for 30 min."
+        "description": "Increases the Stamina of all party members within 30 yds by 5% for 30 min."
       },
       "shadow_word_pain": {
         "name": "Shadow Word: Pain",
@@ -3838,7 +3838,7 @@ export const en_CA: EnTranslations = {
       },
       "mark_of_the_wild": {
         "name": "Mark of the Wild",
-        "description": "Places the Mark of the Wild on a friendly target, increasing armor by 25 for 30 min."
+        "description": "Places the Mark of the Wild on the party, increasing all attributes of party members within 30 yds by 5% for 30 min."
       },
       "moonfire": {
         "name": "Moonfire",
@@ -3910,7 +3910,7 @@ export const en_CA: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Faerie Fire",
-        "description": "Decreases the target's armor by 35 for 40 sec."
+        "description": "Decreases the target's armor by 10% for 40 sec. Does not stack with Sunder Armor."
       },
       "hibernate": {
         "name": "Hibernate",

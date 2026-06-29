@@ -161,6 +161,10 @@ export type AuraKind =
   | 'defensive_stance'
   | 'righteous_fury'
   | 'sunder'
+  // Mob corrosion (Acid Spit / Ledger Rot): a FLAT, stacking armor shred that
+  // subtracts value*stacks. Distinct from the warrior/rogue percent `sunder` so the
+  // two mechanics never collide (effectiveArmor subtracts it before the % debuffs).
+  | 'corrode'
   | 'mortal_wound'
   | 'silence'
   | 'blind'
@@ -178,7 +182,21 @@ export type AuraKind =
   // 2v2 Fiesta power-up buffs: `buff_scale` value = body-size multiplier (also
   // boosts max-hp when >1); `buff_jump` value = jump-height multiplier.
   | 'buff_scale'
-  | 'buff_jump';
+  | 'buff_jump'
+  // Percent stat buffs (multiply the computed stat, vanilla raid-buff style):
+  // Mark of the Wild (+5% all stats), Arcane Intellect (+5% Int), Power Word:
+  // Fortitude (+5% Sta). Folded after flat+talent stats in recalcPlayerStats.
+  | 'buff_allstats_pct'
+  | 'buff_int_pct'
+  | 'buff_sta_pct'
+  // Percent armor / attack-power raid buffs: Devotion Aura (+% armor), Battle Shout
+  // / Trueshot Aura / Blessing of Might (+% attack power). Folded at the armor / AP
+  // derivation steps in recalcPlayerStats.
+  | 'buff_armor_pct'
+  | 'buff_ap_pct'
+  // Faerie Fire: a percent armor reduction that does NOT stack with Sunder Armor
+  // (effectiveArmor max-combines the two). Distinct kind so it is not summed flat.
+  | 'faerie_fire';
 
 export interface Aura {
   id: string; // ability id that applied it
@@ -996,7 +1014,18 @@ export type AbilityEffect =
   | { type: 'judgement' } // consume your imbue, deal its judgement damage to the target
   | { type: 'lifeTap'; hp: number; mana: number }
   | { type: 'drainTick'; min: number; max: number; healFrac: number } // channel tick that heals the caster
-  | { type: 'buffTarget'; kind: AuraKind; value: number; duration: number } // fortitude/might/mark on a friendly target
+  | {
+      type: 'buffTarget';
+      kind: AuraKind;
+      value: number;
+      duration: number;
+      // When true, the buff is applied to every party member within the ability's
+      // range of the caster (plus the caster), not just the single target. Used by
+      // the raid buffs: Mark of the Wild, Arcane Intellect, Power Word: Fortitude,
+      // Blessing of Might.
+      party?: boolean;
+    } // fortitude/might/mark on a friendly target
+  | { type: 'faerieFire'; duration: number } // percent armor-reduction debuff (see AuraKind 'faerie_fire')
   | { type: 'finisherDamage'; base: number; perCombo: number; variance: number } // eviscerate
   | { type: 'dot'; total: number; duration: number; interval: number }
   | { type: 'slow'; mult: number; duration: number }
@@ -1031,7 +1060,10 @@ export type AbilityEffect =
   | { type: 'gainResource'; amount: number } // bloodrage immediate
   | { type: 'selfDamagePctMax'; pct: number } // bloodrage cost
   | { type: 'charge' }
-  | { type: 'sunder'; armor: number; maxStacks: number } // sunder armor: stacking armor debuff + flat threat
+  // sunder armor: stacking percent armor debuff (2% per stack via effectiveArmor) +
+  // flat threat. `full` lands all `maxStacks` at once (Expose Armor, a finisher that
+  // applies the cap in one cast) rather than building a stack per hit (warrior Sunder).
+  | { type: 'sunder'; armor: number; maxStacks: number; full?: boolean }
   | { type: 'taunt' } // taunt/growl: match top threat and force-attack the caster
   | { type: 'tamePet' } // hunter tame beast: the targeted mob becomes the caster's pet
   | { type: 'dismissPet' } // release the caster's pet back to the wild
@@ -1981,6 +2013,19 @@ export const RANGED_SPELL_AP_SCALE = 0.15;
 // weapon-swing and finisher portions already carry AP through their own paths;
 // this only lifts the flat directDamage / DoT / AoE riders.
 export const MELEE_SPELL_AP_SCALE = 0.15;
+// Armor-reduction debuffs as PERCENTAGES (multiplicative on the target's armor).
+// Sunder Armor reduces 2% per stack (5 stacks = 10%); Faerie Fire reduces a flat
+// 10%. They do NOT stack with each other: effectiveArmor takes the larger percent.
+export const SUNDER_ARMOR_PCT_PER_STACK = 0.02;
+export const FAERIE_FIRE_ARMOR_PCT = 0.1;
+// Druid Thorns reflect scales with the caster's Spell Power: reflected damage gains
+// this fraction of Spell Power, snapshotted at cast (on top of the flat rank value).
+export const THORNS_SP_COEFF = 0.15;
+// Percent raid buffs store their magnitude as integer percent POINTS on the aura
+// value (5 = +5%, 10 = +10%), divided by 100 in recalcPlayerStats. Integer points
+// keep them intact through the rounding ability-value talent multiplier. The values
+// live on the abilities themselves (Mark of the Wild / Arcane Intellect / Power
+// Word: Fortitude = 5; Devotion Aura / Battle Shout / Blessing of Might = 10).
 
 // ---------------------------------------------------------------------------
 // Delves, replayable modular instances (see docs/prd/delves.md)

@@ -200,6 +200,14 @@ export function recalcPlayerStats(
   let bearForm = false;
   let catForm = false;
   let scaleMul = 1; // Fiesta buff_scale: body-size multiplier (>1 also adds hp)
+  // Percent raid buffs (Mark of the Wild / Arcane Intellect / Power Word: Fortitude /
+  // Devotion Aura / Battle Shout / Trueshot Aura / Blessing of Might). Accumulated
+  // here, then folded multiplicatively at the relevant derivation step below.
+  let allStatsPct = 0;
+  let intPct = 0;
+  let staPct = 0;
+  let buffArmorPct = 0;
+  let buffApPct = 0;
   for (const a of e.auras) {
     if (a.kind === 'buff_ap') bonusAp += a.value;
     // Attack-power debuff (Demoralizing Shout/Roar). Mobs fold this live in
@@ -220,6 +228,13 @@ export function recalcPlayerStats(
     } else if (a.kind === 'buff_spellpower') bonusSp += a.value;
     else if (a.kind === 'buff_dodge') bonusDodge += a.value;
     else if (a.kind === 'buff_scale') scaleMul *= a.value;
+    // Percent buffs store integer percent POINTS (5 = +5%) so they survive the
+    // integer-rounding talent value-multiplier; converted to a fraction here.
+    else if (a.kind === 'buff_allstats_pct') allStatsPct += a.value / 100;
+    else if (a.kind === 'buff_int_pct') intPct += a.value / 100;
+    else if (a.kind === 'buff_sta_pct') staPct += a.value / 100;
+    else if (a.kind === 'buff_armor_pct') buffArmorPct += a.value / 100;
+    else if (a.kind === 'buff_ap_pct') buffApPct += a.value / 100;
     else if (a.kind === 'form_bear') bearForm = true;
     else if (a.kind === 'form_cat') catForm = true;
   }
@@ -237,6 +252,16 @@ export function recalcPlayerStats(
     bonusDodge += m.dodge;
     if (m.staPct) s.sta = Math.round(s.sta * (1 + m.staPct));
   }
+  // Percent stat raid buffs, applied multiplicatively on the computed (base + gear +
+  // flat + talent) primary stats so they feed every downstream derivation (AP from
+  // str/agi, Spell Power from int, HP from sta, crit/dodge from agi).
+  if (allStatsPct || intPct || staPct) {
+    s.str = Math.round(s.str * (1 + allStatsPct));
+    s.agi = Math.round(s.agi * (1 + allStatsPct));
+    s.sta = Math.round(s.sta * (1 + allStatsPct + staPct));
+    s.int = Math.round(s.int * (1 + allStatsPct + intPct));
+    s.spi = Math.round(s.spi * (1 + allStatsPct));
+  }
   // Floor Agility at 0 so a draining debuff (negative buff_agi) can never push the
   // derived armor/dodge below what zero Agility would give.
   s.agi = Math.max(0, s.agi);
@@ -250,6 +275,7 @@ export function recalcPlayerStats(
     s.agi += Math.max(2, Math.floor(lvl / 2));
   }
   if (mods?.stats.armorPct) s.armor = Math.round(s.armor * (1 + mods.stats.armorPct));
+  if (buffArmorPct) s.armor = Math.round(s.armor * (1 + buffArmorPct)); // Devotion Aura
   // Floor Spirit at 0 so a Spirit-siphoning debuff (negative buff_spi) can never
   // drive out-of-combat regen (updateRegen reads stats.spi) below zero.
   s.spi = Math.max(0, s.spi);
@@ -277,11 +303,14 @@ export function recalcPlayerStats(
         : s.str;
   // Floor at 0 so a heavy debuff_ap stack can never bake a negative attack power
   // (mirrors effectiveAttackPower's mob floor and the agi/spi floors above).
-  e.attackPower = Math.max(0, Math.round((apFromStats + bonusAp) * (1 + (mods?.stats.apPct ?? 0))));
+  e.attackPower = Math.max(
+    0,
+    Math.round((apFromStats + bonusAp) * (1 + (mods?.stats.apPct ?? 0) + buffApPct)),
+  );
   // Hunters: ranged AP = 2/agi (vanilla)
   e.rangedPower =
     cls === 'hunter'
-      ? Math.max(0, Math.round((s.agi * 2 + bonusAp) * (1 + (mods?.stats.apPct ?? 0))))
+      ? Math.max(0, Math.round((s.agi * 2 + bonusAp) * (1 + (mods?.stats.apPct ?? 0) + buffApPct)))
       : 0;
   // Spell Power: Intellect converted via SPELL_POWER_PER_INT plus flat Spell Power
   // from gear/buffs. Floored at 0 so an Intellect-draining debuff can't go negative.
