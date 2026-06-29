@@ -3529,7 +3529,7 @@ export const de_DE: EnTranslations = {
       },
       "stealth": {
         "name": "Verstohlenheit",
-        "description": "Verbirgt euch in den Schatten: Gegner bemerken euch kaum, aber ihr bewegt euch 30% langsamer. Angreifen oder Schaden erleiden bricht Verstohlenheit. Erneut wirken, um hervorzutreten."
+        "description": "Verbirgt euch in den Schatten: Gegner bemerken euch kaum, aber ihr bewegt euch 50% langsamer. Angreifen oder Schaden erleiden bricht Verstohlenheit. Erneut wirken, um hervorzutreten."
       },
       "adrenaline_rush": {
         "name": "Adrenalinrausch",
@@ -3561,7 +3561,7 @@ export const de_DE: EnTranslations = {
       },
       "vanish": {
         "name": "Verschwinden",
-        "description": "Verschwindet aus dem Blickfeld und tretet selbst im Kampf in Verstohlenheit. Ihr bewegt euch 30% langsamer, solange ihr verborgen seid. Hält bis zu 10 Sek. an."
+        "description": "Verschwindet aus dem Blickfeld und tretet selbst im Kampf in Verstohlenheit. Ihr bewegt euch 50% langsamer, solange ihr verborgen seid. Hält bis zu 10 Sek. an."
       },
       "instant_poison": {
         "name": "Sofortgift",
@@ -3969,7 +3969,7 @@ export const de_DE: EnTranslations = {
       },
       "prowl": {
         "name": "Anschleichen",
-        "description": "Geht in Wolfsgestalt in den Schleichmodus über. Im Kampf nicht einsetzbar."
+        "description": "Geht in Wolfsgestalt in den Schleichmodus über und bewegt Euch 50% langsamer. Im Kampf nicht einsetzbar."
       },
       "rake": {
         "name": "Krallenhieb",

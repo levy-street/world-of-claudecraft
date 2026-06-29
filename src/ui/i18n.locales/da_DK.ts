@@ -615,7 +615,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Beskytter målet og opsuger 48 skade i 30 sek.',
   'entities.abilities.power_word_shield.name': 'Magtord: Skjold',
   'entities.abilities.prowl.description':
-    'Gå i sneg-tilstand mens du er i Ulveform. Kan ikke bruges i kamp.',
+    'Gå i sneg-tilstand mens du er i Ulveform, og bevæg dig 50 % langsommere. Kan ikke bruges i kamp.',
   'entities.abilities.prowl.name': 'Luske',
   'entities.abilities.pyroblast.description':
     'Slynger en enorm flammende kampesten, der volder {damage} ildskade plus yderligere skade over tid.',
@@ -699,7 +699,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Nedkalder et lyn af stjerneild og forårsager {damage} Arkan skade.',
   'entities.abilities.starfire.name': 'Stjerneild',
   'entities.abilities.stealth.description':
-    'Skjuler dig i skyggerne: fjender lægger knap mærke til dig, men du bevæger dig 30 % langsommere. Angreb eller skade bryder Snigen. Kast igen for at træde frem.',
+    'Skjuler dig i skyggerne: fjender lægger knap mærke til dig, men du bevæger dig 50 % langsommere. Angreb eller skade bryder Snigen. Kast igen for at træde frem.',
   'entities.abilities.stealth.name': 'Snigen',
   'entities.abilities.stormstrike.description':
     'Kanaliserer stormen gennem dit våben og rammer øjeblikkeligt for våbenskade plus {damage}.',
@@ -749,7 +749,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Skift øjeblikkeligt til en hurtig rejseform, der øger bevægelseshastighed med 40 %. Du kan ikke bruge andre evner mens du er forvandlet, men kan skifte ind eller ud af kamp, ideelt til at flygte.',
   'entities.abilities.travel_form.name': 'Rejseform',
   'entities.abilities.vanish.description':
-    'Forsvind fra syne og træd ind i Snigen selv i kamp. Du bevæger dig 30 % langsommere mens du er skjult. Varer op til 10 sek.',
+    'Forsvind fra syne og træd ind i Snigen selv i kamp. Du bevæger dig 50 % langsommere mens du er skjult. Varer op til 10 sek.',
   'entities.abilities.vanish.name': 'Forsvinding',
   'entities.abilities.whirlwind.description':
     'Snur i en dødelig bue og ram alle nærliggende fjender for {damage}. (Raseri-talent)',

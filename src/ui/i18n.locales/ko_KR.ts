@@ -1671,7 +1671,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '은신 상태에서 대상 뒤를 기습해 무기 피해의 250%에 {damage}를 더한 피해를 입힙니다. 단검이 필요합니다. 연계 점수 1점을 얻습니다.',
   'entities.abilities.stealth.name': '은신',
   'entities.abilities.stealth.description':
-    '그림자 속에 몸을 숨깁니다. 적이 거의 알아차리지 못하지만 이동 속도가 30% 감소합니다. 공격하거나 피해를 받으면 은신이 해제됩니다. 다시 시전하면 모습을 드러냅니다.',
+    '그림자 속에 몸을 숨깁니다. 적이 거의 알아차리지 못하지만 이동 속도가 50% 감소합니다. 공격하거나 피해를 받으면 은신이 해제됩니다. 다시 시전하면 모습을 드러냅니다.',
   'entities.abilities.adrenaline_rush.name': '아드레날린 촉진',
   'entities.abilities.adrenaline_rush.description': '피가 끓어올라 즉시 기력 60을 회복합니다.',
   'entities.abilities.garrote.name': '목조르기',
@@ -1694,7 +1694,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '대상에게 상처를 입혀 16초에 걸쳐 {damage}의 출혈 피해를 입히는 결정타입니다.',
   'entities.abilities.vanish.name': '소멸',
   'entities.abilities.vanish.description':
-    '시야에서 사라져 전투 중에도 은신 상태가 됩니다. 숨어 있는 동안 이동 속도가 30% 감소합니다. 최대 10초 동안 지속됩니다.',
+    '시야에서 사라져 전투 중에도 은신 상태가 됩니다. 숨어 있는 동안 이동 속도가 50% 감소합니다. 최대 10초 동안 지속됩니다.',
   'entities.abilities.instant_poison.name': '속효성 독',
   'entities.abilities.instant_poison.description':
     '30분 동안 무기에 독을 발라 근접 공격마다 8의 추가 자연 피해를 입힙니다.',
@@ -1984,7 +1984,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '주변의 적들을 위축시켜 20초 동안 그들의 전투력을 20만큼 감소시킵니다. 곰 변신 상태에서만 사용 가능.',
   'entities.abilities.prowl.name': '은신 보행',
   'entities.abilities.prowl.description':
-    '늑대 변신 상태에서 은신합니다. 전투 중에는 사용할 수 없습니다.',
+    '늑대 변신 상태에서 은신하고 이동 속도가 50% 감소합니다. 전투 중에는 사용할 수 없습니다.',
   'entities.abilities.rake.name': '할퀴기',
   'entities.abilities.rake.description':
     '은신 상태에서 적을 할퀴어 무기 피해에 더해 {damage}의 피해를 입히고 9초에 걸쳐 출혈 피해를 줍니다. 연계 점수 1을 부여합니다. 늑대 변신 상태에서만 사용 가능.',

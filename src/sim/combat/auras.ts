@@ -175,7 +175,10 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
       e.auras.splice(i, 1);
       ctx.applyNonPlayerStatAura(e, a, -1);
       ctx.emit({ type: 'aura', targetId: e.id, name: a.name, gained: false });
-      if (a.kind.startsWith('buff') || a.kind.startsWith('form')) statsDirty = true;
+      // debuff_ap is the one non-buff kind recalcPlayerStats folds, so it must
+      // mark stats dirty on expiry or the AP cut would persist after the fade.
+      if (a.kind.startsWith('buff') || a.kind.startsWith('form') || a.kind === 'debuff_ap')
+        statsDirty = true;
     }
   }
   if (statsDirty && e.kind === 'player') {

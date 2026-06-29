@@ -3529,7 +3529,7 @@ export const zh_CN: EnTranslations = {
       },
       "stealth": {
         "name": "潜行",
-        "description": "将你隐藏在阴影中：敌人几乎无法察觉你，但你的移动速度降低 30%。攻击或受到伤害会打破潜行。再次施放可现身。"
+        "description": "将你隐藏在阴影中：敌人几乎无法察觉你，但你的移动速度降低 50%。攻击或受到伤害会打破潜行。再次施放可现身。"
       },
       "adrenaline_rush": {
         "name": "冲动",
@@ -3561,7 +3561,7 @@ export const zh_CN: EnTranslations = {
       },
       "vanish": {
         "name": "消失",
-        "description": "从视野中消失，即使在战斗中也能进入潜行状态。隐身时你的移动速度降低 30%。持续最多 10 秒。"
+        "description": "从视野中消失，即使在战斗中也能进入潜行状态。隐身时你的移动速度降低 50%。持续最多 10 秒。"
       },
       "instant_poison": {
         "name": "速效毒药",
@@ -3969,7 +3969,7 @@ export const zh_CN: EnTranslations = {
       },
       "prowl": {
         "name": "潜行",
-        "description": "在狼形态下进入潜行状态。无法在战斗中使用。"
+        "description": "在狼形态下进入潜行状态，移动速度降低 50%。无法在战斗中使用。"
       },
       "rake": {
         "name": "撕抓",

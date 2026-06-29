@@ -1691,7 +1691,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Embosca o alvo com 250% do dano de arma mais {damage}. Você precisa estar furtivo e atrás do alvo. Requer uma adaga. Concede 1 ponto de combo.',
   'entities.abilities.stealth.name': 'Furtividade',
   'entities.abilities.stealth.description':
-    'Esconde você nas sombras: inimigos mal percebem você, mas você se move 30% mais devagar. Atacar ou sofrer dano quebra Furtividade. Lance de novo para sair.',
+    'Esconde você nas sombras: inimigos mal percebem você, mas você se move 50% mais devagar. Atacar ou sofrer dano quebra Furtividade. Lance de novo para sair.',
   'entities.abilities.adrenaline_rush.name': 'Descarga de Adrenalina',
   'entities.abilities.adrenaline_rush.description':
     'Seu sangue ferve, restaurando 60 de energia instantaneamente.',
@@ -1715,7 +1715,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Golpe final que fere o alvo, fazendo-o sangrar por {damage} ao longo de 16 s.',
   'entities.abilities.vanish.name': 'Desaparecer',
   'entities.abilities.vanish.description':
-    'Some de vista, entrando em modo furtivo mesmo em combate. Você se move 30% mais devagar enquanto escondido. Dura até 10 s.',
+    'Some de vista, entrando em modo furtivo mesmo em combate. Você se move 50% mais devagar enquanto escondido. Dura até 10 s.',
   'entities.abilities.instant_poison.name': 'Veneno Instantâneo',
   'entities.abilities.instant_poison.description':
     'Reveste sua arma por 30 min, fazendo cada um de seus golpes corpo a corpo causar 8 de dano adicional da Natureza.',
@@ -2005,7 +2005,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Desmoraliza os inimigos próximos, reduzindo seu poder de ataque em 20 por 20 s. Apenas Forma de Urso.',
   'entities.abilities.prowl.name': 'Espreitar',
   'entities.abilities.prowl.description':
-    'Entra em furtividade enquanto na Forma de Lobo. Não pode ser usado em combate.',
+    'Entra em furtividade enquanto na Forma de Lobo, movendo-se 50% mais devagar. Não pode ser usado em combate.',
   'entities.abilities.rake.name': 'Dilacerar',
   'entities.abilities.rake.description':
     'Um golpe de abertura furtivo que dilacera o inimigo causando dano de arma mais {damage} e provoca sangramento ao longo de 9 s. Concede 1 ponto de combo. Apenas Forma de Lobo.',

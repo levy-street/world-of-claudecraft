@@ -3529,7 +3529,7 @@ export const pl_PL: EnTranslations = {
       },
       "stealth": {
         "name": "Skradanie się",
-        "description": "Ukrywa cię w cieniu: wrogowie ledwie cię dostrzegają, ale poruszasz się o 30% wolniej. Atak lub otrzymanie obrażeń przerywa Skradanie się. Rzuć ponownie, aby się ujawnić."
+        "description": "Ukrywa cię w cieniu: wrogowie ledwie cię dostrzegają, ale poruszasz się o 50% wolniej. Atak lub otrzymanie obrażeń przerywa Skradanie się. Rzuć ponownie, aby się ujawnić."
       },
       "adrenaline_rush": {
         "name": "Przypływ adrenaliny",
@@ -3561,7 +3561,7 @@ export const pl_PL: EnTranslations = {
       },
       "vanish": {
         "name": "Zniknięcie",
-        "description": "Znikasz z pola widzenia, wchodząc w Skradanie się nawet w walce. Ukryty poruszasz się o 30% wolniej. Trwa do 10 sek."
+        "description": "Znikasz z pola widzenia, wchodząc w Skradanie się nawet w walce. Ukryty poruszasz się o 50% wolniej. Trwa do 10 sek."
       },
       "instant_poison": {
         "name": "Natychmiastowa trucizna",
@@ -3969,7 +3969,7 @@ export const pl_PL: EnTranslations = {
       },
       "prowl": {
         "name": "Czajenie",
-        "description": "Wchodzi w skradanie w postaci wilka. Nie można użyć w walce."
+        "description": "Wchodzi w skradanie w postaci wilka, poruszając się o 50% wolniej. Nie można użyć w walce."
       },
       "rake": {
         "name": "Rozoranie",

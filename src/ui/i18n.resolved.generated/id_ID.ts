@@ -3529,7 +3529,7 @@ export const id_ID: EnTranslations = {
       },
       "stealth": {
         "name": "Siluman",
-        "description": "Menyembunyikanmu dalam bayangan: musuh nyaris tak menyadarimu, tetapi kau bergerak 30% lebih lambat. Menyerang atau menerima kerusakan mematahkan Siluman. Rapal lagi untuk keluar."
+        "description": "Menyembunyikanmu dalam bayangan: musuh nyaris tak menyadarimu, tetapi kau bergerak 50% lebih lambat. Menyerang atau menerima kerusakan mematahkan Siluman. Rapal lagi untuk keluar."
       },
       "adrenaline_rush": {
         "name": "Lonjakan Adrenalin",
@@ -3561,7 +3561,7 @@ export const id_ID: EnTranslations = {
       },
       "vanish": {
         "name": "Menghilang",
-        "description": "Menghilang dari pandangan, masuk ke Siluman bahkan dalam pertempuran. Kau bergerak 30% lebih lambat saat tersembunyi. Bertahan hingga 10 detik."
+        "description": "Menghilang dari pandangan, masuk ke Siluman bahkan dalam pertempuran. Kau bergerak 50% lebih lambat saat tersembunyi. Bertahan hingga 10 detik."
       },
       "instant_poison": {
         "name": "Racun Seketika",
@@ -3969,7 +3969,7 @@ export const id_ID: EnTranslations = {
       },
       "prowl": {
         "name": "Mengendap",
-        "description": "Masuk ke siluman saat dalam Wujud Serigala. Tidak dapat digunakan dalam pertempuran."
+        "description": "Masuk ke siluman saat dalam Wujud Serigala, bergerak 50% lebih lambat. Tidak dapat digunakan dalam pertempuran."
       },
       "rake": {
         "name": "Garukan",

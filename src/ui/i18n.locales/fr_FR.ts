@@ -1714,7 +1714,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Prend la cible en embuscade pour 250% des dégâts de l'arme plus {damage}. Vous devez être camouflé et derrière la cible. Requiert une dague. Confère 1 point de combo.",
   'entities.abilities.stealth.name': 'Camouflage',
   'entities.abilities.stealth.description':
-    'Vous dissimule dans les ombres: les ennemis vous remarquent à peine, mais vous vous déplacez 30% plus lentement. Attaquer ou subir des dégâts interrompt Camouflage. Relancez pour sortir.',
+    'Vous dissimule dans les ombres: les ennemis vous remarquent à peine, mais vous vous déplacez 50% plus lentement. Attaquer ou subir des dégâts interrompt Camouflage. Relancez pour sortir.',
   'entities.abilities.adrenaline_rush.name': "Poussée d'adrénaline",
   'entities.abilities.adrenaline_rush.description':
     "Votre sang s'embrase et restaure instantanément 60 énergie.",
@@ -1738,7 +1738,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Coup de grâce qui blesse la cible, la faisant saigner de {damage} pendant 16 s.',
   'entities.abilities.vanish.name': 'Disparition',
   'entities.abilities.vanish.description':
-    "Vous disparaissez et entrez en Camouflage, même en plein combat. Vous vous déplacez 30% plus lentement tant que vous êtes dissimulé. Dure jusqu'à 10 s.",
+    "Vous disparaissez et entrez en Camouflage, même en plein combat. Vous vous déplacez 50% plus lentement tant que vous êtes dissimulé. Dure jusqu'à 10 s.",
   'entities.abilities.instant_poison.name': 'Poison instantané',
   'entities.abilities.instant_poison.description':
     'Enduit votre arme pendant 30 min, chacune de vos attaques en mêlée infligeant 8 dégâts de Nature supplémentaires.',
@@ -2031,7 +2031,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Démoralise les ennemis proches, réduisant leur puissance d'attaque de 20 pendant 20 sec. Forme d'ours uniquement.",
   'entities.abilities.prowl.name': 'Rôder',
   'entities.abilities.prowl.description':
-    'Passe en camouflage tant que vous êtes en forme de loup. Inutilisable en combat.',
+    'Passe en camouflage tant que vous êtes en forme de loup, avec une vitesse de déplacement réduite de 50%. Inutilisable en combat.',
   'entities.abilities.rake.name': 'Lacérer',
   'entities.abilities.rake.description':
     "Une attaque d'ouverture en camouflage qui lacère l'ennemi pour les dégâts de l'arme plus {damage} et inflige des dégâts de saignement sur 9 sec. Octroie 1 point de combo. Forme de loup uniquement.",

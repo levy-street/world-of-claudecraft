@@ -629,7 +629,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Schermt het doelwit af en absorbeert 48 schade gedurende 30 sec.',
   'entities.abilities.power_word_shield.name': 'Machtwoord: Schild',
   'entities.abilities.prowl.description':
-    'Ga in sluiptocht terwijl je in Wolfsgedaante bent. Kan niet in gevecht worden gebruikt.',
+    'Ga in sluiptocht terwijl je in Wolfsgedaante bent en beweeg 50% trager. Kan niet in gevecht worden gebruikt.',
   'entities.abilities.prowl.name': 'Sluipen',
   'entities.abilities.pyroblast.description':
     'Werpt een immense vurige kei die {damage} Vuurschade toebrengt plus extra schade over tijd.',
@@ -717,7 +717,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Roept een bout van sterrenvuur naar beneden, die {damage} Arcane schade veroorzaakt.',
   'entities.abilities.starfire.name': 'Sterrenvuur',
   'entities.abilities.stealth.description':
-    'Verbergt je in de schaduwen: vijanden merken je nauwelijks op, maar je beweegt 30% trager. Aanvallen of schade oplopen verbreekt Sluiptocht. Bezweer opnieuw om eruit te stappen.',
+    'Verbergt je in de schaduwen: vijanden merken je nauwelijks op, maar je beweegt 50% trager. Aanvallen of schade oplopen verbreekt Sluiptocht. Bezweer opnieuw om eruit te stappen.',
   'entities.abilities.stealth.name': 'Sluiptocht',
   'entities.abilities.stormstrike.description':
     'Kanaliseert de storm door je wapen en treft ogenblikkelijk voor wapenschade plus {damage}.',
@@ -768,7 +768,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Verander ogenblikkelijk in een snelle reisgedaante en verhoog je bewegingssnelheid met 40%. Je kunt geen andere vaardigheden gebruiken terwijl je veranderd bent, maar je kunt in of buiten gevecht van gedaante wisselen, ideaal om te ontsnappen.',
   'entities.abilities.travel_form.name': 'Reisgedaante',
   'entities.abilities.vanish.description':
-    'Verdwijn uit het zicht en betreed Sluiptocht zelfs in gevecht. Je beweegt 30% trager terwijl je verborgen bent. Duurt tot 10 sec.',
+    'Verdwijn uit het zicht en betreed Sluiptocht zelfs in gevecht. Je beweegt 50% trager terwijl je verborgen bent. Duurt tot 10 sec.',
   'entities.abilities.vanish.name': 'Verdwijnen',
   'entities.abilities.whirlwind.description':
     'Draai in een dodelijke boog en tref alle nabije vijanden voor {damage}. (Razernij-talent)',

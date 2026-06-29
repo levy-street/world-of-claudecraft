@@ -3122,8 +3122,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     requiresForm: 'cat',
     requiresOutOfCombat: true,
-    effects: [{ type: 'selfBuff', kind: 'stealth', value: 0.7, duration: 3600 }],
-    description: 'Enter stealth while in Wolf Form. Cannot be used in combat.',
+    effects: [{ type: 'selfBuff', kind: 'stealth', value: 0.5, duration: 3600 }],
+    description: 'Enter stealth while in Wolf Form, moving 50% slower. Cannot be used in combat.',
   },
   rake: {
     id: 'rake',

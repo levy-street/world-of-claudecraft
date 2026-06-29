@@ -127,6 +127,14 @@ function despawnMobs(sim: Sim) {
   }
 }
 
+function forwardDistance(sim: Sim, ticks = 60): number {
+  const start = { ...sim.player.pos };
+  sim.moveInput.forward = true;
+  for (let i = 0; i < ticks; i++) sim.tick();
+  sim.moveInput.forward = false;
+  return dist2d(start, sim.player.pos);
+}
+
 describe('classic formulas', () => {
   it('rage conversion matches the vanilla constant', () => {
     expect(rageConversion(1)).toBeCloseTo(0.0091 + 3.23 + 4.27, 4);
@@ -720,12 +728,46 @@ describe('rogue', () => {
     expect((sim as any).moveSpeedMult(sim.player)).toBeCloseTo(0.5, 5);
   });
 
+  it('rogue Stealth actually covers half normal ground', () => {
+    const normal = makeSim('rogue');
+    despawnMobs(normal);
+    (normal as any).grantXp(xpForLevel(1) + xpForLevel(2) + 10);
+
+    const stealthed = makeSim('rogue');
+    despawnMobs(stealthed);
+    (stealthed as any).grantXp(xpForLevel(1) + xpForLevel(2) + 10);
+    stealthed.castAbility('stealth');
+    expect(stealthed.player.auras.some((a) => a.kind === 'stealth')).toBe(true);
+
+    const base = forwardDistance(normal);
+    const stealth = forwardDistance(stealthed);
+    expect(base).toBeGreaterThan(0);
+    expect(stealth / base).toBeCloseTo(0.5, 1);
+  });
+
   it('rogue Vanish moves at 50% speed', () => {
     const sim = makeSim('rogue');
     sim.setPlayerLevel(20); // Vanish learns at level 18
     sim.castAbility('vanish');
     expect(sim.player.auras.some((a) => a.kind === 'stealth')).toBe(true);
     expect((sim as any).moveSpeedMult(sim.player)).toBeCloseTo(0.5, 5);
+  });
+
+  it('rogue Vanish actually covers half normal ground', () => {
+    const normal = makeSim('rogue');
+    despawnMobs(normal);
+    normal.setPlayerLevel(20);
+
+    const vanished = makeSim('rogue');
+    despawnMobs(vanished);
+    vanished.setPlayerLevel(20);
+    vanished.castAbility('vanish');
+    expect(vanished.player.auras.some((a) => a.kind === 'stealth')).toBe(true);
+
+    const base = forwardDistance(normal);
+    const vanish = forwardDistance(vanished);
+    expect(base).toBeGreaterThan(0);
+    expect(vanish / base).toBeCloseTo(0.5, 1);
   });
 
   it('rogue GCD is 1.0s', () => {

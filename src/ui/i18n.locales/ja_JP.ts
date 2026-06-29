@@ -1685,7 +1685,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ステルス中に対象の背後から奇襲し、武器ダメージの250%に {damage} を加えたダメージを与えます。ダガーが必要です。コンボポイントを1獲得します。',
   'entities.abilities.stealth.name': 'ステルス',
   'entities.abilities.stealth.description':
-    '影に身を隠します。敵にほとんど気づかれませんが、移動速度が30%低下します。攻撃するかダメージを受けるとステルスが解除されます。再度使用すると姿を現します。',
+    '影に身を隠します。敵にほとんど気づかれませんが、移動速度が50%低下します。攻撃するかダメージを受けるとステルスが解除されます。再度使用すると姿を現します。',
   'entities.abilities.adrenaline_rush.name': 'アドレナリンラッシュ',
   'entities.abilities.adrenaline_rush.description':
     '血が熱くなり、即座にエネルギーを60回復します。',
@@ -1709,7 +1709,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '対象に傷を負わせ、16秒かけて{damage}の出血ダメージを与えるフィニッシュムーブです。',
   'entities.abilities.vanish.name': 'ヴァニッシュ',
   'entities.abilities.vanish.description':
-    '視界から消え、戦闘中でもステルス状態に入ります。隠れている間は移動速度が30%低下します。最大10秒間持続します。',
+    '視界から消え、戦闘中でもステルス状態に入ります。隠れている間は移動速度が50%低下します。最大10秒間持続します。',
   'entities.abilities.instant_poison.name': 'インスタント・ポイズン',
   'entities.abilities.instant_poison.description':
     '武器に30分間毒を塗り、近接攻撃ごとに8の追加自然ダメージを与えます。',
@@ -1990,7 +1990,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '周囲の敵を萎縮させ、20秒間その攻撃力を20低下させる。ベアフォーム時のみ使用可能。',
   'entities.abilities.prowl.name': '忍び寄り',
   'entities.abilities.prowl.description':
-    'ウルフフォーム中にステルス状態に入る。戦闘中は使用できない。',
+    'ウルフフォーム中にステルス状態に入り、移動速度が50%低下する。戦闘中は使用できない。',
   'entities.abilities.rake.name': '切り裂き',
   'entities.abilities.rake.description':
     'ステルス状態からの先制攻撃で、武器ダメージに加えて{damage}のダメージを与え、9秒かけて出血ダメージを与える。コンボポイントを1獲得する。ウルフフォーム時のみ使用可能。',

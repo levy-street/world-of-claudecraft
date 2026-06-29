@@ -1315,7 +1315,7 @@ export const classAbilityNames = {
         [
           'stealth',
           'Sigilo',
-          'Te oculta en las sombras: los enemigos apenas te detectan, pero te mueves un 30% más lento. Atacar o recibir daño rompe Sigilo. Lánzalo de nuevo para salir.',
+          'Te oculta en las sombras: los enemigos apenas te detectan, pero te mueves un 50% más lento. Atacar o recibir daño rompe Sigilo. Lánzalo de nuevo para salir.',
         ],
         [
           'adrenaline_rush',
@@ -1355,7 +1355,7 @@ export const classAbilityNames = {
         [
           'vanish',
           'Esfumarse',
-          'Desaparece de la vista, entrando en Sigilo incluso en combate. Te mueves un 30% más lento mientras estás oculto. Dura hasta 10 s.',
+          'Desaparece de la vista, entrando en Sigilo incluso en combate. Te mueves un 50% más lento mientras estás oculto. Dura hasta 10 s.',
         ],
         [
           'instant_poison',
@@ -1953,7 +1953,7 @@ export const classAbilityNames = {
         [
           'stealth',
           'Camouflage',
-          'Vous dissimule dans les ombres: les ennemis vous remarquent à peine, mais vous vous déplacez 30% plus lentement. Attaquer ou subir des dégâts interrompt Camouflage. Relancez pour sortir.',
+          'Vous dissimule dans les ombres: les ennemis vous remarquent à peine, mais vous vous déplacez 50% plus lentement. Attaquer ou subir des dégâts interrompt Camouflage. Relancez pour sortir.',
         ],
         [
           'adrenaline_rush',
@@ -1993,7 +1993,7 @@ export const classAbilityNames = {
         [
           'vanish',
           'Disparition',
-          "Vous disparaissez et entrez en Camouflage, même en plein combat. Vous vous déplacez 30% plus lentement tant que vous êtes dissimulé. Dure jusqu'à 10 s.",
+          "Vous disparaissez et entrez en Camouflage, même en plein combat. Vous vous déplacez 50% plus lentement tant que vous êtes dissimulé. Dure jusqu'à 10 s.",
         ],
         [
           'instant_poison',
@@ -2043,7 +2043,7 @@ export const classAbilityNames = {
         [
           'vanish',
           'Disparition',
-          "Vous disparaissez et entrez en Camouflage, même en plein combat. Vous vous déplacez 30% plus lentement tant que vous êtes dissimulé. Dure jusqu'à 10 s.",
+          "Vous disparaissez et entrez en Camouflage, même en plein combat. Vous vous déplacez 50% plus lentement tant que vous êtes dissimulé. Dure jusqu'à 10 s.",
         ],
         [
           'instant_poison',
@@ -2622,7 +2622,7 @@ export const classAbilityNames = {
         [
           'stealth',
           'Furtività',
-          'Ti nasconde nelle ombre: i nemici ti notano appena, ma ti muovi il 30% più lentamente. Attaccare o subire danni interrompe Furtività. Lanciala di nuovo per uscire.',
+          'Ti nasconde nelle ombre: i nemici ti notano appena, ma ti muovi il 50% più lentamente. Attaccare o subire danni interrompe Furtività. Lanciala di nuovo per uscire.',
         ],
         [
           'adrenaline_rush',
@@ -2662,7 +2662,7 @@ export const classAbilityNames = {
         [
           'vanish',
           'Eclissarsi',
-          'Scompari dalla vista, entrando in Furtività anche in combattimento. Ti muovi il 30% più lentamente mentre sei nascosto. Dura fino a 10 sec.',
+          'Scompari dalla vista, entrando in Furtività anche in combattimento. Ti muovi il 50% più lentamente mentre sei nascosto. Dura fino a 10 sec.',
         ],
         [
           'instant_poison',
@@ -3231,7 +3231,7 @@ export const classAbilityNames = {
         [
           'stealth',
           'Verstohlenheit',
-          'Verbirgt euch in den Schatten: Gegner bemerken euch kaum, aber ihr bewegt euch 30% langsamer. Angreifen oder Schaden erleiden bricht Verstohlenheit. Erneut wirken, um hervorzutreten.',
+          'Verbirgt euch in den Schatten: Gegner bemerken euch kaum, aber ihr bewegt euch 50% langsamer. Angreifen oder Schaden erleiden bricht Verstohlenheit. Erneut wirken, um hervorzutreten.',
         ],
         [
           'adrenaline_rush',
@@ -3271,7 +3271,7 @@ export const classAbilityNames = {
         [
           'vanish',
           'Verschwinden',
-          'Verschwindet aus dem Blickfeld und tretet selbst im Kampf in Verstohlenheit. Ihr bewegt euch 30% langsamer, solange ihr verborgen seid. Hält bis zu 10 Sek. an.',
+          'Verschwindet aus dem Blickfeld und tretet selbst im Kampf in Verstohlenheit. Ihr bewegt euch 50% langsamer, solange ihr verborgen seid. Hält bis zu 10 Sek. an.',
         ],
         [
           'instant_poison',
@@ -3768,7 +3768,7 @@ export const classAbilityNames = {
         [
           'stealth',
           '潜行',
-          '将你隐藏在阴影中：敌人几乎无法察觉你，但你的移动速度降低 30%。攻击或受到伤害会打破潜行。再次施放可现身。',
+          '将你隐藏在阴影中：敌人几乎无法察觉你，但你的移动速度降低 50%。攻击或受到伤害会打破潜行。再次施放可现身。',
         ],
         ['adrenaline_rush', '冲动', '热血沸腾，立即恢复 60 点能量。'],
         [
@@ -3792,7 +3792,7 @@ export const classAbilityNames = {
         [
           'vanish',
           '消失',
-          '从视野中消失，即使在战斗中也能进入潜行状态。隐身时你的移动速度降低 30%。持续最多 10 秒。',
+          '从视野中消失，即使在战斗中也能进入潜行状态。隐身时你的移动速度降低 50%。持续最多 10 秒。',
         ],
         [
           'instant_poison',
@@ -4085,7 +4085,7 @@ export const classAbilityNames = {
         [
           'stealth',
           '潛行',
-          '將你隱藏在陰影中：敵人幾乎無法察覺你，但你的移動速度降低 30%。攻擊或受到傷害會打破潛行。再次施放可現身。',
+          '將你隱藏在陰影中：敵人幾乎無法察覺你，但你的移動速度降低 50%。攻擊或受到傷害會打破潛行。再次施放可現身。',
         ],
         ['adrenaline_rush', '衝動', '熱血沸騰，立即恢復 60 點能量。'],
         [
@@ -4113,7 +4113,7 @@ export const classAbilityNames = {
         [
           'vanish',
           '消失',
-          '從視野中消失，即使在戰鬥中也能進入潛行狀態。隱身時你的移動速度降低 30%。最多持續 10 秒。',
+          '從視野中消失，即使在戰鬥中也能進入潛行狀態。隱身時你的移動速度降低 50%。最多持續 10 秒。',
         ],
         [
           'instant_poison',
@@ -4454,7 +4454,7 @@ export const classAbilityNames = {
         [
           'stealth',
           '은신',
-          '그림자 속에 몸을 숨깁니다. 적이 거의 알아차리지 못하지만 이동 속도가 30% 감소합니다. 공격하거나 피해를 받으면 은신이 해제됩니다. 다시 시전하면 모습을 드러냅니다.',
+          '그림자 속에 몸을 숨깁니다. 적이 거의 알아차리지 못하지만 이동 속도가 50% 감소합니다. 공격하거나 피해를 받으면 은신이 해제됩니다. 다시 시전하면 모습을 드러냅니다.',
         ],
         ['adrenaline_rush', '아드레날린 촉진', '피가 끓어올라 즉시 기력 60을 회복합니다.'],
         [
@@ -4490,7 +4490,7 @@ export const classAbilityNames = {
         [
           'vanish',
           '소멸',
-          '시야에서 사라져 전투 중에도 은신 상태가 됩니다. 숨어 있는 동안 이동 속도가 30% 감소합니다. 최대 10초 동안 지속됩니다.',
+          '시야에서 사라져 전투 중에도 은신 상태가 됩니다. 숨어 있는 동안 이동 속도가 50% 감소합니다. 최대 10초 동안 지속됩니다.',
         ],
         [
           'instant_poison',
@@ -4975,7 +4975,7 @@ export const classAbilityNames = {
         [
           'stealth',
           'ステルス',
-          '影に身を隠します。敵にほとんど気づかれませんが、移動速度が30%低下します。攻撃するかダメージを受けるとステルスが解除されます。再度使用すると姿を現します。',
+          '影に身を隠します。敵にほとんど気づかれませんが、移動速度が50%低下します。攻撃するかダメージを受けるとステルスが解除されます。再度使用すると姿を現します。',
         ],
         [
           'adrenaline_rush',
@@ -5015,7 +5015,7 @@ export const classAbilityNames = {
         [
           'vanish',
           'ヴァニッシュ',
-          '視界から消え、戦闘中でもステルス状態に入ります。隠れている間は移動速度が30%低下します。最大10秒間持続します。',
+          '視界から消え、戦闘中でもステルス状態に入ります。隠れている間は移動速度が50%低下します。最大10秒間持続します。',
         ],
         [
           'instant_poison',
@@ -5532,7 +5532,7 @@ export const classAbilityNames = {
         [
           'stealth',
           'Furtividade',
-          'Esconde você nas sombras: inimigos mal percebem você, mas você se move 30% mais devagar. Atacar ou sofrer dano quebra Furtividade. Lance de novo para sair.',
+          'Esconde você nas sombras: inimigos mal percebem você, mas você se move 50% mais devagar. Atacar ou sofrer dano quebra Furtividade. Lance de novo para sair.',
         ],
         [
           'adrenaline_rush',
@@ -5572,7 +5572,7 @@ export const classAbilityNames = {
         [
           'vanish',
           'Desaparecer',
-          'Some de vista, entrando em modo furtivo mesmo em combate. Você se move 30% mais devagar enquanto escondido. Dura até 10 s.',
+          'Some de vista, entrando em modo furtivo mesmo em combate. Você se move 50% mais devagar enquanto escondido. Dura até 10 s.',
         ],
         [
           'instant_poison',
@@ -6121,7 +6121,7 @@ export const classAbilityNames = {
         [
           'stealth',
           'Незаметность',
-          'Скрывает вас в тенях: враги почти не замечают вас, но вы двигаетесь на 30% медленнее. Атака или получение урона прерывает Незаметность. Примените снова, чтобы выйти.',
+          'Скрывает вас в тенях: враги почти не замечают вас, но вы двигаетесь на 50% медленнее. Атака или получение урона прерывает Незаметность. Примените снова, чтобы выйти.',
         ],
         [
           'adrenaline_rush',
@@ -6161,7 +6161,7 @@ export const classAbilityNames = {
         [
           'vanish',
           'Исчезновение',
-          'Исчезает из виду, входя в незаметность даже в бою. Пока вы скрыты, вы двигаетесь на 30% медленнее. Длится до 10 сек.',
+          'Исчезает из виду, входя в незаметность даже в бою. Пока вы скрыты, вы двигаетесь на 50% медленнее. Длится до 10 сек.',
         ],
         [
           'instant_poison',

@@ -3529,7 +3529,7 @@ export const it_IT: EnTranslations = {
       },
       "stealth": {
         "name": "Furtività",
-        "description": "Ti nasconde nelle ombre: i nemici ti notano appena, ma ti muovi il 30% più lentamente. Attaccare o subire danni interrompe Furtività. Lanciala di nuovo per uscire."
+        "description": "Ti nasconde nelle ombre: i nemici ti notano appena, ma ti muovi il 50% più lentamente. Attaccare o subire danni interrompe Furtività. Lanciala di nuovo per uscire."
       },
       "adrenaline_rush": {
         "name": "Scarica di Adrenalina",
@@ -3561,7 +3561,7 @@ export const it_IT: EnTranslations = {
       },
       "vanish": {
         "name": "Eclissarsi",
-        "description": "Scompari dalla vista, entrando in Furtività anche in combattimento. Ti muovi il 30% più lentamente mentre sei nascosto. Dura fino a 10 sec."
+        "description": "Scompari dalla vista, entrando in Furtività anche in combattimento. Ti muovi il 50% più lentamente mentre sei nascosto. Dura fino a 10 sec."
       },
       "instant_poison": {
         "name": "Veleno Istantaneo",
@@ -3969,7 +3969,7 @@ export const it_IT: EnTranslations = {
       },
       "prowl": {
         "name": "Agguato",
-        "description": "Entra in furtività mentre sei in Forma del Lupo. Non utilizzabile in combattimento."
+        "description": "Entra in furtività mentre sei in Forma del Lupo, muovendoti il 50% più lentamente. Non utilizzabile in combattimento."
       },
       "rake": {
         "name": "Sventramento",

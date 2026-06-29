@@ -1609,7 +1609,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '伏擊目標，造成 250% 武器傷害加 {damage}。必須處於潛行並位於目標背後。需要匕首。獎勵 1 個連擊點。',
   'entities.abilities.stealth.name': '潛行',
   'entities.abilities.stealth.description':
-    '將你隱藏在陰影中：敵人幾乎無法察覺你，但你的移動速度降低 30%。攻擊或受到傷害會打破潛行。再次施放可現身。',
+    '將你隱藏在陰影中：敵人幾乎無法察覺你，但你的移動速度降低 50%。攻擊或受到傷害會打破潛行。再次施放可現身。',
   'entities.abilities.adrenaline_rush.name': '衝動',
   'entities.abilities.adrenaline_rush.description': '熱血沸騰，立即恢復 60 點能量。',
   'entities.abilities.garrote.name': '鎖喉',
@@ -1632,7 +1632,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '終結技，撕裂目標的傷口，使其在 16 秒內流血損失 {damage} 點生命。',
   'entities.abilities.vanish.name': '消失',
   'entities.abilities.vanish.description':
-    '從視野中消失，即使在戰鬥中也能進入潛行狀態。隱身時你的移動速度降低 30%。最多持續 10 秒。',
+    '從視野中消失，即使在戰鬥中也能進入潛行狀態。隱身時你的移動速度降低 50%。最多持續 10 秒。',
   'entities.abilities.instant_poison.name': '速效毒藥',
   'entities.abilities.instant_poison.description':
     '在你的武器上塗抹毒藥，持續 30 分鐘，使你的每次近戰揮擊額外造成 8 點自然傷害。',
@@ -1893,7 +1893,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.demoralizing_roar.description':
     '挫敗附近敵人的士氣，使其攻擊強度降低 20，持續 20 秒。僅限熊形態。',
   'entities.abilities.prowl.name': '潛行',
-  'entities.abilities.prowl.description': '在狼形態下進入隱匿狀態。無法於戰鬥中使用。',
+  'entities.abilities.prowl.description':
+    '在狼形態下進入隱匿狀態，移動速度降低 50%。無法於戰鬥中使用。',
   'entities.abilities.rake.name': '撕裂',
   'entities.abilities.rake.description':
     '一招隱匿起手技，以武器傷害外加 {damage} 撕裂敵人，並造成持續 9 秒的流血傷害。給予 1 點連擊點數。僅限狼形態。',

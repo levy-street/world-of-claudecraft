@@ -1701,7 +1701,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Embosca al objetivo por un 250% de daño de arma más {damage}. Debes estar en sigilo y detrás del objetivo. Requiere una daga. Otorga 1 punto de combo.',
   'entities.abilities.stealth.name': 'Sigilo',
   'entities.abilities.stealth.description':
-    'Te oculta en las sombras: los enemigos apenas te detectan, pero te mueves un 30% más lento. Atacar o recibir daño rompe Sigilo. Lánzalo de nuevo para salir.',
+    'Te oculta en las sombras: los enemigos apenas te detectan, pero te mueves un 50% más lento. Atacar o recibir daño rompe Sigilo. Lánzalo de nuevo para salir.',
   'entities.abilities.adrenaline_rush.name': 'Subidón de adrenalina',
   'entities.abilities.adrenaline_rush.description':
     'Tu sangre se enciende y restaura al instante 60 de energía.',
@@ -1725,7 +1725,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Movimiento final que hiere al objetivo, haciéndolo sangrar {damage} durante 16 s.',
   'entities.abilities.vanish.name': 'Esfumarse',
   'entities.abilities.vanish.description':
-    'Desaparece de la vista, entrando en Sigilo incluso en combate. Te mueves un 30% más lento mientras estás oculto. Dura hasta 10 s.',
+    'Desaparece de la vista, entrando en Sigilo incluso en combate. Te mueves un 50% más lento mientras estás oculto. Dura hasta 10 s.',
   'entities.abilities.instant_poison.name': 'Veneno instantáneo',
   'entities.abilities.instant_poison.description':
     'Recubre tu arma durante 30 min, haciendo que cada uno de tus golpes cuerpo a cuerpo inflija 8 de daño de Naturaleza adicional.',
@@ -2018,7 +2018,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Desmoraliza a los enemigos cercanos, reduciendo su poder de ataque en 20 durante 20 s. Solo en Forma de oso.',
   'entities.abilities.prowl.name': 'Acechar',
   'entities.abilities.prowl.description':
-    'Entra en sigilo mientras estás en Forma de lobo. No puede usarse en combate.',
+    'Entra en sigilo mientras estás en Forma de lobo y te mueves un 50% más lento. No puede usarse en combate.',
   'entities.abilities.rake.name': 'Zarpazo',
   'entities.abilities.rake.description':
     'Una apertura sigilosa que desgarra al enemigo causando el daño del arma más {damage} y provoca daño por sangrado durante 9 s. Otorga 1 punto de combo. Solo en Forma de lobo.',

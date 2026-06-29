@@ -3529,7 +3529,7 @@ export const vi_VN: EnTranslations = {
       },
       "stealth": {
         "name": "Ẩn Thân",
-        "description": "Che giấu bạn trong bóng tối: kẻ địch khó nhận ra bạn, nhưng bạn di chuyển chậm hơn 30%. Tấn công hoặc nhận sát thương sẽ phá vỡ Ẩn Thân. Niệm lại để bước ra."
+        "description": "Che giấu bạn trong bóng tối: kẻ địch khó nhận ra bạn, nhưng bạn di chuyển chậm hơn 50%. Tấn công hoặc nhận sát thương sẽ phá vỡ Ẩn Thân. Niệm lại để bước ra."
       },
       "adrenaline_rush": {
         "name": "Bộc Phát Adrenaline",
@@ -3561,7 +3561,7 @@ export const vi_VN: EnTranslations = {
       },
       "vanish": {
         "name": "Tàng Hình",
-        "description": "Biến mất khỏi tầm nhìn, đi vào Ẩn Thân ngay cả trong chiến đấu. Bạn di chuyển chậm hơn 30% khi ẩn nấp. Kéo dài tối đa 10 giây."
+        "description": "Biến mất khỏi tầm nhìn, đi vào Ẩn Thân ngay cả trong chiến đấu. Bạn di chuyển chậm hơn 50% khi ẩn nấp. Kéo dài tối đa 10 giây."
       },
       "instant_poison": {
         "name": "Độc Tức Thời",
@@ -3969,7 +3969,7 @@ export const vi_VN: EnTranslations = {
       },
       "prowl": {
         "name": "Rình Mồi",
-        "description": "Vào trạng thái ẩn thân khi ở Hình Sói. Không thể dùng trong chiến đấu."
+        "description": "Vào trạng thái ẩn thân khi ở Hình Sói, di chuyển chậm hơn 50%. Không thể dùng trong chiến đấu."
       },
       "rake": {
         "name": "Cào Xé",

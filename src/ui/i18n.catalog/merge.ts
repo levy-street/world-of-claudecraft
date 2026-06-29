@@ -3691,7 +3691,11 @@ const mergeExtraEn = {
       'Demoralizing Roar',
       'Demoralizes nearby enemies, reducing their attack power by 20 for 20 sec. Bear Form only.',
     ],
-    ['prowl', 'Prowl', 'Enter stealth while in Wolf Form. Cannot be used in combat.'],
+    [
+      'prowl',
+      'Prowl',
+      'Enter stealth while in Wolf Form, moving 50% slower. Cannot be used in combat.',
+    ],
     [
       'rake',
       'Rake',

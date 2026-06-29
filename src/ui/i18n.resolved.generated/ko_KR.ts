@@ -3529,7 +3529,7 @@ export const ko_KR: EnTranslations = {
       },
       "stealth": {
         "name": "은신",
-        "description": "그림자 속에 몸을 숨깁니다. 적이 거의 알아차리지 못하지만 이동 속도가 30% 감소합니다. 공격하거나 피해를 받으면 은신이 해제됩니다. 다시 시전하면 모습을 드러냅니다."
+        "description": "그림자 속에 몸을 숨깁니다. 적이 거의 알아차리지 못하지만 이동 속도가 50% 감소합니다. 공격하거나 피해를 받으면 은신이 해제됩니다. 다시 시전하면 모습을 드러냅니다."
       },
       "adrenaline_rush": {
         "name": "아드레날린 촉진",
@@ -3561,7 +3561,7 @@ export const ko_KR: EnTranslations = {
       },
       "vanish": {
         "name": "소멸",
-        "description": "시야에서 사라져 전투 중에도 은신 상태가 됩니다. 숨어 있는 동안 이동 속도가 30% 감소합니다. 최대 10초 동안 지속됩니다."
+        "description": "시야에서 사라져 전투 중에도 은신 상태가 됩니다. 숨어 있는 동안 이동 속도가 50% 감소합니다. 최대 10초 동안 지속됩니다."
       },
       "instant_poison": {
         "name": "속효성 독",
@@ -3969,7 +3969,7 @@ export const ko_KR: EnTranslations = {
       },
       "prowl": {
         "name": "은신 보행",
-        "description": "늑대 변신 상태에서 은신합니다. 전투 중에는 사용할 수 없습니다."
+        "description": "늑대 변신 상태에서 은신하고 이동 속도가 50% 감소합니다. 전투 중에는 사용할 수 없습니다."
       },
       "rake": {
         "name": "할퀴기",

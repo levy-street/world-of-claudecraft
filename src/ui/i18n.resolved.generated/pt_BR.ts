@@ -3529,7 +3529,7 @@ export const pt_BR: EnTranslations = {
       },
       "stealth": {
         "name": "Furtividade",
-        "description": "Esconde você nas sombras: inimigos mal percebem você, mas você se move 30% mais devagar. Atacar ou sofrer dano quebra Furtividade. Lance de novo para sair."
+        "description": "Esconde você nas sombras: inimigos mal percebem você, mas você se move 50% mais devagar. Atacar ou sofrer dano quebra Furtividade. Lance de novo para sair."
       },
       "adrenaline_rush": {
         "name": "Descarga de Adrenalina",
@@ -3561,7 +3561,7 @@ export const pt_BR: EnTranslations = {
       },
       "vanish": {
         "name": "Desaparecer",
-        "description": "Some de vista, entrando em modo furtivo mesmo em combate. Você se move 30% mais devagar enquanto escondido. Dura até 10 s."
+        "description": "Some de vista, entrando em modo furtivo mesmo em combate. Você se move 50% mais devagar enquanto escondido. Dura até 10 s."
       },
       "instant_poison": {
         "name": "Veneno Instantâneo",
@@ -3969,7 +3969,7 @@ export const pt_BR: EnTranslations = {
       },
       "prowl": {
         "name": "Espreitar",
-        "description": "Entra em furtividade enquanto na Forma de Lobo. Não pode ser usado em combate."
+        "description": "Entra em furtividade enquanto na Forma de Lobo, movendo-se 50% mais devagar. Não pode ser usado em combate."
       },
       "rake": {
         "name": "Dilacerar",

@@ -3969,7 +3969,7 @@ export const en_CA: EnTranslations = {
       },
       "prowl": {
         "name": "Prowl",
-        "description": "Enter stealth while in Wolf Form. Cannot be used in combat."
+        "description": "Enter stealth while in Wolf Form, moving 50% slower. Cannot be used in combat."
       },
       "rake": {
         "name": "Rake",

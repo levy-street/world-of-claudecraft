@@ -621,7 +621,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Hedefi kalkanlar ve 30 saniye boyunca 48 hasarı emer.',
   'entities.abilities.power_word_shield.name': 'Güç Sözü: Kalkan',
   'entities.abilities.prowl.description':
-    'Kurt Formundayken gizliliğe geçer. Dövüş sırasında kullanılamaz.',
+    'Kurt Formundayken gizliliğe geçer ve 50% daha yavaş hareket edersin. Dövüş sırasında kullanılamaz.',
   'entities.abilities.prowl.name': 'Sinsi Yürüyüş',
   'entities.abilities.pyroblast.description':
     'Devasa ateşli bir kaya fırlatarak {damage} Ateş hasarı ve ek olarak zamana yayılı hasar verir.',

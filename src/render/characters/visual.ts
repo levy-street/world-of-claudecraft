@@ -22,7 +22,7 @@ import {
   skinTexture,
   tintedFarMaterials,
 } from './assets';
-import type { EmoteClipSpec, VisualDef } from './manifest';
+import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
 
 export type { AnimState, BaseState } from './anim_state';
 
@@ -107,9 +107,21 @@ export class CharacterVisual {
   private soulRend = false;
   private bobPhase = Math.random() * Math.PI * 2;
 
-  constructor(key: string, entityColor: number, skinIndex = 0, weaponItemId: string | null = null) {
+  constructor(
+    key: string,
+    entityColor: number,
+    skinIndex = 0,
+    weaponItemId: string | null = null,
+    weaponOverride: WeaponLayoutOverride | null = null,
+  ) {
     const prep = prepareVisual(key);
-    this.def = prep.def;
+    // A cosmetic body (the Combat Mech) keeps its model/clips but can adopt the
+    // wearer class's held-weapon layout (e.g. the rogue dual-wields in both hands).
+    // Override just attach + weaponSlots on a shallow def clone, leaving the rest of
+    // the def (clips/height/tint) intact and never mutating the shared cached def.
+    this.def = weaponOverride
+      ? { ...prep.def, attach: weaponOverride.attach, weaponSlots: weaponOverride.weaponSlots }
+      : prep.def;
     this.key = key;
     this.entityColor = entityColor;
     this.skinIndex = skinIndex;
@@ -119,10 +131,10 @@ export class CharacterVisual {
     // model: yaw/scale/feet normalization wrapper around the skinned clone. The
     // equipped mainhand item (if the class swaps; see VisualDef.weaponSlot) picks
     // the held weapon model, so the visual is born holding the right weapon.
-    this.model = assembleModel(prep.def, weaponItemId);
+    this.model = assembleModel(this.def, weaponItemId);
     applyMaterials(
       this.model,
-      prep.def,
+      this.def,
       entityColor,
       skinTexture(key, skinIndex),
       skinEmissiveTexture(key, skinIndex),

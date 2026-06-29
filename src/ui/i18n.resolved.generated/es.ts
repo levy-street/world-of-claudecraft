@@ -3529,7 +3529,7 @@ export const es: EnTranslations = {
       },
       "stealth": {
         "name": "Sigilo",
-        "description": "Te oculta en las sombras: los enemigos apenas te detectan, pero te mueves un 30% más lento. Atacar o recibir daño rompe Sigilo. Lánzalo de nuevo para salir."
+        "description": "Te oculta en las sombras: los enemigos apenas te detectan, pero te mueves un 50% más lento. Atacar o recibir daño rompe Sigilo. Lánzalo de nuevo para salir."
       },
       "adrenaline_rush": {
         "name": "Subidón de adrenalina",
@@ -3561,7 +3561,7 @@ export const es: EnTranslations = {
       },
       "vanish": {
         "name": "Esfumarse",
-        "description": "Desaparece de la vista, entrando en Sigilo incluso en combate. Te mueves un 30% más lento mientras estás oculto. Dura hasta 10 s."
+        "description": "Desaparece de la vista, entrando en Sigilo incluso en combate. Te mueves un 50% más lento mientras estás oculto. Dura hasta 10 s."
       },
       "instant_poison": {
         "name": "Veneno instantáneo",
@@ -3969,7 +3969,7 @@ export const es: EnTranslations = {
       },
       "prowl": {
         "name": "Acechar",
-        "description": "Entra en sigilo mientras estás en Forma de lobo. No puede usarse en combate."
+        "description": "Entra en sigilo mientras estás en Forma de lobo y te mueves un 50% más lento. No puede usarse en combate."
       },
       "rake": {
         "name": "Zarpazo",

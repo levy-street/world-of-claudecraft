@@ -80,6 +80,8 @@ import { Renderer } from './render/renderer';
 import { navigatorSaveData } from './render/sky';
 import { pathCrossesFence } from './sim/colliders';
 import { ABILITIES, CLASSES } from './sim/content/classes';
+import { ITEMS } from './sim/data';
+import { canEquipItem } from './sim/equipment_rules';
 import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
 import { Sim } from './sim/sim';
 import { TAB_NEAR_RADIUS, TAB_QUERY_RADIUS, tabConeHalfAt } from './sim/tab_target';
@@ -2339,6 +2341,43 @@ async function startOffline(playerClass: PlayerClass, name: string, skin = 0): P
     devCommands: import.meta.env.DEV,
   });
   sim.setPlayerSkin(sim.playerId, skin);
+  // Dev convenience: ?mech drops an offline session straight into the Combat Mech
+  // cosmetic body holding a spread of class-usable weapons, to eyeball the held
+  // weapon model on the mech (swap them in the bag to see each one). DEV builds
+  // only (mirrors devCommands gating); inert in production.
+  if (import.meta.env.DEV && new URLSearchParams(location.search).has('mech')) {
+    sim.setPlayerSkin(sim.playerId, 0, 'mech');
+    // One weapon per held-model family (sword / axe / mace / dagger / staff / wand
+    // / polearm); only the ones this class can wield are granted, so every bag
+    // weapon is swappable and the first one auto-equips.
+    const TEST_WEAPONS = [
+      'worn_sword',
+      'redbrook_blade',
+      'wyrmfang_greatblade',
+      'highwatch_warblade',
+      'rusty_hatchet',
+      'drogmars_skullcleaver',
+      'gorraks_cleaver',
+      'tunnelkings_spade',
+      'bronzework_mace',
+      'voss_sanctified_mace',
+      'bristleback_maul',
+      'keen_dirk',
+      'skullsplitter_dirk',
+      'vale_carving_knife',
+      'gravecaller_staff',
+      'vaels_mist_staff',
+      'staff_of_the_gravewyrm',
+      'drowned_tide_scepter',
+      'drownedmoon_scepter',
+      'palecoil_rod',
+      'fen_reaver_glaive',
+      'tidereaver_gaff',
+    ];
+    const usable = TEST_WEAPONS.filter((id) => ITEMS[id] && canEquipItem(playerClass, ITEMS[id]));
+    for (const id of usable) sim.addItem(id, 1, sim.playerId);
+    if (usable[0]) sim.equipItem(usable[0], sim.playerId);
+  }
   // Offline characters are not persisted (a fresh name is typed each session),
   // so the only stable handle is class + name. Keybinds scope to that pair.
   void startGame(sim, sim, null, `offline:${playerClass}:${name}`);

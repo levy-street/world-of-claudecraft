@@ -3529,7 +3529,7 @@ export const nl_NL: EnTranslations = {
       },
       "stealth": {
         "name": "Sluiptocht",
-        "description": "Verbergt je in de schaduwen: vijanden merken je nauwelijks op, maar je beweegt 30% trager. Aanvallen of schade oplopen verbreekt Sluiptocht. Bezweer opnieuw om eruit te stappen."
+        "description": "Verbergt je in de schaduwen: vijanden merken je nauwelijks op, maar je beweegt 50% trager. Aanvallen of schade oplopen verbreekt Sluiptocht. Bezweer opnieuw om eruit te stappen."
       },
       "adrenaline_rush": {
         "name": "Adrenalinestoot",
@@ -3561,7 +3561,7 @@ export const nl_NL: EnTranslations = {
       },
       "vanish": {
         "name": "Verdwijnen",
-        "description": "Verdwijn uit het zicht en betreed Sluiptocht zelfs in gevecht. Je beweegt 30% trager terwijl je verborgen bent. Duurt tot 10 sec."
+        "description": "Verdwijn uit het zicht en betreed Sluiptocht zelfs in gevecht. Je beweegt 50% trager terwijl je verborgen bent. Duurt tot 10 sec."
       },
       "instant_poison": {
         "name": "Direct Gif",
@@ -3969,7 +3969,7 @@ export const nl_NL: EnTranslations = {
       },
       "prowl": {
         "name": "Sluipen",
-        "description": "Ga in sluiptocht terwijl je in Wolfsgedaante bent. Kan niet in gevecht worden gebruikt."
+        "description": "Ga in sluiptocht terwijl je in Wolfsgedaante bent en beweeg 50% trager. Kan niet in gevecht worden gebruikt."
       },
       "rake": {
         "name": "Harken",

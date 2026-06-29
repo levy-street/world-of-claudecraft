@@ -627,7 +627,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Che chắn mục tiêu, hấp thụ 48 sát thương trong 30 giây.',
   'entities.abilities.power_word_shield.name': 'Thánh Ngữ: Khiên Chắn',
   'entities.abilities.prowl.description':
-    'Vào trạng thái ẩn thân khi ở Hình Sói. Không thể dùng trong chiến đấu.',
+    'Vào trạng thái ẩn thân khi ở Hình Sói, di chuyển chậm hơn 50%. Không thể dùng trong chiến đấu.',
   'entities.abilities.prowl.name': 'Rình Mồi',
   'entities.abilities.pyroblast.description':
     'Ném ra một tảng lửa khổng lồ gây {damage} sát thương Hỏa cùng sát thương cộng dồn theo thời gian.',
@@ -714,7 +714,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Gọi xuống một tia lửa tinh tú, gây {damage} sát thương Bí Thuật.',
   'entities.abilities.starfire.name': 'Tinh Hỏa',
   'entities.abilities.stealth.description':
-    'Che giấu bạn trong bóng tối: kẻ địch khó nhận ra bạn, nhưng bạn di chuyển chậm hơn 30%. Tấn công hoặc nhận sát thương sẽ phá vỡ Ẩn Thân. Niệm lại để bước ra.',
+    'Che giấu bạn trong bóng tối: kẻ địch khó nhận ra bạn, nhưng bạn di chuyển chậm hơn 50%. Tấn công hoặc nhận sát thương sẽ phá vỡ Ẩn Thân. Niệm lại để bước ra.',
   'entities.abilities.stealth.name': 'Ẩn Thân',
   'entities.abilities.stormstrike.description':
     'Dẫn dắt cơn bão qua vũ khí của bạn, tức thì đánh gây sát thương vũ khí cộng thêm {damage}.',
@@ -765,7 +765,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Tức thì biến thành hình lữ hành nhanh nhẹn, tăng 40% tốc độ di chuyển. Bạn không thể dùng các kỹ năng khác khi đã biến hình, nhưng có thể biến hình trong hoặc ngoài chiến đấu, lý tưởng để chạy trốn.',
   'entities.abilities.travel_form.name': 'Hình Lữ Hành',
   'entities.abilities.vanish.description':
-    'Biến mất khỏi tầm nhìn, đi vào Ẩn Thân ngay cả trong chiến đấu. Bạn di chuyển chậm hơn 30% khi ẩn nấp. Kéo dài tối đa 10 giây.',
+    'Biến mất khỏi tầm nhìn, đi vào Ẩn Thân ngay cả trong chiến đấu. Bạn di chuyển chậm hơn 50% khi ẩn nấp. Kéo dài tối đa 10 giây.',
   'entities.abilities.vanish.name': 'Tàng Hình',
   'entities.abilities.whirlwind.description':
     'Xoay theo một vòng cung chết chóc, đánh tất cả kẻ địch lân cận gây {damage}. (Tài năng Cuồng Nộ)',

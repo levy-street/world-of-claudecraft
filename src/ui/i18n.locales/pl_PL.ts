@@ -624,7 +624,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Osłania cel, pochłaniając 48 obrażeń przez 30 sek.',
   'entities.abilities.power_word_shield.name': 'Słowo mocy: Tarcza',
   'entities.abilities.prowl.description':
-    'Wchodzi w skradanie w postaci wilka. Nie można użyć w walce.',
+    'Wchodzi w skradanie w postaci wilka, poruszając się o 50% wolniej. Nie można użyć w walce.',
   'entities.abilities.prowl.name': 'Czajenie',
   'entities.abilities.pyroblast.description':
     'Ciska ogromnym ognistym głazem, który zadaje {damage} obrażeń od ognia oraz dodatkowe obrażenia w czasie.',
@@ -709,7 +709,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Sprowadza pocisk gwiezdnego ognia, zadając {damage} obrażeń od Arkanów.',
   'entities.abilities.starfire.name': 'Gwiezdny ogień',
   'entities.abilities.stealth.description':
-    'Ukrywa cię w cieniu: wrogowie ledwie cię dostrzegają, ale poruszasz się o 30% wolniej. Atak lub otrzymanie obrażeń przerywa Skradanie się. Rzuć ponownie, aby się ujawnić.',
+    'Ukrywa cię w cieniu: wrogowie ledwie cię dostrzegają, ale poruszasz się o 50% wolniej. Atak lub otrzymanie obrażeń przerywa Skradanie się. Rzuć ponownie, aby się ujawnić.',
   'entities.abilities.stealth.name': 'Skradanie się',
   'entities.abilities.stormstrike.description':
     'Kieruje burzę przez twoją broń, natychmiast uderzając za obrażenia broni plus {damage}.',
@@ -760,7 +760,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Natychmiast przemienia cię w szybką postać podróżną, zwiększając szybkość poruszania się o 40%. Po przemianie nie możesz używać innych zdolności, ale możesz się przemieniać w walce i poza nią, co czyni ją idealną do ucieczki.',
   'entities.abilities.travel_form.name': 'Postać podróżna',
   'entities.abilities.vanish.description':
-    'Znikasz z pola widzenia, wchodząc w Skradanie się nawet w walce. Ukryty poruszasz się o 30% wolniej. Trwa do 10 sek.',
+    'Znikasz z pola widzenia, wchodząc w Skradanie się nawet w walce. Ukryty poruszasz się o 50% wolniej. Trwa do 10 sek.',
   'entities.abilities.vanish.name': 'Zniknięcie',
   'entities.abilities.whirlwind.description':
     'Wirujesz w śmiercionośnym łuku, uderzając wszystkich pobliskich wrogów za {damage}. (Talent Furii)',

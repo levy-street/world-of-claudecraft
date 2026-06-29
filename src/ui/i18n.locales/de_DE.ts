@@ -1698,7 +1698,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Überfällt das Ziel für 250% Waffenschaden plus {damage}. Ihr müsst verstohlen und hinter dem Ziel sein. Erfordert einen Dolch. Gewährt 1 Combopunkt.',
   'entities.abilities.stealth.name': 'Verstohlenheit',
   'entities.abilities.stealth.description':
-    'Verbirgt euch in den Schatten: Gegner bemerken euch kaum, aber ihr bewegt euch 30% langsamer. Angreifen oder Schaden erleiden bricht Verstohlenheit. Erneut wirken, um hervorzutreten.',
+    'Verbirgt euch in den Schatten: Gegner bemerken euch kaum, aber ihr bewegt euch 50% langsamer. Angreifen oder Schaden erleiden bricht Verstohlenheit. Erneut wirken, um hervorzutreten.',
   'entities.abilities.adrenaline_rush.name': 'Adrenalinrausch',
   'entities.abilities.adrenaline_rush.description':
     'Euer Blut kocht und stellt sofort 60 Energie wieder her.',
@@ -1722,7 +1722,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Finishing-Move, der das Ziel verwundet und es 16 Sek. lang um {damage} bluten lässt.',
   'entities.abilities.vanish.name': 'Verschwinden',
   'entities.abilities.vanish.description':
-    'Verschwindet aus dem Blickfeld und tretet selbst im Kampf in Verstohlenheit. Ihr bewegt euch 30% langsamer, solange ihr verborgen seid. Hält bis zu 10 Sek. an.',
+    'Verschwindet aus dem Blickfeld und tretet selbst im Kampf in Verstohlenheit. Ihr bewegt euch 50% langsamer, solange ihr verborgen seid. Hält bis zu 10 Sek. an.',
   'entities.abilities.instant_poison.name': 'Sofortgift',
   'entities.abilities.instant_poison.description':
     'Überzieht eure Waffe 30 Min. lang, sodass jeder eurer Nahkampfschwünge 8 zusätzlichen Naturschaden verursacht.',
@@ -2014,7 +2014,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Demoralisiert nahe Gegner und senkt ihre Angriffskraft 20 Sek. lang um 20. Nur in Bärengestalt.',
   'entities.abilities.prowl.name': 'Anschleichen',
   'entities.abilities.prowl.description':
-    'Geht in Wolfsgestalt in den Schleichmodus über. Im Kampf nicht einsetzbar.',
+    'Geht in Wolfsgestalt in den Schleichmodus über und bewegt Euch 50% langsamer. Im Kampf nicht einsetzbar.',
   'entities.abilities.rake.name': 'Krallenhieb',
   'entities.abilities.rake.description':
     'Ein Schleicheröffner, der den Gegner für Waffenschaden plus {damage} aufreißt und über 9 Sek. Blutungsschaden verursacht. Gewährt 1 Combopunkt. Nur in Wolfsgestalt.',

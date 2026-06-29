@@ -618,7 +618,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Skyddar målet och absorberar 48 skada i 30 sek.',
   'entities.abilities.power_word_shield.name': 'Maktord: Sköld',
   'entities.abilities.prowl.description':
-    'Gå i smyg medan du är i vargform. Kan inte användas i strid.',
+    'Gå i smyg medan du är i vargform och rör dig 50 % långsammare. Kan inte användas i strid.',
   'entities.abilities.prowl.name': 'Smyga',
   'entities.abilities.pyroblast.description':
     'Slungar ett väldigt brinnande stenblock som vållar {damage} eldskada plus ytterligare skada över tid.',
@@ -702,7 +702,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Kallar ner en pil av stjärneld och tillfogar {damage} arkan skada.',
   'entities.abilities.starfire.name': 'Stjärneld',
   'entities.abilities.stealth.description':
-    'Döljer dig i skuggorna: fiender lägger knappt märke till dig, men du rör dig 30 % långsammare. Att anfalla eller ta skada bryter Smyg. Kasta igen för att kliva fram.',
+    'Döljer dig i skuggorna: fiender lägger knappt märke till dig, men du rör dig 50 % långsammare. Att anfalla eller ta skada bryter Smyg. Kasta igen för att kliva fram.',
   'entities.abilities.stealth.name': 'Smyg',
   'entities.abilities.stormstrike.description':
     'Kanaliserar stormen genom ditt vapen och hugger omedelbart för vapenskada plus {damage}.',
@@ -753,7 +753,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Skiftar omedelbart till en snabb färdform och ökar förflyttningshastigheten med 40 %. Du kan inte använda andra förmågor i skepnaden, men kan skifta in eller ut i strid, idealiskt för flykt.',
   'entities.abilities.travel_form.name': 'Färdform',
   'entities.abilities.vanish.description':
-    'Försvinn ur sikte och gå in i Smyg även i strid. Du rör dig 30 % långsammare medan du är dold. Varar i upp till 10 sek.',
+    'Försvinn ur sikte och gå in i Smyg även i strid. Du rör dig 50 % långsammare medan du är dold. Varar i upp till 10 sek.',
   'entities.abilities.vanish.name': 'Försvinn',
   'entities.abilities.whirlwind.description':
     'Snurra i en dödlig båge och hugg alla närliggande fiender för {damage}. (Raserital)',

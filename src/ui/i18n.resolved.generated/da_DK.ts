@@ -3529,7 +3529,7 @@ export const da_DK: EnTranslations = {
       },
       "stealth": {
         "name": "Snigen",
-        "description": "Skjuler dig i skyggerne: fjender lægger knap mærke til dig, men du bevæger dig 30 % langsommere. Angreb eller skade bryder Snigen. Kast igen for at træde frem."
+        "description": "Skjuler dig i skyggerne: fjender lægger knap mærke til dig, men du bevæger dig 50 % langsommere. Angreb eller skade bryder Snigen. Kast igen for at træde frem."
       },
       "adrenaline_rush": {
         "name": "Adrenalinrus",
@@ -3561,7 +3561,7 @@ export const da_DK: EnTranslations = {
       },
       "vanish": {
         "name": "Forsvinding",
-        "description": "Forsvind fra syne og træd ind i Snigen selv i kamp. Du bevæger dig 30 % langsommere mens du er skjult. Varer op til 10 sek."
+        "description": "Forsvind fra syne og træd ind i Snigen selv i kamp. Du bevæger dig 50 % langsommere mens du er skjult. Varer op til 10 sek."
       },
       "instant_poison": {
         "name": "Øjeblikkelig Gift",
@@ -3969,7 +3969,7 @@ export const da_DK: EnTranslations = {
       },
       "prowl": {
         "name": "Luske",
-        "description": "Gå i sneg-tilstand mens du er i Ulveform. Kan ikke bruges i kamp."
+        "description": "Gå i sneg-tilstand mens du er i Ulveform, og bevæg dig 50 % langsommere. Kan ikke bruges i kamp."
       },
       "rake": {
         "name": "Kradsning",
