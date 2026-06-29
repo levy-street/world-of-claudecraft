@@ -1608,7 +1608,7 @@ export const ru_RU: EnTranslations = {
     "copyright": "2026 World of ClaudeCraft",
     "githubLink": "https://github.com/levy-street/world-of-claudecraft",
     "githubLabel": "Проект с открытым исходным кодом",
-    "whitepaper": "Белая книга",
+    "whitepaper": "Whitepaper",
     "terms": "Условия использования",
     "privacy": "Политика конфиденциальности",
     "discordLabel": "Присоединиться к Discord"
