@@ -148,6 +148,7 @@ export function mergeAugmentMods(base: TalentModifiers, augIds: string[]): Talen
           costPct: 0,
           cooldownPct: 0,
           castPct: 0,
+          buffPct: 0,
         };
       }
       const cur = m.abilities[am.ability];
@@ -156,6 +157,7 @@ export function mergeAugmentMods(base: TalentModifiers, augIds: string[]): Talen
       cur.costPct += am.costPct ?? 0;
       cur.cooldownPct += am.cooldownPct ?? 0;
       cur.castPct += am.castPct ?? 0;
+      cur.buffPct += am.buffPct ?? 0;
     }
     if (eff.grant) m.grants.push({ ability: eff.grant.ability, rank: eff.grant.rank ?? 1 });
   }
