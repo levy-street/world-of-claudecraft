@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import {
+  da_DK,
   de_DE,
   en,
   en_CA,
@@ -10,16 +11,22 @@ import {
   fr_CA,
   fr_FR,
   hasTranslation,
+  id_ID,
   it_IT,
   ja_JP,
   ko_KR,
   languageTag,
+  nl_NL,
+  pl_PL,
   pt_BR,
   ru_RU,
   type SupportedLanguage,
   setLanguage,
   supportedLanguages,
+  sv_SE,
   tPlural,
+  tr_TR,
+  vi_VN,
   zh_CN,
   zh_TW,
 } from '../src/ui/i18n';
@@ -45,6 +52,13 @@ const TABLES: Record<SupportedLanguage, unknown> = {
   ja_JP,
   pt_BR,
   ru_RU,
+  nl_NL,
+  pl_PL,
+  id_ID,
+  tr_TR,
+  sv_SE,
+  vi_VN,
+  da_DK,
 };
 
 function flatten(

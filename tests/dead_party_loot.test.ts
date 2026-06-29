@@ -15,16 +15,19 @@ import type { Entity } from '../src/sim/types';
 type SimInternals = {
   players: Map<number, PlayerMeta>;
   entities: Map<number, Entity>;
-  parties: Map<
-    number,
-    {
-      id: number;
-      leader: number;
-      members: number[];
-      lootStrategies: { currency: string; commonItems: string; premiumItems: string };
-    }
-  >;
-  partyByPid: Map<number, number>;
+  // parties / partyByPid moved onto the PartyMachine (src/sim/social/party.ts, A1).
+  party: {
+    parties: Map<
+      number,
+      {
+        id: number;
+        leader: number;
+        members: number[];
+        lootStrategies: { currency: string; commonItems: string; premiumItems: string };
+      }
+    >;
+    partyByPid: Map<number, number>;
+  };
   handleDeath: (mob: Entity, killer: Entity | null) => void;
   partyLootCandidatesForMob: (mob: Entity) => PlayerMeta[];
 };
@@ -76,7 +79,7 @@ describe('downed party member keeps loot/xp rights (classic group rules)', () =>
     const { internals, survivor, faller, fE, mob } = setup();
     fE.dead = true;
 
-    const party = internals.parties.get(internals.partyByPid.get(survivor)!)!;
+    const party = internals.party.parties.get(internals.party.partyByPid.get(survivor)!)!;
     party.lootStrategies.currency = 'fair-split';
 
     const candidates = internals.partyLootCandidatesForMob(mob).map((m) => m.entityId);

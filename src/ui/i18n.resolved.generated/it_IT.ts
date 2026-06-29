@@ -222,6 +222,21 @@ export const it_IT: EnTranslations = {
     "rest": {
       "resting": "A riposo"
     },
+    "unitFrame": {
+      "playerLabel": "Il tuo personaggio",
+      "targetLabel": "Il tuo bersaglio",
+      "targetAnnounce": "Bersaglio: {name}",
+      "partyLabel": "Il tuo gruppo",
+      "partyGroup": "Gruppo {n}",
+      "durationUnitSeconds": "s"
+    },
+    "character": {
+      "modelPreview": "Anteprima del modello del personaggio"
+    },
+    "skipLinks": {
+      "mainHud": "Vai all'interfaccia principale",
+      "chat": "Vai alla chat"
+    },
     "mobile": {
       "autorun": "Corsa automatica",
       "jump": "Salta",
@@ -243,6 +258,13 @@ export const it_IT: EnTranslations = {
       "coordinates": "Coordinate",
       "heading": "Direzione",
       "minimapZoom": "Zoom minimappa"
+    },
+    "castBar": {
+      "playerAria": "La tua barra di lancio",
+      "targetAria": "Barra di lancio del bersaglio"
+    },
+    "leaderboard": {
+      "close": "Chiudi"
     },
     "raidLockout": {
       "title": "Blocchi incursione",
@@ -583,6 +605,91 @@ export const it_IT: EnTranslations = {
       "notRaid": "Il tuo gruppo non è un'incursione.",
       "leaderOnly": "Solo il capo incursione può convertire in un gruppo.",
       "tooLarge": "Un'incursione con più di cinque membri non può tornare a essere un gruppo."
+    },
+    "itemArmorType": {
+      "cloth": "Cloth",
+      "leather": "Leather",
+      "mail": "Mail"
+    },
+    "auraEffect": {
+      "dot": "Infligge {value} danni da {school} ogni {interval} s",
+      "hot": "Ripristina {value} salute ogni {interval} s",
+      "absorb": "Assorbe {value} danni",
+      "healAbsorb": "Assorbe {value} cure ricevute",
+      "thorns": "Infligge {value} danni da {school} agli attaccanti",
+      "slow": "Riduce la velocità di movimento del {pct}%",
+      "speed": "Aumenta la velocità di movimento del {pct}%",
+      "attackSpeedSlow": "Rallenta la velocità di attacco del {pct}%",
+      "attackSpeedFast": "Aumenta la velocità di attacco del {pct}%",
+      "haste": "Aumenta la velocità di attacco e lancio del {pct}%",
+      "tongues": "Aumenta il tempo di lancio del {pct}%",
+      "increase": {
+        "ap": "Aumenta la potenza di attacco di {value}",
+        "armor": "Aumenta l'armatura di {value}",
+        "int": "Aumenta l'intelletto di {value}",
+        "agi": "Aumenta l'agilità di {value}",
+        "sta": "Aumenta la tempra di {value}",
+        "spi": "Aumenta lo spirito di {value}",
+        "allStats": "Aumenta tutti gli attributi di {value}"
+      },
+      "reduce": {
+        "ap": "Riduce la potenza di attacco di {value}",
+        "armor": "Riduce l'armatura di {value}",
+        "int": "Riduce l'intelletto di {value}",
+        "agi": "Riduce l'agilità di {value}",
+        "sta": "Riduce la tempra di {value}",
+        "spi": "Riduce lo spirito di {value}",
+        "allStats": "Riduce tutti gli attributi di {value}"
+      },
+      "dodge": "Aumenta la probabilità di schivata del {pct}%",
+      "dodgeReduce": "Riduce la probabilità di schivata del {pct}%",
+      "armorFlat": "Riduce l'armatura di {value}",
+      "armorFlatStacks": "Riduce l'armatura di {value} ({stacks} accumuli)",
+      "mortalWound": "Riduce le cure ricevute del {pct}%",
+      "vulnerability": "Aumenta i danni subiti del {pct}%",
+      "physVuln": "Aumenta i danni fisici subiti del {pct}%",
+      "spellVuln": "Aumenta i danni magici subiti del {pct}%",
+      "critVuln": "Aumenta la probabilità di subire colpi critici del {pct}%",
+      "costTax": "Aumenta i costi delle abilità del {pct}%",
+      "stun": "Stordito: impossibile agire",
+      "root": "Radicato: impossibile muoversi",
+      "incapacitate": "Incapacitato: impossibile agire",
+      "polymorph": "Trasformato: impossibile agire",
+      "hex": "Riduce danni e cure effettuati del {pct}%",
+      "blind": "Accecato: impossibile agire",
+      "silence": "Silenziato: impossibile lanciare incantesimi",
+      "disarm": "Disarmato: impossibile usare attacchi con arma",
+      "lockout": "Scuola di magia bloccata",
+      "imbue": "Arma infusa con effetti bonus",
+      "imbueRange": "Arma infusa: da {min} a {max} danni bonus al giudizio",
+      "stealth": "Nascosto; velocità di movimento ridotta del {pct}%",
+      "formBear": "Forma d’orso: salute e armatura aumentate",
+      "formCat": "Forma felina: danni in mischia ed energia",
+      "formTravel": "Forma di viaggio: velocità di movimento aumentata del {pct}%",
+      "defensiveStance": "Posizione difensiva: danni subiti ridotti, più minaccia",
+      "righteousFury": "Furia Virtuosa: minaccia da danni Sacri molto aumentata",
+      "scale": "Taglia aumentata del {pct}%",
+      "jump": "Altezza di salto aumentata del {pct}%",
+      "school": {
+        "physical": "Fisico",
+        "fire": "Fuoco",
+        "frost": "Gelo",
+        "arcane": "Arcano",
+        "shadow": "Ombra",
+        "holy": "Sacro",
+        "nature": "Natura"
+      }
+    },
+    "loot": {
+      "chestTitle": "Scrigno"
+    },
+    "spellbook": {
+      "addToBarAria": "Aggiungi {name} alla barra azioni",
+      "removeFromBarAria": "Rimuovi {name} dalla barra azioni"
+    },
+    "nameplate": {
+      "mob": "[{level}] {name}",
+      "mobElite": "[{level}+] {name}"
     }
   },
   "guide": {
@@ -2409,7 +2516,9 @@ export const it_IT: EnTranslations = {
       "mobileMap": "Mappa",
       "closeMap": "Chiudi mappa",
       "zoomIn": "Aumenta zoom",
-      "zoomOut": "Riduci zoom"
+      "zoomOut": "Riduci zoom",
+      "mapCanvasLabel": "Mappa",
+      "mapSummary": "Mappa di {zone}."
     },
     "options": {
       "gameMenu": "Menu di gioco",
@@ -2610,6 +2719,7 @@ export const it_IT: EnTranslations = {
     "combat": {
       "floatingMiss": "Mancato",
       "floatingDodge": "Schivata",
+      "floatingResist": "Resist",
       "cannotMove": "Non puoi muoverti!",
       "attack": "attacco",
       "damageDone": "Il tuo {ability} colpisce {target} per {amount}.",
@@ -2618,6 +2728,7 @@ export const it_IT: EnTranslations = {
       "damageTakenCrit": "{source} ti colpisce criticamente per {amount}.",
       "miss": "Il tuo {ability} manca {target}.",
       "dodged": "{target} schiva il tuo {ability}.",
+      "resisted": "Your {ability} is resisted by {target}.",
       "healSelf": "Il tuo {ability} ti cura di {amount}.",
       "healSelfCrit": "Il tuo {ability} ti cura criticamente di {amount}.",
       "healOther": "Il tuo {ability} cura {target} di {amount}.",
@@ -3412,7 +3523,7 @@ export const it_IT: EnTranslations = {
       },
       "stealth": {
         "name": "Furtività",
-        "description": "Ti nasconde nelle ombre: i nemici ti notano appena, ma ti muovi il 30% più lentamente. Attaccare o subire danni interrompe Furtività. Lanciala di nuovo per uscire."
+        "description": "Ti nasconde nelle ombre: i nemici ti notano appena, ma ti muovi il 50% più lentamente. Attaccare o subire danni interrompe Furtività. Lanciala di nuovo per uscire."
       },
       "adrenaline_rush": {
         "name": "Scarica di Adrenalina",
@@ -3444,7 +3555,7 @@ export const it_IT: EnTranslations = {
       },
       "vanish": {
         "name": "Eclissarsi",
-        "description": "Scompari dalla vista, entrando in Furtività anche in combattimento. Ti muovi il 30% più lentamente mentre sei nascosto. Dura fino a 10 sec."
+        "description": "Scompari dalla vista, entrando in Furtività anche in combattimento. Ti muovi il 50% più lentamente mentre sei nascosto. Dura fino a 10 sec."
       },
       "instant_poison": {
         "name": "Veleno Istantaneo",
@@ -3852,7 +3963,7 @@ export const it_IT: EnTranslations = {
       },
       "prowl": {
         "name": "Agguato",
-        "description": "Entra in furtività mentre sei in Forma del Lupo. Non utilizzabile in combattimento."
+        "description": "Entra in furtività mentre sei in Forma del Lupo, muovendoti il 50% più lentamente. Non utilizzabile in combattimento."
       },
       "rake": {
         "name": "Sventramento",

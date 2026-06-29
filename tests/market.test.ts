@@ -223,7 +223,7 @@ describe('the World Market — the Merchant', () => {
     const listing = sim.marketListings.find((l) => !l.house && l.itemId === 'wolf_fang')!;
     listing.sellerKey = 'Seller';
     listing.sellerName = 'Seller';
-    const internals = sim as unknown as {
+    const internals = sim.market as unknown as {
       marketCollections: Map<string, { copper: number; items: [] }>;
     };
     internals.marketCollections.set('Seller', { copper: 95, items: [] });
@@ -389,7 +389,7 @@ describe('the World Market — the Merchant', () => {
     expect(sim2.marketListings.filter((l) => l.house).length).toBe(houseBefore);
     // the waiting sale proceeds came across too
     const col = (
-      sim2 as unknown as { marketCollections: Map<string, { copper: number }> }
+      sim2.market as unknown as { marketCollections: Map<string, { copper: number }> }
     ).marketCollections.get(marketSellerKey(seller));
     expect(col?.copper).toBe(285); // 300 - 5%
     // new listings keep climbing past the loaded ids
@@ -413,7 +413,7 @@ describe('the World Market — the Merchant', () => {
 
     // Flood the shared market with 200 other-seller listings whose names sort
     // first, pushing the seller's own goods well past MARKET_WIRE_LIMIT (120).
-    const internals = sim as unknown as {
+    const internals = sim.market as unknown as {
       marketListings: Array<Record<string, unknown>>;
       nextListingId: number;
     };

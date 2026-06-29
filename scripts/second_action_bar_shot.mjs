@@ -2,8 +2,9 @@
 // mage, levels up so the kit overflows the primary bar onto the secondary bar,
 // drops a couple of item shortcuts on the secondary row, and captures the
 // stacked action bars. Needs a dev server (default :5173, override GAME_URL).
-import puppeteer from 'puppeteer-core';
+
 import fs from 'node:fs';
+import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH } from './browser_path.mjs';
 
 const URL = (process.env.GAME_URL ?? 'http://localhost:5173') + '/?gfx=ultra';
@@ -37,7 +38,8 @@ await sleep(1500);
 await page.evaluate(() => {
   const g = window.__game;
   g.sim.setPlayerLevel?.(20);
-  for (const id of ['minor_healing_potion', 'minor_mana_potion', 'baked_bread']) g.sim.addItem(id, 5);
+  for (const id of ['minor_healing_potion', 'minor_mana_potion', 'baked_bread'])
+    g.sim.addItem(id, 5);
 });
 await sleep(1500);
 
@@ -45,7 +47,8 @@ await sleep(1500);
 const info = await page.evaluate(() => ({
   bar1: document.querySelectorAll('#actionbar .action-btn').length,
   bar2: document.querySelectorAll('#actionbar2 .action-btn').length,
-  bar2Visible: !!document.querySelector('#actionbar2') &&
+  bar2Visible:
+    !!document.querySelector('#actionbar2') &&
     getComputedStyle(document.querySelector('#actionbar2')).display !== 'none',
 }));
 console.log('action bars:', JSON.stringify(info));

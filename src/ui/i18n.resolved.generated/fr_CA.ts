@@ -222,6 +222,21 @@ export const fr_CA: EnTranslations = {
     "rest": {
       "resting": "Au repos"
     },
+    "unitFrame": {
+      "playerLabel": "Votre personnage",
+      "targetLabel": "Votre cible",
+      "targetAnnounce": "Cible : {name}",
+      "partyLabel": "Votre groupe",
+      "partyGroup": "Groupe {n}",
+      "durationUnitSeconds": "s"
+    },
+    "character": {
+      "modelPreview": "Aperçu du modèle du personnage"
+    },
+    "skipLinks": {
+      "mainHud": "Aller à l'interface principale",
+      "chat": "Aller à la discussion"
+    },
     "mobile": {
       "autorun": "Course automatique",
       "jump": "Sauter",
@@ -243,6 +258,13 @@ export const fr_CA: EnTranslations = {
       "coordinates": "Coordonnées",
       "heading": "Cap",
       "minimapZoom": "Zoom de la minicarte"
+    },
+    "castBar": {
+      "playerAria": "Votre barre d'incantation",
+      "targetAria": "Barre d'incantation de la cible"
+    },
+    "leaderboard": {
+      "close": "Fermer"
     },
     "raidLockout": {
       "title": "Verrous de raid",
@@ -583,6 +605,91 @@ export const fr_CA: EnTranslations = {
       "notRaid": "Votre groupe n'est pas un raid.",
       "leaderOnly": "Seul le chef de raid peut convertir en groupe.",
       "tooLarge": "Un raid de plus de cinq membres ne peut pas être reconverti en groupe."
+    },
+    "itemArmorType": {
+      "cloth": "Cloth",
+      "leather": "Leather",
+      "mail": "Mail"
+    },
+    "auraEffect": {
+      "dot": "Cause {value} points de dégâts de {school} toutes les {interval} s",
+      "hot": "Redonne {value} points de vie toutes les {interval} s",
+      "absorb": "Bloque {value} points de dégâts",
+      "healAbsorb": "Bloque {value} points de soins reçus",
+      "thorns": "Cause {value} points de dégâts de {school} aux attaquants",
+      "slow": "Diminue la vitesse de déplacement de {pct}%",
+      "speed": "Accroît la vitesse de déplacement de {pct}%",
+      "attackSpeedSlow": "Diminue la vitesse d'attaque de {pct}%",
+      "attackSpeedFast": "Accroît la vitesse d'attaque de {pct}%",
+      "haste": "Accroît la vitesse d'attaque et d'incantation de {pct}%",
+      "tongues": "Accroît le temps d'incantation de {pct}%",
+      "increase": {
+        "ap": "Accroît la puissance d'attaque de {value}",
+        "armor": "Accroît l'armure de {value}",
+        "int": "Accroît l'intelligence de {value}",
+        "agi": "Accroît l'agilité de {value}",
+        "sta": "Accroît l'endurance de {value}",
+        "spi": "Accroît l'esprit de {value}",
+        "allStats": "Accroît tous les attributs de {value}"
+      },
+      "reduce": {
+        "ap": "Diminue la puissance d'attaque de {value}",
+        "armor": "Diminue l'armure de {value}",
+        "int": "Diminue l'intelligence de {value}",
+        "agi": "Diminue l'agilité de {value}",
+        "sta": "Diminue l'endurance de {value}",
+        "spi": "Diminue l'esprit de {value}",
+        "allStats": "Diminue tous les attributs de {value}"
+      },
+      "dodge": "Accroît les chances d'esquive de {pct}%",
+      "dodgeReduce": "Diminue les chances d'esquive de {pct}%",
+      "armorFlat": "Diminue l'armure de {value}",
+      "armorFlatStacks": "Diminue l'armure de {value} ({stacks} charges)",
+      "mortalWound": "Diminue les soins reçus de {pct}%",
+      "vulnerability": "Accroît les dégâts subis de {pct}%",
+      "physVuln": "Accroît les dégâts physiques subis de {pct}%",
+      "spellVuln": "Accroît les dégâts magiques subis de {pct}%",
+      "critVuln": "Accroît les chances de subir un coup critique de {pct}%",
+      "costTax": "Accroît le coût des techniques de {pct}%",
+      "stun": "Sonné : impossible d'agir",
+      "root": "Immobilisé : impossible de bouger",
+      "incapacitate": "Neutralisé, impossible d'agir",
+      "polymorph": "Transformé : impossible d'agir",
+      "hex": "Diminue les dégâts et soins prodigués de {pct}%",
+      "blind": "Aveuglé, impossible d'agir",
+      "silence": "Diminue au silence : impossible de lancer des sorts",
+      "disarm": "Désarmé, impossible d'utiliser des attaques d'arme",
+      "lockout": "École de magie verrouillée",
+      "imbue": "Arme enchantée avec effets bonus",
+      "imbueRange": "Arme enchantée : {min} à {max} dégâts bonus au jugement",
+      "stealth": "Dissimulé ; vitesse de déplacement réduite de {pct}%",
+      "formBear": "Forme ours : points de vie et armure augmentés",
+      "formCat": "Forme féline : dégâts de mêlée et énergie",
+      "formTravel": "Forme voyage : vitesse de déplacement augmentée de {pct}%",
+      "defensiveStance": "Posture défensive, dégâts subis réduits, menace accrue",
+      "righteousFury": "Fureur vertueuse, menace des dégâts Sacré fortement accrue",
+      "scale": "Gabarit augmentée de {pct}%",
+      "jump": "Saut augmentée de {pct}%",
+      "school": {
+        "physical": "physique",
+        "fire": "feu",
+        "frost": "froid",
+        "arcane": "arcane",
+        "shadow": "ombre",
+        "holy": "sacré",
+        "nature": "nature"
+      }
+    },
+    "loot": {
+      "chestTitle": "Coffre"
+    },
+    "spellbook": {
+      "addToBarAria": "Ajouter {name} à la barre d'action",
+      "removeFromBarAria": "Retirer {name} de la barre d'action"
+    },
+    "nameplate": {
+      "mob": "[{level}] {name}",
+      "mobElite": "[{level}+] {name}"
     }
   },
   "guide": {
@@ -2409,7 +2516,9 @@ export const fr_CA: EnTranslations = {
       "mobileMap": "Carte",
       "closeMap": "Fermer la carte",
       "zoomIn": "Zoom avant",
-      "zoomOut": "Zoom arrière"
+      "zoomOut": "Zoom arrière",
+      "mapCanvasLabel": "Carte",
+      "mapSummary": "Carte de {zone}."
     },
     "options": {
       "gameMenu": "Menu du jeu",
@@ -2610,6 +2719,7 @@ export const fr_CA: EnTranslations = {
     "combat": {
       "floatingMiss": "Raté",
       "floatingDodge": "Esquive",
+      "floatingResist": "Resist",
       "cannotMove": "Immobilisé !",
       "attack": "attaque",
       "damageDone": "Votre {ability} touche {target} pour {amount}.",
@@ -2618,6 +2728,7 @@ export const fr_CA: EnTranslations = {
       "damageTakenCrit": "{source} vous inflige un coup critique pour {amount}.",
       "miss": "Votre {ability} rate {target}.",
       "dodged": "{target} esquive votre {ability}.",
+      "resisted": "Your {ability} is resisted by {target}.",
       "healSelf": "Votre {ability} vous rend {amount} points de vie.",
       "healSelfCrit": "Votre {ability} vous rend un soin critique de {amount}.",
       "healOther": "Votre {ability} soigne {target} pour {amount}.",
@@ -3412,7 +3523,7 @@ export const fr_CA: EnTranslations = {
       },
       "stealth": {
         "name": "Camouflage",
-        "description": "Vous dissimule dans les ombres: les ennemis vous remarquent à peine, mais vous vous déplacez 30% plus lentement. Attaquer ou subir des dégâts interrompt Camouflage. Relancez pour sortir."
+        "description": "Vous dissimule dans les ombres: les ennemis vous remarquent à peine, mais vous vous déplacez 50% plus lentement. Attaquer ou subir des dégâts interrompt Camouflage. Relancez pour sortir."
       },
       "adrenaline_rush": {
         "name": "Poussée d'adrénaline",
@@ -3444,7 +3555,7 @@ export const fr_CA: EnTranslations = {
       },
       "vanish": {
         "name": "Disparition",
-        "description": "Vous disparaissez et entrez en Camouflage, même en plein combat. Vous vous déplacez 30% plus lentement tant que vous êtes dissimulé. Dure jusqu'à 10 s."
+        "description": "Vous disparaissez et entrez en Camouflage, même en plein combat. Vous vous déplacez 50% plus lentement tant que vous êtes dissimulé. Dure jusqu'à 10 s."
       },
       "instant_poison": {
         "name": "Poison instantané",
@@ -3852,7 +3963,7 @@ export const fr_CA: EnTranslations = {
       },
       "prowl": {
         "name": "Rôder",
-        "description": "Passe en camouflage tant que vous êtes en forme de loup. Inutilisable en combat."
+        "description": "Passe en camouflage tant que vous êtes en forme de loup, avec une vitesse de déplacement réduite de 50%. Inutilisable en combat."
       },
       "rake": {
         "name": "Lacérer",

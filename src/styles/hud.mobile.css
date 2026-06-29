@@ -1,0 +1,1825 @@
+/* hud.mobile.css: the in-game mobile-touch layer (touch controls, mobile layout,
+   landscape/portrait rules), extracted verbatim from the index.html inline <style>.
+   Wrapped in @layer hud-mobile, which is ordered AFTER shell (see the
+   barrel): the inline mobile block originally beat every shell rule (it was
+   unlayered), and several of its rules (mobile #mode-select / .play-console /
+   #btn-play, and the char-select panel layout) override pre-game shell elements, so
+   the mobile layer must outrank shell, not sit before it. Both game entries load it
+   via the barrel.
+
+   NOTE the layer name is hud-mobile, NOT "hud.mobile": a DOT in a @layer name means
+   a SUBLAYER (hud.mobile would be the "mobile" sublayer of the early "hud" layer,
+   which loses to shell). A flat hyphenated name keeps it a top-level layer after
+   shell.
+
+   The #rotate-device orientation GATE is the one genuine per-entry difference
+   (landscape-only in-game): index suppresses the overlay in-game
+   (index.extra.css) while play shows it in portrait (play.extra.css). Its
+   per-entry rules live in those .extra files (layers ordered after this one), NOT
+   here, so neither leaks across entries. The shared #start-screen/#mobile-preflight
+   game-active hide and the base/styling of #rotate-device stay here. */
+@layer hud-mobile {
+  /* ---------- mobile touch controls (runtime-gated with body.mobile-touch + game-active) ---------- */
+  #mobile-controls {
+    display: none;
+  }
+  #mobile-preflight {
+    display: none;
+  }
+  #rotate-device {
+    display: none;
+  }
+  body.mobile-touch.game-active #start-screen,
+  body.mobile-touch.game-active #mobile-preflight {
+    display: none !important;
+    pointer-events: none !important;
+  }
+  body.mobile-touch.game-active:not(.mobile-more-open) #mobile-extra-controls {
+    display: none !important;
+  }
+  body.mobile-touch #game-canvas {
+    touch-action: none;
+  }
+  /* The HUD overlay must let one-finger panning reach scrollable windows (Bag,
+     Market, etc.) on iOS: Safari intersects touch-action down the ancestor
+     chain, so `none` here would block child scroll containers and a child's
+     own `pan-y` could not re-enable it. `pan-x pan-y` still blocks pinch/
+     double-tap zoom (also guarded globally in preventMobileZoom). */
+  body.mobile-touch #ui {
+    touch-action: pan-x pan-y;
+  }
+  body.mobile-touch.game-active,
+  body.mobile-touch.game-active #ui,
+  body.mobile-touch.game-active #nameplates,
+  body.mobile-touch.game-active #mobile-controls,
+  body.mobile-touch.game-active #mobile-controls *,
+  body.mobile-touch.game-active #bottom-bar,
+  body.mobile-touch.game-active #bottom-bar *,
+  body.mobile-touch.game-active .action-btn,
+  body.mobile-touch.game-active .mobile-btn {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+  body.mobile-touch.game-active input,
+  body.mobile-touch.game-active textarea,
+  body.mobile-touch.game-active select,
+  body.mobile-touch.game-active [contenteditable=""],
+  body.mobile-touch.game-active [contenteditable="true"] {
+    user-select: text;
+    -webkit-user-select: text;
+    -webkit-touch-callout: default;
+  }
+  body.mobile-touch.game-active #mobile-controls {
+    position: absolute;
+    inset: 0;
+    display: block;
+    pointer-events: none;
+    z-index: 60;
+    opacity: var(--touch-opacity, 1);
+  }
+  body.mobile-touch.game-active #ui {
+    z-index: 80;
+  }
+  body.mobile-touch.mobile-more-open #mobile-controls {
+    z-index: 140;
+  }
+  body.mobile-touch.game-active #ui,
+  body.mobile-touch.game-active #nameplates,
+  body.mobile-touch.game-active #mobile-controls {
+    overflow: hidden;
+    scrollbar-width: none;
+  }
+  body.mobile-touch.game-active #ui::-webkit-scrollbar,
+  body.mobile-touch.game-active #nameplates::-webkit-scrollbar,
+  body.mobile-touch.game-active #mobile-controls::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+  }
+  body.mobile-touch.game-active::-webkit-scrollbar {
+    height: 0;
+  }
+  body.mobile-touch.game-active *::-webkit-scrollbar {
+    height: 0;
+  }
+  body.mobile-touch.game-active *::-webkit-scrollbar:horizontal {
+    height: 0;
+    display: none;
+  }
+  body.mobile-touch .mobile-joystick {
+    position: absolute;
+    left: max(18px, env(safe-area-inset-left));
+    bottom: calc(26px + env(safe-area-inset-bottom));
+    width: 122px;
+    height: 122px;
+    border-radius: 50%;
+    pointer-events: auto;
+    touch-action: none;
+    border: 2px solid #b7a35a80;
+    background: radial-gradient(circle at 50% 50%, #1b1b2960 0%, #0b0b1280 62%, #0505089a 100%);
+    box-shadow:
+      0 3px 18px #0008,
+      inset 0 1px 0 #ffffff12,
+      inset 0 0 26px #0008;
+    opacity: 0.4;
+    transition: opacity 0.18s ease;
+    /* Joystick Size setting: grow/shrink from the anchored bottom corner so the
+       pad stays in the same screen position while resizing. --joy-scale is set
+       on #mobile-controls by applySetting('joystickScale'). */
+    transform: scale(var(--joy-scale, 1));
+    transform-origin: left bottom;
+  }
+  body.mobile-touch .mobile-joystick.active {
+    opacity: 1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    body.mobile-touch .mobile-joystick {
+      transition: none;
+    }
+  }
+  body.mobile-touch .mobile-joystick::before {
+    content: "";
+    position: absolute;
+    inset: 28px;
+    border-radius: 50%;
+    border: 1px solid #ffffff18;
+  }
+  /* Floating move joystick: a lower-left capture zone lets the thumb land
+     anywhere; the joystick rests dimmed at home until touched, then springs to
+     the touch point with a gold "engaged" glow. */
+  body.mobile-touch #mobile-move-zone {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: min(30vw, 132px);
+    min-width: 112px;
+    max-width: 132px;
+    height: min(36vh, 172px);
+    pointer-events: auto;
+    touch-action: none;
+    z-index: 1;
+  }
+  body.mobile-touch.mobile-chat-open #mobile-move-zone {
+    pointer-events: none;
+  }
+  body.mobile-touch #mobile-move-joystick {
+    opacity: 0.5;
+    transition: opacity 0.12s linear;
+  }
+  body.mobile-touch #mobile-move-joystick.floating {
+    opacity: 1;
+    bottom: auto;
+    left: 0;
+    transition: none;
+  }
+  body.mobile-touch #mobile-move-joystick.active {
+    border-color: var(--gold);
+    box-shadow:
+      0 3px 18px #0008,
+      inset 0 1px 0 #ffffff12,
+      inset 0 0 26px #0008,
+      0 0 16px 3px #e3c66a55;
+  }
+  body.mobile-touch #mobile-camera-joystick {
+    left: auto;
+    right: max(18px, env(safe-area-inset-right));
+    transform-origin: right bottom;
+  }
+  body.mobile-touch #mobile-camera-joystick.recentering {
+    animation: mobile-recenter-pulse 0.22s ease-out;
+  }
+  @keyframes mobile-recenter-pulse {
+    0% {
+      box-shadow:
+        0 3px 18px #0008,
+        inset 0 1px 0 #ffffff12,
+        inset 0 0 26px #0008;
+      border-color: #b7a35a80;
+    }
+    45% {
+      box-shadow:
+        0 0 22px 4px #e3d47588,
+        inset 0 0 26px #0008;
+      border-color: #e3d475e0;
+    }
+    100% {
+      box-shadow:
+        0 3px 18px #0008,
+        inset 0 1px 0 #ffffff12,
+        inset 0 0 26px #0008;
+      border-color: #b7a35a80;
+    }
+  }
+  body.mobile-touch .mobile-stick {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 54px;
+    height: 54px;
+    margin: -27px 0 0 -27px;
+    border-radius: 50%;
+    border: 2px solid #e3d475b8;
+    background: radial-gradient(circle at 35% 30%, #867ab6aa, #1d1d2b9a 70%);
+    box-shadow:
+      0 2px 10px #0009,
+      inset 0 1px 0 #ffffff1c;
+    transition: transform 0.06s linear;
+  }
+  body.mobile-touch .mobile-joy-label {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -18px;
+    text-align: center;
+    font-size: 9px;
+    color: #c8b888;
+    text-shadow: 1px 1px 2px #000;
+  }
+  body.mobile-touch #mobile-combat-controls {
+    position: absolute;
+    left: 50%;
+    bottom: calc(3px + env(safe-area-inset-bottom));
+    transform: translateX(-50%) scale(var(--btn-scale, 1));
+    transform-origin: center bottom;
+    display: grid;
+    grid-template-columns: 124px repeat(6, 58px);
+    gap: 8px;
+    pointer-events: auto;
+    align-items: end;
+    z-index: 30;
+  }
+  body.mobile-touch .mobile-btn {
+    width: 58px;
+    height: 54px;
+    border: 2px solid #4a3d1d;
+    border-radius: 8px;
+    background: radial-gradient(circle at 35% 30%, #2d3048d8, #11121ed8 72%);
+    color: #eee8ff;
+    cursor: var(--cursor-point);
+    font-size: 22px;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px #000;
+    box-shadow:
+      inset 0 1px 0 #ffffff14,
+      0 2px 8px #0009;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+  }
+  body.mobile-touch .mobile-btn .ui-icon {
+    width: 22px;
+    height: 22px;
+  }
+  body.mobile-touch #mobile-attack-nearest {
+    width: 124px;
+    color: #ffdf9c;
+    border-color: #8b4e2c;
+  }
+  body.mobile-touch #mobile-more {
+    position: static;
+    z-index: 19;
+  }
+  body.mobile-touch .mobile-btn:active {
+    transform: translateY(1px);
+    border-color: var(--gold);
+    color: #fff;
+  }
+  body.mobile-touch #mobile-autorun {
+    position: static;
+    pointer-events: auto;
+    z-index: 19;
+  }
+  body.mobile-touch #mobile-autorun.active {
+    border-color: var(--gold);
+    color: #fff;
+    background: radial-gradient(circle at 35% 30%, #5a4a1ed8, #2a230fd8 72%);
+    box-shadow:
+      inset 0 1px 0 #ffffff20,
+      0 0 12px #e3c46a80;
+  }
+  body.mobile-touch.mobile-window-open #mobile-autorun {
+    display: none;
+  }
+  body.mobile-touch .mobile-btn.is-on {
+    border-color: var(--gold);
+    color: #fff;
+  }
+  body.mobile-touch .mobile-btn:not(.is-on)#mobile-haptics {
+    opacity: 0.55;
+  }
+  body.mobile-touch .mobile-btn .mobile-label {
+    display: block;
+    margin-top: 1px;
+    font-size: 8px;
+    font-family: var(--ui-font);
+    color: #bfb28a;
+  }
+  body.mobile-touch #mobile-extra-controls {
+    position: fixed;
+    left: 50%;
+    top: max(14px, env(safe-area-inset-top));
+    bottom: auto;
+    transform: translateX(-50%);
+    display: none;
+    width: min(560px, calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right)));
+    padding: 10px;
+    pointer-events: auto;
+    z-index: 100;
+    border: 2px solid #5b4618;
+    border-radius: 10px;
+    background: linear-gradient(170deg, #15151ff2, #08080df8);
+    box-shadow:
+      0 8px 28px #000d,
+      inset 0 1px 0 #ffffff12;
+    /* Top-centred modal: cap to the safe viewport so short landscape phones can
+       scroll the full menu without hiding rows behind controls or browser chrome. */
+    max-width: calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right));
+    max-height: calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  body.mobile-touch.mobile-more-open #mobile-extra-controls {
+    display: flex;
+    flex-direction: column;
+  }
+  body.mobile-touch #mobile-extra-controls .panel-title {
+    min-height: 32px;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    cursor: move;
+    touch-action: none;
+  }
+  body.mobile-touch #mobile-extra-controls .panel-title .x-btn {
+    /* Meet the 40x40 mobile touch floor (was 32x28), matching the general
+       body.mobile-touch .x-btn rule. */
+    min-width: 40px;
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  body.mobile-touch #mobile-extra-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-auto-rows: 42px;
+    gap: 7px;
+  }
+  body.mobile-touch #mobile-extra-controls .mobile-btn {
+    width: 100%;
+    height: 42px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 0 10px;
+    font-size: 17px;
+  }
+  body.mobile-touch #mobile-extra-controls .mobile-label {
+    display: inline;
+    margin: 0;
+    font-size: 10px;
+    color: #e6d8ae;
+  }
+  body.mobile-touch #mobile-extra-controls .mobile-btn .ui-icon {
+    flex: 0 0 22px;
+  }
+  /* A toggle tray button (e.g. Nameplates) glows gold while its feature is on. */
+  body.mobile-touch #mobile-extra-controls .mobile-btn.active {
+    border-color: var(--gold);
+    box-shadow:
+      0 0 8px #ffd10066,
+      inset 0 0 6px #ffd10033;
+  }
+  body.mobile-touch #mobile-extra-controls .mobile-btn.active .mobile-label {
+    color: var(--gold);
+  }
+  /* music toggle: a diagonal slash over the note signals "off" (mirrors #mm-music) */
+  body.mobile-touch #mobile-music {
+    position: relative;
+  }
+  body.mobile-touch #mobile-music.mm-muted::after {
+    content: "";
+    position: absolute;
+    left: 21px;
+    top: 50%;
+    width: 24px;
+    height: 2px;
+    border-radius: 2px;
+    background: #f0e8d2;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.7);
+    transform: translate(-50%, -50%) rotate(-45deg);
+    pointer-events: none;
+  }
+  body.mobile-touch #bottom-bar {
+    left: calc(max(18px, env(safe-area-inset-left)) + 154px);
+    right: calc(max(18px, env(safe-area-inset-right)) + 154px);
+    bottom: calc(64px + env(safe-area-inset-bottom));
+    width: auto;
+    transform: none;
+    z-index: 18;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+  }
+  body.mobile-touch #actionbar-row {
+    pointer-events: auto;
+    width: 100%;
+    min-width: 0;
+  }
+  body.mobile-touch #xpbar {
+    display: none;
+  }
+  body.mobile-touch #player-frame {
+    --xp-ring-start: 210deg;
+    --xp-ring-arc: 360deg;
+  }
+  body.mobile-touch #player-frame::before {
+    content: "";
+    position: absolute;
+    left: -5px;
+    top: -5px;
+    width: 73px;
+    height: 73px;
+    z-index: 2;
+    opacity: 0.96;
+    pointer-events: none;
+    border-radius: 50%;
+    background: conic-gradient(
+      from var(--xp-ring-start),
+      #b85eff 0deg calc(var(--xp-fill, 0) * 360deg),
+      rgba(125, 88, 158, 0.34) calc(var(--xp-fill, 0) * 360deg) var(--xp-ring-arc),
+      transparent var(--xp-ring-arc) 360deg
+    );
+    box-shadow: 0 0 8px rgba(184, 94, 255, 0.28);
+    -webkit-mask: radial-gradient(
+      farthest-side,
+      transparent calc(100% - 7px),
+      #000 calc(100% - 6px)
+    );
+    mask: radial-gradient(farthest-side, transparent calc(100% - 7px), #000 calc(100% - 6px));
+  }
+  body.mobile-touch #player-frame:has(#xpbar.overflow)::before {
+    background: conic-gradient(
+      from var(--xp-ring-start),
+      #ffe27a 0deg calc(var(--xp-fill, 0) * 360deg),
+      rgba(184, 144, 42, 0.34) calc(var(--xp-fill, 0) * 360deg) var(--xp-ring-arc),
+      transparent var(--xp-ring-arc) 360deg
+    );
+    box-shadow: 0 0 9px rgba(245, 200, 67, 0.34);
+  }
+  body.mobile-touch #xpbar .fill,
+  body.mobile-touch #xpbar .ticks {
+    display: none;
+  }
+  body.mobile-touch #xpbar .label {
+    display: none;
+  }
+  body.mobile-touch #castbar {
+    position: fixed;
+    left: calc(max(18px, env(safe-area-inset-left)) + 132px);
+    bottom: calc(17px + env(safe-area-inset-bottom));
+    width: min(170px, calc(50vw - 164px));
+    min-width: 112px;
+    height: 6px;
+    transform: none;
+    z-index: 19;
+    border-width: 1px;
+    border-radius: 2px;
+    opacity: 0.9;
+  }
+  body.mobile-touch #castbar .label {
+    display: none;
+  }
+  body.mobile-touch #actionbar-row {
+    display: block;
+  }
+  body.mobile-touch #actionbar-stack {
+    width: 100%;
+    min-width: 0;
+  }
+  body.mobile-touch #petbar {
+    position: fixed;
+    left: 50%;
+    top: max(8px, env(safe-area-inset-top));
+    transform: translateX(-50%);
+    align-self: auto;
+    margin: 0;
+    z-index: 28;
+    pointer-events: auto;
+  }
+  body.mobile-touch #side-buttons {
+    display: none;
+  }
+  body.mobile-touch #actionbar {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 4px;
+    padding: 4px;
+    width: 100%;
+    max-width: 100%;
+    min-height: 50px;
+    box-sizing: border-box;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+    background: linear-gradient(170deg, #15151fc8, #08080dd8);
+  }
+  body.mobile-touch #actionbar.many-spells {
+    grid-template-columns: none;
+  }
+  /* The second action bar is desktop-only; the mobile hotbar stays a single scroll row. */
+  body.mobile-touch #actionbar2 {
+    display: none;
+  }
+  body.mobile-touch .action-btn {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    border-radius: 7px;
+  }
+  body.mobile-touch.mobile-hotbar-dragging #actionbar {
+    touch-action: none;
+  }
+  body.mobile-touch .action-btn.mobile-drag-source {
+    border-color: var(--gold);
+    box-shadow:
+      0 0 12px #ffd100aa,
+      inset 0 0 0 1px #ffd10077;
+  }
+  body.mobile-touch .action-btn:not(.used):not(.queued):not(.drop-target):hover {
+    border-color: #4a3d1d;
+  }
+  body.mobile-touch .action-btn .icon-label {
+    border-radius: 6px;
+  }
+  body.mobile-touch .action-btn .cd-text {
+    font-size: 13px;
+  }
+  body.mobile-touch .action-btn .keybind {
+    display: none;
+  }
+  body.mobile-touch .action-btn:first-child {
+    display: none;
+  }
+  body.mobile-touch .action-btn.empty {
+    display: none;
+  }
+  body.mobile-touch #community-hud {
+    right: max(8px, env(safe-area-inset-right));
+    top: calc(max(8px, env(safe-area-inset-top)) + 158px);
+    bottom: auto;
+    width: 70px;
+    padding: 0;
+    display: block;
+  }
+  body.mobile-touch #community-menu {
+    display: block;
+    position: relative;
+    width: 100%;
+  }
+  body.mobile-touch #community-menu > summary {
+    list-style: none;
+  }
+  body.mobile-touch #community-menu > summary::-webkit-details-marker {
+    display: none;
+  }
+  body.mobile-touch .community-toggle {
+    width: 44px;
+    height: 44px;
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-muted);
+    border: 2px solid #4a3d1d;
+    border-radius: 8px;
+    background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
+    box-shadow:
+      inset 0 1px 0 #ffffff18,
+      0 2px 4px #0009;
+    cursor: var(--cursor-point);
+  }
+  body.mobile-touch .community-toggle svg {
+    width: 20px;
+    height: 20px;
+    display: block;
+  }
+  body.mobile-touch #community-menu[open] .community-toggle {
+    color: #fff;
+    border-color: var(--gold-dim);
+  }
+  body.mobile-touch .community-tray {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 5px;
+    width: 118px;
+    padding: 5px;
+    border: 2px solid #3d3218;
+    border-radius: 8px;
+    background: linear-gradient(170deg, #15151fe8, #08080df0);
+    box-shadow:
+      0 4px 14px #000b,
+      inset 0 1px 0 #ffffff12;
+    z-index: 90;
+  }
+  body.mobile-touch #community-menu[open] .community-tray {
+    display: flex;
+  }
+  body.mobile-touch .community-link {
+    width: 100%;
+    height: 40px;
+    gap: 7px;
+    padding: 0 9px;
+    justify-content: flex-start;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  body.mobile-touch .community-link svg {
+    width: 20px;
+    height: 20px;
+  }
+  body.mobile-touch .community-link span {
+    display: inline;
+    line-height: 1;
+  }
+  body.mobile-touch .community-link.donate {
+    display: inline-flex;
+    width: 100%;
+    padding: 0 9px;
+    font-size: 12px;
+  }
+  body.mobile-touch #chatlog-wrap {
+    left: max(10px, env(safe-area-inset-left));
+    bottom: calc(160px + env(safe-area-inset-bottom));
+    width: min(340px, calc(100vw - 20px));
+    display: none;
+    z-index: 24;
+  }
+  body.mobile-touch.mobile-chat-open #chatlog-wrap {
+    display: block;
+  }
+  /* Long-pressing the Chat button toggles a read-only peek at the log without
+     raising the keyboard composer. It must not eat taps meant for the world. */
+  body.mobile-touch.mobile-chatlog-peek #chatlog-wrap {
+    display: block;
+    pointer-events: none;
+  }
+  body.mobile-touch.mobile-chatlog-peek #mobile-chat {
+    border-color: var(--gold);
+    box-shadow:
+      0 0 0 1px var(--gold),
+      0 0 10px #c9a84d66;
+  }
+  body.mobile-touch #chatlog-frame {
+    height: 126px;
+  }
+  body.mobile-touch #chatlog-tabs {
+    transform: scale(0.92);
+    transform-origin: left bottom;
+  }
+  body.mobile-touch #chat-input {
+    left: max(10px, env(safe-area-inset-left));
+    bottom: calc(296px + env(safe-area-inset-bottom));
+    width: min(360px, calc(100vw - 20px));
+    min-height: 40px;
+    box-sizing: border-box;
+    font-size: 16px;
+  }
+  body.mobile-touch #player-frame {
+    position: fixed;
+    left: max(8px, env(safe-area-inset-left));
+    top: max(8px, env(safe-area-inset-top));
+    z-index: 21;
+    width: 300px;
+    margin: 0;
+    display: flex;
+    justify-content: flex-start;
+    transform: scale(0.82);
+    transform-origin: left top;
+  }
+  body.mobile-touch #player-frame .portrait-wrap {
+    z-index: 3;
+  }
+  body.mobile-touch #player-frame .uf-bars {
+    position: relative;
+    z-index: 1;
+    width: 224px;
+    max-width: 224px;
+    flex: none;
+  }
+  body.mobile-touch #target-frame {
+    left: max(8px, env(safe-area-inset-left));
+    top: calc(max(8px, env(safe-area-inset-top)) + 72px);
+    transform: scale(0.82);
+    transform-origin: left top;
+  }
+  body.mobile-touch #party-frames {
+    position: fixed;
+    left: max(8px, env(safe-area-inset-left));
+    top: calc(max(8px, env(safe-area-inset-top)) + 74px);
+    gap: 0;
+    z-index: 5;
+  }
+  body.mobile-touch #party-frames.below-target {
+    top: calc(max(8px, env(safe-area-inset-top)) + 130px);
+  }
+  /* party rows are role="button" tap targets (tap to target a member), so they
+     must clear the 40x40 mobile touch floor, not the compact desktop
+     raid-frame height. Base and landscape both move 30/25px up to 40px; #party-leave too. */
+  body.mobile-touch #party-frames .party-frame {
+    width: 132px;
+    min-height: 40px;
+    padding: 3px 6px;
+    border-radius: 0;
+    border-bottom-width: 1px;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.55);
+  }
+  body.mobile-touch #party-frames .party-frame:first-child {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+  }
+  body.mobile-touch #party-frames .party-frame:not(:first-child) {
+    margin-top: -1px;
+  }
+  body.mobile-touch #party-frames .party-frame .pfm-name {
+    min-height: 14px;
+    gap: 3px;
+    font-size: 10px;
+    line-height: 1.1;
+  }
+  body.mobile-touch #party-frames .party-frame .pfm-id {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+  }
+  body.mobile-touch #party-frames .pfm-crest {
+    width: 12px;
+    height: 12px;
+    margin-right: 2px;
+    border-radius: 2px;
+    flex: 0 0 auto;
+  }
+  body.mobile-touch #party-frames .party-frame .pfm-meta {
+    gap: 2px;
+  }
+  body.mobile-touch #party-frames .party-frame .pfm-name .lead,
+  body.mobile-touch #party-frames .party-frame .pf-badge {
+    font-size: 9px;
+  }
+  body.mobile-touch #party-frames .party-frame .bar {
+    height: 5px;
+    margin-top: 1px;
+  }
+  body.mobile-touch #party-frames #party-leave {
+    width: 132px;
+    min-height: 40px;
+    margin: -1px 0 0;
+    padding: 4px 6px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    font-size: 10px;
+  }
+  body.mobile-touch #buff-bar {
+    right: max(10px, env(safe-area-inset-right));
+    top: max(140px, env(safe-area-inset-top));
+    max-width: 180px;
+  }
+  body.mobile-touch #debuff-bar {
+    right: max(10px, env(safe-area-inset-right));
+    top: calc(max(140px, env(safe-area-inset-top)) + 36px);
+    max-width: 180px;
+  }
+  body.mobile-touch #minimap-wrap {
+    right: max(8px, env(safe-area-inset-right));
+    top: max(8px, env(safe-area-inset-top));
+    transform: scale(0.72);
+    transform-origin: right top;
+  }
+  body.mobile-touch #quest-tracker {
+    right: max(10px, env(safe-area-inset-right));
+    top: max(150px, env(safe-area-inset-top));
+    width: 190px;
+    font-size: 11px;
+  }
+  body.mobile-touch #meters-window {
+    position: fixed;
+    left: calc(max(18px, env(safe-area-inset-left)) + 132px);
+    right: auto;
+    top: auto;
+    bottom: calc(31px + env(safe-area-inset-bottom));
+    width: min(220px, calc(50vw - 144px));
+    min-width: 142px;
+    max-height: min(170px, calc(100vh - 128px));
+    overflow: hidden;
+    z-index: 25;
+  }
+  /* Left-handed mirror: swap the two thumb joysticks (and the bottom HUD that
+     hugs them) so the movement stick sits under the right thumb. Opt-in via the
+     "Left-handed Touch" toggle in Key Bindings; centred combat buttons stay put. */
+  body.mobile-touch.mobile-left-handed .mobile-joystick {
+    left: auto;
+    right: max(18px, env(safe-area-inset-right));
+  }
+  body.mobile-touch.mobile-left-handed #mobile-camera-joystick {
+    right: auto;
+    left: max(18px, env(safe-area-inset-left));
+  }
+  body.mobile-touch.mobile-left-handed #mobile-more {
+    left: auto;
+    right: auto;
+  }
+  body.mobile-touch.mobile-left-handed #mobile-extra-controls {
+    left: 50%;
+    right: auto;
+  }
+  body.mobile-touch.mobile-left-handed #castbar {
+    left: auto;
+    right: calc(max(18px, env(safe-area-inset-right)) + 132px);
+  }
+  body.mobile-touch.mobile-left-handed #meters-window {
+    left: auto;
+    right: calc(max(18px, env(safe-area-inset-right)) + 132px);
+  }
+  body.mobile-touch #banner {
+    top: 18%;
+    max-width: calc(100vw - 24px);
+    font-size: 26px;
+    line-height: 1.12;
+    text-align: center;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  body.mobile-touch .window {
+    max-width: calc(100vw - 20px);
+    max-height: calc(100vh - 40px);
+  }
+  body.mobile-touch.mobile-window-open #ui {
+    z-index: 90;
+  }
+  body.mobile-touch #options-menu,
+  body.mobile-touch #quest-log-window,
+  body.mobile-touch #spellbook,
+  body.mobile-touch #vendor-window,
+  body.mobile-touch #market-window,
+  body.mobile-touch #quest-dialog {
+    left: 10px;
+    right: 10px;
+    top: 10px;
+    width: auto;
+    transform: none;
+    box-sizing: border-box;
+    overflow-y: auto;
+  }
+  body.mobile-touch #vendor-window,
+  body.mobile-touch #market-window {
+    max-height: calc(58vh - 20px);
+  }
+  body.mobile-touch #market-window {
+    max-height: calc(58vh - 20px);
+    overflow: hidden;
+  }
+  body.mobile-touch .mkt-filters,
+  body.mobile-touch .mkt-filters.has-subtype {
+    grid-template-columns: 1fr;
+  }
+  body.mobile-touch .mkt-select-btn {
+    min-height: 40px;
+    font-size: 16px;
+  }
+  body.mobile-touch .mkt-select-option {
+    min-height: 40px;
+    font-size: 16px;
+  }
+  body.mobile-touch #social-window,
+  body.mobile-touch #trade-window {
+    position: fixed;
+    left: 10px;
+    right: 10px;
+    width: auto;
+    max-width: calc(100vw - 20px);
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
+  body.mobile-touch #social-window {
+    bottom: 10px;
+    height: min(560px, calc(100vh - 20px));
+  }
+  body.mobile-touch #trade-window {
+    top: 10px;
+    transform: none;
+    max-height: calc(100vh - 20px);
+    overflow-y: auto;
+  }
+  body.mobile-touch #trade-window .trade-cols {
+    flex-direction: column;
+  }
+  body.mobile-touch #bags {
+    position: fixed;
+    left: max(10px, env(safe-area-inset-left));
+    right: max(10px, env(safe-area-inset-right));
+    top: max(10px, env(safe-area-inset-top));
+    bottom: calc(72px + env(safe-area-inset-bottom));
+    width: auto;
+    transform: none;
+    max-height: none;
+    box-sizing: border-box;
+    overflow: hidden;
+    z-index: 95;
+  }
+  body.mobile-touch #bags .bag-grid {
+    min-height: 150px;
+  }
+  body.mobile-touch .vendor-item,
+  body.mobile-touch .bag-item,
+  body.mobile-touch .mkt-tab,
+  body.mobile-touch .mkt-btn,
+  body.mobile-touch .mkt-list-btn,
+  body.mobile-touch #loot-window .btn,
+  body.mobile-touch .loot-roll-btn,
+  body.mobile-touch .soc-tab,
+  body.mobile-touch .soc-x,
+  body.mobile-touch .soc-sugg-item,
+  body.mobile-touch .trade-item.mine,
+  body.mobile-touch #social-window .btn,
+  body.mobile-touch #trade-window .btn {
+    min-height: 40px;
+    font-size: 16px;
+  }
+  body.mobile-touch .soc-add input,
+  body.mobile-touch .trade-money input {
+    min-height: 40px;
+    font-size: 16px;
+    box-sizing: border-box;
+  }
+  body.mobile-touch .soc-x,
+  body.mobile-touch .soc-name.soc-link {
+    min-width: 40px;
+  }
+  body.mobile-touch .soc-name.soc-link {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+    white-space: normal;
+    overflow: visible;
+    overflow-wrap: anywhere;
+    text-overflow: clip;
+  }
+  body.mobile-touch .x-btn {
+    min-width: 40px;
+    min-height: 40px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    font-size: 16px;
+  }
+  body.mobile-touch #player-card-modal .pc-pose,
+  body.mobile-touch #player-card-modal .pc-wallet-toggle,
+  body.mobile-touch #player-card-modal .pc-actions .btn {
+    min-height: 40px;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  body.mobile-touch #player-card-modal .pc-link-input {
+    font-size: 16px;
+  }
+  body.mobile-touch #char-window {
+    left: 10px;
+    top: 10px;
+    /* Reset the base `.window` centering transform: this rule re-pins the
+       window to the left edge, and a leftover translateX(-50%) would shift it
+       half its own width off-screen (the off-screen-left clipping bug). */
+    right: auto;
+    transform: none;
+    width: min(360px, calc(100vw - 20px));
+    max-height: calc(100vh - 20px);
+    box-sizing: border-box;
+    overflow-y: auto;
+  }
+  /* Narrow the flanking equip columns so both fit beside the model on a phone. */
+  body.mobile-touch .equip-col {
+    width: 108px;
+  }
+  body.mobile-touch .equip-slot .slot-name {
+    font-size: 9px;
+  }
+  body.mobile-touch .equip-slot .slot-item {
+    font-size: 10px;
+  }
+  /* Phones (the long-press peek audience, same body.mobile-touch gate attachTooltip
+     uses) get a comfortable >=40px long-press target per .stat-cell. Symmetric
+     vertical padding both reaches the touch floor and optically centers the single
+     line, so no flex is needed; the -5px side margins are unchanged, preserving the
+     hover/focus pill's bleed into the 12px column gap. Because the sizing applies in
+     every state (rest/hover/focus alike), rows still never reflow between states, and
+     the compact desktop sheet (no mobile-touch) is untouched. */
+  body.mobile-touch .char-stats .stat-cell {
+    min-height: 40px;
+    box-sizing: border-box;
+    padding: 10px 5px;
+    margin: 0 -5px;
+  }
+  body.mobile-touch .mkt-price-row {
+    flex-wrap: wrap;
+  }
+  body.mobile-touch .mkt-price-row .coininput {
+    min-height: 40px;
+    font-size: 16px;
+    box-sizing: border-box;
+  }
+  body.mobile-touch #quest-log-window,
+  body.mobile-touch #quest-dialog {
+    max-width: calc(100vw - 20px);
+    max-height: calc(100vh - 20px);
+  }
+  body.mobile-touch #quest-log-window,
+  body.mobile-touch #vendor-window,
+  body.mobile-touch #quest-dialog {
+    left: 50%;
+    right: auto;
+    top: 12px;
+    width: clamp(320px, 76vw, 680px);
+    max-width: calc(100vw - 20px);
+    max-height: calc(100vh - 92px);
+    transform: translateX(-50%);
+  }
+  body.mobile-touch.vendor-open #vendor-window,
+  body.mobile-touch.vendor-open #bags {
+    position: fixed;
+    top: max(10px, env(safe-area-inset-top));
+    bottom: calc(72px + env(safe-area-inset-bottom));
+    width: auto;
+    max-width: none;
+    max-height: none;
+    transform: none;
+    box-sizing: border-box;
+    z-index: 95;
+  }
+  body.mobile-touch.vendor-open #vendor-window {
+    left: max(10px, env(safe-area-inset-left));
+    right: 50vw;
+    display: block;
+    overflow-y: auto;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right-width: 1px;
+  }
+  body.mobile-touch.vendor-open #bags {
+    left: 50vw;
+    right: max(10px, env(safe-area-inset-right));
+    overflow: hidden;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left: 0;
+  }
+  body.mobile-touch.vendor-open #vendor-window .panel-title,
+  body.mobile-touch.vendor-open #bags .panel-title {
+    height: 47px;
+    min-height: 47px;
+    padding-bottom: 6px;
+    margin-bottom: 8px;
+    box-sizing: border-box;
+  }
+  body.mobile-touch.vendor-open #vendor-window .panel-title .x-btn {
+    display: none;
+  }
+  body.mobile-touch #spellbook,
+  body.mobile-touch #options-menu,
+  body.mobile-touch #options-menu.kb-wide,
+  body.mobile-touch #options-menu.perf-wide {
+    left: 50%;
+    right: auto;
+    top: 12px;
+    width: min(560px, calc(100vw - 170px));
+    max-height: calc(100vh - 92px);
+    transform: translateX(-50%);
+  }
+  /* On touch, stack the categories back into a single column so the large
+     touch targets keep their full width. */
+  body.mobile-touch .kb-cols {
+    grid-template-columns: 1fr;
+    gap: 0 0;
+  }
+  /* Performance panel on touch: a roomier width than the cramped default, then
+     stacked rows (label on its own line, control full-width below) so every
+     control is a comfortable, uncluttered touch target. Single column already. */
+  body.mobile-touch #options-menu.perf-wide {
+    width: min(640px, calc(100vw - 24px));
+  }
+  body.mobile-touch .perf-card {
+    padding: 8px 15px 14px;
+  }
+  /* The master header stays centered + prominent on touch too. */
+  body.mobile-touch .perf-master {
+    text-align: center;
+  }
+  body.mobile-touch .perf-master .set-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 8px 12px;
+    padding: 2px 0;
+  }
+  body.mobile-touch .perf-master .set-name {
+    flex: 0 1 auto;
+    font-size: 14px;
+  }
+  body.mobile-touch .perf-master .set-toggle {
+    flex: 0 0 auto;
+    min-height: 40px;
+  }
+  body.mobile-touch .perf-card .set-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 7px 10px;
+    padding: 9px 0;
+  }
+  /* Cancel the desktop grid-column placements so children flow in the flex row. */
+  body.mobile-touch .perf-card .set-row > * {
+    grid-column: auto;
+  }
+  body.mobile-touch .perf-card .set-name {
+    flex: 1 1 100%;
+    font-size: 13.5px;
+  }
+  body.mobile-touch .perf-card .set-slider {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  body.mobile-touch .perf-card .set-val {
+    flex: 0 0 auto;
+    min-width: 46px;
+  }
+  /* Toggle/color sit on their own line, pinned right; swatch row goes full width. */
+  body.mobile-touch .perf-card .set-toggle,
+  body.mobile-touch .perf-card .set-color {
+    margin-left: auto;
+  }
+  body.mobile-touch .perf-card .perf-swatches {
+    flex: 1 1 100%;
+  }
+  /* Comfortable >=44px touch targets for the preset + metric-chip grids. */
+  body.mobile-touch .perf-presets .perf-preset-btn,
+  body.mobile-touch .perf-chips .set-choice-btn {
+    min-height: 44px;
+    font-size: 14px;
+  }
+  body.mobile-touch .perf-footer {
+    flex-direction: column;
+    gap: 10px;
+  }
+  body.mobile-touch .perf-footer .btn {
+    min-height: 44px;
+  }
+  body.mobile-touch #talents-window {
+    position: fixed;
+    left: 50%;
+    right: auto;
+    top: 50%;
+    width: min(600px, calc(100vw - 20px));
+    max-width: calc(100vw - 20px);
+    max-height: calc(100vh - 24px);
+    transform: translate(-50%, -50%);
+    z-index: 95 !important;
+  }
+  body.mobile-touch #spellbook [data-close] {
+    min-width: 40px;
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    box-sizing: border-box;
+    font-size: 16px;
+  }
+  body.mobile-touch #spellbook .spell-row {
+    min-height: 52px;
+    padding-right: 4px;
+  }
+  body.mobile-touch #spellbook .spell-hotbar-toggle {
+    min-width: 40px;
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 40px;
+    border: 2px solid #4a3d1d;
+    border-radius: 7px;
+    background: radial-gradient(circle at 35% 30%, #2d3048e0, #11121ee0 72%);
+    color: var(--gold);
+    font: 700 22px / 1 var(--ui-font);
+    box-shadow:
+      inset 0 1px 0 #ffffff14,
+      0 2px 6px #0008;
+  }
+  body.mobile-touch #spellbook .spell-hotbar-toggle.remove {
+    color: #ffcf9c;
+    border-color: #8b4e2c;
+  }
+  body.mobile-touch #spellbook .spell-hotbar-toggle:disabled {
+    opacity: 0.45;
+  }
+  body.mobile-touch #spellbook .spellbook-reset {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 12px;
+    font-size: 14px;
+  }
+  body.mobile-touch #quest-dialog .qd-list-item,
+  body.mobile-touch #quest-log-window .ql-item,
+  body.mobile-touch #quest-dialog .btn,
+  body.mobile-touch #quest-log-window .btn,
+  body.mobile-touch #quest-dialog [data-close],
+  body.mobile-touch #quest-log-window [data-close] {
+    min-width: 40px;
+    min-height: 40px;
+    font-size: 16px;
+  }
+  body.mobile-touch #quest-dialog .qd-text,
+  body.mobile-touch #quest-log-window .qd-text,
+  body.mobile-touch #quest-dialog .qd-obj,
+  body.mobile-touch #quest-log-window .qd-obj,
+  body.mobile-touch #quest-log-window .ql-empty {
+    font-size: 16px;
+  }
+  body.mobile-touch #quest-log-window .ql-cols {
+    gap: var(--spacing-sm);
+    min-width: 0;
+  }
+  body.mobile-touch #quest-log-window .ql-list {
+    width: min(42%, 220px);
+    min-width: 0;
+  }
+  body.mobile-touch #quest-log-window .ql-detail {
+    min-width: 0;
+  }
+  body.mobile-touch #quest-log-window .ql-detail-body {
+    min-width: 0;
+  }
+  body.mobile-touch #options-menu .btn {
+    min-height: 40px;
+    padding-top: 9px;
+    padding-bottom: 9px;
+    font-size: 16px;
+  }
+  body.mobile-touch #report-window {
+    left: 10px !important;
+    right: 10px !important;
+    width: auto !important;
+    box-sizing: border-box;
+  }
+  body.mobile-touch #report-window select,
+  body.mobile-touch #report-window textarea {
+    min-height: 40px;
+    font-size: 16px;
+  }
+  body.mobile-touch #report-window [data-close],
+  body.mobile-touch #report-window .btn {
+    min-width: 40px;
+    min-height: 40px;
+  }
+  body.mobile-touch #ctx-menu .ctx-item {
+    display: flex;
+    align-items: center;
+    min-height: 40px;
+    font-size: 16px;
+  }
+  body.mobile-touch #social-window {
+    left: 50%;
+    right: auto;
+    top: 44%;
+    bottom: auto;
+    width: min(360px, calc(100vw - 170px));
+    height: min(380px, calc(100vh - 116px));
+    max-height: calc(100vh - 116px);
+    transform: translate(-50%, -50%);
+    z-index: 45;
+  }
+  body.mobile-touch #map-window {
+    left: 50%;
+    top: calc(46% - env(safe-area-inset-bottom));
+    width: min(46vw, 330px);
+    max-width: calc(100vw - 220px);
+    padding: 8px;
+    transform: translate(-50%, -50%);
+  }
+  body.mobile-touch #map-canvas {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  body.mobile-touch #map-close {
+    right: 5px;
+    top: 5px;
+  }
+  /* the map +/- zoom buttons are touch controls on mobile; raise them to the
+     40x40 floor (desktop is 32x32). box-sizing keeps the 2px border inside the box. */
+  body.mobile-touch .map-zoom-btn {
+    min-width: 40px;
+    min-height: 40px;
+    box-sizing: border-box;
+  }
+  body.mobile-touch #controls-hint {
+    max-width: min(360px, 92vw);
+    margin-top: 18px;
+    line-height: 1.45;
+    font-size: 10px;
+  }
+  body.mobile-touch #mode-select {
+    width: 100%;
+    max-width: min(
+      440px,
+      calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right))
+    );
+    margin-inline: auto;
+    padding: 20px 18px 18px;
+  }
+  body.mobile-touch .play-console {
+    width: 100%;
+    gap: 16px;
+  }
+  body.mobile-touch .btn-play {
+    font-size: 21px;
+    letter-spacing: 2px;
+    min-height: 60px;
+    padding: 14px 32px;
+  }
+  body.mobile-touch[data-start-panel="realm-panel"] #homepage-views-container,
+  body.mobile-touch[data-start-panel="charselect-panel"] #homepage-views-container,
+  body.mobile-touch[data-start-panel="login-panel"] #homepage-views-container {
+    align-items: center;
+  }
+  body.mobile-touch[data-start-panel="realm-panel"] #hero-view,
+  body.mobile-touch[data-start-panel="charselect-panel"] #hero-view,
+  body.mobile-touch[data-start-panel="login-panel"] #hero-view {
+    justify-content: center;
+    min-height: calc(var(--app-vh) - 178px);
+  }
+  body.mobile-touch .realm-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    padding: 10px;
+  }
+  body.mobile-touch .realm-row > div:first-child {
+    min-width: 0;
+  }
+  body.mobile-touch .realm-name,
+  body.mobile-touch .realm-sub {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  body.mobile-touch .realm-name .rn-chars,
+  body.mobile-touch .realm-name .rn-rec {
+    display: inline-block;
+    max-width: 100%;
+    vertical-align: middle;
+  }
+  body.mobile-touch .realm-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 2px;
+    min-width: 48px;
+  }
+  body.mobile-touch .realm-type,
+  body.mobile-touch .realm-pop {
+    min-width: 0;
+    line-height: 1.1;
+    text-align: right;
+    white-space: nowrap;
+  }
+  body.mobile-touch .realm-pop {
+    font-size: 11px;
+  }
+  body.mobile-touch .portal-ring,
+  body.mobile-touch .portal-ring-reverse,
+  body.mobile-touch .nebula-overlay {
+    animation: none;
+  }
+  body.mobile-touch .portal-ring,
+  body.mobile-touch .portal-ring-reverse {
+    filter: none;
+    opacity: 0.18;
+  }
+  body.mobile-touch .nebula-overlay {
+    mix-blend-mode: normal;
+    opacity: 0.78;
+  }
+  body.mobile-touch .embers-container {
+    display: none;
+  }
+  body.mobile-touch .class-row {
+    grid-template-columns: repeat(2, minmax(138px, 1fr));
+    gap: 8px;
+    width: min(340px, 92vw);
+  }
+  body.mobile-touch .class-card {
+    padding: 9px 8px 8px;
+  }
+  body.mobile-touch #title-logo {
+    width: min(252px, 52vw);
+    margin-bottom: 18px;
+  }
+  body.mobile-preflight-open #mobile-preflight.visible {
+    position: fixed;
+    inset: 0;
+    z-index: 250;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: max(18px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right))
+      max(18px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+    background: radial-gradient(circle at 50% 42%, #12172bf2, #030407f8 74%);
+    pointer-events: auto;
+  }
+  #mobile-preflight .preflight-panel {
+    width: min(440px, 92vw);
+    max-height: min(520px, 88vh);
+    overflow: auto;
+    padding: 22px 22px 20px;
+    border: 1px solid #c9a84d88;
+    border-radius: 8px;
+    background: linear-gradient(180deg, #171a25f7, #0a0b10fa);
+    box-shadow:
+      0 18px 60px #000d,
+      inset 0 1px 0 #ffffff14;
+    color: var(--color-text-light);
+    text-align: left;
+  }
+  #mobile-preflight h2 {
+    margin: 0 0 8px;
+    color: var(--gold);
+    font-family: var(--title-font);
+    font-size: 24px;
+    font-weight: 400;
+    text-align: center;
+  }
+  #mobile-preflight-detail {
+    margin: 0 0 14px;
+    color: #f0dfab;
+    font-size: 13px;
+    line-height: 1.45;
+    text-align: center;
+  }
+  #mobile-preflight-steps {
+    margin: 0 0 18px 18px;
+    padding: 0;
+    color: #cfc09a;
+    font-size: 12px;
+    line-height: 1.55;
+  }
+  #mobile-preflight-steps li {
+    margin-bottom: 7px;
+  }
+  #mobile-preflight-continue {
+    width: 100%;
+  }
+  body.mobile-touch.game-active #rotate-device {
+    position: absolute;
+    inset: 0;
+    z-index: 190;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: radial-gradient(circle at 50% 45%, #161826f0, #040509f6);
+    color: #f5e7b2;
+    font-family: var(--title-font);
+    padding: 28px;
+    text-shadow: 1px 1px 3px #000;
+    pointer-events: auto;
+  }
+  #rotate-device .rotate-icon {
+    font-size: 48px;
+    margin-bottom: 14px;
+  }
+  #rotate-device .rotate-title {
+    color: var(--gold);
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+  #rotate-device .rotate-sub {
+    font-family: var(--ui-font);
+    font-size: 13px;
+    color: var(--color-accent);
+    line-height: 1.45;
+  }
+
+  @media (orientation: portrait) {
+    body.mobile-touch #mobile-combat-controls {
+      grid-template-columns: 96px repeat(6, 42px);
+      gap: 4px;
+    }
+    body.mobile-touch .mobile-btn {
+      width: 42px;
+      height: 44px;
+      font-size: 16px;
+    }
+    body.mobile-touch #mobile-attack-nearest {
+      width: 96px;
+    }
+    body.mobile-touch #community-hud {
+      top: clamp(calc(max(8px, env(safe-area-inset-top)) + 210px), 44dvh, calc(100dvh - 230px));
+      right: max(8px, env(safe-area-inset-right));
+      bottom: auto;
+      width: 70px;
+    }
+  }
+
+  @media (orientation: landscape) {
+    body.mobile-touch .play-console {
+      width: 100%;
+      max-width: 460px;
+      gap: 12px;
+    }
+    body.mobile-touch .server-select-caption {
+      margin-bottom: 5px;
+    }
+    body.mobile-touch .btn-play {
+      min-height: 54px;
+      font-size: 20px;
+    }
+    body.mobile-touch .mobile-joystick {
+      width: 100px;
+      height: 100px;
+      bottom: calc(15px + env(safe-area-inset-bottom));
+      opacity: 0.72;
+      border-color: #d2bd6a66;
+    }
+    body.mobile-touch #mobile-move-joystick {
+      left: max(20px, env(safe-area-inset-left));
+    }
+    body.mobile-touch #mobile-camera-joystick {
+      right: max(20px, env(safe-area-inset-right));
+    }
+    body.mobile-touch .mobile-joystick::before {
+      inset: 23px;
+    }
+    body.mobile-touch .mobile-stick {
+      width: 44px;
+      height: 44px;
+      margin: -22px 0 0 -22px;
+    }
+    body.mobile-touch .mobile-joy-label {
+      bottom: -15px;
+      font-size: 8px;
+      color: #d7c987aa;
+    }
+    body.mobile-touch #mobile-combat-controls {
+      bottom: calc(2px + env(safe-area-inset-bottom));
+      grid-template-columns: 115px repeat(6, 54px);
+      gap: 7px;
+    }
+    body.mobile-touch .mobile-btn {
+      width: 54px;
+      height: 48px;
+      font-size: 20px;
+      background: radial-gradient(circle at 35% 30%, #2d3048bf, #11121ec2 72%);
+    }
+    body.mobile-touch #mobile-attack-nearest {
+      width: 115px;
+    }
+    body.mobile-touch #mobile-extra-controls {
+      left: 50%;
+      top: max(10px, env(safe-area-inset-top));
+      bottom: auto;
+      padding: 8px;
+      max-height: calc(100dvh - 28px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    }
+    body.mobile-touch #mobile-extra-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-auto-rows: 40px;
+      gap: 6px;
+    }
+    body.mobile-touch.mobile-left-handed #mobile-extra-controls {
+      left: 50%;
+      right: auto;
+    }
+    body.mobile-touch #mobile-extra-controls .mobile-btn {
+      width: 100%;
+      height: 40px;
+      font-size: 16px;
+      padding: 0 9px;
+    }
+    body.mobile-touch #mobile-extra-controls .mobile-label {
+      font-size: 9px;
+    }
+    body.mobile-touch #bottom-bar {
+      left: calc(max(20px, env(safe-area-inset-left)) + 136px);
+      right: calc(max(20px, env(safe-area-inset-right)) + 136px);
+      bottom: calc(57px + env(safe-area-inset-bottom));
+    }
+    body.mobile-touch #actionbar {
+      gap: 4px;
+      padding: 4px;
+      background: linear-gradient(170deg, #15151fa8, #08080db8);
+    }
+    body.mobile-touch #actionbar.many-spells {
+      grid-template-columns: none;
+    }
+    body.mobile-touch .action-btn {
+      width: 40px;
+      height: 40px;
+      flex-basis: 40px;
+    }
+    body.mobile-touch #xpbar {
+      display: none;
+    }
+    body.mobile-touch #player-frame::before {
+      left: -5px;
+      top: -5px;
+      width: 73px;
+      height: 73px;
+      -webkit-mask: radial-gradient(
+        farthest-side,
+        transparent calc(100% - 7px),
+        #000 calc(100% - 6px)
+      );
+      mask: radial-gradient(farthest-side, transparent calc(100% - 7px), #000 calc(100% - 6px));
+    }
+    body.mobile-touch #castbar {
+      left: calc(max(20px, env(safe-area-inset-left)) + 112px);
+      bottom: calc(15px + env(safe-area-inset-bottom));
+      width: min(160px, calc(50vw - 166px));
+      min-width: 100px;
+      height: 5px;
+    }
+    body.mobile-touch #petbar {
+      top: max(6px, env(safe-area-inset-top));
+      transform: translateX(-50%) scale(0.88);
+      transform-origin: center top;
+    }
+    body.mobile-touch #community-hud {
+      top: calc(max(6px, env(safe-area-inset-top)) + 132px);
+      right: max(8px, env(safe-area-inset-right));
+      width: 62px;
+      padding: 4px;
+      gap: 4px;
+    }
+    body.mobile-touch .community-toggle {
+      width: 40px;
+      height: 40px;
+    }
+    body.mobile-touch .community-link {
+      height: 40px;
+    }
+    body.mobile-touch .community-link svg {
+      width: 20px;
+      height: 20px;
+    }
+    body.mobile-touch #chatlog-wrap {
+      left: max(10px, env(safe-area-inset-left));
+      bottom: calc(112px + env(safe-area-inset-bottom));
+      width: min(330px, 44vw);
+    }
+    body.mobile-touch #chatlog-frame {
+      height: 92px;
+    }
+    body.mobile-touch #chat-input {
+      left: max(10px, env(safe-area-inset-left));
+      bottom: calc(213px + env(safe-area-inset-bottom));
+      width: min(330px, 44vw);
+    }
+    body.mobile-touch #player-frame {
+      left: max(6px, env(safe-area-inset-left));
+      top: max(6px, env(safe-area-inset-top));
+      width: 300px;
+      transform: scale(0.6);
+    }
+    body.mobile-touch #player-frame .uf-bars {
+      width: 224px;
+      max-width: 224px;
+    }
+    body.mobile-touch #target-frame {
+      left: max(6px, env(safe-area-inset-left));
+      top: calc(max(6px, env(safe-area-inset-top)) + 56px);
+      transform: scale(0.6);
+    }
+    body.mobile-touch #party-frames {
+      left: max(6px, env(safe-area-inset-left));
+      top: calc(max(6px, env(safe-area-inset-top)) + 58px);
+    }
+    body.mobile-touch #party-frames.below-target {
+      top: calc(max(6px, env(safe-area-inset-top)) + 100px);
+    }
+    /* keep the 40x40 touch floor in landscape too (was 25px). */
+    body.mobile-touch #party-frames .party-frame {
+      width: 118px;
+      min-height: 40px;
+      padding: 2px 5px;
+    }
+    body.mobile-touch #party-frames .party-frame .pfm-name {
+      min-height: 12px;
+      font-size: 9px;
+    }
+    body.mobile-touch #party-frames .pfm-crest {
+      width: 10px;
+      height: 10px;
+    }
+    body.mobile-touch #party-frames .party-frame .bar {
+      height: 4px;
+    }
+    body.mobile-touch #party-frames #party-leave {
+      width: 118px;
+      min-height: 40px;
+      font-size: 9px;
+    }
+    body.mobile-touch #buff-bar {
+      right: calc(98px + env(safe-area-inset-right));
+      top: max(8px, env(safe-area-inset-top));
+      max-width: 160px;
+      transform: scale(0.85);
+      transform-origin: right top;
+    }
+    body.mobile-touch #debuff-bar {
+      right: calc(98px + env(safe-area-inset-right));
+      top: calc(max(8px, env(safe-area-inset-top)) + 32px);
+      max-width: 160px;
+      transform: scale(0.85);
+      transform-origin: right top;
+    }
+    body.mobile-touch #minimap-wrap {
+      right: max(6px, env(safe-area-inset-right));
+      top: max(6px, env(safe-area-inset-top));
+      transform: scale(0.46);
+    }
+    body.mobile-touch #quest-tracker {
+      display: none;
+    }
+    body.mobile-touch #meters-window {
+      position: fixed;
+      left: calc(max(20px, env(safe-area-inset-left)) + 112px);
+      right: auto;
+      top: auto;
+      bottom: calc(26px + env(safe-area-inset-bottom));
+      width: min(190px, calc(50vw - 142px));
+      min-width: 128px;
+      max-height: min(135px, calc(100vh - 112px));
+      transform: none;
+    }
+    body.mobile-touch #banner {
+      top: 18%;
+      max-width: calc(100vw - 24px);
+      font-size: 26px;
+      line-height: 1.12;
+      text-align: center;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    body.mobile-touch #subzone-banner {
+      top: 25%;
+      font-size: 18px;
+    }
+    body.mobile-touch #error-msg {
+      top: 16%;
+      font-size: 16px;
+    }
+    body.mobile-touch #mobile-preflight .preflight-panel {
+      width: min(520px, 84vw);
+      padding: 18px 22px;
+    }
+    body.mobile-touch #mobile-preflight h2 {
+      font-size: 22px;
+    }
+    body.mobile-touch #mobile-preflight-detail {
+      font-size: 12px;
+    }
+    body.mobile-touch #mobile-preflight-steps {
+      font-size: 11px;
+    }
+  }
+  /* Re-homed from the char-select responsive block in shell.css: narrow-width
+     repositioning of the in-game community HUD + quest
+     tracker. Layer hud.mobile sits after components, so these still beat the HUD
+     base; nothing in shell competes once removed there. */
+  @media (max-width: 860px) {
+    #community-hud {
+      top: auto;
+    }
+    #quest-tracker {
+      top: 260px;
+      right: 12px;
+      width: 190px;
+    }
+  }
+}

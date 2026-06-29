@@ -222,6 +222,21 @@ export const zh_CN: EnTranslations = {
     "rest": {
       "resting": "休息中"
     },
+    "unitFrame": {
+      "playerLabel": "你的角色",
+      "targetLabel": "你的目标",
+      "targetAnnounce": "目标：{name}",
+      "partyLabel": "你的队伍",
+      "partyGroup": "小队 {n}",
+      "durationUnitSeconds": "秒"
+    },
+    "character": {
+      "modelPreview": "角色模型预览"
+    },
+    "skipLinks": {
+      "mainHud": "跳转到主界面",
+      "chat": "跳转到聊天"
+    },
     "mobile": {
       "autorun": "自动奔跑",
       "jump": "跳跃",
@@ -243,6 +258,13 @@ export const zh_CN: EnTranslations = {
       "coordinates": "坐标",
       "heading": "朝向",
       "minimapZoom": "小地图缩放"
+    },
+    "castBar": {
+      "playerAria": "你的施法条",
+      "targetAria": "目标施法条"
+    },
+    "leaderboard": {
+      "close": "关闭"
     },
     "raidLockout": {
       "title": "团队副本锁定",
@@ -583,6 +605,91 @@ export const zh_CN: EnTranslations = {
       "notRaid": "你的队伍不是团队。",
       "leaderOnly": "只有团队领袖可以转换为队伍。",
       "tooLarge": "成员超过五人的团队无法转换回队伍。"
+    },
+    "itemArmorType": {
+      "cloth": "布甲",
+      "leather": "皮甲",
+      "mail": "锁甲"
+    },
+    "auraEffect": {
+      "dot": "每 {interval} 秒造成 {value} 点{school}伤害",
+      "hot": "每 {interval} 秒恢复 {value} 点生命值",
+      "absorb": "吸收 {value} 点伤害",
+      "healAbsorb": "吸收 {value} 点受到的治疗",
+      "thorns": "对攻击者造成 {value} 点{school}伤害",
+      "slow": "移动速度降低 {pct}%",
+      "speed": "移动速度提高 {pct}%",
+      "attackSpeedSlow": "攻击速度减慢 {pct}%",
+      "attackSpeedFast": "攻击速度提高 {pct}%",
+      "haste": "攻击速度和施法速度提高 {pct}%",
+      "tongues": "施法时间延长 {pct}%",
+      "increase": {
+        "ap": "攻击强度提高 {value}",
+        "armor": "护甲提高 {value}",
+        "int": "智力提高 {value}",
+        "agi": "敏捷提高 {value}",
+        "sta": "耐力提高 {value}",
+        "spi": "精神提高 {value}",
+        "allStats": "所有属性提高 {value}"
+      },
+      "reduce": {
+        "ap": "攻击强度降低 {value}",
+        "armor": "护甲降低 {value}",
+        "int": "智力降低 {value}",
+        "agi": "敏捷降低 {value}",
+        "sta": "耐力降低 {value}",
+        "spi": "精神降低 {value}",
+        "allStats": "所有属性降低 {value}"
+      },
+      "dodge": "躲闪几率提高 {pct}%",
+      "dodgeReduce": "躲闪几率降低 {pct}%",
+      "armorFlat": "护甲降低 {value}",
+      "armorFlatStacks": "护甲降低 {value}（{stacks} 层）",
+      "mortalWound": "受到的治疗降低 {pct}%",
+      "vulnerability": "受到的伤害提高 {pct}%",
+      "physVuln": "受到的物理伤害提高 {pct}%",
+      "spellVuln": "受到的魔法伤害提高 {pct}%",
+      "critVuln": "受到致命一击的几率提高 {pct}%",
+      "costTax": "技能消耗提高 {pct}%",
+      "stun": "已昏迷：无法行动",
+      "root": "已定身：无法移动",
+      "incapacitate": "已瘫痪：无法行动",
+      "polymorph": "已变形：无法行动",
+      "hex": "造成的伤害和治疗降低 {pct}%",
+      "blind": "已致盲：无法行动",
+      "silence": "已沉默：无法施放法术",
+      "disarm": "已缴械：无法使用武器攻击",
+      "lockout": "法术学派被锁定",
+      "imbue": "武器附有额外效果",
+      "imbueRange": "武器已附魔：审判时附加 {min} 到 {max} 点额外伤害",
+      "stealth": "已隐匿；移动速度降低 {pct}%",
+      "formBear": "熊形态：生命值和护甲提高",
+      "formCat": "猫形态：近战伤害与能量",
+      "formTravel": "旅行形态：移动速度提高 {pct}%",
+      "defensiveStance": "防御姿态：受到的伤害降低，威胁值提高",
+      "righteousFury": "正义之怒：神圣伤害产生的威胁值大幅提高",
+      "scale": "体型增大 {pct}%",
+      "jump": "跳跃高度提高 {pct}%",
+      "school": {
+        "physical": "物理",
+        "fire": "火焰",
+        "frost": "冰霜",
+        "arcane": "奥术",
+        "shadow": "暗影",
+        "holy": "神圣",
+        "nature": "自然"
+      }
+    },
+    "loot": {
+      "chestTitle": "宝箱"
+    },
+    "spellbook": {
+      "addToBarAria": "将{name}添加到动作条",
+      "removeFromBarAria": "从动作条移除{name}"
+    },
+    "nameplate": {
+      "mob": "[{level}] {name}",
+      "mobElite": "[{level}+] {name}"
     }
   },
   "guide": {
@@ -2409,7 +2516,9 @@ export const zh_CN: EnTranslations = {
       "mobileMap": "地图",
       "closeMap": "关闭地图",
       "zoomIn": "放大",
-      "zoomOut": "缩小"
+      "zoomOut": "缩小",
+      "mapCanvasLabel": "地图",
+      "mapSummary": "{zone}的地图。"
     },
     "options": {
       "gameMenu": "游戏菜单",
@@ -2610,6 +2719,7 @@ export const zh_CN: EnTranslations = {
     "combat": {
       "floatingMiss": "未命中",
       "floatingDodge": "闪避",
+      "floatingResist": "抵抗",
       "cannotMove": "无法移动！",
       "attack": "攻击",
       "damageDone": "你的{ability}击中{target}，造成 {amount} 点伤害。",
@@ -2618,6 +2728,7 @@ export const zh_CN: EnTranslations = {
       "damageTakenCrit": "{source}对你造成暴击，造成 {amount} 点伤害。",
       "miss": "你的{ability}未命中{target}。",
       "dodged": "{target}闪避了你的{ability}。",
+      "resisted": "{target}抵抗了你的{ability}。",
       "healSelf": "你的{ability}为你恢复 {amount} 点生命。",
       "healSelfCrit": "你的{ability}对你造成暴击治疗，恢复 {amount} 点生命。",
       "healOther": "你的{ability}为{target}恢复 {amount} 点生命。",
@@ -3412,7 +3523,7 @@ export const zh_CN: EnTranslations = {
       },
       "stealth": {
         "name": "潜行",
-        "description": "将你隐藏在阴影中：敌人几乎无法察觉你，但你的移动速度降低 30%。攻击或受到伤害会打破潜行。再次施放可现身。"
+        "description": "将你隐藏在阴影中：敌人几乎无法察觉你，但你的移动速度降低 50%。攻击或受到伤害会打破潜行。再次施放可现身。"
       },
       "adrenaline_rush": {
         "name": "冲动",
@@ -3444,7 +3555,7 @@ export const zh_CN: EnTranslations = {
       },
       "vanish": {
         "name": "消失",
-        "description": "从视野中消失，即使在战斗中也能进入潜行状态。隐身时你的移动速度降低 30%。持续最多 10 秒。"
+        "description": "从视野中消失，即使在战斗中也能进入潜行状态。隐身时你的移动速度降低 50%。持续最多 10 秒。"
       },
       "instant_poison": {
         "name": "速效毒药",
@@ -3852,7 +3963,7 @@ export const zh_CN: EnTranslations = {
       },
       "prowl": {
         "name": "潜行",
-        "description": "在狼形态下进入潜行状态。无法在战斗中使用。"
+        "description": "在狼形态下进入潜行状态，移动速度降低 50%。无法在战斗中使用。"
       },
       "rake": {
         "name": "撕抓",

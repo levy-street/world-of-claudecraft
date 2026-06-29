@@ -1,0 +1,232 @@
+// Entity roster + tick prologue plumbing, extracted from the Sim monolith (E1).
+//
+// This module owns the roster maintenance every other game system depends on:
+// add/drop/rebucket against the two spatial grids, the despawn/decay prologue that
+// runs at the top of the entity loop, the delayed-event drain, the ground-AoE drain,
+// and the player release-spirit flow (graveyard respawn + in-delve respawn).
+//
+// PRIME DIRECTIVE: this is a MOVE, not a rewrite. Every function below is the former
+// `Sim` method verbatim, with `this.X` rewritten to `ctx.X` (the SimContext seam) or
+// to a sibling function in this module. Statement order, branch order, and the in-place
+// mutation (the refactor's immutability waiver) are preserved exactly so the parity
+// gate's full-state trace AND rng draw-order log stay byte-identical.
+//
+// STATE STAYS ON Sim. `entities`/`grid`/`playerGrid` are a public seam consumed by
+// `server/game.ts`, and `delayedEvents`/`groundAoEs`/`dungeonDoorIds` are pushed to by
+// out-of-scope schedulers that still live on `Sim` (N1/M3 delayed-event scheduling,
+// C1/C4b ground-AoE scheduling). So the fields remain on `Sim` and this module reaches
+// them through SimContext live views; only the behavior moved here.
+//
+// `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
+// (enforced by tests/architecture.test.ts).
+
+import { dungeonAt, isDelvePos, zoneAt } from './data';
+import { recalcPlayerStats } from './entity';
+import type { SimContext } from './sim_context';
+import type { Entity, SimEvent, Vec3 } from './types';
+import { CAST_COMPLETE_EPS, DT } from './types';
+
+// Mobs that despawn after sitting out of combat too long (boss adds that should not
+// litter the world). The idle timer is reset to DAMAGE_IDLE_DESPAWN_SECONDS whenever
+// they take damage (that reset still lives on Sim in the damage path, C1).
+export const DAMAGE_IDLE_DESPAWN_SECONDS = 60;
+export const DAMAGE_IDLE_DESPAWN_MOB_IDS = new Set(['varkas_boneguard', 'bound_guardian']);
+
+// A ticking ground hazard (e.g. Consecration). Scheduled by the damage/effect path
+// (C1/C4b, still on Sim) and drained here by tickGroundAoEs.
+export type GroundAoE = {
+  sourceId: number;
+  pos: Vec3;
+  radius: number;
+  min: number;
+  max: number;
+  remaining: number;
+  interval: number;
+  tickTimer: number;
+  school: string;
+  ability: string;
+};
+
+// A SimEvent scheduled to fire at a future sim time, optionally gated by a live-
+// reference guard checked at fire time. Scheduled by N1/M3 (still on Sim), drained
+// here by drainDelayedEvents.
+export type DelayedEvent = { at: number; event: SimEvent; guard?: () => boolean };
+
+// In-place vector copy (the engine mutates entity positions; see immutability waiver).
+function copyPos(
+  dst: { x: number; y: number; z: number },
+  src: { x: number; y: number; z: number },
+): void {
+  dst.x = src.x;
+  dst.y = src.y;
+  dst.z = src.z;
+}
+
+// -------------------------------------------------------------------------
+// Entity roster: every add/remove/teleport goes through these so the
+// spatial indexes always match the entities map
+// -------------------------------------------------------------------------
+
+export function addEntityToRoster(ctx: SimContext, e: Entity): void {
+  ctx.entities.set(e.id, e);
+  ctx.grid.insert(e);
+  if (e.kind === 'player') ctx.playerGrid.insert(e);
+  if (e.templateId === 'dungeon_door' && ctx.dungeonDoorIds) ctx.dungeonDoorIds.push(e.id);
+}
+
+export function dropEntityFromRoster(ctx: SimContext, id: number): void {
+  ctx.clearEntityMarker(id); // a despawned entity keeps no raid marker
+  const e = ctx.entities.get(id);
+  if (!e) return;
+  ctx.grid.remove(e);
+  if (e.kind === 'player') ctx.playerGrid.remove(e);
+  ctx.entities.delete(id);
+}
+
+export function rebucketEntity(ctx: SimContext, e: Entity): void {
+  ctx.grid.update(e);
+  if (e.kind === 'player') ctx.playerGrid.update(e);
+}
+
+// -------------------------------------------------------------------------
+// Tick prologue: despawn/decay scan, delayed-event drain, ground-AoE drain
+// -------------------------------------------------------------------------
+
+// Top of the entity loop: copy prev pos/facing (movement bookkeeping), age the two
+// despawn timers, expire overhead emotes. Collects ids first, then drops AFTER the
+// loop so dropEntity never mutates the entities map under the iterator.
+export function runDespawnDecay(ctx: SimContext): void {
+  const despawnIds: number[] = [];
+  for (const e of ctx.entities.values()) {
+    copyPos(e.prevPos, e.pos);
+    e.prevFacing = e.facing;
+    if (e.despawnTimer !== undefined) {
+      e.despawnTimer -= DT;
+      if (e.despawnTimer <= 0) despawnIds.push(e.id);
+    }
+    if (
+      e.kind === 'mob' &&
+      DAMAGE_IDLE_DESPAWN_MOB_IDS.has(e.templateId) &&
+      !e.dead &&
+      !e.inCombat
+    ) {
+      e.damageIdleDespawnTimer = (e.damageIdleDespawnTimer ?? DAMAGE_IDLE_DESPAWN_SECONDS) - DT;
+      if (e.damageIdleDespawnTimer <= 0) despawnIds.push(e.id);
+    }
+    if (e.overheadEmoteId && ctx.time >= e.overheadEmoteUntil) {
+      e.overheadEmoteId = null;
+      e.overheadEmoteUntil = 0;
+    }
+  }
+  for (const id of despawnIds) dropEntityFromRoster(ctx, id);
+}
+
+// Fire delayed events whose time has come (subject to their guard), keep the rest.
+// Iterates in insertion order; reordering events IS drift.
+export function drainDelayedEvents(ctx: SimContext): void {
+  if (ctx.delayedEvents.length === 0) return;
+  const pending: DelayedEvent[] = [];
+  for (const delayed of ctx.delayedEvents) {
+    if (delayed.at <= ctx.time) {
+      if (!delayed.guard || delayed.guard()) ctx.emit(delayed.event);
+    } else pending.push(delayed);
+  }
+  ctx.delayedEvents = pending;
+}
+
+// Advance every ground hazard, pulsing it on its interval (the early-tick rng draw)
+// and dropping it when expired. pulseGroundAoE stays on Sim (shared entry point) and
+// is reached via the seam.
+export function tickGroundAoEs(ctx: SimContext): void {
+  for (let i = ctx.groundAoEs.length - 1; i >= 0; i--) {
+    const effect = ctx.groundAoEs[i];
+    effect.remaining -= DT;
+    effect.tickTimer -= DT;
+    while (effect.tickTimer <= CAST_COMPLETE_EPS && effect.remaining > CAST_COMPLETE_EPS) {
+      effect.tickTimer += effect.interval;
+      ctx.pulseGroundAoE(effect);
+    }
+    if (effect.remaining <= CAST_COMPLETE_EPS) ctx.groundAoEs.splice(i, 1);
+  }
+}
+
+// -------------------------------------------------------------------------
+// Player death / respawn
+// -------------------------------------------------------------------------
+
+export function releasePlayerSpirit(ctx: SimContext, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const { meta, e: p } = r;
+  if (!p.dead) return;
+  if (ctx.arenaMatches.has(p.id)) return;
+  if (isDelvePos(p.pos.x)) {
+    releaseSpiritInDelve(ctx, meta.entityId);
+    return;
+  }
+  p.dead = false;
+  // dying in a dungeon sends you to the graveyard of the zone its door is
+  // in; dying outdoors, to your current zone's graveyard
+  const dungeon = dungeonAt(p.pos.x);
+  const graveyard = zoneAt(dungeon ? dungeon.doorPos.z : p.pos.z).graveyard;
+  p.pos = ctx.groundPos(graveyard.x, graveyard.z);
+  p.prevPos = { ...p.pos };
+  rebucketEntity(ctx, p);
+  p.facing = 0;
+  p.auras = [];
+  p.ccDr.clear();
+  recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta));
+  p.hp = p.maxHp;
+  p.resource = p.resourceType === 'mana' ? p.maxResource : p.resourceType === 'energy' ? 100 : 0;
+  p.targetId = null;
+  p.autoAttack = false;
+  p.queuedOnSwing = null;
+  p.combatTimer = 99;
+  p.inCombat = false;
+  ctx.emit({ type: 'respawn', pid: meta.entityId });
+}
+
+export function releaseSpiritInDelve(ctx: SimContext, pid: number): void {
+  const r = ctx.resolve(pid);
+  if (!r?.e.dead) return;
+  const run = ctx.delveRunForPlayer(pid);
+  if (!run) return;
+  const deaths = (run.deathsThisRun[pid] ?? 0) + 1;
+  run.deathsThisRun[pid] = deaths;
+  if (deaths >= 2) {
+    r.e.dead = false;
+    ctx.failDelveRun(run);
+    return;
+  }
+  const p = r.e;
+  p.dead = false;
+  const entry = ctx.delveModuleEntry(run);
+  p.pos = entry;
+  p.prevPos = { ...entry };
+  rebucketEntity(ctx, p);
+  p.facing = 0;
+  p.auras = [];
+  p.ccDr.clear();
+  recalcPlayerStats(p, r.meta.cls, r.meta.equipment, r.meta.talentMods);
+  p.hp = Math.max(1, Math.round(p.maxHp * 0.5));
+  p.resource =
+    p.resourceType === 'mana'
+      ? Math.round(p.maxResource * 0.5)
+      : p.resourceType === 'energy'
+        ? 100
+        : 0;
+  p.targetId = null;
+  p.combatTimer = 99;
+  p.inCombat = false;
+  ctx.emit({ type: 'respawn', pid });
+}
+
+// Readout for "/graveyard": names the graveyard this position falls back to. Pure
+// (zone lookups only); routed through this.error at the call site, so the S3 i18n
+// guard does not see it as a literal emit.
+export function graveyardReadout(p: Entity): string {
+  const dungeon = dungeonAt(p.pos.x);
+  const zone = zoneAt(dungeon ? dungeon.doorPos.z : p.pos.z);
+  const gy = zone.graveyard;
+  return `If you fall here, your spirit returns to the ${zone.name} graveyard at (${Math.floor(gy.x)}, ${Math.floor(gy.z)}).`;
+}

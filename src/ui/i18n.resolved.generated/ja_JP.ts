@@ -222,6 +222,21 @@ export const ja_JP: EnTranslations = {
     "rest": {
       "resting": "休息中"
     },
+    "unitFrame": {
+      "playerLabel": "あなたのキャラクター",
+      "targetLabel": "あなたのターゲット",
+      "targetAnnounce": "ターゲット：{name}",
+      "partyLabel": "あなたのパーティ",
+      "partyGroup": "グループ {n}",
+      "durationUnitSeconds": "秒"
+    },
+    "character": {
+      "modelPreview": "キャラクターモデルプレビュー"
+    },
+    "skipLinks": {
+      "mainHud": "メインHUDへスキップ",
+      "chat": "チャットへスキップ"
+    },
     "mobile": {
       "autorun": "オートラン",
       "jump": "ジャンプ",
@@ -243,6 +258,13 @@ export const ja_JP: EnTranslations = {
       "coordinates": "座標",
       "heading": "方角",
       "minimapZoom": "ミニマップのズーム"
+    },
+    "castBar": {
+      "playerAria": "あなたの詠唱バー",
+      "targetAria": "ターゲットの詠唱バー"
+    },
+    "leaderboard": {
+      "close": "閉じる"
     },
     "raidLockout": {
       "title": "レイドロックアウト",
@@ -583,6 +605,91 @@ export const ja_JP: EnTranslations = {
       "notRaid": "パーティはレイドではありません。",
       "leaderOnly": "パーティに変換できるのはレイドリーダーだけです。",
       "tooLarge": "メンバーが5人を超えるレイドはパーティに戻せません。"
+    },
+    "itemArmorType": {
+      "cloth": "布",
+      "leather": "革",
+      "mail": "鎖"
+    },
+    "auraEffect": {
+      "dot": "{interval}秒ごとに{value}の{school}ダメージを与える",
+      "hot": "{interval}秒ごとに体力を{value}回復する",
+      "absorb": "{value}のダメージを吸収する",
+      "healAbsorb": "受ける回復を{value}吸収する",
+      "thorns": "攻撃者に{value}の{school}ダメージを与える",
+      "slow": "移動速度を{pct}%低下させる",
+      "speed": "移動速度を{pct}%上昇させる",
+      "attackSpeedSlow": "攻撃速度を{pct}%低下させる",
+      "attackSpeedFast": "攻撃速度を{pct}%上昇させる",
+      "haste": "攻撃速度と詠唱速度を{pct}%上昇させる",
+      "tongues": "詠唱時間を{pct}%増加させる",
+      "increase": {
+        "ap": "攻撃力を{value}上昇させる",
+        "armor": "防御力を{value}上昇させる",
+        "int": "知力を{value}上昇させる",
+        "agi": "敏捷性を{value}上昇させる",
+        "sta": "耐久力を{value}上昇させる",
+        "spi": "精神力を{value}上昇させる",
+        "allStats": "すべての能力値を{value}上昇させる"
+      },
+      "reduce": {
+        "ap": "攻撃力を{value}低下させる",
+        "armor": "防御力を{value}低下させる",
+        "int": "知力を{value}低下させる",
+        "agi": "敏捷性を{value}低下させる",
+        "sta": "耐久力を{value}低下させる",
+        "spi": "精神力を{value}低下させる",
+        "allStats": "すべての能力値を{value}低下させる"
+      },
+      "dodge": "回避率を{pct}%上昇させる",
+      "dodgeReduce": "回避率を{pct}%低下させる",
+      "armorFlat": "防御力を{value}低下させる",
+      "armorFlatStacks": "防御力を{value}低下させる({stacks}スタック)",
+      "mortalWound": "受ける回復量を{pct}%低下させる",
+      "vulnerability": "受けるダメージを{pct}%増加させる",
+      "physVuln": "受ける物理ダメージを{pct}%増加させる",
+      "spellVuln": "受ける魔法ダメージを{pct}%増加させる",
+      "critVuln": "クリティカルを受ける確率を{pct}%増加させる",
+      "costTax": "アビリティのコストを{pct}%増加させる",
+      "stun": "スタン: 行動不能",
+      "root": "足止め: 移動不能",
+      "incapacitate": "無力化: 行動不能",
+      "polymorph": "変身: 行動不能",
+      "hex": "与えるダメージと回復を{pct}%低下させる",
+      "blind": "盲目: 行動不能",
+      "silence": "沈黙: 呪文を詠唱できない",
+      "disarm": "武装解除: 武器攻撃を使用できない",
+      "lockout": "呪文系統がロックされている",
+      "imbue": "武器に追加効果が付与されている",
+      "imbueRange": "武器付与: 裁きで{min}から{max}の追加ダメージ",
+      "stealth": "隠密状態。移動速度が{pct}%低下する",
+      "formBear": "ベアフォーム: 体力と防御力が上昇",
+      "formCat": "キャットフォーム: 近接ダメージとエネルギー",
+      "formTravel": "トラベルフォーム: 移動速度が{pct}%上昇",
+      "defensiveStance": "ディフェンシブスタンス: 受けるダメージが減少し、脅威度が上昇",
+      "righteousFury": "正義の怒り: 神聖ダメージによる脅威度が大幅に上昇",
+      "scale": "サイズが{pct}%増加",
+      "jump": "ジャンプの高さが{pct}%増加",
+      "school": {
+        "physical": "物理",
+        "fire": "火",
+        "frost": "氷",
+        "arcane": "秘術",
+        "shadow": "影",
+        "holy": "神聖",
+        "nature": "自然"
+      }
+    },
+    "loot": {
+      "chestTitle": "宝箱"
+    },
+    "spellbook": {
+      "addToBarAria": "{name}をアクションバーに追加",
+      "removeFromBarAria": "{name}をアクションバーから削除"
+    },
+    "nameplate": {
+      "mob": "[{level}] {name}",
+      "mobElite": "[{level}+] {name}"
     }
   },
   "guide": {
@@ -2409,7 +2516,9 @@ export const ja_JP: EnTranslations = {
       "mobileMap": "マップ",
       "closeMap": "マップを閉じる",
       "zoomIn": "ズームイン",
-      "zoomOut": "ズームアウト"
+      "zoomOut": "ズームアウト",
+      "mapCanvasLabel": "マップ",
+      "mapSummary": "{zone}のマップ。"
     },
     "options": {
       "gameMenu": "ゲームメニュー",
@@ -2610,6 +2719,7 @@ export const ja_JP: EnTranslations = {
     "combat": {
       "floatingMiss": "ミス",
       "floatingDodge": "回避",
+      "floatingResist": "抵抗",
       "cannotMove": "動けない！",
       "attack": "攻撃",
       "damageDone": "{ability}が{target}に命中し、{amount}のダメージ。",
@@ -2618,6 +2728,7 @@ export const ja_JP: EnTranslations = {
       "damageTakenCrit": "{source}からクリティカルで{amount}のダメージを受けました。",
       "miss": "{ability}は{target}に外れました。",
       "dodged": "{target}は{ability}を回避しました。",
+      "resisted": "{target}は{ability}に抵抗しました。",
       "healSelf": "{ability}が自分を{amount}回復しました。",
       "healSelfCrit": "{ability}が自分をクリティカルで{amount}回復しました。",
       "healOther": "{ability}が{target}を{amount}回復しました。",
@@ -3412,7 +3523,7 @@ export const ja_JP: EnTranslations = {
       },
       "stealth": {
         "name": "ステルス",
-        "description": "影に身を隠します。敵にほとんど気づかれませんが、移動速度が30%低下します。攻撃するかダメージを受けるとステルスが解除されます。再度使用すると姿を現します。"
+        "description": "影に身を隠します。敵にほとんど気づかれませんが、移動速度が50%低下します。攻撃するかダメージを受けるとステルスが解除されます。再度使用すると姿を現します。"
       },
       "adrenaline_rush": {
         "name": "アドレナリンラッシュ",
@@ -3444,7 +3555,7 @@ export const ja_JP: EnTranslations = {
       },
       "vanish": {
         "name": "ヴァニッシュ",
-        "description": "視界から消え、戦闘中でもステルス状態に入ります。隠れている間は移動速度が30%低下します。最大10秒間持続します。"
+        "description": "視界から消え、戦闘中でもステルス状態に入ります。隠れている間は移動速度が50%低下します。最大10秒間持続します。"
       },
       "instant_poison": {
         "name": "インスタント・ポイズン",
@@ -3852,7 +3963,7 @@ export const ja_JP: EnTranslations = {
       },
       "prowl": {
         "name": "忍び寄り",
-        "description": "ウルフフォーム中にステルス状態に入る。戦闘中は使用できない。"
+        "description": "ウルフフォーム中にステルス状態に入り、移動速度が50%低下する。戦闘中は使用できない。"
       },
       "rake": {
         "name": "切り裂き",

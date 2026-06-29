@@ -127,6 +127,14 @@ function despawnMobs(sim: Sim) {
   }
 }
 
+function forwardDistance(sim: Sim, ticks = 60): number {
+  const start = { ...sim.player.pos };
+  sim.moveInput.forward = true;
+  for (let i = 0; i < ticks; i++) sim.tick();
+  sim.moveInput.forward = false;
+  return dist2d(start, sim.player.pos);
+}
+
 describe('classic formulas', () => {
   it('rage conversion matches the vanilla constant', () => {
     expect(rageConversion(1)).toBeCloseTo(0.0091 + 3.23 + 4.27, 4);
@@ -711,6 +719,57 @@ describe('rogue', () => {
     expect(sim.player.auras.some((a) => a.kind === 'stealth')).toBe(true);
   });
 
+  it('rogue Stealth moves at 50% speed', () => {
+    const sim = makeSim('rogue');
+    (sim as any).grantXp(xpForLevel(1) + xpForLevel(2) + 10); // reach level 3, learns stealth (lvl 2)
+    expect((sim as any).moveSpeedMult(sim.player)).toBe(1);
+    sim.castAbility('stealth');
+    expect(sim.player.auras.some((a) => a.kind === 'stealth')).toBe(true);
+    expect((sim as any).moveSpeedMult(sim.player)).toBeCloseTo(0.5, 5);
+  });
+
+  it('rogue Stealth actually covers half normal ground', () => {
+    const normal = makeSim('rogue');
+    despawnMobs(normal);
+    (normal as any).grantXp(xpForLevel(1) + xpForLevel(2) + 10);
+
+    const stealthed = makeSim('rogue');
+    despawnMobs(stealthed);
+    (stealthed as any).grantXp(xpForLevel(1) + xpForLevel(2) + 10);
+    stealthed.castAbility('stealth');
+    expect(stealthed.player.auras.some((a) => a.kind === 'stealth')).toBe(true);
+
+    const base = forwardDistance(normal);
+    const stealth = forwardDistance(stealthed);
+    expect(base).toBeGreaterThan(0);
+    expect(stealth / base).toBeCloseTo(0.5, 1);
+  });
+
+  it('rogue Vanish moves at 50% speed', () => {
+    const sim = makeSim('rogue');
+    sim.setPlayerLevel(20); // Vanish learns at level 18
+    sim.castAbility('vanish');
+    expect(sim.player.auras.some((a) => a.kind === 'stealth')).toBe(true);
+    expect((sim as any).moveSpeedMult(sim.player)).toBeCloseTo(0.5, 5);
+  });
+
+  it('rogue Vanish actually covers half normal ground', () => {
+    const normal = makeSim('rogue');
+    despawnMobs(normal);
+    normal.setPlayerLevel(20);
+
+    const vanished = makeSim('rogue');
+    despawnMobs(vanished);
+    vanished.setPlayerLevel(20);
+    vanished.castAbility('vanish');
+    expect(vanished.player.auras.some((a) => a.kind === 'stealth')).toBe(true);
+
+    const base = forwardDistance(normal);
+    const vanish = forwardDistance(vanished);
+    expect(base).toBeGreaterThan(0);
+    expect(vanish / base).toBeCloseTo(0.5, 1);
+  });
+
   it('rogue GCD is 1.0s', () => {
     const sim = makeSim('rogue');
     expect(sim.playerGcd).toBe(1.0);
@@ -955,10 +1014,10 @@ describe('food, drink, vendor', () => {
     const wilkes = [...sim.entities.values()].find((e) => e.templateId === 'trader_wilkes')!;
     teleportTo(sim, wilkes.pos.x + 2, wilkes.pos.z);
     sim.copper = 0;
-    sim.addItem('wolf_fang', 2);        // poor (gray), sellValue 4 -> 8
-    sim.addItem('bandit_bandana', 1);   // poor (gray), sellValue 6
+    sim.addItem('wolf_fang', 2); // poor (gray), sellValue 4 -> 8
+    sim.addItem('bandit_bandana', 1); // poor (gray), sellValue 6
     sim.addItem('apprentice_staff', 1); // not poor -> kept
-    sim.addItem('boar_hide', 1);        // quest item -> kept
+    sim.addItem('boar_hide', 1); // quest item -> kept
 
     sim.sellAllJunk();
 
@@ -971,7 +1030,9 @@ describe('food, drink, vendor', () => {
     expect(sim.copper).toBe(14);
     // each sold gray stack is recorded for buyback
     expect(sim.vendorBuyback.some((s) => s.itemId === 'wolf_fang' && s.count === 2)).toBe(true);
-    expect(sim.vendorBuyback.some((s) => s.itemId === 'bandit_bandana' && s.count === 1)).toBe(true);
+    expect(sim.vendorBuyback.some((s) => s.itemId === 'bandit_bandana' && s.count === 1)).toBe(
+      true,
+    );
     // exactly one summary loot line (not one per stack)
     const sold = sim.events.filter((e) => e.type === 'loot' && /^Sold /.test(e.text));
     expect(sold).toHaveLength(1);
@@ -986,7 +1047,11 @@ describe('food, drink, vendor', () => {
     sim.addItem('wolf_fang', 1);
     sim.sellAllJunk();
     expect(sim.countItem('wolf_fang')).toBe(1);
-    expect(sim.events).toContainEqual({ type: 'error', text: 'There is no merchant nearby.', pid: sim.player.id });
+    expect(sim.events).toContainEqual({
+      type: 'error',
+      text: 'There is no merchant nearby.',
+      pid: sim.player.id,
+    });
 
     // at the vendor with no gray items: silent no-op (button is disabled in the UI)
     teleportTo(sim, wilkes.pos.x + 2, wilkes.pos.z);
@@ -1466,13 +1531,13 @@ describe('quests', () => {
     sim.interact();
     const qp = sim.questLog.get('q_wolves')!;
     qp.counts[0] = 8;
-    (sim as any).checkQuestReady(qp, (sim as any).primary);
+    (sim as any).ctx.checkQuestReady(qp, (sim as any).primary);
     sim.interact(); // turn in wolves
     // accept bandits specifically
     sim.acceptQuest('q_bandits');
     const qb = sim.questLog.get('q_bandits')!;
     qb.counts[0] = 10;
-    (sim as any).checkQuestReady(qb, (sim as any).primary);
+    (sim as any).ctx.checkQuestReady(qb, (sim as any).primary);
     sim.turnInQuest('q_bandits');
     expect(sim.equipment.mainhand).toBe('redbrook_blade');
   });

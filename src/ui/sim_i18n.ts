@@ -23,6 +23,7 @@ import {
   type TranslationKey,
   t,
 } from './i18n';
+import { ARENA_NEW, BASE_NEW, ITEM_NEW, PET_NEW, QUEST_NEW, RAID_NEW } from './sim_i18n.newlocales';
 
 const baseEnTable = {
   'error.lineOfSight': 'Line of sight.',
@@ -2178,6 +2179,7 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'aura.causticSpores': 'Едкие споры',
     'aura.elixirBear': 'Мощь Медведя',
   },
+  ...BASE_NEW,
 };
 
 const PET_DICT_EN: Record<PetSimMessageKey, string> = {
@@ -2655,6 +2657,7 @@ const PET_DICT: Record<SupportedLanguage, Record<PetSimMessageKey, string>> = {
   ja_JP: PET_DICT_JA,
   pt_BR: PET_DICT_PT,
   ru_RU: PET_DICT_RU,
+  ...PET_NEW,
 };
 
 export const DICT: Record<SupportedLanguage, Record<SimMessageKey, string>> = Object.fromEntries(
@@ -3051,6 +3054,7 @@ export const ARENA_EXTRA: Record<SupportedLanguage, Record<ArenaExtraKey, string
     memberTrading: '{name} должен завершить обмен перед постановкой в очередь.',
     memberInstance: '{name} не может вставать в очередь из подземелья.',
   },
+  ...ARENA_NEW,
 };
 
 function tArenaExtra(key: ArenaExtraKey, params?: InterpolationValues): string {
@@ -3346,6 +3350,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
       '{name} кричит: "Смерть никогда не заберет моего короля! Ритуал должен сохраниться!"',
     vossYell: '{name} кричит: "Вы не доберетесь до него! Король должен сохраниться!"',
   },
+  ...QUEST_NEW,
 };
 
 function tQuestExtra(key: QuestExtraKey, params?: InterpolationValues): string {
@@ -3494,6 +3499,7 @@ export const ITEM_EXTRA: Record<SupportedLanguage, Record<ItemExtraKey, string>>
     relicBound: 'Реликвия привязана к запечатанной крипте.',
     relicRecovered: 'Вы уже нашли эту реликвию.',
   },
+  ...ITEM_NEW,
 };
 
 function tItemExtra(key: ItemExtraKey, params?: InterpolationValues): string {
@@ -3520,7 +3526,7 @@ type RaidExtraKey =
   | 'engagedSealed'
   | 'mustFall';
 
-const RAID_EXTRA: Record<SupportedLanguage, Record<RaidExtraKey, string>> = {
+export const RAID_EXTRA: Record<SupportedLanguage, Record<RaidExtraKey, string>> = {
   en: {
     converted: 'Your party has converted to a raid group.',
     memberMoved: '{name} has been moved to raid group {group}.',
@@ -3788,6 +3794,7 @@ const RAID_EXTRA: Record<SupportedLanguage, Record<RaidExtraKey, string>> = {
     engagedSealed: 'Нитраксис уже в бою; королевская дверь запечаталась.',
     mustFall: 'Королевская дверь запечатана; сначала должен пасть Нитраксис.',
   },
+  ...RAID_NEW,
 };
 
 function tRaidExtra(key: RaidExtraKey, params?: InterpolationValues): string {

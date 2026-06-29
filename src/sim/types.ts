@@ -7,13 +7,57 @@ export const DT = 1 / TICK_RATE;
 export const RUN_SPEED = 7; // yards/sec, classic run speed
 export const TURN_SPEED = Math.PI; // rad/sec keyboard turning
 export const MELEE_RANGE = 5; // yards
+export const MELEE_ARC = 2.2; // radians half-arc within which melee swings connect
 export const INTERACT_RANGE = 5;
+// /yell broadcast radius and ground-object respawn delay: neutral consts shared by
+// code that stays on Sim (the chat router, pickUpObject) and an extracted slice (the
+// Nythraxis encounter's yells + crypt-relic respawn), so they live here, not in sim.ts.
+export const YELL_RANGE = 100;
+export const OBJECT_RESPAWN = 30;
+// Pet tuning shared between the pet-AI slice (src/sim/pet/pet_ai.ts) and code that
+// stays on Sim, so it lives in this neutral module (the slice-only PET_* consts live
+// in pet_ai.ts). PET_GROWL_INTERVAL is read by the moved updatePet auto-taunt arm AND
+// the on-Sim manual-growl command; PET_TELEPORT_DISTANCE by the moved petFollow heel,
+// an on-Sim follow check, AND the I2c delve companion AI (delves/companion.ts) heel warp.
+export const PET_GROWL_INTERVAL = 10; // controlled pets can tank by forcing attention
+export const PET_TELEPORT_DISTANCE = 60; // owner this far AND no route exists: pet warps to heel (last resort)
+// Leash distance: how far a pulled mob may be dragged from its leash anchor before
+// it evades home. Shared between the mob-locomotion slice (chase/flee leash checks)
+// and the profiled-combat path that stays on Sim, so it lives in this neutral module.
+export const LEASH_DISTANCE = 45;
+export const DUNGEON_LEASH_DISTANCE = 70;
+// Nythraxis add template id. Used by the mob-locomotion slice (the add branch of
+// updateMob); the boss id NYTHRAXIS_BOSS_ID lives lower in this file (C1 relocation).
+export const NYTHRAXIS_ADD_ID = 'nythraxis_skeleton_warrior';
 export const GCD = 1.5; // seconds
 export const CAST_PUSHBACK_SEC = 0.5; // vanilla: each hit delays a cast by 0.5s
 export const CHANNEL_PUSHBACK_FRACTION = 0.25; // vanilla: each hit shaves 25% off a channel
+// Tolerance for "this per-tick timer is effectively complete" comparisons (casting,
+// channels, ground-AoE pulses). Shared across sim modules (sim.ts + entity_roster.ts).
+export const CAST_COMPLETE_EPS = 1e-9;
 export const FISHING_CAST_ID = 'fishing';
 export const FISHING_CAST_NAME = 'Fishing';
 export const FISHING_CAST_TIME = 5;
+// Seconds an empty instance idles before it resets. Shared by the dungeon instance
+// reaper (instances/dungeons.ts) and the delve reaper (sim.ts). NYTHRAXIS_BOSS_ID
+// (the dungeon raid-door seal also keys off it) lives lower in this file (C1 relocation).
+export const INSTANCE_EMPTY_TIMEOUT = 300;
+// Delve pressure-plate trigger radius (yards). Shared by the I2a run module
+// (delves/runs.ts: plate stepping + chest/exit proximity) and the I2b lockpick
+// controller still on Sim (resolveLockChest proximity gate). Relocated from sim.ts.
+export const DELVE_PLATE_RADIUS = 2.5;
+// Max purchasable companion rank. Shared by the I2a run module (companionUpgrade cap)
+// and the I2c companion AI (delves/companion.ts: updateDelveCompanion heal-pct index).
+export const DELVE_COMPANION_MAX_RANK = 3;
+// The warlock Demon Heal channel id. Shared by the casting/channel path on Sim (C4a
+// relocation) and the P1b pet-command healPet/applyDemonHealTick slice; here so both
+// import it cycle-free. (P1b's identical relocation deduped to this one decl.)
+export const DEMON_HEAL_CAST_ID = 'demon_heal';
+// Companion heal cadence (seconds). Shared by the I2c companion AI (delves/companion.ts:
+// updateDelveCompanion wanderTimer reset) and Sim.spawnDelveCompanion (initial timer).
+export const DELVE_COMPANION_HEAL_INTERVAL = 3;
+// PET_TELEPORT_DISTANCE (the pet/companion last-resort heel warp) was relocated to this
+// module by P1a (above); the I2c companion AI shares that same const, not re-declared here.
 
 export type PlayerClass =
   | 'warrior'
@@ -25,6 +69,12 @@ export type PlayerClass =
   | 'mage'
   | 'warlock'
   | 'druid';
+
+// Classes that command a persistent pet (hunter beast, warlock demon). Pure
+// predicate, here so the pet-command slice imports it without a sim.ts cycle.
+export function isPetClass(cls: PlayerClass): boolean {
+  return cls === 'hunter' || cls === 'warlock';
+}
 // '1v1'/'2v2' are the ranked Ashen Coliseum ladders; 'fiesta' is the
 // dopamine-maxxed 2v2 party mode (score-based, respawns, augments, a shrinking
 // ring) — see docs/design and the Fiesta region of sim.ts.
@@ -144,9 +194,18 @@ export interface Aura {
   school: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
   breaksOnDamage?: boolean;
   stacks?: number; // sunder armor: applications stack up to the effect's cap
+  charges?: number; // thorns: remaining reflect charges (Lightning Shield); undefined => unlimited
+  icd?: number; // thorns: internal-cooldown remaining, seconds (counts down each tick)
+  icdMax?: number; // thorns: configured internal cooldown, seconds (re-armed on each reflect)
 }
 
-export type CrowdControlDrCategory = 'root' | 'polymorph' | 'fear';
+export type CrowdControlDrCategory =
+  | 'root'
+  | 'polymorph'
+  | 'fear'
+  | 'openerStun'
+  | 'controlledStun'
+  | 'randomStun';
 
 export interface CrowdControlDrState {
   stage: number;
@@ -205,17 +264,28 @@ export type ItemUse =
 // rank unlocks its own tier and every tier below it (epic unlocks rare+uncommon).
 export type SkinRank = 'uncommon' | 'rare' | 'epic';
 
-export interface ItemDef {
+export type ArmorType = 'cloth' | 'leather' | 'mail';
+
+type ItemKind =
+  | 'weapon'
+  | 'armor'
+  | 'quest'
+  | 'junk'
+  | 'food'
+  | 'drink'
+  | 'tool'
+  | 'potion'
+  | 'elixir';
+
+interface BaseItemDef {
   id: string;
   name: string;
-  kind: 'weapon' | 'armor' | 'quest' | 'junk' | 'food' | 'drink' | 'tool' | 'potion' | 'elixir';
   slot?: EquipSlot;
   weapon?: WeaponInfo;
   stats?: Partial<Stats>;
   use?: ItemUse;
   sellValue: number; // copper (vendor buys at this)
   buyValue?: number; // copper (vendor sells at this)
-  armorType?: 'cloth' | 'leather' | 'mail';
   questId?: string;
   noVendorSell?: boolean;
   noDiscard?: boolean;
@@ -237,6 +307,27 @@ export interface ItemDef {
   quality?: 'poor' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'; // gray/white/green/blue/purple/orange name colors
   requiredClass?: PlayerClass[];
 }
+
+export interface ArmorItemDef extends BaseItemDef {
+  kind: 'armor';
+  slot: Exclude<EquipSlot, 'mainhand'>;
+  armorType: ArmorType;
+  weapon?: never;
+}
+
+export interface WeaponItemDef extends BaseItemDef {
+  kind: 'weapon';
+  slot: 'mainhand';
+  weapon: WeaponInfo;
+  armorType?: never;
+}
+
+export interface OtherItemDef extends BaseItemDef {
+  kind: Exclude<ItemKind, 'armor' | 'weapon'>;
+  armorType?: never;
+}
+
+export type ItemDef = ArmorItemDef | WeaponItemDef | OtherItemDef;
 
 export interface InvSlot {
   itemId: string;
@@ -879,7 +970,16 @@ export type AbilityEffect =
   | { type: 'aoeAttackSpeed'; mult: number; duration: number; radius: number } // thunder clap rider
   | { type: 'aoeAttackPower'; amount: number; duration: number; radius: number } // demoralizing roar/shout
   | { type: 'aoeRoot'; duration: number; radius: number; min: number; max: number }
-  | { type: 'selfBuff'; kind: AuraKind; value: number; duration: number }
+  | {
+      type: 'selfBuff';
+      kind: AuraKind;
+      value: number;
+      duration: number;
+      // thorns auras only: a charge-limited reflect (Lightning Shield) caps how
+      // many melee hits reflect, gated by an internal cooldown between reflects.
+      charges?: number;
+      internalCooldown?: number;
+    }
   | { type: 'finisherHaste'; mult: number; basedur: number; perCombo: number } // slice and dice
   | { type: 'finisherStun'; base: number; perCombo: number } // kidney shot: stun seconds scale with combo
   | { type: 'gainResource'; amount: number } // bloodrage immediate
@@ -924,6 +1024,11 @@ export interface AbilityDef {
   // multiplier on the damage-threat (both scale with stance/form modifiers).
   threat?: { flat?: number; mult?: number };
   requiresForm?: 'bear' | 'cat'; // druid form kit (maul/growl/swipe/claw/bite)
+  // Mutually exclusive self-buff group: casting one ability in the group cancels
+  // any active buff from a sibling in the same group (e.g. hunter aspects, where
+  // only one aspect may be active at a time). Distinct from form toggles, which
+  // are excluded by aura kind, not by group.
+  exclusiveGroup?: string;
   requiresStealth?: boolean; // ambush
   requiresOutOfCombat?: boolean; // stealth
   learnLevel: number;
@@ -1251,6 +1356,7 @@ export interface Entity {
   gm?: boolean;
   respawnTimer: number;
   corpseTimer: number;
+  lootFfaTimer: number; // seconds of owner-lock left before tap loot opens to all (FFA); Infinity until rollLoot starts it
   despawnTimer?: number;
   damageIdleDespawnTimer?: number;
   lootable: boolean;
@@ -1336,7 +1442,7 @@ export type SimEvent = { pid?: number } & (
       crit: boolean;
       school: string;
       ability: string | null;
-      kind: 'hit' | 'miss' | 'dodge' | 'parry';
+      kind: 'hit' | 'miss' | 'dodge' | 'parry' | 'resist';
     }
   | { type: 'heal'; targetId: number; amount: number }
   | { type: 'death'; entityId: number; killerId: number }
@@ -1579,6 +1685,14 @@ export const XP_TABLE = [
   17700, 19400, 21300, 23200,
 ];
 export const MAX_LEVEL = 20;
+
+// Shared sim constants relocated here (C1) so both sim.ts and the extracted damage
+// core (src/sim/combat/damage.ts) can import them without a sim.ts cycle.
+export const PARTY_XP_RANGE = 80; // yards: members this close share kill xp/credit
+// Nythraxis raid boss template id. Used by the damage-core death path (lockout on
+// boss death) and the still-on-Sim encounter logic; N1 may re-home it when it owns
+// the encounter. Kept here as the neutral shared seam in the meantime.
+export const NYTHRAXIS_BOSS_ID = 'nythraxis_scourge_of_thornpeak';
 
 export function xpForLevel(level: number): number {
   return XP_TABLE[Math.min(level - 1, XP_TABLE.length - 1)];

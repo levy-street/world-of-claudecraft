@@ -3,23 +3,36 @@ import { MECH_CHROMAS } from '../src/sim/content/skins';
 
 const openPlaySession = vi.fn(async () => 1);
 const closePlaySession = vi.fn(async () => {});
-const markAccountQuestComplete = vi.fn(async (_accountId: number, questId: string) => ({ completedQuestIds: [questId], mechChromaIds: [] }));
-const grantAccountMechChroma = vi.fn(async (_accountId: number, chromaId: string) => ({ completedQuestIds: [], mechChromaIds: [chromaId] }));
-const revokeAccountMechChroma = vi.fn(async (_accountId: number, _chromaId: string) => ({ completedQuestIds: [], mechChromaIds: [] }));
+const markAccountQuestComplete = vi.fn(async (_accountId: number, questId: string) => ({
+  completedQuestIds: [questId],
+  mechChromaIds: [],
+}));
+const grantAccountMechChroma = vi.fn(async (_accountId: number, chromaId: string) => ({
+  completedQuestIds: [],
+  mechChromaIds: [chromaId],
+}));
+const revokeAccountMechChroma = vi.fn(async (_accountId: number, _chromaId: string) => ({
+  completedQuestIds: [],
+  mechChromaIds: [],
+}));
 
 vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
+  saveCharacterAndMarketState: vi.fn(async () => {}),
   openPlaySession: (...args: unknown[]) => openPlaySession(...(args as [])),
   closePlaySession: (...args: unknown[]) => closePlaySession(...(args as [])),
   insertChatLogs: vi.fn(async () => {}),
-  markAccountQuestComplete: (...args: unknown[]) => markAccountQuestComplete(...(args as [number, string])),
-  grantAccountMechChroma: (...args: unknown[]) => grantAccountMechChroma(...(args as [number, string])),
-  revokeAccountMechChroma: (...args: unknown[]) => revokeAccountMechChroma(...(args as [number, string])),
+  markAccountQuestComplete: (...args: unknown[]) =>
+    markAccountQuestComplete(...(args as [number, string])),
+  grantAccountMechChroma: (...args: unknown[]) =>
+    grantAccountMechChroma(...(args as [number, string])),
+  revokeAccountMechChroma: (...args: unknown[]) =>
+    revokeAccountMechChroma(...(args as [number, string])),
 }));
 
-import { GameServer, type ClientSession } from '../server/game';
-import { saveCharacterState } from '../server/db';
+import { saveCharacterAndMarketState, saveCharacterState } from '../server/db';
+import { type ClientSession, GameServer } from '../server/game';
 
 function fakeWs() {
   return {
@@ -37,16 +50,11 @@ function expectJoined(result: ClientSession | { error: string }): ClientSession 
 describe('GameServer sessions', () => {
   it('applies account-wide quest lockouts when a character joins', () => {
     const server = new GameServer();
-    const session = expectJoined(server.join(
-      fakeWs(),
-      11,
-      101,
-      'Lockedout',
-      'warrior',
-      null,
-      false,
-      { accountCosmetics: { completedQuestIds: ['q_aldrics_fallen_star'], mechChromaIds: [] } },
-    ));
+    const session = expectJoined(
+      server.join(fakeWs(), 11, 101, 'Lockedout', 'warrior', null, false, {
+        accountCosmetics: { completedQuestIds: ['q_aldrics_fallen_star'], mechChromaIds: [] },
+      }),
+    );
 
     expect(server.sim.questState('q_aldrics_fallen_star', session.pid)).toBe('done');
     expect(server.sim.meta(session.pid)?.questsDone.has('q_aldrics_fallen_star')).toBe(true);
@@ -58,14 +66,23 @@ describe('GameServer sessions', () => {
     const session = expectJoined(server.join(fakeWs(), 11, 101, 'Aldricdone', 'warrior', null));
     const meta = server.sim.meta(session.pid)!;
     const player = server.sim.entities.get(session.pid)!;
-    const aldric = [...server.sim.entities.values()].find((e) => e.kind === 'npc' && e.templateId === 'brother_aldric_fen')!;
+    const aldric = [...server.sim.entities.values()].find(
+      (e) => e.kind === 'npc' && e.templateId === 'brother_aldric_fen',
+    )!;
     const pos = server.sim.groundPos(aldric.pos.x + 1, aldric.pos.z);
     player.pos = { ...pos };
     player.prevPos = { ...pos };
-    meta.questLog.set('q_aldrics_fallen_star', { questId: 'q_aldrics_fallen_star', counts: [1], state: 'ready' });
+    meta.questLog.set('q_aldrics_fallen_star', {
+      questId: 'q_aldrics_fallen_star',
+      counts: [1],
+      state: 'ready',
+    });
     server.sim.addItem('unknown_alien_weaponry', 1, session.pid);
 
-    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'turnin', quest: 'q_aldrics_fallen_star' }));
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'turnin', quest: 'q_aldrics_fallen_star' }),
+    );
 
     expect(markAccountQuestComplete).toHaveBeenCalledWith(11, 'q_aldrics_fallen_star');
     expect(session.accountCosmetics.completedQuestIds).toContain('q_aldrics_fallen_star');
@@ -80,14 +97,20 @@ describe('GameServer sessions', () => {
     expect(choice).toBeGreaterThanOrEqual(0);
     server.sim.addItem('alien_armor_plate', 1, session.pid);
 
-    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'use', item: 'alien_armor_plate' }));
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'use', item: 'alien_armor_plate' }),
+    );
 
     expect(grantAccountMechChroma).not.toHaveBeenCalled();
     expect(session.accountCosmetics.mechChromaIds).not.toContain(MECH_CHROMAS[choice].id);
     expect(server.sim.countItem('alien_armor_plate', session.pid)).toBe(1);
     expect(server.sim.entities.get(session.pid)?.skinCatalog).not.toBe('mech');
 
-    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'claim_event_skin', skin: choice }));
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'claim_event_skin', skin: choice }),
+    );
 
     expect(grantAccountMechChroma).toHaveBeenCalledWith(11, MECH_CHROMAS[choice].id);
     expect(session.accountCosmetics.mechChromaIds).toContain(MECH_CHROMAS[choice].id);
@@ -97,13 +120,21 @@ describe('GameServer sessions', () => {
 
   it('equips a live mech appearance only when the account owns the chroma', () => {
     const server = new GameServer();
-    const allowed = expectJoined(server.join(fakeWs(), 11, 101, 'Mechwearer', 'shaman', null, false, {
-      accountCosmetics: { completedQuestIds: [], mechChromaIds: ['amber_crimson'] },
-    }));
+    const allowed = expectJoined(
+      server.join(fakeWs(), 11, 101, 'Mechwearer', 'shaman', null, false, {
+        accountCosmetics: { completedQuestIds: [], mechChromaIds: ['amber_crimson'] },
+      }),
+    );
     const blocked = expectJoined(server.join(fakeWs(), 12, 102, 'Blockedmech', 'shaman', null));
 
-    server.handleMessage(allowed, JSON.stringify({ t: 'cmd', cmd: 'change_skin', skin: 0, catalog: 'mech' }));
-    server.handleMessage(blocked, JSON.stringify({ t: 'cmd', cmd: 'change_skin', skin: 0, catalog: 'mech' }));
+    server.handleMessage(
+      allowed,
+      JSON.stringify({ t: 'cmd', cmd: 'change_skin', skin: 0, catalog: 'mech' }),
+    );
+    server.handleMessage(
+      blocked,
+      JSON.stringify({ t: 'cmd', cmd: 'change_skin', skin: 0, catalog: 'mech' }),
+    );
 
     expect(server.sim.entities.get(allowed.pid)?.skinCatalog).toBe('mech');
     expect(server.sim.entities.get(blocked.pid)?.skinCatalog).not.toBe('mech');
@@ -113,12 +144,29 @@ describe('GameServer sessions', () => {
     revokeAccountMechChroma.mockClear();
     const server = new GameServer();
     const cosmetics = { completedQuestIds: [], mechChromaIds: ['amber_crimson'] };
-    const first = expectJoined(server.join(fakeWs(), 11, 101, 'Mechone', 'shaman', null, false, { accountCosmetics: cosmetics }));
-    const second = expectJoined(server.join(fakeWs(), 11, 102, 'Mechtwo', 'mage', null, false, { accountCosmetics: cosmetics }));
+    const first = expectJoined(
+      server.join(fakeWs(), 11, 101, 'Mechone', 'shaman', null, false, {
+        accountCosmetics: cosmetics,
+      }),
+    );
+    const second = expectJoined(
+      server.join(fakeWs(), 11, 102, 'Mechtwo', 'mage', null, false, {
+        accountCosmetics: cosmetics,
+      }),
+    );
 
-    server.handleMessage(first, JSON.stringify({ t: 'cmd', cmd: 'change_skin', skin: 0, catalog: 'mech' }));
-    server.handleMessage(second, JSON.stringify({ t: 'cmd', cmd: 'change_skin', skin: 0, catalog: 'mech' }));
-    server.handleMessage(first, JSON.stringify({ t: 'cmd', cmd: 'unequip_mech_chroma', chroma: 'amber_crimson' }));
+    server.handleMessage(
+      first,
+      JSON.stringify({ t: 'cmd', cmd: 'change_skin', skin: 0, catalog: 'mech' }),
+    );
+    server.handleMessage(
+      second,
+      JSON.stringify({ t: 'cmd', cmd: 'change_skin', skin: 0, catalog: 'mech' }),
+    );
+    server.handleMessage(
+      first,
+      JSON.stringify({ t: 'cmd', cmd: 'unequip_mech_chroma', chroma: 'amber_crimson' }),
+    );
 
     expect(revokeAccountMechChroma).toHaveBeenCalledWith(11, 'amber_crimson');
     expect(first.accountCosmetics.mechChromaIds).not.toContain('amber_crimson');
@@ -154,12 +202,14 @@ describe('GameServer sessions', () => {
     const first = expectJoined(server.join(fakeWs(), 11, 101, 'Indexa', 'warrior', null));
 
     let resolveSave!: () => void;
-    const slowSave = new Promise<void>((resolve) => { resolveSave = resolve; });
-    vi.mocked(saveCharacterState).mockImplementationOnce(() => slowSave);
+    const slowSave = new Promise<void>((resolve) => {
+      resolveSave = resolve;
+    });
+    vi.mocked(saveCharacterAndMarketState).mockImplementationOnce(() => slowSave);
 
     const leaving = server.leave(first, 'test');
     await vi.waitFor(() => {
-      expect(saveCharacterState).toHaveBeenCalled();
+      expect(saveCharacterAndMarketState).toHaveBeenCalled();
     });
 
     expect((server as any).sessionByCharacterId(101)).toBe(first);
@@ -177,8 +227,8 @@ describe('GameServer sessions', () => {
 
   it('retries failed disconnect saves before releasing the character for rejoin', async () => {
     vi.useFakeTimers();
-    vi.mocked(saveCharacterState).mockReset();
-    vi.mocked(saveCharacterState)
+    vi.mocked(saveCharacterAndMarketState).mockReset();
+    vi.mocked(saveCharacterAndMarketState)
       .mockRejectedValueOnce(new Error('temporary database outage'))
       .mockRejectedValueOnce(new Error('temporary database outage'))
       .mockResolvedValueOnce(undefined);
@@ -189,7 +239,7 @@ describe('GameServer sessions', () => {
       const leaving = server.leave(session, 'test');
 
       await vi.waitFor(() => {
-        expect(saveCharacterState).toHaveBeenCalledTimes(1);
+        expect(saveCharacterAndMarketState).toHaveBeenCalledTimes(1);
       });
       expect(server.join(fakeWs(), 12, 101, 'Indexa', 'warrior', null)).toEqual({
         error: 'character already in world',
@@ -197,13 +247,13 @@ describe('GameServer sessions', () => {
 
       await vi.runOnlyPendingTimersAsync();
       await vi.waitFor(() => {
-        expect(saveCharacterState).toHaveBeenCalledTimes(2);
+        expect(saveCharacterAndMarketState).toHaveBeenCalledTimes(2);
       });
 
       await vi.runOnlyPendingTimersAsync();
       await leaving;
 
-      expect(saveCharacterState).toHaveBeenCalledTimes(3);
+      expect(saveCharacterAndMarketState).toHaveBeenCalledTimes(3);
       expect((server as any).sessionByCharacterId(101)).toBeNull();
     } finally {
       vi.useRealTimers();
@@ -218,7 +268,9 @@ describe('GameServer sessions', () => {
     const session = expectJoined(server.join(fakeWs(), 11, 101, 'Saverace', 'warrior', null));
 
     let resolveFirstSave!: () => void;
-    const firstSave = new Promise<void>((resolve) => { resolveFirstSave = resolve; });
+    const firstSave = new Promise<void>((resolve) => {
+      resolveFirstSave = resolve;
+    });
     vi.mocked(saveCharacterState).mockImplementationOnce(() => firstSave);
 
     const first = server.saveCharacter(session);
@@ -248,7 +300,10 @@ describe('GameServer sessions', () => {
     // Defer the openPlaySession insert so the player can disconnect first.
     let resolveOpen!: (id: number) => void;
     openPlaySession.mockImplementationOnce(
-      () => new Promise<number>((resolve) => { resolveOpen = resolve; }),
+      () =>
+        new Promise<number>((resolve) => {
+          resolveOpen = resolve;
+        }),
     );
 
     const server = new GameServer();
@@ -327,7 +382,9 @@ describe('GameServer sessions', () => {
     vi.mocked(saveCharacterState).mockResolvedValue(undefined);
     const server = new GameServer();
     const ip = '203.0.113.8';
-    const a = expectJoined(server.join(fakeWs(), 43, 403, 'Ipsolo', 'warrior', null, false, { ip }));
+    const a = expectJoined(
+      server.join(fakeWs(), 43, 403, 'Ipsolo', 'warrior', null, false, { ip }),
+    );
     const b = expectJoined(server.join(fakeWs(), 44, 404, 'Ipkick', 'rogue', null, false, { ip }));
     expect(server.countIpSessions(ip)).toBe(2);
 
@@ -344,7 +401,9 @@ describe('GameServer sessions', () => {
     const server = new GameServer();
     const ip1 = '198.51.100.1';
     const ip2 = '198.51.100.2';
-    const a = expectJoined(server.join(fakeWs(), 45, 405, 'Neta', 'warrior', null, false, { ip: ip1 }));
+    const a = expectJoined(
+      server.join(fakeWs(), 45, 405, 'Neta', 'warrior', null, false, { ip: ip1 }),
+    );
     expectJoined(server.join(fakeWs(), 46, 406, 'Netb', 'mage', null, false, { ip: ip2 }));
     expect(server.countIpSessions(ip1)).toBe(1);
     expect(server.countIpSessions(ip2)).toBe(1);
@@ -411,7 +470,9 @@ describe('GameServer sessions', () => {
     // The client is told why and the socket is torn down (mirrors the other
     // kick paths), so net/online.ts surfaces the disconnect and the app can
     // return to character select.
-    expect(ws.send).toHaveBeenCalledWith(JSON.stringify({ t: 'error', error: 'rejected by server' }));
+    expect(ws.send).toHaveBeenCalledWith(
+      JSON.stringify({ t: 'error', error: 'rejected by server' }),
+    );
     expect(ws.close).toHaveBeenCalled();
 
     // The character slot is freed: the same character can enter the world again.

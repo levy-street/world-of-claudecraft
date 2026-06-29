@@ -73,10 +73,48 @@ VITE_API_ORIGIN=http://192.168.1.247 npm run native:sync
 Replace the IP with the Mac's current Wi-Fi/LAN address. Do not use
 `localhost` for a physical phone; that resolves to the phone itself.
 
+## Over The Air Updates
+
+The native apps include the Ionic Appflow Capacitor Live Updates SDK. It is
+configured in `capacitor.config.ts` with:
+
+| Setting | Value |
+|---|---|
+| Appflow app ID | `9fa1b0c1` |
+| Channel | `Production` |
+| Update method | `background` |
+
+Background updates are downloaded after app launch and become active on the next
+launch. Use this for web asset fixes only: HTML, CSS, JavaScript, bundled media,
+copy, and other client code already inside the Capacitor web build. Changes to
+native code, app icons, splash screens, permissions, entitlements, Capacitor
+config, or native plugin versions still require a new App Store or Play Store
+binary.
+
+After changing the Live Updates config or native dependencies, run:
+
+```sh
+npm run native:sync
+```
+
+To ship an OTA update after the app-store binary containing Live Updates has
+been approved:
+
+1. Build the web app in Appflow from the target Git commit.
+2. Assign the web build to the `Production` Live Update channel.
+3. Test on a store or TestFlight build by launching once to download the update,
+   then closing and relaunching the app to apply it.
+
 ## Store Review Notes
 
 - App name: World of ClaudeCraft.
 - Bundle/application ID: `com.worldofclaudecraft`.
+- App Store tags: Action, Fantasy, Free, Co-Op, PvP, Leaderboard, MMO,
+  Multiplayer, Open World.
+- The iOS asset catalog includes Light, Dark, and Tinted app icon variants. The
+  newer Clear appearance is an Icon Composer workflow, not a PNG appiconset slot;
+  create and add a matching `AppIcon.icon` asset in Xcode when adopting Apple's
+  Liquid Glass icon format.
 - First store release hides Donate, GitHub Sponsors, and token contract CTAs in
   native builds.
 - Online play uses the hosted production REST and WebSocket backend.

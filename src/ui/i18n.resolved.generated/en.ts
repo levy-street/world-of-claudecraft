@@ -222,6 +222,21 @@ export const en: EnTranslations = {
     "rest": {
       "resting": "Resting"
     },
+    "unitFrame": {
+      "playerLabel": "Your Hero",
+      "targetLabel": "Your Mark",
+      "targetAnnounce": "Mark {name}",
+      "partyLabel": "Your Band",
+      "partyGroup": "Group {n}",
+      "durationUnitSeconds": "s"
+    },
+    "character": {
+      "modelPreview": "Character Model Preview"
+    },
+    "skipLinks": {
+      "mainHud": "Skip to Main HUD",
+      "chat": "Skip to Chat"
+    },
     "mobile": {
       "autorun": "Autorun",
       "jump": "Jump",
@@ -243,6 +258,13 @@ export const en: EnTranslations = {
       "coordinates": "Coordinates",
       "heading": "Heading",
       "minimapZoom": "Minimap zoom"
+    },
+    "castBar": {
+      "playerAria": "Your Cast Bar",
+      "targetAria": "Unit Cast Bar"
+    },
+    "leaderboard": {
+      "close": "Close"
     },
     "raidLockout": {
       "title": "Raid Lockouts",
@@ -583,6 +605,91 @@ export const en: EnTranslations = {
       "notRaid": "Your group is not a raid.",
       "leaderOnly": "Only the raid leader may convert to a party.",
       "tooLarge": "A raid with more than five members cannot convert back to a party."
+    },
+    "itemArmorType": {
+      "cloth": "Cloth",
+      "leather": "Leather",
+      "mail": "Mail"
+    },
+    "auraEffect": {
+      "dot": "Deals {value} {school} damage every {interval} sec",
+      "hot": "Restores {value} health every {interval} sec",
+      "absorb": "Absorbs {value} damage",
+      "healAbsorb": "Absorbs {value} incoming healing",
+      "thorns": "Deals {value} {school} damage to attackers",
+      "slow": "Reduces movement speed by {pct}%",
+      "speed": "Increases movement speed by {pct}%",
+      "attackSpeedSlow": "Slows attack speed by {pct}%",
+      "attackSpeedFast": "Increases attack speed by {pct}%",
+      "haste": "Increases attack and casting speed by {pct}%",
+      "tongues": "Increases casting time by {pct}%",
+      "increase": {
+        "ap": "Increases attack power by {value}",
+        "armor": "Increases armor by {value}",
+        "int": "Increases Intellect by {value}",
+        "agi": "Increases Agility by {value}",
+        "sta": "Increases Stamina by {value}",
+        "spi": "Increases Spirit by {value}",
+        "allStats": "Increases all attributes by {value}"
+      },
+      "reduce": {
+        "ap": "Reduces attack power by {value}",
+        "armor": "Reduces armor by {value}",
+        "int": "Reduces Intellect by {value}",
+        "agi": "Reduces Agility by {value}",
+        "sta": "Reduces Stamina by {value}",
+        "spi": "Reduces Spirit by {value}",
+        "allStats": "Reduces all attributes by {value}"
+      },
+      "dodge": "Increases dodge chance by {pct}%",
+      "dodgeReduce": "Reduces dodge chance by {pct}%",
+      "armorFlat": "Reduces armor by {value}",
+      "armorFlatStacks": "Reduces armor by {value} ({stacks} stacks)",
+      "mortalWound": "Reduces healing received by {pct}%",
+      "vulnerability": "Increases damage taken by {pct}%",
+      "physVuln": "Increases physical damage taken by {pct}%",
+      "spellVuln": "Increases magic damage taken by {pct}%",
+      "critVuln": "Increases chance to be critically hit by {pct}%",
+      "costTax": "Increases ability costs by {pct}%",
+      "stun": "Stunned: unable to act",
+      "root": "Rooted: unable to move",
+      "incapacitate": "Incapacitated: unable to act",
+      "polymorph": "Polymorphed: unable to act",
+      "hex": "Reduces damage and healing dealt by {pct}%",
+      "blind": "Blinded: unable to act",
+      "silence": "Silenced: unable to cast spells",
+      "disarm": "Disarmed: cannot use weapon attacks",
+      "lockout": "Spell school locked out",
+      "imbue": "Weapon imbued with bonus effects",
+      "imbueRange": "Weapon imbued: {min} to {max} bonus damage on judgement",
+      "stealth": "Concealed; movement speed reduced by {pct}%",
+      "formBear": "Bear Form: increased health and armor",
+      "formCat": "Cat Form: melee damage and energy",
+      "formTravel": "Travel Form: movement speed increased by {pct}%",
+      "defensiveStance": "Defensive Stance: reduced damage taken, more threat",
+      "righteousFury": "Righteous Fury: greatly increased threat from Holy damage",
+      "scale": "Size increased by {pct}%",
+      "jump": "Jump height increased by {pct}%",
+      "school": {
+        "physical": "Physical",
+        "fire": "Fire",
+        "frost": "Frost",
+        "arcane": "Arcane",
+        "shadow": "Shadow",
+        "holy": "Holy",
+        "nature": "Nature"
+      }
+    },
+    "loot": {
+      "chestTitle": "Chest"
+    },
+    "spellbook": {
+      "addToBarAria": "Add {name} to action bar",
+      "removeFromBarAria": "Remove {name} from action bar"
+    },
+    "nameplate": {
+      "mob": "[{level}] {name}",
+      "mobElite": "[{level}+] {name}"
     }
   },
   "guide": {
@@ -2409,7 +2516,9 @@ export const en: EnTranslations = {
       "mobileMap": "Map",
       "closeMap": "Close map",
       "zoomIn": "Zoom in",
-      "zoomOut": "Zoom out"
+      "zoomOut": "Zoom out",
+      "mapCanvasLabel": "Map",
+      "mapSummary": "Map of {zone}."
     },
     "options": {
       "gameMenu": "Game Menu",
@@ -2610,6 +2719,7 @@ export const en: EnTranslations = {
     "combat": {
       "floatingMiss": "Miss",
       "floatingDodge": "Dodge",
+      "floatingResist": "Resist",
       "cannotMove": "Can't move!",
       "attack": "attack",
       "damageDone": "Your {ability} hits {target} for {amount}.",
@@ -2618,6 +2728,7 @@ export const en: EnTranslations = {
       "damageTakenCrit": "{source} critically hits you for {amount}.",
       "miss": "Your {ability} misses {target}.",
       "dodged": "Your {ability} is dodged by {target}.",
+      "resisted": "Your {ability} is resisted by {target}.",
       "healSelf": "Your {ability} heals you for {amount}.",
       "healSelfCrit": "Your {ability} critically heals you for {amount}.",
       "healOther": "Your {ability} heals {target} for {amount}.",
@@ -3412,7 +3523,7 @@ export const en: EnTranslations = {
       },
       "stealth": {
         "name": "Stealth",
-        "description": "Conceals you in the shadows: enemies barely notice you, but you move 30% slower. Attacking or taking damage breaks Stealth. Cast again to step out."
+        "description": "Conceals you in the shadows: enemies barely notice you, but you move 50% slower. Attacking or taking damage breaks Stealth. Cast again to step out."
       },
       "adrenaline_rush": {
         "name": "Adrenaline Rush",
@@ -3444,7 +3555,7 @@ export const en: EnTranslations = {
       },
       "vanish": {
         "name": "Vanish",
-        "description": "Vanish from sight, entering Stealth even in combat. You move 30% slower while hidden. Lasts up to 10 sec."
+        "description": "Vanish from sight, entering Stealth even in combat. You move 50% slower while hidden. Lasts up to 10 sec."
       },
       "instant_poison": {
         "name": "Instant Poison",
@@ -3620,7 +3731,7 @@ export const en: EnTranslations = {
       },
       "lightning_shield": {
         "name": "Lightning Shield",
-        "description": "Surrounds you with crackling lightning: melee attackers take 13 Nature damage."
+        "description": "Surrounds you with crackling lightning: melee attackers take 13 Nature damage, up to 3 charges and at most once every 5 seconds."
       },
       "flame_shock": {
         "name": "Flame Shock",
@@ -3852,7 +3963,7 @@ export const en: EnTranslations = {
       },
       "prowl": {
         "name": "Prowl",
-        "description": "Enter stealth while in Wolf Form. Cannot be used in combat."
+        "description": "Enter stealth while in Wolf Form, moving 50% slower. Cannot be used in combat."
       },
       "rake": {
         "name": "Rake",

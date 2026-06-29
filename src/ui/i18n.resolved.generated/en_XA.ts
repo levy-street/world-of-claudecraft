@@ -222,6 +222,21 @@ export const en_XA: EnTranslations = {
     "rest": {
       "resting": "[Ŕéšţíñĝ]"
     },
+    "unitFrame": {
+      "playerLabel": "[Ýóúŕ Ĥéŕó]",
+      "targetLabel": "[Ýóúŕ Ɱáŕķ]",
+      "targetAnnounce": "[Ɱáŕķ {name}]",
+      "partyLabel": "[Ýóúŕ Ɓáñð]",
+      "partyGroup": "[Ĝŕóúþ {n}]",
+      "durationUnitSeconds": "[š]"
+    },
+    "character": {
+      "modelPreview": "[Çĥáŕáçţéŕ Ɱóðéļ Þŕéʋíéŵ]"
+    },
+    "skipLinks": {
+      "mainHud": "[Šķíþ ţó Ɱáíñ ĤÚÐ]",
+      "chat": "[Šķíþ ţó Çĥáţ]"
+    },
     "mobile": {
       "autorun": "[Áúţóŕúñ]",
       "jump": "[Ĵúɱþ]",
@@ -243,6 +258,13 @@ export const en_XA: EnTranslations = {
       "coordinates": "[Çóóŕðíñáţéš]",
       "heading": "[Ĥéáðíñĝ]",
       "minimapZoom": "[Ɱíñíɱáþ žóóɱ]"
+    },
+    "castBar": {
+      "playerAria": "[Ýóúŕ Çášţ Ɓáŕ]",
+      "targetAria": "[Úñíţ Çášţ Ɓáŕ]"
+    },
+    "leaderboard": {
+      "close": "[Çļóšé]"
     },
     "raidLockout": {
       "title": "[Ŕáíð Ļóçķóúţš]",
@@ -583,6 +605,91 @@ export const en_XA: EnTranslations = {
       "notRaid": "[Ýóúŕ ĝŕóúþ íš ñóţ á ŕáíð.]",
       "leaderOnly": "[Óñļý ţĥé ŕáíð ļéáðéŕ ɱáý çóñʋéŕţ ţó á þáŕţý.]",
       "tooLarge": "[Á ŕáíð ŵíţĥ ɱóŕé ţĥáñ ƒíʋé ɱéɱƀéŕš çáññóţ çóñʋéŕţ ƀáçķ ţó á þáŕţý.]"
+    },
+    "itemArmorType": {
+      "cloth": "[Çļóţĥ]",
+      "leather": "[Ļéáţĥéŕ]",
+      "mail": "[Ɱáíļ]"
+    },
+    "auraEffect": {
+      "dot": "[Ðéáļš {value} {school} ðáɱáĝé éʋéŕý {interval} šéç]",
+      "hot": "[Ŕéšţóŕéš {value} ĥéáļţĥ éʋéŕý {interval} šéç]",
+      "absorb": "[Áƀšóŕƀš {value} ðáɱáĝé]",
+      "healAbsorb": "[Áƀšóŕƀš {value} íñçóɱíñĝ ĥéáļíñĝ]",
+      "thorns": "[Ðéáļš {value} {school} ðáɱáĝé ţó áţţáçķéŕš]",
+      "slow": "[Ŕéðúçéš ɱóʋéɱéñţ šþééð ƀý {pct}%]",
+      "speed": "[Íñçŕéášéš ɱóʋéɱéñţ šþééð ƀý {pct}%]",
+      "attackSpeedSlow": "[Šļóŵš áţţáçķ šþééð ƀý {pct}%]",
+      "attackSpeedFast": "[Íñçŕéášéš áţţáçķ šþééð ƀý {pct}%]",
+      "haste": "[Íñçŕéášéš áţţáçķ áñð çášţíñĝ šþééð ƀý {pct}%]",
+      "tongues": "[Íñçŕéášéš çášţíñĝ ţíɱé ƀý {pct}%]",
+      "increase": {
+        "ap": "[Íñçŕéášéš áţţáçķ þóŵéŕ ƀý {value}]",
+        "armor": "[Íñçŕéášéš áŕɱóŕ ƀý {value}]",
+        "int": "[Íñçŕéášéš Íñţéļļéçţ ƀý {value}]",
+        "agi": "[Íñçŕéášéš Áĝíļíţý ƀý {value}]",
+        "sta": "[Íñçŕéášéš Šţáɱíñá ƀý {value}]",
+        "spi": "[Íñçŕéášéš Šþíŕíţ ƀý {value}]",
+        "allStats": "[Íñçŕéášéš áļļ áţţŕíƀúţéš ƀý {value}]"
+      },
+      "reduce": {
+        "ap": "[Ŕéðúçéš áţţáçķ þóŵéŕ ƀý {value}]",
+        "armor": "[Ŕéðúçéš áŕɱóŕ ƀý {value}]",
+        "int": "[Ŕéðúçéš Íñţéļļéçţ ƀý {value}]",
+        "agi": "[Ŕéðúçéš Áĝíļíţý ƀý {value}]",
+        "sta": "[Ŕéðúçéš Šţáɱíñá ƀý {value}]",
+        "spi": "[Ŕéðúçéš Šþíŕíţ ƀý {value}]",
+        "allStats": "[Ŕéðúçéš áļļ áţţŕíƀúţéš ƀý {value}]"
+      },
+      "dodge": "[Íñçŕéášéš ðóðĝé çĥáñçé ƀý {pct}%]",
+      "dodgeReduce": "[Ŕéðúçéš ðóðĝé çĥáñçé ƀý {pct}%]",
+      "armorFlat": "[Ŕéðúçéš áŕɱóŕ ƀý {value}]",
+      "armorFlatStacks": "[Ŕéðúçéš áŕɱóŕ ƀý {value} ({stacks} šţáçķš)]",
+      "mortalWound": "[Ŕéðúçéš ĥéáļíñĝ ŕéçéíʋéð ƀý {pct}%]",
+      "vulnerability": "[Íñçŕéášéš ðáɱáĝé ţáķéñ ƀý {pct}%]",
+      "physVuln": "[Íñçŕéášéš þĥýšíçáļ ðáɱáĝé ţáķéñ ƀý {pct}%]",
+      "spellVuln": "[Íñçŕéášéš ɱáĝíç ðáɱáĝé ţáķéñ ƀý {pct}%]",
+      "critVuln": "[Íñçŕéášéš çĥáñçé ţó ƀé çŕíţíçáļļý ĥíţ ƀý {pct}%]",
+      "costTax": "[Íñçŕéášéš áƀíļíţý çóšţš ƀý {pct}%]",
+      "stun": "[Šţúññéð: úñáƀļé ţó áçţ]",
+      "root": "[Ŕóóţéð: úñáƀļé ţó ɱóʋé]",
+      "incapacitate": "[Íñçáþáçíţáţéð: úñáƀļé ţó áçţ]",
+      "polymorph": "[Þóļýɱóŕþĥéð: úñáƀļé ţó áçţ]",
+      "hex": "[Ŕéðúçéš ðáɱáĝé áñð ĥéáļíñĝ ðéáļţ ƀý {pct}%]",
+      "blind": "[Ɓļíñðéð: úñáƀļé ţó áçţ]",
+      "silence": "[Šíļéñçéð: úñáƀļé ţó çášţ šþéļļš]",
+      "disarm": "[Ðíšáŕɱéð: çáññóţ úšé ŵéáþóñ áţţáçķš]",
+      "lockout": "[Šþéļļ šçĥóóļ ļóçķéð óúţ]",
+      "imbue": "[Ŵéáþóñ íɱƀúéð ŵíţĥ ƀóñúš éƒƒéçţš]",
+      "imbueRange": "[Ŵéáþóñ íɱƀúéð: {min} ţó {max} ƀóñúš ðáɱáĝé óñ ĵúðĝéɱéñţ]",
+      "stealth": "[Çóñçéáļéð; ɱóʋéɱéñţ šþééð ŕéðúçéð ƀý {pct}%]",
+      "formBear": "[Ɓéáŕ Ƒóŕɱ: íñçŕéášéð ĥéáļţĥ áñð áŕɱóŕ]",
+      "formCat": "[Çáţ Ƒóŕɱ: ɱéļéé ðáɱáĝé áñð éñéŕĝý]",
+      "formTravel": "[Ţŕáʋéļ Ƒóŕɱ: ɱóʋéɱéñţ šþééð íñçŕéášéð ƀý {pct}%]",
+      "defensiveStance": "[Ðéƒéñšíʋé Šţáñçé: ŕéðúçéð ðáɱáĝé ţáķéñ, ɱóŕé ţĥŕéáţ]",
+      "righteousFury": "[Ŕíĝĥţéóúš Ƒúŕý: ĝŕéáţļý íñçŕéášéð ţĥŕéáţ ƒŕóɱ Ĥóļý ðáɱáĝé]",
+      "scale": "[Šížé íñçŕéášéð ƀý {pct}%]",
+      "jump": "[Ĵúɱþ ĥéíĝĥţ íñçŕéášéð ƀý {pct}%]",
+      "school": {
+        "physical": "[Þĥýšíçáļ]",
+        "fire": "[Ƒíŕé]",
+        "frost": "[Ƒŕóšţ]",
+        "arcane": "[Áŕçáñé]",
+        "shadow": "[Šĥáðóŵ]",
+        "holy": "[Ĥóļý]",
+        "nature": "[Ñáţúŕé]"
+      }
+    },
+    "loot": {
+      "chestTitle": "[Çĥéšţ]"
+    },
+    "spellbook": {
+      "addToBarAria": "[Áðð {name} ţó áçţíóñ ƀáŕ]",
+      "removeFromBarAria": "[Ŕéɱóʋé {name} ƒŕóɱ áçţíóñ ƀáŕ]"
+    },
+    "nameplate": {
+      "mob": "[[{level}] {name}]",
+      "mobElite": "[[{level}+] {name}]"
     }
   },
   "guide": {
@@ -2409,7 +2516,9 @@ export const en_XA: EnTranslations = {
       "mobileMap": "[Ɱáþ]",
       "closeMap": "[Çļóšé ɱáþ]",
       "zoomIn": "[Žóóɱ íñ]",
-      "zoomOut": "[Žóóɱ óúţ]"
+      "zoomOut": "[Žóóɱ óúţ]",
+      "mapCanvasLabel": "[Ɱáþ]",
+      "mapSummary": "[Ɱáþ óƒ {zone}.]"
     },
     "options": {
       "gameMenu": "[Ĝáɱé Ɱéñú]",
@@ -2610,6 +2719,7 @@ export const en_XA: EnTranslations = {
     "combat": {
       "floatingMiss": "[Ɱíšš]",
       "floatingDodge": "[Ðóðĝé]",
+      "floatingResist": "[Ŕéšíšţ]",
       "cannotMove": "[Çáñ'ţ ɱóʋé!]",
       "attack": "[áţţáçķ]",
       "damageDone": "[Ýóúŕ {ability} ĥíţš {target} ƒóŕ {amount}.]",
@@ -2618,6 +2728,7 @@ export const en_XA: EnTranslations = {
       "damageTakenCrit": "[{source} çŕíţíçáļļý ĥíţš ýóú ƒóŕ {amount}.]",
       "miss": "[Ýóúŕ {ability} ɱíššéš {target}.]",
       "dodged": "[Ýóúŕ {ability} íš ðóðĝéð ƀý {target}.]",
+      "resisted": "[Ýóúŕ {ability} íš ŕéšíšţéð ƀý {target}.]",
       "healSelf": "[Ýóúŕ {ability} ĥéáļš ýóú ƒóŕ {amount}.]",
       "healSelfCrit": "[Ýóúŕ {ability} çŕíţíçáļļý ĥéáļš ýóú ƒóŕ {amount}.]",
       "healOther": "[Ýóúŕ {ability} ĥéáļš {target} ƒóŕ {amount}.]",
@@ -3412,7 +3523,7 @@ export const en_XA: EnTranslations = {
       },
       "stealth": {
         "name": "[Šţéáļţĥ]",
-        "description": "[Çóñçéáļš ýóú íñ ţĥé šĥáðóŵš: éñéɱíéš ƀáŕéļý ñóţíçé ýóú, ƀúţ ýóú ɱóʋé 30% šļóŵéŕ. Áţţáçķíñĝ óŕ ţáķíñĝ ðáɱáĝé ƀŕéáķš Šţéáļţĥ. Çášţ áĝáíñ ţó šţéþ óúţ.]"
+        "description": "[Çóñçéáļš ýóú íñ ţĥé šĥáðóŵš: éñéɱíéš ƀáŕéļý ñóţíçé ýóú, ƀúţ ýóú ɱóʋé 50% šļóŵéŕ. Áţţáçķíñĝ óŕ ţáķíñĝ ðáɱáĝé ƀŕéáķš Šţéáļţĥ. Çášţ áĝáíñ ţó šţéþ óúţ.]"
       },
       "adrenaline_rush": {
         "name": "[Áðŕéñáļíñé Ŕúšĥ]",
@@ -3444,7 +3555,7 @@ export const en_XA: EnTranslations = {
       },
       "vanish": {
         "name": "[Ʋáñíšĥ]",
-        "description": "[Ʋáñíšĥ ƒŕóɱ šíĝĥţ, éñţéŕíñĝ Šţéáļţĥ éʋéñ íñ çóɱƀáţ. Ýóú ɱóʋé 30% šļóŵéŕ ŵĥíļé ĥíððéñ. Ļášţš úþ ţó 10 šéç.]"
+        "description": "[Ʋáñíšĥ ƒŕóɱ šíĝĥţ, éñţéŕíñĝ Šţéáļţĥ éʋéñ íñ çóɱƀáţ. Ýóú ɱóʋé 50% šļóŵéŕ ŵĥíļé ĥíððéñ. Ļášţš úþ ţó 10 šéç.]"
       },
       "instant_poison": {
         "name": "[Íñšţáñţ Þóíšóñ]",
@@ -3620,7 +3731,7 @@ export const en_XA: EnTranslations = {
       },
       "lightning_shield": {
         "name": "[Ļíĝĥţñíñĝ Šĥíéļð]",
-        "description": "[Šúŕŕóúñðš ýóú ŵíţĥ çŕáçķļíñĝ ļíĝĥţñíñĝ: ɱéļéé áţţáçķéŕš ţáķé 13 Ñáţúŕé ðáɱáĝé.]"
+        "description": "[Šúŕŕóúñðš ýóú ŵíţĥ çŕáçķļíñĝ ļíĝĥţñíñĝ: ɱéļéé áţţáçķéŕš ţáķé 13 Ñáţúŕé ðáɱáĝé, úþ ţó 3 çĥáŕĝéš áñð áţ ɱóšţ óñçé éʋéŕý 5 šéçóñðš.]"
       },
       "flame_shock": {
         "name": "[Ƒļáɱé Šĥóçķ]",
@@ -3852,7 +3963,7 @@ export const en_XA: EnTranslations = {
       },
       "prowl": {
         "name": "[Þŕóŵļ]",
-        "description": "[Éñţéŕ šţéáļţĥ ŵĥíļé íñ Ŵóļƒ Ƒóŕɱ. Çáññóţ ƀé úšéð íñ çóɱƀáţ.]"
+        "description": "[Éñţéŕ šţéáļţĥ ŵĥíļé íñ Ŵóļƒ Ƒóŕɱ, ɱóʋíñĝ 50% šļóŵéŕ. Çáññóţ ƀé úšéð íñ çóɱƀáţ.]"
       },
       "rake": {
         "name": "[Ŕáķé]",

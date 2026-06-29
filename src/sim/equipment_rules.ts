@@ -1,14 +1,24 @@
-import type { ItemDef, PlayerClass } from './types';
+import type { ArmorType, ItemDef, PlayerClass } from './types';
 
-export type ArmorType = 'cloth' | 'leather' | 'mail';
 type WeaponArchetype = 'warrior' | 'caster' | 'rogue';
 
 const MAIL_CLASSES = new Set<PlayerClass>(['warrior', 'paladin', 'shaman']);
 const LEATHER_CLASSES = new Set<PlayerClass>(['druid', 'rogue', 'hunter']);
-const CLOTH_CLASSES = new Set<PlayerClass>(['mage', 'priest', 'warlock']);
-const CASTER_ARCHETYPE_CLASSES = new Set<PlayerClass>(['mage', 'priest', 'warlock', 'druid']);
-const WARRIOR_WEAPON_CLASSES = new Set<PlayerClass>(['warrior', 'rogue', 'hunter', 'shaman', 'paladin']);
-const CASTER_WEAPON_CLASSES = new Set<PlayerClass>(['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid']);
+const WARRIOR_WEAPON_CLASSES = new Set<PlayerClass>([
+  'warrior',
+  'rogue',
+  'hunter',
+  'shaman',
+  'paladin',
+]);
+const CASTER_WEAPON_CLASSES = new Set<PlayerClass>([
+  'mage',
+  'priest',
+  'warlock',
+  'shaman',
+  'paladin',
+  'druid',
+]);
 const ROGUE_WEAPON_CLASSES = new Set<PlayerClass>(['rogue', 'hunter']);
 const OLD_WARRIOR_WEAPON_ARCHETYPE = new Set<PlayerClass>(['warrior', 'paladin', 'shaman']);
 const OLD_CASTER_WEAPON_ARCHETYPE = new Set<PlayerClass>(['mage', 'priest', 'warlock', 'druid']);
@@ -25,12 +35,7 @@ function subsetOf(classes: readonly PlayerClass[], allowed: ReadonlySet<PlayerCl
 
 export function armorTypeForItem(item: ItemDef): ArmorType | null {
   if (item.kind !== 'armor') return null;
-  if (item.armorType) return item.armorType;
-  if (!item.requiredClass) return null;
-  if (subsetOf(item.requiredClass, MAIL_CLASSES)) return 'mail';
-  if (subsetOf(item.requiredClass, LEATHER_CLASSES)) return 'leather';
-  if (subsetOf(item.requiredClass, CLOTH_CLASSES) || subsetOf(item.requiredClass, CASTER_ARCHETYPE_CLASSES)) return 'cloth';
-  return null;
+  return item.armorType;
 }
 
 export function maxArmorTypeForClass(cls: PlayerClass): ArmorType {

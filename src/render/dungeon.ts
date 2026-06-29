@@ -31,6 +31,7 @@ import {
   type WallStub,
 } from '../sim/dungeon_layout';
 import { loadGltf, releaseGltf } from './assets/loader';
+import { registerPreload } from './assets/preload';
 import { sharedUniforms } from './gfx';
 import { radialGlowTexture } from './textures';
 
@@ -117,8 +118,10 @@ const TEMPLE_WATER_VERT = /* glsl */ `
     pos.y += sin(uTime * 1.3 + pos.x * 0.5) * 0.02 + sin(uTime * 0.9 + pos.z * 0.42) * 0.02;
     vec4 wp = modelMatrix * vec4(pos, 1.0);
     vWPos = wp.xyz;
-    vec4 mv = viewMatrix * wp;
-    gl_Position = projectionMatrix * mv;
+    // Name this mvPosition: the fog_vertex chunk reads mvPosition for vFogDepth,
+    // so a different name fails to compile once USE_FOG is defined (outdoor fog).
+    vec4 mvPosition = viewMatrix * wp;
+    gl_Position = projectionMatrix * mvPosition;
     #include <fog_vertex>
   }
 `;
@@ -289,6 +292,13 @@ export function ensureDungeonAssets(): Promise<void> {
   ]).then(() => undefined);
   return dungeonAssetsPromise;
 }
+
+// Fold the dungeon GLBs into the boot preload (like terrain/foliage/props/sky)
+// instead of fetching them lazily on first dungeon approach. Without this the
+// kit + Halloween-bits modules stream in (and their shaders compile) the moment
+// the camera nears a dungeon door, which is the on-approach freeze at the Fallen
+// Chapel. assetsReady() now genuinely covers everything buildInterior needs.
+if (typeof window !== 'undefined') registerPreload(ensureDungeonAssets());
 
 // ---------------------------------------------------------------------------
 // Deterministic placement helpers
@@ -540,6 +550,51 @@ export class DungeonInteriors {
     private flames: THREE.Mesh[],
     private fireLights: THREE.PointLight[],
   ) {}
+
+  // Instantiate every distinct interior material once so the startup prewarm's
+  // compile step links their shader programs up front. Without this the kit /
+  // Halloween-bits pack materials, the Drowned Temple water shader and the
+  // additive torch-glow decal all compile on first dungeon entry (a freeze).
+  // It builds the materials on THIS instance, so the live buildInterior() reuses
+  // the already-linked programs (Three dedupes by program-cache key regardless).
+  // Cheap by design: one instanced mesh per pack plus two small decals, not a
+  // full interior. Caller adds the returned group to the scene before the
+  // compile pass and removes it afterwards.
+  async buildPrewarmGroup(): Promise<THREE.Group> {
+    await ensureDungeonAssets();
+    const group = new THREE.Group();
+    group.name = 'dungeon-material-prewarm';
+    let kitGeo: THREE.BufferGeometry | null = null;
+    let bitsGeo: THREE.BufferGeometry | null = null;
+    for (const asset of moduleAssets.values()) {
+      if (asset.pack === 'kit') kitGeo ??= asset.geo;
+      else if (asset.pack === 'bits') bitsGeo ??= asset.geo;
+      if (kitGeo && bitsGeo) break;
+    }
+    const identity = new THREE.Matrix4();
+    const addPack = (geo: THREE.BufferGeometry | null, pack: Pack): void => {
+      if (!geo) return;
+      const mesh = new THREE.InstancedMesh(geo, this.material(pack), 1);
+      mesh.setMatrixAt(0, identity);
+      mesh.instanceMatrix.needsUpdate = true;
+      mesh.castShadow = false;
+      mesh.receiveShadow = false;
+      mesh.frustumCulled = false;
+      group.add(mesh);
+    };
+    addPack(kitGeo, 'kit');
+    addPack(bitsGeo, 'bits');
+    // Drowned Temple flood water (the one bespoke interior shader).
+    const water = new THREE.Mesh(
+      new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2),
+      this.templeWaterMaterial(),
+    );
+    water.frustumCulled = false;
+    group.add(water);
+    // Torch-glow decal: one MeshBasic program shared by every variant's colour.
+    this.addTorchGlow(group, 0, 0, TORCH_COLORS.crypt.light);
+    return group;
+  }
 
   async buildInterior(
     interior: string,
