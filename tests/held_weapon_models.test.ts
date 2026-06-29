@@ -1,7 +1,11 @@
 import { existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
-import { itemWeaponModelUrl, VISUALS } from '../src/render/characters/manifest';
+import {
+  itemWeaponModelUrl,
+  mechHeldWeaponOverride,
+  VISUALS,
+} from '../src/render/characters/manifest';
 import { ITEM_WEAPON_VARIANTS } from '../src/ui/weapon_variants';
 
 // The per-item held weapon models: each weapon item maps (via the shared
@@ -53,12 +57,13 @@ describe('held weapon models', () => {
   });
 
   // Every player class swaps its held mainhand to the equipped weapon, EXCEPT the
-  // hunter, which keeps its crossbow regardless of the melee weapon equipped.
+  // hunter, which keeps its crossbow regardless of the melee weapon equipped. The
+  // cosmetic Combat Mech (player_mech) is class-agnostic but is included: it still
+  // shows the wearer's equipped mainhand, like every other body.
   it('all player classes swap the mainhand except the hunter', () => {
-    const players = Object.keys(VISUALS).filter(
-      (k) => k.startsWith('player_') && k !== 'player_mech',
-    );
+    const players = Object.keys(VISUALS).filter((k) => k.startsWith('player_'));
     expect(players).toContain('player_hunter');
+    expect(players).toContain('player_mech');
     for (const key of players) {
       const def = VISUALS[key];
       if (key === 'player_hunter') {
@@ -69,5 +74,26 @@ describe('held weapon models', () => {
     }
     // the rogue dual-wields: both hand slots swap so a dagger shows in BOTH hands
     expect(VISUALS.player_rogue.weaponSlots).toEqual([0, 1]);
+  });
+
+  // The class-agnostic Combat Mech adopts the WEARER class's hand layout, so a
+  // rogue wearing the mech still dual-wields (weapon in both hands), while every
+  // single-wield class keeps the mech's own one-hand default (no override).
+  it('the Combat Mech mirrors a dual-wield class so a rogue mech holds both hands', () => {
+    const rogue = mechHeldWeaponOverride('rogue');
+    expect(rogue?.weaponSlots).toEqual([0, 1]);
+    expect(rogue?.attach?.length).toBe(2);
+    for (const cls of [
+      'warrior',
+      'paladin',
+      'hunter',
+      'priest',
+      'mage',
+      'warlock',
+      'shaman',
+      'druid',
+    ] as const) {
+      expect(mechHeldWeaponOverride(cls), `${cls} should not dual-wield on the mech`).toBeNull();
+    }
   });
 });

@@ -609,6 +609,80 @@ export const es_ES: EnTranslations = {
       "leaderOnly": "Solo el líder de la banda puede convertir la banda en grupo.",
       "tooLarge": "Una banda con más de cinco miembros no puede volver a convertirse en grupo."
     },
+    "itemArmorType": {
+      "cloth": "Cloth",
+      "leather": "Leather",
+      "mail": "Mail"
+    },
+    "auraEffect": {
+      "dot": "Provoca {value} de daño de {school} cada {interval} s",
+      "hot": "Recupera {value} de salud cada {interval} s",
+      "absorb": "Bloquea {value} de daño",
+      "healAbsorb": "Bloquea {value} de sanación recibida",
+      "thorns": "Provoca {value} de daño de {school} a los atacantes",
+      "slow": "Disminuye la velocidad de movimiento un {pct}%",
+      "speed": "Incrementa la velocidad de movimiento un {pct}%",
+      "attackSpeedSlow": "Disminuye la velocidad de ataque un {pct}%",
+      "attackSpeedFast": "Incrementa la velocidad de ataque un {pct}%",
+      "haste": "Incrementa la velocidad de ataque y lanzamiento un {pct}%",
+      "tongues": "Incrementa el tiempo de lanzamiento un {pct}%",
+      "increase": {
+        "ap": "Incrementa el poder de ataque en {value}",
+        "armor": "Incrementa la armadura en {value}",
+        "int": "Incrementa el intelecto en {value}",
+        "agi": "Incrementa la agilidad en {value}",
+        "sta": "Incrementa el aguante en {value}",
+        "spi": "Incrementa el espíritu en {value}",
+        "allStats": "Incrementa todos los atributos en {value}"
+      },
+      "reduce": {
+        "ap": "Disminuye el poder de ataque en {value}",
+        "armor": "Disminuye la armadura en {value}",
+        "int": "Disminuye el intelecto en {value}",
+        "agi": "Disminuye la agilidad en {value}",
+        "sta": "Disminuye el aguante en {value}",
+        "spi": "Disminuye el espíritu en {value}",
+        "allStats": "Disminuye todos los atributos en {value}"
+      },
+      "dodge": "Incrementa la probabilidad de esquivar un {pct}%",
+      "dodgeReduce": "Disminuye la probabilidad de esquivar un {pct}%",
+      "armorFlat": "Disminuye la armadura en {value}",
+      "armorFlatStacks": "Disminuye la armadura en {value} ({stacks} acumulaciones)",
+      "mortalWound": "Disminuye la sanación recibida un {pct}%",
+      "vulnerability": "Incrementa el daño recibido un {pct}%",
+      "physVuln": "Incrementa el daño físico recibido un {pct}%",
+      "spellVuln": "Incrementa el daño mágico recibido un {pct}%",
+      "critVuln": "Incrementa la probabilidad de recibir golpes críticos un {pct}%",
+      "costTax": "Incrementa los costes de habilidades un {pct}%",
+      "stun": "Aturdimiento: no puede actuar",
+      "root": "Inmovilizado: no puede moverse",
+      "incapacitate": "Incapacitación: no puede actuar",
+      "polymorph": "Polimorfia: no puede actuar",
+      "hex": "Disminuye el daño y la sanación realizados un {pct}%",
+      "blind": "Ceguera: no puede actuar",
+      "silence": "Silencio: no puede lanzar hechizos",
+      "disarm": "Desarme: no puede usar ataques con arma",
+      "lockout": "Escuela mágica bloqueada",
+      "imbue": "Arma encantada con efectos adicionales",
+      "imbueRange": "Arma encantada: {min} a {max} de daño adicional al juzgar",
+      "stealth": "Encubierto; velocidad de movimiento reducida un {pct}%",
+      "formBear": "Forma de oso, salud y armadura aumentadas",
+      "formCat": "Forma felina, daño cuerpo a cuerpo y energía",
+      "formTravel": "Forma de viaje, velocidad de movimiento aumentada un {pct}%",
+      "defensiveStance": "Actitud defensiva, daño recibido reducido, más amenaza",
+      "righteousFury": "Furia recta, amenaza de daño Sagrado muy aumentada",
+      "scale": "Talla aumentado un {pct}%",
+      "jump": "Salto aumentada un {pct}%",
+      "school": {
+        "physical": "Daño físico",
+        "fire": "Ígneo",
+        "frost": "Hielo",
+        "arcane": "Arcana",
+        "shadow": "Sombra",
+        "holy": "Sagrada",
+        "nature": "Natural"
+      }
+    },
     "loot": {
       "chestTitle": "Cofre"
     },
@@ -2648,6 +2722,7 @@ export const es_ES: EnTranslations = {
     "combat": {
       "floatingMiss": "Fallo",
       "floatingDodge": "Esquiva",
+      "floatingResist": "Resist",
       "cannotMove": "¡No puedes moverte!",
       "attack": "ataque",
       "damageDone": "Tu {ability} golpea a {target} por {amount}.",
@@ -2656,6 +2731,7 @@ export const es_ES: EnTranslations = {
       "damageTakenCrit": "{source} te golpea críticamente por {amount}.",
       "miss": "Tu {ability} falla contra {target}.",
       "dodged": "{target} esquiva tu {ability}.",
+      "resisted": "Your {ability} is resisted by {target}.",
       "healSelf": "Tu {ability} te sana {amount}.",
       "healSelfCrit": "Tu {ability} te sana críticamente {amount}.",
       "healOther": "Tu {ability} sana a {target} por {amount}.",
@@ -3450,7 +3526,7 @@ export const es_ES: EnTranslations = {
       },
       "stealth": {
         "name": "Sigilo",
-        "description": "Te oculta en las sombras: los enemigos apenas te detectan, pero te mueves un 30% más lento. Atacar o recibir daño rompe Sigilo. Lánzalo de nuevo para salir."
+        "description": "Te oculta en las sombras: los enemigos apenas te detectan, pero te mueves un 50% más lento. Atacar o recibir daño rompe Sigilo. Lánzalo de nuevo para salir."
       },
       "adrenaline_rush": {
         "name": "Subidón de adrenalina",
@@ -3482,7 +3558,7 @@ export const es_ES: EnTranslations = {
       },
       "vanish": {
         "name": "Esfumarse",
-        "description": "Desaparece de la vista, entrando en Sigilo incluso en combate. Te mueves un 30% más lento mientras estás oculto. Dura hasta 10 s."
+        "description": "Desaparece de la vista, entrando en Sigilo incluso en combate. Te mueves un 50% más lento mientras estás oculto. Dura hasta 10 s."
       },
       "instant_poison": {
         "name": "Veneno instantáneo",
@@ -3890,7 +3966,7 @@ export const es_ES: EnTranslations = {
       },
       "prowl": {
         "name": "Acechar",
-        "description": "Entra en sigilo mientras estás en Forma de lobo. No puede usarse en combate."
+        "description": "Entra en sigilo mientras estás en Forma de lobo y te mueves un 50% más lento. No puede usarse en combate."
       },
       "rake": {
         "name": "Zarpazo",

@@ -16,7 +16,7 @@ import { voice } from '../game/voice';
 import { castBarState, consumeBarState } from '../render/cast_bar';
 import { CharacterPreview } from '../render/characters';
 import { preloadMechAssets } from '../render/characters/assets';
-import { skinCount } from '../render/characters/manifest';
+import { mechHeldWeaponOverride, skinCount } from '../render/characters/manifest';
 import {
   onPortraitsReady,
   playerPortraitDataUrl,
@@ -57,7 +57,7 @@ import {
   ZONES,
   zoneAt,
 } from '../sim/data';
-import { armorTypeForItem, weaponArchetypeForItem } from '../sim/equipment_rules';
+import { armorTypeForItem, canEquipItem, weaponArchetypeForItem } from '../sim/equipment_rules';
 import { itemLevel, itemScore } from '../sim/item_level';
 import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 import type { Ante, PickAction } from '../sim/lockpick';
@@ -106,6 +106,7 @@ import {
   ITEM_ICON_PREFIX,
 } from './action_bar_view';
 import { ArenaWindow } from './arena_window';
+import { type AuraEffectInput, auraEffectDescriptor } from './aura_effect';
 import { AurasPainter, type AurasPainterDeps } from './auras_painter';
 import { type AurasDeps, createAurasView } from './auras_view';
 import { BagsWindow } from './bags_window';
@@ -186,6 +187,7 @@ import {
   tPlural,
 } from './i18n';
 import { iconDataUrl, QUALITY_COLOR, raidMarkerDataUrl } from './icons';
+import { itemArmorTypeLabelKey } from './item_armor_type';
 import { itemStatDeltas } from './item_compare';
 import { LeaderboardWindow } from './leaderboard_window';
 import { ReannounceMarker } from './live_region_reannounce';
@@ -700,6 +702,7 @@ export class Hud {
   private pfResourceEl = $('#pf-resource');
   private pfAbsorbEl = $('#pf-absorb');
   private buffBarEl = $('#buff-bar');
+  private debuffBarEl = $('#debuff-bar');
   private targetFrameEl = $('#target-frame');
   private targetEliteTagEl = $('#tf-elite-tag');
   private targetNameEl = $('#tf-name');
@@ -2450,22 +2453,48 @@ export class Hud {
       ABILITIES[a.id] ? abilityDisplayName(ABILITIES[a.id]) : auraDisplayNameFromSource(a.name),
     formatStacks: (n) => formatNumber(n, { maximumFractionDigits: 0 }),
     durationUnitSuffix: () => t('hudChrome.unitFrame.durationUnitSeconds'),
+    auraEffectHtml: (a) => this.auraEffectTooltipHtml(a),
   };
   private readonly aurasPainterDeps: AurasPainterDeps = {
     resolveIconUrl: (iconKey) => `url(${iconDataUrl('aura', iconKey)})`,
-    renderTooltip: (name, remaining) =>
-      `<div class="tt-title">${esc(name)}</div><div class="tt-sub">${esc(tPlural('hudChrome.plurals.secondsRemaining', Math.ceil(remaining)))}</div>`,
+    renderTooltip: (name, remaining, effectHtml) =>
+      `<div class="tt-title">${esc(name)}</div>${effectHtml}<div class="tt-sub">${esc(tPlural('hudChrome.plurals.secondsRemaining', Math.ceil(remaining)))}</div>`,
     attachTooltip: (el, html) => this.attachTooltip(el, html),
   };
-  private readonly buffBarView = createAurasView('all', this.aurasViewDeps);
+  // Player auras split across two rows (classic layout): buffs in #buff-bar, debuffs in
+  // #debuff-bar, so a fresh debuff is never buried under a wall of long-lived buffs.
+  private readonly buffBarView = createAurasView('buffs', this.aurasViewDeps);
+  private readonly debuffBarView = createAurasView('debuffs', this.aurasViewDeps);
   private readonly targetDebuffsView = createAurasView('debuffs', this.aurasViewDeps);
+  // The buff-bar painter alone gets attachCancel: right-clicking one of the local player's
+  // own helpful buffs cancels it (classic convention). The debuff / target painters reuse
+  // the shared deps (no cancel: a debuff or another entity's aura is never cancelable).
+  private readonly buffBarPainterDeps: AurasPainterDeps = {
+    ...this.aurasPainterDeps,
+    attachCancel: (el, cancelableAuraId) => {
+      el.addEventListener('contextmenu', (ev) => {
+        const auraId = cancelableAuraId();
+        if (auraId === null) return;
+        ev.preventDefault();
+        this.hideTooltip();
+        this.sim.cancelAura(auraId);
+      });
+    },
+  };
   private readonly buffBarPainter = new AurasPainter(
     this.writerFacet,
     this.buffBarEl,
-    this.aurasPainterDeps,
+    this.buffBarPainterDeps,
     document,
     // Cap the visible aura count on the LOW static preset (never the
     // governor).
+    () => this.fxTier(),
+  );
+  private readonly debuffBarPainter = new AurasPainter(
+    this.writerFacet,
+    this.debuffBarEl,
+    this.aurasPainterDeps,
+    document,
     () => this.fxTier(),
   );
   private readonly targetDebuffsPainter = new AurasPainter(
@@ -2810,6 +2839,24 @@ export class Hud {
     return `<span class="woc-balance ${verified ? 'is-verified' : 'is-preview'}" title="${esc(title)}" aria-label="${esc(aria)}"><span class="woc-coin" aria-hidden="true"></span>${esc(balance)}</span>`;
   }
 
+  // One-line aura effect summary HTML for the buff/debuff tooltip: the pure descriptor
+  // (aura_effect.ts) resolved to localized, esc'd text. Empty when the aura has no
+  // descriptor. Injected into the auras view so the i18n-free core never calls t().
+  private auraEffectTooltipHtml(a: AuraEffectInput): string {
+    const effect = auraEffectDescriptor(a);
+    if (!effect) return '';
+    const values: Record<string, string> = {};
+    if (effect.nums) {
+      for (const [k, n] of Object.entries(effect.nums)) {
+        values[k] = formatNumber(n, { maximumFractionDigits: 0 });
+      }
+    }
+    if (effect.school) {
+      values.school = t(`hudChrome.auraEffect.school.${effect.school}` as TranslationKey);
+    }
+    return `<div class="tt-effect">${esc(t(effect.key as TranslationKey, values))}</div>`;
+  }
+
   attachTooltip(el: HTMLElement, html: () => string): void {
     let touchTimer: number | undefined;
     const mobile = () => document.body.classList.contains('mobile-touch');
@@ -2887,7 +2934,17 @@ export class Hud {
       }),
     )}</div>`;
     if (item.slot) {
-      html += `<div class="tt-sub">${esc(itemSlotName(item.slot))}</div>`;
+      // Classic layout: slot name on the left, armor subtype (Cloth/Leather/Mail)
+      // right-aligned on the same line so it is clear which classes the gear suits.
+      const armorTypeKey = itemArmorTypeLabelKey(item);
+      if (armorTypeKey) {
+        // Red armor type = the viewing player's class cannot wear this armor weight
+        // (e.g. a mage hovering Mail), so they know it is not for them at a glance.
+        const badClass = canEquipItem(this.sim.cfg.playerClass, item) ? '' : ' tt-armor-bad';
+        html += `<div class="tt-sub tt-row"><span>${esc(itemSlotName(item.slot))}</span><span class="tt-armor${badClass}">${esc(t(armorTypeKey))}</span></div>`;
+      } else {
+        html += `<div class="tt-sub">${esc(itemSlotName(item.slot))}</div>`;
+      }
     }
     // Optional item-level readout (off by default; src/sim/item_level.ts derives it
     // from where the item drops). Read live, so toggling it takes effect on the next
@@ -4176,14 +4233,17 @@ export class Hud {
     this.updateLowHealthVignette(p.hp, p.maxHp);
     this.updateLowResource(p);
 
-    // buff bar (player buffs + debuffs): the keyed-pool aura painter, driven by
-    // the auras_view core every frame (the elided writers make a no-op frame free). The
-    // graphics tier coarsens the refresh (tick) granularity: full tiers repaint every frame
-    // (interval 0, cadenceDue always true); low coarsens to ~4Hz. The visible-count cap
+    // buff bar / debuff bar: the keyed-pool aura painter, driven by the auras_view core
+    // every frame (the elided writers make a no-op frame free). Buffs and debuffs render to
+    // separate rows (classic layout) so a fresh debuff is never lost in a wall of long-lived
+    // buffs: two view+painter instances, mode 'buffs' (#buff-bar) and 'debuffs' (#debuff-bar).
+    // The graphics tier coarsens the refresh (tick) granularity: full tiers repaint every
+    // frame (interval 0, cadenceDue always true); low coarsens to ~4Hz. The visible-count cap
     // is applied inside the painter.
     if (cadenceDue(this.lastBuffBarPaintAt, now, auraRefreshIntervalMs(fxTier))) {
       this.lastBuffBarPaintAt = now;
       this.buffBarPainter.paint(this.buffBarView.tick(p));
+      this.debuffBarPainter.paint(this.debuffBarView.tick(p));
     }
 
     // target frame: the SECOND instance of the unit_frame family. The shared
@@ -5567,7 +5627,7 @@ export class Hud {
         const tgt = sim.entities.get(ev.targetId);
         if (!tgt) return;
         const tp = tgt.pos;
-        if (ev.kind === 'miss' || ev.kind === 'dodge') {
+        if (ev.kind === 'miss' || ev.kind === 'dodge' || ev.kind === 'resist') {
           this.combat('combat_dodge', tp.x, tp.y, tp.z, 0.5);
           return;
         }
@@ -5723,9 +5783,11 @@ export class Hud {
           const isPlayerSource = ev.sourceId === sim.playerId;
           const isPlayerTarget = ev.targetId === sim.playerId;
           if (isPlayerSource || isPlayerTarget) this.lastCombatEventAt = performance.now();
-          if (ev.kind === 'miss' || ev.kind === 'dodge') {
-            // self vs other (carried on the shape's isSelf) drives the miss/dodge colour
-            // token (#bbb vs #fff); the localized word stays at the call site.
+          if (ev.kind === 'miss' || ev.kind === 'dodge' || ev.kind === 'resist') {
+            // self vs other (carried on the shape's isSelf) drives the avoidance colour
+            // token (#bbb vs #fff); the localized word stays at the call site. A resisted
+            // spell is an avoidance word like miss/dodge (classic fidelity: spells resist,
+            // not miss).
             const shape = fctSpawnShape({
               type: 'damage',
               damageKind: ev.kind,
@@ -5741,7 +5803,9 @@ export class Hud {
                   text:
                     ev.kind === 'miss'
                       ? t('hud.combat.floatingMiss')
-                      : t('hud.combat.floatingDodge'),
+                      : ev.kind === 'dodge'
+                        ? t('hud.combat.floatingDodge')
+                        : t('hud.combat.floatingResist'),
                   target: tgt,
                 },
                 now,
@@ -5752,8 +5816,14 @@ export class Hud {
               this.renderer.addShake(0.15);
             }
             if (isPlayerSource) {
+              const logKey =
+                ev.kind === 'miss'
+                  ? 'hud.combat.miss'
+                  : ev.kind === 'dodge'
+                    ? 'hud.combat.dodged'
+                    : 'hud.combat.resisted';
               this.combatLog(
-                t(ev.kind === 'miss' ? 'hud.combat.miss' : 'hud.combat.dodged', {
+                t(logKey, {
                   ability: combatAbilityName(ev.ability),
                   target: entityDisplayName(tgt),
                 }),
@@ -8040,8 +8110,14 @@ export class Hud {
     // 3D model reflects gear changes (the char window repaints the preview after an
     // equip via charWindow.renderIfOpen -> renderPreview).
     const weapon = this.sim.equipment.mainhand ?? null;
-    if (previewKey) this.charPreview.setVisualKey(previewKey, weapon);
-    else this.charPreview.setClass(cls, weapon);
+    if (previewKey) {
+      // mech is class-agnostic; mirror the wearer class's hand layout (rogue
+      // dual-wields) so the paperdoll matches the in-world render
+      const override = previewKey === 'player_mech' ? mechHeldWeaponOverride(cls) : null;
+      this.charPreview.setVisualKey(previewKey, weapon, override);
+    } else {
+      this.charPreview.setClass(cls, weapon);
+    }
     this.charPreview.setSkin(skin);
   }
 

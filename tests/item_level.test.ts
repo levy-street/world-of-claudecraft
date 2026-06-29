@@ -136,11 +136,27 @@ describe('itemScore', () => {
   it('counts primary stats, converted armor, and converted weapon dps', () => {
     // Pure stat piece: score is just the stat sum.
     expect(
-      itemScore({ id: 'x', name: 'x', kind: 'armor', sellValue: 0, stats: { str: 4, sta: 3 } }),
+      itemScore({
+        id: 'x',
+        name: 'x',
+        kind: 'armor',
+        slot: 'chest',
+        armorType: 'mail',
+        sellValue: 0,
+        stats: { str: 4, sta: 3 },
+      }),
     ).toBe(7);
     // Armor converts at ARMOR_PER_POINT (12): 24 armor -> 2 points.
     expect(
-      itemScore({ id: 'x', name: 'x', kind: 'armor', sellValue: 0, stats: { armor: 24 } }),
+      itemScore({
+        id: 'x',
+        name: 'x',
+        kind: 'armor',
+        slot: 'chest',
+        armorType: 'mail',
+        sellValue: 0,
+        stats: { armor: 24 },
+      }),
     ).toBe(2);
     // A weapon adds dps weight, so it outscores its raw stat bonus alone.
     const blade = ITEMS.gravecaller_blade;

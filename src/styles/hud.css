@@ -726,6 +726,18 @@
     max-width: 320px;
     pointer-events: auto;
   }
+  /* Debuffs sit in their own row beneath the buff row (classic layout). */
+  #debuff-bar {
+    position: absolute;
+    right: 196px;
+    top: 50px;
+    display: flex;
+    flex-direction: row-reverse;
+    flex-wrap: wrap;
+    gap: 4px;
+    max-width: 320px;
+    pointer-events: auto;
+  }
   .buff {
     width: 28px;
     height: 28px;
@@ -740,6 +752,13 @@
   }
   .buff.debuff {
     border-color: var(--color-debuff);
+  }
+  /* The player's own cancelable buffs: right-click to drop, with a hover cue. */
+  .buff.cancelable {
+    cursor: context-menu;
+  }
+  .buff.cancelable:hover {
+    border-color: var(--color-gold, #d8b56b);
   }
   .buff .dur {
     position: absolute;
@@ -2083,6 +2102,7 @@
   body.native-app .cs-wallet,
   body.native-app .cs-wallet-hidden-note,
   body.native-app .account-wallet-card,
+  body.native-app #performance-tip,
   body.native-app .official-site-copy {
     display: none !important;
   }
@@ -2106,6 +2126,26 @@
   #tooltip .tt-sub {
     color: var(--color-text-muted);
     font-size: 11px;
+  }
+  /* slot line that also carries the armor subtype: slot left, type right-aligned.
+     The slot keeps the muted tt-sub color; the armor class reads brighter so the
+     newly surfaced "which class is this for" cue stands out. */
+  #tooltip .tt-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  #tooltip .tt-row .tt-armor {
+    color: var(--color-text-light);
+  }
+  #tooltip .tt-row .tt-armor.tt-armor-bad {
+    color: #ff5040;
+  }
+  /* One-line aura effect summary under the tooltip title (buff/debuff hover). */
+  #tooltip .tt-effect {
+    color: var(--color-accent, #d4b483);
+    font-size: 11.5px;
+    margin-top: 1px;
   }
   .tt-opt-icon {
     width: 16px;
@@ -2276,6 +2316,9 @@
   }
   #tooltip .tt-sub {
     font-size: calc(11px * var(--tooltip-scale, 1));
+  }
+  #tooltip .tt-effect {
+    font-size: calc(11.5px * var(--tooltip-scale, 1));
   }
   #tooltip .tt-desc,
   #tooltip .tt-stat,

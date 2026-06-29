@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 389,
-      "state": "ddc82b87",
+      "state": "246a7a3f",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -60,6 +60,7 @@
           "id": 388,
           "kind": "player",
           "level": 1,
+          "lootFfaTimer": "Infinity",
           "maxHp": 90,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -99,7 +100,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 390,
-      "state": "ba11e930",
+      "state": "d7f472cc",
       "events": "3d7f30e3",
       "rng": {
         "draws": 4,
@@ -110,7 +111,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 390,
-      "state": "58ec56e7",
+      "state": "2af32773",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -121,7 +122,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 390,
-      "state": "a864fa7a",
+      "state": "be6f9a86",
       "events": "4ecbc29e",
       "rng": {
         "draws": 95,
@@ -132,7 +133,7 @@
       "tick": 72,
       "time": 3.6,
       "nextId": 390,
-      "state": "9c432e52",
+      "state": "563c0a58",
       "events": "2865f00f",
       "rng": {
         "draws": 145,
@@ -180,6 +181,7 @@
           "inCombat": true,
           "kind": "player",
           "level": 10,
+          "lootFfaTimer": "Infinity",
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -245,6 +247,7 @@
               }
             ]
           },
+          "lootFfaTimer": 60,
           "lootRecipientIds": [
             388
           ],
@@ -285,7 +288,7 @@
       "tick": 76,
       "time": 3.8,
       "nextId": 390,
-      "state": "b45be6dc",
+      "state": "e56e5bf0",
       "events": "741638a5",
       "rng": {
         "draws": 163,
@@ -334,6 +337,7 @@
           "inCombat": true,
           "kind": "player",
           "level": 10,
+          "lootFfaTimer": "Infinity",
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -399,6 +403,7 @@
               }
             ]
           },
+          "lootFfaTimer": 59.8,
           "lootRecipientIds": [
             388
           ],

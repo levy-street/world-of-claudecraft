@@ -1,0 +1,30 @@
+/* Admin dashboard style barrel. Declares the one canonical @layer order and @imports
+   every module in that order; it holds no rules of its own. Mirrors the game client's
+   src/styles/index.css. Imported once from src/admin/main.ts. Lightning CSS inlines
+   these local @imports into one stylesheet at build, so there is no runtime waterfall.
+
+   Layer order (cascade): tokens < base < components. Module modules live in
+   src/admin/styles/. The three components modules (components, charts, moderation)
+   all target @layer components and are imported in source order, so their
+   equal-specificity ties fall to import order here.
+
+   Svelte component <style> blocks are scoped and UNLAYERED, so they always win over
+   these layered primitives regardless of specificity, which is the intended direction
+   (this barrel is the low-priority base; components override locally). The one
+   exception is the mobile-zoom floor in base.css: it uses !important, which beats
+   unlayered scoped styles no matter the layer order.
+
+   LAYER NAMES ARE FLAT, never dotted: a dot in a @layer name is a sublayer separator
+   that would silently reorder the cascade.
+
+   Tokens, not magic values: colors that recur across these modules and the scoped
+   component styles are semantic --tokens in tokens.css, not hand-typed hex at each
+   call site. Genuinely one-off colors stay inline. */
+
+@layer tokens, base, components;
+
+@import "./styles/tokens.css";
+@import "./styles/base.css";
+@import "./styles/components.css";
+@import "./styles/charts.css";
+@import "./styles/moderation.css";

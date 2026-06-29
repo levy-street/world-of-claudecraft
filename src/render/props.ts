@@ -343,6 +343,11 @@ export function buildPropMaterialPrewarmGroup(): THREE.Group {
     group.add(obj);
     idx++;
   };
+  // castShadow so the depth/shadow program variant compiles too (ultra renders a
+  // shadow pass; structures cast shadows live). instanceColor covers the tinted
+  // instance variant the way the live placed props do; the plain InstancedMesh
+  // and Mesh cover the untinted and non-instanced paths.
+  const white = new THREE.Color(1, 1, 1);
   for (const key of ACTIVE_PROP_KEYS) {
     const asset = propAsset(key);
     for (const part of asset.parts) {
@@ -350,15 +355,23 @@ export function buildPropMaterialPrewarmGroup(): THREE.Group {
       if (seen.has(matKey)) continue;
       seen.add(matKey);
       const mesh = new THREE.Mesh(part.geo, part.mat);
-      mesh.castShadow = false;
-      mesh.receiveShadow = false;
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
       place(mesh);
       const instanced = new THREE.InstancedMesh(part.geo, part.mat, 1);
       instanced.setMatrixAt(0, instanceMatrix.identity());
       instanced.instanceMatrix.needsUpdate = true;
-      instanced.castShadow = false;
-      instanced.receiveShadow = false;
+      instanced.castShadow = true;
+      instanced.receiveShadow = true;
       place(instanced);
+      const tinted = new THREE.InstancedMesh(part.geo, part.mat, 1);
+      tinted.setMatrixAt(0, instanceMatrix.identity());
+      tinted.setColorAt(0, white);
+      tinted.instanceMatrix.needsUpdate = true;
+      if (tinted.instanceColor) tinted.instanceColor.needsUpdate = true;
+      tinted.castShadow = true;
+      tinted.receiveShadow = true;
+      place(tinted);
     }
   }
   return group;

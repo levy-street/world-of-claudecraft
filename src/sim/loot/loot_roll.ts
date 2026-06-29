@@ -39,6 +39,7 @@ import type {
   LootStrategies,
 } from '../types';
 import { dist2d, PARTY_XP_RANGE } from '../types';
+import { LOOT_FFA_DELAY } from './loot_ffa';
 
 // How long (seconds) a need-greed roll stays open before it auto-resolves. Sole
 // users are startNeedGreedRoll + pruneCorpseLoot, so the constant lives with them.
@@ -145,8 +146,9 @@ export function rollLoot(
       const questRecipients = eligible.filter((m) => needsQuestDrop(ctx, entry, m));
       if (questRecipients.length === 0) continue;
       if (!ctx.rng.chance(entry.chance)) continue;
+      if (!entry.itemId) continue;
       items.push({
-        itemId: entry.itemId!,
+        itemId: entry.itemId,
         count: 1,
         personalFor: questRecipients.map((m) => m.entityId),
       });
@@ -160,6 +162,8 @@ export function rollLoot(
   if (copper > 0 || items.length > 0) {
     mob.loot = { copper, items };
     mob.lootable = true;
+    // start the owner-lock countdown: after LOOT_FFA_DELAY the tap opens to all.
+    mob.lootFfaTimer = LOOT_FFA_DELAY;
   }
 }
 
@@ -294,10 +298,10 @@ export function resolveLootRoll(ctx: SimContext, roll: PendingLootRoll): void {
       ctx.emit({ type: 'loot', text: `Everyone passed on ${roll.itemName}.`, pid });
     return;
   }
-  let winner = contenders[0];
-  for (const contender of contenders.slice(1)) {
-    if ((contender.result.roll ?? 0) > (winner.result.roll ?? 0)) winner = contender;
-  }
+  const highestRoll = Math.max(...contenders.map((contender) => contender.result.roll ?? 0));
+  const tiedWinners = contenders.filter((contender) => contender.result.roll === highestRoll);
+  const winner =
+    tiedWinners.length === 1 ? tiedWinners[0] : tiedWinners[ctx.rng.int(0, tiedWinners.length - 1)];
   const winnerMeta = ctx.players.get(winner.pid);
   const winnerName = winnerMeta?.name ?? 'Unknown';
   for (const pid of roll.candidates) {

@@ -59,6 +59,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     if (mob.ownerId !== null && MOBS[mob.templateId]?.family !== 'demon') return;
     mob.corpseTimer -= DT;
     mob.respawnTimer -= DT;
+    if (mob.lootFfaTimer > 0) mob.lootFfaTimer -= DT; // owner-lock lapses, then loot goes FFA
     // Death Throes: a volatile corpse counts down its fuse, then detonates once.
     if (mob.detonateTimer !== Infinity) {
       mob.detonateTimer -= DT;

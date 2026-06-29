@@ -696,6 +696,7 @@ function blankEntity(id: number): Entity {
     aggroTargetId: null,
     respawnTimer: 0,
     corpseTimer: 0,
+    lootFfaTimer: Infinity,
     lootable: false,
     loot: null,
     xpValue: 0,
@@ -1207,6 +1208,10 @@ export class ClientWorld implements IWorld {
         sourceId: 0,
         school: 'physical' as const,
         stacks: a.stacks,
+        // Mirror the charge count for a charge-limited aura (Lightning Shield); the wire sends it
+        // only when defined (server/game.ts), so an ordinary aura or an old server decodes to
+        // undefined and the badge falls back to the stacks path, exactly as before.
+        charges: a.charges,
       }));
       e.loot = w.lootList ?? null;
       return e;
@@ -1430,6 +1435,11 @@ export class ClientWorld implements IWorld {
       return;
     }
     this.cmd({ cmd: 'castSlot', slot });
+  }
+  cancelAura(auraId: string): void {
+    // Authoritative on the server; the dropped aura disappears on the next self
+    // snapshot. No optimistic local removal (stat recalc is server-owned).
+    this.cmd({ cmd: 'cancel_aura', aura: auraId });
   }
   startAutoAttack(): void {
     this.cmd({ cmd: 'attack' });

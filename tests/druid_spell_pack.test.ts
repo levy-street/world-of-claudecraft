@@ -1,12 +1,20 @@
 import { describe, expect, it } from 'vitest';
+import { ABILITIES, abilitiesKnownAt, CLASSES } from '../src/sim/content/classes';
 import { Sim } from '../src/sim/sim';
-import { AuraKind, dist2d } from '../src/sim/types';
-import { ABILITIES, CLASSES, abilitiesKnownAt } from '../src/sim/content/classes';
+import { type AuraKind, dist2d } from '../src/sim/types';
 import { groundHeight, WATER_LEVEL } from '../src/sim/world';
 
 const NEW_DRUID = [
-  'travel_form', 'enrage', 'bash', 'faerie_fire', 'hibernate',
-  'dash', 'pounce', 'insect_swarm', 'tigers_fury', 'rip',
+  'travel_form',
+  'enrage',
+  'bash',
+  'faerie_fire',
+  'hibernate',
+  'dash',
+  'pounce',
+  'insect_swarm',
+  'tigers_fury',
+  'rip',
 ] as const;
 
 function makeWorld() {
@@ -54,7 +62,13 @@ function giveForm(sim: Sim, pid: number, kind: AuraKind, name: string) {
   const e = sim.entities.get(pid)!;
   e.auras.push({
     id: name.toLowerCase().replace(/\s+/g, '_'),
-    name, kind, remaining: 3600, duration: 3600, value: 1, sourceId: pid, school: 'physical',
+    name,
+    kind,
+    remaining: 3600,
+    duration: 3600,
+    value: 1,
+    sourceId: pid,
+    school: 'physical',
   });
 }
 
@@ -147,11 +161,19 @@ describe('druid spell pack — casting applies effects', () => {
       const e = sim.entities.get(a)!;
       sim.setPlayerLevel(20, a);
       e.resource = 100;
-      if (withForm) { sim.castAbility('travel_form', a); sim.tick(); }
+      if (withForm) {
+        sim.castAbility('travel_form', a);
+        sim.tick();
+      }
       const meta = (sim as any).players.get(a);
       meta.moveInput = {
-        forward: true, back: false, turnLeft: false, turnRight: false,
-        strafeLeft: false, strafeRight: false, jump: false,
+        forward: true,
+        back: false,
+        turnLeft: false,
+        turnRight: false,
+        strafeLeft: false,
+        strafeRight: false,
+        jump: false,
       };
       const start = { x: e.pos.x, z: e.pos.z };
       for (let i = 0; i < 60; i++) sim.tick();
@@ -162,6 +184,43 @@ describe('druid spell pack — casting applies effects', () => {
     expect(base).toBeGreaterThan(0);
     // +40% speed: should cover about 1.4x the ground (allow slack for terrain).
     expect(travel / base).toBeCloseTo(1.4, 1);
+  });
+
+  it('Prowl actually moves the druid at half speed in Wolf Form', () => {
+    const distanceOver = (withProwl: boolean): number => {
+      const sim = makeWorld();
+      const pid = sim.addPlayer('druid', withProwl ? 'Prowler' : 'Runner');
+      const e = sim.entities.get(pid)!;
+      sim.setPlayerLevel(20, pid);
+      e.resource = e.maxResource;
+      sim.castAbility('cat_form', pid);
+      sim.tick();
+      advanceTicks(sim, 40);
+      if (withProwl) {
+        e.resource = e.maxResource;
+        sim.castAbility('prowl', pid);
+        sim.tick();
+        expect(e.auras.some((a) => a.id === 'prowl' && a.kind === 'stealth')).toBe(true);
+      }
+      const meta = (sim as any).players.get(pid);
+      meta.moveInput = {
+        forward: true,
+        back: false,
+        turnLeft: false,
+        turnRight: false,
+        strafeLeft: false,
+        strafeRight: false,
+        jump: false,
+      };
+      const start = { x: e.pos.x, z: e.pos.z };
+      for (let i = 0; i < 60; i++) sim.tick();
+      return Math.hypot(e.pos.x - start.x, e.pos.z - start.z);
+    };
+
+    const base = distanceOver(false);
+    const prowl = distanceOver(true);
+    expect(base).toBeGreaterThan(0);
+    expect(prowl / base).toBeCloseTo(0.5, 1);
   });
 
   it('Travel Form toggles off cleanly, removing the form and the speed', () => {
@@ -189,7 +248,10 @@ describe('druid spell pack — casting applies effects', () => {
     e.inCombat = true; // mid-fight
     sim.castAbility('travel_form', a);
     sim.tick();
-    expect(e.auras.some((au) => au.kind === 'form_travel'), 'travel_form should shift even in combat').toBe(true);
+    expect(
+      e.auras.some((au) => au.kind === 'form_travel'),
+      'travel_form should shift even in combat',
+    ).toBe(true);
   });
 
   it('Travel Form moves the druid 40% faster than normal forward movement', () => {
@@ -285,7 +347,7 @@ describe('druid spell pack — casting applies effects', () => {
     sim.castAbility('prowl', pid);
     sim.tick();
     expect(e.auras.some((a) => a.id === 'prowl' && a.kind === 'stealth')).toBe(true);
-    expect((sim as any).moveSpeedMult(e)).toBeCloseTo(0.7);
+    expect((sim as any).moveSpeedMult(e)).toBeCloseTo(0.5);
     advanceTicks(sim, 40);
 
     e.resource = e.maxResource;

@@ -19,6 +19,7 @@
 // (applyAura/dealDamage/effectiveArmor/recalcPlayer + the rng/emit/players/entities
 // primitives), all of which still resolve on Sim.
 
+import { applyThornsReaction } from '../combat/thorns_charge';
 import { MOBS } from '../data';
 import type { SimContext } from '../sim_context';
 import { type Aura, armorReduction, dist2d, type Entity, type MobTemplate } from '../types';
@@ -366,13 +367,10 @@ export function runMobSwingAffixes(
       school: (cv.school ?? 'physical') as Aura['school'],
     });
   }
-  // thorns / lightning shield on the defender
+  // thorns / lightning shield on the defender (charge-limited reflects gate on
+  // their charge count and internal cooldown; ungated thorns reflect every hit)
   if (!mob.dead) {
-    for (const a of target.auras) {
-      if (a.kind === 'thorns') {
-        ctx.dealDamage(target, mob, a.value, false, a.school, a.name, 'hit', true);
-      }
-    }
+    applyThornsReaction(ctx, target, mob);
   }
   // Mortal Strike: a landed hit can leave a healing-reduction debuff. Guarded on
   // `hostile` so a friendly pet (mobSwing's other caller) never debuffs the party.

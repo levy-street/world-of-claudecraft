@@ -552,6 +552,7 @@ function aurasDeps(): AurasDeps {
     auraName: (a) => a.name,
     formatStacks: (n) => String(n),
     durationUnitSuffix: () => 's',
+    auraEffectHtml: () => '',
   };
 }
 

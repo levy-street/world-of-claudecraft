@@ -194,9 +194,18 @@ export interface Aura {
   school: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
   breaksOnDamage?: boolean;
   stacks?: number; // sunder armor: applications stack up to the effect's cap
+  charges?: number; // thorns: remaining reflect charges (Lightning Shield); undefined => unlimited
+  icd?: number; // thorns: internal-cooldown remaining, seconds (counts down each tick)
+  icdMax?: number; // thorns: configured internal cooldown, seconds (re-armed on each reflect)
 }
 
-export type CrowdControlDrCategory = 'root' | 'polymorph' | 'fear';
+export type CrowdControlDrCategory =
+  | 'root'
+  | 'polymorph'
+  | 'fear'
+  | 'openerStun'
+  | 'controlledStun'
+  | 'randomStun';
 
 export interface CrowdControlDrState {
   stage: number;
@@ -255,17 +264,28 @@ export type ItemUse =
 // rank unlocks its own tier and every tier below it (epic unlocks rare+uncommon).
 export type SkinRank = 'uncommon' | 'rare' | 'epic';
 
-export interface ItemDef {
+export type ArmorType = 'cloth' | 'leather' | 'mail';
+
+type ItemKind =
+  | 'weapon'
+  | 'armor'
+  | 'quest'
+  | 'junk'
+  | 'food'
+  | 'drink'
+  | 'tool'
+  | 'potion'
+  | 'elixir';
+
+interface BaseItemDef {
   id: string;
   name: string;
-  kind: 'weapon' | 'armor' | 'quest' | 'junk' | 'food' | 'drink' | 'tool' | 'potion' | 'elixir';
   slot?: EquipSlot;
   weapon?: WeaponInfo;
   stats?: Partial<Stats>;
   use?: ItemUse;
   sellValue: number; // copper (vendor buys at this)
   buyValue?: number; // copper (vendor sells at this)
-  armorType?: 'cloth' | 'leather' | 'mail';
   questId?: string;
   noVendorSell?: boolean;
   noDiscard?: boolean;
@@ -287,6 +307,27 @@ export interface ItemDef {
   quality?: 'poor' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'; // gray/white/green/blue/purple/orange name colors
   requiredClass?: PlayerClass[];
 }
+
+export interface ArmorItemDef extends BaseItemDef {
+  kind: 'armor';
+  slot: Exclude<EquipSlot, 'mainhand'>;
+  armorType: ArmorType;
+  weapon?: never;
+}
+
+export interface WeaponItemDef extends BaseItemDef {
+  kind: 'weapon';
+  slot: 'mainhand';
+  weapon: WeaponInfo;
+  armorType?: never;
+}
+
+export interface OtherItemDef extends BaseItemDef {
+  kind: Exclude<ItemKind, 'armor' | 'weapon'>;
+  armorType?: never;
+}
+
+export type ItemDef = ArmorItemDef | WeaponItemDef | OtherItemDef;
 
 export interface InvSlot {
   itemId: string;
@@ -929,7 +970,16 @@ export type AbilityEffect =
   | { type: 'aoeAttackSpeed'; mult: number; duration: number; radius: number } // thunder clap rider
   | { type: 'aoeAttackPower'; amount: number; duration: number; radius: number } // demoralizing roar/shout
   | { type: 'aoeRoot'; duration: number; radius: number; min: number; max: number }
-  | { type: 'selfBuff'; kind: AuraKind; value: number; duration: number }
+  | {
+      type: 'selfBuff';
+      kind: AuraKind;
+      value: number;
+      duration: number;
+      // thorns auras only: a charge-limited reflect (Lightning Shield) caps how
+      // many melee hits reflect, gated by an internal cooldown between reflects.
+      charges?: number;
+      internalCooldown?: number;
+    }
   | { type: 'finisherHaste'; mult: number; basedur: number; perCombo: number } // slice and dice
   | { type: 'finisherStun'; base: number; perCombo: number } // kidney shot: stun seconds scale with combo
   | { type: 'gainResource'; amount: number } // bloodrage immediate
@@ -974,6 +1024,11 @@ export interface AbilityDef {
   // multiplier on the damage-threat (both scale with stance/form modifiers).
   threat?: { flat?: number; mult?: number };
   requiresForm?: 'bear' | 'cat'; // druid form kit (maul/growl/swipe/claw/bite)
+  // Mutually exclusive self-buff group: casting one ability in the group cancels
+  // any active buff from a sibling in the same group (e.g. hunter aspects, where
+  // only one aspect may be active at a time). Distinct from form toggles, which
+  // are excluded by aura kind, not by group.
+  exclusiveGroup?: string;
   requiresStealth?: boolean; // ambush
   requiresOutOfCombat?: boolean; // stealth
   learnLevel: number;
@@ -1301,6 +1356,7 @@ export interface Entity {
   gm?: boolean;
   respawnTimer: number;
   corpseTimer: number;
+  lootFfaTimer: number; // seconds of owner-lock left before tap loot opens to all (FFA); Infinity until rollLoot starts it
   despawnTimer?: number;
   damageIdleDespawnTimer?: number;
   lootable: boolean;
@@ -1386,7 +1442,7 @@ export type SimEvent = { pid?: number } & (
       crit: boolean;
       school: string;
       ability: string | null;
-      kind: 'hit' | 'miss' | 'dodge' | 'parry';
+      kind: 'hit' | 'miss' | 'dodge' | 'parry' | 'resist';
     }
   | { type: 'heal'; targetId: number; amount: number }
   | { type: 'death'; entityId: number; killerId: number }

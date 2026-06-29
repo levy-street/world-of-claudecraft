@@ -67,6 +67,11 @@ export function dealDamage(
   kind: 'hit' | 'miss' | 'dodge',
   noRage = false,
   threatOpts?: { flat?: number; mult?: number },
+  // Whether this is a DIRECT attack (auto-attack swing or a direct-hit spell) as
+  // opposed to incidental damage (Lightning Shield/Thorns/spiked-hide reflect, DoT
+  // ticks). Only direct damage may walk a mob's leash anchor; passive damage must
+  // let the mob leash (evade home) so it can't be kited an unlimited distance.
+  direct = true,
 ): void {
   if (target.dead) return;
   if (target.gm) return; // GM characters are invulnerable — every damage path funnels here
@@ -294,7 +299,7 @@ export function dealDamage(
   }
 
   if (source && source.id !== target.id) ctx.enterCombat(source, target);
-  ctx.refreshMobLeashFromAction(source, target);
+  if (direct) ctx.refreshMobLeashFromAction(source, target);
 
   // classic threat: damage (and the ability's flat bonus) lands on the mob's
   // hate table, scaled by the attacker's stance/form modifiers
@@ -507,6 +512,13 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
         ctx.retargetMob(m);
       }
     }
+    // The owner's pet does not outlive them: without this the pet was orphaned
+    // (still owned, owner present-but-dead) so updatePet's despawn guard never
+    // fired and petPickTarget's `!owner.dead` gate left it idle and unkillable.
+    // Route it through handleDeath so the owned-mob branch below applies: warlock
+    // demons unravel, a hunter's beast leaves a revivable corpse (Revive Pet).
+    const pet = ctx.petOf(e.id);
+    if (pet) handleDeath(ctx, pet, killer);
     return;
   }
 

@@ -149,6 +149,7 @@ export interface IWorld
 export const COMMAND_NAMES = [
   'castSlot',
   'cast',
+  'cancel_aura',
   'target',
   'tab',
   'targetNearest',
@@ -318,6 +319,7 @@ export const COMMAND_FACETS = {
   // IWorldCombat: ability casts, auto-attack, spirit release.
   cast: 'IWorldCombat',
   castSlot: 'IWorldCombat',
+  cancel_aura: 'IWorldCombat',
   attack: 'IWorldCombat',
   stopattack: 'IWorldCombat',
   release: 'IWorldCombat',

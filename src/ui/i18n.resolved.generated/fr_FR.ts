@@ -609,6 +609,80 @@ export const fr_FR: EnTranslations = {
       "leaderOnly": "Seul le chef de raid peut convertir en groupe.",
       "tooLarge": "Un raid de plus de cinq membres ne peut pas être reconverti en groupe."
     },
+    "itemArmorType": {
+      "cloth": "Cloth",
+      "leather": "Leather",
+      "mail": "Mail"
+    },
+    "auraEffect": {
+      "dot": "Inflige {value} points de dégâts de {school} toutes les {interval} s",
+      "hot": "Rend {value} points de vie toutes les {interval} s",
+      "absorb": "Absorbe {value} points de dégâts",
+      "healAbsorb": "Absorbe {value} points de soins reçus",
+      "thorns": "Inflige {value} points de dégâts de {school} aux attaquants",
+      "slow": "Réduit la vitesse de déplacement de {pct}%",
+      "speed": "Augmente la vitesse de déplacement de {pct}%",
+      "attackSpeedSlow": "Ralentit la vitesse d'attaque de {pct}%",
+      "attackSpeedFast": "Augmente la vitesse d'attaque de {pct}%",
+      "haste": "Augmente la vitesse d'attaque et d'incantation de {pct}%",
+      "tongues": "Augmente le temps d'incantation de {pct}%",
+      "increase": {
+        "ap": "Augmente la puissance d'attaque de {value}",
+        "armor": "Augmente l'armure de {value}",
+        "int": "Augmente l'intelligence de {value}",
+        "agi": "Augmente l'agilité de {value}",
+        "sta": "Augmente l'endurance de {value}",
+        "spi": "Augmente l'esprit de {value}",
+        "allStats": "Augmente tous les attributs de {value}"
+      },
+      "reduce": {
+        "ap": "Réduit la puissance d'attaque de {value}",
+        "armor": "Réduit l'armure de {value}",
+        "int": "Réduit l'intelligence de {value}",
+        "agi": "Réduit l'agilité de {value}",
+        "sta": "Réduit l'endurance de {value}",
+        "spi": "Réduit l'esprit de {value}",
+        "allStats": "Réduit tous les attributs de {value}"
+      },
+      "dodge": "Augmente les chances d'esquive de {pct}%",
+      "dodgeReduce": "Réduit les chances d'esquive de {pct}%",
+      "armorFlat": "Réduit l'armure de {value}",
+      "armorFlatStacks": "Réduit l'armure de {value} ({stacks} charges)",
+      "mortalWound": "Réduit les soins reçus de {pct}%",
+      "vulnerability": "Augmente les dégâts subis de {pct}%",
+      "physVuln": "Augmente les dégâts physiques subis de {pct}%",
+      "spellVuln": "Augmente les dégâts magiques subis de {pct}%",
+      "critVuln": "Augmente les chances de subir un coup critique de {pct}%",
+      "costTax": "Augmente le coût des techniques de {pct}%",
+      "stun": "Étourdi : impossible d'agir",
+      "root": "Enraciné : impossible de bouger",
+      "incapacitate": "Neutralisé : impossible d'agir",
+      "polymorph": "Métamorphosé : impossible d'agir",
+      "hex": "Réduit les dégâts et soins prodigués de {pct}%",
+      "blind": "Aveuglé : impossible d'agir",
+      "silence": "Réduit au silence : impossible de lancer des sorts",
+      "disarm": "Désarmé : impossible d'utiliser des attaques d'arme",
+      "lockout": "École de sort verrouillée",
+      "imbue": "Arme imprégnée d'effets bonus",
+      "imbueRange": "Arme imprégnée : {min} à {max} dégâts bonus au jugement",
+      "stealth": "Camouflé ; vitesse de déplacement réduite de {pct}%",
+      "formBear": "Forme d’ours : points de vie et armure augmentés",
+      "formCat": "Forme de félin : dégâts de mêlée et énergie",
+      "formTravel": "Forme de voyage : vitesse de déplacement augmentée de {pct}%",
+      "defensiveStance": "Posture défensive : dégâts subis réduits, menace accrue",
+      "righteousFury": "Fureur vertueuse : menace des dégâts Sacré fortement augmentée",
+      "scale": "Taille augmentée de {pct}%",
+      "jump": "Hauteur de saut augmentée de {pct}%",
+      "school": {
+        "physical": "Physique",
+        "fire": "Feu",
+        "frost": "Givre",
+        "arcane": "Arcanes",
+        "shadow": "Ombre",
+        "holy": "Sacré",
+        "nature": "Nature"
+      }
+    },
     "loot": {
       "chestTitle": "Coffre"
     },
@@ -2648,6 +2722,7 @@ export const fr_FR: EnTranslations = {
     "combat": {
       "floatingMiss": "Raté",
       "floatingDodge": "Esquive",
+      "floatingResist": "Resist",
       "cannotMove": "Immobilisé !",
       "attack": "attaque",
       "damageDone": "Votre {ability} touche {target} pour {amount}.",
@@ -2656,6 +2731,7 @@ export const fr_FR: EnTranslations = {
       "damageTakenCrit": "{source} vous inflige un coup critique pour {amount}.",
       "miss": "Votre {ability} rate {target}.",
       "dodged": "{target} esquive votre {ability}.",
+      "resisted": "Your {ability} is resisted by {target}.",
       "healSelf": "Votre {ability} vous rend {amount} points de vie.",
       "healSelfCrit": "Votre {ability} vous rend un soin critique de {amount}.",
       "healOther": "Votre {ability} soigne {target} pour {amount}.",
@@ -3450,7 +3526,7 @@ export const fr_FR: EnTranslations = {
       },
       "stealth": {
         "name": "Camouflage",
-        "description": "Vous dissimule dans les ombres: les ennemis vous remarquent à peine, mais vous vous déplacez 30% plus lentement. Attaquer ou subir des dégâts interrompt Camouflage. Relancez pour sortir."
+        "description": "Vous dissimule dans les ombres: les ennemis vous remarquent à peine, mais vous vous déplacez 50% plus lentement. Attaquer ou subir des dégâts interrompt Camouflage. Relancez pour sortir."
       },
       "adrenaline_rush": {
         "name": "Poussée d'adrénaline",
@@ -3482,7 +3558,7 @@ export const fr_FR: EnTranslations = {
       },
       "vanish": {
         "name": "Disparition",
-        "description": "Vous disparaissez et entrez en Camouflage, même en plein combat. Vous vous déplacez 30% plus lentement tant que vous êtes dissimulé. Dure jusqu'à 10 s."
+        "description": "Vous disparaissez et entrez en Camouflage, même en plein combat. Vous vous déplacez 50% plus lentement tant que vous êtes dissimulé. Dure jusqu'à 10 s."
       },
       "instant_poison": {
         "name": "Poison instantané",
@@ -3890,7 +3966,7 @@ export const fr_FR: EnTranslations = {
       },
       "prowl": {
         "name": "Rôder",
-        "description": "Passe en camouflage tant que vous êtes en forme de loup. Inutilisable en combat."
+        "description": "Passe en camouflage tant que vous êtes en forme de loup, avec une vitesse de déplacement réduite de 50%. Inutilisable en combat."
       },
       "rake": {
         "name": "Lacérer",

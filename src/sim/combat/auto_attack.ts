@@ -44,6 +44,8 @@ import {
 } from '../types';
 import { spendResource } from './casting_lifecycle';
 import { blindMissBonus, isDisarmed, isStunned } from './cc';
+import { baseSwingSpeed } from './form_swing';
+import { applyThornsReaction } from './thorns_charge';
 
 export function startAutoAttack(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
@@ -133,7 +135,9 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
     p.queuedOnSwing = null;
   }
   meleeSwing(ctx, p, t, bonus, abilityName, { threatFlat, threatMult });
-  p.swingTimer = p.weapon.speed * ctx.swingIntervalMult(p);
+  // Wolf Form swings at the rogue's fixed feral cadence, not the carried weapon's
+  // speed (see combat/form_swing.ts); everyone else uses their weapon speed.
+  p.swingTimer = baseSwingSpeed(p) * ctx.swingIntervalMult(p);
 }
 
 export function rangedSwing(
@@ -235,7 +239,11 @@ export function meleeSwing(
   for (const a of attacker.auras) if (a.kind === 'imbue') imbueBonus += a.value;
   let dmg =
     (ctx.rng.range(attacker.weapon.min, attacker.weapon.max) +
-      (ctx.effectiveAttackPower(attacker) / 14) * attacker.weapon.speed) *
+      // Normalize the attack-power contribution to the SAME cadence the swing
+      // fires at: Wolf Form swings at the rogue speed (baseSwingSpeed), so its
+      // AP-per-swing must use that speed too, not the slow staff's, or feral
+      // would double-dip (fast swings AND heavy slow-weapon AP weighting).
+      (ctx.effectiveAttackPower(attacker) / 14) * baseSwingSpeed(attacker)) *
       mult +
     bonus +
     imbueBonus;
@@ -257,13 +265,10 @@ export function meleeSwing(
     false,
     { flat: opts.threatFlat ?? 0, mult: opts.threatMult ?? 1 },
   );
-  // thorns / lightning shield: melee attackers take damage back
+  // thorns / lightning shield: melee attackers take damage back. Charge-limited
+  // thorns (Lightning Shield) consume a charge and gate on an internal cooldown.
   if (!attacker.dead) {
-    for (const a of target.auras) {
-      if (a.kind === 'thorns') {
-        ctx.dealDamage(target, attacker, a.value, false, a.school, a.name, 'hit', true);
-      }
-    }
+    applyThornsReaction(ctx, target, attacker);
     // innate "spiked hide" mobs (e.g. bristleback boars) reflect on every hit
     const spikes = MOBS[target.templateId]?.thorns;
     if (spikes && !attacker.dead) {
@@ -276,6 +281,8 @@ export function meleeSwing(
         spikes.name ?? 'Spiked Hide',
         'hit',
         true,
+        undefined,
+        false, // reflected damage shield: incidental, never walks the leash anchor
       );
     }
   }
