@@ -162,6 +162,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS account_totp_recovery_hash ON account_totp_rec
 CREATE INDEX IF NOT EXISTS accounts_created_at ON accounts(created_at DESC);
 CREATE INDEX IF NOT EXISTS accounts_created_ip_created ON accounts(created_ip, created_at DESC);
 CREATE INDEX IF NOT EXISTS accounts_created_user_agent_created ON accounts(created_user_agent, created_at DESC);
+CREATE INDEX IF NOT EXISTS accounts_last_login_ip_login ON accounts(last_login_ip, last_login DESC);
 ALTER TABLE characters ADD COLUMN IF NOT EXISTS is_gm BOOLEAN NOT NULL DEFAULT FALSE;
 ALTER TABLE characters ADD COLUMN IF NOT EXISTS force_rename BOOLEAN NOT NULL DEFAULT FALSE;
 CREATE TABLE IF NOT EXISTS play_sessions (
@@ -176,6 +177,7 @@ ALTER TABLE play_sessions ADD COLUMN IF NOT EXISTS ip_address TEXT;
 ALTER TABLE play_sessions ADD COLUMN IF NOT EXISTS user_agent TEXT;
 CREATE INDEX IF NOT EXISTS play_sessions_account ON play_sessions(account_id);
 CREATE INDEX IF NOT EXISTS play_sessions_started ON play_sessions(started_at);
+CREATE INDEX IF NOT EXISTS play_sessions_ip_started ON play_sessions(ip_address, started_at DESC);
 CREATE TABLE IF NOT EXISTS admin_online_samples (
   id BIGSERIAL PRIMARY KEY,
   realm TEXT NOT NULL DEFAULT '${REALM_SQL_DEFAULT}',

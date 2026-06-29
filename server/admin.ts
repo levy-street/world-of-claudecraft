@@ -1,12 +1,14 @@
 import type * as http from 'node:http';
 import {
   accountDetail,
+  associationsForIp,
   classDistribution,
   clientPerfRaw,
   clientPerfSummary,
   levelDistribution,
   listAccounts,
   listCharacters,
+  listSharedIps,
   onlineHistory,
   overviewCounts,
   registrationsByDay,
@@ -19,7 +21,6 @@ import {
   chatModeratedAccounts,
   chatModerationForAccount,
   getFilterConfig,
-  liftChatMute,
   listFilterWords,
   removeFilterWord,
   resetChatStrikes,
@@ -40,8 +41,10 @@ import type { GameServer } from './game';
 import { json, readBody } from './http_util';
 import { addBlockedIp, cleanIp, listBlockedIps, removeBlockedIp } from './ip_block_db';
 import {
+  addAccountNote,
   forceCharacterRename,
   ignoreReport,
+  liftAccountChatMute,
   moderateAccount,
   moderationQueue,
   moderationReportsForAccount,
@@ -107,7 +110,7 @@ async function adminAccountId(req: http.IncomingMessage): Promise<number | null>
 
 async function handleLogin(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
   if (rateLimited(req, ADMIN_LOGIN_MAX_PER_MINUTE)) {
-    return fail(res, 429, 'too many attempts — wait a minute and try again');
+    return fail(res, 429, 'too many attempts, wait a minute and try again');
   }
   const body = await readBody(req);
   const account = typeof body.username === 'string' ? await findAccount(body.username) : null;
@@ -138,13 +141,12 @@ export async function handleAdminApi(
     const accountId = await adminAccountId(req);
     if (accountId === null) return fail(res, 401, 'admin authentication required');
 
-    const actionMatch = /^\/admin\/api\/moderation\/accounts\/(\d+)\/(suspend|ban|unban)$/.exec(
-      path,
-    );
+    const actionMatch =
+      /^\/admin\/api\/moderation\/accounts\/(\d+)\/(suspend|unsuspend|ban|unban)$/.exec(path);
     if (req.method === 'POST' && actionMatch) {
       const targetAccountId = Number(actionMatch[1]);
-      const action = actionMatch[2] as 'suspend' | 'ban' | 'unban';
-      if (action !== 'unban' && (await isAdminAccount(targetAccountId))) {
+      const action = actionMatch[2] as 'suspend' | 'unsuspend' | 'ban' | 'unban';
+      if ((action === 'suspend' || action === 'ban') && (await isAdminAccount(targetAccountId))) {
         return fail(res, 400, 'admin accounts cannot be suspended or banned');
       }
       const body = await readBody(req);
@@ -156,7 +158,7 @@ export async function handleAdminApi(
           reason: body.reason,
           expiresAt: body.expiresAt,
         });
-        if (action !== 'unban') {
+        if (action === 'suspend' || action === 'ban') {
           const statusText =
             action === 'ban' ? 'This account has been banned.' : 'This account is suspended.';
           game.disconnectAccount(targetAccountId, statusText);
@@ -251,9 +253,31 @@ export async function handleAdminApi(
     const liftMuteMatch = /^\/admin\/api\/moderation\/accounts\/(\d+)\/lift-mute$/.exec(path);
     if (req.method === 'POST' && liftMuteMatch) {
       const id = Number(liftMuteMatch[1]);
-      const lifted = await liftChatMute(id);
-      if (lifted) game.liftChatMuteLive(id);
-      return lifted ? ok(res, { ok: true }) : fail(res, 404, 'account not found');
+      const body = await readBody(req);
+      try {
+        await liftAccountChatMute({
+          accountId: id,
+          adminAccountId: accountId,
+          reason: body.reason,
+        });
+        game.liftChatMuteLive(id);
+        return ok(res, { ok: true });
+      } catch (err) {
+        return fail(res, 400, err instanceof Error ? err.message : 'chat unmute failed');
+      }
+    }
+    // Append a free-form moderator note to the account's audit log. Non-punitive:
+    // no account-state change, no disconnection, no report resolution.
+    const noteMatch = /^\/admin\/api\/moderation\/accounts\/(\d+)\/note$/.exec(path);
+    if (req.method === 'POST' && noteMatch) {
+      const id = Number(noteMatch[1]);
+      const body = await readBody(req);
+      try {
+        await addAccountNote({ accountId: id, adminAccountId: accountId, note: body.reason });
+        return ok(res, { ok: true });
+      } catch (err) {
+        return fail(res, 400, err instanceof Error ? err.message : 'failed to add note');
+      }
     }
     const resetStrikesMatch = /^\/admin\/api\/moderation\/accounts\/(\d+)\/reset-strikes$/.exec(
       path,
@@ -389,6 +413,45 @@ export async function handleAdminApi(
       const search = (url.searchParams.get('search') ?? '').slice(0, 64);
       return ok(res, await listAccounts(search, page, limit));
     }
+    if (path === '/admin/api/shared-ips') {
+      const { page, limit } = parsePageParams(url.searchParams);
+      if (url.searchParams.get('online') === '1') {
+        const rows = game.liveSharedIps();
+        const offset = (page - 1) * limit;
+        return ok(res, {
+          rows: rows.slice(offset, offset + limit).map((row) => ({
+            ...row,
+            blocked: game.isIpBlocked(row.ip),
+          })),
+          total: rows.length,
+          page,
+          limit,
+        });
+      }
+      const sharedIps = await listSharedIps(page, limit);
+      return ok(res, {
+        ...sharedIps,
+        rows: sharedIps.rows.map((row) => ({
+          ...row,
+          blocked: game.isIpBlocked(row.ip),
+        })),
+      });
+    }
+    if (path === '/admin/api/ip-associations') {
+      const ip = cleanIp(url.searchParams.get('ip'));
+      if (!ip) return fail(res, 400, 'a valid IP address is required');
+      const { page, limit } = parsePageParams(url.searchParams);
+      const associations = await associationsForIp(ip, page, limit);
+      const onlineAccountIds = game.liveAccountIds();
+      return ok(res, {
+        ...associations,
+        accounts: associations.accounts.map((account) => ({
+          ...account,
+          online: onlineAccountIds.has(account.accountId),
+        })),
+        blocked: game.isIpBlocked(ip),
+      });
+    }
     if (path === '/admin/api/moderation/queue') {
       return ok(res, { rows: await moderationQueue(game.liveAccountIds()) });
     }
@@ -412,7 +475,10 @@ export async function handleAdminApi(
       ]);
       if (!detail) return fail(res, 404, 'account not found');
       return ok(res, {
-        account: detail,
+        account: {
+          ...detail,
+          online: game.liveAccountIds().has(id),
+        },
         reports,
         chat,
         blockedIps: getBlockedIpsForAccount(game, detail),
@@ -420,15 +486,20 @@ export async function handleAdminApi(
     }
     const detailMatch = /^\/admin\/api\/accounts\/(\d+)$/.exec(path);
     if (detailMatch) {
-      const detail = await accountDetail(Number(detailMatch[1]));
+      const id = Number(detailMatch[1]);
+      const detail = await accountDetail(id);
       if (!detail) return fail(res, 404, 'account not found');
-      return ok(res, detail);
+      return ok(res, {
+        ...detail,
+        online: game.liveAccountIds().has(id),
+      });
     }
     if (path === '/admin/api/characters') {
       const { page, limit } = parsePageParams(url.searchParams);
+      const search = url.searchParams.get('search') ?? '';
       const sort = url.searchParams.get('sort') ?? 'level';
       const dir = url.searchParams.get('dir') === 'asc' ? 'asc' : 'desc';
-      return ok(res, await listCharacters(sort, dir, page, limit));
+      return ok(res, await listCharacters(search, sort, dir, page, limit));
     }
 
     fail(res, 404, 'unknown admin endpoint');

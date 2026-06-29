@@ -2,6 +2,8 @@ import { execSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { svelte } from '@sveltejs/vite-plugin-svelte';
+import { svelteTesting } from '@testing-library/svelte/vite';
 import { browserslistToTargets } from 'lightningcss';
 import { defineConfig } from 'vite';
 import { loadBrowserslistFloors } from './scripts/browserslist_targets.mjs';
@@ -151,7 +153,14 @@ function i18nModulepreloadPlugin() {
 
 export default defineConfig({
   base: '/',
-  plugins: [staticPageAliasPlugin(), i18nModulepreloadPlugin()],
+  // The Svelte plugin only transforms the standalone admin entry. The testing
+  // plugin is scoped to Vitest so it cannot affect production client builds.
+  plugins: [
+    svelte(),
+    ...(process.env.VITEST ? [svelteTesting()] : []),
+    staticPageAliasPlugin(),
+    i18nModulepreloadPlugin(),
+  ],
   resolve: { alias: { '#bot-detector': botDetectorImpl } },
   define: {
     __APP_VERSION__: JSON.stringify(appVersion),

@@ -1,3 +1,5 @@
+import type { AccountStatus } from './account_status';
+
 // Shapes returned by the /admin/api endpoints (mirrors server/admin_db.ts
 // and server/game.ts admin views).
 
@@ -150,12 +152,50 @@ export interface Paginated<T> {
   limit: number;
 }
 
+export interface IpAssociationsData {
+  ip: string;
+  blocked: boolean;
+  accounts: {
+    accountId: number;
+    username: string;
+    isAdmin: boolean;
+    online: boolean;
+    status: AccountStatus;
+    suspendedUntil: string | null;
+    createdAt: string;
+    createdWithIp: boolean;
+    lastLoginWithIp: boolean;
+    hasSession: boolean;
+    lastSeenAt: string;
+    characters: {
+      characterId: number | null;
+      characterName: string;
+      realm: string | null;
+      lastSeenAt: string;
+      sessionCount: number;
+    }[];
+  }[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface SharedIpRow {
+  ip: string;
+  accountCount: number;
+  lastSeenAt: string;
+  blocked: boolean;
+}
+
+export type SharedIpsData = Paginated<SharedIpRow>;
+
 export interface AccountDetail {
   id: number;
   username: string;
   createdAt: string;
   lastLogin: string | null;
   isAdmin: boolean;
+  online: boolean;
   bannedAt: string | null;
   suspendedUntil: string | null;
   moderationReason: string;
@@ -183,12 +223,24 @@ export interface AccountDetail {
     seconds: number;
     ip: string | null;
   }[];
+  moderationHistory: ModerationHistoryEntry[];
+}
+
+export interface ModerationHistoryEntry {
+  id: number;
+  action: string;
+  reason: string;
+  createdAt: string;
+  expiresAt: string | null;
+  adminAccountId: number | null;
+  adminUsername: string | null;
 }
 
 export interface ModerationQueueRow {
   accountId: number;
   username: string;
-  status: 'active' | 'suspended' | 'banned';
+  isAdmin: boolean;
+  status: AccountStatus;
   suspendedUntil: string | null;
   openReports: number;
   latestReportAt: string;
@@ -301,4 +353,19 @@ export interface ChatFilterData {
   hard: FilterWord[];
   config: EscalationConfig;
   accounts: ChatModeratedAccount[];
+}
+
+// One bar in the overview activity charts (BarChart.svelte). `title` overrides the
+// default "<label>: <value><suffix>" hover tooltip.
+export interface BarPoint {
+  label: string;
+  value: number;
+  title?: string;
+}
+
+export interface LinePoint {
+  label: string;
+  value: number;
+  secondaryValue?: number;
+  title?: string;
 }

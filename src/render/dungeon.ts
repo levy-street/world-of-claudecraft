@@ -298,7 +298,7 @@ export function ensureDungeonAssets(): Promise<void> {
 // kit + Halloween-bits modules stream in (and their shaders compile) the moment
 // the camera nears a dungeon door, which is the on-approach freeze at the Fallen
 // Chapel. assetsReady() now genuinely covers everything buildInterior needs.
-registerPreload(ensureDungeonAssets());
+if (typeof window !== 'undefined') registerPreload(ensureDungeonAssets());
 
 // ---------------------------------------------------------------------------
 // Deterministic placement helpers

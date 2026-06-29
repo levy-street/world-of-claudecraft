@@ -9,7 +9,9 @@
 A classic-style micro-MMO **and** a headless reinforcement-learning
 environment, both driven by one deterministic TypeScript simulation core.
 Stack: TypeScript (ESM, `strict`) · Three.js renderer · `ws` WebSockets ·
-Postgres (`pg`) · Vite + esbuild · Vitest. No UI framework; tiny dependency set.
+Postgres (`pg`) · Vite + esbuild · Vitest. No UI framework in the game client; tiny
+dependency set. The one sanctioned exception is the standalone admin dashboard
+(`src/admin/`), which is built with Svelte 5 (it never touches the game client bundle).
 
 ## Repo map
 | Path | What it is |
@@ -106,7 +108,9 @@ See `README.md` for the full host/develop/play guide and the classic-fidelity ch
 
 ## Conventions
 - **ESM + TypeScript `strict`** everywhere. 2-space indent; match the surrounding file.
-- **Keep the dependency set tiny.** Don't add packages without a clear need.
+- **Keep the dependency set tiny.** Don't add packages without a clear need. (Svelte
+  and `@sveltejs/vite-plugin-svelte` are the one sanctioned exception, scoped to the
+  `src/admin/` dashboard bundle; the game/guide/play entries stay framework-free.)
 - **No em dashes, en dashes, or emojis** anywhere: code, comments, docs, commits, PR
   text, or player-facing copy. Use commas, colons, parentheses, or "to" for ranges.
   (An emoji that stands in for a real label still needs its real `t()` text.)
