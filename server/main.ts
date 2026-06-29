@@ -1445,13 +1445,23 @@ async function main(): Promise<void> {
       ws.close();
       return;
     }
-    const status = await moderationStatusForAccount(accountId);
+    // The remaining account/character reads are independent (each keyed only by
+    // accountId/characterId), so fetch them in one round-trip batch rather than
+    // five sequential awaits: a single join then holds a pool connection for far
+    // less wall-clock, which is what lets a reconnect storm (everyone returning
+    // after a restart) drain instead of piling up behind the 10 s auth timeout.
+    const [status, character, chatMute, isAdmin, accountCosmetics] = await Promise.all([
+      moderationStatusForAccount(accountId),
+      getCharacter(accountId, characterId),
+      chatMuteStatusForAccount(accountId),
+      isAdminAccount(accountId),
+      loadAccountCosmetics(accountId),
+    ]);
     if (status.locked) {
       ws.send(JSON.stringify({ t: 'error', error: status.message }));
       ws.close();
       return;
     }
-    const character = await getCharacter(accountId, characterId);
     if (!character) {
       ws.send(JSON.stringify({ t: 'error', error: 'no such character' }));
       ws.close();
@@ -1467,12 +1477,10 @@ async function main(): Promise<void> {
       ws.close();
       return;
     }
-    const chatMute = await chatMuteStatusForAccount(accountId);
     // Hard per-IP WS connection limit. The soft threshold (composite score evidence)
     // is handled inside game.join(); this guard blocks egregious bot farms before
     // they consume a session slot.
     const ip = requestMetadata(req).ip;
-    const isAdmin = await isAdminAccount(accountId);
     if (
       isConnectionRefused({
         blocked: game.isIpBlocked(ip),
@@ -1484,7 +1492,6 @@ async function main(): Promise<void> {
       ws.close(1008, 'Too many connections from your network');
       return;
     }
-    const accountCosmetics = await loadAccountCosmetics(accountId);
     const result = game.join(
       ws,
       accountId,
@@ -1548,7 +1555,20 @@ async function main(): Promise<void> {
       // attached the permanent message handler. Without this the frames are
       // silently dropped (see ws_buffer.ts).
       const flush = bufferHandshakeMessages(ws);
-      void authenticateWebSocket(ws, String(data), req).finally(flush);
+      // A DB read on the auth path can reject (e.g. the pool is saturated during a
+      // reconnect storm). Without a catch that surfaces as an unhandledRejection and
+      // the socket hangs until the 10 s auth timeout; close it cleanly instead.
+      void authenticateWebSocket(ws, String(data), req)
+        .catch((err) => {
+          console.error('ws auth failed:', err);
+          try {
+            ws.send(JSON.stringify({ t: 'error', error: 'not authenticated' }));
+            ws.close();
+          } catch {
+            /* socket already closing */
+          }
+        })
+        .finally(flush);
     });
   }
 

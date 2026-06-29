@@ -34,7 +34,12 @@ export const DATABASE_URL =
     );
   })();
 
-export const pool = new Pool({ connectionString: DATABASE_URL, max: 10 });
+// Pool size defaults to 10 (unchanged), but is env-tunable so a join burst (each
+// WS auth now fires several reads at once) or a crowd load test can widen it
+// without a code change; an operator must keep the sum across realm processes
+// under the database's own max_connections.
+const PG_POOL_MAX = Math.max(1, Number(process.env.PG_POOL_MAX ?? '10') || 10);
+export const pool = new Pool({ connectionString: DATABASE_URL, max: PG_POOL_MAX });
 
 const REALM_SQL_DEFAULT = REALM.replace(/'/g, "''");
 const LIFETIME_XP_EXPR = "((state->>'lifetimeXp')::bigint)";

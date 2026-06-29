@@ -30,7 +30,11 @@ metrics. Needs `npm run dev` (:5173); the `crowd` scenario also needs
   `sample` injects a rAF collector (`window.__prof`) that records per-frame
   `{dt, programs, views, longTaskMs}`, then folds report + `frameStats` +
   `attributeFreezes`. Online crowds are WS bots with a unique `X-Forwarded-For`
-  per bot to clear the 20/min/IP register limit (load-test only).
+  per bot on BOTH the REST calls and the WS upgrade (load-test only): the REST XFF
+  clears the 20/min/IP register limit, and the WS XFF clears the per-IP connection
+  cap (`MAX_WS_PER_IP_HARD`). Without the WS XFF every bot shared `127.0.0.1` and
+  the crowd hit a flat 20-connection wall (`close(1008)`), which read as a bogus
+  "join timeout" ceiling.
 
 ## Conventions
 - Reads the world only through `window.__game` (sim/world/renderer/input/perf) +

@@ -1,8 +1,9 @@
 // Profiler core: drives the real game (headed, real GPU, vsync off) and turns a
 // scenario into rich, structured perf metrics. Shared by the CLI today and an
 // MCP server later. Reuses the world hooks on window.__game (sim/world/renderer/
-// input/perf) and, online, spawns WS bot crowds (X-Forwarded-For per bot to clear
-// the 20/min/IP register limit). Pure metric math lives in ./metrics.mjs.
+// input/perf) and, online, spawns WS bot crowds (a unique X-Forwarded-For per bot
+// on BOTH the REST calls and the WS upgrade, to clear the 20/min/IP register limit
+// and the per-IP WS connection cap). Pure metric math lives in ./metrics.mjs.
 
 import fs from 'node:fs';
 import puppeteer from 'puppeteer-core';
@@ -186,7 +187,12 @@ class Bot {
     if (!this.charId)
       throw new Error(`charcreate ${this.i}: ${JSON.stringify(char.body).slice(0, 80)}`);
     await new Promise((resolve, reject) => {
-      this.ws = new WebSocket(`${this.wsBase}/ws`);
+      // The WS upgrade needs the SAME per-bot X-Forwarded-For the REST calls use:
+      // without it every bot's socket resolves to 127.0.0.1, so the server's
+      // per-IP hard cap (MAX_WS_PER_IP_HARD, default 20) closes the 21st+ with a
+      // 1008 and the bot then waits forever for `hello` (a "join timeout"). The
+      // header is honoured because a loopback source is a trusted XFF setter.
+      this.ws = new WebSocket(`${this.wsBase}/ws`, { headers: { 'X-Forwarded-For': xff } });
       const to = setTimeout(() => reject(new Error('join timeout')), 20000);
       this.ws.on('open', () =>
         this.ws.send(JSON.stringify({ t: 'auth', token: this.token, character: this.charId })),
@@ -472,8 +478,10 @@ export class Profiler {
     const batch = [];
     for (let i = this.bots.length; i < n; i++)
       batch.push(new Bot(this.server, this.wsBase, this.uniq, i));
-    // Join in WAVES, not all at once: 50 simultaneous WS auth+character-load joins
-    // overwhelm the server's join path (most time out). Waves let it drain each set.
+    // Join in WAVES rather than all at once: a courtesy that keeps a single run
+    // from thundering-herd-ing the DB pool on register/create/auth. It is NOT what
+    // makes the crowd scale (the per-bot WS X-Forwarded-For above is); the wall the
+    // old runs hit was the per-IP connection cap, not join-path throughput.
     const WAVE = 6;
     for (let w = 0; w < batch.length; w += WAVE) {
       await Promise.all(
