@@ -323,7 +323,8 @@ export const ru_RU: EnTranslations = {
       "highContrastBackground": "Фон высокой контрастности",
       "showItemLevel": "Показывать уровень предмета",
       "itemLevelLine": "Уровень предмета {level}",
-      "itemScoreLine": "Оценка {score}"
+      "itemScoreLine": "Оценка {score}",
+      "showSecondaryActionBar": "Показывать вторичную панель действий"
     },
     "controller": {
       "title": "Геймпад",

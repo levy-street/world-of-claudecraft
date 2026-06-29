@@ -323,7 +323,8 @@ export const id_ID: EnTranslations = {
       "highContrastBackground": "Latar Kontras Tinggi",
       "showItemLevel": "Tampilkan Level Item",
       "itemLevelLine": "Level Item {level}",
-      "itemScoreLine": "Skor {score}"
+      "itemScoreLine": "Skor {score}",
+      "showSecondaryActionBar": "Show Secondary Action Bar"
     },
     "controller": {
       "title": "Kontroler",

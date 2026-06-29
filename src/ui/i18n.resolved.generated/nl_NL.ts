@@ -323,7 +323,8 @@ export const nl_NL: EnTranslations = {
       "highContrastBackground": "Hoog-contrastachtergrond",
       "showItemLevel": "Itemniveau tonen",
       "itemLevelLine": "Itemniveau {level}",
-      "itemScoreLine": "Score {score}"
+      "itemScoreLine": "Score {score}",
+      "showSecondaryActionBar": "Show Secondary Action Bar"
     },
     "controller": {
       "title": "Controller",

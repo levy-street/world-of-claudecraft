@@ -323,7 +323,8 @@ export const fr_FR: EnTranslations = {
       "highContrastBackground": "Arrière-plan à contraste élevé",
       "showItemLevel": "Afficher le niveau d'objet",
       "itemLevelLine": "Niveau d'objet {level}",
-      "itemScoreLine": "Score {score}"
+      "itemScoreLine": "Score {score}",
+      "showSecondaryActionBar": "Show Secondary Action Bar"
     },
     "controller": {
       "title": "Manette",

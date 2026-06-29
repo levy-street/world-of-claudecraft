@@ -286,6 +286,9 @@ export const hudChromeStrings = {
     showItemLevel: 'Show Item Level',
     itemLevelLine: 'Item Level {level}',
     itemScoreLine: 'Score {score}',
+    // Interface panel toggle that reveals the optional second action bar row (off
+    // by default). The abilities bound to its slots stay castable via their keybinds.
+    showSecondaryActionBar: 'Show Secondary Action Bar',
   },
   // Controller / gamepad options panel (Options > Controller). Player-facing
   // chrome, so every label is a key here; the live numbers run through

@@ -323,7 +323,8 @@ export const vi_VN: EnTranslations = {
       "highContrastBackground": "Nền Tương Phản Cao",
       "showItemLevel": "Hiển Thị Cấp Vật Phẩm",
       "itemLevelLine": "Cấp Vật Phẩm {level}",
-      "itemScoreLine": "Điểm {score}"
+      "itemScoreLine": "Điểm {score}",
+      "showSecondaryActionBar": "Show Secondary Action Bar"
     },
     "controller": {
       "title": "Tay Cầm",

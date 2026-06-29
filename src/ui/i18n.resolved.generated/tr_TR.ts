@@ -323,7 +323,8 @@ export const tr_TR: EnTranslations = {
       "highContrastBackground": "Yüksek Kontrastlı Arka Plan",
       "showItemLevel": "Eşya Seviyesini Göster",
       "itemLevelLine": "Eşya Seviyesi {level}",
-      "itemScoreLine": "Puan {score}"
+      "itemScoreLine": "Puan {score}",
+      "showSecondaryActionBar": "Show Secondary Action Bar"
     },
     "controller": {
       "title": "Oyun Kolu",

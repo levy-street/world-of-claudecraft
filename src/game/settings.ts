@@ -194,6 +194,11 @@ export const BOOL_SETTINGS = {
   // tooltip. Purely a display preference read live by the HUD; off keeps the
   // classic stat-only tooltip. See src/sim/item_level.ts for the derivation.
   showItemLevel: { def: false },
+  // off by default: out of the box the HUD shows a single action bar. When on, the
+  // second action bar row (#actionbar2, slots 12..22) is revealed via a body class
+  // applied in main.ts. Purely a display preference; the slots stay reachable via
+  // their keybinds either way, so the row being hidden never disables those abilities.
+  showSecondaryActionBar: { def: false },
   // internal, never shown in the options UI: set true once main.ts has persisted a
   // device-appropriate graphicsPreset on a player's first run (a CONCLUSIVE detection).
   // It gates firstRunGraphicsPreset so a recognized device is classified at most once and

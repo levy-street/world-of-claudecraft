@@ -323,7 +323,8 @@ export const zh_TW: EnTranslations = {
       "highContrastBackground": "高對比度背景",
       "showItemLevel": "顯示物品等級",
       "itemLevelLine": "物品等級 {level}",
-      "itemScoreLine": "評分 {score}"
+      "itemScoreLine": "評分 {score}",
+      "showSecondaryActionBar": "顯示副動作列"
     },
     "controller": {
       "title": "手把",

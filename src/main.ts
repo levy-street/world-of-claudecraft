@@ -1325,6 +1325,13 @@ async function startGame(
       document.body.classList.toggle('compact-chat', settings.set('compactChat', !!value));
       return;
     }
+    if (key === 'showSecondaryActionBar') {
+      document.body.classList.toggle(
+        'show-actionbar2',
+        settings.set('showSecondaryActionBar', !!value),
+      );
+      return;
+    }
     if (key === 'browserEffects') {
       applyBrowserEffects(settings.set('browserEffects', value as number));
       return;

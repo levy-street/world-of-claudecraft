@@ -323,7 +323,8 @@ export const pl_PL: EnTranslations = {
       "highContrastBackground": "Tło o wysokim kontraście",
       "showItemLevel": "Pokaż poziom przedmiotu",
       "itemLevelLine": "Poziom przedmiotu {level}",
-      "itemScoreLine": "Ocena {score}"
+      "itemScoreLine": "Ocena {score}",
+      "showSecondaryActionBar": "Show Secondary Action Bar"
     },
     "controller": {
       "title": "Kontroler",

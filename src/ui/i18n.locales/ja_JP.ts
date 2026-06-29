@@ -241,6 +241,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.uiScale': 'UIスケール',
   'hudChrome.options.highContrastBackground': '高コントラスト背景',
   'hudChrome.options.showItemLevel': 'アイテムレベルを表示',
+  'hudChrome.options.showSecondaryActionBar': 'セカンダリアクションバーを表示',
   'hudChrome.options.itemLevelLine': 'アイテムレベル {level}',
   'hudChrome.options.itemScoreLine': 'スコア {score}',
   'hudChrome.landing.highContrast': '高コントラスト',

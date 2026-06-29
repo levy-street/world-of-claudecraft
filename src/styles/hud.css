@@ -1083,9 +1083,17 @@
     padding: 6px;
   }
   /* The optional second action bar (second-action-bar feature) sits just under the
-     primary one; a tighter bottom pad keeps the pair compact. */
+     primary one; a tighter bottom pad keeps the pair compact. It is OFF by default
+     (a single classic bar): the Interface option "Show Secondary Action Bar" adds
+     body.show-actionbar2 to reveal it. The slots stay keybind-reachable either way.
+     Mobile keeps a single bar regardless (see body.mobile-touch rule in hud.mobile.css,
+     imported after this file so it wins the same-specificity tie). */
   #actionbar2 {
     padding-bottom: 2px;
+    display: none;
+  }
+  body.show-actionbar2 #actionbar2 {
+    display: flex;
   }
   .action-btn {
     width: 46px;

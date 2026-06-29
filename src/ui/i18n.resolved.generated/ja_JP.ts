@@ -323,7 +323,8 @@ export const ja_JP: EnTranslations = {
       "highContrastBackground": "高コントラスト背景",
       "showItemLevel": "アイテムレベルを表示",
       "itemLevelLine": "アイテムレベル {level}",
-      "itemScoreLine": "スコア {score}"
+      "itemScoreLine": "スコア {score}",
+      "showSecondaryActionBar": "セカンダリアクションバーを表示"
     },
     "controller": {
       "title": "コントローラー",

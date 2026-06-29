@@ -323,7 +323,8 @@ export const ko_KR: EnTranslations = {
       "highContrastBackground": "고대비 배경",
       "showItemLevel": "아이템 레벨 표시",
       "itemLevelLine": "아이템 레벨 {level}",
-      "itemScoreLine": "점수 {score}"
+      "itemScoreLine": "점수 {score}",
+      "showSecondaryActionBar": "보조 액션 바 표시"
     },
     "controller": {
       "title": "컨트롤러",
