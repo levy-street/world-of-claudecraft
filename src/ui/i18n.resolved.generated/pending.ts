@@ -21,5 +21,40 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [],
-  "ru_RU": []
+  "ru_RU": [],
+  "nl_NL": [
+    "hudChrome.options.itemLevelLine",
+    "hudChrome.options.itemScoreLine",
+    "hudChrome.options.showItemLevel"
+  ],
+  "pl_PL": [
+    "hudChrome.options.itemLevelLine",
+    "hudChrome.options.itemScoreLine",
+    "hudChrome.options.showItemLevel"
+  ],
+  "id_ID": [
+    "hudChrome.options.itemLevelLine",
+    "hudChrome.options.itemScoreLine",
+    "hudChrome.options.showItemLevel"
+  ],
+  "tr_TR": [
+    "hudChrome.options.itemLevelLine",
+    "hudChrome.options.itemScoreLine",
+    "hudChrome.options.showItemLevel"
+  ],
+  "sv_SE": [
+    "hudChrome.options.itemLevelLine",
+    "hudChrome.options.itemScoreLine",
+    "hudChrome.options.showItemLevel"
+  ],
+  "vi_VN": [
+    "hudChrome.options.itemLevelLine",
+    "hudChrome.options.itemScoreLine",
+    "hudChrome.options.showItemLevel"
+  ],
+  "da_DK": [
+    "hudChrome.options.itemLevelLine",
+    "hudChrome.options.itemScoreLine",
+    "hudChrome.options.showItemLevel"
+  ]
 };

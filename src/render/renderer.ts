@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { coerceFxTier, nameplateIntervalSec } from '../game/ui_tier_knobs';
 import { cameraOcclusion } from '../sim/colliders';
 import {
   ABILITIES,
@@ -21,35 +22,20 @@ import {
   isDelvePos,
   MOBS,
   NPCS,
-  QUESTS,
   WORLD_MAX_Z,
   WORLD_MIN_Z,
   ZONES,
 } from '../sim/data';
 import type { DelveModuleId } from '../sim/delve_layout';
 import type { BiomeId } from '../sim/types';
-import {
-  ALL_CLASSES,
-  type Entity,
-  INTERACT_RANGE,
-  isQuestTurnInNpc,
-  type SimEvent,
-} from '../sim/types';
+import { ALL_CLASSES, type Entity, type SimEvent } from '../sim/types';
 import { groundHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 import { tEntity } from '../ui/entity_i18n';
-import {
-  holderTierBadgeDataUrl,
-  holderTierByIndex,
-  holderTierDisplayName,
-} from '../ui/holder_tier';
-import { t } from '../ui/i18n';
-import { raidMarkerDataUrl } from '../ui/icons';
-import { type IWorld, OVERHEAD_EMOTES } from '../world_api';
+import type { IWorld } from '../world_api';
 import { isVisuallyDead } from './anim_state';
 import type { SpatialAudioSink, Surface } from './audio_sink';
 import { type BirdsView, buildBirds } from './birds';
 import { type CameraOcclusionState, stepCameraOcclusion } from './camera_collision';
-import { castBarState } from './cast_bar';
 import { characterSoulRendActive } from './character_effects';
 import { type AnimState, type CharacterVisual, createCharacterVisual } from './characters';
 import { mechAssetsReady, preloadMechAssets } from './characters/assets';
@@ -60,6 +46,7 @@ import { buildCritters, type CritterField } from './critters';
 import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable } from './delve_props';
 import { DungeonInteriors, ensureDungeonAssets } from './dungeon';
+import { objectDisplayName } from './entity_labels';
 import { releaseSelfFacing, stepSelfFacing } from './facing_smooth';
 import { buildFish, type FishView } from './fish';
 import { buildFoliage, type FoliagePerfStats, type FoliageView } from './foliage';
@@ -77,16 +64,16 @@ import { buildImpactSite, type ImpactSiteView } from './impact_site';
 import { ensureDelveInteriorKit } from './interior_kit';
 import { type LocoTrack, newLocoTrack, updateLocomotion } from './locomotion';
 import { buildMotes, type MotesView } from './motes';
-import { COMBO_PIP_MAX, comboPipsFor } from './nameplate_combo';
+import { COMBO_PIP_MAX } from './nameplate_combo';
+import { NameplatePainter } from './nameplate_painter';
 import {
   isProjectedNameplateAnchorVisible,
   nameplateScreenTransform,
 } from './nameplate_projection';
-import { isMobThreateningViewer } from './nameplate_threat';
 import { buildComposer, type PostPipeline } from './post';
 import { buildPropMaterialPrewarmGroup, buildProps } from './props';
 import { buildGroundQuestObject } from './quest_objects';
-import { FRIENDLY, isFriendlyPet, isOwnedPetHostile, mobNameColor } from './reaction';
+import { isOwnedPetHostile } from './reaction';
 import { RenderBudgetGovernor, type RenderBudgetState } from './render_budget';
 import { downscaleDims } from './screenshot';
 import { drapeRingLocalY } from './selection_ring';
@@ -101,9 +88,6 @@ import { Vfx } from './vfx';
 import { buildWater, type WaterView } from './water';
 import { Weather } from './weather';
 
-const NAMEPLATE_RANGE = 55;
-const NAMEPLATE_RANGE_SQ = NAMEPLATE_RANGE * NAMEPLATE_RANGE;
-const emoteIconUrl = (id: string): string => `/ui/emotes/emote-${id}.png`;
 // Entities further than this from the player are hidden entirely: their rigs
 // are several draw calls each and read as sub-pixel specks long before this.
 const ENTITY_DRAW_RANGE = 80;
@@ -434,7 +418,7 @@ function selfSnapshotAlpha(alpha: number, lead: number): number {
   return Math.min(1.25, alpha + Math.max(0, lead));
 }
 
-interface EntityView {
+export interface EntityView {
   group: THREE.Group;
   /** rigged glTF visual for characters; null for object views (doors/crates) */
   visual: CharacterVisual | null;
@@ -649,43 +633,6 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => window.setTimeout(resolve, Math.max(0, ms)));
 }
 
-function mobDisplayName(mobId: string): string {
-  return tEntity({ kind: 'mob', id: mobId, field: 'name' });
-}
-
-function npcDisplayName(npcId: string): string {
-  return tEntity({ kind: 'npc', id: npcId, field: 'name' });
-}
-
-function dungeonDisplayName(dungeonId: string): string {
-  return tEntity({ kind: 'dungeon', id: dungeonId, field: 'name' });
-}
-
-function objectDisplayName(entity: Entity): string {
-  if (entity.templateId === 'delve_locked_chest') {
-    return t('worldContent.delveLockedChestInteract');
-  }
-  if (entity.templateId === 'delve_reward_chest') {
-    return t('worldContent.delveRewardChestInteract');
-  }
-  if (entity.templateId === 'delve_surface_exit') {
-    return t('worldContent.delveSurfaceExitInteract');
-  }
-  if (
-    (entity.templateId === 'dungeon_door' || entity.templateId === 'dungeon_exit') &&
-    entity.dungeonId
-  ) {
-    const dungeonName = dungeonDisplayName(entity.dungeonId);
-    return entity.templateId === 'dungeon_exit'
-      ? t('worldContent.dungeonExitName', { name: dungeonName })
-      : dungeonName;
-  }
-  // Collectible/quest ground objects carry the item id they grant; localize the
-  // nameplate through the item dictionary instead of the raw English name.
-  if (entity.objectItemId) return tEntity({ kind: 'item', id: entity.objectItemId, field: 'name' });
-  return entity.name;
-}
-
 export class Renderer {
   scene = new THREE.Scene();
   camera: THREE.PerspectiveCamera;
@@ -694,6 +641,7 @@ export class Renderer {
   nameplateLayer: HTMLDivElement;
   // Travel-form speed-illusion overlay (presentation only; see travel_speed_fx*).
   private travelSpeedFx: TravelSpeedFxPainter;
+  private nameplatePainter: NameplatePainter;
   // Last local-player XZ, to derive ground speed for the speed cue (yd/s).
   private lastLocalPos: { x: number; z: number } | null = null;
   // Cached prefers-reduced-motion query. `.matches` stays live as the OS setting
@@ -928,6 +876,17 @@ export class Renderer {
       0.1,
       950,
     );
+    // Nameplate Three/DOM ownership lives in the painter; it reads the
+    // viewport / mob-nameplate toggle lazily (the renderer reassigns viewport on
+    // resize) and borrows the renderer's PvP reaction check.
+    this.nameplatePainter = new NameplatePainter({
+      views: this.views,
+      camera: this.camera,
+      world: this.sim,
+      getViewport: () => this.viewport,
+      showNameplates: () => this.showNameplates,
+      isHostilePlayer: (e) => this.isHostilePlayer(e),
+    });
 
     this.scene.fog = new THREE.Fog(
       LOW_GFX ? 0xb6cddd : 0xa6c6e0,
@@ -1908,7 +1867,7 @@ export class Renderer {
       sp.visible = this.fogState === 'outdoor';
     }
     this.updateGodRays();
-    this.updateNameplates(true);
+    this.nameplatePainter.update(true);
     this.updateChatBubbles();
   }
 
@@ -4110,10 +4069,20 @@ export class Renderer {
     markPhase('world');
 
     this.nameplateTimer += dt;
-    const nameplateInterval = this.isMobileRuntime() ? 1 / 15 : 1 / 24;
+    // Static-preset tiered cadence: the nameplate refresh interval follows
+    // the player's chosen graphics tier (the data-fx-level the preset applier
+    // stamps), NEVER the FPS governor (the two-controller rule). The
+    // LOW tier runs 1/15s, richer tiers 1/24s. The axis is the PRESET, not the device:
+    // the weak-GPU cost ceiling (the PR901 lesson) is restored through the device-aware
+    // first-run default (resolveDefaultGraphicsPreset in gfx.ts), which lands a
+    // recognized-weak or software GPU on the LOW preset (its 1/15s ceiling) while a
+    // mid/unknown device defaults to medium (1/24s). An explicit player preset wins.
+    const nameplateInterval = nameplateIntervalSec(
+      coerceFxTier(document.documentElement.dataset.fxLevel),
+    );
     const fullNameplatePass = this.nameplateTimer >= nameplateInterval;
     if (fullNameplatePass) this.nameplateTimer = 0;
-    this.updateNameplates(fullNameplatePass);
+    this.nameplatePainter.update(fullNameplatePass);
     this.updateChatBubbles();
     markPhase('nameplates');
     this.updateTravelSpeedFx(p, selfPos, dt);
@@ -4408,298 +4377,6 @@ export class Renderer {
       const nearWater = !inDungeon && groundHeight(px, pz, seed) < WATER_LEVEL + 0.4;
       sink.ambience(biome, inDungeon, precip, nearWater);
     }
-  }
-
-  private updateNameplates(fullPass: boolean): void {
-    const sim = this.sim;
-    const p = sim.player;
-    const { width: w, height: h } = this.viewport;
-    for (const [id, v] of this.views) {
-      const e = sim.entities.get(id);
-      if (!e) continue;
-      const dx = e.pos.x - p.pos.x,
-        dz = e.pos.z - p.pos.z;
-      const d2 = dx * dx + dz * dz;
-      const urgent = id === p.targetId || d2 < 14 * 14 || e.castingAbility !== null;
-      const isSelf = id === p.id;
-      const hasOverheadEmote = !!(e.kind === 'player' && e.overheadEmoteId && !e.dead);
-      const isDoor = e.templateId === 'dungeon_door' || e.templateId === 'dungeon_exit';
-      const isDelveInteract =
-        e.templateId === 'delve_locked_chest' ||
-        e.templateId === 'delve_reward_chest' ||
-        e.templateId === 'delve_surface_exit';
-      const delveInteractNear =
-        isDelveInteract && d2 <= (INTERACT_RANGE + 1) * (INTERACT_RANGE + 1);
-      const hidden =
-        (isSelf && !hasOverheadEmote) ||
-        d2 > NAMEPLATE_RANGE_SQ ||
-        (e.dead && !e.lootable && e.kind === 'mob') ||
-        (e.kind === 'object' && !isDoor && !delveInteractNear) ||
-        // the sealed royal door inside the crypt carries no floating label —
-        // it reads as part of the back wall, not a portal billboard
-        (isDoor && e.dungeonId === 'nythraxis_boss_arena') ||
-        (!this.showNameplates && e.kind === 'mob' && !e.dead);
-      if (hidden) {
-        if (v.nameplateDisplay !== 'none') {
-          v.nameplate.style.display = 'none';
-          v.nameplateDisplay = 'none';
-        }
-        continue;
-      }
-      this.tmpV.copy(v.group.position);
-      this.tmpV.y += v.height * e.scale + (isSelf && hasOverheadEmote ? 0.2 : 0.8);
-      if (!isProjectedNameplateAnchorVisible(this.camera, this.tmpV, this.tmpV2)) {
-        if (v.nameplateDisplay !== 'none') {
-          v.nameplate.style.display = 'none';
-          v.nameplateDisplay = 'none';
-        }
-        continue;
-      }
-      this.tmpV.project(this.camera);
-      if (this.tmpV.z < -1 || this.tmpV.z > 1) {
-        if (v.nameplateDisplay !== 'none') {
-          v.nameplate.style.display = 'none';
-          v.nameplateDisplay = 'none';
-        }
-        continue;
-      }
-      const sx = (this.tmpV.x * 0.5 + 0.5) * w;
-      const sy = (-this.tmpV.y * 0.5 + 0.5) * h;
-      if (v.nameplateDisplay !== '') {
-        v.nameplate.style.display = '';
-        v.nameplateDisplay = '';
-      }
-      const transform = nameplateScreenTransform(sx, sy);
-      if (transform !== v.nameplateTransform) {
-        v.nameplate.style.transform = transform;
-        v.nameplateTransform = transform;
-      }
-
-      if (!fullPass && !urgent) continue;
-      v.nameplate.classList.toggle('has-emote', hasOverheadEmote);
-
-      // party raid/target marker (only mobs are markable, so this is null elsewhere)
-      const emote = e.overheadEmoteId
-        ? OVERHEAD_EMOTES.find((x) => x.id === e.overheadEmoteId)
-        : null;
-      if (emote && e.kind === 'player' && !e.dead) {
-        v.emoteIconEl.src = emoteIconUrl(emote.id);
-        const emoteLabel = t(`hudChrome.emotes.${emote.id}`);
-        v.emoteLabelEl.textContent = emoteLabel;
-        v.emoteEl.title = emoteLabel;
-        v.emoteEl.style.display = '';
-      } else {
-        v.emoteEl.style.display = 'none';
-      }
-      v.nameEl.style.display = '';
-
-      const raidMark = this.sim.markerFor(e.id);
-      if (raidMark !== null) {
-        v.raidMarkEl.style.backgroundImage = `url(${raidMarkerDataUrl(raidMark)})`;
-        v.raidMarkEl.style.display = '';
-      } else {
-        v.raidMarkEl.style.display = 'none';
-      }
-
-      // combo points the local player has built on this entity (rogue/druid)
-      this.setNameplateCombo(v, comboPipsFor(p, e));
-
-      if (e.kind === 'object') {
-        // dungeon doorways announce themselves
-        const objName = objectDisplayName(e);
-        this.setNameplateStatic(
-          v,
-          `object|${objName}`,
-          objName,
-          '#c084ff',
-          'none',
-          '',
-          'np-marker',
-          '1',
-        );
-      } else if (e.kind === 'player') {
-        // other players: friendly blue with an hp bar; <Guild> tag under the name.
-        // Self has no overhead nameplate, so its guild line stays hidden too.
-        const opacity = e.auras.some((a) => a.kind === 'stealth') ? '0.55' : '1';
-        const nameDisplay = isSelf ? 'none' : '';
-        const hpDisplay = e.dead || isSelf ? 'none' : '';
-        const guild = isSelf ? '' : e.guild;
-        this.setNameplateStatic(
-          v,
-          `player|${e.name}|${guild}|${nameDisplay}|${hpDisplay}|${opacity}`,
-          e.name,
-          '#7fb8ff',
-          hpDisplay,
-          '',
-          'np-marker',
-          opacity,
-          '',
-          guild,
-        );
-        v.nameEl.style.display = nameDisplay;
-        // $WOC holder-tier flair, shown on OTHER players (own nameplate is hidden).
-        this.setNameplateTier(v, isSelf ? 0 : (e.holderTier ?? 0));
-        this.setNameplateHp(v, e);
-      } else if (e.kind === 'npc' || (!e.hostile && e.questIds.length > 0)) {
-        const npcName =
-          e.kind === 'npc'
-            ? npcDisplayName(e.templateId)
-            : tEntity({ kind: 'mob', id: e.templateId, field: 'name' });
-        let marker = '';
-        let cls = '';
-        // role-aware: '!' only at the quest's giver, '?' only at its turn-in
-        // NPC (gray while in progress), matching the gossip dialog
-        for (const qid of e.questIds) {
-          const quest = QUESTS[qid];
-          if (!quest) continue;
-          const st = sim.questState(qid);
-          if (st === 'ready' && isQuestTurnInNpc(quest, e.templateId)) {
-            marker = '?';
-            cls = 'ready';
-            break;
-          }
-          if (st === 'available' && quest.giverNpcId === e.templateId) {
-            marker = '!';
-            cls = 'avail';
-          } else if (st === 'active' && isQuestTurnInNpc(quest, e.templateId) && !marker) {
-            marker = '?';
-            cls = 'active';
-          }
-        }
-        const markerClass = cls ? `np-marker ${cls}` : 'np-marker';
-        this.setNameplateStatic(
-          v,
-          `npc|${npcName}|${marker}|${markerClass}`,
-          npcName,
-          FRIENDLY,
-          'none',
-          marker,
-          markerClass,
-          '1',
-        );
-      } else {
-        const diff = e.level - p.level;
-        const template = MOBS[e.templateId];
-        const elite = !!template?.elite;
-        const boss = !!template?.boss;
-        // A friendly controlled pet reads as friendly green; wild mobs keep the
-        // classic level-difference ("con") color.
-        const friendlyPet = isFriendlyPet(e, this.sim.entities, (pl) => this.isHostilePlayer(pl));
-        const color = mobNameColor(diff, e.dead, friendlyPet);
-        const mobName = e.ownerId !== null ? e.name : mobDisplayName(e.templateId);
-        const name = e.dead
-          ? t('worldContent.corpseName', { name: mobName })
-          : `[${e.level}${elite ? '+' : ''}] ${mobName}`;
-        const hpDisplay = e.dead ? 'none' : '';
-        const marker = e.lootable ? '$' : elite && !e.dead ? '◆' : '';
-        // classic "dragon frame" cue: gold bar frame for elites, red for bosses (live mobs only)
-        const frame = e.dead ? '' : boss ? 'boss' : elite ? 'elite' : '';
-        this.setNameplateStatic(
-          v,
-          `mob|${name}|${color}|${hpDisplay}|${marker}|${frame}`,
-          name,
-          color,
-          hpDisplay,
-          marker,
-          'np-marker loot',
-          '1',
-          frame,
-        );
-        this.setNameplateHp(v, e);
-        // threat plate: tint the bar red when this mob is aggroed on me
-        v.nameplate.classList.toggle('np-threat', isMobThreateningViewer(e, this.sim.playerId));
-      }
-
-      this.updateCastBar(v, e);
-    }
-  }
-
-  private setNameplateStatic(
-    v: EntityView,
-    sig: string,
-    name: string,
-    color: string,
-    hpDisplay: string,
-    marker: string,
-    markerClass: string,
-    opacity: string,
-    frame = '',
-    guild = '',
-  ): void {
-    if (sig === v.nameplateSig) return;
-    v.nameplateSig = sig;
-    v.nameEl.textContent = name;
-    v.nameEl.style.color = color;
-    v.hpBar.style.display = hpDisplay;
-    v.hpBar.classList.toggle('elite', frame === 'elite');
-    v.hpBar.classList.toggle('boss', frame === 'boss');
-    v.markerEl.textContent = marker;
-    v.markerEl.className = markerClass;
-    v.nameplate.style.opacity = opacity;
-    // guild tag rides in the sig (players only); empty for every other kind
-    if (guild) {
-      v.guildEl.textContent = `<${guild}>`;
-      v.guildEl.style.display = '';
-    } else {
-      v.guildEl.style.display = 'none';
-    }
-  }
-
-  // Show/hide the $WOC holder-tier badge on a player's nameplate. Cheap-diffed
-  // on the tier value so the badge image is only rebuilt when the tier changes.
-  private setNameplateTier(v: EntityView, tier: number): void {
-    if (tier === v.tierValue) return;
-    v.tierValue = tier;
-    const def = holderTierByIndex(tier);
-    if (def) {
-      v.tierEl.src = holderTierBadgeDataUrl(def, 32);
-      v.tierEl.title = t('wallet.holderTierTitle', { tier: holderTierDisplayName(def) });
-      v.tierEl.style.display = '';
-    } else {
-      v.tierEl.removeAttribute('src');
-      v.tierEl.style.display = 'none';
-    }
-  }
-
-  private setNameplateHp(v: EntityView, e: Entity): void {
-    const width = `${((100 * e.hp) / Math.max(1, e.maxHp)).toFixed(1)}%`;
-    if (width === v.nameplateHpWidth) return;
-    v.nameplateHpWidth = width;
-    v.hpFill.style.width = width;
-  }
-
-  // Light `count` of the COMBO_PIP_MAX pips over this nameplate; hide the row
-  // entirely at zero so non-combo classes/targets show nothing.
-  private setNameplateCombo(v: EntityView, count: number): void {
-    const n = Math.max(0, Math.min(COMBO_PIP_MAX, count));
-    const sig = `${n}`;
-    if (sig === v.comboSig) return;
-    v.comboSig = sig;
-    v.comboRow.style.display = n > 0 ? '' : 'none';
-    for (let i = 0; i < v.comboPips.length; i++) {
-      v.comboPips[i].classList.toggle('lit', i < n);
-    }
-  }
-
-  // Overhead spell cast/channel bar. The fill + label rules live in the DOM-free
-  // castBarState() helper (cast_bar.ts); here we just push them to the DOM. Casts
-  // fill up toward completion, channels drain down — both honest to the live
-  // cast fields the sim and the online snapshot already expose.
-  private updateCastBar(v: EntityView, e: Entity): void {
-    const st = castBarState(e);
-    if (!st.visible) {
-      if (v.castBar.style.display !== 'none') v.castBar.style.display = 'none';
-      return;
-    }
-    v.castBar.style.display = '';
-    v.castBar.classList.toggle('channel', st.channel);
-    v.castFill.style.width = `${(st.fill * 100).toFixed(1)}%`;
-    // cast_bar.ts keeps st.label as a stable id (DOM/i18n-free); localize here.
-    v.castLabel.textContent = st.fishing
-      ? t('abilityUi.cast.fishing')
-      : ABILITIES[st.label]
-        ? tEntity({ kind: 'ability', id: st.label, field: 'name' })
-        : st.label;
   }
 
   // Hang a speech bubble over an entity's head; it follows the entity and

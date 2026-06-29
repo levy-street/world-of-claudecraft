@@ -414,6 +414,31 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(ev.some((e) => e.type === 'questDone' && e.questId === 'q_boars')).toBe(true);
   });
 
+  it('quest_link_abandon: party gate rejects then shares the quest, and abandon clears it', () => {
+    const rec = run('quest_link_abandon');
+    const ev = rec.allEvents as Ev[];
+    const a = rec.notes.a as number;
+    const b = rec.notes.b as number;
+    // The party gate rejected the pre-party linked accept.
+    expect(
+      ev.some((e) => e.type === 'error' && e.pid === b && /party to accept/.test(String(e.text))),
+    ).toBe(true);
+    // Once partied, finalizeQuestAccept ran for B (questAccepted + the sharer notice to A).
+    expect(
+      ev.some((e) => e.type === 'questAccepted' && e.questId === 'q_wolves' && e.pid === b),
+    ).toBe(true);
+    expect(
+      ev.some(
+        (e) => e.type === 'log' && e.pid === a && /accepted your shared quest/.test(String(e.text)),
+      ),
+    ).toBe(true);
+    // abandonQuest emitted its log and cleared B's quest log entry.
+    expect(
+      ev.some((e) => e.type === 'log' && e.pid === b && /^Quest abandoned:/.test(String(e.text))),
+    ).toBe(true);
+    expect((rec.sim as any).players.get(b)?.questLog?.has('q_wolves')).toBe(false);
+  });
+
   it('talents_progression: applyTalents/respec/loadout/setSpec fire and bake the flat struct', () => {
     const rec = run('talents_progression');
     const pid = (rec.sim as any).playerId;

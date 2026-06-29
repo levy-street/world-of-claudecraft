@@ -21,6 +21,15 @@ const mainTs = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8').
   /\r\n/g,
   '\n',
 );
+// index.html's char-select CSS moved into src/styles/shell.css (@layer shell),
+// loaded by the index entry via the barrel. play.html's inline <style> was emptied and
+// reconciled to the same canonical modules: play.html now loads shell.css through the
+// shared src/main.ts barrel (it carries NO inline char-select copy). So the CSS parity is
+// now structural: both entries load the one shell.css, which both checks below read.
+const shellCss = readFileSync(new URL('../src/styles/shell.css', import.meta.url), 'utf8').replace(
+  /\r\n/g,
+  '\n',
+);
 
 // The ids/classes wireStartScreens() and the sort menu depend on at boot/open time.
 const REQUIRED_SORT_IDS = ['cs-sort-btn', 'cs-sort-menu', 'cs-sort-current'];
@@ -43,12 +52,15 @@ describe('character-select sort control parity', () => {
   }
 
   for (const rule of REQUIRED_SORT_CSS) {
-    it(`index.html styles ${rule}`, () => {
-      expect(indexHtml).toContain(`${rule} {`);
+    it(`shell.css styles ${rule} (moved from index.html inline; shared by both entries)`, () => {
+      expect(shellCss).toContain(`${rule} {`);
     });
 
-    it(`play.html styles ${rule} (mirrors index.html)`, () => {
-      expect(playHtml).toContain(`${rule} {`);
+    it(`play.html reconciles ${rule} via the shared shell.css (its inline was emptied)`, () => {
+      // play.html no longer carries an inline copy of this rule (its <style> was
+      // emptied); it gets the rule from shell.css through the shared barrel.
+      expect(playHtml).not.toContain(`${rule} {`);
+      expect(playHtml).toContain('/src/main.ts');
     });
   }
 });

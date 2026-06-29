@@ -222,6 +222,21 @@ export const en_CA: EnTranslations = {
     "rest": {
       "resting": "Resting"
     },
+    "unitFrame": {
+      "playerLabel": "Your Hero",
+      "targetLabel": "Your Mark",
+      "targetAnnounce": "Mark {name}",
+      "partyLabel": "Your Band",
+      "partyGroup": "Group {n}",
+      "durationUnitSeconds": "s"
+    },
+    "character": {
+      "modelPreview": "Character Model Preview"
+    },
+    "skipLinks": {
+      "mainHud": "Skip to Main HUD",
+      "chat": "Skip to Chat"
+    },
     "mobile": {
       "autorun": "Autorun",
       "jump": "Jump",
@@ -243,6 +258,13 @@ export const en_CA: EnTranslations = {
       "coordinates": "Coordinates",
       "heading": "Heading",
       "minimapZoom": "Minimap zoom"
+    },
+    "castBar": {
+      "playerAria": "Your Cast Bar",
+      "targetAria": "Unit Cast Bar"
+    },
+    "leaderboard": {
+      "close": "Close"
     },
     "raidLockout": {
       "title": "Raid Lockouts",
@@ -586,6 +608,17 @@ export const en_CA: EnTranslations = {
       "notRaid": "Your group is not a raid.",
       "leaderOnly": "Only the raid leader may convert to a party.",
       "tooLarge": "A raid with more than five members cannot convert back to a party."
+    },
+    "loot": {
+      "chestTitle": "Chest"
+    },
+    "spellbook": {
+      "addToBarAria": "Add {name} to action bar",
+      "removeFromBarAria": "Remove {name} from action bar"
+    },
+    "nameplate": {
+      "mob": "[{level}] {name}",
+      "mobElite": "[{level}+] {name}"
     }
   },
   "guide": {
@@ -2412,7 +2445,9 @@ export const en_CA: EnTranslations = {
       "mobileMap": "Map",
       "closeMap": "Close map",
       "zoomIn": "Zoom in",
-      "zoomOut": "Zoom out"
+      "zoomOut": "Zoom out",
+      "mapCanvasLabel": "Map",
+      "mapSummary": "Map of {zone}."
     },
     "options": {
       "gameMenu": "Game Menu",

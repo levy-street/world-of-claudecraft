@@ -70,8 +70,11 @@ export type SchematicPrimitive = SchematicCircle | SchematicRect | SchematicText
 //   ... but hud.ts world-map draws +Z downward, so we keep z → y positive.
 // The room runs from zMin (-19) to zMax (61), width ±23 in localX.
 
-/** Map instance-local (x, z) to canvas (cx, cy). canvasSize is the output square in px. */
-function toCanvas(
+/** Map instance-local (x, z) to canvas (cx, cy). canvasSize is the output square
+ * in px. Exported so the delve_map painter positions live mob / party / player
+ * markers in the SAME space as the static schematic: one source of truth, no
+ * duplicated mapping math (and no stray magic numbers) on the painter side. */
+export function delveLocalToCanvas(
   localX: number,
   localZ: number,
   layout: DungeonLayout,
@@ -89,17 +92,21 @@ function toCanvas(
   return { cx, cy };
 }
 
-/** The static schematic primitives for a module (floor + walls + pillars + tombs + dais + exit). */
+/** The static schematic primitives for a module (floor + walls + pillars + tombs + dais + exit).
+ *  `northLabel` is the localized compass-north glyph drawn at the exit (the caller
+ *  injects t('hudChrome.compass.N'); it is locale-dependent, e.g. ru С, zh/ja 北, ko 북).
+ *  Defaults to the cartographic 'N' for non-rendering callers (tests / direct use). */
 export function delveSchematicStatic(
   layout: DungeonLayout,
   canvasSize: number,
   pad: number,
+  northLabel = 'N',
 ): SchematicPrimitive[] {
   const prims: SchematicPrimitive[] = [];
 
   // Floor background rect (the full room footprint)
-  const topLeft = toCanvas(-23, layout.zMin, layout, canvasSize, pad);
-  const botRight = toCanvas(23, layout.zMax, layout, canvasSize, pad);
+  const topLeft = delveLocalToCanvas(-23, layout.zMin, layout, canvasSize, pad);
+  const botRight = delveLocalToCanvas(23, layout.zMax, layout, canvasSize, pad);
   prims.push({
     kind: 'rect',
     x: Math.min(topLeft.cx, botRight.cx),
@@ -113,7 +120,7 @@ export function delveSchematicStatic(
 
   // Pillars: small dark dots
   for (const p of layout.pillars) {
-    const { cx, cy } = toCanvas(p.x, p.z, layout, canvasSize, pad);
+    const { cx, cy } = delveLocalToCanvas(p.x, p.z, layout, canvasSize, pad);
     prims.push({
       kind: 'circle',
       cx,
@@ -127,7 +134,7 @@ export function delveSchematicStatic(
 
   // Tombs: small rects along the walls
   for (const t of layout.tombs) {
-    const { cx, cy } = toCanvas(t.x, t.z, layout, canvasSize, pad);
+    const { cx, cy } = delveLocalToCanvas(t.x, t.z, layout, canvasSize, pad);
     const tw = Math.max(3, canvasSize * 0.035);
     const th = Math.max(2, canvasSize * 0.02);
     prims.push({
@@ -144,7 +151,7 @@ export function delveSchematicStatic(
 
   // Wall stubs
   for (const s of layout.stubs) {
-    const { cx, cy } = toCanvas(s.x, s.z, layout, canvasSize, pad);
+    const { cx, cy } = delveLocalToCanvas(s.x, s.z, layout, canvasSize, pad);
     const sw = ((s.hw * 2) / 46) * (canvasSize - pad * 2);
     const sh = ((s.hd * 2) / (layout.zMax - layout.zMin)) * (canvasSize - pad * 2);
     prims.push({
@@ -162,7 +169,7 @@ export function delveSchematicStatic(
   // Dais: larger circle near the back; radius expressed as fraction of canvas size
   // (not world units) to keep it from overflowing into the text area.
   const dais = layout.dais;
-  const { cx: dcx, cy: dcy } = toCanvas(dais.x, dais.z, layout, canvasSize, pad);
+  const { cx: dcx, cy: dcy } = delveLocalToCanvas(dais.x, dais.z, layout, canvasSize, pad);
   const dr = Math.max(
     4,
     Math.min(canvasSize * 0.12, (dais.r / (layout.zMax - layout.zMin)) * (canvasSize - pad * 2)),
@@ -181,7 +188,7 @@ export function delveSchematicStatic(
   // The tombstone passage is at the top, zMin end is the ENTRANCE (south), zMax is boss end (north).
   // Actually: zMin = entrance side (-19), zMax = boss end (61). The exit to next module is
   // at zMax (the "sealed passage north"). We draw a small arch glyph there.
-  const { cx: exCx, cy: exCy } = toCanvas(0, layout.zMax - 2, layout, canvasSize, pad);
+  const { cx: exCx, cy: exCy } = delveLocalToCanvas(0, layout.zMax - 2, layout, canvasSize, pad);
   prims.push({
     kind: 'circle',
     cx: exCx,
@@ -195,7 +202,7 @@ export function delveSchematicStatic(
     kind: 'text',
     cx: exCx,
     cy: exCy - Math.max(5, canvasSize * 0.05),
-    text: 'N',
+    text: northLabel,
     fill: '#b090e8',
     font: `bold ${Math.max(8, Math.round(canvasSize * 0.08))}px Georgia`,
   });
@@ -212,7 +219,7 @@ export function delveSchematicPlayer(
   canvasSize: number,
   pad: number,
 ): SchematicArrow {
-  const { cx, cy } = toCanvas(localX, localZ, layout, canvasSize, pad);
+  const { cx, cy } = delveLocalToCanvas(localX, localZ, layout, canvasSize, pad);
   return {
     kind: 'arrow',
     cx,

@@ -1,7 +1,7 @@
-# tests/parity — the golden-trace parity gate
+# tests/parity: the golden-trace parity gate
 
-This is the safety net for the `refactor/sim` extraction work. Every later session
-MOVES a slice of behavior out of the 17.5k-line `Sim` class; the #1 risk is silent
+This is the safety net for the ongoing `refactor/sim` extraction work. Every later
+session MOVES a slice of behavior out of the large `Sim` class; the #1 risk is silent
 behavior drift during a "move." This harness records the FULL deterministic Sim
 behavior for seeded scenarios and fails if any future change alters it.
 
@@ -20,7 +20,7 @@ Per scenario, on a fixed tick cadence, each `Frame` pins:
   (`ENTITY_EXCLUDE`). We sample players + tracked ids only (NOT every world entity)
   to keep goldens ~100 KB, not MB.
 - **The SimEvent stream**, folded per window into one `eventDigest` (emit order
-  preserved — reordering events IS drift).
+  preserved, reordering events IS drift).
 - **The rng draw-order fingerprint**: a rolling FNV-1a over every `sim.rng` draw's
   32-bit mulberry output, in draw order, plus the draw count. Pinned per frame.
 
@@ -42,8 +42,8 @@ The draw-order digest is the precise detector.
   `tests/architecture.test.ts` / `tests/sim.test.ts` are unchanged). It is reset
   between recordings (each `Recorder.finish` detaches it).
 - We fold the **draw VALUE in draw ORDER** (count + ordered values), NOT a
-  callsite tag. A stack-derived tag churns on every `sim.ts` edit — which is
-  exactly what the refactor does — so it would make every extraction's golden
+  callsite tag. A stack-derived tag churns on every `sim.ts` edit (which is
+  exactly what the refactor does), so it would make every extraction's golden
   falsely red. Count + ordered-value already catches reordering without that churn.
 - **Construction-time draws** happen inside the `Sim` ctor, before the Rng exists
   to be observed; they are pinned by the frame-0 state sample instead. The draw log
@@ -64,7 +64,7 @@ pet (`mobSwing` pet arm + `applyTaunt`); a ground AoE (`updateGroundAoEs` first 
 lockpick; and loot rolls (solo death-roll + party need/greed). `coverage.test.ts`
 asserts each subsystem actually FIRES (not merely named in a comment).
 
-## Known boundaries (what is NOT pinned — read before extracting these)
+## Known boundaries (what is NOT pinned, read before extracting these)
 
 The net is deliberately scoped. These gaps are documented so a later session knows
 to add coverage when it extracts the affected subsystem (an adversarial review
@@ -76,14 +76,14 @@ confirmed each):
   *outcomes* are pinned where they surface into a sampled `PlayerMeta`/entity field
   or an emitted event (the fiesta scenario picks an augment so `fiestaAugments` +
   `augmentOffer`/`augmentChosen` are pinned; the delve walks the lockpick so the
-  `lockpickStep` stream is pinned). **A1/A2/A3 (arena/fiesta) and I2a-c (delve)
-  should add a sub-stream draw-order check (or observe the sub-stream) when they
-  move that logic.**
+  `lockpickStep` stream is pinned). When you extract a subsystem that uses a
+  sub-stream, add a sub-stream draw-order check (or observe the sub-stream) in the
+  same change.
 - **Transient Sim-owned collections are not sampled directly.** `arenaMatches`,
   `delveRuns`, `marketListings`/`marketCollections`, `instances`, `groundAoEs`,
   `pendingMobRespawns` are pinned only via their entity/event/`PlayerMeta`
-  projection. **There is no World Market scenario yet** — L2 (market) must add one
-  (or sample `marketListings`) when it extracts the market.
+  projection. Extracting one of these should add a scenario that drives it (or
+  sample the collection directly).
 - **Construction-time draws + ambient world mobs.** The `Rng` is born inside the Sim
   ctor, so ctor draws are not in the draw digest; ambient camp mobs are spawned but
   never tracked. A same-draw-count reorder of ctor spawns that changes only
@@ -111,16 +111,3 @@ du -sh tests/parity/golden                   # confirm ~100 KB, NOT MB
 A red trace means behavior changed. **Fix the extraction, never the harness.** Do
 not widen `round6`, delete sampled fields, or regenerate goldens to "make it pass."
 Regenerate only via `UPDATE_PARITY=1` as a deliberate, separate, reviewed commit.
-
-## Files
-
-- `trace.ts` — `round6`/`canonical`/`fnv1a`/`digest`/`eventDigest`, `sampleEntity`/
-  `samplePlayerMeta`, and the `Frame`/`Trace` schema.
-- `record.ts` — the `Rng` observer wiring + `Recorder` + `recordTrace`/`record`, and
-  the `Scenario` interface.
-- `scenarios.ts` — the coverage-matrix scenarios + `SCENARIOS`.
-- `parity.test.ts` — the gate (determinism + golden match).
-- `coverage.test.ts` — proves each scenario fires its target subsystem.
-- `harness.test.ts` — direct unit tests for the samplers, canonicalization, and the
-  draw-order log.
-- `golden/*.json` — the committed goldens.

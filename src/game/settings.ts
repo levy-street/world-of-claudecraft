@@ -13,9 +13,15 @@ export const SETTING_RANGES = {
   // SFX by default so dialogue reads over ambient combat noise.
   voiceVolume: { min: 0, max: 1, def: 0.9 },
   brightness: { min: 0.6, max: 1.5, def: 1 },
-  // 1 low, 2 medium, 3 high, 4 ultra, 5 advanced. The renderer reads this
-  // from localStorage during startup because tier choice controls preload.
-  graphicsPreset: { min: 1, max: 5, def: 4 },
+  // 1 low, 2 medium, 3 high, 4 ultra, 5 advanced. The renderer reads this from
+  // localStorage during startup because tier choice controls preload. def is MEDIUM (a safe
+  // middle, also the Reset target): on a player's FIRST run main.ts probes the device and
+  // PERSISTS a device-appropriate preset over this default when the GPU is recognized
+  // (resolveDefaultGraphicsPreset in gfx.ts), so a weak phone is not stuck on a tier it cannot
+  // run and a strong desktop is not capped below what it can drive. A masked/inconclusive device
+  // stays on this medium default and keeps re-detecting on later boots (see graphicsDefaultApplied).
+  // An explicit player choice (stored here) is never overridden.
+  graphicsPreset: { min: 1, max: 5, def: 2 },
   // Adaptive browser-effects tier for the DOM/CSS layer (distinct from the WebGL
   // graphicsPreset above). 0 = Auto: detect the engine (Chromium/WebKit/Gecko),
   // version and desktop-vs-mobile and tone down the most GPU-expensive CSS
@@ -188,6 +194,14 @@ export const BOOL_SETTINGS = {
   // tooltip. Purely a display preference read live by the HUD; off keeps the
   // classic stat-only tooltip. See src/sim/item_level.ts for the derivation.
   showItemLevel: { def: false },
+  // internal, never shown in the options UI: set true once main.ts has persisted a
+  // device-appropriate graphicsPreset on a player's first run (a CONCLUSIVE detection).
+  // It gates firstRunGraphicsPreset so a recognized device is classified at most once and
+  // an explicit later choice is never re-detected over. def MUST be false: save() writes the
+  // whole values object (def-filling every key) the first time any setting is stored, so a
+  // non-false def would fake "applied" and defeat detection. reset() clears it back to false,
+  // so Reset to Defaults re-detects the device default on the next reload.
+  graphicsDefaultApplied: { def: false },
 } as const;
 
 export type NumericSettingKey = keyof typeof SETTING_RANGES;

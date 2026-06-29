@@ -5,7 +5,7 @@ FROM node:22-alpine AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
-COPY tsconfig.json vite.config.ts index.html admin.html play.html guide.html ./
+COPY .browserslistrc tsconfig.json vite.config.ts index.html admin.html play.html guide.html ./
 COPY src ./src
 COPY server ./server
 COPY headless ./headless
