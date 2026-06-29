@@ -46,7 +46,10 @@ export function dotTotalCoeff(durationSec: number): number {
 
 // The scaling stat for an ability: Ranged Attack Power for hunter attack-spells,
 // otherwise Spell Power. Reads only the two derived combat ratings off the entity.
-export function abilityScalingPower(e: Pick<Entity, 'spellPower' | 'rangedPower'>, def: AbilityDef): number {
+export function abilityScalingPower(
+  e: Pick<Entity, 'spellPower' | 'rangedPower'>,
+  def: AbilityDef,
+): number {
   return def.scalesWith === 'ranged' ? e.rangedPower : e.spellPower;
 }
 
@@ -77,7 +80,12 @@ export function channelTickBonus(power: number, def: AbilityDef): number {
 }
 
 // Flat bonus added to ONE DoT tick (total DoT coefficient split across its ticks).
-export function dotTickBonus(power: number, def: AbilityDef, durationSec: number, intervalSec: number): number {
+export function dotTickBonus(
+  power: number,
+  def: AbilityDef,
+  durationSec: number,
+  intervalSec: number,
+): number {
   const ticks = intervalSec > 0 ? Math.max(1, durationSec / intervalSec) : 1;
   const coeff = dotTotalCoeff(durationSec) / ticks;
   return Math.round(power * coeff * rangedScale(def));

@@ -8,10 +8,11 @@
 //     real single-target throughput a class achieves.
 //
 // Run: npx tsx scripts/dummy_sim.mjs [class]   (no server needed)
-import { Sim } from '../src/sim/sim.ts';
+
+import { abilitiesKnownAt } from '../src/sim/content/classes.ts';
 import { MOBS } from '../src/sim/data.ts';
 import { createMob } from '../src/sim/entity.ts';
-import { abilitiesKnownAt } from '../src/sim/content/classes.ts';
+import { Sim } from '../src/sim/sim.ts';
 import { DT, MAX_LEVEL } from '../src/sim/types.ts';
 
 const SECONDS = 300;
@@ -26,9 +27,14 @@ function setup(cls) {
   // Immortal, passive dummy at 25yd (in spell range, out of melee so it never
   // swings -> no cast pushback). Kept idle and de-aggroed every tick.
   const dummy = createMob(sim.nextId++, MOBS['forest_wolf'], MAX_LEVEL, {
-    x: p.pos.x, y: p.pos.y, z: p.pos.z + 8,
+    x: p.pos.x,
+    y: p.pos.y,
+    z: p.pos.z + 8,
   });
-  dummy.hostile = true; dummy.aiState = 'idle'; dummy.maxHp = 1e12; dummy.hp = 1e12;
+  dummy.hostile = true;
+  dummy.aiState = 'idle';
+  dummy.maxHp = 1e12;
+  dummy.hp = 1e12;
   sim.addEntity(dummy);
   const dpos = { ...dummy.pos };
   p.facing = Math.atan2(dummy.pos.x - p.pos.x, dummy.pos.z - p.pos.z);
@@ -38,14 +44,19 @@ function setup(cls) {
   let dealt = 0;
   const orig = sim.emit.bind(sim);
   sim.emit = (e) => {
-    if (e?.type === 'damage' && e.targetId === dummy.id && e.sourceId === p.id) dealt += e.amount || 0;
+    if (e?.type === 'damage' && e.targetId === dummy.id && e.sourceId === p.id)
+      dealt += e.amount || 0;
     return orig(e);
   };
   const tick = () => {
     p.resource = p.maxResource; // infinite mana
     // keep the dummy an immortal, pinned, passive punching bag (out of melee, idle)
-    dummy.hp = 1e12; dummy.aiState = 'idle'; dummy.targetId = null;
-    dummy.pos.x = dpos.x; dummy.pos.y = dpos.y; dummy.pos.z = dpos.z;
+    dummy.hp = 1e12;
+    dummy.aiState = 'idle';
+    dummy.targetId = null;
+    dummy.pos.x = dpos.x;
+    dummy.pos.y = dpos.y;
+    dummy.pos.z = dpos.z;
     p.facing = Math.atan2(dummy.pos.x - p.pos.x, dummy.pos.z - p.pos.z);
     sim.tick();
   };
@@ -74,9 +85,19 @@ function rotationDPS(cls, dots, nukes) {
       let acted = false;
       for (const d of dots) {
         const aura = s.dummy.auras.find((a) => a.id === d);
-        if ((!aura || aura.remaining < 1.5) && canCast(s.p, s.sim, d)) { s.sim.castAbility(d, s.pid); acted = true; break; }
+        if ((!aura || aura.remaining < 1.5) && canCast(s.p, s.sim, d)) {
+          s.sim.castAbility(d, s.pid);
+          acted = true;
+          break;
+        }
       }
-      if (!acted) for (const n of nukes) { if (canCast(s.p, s.sim, n)) { s.sim.castAbility(n, s.pid); break; } }
+      if (!acted)
+        for (const n of nukes) {
+          if (canCast(s.p, s.sim, n)) {
+            s.sim.castAbility(n, s.pid);
+            break;
+          }
+        }
     }
     s.tick();
   }
@@ -85,7 +106,10 @@ function rotationDPS(cls, dots, nukes) {
 
 const ROTATIONS = {
   mage: { dots: [], nukes: ['fireball', 'frostbolt', 'scorch'] },
-  warlock: { dots: ['corruption', 'curse_of_agony', 'immolate'], nukes: ['shadow_bolt', 'searing_pain'] },
+  warlock: {
+    dots: ['corruption', 'curse_of_agony', 'immolate'],
+    nukes: ['shadow_bolt', 'searing_pain'],
+  },
   priest: { dots: ['shadow_word_pain'], nukes: ['mind_blast', 'mind_flay', 'smite'] },
   shaman: { dots: ['flame_shock'], nukes: ['lightning_bolt', 'earth_shock'] },
   druid: { dots: ['moonfire', 'insect_swarm'], nukes: ['starfire', 'wrath'] },
@@ -97,7 +121,12 @@ for (const cls of Object.keys(ROTATIONS)) {
   if (only && cls !== only) continue;
   console.log(`\n=== ${cls.toUpperCase()} (target dummy, ${SECONDS}s, infinite mana) ===`);
   const nukes = abilitiesKnownAt(cls, MAX_LEVEL)
-    .filter((k) => k.def.class === cls && k.def.school !== 'physical' && k.effects.some((e) => DMG.has(e.type)))
+    .filter(
+      (k) =>
+        k.def.class === cls &&
+        k.def.school !== 'physical' &&
+        k.effects.some((e) => DMG.has(e.type)),
+    )
     .map((k) => k.def.id);
   const rows = nukes.map((id) => ({ id, dps: spamDPS(cls, id) })).sort((a, b) => b.dps - a.dps);
   for (const r of rows) console.log(`  spam ${r.id.padEnd(18)} ${r.dps.toFixed(1)} dps`);

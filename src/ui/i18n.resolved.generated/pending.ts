@@ -45,5 +45,26 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ru_RU": [
     "hudChrome.abilityScaling.bonus"
+  ],
+  "nl_NL": [
+    "hudChrome.abilityScaling.bonus"
+  ],
+  "pl_PL": [
+    "hudChrome.abilityScaling.bonus"
+  ],
+  "id_ID": [
+    "hudChrome.abilityScaling.bonus"
+  ],
+  "tr_TR": [
+    "hudChrome.abilityScaling.bonus"
+  ],
+  "sv_SE": [
+    "hudChrome.abilityScaling.bonus"
+  ],
+  "vi_VN": [
+    "hudChrome.abilityScaling.bonus"
+  ],
+  "da_DK": [
+    "hudChrome.abilityScaling.bonus"
   ]
 };

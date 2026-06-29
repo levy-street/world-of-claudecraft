@@ -1,0 +1,22 @@
+/* play.extra.css: per-entry CSS for the play.html game entry, loaded only by
+   play.html (via a <link> in its <head>). It declares the canonical @layer order
+   up front (idempotent with the barrel) so the layer slots resolve regardless of
+   parse order.
+
+   play.html is otherwise reconciled to the canonical modules (its inline <style>
+   was emptied, so it now renders from the shared src/styles layers exactly like
+   index.html). The ONLY intentional per-entry difference is the #rotate-device
+   orientation gate (landscape-only in-game): play.html SHOWS the
+   rotate-to-landscape overlay in portrait while in-game. index keeps its own
+   suppress in index.extra.css. Layer name is flat (play-extra), NOT dotted, so it
+   is a top-level layer placed last by the order below, after hud-mobile, so this
+   display:flex wins over the shared #rotate-device base in hud-mobile. */
+@layer tokens, base, layout, components, hud, shell, hud-mobile, index-extra, play-extra;
+
+@layer play-extra {
+  @media (orientation: portrait) {
+    body.mobile-touch.game-active #rotate-device {
+      display: flex;
+    }
+  }
+}

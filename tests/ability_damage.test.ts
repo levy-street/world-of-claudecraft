@@ -19,14 +19,18 @@ describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
   it('a direct nuke folds Spell Power with the rank-resolved cast time', () => {
     const fb = known('mage', 'frostbolt');
     const eff = fb.effects.find((e) => e.type === 'directDamage')!;
-    expect(abilityDamageBonus(fb, eff, SC)).toBe(directHitBonus(SC.spellPower, fb.def, fb.castTime, false));
+    expect(abilityDamageBonus(fb, eff, SC)).toBe(
+      directHitBonus(SC.spellPower, fb.def, fb.castTime, false),
+    );
     expect(abilityDamageBonus(fb, eff, SC)).toBeGreaterThan(0);
   });
 
   it('an AoE nuke takes the AoE-penalised coefficient', () => {
     const ae = known('mage', 'arcane_explosion');
     const eff = ae.effects.find((e) => e.type === 'aoeDamage')!;
-    expect(abilityDamageBonus(ae, eff, SC)).toBe(directHitBonus(SC.spellPower, ae.def, ae.castTime, true));
+    expect(abilityDamageBonus(ae, eff, SC)).toBe(
+      directHitBonus(SC.spellPower, ae.def, ae.castTime, true),
+    );
   });
 
   it('a pure DoT folds Spell Power across all its ticks (the total)', () => {
@@ -43,7 +47,9 @@ describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
     const as = known('hunter', 'arcane_shot');
     const eff = as.effects.find((e) => e.type === 'directDamage')!;
     expect(abilityScalingPower(SC, as.def)).toBe(SC.rangedPower);
-    expect(abilityDamageBonus(as, eff, SC)).toBe(directHitBonus(SC.rangedPower, as.def, as.castTime, false));
+    expect(abilityDamageBonus(as, eff, SC)).toBe(
+      directHitBonus(SC.rangedPower, as.def, as.castTime, false),
+    );
   });
 
   it('a channelled directDamage (Arcane Missiles) uses the per-tick CHANNEL coefficient', () => {

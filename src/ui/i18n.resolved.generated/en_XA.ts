@@ -225,6 +225,21 @@ export const en_XA: EnTranslations = {
     "abilityScaling": {
       "bonus": "[(+{value})]"
     },
+    "unitFrame": {
+      "playerLabel": "[Ýóúŕ Ĥéŕó]",
+      "targetLabel": "[Ýóúŕ Ɱáŕķ]",
+      "targetAnnounce": "[Ɱáŕķ {name}]",
+      "partyLabel": "[Ýóúŕ Ɓáñð]",
+      "partyGroup": "[Ĝŕóúþ {n}]",
+      "durationUnitSeconds": "[š]"
+    },
+    "character": {
+      "modelPreview": "[Çĥáŕáçţéŕ Ɱóðéļ Þŕéʋíéŵ]"
+    },
+    "skipLinks": {
+      "mainHud": "[Šķíþ ţó Ɱáíñ ĤÚÐ]",
+      "chat": "[Šķíþ ţó Çĥáţ]"
+    },
     "mobile": {
       "autorun": "[Áúţóŕúñ]",
       "jump": "[Ĵúɱþ]",
@@ -246,6 +261,13 @@ export const en_XA: EnTranslations = {
       "coordinates": "[Çóóŕðíñáţéš]",
       "heading": "[Ĥéáðíñĝ]",
       "minimapZoom": "[Ɱíñíɱáþ žóóɱ]"
+    },
+    "castBar": {
+      "playerAria": "[Ýóúŕ Çášţ Ɓáŕ]",
+      "targetAria": "[Úñíţ Çášţ Ɓáŕ]"
+    },
+    "leaderboard": {
+      "close": "[Çļóšé]"
     },
     "raidLockout": {
       "title": "[Ŕáíð Ļóçķóúţš]",
@@ -586,6 +608,17 @@ export const en_XA: EnTranslations = {
       "notRaid": "[Ýóúŕ ĝŕóúþ íš ñóţ á ŕáíð.]",
       "leaderOnly": "[Óñļý ţĥé ŕáíð ļéáðéŕ ɱáý çóñʋéŕţ ţó á þáŕţý.]",
       "tooLarge": "[Á ŕáíð ŵíţĥ ɱóŕé ţĥáñ ƒíʋé ɱéɱƀéŕš çáññóţ çóñʋéŕţ ƀáçķ ţó á þáŕţý.]"
+    },
+    "loot": {
+      "chestTitle": "[Çĥéšţ]"
+    },
+    "spellbook": {
+      "addToBarAria": "[Áðð {name} ţó áçţíóñ ƀáŕ]",
+      "removeFromBarAria": "[Ŕéɱóʋé {name} ƒŕóɱ áçţíóñ ƀáŕ]"
+    },
+    "nameplate": {
+      "mob": "[[{level}] {name}]",
+      "mobElite": "[[{level}+] {name}]"
     }
   },
   "guide": {
@@ -2412,7 +2445,9 @@ export const en_XA: EnTranslations = {
       "mobileMap": "[Ɱáþ]",
       "closeMap": "[Çļóšé ɱáþ]",
       "zoomIn": "[Žóóɱ íñ]",
-      "zoomOut": "[Žóóɱ óúţ]"
+      "zoomOut": "[Žóóɱ óúţ]",
+      "mapCanvasLabel": "[Ɱáþ]",
+      "mapSummary": "[Ɱáþ óƒ {zone}.]"
     },
     "options": {
       "gameMenu": "[Ĝáɱé Ɱéñú]",

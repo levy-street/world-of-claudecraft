@@ -19,11 +19,7 @@ import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
-import {
-  abilityScalingPower,
-  directHitBonus,
-  dotTickBonus,
-} from '../spell_scaling';
+import { abilityScalingPower, directHitBonus, dotTickBonus } from '../spell_scaling';
 import { addThreat } from '../threat';
 import type { AbilityDef, Entity } from '../types';
 import { armorReduction, meleeMissChance } from '../types';
@@ -222,7 +218,9 @@ export function runEffects(
         p.auras.splice(sealIdx, 1);
         ctx.emit({ type: 'aura', targetId: p.id, name: seal.name, gained: false });
         // Judgement is an instant holy nuke; scale it with Spell Power too.
-        let dmg = ctx.rng.range(seal.value2 ?? 10, seal.value3 ?? 15) + directHitBonus(p.spellPower, ability, res.castTime);
+        let dmg =
+          ctx.rng.range(seal.value2 ?? 10, seal.value3 ?? 15) +
+          directHitBonus(p.spellPower, ability, res.castTime);
         const crit = ctx.rng.chance(ctx.spellCrit(p));
         if (crit) dmg *= 1.5;
         ctx.dealDamage(p, target, Math.round(dmg), crit, 'holy', ability.name, 'hit');
@@ -430,7 +428,9 @@ export function runEffects(
           school: ability.school,
           ability: ability.name,
           // Each pulse is a spell hit; scale per tick like an AoE nuke.
-          spBonus: isSpell ? directHitBonus(abilityScalingPower(p, ability), ability, res.castTime, true) : 0,
+          spBonus: isSpell
+            ? directHitBonus(abilityScalingPower(p, ability), ability, res.castTime, true)
+            : 0,
         };
         ctx.emit({
           type: 'spellfx',
@@ -487,7 +487,9 @@ export function runEffects(
           school: ability.school,
           fx: 'nova',
         });
-        const aoeRootSp = isSpell ? directHitBonus(abilityScalingPower(p, ability), ability, res.castTime, true) : 0;
+        const aoeRootSp = isSpell
+          ? directHitBonus(abilityScalingPower(p, ability), ability, res.castTime, true)
+          : 0;
         for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
           if (!ctx.hasLineOfSight(p, m)) continue;
           const dmg = ctx.rng.range(eff.min, eff.max) + aoeRootSp;

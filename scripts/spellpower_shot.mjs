@@ -2,8 +2,9 @@
 // client, levels a mage, stages a target dummy, casts Frostbolt, and captures the
 // boosted hit as floating combat text. Prints the base-vs-Spell-Power breakdown.
 // Needs `npm run dev`. Writes PNGs to tmp/.
-import puppeteer from 'puppeteer-core';
+
 import fs from 'node:fs';
+import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH as EDGE } from './browser_path.mjs';
 
 const URL = process.env.GAME_URL ?? 'http://localhost:5173';
@@ -19,16 +20,23 @@ const page = await browser.newPage();
 await page.setViewport({ width: 1280, height: 720 });
 const errors = [];
 page.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
-page.on('console', (m) => { if (m.type() === 'error') errors.push('CONSOLE: ' + m.text()); });
+page.on('console', (m) => {
+  if (m.type() === 'error') errors.push('CONSOLE: ' + m.text());
+});
 
-await page.goto(URL, { waitUntil: 'load', timeout: 60000 }).catch((e) => console.log('goto:', e.message));
+await page
+  .goto(URL, { waitUntil: 'load', timeout: 60000 })
+  .catch((e) => console.log('goto:', e.message));
 await page.waitForSelector('#btn-offline', { timeout: 40000 });
 await wait(300);
 await page.evaluate(() => document.querySelector('#btn-offline')?.click());
 await page.waitForSelector('#offline-select [data-class="mage"]', { timeout: 15000 });
 await page.evaluate(() => {
   const n = document.querySelector('#char-name');
-  if (n) { n.value = 'Jaina'; n.dispatchEvent(new Event('input', { bubbles: true })); }
+  if (n) {
+    n.value = 'Jaina';
+    n.dispatchEvent(new Event('input', { bubbles: true }));
+  }
 });
 await page.evaluate(() => document.querySelector('#offline-select [data-class="mage"]')?.click());
 await wait(200);
@@ -53,19 +61,27 @@ await wait(600);
 const result = await page.evaluate(async () => {
   const sim = window.__game.sim;
   const p = sim.player;
-  let mob = null, best = 1e9;
+  let mob = null,
+    best = 1e9;
   for (const e of sim.entities.values()) {
     if (e.kind !== 'mob' || e.dead) continue;
-    const dx = e.pos.x - p.pos.x, dz = e.pos.z - p.pos.z;
+    const dx = e.pos.x - p.pos.x,
+      dz = e.pos.z - p.pos.z;
     const d = dx * dx + dz * dz;
-    if (d < best) { best = d; mob = e; }
+    if (d < best) {
+      best = d;
+      mob = e;
+    }
   }
   if (!mob) return { ok: false, why: 'no mob nearby' };
   mob.templateId = 'gravecaller_cultist';
   mob.name = 'Training Dummy';
   mob.hostile = true;
-  mob.maxHp = 1e7; mob.hp = 1e7;
-  mob.pos.x = p.pos.x; mob.pos.z = p.pos.z + 10; mob.pos.y = p.pos.y;
+  mob.maxHp = 1e7;
+  mob.hp = 1e7;
+  mob.pos.x = p.pos.x;
+  mob.pos.z = p.pos.z + 10;
+  mob.pos.y = p.pos.y;
   sim.targetEntity(mob.id, p.id);
 
   const hits = [];

@@ -14,6 +14,25 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const pt_BR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.loot.chestTitle': 'Baú',
+  'hudChrome.spellbook.addToBarAria': 'Adicionar {name} à barra de ação',
+  'hudChrome.spellbook.removeFromBarAria': 'Remover {name} da barra de ação',
+  'hudChrome.nameplate.mob': '[{level}] {name}',
+  'hudChrome.nameplate.mobElite': '[{level}+] {name}',
+  'hud.core.mapCanvasLabel': 'Mapa',
+  'hud.core.mapSummary': 'Mapa de {zone}.',
+  'hudChrome.castBar.playerAria': 'Sua barra de conjuração',
+  'hudChrome.castBar.targetAria': 'Barra de conjuração do alvo',
+  'hudChrome.character.modelPreview': 'Prévia do modelo do personagem',
+  'hudChrome.leaderboard.close': 'Fechar',
+  'hudChrome.skipLinks.chat': 'Pular para o chat',
+  'hudChrome.skipLinks.mainHud': 'Pular para a interface principal',
+  'hudChrome.unitFrame.durationUnitSeconds': 's',
+  'hudChrome.unitFrame.partyGroup': 'Grupo {n}',
+  'hudChrome.unitFrame.partyLabel': 'Seu grupo',
+  'hudChrome.unitFrame.playerLabel': 'Seu personagem',
+  'hudChrome.unitFrame.targetAnnounce': 'Alvo: {name}',
+  'hudChrome.unitFrame.targetLabel': 'Seu alvo',
   'seo.officialLabel': 'Site oficial de World of ClaudeCraft',
   'seo.officialBody':
     'worldofclaudecraft.com é o MMO de navegador gratuito oficial do reino Claudemoon. Jogue online com um personagem persistente, explore solo offline, leia a wiki e siga os links verificados da comunidade a partir deste site.',

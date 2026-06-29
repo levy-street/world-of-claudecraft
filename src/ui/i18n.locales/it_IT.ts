@@ -14,6 +14,25 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const it_IT: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.loot.chestTitle': 'Scrigno',
+  'hudChrome.spellbook.addToBarAria': 'Aggiungi {name} alla barra azioni',
+  'hudChrome.spellbook.removeFromBarAria': 'Rimuovi {name} dalla barra azioni',
+  'hudChrome.nameplate.mob': '[{level}] {name}',
+  'hudChrome.nameplate.mobElite': '[{level}+] {name}',
+  'hud.core.mapCanvasLabel': 'Mappa',
+  'hud.core.mapSummary': 'Mappa di {zone}.',
+  'hudChrome.castBar.playerAria': 'La tua barra di lancio',
+  'hudChrome.castBar.targetAria': 'Barra di lancio del bersaglio',
+  'hudChrome.character.modelPreview': 'Anteprima del modello del personaggio',
+  'hudChrome.leaderboard.close': 'Chiudi',
+  'hudChrome.skipLinks.chat': 'Vai alla chat',
+  'hudChrome.skipLinks.mainHud': "Vai all'interfaccia principale",
+  'hudChrome.unitFrame.durationUnitSeconds': 's',
+  'hudChrome.unitFrame.partyGroup': 'Gruppo {n}',
+  'hudChrome.unitFrame.partyLabel': 'Il tuo gruppo',
+  'hudChrome.unitFrame.playerLabel': 'Il tuo personaggio',
+  'hudChrome.unitFrame.targetAnnounce': 'Bersaglio: {name}',
+  'hudChrome.unitFrame.targetLabel': 'Il tuo bersaglio',
   'seo.officialLabel': 'Sito ufficiale di World of ClaudeCraft',
   'seo.officialBody':
     "worldofclaudecraft.com è l'MMO gratuito ufficiale da browser del reame Claudemoon. Gioca online con un personaggio persistente, esplora offline in solitaria, leggi il wiki e segui i link della community verificati da questo sito.",

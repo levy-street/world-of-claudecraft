@@ -14,6 +14,25 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const de_DE: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.loot.chestTitle': 'Truhe',
+  'hudChrome.spellbook.addToBarAria': '{name} zur Aktionsleiste hinzufügen',
+  'hudChrome.spellbook.removeFromBarAria': '{name} von der Aktionsleiste entfernen',
+  'hudChrome.nameplate.mob': '[{level}] {name}',
+  'hudChrome.nameplate.mobElite': '[{level}+] {name}',
+  'hud.core.mapCanvasLabel': 'Karte',
+  'hud.core.mapSummary': 'Karte von {zone}.',
+  'hudChrome.castBar.playerAria': 'Eure Zauberleiste',
+  'hudChrome.castBar.targetAria': 'Zauberleiste des Ziels',
+  'hudChrome.character.modelPreview': 'Charaktermodell-Vorschau',
+  'hudChrome.leaderboard.close': 'Schließen',
+  'hudChrome.skipLinks.chat': 'Zum Chat springen',
+  'hudChrome.skipLinks.mainHud': 'Zum Haupt-HUD springen',
+  'hudChrome.unitFrame.durationUnitSeconds': 's',
+  'hudChrome.unitFrame.partyGroup': 'Gruppe {n}',
+  'hudChrome.unitFrame.partyLabel': 'Eure Gruppe',
+  'hudChrome.unitFrame.playerLabel': 'Euer Charakter',
+  'hudChrome.unitFrame.targetAnnounce': 'Ziel: {name}',
+  'hudChrome.unitFrame.targetLabel': 'Euer Ziel',
   'seo.officialLabel': 'Offizielle Website von World of ClaudeCraft',
   'seo.officialBody':
     'worldofclaudecraft.com ist das offizielle kostenlose Browser-MMO für das Reich Claudemoon. Spiele online mit einem dauerhaften Charakter, erkunde solo offline, lies das Wiki und folge den verifizierten Community-Links auf dieser Website.',

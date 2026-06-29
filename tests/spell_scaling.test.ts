@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   abilityScalingPower,
-  channelTickBonus,
   channelSpellCoeff,
+  channelTickBonus,
   directHitBonus,
   directSpellCoeff,
   dotTickBonus,
@@ -91,7 +91,7 @@ describe('channelTickBonus', () => {
   it('splits the channel coefficient across ticks', () => {
     const sp = 210;
     const d = def({ castTime: 0, channel: { duration: 3, ticks: 3 } });
-    expect(channelTickBonus(sp, d)).toBe(Math.round(sp * ((3 / 3.5) / 3)));
+    expect(channelTickBonus(sp, d)).toBe(Math.round(sp * (3 / 3.5 / 3)));
   });
 
   it('returns 0 for a non-channeled ability', () => {

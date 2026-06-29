@@ -91,6 +91,63 @@ export const hudChromeStrings = {
   abilityScaling: {
     bonus: '(+{value})',
   },
+  // Accessible group names for the unit frames (#player-frame and #target-frame are
+  // role="group" wrappers over a portrait, name, level, and health/resource bars).
+  // Kept short, non-prose labels so they read cleanly as screen-reader group names
+  // (and stay non-wordy so an English-filled non-Latin locale does not trip the
+  // untranslated-leak guard); the maintainer translates them per locale at release.
+  // targetLabel reads as the unit you have marked as your current target (faction
+  // neutral: it labels friendly and hostile targets alike).
+  unitFrame: {
+    playerLabel: 'Your Hero',
+    targetLabel: 'Your Mark',
+    // targetAnnounce is the polite #target-live announcement spoken once when the player's
+    // target CHANGES; {name} is the new target's display name. Kept NON-WORDY
+    // (no run of four-plus lowercase after stripping {name}) so an English-filled non-Latin
+    // locale does not trip the M16 untranslated-leak guard: "Target" would FAIL it ("arget"
+    // is a five-letter run), so this reuses the frame's own term for the target ("Mark", from
+    // targetLabel above), which a screen-reader user already hears as the target frame's name.
+    targetAnnounce: 'Mark {name}',
+    // partyLabel names the #party-frames region (a group of tappable / focusable
+    // party member buttons, each named by its visible member name). Kept short and
+    // non-wordy (no run of four+ lowercase) so an English-filled non-Latin locale
+    // does not trip the untranslated-leak guard; "Band" reads as your group of
+    // companions, parallel to playerLabel / targetLabel.
+    partyLabel: 'Your Band',
+    // partyGroup is the visually-hidden raid-group cue appended to a raid party row's
+    // accessible name (e.g. "Group 1"), so a screen reader conveys which raid group a
+    // member sits in. {n} is the group number (formatNumber). UNLIKE the labels above
+    // this one is WORDY by the M16 rule (a four-plus consecutive-lowercase run survives
+    // stripping {n}: "Group" to "roup"), so an English-filled non-Latin locale WOULD trip
+    // the untranslated-leak guard: the five non-Latin overlays (zh_CN/zh_TW/ja_JP/ko_KR/
+    // ru_RU) carry real fills, the Latin overlays stay pending. Title Case does not help
+    // (M16 is per-word consecutive-lowercase, not word count).
+    partyGroup: 'Group {n}',
+    // durationUnitSeconds is the unit suffix appended to an aura's remaining-seconds count on
+    // the buff/debuff strip (e.g. "5s"). The auras core (auras_view.ts) renders it via the
+    // injected durationUnitSuffix() dep so an in-game language switch lands next tick. A single
+    // char (non-wordy: no four-plus consecutive-lowercase run), so an English-filled non-Latin
+    // overlay does not trip the M16 untranslated-leak guard; the maintainer localizes at release.
+    durationUnitSeconds: 's',
+  },
+  // Character sheet (#char-window) accessible names. modelPreview names the role=img 3D
+  // turntable HOST distinctly from the title's level/class subtitle (the canvas pixels
+  // stay OUT of a11y scope). Like partyGroup this label is WORDY by M16
+  // ("Character"/"Model"/"Preview" each carry a four-plus consecutive-lowercase run), so
+  // the same five non-Latin overlays carry real fills and the Latin overlays stay
+  // pending; Title Case does not make it non-wordy.
+  character: {
+    modelPreview: 'Character Model Preview',
+  },
+  // Skip links: the first focusable elements on both game entries, a keyboard /
+  // screen-reader shortcut to the main HUD and the chat log (mirrors the src/guide
+  // .guide-skip precedent). English-only control labels (the hud_chrome exception);
+  // Title Case keeps them non-wordy (no run of four+ lowercase) so an English-filled
+  // non-Latin locale does not trip the untranslated-leak guard, like the labels above.
+  skipLinks: {
+    mainHud: 'Skip to Main HUD',
+    chat: 'Skip to Chat',
+  },
   // On-screen / mobile control labels and their accessible names. char/bags/music
   // reuse existing keys (hud.keybinds.actions.*, hud.options.music) at the call site.
   mobile: {
@@ -128,6 +185,20 @@ export const hudChromeStrings = {
     coordinates: 'Coordinates',
     heading: 'Heading',
     minimapZoom: 'Minimap zoom',
+  },
+  // Cast-bar progressbar accessible names (the visible spell name + seconds-left
+  // text are the live status; these name which bar is which). One for the player's
+  // own cast (#castbar) and one for the target/boss cast (#tf-castbar).
+  castBar: {
+    playerAria: 'Your Cast Bar',
+    targetAria: 'Unit Cast Bar',
+  },
+  // Leaderboard window chrome: the close-control accessible label only. The board's
+  // title / subtitle / column / loading / empty / retry strings live in the game.ts
+  // catalog (game.leaderboard.*); this is the one control label the inline window
+  // lacked an accessible name for.
+  leaderboard: {
+    close: 'Close',
   },
   // Raid-lockout badge on the minimap rim + its hover/tap panel: the title, the
   // accessible label, the "all ready" line, and the unlock-countdown templates
@@ -564,5 +635,25 @@ export const hudChromeStrings = {
     notRaid: 'Your group is not a raid.',
     leaderOnly: 'Only the raid leader may convert to a party.',
     tooLarge: 'A raid with more than five members cannot convert back to a party.',
+  },
+  // Loot window title shown only when the chest entity is missing (the normal path
+  // uses the chest's localized entity name); replaces a former hard-coded 'Chest'.
+  loot: {
+    chestTitle: 'Chest',
+  },
+  // Spellbook action-bar toggle accessible names. The visible glyph is +/-; the
+  // accessible name states the action so a screen reader is not left with a bare
+  // symbol. {name} is the (already localized) ability name.
+  spellbook: {
+    addToBarAria: 'Add {name} to action bar',
+    removeFromBarAria: 'Remove {name} from action bar',
+  },
+  // Live overworld mob nameplate label: a bracketed level then the localized mob
+  // name (mirrors the corpse branch's worldContent.corpseName template). {level}
+  // runs through formatNumber; {name} is already localized. Format-only (brackets /
+  // order may reorder per locale), kept here so an English-only add compiles.
+  nameplate: {
+    mob: '[{level}] {name}',
+    mobElite: '[{level}+] {name}',
   },
 };

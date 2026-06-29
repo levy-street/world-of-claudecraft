@@ -22,6 +22,7 @@ import {
   tEntity,
 } from '../src/ui/entity_i18n';
 import {
+  da_DK,
   de_DE,
   en,
   en_CA,
@@ -33,17 +34,23 @@ import {
   formatNumber,
   fr_CA,
   fr_FR,
+  id_ID,
   isSupportedLanguage,
   it_IT,
   ja_JP,
   ko_KR,
   languageTag,
+  nl_NL,
+  pl_PL,
   pt_BR,
   ru_RU,
   setLanguage,
   supportedLanguages,
+  sv_SE,
   type TranslationKey,
   t,
+  tr_TR,
+  vi_VN,
   zh_CN,
   zh_TW,
 } from '../src/ui/i18n';
@@ -67,6 +74,13 @@ const locales: Record<string, typeof en> = {
   ja_JP,
   pt_BR,
   ru_RU,
+  nl_NL,
+  pl_PL,
+  id_ID,
+  tr_TR,
+  sv_SE,
+  vi_VN,
+  da_DK,
 };
 
 // Two-tier gate (see .github/workflows/ci.yml). The release tier runs with
@@ -616,6 +630,13 @@ describe('i18n Localization Key Coverage', () => {
       'ja_JP',
       'pt_BR',
       'ru_RU',
+      'nl_NL',
+      'pl_PL',
+      'id_ID',
+      'tr_TR',
+      'sv_SE',
+      'vi_VN',
+      'da_DK',
     ]);
     expect(isSupportedLanguage('de_DE')).toBe(true);
     expect(isSupportedLanguage('de-DE')).toBe(false);
@@ -1216,7 +1237,15 @@ describe('i18n Localization Key Coverage', () => {
   it('should route rendered world-content labels through localized entity helpers', () => {
     const hudSource = fs.readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
     expect(hudSource).toContain('zoneDisplayName');
-    expect(hudSource).toContain("$('#zone-label').textContent = zoneDisplayName");
+    // The overworld #zone-label write moved into minimap_painter: hud wires
+    // zoneDisplayName into the painter, and the painter writes the label through the
+    // elided setText. The localization is preserved, just relocated.
+    expect(hudSource).toContain('zoneDisplayName(zoneId)');
+    const minimapPainterSource = fs.readFileSync(
+      path.resolve(process.cwd(), 'src/ui/minimap_painter.ts'),
+      'utf8',
+    );
+    expect(minimapPainterSource).toContain('this.writers.setText(zoneLabelEl, this.localizeZone(');
     expect(hudSource).toContain('zonePoiLabel');
     expect(hudSource).toContain('dungeonDisplayNameFromSource');
     expect(hudSource).not.toContain('zoneWelcomeText(');
@@ -1225,9 +1254,19 @@ describe('i18n Localization Key Coverage', () => {
       path.resolve(process.cwd(), 'src/render/renderer.ts'),
       'utf8',
     );
+    // objectDisplayName still localizes the build-time object nameplate write in the
+    // renderer; the helper itself moved into entity_labels.ts.
     expect(rendererSource).toContain('objectDisplayName');
-    expect(rendererSource).toContain('worldContent.corpseName');
-    expect(rendererSource).not.toContain('`${e.name} (corpse)`');
+    // The per-entity nameplate content (corpse/mob names) moved into the
+    // NameplatePainter; localization is preserved, just relocated (mirrors the
+    // minimap_painter zone-label move above).
+    const nameplatePainterSource = fs.readFileSync(
+      path.resolve(process.cwd(), 'src/render/nameplate_painter.ts'),
+      'utf8',
+    );
+    expect(nameplatePainterSource).toContain('objectDisplayName');
+    expect(nameplatePainterSource).toContain('worldContent.corpseName');
+    expect(nameplatePainterSource).not.toContain('`${e.name} (corpse)`');
   });
 
   it('should preserve and render every HUD interpolation placeholder in every locale', () => {

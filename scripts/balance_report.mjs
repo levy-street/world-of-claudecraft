@@ -11,9 +11,10 @@
 // which is how we catch outliers like a too-weak Pyroblast.
 //
 // Run: npx tsx scripts/balance_report.mjs   (no server needed)
-import { Sim } from '../src/sim/sim.ts';
+
 import { abilitiesKnownAt } from '../src/sim/content/classes.ts';
-import { directHitBonus, dotTickBonus, channelTickBonus } from '../src/sim/spell_scaling.ts';
+import { Sim } from '../src/sim/sim.ts';
+import { channelTickBonus, directHitBonus, dotTickBonus } from '../src/sim/spell_scaling.ts';
 import { GCD, MAX_LEVEL } from '../src/sim/types.ts';
 
 const SPELL_CRIT_MULT = 1.5; // sim: spell crit deals 1.5x
@@ -83,7 +84,7 @@ function analyze(p, k) {
   }
 
   const damagePerCast = directPerCast + channelTotal + dotDPS * (channelDur || effCast);
-  const dpsPerMana = def.cost > 0 ? (damagePerCast / def.cost) : Infinity;
+  const dpsPerMana = def.cost > 0 ? damagePerCast / def.cost : Infinity;
   return { spamDPS, dpsPerMana, effCast, cost: def.cost };
 }
 
@@ -102,15 +103,18 @@ for (const cls of CASTERS) {
   }
   if (!rows.length) continue;
   rows.sort((a, b) => b.spamDPS - a.spamDPS);
-  const median = [...rows].sort((a, b) => a.spamDPS - b.spamDPS)[Math.floor(rows.length / 2)].spamDPS;
-  console.log(`\n=== ${cls.toUpperCase()}  (SP ${p.spellPower}, int ${p.stats.int}, median spamDPS ${median.toFixed(1)}) ===`);
+  const median = [...rows].sort((a, b) => a.spamDPS - b.spamDPS)[Math.floor(rows.length / 2)]
+    .spamDPS;
+  console.log(
+    `\n=== ${cls.toUpperCase()}  (SP ${p.spellPower}, int ${p.stats.int}, median spamDPS ${median.toFixed(1)}) ===`,
+  );
   for (const r of rows) {
     const dev = (r.spamDPS - median) / median;
     const flag = Math.abs(dev) > THRESH ? (dev < 0 ? '  <-- WEAK' : '  <-- strong') : '';
     console.log(
       `  ${r.id.padEnd(18)} spamDPS ${r.spamDPS.toFixed(1).padStart(6)}  ` +
-      `effCast ${r.effCast.toFixed(1)}s  dps/mana ${(r.dpsPerMana === Infinity ? 'inf' : r.dpsPerMana.toFixed(2)).padStart(6)}` +
-      `  (${(dev * 100).toFixed(0)}%)${flag}`,
+        `effCast ${r.effCast.toFixed(1)}s  dps/mana ${(r.dpsPerMana === Infinity ? 'inf' : r.dpsPerMana.toFixed(2)).padStart(6)}` +
+        `  (${(dev * 100).toFixed(0)}%)${flag}`,
     );
   }
 }

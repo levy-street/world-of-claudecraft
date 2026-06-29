@@ -225,6 +225,21 @@ export const pt_BR: EnTranslations = {
     "abilityScaling": {
       "bonus": "(+{value})"
     },
+    "unitFrame": {
+      "playerLabel": "Seu personagem",
+      "targetLabel": "Seu alvo",
+      "targetAnnounce": "Alvo: {name}",
+      "partyLabel": "Seu grupo",
+      "partyGroup": "Grupo {n}",
+      "durationUnitSeconds": "s"
+    },
+    "character": {
+      "modelPreview": "Prévia do modelo do personagem"
+    },
+    "skipLinks": {
+      "mainHud": "Pular para a interface principal",
+      "chat": "Pular para o chat"
+    },
     "mobile": {
       "autorun": "Corrida automática",
       "jump": "Pular",
@@ -246,6 +261,13 @@ export const pt_BR: EnTranslations = {
       "coordinates": "Coordenadas",
       "heading": "Direção",
       "minimapZoom": "Zoom do minimapa"
+    },
+    "castBar": {
+      "playerAria": "Sua barra de conjuração",
+      "targetAria": "Barra de conjuração do alvo"
+    },
+    "leaderboard": {
+      "close": "Fechar"
     },
     "raidLockout": {
       "title": "Bloqueios de raide",
@@ -586,6 +608,17 @@ export const pt_BR: EnTranslations = {
       "notRaid": "Seu grupo não é uma raide.",
       "leaderOnly": "Só o líder da raide pode converter em um grupo.",
       "tooLarge": "Uma raide com mais de cinco membros não pode ser convertida de volta em um grupo."
+    },
+    "loot": {
+      "chestTitle": "Baú"
+    },
+    "spellbook": {
+      "addToBarAria": "Adicionar {name} à barra de ação",
+      "removeFromBarAria": "Remover {name} da barra de ação"
+    },
+    "nameplate": {
+      "mob": "[{level}] {name}",
+      "mobElite": "[{level}+] {name}"
     }
   },
   "guide": {
@@ -2412,7 +2445,9 @@ export const pt_BR: EnTranslations = {
       "mobileMap": "Mapa",
       "closeMap": "Fechar mapa",
       "zoomIn": "Aproximar",
-      "zoomOut": "Afastar"
+      "zoomOut": "Afastar",
+      "mapCanvasLabel": "Mapa",
+      "mapSummary": "Mapa de {zone}."
     },
     "options": {
       "gameMenu": "Menu do jogo",

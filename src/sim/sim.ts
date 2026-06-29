@@ -4,7 +4,6 @@ import type {
   DelveRunInfo,
   LockpickView,
 } from '../world_api';
-import { type AssistCandidate, resolveAssist } from './assist';
 import { lineOfSightClear, resolveMovement, resolvePosition } from './colliders';
 import {
   cleanseFriendlyNpcAuras,
@@ -63,18 +62,13 @@ import {
   computeTalentModifiers,
   emptyAllocation,
   emptyModifiers,
-  FIRST_TALENT_LEVEL,
-  pointsSpent,
   type Role,
   type SavedLoadout,
   type TalentAllocation,
   type TalentModifiers,
-  talentPointsAtLevel,
-  talentsFor,
 } from './content/talents';
 import type { DelveShopGate, DelveShopOffer } from './data';
 import {
-  ABILITIES,
   abilitiesKnownAt,
   arenaOrigin,
   CAMPS,
@@ -98,18 +92,16 @@ import {
   NPCS,
   PLAYER_START,
   QUESTS,
-  questRewardItemId,
-  ZONES,
   zoneAt,
 } from './data';
 import * as companionMod from './delves/companion';
 import * as lockpickMod from './delves/lockpick_controller';
 import * as runsMod from './delves/runs';
-// A3: ARENA_SPAWNS_A_2v2/B_2v2 (read only by the moved fiestaRevive) now live with
-// social/fiesta.ts; the dungeon-wall consts stay (non-Fiesta callers). I2a's delve
-// move also dropped the now-unused delve_layout import (DELVE_MODULE_LAYOUTS et al.).
-import { DUNGEON_WALL_HW, DUNGEON_WALL_X } from './dungeon_layout';
 import * as nythraxis from './encounters/nythraxis';
+// A3: ARENA_SPAWNS_A_2v2/B_2v2 (read only by the moved fiestaRevive) now live with
+// social/fiesta.ts. The dungeon-wall consts (DUNGEON_WALL_HW/X) are now read only by
+// delves/runs.ts + render/dungeon.ts; W11 dropped the stranded sim.ts import. I2a's delve
+// move also dropped the now-unused delve_layout import (DELVE_MODULE_LAYOUTS et al.).
 import {
   createGroundObject,
   createMob,
@@ -124,7 +116,6 @@ import {
   drainDelayedEvents,
   dropEntityFromRoster,
   type GroundAoE,
-  graveyardReadout,
   rebucketEntity,
   releasePlayerSpirit,
   releaseSpiritInDelve as releaseSpiritInDelveImpl,
@@ -133,6 +124,8 @@ import {
 } from './entity_roster';
 import { canEquipItem } from './equipment_rules';
 import { formatMoney } from './format_money';
+import * as interaction from './interaction';
+import * as items from './items';
 import {
   LEADERBOARD_PAGE_SIZE,
   type LeaderboardPage,
@@ -144,17 +137,13 @@ import type { Ante, PickAction } from './lockpick';
 // Sim keeps thin same-named delegates that call these.
 import {
   activeLootRolls as activeLootRollsImpl,
-  awardSharedLootItem as awardSharedLootItemImpl,
-  distributeLootCopper as distributeLootCopperImpl,
-  lootSlotVisibleTo as lootSlotVisibleToImpl,
   type PendingLootRoll,
   partyLootCandidatesForMob as partyLootCandidatesForMobImpl,
-  pruneCorpseLoot as pruneCorpseLootImpl,
   resolveLootRoll as resolveLootRollImpl,
   rollLoot as rollLootImpl,
   submitLootRoll as submitLootRollImpl,
 } from './loot/loot_roll';
-import { MARKET_MAX_LISTINGS, Market, type MarketListing, type MarketSave } from './market';
+import { Market, type MarketListing, type MarketSave } from './market';
 import * as lifecycle from './mob/lifecycle';
 import { resetEvadingMob as resetEvadingMobFn, updateMob as updateMobFn } from './mob/locomotion';
 import { runMobSwingAffixes } from './mob/mob_swing';
@@ -183,7 +172,6 @@ import {
   talentPointBudget,
 } from './progression/talents';
 import { prestige as prestigeImpl, updateRested } from './progression/xp';
-import { questFallbackGrants } from './quest_fallback';
 import { sanitizeRemovedZone1Content } from './removed_zone1_content';
 import { Rng } from './rng';
 import { createSimContext, type SimContext, type SimContextHost } from './sim_context';
@@ -205,11 +193,18 @@ import {
   updateDoorTriggers as updateDoorTriggersImpl,
   updateInstances as updateInstancesImpl,
 } from './instances/dungeons';
+import * as questCommands from './quests/quest_commands';
 import {
   checkQuestReady,
   onInventoryChangedForQuests,
   onMobKilledForQuests,
 } from './quests/quest_credit';
+
+// computeQuestState (the pure quest-state fn) moved to quests/quest_commands.ts (W4);
+// re-export it here so ClientWorld's `import { computeQuestState } from '../sim/sim'`
+// (online.ts) stays byte-identical.
+export { computeQuestState } from './quests/quest_commands';
+
 import * as arenaMod from './social/arena';
 import * as duelMod from './social/duel';
 
@@ -249,8 +244,6 @@ import {
   type AuraKind,
   angleTo,
   armorReduction,
-  CONSUME_DURATION,
-  CONSUME_TICKS,
   type CrowdControlDrCategory,
   DELVE_COMPANION_HEAL_INTERVAL,
   type DelveDef,
@@ -266,7 +259,6 @@ import {
   FISHING_CAST_ID,
   FISHING_CAST_TIME,
   GCD,
-  INTERACT_RANGE,
   type InvSlot,
   isConsuming,
   isPetClass,
@@ -274,7 +266,6 @@ import {
   LEASH_DISTANCE,
   type LootRollChoice,
   type LootRollPrompt,
-  type LootSlot,
   type LootStrategies,
   MAX_LEVEL,
   MELEE_RANGE,
@@ -282,14 +273,11 @@ import {
   type MoveInput,
   meleeMissChance,
   normAngle,
-  OBJECT_RESPAWN,
   type OverheadEmoteId,
   type PetMode,
   type PlayerClass,
-  type QuestDef,
   type QuestProgress,
   type QuestState,
-  questTurnInNpcIds,
   RUN_SPEED,
   type SimConfig,
   type SimEvent,
@@ -299,9 +287,7 @@ import {
   TURN_SPEED,
   type Vec3,
   virtualLevel,
-  xpForLevel,
   xpToReachLevel,
-  YELL_RANGE,
 } from './types';
 import { groundHeight, WATER_LEVEL } from './world';
 
@@ -329,7 +315,9 @@ const FLEE_HELP_RADIUS = 8;
 const FLEEING_FAMILIES: ReadonlySet<MobFamily> = new Set(['humanoid', 'kobold', 'murloc', 'troll']);
 const GRAVITY = 16;
 const JUMP_VELOCITY = 6; // apex = v^2/2g ≈ 1.125 yd
-const FALL_SAFE_DISTANCE = 12; // yards of free fall before damage
+// Exported for social/chat_readouts.ts (the /falling readout shares the landing-damage
+// threshold with the in-sim fall-damage model below).
+export const FALL_SAFE_DISTANCE = 12; // yards of free fall before damage
 // OBJECT_RESPAWN moved to types.ts (shared with the extracted Nythraxis crypt-relic
 // respawn). The NYTHRAXIS_* encounter consts (relic summons, Aldric id, wardstone /
 // gravebreaker / soul-rend / deathless / transition tuning, room radius, lockout ms,
@@ -366,69 +354,9 @@ export const SAY_RANGE = 25;
 // YELL_RANGE moved to types.ts (the chat router + the extracted Nythraxis yells share it).
 // OVERHEAD_EMOTE_DURATION moved to social/chat.ts (playEmote moved with it).
 
-// Predefined social emotes. Each entry maps a command (and its aliases) to the
-// third-person action text shown to everyone in /say range. `solo` is used with
-// no target; `target` (when present) is used when the emote names another
-// player and contains a `%t` placeholder for that player's name. The actor's
-// own name is rendered separately by the client, so these strings start at the
-// verb (e.g. "Aleph" + " waves.").
-interface EmoteDef {
-  solo: string;
-  target?: string;
-}
-const EMOTES: Record<string, EmoteDef> = {
-  wave: { solo: 'waves.', target: 'waves at %t.' },
-  bow: { solo: 'bows.', target: 'bows before %t.' },
-  cheer: { solo: 'cheers!', target: 'cheers at %t!' },
-  dance: { solo: 'bursts into dance.', target: 'dances with %t.' },
-  laugh: { solo: 'laughs.', target: 'laughs at %t.' },
-  cry: { solo: 'cries.', target: "cries on %t's shoulder." },
-  salute: { solo: 'salutes.', target: 'salutes %t.' },
-  thank: { solo: 'thanks everyone.', target: 'thanks %t.' },
-  clap: { solo: 'applauds. Bravo!', target: 'applauds %t. Bravo!' },
-  greet: { solo: 'greets everyone with a hearty hello.', target: 'greets %t with a hearty hello.' },
-  roar: { solo: 'lets out a mighty roar.', target: 'roars at %t.' },
-  sigh: { solo: 'sighs.', target: 'sighs at %t.' },
-  kneel: { solo: 'kneels down.', target: 'kneels before %t.' },
-  point: { solo: 'points.', target: 'points at %t.' },
-  flex: { solo: 'flexes.', target: 'flexes at %t.' },
-  cower: { solo: 'cowers in fear.', target: 'cowers in fear at the sight of %t.' },
-};
-// Command aliases → canonical emote key above.
-const EMOTE_ALIASES: Record<string, string> = {
-  hi: 'greet',
-  hello: 'greet',
-  thanks: 'thank',
-  applaud: 'clap',
-};
-// The auras a target carries that are working against it. Everything else
-// (buff_*, hot, absorb, imbue, stances, forms, stealth, thorns, attackspeed
-// haste) is treated as helpful/neutral. Used by /targetbuffs to tag each aura.
-const HARMFUL_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
-  'dot',
-  'slow',
-  'stun',
-  'root',
-  'incapacitate',
-  'polymorph',
-  'sunder',
-  'spellvuln',
-  'vulnerability',
-  'tongues',
-  'cost_tax',
-  'critvuln',
-]);
-
-function isHarmfulAura(kind: AuraKind): boolean {
-  return HARMFUL_AURA_KINDS.has(kind);
-}
-const NEARBY_RANGE = 40; // /nearby scan radius — wider than say, tighter than yell
-const NEARBY_MAX = 10; // cap the /nearby list so a crowded camp can't spam chat
-// /assist resolves a named player only if they are within interest range (you can see
-// them) OR in your party/raid (you coordinate with them across the whole map). This
-// mirrors the server's ~120yd snapshot scope so /assist never reaches a stranger on the
-// far side of the world. Party/raid members are always included, regardless of distance.
-const ASSIST_RANGE = 120;
+// EmoteDef/EMOTES/EMOTE_ALIASES + ASSIST_RANGE moved to social/chat.ts (W5) with the
+// chat() router; HARMFUL_AURA_KINDS/isHarmfulAura + NEARBY_RANGE/NEARBY_MAX moved to
+// social/chat_readouts.ts with the /targetbuffs + /nearby readouts.
 // CHAT_BURST / CHAT_REFILL moved to social/chat.ts (chatAllowed moved with them).
 // Max characters in a single chat line, matching classic WoW's 255-char editbox.
 // Authoritative cap: enforced here in the deterministic core so every host agrees;
@@ -437,9 +365,9 @@ export const MAX_CHAT_MESSAGE_LEN = 255;
 // A2: DUEL_FORFEIT_DISTANCE moved to social/duel.ts.
 // G2: TRADE_RANGE moved to social/trade.ts with the trade methods.
 // The World Market (the Merchant's auction house) moved to market.ts (L2); the
-// MARKET_* consts live there now. MARKET_MAX_LISTINGS is re-imported above for the
-// /listings readout (the one in-sim.ts consumer left behind).
-const VENDOR_BUYBACK_LIMIT = 12;
+// MARKET_* consts live there now (MARKET_MAX_LISTINGS moved with the /listings readout
+// to social/chat_readouts.ts in W5, which imports it from market.ts directly).
+// VENDOR_BUYBACK_LIMIT moved to items.ts (W2) with the vendor sell/buyback methods.
 // INSTANCE_EMPTY_TIMEOUT relocated to types.ts (I1); no longer referenced in sim.ts.
 // Delve run-lifecycle consts moved to src/sim/delves/runs.ts (I2a): the solid-prop
 // radii (DELVE_CHEST/GRAVE/WALL_SOLID_R), DELVE_INTERACT_RANGE, DELVE_BAD_AIR_INTERVAL,
@@ -465,7 +393,7 @@ const MAX_CLIMB_SLOPE = PLAYER_MAX_CLIMB_SLOPE; // rise/run above which a ground
 // Murlocs (the clustered water mobs players call "frogs") used to pull too much,
 // chain-aggroing the whole pond and making solo pulls impossible (#102). Tune
 // per family here; everything else falls back to the default.
-const POTION_COOLDOWN = 60; // seconds; shared cooldown across combat potions (#103)
+// POTION_COOLDOWN moved to items.ts (W2) with the useItem potion branch.
 const DEFAULT_SOCIAL_PULL_RADIUS = 5;
 const SOCIAL_PULL_RADIUS: Partial<Record<MobFamily, number>> = {
   murloc: 8,
@@ -838,23 +766,9 @@ export interface PendingMobRespawn {
   timer: number;
 }
 
-// Pure quest-state computation, shared by the sim and the network client.
-export function computeQuestState(
-  questId: string,
-  questLog: Map<string, QuestProgress>,
-  questsDone: Set<string>,
-  playerLevel: number,
-): QuestState {
-  if (questsDone.has(questId)) return 'done';
-  const qp = questLog.get(questId);
-  if (qp) return qp.state === 'ready' ? 'ready' : 'active';
-  const quest = QUESTS[questId];
-  if (!quest) return 'unavailable';
-  if (quest.requiresQuest && !questsDone.has(quest.requiresQuest)) return 'unavailable';
-  if (quest.minLevel && playerLevel < quest.minLevel) return 'unavailable';
-  if (quest.retired) return 'unavailable';
-  return 'available';
-}
+// computeQuestState (the pure quest-state fn) moved to quests/quest_commands.ts (W4),
+// re-exported from sim.ts (see the import region) so the ClientWorld import stays
+// byte-identical.
 
 // copyPos moved to entity_roster.ts (used only by the despawn prologue).
 
@@ -1896,6 +1810,15 @@ export class Sim {
       set nextLootRollId(v) {
         sim.nextLootRollId = v;
       },
+      // W5 chat router/readouts live views: devCommands gates the /dev chat cheats;
+      // marketListings is the Market book the /listings readout filters (the Market
+      // instance is constructed after this host literal, so the getter reads it lazily).
+      get devCommands() {
+        return sim.devCommands;
+      },
+      get marketListings() {
+        return sim.marketListings;
+      },
       // LATE-bound (not .bind(sim)): a moved emit site (C5 meleeSwing/rangedSwing)
       // now emits via ctx.emit, and tests swap (sim as any).emit post-construction to
       // observe events (mob_blind/mob_cleave). An early .bind(sim) would capture the
@@ -2153,6 +2076,31 @@ export class Sim {
       // already bound above; isRooted/moveSpeedMult/swingIntervalMult are M2 bindings above.)
       setPlayerLevel: sim.setPlayerLevel.bind(sim),
       notice: sim.notice.bind(sim),
+      // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved items.useItem
+      // dispatches to. Late-bound arrows (looked up at call time, not `.bind`d at ctor)
+      // so they preserve the pre-move `this.X` dynamic-dispatch semantics, including tests
+      // that reassign a Sim method post-construction. startFishing/unlockMechChromaFromItem/
+      // openSkinSelect are private on Sim; isSwimming is public. The owning facets stay TBD.
+      startFishing: (p, meta) => sim.startFishing(p, meta),
+      unlockMechChromaFromItem: (meta, itemId, chromaId) =>
+        sim.unlockMechChromaFromItem(meta, itemId, chromaId),
+      openSkinSelect: (meta, catalog, itemId) => sim.openSkinSelect(meta, catalog, itemId),
+      isSwimming: (e) => sim.isSwimming(e),
+      // Interaction (W3): the moved interaction.interact dispatches into the quest-NPC
+      // surface that STAYS on Sim (W4 owns talkToNpc / interactNpcForQuests /
+      // isQuestInteractionEntity). Late-bound arrows (call-time lookup, not `.bind`d) so
+      // W4 can re-point them into the quests module without touching this binding, and so
+      // a test that reassigns sim.talkToNpc is honored. talkToNpc is public; isQuestInteractionEntity
+      // is private on Sim. Both MUST keep talkToNpc a resolvable Sim delegate (W4 contract).
+      talkToNpc: (npcId, pid) => sim.talkToNpc(npcId, pid),
+      isQuestInteractionEntity: (e) => sim.isQuestInteractionEntity(e),
+      // W5 chat router/readouts reach-backs. Late-bound arrows (call-time lookup): the
+      // /assist branch routes through Sim's targetEntity delegate (-> targeting.ts);
+      // partyReadout reads the cap off the party machine; the /listings readout asks the
+      // Market instance (constructed after this literal) for listing ownership.
+      targetEntity: (id, pid) => sim.targetEntity(id, pid),
+      partyCapacity: (party) => sim.party.partyCapacity(party),
+      marketListingBelongsTo: (listing, meta) => sim.market.marketListingBelongsTo(listing, meta),
     };
     return createSimContext(host);
   }
@@ -3382,22 +3330,14 @@ export class Sim {
   // lifecycle, corpse-loot helpers) moved to loot/loot_roll.ts behind SimContext.
   // Sim keeps thin same-named delegates only where a foreign caller resolves them:
   //  - rollLoot: ctx.rollLoot (combat/damage.ts handleDeath) + (sim as any) test casts.
-  //  - distributeLootCopper/awardSharedLootItem/lootSlotVisibleTo/pruneCorpseLoot:
-  //    the lootCorpse interaction handler (stays on Sim) calls them.
   //  - resolveLootRoll: the updateLootRolls tick driver (stays on Sim) calls it.
   //  - activeLootRolls/submitLootRoll: the public IWorld surface (HUD + player action).
   // The strategy resolvers + copper/need-greed internals had no external caller and
-  // moved fully (no delegate).
+  // moved fully (no delegate). The corpse-loot helpers (distributeLootCopper/
+  // awardSharedLootItem/lootSlotVisibleTo/pruneCorpseLoot) had their sole Sim caller
+  // (lootCorpse) moved to interaction.ts (W3), which now imports them directly.
   private rollLoot(mob: Entity, meta: PlayerMeta, eligible: PlayerMeta[] = [meta]): void {
     rollLootImpl(this.ctx, mob, meta, eligible);
-  }
-
-  private distributeLootCopper(mob: Entity, looter: PlayerMeta): void {
-    distributeLootCopperImpl(this.ctx, mob, looter);
-  }
-
-  private awardSharedLootItem(itemId: string, mob: Entity, looter: PlayerMeta): void {
-    awardSharedLootItemImpl(this.ctx, itemId, mob, looter);
   }
 
   activeLootRolls(pid = this.playerId): LootRollPrompt[] {
@@ -3410,14 +3350,6 @@ export class Sim {
 
   private resolveLootRoll(roll: PendingLootRoll): void {
     resolveLootRollImpl(this.ctx, roll);
-  }
-
-  private lootSlotVisibleTo(slot: LootSlot, pid: number): boolean {
-    return lootSlotVisibleToImpl(slot, pid);
-  }
-
-  private pruneCorpseLoot(mob: Entity): void {
-    pruneCorpseLootImpl(this.ctx, mob);
   }
 
   // -------------------------------------------------------------------------
@@ -4052,16 +3984,13 @@ export class Sim {
   // room/participant queries, lockout grant, Gravebreaker/Raise Fallen/adds, the Aldric
   // transition + wardstones, Soul Rend, Deathless Rage + ward channels) moved to
   // encounters/nythraxis.ts (N1). updateNythraxisEncounter + grantNythraxisLockout are
-  // reached only via ctx (bound to the module in buildSimContext). Sim keeps two thin
-  // delegates: resetNythraxisEncounter (reached by resetEvadingMob's boss-reset re-entry,
-  // respawnMob, and nythraxis_aldric_npc.test.ts via cast) and tryStartNythraxisWardChannel
-  // (the three interaction call sites short-circuit on a true return).
+  // reached only via ctx (bound to the module in buildSimContext). Sim keeps one thin
+  // delegate: resetNythraxisEncounter (reached by resetEvadingMob's boss-reset re-entry,
+  // respawnMob, and nythraxis_aldric_npc.test.ts via cast). tryStartNythraxisWardChannel
+  // moved with its sole callers (lootCorpse/pickUpObject/interact) to interaction.ts (W3),
+  // which imports it directly from encounters/nythraxis.ts.
   private resetNythraxisEncounter(boss: Entity): void {
     nythraxis.resetNythraxisEncounter(this.ctx, boss);
-  }
-
-  private tryStartNythraxisWardChannel(ward: Entity, player: Entity): boolean {
-    return nythraxis.tryStartNythraxisWardChannel(this.ctx, ward, player);
   }
 
   private spawnBossAdds(boss: Entity, mobId: string, count: number): void {
@@ -4190,71 +4119,15 @@ export class Sim {
   }
 
   discardItem(itemId: string, count = 1, pid?: number): void {
-    const r = this.resolve(pid);
-    if (!r) return;
-    const { meta } = r;
-    const def = ITEMS[itemId];
-    const available = this.countItem(itemId, meta.entityId);
-    if (!def || available <= 0) {
-      this.error(meta.entityId, "You don't have that item.");
-      return;
-    }
-    if (def.noDiscard) return;
-    const discardCount = Number.isFinite(count) ? Math.min(Math.floor(count), available) : 0;
-    if (discardCount <= 0) return;
-    this.removeItem(itemId, discardCount, meta.entityId);
-    this.emit({
-      type: 'log',
-      // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
-      text: `Discarded ${def.name}${discardCount > 1 ? ' x' + discardCount : ''}.`,
-      color: '#999',
-      pid: meta.entityId,
-    });
+    items.discardItem(this.ctx, itemId, count, pid);
   }
 
   equipItem(itemId: string, pid?: number): void {
-    const r = this.resolve(pid);
-    if (!r) return;
-    const { meta, e: p } = r;
-    const def = ITEMS[itemId];
-    if (!def?.slot || (def.kind !== 'weapon' && def.kind !== 'armor')) return;
-    if (this.countItem(itemId, meta.entityId) <= 0) return;
-    if (!canEquipItem(meta.cls, def)) {
-      this.error(meta.entityId, 'You cannot equip that.');
-      return;
-    }
-    const slot = def.slot;
-    const old = meta.equipment[slot];
-    this.removeItem(itemId, 1, meta.entityId);
-    if (old) this.addItemSilent(old, 1, meta);
-    meta.equipment[slot] = itemId;
-    recalcPlayerStats(p, meta.cls, meta.equipment, this.playerMods(meta));
-    this.emit({ type: 'log', text: `Equipped ${def.name}.`, color: '#8f8', pid: meta.entityId });
+    items.equipItem(this.ctx, itemId, pid);
   }
 
-  // Remove the piece in `slot` back to the bags, leaving the slot empty. Unlike
-  // equipItem (which only swaps in a replacement) this is the way to fully
-  // unequip. Bags are uncapped, so the returned item never has nowhere to go.
   unequipItem(slot: EquipSlot, pid?: number): boolean {
-    const r = this.resolve(pid);
-    if (!r) return false;
-    const { meta, e: p } = r;
-    const itemId = meta.equipment[slot];
-    if (!itemId) return false;
-    delete meta.equipment[slot];
-    // addItemSilent (not addItem): returning a piece you already owned to bags is
-    // not a fresh acquisition, so it must not fire collect-quest credit. No quest
-    // today keys on an unequip, so there is nothing to award here regardless.
-    this.addItemSilent(itemId, 1, meta);
-    recalcPlayerStats(p, meta.cls, meta.equipment, this.playerMods(meta));
-    const def = ITEMS[itemId];
-    this.emit({
-      type: 'log',
-      text: `Unequipped ${def?.name ?? itemId}.`,
-      color: '#8f8',
-      pid: meta.entityId,
-    });
-    return true;
+    return items.unequipItem(this.ctx, slot, pid);
   }
 
   private hasFishableWaterAhead(p: Entity): boolean {
@@ -4350,285 +4223,23 @@ export class Sim {
   }
 
   useItem(itemId: string, pid?: number): ItemUseResult | undefined {
-    const r = this.resolve(pid);
-    if (!r) return;
-    const { meta, e: p } = r;
-    const def = ITEMS[itemId];
-    if (!def) return;
-    if (this.countItem(itemId, meta.entityId) <= 0) {
-      this.error(meta.entityId, "You don't have that item.");
-      return;
-    }
-    if (def.use?.type === 'fishing') {
-      this.startFishing(p, meta);
-      return;
-    }
-    if (def.use?.type === 'mechChroma') {
-      return this.unlockMechChromaFromItem(meta, itemId, def.use.chromaId);
-    }
-    if (def.use?.type === 'skinSelect') {
-      this.openSkinSelect(meta, def.use.catalog ?? 'class', itemId);
-      return;
-    }
-    if (p.castingAbility === FISHING_CAST_ID) {
-      this.error(meta.entityId, 'You are busy.');
-      return;
-    }
-    if (p.dead) return;
-    if (def.kind === 'food' || def.kind === 'drink') {
-      if (p.inCombat) {
-        this.error(meta.entityId, "You can't do that while in combat.");
-        return;
-      }
-      if (this.isSwimming(p)) {
-        this.error(meta.entityId, "You can't do that while swimming.");
-        return;
-      }
-      this.removeItem(itemId, 1, meta.entityId);
-      p.sitting = true;
-      // food and drink occupy separate slots, so you can do both at once
-      const slot = def.kind === 'food' ? 'eating' : 'drinking';
-      p[slot] = {
-        itemId,
-        kind: def.kind,
-        hpPer2s: def.foodHp ? Math.round(def.foodHp / CONSUME_TICKS) : 0,
-        manaPer2s: def.drinkMana ? Math.round(def.drinkMana / CONSUME_TICKS) : 0,
-        remaining: CONSUME_DURATION,
-      };
-      this.emit({
-        type: 'log',
-        text: def.kind === 'food' ? 'You sit down to eat.' : 'You sit down to drink.',
-        color: '#999',
-        pid: meta.entityId,
-      });
-    } else if (def.kind === 'potion') {
-      // instant, usable in combat, on a shared 60s cooldown (#103)
-      if (this.time < p.potionCooldownUntil) {
-        this.error(meta.entityId, 'That potion is not ready yet.');
-        return;
-      }
-      const restoresMana =
-        (def.potionMana ?? 0) > 0 && p.resourceType === 'mana' && p.resource < p.maxResource;
-      const restoresHp = (def.potionHp ?? 0) > 0 && p.hp < p.maxHp;
-      if (!restoresHp && !restoresMana) {
-        this.error(
-          meta.entityId,
-          p.hp >= p.maxHp && (def.potionMana ?? 0) === 0
-            ? 'You are already at full health.'
-            : 'Nothing to restore.',
-        );
-        return;
-      }
-      this.removeItem(itemId, 1, meta.entityId);
-      p.potionCooldownUntil = this.time + POTION_COOLDOWN;
-      if (restoresHp) {
-        const heal = Math.min(Math.round(def.potionHp! * this.healingTakenMult(p)), p.maxHp - p.hp);
-        p.hp += heal;
-        this.emit({ type: 'heal', targetId: p.id, amount: heal });
-      }
-      if (restoresMana) {
-        p.resource = Math.min(p.maxResource, p.resource + def.potionMana!);
-      }
-      this.emit({ type: 'log', text: `You quaff ${def.name}.`, color: '#c9f', pid: meta.entityId });
-    } else if (def.kind === 'elixir') {
-      // Battle elixir: grant a temporary stat-buff aura. Usable in combat (classic),
-      // no shared potion cooldown; re-quaffing refreshes the buff via applyAura.
-      const elx = def.elixir;
-      if (!elx) return;
-      this.removeItem(itemId, 1, meta.entityId);
-      this.applyAura(p, {
-        id: `elixir_${itemId}`,
-        name: elx.aura,
-        kind: elx.kind,
-        remaining: elx.duration,
-        duration: elx.duration,
-        value: elx.value,
-        sourceId: p.id,
-        school: 'nature',
-      });
-      this.emit({ type: 'log', text: `You quaff ${def.name}.`, color: '#c9f', pid: meta.entityId });
-    } else if (def.kind === 'weapon' || def.kind === 'armor') {
-      this.equipItem(itemId, meta.entityId);
-    }
+    return items.useItem(this.ctx, itemId, pid);
   }
 
   buyItem(npcId: number, itemId: string, pid?: number): void {
-    const r = this.resolve(pid);
-    if (!r) return;
-    const { meta, e: p } = r;
-    const npc = this.entities.get(npcId);
-    const def = ITEMS[itemId];
-    if (npc?.kind !== 'npc' || npc.vendorItems.length === 0) {
-      this.error(meta.entityId, 'That merchant is not available.');
-      return;
-    }
-    if (!npc.vendorItems.includes(itemId)) {
-      this.error(meta.entityId, 'That item is not sold here.');
-      return;
-    }
-    if (!def?.buyValue) {
-      this.error(meta.entityId, 'That item is not for sale.');
-      return;
-    }
-    if (dist2d(p.pos, npc.pos) > INTERACT_RANGE + 2) {
-      this.error(meta.entityId, 'Too far away.');
-      return;
-    }
-    if (meta.copper < def.buyValue) {
-      this.error(meta.entityId, 'Not enough money.');
-      return;
-    }
-    meta.copper -= def.buyValue;
-    this.addItem(itemId, 1, meta.entityId);
-    this.emit({ type: 'vendor', action: 'buy', itemId, pid: meta.entityId });
-  }
-
-  private vendorInRange(p: Entity): boolean {
-    return [...this.entities.values()].some(
-      (e) =>
-        e.kind === 'npc' && e.vendorItems.length > 0 && dist2d(p.pos, e.pos) <= INTERACT_RANGE + 2,
-    );
-  }
-
-  private recordVendorBuyback(meta: PlayerMeta, itemId: string, count: number): void {
-    const existingIndex = meta.vendorBuyback.findIndex((s) => s.itemId === itemId);
-    if (existingIndex >= 0) {
-      const [existing] = meta.vendorBuyback.splice(existingIndex, 1);
-      existing.count += count;
-      meta.vendorBuyback.unshift(existing);
-    } else {
-      meta.vendorBuyback.unshift({ itemId, count });
-    }
-    while (meta.vendorBuyback.length > VENDOR_BUYBACK_LIMIT) meta.vendorBuyback.pop();
+    items.buyItem(this.ctx, npcId, itemId, pid);
   }
 
   sellItem(itemId: string, count = 1, pid?: number): void {
-    const r = this.resolve(pid);
-    if (!r) return;
-    const { meta, e: p } = r;
-    const def = ITEMS[itemId];
-    const available = this.countItem(itemId, meta.entityId);
-    if (!def || available <= 0) {
-      this.error(meta.entityId, "You don't have that item.");
-      return;
-    }
-    if (p.dead) {
-      this.error(meta.entityId, "You can't do that while dead.");
-      return;
-    }
-    const sellCount = Number.isFinite(count) ? Math.min(Math.floor(count), available) : 0;
-    if (sellCount <= 0) return;
-    if (!this.vendorInRange(p)) {
-      this.error(meta.entityId, 'There is no merchant nearby.');
-      return;
-    }
-    if (def.noVendorSell) {
-      this.error(meta.entityId, 'That item is not for sale.');
-      return;
-    }
-    if (def.kind === 'quest') {
-      this.error(meta.entityId, 'You cannot sell quest items.');
-      return;
-    }
-    this.removeItem(itemId, sellCount, meta.entityId);
-    this.recordVendorBuyback(meta, itemId, sellCount);
-    const payout = def.sellValue * sellCount;
-    meta.copper += payout;
-    this.emit({ type: 'vendor', action: 'sell', itemId, pid: meta.entityId });
-    this.emit({
-      type: 'loot',
-      // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
-      text: `Sold ${def.name}${sellCount > 1 ? ' x' + sellCount : ''} for ${formatMoney(payout)}.`,
-      pid: meta.entityId,
-    });
+    items.sellItem(this.ctx, itemId, count, pid);
   }
 
-  // Bulk-sell every gray (poor-quality) item in the bags in one action, applying the
-  // same rules as the per-item sellItem path: quest items and noVendorSell items are
-  // left untouched and each sold stack is recorded for buyback. One summary loot line
-  // is emitted instead of one per stack.
   sellAllJunk(pid?: number): void {
-    const r = this.resolve(pid);
-    if (!r) return;
-    const { meta, e: p } = r;
-    if (p.dead) {
-      this.error(meta.entityId, "You can't do that while dead.");
-      return;
-    }
-    if (!this.vendorInRange(p)) {
-      this.error(meta.entityId, 'There is no merchant nearby.');
-      return;
-    }
-    const junk = meta.inventory
-      .filter((s) => {
-        const def = ITEMS[s.itemId];
-        return (
-          !!def &&
-          def.quality === 'poor' &&
-          def.kind !== 'quest' &&
-          !def.noVendorSell &&
-          s.count > 0
-        );
-      })
-      .map((s) => ({ itemId: s.itemId, count: s.count }));
-    if (junk.length === 0) return; // nothing gray to sell; the vendor UI keeps the button disabled here
-    let total = 0;
-    let soldCount = 0;
-    for (const { itemId, count } of junk) {
-      const def = ITEMS[itemId]!;
-      this.removeItem(itemId, count, meta.entityId);
-      this.recordVendorBuyback(meta, itemId, count);
-      total += def.sellValue * count;
-      soldCount += count;
-    }
-    meta.copper += total;
-    this.emit({ type: 'vendor', action: 'sell', pid: meta.entityId });
-    this.emit({
-      type: 'loot',
-      text: `Sold ${soldCount} junk item${soldCount === 1 ? '' : 's'} for ${formatMoney(total)}.`,
-      pid: meta.entityId,
-    });
+    items.sellAllJunk(this.ctx, pid);
   }
 
   buyBackItem(itemId: string, pid?: number): void {
-    const r = this.resolve(pid);
-    if (!r) return;
-    const { meta, e: p } = r;
-    const def = ITEMS[itemId];
-    const slot = meta.vendorBuyback.find((s) => s.itemId === itemId);
-    if (!def || !slot || slot.count <= 0) {
-      this.error(meta.entityId, 'That item is not available for buyback.');
-      return;
-    }
-    if (p.dead) {
-      this.error(meta.entityId, "You can't do that while dead.");
-      return;
-    }
-    if (!this.vendorInRange(p)) {
-      this.error(meta.entityId, 'There is no merchant nearby.');
-      return;
-    }
-    if (meta.copper < def.sellValue) {
-      this.error(meta.entityId, 'Not enough money.');
-      return;
-    }
-    meta.copper -= def.sellValue;
-    slot.count -= 1;
-    if (slot.count <= 0) meta.vendorBuyback = meta.vendorBuyback.filter((s) => s !== slot);
-    this.addItemSilent(itemId, 1, meta);
-    this.ctx.onInventoryChangedForQuests(meta);
-    this.emit({ type: 'vendor', action: 'buyback', itemId, pid: meta.entityId });
-    this.emit({
-      type: 'loot',
-      text: `Bought back ${def.name} for ${formatMoney(def.sellValue)}.`,
-      pid: meta.entityId,
-    });
-  }
-
-  private addItemSilent(itemId: string, count: number, meta: PlayerMeta): void {
-    const existing = meta.inventory.find((s) => s.itemId === itemId);
-    if (existing) existing.count += count;
-    else meta.inventory.push({ itemId, count });
+    items.buyBackItem(this.ctx, itemId, pid);
   }
 
   private maybeAutoEquip(itemId: string, meta: PlayerMeta): void {
@@ -4651,176 +4262,22 @@ export class Sim {
   // Interaction: looting, quest NPCs, ground objects
   // -------------------------------------------------------------------------
 
+  // lootCorpse / pickUpObject / interact (the three IWorldInteraction members) moved
+  // to interaction.ts (W3) behind SimContext. Sim keeps thin same-named PUBLIC delegates
+  // (the widened `pid?` overload preserved) so the IWorld surface, server/game.ts, and
+  // tests resolve them on the Sim facade unchanged; each forwards via this.ctx. The
+  // quest-NPC dispatch they fan into (talkToNpc / isQuestInteractionEntity below) STAYS
+  // on Sim (W4) and is reached through two append-only SimContext callbacks.
   lootCorpse(mobId: number, pid?: number): void {
-    const r = this.resolve(pid);
-    if (!r) return;
-    const { meta, e: p } = r;
-    const mob = this.entities.get(mobId);
-    if (!mob?.lootable || !mob.loot) return;
-    const tapperParty = mob.tappedById !== null ? this.partyOf(mob.tappedById) : null;
-    const hasSharedLootRights =
-      mob.tappedById === null ||
-      mob.tappedById === meta.entityId ||
-      !!tapperParty?.members.includes(meta.entityId);
-    const hasPersonalLoot = mob.loot.items.some((s) => s.personalFor?.includes(meta.entityId));
-    const hasOpenLoot = mob.loot.items.some((s) => s.openToAll && s.count > 0);
-    if (!hasSharedLootRights && !hasPersonalLoot && !hasOpenLoot) {
-      this.error(meta.entityId, "You don't have permission to loot that.");
-      return;
-    }
-    if (dist2d(p.pos, mob.pos) > INTERACT_RANGE) {
-      this.error(meta.entityId, 'Too far away.');
-      return;
-    }
-    if (hasSharedLootRights) this.distributeLootCopper(mob, meta);
-    for (const s of [...mob.loot.items]) {
-      if (!this.lootSlotVisibleTo(s, meta.entityId)) continue;
-      if (s.openToAll) {
-        for (let i = 0; i < s.count; i++) this.addItem(s.itemId, 1, meta.entityId);
-        s.count = 0;
-        continue;
-      }
-      if (s.personalFor) {
-        this.addItem(s.itemId, 1, meta.entityId);
-        s.personalFor = s.personalFor.filter((id) => id !== meta.entityId);
-        continue;
-      }
-      if (!hasSharedLootRights) continue;
-      for (let i = 0; i < s.count; i++) {
-        this.awardSharedLootItem(s.itemId, mob, meta);
-      }
-      s.count = 0;
-    }
-    this.pruneCorpseLoot(mob);
-    if (p.targetId === mobId) p.targetId = null;
+    interaction.lootCorpse(this.ctx, mobId, pid);
   }
 
   pickUpObject(objId: number, pid?: number): void {
-    const r = this.resolve(pid);
-    if (!r) return;
-    const { meta, e: p } = r;
-    const obj = this.entities.get(objId);
-    if (obj?.kind !== 'object' || !obj.lootable || !obj.objectItemId) return;
-    if (dist2d(p.pos, obj.pos) > INTERACT_RANGE) {
-      this.error(meta.entityId, 'Too far away.');
-      return;
-    }
-    if (this.tryStartNythraxisWardChannel(obj, p)) return;
-    if (this.activateNythraxisRelic(obj, meta)) return;
-    if (this.interactObjectForQuests(obj, meta)) return;
-    const def = ITEMS[obj.objectItemId];
-    if (def?.questId) {
-      const qp = meta.questLog.get(def.questId);
-      if (!qp || (qp.state !== 'active' && qp.state !== 'ready')) {
-        this.error(meta.entityId, def.pickupDeny ?? `You cannot take the ${def.name} yet.`);
-        return;
-      }
-      const quest = QUESTS[def.questId];
-      const objIdx = quest.objectives.findIndex(
-        (o) => o.type === 'collect' && o.itemId === obj.objectItemId,
-      );
-      if (objIdx < 0) {
-        this.error(meta.entityId, def.pickupEnough ?? `${def.name} offers nothing more.`);
-        return;
-      }
-      if (
-        objIdx >= 0 &&
-        this.countItem(obj.objectItemId, meta.entityId) >= quest.objectives[objIdx].count
-      ) {
-        this.error(meta.entityId, def.pickupEnough ?? 'You have enough of those.');
-        return;
-      }
-    }
-    this.addItem(obj.objectItemId, 1, meta.entityId);
-    obj.lootable = false;
-    obj.respawnTimer = OBJECT_RESPAWN;
-  }
-
-  // The Nythraxis crypt-relic / grave-vision quest chain (activateNythraxisRelic +
-  // interactObjectForQuests + the sharedNythraxisObjectParticipants / summonQuestVision /
-  // summonQuestMob / emitQuestObjectVision / emitQuestMobDialogue helpers) moved to
-  // encounters/nythraxis.ts (N1). pickUpObject short-circuits on the two delegates below
-  // before the generic object-pickup path; the helpers are module-internal.
-  private activateNythraxisRelic(obj: Entity, meta: PlayerMeta): boolean {
-    return nythraxis.activateNythraxisRelic(this.ctx, obj, meta);
-  }
-
-  private interactObjectForQuests(obj: Entity, meta: PlayerMeta): boolean {
-    return nythraxis.interactObjectForQuests(this.ctx, obj, meta);
+    interaction.pickUpObject(this.ctx, objId, pid);
   }
 
   interact(pid?: number): void {
-    const r = this.resolve(pid);
-    if (!r) return;
-    const p = r.e;
-    if (p.targetId !== null) {
-      const target = this.entities.get(p.targetId);
-      if (target && dist2d(p.pos, target.pos) <= INTERACT_RANGE + 2) {
-        if (target.kind === 'mob' && target.lootable) {
-          this.lootCorpse(target.id, p.id);
-          return;
-        }
-        if (target.kind === 'object' && target.lootable) {
-          if (target.templateId === 'dungeon_door' && target.dungeonId) {
-            this.enterDungeon(target.dungeonId, p.id);
-            return;
-          }
-          if (target.templateId === 'dungeon_exit') {
-            this.leaveDungeon(p.id);
-            return;
-          }
-          if (this.tryStartNythraxisWardChannel(target, p)) return;
-          this.pickUpObject(target.id, p.id);
-          return;
-        }
-        if (this.isQuestInteractionEntity(target)) {
-          this.talkToNpc(target.id, p.id);
-          return;
-        }
-      }
-    }
-    let bestCorpse: Entity | null = null;
-    let bestCorpseD2 = INTERACT_RANGE * INTERACT_RANGE;
-    let bestObj: Entity | null = null;
-    let bestObjD2 = INTERACT_RANGE * INTERACT_RANGE;
-    let bestQuestEntity: Entity | null = null;
-    let bestQuestD2 = INTERACT_RANGE * INTERACT_RANGE;
-    this.grid.forEachInRadius(p.pos.x, p.pos.z, INTERACT_RANGE, (e, d2) => {
-      if (e.kind === 'mob' && e.lootable && d2 < bestCorpseD2) {
-        bestCorpse = e;
-        bestCorpseD2 = d2;
-      }
-      if (e.kind === 'object' && e.lootable && d2 < bestObjD2) {
-        bestObj = e;
-        bestObjD2 = d2;
-      }
-      if (this.isQuestInteractionEntity(e) && d2 < bestQuestD2) {
-        bestQuestEntity = e;
-        bestQuestD2 = d2;
-      }
-    });
-    // re-read through wider types: TS cannot see the closure assignments above
-    const corpse = bestCorpse as Entity | null;
-    const obj = bestObj as Entity | null;
-    const questEntity = bestQuestEntity as Entity | null;
-    if (corpse) {
-      this.lootCorpse(corpse.id, p.id);
-      return;
-    }
-    if (obj) {
-      if (obj.templateId === 'dungeon_door' && obj.dungeonId) {
-        this.enterDungeon(obj.dungeonId, p.id);
-        return;
-      }
-      if (obj.templateId === 'dungeon_exit') {
-        this.leaveDungeon(p.id);
-        return;
-      }
-      if (this.tryStartNythraxisWardChannel(obj, p)) return;
-      this.pickUpObject(obj.id, p.id);
-      return;
-    }
-    if (questEntity) this.talkToNpc(questEntity.id, p.id);
+    interaction.interact(this.ctx, pid);
   }
 
   private isQuestInteractionEntity(e: Entity): boolean {
@@ -4884,167 +4341,32 @@ export class Sim {
   // Quests
   // -------------------------------------------------------------------------
 
+  // The quest command surface (questState + acceptQuest/acceptLinkedQuest/abandonQuest/
+  // turnInQuest, plus the private helpers questNpcFor/finalizeQuestAccept and the pure
+  // computeQuestState) moved to quests/quest_commands.ts (W4) behind SimContext. Sim
+  // keeps these thin same-named PUBLIC delegates (the widened `pid?` overload preserved)
+  // so the IWorld surface, server/game.ts, and the in-file interaction path (talkToNpc
+  // above) resolve them on the Sim facade unchanged; each forwards via this.ctx. The
+  // moved questNpcFor reaches the still-on-Sim isQuestInteractionEntity predicate via the
+  // ctx.isQuestInteractionEntity callback.
   questState(questId: string, pid?: number): QuestState {
-    const r = this.resolve(pid);
-    if (!r) return 'unavailable';
-    return computeQuestState(questId, r.meta.questLog, r.meta.questsDone, r.e.level);
-  }
-
-  private questNpcFor(
-    questId: string,
-    role: 'giver' | 'turnIn',
-    p: Entity,
-  ): { npc: Entity | null; tooFar: boolean } {
-    const quest = QUESTS[questId];
-    const templateIds = role === 'giver' ? [quest.giverNpcId] : questTurnInNpcIds(quest);
-    let sawNpc = false;
-    for (const e of this.entities.values()) {
-      if (!this.isQuestInteractionEntity(e) || !templateIds.includes(e.templateId)) continue;
-      if (role === 'giver' && e.kind !== 'npc') continue;
-      sawNpc = true;
-      if (dist2d(p.pos, e.pos) <= INTERACT_RANGE + 2) return { npc: e, tooFar: false };
-    }
-    return { npc: null, tooFar: sawNpc };
-  }
-
-  // Shared accept core for the NPC and linked-share paths. Records progress, then
-  // re-grants any requiredItem the player no longer holds so a lost prerequisite item
-  // can never permanently block the quest, and announces the accept. Both callers go
-  // through here so the two paths cannot drift (notably this re-grant).
-  private finalizeQuestAccept(questId: string, quest: QuestDef, meta: PlayerMeta): void {
-    meta.questLog.set(questId, { questId, counts: quest.objectives.map(() => 0), state: 'active' });
-    for (const itemId of questFallbackGrants(
-      quest,
-      (id) => this.countItem(id, meta.entityId) > 0,
-    )) {
-      this.addItem(itemId, 1, meta.entityId);
-    }
-    this.emit({ type: 'questAccepted', questId, pid: meta.entityId });
-    this.emit({
-      type: 'log',
-      text: `Quest accepted: ${quest.name}`,
-      color: '#ff0',
-      pid: meta.entityId,
-    });
-    this.ctx.onInventoryChangedForQuests(meta);
+    return questCommands.questState(this.ctx, questId, pid);
   }
 
   acceptQuest(questId: string, pid?: number): void {
-    const r = this.resolve(pid);
-    if (!r) return;
-    const quest = QUESTS[questId];
-    const { meta, e: p } = r;
-    if (!quest) {
-      this.error(meta.entityId, 'That quest is not available.');
-      return;
-    }
-    if (this.questState(questId, meta.entityId) !== 'available') {
-      this.error(meta.entityId, 'That quest is not available.');
-      return;
-    }
-    const nearby = this.questNpcFor(questId, 'giver', p);
-    if (!nearby.npc) {
-      this.error(
-        meta.entityId,
-        nearby.tooFar ? 'Too far away.' : 'That quest giver is not nearby.',
-      );
-      return;
-    }
-    this.finalizeQuestAccept(questId, quest, meta);
+    questCommands.acceptQuest(this.ctx, questId, pid);
   }
 
   acceptLinkedQuest(questId: string, sharerPid: number, pid?: number): void {
-    const r = this.resolve(pid);
-    if (!r) return;
-    const { meta } = r;
-    const quest = QUESTS[questId];
-    if (!quest || quest.retired || quest.shareable === false) {
-      this.error(meta.entityId, "This quest can't be shared.");
-      return;
-    }
-    const myParty = this.partyOf(meta.entityId);
-    const sharerParty = this.partyOf(sharerPid);
-    const sharer = this.players.get(sharerPid);
-    if (!myParty || !sharerParty || myParty.id !== sharerParty.id) {
-      const sharerName = sharer ? sharer.name : 'that player';
-      this.error(meta.entityId, `You must be in ${sharerName}'s party to accept that quest.`);
-      return;
-    }
-    if (this.questState(questId, meta.entityId) !== 'available') {
-      this.error(meta.entityId, 'That quest is not available.');
-      return;
-    }
-    this.finalizeQuestAccept(questId, quest, meta);
-    if (sharer) this.notice(sharerPid, `${meta.name} accepted your shared quest.`);
+    questCommands.acceptLinkedQuest(this.ctx, questId, sharerPid, pid);
   }
 
   abandonQuest(questId: string, pid?: number): void {
-    const r = this.resolve(pid);
-    if (!r) return;
-    const { meta } = r;
-    if (!meta.questLog.has(questId)) return;
-    meta.questLog.delete(questId);
-    this.emit({
-      type: 'log',
-      text: `Quest abandoned: ${QUESTS[questId].name}`,
-      color: '#f66',
-      pid: meta.entityId,
-    });
+    questCommands.abandonQuest(this.ctx, questId, pid);
   }
 
   turnInQuest(questId: string, pid?: number): void {
-    const r = this.resolve(pid);
-    if (!r) return;
-    const { meta, e: p } = r;
-    const quest = QUESTS[questId];
-    if (!quest) {
-      this.error(meta.entityId, 'That quest is not available.');
-      return;
-    }
-    const qp = meta.questLog.get(questId);
-    if (!qp) {
-      this.error(meta.entityId, 'That quest is not in your log.');
-      return;
-    }
-    if (qp.state !== 'ready') {
-      this.error(meta.entityId, 'That quest is not complete.');
-      return;
-    }
-    const nearby = this.questNpcFor(questId, 'turnIn', p);
-    if (!nearby.npc) {
-      this.error(
-        meta.entityId,
-        nearby.tooFar ? 'Too far away.' : 'That quest turn-in is not nearby.',
-      );
-      return;
-    }
-
-    for (const obj of quest.objectives) {
-      if (obj.type === 'collect' && obj.itemId)
-        this.removeItem(obj.itemId, obj.count, meta.entityId);
-    }
-    qp.state = 'done';
-    meta.questLog.delete(questId);
-    meta.questsDone.add(questId);
-    meta.counters.questsCompleted++;
-    if (quest.copperReward > 0) {
-      meta.copper += quest.copperReward;
-      this.emit({
-        type: 'loot',
-        text: `You receive ${formatMoney(quest.copperReward)}.`,
-        pid: meta.entityId,
-      });
-    }
-    const rewardItem = questRewardItemId(quest, meta.cls);
-    if (rewardItem) this.addItem(rewardItem, 1, meta.entityId);
-    this.grantXp(quest.xpReward, meta);
-    this.emit({ type: 'questDone', questId, pid: meta.entityId });
-    this.emit({
-      type: 'log',
-      text: `Quest completed: ${quest.name}`,
-      color: '#ff0',
-      pid: meta.entityId,
-    });
+    questCommands.turnInQuest(this.ctx, questId, pid);
   }
 
   // No-op in offline mode
@@ -5072,675 +4394,7 @@ export class Sim {
   // chatMod.*(this.ctx, ...); they had no callers outside chat().
 
   chat(text: string, pid?: number): SentChat | null {
-    const r = this.resolve(pid);
-    if (!r) return null;
-    const raw = text.trim().slice(0, MAX_CHAT_MESSAGE_LEN);
-    if (!raw) return null;
-    if (!chatMod.chatAllowed(this.ctx, r.meta.entityId)) {
-      this.error(r.meta.entityId, 'You are sending messages too quickly.');
-      return null;
-    }
-
-    // "/afk [message]" / "/dnd [message]" — set a presence status. Repeating
-    // the same command with no message toggles it off. While away, anyone who
-    // whispers you gets an auto-reply; /dnd also withholds the whisper itself.
-    const awaym = /^\/(afk|dnd)(?:\s+([\s\S]+))?$/i.exec(raw);
-    if (awaym) {
-      const mode = awaym[1].toLowerCase() as AwayStatus['mode'];
-      const custom = awaym[2]?.trim();
-      if (r.meta.away?.mode === mode && !custom) {
-        r.meta.away = null;
-        this.emit({
-          type: 'log',
-          text:
-            mode === 'afk'
-              ? 'You are no longer Away From Keyboard.'
-              : 'You have left Do Not Disturb mode.',
-          color: '#ffd100',
-          pid: r.meta.entityId,
-        });
-      } else {
-        const message = custom || (mode === 'afk' ? 'Away From Keyboard' : 'Do Not Disturb');
-        r.meta.away = { mode, message };
-        this.emit({
-          type: 'log',
-          text:
-            mode === 'afk'
-              ? `You are now Away From Keyboard: ${message}`
-              : `You are now in Do Not Disturb mode: ${message}`,
-          color: '#ffd100',
-          pid: r.meta.entityId,
-        });
-      }
-      return null;
-    }
-
-    // Any other chat means you're back — clear a lingering away status.
-    if (r.meta.away) {
-      r.meta.away = null;
-      this.emit({
-        type: 'log',
-        text: 'You are no longer marked as away.',
-        color: '#ffd100',
-        pid: r.meta.entityId,
-      });
-    }
-
-    // "/party" (no message) is a self-only roster readout; "/party <msg>"
-    // and "/p <msg>" stay party chat (the trailing \s in that branch below).
-    if (/^\/(party|group|grp)\s*$/i.test(raw)) {
-      this.error(r.meta.entityId, this.partyReadout(r.meta.entityId));
-      return null;
-    }
-
-    if (this.devCommands) {
-      const devHandled = chatMod.handleDevChat(this.ctx, raw, r.meta.entityId);
-      if (devHandled !== undefined && devHandled !== null) return devHandled;
-    }
-
-    if (/^\/who(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, 'The /who roster is available in online play.');
-      return null;
-    }
-
-    // "/talents" (aliases "/talent", "/spec") — self-only readout of the
-    // player's specialization and how their talent points are spent. Returns
-    // null (unlogged); no server interceptor, so it works online for free.
-    if (/^\/(?:talents|talent|spec)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.talentsReadout(r.meta, r.e));
-      return null;
-    }
-
-    // "/help" (or "/?" / "/commands") lists the available chat commands as a
-    // system notice to the asker only. Like /who, it produces no chat message,
-    // so it works identically offline and online without server wiring.
-    if (/^\/(?:help|commands|\?)(?:\s|$)/i.test(raw)) {
-      for (const line of chatMod.helpLines()) this.error(r.meta.entityId, line);
-      return null;
-    }
-
-    // "/roll", "/roll N", "/roll M-N" — a classic random roll for loot disputes
-    // and social play. Rolled through the deterministic sim RNG so it is
-    // server-authoritative (clients can't fake a result) and identical offline.
-    const rollm = /^\/roll(?:\s+(\d+)(?:\s*-\s*(\d+))?)?\s*$/i.exec(raw);
-    if (rollm) {
-      let lo = 1,
-        hi = 100;
-      if (rollm[1] !== undefined) {
-        const n = parseInt(rollm[1], 10);
-        if (rollm[2] !== undefined) {
-          lo = n;
-          hi = parseInt(rollm[2], 10);
-        } else {
-          hi = n;
-        }
-      }
-      const MAX_ROLL = 1_000_000;
-      if (lo < 1 || hi > MAX_ROLL || lo > hi) {
-        this.error(
-          r.meta.entityId,
-          `Invalid roll range. Use /roll, /roll N, or /roll M-N (1-${MAX_ROLL}).`,
-        );
-        return null;
-      }
-      const result = this.rng.int(lo, hi);
-      const text = `${result} (${lo}-${hi})`;
-      const party = this.partyOf(r.meta.entityId);
-      if (party) {
-        for (const mPid of party.members) {
-          this.emit({
-            type: 'chat',
-            fromPid: r.meta.entityId,
-            from: r.meta.name,
-            text,
-            channel: 'roll',
-            pid: mPid,
-          });
-        }
-      } else {
-        for (const meta of this.players.values()) {
-          const e = this.entities.get(meta.entityId);
-          if (!e || dist2d(r.e.pos, e.pos) > SAY_RANGE) continue;
-          this.emit({
-            type: 'chat',
-            fromPid: r.meta.entityId,
-            from: r.meta.name,
-            text,
-            channel: 'roll',
-            pid: meta.entityId,
-          });
-        }
-      }
-      return null;
-    }
-
-    // "/r message" — reply to the last player who whispered us. Rewrite it to
-    // the "/w <name> message" form so delivery, the echo, and case-matching
-    // all stay in the single whisper handler below.
-    const rm = /^\/r(?:eply)?\s+([\s\S]+)$/i.exec(raw);
-    let line = raw;
-    if (rm) {
-      const replyTo = r.meta.lastWhisperFrom;
-      if (!replyTo) {
-        this.error(r.meta.entityId, 'You have no one to reply to.');
-        return null;
-      }
-      line = `/w ${replyTo} ${rm[1]}`;
-    }
-
-    // "/inspect name" — self-only readout of another online player's level,
-    // class, and health. The first cross-player readout; mirrors WoW's Inspect.
-    const im = /^\/(?:inspect|ins|examine)(?:\s+([\s\S]+))?$/i.exec(raw);
-    if (im) {
-      const targetName = (im[1] ?? '').trim();
-      if (!targetName) {
-        this.error(r.meta.entityId, 'Inspect whom? Usage: /inspect <name>.');
-        return null;
-      }
-      // resolve by name with the same exact-then-unambiguous-CI rule as /w
-      let target: PlayerMeta | null = null;
-      const ciMatches: PlayerMeta[] = [];
-      const wanted = targetName.toLowerCase();
-      for (const meta of this.players.values()) {
-        if (meta.name === targetName) {
-          target = meta;
-          break;
-        }
-        if (meta.name.toLowerCase() === wanted) ciMatches.push(meta);
-      }
-      if (!target) {
-        if (ciMatches.length === 1) target = ciMatches[0];
-        else if (ciMatches.length > 1) {
-          this.error(
-            r.meta.entityId,
-            `Several players match '${targetName}'. Use exact capitalization.`,
-          );
-          return null;
-        }
-      }
-      const te = target ? this.entities.get(target.entityId) : null;
-      if (!target || !te) {
-        this.error(r.meta.entityId, `There is no player named '${targetName}' online.`);
-        return null;
-      }
-      this.error(r.meta.entityId, chatMod.inspectReadout(target, te));
-      return null;
-    }
-
-    // "/unfollow" stops an active follow
-    if (/^\/unfollow(?:\s|$)/i.test(raw)) {
-      if (r.e.followTargetId === null) this.error(r.meta.entityId, 'You are not following anyone.');
-      else this.stopFollow(r.e, 'You stop following.');
-      return null;
-    }
-
-    // "/follow [name]" trails another player; with no name it follows the
-    // current target. Movement, combat, casting, re-targeting, or the leader
-    // moving out of range all end it (see updateFollowMovement).
-    const fm = /^\/follow(?:\s+([\s\S]+))?$/i.exec(raw);
-    if (fm) {
-      if (r.e.inCombat) {
-        this.error(r.meta.entityId, "You can't start following while in combat.");
-        return null;
-      }
-      let target: PlayerMeta | null = null;
-      const nameArg = (fm[1] ?? '').trim();
-      if (nameArg) {
-        const wanted = nameArg.toLowerCase();
-        const ci: PlayerMeta[] = [];
-        for (const meta of this.players.values()) {
-          if (meta.name === nameArg) {
-            target = meta;
-            break;
-          }
-          if (meta.name.toLowerCase() === wanted) ci.push(meta);
-        }
-        if (!target) {
-          if (ci.length === 1) target = ci[0];
-          else if (ci.length > 1) {
-            this.error(
-              r.meta.entityId,
-              `Several players match '${nameArg}'. Use exact capitalization.`,
-            );
-            return null;
-          }
-        }
-        if (!target) {
-          this.error(r.meta.entityId, `There is no player named '${nameArg}' online.`);
-          return null;
-        }
-      } else {
-        const cur = r.e.targetId !== null ? this.players.get(r.e.targetId) : undefined;
-        if (!cur) {
-          this.error(r.meta.entityId, 'Target a player to follow, or use /follow <name>.');
-          return null;
-        }
-        target = cur;
-      }
-      if (target.entityId === r.meta.entityId) {
-        this.error(r.meta.entityId, "You can't follow yourself.");
-        return null;
-      }
-      r.e.followTargetId = target.entityId;
-      this.error(r.meta.entityId, `Now following ${target.name}.`);
-      return null;
-    }
-
-    // "/assist [name]" targets whatever the named player is targeting (group-play /
-    // multiboxing target-matching). With no name it assists the player you currently
-    // have targeted. Resolution lives in the pure resolveAssist() core.
-    const am = /^\/(?:assist|as)(?:\s+([\s\S]+))?$/i.exec(raw);
-    if (am) {
-      // Scope the candidate roster the way the server scopes a snapshot: players within
-      // interest range of the caster, PLUS the caster's party/raid members by name no
-      // matter how far they have roamed. Classic /assist only resolves a unit you could
-      // know about, never an arbitrary stranger across the map.
-      const assistParty = this.partyOf(r.meta.entityId);
-      const candidates: AssistCandidate[] = [];
-      for (const meta of this.players.values()) {
-        const ent = this.entities.get(meta.entityId);
-        const inParty = assistParty ? assistParty.members.includes(meta.entityId) : false;
-        const inRange = ent ? dist2d(r.e.pos, ent.pos) <= ASSIST_RANGE : false;
-        if (meta.entityId !== r.meta.entityId && !inParty && !inRange) continue;
-        candidates.push({
-          entityId: meta.entityId,
-          name: meta.name,
-          targetId: ent ? ent.targetId : null,
-        });
-      }
-      const res = resolveAssist(candidates, r.meta.entityId, am[1] ?? '');
-      if (res.kind === 'error') {
-        this.error(r.meta.entityId, res.message);
-        return null;
-      }
-      this.targetEntity(res.targetId, pid);
-      this.error(r.meta.entityId, `Assisting ${res.leaderName}.`);
-      return null;
-    }
-
-    // "/played" — report how long this character has been in the world this
-    // session. Self-only informational line, like /who's reply.
-    if (/^\/played(?:\s|$)/i.test(raw)) {
-      const secs = Math.max(0, Math.floor(this.time - r.meta.joinedAt));
-      const h = Math.floor(secs / 3600);
-      const m = Math.floor((secs % 3600) / 60);
-      const s = secs % 60;
-      const parts: string[] = [];
-      if (h) parts.push(`${h}h`);
-      if (h || m) parts.push(`${m}m`);
-      parts.push(`${s}s`);
-      this.error(r.meta.entityId, `Time played this session: ${parts.join(' ')}.`);
-      return null;
-    }
-
-    // Self-only readouts: emit a private system line and never become chat.
-    if (/^\/(?:where|loc|zone)(?:\s|$)/i.test(raw)) {
-      const zone = zoneAt(r.e.pos.z);
-      const [lo, hi] = zone.levelRange;
-      this.error(
-        r.meta.entityId,
-        `You are in ${zone.name} (levels ${lo}–${hi}) at (${Math.floor(r.e.pos.x)}, ${Math.floor(r.e.pos.z)}).`,
-      );
-      return null;
-    }
-    if (/^\/(?:target|tar)(?:\s|$)/i.test(raw)) {
-      const tid = r.e.targetId;
-      const t = tid !== null ? (this.entities.get(tid) ?? null) : null;
-      if (!t) this.error(r.meta.entityId, 'You have no target.');
-      else this.error(r.meta.entityId, this.targetReadout(t));
-      return null;
-    }
-    if (/^\/(?:xp|exp|experience)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.xpReadout(r.meta, r.e.level));
-      return null;
-    }
-    if (/^\/(?:gold|money|coins)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.goldReadout(r.meta.copper));
-      return null;
-    }
-    if (/^\/(?:stats|st|sheet)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.statsReadout(r.meta, r.e));
-      return null;
-    }
-    if (/^\/(?:buffs?|auras)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.buffsReadout(r.e));
-      return null;
-    }
-    if (/^\/(?:cooldowns?|cds?)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.cooldownsReadout(r.e));
-      return null;
-    }
-    if (/^\/(?:bags|inv|inventory)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.bagsReadout(r.meta));
-      return null;
-    }
-    if (/^\/(?:quests?|ql)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.questReadout(r.meta));
-      return null;
-    }
-    if (/^\/(?:gear|equip|equipment)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.gearReadout(r.meta));
-      return null;
-    }
-    if (/^\/(?:abilities|spells|spellbook)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.abilitiesReadout(r.meta, r.e));
-      return null;
-    }
-    if (/^\/(?:pet|pets|companion)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.petReadout(r.e));
-      return null;
-    }
-    if (/^\/(?:session|sess|sessionstats)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.sessionReadout(r.meta));
-      return null;
-    }
-    if (/^\/(?:threat|aggro)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.threatReadout(r.e));
-      return null;
-    }
-    if (/^\/(?:zones|zonelist|worldmap)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.zonesReadout(r.e.pos.z));
-      return null;
-    }
-    if (/^\/(?:nearby|near|around)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.nearbyReadout(r.e));
-      return null;
-    }
-    if (/^\/(?:arena|pvp|rating)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.arenaReadout(r.meta));
-      return null;
-    }
-    if (/^\/(?:range|dist|distance)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.rangeReadout(r.e));
-      return null;
-    }
-    if (/^\/(?:buyback|bb|repurchase)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.buybackReadout(r.meta));
-      return null;
-    }
-    if (/^\/(?:combo|cp|combopoints)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.comboReadout(r.e));
-      return null;
-    }
-    if (/^\/(?:combat|cb|incombat)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.combatReadout(r.e));
-      return null;
-    }
-    if (/^\/(?:graveyard|gy|spirithealer)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, graveyardReadout(r.e));
-      return null;
-    }
-    if (/^\/(?:dungeons|dungeon|instances)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.dungeonsReadout());
-      return null;
-    }
-    if (/^\/(?:consider|con|difficulty)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.considerReadout(r.e));
-      return null;
-    }
-    if (/^\/(?:pois|poi|landmarks)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.poisReadout(r.e));
-      return null;
-    }
-    if (/^\/(?:completed|questsdone|qdone)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.completedReadout(r.meta));
-      return null;
-    }
-    if (/^\/(?:listings|mylistings|auctions)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.listingsReadout(r.meta));
-      return null;
-    }
-    if (/^\/(?:targetbuffs|debuffs|tb)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.targetBuffsReadout(r.e));
-      return null;
-    }
-    if (/^\/(?:casting|cast|castbar)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.castingReadout(r.e));
-      return null;
-    }
-    if (/^\/(?:speed|movespeed|ms)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.speedReadout(r.e));
-      return null;
-    }
-    if (/^\/(?:attack|autoattack|aa)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.attackReadout(r.e, r.meta));
-      return null;
-    }
-    if (/^\/(consumable|consumables|eat|drink)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.consumableReadout(r.e));
-      return null;
-    }
-    if (/^\/(?:potion|potioncd|pot)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.potionReadout(r.e));
-      return null;
-    }
-    if (/^\/(?:overpower|op|overpowered)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.overpowerReadout(r.e, r.meta));
-      return null;
-    }
-    if (/^\/(form|stance|shapeshift)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.formReadout(r.e));
-      return null;
-    }
-    if (/^\/(?:manaregen|regen|5sr)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.manaRegenReadout(r.e));
-      return null;
-    }
-    if (/^\/(?:falling|jump|airborne)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.fallingReadout(r.e));
-      return null;
-    }
-    if (/^\/(?:pettaunt|petgrowl|growl)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.petTauntReadout(r.e));
-      return null;
-    }
-    if (/^\/(queued|onswing|swingqueue)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.queuedReadout(r.e));
-      return null;
-    }
-    if (/^\/(?:savedmana|parkedmana|sm)(?:\s|$)/i.test(raw)) {
-      this.error(r.meta.entityId, this.savedManaReadout(r.meta, r.e));
-      return null;
-    }
-
-    // "/w name message" — private whisper to an online player. Match against
-    // `line` so a "/r" reply (rewritten to the /w form above) flows through the
-    // same longest-online-name resolver.
-    const wm = /^\/(?:w|whisper|t|tell)\s+([\s\S]+)$/i.exec(line);
-    if (wm) {
-      const resolved = chatMod.resolveWhisperTarget(this.ctx, wm[1]);
-      if (!resolved) return null;
-      if ('error' in resolved) {
-        this.error(r.meta.entityId, resolved.error);
-        return null;
-      }
-      const { target, message: msg } = resolved;
-      if (target.entityId === r.meta.entityId) {
-        this.error(r.meta.entityId, 'You mutter to yourself. Nobody hears it.');
-        return null;
-      }
-      if (target.away) {
-        const label = target.away.mode === 'afk' ? 'Away From Keyboard' : 'Do Not Disturb';
-        this.emit({
-          type: 'log',
-          text: `${target.name} is ${label}: ${target.away.message}`,
-          color: '#ffd100',
-          pid: r.meta.entityId,
-        });
-        if (target.away.mode === 'dnd') {
-          // Withhold the whisper, but still echo the sender's own line so they
-          // see what they tried to send.
-          this.emit({
-            type: 'chat',
-            fromPid: r.meta.entityId,
-            from: r.meta.name,
-            to: target.name,
-            text: msg,
-            channel: 'whisper',
-            pid: r.meta.entityId,
-          });
-          return { channel: 'whisper', message: msg };
-        }
-      }
-      // classic-WoW "/r": the recipient's reply target is whoever last
-      // whispered them, so record it on the target (not the sender).
-      target.lastWhisperFrom = r.meta.name;
-      this.emit({
-        type: 'chat',
-        fromPid: r.meta.entityId,
-        from: r.meta.name,
-        text: msg,
-        channel: 'whisper',
-        pid: target.entityId,
-      });
-      this.emit({
-        type: 'chat',
-        fromPid: r.meta.entityId,
-        from: r.meta.name,
-        to: target.name,
-        text: msg,
-        channel: 'whisper',
-        pid: r.meta.entityId,
-      });
-      return { channel: 'whisper', message: msg, target: target.name };
-    }
-
-    // "/p message" goes to the party channel
-    if (/^\/p(arty)?\s/i.test(raw)) {
-      const clean = raw.replace(/^\/p(arty)?\s+/i, '').trim();
-      if (!clean) return null;
-      const party = this.partyOf(r.meta.entityId);
-      if (!party) {
-        this.error(r.meta.entityId, 'You are not in a party.');
-        return null;
-      }
-      for (const mPid of party.members) {
-        this.emit({
-          type: 'chat',
-          fromPid: r.meta.entityId,
-          from: r.meta.name,
-          text: clean,
-          channel: 'party',
-          pid: mPid,
-        });
-      }
-      return { channel: 'party', message: clean };
-    }
-
-    // "/g message" — world-wide general channel (no pid = broadcast to all)
-    if (/^\/g(eneral)?\s/i.test(raw)) {
-      const clean = raw.replace(/^\/g(eneral)?\s+/i, '').trim();
-      if (!clean) return null;
-      this.emit({
-        type: 'chat',
-        fromPid: r.meta.entityId,
-        from: r.meta.name,
-        text: clean,
-        channel: 'general',
-      });
-      return { channel: 'general', message: clean };
-    }
-
-    // "/join <channel>" / "/leave <channel>" — opt-in global channels
-    const jm = /^\/(join|leave)\b\s*(\S*)\s*$/i.exec(raw);
-    if (jm) {
-      chatMod.handleChannelMembership(
-        this.ctx,
-        r.meta,
-        jm[1].toLowerCase() as 'join' | 'leave',
-        jm[2].toLowerCase(),
-      );
-      return null;
-    }
-
-    // "/world message" / "/lfg message" — talk in an opt-in channel; only
-    // players who have /join-ed it hear the message (the sender included)
-    const cm = /^\/(world|lfg)\s+([\s\S]+)$/i.exec(raw);
-    if (cm) {
-      const channel = cm[1].toLowerCase() as JoinableChannel;
-      const clean = cm[2].trim();
-      if (!clean) return null;
-      const mine = this.channelSubs.get(r.meta.entityId);
-      if (!mine?.has(channel)) {
-        this.error(
-          r.meta.entityId,
-          `You are not in the ${channel} channel. Type /join ${channel} first.`,
-        );
-        return null;
-      }
-      for (const [subPid, set] of this.channelSubs) {
-        if (set.has(channel) && this.players.has(subPid)) {
-          this.emit({
-            type: 'chat',
-            fromPid: r.meta.entityId,
-            from: r.meta.name,
-            text: clean,
-            channel,
-            pid: subPid,
-          });
-        }
-      }
-      return { channel, message: clean };
-    }
-
-    // "/me <action>" — freeform third-person action text, e.g.
-    // "/me ponders the void" → "Aleph ponders the void". Emotes never become
-    // the player's sticky chat channel, so this returns null on success.
-    const meMatch = /^\/(?:me|emote|e)\s+([\s\S]+)$/i.exec(raw);
-    if (meMatch) {
-      const action = meMatch[1].trim();
-      if (action) chatMod.broadcastEmote(this.ctx, r.meta, r.e, action);
-      return null;
-    }
-
-    // "/wave", "/dance [name]" — predefined social emotes. An optional name
-    // targets an online player (in range or not); unknown names fall back to
-    // the untargeted form, matching the classic-MMO convention.
-    const emMatch = /^\/([a-z]+)(?:\s+(\S+))?\s*$/i.exec(raw);
-    if (emMatch) {
-      const key = EMOTE_ALIASES[emMatch[1].toLowerCase()] ?? emMatch[1].toLowerCase();
-      const def = EMOTES[key];
-      if (def) {
-        const targetName = emMatch[2];
-        let text = def.solo;
-        if (targetName && def.target) {
-          const t = chatMod.findPlayerByName(this.ctx, targetName);
-          if (t) text = def.target.replace('%t', t.name === r.meta.name ? 'themselves' : t.name);
-        }
-        chatMod.broadcastEmote(this.ctx, r.meta, r.e, text);
-        return null;
-      }
-    }
-
-    // bare text and "/s" are local say; "/y" carries further — both are
-    // delivered per-player by range and carry the speaker for chat bubbles
-    let channel: 'say' | 'yell' = 'say';
-    let clean = raw;
-    if (/^\/y(ell)?\s/i.test(raw)) {
-      channel = 'yell';
-      clean = raw.replace(/^\/y(ell)?\s+/i, '').trim();
-    } else if (/^\/s(ay)?\s/i.test(raw)) {
-      clean = raw.replace(/^\/s(ay)?\s+/i, '').trim();
-    } else if (raw.startsWith('/')) {
-      this.error(r.meta.entityId, `Unknown command: ${raw.split(' ')[0]}. Type /help for a list.`);
-      return null;
-    }
-    if (!clean) return null;
-    const range = channel === 'yell' ? YELL_RANGE : SAY_RANGE;
-    for (const meta of this.players.values()) {
-      const e = this.entities.get(meta.entityId);
-      if (!e || dist2d(r.e.pos, e.pos) > range) continue;
-      this.emit({
-        type: 'chat',
-        fromPid: r.meta.entityId,
-        from: r.meta.name,
-        text: clean,
-        channel,
-        entityId: r.e.id,
-        pid: meta.entityId,
-      });
-    }
-    return { channel, message: clean };
+    return chatMod.chat(this.ctx, text, pid);
   }
 
   // PUBLIC (IWorld + server) overhead-emote entry; body moved to social/chat.ts (G2).
@@ -5815,8 +4469,8 @@ export class Sim {
   // A1: the party/raid state machine lives in src/sim/social/party.ts. partyOf + the
   // eight command methods stay as thin delegates so IWorld + the many foreign
   // `this.partyOf` call sites (loot/xp/tap/quest/arena/dungeon/UI) resolve unchanged;
-  // hasPendingSocialInvite + partyCapacity stay reachable for the trade/duel invite
-  // and party-readout paths still on Sim.
+  // hasPendingSocialInvite stays reachable for the trade/duel invite path still on Sim;
+  // partyCapacity moved to the SimContext seam (W5), reached by the moved partyReadout.
   partyOf(pid: number): Party | null {
     return this.party.partyOf(pid);
   }
@@ -5827,10 +4481,6 @@ export class Sim {
 
   private entityInDungeon(e: Entity, dungeonId: string): boolean {
     return dungeonAt(e.pos.x)?.id === dungeonId;
-  }
-
-  private partyCapacity(party: Party | null): number {
-    return this.party.partyCapacity(party);
   }
 
   partyInvite(targetPid: number, pid?: number): void {
@@ -6490,314 +5140,6 @@ export class Sim {
     return instanceSlotAtImpl(this.ctx, pos);
   }
 
-  // Builds the self-only "/stats" readout line from live entity state. The
-  // resource clause is dropped for classes whose resourceType is null.
-  private statsReadout(meta: PlayerMeta, e: Entity): string {
-    const className = CLASSES[meta.cls].name;
-    const crit = (e.critChance * 100).toFixed(1);
-    let line = `Level ${e.level} ${className} — HP ${Math.round(e.hp)}/${Math.round(e.maxHp)}`;
-    if (e.resourceType) {
-      const res = e.resourceType.charAt(0).toUpperCase() + e.resourceType.slice(1);
-      line += `, ${res} ${Math.round(e.resource)}/${Math.round(e.maxResource)}`;
-    }
-    line += `. AP ${Math.round(e.attackPower)}, Crit ${crit}%, Armor ${Math.round(e.stats.armor)}.`;
-    return line;
-  }
-  // Self-only readout of carried items for "/bags": items sorted by quality
-  // (epic first), ties keeping inventory order, with the purse appended via
-  // formatMoney. Reads only PlayerMeta state, so it works online for free.
-  private bagsReadout(meta: PlayerMeta): string {
-    const purse = `Purse: ${formatMoney(meta.copper)}.`;
-    if (meta.inventory.length === 0) return `Your bags are empty. ${purse}`;
-    const rank: Record<string, number> = { epic: 0, rare: 1, uncommon: 2, common: 3, poor: 4 };
-    const sorted = meta.inventory
-      .map((s, i) => ({ s, i }))
-      .sort((a, b) => {
-        const qa = rank[ITEMS[a.s.itemId]?.quality ?? 'common'] ?? 3;
-        const qb = rank[ITEMS[b.s.itemId]?.quality ?? 'common'] ?? 3;
-        return qa - qb || a.i - b.i;
-      });
-    const parts = sorted.map(({ s }) => {
-      const name = ITEMS[s.itemId]?.name ?? s.itemId;
-      return s.count > 1 ? `${name} x${s.count}` : name;
-    });
-    return `Bags (${parts.length}): ${parts.join(', ')}. ${purse}`;
-  }
-  // Self-only readout of the player's party: each member in join order with
-  // level, class, and HP% (or (dead)/(offline)), the leader tagged [leader].
-  private partyReadout(pid: number): string {
-    const party = this.partyOf(pid);
-    if (!party) return 'You are not in a party.';
-    const parts = party.members.map((mPid) => {
-      const meta = this.players.get(mPid);
-      const e = this.entities.get(mPid);
-      if (!meta || !e) return meta ? `${meta.name} (offline)` : `Player ${mPid} (offline)`;
-      const cls = CLASSES[meta.cls].name;
-      const state = e.hp <= 0 ? '(dead)' : `${Math.round((e.hp / e.maxHp) * 100)}%`;
-      const tag = mPid === party.leader ? ' [leader]' : '';
-      return `${meta.name} (Lvl ${e.level} ${cls}, ${state})${tag}`;
-    });
-    return `${party.raid ? 'Raid' : 'Party'} (${party.members.length}/${this.partyCapacity(party)}): ${parts.join(', ')}.`;
-  }
-  // Self-only readout for "/zones": lists every overworld zone in travel order
-  // (south -> north) with its level range, tagging the zone the player is in.
-  // `currentZ` is the player's world Z (use zoneAt(currentZ) to find their zone).
-  // ZONES is the ordered ZoneDef[] from ./data; each has .name and
-  // .levelRange = [min, max].
-  private zonesReadout(currentZ: number): string {
-    if (ZONES.length === 0) return 'No zones are defined.';
-    const here = zoneAt(currentZ);
-    const parts = ZONES.map((z) => {
-      const line = `${z.name} (Lvl ${z.levelRange[0]}-${z.levelRange[1]})`;
-      return z.id === here.id ? `${line} [you are here]` : line;
-    });
-    return `Zones (${ZONES.length}): ${parts.join(', ')}.`;
-  }
-  // Self-only readout of a character's Ashen Coliseum standing. Reads only the
-  // persisted PlayerMeta arena fields (no new state). Draws count as neither a
-  // win nor a loss (see resolveArena), so "matches played" is wins + losses.
-  private arenaReadout(meta: PlayerMeta): string {
-    const part = (label: ArenaFormat, rating: number, wins: number, losses: number): string => {
-      const played = wins + losses;
-      if (played <= 0) return `${label} Rating ${rating} - no matches played yet`;
-      const pct = Math.round((wins / played) * 100);
-      return `${label} Rating ${rating} - ${wins} wins, ${losses} losses (${pct}% win rate)`;
-    };
-    return `Arena: ${part('1v1', meta.arenaRating, meta.arenaWins, meta.arenaLosses)}. ${part('2v2', meta.arena2v2Rating, meta.arena2v2Wins, meta.arena2v2Losses)}.`;
-  }
-  private buybackReadout(meta: PlayerMeta): string {
-    const slots = meta.vendorBuyback.filter((s) => ITEMS[s.itemId] && s.count > 0);
-    if (slots.length === 0) return 'Your vendor buyback list is empty.';
-    const parts = slots.map((s) => {
-      const def = ITEMS[s.itemId];
-      const qty = s.count > 1 ? ` x${s.count}` : '';
-      return `${def.name}${qty} (${formatMoney(def.sellValue)} each)`;
-    });
-    return `Vendor buyback (${slots.length}): ${parts.join(', ')}. Repurchase at any merchant.`;
-  }
-  private comboReadout(e: Entity): string {
-    if (e.comboPoints <= 0) return 'You have no combo points built up.';
-    const target = e.comboTargetId !== null ? this.entities.get(e.comboTargetId) : undefined;
-    const on = target ? ` on ${target.name}` : '';
-    return `Combo points: ${e.comboPoints}/5${on}.`;
-  }
-  // Readout for "/combat": reads only the live Entity.inCombat / combatTimer
-  // (no new fields). combatTimer is "time since last combat event"; a player
-  // lingers in combat until it reaches COMBAT_LINGER (the literal 5s drop-out
-  // window applied in updatePlayers, sim.ts where inCombat is recomputed). If
-  // inCombat is still set past that window, an enemy is actively engaged, so no
-  // countdown can be promised.
-  private combatReadout(e: Entity): string {
-    if (!e.inCombat) return 'You are not in combat.';
-    const COMBAT_LINGER = 5;
-    const remaining = COMBAT_LINGER - e.combatTimer;
-    if (remaining > 0) {
-      return `You are in combat — leaving in ${Math.ceil(remaining)}s if no further action.`;
-    }
-    return 'You are in combat (enemies still engaged).';
-  }
-  // Readout for "/graveyard": names the zone graveyard your spirit returns to
-  // if you die here, and its coordinates. Reads only existing zone/dungeon
-  // lookups (no new fields) and resolves the same target as releaseSpirit —
-  // dying inside a dungeon resurrects you at the graveyard of the zone its door
-  // sits in, dying outdoors at your current zone's graveyard.
-  // graveyardReadout moved to entity_roster.ts (pure zone lookup); imported above.
-  // Readout for "/dungeons": lists every group instance in entrance order with
-  // the overworld zone its door sits in and its suggested party size. Reads
-  // only the static DUNGEON_LIST (already entrance-sorted by index) and the
-  // door zone via zoneAt — no new fields.
-  private dungeonsReadout(): string {
-    const parts = DUNGEON_LIST.map(
-      (d) => `${d.name} (${zoneAt(d.doorPos.z).name}, ${d.suggestedPlayers} players)`,
-    );
-    return `Dungeons (${parts.length}): ${parts.join(', ')}.`;
-  }
-  // Readout for "/consider": sizes up the current target's level versus yours.
-  // The verdict bands track the real combat model — meleeMissChance (types.ts)
-  // applies a sharp miss penalty once the target is 3+ levels above you (its
-  // `diff > 2` cliff), and dodge/crit also scale with the level gap — so a
-  // target 3+ levels up is flagged as a steep step beyond a merely tough one.
-  // Reads only the live target Entity.level versus your own (no new fields).
-  private considerReadout(self: Entity): string {
-    const t = self.targetId !== null ? this.entities.get(self.targetId) : undefined;
-    if (!t) return 'You have no target to consider.';
-    const diff = t.level - self.level;
-    let verdict: string;
-    if (diff >= 5) verdict = 'an overwhelming fight';
-    else if (diff >= 3) verdict = 'a daunting fight';
-    else if (diff >= 1) verdict = 'a tough fight';
-    else if (diff === 0) verdict = 'an even fight';
-    else if (diff >= -2) verdict = 'a manageable fight';
-    else verdict = 'an easy fight';
-    return `${t.name} is level ${t.level} — ${verdict} for you (level ${self.level}).`;
-  }
-  // Readout for "/pois": the named landmarks of your current zone, nearest
-  // first, each with its distance in yards. Reads only the static ZoneDef.pois
-  // (the same labels the HUD pins on the map) and your live position — no new
-  // fields.
-  private poisReadout(self: Entity): string {
-    const zone = zoneAt(self.pos.z);
-    if (zone.pois.length === 0) return `${zone.name} has no notable landmarks.`;
-    const parts = zone.pois
-      .map((p) => ({ label: p.label, d: dist2d(self.pos, { x: p.x, y: 0, z: p.z }) }))
-      .sort((a, b) => a.d - b.d)
-      .map((p) => `${p.label} (${Math.round(p.d)}yd)`);
-    return `Landmarks in ${zone.name} (${parts.length}): ${parts.join(', ')}.`;
-  }
-  // Readout for "/completed": the quests you have turned in, in completion
-  // order (questsDone is a Set whose insertion order is preserved on save/load).
-  // Reads only PlayerMeta.questsDone + the QUESTS registry for names (no new
-  // fields); distinct from /quest, which lists the active log.
-  private completedReadout(meta: PlayerMeta): string {
-    const names = [...meta.questsDone].map((id) => QUESTS[id]?.name ?? id);
-    if (names.length === 0) return 'You have not completed any quests yet.';
-    return `Completed quests (${names.length}): ${names.join(', ')}.`;
-  }
-  // Readout for "/listings": your own active World Market listings (house stock
-  // and other sellers excluded), each with item, asking price, and time left
-  // before it returns unsold. Reads only the live marketListings, ITEMS names,
-  // and this.time (no new fields); the count is shown against MARKET_MAX_LISTINGS
-  // so you know how much room you have left, mirroring the cap in marketList.
-  private listingsReadout(meta: PlayerMeta): string {
-    const mine = this.marketListings.filter((l) => this.market.marketListingBelongsTo(l, meta));
-    if (mine.length === 0) return 'You have no goods on the World Market.';
-    const parts = mine.map((l) => {
-      const name = ITEMS[l.itemId]?.name ?? l.itemId;
-      const qty = l.count > 1 ? ` x${l.count}` : '';
-      const secs = Math.max(0, Math.ceil(l.expiresAt - this.time));
-      const h = Math.floor(secs / 3600),
-        m = Math.floor((secs % 3600) / 60);
-      const left = h > 0 ? `${h}h ${m}m` : m > 0 ? `${m}m` : `${secs}s`;
-      return `${name}${qty} — ${formatMoney(l.price)} (${left} left)`;
-    });
-    return `Your market listings (${parts.length}/${MARKET_MAX_LISTINGS}): ${parts.join(', ')}.`;
-  }
-  // Self-only readout of the auras on the player's current target, each tagged
-  // [buff] or [debuff]. Mirrors the self-aura readout but reaches across to the
-  // target's live Entity.auras, so it works for mobs, pets, and other players.
-  private targetBuffsReadout(self: Entity): string {
-    const target = self.targetId !== null ? this.entities.get(self.targetId) : undefined;
-    if (!target || target.hp <= 0) return 'You have no target.';
-    const auras = target.auras;
-    if (auras.length === 0) return `${target.name} has no active effects.`;
-    const parts = auras.map((a) => {
-      const stack = (a.stacks ?? 1) > 1 ? ` x${a.stacks}` : '';
-      const tag = isHarmfulAura(a.kind) ? 'debuff' : 'buff';
-      return `${a.name}${stack} [${tag}] (${Math.ceil(a.remaining)}s)`;
-    });
-    return `Effects on ${target.name} (${auras.length}): ${parts.join(', ')}.`;
-  }
-  // Self-only readout of current movement speed as a percent of normal run
-  // speed. Effective speed is RUN_SPEED * moveSpeedMult(p), where the
-  // multiplier folds slow/stealth auras against speed buffs; a root pins the
-  // player regardless of the multiplier, so it is reported first.
-  private speedReadout(e: Entity): string {
-    if (isRooted(e)) return 'You are rooted in place and cannot move.';
-    const mult = this.moveSpeedMult(e);
-    const pct = Math.round(mult * 100);
-    if (pct > 100) return `Movement speed: ${pct}% of normal (hastened).`;
-    if (pct < 100) return `Movement speed: ${pct}% of normal (slowed).`;
-    return 'Movement speed: 100% of normal.';
-  }
-  // Self-only readout for /attack: reads only live Entity auto-attack state
-  // (autoAttack/swingTimer/targetId). The displayed swing interval reuses the
-  // exact expression the engine resets the timer with (weapon.speed *
-  // swingIntervalMult), so it reflects any active haste/slow auras.
-  private attackReadout(p: Entity, meta: PlayerMeta): string {
-    if (!p.autoAttack) return 'Auto-attack is off.';
-    const t = p.targetId !== null ? this.entities.get(p.targetId) : null;
-    if (!t || t.dead) return 'Auto-attack is on, but you have no valid target.';
-    // ranged classes (hunter auto shot, caster wands) swing at their ranged
-    // speed; everyone else uses the equipped weapon's speed
-    const base = CLASSES[meta.cls].ranged?.speed ?? p.weapon.speed;
-    const interval = base * this.swingIntervalMult(p);
-    const next = p.swingTimer <= 0 ? 'now' : `in ${p.swingTimer.toFixed(1)}s`;
-    return `Auto-attack is on against ${t.name} — next swing ${next} (${interval.toFixed(1)}s swing).`;
-  }
-  // Overpower is a warrior reactive: an enemy dodging the player's attack opens
-  // a 5s window (overpowerUntil = time + 5) in which the ability becomes usable.
-  // It is neither an aura nor a normal cooldown, so no other readout exposes it.
-  private overpowerReadout(e: Entity, meta: PlayerMeta): string {
-    if (meta.cls !== 'warrior') return 'Overpower is a warrior ability; your class cannot use it.';
-    const remaining = Math.ceil(e.overpowerUntil - this.time);
-    if (remaining > 0) {
-      return `Overpower is ready — strike within ${remaining}s (an enemy dodged your attack).`;
-    }
-    return 'Overpower is not available. It opens for 5s after an enemy dodges your attack.';
-  }
-  // Reports the active shapeshift form or combat stance. Anchored to the
-  // same toggle set the cast path treats as mutually-exclusive persistent
-  // states (form_bear / form_cat / defensive_stance / stealth); realistically
-  // only one is ever active, so the first match is the answer.
-  private formReadout(e: Entity): string {
-    const form = e.auras.find(
-      (a) =>
-        a.kind === 'form_bear' ||
-        a.kind === 'form_cat' ||
-        a.kind === 'form_travel' ||
-        a.kind === 'defensive_stance' ||
-        a.kind === 'stealth',
-    );
-    if (!form) return 'You are not in any form or stance.';
-    if (form.kind === 'stealth') return 'You are stealthed.';
-    return `You are in ${form.name}.`;
-  }
-  // Self-only readout of the five-second-rule mana state (#103 out-of-combat
-  // regen). `fiveSecondRule` is the seconds elapsed since the player last spent
-  // mana on an ability (reset to 0 at sim.ts cast path, bumped by DT each tick);
-  // out-of-combat mana regen only ticks once it reaches FSR_THRESHOLD. Only
-  // mana users have meaningful state here — rage/energy classes never spend mana.
-  private manaRegenReadout(e: Entity): string {
-    const FSR_THRESHOLD = 5; // matches the `fiveSecondRule >= 5` gate in updateRegen
-    if (e.resourceType !== 'mana') {
-      return 'Mana regeneration does not apply to your class.';
-    }
-    if (e.fiveSecondRule >= FSR_THRESHOLD) {
-      return 'Your mana is regenerating (out of combat for 5s+).';
-    }
-    const resumesIn = Math.ceil(FSR_THRESHOLD - e.fiveSecondRule);
-    return `Mana regen is paused — resumes in ${resumesIn}s (you spent mana recently).`;
-  }
-  // Self-only readout of vertical/fall state — surfaces the otherwise-invisible
-  // jump physics (sim.ts updatePlayerMovement). Reads only live Entity fields and
-  // the same groundHeight()/FALL_SAFE_DISTANCE the landing-damage model uses, so
-  // the "this will hurt" preview matches what an actual landing would deal.
-  private fallingReadout(e: Entity): string {
-    const ground = groundHeight(e.pos.x, e.pos.z, this.cfg.seed);
-    if (e.onGround) return 'You are on solid ground.';
-    const height = Math.max(0, Math.round(e.pos.y - ground));
-    if (e.vy > 0) return `You are airborne and rising — ${height}yd above the ground.`;
-    const drop = e.fallStartY - ground;
-    const danger =
-      drop > FALL_SAFE_DISTANCE
-        ? ' Brace for impact — this fall is going to hurt.'
-        : ' It should be a safe landing.';
-    return `You are falling — ${height}yd above the ground.${danger}`;
-  }
-  // Self-only readout of the controlled pet's Growl cooldown and autocast state.
-  // Distinct from /pet (vitals) and /cooldowns (the player's own ability map,
-  // which never holds this timer).
-  private petTauntReadout(owner: Entity): string {
-    return petCommands.petTauntReadout(this.ctx, owner);
-  }
-  // Druid forms park the mana bar in savedMana and run on rage/energy instead
-  // (entity.ts:126-130). That parked pool has no in-game UI — the bar shows the
-  // form's resource — so this readout is the only way to see what returns on
-  // shift-out. Gates on the class's natural resource so non-casters get a clean
-  // "never applies" rather than a misleading zero.
-  private savedManaReadout(meta: PlayerMeta, e: Entity): string {
-    if (CLASSES[meta.cls].resourceType !== 'mana') {
-      return 'Only mana-using classes park mana; your class never does.';
-    }
-    if (e.resourceType === 'mana') {
-      return 'Your mana is not parked — you are not shapeshifted.';
-    }
-    if (e.savedMana <= 0) {
-      return 'You have no mana parked while shifted.';
-    }
-    return `You have ${Math.round(e.savedMana)} mana parked while shifted; it returns when you leave your form.`;
-  }
-
   private error(pid: number, text: string, reason?: ErrorReason): void {
     this.emit(reason ? { type: 'error', text, pid, reason } : { type: 'error', text, pid });
   }
@@ -6815,285 +5157,6 @@ export class Sim {
   // handleChannelMembership moved to social/chat.ts (G2); the chat() /join /leave
   // branch reaches it via chatMod.handleChannelMembership(this.ctx, ...).
 
-  // One-line description of an entity for the self-only "/target" readout:
-  // name, level, what it is (player / pet / mob), and current health. A dead
-  // body reports "dead" instead of a percentage so a lootable corpse reads
-  // sensibly.
-  private targetReadout(t: Entity): string {
-    const kind = t.kind === 'player' ? 'player' : t.ownerId !== null ? 'pet' : 'mob';
-    const health = t.dead ? 'dead' : `${Math.round((t.hp / t.maxHp) * 100)}% HP`;
-    return `Target: ${t.name} (level ${t.level} ${kind}) — ${health}.`;
-  }
-  // One-line leveling summary for the /xp readout. At MAX_LEVEL there is no
-  // "next level" so we avoid the percent/remaining math (xpForLevel is 0 there).
-  private xpReadout(meta: PlayerMeta, level: number): string {
-    if (level >= MAX_LEVEL) return `Level ${MAX_LEVEL} — maximum level reached.`;
-    const need = xpForLevel(level);
-    const have = Math.max(0, Math.min(meta.xp, need));
-    const pct = Math.floor((have / need) * 100);
-    const fmt = (n: number) => n.toLocaleString('en-US');
-    return `Level ${level} — ${fmt(have)}/${fmt(need)} XP (${pct}%), ${fmt(need - have)} to go.`;
-  }
-  // Render the /gold readout. An empty purse gets flavor text rather than the
-  // bare "You have 0c." that formatMoney would otherwise produce.
-  private goldReadout(copper: number): string {
-    if (copper <= 0) return 'Your purse is empty.';
-    return `You have ${formatMoney(copper)}.`;
-  }
-  // Self-only readout for "/buffs": summarise the auras currently on the
-  // entity. Auras carry no buff/debuff flag, only an AuraKind and a `remaining`
-  // time in seconds; toggles (stances, forms, stealth) use a 3600s sentinel
-  // duration rather than Infinity, so a raw "(3600s)" reads poorly.
-  private buffsReadout(e: Entity): string {
-    if (e.auras.length === 0) return 'You have no active effects.';
-    const parts = e.auras.map((a) => this.auraLabel(a));
-    return `Active effects (${e.auras.length}): ${parts.join(', ')}.`;
-  }
-
-  // Render one aura for the /buffs list, e.g. "Rend (4s)". `remaining` is a
-  // float, so Math.ceil keeps a still-active 0.3s remainder showing as "(1s)".
-  private auraLabel(a: Aura): string {
-    return `${a.name} (${Math.ceil(a.remaining)}s)`;
-  }
-  // Self-only readout for "/cooldowns": summarise the abilities currently on
-  // cooldown for this entity, soonest-ready first.
-  //
-  // `e.cooldowns` is a Map<abilityId, remainingSeconds> — entries exist ONLY
-  // while an ability is cooling down (updateTimers deletes them at <= 0), so an
-  // empty map means everything is ready. Resolve the display name via
-  // ABILITIES[id]?.name (fall back to the raw id if an ability is ever missing
-  // from the table). `remaining` is a float, so Math.ceil keeps a 0.3s
-  // remainder showing as "(1s)", matching how /buffs renders aura timers.
-  //
-  private cooldownsReadout(e: Entity): string {
-    if (e.cooldowns.size === 0) return 'No abilities are on cooldown.';
-    const parts = [...e.cooldowns]
-      .sort((a, b) => a[1] - b[1])
-      .map(([id, remaining]) => `${ABILITIES[id]?.name ?? id} (${Math.ceil(remaining)}s)`);
-    return `Abilities on cooldown (${parts.length}): ${parts.join(', ')}.`;
-  }
-  // Self-only readout of the active quest log: one entry per tracked quest with
-  // per-objective progress. questLog only ever holds 'active'/'ready' quests
-  // (turn-in deletes the entry), so iterating it gives exactly what to show.
-  private questReadout(meta: PlayerMeta): string {
-    const lines: string[] = [];
-    for (const [qid, qp] of meta.questLog) {
-      const quest = QUESTS[qid];
-      if (!quest) continue;
-      const objs = quest.objectives
-        .map((o, i) => `${o.label} ${Math.min(qp.counts[i] ?? 0, o.count)}/${o.count}`)
-        .join(', ');
-      const tag = qp.state === 'ready' ? ' (ready)' : '';
-      lines.push(`${quest.name}${tag} — ${objs}`);
-    }
-    if (lines.length === 0) return 'Your quest log is empty.';
-    return `Quest log (${lines.length}): ${lines.join(' | ')}.`;
-  }
-  // Self-only readout of equipped items, walked in a fixed slot order so the
-  // line is stable and empty slots are visible (the point of a gear check).
-  private gearReadout(meta: PlayerMeta): string {
-    const slots: [EquipSlot, string][] = [
-      ['mainhand', 'Main Hand'],
-      ['helmet', 'Helmet'],
-      ['shoulder', 'Shoulder'],
-      ['chest', 'Chest'],
-      ['waist', 'Waist'],
-      ['legs', 'Legs'],
-      ['gloves', 'Gloves'],
-      ['feet', 'Feet'],
-    ];
-    let worn = 0;
-    const parts = slots.map(([slot, label]) => {
-      const itemId = meta.equipment[slot];
-      if (!itemId) return `${label}: (empty)`;
-      worn++;
-      return `${label}: ${ITEMS[itemId]?.name ?? itemId}`;
-    });
-    if (worn === 0) return 'You have nothing equipped.';
-    return `Equipped (${worn}/${slots.length}): ${parts.join(', ')}.`;
-  }
-  private abilitiesReadout(meta: PlayerMeta, e: Entity): string {
-    const known = abilitiesKnownAt(meta.cls, e.level);
-    if (known.length === 0) return 'You have not learned any abilities yet.';
-    const list = known.map((k) => `${k.def.name} (Rank ${k.rank})`).join(', ');
-    return `Spellbook (${known.length}): ${list}.`;
-  }
-  // Self-only readout of the player's active pet: name, level, beast family,
-  // and current health. Reads live pet state via petOf() so it stays accurate
-  // regardless of how the pet was acquired (tame, summon).
-  private petReadout(owner: Entity): string {
-    return petCommands.petReadout(this.ctx, owner);
-  }
-  // Build the self-only "/session" line from this session's RewardCounters.
-  // Counters are reset each boot (freshCounters), so this is always per-session.
-  // Format kills/deaths first, then a damage clause, then XP — using
-  // toLocaleString('en-US') for thousands separators on the large numbers.
-  private sessionReadout(meta: PlayerMeta): string {
-    const c = meta.counters;
-    const n = (v: number) => v.toLocaleString('en-US');
-    const plural = (v: number, word: string) => `${n(v)} ${word}${v === 1 ? '' : 's'}`;
-    return (
-      `Session: ${plural(c.kills, 'kill')}, ${plural(c.deaths, 'death')}. ` +
-      `Damage dealt ${n(c.damageDealt)}, taken ${n(c.damageTaken)}. ` +
-      `XP gained ${n(c.xpGained)}.`
-    );
-  }
-  /** Self-only readout of the threat table on the player's current target,
-   *  highest first, as a percentage of the current threat leader. */
-  private threatReadout(self: Entity): string {
-    const t = self.targetId !== null ? this.entities.get(self.targetId) : undefined;
-    if (!t || t.hp <= 0) return 'You have no target.';
-    if (t.kind !== 'mob') return `Threat is only tracked on enemies; ${t.name} is not one.`;
-    const entries = threatEntries(t, 10);
-    if (entries.length === 0) return `Nobody has any threat on ${t.name}.`;
-    const top = entries[0][1] || 1;
-    const parts = entries.map(([id, v], i) => {
-      const pct = Math.round((v / top) * 100);
-      const you = id === self.id ? ' (you)' : '';
-      const lead = i === 0 ? ' [leader]' : '';
-      return `${this.threatName(id)}${you} ${pct}%${lead}`;
-    });
-    return `Threat on ${t.name} (${entries.length}): ${parts.join(', ')}.`;
-  }
-
-  /** Display name for a threat-table source: a player by pid, else the entity
-   *  (pet/mob) name, else a placeholder for sources that have despawned. */
-  private threatName(id: number): string {
-    const meta = this.players.get(id);
-    if (meta) return meta.name;
-    return this.entities.get(id)?.name || 'Unknown';
-  }
-  // One scannable entry per nearby entity: name, what it is, and how far.
-  // Pets are mobs with a non-null ownerId; players have no level prefix.
-  private nearbyLabel(e: Entity, d: number): string {
-    const yd = `${Math.round(d)}yd`;
-    if (e.kind === 'player') return `${e.name} (player, ${yd})`;
-    const kind = e.kind === 'mob' && e.ownerId !== null ? 'pet' : e.kind;
-    return `${e.name} (Lvl ${e.level} ${kind}, ${yd})`;
-  }
-
-  // Self-only readout of living entities within NEARBY_RANGE of `self`,
-  // nearest first. Reads only live Entity state (pos/kind/level/hp), so it
-  // never desyncs and adds no persisted fields.
-  private nearbyReadout(self: Entity): string {
-    const found: { e: Entity; d: number }[] = [];
-    for (const e of this.entities.values()) {
-      if (e.id === self.id || e.kind === 'object' || e.hp <= 0) continue;
-      const d = dist2d(self.pos, e.pos);
-      if (d <= NEARBY_RANGE) found.push({ e, d });
-    }
-    if (found.length === 0) return 'Nothing is nearby.';
-    found.sort((a, b) => a.d - b.d);
-    const shown = found.slice(0, NEARBY_MAX);
-    const labels = shown.map(({ e, d }) => this.nearbyLabel(e, d));
-    const more = found.length - shown.length;
-    if (more > 0) labels.push(`(+${more} more)`);
-    return `Nearby (${found.length}): ${labels.join(', ')}.`;
-  }
-  // Distance from the player to their current target. Reads only live Entity
-  // state (targetId + positions), so it needs no new fields and works online
-  // for free. The in-melee hint compares the RAW distance to MELEE_RANGE — the
-  // same threshold the swing-resolution code uses — while the displayed yards
-  // are rounded, so the hint stays truthful even when rounding lands on 5yd.
-  private rangeReadout(self: Entity): string {
-    if (self.targetId === null) return 'You have no target.';
-    const t = this.entities.get(self.targetId);
-    if (!t) return 'You have no target.';
-    const d = dist2d(self.pos, t.pos);
-    const reach = d <= MELEE_RANGE ? 'in melee range' : 'out of melee range';
-    return `Your target ${t.name} is ${Math.round(d)}yd away (${reach}).`;
-  }
-  // Reads the live cast-bar state (no stored fields): castingAbility holds an
-  // ability id or the FISHING_CAST_ID sentinel, channeling distinguishes a
-  // channel from a normal cast. Times are fractional seconds, so toFixed(1)
-  // stays truthful rather than rounding a 2.5s cast to "3s".
-  private castingReadout(e: Entity): string {
-    if (!e.castingAbility) return 'You are not casting anything.';
-    const remaining = e.castRemaining.toFixed(1);
-    const total = e.castTotal.toFixed(1);
-    if (e.castingAbility === FISHING_CAST_ID) {
-      return `You are fishing — ${remaining}s of ${total}s remaining.`;
-    }
-    const name = ABILITIES[e.castingAbility]?.name ?? e.castingAbility;
-    const verb = e.channeling ? 'Channeling' : 'Casting';
-    return `${verb} ${name} — ${remaining}s of ${total}s remaining.`;
-  }
-  // Self-only readout of what the player is currently eating/drinking. Food and
-  // drink occupy separate slots and tick concurrently, each on its own remaining
-  // timer, so both are reported with their own restore rate and time left.
-  private consumableReadout(e: Entity): string {
-    const parts: string[] = [];
-    for (const c of [e.eating, e.drinking]) {
-      if (!c) continue;
-      const name = ITEMS[c.itemId]?.name ?? c.itemId;
-      const restores: string[] = [];
-      if (c.hpPer2s > 0) restores.push(`+${c.hpPer2s} HP/2s`);
-      if (c.manaPer2s > 0) restores.push(`+${c.manaPer2s} mana/2s`);
-      restores.push(`${Math.ceil(c.remaining)}s left`);
-      const verb = c.kind === 'food' ? 'eating' : 'drinking';
-      parts.push(`${verb} ${name} (${restores.join(', ')})`);
-    }
-    if (parts.length === 0) return 'You are not eating or drinking.';
-    return `You are ${parts.join(' and ')}.`;
-  }
-  // Self-only readout of the shared combat-potion cooldown (#103). Distinct from
-  // /cooldowns, which reads the per-ability Entity.cooldowns map and never shows
-  // this separate 60s potion timer. potionCooldownUntil is an absolute sim-time
-  // deadline, so the remaining time is computed against this.time.
-  private potionReadout(e: Entity): string {
-    const remaining = e.potionCooldownUntil - this.time;
-    if (remaining <= 0) return 'Combat potion is ready to use.';
-    return `Combat potion on cooldown — ready in ${Math.ceil(remaining)}s.`;
-  }
-  // Self-only readout of the ability armed to fire on the next melee swing
-  // (Heroic Strike / Raptor Strike / Maul). Distinct from /casting (active
-  // cast bar) and /cooldowns (recharge timers): an on-swing ability is neither
-  // casting nor on cooldown, just waiting for the swing — and it silently
-  // fizzles if the resource can't be paid when the swing lands (see swing
-  // resolution), so the readout flags that case up front.
-  private queuedReadout(e: Entity): string {
-    if (!e.queuedOnSwing) return 'You have no ability queued for your next swing.';
-    const queued = this.resolvedAbility(e.queuedOnSwing, e.id);
-    const name = queued?.def.name ?? e.queuedOnSwing;
-    if (!queued) return `${name} is queued for your next melee swing.`;
-    const res = e.resourceType ?? 'resource';
-    const have = Math.floor(e.resource);
-    if (e.resource >= queued.cost) {
-      return `${name} is queued for your next melee swing (costs ${queued.cost} ${res}; you have ${have}).`;
-    }
-    return `${name} is queued for your next melee swing, but you cannot afford it (costs ${queued.cost} ${res}; you have ${have}) — it will fizzle.`;
-  }
-
-  // Self-only readout for "/talents": the player's specialization and how their
-  // talent points are split across the Class tree and the chosen spec tree.
-  // Points are derived live from level (talentPointsAtLevel), so the total stays
-  // correct after a level-up even if the allocation hasn't been touched since.
-  private talentsReadout(meta: PlayerMeta, e: Entity): string {
-    const ct = talentsFor(meta.cls);
-    if (!ct) return 'Your class has no talent tree yet.';
-    const total = talentPointsAtLevel(e.level);
-    if (total <= 0)
-      return `You have not unlocked talents yet — they begin at level ${FIRST_TALENT_LEVEL}.`;
-    const spent = pointsSpent(meta.talents);
-    // Split spent points by tree (cold path: walk the allocation once on demand).
-    const byId = new Map(ct.nodes.map((n) => [n.id, n] as const));
-    let classPts = 0;
-    let specPts = 0;
-    for (const id in meta.talents.ranks) {
-      const node = byId.get(id);
-      if (!node) continue;
-      if (node.tree === 'class') classPts += meta.talents.ranks[id];
-      else specPts += meta.talents.ranks[id];
-    }
-    const specName = meta.talents.spec
-      ? (ct.specs.find((s) => s.id === meta.talents.spec)?.name ?? meta.talents.spec)
-      : null;
-    const head = specName ?? 'no specialization';
-    const breakdown = specName ? `Class ${classPts}, ${specName} ${specPts}` : `Class ${classPts}`;
-    const unspent = total - spent;
-    const tail = unspent > 0 ? ` ${unspent} unspent.` : '';
-    return `Talents: ${head} — ${spent}/${total} points spent (${breakdown}).${tail}`;
-  }
   // -------------------------------------------------------------------------
   // Delves, replayable modular instances (see docs/prd/delves.md)
   // -------------------------------------------------------------------------

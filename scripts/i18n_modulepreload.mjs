@@ -20,7 +20,7 @@ export const PLACEHOLDER = '__I18N_LOCALE_CHUNKS__';
 // Root-relative directory of the generated game locale slices. Manifest keys are
 // root-relative source paths, so the lazy chunk for `es` is keyed here as
 // `${GENERATED_DIR}/es.ts`. The admin twin (src/admin/...) is deliberately NOT matched:
-// admin stays statically imported (locked decision 4) so it has no per-locale chunks.
+// admin stays statically imported so it has no per-locale chunks.
 export const GENERATED_DIR = 'src/ui/i18n.resolved.generated';
 
 // Join a Vite `base` ('/' here) with a manifest `file` ('assets/es-HASH.js') into an
@@ -79,7 +79,7 @@ export function injectLocaleChunkMap(html, map, placeholder = PLACEHOLDER) {
   // Escape '<' so the JSON literal embedded in the inline <script> can never break out
   // via a '</script>' or '<!--' sequence (the values are build-fixed same-origin hashed
   // paths today, so this is defense-in-depth).
-  const json = JSON.stringify(map).replace(/</g, "\\u003c");
+  const json = JSON.stringify(map).replace(/</g, '\\u003c');
   return html.split(placeholder).join(json);
 }
 

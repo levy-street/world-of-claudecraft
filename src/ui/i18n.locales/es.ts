@@ -14,6 +14,25 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const es: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.loot.chestTitle': 'Cofre',
+  'hudChrome.spellbook.addToBarAria': 'Añadir {name} a la barra de acción',
+  'hudChrome.spellbook.removeFromBarAria': 'Quitar {name} de la barra de acción',
+  'hudChrome.nameplate.mob': '[{level}] {name}',
+  'hudChrome.nameplate.mobElite': '[{level}+] {name}',
+  'hud.core.mapCanvasLabel': 'Mapa',
+  'hud.core.mapSummary': 'Mapa de {zone}.',
+  'hudChrome.castBar.playerAria': 'Tu barra de lanzamiento',
+  'hudChrome.castBar.targetAria': 'Barra de lanzamiento del objetivo',
+  'hudChrome.character.modelPreview': 'Vista previa del modelo del personaje',
+  'hudChrome.leaderboard.close': 'Cerrar',
+  'hudChrome.skipLinks.chat': 'Saltar al chat',
+  'hudChrome.skipLinks.mainHud': 'Saltar a la interfaz principal',
+  'hudChrome.unitFrame.durationUnitSeconds': 's',
+  'hudChrome.unitFrame.partyGroup': 'Grupo {n}',
+  'hudChrome.unitFrame.partyLabel': 'Tu grupo',
+  'hudChrome.unitFrame.playerLabel': 'Tu personaje',
+  'hudChrome.unitFrame.targetAnnounce': 'Objetivo: {name}',
+  'hudChrome.unitFrame.targetLabel': 'Tu objetivo',
   'seo.officialLabel': 'Sitio web oficial de World of ClaudeCraft',
   'seo.officialBody':
     'worldofclaudecraft.com es el MMO de navegador gratuito oficial del reino Claudemoon. Juega en línea con un personaje persistente, explora en solitario sin conexión, lee la wiki y sigue los enlaces comunitarios verificados desde este sitio.',
@@ -53,8 +72,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidLockout.lockedToast': 'Estás bloqueado en {raid}. Se desbloquea en {time}.',
   'hudChrome.options.interfaceMode': 'Modo de interfaz',
   'hudChrome.options.interfaceModeAuto': 'Auto',
-  'hudChrome.options.interfaceModeDesktop': 'Desktop',
-  'hudChrome.options.interfaceModeTouch': 'Touch',
+  'hudChrome.options.interfaceModeDesktop': 'Escritorio',
+  'hudChrome.options.interfaceModeTouch': 'Táctil',
   'hudChrome.options.interfaceModeNote':
     'Auto elige los controles Desktop o Touch según tu dispositivo. Elige Desktop para forzar teclado y ratón (útil en una tableta con teclado), o Touch para los controles en pantalla.',
   'hudChrome.options.lockCursorOnRotate': 'Bloquear cursor al rotar',

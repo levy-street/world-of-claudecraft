@@ -225,6 +225,21 @@ export const es: EnTranslations = {
     "abilityScaling": {
       "bonus": "(+{value})"
     },
+    "unitFrame": {
+      "playerLabel": "Tu personaje",
+      "targetLabel": "Tu objetivo",
+      "targetAnnounce": "Objetivo: {name}",
+      "partyLabel": "Tu grupo",
+      "partyGroup": "Grupo {n}",
+      "durationUnitSeconds": "s"
+    },
+    "character": {
+      "modelPreview": "Vista previa del modelo del personaje"
+    },
+    "skipLinks": {
+      "mainHud": "Saltar a la interfaz principal",
+      "chat": "Saltar al chat"
+    },
     "mobile": {
       "autorun": "Carrera automática",
       "jump": "Saltar",
@@ -246,6 +261,13 @@ export const es: EnTranslations = {
       "coordinates": "Coordenadas",
       "heading": "Rumbo",
       "minimapZoom": "Zoom del minimapa"
+    },
+    "castBar": {
+      "playerAria": "Tu barra de lanzamiento",
+      "targetAria": "Barra de lanzamiento del objetivo"
+    },
+    "leaderboard": {
+      "close": "Cerrar"
     },
     "raidLockout": {
       "title": "Bloqueos de banda",
@@ -288,8 +310,8 @@ export const es: EnTranslations = {
       "browserEffectsNote": "El modo automático atenúa los efectos CSS pesados (desenfoque, brillo, movimiento de fondo) según tu navegador y dispositivo. Redúcelo manualmente si la interfaz va lenta.",
       "interfaceMode": "Modo de interfaz",
       "interfaceModeAuto": "Auto",
-      "interfaceModeDesktop": "Desktop",
-      "interfaceModeTouch": "Touch",
+      "interfaceModeDesktop": "Escritorio",
+      "interfaceModeTouch": "Táctil",
       "interfaceModeNote": "Auto elige los controles Desktop o Touch según tu dispositivo. Elige Desktop para forzar teclado y ratón (útil en una tableta con teclado), o Touch para los controles en pantalla.",
       "footstepSounds": "Sonidos de pasos",
       "clickFeedback": "Marcador de clic",
@@ -586,6 +608,17 @@ export const es: EnTranslations = {
       "notRaid": "Tu grupo no es una banda.",
       "leaderOnly": "Solo el líder de la banda puede convertir la banda en grupo.",
       "tooLarge": "Una banda con más de cinco miembros no puede volver a convertirse en grupo."
+    },
+    "loot": {
+      "chestTitle": "Cofre"
+    },
+    "spellbook": {
+      "addToBarAria": "Añadir {name} a la barra de acción",
+      "removeFromBarAria": "Quitar {name} de la barra de acción"
+    },
+    "nameplate": {
+      "mob": "[{level}] {name}",
+      "mobElite": "[{level}+] {name}"
     }
   },
   "guide": {
@@ -2412,7 +2445,9 @@ export const es: EnTranslations = {
       "mobileMap": "Mapa",
       "closeMap": "Cerrar mapa",
       "zoomIn": "Acercar",
-      "zoomOut": "Alejar"
+      "zoomOut": "Alejar",
+      "mapCanvasLabel": "Mapa",
+      "mapSummary": "Mapa de {zone}."
     },
     "options": {
       "gameMenu": "Menú del juego",
