@@ -59,15 +59,22 @@ export type DungeonInteriorVariant =
   | 'delve_ossuary'
   | 'delve_bell'
   | 'delve_hall'
-  | 'delve_finale';
+  | 'delve_finale'
+  // Drowned Litany marsh delve sub-themes (share the delve crypt-stone base via
+  // isDelveVariant, but light with a sickly bog-green torch tint; the trash
+  // rooms route through the ossuary dressing path, the apse through the finale).
+  | 'delve_marsh'
+  | 'delve_marsh_apse';
 
-/** True for any Collapsed Reliquary delve module variant. */
+/** True for any delve module variant (Collapsed Reliquary or Drowned Litany). */
 export function isDelveVariant(variant: DungeonInteriorVariant): boolean {
   return (
     variant === 'delve_ossuary' ||
     variant === 'delve_bell' ||
     variant === 'delve_hall' ||
-    variant === 'delve_finale'
+    variant === 'delve_finale' ||
+    variant === 'delve_marsh' ||
+    variant === 'delve_marsh_apse'
   );
 }
 type Variant = DungeonInteriorVariant;
@@ -79,6 +86,9 @@ export function dungeonDaisHasRaisedPlatform(variant: DungeonInteriorVariant): b
   if (variant === 'arena' || variant === 'nythraxis') return false;
   if (variant === 'delve_ossuary' || variant === 'delve_bell' || variant === 'delve_hall')
     return false;
+  // marsh trash rooms are flat fighting floors like the other delve trash; the
+  // marsh apse keeps a raised boss stage like delve_finale.
+  if (variant === 'delve_marsh') return false;
   return true;
 }
 
@@ -103,6 +113,11 @@ const TORCH_COLORS: Record<Variant, TorchColors> = {
   delve_hall: { flame: 0xff7a3c, emissive: 0xcc3a14, light: 0xff6a3c },
   // the bell-buried boss chamber burns hotter: brighter ember over the arena
   delve_finale: { flame: 0xffa24a, emissive: 0xe04a18, light: 0xff7a3c },
+  // the Drowned Litany burns with sickly bog-light: cold green marsh-gas flames
+  // over wet stone, clearly distinct from the reliquary ember-orange.
+  delve_marsh: { flame: 0x6abf6a, emissive: 0x2f6f2f, light: 0x6aff8c },
+  // the drowned apse burns brighter and colder: a cyan corpse-glow over the stage
+  delve_marsh_apse: { flame: 0x7fe6c0, emissive: 0x2f8f6f, light: 0x6affb0 },
 };
 
 // The Drowned Temple is flooded — a translucent, self-animating water sheet
@@ -1336,8 +1351,9 @@ export class DungeonInteriors {
           p.add('skull', t.x, 0, t.z - 1.6, hash2(t.x, t.z) * Math.PI * 2, 1.2);
         continue;
       }
-      if (variant === 'delve_ossuary') {
-        // burial shelves: stacked coffins with bone spill at their feet
+      if (variant === 'delve_ossuary' || variant === 'delve_marsh') {
+        // burial shelves: stacked coffins with bone spill at their feet (the
+        // marsh trash rooms reuse this layout under bog-green light)
         p.add(r < 0.5 ? 'coffin' : 'coffin_decorated', t.x, 0, t.z, 0, [1.15, 1.35, 1.45]);
         const sx = t.x < 0 ? 1 : -1;
         p.add('ribcage', t.x + sx * 1.5, 0.4, t.z - 1.4, hash2(t.x, t.z) * Math.PI * 2, 1.5);
@@ -1453,7 +1469,7 @@ export class DungeonInteriors {
         p.add(i % 2 ? 'skull_candle' : 'candle_triple', x, 0.6, z, hash2(x, z) * Math.PI, 1.4);
       else if (variant === 'temple')
         p.add(i % 2 ? 'candle_triple' : 'shrine_candles', x, 0.6, z, hash2(x, z) * Math.PI, 1.3);
-      else if (variant === 'delve_finale')
+      else if (variant === 'delve_finale' || variant === 'delve_marsh_apse')
         p.add(i % 2 ? 'skull_candle' : 'candle_triple', x, 0.6, z, hash2(x, z) * Math.PI, 1.4);
       else p.add(i % 2 ? 'skull' : 'candle_lit', x, 0.6, z, hash2(x, z) * Math.PI, 1.3);
     }
@@ -1469,7 +1485,7 @@ export class DungeonInteriors {
       p.add('coin_stack_medium', d.x - 2.0, 0.6, d.z + d.r - 3.4, -0.7, 1.5);
       p.add('skull_candle', d.x, 0.68, d.z, 0, 1.6); // the moon-idol at the altar's heart
     }
-    if (variant === 'delve_finale') {
+    if (variant === 'delve_finale' || variant === 'delve_marsh_apse') {
       // Deacon Varric's bell-chamber: low ribcage trophies flanking the south
       // (entrance-facing) edge of the stage. The reward chest is a gameplay
       // object the sim places centre-south, and the surface-exit stairs sit at
@@ -1482,6 +1498,24 @@ export class DungeonInteriors {
   // Bone piles / debris strewn along the aisle (legacy deterministic spots)
   private placeAisleClutter(p: Placements, layout: DungeonLayout, variant: Variant): void {
     if (variant === 'arena') return; // the fighting sands stay clear of obstacles
+    // Delve modules drive clutter straight from their layout's authored scatter
+    // points so the visible bone piles sit exactly on the collision circles
+    // (the Drowned Litany marsh shapes use bespoke scatter, not the sine aisle
+    // formula). The Reliquary clutter arrays mirror the old formula positions, so
+    // their rendered output is unchanged.
+    if (isDelveVariant(variant)) {
+      for (const c of layout.clutter ?? []) {
+        const x = c.x;
+        const z = c.z;
+        if (z > layout.zMax - 4) continue;
+        const r = hash2(x, z);
+        p.add('ribcage', x, 0.5, z, r * Math.PI * 2, 1.7);
+        p.add('bone_A', x + 1.2, 0.08, z + 0.9, r * 7, 1.9);
+        if (r > 0.4) p.add('bone_B', x - 1.1, 0.06, z - 0.8, r * 11, 1.8);
+        if (r > 0.55) p.add('skull', x + 0.4, 0, z - 1.4, r * 3, 1.35);
+      }
+      return;
+    }
     const dense = variant === 'sanctum' || variant === 'temple';
     const count = variant === 'sanctum' ? 14 : variant === 'temple' ? 12 : 10;
     for (let i = 0; i < count; i++) {
@@ -1489,11 +1523,6 @@ export class DungeonInteriors {
       const z = 12 + i * (dense ? 10 : 9.5);
       if (variant === 'sanctum' && ((z > 60 && z < 74) || (z > 110 && z < 120))) continue; // waist walls
       if (variant === 'temple' && z > 60 && z < 72) continue; // single waist arch
-      // Delve clutter must stay locked to the per-module collider sets in
-      // delve_layout.ts (same sine formula): the Bell Niche skips the two spots
-      // that land inside its alcove piers; the Finale clears its north fighting ring.
-      if (variant === 'delve_bell' && (i === 2 || i === 5)) continue;
-      if (variant === 'delve_finale' && i > 3) continue;
       if (z > layout.zMax - 4) continue;
       const r = hash2(x, z);
       if (variant === 'bastion') {
@@ -1575,8 +1604,9 @@ export class DungeonInteriors {
 
     if (isDelveVariant(variant)) {
       const edge = (layout.wallX ?? DUNGEON_WALL_X) - 1.6;
-      if (variant === 'delve_ossuary') {
+      if (variant === 'delve_ossuary' || variant === 'delve_marsh') {
         // ossuary shelves: rows of graves and bone reliquaries hugging the walls
+        // (marsh trash rooms reuse this wall dressing under bog-green light)
         for (let z = layout.zMin + 22; z < layout.zMax - 10; z += 17) {
           for (const side of [-1, 1]) {
             const r = hash2(side * 5.1, z);

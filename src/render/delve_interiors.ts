@@ -11,15 +11,16 @@ const DELVE_MODULE_VARIANT: Record<DelveModuleId, DungeonInteriorVariant> = {
   reliquary_bell_niche: 'delve_bell',
   reliquary_saintless_hall: 'delve_hall',
   reliquary_finale: 'delve_finale',
-  // Drowned Litany (Phase 1): reuse the reliquary dressing variants as
-  // placeholders so the modules render; Phase 2 swaps in marsh-ruin dressing.
-  litany_sluice: 'delve_ossuary',
-  litany_ledger: 'delve_bell',
-  litany_ring: 'delve_hall',
-  litany_baptistry: 'delve_ossuary',
-  litany_choir_loft: 'delve_hall',
-  litany_causeway: 'delve_bell',
-  litany_apse: 'delve_finale',
+  // Drowned Litany (Phase 2): marsh-ruin dressing. The six trash modules light
+  // with sickly bog-green flame (delve_marsh, ossuary-style wet shelves over
+  // cracked flags); the apse is the raised boss stage under a colder corpse-glow.
+  litany_sluice: 'delve_marsh',
+  litany_ledger: 'delve_marsh',
+  litany_ring: 'delve_marsh',
+  litany_baptistry: 'delve_marsh',
+  litany_choir_loft: 'delve_marsh',
+  litany_causeway: 'delve_marsh',
+  litany_apse: 'delve_marsh_apse',
 };
 
 /** Build one delve module at a world origin (crypt KayKit kit + that module's delve layout). */

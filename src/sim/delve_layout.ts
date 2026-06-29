@@ -9,10 +9,10 @@ export type DelveModuleId =
   | 'reliquary_bell_niche'
   | 'reliquary_saintless_hall'
   | 'reliquary_finale'
-  // The Drowned Litany (Mirefen Marsh, delve index 1). Phase 1 reuses the
-  // reliquary geometry as a placeholder so the delve is enterable/completable;
-  // Phase 2 swaps in irregular marsh shapes (crescent, island_cluster, ring,
-  // sinkhole, fan, y_split, asymmetric_apse).
+  // The Drowned Litany (Mirefen Marsh, delve index 1). Each module is an
+  // irregular marsh-ruin shape carved from the shared rectangular footprint by
+  // interior obstacles only (stubs/pillars/tombs/clutter): crescent,
+  // island_cluster, ring, sinkhole, fan, y_split, asymmetric_apse.
   | 'litany_sluice'
   | 'litany_ledger'
   | 'litany_ring'
@@ -155,21 +155,307 @@ export const RELIQUARY_FINALE_LAYOUT: DungeonLayout = {
   clutter: FINALE_CLUTTER,
 };
 
+// ---------------------------------------------------------------------------
+// The Drowned Litany (Mirefen Marsh): 7 irregular marsh-ruin shapes.
+//
+// All seven keep the SHARED outer footprint (Z_MIN..Z_MAX, SIDE_Z/SIDE_HD,
+// WALL_X) and carry doorZ: DOOR_Z. The non-rectangular FEEL comes entirely from
+// interior obstacles: stub walls (OBB) are the primary shaping tool, pillars are
+// dotted obstacles (r=1), tombs are wall-side blocks (1.1 x 2.1), clutter is
+// decorative (r=0.8). Every layout keeps the entry aisle (x in [-3,3], z near
+// -11) clear and leaves a continuous >=4u-wide walkable path from the entry to
+// the dais at the high-z end.
+// ---------------------------------------------------------------------------
+
+/** Litany Sluice, CRESCENT: a curved arc of stub-walls + tombs sweeps from the
+ * south-west to the north-east, forcing the player to trace a banked channel
+ * around the convex (impassable) inner edge rather than walk straight up. */
+export const LITANY_SLUICE_LAYOUT: DungeonLayout = {
+  zMin: Z_MIN,
+  zMax: Z_MAX,
+  sideWallZ: SIDE_Z,
+  sideWallHd: SIDE_HD,
+  wallX: WALL_X,
+  doorZ: DOOR_Z,
+  // The convex inner bank of the crescent: a run of stubs whose centre x sweeps
+  // from west (-12) to east (+12) as z climbs, leaving an open arc on the
+  // OUTSIDE of the curve. Each gap to the side wall (|x|=24 walkable) stays well
+  // over 4u so the channel is traversable the whole way up.
+  stubs: [
+    { x: -12, z: 6, hw: 7, hd: 3 },
+    { x: -8, z: 20, hw: 7, hd: 3 },
+    { x: 0, z: 33, hw: 8, hd: 3 },
+    { x: 9, z: 47, hw: 7, hd: 3 },
+    { x: 13, z: 61, hw: 6, hd: 3 },
+  ],
+  // Pillars dot the concave (walkable) side of the bank as sluice-gate posts.
+  pillars: [
+    { x: 13, z: 6 },
+    { x: 16, z: 20 },
+    { x: -16, z: 47 },
+    { x: -16, z: 61 },
+    { x: -10, z: 73 },
+  ],
+  tombs: [],
+  dais: { x: 0, z: 82, r: 9 },
+  clutter: [
+    { x: 18, z: 33 },
+    { x: -18, z: 33 },
+    { x: 6, z: 73 },
+  ],
+};
+
+/** Litany Ledger, ISLAND_CLUSTER: several blocky raised "islands" (tomb +
+ * pillar groups) scatter across the room with navigable channels of open water
+ * weaving between them; no single island spans the width, so the player threads
+ * a zig-zag of >=4u channels to the dais. */
+export const LITANY_LEDGER_LAYOUT: DungeonLayout = {
+  zMin: Z_MIN,
+  zMax: Z_MAX,
+  sideWallZ: SIDE_Z,
+  sideWallHd: SIDE_HD,
+  wallX: WALL_X,
+  doorZ: DOOR_Z,
+  // Each island is a tight tomb pair the renderer reads as a raised ledge.
+  tombs: [
+    // west island near the entrance (kept clear of the x in [-3,3] aisle)
+    { x: -13, z: 10 },
+    { x: -16, z: 14 },
+    // east mid island
+    { x: 14, z: 28 },
+    { x: 17, z: 24 },
+    // central island (offset east so the west channel stays open)
+    { x: 6, z: 44 },
+    { x: 9, z: 48 },
+    // west far island
+    { x: -14, z: 58 },
+    { x: -17, z: 62 },
+  ],
+  // A few lone rocks pepper the channels without blocking them.
+  pillars: [
+    { x: 13, z: 52 },
+    { x: -8, z: 30 },
+    { x: 0, z: 70 },
+  ],
+  stubs: [],
+  dais: { x: 0, z: 82, r: 9 },
+  clutter: [
+    { x: -19, z: 10 },
+    { x: 19, z: 28 },
+    { x: 12, z: 44 },
+    { x: -19, z: 58 },
+  ],
+};
+
+/** Litany Ring, RING: a dense central mass (tomb + pillar cluster around the
+ * room centre) the player cannot cross; an unbroken walkway loops around it on
+ * all sides, rejoining toward the dais. */
+export const LITANY_RING_LAYOUT: DungeonLayout = {
+  zMin: Z_MIN,
+  zMax: Z_MAX,
+  sideWallZ: SIDE_Z,
+  sideWallHd: SIDE_HD,
+  wallX: WALL_X,
+  doorZ: DOOR_Z,
+  // The impassable central island: a 4-stub box around (0,40) with tomb corners,
+  // ~+-13 in x and z 28..52, leaving ~11u walkway lanes on each side (|x| 13..24)
+  // and clear bands south (z<24) and north (z>54).
+  stubs: [
+    { x: 0, z: 28, hw: 11, hd: 2 }, // south face of the ring
+    { x: 0, z: 52, hw: 11, hd: 2 }, // north face of the ring
+    { x: -11, z: 40, hw: 2, hd: 10 }, // west face
+    { x: 11, z: 40, hw: 2, hd: 10 }, // east face
+  ],
+  pillars: [
+    { x: 0, z: 40 }, // dead centre, inside the sealed ring
+    { x: -7, z: 40 },
+    { x: 7, z: 40 },
+  ],
+  tombs: [],
+  dais: { x: 0, z: 82, r: 9 },
+  clutter: [
+    { x: 18, z: 40 },
+    { x: -18, z: 40 },
+    { x: 0, z: 16 },
+    { x: 0, z: 66 },
+  ],
+};
+
+/** Litany Baptistry, SINKHOLE: a circular pit obstacle dead-centre ringed by a
+ * walkable perimeter. The pit is a ring of pillars (a flooded font) the player
+ * orbits; the central pillar marks the drowned font itself. */
+export const LITANY_BAPTISTRY_LAYOUT: DungeonLayout = {
+  zMin: Z_MIN,
+  zMax: Z_MAX,
+  sideWallZ: SIDE_Z,
+  sideWallHd: SIDE_HD,
+  wallX: WALL_X,
+  doorZ: DOOR_Z,
+  // The pit rim: a ring of pillars about (0,40) at radius ~8, dense enough to
+  // read as a continuous lip, with a central font pillar. The walkway around it
+  // (|x| 9..24, and clear z bands south/north) stays well over 4u wide.
+  pillars: [
+    { x: 0, z: 32 },
+    { x: 6, z: 34 },
+    { x: 8, z: 40 },
+    { x: 6, z: 46 },
+    { x: 0, z: 48 },
+    { x: -6, z: 46 },
+    { x: -8, z: 40 },
+    { x: -6, z: 34 },
+    { x: 0, z: 40 }, // the drowned font at the pit centre
+  ],
+  // Two short kerb stubs flank the pit east/west as a raised walkway edge,
+  // leaving a generous outer lane to the side walls.
+  stubs: [
+    { x: 15, z: 40, hw: 2, hd: 6 },
+    { x: -15, z: 40, hw: 2, hd: 6 },
+  ],
+  tombs: [],
+  dais: { x: 0, z: 82, r: 9 },
+  clutter: [
+    { x: 20, z: 24 },
+    { x: -20, z: 24 },
+    { x: 20, z: 56 },
+    { x: -20, z: 56 },
+  ],
+};
+
+/** Litany Choir Loft, FAN: obstacles fan outward from the entrance in widening
+ * diagonal rows (choir-stall pews), so the room opens like a fan; the player
+ * weaves between the spreading ranks toward the dais. */
+export const LITANY_CHOIR_LOFT_LAYOUT: DungeonLayout = {
+  zMin: Z_MIN,
+  zMax: Z_MAX,
+  sideWallZ: SIDE_Z,
+  sideWallHd: SIDE_HD,
+  wallX: WALL_X,
+  doorZ: DOOR_Z,
+  // Each rank is a pillar pair whose x-spread grows with z (fanning out from the
+  // narrow entrance). Gaps between the pair (>=4u) and to the walls stay open.
+  pillars: [
+    // rank 1 (narrow, just past the clear entry aisle)
+    { x: -5, z: 12 },
+    { x: 5, z: 12 },
+    // rank 2
+    { x: -10, z: 26 },
+    { x: 10, z: 26 },
+    // rank 3
+    { x: -15, z: 40 },
+    { x: 15, z: 40 },
+    // rank 4 (widest, hugging the walls)
+    { x: -19, z: 54 },
+    { x: 19, z: 54 },
+  ],
+  // A second, intermediate fan of tombs offset half a step so the ranks
+  // interleave and the player must slalom rather than walk a straight centre.
+  tombs: [
+    { x: 0, z: 19 },
+    { x: -8, z: 33 },
+    { x: 8, z: 33 },
+    { x: -12, z: 47 },
+    { x: 12, z: 47 },
+  ],
+  stubs: [],
+  dais: { x: 0, z: 82, r: 9 },
+  clutter: [
+    { x: 0, z: 64 },
+    { x: -16, z: 68 },
+    { x: 16, z: 68 },
+  ],
+};
+
+/** Litany Causeway, Y_SPLIT: a central longitudinal spine of stubs splits the
+ * room into two lanes; the spine has a gap at the south end (entry) and the
+ * north end (before the dais) so the two lanes diverge then rejoin (a Y at each
+ * end). */
+export const LITANY_CAUSEWAY_LAYOUT: DungeonLayout = {
+  zMin: Z_MIN,
+  zMax: Z_MAX,
+  sideWallZ: SIDE_Z,
+  sideWallHd: SIDE_HD,
+  wallX: WALL_X,
+  doorZ: DOOR_Z,
+  // The spine: a run of centred stubs from z~12 to z~62, leaving open mouths
+  // south (z<8, the entry confluence) and north (z>66, before the dais) so the
+  // two ~11u side lanes (|x| up to 24) split and rejoin. hw=2 keeps each lane
+  // comfortably over 4u.
+  stubs: [
+    { x: 0, z: 14, hw: 2, hd: 4 },
+    { x: 0, z: 26, hw: 2, hd: 4 },
+    { x: 0, z: 38, hw: 2, hd: 4 },
+    { x: 0, z: 50, hw: 2, hd: 4 },
+    { x: 0, z: 62, hw: 2, hd: 4 },
+  ],
+  // Lane-edge marker posts (one per lane) emphasise the two parallel causeways.
+  pillars: [
+    { x: -13, z: 26 },
+    { x: 13, z: 38 },
+    { x: -13, z: 50 },
+  ],
+  tombs: [],
+  dais: { x: 0, z: 82, r: 9 },
+  clutter: [
+    { x: 0, z: 8 }, // south confluence cobbles (clear of spawn at z=-11)
+    { x: 0, z: 72 }, // north confluence
+  ],
+};
+
+/** Litany Apse, ASYMMETRIC_APSE (BOSS): a clear central fighting ring with a
+ * wide dais (r=12). Cover sits ONLY in the south half (z < ~46) and is
+ * deliberately asymmetric, favouring the WEST side (more, deeper cover west than
+ * east), with NO obstacle within ~14u of the dais centre. Modelled on
+ * RELIQUARY_FINALE_LAYOUT but offset/lopsided to read as a ruined apse. */
+export const LITANY_APSE_LAYOUT: DungeonLayout = {
+  zMin: Z_MIN,
+  zMax: Z_MAX,
+  sideWallZ: SIDE_Z,
+  sideWallHd: SIDE_HD,
+  wallX: WALL_X,
+  doorZ: DOOR_Z,
+  // West-heavy cover in the south half: a deep west colonnade plus one lighter
+  // east post. All at z <= 30, far outside the dais stomp ring at z=80,r=12.
+  pillars: [
+    { x: -16, z: 10 },
+    { x: -16, z: 22 },
+    { x: -10, z: 16 },
+    { x: -10, z: 30 },
+    { x: 14, z: 14 }, // lone east post (asymmetry: east is sparse)
+  ],
+  // A short broken apse-wall stub favouring the west, plus its smaller east
+  // counterpart, both well south of the fighting ring.
+  stubs: [
+    { x: -18, z: 38, hw: 5, hd: 2 },
+    { x: 16, z: 40, hw: 3, hd: 2 },
+  ],
+  // Wall-side rubble blocks in the deep south, west side weighted.
+  tombs: [
+    { x: -20, z: 10 },
+    { x: -20, z: 26 },
+    { x: 20, z: 22 },
+  ],
+  // Wider dais (r=12) so Sister Nhalia's stomp ring fits without stepping off.
+  dais: { x: 0, z: 80, r: 12 },
+  clutter: [
+    { x: -8, z: 42 },
+    { x: 10, z: 28 },
+    { x: 0, z: 16 },
+  ],
+};
+
 export const DELVE_MODULE_LAYOUTS: Record<DelveModuleId, DungeonLayout> = {
   reliquary_sunken_ossuary: RELIQUARY_SUNKEN_OSSUARY_LAYOUT,
   reliquary_bell_niche: RELIQUARY_BELL_NICHE_LAYOUT,
   reliquary_saintless_hall: RELIQUARY_SAINTLESS_HALL_LAYOUT,
   reliquary_finale: RELIQUARY_FINALE_LAYOUT,
-  // Drowned Litany placeholders (Phase 1): point at reliquary geometry until the
-  // Phase 2 irregular marsh layouts replace them. The boss room reuses the wider
-  // finale arena so Sister Nhalia's stomp ring fits.
-  litany_sluice: RELIQUARY_SUNKEN_OSSUARY_LAYOUT,
-  litany_ledger: RELIQUARY_BELL_NICHE_LAYOUT,
-  litany_ring: RELIQUARY_SAINTLESS_HALL_LAYOUT,
-  litany_baptistry: RELIQUARY_SUNKEN_OSSUARY_LAYOUT,
-  litany_choir_loft: RELIQUARY_SAINTLESS_HALL_LAYOUT,
-  litany_causeway: RELIQUARY_BELL_NICHE_LAYOUT,
-  litany_apse: RELIQUARY_FINALE_LAYOUT,
+  // The Drowned Litany (Mirefen Marsh): distinct irregular marsh-ruin shapes.
+  litany_sluice: LITANY_SLUICE_LAYOUT, // crescent: curved banked channel
+  litany_ledger: LITANY_LEDGER_LAYOUT, // island_cluster: scattered ledges + channels
+  litany_ring: LITANY_RING_LAYOUT, // ring: sealed central mass, loop around it
+  litany_baptistry: LITANY_BAPTISTRY_LAYOUT, // sinkhole: central pit + walkway rim
+  litany_choir_loft: LITANY_CHOIR_LOFT_LAYOUT, // fan: ranks fanning from the entrance
+  litany_causeway: LITANY_CAUSEWAY_LAYOUT, // y_split: central spine, two lanes rejoin
+  litany_apse: LITANY_APSE_LAYOUT, // asymmetric_apse: boss ring, west-heavy cover
 };
 
 /** Interior collision set for a delve module, in instance-local coordinates. */

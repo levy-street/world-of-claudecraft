@@ -17,7 +17,7 @@ import {
   isDelvePos,
   MOBS,
 } from '../src/sim/data';
-import { DELVE_MODULE_LAYOUTS } from '../src/sim/delve_layout';
+import { DELVE_MODULE_LAYOUTS, delveModuleColliders } from '../src/sim/delve_layout';
 
 import { createMob } from '../src/sim/entity';
 import { solveLockActions } from '../src/sim/lockpick';
@@ -1234,6 +1234,129 @@ describe('The Drowned Litany (Phase 1 skeleton)', () => {
     expect(run.objective.complete).toBe(true);
     expect(run.rewardChestId).not.toBeNull();
     expect(isDelvePos(sim.player.pos.x)).toBe(true); // not ejected
+  });
+});
+
+describe('The Drowned Litany (Phase 2 marsh layouts: navigable, distinct)', () => {
+  const LITANY_MODULES = [
+    'litany_sluice',
+    'litany_ledger',
+    'litany_ring',
+    'litany_baptistry',
+    'litany_choir_loft',
+    'litany_causeway',
+    'litany_apse',
+  ] as const;
+  // A generous player-body margin: the choke constraint is passages >= ~4u, i.e.
+  // comfortably more than 2 * BODY_R. A* (findPlayerPath) uses a similar radius.
+  const BODY_R = 0.9;
+
+  // All delve colliders are rot:0, so circle = radius test and obb = AABB test.
+  function blockedAt(
+    cols: ReturnType<typeof delveModuleColliders>,
+    x: number,
+    z: number,
+    r: number,
+  ): boolean {
+    for (const c of cols) {
+      if (c.type === 'circle') {
+        if (Math.hypot(x - c.x, z - c.z) < c.r + r) return true;
+      } else if (c.type === 'obb') {
+        if (Math.abs(x - c.x) < c.hw + r && Math.abs(z - c.z) < c.hd + r) return true;
+      }
+    }
+    return false;
+  }
+
+  // 4-connected flood fill over an instance-local grid: is the dais reachable
+  // from the entry spawn (0, zMin+8) without crossing an inflated collider?
+  function daisReachableFromEntry(moduleId: (typeof LITANY_MODULES)[number]): boolean {
+    const layout = DELVE_MODULE_LAYOUTS[moduleId];
+    const cols = delveModuleColliders(moduleId);
+    const cell = 0.5;
+    const minX = -(layout.wallX ?? 25);
+    const minZ = layout.zMin;
+    const W = Math.ceil(((layout.wallX ?? 25) * 2) / cell);
+    const H = Math.ceil((layout.zMax - layout.zMin) / cell);
+    const idx = (gx: number, gz: number) => gz * W + gx;
+    const openCell = (gx: number, gz: number) =>
+      !blockedAt(cols, minX + (gx + 0.5) * cell, minZ + (gz + 0.5) * cell, BODY_R);
+    const startGx = Math.floor((0 - minX) / cell);
+    const startGz = Math.floor((layout.zMin + 8 - minZ) / cell);
+    const goalGx = Math.floor((layout.dais.x - minX) / cell);
+    const goalGz = Math.floor((layout.dais.z - minZ) / cell);
+    if (!openCell(startGx, startGz)) return false; // entry spawn must be clear
+    const seen = new Uint8Array(W * H);
+    const stack: Array<[number, number]> = [[startGx, startGz]];
+    seen[idx(startGx, startGz)] = 1;
+    while (stack.length) {
+      const [gx, gz] = stack.pop()!;
+      for (const [dx, dz] of [
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+        [0, -1],
+      ]) {
+        const nx = gx + dx;
+        const nz = gz + dz;
+        if (nx < 0 || nz < 0 || nx >= W || nz >= H) continue;
+        if (seen[idx(nx, nz)]) continue;
+        seen[idx(nx, nz)] = 1;
+        if (openCell(nx, nz)) stack.push([nx, nz]);
+      }
+    }
+    return seen[idx(goalGx, goalGz)] === 1;
+  }
+
+  it('every marsh module is navigable from the entry spawn to the dais', () => {
+    for (const m of LITANY_MODULES) {
+      expect(daisReachableFromEntry(m), `${m} dais unreachable from entry`).toBe(true);
+    }
+  });
+
+  it('the entry spawn (0, zMin+8) is clear of obstacles in every marsh module', () => {
+    for (const m of LITANY_MODULES) {
+      const layout = DELVE_MODULE_LAYOUTS[m];
+      const cols = delveModuleColliders(m);
+      expect(blockedAt(cols, 0, layout.zMin + 8, BODY_R), `${m} entry blocked`).toBe(false);
+    }
+  });
+
+  it('Phase 2 replaced the placeholders: all 7 marsh layouts are distinct objects', () => {
+    const litany = LITANY_MODULES.map((m) => DELVE_MODULE_LAYOUTS[m]);
+    expect(new Set(litany).size).toBe(LITANY_MODULES.length);
+    // and none is reused from the Collapsed Reliquary set
+    const reliquary = [
+      DELVE_MODULE_LAYOUTS.reliquary_sunken_ossuary,
+      DELVE_MODULE_LAYOUTS.reliquary_bell_niche,
+      DELVE_MODULE_LAYOUTS.reliquary_saintless_hall,
+      DELVE_MODULE_LAYOUTS.reliquary_finale,
+    ];
+    for (const l of litany) expect(reliquary).not.toContain(l);
+  });
+
+  it('the boss apse keeps a clear stomp ring of interior cover around the dais', () => {
+    const layout = DELVE_MODULE_LAYOUTS.litany_apse;
+    expect(layout.dais.r).toBeGreaterThanOrEqual(12);
+    // Interior cover only: drop the room boundary walls (centred on a side wall
+    // |x|=wallX or an end wall z=zMin/zMax) so we test placed obstacles, not the
+    // shell the dais legitimately abuts.
+    const wallX = layout.wallX ?? 25;
+    const interior = delveModuleColliders('litany_apse').filter(
+      (c) => Math.abs(c.x) < wallX - 2 && c.z > layout.zMin + 2 && c.z < layout.zMax - 2,
+    );
+    // No interior obstacle may intrude on the dais radius.
+    for (let r = 0; r <= layout.dais.r; r += 2) {
+      for (let a = 0; a < Math.PI * 2; a += Math.PI / 8) {
+        const x = layout.dais.x + Math.cos(a) * r;
+        const z = layout.dais.z + Math.sin(a) * r;
+        expect(blockedAt(interior, x, z, BODY_R), `apse stomp ring blocked at r=${r}`).toBe(false);
+      }
+    }
+    // And all interior cover sits in the south half (design: z <= ~50).
+    for (const c of interior) {
+      expect(c.z, 'apse cover must stay in the south half').toBeLessThanOrEqual(50);
+    }
   });
 });
 
