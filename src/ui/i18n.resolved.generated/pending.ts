@@ -11,168 +11,79 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "devs.loading",
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
     "nav.devs"
   ],
   "es_ES": [
     "devs.loading",
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
     "nav.devs"
   ],
   "fr_FR": [
     "devs.loading",
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
     "nav.devs"
   ],
   "fr_CA": [
     "devs.loading",
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
     "nav.devs"
   ],
   "en_CA": [],
   "it_IT": [
     "devs.loading",
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
     "nav.devs"
   ],
   "de_DE": [
     "devs.loading",
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
     "nav.devs"
   ],
   "zh_CN": [
     "devs.loading",
-    "hudChrome.abilityScaling.bonus",
     "nav.devs"
   ],
   "zh_TW": [
     "devs.loading",
-    "hudChrome.abilityScaling.bonus",
     "nav.devs"
   ],
   "ko_KR": [
     "devs.loading",
-    "hudChrome.abilityScaling.bonus",
     "nav.devs"
   ],
   "ja_JP": [
     "devs.loading",
-    "hudChrome.abilityScaling.bonus",
     "nav.devs"
   ],
   "pt_BR": [
     "devs.loading",
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
     "nav.devs"
   ],
   "ru_RU": [
     "devs.loading",
-    "hudChrome.abilityScaling.bonus",
     "nav.devs"
   ],
   "nl_NL": [
     "devs.loading",
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
     "nav.devs"
   ],
   "pl_PL": [
     "devs.loading",
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
     "nav.devs"
   ],
   "id_ID": [
     "devs.loading",
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
     "nav.devs"
   ],
   "tr_TR": [
     "devs.loading",
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
     "nav.devs"
   ],
   "sv_SE": [
     "devs.loading",
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
     "nav.devs"
   ],
   "vi_VN": [
     "devs.loading",
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
     "nav.devs"
   ],
   "da_DK": [
     "devs.loading",
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
     "nav.devs"
   ]
 };
