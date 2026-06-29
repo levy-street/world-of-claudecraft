@@ -637,9 +637,9 @@ export const de_DE: EnTranslations = {
       "tooLarge": "Ein Schlachtzug mit mehr als fünf Mitgliedern kann nicht wieder in eine Gruppe umgewandelt werden."
     },
     "itemArmorType": {
-      "cloth": "Stoff",
-      "leather": "Leder",
-      "mail": "Kette"
+      "cloth": "Cloth",
+      "leather": "Leather",
+      "mail": "Mail"
     },
     "auraEffect": {
       "dot": "Verursacht alle {interval} s {value} {school}schaden",
@@ -2850,7 +2850,7 @@ export const de_DE: EnTranslations = {
     "combat": {
       "floatingMiss": "Verfehlt",
       "floatingDodge": "Ausgewichen",
-      "floatingResist": "Widerstand",
+      "floatingResist": "Resist",
       "cannotMove": "Bewegungsunfähig!",
       "attack": "Angriff",
       "damageDone": "Euer {ability} trifft {target} für {amount}.",
@@ -2859,7 +2859,7 @@ export const de_DE: EnTranslations = {
       "damageTakenCrit": "{source} trifft Euch kritisch für {amount}.",
       "miss": "Euer {ability} verfehlt {target}.",
       "dodged": "{target} weicht Eurem {ability} aus.",
-      "resisted": "{target} widersteht Eurem {ability}.",
+      "resisted": "Your {ability} is resisted by {target}.",
       "healSelf": "Euer {ability} heilt Euch um {amount}.",
       "healSelfCrit": "Euer {ability} heilt Euch kritisch um {amount}.",
       "healOther": "Euer {ability} heilt {target} um {amount}.",

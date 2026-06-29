@@ -637,9 +637,9 @@ export const es: EnTranslations = {
       "tooLarge": "Una banda con más de cinco miembros no puede volver a convertirse en grupo."
     },
     "itemArmorType": {
-      "cloth": "Tela",
-      "leather": "Cuero",
-      "mail": "Malla"
+      "cloth": "Cloth",
+      "leather": "Leather",
+      "mail": "Mail"
     },
     "auraEffect": {
       "dot": "Inflige {value} de daño de {school} cada {interval} s",
@@ -1543,7 +1543,7 @@ export const es: EnTranslations = {
     "copyright": "2026 World of ClaudeCraft",
     "githubLink": "https://github.com/levy-street/world-of-claudecraft",
     "githubLabel": "Proyecto de Código Abierto",
-    "whitepaper": "Libro blanco",
+    "whitepaper": "Whitepaper",
     "terms": "Términos de Servicio",
     "privacy": "Política de Privacidad",
     "discordLabel": "Únete al Discord"
@@ -2850,7 +2850,7 @@ export const es: EnTranslations = {
     "combat": {
       "floatingMiss": "Fallo",
       "floatingDodge": "Esquiva",
-      "floatingResist": "Resistido",
+      "floatingResist": "Resist",
       "cannotMove": "¡No puedes moverte!",
       "attack": "ataque",
       "damageDone": "Tu {ability} golpea a {target} por {amount}.",
@@ -2859,7 +2859,7 @@ export const es: EnTranslations = {
       "damageTakenCrit": "{source} te golpea críticamente por {amount}.",
       "miss": "Tu {ability} falla contra {target}.",
       "dodged": "{target} esquiva tu {ability}.",
-      "resisted": "{target} resiste tu {ability}.",
+      "resisted": "Your {ability} is resisted by {target}.",
       "healSelf": "Tu {ability} te sana {amount}.",
       "healSelfCrit": "Tu {ability} te sana críticamente {amount}.",
       "healOther": "Tu {ability} sana a {target} por {amount}.",

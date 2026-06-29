@@ -10,6 +10,7 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "footer.whitepaper",
     "hud.combat.floatingResist",
     "hud.combat.resisted",
     "hudChrome.abilityScaling.bonus",
@@ -18,6 +19,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemArmorType.mail"
   ],
   "es_ES": [
+    "footer.whitepaper",
     "hud.combat.floatingResist",
     "hud.combat.resisted",
     "hudChrome.abilityScaling.bonus",
@@ -26,6 +28,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemArmorType.mail"
   ],
   "fr_FR": [
+    "footer.whitepaper",
     "hud.combat.floatingResist",
     "hud.combat.resisted",
     "hudChrome.abilityScaling.bonus",
@@ -34,6 +37,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemArmorType.mail"
   ],
   "fr_CA": [
+    "footer.whitepaper",
     "hud.combat.floatingResist",
     "hud.combat.resisted",
     "hudChrome.abilityScaling.bonus",
@@ -43,6 +47,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "footer.whitepaper",
     "hud.combat.floatingResist",
     "hud.combat.resisted",
     "hudChrome.abilityScaling.bonus",
@@ -51,6 +56,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemArmorType.mail"
   ],
   "de_DE": [
+    "footer.whitepaper",
     "hud.combat.floatingResist",
     "hud.combat.resisted",
     "hudChrome.abilityScaling.bonus",
@@ -59,18 +65,23 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemArmorType.mail"
   ],
   "zh_CN": [
+    "footer.whitepaper",
     "hudChrome.abilityScaling.bonus"
   ],
   "zh_TW": [
+    "footer.whitepaper",
     "hudChrome.abilityScaling.bonus"
   ],
   "ko_KR": [
+    "footer.whitepaper",
     "hudChrome.abilityScaling.bonus"
   ],
   "ja_JP": [
+    "footer.whitepaper",
     "hudChrome.abilityScaling.bonus"
   ],
   "pt_BR": [
+    "footer.whitepaper",
     "hud.combat.floatingResist",
     "hud.combat.resisted",
     "hudChrome.abilityScaling.bonus",
@@ -79,6 +90,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemArmorType.mail"
   ],
   "ru_RU": [
+    "footer.whitepaper",
     "hudChrome.abilityScaling.bonus"
   ],
   "nl_NL": [
@@ -107,8 +119,6 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_skyward_time_trial.objectives.0.label",
     "entities.quests.q_skyward_time_trial.text",
     "entities.quests.q_skyward_time_trial.title",
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
     "hud.course.aborted",
     "hud.course.beatPar",
     "hud.course.best",
@@ -202,11 +212,7 @@ export const pending: Record<string, readonly string[]> = {
     "hud.wager.title",
     "hud.wager.waiting",
     "hud.wager.won",
-    "hud.wager.wonCharter",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail"
+    "hud.wager.wonCharter"
   ],
   "pl_PL": [
     "entities.items.charter_ashmane.name",
@@ -234,8 +240,6 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_skyward_time_trial.objectives.0.label",
     "entities.quests.q_skyward_time_trial.text",
     "entities.quests.q_skyward_time_trial.title",
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
     "hud.course.aborted",
     "hud.course.beatPar",
     "hud.course.best",
@@ -329,11 +333,7 @@ export const pending: Record<string, readonly string[]> = {
     "hud.wager.title",
     "hud.wager.waiting",
     "hud.wager.won",
-    "hud.wager.wonCharter",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail"
+    "hud.wager.wonCharter"
   ],
   "id_ID": [
     "entities.items.charter_ashmane.name",
@@ -361,8 +361,6 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_skyward_time_trial.objectives.0.label",
     "entities.quests.q_skyward_time_trial.text",
     "entities.quests.q_skyward_time_trial.title",
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
     "hud.course.aborted",
     "hud.course.beatPar",
     "hud.course.best",
@@ -456,11 +454,7 @@ export const pending: Record<string, readonly string[]> = {
     "hud.wager.title",
     "hud.wager.waiting",
     "hud.wager.won",
-    "hud.wager.wonCharter",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail"
+    "hud.wager.wonCharter"
   ],
   "tr_TR": [
     "entities.items.charter_ashmane.name",
@@ -488,8 +482,6 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_skyward_time_trial.objectives.0.label",
     "entities.quests.q_skyward_time_trial.text",
     "entities.quests.q_skyward_time_trial.title",
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
     "hud.course.aborted",
     "hud.course.beatPar",
     "hud.course.best",
@@ -583,11 +575,7 @@ export const pending: Record<string, readonly string[]> = {
     "hud.wager.title",
     "hud.wager.waiting",
     "hud.wager.won",
-    "hud.wager.wonCharter",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail"
+    "hud.wager.wonCharter"
   ],
   "sv_SE": [
     "entities.items.charter_ashmane.name",
@@ -615,8 +603,6 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_skyward_time_trial.objectives.0.label",
     "entities.quests.q_skyward_time_trial.text",
     "entities.quests.q_skyward_time_trial.title",
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
     "hud.course.aborted",
     "hud.course.beatPar",
     "hud.course.best",
@@ -710,11 +696,7 @@ export const pending: Record<string, readonly string[]> = {
     "hud.wager.title",
     "hud.wager.waiting",
     "hud.wager.won",
-    "hud.wager.wonCharter",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail"
+    "hud.wager.wonCharter"
   ],
   "vi_VN": [
     "entities.items.charter_ashmane.name",
@@ -742,8 +724,6 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_skyward_time_trial.objectives.0.label",
     "entities.quests.q_skyward_time_trial.text",
     "entities.quests.q_skyward_time_trial.title",
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
     "hud.course.aborted",
     "hud.course.beatPar",
     "hud.course.best",
@@ -837,11 +817,7 @@ export const pending: Record<string, readonly string[]> = {
     "hud.wager.title",
     "hud.wager.waiting",
     "hud.wager.won",
-    "hud.wager.wonCharter",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail"
+    "hud.wager.wonCharter"
   ],
   "da_DK": [
     "entities.items.charter_ashmane.name",
@@ -869,8 +845,6 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_skyward_time_trial.objectives.0.label",
     "entities.quests.q_skyward_time_trial.text",
     "entities.quests.q_skyward_time_trial.title",
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
     "hud.course.aborted",
     "hud.course.beatPar",
     "hud.course.best",
@@ -964,10 +938,6 @@ export const pending: Record<string, readonly string[]> = {
     "hud.wager.title",
     "hud.wager.waiting",
     "hud.wager.won",
-    "hud.wager.wonCharter",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail"
+    "hud.wager.wonCharter"
   ]
 };
