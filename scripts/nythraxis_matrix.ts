@@ -15,6 +15,7 @@ type Spec = {
   kind: SpecKind;
   melee: boolean;
   talents: TalentAllocation;
+  prepull?: string[];
   rotation: string[];
   healRotation?: string[];
 };
@@ -91,32 +92,38 @@ const specs = {
   fireMage: {
     key: 'fire_mage', cls: 'mage', role: 'dps', kind: 'caster', melee: false,
     talents: { spec: 'fire', ranks: { mag_elemental_precision: 3, mag_flame_throwing: 2, mag_school_focus: 1, fire_imp_fireball: 3, fire_incinerate: 2 }, choices: { mag_school_focus: 'mag_school_fire' } },
-    rotation: ['fire_blast', 'fireball'],
+    prepull: ['arcane_intellect'],
+    rotation: ['fire_blast', 'pyroblast', 'fireball', 'scorch'],
   },
   frostMage: {
     key: 'frost_mage', cls: 'mage', role: 'dps', kind: 'caster', melee: false,
     talents: { spec: 'frost', ranks: { mag_elemental_precision: 3, mag_arcane_focus: 2, mag_school_focus: 1, frost_imp_frostbolt: 3, frost_shatter: 2 }, choices: { mag_school_focus: 'mag_school_frost' } },
+    prepull: ['arcane_intellect'],
     rotation: ['frostbolt'],
   },
   arcaneMage: {
     key: 'arcane_mage', cls: 'mage', role: 'dps', kind: 'caster', melee: false,
     talents: { spec: 'arcane', ranks: { mag_arcane_focus: 3, mag_elemental_precision: 2, mag_school_focus: 1, arc_imp_missiles: 3, arc_arcane_power: 2 }, choices: { mag_school_focus: 'mag_school_arcane' } },
+    prepull: ['arcane_intellect'],
     rotation: ['arcane_missiles'],
   },
   destructionWarlock: {
     key: 'destruction_warlock', cls: 'warlock', role: 'dps', kind: 'caster', melee: false,
     talents: { spec: 'destruction', ranks: { wlk_demonic_embrace: 3, wlk_cataclysm: 2, dest_cataclysm: 3, dest_bane: 3 }, choices: {} },
-    rotation: ['immolate', 'corruption', 'curse_of_agony', 'shadowburn', 'shadow_bolt'],
+    prepull: ['demon_skin'],
+    rotation: ['shadowburn', 'immolate', 'corruption', 'curse_of_agony', 'shadow_bolt'],
   },
   afflictionWarlock: {
     key: 'affliction_warlock', cls: 'warlock', role: 'dps', kind: 'caster', melee: false,
     talents: { spec: 'affliction', ranks: { wlk_suppression: 3, wlk_imp_corruption: 2, wlk_dark_pact: 1, aff_imp_agony: 3, aff_imp_corruption: 2 }, choices: { wlk_dark_pact: 'wlk_pact_affliction' } },
+    prepull: ['demon_skin'],
     rotation: ['immolate', 'corruption', 'curse_of_agony', 'drain_life', 'shadow_bolt'],
   },
   demonologyWarlock: {
     key: 'demonology_warlock', cls: 'warlock', role: 'dps', kind: 'caster', melee: false,
     talents: { spec: 'demonology', ranks: { wlk_demonic_embrace: 3, wlk_cataclysm: 2, wlk_dark_pact: 1, demo_demonic_embrace: 3, demo_fel_armor: 2 }, choices: { wlk_dark_pact: 'wlk_pact_demonology' } },
-    rotation: ['demon_skin', 'immolate', 'corruption', 'curse_of_agony', 'shadow_bolt'],
+    prepull: ['demon_skin'],
+    rotation: ['immolate', 'corruption', 'curse_of_agony', 'shadow_bolt'],
   },
   marksmanshipHunter: {
     key: 'marksmanship_hunter', cls: 'hunter', role: 'dps', kind: 'physical', melee: false,
@@ -141,12 +148,14 @@ const specs = {
   elementalShaman: {
     key: 'elemental_shaman', cls: 'shaman', role: 'dps', kind: 'caster', melee: false,
     talents: { spec: 'elemental', ranks: { sha_convection: 3, sha_ancestral_knowledge: 2, ele_concussion: 3, ele_elemental_focus: 2, ele_choice: 1 }, choices: { ele_choice: 'ele_choice_storm' } },
-    rotation: ['lightning_shield', 'flame_shock', 'earth_shock', 'lightning_bolt'],
+    prepull: ['lightning_shield'],
+    rotation: ['flame_shock', 'earth_shock', 'lightning_bolt'],
   },
   enhancementShaman: {
     key: 'enhancement_shaman', cls: 'shaman', role: 'dps', kind: 'physical', melee: true,
     talents: { spec: 'enhancement', ranks: { sha_ancestral_knowledge: 3, sha_convection: 2, enh_ancestral_weapons: 3, enh_imp_rockbiter: 2, enh_choice: 1 }, choices: { enh_choice: 'enh_choice_stormstrike' } },
-    rotation: ['rockbiter_weapon', 'stormstrike', 'earth_shock', 'flame_shock'],
+    prepull: ['flametongue_weapon'],
+    rotation: ['stormstrike', 'flame_shock', 'earth_shock'],
   },
   balanceDruid: {
     key: 'balance_druid', cls: 'druid', role: 'dps', kind: 'caster', melee: false,
@@ -262,7 +271,7 @@ function cast(sim: Sim, pid: number, targetId: number, ability: string) {
 
 function positionFor(spec: Spec, boss: Entity, i: number) {
   if (spec.key === 'feral_druid_tank') return { x: boss.pos.x + 12, z: boss.pos.z };
-  const range = spec.melee ? MELEE_RANGE - 1.2 : spec.cls === 'hunter' ? 13 : spec.cls === 'warlock' || spec.key === 'shadow_priest' || spec.key === 'elemental_shaman' ? 18 : 24;
+  const range = spec.melee ? MELEE_RANGE - 1.2 : spec.cls === 'hunter' ? 13 : spec.cls === 'warlock' || spec.key === 'shadow_priest' || spec.key === 'elemental_shaman' || spec.key === 'fire_mage' ? 18 : 24;
   const angle = (Math.PI * 2 * i) / 10;
   return { x: boss.pos.x + Math.sin(angle) * range, z: boss.pos.z - Math.cos(angle) * range };
 }
@@ -481,6 +490,7 @@ function runGroup(groupSpecs: Spec[], key: string): Result {
     }
     if (groupSpecs[i].key === 'feral_druid') cast(sim, pids[i], boss.id, 'cat_form');
     if (groupSpecs[i].key === 'protection_warrior') cast(sim, pids[i], boss.id, 'defensive_stance');
+    for (const ability of groupSpecs[i].prepull ?? []) cast(sim, pids[i], boss.id, ability);
     sim.startAutoAttack(pids[i]);
     const pet = sim.petOf(pids[i]);
     if (pet) {

@@ -369,7 +369,7 @@ const WARLOCK_CLASS: TalentNode[] = [
   passive('wlk_demonic_skin', 'class', undefined, 2, { ability: [{ ability: 'demon_skin', dmgPct: 0.20 }], stats: { armorPct: 0.03 } }, '#', 'Improved Demon Skin', 'Strengthens Demon Skin and armor per rank.', 1, 1, { pointsGate: 2 }),
   passive('wlk_cataclysm', 'class', undefined, 3, { ability: [{ ability: 'shadow_bolt', costPct: -0.04 }, { ability: 'immolate', costPct: -0.04 }] }, 'x', 'Cataclysm', 'Reduces destructive spell costs by 4% per rank.', 1, 2, { requires: ['wlk_demonic_embrace'] }),
   choice('wlk_dark_pact', 'class', undefined, '@', 'Dark Pact', 'Choose one warlock emphasis.', 2, 1, [
-    { id: 'wlk_pact_affliction', name: 'Nightfall', icon: '*', description: 'Increases Shadow damage by 8%.', effect: { global: { spellDmgPct: 0.08 } } },
+    { id: 'wlk_pact_affliction', name: 'Nightfall', icon: '*', description: 'Increases Shadow damage by 2%.', effect: { global: { spellDmgPct: 0.02 } } },
     { id: 'wlk_pact_demonology', name: 'Fel Stamina', icon: '+', description: 'Increases Stamina by 8%.', effect: { stats: { staPct: 0.08 } } },
     { id: 'wlk_pact_destruction', name: 'Devastation', icon: 'x', description: 'Increases critical strike by 4%.', effect: { stats: { crit: 0.04 } } },
   ], { pointsGate: 5 }),
@@ -378,14 +378,14 @@ const WARLOCK_CLASS: TalentNode[] = [
 ];
 
 const WARLOCK_SPECS: SpecDef[] = [
-  spec('affliction', 'warlock', 'Affliction', 'dps', '*', 'A curse-weaver using damage over time and drains.', 'drain_life', 'Potent Afflictions', 'Increases Shadow spell damage by 12%.', { global: { spellDmgPct: 0.12 } }),
+  spec('affliction', 'warlock', 'Affliction', 'dps', '*', 'A curse-weaver using damage over time and drains.', 'drain_life', 'Potent Afflictions', 'Increases Shadow spell damage by 4%.', { global: { spellDmgPct: 0.04 } }),
   spec('demonology', 'warlock', 'Demonology', 'dps', '+', 'A durable warlock who survives through demonic resilience.', 'demon_skin', 'Demonic Knowledge', 'Increases Stamina and armor.', { stats: { staPct: 0.10, armorPct: 0.10 } }),
-  spec('destruction', 'warlock', 'Destruction', 'dps', 'x', 'A burst caster using Shadow Bolt, fire, and Shadowburn.', 'shadowburn', 'Ruin', 'Increases spell damage and critical strike chance.', { global: { spellDmgPct: 0.10 }, stats: { crit: 0.02 } }),
+  spec('destruction', 'warlock', 'Destruction', 'dps', 'x', 'A burst caster using Shadow Bolt, fire, and Shadowburn.', 'shadowburn', 'Ruin', 'Increases spell damage and critical strike chance.', { global: { spellDmgPct: 0.03 }, stats: { crit: 0.02 } }),
 ];
 
 const WARLOCK_SPEC_NODES: TalentNode[] = [
-  passive('aff_imp_agony', 'spec', 'affliction', 3, { ability: [{ ability: 'curse_of_agony', dmgPct: 0.08 }] }, '*', 'Improved Curse of Agony', 'Increases Curse of Agony damage by 8% per rank.', 0, 0),
-  passive('aff_imp_corruption', 'spec', 'affliction', 3, { ability: [{ ability: 'corruption', dmgPct: 0.08 }] }, '*', 'Improved Corruption', 'Increases Corruption damage by 8% per rank.', 0, 2),
+  passive('aff_imp_agony', 'spec', 'affliction', 3, { ability: [{ ability: 'curse_of_agony', dmgPct: 0.03 }] }, '*', 'Improved Curse of Agony', 'Increases Curse of Agony damage by 3% per rank.', 0, 0),
+  passive('aff_imp_corruption', 'spec', 'affliction', 3, { ability: [{ ability: 'corruption', dmgPct: 0.03 }] }, '*', 'Improved Corruption', 'Increases Corruption damage by 3% per rank.', 0, 2),
   passive('aff_fel_concentration', 'spec', 'affliction', 2, { ability: [{ ability: 'drain_life', dmgPct: 0.12, costPct: -0.08 }] }, '+', 'Fel Concentration', 'Improves Drain Life damage and cost per rank.', 1, 0, { pointsGate: 2, requires: ['aff_imp_agony'] }),
   passive('aff_amplify_curse', 'spec', 'affliction', 2, { ability: [{ ability: 'curse_of_agony', cooldownPct: -0.10, dmgPct: 0.10 }] }, '*', 'Amplify Curse', 'Improves Curse of Agony pressure per rank.', 1, 2, { pointsGate: 2 }),
   choice('aff_choice', 'spec', 'affliction', '@', 'Soul Harvest', 'Choose one Affliction refinement.', 2, 1, [
@@ -407,7 +407,7 @@ const WARLOCK_SPEC_NODES: TalentNode[] = [
   passive('demo_metamorphosis', 'spec', 'demonology', 2, { stats: { staPct: 0.06, armorPct: 0.06 }, global: { spellDmgPct: 0.03 } }, '#', 'Metamorphosis', 'Improves durability and spell damage per rank.', 3, 1, { pointsGate: 8, requires: ['demo_choice'] }),
 
   passive('dest_cataclysm', 'spec', 'destruction', 3, { ability: [{ ability: 'shadow_bolt', costPct: -0.05 }, { ability: 'immolate', costPct: -0.05 }] }, 'v', 'Cataclysm', 'Reduces destructive spell costs by 5% per rank.', 0, 0),
-  passive('dest_bane', 'spec', 'destruction', 3, { ability: [{ ability: 'shadow_bolt', castPct: -0.04 }, { ability: 'immolate', castPct: -0.04 }] }, '>', 'Bane', 'Reduces Shadow Bolt and Immolate cast times per rank.', 0, 2),
+  passive('dest_bane', 'spec', 'destruction', 3, { ability: [{ ability: 'shadow_bolt', castPct: -0.01 }, { ability: 'immolate', castPct: -0.01 }] }, '>', 'Bane', 'Reduces Shadow Bolt and Immolate cast times per rank.', 0, 2),
   passive('dest_devastation', 'spec', 'destruction', 2, { stats: { crit: 0.02 } }, 'x', 'Devastation', 'Increases critical strike chance by 2% per rank.', 1, 0, { pointsGate: 2, requires: ['dest_cataclysm'] }),
   passive('dest_imp_searing', 'spec', 'destruction', 2, { ability: [{ ability: 'searing_pain', dmgPct: 0.14 }] }, 'x', 'Improved Searing Pain', 'Increases Searing Pain damage by 14% per rank.', 1, 2, { pointsGate: 2 }),
   choice('dest_choice', 'spec', 'destruction', '@', 'Ruin', 'Choose one Destruction refinement.', 2, 1, [
