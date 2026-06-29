@@ -155,6 +155,11 @@ export class ApiError extends Error {
   constructor(
     message: string,
     readonly status: number,
+    // Stable machine-readable error code from the server's JSON body (e.g.
+    // 'rate_limited_ip' vs 'rate_limited_account'), when present. The UI keys off
+    // this instead of fragile error-text matching. Undefined for older servers
+    // or non-JSON failures.
+    readonly code?: string,
   ) {
     super(message);
     this.name = 'ApiError';
@@ -216,7 +221,8 @@ export class Api {
       body: JSON.stringify(body),
     });
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new ApiError(data.error ?? `request failed (${res.status})`, res.status);
+    if (!res.ok)
+      throw new ApiError(data.error ?? `request failed (${res.status})`, res.status, data.code);
     return data;
   }
 
@@ -225,7 +231,8 @@ export class Api {
       headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
     });
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new ApiError(data.error ?? `request failed (${res.status})`, res.status);
+    if (!res.ok)
+      throw new ApiError(data.error ?? `request failed (${res.status})`, res.status, data.code);
     return data;
   }
 
@@ -239,7 +246,8 @@ export class Api {
       body: JSON.stringify(body),
     });
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new ApiError(data.error ?? `request failed (${res.status})`, res.status);
+    if (!res.ok)
+      throw new ApiError(data.error ?? `request failed (${res.status})`, res.status, data.code);
     return data;
   }
 
@@ -389,12 +397,15 @@ export class Api {
     const text = await res.text();
     if (!res.ok) {
       let msg = `request failed (${res.status})`;
+      let code: string | undefined;
       try {
-        msg = JSON.parse(text).error ?? msg;
+        const parsed = JSON.parse(text);
+        msg = parsed.error ?? msg;
+        code = parsed.code;
       } catch {
         /* non-JSON error body */
       }
-      throw new ApiError(msg, res.status);
+      throw new ApiError(msg, res.status, code);
     }
     return JSON.parse(text);
   }

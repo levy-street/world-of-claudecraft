@@ -115,6 +115,8 @@ import {
   cardUploadRateLimited,
   clearAuthFailures,
   publicReadRateLimited,
+  RATE_LIMIT_ACCOUNT,
+  RATE_LIMIT_IP,
   rateLimited,
   recordAuthFailure,
   requestIp,
@@ -614,13 +616,13 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       (url === '/api/register' || url === '/api/login') &&
       rateLimited(req)
     ) {
-      return json(res, 429, { error: 'too many attempts — wait a minute and try again' });
+      return json(res, 429, RATE_LIMIT_IP);
     }
     // Reuse the rate-limit message so a blocked client gets no signal that the
     // block exists. Login is gated separately below, after the account is known,
     // so admins can bypass; registration has no account to check.
     if (req.method === 'POST' && url === '/api/register' && game.isIpBlocked(requestIp(req))) {
-      return json(res, 429, { error: 'too many attempts — wait a minute and try again' });
+      return json(res, 429, RATE_LIMIT_IP);
     }
     if (req.method === 'POST' && url === '/api/register') {
       const body = await readBody(req);
@@ -688,9 +690,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       // Per-account brute-force throttle (#93). The message is identical to a
       // bad-password response so it never reveals whether the account exists.
       if (username && authThrottled(username)) {
-        return json(res, 429, {
-          error: 'too many failed attempts — wait a few minutes and try again',
-        });
+        return json(res, 429, RATE_LIMIT_ACCOUNT);
       }
       const account = username ? await findAccount(username) : null;
       if (!account || !(await verifyPassword(String(body.password ?? ''), account.password_hash))) {
@@ -704,7 +704,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       // correct password vs 401 on a wrong one — a small credential-validity tell
       // we accept, since moving the check before the password would lock admins out.
       if (game.isIpBlocked(requestIp(req)) && !(await isAdminAccount(account.id))) {
-        return json(res, 429, { error: 'too many attempts — wait a minute and try again' });
+        return json(res, 429, RATE_LIMIT_IP);
       }
       // Second factor: if 2FA is enabled, the password alone is not enough. With
       // no code supplied we return a challenge (not a token) so the client shows

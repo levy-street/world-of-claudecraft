@@ -42,7 +42,7 @@ import {
   makeEmailToken,
 } from './email';
 import { json, readBody } from './http_util';
-import { clearAuthFailures, rateLimited, recordAuthFailure } from './ratelimit';
+import { clearAuthFailures, RATE_LIMIT_IP, rateLimited, recordAuthFailure } from './ratelimit';
 import {
   generateRecoveryCodes,
   generateSecret,
@@ -99,7 +99,7 @@ export async function handleAccountChangePassword(
   accountId: number,
   callerToken: string,
 ): Promise<void> {
-  if (rateLimited(req)) return json(res, 429, { error: 'too many attempts, slow down' });
+  if (rateLimited(req)) return json(res, 429, RATE_LIMIT_IP);
   const body = await readBody(req);
   const acct = await accountById(accountId);
   if (!acct) return json(res, 404, { error: 'account not found' });
@@ -157,7 +157,7 @@ export async function handleAccountDeactivate(
   accountId: number,
   hooks: AccountGameHooks,
 ): Promise<void> {
-  if (rateLimited(req)) return json(res, 429, { error: 'too many attempts, slow down' });
+  if (rateLimited(req)) return json(res, 429, RATE_LIMIT_IP);
   const body = await readBody(req);
   const acct = await accountById(accountId);
   if (!acct) return json(res, 404, { error: 'account not found' });
@@ -191,7 +191,7 @@ export async function handleAccountEmailChange(
   res: http.ServerResponse,
   accountId: number,
 ): Promise<void> {
-  if (rateLimited(req)) return json(res, 429, { error: 'too many attempts, slow down' });
+  if (rateLimited(req)) return json(res, 429, RATE_LIMIT_IP);
   const body = await readBody(req);
   const acct = await accountById(accountId);
   if (!acct) return json(res, 404, { error: 'account not found' });
@@ -236,7 +236,7 @@ export async function handleAccountExport(
   res: http.ServerResponse,
   accountId: number,
 ): Promise<void> {
-  if (rateLimited(req)) return json(res, 429, { error: 'too many attempts, slow down' });
+  if (rateLimited(req)) return json(res, 429, RATE_LIMIT_IP);
   const bundle = await exportAccountData(accountId);
   if (!bundle) return json(res, 404, { error: 'account not found' });
   const acct = await accountById(accountId);
@@ -256,7 +256,7 @@ export async function handleAccountMarketing(
   res: http.ServerResponse,
   accountId: number,
 ): Promise<void> {
-  if (rateLimited(req)) return json(res, 429, { error: 'too many attempts, slow down' });
+  if (rateLimited(req)) return json(res, 429, RATE_LIMIT_IP);
   const body = await readBody(req);
   const optIn = body.optIn === true;
   await setAccountMarketingOptIn(accountId, optIn);
@@ -280,7 +280,7 @@ export async function handleAccount2faSetup(
   res: http.ServerResponse,
   accountId: number,
 ): Promise<void> {
-  if (rateLimited(req)) return json(res, 429, { error: 'too many attempts, slow down' });
+  if (rateLimited(req)) return json(res, 429, RATE_LIMIT_IP);
   const body = await readBody(req);
   const acct = await accountById(accountId);
   if (!acct) return json(res, 404, { error: 'account not found' });
@@ -304,7 +304,7 @@ export async function handleAccount2faEnable(
   accountId: number,
   now: number = Date.now(),
 ): Promise<void> {
-  if (rateLimited(req)) return json(res, 429, { error: 'too many attempts, slow down' });
+  if (rateLimited(req)) return json(res, 429, RATE_LIMIT_IP);
   const body = await readBody(req);
   const state = await getTotpState(accountId);
   if (!state) return json(res, 404, { error: 'account not found' });
@@ -328,7 +328,7 @@ export async function handleAccount2faDisable(
   res: http.ServerResponse,
   accountId: number,
 ): Promise<void> {
-  if (rateLimited(req)) return json(res, 429, { error: 'too many attempts, slow down' });
+  if (rateLimited(req)) return json(res, 429, RATE_LIMIT_IP);
   const body = await readBody(req);
   const acct = await accountById(accountId);
   if (!acct) return json(res, 404, { error: 'account not found' });

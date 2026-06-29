@@ -60,6 +60,7 @@ import {
 import { createNativeAttestationProof } from './net/native_attestation';
 import {
   Api,
+  ApiError,
   type CharacterSummary,
   ClientWorld,
   isAuthError,
@@ -253,6 +254,14 @@ function saveHomepageMusicMuted(muted: boolean): void {
 }
 
 function userFacingApiError(err: unknown): string {
+  // Prefer the server's stable error CODE over fragile English-text matching, so
+  // the per-account lockout (rate_limited_account) and the per-IP limit
+  // (rate_limited_ip) always get distinct messages even if the wording drifts.
+  // Falls through to the text matchers below for older servers (no code).
+  if (err instanceof ApiError && err.code) {
+    if (err.code === 'rate_limited_account') return tServer('moderation.tooManyFailed');
+    if (err.code === 'rate_limited_ip') return t('errors.api.tooManyAttempts');
+  }
   const text = technicalErrorMessage(err);
   const suspended = text.match(/^This account is suspended until (.+)\.$/);
   if (suspended) return t('errors.api.accountSuspended', { date: suspended[1] });

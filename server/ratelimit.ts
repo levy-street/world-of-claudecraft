@@ -26,6 +26,37 @@ const STRICTEST_RATE_LIMIT = 10;
 
 const attempts = new Map<string, number[]>();
 
+// ---------------------------------------------------------------------------
+// Rate-limit error responses
+//
+// Every 429 a limiter produces carries a stable machine-readable `code` plus an
+// explanatory English message naming WHICH limiter fired and WHY. The client
+// (src/main.ts userFacingApiError) keys off `code` to render the matching
+// localized message, so a per-account lockout no longer shows the per-IP "wait a
+// minute" copy. The English text keeps its historical "too many attempts" /
+// "too many failed attempts" prefix so a client still matching on text (during a
+// deploy where the two sides differ) localizes correctly. Use these constants
+// instead of inlining a 429 body so the code + copy can never drift across the
+// many call sites.
+export const RATE_LIMIT_IP = {
+  // Per-IP sliding-window limiter (rateLimited): more than maxPerMinute requests
+  // from one client IP within WINDOW_MS (60s). Guards login/register and account
+  // ops against floods/spraying from a single source. Clears ~1 min after the
+  // last request from that IP.
+  code: 'rate_limited_ip',
+  error:
+    'too many attempts: too many requests from your network (IP) in a short time. Wait about a minute and try again.',
+} as const;
+export const RATE_LIMIT_ACCOUNT = {
+  // Per-account failed-login throttle (authThrottled): MAX_AUTH_FAILURES wrong
+  // passwords for one username within AUTH_FAIL_WINDOW_MS (15 min), regardless of
+  // source IP. Blunts distributed credential stuffing aimed at one account; a
+  // correct password clears it. Clears ~15 min after the last failed attempt.
+  code: 'rate_limited_account',
+  error:
+    'too many failed attempts: too many failed sign-ins for this account. Wait a few minutes, or reset your password.',
+} as const;
+
 function backstopTargetSize(): number {
   return Math.max(0, MAX_TRACKED_IPS - BACKSTOP_EVICT_BATCH);
 }
