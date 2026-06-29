@@ -69,6 +69,7 @@ import {
   type TalentAllocation,
   type TalentModifiers,
 } from './content/talents';
+import { applyCooldowns, type SavedCooldowns, serializeCooldowns } from './cooldown_persist';
 import type { DelveShopGate, DelveShopOffer } from './data';
 import {
   abilitiesKnownAt,
@@ -125,7 +126,6 @@ import {
   tickGroundAoEs,
 } from './entity_roster';
 import { canEquipItem } from './equipment_rules';
-import { applyCooldowns, type SavedCooldowns, serializeCooldowns } from './cooldown_persist';
 import { formatMoney } from './format_money';
 import * as interaction from './interaction';
 import * as items from './items';
@@ -140,10 +140,12 @@ import type { Ante, PickAction } from './lockpick';
 // Sim keeps thin same-named delegates that call these.
 import {
   activeLootRolls as activeLootRollsImpl,
+  assignMasterLoot as assignMasterLootImpl,
   type PendingLootRoll,
   partyLootCandidatesForMob as partyLootCandidatesForMobImpl,
   resolveLootRoll as resolveLootRollImpl,
   rollLoot as rollLootImpl,
+  setPartyLootMaster as setPartyLootMasterImpl,
   submitLootRoll as submitLootRollImpl,
 } from './loot/loot_roll';
 import { Market, type MarketListing, type MarketSave } from './market';
@@ -273,6 +275,7 @@ import {
   type LootRollPrompt,
   type LootStrategies,
   MAX_LEVEL,
+  type MasterLootThreshold,
   MELEE_RANGE,
   type MobFamily,
   type MoveInput,
@@ -3398,6 +3401,19 @@ export class Sim {
     resolveLootRollImpl(this.ctx, roll);
   }
 
+  assignMasterLoot(rollId: number, targetPids: number[], pid?: number): void {
+    assignMasterLootImpl(this.ctx, rollId, targetPids, pid);
+  }
+
+  setPartyLootMaster(
+    enabled: boolean,
+    looter: number,
+    threshold: MasterLootThreshold,
+    pid?: number,
+  ): void {
+    setPartyLootMasterImpl(this.ctx, enabled, looter, threshold, pid);
+  }
+
   // -------------------------------------------------------------------------
   // Mob AI
   // -------------------------------------------------------------------------
@@ -5137,6 +5153,7 @@ export class Sim {
     return {
       leader: party.leader,
       raid: party.raid,
+      master: { ...party.lootStrategies.master },
       members: party.members.flatMap((mPid) => {
         const meta = this.players.get(mPid);
         const e = this.entities.get(mPid);

@@ -602,6 +602,29 @@ export const hudChromeStrings = {
     exportDone: 'Your data was downloaded. We emailed you a confirmation.',
     exportFailed: 'Could not export your data. Try again in a moment.',
   },
+  // Master loot: the leader-only loot-method control in the party panel, the
+  // assignment prompt shown to the master looter, and the sim-emitted log lines
+  // re-localized through the hud matchers (localizeLootText/System/Error).
+  masterLoot: {
+    title: 'Master Loot',
+    enableLabel: 'Master loot',
+    enableAria: 'Enable master loot',
+    looterLabel: 'Master looter',
+    leaderOption: 'Party leader',
+    thresholdLabel: 'Threshold',
+    thresholdUncommon: 'Uncommon and up',
+    thresholdRare: 'Rare and up',
+    thresholdEpic: 'Epic and up',
+    assignPrompt: 'Assign {item}',
+    assignAria: 'Assign {item} to {name}',
+    rollButton: 'Roll',
+    selectAll: 'Select all',
+    methodMaster: 'Loot method set to master loot. Master looter: {name}.',
+    methodGroup: 'Loot method set to group loot.',
+    assigned: '{looter} assigned {item} to {target}.',
+    unassigned: '{item} was not assigned and is free for all.',
+    leaderOnly: 'Only the party leader can change the loot method.',
+  },
   // Modular bag filtering controls: the category chips, sort dropdown, and live
   // search above the bag grid, plus the "no items match" empty state.
   bags: {

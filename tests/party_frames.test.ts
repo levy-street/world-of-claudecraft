@@ -24,6 +24,7 @@ describe('party frame member selection', () => {
     const info: PartyInfo = {
       leader: 1,
       raid: true,
+      master: { enabled: false, looter: 0, threshold: 'uncommon' },
       members: [
         member(1, 1),
         member(2, 1),
@@ -48,6 +49,7 @@ describe('party frame member selection', () => {
     const info: PartyInfo = {
       leader: 1,
       raid: true,
+      master: { enabled: false, looter: 0, threshold: 'uncommon' },
       members: [member(1, 1), member(6, 2), member(2, 1), member(7, 2), member(3, 1), member(4, 1)],
     };
 
@@ -60,6 +62,7 @@ describe('party frame member selection', () => {
     const info: PartyInfo = {
       leader: 1,
       raid: true,
+      master: { enabled: false, looter: 0, threshold: 'uncommon' },
       members: [member(1, 1), member(2, 2, 150, 0)],
     };
 
@@ -74,6 +77,7 @@ describe('party frame signature (the per-frame short-circuit)', () => {
   const info = (over: Partial<PartyInfo> = {}): PartyInfo => ({
     leader: 1,
     raid: false,
+    master: { enabled: false, looter: 0, threshold: 'uncommon' },
     members: [member(1, 1), member(2, 1, 10, 0), member(3, 1, 20, 0)],
     ...over,
   });
@@ -158,11 +162,13 @@ describe('ClientWorld-vs-Sim out-of-range parity', () => {
       const sim: PartyInfo = {
         leader: 1,
         raid: false,
+        master: { enabled: false, looter: 0, threshold: 'uncommon' },
         members: [member(1, 1), member(2, 1, dist, 0)],
       };
       const mirror: PartyInfo = {
         leader: 1,
         raid: false,
+        master: { enabled: false, looter: 0, threshold: 'uncommon' },
         members: [member(1, 1), member(2, 1, round2(dist), 0)],
       };
       expect(selectPartyFrameMembers(mirror, 1, playerPos)[0].oor).toBe(
@@ -187,11 +193,13 @@ describe('ClientWorld-vs-Sim out-of-range parity', () => {
     const sim: PartyInfo = {
       leader: 1,
       raid: false,
+      master: { enabled: false, looter: 0, threshold: 'uncommon' },
       members: [member(1, 1), member(2, 1, dist, 0)],
     };
     const mirror: PartyInfo = {
       leader: 1,
       raid: false,
+      master: { enabled: false, looter: 0, threshold: 'uncommon' },
       members: [member(1, 1), member(2, 1, round2(dist), 0)],
     };
     expect(selectPartyFrameMembers(sim, 1, playerPos)[0].oor).toBe(true);

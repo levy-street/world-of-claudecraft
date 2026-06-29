@@ -66,6 +66,7 @@ import type {
   EquipSlot,
   InvSlot,
   LootRollChoice,
+  MasterLootThreshold,
   PetMode,
   PlayerClass,
   ResourceType,
@@ -93,6 +94,7 @@ import {
   isOverheadEmoteId,
   OVERHEAD_EMOTES,
   type OverheadEmoteId,
+  type PartyInfo,
 } from '../world_api';
 import { ActionBarPainter } from './action_bar_painter';
 import {
@@ -816,6 +818,12 @@ export class Hud {
   // later absence from the mirror means the server resolved them (retire), not
   // that the mirror simply has not caught up to a just-shown event yet.
   private confirmedLootRolls = new Set<number>();
+  // Master-loot assignment prompts, shown only to the master looter alongside
+  // the loot-roll rail. Same lifetime/expiry as a need/greed roll.
+  private activeMasterRolls = new Map<
+    number,
+    { event: Extract<SimEvent, { type: 'masterLoot' }>; receivedAt: number; durationMs: number }
+  >();
   private openVendorNpcId: number | null = null;
   private openDelveBoardNpcId: number | null = null;
   private lastDelveTrackerSig = '';
@@ -850,6 +858,9 @@ export class Hud {
   private tradeWasOpen = false;
   private lastTradeSig = '';
   private lastPartySig = '';
+  // Separate, LOW-frequency signature for the leader-only master-loot footer control
+  // (loot settings + membership, no hp/res), so it is not churned every combat tick.
+  private lastPartyFooterSig = '';
   private lastArenaStatusSig = '';
   private arenaMatchSeen = false; // closes the queue panel once a bout starts
   // 2v2 Fiesta UI state (all transient)
@@ -5948,7 +5959,12 @@ export class Hud {
           break;
         case 'loot': {
           this.log(this.localizeLootText(ev.text), '#7fdc4f');
-          if (/ wins .+ \(\d+\)$/.test(ev.text) || /^Everyone passed on .+\.$/.test(ev.text))
+          if (
+            / wins .+ \(\d+\)$/.test(ev.text) ||
+            /^Everyone passed on .+\.$/.test(ev.text) ||
+            / assigned .+ to .+\.$/.test(ev.text) ||
+            /^.+ was not assigned and is free for all\.$/.test(ev.text)
+          )
             this.closeLootRollsForItem(ev.text);
           if (
             ev.text.includes('loot') ||
@@ -5962,6 +5978,10 @@ export class Hud {
         }
         case 'lootRoll': {
           this.showLootRoll(ev);
+          break;
+        }
+        case 'masterLoot': {
+          this.showMasterLoot(ev);
           break;
         }
         case 'vendor': {
@@ -6693,6 +6713,7 @@ export class Hud {
       'No one has whispered you recently.': 'hud.errors.noRecentWhisper',
       'You mutter to yourself. Nobody hears it.': 'hud.errors.whisperSelf',
       'You are not in a party.': 'hud.errors.notInParty',
+      'Only the party leader can change the loot method.': 'hudChrome.masterLoot.leaderOnly',
       'Only the party leader may invite.': 'hud.errors.partyLeaderInvite',
       'Your party is full.': 'hud.errors.partyFull',
       'That party is full.': 'hud.errors.partyFull',
@@ -6821,6 +6842,7 @@ export class Hud {
       'Trade window opened.': 'hud.logs.tradeOpened',
       'Trade complete.': 'hud.logs.tradeComplete',
       'Trade cancelled.': 'hud.logs.tradeCancelled',
+      'Loot method set to group loot.': 'hudChrome.masterLoot.methodGroup',
     };
     const key = exact[text];
     if (key) return t(key);
@@ -6833,7 +6855,9 @@ export class Hud {
       if (text === delve.leaveText) return delveText(delve.id, 'leaveText');
     }
 
-    let match = /^You have invited (.+) to your party\.$/.exec(text);
+    let match = /^Loot method set to master loot\. Master looter: (.+)\.$/.exec(text);
+    if (match) return t('hudChrome.masterLoot.methodMaster', { name: match[1] });
+    match = /^You have invited (.+) to your party\.$/.exec(text);
     if (match) return t('hud.logs.partyInviteSent', { name: match[1] });
     match = /^(.+) joins the party\.$/.exec(text);
     if (match) return t('hud.logs.partyJoin', { name: match[1] });
@@ -6920,6 +6944,16 @@ export class Hud {
         money: this.localizeSimMoney(match[2]),
       });
     }
+    match = /^(.+) assigned (.+) to (.+)\.$/.exec(text);
+    if (match)
+      return t('hudChrome.masterLoot.assigned', {
+        looter: match[1],
+        item: itemDisplayNameFromSource(match[2]),
+        target: match[3],
+      });
+    match = /^(.+) was not assigned and is free for all\.$/.exec(text);
+    if (match)
+      return t('hudChrome.masterLoot.unassigned', { item: itemDisplayNameFromSource(match[1]) });
     match = /^Sold (.+) for (.+)\.$/.exec(text);
     if (match)
       return t('hud.logs.soldItem', {
@@ -7682,6 +7716,9 @@ export class Hud {
   }
 
   private showLootRoll(ev: Extract<SimEvent, { type: 'lootRoll' }>): void {
+    // A master-loot prompt that converts to a need/greed roll reuses the same rollId;
+    // drop the superseded master panel so the looter sees only the need/greed panel.
+    this.activeMasterRolls.delete(ev.rollId);
     this.activeLootRolls.set(ev.rollId, {
       event: ev,
       receivedAt: performance.now(),
@@ -7743,8 +7780,23 @@ export class Hud {
     if (changed) this.renderLootRolls();
   }
 
+  private showMasterLoot(ev: Extract<SimEvent, { type: 'masterLoot' }>): void {
+    this.activeMasterRolls.set(ev.rollId, {
+      event: ev,
+      receivedAt: performance.now(),
+      durationMs: 30_000,
+    });
+    this.renderLootRolls();
+  }
+
+  private assignMasterLoot(rollId: number, targetPids: number[]): void {
+    this.sim.assignMasterLoot(rollId, targetPids);
+    this.activeMasterRolls.delete(rollId);
+    this.renderLootRolls();
+  }
+
   private updateLootRollTimers(now: number): void {
-    if (this.activeLootRolls.size === 0) return;
+    if (this.activeLootRolls.size === 0 && this.activeMasterRolls.size === 0) return;
     let changed = false;
     for (const [rollId, roll] of this.activeLootRolls) {
       if (now - roll.receivedAt >= roll.durationMs) {
@@ -7753,12 +7805,20 @@ export class Hud {
         changed = true;
       }
     }
+    for (const [rollId, roll] of this.activeMasterRolls) {
+      if (now - roll.receivedAt >= roll.durationMs) {
+        this.activeMasterRolls.delete(rollId);
+        changed = true;
+      }
+    }
     if (changed) this.renderLootRolls();
     const root = document.getElementById('loot-rolls');
     if (!root) return;
     for (const row of root.querySelectorAll<HTMLElement>('.loot-roll')) {
       const rollId = Number(row.dataset.rollId);
-      const roll = this.activeLootRolls.get(rollId);
+      const roll = row.dataset.master
+        ? this.activeMasterRolls.get(rollId)
+        : this.activeLootRolls.get(rollId);
       if (!roll) continue;
       const remaining = Math.max(0, 1 - (now - roll.receivedAt) / roll.durationMs);
       row.style.setProperty('--loot-roll-frac', remaining.toFixed(3));
@@ -7766,23 +7826,32 @@ export class Hud {
   }
 
   private closeLootRollsForItem(text: string): void {
-    const match = /^.+ wins (.+) \(\d+\)$/.exec(text) ?? /^Everyone passed on (.+)\.$/.exec(text);
+    const match =
+      /^.+ wins (.+) \(\d+\)$/.exec(text) ??
+      /^Everyone passed on (.+)\.$/.exec(text) ??
+      /^.+ assigned (.+) to .+\.$/.exec(text) ??
+      /^(.+) was not assigned and is free for all\.$/.exec(text);
     if (!match) return;
     for (const [rollId, roll] of this.activeLootRolls) {
       if (roll.event.itemName === match[1]) this.activeLootRolls.delete(rollId);
+    }
+    for (const [rollId, roll] of this.activeMasterRolls) {
+      if (roll.event.itemName === match[1]) this.activeMasterRolls.delete(rollId);
     }
     this.renderLootRolls();
   }
 
   private renderLootRolls(): void {
     const root = this.lootRollRoot();
-    if (this.activeLootRolls.size === 0) {
+    if (this.activeLootRolls.size === 0 && this.activeMasterRolls.size === 0) {
       root.style.display = 'none';
       root.innerHTML = '';
       return;
     }
     root.style.display = 'flex';
     root.innerHTML = '';
+    for (const [rollId, roll] of this.activeMasterRolls)
+      this.renderMasterLootRow(root, rollId, roll.event);
     for (const [rollId, roll] of this.activeLootRolls) {
       const ev = roll.event;
       const item = ITEMS[ev.itemId];
@@ -7817,6 +7886,66 @@ export class Hud {
       });
       root.appendChild(row);
     }
+  }
+
+  private renderMasterLootRow(
+    root: HTMLElement,
+    rollId: number,
+    ev: Extract<SimEvent, { type: 'masterLoot' }>,
+  ): void {
+    const item = ITEMS[ev.itemId];
+    const itemName = item ? itemDisplayName(item) : ev.itemName;
+    const quality = item?.quality ?? ev.quality ?? 'common';
+    const row = document.createElement('div');
+    row.className = 'loot-roll panel master';
+    row.dataset.rollId = String(rollId);
+    row.dataset.master = '1';
+    row.style.setProperty('--loot-roll-frac', '1');
+    const picks = ev.candidates
+      .map(
+        (c) =>
+          `<label><input type="checkbox" class="ml-pick" value="${c.pid}"><span>${esc(c.name)}</span></label>`,
+      )
+      .join('');
+    row.innerHTML = `
+      <div class="loot-roll-item">
+        ${item ? this.itemIcon(item) : `<img class="item-icon q-${quality}" src="${iconDataUrl('item', ev.itemId)}" alt="" draggable="false">`}
+        <div class="loot-roll-copy">
+          <div class="loot-roll-title">${esc(t('hudChrome.masterLoot.assignPrompt', { item: itemName }))}</div>
+          <div class="loot-roll-name" style="color:${QUALITY_COLOR[quality] ?? '#fff'}">${esc(itemName)}</div>
+        </div>
+      </div>
+      <div class="loot-roll-timer" aria-hidden="true"><span></span></div>
+      <div class="master-loot-picks">
+        <label class="ml-all-row"><input type="checkbox" class="ml-all"><span>${esc(t('hudChrome.masterLoot.selectAll'))}</span></label>
+        ${picks}
+      </div>
+      <div class="loot-roll-actions"><button type="button" class="loot-roll-btn assign ml-roll" disabled>${esc(t('hudChrome.masterLoot.rollButton'))}</button></div>`;
+    if (item)
+      this.attachTooltip(row.querySelector('.loot-roll-item') as HTMLElement, () =>
+        this.itemTooltip(item),
+      );
+    // Curate-then-roll: the looter checks a subset and presses Roll. One checked
+    // member is granted directly server-side; two or more open a need/greed roll for
+    // just that subset. The select-all header mirrors / drives the per-member boxes.
+    const all = row.querySelector<HTMLInputElement>('.ml-all')!;
+    const pickEls = [...row.querySelectorAll<HTMLInputElement>('.ml-pick')];
+    const rollBtn = row.querySelector<HTMLButtonElement>('.ml-roll')!;
+    const syncRoll = (): void => {
+      const checked = pickEls.filter((p) => p.checked).length;
+      rollBtn.disabled = checked === 0;
+      all.checked = pickEls.length > 0 && checked === pickEls.length;
+    };
+    all.addEventListener('change', () => {
+      for (const p of pickEls) p.checked = all.checked;
+      syncRoll();
+    });
+    for (const p of pickEls) p.addEventListener('change', syncRoll);
+    rollBtn.addEventListener('click', () => {
+      const pids = pickEls.filter((p) => p.checked).map((p) => Number(p.value));
+      if (pids.length > 0) this.assignMasterLoot(rollId, pids);
+    });
+    root.appendChild(row);
   }
 
   openLoot(mobId: number, screenX: number, screenY: number): void {
@@ -9468,7 +9597,21 @@ export class Hud {
         this.partyFramesPainter.clear();
         this.lastPartySig = '';
       }
+      this.lastPartyFooterSig = '';
       return;
+    }
+    // Leader-only master-loot control. Its signature is deliberately LOW frequency
+    // (loot settings + membership + leadership, NO hp/res), so the checkbox and
+    // dropdowns are not destroyed and rebuilt under the cursor on every combat tick
+    // (the desync/churn the master-loot control is prone to). The painter keeps the
+    // built node positioned just before the leave button across member rebuilds.
+    const isLeader = info.leader === this.sim.playerId;
+    const footerSig = isLeader
+      ? `lead:M${info.master.enabled ? 1 : 0}/${info.master.looter}/${info.master.threshold}:${info.members.map((m) => `${m.pid}:${m.name}`).join(',')}`
+      : 'member';
+    if (footerSig !== this.lastPartyFooterSig) {
+      this.lastPartyFooterSig = footerSig;
+      this.partyFramesPainter.setMasterControl(isLeader ? this.buildMasterLootControl(info) : null);
     }
     // Hoist the cheap signature (a single string pass, no intermediate arrays) AHEAD
     // of the selector so an unchanged party short-circuits before selectPartyFrameMembers
@@ -9478,6 +9621,76 @@ export class Hud {
     this.lastPartySig = sig;
     const others = selectPartyFrameMembers(info, this.sim.playerId, this.sim.player.pos);
     this.partyFramesPainter.sync(others, info.leader, info.raid);
+  }
+
+  // Leader-only loot-method control: enable master loot, choose the master looter
+  // (the leader by default), and the quality threshold for assigned drops. Returns
+  // the built node; the party-frames painter owns its placement + lifetime.
+  private buildMasterLootControl(info: PartyInfo): HTMLElement {
+    const m = info.master;
+    const box = document.createElement('div');
+    box.className = 'party-loot panel';
+    // A label-wrapped checkbox toggles on a primary click, but the browser also
+    // toggles it on right/middle-click here, which spuriously flips the setting.
+    // Suppress non-primary activation (and the context menu) on the whole panel.
+    box.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) e.preventDefault();
+    });
+    box.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+    const memberOptions = info.members
+      .map(
+        (mem) =>
+          `<option value="${mem.pid}" ${m.looter === mem.pid ? 'selected' : ''}>${esc(mem.name)}</option>`,
+      )
+      .join('');
+    const thr = (v: string, label: string) =>
+      `<option value="${v}" ${m.threshold === v ? 'selected' : ''}>${esc(label)}</option>`;
+    box.innerHTML = `
+      <label class="party-loot-row toggle">
+        <input type="checkbox" id="ml-enable" ${m.enabled ? 'checked' : ''} aria-label="${esc(t('hudChrome.masterLoot.enableAria'))}">
+        <span>${esc(t('hudChrome.masterLoot.enableLabel'))}</span>
+      </label>
+      <label class="party-loot-row">
+        <span>${esc(t('hudChrome.masterLoot.looterLabel'))}</span>
+        <select id="ml-looter" ${m.enabled ? '' : 'disabled'}>
+          <option value="0" ${m.looter === 0 ? 'selected' : ''}>${esc(t('hudChrome.masterLoot.leaderOption'))}</option>
+          ${memberOptions}
+        </select>
+      </label>
+      <label class="party-loot-row">
+        <span>${esc(t('hudChrome.masterLoot.thresholdLabel'))}</span>
+        <select id="ml-threshold" ${m.enabled ? '' : 'disabled'}>
+          ${thr('uncommon', t('hudChrome.masterLoot.thresholdUncommon'))}
+          ${thr('rare', t('hudChrome.masterLoot.thresholdRare'))}
+          ${thr('epic', t('hudChrome.masterLoot.thresholdEpic'))}
+        </select>
+      </label>`;
+    const enable = box.querySelector<HTMLInputElement>('#ml-enable')!;
+    const looter = box.querySelector<HTMLSelectElement>('#ml-looter')!;
+    const threshold = box.querySelector<HTMLSelectElement>('#ml-threshold')!;
+    const applyMaster = (enabled: boolean) =>
+      this.sim.setPartyLootMaster(
+        enabled,
+        Number(looter.value),
+        threshold.value as MasterLootThreshold,
+      );
+    // Controlled checkbox: suppress the browser's optimistic toggle and derive the
+    // next value from authoritative party state. The DOM checkbox is only updated by
+    // a server-confirmed rebuild, so it can never desync from the server (a checked
+    // box left over disabled dropdowns) or send a value read from a half-toggled DOM
+    // input.
+    enable.addEventListener('click', (e) => {
+      e.preventDefault();
+      applyMaster(!m.enabled);
+    });
+    // The selects are only enabled while master loot is on, so m.enabled is true
+    // here; keep it and update the looter / threshold.
+    looter.addEventListener('change', () => applyMaster(m.enabled));
+    threshold.addEventListener('change', () => applyMaster(m.enabled));
+    return box;
   }
 
   // -------------------------------------------------------------------------

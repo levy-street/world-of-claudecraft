@@ -584,6 +584,26 @@ export const ru_RU: EnTranslations = {
       "exportDone": "Ваши данные были скачаны. Мы отправили вам подтверждение по email.",
       "exportFailed": "Не удалось экспортировать ваши данные. Попробуйте снова через мгновение."
     },
+    "masterLoot": {
+      "title": "Распределение добычи",
+      "enableLabel": "Мастер добычи",
+      "enableAria": "Включить мастера добычи",
+      "looterLabel": "Мастер добычи",
+      "leaderOption": "Лидер группы",
+      "thresholdLabel": "Порог качества",
+      "thresholdUncommon": "Необычное и выше",
+      "thresholdRare": "Редкое и выше",
+      "thresholdEpic": "Эпическое и выше",
+      "assignPrompt": "Назначить {item}",
+      "assignAria": "Назначить {item} игроку {name}",
+      "rollButton": "Бросок",
+      "selectAll": "Выбрать всех",
+      "methodMaster": "Способ добычи изменён на мастера добычи. Мастер добычи: {name}.",
+      "methodGroup": "Способ добычи изменён на групповой.",
+      "assigned": "{looter} передал предмет {item} игроку {target}.",
+      "unassigned": "Предмет {item} не был назначен и доступен всем.",
+      "leaderOnly": "Только лидер группы может менять способ добычи."
+    },
     "bags": {
       "filterGroupAria": "Фильтровать сумки по категории",
       "filterAll": "Все",

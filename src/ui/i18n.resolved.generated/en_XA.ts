@@ -584,6 +584,26 @@ export const en_XA: EnTranslations = {
       "exportDone": "[Ýóúŕ ðáţá ŵáš ðóŵñļóáðéð. Ŵé éɱáíļéð ýóú á çóñƒíŕɱáţíóñ.]",
       "exportFailed": "[Çóúļð ñóţ éẋþóŕţ ýóúŕ ðáţá. Ţŕý áĝáíñ íñ á ɱóɱéñţ.]"
     },
+    "masterLoot": {
+      "title": "[Ɱášţéŕ Ļóóţ]",
+      "enableLabel": "[Ɱášţéŕ ļóóţ]",
+      "enableAria": "[Éñáƀļé ɱášţéŕ ļóóţ]",
+      "looterLabel": "[Ɱášţéŕ ļóóţéŕ]",
+      "leaderOption": "[Þáŕţý ļéáðéŕ]",
+      "thresholdLabel": "[Ţĥŕéšĥóļð]",
+      "thresholdUncommon": "[Úñçóɱɱóñ áñð úþ]",
+      "thresholdRare": "[Ŕáŕé áñð úþ]",
+      "thresholdEpic": "[Éþíç áñð úþ]",
+      "assignPrompt": "[Áššíĝñ {item}]",
+      "assignAria": "[Áššíĝñ {item} ţó {name}]",
+      "rollButton": "[Ŕóļļ]",
+      "selectAll": "[Šéļéçţ áļļ]",
+      "methodMaster": "[Ļóóţ ɱéţĥóð šéţ ţó ɱášţéŕ ļóóţ. Ɱášţéŕ ļóóţéŕ: {name}.]",
+      "methodGroup": "[Ļóóţ ɱéţĥóð šéţ ţó ĝŕóúþ ļóóţ.]",
+      "assigned": "[{looter} áššíĝñéð {item} ţó {target}.]",
+      "unassigned": "[{item} ŵáš ñóţ áššíĝñéð áñð íš ƒŕéé ƒóŕ áļļ.]",
+      "leaderOnly": "[Óñļý ţĥé þáŕţý ļéáðéŕ çáñ çĥáñĝé ţĥé ļóóţ ɱéţĥóð.]"
+    },
     "bags": {
       "filterGroupAria": "[Ƒíļţéŕ ƀáĝš ƀý çáţéĝóŕý]",
       "filterAll": "[Áļļ]",

@@ -584,6 +584,26 @@ export const ja_JP: EnTranslations = {
       "exportDone": "データをダウンロードしました。確認のメールをお送りしました。",
       "exportFailed": "データをエクスポートできませんでした。しばらくしてからやり直してください。"
     },
+    "masterLoot": {
+      "title": "マスタールート",
+      "enableLabel": "マスタールート",
+      "enableAria": "マスタールートを有効化",
+      "looterLabel": "分配担当",
+      "leaderOption": "パーティリーダー",
+      "thresholdLabel": "品質しきい値",
+      "thresholdUncommon": "アンコモン以上",
+      "thresholdRare": "レア以上",
+      "thresholdEpic": "エピック以上",
+      "assignPrompt": "{item}を分配",
+      "assignAria": "{item}を{name}に分配",
+      "rollButton": "ロール",
+      "selectAll": "全員選択",
+      "methodMaster": "分配方式をマスタールートに設定しました。分配担当：{name}。",
+      "methodGroup": "分配方式をグループルートに設定しました。",
+      "assigned": "{looter}が{item}を{target}に分配しました。",
+      "unassigned": "{item}は分配されず、誰でも入手できます。",
+      "leaderOnly": "分配方式を変更できるのはパーティリーダーだけです。"
+    },
     "bags": {
       "filterGroupAria": "バッグをカテゴリーで絞り込む",
       "filterAll": "すべて",
