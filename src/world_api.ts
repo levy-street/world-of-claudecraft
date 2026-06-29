@@ -227,6 +227,9 @@ export const COMMAND_NAMES = [
   'arena_queue',
   'arena_leave',
   'arena_augment',
+  'wager_queue',
+  'wager_staked',
+  'wager_cancel',
   'prestige',
   'applyTalents',
   'respec',
@@ -267,7 +270,10 @@ export type CommandName = (typeof COMMAND_NAMES)[number];
 // `enter_crypt`/`leave_crypt` are legacy aliases that fall through to the
 // dungeon cases; `social_refresh` is a server-push refresh path; `targetNearest`
 // is called directly on the Sim by the headless RL action layer, never over the
-// wire. Each must be a member of COMMAND_NAMES (the `satisfies` enforces it).
+// wire. The `wager_*` commands (#478 wagered arena) are dispatched server-side
+// but ClientWorld never sends them: the real client drives the wallet/stake flow
+// directly, so they ride the server dispatch path without a ClientWorld sender.
+// Each must be a member of COMMAND_NAMES (the `satisfies` enforces it).
 export const DISPATCH_ONLY_COMMANDS = [
   'dev_level',
   'dev_teleport',
@@ -276,6 +282,9 @@ export const DISPATCH_ONLY_COMMANDS = [
   'leave_crypt',
   'social_refresh',
   'targetNearest',
+  'wager_queue',
+  'wager_staked',
+  'wager_cancel',
 ] as const satisfies readonly CommandName[];
 
 export type DispatchOnlyCommand = (typeof DISPATCH_ONLY_COMMANDS)[number];

@@ -24,8 +24,8 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 
 // Verified counts on the current tree (re-derived below; do not hard-code 85/6).
 const EXPECTED_SEND_COUNT = 102;
-const EXPECTED_DISPATCH_COUNT = 109;
-const EXPECTED_DISPATCH_ONLY_COUNT = 7;
+const EXPECTED_DISPATCH_COUNT = 112;
+const EXPECTED_DISPATCH_ONLY_COUNT = 10;
 
 // The chat sub-channel routing switch (server/game.ts `switch
 // (session.rememberedChat.channel)`) is NOT a msg.cmd dispatch; its labels must
