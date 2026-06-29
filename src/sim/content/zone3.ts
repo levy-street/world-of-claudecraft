@@ -1577,13 +1577,19 @@ export const ZONE3_CAMPS: CampDef[] = [
   { mobId: 'stormcrag_elemental', center: { x: 110, z: 760 }, radius: 20, count: 8 },
   { mobId: 'stormcrag_elemental', center: { x: 135, z: 795 }, radius: 16, count: 6 },
   { mobId: 'shardlord_kazzix', center: { x: 145, z: 815 }, radius: 8, count: 1 },
-  // Wyrmcult: tents below the Sanctum
+  // Wyrmcult: tents below the Sanctum. The (25, 845) pack's radius clipped the
+  // x=0 approach road, so it is nudged east to keep the central path clear; the
+  // tents still flank the gate.
   { mobId: 'wyrmcult_zealot', center: { x: 55, z: 820 }, radius: 20, count: 8 },
-  { mobId: 'wyrmcult_zealot', center: { x: 25, z: 845 }, radius: 16, count: 6 },
+  { mobId: 'wyrmcult_zealot', center: { x: 34, z: 845 }, radius: 16, count: 6 },
   { mobId: 'wyrmcult_necromancer', center: { x: 40, z: 855 }, radius: 14, count: 5 },
-  // Revenants: the old battlefield and the Sanctum gate plaza
+  // Revenants: the old battlefield (Revenant Fields). The second pack used to sit
+  // at (-15, 860), right where the x=0 Sanctum Approach road ends and only ~20yd
+  // from the gate, so (aggroRadius 11) it jumped players entering/exiting the
+  // Sanctum. Pulled it back into the fields, off the central road and away from
+  // the gate, so the approach stays a clear walk.
   { mobId: 'boneclad_revenant', center: { x: -40, z: 830 }, radius: 20, count: 8 },
-  { mobId: 'boneclad_revenant', center: { x: -15, z: 860 }, radius: 16, count: 6 },
+  { mobId: 'boneclad_revenant', center: { x: -40, z: 838 }, radius: 16, count: 6 },
   { mobId: 'marrowlord_varkas', center: { x: -34, z: 842 }, radius: 5, count: 1 },
   // Voskar the Emberwing: perched on a scorched crag east of the Sanctum tents,
   // with two zealot drakebinders posted to keep their captive on its chain.
