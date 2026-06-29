@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+# World of ClaudeCraft pre-push QA floor.
+#
+# Push is the boundary where code leaves your machine, and it happens far less often than a
+# turn or a commit, so this is where the heavier deterministic checks belong: they catch real
+# breakage before it reaches a PR without taxing the edit loop. This runs only fast, high-signal
+# gates, not the full build (that stays in CI):
+#   - tsc --noEmit               (type safety)
+#   - the determinism / purity and i18n-matcher guard tests
+#   - biome on the files this branch changed (scoped, so it does not trip on deferred repo debt)
+#   - a copy-rule scan of the push diff (no em dashes, en dashes, or emojis)
+# It blocks the push on any failure. To bypass in a genuine emergency: `git push --no-verify`.
+# The richer review (coverage, parity, security) is the /qa command and the qa-checklist agent.
+set -uo pipefail
+
+root=$(git rev-parse --show-toplevel 2>/dev/null || echo .)
+cd "$root" || exit 0
+
+fails=()
+
+echo "pre-push QA floor: typecheck, guard tests, lint, copy rules..."
+
+# The checks below need an installed toolchain. If it is missing (a fresh clone), say so clearly
+# and skip them rather than reporting a misleading failure; the copy scan still runs (no tools).
+tools_ok=1
+if [ ! -x node_modules/.bin/tsc ] || [ ! -x node_modules/.bin/vitest ] || [ ! -x node_modules/.bin/biome ]; then
+  echo "  note: dependencies not installed (run 'npm install'); skipping typecheck, tests, and lint"
+  tools_ok=0
+fi
+
+if [ "$tools_ok" = 1 ]; then
+  # 1) Type check.
+  if ! npx --no-install tsc --noEmit; then
+    fails+=("tsc --noEmit failed (type errors)")
+  fi
+
+  # 2) Determinism / purity and i18n-matcher guards (fast, targeted).
+  if ! npx --no-install vitest run tests/architecture.test.ts tests/localization_fixes.test.ts; then
+    fails+=("guard tests failed (tests/architecture.test.ts or tests/localization_fixes.test.ts)")
+  fi
+
+  # 3) Lint, scoped to this branch's changed files (avoids the deferred repo-wide biome debt).
+  if ! npm run --silent ci:changed; then
+    fails+=("biome ci --changed failed on the files this branch changed")
+  fi
+fi
+
+# 4) Copy rules over the push diff: no em dash, en dash, or emoji (locale overlays excluded).
+base=$(git merge-base HEAD '@{upstream}' 2>/dev/null \
+  || git merge-base HEAD origin/main 2>/dev/null \
+  || git rev-parse HEAD~1 2>/dev/null || true)
+if [ -n "$base" ] && command -v perl >/dev/null 2>&1; then
+  copy=$(git diff -U0 --no-color "$base"...HEAD -- \
+    . \
+    ':(exclude)src/ui/i18n.locales' \
+    ':(exclude)src/ui/i18n.resolved.generated' \
+    ':(exclude)src/admin/i18n.resolved.generated' \
+    ':(exclude)*.lock' ':(exclude)package-lock.json' 2>/dev/null \
+    | perl -CSD -ne '
+        if (m{^\+\+\+\s+b/(.+)$}) { our $f = $1; $f =~ s/\s+$//; next; }
+        next unless /^\+/ && !/^\+\+\+/;
+        my $c = substr($_, 1);
+        if ($c =~ /[\x{2013}\x{2014}\x{2015}\x{1F000}-\x{1FAFF}\x{1F1E6}-\x{1F1FF}\x{2600}-\x{27BF}\x{FE0F}]/) {
+          our $f; my $s = $c; $s =~ s/^\s+//; chomp $s;
+          print "  $f: $s\n";
+        }')
+  if [ -n "$copy" ]; then
+    fails+=("em/en dash or emoji introduced in the push diff:"$'\n'"$copy")
+  fi
+fi
+
+if [ ${#fails[@]} -gt 0 ]; then
+  echo ""
+  echo "pre-push QA floor BLOCKED this push:"
+  for f in "${fails[@]}"; do
+    echo "  - $f"
+  done
+  echo ""
+  echo "Fix the above (or run /qa for a full review). To bypass in an emergency: git push --no-verify"
+  exit 1
+fi
+
+echo "pre-push QA floor: green."
+exit 0

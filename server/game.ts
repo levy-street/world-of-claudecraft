@@ -2,7 +2,9 @@ import type { WebSocket } from 'ws';
 import { createBotDetector } from '#bot-detector';
 import { verifyChallenge } from '../src/sim/client_challenge';
 import { MECH_CHROMAS, mechChromaItemId, mechChromaSkinIndex } from '../src/sim/content/skins';
+import type { TalentAllocation } from '../src/sim/content/talents';
 import { DELVES, DUNGEONS, zoneAt } from '../src/sim/data';
+import type { PickAction } from '../src/sim/lockpick';
 import { parseMoveInputFrame } from '../src/sim/move_input';
 import type { PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
@@ -17,10 +19,15 @@ import {
   RUN_SPEED,
   type SimEvent,
 } from '../src/sim/types';
-import { isOverheadEmoteId } from '../src/world_api';
+import { type CommandName, isOverheadEmoteId } from '../src/world_api';
 import { recordOnlineSample } from './admin_db';
 import { offensiveName } from './auth';
-import type { BotDetector, BotTrackingContext } from './bot_detector/contract';
+import type {
+  BotDetector,
+  BotTrackingContext,
+  SessionRuntimeSnapshot,
+  SuspiciousPlayer,
+} from './bot_detector/contract';
 import { ChatFilter } from './chat_filter';
 import { applyChatStrike, loadChatFilterState, recordChatViolation } from './chat_filter_db';
 import { ChatLogger } from './chat_log';
@@ -34,17 +41,21 @@ import {
   openPlaySession,
   pool,
   revokeAccountMechChroma,
+  saveCharacterAndMarketState,
   saveCharacterState,
   saveMarketState,
   walletForAccount,
 } from './db';
 import { IpBlockList } from './ip_block';
 import { loadActiveBlockedIps } from './ip_block_db';
+import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
 import { REALM } from './realm';
+import { createSerialWriter } from './serial_writer';
 import { simRatesFromEnv } from './sim_rate_config';
 import type { Presence, PresenceStatus, SocialActor, SocialTransport } from './social';
 import { SocialService } from './social';
 import { PgSocialDb } from './social_db';
+import { TickProfiler } from './tick_profiler';
 import { holderInfoForPubkey } from './woc_balance';
 
 const WORLD_SEED = 20061;
@@ -75,7 +86,7 @@ const AUTOSAVE_SECONDS = 30;
 const SAVE_CONCURRENCY = 4;
 // Valid lockpicking action enums accepted from the client (anti-cheat: reject
 // anything else before it reaches the Sim).
-const LOCKPICK_ACTIONS = new Set(['hardSet', 'set', 'steady', 'ease', 'drop', 'abort']);
+const LOCKPICK_ACTIONS = new Set<PickAction>(['hardSet', 'set', 'steady', 'ease', 'drop', 'abort']);
 const LEAVE_SAVE_MAX_ATTEMPTS = 5;
 const LEAVE_SAVE_RETRY_BASE_MS = 250;
 const LEAVE_SAVE_RETRY_MAX_MS = 4000;
@@ -103,6 +114,162 @@ const ANTIBOT_ENFORCE = process.env.ANTIBOT_ENFORCE === '1';
 const STALE_INPUT_SECONDS = 0.75;
 // Exponential moving average weight for the per-tick duration stat.
 const TICK_EMA_ALPHA = 0.05;
+const ARENA_WIRE_HZ = 0.1;
+const ARENA_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * ARENA_WIRE_HZ)));
+
+type ClientMessage = Record<string, unknown> & {
+  ability?: string;
+  action?: string;
+  alloc?: unknown;
+  ante?: number;
+  augment?: string;
+  bar?: unknown;
+  catalog?: string;
+  choice?: 'need' | 'greed' | 'pass';
+  chroma?: string;
+  cmd?: string;
+  companionId?: string;
+  count?: number;
+  copper?: number;
+  delveId?: string;
+  dungeon?: string;
+  emote?: unknown;
+  enabled?: boolean;
+  facing?: unknown;
+  format?: string;
+  from?: number;
+  group?: number;
+  id?: number;
+  index?: number;
+  item?: string;
+  itemId?: string;
+  level?: number;
+  marker?: number;
+  mi?: unknown;
+  mode?: string;
+  n?: string;
+  name?: string;
+  npc?: number;
+  objectId?: number;
+  price?: number;
+  q?: string;
+  quest?: string;
+  r?: string;
+  rollId?: number;
+  seq?: number;
+  sid?: string;
+  sig?: string;
+  skin?: number;
+  slot?: number | string;
+  spec?: string;
+  t?: string;
+  text?: string;
+  tierId?: string;
+  x?: number;
+  z?: number;
+};
+
+function recordValue(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null;
+}
+
+function numberRecord(value: unknown): Record<string, number> {
+  const source = recordValue(value);
+  if (!source) return {};
+  const out: Record<string, number> = {};
+  for (const [key, raw] of Object.entries(source)) {
+    if (typeof raw === 'number') out[key] = raw;
+  }
+  return out;
+}
+
+function stringRecord(value: unknown): Record<string, string> {
+  const source = recordValue(value);
+  if (!source) return {};
+  const out: Record<string, string> = {};
+  for (const [key, raw] of Object.entries(source)) {
+    if (typeof raw === 'string') out[key] = raw;
+  }
+  return out;
+}
+
+function talentAllocationFromWire(value: unknown): TalentAllocation | null {
+  const source = recordValue(value);
+  if (!source) return null;
+  return {
+    spec: typeof source.spec === 'string' ? source.spec : null,
+    ranks: numberRecord(source.ranks),
+    choices: stringRecord(source.choices),
+  };
+}
+
+function isPickAction(value: unknown): value is PickAction {
+  return typeof value === 'string' && LOCKPICK_ACTIONS.has(value as PickAction);
+}
+
+// Heavy, rarely-changing self fields (inventory, equipment, stats, talents,
+// quests, milestones, cosmetics) are re-serialized into a snapshot only when a
+// command or sim event that can change them lands for that session, or on a
+// per-session staggered safety refresh. Without this the 20 Hz loop re-stringifies
+// these large, usually-identical structures (and allocates throwaway arrays for
+// each) for every player every tick, the dominant avoidable broadcast cost, and
+// a steady source of GC pressure, when a crowd gathers. The small/dynamic fields
+// (position, resource, target, party HP, cooldowns, ...) still diff every tick.
+const HEAVY_SELF_REFRESH_TICKS = 40; // ~2 s backstop; staggered per session so refreshes don't synchronize into a spike
+const HEAVY_SELF_CMDS = new Set<string>([
+  'equip',
+  'unequip_item',
+  'use',
+  'discard',
+  'buy',
+  'sell',
+  'buyback',
+  'loot',
+  'pickup',
+  'interact',
+  'accept',
+  'turnin',
+  'abandon',
+  'applyTalents',
+  'respec',
+  'setSpec',
+  'saveLoadout',
+  'switchLoadout',
+  'deleteLoadout',
+  'change_skin',
+  'unequip_mech_chroma',
+  'claim_event_skin',
+  'prestige',
+  'market_list',
+  'market_buy',
+  'market_cancel',
+  'market_collect',
+  'pet_feed',
+  'dev_give',
+  'dev_level',
+]);
+const HEAVY_SELF_EVENTS = new Set<string>([
+  'loot',
+  'levelup',
+  'virtualLevelUp',
+  'milestoneUnlocked',
+  'questAccepted',
+  'questProgress',
+  'questReady',
+  'questDone',
+  'learnAbility',
+  'mechChroma',
+  'skinEvent',
+  'skinSelect',
+  'tradeDone',
+  'vendor',
+  'tamePet',
+  'summonPet',
+  'dismissPet',
+  'summonDemon',
+]);
 
 // How often to re-broadcast online players' $WOC holder-tier flair. Each wallet
 // read is served from the woc_balance.ts cache (CACHE_TTL_MS), which is the real
@@ -147,6 +314,18 @@ export interface ClientSession {
   // serialized form of each delta self field as last sent to this client;
   // a field is omitted from a snapshot while its serialization is unchanged
   lastSent: Record<string, string>;
+  // arena readout is reconciled at UI cadence instead of snapshot cadence
+  lastArenaWireTick: number;
+  // set when a command or sim event that can change a heavy self field (bags,
+  // gear, quests, talents, stats, ...) lands for this session, so the next
+  // snapshot re-diffs those fields. Otherwise they're skipped (see
+  // HEAVY_SELF_* and selfWireJson). Starts true so the first snapshot is full.
+  selfHeavyDirty: boolean;
+  // last PlayerMeta.wireRev serialized for this session. The sim bumps wireRev
+  // on any inventory change (however triggered, including paths that emit no
+  // routed event), so this is the authoritative dirty signal for bags + derived
+  // quest state; -1 forces the first snapshot to send them.
+  lastWireRev: number;
   // wire versions of each entity this client knows about: known entities
   // get identity-less "lite" records, unchanged ones ride in the keep list
   sentEnts: Map<number, SentEntityVersions>;
@@ -228,7 +407,17 @@ interface WireAura {
   kind: string;
   rem: number;
   dur: number;
+  // Sent SPARSELY: only a negative-value buff_* aura (a stat-sap) rides the wire (see the
+  // serializer below), the exact case auras_view.isAuraDebuff reads value for. Everything
+  // else (positive buffs, absorb shields, and negative-value non-buff auras like the random
+  // fear angle on an incapacitate) stays off the wire and decodes to 0, exactly as before.
+  value?: number;
   stacks?: number;
+  // Remaining charges on a charge-limited aura (Lightning Shield's reflect count). Sent only
+  // when defined, so ordinary auras stay off the wire and decode to undefined as before; the
+  // client badge prefers this over stacks (auras_view). A pure cosmetic count, not actionable
+  // information a graphics preset could hide, so it rides the wire unconditionally when present.
+  charges?: number;
 }
 
 interface WhoRosterRow {
@@ -294,6 +483,7 @@ function dynamicFields(e: Entity): Record<string, unknown> {
     out.pt = round2(e.petTauntTimer);
     if (e.petAutoTaunt) out.pa = 1;
   }
+  if (e.rangedPower) out.rp = e.rangedPower;
   // top hate-table entries so the party threat meter shows real numbers
   if (e.kind === 'mob' && !e.dead && e.threat.size > 0) out.thr = threatEntries(e, 8);
   if (e.auras.length > 0) {
@@ -304,7 +494,19 @@ function dynamicFields(e: Entity): Record<string, unknown> {
         kind: a.kind,
         rem: round2(a.remaining),
         dur: a.duration,
+        // Carry the value ONLY for the exact case the client UI reads it: a negative-value
+        // buff_* aura (a stat-sap), which auras_view.isAuraDebuff classifies as a debuff via
+        // `kind.startsWith('buff_') && value < 0`. Mirroring that predicate keeps the wire in
+        // lockstep with the classification, so a graphics preset can never hide such a debuff
+        // and nothing else (positive buffs, absorb shields, a fear's random facing angle, any
+        // other negative-value non-buff aura) rides the wire or changes online behavior. Sent
+        // RAW (like `dur`, not round2) so the sign the classification keys on survives the
+        // wire exactly: round2 could round a tiny negative to -0, which JSON writes as 0.
+        ...(a.value < 0 && a.kind.startsWith('buff_') ? { value: a.value } : {}),
         ...(a.stacks && a.stacks > 1 ? { stacks: a.stacks } : {}),
+        // Carry the remaining charges only for a charge-limited aura (Lightning Shield), so the
+        // buff icon can badge the count online exactly as offline; undefined for every other aura.
+        ...(a.charges !== undefined ? { charges: a.charges } : {}),
       }),
     );
   }
@@ -329,7 +531,7 @@ function interestLimitSq(e: Entity, known: boolean): number {
 }
 
 function isStealthed(e: Entity): boolean {
-  return e.auras.some((a) => a.kind === 'stealth');
+  return e.stealthed; // cached in the sim's updateAuras; see Entity.stealthed
 }
 
 // full rate close up and for anything the viewer is fighting; mid range
@@ -426,11 +628,46 @@ export class GameServer {
   private socialPosTimer = 0;
   private saveAllInFlight: Promise<void> | null = null;
   private readonly characterSaveQueues = new Map<number, Promise<void>>();
+  // Serializes every write of the single global Market blob (the 30s autosave
+  // and the leave-path combined save). Both serialize the whole market; without
+  // a queue their transactions could commit out of capture order and persist an
+  // older snapshot over a newer one. Snapshots are captured inside the queued
+  // thunk, so commit order equals capture order equals freshness order.
+  private readonly enqueueMarketWrite = createSerialWriter();
   private restartCountdownStartedAt: number | null = null;
   private readonly restartCountdownTimers: NodeJS.Timeout[] = [];
   private readonly startedAt = Date.now();
   private peakOnline = 0;
   private tickMsAvg = 0;
+  // Rolling per-phase loop timing, localizes a stutter to a phase. Always-on
+  // (the hot path allocates nothing); read via perfProfile() for admin/ops.
+  private readonly tickProfiler = new TickProfiler([
+    'stale',
+    'tick',
+    'events',
+    'antibot',
+    'broadcast',
+    'bcastGrid',
+    'bcastSelf',
+    'social',
+  ]);
+  // Per-loop scratch for broadcast sub-phase timing (ns), summed across clients.
+  // Only measured when PERF_TICK_LOG=1, the per-client hrtime reads would
+  // otherwise add needless work (and BigInt churn) to the hot path.
+  private readonly profileBroadcastPhases = process.env.PERF_TICK_LOG === '1';
+  private bcastGridNs = 0n;
+  private bcastSelfNs = 0n;
+  // Crowd diagnostics (PERF_TICK_LOG only): the interest scan is O(viewers x
+  // neighbors), so `visits` exposes the real driver of broadcast cost in a
+  // crowd, vs the comparatively tiny entity-JSON build time (`serializeMs`).
+  private bcSerializeNs = 0n;
+  private bcVisits = 0;
+  private bcSerializes = 0;
+  // Ops kill-switch: SELF_SNAPSHOT_FULL=1 re-diffs every heavy self field every
+  // tick (pre-optimization behavior), for A/B benchmarking or rollback.
+  private readonly heavySelfGate = process.env.SELF_SNAPSHOT_FULL !== '1';
+  // Throttle for the optional over-budget stutter log (PERF_TICK_LOG=1).
+  private lastPerfLogTick = 0;
   private readonly ipSessionCounts = new Map<string, number>();
 
   constructor() {
@@ -576,20 +813,41 @@ export class GameServer {
       // Feed the authoritative UTC day to the sim so the delve daily reset (FR-5.1)
       // works without the sim reading the wall clock itself (determinism invariant).
       this.sim.utcDay = new Date().toISOString().slice(0, 10);
+      this.bcastGridNs = 0n;
+      this.bcastSelfNs = 0n;
+      this.bcSerializeNs = 0n;
+      this.bcVisits = 0;
+      this.bcSerializes = 0;
+      let mark = now;
+      const lap = (phase: string): void => {
+        const t = process.hrtime.bigint();
+        this.tickProfiler.add(phase, Number(t - mark) / 1e6);
+        mark = t;
+      };
       while (acc >= DT) {
         this.clearStaleInputs();
+        lap('stale');
         const events = this.sim.tick();
+        lap('tick');
         this.routeEvents(events);
+        lap('events');
         this.runAntibotTick();
+        lap('antibot');
         acc -= DT;
       }
       this.broadcastSnapshots();
+      lap('broadcast');
+      this.tickProfiler.add('bcastGrid', Number(this.bcastGridNs) / 1e6);
+      this.tickProfiler.add('bcastSelf', Number(this.bcastSelfNs) / 1e6);
       this.socialPosTimer += dt;
       if (this.socialPosTimer >= 1) {
         this.socialPosTimer = 0;
         this.broadcastSocialPositions();
       }
+      lap('social');
       const tickMs = Number(process.hrtime.bigint() - now) / 1e6;
+      this.tickProfiler.commit(tickMs);
+      this.maybeLogTickPerf(tickMs);
       this.tickMsAvg =
         this.tickMsAvg === 0 ? tickMs : this.tickMsAvg + TICK_EMA_ALPHA * (tickMs - this.tickMsAvg);
       this.saveTimer += dt;
@@ -652,11 +910,48 @@ export class GameServer {
   private runAntibotTick(): void {
     const now = Date.now();
     for (const session of this.clients.values()) {
-      const action = this.botDetector.handleTick(session.botTrackingContext, now, ANTIBOT_ENFORCE);
+      const action = this.botDetector.handleTick(
+        session.botTrackingContext,
+        now,
+        ANTIBOT_ENFORCE,
+        this.captureBotDetectionSnapshot(session, now),
+      );
       if (action === 'kick') {
         void this.kickSession(session, 'rejected by server', 'disconnected');
       }
     }
+  }
+
+  private captureBotDetectionSnapshot(
+    session: ClientSession,
+    capturedAt: number,
+  ): SessionRuntimeSnapshot | null {
+    const e = this.sim.entities.get(session.pid);
+    if (!e) return null;
+    const instance = this.sim.instanceInfoAt(e.pos);
+    return {
+      capturedAt,
+      simTime: this.sim.time,
+      x: e.pos.x,
+      z: e.pos.z,
+      facing: e.facing,
+      dead: e.dead,
+      inCombat: e.inCombat,
+      targetId: e.targetId,
+      instanceSlot: instance?.slot ?? null,
+      instanceDungeonId: instance?.dungeonId ?? null,
+      level: e.level,
+      classId: e.templateId,
+      hp: e.hp,
+      maxHp: e.maxHp,
+      resource: e.resource,
+      maxResource: e.maxResource,
+      resourceType: e.resourceType,
+      autoAttack: e.autoAttack,
+      followTargetId: e.followTargetId,
+      moveSpeed: e.moveSpeed,
+      onGround: e.onGround,
+    };
   }
 
   private clearStaleInputs(): void {
@@ -853,6 +1148,9 @@ export class GameServer {
       lastInputSeq: 0,
       lastInputAt: this.sim.time,
       lastSent: {},
+      lastArenaWireTick: -ARENA_WIRE_INTERVAL_TICKS,
+      selfHeavyDirty: true,
+      lastWireRev: -1,
       sentEnts: new Map(),
       ip: sessionIp,
       isAdmin: meta.isAdmin ?? false,
@@ -975,7 +1273,12 @@ export class GameServer {
   private async saveCharacterOnLeave(session: ClientSession): Promise<void> {
     for (let attempt = 1; attempt <= LEAVE_SAVE_MAX_ATTEMPTS; attempt++) {
       try {
-        await this.saveCharacter(session);
+        // Flush the character AND the World Market together: a Market escrow
+        // straddles both (item out of bags, into a listing), and the autosave
+        // timer only persists the market every 30s. Without this, a crash right
+        // after the leave-flush of bags would tear the escrow in half (item lost
+        // or duplicated). saveCharacter(withMarket) writes both in one transaction.
+        await this.saveCharacter(session, { withMarket: true });
         return;
       } catch (err) {
         if (attempt === LEAVE_SAVE_MAX_ATTEMPTS) {
@@ -992,7 +1295,7 @@ export class GameServer {
     }
   }
 
-  async saveCharacter(session: ClientSession): Promise<void> {
+  async saveCharacter(session: ClientSession, opts: { withMarket?: boolean } = {}): Promise<void> {
     const previous = this.characterSaveQueues.get(session.characterId);
     const run = (previous ? previous.catch(() => {}) : Promise.resolve()).then(async () => {
       const state = this.sim.serializeCharacter(session.pid);
@@ -1001,7 +1304,22 @@ export class GameServer {
         // Use the SERIALIZED level (not e.level): during a 2v2 Fiesta bout e.level
         // is temporarily 20, but serializeCharacter reports the real level — so the
         // character-list/leaderboard `level` column never reflects the temp state.
-        await saveCharacterState(session.characterId, state.level, state);
+        if (opts.withMarket) {
+          // Atomic on the leave path so a logout bag-flush can never tear away
+          // from the global Market escrow (see saveCharacterAndMarketState). Run
+          // through the market queue and capture the market snapshot at write
+          // time so this commit can't clobber a newer one.
+          await this.enqueueMarketWrite(() =>
+            saveCharacterAndMarketState(
+              session.characterId,
+              state.level,
+              state,
+              this.sim.serializeMarket(),
+            ),
+          );
+        } else {
+          await saveCharacterState(session.characterId, state.level, state);
+        }
         session.lastSave = Date.now();
       }
     });
@@ -1056,7 +1374,7 @@ export class GameServer {
 
   async saveMarket(): Promise<void> {
     try {
-      await saveMarketState(this.sim.serializeMarket());
+      await this.enqueueMarketWrite(() => saveMarketState(this.sim.serializeMarket()));
     } catch (err) {
       console.error('failed to save world market:', err);
     }
@@ -1095,6 +1413,38 @@ export class GameServer {
     };
   }
 
+  // Rolling per-phase loop timing for the admin/ops perf view + load harness.
+  perfProfile(): { online: number; simEntities: number } & ReturnType<TickProfiler['profile']> {
+    return {
+      online: this.clients.size,
+      simEntities: this.sim.entities.size,
+      ...this.tickProfiler.profile(),
+    };
+  }
+
+  // Optional stutter trace (PERF_TICK_LOG=1): log a per-phase p95/max breakdown
+  // when a loop body blows the 50 ms budget (throttled to ~1/s), plus a steady
+  // heartbeat every 5 s. Off by default so production logs stay quiet.
+  private maybeLogTickPerf(tickMs: number): void {
+    if (process.env.PERF_TICK_LOG !== '1') return;
+    const tick = this.sim.tickCount;
+    const overBudget = tickMs > 50 && tick - this.lastPerfLogTick >= 20;
+    const heartbeat = tick - this.lastPerfLogTick >= 100;
+    if (!overBudget && !heartbeat) return;
+    this.lastPerfLogTick = tick;
+    const p = this.tickProfiler.profile().phases;
+    const fmt = (n: string) => `${n}=${p[n].p95}/${p[n].max}`;
+    console.log(
+      `[perf] online=${this.clients.size} ents=${this.sim.entities.size} tickMs=${round2(tickMs)}${overBudget ? ' OVER' : ''}` +
+        ` | p95/max ${['total', 'tick', 'broadcast', 'bcastSelf', 'bcastGrid', 'events', 'social'].map(fmt).join(' ')}` +
+        ` | visits=${this.bcVisits} serializes=${this.bcSerializes} serializeMs=${round2(Number(this.bcSerializeNs) / 1e6)}`,
+    );
+  }
+
+  suspiciousPlayers(): SuspiciousPlayer[] {
+    return this.botDetector.listSuspiciousPlayers();
+  }
+
   liveSessions(): AdminLivePlayer[] {
     const now = Date.now();
     const players: AdminLivePlayer[] = [];
@@ -1105,7 +1455,7 @@ export class GameServer {
       const zone = e.dungeonId
         ? (DUNGEONS[e.dungeonId]?.name ?? e.dungeonId)
         : zoneAt(e.pos.z).name;
-      const moveSpeedMultiplier = round2((this.sim as any).moveSpeedMult(e));
+      const moveSpeedMultiplier = round2(this.sim.moveSpeedMult(e));
       players.push({
         pid: session.pid,
         accountId: session.accountId,
@@ -1138,6 +1488,10 @@ export class GameServer {
 
   liveAccountIds(): Set<number> {
     return new Set([...this.clients.values()].map((s) => s.accountId));
+  }
+
+  liveSharedIps(): LiveSharedIp[] {
+    return sharedIpsFromLiveSessions(this.clients.values());
   }
 
   async recordOnlineSnapshot(): Promise<void> {
@@ -1330,7 +1684,7 @@ export class GameServer {
 
   handleMessage(session: ClientSession, raw: string): void {
     const receivedAtMs = Date.now();
-    let msg: any;
+    let msg: unknown;
     try {
       msg = JSON.parse(raw);
     } catch {
@@ -1346,20 +1700,27 @@ export class GameServer {
     try {
       this.dispatchMessage(session, msg, raw, receivedAtMs);
     } catch (err) {
-      console.error(`bad message from ${session.name} (cmd: ${String(msg?.cmd ?? msg?.t)}):`, err);
+      const cmd = this.messageCommand(msg);
+      console.error(`bad message from ${session.name} (cmd: ${cmd}):`, err);
     }
+  }
+
+  private messageCommand(msg: unknown): string {
+    if (typeof msg !== 'object' || msg === null || Array.isArray(msg)) return 'unknown';
+    const record = msg as Record<string, unknown>;
+    return String(record.cmd ?? record.t ?? 'unknown');
   }
 
   private dispatchMessage(
     session: ClientSession,
-    msg: any,
+    rawMsg: unknown,
     raw: string,
     receivedAtMs: number,
   ): void {
     // JSON.parse returns null / numbers / strings / arrays for valid JSON that
     // isn't an object — `null` in particular threw on `msg.t`. Drop anything
     // that isn't a plain object before touching its fields.
-    if (typeof msg !== 'object' || msg === null || Array.isArray(msg)) {
+    if (typeof rawMsg !== 'object' || rawMsg === null || Array.isArray(rawMsg)) {
       this.botDetector.observeProtocolAnomaly(
         session.botTrackingContext,
         'non_object',
@@ -1368,6 +1729,7 @@ export class GameServer {
       );
       return;
     }
+    const msg = rawMsg as ClientMessage;
     const sim = this.sim;
     const pid = session.pid;
     if (msg.t === 'input') {
@@ -1401,12 +1763,27 @@ export class GameServer {
       receivedAtMs,
       msg,
     );
-    switch (msg.cmd) {
+    // W0b command-schema lockstep: cast the untyped wire token to the shared
+    // CommandName union so tsc proves every `case` label below is a member of
+    // COMMAND_NAMES (a typo or out-of-table token is a compile error) and that
+    // the switch covers the whole vocabulary (the `never` assignment in
+    // `default` reddens if a token is missing). Unknown wire input is not a
+    // CommandName at runtime; it still falls through to `default` and is flagged
+    // as a protocol anomaly, exactly as before.
+    const command = msg.cmd as CommandName;
+    // A command that can change a heavy self field forces the next snapshot to
+    // re-diff those fields (combat-only commands like cast/target/attack do not,
+    // which is what keeps the gating a win during a fight).
+    if (typeof msg.cmd === 'string' && HEAVY_SELF_CMDS.has(msg.cmd)) session.selfHeavyDirty = true;
+    switch (command) {
       case 'castSlot':
-        sim.castAbilityBySlot(msg.slot | 0, pid);
+        if (typeof msg.slot === 'number') sim.castAbilityBySlot(msg.slot | 0, pid);
         break;
       case 'cast':
         if (typeof msg.ability === 'string') sim.castAbility(msg.ability, pid);
+        break;
+      case 'cancel_aura':
+        if (typeof msg.aura === 'string') sim.cancelAura(msg.aura, pid);
         break;
       case 'target':
         sim.targetEntity(typeof msg.id === 'number' ? msg.id : null, pid);
@@ -1563,7 +1940,9 @@ export class GameServer {
         const om = gm ? null : /^\/(?:o|officer)\s+([\s\S]+)$/i.exec(text);
         if (gm || om) {
           const channel = gm ? 'guild' : 'officer';
-          const body = (gm ?? om!)[1];
+          const match = gm ?? om;
+          if (!match) break;
+          const body = match[1];
           session.rememberedChat = { channel };
           const route = gm
             ? this.social.guildChat(this.actorFor(session), body)
@@ -1628,6 +2007,23 @@ export class GameServer {
       case 'pmoveRaid':
         if (typeof msg.id === 'number' && (msg.group === 1 || msg.group === 2))
           sim.moveRaidMember(msg.id, msg.group, pid);
+        break;
+      case 'setLootMaster':
+        if (
+          typeof msg.enabled === 'boolean' &&
+          typeof msg.looter === 'number' &&
+          (msg.threshold === 'uncommon' || msg.threshold === 'rare' || msg.threshold === 'epic')
+        )
+          sim.setPartyLootMaster(msg.enabled, msg.looter, msg.threshold, pid);
+        break;
+      case 'masterAssign':
+        if (
+          typeof msg.rollId === 'number' &&
+          Array.isArray(msg.pids) &&
+          msg.pids.length > 0 &&
+          msg.pids.every((p: unknown) => typeof p === 'number')
+        )
+          sim.assignMasterLoot(msg.rollId, msg.pids, pid);
         break;
       // raid/target markers
       case 'setMarker':
@@ -1783,17 +2179,8 @@ export class GameServer {
 
       // Talents & Specializations — every allocation re-validated in the Sim.
       case 'applyTalents': {
-        const a = msg.alloc;
-        if (a && typeof a === 'object') {
-          sim.applyTalents(
-            {
-              spec: typeof a.spec === 'string' ? a.spec : null,
-              ranks: a.ranks && typeof a.ranks === 'object' ? a.ranks : {},
-              choices: a.choices && typeof a.choices === 'object' ? a.choices : {},
-            },
-            pid,
-          );
-        }
+        const alloc = talentAllocationFromWire(msg.alloc);
+        if (alloc) sim.applyTalents(alloc, pid);
         break;
       }
       case 'respec':
@@ -1803,15 +2190,7 @@ export class GameServer {
         sim.setSpec(typeof msg.spec === 'string' ? msg.spec : null, pid);
         break;
       case 'saveLoadout': {
-        const a = msg.alloc;
-        const alloc =
-          a && typeof a === 'object'
-            ? {
-                spec: typeof a.spec === 'string' ? a.spec : null,
-                ranks: a.ranks && typeof a.ranks === 'object' ? a.ranks : {},
-                choices: a.choices && typeof a.choices === 'object' ? a.choices : {},
-              }
-            : undefined;
+        const alloc = talentAllocationFromWire(msg.alloc) ?? undefined;
         if (typeof msg.name === 'string')
           sim.saveLoadout(msg.name, Array.isArray(msg.bar) ? msg.bar : [], pid, alloc);
         break;
@@ -1829,7 +2208,9 @@ export class GameServer {
       case 'market_list':
         if (
           typeof msg.item === 'string' &&
+          typeof msg.count === 'number' &&
           Number.isFinite(msg.count) &&
+          typeof msg.price === 'number' &&
           Number.isFinite(msg.price)
         ) {
           sim.marketList(msg.item, msg.count, msg.price, pid);
@@ -1870,7 +2251,8 @@ export class GameServer {
       }
       case 'dev_give': {
         if (process.env.ALLOW_DEV_COMMANDS === '1' && typeof msg.item === 'string') {
-          sim.addItem(msg.item, Math.max(1, Math.min(20, msg.count | 0)), pid);
+          const count = typeof msg.count === 'number' ? msg.count : 1;
+          sim.addItem(msg.item, Math.max(1, Math.min(20, count | 0)), pid);
         }
         break;
       }
@@ -1952,7 +2334,7 @@ export class GameServer {
         break;
       }
       case 'lockpick_action': {
-        if (!LOCKPICK_ACTIONS.has(msg.action)) break;
+        if (!isPickAction(msg.action)) break;
         const sid = typeof msg.sid === 'string' ? msg.sid : undefined;
         sim.lockpickAction(msg.action, pid, sid);
         break;
@@ -1970,13 +2352,20 @@ export class GameServer {
       // client telemetry should not be considered as unknown command. Used for offline stats computing.
       case 'telemetry':
         break;
-      default:
+      default: {
+        // Exhaustiveness guard: `command` is `never` here when the cases above
+        // cover every CommandName. At runtime an unrecognised wire token lands
+        // in this branch (the cast above is the deliberate boundary) and is
+        // reported as a protocol anomaly, unchanged from before.
+        const _exhaustive: never = command;
+        void _exhaustive;
         this.botDetector.observeProtocolAnomaly(
           session.botTrackingContext,
           'unknown_command',
           raw,
           receivedAtMs,
         );
+      }
     }
   }
 
@@ -1995,7 +2384,9 @@ export class GameServer {
       const ents: string[] = [];
       const keep: number[] = [];
       const present = new Set<number>();
+      const gridStart = this.profileBroadcastPhases ? process.hrtime.bigint() : 0n;
       this.sim.grid.forEachInRadius(p.pos.x, p.pos.z, INTEREST_QUERY_RADIUS, (e, d2) => {
+        if (this.profileBroadcastPhases) this.bcVisits++;
         if (e.id === session.pid) return;
         if (!this.canObserveEntity(p, e, d2)) return;
         const known = session.sentEnts.get(e.id);
@@ -2047,11 +2438,12 @@ export class GameServer {
       for (const id of session.sentEnts.keys()) {
         if (!present.has(id)) session.sentEnts.delete(id);
       }
+      const selfStart = this.profileBroadcastPhases ? process.hrtime.bigint() : 0n;
+      if (this.profileBroadcastPhases) this.bcastGridNs += selfStart - gridStart;
+      const selfJson = this.selfWireJson(session, p, meta);
+      if (this.profileBroadcastPhases) this.bcastSelfNs += process.hrtime.bigint() - selfStart;
       const keepJson = keep.length > 0 ? `,"keep":[${keep.join(',')}]` : '';
-      this.sendRaw(
-        session,
-        `${head},"self":${this.selfWireJson(session, p, meta)},"ents":[${ents.join(',')}]${keepJson}}`,
-      );
+      this.sendRaw(session, `${head},"self":${selfJson},"ents":[${ents.join(',')}]${keepJson}}`);
     }
     // >= rather than a modulo check: catch-up broadcasts can skip ticks
     if (tick - this.lastWireSweepTick >= WIRE_CACHE_SWEEP_TICKS) {
@@ -2090,6 +2482,7 @@ export class GameServer {
     }
     if (cache.tick === this.sim.tickCount) return cache;
     cache.tick = this.sim.tickCount;
+    const t0 = this.profileBroadcastPhases ? process.hrtime.bigint() : 0n;
     const idJson = JSON.stringify(identityFields(e));
     const dynJson = JSON.stringify(dynamicFields(e));
     let changed = false;
@@ -2106,6 +2499,10 @@ export class GameServer {
     if (changed) {
       cache.fullJson = `{"id":${e.id},${idJson.slice(1, -1)},${dynJson.slice(1, -1)}}`;
       cache.liteJson = `{"id":${e.id},${dynJson.slice(1, -1)}}`;
+    }
+    if (this.profileBroadcastPhases) {
+      this.bcSerializeNs += process.hrtime.bigint() - t0;
+      this.bcSerializes++;
     }
     return cache;
   }
@@ -2135,6 +2532,7 @@ export class GameServer {
       auto: p.autoAttack,
       queued: p.queuedOnSwing,
       ap: p.attackPower,
+      sp: p.spellPower,
       crit: p.critChance,
       dodge: p.dodgeChance,
       eat: p.eating ? { remaining: round2(p.eating.remaining) } : null,
@@ -2155,34 +2553,35 @@ export class GameServer {
         extra += `,"${key}":${s}`;
       }
     };
-    maybe('inv', meta.inventory);
-    maybe('buyback', meta.vendorBuyback);
-    maybe('equip', meta.equipment);
-    maybe('cosmetics', session.accountCosmetics);
-    maybe('qlog', [...meta.questLog.values()]);
-    maybe('qdone', [...meta.questsDone]);
+    // Dynamic / latency-sensitive fields: diffed every tick. These change from
+    // outside this session's own commands/events, party member HP from another
+    // player taking damage, cooldowns counting down, an incoming trade/duel,
+    // so they can't be gated behind this session's dirty flag. They're also
+    // cheap (mostly null, or a small map) so the per-tick diff is negligible.
     // Raid lockouts as {dungeonId: expiryEpochMs}, future-only. Absolute expiry
     // (not a countdown) so the serialized form is stable between resets and the
     // delta guard ships it only on grant / reset / expiry; the client derives the
-    // remaining time from its own clock.
+    // remaining time from its own clock. Small, and granted from sim events that
+    // don't mark this session dirty, so kept per-tick rather than gated.
     maybe(
       'lockouts',
       Object.fromEntries([...meta.raidLockouts].filter(([, until]) => until > Date.now())),
     );
-    maybe('milestones', [...meta.unlockedMilestones]);
     maybe('cds', Object.fromEntries([...p.cooldowns.entries()].map(([k, v]) => [k, round2(v)])));
-    maybe('stats', p.stats);
-    maybe('weapon', p.weapon);
     maybe('party', this.partyWire(session.pid));
     maybe('marks', this.markersWire(session.pid));
     maybe('trade', this.tradeWire(session.pid));
     maybe('duel', this.duelWire(session.pid));
-    maybe('arena', this.sim.arenaInfoFor(session.pid));
+    if (this.sim.tickCount - session.lastArenaWireTick >= ARENA_WIRE_INTERVAL_TICKS) {
+      session.lastArenaWireTick = this.sim.tickCount;
+      maybe('arena', this.sim.arenaInfoFor(session.pid));
+    }
     // market info is null unless the player is standing at the Merchant, so it
     // only rides the wire for players actually browsing the World Market
     maybe('market', this.sim.marketInfoFor(session.pid));
     // open need-greed rolls this player can still answer, so a client that
-    // missed the transient lootRoll event re-shows the prompt from state
+    // missed the transient lootRoll event re-shows the prompt from state. Stays
+    // per-tick (it's interactive state that appears from others' actions).
     maybe('lroll', this.sim.activeLootRolls(session.pid));
     maybe('drun', this.sim.delveRunWire(session.pid));
     maybe('dcompanion', this.sim.delveCompanionWire(session.pid));
@@ -2190,16 +2589,43 @@ export class GameServer {
     maybe('dcomp', this.sim.companionUpgradesFor(session.pid));
     maybe('dclears', this.sim.delveClearsFor(session.pid));
     maybe('delveDaily', this.sim.delveDailyWire(session.pid));
-    // talents/spec/loadouts ride the wire only when they change (PR-5: never
-    // every snapshot). The client recomputes its known abilities from this.
-    maybe('tal', {
-      alloc: meta.talents,
-      spec: meta.talentMods.spec,
-      role: meta.talentMods.role,
-      loadouts: meta.loadouts,
-      activeLoadout: meta.activeLoadout,
-    });
-    return extra === '' ? json : `${json.slice(0, -1) + extra}}`;
+    // stats + weapon stay per-tick: recalcPlayerStats re-derives them on every
+    // stat-affecting aura gain/loss (Bear/Cat Form, shouts, debuffs, elixir
+    // wear-off, a buff cast on you by someone else), none of which mark this
+    // session dirty, gating them would lag the character sheet mid-fight. Both
+    // are tiny (a handful of numbers), so the per-tick diff is negligible.
+    maybe('stats', p.stats);
+    maybe('weapon', p.weapon);
+    // Heavy, rarely-changing fields: building + stringifying these every tick for
+    // every player is the dominant avoidable broadcast cost. Skip them unless a
+    // heavy command/event marked this session dirty, or its staggered safety
+    // refresh is due (the modulo is offset by pid so refreshes don't all land on
+    // the same tick and re-create a synchronized spike).
+    const heavyDue =
+      !this.heavySelfGate ||
+      session.selfHeavyDirty ||
+      meta.wireRev !== session.lastWireRev ||
+      (this.sim.tickCount + session.pid) % HEAVY_SELF_REFRESH_TICKS === 0;
+    if (heavyDue) {
+      session.selfHeavyDirty = false;
+      session.lastWireRev = meta.wireRev;
+      maybe('inv', meta.inventory);
+      maybe('buyback', meta.vendorBuyback);
+      maybe('equip', meta.equipment);
+      maybe('cosmetics', session.accountCosmetics);
+      maybe('qlog', [...meta.questLog.values()]);
+      maybe('qdone', [...meta.questsDone]);
+      maybe('milestones', [...meta.unlockedMilestones]);
+      // talents/spec/loadouts: the client recomputes its known abilities from this.
+      maybe('tal', {
+        alloc: meta.talents,
+        spec: meta.talentMods.spec,
+        role: meta.talentMods.role,
+        loadouts: meta.loadouts,
+        activeLoadout: meta.activeLoadout,
+      });
+    }
+    return extra === '' ? json : `${json.slice(0, -1)}${extra}}`;
   }
 
   private partyWire(pid: number): unknown {
@@ -2208,6 +2634,7 @@ export class GameServer {
     return {
       leader: party.leader,
       raid: party.raid,
+      master: { ...party.lootStrategies.master },
       members: party.members
         .map((mPid) => {
           const meta = this.sim.meta(mPid);
@@ -2285,6 +2712,9 @@ export class GameServer {
         if (ev.pid !== undefined) {
           if (ev.pid === session.pid) {
             mine.push(ev);
+            // a sim-driven change to a heavy self field (loot, level-up, quest
+            // credit, ...) refreshes those fields on the next snapshot
+            if (HEAVY_SELF_EVENTS.has(ev.type)) session.selfHeavyDirty = true;
             // remember the last person to whisper us, for /r reply (the
             // recipient copy of a whisper has no `to`; the sender echo does)
             if (
@@ -2632,6 +3062,7 @@ export class GameServer {
   private resyncQuests(session: ClientSession): void {
     delete session.lastSent.qlog;
     delete session.lastSent.qdone;
+    session.selfHeavyDirty = true; // ensure the gated heavy block re-runs next snapshot
   }
 
   private resyncDelves(session: ClientSession): void {

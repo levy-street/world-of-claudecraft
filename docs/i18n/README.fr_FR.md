@@ -1,309 +1,320 @@
 <div align="center">
 
+# World of ClaudeCraft
+
+**Partez en quête, formez un groupe et affrontez des raids dans un monde fait main, gratuitement dans votre navigateur. Open source, web3 et en ligne dès maintenant.**
+
+**Site officiel : https://worldofclaudecraft.com/**
+
+[![CI](https://github.com/levy-street/world-of-claudecraft/actions/workflows/ci.yml/badge.svg)](https://github.com/levy-street/world-of-claudecraft/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Node.js](https://img.shields.io/badge/Node.js-ESM-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![Three.js](https://img.shields.io/badge/Three.js-r165-000000?logo=threedotjs&logoColor=white)](https://threejs.org/)
 [![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)](https://vite.dev/)
 [![Vitest](https://img.shields.io/badge/Vitest-4.1-6E9F18?logo=vitest&logoColor=white)](https://vitest.dev/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
-[![Version](https://img.shields.io/badge/version-0.6.0-blue)](../../package.json)
+[![Version](https://img.shields.io/badge/version-0.14.1-blue)](../../package.json)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.fr_FR.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/GjhnUsBtw)
 
-[English](../../README.md) · [Español](README.es.md) · [Español (España)](README.es_ES.md) · **Français** · [Français (Canada)](README.fr_CA.md) · [Italiano](README.it_IT.md) · [Deutsch](README.de_DE.md) · [简体中文](README.zh_CN.md) · [繁體中文](README.zh_TW.md) · [한국어](README.ko_KR.md) · [日本語](README.ja_JP.md) · [Português (Brasil)](README.pt_BR.md) · [Русский](README.ru_RU.md)
+[English](../../README.md) · [Español](README.es.md) · [Español (España)](README.es_ES.md) · **Français** · [Français (Canada)](README.fr_CA.md) · [Italiano](README.it_IT.md) · [Deutsch](README.de_DE.md) · [简体中文](README.zh_CN.md) · [繁體中文](README.zh_TW.md) · [한국어](README.ko_KR.md) · [日本語](README.ja_JP.md) · [Português (Brasil)](README.pt_BR.md) · [Русский](README.ru_RU.md) · [Nederlands](README.nl_NL.md) · [Polski](README.pl_PL.md) · [Bahasa Indonesia](README.id_ID.md) · [Türkçe](README.tr_TR.md) · [Svenska](README.sv_SE.md) · [Tiếng Việt](README.vi_VN.md) · [Dansk](README.da_DK.md)
 
-</div>
-
-# World of ClaudeCraft — un MMO de style classique
-
-[Rejoindre le Discord de la communauté](https://discord.gg/GjhnUsBtw)
+[Jouer maintenant](https://worldofclaudecraft.com/) · [Héberger votre propre monde](#host-your-own-world-one-command) · [Entraîner un agent](#train-an-agent-headless-rl) · [Web3](#web3) · [Contribuer](CONTRIBUTING.fr_FR.md) · [Discord](https://discord.gg/GjhnUsBtw)
 
 ![Écran-titre de World of ClaudeCraft](../../docs/screenshots/title-screen.jpg)
 
-Un micro-MMO aux saveurs de MMO de l'ère classique que vous pouvez héberger et jouer :
+</div>
 
-1. **Jouez en ligne** — un véritable jeu client/serveur avec des comptes, des
-   personnages persistants dans Postgres, et d'autres joueurs présents dans le monde avec vous.
-2. **Jouez hors ligne** dans votre navigateur pour plonger directement dans le monde.
+## Présentation
 
-Les deux exécutent le **même cœur de simulation déterministe** (`src/sim/`), de sorte que le
-monde hors ligne se comporte exactement comme ce que le serveur multijoueur faisant autorité
-exécute pour tout le monde en ligne.
+World of ClaudeCraft est un MMO complet d'inspiration classique auquel vous pouvez jouer dès maintenant dans votre navigateur, que vous pouvez héberger vous-même en une seule commande, et qui vous permet même d'entraîner des agents IA à y jouer. Il est gratuit, open source, et en ligne sur [worldofclaudecraft.com](https://worldofclaudecraft.com/).
+
+Un même monde partagé tourne à trois endroits, tous issus du même cœur de jeu :
+
+- le **monde navigateur hors ligne**, où il suffit de cliquer sur Play Offline pour entrer en jeu,
+- le **serveur multijoueur autoritaire**, où des comptes stockés dans Postgres partagent un monde vivant,
+- l'**environnement RL headless**, où Python pilote le vrai jeu via une interface Gym.
+
+Même graine, même monde, partout. Et presque rien n'est un asset livré : les villes, les créatures, les icônes de sorts et le son sont tous générés à l'exécution.
+
+## Points forts
+
+- **Neuf classes classiques**, chacune dotée d'une véritable panoplie d'inspiration vanilla qui gagne des rangs à mesure que vous montez en niveau, plus un **système de talents** complet (trois spécialisations par classe, 27 spécialisations en tout).
+- **Trois zones en monde ouvert** du niveau 1 au niveau 20, près de 80 quêtes, et une seule trame narrative reliée autour de la conspiration des Gravecaller.
+- **Cinq donjons instanciés**, dont quatre raids d'élite à cinq joueurs et une crypte en solo, avec une mise à l'échelle d'élite, des mécaniques de boss à dégâts de zone, et du butin propre à chaque archétype de classe.
+- **Des delves évolutives**, un mode pour petit groupe à un ou deux joueurs accompagnés d'un compagnon IA, reconstruites à partir de salles aléatoires à chaque partie, sur les paliers Normal et Héroïque.
+- **The Ashen Coliseum**, une arène JcJ classée avec des classements 1c1 et 2c2 ainsi qu'un mode 2c2 Fiesta (ramassage d'améliorations, un anneau qui se resserre, premier à quinze éliminations).
+- **Du vrai multijoueur** : groupes, échanges, duels, droits de butin, partage d'XP en groupe, chuchotements, statut absent, et un serveur qui gère chaque jet de combat.
+- **Tout est procédural** : villes à colombages, familles de créatures riggées, icônes de sorts peintes sur canvas, son WebAudio, météo de biome, et ombres en temps réel. Aucun fichier de modèle 3D pour le monde.
+- **Localisé dans 21 langues** grâce à un pipeline déterministe où la sim émet des clés.
+- **Environnement RL headless** avec des bindings Gymnasium, un façonnage de récompense, et un mode benchmark.
+- **Nativement web3** : reliez un portefeuille Solana pour afficher votre solde de $WOC et un badge cosmétique de détenteur, entièrement optionnel et non dépositaire.
 
 ## Captures d'écran
 
-![Un groupe se rassemble devant l'apothicaire à Eastbrook](../../docs/screenshots/party-questing.jpg)
+![Un groupe se rassemble devant l'apothicaire d'Eastbrook](../../docs/screenshots/party-questing.jpg)
 
 | | |
 |:---:|:---:|
-| ![Crépuscule au feu de camp d'Eastbrook](../../docs/screenshots/eastbrook-dusk.jpg)<br>*Crépuscule au feu de camp d'Eastbrook* | ![Packs d'élites dans le Hollow Crypt](../../docs/screenshots/hollow-crypt.jpg)<br>*Packs d'élites éclairés aux torches dans le Hollow Crypt* |
-| ![Les morts agités à la chapelle en ruine](../../docs/screenshots/restless-dead.jpg)<br>*Les morts agités à la chapelle en ruine* | ![Une bagarre avec les Vale Bandits](../../docs/screenshots/vale-bandits.jpg)<br>*En infériorité numérique au camp de bandits* |
-| ![Old Greyjaw traqué sur la route du nord](../../docs/screenshots/old-greyjaw.jpg)<br>*Old Greyjaw, le rare spawn, rattrapé sur la route du nord* | ![Interface du marchand et des sacs](../../docs/screenshots/vendor-and-bags.jpg)<br>*S'équiper chez Smith Haldren — infobulles, sacs, pièces* |
+| ![Crépuscule au feu de camp d'Eastbrook](../../docs/screenshots/eastbrook-dusk.jpg)<br>*Crépuscule au feu de camp d'Eastbrook* | ![Pulls d'élite dans the Hollow Crypt](../../docs/screenshots/hollow-crypt.jpg)<br>*Pulls d'élite à la lueur des torches dans the Hollow Crypt* |
+| ![Les morts agités à la chapelle en ruine](../../docs/screenshots/restless-dead.jpg)<br>*Les morts agités à la chapelle en ruine* | ![Une mêlée avec les Vale Bandits](../../docs/screenshots/vale-bandits.jpg)<br>*En infériorité numérique au camp de bandits* |
+| ![Old Greyjaw traqué sur la route du nord](../../docs/screenshots/old-greyjaw.jpg)<br>*Old Greyjaw, le rare spawn, rattrapé sur la route du nord* | ![Interface du marchand et des sacs](../../docs/screenshots/vendor-and-bags.jpg)<br>*S'équiper chez Smith Haldren, avec infobulles, sacs et pièces* |
+| ![Le portail lunaire sur la rive de Glimmermere](../../docs/screenshots/glimmermere-moongate.jpg)<br>*Les noyés remontent au portail lunaire de Glimmermere* | ![Ysolei sur l'autel du Drowned Temple](../../docs/screenshots/drowned-temple-altar.jpg)<br>*Moonfire et l'autel du Drowned Temple* |
 
-![World of Claude](../../worldofclaude.png)
+La météo est pilotée par le biome et purement visuelle, elle ne touche donc jamais à la sim déterministe :
 
-![Communauté de World of ClaudeCraft](../../woc_community.png)
+| | | |
+|:---:|:---:|:---:|
+| ![Ciel dégagé sur Eastbrook Vale](../../docs/screenshots/weather-vale_clear.jpg)<br>*Ciel dégagé sur la Vale* | ![Pluie sur Mirefen Marsh](../../docs/screenshots/weather-marsh_rain.jpg)<br>*Pluie sur Mirefen Marsh* | ![Neige sur Thornpeak Heights](../../docs/screenshots/weather-peaks_snow.jpg)<br>*Neige sur Thornpeak Heights* |
 
----
+## Jouer
 
-## Hébergez-le (une seule commande)
+Vous avez deux façons d'entrer, et elles font tourner le même monde.
+
+### Hors ligne, dans votre navigateur
+
+```bash
+npm install
+npm run dev        # then open http://localhost:5173 and click Play Offline
+```
+
+Nommez votre personnage, choisissez l'une des neuf classes, et vous démarrez à **Eastbrook Vale** (niveaux 1-7), une ville marchande entourée de six pôles : les coulées de loups au nord, les prés de sangliers à l'est, the Webwood à l'ouest, Mirror Lake au nord-ouest, une mine de cuivre kobold au sud-ouest, et une chapelle en ruine peuplée de morts agités au nord-est, avec le camp de bandits de Gorrak au sud-est. La route du nord grimpe par un col de montagne jusqu'à **Mirefen Marsh** (6-13, pôle Fenbridge) et continue jusqu'à **Thornpeak Heights** (13-20, pôle Highwatch). La graine du monde est fixée dans `src/main.ts`, c'est donc le même endroit à chaque visite.
+
+### En ligne, avec d'autres joueurs
+
+Voir [Héberger votre propre monde](#host-your-own-world-one-command) ci-dessous pour monter le vrai jeu client/serveur avec comptes et personnages persistants.
+
+<a id="host-your-own-world-one-command"></a>
+
+## Héberger votre propre monde (une seule commande)
 
 ```bash
 cp .env.example .env
-# modifiez .env et définissez un POSTGRES_PASSWORD long et aléatoire
-docker compose up -d --build     # postgres + serveur de jeu, entièrement construit
-# ouvrez http://localhost:8787 — comptes, personnages, le monde entier
+# edit .env and set a long random POSTGRES_PASSWORD
+docker compose up -d --build     # postgres + game server, fully built
+# open http://localhost:8787 for accounts, characters, and the whole world
 ```
 
-Pour un **hébergement distant** : déployez la stack compose sur n'importe quel VPS, définissez un vrai
-`POSTGRES_PASSWORD` dans l'environnement, et placez devant le port 8787 un reverse proxy
-TLS (avec Caddy, c'est deux lignes — `your.domain { reverse_proxy
-localhost:8787 }`) ; les WebSockets sont proxifiés automatiquement et le client
-sélectionne automatiquement `wss://` sur les pages https. Les points d'accès d'authentification sont
-limités en débit par IP ; les mots de passe sont hachés avec scrypt ; les jetons expirent au bout de 7 jours. Ne définissez jamais
-`ALLOW_DEV_COMMANDS=1` en production (cela active les triches de niveau/téléportation utilisées
-par les bots de test).
+Pour un **hébergement distant**, déployez la pile compose sur n'importe quel VPS, définissez un vrai `POSTGRES_PASSWORD` dans l'environnement, et placez un reverse proxy TLS devant le port 8787. Caddy permet de le faire en deux lignes (`your.domain { reverse_proxy localhost:8787 }`) ; les WebSockets sont proxifiés automatiquement et le client sélectionne tout seul `wss://` sur les pages https. Les points d'accès d'authentification sont limités en débit par IP, les mots de passe sont hachés avec scrypt, et les jetons expirent au bout de 7 jours. Ne définissez jamais `ALLOW_DEV_COMMANDS=1` en production, car cela active les triches de niveau et de téléportation utilisées par les bots de test. Voir [DEPLOY.md](../../DEPLOY.md) pour le guide de production complet.
 
-## Développez en ligne (rechargement à chaud)
+<a id="develop-online-with-hot-reload"></a>
+
+### Développer en ligne avec rechargement à chaud
 
 ```bash
 npm install
 cp .env.example .env
-# modifiez .env et définissez POSTGRES_PASSWORD et DATABASE_URL avec le même mot de passe
-npm run db:up        # postgres 16 dans docker (port 5433, persisté en volume)
-npm run server       # serveur de jeu faisant autorité sur :8787 (REST + WebSocket)
-npm run dev          # serveur de dev du client sur :5173 (proxie /api et /ws)
+# set POSTGRES_PASSWORD and point DATABASE_URL at the same password
+npm run db:up        # postgres 16 in docker (port 5433, volume-persisted)
+npm run server       # authoritative game server on :8787 (REST + WebSocket)
+npm run dev          # client dev server on :5173 (proxies /api and /ws)
 ```
 
-Ouvrez http://localhost:5173 → **Play Online** → créez un compte → créez un
-personnage → Enter World. Ouvrez un second navigateur/onglet et reconnectez-vous — vous
-vous verrez l'un l'autre en ville. `Enter` ouvre le chat.
+Ouvrez http://localhost:5173, choisissez **Play Online**, créez un compte, créez un personnage, et cliquez sur Enter World. Ouvrez un deuxième onglet et reconnectez-vous pour vous voir mutuellement en ville. `Enter` ouvre le tchat. Un vrai wiki de joueurs MediaWiki est lancé en parallèle de la pile Docker Compose à http://localhost:8080/wiki/ ; ses pages de départ sont générées à partir du contenu de jeu actuel avec `npm run wiki:seed`.
 
-- **Comptes** : mots de passe hachés avec scrypt, jetons porteurs de 7 jours (`auth_tokens`).
-- **Personnages** : jusqu'à 10 par compte ; niveau/équipement/sacs/quêtes/position/argent
-  persistent en JSONB dans Postgres — sauvegardés toutes les 30 s, à la déconnexion et à
-  l'arrêt du serveur. Les noms sont uniques à l'échelle mondiale, uniquement des lettres, style classique.
-- **Le serveur fait autorité** : les clients diffusent l'intention de mouvement + les commandes
-  à 20 Hz ; le serveur exécute le monde (un `Sim` partagé) et envoie
-  des instantanés limités par l'intérêt (~120 yd) ainsi que des événements routés par joueur. Tous les
-  calculs de combat, les jets de butin, le crédit de quête et les transactions avec les marchands se déroulent
-  côté serveur ; le client est un moteur de rendu.
-- **Groupes** (jusqu'à 5) : clic droit sur un joueur → *Invite to Party*. Les cadres de groupe
-  à gauche, les membres partagent les droits de tap, le crédit des quêtes de massacre et le partage de
-  l'XP avec les vrais bonus de groupe vanilla (1.166/1.3/1.43 pour 3/4/5). Chat de
-  groupe avec `/p message`. Des blips bleus de membres sur la minicarte.
-- **Échange** : clic droit sur un joueur → *Trade*. Les deux parties placent des objets + de l'argent,
-  les deux doivent accepter, et l'échange est atomique et validé par le serveur (les objets de quête
-  ne sont pas échangeables). S'éloigner annule l'échange.
-- **Duels** : clic droit → *Challenge to a Duel*. Compte à rebours de 3 secondes, combat
-  jusqu'à ce qu'un camp atteigne 1 pv — personne ne meurt, le vainqueur est annoncé dans toute la zone.
-  Courir à 60 yards de distance entraîne un forfait.
-- **The Ashen Coliseum** (arène classée 1c1) : appuyez sur `G` (ou le bouton ⚔) pour
-  ouvrir le panneau d'arène et *Enter the Queue*. Le matchmaking vous associe au
-  challenger en ligne au classement le plus proche, puis vous téléporte tous les deux dans une fosse de
-  combat privée éclairée aux torches. Un compte à rebours de 5 secondes soigne et réinitialise les deux combattants
-  pour un départ équitable ; le combat se termine lorsque l'un abandonne à 1 pv (personne ne meurt). Les victoires
-  et les défaites font évoluer un **classement Elo** persistant (tout le monde commence à 1500), et
-  vous revenez exactement là où vous vous êtes mis en file. Le panneau affiche votre rang, le classement
-  en ligne en direct et le classement de tous les temps (`GET /api/arena/leaderboard`).
-- **Règles multijoueur** : droits de tap classiques (le premier joueur à blesser un monstre possède
-  son butin/XP/crédit de quête — les autres reçoivent « You don't have permission to loot
-  that. »), les monstres reciblent l'attaquant suivant lorsque leur victime meurt (pas de
-  réinitialisation gratuite), annonces d'arrivée/départ, chat de type `/say`.
+Ce qui persiste et comment le serveur garde la main :
 
-## The Hollow Crypt — instance d'élite à 5 joueurs
+- **Comptes** : mots de passe hachés avec scrypt et jetons porteurs valables 7 jours (`auth_tokens`).
+- **Personnages** : jusqu'à 10 par compte ; niveau, équipement, sacs, quêtes, talents, position et argent persistent en JSONB dans Postgres, sauvegardés toutes les 30 secondes, à la déconnexion et à l'arrêt du serveur. Les noms sont uniques au monde, en lettres uniquement, dans le style classique.
+- **Le serveur est autoritaire** : les clients envoient en flux l'intention de mouvement et les commandes à 20 Hz ; le serveur fait tourner l'unique `Sim` partagé et renvoie des snapshots limités à la zone d'intérêt (~120 yd) ainsi que des événements par joueur. Chaque jet de combat, chute de butin, crédit de quête et transaction avec un marchand est résolu côté serveur. Le client est un moteur de rendu.
 
-L'histoire de Brother Aldric se poursuit au-delà de *The Restless Dead* : **Whispers
-Below** (trouvez le sigil du Gravecaller à la chapelle en ruine) → **The Binding
-Rite** (récupérez du Blessed Tallow à la fouille des kobolds et de l'Ghostly Essence auprès
-des morts agités) → **Into the Hollow** (*joueurs suggérés : 5*) — tuez
-Morthen the Gravecaller au fond de la crypte sous la chapelle.
+<a id="train-an-agent-headless-rl"></a>
 
-- La porte de la crypte à la Fallen Chapel téléporte votre **groupe dans sa propre
-  copie d'instance privée** (6 emplacements ; les instances se réinitialisent après 5 minutes de vide).
-- À l'intérieur : couloirs éclairés aux torches, packs de trash **élites** appariés (mise à l'échelle
-  élite vanilla : ~2,3× la santé, ~1,5× les dégâts, double XP), le miniboss Sexton
-  Marrow, et Morthen — un boss élite de niveau 10 avec un AoE **Shadow Pulse**
-  toutes les 10 secondes. Le trash de donjon ne réapparaît pas tant que l'instance ne se réinitialise pas.
-- Récompenses : armes rares (bleues) par archétype de classe, 1 pièce d'or, 1500 XP.
-- C'est réellement calibré pour 5 : notre raid automatisé de 5 bots (warrior, paladin,
-  priest, mage, hunter avec IA de focus-fire + soigneur) le nettoie en ~5 minutes
-  avec ~10 morts (`node scripts/crypt_raid.mjs`, nécessite ALLOW_DEV_COMMANDS=1).
+## Entraîner un agent (RL headless)
 
-```
-docker compose ps          # eastbrook-db (postgres:16-alpine, healthcheck)
-node scripts/mp_integration.mjs   # suite de 26 vérifications API/WS/persistance
-node scripts/mp_browser.mjs       # deux vrais clients navigateur se voient l'un l'autre
-```
-
-## The Sunken Bastion & Gravewyrm Sanctum
-
-La conspiration ne s'arrête pas avec Morthen. **The Sunken Bastion** (5 joueurs,
-~niveau 13, sud-est de Mirefen) abrite Vael the Mistcaller — il invoque des vagues de
-Drowned Thralls à 60 % et 30 % de santé. Le final est le **Gravewyrm
-Sanctum** (5 joueurs, niveau 20, sous Thornpeak) : trois salles de boneguard et de
-drakonid élites, Korgath the Bound (entre en rage en dessous de 30 %), Grand
-Necromancer Velkhar (encore plus de vagues d'adds), et **Korzul the Gravewyrm** — des armes
-épiques tombent ici, et la chaîne de quêtes préparatoire est faisable en solo, donc personne n'est
-exclu de l'histoire.
-
-
-
-## Jouez hors ligne
+Le même cœur déterministe tourne comme un environnement [Gymnasium](https://gymnasium.farama.org/), si bien qu'un agent apprend face au vrai jeu, et non à une réimplémentation. Le serveur d'environnement (`headless/env_server.ts`) enveloppe un `Sim` et communique en JSON délimité par des sauts de ligne sur stdio ; les bindings Python du dossier `python/` le lancent comme sous-processus et exposent la boucle habituelle `reset` / `step` / `close`.
 
 ```bash
-npm run dev        # ouvrez http://localhost:5173 -> Play Offline
+npm run build:env    # bundle the env server to dist-env/env_server.cjs
+npm run env          # run it directly (NDJSON on stdio)
+npm run bench        # in-process throughput benchmark (no IPC)
+
+# drive it from Python
+pip install gymnasium numpy
+python python/example_random_agent.py
 ```
 
-Nommez votre personnage, choisissez l'une des neuf classes, et vous voilà dans **Eastbrook
-Vale** (niveaux 1-7) : une ville-marché entourée de six pôles — les chasses au loup au nord, les
-prairies à sangliers à l'est, le Webwood à l'ouest, Mirror Lake au nord-ouest, une fouille de cuivre des kobolds
-au sud-ouest, une chapelle en ruine avec des morts agités au nord-est, et le camp de bandits de Gorrak
-au sud-est. La route au nord grimpe à travers un col de montagne jusqu'à **Mirefen
-Marsh** (6-13, pôle : Fenbridge) et continue jusqu'à **Thornpeak Heights** (13-20,
-pôle : Highwatch) — trois zones, ~60 quêtes, et une seule trame : la conspiration du
-Gravecaller, des premiers ossements agités à l'extérieur d'Eastbrook jusqu'à **Korzul the
-Gravewyrm** sous les pics. Chaque pôle a des marchands (y compris des forgerons d'armes et
-d'armures vendant d'honnêtes équipements blancs), un cimetière, sa propre musique, et une
-carte de zone.
+```python
+from wow_env import WoWClassicEnv
 
-### Contrôles (disposition classique)
+env = WoWClassicEnv(player_class="warrior")   # warrior or mage
+obs, info = env.reset(seed=42)
+obs, reward, terminated, truncated, info = env.step(env.action_space.sample())
+env.close()
+```
 
-| Entrée | Action |
+- **Les espaces d'observation et d'action sont dérivés du contenu.** Interrogez-les depuis la réponse `info` de l'env au démarrage plutôt que de les coder en dur ; ils grandissent avec le jeu. Aujourd'hui, l'espace d'action est `Discrete(44)` (déplacement, ciblage, attaque, la panoplie complète d'aptitudes, interaction, manger/boire) et l'observation est un `Box` de 276 flottants (soi, aptitudes, cible, créatures à proximité, interactif le plus proche, progression des quêtes).
+- **La récompense** est une somme pondérée de variations de compteurs par tick (XP, dégâts infligés et subis, éliminations, morts, progression des quêtes, montées de niveau), réglable à chaque reset. Chaque `step` applique une action et fait avancer cinq ticks de sim par défaut, soit environ quatre décisions par seconde simulée.
+- **Déterministe par construction.** Pas d'horloge murale, pas de `Math.random`. Donnez une graine au reset et l'épisode se rejoue à l'identique.
+
+Le protocole et les bindings sont documentés dans `headless/CLAUDE.md` et `python/CLAUDE.md`.
+
+<a id="web3"></a>
+
+## Web3
+
+World of ClaudeCraft est nativement web3 autour de **$WOC**, notre jeton communautaire sur Solana. Connectez un portefeuille Solana, reliez-le à votre compte avec une seule signature (non dépositaire, aucune transaction à approuver), et votre solde de $WOC en lecture seule s'affiche dans le HUD aux côtés d'un badge cosmétique de palier de détenteur.
+
+C'est purement cosmétique et non requis pour jouer. Rien n'est dépensé ni gagné en jeu, il n'y a pas de pay-to-win, et tout le jeu se joue très bien sans jamais connecter de portefeuille.
+
+**Adresse du contrat $WOC (Solana) :**
+
+```
+3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth
+```
+
+Plus d'informations sur le jeton à [worldofclaudecraft.com](https://worldofclaudecraft.com/).
+
+## Visite guidée du monde
+
+### Les neuf classes
+
+Chaque classe utilise de véritables mécaniques d'inspiration vanilla et apprend des sorts à rangs au fil des niveaux 1-20 (Lightning Bolt R2 au niveau 8, R3 au 14, R4 au 20, avec des aptitudes de haut niveau comme Execute, Kidney Shot, Flash Heal, Stormstrike et Starfire qui arrivent à leur niveau classique).
+
+- **Warrior** : rage, Heroic Strike (au prochain coup, hors GCD), Battle Shout, Charge, Rend, Thunder Clap, Hamstring, Bloodrage, Overpower (proc d'esquive).
+- **Paladin** : Seal of Righteousness déclenché par Judgement, Holy Light, Devotion Aura, Blessing of Might, Divine Protection (absorption), Hammer of Justice (étourdissement), Lay on Hands.
+- **Hunter** : Auto Shot à distance (8-35 yd avec la zone morte classique), Raptor Strike, Aspect of the Hawk, Serpent Sting, Arcane Shot, Concussive Shot, Mongoose Bite, Wing Clip, et un familier apprivoisable à partir du niveau 10.
+- **Rogue** : énergie et points de combo, Sinister Strike, Eviscerate, Backstab (dans le dos, dague), Gouge, Evasion, Slice and Dice, Sprint.
+- **Priest** : Smite, Lesser Heal, Power Word: Fortitude, Shadow Word: Pain, Power Word: Shield (absorption), Renew (HoT), Mind Blast.
+- **Shaman** : Lightning Bolt, Rockbiter Weapon (enchantement d'arme), Healing Wave, Earth Shock, Lightning Shield (épines), Flame Shock.
+- **Mage** : Fireball, Frost Armor, Arcane Intellect, Frostbolt, Conjure Water, Fire Blast, Arcane Missiles (incantation canalisée), Polymorph, Frost Nova.
+- **Warlock** : Shadow Bolt, Demon Skin, Immolate, Corruption, Life Tap, Curse of Agony, Drain Life, et sept démons invocables, de l'Imp au Doomguard.
+- **Druid** : Wrath, Healing Touch, Mark of the Wild, Moonfire, Rejuvenation, Thorns, Entangling Roots, Bear Form au niveau 10.
+
+Les soins et les buffs s'appliquent aux membres du groupe, les soins peuvent porter des coups critiques, et les boucliers d'absorption encaissent les dégâts avant les points de vie. Dépensez des points dans **trois spécialisations de talents par classe** (Arms/Fury/Protection, Balance/Feral/Restoration, et ainsi de suite) ; l'allocation est validée par le serveur et exportable sous forme de chaîne de build.
+
+### Donjons
+
+La trame des Gravecaller passe par quatre instances d'élite à cinq joueurs, et une crypte solo se tient à l'écart pour les explorateurs.
+
+- **The Hollow Crypt** (5 joueurs) sous the Fallen Chapel : des packs d'élite par paire, le mini-boss Sexton Marrow, et Morthen the Gravecaller, qui lâche un Shadow Pulse à dégâts de zone toutes les dix secondes. La porte de la crypte téléporte votre groupe dans une copie d'instance privée qui se réinitialise après cinq minutes de vide.
+- **The Sunken Bastion** (5 joueurs, vers le niveau 13, au sud-est de Mirefen) : Vael the Mistcaller invoque des vagues de Drowned Thralls à 60 % et 30 % de vie.
+- **Gravewyrm Sanctum** (5 joueurs, niveau 20, sous Thornpeak) : trois salles de gardes-os d'élite et de drakonides, Korgath the Bound (enrage sous 30 %), Grand Necromancer Velkhar, et Korzul the Gravewyrm, où tombent des armes épiques.
+- **The Drowned Temple** (5 joueurs) par le portail lunaire de Glimmermere : une instance pâle, d'un violet lunaire, menant à Choirmother Selthe puis à Ysolei, Avatar of the Drowned Moon, qui pulse Lunar Tide toutes les neuf secondes et invoque des Moonspawn à 60 % et 30 %.
+- **The Abandoned Crypt** (solo) à Thornpeak : une plongée tranquille à base de clé de voûte et de journal, pour un seul joueur, dont la piste descelle la porte royale vers **Nythraxis, Scourge of Thornpeak**, un final de raid à dix joueurs livré autour de trois pierres-gardiennes d'âme.
+
+Les chaînes de quêtes préparatoires sont jouables en solo, l'histoire n'est donc jamais bloquée derrière la recherche d'un groupe. Notre raid automatisé à cinq bots (Warrior, Paladin, Priest, Mage, Hunter avec focus-fire et IA de soigneur) nettoie the Hollow Crypt en environ cinq minutes (`node scripts/crypt_raid.mjs`, nécessite `ALLOW_DEV_COMMANDS=1`).
+
+### Delves
+
+Les delves sont un mode pour petit groupe distinct et évolutif, à un ou deux joueurs. **The Collapsed Reliquary** (niveau 7 et plus) est une crypte reconstruite à partir de salles aléatoires à chaque partie, se terminant sur Deacon Varric. Affrontez-la en solo et un compagnon IA, Tessa, combat à vos côtés. Brother Halven, à la ruine du reliquaire, tient le tableau des delves, où Normal ou Héroïque est votre choix : l'Héroïque augmente le niveau des ennemis et ajoute un affixe aléatoire pour des récompenses plus riches.
+
+### The Ashen Coliseum (JcJ classé)
+
+Appuyez sur `G` ou sur le bouton d'arène pour vous mettre en file. Le matchmaking téléporte les combattants dans une fosse privée éclairée aux torches, un court compte à rebours soigne et réinitialise tout le monde pour un départ équitable, et le combat se termine quand un camp abandonne à 1 pv. Personne ne meurt, et vous revenez exactement là où vous vous étiez mis en file.
+
+- **Classements 1c1 et 2c2**, chacun avec un classement persistant de type Elo (tout le monde démarre à 1500) et un classement absolu (`GET /api/arena/leaderboard`).
+- **2c2 Fiesta**, un mode de groupe plus animé : la première équipe à quinze éliminations gagne dans une limite de six minutes, les joueurs réapparaissent sur des minuteurs croissants, des ramassages d'amélioration distribuent de la puissance sur trois vagues, et un anneau qui se referme force le combat à se rassembler.
+
+### Jouer ensemble
+
+- **Groupes** jusqu'à 5 : clic droit sur un joueur et Inviter dans le groupe. Les membres partagent les droits de butin et le crédit de quête, se répartissent l'XP avec les vrais bonus de groupe vanilla (1.166 / 1.3 / 1.43 pour 3/4/5), et apparaissent comme des points sur la minicarte. `/p` pour le tchat de groupe, `/roll` pour départager le butin.
+- **Échanges** : clic droit et Échanger. Les deux parties déposent objets et argent, les deux doivent accepter, et l'échange est atomique et validé par le serveur. Les objets de quête ne peuvent pas être échangés, et s'éloigner annule.
+- **Duels** : clic droit et Défier en duel. Un compte à rebours de 3 secondes, puis combat jusqu'à ce qu'un camp tombe à 1 pv ; le vainqueur est annoncé à toute la zone et s'enfuir à 60 mètres équivaut à un forfait.
+- **Droits de butin et statut absent** : le premier joueur à blesser une créature possède son butin, son XP et son crédit de quête ; `/afk` et `/dnd` vous marquent comme absent avec une réponse automatique aux chuchotements.
+
+### Monde et systèmes
+
+- **Manger et boire** : asseyez-vous pour récupérer sur 18 secondes, interrompu par les dégâts ou par le fait de se lever, et oui, vous pouvez manger et boire en même temps.
+- **Des marchands** qui achètent nourriture et eau et vendent de l'équipement blanc honnête, avec l'argent affiché en or, argent et cuivre.
+- **IA des créatures** : errance, agressivité de proximité selon la différence de niveau, pulls sociaux, poursuite, retour à la laisse et réinitialisation, butin de cadavre, et réapparitions, avec un rare spawn (Old Greyjaw) sur un long minuteur.
+- **Des spots de pêche** avec leurs propres tables de butin et des prises rares.
+- **Des apparences cosmétiques** tirées en rareté peu commune, rare et épique, purement pour le look.
+- **Mort et rétablissement** : libérez votre esprit vers le cimetière, subissez des dégâts de chute, et ralentissez en nageant.
+- **Météo de biome** : ciel dégagé dans la Vale, pluie dans le Marsh, neige sur les Peaks, avec un fondu enchaîné quand vous passez d'une zone à l'autre.
+
+### Commandes (disposition classique)
+
+| Saisie | Action |
 |---|---|
-| `W`/`S` | courir / reculer — `A`/`D` tournent (strafe en maintenant le clic droit), `Q`/`E` font du strafe |
-| clic droit glissé / clic gauche glissé | vue à la souris / orbite de la caméra &nbsp;·&nbsp; la molette zoome · `Space` saute |
-| `Tab` | parcourir les ennemis les plus proches · clic gauche pour cibler · clic droit pour attaquer/looter/parler |
-| `1`–`9`, `0`, `-`, `=` | barre d'action |
-| `F` | interagir (looter un cadavre / ramasser un objet / parler) |
-| `C` `P` `L` `M` `B` `G` | personnage · grimoire · journal de quêtes · carte du monde · sacs · arène (Ashen Coliseum) |
-| `V` / `R` / `Esc` | plaques de nom · course auto · fermer les fenêtres / désélectionner la cible |
+| `W` / `S` | courir / reculer. `A`/`D` tournent (strafe en maintenant le clic droit), `Q`/`E` font du strafe |
+| clic droit glissé / clic gauche glissé | regard à la souris / caméra en orbite. La molette zoome, `Space` saute |
+| `Tab` | passer aux ennemis les plus proches. Clic gauche pour cibler, clic droit pour attaquer, piller ou parler |
+| `1`-`9`, `0`, `-`, `=` | barre d'action |
+| `F` | interagir (piller un cadavre, ramasser un objet, parler) |
+| `C` `P` `L` `M` `B` `G` | personnage, grimoire, journal de quêtes, carte du monde, sacs, arène |
+| `V` / `R` / `Esc` | barres de nom, course automatique, fermer les fenêtres ou désélectionner la cible |
 
-### Liste de contrôle de fidélité classique
+Les commandes tactiles (un stick de déplacement, le glissement de caméra et des boutons d'action à l'écran) apparaissent automatiquement sur mobile.
 
-**Formules (les vraies, celles de vanilla)**
-- Conversion de la rage `c = 0.0091L² + 3.23L + 4.27` ; gains `7.5·d/c` en infligeant, `2.5·d/c` en subissant
-- Table de toucher des sorts avec la falaise du +3 niveaux (96/95/94/83 %) ; ratés/esquives au corps à corps selon le niveau
-- Réduction d'armure `armor/(armor + 85·AttackerLevel + 400)`
-- Règles de stats PV/mana : les 20 premiers en endurance → 1 pv chacun, le reste → 10 ; les 20 premiers en intelligence → 1 mana, le reste → 15
-- Courbe d'XP 400/900/1400/… jusqu'au niveau 20 ; XP des monstres `45 + 5·L` avec de vraies plages grises à différence nulle
-- GCD de 1,5 s (1,0 s pour les rogues), minuteurs de coups d'arme, règle des 5 secondes de mana
+## Architecture (une sim, trois hôtes)
 
-**Les neuf classes vanilla complètes (niveaux d'apprentissage et valeurs de rang issus de vanilla, 1–20 —
-les sorts gagnent des rangs à mesure que vous montez de niveau : Lightning Bolt R2 au 8, R3 au 14, R4 au 20,
-plus de nouvelles capacités de haut niveau comme Execute, Kidney Shot, Flash Heal,
-Stormstrike et Starfire)**
-- *Warrior* : rage, Heroic Strike (au prochain coup, hors GCD), Battle Shout,
-  Charge, Rend, Thunder Clap, Hamstring, Bloodrage, Overpower (proc sur esquive)
-- *Paladin* : Seal of Righteousness (enchantement d'arme) libéré par **Judgement**,
-  Holy Light, Devotion Aura, Blessing of Might, Divine Protection (absorption),
-  Hammer of Justice (étourdissement), Lay on Hands
-- *Hunter* : **Auto Shot à distance** (8–35 yd avec la dead zone classique),
-  Raptor Strike, Aspect of the Hawk, Serpent Sting, Arcane Shot, Concussive
-  Shot, Mongoose Bite (proc sur esquive), Wing Clip
-- *Rogue* : énergie + **combo points**, Sinister Strike, Eviscerate, Backstab
-  (par derrière + dague), Gouge, Evasion, Slice and Dice, Sprint
-- *Priest* : Smite, Lesser Heal, Power Word: Fortitude, Shadow Word: Pain,
-  **Power Word: Shield** (absorption), **Renew** (HoT), Mind Blast
-- *Shaman* : Lightning Bolt, **Rockbiter Weapon** (enchantement), Healing Wave,
-  Earth Shock, **Lightning Shield** (épines), Flame Shock
-- *Mage* : Fireball, Frost Armor, Arcane Intellect, Frostbolt, Conjure Water,
-  Fire Blast, Arcane Missiles (canalisé), **Polymorph**, Frost Nova
-- *Warlock* : Shadow Bolt, Demon Skin, Immolate, Corruption, **Life Tap**,
-  Curse of Agony, **Drain Life** (vol de santé canalisé)
-- *Druid* : Wrath, Healing Touch, Mark of the Wild, Moonfire, Rejuvenation,
-  Thorns, Entangling Roots, **Bear Form** (changement de forme à activer au 10)
-- Les soins peuvent cibler les membres du groupe (cliquez sur un cadre de groupe, puis soignez) ; les buffs sont
-  lançables sur les joueurs alliés ; les soins peuvent être critiques ; les boucliers d'absorption encaissent les dégâts
-  avant la santé.
+Trois idées tiennent le projet ensemble :
 
-**Monde & systèmes**
-- Manger/boire : asseyez-vous, restaure sur 18 s, s'interrompt en cas de dégâts ou si vous vous levez
-  — et oui, vous pouvez manger et boire en même temps
-- Marchand : achetez nourriture/eau, vendez vos gris ; affichage des pièces en o/a/c
-- Objets de quête au sol avec des étincelles (récupérez les caisses d'approvisionnement des bandits)
-- IA des monstres : errance, aggro de proximité selon la différence de niveau, pulls sociaux (les murlocs
-  attirent de plus loin — amenez des amis), poursuite, leash-évasion-réinitialisation, butin de cadavre,
-  réapparitions ; un rare spawn (Old Greyjaw) sur un long minuteur
-- Mort → libérer l'esprit → cimetière ; dégâts de chute ; nager vous ralentit
-- Journal de quêtes avec abandon, dialogues de gossip avec salutations, récompenses par classe
+- **Une sim, trois hôtes.** Le même code `src/sim/` fait tourner le monde navigateur hors ligne, le serveur en ligne, et l'env RL. Le comportement doit être identique partout, et les tests existent pour le garantir.
+- **`IWorld` est la seule jointure.** `src/world_api.ts` définit `IWorld`. Le `Sim` hors ligne le satisfait structurellement et le `ClientWorld` en ligne l'implémente en reflétant les snapshots du serveur. Le moteur de rendu et le HUD ne parlent qu'à `IWorld`, jamais à un monde concret, si bien qu'une nouvelle fonctionnalité étend d'abord l'interface, puis les deux mondes.
+- **Le serveur est autoritaire.** Les clients envoient l'intention ; le serveur décide des résultats. Le client ne résout jamais le combat, le butin ou l'économie de lui-même.
 
-**Présentation**
-- Tout est procédural : maisons à colombages, toits en bardeaux, chapelle, étal de
-  marché, tentes, feux de camp à la lumière vacillante, portail de mine, colonnes en ruine,
-  ponton de pêche, huttes de boue des murlocs, routes peintes dans le terrain, touffes d'herbe,
-  pins + chênes, lac à l'eau animée, nuages à la dérive, ombres en temps réel
-- Douze familles de créatures riggées (loup/sanglier/araignée/murloc/kobold/squelette/
-  humanoïde/troll/ogre/élémentaire/dragonkin/mouton) avec animations de marche/attaque/incantation/assise/
-  mort
-- Icônes procédurales peintes pour chaque sort, objet et buff — dessinées sur canvas
-  à l'exécution, aucun fichier d'asset
-- UI classique : cadres d'unité avec portraits, barres de buff/debuff avec durées, barre
-  d'action avec balayages de cooldown + coloration portée/ressource, barre d'incantation/canalisation,
-  grimoire, mannequin de personnage, journal de quêtes, carte du monde, fenêtres de marchand + de butin,
-  infobulles à bordure dorée, texte de combat flottant, journal de combat, barre d'XP segmentée,
-  minicarte avec blips et une carte de zone complète
-- Son procédural WebAudio : impacts de corps à corps/sorts, fanfare de montée de niveau, carillons de
-  quête, tintements de pièces, le glas de la mort — aucun fichier audio
+La sim est un tick fixe à 20 Hz (`DT = 1/20`), tout l'aléatoire passe par un unique `Rng` à graine, et `src/sim/` ne porte aucun import DOM, navigateur ou Three.js. C'est ce qui permet au même code de se bundler en serveur d'env Node, en boucle de jeu autoritaire et en onglet de navigateur sans changer une ligne.
+
+### Organisation du projet
+
+| Chemin | De quoi il s'agit |
+|---|---|
+| `src/sim/` | Cœur de jeu déterministe, la source de vérité. Aucune dépendance DOM ou Three. |
+| `src/sim/content/` | Les données comme du code : les neuf classes, aptitudes, zones, donjons, objets, talents. |
+| `src/render/` | Moteur de rendu Three.js (géométrie procédurale, textures, VFX). Lit le monde, ne le modifie jamais. |
+| `src/game/` | Saisie locale, caméra, raccourcis clavier, commandes mobiles, WebAudio procédural. |
+| `src/ui/` | HUD classique (cadres, fenêtres, infobulles, carte, texte de combat flottant), icônes procédurales, i18n. |
+| `src/net/` | Client en ligne : authentification REST plus un miroir de monde WebSocket (`ClientWorld`). |
+| `src/admin/` | SPA du tableau de bord admin (entrée `admin.html` distincte). |
+| `server/` | Serveur autoritaire : HTTP et WS, boucle de monde, Postgres, authentification, social, modération. |
+| `headless/` + `python/` | Serveur d'env RL (`env_server.ts`) et bindings Python Gym. |
+| `tests/` | Suite Vitest. |
+| `scripts/` | Build d'assets plus scripts E2E navigateur, captures d'écran et intégration. |
+| `public/` · `docs/` | Assets statiques (modèles GLB, textures, HDRIs) et documents de conception. |
+
+La plupart des répertoires portent leur propre `CLAUDE.md` avec les conventions locales. L'ensemble complet des invariants du projet vit dans le [`CLAUDE.md`](../../CLAUDE.md) racine.
+
+## Construit comme les classiques
+
+Le combat, la montée en niveau et la menace tournent tous sur d'authentiques règles d'inspiration classique : rage et énergie, tables de toucher et d'esquive, atténuation par l'armure, la vraie courbe d'XP, les minuteurs de coup, et le cooldown global. Le ressenti est tel que vous vous en souvenez plutôt qu'une approximation. Les chiffres exacts vivent dans `src/sim/` si vous voulez les lire.
+
+Et presque rien de tout cela n'est un asset livré. Le monde est dessiné à partir du code :
+
+- Villes, créatures, terrain, eau, météo et ombres en temps réel procéduraux, sans aucun fichier de modèle 3D pour le monde.
+- Douze familles de créatures riggées avec des animations complètes de marche, attaque, incantation, assise et mort.
+- Icônes de sorts, d'objets et de buffs peintes sur canvas à l'exécution.
+- Un HUD classique complet (cadres d'unité, barres d'action, infobulles, journal de quêtes, carte du monde, minicarte, texte de combat flottant) et du WebAudio procédural pour chaque son.
 
 ## Développement
 
 ```bash
-npm test                        # suite vitest : formules, combat, IA, quêtes, les 9 classes,
-                                #   groupes, duels, échanges, élites, la crypte
-npm run build                   # build web de production
-node scripts/smoke_browser.mjs  # E2E warrior (nécessite `npm run dev` en cours d'exécution)
-node scripts/smoke_mage.mjs     # mage : incantation, polymorph, conjure+boire, mort/libération
-node scripts/smoke_rogue.mjs    # rogue : combo points, eviscerate, marchand, manger
-node scripts/visual_tour.mjs    # tour en captures d'écran de la zone + UI dans tmp/
-node scripts/mp_integration.mjs # suite de 26 vérifications API/WS/persistance (serveur en cours)
-node scripts/social_e2e.mjs     # échange + duel sur le réseau (ALLOW_DEV_COMMANDS=1)
-node scripts/arena_visual.mjs   # deux clients se mettent en file + s'affrontent en 1c1 classé dans le Ashen Coliseum
-node scripts/crypt_raid.mjs     # cinq bots nettoient le Hollow Crypt (ALLOW_DEV_COMMANDS=1)
+npm test                        # vitest: formulas, combat, AI, quests, all 9 classes, parties, duels, trades, dungeons
+npm run build                   # production web build
+node scripts/smoke_browser.mjs  # warrior end-to-end (needs npm run dev)
+node scripts/smoke_mage.mjs     # mage: casting, polymorph, conjure and drink, death and release
+node scripts/visual_tour.mjs    # screenshot tour of the zone and UI into tmp/
+node scripts/tour_temple.mjs    # screenshot tour of the Glimmermere and Drowned Temple into tmp/
+node scripts/mp_integration.mjs # API, WS, and persistence checks (server running)
+node scripts/social_e2e.mjs     # trade and duel over the wire (ALLOW_DEV_COMMANDS=1)
+node scripts/arena_visual.mjs   # two clients queue and fight a ranked 1v1
+node scripts/crypt_raid.mjs     # five bots clear the Hollow Crypt (ALLOW_DEV_COMMANDS=1)
 ```
 
-Les agents de navigateur peuvent piloter le mouvement via `window.__game.controller` au lieu
-de simuler des touches maintenues. Utilisez `controller.move({ forward: true }, facingRadians)`
-ou des drapeaux websocket compacts tels que `{ f: 1, sr: 1 }` ; appelez
-`controller.face(facingRadians)` pour mettre à jour l'orientation sans changer le mouvement et
-`controller.stop()` pour revenir à la véritable saisie clavier. Le jeu en ligne envoie la
-même trame d'entrée au serveur, qui n'accepte que des drapeaux de mouvement booléens/`1` et des
-valeurs d'orientation finies.
+Les tests logiques et unitaires utilisent Vitest. Pendant l'itération, lancez un seul fichier : `npx vitest run tests/sim.test.ts`. Les scripts E2E et visuels pilotent de vrais navigateurs via `puppeteer-core` et nécessitent que `npm run dev` tourne (souvent `npm run server` aussi). Les agents navigateurs peuvent piloter le déplacement via `window.__game.controller` plutôt que de simuler des touches maintenues, par exemple `controller.move({ forward: true }, facingRadians)` ou des indicateurs compacts comme `{ f: 1, sr: 1 }`.
 
-Structure :
+Pour les commandes du serveur, voir [Développer en ligne](#develop-online-with-hot-reload) ci-dessus, [DEPLOY.md](../../DEPLOY.md) pour la production, et [CREDITS.md](../../CREDITS.md) pour les licences des assets.
 
-```
-src/sim/      cœur de jeu déterministe à N joueurs (aucun import DOM) — partagé par toutes les cibles
-src/render/   moteur de rendu Three.js : models.ts (rigs), props.ts, textures.ts (procédural)
-src/game/     entrée + caméra + synthé WebAudio
-src/ui/       HUD classique : cadres, fenêtres, infobulles, carte, FCT
-src/net/      client en ligne : auth REST + miroir du monde WebSocket (ClientWorld)
-src/world_api.ts  l'interface IWorld que Sim et ClientWorld satisfont tous deux
-server/       serveur de jeu : main.ts (HTTP+WS), game.ts (boucle de monde), db.ts, auth.ts
-docker-compose.yml  postgres:16-alpine
-tests/        suite vitest
-scripts/      E2E navigateur + tour de captures d'écran + tests d'intégration multijoueur
-```
+## Localisation
 
-Les noms, les quêtes et les zones sont originaux ; les formules et les mécaniques suivent
-vanilla. La graine du monde est fixée dans `src/main.ts` afin que le monde soit le même endroit
-à chaque visite.
+Chaque chaîne visible par le joueur est résolue via `t()`, et le jeu est livré dans **21 langues** (anglais, deux espagnols, deux français, anglais Canada, italien, allemand, chinois simplifié et traditionnel, coréen, japonais, portugais du Brésil, russe, néerlandais, polonais, indonésien, turc, suédois, vietnamien et danois). La sim et le serveur restent agnostiques sur la langue : ils émettent des clés stables ou de l'anglais que le client relocalise à la frontière, ce qui préserve le déterminisme. Les contributeurs ajoutent uniquement l'anglais ; le mainteneur remplit en lot les autres langues avant chaque version. Le workflow est documenté dans `docs/i18n-scaling/translation-workflow.md`.
 
 ## Contribuer
 
-Les contributions de toutes sortes sont les bienvenues : code, traductions,
-rapports de bugs et documentation. Commencez par
-[CONTRIBUTING.fr_FR.md](CONTRIBUTING.fr_FR.md) pour la mise en place et les
-recommandations, et merci de respecter notre [Code de conduite](../../CODE_OF_CONDUCT.md).
-Vous débutez ici ? Cherchez les tickets étiquetés
-[`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue),
-ouvrez un [ticket](https://github.com/levy-street/world-of-claudecraft/issues/new/choose),
-ou venez dire bonjour sur [Discord](https://discord.gg/GjhnUsBtw).
+Les contributions de toute sorte sont les bienvenues : code, traductions, rapports de bugs et documentation. Commencez par [CONTRIBUTING.md](CONTRIBUTING.fr_FR.md) pour la mise en place, lisez le [Code de conduite](../../CODE_OF_CONDUCT.md), et consultez [SECURITY.md](../../SECURITY.md) avant de signaler une vulnérabilité. Nouveau ici ? Cherchez les tickets étiquetés [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue), ouvrez un [ticket](https://github.com/levy-street/world-of-claudecraft/issues/new/choose), ou venez dire bonjour sur [Discord](https://discord.gg/GjhnUsBtw).
+
+<div align="center">
+
+![World of Claude](../../worldofclaude.png)
+
+![Communauté World of ClaudeCraft](../../woc_community.png)
+
+</div>
 
 ## Licence
 
-Le code est [sous licence MIT](../../LICENSE) — forkez-le, remixez-le, hébergez votre propre monde.
+Le code est [sous licence MIT](../../LICENSE), alors forkez-le, remixez-le, et hébergez votre propre monde.
 
-Les assets artistiques tiers fournis (modèles, textures, HDRIs) restent sous
-leurs propres licences — tous en CC0 domaine public sauf les normal maps d'eau sous licence MIT,
-comme documenté pour chaque pack dans [CREDITS.md](../../CREDITS.md).
+Les assets artistiques tiers fournis (modèles, textures, HDRIs) conservent leurs propres licences, tous CC0 du domaine public sauf les normal maps d'eau sous MIT, documentés par pack dans [CREDITS.md](../../CREDITS.md).

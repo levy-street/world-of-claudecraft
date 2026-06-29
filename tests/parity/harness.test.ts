@@ -146,6 +146,7 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
       'scale',
       'skin',
       'skinCatalog',
+      'stealthed',
       'vx',
       'vy',
       'vz',
@@ -171,6 +172,7 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
       'skin',
       'skinCatalog',
       'talentMods',
+      'wireRev',
     ]);
   });
 

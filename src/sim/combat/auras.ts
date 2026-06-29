@@ -32,6 +32,7 @@ import { recalcPlayerStats } from '../entity';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
+import { tickThornsCooldown } from './thorns_charge';
 
 // Friendly NPCs reject hostile control / debuff auras: any aura of these kinds is
 // stripped on the NPC's tick (cleanseFriendlyNpcAuras). Moved here with that method
@@ -114,11 +115,17 @@ export function cleanseFriendlyNpcAuras(ctx: SimContext, e: Entity): void {
 }
 
 export function updateAuras(ctx: SimContext, e: Entity): void {
-  if (e.dead) return;
+  if (e.dead) {
+    e.stealthed = e.auras.some((a) => a.kind === 'stealth');
+    return;
+  }
   let statsDirty = false;
   for (let i = e.auras.length - 1; i >= 0; i--) {
     const a = e.auras[i];
     a.remaining -= DT;
+    // charge-limited thorns (Lightning Shield): age its internal cooldown so the
+    // next melee hit can reflect once it elapses. No-op for ungated thorns.
+    if (a.kind === 'thorns') tickThornsCooldown(a);
     if (a.tickInterval) {
       a.tickTimer = (a.tickTimer ?? a.tickInterval) - DT;
       if (a.tickTimer <= CAST_COMPLETE_EPS) {
@@ -140,6 +147,10 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             a.name,
             'hit',
             true,
+            undefined,
+            // Periodic (DoT) ticks are not a direct attack: they must not walk a
+            // mob's leash anchor, so a DoT-kited mob still leashes home.
+            false,
           );
           if (e.dead) return;
         } else if (a.kind === 'hot') {
@@ -167,11 +178,15 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
       e.auras.splice(i, 1);
       ctx.applyNonPlayerStatAura(e, a, -1);
       ctx.emit({ type: 'aura', targetId: e.id, name: a.name, gained: false });
-      if (a.kind.startsWith('buff') || a.kind.startsWith('form')) statsDirty = true;
+      // debuff_ap is the one non-buff kind recalcPlayerStats folds, so it must
+      // mark stats dirty on expiry or the AP cut would persist after the fade.
+      if (a.kind.startsWith('buff') || a.kind.startsWith('form') || a.kind === 'debuff_ap')
+        statsDirty = true;
     }
   }
   if (statsDirty && e.kind === 'player') {
     const meta = ctx.players.get(e.id);
     if (meta) recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta));
   }
+  e.stealthed = e.auras.some((a) => a.kind === 'stealth');
 }

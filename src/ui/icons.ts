@@ -2805,13 +2805,18 @@ function weaponIconUrl(id: string): string | null {
   return model ? `${WEAPON_ICON_DIR}/${model}.jpg` : null;
 }
 
-// Hand-picked image icons for class abilities, served from
-// /ui/skills/<class>/<abilityId>.png (128px PNGs; see public/ui/skills/ and the
-// per-class mapping.json). Class folder is derived from the ability's own
-// `class`, so adding a class is just listing its ability ids here. Abilities not
-// listed fall through to the procedural ABILITY_RECIPES below.
+// Hand-picked image icons for class abilities, committed as 128px WebP under
+// public/ui/skills/<class>/<id>.webp (each icon's provenance/license is recorded in the
+// per-class mapping.json). WebP is the source of truth: the tree is WebP only, no PNGs.
+// To add an icon, drop the art into public/ui/skills/<class>/ in any common raster format
+// and run `npm run assets:skills` (scripts/convert_skill_icons_webp.mjs): it encodes each
+// non-webp image to WebP (quality 82, alphaQuality 100, smartSubsample true, effort 6) and
+// deletes the original. Then list its id below. Class folder is derived from the ability's
+// own `class`, so adding a class is just listing its ability ids here. Abilities not listed
+// fall through to the procedural ABILITY_RECIPES below. ABILITY_IMAGE_IDS and abilityImageUrl
+// are exported for the gate in tests/skill_icons.test.ts.
 const SKILL_ICON_DIR = '/ui/skills';
-const ABILITY_IMAGE_IDS = new Set<string>([
+export const ABILITY_IMAGE_IDS = new Set<string>([
   // paladin (CraftPix premium "RPG Paladin skill icons" pack)
   'seal_of_righteousness',
   'holy_light',
@@ -2990,10 +2995,10 @@ const ABILITY_IMAGE_IDS = new Set<string>([
 ]);
 
 /** Static URL of an ability's image icon, or null if it uses a recipe. */
-function abilityImageUrl(id: string): string | null {
+export function abilityImageUrl(id: string): string | null {
   if (!ABILITY_IMAGE_IDS.has(id)) return null;
   const cls = ABILITIES[id]?.class;
-  return cls ? `${SKILL_ICON_DIR}/${cls}/${id}.png` : null;
+  return cls ? `${SKILL_ICON_DIR}/${cls}/${id}.webp` : null;
 }
 
 const urlCache = new Map<string, string>();

@@ -222,6 +222,24 @@ export const fr_CA: EnTranslations = {
     "rest": {
       "resting": "Au repos"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
+    "unitFrame": {
+      "playerLabel": "Votre personnage",
+      "targetLabel": "Votre cible",
+      "targetAnnounce": "Cible : {name}",
+      "partyLabel": "Votre groupe",
+      "partyGroup": "Groupe {n}",
+      "durationUnitSeconds": "s"
+    },
+    "character": {
+      "modelPreview": "Aperçu du modèle du personnage"
+    },
+    "skipLinks": {
+      "mainHud": "Aller à l'interface principale",
+      "chat": "Aller à la discussion"
+    },
     "mobile": {
       "autorun": "Course automatique",
       "jump": "Sauter",
@@ -243,6 +261,13 @@ export const fr_CA: EnTranslations = {
       "coordinates": "Coordonnées",
       "heading": "Cap",
       "minimapZoom": "Zoom de la minicarte"
+    },
+    "castBar": {
+      "playerAria": "Votre barre d'incantation",
+      "targetAria": "Barre d'incantation de la cible"
+    },
+    "leaderboard": {
+      "close": "Fermer"
     },
     "raidLockout": {
       "title": "Verrous de raid",
@@ -295,7 +320,10 @@ export const fr_CA: EnTranslations = {
       "showWalletOnCharacterScreen": "Afficher le portefeuille sur l’écran des personnages",
       "showWalletOnPlayerCard": "Afficher le portefeuille sur la carte de joueur",
       "uiScale": "Échelle de l’interface",
-      "highContrastBackground": "Arrière-plan à contraste élevé"
+      "highContrastBackground": "Arrière-plan à contraste élevé",
+      "showItemLevel": "Afficher le niveau d'objet",
+      "itemLevelLine": "Niveau d'objet {level}",
+      "itemScoreLine": "Score {score}"
     },
     "controller": {
       "title": "Manette",
@@ -425,6 +453,10 @@ export const fr_CA: EnTranslations = {
     },
     "tips": {
       "joinChannels": "Conseil : tapez /join world ou /join lfg pour discuter avec les joueurs de tout le royaume."
+    },
+    "itemSet": {
+      "header": "{name} ({have}/{total})",
+      "bonusLine": "({pieces}) {bonus}"
     },
     "questShare": {
       "notShareable": "Cette quête ne peut pas être partagée.",
@@ -562,6 +594,26 @@ export const fr_CA: EnTranslations = {
       "exportDone": "Vos données ont été téléchargées. Nous vous avons envoyé une confirmation par e-mail.",
       "exportFailed": "Impossible d'exporter vos données. Réessayez dans un moment."
     },
+    "masterLoot": {
+      "title": "Butin de maitre",
+      "enableLabel": "Butin de maitre",
+      "enableAria": "Activer le butin de maitre",
+      "looterLabel": "Maitre du butin",
+      "leaderOption": "Chef de groupe",
+      "thresholdLabel": "Seuil",
+      "thresholdUncommon": "Inhabituel et plus",
+      "thresholdRare": "Rare et plus",
+      "thresholdEpic": "Epique et plus",
+      "assignPrompt": "Attribuer {item}",
+      "assignAria": "Attribuer {item} a {name}",
+      "rollButton": "Tirer au sort",
+      "selectAll": "Tout selectionner",
+      "methodMaster": "Mode de butin defini sur butin de maitre. Maitre du butin: {name}.",
+      "methodGroup": "Mode de butin defini sur butin de groupe.",
+      "assigned": "{looter} a attribue {item} a {target}.",
+      "unassigned": "{item} n a pas ete attribue et devient libre pour tous.",
+      "leaderOnly": "Seul le chef de groupe peut changer le mode de butin."
+    },
     "bags": {
       "filterGroupAria": "Filtrer les sacs par catégorie",
       "filterAll": "Tous",
@@ -583,6 +635,91 @@ export const fr_CA: EnTranslations = {
       "notRaid": "Votre groupe n'est pas un raid.",
       "leaderOnly": "Seul le chef de raid peut convertir en groupe.",
       "tooLarge": "Un raid de plus de cinq membres ne peut pas être reconverti en groupe."
+    },
+    "itemArmorType": {
+      "cloth": "Tissu",
+      "leather": "Cuir",
+      "mail": "Mailles"
+    },
+    "auraEffect": {
+      "dot": "Cause {value} points de dégâts de {school} toutes les {interval} s",
+      "hot": "Redonne {value} points de vie toutes les {interval} s",
+      "absorb": "Bloque {value} points de dégâts",
+      "healAbsorb": "Bloque {value} points de soins reçus",
+      "thorns": "Cause {value} points de dégâts de {school} aux attaquants",
+      "slow": "Diminue la vitesse de déplacement de {pct}%",
+      "speed": "Accroît la vitesse de déplacement de {pct}%",
+      "attackSpeedSlow": "Diminue la vitesse d'attaque de {pct}%",
+      "attackSpeedFast": "Accroît la vitesse d'attaque de {pct}%",
+      "haste": "Accroît la vitesse d'attaque et d'incantation de {pct}%",
+      "tongues": "Accroît le temps d'incantation de {pct}%",
+      "increase": {
+        "ap": "Accroît la puissance d'attaque de {value}",
+        "armor": "Accroît l'armure de {value}",
+        "int": "Accroît l'intelligence de {value}",
+        "agi": "Accroît l'agilité de {value}",
+        "sta": "Accroît l'endurance de {value}",
+        "spi": "Accroît l'esprit de {value}",
+        "allStats": "Accroît tous les attributs de {value}"
+      },
+      "reduce": {
+        "ap": "Diminue la puissance d'attaque de {value}",
+        "armor": "Diminue l'armure de {value}",
+        "int": "Diminue l'intelligence de {value}",
+        "agi": "Diminue l'agilité de {value}",
+        "sta": "Diminue l'endurance de {value}",
+        "spi": "Diminue l'esprit de {value}",
+        "allStats": "Diminue tous les attributs de {value}"
+      },
+      "dodge": "Accroît les chances d'esquive de {pct}%",
+      "dodgeReduce": "Diminue les chances d'esquive de {pct}%",
+      "armorFlat": "Diminue l'armure de {value}",
+      "armorFlatStacks": "Diminue l'armure de {value} ({stacks} charges)",
+      "mortalWound": "Diminue les soins reçus de {pct}%",
+      "vulnerability": "Accroît les dégâts subis de {pct}%",
+      "physVuln": "Accroît les dégâts physiques subis de {pct}%",
+      "spellVuln": "Accroît les dégâts magiques subis de {pct}%",
+      "critVuln": "Accroît les chances de subir un coup critique de {pct}%",
+      "costTax": "Accroît le coût des techniques de {pct}%",
+      "stun": "Sonné : impossible d'agir",
+      "root": "Immobilisé : impossible de bouger",
+      "incapacitate": "Neutralisé, impossible d'agir",
+      "polymorph": "Transformé : impossible d'agir",
+      "hex": "Diminue les dégâts et soins prodigués de {pct}%",
+      "blind": "Aveuglé, impossible d'agir",
+      "silence": "Diminue au silence : impossible de lancer des sorts",
+      "disarm": "Désarmé, impossible d'utiliser des attaques d'arme",
+      "lockout": "École de magie verrouillée",
+      "imbue": "Arme enchantée avec effets bonus",
+      "imbueRange": "Arme enchantée : {min} à {max} dégâts bonus au jugement",
+      "stealth": "Dissimulé ; vitesse de déplacement réduite de {pct}%",
+      "formBear": "Forme ours : points de vie et armure augmentés",
+      "formCat": "Forme féline : dégâts de mêlée et énergie",
+      "formTravel": "Forme voyage : vitesse de déplacement augmentée de {pct}%",
+      "defensiveStance": "Posture défensive, dégâts subis réduits, menace accrue",
+      "righteousFury": "Fureur vertueuse, menace des dégâts Sacré fortement accrue",
+      "scale": "Gabarit augmentée de {pct}%",
+      "jump": "Saut augmentée de {pct}%",
+      "school": {
+        "physical": "physique",
+        "fire": "feu",
+        "frost": "froid",
+        "arcane": "arcane",
+        "shadow": "ombre",
+        "holy": "sacré",
+        "nature": "nature"
+      }
+    },
+    "loot": {
+      "chestTitle": "Coffre"
+    },
+    "spellbook": {
+      "addToBarAria": "Ajouter {name} à la barre d'action",
+      "removeFromBarAria": "Retirer {name} de la barre d'action"
+    },
+    "nameplate": {
+      "mob": "[{level}] {name}",
+      "mobElite": "[{level}+] {name}"
     }
   },
   "guide": {
@@ -1406,6 +1543,7 @@ export const fr_CA: EnTranslations = {
     "copyright": "2026 World of ClaudeCraft",
     "githubLink": "https://github.com/levy-street/world-of-claudecraft",
     "githubLabel": "Projet open source",
+    "whitepaper": "Livre blanc",
     "terms": "Conditions d'utilisation",
     "privacy": "Politique de confidentialité",
     "discordLabel": "Rejoindre le Discord"
@@ -2409,7 +2547,9 @@ export const fr_CA: EnTranslations = {
       "mobileMap": "Carte",
       "closeMap": "Fermer la carte",
       "zoomIn": "Zoom avant",
-      "zoomOut": "Zoom arrière"
+      "zoomOut": "Zoom arrière",
+      "mapCanvasLabel": "Carte",
+      "mapSummary": "Carte de {zone}."
     },
     "options": {
       "gameMenu": "Menu du jeu",
@@ -2610,6 +2750,7 @@ export const fr_CA: EnTranslations = {
     "combat": {
       "floatingMiss": "Raté",
       "floatingDodge": "Esquive",
+      "floatingResist": "Résisté",
       "cannotMove": "Immobilisé !",
       "attack": "attaque",
       "damageDone": "Votre {ability} touche {target} pour {amount}.",
@@ -2618,6 +2759,7 @@ export const fr_CA: EnTranslations = {
       "damageTakenCrit": "{source} vous inflige un coup critique pour {amount}.",
       "miss": "Votre {ability} rate {target}.",
       "dodged": "{target} esquive votre {ability}.",
+      "resisted": "{target} résiste à votre {ability}.",
       "healSelf": "Votre {ability} vous rend {amount} points de vie.",
       "healSelfCrit": "Votre {ability} vous rend un soin critique de {amount}.",
       "healOther": "Votre {ability} soigne {target} pour {amount}.",
@@ -3348,7 +3490,7 @@ export const fr_CA: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "Projectiles des Arcanes",
-        "description": "Lance des Projectiles des Arcanes sur l'ennemi et inflige 8 points de dégâts des Arcanes chaque seconde pendant 3 s."
+        "description": "Lance des Projectiles des Arcanes sur l'ennemi et inflige {damage} points de dégâts des Arcanes chaque seconde pendant 3 s."
       },
       "polymorph": {
         "name": "Métamorphose",
@@ -3412,7 +3554,7 @@ export const fr_CA: EnTranslations = {
       },
       "stealth": {
         "name": "Camouflage",
-        "description": "Vous dissimule dans les ombres: les ennemis vous remarquent à peine, mais vous vous déplacez 30% plus lentement. Attaquer ou subir des dégâts interrompt Camouflage. Relancez pour sortir."
+        "description": "Vous dissimule dans les ombres: les ennemis vous remarquent à peine, mais vous vous déplacez 50% plus lentement. Attaquer ou subir des dégâts interrompt Camouflage. Relancez pour sortir."
       },
       "adrenaline_rush": {
         "name": "Poussée d'adrénaline",
@@ -3444,7 +3586,7 @@ export const fr_CA: EnTranslations = {
       },
       "vanish": {
         "name": "Disparition",
-        "description": "Vous disparaissez et entrez en Camouflage, même en plein combat. Vous vous déplacez 30% plus lentement tant que vous êtes dissimulé. Dure jusqu'à 10 s."
+        "description": "Vous disparaissez et entrez en Camouflage, même en plein combat. Vous vous déplacez 50% plus lentement tant que vous êtes dissimulé. Dure jusqu'à 10 s."
       },
       "instant_poison": {
         "name": "Poison instantané",
@@ -3596,7 +3738,7 @@ export const fr_CA: EnTranslations = {
       },
       "mind_flay": {
         "name": "Fouet mental",
-        "description": "Assaille l'esprit de la cible avec de l'énergie d'Ombre et inflige 12 points de dégâts chaque seconde pendant 3 s."
+        "description": "Assaille l'esprit de la cible avec de l'énergie d'Ombre et inflige {damage} points de dégâts chaque seconde pendant 3 s."
       },
       "flash_heal": {
         "name": "Soins rapides",
@@ -3672,7 +3814,7 @@ export const fr_CA: EnTranslations = {
       },
       "drain_life": {
         "name": "Drain de vie",
-        "description": "Draine la vie de la cible et vous transfère 7 points de vie chaque seconde pendant 5 s."
+        "description": "Draine la vie de la cible et vous transfère {damage} points de vie chaque seconde pendant 5 s."
       },
       "fear": {
         "name": "Peur",
@@ -3852,7 +3994,7 @@ export const fr_CA: EnTranslations = {
       },
       "prowl": {
         "name": "Rôder",
-        "description": "Passe en camouflage tant que vous êtes en forme de loup. Inutilisable en combat."
+        "description": "Passe en camouflage tant que vous êtes en forme de loup, avec une vitesse de déplacement réduite de 50%. Inutilisable en combat."
       },
       "rake": {
         "name": "Lacérer",
@@ -6248,6 +6390,43 @@ export const fr_CA: EnTranslations = {
         "name": "Le Reliquaire effondré",
         "enterText": "Vous descendez dans le reliquaire effondré.",
         "leaveText": "Vous remontez auprès du frère Halven, à la ruine du reliquaire."
+      }
+    },
+    "itemSets": {
+      "crownforged": {
+        "name": "Tenue de guerre Couronneforge",
+        "bonus2": "Augmente la puissance d'attaque de 40.",
+        "bonus3": "Augmente la force de 15 et l'endurance de 15."
+      },
+      "deathlord": {
+        "name": "Tenue de guerre du seigneur de la mort",
+        "bonus2": "Augmente la puissance d'attaque de 40.",
+        "bonus3": "Augmente la force de 15 et l'endurance de 15."
+      },
+      "necromancers": {
+        "name": "Robe du nécromancien",
+        "bonus2": "Réduit de 50% le recul des incantations causé par les dégâts.",
+        "bonus3": "Les dégâts subis ne retardent pas l'incantation."
+      },
+      "nighttalon": {
+        "name": "Tenue de cuir Serre-nuit",
+        "bonus2": "Augmente la puissance d'attaque de 40.",
+        "bonus3": "Augmente l’agilité de 15 et les chances de critique de 2%."
+      },
+      "soulflame": {
+        "name": "Robe de Flamme d’âme",
+        "bonus2": "Réduit de 50% le recul des incantations causé par les dégâts.",
+        "bonus3": "Les dégâts subis ne retardent pas l'incantation."
+      },
+      "stormcallers": {
+        "name": "Robe de l’Appel-tempête",
+        "bonus2": "Réduit de 50% le recul des incantations causé par les dégâts.",
+        "bonus3": "Les dégâts subis ne retardent pas l'incantation."
+      },
+      "wyrmshadow": {
+        "name": "Tenue d’Ombre-drake",
+        "bonus2": "Augmente la puissance d'attaque de 40.",
+        "bonus3": "Augmente l’agilité de 15 et les chances de critique de 2%."
       }
     }
   },

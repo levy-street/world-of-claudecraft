@@ -41,6 +41,7 @@ import {
   type Vec3,
 } from '../types';
 import { groundHeight, WATER_LEVEL } from '../world';
+import { rallyFleeingAllies } from './social_aggro';
 import { isTrivialTo, retargetMob, updateMobTarget } from './targeting';
 
 const EVADE_SPEED_MULT = 1.6;
@@ -59,6 +60,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     if (mob.ownerId !== null && MOBS[mob.templateId]?.family !== 'demon') return;
     mob.corpseTimer -= DT;
     mob.respawnTimer -= DT;
+    if (mob.lootFfaTimer > 0) mob.lootFfaTimer -= DT; // owner-lock lapses, then loot goes FFA
     // Death Throes: a volatile corpse counts down its fuse, then detonates once.
     if (mob.detonateTimer !== Infinity) {
       mob.detonateTimer -= DT;
@@ -450,6 +452,16 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       mob.fleeTimer -= DT;
       if (mob.fleeTimer <= 0) {
         // Recover nerve and turn to fight again; hasFled keeps it from re-fleeing.
+        recoverFromFlee(mob, target, leash, leashAnchor);
+        mob.swingTimer = Math.min(mob.swingTimer, 0.4);
+        break;
+      }
+      // Each tick of the flee, look for a local same-family ally to run back with. The
+      // instant the fleer reaches one (the first non-empty rally), that local cluster
+      // joins the fight and the fleer turns back to re-engage WITH it. Ending the flee on
+      // first contact is what keeps the rally LOCAL: the fleer pulls one cluster, then
+      // heads back the way it came, so it never chains the rest of the pack down the lane.
+      if (rallyFleeingAllies(ctx, mob, target) > 0) {
         recoverFromFlee(mob, target, leash, leashAnchor);
         mob.swingTimer = Math.min(mob.swingTimer, 0.4);
         break;

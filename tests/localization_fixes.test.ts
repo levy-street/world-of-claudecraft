@@ -5,6 +5,7 @@ import { resolveReportTarget } from '../server/report_target';
 import { DICT as adminDICT, classLabel, setAdminLanguage } from '../src/admin/i18n';
 import { ABILITIES } from '../src/sim/data';
 import {
+  da_DK,
   de_DE,
   en,
   en_CA,
@@ -13,13 +14,19 @@ import {
   es_ES,
   fr_CA,
   fr_FR,
+  id_ID,
   it_IT,
   ja_JP,
   ko_KR,
+  nl_NL,
+  pl_PL,
   pt_BR,
   ru_RU,
   setLanguage,
   supportedLanguages,
+  sv_SE,
+  tr_TR,
+  vi_VN,
   zh_CN,
   zh_TW,
 } from '../src/ui/i18n';
@@ -55,6 +62,13 @@ const locales: Record<string, any> = {
   ja_JP,
   pt_BR,
   ru_RU,
+  nl_NL,
+  pl_PL,
+  id_ID,
+  tr_TR,
+  sv_SE,
+  vi_VN,
+  da_DK,
 };
 const ph = (s: string) =>
   [...String(s).matchAll(/\{([A-Za-z0-9_]+)\}/g)]
@@ -618,9 +632,10 @@ describe("R2: bug-report errors map to the server's exact emitted bytes", () => 
       expect(serverSrc.includes(`'${e}'`), `server no longer emits "${e}"`).toBe(true);
     }
 
-    const hudSrc = fs.readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+    // localizeBugReportError moved to the options window painter.
+    const hudSrc = fs.readFileSync(path.resolve(process.cwd(), 'src/ui/options_window.ts'), 'utf8');
     const fnStart = hudSrc.indexOf('localizeBugReportError(err: unknown)');
-    expect(fnStart, 'localizeBugReportError not found in hud.ts').toBeGreaterThan(-1);
+    expect(fnStart, 'localizeBugReportError not found in options_window.ts').toBeGreaterThan(-1);
     const start = hudSrc.indexOf('keyByMessage: Record<string, TranslationKey> = {', fnStart);
     const body = hudSrc.slice(start, hudSrc.indexOf('};', start));
     const keys = new Set(
@@ -805,6 +820,12 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/delves/runs.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/delves/lockpick_controller.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/market.ts'), 'utf8'),
+    // W2: the inventory/vendor command bodies (equip/use/discard + buy/sell/buyback).
+    // The "Discarded"/"Equipped"/"Unequipped"/"You sit down to eat|drink"/"You quaff"/
+    // "Sold ... for"/"Bought back ... for" emit literals are byte-identical after the
+    // move, so their hud/sim_i18n matchers are unchanged; scan them here so they stay
+    // under the drift guard now that they live outside sim.ts.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/items.ts'), 'utf8'),
     // L1: the loot-distribution layer's player-facing loot emits ("You loot ...",
     // "Everyone passed on ...", "<name> wins ...").
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/loot/loot_roll.ts'), 'utf8'),

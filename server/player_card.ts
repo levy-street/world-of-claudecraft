@@ -21,6 +21,7 @@ import {
   upsertPlayerCard,
 } from './db';
 import { isUniqueViolation, json, parsePngInfo, readBinaryBody } from './http_util';
+import { PLAYERCARD_NEW } from './player_card.newlocales';
 import { recordUsageMetric } from './provider_usage';
 import { REALM_PUBLIC_ORIGIN } from './realm';
 
@@ -64,6 +65,13 @@ export const PUBLIC_CARD_LOCALES = [
   'ja_JP',
   'pt_BR',
   'ru_RU',
+  'nl_NL',
+  'pl_PL',
+  'id_ID',
+  'tr_TR',
+  'sv_SE',
+  'vi_VN',
+  'da_DK',
 ] as const;
 export type PublicCardLocale = (typeof PUBLIC_CARD_LOCALES)[number];
 
@@ -78,7 +86,7 @@ type PlayerClassKey =
   | 'warlock'
   | 'druid';
 
-interface PublicCardCopy {
+export interface PublicCardCopy {
   gameName: string;
   unknownClass: string;
   levelClass: string;
@@ -393,6 +401,7 @@ export const PUBLIC_CARD_COPY: Record<PublicCardLocale, PublicCardCopy> = {
       druid: 'Друид',
     },
   },
+  ...PLAYERCARD_NEW,
 };
 
 const PUBLIC_CARD_LOCALE_BY_LOWER = new Map(
@@ -418,6 +427,13 @@ export function normalizePublicCardLocale(raw: unknown): PublicCardLocale {
   if (lower.startsWith('ja')) return 'ja_JP';
   if (lower.startsWith('pt')) return 'pt_BR';
   if (lower.startsWith('ru')) return 'ru_RU';
+  if (lower.startsWith('nl')) return 'nl_NL';
+  if (lower.startsWith('pl')) return 'pl_PL';
+  if (lower.startsWith('id')) return 'id_ID';
+  if (lower.startsWith('tr')) return 'tr_TR';
+  if (lower.startsWith('sv')) return 'sv_SE';
+  if (lower.startsWith('vi')) return 'vi_VN';
+  if (lower.startsWith('da')) return 'da_DK';
   return 'en';
 }
 

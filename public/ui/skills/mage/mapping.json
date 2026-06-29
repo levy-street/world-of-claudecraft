@@ -14,85 +14,85 @@
       "abilityId": "fireball",
       "sourcePack": "pyromancer",
       "sourceFile": "24.png",
-      "output": "fireball.png"
+      "output": "fireball.webp"
     },
     {
       "abilityId": "frost_armor",
       "sourcePack": "cryomancer",
       "sourceFile": "16.png",
-      "output": "frost_armor.png"
+      "output": "frost_armor.webp"
     },
     {
       "abilityId": "arcane_intellect",
       "sourcePack": "lightning",
       "sourceFile": "17.png",
-      "output": "arcane_intellect.png"
+      "output": "arcane_intellect.webp"
     },
     {
       "abilityId": "frostbolt",
       "sourcePack": "cryomancer",
       "sourceFile": "20.png",
-      "output": "frostbolt.png"
+      "output": "frostbolt.webp"
     },
     {
       "abilityId": "conjure_water",
       "sourcePack": "cryomancer",
       "sourceFile": "34.png",
-      "output": "conjure_water.png"
+      "output": "conjure_water.webp"
     },
     {
       "abilityId": "fire_blast",
       "sourcePack": "pyromancer",
       "sourceFile": "27.png",
-      "output": "fire_blast.png"
+      "output": "fire_blast.webp"
     },
     {
       "abilityId": "arcane_missiles",
       "sourcePack": "lightning",
       "sourceFile": "4.png",
-      "output": "arcane_missiles.png"
+      "output": "arcane_missiles.webp"
     },
     {
       "abilityId": "frost_nova",
       "sourcePack": "cryomancer",
       "sourceFile": "40.png",
-      "output": "frost_nova.png"
+      "output": "frost_nova.webp"
     },
     {
       "abilityId": "arcane_explosion",
       "sourcePack": "lightning",
       "sourceFile": "2.png",
-      "output": "arcane_explosion.png"
+      "output": "arcane_explosion.webp"
     },
     {
       "abilityId": "scorch",
       "sourcePack": "pyromancer",
       "sourceFile": "38.png",
-      "output": "scorch.png"
+      "output": "scorch.webp"
     },
     {
       "abilityId": "ice_barrier",
       "sourcePack": "cryomancer",
       "sourceFile": "17.png",
-      "output": "ice_barrier.png"
+      "output": "ice_barrier.webp"
     },
     {
       "abilityId": "pyroblast",
       "sourcePack": "pyromancer",
       "sourceFile": "12.png",
-      "output": "pyroblast.png"
+      "output": "pyroblast.webp"
     },
     {
       "abilityId": "conjure_food",
       "sourcePack": "_Missing_Mage",
       "sourceFile": "11.png",
-      "output": "conjure_food.png"
+      "output": "conjure_food.webp"
     },
     {
       "abilityId": "polymorph",
       "sourcePack": "_Missing_Mage",
       "sourceFile": "32.png",
-      "output": "polymorph.png"
+      "output": "polymorph.webp"
     }
   ],
   "deferredStayProcedural": {}

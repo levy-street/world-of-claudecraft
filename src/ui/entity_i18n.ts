@@ -3,6 +3,7 @@ import {
   CLASSES,
   DELVES,
   DUNGEONS,
+  ITEM_SETS,
   ITEMS,
   MOBS,
   NPCS,
@@ -20,7 +21,7 @@ import {
   tOptional,
 } from './i18n';
 
-export type EntityTranslationGroup = 'classAbility' | 'item' | 'world';
+export type EntityTranslationGroup = 'classAbility' | 'item' | 'itemSet' | 'world';
 export type EntityTranslationKind =
   | 'class'
   | 'ability'
@@ -32,7 +33,8 @@ export type EntityTranslationKind =
   | 'zone'
   | 'zonePoi'
   | 'dungeon'
-  | 'delve';
+  | 'delve'
+  | 'itemSet';
 export type EntityTranslationField =
   | 'name'
   | 'description'
@@ -43,12 +45,20 @@ export type EntityTranslationField =
   | 'label'
   | 'welcome'
   | 'enterText'
-  | 'leaveText';
+  | 'leaveText'
+  | 'bonus2'
+  | 'bonus3';
 
 export type EntityTranslationRequest =
   | { kind: 'class'; id: PlayerClass; field: 'name' | 'description'; values?: InterpolationValues }
   | { kind: 'ability'; id: string; field: 'name' | 'description'; values?: InterpolationValues }
   | { kind: 'item'; id: string; field: 'name'; values?: InterpolationValues }
+  | {
+      kind: 'itemSet';
+      id: string;
+      field: 'name' | 'bonus2' | 'bonus3';
+      values?: InterpolationValues;
+    }
   | { kind: 'mob'; id: string; field: 'name'; values?: InterpolationValues }
   | { kind: 'npc'; id: string; field: 'name' | 'title' | 'greeting'; values?: InterpolationValues }
   | {
@@ -178,6 +188,13 @@ function canonicalEntityText(request: EntityTranslationRequest): string {
     }
     case 'item':
       return ITEMS[request.id]?.name ?? request.id;
+    case 'itemSet': {
+      const set = ITEM_SETS[request.id];
+      if (!set) return request.id;
+      if (request.field === 'name') return set.name;
+      const pieces = request.field === 'bonus2' ? 2 : 3;
+      return set.bonuses.find((b) => b.pieces === pieces)?.text ?? request.id;
+    }
     case 'mob':
       return MOBS[request.id]?.name ?? request.id;
     case 'npc': {
@@ -235,6 +252,8 @@ export function entityTranslationKey(request: EntityTranslationRequest): string 
       return `entities.abilities.${entityPathSegment(request.id)}.${request.field}`;
     case 'item':
       return `entities.items.${entityPathSegment(request.id)}.name`;
+    case 'itemSet':
+      return `entities.itemSets.${entityPathSegment(request.id)}.${request.field}`;
     case 'mob':
       return `entities.mobs.${entityPathSegment(request.id)}.name`;
     case 'npc':
@@ -264,9 +283,11 @@ function requestManifestEntry(request: EntityTranslationRequest): EntityTranslat
   const group: EntityTranslationGroup =
     request.kind === 'class' || request.kind === 'ability'
       ? 'classAbility'
-      : request.kind === 'item'
-        ? 'item'
-        : 'world';
+      : request.kind === 'itemSet'
+        ? 'itemSet'
+        : request.kind === 'item'
+          ? 'item'
+          : 'world';
   return entry(
     request.kind,
     id,
@@ -294,6 +315,26 @@ export function tEntity(request: EntityTranslationRequest): string {
 
 export function itemDisplayName(item: ItemDef): string {
   return tEntity({ kind: 'item', id: item.id, field: 'name' });
+}
+
+// Thin tEntity wrappers for the display helpers that several windows + painters each
+// re-declared (class/zone/poi/dungeon names). Mirroring itemDisplayName above, these are
+// the single shared home so hud.ts, the cold windows, and map_window_painter import one
+// definition instead of redefining it per module.
+export function classDisplayName(cls: PlayerClass): string {
+  return tEntity({ kind: 'class', id: cls, field: 'name' });
+}
+
+export function zoneDisplayName(zoneId: string): string {
+  return tEntity({ kind: 'zone', id: zoneId, field: 'name' });
+}
+
+export function zonePoiLabel(zoneId: string, poiIndex: number): string {
+  return tEntity({ kind: 'zonePoi', zoneId, poiIndex, field: 'label' });
+}
+
+export function dungeonDisplayName(dungeonId: string): string {
+  return tEntity({ kind: 'dungeon', id: dungeonId, field: 'name' });
 }
 
 export function resetEntityTranslationFallbackLog(): void {
@@ -353,6 +394,21 @@ export function entityTranslationManifest(): EntityTranslationManifestEntry[] {
         entityTranslationKey({ kind: 'item', id: item.id, field: 'name' }),
       ),
     );
+  }
+  for (const set of Object.values(ITEM_SETS).sort(compareById)) {
+    const fields: ('name' | 'bonus2' | 'bonus3')[] = ['name', 'bonus2', 'bonus3'];
+    for (const field of fields) {
+      entries.push(
+        entry(
+          'itemSet',
+          set.id,
+          field,
+          canonicalEntityText({ kind: 'itemSet', id: set.id, field }),
+          'itemSet',
+          entityTranslationKey({ kind: 'itemSet', id: set.id, field }),
+        ),
+      );
+    }
   }
   for (const mob of Object.values(MOBS).sort(compareById)) {
     entries.push(

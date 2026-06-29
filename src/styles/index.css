@@ -1,0 +1,46 @@
+/* index.css: the single style barrel for the game client. Both game entries
+   (index.html and play.html) are bootstrapped by src/main.ts, which imports this
+   file once, so this barrel serves both. It declares the one canonical @layer
+   cascade order up front, then @imports the layer modules in that order. Vite
+   inlines these local @imports into one stylesheet at build, so there is no runtime
+   import waterfall.
+
+   The tokens and base layers hold the design tokens and base resets; hud.css sits in
+   the components layer (the in-world HUD chrome). layout.css holds the shared .window
+   shell (in @layer layout) and components.css holds the feature-window bodies (in
+   @layer components). The remaining layers fill against this fixed order, so no later
+   CSS change re-litigates the cascade. The only intentionally-empty barrel layer is
+   the reserved `hud` slot (hud.css and components.css both target @layer components,
+   see below); index-extra and play-extra are filled per entry by the .extra files,
+   not by this barrel. admin.html and guide.html keep their own inline CSS and do not
+   load this barrel.
+
+   Both hud.css and components.css put their rules in @layer components (the declared
+   `hud` layer below stays empty, reserved). Because they share one layer, cross-layer
+   @layer ordering does NOT separate them; their equal-specificity ties fall to WITHIN
+   -layer order, which is import order here. components.css is imported last, so the
+   feature-window bodies win those ties over the HUD chrome, matching the pre-extraction
+   precedence (the windows block was inline-unlayered and beat the layered HUD chrome).
+   In practice the two never share a selector, so this is precedence insurance, not an
+   active tie-break.
+
+   Three more layers: hud-mobile (the in-game mobile-touch block, from
+   hud.mobile.css) ordered AFTER shell so the mobile overrides of pre-game shell
+   elements (mode-select / play-console / btn-play / char-select) win as they did
+   when the block was inline-unlayered; and the per-entry index-extra / play-extra
+   (loaded only by index.html / play.html via a <link>, holding the #rotate-device
+   orientation gate), last so they outrank everything.
+
+   LAYER NAMES ARE FLAT (hyphenated), NOT dotted: a DOT in a @layer name is a
+   SUBLAYER separator, so "hud.mobile" would be the "mobile" sublayer of the early
+   "hud" layer (and would lose to shell). hud-mobile / index-extra / play-extra are
+   top-level layers placed exactly where this declaration puts them. */
+@layer tokens, base, layout, components, hud, shell, hud-mobile, index-extra, play-extra;
+
+@import "./tokens.css";
+@import "./base.css";
+@import "./layout.css";
+@import "./hud.css";
+@import "./components.css";
+@import "./shell.css";
+@import "./hud.mobile.css";

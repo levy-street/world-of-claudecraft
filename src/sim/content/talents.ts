@@ -138,6 +138,7 @@ export interface SavedLoadout {
 }
 
 export const MAX_LOADOUTS = 10;
+export const SAVED_LOADOUT_BAR_SLOTS = 22;
 
 export interface ResolvedAbilityMod {
   dmgPct: number;
@@ -203,7 +204,7 @@ export function pointsSpent(alloc: TalentAllocation): number {
   return n;
 }
 
-function pointsSpentInTree(ct: ClassTalents, alloc: TalentAllocation, tree: TalentTree): number {
+function _pointsSpentInTree(ct: ClassTalents, alloc: TalentAllocation, tree: TalentTree): number {
   const idx = nodeIndex(ct);
   let n = 0;
   for (const id in alloc.ranks) {

@@ -14,11 +14,11 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.10.0-blue)](package.json)
+[![Version](https://img.shields.io/badge/version-0.14.1-blue)](package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/GjhnUsBtw)
 
-**English** · [Español](docs/i18n/README.es.md) · [Español (España)](docs/i18n/README.es_ES.md) · [Français](docs/i18n/README.fr_FR.md) · [Français (Canada)](docs/i18n/README.fr_CA.md) · [Italiano](docs/i18n/README.it_IT.md) · [Deutsch](docs/i18n/README.de_DE.md) · [简体中文](docs/i18n/README.zh_CN.md) · [繁體中文](docs/i18n/README.zh_TW.md) · [한국어](docs/i18n/README.ko_KR.md) · [日本語](docs/i18n/README.ja_JP.md) · [Português (Brasil)](docs/i18n/README.pt_BR.md) · [Русский](docs/i18n/README.ru_RU.md)
+**English** · [Español](docs/i18n/README.es.md) · [Español (España)](docs/i18n/README.es_ES.md) · [Français](docs/i18n/README.fr_FR.md) · [Français (Canada)](docs/i18n/README.fr_CA.md) · [Italiano](docs/i18n/README.it_IT.md) · [Deutsch](docs/i18n/README.de_DE.md) · [简体中文](docs/i18n/README.zh_CN.md) · [繁體中文](docs/i18n/README.zh_TW.md) · [한국어](docs/i18n/README.ko_KR.md) · [日本語](docs/i18n/README.ja_JP.md) · [Português (Brasil)](docs/i18n/README.pt_BR.md) · [Русский](docs/i18n/README.ru_RU.md) · [Nederlands](docs/i18n/README.nl_NL.md) · [Polski](docs/i18n/README.pl_PL.md) · [Bahasa Indonesia](docs/i18n/README.id_ID.md) · [Türkçe](docs/i18n/README.tr_TR.md) · [Svenska](docs/i18n/README.sv_SE.md) · [Tiếng Việt](docs/i18n/README.vi_VN.md) · [Dansk](docs/i18n/README.da_DK.md)
 
 [Play now](https://worldofclaudecraft.com/) · [Host your own world](#host-your-own-world-one-command) · [Train an agent](#train-an-agent-headless-rl) · [Web3](#web3) · [Contributing](CONTRIBUTING.md) · [Discord](https://discord.gg/GjhnUsBtw)
 
@@ -41,24 +41,25 @@ Same seed, same world, everywhere. And almost nothing is a shipped asset: the to
 ## Highlights
 
 - **Nine classic classes**, each with a real vanilla-style kit that gains ranks as you level, plus a full **talent system** (three specs per class, 27 specs in all).
-- **Three open-world zones** from level 1 to 20, nearly 90 quests, and a single connected storyline about the Gravecaller conspiracy.
+- **Three open-world zones** from level 1 to 20, nearly 80 quests, and a single connected storyline about the Gravecaller conspiracy.
 - **Five instanced dungeons**, four of them five-player elite raids and one solo crypt, with elite scaling, AoE boss mechanics, and class-archetype loot.
+- **Scalable delves**, a small-group mode for one or two players plus an AI companion, rebuilt from randomized chambers each run across Normal and Heroic tiers.
 - **The Ashen Coliseum**, a ranked PvP arena with 1v1 and 2v2 ladders plus a 2v2 Fiesta mode (augment pickups, a shrinking ring, first to fifteen takedowns).
 - **Real multiplayer**: parties, trading, duels, tap rights, party-split XP, whispers, away status, and a server that owns every combat roll.
 - **Procedural everything**: timber-framed towns, rigged creature families, painted spell icons drawn on canvas, WebAudio sound, biome weather, and real-time shadows. No 3D model files for the world.
-- **Localized into 14 locales** through a deterministic, sim-emits-keys pipeline.
+- **Localized into 21 locales** through a deterministic, sim-emits-keys pipeline.
 - **Headless RL environment** with Gymnasium bindings, reward shaping, and a benchmark mode.
 - **Web3-native**: link a Solana wallet to show your $WOC balance and a cosmetic holder badge, fully optional and non-custodial.
 
 ## Screenshots
 
-![A party gathers outside the apothecary in Eastbrook](docs/screenshots/party-questing.jpg)
+![The Eastbrook town square, campfire and questgivers](docs/screenshots/party-questing.jpg)
 
 | | |
 |:---:|:---:|
 | ![Dusk at the Eastbrook campfire](docs/screenshots/eastbrook-dusk.jpg)<br>*Dusk at the Eastbrook campfire* | ![Elite pulls in the Hollow Crypt](docs/screenshots/hollow-crypt.jpg)<br>*Torch-lit elite pulls in the Hollow Crypt* |
 | ![The restless dead at the ruined chapel](docs/screenshots/restless-dead.jpg)<br>*The restless dead at the ruined chapel* | ![A brawl with Vale Bandits](docs/screenshots/vale-bandits.jpg)<br>*Outnumbered at the bandit camp* |
-| ![Old Greyjaw hunted down on the north road](docs/screenshots/old-greyjaw.jpg)<br>*Old Greyjaw, the rare spawn, run down on the north road* | ![Vendor and bags UI](docs/screenshots/vendor-and-bags.jpg)<br>*Gearing up at Smith Haldren's, with tooltips, bags, and coin* |
+| ![Old Greyjaw hunted down on the north road](docs/screenshots/old-greyjaw.jpg)<br>*Old Greyjaw, the rare spawn, run down on the north road* | ![Vendor and bags UI](docs/screenshots/vendor-and-bags.jpg)<br>*Gearing up at Trader Wilkes's, with the vendor and bags open* |
 | ![The moongate on the Glimmermere shore](docs/screenshots/glimmermere-moongate.jpg)<br>*The drowned climb out at the Glimmermere moongate* | ![Ysolei on the altar of the Drowned Temple](docs/screenshots/drowned-temple-altar.jpg)<br>*Moonfire and the altar of the Drowned Temple* |
 
 Weather is biome-driven and render-only, so it never touches the deterministic sim:
@@ -137,7 +138,7 @@ obs, reward, terminated, truncated, info = env.step(env.action_space.sample())
 env.close()
 ```
 
-- **Observation and action spaces are content-derived.** Query them from the env's `info` reply at startup rather than hardcoding; they grow with the game. Today the action space is `Discrete(44)` (movement, target, attack, the full ability kit, interact, eat/drink) and the observation is a `Box` of 300 floats (self, abilities, target, nearby mobs, nearest interactable, quest progress).
+- **Observation and action spaces are content-derived.** Query them from the env's `info` reply at startup rather than hardcoding; they grow with the game. Today the action space is `Discrete(44)` (movement, target, attack, the full ability kit, interact, eat/drink) and the observation is a `Box` of 276 floats (self, abilities, target, nearby mobs, nearest interactable, quest progress).
 - **Reward** is a weighted sum of per-tick counter deltas (XP, damage dealt and taken, kills, deaths, quest progress, level-ups), tunable per reset. Each `step` applies one action and advances five sim ticks by default, so roughly four decisions per simulated second.
 - **Deterministic by construction.** No wall clock, no `Math.random`. Seed the reset and the episode replays exactly.
 
@@ -183,9 +184,13 @@ The Gravecaller storyline runs through four five-player elite instances, and a s
 - **The Sunken Bastion** (5 players, around level 13, southeast Mirefen): Vael the Mistcaller summons waves of Drowned Thralls at 60% and 30% health.
 - **Gravewyrm Sanctum** (5 players, level 20, beneath Thornpeak): three chambers of elite boneguard and drakonid, Korgath the Bound (enrages below 30%), Grand Necromancer Velkhar, and Korzul the Gravewyrm, where epic weapons drop.
 - **The Drowned Temple** (5 players) through the Glimmermere moongate: a pale, moon-violet instance leading to Choirmother Selthe and then Ysolei, Avatar of the Drowned Moon, who pulses Lunar Tide every nine seconds and summons Moonspawn at 60% and 30%.
-- **The Abandoned Crypt** (solo) in Thornpeak: a quiet keystone-and-diary dive for one, no boss, just the story.
+- **The Abandoned Crypt** (solo) in Thornpeak: a quiet keystone-and-diary dive for one whose trail unseals the royal door to **Nythraxis, Scourge of Thornpeak**, a ten-player raid finale fought across three soul wardstones.
 
 The lead-up quest chains are soloable, so the story is never gated behind finding a group. Our automated five-bot raid (warrior, paladin, priest, mage, hunter with focus-fire and healer AI) clears the Hollow Crypt in about five minutes (`node scripts/crypt_raid.mjs`, needs `ALLOW_DEV_COMMANDS=1`).
+
+### Delves
+
+Delves are a separate, scalable small-group mode for one or two players. **The Collapsed Reliquary** (level 7 and up) is a crypt rebuilt from randomized chambers on every run, ending at Deacon Varric. Solo it and an AI companion, Tessa, fights at your side. Brother Halven at the reliquary ruin runs the delve board, where Normal or Heroic is your call: Heroic raises enemy levels and adds a random affix for richer rewards.
 
 ### The Ashen Coliseum (ranked PvP)
 
@@ -286,7 +291,7 @@ For the server commands see [Develop online](#develop-online-with-hot-reload) ab
 
 ## Localization
 
-Every player-visible string resolves through `t()`, and the game ships in **14 locales** (English, two Spanish, two French, English Canada, Italian, German, Simplified and Traditional Chinese, Korean, Japanese, Brazilian Portuguese, and Russian). The sim and server stay language-agnostic: they emit stable keys or English that the client re-localizes at the boundary, which keeps determinism intact. Contributors add English only; the maintainer batch-fills the other locales before each release. The workflow is documented in `docs/i18n-scaling/translation-workflow.md`.
+Every player-visible string resolves through `t()`, and the game ships in **21 locales** (English, two Spanish, two French, English Canada, Italian, German, Simplified and Traditional Chinese, Korean, Japanese, Brazilian Portuguese, Russian, Dutch, Polish, Indonesian, Turkish, Swedish, Vietnamese, and Danish). The sim and server stay language-agnostic: they emit stable keys or English that the client re-localizes at the boundary, which keeps determinism intact. Contributors add English only; the maintainer batch-fills the other locales before each release. The workflow is documented in `docs/i18n-scaling/translation-workflow.md`.
 
 ## Contributing
 

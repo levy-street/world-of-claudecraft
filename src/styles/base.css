@@ -1,0 +1,690 @@
+/* base.css: universal reset, custom scrollbars, native form-control theming, the
+   global cursor / canvas / click-to-move marker, and the shared panel chrome.
+   Relocated verbatim from the inline <style> of index.html under @layer base (the
+   contiguous block between the :root tokens and the first HUD section), rule set and
+   intra-block order preserved. Includes the range-slider track rule whose gold fill
+   rides the inline var(--range-fill, 0%) fallback, set per element by the HUD; it
+   stays here and is never promoted to a :root token. */
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+  }
+  ul,
+  ol,
+  li {
+    list-style: none;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Only apply standard scrollbar properties in browsers that do not support WebKit scrollbar styling (like Firefox) */
+  @supports not selector(::-webkit-scrollbar) {
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+    }
+  }
+
+  /* Global custom scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--scrollbar-thumb) 0%, #3a2b10 100%);
+    border-radius: 4px;
+    border: 1px solid var(--scrollbar-border);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.15),
+      0 1px 3px rgba(0, 0, 0, 0.5);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, var(--scrollbar-thumb-hover) 0%, #4f3b17 100%);
+    border-color: var(--color-border-focus);
+  }
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  /* Software pointer driven by the gamepad's stick while a HUD window is open
+     (gamepad.ts). Hidden until cursor mode activates; sits above the HUD. */
+  .gamepad-cursor {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 22px;
+    height: 22px;
+    margin: -11px 0 0 -11px;
+    border: 2px solid #d4af37;
+    border-radius: 50%;
+    background: rgba(212, 175, 55, 0.25);
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+    z-index: 100000;
+    display: none;
+  }
+
+  /* ---------- MMO-themed native form controls ----------
+     Global element-level theming so every slider/spinner/checkbox/textarea
+     inherits the dark-fantasy look (matches the scrollbar palette above),
+     replacing the default browser chrome. Keyed off element + type so new
+     controls are covered for free. Native <select> menus can't be themed
+     cross-browser, so those are migrated to the .ui-dd custom dropdown. */
+
+  /* Range sliders, inset groove with gold fill + a raised gem thumb. */
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 18px;
+    background: transparent;
+    cursor: var(--cursor-point);
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 6px;
+    border-radius: 3px;
+    border: 1px solid var(--scrollbar-border);
+    /* gold fill up to --range-fill (set per-slider in JS), dark groove beneath */
+    background:
+      linear-gradient(180deg, #ffef9e 0%, var(--gold) 100%) no-repeat,
+      linear-gradient(180deg, #15110a 0%, #0b0b10 100%);
+    background-size:
+      var(--range-fill, 0%) 100%,
+      100% 100%;
+    box-shadow: inset 0 1px 2px #000a;
+  }
+  input[type="range"]::-moz-range-track {
+    height: 6px;
+    border-radius: 3px;
+    border: 1px solid var(--scrollbar-border);
+    background: linear-gradient(180deg, #15110a 0%, #0b0b10 100%);
+    box-shadow: inset 0 1px 2px #000a;
+  }
+  input[type="range"]::-moz-range-progress {
+    height: 6px;
+    border-radius: 3px;
+    /* gold to match the webkit fill (was the brown scrollbar palette) */
+    background: linear-gradient(180deg, #ffef9e 0%, var(--gold) 100%);
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    margin-top: -6px; /* center the 16px thumb on the 6px track */
+    border-radius: 50%;
+    border: 1px solid #2a2008;
+    background: radial-gradient(circle at 35% 30%, #ffef9e 0%, var(--gold) 45%, #b8860b 100%);
+    box-shadow:
+      0 1px 3px #000b,
+      0 0 5px var(--color-primary-glow);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 1px solid #2a2008;
+    background: radial-gradient(circle at 35% 30%, #ffef9e 0%, var(--gold) 45%, #b8860b 100%);
+    box-shadow:
+      0 1px 3px #000b,
+      0 0 5px var(--color-primary-glow);
+  }
+  input[type="range"]:hover::-webkit-slider-thumb {
+    background: radial-gradient(circle at 35% 30%, #fff7c8 0%, #ffe14d 45%, #c79410 100%);
+  }
+  input[type="range"]:hover::-moz-range-thumb {
+    background: radial-gradient(circle at 35% 30%, #fff7c8 0%, #ffe14d 45%, #c79410 100%);
+  }
+  input[type="range"]:focus-visible {
+    outline: none;
+  }
+  input[type="range"]:focus-visible::-webkit-slider-thumb {
+    box-shadow:
+      0 0 0 3px var(--color-border-focus),
+      0 1px 3px #000b;
+  }
+  input[type="range"]:focus-visible::-moz-range-thumb {
+    box-shadow:
+      0 0 0 3px var(--color-border-focus),
+      0 1px 3px #000b;
+  }
+
+  /* Number inputs, drop the cramped native spinner arrows (all such inputs
+     have explicit min/max validation, so the micro-steppers add nothing but
+     browser chrome and sub-40px tap targets). */
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
+  }
+
+  /* Checkboxes, gold accent + themed focus ring instead of OS blue. */
+  input[type="checkbox"],
+  input[type="radio"] {
+    accent-color: var(--gold);
+    cursor: var(--cursor-point);
+  }
+  input[type="checkbox"]:focus-visible,
+  input[type="radio"]:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+
+  /* Textareas, keep vertical resize but swap the native diagonal grip for a
+     themed gold corner that matches the chat-window resize grip. */
+  textarea {
+    resize: vertical;
+  }
+  textarea::-webkit-resizer {
+    background: linear-gradient(
+      135deg,
+      transparent 0 46%,
+      var(--scrollbar-border) 46% 54%,
+      transparent 54% 71%,
+      var(--scrollbar-border) 71% 79%,
+      transparent 79%
+    );
+    border-bottom-right-radius: 4px;
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+  html,
+  body {
+    width: var(--app-vw);
+    height: var(--app-vh);
+    min-width: 100%;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    background: #000;
+    font-family: var(--ui-font);
+    touch-action: pan-y;
+    overscroll-behavior-y: auto;
+    -webkit-text-size-adjust: 100%;
+    cursor: var(--cursor-arrow); /* custom arrow is the global default */
+  }
+  body.game-active {
+    overflow: hidden;
+    touch-action: none;
+    overscroll-behavior: none;
+  }
+  #game-canvas {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: var(--app-vw);
+    height: var(--app-vh);
+    display: block;
+    z-index: 0;
+  }
+  .click-move-marker {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 56px;
+    height: 56px;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 2;
+    transform: translate(-999px, -999px);
+    transition: opacity 45ms ease-out;
+    filter: drop-shadow(0 2px 5px #000d);
+    --ctm-color: #7ef06b;
+    --ctm-core: #d9ffd1;
+    --ctm-edge: #245f1f;
+  }
+  .click-move-marker.active {
+    opacity: 0.98;
+  }
+  .click-move-marker.entity {
+    --ctm-color: #ffd35a;
+    --ctm-core: #fff0a8;
+    --ctm-edge: #6b4a10;
+  }
+  /* Held in place (rooted/stunned): recolor the destination pip red and pulse it
+     so a frozen click-to-move reads as "can't move yet", not a stuck game. */
+  .click-move-marker.blocked {
+    --ctm-color: #ff5a4d;
+    --ctm-core: #ffd2cc;
+    --ctm-edge: #5f1a14;
+    animation: click-move-blocked 900ms ease-in-out infinite;
+  }
+  @keyframes click-move-blocked {
+    0%,
+    100% {
+      opacity: 0.55;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .click-move-marker.blocked {
+      animation: none;
+      opacity: 0.9;
+    }
+  }
+  .click-move-marker::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 5px;
+    height: 5px;
+    background: var(--ctm-core);
+    border: 1px solid var(--ctm-edge);
+    border-radius: 50%;
+    box-shadow: 0 0 8px color-mix(in srgb, var(--ctm-color) 85%, transparent);
+    transform: translate(-50%, -50%);
+  }
+  .click-move-marker::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 14px;
+    height: 14px;
+    border: 1px solid color-mix(in srgb, var(--ctm-color) 72%, transparent);
+    border-radius: 50%;
+    opacity: 0;
+    transform: translate(-50%, -50%);
+  }
+  .click-move-marker.pulse::after {
+    animation: click-move-core 220ms ease-out both;
+  }
+  .ctm-arrow {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 11px;
+    height: 11px;
+    opacity: 0;
+    transform-origin: center;
+    will-change: transform, opacity;
+  }
+  .click-move-marker.pulse .ctm-arrow {
+    animation: click-move-collapse 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .ctm-arrow::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-style: solid;
+    border-color: var(--ctm-core);
+    border-width: 2px 2px 0 0;
+    box-shadow: 1.5px -1.5px 0 color-mix(in srgb, var(--ctm-edge) 58%, transparent);
+  }
+  .ctm-n {
+    --ctm-x0: -5.5px;
+    --ctm-y0: -36px;
+    --ctm-x1: -5.5px;
+    --ctm-y1: -23px;
+    --ctm-r: 135deg;
+    transform: translate(-5.5px, -36px) rotate(135deg);
+  }
+  .ctm-e {
+    --ctm-x0: 25px;
+    --ctm-y0: -5.5px;
+    --ctm-x1: 12px;
+    --ctm-y1: -5.5px;
+    --ctm-r: -135deg;
+    transform: translate(25px, -5.5px) rotate(-135deg);
+  }
+  .ctm-s {
+    --ctm-x0: -5.5px;
+    --ctm-y0: 25px;
+    --ctm-x1: -5.5px;
+    --ctm-y1: 12px;
+    --ctm-r: -45deg;
+    transform: translate(-5.5px, 25px) rotate(-45deg);
+  }
+  .ctm-w {
+    --ctm-x0: -36px;
+    --ctm-y0: -5.5px;
+    --ctm-x1: -23px;
+    --ctm-y1: -5.5px;
+    --ctm-r: 45deg;
+    transform: translate(-36px, -5.5px) rotate(45deg);
+  }
+  @keyframes click-move-collapse {
+    0% {
+      opacity: 0.95;
+      transform: translate(var(--ctm-x0), var(--ctm-y0)) rotate(var(--ctm-r, 0deg)) scale(1.05);
+    }
+    16% {
+      opacity: 1;
+    }
+    72% {
+      opacity: 0.95;
+      transform: translate(var(--ctm-x1), var(--ctm-y1)) rotate(var(--ctm-r, 0deg)) scale(0.78);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(var(--ctm-x1), var(--ctm-y1)) rotate(var(--ctm-r, 0deg)) scale(0.62);
+    }
+  }
+  @keyframes click-move-core {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.35);
+    }
+    50% {
+      opacity: 0.9;
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(1.7);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ctm-arrow,
+    .click-move-marker.pulse::after {
+      animation-duration: 0.01ms;
+      animation-iteration-count: 1;
+    }
+  }
+
+  /* Pre-game screens use the same hand / sword cursors as in-world (cursors.ts). */
+  #start-screen,
+  #loading-screen.visible {
+    cursor: var(--cursor-hand);
+  }
+  #start-screen
+    :is(
+      .btn,
+      .btn-play,
+      .server-select-trigger,
+      .server-select-option,
+      .social-link,
+      .realm-row,
+      .char-row,
+      .class-card,
+      .password-toggle,
+      #btn-toggle-controls,
+      .btn-close-drawer
+    ) {
+    cursor: var(--cursor-sword);
+  }
+  #start-screen :is(input, textarea) {
+    cursor: text;
+  }
+
+  /* Mobile zoom prevention: iOS Safari (10+) auto-zooms the page whenever a focused
+     text-entry control renders below 16px, and it ignores the viewport scale-lock
+     in the <meta> above (that obedience was dropped for accessibility). 16px is the
+     documented threshold. Floor every focusable control at 16px on coarse-pointer
+     (touch) devices, which also covers tablets/iPad that the JS-driven
+     body.mobile-touch class (gated to <=940px) would miss. !important guarantees the
+     floor wins over the small classic-font rules regardless of selector specificity
+     (e.g. .prompt .prompt-number, which out-specifies a plain catch-all); pointer:coarse
+     leaves desktop (fine pointer) untouched. New inputs are covered automatically. */
+  @media (pointer: coarse) {
+    input,
+    textarea,
+    select {
+      font-size: 16px !important;
+    }
+  }
+
+  #nameplates {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: var(--app-vw);
+    height: var(--app-vh);
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 1;
+  }
+  #ui {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: var(--app-vw);
+    max-width: 100vw;
+    height: var(--app-vh);
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 10;
+  }
+  #ui > * {
+    pointer-events: auto;
+  }
+  #ui > .click-move-marker,
+  #ui > .click-move-marker * {
+    pointer-events: none;
+  }
+
+  .panel {
+    background: var(--panel-bg);
+    border: 2px solid var(--border);
+    outline: 1px solid #000;
+    border-radius: 6px;
+    box-shadow:
+      0 2px 16px #000c,
+      inset 0 0 24px #0006,
+      inset 0 1px 0 #ffffff14;
+    color: var(--color-text-light);
+  }
+  .panel-title {
+    font-family: var(--title-font);
+    color: var(--gold);
+    font-size: 15px;
+    letter-spacing: 0.5px;
+    text-shadow: 1px 1px 2px #000;
+    border-bottom: 1px solid #463a1c;
+    padding-bottom: 6px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .window .panel-title {
+    cursor: move;
+    touch-action: none;
+  }
+  .window .panel-title .x-btn {
+    cursor: var(--cursor-point);
+  }
+  .window.window-dragging {
+    cursor: move;
+  }
+  .x-btn {
+    color: #c9b27a;
+    cursor: var(--cursor-point);
+    font-size: 14px;
+    padding: 0 4px;
+    border: 1px solid #463a1c;
+    border-radius: 3px;
+    background: #1a1410;
+    font-family: var(--ui-font);
+  }
+  .x-btn:hover {
+    color: #fff;
+    border-color: var(--gold-dim);
+  }
+  .x-btn:focus-visible,
+  .action-btn:focus-visible,
+  .chat-tab:focus-visible,
+  .micro-btn:focus-visible,
+  .mobile-btn:focus-visible,
+  .vendor-item:focus-visible,
+  .vendor-sell-junk:focus-visible,
+  .bag-item:focus-visible,
+  .mkt-tab:focus-visible,
+  .mkt-btn:focus-visible,
+  .mkt-list-btn:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .panel-subtitle {
+    color: var(--color-text-muted);
+    font-size: 11px;
+    font-weight: 400;
+  }
+  .gold {
+    color: var(--gold);
+  }
+
+  /* UI chrome icons: shared glyph-sizing primitives (siblings of the .x-btn /
+     .panel chrome above). Relocated from index.html's inline <style>: these are
+     base-tier glyph styling, and keeping them in
+     @layer base lets component overrides (e.g. #mm-music .ui-icon) win as intended.
+     They had been left inline-unlayered, which would have inverted those overrides. */
+  /* ---------- UI chrome icons (inline SVG from ui_icons.ts, tinted via currentColor) ---------- */
+  .ui-icon {
+    width: 1em;
+    height: 1em;
+    display: inline-block;
+    vertical-align: -0.125em;
+    flex: none;
+    pointer-events: none;
+  }
+  .x-btn .ui-icon {
+    width: 12px;
+    height: 12px;
+    vertical-align: middle;
+  }
+  .micro-btn .ui-icon {
+    width: 18px;
+    height: 18px;
+    vertical-align: middle;
+  }
+  .pfm-crest {
+    width: 16px;
+    height: 16px;
+    vertical-align: -3px;
+    margin-right: 3px;
+    border-radius: 3px;
+  }
+  /* Hide all other UI components while the start screen is visible to prevent keyboard focus leakage */
+  body:has(#start-screen:not([style*="display: none"])) #ui {
+    display: none !important;
+  }
+
+  /* ---------- skip links ---------- */
+  /* a11y: the first focusable elements on both game entries, parked off-screen
+     until they take keyboard focus, then slid into view (mirrors the src/guide
+     .guide-skip precedent). Only the position transitions, and that transition is
+     dropped under prefers-reduced-motion (below); the :focus-visible ring is steady (no
+     transition / animation / filter on the outline) per the focus-ring rule. Colours /
+     spacing / radius reference tokens; the off-screen offset, the anti-zoom 16px font
+     floor, and the top-tier z-index are intentional literals (no token exists for any of
+     them; the z-index matches the existing top overlay precedent at base.css:75). */
+  .hud-skip {
+    position: fixed;
+    inset-block-start: -120px;
+    inset-inline-start: var(--spacing-sm);
+    /* rides the top overlay tier (shared with the gamepad cursor) so a focused skip link
+       is not occluded by HUD chrome; the dev-only perf overlay may sit above it. */
+    z-index: 100000;
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--panel-base);
+    color: var(--color-text-light);
+    border: 1px solid var(--color-border-focus);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-ui);
+    font-size: 16px;
+    text-decoration: none;
+    transition: inset-block-start var(--transition-speed) var(--transition-ease);
+  }
+  .hud-skip:focus-visible {
+    inset-block-start: var(--spacing-sm);
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  /* Reveal instantly under reduced-motion: drop the slide (the steady focus ring still
+     marks the link), mirroring the prefers-reduced-motion handling elsewhere in the HUD. */
+  @media (prefers-reduced-motion: reduce) {
+    .hud-skip {
+      transition: none;
+    }
+  }
+  /* The skip links target the in-game HUD, so hide them while the pre-game start
+     screen is up (they would otherwise sit ahead of the login / char-select flow). */
+  body:has(#start-screen:not([style*="display: none"])) .hud-skip {
+    display: none;
+  }
+
+  /* ---------- forced-colors ---------- */
+  /* a11y: the one dark aesthetic stays; forced-colors is the ONLY contrast
+     adaptation (no light theme, no prefers-color-scheme branch). Borders
+     and the focus ring must survive when the OS forces its own palette, and no state
+     may be carried by a background alone, so system-color keywords are pinned where
+     the forced palette applies. */
+  @media (forced-colors: active) {
+    /* Keep every focus ring visible against the forced palette. The !important is
+       load-bearing: this net lives in @layer base, but per-control focus rules live
+       in the later @layer components, so a normal Highlight outline here would lose
+       the cascade to any component outline. An !important in an earlier layer beats
+       a normal declaration in a later layer, so every focusable keeps a system ring
+       in forced-colors regardless of its component styling. */
+    :focus-visible {
+      outline: 2px solid Highlight !important;
+      outline-offset: 2px;
+    }
+    /* Panels / windows / skip links keep a real border (forced-colors drops box-shadow
+       and most backgrounds, so a shadow-only or fill-only edge would vanish). */
+    .panel,
+    .window,
+    .hud-skip {
+      border: 1px solid CanvasText;
+    }
+    /* The skip link must still read as actionable in high contrast. */
+    .hud-skip {
+      background: Canvas;
+      color: CanvasText;
+    }
+    /* The target name carries hostile-vs-friendly by inline color alone, which the forced
+       palette strips, so both reactions would read identically. Underline the hostile name
+       as a redundant non-color cue (keyed off the hud.ts toggleClass). Scoped to #tf-name so
+       the player (#uf-name) and party (#pf-name) names are untouched; the cue lives only in
+       this forced-colors block, so normal mode is unchanged. */
+    #tf-name.hostile {
+      text-decoration: underline;
+    }
+    /* Cast progress is shown by the .fill gradient, which forced-colors strips, so the filled
+       width that conveys cast / channel PROGRESS would vanish against the bar background. Pin
+       the fill to the Highlight system color so progress stays visible across all three cast
+       bars: the player (#castbar) and target (#tf-castbar) HUD bars and the world-anchored mob
+       nameplate bar (.np-castfill, also the channel variant). The !important is load-bearing
+       for the same reason as the focus net above: these fills live in @layer components (a
+       normal declaration there), so an !important in this earlier @layer base is required to
+       win the cascade. (No second forced accent exists, so the cast-vs-channel hue distinction
+       is intentionally not restored on any of them.) */
+    #castbar .fill,
+    #tf-castbar .fill,
+    .np-castfill {
+      background: Highlight !important;
+    }
+  }
+
+  /* ---------- print reset ---------- */
+  /* a11y: a full-screen real-time WebGL game has no print layout,
+     so hide the canvas and the HUD chrome rather than reflow. Minimal by design. */
+  @media print {
+    #game-canvas,
+    #ui,
+    #nameplates,
+    .hud-skip {
+      display: none !important;
+    }
+  }
+}

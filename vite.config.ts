@@ -2,12 +2,24 @@ import { execSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { svelte } from '@sveltejs/vite-plugin-svelte';
+import { svelteTesting } from '@testing-library/svelte/vite';
+import { browserslistToTargets } from 'lightningcss';
 import { defineConfig } from 'vite';
+import { loadBrowserslistFloors } from './scripts/browserslist_targets.mjs';
 // Untyped zero-dep build helper (same convention as the other scripts/*.mjs tools).
 // vite.config.ts is outside tsconfig `include`, so this import is never type-checked.
 import { templateModulepreload } from './scripts/i18n_modulepreload.mjs';
 
 const root = fileURLToPath(new URL('.', import.meta.url));
+
+// Lightning CSS engine targets, derived from .browserslistrc (the single source of
+// the floor) via the zero-dep parser, never a hand-typed object. Drives both the
+// CSS transform and the minifier below, so the floor governs which prefixes and
+// fallbacks survive minification (for example the -webkit-backdrop-filter twin).
+const cssTargets = browserslistToTargets(
+  loadBrowserslistFloors(fileURLToPath(new URL('.browserslistrc', import.meta.url))),
+);
 
 // `#bot-detector` → the private detector if its clone is present, else the no-op
 // stub. Mirrors scripts/build_server.mjs (bundle) and tsconfig.json `paths` (tsc).
@@ -141,18 +153,26 @@ function i18nModulepreloadPlugin() {
 
 export default defineConfig({
   base: '/',
-  plugins: [staticPageAliasPlugin(), i18nModulepreloadPlugin()],
+  // The Svelte plugin only transforms the standalone admin entry. The testing
+  // plugin is scoped to Vitest so it cannot affect production client builds.
+  plugins: [
+    svelte(),
+    ...(process.env.VITEST ? [svelteTesting()] : []),
+    staticPageAliasPlugin(),
+    i18nModulepreloadPlugin(),
+  ],
   resolve: { alias: { '#bot-detector': botDetectorImpl } },
   define: {
     __APP_VERSION__: JSON.stringify(appVersion),
     __APP_BUILD_ID__: JSON.stringify(appBuildId.slice(0, 12)),
     __APP_BUILD_DATE__: JSON.stringify(appBuildDate),
   },
-  // Parent dir has a postcss.config.js with Tailwind — ignore it; this project has no CSS pipeline.
+  // Lightning CSS handles all CSS transform and minify. Under the lightningcss
+  // transformer css.postcss is inert, so no postcss.config is consulted and the
+  // project stays vanilla (no Tailwind, no PostCSS plugins).
   css: {
-    postcss: {
-      plugins: [],
-    },
+    transformer: 'lightningcss',
+    lightningcss: { targets: cssTargets },
   },
   server: {
     port: 5173,
@@ -169,6 +189,7 @@ export default defineConfig({
   },
   build: {
     target: 'es2022',
+    cssMinify: 'lightningcss',
     chunkSizeWarningLimit: 1500,
     // Emit dist/.vite/manifest.json so the Phase 4 modulepreload hook can resolve each
     // lazy locale chunk's content-hashed filename. Metadata only - does not perturb the
@@ -184,9 +205,21 @@ export default defineConfig({
     },
   },
   test: {
-    // .codex/.venv are local-only worktree/venv pollution that a clean CI checkout
-    // never has; excluding them keeps the local gate mirroring CI (otherwise stale
-    // .codex worktree copies of test files run and falsely fail).
-    exclude: ['**/node_modules/**', '**/dist/**', '**/.claude/**', '**/.codex/**', '**/.venv/**'],
+    // Two kinds of exclusion, kept together:
+    // - .codex/.venv are local-only worktree/venv pollution a clean CI checkout never has;
+    //   excluding them keeps the local gate mirroring CI (otherwise stale .codex worktree
+    //   copies of test files run and falsely fail).
+    // - the opt-in browser suite (vitest.browser.config.ts, npm run test:browser) must NOT
+    //   leak into a bare `vitest run`: excluding its files keeps the default Node run from
+    //   importing the Playwright provider or launching a browser. Cross-engine CI is P17b.
+    exclude: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/.claude/**',
+      '**/.codex/**',
+      '**/.venv/**',
+      'tests/browser/**',
+      '**/*.browser.test.ts',
+    ],
   },
 });

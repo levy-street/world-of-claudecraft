@@ -1,4 +1,4 @@
-# src/guide/viewer/ — interactive 3D model viewer
+# src/guide/viewer/ : interactive 3D model viewer
 
 A self-contained turntable that loads ONE game model (a GLB) on demand and lets the
 reader drag to rotate it. Embedded on the class, bestiary, and warlock pages, and the
@@ -6,7 +6,7 @@ full `/guide/models` gallery.
 
 ## Why standalone (not the renderer's preview)
 The renderer's `src/render/characters` pipeline (`CharacterVisual`, `CharacterPreview`)
-preloads the entire ~23 MB character/creature GLB set at module import — fine for the
+preloads the entire ~23 MB character/creature GLB set at module import, fine for the
 game, far too heavy for a docs page on mobile. So this viewer reuses ONLY the renderer's
 pure GLB loader (`src/render/assets/loader` `loadGltf`, which also resolves dev/prod asset
 URLs) and mirrors the small `assembleModel` logic (accessory allowlist, weapon attach,
@@ -23,11 +23,11 @@ wiki:content`.
 ## Files (load order matters for code-splitting)
 | File | In bundle | Imports three? |
 |---|---|---|
-| `embed.ts` | main Guide | no — pure markup (`modelViewerEmbed`) |
-| `mount.ts` | main Guide | no — wiring + `hasWebGL`; dynamically `import('./scene')` |
-| `index.ts` | main Guide | no — barrel (the only import surface for pages) |
-| `scene.ts` | lazy chunk | yes — the `ModelViewer` turntable (scene/camera/loop/controls) |
-| `model.ts` | lazy chunk | yes — `buildModel` (GLB assembly via `loadGltf`) |
+| `embed.ts` | main Guide | no, pure markup (`modelViewerEmbed`) |
+| `mount.ts` | main Guide | no, wiring + `hasWebGL`; dynamically `import('./scene')` |
+| `index.ts` | main Guide | no, barrel (the only import surface for pages) |
+| `scene.ts` | lazy chunk | yes, the `ModelViewer` turntable (scene/camera/loop/controls) |
+| `model.ts` | lazy chunk | yes, `buildModel` (GLB assembly via `loadGltf`) |
 
 **Keep three.js out of the main bundle:** never statically import `scene.ts`/`model.ts`
 from `embed.ts`/`mount.ts`/`index.ts` or a page. The only path to three is the dynamic

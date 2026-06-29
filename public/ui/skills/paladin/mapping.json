@@ -9,91 +9,91 @@
       "abilityId": "seal_of_righteousness",
       "name": "Seal of Righteousness",
       "sourceFile": "40.png",
-      "output": "seal_of_righteousness.png",
+      "output": "seal_of_righteousness.webp",
       "confidence": "high"
     },
     {
       "abilityId": "holy_light",
       "name": "Holy Light",
       "sourceFile": "38.png",
-      "output": "holy_light.png",
+      "output": "holy_light.webp",
       "confidence": "high"
     },
     {
       "abilityId": "devotion_aura",
       "name": "Devotion Aura",
       "sourceFile": "34.png",
-      "output": "devotion_aura.png",
+      "output": "devotion_aura.webp",
       "confidence": "review"
     },
     {
       "abilityId": "judgement",
       "name": "Judgement",
       "sourceFile": "50.png",
-      "output": "judgement.png",
+      "output": "judgement.webp",
       "confidence": "high"
     },
     {
       "abilityId": "blessing_of_might",
       "name": "Blessing of Might",
       "sourceFile": "6.png",
-      "output": "blessing_of_might.png",
+      "output": "blessing_of_might.webp",
       "confidence": "high"
     },
     {
       "abilityId": "divine_protection",
       "name": "Divine Protection",
       "sourceFile": "43.png",
-      "output": "divine_protection.png",
+      "output": "divine_protection.webp",
       "confidence": "high"
     },
     {
       "abilityId": "hammer_of_justice",
       "name": "Hammer of Justice",
       "sourceFile": "8.png",
-      "output": "hammer_of_justice.png",
+      "output": "hammer_of_justice.webp",
       "confidence": "high"
     },
     {
       "abilityId": "lay_on_hands",
       "name": "Lay on Hands",
       "sourceFile": "17.png",
-      "output": "lay_on_hands.png",
+      "output": "lay_on_hands.webp",
       "confidence": "high"
     },
     {
       "abilityId": "flash_of_light",
       "name": "Flash of Light",
       "sourceFile": "2.png",
-      "output": "flash_of_light.png",
+      "output": "flash_of_light.webp",
       "confidence": "medium"
     },
     {
       "abilityId": "exorcism",
       "name": "Exorcism",
       "sourceFile": "32.png",
-      "output": "exorcism.png",
+      "output": "exorcism.webp",
       "confidence": "high"
     },
     {
       "abilityId": "consecration",
       "name": "Consecration",
       "sourceFile": "30.png",
-      "output": "consecration.png",
+      "output": "consecration.webp",
       "confidence": "medium"
     },
     {
       "abilityId": "righteous_fury",
       "name": "Righteous Fury",
       "sourceFile": "45.png",
-      "output": "righteous_fury.png",
+      "output": "righteous_fury.webp",
       "confidence": "high"
     },
     {
       "abilityId": "retribution_aura",
       "name": "Retribution Aura",
       "sourceFile": "44.png",
-      "output": "retribution_aura.png",
+      "output": "retribution_aura.webp",
       "confidence": "high"
     }
   ]

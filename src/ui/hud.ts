@@ -1,28 +1,22 @@
 import { audio } from '../game/audio';
-import { GAMEPAD_BUTTON_LABELS, GAMEPAD_NONE } from '../game/gamepad_map';
-import {
-  BIND_ACTIONS,
-  BIND_CATEGORIES,
-  isReservedCode,
-  type Keybinds,
-  keyLabel,
-} from '../game/keybinds';
-import { isNativeAppShell, useTouchInterface } from '../game/mobile_controls';
+import type { Keybinds } from '../game/keybinds';
 import { music, musicZoneForLocation, shouldResetMusicForDungeonEntry } from '../game/music';
-import {
-  type BoolSettingKey,
-  type GameSettings,
-  type NumericSettingKey,
-  normalizeClickMoveButton,
-  SETTING_RANGES,
-  type Settings,
-} from '../game/settings';
+import type { GameSettings, Settings } from '../game/settings';
 import { sfx } from '../game/sfx';
+import type { UiEffectsTier } from '../game/ui_effects_profile';
+import {
+  auraRefreshIntervalMs,
+  cadenceDue,
+  coerceFxTier,
+  minimapRedrawIntervalMs,
+  nonSelfRepaintDue,
+  targetFrameNonSelfIntervalMs,
+} from '../game/ui_tier_knobs';
 import { voice } from '../game/voice';
-import { castBarState } from '../render/cast_bar';
+import { castBarState, consumeBarState } from '../render/cast_bar';
 import { CharacterPreview } from '../render/characters';
 import { preloadMechAssets } from '../render/characters/assets';
-import { skinCount } from '../render/characters/manifest';
+import { mechHeldWeaponOverride, skinCount } from '../render/characters/manifest';
 import {
   onPortraitsReady,
   playerPortraitDataUrl,
@@ -37,19 +31,7 @@ import {
   type SkinTier,
   skinRankOrder,
 } from '../sim/content/skins';
-import {
-  cloneAllocation,
-  dormantNodes,
-  exportBuild,
-  FIRST_TALENT_LEVEL,
-  importBuild,
-  pointsSpent,
-  type Role,
-  type TalentAllocation,
-  type TalentNode,
-  talentsFor,
-  validateAllocation,
-} from '../sim/content/talents';
+import { FIRST_TALENT_LEVEL, type TalentAllocation, talentsFor } from '../sim/content/talents';
 import type { ZoneDef } from '../sim/data';
 import {
   ABILITIES,
@@ -66,7 +48,6 @@ import {
   isDelvePos,
   MOBS,
   NPCS,
-  PROPS,
   QUESTS,
   questRewardItem,
   WORLD_MAX_X,
@@ -76,9 +57,8 @@ import {
   ZONES,
   zoneAt,
 } from '../sim/data';
-import { DELVE_MODULE_LAYOUTS, type DelveModuleId } from '../sim/delve_layout';
-import { armorTypeForItem, weaponArchetypeForItem } from '../sim/equipment_rules';
-import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
+import { armorTypeForItem, canEquipItem, weaponArchetypeForItem } from '../sim/equipment_rules';
+import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
 import type { Ante, PickAction } from '../sim/lockpick';
 import { PICK_ACTIONS } from '../sim/lockpick';
 import type { ResolvedAbility } from '../sim/sim';
@@ -87,6 +67,7 @@ import type {
   EquipSlot,
   InvSlot,
   LootRollChoice,
+  MasterLootThreshold,
   PetMode,
   PlayerClass,
   ResourceType,
@@ -100,46 +81,44 @@ import {
   dist2d,
   type Entity,
   FISHING_CAST_ID,
-  GCD,
   type ItemDef,
   isQuestTurnInNpc,
   MAX_LEVEL,
-  MELEE_RANGE,
   MILESTONES,
   type SimEvent,
   virtualLevel,
   xpUntilNextPrestige,
 } from '../sim/types';
-import type { Decoration } from '../sim/world';
-import { generateDecorations } from '../sim/world';
 import {
-  type ArenaFormat,
   type DelveRunInfo,
-  type FriendInfo,
   type IWorld,
   isOverheadEmoteId,
-  type LeaderboardEntry,
-  type LeaderboardPage,
-  type MarketInfo,
   OVERHEAD_EMOTES,
   type OverheadEmoteId,
+  type PartyInfo,
 } from '../world_api';
-import { absorbBarView } from './absorb_bar';
+import { type AbilityScaling, abilityDamageBonus } from './ability_damage';
+import { ActionBarPainter } from './action_bar_painter';
 import {
-  applyBagFilter,
-  BAG_CATEGORIES,
-  BAG_SORTS,
-  type BagCategory,
-  type BagFilterState,
-  type BagSort,
-  DEFAULT_BAG_FILTER,
-  parseBagFilter,
-  serializeBagFilter,
-} from './bag_filter';
+  ABILITY_ICON_PREFIX,
+  type ActionBarView,
+  ATTACK_ICON_KEY,
+  createActionBarView,
+  EMPTY_ICON_KEY,
+  ITEM_ICON_PREFIX,
+} from './action_bar_view';
+import { ArenaWindow } from './arena_window';
+import { type AuraEffectInput, auraEffectDescriptor } from './aura_effect';
+import { AurasPainter, type AurasPainterDeps } from './auras_painter';
+import { type AurasDeps, createAurasView } from './auras_view';
+import { BagsWindow } from './bags_window';
+import { CastBarPainter } from './cast_bar_painter';
+import { CharWindow } from './char_window';
 import {
   activeCharacterAppearancePreview,
   characterAppearanceOptions,
 } from './character_appearance';
+import { ChatAnnouncer } from './chat_announcer';
 import {
   CHANNEL_LABEL_KEYS,
   CHAT_TAB_CHANNELS,
@@ -154,6 +133,7 @@ import {
 import { type ChatClock, clampChatClock, formatChatTimestamp } from './chat_timestamp';
 import { type ChatBoxGeometry, clampChatBox, parseChatBox, serializeChatBox } from './chat_window';
 import { formatClockTime } from './clock';
+import { CombatAnnouncer } from './combat_announcer';
 import {
   shouldPlayCombatImpactForTarget,
   shouldPlayCritSfxForTarget,
@@ -161,17 +141,22 @@ import {
 } from './combat_sfx';
 import { type CardinalId, compassView } from './compass';
 import { formatMinimapCoords } from './coords';
-import {
-  delveAreaLabel,
-  delveSchematicPlayer,
-  delveSchematicStatic,
-  playerDelveLocal,
-  type SchematicPrimitive,
-} from './delve_map';
+import { DelveMapPainter } from './delve_map_painter';
+import { markDialogRoot } from './dialog_root';
 import { dropdownKeyNav } from './dropdown_nav';
 import { emoteIconUrl } from './emote_icons';
-import { itemDisplayName, tEntity } from './entity_i18n';
+import {
+  classDisplayName,
+  dungeonDisplayName,
+  itemDisplayName,
+  tEntity,
+  zoneDisplayName,
+  zonePoiLabel,
+} from './entity_i18n';
 import { esc } from './esc';
+import { fctSpawnShape } from './fct_event';
+import { FctPainter } from './fct_painter';
+import { FocusManager, type FocusTrapHandle } from './focus_manager';
 import {
   holderTierBadgeDataUrl,
   holderTierByIndex,
@@ -196,38 +181,31 @@ import {
 import {
   formatMoney as formatLocalizedMoney,
   formatNumber,
-  getLanguage,
-  isSupportedLanguage,
   moneyParts,
   type SupportedLanguage,
-  supportedLanguages,
   type TranslationKey,
   t,
   tOptional,
   tPlural,
 } from './i18n';
 import { iconDataUrl, QUALITY_COLOR, raidMarkerDataUrl } from './icons';
+import { itemArmorTypeLabelKey } from './item_armor_type';
 import { itemStatDeltas } from './item_compare';
+import { itemSetMemberCounts, itemSetTooltipModel } from './item_set_tooltip_view';
+import { LeaderboardWindow } from './leaderboard_window';
+import { ReannounceMarker } from './live_region_reannounce';
 import { PICK_ACTION_HOTKEYS } from './lockpick_panel';
 import { LockpickWindow } from './lockpick_window';
 import { reconcileLootRolls as computeLootRollReconcile } from './loot_roll_reconcile';
 import { lowHealthVignette } from './low_health';
 import { lowResourceView } from './low_resource';
-import { overworldDungeonPortals } from './map_dungeon_portals';
 import { type MapRegion, mapCanvasHeight, paintTerrainRows } from './map_terrain';
-import {
-  filterMarketListings,
-  MARKET_ARMOR_TYPE_FILTERS,
-  MARKET_ITEM_TYPE_FILTERS,
-  MARKET_PAGE_SIZE,
-  MARKET_RARITY_FILTERS,
-  MARKET_WEAPON_TYPE_FILTERS,
-  type MarketItemTypeFilter,
-  type MarketRarityFilter,
-  type MarketSubtypeFilter,
-  paginateMarketListings,
-} from './market_filters';
+import { MapWindowPainter } from './map_window_painter';
+import { MAP_MAX_ZOOM, mapWindowMode } from './map_window_view';
+import { MarketWindow } from './market_window';
 import { Meters } from './meters';
+import { minimapMode } from './minimap_markers';
+import { MINIMAP_SIZE, MinimapPainter } from './minimap_painter';
 import {
   clampMinimapZoom,
   isMaxMinimapZoom,
@@ -236,12 +214,11 @@ import {
   minimapZoomValue,
   nextMinimapZoom,
 } from './minimap_zoom';
-import { selectPartyFrameMembers } from './party_frames';
-import {
-  type PerfOverlayHooks,
-  PerfOverlaySettingsPanel,
-  type PerfSettingsHost,
-} from './perf_overlay_settings';
+import { OptionsWindow } from './options_window';
+import { makeWriterFacet, type PainterHostPresentation } from './painter_host';
+import { partyFrameSignature, selectPartyFrameMembers } from './party_frames';
+import { PartyFramesPainter } from './party_frames_painter';
+import type { PerfOverlayHooks } from './perf_overlay_settings';
 import {
   CARD_POSES,
   cardCanvasToBlob,
@@ -263,29 +240,28 @@ import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import { maskProfanity } from './profanity';
 import { encodeQuestLink, parseChatSegments } from './quest_link';
 import { type QuestTrackerView, questTrackerView, type TrackedQuest } from './quest_tracker';
+import { QuestLogWindow } from './questlog_window';
 import { lockoutParts, lockoutShape } from './raid_lockout';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
 import { restView } from './rest_indicator';
-import { localizeServerText, localizeZone } from './server_i18n';
+import { localizeServerText } from './server_i18n';
 import { localizeSimAuraName, localizeSimText } from './sim_i18n';
+import { SocialWindow } from './social_window';
+import { SpellbookWindow } from './spellbook_window';
 import { buildStatTooltip, type StatId, type StatTooltipModel, weaponDps } from './stat_tooltip';
 import { type StatTooltipI18n, statCellHtml, statTooltipHtml } from './stat_tooltip_view';
 import { nearestSubzone } from './subzone';
-import { localizeTalentTitle, tTalent } from './talent_i18n';
-import { talentChoiceIconDataUrl, talentNodeIconDataUrl } from './talent_icons';
-import {
-  PRESET_ORDER,
-  type PresetId,
-  resolveTheme,
-  THEME_KNOB_LABEL_KEY,
-  THEME_KNOB_ORDER,
-  type ThemeKnob,
-  type ThemeState,
-} from './theme';
+import { swingTimerState } from './swing_timer';
+import { SwingTimerPainter } from './swing_timer_painter';
+import { localizeTalentTitle, roleLabel, tTalent } from './talent_i18n';
+import { TalentsWindow } from './talents_window';
+import type { PresetId, ThemeKnob, ThemeState } from './theme';
 import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { TutorialOverlay } from './tutorial';
 import { svgIcon } from './ui_icons';
 import { getUiScale } from './ui_scale';
+import { type UnitFrameDescriptor, unitFrameView } from './unit_frame';
+import { UnitFramePainter } from './unit_frame_painter';
 import { crestIdForEntity } from './unit_portrait';
 import { UnitPortraitPainter } from './unit_portrait_painter';
 import { buildVendorView } from './vendor_view';
@@ -299,7 +275,9 @@ import {
   wocBalance,
   wocBalanceVerified,
 } from './wallet_balance';
+import { makeWindowFocus } from './window_focus';
 import { formatXp, xpBarView } from './xp_bar';
+import { XpBarPainter } from './xp_bar_painter';
 
 // hooks main wires after Input exists (the options menu drives input, audio,
 // graphics, and logout, all of which live outside the HUD). PerfOverlayHooks
@@ -364,6 +342,33 @@ export interface BugReportHooks {
 }
 
 const $ = <T extends HTMLElement = HTMLElement>(sel: string): T => document.querySelector(sel) as T;
+// The player frame's stable portrait-identity key. The player portrait is drawn at
+// character setup (drawPlayerFramePortrait), not by the unit_frame painter, so the
+// painter's repaint gate never fires for it; the constant just pins the key so the
+// gate stays a no-op (target/party pass a per-unit key).
+const PLAYER_PORTRAIT_KEY = 'player';
+// The target frame's boss glyph (a skull replaces the numeric level chip for a
+// boss-rank target) and the number of combo pips, named so the per-frame target
+// paint carries no bare literal at the call site.
+const BOSS_SKULL_GLYPH = '☠';
+const COMBO_PIP_COUNT = 5;
+// The descriptor for a hidden target frame (no target, or a targeted world object).
+// unitFrameView reads only `present` when hiding, so the rest are no-op defaults; a
+// shared const avoids allocating a fresh descriptor for every hidden frame.
+const ABSENT_TARGET_DESCRIPTOR: UnitFrameDescriptor = {
+  present: false,
+  hpFrac: 0,
+  hpText: '',
+  resourceKind: 'none',
+  resFrac: 0,
+  resText: '',
+  levelText: null,
+  name: '',
+  portraitKey: '',
+  absorb: null,
+  dead: false,
+  outOfRange: false,
+};
 const trackMetaPixel = (eventName: string, data?: Record<string, unknown>): void => {
   const fbq = (window as Window & { fbq?: (...args: unknown[]) => void }).fbq;
   if (typeof fbq !== 'function') return;
@@ -382,66 +387,10 @@ const castDisplayName = (id: string): string => {
   return ability ? abilityDisplayName(ability) : id;
 };
 
-const _FAMILY_GLYPH: Record<string, string> = {
-  beast: '🐾',
-  humanoid: '🗡️',
-  murloc: '🐟',
-  spider: '🕷️',
-  kobold: '⛏️',
-  undead: '💀',
-  troll: '🦴',
-  ogre: '👊',
-  elemental: '🌀',
-  dragonkin: '🐉',
-};
-const _CLASS_GLYPH: Record<string, string> = {
-  warrior: '⚔️',
-  paladin: '🔨',
-  hunter: '🏹',
-  rogue: '🗡️',
-  priest: '✝️',
-  shaman: '🌩️',
-  mage: '🔮',
-  warlock: '🕯️',
-  druid: '🐻',
-};
-// Language picker labels. Endonyms (each language's name in its own script) are NOT
-// translated — they render identically in every locale, matching the homepage footer
-// picker (index.html) and standard i18n practice. Keyed by SupportedLanguage; the picker
-// iterates `supportedLanguages`, so a new locale appears once its label is added here.
-const LANGUAGE_ENDONYMS: Record<SupportedLanguage, string> = {
-  en: 'English (US)',
-  es: 'Español (LatAm)',
-  es_ES: 'Español (España)',
-  fr_FR: 'Français (France)',
-  fr_CA: 'Français (Canada)',
-  en_CA: 'English (Canada)',
-  it_IT: 'Italiano',
-  de_DE: 'Deutsch',
-  zh_CN: '简体中文',
-  zh_TW: '繁體中文',
-  ko_KR: '한국어',
-  ja_JP: '日本語',
-  pt_BR: 'Português (Brasil)',
-  ru_RU: 'Русский',
-};
 const RESOURCE_LABEL_KEYS: Record<ResourceType, TranslationKey> = {
   mana: 'abilityUi.resources.mana',
   rage: 'abilityUi.resources.rage',
   energy: 'abilityUi.resources.energy',
-};
-const BAG_CATEGORY_LABEL_KEYS: Record<BagCategory, TranslationKey> = {
-  all: 'hudChrome.bags.filterAll',
-  weapon: 'hudChrome.bags.filterWeapon',
-  armor: 'hudChrome.bags.filterArmor',
-  consumable: 'hudChrome.bags.filterConsumable',
-  material: 'hudChrome.bags.filterMaterial',
-  quest: 'hudChrome.bags.filterQuest',
-};
-const BAG_SORT_LABEL_KEYS: Record<BagSort, TranslationKey> = {
-  recent: 'hudChrome.bags.sortRecent',
-  quality: 'hudChrome.bags.sortQuality',
-  name: 'hudChrome.bags.sortName',
 };
 const RAID_MARKER_LABEL_KEYS = [
   'hud.markers.names.star',
@@ -534,45 +483,6 @@ const CHAT_ACTIVE_TAB_KEY = 'woc_chat_active_tab';
 // Persisted chat-window geometry (drag position + resize size). Desktop only —
 // the mobile layout owns its own placement and ignores this.
 const CHAT_GEOMETRY_KEY = 'woc_chat_geometry';
-const BIND_CATEGORY_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
-  Movement: 'hud.keybinds.categories.movement',
-  Targeting: 'hud.keybinds.categories.targeting',
-  Interface: 'hud.keybinds.categories.interface',
-  'Action Bar': 'hud.keybinds.categories.actionBar',
-};
-const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
-  forward: 'hud.keybinds.actions.forward',
-  back: 'hud.keybinds.actions.back',
-  turnLeft: 'hud.keybinds.actions.turnLeft',
-  turnRight: 'hud.keybinds.actions.turnRight',
-  strafeLeft: 'hud.keybinds.actions.strafeLeft',
-  strafeRight: 'hud.keybinds.actions.strafeRight',
-  jump: 'hud.keybinds.actions.jump',
-  autorun: 'hud.keybinds.actions.autorun',
-  target: 'hud.keybinds.actions.target',
-  attackMove: 'hud.keybinds.actions.attackMove',
-  interact: 'hud.keybinds.actions.interact',
-  char: 'hud.keybinds.actions.char',
-  spellbook: 'hud.keybinds.actions.spellbook',
-  questlog: 'hud.keybinds.actions.questlog',
-  map: 'hud.keybinds.actions.map',
-  bags: 'hud.keybinds.actions.bags',
-  nameplates: 'hud.keybinds.actions.nameplates',
-  meters: 'hud.keybinds.actions.meters',
-  social: 'hud.keybinds.actions.social',
-  arena: 'hud.keybinds.actions.arena',
-  chat: 'hud.keybinds.actions.chat',
-  // Combat/social target + emote-wheel actions. English-only chrome keys (the
-  // `hud` catalog domain is tsc-locked to inline per-locale blocks).
-  emoteWheel: 'hudChrome.keybinds.emoteWheel',
-  targetFriendly: 'hudChrome.keybinds.targetFriendly',
-  targetFriendlyNext: 'hudChrome.keybinds.targetFriendlyNext',
-  // Reuse the existing window/feature names so these labels localize everywhere
-  // without duplicating strings (these two ids were previously absent from the
-  // map and fell back to the raw English BIND_ACTIONS labels).
-  talents: 'game.talents.title',
-  leaderboard: 'game.leaderboard.title',
-};
 const CHAT_TEMPLATE_KEYS = {
   party: 'hud.chat.templates.party',
   yell: 'hud.chat.templates.yell',
@@ -613,8 +523,8 @@ type MobileHotbarDrag = {
 // world map: terrain is pre-rendered for the whole zone at this resolution
 // (cached per zone) and a sub-rect is blitted for the current zoom.
 const MAP_BG_RES = 480;
-const MAP_MAX_ZOOM = 6;
-const MAP_DETAIL_ZOOM = 2.2; // at/above this zoom, overlay buildings + vegetation
+// MAP_MAX_ZOOM (zoomMap clamp) and MAP_DETAIL_ZOOM live in map_window_view.ts now,
+// alongside the overworld map geometry that uses them.
 
 // --- spatial sound-effect mapping (clips generated by scripts/gen_sfx.mjs;
 // engine in src/game/sfx.ts) ------------------------------------------------
@@ -691,7 +601,12 @@ function yellVoiceKey(text: string): string {
 }
 
 export class Hud {
-  private static readonly BAR_ABILITY_SLOTS = 11; // bar slots 1..11; slot 0 is the fixed Attack toggle
+  // Ability slots across both rows: 1..11 on the primary bar, 12..22 on the
+  // secondary bar (slot 0 is the fixed Attack toggle on the primary bar). The
+  // two rows share one hotbarActions array, so drag/drop, persistence, and the
+  // keybind dispatch all work across both with no per-bar bookkeeping.
+  private static readonly PRIMARY_BAR_ABILITY_SLOTS = 11;
+  private static readonly BAR_ABILITY_SLOTS = 22;
   private static readonly PET_AUTOCAST_TOUCH_HOLD_MS = 2000;
   private static ddSeq = 0; // monotonic id source for buildDropdown listbox/option ARIA wiring
   private static readonly FORM_TOGGLE_IDS = new Set(['bear_form', 'cat_form', 'travel_form']); // shift toggles, castable in any form
@@ -702,8 +617,13 @@ export class Hud {
     keybindEl: HTMLSpanElement;
     cdOverlay: HTMLDivElement;
     cdText: HTMLDivElement;
-    lastIcon: string;
   }[] = [];
+  // The action bar's pure core + thin painter. Built in buildActionBar once
+  // the slot buttons exist; tick(world) -> ActionBarState, painted via the shared
+  // elided writer facet. The descriptor parameterizes the single existing bar so a
+  // second/third bar is another descriptor, not a code fork.
+  private actionBarView!: ActionBarView;
+  private actionBarPainter!: ActionBarPainter;
   private hotbarActions: HotbarAction[] = []; // index = barSlot-1
   private loadedSlotMapFromStorage = false;
   private knownAbilityIdsAtLastSlotSync: Set<string> | null = null;
@@ -720,20 +640,6 @@ export class Hud {
   // Soft swear terms from the server (online only), masked in chat when the
   // player's "Filter Profanity" setting is on. Fed by main.ts from ClientWorld.
   private profanityWords: string[] = [];
-  private optionsView:
-    | 'main'
-    | 'keybinds'
-    | 'graphics'
-    | 'audio'
-    | 'interface'
-    | 'performance'
-    | 'controller'
-    | 'bugreport' = 'main';
-  // The Options > Performance panel, lazily built and reused (it caches the live
-  // position-slider handles so a drag-to-move can update them in place).
-  private perfSettings: PerfOverlaySettingsPanel | null = null;
-  private capturingKey: { action: string; index: number } | null = null; // binding awaiting a key
-  private keybindNote = '';
   private emoteWheelOpen = false;
   private emoteWheelHover: OverheadEmoteId | 'edit' | null = null;
   private emoteWheelSlots: OverheadEmoteId[] = [];
@@ -746,6 +652,43 @@ export class Hud {
   private chatTimestamps = localStorage.getItem('chatTimestamps') === '1';
   private chatClock: ChatClock = clampChatClock(localStorage.getItem('chatClock'));
   private combatLogEl = $('#combatlog');
+  // Off-screen polite live region for the throttled combat summary. The 3D
+  // world / game canvas is OUT of accessibility scope (not screen-readable), so this
+  // announces only the combat-log text, never the game world.
+  private combatLiveEl = $('#combat-live');
+  private readonly combatAnnouncer = new CombatAnnouncer((summary) => {
+    this.combatLiveEl.textContent = summary;
+  });
+  // Off-screen polite live region for the current target's name, announced once per target
+  // CHANGE, never per frame. A separate node from #combat-live so it never
+  // re-announces what the combat summary speaks. The announce writes textContent DIRECTLY
+  // (NOT the per-frame elided setText, like the combat + chat announcer sinks): two distinct
+  // mobs of the same TEMPLATE share a display name, and the elided writer skips an identical
+  // write, so routing through it would swallow every same-named re-target and the region would
+  // fall silent on a screen reader. The path is change-gated on the target id, so it is an
+  // event write, not a per-frame write; the perf tour acquires no target, so the floor holds.
+  private targetLiveEl = $('#target-live');
+  // The last target id announced into #target-live, tracked SEPARATELY from the paint
+  // cadence id (lastTargetFrameId) so the announce fires on the real id change, not the
+  // throttled repaint; reset to null on no-target so re-acquiring the SAME target re-announces.
+  private lastAnnouncedTargetId: number | null = null;
+  // Forces a byte-different write when consecutive targets share a display name (a pack of
+  // identically-named mobs) so the polite region re-reads on every re-target, mirroring the
+  // combat-summary re-announce. The shared DOM-free deterministic marker.
+  private readonly targetReannounce = new ReannounceMarker();
+  // Dedicated tab-independent off-screen polite live region for chat:
+  // #chatlog goes display:none on the combat tab (a display:none live region is silent), so
+  // chat rides this always-present region instead, throttled by ChatAnnouncer so a chat
+  // burst never floods the screen reader.
+  private chatLiveEl = $('#chat-live');
+  private readonly chatAnnouncer = new ChatAnnouncer((summary) => {
+    this.chatLiveEl.textContent = summary;
+  });
+  // The ONE shared focus manager: trap (Tab/Shift+Tab cycle) + focus-first +
+  // return-to-opener, unifying the former ad-hoc Hud focus helpers. See
+  // ./focus_manager. Escape is NOT handled here: it stays with the existing unified
+  // dispatcher (main.ts game input -> hud.closeAll()), so there is one Escape path.
+  private readonly focusManager = new FocusManager();
   // WoW-style chat tabs. `chatTabs` are the player-added channel tabs (the
   // built-in `all`/`combat` views are implicit); `activeChatTab` is the one
   // currently shown, and drives both the log filter and the send channel.
@@ -765,7 +708,9 @@ export class Hud {
   private pfResEl = $('#pf-res');
   private pfResTextEl = $('#pf-res-text');
   private pfResourceEl = $('#pf-resource');
+  private pfAbsorbEl = $('#pf-absorb');
   private buffBarEl = $('#buff-bar');
+  private debuffBarEl = $('#debuff-bar');
   private targetFrameEl = $('#target-frame');
   private targetEliteTagEl = $('#tf-elite-tag');
   private targetNameEl = $('#tf-name');
@@ -773,7 +718,18 @@ export class Hud {
   private targetHpEl = $('#tf-hp');
   private targetHpTextEl = $('#tf-hp-text');
   private targetPortraitEl = $('#tf-portrait') as unknown as HTMLCanvasElement;
+  // The target absorb-shield overlay node, resolved ONCE here instead of the old
+  // per-frame updateAbsorb document query by hardcoded selector (per-frame
+  // discipline). The unit_frame painter drives it through the elided
+  // writers, exactly as the player frame drives its own absorb node.
+  private targetAbsorbEl = $('#tf-absorb');
   private targetDebuffsEl = $('#tf-debuffs');
+  // The target whose portrait the family painter's repaint gate redraws this frame.
+  // The gate fires synchronously inside the targetFramePainter.paint() call below,
+  // so this holds the subject for that one call (the old inline block read `target`
+  // from its enclosing scope; the gate now lives in the painter, so the redraw
+  // closure reads it from here).
+  private targetPortraitSubject: Entity | null = null;
   private comboRowEl = $('#combo-row');
   private castbarEl = $('#castbar');
   private castbarFillEl = this.castbarEl.querySelector('.fill') as HTMLElement;
@@ -786,9 +742,31 @@ export class Hud {
   private actionbarEl = $('#actionbar');
   private xpFillEl = $('#xpbar .fill');
   private xpLabelEl = $('#xpbar .label');
+  // XP + swing bar element refs cached once for their painters (the #xpbar /
+  // .rested / #player-frame / #swingbar refs were re-queried via $()/querySelector
+  // every frame, the leak this fixes).
+  private xpbarEl = $('#xpbar');
+  private xpRestedEl = $('#xpbar .rested');
+  private playerFrameEl = $('#player-frame');
+  // The party-frames container, resolved once (was re-queried every frame); the
+  // keyed-pool party painter owns its children.
+  private partyFramesEl = $('#party-frames');
+  private swingbarEl = $('#swingbar');
+  private swingFillEl = this.swingbarEl.querySelector('.fill') as HTMLElement;
+  private swingLabelEl = this.swingbarEl.querySelector('.label') as HTMLElement;
   private deathOverlayEl = $('#death-overlay');
   private releaseSpiritBtnEl = $('#release-btn');
+  // Cached once (was re-queried every frame): the near-death screen-edge overlay.
+  private lowHealthVignetteEl = document.getElementById('low-health-vignette');
   private hotWriteCache = new Map<HTMLElement, string>();
+  // Multi-slot caches for the per-frame writers: one element holds many
+  // custom properties / toggled classes, so these key per (element, prop) and
+  // (element, class) instead of the single slot per element hotWriteCache uses.
+  private hotStylePropCache = new Map<HTMLElement, Map<string, string>>();
+  private hotClassCache = new Map<HTMLElement, Map<string, string>>();
+  // Multi-slot cache for the action-bar setAttr writer: the action-bar
+  // aria-label is a per-frame attribute write, keyed per (element, attr name).
+  private hotAttrCache = new Map<HTMLElement, Map<string, string>>();
   private hotDomWrites = 0;
   private hotDomSkippedWrites = 0;
   private subzoneTimer: number | undefined;
@@ -835,10 +813,6 @@ export class Hud {
   private mapPrewarmVia: 'idle' | 'timeout' | null = null;
   // Delve schematic caches: static background (floor/pillars/tombs/dais/exit)
   // keyed by module id, redrawn only when the module changes.
-  private delveSchematicBg: HTMLCanvasElement | null = null;
-  private delveSchematicBgModuleId: string = '';
-  private delveMapBg: HTMLCanvasElement | null = null;
-  private delveMapBgModuleId: string = '';
   private openLootMobId: number | null = null;
   private openLootChestId: number | null = null;
   private activeLootRolls = new Map<
@@ -852,15 +826,19 @@ export class Hud {
   // later absence from the mirror means the server resolved them (retire), not
   // that the mirror simply has not caught up to a just-shown event yet.
   private confirmedLootRolls = new Set<number>();
+  // Master-loot assignment prompts, shown only to the master looter alongside
+  // the loot-roll rail. Same lifetime/expiry as a need/greed roll.
+  private activeMasterRolls = new Map<
+    number,
+    { event: Extract<SimEvent, { type: 'masterLoot' }>; receivedAt: number; durationMs: number }
+  >();
   private openVendorNpcId: number | null = null;
   private openDelveBoardNpcId: number | null = null;
   private lastDelveTrackerSig = '';
   private selectedDelveTier: 'normal' | 'heroic' = 'normal';
   private delveBoardTab: 'delve' | 'shop' = 'delve';
-  private delveBoardReturnFocus: HTMLElement | null = null;
-  private lockpickOfferId: number | null = null;
-  private lockpickCoffer = false;
-  private lockpickReturnFocus: HTMLElement | null = null;
+  private delveTrap: FocusTrapHandle | null = null;
+  private lockpickTrap: FocusTrapHandle | null = null;
   private lockpickKeyHandler: ((e: KeyboardEvent) => void) | null = null;
   // The board paints from the authoritative world.lockpickState (never a cached
   // copy), and owns the per-page countdown with a generation guard. hud.ts keeps
@@ -875,12 +853,9 @@ export class Hud {
   });
   private openGossipNpcId: number | null = null;
   private openQuestDetailId: string | null = null;
-  private selectedQuestLogId: string | null = null;
   private pendingChatLinks = new Map<string, string>(); // display "[Name]" -> questId
-  private questDialogReturnFocus: HTMLElement | null = null;
+  private questDialogTrap: FocusTrapHandle | null = null;
   private questDialogOpenedAtMs = 0;
-  private questLogReturnFocus: HTMLElement | null = null;
-  private lastPortraitTarget = -999;
   // swing timer: the period is captured from the reset edge (swingTimer jumping
   // up), so the bar tracks real swing speed including haste / ranged weapons.
   private swingPeriod = 0;
@@ -891,47 +866,16 @@ export class Hud {
   private tradeWasOpen = false;
   private lastTradeSig = '';
   private lastPartySig = '';
-  private lastArenaSig = '';
+  // Separate, LOW-frequency signature for the leader-only master-loot footer control
+  // (loot settings + membership, no hp/res), so it is not churned every combat tick.
+  private lastPartyFooterSig = '';
   private lastArenaStatusSig = '';
   private arenaMatchSeen = false; // closes the queue panel once a bout starts
-  private arenaBracket: ArenaFormat = '1v1';
   // 2v2 Fiesta UI state (all transient)
   private fiestaScoreSeen = { a: -1, b: -1 }; // last rendered tally (for score-ping)
   private fiestaOfferKey = ''; // identity of the currently-shown augment offer
   private fiestaActiveSeen = false; // were we in a fiesta bout last frame
   private fiestaWasDown = false; // were we benched last frame (for the revive cue)
-  // Offline only: dev toggle that spins up a 2v2 Fiesta vs bots. Wired by main.ts
-  // (left null online, which hides the button).
-  private fiestaPracticeHook: (() => void) | null = null;
-  // World Market (the Merchant's auction house)
-  private marketOpen = false;
-  private marketTab: 'browse' | 'sell' | 'collect' = 'browse';
-  private marketItemTypeFilter: MarketItemTypeFilter = 'all';
-  private marketSubtypeFilter: MarketSubtypeFilter = 'all';
-  private marketRarityFilter: MarketRarityFilter = 'all';
-  private marketBrowsePage = 0;
-  private leaderboardPage = 0;
-  private marketSellItem: string | null = null; // bag item staged for listing
-  private marketSearchQuery = ''; // active browse search term (sent to the server)
-  private lastMarketSig = '';
-  // Modular bag filtering: category chips + sort + live search, persisted across
-  // sessions. Pure logic lives in bag_filter.ts; renderBags() is the thin consumer.
-  private static readonly BAG_FILTER_KEY = 'woc_bag_filter';
-  private bagFilter: BagFilterState = (() => {
-    try {
-      return parseBagFilter(localStorage.getItem(Hud.BAG_FILTER_KEY));
-    } catch {
-      return { ...DEFAULT_BAG_FILTER };
-    }
-  })();
-  // all-time ladder, fetched best-effort from the server (online only)
-  private arenaAllTime: Partial<
-    Record<
-      ArenaFormat,
-      { name: string; class: string; level: number; rating: number; wins: number; losses: number }[]
-    >
-  > = {};
-  private arenaLbFetchedAt: Partial<Record<ArenaFormat, number>> = {};
   private lastCombatEventAt = 0;
   // mob ids that have already vocalized their aggro alert (so the first strike
   // roars and subsequent strikes use the attack vocalization). Cleared on death
@@ -954,7 +898,6 @@ export class Hud {
     minZ: number;
     maxZ: number;
   } | null = null;
-  private mapDecorations: Decoration[] | null = null; // cached trees/rocks (whole world)
   private windowDrag: {
     el: HTMLElement;
     pointerId: number;
@@ -978,22 +921,26 @@ export class Hud {
   private windowObserver: MutationObserver | null = null;
   private windowZ = 50;
   private ignoredChatNames = new Set<string>();
-  private socialTab: 'friends' | 'guild' | 'ignore' | 'raid' = 'friends';
-  // split signatures: structural changes (tab, guild membership) rebuild the
-  // whole panel; content-only changes (a friend's presence) refresh just the
-  // list, so an open typeahead / half-typed name survives a snapshot
-  private lastSocialStruct = '';
-  private lastSocialContent = '';
-  private socialNotice: { text: string; error: boolean } | null = null;
-  private socialSuggestTimer: number | undefined;
   private lastHudFastAt = 0;
   private lastHudMediumAt = 0;
   private lastHudSlowAt = 0;
+  // Per-element tier cadence stamps (graphics-tier knobs). Each gates a non-self /
+  // canvas redraw to a slower interval on the LOW static preset; on every other tier the
+  // interval is 0 (cadenceDue is always true), so these are no-ops and the path is the
+  // unchanged per-frame path. The SELF/player frame has no stamp (it always paints), and
+  // party frames are deliberately not stamped (party-member HP is a healer's actionable
+  // signal, so it stays on the mediumHud band for every tier: see ui_tier_knobs).
+  private lastMinimapDrawAt = 0;
+  private lastBuffBarPaintAt = 0;
+  private lastTargetDebuffsPaintAt = 0;
+  private lastTargetFramePaintAt = 0;
+  private lastTargetFrameId: number | null = null;
   private charPreview: CharacterPreview | null = null;
   private charPreviewCanvas: HTMLCanvasElement | null = null;
   // Cosmetic skin-select event overlay (opened by the skinEvent cue). The shared
   // CharacterPreview above is borrowed for the rotatable 3D preview.
   private skinEventEl: HTMLElement | null = null;
+  private skinEventTrap: FocusTrapHandle | null = null;
   private skinEventRank: SkinRank | null = null;
   private skinEventTiers: readonly SkinTier[] = EVENT_SKIN_TIERS;
   private skinEventSelected = -1;
@@ -1005,27 +952,21 @@ export class Hud {
   // Pending lazy-load of the mech GLB + chromas; the reveal waits on it.
   private mechAssetsPromise: Promise<void> | null = null;
   private cardModalEl: HTMLElement | null = null;
-  private cardModalReturnFocus: HTMLElement | null = null;
+  private cardModalTrap: FocusTrapHandle | null = null;
+  // Shared by the confirm + input modals (one #confirm-dialog id; they never coexist).
+  private confirmTrap: FocusTrapHandle | null = null;
   // Set while the player-card modal is open: re-composites the card with the
   // current pose so a $WOC balance change (the bag-footer path can't reach the
   // card's canvas) is reflected. Cleared when the modal closes.
   private recomposeOpenCard: (() => void) | null = null;
-  // current typeahead state: which input, its results, and the keyboard-
-  // highlighted row (-1 = none), so Enter/Arrow keys can pick a suggestion
-  private socialSuggest: {
-    field: string;
-    items: { name: string; cls: string; level: number }[];
-    index: number;
-  } = { field: '', items: [], index: -1 };
-
   private meters: Meters;
   private tutorial = new TutorialOverlay();
   private lastPetBarSig = '';
   private pendingPetFeed = false;
   private petModeMenuOpen = false;
-  // Talents: a local staged allocation the user edits before committing (Apply).
+  // Talents: the local staged allocation the user edits before committing it on save
+  // or loadout switch. Owned here; TalentsWindow reads/replaces it via its deps.
   private talentStage: TalentAllocation | null = null;
-  private talentTab: 'class' | 'spec' = 'class';
 
   constructor(
     private sim: IWorld,
@@ -1046,7 +987,7 @@ export class Hud {
     // re-render the bag footer (and re-composite an open player card) when the
     // connected wallet's $WOC balance changes
     onWalletUiChange(() => {
-      if ($('#bags').style.display === 'block') this.renderBags();
+      if ($('#bags').style.display !== 'none') this.renderBags();
       this.recomposeOpenCard?.();
     });
     $('#pf-name').textContent = sim.player.name;
@@ -1055,10 +996,10 @@ export class Hud {
     // ready, upgrade the player frame and force the target frame to redraw.
     onPortraitsReady(() => {
       this.drawPlayerFramePortrait();
-      this.lastPortraitTarget = -999;
+      this.targetFramePainter.invalidatePortrait();
     });
     const mm = $('#minimap') as unknown as HTMLCanvasElement;
-    this.minimapCtx = mm.getContext('2d')!;
+    this.minimapCtx = require2dContext(mm);
     this.minimapBg = this.renderTerrainCanvas(140, {
       minX: WORLD_MIN_X,
       maxX: WORLD_MAX_X,
@@ -1270,7 +1211,7 @@ export class Hud {
     bagsEl.addEventListener('dragover', (e) => {
       if (this.dragUnequipSlot === null) return;
       e.preventDefault();
-      e.dataTransfer!.dropEffect = 'move';
+      if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
       bagsEl.classList.add('drop-target');
     });
     bagsEl.addEventListener('dragleave', (e) => {
@@ -1340,26 +1281,49 @@ export class Hud {
     el.style.display = display;
   }
 
-  private setTransform(el: HTMLElement, transform: string): void {
-    const key = `transform:${transform}`;
-    if (this.hotWriteCache.get(el) === key) {
+  // Note: the per-frame transform + width writers live only on the painter facet now
+  // (makeWriterFacet's setTransform/setWidth, painter_host.ts). The target hp bar was
+  // the last Hud-direct setTransform caller and the cast bars were the last
+  // setWidth caller; with both on their painters, every transform/width write
+  // routes through the facet over the SAME hotWriteCache + `transform:`/`width:` keys,
+  // so the Hud no longer mirrors a private setTransform or setWidth.
+
+  // Write-elision extension. setStyleProp drives a custom
+  // property (or any standard property) and toggleClass drives a class, each
+  // keyed in a MULTI-SLOT cache: one element can hold many props / toggled
+  // classes, so collapsing these into the single-slot hotWriteCache would
+  // silently break elision (Top risk 1). The facet in painter_host.ts binds the
+  // same two writers over these same caches + counters, so Hud-direct writes and
+  // painter writes share one skip-rate.
+  private setStyleProp(el: HTMLElement, prop: string, value: string): void {
+    let slots = this.hotStylePropCache.get(el);
+    if (slots === undefined) {
+      slots = new Map();
+      this.hotStylePropCache.set(el, slots);
+    }
+    if (slots.get(prop) === value) {
       this.hotDomSkippedWrites++;
       return;
     }
-    this.hotWriteCache.set(el, key);
+    slots.set(prop, value);
     this.hotDomWrites++;
-    el.style.transform = transform;
+    el.style.setProperty(prop, value);
   }
 
-  private setWidth(el: HTMLElement, width: string): void {
-    const key = `width:${width}`;
-    if (this.hotWriteCache.get(el) === key) {
+  private toggleClass(el: HTMLElement, cls: string, on: boolean): void {
+    const state = on ? 'on' : 'off';
+    let slots = this.hotClassCache.get(el);
+    if (slots === undefined) {
+      slots = new Map();
+      this.hotClassCache.set(el, slots);
+    }
+    if (slots.get(cls) === state) {
       this.hotDomSkippedWrites++;
       return;
     }
-    this.hotWriteCache.set(el, key);
+    slots.set(cls, state);
     this.hotDomWrites++;
-    el.style.width = width;
+    el.classList.toggle(cls, on);
   }
 
   perfStats(): { hotDomWrites: number; hotDomSkippedWrites: number; hotDomSkipRate: number } {
@@ -1588,14 +1552,21 @@ export class Hud {
     delete el.dataset.windowOpen;
     switch (el.id) {
       case 'confirm-dialog':
+        this.confirmTrap?.release();
+        this.confirmTrap = null;
         el.remove();
         break;
       case 'options-menu':
         this.closeOptions();
         break;
       case 'social-window':
-        el.classList.remove('open');
-        this.hideTooltip();
+        // Route through the painter so focus returns to the opener (WCAG 2.2 AA),
+        // consistent with the toggle/X close path.
+        this.socialWindow.close();
+        break;
+      case 'char-window':
+        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
+        this.charWindow.close();
         break;
       case 'trade-window':
         this.sim.tradeCancel();
@@ -1603,6 +1574,11 @@ export class Hud {
         break;
       case 'market-window':
         this.closeMarket();
+        break;
+      case 'arena-window':
+        // Route through the painter so focus returns to the opener (WCAG 2.2 AA),
+        // consistent with the toggle / X close path.
+        this.arenaWindow.close();
         break;
       case 'vendor-window':
         this.closeVendor();
@@ -1618,16 +1594,24 @@ export class Hud {
         break;
       case 'bags':
         if (this.vendorOpen && document.body.classList.contains('mobile-touch')) this.closeVendor();
-        else {
-          el.style.display = 'none';
-          this.hideTooltip();
-          this.cancelPetFeed();
-        }
+        // Route through the painter so focus returns to the opener (WCAG 2.4.3),
+        // consistent with the toggle / X close path. NON-MODAL: no trap is released.
+        else this.bagsWindow.close();
         break;
       case 'talents-window':
-        el.style.display = 'none';
-        this.talentStage = null;
-        this.hideTooltip();
+        // Route through the painter so the staged buffer is dropped AND focus
+        // returns to the opener (WCAG), consistent with the toggle/X close path.
+        this.talentsWindow.close();
+        break;
+      case 'spellbook':
+        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
+        this.spellbookWindow.close();
+        break;
+      case 'quest-log-window':
+        this.questlogWindow.close();
+        break;
+      case 'leaderboard-window':
+        this.leaderboardWindow.close();
         break;
       case 'emote-editor':
         this.closeEmoteEditor();
@@ -2068,7 +2052,7 @@ export class Hud {
   // existing "You are not in a party." error from the /p path.
   maybeHandleQuestShareCommand(raw: string): boolean {
     if (!/^\/share(?:\s|$)/i.test(raw.trim())) return false;
-    const id = this.selectedQuestLogId;
+    const id = this.questlogWindow.selectedQuestId;
     if (!id || !this.sim.questLog.has(id)) {
       this.showError(t('hudChrome.questShare.noQuestSelected'));
       return true;
@@ -2332,12 +2316,511 @@ export class Hud {
   // HUD just routes the framed unit (class headshot vs mob/NPC crest) to it.
   private readonly portraits = new UnitPortraitPainter();
 
+  // PainterHost facets (painter_host.ts). The write-elision facet binds the six
+  // private hot writers as closures over the SAME caches + counters (no visibility
+  // change), so the HUD and painters share one skip-rate; the delve painter uses it
+  // for the '#zone-label' text, the xp/swing painters for their per-frame writes.
+  // The presentation bag is the shared icon/money/tooltip surface item windows
+  // compose (today only the vendor window).
+  private readonly writerFacet = makeWriterFacet(
+    this.hotWriteCache,
+    this.hotStylePropCache,
+    this.hotClassCache,
+    this.hotAttrCache,
+    () => {
+      this.hotDomWrites++;
+    },
+    () => {
+      this.hotDomSkippedWrites++;
+    },
+  );
+  private readonly delvePainter = new DelveMapPainter(this.writerFacet, classCss);
+  // Per-frame XP + swing painters. Each caches its element refs once and
+  // routes every write through the same six-writer facet, so their --xp-fill /
+  // .rested / swing writes share the one skip-rate.
+  private readonly xpBarPainter = new XpBarPainter(
+    this.writerFacet,
+    this.xpbarEl,
+    this.xpFillEl,
+    this.xpRestedEl,
+    this.xpLabelEl,
+    this.playerFrameEl,
+  );
+  private readonly swingTimerPainter = new SwingTimerPainter(
+    this.writerFacet,
+    this.swingbarEl,
+    this.swingFillEl,
+    this.swingLabelEl,
+  );
+  // The per-frame FCT painter: the pooled-div ring that replaced the per-event
+  // createElement + setTimeout fct() below. handleEvents + showSelfNote feed spawn(), which
+  // projects the head anchor ONCE (screen-anchored, byte-faithful to the old fct() and to
+  // WoW combat text: the number rises in screen space, it does not chase the camera) and
+  // behind-culls; the every-frame tier of update() drives step(), which ONLY TTL-recycles
+  // expired floaters (no per-frame reposition). It owns FCT_POOL_CAP pre-allocated #ui
+  // children, projecting through renderer.worldToScreen and dividing by getUiScale into
+  // author space (the same zoom correction the old fct() applied). All writes route through
+  // the write-elision facet; the per-kind colour is a CSS class token,
+  // never an inline hex.
+  private readonly fctPainter = new FctPainter(
+    this.writerFacet,
+    document.getElementById('ui') as HTMLElement,
+    (x, y, z) => this.renderer.worldToScreen(x, y, z),
+    getUiScale,
+    // Tier the pool cap / TTL / drop-non-crit from the STATIC preset (data-fx-level),
+    // never the governor. spawn() reads this per event.
+    { getFxTier: () => this.fxTier() },
+  );
+  // The player frame is the FIRST instance of the unit_frame family. It owns
+  // its own element set; target/party become further instances of this exact
+  // painter. The element set + options deliberately mirror the inline block
+  // exactly, so the player path stays byte-faithful: no `name` (the player name is
+  // static, set once at login, not on the hot path); no `stateClasses` (the player
+  // frame never carries dead/out-of-range, those are party-only); no `shownDisplay`
+  // (the frame is always visible via CSS, never toggled); no `repaintPortrait` (its
+  // portrait is drawn at character setup, drawPlayerFramePortrait, not per frame).
+  private readonly playerFramePainter = new UnitFramePainter(this.writerFacet, {
+    frame: this.playerFrameEl,
+    level: this.pfLevelEl,
+    hpFill: this.pfHpEl,
+    hpText: this.pfHpTextEl,
+    absorb: this.pfAbsorbEl,
+    resource: { container: this.pfResourceEl, fill: this.pfResEl, text: this.pfResTextEl },
+  });
+  // The two cast bars are ONE instance-parameterized painter, over the
+  // castBarState core. The PLAYER instance localizes the cast id (castDisplayName),
+  // layers the eat/drink overlay (consumeBarState, player-only), and clears the bar
+  // on hide (its inline block did). The TARGET instance shows the raw cast id
+  // (byte-faithful: the target block set the raw `label`), has no eat/drink (the
+  // target never eats/drinks, so its paint omits `consume`), and hides with only
+  // display:none (its inline block did not clear).
+  private readonly playerCastBarPainter = new CastBarPainter(
+    this.writerFacet,
+    {
+      bar: this.castbarEl,
+      fill: this.castbarFillEl,
+      label: this.castbarLabelEl,
+      timer: this.castbarTimerEl,
+    },
+    { resolveCastLabel: (s) => castDisplayName(s.label), clearOnHide: true },
+  );
+  private readonly targetCastBarPainter = new CastBarPainter(
+    this.writerFacet,
+    {
+      bar: this.targetCastbarEl,
+      fill: this.targetCastbarFillEl,
+      label: this.targetCastbarLabelEl,
+      timer: this.targetCastbarTimerEl,
+    },
+    { resolveCastLabel: (s) => s.label },
+  );
+  // The target frame is the SECOND instance of the unit_frame family: the same
+  // painter + core as the player, over the target's element set. It supplies the
+  // per-unit `name`, the cached `#tf-absorb` overlay node (no per-frame query), the
+  // `shownDisplay` show/hide path, and the portrait repaint gate (the painter owns
+  // the gate, so the old `lastPortraitTarget` sentinel is now the painter's
+  // `lastPortraitKey`). It passes NO resource group (the target has no power bar) and
+  // NO `stateClasses` (the target carries its own `elite` class, painted at the call
+  // site, not the party dead/out-of-range classes). The target-only concerns the
+  // family does not express (the elite class + tag, the hostile/friendly name color,
+  // the combo pips) route through the SAME elided writers in update() below.
+  private readonly targetFramePainter = new UnitFramePainter(
+    this.writerFacet,
+    {
+      frame: this.targetFrameEl,
+      name: this.targetNameEl,
+      level: this.targetLevelEl,
+      hpFill: this.targetHpEl,
+      hpText: this.targetHpTextEl,
+      absorb: this.targetAbsorbEl,
+    },
+    {
+      shownDisplay: 'flex',
+      repaintPortrait: () => this.drawTargetPortrait(),
+    },
+  );
+  // The party frames are N further instances of the unit_frame family, one per
+  // member, behind a keyed node pool that replaces the old per-rebuild innerHTML wipe
+  // + click/contextmenu re-attach. The pool owns #party-frames; updatePartyFrames
+  // feeds it the pure selectPartyFrameMembers result only when the cheap signature
+  // changed. All closures are lazy, so this field initializer is safe.
+  private readonly partyFramesPainter = new PartyFramesPainter(
+    this.writerFacet,
+    this.partyFramesEl,
+    {
+      classCss,
+      onTarget: (pid) => this.sim.targetEntity(pid),
+      onContextMenu: (pid, name, x, y) => this.openContextMenu(pid, name, x, y),
+      onLeave: () => this.sim.partyLeave(),
+      leaveLabel: () => t('hud.social.leaveParty'),
+    },
+  );
+  // Overworld world-map painter (the delve branch stays with delvePainter). Owns
+  // the cached whole-world decorations; redraws from the mediumHud band while open.
+  private readonly mapPainter = new MapWindowPainter();
+  // The aura strips are the keyed-pool aura painter, two instances of the
+  // auras_view core + AurasPainter: the player buff bar (#buff-bar, mode
+  // 'all') and the target debuffs (#tf-debuffs, mode 'debuffs'). The shared deps fire
+  // the i18n lookups every frame (so a language switch lands on the next tick) and the
+  // painter's tooltip closure reads the pool's LIVE record (Top risk 3, never a captured
+  // aura). All closures are lazy, so these field initializers are safe.
+  private readonly aurasViewDeps: AurasDeps = {
+    iconId: (a) => (ABILITIES[a.id] ? a.id : `aura_${a.kind}`),
+    auraName: (a) =>
+      ABILITIES[a.id] ? abilityDisplayName(ABILITIES[a.id]) : auraDisplayNameFromSource(a.name),
+    formatStacks: (n) => formatNumber(n, { maximumFractionDigits: 0 }),
+    durationUnitSuffix: () => t('hudChrome.unitFrame.durationUnitSeconds'),
+    auraEffectHtml: (a) => this.auraEffectTooltipHtml(a),
+  };
+  private readonly aurasPainterDeps: AurasPainterDeps = {
+    resolveIconUrl: (iconKey) => `url(${iconDataUrl('aura', iconKey)})`,
+    renderTooltip: (name, remaining, effectHtml) =>
+      `<div class="tt-title">${esc(name)}</div>${effectHtml}<div class="tt-sub">${esc(tPlural('hudChrome.plurals.secondsRemaining', Math.ceil(remaining)))}</div>`,
+    attachTooltip: (el, html) => this.attachTooltip(el, html),
+  };
+  // Player auras split across two rows (classic layout): buffs in #buff-bar, debuffs in
+  // #debuff-bar, so a fresh debuff is never buried under a wall of long-lived buffs.
+  private readonly buffBarView = createAurasView('buffs', this.aurasViewDeps);
+  private readonly debuffBarView = createAurasView('debuffs', this.aurasViewDeps);
+  private readonly targetDebuffsView = createAurasView('debuffs', this.aurasViewDeps);
+  // The buff-bar painter alone gets attachCancel: right-clicking one of the local player's
+  // own helpful buffs cancels it (classic convention). The debuff / target painters reuse
+  // the shared deps (no cancel: a debuff or another entity's aura is never cancelable).
+  private readonly buffBarPainterDeps: AurasPainterDeps = {
+    ...this.aurasPainterDeps,
+    attachCancel: (el, cancelableAuraId) => {
+      el.addEventListener('contextmenu', (ev) => {
+        const auraId = cancelableAuraId();
+        if (auraId === null) return;
+        ev.preventDefault();
+        this.hideTooltip();
+        this.sim.cancelAura(auraId);
+      });
+    },
+  };
+  private readonly buffBarPainter = new AurasPainter(
+    this.writerFacet,
+    this.buffBarEl,
+    this.buffBarPainterDeps,
+    document,
+    // Cap the visible aura count on the LOW static preset (never the
+    // governor).
+    () => this.fxTier(),
+  );
+  private readonly debuffBarPainter = new AurasPainter(
+    this.writerFacet,
+    this.debuffBarEl,
+    this.aurasPainterDeps,
+    document,
+    () => this.fxTier(),
+  );
+  private readonly targetDebuffsPainter = new AurasPainter(
+    this.writerFacet,
+    this.targetDebuffsEl,
+    this.aurasPainterDeps,
+    document,
+    () => this.fxTier(),
+  );
+  // Overworld minimap canvas painter (the delve branch stays with delvePainter). Owns
+  // the marker core; redraws from the fastHud (~10Hz) band. classCss colors the party
+  // discs/arrows; zoneDisplayName localizes the '#zone-label' it writes via setText.
+  private readonly minimapPainter = new MinimapPainter(this.writerFacet, classCss, (zoneId) =>
+    zoneDisplayName(zoneId),
+  );
+  private readonly presentationBag: PainterHostPresentation = {
+    itemIcon: (item) => this.itemIcon(item),
+    moneyHtml: (copper) => this.moneyHtml(copper),
+    itemTooltip: (item) => this.itemTooltip(item),
+    attachTooltip: (el, html) => this.attachTooltip(el, html),
+  };
+  // The interactive talents window. Hud stays the coordinator (closeOtherWindows
+  // needs its private window state) and owns the single staged edit buffer
+  // (talentStage); the painter reads/replaces it via getStage/setStage and mutates
+  // it in place. All closures are lazy, so this field initializer is safe even
+  // though this.sim is assigned in the ctor body.
+  private readonly talentsWindow = new TalentsWindow({
+    ...this.presentationBag,
+    root: () => $('#talents-window'),
+    hideTooltip: () => this.hideTooltip(),
+    ...this.windowFocus('#talents-window'),
+    getStage: () => this.talentStage,
+    setStage: (s) => {
+      this.talentStage = s;
+    },
+    playerClass: () => this.sim.cfg.playerClass,
+    totalPoints: () => this.sim.talentPoints().total,
+    currentAllocation: () => this.sim.talents,
+    activeLoadout: () => this.sim.activeLoadout,
+    loadouts: () => this.sim.loadouts,
+    currentBar: () => this.hotbarActions.map((a) => (a && a.type === 'ability' ? a.id : null)),
+    saveLoadout: (name, bar, alloc) => this.sim.saveLoadout(name, bar, alloc),
+    switchLoadout: (i) => this.sim.switchLoadout(i),
+    deleteLoadout: (i) => this.sim.deleteLoadout(i),
+    applyLoadoutBar: (bar) => this.applyLoadoutBar(bar),
+    buildDropdown: (options, current, onChange, placeholder, a11y) =>
+      this.buildDropdown(options, current, onChange, placeholder, a11y),
+    inputDialog: (opts) => this.inputDialog(opts),
+    confirmDialog: (title, body, okText, cancelText, onOk) =>
+      this.confirmDialog(title, body, okText, cancelText, onOk),
+    showError: (text) => this.showError(text),
+  });
+  // Social panel painter (social_view.ts core + social_window.ts painter). The
+  // window renders no item rows, so it composes no PainterHostPresentation bag; it
+  // reads/commands the live world and routes the shared chrome (whisper, confirm
+  // prompt, close-others, focus return) through these lazy closures.
+  private readonly socialWindow = new SocialWindow({
+    root: () => $('#social-window'),
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#social-window'),
+    hideTooltip: () => this.hideTooltip(),
+    ...this.windowFocus('#social-window'),
+    showPrompt: (text, acceptLabel, onAccept, onDecline) =>
+      this.showPrompt(text, acceptLabel, onAccept, onDecline),
+    startWhisper: (name) => this.startWhisper(name),
+  });
+  // Bags window painter (bags_view.ts core + bags_window.ts painter). It composes
+  // the shared presentation bag (icon/money/tooltip) and adds the inventory-cluster
+  // surface: world reads, cross-window mode flags + commands, pet-feed / drag /
+  // wallet plumbing. The cross-window modes stay HUD state, read each click.
+  private readonly bagsWindow = new BagsWindow({
+    ...this.presentationBag,
+    root: () => $('#bags'),
+    world: () => this.sim,
+    wocBalanceHtml: () => this.wocBalanceHtml(),
+    hideTooltip: () => this.hideTooltip(),
+    cancelPetFeed: () => this.cancelPetFeed(),
+    // Non-trapping focus capture/return (bags is a non-modal companion of vendor /
+    // trade / market): NOT windowFocus('#bags'), which would install a Tab trap and
+    // break the inventory cluster.
+    captureFocus: () => this.focusManager.activeFocusable(),
+    restoreFocus: (target) => this.focusManager.restore(target),
+    renderCharIfOpen: () => this.renderCharIfOpen(),
+    vendorOpen: () => this.vendorOpen,
+    tradeOpen: () => this.tradeOpen,
+    isMarketSell: () => this.marketWindow.isSellTab,
+    pendingPetFeed: () => this.pendingPetFeed,
+    closeVendor: () => this.closeVendor(),
+    addItemToTrade: (itemId) => this.addItemToTrade(itemId),
+    stageMarketSell: (itemId) => this.marketWindow.stageSell(itemId),
+    showError: (text) => this.showError(text),
+    setPendingPetFeed: (active) => {
+      this.pendingPetFeed = active;
+    },
+    resetPetBarSig: () => {
+      this.lastPetBarSig = '';
+    },
+    isHotbarItemId: (itemId) => this.isHotbarItemId(itemId),
+    setDragAction: (action) => {
+      this.dragAction = action ? { action, sourceIndex: null } : null;
+    },
+    clearActionDropTargets: () => this.clearActionDropTargets(),
+  });
+  // World Market window painter (market_view.ts core + market_window.ts painter).
+  // It composes the shared presentation bag (icon/money/tooltip) and owns the
+  // market's view-state (tab, filters, page, staged sell item, search). The bags
+  // window stays HUD-coordinated (it rides alongside and stages the Sell tab), so
+  // the cross-window bag sync routes back through these lazy closures.
+  private readonly marketWindow = new MarketWindow({
+    ...this.presentationBag,
+    root: () => $('#market-window'),
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#market-window'),
+    hideTooltip: () => this.hideTooltip(),
+    ...this.windowFocus('#market-window'),
+    showError: (text) => this.showError(text),
+    slotName: (slot) => itemSlotName(slot),
+    syncBags: (open) => {
+      if (open) {
+        this.renderBags();
+        $('#bags').style.display = 'flex';
+      } else if ($('#bags').style.display !== 'none') {
+        this.renderBags();
+      }
+    },
+  });
+  // Ashen Coliseum window painter (arena_window_view.ts offline/live model +
+  // arena_window.ts painter). It owns the selected bracket, the all-time-ladder
+  // cache + fetch throttle, the render-skip signature, and focus-return; Hud
+  // forwards the keybind toggle and drives render() from the mediumHud band.
+  private readonly arenaWindow = new ArenaWindow({
+    root: () => $('#arena-window'),
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#arena-window'),
+    ...this.windowFocus('#arena-window'),
+  });
+  // Character window painter (char_view.ts paperdoll core + char_window.ts painter).
+  // It composes the presentation bag (icon/tooltip) for the equip slots and routes
+  // the HUD-built stat / talent / progression fragments plus the unequip + drag
+  // plumbing. The shared 3D turntable preview and the cosmetic skin picker stay
+  // HUD-owned (the single WebGL preview is borrowed by the skin-event overlay and
+  // the player card), so the painter triggers them through renderPreview /
+  // renderSkinPicker closures rather than building them.
+  private readonly charWindow = new CharWindow({
+    ...this.presentationBag,
+    root: () => $('#char-window'),
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#char-window'),
+    hideTooltip: () => this.hideTooltip(),
+    ...this.windowFocus('#char-window'),
+    slotName: (slot) => itemSlotName(slot),
+    statCellHtml: (stat) => statCellHtml(this.statModel(stat), STAT_VIEW_DEPS),
+    statTooltipHtml: (stat) => statTooltipHtml(this.statModel(stat), STAT_VIEW_DEPS),
+    talentSummaryHtml: () => this.talentSummaryHtml(),
+    progressionHtml: (level) => this.progressionHtml(level),
+    unequip: (slot) => {
+      this.sim.unequipItem(slot);
+      audio.click();
+      this.hideTooltip();
+      this.renderBags();
+      this.renderCharIfOpen();
+    },
+    beginUnequipDrag: (slot) => {
+      this.dragUnequipSlot = slot;
+      // Open the bags window if it's closed so there's a visible drop target,
+      // otherwise the drag silently snaps back with no feedback.
+      const bags = $('#bags');
+      // Match the common open path (display: flex): opening as 'block' would drop the
+      // flex-column layout, and re-forcing 'block' on an already-open (flex) bag would
+      // clobber it mid-drag. Open as flex only when it is not already shown as flex (this
+      // also covers the never-yet-opened state, where the inline display is '').
+      if (bags.style.display !== 'flex') {
+        bags.style.display = 'flex';
+        this.renderBags();
+      }
+    },
+    endUnequipDrag: () => {
+      this.dragUnequipSlot = null;
+      $('#bags').classList.remove('drop-target');
+    },
+    renderPreview: () => this.renderCharPreview(),
+    renderSkinPicker: () => this.renderCharSkinPicker(),
+    openPlayerCard: () => {
+      void this.openPlayerCard();
+    },
+    openPrestige: () => this.openPrestigeDialog(),
+  });
+  // Options window painter (options_view.ts core + options_window.ts painter). The
+  // window renders no item rows, so it composes no PainterHostPresentation bag; it
+  // reads only the world's bug-report slice and routes the options/bug-report seams,
+  // the keybind store, the shared dropdown, focus management, and the chat-timestamp
+  // state through these lazy closures.
+  private readonly optionsWindow = new OptionsWindow({
+    root: () => $('#options-menu'),
+    world: () => this.sim,
+    options: () => this.optionsHooks,
+    bugReport: () => this.bugReportHooks,
+    keybinds: () => this.keybinds,
+    slotActionName: (slot) => {
+      const ability = this.abilityForSlot(slot);
+      if (ability) return abilityDisplayName(ability.def);
+      const item = this.itemForSlot(slot);
+      return item ? itemDisplayName(item) : null;
+    },
+    refreshKeybindLabels: () => this.refreshKeybindLabels(),
+    buildDropdown: (options, current, onChange, placeholder, a11y) =>
+      this.buildDropdown(options, current, onChange, placeholder, a11y),
+    setDropdownValue: (root, value) => this.setDropdownValue(root, value),
+    focusFirstInteractive: (root, preferredSelector) =>
+      this.focusManager.focusFirst(root, preferredSelector),
+    closeOthers: () => this.closeOtherWindows('#options-menu'),
+    hideTooltip: () => this.hideTooltip(),
+    ...this.windowFocus('#options-menu'),
+    // The gold log tint stays Hud-side so the painter carries no color literal.
+    log: (message) => this.log(message, '#ffd100'),
+    resetChatWindow: () => this.resetChatWindow(),
+    getChatTimestamps: () => this.chatTimestamps,
+    setChatTimestamps: (on) => {
+      this.chatTimestamps = on;
+      localStorage.setItem('chatTimestamps', on ? '1' : '0');
+    },
+    getChatClock: () => this.chatClock,
+    setChatClock: (clock) => {
+      this.chatClock = clock;
+      localStorage.setItem('chatClock', clock);
+    },
+  });
+  // Leaderboard window painter (leaderboard_view.ts async-free core + leaderboard_
+  // window.ts painter). It owns the page index + focus opener and the one
+  // consumed-new signature: it awaits the paged leaderboard() and renders the page
+  // (or the loading / empty / error state). All closures are lazy.
+  private readonly leaderboardWindow = new LeaderboardWindow({
+    root: () => $('#leaderboard-window'),
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#leaderboard-window'),
+    ...this.windowFocus('#leaderboard-window'),
+  });
+  // Spellbook window painter (spellbook_view.ts core + spellbook_window.ts painter).
+  // The window renders ability rows (not item rows), so it composes no presentation
+  // bag; it reads the class kit + bar state from the world and routes the hotbar /
+  // drag / tooltip seams through these lazy closures. refreshHotbarControls keeps
+  // the +/- toggles in sync from hud.update() while the window is open.
+  private readonly spellbookWindow = new SpellbookWindow({
+    root: () => $('#spellbook'),
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#spellbook'),
+    ...this.windowFocus('#spellbook'),
+    hideTooltip: () => this.hideTooltip(),
+    attachTooltip: (el, html) => this.attachTooltip(el, html),
+    abilitySummary: (known) => describeAbilitySummary(known, this.sim.player.resourceType),
+    abilityTooltip: (known) => this.abilityTooltip(known),
+    barAbilityIds: () =>
+      this.hotbarActions.flatMap((a) => (a && a.type === 'ability' ? [a.id] : [])),
+    hasFreeSlot: () => this.firstEmptyHotbarIndex() !== -1,
+    addToBar: (id) => this.addAbilityToHotbar(id),
+    removeFromBar: (id) => this.removeAbilityFromHotbar(id),
+    hasFormBars: () => this.classHasFormBars(),
+    resetFormBar: () => this.resetActiveFormBarToDefault(),
+    setDragAction: (action) => {
+      this.dragAction = action ? { action, sourceIndex: null } : null;
+    },
+    clearActionDropTargets: () => this.clearActionDropTargets(),
+  });
+  // Quest-log window painter (questlog_view.ts core + questlog_window.ts painter).
+  // It composes the presentation bag (icon/money/tooltip) for the reward row and
+  // owns the selected quest id (Hud's quest-share command reads it back); the
+  // abandon / chat-link / confirm seams route through these lazy closures.
+  private readonly questlogWindow = new QuestLogWindow({
+    ...this.presentationBag,
+    root: () => $('#quest-log-window'),
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#quest-log-window'),
+    ...this.windowFocus('#quest-log-window'),
+    hideTooltip: () => this.hideTooltip(),
+    focusFirstInteractive: (root, preferredSelector) =>
+      this.focusManager.focusFirst(root, preferredSelector),
+    confirmDialog: (title, body, okText, cancelText, onOk) =>
+      this.confirmDialog(title, body, okText, cancelText, onOk),
+    insertQuestChatLink: (questId) => this.insertQuestChatLink(questId),
+  });
+
   private drawPlayerFramePortrait(): void {
     this.portraits.drawClass(
       $('#pf-portrait') as unknown as HTMLCanvasElement,
       this.sim.cfg.playerClass,
       this.sim.player.skin ?? 0,
     );
+  }
+
+  // Redraw the target portrait canvas. Called by the unit_frame painter's repaint
+  // gate ONLY when the target identity changes (or after invalidatePortrait), never
+  // per frame, and reads the subject set just before that frame's paint() call. A
+  // player target shows its real 3D class headshot (rendered locally from the synced
+  // class + skin); any other entity shows its faction/family crest.
+  private drawTargetPortrait(): void {
+    const target = this.targetPortraitSubject;
+    if (!target) return;
+    if (target.kind === 'player') {
+      this.portraits.drawClass(
+        this.targetPortraitEl,
+        target.templateId as PlayerClass,
+        target.skin ?? 0,
+      );
+    } else {
+      this.portraits.drawCrest(
+        this.targetPortraitEl,
+        crestIdForEntity(target.kind, MOBS[target.templateId]?.family),
+      );
+    }
   }
 
   private itemIcon(item: ItemDef): string {
@@ -2371,6 +2854,24 @@ export class Hud {
       ? t('wallet.balanceAria', { balance })
       : t('wallet.balancePreviewAria', { balance });
     return `<span class="woc-balance ${verified ? 'is-verified' : 'is-preview'}" title="${esc(title)}" aria-label="${esc(aria)}"><span class="woc-coin" aria-hidden="true"></span>${esc(balance)}</span>`;
+  }
+
+  // One-line aura effect summary HTML for the buff/debuff tooltip: the pure descriptor
+  // (aura_effect.ts) resolved to localized, esc'd text. Empty when the aura has no
+  // descriptor. Injected into the auras view so the i18n-free core never calls t().
+  private auraEffectTooltipHtml(a: AuraEffectInput): string {
+    const effect = auraEffectDescriptor(a);
+    if (!effect) return '';
+    const values: Record<string, string> = {};
+    if (effect.nums) {
+      for (const [k, n] of Object.entries(effect.nums)) {
+        values[k] = formatNumber(n, { maximumFractionDigits: 0 });
+      }
+    }
+    if (effect.school) {
+      values.school = t(`hudChrome.auraEffect.school.${effect.school}` as TranslationKey);
+    }
+    return `<div class="tt-effect">${esc(t(effect.key as TranslationKey, values))}</div>`;
   }
 
   attachTooltip(el: HTMLElement, html: () => string): void {
@@ -2450,7 +2951,32 @@ export class Hud {
       }),
     )}</div>`;
     if (item.slot) {
-      html += `<div class="tt-sub">${esc(itemSlotName(item.slot))}</div>`;
+      // Classic layout: slot name on the left, armor subtype (Cloth/Leather/Mail)
+      // right-aligned on the same line so it is clear which classes the gear suits.
+      const armorTypeKey = itemArmorTypeLabelKey(item);
+      if (armorTypeKey) {
+        // Red armor type = the viewing player's class cannot wear this armor weight
+        // (e.g. a mage hovering Mail), so they know it is not for them at a glance.
+        const badClass = canEquipItem(this.sim.cfg.playerClass, item) ? '' : ' tt-armor-bad';
+        html += `<div class="tt-sub tt-row"><span>${esc(itemSlotName(item.slot))}</span><span class="tt-armor${badClass}">${esc(t(armorTypeKey))}</span></div>`;
+      } else {
+        html += `<div class="tt-sub">${esc(itemSlotName(item.slot))}</div>`;
+      }
+    }
+    // Optional item-level readout (off by default; src/sim/item_level.ts derives it
+    // from where the item drops). Read live, so toggling it takes effect on the next
+    // hover. Combat gear only: sourceless items (vendor/starter) have no level,
+    // and non-combat items never get an item-level line.
+    if (isItemLevelEligible(item) && this.optionsHooks?.settings.get('showItemLevel')) {
+      const level = itemLevel(item);
+      if (level !== undefined) {
+        html += `<div class="tt-stat" style="color:#ffd100">${esc(
+          t('hudChrome.options.itemLevelLine', { level: itemNumber(level) }),
+        )}</div>`;
+        html += `<div class="tt-sub">${esc(
+          t('hudChrome.options.itemScoreLine', { score: itemNumber(itemScore(item), 1) }),
+        )}</div>`;
+      }
     }
     if (item.weapon) {
       const dps = (item.weapon.min + item.weapon.max) / 2 / item.weapon.speed;
@@ -2495,9 +3021,42 @@ export class Hud {
     if (item.requiredClass && !armorTypeForItem(item) && !weaponArchetypeForItem(item)) {
       html += `<div class="tt-sub">${esc(t('itemUi.tooltip.classes', { classes: item.requiredClass.map(classDisplayName).join(', ') }))}</div>`;
     }
+    html += this.itemSetBlock(item);
     if (item.sellValue > 0)
       html += `<div class="tt-sub">${esc(t('itemUi.tooltip.sellPrice', { money: formatLocalizedMoney(item.sellValue) }))}</div>`;
     if (compare) html += this.itemCompareBlock(item);
+    return html;
+  }
+
+  // How many equipped pieces belong to the given set (read from IWorld.equipment
+  // so it is identical offline and online).
+  private equippedSetPieces(setId: string): number {
+    let n = 0;
+    for (const equippedId of Object.values(this.sim.equipment)) {
+      if (equippedId && ITEMS[equippedId]?.set === setId) n += 1;
+    }
+    return n;
+  }
+
+  // Classic tier-set block: the set name with the live (have/total) piece count,
+  // then each bonus tier - lit when its threshold is met, greyed otherwise. Set
+  // name and bonus text localize through entity_i18n (English source in
+  // content/item_sets.ts).
+  private itemSetBlock(item: ItemDef): string {
+    if (!item.set) return '';
+    const model = itemSetTooltipModel({
+      itemSetId: item.set,
+      equippedPieces: this.equippedSetPieces(item.set),
+      itemSetMembers: itemSetMemberCounts(),
+    });
+    if (!model) return '';
+    const name = tEntity({ kind: 'itemSet', id: model.setId, field: 'name' });
+    let html = `<div class="tt-set-name">${esc(t('hudChrome.itemSet.header', { name, have: formatNumber(model.equippedPieces, { maximumFractionDigits: 0 }), total: formatNumber(model.totalPieces, { maximumFractionDigits: 0 }) }))}</div>`;
+    for (const tier of model.bonusTiers) {
+      const field = tier.pieces === 2 ? 'bonus2' : 'bonus3';
+      const text = tEntity({ kind: 'itemSet', id: model.setId, field });
+      html += `<div class="tt-set-bonus${tier.active ? ' active' : ''}">${esc(t('hudChrome.itemSet.bonusLine', { pieces: formatNumber(tier.pieces, { maximumFractionDigits: 0 }), bonus: text }))}</div>`;
+    }
     return html;
   }
 
@@ -2567,54 +3126,36 @@ export class Hud {
     return ` <span class="quest-suggested">${esc(t('questUi.log.suggestedPlayers', { count: this.questNumber(count) }))}</span>`;
   }
 
-  private canRestoreFocusTo(target: HTMLElement | null): target is HTMLElement {
-    return Boolean(target?.isConnected && target.getClientRects().length > 0);
-  }
-
-  private currentFocusableElement(): HTMLElement | null {
-    const active = document.activeElement;
-    return active instanceof HTMLElement &&
-      active !== document.body &&
-      this.canRestoreFocusTo(active)
-      ? active
-      : null;
-  }
-
-  private restoreFocus(target: HTMLElement | null, fallback?: HTMLElement | null): void {
-    const candidate = this.canRestoreFocusTo(target)
-      ? target
-      : this.canRestoreFocusTo(fallback ?? null)
-        ? fallback!
-        : null;
-    if (!candidate) return;
-    window.setTimeout(() => candidate.focus(), 0);
-  }
-
-  private focusFirstInteractive(root: HTMLElement, preferredSelector?: string): void {
-    window.setTimeout(() => {
-      const target =
-        (preferredSelector ? root.querySelector<HTMLElement>(preferredSelector) : null) ??
-        root.querySelector<HTMLElement>(
-          'button:not([disabled]):not([data-close]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
-        );
-      (target ?? root).focus();
-    }, 0);
+  // The {captureFocus, restoreFocus} pair for a painter window. The bridge logic
+  // (open the trap on capture, release-and-return on close, leaving an in-window
+  // refocus alone) lives in ./window_focus, so hud.ts and the keyboard E2E share
+  // ONE implementation; this thin wrapper binds it to the shared focus manager
+  // and the window root. Escape is handled by the existing unified
+  // dispatcher (main.ts game input -> hud.closeAll()), not by the trap.
+  private windowFocus(rootSel: string): {
+    captureFocus: () => HTMLElement | null;
+    restoreFocus: (target: HTMLElement | null) => void;
+  } {
+    return makeWindowFocus(this.focusManager, () => $(rootSel));
   }
 
   private refreshLocalizedDynamicUi(): void {
     this.refreshKeybindLabels();
     this.updateQuestTracker();
     this.updateDelveTracker();
-    const log = $('#quest-log-window');
-    if (log.style.display === 'block') this.renderQuestLog();
-    if ($('#bags').style.display === 'block') this.renderBags();
+    // The keyed-pool party rows reuse their DOM, so a rebuild never re-runs t() on
+    // their badge tooltips / leave label; re-localize them in place on a switch.
+    this.partyFramesPainter.relocalize();
+    if (this.questlogWindow.isOpen) this.questlogWindow.render();
+    if ($('#bags').style.display !== 'none') this.renderBags();
     if (this.openVendorNpcId !== null && $('#vendor-window').style.display === 'block')
       this.renderVendor();
-    if (this.marketOpen) {
-      this.lastMarketSig = '';
-      this.renderMarket();
-    }
-    if ($('#char-window').style.display === 'block') this.renderChar();
+    if (this.marketWindow.isOpen) this.marketWindow.render();
+    this.charWindow.renderIfOpen();
+    // The arena window's render-skip signature is text-independent (offline sentinel or a
+    // JSON of ids/numbers), so a language switch alone never moves it; relocalize() forces
+    // one rebuild with fresh t() (self-gated on isOpen).
+    this.arenaWindow.relocalize();
     const dialog = $('#quest-dialog');
     if (dialog.style.display !== 'block' || this.openGossipNpcId === null) return;
     const npc = this.sim.entities.get(this.openGossipNpcId);
@@ -2631,7 +3172,12 @@ export class Hud {
 
   private abilityTooltip(res: ResolvedAbility): string {
     const a = res.def;
-    const damageText = abilityEffectText(res.effects);
+    const p = this.sim.player;
+    const damageText = abilityEffectText(res, {
+      spellPower: p.spellPower,
+      rangedPower: p.rangedPower,
+      attackPower: p.attackPower,
+    });
     let html = `<div class="tt-title">${esc(abilityDisplayName(a))}</div>`;
     html += `<div class="tt-sub">${esc(t('abilityUi.tooltip.rank', { rank: formatAbilityNumber(res.rank) }))}</div>`;
     const costLine: string[] = [];
@@ -2869,20 +3415,6 @@ export class Hud {
     return true;
   }
 
-  private refreshSpellbookHotbarControls(): void {
-    document
-      .querySelectorAll<HTMLButtonElement>('#spellbook .spell-hotbar-toggle')
-      .forEach((btn) => {
-        const id = btn.dataset.abilityId;
-        if (!id) return;
-        const onBar = this.hotbarIndexForAbility(id) !== -1;
-        btn.textContent = onBar ? '-' : '+';
-        btn.classList.toggle('remove', onBar);
-        btn.setAttribute('aria-pressed', onBar ? 'true' : 'false');
-        btn.disabled = !onBar && this.firstEmptyHotbarIndex() === -1;
-      });
-  }
-
   // Rebuild the active bar from its default kit (form bars get their form kit;
   // the caster/stealth bar gets the form-filtered known abilities). Item
   // shortcuts and manual arrangement are intentionally discarded — it's a reset.
@@ -2896,7 +3428,7 @@ export class Hud {
     this.knownAbilityIdsAtLastSlotSync = new Set(this.sim.known.map((k) => k.def.id));
     this.markFormBarSeeded();
     this.saveSlotMap();
-    this.refreshSpellbookHotbarControls();
+    this.spellbookWindow.refreshHotbarControls();
   }
 
   private formToggleAbilityId(): string | null {
@@ -2943,12 +3475,12 @@ export class Hud {
   }
 
   private actionForSlot(barSlot: number): HotbarAction {
-    // barSlot 1..11
+    // barSlot 1..22 (1..11 primary bar, 12..22 secondary bar)
     return this.hotbarActions[barSlot - 1] ?? null;
   }
 
   abilityForSlot(barSlot: number): ResolvedAbility | null {
-    // barSlot 1..11
+    // barSlot 1..22 (1..11 primary bar, 12..22 secondary bar)
     const action = this.actionForSlot(barSlot);
     return action?.type === 'ability'
       ? (this.sim.known.find((k) => k.def.id === action.id) ?? null)
@@ -3029,7 +3561,12 @@ export class Hud {
 
   private buildActionBar(): void {
     const bar = $('#actionbar');
-    for (let i = 0; i < 12; i++) {
+    const bar2 = $('#actionbar2');
+    // slot 0 (Attack) + slots 1..11 render on the primary bar; slots 12..22 on
+    // the secondary bar. One button list (this.abilityButtons), indexed by slot.
+    const totalButtons = 1 + Hud.BAR_ABILITY_SLOTS;
+    for (let i = 0; i < totalButtons; i++) {
+      const container = i <= Hud.PRIMARY_BAR_ABILITY_SLOTS ? bar : bar2;
       const btn = document.createElement('button');
       btn.className = 'action-btn empty';
       const label = document.createElement('span');
@@ -3038,7 +3575,7 @@ export class Hud {
       countEl.className = 'item-count';
       const kb = document.createElement('span');
       kb.className = 'keybind';
-      kb.textContent = this.keybinds.primaryLabel(`slot${i}`); // rebindable; refreshKeybindLabels keeps it current
+      kb.textContent = this.keybinds.primaryLabel(`slot${i}`); // initial keycap; the ActionBarPainter keeps it current each frame
       const cdOverlay = document.createElement('div');
       cdOverlay.className = 'cd-overlay';
       const cdText = document.createElement('div');
@@ -3124,7 +3661,7 @@ export class Hud {
           }
           this.dragAction = { action, sourceIndex: slot - 1 };
           this.writeDraggedAction(e.dataTransfer, action);
-          e.dataTransfer!.effectAllowed = 'move';
+          if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move';
           this.hideTooltip();
         });
         btn.addEventListener('dragover', (e) => {
@@ -3132,8 +3669,9 @@ export class Hud {
           if (!dragged) return;
           if (this.dragAction?.sourceIndex === slot - 1) return;
           e.preventDefault(); // required to permit the drop
-          e.dataTransfer!.dropEffect =
-            this.dragAction?.sourceIndex === null && dragged.type === 'item' ? 'copy' : 'move';
+          if (e.dataTransfer)
+            e.dataTransfer.dropEffect =
+              this.dragAction?.sourceIndex === null && dragged.type === 'item' ? 'copy' : 'move';
           btn.classList.add('drop-target');
         });
         btn.addEventListener('dragleave', () => btn.classList.remove('drop-target'));
@@ -3173,7 +3711,7 @@ export class Hud {
           this.hideTooltip();
         });
       }
-      bar.appendChild(btn);
+      container.appendChild(btn);
       this.abilityButtons.push({
         btn,
         label,
@@ -3181,13 +3719,72 @@ export class Hud {
         keybindEl: kb,
         cdOverlay,
         cdText,
-        lastIcon: '',
       });
     }
+
+    // Build the action-bar core + painter now that the slot buttons exist. The core
+    // descriptor carries slot identity + the host-resolved binding/keybind accessors
+    // (NO element refs); the paint descriptor carries the container + per-slot
+    // elements (multiplicity is a constructor arg, not a hardcoded id).
+    this.actionBarView = createActionBarView(
+      {
+        manySpellsSlotMax: Hud.PRIMARY_BAR_ABILITY_SLOTS,
+        slots: this.abilityButtons.map((_, i) => {
+          // Precompute the keybind lookup key once per slot (not per frame).
+          const slotKey = `slot${i}`;
+          return {
+            slotIndex: i,
+            isAttack: i === 0,
+            // Raw binding presence (any assigned slot, even one whose ability is
+            // unlearned or item id is unknown): the many-spells count source, kept
+            // byte-identical to the former hotbarActions.filter(a => a !== null).
+            hasAction: () => this.actionForSlot(i) !== null,
+            ability: () => this.abilityForSlot(i),
+            item: () => this.itemForSlot(i),
+            keybindLabel: () => this.keybinds.primaryLabel(slotKey),
+          };
+        }),
+      },
+      {
+        t,
+        abilityName: abilityDisplayName,
+        itemName: itemDisplayName,
+        slotLabel: (i) => formatAbilityNumber(i + 1),
+        formatCount: (n) => formatNumber(n, { maximumFractionDigits: 0 }),
+      },
+    );
+    this.actionBarPainter = new ActionBarPainter(
+      this.writerFacet,
+      {
+        container: this.actionbarEl,
+        slots: this.abilityButtons.map((ab) => ({
+          btn: ab.btn,
+          label: ab.label,
+          countEl: ab.countEl,
+          keybindEl: ab.keybindEl,
+          cdOverlay: ab.cdOverlay,
+          cdText: ab.cdText,
+        })),
+      },
+      (iconKey) => this.actionBarIconBg(iconKey),
+    );
+  }
+
+  // Resolve a core icon key to the slot label's background-image value. Kept on the
+  // Hud (not the painter) so the painter holds no icon table or literal URL; the
+  // painter calls this only when a slot's icon key changes.
+  private actionBarIconBg(iconKey: string): string {
+    if (iconKey === EMPTY_ICON_KEY) return '';
+    if (iconKey === ATTACK_ICON_KEY) return `url(${iconDataUrl('ability', 'attack')})`;
+    if (iconKey.startsWith(ITEM_ICON_PREFIX)) {
+      return `url(${iconDataUrl('item', iconKey.slice(ITEM_ICON_PREFIX.length))})`;
+    }
+    return `url(${iconDataUrl('ability', iconKey.slice(ABILITY_ICON_PREFIX.length))})`;
   }
 
   private clearActionDropTargets(): void {
-    document.querySelectorAll('#actionbar .drop-target').forEach((el) => {
+    // Both action rows (#actionbar and #actionbar2) hold .action-btn slots.
+    document.querySelectorAll('.action-btn.drop-target').forEach((el) => {
       el.classList.remove('drop-target');
     });
   }
@@ -3207,7 +3804,7 @@ export class Hud {
     if (drag) window.clearTimeout(drag.timer);
     this.mobileHotbarDrag = null;
     document.body.classList.remove('mobile-hotbar-dragging');
-    document.querySelectorAll('#actionbar .mobile-drag-source').forEach((el) => {
+    document.querySelectorAll('.action-btn.mobile-drag-source').forEach((el) => {
       el.classList.remove('mobile-drag-source');
     });
     this.clearActionDropTargets();
@@ -3284,11 +3881,14 @@ export class Hud {
     btn.addEventListener('pointercancel', finish);
   }
 
-  // Repaint the keycap on every action button from the current bindings.
+  // Repaint the side-menu button keycaps + aria labels from the current bindings.
   private refreshKeybindLabels(): void {
-    for (let i = 0; i < this.abilityButtons.length; i++) {
-      this.abilityButtons[i].keybindEl.textContent = this.keybinds.primaryLabel(`slot${i}`);
-    }
+    // The action-bar keycaps are owned by the per-frame ActionBarPainter, which writes
+    // each slot's keybind label through the elided setText every frame; a rebind or
+    // language switch therefore lands on the next update() tick (update() runs every
+    // frame in-game). Refreshing them here too would be a second writer bypassing that
+    // elision cache. This method owns only the side-menu buttons, which
+    // have no per-frame painter.
     const sideButtons: [selector: string, action: string, labelKey: TranslationKey][] = [
       ['#mm-char', 'char', 'hud.keybinds.actions.char'],
       ['#mm-spell', 'spellbook', 'abilityUi.spellbook.title'],
@@ -3548,7 +4148,7 @@ export class Hud {
           }
           this.pendingPetFeed = true;
           this.lastPetBarSig = '';
-          $('#bags').style.display = 'block';
+          $('#bags').style.display = 'flex';
           this.renderBags();
         },
         { active: this.pendingPetFeed },
@@ -3612,22 +4212,32 @@ export class Hud {
   // from the pure lowHealthVignette() curve; purely presentational (CSS vars on
   // a fixed overlay), works on every GFX tier since it's DOM, not a post pass.
   private updateLowHealthVignette(hp: number, maxHp: number): void {
-    const el = document.getElementById('low-health-vignette');
+    const el = this.lowHealthVignetteEl;
     if (!el) return;
     const v = lowHealthVignette(hp, maxHp);
-    if (!v.active) {
-      el.classList.remove('active');
-      return;
-    }
-    el.style.setProperty('--lhv-opacity', v.opacity.toFixed(3));
-    el.style.setProperty('--lhv-pulse', `${v.pulseSeconds.toFixed(3)}s`);
-    el.classList.add('active');
+    // Route through the elided writers (the cached ref + setStyleProp /
+    // toggleClass): a per-frame query + raw uncounted writes become a counted,
+    // change-only write that the skip-rate sees while the player is at full health.
+    this.toggleClass(el, 'active', v.active);
+    if (!v.active) return;
+    this.setStyleProp(el, '--lhv-opacity', v.opacity.toFixed(3));
+    this.setStyleProp(el, '--lhv-pulse', `${v.pulseSeconds.toFixed(3)}s`);
+  }
+
+  // The STATIC ui effects tier (data-fx-level, written by the preset applier and
+  // NEVER the FPS governor: the two-controller hazard). The per-element tier knobs read
+  // this, so flipping the graphics preset is the only thing that moves a knob. Read once
+  // per update() frame; coerceFxTier defaults an unset/unknown stamp to 'ultra' (full
+  // effects), so a missing stamp never silently sheds HUD cost.
+  private fxTier(): UiEffectsTier {
+    return coerceFxTier(document.documentElement.dataset.fxLevel);
   }
 
   update(): void {
     const sim = this.sim;
     const p = sim.player;
     const now = performance.now();
+    const fxTier = this.fxTier();
     const fastHud = now - this.lastHudFastAt >= 100;
     if (fastHud) {
       this.lastHudFastAt = now;
@@ -3637,6 +4247,13 @@ export class Hud {
     if (mediumHud) this.lastHudMediumAt = now;
     const slowHud = now - this.lastHudSlowAt >= 500;
     if (slowHud) this.lastHudSlowAt = now;
+
+    // Drain a trailing combat-announcement burst to the polite live region (push()
+    // already flushes; this catches the last buffered line once combat goes quiet).
+    if (fastHud) this.combatAnnouncer.flush(now);
+    // Same for the tab-independent chat live region: drain the trailing
+    // chat burst on the fast tier once chat goes quiet.
+    if (fastHud) this.chatAnnouncer.flush(now);
 
     this.meters.update();
     this.lockpickWindow.repaintIfChanged();
@@ -3653,84 +4270,150 @@ export class Hud {
     document.getElementById('mm-talents')?.classList.toggle('has-points', talGlow);
     document.getElementById('mobile-talents')?.classList.toggle('has-points', talGlow);
 
-    // player frame
-    this.setText(this.pfLevelEl, String(p.level));
-    this.setTransform(this.pfHpEl, `scaleX(${p.hp / Math.max(1, p.maxHp)})`);
-    this.updateAbsorb('#pf-absorb', p);
-    this.setText(this.pfHpTextEl, `${p.hp} / ${p.maxHp}`);
+    // player frame: the first instance of the unit_frame family. Build a
+    // player-shaped descriptor and paint it. The absorb overlay + the resource-type
+    // class fold into the painter's elided writers (no more raw updateAbsorb /
+    // className swap on the player hot path). updateLowHealthVignette +
+    // updateLowResource are player-only side effects with their own cores and stay
+    // here, OUT of the shared family (target/party must not inherit them).
+    this.playerFramePainter.paint(
+      unitFrameView({
+        present: true,
+        hpFrac: p.hp / Math.max(1, p.maxHp),
+        hpText: `${p.hp} / ${p.maxHp}`,
+        resourceKind: p.resourceType,
+        resFrac: p.resource / Math.max(1, p.maxResource),
+        resText: `${Math.round(p.resource)} / ${p.maxResource}`,
+        levelText: String(p.level),
+        name: p.name,
+        portraitKey: PLAYER_PORTRAIT_KEY,
+        absorb: p,
+        dead: false,
+        outOfRange: false,
+      }),
+    );
     this.updateLowHealthVignette(p.hp, p.maxHp);
-    const resFrac = p.resource / Math.max(1, p.maxResource);
-    this.setTransform(this.pfResEl, `scaleX(${resFrac})`);
-    this.setText(this.pfResTextEl, `${Math.round(p.resource)} / ${p.maxResource}`);
-    const resClass = `bar ${p.resourceType === 'rage' ? 'rage' : p.resourceType === 'energy' ? 'energy' : 'mana'}`;
-    if (this.pfResourceEl.className !== resClass) this.pfResourceEl.className = resClass;
     this.updateLowResource(p);
 
-    // buff bar (player buffs + debuffs)
-    this.renderAuras(this.buffBarEl, p, 'all');
+    // buff bar / debuff bar: the keyed-pool aura painter, driven by the auras_view core
+    // every frame (the elided writers make a no-op frame free). Buffs and debuffs render to
+    // separate rows (classic layout) so a fresh debuff is never lost in a wall of long-lived
+    // buffs: two view+painter instances, mode 'buffs' (#buff-bar) and 'debuffs' (#debuff-bar).
+    // The graphics tier coarsens the refresh (tick) granularity: full tiers repaint every
+    // frame (interval 0, cadenceDue always true); low coarsens to ~4Hz. The visible-count cap
+    // is applied inside the painter.
+    if (cadenceDue(this.lastBuffBarPaintAt, now, auraRefreshIntervalMs(fxTier))) {
+      this.lastBuffBarPaintAt = now;
+      this.buffBarPainter.paint(this.buffBarView.tick(p));
+      this.debuffBarPainter.paint(this.debuffBarView.tick(p));
+    }
 
-    // target frame
+    // target frame: the SECOND instance of the unit_frame family. The shared
+    // frame (display/name/level/hp/absorb/portrait gate) goes through the family
+    // painter; the target-only concerns (the elite class + tag, the hostile/friendly
+    // name color, and the combo pips) route through the SAME elided writers here, and
+    // the target debuffs + cast bar CONSUME the existing auras paint + the cast_bar
+    // target instance. (Targeting a world object hides the frame, like no target.)
     const target = p.targetId !== null ? sim.entities.get(p.targetId) : null;
     if (target && target.kind !== 'object') {
-      this.setDisplay(this.targetFrameEl, 'flex');
-      this.targetFrameEl.classList.toggle('elite', !!MOBS[target.templateId]?.elite);
-      this.setText(
-        this.targetEliteTagEl,
-        MOBS[target.templateId]?.boss ? t('hud.core.boss') : t('hud.core.elite'),
-      );
-      this.setText(this.targetNameEl, entityDisplayName(target));
-      this.setText(this.targetLevelEl, MOBS[target.templateId]?.boss ? '☠' : String(target.level));
-      this.setTransform(this.targetHpEl, `scaleX(${target.hp / Math.max(1, target.maxHp)})`);
-      this.updateAbsorb('#tf-absorb', target.dead ? null : target);
-      this.setText(
-        this.targetHpTextEl,
-        target.dead ? t('hud.core.dead') : `${target.hp} / ${target.maxHp}`,
-      );
-      const targetNameColor = target.hostile ? 'var(--color-hostile)' : 'var(--color-friendly)';
-      if (this.targetNameEl.style.color !== targetNameColor)
-        this.targetNameEl.style.color = targetNameColor;
-      if (this.lastPortraitTarget !== target.id) {
-        this.lastPortraitTarget = target.id;
-        if (target.kind === 'player') {
-          // Other players: their real 3D headshot, rendered locally from the
-          // class (templateId) + skin in their synced identity fields.
-          this.portraits.drawClass(
-            this.targetPortraitEl,
-            target.templateId as PlayerClass,
-            target.skin ?? 0,
-          );
-        } else {
-          this.portraits.drawCrest(
-            this.targetPortraitEl,
-            crestIdForEntity(target.kind, MOBS[target.templateId]?.family),
-          );
-        }
+      const isBoss = !!MOBS[target.templateId]?.boss;
+      // The portrait gate fires inside paint(); hand it the subject to redraw.
+      this.targetPortraitSubject = target;
+      // The target is a NON-SELF frame; on low throttle its HP/level/
+      // portrait refresh (~10Hz), while the SELF/player frame stays full-rate. A target
+      // SWAP bypasses the throttle so selecting a new target updates immediately. The full
+      // tiers return interval 0 (cadenceDue always true), so this paints every frame as
+      // before. The elite tag / name color / debuffs / cast bar / combo below stay
+      // full-rate (debuffs are separately tiered; the cast bar is a raid
+      // mechanic indicator), so only the unit_frame body is throttled.
+      const targetChanged = target.id !== this.lastTargetFrameId;
+      // Announce the new target's name into the polite #target-live region once per target
+      // CHANGE, tracked by lastAnnouncedTargetId independently of the paint
+      // cadence so it fires on the real id change, not the throttled repaint. Write textContent
+      // DIRECTLY through the re-announce marker (NOT the elided setText): a pack of same-template
+      // mobs share a display name, so the elided writer would skip every same-named re-target and
+      // the region would fall silent; the marker forces a byte-different value so it re-reads. The
+      // change gate means this is an event write, not a per-frame write.
+      if (target.id !== this.lastAnnouncedTargetId) {
+        this.targetLiveEl.textContent = this.targetReannounce.mark(
+          t('hudChrome.unitFrame.targetAnnounce', { name: entityDisplayName(target) }),
+        );
+        this.lastAnnouncedTargetId = target.id;
       }
-      this.renderAuras(this.targetDebuffsEl, target, 'debuffs');
-      // target/boss cast bar (e.g. Nythraxis' Deathless Rage) — shown under the
-      // name + HP so the raid sees exactly when to channel the wardstones
-      const tcb = castBarState(target);
-      if (tcb.visible) {
-        this.setDisplay(this.targetCastbarEl, 'block');
-        this.targetCastbarEl.classList.toggle('channel', tcb.channel);
-        this.setWidth(this.targetCastbarFillEl, `${(tcb.fill * 100).toFixed(1)}%`);
-        this.setText(this.targetCastbarLabelEl, tcb.label);
-        this.setText(
-          this.targetCastbarTimerEl,
-          formatNumber(Math.max(0, target.castRemaining), {
-            minimumFractionDigits: 1,
-            maximumFractionDigits: 1,
+      if (
+        nonSelfRepaintDue(
+          targetChanged,
+          this.lastTargetFramePaintAt,
+          now,
+          targetFrameNonSelfIntervalMs(fxTier),
+        )
+      ) {
+        this.lastTargetFramePaintAt = now;
+        this.lastTargetFrameId = target.id;
+        this.targetFramePainter.paint(
+          unitFrameView({
+            present: true,
+            hpFrac: target.hp / Math.max(1, target.maxHp),
+            hpText: target.dead ? t('hud.core.dead') : `${target.hp} / ${target.maxHp}`,
+            resourceKind: 'none',
+            resFrac: 0,
+            resText: '',
+            levelText: isBoss ? BOSS_SKULL_GLYPH : String(target.level),
+            name: entityDisplayName(target),
+            // id-keyed gate, byte-faithful to the old lastPortraitTarget !== target.id;
+            // the painter resets it on hide so an id reused by a new mob still redraws.
+            portraitKey: String(target.id),
+            absorb: target.dead ? null : target,
+            dead: false,
+            outOfRange: false,
           }),
         );
-      } else {
-        this.setDisplay(this.targetCastbarEl, 'none');
       }
-      // combo points
+      // Target-only sub-parts the family frame does not express, each routed through
+      // the elided writers (the elite class + name color are the two writes the four
+      // original writers cannot express, hence the toggleClass / setStyleProp).
+      this.toggleClass(this.targetFrameEl, 'elite', !!MOBS[target.templateId]?.elite);
+      this.setText(this.targetEliteTagEl, isBoss ? t('hud.core.boss') : t('hud.core.elite'));
+      this.setStyleProp(
+        this.targetNameEl,
+        'color',
+        target.hostile ? 'var(--color-hostile)' : 'var(--color-friendly)',
+      );
+      // Redundant non-color cue for forced-colors (high-contrast) mode, where the OS
+      // strips the inline color so a hostile and a friendly name would read identically.
+      // The base.css forced-colors block underlines #tf-name.hostile; routed through the
+      // elided toggleClass writer so the per-frame hot path stays write-elided. Normal
+      // mode is unaffected (the rule lives only inside @media (forced-colors: active)).
+      this.toggleClass(this.targetNameEl, 'hostile', target.hostile);
+      // Tier the target-debuff refresh (tick) granularity like the buff
+      // bar. A target SWAP (targetChanged) forces an immediate repaint so the strip never
+      // shows the previous target's debuffs while throttled on low; otherwise the full
+      // tiers repaint every frame and low coarsens to ~4Hz.
+      if (
+        nonSelfRepaintDue(
+          targetChanged,
+          this.lastTargetDebuffsPaintAt,
+          now,
+          auraRefreshIntervalMs(fxTier),
+        )
+      ) {
+        this.lastTargetDebuffsPaintAt = now;
+        this.targetDebuffsPainter.paint(this.targetDebuffsView.tick(target));
+      }
+      // target/boss cast bar (e.g. Nythraxis' Deathless Rage), shown under the name +
+      // HP so the raid sees exactly when to channel the wardstones. The target
+      // instance shows the raw cast id and never eats/drinks (no `consume`).
+      this.targetCastBarPainter.paint({
+        cast: castBarState(target),
+        castRemaining: target.castRemaining,
+      });
+      // combo points: the row of pips is lazy-built ONCE (then only the `on` class is
+      // toggled per frame, through the elided writer), never rebuilt per frame.
       if (p.resourceType === 'energy') {
         this.setDisplay(this.comboRowEl, 'flex');
-        if (this.comboRowEl.children.length !== 5) {
+        if (this.comboRowEl.children.length !== COMBO_PIP_COUNT) {
           this.comboRowEl.innerHTML = '';
-          for (let i = 0; i < 5; i++) {
+          for (let i = 0; i < COMBO_PIP_COUNT; i++) {
             const pip = document.createElement('div');
             pip.className = 'combo-pip';
             this.comboRowEl.appendChild(pip);
@@ -3738,200 +4421,63 @@ export class Hud {
         }
         const points = p.comboTargetId === target.id ? p.comboPoints : 0;
         [...this.comboRowEl.children].forEach((pip, i) => {
-          pip.classList.toggle('on', i < points);
+          this.toggleClass(pip as HTMLElement, 'on', i < points);
         });
       } else {
         this.setDisplay(this.comboRowEl, 'none');
       }
     } else {
-      this.setDisplay(this.targetFrameEl, 'none');
-      this.lastPortraitTarget = -999;
-    }
-
-    // cast bar
-    if (p.castingAbility) {
-      this.setDisplay(this.castbarEl, 'block');
-      this.castbarEl.classList.toggle('channel', p.channeling);
-      const frac = p.channeling
-        ? p.castRemaining / Math.max(0.01, p.castTotal)
-        : 1 - p.castRemaining / Math.max(0.01, p.castTotal);
-      this.setWidth(this.castbarFillEl, `${(frac * 100).toFixed(1)}%`);
-      this.setText(this.castbarLabelEl, castDisplayName(p.castingAbility));
-      this.setText(
-        this.castbarTimerEl,
-        formatNumber(Math.max(0, p.castRemaining), {
-          minimumFractionDigits: 1,
-          maximumFractionDigits: 1,
-        }),
-      );
-    } else if (p.eating || p.drinking) {
-      this.setDisplay(this.castbarEl, 'block');
-      this.castbarEl.classList.add('channel');
-      const c =
-        p.eating && p.drinking
-          ? p.eating.remaining >= p.drinking.remaining
-            ? p.eating
-            : p.drinking
-          : (p.eating ?? p.drinking)!;
-      this.setWidth(this.castbarFillEl, `${((c.remaining / CONSUME_DURATION) * 100).toFixed(1)}%`);
-      this.setText(
-        this.castbarLabelEl,
-        p.eating && p.drinking
-          ? t('hud.core.eatingDrinking')
-          : p.eating
-            ? t('hud.core.eating')
-            : t('hud.core.drinking'),
-      );
-      this.setText(
-        this.castbarTimerEl,
-        formatNumber(Math.max(0, c.remaining), {
-          minimumFractionDigits: 1,
-          maximumFractionDigits: 1,
-        }),
-      );
-    } else {
-      this.setDisplay(this.castbarEl, 'none');
-      this.castbarEl.classList.remove('channel');
-      this.setWidth(this.castbarFillEl, '0%');
-      this.setText(this.castbarLabelEl, '');
-      this.setText(this.castbarTimerEl, '');
-    }
-
-    // swing timer — fills between melee/ranged auto-attack swings. swingTimer
-    // counts DOWN to 0 (ready); we recover the full interval from the reset
-    // edge so the bar stays accurate under haste and for ranged weapons.
-    const sw = $('#swingbar');
-    if (p.autoAttack && target && !target.dead && target.kind !== 'object') {
-      if (p.swingTimer > this.lastSwingTimer + 1e-4 || this.swingPeriod <= 0) {
-        this.swingPeriod = Math.max(p.swingTimer, p.weapon.speed);
+      // No target (or a world object): hide the frame. The painter also resets its
+      // portrait gate here, so re-acquiring a target repaints (the old -999 reset). Reset
+      // the tier cadence id too, so re-acquiring a target bypasses the low-tier throttle
+      // and paints immediately (targetChanged becomes true on the next frame with a target).
+      this.lastTargetFrameId = null;
+      // Clear the target-name live region on the transition to no-target, and reset BOTH the
+      // tracker and the re-announce marker so re-acquiring the SAME target re-announces cleanly
+      // GATED on the tracker so it fires only on the clear EDGE, never per frame:
+      // with no target (e.g. the whole perf tour, which acquires none) the region is never
+      // written, so the per-frame floor is unchanged. Direct textContent write (matching the
+      // announce above), not the elided setText.
+      if (this.lastAnnouncedTargetId !== null) {
+        this.targetLiveEl.textContent = '';
+        this.targetReannounce.reset();
+        this.lastAnnouncedTargetId = null;
       }
-      this.lastSwingTimer = p.swingTimer;
-      const frac =
-        this.swingPeriod > 0 ? Math.min(1, Math.max(0, 1 - p.swingTimer / this.swingPeriod)) : 1;
-      sw.style.display = 'block';
-      (sw.querySelector('.fill') as HTMLElement).style.width = `${(frac * 100).toFixed(1)}%`;
-      sw.classList.toggle('ready', p.swingTimer <= 0);
-      (sw.querySelector('.label') as HTMLElement).textContent =
-        p.swingTimer <= 0
-          ? t('hudChrome.swing.ready')
-          : t('hudChrome.swing.seconds', {
-              seconds: formatNumber(p.swingTimer, {
-                minimumFractionDigits: 1,
-                maximumFractionDigits: 1,
-              }),
-            });
-    } else {
-      sw.style.display = 'none';
-      this.lastSwingTimer = 0;
-      this.swingPeriod = 0;
+      this.targetFramePainter.paint(unitFrameView(ABSENT_TARGET_DESCRIPTOR));
     }
 
-    // action bar
+    // cast bar: the player instance localizes the cast id (castDisplayName), layers
+    // the player-only eat/drink overlay (consumeBarState), and clears on hide.
+    this.playerCastBarPainter.paint({
+      cast: castBarState(p),
+      castRemaining: p.castRemaining,
+      consume: consumeBarState(p.eating, p.drinking),
+    });
+
+    // swing timer: fills between melee/ranged auto-attack swings. swingTimer
+    // counts DOWN to 0 (ready); swing_timer.ts recovers the full interval from the
+    // reset edge so the bar stays accurate under haste and for ranged weapons. The
+    // period/timer edge-tracking round-trips through the core (parameter-in /
+    // next-state-out): Hud holds the two scalars and feeds them back next frame.
+    const swing = swingTimerState(p, target ?? null, this.swingPeriod, this.lastSwingTimer);
+    this.swingPeriod = swing.nextPeriod;
+    this.lastSwingTimer = swing.nextTimer;
+    this.swingTimerPainter.paint(swing);
+
+    // action bar: the slot row, driven by the pure action_bar_view core + the thin
+    // ActionBarPainter. Every per-slot icon / cooldown / dimming / count write
+    // routes through the elided writer facet; the aria-label keeps its per-frame t()
+    // call IN the core while the painter elides the DOM setAttribute (Top risk 4).
     this.renderPetBar();
-    const tgtDist = target && !target.dead ? dist2d(p.pos, target.pos) : null;
-    this.actionbarEl.classList.toggle(
-      'many-spells',
-      this.hotbarActions.filter((action) => action !== null).length > 10,
+    if (this.spellbookWindow.isOpen) this.spellbookWindow.refreshHotbarControls();
+    this.actionBarPainter.paint(
+      this.actionBarView.tick({ player: p, target: target ?? null, inventory: sim.inventory }),
     );
-    if ($('#spellbook').style.display === 'block') this.refreshSpellbookHotbarControls();
-    for (let i = 0; i < this.abilityButtons.length; i++) {
-      const ab = this.abilityButtons[i];
-      const slotLabel = formatAbilityNumber(i + 1);
-      if (i === 0) {
-        // Attack button: glows while auto-attacking, red-edged out of range
-        ab.btn.classList.remove('empty', 'unusable');
-        ab.btn.setAttribute(
-          'aria-label',
-          t('abilityUi.actionBar.slotAria', {
-            slot: slotLabel,
-            ability: t('abilityUi.actionBar.attackName'),
-          }),
-        );
-        if (ab.lastIcon !== '__attack') {
-          ab.lastIcon = '__attack';
-          ab.label.style.backgroundImage = `url(${iconDataUrl('ability', 'attack')})`;
-        }
-        this.setText(ab.countEl, '');
-        if (ab.cdOverlay.style.height !== '0%') ab.cdOverlay.style.height = '0%';
-        this.setText(ab.cdText, '');
-        ab.btn.classList.toggle('queued', !!p.autoAttack);
-        ab.btn.classList.toggle('oor', tgtDist !== null && tgtDist > MELEE_RANGE);
-        continue;
-      }
-      const action = this.actionForSlot(i);
-      const known = this.abilityForSlot(i);
-      const item = this.itemForSlot(i);
-      if (!known && !item) {
-        ab.btn.classList.add('empty');
-        ab.btn.setAttribute(
-          'aria-label',
-          t('abilityUi.actionBar.emptySlotAria', { slot: slotLabel }),
-        );
-        ab.btn.classList.remove('unusable', 'oor', 'queued');
-        if (ab.lastIcon !== '') {
-          ab.lastIcon = '';
-          ab.label.style.backgroundImage = '';
-        }
-        this.setText(ab.countEl, '');
-        if (ab.cdOverlay.style.height !== '0%') ab.cdOverlay.style.height = '0%';
-        this.setText(ab.cdText, '');
-        continue;
-      }
-      ab.btn.classList.remove('empty');
-      if (item && action?.type === 'item') {
-        ab.btn.setAttribute(
-          'aria-label',
-          t('abilityUi.actionBar.slotAria', {
-            slot: slotLabel,
-            ability: itemDisplayName(item),
-          }),
-        );
-        const iconKey = `item:${item.id}`;
-        if (ab.lastIcon !== iconKey) {
-          ab.lastIcon = iconKey;
-          ab.label.style.backgroundImage = `url(${iconDataUrl('item', item.id)})`;
-        }
-        const count = this.inventoryCount(item.id);
-        this.setText(ab.countEl, String(count));
-        if (ab.cdOverlay.style.height !== '0%') ab.cdOverlay.style.height = '0%';
-        this.setText(ab.cdText, '');
-        ab.btn.classList.toggle('unusable', count <= 0 || p.dead);
-        ab.btn.classList.remove('oor', 'queued');
-        continue;
-      }
-      if (!known) continue;
-      const a = known.def;
-      ab.btn.setAttribute(
-        'aria-label',
-        t('abilityUi.actionBar.slotAria', {
-          slot: slotLabel,
-          ability: abilityDisplayName(a),
-        }),
-      );
-      // set the painted icon once per slot change, not every frame
-      const iconKey = `ability:${a.id}`;
-      if (ab.lastIcon !== iconKey) {
-        ab.lastIcon = iconKey;
-        ab.label.style.backgroundImage = `url(${iconDataUrl('ability', a.id)})`;
-      }
-      this.setText(ab.countEl, '');
-      const cd = p.cooldowns.get(a.id) ?? 0;
-      const gcdActive = !a.offGcd && p.gcdRemaining > 0;
-      const shown = Math.max(cd, gcdActive ? p.gcdRemaining : 0);
-      const denom = cd > 0 ? a.cooldown : GCD;
-      const cdHeight =
-        shown > 0 ? `${Math.min(100, (shown / Math.max(0.01, denom)) * 100)}%` : '0%';
-      if (ab.cdOverlay.style.height !== cdHeight) ab.cdOverlay.style.height = cdHeight;
-      this.setText(ab.cdText, cd > 1 ? Math.ceil(cd).toString() : '');
-      ab.btn.classList.toggle('unusable', p.resource < known.cost);
-      const oor =
-        a.requiresTarget && tgtDist !== null && tgtDist > (a.range > 0 ? a.range : MELEE_RANGE);
-      ab.btn.classList.toggle('oor', !!oor);
-      ab.btn.classList.toggle('queued', p.queuedOnSwing === a.id);
-    }
 
-    // xp bar — pre-cap shows the level bar; post-cap fills toward the next
-    // virtual level (Max-Level XP Overflow), with distinct prestige/gold styling.
+    // xp bar: pre-cap shows the level bar; post-cap fills toward the next virtual
+    // level (Max-Level XP Overflow), with distinct prestige/gold styling. The
+    // painter caches the #xpbar / .rested / #player-frame refs once and routes the
+    // --xp-fill / .rested / class writes through the elided helpers.
     const showOverflow = (this.optionsHooks?.settings.get('showOverflowXp') ?? 1) >= 0.5;
     const bar = xpBarView({
       level: p.level,
@@ -3940,16 +4486,14 @@ export class Hud {
       restedXp: sim.restedXp,
       showOverflow,
     });
-    this.setWidth(this.xpFillEl, `${(bar.fillFrac * 100).toFixed(1)}%`);
-    $('#xpbar').style.setProperty('--xp-fill', bar.fillFrac.toFixed(4));
-    $('#player-frame').style.setProperty('--xp-fill', bar.fillFrac.toFixed(4));
-    // Rested overlay sits ahead of the fill (classic inn-rested bonus preview).
-    const restedEl = $('#xpbar .rested') as HTMLElement;
-    restedEl.style.left = `${(bar.fillFrac * 100).toFixed(1)}%`;
-    restedEl.style.width = `${(bar.restedFrac * 100).toFixed(1)}%`;
-    this.setText(this.xpLabelEl, bar.label);
-    $('#xpbar').classList.toggle('overflow', bar.postCap);
-    $('#xpbar').classList.toggle('rested', bar.restedFrac > 0);
+    this.xpBarPainter.paint(bar);
+
+    // FCT painter: drive the pooled floating-combat-text ring on the every-frame
+    // tier (folded into the existing `hud` perf bucket, not a second rAF).
+    // step() only TTL-recycles each live floater (the number is screen-anchored, positioned
+    // once at spawn, so there is no per-frame reposition); an empty pool (no recent combat)
+    // returns immediately, so this costs nothing at steady state.
+    this.fctPainter.step(now);
 
     const deadInArena = p.dead && !!this.sim.arenaInfo?.match;
     this.setDisplay(this.deathOverlayEl, p.dead ? 'flex' : 'none');
@@ -3996,7 +4540,6 @@ export class Hud {
       // Combat = a mob is on us, or we traded blows in the last few seconds
       // (the wire protocol doesn't ship the inCombat flag).
       let aggroed = false;
-      let _nythraxisAlive = false;
       let bossEngaged = false; // the Nythraxis raid boss is pulled -> its own track
       const dungeon = dungeonAt(p.pos.x);
       const inNythraxisArena = dungeon?.id === 'nythraxis_boss_arena';
@@ -4004,7 +4547,6 @@ export class Hud {
         if (e.kind !== 'mob' || e.dead) continue;
         if (e.aggroTargetId === sim.playerId) aggroed = true;
         if (e.templateId === 'nythraxis_scourge_of_thornpeak') {
-          _nythraxisAlive = true;
           if (e.aggroTargetId !== null) bossEngaged = true;
         }
       }
@@ -4038,8 +4580,10 @@ export class Hud {
       music.update(zone, musicCombat);
       music.setBossCombat(bossEngaged);
 
-      // classic combat indicator: crossed swords + red ring on the player portrait
-      $('#player-frame').classList.toggle('combat', inCombat);
+      // classic combat indicator: crossed swords + red ring on the player portrait.
+      // Routed through the cached ref + the elided toggleClass writer: a counted,
+      // change-only write replacing a per-frame raw re-querying classList.toggle.
+      this.toggleClass(this.playerFrameEl, 'combat', inCombat);
       // classic "resting" zZz on the player portrait while seated / recovering.
       // Reads the seated booleans IWorld exposes; works offline + online alike.
       const rest = restView({ sitting: !!p.sitting, eating: !!p.eating, drinking: !!p.drinking });
@@ -4052,12 +4596,17 @@ export class Hud {
 
       this.updateQuestTracker();
       this.updateDelveTracker();
+      // Party frames run on the ~4Hz mediumHud band (the enclosing block) for EVERY tier.
+      // The tier knobs deliberately do NOT tier them down on low: party-member HP is a healer's
+      // only actionable signal (no self-dispel), so a graphics preset must not slow it
+      // (ui_tier_knobs). updatePartyFrames already short-circuits an unchanged
+      // party via its signature, so an idle frame is near-free without a tier gate.
       this.updatePartyFrames();
       this.updateTradeWindow();
       this.updateArenaStatus();
       this.updateFiestaHud();
       if ($('#map-window').style.display === 'block') this.updateMapWindow();
-      if ($('#arena-window').style.display === 'block') this.renderArenaWindow();
+      if ($('#arena-window').style.display === 'block') this.arenaWindow.render();
       if (this.openLootMobId !== null) {
         const mob = sim.entities.get(this.openLootMobId);
         if (!mob?.lootable || dist2d(p.pos, mob.pos) > 7) this.closeLoot();
@@ -4072,48 +4621,33 @@ export class Hud {
       }
     }
 
-    // when a bout begins, get the queue panel out of the way for the fight
+    // when a bout begins, get the queue panel out of the way for the fight. Route through
+    // arenaWindow.close() (not a raw hide) so it returns focus to the opener (WCAG 2.4.3):
+    // close() guards a not-displayed window and tolerates a stale opener.
     const inArenaMatch = !!this.sim.arenaInfo?.match;
     if (inArenaMatch && !this.arenaMatchSeen && $('#arena-window').style.display === 'block') {
-      $('#arena-window').style.display = 'none';
+      this.arenaWindow.close();
     }
     this.arenaMatchSeen = inArenaMatch;
     if (fastHud) {
-      this.updateMinimap();
+      // The minimap canvas redraw is the heaviest fastHud item; tier its
+      // cadence (full tiers redraw every fastHud tick = ~10Hz; low throttles to ~3-4Hz).
+      // The clock / coords / compass are cheap text and stay at the full fastHud rate.
+      if (cadenceDue(this.lastMinimapDrawAt, now, minimapRedrawIntervalMs(fxTier))) {
+        this.lastMinimapDrawAt = now;
+        this.updateMinimap();
+      }
       this.updateClock();
       this.updateMinimapCoords();
       this.updateCompass();
     }
-    if (slowHud && $('#social-window').classList.contains('open')) {
-      const struct = this.socialStructSig();
-      if (struct !== this.lastSocialStruct) {
-        this.lastSocialStruct = struct;
-        this.lastSocialContent = JSON.stringify({
-          social: this.sim.socialInfo,
-          party: this.sim.partyInfo,
-        });
-        this.renderSocial();
-      } else {
-        const content = JSON.stringify({ social: this.sim.socialInfo, party: this.sim.partyInfo });
-        if (content !== this.lastSocialContent) {
-          this.lastSocialContent = content;
-          this.refreshSocialList();
-        }
-      }
+    // Social repaints only on the slow divider, behind the painter's struct/content
+    // diff-gate; a content tick swaps the body innerHTML without re-wiring rows.
+    if (slowHud) this.socialWindow.refreshIfChanged();
+    if (slowHud && this.marketWindow.isOpen) {
+      if (!this.nearbyMarketNpc()) this.marketWindow.close();
+      else this.marketWindow.refreshIfChanged();
     }
-    if (slowHud && this.marketOpen) {
-      if (!this.nearbyMarketNpc()) this.closeMarket();
-      else this.refreshMarket();
-    }
-  }
-
-  // Overlay the absorb-shield segment on a unit-frame health bar. A null entity
-  // (no target / dead) hides it.
-  private updateAbsorb(sel: string, e: Entity | null): void {
-    const el = $(sel) as HTMLElement;
-    const v = e ? absorbBarView(e) : { fillFrac: 0, overshield: false, total: 0 };
-    el.style.transform = `scaleX(${v.fillFrac})`;
-    el.classList.toggle('overshield', v.overshield);
   }
 
   // Classic "low mana/energy" warning: pulse the player resource bar when power
@@ -4125,10 +4659,11 @@ export class Hud {
       maxResource: p.maxResource,
       resourceType: p.resourceType,
     });
-    const bar = $('#pf-resource') as HTMLElement;
-    // The resource className is rebuilt every frame just above this call, so the
-    // `.low` flag must be re-applied every frame too. Only the expensive style /
-    // label writes are diffed against the cached signature.
+    const bar = this.pfResourceEl; // the cached ref the family painter also writes
+    // `.low` is this method's own class (the unit_frame painter toggles only the
+    // mutually-exclusive power-type classes, never `low`), so toggling it each frame
+    // is cheap and idempotent. Only the expensive style / label writes below are
+    // diffed against the cached signature.
     bar.classList.toggle('low', v.active);
     const sig = v.active ? `${v.opacity.toFixed(2)}|${v.pulseSeconds.toFixed(2)}|${v.label}` : '';
     if (sig === this.lastLowResourceSig) return;
@@ -4180,67 +4715,6 @@ export class Hud {
         return t('hudChrome.raidLockout.minutes', { m: n(minutes) });
       default:
         return t('hudChrome.raidLockout.lessThanMinute');
-    }
-  }
-
-  private renderAuras(el: HTMLElement, e: Entity, mode: 'all' | 'debuffs'): void {
-    // cheap diff: rebuild only when the aura set changes
-    const sig = e.auras.map((a) => `${a.id}${Math.ceil(a.remaining)}x${a.stacks ?? 0}`).join('|');
-    if ((el as any).__sig === sig) return;
-    (el as any).__sig = sig;
-    el.innerHTML = '';
-    for (const a of e.auras) {
-      // A negative-value stat aura (e.g. a mob's Withering Wail sapping attack
-      // power, or an Intellect-draining curse) is a debuff even though it reuses a buff_* kind.
-      const isDebuff =
-        [
-          'dot',
-          'slow',
-          'root',
-          'stun',
-          'incapacitate',
-          'polymorph',
-          'attackspeed',
-          'debuff_ap',
-          'sunder',
-          'mortal_wound',
-          'silence',
-          'disarm',
-          'blind',
-          'expose',
-          'spellvuln',
-          'lockout',
-          'vulnerability',
-          'hex',
-          'tongues',
-          'cost_tax',
-          'heal_absorb',
-          'critvuln',
-        ].includes(a.kind) ||
-        (a.kind.startsWith('buff_') && a.value < 0);
-      if (mode === 'debuffs' && !isDebuff) continue;
-      const d = document.createElement('div');
-      d.className = `buff${isDebuff ? ' debuff' : ''}`;
-      d.style.backgroundImage = `url(${iconDataUrl('aura', ABILITIES[a.id] ? a.id : `aura_${a.kind}`)})`;
-      const dur = document.createElement('div');
-      dur.className = 'dur';
-      dur.textContent = a.remaining < 99 ? `${Math.ceil(a.remaining)}s` : '';
-      d.appendChild(dur);
-      if (a.stacks && a.stacks > 1) {
-        const st = document.createElement('div');
-        st.className = 'stacks';
-        st.textContent = formatNumber(a.stacks, { maximumFractionDigits: 0 });
-        d.appendChild(st);
-      }
-      const auraName = ABILITIES[a.id]
-        ? abilityDisplayName(ABILITIES[a.id])
-        : auraDisplayNameFromSource(a.name);
-      this.attachTooltip(
-        d,
-        () =>
-          `<div class="tt-title">${esc(auraName)}</div><div class="tt-sub">${esc(tPlural('hudChrome.plurals.secondsRemaining', Math.ceil(a.remaining)))}</div>`,
-      );
-      el.appendChild(d);
     }
   }
 
@@ -4336,7 +4810,7 @@ export class Hud {
     const delve = Object.values(DELVES).find((d) => d.boardNpcId === npc.templateId);
     if (!delve) return;
     if ($('#delve-board').style.display !== 'block')
-      this.delveBoardReturnFocus = this.currentFocusableElement();
+      this.delveTrap = this.focusManager.open({ root: () => $('#delve-board') });
     this.openDelveBoardNpcId = npcId;
     this.selectedDelveTier = 'normal';
     this.delveBoardTab = 'delve';
@@ -4452,8 +4926,7 @@ export class Hud {
       });
     }
     el.querySelector('[data-close]')?.addEventListener('click', () => this.closeDelveBoard());
-    if (focus)
-      this.focusFirstInteractive(el, tab === 'shop' ? '.delve-shop-buy' : '.delve-enter-btn');
+    if (focus) this.delveTrap?.focusFirst(tab === 'shop' ? '.delve-shop-buy' : '.delve-enter-btn');
   }
 
   // Brother Halven's Marks-vendor stock for the open delve. Offers + lock state
@@ -4514,9 +4987,8 @@ export class Hud {
     $('#delve-board').style.display = 'none';
     this.openDelveBoardNpcId = null;
     this.hideTooltip();
-    const target = this.delveBoardReturnFocus;
-    this.delveBoardReturnFocus = null;
-    if (restoreFocus) this.restoreFocus(target);
+    this.delveTrap?.release(restoreFocus);
+    this.delveTrap = null;
   }
 
   // ---------------------------------------------------------------------------
@@ -4529,13 +5001,12 @@ export class Hud {
 
   private openLockpickAnte(objectId: number, bountiful = false): void {
     const el = $('#lockpick-panel');
-    if (el.style.display !== 'block') this.lockpickReturnFocus = this.currentFocusableElement();
-    this.lockpickOfferId = objectId;
-    this.lockpickCoffer = bountiful;
+    if (el.style.display !== 'block')
+      this.lockpickTrap = this.focusManager.open({ root: () => $('#lockpick-panel') });
     el.style.display = 'block';
     this.bindLockpickKeys();
     this.lockpickWindow.renderAnte(objectId, bountiful);
-    this.focusFirstInteractive(el, '.lp-ante-btn');
+    this.lockpickTrap?.focusFirst('.lp-ante-btn');
   }
 
   // The lockpick loot tier names are shared with the combat-log lines, so reuse
@@ -4554,8 +5025,8 @@ export class Hud {
   // world.lockpickState; show the panel and let the window paint from it.
   private openLockpickBoard(): void {
     const el = $('#lockpick-panel');
-    if (el.style.display !== 'block') this.lockpickReturnFocus = this.currentFocusableElement();
-    this.lockpickOfferId = null;
+    if (el.style.display !== 'block')
+      this.lockpickTrap = this.focusManager.open({ root: () => $('#lockpick-panel') });
     el.style.display = 'block';
     this.bindLockpickKeys();
     this.lockpickWindow.openBoard();
@@ -4586,14 +5057,14 @@ export class Hud {
     this.openLootChestId = chestId;
     const chest = this.sim.entities.get(chestId);
     const el = $('#loot-window');
-    let html = `<div class="panel-title"><span>${esc(chest ? entityDisplayName(chest) : 'Chest')}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('itemUi.loot.close'))}">${svgIcon('close')}</button></div>`;
+    let html = `<div class="panel-title"><span>${esc(chest ? entityDisplayName(chest) : t('hudChrome.loot.chestTitle'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('itemUi.loot.close'))}">${svgIcon('close')}</button></div>`;
     for (const s of items) {
       const item = ITEMS[s.itemId];
-      html += `<div class="loot-item" data-item="${s.itemId}">${this.itemIcon(item)}<span style="font-size:12px">${esc(itemDisplayName(item))}${s.count > 1 ? ` x${s.count}` : ''}</span></div>`;
+      html += `<div class="loot-item" data-item="${s.itemId}">${this.itemIcon(item)}<span style="font-size:12px">${esc(itemDisplayName(item))}${s.count > 1 ? ` ${esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) }))}` : ''}</span></div>`;
     }
     el.innerHTML = html;
     el.querySelectorAll('[data-item]').forEach((row) => {
-      const itemId = (row as HTMLElement).dataset.item!;
+      const itemId = (row as HTMLElement).dataset.item ?? '';
       this.attachTooltip(row as HTMLElement, () => this.itemTooltip(ITEMS[itemId]));
     });
     const btn = document.createElement('button');
@@ -4674,17 +5145,14 @@ export class Hud {
 
   private closeLockpick(restoreFocus = true): void {
     $('#lockpick-panel').style.display = 'none';
-    this.lockpickOfferId = null;
-    this.lockpickCoffer = false;
     this.lockpickWindow.close();
     this.hideTooltip();
     if (this.lockpickKeyHandler) {
       window.removeEventListener('keydown', this.lockpickKeyHandler, true);
       this.lockpickKeyHandler = null;
     }
-    const target = this.lockpickReturnFocus;
-    this.lockpickReturnFocus = null;
-    if (restoreFocus) this.restoreFocus(target);
+    this.lockpickTrap?.release(restoreFocus);
+    this.lockpickTrap = null;
   }
 
   private delveObjectiveLine(run: DelveRunInfo): string {
@@ -4769,7 +5237,7 @@ export class Hud {
       `<div class="dt-obj">- ${esc(t('delveUi.tracker.marks', { count: marks }))}</div>` +
       affixHtml;
     el.querySelectorAll('.dt-affix-icon').forEach((icon) => {
-      const affixId = (icon as HTMLElement).dataset.affix!;
+      const affixId = (icon as HTMLElement).dataset.affix ?? '';
       this.attachTooltip(
         icon as HTMLElement,
         () => `<div class="tt-title">${esc(this.delveAffixLabel(affixId))}</div>`,
@@ -4788,7 +5256,7 @@ export class Hud {
     const c = document.createElement('canvas');
     c.width = W;
     c.height = H;
-    const ctx = c.getContext('2d')!;
+    const ctx = require2dContext(c);
     const img = ctx.createImageData(W, H);
     paintTerrainRows(img.data, W, H, region, this.sim.cfg.seed, 0, H);
     ctx.putImageData(img, 0, 0);
@@ -4829,7 +5297,7 @@ export class Hud {
     const c = document.createElement('canvas');
     c.width = W;
     c.height = H;
-    const ctx = c.getContext('2d')!;
+    const ctx = require2dContext(c);
     this.mapPrewarm = {
       zoneId,
       canvas: c,
@@ -5021,240 +5489,25 @@ export class Hud {
 
   private updateMinimap(): void {
     const ctx = this.minimapCtx;
-    const S = 162;
-    const p = this.sim.player;
-    const run = this.sim.delveRun;
-    const inDelve = isDelvePos(p.pos.x);
-
-    // Area label: delve module name or overworld zone name
-    if (inDelve && run) {
-      const modId = run.modules[run.moduleIndex];
-      const delveName = delveDisplayName(run.delveId);
-      const modName = modId ? t(`delveUi.moduleName.${modId}` as TranslationKey) : '';
-      $('#zone-label').textContent = delveAreaLabel(delveName, modName);
-    } else {
-      $('#zone-label').textContent = zoneDisplayName(zoneAt(p.pos.z).id);
-    }
-
-    ctx.clearRect(0, 0, S, S);
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(S / 2, S / 2, S / 2 - 2, 0, Math.PI * 2);
-    ctx.clip();
-    ctx.imageSmoothingEnabled = false;
-
-    if (inDelve && run) {
-      // Draw delve schematic instead of overworld terrain
-      const modId = run.modules[run.moduleIndex];
-      const layoutId = (modId ?? 'reliquary_sunken_ossuary') as DelveModuleId;
-      const layout =
-        DELVE_MODULE_LAYOUTS[layoutId] ?? DELVE_MODULE_LAYOUTS.reliquary_sunken_ossuary;
-      const pad = 8;
-
-      // Rebuild static background only when module changes
-      if (!this.delveSchematicBg || this.delveSchematicBgModuleId !== layoutId) {
-        const bgCanvas = document.createElement('canvas');
-        bgCanvas.width = S;
-        bgCanvas.height = S;
-        const bgCtx = bgCanvas.getContext('2d')!;
-        // Dark room fill behind everything
-        bgCtx.fillStyle = '#0e0c0a';
-        bgCtx.fillRect(0, 0, S, S);
-        drawSchematicPrimitives(bgCtx, delveSchematicStatic(layout, S, pad));
-        this.delveSchematicBg = bgCanvas;
-        this.delveSchematicBgModuleId = layoutId;
-      }
-      ctx.drawImage(this.delveSchematicBg, 0, 0);
-
-      // Entity overlay (mobs and party only -- no NPCs/loot inside delves for simplicity)
-      const { localX: pLocalX, localZ: pLocalZ } = playerDelveLocal(p.pos.x, p.pos.z, run.origin);
-      for (const e of this.sim.entities.values()) {
-        if (e.id === p.id) continue;
-        if (e.kind !== 'mob' || e.dead) continue;
-        const elocalX = e.pos.x - run.origin.x;
-        const elocalZ = e.pos.z - run.origin.z;
-        // Map from module-local to the same toCanvas space (mirror X for map-left)
-        const ex = pad + ((23 - elocalX) / 46) * (S - pad * 2);
-        const ey = pad + ((elocalZ - layout.zMin) / (layout.zMax - layout.zMin)) * (S - pad * 2);
-        if (ex < 0 || ex > S || ey < 0 || ey > S) continue;
-        ctx.fillStyle = e.aggroTargetId === p.id ? '#ff8800' : '#e74c3c';
-        ctx.fillRect(ex - 1.5, ey - 1.5, 3, 3);
-      }
-
-      // Party members in the delve
-      const party = this.sim.partyInfo;
-      if (party) {
-        for (const m of party.members) {
-          if (m.pid === p.id) continue;
-          const mlx = m.x - run.origin.x;
-          const mlz = m.z - run.origin.z;
-          const mx = pad + ((23 - mlx) / 46) * (S - pad * 2);
-          const my = pad + ((mlz - layout.zMin) / (layout.zMax - layout.zMin)) * (S - pad * 2);
-          if (mx < 0 || mx > S || my < 0 || my > S) continue;
-          const color = m.dead ? '#9a9a9a' : classCss(m.cls);
-          ctx.fillStyle = color;
-          ctx.strokeStyle = '#000';
-          ctx.lineWidth = 1.5;
-          ctx.beginPath();
-          ctx.arc(mx, my, 4, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.stroke();
-        }
-      }
-
-      // Player arrow (schematic uses absolute canvas position from delveSchematicPlayer)
-      const arrow = delveSchematicPlayer(pLocalX, pLocalZ, p.facing, layout, S, pad);
-      ctx.save();
-      ctx.translate(arrow.cx, arrow.cy);
-      ctx.rotate(arrow.angle);
-      ctx.fillStyle = arrow.fill;
-      ctx.strokeStyle = arrow.stroke;
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.moveTo(0, -arrow.size);
-      ctx.lineTo(arrow.size * 0.6, arrow.size * 0.8);
-      ctx.lineTo(-arrow.size * 0.6, arrow.size * 0.8);
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-      ctx.restore();
-
-      ctx.restore();
+    // minimapMode (the minimap_markers core) is the single source of truth for the
+    // delve-vs-overworld branch (the same isDelvePos + delveRun guard, lifted into the
+    // core so hud and the painters never duplicate it).
+    if (minimapMode(this.sim) === 'delve') {
+      // The delve painter owns the '#zone-label' text (written through the
+      // write-elision facet) and the full minimap schematic render.
+      this.delvePainter.paintMinimapDelve(ctx, this.sim, $('#zone-label'), MINIMAP_SIZE);
       return;
     }
-
-    // 1.7 is the historical base scale; the zoom multiplier shrinks the world
-    // radius shown so markers spread out as you zoom in (default 1 = unchanged).
-    const pxPerYard = 1.7 * this.minimapZoom;
-    const bg = this.minimapBg;
-    const bgPxPerYard = bg.width / (WORLD_MAX_X - WORLD_MIN_X);
-    const sw = S / (pxPerYard / bgPxPerYard);
-    const sx = (WORLD_MAX_X - p.pos.x) * bgPxPerYard - sw / 2; // bg is +X-left
-    const sy = (WORLD_MAX_Z - p.pos.z) * bgPxPerYard - sw / 2;
-    ctx.drawImage(bg, sx, sy, sw, sw, 0, 0, S, S);
-
-    // friend/guild lookup for colouring nearby allies (party markers are drawn
-    // separately below, so skip party members here to avoid double dots)
-    const social = this.sim.socialInfo;
-    const friendNames = social
-      ? new Set(social.friends.filter((f) => f.online).map((f) => f.name))
-      : null;
-    const guildNames = social?.guild ? new Set(social.guild.members.map((m) => m.name)) : null;
-    const partyPids = this.sim.partyInfo
-      ? new Set(this.sim.partyInfo.members.map((m) => m.pid))
-      : null;
-
-    for (const e of this.sim.entities.values()) {
-      if (e.id === p.id) continue;
-      const dx = -(e.pos.x - p.pos.x) * pxPerYard; // +X is map-left
-      const dz = -(e.pos.z - p.pos.z) * pxPerYard;
-      const mx = S / 2 + dx,
-        my = S / 2 + dz;
-      if ((mx - S / 2) ** 2 + (my - S / 2) ** 2 > (S / 2 - 7) ** 2) continue;
-      if (e.kind === 'player' && !partyPids?.has(e.id)) {
-        const isFriend = friendNames?.has(e.name) ?? false;
-        const isGuild = !isFriend && (guildNames?.has(e.name) ?? false);
-        if (isFriend || isGuild) {
-          ctx.fillStyle = isFriend ? '#4ade80' : '#60a5fa';
-          ctx.strokeStyle = '#000';
-          ctx.lineWidth = 1.5;
-          ctx.beginPath();
-          ctx.arc(mx, my, 3, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.stroke();
-        }
-      } else if (e.kind === 'npc') {
-        const hasAvail = e.questIds.some(
-          (q) => QUESTS[q].giverNpcId === e.templateId && this.sim.questState(q) === 'available',
-        );
-        const hasReady = e.questIds.some(
-          (q) => isQuestTurnInNpc(QUESTS[q], e.templateId) && this.sim.questState(q) === 'ready',
-        );
-        ctx.fillStyle = '#ffd100';
-        ctx.font = 'bold 11px Georgia';
-        ctx.fillText(hasReady ? '?' : hasAvail ? '!' : '•', mx - 2, my + 3);
-      } else if (
-        e.kind === 'object' &&
-        (e.templateId === 'dungeon_door' || e.templateId === 'dungeon_exit')
-      ) {
-        ctx.fillStyle = '#c084ff';
-        ctx.beginPath();
-        ctx.arc(mx, my, 3.5, 0, Math.PI * 2);
-        ctx.fill();
-      } else if (e.kind === 'object' && e.lootable) {
-        ctx.fillStyle = '#ffe97a';
-        ctx.fillRect(mx - 1.5, my - 1.5, 3, 3);
-      } else if (e.kind === 'mob' && !e.dead) {
-        ctx.fillStyle = e.aggroTargetId === p.id ? '#ff8800' : '#e74c3c';
-        ctx.fillRect(mx - 1.5, my - 1.5, 3, 3);
-      } else if (e.kind === 'mob' && e.lootable) {
-        ctx.fillStyle = '#ffd100';
-        ctx.fillRect(mx - 1.5, my - 1.5, 3, 3);
-      }
-    }
-    // Party members: class-colored markers. On-map allies are discs that
-    // scale up the closer they are (proximity scaling); allies past the rim
-    // are pinned to the edge as arrows pointing the way to regroup.
-    const party = this.sim.partyInfo;
-    if (party) {
-      const R = S / 2 - 7;
-      for (const m of party.members) {
-        if (m.pid === p.id) continue;
-        const dx = -(m.x - p.pos.x) * pxPerYard; // +X is map-left
-        const dz = -(m.z - p.pos.z) * pxPerYard;
-        const dist = Math.hypot(dx, dz);
-        const offMap = dist > R;
-        const ang = Math.atan2(dz, dx);
-        const color = m.dead ? '#9a9a9a' : classCss(m.cls);
-        ctx.save();
-        if (offMap) {
-          // edge-anchored arrow pointing outward toward the off-screen ally
-          ctx.translate(S / 2 + Math.cos(ang) * R, S / 2 + Math.sin(ang) * R);
-          ctx.rotate(ang);
-          ctx.fillStyle = color;
-          ctx.strokeStyle = '#000';
-          ctx.lineWidth = 1.5;
-          ctx.beginPath();
-          ctx.moveTo(6, 0);
-          ctx.lineTo(-4, 4.5);
-          ctx.lineTo(-4, -4.5);
-          ctx.closePath();
-          ctx.fill();
-          ctx.stroke();
-        } else {
-          // proximity scaling: ~6px adjacent down to ~3px near the rim
-          const r = 6 - (dist / R) * 3;
-          ctx.translate(S / 2 + dx, S / 2 + dz);
-          ctx.fillStyle = color;
-          ctx.strokeStyle = '#000';
-          ctx.lineWidth = 1.5;
-          ctx.beginPath();
-          ctx.arc(0, 0, r, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.stroke();
-          if (!m.dead) {
-            // bright inner pip so members pop against terrain
-            ctx.fillStyle = '#ffffffcc';
-            ctx.beginPath();
-            ctx.arc(0, 0, Math.max(1, r * 0.35), 0, Math.PI * 2);
-            ctx.fill();
-          }
-        }
-        ctx.restore();
-      }
-    }
-    ctx.translate(S / 2, S / 2);
-    ctx.rotate(-p.facing); // canvas rotates clockwise; facing increases turning left
-    ctx.fillStyle = '#fff';
-    ctx.strokeStyle = '#000';
-    ctx.beginPath();
-    ctx.moveTo(0, -7);
-    ctx.lineTo(4.5, 5.5);
-    ctx.lineTo(-4.5, 5.5);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-    ctx.restore();
+    // The overworld minimap: a pure marker core (minimap_markers) + the thin canvas
+    // painter. It owns the cached terrain blit + the marker draws and writes
+    // '#zone-label' through the write-elision facet.
+    this.minimapPainter.paintOverworld(
+      ctx,
+      this.sim,
+      $('#zone-label'),
+      this.minimapBg,
+      this.minimapZoom,
+    );
   }
 
   toggleMeters(): void {
@@ -5265,224 +5518,12 @@ export class Hud {
   // The Ashen Coliseum - 1v1 arena panel + in-match banner
   // -------------------------------------------------------------------------
 
+  // The Ashen Coliseum window is owned by arena_window.ts (the painter) + the pure
+  // arena_window_view.ts (the offline/live model). Hud stays the coordinator: it
+  // forwards the keybind toggle and drives the painter's redraw from the mediumHud
+  // band while open. The in-match auto-close + the pinned banner stay here.
   toggleArena(): void {
-    const el = $('#arena-window');
-    if (el.style.display === 'block') {
-      el.style.display = 'none';
-      return;
-    }
-    this.closeOtherWindows('#arena-window');
-    el.style.display = 'block';
-    this.lastArenaSig = '';
-    this.fetchArenaLeaderboard(this.arenaBracket);
-    this.renderArenaWindow();
-  }
-
-  // Best-effort all-time ladder pull. Throttled; silently no-ops offline (no
-  // server) so the panel still shows the live online ladder either way.
-  private fetchArenaLeaderboard(format: ArenaFormat): void {
-    const now = performance.now();
-    if (now - (this.arenaLbFetchedAt[format] ?? 0) < 15000) return;
-    this.arenaLbFetchedAt[format] = now;
-    fetch(`/api/arena/leaderboard?format=${encodeURIComponent(format)}`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => {
-        if (d && Array.isArray(d.leaders)) {
-          this.arenaAllTime[format] = d.leaders;
-          this.lastArenaSig = '';
-        }
-      })
-      .catch(() => {
-        /* offline or no server — live ladder only */
-      });
-  }
-
-  private renderArenaWindow(): void {
-    const el = $('#arena-window');
-    const a = this.sim.arenaInfo;
-    if (!a) {
-      // offline / not yet synced: arena is an online ranked feature
-      el.innerHTML =
-        `<div class="panel-title"><span>${esc(t('hud.arena.title'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.arena.close'))}">${svgIcon('close')}</button></div>` +
-        `<div class="arena-note">${esc(t('hud.arena.offlineNote'))}</div>`;
-      el.querySelector('[data-close]')?.addEventListener('click', () => {
-        el.style.display = 'none';
-      });
-      return;
-    }
-    const inMatch = a.match !== null;
-    const queuedFmt = a.queued ? a.format : null;
-    const bracket = a.match?.format ?? queuedFmt ?? this.arenaBracket;
-    if (queuedFmt || a.match) this.arenaBracket = bracket;
-    const canSwitchBracket = !a.queued && !inMatch;
-    const standing = a.standings[bracket];
-    const ladderRows = a.ladders[bracket];
-    const myPid = this.sim.playerId;
-    const party = this.sim.partyInfo;
-    const partySize = party?.members.length ?? 1;
-    const isLeader = !party || party.leader === myPid;
-
-    const ladder =
-      ladderRows
-        .map((r, i) => {
-          const me = r.pid === myPid;
-          const classId = r.cls as PlayerClass;
-          const cls = CLASSES[classId] ? classDisplayName(classId) : r.cls;
-          return (
-            `<div class="ladder-row${me ? ' me' : ''}"><span class="rank">${esc(formatNumber(i + 1, { maximumFractionDigits: 0 }))}</span>` +
-            `<span class="lr-name" title="${esc(t('hud.arena.playerClassTitle', { name: r.name, className: cls }))}">${esc(r.name)}</span>` +
-            `<span class="lr-rating">${esc(formatNumber(r.rating, { maximumFractionDigits: 0 }))}</span>` +
-            `<span class="lr-wl">${esc(formatNumber(r.wins, { maximumFractionDigits: 0 }))}-${esc(formatNumber(r.losses, { maximumFractionDigits: 0 }))}</span></div>`
-          );
-        })
-        .join('') || `<div class="ladder-empty">${esc(t('hud.arena.noChallengers'))}</div>`;
-
-    const bracketLabel = (fmt: ArenaFormat) => (fmt === 'fiesta' ? t('fiesta.bracket') : fmt);
-    const bracketBtn = (fmt: ArenaFormat) => {
-      const active = bracket === fmt;
-      const locked = !canSwitchBracket && !active;
-      const fiestaCls = fmt === 'fiesta' ? ' fiesta' : '';
-      return `<button class="arena-bracket${fiestaCls}${active ? ' active' : ''}${locked ? ' locked' : ''}" data-bracket="${fmt}" aria-pressed="${active ? 'true' : 'false'}"${locked ? ' disabled' : ''}>${esc(bracketLabel(fmt))}</button>`;
-    };
-    const bracketTabs = `<div class="arena-brackets">${bracketBtn('1v1')}${bracketBtn('2v2')}${bracketBtn('fiesta')}</div>`;
-    const isTeamBracket = bracket === '2v2' || bracket === 'fiesta';
-
-    let partySection = '';
-    if (isTeamBracket && !inMatch && !a.queued) {
-      if (party && partySize === 2) {
-        const rows = party.members
-          .map((m) => {
-            const cls = CLASSES[m.cls] ? classDisplayName(m.cls) : m.cls;
-            const me = m.pid === myPid ? ' me' : '';
-            return (
-              `<div class="arena-party-row${me}"><span class="apr-name">${esc(m.name)}</span>` +
-              `<span class="apr-meta">${esc(
-                t('hud.arena.levelClass', {
-                  level: formatNumber(m.level, { maximumFractionDigits: 0 }),
-                  className: cls,
-                }),
-              )}</span></div>`
-            );
-          })
-          .join('');
-        partySection = `<div class="arena-party">${rows}</div>`;
-      } else if (party && partySize > 2) {
-        partySection = `<div class="arena-note arena-warn">${esc(t('hud.arena.queueNote'))}</div>`;
-      }
-    }
-
-    let action: string;
-    if (inMatch) {
-      action = `<div class="arena-queue-status">${svgIcon('arena')} ${esc(t('hud.arena.matchInProgress', { name: a.match?.oppName ?? '' }))}</div>`;
-    } else if (a.queued) {
-      action =
-        `<button class="btn leave" data-act="leave">${esc(t('hud.arena.leaveQueue'))}</button>` +
-        `<div class="arena-queue-status">${esc(t('hud.arena.searching', { count: formatNumber(a.queueSize, { maximumFractionDigits: 0 }) }))}</div>`;
-    } else {
-      let queueDisabled = false;
-      if (isTeamBracket && party && partySize === 2 && !isLeader) {
-        queueDisabled = true;
-      } else if (isTeamBracket && party && partySize > 2) {
-        queueDisabled = true;
-      } else if (bracket === '1v1' && party && partySize > 1) {
-        queueDisabled = true;
-      }
-      const btnCls = queueDisabled ? 'btn disabled' : 'btn';
-      const queueLabel = bracket === 'fiesta' ? t('fiesta.enterQueue') : t('hud.arena.enterQueue');
-      action =
-        `<button class="${btnCls}" data-act="queue"${queueDisabled ? ' disabled' : ''}>${esc(queueLabel)}</button>` +
-        `<div class="arena-note">${esc(t('hud.arena.queueNote'))}</div>`;
-    }
-
-    // Offline dev affordance: practice Fiesta against bots (hidden online).
-    let practiceSection = '';
-    if (bracket === 'fiesta' && this.fiestaPracticeHook && !inMatch) {
-      practiceSection =
-        `<button class="btn fiesta-practice" data-act="practice">${esc(t('fiesta.practice'))}</button>` +
-        `<div class="arena-note">${esc(t('fiesta.practiceNote'))}</div>`;
-    }
-
-    this.fetchArenaLeaderboard(bracket);
-    const allTimeRows = this.arenaAllTime[bracket] ?? null;
-    const allTime = (allTimeRows ?? [])
-      .map((r, i) => {
-        const me = r.name === this.sim.player.name;
-        const classId = r.class as PlayerClass;
-        const cls = CLASSES[classId] ? classDisplayName(classId) : r.class;
-        return (
-          `<div class="ladder-row${me ? ' me' : ''}"><span class="rank">${esc(formatNumber(i + 1, { maximumFractionDigits: 0 }))}</span>` +
-          `<span class="lr-name" title="${esc(
-            t('hud.arena.playerLevelClassTitle', {
-              name: r.name,
-              level: formatNumber(r.level, { maximumFractionDigits: 0 }),
-              className: cls,
-            }),
-          )}">${esc(r.name)}</span>` +
-          `<span class="lr-rating">${esc(formatNumber(r.rating, { maximumFractionDigits: 0 }))}</span>` +
-          `<span class="lr-wl">${esc(formatNumber(r.wins, { maximumFractionDigits: 0 }))}-${esc(formatNumber(r.losses, { maximumFractionDigits: 0 }))}</span></div>`
-        );
-      })
-      .join('');
-    const allTimeSection =
-      allTimeRows && allTimeRows.length > 0
-        ? `<div class="arena-sub">${esc(t('hud.arena.ladderAllTime'))}</div>${allTime}`
-        : '';
-
-    const sig = JSON.stringify([
-      standing,
-      a.queued,
-      a.queueSize,
-      inMatch,
-      ladderRows,
-      allTimeRows,
-      bracket,
-      party,
-      canSwitchBracket,
-    ]);
-    if (sig === this.lastArenaSig) return;
-    this.lastArenaSig = sig;
-
-    el.innerHTML =
-      `<div class="panel-title"><span>${esc(t('hud.arena.title'))} <span class="arena-bracket-tag${bracket === 'fiesta' ? ' fiesta' : ''}">${esc(bracketLabel(bracket))}</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.arena.close'))}">${svgIcon('close')}</button></div>` +
-      bracketTabs +
-      `<div class="arena-rank"><span class="rating">${esc(formatNumber(standing.rating, { maximumFractionDigits: 0 }))}</span>` +
-      `<span class="wl">${esc(
-        t('hud.arena.ratingSummary', {
-          wins: formatNumber(standing.wins, { maximumFractionDigits: 0 }),
-          losses: formatNumber(standing.losses, { maximumFractionDigits: 0 }),
-        }),
-      )}</span></div>` +
-      partySection +
-      action +
-      practiceSection +
-      `<div class="arena-sub">${esc(t('hud.arena.ladderOnline'))}</div>` +
-      ladder +
-      allTimeSection;
-
-    el.querySelector('[data-close]')?.addEventListener('click', () => {
-      el.style.display = 'none';
-    });
-    el.querySelectorAll('[data-bracket]:not([disabled])').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        this.arenaBracket = (btn as HTMLElement).dataset.bracket as ArenaFormat;
-        this.lastArenaSig = '';
-        this.renderArenaWindow();
-        audio.click();
-      });
-    });
-    el.querySelector('[data-act="queue"]:not([disabled])')?.addEventListener('click', () => {
-      this.sim.arenaQueueJoin(bracket);
-      audio.click();
-    });
-    el.querySelector('[data-act="leave"]')?.addEventListener('click', () => {
-      this.sim.arenaQueueLeave();
-      audio.click();
-    });
-    el.querySelector('[data-act="practice"]')?.addEventListener('click', () => {
-      this.fiestaPracticeHook?.();
-      this.lastArenaSig = '';
-      audio.click();
-    });
+    this.arenaWindow.toggle();
   }
 
   // The pinned in-match banner: opponent name + countdown / live match timer.
@@ -5556,341 +5597,46 @@ export class Hud {
     if ($('#map-window').style.display === 'block') this.updateMapWindow();
   }
 
-  // The map window shows the zone band the player is standing in (each band
-  // is a square); POIs and dungeon portals come from the zone/dungeon data.
+  // The map window shows the zone band the player is standing in (each band is a
+  // square); POIs and dungeon portals come from the zone/dungeon data. It redraws
+  // while open from hud.update()'s mediumHud band; the painter owns the canvas
+  // draw, the cached terrain blit, and the cadence. The delve branch is owned by
+  // delve_map_painter (paintWorldMapDelve), the overworld branch by
+  // map_window_painter; the pure geometry lives in map_window_view.ts.
   private updateMapWindow(): void {
     const canvas = $('#map-canvas') as unknown as HTMLCanvasElement;
-    const ctx = canvas.getContext('2d')!;
+    const ctx = require2dContext(canvas);
     const S = canvas.width;
     const p = this.sim.player;
+    const summaryEl = $('#map-summary');
 
-    // --- Delve branch: render the module schematic instead of the overworld map
-    const run = this.sim.delveRun;
-    if (isDelvePos(p.pos.x) && run) {
-      const modId = run.modules[run.moduleIndex];
-      const layoutId = (modId ?? 'reliquary_sunken_ossuary') as DelveModuleId;
-      const layout =
-        DELVE_MODULE_LAYOUTS[layoutId] ?? DELVE_MODULE_LAYOUTS.reliquary_sunken_ossuary;
-      const pad = Math.round(S * 0.06);
-
-      // Rebuild static background only when module changes
-      if (!this.delveMapBg || this.delveMapBgModuleId !== layoutId) {
-        const bgCanvas = document.createElement('canvas');
-        bgCanvas.width = S;
-        bgCanvas.height = S;
-        const bgCtx = bgCanvas.getContext('2d')!;
-        bgCtx.fillStyle = '#0e0c0a';
-        bgCtx.fillRect(0, 0, S, S);
-        drawSchematicPrimitives(bgCtx, delveSchematicStatic(layout, S, pad));
-        this.delveMapBg = bgCanvas;
-        this.delveMapBgModuleId = layoutId;
-      }
-
-      ctx.clearRect(0, 0, S, S);
-      ctx.drawImage(this.delveMapBg, 0, 0);
-
-      // Map-local coordinate helper (mirrors local-to-canvas from delve_map.ts)
-      const toDelveMap = (localX: number, localZ: number) => ({
-        mx: pad + ((23 - localX) / 46) * (S - pad * 2),
-        my: pad + ((localZ - layout.zMin) / (layout.zMax - layout.zMin)) * (S - pad * 2),
-      });
-
-      // Mob overlays
-      for (const e of this.sim.entities.values()) {
-        if (e.kind !== 'mob' || e.dead) continue;
-        const { mx, my } = toDelveMap(e.pos.x - run.origin.x, e.pos.z - run.origin.z);
-        if (mx < 0 || mx > S || my < 0 || my > S) continue;
-        ctx.fillStyle = e.aggroTargetId === p.id ? '#ff8800' : '#e74c3c';
-        ctx.fillRect(mx - 2, my - 2, 4, 4);
-      }
-
-      // Party members
-      const party = this.sim.partyInfo;
-      if (party) {
-        ctx.strokeStyle = '#000';
-        ctx.lineWidth = 2;
-        for (const m of party.members) {
-          if (m.pid === p.id) continue;
-          const { mx, my } = toDelveMap(m.x - run.origin.x, m.z - run.origin.z);
-          if (mx < 0 || mx > S || my < 0 || my > S) continue;
-          ctx.fillStyle = m.dead ? '#9a9a9a' : classCss(m.cls);
-          ctx.beginPath();
-          ctx.arc(mx, my, 5, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.stroke();
-        }
-      }
-
-      // Player arrow
-      const { localX: pLocalX, localZ: pLocalZ } = playerDelveLocal(p.pos.x, p.pos.z, run.origin);
-      const arrow = delveSchematicPlayer(pLocalX, pLocalZ, p.facing, layout, S, pad);
-      ctx.save();
-      ctx.translate(arrow.cx, arrow.cy);
-      ctx.rotate(arrow.angle);
-      ctx.fillStyle = arrow.fill;
-      ctx.strokeStyle = '#000';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(0, -arrow.size);
-      ctx.lineTo(arrow.size * 0.6, arrow.size * 0.8);
-      ctx.lineTo(-arrow.size * 0.6, arrow.size * 0.8);
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-      ctx.restore();
-
-      // Module title at top
-      const delveName = delveDisplayName(run.delveId);
-      const modName = modId ? t(`delveUi.moduleName.${modId}` as TranslationKey) : '';
-      const areaLabel = delveAreaLabel(delveName, modName);
-      ctx.font = 'bold 14px Georgia';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'top';
-      ctx.strokeStyle = '#000';
-      ctx.lineWidth = 3;
-      ctx.fillStyle = '#ffe9a0';
-      ctx.strokeText(areaLabel, S / 2, 6);
-      ctx.fillText(areaLabel, S / 2, 6);
-      ctx.textBaseline = 'alphabetic';
+    if (mapWindowMode(this.sim) === 'delve') {
+      // The delve painter owns the full world-map schematic render (the area
+      // title is drawn on-canvas, since the world map has no DOM zone label).
+      this.delvePainter.paintWorldMapDelve(ctx, this.sim, S);
+      const run = this.sim.delveRun;
+      const area = run ? delveDisplayName(run.delveId) : '';
+      this.setText(summaryEl, t('hud.core.mapSummary', { zone: area }));
       return;
     }
 
-    // inside an instance, show the zone the dungeon's door is in (dungeonAt
-    // owns the instance x-band layout); outdoors, follow the committed zone
-    // so border-straddling can't thrash the 280px canvas regen below
+    // inside an instance, show the zone the dungeon's door is in (dungeonAt owns
+    // the instance x-band layout); outdoors, follow the committed zone so
+    // border-straddling can't thrash the cached terrain regen.
     const dungeon = dungeonAt(p.pos.x);
     const zone: ZoneDef = dungeon
       ? zoneAt(dungeon.doorPos.z)
       : (ZONES.find((z) => z.id === this.lastZoneId) ?? zoneAt(p.pos.z));
-    const full = this.mapZoneRegion(zone);
-    const mapBg = this.mapZoneBg(zone); // cached per zone; prewarmed during idle
-    // zoomed view: a sub-rectangle of the zone, centred on the player and
-    // clamped to the zone bounds (zoom 1 = the whole zone).
-    const fullSpanX = full.maxX - full.minX;
-    const fullSpanZ = full.maxZ - full.minZ;
-    const spanX = fullSpanX / this.mapZoom;
-    const spanZ = fullSpanZ / this.mapZoom;
-    // centre on the pan target if the user dragged, else follow the player
-    const baseX = this.mapCenter ? this.mapCenter.x : p.pos.x;
-    const baseZ = this.mapCenter ? this.mapCenter.z : p.pos.z;
-    const cx = Math.max(full.minX + spanX / 2, Math.min(full.maxX - spanX / 2, baseX));
-    const cz = Math.max(full.minZ + spanZ / 2, Math.min(full.maxZ - spanZ / 2, baseZ));
-    const region = {
-      minX: cx - spanX / 2,
-      maxX: cx + spanX / 2,
-      minZ: cz - spanZ / 2,
-      maxZ: cz + spanZ / 2,
-    };
-    this.mapView = {
-      spanX,
-      spanZ,
-      minX: full.minX,
-      maxX: full.maxX,
-      minZ: full.minZ,
-      maxZ: full.maxZ,
-    };
-    if (!this.mapDrag) canvas.style.cursor = this.mapZoom > 1 ? 'grab' : 'default';
-    // blit the matching sub-rect of the cached terrain (note: +X is map-left)
-    const bg = mapBg;
-    ctx.imageSmoothingEnabled = true;
-    ctx.drawImage(
-      bg,
-      ((full.maxX - region.maxX) / fullSpanX) * bg.width,
-      ((full.maxZ - region.maxZ) / fullSpanZ) * bg.height,
-      (spanX / fullSpanX) * bg.width,
-      (spanZ / fullSpanZ) * bg.height,
-      0,
-      0,
-      S,
-      S,
-    );
-    const toMap = (x: number, z: number) => ({
-      mx: ((region.maxX - x) / spanX) * S, // +X is map-left (east = -X)
-      my: ((region.maxZ - z) / spanZ) * S,
+    const result = this.mapPainter.paintOverworld(ctx, this.sim, {
+      zone,
+      bg: this.mapZoneBg(zone), // cached per zone; prewarmed during idle
+      canvasSize: S,
+      zoom: this.mapZoom,
+      center: this.mapCenter,
     });
-    // zoomed in far enough → overlay buildings + vegetation (under the labels)
-    if (this.mapZoom >= MAP_DETAIL_ZOOM) this.drawMapDetail(ctx, region, toMap);
-    // zone title
-    ctx.font = 'bold 16px Georgia';
-    ctx.textAlign = 'center';
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = 3;
-    ctx.fillStyle = '#ffe9a0';
-    const zoneName = zoneDisplayName(zone.id);
-    ctx.strokeText(zoneName, S / 2, 20);
-    ctx.fillText(zoneName, S / 2, 20);
-    // labels
-    ctx.font = 'bold 13px Georgia';
-    const label = (x: number, z: number, text: string) => {
-      const { mx, my } = toMap(x, z);
-      ctx.strokeText(text, mx, my);
-      ctx.fillText(text, mx, my);
-    };
-    zone.pois.forEach((poi, poiIndex) => {
-      label(poi.x, poi.z, zonePoiLabel(zone.id, poiIndex));
-    });
-    // dungeon entrance portals in this zone (raids reached only through an
-    // internal door share their parent's doorPos and carry no overworld portal,
-    // so their label does not overlap the parent's, see overworldDungeonPortals)
-    for (const portal of overworldDungeonPortals(DUNGEON_LIST, zone.zMin, zone.zMax)) {
-      const { mx, my } = toMap(portal.x, portal.z);
-      ctx.fillStyle = '#c084ff';
-      ctx.beginPath();
-      ctx.arc(mx, my, 5, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
-      ctx.fillStyle = '#e0c0ff';
-      ctx.font = 'bold 12px Georgia';
-      const dungeonName = dungeonDisplayName(portal.id);
-      ctx.strokeText(dungeonName, mx, my - 9);
-      ctx.fillText(dungeonName, mx, my - 9);
-      ctx.font = 'bold 13px Georgia';
-      ctx.fillStyle = '#ffe9a0';
-    }
-    // npcs
-    for (const e of this.sim.entities.values()) {
-      if (e.kind !== 'npc') continue;
-      if (e.pos.z < zone.zMin || e.pos.z >= zone.zMax) continue;
-      const { mx, my } = toMap(e.pos.x, e.pos.z);
-      const hasAvail = e.questIds.some(
-        (q) => QUESTS[q].giverNpcId === e.templateId && this.sim.questState(q) === 'available',
-      );
-      const hasReady = e.questIds.some(
-        (q) => isQuestTurnInNpc(QUESTS[q], e.templateId) && this.sim.questState(q) === 'ready',
-      );
-      if (hasAvail || hasReady) {
-        ctx.fillStyle = '#ffd100';
-        ctx.font = 'bold 15px Georgia';
-        ctx.strokeText(hasReady ? '?' : '!', mx, my);
-        ctx.fillText(hasReady ? '?' : '!', mx, my);
-      }
-    }
-    // player
-    if (p.pos.z >= zone.zMin && p.pos.z < zone.zMax && p.pos.x <= WORLD_MAX_X) {
-      const { mx, my } = toMap(p.pos.x, p.pos.z);
-      ctx.save();
-      ctx.translate(mx, my);
-      ctx.rotate(-p.facing); // matches the flipped map (see toMap)
-      ctx.fillStyle = '#fff';
-      ctx.beginPath();
-      ctx.moveTo(0, -7);
-      ctx.lineTo(5, 6);
-      ctx.lineTo(-5, 6);
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-      ctx.restore();
-    }
-    // friends (green) and guild members (blue), plotted anywhere in this zone
-    // from the live positions the server streams for online allies. socialInfo
-    // is null offline, so this is online-only.
-    const social = this.sim.socialInfo;
-    if (social) {
-      ctx.lineWidth = 3;
-      ctx.font = 'bold 11px Georgia';
-      ctx.textAlign = 'center';
-      const selfName = p.name;
-      const drawn = new Set<number>();
-      const plotAlly = (m: FriendInfo, color: string) => {
-        if (
-          !m.online ||
-          m.x === undefined ||
-          m.z === undefined ||
-          m.name === selfName ||
-          drawn.has(m.id)
-        )
-          return;
-        if (m.z < zone.zMin || m.z >= zone.zMax || m.x > WORLD_MAX_X) return;
-        drawn.add(m.id);
-        const { mx, my } = toMap(m.x, m.z);
-        ctx.fillStyle = color;
-        ctx.strokeStyle = '#000';
-        ctx.beginPath();
-        ctx.arc(mx, my, 4, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
-        ctx.fillStyle = color;
-        ctx.strokeText(m.name, mx, my - 8);
-        ctx.fillText(m.name, mx, my - 8);
-      };
-      for (const f of social.friends) plotAlly(f, '#4ade80'); // friends green (win ties)
-      if (social.guild) for (const m of social.guild.members) plotAlly(m, '#60a5fa');
-    }
-  }
-
-  // Buildings + vegetation overlay for the zoomed-in map, drawn from the same
-  // shared world data the renderer uses (PROPS + generateDecorations), so it
-  // matches the actual world. Only invoked at/above MAP_DETAIL_ZOOM.
-  private drawMapDetail(
-    ctx: CanvasRenderingContext2D,
-    region: { minX: number; maxX: number; minZ: number; maxZ: number },
-    toMap: (x: number, z: number) => { mx: number; my: number },
-  ): void {
-    const inView = (x: number, z: number) =>
-      x >= region.minX - 6 && x <= region.maxX + 6 && z >= region.minZ - 6 && z <= region.maxZ + 6;
-    // px per world unit (use the X axis; footprints stay roughly to scale)
-    const ppu =
-      ((toMap(region.minX + 1, region.minZ).mx - toMap(region.minX, region.minZ).mx) ** 2) ** 0.5;
-
-    // vegetation: pine/oak/rock scattered across the world (cached once)
-    if (!this.mapDecorations) this.mapDecorations = generateDecorations(this.sim.cfg.seed);
-    for (const d of this.mapDecorations) {
-      if (!inView(d.x, d.z)) continue;
-      const { mx, my } = toMap(d.x, d.z);
-      if (d.kind === 'rock') {
-        ctx.fillStyle = '#8c8b86';
-        ctx.beginPath();
-        ctx.arc(mx, my, Math.max(1.2, ppu * 0.5), 0, Math.PI * 2);
-        ctx.fill();
-      } else {
-        ctx.fillStyle = d.kind === 'tree' ? '#2f6b34' : '#4f8c3a'; // pine darker, oak lighter
-        const r = Math.max(1.6, ppu * 0.8);
-        ctx.beginPath();
-        ctx.arc(mx, my, r, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
-
-    // buildings: rotated footprints (house/inn brown, chapel stone)
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = '#1a140a';
-    for (const b of PROPS.buildings) {
-      if (!inView(b.x, b.z)) continue;
-      const c = Math.cos(b.rot),
-        s = Math.sin(b.rot);
-      const corner = (dx: number, dz: number) =>
-        toMap(b.x + dx * c - dz * s, b.z + dx * s + dz * c);
-      const p0 = corner(-b.w / 2, -b.d / 2),
-        p1 = corner(b.w / 2, -b.d / 2);
-      const p2 = corner(b.w / 2, b.d / 2),
-        p3 = corner(-b.w / 2, b.d / 2);
-      ctx.fillStyle = b.kind === 'chapel' ? '#9b9080' : b.kind === 'inn' ? '#8a6233' : '#7a5630';
-      ctx.beginPath();
-      ctx.moveTo(p0.mx, p0.my);
-      ctx.lineTo(p1.mx, p1.my);
-      ctx.lineTo(p2.mx, p2.my);
-      ctx.lineTo(p3.mx, p3.my);
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-    }
-
-    // smaller props as dots
-    const dot = (x: number, z: number, color: string, r = Math.max(1.8, ppu * 0.7)) => {
-      if (!inView(x, z)) return;
-      const { mx, my } = toMap(x, z);
-      ctx.fillStyle = color;
-      ctx.beginPath();
-      ctx.arc(mx, my, r, 0, Math.PI * 2);
-      ctx.fill();
-    };
-    for (const w of PROPS.wells) dot(w.x, w.z, '#5a7fa8');
-    for (const st of PROPS.stalls) dot(st.x, st.z, '#b07a3a');
-    for (const tn of PROPS.tents) dot(tn.x, tn.z, '#9a8a5a');
-    for (const m of PROPS.mines) dot(m.x, m.z, '#6a5a4a');
-    for (const g of PROPS.graveyards) dot(g.x, g.z, '#8a929c');
-    for (const [x, z] of PROPS.mudHuts) dot(x, z, '#7a6a4a');
-    for (const [x, z] of PROPS.campfires) dot(x, z, '#ff9a3c', Math.max(1.4, ppu * 0.5));
+    this.mapView = result.view;
+    if (!this.mapDrag) canvas.style.cursor = result.cursor;
+    this.setText(summaryEl, t('hud.core.mapSummary', { zone: zoneDisplayName(zone.id) }));
   }
 
   // -------------------------------------------------------------------------
@@ -5943,7 +5689,7 @@ export class Hud {
         const tgt = sim.entities.get(ev.targetId);
         if (!tgt) return;
         const tp = tgt.pos;
-        if (ev.kind === 'miss' || ev.kind === 'dodge') {
+        if (ev.kind === 'miss' || ev.kind === 'dodge' || ev.kind === 'resist') {
           this.combat('combat_dodge', tp.x, tp.y, tp.z, 0.5);
           return;
         }
@@ -6081,6 +5827,9 @@ export class Hud {
 
   handleEvents(events: SimEvent[]): void {
     const sim = this.sim;
+    // One spawn clock for the whole batch: FCT floaters spawned from this event burst
+    // share a bornAt, and the pooled painter's step() evicts each once now - bornAt >= ttl.
+    const now = performance.now();
     for (const ev of events) {
       // visual effects (swings, projectiles, glows) — for everyone nearby,
       // not just events involving this player
@@ -6096,21 +5845,47 @@ export class Hud {
           const isPlayerSource = ev.sourceId === sim.playerId;
           const isPlayerTarget = ev.targetId === sim.playerId;
           if (isPlayerSource || isPlayerTarget) this.lastCombatEventAt = performance.now();
-          if (ev.kind === 'miss' || ev.kind === 'dodge') {
-            this.fct(
-              tgt,
-              ev.kind === 'miss' ? t('hud.combat.floatingMiss') : t('hud.combat.floatingDodge'),
-              isPlayerTarget ? '#bbb' : '#fff',
-              false,
-            );
+          if (ev.kind === 'miss' || ev.kind === 'dodge' || ev.kind === 'resist') {
+            // self vs other (carried on the shape's isSelf) drives the avoidance colour
+            // token (#bbb vs #fff); the localized word stays at the call site. A resisted
+            // spell is an avoidance word like miss/dodge (classic fidelity: spells resist,
+            // not miss).
+            const shape = fctSpawnShape({
+              type: 'damage',
+              damageKind: ev.kind,
+              ability: false,
+              crit: false,
+              isPlayerSource,
+              isPlayerTarget,
+            });
+            if (shape)
+              this.fctPainter.spawn(
+                {
+                  ...shape,
+                  text:
+                    ev.kind === 'miss'
+                      ? t('hud.combat.floatingMiss')
+                      : ev.kind === 'dodge'
+                        ? t('hud.combat.floatingDodge')
+                        : t('hud.combat.floatingResist'),
+                  target: tgt,
+                },
+                now,
+              );
             // Fiesta: a dodge is a moment — pop a big exaggerated word for it.
             if (ev.kind === 'dodge' && (isPlayerSource || isPlayerTarget) && this.inFiesta()) {
               this.fiestaWordPop(t('fiesta.word.dodge'), '#7fd4ff', 1);
               this.renderer.addShake(0.15);
             }
             if (isPlayerSource) {
+              const logKey =
+                ev.kind === 'miss'
+                  ? 'hud.combat.miss'
+                  : ev.kind === 'dodge'
+                    ? 'hud.combat.dodged'
+                    : 'hud.combat.resisted';
               this.combatLog(
-                t(ev.kind === 'miss' ? 'hud.combat.miss' : 'hud.combat.dodged', {
+                t(logKey, {
                   ability: combatAbilityName(ev.ability),
                   target: entityDisplayName(tgt),
                 }),
@@ -6119,9 +5894,25 @@ export class Hud {
             }
             break;
           }
-          if (isPlayerSource && !isPlayerTarget) {
-            const color = ev.ability ? '#ffe97a' : '#fff';
-            this.fct(tgt, `${ev.amount}${ev.crit ? '!' : ''}`, color, ev.crit);
+          // A landed hit: the mapper resolves damage-done (player dealt to other) vs
+          // damage-taken (player took) vs null (a hit between two non-player entities, which
+          // floats nothing). The amount text + target entity stay at the call site.
+          const hitShape = fctSpawnShape({
+            type: 'damage',
+            damageKind: 'hit',
+            ability: !!ev.ability,
+            crit: ev.crit,
+            isPlayerSource,
+            isPlayerTarget,
+          });
+          if (
+            hitShape &&
+            (hitShape.kind === 'damage-done-ability' || hitShape.kind === 'damage-done-auto')
+          ) {
+            this.fctPainter.spawn(
+              { ...hitShape, text: `${ev.amount}${ev.crit ? '!' : ''}`, target: tgt },
+              now,
+            );
             this.combatLog(
               t(ev.crit ? 'hud.combat.damageDoneCrit' : 'hud.combat.damageDone', {
                 ability: combatAbilityName(ev.ability),
@@ -6130,12 +5921,12 @@ export class Hud {
               }),
               ev.ability ? '#ffe97a' : '#eee',
             );
-            // combat SFX (swing + material/school impact + crit) is spatial now —
+            // combat SFX (swing + material/school impact + crit) is spatial now;
             // see playEventSfx, which runs for every damage event above.
             // Fiesta: every blow you land kicks the camera (bigger on a crit).
             if (this.inFiesta()) this.renderer.addShake(ev.crit ? 0.3 : 0.12);
-          } else if (isPlayerTarget) {
-            this.fct(tgt, `-${ev.amount}`, '#ff5544', ev.crit);
+          } else if (hitShape && hitShape.kind === 'damage-taken') {
+            this.fctPainter.spawn({ ...hitShape, text: `-${ev.amount}`, target: tgt }, now);
             this.combatLog(
               t(ev.crit ? 'hud.combat.damageTakenCrit' : 'hud.combat.damageTaken', {
                 source: src ? entityDisplayName(src) : '?',
@@ -6152,7 +5943,13 @@ export class Hud {
           if (ev.amount > 0) {
             const healed =
               ev.targetId === sim.playerId ? sim.player : sim.entities.get(ev.targetId);
-            if (healed) this.fct(healed, `+${ev.amount}`, '#3ce63c', false);
+            const shape = fctSpawnShape({
+              type: 'heal',
+              crit: false,
+              isPlayerTarget: ev.targetId === sim.playerId,
+            });
+            if (healed && shape)
+              this.fctPainter.spawn({ ...shape, text: `+${ev.amount}`, target: healed }, now);
           }
           break;
         }
@@ -6163,14 +5960,27 @@ export class Hud {
           break;
         }
         case 'xp': {
-          this.fct(sim.player, t('hud.core.xpFloat', { amount: ev.amount }), '#b974ff', false);
-          if (ev.rested && ev.rested > 0) {
-            this.fct(
-              sim.player,
-              t('hud.core.xpFloatRested', { amount: ev.rested }),
-              '#4a9eff',
-              false,
+          const xpShape = fctSpawnShape({ type: 'xp' });
+          if (xpShape)
+            this.fctPainter.spawn(
+              {
+                ...xpShape,
+                text: t('hud.core.xpFloat', { amount: ev.amount }),
+                target: sim.player,
+              },
+              now,
             );
+          if (ev.rested && ev.rested > 0) {
+            const restedShape = fctSpawnShape({ type: 'rested-xp' });
+            if (restedShape)
+              this.fctPainter.spawn(
+                {
+                  ...restedShape,
+                  text: t('hud.core.xpFloatRested', { amount: ev.rested }),
+                  target: sim.player,
+                },
+                now,
+              );
             this.log(
               t('hud.core.xpGainRested', { amount: ev.amount, rested: ev.rested }),
               '#a980d8',
@@ -6194,8 +6004,13 @@ export class Hud {
         }
         case 'virtualLevelUp': {
           // cosmetic post-cap "level up" — reuses the levelup banner + sound
-          this.showBanner(`${t('game.progression.virtualLevelUp')} ${ev.level}!`);
-          this.log(`${t('game.progression.virtualLevelUp')} ${ev.level}!`, '#ffd100');
+          this.showBanner(
+            `${t('game.progression.virtualLevelUp')} ${formatNumber(ev.level, { maximumFractionDigits: 0 })}!`,
+          );
+          this.log(
+            `${t('game.progression.virtualLevelUp')} ${formatNumber(ev.level, { maximumFractionDigits: 0 })}!`,
+            '#ffd100',
+          );
           audio.levelUp();
           break;
         }
@@ -6212,7 +6027,12 @@ export class Hud {
           break;
         case 'loot': {
           this.log(this.localizeLootText(ev.text), '#7fdc4f');
-          if (/ wins .+ \(\d+\)$/.test(ev.text) || /^Everyone passed on .+\.$/.test(ev.text))
+          if (
+            / wins .+ \(\d+\)$/.test(ev.text) ||
+            /^Everyone passed on .+\.$/.test(ev.text) ||
+            / assigned .+ to .+\.$/.test(ev.text) ||
+            /^.+ was not assigned and is free for all\.$/.test(ev.text)
+          )
             this.closeLootRollsForItem(ev.text);
           if (
             ev.text.includes('loot') ||
@@ -6226,6 +6046,10 @@ export class Hud {
         }
         case 'lootRoll': {
           this.showLootRoll(ev);
+          break;
+        }
+        case 'masterLoot': {
+          this.showMasterLoot(ev);
           break;
         }
         case 'vendor': {
@@ -6419,7 +6243,16 @@ export class Hud {
         case 'heal2': {
           const tgt = sim.entities.get(ev.targetId);
           if (tgt && ev.amount > 0) {
-            this.fct(tgt, `+${ev.amount}${ev.crit ? '!' : ''}`, '#3ce63c', ev.crit);
+            const shape = fctSpawnShape({
+              type: 'heal',
+              crit: ev.crit,
+              isPlayerTarget: ev.targetId === sim.playerId,
+            });
+            if (shape)
+              this.fctPainter.spawn(
+                { ...shape, text: `+${ev.amount}${ev.crit ? '!' : ''}`, target: tgt },
+                now,
+              );
             if (ev.sourceId === sim.playerId) {
               const selfTarget = ev.targetId === sim.playerId;
               this.combatLog(
@@ -6841,8 +6674,13 @@ export class Hud {
       this.appendChatMessageBody(div, text, fromPid);
     }
     this.chatLogEl.appendChild(div);
-    while (this.chatLogEl.children.length > 200)
-      this.chatLogEl.removeChild(this.chatLogEl.firstChild!);
+    // Announce the player-chat line through the tab-independent #chat-live region.
+    this.announceChatLine(div);
+    while (this.chatLogEl.children.length > 200) {
+      const first = this.chatLogEl.firstChild;
+      if (!first) break;
+      this.chatLogEl.removeChild(first);
+    }
     if (wasNearBottom) this.chatLogEl.scrollTop = this.chatLogEl.scrollHeight;
   }
 
@@ -6943,6 +6781,7 @@ export class Hud {
       'No one has whispered you recently.': 'hud.errors.noRecentWhisper',
       'You mutter to yourself. Nobody hears it.': 'hud.errors.whisperSelf',
       'You are not in a party.': 'hud.errors.notInParty',
+      'Only the party leader can change the loot method.': 'hudChrome.masterLoot.leaderOnly',
       'Only the party leader may invite.': 'hud.errors.partyLeaderInvite',
       'Your party is full.': 'hud.errors.partyFull',
       'That party is full.': 'hud.errors.partyFull',
@@ -7071,6 +6910,7 @@ export class Hud {
       'Trade window opened.': 'hud.logs.tradeOpened',
       'Trade complete.': 'hud.logs.tradeComplete',
       'Trade cancelled.': 'hud.logs.tradeCancelled',
+      'Loot method set to group loot.': 'hudChrome.masterLoot.methodGroup',
     };
     const key = exact[text];
     if (key) return t(key);
@@ -7083,7 +6923,9 @@ export class Hud {
       if (text === delve.leaveText) return delveText(delve.id, 'leaveText');
     }
 
-    let match = /^You have invited (.+) to your party\.$/.exec(text);
+    let match = /^Loot method set to master loot\. Master looter: (.+)\.$/.exec(text);
+    if (match) return t('hudChrome.masterLoot.methodMaster', { name: match[1] });
+    match = /^You have invited (.+) to your party\.$/.exec(text);
     if (match) return t('hud.logs.partyInviteSent', { name: match[1] });
     match = /^(.+) joins the party\.$/.exec(text);
     if (match) return t('hud.logs.partyJoin', { name: match[1] });
@@ -7170,6 +7012,16 @@ export class Hud {
         money: this.localizeSimMoney(match[2]),
       });
     }
+    match = /^(.+) assigned (.+) to (.+)\.$/.exec(text);
+    if (match)
+      return t('hudChrome.masterLoot.assigned', {
+        looter: match[1],
+        item: itemDisplayNameFromSource(match[2]),
+        target: match[3],
+      });
+    match = /^(.+) was not assigned and is free for all\.$/.exec(text);
+    if (match)
+      return t('hudChrome.masterLoot.unassigned', { item: itemDisplayNameFromSource(match[1]) });
     match = /^Sold (.+) for (.+)\.$/.exec(text);
     if (match)
       return t('hud.logs.soldItem', {
@@ -7225,6 +7077,23 @@ export class Hud {
 
   private combatLog(text: string, color = '#ccc'): void {
     this.appendLog(this.combatLogEl, text, color);
+    // Mirror the combat line to the off-screen polite live region, throttled so a
+    // damage burst does not flood the screen reader (see ./combat_announcer). The
+    // text is already a t()-localized line, so nothing new is concatenated here.
+    this.combatAnnouncer.push(text, performance.now());
+  }
+
+  // Announce a chat line that reached the visible #chatlog pane through the tab-independent
+  // #chat-live region, mirroring what the old #chatlog aria-live spoke: a
+  // channel-filtered line is .chat-hidden (display:none) and stays silent, exactly as a
+  // display:none live-region child did. The relayed text is the rendered line text the
+  // screen reader read off the div (sender + message, already localized); ChatAnnouncer
+  // coalesces + throttles a burst. Both chat append paths (appendLog's chat case and
+  // chatLogFrom) call this so player chat and system chat announce alike, as #chatlog's
+  // implicit-polite log did before the decouple.
+  private announceChatLine(div: HTMLElement): void {
+    if (div.classList.contains('chat-hidden')) return;
+    this.chatAnnouncer.push(div.textContent ?? '', performance.now());
   }
 
   private appendLog(
@@ -7245,34 +7114,32 @@ export class Hud {
     }
     div.append(document.createTextNode(text));
     el.appendChild(div);
-    while (el.children.length > 200) el.removeChild(el.firstChild!);
+    // Announce chat-pane lines through #chat-live (the combat pane has its own announcer).
+    if (el === this.chatLogEl) this.announceChatLine(div);
+    while (el.children.length > 200) {
+      const first = el.firstChild;
+      if (!first) break;
+      el.removeChild(first);
+    }
     if (wasNearBottom) el.scrollTop = el.scrollHeight;
   }
 
-  // A floating note over the local player (e.g. "Can't move!" when a movement
-  // command lands while rooted/stunned). Throttling is the caller's job.
-  showSelfNote(text: string, color = '#ff8c66'): void {
-    this.fct(this.sim.player, text, color, false);
-  }
-
-  private fct(target: Entity, text: string, color: string, crit: boolean): void {
-    const v = this.renderer.worldToScreen(
-      target.pos.x,
-      target.pos.y + 2.2 * target.scale,
-      target.pos.z,
-    );
-    if (v.behind) return;
-    const el = document.createElement('div');
-    el.className = `fct${crit ? ' crit' : ''}`;
-    el.style.color = color;
-    // worldToScreen() is in the unzoomed renderer viewport, but #ui (this node's
-    // parent) is scaled by `zoom`, so divide into author space before writing.
-    const z = getUiScale();
-    el.style.left = `${(v.x + (Math.random() * 30 - 15)) / z}px`;
-    el.style.top = `${v.y / z}px`;
-    el.textContent = text;
-    document.getElementById('ui')?.appendChild(el);
-    setTimeout(() => el.remove(), 1250);
+  // A floating note over the local player (e.g. "Can't move!" when a movement command
+  // lands while rooted/stunned). The 8th FCT spawn site: it rides the same pooled painter
+  // as the combat floaters via the self-note kind (the #ff8c66 colour token). Throttling
+  // is the caller's job (main.ts gates it behind IMMOBILE_NOTE_THROTTLE_MS).
+  showSelfNote(text: string): void {
+    const shape = fctSpawnShape({ type: 'self-note' });
+    if (shape)
+      this.fctPainter.spawn({ ...shape, text, target: this.sim.player }, performance.now());
+    // Also route the self-note into the polite #combat-live region: the
+    // self-note is the one FCT-only event with NO combat-log line, so without this it would
+    // never be announced. The text is already t()-localized (e.g. "Can't move!") so nothing
+    // new is built here, and the announcer coalesces + throttles so it never streams raw
+    // per-damage text. (The xp / rested-xp floats are NOT routed here: those events already
+    // emit a textual chat line via log(), so the #chat-live region announces them; adding the
+    // float too would double-announce, which the announce contract forbids.)
+    this.combatAnnouncer.push(text, performance.now());
   }
 
   showError(text: string): void {
@@ -7311,7 +7178,7 @@ export class Hud {
   // -------------------------------------------------------------------------
 
   setFiestaPracticeHook(fn: (() => void) | null): void {
-    this.fiestaPracticeHook = fn;
+    this.arenaWindow.setPracticeHook(fn);
   }
 
   private inFiesta(): boolean {
@@ -7429,7 +7296,8 @@ export class Hud {
 
   // A burst of CSS confetti raining down the screen in a team colour.
   private fiestaConfetti(color: string): void {
-    const ui = document.getElementById('ui')!;
+    const ui = document.getElementById('ui');
+    if (!ui) return;
     const layer = document.createElement('div');
     layer.className = 'fiesta-confetti';
     const tints = [color, '#ffffff', '#ffd24a'];
@@ -7482,7 +7350,8 @@ export class Hud {
     const tierLabel = esc(t(`fiesta.tier.${offer.tier}` as TranslationKey));
     el.innerHTML = `<div class="fa-head">${esc(t('fiesta.augment.choose'))} <span class="fa-tier ${offer.tier}">${tierLabel}</span></div>
       <div class="fa-cards"></div>`;
-    const cards = el.querySelector('.fa-cards')!;
+    const cards = el.querySelector('.fa-cards');
+    if (!cards) return;
     for (const id of offer.choices) {
       const cat = augmentCategory(id);
       const card = document.createElement('button');
@@ -7598,7 +7467,7 @@ export class Hud {
     if (npc?.kind !== 'npc') return;
     this.questDialogOpenedAtMs = performance.now();
     if ($('#quest-dialog').style.display !== 'block')
-      this.questDialogReturnFocus = this.currentFocusableElement();
+      this.questDialogTrap = this.focusManager.open({ root: () => $('#quest-dialog') });
     this.closeOtherWindows('#quest-dialog');
     // Voice the greeting only on the initial open — renderGossip also runs when
     // navigating back from a quest detail or after accept/turn-in, where a
@@ -7632,10 +7501,7 @@ export class Hud {
         ),
       )
       .map((qp) => qp.questId);
-    el.setAttribute('role', 'dialog');
-    el.setAttribute('aria-modal', 'false');
-    el.setAttribute('aria-labelledby', 'quest-dialog-title');
-    el.setAttribute('tabindex', '-1');
+    markDialogRoot(el, { labelledBy: 'quest-dialog-title' });
     const npcName = def ? npcDisplayName(npc.templateId) : mobDisplayName(npc.templateId);
     const npcTitle = def ? npcDisplayTitle(def.id) : '';
     let html = `<div class="panel-title"><span id="quest-dialog-title">${esc(npcName)}<span class="quest-muted"> &lt;${esc(npcTitle)}&gt;</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>`;
@@ -7671,12 +7537,11 @@ export class Hud {
     el.innerHTML = html;
     el.querySelectorAll('[data-quest]').forEach((item) => {
       item.addEventListener('click', () =>
-        this.renderQuestDetail(npc, (item as HTMLElement).dataset.quest!),
+        this.renderQuestDetail(npc, (item as HTMLElement).dataset.quest ?? ''),
       );
     });
     el.querySelectorAll('[data-discuss]').forEach((item) => {
       item.addEventListener('click', () => {
-        const _questId = (item as HTMLElement).dataset.discuss!;
         this.sim.targetEntity(npc.id);
         this.sim.interact();
         (item as HTMLButtonElement).disabled = true;
@@ -7696,7 +7561,7 @@ export class Hud {
     });
     el.querySelector('[data-close]')?.addEventListener('click', () => this.closeQuestDialog());
     el.style.display = 'block';
-    this.focusFirstInteractive(el);
+    this.questDialogTrap?.focusFirst();
   }
 
   private renderQuestDetail(npc: Entity, questId: string): void {
@@ -7710,10 +7575,7 @@ export class Hud {
       this.sim.player.name,
     );
     voice.play(state === 'ready' ? `quest__${questId}__complete` : `quest__${questId}__offer`);
-    el.setAttribute('role', 'dialog');
-    el.setAttribute('aria-modal', 'false');
-    el.setAttribute('aria-labelledby', 'quest-dialog-title');
-    el.setAttribute('tabindex', '-1');
+    markDialogRoot(el, { labelledBy: 'quest-dialog-title' });
     let html = `<div class="panel-title"><span id="quest-dialog-title">${esc(questTitle(questId))}${this.questSuggestedPlayersHtml(quest.suggestedPlayers)}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>`;
     if (state === 'available' && quest.minLevel) {
       html += `<div class="qd-req">${esc(t('questUi.detail.requiresLevel', { level: this.questNumber(quest.minLevel) }))}</div>`;
@@ -7776,7 +7638,7 @@ export class Hud {
     el.appendChild(back);
     el.querySelector('[data-close]')?.addEventListener('click', () => this.closeQuestDialog());
     el.style.display = 'block';
-    this.focusFirstInteractive(el);
+    this.questDialogTrap?.focusFirst();
   }
 
   // Open the read-only quest detail for a chat-link click. Shows Accept only when the
@@ -7787,17 +7649,14 @@ export class Hud {
     if (!quest) return;
     this.openGossipNpcId = null;
     if ($('#quest-dialog').style.display !== 'block')
-      this.questDialogReturnFocus = this.currentFocusableElement();
+      this.questDialogTrap = this.focusManager.open({ root: () => $('#quest-dialog') });
     this.closeOtherWindows('#quest-dialog');
     const el = $('#quest-dialog');
     const state = this.sim.questState(questId);
     const inSharerParty =
       fromPid !== undefined &&
       (this.sim.partyInfo?.members.some((m) => m.pid === fromPid) ?? false);
-    el.setAttribute('role', 'dialog');
-    el.setAttribute('aria-modal', 'false');
-    el.setAttribute('aria-labelledby', 'quest-dialog-title');
-    el.setAttribute('tabindex', '-1');
+    markDialogRoot(el, { labelledBy: 'quest-dialog-title' });
     let html = `<div class="panel-title"><span id="quest-dialog-title">${esc(questTitle(questId))}${this.questSuggestedPlayersHtml(quest.suggestedPlayers)} <span class="quest-muted">&lt;${esc(t('hudChrome.questShare.dialogTitle'))}&gt;</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>`;
     if (quest.minLevel)
       html += `<div class="qd-req">${esc(t('questUi.detail.requiresLevel', { level: this.questNumber(quest.minLevel) }))}</div>`;
@@ -7826,7 +7685,8 @@ export class Hud {
       btn.type = 'button';
       btn.textContent = t('questUi.dialog.accept');
       btn.addEventListener('click', () => {
-        this.sim.acceptLinkedQuest(questId, fromPid!);
+        if (fromPid === undefined) return;
+        this.sim.acceptLinkedQuest(questId, fromPid);
         this.closeQuestDialog();
       });
       el.appendChild(btn);
@@ -7846,7 +7706,7 @@ export class Hud {
     }
     el.querySelector('[data-close]')?.addEventListener('click', () => this.closeQuestDialog());
     el.style.display = 'block';
-    this.focusFirstInteractive(el);
+    this.questDialogTrap?.focusFirst();
   }
 
   private renderQuestDiscussion(npc: Entity, questId: string, page: number): void {
@@ -7856,10 +7716,7 @@ export class Hud {
       questNarrative(questId, 'completion', this.sim.player.name),
     ];
     const clampedPage = Math.max(0, Math.min(page, pages.length - 1));
-    el.setAttribute('role', 'dialog');
-    el.setAttribute('aria-modal', 'false');
-    el.setAttribute('aria-labelledby', 'quest-dialog-title');
-    el.setAttribute('tabindex', '-1');
+    markDialogRoot(el, { labelledBy: 'quest-dialog-title' });
     el.innerHTML =
       `<div class="panel-title"><span id="quest-dialog-title">${esc(questTitle(questId))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>` +
       `<div class="qd-text">${esc(pages[clampedPage])}</div>`;
@@ -7888,7 +7745,7 @@ export class Hud {
     el.appendChild(back);
     el.querySelector('[data-close]')?.addEventListener('click', () => this.closeQuestDialog());
     el.style.display = 'block';
-    this.focusFirstInteractive(el);
+    this.questDialogTrap?.focusFirst();
   }
 
   closeQuestDialog(restoreFocus = true): void {
@@ -7896,9 +7753,8 @@ export class Hud {
     this.openGossipNpcId = null;
     this.openQuestDetailId = null;
     this.hideTooltip();
-    const target = this.questDialogReturnFocus;
-    this.questDialogReturnFocus = null;
-    if (restoreFocus) this.restoreFocus(target);
+    this.questDialogTrap?.release(restoreFocus);
+    this.questDialogTrap = null;
   }
 
   // Re-render the open gossip dialog after quest state changes so completed
@@ -7928,10 +7784,13 @@ export class Hud {
   }
 
   private showLootRoll(ev: Extract<SimEvent, { type: 'lootRoll' }>): void {
+    // A master-loot prompt that converts to a need/greed roll reuses the same rollId;
+    // drop the superseded master panel so the looter sees only the need/greed panel.
+    this.activeMasterRolls.delete(ev.rollId);
     this.activeLootRolls.set(ev.rollId, {
       event: ev,
       receivedAt: performance.now(),
-      durationMs: 30_000,
+      durationMs: 60_000,
     });
     this.renderLootRolls();
   }
@@ -7948,7 +7807,7 @@ export class Hud {
   // both RE-SHOWS an open roll whose event was missed (reconnect, interest
   // churn, a dropped snapshot) and RETIRES a shown roll the server has since
   // resolved (the mirror drops it to []), so a stale dead-button prompt no
-  // longer lingers until the 30s local timer. The three-way decision lives in
+  // longer lingers until the local timer. The three-way decision lives in
   // the pure computeLootRollReconcile; here we apply it to the live DOM state.
   private reconcileLootRolls(): void {
     const open = this.sim.activeLootRolls();
@@ -7982,15 +7841,30 @@ export class Hud {
       this.activeLootRolls.set(id, {
         event: { type: 'lootRoll', ...p },
         receivedAt: performance.now(),
-        durationMs: 30_000,
+        durationMs: 60_000,
       });
       changed = true;
     }
     if (changed) this.renderLootRolls();
   }
 
+  private showMasterLoot(ev: Extract<SimEvent, { type: 'masterLoot' }>): void {
+    this.activeMasterRolls.set(ev.rollId, {
+      event: ev,
+      receivedAt: performance.now(),
+      durationMs: 60_000,
+    });
+    this.renderLootRolls();
+  }
+
+  private assignMasterLoot(rollId: number, targetPids: number[]): void {
+    this.sim.assignMasterLoot(rollId, targetPids);
+    this.activeMasterRolls.delete(rollId);
+    this.renderLootRolls();
+  }
+
   private updateLootRollTimers(now: number): void {
-    if (this.activeLootRolls.size === 0) return;
+    if (this.activeLootRolls.size === 0 && this.activeMasterRolls.size === 0) return;
     let changed = false;
     for (const [rollId, roll] of this.activeLootRolls) {
       if (now - roll.receivedAt >= roll.durationMs) {
@@ -7999,12 +7873,20 @@ export class Hud {
         changed = true;
       }
     }
+    for (const [rollId, roll] of this.activeMasterRolls) {
+      if (now - roll.receivedAt >= roll.durationMs) {
+        this.activeMasterRolls.delete(rollId);
+        changed = true;
+      }
+    }
     if (changed) this.renderLootRolls();
     const root = document.getElementById('loot-rolls');
     if (!root) return;
     for (const row of root.querySelectorAll<HTMLElement>('.loot-roll')) {
       const rollId = Number(row.dataset.rollId);
-      const roll = this.activeLootRolls.get(rollId);
+      const roll = row.dataset.master
+        ? this.activeMasterRolls.get(rollId)
+        : this.activeLootRolls.get(rollId);
       if (!roll) continue;
       const remaining = Math.max(0, 1 - (now - roll.receivedAt) / roll.durationMs);
       row.style.setProperty('--loot-roll-frac', remaining.toFixed(3));
@@ -8012,23 +7894,32 @@ export class Hud {
   }
 
   private closeLootRollsForItem(text: string): void {
-    const match = /^.+ wins (.+) \(\d+\)$/.exec(text) ?? /^Everyone passed on (.+)\.$/.exec(text);
+    const match =
+      /^.+ wins (.+) \(\d+\)$/.exec(text) ??
+      /^Everyone passed on (.+)\.$/.exec(text) ??
+      /^.+ assigned (.+) to .+\.$/.exec(text) ??
+      /^(.+) was not assigned and is free for all\.$/.exec(text);
     if (!match) return;
     for (const [rollId, roll] of this.activeLootRolls) {
       if (roll.event.itemName === match[1]) this.activeLootRolls.delete(rollId);
+    }
+    for (const [rollId, roll] of this.activeMasterRolls) {
+      if (roll.event.itemName === match[1]) this.activeMasterRolls.delete(rollId);
     }
     this.renderLootRolls();
   }
 
   private renderLootRolls(): void {
     const root = this.lootRollRoot();
-    if (this.activeLootRolls.size === 0) {
+    if (this.activeLootRolls.size === 0 && this.activeMasterRolls.size === 0) {
       root.style.display = 'none';
       root.innerHTML = '';
       return;
     }
     root.style.display = 'flex';
     root.innerHTML = '';
+    for (const [rollId, roll] of this.activeMasterRolls)
+      this.renderMasterLootRow(root, rollId, roll.event);
     for (const [rollId, roll] of this.activeLootRolls) {
       const ev = roll.event;
       const item = ITEMS[ev.itemId];
@@ -8065,6 +7956,66 @@ export class Hud {
     }
   }
 
+  private renderMasterLootRow(
+    root: HTMLElement,
+    rollId: number,
+    ev: Extract<SimEvent, { type: 'masterLoot' }>,
+  ): void {
+    const item = ITEMS[ev.itemId];
+    const itemName = item ? itemDisplayName(item) : ev.itemName;
+    const quality = item?.quality ?? ev.quality ?? 'common';
+    const row = document.createElement('div');
+    row.className = 'loot-roll panel master';
+    row.dataset.rollId = String(rollId);
+    row.dataset.master = '1';
+    row.style.setProperty('--loot-roll-frac', '1');
+    const picks = ev.candidates
+      .map(
+        (c) =>
+          `<label><input type="checkbox" class="ml-pick" value="${c.pid}"><span>${esc(c.name)}</span></label>`,
+      )
+      .join('');
+    row.innerHTML = `
+      <div class="loot-roll-item">
+        ${item ? this.itemIcon(item) : `<img class="item-icon q-${quality}" src="${iconDataUrl('item', ev.itemId)}" alt="" draggable="false">`}
+        <div class="loot-roll-copy">
+          <div class="loot-roll-title">${esc(t('hudChrome.masterLoot.assignPrompt', { item: itemName }))}</div>
+          <div class="loot-roll-name" style="color:${QUALITY_COLOR[quality] ?? '#fff'}">${esc(itemName)}</div>
+        </div>
+      </div>
+      <div class="loot-roll-timer" aria-hidden="true"><span></span></div>
+      <div class="master-loot-picks">
+        <label class="ml-all-row"><input type="checkbox" class="ml-all"><span>${esc(t('hudChrome.masterLoot.selectAll'))}</span></label>
+        ${picks}
+      </div>
+      <div class="loot-roll-actions"><button type="button" class="loot-roll-btn assign ml-roll" disabled>${esc(t('hudChrome.masterLoot.rollButton'))}</button></div>`;
+    if (item)
+      this.attachTooltip(row.querySelector('.loot-roll-item') as HTMLElement, () =>
+        this.itemTooltip(item),
+      );
+    // Curate-then-roll: the looter checks a subset and presses Roll. One checked
+    // member is granted directly server-side; two or more open a need/greed roll for
+    // just that subset. The select-all header mirrors / drives the per-member boxes.
+    const all = row.querySelector<HTMLInputElement>('.ml-all')!;
+    const pickEls = [...row.querySelectorAll<HTMLInputElement>('.ml-pick')];
+    const rollBtn = row.querySelector<HTMLButtonElement>('.ml-roll')!;
+    const syncRoll = (): void => {
+      const checked = pickEls.filter((p) => p.checked).length;
+      rollBtn.disabled = checked === 0;
+      all.checked = pickEls.length > 0 && checked === pickEls.length;
+    };
+    all.addEventListener('change', () => {
+      for (const p of pickEls) p.checked = all.checked;
+      syncRoll();
+    });
+    for (const p of pickEls) p.addEventListener('change', syncRoll);
+    rollBtn.addEventListener('click', () => {
+      const pids = pickEls.filter((p) => p.checked).map((p) => Number(p.value));
+      if (pids.length > 0) this.assignMasterLoot(rollId, pids);
+    });
+    root.appendChild(row);
+  }
+
   openLoot(mobId: number, screenX: number, screenY: number): void {
     const mob = this.sim.entities.get(mobId);
     if (!mob?.loot) return;
@@ -8082,11 +8033,11 @@ export class Hud {
     }
     for (const s of visibleItems) {
       const item = ITEMS[s.itemId];
-      html += `<div class="loot-item" data-item="${s.itemId}">${this.itemIcon(item)}<span style="font-size:12px">${esc(itemDisplayName(item))}${s.count > 1 ? ` x${s.count}` : ''}</span></div>`;
+      html += `<div class="loot-item" data-item="${s.itemId}">${this.itemIcon(item)}<span style="font-size:12px">${esc(itemDisplayName(item))}${s.count > 1 ? ` ${esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) }))}` : ''}</span></div>`;
     }
     el.innerHTML = html;
     el.querySelectorAll('[data-item]').forEach((row) => {
-      const itemId = (row as HTMLElement).dataset.item!;
+      const itemId = (row as HTMLElement).dataset.item ?? '';
       this.attachTooltip(row as HTMLElement, () => this.itemTooltip(ITEMS[itemId]));
     });
     const btn = document.createElement('button');
@@ -8151,10 +8102,7 @@ export class Hud {
       entityDisplayName(npc),
       buildVendorView(npc.vendorItems, this.sim.vendorBuyback, ITEMS),
       {
-        itemIcon: (item) => this.itemIcon(item),
-        moneyHtml: (copper) => this.moneyHtml(copper),
-        itemTooltip: (item) => this.itemTooltip(item),
-        attachTooltip: (el, html) => this.attachTooltip(el, html),
+        ...this.presentationBag,
         hideTooltip: () => this.hideTooltip(),
         onBuy: (itemId) => buyAndRefresh(() => this.sim.buyItem(npc.id, itemId)),
         onBuyBack: (itemId) => buyAndRefresh(() => this.sim.buyBackItem(itemId)),
@@ -8176,7 +8124,13 @@ export class Hud {
     document.body.classList.remove('vendor-open'); // bags (if still open) re-centres
     this.hideTooltip();
     if (closeMobileBags) {
-      $('#bags').style.display = 'none';
+      // Mirror BagsWindow.close()'s teardown backstop: a discard/sell prompt may hold
+      // #bags inert (installPromptDialog) and this mobile path hides the grid without
+      // running the prompt's dismiss(), so clear inert here too or the next open shows a
+      // dead grid (invariant: a hidden #bags is never inert).
+      const bags = $('#bags');
+      bags.style.display = 'none';
+      bags.inert = false;
       this.cancelPetFeed();
     } else if ($('#bags').style.display !== 'none') {
       this.renderBags();
@@ -8192,36 +8146,15 @@ export class Hud {
   // -------------------------------------------------------------------------
 
   openMarket(): void {
-    this.closeOtherWindows('#market-window');
-    this.marketOpen = true;
-    this.marketTab = 'browse';
-    this.marketItemTypeFilter = 'all';
-    this.marketSubtypeFilter = 'all';
-    this.marketRarityFilter = 'all';
-    this.marketBrowsePage = 0;
-    this.marketSellItem = null;
-    this.marketSearchQuery = '';
-    this.sim.marketSearch('');
-    this.lastMarketSig = '';
-    this.renderMarket();
-    $('#market-window').style.display = 'flex';
-    // bags ride alongside so you can click items straight onto the Sell tab
-    this.renderBags();
-    $('#bags').style.display = 'flex';
-    audio.bagOpen();
+    this.marketWindow.open();
   }
 
   closeMarket(): void {
-    if (!this.marketOpen) return;
-    this.marketOpen = false;
-    this.marketSellItem = null;
-    $('#market-window').style.display = 'none';
-    this.hideTooltip();
-    if ($('#bags').style.display !== 'none') this.renderBags();
+    this.marketWindow.close();
   }
 
   get marketWindowOpen(): boolean {
-    return this.marketOpen;
+    return this.marketWindow.isOpen;
   }
 
   private nearbyMarketNpc(): Entity | null {
@@ -8230,480 +8163,6 @@ export class Hud {
       if (e.kind === 'npc' && NPCS[e.templateId]?.market && dist2d(p.pos, e.pos) <= 8) return e;
     }
     return null;
-  }
-
-  private bagCount(itemId: string): number {
-    return this.sim.inventory.filter((s) => s.itemId === itemId).reduce((n, s) => n + s.count, 0);
-  }
-
-  private marketItemTypeLabelKey(filter: MarketItemTypeFilter): TranslationKey {
-    if (filter === 'weapon') return 'itemUi.market.filterTypeWeapon';
-    if (filter === 'armor') return 'itemUi.market.filterTypeArmor';
-    if (filter === 'consumable') return 'itemUi.market.filterTypeConsumable';
-    if (filter === 'material') return 'itemUi.market.filterTypeMaterial';
-    if (filter === 'cosmetic') return 'itemUi.market.filterTypeCosmetic';
-    if (filter === 'other') return 'itemUi.market.filterTypeOther';
-    return 'itemUi.market.filterTypeAll';
-  }
-
-  private marketRarityLabelKey(filter: MarketRarityFilter): TranslationKey {
-    if (filter === 'poor') return 'itemUi.market.rarityPoor';
-    if (filter === 'common') return 'itemUi.market.rarityCommon';
-    if (filter === 'uncommon') return 'itemUi.market.rarityUncommon';
-    if (filter === 'rare') return 'itemUi.market.rarityRare';
-    if (filter === 'epic') return 'itemUi.market.rarityEpic';
-    return 'itemUi.market.filterRarityAll';
-  }
-
-  private marketSubtypeOptions(): readonly MarketSubtypeFilter[] {
-    if (this.marketItemTypeFilter === 'armor') return MARKET_ARMOR_TYPE_FILTERS;
-    if (this.marketItemTypeFilter === 'weapon') return MARKET_WEAPON_TYPE_FILTERS;
-    return ['all'];
-  }
-
-  private marketSubtypeLabel(): string {
-    return t(
-      this.marketItemTypeFilter === 'armor'
-        ? 'itemUi.market.filterArmorType'
-        : 'itemUi.market.filterWeaponType',
-    );
-  }
-
-  private marketSubtypeOptionLabel(filter: MarketSubtypeFilter): string {
-    if (filter === 'all')
-      return t(
-        this.marketItemTypeFilter === 'armor'
-          ? 'itemUi.market.filterArmorAll'
-          : 'itemUi.market.filterWeaponAll',
-      );
-    if (this.marketItemTypeFilter === 'armor') return itemSlotName(filter as EquipSlot);
-    if (filter === 'sword') return t('itemUi.market.weaponSword');
-    if (filter === 'dagger') return t('itemUi.market.weaponDagger');
-    if (filter === 'staff') return t('itemUi.market.weaponStaff');
-    if (filter === 'mace') return t('itemUi.market.weaponMace');
-    if (filter === 'axe') return t('itemUi.market.weaponAxe');
-    return t('itemUi.market.weaponOther');
-  }
-
-  private renderMarketFilterMenu(
-    menu: 'itemType' | 'subtype' | 'rarity',
-    label: string,
-    value: string,
-    options: readonly string[],
-    optionLabel: (option: string) => string,
-  ): string {
-    const current = optionLabel(value);
-    const optionHtml = options
-      .map((option) => {
-        const selected = option === value;
-        return `<button type="button" class="mkt-select-option${selected ? ' sel' : ''}" role="option" aria-selected="${selected ? 'true' : 'false'}" data-market-filter-option="${option}">${esc(optionLabel(option))}</button>`;
-      })
-      .join('');
-    return (
-      `<div class="mkt-filter"><span>${esc(label)}</span><div class="mkt-select" data-market-filter-menu="${menu}">` +
-      `<button type="button" class="mkt-select-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="${esc(`${label}: ${current}`)}"><span>${esc(current)}</span><span class="mkt-select-chevron" aria-hidden="true"></span></button>` +
-      `<div class="mkt-select-menu" role="listbox" hidden>${optionHtml}</div>` +
-      `</div></div>`
-    );
-  }
-
-  private renderMarketFilters(): string {
-    if (this.marketTab !== 'browse') return '';
-    const hasSubtype =
-      this.marketItemTypeFilter === 'armor' || this.marketItemTypeFilter === 'weapon';
-    return (
-      `<div class="mkt-filters${hasSubtype ? ' has-subtype' : ''}" role="group" aria-label="${esc(t('itemUi.market.filters'))}">` +
-      this.renderMarketFilterMenu(
-        'itemType',
-        t('itemUi.market.filterType'),
-        this.marketItemTypeFilter,
-        MARKET_ITEM_TYPE_FILTERS,
-        (filter) => t(this.marketItemTypeLabelKey(filter as MarketItemTypeFilter)),
-      ) +
-      (hasSubtype
-        ? this.renderMarketFilterMenu(
-            'subtype',
-            this.marketSubtypeLabel(),
-            this.marketSubtypeFilter,
-            this.marketSubtypeOptions(),
-            (filter) => this.marketSubtypeOptionLabel(filter as MarketSubtypeFilter),
-          )
-        : '') +
-      this.renderMarketFilterMenu(
-        'rarity',
-        t('itemUi.market.filterRarity'),
-        this.marketRarityFilter,
-        MARKET_RARITY_FILTERS,
-        (filter) => t(this.marketRarityLabelKey(filter as MarketRarityFilter)),
-      ) +
-      `</div>`
-    );
-  }
-
-  private renderMarket(): void {
-    const el = $('#market-window');
-    this.hideTooltip();
-    const info = this.sim.marketInfo;
-    const collectN = info ? (info.collectionCopper > 0 ? 1 : 0) + info.collectionItems.length : 0;
-    const tabLabel = (id: typeof this.marketTab): string => {
-      if (id === 'browse') return t('itemUi.market.browse');
-      if (id === 'sell') return t('itemUi.market.sell');
-      return collectN > 0
-        ? t('itemUi.market.collectWithCount', {
-            count: formatNumber(collectN, { maximumFractionDigits: 0 }),
-          })
-        : t('itemUi.market.collect');
-    };
-    const tab = (id: typeof this.marketTab) =>
-      `<button type="button" class="mkt-tab${this.marketTab === id ? ' sel' : ''}" data-tab="${id}" aria-pressed="${this.marketTab === id ? 'true' : 'false'}">${esc(tabLabel(id))}</button>`;
-    el.innerHTML =
-      `<div class="panel-title"><span>${esc(t('itemUi.market.title'))} <span class="panel-subtitle">${esc(t('itemUi.market.subtitle'))}</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('itemUi.market.close'))}">${svgIcon('close')}</button></div>` +
-      `<div class="mkt-tabs">` +
-      tab('browse') +
-      tab('sell') +
-      tab('collect') +
-      `</div>` +
-      this.renderMarketFilters() +
-      `<div id="market-body"></div>`;
-    el.querySelector('[data-close]')?.addEventListener('click', () => this.closeMarket());
-    el.querySelectorAll('[data-tab]').forEach((t) => {
-      t.addEventListener('click', () => {
-        const next = (t as HTMLElement).dataset.tab as typeof this.marketTab;
-        if (next === this.marketTab) return;
-        this.marketTab = next;
-        this.marketBrowsePage = 0;
-        this.lastMarketSig = '';
-        audio.click();
-        this.renderMarket();
-      });
-    });
-    const closeFilterMenus = () => {
-      el.querySelectorAll<HTMLElement>('.mkt-select.open').forEach((menu) => {
-        menu.classList.remove('open');
-        menu
-          .querySelector<HTMLButtonElement>('.mkt-select-btn')
-          ?.setAttribute('aria-expanded', 'false');
-        const list = menu.querySelector<HTMLElement>('.mkt-select-menu');
-        if (list) list.hidden = true;
-      });
-    };
-    el.querySelectorAll<HTMLButtonElement>('.mkt-select-btn').forEach((button) => {
-      button.addEventListener('click', (event) => {
-        event.stopPropagation();
-        const menu = button.closest<HTMLElement>('.mkt-select');
-        if (!menu) return;
-        const open = !menu.classList.contains('open');
-        closeFilterMenus();
-        menu.classList.toggle('open', open);
-        button.setAttribute('aria-expanded', open ? 'true' : 'false');
-        const list = menu.querySelector<HTMLElement>('.mkt-select-menu');
-        if (list) list.hidden = !open;
-      });
-    });
-    el.querySelectorAll<HTMLButtonElement>('[data-market-filter-option]').forEach((option) => {
-      option.addEventListener('click', () => {
-        const menu = option.closest<HTMLElement>('[data-market-filter-menu]');
-        const key = menu?.dataset.marketFilterMenu;
-        const value = option.dataset.marketFilterOption ?? 'all';
-        if (key === 'itemType') {
-          const next = value as MarketItemTypeFilter;
-          if (next !== this.marketItemTypeFilter) {
-            this.marketItemTypeFilter = next;
-            this.marketSubtypeFilter = 'all';
-            this.marketBrowsePage = 0;
-          }
-        } else if (key === 'subtype') {
-          this.marketSubtypeFilter = value as MarketSubtypeFilter;
-          this.marketBrowsePage = 0;
-        } else if (key === 'rarity') {
-          this.marketRarityFilter = value as MarketRarityFilter;
-          this.marketBrowsePage = 0;
-        } else {
-          return;
-        }
-        this.lastMarketSig = '';
-        audio.click();
-        this.renderMarket();
-      });
-    });
-    el.addEventListener('click', closeFilterMenus);
-    this.renderMarketContent(info);
-  }
-
-  // Per-frame: refresh the live lists (Browse/Collect) when they change. The
-  // Sell tab holds typed inputs, so it is only rebuilt on explicit actions.
-  private refreshMarket(): void {
-    if (!this.marketOpen || this.marketTab === 'sell') return;
-    const info = this.sim.marketInfo;
-    const collectN = info ? (info.collectionCopper > 0 ? 1 : 0) + info.collectionItems.length : 0;
-    const sig = JSON.stringify([
-      this.marketTab,
-      this.marketItemTypeFilter,
-      this.marketSubtypeFilter,
-      this.marketRarityFilter,
-      this.marketBrowsePage,
-      info?.listings,
-      info?.totalCount,
-      info?.filter,
-      info?.collectionCopper,
-      info?.collectionItems,
-    ]);
-    if (sig === this.lastMarketSig) return;
-    this.lastMarketSig = sig;
-    const collectTab = $('#market-window').querySelector('[data-tab="collect"]');
-    if (collectTab) {
-      collectTab.textContent =
-        collectN > 0
-          ? t('itemUi.market.collectWithCount', {
-              count: formatNumber(collectN, { maximumFractionDigits: 0 }),
-            })
-          : t('itemUi.market.collect');
-    }
-    this.renderMarketContent(info);
-  }
-
-  private renderMarketContent(info: MarketInfo | null): void {
-    const body = document.getElementById('market-body');
-    if (!body) return;
-    if (!info) {
-      body.innerHTML = `<div class="mkt-empty">${esc(t('itemUi.market.noMerchant'))}</div>`;
-      return;
-    }
-    if (this.marketTab === 'browse') this.renderMarketBrowse(body, info);
-    else if (this.marketTab === 'sell') this.renderMarketSell(body, info);
-    else this.renderMarketCollect(body, info);
-  }
-
-  private renderMarketBrowse(body: HTMLElement, info: MarketInfo): void {
-    // Reuse the search field and list container across refreshes so typing in
-    // the box never loses focus when the server streams back filtered results.
-    let search = body.querySelector('.mkt-search') as HTMLInputElement | null;
-    let list = body.querySelector('.mkt-list') as HTMLElement | null;
-    if (!search || !list) {
-      body.innerHTML = '';
-      search = document.createElement('input');
-      search.type = 'search';
-      search.className = 'mkt-search';
-      search.placeholder = t('itemUi.market.searchPlaceholder');
-      search.setAttribute('aria-label', t('itemUi.market.searchAria'));
-      search.value = this.marketSearchQuery;
-      search.addEventListener('input', () => {
-        if (!search) return;
-        this.marketSearchQuery = search.value;
-        this.marketBrowsePage = 0;
-        this.sim.marketSearch(search.value);
-      });
-      body.appendChild(search);
-      list = document.createElement('div');
-      list.className = 'mkt-list';
-      body.appendChild(list);
-    }
-    // Keep the field in sync on external resets, but never clobber active typing.
-    if (document.activeElement !== search && search.value !== this.marketSearchQuery) {
-      search.value = this.marketSearchQuery;
-    }
-    list.innerHTML = '';
-    if (info.listings.length === 0) {
-      const empty = document.createElement('div');
-      empty.className = 'mkt-empty';
-      empty.textContent = info.filter.trim()
-        ? t('itemUi.market.emptySearch')
-        : t('itemUi.market.emptyBrowse');
-      list.appendChild(empty);
-      return;
-    }
-    const listings = filterMarketListings(info.listings, {
-      itemType: this.marketItemTypeFilter,
-      subtype: this.marketSubtypeFilter,
-      rarity: this.marketRarityFilter,
-    });
-    if (listings.length === 0) {
-      this.marketBrowsePage = 0;
-      const empty = document.createElement('div');
-      empty.className = 'mkt-empty';
-      empty.textContent = t('itemUi.market.emptyFiltered');
-      list.appendChild(empty);
-      return;
-    }
-    const page = paginateMarketListings(listings, this.marketBrowsePage, MARKET_PAGE_SIZE);
-    this.marketBrowsePage = page.page;
-    const note = document.createElement('div');
-    note.className = 'mkt-note';
-    const shown = `${formatNumber(page.start + 1, { maximumFractionDigits: 0 })}-${formatNumber(page.end, { maximumFractionDigits: 0 })}`;
-    const total = formatNumber(page.total, { maximumFractionDigits: 0 });
-    note.textContent = t('itemUi.market.pageRange', { shown, total });
-    list.appendChild(note);
-    for (const l of page.items) {
-      const item = ITEMS[l.itemId];
-      if (!item) continue;
-      const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff';
-      const row = document.createElement('div');
-      row.className = 'mkt-row';
-      const itemName = itemDisplayName(item);
-      const each =
-        l.count > 1
-          ? `<br><span class="seller">${esc(t('itemUi.market.each', { money: formatLocalizedMoney(Math.ceil(l.price / l.count)) }))}</span>`
-          : '';
-      const stack =
-        l.count > 1
-          ? ` <span class="stack">${esc(t('itemUi.market.stackCount', { count: formatNumber(l.count, { maximumFractionDigits: 0 }) }))}</span>`
-          : '';
-      row.innerHTML =
-        `${this.itemIcon(item)}` +
-        `<span class="mkt-name"><span class="nm" style="color:${qColor}">${esc(itemName)}${stack}</span>` +
-        `<span class="seller${l.house ? ' house' : ''}">${esc(l.house ? t('itemUi.market.merchantStock') : l.sellerName)}</span></span>` +
-        `<span class="mkt-price">${this.moneyHtml(l.price)}${each}</span>`;
-      const btn = document.createElement('button');
-      btn.className = `mkt-btn${l.mine ? ' cancel' : ''}`;
-      btn.textContent = l.mine ? t('itemUi.market.reclaim') : t('itemUi.market.buy');
-      btn.setAttribute(
-        'aria-label',
-        t(l.mine ? 'itemUi.market.reclaimAria' : 'itemUi.market.buyAria', {
-          item: itemName,
-          price: formatLocalizedMoney(l.price),
-        }),
-      );
-      btn.addEventListener('click', () => {
-        if (l.mine) this.sim.marketCancel(l.id);
-        else this.sim.marketBuy(l.id);
-        audio.click();
-      });
-      row.appendChild(btn);
-      this.attachTooltip(row, () => this.itemTooltip(item));
-      list.appendChild(row);
-    }
-    if (page.pageCount > 1) {
-      const pager = document.createElement('div');
-      pager.className = 'mkt-page';
-      const pageNumber = formatNumber(page.page + 1, { maximumFractionDigits: 0 });
-      const pageCount = formatNumber(page.pageCount, { maximumFractionDigits: 0 });
-      pager.innerHTML =
-        `<button type="button" class="mkt-page-btn" data-market-page="prev"${page.page <= 0 ? ' disabled' : ''} aria-label="${esc(t('itemUi.market.pagePrevAria'))}">${esc(t('itemUi.market.pagePrev'))}</button>` +
-        `<span class="mkt-page-info">${esc(t('itemUi.market.pageStatus', { current: pageNumber, total: pageCount }))}</span>` +
-        `<button type="button" class="mkt-page-btn" data-market-page="next"${page.page >= page.pageCount - 1 ? ' disabled' : ''} aria-label="${esc(t('itemUi.market.pageNextAria'))}">${esc(t('itemUi.market.pageNext'))}</button>`;
-      pager.querySelectorAll<HTMLButtonElement>('[data-market-page]').forEach((button) => {
-        button.addEventListener('click', () => {
-          if (button.disabled) return;
-          this.marketBrowsePage += button.dataset.marketPage === 'next' ? 1 : -1;
-          this.lastMarketSig = '';
-          audio.click();
-          this.renderMarketContent(info);
-          body.scrollTop = 0;
-        });
-      });
-      list.appendChild(pager);
-    }
-  }
-
-  private renderMarketSell(body: HTMLElement, info: MarketInfo): void {
-    body.innerHTML = `<div class="mkt-note">${esc(
-      t('itemUi.market.sellNote', {
-        cut: formatNumber(info.cutPct, { maximumFractionDigits: 0 }),
-        used: formatNumber(info.myListingCount, { maximumFractionDigits: 0 }),
-        max: formatNumber(info.maxListings, { maximumFractionDigits: 0 }),
-      }),
-    )}</div>`;
-    const item = this.marketSellItem ? ITEMS[this.marketSellItem] : null;
-    const have = this.marketSellItem ? this.bagCount(this.marketSellItem) : 0;
-    const pick = document.createElement('div');
-    if (!item || have <= 0) {
-      pick.className = 'mkt-sell-pick empty';
-      pick.textContent = t('itemUi.market.sellPickEmpty');
-      body.appendChild(pick);
-      return;
-    }
-    if (item.kind === 'quest' || item.noMarketList) {
-      this.marketSellItem = null;
-      pick.className = 'mkt-sell-pick empty';
-      pick.textContent = t('itemUi.tooltip.cannotMarket');
-      body.appendChild(pick);
-      return;
-    }
-    const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff';
-    pick.className = 'mkt-sell-pick';
-    pick.innerHTML = `${this.itemIcon(item)}<span class="ps-name" style="color:${qColor}">${esc(itemDisplayName(item))}</span>`;
-    body.appendChild(pick);
-
-    const form = document.createElement('div');
-    form.className = 'mkt-price-form';
-    const qtyRow =
-      have > 1
-        ? `<div class="mkt-price-row"><label for="mkt-qty">${esc(t('itemUi.market.quantity'))}</label><input class="coininput" id="mkt-qty" type="number" min="1" max="${have}" value="1"> <span class="mkt-coin-tag">${esc(t('itemUi.market.quantityOf', { count: formatNumber(have, { maximumFractionDigits: 0 }) }))}</span></div>`
-        : '';
-    // a gentle starting ask: a few times vendor value, never below 1c
-    const suggested = Math.max(1, item.buyValue ?? Math.max(1, item.sellValue) * 4);
-    const g = Math.floor(suggested / 10000),
-      s = Math.floor((suggested % 10000) / 100),
-      c = suggested % 100;
-    form.innerHTML =
-      qtyRow +
-      `<div class="mkt-price-row"><label>${esc(t('itemUi.market.priceEach'))}</label>` +
-      `<input class="coininput" id="mkt-g" type="number" min="0" value="${g}" aria-label="${esc(t('itemUi.money.gold'))}"><span class="coin g" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.goldShort'))}</span>` +
-      `<input class="coininput" id="mkt-s" type="number" min="0" max="99" value="${s}" aria-label="${esc(t('itemUi.money.silver'))}"><span class="coin s" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.silverShort'))}</span>` +
-      `<input class="coininput" id="mkt-c" type="number" min="0" max="99" value="${c}" aria-label="${esc(t('itemUi.money.copper'))}"><span class="coin c" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.copperShort'))}</span></div>`;
-    body.appendChild(form);
-
-    const listBtn = document.createElement('button');
-    listBtn.className = 'mkt-list-btn';
-    listBtn.textContent = t('itemUi.market.listButton');
-    listBtn.addEventListener('click', () => {
-      const qty =
-        have > 1
-          ? Math.max(
-              1,
-              Math.min(have, parseInt(($('#mkt-qty') as HTMLInputElement)?.value || '1', 10) || 1),
-            )
-          : 1;
-      const gg = Math.max(0, parseInt(($('#mkt-g') as HTMLInputElement)?.value || '0', 10) || 0);
-      const ss = Math.max(0, parseInt(($('#mkt-s') as HTMLInputElement)?.value || '0', 10) || 0);
-      const cc = Math.max(0, parseInt(($('#mkt-c') as HTMLInputElement)?.value || '0', 10) || 0);
-      const each = gg * 10000 + ss * 100 + cc;
-      if (each < 1) {
-        this.showError(t('itemUi.market.minPriceError'));
-        return;
-      }
-      this.sim.marketList(this.marketSellItem!, qty, each * qty);
-      this.marketSellItem = null;
-      audio.coin();
-      this.renderMarket(); // the next snapshot echoes the new bags + listings
-    });
-    body.appendChild(listBtn);
-  }
-
-  private renderMarketCollect(body: HTMLElement, info: MarketInfo): void {
-    if (info.collectionCopper <= 0 && info.collectionItems.length === 0) {
-      body.innerHTML = `<div class="mkt-empty">${esc(t('itemUi.market.collectEmpty'))}</div>`;
-      return;
-    }
-    body.innerHTML = `<div class="mkt-note">${esc(t('itemUi.market.collectNote'))}</div>`;
-    if (info.collectionCopper > 0) {
-      const row = document.createElement('div');
-      row.className = 'mkt-collect';
-      row.innerHTML = `<span>${esc(t('itemUi.market.saleProceeds'))}</span><span class="mkt-price">${this.moneyHtml(info.collectionCopper)}</span>`;
-      body.appendChild(row);
-    }
-    for (const s of info.collectionItems) {
-      const item = ITEMS[s.itemId];
-      if (!item) continue;
-      const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff';
-      const row = document.createElement('div');
-      row.className = 'mkt-collect';
-      const stack =
-        s.count > 1
-          ? ` ${t('itemUi.market.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })}`
-          : '';
-      row.innerHTML = `<span style="display:flex;gap:8px;align-items:center">${this.itemIcon(item)}<span style="color:${qColor}">${esc(itemDisplayName(item))}${esc(stack)}</span></span>`;
-      this.attachTooltip(row, () => this.itemTooltip(item));
-      body.appendChild(row);
-    }
-    const btn = document.createElement('button');
-    btn.className = 'mkt-list-btn';
-    btn.textContent = t('itemUi.market.collectAll');
-    btn.addEventListener('click', () => {
-      this.sim.marketCollect();
-      audio.coin();
-    });
-    body.appendChild(btn);
   }
 
   // -------------------------------------------------------------------------
@@ -8731,13 +8190,15 @@ export class Hud {
   toggleBags(): void {
     const el = $('#bags');
     if (el.style.display !== 'none') {
-      el.style.display = 'none';
-      this.hideTooltip();
+      // Close through the painter so focus returns to the opener (WCAG 2.4.3); close()
+      // owns the hide + tooltip + pet-feed teardown, so keep only the audio cue here.
       audio.bagClose();
-      this.cancelPetFeed();
+      this.bagsWindow.close();
       return;
     }
     this.closeOtherWindows('#bags');
+    // Record the opener (the minimap bag button / keybind focus) for the focus return.
+    this.bagsWindow.noteOpener();
     this.renderBags();
     el.style.display = 'flex';
     audio.bagOpen();
@@ -8759,342 +8220,11 @@ export class Hud {
   }
 
   private renderCharIfOpen(): void {
-    if ($('#char-window').style.display === 'block') this.renderChar();
-  }
-
-  private persistBagFilter(): void {
-    try {
-      localStorage.setItem(Hud.BAG_FILTER_KEY, serializeBagFilter(this.bagFilter));
-    } catch {
-      /* storage unavailable (private mode); filter still works in-session */
-    }
-  }
-
-  // The category-chip + sort + search controls above the bag grid. Each control
-  // mutates this.bagFilter, persists, and re-renders; the actual filtering is the
-  // pure applyBagFilter() in bag_filter.ts.
-  private buildBagFilterBar(): HTMLElement {
-    const bar = document.createElement('div');
-    bar.className = 'bag-filter-bar';
-
-    const chips = document.createElement('div');
-    chips.className = 'bag-chips';
-    chips.setAttribute('role', 'group');
-    chips.setAttribute('aria-label', t('hudChrome.bags.filterGroupAria'));
-    for (const category of BAG_CATEGORIES) {
-      const chip = document.createElement('button');
-      chip.type = 'button';
-      chip.className = `bag-chip${this.bagFilter.category === category ? ' active' : ''}`;
-      chip.textContent = t(BAG_CATEGORY_LABEL_KEYS[category]);
-      chip.setAttribute('aria-pressed', this.bagFilter.category === category ? 'true' : 'false');
-      chip.addEventListener('click', () => {
-        if (this.bagFilter.category === category) return;
-        this.bagFilter.category = category;
-        this.persistBagFilter();
-        audio.click();
-        this.renderBags();
-      });
-      chips.appendChild(chip);
-    }
-    bar.appendChild(chips);
-
-    const tools = document.createElement('div');
-    tools.className = 'bag-tools';
-
-    const search = document.createElement('input');
-    search.type = 'search';
-    search.className = 'bag-search';
-    search.placeholder = t('hudChrome.bags.searchPlaceholder');
-    search.setAttribute('aria-label', t('hudChrome.bags.searchAria'));
-    search.value = this.bagFilter.search;
-    search.addEventListener('input', () => {
-      this.bagFilter.search = search.value;
-      this.persistBagFilter();
-      this.refreshBagGrid();
-    });
-    tools.appendChild(search);
-
-    const sort = document.createElement('select');
-    sort.className = 'bag-sort';
-    sort.setAttribute('aria-label', t('hudChrome.bags.sortAria'));
-    for (const option of BAG_SORTS) {
-      const opt = document.createElement('option');
-      opt.value = option;
-      opt.textContent = t(BAG_SORT_LABEL_KEYS[option]);
-      if (this.bagFilter.sort === option) opt.selected = true;
-      sort.appendChild(opt);
-    }
-    sort.addEventListener('change', () => {
-      this.bagFilter.sort = sort.value as BagSort;
-      this.persistBagFilter();
-      audio.click();
-      this.renderBags();
-    });
-    tools.appendChild(sort);
-
-    bar.appendChild(tools);
-    return bar;
+    this.charWindow.renderIfOpen();
   }
 
   renderBags(): void {
-    const el = $('#bags');
-    const sim = this.sim;
-    // .bag-grid (not #bags) is the scroll container; it is recreated on every
-    // rebuild, so capture its scroll offset and reapply it to the fresh grid —
-    // otherwise using an item (e.g. a potion) snaps the list back to the top.
-    const prevScrollTop = el.querySelector('.bag-grid')?.scrollTop ?? 0;
-    el.innerHTML = `<div class="panel-title"><span>${esc(t('itemUi.bags.title'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('itemUi.bags.close'))}">${svgIcon('close')}</button></div>`;
-    // Skip the chip/search row entirely when the bag is empty: a full filter bar
-    // above a single "(empty)" line is just noise.
-    if (sim.inventory.length > 0) el.appendChild(this.buildBagFilterBar());
-    const grid = document.createElement('div');
-    grid.className = 'bag-grid';
-    this.fillBagGrid(grid);
-    el.appendChild(grid);
-    grid.scrollTop = prevScrollTop;
-    const moneyRow = document.createElement('div');
-    moneyRow.className = 'money';
-    moneyRow.innerHTML = `${this.wocBalanceHtml()}${this.moneyHtml(sim.copper)}`;
-    el.appendChild(moneyRow);
-    el.querySelector('[data-close]')?.addEventListener('click', () => {
-      if (this.vendorOpen && document.body.classList.contains('mobile-touch')) {
-        this.closeVendor();
-        return;
-      }
-      el.style.display = 'none';
-      this.hideTooltip();
-      this.cancelPetFeed();
-    });
-  }
-
-  // Populate (or repopulate) the .bag-grid scroll container from the current
-  // filter state. Split out so a search keystroke can refresh just the grid
-  // (refreshBagGrid) without rebuilding the filter bar and stealing input focus.
-  private fillBagGrid(grid: HTMLElement): void {
-    const sim = this.sim;
-    const visible = applyBagFilter(sim.inventory, (id) => ITEMS[id], this.bagFilter);
-    if (sim.inventory.length === 0) {
-      grid.innerHTML = `<div class="bag-empty">${esc(t('itemUi.bags.empty'))}</div>`;
-      return;
-    } else if (visible.length === 0) {
-      grid.innerHTML = `<div class="bag-empty">${esc(t('hudChrome.bags.noMatch'))}</div>`;
-      return;
-    }
-    for (const s of visible) {
-      const item = ITEMS[s.itemId];
-      if (!item) continue;
-      const row = document.createElement('button');
-      row.type = 'button';
-      row.className = 'bag-item';
-      const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff';
-      const itemName = itemDisplayName(item);
-      row.setAttribute(
-        'aria-label',
-        t('itemUi.bags.itemAria', {
-          item: itemName,
-          count: formatNumber(s.count, { maximumFractionDigits: 0 }),
-        }),
-      );
-      row.innerHTML = `${this.itemIcon(item)}<span style="color:${qColor}">${esc(itemName)}</span><span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
-      row.addEventListener('click', (ev) => {
-        if (this.tradeOpen) {
-          this.addItemToTrade(s.itemId);
-        } else if (this.marketOpen && this.marketTab === 'sell') {
-          if (item.kind === 'quest') {
-            this.showError(t('itemUi.errors.noQuestItems'));
-            return;
-          }
-          if (item.noMarketList) {
-            this.showError(t('itemUi.tooltip.cannotMarket'));
-            return;
-          }
-          this.marketSellItem = s.itemId;
-          this.renderMarket();
-        } else if (this.vendorOpen) {
-          this.sellBagItem(s, ev);
-        } else if (this.pendingPetFeed) {
-          if (item.kind !== 'food') {
-            this.showError(t('hud.pet.petEatsFoodOnly'));
-            return;
-          }
-          this.sim.feedPet(s.itemId);
-          this.pendingPetFeed = false;
-          this.lastPetBarSig = '';
-          this.renderBags();
-        } else if (item.kind === 'quest') {
-          this.showDiscardItemPrompt(s.itemId, Math.max(1, Math.floor(s.count)));
-        } else {
-          this.sim.useItem(s.itemId);
-          this.renderBags();
-          this.renderCharIfOpen();
-        }
-      });
-      row.addEventListener('contextmenu', (ev) => {
-        if (!this.vendorOpen || (!ev.ctrlKey && !ev.metaKey)) return;
-        ev.preventDefault();
-        this.sellBagItem(s, ev);
-      });
-      if (!this.tradeOpen && !this.vendorOpen && this.isHotbarItemId(s.itemId)) {
-        row.draggable = true;
-        row.addEventListener('dragstart', (e) => {
-          const action = { type: 'item' as const, id: s.itemId };
-          this.dragAction = { action, sourceIndex: null };
-          this.writeDraggedAction(e.dataTransfer, action);
-          e.dataTransfer!.effectAllowed = 'copy';
-          this.hideTooltip();
-        });
-        row.addEventListener('dragend', () => {
-          this.dragAction = null;
-          this.clearActionDropTargets();
-        });
-      }
-      this.attachTooltip(row, () => {
-        let extra = '';
-        if (this.tradeOpen)
-          extra = `<div class="tt-sub">${esc(t('itemUi.tooltip.clickTradeOffer'))}</div>`;
-        else if (this.marketOpen && this.marketTab === 'sell')
-          extra =
-            item.kind === 'quest' || item.noMarketList
-              ? `<div class="tt-sub">${esc(t('itemUi.tooltip.cannotMarket'))}</div>`
-              : `<div class="tt-sub">${esc(t('itemUi.tooltip.clickMarketList'))}</div>`;
-        else if (this.vendorOpen)
-          extra =
-            item.kind === 'quest'
-              ? `<div class="tt-sub">${esc(t('itemUi.tooltip.cannotVendor'))}</div>`
-              : `<div class="tt-sub">${esc(t('itemUi.tooltip.clickSell'))}</div>`;
-        else if (item.kind === 'quest')
-          extra = `<div class="tt-sub">${esc(t('itemUi.tooltip.clickDestroy'))}</div>`;
-        else if (item.kind === 'weapon' || item.kind === 'armor')
-          extra = `<div class="tt-sub">${esc(t('itemUi.tooltip.clickEquip'))}</div>`;
-        else if (item.kind === 'food' || item.kind === 'drink')
-          extra = `<div class="tt-sub">${esc(t('itemUi.tooltip.clickConsume'))}</div>`;
-        else if (item.kind === 'potion')
-          extra = `<div class="tt-sub">${esc(t('itemUi.tooltip.clickUseInstant'))}</div>`;
-        else if (item.use) extra = `<div class="tt-sub">${esc(t('itemUi.tooltip.clickUse'))}</div>`;
-        return this.itemTooltip(item) + extra;
-      });
-      grid.appendChild(row);
-    }
-  }
-
-  // Refresh only the grid contents (used by live search) so the search input
-  // keeps focus and caret position across keystrokes.
-  private refreshBagGrid(): void {
-    const grid = $('#bags').querySelector('.bag-grid') as HTMLElement | null;
-    if (!grid) return;
-    const prevScrollTop = grid.scrollTop;
-    grid.innerHTML = '';
-    this.fillBagGrid(grid);
-    grid.scrollTop = prevScrollTop;
-  }
-
-  private sellBagItem(slot: InvSlot, ev: MouseEvent): void {
-    const count = Math.max(1, Math.floor(slot.count));
-    if (ev.ctrlKey || ev.metaKey) {
-      this.sim.sellItem(slot.itemId, count);
-    } else if (ev.shiftKey && count > 1) {
-      this.showSellQuantityPrompt(slot.itemId, count);
-    } else {
-      this.sim.sellItem(slot.itemId);
-    }
-  }
-
-  private showDiscardItemPrompt(itemId: string, maxCount: number): void {
-    document.querySelectorAll('.discard-item-prompt').forEach((el) => {
-      el.remove();
-    });
-    const item = ITEMS[itemId];
-    const stack = $('#prompt-stack');
-    const prompt = document.createElement('div');
-    prompt.className = 'prompt panel discard-item-prompt';
-    const itemName = item ? itemDisplayName(item) : itemId;
-    prompt.innerHTML = `<div class="prompt-text">${esc(t('itemUi.bags.destroyTitle', { item: itemName }))}</div>`;
-    let input: HTMLInputElement | null = null;
-    if (maxCount > 1) {
-      input = document.createElement('input');
-      input.className = 'prompt-number';
-      input.type = 'number';
-      input.min = '1';
-      input.max = String(maxCount);
-      input.step = '1';
-      input.value = '1';
-      prompt.appendChild(input);
-    }
-    const confirm = document.createElement('button');
-    confirm.className = 'btn';
-    confirm.textContent = t('itemUi.bags.destroyConfirm');
-    const cancel = document.createElement('button');
-    cancel.className = 'btn';
-    cancel.textContent = t('itemUi.bags.destroyCancel');
-    const close = () => prompt.remove();
-    const submit = () => {
-      const count = input
-        ? Math.max(1, Math.min(maxCount, Math.floor(Number(input.value) || 0)))
-        : 1;
-      this.sim.discardItem(itemId, count);
-      close();
-      this.hideTooltip();
-      this.renderBags();
-    };
-    confirm.addEventListener('click', submit);
-    cancel.addEventListener('click', close);
-    if (input) {
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') submit();
-        else if (e.key === 'Escape') close();
-      });
-    }
-    prompt.append(confirm, cancel);
-    stack.appendChild(prompt);
-    if (input)
-      window.setTimeout(() => {
-        input.focus();
-        input.select();
-      }, 0);
-  }
-
-  private showSellQuantityPrompt(itemId: string, maxCount: number): void {
-    document.querySelectorAll('.sell-quantity-prompt').forEach((el) => {
-      el.remove();
-    });
-    const item = ITEMS[itemId];
-    const stack = $('#prompt-stack');
-    const prompt = document.createElement('div');
-    prompt.className = 'prompt panel sell-quantity-prompt';
-    const itemName = item ? itemDisplayName(item) : itemId;
-    prompt.innerHTML = `<div class="prompt-text">${esc(t('itemUi.vendor.sellQuantityTitle', { item: itemName }))}</div>`;
-    const input = document.createElement('input');
-    input.className = 'prompt-number';
-    input.type = 'number';
-    input.setAttribute('aria-label', t('itemUi.vendor.sellQuantityInput'));
-    input.min = '1';
-    input.max = String(maxCount);
-    input.step = '1';
-    input.value = '1';
-    const confirm = document.createElement('button');
-    confirm.className = 'btn';
-    confirm.textContent = t('itemUi.vendor.sellQuantityConfirm');
-    const cancel = document.createElement('button');
-    cancel.className = 'btn';
-    cancel.textContent = t('itemUi.vendor.sellQuantityCancel');
-    const close = () => prompt.remove();
-    const submit = () => {
-      const count = Math.max(1, Math.min(maxCount, Math.floor(Number(input.value) || 0)));
-      this.sim.sellItem(itemId, count);
-      close();
-    };
-    confirm.addEventListener('click', submit);
-    cancel.addEventListener('click', close);
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') submit();
-      else if (e.key === 'Escape') close();
-    });
-    prompt.append(input, confirm, cancel);
-    stack.appendChild(prompt);
-    window.setTimeout(() => {
-      input.focus();
-      input.select();
-    }, 0);
+    this.bagsWindow.render();
   }
 
   // -------------------------------------------------------------------------
@@ -9102,172 +8232,7 @@ export class Hud {
   // -------------------------------------------------------------------------
 
   toggleChar(): void {
-    const el = $('#char-window');
-    if (el.style.display === 'block') {
-      el.style.display = 'none';
-      this.hideTooltip();
-      return;
-    }
-    this.closeOtherWindows('#char-window');
-    this.renderChar();
-    el.style.display = 'block';
-  }
-
-  renderChar(): void {
-    const el = $('#char-window');
-    const sim = this.sim;
-    const p = sim.player;
-    const cls = CLASSES[sim.cfg.playerClass];
-    const className = classDisplayName(cls.id);
-    let html = `<div class="panel-title char-title-portrait">${portraitChipHtml({ cls: sim.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'md' })}<span class="char-title-text">${esc(p.name)} <span class="panel-subtitle">${esc(t('itemUi.equipment.levelClass', { level: formatNumber(p.level, { maximumFractionDigits: 0 }), className }))}</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
-    html += `<div class="paperdoll">
-      <div class="equip-col" id="equip-col-left"></div>
-      <div class="char-model-panel">
-        <div id="char-model-preview" class="char-model-preview"></div>
-        <div id="char-skin-row" class="skin-row char-skin-row" role="list" aria-label="${esc(t('auth.appearance'))}"></div>
-      </div>
-      <div class="equip-col equip-col-right" id="equip-col-right"></div>
-    </div>`;
-    // Ten focusable stat cells, primaries down the left column and derived stats
-    // down the right. The cell markup, value formatting, and the visually-hidden
-    // aria breakdown all come from the pure, unit-tested stat_tooltip_view module;
-    // each cell's value is read from the model so it cannot drift from the tooltip
-    // it opens, and the post-render pass below attaches the floating breakdown.
-    const statCell = (stat: StatId) => statCellHtml(this.statModel(stat), STAT_VIEW_DEPS);
-    html += `<div class="char-stats">
-      ${statCell('str')}${statCell('armor')}
-      ${statCell('agi')}${statCell('attackPower')}
-      ${statCell('sta')}${statCell('dps')}
-      ${statCell('int')}${statCell('critChance')}
-      ${statCell('spi')}${statCell('dodge')}
-    </div>`;
-    html += this.talentSummaryHtml();
-    html += this.progressionHtml(p.level);
-    const shareGlyph = `<svg class="pc-share-ico" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M18 16.1a3 3 0 0 0-2.3 1.1l-6.7-3.9a3 3 0 0 0 0-2.6l6.7-3.9A3 3 0 1 0 15 4l-6.7 3.9a3 3 0 1 0 0 8.2L15 20a3 3 0 1 0 3-3.9z"/></svg>`;
-    html += `<div class="pc-share-row"><button type="button" class="btn pc-share-btn" data-act="share-card">${shareGlyph}<span>${esc(t('playerCard.shareButton'))}</span></button></div>`;
-    el.innerHTML = html;
-    hydratePortraits(el);
-    el.querySelector('[data-act="prestige"]')?.addEventListener('click', () =>
-      this.openPrestigeDialog(),
-    );
-    el.querySelector('[data-act="share-card"]')?.addEventListener('click', () => {
-      audio.click();
-      void this.openPlayerCard();
-    });
-    const leftCol = el.querySelector('#equip-col-left')!;
-    const rightCol = el.querySelector('#equip-col-right')!;
-    // Two columns flanking the model, like the classic WoW character sheet:
-    // the left column holds head/shoulder/chest (+ weapon, since we have no
-    // neck/back/wrist slots to fill it) and the right column holds the
-    // hands/waist/legs/feet quartet.
-    const leftSlots: { key: EquipSlot; name: string }[] = [
-      { key: 'helmet', name: itemSlotName('helmet') },
-      { key: 'shoulder', name: itemSlotName('shoulder') },
-      { key: 'chest', name: itemSlotName('chest') },
-      { key: 'mainhand', name: itemSlotName('mainhand') },
-    ];
-    const rightSlots: { key: EquipSlot; name: string }[] = [
-      { key: 'gloves', name: itemSlotName('gloves') },
-      { key: 'waist', name: itemSlotName('waist') },
-      { key: 'legs', name: itemSlotName('legs') },
-      { key: 'feet', name: itemSlotName('feet') },
-    ];
-    const buildSlotRow = (slot: { key: EquipSlot; name: string }): HTMLElement => {
-      const itemId = sim.equipment[slot.key];
-      const item = itemId ? ITEMS[itemId] : null;
-      const row = document.createElement('div');
-      row.className = 'equip-slot';
-      // Stable id + programmatic focusability so the corner-× rebuild can hand
-      // focus back to this slot (the rebuilt row may be empty, with no × to focus).
-      row.id = `equip-slot-${slot.key}`;
-      row.tabIndex = -1;
-      const qColor = !item ? '#666' : (QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff');
-      row.innerHTML = `${item ? this.itemIcon(item) : `<img class="item-icon" style="border-color:#444" src="${iconDataUrl('item', 'slot_empty')}" alt="" draggable="false">`}
-        <div><div class="slot-name">${esc(slot.name)}</div><div class="slot-item" style="color:${qColor}">${item ? esc(itemDisplayName(item)) : esc(t('itemUi.equipment.empty'))}</div></div>`;
-      if (item) {
-        // Remove the piece back to bags, leaving the slot empty (equipping only
-        // ever swaps in a replacement — this is the way to fully unequip). Three
-        // affordances all route through here: the corner ×, right-click, and
-        // dragging the piece out onto the bags window.
-        // `keepFocus` rebuilds the paperdoll (renderChar replaces the subtree via
-        // innerHTML, which otherwise drops focus to <body>) and hands focus back to
-        // the now-empty slot row — the keyboard/touch × path needs this; right-click
-        // and drag are mouse-only and don't.
-        const doUnequip = (keepFocus = false) => {
-          this.sim.unequipItem(slot.key);
-          audio.click();
-          this.hideTooltip();
-          this.renderBags();
-          this.renderCharIfOpen();
-          if (keepFocus) {
-            const rebuilt = document.getElementById(`equip-slot-${slot.key}`);
-            this.restoreFocus(rebuilt instanceof HTMLElement ? rebuilt : null);
-          }
-        };
-        this.attachTooltip(
-          row,
-          () =>
-            `${this.itemTooltip(item)}<div class="tt-sub">${esc(t('hudChrome.paperdoll.unequipHint'))}</div>`,
-        );
-        // Corner ×: a styled glyph control (not an in-game icon), revealed on
-        // hover/focus and always shown on touch where right-click is unavailable.
-        const unequip = document.createElement('button');
-        unequip.type = 'button';
-        unequip.className = 'equip-unequip-btn';
-        unequip.textContent = '×';
-        unequip.setAttribute(
-          'aria-label',
-          t('hudChrome.paperdoll.unequipAria', { item: itemDisplayName(item) }),
-        );
-        unequip.addEventListener('click', (ev) => {
-          ev.stopPropagation();
-          doUnequip(true);
-        });
-        row.appendChild(unequip);
-        // Right-click the slot (classic-MMO muscle memory; matches the bags grid).
-        row.addEventListener('contextmenu', (ev) => {
-          ev.preventDefault();
-          doUnequip();
-        });
-        // Drag the piece out onto the bags window to unequip it.
-        row.draggable = true;
-        row.addEventListener('dragstart', (e) => {
-          this.dragUnequipSlot = slot.key;
-          e.dataTransfer!.effectAllowed = 'move';
-          this.hideTooltip();
-          // Open the bags window if it's closed so there's a visible drop target —
-          // otherwise the drag silently snaps back with no feedback.
-          const bags = $('#bags');
-          if (bags.style.display !== 'block') {
-            bags.style.display = 'block';
-            this.renderBags();
-          }
-        });
-        row.addEventListener('dragend', () => {
-          this.dragUnequipSlot = null;
-          $('#bags').classList.remove('drop-target');
-        });
-      } else {
-        // Empty slot: still swallow the native browser menu so right-click feels
-        // consistent across the paperdoll (an empty slot has nothing to unequip).
-        row.addEventListener('contextmenu', (ev) => ev.preventDefault());
-      }
-      return row;
-    };
-    for (const slot of leftSlots) leftCol.appendChild(buildSlotRow(slot));
-    for (const slot of rightSlots) rightCol.appendChild(buildSlotRow(slot));
-    for (const cell of el.querySelectorAll<HTMLElement>('.char-stats [data-stat]')) {
-      const stat = cell.dataset.stat as StatId;
-      // Resolve the model lazily, on show, so the breakdown reflects the player's
-      // current stats (gear/buffs/talents) at the moment they hover, not at render.
-      this.attachTooltip(cell, () => statTooltipHtml(this.statModel(stat), STAT_VIEW_DEPS));
-    }
-    this.renderCharPreview();
-    this.renderCharSkinPicker();
-    el.querySelector('[data-close]')?.addEventListener('click', () => {
-      el.style.display = 'none';
-      this.hideTooltip();
-    });
+    this.charWindow.toggle();
   }
 
   private renderCharPreview(): void {
@@ -9322,10 +8287,17 @@ export class Hud {
       this.charPreview.setContainer(container);
     }
     // Show the player's currently equipped mainhand on the character sheet, so the
-    // 3D model reflects gear changes (re-runs on each renderChar after an equip).
+    // 3D model reflects gear changes (the char window repaints the preview after an
+    // equip via charWindow.renderIfOpen -> renderPreview).
     const weapon = this.sim.equipment.mainhand ?? null;
-    if (previewKey) this.charPreview.setVisualKey(previewKey, weapon);
-    else this.charPreview.setClass(cls, weapon);
+    if (previewKey) {
+      // mech is class-agnostic; mirror the wearer class's hand layout (rogue
+      // dual-wields) so the paperdoll matches the in-world render
+      const override = previewKey === 'player_mech' ? mechHeldWeaponOverride(cls) : null;
+      this.charPreview.setVisualKey(previewKey, weapon, override);
+    } else {
+      this.charPreview.setClass(cls, weapon);
+    }
     this.charPreview.setSkin(skin);
   }
 
@@ -9577,6 +8549,8 @@ export class Hud {
       this.skinEventRevealTimer = null;
     }
     this.skinEventEl.classList.remove('open');
+    this.skinEventTrap?.release();
+    this.skinEventTrap = null;
     this.skinEventRank = null;
     this.skinEventTiers = EVENT_SKIN_TIERS;
     this.skinEventMode = 'class';
@@ -9646,6 +8620,8 @@ export class Hud {
       `<b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b>` +
       `<b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b></div>` +
       `</div>`;
+    if (!this.skinEventTrap)
+      this.skinEventTrap = this.focusManager.open({ root: () => this.skinEventEl });
     el.classList.add('open');
   }
 
@@ -9806,6 +8782,8 @@ export class Hud {
     });
 
     // Show, mount the shared 3D preview into the right column, focus the choice.
+    if (!this.skinEventTrap)
+      this.skinEventTrap = this.focusManager.open({ root: () => this.skinEventEl });
     el.classList.add('open');
     this.mountCharPreview(
       el.querySelector('.se-preview') as HTMLElement,
@@ -9839,7 +8817,7 @@ export class Hud {
     // async result lands via onWalletUiChange → recomposeOpenCard (below), which
     // re-composites the card with the current pose once the new value arrives.
     this.optionsHooks?.refreshWocBalance();
-    this.cardModalReturnFocus = this.currentFocusableElement();
+    this.cardModalTrap = this.focusManager.open({ root: () => this.cardModalEl });
     const back = document.createElement('div');
     back.className = 'modal-backdrop';
     back.id = 'player-card-modal';
@@ -9874,7 +8852,7 @@ export class Hud {
       audio.click();
       close();
     });
-    this.focusFirstInteractive(back, '[data-close]');
+    this.cardModalTrap?.focusFirst('[data-close]');
 
     const previewBox = back.querySelector('.pc-preview') as HTMLElement;
     const status = back.querySelector('.pc-status') as HTMLElement;
@@ -10007,9 +8985,8 @@ export class Hud {
     back.remove();
     if (this.cardModalEl === back) this.cardModalEl = null;
     this.recomposeOpenCard = null;
-    const target = this.cardModalReturnFocus;
-    this.cardModalReturnFocus = null;
-    if (restoreFocus) this.restoreFocus(target);
+    this.cardModalTrap?.release(restoreFocus);
+    this.cardModalTrap = null;
   }
 
   private wireCardActions(
@@ -10295,7 +9272,7 @@ export class Hud {
       : t('game.talents.noSpec');
     let html = `<div class="char-progression"><div class="cp-title">${t('game.talents.specTab')}</div>`;
     html += `<div class="char-stats cp-stats"><span>${t('game.talents.specTab')}: <b>${specName}</b></span>`;
-    if (sp) html += `<span>${t('game.talents.role')}: <b>${this.roleLabel(sp.role)}</b></span>`;
+    if (sp) html += `<span>${t('game.talents.role')}: <b>${roleLabel(sp.role)}</b></span>`;
     html += `</div>`;
     if (sp)
       html += `<div class="cp-milestones"><span class="cp-ms-label">${t('game.talents.mastery')}:</span> <b style="color:var(--gold)">${esc(tTalent({ kind: 'talentMastery', spec: sp, field: 'name' }))}</b> <span class="cp-none">${esc(tTalent({ kind: 'talentMastery', spec: sp, field: 'description' }))}</span></div>`;
@@ -10365,21 +9342,32 @@ export class Hud {
     cancelText: string,
     onOk: () => void,
   ): void {
+    this.confirmTrap?.release(false);
+    this.confirmTrap = null;
     document.getElementById('confirm-dialog')?.remove();
     const el = document.createElement('div');
     el.id = 'confirm-dialog';
     el.className = 'window panel';
     el.style.display = 'block';
+    // Kept inline rather than folded onto markDialogRoot: that helper would also set
+    // tabindex=-1 on the root, which this focusManager-trapped prompt does not use
+    // (byte-preserving on the trap). The dialog is named via aria-labelledby.
     el.setAttribute('role', 'dialog');
     el.setAttribute('aria-modal', 'true');
+    el.setAttribute('aria-labelledby', 'confirm-dialog-title');
     el.innerHTML =
-      `<div class="panel-title"><span>${esc(title)}</span><button type="button" class="x-btn" data-cancel aria-label="${esc(cancelText)}">${svgIcon('close')}</button></div>` +
+      `<div class="panel-title"><span id="confirm-dialog-title">${esc(title)}</span><button type="button" class="x-btn" data-cancel aria-label="${esc(cancelText)}">${svgIcon('close')}</button></div>` +
       `<div class="cd-body">${esc(body)}</div>` +
       `<div class="cd-actions"><button type="button" class="btn" data-cancel>${esc(cancelText)}</button><button type="button" class="btn cd-ok" data-ok>${esc(okText)}</button></div>`;
     document.body.appendChild(el);
     this.bringWindowToFront(el);
+    this.confirmTrap = this.focusManager.open({ root: () => el });
     el.querySelector<HTMLElement>('[data-ok]')?.focus();
-    const close = () => el.remove();
+    const close = () => {
+      this.confirmTrap?.release();
+      this.confirmTrap = null;
+      el.remove();
+    };
     el.querySelectorAll('[data-cancel]').forEach((b) => {
       b.addEventListener('click', () => {
         audio.click();
@@ -10408,16 +9396,23 @@ export class Hud {
     cancelText?: string;
     onOk?: (value: string) => void;
   }): void {
+    this.confirmTrap?.release(false);
+    this.confirmTrap = null;
     document.getElementById('confirm-dialog')?.remove();
     const el = document.createElement('div');
     el.id = 'confirm-dialog';
     el.className = 'window panel';
     el.style.display = 'block';
+    // Same named, modal dialog semantics as confirmDialog (this reuses the #confirm-dialog
+    // chrome and is focus-trapped below); without them it announces as a bare unlabelled div.
+    el.setAttribute('role', 'dialog');
+    el.setAttribute('aria-modal', 'true');
+    el.setAttribute('aria-labelledby', 'confirm-dialog-title');
     const field = opts.multiline
       ? `<textarea class="cd-input" rows="3" ${opts.readOnly ? 'readonly' : ''} placeholder="${esc(opts.placeholder ?? '')}">${esc(opts.value ?? '')}</textarea>`
       : `<input class="cd-input" type="text" ${opts.readOnly ? 'readonly' : ''} placeholder="${esc(opts.placeholder ?? '')}" value="${esc(opts.value ?? '')}">`;
     el.innerHTML =
-      `<div class="panel-title"><span>${esc(opts.title)}</span><span class="x-btn" data-cancel>${svgIcon('close')}</span></div>` +
+      `<div class="panel-title"><span id="confirm-dialog-title">${esc(opts.title)}</span><span class="x-btn" data-cancel>${svgIcon('close')}</span></div>` +
       (opts.label ? `<div class="cd-body">${esc(opts.label)}</div>` : '') +
       `<div class="cd-field">${field}</div>` +
       `<div class="cd-actions"><button class="btn" data-cancel>${esc(opts.cancelText ?? t('game.talents.cancel'))}</button>` +
@@ -10427,8 +9422,13 @@ export class Hud {
         : '') +
       `</div>`;
     document.body.appendChild(el);
+    this.confirmTrap = this.focusManager.open({ root: () => el });
     const input = el.querySelector('.cd-input') as HTMLInputElement | HTMLTextAreaElement;
-    const close = () => el.remove();
+    const close = () => {
+      this.confirmTrap?.release();
+      this.confirmTrap = null;
+      el.remove();
+    };
     const submit = () => {
       const v = input?.value ?? '';
       close();
@@ -10506,6 +9506,10 @@ export class Hud {
       menu.setAttribute('hidden', '');
       btn.setAttribute('aria-expanded', 'false');
       document.removeEventListener('click', onAway);
+      // Return-to-trigger stays synchronous and OUTSIDE the focus manager: this is the
+      // WAI-ARIA listbox pattern (dropdown_nav.ts), not a window trap, and the manager's
+      // restore() defers a tick, which would drop focus to <body> before the native Tab
+      // handoff below. The dropdown lives inside windows the manager already traps.
       if (returnFocus) btn.focus();
     };
     const onAway = () => close(false);
@@ -10588,777 +9592,40 @@ export class Hud {
     });
   }
 
-  // classic-MMO-style choice-node picker: clicking an octagon node opens a flyout of its
-  // options; selecting one assigns it (spending a point if needed). Anchored to
-  // the node, closes on click-away.
-  private openChoicePopup(anchor: HTMLElement, node: TalentNode, stage: TalentAllocation): void {
-    document.getElementById('tal-choice-pop')?.remove();
-    const cls = this.sim.cfg.playerClass;
-    const total = this.sim.talentPoints().total;
-    const ranks = stage.ranks[node.id] ?? 0;
-    const pop = document.createElement('div');
-    pop.id = 'tal-choice-pop';
-    pop.className = 'tal-choice-pop';
-    pop.setAttribute('role', 'menu');
-    pop.setAttribute('aria-label', tTalent({ kind: 'talentNode', node, field: 'name' }));
-    pop.innerHTML = (node.choices ?? [])
-      .map((o) => {
-        const sel = stage.choices[node.id] === o.id;
-        return (
-          `<div class="tal-choice-opt${sel ? ' sel' : ''}" role="menuitemradio" tabindex="0" aria-checked="${sel}" data-opt="${esc(o.id)}"><span class="tco-icon" style="background-image:url(${esc(talentChoiceIconDataUrl(o))})"></span>` +
-          `<span class="tco-text"><b>${esc(tTalent({ kind: 'talentChoice', choice: o, field: 'name' }))}</b><span>${esc(tTalent({ kind: 'talentChoice', choice: o, field: 'description' }))}</span></span></div>`
-        );
-      })
-      .join('');
-    document.body.appendChild(pop);
-    const r = anchor.getBoundingClientRect();
-    const preferredLeft = r.left + r.width / 2 - pop.offsetWidth / 2;
-    const left = Math.max(8, Math.min(window.innerWidth - pop.offsetWidth - 8, preferredLeft));
-    const top = Math.max(8, Math.min(window.innerHeight - pop.offsetHeight - 8, r.bottom + 12));
-    const caretLeft = Math.max(14, Math.min(pop.offsetWidth - 14, r.left + r.width / 2 - left));
-    pop.style.left = `${left}px`;
-    pop.style.top = `${top}px`;
-    pop.style.setProperty('--tal-choice-caret-left', `${caretLeft}px`);
-    const choose = (optEl: Element) => {
-      const optId = optEl.getAttribute('data-opt') ?? '';
-      if (ranks === 0) {
-        const cand = cloneAllocation(stage);
-        cand.ranks[node.id] = 1;
-        cand.choices[node.id] = optId;
-        if (!validateAllocation(cls, cand, total).ok) {
-          pop.remove();
-          return;
-        } // can't afford / gated
-        stage.ranks[node.id] = 1;
-      }
-      stage.choices[node.id] = optId;
-      pop.remove();
-      this.renderTalents();
-    };
-    pop.querySelectorAll('.tal-choice-opt').forEach((optEl) => {
-      optEl.addEventListener('click', (e) => {
-        e.stopPropagation();
-        choose(optEl);
-      });
-      optEl.addEventListener('keydown', (e) => {
-        const ke = e as KeyboardEvent;
-        if (ke.key === 'Escape') {
-          ke.preventDefault();
-          pop.remove();
-          anchor.focus();
-          return;
-        }
-        this.keyboardActivate(ke, () => choose(optEl));
-      });
-    });
-    const firstOpt = (pop.querySelector('.tal-choice-opt.sel') ??
-      pop.querySelector('.tal-choice-opt')) as HTMLElement | null;
-    firstOpt?.focus();
-    setTimeout(() => document.addEventListener('click', () => pop.remove(), { once: true }), 0);
-  }
-
+  // The leaderboard window is the one async/paged window; it lives in
+  // LeaderboardWindow (leaderboard_view.ts core + leaderboard_window.ts painter),
+  // which consumes the paged leaderboard() and owns the page index + focus.
   toggleLeaderboard(): void {
-    const el = $('#leaderboard-window');
-    if (el.style.display === 'block') {
-      el.style.display = 'none';
-      this.hideTooltip();
-      return;
-    }
-    this.closeOtherWindows('#leaderboard-window');
-    this.leaderboardPage = 0;
-    el.style.display = 'block';
-    void this.renderLeaderboard();
-  }
-
-  async renderLeaderboard(): Promise<void> {
-    const el = $('#leaderboard-window');
-    const myName = this.sim.player.name;
-    el.innerHTML =
-      `<div class="panel-title"><span>${t('game.leaderboard.title')} <span style="color:#998d6a;font-size:11px">${t('game.leaderboard.subtitle')}${this.sim.realm ? ` &middot; ${this.sim.realm}` : ''}</span></span><span class="x-btn" data-close>${svgIcon('close')}</span></div>` +
-      `<div class="lb-body"><div class="lb-loading">${t('game.leaderboard.loading')}</div></div>`;
-    el.querySelector('[data-close]')?.addEventListener('click', () => {
-      el.style.display = 'none';
-    });
-
-    let result: LeaderboardPage | null = null;
-    try {
-      result = await this.sim.leaderboard(this.leaderboardPage, LEADERBOARD_PAGE_SIZE);
-    } catch {
-      result = null;
-    }
-    // panel may have been closed while the fetch was in flight
-    if (el.style.display !== 'block') return;
-    const body = el.querySelector('.lb-body')!;
-    const rows = result?.leaders ?? [];
-    if (rows.length === 0) {
-      body.innerHTML = `<div class="lb-empty">${t('game.leaderboard.empty')}</div>`;
-      return;
-    }
-    // The server clamps the requested page; mirror its answer so the pager state
-    // never drifts past the real last page.
-    this.leaderboardPage = result?.page ?? 0;
-    const header = `<div class="lb-row lb-head"><span class="lb-rank">${t('game.leaderboard.rank')}</span><span class="lb-name">${t('game.leaderboard.name')}</span><span class="lb-lvl">${t('game.leaderboard.level')}</span><span class="lb-vlvl">${t('game.leaderboard.vlevel')}</span><span class="lb-xp">${t('game.leaderboard.lifetimeXp')}</span></div>`;
-    const rowHtml = (r: LeaderboardEntry, mine: boolean): string => {
-      const cls = CLASSES[r.cls];
-      const star =
-        r.prestigeRank > 0
-          ? `<span class="lb-prestige" title="${t('game.prestige.rank')} ${r.prestigeRank}">★${r.prestigeRank}</span> `
-          : '';
-      const title = cls ? ` title="${esc(classDisplayName(r.cls))}"` : '';
-      return (
-        `<div class="lb-row${mine ? ' lb-mine' : ''}"><span class="lb-rank">${r.rank}</span>` +
-        `<span class="lb-name"${title}>${star}${r.name}${mine ? ` <span class="lb-you">(${t('game.leaderboard.you')})</span>` : ''}</span>` +
-        `<span class="lb-lvl">${r.level}</span><span class="lb-vlvl">${r.virtualLevel}</span><span class="lb-xp">${formatXp(r.lifetimeXp)}</span></div>`
-      );
-    };
-    const mineIndex = rows.findIndex((r) => r.name === myName);
-    let html = header + rows.map((r) => rowHtml(r, r.name === myName)).join('');
-    // sticky "your standing" row when the viewer is outside the visible page
-    if (mineIndex === -1) {
-      html += `<div class="lb-sticky"><div class="lb-row lb-mine"><span class="lb-rank">—</span><span class="lb-name">${myName} <span class="lb-you">(${t('game.leaderboard.you')})</span></span><span class="lb-lvl">${this.sim.player.level}</span><span class="lb-vlvl">${virtualLevel(this.sim.lifetimeXp)}</span><span class="lb-xp">${formatXp(this.sim.lifetimeXp)}</span></div></div>`;
-    }
-    html += this.leaderboardPagerHtml(result!);
-    body.innerHTML = html;
-    body.querySelectorAll<HTMLButtonElement>('[data-leaderboard-page]').forEach((button) => {
-      button.addEventListener('click', () => {
-        if (button.disabled) return;
-        this.leaderboardPage += button.dataset.leaderboardPage === 'next' ? 1 : -1;
-        if (this.leaderboardPage < 0) this.leaderboardPage = 0;
-        void this.renderLeaderboard();
-      });
-    });
-  }
-
-  // Prev/Next pager for the leaderboard, mirroring the World Market browse pager.
-  // Reuses the Market pager's generic, fully-localized page strings ("Page X of
-  // Y", "Prev"/"Next"); the visible button text is the accessible name. Hidden
-  // when the whole board fits on one page.
-  private leaderboardPagerHtml(page: LeaderboardPage): string {
-    if (page.pageCount <= 1) return '';
-    const current = formatNumber(page.page + 1, { maximumFractionDigits: 0 });
-    const total = formatNumber(page.pageCount, { maximumFractionDigits: 0 });
-    const status = t('itemUi.market.pageStatus', { current, total });
-    return (
-      `<div class="lb-pager">` +
-      `<button type="button" class="lb-page-btn" data-leaderboard-page="prev"${page.page <= 0 ? ' disabled' : ''}>${esc(t('itemUi.market.pagePrev'))}</button>` +
-      `<span class="lb-page-status">${esc(status)}</span>` +
-      `<button type="button" class="lb-page-btn" data-leaderboard-page="next"${page.page >= page.pageCount - 1 ? ' disabled' : ''}>${esc(t('itemUi.market.pageNext'))}</button>` +
-      `</div>`
-    );
+    this.leaderboardWindow.toggle();
   }
 
   // -------------------------------------------------------------------------
   // Spellbook
   // -------------------------------------------------------------------------
 
+  // The spellbook window lives in SpellbookWindow (spellbook_view.ts core +
+  // spellbook_window.ts painter), which renders the class kit + bar toggles and
+  // refreshes the +/- controls from hud.update() while open.
   toggleSpellbook(): void {
-    const el = $('#spellbook');
-    if (el.style.display === 'block') {
-      el.style.display = 'none';
-      this.hideTooltip();
-      return;
-    }
-    this.closeOtherWindows('#spellbook');
-    this.renderSpellbook();
-    el.style.display = 'block';
-  }
-
-  renderSpellbook(): void {
-    const el = $('#spellbook');
-    const sim = this.sim;
-    const cls = CLASSES[sim.cfg.playerClass];
-    const className = classDisplayName(cls.id);
-    el.setAttribute('aria-label', t('abilityUi.spellbook.title'));
-    // "Reset bar" only applies to classes with per-form bars (druid); other
-    // classes have a single bar, so the button is omitted for them.
-    const resetBtnHtml = this.classHasFormBars()
-      ? `<button type="button" class="x-btn spellbook-reset" data-reset-bar aria-label="${esc(t('abilityUi.spellbook.resetBarAria'))}">${esc(t('abilityUi.spellbook.resetBar'))}</button>`
-      : '';
-    el.innerHTML = `<div class="panel-title"><span>${esc(t('abilityUi.spellbook.title'))} <span class="spellbook-class">${esc(t('abilityUi.spellbook.classSubtitle', { className }))}</span></span><div class="panel-title-actions">${resetBtnHtml}<button type="button" class="x-btn" data-close aria-label="${esc(t('abilityUi.spellbook.close'))}">${svgIcon('close')}</button></div></div>`;
-    const list = document.createElement('div');
-    list.className = 'spell-list';
-    list.setAttribute('role', 'list');
-    el.appendChild(list);
-    let rendered = 0;
-    for (const abilityId of cls.abilities) {
-      const def = ABILITIES[abilityId];
-      const known = sim.known.find((k) => k.def.id === abilityId) ?? null;
-      const row = document.createElement('div');
-      row.className = `spell-row${known ? '' : ' locked'}`;
-      row.tabIndex = 0;
-      row.setAttribute('role', 'listitem');
-      const locked = !known;
-      const summary = known ? describeAbilitySummary(known, sim.player.resourceType) : '';
-      const name = abilityDisplayName(def);
-      const learnLevel = formatAbilityNumber(def.learnLevel);
-      row.setAttribute(
-        'aria-label',
-        known
-          ? t('abilityUi.spellbook.knownAbilityAria', {
-              name,
-              rank: formatAbilityNumber(known.rank),
-              summary,
-            })
-          : t('abilityUi.spellbook.unlearnedAbilityAria', { name, level: learnLevel }),
-      );
-      row.innerHTML = `<div class="spell-icon" style="background-image:url(${iconDataUrl('ability', abilityId)})"></div>
-        <div class="spell-text"><div class="spell-name">${esc(name)}${known && known.rank > 1 ? ` <span class="spell-rank">${esc(t('abilityUi.tooltip.rank', { rank: formatAbilityNumber(known.rank) }))}</span>` : ''}</div>
-        <div class="spell-sub">${locked ? esc(t('abilityUi.spellbook.trainableAtLevel', { level: learnLevel })) : esc(summary)}</div></div>`;
-      if (known) {
-        const onBar = this.hotbarIndexForAbility(known.def.id) !== -1;
-        const toggle = document.createElement('button');
-        toggle.type = 'button';
-        toggle.className = `spell-hotbar-toggle${onBar ? ' remove' : ''}`;
-        toggle.dataset.abilityId = known.def.id;
-        toggle.textContent = onBar ? '-' : '+';
-        toggle.setAttribute('aria-label', `${name} ${onBar ? '-' : '+'}`);
-        toggle.setAttribute('aria-pressed', onBar ? 'true' : 'false');
-        toggle.disabled = !onBar && this.firstEmptyHotbarIndex() === -1;
-        toggle.addEventListener('pointerdown', (ev) => ev.stopPropagation());
-        toggle.addEventListener('click', (ev) => {
-          ev.preventDefault();
-          ev.stopPropagation();
-          const changed =
-            this.hotbarIndexForAbility(known.def.id) !== -1
-              ? this.removeAbilityFromHotbar(known.def.id)
-              : this.addAbilityToHotbar(known.def.id);
-          if (!changed) return;
-          audio.click();
-          this.refreshSpellbookHotbarControls();
-        });
-        row.appendChild(toggle);
-        row.draggable = true;
-        row.addEventListener('dragstart', (e) => {
-          const action = { type: 'ability' as const, id: known.def.id };
-          this.dragAction = { action, sourceIndex: null };
-          this.writeDraggedAction(e.dataTransfer, action);
-          e.dataTransfer!.effectAllowed = 'move';
-          this.hideTooltip();
-        });
-        row.addEventListener('dragend', () => {
-          this.dragAction = null;
-          this.clearActionDropTargets();
-        });
-        this.attachTooltip(row, () => this.abilityTooltip(known));
-      } else {
-        this.attachTooltip(
-          row,
-          () =>
-            `<div class="tt-title">${esc(name)}</div><div class="tt-sub">${esc(t('abilityUi.spellbook.learnAtLevel', { level: learnLevel }))}</div>`,
-        );
-      }
-      list.appendChild(row);
-      rendered++;
-    }
-    if (rendered === 0) {
-      const empty = document.createElement('div');
-      empty.className = 'spell-sub';
-      empty.textContent = t('abilityUi.spellbook.empty');
-      list.appendChild(empty);
-    }
-    el.querySelector('[data-close]')?.addEventListener('click', () => {
-      el.style.display = 'none';
-      this.hideTooltip();
-    });
-    const resetBtn = el.querySelector('[data-reset-bar]');
-    resetBtn?.addEventListener('pointerdown', (ev) => ev.stopPropagation());
-    resetBtn?.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-      this.resetActiveFormBarToDefault();
-      audio.click();
-    });
+    this.spellbookWindow.toggle();
   }
 
   // -------------------------------------------------------------------------
-  // Talents & Specializations panel (bound to 'N'). Staged-edit model: the user
-  // edits a local copy (talentStage), then Apply commits the whole build via the
-  // server-authoritative IWorld.applyTalents (which re-validates). Class/Spec
-  // tabs, shape-coded nodes (square=active, circle=passive, octagon=choice),
-  // prereq arrows, dormant (red) dependents, loadouts, and import/export.
+  // Talents & Specializations panel (bound to 'N'). The interactive staged-edit
+  // window (tree, spec tabs, loadout footer) lives in TalentsWindow; Hud stays the
+  // coordinator (closeOtherWindows needs its private window state). The staged build
+  // commits through the server-authoritative IWorld on save / loadout switch /
+  // delete (saveLoadout / switchLoadout / deleteLoadout), never inline.
   // -------------------------------------------------------------------------
 
   toggleTalents(): void {
     const el = $('#talents-window');
     if (el.style.display === 'block') {
-      el.style.display = 'none';
-      this.hideTooltip();
-      this.talentStage = null;
+      this.talentsWindow.close();
       return;
     }
     this.closeOtherWindows('#talents-window');
-    this.talentStage = cloneAllocation(this.sim.talents);
-    this.renderTalents();
-    el.style.display = 'block';
-  }
-
-  private roleLabel(role: Role): string {
-    return role === 'tank'
-      ? t('game.talents.roleTank')
-      : role === 'healer'
-        ? t('game.talents.roleHealer')
-        : t('game.talents.roleDps');
-  }
-
-  private keyboardActivate(e: KeyboardEvent, action: () => void): void {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    e.preventDefault();
-    action();
-  }
-
-  renderTalents(): void {
-    const el = $('#talents-window');
-    if (el.style.display !== 'block' && this.talentStage === null) return;
-    const cls = this.sim.cfg.playerClass;
-    const ct = talentsFor(cls);
-    const close = `<span class="x-btn" data-close>${svgIcon('close')}</span>`;
-    if (!ct) {
-      el.innerHTML =
-        `<div class="panel-title"><span>${t('game.talents.title')} <span style="color:#998d6a;font-size:11px">${esc(classDisplayName(cls))}</span></span>${close}</div>` +
-        `<div class="tal-empty tal-coming-soon" data-talents-coming-soon>` +
-        `<b>${t('game.talents.comingSoonTitle')}</b>` +
-        `<span>${t('game.talents.comingSoonBody')}</span>` +
-        `</div>`;
-      el.querySelector('[data-close]')?.addEventListener('click', () => {
-        el.style.display = 'none';
-        this.hideTooltip();
-      });
-      return;
-    }
-    if (!this.talentStage) this.talentStage = cloneAllocation(this.sim.talents);
-    const stage = this.talentStage;
-    const total = this.sim.talentPoints().total;
-    const spent = pointsSpent(stage);
-    const treeSpent = (tree: 'class' | 'spec') =>
-      ct.nodes
-        .filter((n) => n.tree === tree && (tree === 'class' || n.specId === stage.spec))
-        .reduce((a, n) => a + (stage.ranks[n.id] ?? 0), 0);
-
-    el.innerHTML =
-      `<div class="panel-title"><span>${t('game.talents.title')} <span style="color:#998d6a;font-size:11px">${esc(classDisplayName(cls))}</span></span>${close}</div>` +
-      `<div class="tal-head"><span>${t('game.talents.available')}: <b>${Math.max(0, total - spent)}</b> / ${total}</span><span>${t('game.talents.spent')}: <b>${spent}</b></span></div>` +
-      `<div class="tal-help">${esc(t('game.talents.pointSource').replace('{first}', String(FIRST_TALENT_LEVEL)).replace('{cap}', String(MAX_LEVEL)))}</div>` +
-      `<div class="tal-tabs" role="tablist" aria-label="${esc(t('game.talents.title'))}">` +
-      `<div class="tal-tab${this.talentTab === 'class' ? ' active' : ''}" role="tab" tabindex="${this.talentTab === 'class' ? '0' : '-1'}" aria-selected="${this.talentTab === 'class'}" aria-controls="tal-body" data-tab="class"><span class="tal-tab-label">${t('game.talents.classTab')}</span><span class="tt-pts">${treeSpent('class')}</span></div>` +
-      `<div class="tal-tab${this.talentTab === 'spec' ? ' active' : ''}" role="tab" tabindex="${this.talentTab === 'spec' ? '0' : '-1'}" aria-selected="${this.talentTab === 'spec'}" aria-controls="tal-body" data-tab="spec"><span class="tal-tab-label">${t('game.talents.specTab')}</span><span class="tt-pts">${treeSpent('spec')}</span></div>` +
-      `</div><div id="tal-body" role="tabpanel"></div>` +
-      this.talentFooterHtml(stage, total, spent);
-
-    const switchTab = (tab: HTMLElement) => {
-      this.talentTab = tab.dataset.tab as 'class' | 'spec';
-      this.renderTalents();
-    };
-    el.querySelectorAll('.tal-tab').forEach((tab) => {
-      tab.addEventListener('click', () => switchTab(tab as HTMLElement));
-      tab.addEventListener('keydown', (e) =>
-        this.keyboardActivate(e as KeyboardEvent, () => switchTab(tab as HTMLElement)),
-      );
-    });
-    el.querySelector('[data-close]')?.addEventListener('click', () => {
-      el.style.display = 'none';
-      this.hideTooltip();
-      this.talentStage = null;
-    });
-
-    const body = el.querySelector('#tal-body') as HTMLElement;
-    if (this.talentTab === 'class') {
-      const tree = document.createElement('div');
-      tree.className = 'tal-tree';
-      body.appendChild(tree);
-      this.renderTalentTree(tree, ct, stage, 'class', undefined);
-    } else {
-      this.renderSpecTab(body, ct, stage);
-    }
-    this.wireTalentFooter(el, stage, total);
-  }
-
-  private renderSpecTab(
-    body: HTMLElement,
-    ct: NonNullable<ReturnType<typeof talentsFor>>,
-    stage: TalentAllocation,
-  ): void {
-    const picker = document.createElement('div');
-    picker.className = 'tal-specs';
-    picker.setAttribute('role', 'radiogroup');
-    picker.setAttribute('aria-label', t('game.talents.specTab'));
-    for (const sp of ct.specs) {
-      const card = document.createElement('div');
-      const selected = stage.spec === sp.id;
-      card.className = `tal-spec${selected ? ' sel' : ''}`;
-      card.setAttribute('role', 'radio');
-      card.setAttribute('tabindex', selected || !stage.spec ? '0' : '-1');
-      card.setAttribute('aria-checked', String(selected));
-      const specName = tTalent({ kind: 'talentSpec', spec: sp, field: 'name' });
-      const specDescription = tTalent({ kind: 'talentSpec', spec: sp, field: 'description' });
-      const masteryName = tTalent({ kind: 'talentMastery', spec: sp, field: 'name' });
-      const masteryDescription = tTalent({ kind: 'talentMastery', spec: sp, field: 'description' });
-      card.setAttribute('aria-label', `${specName}, ${this.roleLabel(sp.role)}`);
-      card.innerHTML = `<div class="ts-icon">${esc(sp.icon)}</div><div class="ts-name">${esc(specName)}</div><div class="ts-role">${this.roleLabel(sp.role)}</div>`;
-      this.attachTooltip(
-        card,
-        () =>
-          `<div class="tt-title">${esc(specName)}</div><div class="tt-sub">${esc(specDescription)}</div>` +
-          `<div class="tt-sub" style="color:#ffd100">${t('game.talents.signature')}: ${esc(ABILITIES[sp.signature] ? abilityDisplayName(ABILITIES[sp.signature]) : sp.signature)}</div>` +
-          `<div class="tt-sub">${t('game.talents.mastery')}: ${esc(masteryName)} — ${esc(masteryDescription)}</div>`,
-      );
-      card.addEventListener('click', () => this.stageSetSpec(stage, sp.id));
-      card.addEventListener('keydown', (e) =>
-        this.keyboardActivate(e as KeyboardEvent, () => this.stageSetSpec(stage, sp.id)),
-      );
-      picker.appendChild(card);
-    }
-    body.appendChild(picker);
-    const sp = ct.specs.find((s) => s.id === stage.spec);
-    if (!sp) {
-      const e = document.createElement('div');
-      e.className = 'tal-empty';
-      e.textContent = t('game.talents.chooseSpec');
-      body.appendChild(e);
-      return;
-    }
-    const m = document.createElement('div');
-    m.className = 'tal-mastery';
-    m.innerHTML = `<b>${t('game.talents.mastery')}: ${esc(tTalent({ kind: 'talentMastery', spec: sp, field: 'name' }))}</b> — ${esc(tTalent({ kind: 'talentMastery', spec: sp, field: 'description' }))}`;
-    body.appendChild(m);
-    const tree = document.createElement('div');
-    tree.className = 'tal-tree';
-    body.appendChild(tree);
-    this.renderTalentTree(tree, ct, stage, 'spec', sp.id);
-  }
-
-  private stageSetSpec(stage: TalentAllocation, specId: string): void {
-    if (stage.spec === specId) return;
-    stage.spec = specId;
-    const ct = talentsFor(this.sim.cfg.playerClass);
-    for (const id of Object.keys(stage.ranks)) {
-      const n = ct?.nodes.find((x) => x.id === id);
-      if (n?.tree === 'spec' && n.specId !== specId) {
-        delete stage.ranks[id];
-        delete stage.choices[id];
-      }
-    }
-    this.renderTalents();
-  }
-
-  private renderTalentTree(
-    host: HTMLElement,
-    ct: NonNullable<ReturnType<typeof talentsFor>>,
-    stage: TalentAllocation,
-    tree: 'class' | 'spec',
-    specId: string | undefined,
-  ): void {
-    const cls = this.sim.cfg.playerClass;
-    const nodes = ct.nodes.filter(
-      (n) => n.tree === tree && (tree === 'class' || n.specId === specId),
-    );
-    if (nodes.length === 0) {
-      host.innerHTML = `<div class="tal-empty">${t('game.talents.pickSpecFirst')}</div>`;
-      return;
-    }
-    const cols = Math.max(...nodes.map((n) => n.col)) + 1;
-    const rows = Math.max(...nodes.map((n) => n.row)) + 1;
-    const CW = 86,
-      CH = 70,
-      NS = 46,
-      TOP = 6;
-    const W = cols * CW,
-      H = rows * CH + TOP;
-    host.style.width = `${W}px`;
-    host.style.height = `${H}px`;
-    const cx = (n: TalentNode) => n.col * CW + CW / 2;
-    const cy = (n: TalentNode) => n.row * CH + TOP + NS / 2;
-    const byId = new Map(nodes.map((n) => [n.id, n]));
-    const dormant = dormantNodes(cls, stage);
-    const total = this.sim.talentPoints().total;
-
-    let svg = `<svg class="tal-arrows" width="${W}" height="${H}">`;
-    for (const n of nodes)
-      for (const req of n.requires ?? []) {
-        const r = byId.get(req);
-        if (!r) continue;
-        const filled = (stage.ranks[req] ?? 0) > 0;
-        svg += `<line x1="${cx(r)}" y1="${cy(r) + NS / 2}" x2="${cx(n)}" y2="${cy(n) - NS / 2}" stroke="${filled ? '#f5c843' : '#5a4a22'}" stroke-width="2"/>`;
-      }
-    host.insertAdjacentHTML('beforeend', `${svg}</svg>`);
-
-    for (const n of nodes) {
-      const ranks = stage.ranks[n.id] ?? 0;
-      const isDormant = dormant.has(n.id);
-      const cand = cloneAllocation(stage);
-      cand.ranks[n.id] = ranks + 1;
-      if (n.kind === 'choice' && !cand.choices[n.id] && n.choices?.[0]) {
-        cand.choices[n.id] = n.choices[0].id;
-      }
-      const canAdd = ranks < n.maxRank && validateAllocation(cls, cand, total).ok;
-      const shape = n.kind === 'active' ? 'square' : n.kind === 'choice' ? 'octagon' : 'circle';
-      const state = isDormant
-        ? 'dormant'
-        : ranks >= n.maxRank
-          ? 'maxed'
-          : ranks > 0
-            ? 'filled'
-            : canAdd
-              ? 'avail'
-              : 'locked';
-      const chosen =
-        n.kind === 'choice' ? n.choices?.find((c) => c.id === stage.choices[n.id]) : undefined;
-      const div = document.createElement('div');
-      div.className = `tal-node ${shape} ${state}`;
-      div.setAttribute('role', 'button');
-      div.setAttribute('tabindex', '0');
-      div.setAttribute('aria-pressed', String(ranks > 0));
-      if (!canAdd && ranks <= 0) div.setAttribute('aria-disabled', 'true');
-      const nodeName = tTalent({ kind: 'talentNode', node: n, field: 'name' });
-      const chosenLabel = chosen
-        ? `, ${tTalent({ kind: 'talentChoice', choice: chosen, field: 'name' })}`
-        : '';
-      div.setAttribute(
-        'aria-label',
-        `${nodeName}${chosenLabel}, ${t('game.talents.rank')} ${ranks}/${n.maxRank}`,
-      );
-      div.style.left = `${n.col * CW + (CW - NS) / 2}px`;
-      div.style.top = `${n.row * CH + TOP}px`;
-      const icon = document.createElement('span');
-      icon.className = 'tal-icon';
-      icon.style.backgroundImage = `url(${chosen ? talentChoiceIconDataUrl(chosen) : talentNodeIconDataUrl(n)})`;
-      div.appendChild(icon);
-      if (ranks > 0 || n.maxRank > 1) {
-        const badge = document.createElement('span');
-        badge.className = 'tal-rank';
-        badge.textContent = `${ranks}/${n.maxRank}`;
-        div.appendChild(badge);
-      }
-      this.attachTooltip(div, () => this.talentTooltip(n, stage, isDormant));
-      div.addEventListener('click', () => {
-        // octagon choice nodes open a classic-MMO-style option flyout; others add a rank
-        if (n.kind === 'choice') this.openChoicePopup(div, n, stage);
-        else this.talentNodeClick(stage, n);
-      });
-      div.addEventListener('keydown', (e) => {
-        const ke = e as KeyboardEvent;
-        if (ke.key === 'Backspace' || ke.key === 'Delete') {
-          ke.preventDefault();
-          this.talentNodeRemove(stage, n);
-          return;
-        }
-        this.keyboardActivate(ke, () => {
-          if (n.kind === 'choice') this.openChoicePopup(div, n, stage);
-          else this.talentNodeClick(stage, n);
-        });
-      });
-      div.addEventListener('contextmenu', (e) => {
-        e.preventDefault();
-        this.talentNodeRemove(stage, n);
-      });
-      host.appendChild(div);
-    }
-  }
-
-  private talentNodeClick(stage: TalentAllocation, n: TalentNode): void {
-    const cls = this.sim.cfg.playerClass;
-    const total = this.sim.talentPoints().total;
-    const ranks = stage.ranks[n.id] ?? 0;
-    if (ranks >= n.maxRank) return;
-    const cand = cloneAllocation(stage);
-    cand.ranks[n.id] = ranks + 1;
-    if (!validateAllocation(cls, cand, total).ok) return;
-    stage.ranks[n.id] = ranks + 1;
-    this.renderTalents();
-  }
-
-  private talentNodeRemove(stage: TalentAllocation, n: TalentNode): void {
-    const ranks = stage.ranks[n.id] ?? 0;
-    if (ranks <= 0) return;
-    if (ranks - 1 <= 0) {
-      delete stage.ranks[n.id];
-      delete stage.choices[n.id];
-    } else stage.ranks[n.id] = ranks - 1;
-    this.renderTalents();
-  }
-
-  private talentTooltip(n: TalentNode, stage: TalentAllocation, isDormant: boolean): string {
-    const ranks = stage.ranks[n.id] ?? 0;
-    let html = `<div class="tt-title">${esc(tTalent({ kind: 'talentNode', node: n, field: 'name' }))}</div><div class="tt-sub">${esc(tTalent({ kind: 'talentNode', node: n, field: 'description' }))}</div>`;
-    if (n.kind === 'choice') {
-      for (const o of n.choices!) {
-        const sel = stage.choices[n.id] === o.id;
-        html += `<div class="tt-sub" style="color:${sel ? '#ffd100' : '#aaa'}"><span class="tt-opt-icon" style="background-image:url(${esc(talentChoiceIconDataUrl(o))})"></span> ${esc(tTalent({ kind: 'talentChoice', choice: o, field: 'name' }))} — ${esc(tTalent({ kind: 'talentChoice', choice: o, field: 'description' }))}</div>`;
-      }
-      html += `<div class="tt-sub" style="color:#8aa">${t('game.talents.cycleHint')}</div>`;
-    } else {
-      html += `<div class="tt-sub">${t('game.talents.rank')} ${ranks}/${n.maxRank}</div>`;
-    }
-    const ct = talentsFor(this.sim.cfg.playerClass);
-    if (n.requires?.length) {
-      const names = n.requires
-        .map((r) => {
-          const required = ct?.nodes.find((x) => x.id === r);
-          return required ? tTalent({ kind: 'talentNode', node: required, field: 'name' }) : r;
-        })
-        .join(', ');
-      html += `<div class="tt-sub" style="color:#caa">${t('game.talents.requires')}: ${esc(names)}</div>`;
-    }
-    if (n.pointsGate)
-      html += `<div class="tt-sub" style="color:#caa">${n.pointsGate} ${t('game.talents.pointsGate')}</div>`;
-    if (isDormant)
-      html += `<div class="tt-sub" style="color:#e0635a">${t('game.talents.dormant')}</div>`;
-    html += `<div class="tt-sub" style="color:#8aa">${t('game.talents.editHint')}</div>`;
-    return html;
-  }
-
-  private talentFooterHtml(stage: TalentAllocation, total: number, spent: number): string {
-    const cls = this.sim.cfg.playerClass;
-    const valid = validateAllocation(cls, stage, total).ok;
-    return (
-      `<div class="tal-foot">` +
-      `<section class="tal-build-card tal-build-current" aria-label="${esc(t('game.talents.currentBuild'))}">` +
-      `<div class="tal-build-head"><span>${t('game.talents.currentBuild')}</span><span class="tal-loadslot"></span></div>` +
-      `<div class="tal-build-actions">` +
-      `<button class="btn tal-primary" data-act="save"${valid ? '' : ' disabled'}>${t('game.talents.saveBuild')}</button>` +
-      `<button class="btn tal-secondary" data-act="export">${t('game.talents.export')}</button>` +
-      `<button class="btn tal-secondary" data-act="del"${this.sim.activeLoadout >= 0 ? '' : ' disabled'}>${t('game.talents.deleteBuild')}</button>` +
-      `<button class="btn tal-secondary" data-act="clear"${spent > 0 ? '' : ' disabled'}>${t('game.talents.clear')}</button>` +
-      `</div>` +
-      `<div class="tal-build-help">${t('game.talents.currentBuildHint')}</div>` +
-      `</section>` +
-      `<section class="tal-build-card tal-build-create" aria-label="${esc(t('game.talents.createBuild'))}">` +
-      `<div class="tal-build-head"><span>${t('game.talents.createBuild')}</span></div>` +
-      `<div class="tal-build-actions">` +
-      `<button class="btn tal-primary" data-act="new"${valid ? '' : ' disabled'}>${t('game.talents.newBuild')}</button>` +
-      `<button class="btn tal-secondary" data-act="import">${t('game.talents.import')}</button>` +
-      `</div>` +
-      `<div class="tal-build-help">${t('game.talents.createBuildHint')}</div>` +
-      `</section>` +
-      `</div>`
-    );
-  }
-
-  private wireTalentFooter(el: HTMLElement, stage: TalentAllocation, total: number): void {
-    const cls = this.sim.cfg.playerClass;
-    el.querySelector('[data-act="clear"]')?.addEventListener('click', () => {
-      stage.ranks = {};
-      stage.choices = {};
-      this.renderTalents();
-    });
-    const saveStagedBuild = (name: string): void => {
-      const n = name.trim();
-      if (!n) return;
-      this.sim.saveLoadout(
-        n,
-        this.hotbarActions.map((a) => (a && a.type === 'ability' ? a.id : null)),
-        cloneAllocation(stage),
-      );
-      this.talentStage = cloneAllocation(stage);
-      this.renderTalents();
-    };
-    const promptNewBuild = (): void => {
-      this.inputDialog({
-        title: t('game.talents.saveBuildAs'),
-        label: t('game.talents.namePrompt'),
-        value: t('hudChrome.talents.defaultBuildName', { n: this.sim.loadouts.length + 1 }),
-        okText: t('game.talents.save'),
-        selectText: true,
-        onOk: saveStagedBuild,
-      });
-    };
-    el.querySelector('[data-act="save"]')?.addEventListener('click', () => {
-      if (!validateAllocation(cls, stage, total).ok) {
-        this.showError(t('game.talents.buildInvalid'));
-        return;
-      }
-      const active = this.sim.activeLoadout >= 0 ? this.sim.loadouts[this.sim.activeLoadout] : null;
-      if (active) saveStagedBuild(active.name);
-      else promptNewBuild();
-    });
-    el.querySelector('[data-act="new"]')?.addEventListener('click', () => {
-      if (!validateAllocation(cls, stage, total).ok) {
-        this.showError(t('game.talents.buildInvalid'));
-        return;
-      }
-      promptNewBuild();
-    });
-    // in-app loadout dropdown (shared component, no native <select>)
-    const slot = el.querySelector('.tal-loadslot');
-    if (slot) {
-      const opts = this.sim.loadouts.length
-        ? this.sim.loadouts.map((l, i) => ({ value: String(i), label: l.name }))
-        : [{ value: '-1', label: t('game.talents.noBuilds') }];
-      const current =
-        this.sim.activeLoadout >= 0
-          ? String(this.sim.activeLoadout)
-          : this.sim.loadouts.length
-            ? ''
-            : '-1';
-      slot.replaceWith(
-        this.buildDropdown(
-          opts,
-          current,
-          (v) => {
-            const i = parseInt(v, 10);
-            const lo = this.sim.loadouts[i];
-            if (!lo) return;
-            this.sim.switchLoadout(i);
-            this.applyLoadoutBar(lo.bar);
-            this.talentStage = cloneAllocation(lo.alloc);
-            this.renderTalents();
-          },
-          t('game.talents.loadouts'),
-          { ariaLabel: t('game.talents.loadouts') },
-        ),
-      );
-    }
-    el.querySelector('[data-act="del"]')?.addEventListener('click', () => {
-      if (this.sim.activeLoadout < 0) {
-        this.showError(t('game.talents.selectBuildFirst'));
-        return;
-      }
-      const active = this.sim.loadouts[this.sim.activeLoadout];
-      if (!active) {
-        this.showError(t('game.talents.selectBuildFirst'));
-        return;
-      }
-      const body = t('game.talents.deleteBuildBody', { name: active.name });
-      this.confirmDialog(
-        t('game.talents.deleteBuildTitle'),
-        body,
-        t('game.talents.deleteBuildConfirm'),
-        t('game.talents.cancel'),
-        () => {
-          this.sim.deleteLoadout(this.sim.activeLoadout);
-          this.renderTalents();
-        },
-      );
-    });
-    el.querySelector('[data-act="export"]')?.addEventListener('click', () => {
-      const active = this.sim.activeLoadout >= 0 ? this.sim.loadouts[this.sim.activeLoadout] : null;
-      this.inputDialog({
-        title: t('game.talents.export'),
-        label: t('game.talents.exportTitle'),
-        value: exportBuild(cls, active?.alloc ?? stage),
-        multiline: true,
-        readOnly: true,
-        copy: true,
-        cancelText: t('game.talents.close'),
-      });
-    });
-    el.querySelector('[data-act="import"]')?.addEventListener('click', () => {
-      this.inputDialog({
-        title: t('game.talents.import'),
-        label: t('game.talents.importPrompt'),
-        placeholder: 'eyJ2Ijox…',
-        multiline: true,
-        okText: t('game.talents.import'),
-        onOk: (str) => {
-          const res = importBuild(str.trim());
-          if (!res.ok || res.cls !== cls) {
-            this.showError(t('game.talents.invalidBuild'));
-            return;
-          }
-          this.talentStage = res.alloc;
-          this.renderTalents();
-        },
-      });
-    });
+    this.talentsWindow.open();
   }
 
   // Restore a saved loadout's action bar into the per-class slot map (reuses the
@@ -11375,130 +9642,11 @@ export class Hud {
   // Quest log window
   // -------------------------------------------------------------------------
 
+  // The quest-log window lives in QuestLogWindow (questlog_view.ts core +
+  // questlog_window.ts painter), which owns the selected quest id (read back by the
+  // quest-share command via selectedQuestId) and the abandon / chat-link flows.
   toggleQuestLog(): void {
-    const el = $('#quest-log-window');
-    if (el.style.display === 'block') {
-      this.closeQuestLog();
-      return;
-    }
-    this.questLogReturnFocus = this.currentFocusableElement();
-    this.closeOtherWindows('#quest-log-window');
-    this.renderQuestLog();
-    el.style.display = 'block';
-  }
-
-  private closeQuestLog(restoreFocus = true): void {
-    $('#quest-log-window').style.display = 'none';
-    this.hideTooltip();
-    const target = this.questLogReturnFocus;
-    this.questLogReturnFocus = null;
-    if (restoreFocus) this.restoreFocus(target);
-  }
-
-  renderQuestLog(): void {
-    const el = $('#quest-log-window');
-    const sim = this.sim;
-    el.setAttribute('role', 'dialog');
-    el.setAttribute('aria-modal', 'false');
-    el.setAttribute('aria-labelledby', 'quest-log-title');
-    el.setAttribute('tabindex', '-1');
-    el.innerHTML = `<div class="panel-title"><span id="quest-log-title">${esc(t('questUi.log.title'))} <span class="quest-muted">${esc(
-      t('questUi.log.summary', {
-        active: this.questNumber(sim.questLog.size),
-        completed: this.questNumber(sim.questsDone.size),
-      }),
-    )}</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('questUi.log.close'))}">${svgIcon('close')}</button></div>`;
-    const cols = document.createElement('div');
-    cols.className = 'ql-cols';
-    const list = document.createElement('div');
-    list.className = 'ql-list';
-    const detail = document.createElement('div');
-    detail.className = 'ql-detail';
-    cols.append(list, detail);
-    el.appendChild(cols);
-
-    const quests = [...sim.questLog.values()];
-    if (quests.length === 0) {
-      list.innerHTML = `<div class="ql-empty">${esc(t('questUi.log.emptyTitle'))}</div>`;
-      detail.innerHTML = `<div class="ql-detail-body"><div class="qd-text">${esc(t('questUi.log.emptyHint'))}</div></div>`;
-    }
-    if (!this.selectedQuestLogId || !sim.questLog.has(this.selectedQuestLogId)) {
-      this.selectedQuestLogId = quests[0]?.questId ?? null;
-    }
-    for (const qp of quests) {
-      const _quest = QUESTS[qp.questId];
-      const item = document.createElement('button');
-      const status =
-        qp.state === 'ready' ? t('questUi.log.readyStatus') : t('questUi.log.activeStatus');
-      const title = questTitle(qp.questId);
-      item.type = 'button';
-      item.className = `ql-item${qp.questId === this.selectedQuestLogId ? ' sel' : ''}`;
-      item.setAttribute('aria-pressed', qp.questId === this.selectedQuestLogId ? 'true' : 'false');
-      item.setAttribute('aria-label', t('questUi.log.selectedQuestAria', { name: title, status }));
-      item.title = t('hudChrome.questShare.linkTitle');
-      item.innerHTML = `${esc(title)}${qp.state === 'ready' ? ` <span class="quest-complete">(${esc(t('questUi.log.readyStatus'))})</span>` : ''}`;
-      item.addEventListener('click', (ev) => {
-        if (ev.shiftKey) {
-          this.insertQuestChatLink(qp.questId);
-          return;
-        }
-        this.selectedQuestLogId = qp.questId;
-        this.renderQuestLog();
-      });
-      list.appendChild(item);
-    }
-    if (this.selectedQuestLogId) {
-      const qp = sim.questLog.get(this.selectedQuestLogId)!;
-      const quest = QUESTS[this.selectedQuestLogId];
-      let html = `<div class="qd-sub ql-detail-title">${esc(questTitle(this.selectedQuestLogId))}${this.questSuggestedPlayersHtml(quest.suggestedPlayers)}</div>`;
-      html += quest.objectives
-        .map(
-          (o, i) =>
-            `<div class="qd-obj${qp.counts[i] >= o.count ? ' done' : ''}">${esc(this.questProgressText(questObjectiveLabel(this.selectedQuestLogId!, i), qp.counts[i], o.count))}</div>`,
-        )
-        .join('');
-      html += `<div class="qd-text ql-detail-text">${esc(questNarrative(this.selectedQuestLogId, 'text', sim.player.name))}</div>`;
-      html += `<div class="qd-sub">${esc(t('questUi.detail.rewards'))}</div><div class="qd-obj">${esc(t('questUi.detail.xpReward', { xp: this.questNumber(quest.xpReward) }))} &nbsp; ${this.moneyHtml(quest.copperReward)}</div>`;
-      const rewardItem = questRewardItem(quest, sim.cfg.playerClass);
-      if (rewardItem) {
-        const item = ITEMS[rewardItem];
-        html += `<div class="qd-reward-row" data-reward><span class="qd-reward-label">${esc(t('questUi.detail.itemReward'))}</span>${this.itemIcon(item)}<span class="qd-reward-name" style="color:${QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff'}">${esc(itemDisplayName(item))}</span></div>`;
-      }
-      const giver = NPCS[quest.turnInNpcId];
-      html += `<div class="qd-obj quest-return">${esc(t('questUi.log.returnTo', { name: giver ? npcDisplayName(giver.id) : '?' }))}</div>`;
-      const body = document.createElement('div');
-      body.className = 'ql-detail-body';
-      body.innerHTML = html;
-      detail.replaceChildren(body);
-      const rewardRow = body.querySelector('[data-reward]') as HTMLElement | null;
-      if (rewardRow && rewardItem)
-        this.attachTooltip(rewardRow, () => this.itemTooltip(ITEMS[rewardItem]));
-      const actions = document.createElement('div');
-      actions.className = 'ql-detail-actions';
-      const abandon = document.createElement('button');
-      abandon.className = 'btn';
-      abandon.type = 'button';
-      abandon.textContent = t('questUi.log.abandon');
-      abandon.addEventListener('click', () => {
-        const questId = this.selectedQuestLogId;
-        if (!questId) return;
-        this.confirmDialog(
-          t('questUi.log.abandonConfirmTitle'),
-          t('questUi.log.abandonConfirmBody', { name: questTitle(questId) }),
-          t('questUi.log.abandonConfirm'),
-          t('questUi.log.abandonCancel'),
-          () => {
-            sim.abandonQuest(questId);
-            this.selectedQuestLogId = null;
-            this.renderQuestLog();
-          },
-        );
-      });
-      actions.appendChild(abandon);
-      detail.appendChild(actions);
-    }
-    el.querySelector('[data-close]')?.addEventListener('click', () => this.closeQuestLog());
-    this.focusFirstInteractive(el);
+    this.questlogWindow.toggle();
   }
 
   // -------------------------------------------------------------------------
@@ -11506,59 +9654,111 @@ export class Hud {
   // -------------------------------------------------------------------------
 
   private updatePartyFrames(): void {
-    const el = $('#party-frames');
     const target =
       this.sim.player.targetId !== null ? this.sim.entities.get(this.sim.player.targetId) : null;
-    el.classList.toggle('below-target', !!target && target.kind !== 'object');
+    this.partyFramesPainter.setBelowTarget(!!target && target.kind !== 'object');
     const info = this.sim.partyInfo;
     if (!info) {
-      if (el.innerHTML !== '') el.innerHTML = '';
-      this.lastPartySig = '';
+      // Clear only on the transition out of a party (matching the inline `innerHTML
+      // !== ''` guard), so a persistently party-less HUD does no per-frame work.
+      if (this.lastPartySig !== '') {
+        this.partyFramesPainter.clear();
+        this.lastPartySig = '';
+      }
+      this.lastPartyFooterSig = '';
       return;
     }
-    const myGroup = info.members.find((m) => m.pid === this.sim.playerId)?.group ?? 1;
-    const others = selectPartyFrameMembers(info, this.sim.playerId, this.sim.player.pos);
-    // include combat/range state so the frames rebuild when a badge changes
-    const sig = `${others.map((m) => `${m.pid}:${m.group}:${m.hp}/${m.mhp}:${m.res}:${m.dead}:${m.inCombat}:${m.oor ? 1 : 0}:${m.level}`).join('|')}L${info.leader}:R${info.raid ? 1 : 0}:G${myGroup}`;
+    // Leader-only master-loot control. Its signature is deliberately LOW frequency
+    // (loot settings + membership + leadership, NO hp/res), so the checkbox and
+    // dropdowns are not destroyed and rebuilt under the cursor on every combat tick
+    // (the desync/churn the master-loot control is prone to). The painter keeps the
+    // built node positioned just before the leave button across member rebuilds.
+    const isLeader = info.leader === this.sim.playerId;
+    const footerSig = isLeader
+      ? `lead:M${info.master.enabled ? 1 : 0}/${info.master.looter}/${info.master.threshold}:${info.members.map((m) => `${m.pid}:${m.name}`).join(',')}`
+      : 'member';
+    if (footerSig !== this.lastPartyFooterSig) {
+      this.lastPartyFooterSig = footerSig;
+      this.partyFramesPainter.setMasterControl(isLeader ? this.buildMasterLootControl(info) : null);
+    }
+    // Hoist the cheap signature (a single string pass, no intermediate arrays) AHEAD
+    // of the selector so an unchanged party short-circuits before selectPartyFrameMembers
+    // allocates its sorted / filtered / mapped arrays.
+    const sig = partyFrameSignature(info, this.sim.playerId, this.sim.player.pos);
     if (sig === this.lastPartySig) return;
     this.lastPartySig = sig;
-    el.innerHTML = '';
-    for (const m of others) {
-      const frame = document.createElement('div');
-      frame.className =
-        'party-frame panel' +
-        (m.dead ? ' dead' : m.inCombat ? ' combat' : '') +
-        (m.oor ? ' oor' : '');
-      frame.style.setProperty('--cls', classCss(m.cls));
-      const resClass = m.rtype === 'rage' ? 'rage' : m.rtype === 'energy' ? 'energy' : 'mana';
-      const badge = m.dead
-        ? `<span class="pf-badge dead" title="${esc(t('hud.social.status.dead'))}">${svgIcon('skull')}</span>`
-        : m.inCombat
-          ? `<span class="pf-badge combat" title="${esc(t('hud.social.status.combat'))}">${svgIcon('arena')}</span>`
-          : '';
-      const range = m.oor
-        ? `<span class="pf-badge oor" title="${esc(t('hud.errors.outOfRange'))}">⤢</span>`
-        : '';
-      const crest = m.cls
-        ? `<img class="pfm-crest" src="${iconDataUrl('crest', `class_${m.cls}`, 20)}" alt="">`
-        : '';
-      frame.innerHTML = `
-        <div class="pfm-name"><span class="pfm-id">${crest}${esc(m.name)}</span><span class="pfm-meta">${badge}${range}<span class="lead">${info.leader === m.pid ? '★' : ''}${m.level}</span></span></div>
-        <div class="bar hp"><div class="bar-fill" style="transform:scaleX(${(m.hp / Math.max(1, m.mhp)).toFixed(3)})"></div></div>
-        <div class="bar ${resClass}"><div class="bar-fill" style="transform:scaleX(${(m.res / Math.max(1, m.mres)).toFixed(3)})"></div></div>`;
-      frame.addEventListener('click', () => this.sim.targetEntity(m.pid));
-      frame.addEventListener('contextmenu', (ev) => {
-        ev.preventDefault();
-        this.openContextMenu(m.pid, m.name, ev.clientX, ev.clientY);
-      });
-      el.appendChild(frame);
-    }
-    const leave = document.createElement('button');
-    leave.className = 'btn';
-    leave.id = 'party-leave';
-    leave.textContent = t('hud.social.leaveParty');
-    leave.addEventListener('click', () => this.sim.partyLeave());
-    el.appendChild(leave);
+    const others = selectPartyFrameMembers(info, this.sim.playerId, this.sim.player.pos);
+    this.partyFramesPainter.sync(others, info.leader, info.raid);
+  }
+
+  // Leader-only loot-method control: enable master loot, choose the master looter
+  // (the leader by default), and the quality threshold for assigned drops. Returns
+  // the built node; the party-frames painter owns its placement + lifetime.
+  private buildMasterLootControl(info: PartyInfo): HTMLElement {
+    const m = info.master;
+    const box = document.createElement('div');
+    box.className = 'party-loot panel';
+    // A label-wrapped checkbox toggles on a primary click, but the browser also
+    // toggles it on right/middle-click here, which spuriously flips the setting.
+    // Suppress non-primary activation (and the context menu) on the whole panel.
+    box.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) e.preventDefault();
+    });
+    box.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+    const memberOptions = info.members
+      .map(
+        (mem) =>
+          `<option value="${mem.pid}" ${m.looter === mem.pid ? 'selected' : ''}>${esc(mem.name)}</option>`,
+      )
+      .join('');
+    const thr = (v: string, label: string) =>
+      `<option value="${v}" ${m.threshold === v ? 'selected' : ''}>${esc(label)}</option>`;
+    box.innerHTML = `
+      <label class="party-loot-row toggle">
+        <input type="checkbox" id="ml-enable" ${m.enabled ? 'checked' : ''} aria-label="${esc(t('hudChrome.masterLoot.enableAria'))}">
+        <span>${esc(t('hudChrome.masterLoot.enableLabel'))}</span>
+      </label>
+      <label class="party-loot-row">
+        <span>${esc(t('hudChrome.masterLoot.looterLabel'))}</span>
+        <select id="ml-looter" ${m.enabled ? '' : 'disabled'}>
+          <option value="0" ${m.looter === 0 ? 'selected' : ''}>${esc(t('hudChrome.masterLoot.leaderOption'))}</option>
+          ${memberOptions}
+        </select>
+      </label>
+      <label class="party-loot-row">
+        <span>${esc(t('hudChrome.masterLoot.thresholdLabel'))}</span>
+        <select id="ml-threshold" ${m.enabled ? '' : 'disabled'}>
+          ${thr('uncommon', t('hudChrome.masterLoot.thresholdUncommon'))}
+          ${thr('rare', t('hudChrome.masterLoot.thresholdRare'))}
+          ${thr('epic', t('hudChrome.masterLoot.thresholdEpic'))}
+        </select>
+      </label>`;
+    const enable = box.querySelector<HTMLInputElement>('#ml-enable')!;
+    const looter = box.querySelector<HTMLSelectElement>('#ml-looter')!;
+    const threshold = box.querySelector<HTMLSelectElement>('#ml-threshold')!;
+    const applyMaster = (enabled: boolean) =>
+      this.sim.setPartyLootMaster(
+        enabled,
+        Number(looter.value),
+        threshold.value as MasterLootThreshold,
+      );
+    // Controlled checkbox: suppress the browser's optimistic toggle and derive the
+    // next value from authoritative party state. The DOM checkbox is only updated by
+    // a server-confirmed rebuild, so it can never desync from the server (a checked
+    // box left over disabled dropdowns) or send a value read from a half-toggled DOM
+    // input.
+    enable.addEventListener('click', (e) => {
+      e.preventDefault();
+      applyMaster(!m.enabled);
+    });
+    // The selects are only enabled while master loot is on, so m.enabled is true
+    // here; keep it and update the looter / threshold.
+    looter.addEventListener('change', () => applyMaster(m.enabled));
+    threshold.addEventListener('change', () => applyMaster(m.enabled));
+    return box;
   }
 
   // -------------------------------------------------------------------------
@@ -11586,12 +9786,10 @@ export class Hud {
     this.bindContextMenuActions((act) => {
       if (act === 'convert-raid') {
         this.sim.convertPartyToRaid();
-        this.socialTab = 'raid';
-        if ($('#social-window').classList.contains('open')) this.renderSocial();
+        this.socialWindow.selectRaidTab();
       } else if (act === 'convert-party') {
         this.sim.convertRaidToParty();
-        this.socialTab = 'raid';
-        if ($('#social-window').classList.contains('open')) this.renderSocial();
+        this.socialWindow.selectRaidTab();
       }
     });
   }
@@ -11988,563 +10186,18 @@ export class Hud {
   }
 
   // -------------------------------------------------------------------------
-  // Social panel: friends / guild / ignore (online play)
+  // Social panel: friends / guild / ignore / raid (online play).
+  //
+  // The window is a pure core (social_view.ts) + painter (social_window.ts). Hud
+  // stays the coordinator: it owns the open/close keybind, the slow-HUD cadence
+  // refresh (update -> socialWindow.refreshIfChanged), the chat-context raid-tab
+  // jump (selectRaidTab), and the window-manager close, delegating each to the
+  // painter. The painter owns the tab/notice/typeahead state + the listener
+  // delegation that keeps a cadence repaint from churning per-row handlers.
   // -------------------------------------------------------------------------
 
   toggleSocial(): void {
-    const el = $('#social-window');
-    if (el.classList.contains('open')) {
-      el.classList.remove('open');
-      return;
-    }
-    this.closeOtherWindows('#social-window');
-    el.classList.add('open');
-    this.socialNotice = null;
-    this.lastSocialStruct = this.socialStructSig();
-    this.lastSocialContent = JSON.stringify({
-      social: this.sim.socialInfo,
-      party: this.sim.partyInfo,
-    });
-    this.renderSocial();
-  }
-
-  // structural identity of the panel: which tab, online or not, and the guild
-  // membership/rank (which changes the footer). Content within a tab — a
-  // friend's zone, the roster — doesn't count, so it can refresh in place.
-  private socialStructSig(): string {
-    const g = this.sim.socialInfo?.guild;
-    const p = this.sim.partyInfo;
-    const raidSig = p
-      ? `${p.raid ? 1 : 0}:${p.leader}:${p.members.map((m) => `${m.pid}.${m.group}`).join(',')}`
-      : 'solo';
-    return `${this.socialTab}|${this.sim.socialInfo !== null}|${g?.id ?? 0}|${g?.rank ?? ''}|${raidSig}`;
-  }
-
-  // Full rebuild: title, tabs, body, notice, and the tab's footer (with its
-  // typeahead). Used on open, tab switch, and guild-membership changes.
-  private renderSocial(): void {
-    const el = $('#social-window');
-    if (!el.classList.contains('open')) return;
-    const tab = this.socialTab;
-    const online = this.sim.socialInfo !== null;
-    const realmTag =
-      online && this.sim.realm
-        ? ` <span class="soc-realm-tag">- ${esc(this.sim.realm)}</span>`
-        : '';
-    el.innerHTML =
-      `<div class="panel-title"><span>${esc(t('hud.social.title'))}${realmTag}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>` +
-      `<div class="soc-tabs">` +
-      `<button type="button" class="soc-tab ${tab === 'friends' ? 'on' : ''}" data-tab="friends" aria-pressed="${tab === 'friends' ? 'true' : 'false'}">${esc(t('hud.social.friendsTab'))}</button>` +
-      `<button type="button" class="soc-tab ${tab === 'guild' ? 'on' : ''}" data-tab="guild" aria-pressed="${tab === 'guild' ? 'true' : 'false'}">${esc(t('hud.social.guildTab'))}</button>` +
-      `<button type="button" class="soc-tab ${tab === 'ignore' ? 'on' : ''}" data-tab="ignore" aria-pressed="${tab === 'ignore' ? 'true' : 'false'}">${esc(t('hud.social.ignoreTab'))}</button>` +
-      `<button type="button" class="soc-tab ${tab === 'raid' ? 'on' : ''}" data-tab="raid" aria-pressed="${tab === 'raid' ? 'true' : 'false'}">${esc(t('hud.social.raidTab'))}</button>` +
-      `</div>` +
-      `<div class="soc-body"></div>` +
-      `<div class="soc-notice"></div>` +
-      (tab === 'raid' ? '' : online ? this.socialFooter() : '');
-    this.wireSocialChrome(el);
-    this.refreshSocialList();
-    this.renderSocialNotice();
-  }
-
-  // Lighter refresh: just the list inside the current tab, leaving the footer
-  // (and any half-typed name / open suggestions) untouched.
-  private refreshSocialList(): void {
-    const body = $('#social-window').querySelector('.soc-body') as HTMLElement | null;
-    if (!body) return;
-    const online = this.sim.socialInfo !== null;
-    body.innerHTML =
-      this.socialTab === 'raid'
-        ? this.raidHtml()
-        : !online
-          ? `<div class="soc-empty">${esc(t('hud.social.offlineEmpty'))}</div>`
-          : this.socialTab === 'friends'
-            ? this.friendsHtml()
-            : this.socialTab === 'guild'
-              ? this.guildHtml()
-              : this.ignoreHtml();
-    this.wireSocialRows(body);
-  }
-
-  private friendsHtml(): string {
-    const friends = this.sim.socialInfo?.friends ?? [];
-    if (friends.length === 0)
-      return `<div class="soc-empty">${esc(t('hud.social.friendsEmpty'))}</div>`;
-    return friends
-      .map((f) => {
-        const dot = f.online ? (f.status ?? 'online') : 'off';
-        const meta = f.online
-          ? `<span class="zone">${esc(f.zone ? localizeZone(f.zone) : '')}</span><br>${esc(statusLabel(f.status))}`
-          : esc(t('hud.social.status.offline'));
-        const name = f.online
-          ? `<button type="button" class="soc-name soc-link" data-whisper="${esc(f.name)}" title="${esc(t('hud.social.whisperTitle', { name: f.name }))}">${esc(f.name)}</button>`
-          : `<span class="soc-name">${esc(f.name)}</span>`;
-        const whisper = f.online
-          ? `<button type="button" class="soc-x" data-whisper="${esc(f.name)}" title="${esc(t('hud.social.whisperTitle', { name: f.name }))}">${svgIcon('whisper')}</button>`
-          : '';
-        const tip = esc(dotTitle(f.online, f.status, f.zone));
-        return (
-          `<div class="soc-row">` +
-          `<span class="soc-dot ${dot === 'off' ? '' : dot}" title="${tip}"></span>` +
-          `<span class="soc-id">${name}<span class="soc-sub">${esc(t('hud.social.levelClass', { level: formatNumber(f.level, { maximumFractionDigits: 0 }), className: playerClassDisplayName(f.cls) }))}</span></span>` +
-          `<span class="soc-meta" title="${tip}">${meta}</span>` +
-          `<span class="soc-actions">${whisper}<button type="button" class="soc-x" data-act="unfriend" data-name="${esc(f.name)}" title="${esc(t('hud.social.removeFriendTitle', { name: f.name }))}">${svgIcon('close')}</button></span>` +
-          `</div>`
-        );
-      })
-      .join('');
-  }
-
-  private ignoreHtml(): string {
-    const blocks = this.sim.socialInfo?.blocks ?? [];
-    if (blocks.length === 0)
-      return `<div class="soc-empty">${esc(t('hud.social.ignoreEmpty'))}</div>`;
-    return blocks
-      .map(
-        (b) =>
-          `<div class="soc-row">` +
-          `<span class="soc-name">${esc(b.name)}</span>` +
-          `<span class="soc-actions" style="margin-left:auto"><button type="button" class="soc-x" data-act="unblock" data-name="${esc(b.name)}" title="${esc(t('hud.social.stopIgnoringTitle', { name: b.name }))}">${svgIcon('close')}</button></span>` +
-          `</div>`,
-      )
-      .join('');
-  }
-
-  private guildHtml(): string {
-    const guild = this.sim.socialInfo?.guild ?? null;
-    if (!guild) return `<div class="soc-empty">${esc(t('hud.social.noGuild'))}</div>`;
-    const me = guild.rank;
-    const memberCount = guild.members.length;
-    const guildCount = formatNumber(memberCount, { maximumFractionDigits: 0 });
-    const head = `<div class="soc-guild-head">&lt;${esc(guild.name)}&gt; <span class="gm">${esc(tPlural('hudChrome.plurals.guildMembers', memberCount, { rank: rankLabel(me), count: guildCount }))}</span></div>`;
-    const rows = guild.members
-      .map((m) => {
-        const dot = m.online ? (m.status ?? 'online') : 'off';
-        const meta = m.online
-          ? `<span class="zone">${esc(m.zone ? localizeZone(m.zone) : '')}</span><br>${esc(statusLabel(m.status))}`
-          : esc(t('hud.social.status.offline'));
-        const self = m.name === this.sim.player.name;
-        const nameInner = `${esc(m.name)}<span class="rank">${esc(rankLabel(m.rank))}</span>`;
-        const name =
-          m.online && !self
-            ? `<button type="button" class="soc-name soc-link" data-whisper="${esc(m.name)}" title="${esc(t('hud.social.whisperTitle', { name: m.name }))}">${nameInner}</button>`
-            : `<span class="soc-name">${nameInner}</span>`;
-        let actions =
-          m.online && !self
-            ? `<button type="button" class="soc-x" data-whisper="${esc(m.name)}" title="${esc(t('hud.social.whisperTitle', { name: m.name }))}">${svgIcon('whisper')}</button>`
-            : '';
-        if (!self && me === 'leader')
-          actions += `<button type="button" class="soc-x" data-act="gtransfer" data-name="${esc(m.name)}" title="${esc(t('hud.social.makeGuildMasterTitle', { name: m.name }))}">${svgIcon('crown')}</button>`;
-        if (!self && me === 'leader' && m.rank === 'member')
-          actions += `<button type="button" class="soc-x" data-act="promote" data-name="${esc(m.name)}" title="${esc(t('hud.social.promoteTitle', { name: m.name }))}">▲</button>`;
-        if (!self && me === 'leader' && m.rank === 'officer')
-          actions += `<button type="button" class="soc-x" data-act="demote" data-name="${esc(m.name)}" title="${esc(t('hud.social.demoteTitle', { name: m.name }))}">▼</button>`;
-        // leaders may remove members + officers; officers may remove only members
-        const canKick =
-          !self &&
-          ((me === 'leader' && m.rank !== 'leader') || (me === 'officer' && m.rank === 'member'));
-        if (canKick)
-          actions += `<button type="button" class="soc-x" data-act="gkick" data-name="${esc(m.name)}" title="${esc(t('hud.social.removeGuildTitle', { name: m.name }))}">${svgIcon('close')}</button>`;
-        const tip = esc(dotTitle(m.online, m.status, m.zone));
-        return (
-          `<div class="soc-row">` +
-          `<span class="soc-dot ${dot === 'off' ? '' : dot}" title="${tip}"></span>` +
-          `<span class="soc-id">${name}<span class="soc-sub">${esc(t('hud.social.levelClass', { level: formatNumber(m.level, { maximumFractionDigits: 0 }), className: playerClassDisplayName(m.cls) }))}</span></span>` +
-          `<span class="soc-meta" title="${tip}">${meta}</span>` +
-          (actions ? `<span class="soc-actions">${actions}</span>` : '') +
-          `</div>`
-        );
-      })
-      .join('');
-    return head + rows;
-  }
-
-  private raidHtml(): string {
-    const party = this.sim.partyInfo;
-    if (!party?.raid) {
-      const canConvert = !!party && party.leader === this.sim.playerId && party.members.length >= 5;
-      return `<div class="soc-empty">${esc(t('hud.social.raidEmpty'))}${canConvert ? `<div class="soc-empty-action"><button type="button" class="soc-x" data-act="convert-raid">${esc(t('hud.chat.context.convertToRaid'))}</button></div>` : ''}</div>`;
-    }
-    const leader = party.leader === this.sim.playerId;
-    const groups: Record<1 | 2, typeof party.members> = {
-      1: party.members.filter((m) => m.group === 1),
-      2: party.members.filter((m) => m.group === 2),
-    };
-    const groupHtml = (group: 1 | 2): string => {
-      const rows =
-        groups[group]
-          .map((m) => {
-            const isLead = m.pid === party.leader;
-            const otherGroup = group === 1 ? 2 : 1;
-            const otherFull = groups[otherGroup].length >= 5;
-            const move =
-              leader && !otherFull
-                ? `<button type="button" class="soc-x" data-act="raid-move" data-pid="${m.pid}" data-group="${otherGroup}" title="${esc(t('hud.social.raidMoveToGroup', { group: formatNumber(otherGroup, { maximumFractionDigits: 0 }) }))}">${esc(formatNumber(otherGroup, { maximumFractionDigits: 0 }))}</button>`
-                : '';
-            return (
-              `<div class="soc-row raid-row">` +
-              `<span class="soc-id"><span class="soc-name">${esc(m.name)}${isLead ? `<span class="rank">${esc(t('hud.social.raidLeader'))}</span>` : ''}</span><span class="soc-sub">${esc(t('hud.social.levelClass', { level: formatNumber(m.level, { maximumFractionDigits: 0 }), className: playerClassDisplayName(m.cls) }))}</span></span>` +
-              `<span class="soc-meta">${esc(formatNumber(Math.round((m.hp / Math.max(1, m.mhp)) * 100), { maximumFractionDigits: 0 }))}%</span>` +
-              (move ? `<span class="soc-actions">${move}</span>` : '') +
-              `</div>`
-            );
-          })
-          .join('') || `<div class="soc-empty">${esc(t('hud.social.raidGroupEmpty'))}</div>`;
-      return `<div class="raid-group"><div class="soc-guild-head">${esc(t('hud.social.raidGroupTitle', { position: formatNumber(group, { maximumFractionDigits: 0 }), count: formatNumber(groups[group].length, { maximumFractionDigits: 0 }) }))}</div>${rows}</div>`;
-    };
-    // Raid groups cannot enter standard instances; let the leader fold a small raid
-    // (<= one party's worth) back into a normal party. Larger raids must shed members first.
-    const canUnconvert = leader && party.members.length <= 5;
-    const footer = canUnconvert
-      ? `<div class="soc-empty-action"><button type="button" class="soc-x" data-act="convert-party">${esc(t('hud.chat.context.convertToParty'))}</button></div>`
-      : '';
-    return `<div class="raid-groups">${groupHtml(1)}${groupHtml(2)}</div>${footer}`;
-  }
-
-  // The add/action row changes with the tab (and guild membership). Inputs
-  // tagged data-suggest get the username typeahead.
-  private socialFooter(): string {
-    if (this.socialTab === 'friends')
-      return this.addRow(
-        'friend',
-        'friend-add',
-        t('hud.social.friendSearchPlaceholder'),
-        t('hud.social.add'),
-        16,
-        true,
-      );
-    if (this.socialTab === 'ignore')
-      return this.addRow(
-        'ignore',
-        'block-add',
-        t('hud.social.ignoreSearchPlaceholder'),
-        t('hud.social.ignoreAction'),
-        16,
-        true,
-      );
-    const guild = this.sim.socialInfo?.guild ?? null;
-    if (!guild)
-      return this.addRow(
-        'gname',
-        'guild-create',
-        t('hud.social.guildNamePlaceholder'),
-        t('hud.social.found'),
-        24,
-        false,
-      );
-    let foot = '';
-    if (guild.rank !== 'member')
-      foot += this.addRow(
-        'ginvite',
-        'guild-invite',
-        t('hud.social.guildInvitePlaceholder'),
-        t('hud.social.invite'),
-        16,
-        true,
-      );
-    // classic MMOs: a Guild Master with other members can't just leave — they disband
-    // (or hand over leadership via the crown action). Everyone else can leave.
-    foot +=
-      guild.rank === 'leader' && guild.members.length > 1
-        ? `<div class="soc-add soc-leave"><button class="btn" data-act="guild-disband">${esc(t('hud.social.disbandGuild'))}</button></div>`
-        : `<div class="soc-add soc-leave"><button class="btn" data-act="guild-leave">${esc(t('hud.social.leaveGuild'))}</button></div>`;
-    return foot;
-  }
-
-  private addRow(
-    field: string,
-    act: string,
-    placeholder: string,
-    label: string,
-    maxlen: number,
-    suggest: boolean,
-  ): string {
-    return (
-      `<div class="soc-add">` +
-      (suggest ? `<div class="soc-suggest" data-for="${field}" role="listbox"></div>` : '') +
-      `<input maxlength="${maxlen}" aria-label="${esc(placeholder)}" placeholder="${esc(placeholder)}" data-field="${field}"${suggest ? ' data-suggest="1" aria-autocomplete="list"' : ''} autocomplete="off" spellcheck="false"/>` +
-      `<button class="btn" data-act="${act}">${esc(label)}</button></div>`
-    );
-  }
-
-  // Wire the parts that survive a content refresh: close, tabs, footer + search.
-  private wireSocialChrome(el: HTMLElement): void {
-    el.querySelector('[data-close]')?.addEventListener('click', () => this.toggleSocial());
-    el.querySelectorAll('.soc-tab').forEach((t) => {
-      t.addEventListener('click', () => {
-        this.socialTab = (t as HTMLElement).dataset.tab as 'friends' | 'guild' | 'ignore' | 'raid';
-        this.socialNotice = null;
-        this.lastSocialStruct = this.socialStructSig();
-        this.renderSocial();
-      });
-    });
-    const field = (sel: string): string =>
-      (el.querySelector(`input[data-field="${sel}"]`) as HTMLInputElement | null)?.value.trim() ??
-      '';
-    const submit = (act: string | undefined): void => {
-      if (act === 'friend-add') void this.socialResolveAndAct('friend', field('friend'));
-      else if (act === 'block-add') void this.socialResolveAndAct('ignore', field('ignore'));
-      else if (act === 'guild-invite') void this.socialResolveAndAct('ginvite', field('ginvite'));
-      else if (act === 'guild-create') {
-        const n = field('gname');
-        if (n) {
-          this.sim.guildCreate(n);
-          this.clearSocialInput('gname');
-        }
-      } else if (act === 'guild-leave')
-        this.showPrompt(
-          esc(t('hud.social.leavePrompt')),
-          t('hud.social.leaveGuild'),
-          () => this.sim.guildLeave(),
-          () => {},
-        );
-      else if (act === 'guild-disband')
-        this.showPrompt(
-          esc(t('hud.social.disbandPrompt')),
-          t('hud.social.disbandConfirm'),
-          () => this.sim.guildDisband(),
-          () => {
-            /* keep */
-          },
-        );
-    };
-    el.querySelectorAll('.soc-add .btn').forEach((b) => {
-      b.addEventListener('click', () => {
-        submit((b as HTMLElement).dataset.act);
-      });
-    });
-    // Enter-to-submit only for plain inputs (the guild name). Search inputs get
-    // richer keyboard handling — arrows + Enter to pick a suggestion — below.
-    el.querySelectorAll('.soc-add input:not([data-suggest])').forEach((inp) => {
-      inp.addEventListener('keydown', (e) => {
-        if ((e as KeyboardEvent).key !== 'Enter') return;
-        submit((inp.parentElement?.querySelector('.btn') as HTMLElement | null)?.dataset.act);
-      });
-    });
-    this.wireSuggest(el);
-  }
-
-  // Wire per-row actions (re-run on every list refresh).
-  private wireSocialRows(scope: HTMLElement): void {
-    scope.querySelectorAll('.soc-x').forEach((x) => {
-      x.addEventListener('click', () => {
-        const act = (x as HTMLElement).dataset.act;
-        const name = (x as HTMLElement).dataset.name ?? '';
-        if (act === 'unfriend') this.sim.friendRemove(name);
-        else if (act === 'unblock') this.sim.blockRemove(name);
-        else if (act === 'gkick') this.sim.guildKick(name);
-        else if (act === 'promote') this.sim.guildPromote(name);
-        else if (act === 'demote') this.sim.guildDemote(name);
-        else if (act === 'gtransfer')
-          this.showPrompt(
-            t('hud.social.transferPrompt', { name: `<b>${esc(name)}</b>` }),
-            t('hud.social.transferConfirm'),
-            () => this.sim.guildTransfer(name),
-            () => {
-              /* keep */
-            },
-          );
-        else if (act === 'raid-move') {
-          const pid = Number((x as HTMLElement).dataset.pid);
-          const group = Number((x as HTMLElement).dataset.group);
-          if (Number.isFinite(pid) && (group === 1 || group === 2))
-            this.sim.moveRaidMember(pid, group);
-        } else if (act === 'convert-raid') {
-          this.sim.convertPartyToRaid();
-          this.socialTab = 'raid';
-          this.renderSocial();
-        } else if (act === 'convert-party') {
-          this.sim.convertRaidToParty();
-          this.socialTab = 'raid';
-          this.renderSocial();
-        }
-      });
-    });
-    scope.querySelectorAll('[data-whisper]').forEach((w) => {
-      w.addEventListener('click', () => {
-        this.startWhisper((w as HTMLElement).dataset.whisper ?? '');
-      });
-    });
-  }
-
-  private suggestKind(field: string): 'friend' | 'ignore' | 'ginvite' {
-    return field === 'friend' ? 'friend' : field === 'ignore' ? 'ignore' : 'ginvite';
-  }
-
-  // Username typeahead: debounced search against same-realm characters, with
-  // arrow-key navigation and Enter to pick the highlighted name.
-  private wireSuggest(el: HTMLElement): void {
-    el.querySelectorAll('input[data-suggest]').forEach((node) => {
-      const input = node as HTMLInputElement;
-      const field = input.dataset.field ?? '';
-      input.addEventListener('input', () => {
-        const q = input.value.trim();
-        window.clearTimeout(this.socialSuggestTimer);
-        if (!q) {
-          this.renderSuggest(field, []);
-          return;
-        }
-        this.socialSuggestTimer = window.setTimeout(async () => {
-          const results = await this.sim.searchCharacters(q);
-          this.renderSuggest(
-            field,
-            results.filter((r) => r.name !== this.sim.player.name).slice(0, 8),
-          );
-        }, 160);
-      });
-      input.addEventListener('keydown', (e) => {
-        const ke = e as KeyboardEvent;
-        const open = this.socialSuggest.field === field && this.socialSuggest.items.length > 0;
-        if (ke.key === 'ArrowDown' && open) {
-          ke.preventDefault();
-          this.moveSuggest(field, 1);
-        } else if (ke.key === 'ArrowUp' && open) {
-          ke.preventDefault();
-          this.moveSuggest(field, -1);
-        } else if (ke.key === 'Escape' && open) {
-          ke.preventDefault();
-          this.renderSuggest(field, []);
-        } else if (ke.key === 'Enter') {
-          ke.preventDefault();
-          const picked =
-            open && this.socialSuggest.index >= 0
-              ? this.socialSuggest.items[this.socialSuggest.index].name
-              : input.value;
-          void this.socialResolveAndAct(this.suggestKind(field), picked);
-        }
-      });
-      // let a suggestion's mousedown fire before blur clears the list
-      input.addEventListener('blur', () =>
-        window.setTimeout(() => this.renderSuggest(field, []), 150),
-      );
-    });
-  }
-
-  private renderSuggest(
-    field: string,
-    results: { name: string; cls: string; level: number }[],
-  ): void {
-    const box = $('#social-window').querySelector(
-      `.soc-suggest[data-for="${field}"]`,
-    ) as HTMLElement | null;
-    if (!box) return;
-    this.socialSuggest = { field, items: results, index: -1 };
-    if (results.length === 0) {
-      box.style.display = 'none';
-      box.innerHTML = '';
-      return;
-    }
-    const kind = this.suggestKind(field);
-    box.innerHTML = results
-      .map((r, i) => {
-        const meta = t('hud.social.levelClass', {
-          level: formatNumber(r.level, { maximumFractionDigits: 0 }),
-          className: playerClassDisplayName(r.cls),
-        });
-        return `<button type="button" class="soc-sugg-item" data-i="${i}" data-name="${esc(r.name)}" role="option"><span class="soc-name">${esc(r.name)}</span><span class="soc-meta">${esc(meta)}</span></button>`;
-      })
-      .join('');
-    box.style.display = 'block';
-    box.querySelectorAll('.soc-sugg-item').forEach((it) => {
-      it.addEventListener('mousedown', (e) => {
-        e.preventDefault();
-        void this.socialResolveAndAct(kind, (it as HTMLElement).dataset.name ?? '');
-      });
-      it.addEventListener('mousemove', () => {
-        this.socialSuggest.index = Number((it as HTMLElement).dataset.i);
-        this.highlightSuggest(field);
-      });
-    });
-  }
-
-  private moveSuggest(field: string, delta: number): void {
-    const n = this.socialSuggest.items.length;
-    if (n === 0) return;
-    // start at the top when nothing is highlighted yet, then wrap
-    this.socialSuggest.index =
-      this.socialSuggest.index < 0
-        ? delta > 0
-          ? 0
-          : n - 1
-        : (this.socialSuggest.index + delta + n) % n;
-    this.highlightSuggest(field);
-  }
-
-  private highlightSuggest(field: string): void {
-    const box = $('#social-window').querySelector(
-      `.soc-suggest[data-for="${field}"]`,
-    ) as HTMLElement | null;
-    if (!box) return;
-    box.querySelectorAll('.soc-sugg-item').forEach((it) => {
-      const on = Number((it as HTMLElement).dataset.i) === this.socialSuggest.index;
-      it.classList.toggle('active', on);
-      if (on) (it as HTMLElement).scrollIntoView({ block: 'nearest' });
-    });
-  }
-
-  // Authoritative existence check (realm-scoped) before acting, so we can give
-  // clear inline "no such player" feedback instead of a silent failure.
-  private async socialResolveAndAct(
-    kind: 'friend' | 'ignore' | 'ginvite',
-    rawName: string,
-  ): Promise<void> {
-    const name = rawName.trim();
-    if (!name) return;
-    const results = await this.sim.searchCharacters(name);
-    const exact = results.find((r) => r.name.toLowerCase() === name.toLowerCase());
-    if (!exact) {
-      this.setSocialNotice(
-        t('hud.social.noPlayerNamed', {
-          name,
-          realm: this.sim.realm || t('hud.social.currentRealm'),
-        }),
-        true,
-      );
-      return;
-    }
-    if (exact.name === this.sim.player.name) {
-      this.setSocialNotice(t('hud.social.selfNotice'), true);
-      return;
-    }
-    if (kind === 'friend') {
-      this.sim.friendAdd(exact.name);
-      this.setSocialNotice(t('hud.social.friendAdded', { name: exact.name }), false);
-      this.clearSocialInput('friend');
-    } else if (kind === 'ignore') {
-      this.sim.blockAdd(exact.name);
-      this.setSocialNotice(t('hud.social.nowIgnoring', { name: exact.name }), false);
-      this.clearSocialInput('ignore');
-    } else {
-      this.sim.guildInvite(exact.name);
-      this.setSocialNotice(t('hud.social.guildInvited', { name: exact.name }), false);
-      this.clearSocialInput('ginvite');
-    }
-    this.renderSuggest(kind, []);
-  }
-
-  private clearSocialInput(field: string): void {
-    const inp = $('#social-window').querySelector(
-      `input[data-field="${field}"]`,
-    ) as HTMLInputElement | null;
-    if (inp) inp.value = '';
-  }
-
-  private setSocialNotice(text: string, error: boolean): void {
-    this.socialNotice = { text, error };
-    this.renderSocialNotice();
-  }
-
-  private renderSocialNotice(): void {
-    const box = $('#social-window').querySelector('.soc-notice') as HTMLElement | null;
-    if (!box) return;
-    if (!this.socialNotice) {
-      box.style.display = 'none';
-      box.textContent = '';
-      return;
-    }
-    box.textContent = this.socialNotice.text;
-    box.className = `soc-notice${this.socialNotice.error ? ' err' : ' ok'}`;
-    box.style.display = 'block';
+    this.socialWindow.toggle();
   }
 
   // Open the chat bar pre-filled with a whisper to this player (classic-MMO-style DM).
@@ -12693,7 +10346,7 @@ export class Hud {
     el.querySelector('[data-close]')?.addEventListener('click', () => this.sim.tradeCancel());
     el.querySelectorAll('.trade-item.mine').forEach((row) => {
       row.addEventListener('click', () => {
-        const itemId = (row as HTMLElement).dataset.item!;
+        const itemId = (row as HTMLElement).dataset.item ?? '';
         const idx = this.stagedTrade.items.findIndex((s) => s.itemId === itemId);
         if (idx >= 0) {
           this.stagedTrade.items[idx].count--;
@@ -12737,7 +10390,7 @@ export class Hud {
   }
 
   get optionsOpen(): boolean {
-    return $('#options-menu').style.display === 'block';
+    return this.optionsWindow.isOpen;
   }
 
   // True while a menu that should pause character movement is up.
@@ -12758,1199 +10411,17 @@ export class Hud {
   }
 
   toggleOptionsMenu(): void {
-    if (this.optionsOpen) {
-      this.closeOptions();
-      return;
-    }
-    this.closeOtherWindows('#options-menu');
-    this.optionsView = 'main';
-    this.capturingKey = null;
-    this.keybindNote = '';
-    this.renderOptions();
-    $('#options-menu').style.display = 'block';
-    music.pauseForMenu();
-    audio.click();
+    this.optionsWindow.toggle();
   }
 
   closeOptions(): void {
-    $('#options-menu').style.display = 'none';
-    this.capturingKey = null;
-    this.optionsHooks?.perfOverlay.setPlacement(false);
-    this.hideTooltip();
-    music.resumeFromMenu();
+    this.optionsWindow.close();
   }
 
-  private renderOptions(): void {
-    // The wide multi-column layouts belong to their own sub-views; clear each when
-    // leaving it so the other sub-views (and the main menu) keep their default width.
-    if (this.optionsView !== 'keybinds') $('#options-menu').classList.remove('kb-wide');
-    if (this.optionsView !== 'performance') $('#options-menu').classList.remove('perf-wide');
-    // The overlay is draggable only while the Performance sub-view is open.
-    this.optionsHooks?.perfOverlay.setPlacement(this.optionsView === 'performance');
-    if (this.optionsView === 'keybinds') {
-      this.renderKeybinds();
-      return;
-    }
-    if (this.optionsView === 'graphics') {
-      this.renderGraphics();
-      return;
-    }
-    if (this.optionsView === 'audio') {
-      this.renderAudio();
-      return;
-    }
-    if (this.optionsView === 'interface') {
-      this.renderInterface();
-      return;
-    }
-    if (this.optionsView === 'controller') {
-      this.renderController();
-      return;
-    }
-    if (this.optionsView === 'performance') {
-      this.renderPerformance();
-      return;
-    }
-    if (this.optionsView === 'bugreport') {
-      this.renderBugReport();
-      return;
-    }
-    const el = $('#options-menu');
-    el.innerHTML = `<div class="panel-title"><span>${esc(t('hud.options.gameMenu'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
-    const list = document.createElement('div');
-    list.className = 'opt-list';
-    const add = (text: string, onClick: () => void) => {
-      const b = document.createElement('button');
-      b.className = 'btn opt-btn';
-      b.textContent = text;
-      b.addEventListener('click', () => {
-        audio.click();
-        onClick();
-      });
-      list.appendChild(b);
-    };
-    const goto = (
-      view:
-        | 'keybinds'
-        | 'graphics'
-        | 'audio'
-        | 'interface'
-        | 'performance'
-        | 'controller'
-        | 'bugreport',
-    ) => {
-      this.optionsView = view;
-      this.keybindNote = '';
-      this.renderOptions();
-    };
-    add(t('hud.options.keyBindings'), () => goto('keybinds'));
-    add(t('hudChrome.controller.title'), () => goto('controller'));
-    add(t('hud.options.graphics'), () => goto('graphics'));
-    add(t('hud.options.interface'), () => goto('interface'));
-    add(t('hud.options.audio'), () => goto('audio'));
-    add(t('hudChrome.perf.title'), () => goto('performance'));
-    // Online-only: capturing realm/character/position needs an authoritative server.
-    if (this.bugReportHooks) add(t('hudChrome.bugReport.menuButton'), () => goto('bugreport'));
-    add(t('hud.options.logout'), () => this.optionsHooks?.logout());
-    add(t('hud.options.returnToGame'), () => this.closeOptions());
-    el.appendChild(list);
-    el.querySelector('[data-close]')?.addEventListener('click', () => this.closeOptions());
-  }
-
-  // A labelled slider bound to a numeric setting; live-applies via the hook.
-  // opts.fmt renders the readout (default: a percentage); opts.step overrides the
-  // 0.05 increment for settings measured in whole units (e.g. FOV degrees).
-  private settingSlider(
-    parent: HTMLElement,
-    label: string,
-    key: NumericSettingKey,
-    opts?: { fmt?: (v: number) => string; step?: number },
-  ): void {
-    const hooks = this.optionsHooks;
-    if (!hooks) return;
-    const r = SETTING_RANGES[key];
-    const row = document.createElement('div');
-    row.className = 'set-row';
-    const name = document.createElement('span');
-    name.className = 'set-name';
-    name.textContent = label;
-    const slider = document.createElement('input');
-    slider.type = 'range';
-    slider.className = 'set-slider';
-    slider.min = String(r.min);
-    slider.max = String(r.max);
-    slider.step = String(opts?.step ?? 0.05);
-    slider.value = String(hooks.settings.get(key));
-    slider.setAttribute('aria-label', label);
-    const val = document.createElement('span');
-    val.className = 'set-val';
-    const fmt =
-      opts?.fmt ?? ((v: number) => formatNumber(v, { style: 'percent', maximumFractionDigits: 0 }));
-    const readout = () => fmt(hooks.settings.get(key));
-    val.textContent = readout();
-    // Paint a gold fill up to the current value on every engine (CSS alone can't
-    // read the value; --range-fill drives the webkit track gradient and Firefox's
-    // native progress is recolored to match). Set initially + on every input.
-    const paintFill = () => {
-      const min = Number(slider.min),
-        max = Number(slider.max),
-        v = Number(slider.value);
-      const pct = max > min ? ((v - min) / (max - min)) * 100 : 0;
-      slider.style.setProperty('--range-fill', `${Math.max(0, Math.min(100, pct))}%`);
-    };
-    paintFill();
-    slider.addEventListener('input', () => {
-      hooks.onSettingChange(key, Number(slider.value));
-      val.textContent = readout();
-      paintFill();
-    });
-    row.append(name, slider, val);
-    parent.appendChild(row);
-  }
-
-  private settingToggle(
-    parent: HTMLElement,
-    label: string,
-    key: 'fullscreen' | 'showOverflowXp' | 'weather',
-  ): void {
-    const hooks = this.optionsHooks;
-    if (!hooks) return;
-    const row = document.createElement('div');
-    row.className = 'set-row';
-    const name = document.createElement('span');
-    name.className = 'set-name';
-    name.textContent = label;
-    const toggle = document.createElement('button');
-    toggle.className = 'btn set-toggle';
-    const sync = () => {
-      const on = hooks.settings.get(key) >= 0.5;
-      toggle.textContent = on ? t('hud.options.on') : t('hud.options.off');
-      toggle.classList.toggle('off', !on);
-      toggle.setAttribute('aria-pressed', String(on));
-      toggle.setAttribute('aria-label', label);
-    };
-    sync();
-    toggle.addEventListener('click', () => {
-      audio.click();
-      const next = hooks.settings.get(key) >= 0.5 ? 0 : 1;
-      hooks.onSettingChange(key, next);
-      sync();
-    });
-    row.append(name, toggle);
-    parent.appendChild(row);
-  }
-
-  // Like settingToggle but for a true/false BOOL_SETTINGS key (Interface panel).
-  private settingBoolToggle(parent: HTMLElement, label: string, key: BoolSettingKey): void {
-    const hooks = this.optionsHooks;
-    if (!hooks) return;
-    const row = document.createElement('div');
-    row.className = 'set-row';
-    const name = document.createElement('span');
-    name.className = 'set-name';
-    name.textContent = label;
-    const toggle = document.createElement('button');
-    toggle.className = 'btn set-toggle';
-    const sync = () => {
-      const on = hooks.settings.get(key);
-      toggle.textContent = on ? t('hud.options.on') : t('hud.options.off');
-      toggle.classList.toggle('off', !on);
-      toggle.setAttribute('aria-pressed', String(on));
-      toggle.setAttribute('aria-label', label);
-    };
-    sync();
-    toggle.addEventListener('click', () => {
-      audio.click();
-      hooks.onSettingChange(key, hooks.settings.set(key, !hooks.settings.get(key)));
-      sync();
-    });
-    row.append(name, toggle);
-    parent.appendChild(row);
-  }
-
-  private settingChoice(
-    parent: HTMLElement,
-    label: string,
-    key: NumericSettingKey,
-    options: { value: number; label: string }[],
-    onChange?: () => void,
-  ): void {
-    const hooks = this.optionsHooks;
-    if (!hooks) return;
-    const row = document.createElement('div');
-    row.className = 'set-row';
-    const name = document.createElement('span');
-    name.className = 'set-name';
-    name.textContent = label;
-    const wrap = document.createElement('div');
-    wrap.className = 'set-choice';
-    const sync = () => {
-      const current = Math.round(hooks.settings.get(key));
-      for (const btn of [...wrap.querySelectorAll<HTMLButtonElement>('button[data-value]')]) {
-        const selected = Number(btn.dataset.value) === current;
-        btn.classList.toggle('sel', selected);
-        btn.setAttribute('aria-pressed', String(selected));
-      }
-    };
-    for (const option of options) {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'btn set-choice-btn';
-      btn.dataset.value = String(option.value);
-      btn.textContent = option.label;
-      btn.setAttribute('aria-label', option.label);
-      btn.addEventListener('click', () => {
-        audio.click();
-        hooks.onSettingChange(key, option.value);
-        sync();
-        onChange?.();
-      });
-      wrap.appendChild(btn);
-    }
-    row.append(name, wrap);
-    parent.appendChild(row);
-    sync();
-  }
-
-  private settingsViewShell(title: string): HTMLElement {
-    const el = $('#options-menu');
-    el.innerHTML = `<div class="panel-title"><span>${esc(title)}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
-    const body = document.createElement('div');
-    body.className = 'set-rows';
-    el.appendChild(body);
-    return body;
-  }
-
-  private settingsViewFooter(): void {
-    const el = $('#options-menu');
-    const reset = document.createElement('button');
-    reset.className = 'btn';
-    reset.textContent = t('hud.options.resetToDefaults');
-    reset.addEventListener('click', () => {
-      audio.click();
-      this.optionsHooks?.settings.reset();
-      // re-apply every setting to its subsystem, then redraw the view
-      const all = this.optionsHooks?.settings.all();
-      if (all)
-        for (const k of Object.keys(all) as (keyof GameSettings)[])
-          this.optionsHooks?.onSettingChange(k, all[k]);
-      this.renderOptions();
-    });
-    const back = document.createElement('button');
-    back.className = 'btn';
-    back.textContent = t('hud.options.back');
-    back.addEventListener('click', () => {
-      audio.click();
-      this.optionsView = 'main';
-      this.renderOptions();
-    });
-    el.append(reset, back);
-    el.querySelector('[data-close]')?.addEventListener('click', () => this.closeOptions());
-  }
-
-  private renderBugReport(): void {
-    const hooks = this.bugReportHooks;
-    if (!hooks) {
-      this.optionsView = 'main';
-      this.renderOptions();
-      return;
-    }
-    const body = this.settingsViewShell(t('hudChrome.bugReport.menuButton'));
-    const p = this.sim.player;
-    const realm = this.sim.realm || t('hudChrome.bugReport.unknown');
-    const coords =
-      `${formatNumber(p.pos.x, { maximumFractionDigits: 0, useGrouping: false })}, ` +
-      `${formatNumber(p.pos.y, { maximumFractionDigits: 0, useGrouping: false })}, ` +
-      `${formatNumber(p.pos.z, { maximumFractionDigits: 0, useGrouping: false })}`;
-
-    const info = document.createElement('div');
-    info.className = 'bug-info';
-    const row = (label: string, value: string): string =>
-      `<div class="bug-info-row"><span class="bug-info-label">${esc(label)}</span><span class="bug-info-val">${esc(value)}</span></div>`;
-    info.innerHTML =
-      row(t('hudChrome.bugReport.realm'), realm) +
-      row(t('hudChrome.bugReport.character'), p.name) +
-      row(t('hudChrome.bugReport.position'), coords);
-    body.appendChild(info);
-
-    // Capture once when the form opens so the screenshot reflects what the player
-    // saw, not a later frame. null when capture is unavailable/failed.
-    const shot = hooks.capture();
-
-    const descLabel = document.createElement('label');
-    descLabel.className = 'bug-label';
-    descLabel.setAttribute('for', 'bug-desc');
-    descLabel.textContent = t('hudChrome.bugReport.description');
-    const desc = document.createElement('textarea');
-    desc.id = 'bug-desc';
-    desc.className = 'bug-desc';
-    desc.maxLength = 2000;
-    desc.setAttribute('placeholder', t('hudChrome.bugReport.descriptionPlaceholder'));
-    desc.setAttribute('aria-describedby', 'bug-error');
-    body.append(descLabel, desc);
-
-    let includeShot = shot !== null;
-    if (shot) {
-      const shotWrap = document.createElement('div');
-      shotWrap.className = 'bug-shot';
-      const img = document.createElement('img');
-      img.className = 'bug-shot-img';
-      img.src = shot;
-      img.alt = t('hudChrome.bugReport.screenshotAlt');
-      const toggle = document.createElement('button');
-      toggle.type = 'button';
-      toggle.className = 'btn set-toggle';
-      const syncToggle = () => {
-        toggle.textContent = includeShot ? t('hud.options.on') : t('hud.options.off');
-        toggle.classList.toggle('off', !includeShot);
-        toggle.setAttribute('aria-pressed', String(includeShot));
-        toggle.setAttribute('aria-label', t('hudChrome.bugReport.includeScreenshot'));
-        img.style.display = includeShot ? '' : 'none';
-      };
-      toggle.addEventListener('click', () => {
-        audio.click();
-        includeShot = !includeShot;
-        syncToggle();
-      });
-      syncToggle();
-      const toggleRow = document.createElement('div');
-      toggleRow.className = 'set-row';
-      const name = document.createElement('span');
-      name.className = 'set-name';
-      name.textContent = t('hudChrome.bugReport.includeScreenshot');
-      toggleRow.append(name, toggle);
-      shotWrap.append(toggleRow, img);
-      body.appendChild(shotWrap);
-    }
-
-    const error = document.createElement('div');
-    error.className = 'report-error';
-    error.id = 'bug-error';
-    // role="alert" already implies an assertive live region; a second aria-live
-    // would conflict, so it is the only announcement hook on this node.
-    error.setAttribute('role', 'alert');
-    body.appendChild(error);
-
-    const actions = document.createElement('div');
-    actions.className = 'report-actions';
-    const submit = document.createElement('button');
-    submit.className = 'btn';
-    submit.type = 'button';
-    submit.textContent = t('hudChrome.bugReport.submit');
-    const back = document.createElement('button');
-    back.className = 'btn';
-    back.type = 'button';
-    back.textContent = t('hud.options.back');
-    back.addEventListener('click', () => {
-      audio.click();
-      this.optionsView = 'main';
-      this.renderOptions();
-    });
-    actions.append(submit, back);
-    body.appendChild(actions);
-
-    submit.addEventListener('click', () => {
-      const description = desc.value.trim();
-      if (!description) {
-        error.textContent = t('hudChrome.bugReport.describeFirst');
-        return;
-      }
-      submit.disabled = true;
-      error.textContent = '';
-      const sentShot = includeShot && shot !== null;
-      hooks
-        .submit({ description, screenshot: includeShot ? shot : null, meta: hooks.collectMeta() })
-        .then(({ screenshotStored }) => {
-          // Be honest when the server dropped a screenshot the player asked to send.
-          const droppedShot = sentShot && !screenshotStored;
-          this.log(
-            t(
-              droppedShot ? 'hudChrome.bugReport.submittedNoShot' : 'hudChrome.bugReport.submitted',
-            ),
-            '#ffd100',
-          );
-          this.optionsView = 'main';
-          this.renderOptions();
-        })
-        .catch((err: unknown) => {
-          submit.disabled = false;
-          error.textContent = this.localizeBugReportError(err);
-        });
-    });
-
-    $('#options-menu')
-      .querySelector('[data-close]')
-      ?.addEventListener('click', () => this.closeOptions());
-    // Focus the description so a keyboard/screen-reader user lands in the field.
-    window.setTimeout(() => desc.focus(), 0);
-  }
-
-  private localizeBugReportError(err: unknown): string {
-    const text = err instanceof Error ? err.message : '';
-    const keyByMessage: Record<string, TranslationKey> = {
-      'describe the bug': 'hudChrome.bugReport.describeFirst',
-      'bug report too large': 'hudChrome.bugReport.tooLarge',
-      'too many bug reports, try again later': 'hudChrome.bugReport.rateLimited',
-    };
-    const key = keyByMessage[text.toLowerCase()];
-    return key ? t(key) : t('hudChrome.bugReport.failed');
-  }
-
-  private renderGraphics(): void {
-    const body = this.settingsViewShell(t('hud.options.graphics'));
-    this.settingChoice(
-      body,
-      t('hud.options.graphicsQuality'),
-      'graphicsPreset',
-      [
-        { value: 1, label: t('hud.options.graphicsPresetLow') },
-        { value: 2, label: t('hud.options.graphicsPresetMedium') },
-        { value: 3, label: t('hud.options.graphicsPresetHigh') },
-        { value: 4, label: t('hud.options.graphicsPresetUltra') },
-        { value: 5, label: t('hud.options.graphicsPresetAdvanced') },
-      ],
-      () => this.renderGraphics(),
-    );
-    if (Math.round(this.optionsHooks?.settings.get('graphicsPreset') ?? 0) === 5) {
-      this.settingChoice(body, t('hud.options.terrainDetail'), 'terrainDetail', [
-        { value: 0, label: t('hud.options.terrainLow') },
-        { value: 1, label: t('hud.options.terrainHigh') },
-      ]);
-      this.settingChoice(body, t('hud.options.foliageDensity'), 'foliageDensity', [
-        { value: 0, label: t('hud.options.terrainLow') },
-        { value: 1, label: t('hud.options.terrainHigh') },
-      ]);
-      this.settingChoice(body, t('hud.options.effectsQuality'), 'effectsQuality', [
-        { value: 0, label: t('hud.options.terrainLow') },
-        { value: 1, label: t('hud.options.terrainHigh') },
-      ]);
-      this.settingChoice(body, t('hud.options.shadowQuality'), 'shadowQuality', [
-        { value: 0, label: t('hud.options.terrainLow') },
-        { value: 1, label: t('hud.options.terrainHigh') },
-      ]);
-    }
-    // Adaptive CSS-effects tier (DOM layer, separate from the WebGL preset above).
-    // Auto detects the browser engine/version + device; manual values pin it.
-    this.settingChoice(body, t('hudChrome.options.browserEffects'), 'browserEffects', [
-      { value: 0, label: t('hudChrome.options.browserEffectsAuto') },
-      { value: 1, label: t('hudChrome.options.browserEffectsFull') },
-      { value: 2, label: t('hudChrome.options.browserEffectsReduced') },
-      { value: 3, label: t('hudChrome.options.browserEffectsMinimal') },
-    ]);
-    const fxNote = document.createElement('div');
-    fxNote.className = 'set-note';
-    fxNote.textContent = t('hudChrome.options.browserEffectsNote');
-    body.appendChild(fxNote);
-    // Desktop keyboard/mouse vs the on-screen touch controls. Auto detects the
-    // device; Desktop/Touch force one (e.g. a tablet with a keyboard picks
-    // Desktop). Re-render so the touch-only sliders below show/hide to match.
-    // Hidden in the native app shell, which forces the touch UI regardless.
-    if (!isNativeAppShell()) {
-      this.settingChoice(
-        body,
-        t('hudChrome.options.interfaceMode'),
-        'interfaceMode',
-        [
-          { value: 0, label: t('hudChrome.options.interfaceModeAuto') },
-          { value: 1, label: t('hudChrome.options.interfaceModeDesktop') },
-          { value: 2, label: t('hudChrome.options.interfaceModeTouch') },
-        ],
-        () => this.renderGraphics(),
-      );
-      const interfaceNote = document.createElement('div');
-      interfaceNote.className = 'set-note';
-      interfaceNote.textContent = t('hudChrome.options.interfaceModeNote');
-      body.appendChild(interfaceNote);
-    }
-    this.settingSlider(body, t('hud.options.cameraSpeed'), 'cameraSpeed');
-    // Camera Speed only scales mouselook; on touch the camera joystick has its
-    // own rate, so phones get a dedicated sensitivity slider here.
-    if (useTouchInterface())
-      this.settingSlider(body, t('hud.options.touchLookSpeed'), 'touchLookSpeed');
-    this.settingSlider(body, t('hud.options.brightness'), 'brightness');
-    this.settingSlider(body, t('hud.options.fieldOfView'), 'cameraFov', {
-      fmt: (v) => `${formatNumber(Math.round(v), { maximumFractionDigits: 0 })}°`,
-      step: 1,
-    });
-    this.settingSlider(body, t('hud.options.renderQuality'), 'renderScale');
-    this.settingToggle(body, t('hud.options.fullscreen'), 'fullscreen');
-    this.settingToggle(body, t('game.settings.showOverflowXp'), 'showOverflowXp');
-    // Touch-only: lets phone players dim the on-screen joysticks + buttons.
-    if (useTouchInterface())
-      this.settingSlider(body, t('hud.options.touchOpacity'), 'touchOpacity');
-    this.settingToggle(body, t('game.settings.weather'), 'weather');
-    // Touch-only: lets phone players size the on-screen joysticks to their hands.
-    if (useTouchInterface())
-      this.settingSlider(body, t('hud.options.joystickSize'), 'joystickScale');
-    // Touch-only: lets phone players size the on-screen action buttons to taste.
-    if (useTouchInterface())
-      this.settingSlider(body, t('hud.options.buttonSize'), 'actionButtonScale');
-    // Touch-only: a larger deadzone resists accidental drift from a resting
-    // thumb on the move stick; only meaningful with on-screen controls.
-    if (useTouchInterface())
-      this.settingSlider(body, t('hud.options.joystickDeadzone'), 'joystickDeadzone');
-    // Touch-only: flips the vertical axis of the on-screen camera joystick + swipe-look.
-    if (useTouchInterface())
-      this.settingBoolToggle(body, t('hud.options.invertLook'), 'touchInvertLook');
-    const note = document.createElement('div');
-    note.className = 'set-note';
-    note.textContent = t('hud.options.graphicsNote');
-    $('#options-menu').appendChild(note);
-    const reloadNote = document.createElement('div');
-    reloadNote.className = 'set-note';
-    reloadNote.textContent = t('hud.options.graphicsReloadNote');
-    const reload = document.createElement('button');
-    reload.type = 'button';
-    reload.className = 'btn';
-    reload.textContent = t('hud.options.reloadNow');
-    reload.addEventListener('click', () => {
-      audio.click();
-      location.reload();
-    });
-    $('#options-menu').append(reloadNote, reload);
-    this.settingsViewFooter();
-  }
-
-  private renderAudio(): void {
-    const body = this.settingsViewShell(t('hud.options.audio'));
-    this.settingSlider(body, t('hud.options.soundEffects'), 'sfxVolume');
-    this.settingSlider(body, t('hud.options.musicVolume'), 'musicVolume');
-    this.settingSlider(body, t('hud.options.voiceVolume'), 'voiceVolume');
-    const row = document.createElement('div');
-    row.className = 'set-row';
-    const name = document.createElement('span');
-    name.className = 'set-name';
-    name.textContent = t('hud.options.music');
-    const toggle = document.createElement('button');
-    toggle.className = 'btn set-toggle';
-    const sync = () => {
-      toggle.textContent = music.enabled ? t('hud.options.on') : t('hud.options.off');
-      toggle.classList.toggle('off', !music.enabled);
-      toggle.setAttribute('aria-pressed', String(music.enabled));
-      toggle.setAttribute('aria-label', t('hud.options.music'));
-    };
-    sync();
-    toggle.addEventListener('click', () => {
-      audio.click();
-      music.setEnabled(!music.enabled);
-      sync();
-    });
-    row.append(name, toggle);
-    body.appendChild(row);
-    this.settingBoolToggle(body, t('hud.options.npcVoices'), 'voiceEnabled');
-    this.settingBoolToggle(body, t('hudChrome.options.footstepSounds'), 'footstepSfx');
-    this.settingBoolToggle(body, t('hudChrome.options.clickFeedback'), 'clickFeedback');
-    this.settingsViewFooter();
-  }
-
-  // Interface & Comfort panel: presentational HUD tuning + accessibility toggles
-  // (sliders/toggles persisted to the GameSettings store, applied via CSS in
-  // main.ts) plus the classic client-side "Show Timestamps" chat option. None of
-  // it touches the simulation.
-  // In-game language picker (Options > Interface). Mirrors the homepage footer picker so a
-  // player can switch locales without leaving the world. Switching is delegated to the
-  // OptionsHooks.changeLanguage seam (main.ts owns the locale load + page relocalization);
-  // the HUD itself relocalizes its dynamic UI off the woc:languagechange event (see ctor).
-  private languageSelect(parent: HTMLElement): void {
-    const hooks = this.optionsHooks;
-    if (!hooks) return;
-    const row = document.createElement('div');
-    row.className = 'set-row';
-    const name = document.createElement('span');
-    name.className = 'set-name';
-    name.textContent = t('hud.options.language');
-    // Custom gold-themed dropdown (.ui-dd) rather than a native <select>, so the
-    // open option list matches the MMO theme; buildDropdown carries the listbox
-    // ARIA + keyboard semantics a native <select> would have.
-    const options = supportedLanguages.map((lang) => ({
-      value: lang,
-      label: LANGUAGE_ENDONYMS[lang],
-    }));
-    // aria-live status for the async locale load (loading / load-failed).
-    const status = document.createElement('span');
-    status.className = 'visually-hidden';
-    status.setAttribute('role', 'status');
-    status.setAttribute('aria-live', 'polite');
-    let busy = false;
-    const dropdown = this.buildDropdown(
-      options,
-      getLanguage(),
-      (selected) => {
-        if (busy || !isSupportedLanguage(selected) || selected === getLanguage()) return;
-        audio.click();
-        busy = true;
-        void hooks
-          .changeLanguage(selected, (msg) => {
-            status.textContent = msg;
-          })
-          .then((ok) => {
-            if (ok) {
-              // Success: rebuild the panel in the new language (re-creates this picker
-              // at the now-active locale).
-              if (this.optionsOpen && this.optionsView === 'interface') {
-                this.renderInterface();
-                // Return keyboard focus to the fresh picker trigger so it isn't lost to <body>.
-                this.focusFirstInteractive($('#options-menu'), '.set-lang-select .ui-dd-btn');
-              }
-            } else {
-              // Graceful failure (the locale chunk failed to load): the active locale
-              // is unchanged. Revert the trigger IN PLACE — don't renderInterface(),
-              // which would rebuild and wipe the aria-live `status` node that
-              // changeLanguage just wrote the failure message into.
-              this.setDropdownValue(dropdown, getLanguage());
-            }
-          })
-          .catch(() => {
-            // Defensive: changeLanguage swallows load errors and resolves false, so
-            // this is unreachable today — but if it ever throws, keep the same
-            // in-place revert + intact live region rather than rebuilding.
-            status.textContent = t('settings.languageLoadFailed');
-            this.setDropdownValue(dropdown, getLanguage());
-          })
-          .finally(() => {
-            busy = false;
-          });
-      },
-      undefined,
-      { ariaLabel: t('hud.options.language') },
-    );
-    dropdown.classList.add('set-lang-select');
-    row.append(name, dropdown);
-    parent.append(row, status);
-  }
-
-  // UI theme picker: a preset selector plus a full-palette custom-colour block.
-  // Preset/custom changes route through OptionsHooks.theme; main.ts persists and
-  // live-applies the resulting CSS variables, so no reload is needed.
-  private renderThemeControls(body: HTMLElement): void {
-    const hooks = this.optionsHooks;
-    if (!hooks) return;
-    const theme = hooks.theme;
-
-    const presetRow = document.createElement('div');
-    presetRow.className = 'set-row';
-    const presetName = document.createElement('span');
-    presetName.className = 'set-name';
-    presetName.textContent = t('hudChrome.theme.preset');
-    const seg = document.createElement('div');
-    seg.className = 'set-seg theme-presets';
-    const presetLabel = (id: PresetId): string =>
-      t(`hudChrome.theme.presets.${id}` as TranslationKey);
-    for (const id of PRESET_ORDER) {
-      const btn = document.createElement('button');
-      btn.className = 'btn set-seg-btn';
-      btn.textContent = presetLabel(id);
-      btn.classList.toggle('active', theme.get().preset === id);
-      btn.addEventListener('click', () => {
-        audio.click();
-        theme.setPreset(id);
-        this.renderInterface(); // refresh active state + custom pickers
-      });
-      seg.appendChild(btn);
-    }
-    presetRow.append(presetName, seg);
-    body.appendChild(presetRow);
-
-    // Custom palette: one colour input per knob, seeded with the effective value.
-    const effective = resolveTheme(theme.get());
-    const customCount = Object.keys(theme.get().custom).length;
-    const customRow = document.createElement('div');
-    customRow.className = 'set-row theme-custom-head';
-    const customName = document.createElement('span');
-    customName.className = 'set-name';
-    customName.textContent = t('hudChrome.theme.customColors');
-    const reset = document.createElement('button');
-    reset.className = 'btn set-toggle';
-    reset.textContent = t('hudChrome.theme.reset');
-    reset.disabled = customCount === 0;
-    reset.addEventListener('click', () => {
-      audio.click();
-      theme.resetCustom();
-      this.renderInterface();
-    });
-    customRow.append(customName, reset);
-    body.appendChild(customRow);
-
-    const grid = document.createElement('div');
-    grid.className = 'theme-color-grid';
-    for (const knob of THEME_KNOB_ORDER) {
-      const row = document.createElement('label');
-      row.className = 'theme-color-row';
-      const swatchLabel = document.createElement('span');
-      swatchLabel.textContent = t(
-        `hudChrome.theme.knob.${THEME_KNOB_LABEL_KEY[knob]}` as TranslationKey,
-      );
-      const input = document.createElement('input');
-      input.type = 'color';
-      input.value = effective[knob];
-      input.setAttribute('aria-label', swatchLabel.textContent);
-      // 'input' fires continuously while dragging the picker → live preview.
-      input.addEventListener('input', () => theme.setCustom(knob, input.value));
-      input.addEventListener('change', () => {
-        theme.setCustom(knob, input.value);
-        reset.disabled = false;
-      });
-      row.append(input, swatchLabel);
-      grid.appendChild(row);
-    }
-    body.appendChild(grid);
-  }
-
-  private renderInterface(): void {
-    const body = this.settingsViewShell(t('hud.options.interface'));
-    this.languageSelect(body);
-    this.renderThemeControls(body);
-    this.settingSlider(body, t('hudChrome.options.uiScale'), 'uiScale');
-    this.settingSlider(body, t('hud.options.hudOpacity'), 'hudOpacity');
-    this.settingSlider(body, t('hud.options.tooltipScale'), 'tooltipScale');
-    this.settingSlider(body, t('hud.options.fctScale'), 'fctScale');
-    this.settingSlider(body, t('hud.options.chatFontScale'), 'chatFontScale');
-    this.settingSlider(body, t('hud.options.chatOpacity'), 'chatOpacity');
-    this.settingBoolToggle(body, t('hud.options.compactChat'), 'compactChat');
-    this.settingBoolToggle(body, t('hud.options.frostedPanels'), 'frostedPanels');
-    this.settingBoolToggle(body, t('hud.options.highContrastText'), 'highContrastText');
-    this.settingBoolToggle(body, t('hud.options.reduceMotion'), 'reduceMotion');
-    this.settingBoolToggle(
-      body,
-      t('hudChrome.options.showWalletOnCharacterScreen'),
-      'showWalletOnCharacterScreen',
-    );
-    this.settingBoolToggle(
-      body,
-      t('hudChrome.options.showWalletOnPlayerCard'),
-      'showWalletOnPlayerCard',
-    );
-    this.settingBoolToggle(
-      body,
-      t('hudChrome.options.highContrastBackground'),
-      'landingHighContrast',
-    );
-    this.settingBoolToggle(body, t('hud.options.invertLookY'), 'invertLookY');
-
-    // On/off toggle for chat timestamps.
-    const tsRow = document.createElement('div');
-    tsRow.className = 'set-row';
-    const tsName = document.createElement('span');
-    tsName.className = 'set-name';
-    tsName.textContent = t('hudChrome.chatTimestamps.show');
-    const tsToggle = document.createElement('button');
-    tsToggle.className = 'btn set-toggle';
-
-    // 12/24-hour format selector — two segmented buttons, dimmed when off.
-    const fmtRow = document.createElement('div');
-    fmtRow.className = 'set-row';
-    const fmtName = document.createElement('span');
-    fmtName.className = 'set-name';
-    fmtName.textContent = t('hudChrome.chatTimestamps.format');
-    const seg = document.createElement('div');
-    seg.className = 'set-seg';
-    const btn12 = document.createElement('button');
-    btn12.className = 'btn set-seg-btn';
-    btn12.textContent = t('hudChrome.chatTimestamps.clock12h');
-    const btn24 = document.createElement('button');
-    btn24.className = 'btn set-seg-btn';
-    btn24.textContent = t('hudChrome.chatTimestamps.clock24h');
-    seg.append(btn12, btn24);
-    fmtRow.append(fmtName, seg);
-
-    const sync = () => {
-      tsToggle.textContent = this.chatTimestamps ? t('hud.options.on') : t('hud.options.off');
-      tsToggle.classList.toggle('off', !this.chatTimestamps);
-      tsToggle.setAttribute('aria-pressed', String(this.chatTimestamps));
-      btn12.classList.toggle('active', this.chatClock === '12h');
-      btn24.classList.toggle('active', this.chatClock === '24h');
-      fmtRow.classList.toggle('disabled', !this.chatTimestamps);
-      btn12.disabled = !this.chatTimestamps;
-      btn24.disabled = !this.chatTimestamps;
-    };
-    sync();
-
-    tsToggle.addEventListener('click', () => {
-      audio.click();
-      this.chatTimestamps = !this.chatTimestamps;
-      localStorage.setItem('chatTimestamps', this.chatTimestamps ? '1' : '0');
-      sync();
-    });
-    const setClock = (clock: ChatClock) => {
-      if (!this.chatTimestamps) return;
-      audio.click();
-      this.chatClock = clock;
-      localStorage.setItem('chatClock', clock);
-      sync();
-    };
-    btn12.addEventListener('click', () => setClock('12h'));
-    btn24.addEventListener('click', () => setClock('24h'));
-
-    tsRow.append(tsName, tsToggle);
-    body.append(tsRow, fmtRow);
-
-    // Reset the movable/resizable chat window back to its default placement.
-    const resetRow = document.createElement('div');
-    resetRow.className = 'set-row';
-    const resetName = document.createElement('span');
-    resetName.className = 'set-name';
-    resetName.textContent = t('hudChrome.chatWindow.reset');
-    const resetBtn = document.createElement('button');
-    resetBtn.className = 'btn set-toggle';
-    resetBtn.textContent = t('hudChrome.chatWindow.resetAction');
-    resetBtn.addEventListener('click', () => {
-      audio.click();
-      this.resetChatWindow();
-    });
-    resetRow.append(resetName, resetBtn);
-    body.append(resetRow);
-
-    const note = document.createElement('div');
-    note.className = 'set-note';
-    note.textContent = t('hudChrome.chatTimestamps.note');
-    $('#options-menu').appendChild(note);
-
-    const chatWinNote = document.createElement('div');
-    chatWinNote.className = 'set-note';
-    chatWinNote.textContent = t('hudChrome.chatWindow.note');
-    $('#options-menu').appendChild(chatWinNote);
-
-    const back = document.createElement('button');
-    back.className = 'btn';
-    back.textContent = t('hud.options.back');
-    back.addEventListener('click', () => {
-      audio.click();
-      this.optionsView = 'main';
-      this.renderOptions();
-    });
-    $('#options-menu').appendChild(back);
-    $('#options-menu')
-      .querySelector('[data-close]')
-      ?.addEventListener('click', () => this.closeOptions());
-  }
-
-  // ---- Performance overlay panel -----------------------------------------
-  // Customizable in-game stats overlay (FPS, frame time, ping, draw calls, …).
-  // The wide, categorized panel lives in perf_overlay_settings.ts (the pure
-  // consumer of the overlay's config store); the HUD only owns this thin delegate
-  // + the master on/off wiring (showFps rides on GameSettings).
-
-  private renderPerformance(): void {
-    const hooks = this.optionsHooks;
-    if (!hooks) return;
-    this.perfSettings ??= new PerfOverlaySettingsPanel(this.perfSettingsHost(hooks));
-    this.perfSettings.render($('#options-menu'));
-  }
-
-  private perfSettingsHost(hooks: OptionsHooks): PerfSettingsHost {
-    return {
-      perf: hooks.perfOverlay,
-      getShowFps: () => hooks.settings.get('showFps'),
-      setShowFps: (on) => hooks.onSettingChange('showFps', on),
-      click: () => audio.click(),
-      onClose: () => this.closeOptions(),
-      onBack: () => {
-        this.optionsView = 'main';
-        this.renderOptions();
-      },
-      closeIconHtml: svgIcon('close'),
-    };
-  }
-
-  /** Called by main.ts when a drag settles on the live overlay: push the dropped
-   *  normalized position into the open panel's Horizontal/Vertical sliders so they
-   *  do not lag behind the drag. No-op when the panel is not on screen. */
+  /** Called by main.ts when a drag settles on the live overlay: forward the
+   *  dropped normalized position to the options window's open performance panel. */
   onPerfOverlayMoved(x: number, y: number): void {
-    this.perfSettings?.syncPosition(x, y);
-  }
-
-  // Display name for an action row. Action-bar slots show the shortcut that
-  // currently occupies them (slot 0 is always Attack); everything else uses
-  // its registry label.
-  private actionDisplayName(actionId: string, fallback: string): string {
-    if (!actionId.startsWith('slot'))
-      return BIND_ACTION_LABEL_KEYS[actionId] ? t(BIND_ACTION_LABEL_KEYS[actionId]) : fallback;
-    const slot = Number(actionId.slice(4));
-    if (slot === 0) return t('hud.keybinds.actions.attack');
-    const known = this.abilityForSlot(slot);
-    if (known) return abilityDisplayName(known.def);
-    const item = this.itemForSlot(slot);
-    return item
-      ? itemDisplayName(item)
-      : t('hud.keybinds.actions.actionBarSlot', { slot: slot + 1 });
-  }
-
-  // Toggle row styled for the Key Bindings panel. Handles the bool Mouse Camera
-  // setting and the numeric (0/1) Click to Move setting, which both live here
-  // alongside the rebindable keys.
-  private settingToggleKeybind(
-    parent: HTMLElement,
-    label: string,
-    key: BoolSettingKey | 'clickToMove',
-    help?: string,
-  ): void {
-    const hooks = this.optionsHooks;
-    if (!hooks) return;
-    const isOn = () =>
-      key === 'clickToMove' ? hooks.settings.get(key) >= 0.5 : hooks.settings.get(key);
-    const row = document.createElement('div');
-    row.className = 'kb-row kb-toggle-row';
-    const name = document.createElement('span');
-    name.className = 'kb-name';
-    name.textContent = label;
-    const toggle = document.createElement('button');
-    toggle.type = 'button';
-    toggle.className = 'btn kb-key kb-toggle';
-    const sync = () => {
-      const on = isOn();
-      toggle.textContent = on ? t('hud.options.on') : t('hud.options.off');
-      toggle.classList.toggle('off', !on);
-      toggle.setAttribute('aria-pressed', on ? 'true' : 'false');
-      toggle.setAttribute('aria-label', label);
-    };
-    sync();
-    toggle.addEventListener('click', () => {
-      audio.click();
-      const next = !isOn();
-      if (key === 'clickToMove') hooks.onSettingChange(key, next ? 1 : 0);
-      else hooks.onSettingChange(key, hooks.settings.set(key, next));
-      sync();
-      // Attack Move reveals/hides its rebindable key row, so redraw the panel.
-      if (key === 'attackMove') this.renderKeybinds();
-    });
-    row.append(name, toggle);
-    parent.appendChild(row);
-    if (help) {
-      const hint = document.createElement('div');
-      hint.className = 'kb-note kb-toggle-help';
-      hint.textContent = help;
-      parent.appendChild(hint);
-    }
-  }
-
-  private clickMoveMouseButtonRow(parent: HTMLElement): void {
-    const hooks = this.optionsHooks;
-    if (!hooks) return;
-    const row = document.createElement('div');
-    row.className = 'kb-row kb-toggle-row';
-    const name = document.createElement('span');
-    name.className = 'kb-name';
-    name.textContent = t('hud.options.clickMoveButton');
-    const toggle = document.createElement('button');
-    toggle.type = 'button';
-    toggle.className = 'btn kb-key kb-toggle kb-mouse-toggle';
-    const sync = () => {
-      toggle.textContent = t(
-        normalizeClickMoveButton(hooks.settings.get('clickToMoveButton')) === 2
-          ? 'hudChrome.options.clickMoveRight'
-          : 'hudChrome.options.clickMoveLeft',
-      );
-      toggle.setAttribute(
-        'aria-label',
-        `${t('hud.options.clickMoveButton')}: ${toggle.textContent}`,
-      );
-    };
-    sync();
-    toggle.addEventListener('click', () => {
-      audio.click();
-      const next = normalizeClickMoveButton(hooks.settings.get('clickToMoveButton')) === 0 ? 2 : 0;
-      hooks.onSettingChange('clickToMoveButton', next);
-      sync();
-    });
-    row.append(name, toggle);
-    parent.appendChild(row);
-  }
-
-  // Action ids a gamepad button may be bound to: explicit unbind, the game menu,
-  // plus every one-shot (edge) keybind action and Jump. Movement-axis actions
-  // (forward/strafe/turn) are excluded, they live on the analog stick.
-  private gamepadActionOptions(): { value: string; label: string }[] {
-    const opts: { value: string; label: string }[] = [
-      { value: GAMEPAD_NONE, label: t('hud.options.unbound') },
-      { value: 'escape', label: t('hudChrome.controller.menuAction') },
-    ];
-    for (const a of BIND_ACTIONS) {
-      if (a.id === 'attackMove') continue; // mode-gated; not a useful pad default
-      if (a.kind !== 'edge' && a.id !== 'jump') continue;
-      opts.push({ value: a.id, label: this.actionDisplayName(a.id, a.label) });
-    }
-    return opts;
-  }
-
-  // Controller panel: enable/invert toggles, deadzone/camera/vibration sliders,
-  // and a remap row per bindable button (dropdown of actions). Mirrors the
-  // separate woc_gamepad profile; keyboard Key Bindings are untouched.
-  private renderController(): void {
-    const hooks = this.optionsHooks;
-    const body = this.settingsViewShell(t('hudChrome.controller.title'));
-    this.settingBoolToggle(body, t('hudChrome.controller.enable'), 'gamepadEnabled');
-    this.settingBoolToggle(body, t('hudChrome.controller.invertY'), 'gamepadInvertY');
-    this.settingSlider(body, t('hudChrome.controller.deadzone'), 'gamepadStickDeadzone');
-    this.settingSlider(body, t('hudChrome.controller.cameraSpeed'), 'gamepadCameraSpeed', {
-      fmt: (v) => formatNumber(v, { maximumFractionDigits: 1 }),
-    });
-    this.settingSlider(body, t('hudChrome.controller.vibration'), 'gamepadVibration');
-
-    const note = document.createElement('div');
-    note.className = 'set-note';
-    note.textContent = t('hudChrome.controller.help');
-    body.appendChild(note);
-
-    const head = document.createElement('div');
-    head.className = 'kb-cat';
-    head.textContent = t('hudChrome.controller.buttons');
-    body.appendChild(head);
-
-    if (hooks) {
-      const opts = this.gamepadActionOptions();
-      for (const { button, action } of hooks.gamepad.entries()) {
-        const row = document.createElement('div');
-        row.className = 'set-row';
-        const name = document.createElement('span');
-        name.className = 'set-name';
-        name.textContent = GAMEPAD_BUTTON_LABELS[button] ?? `#${button}`;
-        const dd = this.buildDropdown(opts, action, (v) => hooks.gamepad.bind(button, v));
-        row.append(name, dd);
-        body.appendChild(row);
-      }
-      const reset = document.createElement('button');
-      reset.type = 'button';
-      reset.className = 'btn';
-      reset.textContent = t('hudChrome.controller.resetButtons');
-      reset.addEventListener('click', () => {
-        audio.click();
-        hooks.gamepad.reset();
-        this.renderController();
-      });
-      body.appendChild(reset);
-    }
-    this.settingsViewFooter();
-  }
-
-  private renderKeybinds(): void {
-    const el = $('#options-menu');
-    // Wide, multi-column layout for the key-binding view only; other options
-    // sub-views (graphics/audio/interface) keep the default 420px width.
-    el.classList.add('kb-wide');
-    el.innerHTML = `<div class="panel-title"><span>${esc(t('hud.options.keyBindings'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
-    this.settingToggleKeybind(el, t('hud.options.mouseCamera'), 'mouseCamera');
-    this.settingToggleKeybind(
-      el,
-      t('hudChrome.options.lockCursorOnRotate'),
-      'lockCursorOnRotate',
-      t('hudChrome.options.keybindHelpLockCursorOnRotate'),
-    );
-    this.settingToggleKeybind(el, t('hud.options.clickToMove'), 'clickToMove');
-    this.clickMoveMouseButtonRow(el);
-    this.settingToggleKeybind(el, t('hud.keybinds.actions.attackMove'), 'attackMove');
-    this.settingToggleKeybind(el, t('hud.options.leftHandedTouch'), 'leftHandedTouch');
-    this.settingToggleKeybind(el, t('hud.options.filterProfanity'), 'filterProfanity');
-    const note = document.createElement('div');
-    note.className = 'kb-note';
-    note.textContent = this.keybindNote || t('hud.options.keybindHelpMouseCamera');
-    el.appendChild(note);
-    const cols = document.createElement('div');
-    cols.className = 'kb-cols';
-    // The Attack Move key is only meaningful (and only rebindable) while its mode
-    // is on; otherwise hide its row so it can't shadow Turn Left's A in the list.
-    const attackMoveOn = !!this.optionsHooks?.settings.get('attackMove');
-    for (const category of BIND_CATEGORIES) {
-      const visible = BIND_ACTIONS.filter(
-        (a) => a.category === category && (a.id !== 'attackMove' || attackMoveOn),
-      );
-      if (visible.length === 0) continue;
-      // Each category is its own column block (header + its rows) so the wide
-      // grid can flow categories side by side; on mobile they stack to one column.
-      const col = document.createElement('div');
-      col.className = 'kb-col';
-      const header = document.createElement('div');
-      header.className = 'kb-cat';
-      header.textContent = BIND_CATEGORY_LABEL_KEYS[category]
-        ? t(BIND_CATEGORY_LABEL_KEYS[category])
-        : category;
-      col.appendChild(header);
-      const rows = document.createElement('div');
-      rows.className = 'kb-rows';
-      for (const action of visible) {
-        const row = document.createElement('div');
-        row.className = 'kb-row';
-        const name = document.createElement('span');
-        name.className = 'kb-name';
-        const label = document.createElement('span');
-        label.className = 'kb-label';
-        label.textContent = this.actionDisplayName(action.id, action.label);
-        const hint = document.createElement('span');
-        hint.className = 'kb-inline-key';
-        const primary = this.keybinds.labelAt(action.id, 0);
-        hint.textContent = primary ? `(${primary})` : '';
-        name.append(label, hint);
-        row.appendChild(name);
-        for (let index = 0; index < 2; index++) {
-          const capturing =
-            this.capturingKey?.action === action.id && this.capturingKey?.index === index;
-          const key = document.createElement('button');
-          key.className = `btn kb-key${capturing ? ' capturing' : ''}`;
-          key.textContent = capturing
-            ? '...'
-            : this.keybinds.labelAt(action.id, index) || t('hud.options.unbound');
-          key.title = index === 0 ? t('hud.options.primary') : t('hud.options.alternate');
-          key.setAttribute(
-            'aria-label',
-            `${this.actionDisplayName(action.id, action.label)} ${key.title}`,
-          );
-          key.addEventListener('click', () => this.beginCapture(action.id, index, action.label));
-          row.appendChild(key);
-        }
-        rows.appendChild(row);
-      }
-      col.appendChild(rows);
-      cols.appendChild(col);
-    }
-    el.appendChild(cols);
-    const reset = document.createElement('button');
-    reset.className = 'btn';
-    reset.textContent = t('hud.options.resetToDefaults');
-    reset.addEventListener('click', () => {
-      audio.click();
-      this.keybinds.reset();
-      this.capturingKey = null;
-      this.keybindNote = t('hud.options.keybindReset');
-      this.refreshKeybindLabels();
-      this.renderKeybinds();
-    });
-    const back = document.createElement('button');
-    back.className = 'btn';
-    back.textContent = t('hud.options.back');
-    back.addEventListener('click', () => {
-      audio.click();
-      this.optionsView = 'main';
-      this.capturingKey = null;
-      this.renderOptions();
-    });
-    el.append(reset, back);
-    el.querySelector('[data-close]')?.addEventListener('click', () => this.closeOptions());
-  }
-
-  private beginCapture(actionId: string, index: number, fallbackLabel: string): void {
-    if (!this.optionsHooks) return;
-    const name = this.actionDisplayName(actionId, fallbackLabel);
-    this.capturingKey = { action: actionId, index };
-    this.keybindNote = t('hud.options.keybindCapture', { action: name });
-    this.renderKeybinds();
-    this.optionsHooks.captureKey((code) => {
-      this.capturingKey = null;
-      if (code === null) {
-        this.keybindNote = t('hud.options.keybindCancelled');
-      } else if (this.keybinds.bind(actionId, index, code)) {
-        // Label what was actually stored: bind() strips modifiers from held
-        // (movement) actions, so a captured "Shift+KeyW" is saved bare as "KeyW".
-        // Reading it back keeps the confirmation in sync with the action-bar keycap.
-        this.keybindNote = t('hud.options.keybindBound', {
-          action: name,
-          key: keyLabel(this.keybinds.codeAt(actionId, index)),
-        });
-        this.refreshKeybindLabels();
-      } else if (isReservedCode(code)) {
-        this.keybindNote = t('hud.options.keybindReserved', { key: keyLabel(code) });
-      }
-      // re-render only if the menu is still open (player may have closed it)
-      if (this.optionsOpen) this.renderKeybinds();
-    });
+    this.optionsWindow.onPerfOverlayMoved(x, y);
   }
 
   // -------------------------------------------------------------------------
@@ -14020,10 +10491,6 @@ function abilityDisplayDescription(def: AbilityDef, damageText: string): string 
   });
 }
 
-function classDisplayName(cls: PlayerClass): string {
-  return tEntity({ kind: 'class', id: cls, field: 'name' });
-}
-
 function itemDisplayNameFromSource(name: string): string {
   const item = Object.values(ITEMS).find((candidate) => candidate.name === name);
   return item ? itemDisplayName(item) : name;
@@ -14075,20 +10542,8 @@ function questTitleFromSource(name: string): string {
   return quest ? questTitle(quest.id) : name;
 }
 
-function zoneDisplayName(zoneId: string): string {
-  return tEntity({ kind: 'zone', id: zoneId, field: 'name' });
-}
-
 function zoneWelcome(zoneId: string): string {
   return tEntity({ kind: 'zone', id: zoneId, field: 'welcome' });
-}
-
-function zonePoiLabel(zoneId: string, poiIndex: number): string {
-  return tEntity({ kind: 'zonePoi', zoneId, poiIndex, field: 'label' });
-}
-
-function dungeonDisplayName(dungeonId: string): string {
-  return tEntity({ kind: 'dungeon', id: dungeonId, field: 'name' });
 }
 
 function dungeonText(dungeonId: string, field: 'enterText' | 'leaveText'): string {
@@ -14113,55 +10568,6 @@ function entityDisplayName(entity: Entity): string {
 
 function delveDisplayName(delveId: string): string {
   return tEntity({ kind: 'delve', id: delveId, field: 'name' });
-}
-
-/** Render SchematicPrimitive[] onto a canvas context (shared by minimap and world-map). */
-function drawSchematicPrimitives(ctx: CanvasRenderingContext2D, prims: SchematicPrimitive[]): void {
-  for (const prim of prims) {
-    ctx.save();
-    if (prim.kind === 'circle') {
-      ctx.beginPath();
-      ctx.arc(prim.cx, prim.cy, prim.r, 0, Math.PI * 2);
-      ctx.fillStyle = prim.fill;
-      ctx.fill();
-      if (prim.stroke) {
-        ctx.strokeStyle = prim.stroke;
-        ctx.lineWidth = prim.strokeWidth ?? 1;
-        ctx.stroke();
-      }
-    } else if (prim.kind === 'rect') {
-      ctx.fillStyle = prim.fill;
-      ctx.fillRect(prim.x, prim.y, prim.w, prim.h);
-      if (prim.stroke) {
-        ctx.strokeStyle = prim.stroke;
-        ctx.lineWidth = prim.strokeWidth ?? 1;
-        ctx.strokeRect(prim.x, prim.y, prim.w, prim.h);
-      }
-    } else if (prim.kind === 'text') {
-      ctx.font = prim.font;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillStyle = prim.fill;
-      ctx.strokeStyle = '#000';
-      ctx.lineWidth = 2;
-      ctx.strokeText(prim.text, prim.cx, prim.cy);
-      ctx.fillText(prim.text, prim.cx, prim.cy);
-    } else if (prim.kind === 'arrow') {
-      ctx.translate(prim.cx, prim.cy);
-      ctx.rotate(prim.angle);
-      ctx.fillStyle = prim.fill;
-      ctx.strokeStyle = prim.stroke;
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.moveTo(0, -prim.size);
-      ctx.lineTo(prim.size * 0.6, prim.size * 0.8);
-      ctx.lineTo(-prim.size * 0.6, prim.size * 0.8);
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-    }
-    ctx.restore();
-  }
 }
 
 function abilityDisplayNameFromSource(name: string): string {
@@ -14277,7 +10683,21 @@ function abilityRequirementLines(def: AbilityDef): string[] {
   return lines;
 }
 
-function abilityEffectText(effects: AbilityEffect[]): string {
+// Builds the `$d` damage string for an ability tooltip. When `scaling` (the live
+// character's Spell Power / Ranged AP / Attack Power) is given, the BASE damage is
+// shown with the scaling contribution called out as a "(+N)" suffix, e.g.
+// "66 to 74 (+29)", so a caster sees both the base and exactly what their Spell
+// Power adds, and watches it climb as gear changes.
+function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling): string {
+  const effects = res.effects;
+  // " (+N)" callout for the scaling contribution (Spell Power / Attack Power),
+  // omitted when there is none. Punctuation + formatted number only (no words).
+  const suffix = (eff: AbilityEffect) => {
+    const b = scaling ? abilityDamageBonus(res, eff, scaling) : 0;
+    return b > 0
+      ? ` ${t('hudChrome.abilityScaling.bonus', { value: formatAbilityNumber(b) })}`
+      : '';
+  };
   const primary = effects.find(
     (eff) =>
       eff.type === 'directDamage' ||
@@ -14296,15 +10716,17 @@ function abilityEffectText(effects: AbilityEffect[]): string {
       case 'aoeDamage':
       case 'aoeRoot':
       case 'drainTick':
-        return abilityAmountRange(primary.min, primary.max);
+        return abilityAmountRange(primary.min, primary.max) + suffix(primary);
       case 'weaponDamage':
       case 'weaponStrike':
         return formatAbilityNumber(primary.bonus);
       case 'finisherDamage':
-        return t('abilityUi.tooltip.finisherDamage', {
-          base: formatAbilityNumber(primary.base),
-          perCombo: formatAbilityNumber(primary.perCombo),
-        });
+        return (
+          t('abilityUi.tooltip.finisherDamage', {
+            base: formatAbilityNumber(primary.base),
+            perCombo: formatAbilityNumber(primary.perCombo),
+          }) + suffix(primary)
+        );
     }
   }
 
@@ -14315,6 +10737,7 @@ function abilityEffectText(effects: AbilityEffect[]): string {
   if (!secondary) return '';
   switch (secondary.type) {
     case 'dot':
+      return formatAbilityNumber(secondary.total) + suffix(secondary);
     case 'hot':
       return formatAbilityNumber(secondary.total);
     case 'absorb':
@@ -14338,40 +10761,15 @@ function cap(s: string): string {
   return s ? s[0].toUpperCase() + s.slice(1) : s;
 }
 
-function playerClassDisplayName(value: string): string {
-  const cls = value as PlayerClass;
-  return CLASSES[cls] ? classDisplayName(cls) : cap(value);
+// A 2D canvas context is non-null for any attached canvas in this app; centralize
+// the assertion so the call sites do not each carry a non-null bang. Throws (a
+// dev-surfaced failure, never reached in practice) rather than asserting.
+function require2dContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('2D canvas context unavailable');
+  return ctx;
 }
 
 function raidMarkerDisplayName(index: number): string {
   return t(RAID_MARKER_LABEL_KEYS[index] ?? RAID_MARKER_LABEL_KEYS[0]);
-}
-
-function statusLabel(status: string | undefined): string {
-  switch (status) {
-    case 'combat':
-      return t('hud.social.status.combat');
-    case 'dungeon':
-      return t('hud.social.status.dungeon');
-    case 'dead':
-      return t('hud.social.status.dead');
-    default:
-      return t('hud.social.status.online');
-  }
-}
-
-// Hover text spelling out what a status dot means, so the orange/grey circles
-// aren't a mystery (#100).
-function dotTitle(online: boolean, status: string | undefined, zone: string | undefined): string {
-  if (!online) return t('hud.social.status.offline');
-  const label = statusLabel(status);
-  return zone ? t('hud.social.statusWithZone', { status: label, zone: localizeZone(zone) }) : label;
-}
-
-function rankLabel(rank: string): string {
-  return rank === 'leader'
-    ? t('hud.social.ranks.leader')
-    : rank === 'officer'
-      ? t('hud.social.ranks.officer')
-      : t('hud.social.ranks.member');
 }

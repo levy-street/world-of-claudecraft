@@ -19,15 +19,7 @@
 // mobSwing, spawnDelveModule), never reaching into not-yet-extracted internals
 // in a way the sim itself does not already expose.
 
-import {
-  arenaOrigin,
-  DELVES,
-  DUNGEONS,
-  instanceOrigin,
-  MOBS,
-  PROPS,
-  QUESTS,
-} from '../../src/sim/data';
+import { arenaOrigin, DELVES, instanceOrigin, MOBS, PROPS, QUESTS } from '../../src/sim/data';
 import { createMob } from '../../src/sim/entity';
 import { solveLockActions } from '../../src/sim/lockpick';
 import { Sim } from '../../src/sim/sim';
@@ -1727,6 +1719,56 @@ function questCollectTurnIn(): Scenario {
   };
 }
 
+// Quest link-share + abandon (W4): the two quest verbs no other parity scenario
+// drives. Two players, NO proximity needed for the linked path. First the share is
+// rejected by the party gate (acceptLinkedQuest's myParty/sharerParty check) and an
+// abandon of an unheld quest hits the early-return guard (no emit); then A invites B
+// into a party and the share goes through (finalizeQuestAccept's questLog.set + the
+// fallback re-grant loop + the accept log, plus the sharer notice back to A); finally
+// B abandons the held quest (questLog.delete + the 'Quest abandoned' log). q_wolves is
+// shareable (no `shareable:false`), level-gateless, and prereq-free, so it is
+// 'available' to a fresh player. Draws NO rng, so the draw-order digest must stay
+// byte-identical across the move.
+function questLinkAbandon(): Scenario {
+  return {
+    name: 'quest_link_abandon',
+    coverage: [
+      'acceptLinkedQuest party-gate: not-in-party error then in-party share',
+      'finalizeQuestAccept via the linked-share path (questLog.set + fallback re-grant + sharer notice)',
+      'abandonQuest questLog.delete + log emit, plus the not-in-log early-return guard',
+    ],
+    build: () => new Sim({ seed: 1017, playerClass: 'warrior', noPlayer: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const a = sim.addPlayer('warrior', 'Aleph'); // sharer
+      const b = sim.addPlayer('mage', 'Bet'); // acceptor
+      teleport(sim, sim.entities.get(a)!, 20, 20);
+      teleport(sim, sim.entities.get(b)!, 21, 20);
+      rec.notes.a = a;
+      rec.notes.b = b;
+      const questId = 'q_wolves';
+      // 1. Not partied yet: the party gate rejects the linked accept (error, no quest).
+      sim.acceptLinkedQuest(questId, a, b);
+      rec.snapshot('link-no-party');
+      // 2. Abandon a quest B does not hold: the `!questLog.has` early-return (no emit).
+      sim.abandonQuest(questId, b);
+      rec.snapshot('abandon-noop');
+      // 3. Form a party (A invites, B accepts).
+      sim.partyInvite(b, a);
+      sim.partyAccept(b);
+      rec.snapshot('partied');
+      // 4. In party + quest available: the share goes through (finalizeQuestAccept
+      //    re-grant + accept log, plus the sharer notice to A).
+      sim.acceptLinkedQuest(questId, a, b);
+      rec.snapshot('link-accepted');
+      // 5. B abandons the quest it now holds (questLog.delete + 'Quest abandoned' log).
+      sim.abandonQuest(questId, b);
+      rec.snapshot('abandoned');
+      rec.tick(2);
+    },
+  };
+}
+
 // Party/raid state machine (A1): the full social flow, which draws NO rng of its
 // own. Forms a party of five, converts it to a raid, fills to a second subgroup,
 // moves a member across groups, then hands off leadership and drains the roster to
@@ -2156,7 +2198,8 @@ function mobLocomotion(): Scenario {
 
       // Cowardly flee: a low-HP humanoid in melee panics once (maybeFlee at/under
       // FLEE_HP_THRESHOLD -> aiState 'flee'), then the flee arm runs it away. The
-      // 'attempts to flee!' emit + callForHelp stay on Sim; the flee arm draws no rng.
+      // 'attempts to flee!' emit stays on Sim; a fleeing mob no longer rallies
+      // allies (no social aggro), and the flee arm draws no rng.
       const coward = spawnMob(
         sim,
         'mogger_lackey',
@@ -3429,6 +3472,97 @@ function marketRoundTrip(): Scenario {
   };
 }
 
+// Inventory + vendor (W2): the player-facing items/vendor command surface that is
+// still inline on Sim today and the W2 slice extracts into src/sim/items.ts behind
+// SimContext. Drives buyItem, equipItem (an empty-slot equip then a same-slot SWAP
+// that returns the old piece to the bags via addItemSilent + recalcPlayerStats),
+// unequipItem (piece back to bags + recalc), useItem (food/drink sit, potion heal +
+// cooldown, elixir aura), discardItem, sellItem (vendorInRange gate + recordVendorBuyback
+// + meta.copper payout), sellAllJunk (bulk gray sweep + per-stack buyback record), and
+// buyBackItem (meta.copper spend + addItemSilent + onInventoryChangedForQuests). Pins
+// copper / inventory / equipment / vendorBuyback in samplePlayerMeta so the W2 move stays
+// byte-identical. None of these commands draw rng, so the draw-order log must be UNCHANGED
+// across the move.
+function inventoryVendor(): Scenario {
+  return {
+    name: 'inventory_vendor',
+    coverage: [
+      'buyItem: meta.copper - buyValue + addItem at trader_wilkes (vendor proximity gate)',
+      'equipItem empty-slot equip + recalcPlayerStats',
+      'equipItem same-slot SWAP: old piece returned to bags via addItemSilent + recalc',
+      'unequipItem: piece back to bags, slot emptied, recalc',
+      'useItem food/drink (sit + eating/drinking slot), potion (heal + cooldown), elixir (applyAura)',
+      'discardItem: removeItem the discarded count',
+      'sellItem: vendorInRange gate + recordVendorBuyback + meta.copper payout',
+      'sellAllJunk: bulk gray sweep, per-stack buyback record, one summary line',
+      'buyBackItem: meta.copper spend + addItemSilent + onInventoryChangedForQuests',
+    ],
+    build: () => new Sim({ seed: 5150, playerClass: 'warrior', noPlayer: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const buyer = sim.addPlayer('warrior', 'Buyer');
+      const meta = sim.players.get(buyer) as any;
+      const p = sim.entities.get(buyer) as AnyEntity;
+      const wilkes = [...sim.entities.values()].find(
+        (e: AnyEntity) => e.templateId === 'trader_wilkes',
+      ) as AnyEntity;
+      // Stand at the vendor so the buyItem proximity + vendorInRange gates pass.
+      teleport(sim, p, wilkes.pos.x + 2, wilkes.pos.z);
+      meta.copper = 1000;
+      rec.notes.buyer = buyer;
+      rec.snapshot('iv-setup');
+
+      // 1) buy a food, a drink, and a potion from the merchant (copper - buyValue each).
+      sim.buyItem(wilkes.id, 'baked_bread', buyer);
+      sim.buyItem(wilkes.id, 'spring_water', buyer);
+      sim.buyItem(wilkes.id, 'minor_healing_potion', buyer);
+      rec.snapshot('bought');
+
+      // 2) equip a helmet into the empty slot, then a second helmet to force a SWAP
+      //    (the old piece returns to the bags via addItemSilent) + recalcPlayerStats.
+      sim.addItem('cryptbone_helm', 1, buyer);
+      sim.addItem('roadwardens_helm', 1, buyer);
+      sim.equipItem('cryptbone_helm', buyer);
+      rec.snapshot('equipped');
+      sim.equipItem('roadwardens_helm', buyer);
+      rec.snapshot('equip-swapped');
+
+      // 3) unequip the helmet back to the bags (recalc).
+      sim.unequipItem('helmet', buyer);
+      rec.snapshot('unequipped');
+
+      // 4) consume: food + drink (sit + slot), a potion (heal + cooldown), an elixir (aura).
+      sim.useItem('baked_bread', buyer);
+      sim.useItem('spring_water', buyer);
+      rec.snapshot('consumed');
+      p.hp = p.maxHp - 50;
+      sim.useItem('minor_healing_potion', buyer);
+      rec.snapshot('quaffed-potion');
+      sim.addItem('elixir_of_the_bear', 1, buyer);
+      sim.useItem('elixir_of_the_bear', buyer);
+      rec.snapshot('quaffed-elixir');
+
+      // 5) discard one of a gray stack.
+      sim.addItem('wolf_fang', 3, buyer);
+      sim.discardItem('wolf_fang', 1, buyer);
+      rec.snapshot('discarded');
+
+      // 6) sell one gray item to the vendor (copper payout + buyback record).
+      sim.sellItem('wolf_fang', 1, buyer);
+      rec.snapshot('sold');
+
+      // 7) bulk-sell the remaining gray (sellAllJunk: one summary line + per-stack buyback).
+      sim.addItem('bandit_bandana', 1, buyer);
+      sim.sellAllJunk(buyer);
+      rec.snapshot('sold-junk');
+
+      // 8) buy one back (copper spend + addItemSilent + onInventoryChangedForQuests).
+      sim.buyBackItem('wolf_fang', buyer);
+      rec.snapshot('bought-back');
+    },
+  };
+}
+
 // XP / prestige (G1b): the residual XP-shaping surface C1 left on Sim. Parks a
 // warrior inside an inn footprint to accrue rested XP (updateRested + isResting),
 // spends it on a kill-flagged award (the grantXp rested double-up), dings the
@@ -3639,6 +3773,7 @@ export const SCENARIOS: Scenario[] = [
   delveCompanion(),
   questKillCredit(),
   questCollectTurnIn(),
+  questLinkAbandon(),
   talentsProgression(),
   multiClassHeal(),
   mobLocomotion(),
@@ -3653,6 +3788,7 @@ export const SCENARIOS: Scenario[] = [
   c4bEffectDispatch(),
   c5AutoAttack(),
   marketRoundTrip(),
+  inventoryVendor(),
   g1bXpPrestige(),
   playerTrade(),
   chatSocial(),

@@ -15,13 +15,17 @@
 // `src/sim`-pure: no DOM/Three, no Math.random/Date.now; all randomness is the
 // shared `ctx.rng` stream, drawn in the exact pre-move order.
 
+import { ABILITIES } from '../data';
 import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
+import { abilityScalingPower, directHitBonus, dotTickBonus } from '../spell_scaling';
+import { stunDrCategory } from '../stun_dr';
 import { addThreat } from '../threat';
 import type { AbilityDef, Entity } from '../types';
 import { armorReduction, meleeMissChance } from '../types';
+import { exclusiveAuraConflicts } from './exclusive_aura';
 
 const CHARGE_MAX_DURATION = 3; // seconds before a blocked charge gives up
 
@@ -70,6 +74,11 @@ export function runEffects(
         if (!target) break;
         const critChance = isSpell ? ctx.spellCrit(p) : p.critChance;
         let dmg = ctx.rng.range(eff.min, eff.max);
+        // The flat rider scales with the school's rating: Spell Power for spells,
+        // Ranged AP for hunter shots, melee Attack Power for physical specials.
+        // abilityScalingPower picks the rating; powerScale (inside directHitBonus)
+        // applies the AP scale-down. A non-scaling effect just contributes 0.
+        dmg += directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
         const crit = ctx.rng.chance(critChance);
         if (crit) dmg *= isSpell ? 1.5 : 2;
         if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
@@ -129,7 +138,13 @@ export function runEffects(
       }
       case 'finisherStun': {
         if (!target || target.dead || spentCombo <= 0) break;
-        const dur = eff.base + eff.perCombo * spentCombo;
+        const dur = ctx.diminishedCrowdControlDuration(
+          p,
+          target,
+          stunDrCategory(ability.id),
+          eff.base + eff.perCombo * spentCombo,
+        );
+        if (dur === null) break;
         ctx.applyAura(target, {
           id: `${ability.id}_stun`,
           name: ability.name,
@@ -212,7 +227,10 @@ export function runEffects(
         const seal = p.auras[sealIdx];
         p.auras.splice(sealIdx, 1);
         ctx.emit({ type: 'aura', targetId: p.id, name: seal.name, gained: false });
-        let dmg = ctx.rng.range(seal.value2 ?? 10, seal.value3 ?? 15);
+        // Judgement is an instant holy nuke; scale it with Spell Power too.
+        let dmg =
+          ctx.rng.range(seal.value2 ?? 10, seal.value3 ?? 15) +
+          directHitBonus(p.spellPower, ability, res.castTime);
         const crit = ctx.rng.chance(ctx.spellCrit(p));
         if (crit) dmg *= 1.5;
         ctx.dealDamage(p, target, Math.round(dmg), crit, 'holy', ability.name, 'hit');
@@ -255,13 +273,29 @@ export function runEffects(
       }
       case 'dot': {
         if (!target || target.dead) break;
+        // Snapshot Spell Power (or Ranged AP) into the per-tick value at cast time,
+        // vanilla-style: the total DoT coefficient spread across its ticks. A DoT
+        // that RIDES a direct/AoE nuke (Fireball, Pyroblast, Immolate) does NOT also
+        // scale here: the direct component already took the cast-time coefficient, so
+        // scaling the rider too would double-dip and over-reward hybrids. Only pure
+        // DoTs (Corruption, SW:P, Serpent Sting) scale through this path.
+        const hybrid = res.effects.some(
+          (e) => e.type === 'directDamage' || e.type === 'aoeDamage' || e.type === 'aoeRoot',
+        );
+        const dotBase = Math.max(1, Math.round(eff.total / (eff.duration / eff.interval)));
+        // Physical bleeds (Rend, Rupture, Garrote, Rip) scale off melee Attack
+        // Power here just like a spell DoT scales off Spell Power; `hybrid` still
+        // suppresses the rider on a DoT that trails its own direct nuke.
+        const dotSp = !hybrid
+          ? dotTickBonus(abilityScalingPower(p, ability), ability, eff.duration, eff.interval)
+          : 0;
         ctx.applyAura(target, {
           id: ability.id,
           name: ability.name,
           kind: 'dot',
           remaining: eff.duration,
           duration: eff.duration,
-          value: Math.max(1, Math.round(eff.total / (eff.duration / eff.interval))),
+          value: dotBase + dotSp,
           tickInterval: eff.interval,
           tickTimer: eff.interval,
           sourceId: p.id,
@@ -300,12 +334,19 @@ export function runEffects(
       }
       case 'stun': {
         if (!target || target.dead) break;
+        const remaining = ctx.diminishedCrowdControlDuration(
+          p,
+          target,
+          stunDrCategory(ability.id),
+          eff.duration,
+        );
+        if (remaining === null) break;
         ctx.applyAura(target, {
           id: `${ability.id}_stun`,
           name: ability.name,
           kind: 'stun',
-          remaining: eff.duration,
-          duration: eff.duration,
+          remaining,
+          duration: remaining,
           value: 0,
           sourceId: p.id,
           school: ability.school,
@@ -368,9 +409,15 @@ export function runEffects(
           school: ability.school,
           fx: 'nova',
         });
+        const aoeSpBonus = directHitBonus(
+          abilityScalingPower(p, ability),
+          ability,
+          res.castTime,
+          true,
+        );
         for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
           if (!ctx.hasLineOfSight(p, m)) continue;
-          let dmg = ctx.rng.range(eff.min, eff.max);
+          let dmg = ctx.rng.range(eff.min, eff.max) + aoeSpBonus;
           // Armor only mitigates physical damage, mirroring the single-target
           // path above — spell-school AoE (Arcane Explosion, Consecration) is
           // not reduced by the target's armor.
@@ -401,6 +448,9 @@ export function runEffects(
           tickTimer: eff.interval,
           school: ability.school,
           ability: ability.name,
+          // Each pulse is an AoE hit; scale per tick off the school's rating
+          // (Spell Power, Ranged AP, or melee Attack Power for physical pulses).
+          spBonus: directHitBonus(abilityScalingPower(p, ability), ability, res.castTime, true),
         };
         ctx.emit({
           type: 'spellfx',
@@ -409,7 +459,7 @@ export function runEffects(
           school: ability.school,
           fx: 'nova',
         });
-        ctx.pulseGroundAoE(groundEffect, threatOpts);
+        ctx.pulseGroundAoE(groundEffect, threatOpts, true);
         ctx.groundAoEs.push(groundEffect);
         break;
       }
@@ -457,9 +507,15 @@ export function runEffects(
           school: ability.school,
           fx: 'nova',
         });
+        const aoeRootSp = directHitBonus(
+          abilityScalingPower(p, ability),
+          ability,
+          res.castTime,
+          true,
+        );
         for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
           if (!ctx.hasLineOfSight(p, m)) continue;
-          const dmg = ctx.rng.range(eff.min, eff.max);
+          const dmg = ctx.rng.range(eff.min, eff.max) + aoeRootSp;
           ctx.dealDamage(p, m, Math.round(dmg), false, ability.school, ability.name, 'hit');
           if (!m.dead && ctx.isHostileTo(p, m)) {
             ctx.applyRootAura(
@@ -487,6 +543,7 @@ export function runEffects(
           const existing = p.auras.findIndex((a) => a.id === ability.id);
           if (existing >= 0) {
             p.auras.splice(existing, 1);
+            if (eff.kind === 'stealth') p.stealthed = false; // toggled back out of stealth
             ctx.emit({ type: 'aura', targetId: p.id, name: ability.name, gained: false });
             recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta));
             break;
@@ -505,6 +562,18 @@ export function runEffects(
             }
           }
         }
+        // Mutually exclusive self-buff group (hunter aspects): casting one cancels
+        // any active sibling so only one in the group is ever up at a time.
+        for (const i of exclusiveAuraConflicts(
+          ability.exclusiveGroup,
+          ability.id,
+          p.auras,
+          (id) => ABILITIES[id]?.exclusiveGroup,
+        )) {
+          const a = p.auras[i];
+          p.auras.splice(i, 1);
+          ctx.emit({ type: 'aura', targetId: p.id, name: a.name, gained: false });
+        }
         ctx.applyAura(p, {
           id: ability.id,
           name: ability.name,
@@ -514,6 +583,10 @@ export function runEffects(
           value: eff.value,
           sourceId: p.id,
           school: ability.school,
+          // charge-limited thorns (Lightning Shield): cap reflects and gate them
+          // behind an internal cooldown. Absent on a plain always-on thorns coat.
+          charges: eff.charges,
+          icdMax: eff.internalCooldown,
         });
         recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta));
         break;

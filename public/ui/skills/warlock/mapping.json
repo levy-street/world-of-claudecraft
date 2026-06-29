@@ -12,104 +12,104 @@
       "abilityId": "shadow_bolt",
       "sourcePack": "warlock",
       "sourceFile": "15.png",
-      "output": "shadow_bolt.png"
+      "output": "shadow_bolt.webp"
     },
     {
       "abilityId": "demon_skin",
       "sourcePack": "warlock",
       "sourceFile": "43.png",
-      "output": "demon_skin.png"
+      "output": "demon_skin.webp"
     },
     {
       "abilityId": "immolate",
       "sourcePack": "warlock",
       "sourceFile": "4.png",
-      "output": "immolate.png"
+      "output": "immolate.webp"
     },
     {
       "abilityId": "corruption",
       "sourcePack": "warlock",
       "sourceFile": "12.png",
-      "output": "corruption.png"
+      "output": "corruption.webp"
     },
     {
       "abilityId": "curse_of_agony",
       "sourcePack": "warlock",
       "sourceFile": "38.png",
-      "output": "curse_of_agony.png"
+      "output": "curse_of_agony.webp"
     },
     {
       "abilityId": "drain_life",
       "sourcePack": "warlock",
       "sourceFile": "14.png",
-      "output": "drain_life.png"
+      "output": "drain_life.webp"
     },
     {
       "abilityId": "fear",
       "sourcePack": "warlock",
       "sourceFile": "28.png",
-      "output": "fear.png"
+      "output": "fear.webp"
     },
     {
       "abilityId": "shadowburn",
       "sourcePack": "warlock",
       "sourceFile": "33.png",
-      "output": "shadowburn.png"
+      "output": "shadowburn.webp"
     },
     {
       "abilityId": "summon_imp",
       "sourcePack": "Summon_Imp_Warlock",
       "sourceFile": "11.png",
-      "output": "summon_imp.png",
+      "output": "summon_imp.webp",
       "note": "replaced generic demon face with a proper imp"
     },
     {
       "abilityId": "summon_voidwalker",
       "sourcePack": "warlock",
       "sourceFile": "36.png",
-      "output": "summon_voidwalker.png"
+      "output": "summon_voidwalker.webp"
     },
     {
       "abilityId": "summon_succubus",
       "sourcePack": "warlock",
       "sourceFile": "48.png",
-      "output": "summon_succubus.png"
+      "output": "summon_succubus.webp"
     },
     {
       "abilityId": "summon_felhunter",
       "sourcePack": "demon",
       "sourceFile": "19.png",
-      "output": "summon_felhunter.png"
+      "output": "summon_felhunter.webp"
     },
     {
       "abilityId": "summon_felguard",
       "sourcePack": "demon",
       "sourceFile": "25.png",
-      "output": "summon_felguard.png"
+      "output": "summon_felguard.webp"
     },
     {
       "abilityId": "summon_infernal",
       "sourcePack": "demon",
       "sourceFile": "48.png",
-      "output": "summon_infernal.png"
+      "output": "summon_infernal.webp"
     },
     {
       "abilityId": "summon_doomguard",
       "sourcePack": "demon",
       "sourceFile": "1.png",
-      "output": "summon_doomguard.png"
+      "output": "summon_doomguard.webp"
     },
     {
       "abilityId": "life_tap",
       "sourcePack": "demon",
       "sourceFile": "44.png",
-      "output": "life_tap.png"
+      "output": "life_tap.webp"
     },
     {
       "abilityId": "searing_pain",
       "sourcePack": "demon",
       "sourceFile": "12.png",
-      "output": "searing_pain.png"
+      "output": "searing_pain.webp"
     }
   ],
   "deferredStayProcedural": {}

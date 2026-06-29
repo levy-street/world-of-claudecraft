@@ -1,3 +1,7 @@
+// Game-client style barrel (declares the @layer order, loads tokens + base, etc.).
+// index.html and play.html both bootstrap through this module, so this one import
+// styles both game entries; admin/guide use their own entries and inline CSS.
+import './styles/index.css';
 import { audio } from './game/audio';
 import {
   BROWSER_BODY_CLASSES,
@@ -45,6 +49,7 @@ import {
   Settings,
 } from './game/settings';
 import { sfx } from './game/sfx';
+import { resolveUiEffectsProfile } from './game/ui_effects_profile';
 import { voice } from './game/voice';
 import {
   CHAR_SORT_MODES,
@@ -70,11 +75,13 @@ import { CharacterPreview } from './render/characters';
 import { skinCount } from './render/characters/manifest';
 import { playerPortraitDataUrl } from './render/characters/portrait';
 import { installWebGLContextRelease } from './render/context_release';
-import { GFX } from './render/gfx';
+import { firstRunGraphicsPreset, GFX, graphicsPresetLabel } from './render/gfx';
 import { Renderer } from './render/renderer';
 import { navigatorSaveData } from './render/sky';
 import { pathCrossesFence } from './sim/colliders';
 import { ABILITIES, CLASSES } from './sim/content/classes';
+import { ITEMS } from './sim/data';
+import { canEquipItem } from './sim/equipment_rules';
 import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
 import { Sim } from './sim/sim';
 import { TAB_NEAR_RADIUS, TAB_QUERY_RADIUS, tabConeHalfAt } from './sim/tab_target';
@@ -97,7 +104,8 @@ import {
 import { assembleBugReportMeta } from './ui/bug_report';
 import { chatInputSize } from './ui/chat_input_autosize';
 import { CLASS_DETAILS, SIGNATURE_ABILITIES } from './ui/class_details_data';
-import { tEntity } from './ui/entity_i18n';
+import { classDisplayName, tEntity } from './ui/entity_i18n';
+import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
 import { Hud } from './ui/hud';
 import {
   ensureLocaleLoaded,
@@ -133,6 +141,7 @@ import {
   formatSecretGroups,
   isCompleteTotpCode,
 } from './ui/two_factor_setup';
+import { UiEffectsApplier } from './ui/ui_effects_applier';
 import { hydrateIcons } from './ui/ui_icons';
 import {
   resolveWocBalanceUpdate,
@@ -185,10 +194,6 @@ const RESOURCE_KEYS = {
   energy: 'classDetails.resources.energy',
   rage: 'classDetails.resources.rage',
 } satisfies Record<string, TranslationKey>;
-
-function classDisplayName(className: PlayerClass): string {
-  return tEntity({ kind: 'class', id: className, field: 'name' });
-}
 
 function classDisplayDescription(className: PlayerClass): string {
   return tEntity({ kind: 'class', id: className, field: 'description' });
@@ -589,6 +594,7 @@ function showMobilePreflightPrompt(): Promise<void> {
   // Deliberately the device FACT (isPhoneTouchDevice), not the Interface Mode
   // override: the "install to home screen" preflight is phone-hardware-only, so a
   // desktop forced to Touch correctly skips it.
+  if (NATIVE_APP) return Promise.resolve();
   if (!isPhoneTouchDevice()) return Promise.resolve();
   if (mobilePreflightPromptPromise) return mobilePreflightPromptPromise;
   const prompt = document.getElementById('mobile-preflight') as HTMLElement | null;
@@ -851,6 +857,22 @@ async function startGame(
 
   const keybinds = new Keybinds(keybindScope);
   const settings = new Settings();
+  // First-run graphics default: until a device default has been applied (the dedicated
+  // graphicsDefaultApplied marker, NOT the graphicsPreset key, which save() def-fills the moment
+  // any unrelated setting is stored), probe the device (GPU name, memory, cores, touch) and
+  // PERSIST a device-appropriate preset over the medium default, BEFORE the effects applier and
+  // renderer read it, so the 3D tier, the data-fx-level cadence (nameplates), and the options UI
+  // all agree. A static one-shot probe (resolveDefaultGraphicsPreset), never the FPS governor.
+  // A masked/inconclusive device resolves to medium and returns null, so it stays on
+  // the medium default and re-detects next boot; only a CONCLUSIVE result is persisted + marked.
+  // An explicit player choice is never overridden: a recognized device is marked applied on its
+  // first boot so it never re-detects, and an inconclusive device returns null so it never
+  // overwrites a stored preset.
+  const autoPreset = firstRunGraphicsPreset(settings.get('graphicsDefaultApplied'));
+  if (autoPreset !== null) {
+    settings.set('graphicsPreset', autoPreset);
+    settings.set('graphicsDefaultApplied', true);
+  }
   // UI theming: apply the persisted theme's CSS variables to :root, then keep a
   // hook so the Options panel can switch preset / override colours live.
   const themeStore = new ThemeStore();
@@ -860,6 +882,24 @@ async function startGame(
       document.documentElement.style.setProperty(name, vars[name]);
   }
   applyTheme();
+  // Graphics-tier HUD effects: publish the resolved effect profile (data-fx-level +
+  // the --fx-* tokens) on settings / OS reduced-motion changes only, never per
+  // frame. Driven by the STATIC graphics preset (the gfx.ts `ui` band stays
+  // governable:false): the FPS governor cannot measure compositor blur cost (the
+  // two-controller hazard). The pure resolver decides; this applier is the thin DOM
+  // consumer, mirroring applyTheme above. Motion has a single source of truth: the
+  // OS prefers-reduced-motion channel (owned by the applier) OR the in-game
+  // reduceMotion setting, both feeding the resolver's reduceMotion input; the
+  // body.reduce-motion class below stays only as the CSS hook it already is.
+  const uiEffectsApplier = new UiEffectsApplier({
+    resolve: (osReducedMotion) =>
+      resolveUiEffectsProfile({
+        presetLabel: graphicsPresetLabel(settings.get('graphicsPreset')),
+        effectsQuality: settings.get('effectsQuality'),
+        reduceMotion: osReducedMotion || settings.get('reduceMotion'),
+      }),
+  });
+  uiEffectsApplier.applyNow();
   let renderer!: Renderer;
   let hud!: Hud;
   const perf = createPerfMonitor(null);
@@ -1262,9 +1302,12 @@ async function startGame(
       return;
     }
     // Interface & Comfort booleans: each toggles a body class (CSS does the rest)
-    // or flips a live subsystem flag. No sim involvement — purely presentational.
+    // or flips a live subsystem flag. No sim involvement, purely presentational.
     if (key === 'reduceMotion') {
+      // body.reduce-motion stays the CSS hook it already is; the applier folds the
+      // same flag into the graphics-tier effect profile so the two never fight.
       document.body.classList.toggle('reduce-motion', settings.set('reduceMotion', !!value));
+      uiEffectsApplier.applyNow();
       return;
     }
     if (key === 'highContrastText') {
@@ -1417,6 +1460,17 @@ async function startGame(
         break;
       case 'uiScale':
         document.documentElement.style.setProperty('--ui-scale', String(v));
+        break;
+      // Graphics-tier HUD effects follow the STATIC preset + the advanced
+      // effectsQuality slider. The 3D renderer tier is resolved at renderer
+      // construction (a reload); here we only re-publish the HUD effect profile
+      // (data-fx-level + --fx-* tokens). The preset is a discrete change so it
+      // applies immediately; effectsQuality is a slider so it is debounced.
+      case 'graphicsPreset':
+        uiEffectsApplier.applyNow();
+        break;
+      case 'effectsQuality':
+        uiEffectsApplier.applyDebounced();
         break;
     }
   }
@@ -2287,6 +2341,43 @@ async function startOffline(playerClass: PlayerClass, name: string, skin = 0): P
     devCommands: import.meta.env.DEV,
   });
   sim.setPlayerSkin(sim.playerId, skin);
+  // Dev convenience: ?mech drops an offline session straight into the Combat Mech
+  // cosmetic body holding a spread of class-usable weapons, to eyeball the held
+  // weapon model on the mech (swap them in the bag to see each one). DEV builds
+  // only (mirrors devCommands gating); inert in production.
+  if (import.meta.env.DEV && new URLSearchParams(location.search).has('mech')) {
+    sim.setPlayerSkin(sim.playerId, 0, 'mech');
+    // One weapon per held-model family (sword / axe / mace / dagger / staff / wand
+    // / polearm); only the ones this class can wield are granted, so every bag
+    // weapon is swappable and the first one auto-equips.
+    const TEST_WEAPONS = [
+      'worn_sword',
+      'redbrook_blade',
+      'wyrmfang_greatblade',
+      'highwatch_warblade',
+      'rusty_hatchet',
+      'drogmars_skullcleaver',
+      'gorraks_cleaver',
+      'tunnelkings_spade',
+      'bronzework_mace',
+      'voss_sanctified_mace',
+      'bristleback_maul',
+      'keen_dirk',
+      'skullsplitter_dirk',
+      'vale_carving_knife',
+      'gravecaller_staff',
+      'vaels_mist_staff',
+      'staff_of_the_gravewyrm',
+      'drowned_tide_scepter',
+      'drownedmoon_scepter',
+      'palecoil_rod',
+      'fen_reaver_glaive',
+      'tidereaver_gaff',
+    ];
+    const usable = TEST_WEAPONS.filter((id) => ITEMS[id] && canEquipItem(playerClass, ITEMS[id]));
+    for (const id of usable) sim.addItem(id, 1, sim.playerId);
+    if (usable[0]) sim.equipItem(usable[0], sim.playerId);
+  }
   // Offline characters are not persisted (a fresh name is typed each session),
   // so the only stable handle is class + name. Keybinds scope to that pair.
   void startGame(sim, sim, null, `offline:${playerClass}:${name}`);
@@ -4456,42 +4547,61 @@ const walletBalanceText = (n: number): string =>
   t('wallet.balanceAmount', { amount: formatWoc(n) });
 let walletPickerModal: HTMLDivElement | null = null;
 let walletPickerResolve: ((id: string | null) => void) | null = null;
-let walletPickerReturnFocus: HTMLElement | null = null;
+// One module-local FocusManager INSTANCE for the pre-game wallet-picker modal:
+// the shared focus-trap implementation, not a second hand-rolled one. It is an instance, NOT
+// a module singleton exported from focus_manager, mirroring
+// how Hud owns its own FocusManager; the pre-game shell cannot reach Hud's private instance, so
+// a dedicated instance is the correct unification. It owns trap + focus-first + return-to-opener
+// only; this modal keeps its OWN Escape + backdrop-click close (below) because the manager
+// deliberately owns no Escape and the wallet picker is not a hud.closeAll window.
+const walletFocusManager = new FocusManager();
+let walletPickerFocusHandle: FocusTrapHandle | null = null;
+// The control that opened the picker, captured on the FIRST open and preserved across a
+// re-entrant re-open so closing the (re-)opened modal still returns focus to where the flow
+// started. The re-entrant close detaches the prior modal (dropping focus to document.body), so
+// re-reading document.activeElement at the new open would record body, not the real opener.
+let walletPickerOpener: HTMLElement | null = null;
 
-function walletPickerFocusable(root: HTMLElement): HTMLElement[] {
-  return Array.from(
-    root.querySelectorAll<HTMLElement>(
-      'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-    ),
-  ).filter(
-    (el) =>
-      !el.hasAttribute('disabled') &&
-      !el.getAttribute('aria-hidden') &&
-      (el.offsetParent !== null || el === document.activeElement),
-  );
-}
-
-function closeWalletPicker(id: string | null): void {
+function closeWalletPicker(id: string | null, returnFocus = true): void {
   const modal = walletPickerModal;
   const resolve = walletPickerResolve;
+  const focusHandle = walletPickerFocusHandle;
   walletPickerModal = null;
   walletPickerResolve = null;
+  walletPickerFocusHandle = null;
   if (modal) modal.remove();
-  const returnFocus = walletPickerReturnFocus;
-  walletPickerReturnFocus = null;
-  if (returnFocus?.isConnected) returnFocus.focus();
+  // Return focus to the opener through the shared FocusManager (replacing the manual
+  // returnFocus.focus()): release(true) pops the trap and refocuses the recorded opener. The
+  // re-entrant re-open path passes returnFocus=false so the FocusManager's deferred opener
+  // focus cannot land AFTER (and steal focus from) the new modal's synchronous initial focus;
+  // the original opener is preserved separately in walletPickerOpener for the eventual real
+  // close. Drop that recorded opener only on a real (returnFocus=true) close so a re-opened
+  // picker still returns to where the flow started.
+  focusHandle?.release(returnFocus);
+  if (returnFocus) walletPickerOpener = null;
   if (resolve) resolve(id);
 }
 
+// The wallet picker uses the shared src/ui/focus_manager FocusManager, so there
+// is ONE focus-trap implementation. It keeps its own Escape + backdrop-click close because the
+// manager owns no Escape and this is a pre-game shell modal, not a hud.closeAll window; the
+// FocusManager is a module-local INSTANCE, never a module singleton.
 function showWalletPicker(
   wallets: readonly WalletOption[],
   selectedId: string | null,
 ): Promise<string | null> {
-  if (walletPickerResolve) closeWalletPicker(null);
+  const reentrant = walletPickerResolve !== null;
+  if (reentrant) closeWalletPicker(null, false);
   return new Promise((resolve) => {
     walletPickerResolve = resolve;
-    walletPickerReturnFocus =
-      document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    // Capture the opener BEFORE focus moves into the modal; the FocusManager returns focus here
+    // on release(). On a re-entrant re-open keep the FIRST opener (the re-entrant close already
+    // detached its modal and dropped focus to body, so re-reading activeElement now would record
+    // body, not the control that started the flow).
+    if (!reentrant) {
+      walletPickerOpener =
+        document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    }
 
     const back = document.createElement('div');
     back.className = 'modal-backdrop wallet-picker-backdrop';
@@ -4563,33 +4673,31 @@ function showWalletPicker(
     back.appendChild(panel);
     document.body.appendChild(back);
     walletPickerModal = back;
+    // Install the shared focus trap over the panel: Tab/Shift+Tab cycle + return-to-opener.
+    // This replaces the deleted hand-rolled focusable list + inline Tab cycle, so there is one
+    // focus-trap implementation (the manager re-queries the panel's focusables on each Tab).
+    walletPickerFocusHandle = walletFocusManager.open({
+      root: () => panel,
+      returnFocusTo: walletPickerOpener,
+    });
 
     const close = () => closeWalletPicker(null);
     closeBtn.addEventListener('click', close);
     back.addEventListener('click', (e) => {
       if (e.target === back) close();
     });
+    // Keep ONLY the modal's own Escape (the FocusManager owns no Escape, and this is a
+    // pre-game shell modal, not a hud.closeAll window). Tab/Shift+Tab is the shared trap's job.
     back.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        e.stopPropagation();
-        close();
-        return;
-      }
-      if (e.key !== 'Tab') return;
-      const focusable = walletPickerFocusable(back);
-      if (focusable.length === 0) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
+      if (e.key !== 'Escape') return;
+      e.preventDefault();
+      e.stopPropagation();
+      close();
     });
 
+    // Initial focus preserved byte-faithfully: the selected option, else the first option,
+    // else the close button. Kept explicit (synchronous) so the initial-focus behavior is
+    // unchanged; the shared manager owns the Tab trap + return-to-opener.
     const initialFocus =
       back.querySelector<HTMLElement>('.wallet-picker-option.selected') ??
       back.querySelector<HTMLElement>('.wallet-picker-option') ??
@@ -5147,8 +5255,10 @@ function applyLandingBackdrop(highContrast: boolean): void {
     return;
   }
 
-  // Video path: attach the source lazily and play. Reveal classes flip on the
-  // first painted frame so the poster cross-fades into live motion.
+  // Video path: attach the source lazily and play. The trailer is held hidden
+  // (opacity 0) until it is genuinely playing, so the static poster never flashes
+  // before the video. trailer-ready reveals the layer; trailer-playing adds the
+  // drift, and only on real playback.
   const src = video.dataset.trailerSrc;
   if (src && !video.src) {
     video.src = src;
@@ -5157,11 +5267,17 @@ function applyLandingBackdrop(highContrast: boolean): void {
       video.addEventListener('playing', () => {
         backdrop.classList.add('trailer-ready', 'trailer-playing');
       });
+      // Failure fallback: a trailer that cannot decode/load still reveals the
+      // static poster (trailer-ready, no drift) instead of leaving a black void.
+      video.addEventListener('error', () => {
+        backdrop.classList.add('trailer-ready');
+      });
     }
     video.load();
   }
   video.play().catch(() => {
-    /* autoplay blocked: poster stays, no error surfaced */
+    // autoplay blocked: reveal the static poster (no drift), not a black backdrop.
+    backdrop.classList.add('trailer-ready');
   });
 }
 

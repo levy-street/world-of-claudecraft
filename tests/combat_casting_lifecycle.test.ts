@@ -86,6 +86,9 @@ describe('casting_lifecycle: channel start -> tick -> finish', () => {
     const ticks = drainCast(sim, p, meta);
     expect(p.castingAbility).toBeNull(); // channel ran to completion
     expect(ticks).toBeGreaterThan(1);
+    // Each channel bolt deals its damage when it reaches the target (projectile_travel),
+    // a few ticks after it is fired: let the last bolts land.
+    for (let i = 0; i < 20 && mob.hp >= mobHp0; i++) sim.tick();
     expect(mob.hp).toBeLessThan(mobHp0); // applyChannelTick dealt drain damage
   });
 });

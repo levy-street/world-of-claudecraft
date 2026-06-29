@@ -28,6 +28,7 @@
 // `ctx.rng` stream, drawn in the exact pre-move positions.
 
 import { CLASSES, MOBS } from '../data';
+import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { addThreat } from '../threat';
@@ -44,6 +45,8 @@ import {
 } from '../types';
 import { spendResource } from './casting_lifecycle';
 import { blindMissBonus, isDisarmed, isStunned } from './cc';
+import { baseSwingSpeed } from './form_swing';
+import { applyThornsReaction } from './thorns_charge';
 
 export function startAutoAttack(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
@@ -133,7 +136,9 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
     p.queuedOnSwing = null;
   }
   meleeSwing(ctx, p, t, bonus, abilityName, { threatFlat, threatMult });
-  p.swingTimer = p.weapon.speed * ctx.swingIntervalMult(p);
+  // Wolf Form swings at the rogue's fixed feral cadence, not the carried weapon's
+  // speed (see combat/form_swing.ts); everyone else uses their weapon speed.
+  p.swingTimer = baseSwingSpeed(p) * ctx.swingIntervalMult(p);
 }
 
 export function rangedSwing(
@@ -151,32 +156,33 @@ export function rangedSwing(
     school,
     fx: 'projectile',
   });
-  const missChance = meleeMissChance(attacker.level, target.level) + blindMissBonus(attacker);
-  if (ctx.rng.chance(missChance)) {
-    ctx.emit({
-      type: 'damage',
-      sourceId: attacker.id,
-      targetId: target.id,
-      amount: 0,
-      crit: false,
-      school,
-      ability: label,
-      kind: 'miss',
-    });
-    ctx.enterCombat(attacker, target);
-    return;
-  }
-  let dmg = ctx.rng.range(ranged.min, ranged.max) + (attacker.rangedPower / 14) * ranged.speed;
-  // ranged white hits suffer the same higher-level crit suppression as melee
-  const critChance = Math.max(
-    0.005,
-    attacker.critChance - Math.max(0, target.level - attacker.level) * 0.002,
-  );
-  const crit = ctx.rng.chance(critChance);
-  if (crit) dmg *= 2;
-  // wand bolts are magic — armor doesn't apply; physical auto shot is mitigated
-  if (!ranged.wand) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), attacker.level);
-  ctx.dealDamage(attacker, target, Math.max(1, Math.round(dmg)), crit, school, label, 'hit');
+  // The shot/bolt is in flight: its miss roll and damage land when it reaches the
+  // target (projectile_travel), and fizzle if the target dies before impact.
+  scheduleProjectile(ctx, attacker, target, (atk, tgt) => {
+    const missChance = meleeMissChance(atk.level, tgt.level) + blindMissBonus(atk);
+    if (ctx.rng.chance(missChance)) {
+      ctx.emit({
+        type: 'damage',
+        sourceId: atk.id,
+        targetId: tgt.id,
+        amount: 0,
+        crit: false,
+        school,
+        ability: label,
+        kind: 'miss',
+      });
+      ctx.enterCombat(atk, tgt);
+      return;
+    }
+    let dmg = ctx.rng.range(ranged.min, ranged.max) + (atk.rangedPower / 14) * ranged.speed;
+    // ranged white hits suffer the same higher-level crit suppression as melee
+    const critChance = Math.max(0.005, atk.critChance - Math.max(0, tgt.level - atk.level) * 0.002);
+    const crit = ctx.rng.chance(critChance);
+    if (crit) dmg *= 2;
+    // wand bolts are magic — armor doesn't apply; physical auto shot is mitigated
+    if (!ranged.wand) dmg *= 1 - armorReduction(ctx.effectiveArmor(tgt), atk.level);
+    ctx.dealDamage(atk, tgt, Math.max(1, Math.round(dmg)), crit, school, label, 'hit');
+  });
 }
 
 // Returns true if the swing connected.
@@ -235,7 +241,11 @@ export function meleeSwing(
   for (const a of attacker.auras) if (a.kind === 'imbue') imbueBonus += a.value;
   let dmg =
     (ctx.rng.range(attacker.weapon.min, attacker.weapon.max) +
-      (ctx.effectiveAttackPower(attacker) / 14) * attacker.weapon.speed) *
+      // Normalize the attack-power contribution to the SAME cadence the swing
+      // fires at: Wolf Form swings at the rogue speed (baseSwingSpeed), so its
+      // AP-per-swing must use that speed too, not the slow staff's, or feral
+      // would double-dip (fast swings AND heavy slow-weapon AP weighting).
+      (ctx.effectiveAttackPower(attacker) / 14) * baseSwingSpeed(attacker)) *
       mult +
     bonus +
     imbueBonus;
@@ -257,13 +267,10 @@ export function meleeSwing(
     false,
     { flat: opts.threatFlat ?? 0, mult: opts.threatMult ?? 1 },
   );
-  // thorns / lightning shield: melee attackers take damage back
+  // thorns / lightning shield: melee attackers take damage back. Charge-limited
+  // thorns (Lightning Shield) consume a charge and gate on an internal cooldown.
   if (!attacker.dead) {
-    for (const a of target.auras) {
-      if (a.kind === 'thorns') {
-        ctx.dealDamage(target, attacker, a.value, false, a.school, a.name, 'hit', true);
-      }
-    }
+    applyThornsReaction(ctx, target, attacker);
     // innate "spiked hide" mobs (e.g. bristleback boars) reflect on every hit
     const spikes = MOBS[target.templateId]?.thorns;
     if (spikes && !attacker.dead) {
@@ -276,6 +283,8 @@ export function meleeSwing(
         spikes.name ?? 'Spiked Hide',
         'hit',
         true,
+        undefined,
+        false, // reflected damage shield: incidental, never walks the leash anchor
       );
     }
   }

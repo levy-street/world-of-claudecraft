@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { coerceFxTier, nameplateIntervalSec } from '../game/ui_tier_knobs';
 import { cameraOcclusion } from '../sim/colliders';
 import {
   ABILITIES,
@@ -21,35 +22,20 @@ import {
   isDelvePos,
   MOBS,
   NPCS,
-  QUESTS,
   WORLD_MAX_Z,
   WORLD_MIN_Z,
   ZONES,
 } from '../sim/data';
 import type { DelveModuleId } from '../sim/delve_layout';
 import type { BiomeId } from '../sim/types';
-import {
-  ALL_CLASSES,
-  type Entity,
-  INTERACT_RANGE,
-  isQuestTurnInNpc,
-  type SimEvent,
-} from '../sim/types';
+import { ALL_CLASSES, type Entity, type SimEvent } from '../sim/types';
 import { groundHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 import { tEntity } from '../ui/entity_i18n';
-import {
-  holderTierBadgeDataUrl,
-  holderTierByIndex,
-  holderTierDisplayName,
-} from '../ui/holder_tier';
-import { t } from '../ui/i18n';
-import { raidMarkerDataUrl } from '../ui/icons';
-import { type IWorld, OVERHEAD_EMOTES } from '../world_api';
+import type { IWorld } from '../world_api';
 import { isVisuallyDead } from './anim_state';
 import type { SpatialAudioSink, Surface } from './audio_sink';
 import { type BirdsView, buildBirds } from './birds';
 import { type CameraOcclusionState, stepCameraOcclusion } from './camera_collision';
-import { castBarState } from './cast_bar';
 import { characterSoulRendActive } from './character_effects';
 import { type AnimState, type CharacterVisual, createCharacterVisual } from './characters';
 import { mechAssetsReady, preloadMechAssets } from './characters/assets';
@@ -60,9 +46,15 @@ import { buildCritters, type CritterField } from './critters';
 import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable } from './delve_props';
 import { DungeonInteriors, ensureDungeonAssets } from './dungeon';
+import { objectDisplayName } from './entity_labels';
 import { releaseSelfFacing, stepSelfFacing } from './facing_smooth';
 import { buildFish, type FishView } from './fish';
-import { buildFoliage, type FoliagePerfStats, type FoliageView } from './foliage';
+import {
+  buildFoliage,
+  buildFoliageMaterialPrewarmGroup,
+  type FoliagePerfStats,
+  type FoliageView,
+} from './foliage';
 import {
   GFX,
   type GfxBucketBands,
@@ -77,16 +69,16 @@ import { buildImpactSite, type ImpactSiteView } from './impact_site';
 import { ensureDelveInteriorKit } from './interior_kit';
 import { type LocoTrack, newLocoTrack, updateLocomotion } from './locomotion';
 import { buildMotes, type MotesView } from './motes';
-import { COMBO_PIP_MAX, comboPipsFor } from './nameplate_combo';
+import { COMBO_PIP_MAX } from './nameplate_combo';
+import { NameplatePainter } from './nameplate_painter';
 import {
   isProjectedNameplateAnchorVisible,
   nameplateScreenTransform,
 } from './nameplate_projection';
-import { isMobThreateningViewer } from './nameplate_threat';
 import { buildComposer, type PostPipeline } from './post';
 import { buildPropMaterialPrewarmGroup, buildProps } from './props';
 import { buildGroundQuestObject } from './quest_objects';
-import { FRIENDLY, isFriendlyPet, isOwnedPetHostile, mobNameColor } from './reaction';
+import { isOwnedPetHostile } from './reaction';
 import { RenderBudgetGovernor, type RenderBudgetState } from './render_budget';
 import { downscaleDims } from './screenshot';
 import { drapeRingLocalY } from './selection_ring';
@@ -101,9 +93,6 @@ import { Vfx } from './vfx';
 import { buildWater, type WaterView } from './water';
 import { Weather } from './weather';
 
-const NAMEPLATE_RANGE = 55;
-const NAMEPLATE_RANGE_SQ = NAMEPLATE_RANGE * NAMEPLATE_RANGE;
-const emoteIconUrl = (id: string): string => `/ui/emotes/emote-${id}.png`;
 // Entities further than this from the player are hidden entirely: their rigs
 // are several draw calls each and read as sub-pixel specks long before this.
 const ENTITY_DRAW_RANGE = 80;
@@ -125,6 +114,10 @@ const VIEW_PREWARM_MAX_MS = 12000;
 // stalls the parallel-compile queue; keep it modest, since a long hold here is
 // itself worse than the freeze it prevents.
 const PREWARM_COMPILE_MAX_MS = 10000;
+// Safety ceiling for the per-view async-compile gate: if KHR_parallel_shader_compile
+// somehow never reports a program ready, show the view anyway (degrading to the old
+// synchronous first-use compile) rather than stranding an entity invisible.
+const VIEW_COMPILE_GATE_MAX_MS = 1500;
 // Reserve at the tail of the view-build budget so the compile + final-frame
 // steps always start before the prewarm deadline (runEntry skips late entries).
 const PREWARM_BUILD_RESERVE_MS = 3000;
@@ -144,6 +137,26 @@ const SPARKLE_DRAW_RANGE_SQ = 40 * 40;
 // Keep the full rig just past nameplate range so nearby characters and held
 // weapons stay readable on low while the 80u draw cap still bounds total cost.
 const ENTITY_LOD_RANGE_SQ = 58 * 58;
+
+// Crowd-adaptive character LOD. In a dense scene (capital, raid, world boss) the
+// dominant client cost is many full-articulated rigs plus their shadow passes,
+// which the frame-budget governor cannot shed (characters are non-governable).
+// Once the visible-rig count climbs past a soft knee, pull the articulated-LOD
+// and full-shadow distances in toward a floor so more of the throng collapses to
+// the single-draw far LOD + static proxy shadow. Below the knee (ordinary play,
+// a handful of rigs) the scale is exactly 1, so normal scenes are untouched.
+// FPS-first: in a crowd the frozen far-pose that shows a little sooner is a fair
+// trade for staying above 60. Distances compare squared, so scale is squared.
+const CROWD_LOD_SOFT_RIGS = 14;
+const CROWD_LOD_HARD_RIGS = 48;
+const CROWD_LOD_MIN_SCALE = 0.6;
+function crowdLodScaleSq(visibleRigs: number): number {
+  if (visibleRigs <= CROWD_LOD_SOFT_RIGS) return 1;
+  const span = CROWD_LOD_HARD_RIGS - CROWD_LOD_SOFT_RIGS;
+  const t = Math.min(1, (visibleRigs - CROWD_LOD_SOFT_RIGS) / span);
+  const scale = 1 - t * (1 - CROWD_LOD_MIN_SCALE);
+  return scale * scale;
+}
 // Feet-above-terrain margin that counts as "airborne" for the jump pose. Mirrors
 // the sim's own 0.4u grounded tolerance (sim.ts), so walking slopes doesn't trip
 // it but a jump (apex ~1.1u) does. Needed because online snapshots don't carry
@@ -434,7 +447,7 @@ function selfSnapshotAlpha(alpha: number, lead: number): number {
   return Math.min(1.25, alpha + Math.max(0, lead));
 }
 
-interface EntityView {
+export interface EntityView {
   group: THREE.Group;
   /** rigged glTF visual for characters; null for object views (doors/crates) */
   visual: CharacterVisual | null;
@@ -479,8 +492,11 @@ interface EntityView {
   objectPoolKey: string | null;
   portal?: THREE.Mesh; // dungeon door swirl
   objectCasters: THREE.Object3D[]; // object-view shadow meshes, distance-gated
+  viewLights: THREE.PointLight[]; // point lights this view contributes to the budget
   shadowOn: boolean;
   isFar: boolean;
+  // hidden until its shader programs finish linking off-thread (async-compile gate)
+  compilePending: boolean;
   lastOverheadEmoteKey: string | null;
   // render-space position last frame, for true u/s locomotion speed
   lastX: number;
@@ -649,43 +665,6 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => window.setTimeout(resolve, Math.max(0, ms)));
 }
 
-function mobDisplayName(mobId: string): string {
-  return tEntity({ kind: 'mob', id: mobId, field: 'name' });
-}
-
-function npcDisplayName(npcId: string): string {
-  return tEntity({ kind: 'npc', id: npcId, field: 'name' });
-}
-
-function dungeonDisplayName(dungeonId: string): string {
-  return tEntity({ kind: 'dungeon', id: dungeonId, field: 'name' });
-}
-
-function objectDisplayName(entity: Entity): string {
-  if (entity.templateId === 'delve_locked_chest') {
-    return t('worldContent.delveLockedChestInteract');
-  }
-  if (entity.templateId === 'delve_reward_chest') {
-    return t('worldContent.delveRewardChestInteract');
-  }
-  if (entity.templateId === 'delve_surface_exit') {
-    return t('worldContent.delveSurfaceExitInteract');
-  }
-  if (
-    (entity.templateId === 'dungeon_door' || entity.templateId === 'dungeon_exit') &&
-    entity.dungeonId
-  ) {
-    const dungeonName = dungeonDisplayName(entity.dungeonId);
-    return entity.templateId === 'dungeon_exit'
-      ? t('worldContent.dungeonExitName', { name: dungeonName })
-      : dungeonName;
-  }
-  // Collectible/quest ground objects carry the item id they grant; localize the
-  // nameplate through the item dictionary instead of the raw English name.
-  if (entity.objectItemId) return tEntity({ kind: 'item', id: entity.objectItemId, field: 'name' });
-  return entity.name;
-}
-
 export class Renderer {
   scene = new THREE.Scene();
   camera: THREE.PerspectiveCamera;
@@ -694,6 +673,7 @@ export class Renderer {
   nameplateLayer: HTMLDivElement;
   // Travel-form speed-illusion overlay (presentation only; see travel_speed_fx*).
   private travelSpeedFx: TravelSpeedFxPainter;
+  private nameplatePainter: NameplatePainter;
   // Last local-player XZ, to derive ground speed for the speed cue (yd/s).
   private lastLocalPos: { x: number; z: number } | null = null;
   // Cached prefers-reduced-motion query. `.matches` stays live as the OS setting
@@ -762,6 +742,21 @@ export class Renderer {
   private cullViewProj = new THREE.Matrix4();
   private cullSphere = new THREE.Sphere();
   private cullCharacters = false;
+  // Scratch AnimState reused across the per-entity sync loop: CharacterVisual
+  // .update() and the pose-selection helpers only read it within the call (the
+  // preview drives a shared constant too), so one buffer avoids allocating a
+  // fresh state object per entity per frame, reducing GC churn that scales with crowd.
+  private readonly animScratch: AnimState = {
+    speed: 0,
+    moving: false,
+    airborne: false,
+    backwards: false,
+    reverseBackpedal: false,
+    dead: false,
+    casting: false,
+    swimming: false,
+    sitting: false,
+  };
   private selfRenderPosition = new THREE.Vector3();
   private selfRenderPositionReady = false;
   // Last yaw applied to the local player while the camera was driving its facing
@@ -791,6 +786,12 @@ export class Renderer {
   private fogScratch = new THREE.Color();
   private flames: THREE.Mesh[];
   private fireLights: THREE.PointLight[];
+  // Point lights owned by entity views (e.g. the quest-object glow). These stream
+  // in/out with interest, so they are budgeted into the SAME constant count as the
+  // static fire lights - otherwise numPointLights toggles as a lit object enters or
+  // leaves view and every lit material recompiles (an open-world travel hitch).
+  private viewLights: THREE.PointLight[] = [];
+  private lightRankDirty = true; // viewLights set changed: rebuild the budget rank
   private effectivePointLights = 0;
   private propsView!: {
     update(
@@ -803,7 +804,12 @@ export class Renderer {
       fogFar: number,
     ): void;
   };
-  private lightRank: { light: THREE.PointLight; d2: number; worldPos: THREE.Vector3 }[] = [];
+  private lightRank: {
+    light: THREE.PointLight;
+    d2: number;
+    worldPos: THREE.Vector3;
+    base: number | null; // view-light base intensity (no external flicker restores it); null for fire lights
+  }[] = [];
   private doomedIds: number[] = [];
   private dungeons: DungeonInteriors | null = null;
   private envRTs = new Map<BiomeId, THREE.WebGLRenderTarget>();
@@ -811,6 +817,11 @@ export class Renderer {
   private envOutdoorIntensity = ENV_INTENSITY;
   private time = 0;
   private frameIdx = 0;
+  // Visible non-self character rigs last frame, feeding the crowd-adaptive LOD.
+  private lastVisibleRigCount = 0;
+  // KHR_parallel_shader_compile present: lets us link new programs off-thread and
+  // gate a freshly-streamed view's draw on readiness instead of stalling the frame.
+  private asyncCompileSupported = false;
   vfx: Vfx;
   private weather: Weather;
   private weatherOn = true;
@@ -922,12 +933,33 @@ export class Renderer {
     this.webgl.shadowMap.type = THREE.PCFSoftShadowMap;
     this.webgl.toneMapping = THREE.ACESFilmicToneMapping; // OutputPass reads this on the composer path
     this.webgl.toneMappingExposure = this.baseExposure;
+    // Only worth gating view draws on compileAsync when programs can link OFF the
+    // main thread; without the extension compileAsync compiles synchronously, so
+    // gating would just delay the same stall. Detected once here.
+    try {
+      this.asyncCompileSupported =
+        typeof this.webgl.compileAsync === 'function' &&
+        this.webgl.getContext().getExtension('KHR_parallel_shader_compile') !== null;
+    } catch {
+      this.asyncCompileSupported = false;
+    }
     this.camera = new THREE.PerspectiveCamera(
       CAMERA_BASE_FOV,
       this.viewport.width / this.viewport.height,
       0.1,
       950,
     );
+    // Nameplate Three/DOM ownership lives in the painter; it reads the
+    // viewport / mob-nameplate toggle lazily (the renderer reassigns viewport on
+    // resize) and borrows the renderer's PvP reaction check.
+    this.nameplatePainter = new NameplatePainter({
+      views: this.views,
+      camera: this.camera,
+      world: this.sim,
+      getViewport: () => this.viewport,
+      showNameplates: () => this.showNameplates,
+      isHostilePlayer: (e) => this.isHostilePlayer(e),
+    });
 
     this.scene.fog = new THREE.Fog(
       LOW_GFX ? 0xb6cddd : 0xa6c6e0,
@@ -1114,6 +1146,7 @@ export class Renderer {
     this.scene.add(this.birds.group);
     this.impactSite = buildImpactSite(this.sim.cfg.seed);
     this.scene.add(this.impactSite.group);
+    this.scene.add(this.impactSite.light);
     const props = buildProps(this.sim.cfg.seed, (delveId) =>
       tEntity({ kind: 'delve', id: delveId, field: 'name' }),
     );
@@ -1121,6 +1154,10 @@ export class Renderer {
     this.scene.add(props.group);
     this.flames = props.flames;
     this.fireLights = props.fireLights;
+    // The impact-site light rides the campfire point-light budget so the visible
+    // point-light count stays constant as the player travels (constant
+    // numPointLights -> materials never recompile for a light-count change).
+    this.fireLights.push(this.impactSite.light);
     this.propsView = props;
 
     // selection ring — a classic target reticle: a base ring plus four
@@ -1908,7 +1945,7 @@ export class Renderer {
       sp.visible = this.fogState === 'outdoor';
     }
     this.updateGodRays();
-    this.updateNameplates(true);
+    this.nameplatePainter.update(true);
     this.updateChatBubbles();
   }
 
@@ -1950,8 +1987,14 @@ export class Renderer {
   }
 
   private visualPoolKeyFor(e: Entity): string | null {
-    if (e.kind !== 'mob') return null;
-    return `mob:${e.templateId}:${e.color}:${e.scale}`;
+    if (e.kind === 'mob') return `mob:${e.templateId}:${e.color}:${e.scale}`;
+    // NPCs are skinned characters too: pool them like mobs so their Skeleton (and its
+    // bone-matrix DataTexture) survives interest churn instead of being disposed and
+    // re-uploaded every time one streams out and back into view - that dispose +
+    // re-upload cycle is the open-world "asset-upload" travel hitch (Skeleton.dispose
+    // via CharacterVisual.dispose in removeView, pinned by GPU-upload profiling).
+    if (e.kind === 'npc') return `npc:${e.templateId}:${e.skin}:${e.color}:${e.scale}`;
+    return null;
   }
 
   private takePooledVisual(key: string): CharacterVisual | null {
@@ -2014,7 +2057,7 @@ export class Renderer {
     pool.push(object);
   }
 
-  private buildEntityPrewarmGroup(deadline: number): THREE.Group {
+  private buildEntityPrewarmGroup(): THREE.Group {
     const group = new THREE.Group();
     const p = this.sim.player;
     group.position.set(p.pos.x, p.pos.y, p.pos.z - 14);
@@ -2047,10 +2090,14 @@ export class Renderer {
     for (const templateId of PREWARM_MOB_TEMPLATE_IDS) build(templateId, PREWARM_MOB_POOL_COPIES);
     // Then every remaining mob whose visual MODEL hasn't been built yet — one copy,
     // so its shader program is compiled at load and never hitches in-world. Mobs that
-    // share a family model are built only once.
+    // share a family model are built only once. NOT deadline-gated: the distinct-model
+    // set is small (deduped by visualKeyFor) and is the whole point of this pass — a
+    // skipped model is a guaranteed in-world compile stall (real-GPU walk profiling
+    // caught a beast model linking ~4 programs / ~240ms when first seen north of spawn
+    // because the shared build deadline cut this loop off). The deadline still bounds
+    // the EXTRA pool copies above; one copy per model is cheap and mandatory.
     for (const templateId of Object.keys(MOBS)) {
       if (PREWARM_MOB_COMMON_IDS.has(templateId)) continue;
-      if (performance.now() >= deadline) break;
       const template = MOBS[templateId];
       if (!template) continue;
       const modelKey = visualKeyFor(
@@ -2131,6 +2178,14 @@ export class Renderer {
         const built = buildGroundQuestObject(itemId, -20_000 - idx);
         this.storePooledObject(key, built);
         built.group.visible = true;
+        // Hide the object's own point light (e.g. the ritual circle glow) during
+        // the prewarm: it must not inflate numPointLights, or every material would
+        // compile for one more light than the open world's constant budget ever
+        // shows and they would all recompile on first travel. Restored in the
+        // prewarm finally so the pooled object lights normally when reused live.
+        built.group.traverse((o) => {
+          if ((o as THREE.PointLight).isPointLight) o.visible = false;
+        });
         place(built.group);
       }
     }
@@ -2226,11 +2281,13 @@ export class Renderer {
     let createdViews = 0;
     let candidateViews = 0;
     let doorPrewarmGroup: THREE.Group | null = null;
+    let interiorPrewarmGroup: THREE.Group | null = null;
     let entityPrewarmGroup: THREE.Group | null = null;
     let npcPrewarmGroup: THREE.Group | null = null;
     let playerPrewarmGroup: THREE.Group | null = null;
     let objectPrewarmGroup: THREE.Group | null = null;
     let propMaterialPrewarmGroup: THREE.Group | null = null;
+    let foliagePrewarmGroup: THREE.Group | null = null;
 
     let renderPasses = 0;
     let playerPrewarmVisuals = 0;
@@ -2341,6 +2398,27 @@ export class Renderer {
         },
       },
       {
+        // Compile the dungeon interior shaders (kit + Halloween-bits pack
+        // materials, the Drowned Temple water shader, torch-glow decal) at boot
+        // so first entry / nearing a dungeon door does not link them live.
+        // Assets are boot-preloaded (see dungeon.ts), so the await is resolved.
+        id: 'interiors.materials',
+        category: 'objects',
+        priority: 32,
+        required: false,
+        run: async () => {
+          this.dungeons ??= new DungeonInteriors(
+            this.scene,
+            this.lowGfx,
+            this.flames,
+            this.fireLights,
+          );
+          interiorPrewarmGroup = await this.dungeons.buildPrewarmGroup();
+          this.scene.add(interiorPrewarmGroup);
+        },
+        detail: () => `objects=${interiorPrewarmGroup?.children.length ?? 0}`,
+      },
+      {
         // Players are the #1 shader-compile trigger in a crowd, so build their
         // archetypes first (before the long mob tail) — guaranteed within budget.
         id: 'entities.player-archetypes',
@@ -2362,7 +2440,7 @@ export class Renderer {
         priority: 35,
         required: true,
         run: () => {
-          entityPrewarmGroup = this.buildEntityPrewarmGroup(buildDeadline);
+          entityPrewarmGroup = this.buildEntityPrewarmGroup();
           this.scene.add(entityPrewarmGroup);
         },
         detail: () =>
@@ -2403,6 +2481,21 @@ export class Renderer {
           this.scene.add(propMaterialPrewarmGroup);
         },
         detail: () => `objects=${propMaterialPrewarmGroup?.children.length ?? 0}`,
+      },
+      {
+        // Compile every foliage shader (tree/rock/dressing species + far-tree
+        // impostors) at boot. The renderer streams foliage buckets in as you
+        // move, so distant-only species otherwise link their shaders mid-travel
+        // (the open-world hitch walking north out of spawn).
+        id: 'foliage.materials',
+        category: 'props',
+        priority: 46,
+        required: false,
+        run: () => {
+          foliagePrewarmGroup = buildFoliageMaterialPrewarmGroup();
+          this.scene.add(foliagePrewarmGroup);
+        },
+        detail: () => `objects=${foliagePrewarmGroup?.children.length ?? 0}`,
       },
       {
         id: 'textures.scene',
@@ -2527,11 +2620,21 @@ export class Renderer {
     } finally {
       this.vfx.clear();
       if (doorPrewarmGroup) this.scene.remove(doorPrewarmGroup);
+      if (interiorPrewarmGroup) this.scene.remove(interiorPrewarmGroup);
       if (entityPrewarmGroup) this.scene.remove(entityPrewarmGroup);
       if (npcPrewarmGroup) this.scene.remove(npcPrewarmGroup);
       if (playerPrewarmGroup) this.scene.remove(playerPrewarmGroup);
-      if (objectPrewarmGroup) this.scene.remove(objectPrewarmGroup);
+      if (objectPrewarmGroup) {
+        // Re-show the object lights hidden during the prewarm so the pooled objects
+        // (reused for the live ground objects) light normally. (Cast: the manifest
+        // closure assignment is invisible to TS flow analysis here.)
+        (objectPrewarmGroup as THREE.Group).traverse((o: THREE.Object3D) => {
+          if ((o as THREE.PointLight).isPointLight) o.visible = true;
+        });
+        this.scene.remove(objectPrewarmGroup);
+      }
       if (propMaterialPrewarmGroup) this.scene.remove(propMaterialPrewarmGroup);
+      if (foliagePrewarmGroup) this.scene.remove(foliagePrewarmGroup);
     }
 
     const elapsed = performance.now() - started;
@@ -2966,8 +3069,14 @@ export class Renderer {
       visualPoolKey = this.visualPoolKeyFor(e);
       visual = visualPoolKey ? this.takePooledVisual(visualPoolKey) : null;
       if (!visual) {
+        // Pool MISS: build a fresh visual but KEEP its pool key so removeView returns
+        // it to the pool (which self-sizes to demand) instead of disposing it. Disposing
+        // a skinned visual frees its Skeleton's bone-matrix DataTexture; re-creating it
+        // when the entity streams back re-uploads that texture - the open-world
+        // "asset-upload" travel hitch. Before, only the few prewarm-seeded copies were
+        // ever recycled, so every mob past that count churned. Key is per-template, so
+        // the pool stays bounded by the peak simultaneous count.
         visual = createCharacterVisual(e);
-        visualPoolKey = null;
       }
       // entity scale is applied to the whole group below, so it can update live
       // (Fiesta size buffs) and also scale lazily-built form visuals for free.
@@ -3055,6 +3164,23 @@ export class Renderer {
     // object views gate their own casters; character shadows live in visual
     const objectCasters: THREE.Object3D[] = [];
     if (!visual) collectCasters(group, objectCasters);
+    // Register any point lights this view owns (e.g. the quest-object glow) into the
+    // constant point-light budget so numPointLights never changes as it streams in.
+    const viewLights: THREE.PointLight[] = [];
+    group.traverse((o) => {
+      if ((o as THREE.PointLight).isPointLight) viewLights.push(o as THREE.PointLight);
+    });
+    if (viewLights.length > 0) {
+      for (const light of viewLights) {
+        // Remember the design intensity ONCE: pooled object views are reused, and by
+        // the time one is re-taken the budget may have dimmed the light to 0, so
+        // reading it again would stick it dark. userData persists on the pooled light.
+        if (typeof light.userData.budgetBase !== 'number')
+          light.userData.budgetBase = light.intensity;
+        this.viewLights.push(light);
+      }
+      this.lightRankDirty = true;
+    }
     this.views.set(e.id, {
       group,
       visual,
@@ -3093,8 +3219,10 @@ export class Renderer {
       comboSig: '',
       tierValue: 0,
       objectCasters,
+      viewLights,
       shadowOn: true,
       isFar: false,
+      compilePending: false,
       lastOverheadEmoteKey: null,
       lastX: e.pos.x,
       lastZ: e.pos.z,
@@ -3106,6 +3234,38 @@ export class Renderer {
       wasAirborne: false,
       wasSwimming: false,
     });
+    const view = this.views.get(e.id);
+    // Never gate the player's OWN view: it must be on screen immediately, its
+    // class is already prewarmed, and the self render path does not re-evaluate
+    // the compilePending flag (only the non-self loop does), so gating it would
+    // strand the player invisible. Other entities un-hide via that loop.
+    if (view && e.id !== this.sim.player.id) this.gateViewOnCompile(view, group);
+  }
+
+  // Generic anti-freeze layer. A freshly-streamed view links its shader programs
+  // SYNCHRONOUSLY on first draw - a 50-1700ms frame stall (the open-world travel
+  // hitch). Instead link them OFF the main thread (KHR_parallel_shader_compile via
+  // compileAsync) against the live scene's exact lights + environment, and keep the
+  // view hidden until ready: it pops in a frame or two late rather than freezing.
+  // Unlike the boot prewarm this enumerates NOTHING, so new content and render-state
+  // variants the prewarm cannot anticipate (e.g. the env-map-lit material that links
+  // only when you walk into a biome) never hitch in-world. The prewarm stays a pure
+  // optimization: already-compiled spawn content resolves instantly, no pop-in.
+  private gateViewOnCompile(view: EntityView, group: THREE.Group): void {
+    if (!this.asyncCompileSupported) return;
+    view.compilePending = true;
+    group.visible = false;
+    let settled = false;
+    const clear = (): void => {
+      if (settled) return;
+      settled = true;
+      view.compilePending = false;
+    };
+    const guard = setTimeout(clear, VIEW_COMPILE_GATE_MAX_MS);
+    this.webgl
+      .compileAsync(group, this.camera, this.scene)
+      .then(clear, clear)
+      .finally(() => clearTimeout(guard));
   }
 
   /** The visual the player currently sees (form swaps hide the base rig). */
@@ -3412,6 +3572,13 @@ export class Renderer {
     const v = this.views.get(id);
     if (!v) return;
     this.scene.remove(v.group);
+    if (v.viewLights.length > 0) {
+      for (const light of v.viewLights) {
+        const i = this.viewLights.indexOf(light);
+        if (i >= 0) this.viewLights.splice(i, 1);
+      }
+      this.lightRankDirty = true;
+    }
     v.nameplate.remove();
     const idx = this.clickTargets.indexOf(v.clickTarget);
     if (idx >= 0) this.clickTargets.splice(idx, 1);
@@ -3584,6 +3751,13 @@ export class Renderer {
       this.cullFrustum.setFromProjectionMatrix(this.cullViewProj);
     }
 
+    // Crowd-adaptive LOD/shadow distances, derived from last frame's visible-rig
+    // count (the one-frame lag is imperceptible); recount as we go this frame.
+    const crowdScaleSq = crowdLodScaleSq(this.lastVisibleRigCount);
+    const lodRangeSq = ENTITY_LOD_RANGE_SQ * crowdScaleSq;
+    const shadowRangeSq = ENTITY_SHADOW_RANGE_SQ * crowdScaleSq;
+    let visibleRigCount = 0;
+
     for (const [id, v] of this.views) {
       const e = sim.entities.get(id);
       if (!e) continue;
@@ -3613,13 +3787,16 @@ export class Renderer {
           v.group.visible = false;
           continue;
         }
-        v.group.visible = true; // the object branch below may re-hide loot
+        // hidden until its shaders finish linking off-thread (async-compile gate);
+        // the object branch below may still re-hide loot
+        v.group.visible = !v.compilePending;
         // mid-distance rigs keep rendering but leave the shadow pass
-        const wantShadow = d2 < ENTITY_SHADOW_RANGE_SQ;
+        const wantShadow = d2 < shadowRangeSq;
         const inProxyBand = d2 < ENTITY_PROXY_SHADOW_RANGE_SQ;
         if (v.visual) {
+          visibleRigCount++; // crowd-density signal for next frame's adaptive LOD
           v.visual.setShadow(wantShadow);
-          v.isFar = d2 > ENTITY_LOD_RANGE_SQ;
+          v.isFar = d2 > lodRangeSq;
           // past the articulated gate the static-pose proxy carries the
           // shadow; an active form's own rig keeps casting instead
           v.visual.setProxyShadow(
@@ -3811,17 +3988,16 @@ export class Renderer {
         !swimming &&
         (!e.onGround ||
           (e.kind === 'player' && ay - groundHeight(ax, az, this.sim.cfg.seed) > AIRBORNE_EPS));
-      const st: AnimState = {
-        speed: loco.speed,
-        moving,
-        airborne,
-        backwards: loco.backwards,
-        reverseBackpedal: ghostWolf,
-        dead: visuallyDead,
-        casting: e.castingAbility !== null && !visuallyDead,
-        swimming,
-        sitting: e.kind === 'player' && (e.sitting || e.eating !== null || e.drinking !== null),
-      };
+      const st = this.animScratch;
+      st.speed = loco.speed;
+      st.moving = moving;
+      st.airborne = airborne;
+      st.backwards = loco.backwards;
+      st.reverseBackpedal = ghostWolf;
+      st.dead = visuallyDead;
+      st.casting = e.castingAbility !== null && !visuallyDead;
+      st.swimming = swimming;
+      st.sitting = e.kind === 'player' && (e.sitting || e.eating !== null || e.drinking !== null);
       // --- spatial movement audio (self + others) --------------------------
       // All gated by audibility (squared distance) so far entities cost nothing.
       const sink = this.audioSink;
@@ -3903,6 +4079,7 @@ export class Renderer {
       // skip the draw for off-screen rigs (pose/audio above already ran)
       if (!charOnScreen) v.group.visible = false;
     }
+    this.lastVisibleRigCount = visibleRigCount;
 
     // selection ring
     const target = p.targetId !== null ? sim.entities.get(p.targetId) : null;
@@ -4110,10 +4287,20 @@ export class Renderer {
     markPhase('world');
 
     this.nameplateTimer += dt;
-    const nameplateInterval = this.isMobileRuntime() ? 1 / 15 : 1 / 24;
+    // Static-preset tiered cadence: the nameplate refresh interval follows
+    // the player's chosen graphics tier (the data-fx-level the preset applier
+    // stamps), NEVER the FPS governor (the two-controller rule). The
+    // LOW tier runs 1/15s, richer tiers 1/24s. The axis is the PRESET, not the device:
+    // the weak-GPU cost ceiling (the PR901 lesson) is restored through the device-aware
+    // first-run default (resolveDefaultGraphicsPreset in gfx.ts), which lands a
+    // recognized-weak or software GPU on the LOW preset (its 1/15s ceiling) while a
+    // mid/unknown device defaults to medium (1/24s). An explicit player preset wins.
+    const nameplateInterval = nameplateIntervalSec(
+      coerceFxTier(document.documentElement.dataset.fxLevel),
+    );
     const fullNameplatePass = this.nameplateTimer >= nameplateInterval;
     if (fullNameplatePass) this.nameplateTimer = 0;
-    this.updateNameplates(fullNameplatePass);
+    this.nameplatePainter.update(fullNameplatePass);
     this.updateChatBubbles();
     markPhase('nameplates');
     this.updateTravelSpeedFx(p, selfPos, dt);
@@ -4242,19 +4429,58 @@ export class Renderer {
   // allocates nothing and skips the sort while the budget isn't contended.
   private budgetFireLights(px: number, pz: number): void {
     const ranked = this.lightRank;
-    while (ranked.length < this.fireLights.length) {
-      const light = this.fireLights[ranked.length];
-      ranked.push({ light, d2: 0, worldPos: light.getWorldPosition(new THREE.Vector3()) });
+    // Rank the union of static fire lights AND entity-view lights (e.g. quest-object
+    // glows). Both must share one budget: if a view light were counted separately,
+    // numPointLights would change as it streams in/out and recompile every lit
+    // material. Rebuild only when the set changes (dirty), or when fire lights grow
+    // (dungeon interiors push to fireLights) - both rare, so the hot path just
+    // refreshes distances. View positions are cached at rebuild; lights never move.
+    const want = this.fireLights.length + this.viewLights.length;
+    if (this.lightRankDirty || ranked.length !== want) {
+      ranked.length = 0;
+      for (const light of this.fireLights) {
+        ranked.push({
+          light,
+          d2: 0,
+          worldPos: light.getWorldPosition(new THREE.Vector3()),
+          base: null,
+        });
+      }
+      for (const light of this.viewLights) {
+        const stored = light.userData.budgetBase;
+        const base = typeof stored === 'number' ? stored : light.intensity;
+        ranked.push({ light, d2: 0, worldPos: light.getWorldPosition(new THREE.Vector3()), base });
+      }
+      this.lightRankDirty = false;
     }
     for (const entry of ranked) {
       const dx = entry.worldPos.x - px,
         dz = entry.worldPos.z - pz;
       entry.d2 = dx * dx + dz * dz;
     }
-    const lightBudget = this.effectivePointLights || GFX.maxPointLights;
-    if (ranked.length > lightBudget) ranked.sort((a, b) => a.d2 - b.d2);
+    // Keep a CONSTANT number of point lights `visible` so numPointLights in every
+    // material's program cache key never changes as the player travels. Three counts
+    // a light into numPointLights iff `visible` (intensity is irrelevant to the
+    // count), so toggling visibility as campfires budget in/out used to recompile
+    // every nearby material 0<->maxPointLights times - the dominant open-world travel
+    // freeze. Now the nearest maxPointLights lights stay visible (one stable program
+    // per material); lights past the live budget or out of range simply contribute
+    // nothing (intensity 0). maxPointLights is the per-tier constant, so the live
+    // governor (effectivePointLights) only changes how many SHINE, not the count.
+    const visibleCount = GFX.maxPointLights;
+    const liveBudget = this.effectivePointLights || GFX.maxPointLights;
+    if (ranked.length > visibleCount) ranked.sort((a, b) => a.d2 - b.d2);
     for (let i = 0; i < ranked.length; i++) {
-      ranked[i].light.visible = i < lightBudget && ranked[i].d2 < LIGHT_BUDGET_RANGE_SQ;
+      const entry = ranked[i];
+      const counted = i < visibleCount;
+      entry.light.visible = counted;
+      const shine = counted && i < liveBudget && entry.d2 < LIGHT_BUDGET_RANGE_SQ;
+      if (entry.base !== null) {
+        // view light: no flicker pass restores it, so drive its intensity directly
+        entry.light.intensity = shine ? entry.base : 0;
+      } else if (counted && !shine) {
+        entry.light.intensity = 0; // fire light: dark now; the flicker pass relights it when it shines
+      }
     }
   }
 
@@ -4408,298 +4634,6 @@ export class Renderer {
       const nearWater = !inDungeon && groundHeight(px, pz, seed) < WATER_LEVEL + 0.4;
       sink.ambience(biome, inDungeon, precip, nearWater);
     }
-  }
-
-  private updateNameplates(fullPass: boolean): void {
-    const sim = this.sim;
-    const p = sim.player;
-    const { width: w, height: h } = this.viewport;
-    for (const [id, v] of this.views) {
-      const e = sim.entities.get(id);
-      if (!e) continue;
-      const dx = e.pos.x - p.pos.x,
-        dz = e.pos.z - p.pos.z;
-      const d2 = dx * dx + dz * dz;
-      const urgent = id === p.targetId || d2 < 14 * 14 || e.castingAbility !== null;
-      const isSelf = id === p.id;
-      const hasOverheadEmote = !!(e.kind === 'player' && e.overheadEmoteId && !e.dead);
-      const isDoor = e.templateId === 'dungeon_door' || e.templateId === 'dungeon_exit';
-      const isDelveInteract =
-        e.templateId === 'delve_locked_chest' ||
-        e.templateId === 'delve_reward_chest' ||
-        e.templateId === 'delve_surface_exit';
-      const delveInteractNear =
-        isDelveInteract && d2 <= (INTERACT_RANGE + 1) * (INTERACT_RANGE + 1);
-      const hidden =
-        (isSelf && !hasOverheadEmote) ||
-        d2 > NAMEPLATE_RANGE_SQ ||
-        (e.dead && !e.lootable && e.kind === 'mob') ||
-        (e.kind === 'object' && !isDoor && !delveInteractNear) ||
-        // the sealed royal door inside the crypt carries no floating label —
-        // it reads as part of the back wall, not a portal billboard
-        (isDoor && e.dungeonId === 'nythraxis_boss_arena') ||
-        (!this.showNameplates && e.kind === 'mob' && !e.dead);
-      if (hidden) {
-        if (v.nameplateDisplay !== 'none') {
-          v.nameplate.style.display = 'none';
-          v.nameplateDisplay = 'none';
-        }
-        continue;
-      }
-      this.tmpV.copy(v.group.position);
-      this.tmpV.y += v.height * e.scale + (isSelf && hasOverheadEmote ? 0.2 : 0.8);
-      if (!isProjectedNameplateAnchorVisible(this.camera, this.tmpV, this.tmpV2)) {
-        if (v.nameplateDisplay !== 'none') {
-          v.nameplate.style.display = 'none';
-          v.nameplateDisplay = 'none';
-        }
-        continue;
-      }
-      this.tmpV.project(this.camera);
-      if (this.tmpV.z < -1 || this.tmpV.z > 1) {
-        if (v.nameplateDisplay !== 'none') {
-          v.nameplate.style.display = 'none';
-          v.nameplateDisplay = 'none';
-        }
-        continue;
-      }
-      const sx = (this.tmpV.x * 0.5 + 0.5) * w;
-      const sy = (-this.tmpV.y * 0.5 + 0.5) * h;
-      if (v.nameplateDisplay !== '') {
-        v.nameplate.style.display = '';
-        v.nameplateDisplay = '';
-      }
-      const transform = nameplateScreenTransform(sx, sy);
-      if (transform !== v.nameplateTransform) {
-        v.nameplate.style.transform = transform;
-        v.nameplateTransform = transform;
-      }
-
-      if (!fullPass && !urgent) continue;
-      v.nameplate.classList.toggle('has-emote', hasOverheadEmote);
-
-      // party raid/target marker (only mobs are markable, so this is null elsewhere)
-      const emote = e.overheadEmoteId
-        ? OVERHEAD_EMOTES.find((x) => x.id === e.overheadEmoteId)
-        : null;
-      if (emote && e.kind === 'player' && !e.dead) {
-        v.emoteIconEl.src = emoteIconUrl(emote.id);
-        const emoteLabel = t(`hudChrome.emotes.${emote.id}`);
-        v.emoteLabelEl.textContent = emoteLabel;
-        v.emoteEl.title = emoteLabel;
-        v.emoteEl.style.display = '';
-      } else {
-        v.emoteEl.style.display = 'none';
-      }
-      v.nameEl.style.display = '';
-
-      const raidMark = this.sim.markerFor(e.id);
-      if (raidMark !== null) {
-        v.raidMarkEl.style.backgroundImage = `url(${raidMarkerDataUrl(raidMark)})`;
-        v.raidMarkEl.style.display = '';
-      } else {
-        v.raidMarkEl.style.display = 'none';
-      }
-
-      // combo points the local player has built on this entity (rogue/druid)
-      this.setNameplateCombo(v, comboPipsFor(p, e));
-
-      if (e.kind === 'object') {
-        // dungeon doorways announce themselves
-        const objName = objectDisplayName(e);
-        this.setNameplateStatic(
-          v,
-          `object|${objName}`,
-          objName,
-          '#c084ff',
-          'none',
-          '',
-          'np-marker',
-          '1',
-        );
-      } else if (e.kind === 'player') {
-        // other players: friendly blue with an hp bar; <Guild> tag under the name.
-        // Self has no overhead nameplate, so its guild line stays hidden too.
-        const opacity = e.auras.some((a) => a.kind === 'stealth') ? '0.55' : '1';
-        const nameDisplay = isSelf ? 'none' : '';
-        const hpDisplay = e.dead || isSelf ? 'none' : '';
-        const guild = isSelf ? '' : e.guild;
-        this.setNameplateStatic(
-          v,
-          `player|${e.name}|${guild}|${nameDisplay}|${hpDisplay}|${opacity}`,
-          e.name,
-          '#7fb8ff',
-          hpDisplay,
-          '',
-          'np-marker',
-          opacity,
-          '',
-          guild,
-        );
-        v.nameEl.style.display = nameDisplay;
-        // $WOC holder-tier flair, shown on OTHER players (own nameplate is hidden).
-        this.setNameplateTier(v, isSelf ? 0 : (e.holderTier ?? 0));
-        this.setNameplateHp(v, e);
-      } else if (e.kind === 'npc' || (!e.hostile && e.questIds.length > 0)) {
-        const npcName =
-          e.kind === 'npc'
-            ? npcDisplayName(e.templateId)
-            : tEntity({ kind: 'mob', id: e.templateId, field: 'name' });
-        let marker = '';
-        let cls = '';
-        // role-aware: '!' only at the quest's giver, '?' only at its turn-in
-        // NPC (gray while in progress), matching the gossip dialog
-        for (const qid of e.questIds) {
-          const quest = QUESTS[qid];
-          if (!quest) continue;
-          const st = sim.questState(qid);
-          if (st === 'ready' && isQuestTurnInNpc(quest, e.templateId)) {
-            marker = '?';
-            cls = 'ready';
-            break;
-          }
-          if (st === 'available' && quest.giverNpcId === e.templateId) {
-            marker = '!';
-            cls = 'avail';
-          } else if (st === 'active' && isQuestTurnInNpc(quest, e.templateId) && !marker) {
-            marker = '?';
-            cls = 'active';
-          }
-        }
-        const markerClass = cls ? `np-marker ${cls}` : 'np-marker';
-        this.setNameplateStatic(
-          v,
-          `npc|${npcName}|${marker}|${markerClass}`,
-          npcName,
-          FRIENDLY,
-          'none',
-          marker,
-          markerClass,
-          '1',
-        );
-      } else {
-        const diff = e.level - p.level;
-        const template = MOBS[e.templateId];
-        const elite = !!template?.elite;
-        const boss = !!template?.boss;
-        // A friendly controlled pet reads as friendly green; wild mobs keep the
-        // classic level-difference ("con") color.
-        const friendlyPet = isFriendlyPet(e, this.sim.entities, (pl) => this.isHostilePlayer(pl));
-        const color = mobNameColor(diff, e.dead, friendlyPet);
-        const mobName = e.ownerId !== null ? e.name : mobDisplayName(e.templateId);
-        const name = e.dead
-          ? t('worldContent.corpseName', { name: mobName })
-          : `[${e.level}${elite ? '+' : ''}] ${mobName}`;
-        const hpDisplay = e.dead ? 'none' : '';
-        const marker = e.lootable ? '$' : elite && !e.dead ? '◆' : '';
-        // classic "dragon frame" cue: gold bar frame for elites, red for bosses (live mobs only)
-        const frame = e.dead ? '' : boss ? 'boss' : elite ? 'elite' : '';
-        this.setNameplateStatic(
-          v,
-          `mob|${name}|${color}|${hpDisplay}|${marker}|${frame}`,
-          name,
-          color,
-          hpDisplay,
-          marker,
-          'np-marker loot',
-          '1',
-          frame,
-        );
-        this.setNameplateHp(v, e);
-        // threat plate: tint the bar red when this mob is aggroed on me
-        v.nameplate.classList.toggle('np-threat', isMobThreateningViewer(e, this.sim.playerId));
-      }
-
-      this.updateCastBar(v, e);
-    }
-  }
-
-  private setNameplateStatic(
-    v: EntityView,
-    sig: string,
-    name: string,
-    color: string,
-    hpDisplay: string,
-    marker: string,
-    markerClass: string,
-    opacity: string,
-    frame = '',
-    guild = '',
-  ): void {
-    if (sig === v.nameplateSig) return;
-    v.nameplateSig = sig;
-    v.nameEl.textContent = name;
-    v.nameEl.style.color = color;
-    v.hpBar.style.display = hpDisplay;
-    v.hpBar.classList.toggle('elite', frame === 'elite');
-    v.hpBar.classList.toggle('boss', frame === 'boss');
-    v.markerEl.textContent = marker;
-    v.markerEl.className = markerClass;
-    v.nameplate.style.opacity = opacity;
-    // guild tag rides in the sig (players only); empty for every other kind
-    if (guild) {
-      v.guildEl.textContent = `<${guild}>`;
-      v.guildEl.style.display = '';
-    } else {
-      v.guildEl.style.display = 'none';
-    }
-  }
-
-  // Show/hide the $WOC holder-tier badge on a player's nameplate. Cheap-diffed
-  // on the tier value so the badge image is only rebuilt when the tier changes.
-  private setNameplateTier(v: EntityView, tier: number): void {
-    if (tier === v.tierValue) return;
-    v.tierValue = tier;
-    const def = holderTierByIndex(tier);
-    if (def) {
-      v.tierEl.src = holderTierBadgeDataUrl(def, 32);
-      v.tierEl.title = t('wallet.holderTierTitle', { tier: holderTierDisplayName(def) });
-      v.tierEl.style.display = '';
-    } else {
-      v.tierEl.removeAttribute('src');
-      v.tierEl.style.display = 'none';
-    }
-  }
-
-  private setNameplateHp(v: EntityView, e: Entity): void {
-    const width = `${((100 * e.hp) / Math.max(1, e.maxHp)).toFixed(1)}%`;
-    if (width === v.nameplateHpWidth) return;
-    v.nameplateHpWidth = width;
-    v.hpFill.style.width = width;
-  }
-
-  // Light `count` of the COMBO_PIP_MAX pips over this nameplate; hide the row
-  // entirely at zero so non-combo classes/targets show nothing.
-  private setNameplateCombo(v: EntityView, count: number): void {
-    const n = Math.max(0, Math.min(COMBO_PIP_MAX, count));
-    const sig = `${n}`;
-    if (sig === v.comboSig) return;
-    v.comboSig = sig;
-    v.comboRow.style.display = n > 0 ? '' : 'none';
-    for (let i = 0; i < v.comboPips.length; i++) {
-      v.comboPips[i].classList.toggle('lit', i < n);
-    }
-  }
-
-  // Overhead spell cast/channel bar. The fill + label rules live in the DOM-free
-  // castBarState() helper (cast_bar.ts); here we just push them to the DOM. Casts
-  // fill up toward completion, channels drain down — both honest to the live
-  // cast fields the sim and the online snapshot already expose.
-  private updateCastBar(v: EntityView, e: Entity): void {
-    const st = castBarState(e);
-    if (!st.visible) {
-      if (v.castBar.style.display !== 'none') v.castBar.style.display = 'none';
-      return;
-    }
-    v.castBar.style.display = '';
-    v.castBar.classList.toggle('channel', st.channel);
-    v.castFill.style.width = `${(st.fill * 100).toFixed(1)}%`;
-    // cast_bar.ts keeps st.label as a stable id (DOM/i18n-free); localize here.
-    v.castLabel.textContent = st.fishing
-      ? t('abilityUi.cast.fishing')
-      : ABILITIES[st.label]
-        ? tEntity({ kind: 'ability', id: st.label, field: 'name' })
-        : st.label;
   }
 
   // Hang a speech bubble over an entity's head; it follows the entity and

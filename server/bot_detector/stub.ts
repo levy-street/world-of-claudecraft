@@ -12,5 +12,6 @@ export function createBotDetector(): BotDetector {
     observeInput: () => {},
     observeProtocolAnomaly: () => {},
     handleTick: () => 'none',
+    listSuspiciousPlayers: () => [],
   };
 }

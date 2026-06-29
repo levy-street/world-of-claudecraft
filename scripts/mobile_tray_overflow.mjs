@@ -5,9 +5,11 @@
 //
 // Usage: node scripts/mobile_tray_overflow.mjs           (default 740x360)
 //        VP=812x375 node scripts/mobile_tray_overflow.mjs
-import puppeteer from 'puppeteer-core';
+
 import fs from 'node:fs';
+import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH as CHROME } from './browser_path.mjs';
+import { enterOfflineGame } from './enter_offline_game.mjs';
 
 const URL = process.env.GAME_URL ?? 'http://localhost:5173';
 const [W, H] = (process.env.VP ?? '740x360').split('x').map(Number);
@@ -16,22 +18,18 @@ fs.mkdirSync('tmp', { recursive: true });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const browser = await puppeteer.launch({
-  executablePath: CHROME, headless: 'new',
+  executablePath: CHROME,
+  headless: 'new',
   args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
 });
 const page = await browser.newPage();
 await page.emulate({
   viewport: { width: W, height: H, deviceScaleFactor: 2, isMobile: true, hasTouch: true },
-  userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148',
+  userAgent:
+    'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148',
 });
 await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
-await page.waitForSelector('#btn-offline', { timeout: 30000 });
-await page.evaluate(() => document.querySelector('#btn-offline').click());
-await sleep(250);
-await page.type('#char-name', 'Mobile');
-await page.click('#offline-select .mini-class[data-class="warrior"]');
-await page.click('#btn-start-offline');
-await sleep(2500);
+await enterOfflineGame(page, { charClass: 'warrior', charName: 'Mobile', settleMs: 2500 });
 await page.click('#mobile-more');
 await sleep(400);
 
@@ -53,9 +51,15 @@ const report = await page.evaluate((vh) => {
 }, H);
 
 await page.screenshot({ path: `tmp/tray_overflow_${TAG}.png` });
-console.log(`viewport ${W}x${H} - ${report.count} buttons, tray top=${report.trayTop} bottom=${report.trayBottom}, overflowY=${report.overflowY}, maxHeight=${report.maxHeight}`);
+console.log(
+  `viewport ${W}x${H} - ${report.count} buttons, tray top=${report.trayTop} bottom=${report.trayBottom}, overflowY=${report.overflowY}, maxHeight=${report.maxHeight}`,
+);
 console.log('off-screen (unreachable) buttons:', JSON.stringify(report.clipped));
 await browser.close();
 const bug = report.clipped.length > 0;
-console.log(bug ? `RESULT: BUG - ${report.clipped.length} buttons off-screen` : 'RESULT: OK - all buttons on-screen');
+console.log(
+  bug
+    ? `RESULT: BUG - ${report.clipped.length} buttons off-screen`
+    : 'RESULT: OK - all buttons on-screen',
+);
 process.exit(0);

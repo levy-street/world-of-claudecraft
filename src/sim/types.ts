@@ -148,6 +148,7 @@ export type AuraKind =
   | 'buff_dodge'
   | 'buff_speed'
   | 'buff_haste'
+  | 'buff_spellpower'
   | 'hot'
   | 'absorb'
   | 'imbue'
@@ -195,9 +196,18 @@ export interface Aura {
   school: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
   breaksOnDamage?: boolean;
   stacks?: number; // sunder armor: applications stack up to the effect's cap
+  charges?: number; // thorns: remaining reflect charges (Lightning Shield); undefined => unlimited
+  icd?: number; // thorns: internal-cooldown remaining, seconds (counts down each tick)
+  icdMax?: number; // thorns: configured internal cooldown, seconds (re-armed on each reflect)
 }
 
-export type CrowdControlDrCategory = 'root' | 'polymorph' | 'fear';
+export type CrowdControlDrCategory =
+  | 'root'
+  | 'polymorph'
+  | 'fear'
+  | 'openerStun'
+  | 'controlledStun'
+  | 'randomStun';
 
 export interface CrowdControlDrState {
   stage: number;
@@ -256,17 +266,32 @@ export type ItemUse =
 // rank unlocks its own tier and every tier below it (epic unlocks rare+uncommon).
 export type SkinRank = 'uncommon' | 'rare' | 'epic';
 
-export interface ItemDef {
+export type ArmorType = 'cloth' | 'leather' | 'mail';
+
+type ItemKind =
+  | 'weapon'
+  | 'armor'
+  | 'quest'
+  | 'junk'
+  | 'food'
+  | 'drink'
+  | 'tool'
+  | 'potion'
+  | 'elixir';
+
+interface BaseItemDef {
   id: string;
   name: string;
-  kind: 'weapon' | 'armor' | 'quest' | 'junk' | 'food' | 'drink' | 'tool' | 'potion' | 'elixir';
   slot?: EquipSlot;
   weapon?: WeaponInfo;
   stats?: Partial<Stats>;
+  // Spell Power affix (caster gear): flat Spell Power, summed in recalcPlayerStats.
+  // Kept off `Stats` because Spell Power is a derived combat rating (like attackPower),
+  // not one of the six primary attributes.
+  spellPower?: number;
   use?: ItemUse;
   sellValue: number; // copper (vendor buys at this)
   buyValue?: number; // copper (vendor sells at this)
-  armorType?: 'cloth' | 'leather' | 'mail';
   questId?: string;
   noVendorSell?: boolean;
   noDiscard?: boolean;
@@ -287,7 +312,58 @@ export interface ItemDef {
   elixir?: { aura: string; kind: AuraKind; value: number; duration: number };
   quality?: 'poor' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'; // gray/white/green/blue/purple/orange name colors
   requiredClass?: PlayerClass[];
+  /** Set id this piece belongs to; equipping enough pieces grants the set bonuses (see ITEM_SETS). */
+  set?: string;
 }
+
+// Item-set bonuses (classic "tier set" style). Flat effects fold into
+// recalcPlayerStats: primary stats feed the AP/crit/HP derivations, `ap`/`crit`
+// add at their derivation steps, and `castPushbackReduction` (0..1) scales the
+// damage-driven cast pushback in Sim.pushbackCast. Balance values are authored in
+// content/item_sets.ts, never inline in engine code.
+export interface SetBonusEffect {
+  str?: number;
+  agi?: number;
+  sta?: number;
+  int?: number;
+  spi?: number;
+  ap?: number; // flat attack power
+  crit?: number; // flat crit chance, 0..1
+  castPushbackReduction?: number; // 0..1: fraction of damage cast-pushback removed (1 = immune)
+}
+
+export interface SetBonusTier {
+  pieces: number; // equipped-piece threshold that unlocks this tier
+  effect: SetBonusEffect;
+  text: string; // English source, localized at the client tooltip
+}
+
+export interface ItemSet {
+  id: string;
+  name: string; // English source
+  bonuses: SetBonusTier[]; // ascending by `pieces`
+}
+
+export interface ArmorItemDef extends BaseItemDef {
+  kind: 'armor';
+  slot: Exclude<EquipSlot, 'mainhand'>;
+  armorType: ArmorType;
+  weapon?: never;
+}
+
+export interface WeaponItemDef extends BaseItemDef {
+  kind: 'weapon';
+  slot: 'mainhand';
+  weapon: WeaponInfo;
+  armorType?: never;
+}
+
+export interface OtherItemDef extends BaseItemDef {
+  kind: Exclude<ItemKind, 'armor' | 'weapon'>;
+  armorType?: never;
+}
+
+export type ItemDef = ArmorItemDef | WeaponItemDef | OtherItemDef;
 
 export interface InvSlot {
   itemId: string;
@@ -322,16 +398,27 @@ export interface LootRollPrompt {
   expiresAt: number;
 }
 
+// Master loot intercepts roll-worthy drops at/above a quality threshold and hands
+// the assignment decision to a single designated looter (the leader, or 0 = leader).
+export type MasterLootThreshold = 'uncommon' | 'rare' | 'epic';
+export interface MasterLootSettings {
+  enabled: boolean;
+  looter: number; // pid of the master looter; 0 means "the current leader"
+  threshold: MasterLootThreshold;
+}
+
 export interface LootStrategies {
   currency: CurrencyLootStrategy;
   commonItems: ItemLootStrategy;
   premiumItems: ItemLootStrategy;
+  master: MasterLootSettings;
 }
 
 export const DEFAULT_PARTY_LOOT_STRATEGIES: LootStrategies = {
   currency: 'fair-split',
   commonItems: 'looter-takes-all',
   premiumItems: 'need-greed',
+  master: { enabled: false, looter: 0, threshold: 'uncommon' },
 };
 
 export interface LootEntry {
@@ -930,7 +1017,16 @@ export type AbilityEffect =
   | { type: 'aoeAttackSpeed'; mult: number; duration: number; radius: number } // thunder clap rider
   | { type: 'aoeAttackPower'; amount: number; duration: number; radius: number } // demoralizing roar/shout
   | { type: 'aoeRoot'; duration: number; radius: number; min: number; max: number }
-  | { type: 'selfBuff'; kind: AuraKind; value: number; duration: number }
+  | {
+      type: 'selfBuff';
+      kind: AuraKind;
+      value: number;
+      duration: number;
+      // thorns auras only: a charge-limited reflect (Lightning Shield) caps how
+      // many melee hits reflect, gated by an internal cooldown between reflects.
+      charges?: number;
+      internalCooldown?: number;
+    }
   | { type: 'finisherHaste'; mult: number; basedur: number; perCombo: number } // slice and dice
   | { type: 'finisherStun'; base: number; perCombo: number } // kidney shot: stun seconds scale with combo
   | { type: 'gainResource'; amount: number } // bloodrage immediate
@@ -963,6 +1059,12 @@ export interface AbilityDef {
   range: number; // yards; 0 = melee range
   minRange?: number;
   school: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
+  // Damage scaling source for the flat directDamage / DoT / AoE riders. Default:
+  // non-physical damage scales with Spell Power; physical damage scales with melee
+  // Attack Power (on top of the weapon/finisher paths, which already carry AP).
+  // 'ranged' marks a hunter "attack spell" that scales off Ranged Attack Power
+  // instead (Arcane Shot, Serpent Sting, Aimed Shot), regardless of school.
+  scalesWith?: 'ranged';
   requiresTarget: boolean;
   targetType?: 'enemy' | 'friendly'; // friendly = self or allied player (defaults to enemy)
   onNextSwing?: boolean; // heroic strike style: no GCD, queues on swing
@@ -975,6 +1077,11 @@ export interface AbilityDef {
   // multiplier on the damage-threat (both scale with stance/form modifiers).
   threat?: { flat?: number; mult?: number };
   requiresForm?: 'bear' | 'cat'; // druid form kit (maul/growl/swipe/claw/bite)
+  // Mutually exclusive self-buff group: casting one ability in the group cancels
+  // any active buff from a sibling in the same group (e.g. hunter aspects, where
+  // only one aspect may be active at a time). Distinct from form toggles, which
+  // are excluded by aura kind, not by group.
+  exclusiveGroup?: string;
   requiresStealth?: boolean; // ambush
   requiresOutOfCombat?: boolean; // stealth
   learnLevel: number;
@@ -1223,8 +1330,10 @@ export interface Entity {
   weapon: WeaponInfo;
   attackPower: number;
   rangedPower: number; // hunters: ranged attack power
+  spellPower: number; // casters: added to spell damage via per-spell coefficients
   critChance: number; // 0..1
   dodgeChance: number;
+  castPushbackReduction: number; // 0..1: damage cast-pushback removed by item-set bonuses (1 = immune)
   moveSpeed: number;
   hostile: boolean;
   // combat
@@ -1234,6 +1343,10 @@ export interface Entity {
   inCombat: boolean;
   combatTimer: number; // time since last combat event
   auras: Aura[];
+  // cached `auras.some(a => a.kind === 'stealth')`, refreshed in updateAuras.
+  // Hosts read it per interest-scan visit (O(viewers x neighbors)); recomputing
+  // it from auras each visit was a measurable cost in crowds.
+  stealthed: boolean;
   ccDr: Map<CrowdControlDrCategory, CrowdControlDrState>;
   castingAbility: string | null;
   castRemaining: number;
@@ -1302,6 +1415,7 @@ export interface Entity {
   gm?: boolean;
   respawnTimer: number;
   corpseTimer: number;
+  lootFfaTimer: number; // seconds of owner-lock left before tap loot opens to all (FFA); Infinity until rollLoot starts it
   despawnTimer?: number;
   damageIdleDespawnTimer?: number;
   lootable: boolean;
@@ -1387,7 +1501,7 @@ export type SimEvent = { pid?: number } & (
       crit: boolean;
       school: string;
       ability: string | null;
-      kind: 'hit' | 'miss' | 'dodge' | 'parry';
+      kind: 'hit' | 'miss' | 'dodge' | 'parry' | 'resist';
     }
   | { type: 'heal'; targetId: number; amount: number }
   | { type: 'death'; entityId: number; killerId: number }
@@ -1406,6 +1520,16 @@ export type SimEvent = { pid?: number } & (
       itemName: string;
       quality: ItemDef['quality'];
       expiresAt: number;
+    }
+  // master loot: sent only to the master looter; candidates are the eligible recipients
+  | {
+      type: 'masterLoot';
+      rollId: number;
+      itemId: string;
+      itemName: string;
+      quality: ItemDef['quality'];
+      expiresAt: number;
+      candidates: { pid: number; name: string }[];
     }
   | { type: 'error'; text: string; reason?: ErrorReason }
   | { type: 'questAccepted'; questId: string }
@@ -1829,6 +1953,40 @@ export function armorReduction(armor: number, attackerLevel: number): number {
   const a = Math.max(0, armor);
   return Math.min(0.75, a / (a + 85 * attackerLevel + 400));
 }
+
+// ---------------------------------------------------------------------------
+// Spell Power: caster damage scaling (vanilla-style cast-time / DoT-duration
+// coefficient model). Casters convert Intellect into Spell Power; Spell Power
+// then adds to each spell's damage via a per-spell coefficient. Hunter "attack
+// spells" (Arcane Shot, Serpent Sting, Aimed Shot) instead scale off Ranged
+// Attack Power, mirroring the physical attack-power path. The pure coefficient
+// helpers live in src/sim/spell_scaling.ts; these are the tuning knobs.
+// ---------------------------------------------------------------------------
+// Spell Power gained per point of Intellect (1 Spell Power per 2 Intellect). Tuned
+// (see tests/spell_power.test.ts) so a fully-leveled caster gets a meaningful but
+// not dominant damage lift, scaling further as caster gear adds Int + Spell Power.
+export const SPELL_POWER_PER_INT = 0.5;
+// Direct nuke coefficient = clamp(castTime, MIN, MAX) / DIVISOR (vanilla 3.5). The
+// max equals the divisor so the direct coefficient caps at 1.0 (a 3.5s+ cast gets
+// full Spell Power; a 6s Pyroblast does not exceed it).
+export const SPELL_COEFF_DIVISOR = 3.5;
+export const SPELL_COEFF_MIN_CAST = 1.5; // instant / sub-1.5s casts use this floor
+export const SPELL_COEFF_MAX_CAST = 3.5; // longer casts cap at a 1.0 coefficient
+// Total DoT coefficient = duration / DURATION (vanilla 15), spread across ticks.
+export const SPELL_DOT_COEFF_DURATION = 15;
+// AoE spells take a reduced coefficient (vanilla AoE penalty).
+export const SPELL_AOE_COEFF_MULT = 0.333;
+// Hunter ranged "attack spells" scale off Ranged Attack Power using the same
+// cast/duration shape, scaled down by this factor (RAP is far larger than SP).
+// Tuned so Arcane Shot / Aimed Shot / Serpent Sting gain a ~20-30% lift at cap.
+export const RANGED_SPELL_AP_SCALE = 0.15;
+// Melee physical "attack spells" (warrior Rend/Execute/Cleave, rogue Rupture/
+// Garrote bleeds, druid feral bleeds, etc.) take the flat-damage portion of a
+// special and scale it off melee Attack Power with the same shape. Melee AP is
+// the same magnitude as Ranged AP, so it reuses the same scale-down factor. The
+// weapon-swing and finisher portions already carry AP through their own paths;
+// this only lifts the flat directDamage / DoT / AoE riders.
+export const MELEE_SPELL_AP_SCALE = 0.15;
 
 // ---------------------------------------------------------------------------
 // Delves, replayable modular instances (see docs/prd/delves.md)

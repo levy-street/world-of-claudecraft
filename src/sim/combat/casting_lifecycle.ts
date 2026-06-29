@@ -28,8 +28,10 @@
 // tests/architecture.test.ts.
 
 import { ITEMS, MOBS } from '../data';
+import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
+import { abilityScalingPower, channelTickBonus } from '../spell_scaling';
 import type { AbilityDef, Entity } from '../types';
 import {
   angleTo,
@@ -43,9 +45,9 @@ import {
   MELEE_ARC,
   MELEE_RANGE,
   normAngle,
-  spellHitChance,
 } from '../types';
 import { isLockedOut, isSilenced, isStunned, tonguesMult } from './cc';
+import { isSpellResisted } from './spell_resist';
 
 // Shaman shocks (earth/flame/frost) share one cooldown; lightning_shock joins them
 // for the shared-cooldown predicate. Moved with the casting slice (only callers).
@@ -147,11 +149,17 @@ export function cancelCast(ctx: SimContext, p: Entity): void {
 }
 
 export function pushbackCast(p: Entity): void {
+  // Item-set caster bonus scales damage-driven pushback (1 = fully immune).
+  const factor = 1 - p.castPushbackReduction;
+  if (factor <= 0) return;
   if (p.channeling) {
-    p.castRemaining = Math.max(0, p.castRemaining - p.castTotal * CHANNEL_PUSHBACK_FRACTION);
+    p.castRemaining = Math.max(
+      0,
+      p.castRemaining - p.castTotal * CHANNEL_PUSHBACK_FRACTION * factor,
+    );
   } else {
-    p.castRemaining += CAST_PUSHBACK_SEC;
-    p.castTotal += CAST_PUSHBACK_SEC;
+    p.castRemaining += CAST_PUSHBACK_SEC * factor;
+    p.castTotal += CAST_PUSHBACK_SEC * factor;
   }
 }
 
@@ -450,32 +458,37 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
     school: res.def.school,
     fx: 'projectile',
   });
-  for (const eff of res.effects) {
-    if (eff.type === 'directDamage') {
-      const crit = ctx.rng.chance(ctx.spellCrit(p));
-      let dmg = ctx.rng.range(eff.min, eff.max);
-      if (crit) dmg *= 1.5;
-      ctx.dealDamage(p, target, Math.round(dmg), crit, res.def.school, res.def.name, 'hit');
-    } else if (eff.type === 'drainTick') {
-      const dmg = Math.round(ctx.rng.range(eff.min, eff.max));
-      ctx.dealDamage(p, target, dmg, false, res.def.school, res.def.name, 'hit');
-      if (!p.dead) {
-        const healed = Math.min(Math.round(dmg * eff.healFrac), p.maxHp - p.hp);
-        if (healed > 0) {
-          p.hp += healed;
-          ctx.emit({
-            type: 'heal2',
-            sourceId: p.id,
-            targetId: p.id,
-            amount: healed,
-            crit: false,
-            ability: res.def.name,
-          });
-          ctx.healingThreat(p, p, healed);
+  // Each channel bolt (e.g. Arcane Missiles) deals its damage on arrival, not on the
+  // tick it is fired; a target that dies mid-flight fizzles it (the drain's guard).
+  scheduleProjectile(ctx, p, target, (src, tgt) => {
+    const channelSp = channelTickBonus(abilityScalingPower(src, res.def), res.def);
+    for (const eff of res.effects) {
+      if (eff.type === 'directDamage') {
+        const crit = ctx.rng.chance(ctx.spellCrit(src));
+        let dmg = ctx.rng.range(eff.min, eff.max) + channelSp;
+        if (crit) dmg *= 1.5;
+        ctx.dealDamage(src, tgt, Math.round(dmg), crit, res.def.school, res.def.name, 'hit');
+      } else if (eff.type === 'drainTick') {
+        const dmg = Math.round(ctx.rng.range(eff.min, eff.max) + channelSp);
+        ctx.dealDamage(src, tgt, dmg, false, res.def.school, res.def.name, 'hit');
+        if (!src.dead) {
+          const healed = Math.min(Math.round(dmg * eff.healFrac), src.maxHp - src.hp);
+          if (healed > 0) {
+            src.hp += healed;
+            ctx.emit({
+              type: 'heal2',
+              sourceId: src.id,
+              targetId: src.id,
+              amount: healed,
+              crit: false,
+              ability: res.def.name,
+            });
+            ctx.healingThreat(src, src, healed);
+          }
         }
       }
     }
-  }
+  });
 }
 
 function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: ResolvedAbility): void {
@@ -563,21 +576,28 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
       school: ability.school,
       fx: 'projectile',
     });
-    if (!ctx.rng.chance(spellHitChance(p.level, target.level))) {
-      ctx.emit({
-        type: 'damage',
-        sourceId: p.id,
-        targetId: target.id,
-        amount: 0,
-        crit: false,
-        school: ability.school,
-        ability: ability.name,
-        kind: 'miss',
-      });
-      ctx.enterCombat(p, target);
-      return;
-    }
-    ctx.runEffects(p, meta, target, res);
+    // The bolt is now in flight: its hit roll and effects resolve when it reaches the
+    // target (projectile_travel), not this tick. A target that dies before impact
+    // takes nothing (the drain fizzles the projectile). Spells never "miss" like a
+    // physical attack; a target can only fully RESIST them (classic-era semantics),
+    // so the on-impact roll uses isSpellResisted and emits a 'resist', not a 'miss'.
+    scheduleProjectile(ctx, p, target, (src, tgt) => {
+      if (isSpellResisted(ctx.rng, src.level, tgt.level)) {
+        ctx.emit({
+          type: 'damage',
+          sourceId: src.id,
+          targetId: tgt.id,
+          amount: 0,
+          crit: false,
+          school: ability.school,
+          ability: ability.name,
+          kind: 'resist',
+        });
+        ctx.enterCombat(src, tgt);
+        return;
+      }
+      ctx.runEffects(src, meta, tgt, res);
+    });
     return;
   }
 

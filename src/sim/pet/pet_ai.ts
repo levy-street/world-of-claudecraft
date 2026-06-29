@@ -33,6 +33,7 @@
 import { lineOfSightClear } from '../colliders';
 import { MOBS } from '../data';
 import { findPlayerPath, PLAYER_BODY_RADIUS } from '../pathfind';
+import { scheduleProjectile } from '../projectile_travel';
 import type { SimContext } from '../sim_context';
 import {
   type Aura,
@@ -200,12 +201,16 @@ export function petRangedAttack(
     school: ranged.school,
     fx: 'projectile',
   });
-  const crit = ctx.rng.chance(0.05);
-  let dmg =
-    ctx.rng.range(pet.weapon.min, pet.weapon.max) +
-    (ctx.effectiveAttackPower(pet) / 14) * pet.weapon.speed;
-  if (crit) dmg *= 2;
-  ctx.dealDamage(pet, target, Math.max(1, Math.round(dmg)), crit, ranged.school, null, 'hit');
+  // The imp's bolt resolves on arrival (projectile_travel), not the tick it is hurled;
+  // it fizzles if the pet or its target dies before impact.
+  scheduleProjectile(ctx, pet, target, (src, tgt) => {
+    const crit = ctx.rng.chance(0.05);
+    let dmg =
+      ctx.rng.range(src.weapon.min, src.weapon.max) +
+      (ctx.effectiveAttackPower(src) / 14) * src.weapon.speed;
+    if (crit) dmg *= 2;
+    ctx.dealDamage(src, tgt, Math.max(1, Math.round(dmg)), crit, ranged.school, null, 'hit');
+  });
 }
 
 export function petPickTarget(ctx: SimContext, pet: Entity, owner: Entity): Entity | null {

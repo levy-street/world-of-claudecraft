@@ -15,6 +15,8 @@
 import type { TalentModifiers } from './content/talents';
 import type { DelayedEvent, GroundAoE } from './entity_roster';
 import type { PendingLootRoll } from './loot/loot_roll';
+import type { MarketListing } from './market';
+import type { PendingProjectile } from './projectile_travel';
 import type { Rng } from './rng';
 import type {
   ArenaMatch,
@@ -22,6 +24,7 @@ import type {
   DuelState,
   FiestaState,
   InstanceSlot,
+  ItemUseResult,
   JoinableChannel,
   Party,
   PendingMobRespawn,
@@ -42,6 +45,7 @@ import type {
   QuestProgress,
   ResolvedSimConfig,
   SimEvent,
+  SkinCatalog,
   Vec3,
 } from './types';
 
@@ -80,6 +84,11 @@ export interface SimContextPrimitives {
   // reached here as live views. `delayedEvents` is read-write (the drain reassigns
   // the pending list); `groundAoEs` is mutated in place (splice), so read-only.
   delayedEvents: DelayedEvent[];
+  // In-flight projectiles (projectile_travel.ts): launched by the ranged combat
+  // paths, stepped toward their live targets in the tick prologue and resolved on the
+  // tick they arrive. Read-write (the advance reassigns the pending list), like
+  // delayedEvents.
+  pendingProjectiles: PendingProjectile[];
   readonly groundAoEs: GroundAoE[];
   // dungeon-door registry (I1) appended to on dungeon_door spawn; null until built.
   // Read-write: I1's updateDoorTriggers lazily assigns the array on first build.
@@ -136,6 +145,13 @@ export interface SimContextPrimitives {
   // read-write primitive (get + set). Backing fields stay on Sim.
   readonly pendingLootRolls: Map<number, PendingLootRoll>;
   nextLootRollId: number;
+  // W5 chat router/readouts. `devCommands` gates the /dev chat cheats (the router's
+  // `if (ctx.devCommands)` guard, exactly the Sim field). `marketListings` is the live
+  // World Market book the /listings readout filters to the player's own listings; the
+  // backing field stays Sim-owned (the Market instance owns it), exposed here as a live
+  // read-only view (never reassigned by the readout).
+  readonly devCommands: boolean;
+  readonly marketListings: MarketListing[];
 }
 
 // Cross-system callbacks. Each signature mirrors the still-on-`Sim` method it
@@ -173,6 +189,7 @@ export interface SimContextCallbacks {
     kind: 'hit' | 'miss' | 'dodge',
     noRage?: boolean,
     threatOpts?: { flat?: number; mult?: number },
+    direct?: boolean,
   ): void;
   handleDeath(entity: Entity, killer: Entity | null): void;
   cancelCast(entity: Entity): void;
@@ -298,7 +315,11 @@ export interface SimContextCallbacks {
   delveRunForPlayer(pid: number): DelveRun | null;
   delveModuleEntry(run: DelveRun): Vec3;
   failDelveRun(run: DelveRun): void;
-  pulseGroundAoE(effect: GroundAoE, threatOpts?: { flat?: number; mult?: number }): void;
+  pulseGroundAoE(
+    effect: GroundAoE,
+    threatOpts?: { flat?: number; mult?: number },
+    direct?: boolean,
+  ): void;
 
   // C1 damage core: the post-mitigation damage/death/xp hub the extracted module
   // (src/sim/combat/damage.ts) owns plus the helpers it consumes (all still on Sim
@@ -495,6 +516,40 @@ export interface SimContextCallbacks {
   // moveSpeedMult/swingIntervalMult are M2 decls above -> all deduped.)
   setPlayerLevel(level: number, pid?: number): void;
   notice(pid: number, text: string, color?: string): void;
+
+  // L2 inventory/vendor (src/sim/items.ts): the four helpers the moved useItem
+  // dispatches to that STAY on Sim (their owning facets are decided later). W2 owns
+  // these declarations; each is a thin late-bound delegate to the still-on-Sim method.
+  // startFishing's body stays on Sim (fishing facet TBD); unlockMechChromaFromItem /
+  // openSkinSelect are cosmetics internals (facet W7); isSwimming is a shared terrain
+  // predicate. unlockMechChromaFromItem's return value flows out through useItem to the
+  // server `use` case (result?.type === 'mechChroma').
+  startFishing(p: Entity, meta: PlayerMeta): void;
+  unlockMechChromaFromItem(
+    meta: PlayerMeta,
+    itemId: string,
+    chromaId: string,
+  ): ItemUseResult | undefined;
+  openSkinSelect(meta: PlayerMeta, catalog: SkinCatalog, itemId: string): void;
+  isSwimming(e: Entity): boolean;
+
+  // W3 interaction (src/sim/interaction.ts): the moved `interact` dispatcher fans into
+  // the quest-NPC surface that STAYS on Sim (W4 owns talkToNpc / interactNpcForQuests /
+  // isQuestInteractionEntity). These two callbacks are thin late-bound delegates to the
+  // still-on-Sim methods; W4 later re-points them into the quests module WITHOUT renaming
+  // (append-only). talkToNpc MUST stay a resolvable Sim delegate (external test call sites).
+  talkToNpc(npcId: number, pid?: number): void;
+  isQuestInteractionEntity(e: Entity): boolean;
+
+  // W5 chat router/readouts (src/sim/social/chat.ts + chat_readouts.ts): the three
+  // reach-backs the moved code CONSUMES that stay on Sim / a sibling machine.
+  // `targetEntity` is the T1 player target-selection entry the /assist branch calls
+  // (thin Sim delegate -> targeting.ts); `partyCapacity` is the party-machine read the
+  // partyReadout shows the roster cap against; `marketListingBelongsTo` is the Market
+  // ownership test the /listings readout filters with. All append-only, late-bound to Sim.
+  targetEntity(id: number | null, pid?: number): void;
+  partyCapacity(party: Party | null): number;
+  marketListingBelongsTo(listing: MarketListing, meta: PlayerMeta): boolean;
 }
 
 // The seam consumed by extracted modules.
@@ -554,6 +609,12 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     set delayedEvents(v) {
       host.delayedEvents = v;
+    },
+    get pendingProjectiles() {
+      return host.pendingProjectiles;
+    },
+    set pendingProjectiles(v) {
+      host.pendingProjectiles = v;
     },
     get groundAoEs() {
       return host.groundAoEs;
@@ -635,6 +696,12 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     set nextLootRollId(v) {
       host.nextLootRollId = v;
+    },
+    get devCommands() {
+      return host.devCommands;
+    },
+    get marketListings() {
+      return host.marketListings;
     },
     emit: host.emit,
     error: host.error,
@@ -800,5 +867,17 @@ export function createSimContext(host: SimContextHost): SimContext {
     // G2 social plumbing passthroughs (hasPendingSocialInvite already bound above; deduped).
     setPlayerLevel: host.setPlayerLevel,
     notice: host.notice,
+    // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved useItem dispatches to.
+    startFishing: host.startFishing,
+    unlockMechChromaFromItem: host.unlockMechChromaFromItem,
+    openSkinSelect: host.openSkinSelect,
+    isSwimming: host.isSwimming,
+    // W3 interaction: the two still-on-Sim quest-NPC delegates the moved interact dispatches to.
+    talkToNpc: host.talkToNpc,
+    isQuestInteractionEntity: host.isQuestInteractionEntity,
+    // W5 chat router/readouts reach-backs (targetEntity/partyCapacity/marketListingBelongsTo).
+    targetEntity: host.targetEntity,
+    partyCapacity: host.partyCapacity,
+    marketListingBelongsTo: host.marketListingBelongsTo,
   };
 }

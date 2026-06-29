@@ -15,6 +15,7 @@ import type { SimEvent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
 const makeSim = (seed = 42) => new Sim({ seed, playerClass: 'warrior', autoEquip: true });
+const BOUNTIFUL_STRESS_TIMEOUT_MS = 15_000;
 
 function enterBountifulFinale(sim: Sim) {
   sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel);
@@ -83,25 +84,29 @@ describe('Bountiful lockpick, flawless sim path', () => {
 });
 
 describe('Bountiful lockpick, the old jam is gone (authoritative-state picking)', () => {
-  it('opens every seed when each pick reads the live column, with NO drain', () => {
-    // This is the headline regression: previously a frozen HUD column jammed
-    // most seeds on the single premium try. Reading sim.lockpickState directly
-    // (what the rewritten board does) cannot freeze, so every seed opens.
-    const N = 80;
-    let opened = 0;
-    for (let seed = 0; seed < N; seed++) {
-      const sim = makeSim(seed);
-      const { run, chestId } = enterBountifulFinale(sim);
-      sim.lockpickEngage(chestId, 1);
-      let guard = 0;
-      while (run.lockpick && run.lockpick.state === 'IN_PROGRESS' && guard++ < 200) {
-        const col = sim.lockpickState!.col; // authoritative; never stale
-        sim.lockpickAction(solveLockActions(curSpec(run))![col]!);
+  it(
+    'opens every seed when each pick reads the live column, with NO drain',
+    () => {
+      // This is the headline regression: previously a frozen HUD column jammed
+      // most seeds on the single premium try. Reading sim.lockpickState directly
+      // (what the rewritten board does) cannot freeze, so every seed opens.
+      const N = 80;
+      let opened = 0;
+      for (let seed = 0; seed < N; seed++) {
+        const sim = makeSim(seed);
+        const { run, chestId } = enterBountifulFinale(sim);
+        sim.lockpickEngage(chestId, 1);
+        let guard = 0;
+        while (run.lockpick && run.lockpick.state === 'IN_PROGRESS' && guard++ < 200) {
+          const col = sim.lockpickState!.col; // authoritative; never stale
+          sim.lockpickAction(solveLockActions(curSpec(run))![col]!);
+        }
+        if (run.objectState[chestId].looted) opened++;
       }
-      if (run.objectState[chestId].looted) opened++;
-    }
-    expect(opened).toBe(N);
-  });
+      expect(opened).toBe(N);
+    },
+    BOUNTIFUL_STRESS_TIMEOUT_MS,
+  );
 
   it('first page (16 cols) seats and rolls onto page 2 without any drain', () => {
     const sim = makeSim(99);

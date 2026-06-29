@@ -19,6 +19,7 @@
 // Three/render/ui/game/net, no Math.random/Date.now), so it runs unchanged in Node,
 // the browser, and the headless RL env (enforced by tests/architecture.test.ts).
 
+import { deadTargetSelectable } from './dead_target';
 import type { SimContext } from './sim_context';
 import { orderTabTargets, TAB_QUERY_RADIUS } from './tab_target';
 import type { Entity } from './types';
@@ -48,7 +49,7 @@ export class Targeting {
       return;
     }
     const e = this.ctx.entities.get(id);
-    if (!e || (e.dead && !e.lootable)) return;
+    if (!e || (e.dead && !deadTargetSelectable(e, p.id))) return;
     p.targetId = id;
     if (!this.ctx.isHostileTo(p, e) || e.dead) p.autoAttack = false;
   }

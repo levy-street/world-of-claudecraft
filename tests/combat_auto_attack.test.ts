@@ -73,6 +73,13 @@ function capture(sim: AnySim): Ev[] {
   return events;
 }
 
+// Ranged/spell damage now lands when the projectile arrives (projectile_travel), not
+// the tick it is fired. Advance the sim until the captured stream shows the awaited
+// event (or a tick cap), so a deferred Auto Shot / Wand bolt has time to connect.
+function landProjectiles(sim: AnySim, events: Ev[], pred: (e: Ev) => boolean, maxTicks = 40) {
+  for (let i = 0; i < maxTicks && !events.some(pred); i++) sim.tick();
+}
+
 describe('auto_attack meleeSwing: the white-hit table', () => {
   it('a swing that passes the table connects and deals physical damage', () => {
     const { sim, p } = makeSim('warrior', 12);
@@ -149,6 +156,7 @@ describe('auto_attack rangedSwing: Auto Shot vs Wand', () => {
     const events = capture(sim);
     rangedSwing(sim.ctx, p, mob, { min: 5, max: 9, speed: 2.3 });
     expect(events.some((e) => e.type === 'spellfx' && e.school === 'physical')).toBe(true);
+    landProjectiles(sim, events, (e) => e.type === 'damage' && e.ability === 'Auto Shot');
     expect(events.some((e) => e.type === 'damage' && e.ability === 'Auto Shot')).toBe(true);
   });
 
@@ -158,6 +166,11 @@ describe('auto_attack rangedSwing: Auto Shot vs Wand', () => {
     const events = capture(sim);
     rangedSwing(sim.ctx, p, mob, { min: 3, max: 6, speed: 1.8, wand: true, school: 'arcane' });
     expect(events.some((e) => e.type === 'spellfx' && e.school === 'arcane')).toBe(true);
+    landProjectiles(
+      sim,
+      events,
+      (e) => e.type === 'damage' && e.ability === 'Wand' && e.school === 'arcane',
+    );
     expect(
       events.some((e) => e.type === 'damage' && e.ability === 'Wand' && e.school === 'arcane'),
     ).toBe(true);
@@ -172,8 +185,9 @@ describe('auto_attack updatePlayerAutoAttack: ranged-vs-melee dispatch', () => {
     p.swingTimer = 0;
     const events = capture(sim);
     updatePlayerAutoAttack(sim.ctx, p, meta);
+    expect(p.swingTimer).toBeGreaterThan(0); // reset to ranged.speed * swingIntervalMult (at fire time)
+    landProjectiles(sim, events, (e) => e.type === 'damage' && e.ability === 'Auto Shot');
     expect(events.some((e) => e.type === 'damage' && e.ability === 'Auto Shot')).toBe(true);
-    expect(p.swingTimer).toBeGreaterThan(0); // reset to ranged.speed * swingIntervalMult
   });
 
   it('a warrior in melee takes the melee branch, arming weapon-speed cadence', () => {

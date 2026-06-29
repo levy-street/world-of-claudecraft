@@ -22,6 +22,7 @@ import {
   tEntity,
 } from '../src/ui/entity_i18n';
 import {
+  da_DK,
   de_DE,
   en,
   en_CA,
@@ -33,17 +34,23 @@ import {
   formatNumber,
   fr_CA,
   fr_FR,
+  id_ID,
   isSupportedLanguage,
   it_IT,
   ja_JP,
   ko_KR,
   languageTag,
+  nl_NL,
+  pl_PL,
   pt_BR,
   ru_RU,
   setLanguage,
   supportedLanguages,
+  sv_SE,
   type TranslationKey,
   t,
+  tr_TR,
+  vi_VN,
   zh_CN,
   zh_TW,
 } from '../src/ui/i18n';
@@ -67,6 +74,13 @@ const locales: Record<string, typeof en> = {
   ja_JP,
   pt_BR,
   ru_RU,
+  nl_NL,
+  pl_PL,
+  id_ID,
+  tr_TR,
+  sv_SE,
+  vi_VN,
+  da_DK,
 };
 
 // Two-tier gate (see .github/workflows/ci.yml). The release tier runs with
@@ -616,6 +630,13 @@ describe('i18n Localization Key Coverage', () => {
       'ja_JP',
       'pt_BR',
       'ru_RU',
+      'nl_NL',
+      'pl_PL',
+      'id_ID',
+      'tr_TR',
+      'sv_SE',
+      'vi_VN',
+      'da_DK',
     ]);
     expect(isSupportedLanguage('de_DE')).toBe(true);
     expect(isSupportedLanguage('de-DE')).toBe(false);
@@ -854,6 +875,31 @@ describe('i18n Localization Key Coverage', () => {
     setLanguage('en');
   });
 
+  it('should track item-set names and bonus text in the entity catalog', async () => {
+    const itemSetEntries = entityTranslationManifest().filter((entry) => entry.group === 'itemSet');
+    expect(itemSetEntries).toHaveLength(7 * 3);
+    expect(missingEntityTranslationsForGroups(['itemSet'])).toHaveLength(0);
+
+    for (const lang of ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const) {
+      await ensureLocaleLoaded(lang);
+      setLanguage(lang);
+      resetEntityTranslationFallbackLog();
+      for (const entry of itemSetEntries) {
+        const rendered = tEntity({
+          kind: 'itemSet',
+          id: entry.id,
+          field: entry.field as 'name' | 'bonus2' | 'bonus3',
+        });
+        expect(rendered.trim().length, `${lang}.${entry.key}`).toBeGreaterThan(0);
+        expect(rendered, `${lang}.${entry.key}`).not.toBe(entry.key);
+        expect(rendered, `${lang}.${entry.key}`).not.toBe(entry.source);
+      }
+      expect(entityTranslationFallbackLog(), `${lang} fallback log`).toHaveLength(0);
+    }
+
+    setLanguage('en');
+  });
+
   it('should route class-detail damage ranges through localized templates', () => {
     const source = fs.readFileSync(path.resolve(process.cwd(), 'src/main.ts'), 'utf8');
     expect(source).toContain('abilityUi.tooltip.damageRange');
@@ -873,12 +919,17 @@ describe('i18n Localization Key Coverage', () => {
     expect(classAbilityMissing).toHaveLength(0);
 
     expect(missingEntityTranslationsForGroups(['classAbility', 'item'])).toHaveLength(0);
+    expect(missingEntityTranslationsForGroups(['itemSet'])).toHaveLength(0);
     expect(missingEntityTranslationsForGroups(['world'])).toHaveLength(0);
-    expect(missingEntityTranslationsForGroups(['classAbility', 'item', 'world'])).toHaveLength(0);
+    expect(
+      missingEntityTranslationsForGroups(['classAbility', 'item', 'itemSet', 'world']),
+    ).toHaveLength(0);
     expect(() => assertEntityTranslationsReady([])).not.toThrow();
     expect(() => assertEntityTranslationsReady(['classAbility'])).not.toThrow();
     expect(() => assertEntityTranslationsReady(['classAbility', 'item'])).not.toThrow();
-    expect(() => assertEntityTranslationsReady(['classAbility', 'item', 'world'])).not.toThrow();
+    expect(() =>
+      assertEntityTranslationsReady(['classAbility', 'item', 'itemSet', 'world']),
+    ).not.toThrow();
   });
 
   it('should provide every world-content translation in every locale without canonical fallbacks', () => {
@@ -1216,7 +1267,15 @@ describe('i18n Localization Key Coverage', () => {
   it('should route rendered world-content labels through localized entity helpers', () => {
     const hudSource = fs.readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
     expect(hudSource).toContain('zoneDisplayName');
-    expect(hudSource).toContain("$('#zone-label').textContent = zoneDisplayName");
+    // The overworld #zone-label write moved into minimap_painter: hud wires
+    // zoneDisplayName into the painter, and the painter writes the label through the
+    // elided setText. The localization is preserved, just relocated.
+    expect(hudSource).toContain('zoneDisplayName(zoneId)');
+    const minimapPainterSource = fs.readFileSync(
+      path.resolve(process.cwd(), 'src/ui/minimap_painter.ts'),
+      'utf8',
+    );
+    expect(minimapPainterSource).toContain('this.writers.setText(zoneLabelEl, this.localizeZone(');
     expect(hudSource).toContain('zonePoiLabel');
     expect(hudSource).toContain('dungeonDisplayNameFromSource');
     expect(hudSource).not.toContain('zoneWelcomeText(');
@@ -1225,9 +1284,19 @@ describe('i18n Localization Key Coverage', () => {
       path.resolve(process.cwd(), 'src/render/renderer.ts'),
       'utf8',
     );
+    // objectDisplayName still localizes the build-time object nameplate write in the
+    // renderer; the helper itself moved into entity_labels.ts.
     expect(rendererSource).toContain('objectDisplayName');
-    expect(rendererSource).toContain('worldContent.corpseName');
-    expect(rendererSource).not.toContain('`${e.name} (corpse)`');
+    // The per-entity nameplate content (corpse/mob names) moved into the
+    // NameplatePainter; localization is preserved, just relocated (mirrors the
+    // minimap_painter zone-label move above).
+    const nameplatePainterSource = fs.readFileSync(
+      path.resolve(process.cwd(), 'src/render/nameplate_painter.ts'),
+      'utf8',
+    );
+    expect(nameplatePainterSource).toContain('objectDisplayName');
+    expect(nameplatePainterSource).toContain('worldContent.corpseName');
+    expect(nameplatePainterSource).not.toContain('`${e.name} (corpse)`');
   });
 
   it('should preserve and render every HUD interpolation placeholder in every locale', () => {
