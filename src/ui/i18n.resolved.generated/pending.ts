@@ -10,12 +10,6 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
     "hudChrome.wocSeason.close",
     "hudChrome.wocSeason.colPlayer",
     "hudChrome.wocSeason.colRank",
@@ -42,12 +36,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.wocUnit"
   ],
   "es_ES": [
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
     "hudChrome.wocSeason.close",
     "hudChrome.wocSeason.colPlayer",
     "hudChrome.wocSeason.colRank",
@@ -74,12 +62,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.wocUnit"
   ],
   "fr_FR": [
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
     "hudChrome.wocSeason.close",
     "hudChrome.wocSeason.colPlayer",
     "hudChrome.wocSeason.colRank",
@@ -106,12 +88,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.wocUnit"
   ],
   "fr_CA": [
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
     "hudChrome.wocSeason.close",
     "hudChrome.wocSeason.colPlayer",
     "hudChrome.wocSeason.colRank",
@@ -139,12 +115,6 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
     "hudChrome.wocSeason.close",
     "hudChrome.wocSeason.colPlayer",
     "hudChrome.wocSeason.colRank",
@@ -171,12 +141,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.wocUnit"
   ],
   "de_DE": [
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
     "hudChrome.wocSeason.close",
     "hudChrome.wocSeason.colPlayer",
     "hudChrome.wocSeason.colRank",
@@ -203,7 +167,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.wocUnit"
   ],
   "zh_CN": [
-    "hudChrome.abilityScaling.bonus",
     "hudChrome.wocSeason.close",
     "hudChrome.wocSeason.colPlayer",
     "hudChrome.wocSeason.colRank",
@@ -230,7 +193,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.wocUnit"
   ],
   "zh_TW": [
-    "hudChrome.abilityScaling.bonus",
     "hudChrome.wocSeason.close",
     "hudChrome.wocSeason.colPlayer",
     "hudChrome.wocSeason.colRank",
@@ -257,7 +219,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.wocUnit"
   ],
   "ko_KR": [
-    "hudChrome.abilityScaling.bonus",
     "hudChrome.wocSeason.close",
     "hudChrome.wocSeason.colPlayer",
     "hudChrome.wocSeason.colRank",
@@ -284,7 +245,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.wocUnit"
   ],
   "ja_JP": [
-    "hudChrome.abilityScaling.bonus",
     "hudChrome.wocSeason.close",
     "hudChrome.wocSeason.colPlayer",
     "hudChrome.wocSeason.colRank",
@@ -311,12 +271,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.wocUnit"
   ],
   "pt_BR": [
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
     "hudChrome.wocSeason.close",
     "hudChrome.wocSeason.colPlayer",
     "hudChrome.wocSeason.colRank",
@@ -343,7 +297,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.wocUnit"
   ],
   "ru_RU": [
-    "hudChrome.abilityScaling.bonus",
     "hudChrome.wocSeason.close",
     "hudChrome.wocSeason.colPlayer",
     "hudChrome.wocSeason.colRank",
@@ -370,12 +323,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.wocUnit"
   ],
   "nl_NL": [
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
     "hudChrome.wocSeason.close",
     "hudChrome.wocSeason.colPlayer",
     "hudChrome.wocSeason.colRank",
@@ -402,12 +349,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.wocUnit"
   ],
   "pl_PL": [
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
     "hudChrome.wocSeason.close",
     "hudChrome.wocSeason.colPlayer",
     "hudChrome.wocSeason.colRank",
@@ -434,12 +375,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.wocUnit"
   ],
   "id_ID": [
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
     "hudChrome.wocSeason.close",
     "hudChrome.wocSeason.colPlayer",
     "hudChrome.wocSeason.colRank",
@@ -466,12 +401,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.wocUnit"
   ],
   "tr_TR": [
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
     "hudChrome.wocSeason.close",
     "hudChrome.wocSeason.colPlayer",
     "hudChrome.wocSeason.colRank",
@@ -498,12 +427,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.wocUnit"
   ],
   "sv_SE": [
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
     "hudChrome.wocSeason.close",
     "hudChrome.wocSeason.colPlayer",
     "hudChrome.wocSeason.colRank",
@@ -530,12 +453,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.wocUnit"
   ],
   "vi_VN": [
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
     "hudChrome.wocSeason.close",
     "hudChrome.wocSeason.colPlayer",
     "hudChrome.wocSeason.colRank",
@@ -562,12 +479,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.wocUnit"
   ],
   "da_DK": [
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail",
     "hudChrome.wocSeason.close",
     "hudChrome.wocSeason.colPlayer",
     "hudChrome.wocSeason.colRank",
