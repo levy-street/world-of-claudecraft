@@ -1,5 +1,5 @@
-// Player-rebindable controls. Every bindable game action — movement, camera,
-// targeting, interface windows, and the 12 action-bar slots — lives in one
+// Player-rebindable controls. Every bindable game action, movement, camera,
+// targeting, interface windows, and the 23 action-bar slots, lives in one
 // registry, and the Keybinds map holds up to two KeyboardEvent.codes per
 // action (primary + secondary, e.g. W and ArrowUp both Move Forward). Input
 // dispatches edge actions and polls held (movement) actions through this map;
@@ -303,7 +303,7 @@ function codeLabel(code: string): string {
   if (/^Digit\d$/.test(code)) return code.slice(5);
   if (/^Key[A-Z]$/.test(code)) return code.slice(3);
   if (/^F\d{1,2}$/.test(code)) return code;
-  if (/^Numpad\d$/.test(code)) return 'Num' + code.slice(6);
+  if (/^Numpad\d$/.test(code)) return `Num${code.slice(6)}`;
   const named: Record<string, string> = {
     Minus: '-',
     Equal: '=',

@@ -38,6 +38,7 @@ import {
   FIRST_TALENT_LEVEL,
   MAX_LOADOUTS,
   pointsSpent,
+  SAVED_LOADOUT_BAR_SLOTS,
   type SavedLoadout,
   type TalentAllocation,
   talentPointsAtLevel,
@@ -200,7 +201,7 @@ export function saveTalentLoadout(
   }
   const clean = (name || 'Build').toString().slice(0, 24);
   const safeBar = Array.isArray(bar)
-    ? bar.slice(0, 16).map((b) => (typeof b === 'string' ? b : null))
+    ? bar.slice(0, SAVED_LOADOUT_BAR_SLOTS).map((b) => (typeof b === 'string' ? b : null))
     : [];
   const lo: SavedLoadout = { name: clean, alloc: cloneAllocation(r.meta.talents), bar: safeBar };
   const existing = r.meta.loadouts.findIndex((l) => l.name === clean);

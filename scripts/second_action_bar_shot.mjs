@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH } from './browser_path.mjs';
 
-const URL = (process.env.GAME_URL ?? 'http://localhost:5173') + '/?gfx=ultra';
+const URL = `${process.env.GAME_URL ?? 'http://localhost:5173'}/?gfx=ultra`;
 fs.mkdirSync('tmp', { recursive: true });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 

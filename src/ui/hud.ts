@@ -3661,6 +3661,7 @@ export class Hud {
     // elements (multiplicity is a constructor arg, not a hardcoded id).
     this.actionBarView = createActionBarView(
       {
+        manySpellsSlotMax: Hud.PRIMARY_BAR_ABILITY_SLOTS,
         slots: this.abilityButtons.map((_, i) => {
           // Precompute the keybind lookup key once per slot (not per frame).
           const slotKey = `slot${i}`;
@@ -4404,12 +4405,6 @@ export class Hud {
     if (this.spellbookWindow.isOpen) this.spellbookWindow.refreshHotbarControls();
     this.actionBarPainter.paint(
       this.actionBarView.tick({ player: p, target: target ?? null, inventory: sim.inventory }),
-    );
-    // second-action-bar: flag the primary bar when it holds many spells (CSS sizing hook).
-    this.actionbarEl.classList.toggle(
-      'many-spells',
-      this.hotbarActions.slice(0, Hud.PRIMARY_BAR_ABILITY_SLOTS).filter((action) => action !== null)
-        .length > 10,
     );
 
     // xp bar: pre-cap shows the level bar; post-cap fills toward the next virtual
