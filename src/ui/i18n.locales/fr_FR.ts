@@ -1667,7 +1667,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Frappe l'ennemi pour {damage} points de dégâts de Feu. Instantané.",
   'entities.abilities.arcane_missiles.name': 'Projectiles des Arcanes',
   'entities.abilities.arcane_missiles.description':
-    "Lance des Projectiles des Arcanes sur l'ennemi et inflige 8 points de dégâts des Arcanes chaque seconde pendant 3 s.",
+    "Lance des Projectiles des Arcanes sur l'ennemi et inflige {damage} points de dégâts des Arcanes chaque seconde pendant 3 s.",
   'entities.abilities.polymorph.name': 'Métamorphose',
   'entities.abilities.polymorph.description':
     "Transforme l'ennemi en mouton pendant un maximum de 15 s. Le mouton erre et récupère rapidement. Tout dégât interrompt l'effet. Bêtes et humanoïdes uniquement.",
@@ -1845,7 +1845,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Une prière lente mais puissante qui rend {damage} points de vie à une cible alliée.',
   'entities.abilities.mind_flay.name': 'Fouet mental',
   'entities.abilities.mind_flay.description':
-    "Assaille l'esprit de la cible avec de l'énergie d'Ombre et inflige 12 points de dégâts chaque seconde pendant 3 s.",
+    "Assaille l'esprit de la cible avec de l'énergie d'Ombre et inflige {damage} points de dégâts chaque seconde pendant 3 s.",
   'entities.abilities.flash_heal.name': 'Soins rapides',
   'entities.abilities.flash_heal.description':
     'Une prière rapide qui rend {damage} points de vie à une cible alliée.',
@@ -1900,7 +1900,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Maudit la cible d'agonie: {damage} points de dégâts d'Ombre en 24 s.",
   'entities.abilities.drain_life.name': 'Drain de vie',
   'entities.abilities.drain_life.description':
-    'Draine la vie de la cible et vous transfère 7 points de vie chaque seconde pendant 5 s.',
+    'Draine la vie de la cible et vous transfère {damage} points de vie chaque seconde pendant 5 s.',
   'entities.abilities.fear.name': 'Peur',
   'entities.abilities.fear.description':
     "Terrifie l'ennemi et le laisse tremblant pendant un maximum de 8 s. Tout dégât interrompt l'effet.",

@@ -1645,7 +1645,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Investe il nemico per {damage} danni da Fuoco. Istantaneo.',
   'entities.abilities.arcane_missiles.name': 'Dardi Arcani',
   'entities.abilities.arcane_missiles.description':
-    'Lancia Dardi Arcani contro il nemico, infliggendo 8 danni Arcani ogni secondo per 3 s.',
+    'Lancia Dardi Arcani contro il nemico, infliggendo {damage} danni Arcani ogni secondo per 3 s.',
   'entities.abilities.polymorph.name': 'Metamorfosi',
   'entities.abilities.polymorph.description':
     "Trasforma il nemico in una pecora per un massimo di 15 s. La pecora vaga e guarisce rapidamente. Qualsiasi danno interrompe l'effetto. Solo bestie e umanoidi.",
@@ -1822,7 +1822,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Una preghiera lenta ma potente che cura un bersaglio alleato di {damage}.',
   'entities.abilities.mind_flay.name': 'Flagello Mentale',
   'entities.abilities.mind_flay.description':
-    "Assale la mente del bersaglio con energia d'Ombra, infliggendo 12 danni ogni secondo per 3 s.",
+    "Assale la mente del bersaglio con energia d'Ombra, infliggendo {damage} danni ogni secondo per 3 s.",
   'entities.abilities.flash_heal.name': 'Cura Rapida',
   'entities.abilities.flash_heal.description':
     'Una preghiera veloce che cura un bersaglio alleato di {damage}.',
@@ -1877,7 +1877,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Maledice il bersaglio con agonia: {damage} danni da Ombra in 24 s.',
   'entities.abilities.drain_life.name': 'Risucchio di Vita',
   'entities.abilities.drain_life.description':
-    'Risucchia la vita del bersaglio, trasferendoti 7 salute ogni secondo per 5 s.',
+    'Risucchia la vita del bersaglio, trasferendoti {damage} salute ogni secondo per 5 s.',
   'entities.abilities.fear.name': 'Paura',
   'entities.abilities.fear.description':
     "Terrorizza il nemico, lasciandolo tremante per un massimo di 8 s. Qualsiasi danno interrompe l'effetto.",

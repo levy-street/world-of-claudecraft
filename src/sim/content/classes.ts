@@ -928,7 +928,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 3, level: 20, cost: 105, effects: [{ type: 'directDamage', min: 22, max: 22 }] },
     ],
     description:
-      'Launches Arcane Missiles at the enemy, causing 8 Arcane damage each second for 3 sec.',
+      'Launches Arcane Missiles at the enemy, causing $d Arcane damage each second for 3 sec.',
   },
   polymorph: {
     id: 'polymorph',
@@ -1008,8 +1008,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'fire',
     requiresTarget: true,
     effects: [
-      { type: 'directDamage', min: 75, max: 100 },
-      { type: 'dot', total: 24, duration: 12, interval: 2 },
+      { type: 'directDamage', min: 170, max: 225 },
+      { type: 'dot', total: 48, duration: 12, interval: 2 },
     ],
     description:
       'Hurls an immense fiery boulder that causes $d Fire damage plus additional damage over time.',
@@ -1780,6 +1780,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 35,
     minRange: 8,
     school: 'nature',
+    scalesWith: 'ranged',
     requiresTarget: true,
     effects: [{ type: 'dot', total: 20, duration: 15, interval: 3 }],
     ranks: [
@@ -1809,6 +1810,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 35,
     minRange: 8,
     school: 'arcane',
+    scalesWith: 'ranged',
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 13, max: 17 }],
     ranks: [
@@ -1828,6 +1830,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 35,
     minRange: 8,
     school: 'physical',
+    // A fired shot: its flat damage scales off Ranged AP like the other shots,
+    // not melee AP, even though it is physical.
+    scalesWith: 'ranged',
     requiresTarget: true,
     effects: [
       { type: 'directDamage', min: 4, max: 6 },
@@ -1917,6 +1922,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 35,
     minRange: 8,
     school: 'physical',
+    scalesWith: 'ranged',
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 50, max: 62 }],
     description: 'A carefully aimed shot that deals $d damage.',
@@ -2141,7 +2147,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [{ type: 'drainTick', min: 12, max: 12, healFrac: 0 }],
     description:
-      "Assaults the target's mind with Shadow energy, causing 12 damage each second for 3 sec.",
+      "Assaults the target's mind with Shadow energy, causing $d Shadow damage each second for 3 sec.",
   },
   flash_heal: {
     id: 'flash_heal',
@@ -2561,7 +2567,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         rank: 3,
         level: 18,
         cost: 75,
-        effects: [{ type: 'dot', total: 108, duration: 18, interval: 3 }],
+        effects: [{ type: 'dot', total: 85, duration: 18, interval: 3 }],
       },
     ],
     description: 'Corrupts the target, causing $d Shadow damage over 18 sec.',
@@ -2607,7 +2613,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         rank: 3,
         level: 20,
         cost: 60,
-        effects: [{ type: 'dot', total: 112, duration: 24, interval: 3 }],
+        effects: [{ type: 'dot', total: 78, duration: 24, interval: 3 }],
       },
     ],
     description: 'Curses the target with agony: $d Shadow damage over 24 sec.',
@@ -2639,7 +2645,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         effects: [{ type: 'drainTick', min: 17, max: 17, healFrac: 1 }],
       },
     ],
-    description: "Drains the target's life, transferring 7 health to you each second for 5 sec.",
+    description: "Drains the target's life, transferring $d health to you each second for 5 sec.",
   },
   fear: {
     id: 'fear',
@@ -3250,7 +3256,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'arcane',
     requiresTarget: true,
-    effects: [{ type: 'directDamage', min: 60, max: 74 }],
+    effects: [{ type: 'directDamage', min: 80, max: 112 }],
     description: 'Calls down a bolt of stellar fire, causing $d Arcane damage.',
   },
   travel_form: {

@@ -88,6 +88,8 @@ export interface ActionBarSlotDescriptor {
 /** The bar descriptor: the slot set. The FAMILY parameter. */
 export interface ActionBarDescriptor {
   slots: readonly ActionBarSlotDescriptor[];
+  /** Optional inclusive max slot index for the container-level many-spells count. */
+  manySpellsSlotMax?: number;
 }
 
 /** Injected localization helpers. The core builds the final aria string via t() so
@@ -216,7 +218,13 @@ export function createActionBarView(
 
         // many-spells counts RAW assigned slots (the attack slot reports no action),
         // byte-identical to the former hotbarActions.filter(a => a !== null).length.
-        if (sd.hasAction()) boundCount++;
+        if (
+          sd.hasAction() &&
+          (descriptor.manySpellsSlotMax === undefined ||
+            sd.slotIndex <= descriptor.manySpellsSlotMax)
+        ) {
+          boundCount++;
+        }
 
         if (sd.isAttack) {
           slot.kind = 'attack';

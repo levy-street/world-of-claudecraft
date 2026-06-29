@@ -222,6 +222,9 @@ export const ja_JP: EnTranslations = {
     "rest": {
       "resting": "休息中"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
     "unitFrame": {
       "playerLabel": "あなたのキャラクター",
       "targetLabel": "あなたのターゲット",
@@ -3459,7 +3462,7 @@ export const ja_JP: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "アーケインミサイル",
-        "description": "敵にアーケインミサイルを放ち、3秒間、毎秒8の秘術ダメージを与えます。"
+        "description": "敵にアーケインミサイルを放ち、3秒間、毎秒{damage}の秘術ダメージを与えます。"
       },
       "polymorph": {
         "name": "ポリモーフ",
@@ -3707,7 +3710,7 @@ export const ja_JP: EnTranslations = {
       },
       "mind_flay": {
         "name": "マインドフレイ",
-        "description": "暗黒エネルギーで対象の精神を攻撃し、3秒間、毎秒12ダメージを与えます。"
+        "description": "暗黒エネルギーで対象の精神を攻撃し、3秒間、毎秒{damage}ダメージを与えます。"
       },
       "flash_heal": {
         "name": "フラッシュヒール",
@@ -3783,7 +3786,7 @@ export const ja_JP: EnTranslations = {
       },
       "drain_life": {
         "name": "ドレインライフ",
-        "description": "対象の生命力を吸収し、5秒間、毎秒7の体力を自分に移します。"
+        "description": "対象の生命力を吸収し、5秒間、毎秒{damage}の体力を自分に移します。"
       },
       "fear": {
         "name": "フィアー",

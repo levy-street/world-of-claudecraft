@@ -55,10 +55,13 @@ describe('registry', () => {
     expect(actionKind('nope')).toBe(null);
   });
 
-  it('covers the expected categories and 12 action-bar slots', () => {
+  it('covers the expected categories and 23 action-bar slots (attack + 11 primary + 11 secondary)', () => {
     expect(BIND_CATEGORIES).toContain('Movement');
     expect(BIND_CATEGORIES).toContain('Action Bar');
-    expect(BIND_ACTIONS.filter((a) => a.category === 'Action Bar').length).toBe(12);
+    expect(BIND_ACTIONS.filter((a) => a.category === 'Action Bar').length).toBe(23);
+    // The secondary bar's slots exist and default to the numpad row.
+    expect(BIND_ACTIONS.find((a) => a.id === 'slot12')?.defaults).toEqual(['Numpad1']);
+    expect(BIND_ACTIONS.find((a) => a.id === 'slot22')?.defaults).toEqual(['NumpadDecimal']);
   });
 });
 

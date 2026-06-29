@@ -11,9 +11,9 @@
 //
 // Sim keeps same-named thin delegates (enterDungeon/leaveDungeon/instanceKeyFor/
 // instanceOriginOf/enterCrypt/leaveCrypt/updateDoorTriggers/updateInstances/
-// instanceSlotAt) so every foreign `this.X` call site resolves unchanged, and the
-// seam exposes instanceKeyFor/instanceOriginOf/enterDungeon/leaveDungeon for the
-// N1/quest/delve code that reaches them through `ctx`.
+// instanceSlotAt/instanceInfoAt) so every foreign `this.X` call site resolves unchanged,
+// and the seam exposes instanceKeyFor/instanceOriginOf/enterDungeon/leaveDungeon for
+// the N1/quest/delve code that reaches them through `ctx`.
 
 import { DUNGEON_X_THRESHOLD, DUNGEONS, dungeonAt, instanceOrigin, MOBS } from '../data';
 import { createGroundObject, createMob } from '../entity';
@@ -294,9 +294,18 @@ export function updateInstances(ctx: SimContext): void {
 }
 
 export function instanceSlotAt(ctx: SimContext, pos: Vec3): number | null {
+  return instanceInfoAt(ctx, pos)?.slot ?? null;
+}
+
+export function instanceInfoAt(
+  ctx: SimContext,
+  pos: Vec3,
+): { slot: number; dungeonId: string } | null {
   for (const inst of ctx.instances) {
     const origin = instanceOriginOf(inst);
-    if (Math.abs(pos.x - origin.x) < 120 && Math.abs(pos.z - origin.z) < 250) return inst.slot;
+    if (Math.abs(pos.x - origin.x) < 120 && Math.abs(pos.z - origin.z) < 250) {
+      return { slot: inst.slot, dungeonId: inst.dungeonId };
+    }
   }
   return null;
 }

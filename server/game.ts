@@ -22,7 +22,12 @@ import {
 import { type CommandName, isOverheadEmoteId } from '../src/world_api';
 import { recordOnlineSample } from './admin_db';
 import { offensiveName } from './auth';
-import type { BotDetector, BotTrackingContext } from './bot_detector/contract';
+import type {
+  BotDetector,
+  BotTrackingContext,
+  SessionRuntimeSnapshot,
+  SuspiciousPlayer,
+} from './bot_detector/contract';
 import { ChatFilter } from './chat_filter';
 import { applyChatStrike, loadChatFilterState, recordChatViolation } from './chat_filter_db';
 import { ChatLogger } from './chat_log';
@@ -477,6 +482,7 @@ function dynamicFields(e: Entity): Record<string, unknown> {
     out.pt = round2(e.petTauntTimer);
     if (e.petAutoTaunt) out.pa = 1;
   }
+  if (e.rangedPower) out.rp = e.rangedPower;
   // top hate-table entries so the party threat meter shows real numbers
   if (e.kind === 'mob' && !e.dead && e.threat.size > 0) out.thr = threatEntries(e, 8);
   if (e.auras.length > 0) {
@@ -902,11 +908,48 @@ export class GameServer {
   private runAntibotTick(): void {
     const now = Date.now();
     for (const session of this.clients.values()) {
-      const action = this.botDetector.handleTick(session.botTrackingContext, now, ANTIBOT_ENFORCE);
+      const action = this.botDetector.handleTick(
+        session.botTrackingContext,
+        now,
+        ANTIBOT_ENFORCE,
+        this.captureBotDetectionSnapshot(session, now),
+      );
       if (action === 'kick') {
         void this.kickSession(session, 'rejected by server', 'disconnected');
       }
     }
+  }
+
+  private captureBotDetectionSnapshot(
+    session: ClientSession,
+    capturedAt: number,
+  ): SessionRuntimeSnapshot | null {
+    const e = this.sim.entities.get(session.pid);
+    if (!e) return null;
+    const instance = this.sim.instanceInfoAt(e.pos);
+    return {
+      capturedAt,
+      simTime: this.sim.time,
+      x: e.pos.x,
+      z: e.pos.z,
+      facing: e.facing,
+      dead: e.dead,
+      inCombat: e.inCombat,
+      targetId: e.targetId,
+      instanceSlot: instance?.slot ?? null,
+      instanceDungeonId: instance?.dungeonId ?? null,
+      level: e.level,
+      classId: e.templateId,
+      hp: e.hp,
+      maxHp: e.maxHp,
+      resource: e.resource,
+      maxResource: e.maxResource,
+      resourceType: e.resourceType,
+      autoAttack: e.autoAttack,
+      followTargetId: e.followTargetId,
+      moveSpeed: e.moveSpeed,
+      onGround: e.onGround,
+    };
   }
 
   private clearStaleInputs(): void {
@@ -1394,6 +1437,10 @@ export class GameServer {
         ` | p95/max ${['total', 'tick', 'broadcast', 'bcastSelf', 'bcastGrid', 'events', 'social'].map(fmt).join(' ')}` +
         ` | visits=${this.bcVisits} serializes=${this.bcSerializes} serializeMs=${round2(Number(this.bcSerializeNs) / 1e6)}`,
     );
+  }
+
+  suspiciousPlayers(): SuspiciousPlayer[] {
+    return this.botDetector.listSuspiciousPlayers();
   }
 
   liveSessions(): AdminLivePlayer[] {
@@ -2466,6 +2513,7 @@ export class GameServer {
       auto: p.autoAttack,
       queued: p.queuedOnSwing,
       ap: p.attackPower,
+      sp: p.spellPower,
       crit: p.critChance,
       dodge: p.dodgeChance,
       eat: p.eating ? { remaining: round2(p.eating.remaining) } : null,

@@ -35,7 +35,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 395,
-      "state": "e839c209",
+      "state": "ea9f3dfb",
       "events": "76786ab8",
       "rng": {
         "draws": 2,
@@ -46,7 +46,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 395,
-      "state": "97c69b7f",
+      "state": "f54b6f6d",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -57,7 +57,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 395,
-      "state": "5cf1df75",
+      "state": "74685b47",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -68,7 +68,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 395,
-      "state": "cb6135d9",
+      "state": "684db6eb",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -79,7 +79,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 395,
-      "state": "34432532",
+      "state": "dc21136c",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -90,7 +90,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 395,
-      "state": "71fa2916",
+      "state": "948fa1ee",
       "events": "d02c3164",
       "rng": {
         "draws": 4,
@@ -101,7 +101,7 @@
       "tick": 32,
       "time": 1.6,
       "nextId": 395,
-      "state": "c00c0a88",
+      "state": "4294003c",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -263,6 +263,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 39,
             "armor": 376,
@@ -311,6 +312,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 41,
           "stats": {
             "agi": 12,
             "armor": 133,
@@ -359,6 +361,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 6,
           "stats": {
             "agi": 82,
             "armor": 370,
@@ -407,6 +410,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 16,
           "stats": {
             "agi": 36,
             "armor": 365,
@@ -455,6 +459,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 29,
           "stats": {
             "agi": 34,
             "armor": 226,
@@ -505,6 +510,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 40,
           "stats": {
             "agi": 12,
             "armor": 130,
@@ -600,7 +606,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 395,
-      "state": "2061bd9d",
+      "state": "c963bfbf",
       "events": "2077d05b",
       "rng": {
         "draws": 4,
@@ -611,7 +617,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 395,
-      "state": "d5e8f5cc",
+      "state": "ba3fa5d6",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -622,7 +628,7 @@
       "tick": 45,
       "time": 2.25,
       "nextId": 395,
-      "state": "3a617052",
+      "state": "e8c3604c",
       "events": "741638a5",
       "rng": {
         "draws": 36,
@@ -633,7 +639,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 395,
-      "state": "4fbea86a",
+      "state": "db65ddd0",
       "events": "741638a5",
       "rng": {
         "draws": 50,
@@ -644,7 +650,7 @@
       "tick": 55,
       "time": 2.75,
       "nextId": 395,
-      "state": "93a795ff",
+      "state": "99a83a91",
       "events": "741638a5",
       "rng": {
         "draws": 66,
@@ -655,7 +661,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 395,
-      "state": "549b80e5",
+      "state": "d9444433",
       "events": "741638a5",
       "rng": {
         "draws": 80,
@@ -666,7 +672,7 @@
       "tick": 65,
       "time": 3.25,
       "nextId": 395,
-      "state": "ed01ec6b",
+      "state": "72d53849",
       "events": "741638a5",
       "rng": {
         "draws": 101,
@@ -677,7 +683,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 395,
-      "state": "5d3dfdb4",
+      "state": "4d5c3128",
       "events": "741638a5",
       "rng": {
         "draws": 127,
@@ -688,7 +694,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 395,
-      "state": "9a4e2c3e",
+      "state": "c5505b74",
       "events": "741638a5",
       "rng": {
         "draws": 152,
@@ -699,7 +705,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 395,
-      "state": "9079bdea",
+      "state": "e711a61a",
       "events": "741638a5",
       "rng": {
         "draws": 174,
@@ -710,7 +716,7 @@
       "tick": 85,
       "time": 4.25,
       "nextId": 395,
-      "state": "25e3b2b1",
+      "state": "4c8ecb9b",
       "events": "741638a5",
       "rng": {
         "draws": 203,
@@ -721,7 +727,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 395,
-      "state": "9c9a1153",
+      "state": "3de20753",
       "events": "741638a5",
       "rng": {
         "draws": 230,
@@ -732,7 +738,7 @@
       "tick": 95,
       "time": 4.75,
       "nextId": 395,
-      "state": "89218676",
+      "state": "279b4a08",
       "events": "741638a5",
       "rng": {
         "draws": 253,
@@ -743,7 +749,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 395,
-      "state": "309882f9",
+      "state": "7761fe71",
       "events": "741638a5",
       "rng": {
         "draws": 276,
@@ -754,7 +760,7 @@
       "tick": 105,
       "time": 5.25,
       "nextId": 395,
-      "state": "23e8d7fb",
+      "state": "0c98db95",
       "events": "741638a5",
       "rng": {
         "draws": 304,
@@ -765,7 +771,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 395,
-      "state": "6d7a4b84",
+      "state": "52e13788",
       "events": "741638a5",
       "rng": {
         "draws": 328,
@@ -776,7 +782,7 @@
       "tick": 115,
       "time": 5.75,
       "nextId": 395,
-      "state": "2dc8fbfe",
+      "state": "1831dba0",
       "events": "741638a5",
       "rng": {
         "draws": 360,
@@ -787,7 +793,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 395,
-      "state": "9b7aba87",
+      "state": "93620697",
       "events": "741638a5",
       "rng": {
         "draws": 387,
@@ -798,7 +804,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 395,
-      "state": "5cbaf2ce",
+      "state": "54eb7214",
       "events": "741638a5",
       "rng": {
         "draws": 406,
@@ -809,7 +815,7 @@
       "tick": 130,
       "time": 6.5,
       "nextId": 395,
-      "state": "44a2a220",
+      "state": "47e64188",
       "events": "741638a5",
       "rng": {
         "draws": 433,
@@ -820,7 +826,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 396,
-      "state": "801fa0ba",
+      "state": "3075d8f2",
       "events": "1d7706ab",
       "rng": {
         "draws": 444,
@@ -982,6 +988,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 39,
             "armor": 376,
@@ -1030,6 +1037,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 41,
           "stats": {
             "agi": 12,
             "armor": 133,
@@ -1078,6 +1086,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 6,
           "stats": {
             "agi": 82,
             "armor": 370,
@@ -1126,6 +1135,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 16,
           "stats": {
             "agi": 36,
             "armor": 365,
@@ -1174,6 +1184,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 29,
           "stats": {
             "agi": 34,
             "armor": 226,
@@ -1224,6 +1235,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 40,
           "stats": {
             "agi": 12,
             "armor": 130,
@@ -1319,7 +1331,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 397,
-      "state": "125980c1",
+      "state": "153acee5",
       "events": "2c561b83",
       "rng": {
         "draws": 445,
@@ -1483,6 +1495,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 39,
             "armor": 376,
@@ -1532,6 +1545,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 41,
           "stats": {
             "agi": 12,
             "armor": 133,
@@ -1580,6 +1594,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 6,
           "stats": {
             "agi": 82,
             "armor": 370,
@@ -1628,6 +1643,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 16,
           "stats": {
             "agi": 36,
             "armor": 365,
@@ -1676,6 +1692,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 29,
           "stats": {
             "agi": 34,
             "armor": 226,
@@ -1726,6 +1743,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 40,
           "stats": {
             "agi": 12,
             "armor": 130,
@@ -1886,8 +1904,8 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 399,
-      "state": "e6047c69",
-      "events": "3e994f44",
+      "state": "3cc3e89b",
+      "events": "a395f6c5",
       "rng": {
         "draws": 447,
         "digest": "f185f2b2"
@@ -1921,7 +1939,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 57
+            "damageDealt": 69
           },
           "delveClears": {},
           "delveDaily": {},
@@ -2052,6 +2070,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 39,
             "armor": 376,
@@ -2101,6 +2120,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 41,
           "stats": {
             "agi": 12,
             "armor": 133,
@@ -2149,6 +2169,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 6,
           "stats": {
             "agi": 82,
             "armor": 370,
@@ -2197,6 +2218,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 16,
           "stats": {
             "agi": 36,
             "armor": 365,
@@ -2245,6 +2267,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 29,
           "stats": {
             "agi": 34,
             "armor": 226,
@@ -2295,6 +2318,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 40,
           "stats": {
             "agi": 12,
             "armor": 130,
@@ -2458,7 +2482,7 @@
           "fallStartY": -3.247367,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499973,
+          "hp": 499967,
           "id": 397,
           "inCombat": true,
           "kind": "mob",
@@ -2493,7 +2517,7 @@
           "threat": [
             [
               389,
-              28
+              34
             ]
           ],
           "weapon": {
@@ -2511,7 +2535,7 @@
           "fallStartY": -3.247367,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499970,
+          "hp": 499964,
           "id": 398,
           "inCombat": true,
           "kind": "mob",
@@ -2546,7 +2570,7 @@
           "threat": [
             [
               389,
-              31
+              37
             ]
           ],
           "weapon": {
@@ -2561,7 +2585,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 400,
-      "state": "2dfe5542",
+      "state": "da98623a",
       "events": "06593d19",
       "rng": {
         "draws": 452,
@@ -2596,7 +2620,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 57
+            "damageDealt": 69
           },
           "delveClears": {},
           "delveDaily": {},
@@ -2729,6 +2753,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 39,
             "armor": 376,
@@ -2778,6 +2803,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 41,
           "stats": {
             "agi": 12,
             "armor": 133,
@@ -2834,6 +2860,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 6,
           "stats": {
             "agi": 82,
             "armor": 370,
@@ -2883,6 +2910,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 16,
           "stats": {
             "agi": 36,
             "armor": 365,
@@ -2931,6 +2959,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 29,
           "stats": {
             "agi": 34,
             "armor": 226,
@@ -2981,6 +3010,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 40,
           "stats": {
             "agi": 12,
             "armor": 130,
@@ -3144,7 +3174,7 @@
           "fallStartY": -3.247367,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499973,
+          "hp": 499967,
           "id": 397,
           "inCombat": true,
           "kind": "mob",
@@ -3179,7 +3209,7 @@
           "threat": [
             [
               389,
-              28
+              34
             ]
           ],
           "weapon": {
@@ -3197,7 +3227,7 @@
           "fallStartY": -3.247367,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499970,
+          "hp": 499964,
           "id": 398,
           "inCombat": true,
           "kind": "mob",
@@ -3232,7 +3262,7 @@
           "threat": [
             [
               389,
-              31
+              37
             ]
           ],
           "weapon": {
@@ -3311,8 +3341,8 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 401,
-      "state": "65583bfe",
-      "events": "ffa85df2",
+      "state": "8f28b657",
+      "events": "c1c256fa",
       "rng": {
         "draws": 456,
         "digest": "f6b81b22"
@@ -3346,7 +3376,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 57
+            "damageDealt": 69
           },
           "delveClears": {},
           "delveDaily": {},
@@ -3390,7 +3420,7 @@
           "cls": "paladin",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 70
+            "damageDealt": 79
           },
           "delveClears": {},
           "delveDaily": {},
@@ -3481,6 +3511,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 39,
             "armor": 376,
@@ -3530,6 +3561,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 41,
           "stats": {
             "agi": 12,
             "armor": 133,
@@ -3586,6 +3618,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 6,
           "stats": {
             "agi": 82,
             "armor": 370,
@@ -3645,6 +3678,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 16,
           "stats": {
             "agi": 36,
             "armor": 365,
@@ -3694,6 +3728,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 29,
           "stats": {
             "agi": 34,
             "armor": 226,
@@ -3744,6 +3779,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 40,
           "stats": {
             "agi": 12,
             "armor": 130,
@@ -3907,7 +3943,7 @@
           "fallStartY": -3.247367,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499973,
+          "hp": 499967,
           "id": 397,
           "inCombat": true,
           "kind": "mob",
@@ -3942,7 +3978,7 @@
           "threat": [
             [
               389,
-              28
+              34
             ]
           ],
           "weapon": {
@@ -3960,7 +3996,7 @@
           "fallStartY": -3.247367,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499970,
+          "hp": 499964,
           "id": 398,
           "inCombat": true,
           "kind": "mob",
@@ -3995,7 +4031,7 @@
           "threat": [
             [
               389,
-              31
+              37
             ]
           ],
           "weapon": {
@@ -4077,7 +4113,7 @@
           "fallStartY": -1.36912,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499930,
+          "hp": 499921,
           "id": 400,
           "inCombat": true,
           "kind": "mob",
@@ -4109,7 +4145,7 @@
           "threat": [
             [
               391,
-              71
+              80
             ]
           ],
           "weapon": {
@@ -4124,8 +4160,8 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 402,
-      "state": "680ab8ef",
-      "events": "9834b1cf",
+      "state": "4ecedd2a",
+      "events": "555e2b8a",
       "rng": {
         "draws": 459,
         "digest": "10480b84"
@@ -4159,7 +4195,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 57
+            "damageDealt": 69
           },
           "delveClears": {},
           "delveDaily": {},
@@ -4203,7 +4239,7 @@
           "cls": "paladin",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 70
+            "damageDealt": 79
           },
           "delveClears": {},
           "delveDaily": {},
@@ -4225,7 +4261,7 @@
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 30
+            "damageDealt": 42
           },
           "delveClears": {},
           "delveDaily": {},
@@ -4296,6 +4332,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 39,
             "armor": 376,
@@ -4345,6 +4382,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 41,
           "stats": {
             "agi": 12,
             "armor": 133,
@@ -4401,6 +4439,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 6,
           "stats": {
             "agi": 82,
             "armor": 370,
@@ -4460,6 +4499,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 16,
           "stats": {
             "agi": 36,
             "armor": 365,
@@ -4521,6 +4561,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 29,
           "stats": {
             "agi": 44,
             "armor": 226,
@@ -4572,6 +4613,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 40,
           "stats": {
             "agi": 12,
             "armor": 130,
@@ -4735,7 +4777,7 @@
           "fallStartY": -3.247367,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499973,
+          "hp": 499967,
           "id": 397,
           "inCombat": true,
           "kind": "mob",
@@ -4770,7 +4812,7 @@
           "threat": [
             [
               389,
-              28
+              34
             ]
           ],
           "weapon": {
@@ -4788,7 +4830,7 @@
           "fallStartY": -3.247367,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499970,
+          "hp": 499964,
           "id": 398,
           "inCombat": true,
           "kind": "mob",
@@ -4823,7 +4865,7 @@
           "threat": [
             [
               389,
-              31
+              37
             ]
           ],
           "weapon": {
@@ -4905,7 +4947,7 @@
           "fallStartY": -1.36912,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499930,
+          "hp": 499921,
           "id": 400,
           "inCombat": true,
           "kind": "mob",
@@ -4937,7 +4979,7 @@
           "threat": [
             [
               391,
-              71
+              80
             ]
           ],
           "weapon": {
@@ -4969,7 +5011,7 @@
           "fallStartY": -1.618121,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499970,
+          "hp": 499958,
           "id": 401,
           "inCombat": true,
           "kind": "mob",
@@ -5004,7 +5046,7 @@
           "threat": [
             [
               392,
-              31
+              43
             ]
           ],
           "weapon": {
@@ -5019,7 +5061,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 402,
-      "state": "680ab8ef",
+      "state": "4ecedd2a",
       "events": "741638a5",
       "rng": {
         "draws": 459,
@@ -5054,7 +5096,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 57
+            "damageDealt": 69
           },
           "delveClears": {},
           "delveDaily": {},
@@ -5098,7 +5140,7 @@
           "cls": "paladin",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 70
+            "damageDealt": 79
           },
           "delveClears": {},
           "delveDaily": {},
@@ -5120,7 +5162,7 @@
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 30
+            "damageDealt": 42
           },
           "delveClears": {},
           "delveDaily": {},
@@ -5191,6 +5233,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 39,
             "armor": 376,
@@ -5240,6 +5283,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 41,
           "stats": {
             "agi": 12,
             "armor": 133,
@@ -5296,6 +5340,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 6,
           "stats": {
             "agi": 82,
             "armor": 370,
@@ -5355,6 +5400,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 16,
           "stats": {
             "agi": 36,
             "armor": 365,
@@ -5416,6 +5462,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 29,
           "stats": {
             "agi": 44,
             "armor": 226,
@@ -5467,6 +5514,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 40,
           "stats": {
             "agi": 12,
             "armor": 130,
@@ -5630,7 +5678,7 @@
           "fallStartY": -3.247367,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499973,
+          "hp": 499967,
           "id": 397,
           "inCombat": true,
           "kind": "mob",
@@ -5665,7 +5713,7 @@
           "threat": [
             [
               389,
-              28
+              34
             ]
           ],
           "weapon": {
@@ -5683,7 +5731,7 @@
           "fallStartY": -3.247367,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499970,
+          "hp": 499964,
           "id": 398,
           "inCombat": true,
           "kind": "mob",
@@ -5718,7 +5766,7 @@
           "threat": [
             [
               389,
-              31
+              37
             ]
           ],
           "weapon": {
@@ -5800,7 +5848,7 @@
           "fallStartY": -1.36912,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499930,
+          "hp": 499921,
           "id": 400,
           "inCombat": true,
           "kind": "mob",
@@ -5832,7 +5880,7 @@
           "threat": [
             [
               391,
-              71
+              80
             ]
           ],
           "weapon": {
@@ -5864,7 +5912,7 @@
           "fallStartY": -1.618121,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499970,
+          "hp": 499958,
           "id": 401,
           "inCombat": true,
           "kind": "mob",
@@ -5899,7 +5947,7 @@
           "threat": [
             [
               392,
-              31
+              43
             ]
           ],
           "weapon": {

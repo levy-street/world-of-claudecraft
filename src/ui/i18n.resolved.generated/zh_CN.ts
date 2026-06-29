@@ -222,6 +222,9 @@ export const zh_CN: EnTranslations = {
     "rest": {
       "resting": "休息中"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
     "unitFrame": {
       "playerLabel": "你的角色",
       "targetLabel": "你的目标",
@@ -3459,7 +3462,7 @@ export const zh_CN: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "奥术飞弹",
-        "description": "向敌人发射奥术飞弹，持续 3 秒，每秒造成 8 点奥术伤害。"
+        "description": "向敌人发射奥术飞弹，持续 3 秒，每秒造成 {damage} 点奥术伤害。"
       },
       "polymorph": {
         "name": "变形术",
@@ -3707,7 +3710,7 @@ export const zh_CN: EnTranslations = {
       },
       "mind_flay": {
         "name": "精神鞭笞",
-        "description": "用暗影能量攻击目标的心灵，持续 3 秒，每秒造成 12 点伤害。"
+        "description": "用暗影能量攻击目标的心灵，持续 3 秒，每秒造成 {damage} 点伤害。"
       },
       "flash_heal": {
         "name": "快速治疗",
@@ -3783,7 +3786,7 @@ export const zh_CN: EnTranslations = {
       },
       "drain_life": {
         "name": "吸取生命",
-        "description": "吸取目标的生命，持续 5 秒，每秒向你转移 7 点生命值。"
+        "description": "吸取目标的生命，持续 5 秒，每秒向你转移 {damage} 点生命值。"
       },
       "fear": {
         "name": "恐惧",

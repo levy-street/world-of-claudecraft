@@ -1634,7 +1634,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '敵を爆炎で打ち、{damage} の火炎ダメージを与えます。即時発動。',
   'entities.abilities.arcane_missiles.name': 'アーケインミサイル',
   'entities.abilities.arcane_missiles.description':
-    '敵にアーケインミサイルを放ち、3秒間、毎秒8の秘術ダメージを与えます。',
+    '敵にアーケインミサイルを放ち、3秒間、毎秒{damage}の秘術ダメージを与えます。',
   'entities.abilities.polymorph.name': 'ポリモーフ',
   'entities.abilities.polymorph.description':
     '敵を最大15秒間ヒツジに変えます。ヒツジは歩き回り、急速に回復します。ダメージを受けると効果が切れます。獣と人型のみ。',
@@ -1803,7 +1803,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '遅いが強力な祈りで、味方対象の体力を {damage} 回復します。',
   'entities.abilities.mind_flay.name': 'マインドフレイ',
   'entities.abilities.mind_flay.description':
-    '暗黒エネルギーで対象の精神を攻撃し、3秒間、毎秒12ダメージを与えます。',
+    '暗黒エネルギーで対象の精神を攻撃し、3秒間、毎秒{damage}ダメージを与えます。',
   'entities.abilities.flash_heal.name': 'フラッシュヒール',
   'entities.abilities.flash_heal.description': '素早い祈りで味方対象の体力を {damage} 回復します。',
   'entities.abilities.lightning_bolt.name': 'ライトニングボルト',
@@ -1856,7 +1856,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '対象に苦痛の呪いをかけ、24秒間で {damage} の暗黒ダメージを与えます。',
   'entities.abilities.drain_life.name': 'ドレインライフ',
   'entities.abilities.drain_life.description':
-    '対象の生命力を吸収し、5秒間、毎秒7の体力を自分に移します。',
+    '対象の生命力を吸収し、5秒間、毎秒{damage}の体力を自分に移します。',
   'entities.abilities.fear.name': 'フィアー',
   'entities.abilities.fear.description':
     '敵に恐怖を刻み、最大8秒間おびえさせます。ダメージを受けると効果が切れます。',

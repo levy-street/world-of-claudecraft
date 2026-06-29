@@ -222,6 +222,9 @@ export const fr_FR: EnTranslations = {
     "rest": {
       "resting": "Au repos"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
     "unitFrame": {
       "playerLabel": "Votre personnage",
       "targetLabel": "Votre cible",
@@ -3459,7 +3462,7 @@ export const fr_FR: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "Projectiles des Arcanes",
-        "description": "Lance des Projectiles des Arcanes sur l'ennemi et inflige 8 points de dégâts des Arcanes chaque seconde pendant 3 s."
+        "description": "Lance des Projectiles des Arcanes sur l'ennemi et inflige {damage} points de dégâts des Arcanes chaque seconde pendant 3 s."
       },
       "polymorph": {
         "name": "Métamorphose",
@@ -3707,7 +3710,7 @@ export const fr_FR: EnTranslations = {
       },
       "mind_flay": {
         "name": "Fouet mental",
-        "description": "Assaille l'esprit de la cible avec de l'énergie d'Ombre et inflige 12 points de dégâts chaque seconde pendant 3 s."
+        "description": "Assaille l'esprit de la cible avec de l'énergie d'Ombre et inflige {damage} points de dégâts chaque seconde pendant 3 s."
       },
       "flash_heal": {
         "name": "Soins rapides",
@@ -3783,7 +3786,7 @@ export const fr_FR: EnTranslations = {
       },
       "drain_life": {
         "name": "Drain de vie",
-        "description": "Draine la vie de la cible et vous transfère 7 points de vie chaque seconde pendant 5 s."
+        "description": "Draine la vie de la cible et vous transfère {damage} points de vie chaque seconde pendant 5 s."
       },
       "fear": {
         "name": "Peur",

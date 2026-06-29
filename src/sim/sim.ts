@@ -189,6 +189,7 @@ export type { MarketSave } from './market';
 import {
   enterCrypt as enterCryptImpl,
   enterDungeon as enterDungeonImpl,
+  instanceInfoAt as instanceInfoAtImpl,
   instanceKeyFor as instanceKeyForImpl,
   instanceOriginOf as instanceOriginOfImpl,
   instanceSlotAt as instanceSlotAtImpl,
@@ -2861,7 +2862,7 @@ export class Sim {
     });
     for (const target of this.hostilesInRadius(source, effect.pos, effect.radius)) {
       if (!this.hasLineOfSight(source, target)) continue;
-      const dmg = Math.round(this.rng.range(effect.min, effect.max));
+      const dmg = Math.round(this.rng.range(effect.min, effect.max) + (effect.spBonus ?? 0));
       this.dealDamage(
         source,
         target,
@@ -5193,6 +5194,10 @@ export class Sim {
 
   instanceSlotAt(pos: Vec3): number | null {
     return instanceSlotAtImpl(this.ctx, pos);
+  }
+
+  instanceInfoAt(pos: Vec3): { slot: number; dungeonId: string } | null {
+    return instanceInfoAtImpl(this.ctx, pos);
   }
 
   private error(pid: number, text: string, reason?: ErrorReason): void {

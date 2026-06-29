@@ -426,8 +426,12 @@ describe('the Hollow Crypt doors', () => {
     expect(eb.pos.x).toBeGreaterThan(DUNGEON_X_THRESHOLD);
     const slotA = sim.instanceSlotAt(ea.pos);
     const slotB = sim.instanceSlotAt(eb.pos);
+    const infoA = sim.instanceInfoAt(ea.pos);
+    const infoB = sim.instanceInfoAt(eb.pos);
     expect(slotA).not.toBeNull();
     expect(slotA).toBe(slotB);
+    expect(infoA).toEqual({ slot: slotA, dungeonId: 'hollow_crypt' });
+    expect(infoB).toEqual(infoA);
   });
 
   it('solo players from different groups get different instances', () => {

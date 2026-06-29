@@ -36,7 +36,7 @@ describe('wallet link signature verification', () => {
 
   it('rejects a tampered message', () => {
     const signature = sign(message, wallet.priv);
-    expect(verifySolanaSignature(message + ' ', signature, wallet.address)).toBe(false);
+    expect(verifySolanaSignature(`${message} `, signature, wallet.address)).toBe(false);
   });
 
   it('rejects a signature produced by a different wallet', () => {

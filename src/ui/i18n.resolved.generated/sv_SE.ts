@@ -222,6 +222,9 @@ export const sv_SE: EnTranslations = {
     "rest": {
       "resting": "Vilar"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
     "unitFrame": {
       "playerLabel": "Din hjälte",
       "targetLabel": "Ditt mål",
@@ -3459,7 +3462,7 @@ export const sv_SE: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "Arkana missiler",
-        "description": "Skickar arkana missiler mot fienden och vållar 8 arkanskada varje sekund i 3 sek."
+        "description": "Skickar arkana missiler mot fienden och vållar {damage} arkanskada varje sekund i 3 sek."
       },
       "polymorph": {
         "name": "Förvandling",
@@ -3707,7 +3710,7 @@ export const sv_SE: EnTranslations = {
       },
       "mind_flay": {
         "name": "Sinnesgissel",
-        "description": "Angriper målets sinne med skuggenergi och vållar 12 skada varje sekund i 3 sek."
+        "description": "Angriper målets sinne med skuggenergi och vållar {damage} skada varje sekund i 3 sek."
       },
       "flash_heal": {
         "name": "Snabbläkning",
@@ -3783,7 +3786,7 @@ export const sv_SE: EnTranslations = {
       },
       "drain_life": {
         "name": "Dränera liv",
-        "description": "Dränerar målets liv och överför 7 hälsa till dig varje sekund i 5 sek."
+        "description": "Dränerar målets liv och överför {damage} hälsa till dig varje sekund i 5 sek."
       },
       "fear": {
         "name": "Skräck",

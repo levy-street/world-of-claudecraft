@@ -222,6 +222,9 @@ export const en_XA: EnTranslations = {
     "rest": {
       "resting": "[Ŕéšţíñĝ]"
     },
+    "abilityScaling": {
+      "bonus": "[(+{value})]"
+    },
     "unitFrame": {
       "playerLabel": "[Ýóúŕ Ĥéŕó]",
       "targetLabel": "[Ýóúŕ Ɱáŕķ]",
@@ -3459,7 +3462,7 @@ export const en_XA: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "[Áŕçáñé Ɱíššíļéš]",
-        "description": "[Ļáúñçĥéš Áŕçáñé Ɱíššíļéš áţ ţĥé éñéɱý, çáúšíñĝ 8 Áŕçáñé ðáɱáĝé éáçĥ šéçóñð ƒóŕ 3 šéç.]"
+        "description": "[Ļáúñçĥéš Áŕçáñé Ɱíššíļéš áţ ţĥé éñéɱý, çáúšíñĝ {damage} Áŕçáñé ðáɱáĝé éáçĥ šéçóñð ƒóŕ 3 šéç.]"
       },
       "polymorph": {
         "name": "[Þóļýɱóŕþĥ]",
@@ -3707,7 +3710,7 @@ export const en_XA: EnTranslations = {
       },
       "mind_flay": {
         "name": "[Ɱíñð Ƒļáý]",
-        "description": "[Áššáúļţš ţĥé ţáŕĝéţ'š ɱíñð ŵíţĥ Šĥáðóŵ éñéŕĝý, çáúšíñĝ 12 ðáɱáĝé éáçĥ šéçóñð ƒóŕ 3 šéç.]"
+        "description": "[Áššáúļţš ţĥé ţáŕĝéţ'š ɱíñð ŵíţĥ Šĥáðóŵ éñéŕĝý, çáúšíñĝ {damage} ðáɱáĝé éáçĥ šéçóñð ƒóŕ 3 šéç.]"
       },
       "flash_heal": {
         "name": "[Ƒļášĥ Ĥéáļ]",
@@ -3783,7 +3786,7 @@ export const en_XA: EnTranslations = {
       },
       "drain_life": {
         "name": "[Ðŕáíñ Ļíƒé]",
-        "description": "[Ðŕáíñš ţĥé ţáŕĝéţ'š ļíƒé, ţŕáñšƒéŕŕíñĝ 7 ĥéáļţĥ ţó ýóú éáçĥ šéçóñð ƒóŕ 5 šéç.]"
+        "description": "[Ðŕáíñš ţĥé ţáŕĝéţ'š ļíƒé, ţŕáñšƒéŕŕíñĝ {damage} ĥéáļţĥ ţó ýóú éáçĥ šéçóñð ƒóŕ 5 šéç.]"
       },
       "fear": {
         "name": "[Ƒéáŕ]",

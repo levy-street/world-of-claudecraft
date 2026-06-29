@@ -353,7 +353,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_intellect.description': 'Tăng 2 Trí Tuệ trong 30 phút.',
   'entities.abilities.arcane_intellect.name': 'Trí Tuệ Bí Thuật',
   'entities.abilities.arcane_missiles.description':
-    'Phóng các Phi Đạn Bí Thuật vào kẻ địch, gây 8 sát thương Bí Thuật mỗi giây trong 3 giây.',
+    'Phóng các Phi Đạn Bí Thuật vào kẻ địch, gây {damage} sát thương Bí Thuật mỗi giây trong 3 giây.',
   'entities.abilities.arcane_missiles.name': 'Phi Đạn Bí Thuật',
   'entities.abilities.arcane_shot.description':
     'Một phát bắn tức thời gây {damage} sát thương Bí Thuật.',
@@ -462,7 +462,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Một tấm khiên thần thánh hấp thụ 50 sát thương trong 10 giây.',
   'entities.abilities.divine_protection.name': 'Thần Thánh Bảo Hộ',
   'entities.abilities.drain_life.description':
-    'Hút sinh lực của mục tiêu, chuyển 7 máu sang cho bạn mỗi giây trong 5 giây.',
+    'Hút sinh lực của mục tiêu, chuyển {damage} máu sang cho bạn mỗi giây trong 5 giây.',
   'entities.abilities.drain_life.name': 'Hút Sinh Lực',
   'entities.abilities.earth_shock.description':
     'Lập tức giáng chấn động vào mục tiêu, gây {damage} sát thương Tự Nhiên.',
@@ -600,7 +600,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Nổ tung tâm trí của mục tiêu gây {damage} sát thương Bóng Tối.',
   'entities.abilities.mind_blast.name': 'Nổ Tâm Trí',
   'entities.abilities.mind_flay.description':
-    'Công kích tâm trí mục tiêu bằng năng lượng Bóng Tối, gây 12 sát thương mỗi giây trong 3 giây.',
+    'Công kích tâm trí mục tiêu bằng năng lượng Bóng Tối, gây {damage} sát thương mỗi giây trong 3 giây.',
   'entities.abilities.mind_flay.name': 'Cào Xé Tâm Trí',
   'entities.abilities.mongoose_bite.description':
     'Phản công sau khi mục tiêu né đòn, gây sát thương vũ khí cộng thêm 12. Không thể bị né.',

@@ -351,7 +351,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_intellect.description': 'Zwiększa intelekt o 2 na 30 min.',
   'entities.abilities.arcane_intellect.name': 'Arkaniczny intelekt',
   'entities.abilities.arcane_missiles.description':
-    'Wystrzeliwuje arkaniczne pociski we wroga, zadając 8 obrażeń arkanicznych co sekundę przez 3 sek.',
+    'Wystrzeliwuje arkaniczne pociski we wroga, zadając {damage} obrażeń arkanicznych co sekundę przez 3 sek.',
   'entities.abilities.arcane_missiles.name': 'Arkaniczne pociski',
   'entities.abilities.arcane_shot.description':
     'Natychmiastowy strzał, który zadaje {damage} obrażeń arkanicznych.',
@@ -459,7 +459,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Święta tarcza pochłania 50 obrażeń przez 10 sek.',
   'entities.abilities.divine_protection.name': 'Boska ochrona',
   'entities.abilities.drain_life.description':
-    'Wysysa życie celu, przekazując ci 7 zdrowia co sekundę przez 5 sek.',
+    'Wysysa życie celu, przekazując ci {damage} zdrowia co sekundę przez 5 sek.',
   'entities.abilities.drain_life.name': 'Wyssanie życia',
   'entities.abilities.earth_shock.description':
     'Natychmiast razi cel wstrząsową siłą, zadając {damage} obrażeń od natury.',
@@ -597,7 +597,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Razi umysł celu, zadając {damage} obrażeń od cienia.',
   'entities.abilities.mind_blast.name': 'Atak umysłu',
   'entities.abilities.mind_flay.description':
-    'Naciera na umysł celu energią cienia, zadając 12 obrażeń co sekundę przez 3 sek.',
+    'Naciera na umysł celu energią cienia, zadając {damage} obrażeń co sekundę przez 3 sek.',
   'entities.abilities.mind_flay.name': 'Smaganie umysłu',
   'entities.abilities.mongoose_bite.description':
     'Kontratak po uniku celu, zadający obrażenia broni plus 12. Nie można uniknąć.',
