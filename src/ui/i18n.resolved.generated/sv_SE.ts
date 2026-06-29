@@ -591,6 +591,26 @@ export const sv_SE: EnTranslations = {
       "exportDone": "Dina data laddades ner. Vi har mejlat dig en bekräftelse.",
       "exportFailed": "Kunde inte exportera dina data. Försök igen om en stund."
     },
+    "masterLoot": {
+      "title": "Master loot",
+      "enableLabel": "Master loot",
+      "enableAria": "Aktivera master loot",
+      "looterLabel": "Master looter",
+      "leaderOption": "Gruppledare",
+      "thresholdLabel": "Tröskel",
+      "thresholdUncommon": "Ovanlig och uppat",
+      "thresholdRare": "Sallsynt och uppat",
+      "thresholdEpic": "Episk och uppat",
+      "assignPrompt": "Tilldela {item}",
+      "assignAria": "Tilldela {item} till {name}",
+      "rollButton": "Slå",
+      "selectAll": "Markera alla",
+      "methodMaster": "Lootmetod satt till master loot. Master looter: {name}.",
+      "methodGroup": "Lootmetod satt till grupploot.",
+      "assigned": "{looter} tilldelade {item} till {target}.",
+      "unassigned": "{item} tilldelades inte och ar fritt for alla.",
+      "leaderOnly": "Endast gruppledaren kan andra lootmetoden."
+    },
     "bags": {
       "filterGroupAria": "Filtrera väskor efter kategori",
       "filterAll": "Alla",
@@ -6370,39 +6390,39 @@ export const sv_SE: EnTranslations = {
     },
     "itemSets": {
       "crownforged": {
-        "name": "Crownforged Regalia",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Strength by 15 and Stamina by 15."
+        "name": "Kronsmidd stridsutrustning",
+        "bonus2": "Ökar attackkraft med 40.",
+        "bonus3": "Ökar styrka med 15 och uthållighet med 15."
       },
       "deathlord": {
-        "name": "Deathlord Battlegear",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Strength by 15 and Stamina by 15."
+        "name": "Dödsherrens stridsutrustning",
+        "bonus2": "Ökar attackkraft med 40.",
+        "bonus3": "Ökar styrka med 15 och uthållighet med 15."
       },
       "necromancers": {
-        "name": "Necromancer's Raiment",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "Nekromantikerns skrud",
+        "bonus2": "Minskar kastfördröjning från skada med 50%.",
+        "bonus3": "Skada du tar fördröjer inte dina besvärjelser."
       },
       "nighttalon": {
-        "name": "Nighttalon Pelt",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15 and critical strike chance by 2%."
+        "name": "Nattklo läderutrustning",
+        "bonus2": "Ökar attackkraft med 40.",
+        "bonus3": "Ökar smidighet med 15 och kritisk chans med 2%."
       },
       "soulflame": {
-        "name": "Soulflame Regalia",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "Själsflammans skrud",
+        "bonus2": "Minskar kastfördröjning från skada med 50%.",
+        "bonus3": "Skada du tar fördröjer inte dina besvärjelser."
       },
       "stormcallers": {
-        "name": "Stormcaller's Vestments",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "Stormkallarens skrud",
+        "bonus2": "Minskar kastfördröjning från skada med 50%.",
+        "bonus3": "Skada du tar fördröjer inte dina besvärjelser."
       },
       "wyrmshadow": {
-        "name": "Wyrmshadow Vestments",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15 and critical strike chance by 2%."
+        "name": "Wyrmskuggans utrustning",
+        "bonus2": "Ökar attackkraft med 40.",
+        "bonus3": "Ökar smidighet med 15 och kritisk chans med 2%."
       }
     }
   },

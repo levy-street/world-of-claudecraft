@@ -591,6 +591,26 @@ export const nl_NL: EnTranslations = {
       "exportDone": "Je gegevens zijn gedownload. We hebben je een bevestiging gemaild.",
       "exportFailed": "Je gegevens konden niet worden geëxporteerd. Probeer het zo dadelijk opnieuw."
     },
+    "masterLoot": {
+      "title": "Meesterbuit",
+      "enableLabel": "Meesterbuit",
+      "enableAria": "Meesterbuit inschakelen",
+      "looterLabel": "Buitmeester",
+      "leaderOption": "Groepsleider",
+      "thresholdLabel": "Drempel",
+      "thresholdUncommon": "Ongewoon en hoger",
+      "thresholdRare": "Zeldzaam en hoger",
+      "thresholdEpic": "Episch en hoger",
+      "assignPrompt": "{item} toewijzen",
+      "assignAria": "{item} toewijzen aan {name}",
+      "rollButton": "Rollen",
+      "selectAll": "Alles selecteren",
+      "methodMaster": "Buitmethode ingesteld op meesterbuit. Buitmeester: {name}.",
+      "methodGroup": "Buitmethode ingesteld op groepsbuit.",
+      "assigned": "{looter} heeft {item} toegewezen aan {target}.",
+      "unassigned": "{item} is niet toegewezen en is vrij voor iedereen.",
+      "leaderOnly": "Alleen de groepsleider kan de buitmethode wijzigen."
+    },
     "bags": {
       "filterGroupAria": "Tassen filteren op categorie",
       "filterAll": "Alle",
@@ -6370,39 +6390,39 @@ export const nl_NL: EnTranslations = {
     },
     "itemSets": {
       "crownforged": {
-        "name": "Crownforged Regalia",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Strength by 15 and Stamina by 15."
+        "name": "Kroongesmede gevechtsuitrusting",
+        "bonus2": "Verhoogt aanvalskracht met 40.",
+        "bonus3": "Verhoogt kracht met 15 en uithoudingsvermogen met 15."
       },
       "deathlord": {
-        "name": "Deathlord Battlegear",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Strength by 15 and Stamina by 15."
+        "name": "Gevechtsuitrusting van de Dodenheer",
+        "bonus2": "Verhoogt aanvalskracht met 40.",
+        "bonus3": "Verhoogt kracht met 15 en uithoudingsvermogen met 15."
       },
       "necromancers": {
-        "name": "Necromancer's Raiment",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "Gewaden van de necromant",
+        "bonus2": "Vermindert terugslag bij spreuken door schade met 50%.",
+        "bonus3": "Opgelopen schade vertraagt je spreuken niet."
       },
       "nighttalon": {
-        "name": "Nighttalon Pelt",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15 and critical strike chance by 2%."
+        "name": "Nachtklauw leren uitrusting",
+        "bonus2": "Verhoogt aanvalskracht met 40.",
+        "bonus3": "Verhoogt behendigheid met 15 en kritieke kans met 2%."
       },
       "soulflame": {
-        "name": "Soulflame Regalia",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "Zielenvlamgewaden",
+        "bonus2": "Vermindert terugslag bij spreuken door schade met 50%.",
+        "bonus3": "Opgelopen schade vertraagt je spreuken niet."
       },
       "stormcallers": {
-        "name": "Stormcaller's Vestments",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "Gewaden van de Stormroeper",
+        "bonus2": "Vermindert terugslag bij spreuken door schade met 50%.",
+        "bonus3": "Opgelopen schade vertraagt je spreuken niet."
       },
       "wyrmshadow": {
-        "name": "Wyrmshadow Vestments",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15 and critical strike chance by 2%."
+        "name": "Wurmschaduw-uitrusting",
+        "bonus2": "Verhoogt aanvalskracht met 40.",
+        "bonus3": "Verhoogt behendigheid met 15 en kritieke kans met 2%."
       }
     }
   },

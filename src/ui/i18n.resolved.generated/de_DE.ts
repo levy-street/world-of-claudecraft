@@ -591,6 +591,26 @@ export const de_DE: EnTranslations = {
       "exportDone": "Eure Daten wurden heruntergeladen. Wir haben Euch eine Bestätigung per E-Mail gesendet.",
       "exportFailed": "Eure Daten konnten nicht exportiert werden. Versucht es gleich noch einmal."
     },
+    "masterLoot": {
+      "title": "Pluendermeister",
+      "enableLabel": "Pluendermeister",
+      "enableAria": "Pluendermeister aktivieren",
+      "looterLabel": "Pluendermeister",
+      "leaderOption": "Gruppenleiter",
+      "thresholdLabel": "Schwelle",
+      "thresholdUncommon": "Ungewoehnlich und hoeher",
+      "thresholdRare": "Selten und hoeher",
+      "thresholdEpic": "Episch und hoeher",
+      "assignPrompt": "{item} zuweisen",
+      "assignAria": "{item} an {name} zuweisen",
+      "rollButton": "Wuerfeln",
+      "selectAll": "Alle auswaehlen",
+      "methodMaster": "Beutemethode auf Pluendermeister gesetzt. Pluendermeister: {name}.",
+      "methodGroup": "Beutemethode auf Gruppenbeute gesetzt.",
+      "assigned": "{looter} hat {item} an {target} zugewiesen.",
+      "unassigned": "{item} wurde nicht zugewiesen und ist fuer alle frei.",
+      "leaderOnly": "Nur der Gruppenleiter kann die Beutemethode aendern."
+    },
     "bags": {
       "filterGroupAria": "Taschen nach Kategorie filtern",
       "filterAll": "Alle",
@@ -6370,39 +6390,39 @@ export const de_DE: EnTranslations = {
     },
     "itemSets": {
       "crownforged": {
-        "name": "Crownforged Regalia",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Strength by 15 and Stamina by 15."
+        "name": "Kronengeschmiedete Kriegstracht",
+        "bonus2": "Erhöht Angriffskraft um 40.",
+        "bonus3": "Erhöht Stärke um 15 und Ausdauer um 15."
       },
       "deathlord": {
-        "name": "Deathlord Battlegear",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Strength by 15 and Stamina by 15."
+        "name": "Kriegstracht des Todesfürsten",
+        "bonus2": "Erhöht Angriffskraft um 40.",
+        "bonus3": "Erhöht Stärke um 15 und Ausdauer um 15."
       },
       "necromancers": {
-        "name": "Necromancer's Raiment",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "Gewänder des Nekromanten",
+        "bonus2": "Verringert Zauberrückstoß durch Schaden um 50%.",
+        "bonus3": "Erlittener Schaden verzögert das Zauberwirken nicht."
       },
       "nighttalon": {
-        "name": "Nighttalon Pelt",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15 and critical strike chance by 2%."
+        "name": "Nachtkrallen-Ledertracht",
+        "bonus2": "Erhöht Angriffskraft um 40.",
+        "bonus3": "Erhöht Beweglichkeit um 15 und kritische Trefferchance um 2%."
       },
       "soulflame": {
-        "name": "Soulflame Regalia",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "Seelenflammengewänder",
+        "bonus2": "Verringert Zauberrückstoß durch Schaden um 50%.",
+        "bonus3": "Erlittener Schaden verzögert das Zauberwirken nicht."
       },
       "stormcallers": {
-        "name": "Stormcaller's Vestments",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "Gewänder des Sturmrufers",
+        "bonus2": "Verringert Zauberrückstoß durch Schaden um 50%.",
+        "bonus3": "Erlittener Schaden verzögert das Zauberwirken nicht."
       },
       "wyrmshadow": {
-        "name": "Wyrmshadow Vestments",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15 and critical strike chance by 2%."
+        "name": "Wyrmschattentracht",
+        "bonus2": "Erhöht Angriffskraft um 40.",
+        "bonus3": "Erhöht Beweglichkeit um 15 und kritische Trefferchance um 2%."
       }
     }
   },

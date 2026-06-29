@@ -397,16 +397,27 @@ export interface LootRollPrompt {
   expiresAt: number;
 }
 
+// Master loot intercepts roll-worthy drops at/above a quality threshold and hands
+// the assignment decision to a single designated looter (the leader, or 0 = leader).
+export type MasterLootThreshold = 'uncommon' | 'rare' | 'epic';
+export interface MasterLootSettings {
+  enabled: boolean;
+  looter: number; // pid of the master looter; 0 means "the current leader"
+  threshold: MasterLootThreshold;
+}
+
 export interface LootStrategies {
   currency: CurrencyLootStrategy;
   commonItems: ItemLootStrategy;
   premiumItems: ItemLootStrategy;
+  master: MasterLootSettings;
 }
 
 export const DEFAULT_PARTY_LOOT_STRATEGIES: LootStrategies = {
   currency: 'fair-split',
   commonItems: 'looter-takes-all',
   premiumItems: 'need-greed',
+  master: { enabled: false, looter: 0, threshold: 'uncommon' },
 };
 
 export interface LootEntry {
@@ -1504,6 +1515,16 @@ export type SimEvent = { pid?: number } & (
       itemName: string;
       quality: ItemDef['quality'];
       expiresAt: number;
+    }
+  // master loot: sent only to the master looter; candidates are the eligible recipients
+  | {
+      type: 'masterLoot';
+      rollId: number;
+      itemId: string;
+      itemName: string;
+      quality: ItemDef['quality'];
+      expiresAt: number;
+      candidates: { pid: number; name: string }[];
     }
   | { type: 'error'; text: string; reason?: ErrorReason }
   | { type: 'questAccepted'; questId: string }

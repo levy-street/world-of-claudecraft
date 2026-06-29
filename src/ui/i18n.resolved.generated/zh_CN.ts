@@ -591,6 +591,26 @@ export const zh_CN: EnTranslations = {
       "exportDone": "你的数据已下载。我们已向你发送确认邮件。",
       "exportFailed": "无法导出你的数据。请稍后重试。"
     },
+    "masterLoot": {
+      "title": "队长分配",
+      "enableLabel": "队长分配",
+      "enableAria": "启用队长分配",
+      "looterLabel": "分配者",
+      "leaderOption": "队长",
+      "thresholdLabel": "品质门槛",
+      "thresholdUncommon": "优秀及以上",
+      "thresholdRare": "稀有及以上",
+      "thresholdEpic": "史诗及以上",
+      "assignPrompt": "分配{item}",
+      "assignAria": "将{item}分配给{name}",
+      "rollButton": "掷骰",
+      "selectAll": "全选",
+      "methodMaster": "拾取方式已设为队长分配。分配者：{name}。",
+      "methodGroup": "拾取方式已设为小队拾取。",
+      "assigned": "{looter}将{item}分配给了{target}。",
+      "unassigned": "{item}未被分配，现可自由拾取。",
+      "leaderOnly": "只有队长才能更改拾取方式。"
+    },
     "bags": {
       "filterGroupAria": "按类别筛选背包",
       "filterAll": "全部",

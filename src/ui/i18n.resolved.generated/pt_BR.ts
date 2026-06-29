@@ -591,6 +591,26 @@ export const pt_BR: EnTranslations = {
       "exportDone": "Seus dados foram baixados. Enviamos uma confirmação por email.",
       "exportFailed": "Não foi possível exportar seus dados. Tente novamente em instantes."
     },
+    "masterLoot": {
+      "title": "Saque mestre",
+      "enableLabel": "Saque mestre",
+      "enableAria": "Ativar saque mestre",
+      "looterLabel": "Mestre do saque",
+      "leaderOption": "Lider do grupo",
+      "thresholdLabel": "Limite",
+      "thresholdUncommon": "Incomum ou superior",
+      "thresholdRare": "Raro ou superior",
+      "thresholdEpic": "Epico ou superior",
+      "assignPrompt": "Atribuir {item}",
+      "assignAria": "Atribuir {item} a {name}",
+      "rollButton": "Rolar",
+      "selectAll": "Selecionar tudo",
+      "methodMaster": "Metodo de saque definido como saque mestre. Mestre do saque: {name}.",
+      "methodGroup": "Metodo de saque definido como saque em grupo.",
+      "assigned": "{looter} atribuiu {item} a {target}.",
+      "unassigned": "{item} nao foi atribuido e esta livre para todos.",
+      "leaderOnly": "Somente o lider do grupo pode alterar o metodo de saque."
+    },
     "bags": {
       "filterGroupAria": "Filtrar bolsas por categoria",
       "filterAll": "Todos",
@@ -6370,39 +6390,39 @@ export const pt_BR: EnTranslations = {
     },
     "itemSets": {
       "crownforged": {
-        "name": "Crownforged Regalia",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Strength by 15 and Stamina by 15."
+        "name": "Traje de batalha Forjacoroa",
+        "bonus2": "Aumenta o poder de ataque em 40.",
+        "bonus3": "Aumenta a força em 15 e o vigor em 15."
       },
       "deathlord": {
-        "name": "Deathlord Battlegear",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Strength by 15 and Stamina by 15."
+        "name": "Traje de batalha do Senhor da Morte",
+        "bonus2": "Aumenta o poder de ataque em 40.",
+        "bonus3": "Aumenta a força em 15 e o vigor em 15."
       },
       "necromancers": {
-        "name": "Necromancer's Raiment",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "Vestes do necromante",
+        "bonus2": "Reduz em 50% o atraso de conjuração causado por dano.",
+        "bonus3": "Dano recebido não atrasa suas conjurações."
       },
       "nighttalon": {
-        "name": "Nighttalon Pelt",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15 and critical strike chance by 2%."
+        "name": "Traje de couro Garranoite",
+        "bonus2": "Aumenta o poder de ataque em 40.",
+        "bonus3": "Aumenta a agilidade em 15 e a chance de crítico em 2%."
       },
       "soulflame": {
-        "name": "Soulflame Regalia",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "Vestes de Chama da Alma",
+        "bonus2": "Reduz em 50% o atraso de conjuração causado por dano.",
+        "bonus3": "Dano recebido não atrasa suas conjurações."
       },
       "stormcallers": {
-        "name": "Stormcaller's Vestments",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "Vestes do Chamatormentas",
+        "bonus2": "Reduz em 50% o atraso de conjuração causado por dano.",
+        "bonus3": "Dano recebido não atrasa suas conjurações."
       },
       "wyrmshadow": {
-        "name": "Wyrmshadow Vestments",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15 and critical strike chance by 2%."
+        "name": "Traje Sombraverme",
+        "bonus2": "Aumenta o poder de ataque em 40.",
+        "bonus3": "Aumenta a agilidade em 15 e a chance de crítico em 2%."
       }
     }
   },

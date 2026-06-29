@@ -63,6 +63,11 @@ export class PartyFramesPainter {
   // listeners stay attached and read the live slot, so a recycled row is safe.
   private readonly free: PartyRow[] = [];
   private leaveBtn: HTMLButtonElement | null = null;
+  // The leader-only master-loot control, owned by the Hud (built on its own
+  // low-frequency footer signature) and handed to the pool for placement. It sits
+  // between the member rows and the leave button, and persists across member-frame
+  // rebuilds so its checkbox / dropdowns are never churned under the cursor.
+  private masterControl: HTMLElement | null = null;
   // The last synced raid flag, so relocalize() can re-emit each pooled row's group
   // label in the new language after an in-game language switch (a switch does not flip
   // partyFrameSignature, so the Hud never re-syncs us, exactly like the badge tooltips).
@@ -85,6 +90,22 @@ export class PartyFramesPainter {
    *  matching the inline `el.classList.toggle('below-target', ...)`. */
   setBelowTarget(on: boolean): void {
     this.writers.toggleClass(this.container, BELOW_TARGET_CLASS, on);
+  }
+
+  /** Set (or clear with null) the leader-only master-loot control. The Hud rebuilds
+   *  the node only when its low-frequency footer signature changes, so this is not a
+   *  per-frame call; we just keep the node in the DOM between the member rows and the
+   *  leave button. A changed node replaces the old one in place; reconcileOrder keeps
+   *  it positioned on later member rebuilds. */
+  setMasterControl(el: HTMLElement | null): void {
+    if (this.masterControl === el) return;
+    if (this.masterControl) this.masterControl.remove();
+    this.masterControl = el;
+    if (el) {
+      const leave = this.leaveBtn;
+      if (leave && leave.parentNode === this.container) this.container.insertBefore(el, leave);
+      else this.container.appendChild(el);
+    }
   }
 
   /** Reconcile the pool to `members` and repaint each in place. Called only when the
@@ -147,6 +168,7 @@ export class PartyFramesPainter {
       }
     };
     for (const row of rows) place(row.el);
+    if (this.masterControl) place(this.masterControl);
     place(leave);
   }
 
@@ -175,6 +197,8 @@ export class PartyFramesPainter {
       this.pool.delete(pid);
     }
     this.leaveBtn?.remove();
+    this.masterControl?.remove();
+    this.masterControl = null;
   }
 
   private paintRow(row: PartyRow, m: PartyFrameMember, leader: number, raid: boolean): void {

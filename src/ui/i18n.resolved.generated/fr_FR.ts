@@ -591,6 +591,26 @@ export const fr_FR: EnTranslations = {
       "exportDone": "Vos données ont été téléchargées. Nous vous avons envoyé une confirmation par e-mail.",
       "exportFailed": "Impossible d'exporter vos données. Réessayez dans un moment."
     },
+    "masterLoot": {
+      "title": "Butin de maitre",
+      "enableLabel": "Butin de maitre",
+      "enableAria": "Activer le butin de maitre",
+      "looterLabel": "Maitre du butin",
+      "leaderOption": "Chef de groupe",
+      "thresholdLabel": "Seuil",
+      "thresholdUncommon": "Inhabituel et plus",
+      "thresholdRare": "Rare et plus",
+      "thresholdEpic": "Epique et plus",
+      "assignPrompt": "Attribuer {item}",
+      "assignAria": "Attribuer {item} a {name}",
+      "rollButton": "Tirer au sort",
+      "selectAll": "Tout selectionner",
+      "methodMaster": "Mode de butin defini sur butin de maitre. Maitre du butin: {name}.",
+      "methodGroup": "Mode de butin defini sur butin de groupe.",
+      "assigned": "{looter} a attribue {item} a {target}.",
+      "unassigned": "{item} n a pas ete attribue et devient libre pour tous.",
+      "leaderOnly": "Seul le chef de groupe peut changer le mode de butin."
+    },
     "bags": {
       "filterGroupAria": "Filtrer les sacs par catégorie",
       "filterAll": "Tous",
@@ -6370,39 +6390,39 @@ export const fr_FR: EnTranslations = {
     },
     "itemSets": {
       "crownforged": {
-        "name": "Crownforged Regalia",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Strength by 15 and Stamina by 15."
+        "name": "Tenue de guerre Couronneforge",
+        "bonus2": "Augmente la puissance d'attaque de 40.",
+        "bonus3": "Augmente la force de 15 et l'endurance de 15."
       },
       "deathlord": {
-        "name": "Deathlord Battlegear",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Strength by 15 and Stamina by 15."
+        "name": "Tenue de guerre du seigneur de la mort",
+        "bonus2": "Augmente la puissance d'attaque de 40.",
+        "bonus3": "Augmente la force de 15 et l'endurance de 15."
       },
       "necromancers": {
-        "name": "Necromancer's Raiment",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "Robe du nécromancien",
+        "bonus2": "Réduit de 50% le recul des incantations causé par les dégâts.",
+        "bonus3": "Les dégâts subis ne retardent pas l'incantation."
       },
       "nighttalon": {
-        "name": "Nighttalon Pelt",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15 and critical strike chance by 2%."
+        "name": "Tenue de cuir Serre-nuit",
+        "bonus2": "Augmente la puissance d'attaque de 40.",
+        "bonus3": "Augmente l’agilité de 15 et les chances de critique de 2%."
       },
       "soulflame": {
-        "name": "Soulflame Regalia",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "Robe de Flamme d’âme",
+        "bonus2": "Réduit de 50% le recul des incantations causé par les dégâts.",
+        "bonus3": "Les dégâts subis ne retardent pas l'incantation."
       },
       "stormcallers": {
-        "name": "Stormcaller's Vestments",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "Robe de l’Appel-tempête",
+        "bonus2": "Réduit de 50% le recul des incantations causé par les dégâts.",
+        "bonus3": "Les dégâts subis ne retardent pas l'incantation."
       },
       "wyrmshadow": {
-        "name": "Wyrmshadow Vestments",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15 and critical strike chance by 2%."
+        "name": "Tenue d’Ombre-drake",
+        "bonus2": "Augmente la puissance d'attaque de 40.",
+        "bonus3": "Augmente l’agilité de 15 et les chances de critique de 2%."
       }
     }
   },

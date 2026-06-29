@@ -591,6 +591,26 @@ export const ko_KR: EnTranslations = {
       "exportDone": "데이터가 다운로드되었습니다. 확인 메일을 보내드렸습니다.",
       "exportFailed": "데이터를 내보낼 수 없습니다. 잠시 후 다시 시도하세요."
     },
+    "masterLoot": {
+      "title": "분배 담당",
+      "enableLabel": "분배 담당",
+      "enableAria": "분배 담당 사용",
+      "looterLabel": "분배 담당자",
+      "leaderOption": "파티장",
+      "thresholdLabel": "품질 기준",
+      "thresholdUncommon": "고급 이상",
+      "thresholdRare": "희귀 이상",
+      "thresholdEpic": "영웅 이상",
+      "assignPrompt": "{item} 분배",
+      "assignAria": "{item}을(를) {name}에게 분배",
+      "rollButton": "주사위",
+      "selectAll": "전체 선택",
+      "methodMaster": "전리품 방식이 분배 담당으로 설정되었습니다. 분배 담당자: {name}.",
+      "methodGroup": "전리품 방식이 파티 분배로 설정되었습니다.",
+      "assigned": "{looter}님이 {item}을(를) {target}에게 분배했습니다.",
+      "unassigned": "{item}이(가) 분배되지 않아 모두가 획득할 수 있습니다.",
+      "leaderOnly": "파티장만 전리품 방식을 변경할 수 있습니다."
+    },
     "bags": {
       "filterGroupAria": "가방을 분류별로 필터링",
       "filterAll": "전체",

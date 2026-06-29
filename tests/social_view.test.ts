@@ -105,6 +105,7 @@ describe('socialStructSig', () => {
     const a: PartyInfo = {
       leader: 1,
       raid: true,
+      master: { enabled: false, looter: 0, threshold: 'uncommon' },
       members: [partyMember({ pid: 1, group: 1 }), partyMember({ pid: 2, group: 1 })],
     };
     const b: PartyInfo = {
@@ -161,6 +162,7 @@ describe('raidView', () => {
     const party: PartyInfo = {
       leader: 1,
       raid: false,
+      master: { enabled: false, looter: 0, threshold: 'uncommon' },
       members: [1, 2, 3, 4, 5].map((pid) => partyMember({ pid, group: 1 })),
     };
     const view = raidView(party, 1);
@@ -174,6 +176,7 @@ describe('raidView', () => {
     const party: PartyInfo = {
       leader: 1,
       raid: true,
+      master: { enabled: false, looter: 0, threshold: 'uncommon' },
       members: [
         partyMember({ pid: 1, group: 1, hp: 50, mhp: 200 }),
         partyMember({ pid: 2, group: 2, hp: 100, mhp: 100 }),
@@ -194,7 +197,15 @@ describe('raidView', () => {
       ...[1, 2, 3, 4, 5].map((pid) => partyMember({ pid, group: 2 })),
       partyMember({ pid: 6, group: 1 }),
     ];
-    const view = raidView({ leader: 1, raid: true, members }, 1);
+    const view = raidView(
+      {
+        leader: 1,
+        raid: true,
+        master: { enabled: false, looter: 0, threshold: 'uncommon' },
+        members,
+      },
+      1,
+    );
     const g1 = view.groups![0];
     expect(g1.members[0].moveTo).toBeNull();
   });
@@ -220,6 +231,7 @@ describe('ClientWorld-vs-Sim parity', () => {
       party: {
         leader: 1,
         raid: true,
+        master: { enabled: false, looter: 0, threshold: 'uncommon' },
         members: [partyMember({ pid: 1, group: 1 }), partyMember({ pid: 2, group: 2 })],
       },
     };

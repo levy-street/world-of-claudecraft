@@ -591,6 +591,26 @@ export const tr_TR: EnTranslations = {
       "exportDone": "Verileriniz indirildi. Size bir onay e-postası gönderdik.",
       "exportFailed": "Verileriniz dışa aktarılamadı. Birazdan tekrar deneyin."
     },
+    "masterLoot": {
+      "title": "Ganimet ustasi",
+      "enableLabel": "Ganimet ustasi",
+      "enableAria": "Ganimet ustasini etkinlestir",
+      "looterLabel": "Ganimet ustasi",
+      "leaderOption": "Grup lideri",
+      "thresholdLabel": "Esik",
+      "thresholdUncommon": "Sira disi ve ustu",
+      "thresholdRare": "Nadir ve ustu",
+      "thresholdEpic": "Epik ve ustu",
+      "assignPrompt": "{item} ata",
+      "assignAria": "{item} esyasini {name} oyuncusuna ata",
+      "rollButton": "Zar at",
+      "selectAll": "Tümünü sec",
+      "methodMaster": "Ganimet yontemi ganimet ustasi olarak ayarlandi. Ganimet ustasi: {name}.",
+      "methodGroup": "Ganimet yontemi grup ganimeti olarak ayarlandi.",
+      "assigned": "{looter}, {item} esyasini {target} oyuncusuna atadi.",
+      "unassigned": "{item} atanmadi ve herkes icin serbest.",
+      "leaderOnly": "Ganimet yontemini yalnizca grup lideri degistirebilir."
+    },
     "bags": {
       "filterGroupAria": "Çantaları kategoriye göre filtrele",
       "filterAll": "Tümü",
@@ -6370,39 +6390,39 @@ export const tr_TR: EnTranslations = {
     },
     "itemSets": {
       "crownforged": {
-        "name": "Crownforged Regalia",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Strength by 15 and Stamina by 15."
+        "name": "Taçdövme savaş takımı",
+        "bonus2": "Saldırı gücünü 40 artırır.",
+        "bonus3": "Gücü 15 ve dayanıklılığı 15 artırır."
       },
       "deathlord": {
-        "name": "Deathlord Battlegear",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Strength by 15 and Stamina by 15."
+        "name": "Ölüm Lordu savaş takımı",
+        "bonus2": "Saldırı gücünü 40 artırır.",
+        "bonus3": "Gücü 15 ve dayanıklılığı 15 artırır."
       },
       "necromancers": {
-        "name": "Necromancer's Raiment",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "Nekromansır giysileri",
+        "bonus2": "Hasarın neden olduğu büyü geri itmesini %50 azaltır.",
+        "bonus3": "Alınan hasar büyü yapmanı geciktirmez."
       },
       "nighttalon": {
-        "name": "Nighttalon Pelt",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15 and critical strike chance by 2%."
+        "name": "Gece Pençesi deri takımı",
+        "bonus2": "Saldırı gücünü 40 artırır.",
+        "bonus3": "Çevikliği 15 ve kritik şansını %2 artırır."
       },
       "soulflame": {
-        "name": "Soulflame Regalia",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "Ruh Alevi giysileri",
+        "bonus2": "Hasarın neden olduğu büyü geri itmesini %50 azaltır.",
+        "bonus3": "Alınan hasar büyü yapmanı geciktirmez."
       },
       "stormcallers": {
-        "name": "Stormcaller's Vestments",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "Fırtına Çağıran giysileri",
+        "bonus2": "Hasarın neden olduğu büyü geri itmesini %50 azaltır.",
+        "bonus3": "Alınan hasar büyü yapmanı geciktirmez."
       },
       "wyrmshadow": {
-        "name": "Wyrmshadow Vestments",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15 and critical strike chance by 2%."
+        "name": "Wyrm Gölgesi takımı",
+        "bonus2": "Saldırı gücünü 40 artırır.",
+        "bonus3": "Çevikliği 15 ve kritik şansını %2 artırır."
       }
     }
   },

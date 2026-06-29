@@ -591,6 +591,26 @@ export const id_ID: EnTranslations = {
       "exportDone": "Datamu telah diunduh. Kami mengirimkan konfirmasi melalui email.",
       "exportFailed": "Tidak dapat mengekspor datamu. Coba lagi sebentar."
     },
+    "masterLoot": {
+      "title": "Master loot",
+      "enableLabel": "Master loot",
+      "enableAria": "Aktifkan master loot",
+      "looterLabel": "Master looter",
+      "leaderOption": "Pemimpin grup",
+      "thresholdLabel": "Ambang",
+      "thresholdUncommon": "Uncommon ke atas",
+      "thresholdRare": "Rare ke atas",
+      "thresholdEpic": "Epic ke atas",
+      "assignPrompt": "Berikan {item}",
+      "assignAria": "Berikan {item} kepada {name}",
+      "rollButton": "Gulung",
+      "selectAll": "Pilih semua",
+      "methodMaster": "Metode loot diatur ke master loot. Master looter: {name}.",
+      "methodGroup": "Metode loot diatur ke loot grup.",
+      "assigned": "{looter} memberikan {item} kepada {target}.",
+      "unassigned": "{item} tidak diberikan dan bebas untuk semua.",
+      "leaderOnly": "Hanya pemimpin grup yang dapat mengubah metode loot."
+    },
     "bags": {
       "filterGroupAria": "Saring tas menurut kategori",
       "filterAll": "Semua",
@@ -6370,39 +6390,39 @@ export const id_ID: EnTranslations = {
     },
     "itemSets": {
       "crownforged": {
-        "name": "Crownforged Regalia",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Strength by 15 and Stamina by 15."
+        "name": "Perlengkapan tempur Tempa Mahkota",
+        "bonus2": "Meningkatkan daya serang sebesar 40.",
+        "bonus3": "Meningkatkan kekuatan sebesar 15 dan stamina sebesar 15."
       },
       "deathlord": {
-        "name": "Deathlord Battlegear",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Strength by 15 and Stamina by 15."
+        "name": "Perlengkapan tempur Penguasa Maut",
+        "bonus2": "Meningkatkan daya serang sebesar 40.",
+        "bonus3": "Meningkatkan kekuatan sebesar 15 dan stamina sebesar 15."
       },
       "necromancers": {
-        "name": "Necromancer's Raiment",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "Jubah ahli nujum",
+        "bonus2": "Mengurangi dorongan balik sihir akibat kerusakan sebesar 50%.",
+        "bonus3": "Kerusakan yang diterima tidak menunda perapalan sihir."
       },
       "nighttalon": {
-        "name": "Nighttalon Pelt",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15 and critical strike chance by 2%."
+        "name": "Perlengkapan kulit Cakar Malam",
+        "bonus2": "Meningkatkan daya serang sebesar 40.",
+        "bonus3": "Meningkatkan kelincahan sebesar 15 dan peluang kritis sebesar 2%."
       },
       "soulflame": {
-        "name": "Soulflame Regalia",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "Jubah Api Jiwa",
+        "bonus2": "Mengurangi dorongan balik sihir akibat kerusakan sebesar 50%.",
+        "bonus3": "Kerusakan yang diterima tidak menunda perapalan sihir."
       },
       "stormcallers": {
-        "name": "Stormcaller's Vestments",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "Jubah Pemanggil Badai",
+        "bonus2": "Mengurangi dorongan balik sihir akibat kerusakan sebesar 50%.",
+        "bonus3": "Kerusakan yang diterima tidak menunda perapalan sihir."
       },
       "wyrmshadow": {
-        "name": "Wyrmshadow Vestments",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15 and critical strike chance by 2%."
+        "name": "Perlengkapan Bayangan Wyrm",
+        "bonus2": "Meningkatkan daya serang sebesar 40.",
+        "bonus3": "Meningkatkan kelincahan sebesar 15 dan peluang kritis sebesar 2%."
       }
     }
   },

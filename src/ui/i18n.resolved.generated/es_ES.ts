@@ -591,6 +591,26 @@ export const es_ES: EnTranslations = {
       "exportDone": "Tus datos se descargaron. Te enviamos una confirmación por correo.",
       "exportFailed": "No se pudieron exportar tus datos. Inténtalo de nuevo en un momento."
     },
+    "masterLoot": {
+      "title": "Botin maestro",
+      "enableLabel": "Botin maestro",
+      "enableAria": "Activar botin maestro",
+      "looterLabel": "Maestro del botin",
+      "leaderOption": "Lider del grupo",
+      "thresholdLabel": "Umbral",
+      "thresholdUncommon": "Poco comun o superior",
+      "thresholdRare": "Raro o superior",
+      "thresholdEpic": "Epico o superior",
+      "assignPrompt": "Asignar {item}",
+      "assignAria": "Asignar {item} a {name}",
+      "rollButton": "Tirar",
+      "selectAll": "Elegir todos",
+      "methodMaster": "Metodo de botin cambiado a botin maestro. Maestro del botin: {name}.",
+      "methodGroup": "Metodo de botin cambiado a botin de grupo.",
+      "assigned": "{looter} asigno {item} a {target}.",
+      "unassigned": "{item} no fue asignado y queda libre para todos.",
+      "leaderOnly": "Solo el lider del grupo puede cambiar el metodo de botin."
+    },
     "bags": {
       "filterGroupAria": "Filtrar bolsas por categoría",
       "filterAll": "Todos",
@@ -6370,39 +6390,39 @@ export const es_ES: EnTranslations = {
     },
     "itemSets": {
       "crownforged": {
-        "name": "Crownforged Regalia",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Strength by 15 and Stamina by 15."
+        "name": "Equipo de batalla Forjacorona",
+        "bonus2": "Aumenta el poder de ataque en 40.",
+        "bonus3": "Aumenta la fuerza en 15 y el aguante en 15."
       },
       "deathlord": {
-        "name": "Deathlord Battlegear",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Strength by 15 and Stamina by 15."
+        "name": "Equipo de batalla del Señor de la Muerte",
+        "bonus2": "Aumenta el poder de ataque en 40.",
+        "bonus3": "Aumenta la fuerza en 15 y el aguante en 15."
       },
       "necromancers": {
-        "name": "Necromancer's Raiment",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "Vestiduras del nigromante",
+        "bonus2": "Reduce un 50% el retroceso de lanzamiento causado por daño.",
+        "bonus3": "El daño recibido no retrasa tus lanzamientos."
       },
       "nighttalon": {
-        "name": "Nighttalon Pelt",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15 and critical strike chance by 2%."
+        "name": "Atuendo de cuero Garra Nocturna",
+        "bonus2": "Aumenta el poder de ataque en 40.",
+        "bonus3": "Aumenta la agilidad en 15 y la probabilidad de crítico en 2%."
       },
       "soulflame": {
-        "name": "Soulflame Regalia",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "Vestiduras de Llama de Alma",
+        "bonus2": "Reduce un 50% el retroceso de lanzamiento causado por daño.",
+        "bonus3": "El daño recibido no retrasa tus lanzamientos."
       },
       "stormcallers": {
-        "name": "Stormcaller's Vestments",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "Vestiduras del Invocatormentas",
+        "bonus2": "Reduce un 50% el retroceso de lanzamiento causado por daño.",
+        "bonus3": "El daño recibido no retrasa tus lanzamientos."
       },
       "wyrmshadow": {
-        "name": "Wyrmshadow Vestments",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15 and critical strike chance by 2%."
+        "name": "Atuendo de Sombra de Vermis",
+        "bonus2": "Aumenta el poder de ataque en 40.",
+        "bonus3": "Aumenta la agilidad en 15 y la probabilidad de crítico en 2%."
       }
     }
   },

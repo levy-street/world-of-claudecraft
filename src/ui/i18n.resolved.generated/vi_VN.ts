@@ -591,6 +591,26 @@ export const vi_VN: EnTranslations = {
       "exportDone": "Dữ liệu của bạn đã được tải xuống. Chúng tôi đã gửi email xác nhận cho bạn.",
       "exportFailed": "Không thể xuất dữ liệu của bạn. Thử lại sau giây lát."
     },
+    "masterLoot": {
+      "title": "Chia chien loi pham",
+      "enableLabel": "Chia chien loi pham",
+      "enableAria": "Bat chia chien loi pham",
+      "looterLabel": "Nguoi chia chien loi pham",
+      "leaderOption": "Truong nhom",
+      "thresholdLabel": "Nguong",
+      "thresholdUncommon": "Uncommon tro len",
+      "thresholdRare": "Rare tro len",
+      "thresholdEpic": "Epic tro len",
+      "assignPrompt": "Gan {item}",
+      "assignAria": "Gan {item} cho {name}",
+      "rollButton": "Do",
+      "selectAll": "Chon tat ca",
+      "methodMaster": "Phuong thuc chien loi pham da dat thanh chia chien loi pham. Nguoi chia: {name}.",
+      "methodGroup": "Phuong thuc chien loi pham da dat thanh loot nhom.",
+      "assigned": "{looter} da gan {item} cho {target}.",
+      "unassigned": "{item} chua duoc gan va moi nguoi deu co the nhat.",
+      "leaderOnly": "Chi truong nhom co the doi phuong thuc chien loi pham."
+    },
     "bags": {
       "filterGroupAria": "Lọc túi đồ theo danh mục",
       "filterAll": "Tất cả",
@@ -6370,39 +6390,39 @@ export const vi_VN: EnTranslations = {
     },
     "itemSets": {
       "crownforged": {
-        "name": "Crownforged Regalia",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Strength by 15 and Stamina by 15."
+        "name": "Bộ chiến Crownforged",
+        "bonus2": "Tăng sức mạnh tấn công thêm 40.",
+        "bonus3": "Tăng sức mạnh thêm 15 và thể lực thêm 15."
       },
       "deathlord": {
-        "name": "Deathlord Battlegear",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Strength by 15 and Stamina by 15."
+        "name": "Bộ chiến Deathlord",
+        "bonus2": "Tăng sức mạnh tấn công thêm 40.",
+        "bonus3": "Tăng sức mạnh thêm 15 và thể lực thêm 15."
       },
       "necromancers": {
-        "name": "Necromancer's Raiment",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "Áo choàng pháp sư gọi hồn",
+        "bonus2": "Giảm 50% độ lùi khi niệm phép do sát thương.",
+        "bonus3": "Sát thương nhận vào không làm chậm niệm phép."
       },
       "nighttalon": {
-        "name": "Nighttalon Pelt",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15 and critical strike chance by 2%."
+        "name": "Bộ da Móng Đêm",
+        "bonus2": "Tăng sức mạnh tấn công thêm 40.",
+        "bonus3": "Tăng nhanh nhẹn thêm 15 và tỉ lệ chí mạng thêm 2%."
       },
       "soulflame": {
-        "name": "Soulflame Regalia",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "Áo choàng Lửa Linh Hồn",
+        "bonus2": "Giảm 50% độ lùi khi niệm phép do sát thương.",
+        "bonus3": "Sát thương nhận vào không làm chậm niệm phép."
       },
       "stormcallers": {
-        "name": "Stormcaller's Vestments",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "Áo choàng Gọi Bão",
+        "bonus2": "Giảm 50% độ lùi khi niệm phép do sát thương.",
+        "bonus3": "Sát thương nhận vào không làm chậm niệm phép."
       },
       "wyrmshadow": {
-        "name": "Wyrmshadow Vestments",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15 and critical strike chance by 2%."
+        "name": "Bộ Bóng Wyrm",
+        "bonus2": "Tăng sức mạnh tấn công thêm 40.",
+        "bonus3": "Tăng nhanh nhẹn thêm 15 và tỉ lệ chí mạng thêm 2%."
       }
     }
   },

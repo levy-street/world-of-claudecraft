@@ -591,6 +591,26 @@ export const pl_PL: EnTranslations = {
       "exportDone": "Twoje dane zostały pobrane. Wysłaliśmy ci potwierdzenie e-mailem.",
       "exportFailed": "Nie udało się wyeksportować twoich danych. Spróbuj ponownie za chwilę."
     },
+    "masterLoot": {
+      "title": "Mistrz lupow",
+      "enableLabel": "Mistrz lupow",
+      "enableAria": "Wlacz mistrza lupow",
+      "looterLabel": "Mistrz lupow",
+      "leaderOption": "Przywodca grupy",
+      "thresholdLabel": "Prog",
+      "thresholdUncommon": "Niezwykle i wyzej",
+      "thresholdRare": "Rzadkie i wyzej",
+      "thresholdEpic": "Epickie i wyzej",
+      "assignPrompt": "Przydziel {item}",
+      "assignAria": "Przydziel {item} graczowi {name}",
+      "rollButton": "Rzut",
+      "selectAll": "Zaznacz wszystko",
+      "methodMaster": "Metoda lupow ustawiona na mistrza lupow. Mistrz lupow: {name}.",
+      "methodGroup": "Metoda lupow ustawiona na lup grupowy.",
+      "assigned": "{looter} przydzielil {item} graczowi {target}.",
+      "unassigned": "{item} nie zostal przydzielony i jest wolny dla wszystkich.",
+      "leaderOnly": "Tylko przywodca grupy moze zmienic metode lupow."
+    },
     "bags": {
       "filterGroupAria": "Filtruj torby według kategorii",
       "filterAll": "Wszystko",
@@ -6370,39 +6390,39 @@ export const pl_PL: EnTranslations = {
     },
     "itemSets": {
       "crownforged": {
-        "name": "Crownforged Regalia",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Strength by 15 and Stamina by 15."
+        "name": "Koronokuty rynsztunek bojowy",
+        "bonus2": "Zwiększa siłę ataku o 40.",
+        "bonus3": "Zwiększa siłę o 15 i wytrzymałość o 15."
       },
       "deathlord": {
-        "name": "Deathlord Battlegear",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Strength by 15 and Stamina by 15."
+        "name": "Rynsztunek bojowy Władcy Śmierci",
+        "bonus2": "Zwiększa siłę ataku o 40.",
+        "bonus3": "Zwiększa siłę o 15 i wytrzymałość o 15."
       },
       "necromancers": {
-        "name": "Necromancer's Raiment",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "Szaty nekromanty",
+        "bonus2": "Zmniejsza opóźnianie zaklęć przez obrażenia o 50%.",
+        "bonus3": "Otrzymywane obrażenia nie opóźniają rzucania zaklęć."
       },
       "nighttalon": {
-        "name": "Nighttalon Pelt",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15 and critical strike chance by 2%."
+        "name": "Skórzany rynsztunek Nocnego Szpona",
+        "bonus2": "Zwiększa siłę ataku o 40.",
+        "bonus3": "Zwiększa zręczność o 15 i szansę na trafienie krytyczne o 2%."
       },
       "soulflame": {
-        "name": "Soulflame Regalia",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "Szaty Płomienia Duszy",
+        "bonus2": "Zmniejsza opóźnianie zaklęć przez obrażenia o 50%.",
+        "bonus3": "Otrzymywane obrażenia nie opóźniają rzucania zaklęć."
       },
       "stormcallers": {
-        "name": "Stormcaller's Vestments",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "Szaty Przyzywacza Burz",
+        "bonus2": "Zmniejsza opóźnianie zaklęć przez obrażenia o 50%.",
+        "bonus3": "Otrzymywane obrażenia nie opóźniają rzucania zaklęć."
       },
       "wyrmshadow": {
-        "name": "Wyrmshadow Vestments",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15 and critical strike chance by 2%."
+        "name": "Rynsztunek Cienia Żmija",
+        "bonus2": "Zwiększa siłę ataku o 40.",
+        "bonus3": "Zwiększa zręczność o 15 i szansę na trafienie krytyczne o 2%."
       }
     }
   },
