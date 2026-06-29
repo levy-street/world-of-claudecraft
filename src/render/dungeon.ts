@@ -615,7 +615,11 @@ export class DungeonInteriors {
     interior: string,
     ox: number,
     oz: number,
-    opts?: { layout?: DungeonLayout; variant?: Variant },
+    opts?: {
+      layout?: DungeonLayout;
+      variant?: Variant;
+      hazards?: Array<{ x: number; z: number; r: number }>;
+    },
   ): Promise<void> {
     await ensureDungeonAssets();
     // Delve modules pass an explicit per-module layout so render geometry matches
@@ -650,6 +654,7 @@ export class DungeonInteriors {
       this.placeFloodwater(group, layout);
       this.placeAquaticDressing(group, layout);
     }
+    if (opts?.hazards?.length) this.placeBlackwaterPools(group, opts.hazards);
 
     this.emit(group, p);
     if (arenaWalls) {
@@ -709,6 +714,45 @@ export class DungeonInteriors {
       this.addTorchGlow(group, 0, z, 0x37e6cf, 0.24, 1.4);
     }
     this.addTorchGlow(group, layout.dais.x, layout.dais.z, 0x37e6cf, 0.74, 2.0);
+  }
+
+  // The Drowned Litany's static Blackwater hazards: a dark, near-opaque pool with
+  // a sickly bog-green rim glow at each zone, so the damage area reads clearly at a
+  // glance (the sim deals damage to players standing inside, see runs.ts). Drawn in
+  // instance-local coords; the group is positioned at the module origin like the
+  // rest of the interior.
+  private placeBlackwaterPools(
+    group: THREE.Group,
+    hazards: Array<{ x: number; z: number; r: number }>,
+  ): void {
+    for (const h of hazards) {
+      const pool = new THREE.Mesh(
+        new THREE.CircleGeometry(h.r, 28).rotateX(-Math.PI / 2).translate(h.x, 0.12, h.z),
+        new THREE.MeshBasicMaterial({
+          color: 0x0a1a12,
+          transparent: true,
+          opacity: 0.82,
+          depthWrite: false,
+        }),
+      );
+      pool.renderOrder = 1; // floats over the floor tiles
+      group.add(pool);
+      // Bog-green rim so the edge of the hazard is unmistakable.
+      const rim = new THREE.Mesh(
+        new THREE.RingGeometry(h.r * 0.82, h.r, 32).rotateX(-Math.PI / 2).translate(h.x, 0.14, h.z),
+        new THREE.MeshBasicMaterial({
+          color: 0x3fae5a,
+          transparent: true,
+          opacity: 0.5,
+          side: THREE.DoubleSide,
+          depthWrite: false,
+          blending: THREE.AdditiveBlending,
+        }),
+      );
+      rim.renderOrder = 2;
+      group.add(rim);
+      this.addTorchGlow(group, h.x, h.z, 0x2f8f4f, 0.3, h.r * 0.6);
+    }
   }
 
   private placeAquaticDressing(group: THREE.Group, layout: DungeonLayout): void {

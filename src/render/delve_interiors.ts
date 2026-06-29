@@ -39,5 +39,7 @@ export function buildDelveModule(
   // with per-module reliquary dressing.
   const layout = DELVE_MODULE_LAYOUTS[moduleId];
   const variant = DELVE_MODULE_VARIANT[moduleId] ?? 'delve_ossuary';
-  return dungeons.buildInterior(interior, ox, oz, { layout, variant });
+  // Static Blackwater hazard pools (The Drowned Litany) are authored on the module
+  // def; the renderer draws a visible pool at each so the sim's damage zone reads.
+  return dungeons.buildInterior(interior, ox, oz, { layout, variant, hazards: mod?.hazards });
 }
