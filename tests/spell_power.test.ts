@@ -96,6 +96,44 @@ describe('Spell Power balance band (cap)', () => {
     expect(share).toBeGreaterThan(0.1);
     expect(share).toBeLessThan(0.45);
   });
+
+  it('warrior Execute scales off melee Attack Power (not Spell Power) within the band', () => {
+    const { p } = leveled('warrior');
+    const ex = abilitiesKnownAt('warrior', MAX_LEVEL).find((k) => k.def.id === 'execute')!;
+    expect(ex.def.school).toBe('physical');
+    expect(ex.def.scalesWith).toBeUndefined();
+    // A physical special routes to melee Attack Power, which dwarfs a warrior's SP.
+    expect(abilityScalingPower(p, ex.def)).toBe(p.attackPower);
+    expect(p.attackPower).toBeGreaterThan(p.spellPower);
+    const dd = ex.effects.find((e) => e.type === 'directDamage') as { min: number; max: number };
+    const avgBase = (dd.min + dd.max) / 2;
+    const bonus = directHitBonus(p.attackPower, ex.def, ex.castTime);
+    expect(bonus).toBeGreaterThan(0);
+    const share = bonus / (avgBase + bonus);
+    expect(share).toBeGreaterThan(0.1);
+    expect(share).toBeLessThan(0.45);
+  });
+
+  it('a warrior bleed (Rend) folds melee Attack Power into each DoT tick', () => {
+    const { sim, p } = leveled('warrior');
+    const dummy = spawnDummy(sim, p);
+    p.targetId = dummy.id;
+    p.resource = 100; // rage to pay for Rend
+    const rend = abilitiesKnownAt('warrior', MAX_LEVEL).find((k) => k.def.id === 'rend')!;
+    const dot = rend.effects.find((e) => e.type === 'dot') as {
+      total: number;
+      duration: number;
+      interval: number;
+    };
+    sim.castAbility('rend', p.id);
+    sim.tick();
+    const aura = dummy.auras.find((a) => a.kind === 'dot' && a.id === 'rend')!;
+    expect(aura).toBeDefined();
+    const basePerTick = Math.max(1, Math.round(dot.total / (dot.duration / dot.interval)));
+    const bonusPerTick = dotTickBonus(p.attackPower, rend.def, dot.duration, dot.interval);
+    expect(bonusPerTick).toBeGreaterThan(0);
+    expect(aura.value).toBe(basePerTick + bonusPerTick);
+  });
 });
 
 // End-to-end: the snapshotted DoT tick value on the target reflects Spell Power.

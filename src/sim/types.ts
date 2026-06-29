@@ -1017,8 +1017,9 @@ export interface AbilityDef {
   range: number; // yards; 0 = melee range
   minRange?: number;
   school: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
-  // Damage scaling source. Default: non-physical damage scales with Spell Power,
-  // physical damage scales with melee Attack Power (the weapon/finisher paths).
+  // Damage scaling source for the flat directDamage / DoT / AoE riders. Default:
+  // non-physical damage scales with Spell Power; physical damage scales with melee
+  // Attack Power (on top of the weapon/finisher paths, which already carry AP).
   // 'ranged' marks a hunter "attack spell" that scales off Ranged Attack Power
   // instead (Arcane Shot, Serpent Sting, Aimed Shot), regardless of school.
   scalesWith?: 'ranged';
@@ -1917,6 +1918,13 @@ export const SPELL_AOE_COEFF_MULT = 0.333;
 // cast/duration shape, scaled down by this factor (RAP is far larger than SP).
 // Tuned so Arcane Shot / Aimed Shot / Serpent Sting gain a ~20-30% lift at cap.
 export const RANGED_SPELL_AP_SCALE = 0.15;
+// Melee physical "attack spells" (warrior Rend/Execute/Cleave, rogue Rupture/
+// Garrote bleeds, druid feral bleeds, etc.) take the flat-damage portion of a
+// special and scale it off melee Attack Power with the same shape. Melee AP is
+// the same magnitude as Ranged AP, so it reuses the same scale-down factor. The
+// weapon-swing and finisher portions already carry AP through their own paths;
+// this only lifts the flat directDamage / DoT / AoE riders.
+export const MELEE_SPELL_AP_SCALE = 0.15;
 
 // ---------------------------------------------------------------------------
 // Delves, replayable modular instances (see docs/prd/delves.md)

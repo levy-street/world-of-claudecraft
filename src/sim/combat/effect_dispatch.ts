@@ -74,10 +74,11 @@ export function runEffects(
         if (!target) break;
         const critChance = isSpell ? ctx.spellCrit(p) : p.critChance;
         let dmg = ctx.rng.range(eff.min, eff.max);
-        // Spell Power (or Ranged AP for hunter attack-spells) adds to the base
-        // before crit/armor, mirroring the melee attack-power path.
-        if (isSpell || ability.scalesWith === 'ranged')
-          dmg += directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
+        // The flat rider scales with the school's rating: Spell Power for spells,
+        // Ranged AP for hunter shots, melee Attack Power for physical specials.
+        // abilityScalingPower picks the rating; powerScale (inside directHitBonus)
+        // applies the AP scale-down. A non-scaling effect just contributes 0.
+        dmg += directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
         const crit = ctx.rng.chance(critChance);
         if (crit) dmg *= isSpell ? 1.5 : 2;
         if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
@@ -282,10 +283,12 @@ export function runEffects(
           (e) => e.type === 'directDamage' || e.type === 'aoeDamage' || e.type === 'aoeRoot',
         );
         const dotBase = Math.max(1, Math.round(eff.total / (eff.duration / eff.interval)));
-        const dotSp =
-          !hybrid && (isSpell || ability.scalesWith === 'ranged')
-            ? dotTickBonus(abilityScalingPower(p, ability), ability, eff.duration, eff.interval)
-            : 0;
+        // Physical bleeds (Rend, Rupture, Garrote, Rip) scale off melee Attack
+        // Power here just like a spell DoT scales off Spell Power; `hybrid` still
+        // suppresses the rider on a DoT that trails its own direct nuke.
+        const dotSp = !hybrid
+          ? dotTickBonus(abilityScalingPower(p, ability), ability, eff.duration, eff.interval)
+          : 0;
         ctx.applyAura(target, {
           id: ability.id,
           name: ability.name,
@@ -406,10 +409,12 @@ export function runEffects(
           school: ability.school,
           fx: 'nova',
         });
-        const aoeSpBonus =
-          isSpell || ability.scalesWith === 'ranged'
-            ? directHitBonus(abilityScalingPower(p, ability), ability, res.castTime, true)
-            : 0;
+        const aoeSpBonus = directHitBonus(
+          abilityScalingPower(p, ability),
+          ability,
+          res.castTime,
+          true,
+        );
         for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
           if (!ctx.hasLineOfSight(p, m)) continue;
           let dmg = ctx.rng.range(eff.min, eff.max) + aoeSpBonus;
@@ -443,10 +448,9 @@ export function runEffects(
           tickTimer: eff.interval,
           school: ability.school,
           ability: ability.name,
-          // Each pulse is a spell hit; scale per tick like an AoE nuke.
-          spBonus: isSpell
-            ? directHitBonus(abilityScalingPower(p, ability), ability, res.castTime, true)
-            : 0,
+          // Each pulse is an AoE hit; scale per tick off the school's rating
+          // (Spell Power, Ranged AP, or melee Attack Power for physical pulses).
+          spBonus: directHitBonus(abilityScalingPower(p, ability), ability, res.castTime, true),
         };
         ctx.emit({
           type: 'spellfx',
@@ -503,9 +507,12 @@ export function runEffects(
           school: ability.school,
           fx: 'nova',
         });
-        const aoeRootSp = isSpell
-          ? directHitBonus(abilityScalingPower(p, ability), ability, res.castTime, true)
-          : 0;
+        const aoeRootSp = directHitBonus(
+          abilityScalingPower(p, ability),
+          ability,
+          res.castTime,
+          true,
+        );
         for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
           if (!ctx.hasLineOfSight(p, m)) continue;
           const dmg = ctx.rng.range(eff.min, eff.max) + aoeRootSp;

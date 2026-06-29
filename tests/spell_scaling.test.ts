@@ -10,6 +10,7 @@ import {
 } from '../src/sim/spell_scaling';
 import type { AbilityDef } from '../src/sim/types';
 import {
+  MELEE_SPELL_AP_SCALE,
   RANGED_SPELL_AP_SCALE,
   SPELL_AOE_COEFF_MULT,
   SPELL_COEFF_DIVISOR,
@@ -118,9 +119,26 @@ describe('dotTickBonus', () => {
 });
 
 describe('abilityScalingPower', () => {
-  it('returns rangedPower for ranged attack-spells, spellPower otherwise', () => {
-    const e = { spellPower: 120, rangedPower: 350 };
-    expect(abilityScalingPower(e, def({}))).toBe(120);
-    expect(abilityScalingPower(e, def({ scalesWith: 'ranged' }))).toBe(350);
+  it('routes ranged shots to RAP, physical specials to melee AP, spells to SP', () => {
+    const e = { spellPower: 120, rangedPower: 350, attackPower: 500 };
+    expect(abilityScalingPower(e, def({}))).toBe(120); // fire spell -> Spell Power
+    expect(abilityScalingPower(e, def({ scalesWith: 'ranged' }))).toBe(350); // hunter shot -> RAP
+    expect(abilityScalingPower(e, def({ school: 'physical' }))).toBe(500); // melee special -> AP
+    // 'ranged' wins even on a physical shot (Aimed Shot / Concussive Shot).
+    expect(abilityScalingPower(e, def({ school: 'physical', scalesWith: 'ranged' }))).toBe(350);
+  });
+});
+
+describe('powerScale (melee AP riders)', () => {
+  it('physical specials take the melee AP scale-down, spells take the full coeff', () => {
+    const ap = 500;
+    // Instant physical special: coeff = 1.5/3.5 floor, scaled by MELEE_SPELL_AP_SCALE.
+    expect(directHitBonus(ap, def({ school: 'physical' }), 0)).toBe(
+      Math.round(ap * (SPELL_COEFF_MIN_CAST / SPELL_COEFF_DIVISOR) * MELEE_SPELL_AP_SCALE),
+    );
+    // A physical bleed splits the melee-AP-scaled total across its ticks.
+    expect(dotTickBonus(ap, def({ school: 'physical' }), 12, 2)).toBe(
+      Math.round((ap * (12 / 15) * MELEE_SPELL_AP_SCALE) / 6),
+    );
   });
 });

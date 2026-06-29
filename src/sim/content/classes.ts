@@ -1830,6 +1830,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 35,
     minRange: 8,
     school: 'physical',
+    // A fired shot: its flat damage scales off Ranged AP like the other shots,
+    // not melee AP, even though it is physical.
+    scalesWith: 'ranged',
     requiresTarget: true,
     effects: [
       { type: 'directDamage', min: 4, max: 6 },
