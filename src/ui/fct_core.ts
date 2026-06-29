@@ -28,6 +28,7 @@
 export type FctKind =
   | 'miss'
   | 'dodge'
+  | 'resist'
   | 'damage-done-ability'
   | 'damage-done-auto'
   | 'damage-taken'
@@ -153,6 +154,10 @@ function colorToken(kind: FctKind, isSelf: boolean): FctColorToken {
       return isSelf ? 'miss-self' : 'miss-other';
     case 'dodge':
       return isSelf ? 'dodge-self' : 'dodge-other';
+    case 'resist':
+      // A resisted spell is an avoidance word like a miss; it reuses the miss colour token
+      // (self grey / other white) so it needs no new CSS class.
+      return isSelf ? 'miss-self' : 'miss-other';
     default:
       // The seven non-avoidance kinds are their own color token 1:1; isSelf never
       // changes their color in the live fct(), so it is ignored here.

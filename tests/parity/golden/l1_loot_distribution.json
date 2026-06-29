@@ -30,7 +30,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 392,
-      "state": "4be3f60f",
+      "state": "d1f873a7",
       "events": "7601bb8c",
       "rng": {
         "draws": 1,
@@ -125,6 +125,7 @@
           "id": 388,
           "kind": "player",
           "level": 1,
+          "lootFfaTimer": "Infinity",
           "maxHp": 90,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -171,6 +172,7 @@
           "id": 389,
           "kind": "player",
           "level": 1,
+          "lootFfaTimer": "Infinity",
           "maxHp": 54,
           "maxResource": 195,
           "moveSpeed": 7,
@@ -218,6 +220,7 @@
           "id": 390,
           "kind": "player",
           "level": 1,
+          "lootFfaTimer": "Infinity",
           "maxHp": 62,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -279,6 +282,7 @@
               }
             ]
           },
+          "lootFfaTimer": "Infinity",
           "lootRecipientIds": [
             388,
             389,
@@ -318,7 +322,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 392,
-      "state": "b1f25831",
+      "state": "8e0f1f59",
       "events": "6694308e",
       "rng": {
         "draws": 3,
@@ -417,6 +421,7 @@
           "id": 388,
           "kind": "player",
           "level": 1,
+          "lootFfaTimer": "Infinity",
           "maxHp": 90,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -463,6 +468,7 @@
           "id": 389,
           "kind": "player",
           "level": 1,
+          "lootFfaTimer": "Infinity",
           "maxHp": 54,
           "maxResource": 195,
           "moveSpeed": 7,
@@ -510,6 +516,7 @@
           "id": 390,
           "kind": "player",
           "level": 1,
+          "lootFfaTimer": "Infinity",
           "maxHp": 62,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -576,6 +583,7 @@
               }
             ]
           },
+          "lootFfaTimer": "Infinity",
           "lootRecipientIds": [
             388,
             389,
@@ -616,7 +624,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 392,
-      "state": "a9fdbc3e",
+      "state": "ef69527a",
       "events": "904c6282",
       "rng": {
         "draws": 3,
@@ -725,6 +733,7 @@
           "id": 388,
           "kind": "player",
           "level": 1,
+          "lootFfaTimer": "Infinity",
           "maxHp": 90,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -771,6 +780,7 @@
           "id": 389,
           "kind": "player",
           "level": 1,
+          "lootFfaTimer": "Infinity",
           "maxHp": 54,
           "maxResource": 195,
           "moveSpeed": 7,
@@ -818,6 +828,7 @@
           "id": 390,
           "kind": "player",
           "level": 1,
+          "lootFfaTimer": "Infinity",
           "maxHp": 62,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -868,6 +879,7 @@
           "id": 391,
           "kind": "mob",
           "level": 2,
+          "lootFfaTimer": "Infinity",
           "lootRecipientIds": [
             388,
             389,
@@ -907,7 +919,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 392,
-      "state": "625acbe2",
+      "state": "bb33d672",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -1017,6 +1029,7 @@
           "inCombat": true,
           "kind": "player",
           "level": 1,
+          "lootFfaTimer": "Infinity",
           "maxHp": 90,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -1063,6 +1076,7 @@
           "id": 389,
           "kind": "player",
           "level": 1,
+          "lootFfaTimer": "Infinity",
           "maxHp": 54,
           "maxResource": 195,
           "moveSpeed": 7,
@@ -1110,6 +1124,7 @@
           "id": 390,
           "kind": "player",
           "level": 1,
+          "lootFfaTimer": "Infinity",
           "maxHp": 62,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -1166,6 +1181,7 @@
             "z": 22
           },
           "level": 2,
+          "lootFfaTimer": "Infinity",
           "maxHp": 42,
           "moveSpeed": 8,
           "onGround": true,

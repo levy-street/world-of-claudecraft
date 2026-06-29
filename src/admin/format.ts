@@ -1,15 +1,6 @@
 // Small display formatters shared across the admin dashboard.
 import { adminLanguageTag, t } from './i18n';
 
-export function escapeHtml(value: unknown): string {
-  return String(value ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
 // Locale-aware unit abbreviations (mirrors the fmtCopper t()-keyed-unit pattern):
 // each carries the {n} value so a translator can reorder the number/unit per locale.
 const durSeconds = (n: number) => t('duration.secondsShort', { n });
@@ -28,9 +19,9 @@ export function fmtDuration(totalSeconds: number): string {
 }
 
 export function fmtDate(iso: string | null): string {
-  if (!iso) return '—';
+  if (!iso) return t('common.emptyValue');
   const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return '—';
+  if (Number.isNaN(d.getTime())) return t('common.emptyValue');
   return new Intl.DateTimeFormat(adminLanguageTag(), {
     year: 'numeric',
     month: 'short',

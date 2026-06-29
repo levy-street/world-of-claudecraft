@@ -25,6 +25,7 @@ function deps(): AurasDeps {
     auraName: (a) => `name:${a.name}`,
     formatStacks: (n) => String(n),
     durationUnitSuffix: () => 's',
+    auraEffectHtml: () => '',
   };
 }
 

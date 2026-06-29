@@ -10,6 +10,7 @@
 // S3 i18n guard never scanned their internal `return '...'` strings; the existing en/
 // em-dash readout literals are preserved byte-for-byte under the move-not-rewrite waiver.
 
+import { isDebuffAura } from '../aura_classify';
 import { isRooted } from '../combat/cc';
 import {
   FIRST_TALENT_LEVEL,
@@ -47,27 +48,6 @@ import {
 } from '../types';
 import { groundHeight } from '../world';
 
-// The auras a target carries that are working against it. Everything else
-// (buff_*, hot, absorb, imbue, stances, forms, stealth, thorns, attackspeed
-// haste) is treated as helpful/neutral. Used by /targetbuffs to tag each aura.
-const HARMFUL_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
-  'dot',
-  'slow',
-  'stun',
-  'root',
-  'incapacitate',
-  'polymorph',
-  'sunder',
-  'spellvuln',
-  'vulnerability',
-  'tongues',
-  'cost_tax',
-  'critvuln',
-]);
-
-function isHarmfulAura(kind: AuraKind): boolean {
-  return HARMFUL_AURA_KINDS.has(kind);
-}
 const NEARBY_RANGE = 40; // /nearby scan radius — wider than say, tighter than yell
 const NEARBY_MAX = 10; // cap the /nearby list so a crowded camp can't spam chat
 
@@ -257,7 +237,7 @@ export function targetBuffsReadout(ctx: SimContext, self: Entity): string {
   if (auras.length === 0) return `${target.name} has no active effects.`;
   const parts = auras.map((a) => {
     const stack = (a.stacks ?? 1) > 1 ? ` x${a.stacks}` : '';
-    const tag = isHarmfulAura(a.kind) ? 'debuff' : 'buff';
+    const tag = isDebuffAura(a.kind, a.value) ? 'debuff' : 'buff';
     return `${a.name}${stack} [${tag}] (${Math.ceil(a.remaining)}s)`;
   });
   return `Effects on ${target.name} (${auras.length}): ${parts.join(', ')}.`;

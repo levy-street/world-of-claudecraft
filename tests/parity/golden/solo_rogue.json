@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 389,
-      "state": "901c55a7",
+      "state": "85d930c7",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -58,6 +58,7 @@
           "id": 388,
           "kind": "player",
           "level": 1,
+          "lootFfaTimer": "Infinity",
           "maxHp": 62,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -99,7 +100,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 390,
-      "state": "788290aa",
+      "state": "58f4015a",
       "events": "f9b79d6c",
       "rng": {
         "draws": 7,
@@ -110,7 +111,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 390,
-      "state": "74c1c313",
+      "state": "32efe437",
       "events": "33a84e8d",
       "rng": {
         "draws": 13,
@@ -121,7 +122,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 390,
-      "state": "746485da",
+      "state": "f3d47e52",
       "events": "fd9e884b",
       "rng": {
         "draws": 89,
@@ -132,7 +133,7 @@
       "tick": 72,
       "time": 3.6,
       "nextId": 390,
-      "state": "1faa826a",
+      "state": "04a52d66",
       "events": "741638a5",
       "rng": {
         "draws": 141,
@@ -183,6 +184,7 @@
           "inCombat": true,
           "kind": "player",
           "level": 10,
+          "lootFfaTimer": "Infinity",
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -241,6 +243,7 @@
             "z": -2
           },
           "level": 5,
+          "lootFfaTimer": "Infinity",
           "maxHp": 9000,
           "moveSpeed": 8,
           "onGround": true,

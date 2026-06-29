@@ -630,6 +630,89 @@ export const hudChromeStrings = {
     leaderOnly: 'Only the raid leader may convert to a party.',
     tooLarge: 'A raid with more than five members cannot convert back to a party.',
   },
+  // Armor subtype shown on an armor item's slot line (classic shows the slot on the
+  // left, the armor class on the right). Resolved from src/ui/item_armor_type.ts via
+  // the sim's armorTypeForItem; tells the player which classes the gear is meant for.
+  itemArmorType: {
+    cloth: 'Cloth',
+    leather: 'Leather',
+    mail: 'Mail',
+  },
+  // Buff/debuff hover tooltip effect line: a one-line summary of what the active
+  // aura does, shown under its name and remaining time. Numbers are spliced in via
+  // formatNumber as {value}/{pct}/{interval}/{stacks}/{min}/{max}; {school} is the
+  // localized damage-school name (see schools below). Keys are produced by the pure
+  // aura_effect.ts descriptor; render via t('hudChrome.auraEffect.<key>', values).
+  auraEffect: {
+    dot: 'Deals {value} {school} damage every {interval} sec',
+    hot: 'Restores {value} health every {interval} sec',
+    absorb: 'Absorbs {value} damage',
+    healAbsorb: 'Absorbs {value} incoming healing',
+    thorns: 'Deals {value} {school} damage to attackers',
+    slow: 'Reduces movement speed by {pct}%',
+    speed: 'Increases movement speed by {pct}%',
+    attackSpeedSlow: 'Slows attack speed by {pct}%',
+    attackSpeedFast: 'Increases attack speed by {pct}%',
+    haste: 'Increases attack and casting speed by {pct}%',
+    tongues: 'Increases casting time by {pct}%',
+    increase: {
+      ap: 'Increases attack power by {value}',
+      armor: 'Increases armor by {value}',
+      int: 'Increases Intellect by {value}',
+      agi: 'Increases Agility by {value}',
+      sta: 'Increases Stamina by {value}',
+      spi: 'Increases Spirit by {value}',
+      allStats: 'Increases all attributes by {value}',
+    },
+    reduce: {
+      ap: 'Reduces attack power by {value}',
+      armor: 'Reduces armor by {value}',
+      int: 'Reduces Intellect by {value}',
+      agi: 'Reduces Agility by {value}',
+      sta: 'Reduces Stamina by {value}',
+      spi: 'Reduces Spirit by {value}',
+      allStats: 'Reduces all attributes by {value}',
+    },
+    dodge: 'Increases dodge chance by {pct}%',
+    dodgeReduce: 'Reduces dodge chance by {pct}%',
+    armorFlat: 'Reduces armor by {value}',
+    armorFlatStacks: 'Reduces armor by {value} ({stacks} stacks)',
+    mortalWound: 'Reduces healing received by {pct}%',
+    vulnerability: 'Increases damage taken by {pct}%',
+    physVuln: 'Increases physical damage taken by {pct}%',
+    spellVuln: 'Increases magic damage taken by {pct}%',
+    critVuln: 'Increases chance to be critically hit by {pct}%',
+    costTax: 'Increases ability costs by {pct}%',
+    stun: 'Stunned: unable to act',
+    root: 'Rooted: unable to move',
+    incapacitate: 'Incapacitated: unable to act',
+    polymorph: 'Polymorphed: unable to act',
+    hex: 'Reduces damage and healing dealt by {pct}%',
+    blind: 'Blinded: unable to act',
+    silence: 'Silenced: unable to cast spells',
+    disarm: 'Disarmed: cannot use weapon attacks',
+    lockout: 'Spell school locked out',
+    imbue: 'Weapon imbued with bonus effects',
+    imbueRange: 'Weapon imbued: {min} to {max} bonus damage on judgement',
+    stealth: 'Concealed; movement speed reduced by {pct}%',
+    formBear: 'Bear Form: increased health and armor',
+    formCat: 'Cat Form: melee damage and energy',
+    formTravel: 'Travel Form: movement speed increased by {pct}%',
+    defensiveStance: 'Defensive Stance: reduced damage taken, more threat',
+    righteousFury: 'Righteous Fury: greatly increased threat from Holy damage',
+    scale: 'Size increased by {pct}%',
+    jump: 'Jump height increased by {pct}%',
+    // Localized damage-school names spliced into {school} above.
+    school: {
+      physical: 'Physical',
+      fire: 'Fire',
+      frost: 'Frost',
+      arcane: 'Arcane',
+      shadow: 'Shadow',
+      holy: 'Holy',
+      nature: 'Nature',
+    },
+  },
   // Loot window title shown only when the chest entity is missing (the normal path
   // uses the chest's localized entity name); replaces a former hard-coded 'Chest'.
   loot: {

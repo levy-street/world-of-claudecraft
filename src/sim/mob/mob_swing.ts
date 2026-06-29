@@ -370,7 +370,22 @@ export function runMobSwingAffixes(
   if (!mob.dead) {
     for (const a of target.auras) {
       if (a.kind === 'thorns') {
-        ctx.dealDamage(target, mob, a.value, false, a.school, a.name, 'hit', true);
+        // Reflect (Thorns / Lightning Shield) fired by a mob's own swing is
+        // incidental, not a direct attack: direct=false so it never walks the
+        // mob's leash anchor (else a kited mob meleeing a shielded player would
+        // be re-anchored every swing and never leash home).
+        ctx.dealDamage(
+          target,
+          mob,
+          a.value,
+          false,
+          a.school,
+          a.name,
+          'hit',
+          true,
+          undefined,
+          false,
+        );
       }
     }
   }

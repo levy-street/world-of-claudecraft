@@ -47,6 +47,10 @@ const hudMobileCss = readFileSync(
   new URL('../src/styles/hud.mobile.css', import.meta.url),
   'utf8',
 ).replace(/\r\n/g, '\n');
+const indexExtraCss = readFileSync(
+  new URL('../src/styles/index.extra.css', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
 const playHtml = readFileSync(new URL('../play.html', import.meta.url), 'utf8').replace(
   /\r\n/g,
   '\n',
@@ -586,12 +590,26 @@ describe('client HTML shell', () => {
     expect(hudCss).toContain(
       'body.native-app .cs-wallet,\n  body.native-app .cs-wallet-hidden-note,\n  body.native-app .account-wallet-card',
     );
+    expect(hudCss).toContain('body.native-app #performance-tip,');
     expect(html).toContain('<section class="account-card account-wallet-card">');
     expect(mainTs).toContain(
       "const WALLET_ENABLED = !NATIVE_APP && String(import.meta.env.VITE_WALLET_DISABLED ?? '').trim() !== '1';",
     );
     expect(mainTs).toContain("document.querySelector('.cs-wallet')?.remove();");
     expect(mainTs).toContain("document.querySelector('.account-wallet-card')?.remove();");
+  });
+
+  it('skips the web mobile preflight in native builds and shows an in-game rotate prompt', () => {
+    expect(mainTs).toContain('if (NATIVE_APP) return Promise.resolve();');
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.game-active #mobile-preflight {\n    display: none !important;',
+    );
+    expect(indexExtraCss).toContain(
+      'body.mobile-touch.game-active:not(.native-app) #rotate-device',
+    );
+    expect(indexExtraCss).toContain(
+      '@media (orientation: portrait) {\n    body.native-app.mobile-touch.game-active #rotate-device {\n      display: flex;',
+    );
   });
 
   it('offers the quest log in the mobile controls drawer', () => {

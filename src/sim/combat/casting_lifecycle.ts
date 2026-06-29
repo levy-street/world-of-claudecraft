@@ -43,9 +43,9 @@ import {
   MELEE_ARC,
   MELEE_RANGE,
   normAngle,
-  spellHitChance,
 } from '../types';
 import { isLockedOut, isSilenced, isStunned, tonguesMult } from './cc';
+import { isSpellResisted } from './spell_resist';
 
 // Shaman shocks (earth/flame/frost) share one cooldown; lightning_shock joins them
 // for the shared-cooldown predicate. Moved with the casting slice (only callers).
@@ -563,7 +563,9 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
       school: ability.school,
       fx: 'projectile',
     });
-    if (!ctx.rng.chance(spellHitChance(p.level, target.level))) {
+    // Spells never "miss" like a physical attack; a target can only fully
+    // RESIST them (classic-era semantics). Same level-based roll, relabeled.
+    if (isSpellResisted(ctx.rng, p.level, target.level)) {
       ctx.emit({
         type: 'damage',
         sourceId: p.id,
@@ -572,7 +574,7 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
         crit: false,
         school: ability.school,
         ability: ability.name,
-        kind: 'miss',
+        kind: 'resist',
       });
       ctx.enterCombat(p, target);
       return;

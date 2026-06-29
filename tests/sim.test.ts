@@ -711,6 +711,23 @@ describe('rogue', () => {
     expect(sim.player.auras.some((a) => a.kind === 'stealth')).toBe(true);
   });
 
+  it('rogue Stealth moves at 50% speed', () => {
+    const sim = makeSim('rogue');
+    (sim as any).grantXp(xpForLevel(1) + xpForLevel(2) + 10); // reach level 3, learns stealth (lvl 2)
+    expect((sim as any).moveSpeedMult(sim.player)).toBe(1);
+    sim.castAbility('stealth');
+    expect(sim.player.auras.some((a) => a.kind === 'stealth')).toBe(true);
+    expect((sim as any).moveSpeedMult(sim.player)).toBeCloseTo(0.5, 5);
+  });
+
+  it('rogue Vanish moves at 50% speed', () => {
+    const sim = makeSim('rogue');
+    sim.setPlayerLevel(20); // Vanish learns at level 18
+    sim.castAbility('vanish');
+    expect(sim.player.auras.some((a) => a.kind === 'stealth')).toBe(true);
+    expect((sim as any).moveSpeedMult(sim.player)).toBeCloseTo(0.5, 5);
+  });
+
   it('rogue GCD is 1.0s', () => {
     const sim = makeSim('rogue');
     expect(sim.playerGcd).toBe(1.0);

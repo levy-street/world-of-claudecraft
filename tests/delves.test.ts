@@ -215,6 +215,32 @@ describe('delve registry', () => {
 });
 
 describe('delve lifecycle', () => {
+  it('more than six solo parties can hold their own Collapsed Reliquary run at once', () => {
+    const sim = makeSim();
+    const PARTIES = 8; // was capped at 6 concurrent delve runs before the bump
+    const pids = [sim.playerId];
+    for (let i = 1; i < PARTIES; i++) {
+      pids.push(sim.addPlayer('warrior', `Delver${i}`));
+    }
+
+    for (const pid of pids) {
+      sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel, pid);
+      sim.drainEvents();
+      sim.enterDelve('collapsed_reliquary', 'normal', pid);
+      const events = sim.drainEvents();
+      expect(
+        events.some((e) => e.type === 'error' && /All instances of .* are busy/.test(e.text ?? '')),
+      ).toBe(false);
+    }
+
+    const claimed = sim.delveRuns.filter(
+      (run) => run.delveId === 'collapsed_reliquary' && run.partyKey !== null,
+    );
+    expect(claimed.length).toBe(PARTIES);
+    // every claimed solo player landed in a distinct run slot (no double-booking)
+    expect(new Set(claimed.map((run) => run.slot)).size).toBe(PARTIES);
+  });
+
   it('enter and leave toggle delve position band', () => {
     const sim = makeSim();
     enterReliquary(sim);

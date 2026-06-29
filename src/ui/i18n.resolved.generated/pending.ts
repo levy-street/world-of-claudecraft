@@ -15,7 +15,12 @@ export const pending: Record<string, readonly string[]> = {
     "game.leaderboard.tabGuilds",
     "game.leaderboard.tabPlayers",
     "game.leaderboard.topLevel",
-    "game.leaderboard.totalXp"
+    "game.leaderboard.totalXp",
+    "hud.combat.floatingResist",
+    "hud.combat.resisted",
+    "hudChrome.itemArmorType.cloth",
+    "hudChrome.itemArmorType.leather",
+    "hudChrome.itemArmorType.mail"
   ],
   "es_ES": [
     "game.leaderboard.guildCol",
@@ -23,7 +28,12 @@ export const pending: Record<string, readonly string[]> = {
     "game.leaderboard.tabGuilds",
     "game.leaderboard.tabPlayers",
     "game.leaderboard.topLevel",
-    "game.leaderboard.totalXp"
+    "game.leaderboard.totalXp",
+    "hud.combat.floatingResist",
+    "hud.combat.resisted",
+    "hudChrome.itemArmorType.cloth",
+    "hudChrome.itemArmorType.leather",
+    "hudChrome.itemArmorType.mail"
   ],
   "fr_FR": [
     "game.leaderboard.guildCol",
@@ -31,7 +41,12 @@ export const pending: Record<string, readonly string[]> = {
     "game.leaderboard.tabGuilds",
     "game.leaderboard.tabPlayers",
     "game.leaderboard.topLevel",
-    "game.leaderboard.totalXp"
+    "game.leaderboard.totalXp",
+    "hud.combat.floatingResist",
+    "hud.combat.resisted",
+    "hudChrome.itemArmorType.cloth",
+    "hudChrome.itemArmorType.leather",
+    "hudChrome.itemArmorType.mail"
   ],
   "fr_CA": [
     "game.leaderboard.guildCol",
@@ -39,7 +54,12 @@ export const pending: Record<string, readonly string[]> = {
     "game.leaderboard.tabGuilds",
     "game.leaderboard.tabPlayers",
     "game.leaderboard.topLevel",
-    "game.leaderboard.totalXp"
+    "game.leaderboard.totalXp",
+    "hud.combat.floatingResist",
+    "hud.combat.resisted",
+    "hudChrome.itemArmorType.cloth",
+    "hudChrome.itemArmorType.leather",
+    "hudChrome.itemArmorType.mail"
   ],
   "en_CA": [],
   "it_IT": [
@@ -48,7 +68,12 @@ export const pending: Record<string, readonly string[]> = {
     "game.leaderboard.tabGuilds",
     "game.leaderboard.tabPlayers",
     "game.leaderboard.topLevel",
-    "game.leaderboard.totalXp"
+    "game.leaderboard.totalXp",
+    "hud.combat.floatingResist",
+    "hud.combat.resisted",
+    "hudChrome.itemArmorType.cloth",
+    "hudChrome.itemArmorType.leather",
+    "hudChrome.itemArmorType.mail"
   ],
   "de_DE": [
     "game.leaderboard.guildCol",
@@ -56,7 +81,12 @@ export const pending: Record<string, readonly string[]> = {
     "game.leaderboard.tabGuilds",
     "game.leaderboard.tabPlayers",
     "game.leaderboard.topLevel",
-    "game.leaderboard.totalXp"
+    "game.leaderboard.totalXp",
+    "hud.combat.floatingResist",
+    "hud.combat.resisted",
+    "hudChrome.itemArmorType.cloth",
+    "hudChrome.itemArmorType.leather",
+    "hudChrome.itemArmorType.mail"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -68,7 +98,12 @@ export const pending: Record<string, readonly string[]> = {
     "game.leaderboard.tabGuilds",
     "game.leaderboard.tabPlayers",
     "game.leaderboard.topLevel",
-    "game.leaderboard.totalXp"
+    "game.leaderboard.totalXp",
+    "hud.combat.floatingResist",
+    "hud.combat.resisted",
+    "hudChrome.itemArmorType.cloth",
+    "hudChrome.itemArmorType.leather",
+    "hudChrome.itemArmorType.mail"
   ],
   "ru_RU": [],
   "nl_NL": [
@@ -77,7 +112,12 @@ export const pending: Record<string, readonly string[]> = {
     "game.leaderboard.tabGuilds",
     "game.leaderboard.tabPlayers",
     "game.leaderboard.topLevel",
-    "game.leaderboard.totalXp"
+    "game.leaderboard.totalXp",
+    "hud.combat.floatingResist",
+    "hud.combat.resisted",
+    "hudChrome.itemArmorType.cloth",
+    "hudChrome.itemArmorType.leather",
+    "hudChrome.itemArmorType.mail"
   ],
   "pl_PL": [
     "game.leaderboard.guildCol",
@@ -85,7 +125,12 @@ export const pending: Record<string, readonly string[]> = {
     "game.leaderboard.tabGuilds",
     "game.leaderboard.tabPlayers",
     "game.leaderboard.topLevel",
-    "game.leaderboard.totalXp"
+    "game.leaderboard.totalXp",
+    "hud.combat.floatingResist",
+    "hud.combat.resisted",
+    "hudChrome.itemArmorType.cloth",
+    "hudChrome.itemArmorType.leather",
+    "hudChrome.itemArmorType.mail"
   ],
   "id_ID": [
     "game.leaderboard.guildCol",
@@ -93,7 +138,12 @@ export const pending: Record<string, readonly string[]> = {
     "game.leaderboard.tabGuilds",
     "game.leaderboard.tabPlayers",
     "game.leaderboard.topLevel",
-    "game.leaderboard.totalXp"
+    "game.leaderboard.totalXp",
+    "hud.combat.floatingResist",
+    "hud.combat.resisted",
+    "hudChrome.itemArmorType.cloth",
+    "hudChrome.itemArmorType.leather",
+    "hudChrome.itemArmorType.mail"
   ],
   "tr_TR": [
     "game.leaderboard.guildCol",
@@ -101,7 +151,12 @@ export const pending: Record<string, readonly string[]> = {
     "game.leaderboard.tabGuilds",
     "game.leaderboard.tabPlayers",
     "game.leaderboard.topLevel",
-    "game.leaderboard.totalXp"
+    "game.leaderboard.totalXp",
+    "hud.combat.floatingResist",
+    "hud.combat.resisted",
+    "hudChrome.itemArmorType.cloth",
+    "hudChrome.itemArmorType.leather",
+    "hudChrome.itemArmorType.mail"
   ],
   "sv_SE": [
     "game.leaderboard.guildCol",
@@ -109,7 +164,12 @@ export const pending: Record<string, readonly string[]> = {
     "game.leaderboard.tabGuilds",
     "game.leaderboard.tabPlayers",
     "game.leaderboard.topLevel",
-    "game.leaderboard.totalXp"
+    "game.leaderboard.totalXp",
+    "hud.combat.floatingResist",
+    "hud.combat.resisted",
+    "hudChrome.itemArmorType.cloth",
+    "hudChrome.itemArmorType.leather",
+    "hudChrome.itemArmorType.mail"
   ],
   "vi_VN": [
     "game.leaderboard.guildCol",
@@ -117,7 +177,12 @@ export const pending: Record<string, readonly string[]> = {
     "game.leaderboard.tabGuilds",
     "game.leaderboard.tabPlayers",
     "game.leaderboard.topLevel",
-    "game.leaderboard.totalXp"
+    "game.leaderboard.totalXp",
+    "hud.combat.floatingResist",
+    "hud.combat.resisted",
+    "hudChrome.itemArmorType.cloth",
+    "hudChrome.itemArmorType.leather",
+    "hudChrome.itemArmorType.mail"
   ],
   "da_DK": [
     "game.leaderboard.guildCol",
@@ -125,6 +190,11 @@ export const pending: Record<string, readonly string[]> = {
     "game.leaderboard.tabGuilds",
     "game.leaderboard.tabPlayers",
     "game.leaderboard.topLevel",
-    "game.leaderboard.totalXp"
+    "game.leaderboard.totalXp",
+    "hud.combat.floatingResist",
+    "hud.combat.resisted",
+    "hudChrome.itemArmorType.cloth",
+    "hudChrome.itemArmorType.leather",
+    "hudChrome.itemArmorType.mail"
   ]
 };

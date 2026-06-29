@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import {
@@ -11,8 +11,9 @@ import {
   rollLoot,
   submitLootRoll,
 } from '../src/sim/loot/loot_roll';
+import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
-import type { Entity, LootSlot } from '../src/sim/types';
+import type { Entity, LootSlot, SimEvent } from '../src/sim/types';
 
 // Direct unit tests for the extracted loot-distribution module (L1). These drive the
 // module's exported `(ctx, ...)` functions through `sim.ctx` (the real SimContext
@@ -32,6 +33,20 @@ function partyOfThree(seed = 42) {
   sim.partyInvite(c, a);
   sim.partyAccept(c);
   return { sim, a, b, c };
+}
+
+function playerMeta(sim: Sim, pid: number): PlayerMeta {
+  const meta = sim.ctx.players.get(pid);
+  if (!meta) throw new Error(`expected player ${pid}`);
+  return meta;
+}
+
+function lootRollEvent(sim: Sim): Extract<SimEvent, { type: 'lootRoll' }> {
+  const event = sim.events.find((e): e is Extract<SimEvent, { type: 'lootRoll' }> => {
+    return e.type === 'lootRoll';
+  });
+  if (!event) throw new Error('expected loot roll event');
+  return event;
 }
 
 // A pre-killed corpse with an explicit death-time recipient snapshot, so the
@@ -56,7 +71,7 @@ describe('loot_roll: rollLoot producer (drop-rate determinism)', () => {
   function dropRate(seed: number, mobId: string, itemId: string, n: number): number {
     const sim = makeSim(seed);
     const pid = sim.addPlayer('warrior', 'Looter');
-    const meta = sim.ctx.players.get(pid)!;
+    const meta = playerMeta(sim, pid);
     const template = MOBS[mobId];
     let hits = 0;
     for (let i = 0; i < n; i++) {
@@ -80,6 +95,31 @@ describe('loot_roll: rollLoot producer (drop-rate determinism)', () => {
   });
 });
 
+describe('loot_roll: probability tables', () => {
+  it('keeps every chance valid and every exclusive group at or below 100%', () => {
+    const problems: string[] = [];
+
+    for (const [mobId, mob] of Object.entries(MOBS)) {
+      const groupTotals = new Map<string, number>();
+      for (const [index, entry] of mob.loot.entries()) {
+        if (!Number.isFinite(entry.chance) || entry.chance < 0 || entry.chance > 1) {
+          problems.push(`${mobId}.loot[${index}] has invalid chance ${entry.chance}`);
+        }
+        if (entry.rollGroup) {
+          groupTotals.set(entry.rollGroup, (groupTotals.get(entry.rollGroup) ?? 0) + entry.chance);
+        }
+      }
+      for (const [group, total] of groupTotals) {
+        if (total > 1 + Number.EPSILON) {
+          problems.push(`${mobId}.${group} totals ${total}`);
+        }
+      }
+    }
+
+    expect(problems).toEqual([]);
+  });
+});
+
 describe('loot_roll: need-greed resolution (module entry)', () => {
   it('need beats greed; the winner receives the item and others get nothing', () => {
     const { sim, a, b, c } = partyOfThree();
@@ -87,8 +127,8 @@ describe('loot_roll: need-greed resolution (module entry)', () => {
       copper: 0,
       items: [{ itemId: 'greyjaw_hide_boots', count: 1 }],
     });
-    awardSharedLootItem(sim.ctx, 'greyjaw_hide_boots', mob, sim.ctx.players.get(a)!);
-    const rollId = sim.events.find((e) => e.type === 'lootRoll')!.rollId as number;
+    awardSharedLootItem(sim.ctx, 'greyjaw_hide_boots', mob, playerMeta(sim, a));
+    const rollId = lootRollEvent(sim).rollId;
     submitLootRoll(sim.ctx, rollId, 'greed', b);
     submitLootRoll(sim.ctx, rollId, 'need', a);
     submitLootRoll(sim.ctx, rollId, 'pass', c);
@@ -104,8 +144,8 @@ describe('loot_roll: need-greed resolution (module entry)', () => {
         copper: 0,
         items: [{ itemId: 'greyjaw_hide_boots', count: 1 }],
       });
-      awardSharedLootItem(sim.ctx, 'greyjaw_hide_boots', mob, sim.ctx.players.get(a)!);
-      const rollId = sim.events.find((e) => e.type === 'lootRoll')!.rollId as number;
+      awardSharedLootItem(sim.ctx, 'greyjaw_hide_boots', mob, playerMeta(sim, a));
+      const rollId = lootRollEvent(sim).rollId;
       submitLootRoll(sim.ctx, rollId, 'need', a);
       submitLootRoll(sim.ctx, rollId, 'need', b);
       submitLootRoll(sim.ctx, rollId, 'pass', c);
@@ -118,17 +158,40 @@ describe('loot_roll: need-greed resolution (module entry)', () => {
     expect(resolveWinner()).toBe(winner);
   });
 
+  it('breaks an exact d100 tie with a separate random draw', () => {
+    const { sim, a, b, c } = partyOfThree();
+    const mob = deadCorpse(sim, a, [a, b, c], {
+      copper: 0,
+      items: [{ itemId: 'greyjaw_hide_boots', count: 1 }],
+    });
+    awardSharedLootItem(sim.ctx, 'greyjaw_hide_boots', mob, playerMeta(sim, a));
+    const rollId = lootRollEvent(sim).rollId;
+    const int = vi
+      .spyOn(sim.ctx.rng, 'int')
+      .mockReturnValueOnce(50)
+      .mockReturnValueOnce(50)
+      .mockReturnValueOnce(1);
+
+    submitLootRoll(sim.ctx, rollId, 'need', a);
+    submitLootRoll(sim.ctx, rollId, 'need', b);
+    submitLootRoll(sim.ctx, rollId, 'pass', c);
+
+    expect(int).toHaveBeenNthCalledWith(3, 0, 1);
+    expect(sim.countItem('greyjaw_hide_boots', a)).toBe(0);
+    expect(sim.countItem('greyjaw_hide_boots', b)).toBe(1);
+  });
+
   it('when everyone passes, the item returns to the corpse as an open slot for all', () => {
     const { sim, a, b, c } = partyOfThree();
     const mob = deadCorpse(sim, a, [a, b, c], {
       copper: 0,
       items: [{ itemId: 'greyjaw_hide_boots', count: 1 }],
     });
-    awardSharedLootItem(sim.ctx, 'greyjaw_hide_boots', mob, sim.ctx.players.get(a)!);
+    awardSharedLootItem(sim.ctx, 'greyjaw_hide_boots', mob, playerMeta(sim, a));
     // Starting the roll pulls the item off the corpse (lootCorpse zeroes the slot and
     // prunes it); model that so the only slot left is whatever the roll returns.
     mob.loot = { copper: 0, items: [] };
-    const rollId = sim.events.find((e) => e.type === 'lootRoll')!.rollId as number;
+    const rollId = lootRollEvent(sim).rollId;
     submitLootRoll(sim.ctx, rollId, 'pass', a);
     submitLootRoll(sim.ctx, rollId, 'pass', b);
     submitLootRoll(sim.ctx, rollId, 'pass', c);
@@ -145,9 +208,9 @@ describe('loot_roll: fair-split copper (module entry)', () => {
     const run = () => {
       const { sim, a, b, c } = partyOfThree(99);
       const mob = deadCorpse(sim, a, [a, b, c], { copper: 100, items: [] });
-      const before = [a, b, c].map((pid) => sim.ctx.players.get(pid)!.copper);
-      distributeLootCopper(sim.ctx, mob, sim.ctx.players.get(a)!);
-      const after = [a, b, c].map((pid) => sim.ctx.players.get(pid)!.copper);
+      const before = [a, b, c].map((pid) => playerMeta(sim, pid).copper);
+      distributeLootCopper(sim.ctx, mob, playerMeta(sim, a));
+      const after = [a, b, c].map((pid) => playerMeta(sim, pid).copper);
       return after.map((v, i) => v - before[i]);
     };
     const shares = run();
@@ -163,9 +226,9 @@ describe('loot_roll: fair-split copper (module entry)', () => {
     const run = () => {
       const { sim, a, b, c } = partyOfThree(123);
       const mob = deadCorpse(sim, a, [a, b, c], { copper: 101, items: [] });
-      const before = [a, b, c].map((pid) => sim.ctx.players.get(pid)!.copper);
-      distributeLootCopper(sim.ctx, mob, sim.ctx.players.get(a)!);
-      const after = [a, b, c].map((pid) => sim.ctx.players.get(pid)!.copper);
+      const before = [a, b, c].map((pid) => playerMeta(sim, pid).copper);
+      distributeLootCopper(sim.ctx, mob, playerMeta(sim, a));
+      const after = [a, b, c].map((pid) => playerMeta(sim, pid).copper);
       return after.map((v, i) => v - before[i]);
     };
     const shares = run();
@@ -179,7 +242,7 @@ describe('loot_roll: fair-split copper (module entry)', () => {
     const sim = makeSim(7);
     const a = sim.addPlayer('warrior', 'Solo');
     const mob = deadCorpse(sim, a, [a], { copper: 50, items: [] });
-    const meta = sim.ctx.players.get(a)!;
+    const meta = playerMeta(sim, a);
     const before = meta.copper;
     distributeLootCopper(sim.ctx, mob, meta);
     expect(meta.copper - before).toBe(50);

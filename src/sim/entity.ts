@@ -99,6 +99,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     aggroTargetId: null,
     respawnTimer: 0,
     corpseTimer: 0,
+    lootFfaTimer: Infinity, // no FFA countdown until rollLoot starts it at death
     lootable: false,
     loot: null,
     xpValue: 0,

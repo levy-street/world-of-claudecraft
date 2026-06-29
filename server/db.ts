@@ -162,6 +162,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS account_totp_recovery_hash ON account_totp_rec
 CREATE INDEX IF NOT EXISTS accounts_created_at ON accounts(created_at DESC);
 CREATE INDEX IF NOT EXISTS accounts_created_ip_created ON accounts(created_ip, created_at DESC);
 CREATE INDEX IF NOT EXISTS accounts_created_user_agent_created ON accounts(created_user_agent, created_at DESC);
+CREATE INDEX IF NOT EXISTS accounts_last_login_ip_login ON accounts(last_login_ip, last_login DESC);
 ALTER TABLE characters ADD COLUMN IF NOT EXISTS is_gm BOOLEAN NOT NULL DEFAULT FALSE;
 ALTER TABLE characters ADD COLUMN IF NOT EXISTS force_rename BOOLEAN NOT NULL DEFAULT FALSE;
 CREATE TABLE IF NOT EXISTS play_sessions (
@@ -176,6 +177,7 @@ ALTER TABLE play_sessions ADD COLUMN IF NOT EXISTS ip_address TEXT;
 ALTER TABLE play_sessions ADD COLUMN IF NOT EXISTS user_agent TEXT;
 CREATE INDEX IF NOT EXISTS play_sessions_account ON play_sessions(account_id);
 CREATE INDEX IF NOT EXISTS play_sessions_started ON play_sessions(started_at);
+CREATE INDEX IF NOT EXISTS play_sessions_ip_started ON play_sessions(ip_address, started_at DESC);
 CREATE TABLE IF NOT EXISTS admin_online_samples (
   id BIGSERIAL PRIMARY KEY,
   realm TEXT NOT NULL DEFAULT '${REALM_SQL_DEFAULT}',
@@ -1681,6 +1683,41 @@ export async function saveCharacterState(
     'UPDATE characters SET level = $2, state = $3, updated_at = now() WHERE id = $1',
     [characterId, level, JSON.stringify(cleanState)],
   );
+}
+
+// Persist a character row AND the global World Market blob in ONE transaction.
+// The two live in different tables (characters / world_state), but a Market
+// listing is an escrow: the item leaves the seller's bags (character state) and
+// becomes a listing (market state) in the same Sim action. Saving them as two
+// independent writes lets an unclean crash persist one half and not the other,
+// vaporising the item or duplicating it across bags and market. The leave path
+// uses this so a logout flush of bags can never tear away from the market.
+export async function saveCharacterAndMarketState(
+  characterId: number,
+  level: number,
+  state: CharacterState,
+  market: MarketSave,
+): Promise<void> {
+  const cleanState = sanitizeRemovedZone1Content(state).state;
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    await client.query(
+      'UPDATE characters SET level = $2, state = $3, updated_at = now() WHERE id = $1',
+      [characterId, level, JSON.stringify(cleanState)],
+    );
+    await client.query(
+      `INSERT INTO world_state (key, data, updated_at) VALUES ($1, $2, now())
+       ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
+      ['market', JSON.stringify(market)],
+    );
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 
 export async function isAdminAccount(accountId: number): Promise<boolean> {

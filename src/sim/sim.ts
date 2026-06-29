@@ -5,6 +5,7 @@ import type {
   LockpickView,
 } from '../world_api';
 import { lineOfSightClear, resolveMovement, resolvePosition } from './colliders';
+import { auraAffectsStats, removeCancelableAura } from './combat/aura_cancel';
 import {
   cleanseFriendlyNpcAuras,
   isRejectedFriendlyNpcAura,
@@ -42,6 +43,7 @@ import {
   healingThreat as healingThreatImpl,
   hexOutputMult as hexOutputMultImpl,
 } from './combat/heal';
+import { isSpellResisted } from './combat/spell_resist';
 // A3: the augment/power-up content helpers used by the Fiesta match logic
 // (AUGMENTS_BY_ID/AugmentDef/eligibleAugments/POWERUPS/PowerupDef/tierForWave)
 // moved to social/fiesta.ts with that logic; sim.ts keeps only the type used by
@@ -174,6 +176,7 @@ import {
 import { prestige as prestigeImpl, updateRested } from './progression/xp';
 import { sanitizeRemovedZone1Content } from './removed_zone1_content';
 import { Rng } from './rng';
+import { persistedResource } from './serialize_resource';
 import { createSimContext, type SimContext, type SimContextHost } from './sim_context';
 import * as chatMod from './social/chat';
 import * as tradeMod from './social/trade';
@@ -225,6 +228,7 @@ import {
 import * as fiestaBotsMod from './social/fiesta_bots';
 import { PartyMachine } from './social/party';
 import { SpatialGrid } from './spatial';
+import { isStunDrCategory } from './stun_dr';
 import { Targeting } from './targeting';
 import {
   addThreat,
@@ -283,7 +287,6 @@ import {
   type SimEvent,
   type SkinCatalog,
   type SkinRank,
-  spellHitChance,
   TURN_SPEED,
   type Vec3,
   virtualLevel,
@@ -343,6 +346,7 @@ const ARENA_LADDER_SIZE = 10; // live online standings shipped to clients
 // imported back (above) for the fiestaMatchInfo presentation accessor, which stays
 // on Sim. (A2 already moved FIESTA_COUNTDOWN to social/arena.ts.)
 const PVP_ROOT_DR_RESET = 18; // seconds before a repeated PvP root is fresh again
+const PVP_STUN_DR_RESET = 18; // stuns share the root-style 100/50/25/immune scheme
 const PVP_POLYMORPH_DR_RESET = 60;
 const PVP_FEAR_DR_RESET = 60;
 const PVP_CC_DR_MULTIPLIERS = [1, 0.5, 0.25] as const;
@@ -1327,7 +1331,15 @@ export class Sim {
       restedXp: meta.restedXp,
       copper: meta.copper,
       hp: e.hp,
-      resource: e.resource,
+      // A druid saved while shifted runs on rage/energy with its mana parked in
+      // savedMana; persist the parked mana so reload (always caster form) restores
+      // it instead of clamping the form bar into the mana pool.
+      resource: persistedResource(
+        CLASSES[meta.cls].resourceType,
+        e.resourceType,
+        e.resource,
+        e.savedMana,
+      ),
       pos: { x: e.pos.x, z: e.pos.z },
       facing: e.facing,
       equipment: { ...meta.equipment },
@@ -2818,7 +2830,11 @@ export class Sim {
   // updateGroundAoEs (the drain) moved to entity_roster.ts (tickGroundAoEs); it pulses
   // through this.ctx.pulseGroundAoE. pulseGroundAoE STAYS here (shared entry point,
   // also called on-cast from the effect path).
-  private pulseGroundAoE(effect: GroundAoE, threatOpts?: { flat?: number; mult?: number }): void {
+  private pulseGroundAoE(
+    effect: GroundAoE,
+    threatOpts?: { flat?: number; mult?: number },
+    direct = false,
+  ): void {
     const source = this.entities.get(effect.sourceId);
     if (!source || source.dead) return;
     this.emit({
@@ -2841,6 +2857,7 @@ export class Sim {
         'hit',
         false,
         threatOpts,
+        direct,
       );
     }
   }
@@ -2889,6 +2906,22 @@ export class Sim {
 
   castAbility(abilityId: string, pid?: number): void {
     castAbilityImpl(this.ctx, abilityId, pid);
+  }
+
+  // Voluntarily cancel one of a player's own helpful auras (the HUD right-click-a-buff
+  // action). Authoritative: the pure predicate refuses debuffs, so a player can never
+  // strip a silence/hex/root off themselves. Mirrors clearAurasFromSource's fade-event
+  // + conditional stat recalc so a stripped buff_*/form_* actually un-folds.
+  cancelAura(auraId: string, pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    const { e, meta } = r;
+    const removed = removeCancelableAura(e.auras, auraId);
+    if (!removed) return;
+    this.emit({ type: 'aura', targetId: e.id, name: removed.name, gained: false });
+    if (auraAffectsStats(removed)) {
+      recalcPlayerStats(e, meta.cls, meta.equipment, this.playerMods(meta));
+    }
   }
 
   private spendResource(p: Entity, cost: number): void {
@@ -3058,7 +3091,9 @@ export class Sim {
         ? PVP_POLYMORPH_DR_RESET
         : category === 'fear'
           ? PVP_FEAR_DR_RESET
-          : PVP_ROOT_DR_RESET;
+          : isStunDrCategory(category)
+            ? PVP_STUN_DR_RESET
+            : PVP_ROOT_DR_RESET;
     if (category === 'polymorph') {
       target.ccDr.set(category, { stage: stage + 1, resetAt: this.time + reset });
       return PVP_POLYMORPH_DR_DURATIONS[Math.min(stage, PVP_POLYMORPH_DR_DURATIONS.length - 1)];
@@ -3271,6 +3306,7 @@ export class Sim {
     kind: 'hit' | 'miss' | 'dodge',
     noRage = false,
     threatOpts?: { flat?: number; mult?: number },
+    direct = true,
   ): void {
     dealDamageImpl(
       this.ctx,
@@ -3283,6 +3319,7 @@ export class Sim {
       kind,
       noRage,
       threatOpts,
+      direct,
     );
   }
 
@@ -3670,7 +3707,8 @@ export class Sim {
       school: spell.school,
       fx: 'projectile',
     });
-    if (!this.rng.chance(spellHitChance(pet.level, target.level))) {
+    // Pet spells are resisted, not missed (same semantics as player casts).
+    if (isSpellResisted(this.rng, pet.level, target.level)) {
       this.emit({
         type: 'damage',
         sourceId: pet.id,
@@ -3679,7 +3717,7 @@ export class Sim {
         crit: false,
         school: spell.school,
         ability: spell.name,
-        kind: 'miss',
+        kind: 'resist',
       });
       this.enterCombat(pet, target);
     } else {
