@@ -875,6 +875,31 @@ describe('i18n Localization Key Coverage', () => {
     setLanguage('en');
   });
 
+  it('should track item-set names and bonus text in the entity catalog', async () => {
+    const itemSetEntries = entityTranslationManifest().filter((entry) => entry.group === 'itemSet');
+    expect(itemSetEntries).toHaveLength(7 * 3);
+    expect(missingEntityTranslationsForGroups(['itemSet'])).toHaveLength(0);
+
+    for (const lang of ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const) {
+      await ensureLocaleLoaded(lang);
+      setLanguage(lang);
+      resetEntityTranslationFallbackLog();
+      for (const entry of itemSetEntries) {
+        const rendered = tEntity({
+          kind: 'itemSet',
+          id: entry.id,
+          field: entry.field as 'name' | 'bonus2' | 'bonus3',
+        });
+        expect(rendered.trim().length, `${lang}.${entry.key}`).toBeGreaterThan(0);
+        expect(rendered, `${lang}.${entry.key}`).not.toBe(entry.key);
+        expect(rendered, `${lang}.${entry.key}`).not.toBe(entry.source);
+      }
+      expect(entityTranslationFallbackLog(), `${lang} fallback log`).toHaveLength(0);
+    }
+
+    setLanguage('en');
+  });
+
   it('should route class-detail damage ranges through localized templates', () => {
     const source = fs.readFileSync(path.resolve(process.cwd(), 'src/main.ts'), 'utf8');
     expect(source).toContain('abilityUi.tooltip.damageRange');
@@ -894,12 +919,17 @@ describe('i18n Localization Key Coverage', () => {
     expect(classAbilityMissing).toHaveLength(0);
 
     expect(missingEntityTranslationsForGroups(['classAbility', 'item'])).toHaveLength(0);
+    expect(missingEntityTranslationsForGroups(['itemSet'])).toHaveLength(0);
     expect(missingEntityTranslationsForGroups(['world'])).toHaveLength(0);
-    expect(missingEntityTranslationsForGroups(['classAbility', 'item', 'world'])).toHaveLength(0);
+    expect(
+      missingEntityTranslationsForGroups(['classAbility', 'item', 'itemSet', 'world']),
+    ).toHaveLength(0);
     expect(() => assertEntityTranslationsReady([])).not.toThrow();
     expect(() => assertEntityTranslationsReady(['classAbility'])).not.toThrow();
     expect(() => assertEntityTranslationsReady(['classAbility', 'item'])).not.toThrow();
-    expect(() => assertEntityTranslationsReady(['classAbility', 'item', 'world'])).not.toThrow();
+    expect(() =>
+      assertEntityTranslationsReady(['classAbility', 'item', 'itemSet', 'world']),
+    ).not.toThrow();
   });
 
   it('should provide every world-content translation in every locale without canonical fallbacks', () => {

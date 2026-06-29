@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   aggregateSetBonuses,
   ITEM_SETS,
+  SET_CROWNFORGED,
   SET_DEATHLORD,
   SET_NECROMANCERS,
   SET_NIGHTTALON,
@@ -11,6 +12,7 @@ import { createPlayer, recalcPlayerStats } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity, PlayerClass } from '../src/sim/types';
 import { CAST_PUSHBACK_SEC, CHANNEL_PUSHBACK_FRACTION } from '../src/sim/types';
+import { itemSetTooltipModel } from '../src/ui/item_set_tooltip_view';
 
 const counts = (m: Record<string, number>) => new Map(Object.entries(m));
 
@@ -64,6 +66,32 @@ describe('aggregateSetBonuses (pure resolver)', () => {
     for (const set of Object.values(ITEM_SETS)) {
       expect(set.bonuses.map((b) => b.pieces)).toEqual([2, 3]);
     }
+  });
+});
+
+describe('item set tooltip model', () => {
+  it('uses the authored member count, not the highest bonus threshold, as the header total', () => {
+    const model = itemSetTooltipModel({
+      itemSetId: SET_DEATHLORD,
+      equippedPieces: 2,
+      itemSetMembers: {
+        [SET_DEATHLORD]: 4,
+      },
+    });
+    expect(model?.totalPieces).toBe(4);
+    expect(model?.bonusTiers.map((tier) => tier.pieces)).toEqual([2, 3]);
+  });
+
+  it('hides bonus tiers that cannot be reached by the currently authored set pieces', () => {
+    const model = itemSetTooltipModel({
+      itemSetId: SET_CROWNFORGED,
+      equippedPieces: 2,
+      itemSetMembers: {
+        [SET_CROWNFORGED]: 2,
+      },
+    });
+    expect(model?.totalPieces).toBe(2);
+    expect(model?.bonusTiers.map((tier) => tier.pieces)).toEqual([2]);
   });
 });
 

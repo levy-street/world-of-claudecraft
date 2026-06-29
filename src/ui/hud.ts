@@ -44,7 +44,6 @@ import {
   DUNGEON_X_THRESHOLD,
   delveAt,
   dungeonAt,
-  ITEM_SETS,
   ITEMS,
   isDelvePos,
   MOBS,
@@ -189,6 +188,7 @@ import {
 import { iconDataUrl, QUALITY_COLOR, raidMarkerDataUrl } from './icons';
 import { itemArmorTypeLabelKey } from './item_armor_type';
 import { itemStatDeltas } from './item_compare';
+import { itemSetMemberCounts, itemSetTooltipModel } from './item_set_tooltip_view';
 import { LeaderboardWindow } from './leaderboard_window';
 import { ReannounceMarker } from './live_region_reannounce';
 import { PICK_ACTION_HOTKEYS } from './lockpick_panel';
@@ -3017,17 +3017,18 @@ export class Hud {
   // content/item_sets.ts).
   private itemSetBlock(item: ItemDef): string {
     if (!item.set) return '';
-    const set = ITEM_SETS[item.set];
-    if (!set) return '';
-    const have = this.equippedSetPieces(set.id);
-    const total = set.bonuses.reduce((max, b) => Math.max(max, b.pieces), 0);
-    const name = tEntity({ kind: 'itemSet', id: set.id, field: 'name' });
-    let html = `<div class="tt-set-name">${esc(t('hudChrome.itemSet.header', { name, have: formatNumber(have, { maximumFractionDigits: 0 }), total: formatNumber(total, { maximumFractionDigits: 0 }) }))}</div>`;
-    for (const tier of set.bonuses) {
-      const active = have >= tier.pieces;
+    const model = itemSetTooltipModel({
+      itemSetId: item.set,
+      equippedPieces: this.equippedSetPieces(item.set),
+      itemSetMembers: itemSetMemberCounts(),
+    });
+    if (!model) return '';
+    const name = tEntity({ kind: 'itemSet', id: model.setId, field: 'name' });
+    let html = `<div class="tt-set-name">${esc(t('hudChrome.itemSet.header', { name, have: formatNumber(model.equippedPieces, { maximumFractionDigits: 0 }), total: formatNumber(model.totalPieces, { maximumFractionDigits: 0 }) }))}</div>`;
+    for (const tier of model.bonusTiers) {
       const field = tier.pieces === 2 ? 'bonus2' : 'bonus3';
-      const text = tEntity({ kind: 'itemSet', id: set.id, field });
-      html += `<div class="tt-set-bonus${active ? ' active' : ''}">${esc(t('hudChrome.itemSet.bonusLine', { pieces: formatNumber(tier.pieces, { maximumFractionDigits: 0 }), bonus: text }))}</div>`;
+      const text = tEntity({ kind: 'itemSet', id: model.setId, field });
+      html += `<div class="tt-set-bonus${tier.active ? ' active' : ''}">${esc(t('hudChrome.itemSet.bonusLine', { pieces: formatNumber(tier.pieces, { maximumFractionDigits: 0 }), bonus: text }))}</div>`;
     }
     return html;
   }

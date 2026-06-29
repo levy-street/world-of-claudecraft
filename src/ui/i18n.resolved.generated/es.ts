@@ -6367,6 +6367,43 @@ export const es: EnTranslations = {
         "enterText": "Desciendes al relicario hundido.",
         "leaveText": "Subes de vuelta hasta el Hermano Halven, en la ruina del relicario."
       }
+    },
+    "itemSets": {
+      "crownforged": {
+        "name": "Crownforged Regalia",
+        "bonus2": "Increases attack power by 40.",
+        "bonus3": "Increases Strength by 15 and Stamina by 15."
+      },
+      "deathlord": {
+        "name": "Deathlord Battlegear",
+        "bonus2": "Increases attack power by 40.",
+        "bonus3": "Increases Strength by 15 and Stamina by 15."
+      },
+      "necromancers": {
+        "name": "Necromancer's Raiment",
+        "bonus2": "Reduces cast pushback from damage by 50%.",
+        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+      },
+      "nighttalon": {
+        "name": "Nighttalon Pelt",
+        "bonus2": "Increases attack power by 40.",
+        "bonus3": "Increases Agility by 15 and critical strike chance by 2%."
+      },
+      "soulflame": {
+        "name": "Soulflame Regalia",
+        "bonus2": "Reduces cast pushback from damage by 50%.",
+        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+      },
+      "stormcallers": {
+        "name": "Stormcaller's Vestments",
+        "bonus2": "Reduces cast pushback from damage by 50%.",
+        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+      },
+      "wyrmshadow": {
+        "name": "Wyrmshadow Vestments",
+        "bonus2": "Increases attack power by 40.",
+        "bonus3": "Increases Agility by 15 and critical strike chance by 2%."
+      }
     }
   },
   "worldContent": {

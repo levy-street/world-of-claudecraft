@@ -6367,6 +6367,43 @@ export const zh_CN: EnTranslations = {
         "enterText": "你向下深入坍塌的圣物库。",
         "leaveText": "你攀回圣物库废墟旁的哈尔文修士身边。"
       }
+    },
+    "itemSets": {
+      "crownforged": {
+        "name": "铸冠战装",
+        "bonus2": "攻击强度提高 40 点。",
+        "bonus3": "力量提高 15 点，耐力提高 15 点。"
+      },
+      "deathlord": {
+        "name": "死王战甲",
+        "bonus2": "攻击强度提高 40 点。",
+        "bonus3": "力量提高 15 点，耐力提高 15 点。"
+      },
+      "necromancers": {
+        "name": "死灵法师法衣",
+        "bonus2": "受到伤害造成的施法延退降低 50%。",
+        "bonus3": "施法时不会因受到伤害而被延退。"
+      },
+      "nighttalon": {
+        "name": "夜爪皮甲",
+        "bonus2": "攻击强度提高 40 点。",
+        "bonus3": "敏捷提高 15 点，致命一击几率提高 2%。"
+      },
+      "soulflame": {
+        "name": "魂焰法衣",
+        "bonus2": "受到伤害造成的施法延退降低 50%。",
+        "bonus3": "施法时不会因受到伤害而被延退。"
+      },
+      "stormcallers": {
+        "name": "唤雷者法衣",
+        "bonus2": "受到伤害造成的施法延退降低 50%。",
+        "bonus3": "施法时不会因受到伤害而被延退。"
+      },
+      "wyrmshadow": {
+        "name": "龙影外衣",
+        "bonus2": "攻击强度提高 40 点。",
+        "bonus3": "敏捷提高 15 点，致命一击几率提高 2%。"
+      }
     }
   },
   "worldContent": {
