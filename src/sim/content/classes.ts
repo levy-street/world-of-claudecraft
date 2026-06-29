@@ -386,6 +386,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'physical',
     requiresTarget: false,
+    exclusiveGroup: 'warrior_shout',
     effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 20, duration: 120 }],
     ranks: [
       {
@@ -414,6 +415,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'physical',
     requiresTarget: false,
+    exclusiveGroup: 'warrior_shout',
     effects: [{ type: 'selfBuff', kind: 'buff_sta', value: 6, duration: 120 }],
     ranks: [
       {
@@ -1487,6 +1489,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'holy',
     requiresTarget: false,
+    exclusiveGroup: 'paladin_aura',
     effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 40, duration: 1800 }],
     ranks: [
       {
@@ -1666,6 +1669,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'holy',
     requiresTarget: false,
+    exclusiveGroup: 'paladin_aura',
     effects: [{ type: 'selfBuff', kind: 'thorns', value: 5, duration: 1800 }],
     description:
       'Surrounds you with holy energy for 30 min, dealing 5 Holy damage to any enemy that strikes you in melee.',
@@ -1747,6 +1751,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'nature',
     requiresTarget: false,
+    exclusiveGroup: 'aspect',
     effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 20, duration: 1800 }],
     ranks: [
       {
@@ -1882,6 +1887,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'nature',
     requiresTarget: false,
+    exclusiveGroup: 'aspect',
     effects: [{ type: 'selfBuff', kind: 'buff_dodge', value: 0.08, duration: 1800 }],
     description: 'Take on the aspect of the monkey, increasing your dodge chance by 8% for 30 min.',
   },
@@ -1896,6 +1902,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'nature',
     requiresTarget: false,
+    exclusiveGroup: 'aspect',
     effects: [{ type: 'selfBuff', kind: 'buff_speed', value: 1.3, duration: 1800 }],
     description: 'Take on the aspect of the cheetah, increasing movement speed by 30% for 30 min.',
   },
@@ -2270,22 +2277,50 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'nature',
     requiresTarget: false,
-    effects: [{ type: 'selfBuff', kind: 'thorns', value: 13, duration: 600 }],
+    effects: [
+      {
+        type: 'selfBuff',
+        kind: 'thorns',
+        value: 13,
+        duration: 600,
+        charges: 3,
+        internalCooldown: 5,
+      },
+    ],
     ranks: [
       {
         rank: 2,
         level: 12,
         cost: 40,
-        effects: [{ type: 'selfBuff', kind: 'thorns', value: 20, duration: 600 }],
+        effects: [
+          {
+            type: 'selfBuff',
+            kind: 'thorns',
+            value: 20,
+            duration: 600,
+            charges: 3,
+            internalCooldown: 5,
+          },
+        ],
       },
       {
         rank: 3,
         level: 18,
         cost: 55,
-        effects: [{ type: 'selfBuff', kind: 'thorns', value: 29, duration: 600 }],
+        effects: [
+          {
+            type: 'selfBuff',
+            kind: 'thorns',
+            value: 29,
+            duration: 600,
+            charges: 3,
+            internalCooldown: 5,
+          },
+        ],
       },
     ],
-    description: 'Surrounds you with crackling lightning: melee attackers take 13 Nature damage.',
+    description:
+      'Surrounds you with crackling lightning: melee attackers take 13 Nature damage, up to 3 charges and at most once every 5 seconds.',
   },
   flame_shock: {
     id: 'flame_shock',

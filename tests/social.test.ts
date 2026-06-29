@@ -257,6 +257,53 @@ describe('nine classes', () => {
     expect(zapped).toBe(true);
   });
 
+  it('lightning shield reflects at most 3 charges, gated by a 5s internal cooldown', () => {
+    const runReflects = () => {
+      const sim = new Sim({ seed: 7, playerClass: 'shaman' });
+      sim.setPlayerLevel(12);
+      const p = sim.player;
+      sim.castAbility('lightning_shield');
+      sim.tick();
+      const aura = p.auras.find((a) => a.id === 'lightning_shield');
+      expect(aura?.charges).toBe(3);
+      const wolf = nearestMob(sim, 'forest_wolf');
+      // A fast, low-damage, beefy attacker: lands many swings without killing the
+      // shaman or dying to the reflects, so we measure the cap, not the fight.
+      wolf.level = p.level;
+      wolf.weapon = { min: 1, max: 1, speed: 1 };
+      wolf.hp = wolf.maxHp = 100000;
+      p.hp = p.maxHp = 100000;
+      teleport(sim, p.id, wolf.pos.x + 2, wolf.pos.z);
+      let reflects = 0;
+      const reflectTicks: number[] = [];
+      for (let i = 0; i < 20 * 40; i++) {
+        const evs = sim.tick();
+        for (const e of evs) {
+          if (e.type === 'damage' && e.ability === 'Lightning Shield' && e.targetId === wolf.id) {
+            reflects++;
+            reflectTicks.push(i);
+          }
+        }
+      }
+      return {
+        reflects,
+        reflectTicks,
+        auraGone: !p.auras.some((a) => a.id === 'lightning_shield'),
+      };
+    };
+
+    const r = runReflects();
+    // exactly the 3 charges fire, then the aura is spent and removed
+    expect(r.reflects).toBe(3);
+    expect(r.auraGone).toBe(true);
+    // consecutive reflects are at least the 5s internal cooldown apart (>= 100 ticks)
+    for (let i = 1; i < r.reflectTicks.length; i++) {
+      expect(r.reflectTicks[i] - r.reflectTicks[i - 1]).toBeGreaterThanOrEqual(20 * 5);
+    }
+    // deterministic
+    expect(runReflects()).toEqual(r);
+  });
+
   it('druid bear form toggles and raises armor', () => {
     const sim = new Sim({ seed: 42, playerClass: 'druid' });
     sim.setPlayerLevel(10);

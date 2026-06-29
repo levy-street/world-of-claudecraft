@@ -15,6 +15,7 @@
 // `src/sim`-pure: no DOM/Three, no Math.random/Date.now; all randomness is the
 // shared `ctx.rng` stream, drawn in the exact pre-move order.
 
+import { ABILITIES } from '../data';
 import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
@@ -23,6 +24,7 @@ import { stunDrCategory } from '../stun_dr';
 import { addThreat } from '../threat';
 import type { AbilityDef, Entity } from '../types';
 import { armorReduction, meleeMissChance } from '../types';
+import { exclusiveAuraConflicts } from './exclusive_aura';
 
 const CHARGE_MAX_DURATION = 3; // seconds before a blocked charge gives up
 
@@ -519,6 +521,18 @@ export function runEffects(
             }
           }
         }
+        // Mutually exclusive self-buff group (hunter aspects): casting one cancels
+        // any active sibling so only one in the group is ever up at a time.
+        for (const i of exclusiveAuraConflicts(
+          ability.exclusiveGroup,
+          ability.id,
+          p.auras,
+          (id) => ABILITIES[id]?.exclusiveGroup,
+        )) {
+          const a = p.auras[i];
+          p.auras.splice(i, 1);
+          ctx.emit({ type: 'aura', targetId: p.id, name: a.name, gained: false });
+        }
         ctx.applyAura(p, {
           id: ability.id,
           name: ability.name,
@@ -528,6 +542,10 @@ export function runEffects(
           value: eff.value,
           sourceId: p.id,
           school: ability.school,
+          // charge-limited thorns (Lightning Shield): cap reflects and gate them
+          // behind an internal cooldown. Absent on a plain always-on thorns coat.
+          charges: eff.charges,
+          icdMax: eff.internalCooldown,
         });
         recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta));
         break;

@@ -1011,6 +1011,39 @@ describe('client-side delta merge', () => {
     expect(aura?.stacks, 'client should mirror the wire stack count').toBe(3);
   });
 
+  it('reconstructs charge-limited aura charges from the wire (Lightning Shield)', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({
+      ents: [
+        {
+          id: 3,
+          k: 'player',
+          tid: '',
+          nm: 'Shaman',
+          lv: 12,
+          x: 0,
+          y: 0,
+          z: 0,
+          f: 0,
+          hp: 200,
+          mhp: 200,
+          auras: [
+            {
+              id: 'lightning_shield',
+              name: 'Lightning Shield',
+              kind: 'thorns',
+              rem: 600,
+              dur: 600,
+              charges: 2,
+            },
+          ],
+        },
+      ],
+    });
+    const aura = client.entities.get(3)?.auras.find((a) => a.id === 'lightning_shield');
+    expect(aura?.charges, 'client should mirror the wire charge count').toBe(2);
+  });
+
   it('snaps the interpolation anchor on a teleport but tweens normal moves', () => {
     const client = bareClient(1);
     const ent = (x: number, z: number) => ({

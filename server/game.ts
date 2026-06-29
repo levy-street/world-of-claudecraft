@@ -334,6 +334,11 @@ interface WireAura {
   // fear angle on an incapacitate) stays off the wire and decodes to 0, exactly as before.
   value?: number;
   stacks?: number;
+  // Remaining charges on a charge-limited aura (Lightning Shield's reflect count). Sent only
+  // when defined, so ordinary auras stay off the wire and decode to undefined as before; the
+  // client badge prefers this over stacks (auras_view). A pure cosmetic count, not actionable
+  // information a graphics preset could hide, so it rides the wire unconditionally when present.
+  charges?: number;
 }
 
 interface WhoRosterRow {
@@ -419,6 +424,9 @@ function dynamicFields(e: Entity): Record<string, unknown> {
         // wire exactly: round2 could round a tiny negative to -0, which JSON writes as 0.
         ...(a.value < 0 && a.kind.startsWith('buff_') ? { value: a.value } : {}),
         ...(a.stacks && a.stacks > 1 ? { stacks: a.stacks } : {}),
+        // Carry the remaining charges only for a charge-limited aura (Lightning Shield), so the
+        // buff icon can badge the count online exactly as offline; undefined for every other aura.
+        ...(a.charges !== undefined ? { charges: a.charges } : {}),
       }),
     );
   }

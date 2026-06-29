@@ -157,6 +157,21 @@ describe('createAurasView: derivation per mode', () => {
     expect(v.tick(entity([aura({ id: 'a', stacks: 4 })])).slots[0].stacksText).toBe('4');
   });
 
+  it('badges remaining charges (shown even at 1) and prefers charges over stacks', () => {
+    // A charge-limited aura (Lightning Shield) badges its charge count, unlike stacks it
+    // shows at 1, and when both are present charges wins (it is the meaningful count).
+    const v = createAurasView('all', deps());
+    expect(v.tick(entity([aura({ id: 'lightning_shield', charges: 3 })])).slots[0].stacksText).toBe(
+      '3',
+    );
+    expect(v.tick(entity([aura({ id: 'lightning_shield', charges: 1 })])).slots[0].stacksText).toBe(
+      '1',
+    );
+    expect(
+      v.tick(entity([aura({ id: 'lightning_shield', charges: 2, stacks: 5 })])).slots[0].stacksText,
+    ).toBe('2');
+  });
+
   it('is deterministic: identical inputs produce deep-equal slot state', () => {
     const build = () => {
       const state = createAurasView('all', deps()).tick(

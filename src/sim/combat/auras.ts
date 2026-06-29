@@ -32,6 +32,7 @@ import { recalcPlayerStats } from '../entity';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
+import { tickThornsCooldown } from './thorns_charge';
 
 // Friendly NPCs reject hostile control / debuff auras: any aura of these kinds is
 // stripped on the NPC's tick (cleanseFriendlyNpcAuras). Moved here with that method
@@ -119,6 +120,9 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
   for (let i = e.auras.length - 1; i >= 0; i--) {
     const a = e.auras[i];
     a.remaining -= DT;
+    // charge-limited thorns (Lightning Shield): age its internal cooldown so the
+    // next melee hit can reflect once it elapses. No-op for ungated thorns.
+    if (a.kind === 'thorns') tickThornsCooldown(a);
     if (a.tickInterval) {
       a.tickTimer = (a.tickTimer ?? a.tickInterval) - DT;
       if (a.tickTimer <= CAST_COMPLETE_EPS) {

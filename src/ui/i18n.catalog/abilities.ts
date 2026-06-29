@@ -911,7 +911,7 @@ const classAbilityNamesEn = {
       [
         'lightning_shield',
         'Lightning Shield',
-        'Surrounds you with crackling lightning: melee attackers take 13 Nature damage.',
+        'Surrounds you with crackling lightning: melee attackers take 13 Nature damage, up to 3 charges and at most once every 5 seconds.',
       ],
       [
         'flame_shock',

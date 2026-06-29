@@ -85,6 +85,11 @@ export interface AuraInput {
   tickInterval?: number;
   school?: AuraSchool;
   stacks?: number;
+  // Remaining charges on a charge-limited aura (e.g. Lightning Shield's 3 reflects). Present
+  // on the offline Sim aura and mirrored over the wire; undefined for ordinary auras. When
+  // present it drives the badge overlay INSTEAD of stacks (a charge count, not a stack count),
+  // and unlike stacks it shows even at 1 so the player sees the shield about to drop.
+  charges?: number;
 }
 
 /** The entity fields the core reads: just its aura list. */
@@ -220,7 +225,14 @@ export function createAurasView(mode: AuraMode, deps: AurasDeps): AurasView {
         slot.isDebuff = debuff;
         slot.durationText =
           a.remaining < DURATION_HIDE_THRESHOLD ? `${Math.ceil(a.remaining)}${durSuffix}` : '';
-        slot.stacksText = a.stacks && a.stacks > 1 ? deps.formatStacks(a.stacks) : '';
+        // A charge-limited aura badges its remaining charges (shown even at 1); otherwise the
+        // badge shows a stack count, and only when it stacks past 1.
+        slot.stacksText =
+          a.charges !== undefined
+            ? deps.formatStacks(a.charges)
+            : a.stacks && a.stacks > 1
+              ? deps.formatStacks(a.stacks)
+              : '';
         slot.name = deps.auraName(a);
         slot.remaining = a.remaining;
         // The buff bar (mode 'buffs', the player's own auras) offers right-click-cancel;
