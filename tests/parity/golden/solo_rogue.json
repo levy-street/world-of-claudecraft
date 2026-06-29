@@ -8,8 +8,8 @@
     "meleeSwing weaponStrike (sinister_strike via castAbility ~3736)",
     "combo points"
   ],
-  "draws": 141,
-  "drawDigest": "3d03a3d5",
+  "draws": 143,
+  "drawDigest": "9dafb67b",
   "frames": [
     {
       "tick": 0,
@@ -101,44 +101,44 @@
       "tick": 20,
       "time": 1,
       "nextId": 390,
-      "state": "dbccf12f",
-      "events": "f9b79d6c",
+      "state": "35f9fd0f",
+      "events": "71b126e6",
       "rng": {
-        "draws": 7,
-        "digest": "14806c1c"
+        "draws": 9,
+        "digest": "8ecad8de"
       }
     },
     {
       "tick": 40,
       "time": 2,
       "nextId": 390,
-      "state": "fb9326a4",
+      "state": "1f4b6ff4",
       "events": "33a84e8d",
       "rng": {
-        "draws": 13,
-        "digest": "3fc203d8"
+        "draws": 15,
+        "digest": "843b3bf7"
       }
     },
     {
       "tick": 60,
       "time": 3,
       "nextId": 390,
-      "state": "e5155f8f",
+      "state": "3d670381",
       "events": "fd9e884b",
       "rng": {
-        "draws": 89,
-        "digest": "2c06bf7c"
+        "draws": 90,
+        "digest": "0f3d4b16"
       }
     },
     {
       "tick": 72,
       "time": 3.6,
       "nextId": 390,
-      "state": "b042b2df",
+      "state": "0bd1b16b",
       "events": "741638a5",
       "rng": {
-        "draws": 141,
-        "digest": "3d03a3d5"
+        "draws": 143,
+        "digest": "9dafb67b"
       },
       "label": "final",
       "players": [
@@ -150,7 +150,8 @@
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 79
+            "damageDealt": 79,
+            "damageTaken": 9
           },
           "delveClears": {},
           "delveDaily": {},
@@ -180,7 +181,7 @@
           "facing": 1.570796,
           "fallStartY": 1.5,
           "fiveSecondRule": 102.6,
-          "hp": 50000,
+          "hp": 49991,
           "id": 388,
           "inCombat": true,
           "kind": "player",

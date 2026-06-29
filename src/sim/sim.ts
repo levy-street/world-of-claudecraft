@@ -281,7 +281,6 @@ import {
   MELEE_RANGE,
   type MobFamily,
   type MoveInput,
-  meleeMissChance,
   normAngle,
   type OverheadEmoteId,
   type PetMode,
@@ -293,6 +292,7 @@ import {
   type SimEvent,
   type SkinCatalog,
   type SkinRank,
+  swingMissChance,
   TURN_SPEED,
   type Vec3,
   virtualLevel,
@@ -3646,7 +3646,7 @@ export class Sim {
   }
 
   mobSwing(mob: Entity, target: Entity): void {
-    const missChance = meleeMissChance(mob.level, target.level);
+    const missChance = swingMissChance(mob, target);
     const dodgeChance = target.kind === 'player' ? target.dodgeChance : 0.05;
     const roll = this.rng.next();
     if (roll < missChance) {

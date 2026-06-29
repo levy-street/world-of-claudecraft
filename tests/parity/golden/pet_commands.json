@@ -16,8 +16,8 @@
     "petTaunt -> applyTaunt manual arm + PET_GROWL_INTERVAL cooldown",
     "stowPetForDelve/restorePetFromDelveStash (serializePet/restorePet round-trip)"
   ],
-  "draws": 156,
-  "drawDigest": "6a78189c",
+  "draws": 158,
+  "drawDigest": "878ecdcb",
   "frames": [
     {
       "tick": 0,
@@ -1648,33 +1648,33 @@
       "tick": 60,
       "time": 3,
       "nextId": 397,
-      "state": "1f4502c3",
-      "events": "4a181d87",
+      "state": "98f025f7",
+      "events": "a19c527c",
       "rng": {
-        "draws": 80,
-        "digest": "cdfb4afc"
+        "draws": 82,
+        "digest": "e2e5902a"
       }
     },
     {
       "tick": 80,
       "time": 4,
       "nextId": 397,
-      "state": "296a1b91",
+      "state": "dd75f145",
       "events": "669474ea",
       "rng": {
-        "draws": 156,
-        "digest": "6a78189c"
+        "draws": 158,
+        "digest": "878ecdcb"
       }
     },
     {
       "tick": 80,
       "time": 4,
       "nextId": 397,
-      "state": "296a1b91",
+      "state": "dd75f145",
       "events": "741638a5",
       "rng": {
-        "draws": 156,
-        "digest": "6a78189c"
+        "draws": 158,
+        "digest": "878ecdcb"
       },
       "label": "demon-heal-tick",
       "players": [
@@ -1685,7 +1685,9 @@
           "autoEquip": true,
           "cls": "hunter",
           "companionUpgrades": {},
-          "counters": {},
+          "counters": {
+            "damageTaken": 10
+          },
           "delveClears": {},
           "delveDaily": {},
           "entityId": 388,
@@ -1724,13 +1726,13 @@
         {
           "aiState": "idle",
           "attackPower": 83,
-          "combatTimer": 103,
+          "combatTimer": 1.95,
           "critChance": 0.079,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.079,
           "fallStartY": 1.5,
           "fiveSecondRule": 103,
-          "hp": 50000,
+          "hp": 49990,
           "id": 388,
           "inCombat": true,
           "kind": "player",
@@ -1785,7 +1787,7 @@
           "forcedTargetId": 390,
           "forcedTargetTimer": 1,
           "hostile": true,
-          "hp": 49975,
+          "hp": 49983,
           "id": 391,
           "inCombat": true,
           "kind": "mob",
@@ -1826,7 +1828,7 @@
             ],
             [
               394,
-              25
+              17
             ]
           ],
           "weapon": {
@@ -1936,11 +1938,11 @@
       "tick": 80,
       "time": 4,
       "nextId": 398,
-      "state": "7c6180d8",
+      "state": "9eec8b90",
       "events": "fea91c51",
       "rng": {
-        "draws": 156,
-        "digest": "6a78189c"
+        "draws": 158,
+        "digest": "878ecdcb"
       },
       "label": "demon-faded",
       "players": [
@@ -1951,7 +1953,9 @@
           "autoEquip": true,
           "cls": "hunter",
           "companionUpgrades": {},
-          "counters": {},
+          "counters": {
+            "damageTaken": 10
+          },
           "delveClears": {},
           "delveDaily": {},
           "entityId": 388,
@@ -1990,13 +1994,13 @@
         {
           "aiState": "idle",
           "attackPower": 83,
-          "combatTimer": 103,
+          "combatTimer": 1.95,
           "critChance": 0.079,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.079,
           "fallStartY": 1.5,
           "fiveSecondRule": 103,
-          "hp": 50000,
+          "hp": 49990,
           "id": 388,
           "inCombat": true,
           "kind": "player",
@@ -2051,7 +2055,7 @@
           "forcedTargetId": 390,
           "forcedTargetTimer": 1,
           "hostile": true,
-          "hp": 49975,
+          "hp": 49983,
           "id": 391,
           "inCombat": true,
           "kind": "mob",
@@ -2092,7 +2096,7 @@
             ],
             [
               394,
-              25
+              17
             ]
           ],
           "weapon": {
@@ -2162,11 +2166,11 @@
       "tick": 80,
       "time": 4,
       "nextId": 400,
-      "state": "b76f3913",
+      "state": "47192443",
       "events": "5f9f8407",
       "rng": {
-        "draws": 156,
-        "digest": "6a78189c"
+        "draws": 158,
+        "digest": "878ecdcb"
       },
       "label": "demon-despawned",
       "players": [
@@ -2177,7 +2181,9 @@
           "autoEquip": true,
           "cls": "hunter",
           "companionUpgrades": {},
-          "counters": {},
+          "counters": {
+            "damageTaken": 10
+          },
           "delveClears": {},
           "delveDaily": {},
           "entityId": 388,
@@ -2216,13 +2222,13 @@
         {
           "aiState": "idle",
           "attackPower": 83,
-          "combatTimer": 103,
+          "combatTimer": 1.95,
           "critChance": 0.079,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.079,
           "fallStartY": 1.5,
           "fiveSecondRule": 103,
-          "hp": 50000,
+          "hp": 49990,
           "id": 388,
           "inCombat": true,
           "kind": "player",
@@ -2277,7 +2283,7 @@
           "forcedTargetId": 390,
           "forcedTargetTimer": 1,
           "hostile": true,
-          "hp": 49975,
+          "hp": 49983,
           "id": 391,
           "inCombat": true,
           "kind": "mob",
@@ -2318,7 +2324,7 @@
             ],
             [
               394,
-              25
+              17
             ]
           ],
           "weapon": {
@@ -2437,11 +2443,11 @@
       "tick": 80,
       "time": 4,
       "nextId": 400,
-      "state": "b76f3913",
+      "state": "47192443",
       "events": "741638a5",
       "rng": {
-        "draws": 156,
-        "digest": "6a78189c"
+        "draws": 158,
+        "digest": "878ecdcb"
       },
       "label": "final",
       "players": [
@@ -2452,7 +2458,9 @@
           "autoEquip": true,
           "cls": "hunter",
           "companionUpgrades": {},
-          "counters": {},
+          "counters": {
+            "damageTaken": 10
+          },
           "delveClears": {},
           "delveDaily": {},
           "entityId": 388,
@@ -2491,13 +2499,13 @@
         {
           "aiState": "idle",
           "attackPower": 83,
-          "combatTimer": 103,
+          "combatTimer": 1.95,
           "critChance": 0.079,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.079,
           "fallStartY": 1.5,
           "fiveSecondRule": 103,
-          "hp": 50000,
+          "hp": 49990,
           "id": 388,
           "inCombat": true,
           "kind": "player",
@@ -2552,7 +2560,7 @@
           "forcedTargetId": 390,
           "forcedTargetTimer": 1,
           "hostile": true,
-          "hp": 49975,
+          "hp": 49983,
           "id": 391,
           "inCombat": true,
           "kind": "mob",
@@ -2593,7 +2601,7 @@
             ],
             [
               394,
-              25
+              17
             ]
           ],
           "weapon": {

@@ -10,8 +10,8 @@
     "base mobSwing (mob swings the player)",
     "rollLoot via mob death (L1, ~5876/6036)"
   ],
-  "draws": 163,
-  "drawDigest": "3a2585bb",
+  "draws": 171,
+  "drawDigest": "aaf5d249",
   "frames": [
     {
       "tick": 0,
@@ -101,44 +101,44 @@
       "tick": 20,
       "time": 1,
       "nextId": 390,
-      "state": "760d8854",
-      "events": "3d7f30e3",
+      "state": "107ce7c4",
+      "events": "bcbeedf1",
       "rng": {
-        "draws": 4,
-        "digest": "16110a33"
+        "draws": 6,
+        "digest": "93f0e12e"
       }
     },
     {
       "tick": 40,
       "time": 2,
       "nextId": 390,
-      "state": "2b72447b",
+      "state": "1e199695",
       "events": "741638a5",
       "rng": {
-        "draws": 4,
-        "digest": "16110a33"
+        "draws": 6,
+        "digest": "93f0e12e"
       }
     },
     {
       "tick": 60,
       "time": 3,
       "nextId": 390,
-      "state": "132795fe",
-      "events": "4ecbc29e",
+      "state": "3170db8d",
+      "events": "4da9aa1f",
       "rng": {
-        "draws": 95,
-        "digest": "a28d26f7"
+        "draws": 98,
+        "digest": "92f0a886"
       }
     },
     {
       "tick": 72,
       "time": 3.6,
       "nextId": 390,
-      "state": "31822ff8",
+      "state": "b5990b0e",
       "events": "2865f00f",
       "rng": {
-        "draws": 145,
-        "digest": "837b1a1a"
+        "draws": 153,
+        "digest": "5d6b4ea1"
       },
       "label": "kill",
       "players": [
@@ -150,7 +150,8 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 7073,
+            "damageDealt": 7074,
+            "damageTaken": 11,
             "kills": 1
           },
           "delveClears": {},
@@ -177,7 +178,7 @@
           "facing": 1.570796,
           "fallStartY": 1.5,
           "fiveSecondRule": 102.6,
-          "hp": 50000,
+          "hp": 49989,
           "id": 388,
           "inCombat": true,
           "kind": "player",
@@ -241,13 +242,7 @@
           },
           "level": 2,
           "loot": {
-            "copper": 10,
-            "items": [
-              {
-                "count": 1,
-                "itemId": "wolf_fang"
-              }
-            ]
+            "copper": 10
           },
           "lootFfaTimer": 60,
           "lootRecipientIds": [
@@ -290,11 +285,11 @@
       "tick": 76,
       "time": 3.8,
       "nextId": 390,
-      "state": "9be86a36",
+      "state": "d490a79e",
       "events": "741638a5",
       "rng": {
-        "draws": 163,
-        "digest": "3a2585bb"
+        "draws": 171,
+        "digest": "aaf5d249"
       },
       "label": "final",
       "players": [
@@ -306,7 +301,8 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 7073,
+            "damageDealt": 7074,
+            "damageTaken": 11,
             "kills": 1
           },
           "delveClears": {},
@@ -334,7 +330,7 @@
           "facing": 1.570796,
           "fallStartY": 1.5,
           "fiveSecondRule": 102.8,
-          "hp": 50000,
+          "hp": 49989,
           "id": 388,
           "inCombat": true,
           "kind": "player",
@@ -398,13 +394,7 @@
           },
           "level": 2,
           "loot": {
-            "copper": 10,
-            "items": [
-              {
-                "count": 1,
-                "itemId": "wolf_fang"
-              }
-            ]
+            "copper": 10
           },
           "lootFfaTimer": 59.8,
           "lootRecipientIds": [

@@ -40,8 +40,8 @@ import {
   type Entity,
   MELEE_ARC,
   MELEE_RANGE,
-  meleeMissChance,
   normAngle,
+  swingMissChance,
 } from '../types';
 import { spendResource } from './casting_lifecycle';
 import { blindMissBonus, isDisarmed, isStunned } from './cc';
@@ -159,7 +159,7 @@ export function rangedSwing(
   // The shot/bolt is in flight: its miss roll and damage land when it reaches the
   // target (projectile_travel), and fizzle if the target dies before impact.
   scheduleProjectile(ctx, attacker, target, (atk, tgt) => {
-    const missChance = meleeMissChance(atk.level, tgt.level) + blindMissBonus(atk);
+    const missChance = swingMissChance(atk, tgt) + blindMissBonus(atk);
     if (ctx.rng.chance(missChance)) {
       ctx.emit({
         type: 'damage',
@@ -199,7 +199,7 @@ export function meleeSwing(
     threatMult?: number;
   },
 ): boolean {
-  const missChance = meleeMissChance(attacker.level, target.level) + blindMissBonus(attacker);
+  const missChance = swingMissChance(attacker, target) + blindMissBonus(attacker);
   const dodgeChance = opts.cannotBeDodged
     ? 0
     : target.kind === 'player'

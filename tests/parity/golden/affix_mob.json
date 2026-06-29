@@ -9,8 +9,8 @@
     "applyTaunt player-cast arm (taunt ability, ~4279)",
     "class:warrior"
   ],
-  "draws": 67,
-  "drawDigest": "80476701",
+  "draws": 71,
+  "drawDigest": "60069de6",
   "frames": [
     {
       "tick": 0,
@@ -100,33 +100,33 @@
       "tick": 20,
       "time": 1,
       "nextId": 391,
-      "state": "739bb371",
-      "events": "7aaac460",
+      "state": "a6f7de29",
+      "events": "3bcebefe",
       "rng": {
-        "draws": 15,
-        "digest": "c18c727a"
+        "draws": 14,
+        "digest": "97283cfb"
       }
     },
     {
       "tick": 40,
       "time": 2,
       "nextId": 391,
-      "state": "84d8bd3f",
-      "events": "40a7d5b3",
+      "state": "a2814025",
+      "events": "b1081a8d",
       "rng": {
-        "draws": 27,
-        "digest": "7af51137"
+        "draws": 28,
+        "digest": "9c413583"
       }
     },
     {
       "tick": 50,
       "time": 2.5,
       "nextId": 391,
-      "state": "a2b83c42",
-      "events": "5b5dc793",
+      "state": "4d2a0484",
+      "events": "73540386",
       "rng": {
-        "draws": 53,
-        "digest": "4e713ade"
+        "draws": 57,
+        "digest": "390c5ea3"
       },
       "label": "taunt",
       "players": [
@@ -139,7 +139,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 200,
-            "damageTaken": 197
+            "damageTaken": 194
           },
           "delveClears": {},
           "delveDaily": {},
@@ -165,11 +165,11 @@
               "id": "bleed_ridge_stalker",
               "kind": "dot",
               "name": "Rending Claws",
-              "remaining": 8.45,
+              "remaining": 8.5,
               "school": "physical",
               "sourceId": 390,
               "tickInterval": 3,
-              "tickTimer": 2.45,
+              "tickTimer": 2.5,
               "value": 5
             }
           ],
@@ -184,7 +184,7 @@
           "dodgeChance": 0.066,
           "fallStartY": 1.5,
           "fiveSecondRule": 101.5,
-          "hp": 389,
+          "hp": 392,
           "id": 388,
           "inCombat": true,
           "kind": "player",
@@ -202,7 +202,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 10.102564,
+          "resource": 12.025641,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -299,7 +299,7 @@
         {
           "aggroTargetId": 388,
           "aiState": "attack",
-          "combatTimer": 0.55,
+          "combatTimer": 0.5,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
@@ -345,11 +345,11 @@
       "tick": 54,
       "time": 2.7,
       "nextId": 391,
-      "state": "5fc56af1",
+      "state": "49316be9",
       "events": "741638a5",
       "rng": {
-        "draws": 67,
-        "digest": "80476701"
+        "draws": 71,
+        "digest": "60069de6"
       },
       "label": "final",
       "players": [
@@ -362,7 +362,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 200,
-            "damageTaken": 197
+            "damageTaken": 194
           },
           "delveClears": {},
           "delveDaily": {},
@@ -388,11 +388,11 @@
               "id": "bleed_ridge_stalker",
               "kind": "dot",
               "name": "Rending Claws",
-              "remaining": 8.25,
+              "remaining": 8.3,
               "school": "physical",
               "sourceId": 390,
               "tickInterval": 3,
-              "tickTimer": 2.25,
+              "tickTimer": 2.3,
               "value": 5
             }
           ],
@@ -408,7 +408,7 @@
           "dodgeChance": 0.066,
           "fallStartY": 1.5,
           "fiveSecondRule": 101.7,
-          "hp": 389,
+          "hp": 392,
           "id": 388,
           "inCombat": true,
           "kind": "player",
@@ -426,7 +426,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 10.102564,
+          "resource": 12.025641,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -524,7 +524,7 @@
         {
           "aggroTargetId": 388,
           "aiState": "attack",
-          "combatTimer": 0.75,
+          "combatTimer": 0.7,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
