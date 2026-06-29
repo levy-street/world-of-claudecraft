@@ -733,10 +733,17 @@ export class Renderer {
   // Scratch AnimState reused across the per-entity sync loop: CharacterVisual
   // .update() and the pose-selection helpers only read it within the call (the
   // preview drives a shared constant too), so one buffer avoids allocating a
-  // fresh state object per entity per frame — GC churn that scales with crowd.
+  // fresh state object per entity per frame, reducing GC churn that scales with crowd.
   private readonly animScratch: AnimState = {
-    speed: 0, moving: false, airborne: false, backwards: false,
-    reverseBackpedal: false, dead: false, casting: false, swimming: false, sitting: false,
+    speed: 0,
+    moving: false,
+    airborne: false,
+    backwards: false,
+    reverseBackpedal: false,
+    dead: false,
+    casting: false,
+    swimming: false,
+    sitting: false,
   };
   private selfRenderPosition = new THREE.Vector3();
   private selfRenderPositionReady = false;
