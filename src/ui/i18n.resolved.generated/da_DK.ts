@@ -2382,6 +2382,12 @@ export const da_DK: EnTranslations = {
     "renameRequired": "omdøbning påkrævet",
     "delete": "Slet",
     "rename": "Omdøb",
+    "renamePaidButton": "Pay {amount} $WOC & Rename",
+    "renamePriceHint": "A voluntary rename burns {amount} $WOC.",
+    "renameCancel": "Cancel",
+    "mintSolName": "Get .sol name",
+    "mintSolButton": "Burn {amount} $WOC & Mint",
+    "mintSolHint": "Mint a player-owned ‹name›.worldofclaudecraft.sol for {amount} $WOC, yours on-chain.",
     "newNamePlaceholder": "Nyt karakternavn",
     "tabCharacters": "Karakterer",
     "tabCreate": "Opret",
@@ -2396,6 +2402,19 @@ export const da_DK: EnTranslations = {
     "sortName": "Navn",
     "sortRecent": "Senest spillet",
     "sortPlaytime": "Spilletid"
+  },
+  "woc": {
+    "linkWalletFirst": "Connect and link a Solana wallet to pay with $WOC.",
+    "quoting": "Preparing your $WOC payment…",
+    "approveBurn": "Approve the {amount} $WOC burn in your wallet…",
+    "confirming": "Confirming the burn on-chain…",
+    "finalizing": "Waiting for Solana finalization…",
+    "confirmFailed": "The $WOC payment could not be verified.",
+    "finalizeTimeout": "Timed out waiting for finalization. If $WOC was burned, reopen and retry — the payment settles once it finalizes.",
+    "renameSuccess": "Renamed to {name}.",
+    "mintSuccess": "Minted {domain} — it's yours on-chain.",
+    "guildRenameSuccess": "Guild renamed to {name}.",
+    "reserveSuccess": "Reserved the name {name}."
   },
   "deleteCharacter": {
     "title": "Slet Karakter",
@@ -2550,6 +2569,76 @@ export const da_DK: EnTranslations = {
       "zoomOut": "Zoom ud",
       "mapCanvasLabel": "Kort",
       "mapSummary": "Kort over {zone}."
+    },
+    "mounts": {
+      "title": "Mounts",
+      "subtitle": "$WOC Travel Steeds",
+      "close": "Close mounts",
+      "summon": "Summon",
+      "dismount": "Dismount",
+      "summoning": "Summoning {name}…",
+      "riding": "Riding",
+      "flies": "Flies",
+      "locked": "Locked",
+      "speed": "+{percent}% speed",
+      "unlockAt": "Unlocks at {amount} $WOC",
+      "supplyShare": "{percent} of supply",
+      "qualifyHeader": "You qualify for {count} of {total} travel mounts.",
+      "holdingHint": "Holding {amount} $WOC.",
+      "noWallet": "Hold at least {amount} $WOC — 0.1% of supply — on a linked wallet to earn your first travel mount.",
+      "cantInCombat": "You can't mount while in combat.",
+      "cantSwimming": "You can't mount while swimming.",
+      "cantDead": "You can't mount while dead.",
+      "notEligible": "Your $WOC holdings don't reach that steed yet.",
+      "summonedBanner": "You summon {name}.",
+      "summonAria": "Summon {name}",
+      "dismountAria": "Dismount {name}",
+      "lockedAria": "{name} — locked; unlocks at {amount} $WOC",
+      "activeAria": "{name} — currently active",
+      "cardAria": "{name}: {flavor}",
+      "owned": "Owned",
+      "mint": "Mint Charter",
+      "mintHint": "Strike a tradeable Charter for this mount — sell it for gold so a non-holder can earn it.",
+      "mintAria": "Mint a tradeable Charter for {name}",
+      "mintedBanner": "You strike a Charter for {name}.",
+      "earnedBanner": "You have earned {name} — it is yours for good.",
+      "alreadyOwnErr": "You already own that mount.",
+      "charterVoidErr": "That Charter is void.",
+      "noCharterErr": "No Charter can be struck for that mount.",
+      "holdingsShortErr": "Your holdings do not cover that mount."
+    },
+    "course": {
+      "skytrials": "Skytrials",
+      "skytrialsHint": "Fly a timed ring course on a flying mount.",
+      "needFlyer": "Summon a flying mount to fly Skytrials.",
+      "start": "Fly",
+      "give_up": "Give up",
+      "par": "Par {time}",
+      "laps": "{count} laps",
+      "onePass": "1 lap",
+      "starting": "Fly through the first ring to start the clock",
+      "gate": "Ring {n}/{total}",
+      "lap": "Lap {n}/{total}",
+      "time": "Time",
+      "finish": "Finish!",
+      "beatPar": "Beat par by {time}",
+      "offPar": "{time} off par",
+      "failed": "Run ended — you left your mount",
+      "aborted": "Run abandoned",
+      "best": "Best {time}",
+      "newBest": "New best!",
+      "board": "Board",
+      "boardTitle": "{name} — top times",
+      "noTimes": "No times yet — be the first.",
+      "loadingBoard": "Loading…",
+      "you": "(you)",
+      "race": "Race",
+      "racePartyHint": "Race your party — first through the rings wins.",
+      "getReady": "Get ready",
+      "go": "GO!",
+      "dnf": "DNF",
+      "placeOf": "#{place} of {total}",
+      "racing": "Racing"
     },
     "options": {
       "gameMenu": "Spilmenu",
@@ -4536,6 +4625,36 @@ export const da_DK: EnTranslations = {
       },
       "monarch_crown_helm": {
         "name": "Monarkens Krone"
+      },
+      "charter_ashmane": {
+        "name": "Charter: Ashmane Courser"
+      },
+      "charter_emberhoof": {
+        "name": "Charter: Emberhoof Charger"
+      },
+      "charter_bronzeflank": {
+        "name": "Charter: Bronzeflank Destrier"
+      },
+      "charter_silvermane": {
+        "name": "Charter: Silvermane Stallion"
+      },
+      "charter_stormhoof": {
+        "name": "Charter: Stormhoof Charger"
+      },
+      "charter_goldcrest": {
+        "name": "Charter: Goldcrest Skystrider"
+      },
+      "charter_verdant": {
+        "name": "Charter: Verdant Wildwing"
+      },
+      "charter_voidstrider": {
+        "name": "Charter: Voidwing Strider"
+      },
+      "charter_celestial": {
+        "name": "Charter: Celestial Seraph"
+      },
+      "charter_worldbearer": {
+        "name": "Charter: Worldbearer's Roc"
       },
       "bristleback_maul": {
         "name": "Børsterygs-Lemlæster"
