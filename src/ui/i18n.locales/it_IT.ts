@@ -4784,4 +4784,31 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterLoot.assigned': '{looter} ha assegnato {item} a {target}.',
   'hudChrome.masterLoot.unassigned': '{item} non e stato assegnato ed e libero per tutti.',
   'hudChrome.masterLoot.leaderOnly': 'Solo il capogruppo puo cambiare il metodo bottino.',
+  'entities.itemSets.crownforged.name': 'Tenuta da battaglia Forgiacorona',
+  'entities.itemSets.crownforged.bonus2': "Aumenta la potenza d'attacco di 40.",
+  'entities.itemSets.crownforged.bonus3': 'Aumenta la forza di 15 e la vigoria di 15.',
+  'entities.itemSets.deathlord.name': 'Tenuta da battaglia del Signore della Morte',
+  'entities.itemSets.deathlord.bonus2': "Aumenta la potenza d'attacco di 40.",
+  'entities.itemSets.deathlord.bonus3': 'Aumenta la forza di 15 e la vigoria di 15.',
+  'entities.itemSets.necromancers.name': 'Vesti del negromante',
+  'entities.itemSets.necromancers.bonus2': 'Riduce del 50% il ritardo al lancio causato dai danni.',
+  'entities.itemSets.necromancers.bonus3':
+    'I danni subiti non ritardano il lancio degli incantesimi.',
+  'entities.itemSets.nighttalon.name': 'Tenuta di cuoio Artiglio Notturno',
+  'entities.itemSets.nighttalon.bonus2': "Aumenta la potenza d'attacco di 40.",
+  'entities.itemSets.nighttalon.bonus3':
+    'Aumenta l’agilità di 15 e la probabilità di critico del 2%.',
+  'entities.itemSets.soulflame.name': 'Vesti Fiamma dell’Anima',
+  'entities.itemSets.soulflame.bonus2': 'Riduce del 50% il ritardo al lancio causato dai danni.',
+  'entities.itemSets.soulflame.bonus3': 'I danni subiti non ritardano il lancio degli incantesimi.',
+  'entities.itemSets.stormcallers.name': 'Vesti del Chiamatempeste',
+  'entities.itemSets.stormcallers.bonus2': 'Riduce del 50% il ritardo al lancio causato dai danni.',
+  'entities.itemSets.stormcallers.bonus3':
+    'I danni subiti non ritardano il lancio degli incantesimi.',
+  'entities.itemSets.wyrmshadow.name': 'Tenuta Ombra del Dragone',
+  'entities.itemSets.wyrmshadow.bonus2': "Aumenta la potenza d'attacco di 40.",
+  'entities.itemSets.wyrmshadow.bonus3':
+    'Aumenta l’agilità di 15 e la probabilità di critico del 2%.',
+  'hudChrome.itemSet.header': '{name} ({have}/{total})',
+  'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
 };

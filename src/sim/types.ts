@@ -311,6 +311,36 @@ interface BaseItemDef {
   elixir?: { aura: string; kind: AuraKind; value: number; duration: number };
   quality?: 'poor' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'; // gray/white/green/blue/purple/orange name colors
   requiredClass?: PlayerClass[];
+  /** Set id this piece belongs to; equipping enough pieces grants the set bonuses (see ITEM_SETS). */
+  set?: string;
+}
+
+// Item-set bonuses (classic "tier set" style). Flat effects fold into
+// recalcPlayerStats: primary stats feed the AP/crit/HP derivations, `ap`/`crit`
+// add at their derivation steps, and `castPushbackReduction` (0..1) scales the
+// damage-driven cast pushback in Sim.pushbackCast. Balance values are authored in
+// content/item_sets.ts, never inline in engine code.
+export interface SetBonusEffect {
+  str?: number;
+  agi?: number;
+  sta?: number;
+  int?: number;
+  spi?: number;
+  ap?: number; // flat attack power
+  crit?: number; // flat crit chance, 0..1
+  castPushbackReduction?: number; // 0..1: fraction of damage cast-pushback removed (1 = immune)
+}
+
+export interface SetBonusTier {
+  pieces: number; // equipped-piece threshold that unlocks this tier
+  effect: SetBonusEffect;
+  text: string; // English source, localized at the client tooltip
+}
+
+export interface ItemSet {
+  id: string;
+  name: string; // English source
+  bonuses: SetBonusTier[]; // ascending by `pieces`
 }
 
 export interface ArmorItemDef extends BaseItemDef {
@@ -1302,6 +1332,7 @@ export interface Entity {
   spellPower: number; // casters: added to spell damage via per-spell coefficients
   critChance: number; // 0..1
   dodgeChance: number;
+  castPushbackReduction: number; // 0..1: damage cast-pushback removed by item-set bonuses (1 = immune)
   moveSpeed: number;
   hostile: boolean;
   // combat

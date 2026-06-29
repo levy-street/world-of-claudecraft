@@ -191,6 +191,7 @@ import {
 import { iconDataUrl, QUALITY_COLOR, raidMarkerDataUrl } from './icons';
 import { itemArmorTypeLabelKey } from './item_armor_type';
 import { itemStatDeltas } from './item_compare';
+import { itemSetMemberCounts, itemSetTooltipModel } from './item_set_tooltip_view';
 import { LeaderboardWindow } from './leaderboard_window';
 import { ReannounceMarker } from './live_region_reannounce';
 import { PICK_ACTION_HOTKEYS } from './lockpick_panel';
@@ -3020,9 +3021,42 @@ export class Hud {
     if (item.requiredClass && !armorTypeForItem(item) && !weaponArchetypeForItem(item)) {
       html += `<div class="tt-sub">${esc(t('itemUi.tooltip.classes', { classes: item.requiredClass.map(classDisplayName).join(', ') }))}</div>`;
     }
+    html += this.itemSetBlock(item);
     if (item.sellValue > 0)
       html += `<div class="tt-sub">${esc(t('itemUi.tooltip.sellPrice', { money: formatLocalizedMoney(item.sellValue) }))}</div>`;
     if (compare) html += this.itemCompareBlock(item);
+    return html;
+  }
+
+  // How many equipped pieces belong to the given set (read from IWorld.equipment
+  // so it is identical offline and online).
+  private equippedSetPieces(setId: string): number {
+    let n = 0;
+    for (const equippedId of Object.values(this.sim.equipment)) {
+      if (equippedId && ITEMS[equippedId]?.set === setId) n += 1;
+    }
+    return n;
+  }
+
+  // Classic tier-set block: the set name with the live (have/total) piece count,
+  // then each bonus tier - lit when its threshold is met, greyed otherwise. Set
+  // name and bonus text localize through entity_i18n (English source in
+  // content/item_sets.ts).
+  private itemSetBlock(item: ItemDef): string {
+    if (!item.set) return '';
+    const model = itemSetTooltipModel({
+      itemSetId: item.set,
+      equippedPieces: this.equippedSetPieces(item.set),
+      itemSetMembers: itemSetMemberCounts(),
+    });
+    if (!model) return '';
+    const name = tEntity({ kind: 'itemSet', id: model.setId, field: 'name' });
+    let html = `<div class="tt-set-name">${esc(t('hudChrome.itemSet.header', { name, have: formatNumber(model.equippedPieces, { maximumFractionDigits: 0 }), total: formatNumber(model.totalPieces, { maximumFractionDigits: 0 }) }))}</div>`;
+    for (const tier of model.bonusTiers) {
+      const field = tier.pieces === 2 ? 'bonus2' : 'bonus3';
+      const text = tEntity({ kind: 'itemSet', id: model.setId, field });
+      html += `<div class="tt-set-bonus${tier.active ? ' active' : ''}">${esc(t('hudChrome.itemSet.bonusLine', { pieces: formatNumber(tier.pieces, { maximumFractionDigits: 0 }), bonus: text }))}</div>`;
+    }
     return html;
   }
 

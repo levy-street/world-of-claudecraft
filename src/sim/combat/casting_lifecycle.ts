@@ -148,11 +148,17 @@ export function cancelCast(ctx: SimContext, p: Entity): void {
 }
 
 export function pushbackCast(p: Entity): void {
+  // Item-set caster bonus scales damage-driven pushback (1 = fully immune).
+  const factor = 1 - p.castPushbackReduction;
+  if (factor <= 0) return;
   if (p.channeling) {
-    p.castRemaining = Math.max(0, p.castRemaining - p.castTotal * CHANNEL_PUSHBACK_FRACTION);
+    p.castRemaining = Math.max(
+      0,
+      p.castRemaining - p.castTotal * CHANNEL_PUSHBACK_FRACTION * factor,
+    );
   } else {
-    p.castRemaining += CAST_PUSHBACK_SEC;
-    p.castTotal += CAST_PUSHBACK_SEC;
+    p.castRemaining += CAST_PUSHBACK_SEC * factor;
+    p.castTotal += CAST_PUSHBACK_SEC * factor;
   }
 }
 

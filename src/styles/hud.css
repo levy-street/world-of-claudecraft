@@ -2133,6 +2133,20 @@
     color: var(--color-text-muted);
     font-size: 11px;
   }
+  /* Item-set (tier set) tooltip lines: gold set name, then bonus tiers that are
+     dim until their piece threshold is met, lit green when active. */
+  #tooltip .tt-set-name {
+    color: var(--color-accent);
+    font-size: 11.5px;
+    margin-top: 4px;
+  }
+  #tooltip .tt-set-bonus {
+    color: var(--color-text-muted);
+    font-size: 11px;
+  }
+  #tooltip .tt-set-bonus.active {
+    color: #1eff00;
+  }
   /* slot line that also carries the armor subtype: slot left, type right-aligned.
      The slot keeps the muted tt-sub color; the armor class reads brighter so the
      newly surfaced "which class is this for" cue stands out. */

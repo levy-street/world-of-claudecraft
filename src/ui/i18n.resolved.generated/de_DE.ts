@@ -454,6 +454,10 @@ export const de_DE: EnTranslations = {
     "tips": {
       "joinChannels": "Tipp: Gebt /join world oder /join lfg ein, um mit Spielern im ganzen Realm zu chatten."
     },
+    "itemSet": {
+      "header": "{name} ({have}/{total})",
+      "bonusLine": "({pieces}) {bonus}"
+    },
     "questShare": {
       "notShareable": "Diese Quest kann nicht geteilt werden.",
       "notInSharerParty": "Ihr müsst in der Gruppe von {name} sein, um diese Quest anzunehmen.",
@@ -6385,6 +6389,43 @@ export const de_DE: EnTranslations = {
         "name": "Das Eingestürzte Reliquiar",
         "enterText": "Du steigst hinab in das eingestürzte Reliquiar.",
         "leaveText": "Du kletterst zurück zu Bruder Halven bei der Reliquiarruine."
+      }
+    },
+    "itemSets": {
+      "crownforged": {
+        "name": "Kronengeschmiedete Kriegstracht",
+        "bonus2": "Erhöht Angriffskraft um 40.",
+        "bonus3": "Erhöht Stärke um 15 und Ausdauer um 15."
+      },
+      "deathlord": {
+        "name": "Kriegstracht des Todesfürsten",
+        "bonus2": "Erhöht Angriffskraft um 40.",
+        "bonus3": "Erhöht Stärke um 15 und Ausdauer um 15."
+      },
+      "necromancers": {
+        "name": "Gewänder des Nekromanten",
+        "bonus2": "Verringert Zauberrückstoß durch Schaden um 50%.",
+        "bonus3": "Erlittener Schaden verzögert das Zauberwirken nicht."
+      },
+      "nighttalon": {
+        "name": "Nachtkrallen-Ledertracht",
+        "bonus2": "Erhöht Angriffskraft um 40.",
+        "bonus3": "Erhöht Beweglichkeit um 15 und kritische Trefferchance um 2%."
+      },
+      "soulflame": {
+        "name": "Seelenflammengewänder",
+        "bonus2": "Verringert Zauberrückstoß durch Schaden um 50%.",
+        "bonus3": "Erlittener Schaden verzögert das Zauberwirken nicht."
+      },
+      "stormcallers": {
+        "name": "Gewänder des Sturmrufers",
+        "bonus2": "Verringert Zauberrückstoß durch Schaden um 50%.",
+        "bonus3": "Erlittener Schaden verzögert das Zauberwirken nicht."
+      },
+      "wyrmshadow": {
+        "name": "Wyrmschattentracht",
+        "bonus2": "Erhöht Angriffskraft um 40.",
+        "bonus3": "Erhöht Beweglichkeit um 15 und kritische Trefferchance um 2%."
       }
     }
   },

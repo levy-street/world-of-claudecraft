@@ -454,6 +454,10 @@ export const ja_JP: EnTranslations = {
     "tips": {
       "joinChannels": "ヒント：/join world または /join lfg と入力すると、レルム全体のプレイヤーとチャットできます。"
     },
+    "itemSet": {
+      "header": "{name} ({have}/{total})",
+      "bonusLine": "({pieces}) {bonus}"
+    },
     "questShare": {
       "notShareable": "このクエストは共有できません。",
       "notInSharerParty": "{name} のパーティに参加していないと、このクエストを受諾できません。",
@@ -6385,6 +6389,43 @@ export const ja_JP: EnTranslations = {
         "name": "崩れた聖遺物庫",
         "enterText": "あなたは崩れた聖遺物庫へと降りていく。",
         "leaveText": "あなたは聖遺物庫の廃墟にいるハルヴェン修道士のもとへ登り戻る。"
+      }
+    },
+    "itemSets": {
+      "crownforged": {
+        "name": "冠鋳の戦装束",
+        "bonus2": "攻撃力が40上昇します。",
+        "bonus3": "筋力が15、スタミナが15上昇します。"
+      },
+      "deathlord": {
+        "name": "死王の戦装束",
+        "bonus2": "攻撃力が40上昇します。",
+        "bonus3": "筋力が15、スタミナが15上昇します。"
+      },
+      "necromancers": {
+        "name": "死霊術師の法衣",
+        "bonus2": "ダメージによる詠唱押し戻しを50%軽減します。",
+        "bonus3": "詠唱中にダメージを受けても押し戻されません。"
+      },
+      "nighttalon": {
+        "name": "夜爪の革装束",
+        "bonus2": "攻撃力が40上昇します。",
+        "bonus3": "敏捷性が15、クリティカル率が2%上昇します。"
+      },
+      "soulflame": {
+        "name": "魂炎の法衣",
+        "bonus2": "ダメージによる詠唱押し戻しを50%軽減します。",
+        "bonus3": "詠唱中にダメージを受けても押し戻されません。"
+      },
+      "stormcallers": {
+        "name": "嵐呼びの法衣",
+        "bonus2": "ダメージによる詠唱押し戻しを50%軽減します。",
+        "bonus3": "詠唱中にダメージを受けても押し戻されません。"
+      },
+      "wyrmshadow": {
+        "name": "竜影の装束",
+        "bonus2": "攻撃力が40上昇します。",
+        "bonus3": "敏捷性が15、クリティカル率が2%上昇します。"
       }
     }
   },

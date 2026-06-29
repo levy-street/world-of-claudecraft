@@ -454,6 +454,10 @@ export const it_IT: EnTranslations = {
     "tips": {
       "joinChannels": "Suggerimento: digita /join world o /join lfg per chattare con i giocatori di tutto il reame."
     },
+    "itemSet": {
+      "header": "{name} ({have}/{total})",
+      "bonusLine": "({pieces}) {bonus}"
+    },
     "questShare": {
       "notShareable": "Questa missione non può essere condivisa.",
       "notInSharerParty": "Devi essere nel gruppo di {name} per accettare quella missione.",
@@ -6385,6 +6389,43 @@ export const it_IT: EnTranslations = {
         "name": "Il Reliquiario Crollato",
         "enterText": "Scendi nel reliquiario crollato.",
         "leaveText": "Risali da Fratello Halven, alla rovina del reliquiario."
+      }
+    },
+    "itemSets": {
+      "crownforged": {
+        "name": "Tenuta da battaglia Forgiacorona",
+        "bonus2": "Aumenta la potenza d'attacco di 40.",
+        "bonus3": "Aumenta la forza di 15 e la vigoria di 15."
+      },
+      "deathlord": {
+        "name": "Tenuta da battaglia del Signore della Morte",
+        "bonus2": "Aumenta la potenza d'attacco di 40.",
+        "bonus3": "Aumenta la forza di 15 e la vigoria di 15."
+      },
+      "necromancers": {
+        "name": "Vesti del negromante",
+        "bonus2": "Riduce del 50% il ritardo al lancio causato dai danni.",
+        "bonus3": "I danni subiti non ritardano il lancio degli incantesimi."
+      },
+      "nighttalon": {
+        "name": "Tenuta di cuoio Artiglio Notturno",
+        "bonus2": "Aumenta la potenza d'attacco di 40.",
+        "bonus3": "Aumenta l’agilità di 15 e la probabilità di critico del 2%."
+      },
+      "soulflame": {
+        "name": "Vesti Fiamma dell’Anima",
+        "bonus2": "Riduce del 50% il ritardo al lancio causato dai danni.",
+        "bonus3": "I danni subiti non ritardano il lancio degli incantesimi."
+      },
+      "stormcallers": {
+        "name": "Vesti del Chiamatempeste",
+        "bonus2": "Riduce del 50% il ritardo al lancio causato dai danni.",
+        "bonus3": "I danni subiti non ritardano il lancio degli incantesimi."
+      },
+      "wyrmshadow": {
+        "name": "Tenuta Ombra del Dragone",
+        "bonus2": "Aumenta la potenza d'attacco di 40.",
+        "bonus3": "Aumenta l’agilità di 15 e la probabilità di critico del 2%."
       }
     }
   },

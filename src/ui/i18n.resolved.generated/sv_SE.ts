@@ -454,6 +454,10 @@ export const sv_SE: EnTranslations = {
     "tips": {
       "joinChannels": "Tips: skriv /join world eller /join lfg för att chatta med spelare över hela världen."
     },
+    "itemSet": {
+      "header": "{name} ({have}/{total})",
+      "bonusLine": "({pieces}) {bonus}"
+    },
     "questShare": {
       "notShareable": "Det här uppdraget kan inte delas.",
       "notInSharerParty": "Du måste vara i {name}s grupp för att anta det uppdraget.",
@@ -6385,6 +6389,43 @@ export const sv_SE: EnTranslations = {
         "name": "Det rasade relikvariet",
         "enterText": "Du stiger ner i det rasade relikvariet.",
         "leaveText": "Du klättrar tillbaka till broder Halven vid relikvarieruinen."
+      }
+    },
+    "itemSets": {
+      "crownforged": {
+        "name": "Kronsmidd stridsutrustning",
+        "bonus2": "Ökar attackkraft med 40.",
+        "bonus3": "Ökar styrka med 15 och uthållighet med 15."
+      },
+      "deathlord": {
+        "name": "Dödsherrens stridsutrustning",
+        "bonus2": "Ökar attackkraft med 40.",
+        "bonus3": "Ökar styrka med 15 och uthållighet med 15."
+      },
+      "necromancers": {
+        "name": "Nekromantikerns skrud",
+        "bonus2": "Minskar kastfördröjning från skada med 50%.",
+        "bonus3": "Skada du tar fördröjer inte dina besvärjelser."
+      },
+      "nighttalon": {
+        "name": "Nattklo läderutrustning",
+        "bonus2": "Ökar attackkraft med 40.",
+        "bonus3": "Ökar smidighet med 15 och kritisk chans med 2%."
+      },
+      "soulflame": {
+        "name": "Själsflammans skrud",
+        "bonus2": "Minskar kastfördröjning från skada med 50%.",
+        "bonus3": "Skada du tar fördröjer inte dina besvärjelser."
+      },
+      "stormcallers": {
+        "name": "Stormkallarens skrud",
+        "bonus2": "Minskar kastfördröjning från skada med 50%.",
+        "bonus3": "Skada du tar fördröjer inte dina besvärjelser."
+      },
+      "wyrmshadow": {
+        "name": "Wyrmskuggans utrustning",
+        "bonus2": "Ökar attackkraft med 40.",
+        "bonus3": "Ökar smidighet med 15 och kritisk chans med 2%."
       }
     }
   },

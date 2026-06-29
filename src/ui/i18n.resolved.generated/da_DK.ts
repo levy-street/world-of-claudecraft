@@ -454,6 +454,10 @@ export const da_DK: EnTranslations = {
     "tips": {
       "joinChannels": "Tip: skriv /join world eller /join lfg for at chatte med spillere på tværs af realmet."
     },
+    "itemSet": {
+      "header": "{name} ({have}/{total})",
+      "bonusLine": "({pieces}) {bonus}"
+    },
     "questShare": {
       "notShareable": "Denne opgave kan ikke deles.",
       "notInSharerParty": "Du skal være i {name}s gruppe for at acceptere den opgave.",
@@ -6385,6 +6389,43 @@ export const da_DK: EnTranslations = {
         "name": "Det Sammenstyrtede Relikvarium",
         "enterText": "Du stiger ned i det sammenstyrtede relikvarium.",
         "leaveText": "Du klatrer tilbage til Broder Halven ved relikvariets ruin."
+      }
+    },
+    "itemSets": {
+      "crownforged": {
+        "name": "Kronesmedet kampudstyr",
+        "bonus2": "Øger angrebskraft med 40.",
+        "bonus3": "Øger styrke med 15 og udholdenhed med 15."
+      },
+      "deathlord": {
+        "name": "Dødsherrens kampudstyr",
+        "bonus2": "Øger angrebskraft med 40.",
+        "bonus3": "Øger styrke med 15 og udholdenhed med 15."
+      },
+      "necromancers": {
+        "name": "Nekromantikerens klæder",
+        "bonus2": "Reducerer kastetilbageslag fra skade med 50%.",
+        "bonus3": "Skade forsinker ikke dine besværgelser."
+      },
+      "nighttalon": {
+        "name": "Natteklos læderudstyr",
+        "bonus2": "Øger angrebskraft med 40.",
+        "bonus3": "Øger smidighed med 15 og kritisk chance med 2%."
+      },
+      "soulflame": {
+        "name": "Sjæleflamme-klæder",
+        "bonus2": "Reducerer kastetilbageslag fra skade med 50%.",
+        "bonus3": "Skade forsinker ikke dine besværgelser."
+      },
+      "stormcallers": {
+        "name": "Stormkalderens klæder",
+        "bonus2": "Reducerer kastetilbageslag fra skade med 50%.",
+        "bonus3": "Skade forsinker ikke dine besværgelser."
+      },
+      "wyrmshadow": {
+        "name": "Wyrmskygge-udstyr",
+        "bonus2": "Øger angrebskraft med 40.",
+        "bonus3": "Øger smidighed med 15 og kritisk chance med 2%."
       }
     }
   },

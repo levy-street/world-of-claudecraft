@@ -4762,4 +4762,33 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterLoot.assigned': '{looter} memberikan {item} kepada {target}.',
   'hudChrome.masterLoot.unassigned': '{item} tidak diberikan dan bebas untuk semua.',
   'hudChrome.masterLoot.leaderOnly': 'Hanya pemimpin grup yang dapat mengubah metode loot.',
+  'entities.itemSets.crownforged.name': 'Perlengkapan tempur Tempa Mahkota',
+  'entities.itemSets.crownforged.bonus2': 'Meningkatkan daya serang sebesar 40.',
+  'entities.itemSets.crownforged.bonus3':
+    'Meningkatkan kekuatan sebesar 15 dan stamina sebesar 15.',
+  'entities.itemSets.deathlord.name': 'Perlengkapan tempur Penguasa Maut',
+  'entities.itemSets.deathlord.bonus2': 'Meningkatkan daya serang sebesar 40.',
+  'entities.itemSets.deathlord.bonus3': 'Meningkatkan kekuatan sebesar 15 dan stamina sebesar 15.',
+  'entities.itemSets.necromancers.name': 'Jubah ahli nujum',
+  'entities.itemSets.necromancers.bonus2':
+    'Mengurangi dorongan balik sihir akibat kerusakan sebesar 50%.',
+  'entities.itemSets.necromancers.bonus3': 'Kerusakan yang diterima tidak menunda perapalan sihir.',
+  'entities.itemSets.nighttalon.name': 'Perlengkapan kulit Cakar Malam',
+  'entities.itemSets.nighttalon.bonus2': 'Meningkatkan daya serang sebesar 40.',
+  'entities.itemSets.nighttalon.bonus3':
+    'Meningkatkan kelincahan sebesar 15 dan peluang kritis sebesar 2%.',
+  'entities.itemSets.soulflame.name': 'Jubah Api Jiwa',
+  'entities.itemSets.soulflame.bonus2':
+    'Mengurangi dorongan balik sihir akibat kerusakan sebesar 50%.',
+  'entities.itemSets.soulflame.bonus3': 'Kerusakan yang diterima tidak menunda perapalan sihir.',
+  'entities.itemSets.stormcallers.name': 'Jubah Pemanggil Badai',
+  'entities.itemSets.stormcallers.bonus2':
+    'Mengurangi dorongan balik sihir akibat kerusakan sebesar 50%.',
+  'entities.itemSets.stormcallers.bonus3': 'Kerusakan yang diterima tidak menunda perapalan sihir.',
+  'entities.itemSets.wyrmshadow.name': 'Perlengkapan Bayangan Wyrm',
+  'entities.itemSets.wyrmshadow.bonus2': 'Meningkatkan daya serang sebesar 40.',
+  'entities.itemSets.wyrmshadow.bonus3':
+    'Meningkatkan kelincahan sebesar 15 dan peluang kritis sebesar 2%.',
+  'hudChrome.itemSet.header': '{name} ({have}/{total})',
+  'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
 };

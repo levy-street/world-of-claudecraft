@@ -454,6 +454,10 @@ export const nl_NL: EnTranslations = {
     "tips": {
       "joinChannels": "Tip: typ /join world of /join lfg om te chatten met spelers over het hele rijk."
     },
+    "itemSet": {
+      "header": "{name} ({have}/{total})",
+      "bonusLine": "({pieces}) {bonus}"
+    },
     "questShare": {
       "notShareable": "Deze queeste kan niet gedeeld worden.",
       "notInSharerParty": "Je moet in de groep van {name} zitten om die queeste aan te nemen.",
@@ -6385,6 +6389,43 @@ export const nl_NL: EnTranslations = {
         "name": "Het Ingestorte Reliekschrijn",
         "enterText": "Je daalt af in het ingestorte reliekschrijn.",
         "leaveText": "Je klimt terug omhoog naar Broeder Halven bij de reliekschrijnruïne."
+      }
+    },
+    "itemSets": {
+      "crownforged": {
+        "name": "Kroongesmede gevechtsuitrusting",
+        "bonus2": "Verhoogt aanvalskracht met 40.",
+        "bonus3": "Verhoogt kracht met 15 en uithoudingsvermogen met 15."
+      },
+      "deathlord": {
+        "name": "Gevechtsuitrusting van de Dodenheer",
+        "bonus2": "Verhoogt aanvalskracht met 40.",
+        "bonus3": "Verhoogt kracht met 15 en uithoudingsvermogen met 15."
+      },
+      "necromancers": {
+        "name": "Gewaden van de necromant",
+        "bonus2": "Vermindert terugslag bij spreuken door schade met 50%.",
+        "bonus3": "Opgelopen schade vertraagt je spreuken niet."
+      },
+      "nighttalon": {
+        "name": "Nachtklauw leren uitrusting",
+        "bonus2": "Verhoogt aanvalskracht met 40.",
+        "bonus3": "Verhoogt behendigheid met 15 en kritieke kans met 2%."
+      },
+      "soulflame": {
+        "name": "Zielenvlamgewaden",
+        "bonus2": "Vermindert terugslag bij spreuken door schade met 50%.",
+        "bonus3": "Opgelopen schade vertraagt je spreuken niet."
+      },
+      "stormcallers": {
+        "name": "Gewaden van de Stormroeper",
+        "bonus2": "Vermindert terugslag bij spreuken door schade met 50%.",
+        "bonus3": "Opgelopen schade vertraagt je spreuken niet."
+      },
+      "wyrmshadow": {
+        "name": "Wurmschaduw-uitrusting",
+        "bonus2": "Verhoogt aanvalskracht met 40.",
+        "bonus3": "Verhoogt behendigheid met 15 en kritieke kans met 2%."
       }
     }
   },

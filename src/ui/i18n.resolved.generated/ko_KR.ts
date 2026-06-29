@@ -454,6 +454,10 @@ export const ko_KR: EnTranslations = {
     "tips": {
       "joinChannels": "팁: /join world 또는 /join lfg를 입력하면 서버 전역의 플레이어와 대화할 수 있습니다."
     },
+    "itemSet": {
+      "header": "{name} ({have}/{total})",
+      "bonusLine": "({pieces}) {bonus}"
+    },
     "questShare": {
       "notShareable": "이 퀘스트는 공유할 수 없습니다.",
       "notInSharerParty": "{name}님의 파티에 속해 있어야 이 퀘스트를 수락할 수 있습니다.",
@@ -6385,6 +6389,43 @@ export const ko_KR: EnTranslations = {
         "name": "무너진 성물실",
         "enterText": "무너진 성물실로 내려갑니다.",
         "leaveText": "성물실 폐허의 브라더 할벤에게로 다시 올라갑니다."
+      }
+    },
+    "itemSets": {
+      "crownforged": {
+        "name": "왕관벼림 전투장비",
+        "bonus2": "전투력이 40만큼 증가합니다.",
+        "bonus3": "힘이 15, 체력이 15만큼 증가합니다."
+      },
+      "deathlord": {
+        "name": "죽음군주의 전투장비",
+        "bonus2": "전투력이 40만큼 증가합니다.",
+        "bonus3": "힘이 15, 체력이 15만큼 증가합니다."
+      },
+      "necromancers": {
+        "name": "강령술사의 의복",
+        "bonus2": "피해로 인한 시전 밀림이 50% 감소합니다.",
+        "bonus3": "시전 중 피해를 받아도 밀려나지 않습니다."
+      },
+      "nighttalon": {
+        "name": "밤발톱 가죽장비",
+        "bonus2": "전투력이 40만큼 증가합니다.",
+        "bonus3": "민첩이 15, 치명타 확률이 2% 증가합니다."
+      },
+      "soulflame": {
+        "name": "영혼불꽃 의복",
+        "bonus2": "피해로 인한 시전 밀림이 50% 감소합니다.",
+        "bonus3": "시전 중 피해를 받아도 밀려나지 않습니다."
+      },
+      "stormcallers": {
+        "name": "폭풍소환사의 의복",
+        "bonus2": "피해로 인한 시전 밀림이 50% 감소합니다.",
+        "bonus3": "시전 중 피해를 받아도 밀려나지 않습니다."
+      },
+      "wyrmshadow": {
+        "name": "고룡그림자 의복",
+        "bonus2": "전투력이 40만큼 증가합니다.",
+        "bonus3": "민첩이 15, 치명타 확률이 2% 증가합니다."
       }
     }
   },

@@ -454,6 +454,10 @@ export const pl_PL: EnTranslations = {
     "tips": {
       "joinChannels": "Wskazówka: wpisz /join world lub /join lfg, aby rozmawiać z graczami z całego realmu."
     },
+    "itemSet": {
+      "header": "{name} ({have}/{total})",
+      "bonusLine": "({pieces}) {bonus}"
+    },
     "questShare": {
       "notShareable": "Tego zadania nie można udostępnić.",
       "notInSharerParty": "Musisz być w drużynie gracza {name}, aby przyjąć to zadanie.",
@@ -6385,6 +6389,43 @@ export const pl_PL: EnTranslations = {
         "name": "Zawalony Relikwiarz",
         "enterText": "Schodzisz do zawalonego relikwiarza.",
         "leaveText": "Wspinasz się z powrotem do Brata Halvena przy ruinie relikwiarza."
+      }
+    },
+    "itemSets": {
+      "crownforged": {
+        "name": "Koronokuty rynsztunek bojowy",
+        "bonus2": "Zwiększa siłę ataku o 40.",
+        "bonus3": "Zwiększa siłę o 15 i wytrzymałość o 15."
+      },
+      "deathlord": {
+        "name": "Rynsztunek bojowy Władcy Śmierci",
+        "bonus2": "Zwiększa siłę ataku o 40.",
+        "bonus3": "Zwiększa siłę o 15 i wytrzymałość o 15."
+      },
+      "necromancers": {
+        "name": "Szaty nekromanty",
+        "bonus2": "Zmniejsza opóźnianie zaklęć przez obrażenia o 50%.",
+        "bonus3": "Otrzymywane obrażenia nie opóźniają rzucania zaklęć."
+      },
+      "nighttalon": {
+        "name": "Skórzany rynsztunek Nocnego Szpona",
+        "bonus2": "Zwiększa siłę ataku o 40.",
+        "bonus3": "Zwiększa zręczność o 15 i szansę na trafienie krytyczne o 2%."
+      },
+      "soulflame": {
+        "name": "Szaty Płomienia Duszy",
+        "bonus2": "Zmniejsza opóźnianie zaklęć przez obrażenia o 50%.",
+        "bonus3": "Otrzymywane obrażenia nie opóźniają rzucania zaklęć."
+      },
+      "stormcallers": {
+        "name": "Szaty Przyzywacza Burz",
+        "bonus2": "Zmniejsza opóźnianie zaklęć przez obrażenia o 50%.",
+        "bonus3": "Otrzymywane obrażenia nie opóźniają rzucania zaklęć."
+      },
+      "wyrmshadow": {
+        "name": "Rynsztunek Cienia Żmija",
+        "bonus2": "Zwiększa siłę ataku o 40.",
+        "bonus3": "Zwiększa zręczność o 15 i szansę na trafienie krytyczne o 2%."
       }
     }
   },
