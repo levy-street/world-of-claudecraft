@@ -91,7 +91,7 @@ export type {
 export type { RaidLockout } from './world_api/dungeons';
 export type { MarketInfo, MarketListingView } from './world_api/market';
 export type { PartyInfo, PartyMemberInfo } from './world_api/party';
-export type { LeaderboardEntry } from './world_api/progression_xp';
+export type { GuildLeaderboardEntry, LeaderboardEntry } from './world_api/progression_xp';
 export type {
   CharacterSearchResult,
   FriendInfo,

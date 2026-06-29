@@ -53,7 +53,13 @@ export const zh_TW: EnTranslations = {
       "unranked": "未上榜",
       "you": "你",
       "globalSubtitle": "所有伺服器的頂尖冠軍",
-      "retry": "無法載入排行榜。請再試一次。"
+      "retry": "無法載入排行榜。請再試一次。",
+      "guildCol": "公會",
+      "members": "成員",
+      "topLevel": "最高等級",
+      "totalXp": "總經驗",
+      "tabPlayers": "玩家",
+      "tabGuilds": "公會"
     },
     "milestone": {
       "unlocked": "里程碑解鎖",

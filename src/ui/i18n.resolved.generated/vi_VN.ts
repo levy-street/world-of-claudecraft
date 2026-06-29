@@ -53,7 +53,13 @@ export const vi_VN: EnTranslations = {
       "unranked": "Chưa Xếp Hạng",
       "you": "Bạn",
       "globalSubtitle": "Những nhà vô địch hàng đầu trên mọi máy chủ",
-      "retry": "Không thể tải bảng xếp hạng. Hãy thử lại."
+      "retry": "Không thể tải bảng xếp hạng. Hãy thử lại.",
+      "guildCol": "Guild",
+      "members": "Members",
+      "topLevel": "Top Lvl",
+      "totalXp": "Total XP",
+      "tabPlayers": "Players",
+      "tabGuilds": "Guilds"
     },
     "milestone": {
       "unlocked": "Đã Mở Khóa Cột Mốc",

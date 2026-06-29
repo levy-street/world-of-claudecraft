@@ -14,6 +14,19 @@ export interface LeaderboardEntry {
   realm?: string; // present on the global (cross-realm) home-page board
 }
 
+// One ranked row of the guild high score board: guilds ranked by total member
+// lifetime XP. Like LeaderboardEntry this is computed server-side and the client
+// only displays it. Not part of IWorld (the in-game panel ranks characters, not
+// guilds); it rides the same REST plumbing as the home-page player board.
+export interface GuildLeaderboardEntry {
+  rank: number;
+  guild: string;
+  members: number;
+  topLevel: number;
+  totalXp: number;
+  realm?: string; // present on the global (cross-realm) home-page board
+}
+
 export interface IWorldProgressionXp {
   xp: number;
   // Post-cap progression (Max-Level XP Overflow). All server-authoritative;

@@ -53,7 +53,13 @@ export const it_IT: EnTranslations = {
       "unranked": "Non classificato",
       "you": "Tu",
       "globalSubtitle": "Migliori campioni di tutti i reami",
-      "retry": "Impossibile caricare la classifica. Riprova."
+      "retry": "Impossibile caricare la classifica. Riprova.",
+      "guildCol": "Guild",
+      "members": "Members",
+      "topLevel": "Top Lvl",
+      "totalXp": "Total XP",
+      "tabPlayers": "Players",
+      "tabGuilds": "Guilds"
     },
     "milestone": {
       "unlocked": "Traguardo sbloccato",

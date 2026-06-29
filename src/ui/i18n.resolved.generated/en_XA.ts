@@ -53,7 +53,13 @@ export const en_XA: EnTranslations = {
       "unranked": "[Úñŕáñķéð]",
       "you": "[Ýóú]",
       "globalSubtitle": "[Ţóþ çĥáɱþíóñš áçŕóšš áļļ ŕéáļɱš]",
-      "retry": "[Çóúļð ñóţ ļóáð ţĥé ļéáðéŕƀóáŕð. Ţŕý áĝáíñ.]"
+      "retry": "[Çóúļð ñóţ ļóáð ţĥé ļéáðéŕƀóáŕð. Ţŕý áĝáíñ.]",
+      "guildCol": "[Ĝúíļð]",
+      "members": "[Ɱéɱƀéŕš]",
+      "topLevel": "[Ţóþ Ļʋļ]",
+      "totalXp": "[Ţóţáļ ẊÞ]",
+      "tabPlayers": "[Þļáýéŕš]",
+      "tabGuilds": "[Ĝúíļðš]"
     },
     "milestone": {
       "unlocked": "[Ɱíļéšţóñé Úñļóçķéð]",

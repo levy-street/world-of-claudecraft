@@ -53,7 +53,13 @@ export const tr_TR: EnTranslations = {
       "unranked": "Sırasız",
       "you": "Sen",
       "globalSubtitle": "Tüm diyarların en iyi şampiyonları",
-      "retry": "Lider tablosu yüklenemedi. Tekrar deneyin."
+      "retry": "Lider tablosu yüklenemedi. Tekrar deneyin.",
+      "guildCol": "Guild",
+      "members": "Members",
+      "topLevel": "Top Lvl",
+      "totalXp": "Total XP",
+      "tabPlayers": "Players",
+      "tabGuilds": "Guilds"
     },
     "milestone": {
       "unlocked": "Kilometre Taşı Açıldı",

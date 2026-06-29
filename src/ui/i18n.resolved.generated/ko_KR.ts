@@ -53,7 +53,13 @@ export const ko_KR: EnTranslations = {
       "unranked": "순위 없음",
       "you": "나",
       "globalSubtitle": "모든 서버의 최고 영웅",
-      "retry": "순위표를 불러오지 못했습니다. 다시 시도하세요."
+      "retry": "순위표를 불러오지 못했습니다. 다시 시도하세요.",
+      "guildCol": "길드",
+      "members": "구성원",
+      "topLevel": "최고 레벨",
+      "totalXp": "총 경험치",
+      "tabPlayers": "플레이어",
+      "tabGuilds": "길드"
     },
     "milestone": {
       "unlocked": "이정표 해제",

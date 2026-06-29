@@ -53,7 +53,13 @@ export const fr_CA: EnTranslations = {
       "unranked": "Non classé",
       "you": "Vous",
       "globalSubtitle": "Meilleurs champions de tous les royaumes",
-      "retry": "Impossible de charger le classement. Réessayez."
+      "retry": "Impossible de charger le classement. Réessayez.",
+      "guildCol": "Guild",
+      "members": "Members",
+      "topLevel": "Top Lvl",
+      "totalXp": "Total XP",
+      "tabPlayers": "Players",
+      "tabGuilds": "Guilds"
     },
     "milestone": {
       "unlocked": "Jalon débloqué",

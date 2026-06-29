@@ -53,7 +53,13 @@ export const sv_SE: EnTranslations = {
       "unranked": "Orankad",
       "you": "Du",
       "globalSubtitle": "Främsta mästarna över alla riken",
-      "retry": "Kunde inte ladda topplistan. Försök igen."
+      "retry": "Kunde inte ladda topplistan. Försök igen.",
+      "guildCol": "Guild",
+      "members": "Members",
+      "topLevel": "Top Lvl",
+      "totalXp": "Total XP",
+      "tabPlayers": "Players",
+      "tabGuilds": "Guilds"
     },
     "milestone": {
       "unlocked": "Milstolpe upplåst",

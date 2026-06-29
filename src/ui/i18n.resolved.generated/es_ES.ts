@@ -53,7 +53,13 @@ export const es_ES: EnTranslations = {
       "unranked": "Sin clasificar",
       "you": "Tú",
       "globalSubtitle": "Mejores campeones de todos los reinos",
-      "retry": "No se pudo cargar la clasificación. Intenta de nuevo."
+      "retry": "No se pudo cargar la clasificación. Intenta de nuevo.",
+      "guildCol": "Guild",
+      "members": "Members",
+      "topLevel": "Top Lvl",
+      "totalXp": "Total XP",
+      "tabPlayers": "Players",
+      "tabGuilds": "Guilds"
     },
     "milestone": {
       "unlocked": "Hito desbloqueado",

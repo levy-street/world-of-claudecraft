@@ -53,7 +53,13 @@ export const id_ID: EnTranslations = {
       "unranked": "Tanpa Peringkat",
       "you": "Anda",
       "globalSubtitle": "Juara teratas di seluruh realm",
-      "retry": "Tidak dapat memuat papan peringkat. Coba lagi."
+      "retry": "Tidak dapat memuat papan peringkat. Coba lagi.",
+      "guildCol": "Guild",
+      "members": "Members",
+      "topLevel": "Top Lvl",
+      "totalXp": "Total XP",
+      "tabPlayers": "Players",
+      "tabGuilds": "Guilds"
     },
     "milestone": {
       "unlocked": "Tonggak Tercapai",

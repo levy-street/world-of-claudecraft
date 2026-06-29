@@ -1802,6 +1802,64 @@ export async function topLifetimeXp(
   }));
 }
 
+export interface GuildXpLeaderRow {
+  guild: string;
+  realm: string;
+  members: number;
+  totalXp: number;
+  topLevel: number;
+}
+
+// Guild high score board: guilds ranked by the SUM of member lifetime XP. Mirrors
+// topLifetimeXp's global/realm split and LEADERBOARD_MAX cap; read through the
+// in-memory cache in main.ts, never per request. The existing guild_members_guild
+// index covers the join. `global: true` ranks guilds across every realm (home
+// page); otherwise it is scoped to this process's realm.
+export async function topGuildsByXp(
+  limit = 100,
+  opts: { global?: boolean } = {},
+): Promise<GuildXpLeaderRow[]> {
+  const cap = Math.max(1, Math.min(LEADERBOARD_MAX, limit));
+  const res = opts.global
+    ? await pool.query(
+        `SELECT g.name AS guild, g.realm,
+                COUNT(gm.character_id)                              AS members,
+                COALESCE(SUM((c.state->>'lifetimeXp')::bigint), 0)  AS total_xp,
+                MAX(c.level)                                        AS top_level
+           FROM guilds g
+           JOIN guild_members gm ON gm.guild_id = g.id
+           JOIN characters c     ON c.id = gm.character_id
+          WHERE c.state IS NOT NULL
+          GROUP BY g.id, g.name, g.realm
+         HAVING COALESCE(SUM((c.state->>'lifetimeXp')::bigint), 0) > 0
+          ORDER BY total_xp DESC, members DESC, guild ASC
+          LIMIT $1`,
+        [cap],
+      )
+    : await pool.query(
+        `SELECT g.name AS guild, g.realm,
+                COUNT(gm.character_id)                              AS members,
+                COALESCE(SUM((c.state->>'lifetimeXp')::bigint), 0)  AS total_xp,
+                MAX(c.level)                                        AS top_level
+           FROM guilds g
+           JOIN guild_members gm ON gm.guild_id = g.id
+           JOIN characters c     ON c.id = gm.character_id
+          WHERE c.state IS NOT NULL AND g.realm = $1
+          GROUP BY g.id, g.name, g.realm
+         HAVING COALESCE(SUM((c.state->>'lifetimeXp')::bigint), 0) > 0
+          ORDER BY total_xp DESC, members DESC, guild ASC
+          LIMIT $2`,
+        [REALM, cap],
+      );
+  return res.rows.map((r) => ({
+    guild: r.guild,
+    realm: r.realm,
+    members: Number(r.members),
+    totalXp: Number(r.total_xp),
+    topLevel: Number(r.top_level),
+  }));
+}
+
 // ---------------------------------------------------------------------------
 // Client performance telemetry: small, sanitized summaries from the browser.
 // Kept separate from play sessions because reports can come from offline

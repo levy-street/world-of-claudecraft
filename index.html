@@ -800,7 +800,14 @@
           </div>
           <h2 class="skeleton-title" data-i18n="highscores.title">High Scores Leaderboard</h2>
           <p class="skeleton-desc" data-i18n="game.leaderboard.globalSubtitle">Top champions across all realms</p>
-          <div id="hs-leaderboard" class="hs-leaderboard" aria-live="polite">
+          <div class="hs-tabs" role="tablist">
+            <button type="button" id="hs-tab-players" class="hs-tab active" role="tab" aria-selected="true" aria-controls="hs-leaderboard" data-i18n="game.leaderboard.tabPlayers">Players</button>
+            <button type="button" id="hs-tab-guilds" class="hs-tab" role="tab" aria-selected="false" aria-controls="hs-guild-leaderboard" data-i18n="game.leaderboard.tabGuilds">Guilds</button>
+          </div>
+          <div id="hs-leaderboard" class="hs-leaderboard" role="tabpanel" aria-labelledby="hs-tab-players" aria-live="polite">
+            <div class="hs-loading" data-i18n="game.leaderboard.loading">Loading rankings…</div>
+          </div>
+          <div id="hs-guild-leaderboard" class="hs-leaderboard" role="tabpanel" aria-labelledby="hs-tab-guilds" aria-live="polite" hidden>
             <div class="hs-loading" data-i18n="game.leaderboard.loading">Loading rankings…</div>
           </div>
         </div>

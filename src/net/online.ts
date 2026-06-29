@@ -41,6 +41,7 @@ import {
   type DelveShopOfferView,
   type DuelInfo,
   type FriendInfo,
+  type GuildLeaderboardEntry,
   type IWorld,
   isOverheadEmoteId,
   type LeaderboardEntry,
@@ -465,12 +466,27 @@ export class Api {
   // Lifetime-XP leaderboard for the home page. 'global' ranks across all realms.
   async leaderboard(
     scope: 'realm' | 'global' = 'global',
-    limit = 100,
+    limit = 500,
   ): Promise<LeaderboardEntry[]> {
     try {
       const data = await this.get(
         `/api/leaderboard?scope=${scope}&metric=lifetimeXp&limit=${limit}`,
       );
+      return data.leaders ?? [];
+    } catch {
+      return [];
+    }
+  }
+
+  // Guild high score board for the home page: guilds ranked by total member
+  // lifetime XP. 'global' ranks across all realms. Mirrors leaderboard() above,
+  // returning [] on failure so the board degrades the same way when offline.
+  async guildLeaderboard(
+    scope: 'realm' | 'global' = 'global',
+    limit = 500,
+  ): Promise<GuildLeaderboardEntry[]> {
+    try {
+      const data = await this.get(`/api/guild-leaderboard?scope=${scope}&limit=${limit}`);
       return data.leaders ?? [];
     } catch {
       return [];

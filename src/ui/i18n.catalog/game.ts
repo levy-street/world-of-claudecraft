@@ -40,6 +40,12 @@ export const gameStrings = {
     you: "You",
     globalSubtitle: "Top champions across all realms",
     retry: "Could not load the leaderboard. Try again.",
+    guildCol: "Guild",
+    members: "Members",
+    topLevel: "Top Lvl",
+    totalXp: "Total XP",
+    tabPlayers: "Players",
+    tabGuilds: "Guilds",
   },
   milestone: {
     unlocked: "Milestone Unlocked",
@@ -168,6 +174,12 @@ export const gameStringsEs: typeof gameStrings = {
     you: "Tú",
     globalSubtitle: "Mejores campeones de todos los reinos",
     retry: "No se pudo cargar la clasificación. Intenta de nuevo.",
+    guildCol: "Hermandad",
+    members: "Miembros",
+    topLevel: "Nv. máx.",
+    totalXp: "EXP total",
+    tabPlayers: "Jugadores",
+    tabGuilds: "Hermandades",
   },
   milestone: {
     unlocked: "Hito desbloqueado",
@@ -281,6 +293,12 @@ export const gameStringsFrFR: typeof gameStrings = {
     you: "Vous",
     globalSubtitle: "Meilleurs champions de tous les royaumes",
     retry: "Impossible de charger le classement. Réessayez.",
+    guildCol: "Guilde",
+    members: "Membres",
+    topLevel: "Niv. max",
+    totalXp: "EXP totale",
+    tabPlayers: "Joueurs",
+    tabGuilds: "Guildes",
   },
   milestone: {
     unlocked: "Jalon débloqué",
@@ -370,7 +388,7 @@ export const gameStringsFrCA: typeof gameStrings = gameStringsFrFR;
 export const gameStringsItIT: typeof gameStrings = {
   xp: { suffix: "PE", maxLevel: "LIVELLO MAX", totalXp: "PE totali", lv: "Liv", toNext: "al prossimo", rested: "Riposato" },
   progression: { heading: "Progressione", totalXp: "PE totali", virtualLevel: "Livello virtuale", prestigeRank: "Rango prestigio", milestones: "Traguardi", none: "Ancora nessuno", virtualLevelUp: "Livello virtuale" },
-  leaderboard: { title: "Classifica", subtitle: "PE totali", rank: "Posizione", name: "Nome", realmCol: "Reame", level: "Liv", vlevel: "Liv.V", lifetimeXp: "PE totali", yourRank: "La tua posizione", empty: "Non ci sono ancora campioni: lascia il primo segno.", loading: "Caricamento classifica...", unranked: "Non classificato", you: "Tu", globalSubtitle: "Migliori campioni di tutti i reami", retry: "Impossibile caricare la classifica. Riprova." },
+  leaderboard: { title: "Classifica", subtitle: "PE totali", rank: "Posizione", name: "Nome", realmCol: "Reame", level: "Liv", vlevel: "Liv.V", lifetimeXp: "PE totali", yourRank: "La tua posizione", empty: "Non ci sono ancora campioni: lascia il primo segno.", loading: "Caricamento classifica...", unranked: "Non classificato", you: "Tu", globalSubtitle: "Migliori campioni di tutti i reami", retry: "Impossibile caricare la classifica. Riprova.", guildCol: "Gilda", members: "Membri", topLevel: "Liv. max", totalXp: "PE totali", tabPlayers: "Giocatori", tabGuilds: "Gilde" },
   milestone: { unlocked: "Traguardo sbloccato", veteran: "Veterano", champion: "Campione", paragon: "Esemplare", mythic: "Mitico", eternal: "Eterno" },
   prestige: { action: "Prestigio", title: "Prestigio personaggio", body: "Il prestigio aumenta il tuo rango prestigio di 1 e azzera la barra PE del livello. Non cambia livello, equipaggiamento, talenti, abilità, PE totali o posizione in classifica: è solo un segno cosmetico.", confirm: "Prestigio", cancel: "Annulla", rank: "Prestigio", needCap: "Devi essere al livello massimo per ottenere prestigio.", needXp: "PE totali in più per il prestigio" },
   settings: { showOverflowXp: "Mostra PE eccedenti", weather: "Effetti meteo" },
@@ -384,7 +402,7 @@ export const gameStringsItIT: typeof gameStrings = {
 export const gameStringsDeDE: typeof gameStrings = {
   xp: { suffix: "EP", maxLevel: "MAX. STUFE", totalXp: "EP gesamt", lv: "St.", toNext: "bis zur nächsten", rested: "Ausgeruht" },
   progression: { heading: "Fortschritt", totalXp: "EP gesamt", virtualLevel: "Virtuelle Stufe", prestigeRank: "Prestigerang", milestones: "Meilensteine", none: "Noch keine", virtualLevelUp: "Virtuelle Stufe" },
-  leaderboard: { title: "Rangliste", subtitle: "Lebenszeit-EP", rank: "Rang", name: "Name", realmCol: "Realm", level: "St.", vlevel: "V.St.", lifetimeXp: "Lebenszeit-EP", yourRank: "Euer Rang", empty: "Noch keine Champions; setzt als Erste ein Zeichen.", loading: "Rangliste wird geladen...", unranked: "Ohne Rang", you: "Ihr", globalSubtitle: "Beste Champions aller Realms", retry: "Rangliste konnte nicht geladen werden. Versucht es erneut." },
+  leaderboard: { title: "Rangliste", subtitle: "Lebenszeit-EP", rank: "Rang", name: "Name", realmCol: "Realm", level: "St.", vlevel: "V.St.", lifetimeXp: "Lebenszeit-EP", yourRank: "Euer Rang", empty: "Noch keine Champions; setzt als Erste ein Zeichen.", loading: "Rangliste wird geladen...", unranked: "Ohne Rang", you: "Ihr", globalSubtitle: "Beste Champions aller Realms", retry: "Rangliste konnte nicht geladen werden. Versucht es erneut.", guildCol: "Gilde", members: "Mitglieder", topLevel: "Max. St.", totalXp: "EP gesamt", tabPlayers: "Spieler", tabGuilds: "Gilden" },
   milestone: { unlocked: "Meilenstein freigeschaltet", veteran: "Veteran", champion: "Champion", paragon: "Paragon", mythic: "Mythisch", eternal: "Ewig" },
   prestige: { action: "Prestige", title: "Charakter prestigen", body: "Prestige erhöht Euren Prestigerang um 1 und setzt die Stufen-EP-Leiste zurück. Stufe, Ausrüstung, Talente, Fähigkeiten, Lebenszeit-EP und Ranglistenplatz bleiben unverändert; es ist nur ein kosmetisches Zeichen.", confirm: "Prestige", cancel: "Abbrechen", rank: "Prestige", needCap: "Ihr müsst die Maximalstufe erreicht haben, um Prestige zu erhalten.", needXp: "mehr Lebenszeit-EP für Prestige" },
   settings: { showOverflowXp: "Überschuss-EP anzeigen", weather: "Wettereffekte" },
@@ -398,7 +416,7 @@ export const gameStringsDeDE: typeof gameStrings = {
 export const gameStringsZhCN: typeof gameStrings = {
   xp: { suffix: "经验", maxLevel: "满级", totalXp: "总经验", lv: "等级", toNext: "到下一级", rested: "充分休息" },
   progression: { heading: "进度", totalXp: "总经验", virtualLevel: "虚拟等级", prestigeRank: "声望阶级", milestones: "里程碑", none: "尚无", virtualLevelUp: "虚拟等级" },
-  leaderboard: { title: "排行榜", subtitle: "终身经验", rank: "名次", name: "名称", realmCol: "服务器", level: "等级", vlevel: "虚等", lifetimeXp: "终身经验", yourRank: "你的排名", empty: "还没有冠军；成为第一个留下传说的人。", loading: "正在加载排名...", unranked: "未上榜", you: "你", globalSubtitle: "所有服务器的顶尖冠军", retry: "无法加载排行榜。请重试。" },
+  leaderboard: { title: "排行榜", subtitle: "终身经验", rank: "名次", name: "名称", realmCol: "服务器", level: "等级", vlevel: "虚等", lifetimeXp: "终身经验", yourRank: "你的排名", empty: "还没有冠军；成为第一个留下传说的人。", loading: "正在加载排名...", unranked: "未上榜", you: "你", globalSubtitle: "所有服务器的顶尖冠军", retry: "无法加载排行榜。请重试。", guildCol: "公会", members: "成员", topLevel: "最高等级", totalXp: "总经验", tabPlayers: "玩家", tabGuilds: "公会" },
   milestone: { unlocked: "里程碑解锁", veteran: "老兵", champion: "冠军", paragon: "典范", mythic: "神话", eternal: "永恒" },
   prestige: { action: "声望晋升", title: "角色声望晋升", body: "声望晋升会使你的声望阶级提高 1，并重置等级经验条。它不会改变等级、装备、天赋、技能、终身经验或排行榜位置；这只是外观荣誉。", confirm: "声望晋升", cancel: "取消", rank: "声望", needCap: "你必须达到等级上限才能进行声望晋升。", needXp: "更多终身经验才可声望晋升" },
   settings: { showOverflowXp: "显示溢出经验", weather: "天气效果" },
@@ -412,7 +430,7 @@ export const gameStringsZhCN: typeof gameStrings = {
 export const gameStringsZhTW: typeof gameStrings = {
   xp: { suffix: "經驗", maxLevel: "滿級", totalXp: "總經驗", lv: "等級", toNext: "到下一級", rested: "充分休息" },
   progression: { heading: "進度", totalXp: "總經驗", virtualLevel: "虛擬等級", prestigeRank: "威望階級", milestones: "里程碑", none: "尚無", virtualLevelUp: "虛擬等級" },
-  leaderboard: { title: "排行榜", subtitle: "終身經驗", rank: "名次", name: "名稱", realmCol: "伺服器", level: "等級", vlevel: "虛等", lifetimeXp: "終身經驗", yourRank: "你的排名", empty: "還沒有冠軍；成為第一個留下傳說的人。", loading: "正在載入排名...", unranked: "未上榜", you: "你", globalSubtitle: "所有伺服器的頂尖冠軍", retry: "無法載入排行榜。請再試一次。" },
+  leaderboard: { title: "排行榜", subtitle: "終身經驗", rank: "名次", name: "名稱", realmCol: "伺服器", level: "等級", vlevel: "虛等", lifetimeXp: "終身經驗", yourRank: "你的排名", empty: "還沒有冠軍；成為第一個留下傳說的人。", loading: "正在載入排名...", unranked: "未上榜", you: "你", globalSubtitle: "所有伺服器的頂尖冠軍", retry: "無法載入排行榜。請再試一次。", guildCol: "公會", members: "成員", topLevel: "最高等級", totalXp: "總經驗", tabPlayers: "玩家", tabGuilds: "公會" },
   milestone: { unlocked: "里程碑解鎖", veteran: "老兵", champion: "冠軍", paragon: "典範", mythic: "神話", eternal: "永恆" },
   prestige: { action: "威望晉升", title: "角色威望晉升", body: "威望晉升會使你的威望階級提高 1，並重置等級經驗條。它不會改變等級、裝備、天賦、技能、終身經驗或排行榜位置；這只是外觀榮譽。", confirm: "威望晉升", cancel: "取消", rank: "威望", needCap: "你必須達到等級上限才能進行威望晉升。", needXp: "更多終身經驗才可威望晉升" },
   settings: { showOverflowXp: "顯示溢出經驗", weather: "天氣效果" },
@@ -482,7 +500,7 @@ export const gameStringsZhTW: typeof gameStrings = {
 export const gameStringsKoKR: typeof gameStrings = {
   xp: { suffix: "경험치", maxLevel: "최대 레벨", totalXp: "총 경험치", lv: "레벨", toNext: "다음까지", rested: "휴식" },
   progression: { heading: "진행도", totalXp: "총 경험치", virtualLevel: "가상 레벨", prestigeRank: "명예 등급", milestones: "이정표", none: "아직 없음", virtualLevelUp: "가상 레벨" },
-  leaderboard: { title: "순위표", subtitle: "누적 경험치", rank: "순위", name: "이름", realmCol: "서버", level: "레벨", vlevel: "가상", lifetimeXp: "누적 경험치", yourRank: "내 순위", empty: "아직 영웅이 없습니다. 첫 흔적을 남겨 보세요.", loading: "순위 불러오는 중...", unranked: "순위 없음", you: "나", globalSubtitle: "모든 서버의 최고 영웅", retry: "순위표를 불러오지 못했습니다. 다시 시도하세요." },
+  leaderboard: { title: "순위표", subtitle: "누적 경험치", rank: "순위", name: "이름", realmCol: "서버", level: "레벨", vlevel: "가상", lifetimeXp: "누적 경험치", yourRank: "내 순위", empty: "아직 영웅이 없습니다. 첫 흔적을 남겨 보세요.", loading: "순위 불러오는 중...", unranked: "순위 없음", you: "나", globalSubtitle: "모든 서버의 최고 영웅", retry: "순위표를 불러오지 못했습니다. 다시 시도하세요.", guildCol: "길드", members: "구성원", topLevel: "최고 레벨", totalXp: "총 경험치", tabPlayers: "플레이어", tabGuilds: "길드" },
   milestone: { unlocked: "이정표 해제", veteran: "베테랑", champion: "용사", paragon: "귀감", mythic: "신화", eternal: "영원" },
   prestige: { action: "명예 승급", title: "캐릭터 명예 승급", body: "명예 승급은 명예 등급을 1 올리고 레벨 경험치 막대를 초기화합니다. 레벨, 장비, 특성, 능력, 누적 경험치, 순위표 위치는 바뀌지 않으며 외형적 표시입니다.", confirm: "명예 승급", cancel: "취소", rank: "명예", needCap: "명예 승급을 하려면 최대 레벨이어야 합니다.", needXp: "명예 승급까지 필요한 추가 누적 경험치" },
   settings: { showOverflowXp: "초과 경험치 표시", weather: "날씨 효과" },
@@ -494,7 +512,7 @@ export const gameStringsKoKR: typeof gameStrings = {
 export const gameStringsJaJP: typeof gameStrings = {
   xp: { suffix: "経験値", maxLevel: "最大レベル", totalXp: "総経験値", lv: "Lv", toNext: "次まで", rested: "休息" },
   progression: { heading: "進行", totalXp: "総経験値", virtualLevel: "仮想レベル", prestigeRank: "威信ランク", milestones: "到達点", none: "まだなし", virtualLevelUp: "仮想レベル" },
-  leaderboard: { title: "ランキング", subtitle: "累計経験値", rank: "順位", name: "名前", realmCol: "レルム", level: "Lv", vlevel: "仮Lv", lifetimeXp: "累計経験値", yourRank: "あなたの順位", empty: "まだ英雄はいません。最初の名を刻みましょう。", loading: "ランキングを読み込み中...", unranked: "順位なし", you: "あなた", globalSubtitle: "全レルムの上位英雄", retry: "ランキングを読み込めませんでした。もう一度お試しください。" },
+  leaderboard: { title: "ランキング", subtitle: "累計経験値", rank: "順位", name: "名前", realmCol: "レルム", level: "Lv", vlevel: "仮Lv", lifetimeXp: "累計経験値", yourRank: "あなたの順位", empty: "まだ英雄はいません。最初の名を刻みましょう。", loading: "ランキングを読み込み中...", unranked: "順位なし", you: "あなた", globalSubtitle: "全レルムの上位英雄", retry: "ランキングを読み込めませんでした。もう一度お試しください。", guildCol: "ギルド", members: "メンバー", topLevel: "最高Lv", totalXp: "総経験値", tabPlayers: "プレイヤー", tabGuilds: "ギルド" },
   milestone: { unlocked: "到達点解除", veteran: "古参", champion: "勇者", paragon: "範士", mythic: "神話", eternal: "永遠" },
   prestige: { action: "威信", title: "キャラクター威信化", body: "威信は威信ランクを1上げ、レベル経験値バーをリセットします。レベル、装備、タレント、アビリティ、累計経験値、ランキング順位は変わりません。見た目の栄誉です。", confirm: "威信", cancel: "キャンセル", rank: "威信", needCap: "威信を得るにはレベル上限に達している必要があります。", needXp: "威信までに必要な追加累計経験値" },
   settings: { showOverflowXp: "超過経験値を表示", weather: "天候エフェクト" },
@@ -506,7 +524,7 @@ export const gameStringsJaJP: typeof gameStrings = {
 export const gameStringsPtBR: typeof gameStrings = {
   xp: { suffix: "EXP", maxLevel: "NÍVEL MAX.", totalXp: "EXP total", lv: "Nv", toNext: "para o próximo", rested: "Descansado" },
   progression: { heading: "Progressão", totalXp: "EXP total", virtualLevel: "Nível virtual", prestigeRank: "Grau de prestígio", milestones: "Marcos", none: "Nenhum ainda", virtualLevelUp: "Nível virtual" },
-  leaderboard: { title: "Classificação", subtitle: "EXP vitalícia", rank: "Posição", name: "Nome", realmCol: "Reino", level: "Nv", vlevel: "Nv.V", lifetimeXp: "EXP vitalícia", yourRank: "Sua posição", empty: "Ainda não há campeões; seja o primeiro a deixar sua marca.", loading: "Carregando classificação...", unranked: "Sem ranking", you: "Você", globalSubtitle: "Maiores campeões de todos os reinos", retry: "Não foi possível carregar a classificação. Tente novamente." },
+  leaderboard: { title: "Classificação", subtitle: "EXP vitalícia", rank: "Posição", name: "Nome", realmCol: "Reino", level: "Nv", vlevel: "Nv.V", lifetimeXp: "EXP vitalícia", yourRank: "Sua posição", empty: "Ainda não há campeões; seja o primeiro a deixar sua marca.", loading: "Carregando classificação...", unranked: "Sem ranking", you: "Você", globalSubtitle: "Maiores campeões de todos os reinos", retry: "Não foi possível carregar a classificação. Tente novamente.", guildCol: "Guilda", members: "Membros", topLevel: "Nv. máx.", totalXp: "EXP total", tabPlayers: "Jogadores", tabGuilds: "Guildas" },
   milestone: { unlocked: "Marco desbloqueado", veteran: "Veterano", champion: "Campeão", paragon: "Paragão", mythic: "Mítico", eternal: "Eterno" },
   prestige: { action: "Prestigiar", title: "Prestigiar personagem", body: "Prestígio aumenta seu grau de prestígio em 1 e reinicia a barra de EXP do nível. Ele não muda nível, equipamento, talentos, habilidades, EXP vitalícia nem posição na classificação; é apenas um destaque cosmético.", confirm: "Prestigiar", cancel: "Cancelar", rank: "Prestígio", needCap: "Você precisa estar no nível máximo para prestigiar.", needXp: "mais EXP vitalícia para prestigiar" },
   settings: { showOverflowXp: "Mostrar EXP excedente", weather: "Efeitos climáticos" },
@@ -576,7 +594,7 @@ export const gameStringsPtBR: typeof gameStrings = {
 export const gameStringsRuRU: typeof gameStrings = {
   xp: { suffix: "опыт", maxLevel: "МАКС. УРОВЕНЬ", totalXp: "всего опыта", lv: "Ур.", toNext: "до следующего", rested: "Отдохнувший" },
   progression: { heading: "Прогресс", totalXp: "Всего опыта", virtualLevel: "Виртуальный уровень", prestigeRank: "Ранг престижа", milestones: "Вехи", none: "Пока нет", virtualLevelUp: "Виртуальный уровень" },
-  leaderboard: { title: "Рейтинг", subtitle: "Опыт за все время", rank: "Место", name: "Имя", realmCol: "Мир", level: "Ур.", vlevel: "Вирт.", lifetimeXp: "Опыт за все время", yourRank: "Ваше место", empty: "Чемпионов пока нет; станьте первым.", loading: "Загрузка рейтинга...", unranked: "Без места", you: "Вы", globalSubtitle: "Лучшие чемпионы всех миров", retry: "Не удалось загрузить рейтинг. Попробуйте еще раз." },
+  leaderboard: { title: "Рейтинг", subtitle: "Опыт за все время", rank: "Место", name: "Имя", realmCol: "Мир", level: "Ур.", vlevel: "Вирт.", lifetimeXp: "Опыт за все время", yourRank: "Ваше место", empty: "Чемпионов пока нет; станьте первым.", loading: "Загрузка рейтинга...", unranked: "Без места", you: "Вы", globalSubtitle: "Лучшие чемпионы всех миров", retry: "Не удалось загрузить рейтинг. Попробуйте еще раз.", guildCol: "Гильдия", members: "Участники", topLevel: "Макс. ур.", totalXp: "Всего опыта", tabPlayers: "Игроки", tabGuilds: "Гильдии" },
   milestone: { unlocked: "Веха открыта", veteran: "Ветеран", champion: "Чемпион", paragon: "Образец", mythic: "Мифический", eternal: "Вечный" },
   prestige: { action: "Престиж", title: "Престиж персонажа", body: "Престиж повышает ранг престижа на 1 и сбрасывает шкалу опыта уровня. Он не меняет уровень, снаряжение, таланты, способности, общий опыт или место в рейтинге; это только косметический знак.", confirm: "Престиж", cancel: "Отмена", rank: "Престиж", needCap: "Для престижа нужен максимальный уровень.", needXp: "еще общего опыта до престижа" },
   settings: { showOverflowXp: "Показывать лишний опыт", weather: "Погодные эффекты" },

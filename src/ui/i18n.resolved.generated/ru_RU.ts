@@ -53,7 +53,13 @@ export const ru_RU: EnTranslations = {
       "unranked": "Без места",
       "you": "Вы",
       "globalSubtitle": "Лучшие чемпионы всех миров",
-      "retry": "Не удалось загрузить рейтинг. Попробуйте еще раз."
+      "retry": "Не удалось загрузить рейтинг. Попробуйте еще раз.",
+      "guildCol": "Гильдия",
+      "members": "Участники",
+      "topLevel": "Макс. ур.",
+      "totalXp": "Всего опыта",
+      "tabPlayers": "Игроки",
+      "tabGuilds": "Гильдии"
     },
     "milestone": {
       "unlocked": "Веха открыта",

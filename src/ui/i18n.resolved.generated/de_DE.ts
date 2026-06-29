@@ -53,7 +53,13 @@ export const de_DE: EnTranslations = {
       "unranked": "Ohne Rang",
       "you": "Ihr",
       "globalSubtitle": "Beste Champions aller Realms",
-      "retry": "Rangliste konnte nicht geladen werden. Versucht es erneut."
+      "retry": "Rangliste konnte nicht geladen werden. Versucht es erneut.",
+      "guildCol": "Guild",
+      "members": "Members",
+      "topLevel": "Top Lvl",
+      "totalXp": "Total XP",
+      "tabPlayers": "Players",
+      "tabGuilds": "Guilds"
     },
     "milestone": {
       "unlocked": "Meilenstein freigeschaltet",

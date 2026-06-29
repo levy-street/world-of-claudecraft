@@ -53,7 +53,13 @@ export const ja_JP: EnTranslations = {
       "unranked": "順位なし",
       "you": "あなた",
       "globalSubtitle": "全レルムの上位英雄",
-      "retry": "ランキングを読み込めませんでした。もう一度お試しください。"
+      "retry": "ランキングを読み込めませんでした。もう一度お試しください。",
+      "guildCol": "ギルド",
+      "members": "メンバー",
+      "topLevel": "最高Lv",
+      "totalXp": "総経験値",
+      "tabPlayers": "プレイヤー",
+      "tabGuilds": "ギルド"
     },
     "milestone": {
       "unlocked": "到達点解除",

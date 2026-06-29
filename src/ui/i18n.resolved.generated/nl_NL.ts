@@ -53,7 +53,13 @@ export const nl_NL: EnTranslations = {
       "unranked": "Geen rang",
       "you": "Jij",
       "globalSubtitle": "Topkampioenen uit alle realms",
-      "retry": "Kon de ranglijst niet laden. Probeer het opnieuw."
+      "retry": "Kon de ranglijst niet laden. Probeer het opnieuw.",
+      "guildCol": "Guild",
+      "members": "Members",
+      "topLevel": "Top Lvl",
+      "totalXp": "Total XP",
+      "tabPlayers": "Players",
+      "tabGuilds": "Guilds"
     },
     "milestone": {
       "unlocked": "Mijlpaal ontgrendeld",

@@ -149,7 +149,7 @@ import {
   shouldDisconnectUnverifiedWallet,
 } from './ui/wallet_balance';
 import { formatXp } from './ui/xp_bar';
-import type { IWorld, LeaderboardEntry } from './world_api';
+import type { GuildLeaderboardEntry, IWorld, LeaderboardEntry } from './world_api';
 
 const WORLD_SEED = 20061; // fixed: World of ClaudeCraft is a persistent place
 const CLICK_MOVE_TURN_RATE = 4.2; // rad/sec; responsive turning while the camera stays decoupled from click spam
@@ -4184,7 +4184,7 @@ async function loadHighscores(): Promise<void> {
   host.innerHTML = `<div class="hs-loading">${t('game.leaderboard.loading')}</div>`;
   let rows: LeaderboardEntry[] = [];
   try {
-    rows = await api.leaderboard('global', 100);
+    rows = await api.leaderboard('global', 500);
   } catch {
     host.innerHTML = `<div class="hs-error">${t('game.leaderboard.retry')}</div>`;
     highscoresLoading = false;
@@ -4230,6 +4230,80 @@ async function loadHighscores(): Promise<void> {
     })
     .join('');
   host.innerHTML = head + body;
+}
+
+// Home-page global (cross-realm) guild high score board: guilds ranked by total
+// member lifetime XP. Mirrors loadHighscores() (server computes the ranking, this
+// only renders) and degrades to the empty state the same way when offline (the
+// REST call returns [] on failure, and the offline build has no guild database).
+let guildHighscoresLoading = false;
+async function loadGuildHighscores(): Promise<void> {
+  const host = $('#hs-guild-leaderboard');
+  if (!host || guildHighscoresLoading) return;
+  guildHighscoresLoading = true;
+  host.innerHTML = `<div class="hs-loading">${t('game.leaderboard.loading')}</div>`;
+  let rows: GuildLeaderboardEntry[] = [];
+  try {
+    rows = await api.guildLeaderboard('global', 500);
+  } catch {
+    host.innerHTML = `<div class="hs-error">${t('game.leaderboard.retry')}</div>`;
+    guildHighscoresLoading = false;
+    return;
+  }
+  guildHighscoresLoading = false;
+  if (rows.length === 0) {
+    host.innerHTML = `<div class="hs-empty">${t('game.leaderboard.empty')}</div>`;
+    return;
+  }
+  const esc = (s: string): string =>
+    s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+  const rankLabel = t('game.leaderboard.rank');
+  const guildLabel = t('game.leaderboard.guildCol');
+  const membersLabel = t('game.leaderboard.members');
+  const topLevelLabel = t('game.leaderboard.topLevel');
+  const totalXpLabel = t('game.leaderboard.totalXp');
+  const head =
+    `<div class="hs-row hs-guild-row hs-head">` +
+    `<span class="hs-rank">${rankLabel}</span>` +
+    `<span class="hs-name">${guildLabel}</span>` +
+    `<span class="hs-lvl">${membersLabel}</span>` +
+    `<span class="hs-vlvl">${topLevelLabel}</span>` +
+    `<span class="hs-xp">${totalXpLabel}</span></div>`;
+  const body = rows
+    .map((r) => {
+      return (
+        `<div class="hs-row hs-guild-row${r.rank <= 3 ? ' hs-top' : ''}">` +
+        `<span class="hs-rank">${r.rank}</span>` +
+        `<span class="hs-name">${esc(r.guild)}</span>` +
+        `<span class="hs-lvl" data-label="${esc(membersLabel)}">${r.members}</span>` +
+        `<span class="hs-vlvl" data-label="${esc(topLevelLabel)}">${r.topLevel}</span>` +
+        `<span class="hs-xp" data-label="${esc(totalXpLabel)}">${formatXp(r.totalXp)}</span></div>`
+      );
+    })
+    .join('');
+  host.innerHTML = head + body;
+}
+
+// The Players / Guilds toggle in the High Scores view. Switching tabs shows the
+// matching board and lazily loads it on first view.
+function selectHighscoresTab(tab: 'players' | 'guilds'): void {
+  const playersTab = $('#hs-tab-players');
+  const guildsTab = $('#hs-tab-guilds');
+  const playersHost = $('#hs-leaderboard');
+  const guildsHost = $('#hs-guild-leaderboard');
+  if (!playersTab || !guildsTab || !playersHost || !guildsHost) return;
+  const guilds = tab === 'guilds';
+  playersTab.classList.toggle('active', !guilds);
+  guildsTab.classList.toggle('active', guilds);
+  playersTab.setAttribute('aria-selected', String(!guilds));
+  guildsTab.setAttribute('aria-selected', String(guilds));
+  playersHost.hidden = guilds;
+  guildsHost.hidden = !guilds;
+  if (guilds) {
+    void loadGuildHighscores();
+  } else {
+    void loadHighscores();
+  }
 }
 
 // Minimal, safe Markdown → HTML for GitHub release notes. The input is escaped
@@ -6090,8 +6164,10 @@ function wireStartScreens(): void {
 
   setupNavBtn(navBtnHighscores, '#highscores-view', () => {
     switchMainView('#highscores-view');
-    void loadHighscores();
+    selectHighscoresTab('players');
   });
+  $('#hs-tab-players')?.addEventListener('click', () => selectHighscoresTab('players'));
+  $('#hs-tab-guilds')?.addEventListener('click', () => selectHighscoresTab('guilds'));
   // The wiki is the curated guide SPA at /wiki (its own page), so this nav item
   // navigates there rather than switching an in-page view.
   setupNavBtn(navBtnWiki, '', () => {

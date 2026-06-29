@@ -53,7 +53,13 @@ export const en_CA: EnTranslations = {
       "unranked": "Unranked",
       "you": "You",
       "globalSubtitle": "Top champions across all realms",
-      "retry": "Could not load the leaderboard. Try again."
+      "retry": "Could not load the leaderboard. Try again.",
+      "guildCol": "Guild",
+      "members": "Members",
+      "topLevel": "Top Lvl",
+      "totalXp": "Total XP",
+      "tabPlayers": "Players",
+      "tabGuilds": "Guilds"
     },
     "milestone": {
       "unlocked": "Milestone Unlocked",

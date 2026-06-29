@@ -53,7 +53,13 @@ export const zh_CN: EnTranslations = {
       "unranked": "未上榜",
       "you": "你",
       "globalSubtitle": "所有服务器的顶尖冠军",
-      "retry": "无法加载排行榜。请重试。"
+      "retry": "无法加载排行榜。请重试。",
+      "guildCol": "公会",
+      "members": "成员",
+      "topLevel": "最高等级",
+      "totalXp": "总经验",
+      "tabPlayers": "玩家",
+      "tabGuilds": "公会"
     },
     "milestone": {
       "unlocked": "里程碑解锁",

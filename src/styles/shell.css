@@ -1316,6 +1316,41 @@
     font-size: 11px;
     margin-right: 4px;
   }
+  /* Players / Guilds toggle in the High Scores view */
+  .hs-tabs {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    width: 100%;
+    margin-top: var(--spacing-sm);
+  }
+  .hs-tab {
+    font-family: var(--font-heading);
+    font-size: 12px;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: var(--color-primary-dim);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    padding: 8px 18px;
+    min-height: 40px;
+    cursor: pointer;
+  }
+  .hs-tab:hover {
+    color: var(--color-primary);
+    background: rgba(255, 255, 255, 0.06);
+  }
+  .hs-tab.active {
+    color: #ffd86b;
+    border-color: var(--color-primary);
+    background: rgba(255, 216, 107, 0.08);
+  }
+  /* Guild board reuses the player-row classes but ranks five columns
+     (rank, guild, members, top level, total XP) instead of six. */
+  .hs-row.hs-guild-row {
+    grid-template-columns: 48px 1fr 72px 72px 120px;
+  }
   body.mobile-touch .hs-panel {
     width: 100%;
     max-width: 560px;
@@ -1417,6 +1452,9 @@
       padding: 10px 12px;
       border: 1px solid rgba(78, 61, 29, 0.35);
       background: rgba(255, 255, 255, 0.025);
+    }
+    .hs-row.hs-guild-row {
+      grid-template-columns: 38px minmax(0, 1fr);
     }
     .hs-rank {
       grid-area: rank;

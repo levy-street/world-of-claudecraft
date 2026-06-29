@@ -53,7 +53,13 @@ export const da_DK: EnTranslations = {
       "unranked": "Uplaceret",
       "you": "Dig",
       "globalSubtitle": "Topmestre på tværs af alle riger",
-      "retry": "Resultattavlen kunne ikke indlæses. Prøv igen."
+      "retry": "Resultattavlen kunne ikke indlæses. Prøv igen.",
+      "guildCol": "Guild",
+      "members": "Members",
+      "topLevel": "Top Lvl",
+      "totalXp": "Total XP",
+      "tabPlayers": "Players",
+      "tabGuilds": "Guilds"
     },
     "milestone": {
       "unlocked": "Milepæl Låst Op",

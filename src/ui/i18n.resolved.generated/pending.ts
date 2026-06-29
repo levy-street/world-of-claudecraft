@@ -9,24 +9,122 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "game.leaderboard.guildCol",
+    "game.leaderboard.members",
+    "game.leaderboard.tabGuilds",
+    "game.leaderboard.tabPlayers",
+    "game.leaderboard.topLevel",
+    "game.leaderboard.totalXp"
+  ],
+  "es_ES": [
+    "game.leaderboard.guildCol",
+    "game.leaderboard.members",
+    "game.leaderboard.tabGuilds",
+    "game.leaderboard.tabPlayers",
+    "game.leaderboard.topLevel",
+    "game.leaderboard.totalXp"
+  ],
+  "fr_FR": [
+    "game.leaderboard.guildCol",
+    "game.leaderboard.members",
+    "game.leaderboard.tabGuilds",
+    "game.leaderboard.tabPlayers",
+    "game.leaderboard.topLevel",
+    "game.leaderboard.totalXp"
+  ],
+  "fr_CA": [
+    "game.leaderboard.guildCol",
+    "game.leaderboard.members",
+    "game.leaderboard.tabGuilds",
+    "game.leaderboard.tabPlayers",
+    "game.leaderboard.topLevel",
+    "game.leaderboard.totalXp"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "game.leaderboard.guildCol",
+    "game.leaderboard.members",
+    "game.leaderboard.tabGuilds",
+    "game.leaderboard.tabPlayers",
+    "game.leaderboard.topLevel",
+    "game.leaderboard.totalXp"
+  ],
+  "de_DE": [
+    "game.leaderboard.guildCol",
+    "game.leaderboard.members",
+    "game.leaderboard.tabGuilds",
+    "game.leaderboard.tabPlayers",
+    "game.leaderboard.topLevel",
+    "game.leaderboard.totalXp"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "game.leaderboard.guildCol",
+    "game.leaderboard.members",
+    "game.leaderboard.tabGuilds",
+    "game.leaderboard.tabPlayers",
+    "game.leaderboard.topLevel",
+    "game.leaderboard.totalXp"
+  ],
   "ru_RU": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "nl_NL": [
+    "game.leaderboard.guildCol",
+    "game.leaderboard.members",
+    "game.leaderboard.tabGuilds",
+    "game.leaderboard.tabPlayers",
+    "game.leaderboard.topLevel",
+    "game.leaderboard.totalXp"
+  ],
+  "pl_PL": [
+    "game.leaderboard.guildCol",
+    "game.leaderboard.members",
+    "game.leaderboard.tabGuilds",
+    "game.leaderboard.tabPlayers",
+    "game.leaderboard.topLevel",
+    "game.leaderboard.totalXp"
+  ],
+  "id_ID": [
+    "game.leaderboard.guildCol",
+    "game.leaderboard.members",
+    "game.leaderboard.tabGuilds",
+    "game.leaderboard.tabPlayers",
+    "game.leaderboard.topLevel",
+    "game.leaderboard.totalXp"
+  ],
+  "tr_TR": [
+    "game.leaderboard.guildCol",
+    "game.leaderboard.members",
+    "game.leaderboard.tabGuilds",
+    "game.leaderboard.tabPlayers",
+    "game.leaderboard.topLevel",
+    "game.leaderboard.totalXp"
+  ],
+  "sv_SE": [
+    "game.leaderboard.guildCol",
+    "game.leaderboard.members",
+    "game.leaderboard.tabGuilds",
+    "game.leaderboard.tabPlayers",
+    "game.leaderboard.topLevel",
+    "game.leaderboard.totalXp"
+  ],
+  "vi_VN": [
+    "game.leaderboard.guildCol",
+    "game.leaderboard.members",
+    "game.leaderboard.tabGuilds",
+    "game.leaderboard.tabPlayers",
+    "game.leaderboard.topLevel",
+    "game.leaderboard.totalXp"
+  ],
+  "da_DK": [
+    "game.leaderboard.guildCol",
+    "game.leaderboard.members",
+    "game.leaderboard.tabGuilds",
+    "game.leaderboard.tabPlayers",
+    "game.leaderboard.topLevel",
+    "game.leaderboard.totalXp"
+  ]
 };

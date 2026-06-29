@@ -10,7 +10,7 @@ import {
 import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 import { virtualLevel } from '../src/sim/types';
-import type { LeaderboardEntry } from '../src/world_api';
+import type { GuildLeaderboardEntry, LeaderboardEntry } from '../src/world_api';
 import {
   handleAccount2faDisable,
   handleAccount2faEnable,
@@ -83,6 +83,7 @@ import {
   setAccountEmail,
   type TokenScope,
   topArenaRatings,
+  topGuildsByXp,
   topLifetimeXp,
   touchLogin,
   updatePasswordHash,
@@ -247,6 +248,49 @@ async function getLeaderboard(scope: 'realm' | 'global'): Promise<LeaderboardEnt
     return await refreshLeaderboard(scope);
   } catch (err) {
     console.error(`leaderboard refresh failed (${scope}):`, err);
+    return cached?.entries ?? [];
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Guild high score board cache: guilds ranked by total member lifetime XP.
+// Same compute-once/serve-from-memory shape as the player leaderboard above,
+// reusing the 30 second TTL so the SUM aggregate runs at most twice a minute
+// per scope, never per request.
+// ---------------------------------------------------------------------------
+const guildLeaderboardCache: Record<
+  'realm' | 'global',
+  { at: number; entries: GuildLeaderboardEntry[] } | null
+> = {
+  realm: null,
+  global: null,
+};
+
+async function refreshGuildLeaderboard(
+  scope: 'realm' | 'global',
+): Promise<GuildLeaderboardEntry[]> {
+  const rows = await topGuildsByXp(LEADERBOARD_SIZE, { global: scope === 'global' });
+  const entries: GuildLeaderboardEntry[] = rows.map((r, i) => ({
+    rank: i + 1,
+    guild: r.guild,
+    members: r.members,
+    topLevel: r.topLevel,
+    totalXp: r.totalXp,
+    ...(scope === 'global' ? { realm: r.realm } : {}),
+  }));
+  guildLeaderboardCache[scope] = { at: Date.now(), entries };
+  return entries;
+}
+
+async function getGuildLeaderboard(
+  scope: 'realm' | 'global',
+): Promise<GuildLeaderboardEntry[]> {
+  const cached = guildLeaderboardCache[scope];
+  if (cached && Date.now() - cached.at < LEADERBOARD_TTL_MS) return cached.entries;
+  try {
+    return await refreshGuildLeaderboard(scope);
+  } catch (err) {
+    console.error(`guild leaderboard refresh failed (${scope}):`, err);
     return cached?.entries ?? [];
   }
 }
@@ -1111,6 +1155,27 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const slice = paginateLeaderboard(entries, page, pageSize);
       return json(res, 200, { realm: REALM, scope, metric: 'lifetimeXp', ...slice });
     }
+    if (req.method === 'GET' && url === '/api/guild-leaderboard') {
+      // guild high score board (guilds ranked by total member lifetime XP),
+      // served from the in-memory cache. ?scope=global ranks across every realm
+      // (home page); default is this process's realm. ?limit=N returns the top N
+      // as a single board, mirroring the player board's legacy limit path.
+      const params = new URLSearchParams((req.url ?? '').split('?')[1] ?? '');
+      const scope: 'realm' | 'global' = params.get('scope') === 'global' ? 'global' : 'realm';
+      const entries = await getGuildLeaderboard(scope);
+      const limit = Math.max(
+        1,
+        Math.min(LEADERBOARD_SIZE, Number(params.get('limit')) || LEADERBOARD_SIZE),
+      );
+      const leaders = entries.slice(0, limit);
+      return json(res, 200, {
+        realm: REALM,
+        scope,
+        metric: 'guildLifetimeXp',
+        leaders,
+        total: leaders.length,
+      });
+    }
     if (req.method === 'GET' && url === '/api/releases') {
       recordUsageMetric('github.releases.api');
       // public News & Updates feed, mirrored from GitHub Releases and served
@@ -1369,6 +1434,12 @@ async function main(): Promise<void> {
     );
     void refreshLeaderboard('global').catch((err) =>
       console.error('leaderboard refresh failed (global):', err),
+    );
+    void refreshGuildLeaderboard('realm').catch((err) =>
+      console.error('guild leaderboard refresh failed (realm):', err),
+    );
+    void refreshGuildLeaderboard('global').catch((err) =>
+      console.error('guild leaderboard refresh failed (global):', err),
     );
   };
   warmLeaderboards();

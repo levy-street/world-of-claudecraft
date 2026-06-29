@@ -53,7 +53,13 @@ export const pl_PL: EnTranslations = {
       "unranked": "Bez pozycji",
       "you": "Ty",
       "globalSubtitle": "Najlepsi mistrzowie ze wszystkich światów",
-      "retry": "Nie udało się wczytać tablicy wyników. Spróbuj ponownie."
+      "retry": "Nie udało się wczytać tablicy wyników. Spróbuj ponownie.",
+      "guildCol": "Guild",
+      "members": "Members",
+      "topLevel": "Top Lvl",
+      "totalXp": "Total XP",
+      "tabPlayers": "Players",
+      "tabGuilds": "Guilds"
     },
     "milestone": {
       "unlocked": "Odblokowano kamień milowy",
