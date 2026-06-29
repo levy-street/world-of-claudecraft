@@ -222,6 +222,9 @@ export const ko_KR: EnTranslations = {
     "rest": {
       "resting": "휴식 중"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
     "unitFrame": {
       "playerLabel": "내 캐릭터",
       "targetLabel": "내 대상",
@@ -3463,7 +3466,7 @@ export const ko_KR: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "비전 화살",
-        "description": "적에게 비전 화살을 발사하여 3초 동안 매초 8의 비전 피해를 입힙니다."
+        "description": "적에게 비전 화살을 발사하여 3초 동안 매초 {damage}의 비전 피해를 입힙니다."
       },
       "polymorph": {
         "name": "변이",
@@ -3711,7 +3714,7 @@ export const ko_KR: EnTranslations = {
       },
       "mind_flay": {
         "name": "정신의 채찍",
-        "description": "암흑 에너지로 대상의 정신을 공격해 3초 동안 매초 12의 피해를 입힙니다."
+        "description": "암흑 에너지로 대상의 정신을 공격해 3초 동안 매초 {damage}의 피해를 입힙니다."
       },
       "flash_heal": {
         "name": "순간 치유",
@@ -3787,7 +3790,7 @@ export const ko_KR: EnTranslations = {
       },
       "drain_life": {
         "name": "생명력 흡수",
-        "description": "대상의 생명력을 흡수해 5초 동안 매초 7의 생명력을 자신에게 이전합니다."
+        "description": "대상의 생명력을 흡수해 5초 동안 매초 {damage}의 생명력을 자신에게 이전합니다."
       },
       "fear": {
         "name": "공포",

@@ -352,7 +352,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_intellect.description': 'Verhoogt Intellect met 2 gedurende 30 min.',
   'entities.abilities.arcane_intellect.name': 'Arcaan Intellect',
   'entities.abilities.arcane_missiles.description':
-    'Lanceert Arcane Projectielen op de vijand en veroorzaakt elke seconde 8 Arcane schade gedurende 3 sec.',
+    'Lanceert Arcane Projectielen op de vijand en veroorzaakt elke seconde {damage} Arcane schade gedurende 3 sec.',
   'entities.abilities.arcane_missiles.name': 'Arcane Projectielen',
   'entities.abilities.arcane_shot.description':
     'Een onmiddellijk schot dat {damage} Arcane schade toebrengt.',
@@ -463,7 +463,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Een heilig schild absorbeert 50 schade gedurende 10 sec.',
   'entities.abilities.divine_protection.name': 'Goddelijke Bescherming',
   'entities.abilities.drain_life.description':
-    'Tapt het leven van het doelwit af en draagt elke seconde 7 levenskracht naar je over gedurende 5 sec.',
+    'Tapt het leven van het doelwit af en draagt elke seconde {damage} levenskracht naar je over gedurende 5 sec.',
   'entities.abilities.drain_life.name': 'Leven Aftappen',
   'entities.abilities.earth_shock.description':
     'Schokt het doelwit ogenblikkelijk met verpletterende kracht voor {damage} Natuurschade.',
@@ -602,7 +602,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Treft de geest van het doelwit voor {damage} Schaduwschade.',
   'entities.abilities.mind_blast.name': 'Geestesstoot',
   'entities.abilities.mind_flay.description':
-    'Bestookt de geest van het doelwit met Schaduwenergie en brengt elke seconde 12 schade toe gedurende 3 sec.',
+    'Bestookt de geest van het doelwit met Schaduwenergie en brengt elke seconde {damage} schade toe gedurende 3 sec.',
   'entities.abilities.mind_flay.name': 'Geestesmarteling',
   'entities.abilities.mongoose_bite.description':
     'Tegenaanval nadat het doelwit ontwijkt voor wapenschade plus 12. Kan niet worden ontweken.',

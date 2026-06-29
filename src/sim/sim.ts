@@ -69,6 +69,7 @@ import {
   type TalentAllocation,
   type TalentModifiers,
 } from './content/talents';
+import { applyCooldowns, type SavedCooldowns, serializeCooldowns } from './cooldown_persist';
 import type { DelveShopGate, DelveShopOffer } from './data';
 import {
   abilitiesKnownAt,
@@ -125,7 +126,6 @@ import {
   tickGroundAoEs,
 } from './entity_roster';
 import { canEquipItem } from './equipment_rules';
-import { applyCooldowns, type SavedCooldowns, serializeCooldowns } from './cooldown_persist';
 import { formatMoney } from './format_money';
 import * as interaction from './interaction';
 import * as items from './items';
@@ -2855,7 +2855,7 @@ export class Sim {
     });
     for (const target of this.hostilesInRadius(source, effect.pos, effect.radius)) {
       if (!this.hasLineOfSight(source, target)) continue;
-      const dmg = Math.round(this.rng.range(effect.min, effect.max));
+      const dmg = Math.round(this.rng.range(effect.min, effect.max) + (effect.spBonus ?? 0));
       this.dealDamage(
         source,
         target,

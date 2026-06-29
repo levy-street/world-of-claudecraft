@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 389,
-      "state": "246a7a3f",
+      "state": "f3159fdf",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -78,6 +78,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 20,
             "armor": 110,
@@ -99,7 +100,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 391,
-      "state": "9aaa593b",
+      "state": "cb3ad0ab",
       "events": "2b429bb7",
       "rng": {
         "draws": 4,
@@ -110,7 +111,7 @@
       "tick": 4,
       "time": 0.2,
       "nextId": 391,
-      "state": "78203935",
+      "state": "6028455d",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -121,7 +122,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 391,
-      "state": "8d7c1af9",
+      "state": "19db0059",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -184,6 +185,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 29,
             "armor": 236,
@@ -205,7 +207,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 391,
-      "state": "07cec5d5",
+      "state": "86e636bd",
       "events": "2b429bb7",
       "rng": {
         "draws": 4,
@@ -268,6 +270,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 29,
             "armor": 236,
@@ -289,7 +292,7 @@
       "tick": 6,
       "time": 0.3,
       "nextId": 391,
-      "state": "99b7d3c2",
+      "state": "a8509248",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -300,7 +303,7 @@
       "tick": 7,
       "time": 0.35,
       "nextId": 391,
-      "state": "d88f09d1",
+      "state": "e89b4d91",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -363,6 +366,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 29,
             "armor": 236,

@@ -85,6 +85,12 @@ export const hudChromeStrings = {
   rest: {
     resting: 'Resting',
   },
+  // The Spell Power / Attack Power contribution appended to an ability tooltip's
+  // base damage, e.g. "66 to 74 (+29)". Punctuation + a formatted number only (no
+  // words), so it is locale-neutral and an English-only add.
+  abilityScaling: {
+    bonus: '(+{value})',
+  },
   // Accessible group names for the unit frames (#player-frame and #target-frame are
   // role="group" wrappers over a portrait, name, level, and health/resource bars).
   // Kept short, non-prose labels so they read cleanly as screen-reader group names

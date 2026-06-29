@@ -1560,7 +1560,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fire_blast.description': '衝擊敵人，造成 {damage} 點火焰傷害。瞬發。',
   'entities.abilities.arcane_missiles.name': '秘法飛彈',
   'entities.abilities.arcane_missiles.description':
-    '向敵人發射秘法飛彈，持續 3 秒，每秒造成 8 點秘法傷害。',
+    '向敵人發射秘法飛彈，持續 3 秒，每秒造成 {damage} 點秘法傷害。',
   'entities.abilities.polymorph.name': '變形術',
   'entities.abilities.polymorph.description':
     '將敵人變成綿羊，最多持續 15 秒。綿羊會四處遊蕩並快速恢復。任何傷害都會打破效果。僅限野獸和人型生物。',
@@ -1720,7 +1720,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.heal.description': '緩慢但強大的祈禱，為一個友方目標恢復 {damage} 點生命值。',
   'entities.abilities.mind_flay.name': '精神鞭笞',
   'entities.abilities.mind_flay.description':
-    '用暗影能量攻擊目標的心靈，持續 3 秒，每秒造成 12 點傷害。',
+    '用暗影能量攻擊目標的心靈，持續 3 秒，每秒造成 {damage} 點傷害。',
   'entities.abilities.flash_heal.name': '快速治療',
   'entities.abilities.flash_heal.description': '快速祈禱，為一個友方目標恢復 {damage} 點生命值。',
   'entities.abilities.lightning_bolt.name': '閃電箭',
@@ -1769,7 +1769,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '以痛苦詛咒目標：在 24 秒內造成 {damage} 點暗影傷害。',
   'entities.abilities.drain_life.name': '吸取生命',
   'entities.abilities.drain_life.description':
-    '吸取目標的生命，持續 5 秒，每秒向你轉移 7 點生命值。',
+    '吸取目標的生命，持續 5 秒，每秒向你轉移 {damage} 點生命值。',
   'entities.abilities.fear.name': '恐懼',
   'entities.abilities.fear.description':
     '使敵人陷入恐懼並畏縮，最多持續 8 秒。任何傷害都會打破效果。',

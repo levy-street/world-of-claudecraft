@@ -1653,7 +1653,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Поражает врага на {damage} ед. урона от огня. Мгновенно.',
   'entities.abilities.arcane_missiles.name': 'Чародейские стрелы',
   'entities.abilities.arcane_missiles.description':
-    'Выпускает в противника Чародейские стрелы, наносящие 8 ед. урона от тайной магии каждую секунду в течение 3 сек.',
+    'Выпускает в противника Чародейские стрелы, наносящие {damage} ед. урона от тайной магии каждую секунду в течение 3 сек.',
   'entities.abilities.polymorph.name': 'Превращение',
   'entities.abilities.polymorph.description':
     'Превращает врага в овцу на срок до 15 сек. Овца бродит и быстро восстанавливается. Любой урон прерывает эффект. Только звери и гуманоиды.',
@@ -1829,7 +1829,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Медленная, но мощная молитва, исцеляющая дружественную цель на {damage}.',
   'entities.abilities.mind_flay.name': 'Пытка разума',
   'entities.abilities.mind_flay.description':
-    'Терзает разум цели темной энергией, нанося 12 ед. урона каждую секунду в течение 3 сек.',
+    'Терзает разум цели темной энергией, нанося {damage} ед. урона каждую секунду в течение 3 сек.',
   'entities.abilities.flash_heal.name': 'Быстрое исцеление',
   'entities.abilities.flash_heal.description':
     'Быстрая молитва, исцеляющая дружественную цель на {damage}.',
@@ -1884,7 +1884,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Проклинает цель агонией: {damage} ед. урона от темной магии за 24 сек.',
   'entities.abilities.drain_life.name': 'Похищение жизни',
   'entities.abilities.drain_life.description':
-    'Похищает жизнь цели, передавая вам 7 здоровья каждую секунду в течение 5 сек.',
+    'Похищает жизнь цели, передавая вам {damage} здоровья каждую секунду в течение 5 сек.',
   'entities.abilities.fear.name': 'Страх',
   'entities.abilities.fear.description':
     'Вселяет ужас во врага, заставляя его дрожать до 8 сек. Любой урон прерывает эффект.',

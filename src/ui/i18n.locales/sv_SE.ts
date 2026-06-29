@@ -350,7 +350,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_intellect.description': 'Ökar intellekt med 2 i 30 min.',
   'entities.abilities.arcane_intellect.name': 'Arkant intellekt',
   'entities.abilities.arcane_missiles.description':
-    'Skickar arkana missiler mot fienden och vållar 8 arkanskada varje sekund i 3 sek.',
+    'Skickar arkana missiler mot fienden och vållar {damage} arkanskada varje sekund i 3 sek.',
   'entities.abilities.arcane_missiles.name': 'Arkana missiler',
   'entities.abilities.arcane_shot.description':
     'Ett omedelbart skott som vållar {damage} arkanskada.',
@@ -457,7 +457,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'En helig sköld absorberar 50 skada i 10 sek.',
   'entities.abilities.divine_protection.name': 'Gudomligt skydd',
   'entities.abilities.drain_life.description':
-    'Dränerar målets liv och överför 7 hälsa till dig varje sekund i 5 sek.',
+    'Dränerar målets liv och överför {damage} hälsa till dig varje sekund i 5 sek.',
   'entities.abilities.drain_life.name': 'Dränera liv',
   'entities.abilities.earth_shock.description':
     'Chockar omedelbart målet med dånande kraft för {damage} naturskada.',
@@ -592,7 +592,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_blast.description': 'Spränger målets sinne för {damage} skuggskada.',
   'entities.abilities.mind_blast.name': 'Sinnesstöt',
   'entities.abilities.mind_flay.description':
-    'Angriper målets sinne med skuggenergi och vållar 12 skada varje sekund i 3 sek.',
+    'Angriper målets sinne med skuggenergi och vållar {damage} skada varje sekund i 3 sek.',
   'entities.abilities.mind_flay.name': 'Sinnesgissel',
   'entities.abilities.mongoose_bite.description':
     'Motanfall efter att målet väjt undan för vapenskada plus 12. Kan inte väjas undan.',

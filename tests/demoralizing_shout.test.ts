@@ -10,7 +10,7 @@ import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 
 function spawnDummy(sim: Sim, target: Entity): Entity {
-  const mob = createMob((sim as any).nextId++, MOBS['gravecaller_summoner'], 14, {
+  const mob = createMob((sim as any).nextId++, MOBS.gravecaller_summoner, 14, {
     x: target.pos.x,
     y: target.pos.y,
     z: target.pos.z,
@@ -22,7 +22,7 @@ function spawnDummy(sim: Sim, target: Entity): Entity {
 
 describe('warrior Demoralizing Shout', () => {
   it('is defined as a level-14 area attack-power debuff', () => {
-    const def = ABILITIES['demoralizing_shout'];
+    const def = ABILITIES.demoralizing_shout;
     expect(def).toBeTruthy();
     expect(def.class).toBe('warrior');
     expect(def.learnLevel).toBe(14);
@@ -61,8 +61,8 @@ describe('warrior Demoralizing Shout', () => {
 
     const aura = mob.auras.find((a) => a.kind === 'debuff_ap' && a.id === 'demoralizing_shout_ap');
     expect(aura).toBeTruthy();
-    expect(aura!.value).toBe(30);
-    expect(aura!.remaining).toBeGreaterThan(0);
+    expect(aura?.value).toBe(30);
+    expect(aura?.remaining).toBeGreaterThan(0);
   });
 
   it('cuts an enemy player effective attack power (PvP)', () => {

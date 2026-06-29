@@ -358,7 +358,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Meningkatkan Kecerdasan sebesar 2 selama 30 menit.',
   'entities.abilities.arcane_intellect.name': 'Kecerdasan Arkana',
   'entities.abilities.arcane_missiles.description':
-    'Melontarkan Misil Arkana ke arah musuh, menimbulkan 8 kerusakan Arkana setiap detik selama 3 detik.',
+    'Melontarkan Misil Arkana ke arah musuh, menimbulkan {damage} kerusakan Arkana setiap detik selama 3 detik.',
   'entities.abilities.arcane_missiles.name': 'Misil Arkana',
   'entities.abilities.arcane_shot.description':
     'Tembakan seketika yang menimbulkan {damage} kerusakan Arkana.',
@@ -470,7 +470,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Perisai suci menyerap 50 kerusakan selama 10 detik.',
   'entities.abilities.divine_protection.name': 'Perlindungan Ilahi',
   'entities.abilities.drain_life.description':
-    'Menyedot nyawa target, memindahkan 7 kesehatan kepadamu setiap detik selama 5 detik.',
+    'Menyedot nyawa target, memindahkan {damage} kesehatan kepadamu setiap detik selama 5 detik.',
   'entities.abilities.drain_life.name': 'Sedot Nyawa',
   'entities.abilities.earth_shock.description':
     'Seketika mengejutkan target dengan kekuatan pengguncang sebesar {damage} kerusakan Alam.',
@@ -611,7 +611,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Meledakkan pikiran target sebesar {damage} kerusakan Bayangan.',
   'entities.abilities.mind_blast.name': 'Ledakan Pikiran',
   'entities.abilities.mind_flay.description':
-    'Menyerang pikiran target dengan energi Bayangan, menimbulkan 12 kerusakan setiap detik selama 3 detik.',
+    'Menyerang pikiran target dengan energi Bayangan, menimbulkan {damage} kerusakan setiap detik selama 3 detik.',
   'entities.abilities.mind_flay.name': 'Cambuk Pikiran',
   'entities.abilities.mongoose_bite.description':
     'Serangan balasan setelah target mengelak sebesar kerusakan senjata ditambah 12. Tidak dapat dielakkan.',

@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 389,
-      "state": "0658b016",
+      "state": "e28a2d3d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -79,6 +79,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 11,
           "stats": {
             "agi": 12,
             "armor": 54,
@@ -100,7 +101,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 389,
-      "state": "f6a57bd2",
+      "state": "90b543eb",
       "events": "e2644273",
       "rng": {
         "draws": 0,
@@ -111,7 +112,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 389,
-      "state": "477673bc",
+      "state": "ddd29445",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -122,7 +123,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 389,
-      "state": "fab11787",
+      "state": "62be064e",
       "events": "741638a5",
       "rng": {
         "draws": 100,
@@ -133,7 +134,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 389,
-      "state": "c292f30a",
+      "state": "0264e6e3",
       "events": "741638a5",
       "rng": {
         "draws": 186,
@@ -144,7 +145,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 390,
-      "state": "f05d060e",
+      "state": "0ff7664f",
       "events": "c85a9d08",
       "rng": {
         "draws": 271,
@@ -155,8 +156,8 @@
       "tick": 120,
       "time": 6,
       "nextId": 391,
-      "state": "9924e9b4",
-      "events": "93a14dd8",
+      "state": "1b7409c2",
+      "events": "c2e31079",
       "rng": {
         "draws": 366,
         "digest": "e513d33c"
@@ -166,7 +167,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 391,
-      "state": "be237960",
+      "state": "e725a1bb",
       "events": "c0b843fe",
       "rng": {
         "draws": 497,
@@ -177,8 +178,8 @@
       "tick": 160,
       "time": 8,
       "nextId": 391,
-      "state": "084a30bb",
-      "events": "b38f1be8",
+      "state": "61d11366",
+      "events": "3c2ff05a",
       "rng": {
         "draws": 627,
         "digest": "308f8bef"
@@ -188,7 +189,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 391,
-      "state": "5b1f5699",
+      "state": "1049b4ba",
       "events": "c0b843fe",
       "rng": {
         "draws": 770,
@@ -199,8 +200,8 @@
       "tick": 200,
       "time": 10,
       "nextId": 391,
-      "state": "7eda13b1",
-      "events": "fbe68081",
+      "state": "473dfddc",
+      "events": "b8b1086d",
       "rng": {
         "draws": 930,
         "digest": "01768b34"
@@ -210,7 +211,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 391,
-      "state": "3a024847",
+      "state": "9ce58c45",
       "events": "b0d88419",
       "rng": {
         "draws": 1027,
@@ -221,7 +222,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 391,
-      "state": "0c984a22",
+      "state": "d7e3a82a",
       "events": "741638a5",
       "rng": {
         "draws": 1027,
@@ -290,6 +291,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 28,
           "stats": {
             "agi": 12,
             "armor": 98,
@@ -347,8 +349,8 @@
           "swingTimer": 0.05,
           "templateId": "voidwalker",
           "weapon": {
-            "max": 22,
-            "min": 14,
+            "max": 15,
+            "min": 10,
             "speed": 2
           }
         },
@@ -364,7 +366,7 @@
           "forcedTargetId": 389,
           "forcedTargetTimer": 3,
           "hostile": true,
-          "hp": 49934,
+          "hp": 49949,
           "id": 390,
           "inCombat": true,
           "kind": "mob",
@@ -405,7 +407,7 @@
             ],
             [
               389,
-              54
+              39
             ]
           ],
           "weapon": {
@@ -420,8 +422,8 @@
       "tick": 224,
       "time": 11.2,
       "nextId": 391,
-      "state": "cbe0e6d5",
-      "events": "3c2ff05a",
+      "state": "7d27151d",
+      "events": "b8b1086d",
       "rng": {
         "draws": 1048,
         "digest": "cfb39eb3"
@@ -489,6 +491,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 28,
           "stats": {
             "agi": 12,
             "armor": 98,
@@ -547,8 +550,8 @@
           "swingTimer": 1.85,
           "templateId": "voidwalker",
           "weapon": {
-            "max": 22,
-            "min": 14,
+            "max": 15,
+            "min": 10,
             "speed": 2
           }
         },
@@ -565,7 +568,7 @@
           "forcedTargetId": 389,
           "forcedTargetTimer": 2.8,
           "hostile": true,
-          "hp": 49921,
+          "hp": 49939,
           "id": 390,
           "inCombat": true,
           "kind": "mob",
@@ -606,7 +609,7 @@
             ],
             [
               389,
-              67
+              49
             ]
           ],
           "weapon": {

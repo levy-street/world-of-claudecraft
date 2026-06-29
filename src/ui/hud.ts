@@ -95,6 +95,7 @@ import {
   OVERHEAD_EMOTES,
   type OverheadEmoteId,
 } from '../world_api';
+import { type AbilityScaling, abilityDamageBonus } from './ability_damage';
 import { ActionBarPainter } from './action_bar_painter';
 import {
   ABILITY_ICON_PREFIX,
@@ -597,7 +598,12 @@ function yellVoiceKey(text: string): string {
 }
 
 export class Hud {
-  private static readonly BAR_ABILITY_SLOTS = 11; // bar slots 1..11; slot 0 is the fixed Attack toggle
+  // Ability slots across both rows: 1..11 on the primary bar, 12..22 on the
+  // secondary bar (slot 0 is the fixed Attack toggle on the primary bar). The
+  // two rows share one hotbarActions array, so drag/drop, persistence, and the
+  // keybind dispatch all work across both with no per-bar bookkeeping.
+  private static readonly PRIMARY_BAR_ABILITY_SLOTS = 11;
+  private static readonly BAR_ABILITY_SLOTS = 22;
   private static readonly PET_AUTOCAST_TOUCH_HOLD_MS = 2000;
   private static ddSeq = 0; // monotonic id source for buildDropdown listbox/option ARIA wiring
   private static readonly FORM_TOGGLE_IDS = new Set(['bear_form', 'cat_form', 'travel_form']); // shift toggles, castable in any form
@@ -3138,7 +3144,12 @@ export class Hud {
 
   private abilityTooltip(res: ResolvedAbility): string {
     const a = res.def;
-    const damageText = abilityEffectText(res.effects);
+    const p = this.sim.player;
+    const damageText = abilityEffectText(res, {
+      spellPower: p.spellPower,
+      rangedPower: p.rangedPower,
+      attackPower: p.attackPower,
+    });
     let html = `<div class="tt-title">${esc(abilityDisplayName(a))}</div>`;
     html += `<div class="tt-sub">${esc(t('abilityUi.tooltip.rank', { rank: formatAbilityNumber(res.rank) }))}</div>`;
     const costLine: string[] = [];
@@ -3436,12 +3447,12 @@ export class Hud {
   }
 
   private actionForSlot(barSlot: number): HotbarAction {
-    // barSlot 1..11
+    // barSlot 1..22 (1..11 primary bar, 12..22 secondary bar)
     return this.hotbarActions[barSlot - 1] ?? null;
   }
 
   abilityForSlot(barSlot: number): ResolvedAbility | null {
-    // barSlot 1..11
+    // barSlot 1..22 (1..11 primary bar, 12..22 secondary bar)
     const action = this.actionForSlot(barSlot);
     return action?.type === 'ability'
       ? (this.sim.known.find((k) => k.def.id === action.id) ?? null)
@@ -3522,7 +3533,12 @@ export class Hud {
 
   private buildActionBar(): void {
     const bar = $('#actionbar');
-    for (let i = 0; i < 12; i++) {
+    const bar2 = $('#actionbar2');
+    // slot 0 (Attack) + slots 1..11 render on the primary bar; slots 12..22 on
+    // the secondary bar. One button list (this.abilityButtons), indexed by slot.
+    const totalButtons = 1 + Hud.BAR_ABILITY_SLOTS;
+    for (let i = 0; i < totalButtons; i++) {
+      const container = i <= Hud.PRIMARY_BAR_ABILITY_SLOTS ? bar : bar2;
       const btn = document.createElement('button');
       btn.className = 'action-btn empty';
       const label = document.createElement('span');
@@ -3667,7 +3683,7 @@ export class Hud {
           this.hideTooltip();
         });
       }
-      bar.appendChild(btn);
+      container.appendChild(btn);
       this.abilityButtons.push({
         btn,
         label,
@@ -3684,6 +3700,7 @@ export class Hud {
     // elements (multiplicity is a constructor arg, not a hardcoded id).
     this.actionBarView = createActionBarView(
       {
+        manySpellsSlotMax: Hud.PRIMARY_BAR_ABILITY_SLOTS,
         slots: this.abilityButtons.map((_, i) => {
           // Precompute the keybind lookup key once per slot (not per frame).
           const slotKey = `slot${i}`;
@@ -3738,7 +3755,8 @@ export class Hud {
   }
 
   private clearActionDropTargets(): void {
-    document.querySelectorAll('#actionbar .drop-target').forEach((el) => {
+    // Both action rows (#actionbar and #actionbar2) hold .action-btn slots.
+    document.querySelectorAll('.action-btn.drop-target').forEach((el) => {
       el.classList.remove('drop-target');
     });
   }
@@ -3758,7 +3776,7 @@ export class Hud {
     if (drag) window.clearTimeout(drag.timer);
     this.mobileHotbarDrag = null;
     document.body.classList.remove('mobile-hotbar-dragging');
-    document.querySelectorAll('#actionbar .mobile-drag-source').forEach((el) => {
+    document.querySelectorAll('.action-btn.mobile-drag-source').forEach((el) => {
       el.classList.remove('mobile-drag-source');
     });
     this.clearActionDropTargets();
@@ -10435,7 +10453,21 @@ function abilityRequirementLines(def: AbilityDef): string[] {
   return lines;
 }
 
-function abilityEffectText(effects: AbilityEffect[]): string {
+// Builds the `$d` damage string for an ability tooltip. When `scaling` (the live
+// character's Spell Power / Ranged AP / Attack Power) is given, the BASE damage is
+// shown with the scaling contribution called out as a "(+N)" suffix, e.g.
+// "66 to 74 (+29)", so a caster sees both the base and exactly what their Spell
+// Power adds, and watches it climb as gear changes.
+function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling): string {
+  const effects = res.effects;
+  // " (+N)" callout for the scaling contribution (Spell Power / Attack Power),
+  // omitted when there is none. Punctuation + formatted number only (no words).
+  const suffix = (eff: AbilityEffect) => {
+    const b = scaling ? abilityDamageBonus(res, eff, scaling) : 0;
+    return b > 0
+      ? ` ${t('hudChrome.abilityScaling.bonus', { value: formatAbilityNumber(b) })}`
+      : '';
+  };
   const primary = effects.find(
     (eff) =>
       eff.type === 'directDamage' ||
@@ -10454,15 +10486,17 @@ function abilityEffectText(effects: AbilityEffect[]): string {
       case 'aoeDamage':
       case 'aoeRoot':
       case 'drainTick':
-        return abilityAmountRange(primary.min, primary.max);
+        return abilityAmountRange(primary.min, primary.max) + suffix(primary);
       case 'weaponDamage':
       case 'weaponStrike':
         return formatAbilityNumber(primary.bonus);
       case 'finisherDamage':
-        return t('abilityUi.tooltip.finisherDamage', {
-          base: formatAbilityNumber(primary.base),
-          perCombo: formatAbilityNumber(primary.perCombo),
-        });
+        return (
+          t('abilityUi.tooltip.finisherDamage', {
+            base: formatAbilityNumber(primary.base),
+            perCombo: formatAbilityNumber(primary.perCombo),
+          }) + suffix(primary)
+        );
     }
   }
 
@@ -10473,6 +10507,7 @@ function abilityEffectText(effects: AbilityEffect[]): string {
   if (!secondary) return '';
   switch (secondary.type) {
     case 'dot':
+      return formatAbilityNumber(secondary.total) + suffix(secondary);
     case 'hot':
       return formatAbilityNumber(secondary.total);
     case 'absorb':

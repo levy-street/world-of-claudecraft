@@ -45,6 +45,8 @@ export type GroundAoE = {
   tickTimer: number;
   school: string;
   ability: string;
+  // Spell Power added per tick, snapshotted at cast time (caster ground AoEs).
+  spBonus?: number;
 };
 
 // A SimEvent scheduled to fire at a future sim time, optionally gated by a live-
