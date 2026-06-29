@@ -598,7 +598,12 @@ function yellVoiceKey(text: string): string {
 }
 
 export class Hud {
-  private static readonly BAR_ABILITY_SLOTS = 11; // bar slots 1..11; slot 0 is the fixed Attack toggle
+  // Ability slots across both rows: 1..11 on the primary bar, 12..22 on the
+  // secondary bar (slot 0 is the fixed Attack toggle on the primary bar). The
+  // two rows share one hotbarActions array, so drag/drop, persistence, and the
+  // keybind dispatch all work across both with no per-bar bookkeeping.
+  private static readonly PRIMARY_BAR_ABILITY_SLOTS = 11;
+  private static readonly BAR_ABILITY_SLOTS = 22;
   private static readonly PET_AUTOCAST_TOUCH_HOLD_MS = 2000;
   private static ddSeq = 0; // monotonic id source for buildDropdown listbox/option ARIA wiring
   private static readonly FORM_TOGGLE_IDS = new Set(['bear_form', 'cat_form', 'travel_form']); // shift toggles, castable in any form
@@ -3420,12 +3425,12 @@ export class Hud {
   }
 
   private actionForSlot(barSlot: number): HotbarAction {
-    // barSlot 1..11
+    // barSlot 1..22 (1..11 primary bar, 12..22 secondary bar)
     return this.hotbarActions[barSlot - 1] ?? null;
   }
 
   abilityForSlot(barSlot: number): ResolvedAbility | null {
-    // barSlot 1..11
+    // barSlot 1..22 (1..11 primary bar, 12..22 secondary bar)
     const action = this.actionForSlot(barSlot);
     return action?.type === 'ability'
       ? (this.sim.known.find((k) => k.def.id === action.id) ?? null)
@@ -3506,7 +3511,12 @@ export class Hud {
 
   private buildActionBar(): void {
     const bar = $('#actionbar');
-    for (let i = 0; i < 12; i++) {
+    const bar2 = $('#actionbar2');
+    // slot 0 (Attack) + slots 1..11 render on the primary bar; slots 12..22 on
+    // the secondary bar. One button list (this.abilityButtons), indexed by slot.
+    const totalButtons = 1 + Hud.BAR_ABILITY_SLOTS;
+    for (let i = 0; i < totalButtons; i++) {
+      const container = i <= Hud.PRIMARY_BAR_ABILITY_SLOTS ? bar : bar2;
       const btn = document.createElement('button');
       btn.className = 'action-btn empty';
       const label = document.createElement('span');
@@ -3651,7 +3661,7 @@ export class Hud {
           this.hideTooltip();
         });
       }
-      bar.appendChild(btn);
+      container.appendChild(btn);
       this.abilityButtons.push({
         btn,
         label,
@@ -3668,6 +3678,7 @@ export class Hud {
     // elements (multiplicity is a constructor arg, not a hardcoded id).
     this.actionBarView = createActionBarView(
       {
+        manySpellsSlotMax: Hud.PRIMARY_BAR_ABILITY_SLOTS,
         slots: this.abilityButtons.map((_, i) => {
           // Precompute the keybind lookup key once per slot (not per frame).
           const slotKey = `slot${i}`;
@@ -3722,7 +3733,8 @@ export class Hud {
   }
 
   private clearActionDropTargets(): void {
-    document.querySelectorAll('#actionbar .drop-target').forEach((el) => {
+    // Both action rows (#actionbar and #actionbar2) hold .action-btn slots.
+    document.querySelectorAll('.action-btn.drop-target').forEach((el) => {
       el.classList.remove('drop-target');
     });
   }
@@ -3742,7 +3754,7 @@ export class Hud {
     if (drag) window.clearTimeout(drag.timer);
     this.mobileHotbarDrag = null;
     document.body.classList.remove('mobile-hotbar-dragging');
-    document.querySelectorAll('#actionbar .mobile-drag-source').forEach((el) => {
+    document.querySelectorAll('.action-btn.mobile-drag-source').forEach((el) => {
       el.classList.remove('mobile-drag-source');
     });
     this.clearActionDropTargets();
