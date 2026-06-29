@@ -29,6 +29,7 @@ import {
   interactObjectForQuests,
   tryStartNythraxisWardChannel,
 } from './encounters/nythraxis';
+import { hasSharedLootRights as computeSharedLootRights, lootHasGoneFfa } from './loot/loot_ffa';
 import {
   awardSharedLootItem,
   distributeLootCopper,
@@ -45,10 +46,14 @@ export function lootCorpse(ctx: SimContext, mobId: number, pid?: number): void {
   const mob = ctx.entities.get(mobId);
   if (!mob?.lootable || !mob.loot) return;
   const tapperParty = mob.tappedById !== null ? ctx.partyOf(mob.tappedById) : null;
-  const hasSharedLootRights =
-    mob.tappedById === null ||
-    mob.tappedById === meta.entityId ||
-    !!tapperParty?.members.includes(meta.entityId);
+  // owner-lock lapses LOOT_FFA_DELAY after the corpse became lootable: then anyone may loot.
+  const ffaUnlocked = lootHasGoneFfa(mob.lootFfaTimer);
+  const hasSharedLootRights = computeSharedLootRights(
+    meta.entityId,
+    mob.tappedById,
+    tapperParty?.members ?? null,
+    ffaUnlocked,
+  );
   const hasPersonalLoot = mob.loot.items.some((s) => s.personalFor?.includes(meta.entityId));
   const hasOpenLoot = mob.loot.items.some((s) => s.openToAll && s.count > 0);
   if (!hasSharedLootRights && !hasPersonalLoot && !hasOpenLoot) {

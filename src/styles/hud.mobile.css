@@ -791,6 +791,11 @@
     top: max(140px, env(safe-area-inset-top));
     max-width: 180px;
   }
+  body.mobile-touch #debuff-bar {
+    right: max(10px, env(safe-area-inset-right));
+    top: calc(max(140px, env(safe-area-inset-top)) + 36px);
+    max-width: 180px;
+  }
   body.mobile-touch #minimap-wrap {
     right: max(8px, env(safe-area-inset-right));
     top: max(8px, env(safe-area-inset-top));
@@ -1738,6 +1743,13 @@
     body.mobile-touch #buff-bar {
       right: calc(98px + env(safe-area-inset-right));
       top: max(8px, env(safe-area-inset-top));
+      max-width: 160px;
+      transform: scale(0.85);
+      transform-origin: right top;
+    }
+    body.mobile-touch #debuff-bar {
+      right: calc(98px + env(safe-area-inset-right));
+      top: calc(max(8px, env(safe-area-inset-top)) + 32px);
       max-width: 160px;
       transform: scale(0.85);
       transform-origin: right top;

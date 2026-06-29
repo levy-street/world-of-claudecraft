@@ -1,4 +1,4 @@
-import { translations, pending, en_XA } from './i18n.resolved.generated';
+import { en_XA, pending, translations } from './i18n.resolved.generated';
 import { LOCALE_LOADERS } from './i18n.resolved.generated/loaders';
 
 // The admin dashboard's own i18n layer (overlay + registry + release-gate
@@ -15,7 +15,7 @@ import { LOCALE_LOADERS } from './i18n.resolved.generated/loaders';
 export const DICT = translations as Record<string, Record<string, string>>;
 
 const SUPPORTED = Object.keys(DICT);
-let current = "en";
+let current = 'en';
 
 // --- en_XA dev-only pseudo-locale (mirrors src/ui/i18n.ts) -------------
 //
@@ -25,34 +25,48 @@ let current = "en";
 // never enters the operator language list or the admin release gate. Selectable ONLY
 // via ?lang=en_XA on a NON-RELEASE build; the import.meta.env.PROD guard in
 // tableFor() tree-shakes the pseudo table out of the production admin bundle.
-const DEV_PSEUDO_LOCALE = "en_XA";
+const DEV_PSEUDO_LOCALE = 'en_XA';
 let pseudoActive = false;
 
 function detect(): string {
   try {
-    if (typeof window !== "undefined" && window.location) {
-      const q = new URLSearchParams(window.location.search).get("lang");
+    if (typeof window !== 'undefined' && window.location) {
+      const q = new URLSearchParams(window.location.search).get('lang');
       // Dev-only pseudo-locale: flip the flag, keep the base locale at "en". Skipped
       // on a release build, so ?lang=en_XA degrades to the default for operators.
-      if (q === DEV_PSEUDO_LOCALE && !isReleaseBuild()) { pseudoActive = true; return "en"; }
+      if (q === DEV_PSEUDO_LOCALE && !isReleaseBuild()) {
+        pseudoActive = true;
+        return 'en';
+      }
       if (q && SUPPORTED.includes(q)) return q;
     }
-    if (typeof localStorage !== "undefined") {
-      const s = localStorage.getItem("locale");
+    if (typeof localStorage !== 'undefined') {
+      const s = localStorage.getItem('locale');
       if (s && SUPPORTED.includes(s)) return s;
     }
-  } catch { /* ignore */ }
-  return "en";
+  } catch {
+    /* ignore */
+  }
+  return 'en';
 }
 current = detect();
 
-export function adminLanguage(): string { return current; }
+export function adminLanguage(): string {
+  return current;
+}
 // BCP-47 tag for the Intl APIs. The locale codes carry an underscore region
 // (de_DE, zh_CN, ...), which Intl rejects with a RangeError, so normalize the
 // separator to a hyphen (mirrors the game's languageTag in src/ui/i18n.ts).
 // adminLanguage() still returns the raw code for DICT/t() lookups.
-export function adminLanguageTag(): string { return current.replace("_", "-"); }
-export function setAdminLanguage(lang: string): void { if (SUPPORTED.includes(lang)) { pseudoActive = false; current = lang; } }
+export function adminLanguageTag(): string {
+  return current.replace('_', '-');
+}
+export function setAdminLanguage(lang: string): void {
+  if (SUPPORTED.includes(lang)) {
+    pseudoActive = false;
+    current = lang;
+  }
+}
 
 // --- async locale-load seam (parity with the game's ensureLocaleLoaded) ----------
 //
@@ -64,20 +78,22 @@ export function setAdminLanguage(lang: string): void { if (SUPPORTED.includes(la
 const adminInflight = new Map<string, Promise<void>>();
 
 export function isAdminLocaleResident(lang: string): boolean {
-  return lang === "en" || DICT[lang] !== undefined;
+  return lang === 'en' || DICT[lang] !== undefined;
 }
 
 export async function ensureAdminLocaleLoaded(lang: string): Promise<void> {
   if (isAdminLocaleResident(lang)) return; // always true while admin stays static
   const existing = adminInflight.get(lang);
   if (existing) return existing; // coalesce onto the in-flight import
-  const loader = (LOCALE_LOADERS as Record<string, (() => Promise<Record<string, unknown>>) | undefined>)[lang];
+  const loader = (
+    LOCALE_LOADERS as Record<string, (() => Promise<Record<string, unknown>>) | undefined>
+  )[lang];
   if (!loader) return;
   const task = loader()
     .then((mod) => {
       // Shape-tolerant read mirroring src/ui/i18n.ts (default OR named export).
-      DICT[lang] = ((mod as { default?: Record<string, string> }).default
-        ?? (mod as Record<string, Record<string, string>>)[lang]) as Record<string, string>;
+      DICT[lang] = ((mod as { default?: Record<string, string> }).default ??
+        (mod as Record<string, Record<string, string>>)[lang]) as Record<string, string>;
       adminInflight.delete(lang);
     })
     .catch((err) => {
@@ -100,7 +116,8 @@ export async function ensureAdminLocaleLoaded(lang: string): Promise<void> {
 // import.meta.env.PROD (the real Vite admin build). Read lazily, on the cold path.
 function isReleaseBuild(): boolean {
   try {
-    if (typeof process !== "undefined" && process.env && process.env.I18N_RELEASE === "1") return true;
+    if (typeof process !== 'undefined' && process.env && process.env.I18N_RELEASE === '1')
+      return true;
   } catch {
     // No `process` (browser runtime) - fall through to the build-time flag.
   }
@@ -151,7 +168,7 @@ function tableFor(lang: string): Record<string, string> {
 export function t(key: string, params?: Record<string, string | number>): string {
   const table = tableFor(current);
   const tmpl = table[key];
-  if (typeof tmpl !== "string") return onUntrackedKey(key);
+  if (typeof tmpl !== 'string') return onUntrackedKey(key);
   if (PENDING_TOTAL > 0 && PENDING_SETS[current]?.has(key) && isReleaseBuild()) {
     throw new Error(
       `admin i18n: key "${key}" is untranslated (pending) for locale "${current}" on a release build; English must never ship to a translated operator`,
@@ -164,27 +181,30 @@ export function t(key: string, params?: Record<string, string | number>): string
 // strings. Unknown / transport / code-diagnostic errors fall through to English on
 // purpose (the localization design principle: only operator-facing UI is translated).
 const ADMIN_ERROR_KEYS: Record<string, string> = {
-  "too many attempts — wait a minute and try again": "error.tooManyAttempts",
-  "invalid username or password": "error.invalidCredentials",
-  "this account does not have admin access": "error.noAdminAccess",
-  "admin accounts cannot be suspended or banned": "error.cannotModerateAdmin",
-  "open report not found": "error.reportNotFound",
-  "account not found": "error.accountNotFound",
-  "moderation action failed": "error.moderationFailed",
-  "force rename failed": "error.forceRenameFailed",
-  "chat mute failed": "error.chatMuteFailed",
-  "moderation reason is required": "error.moderationReasonRequired",
-  "suspension expiry must be in the future": "error.moderationExpiryFuture",
-  "character not found": "error.characterNotFound",
-  "admin accounts cannot be chat muted": "error.cannotChatMuteAdmin",
-  "tier must be \"soft\" or \"hard\"": "error.invalidWordTier",
-  "word is empty after normalization": "error.wordEmptyAfterNormalization",
-  "word not found": "error.wordNotFound",
-  "chat mute expiry must be in the future": "error.chatMuteExpiryFuture",
-  "a valid ip address is required": "error.invalidIp",
-  "block expiry must be in the future": "error.blockExpiryFuture",
-  "failed to block ip": "error.blockFailed",
-  "ip not found": "error.blockNotFound",
+  'too many attempts, wait a minute and try again': 'error.tooManyAttempts',
+  'invalid username or password': 'error.invalidCredentials',
+  'this account does not have admin access': 'error.noAdminAccess',
+  'admin accounts cannot be suspended or banned': 'error.cannotModerateAdmin',
+  'open report not found': 'error.reportNotFound',
+  'account not found': 'error.accountNotFound',
+  'account is not suspended': 'error.accountNotSuspended',
+  'moderation action failed': 'error.moderationFailed',
+  'force rename failed': 'error.forceRenameFailed',
+  'chat mute failed': 'error.chatMuteFailed',
+  'chat unmute failed': 'error.chatUnmuteFailed',
+  'account is not chat muted': 'error.accountNotChatMuted',
+  'moderation reason is required': 'error.moderationReasonRequired',
+  'suspension expiry must be in the future': 'error.moderationExpiryFuture',
+  'character not found': 'error.characterNotFound',
+  'admin accounts cannot be chat muted': 'error.cannotChatMuteAdmin',
+  'tier must be "soft" or "hard"': 'error.invalidWordTier',
+  'word is empty after normalization': 'error.wordEmptyAfterNormalization',
+  'word not found': 'error.wordNotFound',
+  'chat mute expiry must be in the future': 'error.chatMuteExpiryFuture',
+  'a valid ip address is required': 'error.invalidIp',
+  'block expiry must be in the future': 'error.blockExpiryFuture',
+  'failed to block ip': 'error.blockFailed',
+  'ip not found': 'error.blockNotFound',
 };
 export function localizeAdminError(message: string): string {
   const key = ADMIN_ERROR_KEYS[message.trim().toLowerCase()];
@@ -194,7 +214,17 @@ export function localizeAdminError(message: string): string {
 // Operator-facing class label for the dashboard tables/charts. The class id is the
 // raw PlayerClass enum value (e.g. "mage"); render the localized name to match the
 // game client. Unknown ids fall back to the raw id.
-const CLASS_LABEL_IDS = new Set(['warrior', 'paladin', 'hunter', 'rogue', 'priest', 'shaman', 'mage', 'warlock', 'druid']);
+const CLASS_LABEL_IDS = new Set([
+  'warrior',
+  'paladin',
+  'hunter',
+  'rogue',
+  'priest',
+  'shaman',
+  'mage',
+  'warlock',
+  'druid',
+]);
 export function classLabel(classId: string): string {
   return CLASS_LABEL_IDS.has(classId) ? t(`class.${classId}`) : classId;
 }

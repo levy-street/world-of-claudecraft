@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 389,
-      "state": "989ad720",
+      "state": "d4c14b80",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -59,6 +59,7 @@
           "id": 388,
           "kind": "player",
           "level": 1,
+          "lootFfaTimer": "Infinity",
           "maxHp": 62,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -101,7 +102,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 402,
-      "state": "f1f08293",
+      "state": "de20c8c3",
       "events": "f1c417ce",
       "rng": {
         "draws": 4,
@@ -112,7 +113,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 402,
-      "state": "358aef62",
+      "state": "86b30312",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -123,7 +124,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 402,
-      "state": "f716806d",
+      "state": "61ecc6d1",
       "events": "3a3cdaf4",
       "rng": {
         "draws": 5,
@@ -134,7 +135,7 @@
       "tick": 38,
       "time": 1.9,
       "nextId": 404,
-      "state": "0b6f12f3",
+      "state": "c726d61d",
       "events": "ddc6ffa8",
       "rng": {
         "draws": 8,
@@ -195,6 +196,7 @@
           "inCombat": true,
           "kind": "player",
           "level": 7,
+          "lootFfaTimer": "Infinity",
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -243,6 +245,7 @@
           "id": 397,
           "kind": "mob",
           "level": 4,
+          "lootFfaTimer": "Infinity",
           "maxHp": 103,
           "moveSpeed": 7,
           "onGround": true,
@@ -291,6 +294,7 @@
           "loot": {
             "copper": 439
           },
+          "lootFfaTimer": 59.6,
           "lootRecipientIds": [
             388
           ],
@@ -339,6 +343,7 @@
           "id": 402,
           "kind": "object",
           "level": 1,
+          "lootFfaTimer": "Infinity",
           "lootable": true,
           "maxHp": 1,
           "moveSpeed": 7,
@@ -369,7 +374,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 404,
-      "state": "ffa84389",
+      "state": "fbc85cd0",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -380,7 +385,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 404,
-      "state": "ffa84389",
+      "state": "fbc85cd0",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -441,6 +446,7 @@
           "inCombat": true,
           "kind": "player",
           "level": 7,
+          "lootFfaTimer": "Infinity",
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -489,6 +495,7 @@
           "id": 397,
           "kind": "mob",
           "level": 4,
+          "lootFfaTimer": "Infinity",
           "maxHp": 103,
           "moveSpeed": 7,
           "onGround": true,
@@ -537,6 +544,7 @@
           "loot": {
             "copper": 439
           },
+          "lootFfaTimer": 59.5,
           "lootRecipientIds": [
             388
           ],
@@ -585,6 +593,7 @@
           "id": 402,
           "kind": "object",
           "level": 1,
+          "lootFfaTimer": "Infinity",
           "lootable": true,
           "maxHp": 1,
           "moveSpeed": 7,

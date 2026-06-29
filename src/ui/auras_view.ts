@@ -28,6 +28,7 @@
 // mirror aura {stacks:undefined} derive identical output.
 
 import type { AuraKind } from '../sim/types';
+import type { AuraSchool } from './aura_effect';
 
 // The aura kinds that read as a DEBUFF even when they reuse a buff_* kind is handled
 // separately below. Lifted verbatim from the old inline `renderAuras` allowlist; a
@@ -64,9 +65,9 @@ export const DEBUFF_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
 // `a.remaining < 99 ? ... : ''`).
 const DURATION_HIDE_THRESHOLD = 99;
 
-/** Which aura strip a view drives: every aura (the player buff bar) or debuffs only
- *  (the target frame). */
-export type AuraMode = 'all' | 'debuffs';
+/** Which aura strip a view drives: every aura, buffs only (the player buff row), or
+ *  debuffs only (the player debuff row and the target frame). */
+export type AuraMode = 'all' | 'buffs' | 'debuffs';
 
 /** The aura fields the core reads. A structural subset of sim `Aura` that both worlds
  *  mirror. `stacks` is optional (the wire omits it when 1). */
@@ -76,7 +77,19 @@ export interface AuraInput {
   kind: AuraKind;
   remaining: number;
   value: number;
+  // Optional effect-descriptor inputs (DoT/HoT tick interval, secondary values, magic
+  // school). Present on the offline Sim aura; the online ClientWorld mirror may omit
+  // them, in which case auraEffectDescriptor falls back to its defaults.
+  value2?: number;
+  value3?: number;
+  tickInterval?: number;
+  school?: AuraSchool;
   stacks?: number;
+  // Remaining charges on a charge-limited aura (e.g. Lightning Shield's 3 reflects). Present
+  // on the offline Sim aura and mirrored over the wire; undefined for ordinary auras. When
+  // present it drives the badge overlay INSTEAD of stacks (a charge count, not a stack count),
+  // and unlike stacks it shows even at 1 so the player sees the shield about to drop.
+  charges?: number;
 }
 
 /** The entity fields the core reads: just its aura list. */
@@ -96,6 +109,10 @@ export interface AurasDeps {
   auraName(aura: AuraInput): string;
   /** The formatted stack count (host: `formatNumber(stacks, {maximumFractionDigits:0})`). */
   formatStacks(stacks: number): string;
+  /** The one-line aura effect-summary HTML the tooltip prepends (or '' when the aura has
+   *  no descriptor). Injected so the i18n-free core never calls t(): the host builds the
+   *  localized, esc'd HTML from the pure aura_effect descriptor. */
+  auraEffectHtml(aura: AuraInput): string;
   /** The localized duration unit suffix appended to the remaining-seconds count (host:
    *  `t('hudChrome.unitFrame.durationUnitSeconds')`, English 's'). Frame-constant: tick() reads
    *  it ONCE per frame (not per aura, unlike the per-aura deps above), and re-reads each frame so
@@ -126,6 +143,12 @@ export interface AuraSlotState {
   name: string;
   /** Raw seconds remaining, for the tooltip (read live by the pooled closure). */
   remaining: number;
+  /** Whether this aura is the player's own cancelable buff (mode 'buffs', not a debuff):
+   *  the buff bar offers right-click-cancel, a target's debuff strip is read-only. */
+  cancelable: boolean;
+  /** The one-line effect-summary HTML for the tooltip (or '' when none), read live by the
+   *  pooled closure. */
+  effectHtml: string;
 }
 
 /** The whole strip's derived state: the reused slot pool plus the active count. Both
@@ -168,6 +191,8 @@ function makeSlotState(): AuraSlotState {
     stacksText: '',
     name: '',
     remaining: 0,
+    cancelable: false,
+    effectHtml: '',
   };
 }
 
@@ -191,6 +216,7 @@ export function createAurasView(mode: AuraMode, deps: AurasDeps): AurasView {
       for (const a of entity.auras) {
         const debuff = isAuraDebuff(a);
         if (mode === 'debuffs' && !debuff) continue;
+        if (mode === 'buffs' && debuff) continue;
         // Grow the pool only when this frame needs a slot it has never held before.
         if (count >= slots.length) slots.push(makeSlotState());
         const slot = slots[count];
@@ -199,9 +225,21 @@ export function createAurasView(mode: AuraMode, deps: AurasDeps): AurasView {
         slot.isDebuff = debuff;
         slot.durationText =
           a.remaining < DURATION_HIDE_THRESHOLD ? `${Math.ceil(a.remaining)}${durSuffix}` : '';
-        slot.stacksText = a.stacks && a.stacks > 1 ? deps.formatStacks(a.stacks) : '';
+        // A charge-limited aura badges its remaining charges (shown even at 1); otherwise the
+        // badge shows a stack count, and only when it stacks past 1.
+        slot.stacksText =
+          a.charges !== undefined
+            ? deps.formatStacks(a.charges)
+            : a.stacks && a.stacks > 1
+              ? deps.formatStacks(a.stacks)
+              : '';
         slot.name = deps.auraName(a);
         slot.remaining = a.remaining;
+        // The buff bar (mode 'buffs', the player's own auras) offers right-click-cancel;
+        // a helpful buff is cancelable, a debuff never. The target debuff strip
+        // (mode 'debuffs') is read-only, so nothing there is cancelable.
+        slot.cancelable = mode === 'buffs' && !debuff;
+        slot.effectHtml = deps.auraEffectHtml(a);
         count++;
       }
       state.count = count;

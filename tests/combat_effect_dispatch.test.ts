@@ -11,29 +11,37 @@ import { describe, expect, it } from 'vitest';
 import { runEffects } from '../src/sim/combat/effect_dispatch';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
-import type { ResolvedAbility } from '../src/sim/sim';
+import type { PlayerMeta, ResolvedAbility } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
-import type { Entity, PlayerClass } from '../src/sim/types';
+import type { Aura, Entity, PlayerClass } from '../src/sim/types';
 
-type AnySim = Sim & Record<string, any>;
-type AnyEntity = Entity & Record<string, any>;
+type TestSim = Sim & {
+  nextId: number;
+  players: Map<number, PlayerMeta>;
+  addEntity(entity: Entity): void;
+};
 
-function makeSim(cls: PlayerClass, level: number): { sim: AnySim; p: AnyEntity; meta: any } {
-  const sim = new Sim({ seed: 4242, playerClass: cls, autoEquip: true }) as AnySim;
+function harness(sim: Sim): TestSim {
+  return sim as unknown as TestSim;
+}
+
+function makeSim(cls: PlayerClass, level: number): { sim: TestSim; p: Entity; meta: PlayerMeta } {
+  const sim = harness(new Sim({ seed: 4242, playerClass: cls, autoEquip: true }));
   sim.setPlayerLevel(level);
-  const p = sim.player as AnyEntity;
+  const p = sim.player;
   const meta = sim.players.get(p.id);
+  if (!meta) throw new Error(`missing player meta for ${p.id}`);
   p.resource = p.maxResource;
   return { sim, p, meta };
 }
 
 // An idle hostile target in range + faced, so an offensive ability resolves + lands.
-function spawnTarget(sim: AnySim, p: AnyEntity, level = 1, dz = 4): AnyEntity {
-  const mob = createMob(sim.nextId++, MOBS['forest_wolf'], level, {
+function spawnTarget(sim: TestSim, p: Entity, level = 1, dz = 4): Entity {
+  const mob = createMob(sim.nextId++, MOBS.forest_wolf, level, {
     x: p.pos.x,
     y: p.pos.y,
     z: p.pos.z + dz,
-  }) as AnyEntity;
+  });
   mob.maxHp = 50000;
   mob.hp = 50000;
   mob.hostile = true;
@@ -46,7 +54,7 @@ function spawnTarget(sim: AnySim, p: AnyEntity, level = 1, dz = 4): AnyEntity {
 
 // Resolve an ability the way the cast lifecycle does; throw (narrowing null away) so
 // a content change that stops the ability resolving fails loudly instead of silently.
-function resolve(sim: AnySim, abilityId: string, pid: number): ResolvedAbility {
+function resolve(sim: TestSim, abilityId: string, pid: number): ResolvedAbility {
   const res = sim.ctx.resolvedAbility(abilityId, pid) as ResolvedAbility | null;
   if (!res) throw new Error(`${abilityId} did not resolve`);
   return res;
@@ -64,7 +72,7 @@ describe('effect_dispatch: a single cast fans into every listed effect', () => {
     // directDamage effect: the mob took a hit.
     expect(mob.hp).toBeLessThan(hp0);
     // dot effect (same cast): a damage-over-time aura sourced by the druid landed.
-    expect(mob.auras.some((a: any) => a.kind === 'dot' && a.sourceId === p.id)).toBe(true);
+    expect(mob.auras.some((a: Aura) => a.kind === 'dot' && a.sourceId === p.id)).toBe(true);
   });
 
   it('rogue eviscerate: finisherDamage lands AND the combo-spend reset fires after the loop', () => {
@@ -85,6 +93,12 @@ describe('effect_dispatch: a single cast fans into every listed effect', () => {
     const { sim, p, meta } = makeSim('paladin', 20);
     const mob = spawnTarget(sim, p, 8, 2); // within the 8yd consecration radius
     const before = sim.ctx.groundAoEs.length;
+    mob.aiState = 'chase';
+    mob.aggroTargetId = p.id;
+    mob.inCombat = true;
+    p.inCombat = true;
+    mob.leashAnchor = { ...mob.pos, x: mob.pos.x - 10 };
+    const anchorBefore = { ...mob.leashAnchor };
     const res = resolve(sim, 'consecration', p.id);
 
     runEffects(sim.ctx, p, meta, null, res); // consecration is self-centered (no target)
@@ -92,6 +106,15 @@ describe('effect_dispatch: a single cast fans into every listed effect', () => {
     expect(sim.ctx.groundAoEs.length).toBe(before + 1); // groundAoEs.push happened
     // the immediate on-cast pulse (pulseGroundAoE) hit the in-radius mob.
     expect(mob.hp).toBeLessThan(mob.maxHp);
+    expect(mob.leashAnchor).not.toEqual(anchorBefore);
+    expect(mob.leashAnchor.x).toBeCloseTo(mob.pos.x);
+    expect(mob.leashAnchor.z).toBeCloseTo(mob.pos.z);
+
+    const anchorAfterCast = { ...mob.leashAnchor };
+    mob.pos = { x: mob.pos.x + 3, y: mob.pos.y, z: mob.pos.z };
+    sim.ctx.pulseGroundAoE(sim.ctx.groundAoEs[0]);
+    expect(mob.leashAnchor.x).toBeCloseTo(anchorAfterCast.x);
+    expect(mob.leashAnchor.z).toBeCloseTo(anchorAfterCast.z);
   });
 });
 

@@ -292,7 +292,11 @@ export const ZONE_NAME = ZONE1_ZONE.name;
 // slots stack along z.
 // ---------------------------------------------------------------------------
 
-export const INSTANCE_SLOT_COUNT = 6;
+// Concurrent copies a single dungeon can host. Each slot is a cheap, empty
+// InstanceSlot (no entities, no rng) pre-allocated in the Sim ctor and only
+// populated when a party claims it, so a generous ceiling costs little memory
+// and lets a busy realm keep many leveling groups in the same dungeon at once.
+export const INSTANCE_SLOT_COUNT = 24;
 export const DUNGEON_X_THRESHOLD = 600; // x beyond this = inside an instance
 export const DUNGEON_FLOOR_Y = 0;
 
@@ -377,7 +381,8 @@ export const DELVE_X_MIN = 4800;
 // and the west half is never misclassified as arena. Still >500u clear of ARENA_X.
 const DELVE_WALL_X = 25; // mirror of delve_layout.ts WALL_X (delve side-wall centre)
 export const DELVE_BAND_X_MIN = DELVE_X_MIN - (DELVE_WALL_X + DUNGEON_WALL_HW + 1);
-export const DELVE_SLOT_COUNT = 6;
+// Concurrent copies a single delve can host (mirrors INSTANCE_SLOT_COUNT).
+export const DELVE_SLOT_COUNT = 24;
 export const DELVE_MODULE_GAP = 16;
 export const DELVE_MODULE_Z_START = 8;
 const DELVE_Z0 = -1250;

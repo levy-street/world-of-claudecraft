@@ -100,6 +100,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     aggroTargetId: null,
     respawnTimer: 0,
     corpseTimer: 0,
+    lootFfaTimer: Infinity, // no FFA countdown until rollLoot starts it at death
     lootable: false,
     loot: null,
     xpValue: 0,
@@ -188,6 +189,10 @@ export function recalcPlayerStats(
   let scaleMul = 1; // Fiesta buff_scale: body-size multiplier (>1 also adds hp)
   for (const a of e.auras) {
     if (a.kind === 'buff_ap') bonusAp += a.value;
+    // Attack-power debuff (Demoralizing Shout/Roar). Mobs fold this live in
+    // effectiveAttackPower; players bake it here, so without this arm the debuff
+    // was a no-op versus enemy players (PvP).
+    else if (a.kind === 'debuff_ap') bonusAp -= a.value;
     else if (a.kind === 'buff_armor') s.armor += a.value;
     else if (a.kind === 'buff_int') s.int += a.value;
     else if (a.kind === 'buff_agi') s.agi += a.value;
@@ -257,10 +262,14 @@ export function recalcPlayerStats(
       : cls === 'rogue' || cls === 'hunter'
         ? s.str + s.agi
         : s.str;
-  e.attackPower = Math.round((apFromStats + bonusAp) * (1 + (mods?.stats.apPct ?? 0)));
+  // Floor at 0 so a heavy debuff_ap stack can never bake a negative attack power
+  // (mirrors effectiveAttackPower's mob floor and the agi/spi floors above).
+  e.attackPower = Math.max(0, Math.round((apFromStats + bonusAp) * (1 + (mods?.stats.apPct ?? 0))));
   // Hunters: ranged AP = 2/agi (vanilla)
   e.rangedPower =
-    cls === 'hunter' ? Math.round((s.agi * 2 + bonusAp) * (1 + (mods?.stats.apPct ?? 0))) : 0;
+    cls === 'hunter'
+      ? Math.max(0, Math.round((s.agi * 2 + bonusAp) * (1 + (mods?.stats.apPct ?? 0))))
+      : 0;
   // Spell Power: Intellect converted via SPELL_POWER_PER_INT plus flat Spell Power
   // from gear/buffs. Floored at 0 so an Intellect-draining debuff can't go negative.
   e.spellPower = Math.max(0, Math.round(s.int * SPELL_POWER_PER_INT + bonusSp));

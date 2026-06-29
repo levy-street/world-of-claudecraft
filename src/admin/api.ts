@@ -5,7 +5,10 @@ const TOKEN_KEY = 'claudecraft_admin_token';
 const NAME_KEY = 'claudecraft_admin_name';
 
 export class ApiError extends Error {
-  constructor(public status: number, message: string) {
+  constructor(
+    public status: number,
+    message: string,
+  ) {
     super(message);
   }
 }

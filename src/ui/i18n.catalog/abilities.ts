@@ -723,7 +723,7 @@ const classAbilityNamesEn = {
       [
         'stealth',
         'Stealth',
-        'Conceals you in the shadows: enemies barely notice you, but you move 30% slower. Attacking or taking damage breaks Stealth. Cast again to step out.',
+        'Conceals you in the shadows: enemies barely notice you, but you move 50% slower. Attacking or taking damage breaks Stealth. Cast again to step out.',
       ],
       ['adrenaline_rush', 'Adrenaline Rush', 'Your blood runs hot, instantly restoring 60 energy.'],
       [
@@ -759,7 +759,7 @@ const classAbilityNamesEn = {
       [
         'vanish',
         'Vanish',
-        'Vanish from sight, entering Stealth even in combat. You move 30% slower while hidden. Lasts up to 10 sec.',
+        'Vanish from sight, entering Stealth even in combat. You move 50% slower while hidden. Lasts up to 10 sec.',
       ],
       [
         'instant_poison',
@@ -911,7 +911,7 @@ const classAbilityNamesEn = {
       [
         'lightning_shield',
         'Lightning Shield',
-        'Surrounds you with crackling lightning: melee attackers take 13 Nature damage.',
+        'Surrounds you with crackling lightning: melee attackers take 13 Nature damage, up to 3 charges and at most once every 5 seconds.',
       ],
       [
         'flame_shock',
@@ -1247,7 +1247,7 @@ export const classAbilityNames = {
         [
           'arcane_missiles',
           'Misiles Arcanos',
-          'Lanza Misiles Arcanos al enemigo, causando {damage} de daño Arcano cada segundo durante 3 s.',
+          'Lanza Misiles Arcanos al enemigo, causando 8 de daño Arcano cada segundo durante 3 s.',
         ],
         [
           'polymorph',
@@ -1315,7 +1315,7 @@ export const classAbilityNames = {
         [
           'stealth',
           'Sigilo',
-          'Te oculta en las sombras: los enemigos apenas te detectan, pero te mueves un 30% más lento. Atacar o recibir daño rompe Sigilo. Lánzalo de nuevo para salir.',
+          'Te oculta en las sombras: los enemigos apenas te detectan, pero te mueves un 50% más lento. Atacar o recibir daño rompe Sigilo. Lánzalo de nuevo para salir.',
         ],
         [
           'adrenaline_rush',
@@ -1355,7 +1355,7 @@ export const classAbilityNames = {
         [
           'vanish',
           'Esfumarse',
-          'Desaparece de la vista, entrando en Sigilo incluso en combate. Te mueves un 30% más lento mientras estás oculto. Dura hasta 10 s.',
+          'Desaparece de la vista, entrando en Sigilo incluso en combate. Te mueves un 50% más lento mientras estás oculto. Dura hasta 10 s.',
         ],
         [
           'instant_poison',
@@ -1513,7 +1513,7 @@ export const classAbilityNames = {
         [
           'mind_flay',
           'Tortura mental',
-          'Asalta la mente del objetivo con energía de las Sombras e inflige {damage} de daño cada segundo durante 3 s.',
+          'Asalta la mente del objetivo con energía de las Sombras e inflige 12 de daño cada segundo durante 3 s.',
         ],
         [
           'flash_heal',
@@ -1600,7 +1600,7 @@ export const classAbilityNames = {
         [
           'drain_life',
           'Drenar vida',
-          'Drena la vida del objetivo y te transfiere {damage} de salud cada segundo durante 5 s.',
+          'Drena la vida del objetivo y te transfiere 7 de salud cada segundo durante 5 s.',
         ],
         [
           'fear',
@@ -1885,7 +1885,7 @@ export const classAbilityNames = {
         [
           'arcane_missiles',
           'Projectiles des Arcanes',
-          "Lance des Projectiles des Arcanes sur l'ennemi et inflige {damage} points de dégâts des Arcanes chaque seconde pendant 3 s.",
+          "Lance des Projectiles des Arcanes sur l'ennemi et inflige 8 points de dégâts des Arcanes chaque seconde pendant 3 s.",
         ],
         [
           'polymorph',
@@ -1953,7 +1953,7 @@ export const classAbilityNames = {
         [
           'stealth',
           'Camouflage',
-          'Vous dissimule dans les ombres: les ennemis vous remarquent à peine, mais vous vous déplacez 30% plus lentement. Attaquer ou subir des dégâts interrompt Camouflage. Relancez pour sortir.',
+          'Vous dissimule dans les ombres: les ennemis vous remarquent à peine, mais vous vous déplacez 50% plus lentement. Attaquer ou subir des dégâts interrompt Camouflage. Relancez pour sortir.',
         ],
         [
           'adrenaline_rush',
@@ -1993,7 +1993,7 @@ export const classAbilityNames = {
         [
           'vanish',
           'Disparition',
-          "Vous disparaissez et entrez en Camouflage, même en plein combat. Vous vous déplacez 30% plus lentement tant que vous êtes dissimulé. Dure jusqu'à 10 s.",
+          "Vous disparaissez et entrez en Camouflage, même en plein combat. Vous vous déplacez 50% plus lentement tant que vous êtes dissimulé. Dure jusqu'à 10 s.",
         ],
         [
           'instant_poison',
@@ -2043,7 +2043,7 @@ export const classAbilityNames = {
         [
           'vanish',
           'Disparition',
-          "Vous disparaissez et entrez en Camouflage, même en plein combat. Vous vous déplacez 30% plus lentement tant que vous êtes dissimulé. Dure jusqu'à 10 s.",
+          "Vous disparaissez et entrez en Camouflage, même en plein combat. Vous vous déplacez 50% plus lentement tant que vous êtes dissimulé. Dure jusqu'à 10 s.",
         ],
         [
           'instant_poison',
@@ -2201,7 +2201,7 @@ export const classAbilityNames = {
         [
           'mind_flay',
           'Fouet mental',
-          "Assaille l'esprit de la cible avec de l'énergie d'Ombre et inflige {damage} points de dégâts chaque seconde pendant 3 s.",
+          "Assaille l'esprit de la cible avec de l'énergie d'Ombre et inflige 12 points de dégâts chaque seconde pendant 3 s.",
         ],
         [
           'flash_heal',
@@ -2288,7 +2288,7 @@ export const classAbilityNames = {
         [
           'drain_life',
           'Drain de vie',
-          'Draine la vie de la cible et vous transfère {damage} points de vie chaque seconde pendant 5 s.',
+          'Draine la vie de la cible et vous transfère 7 points de vie chaque seconde pendant 5 s.',
         ],
         [
           'fear',
@@ -2558,7 +2558,7 @@ export const classAbilityNames = {
         [
           'arcane_missiles',
           'Dardi Arcani',
-          'Lancia Dardi Arcani contro il nemico, infliggendo {damage} danni Arcani ogni secondo per 3 s.',
+          'Lancia Dardi Arcani contro il nemico, infliggendo 8 danni Arcani ogni secondo per 3 s.',
         ],
         [
           'polymorph',
@@ -2622,7 +2622,7 @@ export const classAbilityNames = {
         [
           'stealth',
           'Furtività',
-          'Ti nasconde nelle ombre: i nemici ti notano appena, ma ti muovi il 30% più lentamente. Attaccare o subire danni interrompe Furtività. Lanciala di nuovo per uscire.',
+          'Ti nasconde nelle ombre: i nemici ti notano appena, ma ti muovi il 50% più lentamente. Attaccare o subire danni interrompe Furtività. Lanciala di nuovo per uscire.',
         ],
         [
           'adrenaline_rush',
@@ -2662,7 +2662,7 @@ export const classAbilityNames = {
         [
           'vanish',
           'Eclissarsi',
-          'Scompari dalla vista, entrando in Furtività anche in combattimento. Ti muovi il 30% più lentamente mentre sei nascosto. Dura fino a 10 sec.',
+          'Scompari dalla vista, entrando in Furtività anche in combattimento. Ti muovi il 50% più lentamente mentre sei nascosto. Dura fino a 10 sec.',
         ],
         [
           'instant_poison',
@@ -2808,7 +2808,7 @@ export const classAbilityNames = {
         [
           'mind_flay',
           'Flagello Mentale',
-          "Assale la mente del bersaglio con energia d'Ombra, infliggendo {damage} danni ogni secondo per 3 s.",
+          "Assale la mente del bersaglio con energia d'Ombra, infliggendo 12 danni ogni secondo per 3 s.",
         ],
         [
           'flash_heal',
@@ -2891,7 +2891,7 @@ export const classAbilityNames = {
         [
           'drain_life',
           'Risucchio di Vita',
-          'Risucchia la vita del bersaglio, trasferendoti {damage} salute ogni secondo per 5 s.',
+          'Risucchia la vita del bersaglio, trasferendoti 7 salute ogni secondo per 5 s.',
         ],
         [
           'fear',
@@ -3163,7 +3163,7 @@ export const classAbilityNames = {
         [
           'arcane_missiles',
           'Arkane Geschosse',
-          'Schleudert Arkane Geschosse auf den Gegner und verursacht 3 Sek. lang jede Sekunde {damage} Arkanschaden.',
+          'Schleudert Arkane Geschosse auf den Gegner und verursacht 3 Sek. lang jede Sekunde 8 Arkanschaden.',
         ],
         [
           'polymorph',
@@ -3231,7 +3231,7 @@ export const classAbilityNames = {
         [
           'stealth',
           'Verstohlenheit',
-          'Verbirgt euch in den Schatten: Gegner bemerken euch kaum, aber ihr bewegt euch 30% langsamer. Angreifen oder Schaden erleiden bricht Verstohlenheit. Erneut wirken, um hervorzutreten.',
+          'Verbirgt euch in den Schatten: Gegner bemerken euch kaum, aber ihr bewegt euch 50% langsamer. Angreifen oder Schaden erleiden bricht Verstohlenheit. Erneut wirken, um hervorzutreten.',
         ],
         [
           'adrenaline_rush',
@@ -3271,7 +3271,7 @@ export const classAbilityNames = {
         [
           'vanish',
           'Verschwinden',
-          'Verschwindet aus dem Blickfeld und tretet selbst im Kampf in Verstohlenheit. Ihr bewegt euch 30% langsamer, solange ihr verborgen seid. Hält bis zu 10 Sek. an.',
+          'Verschwindet aus dem Blickfeld und tretet selbst im Kampf in Verstohlenheit. Ihr bewegt euch 50% langsamer, solange ihr verborgen seid. Hält bis zu 10 Sek. an.',
         ],
         [
           'instant_poison',
@@ -3429,7 +3429,7 @@ export const classAbilityNames = {
         [
           'mind_flay',
           'Gedankenschinden',
-          'Greift den Geist des Ziels mit Schattenenergie an und verursacht 3 Sek. lang jede Sekunde {damage} Schaden.',
+          'Greift den Geist des Ziels mit Schattenenergie an und verursacht 3 Sek. lang jede Sekunde 12 Schaden.',
         ],
         [
           'flash_heal',
@@ -3508,7 +3508,7 @@ export const classAbilityNames = {
         [
           'drain_life',
           'Blutsauger',
-          'Entzieht dem Ziel Leben und überträgt euch 5 Sek. lang jede Sekunde {damage} Gesundheit.',
+          'Entzieht dem Ziel Leben und überträgt euch 5 Sek. lang jede Sekunde 7 Gesundheit.',
         ],
         [
           'fear',
@@ -3729,11 +3729,7 @@ export const classAbilityNames = {
         ['conjure_water', '造水术', '制造 2 瓶水，饮用后恢复法力。更高等级可制造更纯净的水。'],
         ['conjure_food', '造食术', '制造 2 份面包，食用后恢复生命值。更高等级可制造更丰盛的食物。'],
         ['fire_blast', '火焰冲击', '冲击敌人，造成 {damage} 点火焰伤害。瞬发。'],
-        [
-          'arcane_missiles',
-          '奥术飞弹',
-          '向敌人发射奥术飞弹，持续 3 秒，每秒造成 {damage} 点奥术伤害。',
-        ],
+        ['arcane_missiles', '奥术飞弹', '向敌人发射奥术飞弹，持续 3 秒，每秒造成 8 点奥术伤害。'],
         [
           'polymorph',
           '变形术',
@@ -3772,7 +3768,7 @@ export const classAbilityNames = {
         [
           'stealth',
           '潜行',
-          '将你隐藏在阴影中：敌人几乎无法察觉你，但你的移动速度降低 30%。攻击或受到伤害会打破潜行。再次施放可现身。',
+          '将你隐藏在阴影中：敌人几乎无法察觉你，但你的移动速度降低 50%。攻击或受到伤害会打破潜行。再次施放可现身。',
         ],
         ['adrenaline_rush', '冲动', '热血沸腾，立即恢复 60 点能量。'],
         [
@@ -3796,7 +3792,7 @@ export const classAbilityNames = {
         [
           'vanish',
           '消失',
-          '从视野中消失，即使在战斗中也能进入潜行状态。隐身时你的移动速度降低 30%。持续最多 10 秒。',
+          '从视野中消失，即使在战斗中也能进入潜行状态。隐身时你的移动速度降低 50%。持续最多 10 秒。',
         ],
         [
           'instant_poison',
@@ -3867,11 +3863,7 @@ export const classAbilityNames = {
         ['renew', '恢复', '在 15 秒内为目标恢复 {damage} 点生命值。'],
         ['mind_blast', '心灵震爆', '震击目标的心灵，造成 {damage} 点暗影伤害。'],
         ['heal', '治疗术', '缓慢但强大的祈祷，为一个友方目标恢复 {damage} 点生命值。'],
-        [
-          'mind_flay',
-          '精神鞭笞',
-          '用暗影能量攻击目标的心灵，持续 3 秒，每秒造成 {damage} 点伤害。',
-        ],
+        ['mind_flay', '精神鞭笞', '用暗影能量攻击目标的心灵，持续 3 秒，每秒造成 12 点伤害。'],
         ['flash_heal', '快速治疗', '快速祈祷，为一个友方目标恢复 {damage} 点生命值。'],
         ['lightning_bolt', '闪电箭', '投掷一道闪电，造成 {damage} 点自然伤害。'],
         [
@@ -3910,7 +3902,7 @@ export const classAbilityNames = {
         ['corruption', '腐蚀术', '腐蚀目标，在 18 秒内造成 {damage} 点暗影伤害。'],
         ['life_tap', '生命分流', '将 30 点生命值转化为 30 点法力值。'],
         ['curse_of_agony', '痛苦诅咒', '以痛苦诅咒目标：在 24 秒内造成 {damage} 点暗影伤害。'],
-        ['drain_life', '吸取生命', '吸取目标的生命，持续 5 秒，每秒向你转移 {damage} 点生命值。'],
+        ['drain_life', '吸取生命', '吸取目标的生命，持续 5 秒，每秒向你转移 7 点生命值。'],
         ['fear', '恐惧', '使敌人陷入恐惧并畏缩，最多持续 8 秒。任何伤害都会打破效果。'],
         ['searing_pain', '灼热之痛', '以痛苦烈焰灼烧敌人，造成 {damage} 点火焰伤害。施法迅速。'],
         ['shadowburn', '暗影灼烧', '立即以暗影烈焰轰击目标，造成 {damage} 点暗影伤害。'],
@@ -4054,11 +4046,7 @@ export const classAbilityNames = {
         ['conjure_water', '造水術', '製造 2 瓶水，飲用後恢復法力。更高等級可製造更純淨的水。'],
         ['conjure_food', '造食術', '製造 2 份麵包，食用後恢復生命值。更高等級可製造更豐盛的食物。'],
         ['fire_blast', '火焰衝擊', '衝擊敵人，造成 {damage} 點火焰傷害。瞬發。'],
-        [
-          'arcane_missiles',
-          '秘法飛彈',
-          '向敵人發射秘法飛彈，持續 3 秒，每秒造成 {damage} 點秘法傷害。',
-        ],
+        ['arcane_missiles', '秘法飛彈', '向敵人發射秘法飛彈，持續 3 秒，每秒造成 8 點秘法傷害。'],
         [
           'polymorph',
           '變形術',
@@ -4097,7 +4085,7 @@ export const classAbilityNames = {
         [
           'stealth',
           '潛行',
-          '將你隱藏在陰影中：敵人幾乎無法察覺你，但你的移動速度降低 30%。攻擊或受到傷害會打破潛行。再次施放可現身。',
+          '將你隱藏在陰影中：敵人幾乎無法察覺你，但你的移動速度降低 50%。攻擊或受到傷害會打破潛行。再次施放可現身。',
         ],
         ['adrenaline_rush', '衝動', '熱血沸騰，立即恢復 60 點能量。'],
         [
@@ -4125,7 +4113,7 @@ export const classAbilityNames = {
         [
           'vanish',
           '消失',
-          '從視野中消失，即使在戰鬥中也能進入潛行狀態。隱身時你的移動速度降低 30%。最多持續 10 秒。',
+          '從視野中消失，即使在戰鬥中也能進入潛行狀態。隱身時你的移動速度降低 50%。最多持續 10 秒。',
         ],
         [
           'instant_poison',
@@ -4192,11 +4180,7 @@ export const classAbilityNames = {
         ['renew', '恢復', '在 15 秒內為目標恢復 {damage} 點生命值。'],
         ['mind_blast', '心靈震爆', '震擊目標的心靈，造成 {damage} 點暗影傷害。'],
         ['heal', '治療術', '緩慢但強大的祈禱，為一個友方目標恢復 {damage} 點生命值。'],
-        [
-          'mind_flay',
-          '精神鞭笞',
-          '用暗影能量攻擊目標的心靈，持續 3 秒，每秒造成 {damage} 點傷害。',
-        ],
+        ['mind_flay', '精神鞭笞', '用暗影能量攻擊目標的心靈，持續 3 秒，每秒造成 12 點傷害。'],
         ['flash_heal', '快速治療', '快速祈禱，為一個友方目標恢復 {damage} 點生命值。'],
         ['lightning_bolt', '閃電箭', '投擲一道閃電，造成 {damage} 點自然傷害。'],
         [
@@ -4235,7 +4219,7 @@ export const classAbilityNames = {
         ['corruption', '腐蝕術', '腐蝕目標，在 18 秒內造成 {damage} 點暗影傷害。'],
         ['life_tap', '生命分流', '將 30 點生命值轉化為 30 點法力值。'],
         ['curse_of_agony', '痛苦詛咒', '以痛苦詛咒目標：在 24 秒內造成 {damage} 點暗影傷害。'],
-        ['drain_life', '吸取生命', '吸取目標的生命，持續 5 秒，每秒向你轉移 {damage} 點生命值。'],
+        ['drain_life', '吸取生命', '吸取目標的生命，持續 5 秒，每秒向你轉移 7 點生命值。'],
         ['fear', '恐懼', '使敵人陷入恐懼並畏縮，最多持續 8 秒。任何傷害都會打破效果。'],
         ['searing_pain', '灼熱之痛', '以痛苦烈焰灼燒敵人，造成 {damage} 點火焰傷害。施法迅速。'],
         ['shadowburn', '暗影灼燒', '立即以暗影烈焰轟擊目標，造成 {damage} 點暗影傷害。'],
@@ -4410,7 +4394,7 @@ export const classAbilityNames = {
         [
           'arcane_missiles',
           '신비한 화살',
-          '적에게 신비한 화살을 발사하여 3초 동안 매초 {damage}의 비전 피해를 입힙니다.',
+          '적에게 신비한 화살을 발사하여 3초 동안 매초 8의 비전 피해를 입힙니다.',
         ],
         [
           'polymorph',
@@ -4470,7 +4454,7 @@ export const classAbilityNames = {
         [
           'stealth',
           '은신',
-          '그림자 속에 몸을 숨깁니다. 적이 거의 알아차리지 못하지만 이동 속도가 30% 감소합니다. 공격하거나 피해를 받으면 은신이 해제됩니다. 다시 시전하면 모습을 드러냅니다.',
+          '그림자 속에 몸을 숨깁니다. 적이 거의 알아차리지 못하지만 이동 속도가 50% 감소합니다. 공격하거나 피해를 받으면 은신이 해제됩니다. 다시 시전하면 모습을 드러냅니다.',
         ],
         ['adrenaline_rush', '아드레날린 촉진', '피가 끓어올라 즉시 기력 60을 회복합니다.'],
         [
@@ -4506,7 +4490,7 @@ export const classAbilityNames = {
         [
           'vanish',
           '소멸',
-          '시야에서 사라져 전투 중에도 은신 상태가 됩니다. 숨어 있는 동안 이동 속도가 30% 감소합니다. 최대 10초 동안 지속됩니다.',
+          '시야에서 사라져 전투 중에도 은신 상태가 됩니다. 숨어 있는 동안 이동 속도가 50% 감소합니다. 최대 10초 동안 지속됩니다.',
         ],
         [
           'instant_poison',
@@ -4620,7 +4604,7 @@ export const classAbilityNames = {
         [
           'mind_flay',
           '정신의 채찍',
-          '암흑 에너지로 대상의 정신을 공격해 3초 동안 매초 {damage}의 피해를 입힙니다.',
+          '암흑 에너지로 대상의 정신을 공격해 3초 동안 매초 12의 피해를 입힙니다.',
         ],
         ['flash_heal', '순간 치유', '빠른 기도로 아군 대상의 생명력을 {damage}만큼 회복시킵니다.'],
         ['lightning_bolt', '번개 화살', '번개 화살을 던져 {damage}의 자연 피해를 입힙니다.'],
@@ -4687,7 +4671,7 @@ export const classAbilityNames = {
         [
           'drain_life',
           '생명력 흡수',
-          '대상의 생명력을 흡수해 5초 동안 매초 {damage}의 생명력을 자신에게 이전합니다.',
+          '대상의 생명력을 흡수해 5초 동안 매초 7의 생명력을 자신에게 이전합니다.',
         ],
         [
           'fear',
@@ -4927,7 +4911,7 @@ export const classAbilityNames = {
         [
           'arcane_missiles',
           'アーケインミサイル',
-          '敵にアーケインミサイルを放ち、3秒間、毎秒{damage}の秘術ダメージを与えます。',
+          '敵にアーケインミサイルを放ち、3秒間、毎秒8の秘術ダメージを与えます。',
         ],
         [
           'polymorph',
@@ -4991,7 +4975,7 @@ export const classAbilityNames = {
         [
           'stealth',
           'ステルス',
-          '影に身を隠します。敵にほとんど気づかれませんが、移動速度が30%低下します。攻撃するかダメージを受けるとステルスが解除されます。再度使用すると姿を現します。',
+          '影に身を隠します。敵にほとんど気づかれませんが、移動速度が50%低下します。攻撃するかダメージを受けるとステルスが解除されます。再度使用すると姿を現します。',
         ],
         [
           'adrenaline_rush',
@@ -5031,7 +5015,7 @@ export const classAbilityNames = {
         [
           'vanish',
           'ヴァニッシュ',
-          '視界から消え、戦闘中でもステルス状態に入ります。隠れている間は移動速度が30%低下します。最大10秒間持続します。',
+          '視界から消え、戦闘中でもステルス状態に入ります。隠れている間は移動速度が50%低下します。最大10秒間持続します。',
         ],
         [
           'instant_poison',
@@ -5153,7 +5137,7 @@ export const classAbilityNames = {
         [
           'mind_flay',
           'マインドフレイ',
-          '暗黒エネルギーで対象の精神を攻撃し、3秒間、毎秒{damage}ダメージを与えます。',
+          '暗黒エネルギーで対象の精神を攻撃し、3秒間、毎秒12ダメージを与えます。',
         ],
         ['flash_heal', 'フラッシュヒール', '素早い祈りで味方対象の体力を {damage} 回復します。'],
         [
@@ -5228,7 +5212,7 @@ export const classAbilityNames = {
         [
           'drain_life',
           'ドレインライフ',
-          '対象の生命力を吸収し、5秒間、毎秒{damage}の体力を自分に移します。',
+          '対象の生命力を吸収し、5秒間、毎秒7の体力を自分に移します。',
         ],
         [
           'fear',
@@ -5480,7 +5464,7 @@ export const classAbilityNames = {
         [
           'arcane_missiles',
           'Mísseis Arcanos',
-          'Lança Mísseis Arcanos no inimigo, causando {damage} de dano Arcano a cada segundo por 3 s.',
+          'Lança Mísseis Arcanos no inimigo, causando 8 de dano Arcano a cada segundo por 3 s.',
         ],
         [
           'polymorph',
@@ -5548,7 +5532,7 @@ export const classAbilityNames = {
         [
           'stealth',
           'Furtividade',
-          'Esconde você nas sombras: inimigos mal percebem você, mas você se move 30% mais devagar. Atacar ou sofrer dano quebra Furtividade. Lance de novo para sair.',
+          'Esconde você nas sombras: inimigos mal percebem você, mas você se move 50% mais devagar. Atacar ou sofrer dano quebra Furtividade. Lance de novo para sair.',
         ],
         [
           'adrenaline_rush',
@@ -5588,7 +5572,7 @@ export const classAbilityNames = {
         [
           'vanish',
           'Desaparecer',
-          'Some de vista, entrando em modo furtivo mesmo em combate. Você se move 30% mais devagar enquanto escondido. Dura até 10 s.',
+          'Some de vista, entrando em modo furtivo mesmo em combate. Você se move 50% mais devagar enquanto escondido. Dura até 10 s.',
         ],
         [
           'instant_poison',
@@ -5726,7 +5710,7 @@ export const classAbilityNames = {
         [
           'mind_flay',
           'Açoite Mental',
-          'Assalta a mente do alvo com energia de Sombra, causando {damage} de dano por segundo durante 3 s.',
+          'Assalta a mente do alvo com energia de Sombra, causando 12 de dano por segundo durante 3 s.',
         ],
         ['flash_heal', 'Cura Rápida', 'Uma prece rápida que cura um alvo aliado em {damage}.'],
         ['lightning_bolt', 'Raio', 'Arremessa um raio que causa {damage} de dano de Natureza.'],
@@ -5801,7 +5785,7 @@ export const classAbilityNames = {
         [
           'drain_life',
           'Drenar Vida',
-          'Drena a vida do alvo, transferindo {damage} de vida para você a cada segundo por 5 s.',
+          'Drena a vida do alvo, transferindo 7 de vida para você a cada segundo por 5 s.',
         ],
         [
           'fear',
@@ -6069,7 +6053,7 @@ export const classAbilityNames = {
         [
           'arcane_missiles',
           'Чародейские стрелы',
-          'Выпускает в противника Чародейские стрелы, наносящие {damage} ед. урона от тайной магии каждую секунду в течение 3 сек.',
+          'Выпускает в противника Чародейские стрелы, наносящие 8 ед. урона от тайной магии каждую секунду в течение 3 сек.',
         ],
         [
           'polymorph',
@@ -6137,7 +6121,7 @@ export const classAbilityNames = {
         [
           'stealth',
           'Незаметность',
-          'Скрывает вас в тенях: враги почти не замечают вас, но вы двигаетесь на 30% медленнее. Атака или получение урона прерывает Незаметность. Примените снова, чтобы выйти.',
+          'Скрывает вас в тенях: враги почти не замечают вас, но вы двигаетесь на 50% медленнее. Атака или получение урона прерывает Незаметность. Примените снова, чтобы выйти.',
         ],
         [
           'adrenaline_rush',
@@ -6177,7 +6161,7 @@ export const classAbilityNames = {
         [
           'vanish',
           'Исчезновение',
-          'Исчезает из виду, входя в незаметность даже в бою. Пока вы скрыты, вы двигаетесь на 30% медленнее. Длится до 10 сек.',
+          'Исчезает из виду, входя в незаметность даже в бою. Пока вы скрыты, вы двигаетесь на 50% медленнее. Длится до 10 сек.',
         ],
         [
           'instant_poison',
@@ -6331,7 +6315,7 @@ export const classAbilityNames = {
         [
           'mind_flay',
           'Пытка разума',
-          'Терзает разум цели темной энергией, нанося {damage} ед. урона каждую секунду в течение 3 сек.',
+          'Терзает разум цели темной энергией, нанося 12 ед. урона каждую секунду в течение 3 сек.',
         ],
         [
           'flash_heal',
@@ -6414,7 +6398,7 @@ export const classAbilityNames = {
         [
           'drain_life',
           'Похищение жизни',
-          'Похищает жизнь цели, передавая вам {damage} здоровья каждую секунду в течение 5 сек.',
+          'Похищает жизнь цели, передавая вам 7 здоровья каждую секунду в течение 5 сек.',
         ],
         [
           'fear',

@@ -8,9 +8,9 @@
 import { describe, expect, it } from 'vitest';
 import { type FctSpawnShape, fctSpawnShape } from '../src/ui/fct_event';
 
-describe('fctSpawnShape: damage avoidance (miss/dodge)', () => {
-  it('miss/dodge always float; isSelf tracks isPlayerTarget; never crit', () => {
-    for (const damageKind of ['miss', 'dodge'] as const) {
+describe('fctSpawnShape: damage avoidance (miss/dodge/resist)', () => {
+  it('miss/dodge/resist always float; isSelf tracks isPlayerTarget; never crit', () => {
+    for (const damageKind of ['miss', 'dodge', 'resist'] as const) {
       // player is the target -> isSelf true (the #bbb self colour token)
       expect(
         fctSpawnShape({

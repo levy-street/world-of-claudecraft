@@ -138,6 +138,28 @@ describe('dungeons: empty-instance reset', () => {
   });
 });
 
+describe('dungeons: concurrent-instance capacity', () => {
+  it('more than six solo parties can hold their own Hollow Crypt instance at once', () => {
+    const sim = makeSim();
+    const PARTIES = 8; // was capped at 6 concurrent instances before the bump
+    for (let i = 0; i < PARTIES; i++) {
+      const pid = sim.addPlayer('warrior', `Solo${i}`);
+      sim.drainEvents();
+      enterDungeon(sim.ctx, 'hollow_crypt', pid);
+      const events = sim.drainEvents() as any[];
+      expect(
+        events.some((e) => e.type === 'error' && /All instances of .* are busy/.test(e.text ?? '')),
+      ).toBe(false);
+    }
+    const claimed = (sim.instances as any[]).filter(
+      (i) => i.dungeonId === 'hollow_crypt' && i.partyKey !== null,
+    );
+    expect(claimed.length).toBe(PARTIES);
+    // every claimed party landed in a distinct slot (no double-booking)
+    expect(new Set(claimed.map((i) => i.slot)).size).toBe(PARTIES);
+  });
+});
+
 describe('dungeons: raid lockout gate', () => {
   function attunedRaid(sim: AnySim): number {
     const leader = sim.addPlayer('warrior', 'Lead');

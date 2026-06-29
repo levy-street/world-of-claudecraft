@@ -1,18 +1,27 @@
 import * as THREE from 'three';
-import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import {
-  CAMPS, DUNGEON_X_THRESHOLD, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z, ZONES,
+  CAMPS,
+  DUNGEON_X_THRESHOLD,
+  WORLD_MAX_X,
+  WORLD_MAX_Z,
+  WORLD_MIN_Z,
+  ZONES,
 } from '../sim/data';
 import type { BiomeId } from '../sim/types';
-import {
-  generateDecorations, roadDistance, terrainHeight, zoneBiomeAt, WATER_LEVEL,
-} from '../sim/world';
 import type { Decoration } from '../sim/world';
-import { configureMaskedDoubleSidedVegetationMaterial, GFX, sharedUniforms } from './gfx';
-import { grassTuftTexture } from './textures';
+import {
+  generateDecorations,
+  roadDistance,
+  terrainHeight,
+  WATER_LEVEL,
+  zoneBiomeAt,
+} from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
+import { configureMaskedDoubleSidedVegetationMaterial, GFX, sharedUniforms } from './gfx';
+import { grassTuftTexture } from './textures';
 
 // Vegetation: trees, rocks, ground dressing and the grass ring.
 //
@@ -90,7 +99,11 @@ const MODEL_URLS = GFX.leanFoliage ? FOLIAGE_MODEL_URLS_LOW : FOLIAGE_MODEL_URLS
 const loadedModels = new Map<string, GLTF>();
 for (const urls of Object.values(MODEL_URLS)) {
   for (const url of urls) {
-    registerPreload(loadGltf(url).then((g) => { loadedModels.set(url, g); }));
+    registerPreload(
+      loadGltf(url).then((g) => {
+        loadedModels.set(url, g);
+      }),
+    );
   }
 }
 
@@ -122,9 +135,14 @@ export interface FoliageView {
   group: THREE.Group;
   /** per-frame: grass fade + ring rebuild, fog culling of far tree buckets */
   update(
-    px: number, pz: number,
-    camX: number, camY: number, camZ: number,
-    eyeX: number, eyeY: number, eyeZ: number,
+    px: number,
+    pz: number,
+    camX: number,
+    camY: number,
+    camZ: number,
+    eyeX: number,
+    eyeY: number,
+    eyeZ: number,
     fogFar: number,
   ): void;
   setGrassQuality(level: number): void;
@@ -182,9 +200,16 @@ interface BucketMesh {
   triangles: number;
 }
 
-function drawCountFor(material: THREE.Material | THREE.Material[], geometry?: THREE.BufferGeometry): number {
-  if (Array.isArray(material)) return Math.max(1, geometry?.groups.length ? geometry.groups.length : material.length);
-  return Math.max(1, geometry?.groups.length && geometry.groups.length > 0 ? geometry.groups.length : 1);
+function drawCountFor(
+  material: THREE.Material | THREE.Material[],
+  geometry?: THREE.BufferGeometry,
+): number {
+  if (Array.isArray(material))
+    return Math.max(1, geometry?.groups.length ? geometry.groups.length : material.length);
+  return Math.max(
+    1,
+    geometry?.groups.length && geometry.groups.length > 0 ? geometry.groups.length : 1,
+  );
 }
 
 function triangleCountFor(geometry?: THREE.BufferGeometry): number {
@@ -229,11 +254,23 @@ interface LodDists {
   rockFar: number;
   treeFillFar: number;
 }
-const LOD_HIGH: LodDists = { barkFar: 330, treeDetailFar: 300, dressFar: 200, rockFar: 360, treeFillFar: 310 };
+const LOD_HIGH: LodDists = {
+  barkFar: 330,
+  treeDetailFar: 300,
+  dressFar: 200,
+  rockFar: 360,
+  treeFillFar: 310,
+};
 // low caps must clear the worst camera-to-bucket-CENTRE distance (~158u for a
 // 2-column x 240u-band bucket) or nearby dressing vanishes and trunks pop at
 // bucket boundaries — the windows test bucket centres, not instances
-const LOD_LOW: LodDists = { barkFar: 170, treeDetailFar: 250, dressFar: 185, rockFar: 190, treeFillFar: 245 };
+const LOD_LOW: LodDists = {
+  barkFar: 170,
+  treeDetailFar: 250,
+  dressFar: 185,
+  rockFar: 190,
+  treeFillFar: 245,
+};
 function lodDists(): LodDists {
   return GFX.leanFoliage ? LOD_LOW : LOD_HIGH;
 }
@@ -247,10 +284,15 @@ function addWind(mat: THREE.Material, strength: number): void {
     sh.uniforms.uTime = sharedUniforms.uTime;
     sh.uniforms.uWindStrength = { value: strength };
     sh.vertexShader = sh.vertexShader
-      .replace('#include <common>', `#include <common>
+      .replace(
+        '#include <common>',
+        `#include <common>
         uniform float uTime;
-        uniform float uWindStrength;`)
-      .replace('#include <begin_vertex>', `#include <begin_vertex>
+        uniform float uWindStrength;`,
+      )
+      .replace(
+        '#include <begin_vertex>',
+        `#include <begin_vertex>
         #ifdef USE_INSTANCING
           float windPhase = instanceMatrix[3][0] * 0.15 + instanceMatrix[3][2] * 0.17;
         #else
@@ -259,7 +301,8 @@ function addWind(mat: THREE.Material, strength: number): void {
         float windAmt = (sin(uTime * 1.7 + windPhase) + 0.5 * sin(uTime * 3.1 + windPhase * 1.3))
           * uWindStrength * smoothstep(0.0, 1.0, transformed.y);
         transformed.x += windAmt;
-        transformed.z += windAmt * 0.6;`);
+        transformed.z += windAmt * 0.6;`,
+      );
   };
 }
 
@@ -312,8 +355,11 @@ function foliageMaterial(src: THREE.Material, hasVertexColors: boolean): THREE.M
   };
   const mat = GFX.standardMaterials
     ? new THREE.MeshStandardMaterial({
-      ...common, normalMap: std.normalMap, roughness: pol.roughness, metalness: 0,
-    })
+        ...common,
+        normalMap: std.normalMap,
+        roughness: pol.roughness,
+        metalness: 0,
+      })
     : new THREE.MeshLambertMaterial(common);
   if (pol.windMul > 0) addWind(mat, TREE_WIND_STRENGTH * pol.windMul);
   materialCache.set(src.name, mat);
@@ -324,7 +370,9 @@ function foliageMaterial(src: THREE.Material, hasVertexColors: boolean): THREE.M
 // normalized integer attributes with a dequantization node transform. Bake
 // everything to float32 + world space once so geometries can be shared by
 // InstancedMeshes and merged into clusters without overflow.
-function toFloatAttribute(attr: THREE.BufferAttribute | THREE.InterleavedBufferAttribute): THREE.BufferAttribute {
+function toFloatAttribute(
+  attr: THREE.BufferAttribute | THREE.InterleavedBufferAttribute,
+): THREE.BufferAttribute {
   const out = new Float32Array(attr.count * attr.itemSize);
   for (let i = 0; i < attr.count; i++) {
     for (let j = 0; j < attr.itemSize; j++) out[i * attr.itemSize + j] = attr.getComponent(i, j);
@@ -386,7 +434,12 @@ function bakeTopTint(geo: THREE.BufferGeometry, tint: THREE.Color): THREE.Buffer
 // from world position
 const tmpWhite = new THREE.Color(1, 1, 1);
 function softTint(
-  x: number, z: number, hex: number, out: THREE.Color, soften: number, jitter = 1,
+  x: number,
+  z: number,
+  hex: number,
+  out: THREE.Color,
+  soften: number,
+  jitter = 1,
 ): THREE.Color {
   out.setHex(hex).lerp(tmpWhite, soften);
   out.offsetHSL(
@@ -403,7 +456,13 @@ function softTint(
 
 // deterministic per-bucket subset of model variants: rotating start + stride
 // (variant counts are 3/5, both coprime with every stride < count)
-function variantSubset(count: number, total: number, band: number, col: number, salt: number): number[] {
+function variantSubset(
+  count: number,
+  total: number,
+  band: number,
+  col: number,
+  salt: number,
+): number[] {
   const n = Math.min(count, total);
   const start = Math.floor(hashAt(band, col, salt) * total);
   const stride = total <= n ? 1 : 1 + Math.floor(hashAt(band, col, salt + 1) * (total - 1));
@@ -461,13 +520,14 @@ function farTreeProxyGeo(shape: SpeciesSpec['proxyShape']): THREE.BufferGeometry
 function farTreeProxyMaterial(shape: SpeciesSpec['proxyShape']): THREE.Material {
   const cached = farTreeProxyMatCache.get(shape);
   if (cached) return cached;
-  const fallback = shape === 'dead'
-    ? 0xbca784
-    : shape === 'pine'
-      ? 0xb8d7a5
-      : shape === 'twisted'
-        ? 0xb7cda0
-        : 0xc0d8a8;
+  const fallback =
+    shape === 'dead'
+      ? 0xbca784
+      : shape === 'pine'
+        ? 0xb8d7a5
+        : shape === 'twisted'
+          ? 0xb7cda0
+          : 0xc0d8a8;
   const mat = new THREE.MeshLambertMaterial({
     color: fallback,
     vertexColors: true,
@@ -476,6 +536,67 @@ function farTreeProxyMaterial(shape: SpeciesSpec['proxyShape']): THREE.Material 
   mat.name = `foliage:far-${shape}`;
   farTreeProxyMatCache.set(shape, mat);
   return mat;
+}
+
+// Compile every foliage shader program up front. The renderer streams its tree /
+// rock buckets in as the player moves, so a species (or its far-impostor) whose
+// buckets are not near spawn otherwise links its shader the first time you walk
+// into it: the open-world travel hitch. We instantiate one mesh per distinct
+// foliage material using the REAL extracted geometry and the same per-mesh state
+// the live buckets use, so compileAsync links the exact program by cache key.
+// Three pitfalls matter, all learned from real-GPU freeze logging:
+//   - real geometry, not a dummy plane: the program key depends on the geometry's
+//     attributes (a normal-mapped ultra material needs TANGENTS; a dummy plane has
+//     none, so its program differs and the live bucket recompiles);
+//   - instanceColor: every live bucket tints per instance (setColorAt ->
+//     USE_INSTANCING_COLOR);
+//   - castShadow: ultra renders a shadow pass, so the depth/shadow program variant
+//     must compile too.
+// Caller adds the group to the scene before the compile pass and removes it after.
+// (Grass compiles at spawn via the player-centred ring, so it is not duplicated.)
+export function buildFoliageMaterialPrewarmGroup(): THREE.Group {
+  const group = new THREE.Group();
+  group.name = 'foliage-material-prewarm';
+  group.position.set(0, -1000, 0); // off-screen; compileAsync ignores position
+  const identity = new THREE.Matrix4();
+  const white = new THREE.Color(1, 1, 1);
+  const seen = new Set<THREE.Material>();
+  const add = (geo: THREE.BufferGeometry, mat: THREE.Material): void => {
+    if (seen.has(mat)) return;
+    seen.add(mat);
+    const im = new THREE.InstancedMesh(geo, mat, 1);
+    im.setMatrixAt(0, identity);
+    im.setColorAt(0, white);
+    im.instanceMatrix.needsUpdate = true;
+    if (im.instanceColor) im.instanceColor.needsUpdate = true;
+    im.castShadow = true;
+    im.receiveShadow = true;
+    im.frustumCulled = false;
+    group.add(im);
+  };
+  // One mesh per material, keyed on the real per-species extracted parts so the
+  // geometry attributes (uv / normal / tangent / color) match the live buckets.
+  const speciesUrls = [
+    ...MODEL_URLS.pine,
+    ...MODEL_URLS.oak,
+    ...MODEL_URLS.twisted,
+    ...MODEL_URLS.dead,
+    ...MODEL_URLS.rock,
+    MODEL_URLS.bush[0],
+    MODEL_URLS.bushFlowers[0],
+    MODEL_URLS.fern[0],
+    MODEL_URLS.mushroom[0],
+  ];
+  for (const url of speciesUrls) {
+    for (const part of extractParts(url)) add(part.geometry, part.material);
+  }
+  // Far-tree impostors (gated exactly like the live tree builder).
+  if (GFX.standardMaterials && !GFX.leanFoliage) {
+    for (const shape of ['pine', 'round', 'twisted', 'dead'] as const) {
+      add(farTreeProxyGeo(shape), farTreeProxyMaterial(shape));
+    }
+  }
+  return group;
 }
 
 // far-LOD stand-in for a straight trunk: an open tapered cylinder sized from
@@ -500,14 +621,17 @@ function farTrunkGeo(barkGeo: THREE.BufferGeometry): THREE.BufferGeometry {
 
 // second InstancedMesh sharing another's instance matrices/colors
 function cloneInstancedTo(
-  src: THREE.InstancedMesh, geometry: THREE.BufferGeometry, material: THREE.Material,
+  src: THREE.InstancedMesh,
+  geometry: THREE.BufferGeometry,
+  material: THREE.Material,
 ): THREE.InstancedMesh {
   const out = new THREE.InstancedMesh(geometry, material, src.count);
   (out.instanceMatrix.array as Float32Array).set(src.instanceMatrix.array as Float32Array);
   out.instanceMatrix.needsUpdate = true;
   if (src.instanceColor) {
     out.instanceColor = new THREE.InstancedBufferAttribute(
-      (src.instanceColor.array as Float32Array).slice(), 3,
+      (src.instanceColor.array as Float32Array).slice(),
+      3,
     );
     out.instanceColor.needsUpdate = true;
   }
@@ -542,15 +666,31 @@ function makeShadowOnlyMaterial(src: THREE.Material): THREE.Material {
 }
 
 function placeSpecies(
-  parent: THREE.Group, seed: number, bucket: Bucket, items: Decoration[],
-  spec: SpeciesSpec, register: (mesh: THREE.InstancedMesh, lod: BucketMesh['lod'], minDist?: number, maxDist?: number) => void,
+  parent: THREE.Group,
+  seed: number,
+  bucket: Bucket,
+  items: Decoration[],
+  spec: SpeciesSpec,
+  register: (
+    mesh: THREE.InstancedMesh,
+    lod: BucketMesh['lod'],
+    minDist?: number,
+    maxDist?: number,
+  ) => void,
   hideRegistry: TreeHideable[],
 ): void {
   if (items.length === 0) return;
-  const subset = variantSubset(spec.perBucket, spec.sets.length, bucket.band, bucket.col, spec.salt);
+  const subset = variantSubset(
+    spec.perBucket,
+    spec.sets.length,
+    bucket.band,
+    bucket.col,
+    spec.salt,
+  );
   const groups: Decoration[][] = subset.map(() => []);
   for (const d of items) {
-    const pick = (d.variant + Math.floor(hashAt(d.x, d.z, spec.salt + 2) * subset.length)) % subset.length;
+    const pick =
+      (d.variant + Math.floor(hashAt(d.x, d.z, spec.salt + 2) * subset.length)) % subset.length;
     groups[pick].push(d);
   }
   groups.forEach((list, gi) => {
@@ -593,10 +733,22 @@ function placeSpecies(
           q.setFromAxisAngle(up, d.variant * 2.1 + hashAt(d.x, d.z, 11) * Math.PI * 2);
           m.compose(v.set(d.x, y - spec.sink * s, d.z), q, sv.set(s, s, s));
           proxy.setMatrixAt(i, m);
-          const tintHex = spec.proxyShape === 'dead'
-            ? TRUNK_TINT[d.biome]
-            : typeof spec.leafTint === 'number' ? spec.leafTint : spec.leafTint[d.biome];
-          proxy.setColorAt(i, softTint(d.x, d.z, tintHex, c, spec.proxyShape === 'dead' ? BARK_TINT_SOFTEN : LEAF_TINT_SOFTEN));
+          const tintHex =
+            spec.proxyShape === 'dead'
+              ? TRUNK_TINT[d.biome]
+              : typeof spec.leafTint === 'number'
+                ? spec.leafTint
+                : spec.leafTint[d.biome];
+          proxy.setColorAt(
+            i,
+            softTint(
+              d.x,
+              d.z,
+              tintHex,
+              c,
+              spec.proxyShape === 'dead' ? BARK_TINT_SOFTEN : LEAF_TINT_SOFTEN,
+            ),
+          );
         });
         if (proxy.instanceColor) proxy.instanceColor.needsUpdate = true;
         proxy.receiveShadow = true;
@@ -630,13 +782,11 @@ function placeSpecies(
         im.castShadow = false;
         im.receiveShadow = true;
         parent.add(im);
-        const cullBark = GFX.standardMaterials && !part.isLeaf && (spec.cullBarkFar || spec.farTrunkProxy);
-        const detailMaxDist = group.maxDist === undefined
-          ? treeDetailFar
-          : Math.min(group.maxDist, treeDetailFar);
-        const maxDist = cullBark
-          ? Math.min(detailMaxDist, barkFar)
-          : detailMaxDist;
+        const cullBark =
+          GFX.standardMaterials && !part.isLeaf && (spec.cullBarkFar || spec.farTrunkProxy);
+        const detailMaxDist =
+          group.maxDist === undefined ? treeDetailFar : Math.min(group.maxDist, treeDetailFar);
+        const maxDist = cullBark ? Math.min(detailMaxDist, barkFar) : detailMaxDist;
         register(im, group.lod, undefined, maxDist === Infinity ? undefined : maxDist);
         if (GFX.standardMaterials && !GFX.leanFoliage && castsShadow) {
           const shadow = cloneInstancedTo(im, part.geometry, makeShadowOnlyMaterial(part.material));
@@ -645,7 +795,12 @@ function placeSpecies(
           parent.add(shadow);
           register(shadow, 'shadow', undefined, maxDist === Infinity ? undefined : maxDist);
         }
-        if (GFX.standardMaterials && !part.isLeaf && spec.farTrunkProxy && detailMaxDist > barkFar) {
+        if (
+          GFX.standardMaterials &&
+          !part.isLeaf &&
+          spec.farTrunkProxy &&
+          detailMaxDist > barkFar
+        ) {
           const proxy = cloneInstancedTo(im, farTrunkGeo(part.geometry), part.material);
           proxy.receiveShadow = true;
           for (let i = 0; i < group.items.length; i++) {
@@ -665,16 +820,25 @@ function placeSpecies(
   });
 }
 
-function buildTrees(parent: THREE.Group, seed: number, registry: BucketMesh[], hideRegistry: TreeHideable[]): void {
+function buildTrees(
+  parent: THREE.Group,
+  seed: number,
+  registry: BucketMesh[],
+  hideRegistry: TreeHideable[],
+): void {
   const decos = generateDecorations(seed);
   const sourceDecos = !GFX.leanFoliage
     ? decos
     : decos.filter((d) => {
-      const keep = GFX.standardMaterials
-        ? d.kind === 'rock' ? 0.74 : 0.68
-        : d.kind === 'rock' ? 0.55 : 0.46;
-      return hashAt(d.x, d.z, 83) < keep;
-    });
+        const keep = GFX.standardMaterials
+          ? d.kind === 'rock'
+            ? 0.74
+            : 0.68
+          : d.kind === 'rock'
+            ? 0.55
+            : 0.46;
+        return hashAt(d.x, d.z, 83) < keep;
+      });
   const buckets = new Map<string, Bucket>();
   for (const d of sourceDecos) {
     const col = d.x < 0 ? 0 : 1;
@@ -693,30 +857,46 @@ function buildTrees(parent: THREE.Group, seed: number, registry: BucketMesh[], h
   const treeVariants = GFX.leanFoliage ? 1 : 2;
   const pineSpec: SpeciesSpec = {
     sets: MODEL_URLS.pine.map(extractParts),
-    perBucket: treeVariants, salt: 51, baseScale: 1.1, sink: 0.05,
-    leafTint: PINE_TINT, castBarkShadow: false,
+    perBucket: treeVariants,
+    salt: 51,
+    baseScale: 1.1,
+    sink: 0.05,
+    leafTint: PINE_TINT,
+    castBarkShadow: false,
     proxyShape: 'pine',
     cullBarkFar: true, // pine canopies start ~2u up: no proxy needed in fog
   };
   const oakSpec: SpeciesSpec = {
     sets: MODEL_URLS.oak.map(extractParts),
-    perBucket: treeVariants, salt: 54, baseScale: 1.15, sink: 0.05,
-    leafTint: OAK_TINT, castBarkShadow: false,
+    perBucket: treeVariants,
+    salt: 54,
+    baseScale: 1.15,
+    sink: 0.05,
+    leafTint: OAK_TINT,
+    castBarkShadow: false,
     proxyShape: 'round',
     farTrunkProxy: true, // oak crowns float without a trunk stand-in
   };
   const twistedSpec: SpeciesSpec = {
     sets: MODEL_URLS.twisted.map(extractParts),
-    perBucket: treeVariants, salt: 57, baseScale: 0.5, sink: 0.05,
+    perBucket: treeVariants,
+    salt: 57,
+    baseScale: 0.5,
+    sink: 0.05,
     // twisted trunks sprawl sideways — no cheap proxy fits, keep them whole
-    leafTint: SWAMP_CANOPY_TINT, castBarkShadow: false,
+    leafTint: SWAMP_CANOPY_TINT,
+    castBarkShadow: false,
     proxyShape: 'twisted',
   };
   const deadSpec: SpeciesSpec = {
     sets: MODEL_URLS.dead.map(extractParts),
-    perBucket: 1, salt: 60, baseScale: 0.7, sink: 0.05,
+    perBucket: 1,
+    salt: 60,
+    baseScale: 0.7,
+    sink: 0.05,
     // dead trees have no canopy — the bark must cast or they go shadowless
-    leafTint: TRUNK_TINT.marsh, castBarkShadow: true,
+    leafTint: TRUNK_TINT.marsh,
+    castBarkShadow: true,
     proxyShape: 'dead',
   };
 
@@ -731,10 +911,17 @@ function buildTrees(parent: THREE.Group, seed: number, registry: BucketMesh[], h
   rockMat.vertexColors = true;
   const colorway = (tint: THREE.Color): THREE.BufferGeometry[] => {
     const singles = rockParts.map((parts) => bakeTopTint(parts[0].geometry.clone(), tint));
-    const member = (gi: number, x: number, y: number, z: number, ry: number, s: number): THREE.BufferGeometry =>
-      singles[gi % singles.length].clone().applyMatrix4(
-        m.compose(v.set(x, y, z), q.setFromAxisAngle(up, ry), sv.set(s, s, s)),
-      );
+    const member = (
+      gi: number,
+      x: number,
+      y: number,
+      z: number,
+      ry: number,
+      s: number,
+    ): THREE.BufferGeometry =>
+      singles[gi % singles.length]
+        .clone()
+        .applyMatrix4(m.compose(v.set(x, y, z), q.setFromAxisAngle(up, ry), sv.set(s, s, s)));
     const cluster = mergeGeometries([
       member(0, -0.55, 0, 0.15, 0.3, 0.85),
       member(1, 0.95, -0.12, 0.45, 1.4, 0.62),
@@ -755,14 +942,18 @@ function buildTrees(parent: THREE.Group, seed: number, registry: BucketMesh[], h
     const deads = swamps.filter((d) => hashAt(d.x, d.z, 19) < 0.35);
     const rocks = items.filter((d) => d.kind === 'rock');
 
-    let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
+    let minX = Infinity,
+      maxX = -Infinity,
+      minZ = Infinity,
+      maxZ = -Infinity;
     for (const d of items) {
       minX = Math.min(minX, d.x);
       maxX = Math.max(maxX, d.x);
       minZ = Math.min(minZ, d.z);
       maxZ = Math.max(maxZ, d.z);
     }
-    const bx = (minX + maxX) / 2, bz = (minZ + maxZ) / 2;
+    const bx = (minX + maxX) / 2,
+      bz = (minZ + maxZ) / 2;
     const bRadius = Math.hypot(maxX - minX, maxZ - minZ) / 2 + 18; // canopy margin
     const register = (
       mesh: THREE.InstancedMesh,
@@ -770,7 +961,16 @@ function buildTrees(parent: THREE.Group, seed: number, registry: BucketMesh[], h
       minDist?: number,
       maxDist?: number,
     ): void => {
-      registry.push({ mesh, x: bx, z: bz, radius: bRadius, minDist, maxDist, lod, ...bucketMeshCost(mesh) });
+      registry.push({
+        mesh,
+        x: bx,
+        z: bz,
+        radius: bRadius,
+        minDist,
+        maxDist,
+        lod,
+        ...bucketMeshCost(mesh),
+      });
     };
 
     placeSpecies(parent, seed, bucket, pines, pineSpec, register, hideRegistry);
@@ -800,7 +1000,9 @@ function buildTrees(parent: THREE.Group, seed: number, registry: BucketMesh[], h
         const rockMesh = new THREE.InstancedMesh(geo, rockMat, list.length);
         list.forEach((r, i) => {
           const y = terrainHeight(r.x, r.z, seed);
-          const h1 = hashAt(r.x, r.z, 8), h2 = hashAt(r.x, r.z, 9), h3 = hashAt(r.x, r.z, 10);
+          const h1 = hashAt(r.x, r.z, 8),
+            h2 = hashAt(r.x, r.z, 9),
+            h3 = hashAt(r.x, r.z, 10);
           // slight tilt + non-uniform scale: one geometry reads as round
           // boulders, low slabs and tall stones depending on the draw
           const sxz1 = r.scale * 0.62 * (0.85 + h2 * 0.5);
@@ -808,7 +1010,9 @@ function buildTrees(parent: THREE.Group, seed: number, registry: BucketMesh[], h
           const maxH = Math.max(sxz1, sxz2);
           const sy = Math.max(r.scale * 0.45 * (0.75 + h3 * 0.5), 0.55 * maxH);
           const tiltAmp = maxH > 0.8 ? 0.12 : 0.26;
-          q.setFromEuler(e.set((h1 - 0.5) * tiltAmp, r.variant * 1.7 + h3 * 2.0, (h2 - 0.5) * tiltAmp));
+          q.setFromEuler(
+            e.set((h1 - 0.5) * tiltAmp, r.variant * 1.7 + h3 * 2.0, (h2 - 0.5) * tiltAmp),
+          );
           // sink so undersides bury on slopes (geometry base is near y=0)
           m.compose(v.set(r.x, y - 0.3 * sy, r.z), q, sv.set(sxz1, sy, sxz2));
           rockMesh.setMatrixAt(i, m);
@@ -866,12 +1070,17 @@ function dressKindFor(biome: BiomeId, r: number): DressKind {
 }
 
 const DRESS_SCALE: Record<DressKind, [number, number]> = {
-  bush: [0.9, 0.7], bushFlowers: [0.9, 0.7], fern: [0.85, 0.6], mushroom: [0.9, 0.8],
+  bush: [0.9, 0.7],
+  bushFlowers: [0.9, 0.7],
+  fern: [0.85, 0.6],
+  mushroom: [0.9, 0.8],
 };
 
 function tooSteep(x: number, z: number, seed: number): boolean {
-  const hx = terrainHeight(x + GRASS_SLOPE_EPS, z, seed) - terrainHeight(x - GRASS_SLOPE_EPS, z, seed);
-  const hz = terrainHeight(x, z + GRASS_SLOPE_EPS, seed) - terrainHeight(x, z - GRASS_SLOPE_EPS, seed);
+  const hx =
+    terrainHeight(x + GRASS_SLOPE_EPS, z, seed) - terrainHeight(x - GRASS_SLOPE_EPS, z, seed);
+  const hz =
+    terrainHeight(x, z + GRASS_SLOPE_EPS, seed) - terrainHeight(x, z - GRASS_SLOPE_EPS, seed);
   return Math.hypot(hx, hz) / (2 * GRASS_SLOPE_EPS) > GRASS_MAX_SLOPE;
 }
 
@@ -890,11 +1099,17 @@ function generateDressing(seed: number): DressingSpot[] {
       const z = gz + (hashAt(gx, gz, 43) - 0.5) * step;
       let blocked = false;
       for (const zone of ZONES) {
-        if (Math.hypot(x - zone.hub.x, z - zone.hub.z) < zone.hub.radius + 4) { blocked = true; break; }
+        if (Math.hypot(x - zone.hub.x, z - zone.hub.z) < zone.hub.radius + 4) {
+          blocked = true;
+          break;
+        }
       }
       if (blocked) continue;
       for (const camp of CAMPS) {
-        if (Math.hypot(x - camp.center.x, z - camp.center.z) < camp.radius + 2) { blocked = true; break; }
+        if (Math.hypot(x - camp.center.x, z - camp.center.z) < camp.radius + 2) {
+          blocked = true;
+          break;
+        }
       }
       if (blocked) continue;
       if (roadDistance(x, z) < 4) continue;
@@ -924,14 +1139,18 @@ function buildDressing(parent: THREE.Group, seed: number, registry: BucketMesh[]
   }
 
   for (const spots of buckets.values()) {
-    let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
+    let minX = Infinity,
+      maxX = -Infinity,
+      minZ = Infinity,
+      maxZ = -Infinity;
     for (const s of spots) {
       minX = Math.min(minX, s.x);
       maxX = Math.max(maxX, s.x);
       minZ = Math.min(minZ, s.z);
       maxZ = Math.max(maxZ, s.z);
     }
-    const bx = (minX + maxX) / 2, bz = (minZ + maxZ) / 2;
+    const bx = (minX + maxX) / 2,
+      bz = (minZ + maxZ) / 2;
     const bRadius = Math.hypot(maxX - minX, maxZ - minZ) / 2 + 6;
 
     const byKind = new Map<DressKind, DressingSpot[]>();
@@ -944,9 +1163,7 @@ function buildDressing(parent: THREE.Group, seed: number, registry: BucketMesh[]
     // dressing well below both call and triangle budgets, so variety here is
     // higher ROI than adding more far canopy or post-processing work.
     const maxKinds = 4;
-    const kept = [...byKind.entries()]
-      .sort((a, b) => b[1].length - a[1].length)
-      .slice(0, maxKinds);
+    const kept = [...byKind.entries()].sort((a, b) => b[1].length - a[1].length).slice(0, maxKinds);
     for (const [kind, list] of kept) {
       for (const part of kindParts[kind]) {
         const im = new THREE.InstancedMesh(part.geometry, part.material, list.length);
@@ -959,18 +1176,29 @@ function buildDressing(parent: THREE.Group, seed: number, registry: BucketMesh[]
             // mushrooms keep their painted cap colors — brightness jitter only
             im.setColorAt(i, c.setScalar(0.85 + hashAt(s.x, s.z, 47) * 0.3));
           } else {
-            im.setColorAt(i, softTint(
-              s.x,
-              s.z,
-              DRESS_TINT[zoneBiomeAt(s.z)],
-              c,
-              GFX.leanFoliage ? DRESS_TINT_SOFTEN_LOW : DRESS_TINT_SOFTEN,
-            ));
+            im.setColorAt(
+              i,
+              softTint(
+                s.x,
+                s.z,
+                DRESS_TINT[zoneBiomeAt(s.z)],
+                c,
+                GFX.leanFoliage ? DRESS_TINT_SOFTEN_LOW : DRESS_TINT_SOFTEN,
+              ),
+            );
           }
         });
         im.receiveShadow = true; // dressing casts nothing: too small to matter
         parent.add(im);
-        registry.push({ mesh: im, x: bx, z: bz, radius: bRadius, maxDist: lodDists().dressFar, lod: 'dressing', ...bucketMeshCost(im) });
+        registry.push({
+          mesh: im,
+          x: bx,
+          z: bz,
+          radius: bRadius,
+          maxDist: lodDists().dressFar,
+          lod: 'dressing',
+          ...bucketMeshCost(im),
+        });
       }
     }
   }
@@ -1019,29 +1247,46 @@ function applyGrassShader(
         transformed.z += windAmt * 0.6;`
       : '';
     sh.vertexShader = sh.vertexShader
-      .replace('#include <common>', `#include <common>
+      .replace(
+        '#include <common>',
+        `#include <common>
         uniform float uTime;
-        varying vec2 vTuftWorld;`)
-      .replace('#include <begin_vertex>', `#include <begin_vertex>
+        varying vec2 vTuftWorld;`,
+      )
+      .replace(
+        '#include <begin_vertex>',
+        `#include <begin_vertex>
         #ifdef USE_INSTANCING
           vec2 tuftBase = vec2(instanceMatrix[3][0], instanceMatrix[3][2]);
         #else
           vec2 tuftBase = vec2(0.0);
         #endif
         ${wind}
-        vTuftWorld = tuftBase;`);
+        vTuftWorld = tuftBase;`,
+      );
     sh.fragmentShader = sh.fragmentShader
-      .replace('#include <common>', `#include <common>
+      .replace(
+        '#include <common>',
+        `#include <common>
         varying vec2 vTuftWorld;
         uniform vec2 uPlayerPos;
-        uniform float uFadeFar;`)
-      .replace('#include <map_fragment>', `#include <map_fragment>
-        diffuseColor.a *= 1.0 - smoothstep(uFadeFar * 0.7, uFadeFar, distance(vTuftWorld, uPlayerPos));`);
+        uniform float uFadeFar;`,
+      )
+      .replace(
+        '#include <map_fragment>',
+        `#include <map_fragment>
+        diffuseColor.a *= 1.0 - smoothstep(uFadeFar * 0.7, uFadeFar, distance(vTuftWorld, uPlayerPos));`,
+      );
   };
 }
 
 function loopbackHostname(hostname: string): boolean {
-  return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1' || hostname === '[::1]';
+  return (
+    hostname === 'localhost' ||
+    hostname === '127.0.0.1' ||
+    hostname === '::1' ||
+    hostname === '[::1]'
+  );
 }
 
 function localGrassDisabled(): boolean {
@@ -1049,7 +1294,9 @@ function localGrassDisabled(): boolean {
   if (typeof location === 'undefined') return false;
   if (!loopbackHostname(location.hostname)) return false;
   const params = new URLSearchParams(location.search);
-  return params.get('grass') === '0' || params.get('grass') === 'off' || params.get('noGrass') === '1';
+  return (
+    params.get('grass') === '0' || params.get('grass') === 'off' || params.get('noGrass') === '1'
+  );
 }
 
 function emptyGrassStats(enabled: boolean, cacheLimit = 0): FoliagePerfStats {
@@ -1097,7 +1344,10 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
   // the legacy sprite size
   const lush = !GFX.leanFoliage;
   const lowPlusGrassScale = GFX.lowPlus ? 1.08 : 1;
-  const quad = new THREE.PlaneGeometry(lush ? 1.45 : 1.1 * lowPlusGrassScale, lush ? 0.9 : 0.7 * lowPlusGrassScale);
+  const quad = new THREE.PlaneGeometry(
+    lush ? 1.45 : 1.1 * lowPlusGrassScale,
+    lush ? 0.9 : 0.7 * lowPlusGrassScale,
+  );
   quad.translate(0, lush ? 0.42 : 0.35 * lowPlusGrassScale, 0);
   const quad2 = quad.clone().rotateY(Math.PI / 2);
   const geo = mergeGeometries([quad, quad2]);
@@ -1105,15 +1355,24 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
   const tuftTex = grassTuftTexture(lush ? 30 : 18);
   let quality = 1;
   const minRadiusScale = lush ? 0.58 : 0.48;
-  const activeRadius = (): number => Math.round(baseRadius * Math.max(minRadiusScale, quality) * 10) / 10;
-  const uniforms = { uPlayerPos: { value: new THREE.Vector2(1e6, 1e6) }, uFadeFar: { value: activeRadius() } };
-  const mat = configureMaskedDoubleSidedVegetationMaterial(lush
-    ? new THREE.MeshStandardMaterial({
-      map: tuftTex, alphaTest: 0.3, roughness: 0.9,
-    })
-    : new THREE.MeshLambertMaterial({
-      map: tuftTex, alphaTest: 0.35,
-    }));
+  const activeRadius = (): number =>
+    Math.round(baseRadius * Math.max(minRadiusScale, quality) * 10) / 10;
+  const uniforms = {
+    uPlayerPos: { value: new THREE.Vector2(1e6, 1e6) },
+    uFadeFar: { value: activeRadius() },
+  };
+  const mat = configureMaskedDoubleSidedVegetationMaterial(
+    lush
+      ? new THREE.MeshStandardMaterial({
+          map: tuftTex,
+          alphaTest: 0.3,
+          roughness: 0.9,
+        })
+      : new THREE.MeshLambertMaterial({
+          map: tuftTex,
+          alphaTest: 0.35,
+        }),
+  );
   applyGrassShader(mat, uniforms);
 
   const chunks = new Map<string, GrassChunk>();
@@ -1175,14 +1434,18 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
         const x = i * step + (hashAt(i, j, 1) - 0.5) * step * 1.4;
         const z = j * step + (hashAt(i, j, 2) - 0.5) * step * 1.4;
         if (x < minX || x >= maxX || z < minZ || z >= maxZ) continue;
-        if (Math.abs(x) > WORLD_MAX_X - 16 || z < WORLD_MIN_Z + 16 || z > WORLD_MAX_Z - 16) continue;
+        if (Math.abs(x) > WORLD_MAX_X - 16 || z < WORLD_MIN_Z + 16 || z > WORLD_MAX_Z - 16)
+          continue;
         const h = terrainHeight(x, z, seed);
         if (h < WATER_LEVEL + 1.6) continue;
         // no blades pasted onto cliff faces
         if (tooSteep(x, z, seed)) continue;
         let nearHub = false;
         for (const zn of ZONES) {
-          if (Math.hypot(x - zn.hub.x, z - zn.hub.z) < 15) { nearHub = true; break; }
+          if (Math.hypot(x - zn.hub.x, z - zn.hub.z) < 15) {
+            nearHub = true;
+            break;
+          }
         }
         if (nearHub) continue;
         if (roadDistance(x, z) < 3.2) continue;
@@ -1325,18 +1588,26 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
 // ---------------------------------------------------------------------------
 
 function pointInsideTree(t: TreeHideable, x: number, z: number): boolean {
-  const dx = x - t.x, dz = z - t.z;
+  const dx = x - t.x,
+    dz = z - t.z;
   return dx * dx + dz * dz < t.r * t.r;
 }
 
 function segmentCircleEntry(
-  ax: number, az: number, bx: number, bz: number,
-  cx: number, cz: number, r: number,
+  ax: number,
+  az: number,
+  bx: number,
+  bz: number,
+  cx: number,
+  cz: number,
+  r: number,
 ): number {
-  const dx = bx - ax, dz = bz - az;
+  const dx = bx - ax,
+    dz = bz - az;
   const a = dx * dx + dz * dz;
   if (a < 1e-12) return Infinity;
-  const fx = ax - cx, fz = az - cz;
+  const fx = ax - cx,
+    fz = az - cz;
   const c0 = fx * fx + fz * fz - r * r;
   if (c0 < 0) return 0;
   const b = 2 * (fx * dx + fz * dz);
@@ -1347,11 +1618,17 @@ function segmentCircleEntry(
 
 function cameraSegmentHitsTree(
   t: TreeHideable,
-  eyeX: number, eyeY: number, eyeZ: number,
-  camX: number, camY: number, camZ: number,
+  eyeX: number,
+  eyeY: number,
+  eyeZ: number,
+  camX: number,
+  camY: number,
+  camZ: number,
 ): boolean {
-  if ((eyeY < t.topY && pointInsideTree(t, eyeX, eyeZ))
-    || (camY < t.topY && pointInsideTree(t, camX, camZ))) {
+  if (
+    (eyeY < t.topY && pointInsideTree(t, eyeX, eyeZ)) ||
+    (camY < t.topY && pointInsideTree(t, camX, camZ))
+  ) {
     return true;
   }
   const hitT = segmentCircleEntry(eyeX, eyeZ, camX, camZ, t.x, t.z, t.r);
@@ -1361,8 +1638,12 @@ function cameraSegmentHitsTree(
 
 function updateTreeHides(
   trees: TreeHideable[],
-  eyeX: number, eyeY: number, eyeZ: number,
-  camX: number, camY: number, camZ: number,
+  eyeX: number,
+  eyeY: number,
+  eyeZ: number,
+  camX: number,
+  camY: number,
+  camZ: number,
 ): void {
   for (const t of trees) {
     const hide = cameraSegmentHitsTree(t, eyeX, eyeY, eyeZ, camX, camY, camZ);
@@ -1403,10 +1684,12 @@ export function buildFoliage(seed: number): FoliageView {
   }
   const grass = localGrassDisabled()
     ? {
-      update(): void {},
-      setQuality(): void {},
-      perfStats(): FoliagePerfStats { return emptyGrassStats(false); },
-    }
+        update(): void {},
+        setQuality(): void {},
+        perfStats(): FoliagePerfStats {
+          return emptyGrassStats(false);
+        },
+      }
     : buildGrassRing(group, seed);
   return {
     group,
@@ -1417,9 +1700,14 @@ export function buildFoliage(seed: number): FoliageView {
       modelQuality = Math.min(1, Math.max(0, Number.isFinite(level) ? level : 1));
     },
     update(
-      px: number, pz: number,
-      camX: number, camY: number, camZ: number,
-      eyeX: number, eyeY: number, eyeZ: number,
+      px: number,
+      pz: number,
+      camX: number,
+      camY: number,
+      camZ: number,
+      eyeX: number,
+      eyeY: number,
+      eyeZ: number,
       fogFar: number,
     ): void {
       grass.update(px, pz);
@@ -1440,19 +1728,21 @@ export function buildFoliage(seed: number): FoliageView {
       for (const b of bucketMeshes) {
         const d = Math.hypot(b.x - camX, b.z - camZ);
         const minDist = (b.minDist ?? 0) * distanceScale;
-        const revealScale = GFX.leanFoliage && (b.lod === 'core' || b.lod === 'near-fill')
-          ? 0.94 + hashAt(b.x, b.z, 109) * 0.06
-          : 1;
-        const maxDist = b.maxDist === undefined ? Infinity : b.maxDist * distanceScale * revealScale;
-        b.mesh.visible = d >= minDist && d < maxDist
-          && d - b.radius < fogLimit;
+        const revealScale =
+          GFX.leanFoliage && (b.lod === 'core' || b.lod === 'near-fill')
+            ? 0.94 + hashAt(b.x, b.z, 109) * 0.06
+            : 1;
+        const maxDist =
+          b.maxDist === undefined ? Infinity : b.maxDist * distanceScale * revealScale;
+        b.mesh.visible = d >= minDist && d < maxDist && d - b.radius < fogLimit;
         if (b.mesh.visible) {
           modelVisibleBuckets++;
           modelVisibleDraws += b.draws;
           modelVisibleTriangles += b.triangles;
           modelVisibleByLod[b.lod] = (modelVisibleByLod[b.lod] ?? 0) + 1;
           modelVisibleDrawsByLod[b.lod] = (modelVisibleDrawsByLod[b.lod] ?? 0) + b.draws;
-          modelVisibleTrianglesByLod[b.lod] = (modelVisibleTrianglesByLod[b.lod] ?? 0) + b.triangles;
+          modelVisibleTrianglesByLod[b.lod] =
+            (modelVisibleTrianglesByLod[b.lod] ?? 0) + b.triangles;
         }
       }
     },

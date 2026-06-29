@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { CLASSES } from '../../sim/data';
 import type { PlayerClass } from '../../sim/types';
 import { trackWebGLContext } from '../context_release';
+import type { WeaponLayoutOverride } from './manifest';
 import { CharacterVisual } from './visual';
 
 const PREVIEW_ANIM_STATE = {
@@ -97,8 +98,14 @@ export class CharacterPreview {
   }
 
   /** Set the active model by raw visual key (e.g. `player_mech` for the cosmetic
-   *  turntable). The asset must already be loaded — callers preload first. */
-  setVisualKey(visualKey: string, weaponItemId: string | null = null): void {
+   *  turntable). The asset must already be loaded — callers preload first.
+   *  `weaponOverride` lets a cosmetic body adopt a class hand layout (rogue mech
+   *  dual-wields), matching the in-world render. */
+  setVisualKey(
+    visualKey: string,
+    weaponItemId: string | null = null,
+    weaponOverride: WeaponLayoutOverride | null = null,
+  ): void {
     // Clean up current visual if it exists
     if (this.currentVisual) {
       this.characterGroup.remove(this.currentVisual.root);
@@ -107,7 +114,13 @@ export class CharacterPreview {
     }
 
     try {
-      this.currentVisual = new CharacterVisual(visualKey, 0xffffff, this.currentSkin, weaponItemId);
+      this.currentVisual = new CharacterVisual(
+        visualKey,
+        0xffffff,
+        this.currentSkin,
+        weaponItemId,
+        weaponOverride,
+      );
       this.characterGroup.add(this.currentVisual.root);
 
       // Reset rotation of group so new character faces forward but holds any user offset if preferred.
