@@ -222,6 +222,9 @@ export const pt_BR: EnTranslations = {
     "rest": {
       "resting": "Descansando"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
     "unitFrame": {
       "playerLabel": "Seu personagem",
       "targetLabel": "Seu alvo",
@@ -586,6 +589,26 @@ export const pt_BR: EnTranslations = {
       "exportBtn": "Baixar meus dados",
       "exportDone": "Seus dados foram baixados. Enviamos uma confirmação por email.",
       "exportFailed": "Não foi possível exportar seus dados. Tente novamente em instantes."
+    },
+    "masterLoot": {
+      "title": "Saque mestre",
+      "enableLabel": "Saque mestre",
+      "enableAria": "Ativar saque mestre",
+      "looterLabel": "Mestre do saque",
+      "leaderOption": "Lider do grupo",
+      "thresholdLabel": "Limite",
+      "thresholdUncommon": "Incomum ou superior",
+      "thresholdRare": "Raro ou superior",
+      "thresholdEpic": "Epico ou superior",
+      "assignPrompt": "Atribuir {item}",
+      "assignAria": "Atribuir {item} a {name}",
+      "rollButton": "Rolar",
+      "selectAll": "Selecionar tudo",
+      "methodMaster": "Metodo de saque definido como saque mestre. Mestre do saque: {name}.",
+      "methodGroup": "Metodo de saque definido como saque em grupo.",
+      "assigned": "{looter} atribuiu {item} a {target}.",
+      "unassigned": "{item} nao foi atribuido e esta livre para todos.",
+      "leaderOnly": "Somente o lider do grupo pode alterar o metodo de saque."
     },
     "bags": {
       "filterGroupAria": "Filtrar bolsas por categoria",
@@ -3462,7 +3485,7 @@ export const pt_BR: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "Mísseis Arcanos",
-        "description": "Lança Mísseis Arcanos no inimigo, causando 8 de dano Arcano a cada segundo por 3 s."
+        "description": "Lança Mísseis Arcanos no inimigo, causando {damage} de dano Arcano a cada segundo por 3 s."
       },
       "polymorph": {
         "name": "Polimorfia",
@@ -3710,7 +3733,7 @@ export const pt_BR: EnTranslations = {
       },
       "mind_flay": {
         "name": "Açoite Mental",
-        "description": "Assalta a mente do alvo com energia de Sombra, causando 12 de dano por segundo durante 3 s."
+        "description": "Assalta a mente do alvo com energia de Sombra, causando {damage} de dano por segundo durante 3 s."
       },
       "flash_heal": {
         "name": "Cura Rápida",
@@ -3786,7 +3809,7 @@ export const pt_BR: EnTranslations = {
       },
       "drain_life": {
         "name": "Drenar Vida",
-        "description": "Drena a vida do alvo, transferindo 7 de vida para você a cada segundo por 5 s."
+        "description": "Drena a vida do alvo, transferindo {damage} de vida para você a cada segundo por 5 s."
       },
       "fear": {
         "name": "Medo",

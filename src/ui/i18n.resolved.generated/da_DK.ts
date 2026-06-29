@@ -222,6 +222,9 @@ export const da_DK: EnTranslations = {
     "rest": {
       "resting": "Hviler"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
     "unitFrame": {
       "playerLabel": "Din helt",
       "targetLabel": "Dit mål",
@@ -586,6 +589,26 @@ export const da_DK: EnTranslations = {
       "exportBtn": "Download mine data",
       "exportDone": "Dine data blev downloadet. Vi har sendt dig en bekræftelse på e-mail.",
       "exportFailed": "Kunne ikke eksportere dine data. Prøv igen om et øjeblik."
+    },
+    "masterLoot": {
+      "title": "Master loot",
+      "enableLabel": "Master loot",
+      "enableAria": "Aktiver master loot",
+      "looterLabel": "Master looter",
+      "leaderOption": "Gruppeleder",
+      "thresholdLabel": "Tærskel",
+      "thresholdUncommon": "Uncommon og op",
+      "thresholdRare": "Rare og op",
+      "thresholdEpic": "Epic og op",
+      "assignPrompt": "Tildel {item}",
+      "assignAria": "Tildel {item} til {name}",
+      "rollButton": "Rul",
+      "selectAll": "Vaelg alle",
+      "methodMaster": "Lootmetode sat til master loot. Master looter: {name}.",
+      "methodGroup": "Lootmetode sat til gruppeloot.",
+      "assigned": "{looter} tildelte {item} til {target}.",
+      "unassigned": "{item} blev ikke tildelt og er frit for alle.",
+      "leaderOnly": "Kun gruppelederen kan aendre lootmetoden."
     },
     "bags": {
       "filterGroupAria": "Filtrér tasker efter kategori",
@@ -3462,7 +3485,7 @@ export const da_DK: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "Arkane Missiler",
-        "description": "Affyrer Arkane Missiler mod fjenden, der forvolder 8 Arkan skade hvert sekund i 3 sek."
+        "description": "Affyrer Arkane Missiler mod fjenden, der forvolder {damage} Arkan skade hvert sekund i 3 sek."
       },
       "polymorph": {
         "name": "Polymorfi",
@@ -3710,7 +3733,7 @@ export const da_DK: EnTranslations = {
       },
       "mind_flay": {
         "name": "Sindsflåning",
-        "description": "Angriber målets sind med skyggeenergi, hvilket volder 12 skade hvert sekund i 3 sek."
+        "description": "Angriber målets sind med skyggeenergi, hvilket volder {damage} skade hvert sekund i 3 sek."
       },
       "flash_heal": {
         "name": "Lynhelbredelse",
@@ -3786,7 +3809,7 @@ export const da_DK: EnTranslations = {
       },
       "drain_life": {
         "name": "Dræn Liv",
-        "description": "Dræner målets liv og overfører 7 helbred til dig hvert sekund i 5 sek."
+        "description": "Dræner målets liv og overfører {damage} helbred til dig hvert sekund i 5 sek."
       },
       "fear": {
         "name": "Frygt",

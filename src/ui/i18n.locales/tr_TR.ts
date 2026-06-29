@@ -354,7 +354,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_intellect.description': 'Zekayı 30 dakika boyunca 2 artırır.',
   'entities.abilities.arcane_intellect.name': 'Gizemli Zeka',
   'entities.abilities.arcane_missiles.description':
-    'Düşmana Gizemli Füzeler fırlatır, 3 saniye boyunca her saniye 8 Gizemli hasar verir.',
+    'Düşmana Gizemli Füzeler fırlatır, 3 saniye boyunca her saniye {damage} Gizemli hasar verir.',
   'entities.abilities.arcane_missiles.name': 'Gizemli Füzeler',
   'entities.abilities.arcane_shot.description': '{damage} Gizemli hasar veren anlık bir atış.',
   'entities.abilities.arcane_shot.name': 'Gizemli Atış',
@@ -460,7 +460,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Kutsal bir kalkan 10 saniye boyunca 50 hasarı emer.',
   'entities.abilities.divine_protection.name': 'Kutsal Koruma',
   'entities.abilities.drain_life.description':
-    'Hedefin canını emer; 5 saniye boyunca her saniye sana 7 can aktarır.',
+    'Hedefin canını emer; 5 saniye boyunca her saniye sana {damage} can aktarır.',
   'entities.abilities.drain_life.name': 'Can Emme',
   'entities.abilities.earth_shock.description':
     'Hedefi sersemletici bir kuvvetle anında şoklar ve {damage} Doğa hasarı verir.',
@@ -594,7 +594,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_blast.description': 'Hedefin zihnini {damage} Gölge hasarıyla patlatır.',
   'entities.abilities.mind_blast.name': 'Zihin Patlaması',
   'entities.abilities.mind_flay.description':
-    'Hedefin zihnini Gölge enerjisiyle sarsar ve 3 saniye boyunca her saniye 12 hasar verir.',
+    'Hedefin zihnini Gölge enerjisiyle sarsar ve 3 saniye boyunca her saniye {damage} hasar verir.',
   'entities.abilities.mind_flay.name': 'Zihin Dağlama',
   'entities.abilities.mongoose_bite.description':
     'Hedef sıyırma yaptıktan sonra silah hasarı artı 12 ile karşı saldırı. Sıyrılamaz.',
@@ -4679,4 +4679,23 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.school.shadow': 'Gölge',
   'hudChrome.auraEffect.school.holy': 'Kutsal',
   'hudChrome.auraEffect.school.nature': 'Doğa',
+  'hudChrome.masterLoot.title': 'Ganimet ustasi',
+  'hudChrome.masterLoot.enableLabel': 'Ganimet ustasi',
+  'hudChrome.masterLoot.enableAria': 'Ganimet ustasini etkinlestir',
+  'hudChrome.masterLoot.looterLabel': 'Ganimet ustasi',
+  'hudChrome.masterLoot.leaderOption': 'Grup lideri',
+  'hudChrome.masterLoot.thresholdLabel': 'Esik',
+  'hudChrome.masterLoot.thresholdUncommon': 'Sira disi ve ustu',
+  'hudChrome.masterLoot.thresholdRare': 'Nadir ve ustu',
+  'hudChrome.masterLoot.thresholdEpic': 'Epik ve ustu',
+  'hudChrome.masterLoot.assignPrompt': '{item} ata',
+  'hudChrome.masterLoot.assignAria': '{item} esyasini {name} oyuncusuna ata',
+  'hudChrome.masterLoot.rollButton': 'Zar at',
+  'hudChrome.masterLoot.selectAll': 'Tümünü sec',
+  'hudChrome.masterLoot.methodMaster':
+    'Ganimet yontemi ganimet ustasi olarak ayarlandi. Ganimet ustasi: {name}.',
+  'hudChrome.masterLoot.methodGroup': 'Ganimet yontemi grup ganimeti olarak ayarlandi.',
+  'hudChrome.masterLoot.assigned': '{looter}, {item} esyasini {target} oyuncusuna atadi.',
+  'hudChrome.masterLoot.unassigned': '{item} atanmadi ve herkes icin serbest.',
+  'hudChrome.masterLoot.leaderOnly': 'Ganimet yontemini yalnizca grup lideri degistirebilir.',
 };

@@ -1649,7 +1649,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Explode contra o inimigo, causando {damage} de dano de Fogo. Instantâneo.',
   'entities.abilities.arcane_missiles.name': 'Mísseis Arcanos',
   'entities.abilities.arcane_missiles.description':
-    'Lança Mísseis Arcanos no inimigo, causando 8 de dano Arcano a cada segundo por 3 s.',
+    'Lança Mísseis Arcanos no inimigo, causando {damage} de dano Arcano a cada segundo por 3 s.',
   'entities.abilities.polymorph.name': 'Polimorfia',
   'entities.abilities.polymorph.description':
     'Transforma o inimigo em ovelha por até 15 s. A ovelha vagueia e se cura rapidamente. Qualquer dano quebra o efeito. Apenas feras e humanoides.',
@@ -1823,7 +1823,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Uma prece lenta, mas poderosa, que cura um alvo aliado em {damage}.',
   'entities.abilities.mind_flay.name': 'Açoite Mental',
   'entities.abilities.mind_flay.description':
-    'Assalta a mente do alvo com energia de Sombra, causando 12 de dano por segundo durante 3 s.',
+    'Assalta a mente do alvo com energia de Sombra, causando {damage} de dano por segundo durante 3 s.',
   'entities.abilities.flash_heal.name': 'Cura Rápida',
   'entities.abilities.flash_heal.description':
     'Uma prece rápida que cura um alvo aliado em {damage}.',
@@ -1878,7 +1878,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Amaldiçoa o alvo com agonia: {damage} de dano de Sombra ao longo de 24 s.',
   'entities.abilities.drain_life.name': 'Drenar Vida',
   'entities.abilities.drain_life.description':
-    'Drena a vida do alvo, transferindo 7 de vida para você a cada segundo por 5 s.',
+    'Drena a vida do alvo, transferindo {damage} de vida para você a cada segundo por 5 s.',
   'entities.abilities.fear.name': 'Medo',
   'entities.abilities.fear.description':
     'Aterroriza o inimigo, deixando-o acuado por até 8 s. Qualquer dano quebra o efeito.',
@@ -4755,4 +4755,23 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.school.shadow': 'Sombra',
   'hudChrome.auraEffect.school.holy': 'Sagrado',
   'hudChrome.auraEffect.school.nature': 'Natureza',
+  'hudChrome.masterLoot.title': 'Saque mestre',
+  'hudChrome.masterLoot.enableLabel': 'Saque mestre',
+  'hudChrome.masterLoot.enableAria': 'Ativar saque mestre',
+  'hudChrome.masterLoot.looterLabel': 'Mestre do saque',
+  'hudChrome.masterLoot.leaderOption': 'Lider do grupo',
+  'hudChrome.masterLoot.thresholdLabel': 'Limite',
+  'hudChrome.masterLoot.thresholdUncommon': 'Incomum ou superior',
+  'hudChrome.masterLoot.thresholdRare': 'Raro ou superior',
+  'hudChrome.masterLoot.thresholdEpic': 'Epico ou superior',
+  'hudChrome.masterLoot.assignPrompt': 'Atribuir {item}',
+  'hudChrome.masterLoot.assignAria': 'Atribuir {item} a {name}',
+  'hudChrome.masterLoot.rollButton': 'Rolar',
+  'hudChrome.masterLoot.selectAll': 'Selecionar tudo',
+  'hudChrome.masterLoot.methodMaster':
+    'Metodo de saque definido como saque mestre. Mestre do saque: {name}.',
+  'hudChrome.masterLoot.methodGroup': 'Metodo de saque definido como saque em grupo.',
+  'hudChrome.masterLoot.assigned': '{looter} atribuiu {item} a {target}.',
+  'hudChrome.masterLoot.unassigned': '{item} nao foi atribuido e esta livre para todos.',
+  'hudChrome.masterLoot.leaderOnly': 'Somente o lider do grupo pode alterar o metodo de saque.',
 };

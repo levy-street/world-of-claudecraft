@@ -222,6 +222,9 @@ export const ru_RU: EnTranslations = {
     "rest": {
       "resting": "Отдых"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
     "unitFrame": {
       "playerLabel": "Ваш персонаж",
       "targetLabel": "Ваша цель",
@@ -586,6 +589,26 @@ export const ru_RU: EnTranslations = {
       "exportBtn": "Скачать мои данные",
       "exportDone": "Ваши данные были скачаны. Мы отправили вам подтверждение по email.",
       "exportFailed": "Не удалось экспортировать ваши данные. Попробуйте снова через мгновение."
+    },
+    "masterLoot": {
+      "title": "Распределение добычи",
+      "enableLabel": "Мастер добычи",
+      "enableAria": "Включить мастера добычи",
+      "looterLabel": "Мастер добычи",
+      "leaderOption": "Лидер группы",
+      "thresholdLabel": "Порог качества",
+      "thresholdUncommon": "Необычное и выше",
+      "thresholdRare": "Редкое и выше",
+      "thresholdEpic": "Эпическое и выше",
+      "assignPrompt": "Назначить {item}",
+      "assignAria": "Назначить {item} игроку {name}",
+      "rollButton": "Бросок",
+      "selectAll": "Выбрать всех",
+      "methodMaster": "Способ добычи изменён на мастера добычи. Мастер добычи: {name}.",
+      "methodGroup": "Способ добычи изменён на групповой.",
+      "assigned": "{looter} передал предмет {item} игроку {target}.",
+      "unassigned": "Предмет {item} не был назначен и доступен всем.",
+      "leaderOnly": "Только лидер группы может менять способ добычи."
     },
     "bags": {
       "filterGroupAria": "Фильтровать сумки по категории",
@@ -3462,7 +3485,7 @@ export const ru_RU: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "Чародейские стрелы",
-        "description": "Выпускает в противника Чародейские стрелы, наносящие 8 ед. урона от тайной магии каждую секунду в течение 3 сек."
+        "description": "Выпускает в противника Чародейские стрелы, наносящие {damage} ед. урона от тайной магии каждую секунду в течение 3 сек."
       },
       "polymorph": {
         "name": "Превращение",
@@ -3710,7 +3733,7 @@ export const ru_RU: EnTranslations = {
       },
       "mind_flay": {
         "name": "Пытка разума",
-        "description": "Терзает разум цели темной энергией, нанося 12 ед. урона каждую секунду в течение 3 сек."
+        "description": "Терзает разум цели темной энергией, нанося {damage} ед. урона каждую секунду в течение 3 сек."
       },
       "flash_heal": {
         "name": "Быстрое исцеление",
@@ -3786,7 +3809,7 @@ export const ru_RU: EnTranslations = {
       },
       "drain_life": {
         "name": "Похищение жизни",
-        "description": "Похищает жизнь цели, передавая вам 7 здоровья каждую секунду в течение 5 сек."
+        "description": "Похищает жизнь цели, передавая вам {damage} здоровья каждую секунду в течение 5 сек."
       },
       "fear": {
         "name": "Страх",

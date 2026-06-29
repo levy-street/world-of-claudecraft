@@ -222,6 +222,9 @@ export const tr_TR: EnTranslations = {
     "rest": {
       "resting": "Dinleniyor"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
     "unitFrame": {
       "playerLabel": "Kahramanın",
       "targetLabel": "Hedefin",
@@ -586,6 +589,26 @@ export const tr_TR: EnTranslations = {
       "exportBtn": "Verilerimi İndir",
       "exportDone": "Verileriniz indirildi. Size bir onay e-postası gönderdik.",
       "exportFailed": "Verileriniz dışa aktarılamadı. Birazdan tekrar deneyin."
+    },
+    "masterLoot": {
+      "title": "Ganimet ustasi",
+      "enableLabel": "Ganimet ustasi",
+      "enableAria": "Ganimet ustasini etkinlestir",
+      "looterLabel": "Ganimet ustasi",
+      "leaderOption": "Grup lideri",
+      "thresholdLabel": "Esik",
+      "thresholdUncommon": "Sira disi ve ustu",
+      "thresholdRare": "Nadir ve ustu",
+      "thresholdEpic": "Epik ve ustu",
+      "assignPrompt": "{item} ata",
+      "assignAria": "{item} esyasini {name} oyuncusuna ata",
+      "rollButton": "Zar at",
+      "selectAll": "Tümünü sec",
+      "methodMaster": "Ganimet yontemi ganimet ustasi olarak ayarlandi. Ganimet ustasi: {name}.",
+      "methodGroup": "Ganimet yontemi grup ganimeti olarak ayarlandi.",
+      "assigned": "{looter}, {item} esyasini {target} oyuncusuna atadi.",
+      "unassigned": "{item} atanmadi ve herkes icin serbest.",
+      "leaderOnly": "Ganimet yontemini yalnizca grup lideri degistirebilir."
     },
     "bags": {
       "filterGroupAria": "Çantaları kategoriye göre filtrele",
@@ -3462,7 +3485,7 @@ export const tr_TR: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "Gizemli Füzeler",
-        "description": "Düşmana Gizemli Füzeler fırlatır, 3 saniye boyunca her saniye 8 Gizemli hasar verir."
+        "description": "Düşmana Gizemli Füzeler fırlatır, 3 saniye boyunca her saniye {damage} Gizemli hasar verir."
       },
       "polymorph": {
         "name": "Dönüştürme",
@@ -3710,7 +3733,7 @@ export const tr_TR: EnTranslations = {
       },
       "mind_flay": {
         "name": "Zihin Dağlama",
-        "description": "Hedefin zihnini Gölge enerjisiyle sarsar ve 3 saniye boyunca her saniye 12 hasar verir."
+        "description": "Hedefin zihnini Gölge enerjisiyle sarsar ve 3 saniye boyunca her saniye {damage} hasar verir."
       },
       "flash_heal": {
         "name": "Hızlı İyileştirme",
@@ -3786,7 +3809,7 @@ export const tr_TR: EnTranslations = {
       },
       "drain_life": {
         "name": "Can Emme",
-        "description": "Hedefin canını emer; 5 saniye boyunca her saniye sana 7 can aktarır."
+        "description": "Hedefin canını emer; 5 saniye boyunca her saniye sana {damage} can aktarır."
       },
       "fear": {
         "name": "Korku",

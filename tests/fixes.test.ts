@@ -426,8 +426,12 @@ describe('the Hollow Crypt doors', () => {
     expect(eb.pos.x).toBeGreaterThan(DUNGEON_X_THRESHOLD);
     const slotA = sim.instanceSlotAt(ea.pos);
     const slotB = sim.instanceSlotAt(eb.pos);
+    const infoA = sim.instanceInfoAt(ea.pos);
+    const infoB = sim.instanceInfoAt(eb.pos);
     expect(slotA).not.toBeNull();
     expect(slotA).toBe(slotB);
+    expect(infoA).toEqual({ slot: slotA, dungeonId: 'hollow_crypt' });
+    expect(infoB).toEqual(infoA);
   });
 
   it('solo players from different groups get different instances', () => {
@@ -786,7 +790,7 @@ describe('boss loot and encounter resets', () => {
     sim.events.length = 0;
     sim.lootCorpse(mob.id, a);
     const events: SimEvent[] = [];
-    for (let i = 0; i < 31 * 20; i++) events.push(...sim.tick());
+    for (let i = 0; i < 61 * 20; i++) events.push(...sim.tick());
 
     expect(sim.countItem('greyjaw_hide_boots', a)).toBe(0);
     expect(sim.countItem('greyjaw_hide_boots', b)).toBe(0);
@@ -881,7 +885,7 @@ describe('boss loot and encounter resets', () => {
 
     sim.events.length = 0;
     sim.lootCorpse(mob.id, a);
-    for (let i = 0; i < 31 * 20; i++) sim.tick();
+    for (let i = 0; i < 61 * 20; i++) sim.tick();
 
     expect(mob.loot?.items).toEqual([{ itemId: 'greyjaw_hide_boots', count: 1, openToAll: true }]);
 

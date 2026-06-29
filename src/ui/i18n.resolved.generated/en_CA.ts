@@ -222,6 +222,9 @@ export const en_CA: EnTranslations = {
     "rest": {
       "resting": "Resting"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
     "unitFrame": {
       "playerLabel": "Your Hero",
       "targetLabel": "Your Mark",
@@ -586,6 +589,26 @@ export const en_CA: EnTranslations = {
       "exportBtn": "Download My Data",
       "exportDone": "Your data was downloaded. We emailed you a confirmation.",
       "exportFailed": "Could not export your data. Try again in a moment."
+    },
+    "masterLoot": {
+      "title": "Master Loot",
+      "enableLabel": "Master loot",
+      "enableAria": "Enable master loot",
+      "looterLabel": "Master looter",
+      "leaderOption": "Party leader",
+      "thresholdLabel": "Threshold",
+      "thresholdUncommon": "Uncommon and up",
+      "thresholdRare": "Rare and up",
+      "thresholdEpic": "Epic and up",
+      "assignPrompt": "Assign {item}",
+      "assignAria": "Assign {item} to {name}",
+      "rollButton": "Roll",
+      "selectAll": "Select all",
+      "methodMaster": "Loot method set to master loot. Master looter: {name}.",
+      "methodGroup": "Loot method set to group loot.",
+      "assigned": "{looter} assigned {item} to {target}.",
+      "unassigned": "{item} was not assigned and is free for all.",
+      "leaderOnly": "Only the party leader can change the loot method."
     },
     "bags": {
       "filterGroupAria": "Filter bags by category",
@@ -3462,7 +3485,7 @@ export const en_CA: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "Arcane Missiles",
-        "description": "Launches Arcane Missiles at the enemy, causing 8 Arcane damage each second for 3 sec."
+        "description": "Launches Arcane Missiles at the enemy, causing {damage} Arcane damage each second for 3 sec."
       },
       "polymorph": {
         "name": "Polymorph",
@@ -3710,7 +3733,7 @@ export const en_CA: EnTranslations = {
       },
       "mind_flay": {
         "name": "Mind Flay",
-        "description": "Assaults the target's mind with Shadow energy, causing 12 damage each second for 3 sec."
+        "description": "Assaults the target's mind with Shadow energy, causing {damage} damage each second for 3 sec."
       },
       "flash_heal": {
         "name": "Flash Heal",
@@ -3786,7 +3809,7 @@ export const en_CA: EnTranslations = {
       },
       "drain_life": {
         "name": "Drain Life",
-        "description": "Drains the target's life, transferring 7 health to you each second for 5 sec."
+        "description": "Drains the target's life, transferring {damage} health to you each second for 5 sec."
       },
       "fear": {
         "name": "Fear",

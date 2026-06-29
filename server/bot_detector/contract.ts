@@ -1,13 +1,9 @@
-import type { SimEvent } from '../../src/sim/types';
 import type { MoveInputFrame } from '../../src/sim/move_input';
+import type { SimEvent } from '../../src/sim/types';
 
 export type EnforcementAction = 'none' | 'kick';
 
-export type ProtocolAnomaly =
-  | 'invalid_json'
-  | 'non_object'
-  | 'unknown_type'
-  | 'unknown_command';
+export type ProtocolAnomaly = 'invalid_json' | 'non_object' | 'unknown_type' | 'unknown_command';
 
 export interface PlayerSessionRef {
   accountId: number;
@@ -16,10 +12,52 @@ export interface PlayerSessionRef {
   ip: string;
 }
 
+export interface SessionRuntimeSnapshot {
+  capturedAt: number;
+  simTime: number;
+  x: number;
+  z: number;
+  facing: number;
+  dead: boolean;
+  inCombat: boolean;
+  targetId: number | null;
+  instanceSlot: number | null;
+  instanceDungeonId: string | null;
+  level: number;
+  classId: string;
+  hp: number;
+  maxHp: number;
+  resource: number;
+  maxResource: number;
+  resourceType: string | null;
+  autoAttack: boolean;
+  followTargetId: number | null;
+  moveSpeed: number;
+  onGround: boolean;
+}
+
+export interface SuspiciousEvidence {
+  kind: string;
+  weight: number;
+  detail: string;
+  expiresAt: number;
+}
+
+export type SuspiciousPlayerState = 'SUSPICIOUS' | 'CONFIRMED';
+
+export interface SuspiciousPlayer {
+  ref: PlayerSessionRef;
+  snapshot: SessionRuntimeSnapshot | null;
+  state: SuspiciousPlayerState;
+  score: number;
+  evidence: SuspiciousEvidence[];
+}
+
 // The brand makes this handle impossible to construct or read outside this module.
 declare const botTrackingBrand: unique symbol;
-export interface BotTrackingContext { readonly [botTrackingBrand]: true }
-
+export interface BotTrackingContext {
+  readonly [botTrackingBrand]: true;
+}
 
 export interface BotDetector {
   createTrackingContext(ref: PlayerSessionRef, meta?: unknown): BotTrackingContext;
@@ -27,6 +65,17 @@ export interface BotDetector {
   observeCommand(ctx: BotTrackingContext, cmd: string, now: number, message?: unknown): void;
   observeEvent(ctx: BotTrackingContext, ev: SimEvent, now: number): void;
   observeInput(ctx: BotTrackingContext, frame: MoveInputFrame, now: number): void;
-  observeProtocolAnomaly(ctx: BotTrackingContext, anomaly: ProtocolAnomaly, raw: string, now: number): void;
-  handleTick(ctx: BotTrackingContext, now: number, enforce: boolean): EnforcementAction;
+  observeProtocolAnomaly(
+    ctx: BotTrackingContext,
+    anomaly: ProtocolAnomaly,
+    raw: string,
+    now: number,
+  ): void;
+  handleTick(
+    ctx: BotTrackingContext,
+    now: number,
+    enforce: boolean,
+    snapshot: SessionRuntimeSnapshot | null,
+  ): EnforcementAction;
+  listSuspiciousPlayers(): SuspiciousPlayer[];
 }

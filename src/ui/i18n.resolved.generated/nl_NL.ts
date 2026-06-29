@@ -222,6 +222,9 @@ export const nl_NL: EnTranslations = {
     "rest": {
       "resting": "Aan het rusten"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
     "unitFrame": {
       "playerLabel": "Je Held",
       "targetLabel": "Je Doelwit",
@@ -586,6 +589,26 @@ export const nl_NL: EnTranslations = {
       "exportBtn": "Mijn Gegevens Downloaden",
       "exportDone": "Je gegevens zijn gedownload. We hebben je een bevestiging gemaild.",
       "exportFailed": "Je gegevens konden niet worden geëxporteerd. Probeer het zo dadelijk opnieuw."
+    },
+    "masterLoot": {
+      "title": "Meesterbuit",
+      "enableLabel": "Meesterbuit",
+      "enableAria": "Meesterbuit inschakelen",
+      "looterLabel": "Buitmeester",
+      "leaderOption": "Groepsleider",
+      "thresholdLabel": "Drempel",
+      "thresholdUncommon": "Ongewoon en hoger",
+      "thresholdRare": "Zeldzaam en hoger",
+      "thresholdEpic": "Episch en hoger",
+      "assignPrompt": "{item} toewijzen",
+      "assignAria": "{item} toewijzen aan {name}",
+      "rollButton": "Rollen",
+      "selectAll": "Alles selecteren",
+      "methodMaster": "Buitmethode ingesteld op meesterbuit. Buitmeester: {name}.",
+      "methodGroup": "Buitmethode ingesteld op groepsbuit.",
+      "assigned": "{looter} heeft {item} toegewezen aan {target}.",
+      "unassigned": "{item} is niet toegewezen en is vrij voor iedereen.",
+      "leaderOnly": "Alleen de groepsleider kan de buitmethode wijzigen."
     },
     "bags": {
       "filterGroupAria": "Tassen filteren op categorie",
@@ -3462,7 +3485,7 @@ export const nl_NL: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "Arcane Projectielen",
-        "description": "Lanceert Arcane Projectielen op de vijand en veroorzaakt elke seconde 8 Arcane schade gedurende 3 sec."
+        "description": "Lanceert Arcane Projectielen op de vijand en veroorzaakt elke seconde {damage} Arcane schade gedurende 3 sec."
       },
       "polymorph": {
         "name": "Gedaanteverwisseling",
@@ -3710,7 +3733,7 @@ export const nl_NL: EnTranslations = {
       },
       "mind_flay": {
         "name": "Geestesmarteling",
-        "description": "Bestookt de geest van het doelwit met Schaduwenergie en brengt elke seconde 12 schade toe gedurende 3 sec."
+        "description": "Bestookt de geest van het doelwit met Schaduwenergie en brengt elke seconde {damage} schade toe gedurende 3 sec."
       },
       "flash_heal": {
         "name": "Snelle Genezing",
@@ -3786,7 +3809,7 @@ export const nl_NL: EnTranslations = {
       },
       "drain_life": {
         "name": "Leven Aftappen",
-        "description": "Tapt het leven van het doelwit af en draagt elke seconde 7 levenskracht naar je over gedurende 5 sec."
+        "description": "Tapt het leven van het doelwit af en draagt elke seconde {damage} levenskracht naar je over gedurende 5 sec."
       },
       "fear": {
         "name": "Angst",

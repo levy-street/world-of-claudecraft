@@ -1655,7 +1655,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Trifft den Gegner für {damage} Feuerschaden. Sofort.',
   'entities.abilities.arcane_missiles.name': 'Arkane Geschosse',
   'entities.abilities.arcane_missiles.description':
-    'Schleudert Arkane Geschosse auf den Gegner und verursacht 3 Sek. lang jede Sekunde 8 Arkanschaden.',
+    'Schleudert Arkane Geschosse auf den Gegner und verursacht 3 Sek. lang jede Sekunde {damage} Arkanschaden.',
   'entities.abilities.polymorph.name': 'Verwandlung',
   'entities.abilities.polymorph.description':
     'Verwandelt den Gegner bis zu 15 Sek. lang in ein Schaf. Das Schaf wandert umher und heilt sich schnell. Jeder Schaden bricht den Effekt. Nur Wildtiere und Humanoide.',
@@ -1831,7 +1831,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Ein langsames, aber mächtiges Gebet, das ein freundliches Ziel um {damage} heilt.',
   'entities.abilities.mind_flay.name': 'Gedankenschinden',
   'entities.abilities.mind_flay.description':
-    'Greift den Geist des Ziels mit Schattenenergie an und verursacht 3 Sek. lang jede Sekunde 12 Schaden.',
+    'Greift den Geist des Ziels mit Schattenenergie an und verursacht 3 Sek. lang jede Sekunde {damage} Schaden.',
   'entities.abilities.flash_heal.name': 'Blitzheilung',
   'entities.abilities.flash_heal.description':
     'Ein schnelles Gebet, das ein freundliches Ziel um {damage} heilt.',
@@ -1886,7 +1886,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Verflucht das Ziel mit Pein: {damage} Schattenschaden über 24 Sek.',
   'entities.abilities.drain_life.name': 'Blutsauger',
   'entities.abilities.drain_life.description':
-    'Entzieht dem Ziel Leben und überträgt euch 5 Sek. lang jede Sekunde 7 Gesundheit.',
+    'Entzieht dem Ziel Leben und überträgt euch 5 Sek. lang jede Sekunde {damage} Gesundheit.',
   'entities.abilities.fear.name': 'Furcht',
   'entities.abilities.fear.description':
     'Versetzt den Gegner in Schrecken und lässt ihn bis zu 8 Sek. lang kauern. Jeder Schaden bricht den Effekt.',
@@ -4793,4 +4793,23 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.school.shadow': 'Schatten',
   'hudChrome.auraEffect.school.holy': 'Heilig',
   'hudChrome.auraEffect.school.nature': 'Natur',
+  'hudChrome.masterLoot.title': 'Pluendermeister',
+  'hudChrome.masterLoot.enableLabel': 'Pluendermeister',
+  'hudChrome.masterLoot.enableAria': 'Pluendermeister aktivieren',
+  'hudChrome.masterLoot.looterLabel': 'Pluendermeister',
+  'hudChrome.masterLoot.leaderOption': 'Gruppenleiter',
+  'hudChrome.masterLoot.thresholdLabel': 'Schwelle',
+  'hudChrome.masterLoot.thresholdUncommon': 'Ungewoehnlich und hoeher',
+  'hudChrome.masterLoot.thresholdRare': 'Selten und hoeher',
+  'hudChrome.masterLoot.thresholdEpic': 'Episch und hoeher',
+  'hudChrome.masterLoot.assignPrompt': '{item} zuweisen',
+  'hudChrome.masterLoot.assignAria': '{item} an {name} zuweisen',
+  'hudChrome.masterLoot.rollButton': 'Wuerfeln',
+  'hudChrome.masterLoot.selectAll': 'Alle auswaehlen',
+  'hudChrome.masterLoot.methodMaster':
+    'Beutemethode auf Pluendermeister gesetzt. Pluendermeister: {name}.',
+  'hudChrome.masterLoot.methodGroup': 'Beutemethode auf Gruppenbeute gesetzt.',
+  'hudChrome.masterLoot.assigned': '{looter} hat {item} an {target} zugewiesen.',
+  'hudChrome.masterLoot.unassigned': '{item} wurde nicht zugewiesen und ist fuer alle frei.',
+  'hudChrome.masterLoot.leaderOnly': 'Nur der Gruppenleiter kann die Beutemethode aendern.',
 };

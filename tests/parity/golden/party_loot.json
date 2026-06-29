@@ -28,8 +28,8 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 391,
-      "state": "0aeb8ecf",
-      "events": "dcc1863c",
+      "state": "cb8f2031",
+      "events": "c6ab1462",
       "rng": {
         "draws": 2,
         "digest": "c05535b8"
@@ -114,6 +114,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 20,
             "armor": 110,
@@ -162,6 +163,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 13,
           "stats": {
             "agi": 12,
             "armor": 57,
@@ -180,7 +182,7 @@
         {
           "aiState": "idle",
           "combatTimer": 99,
-          "corpseTimer": 31.85,
+          "corpseTimer": 61.85,
           "critChance": 0.05,
           "dead": true,
           "detonateTimer": "Infinity",

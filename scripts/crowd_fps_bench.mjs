@@ -26,7 +26,7 @@ function record(line) {
   console.log(line);
   try {
     fs.mkdirSync('tmp', { recursive: true });
-    fs.appendFileSync(OUT_FILE, line + '\n');
+    fs.appendFileSync(OUT_FILE, `${line}\n`);
   } catch {
     /* ignore */
   }
@@ -238,9 +238,9 @@ async function sample(page, label) {
     const g = window.__game;
     const r = g.perf.report();
     const rr = r.renderer ?? {};
-    let visiblePlayers = 0;
+    let _visiblePlayers = 0;
     for (const e of g.world.entities.values())
-      if (e.kind === 'player' || e.k === 'player') visiblePlayers++;
+      if (e.kind === 'player' || e.k === 'player') _visiblePlayers++;
     return {
       label,
       fps: r.fps,
@@ -297,7 +297,7 @@ async function main() {
     console.log(`render client at x=${center.x.toFixed(1)} z=${center.z.toFixed(1)}`);
 
     results.push(await sample(page, 'solo'));
-    record('  ' + row(results.at(-1)));
+    record(`  ${row(results.at(-1))}`);
 
     let spawned = 0;
     for (const target of BATCHES) {
@@ -322,7 +322,7 @@ async function main() {
       for (const b of bots) b.place(center.x, center.z);
       await sleep(SETTLE_MS);
       results.push(await sample(page, `crowd-${target}`));
-      record('  ' + row(results.at(-1)));
+      record(`  ${row(results.at(-1))}`);
       try {
         await page.screenshot({ path: `tmp/crowd-${target}.png` });
       } catch {
@@ -340,7 +340,7 @@ async function main() {
       }),
     );
     results.push(await sample(page, `run-through`));
-    record('  ' + row(results.at(-1)));
+    record(`  ${row(results.at(-1))}`);
     await page.evaluate(() => window.__game.input.clearTouchMove());
 
     console.log('\n========== CROWD FPS SUMMARY ==========');

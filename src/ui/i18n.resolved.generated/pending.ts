@@ -12,6 +12,7 @@ export const pending: Record<string, readonly string[]> = {
   "es": [
     "hud.combat.floatingResist",
     "hud.combat.resisted",
+    "hudChrome.abilityScaling.bonus",
     "hudChrome.itemArmorType.cloth",
     "hudChrome.itemArmorType.leather",
     "hudChrome.itemArmorType.mail"
@@ -19,6 +20,7 @@ export const pending: Record<string, readonly string[]> = {
   "es_ES": [
     "hud.combat.floatingResist",
     "hud.combat.resisted",
+    "hudChrome.abilityScaling.bonus",
     "hudChrome.itemArmorType.cloth",
     "hudChrome.itemArmorType.leather",
     "hudChrome.itemArmorType.mail"
@@ -26,6 +28,7 @@ export const pending: Record<string, readonly string[]> = {
   "fr_FR": [
     "hud.combat.floatingResist",
     "hud.combat.resisted",
+    "hudChrome.abilityScaling.bonus",
     "hudChrome.itemArmorType.cloth",
     "hudChrome.itemArmorType.leather",
     "hudChrome.itemArmorType.mail"
@@ -33,6 +36,7 @@ export const pending: Record<string, readonly string[]> = {
   "fr_CA": [
     "hud.combat.floatingResist",
     "hud.combat.resisted",
+    "hudChrome.abilityScaling.bonus",
     "hudChrome.itemArmorType.cloth",
     "hudChrome.itemArmorType.leather",
     "hudChrome.itemArmorType.mail"
@@ -41,6 +45,7 @@ export const pending: Record<string, readonly string[]> = {
   "it_IT": [
     "hud.combat.floatingResist",
     "hud.combat.resisted",
+    "hudChrome.abilityScaling.bonus",
     "hudChrome.itemArmorType.cloth",
     "hudChrome.itemArmorType.leather",
     "hudChrome.itemArmorType.mail"
@@ -48,25 +53,38 @@ export const pending: Record<string, readonly string[]> = {
   "de_DE": [
     "hud.combat.floatingResist",
     "hud.combat.resisted",
+    "hudChrome.abilityScaling.bonus",
     "hudChrome.itemArmorType.cloth",
     "hudChrome.itemArmorType.leather",
     "hudChrome.itemArmorType.mail"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "hudChrome.abilityScaling.bonus"
+  ],
+  "zh_TW": [
+    "hudChrome.abilityScaling.bonus"
+  ],
+  "ko_KR": [
+    "hudChrome.abilityScaling.bonus"
+  ],
+  "ja_JP": [
+    "hudChrome.abilityScaling.bonus"
+  ],
   "pt_BR": [
     "hud.combat.floatingResist",
     "hud.combat.resisted",
+    "hudChrome.abilityScaling.bonus",
     "hudChrome.itemArmorType.cloth",
     "hudChrome.itemArmorType.leather",
     "hudChrome.itemArmorType.mail"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "hudChrome.abilityScaling.bonus"
+  ],
   "nl_NL": [
     "hud.combat.floatingResist",
     "hud.combat.resisted",
+    "hudChrome.abilityScaling.bonus",
     "hudChrome.itemArmorType.cloth",
     "hudChrome.itemArmorType.leather",
     "hudChrome.itemArmorType.mail"
@@ -74,6 +92,7 @@ export const pending: Record<string, readonly string[]> = {
   "pl_PL": [
     "hud.combat.floatingResist",
     "hud.combat.resisted",
+    "hudChrome.abilityScaling.bonus",
     "hudChrome.itemArmorType.cloth",
     "hudChrome.itemArmorType.leather",
     "hudChrome.itemArmorType.mail"
@@ -81,6 +100,7 @@ export const pending: Record<string, readonly string[]> = {
   "id_ID": [
     "hud.combat.floatingResist",
     "hud.combat.resisted",
+    "hudChrome.abilityScaling.bonus",
     "hudChrome.itemArmorType.cloth",
     "hudChrome.itemArmorType.leather",
     "hudChrome.itemArmorType.mail"
@@ -88,6 +108,7 @@ export const pending: Record<string, readonly string[]> = {
   "tr_TR": [
     "hud.combat.floatingResist",
     "hud.combat.resisted",
+    "hudChrome.abilityScaling.bonus",
     "hudChrome.itemArmorType.cloth",
     "hudChrome.itemArmorType.leather",
     "hudChrome.itemArmorType.mail"
@@ -95,6 +116,7 @@ export const pending: Record<string, readonly string[]> = {
   "sv_SE": [
     "hud.combat.floatingResist",
     "hud.combat.resisted",
+    "hudChrome.abilityScaling.bonus",
     "hudChrome.itemArmorType.cloth",
     "hudChrome.itemArmorType.leather",
     "hudChrome.itemArmorType.mail"
@@ -102,6 +124,7 @@ export const pending: Record<string, readonly string[]> = {
   "vi_VN": [
     "hud.combat.floatingResist",
     "hud.combat.resisted",
+    "hudChrome.abilityScaling.bonus",
     "hudChrome.itemArmorType.cloth",
     "hudChrome.itemArmorType.leather",
     "hudChrome.itemArmorType.mail"
@@ -109,6 +132,7 @@ export const pending: Record<string, readonly string[]> = {
   "da_DK": [
     "hud.combat.floatingResist",
     "hud.combat.resisted",
+    "hudChrome.abilityScaling.bonus",
     "hudChrome.itemArmorType.cloth",
     "hudChrome.itemArmorType.leather",
     "hudChrome.itemArmorType.mail"

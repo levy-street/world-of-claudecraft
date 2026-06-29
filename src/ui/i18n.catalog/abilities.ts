@@ -663,7 +663,7 @@ const classAbilityNamesEn = {
       [
         'arcane_missiles',
         'Arcane Missiles',
-        'Launches Arcane Missiles at the enemy, causing 8 Arcane damage each second for 3 sec.',
+        'Launches Arcane Missiles at the enemy, causing {damage} Arcane damage each second for 3 sec.',
       ],
       [
         'polymorph',
@@ -893,7 +893,7 @@ const classAbilityNamesEn = {
       [
         'mind_flay',
         'Mind Flay',
-        "Assaults the target's mind with Shadow energy, causing 12 damage each second for 3 sec.",
+        "Assaults the target's mind with Shadow energy, causing {damage} damage each second for 3 sec.",
       ],
       ['flash_heal', 'Flash Heal', 'A fast prayer that heals a friendly target for {damage}.'],
       ['lightning_bolt', 'Lightning Bolt', 'Hurls a bolt of lightning for {damage} Nature damage.'],
@@ -968,7 +968,7 @@ const classAbilityNamesEn = {
       [
         'drain_life',
         'Drain Life',
-        "Drains the target's life, transferring 7 health to you each second for 5 sec.",
+        "Drains the target's life, transferring {damage} health to you each second for 5 sec.",
       ],
       [
         'fear',

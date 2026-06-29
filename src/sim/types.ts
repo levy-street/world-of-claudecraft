@@ -147,6 +147,7 @@ export type AuraKind =
   | 'buff_dodge'
   | 'buff_speed'
   | 'buff_haste'
+  | 'buff_spellpower'
   | 'hot'
   | 'absorb'
   | 'imbue'
@@ -283,6 +284,10 @@ interface BaseItemDef {
   slot?: EquipSlot;
   weapon?: WeaponInfo;
   stats?: Partial<Stats>;
+  // Spell Power affix (caster gear): flat Spell Power, summed in recalcPlayerStats.
+  // Kept off `Stats` because Spell Power is a derived combat rating (like attackPower),
+  // not one of the six primary attributes.
+  spellPower?: number;
   use?: ItemUse;
   sellValue: number; // copper (vendor buys at this)
   buyValue?: number; // copper (vendor sells at this)
@@ -362,16 +367,27 @@ export interface LootRollPrompt {
   expiresAt: number;
 }
 
+// Master loot intercepts roll-worthy drops at/above a quality threshold and hands
+// the assignment decision to a single designated looter (the leader, or 0 = leader).
+export type MasterLootThreshold = 'uncommon' | 'rare' | 'epic';
+export interface MasterLootSettings {
+  enabled: boolean;
+  looter: number; // pid of the master looter; 0 means "the current leader"
+  threshold: MasterLootThreshold;
+}
+
 export interface LootStrategies {
   currency: CurrencyLootStrategy;
   commonItems: ItemLootStrategy;
   premiumItems: ItemLootStrategy;
+  master: MasterLootSettings;
 }
 
 export const DEFAULT_PARTY_LOOT_STRATEGIES: LootStrategies = {
   currency: 'fair-split',
   commonItems: 'looter-takes-all',
   premiumItems: 'need-greed',
+  master: { enabled: false, looter: 0, threshold: 'uncommon' },
 };
 
 export interface LootEntry {
@@ -1012,6 +1028,12 @@ export interface AbilityDef {
   range: number; // yards; 0 = melee range
   minRange?: number;
   school: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
+  // Damage scaling source for the flat directDamage / DoT / AoE riders. Default:
+  // non-physical damage scales with Spell Power; physical damage scales with melee
+  // Attack Power (on top of the weapon/finisher paths, which already carry AP).
+  // 'ranged' marks a hunter "attack spell" that scales off Ranged Attack Power
+  // instead (Arcane Shot, Serpent Sting, Aimed Shot), regardless of school.
+  scalesWith?: 'ranged';
   requiresTarget: boolean;
   targetType?: 'enemy' | 'friendly'; // friendly = self or allied player (defaults to enemy)
   onNextSwing?: boolean; // heroic strike style: no GCD, queues on swing
@@ -1277,6 +1299,7 @@ export interface Entity {
   weapon: WeaponInfo;
   attackPower: number;
   rangedPower: number; // hunters: ranged attack power
+  spellPower: number; // casters: added to spell damage via per-spell coefficients
   critChance: number; // 0..1
   dodgeChance: number;
   moveSpeed: number;
@@ -1461,6 +1484,16 @@ export type SimEvent = { pid?: number } & (
       itemName: string;
       quality: ItemDef['quality'];
       expiresAt: number;
+    }
+  // master loot: sent only to the master looter; candidates are the eligible recipients
+  | {
+      type: 'masterLoot';
+      rollId: number;
+      itemId: string;
+      itemName: string;
+      quality: ItemDef['quality'];
+      expiresAt: number;
+      candidates: { pid: number; name: string }[];
     }
   | { type: 'error'; text: string; reason?: ErrorReason }
   | { type: 'questAccepted'; questId: string }
@@ -1879,6 +1912,40 @@ export function armorReduction(armor: number, attackerLevel: number): number {
   const a = Math.max(0, armor);
   return Math.min(0.75, a / (a + 85 * attackerLevel + 400));
 }
+
+// ---------------------------------------------------------------------------
+// Spell Power: caster damage scaling (vanilla-style cast-time / DoT-duration
+// coefficient model). Casters convert Intellect into Spell Power; Spell Power
+// then adds to each spell's damage via a per-spell coefficient. Hunter "attack
+// spells" (Arcane Shot, Serpent Sting, Aimed Shot) instead scale off Ranged
+// Attack Power, mirroring the physical attack-power path. The pure coefficient
+// helpers live in src/sim/spell_scaling.ts; these are the tuning knobs.
+// ---------------------------------------------------------------------------
+// Spell Power gained per point of Intellect (1 Spell Power per 2 Intellect). Tuned
+// (see tests/spell_power.test.ts) so a fully-leveled caster gets a meaningful but
+// not dominant damage lift, scaling further as caster gear adds Int + Spell Power.
+export const SPELL_POWER_PER_INT = 0.5;
+// Direct nuke coefficient = clamp(castTime, MIN, MAX) / DIVISOR (vanilla 3.5). The
+// max equals the divisor so the direct coefficient caps at 1.0 (a 3.5s+ cast gets
+// full Spell Power; a 6s Pyroblast does not exceed it).
+export const SPELL_COEFF_DIVISOR = 3.5;
+export const SPELL_COEFF_MIN_CAST = 1.5; // instant / sub-1.5s casts use this floor
+export const SPELL_COEFF_MAX_CAST = 3.5; // longer casts cap at a 1.0 coefficient
+// Total DoT coefficient = duration / DURATION (vanilla 15), spread across ticks.
+export const SPELL_DOT_COEFF_DURATION = 15;
+// AoE spells take a reduced coefficient (vanilla AoE penalty).
+export const SPELL_AOE_COEFF_MULT = 0.333;
+// Hunter ranged "attack spells" scale off Ranged Attack Power using the same
+// cast/duration shape, scaled down by this factor (RAP is far larger than SP).
+// Tuned so Arcane Shot / Aimed Shot / Serpent Sting gain a ~20-30% lift at cap.
+export const RANGED_SPELL_AP_SCALE = 0.15;
+// Melee physical "attack spells" (warrior Rend/Execute/Cleave, rogue Rupture/
+// Garrote bleeds, druid feral bleeds, etc.) take the flat-damage portion of a
+// special and scale it off melee Attack Power with the same shape. Melee AP is
+// the same magnitude as Ranged AP, so it reuses the same scale-down factor. The
+// weapon-swing and finisher portions already carry AP through their own paths;
+// this only lifts the flat directDamage / DoT / AoE riders.
+export const MELEE_SPELL_AP_SCALE = 0.15;
 
 // ---------------------------------------------------------------------------
 // Delves, replayable modular instances (see docs/prd/delves.md)

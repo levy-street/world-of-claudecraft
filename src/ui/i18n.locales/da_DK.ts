@@ -348,7 +348,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_intellect.description': 'Øger Intellekt med 2 i 30 min.',
   'entities.abilities.arcane_intellect.name': 'Arkan Intellekt',
   'entities.abilities.arcane_missiles.description':
-    'Affyrer Arkane Missiler mod fjenden, der forvolder 8 Arkan skade hvert sekund i 3 sek.',
+    'Affyrer Arkane Missiler mod fjenden, der forvolder {damage} Arkan skade hvert sekund i 3 sek.',
   'entities.abilities.arcane_missiles.name': 'Arkane Missiler',
   'entities.abilities.arcane_shot.description':
     'Et øjeblikkeligt skud, der giver {damage} Arkan skade.',
@@ -455,7 +455,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Et helligt skjold opsuger 50 skade i 10 sek.',
   'entities.abilities.divine_protection.name': 'Guddommelig Beskyttelse',
   'entities.abilities.drain_life.description':
-    'Dræner målets liv og overfører 7 helbred til dig hvert sekund i 5 sek.',
+    'Dræner målets liv og overfører {damage} helbred til dig hvert sekund i 5 sek.',
   'entities.abilities.drain_life.name': 'Dræn Liv',
   'entities.abilities.earth_shock.description':
     'Chokerer øjeblikkeligt målet med rystende kraft for {damage} naturskade.',
@@ -589,7 +589,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_blast.description': 'Sprænger målets sind for {damage} skyggeskade.',
   'entities.abilities.mind_blast.name': 'Sindsstød',
   'entities.abilities.mind_flay.description':
-    'Angriber målets sind med skyggeenergi, hvilket volder 12 skade hvert sekund i 3 sek.',
+    'Angriber målets sind med skyggeenergi, hvilket volder {damage} skade hvert sekund i 3 sek.',
   'entities.abilities.mind_flay.name': 'Sindsflåning',
   'entities.abilities.mongoose_bite.description':
     'Modangreb efter målet undviger for våbenskade plus 12. Kan ikke undviges.',
@@ -4677,4 +4677,22 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.school.shadow': 'Skygge',
   'hudChrome.auraEffect.school.holy': 'Hellig',
   'hudChrome.auraEffect.school.nature': 'Natur',
+  'hudChrome.masterLoot.title': 'Master loot',
+  'hudChrome.masterLoot.enableLabel': 'Master loot',
+  'hudChrome.masterLoot.enableAria': 'Aktiver master loot',
+  'hudChrome.masterLoot.looterLabel': 'Master looter',
+  'hudChrome.masterLoot.leaderOption': 'Gruppeleder',
+  'hudChrome.masterLoot.thresholdLabel': 'Tærskel',
+  'hudChrome.masterLoot.thresholdUncommon': 'Uncommon og op',
+  'hudChrome.masterLoot.thresholdRare': 'Rare og op',
+  'hudChrome.masterLoot.thresholdEpic': 'Epic og op',
+  'hudChrome.masterLoot.assignPrompt': 'Tildel {item}',
+  'hudChrome.masterLoot.assignAria': 'Tildel {item} til {name}',
+  'hudChrome.masterLoot.rollButton': 'Rul',
+  'hudChrome.masterLoot.selectAll': 'Vaelg alle',
+  'hudChrome.masterLoot.methodMaster': 'Lootmetode sat til master loot. Master looter: {name}.',
+  'hudChrome.masterLoot.methodGroup': 'Lootmetode sat til gruppeloot.',
+  'hudChrome.masterLoot.assigned': '{looter} tildelte {item} til {target}.',
+  'hudChrome.masterLoot.unassigned': '{item} blev ikke tildelt og er frit for alle.',
+  'hudChrome.masterLoot.leaderOnly': 'Kun gruppelederen kan aendre lootmetoden.',
 };

@@ -146,6 +146,8 @@ export const IWORLD_MEMBERS = [
   { name: 'convertPartyToRaid', kind: 'method' },
   { name: 'convertRaidToParty', kind: 'method' },
   { name: 'moveRaidMember', kind: 'method' },
+  { name: 'setPartyLootMaster', kind: 'method' },
+  { name: 'assignMasterLoot', kind: 'method' },
   { name: 'markerFor', kind: 'method' }, // read-returning (3/6)
   { name: 'setMarker', kind: 'method' },
   { name: 'clearMarker', kind: 'method' },
@@ -320,9 +322,9 @@ beforeAll(() => {
 
 describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => {
   it('pins total / data / method counts', () => {
-    expect(IWORLD_MEMBERS.length).toBe(143);
+    expect(IWORLD_MEMBERS.length).toBe(145);
     expect(DATA_MEMBERS.length).toBe(36);
-    expect(METHOD_MEMBERS.length).toBe(107);
+    expect(METHOD_MEMBERS.length).toBe(109);
   });
 
   it('has no duplicate member names', () => {
@@ -346,6 +348,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'arenaInfo',
       'arenaQueueJoin',
       'arenaQueueLeave',
+      'assignMasterLoot',
       'blockAdd',
       'blockRemove',
       'buyBackItem',
@@ -449,6 +452,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'sellAllJunk',
       'sellItem',
       'setMarker',
+      'setPartyLootMaster',
       'setPetAutoTaunt',
       'setPetMode',
       'setSpec',
@@ -532,6 +536,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'arenaAugmentPick',
       'arenaQueueJoin',
       'arenaQueueLeave',
+      'assignMasterLoot',
       'blockAdd',
       'blockRemove',
       'buyBackItem',
@@ -610,6 +615,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'sellAllJunk',
       'sellItem',
       'setMarker',
+      'setPartyLootMaster',
       'setPetAutoTaunt',
       'setPetMode',
       'setSpec',
@@ -825,6 +831,8 @@ const FACET_PARTY = [
   'convertPartyToRaid',
   'convertRaidToParty',
   'moveRaidMember',
+  'setPartyLootMaster',
+  'assignMasterLoot',
   'markerFor',
   'setMarker',
   'clearMarker',
@@ -976,8 +984,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the 20 fa
 
   it('the union of the 20 facets equals the pinned 143-member IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(143);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(143);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(145);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(145);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

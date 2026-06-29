@@ -222,6 +222,9 @@ export const es: EnTranslations = {
     "rest": {
       "resting": "Descansando"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
     "unitFrame": {
       "playerLabel": "Tu personaje",
       "targetLabel": "Tu objetivo",
@@ -586,6 +589,26 @@ export const es: EnTranslations = {
       "exportBtn": "Descargar Mis Datos",
       "exportDone": "Tus datos se descargaron. Te enviamos una confirmación por correo.",
       "exportFailed": "No se pudieron exportar tus datos. Inténtalo de nuevo en un momento."
+    },
+    "masterLoot": {
+      "title": "Botin maestro",
+      "enableLabel": "Botin maestro",
+      "enableAria": "Activar botin maestro",
+      "looterLabel": "Maestro del botin",
+      "leaderOption": "Lider del grupo",
+      "thresholdLabel": "Umbral",
+      "thresholdUncommon": "Poco comun o superior",
+      "thresholdRare": "Raro o superior",
+      "thresholdEpic": "Epico o superior",
+      "assignPrompt": "Asignar {item}",
+      "assignAria": "Asignar {item} a {name}",
+      "rollButton": "Tirar",
+      "selectAll": "Elegir todos",
+      "methodMaster": "Metodo de botin cambiado a botin maestro. Maestro del botin: {name}.",
+      "methodGroup": "Metodo de botin cambiado a botin de grupo.",
+      "assigned": "{looter} asigno {item} a {target}.",
+      "unassigned": "{item} no fue asignado y queda libre para todos.",
+      "leaderOnly": "Solo el lider del grupo puede cambiar el metodo de botin."
     },
     "bags": {
       "filterGroupAria": "Filtrar bolsas por categoría",
@@ -3462,7 +3485,7 @@ export const es: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "Misiles Arcanos",
-        "description": "Lanza Misiles Arcanos al enemigo, causando 8 de daño Arcano cada segundo durante 3 s."
+        "description": "Lanza Misiles Arcanos al enemigo, causando {damage} de daño Arcano cada segundo durante 3 s."
       },
       "polymorph": {
         "name": "Polimorfia",
@@ -3710,7 +3733,7 @@ export const es: EnTranslations = {
       },
       "mind_flay": {
         "name": "Tortura mental",
-        "description": "Asalta la mente del objetivo con energía de las Sombras e inflige 12 de daño cada segundo durante 3 s."
+        "description": "Asalta la mente del objetivo con energía de las Sombras e inflige {damage} de daño cada segundo durante 3 s."
       },
       "flash_heal": {
         "name": "Sanación relámpago",
@@ -3786,7 +3809,7 @@ export const es: EnTranslations = {
       },
       "drain_life": {
         "name": "Drenar vida",
-        "description": "Drena la vida del objetivo y te transfiere 7 de salud cada segundo durante 5 s."
+        "description": "Drena la vida del objetivo y te transfiere {damage} de salud cada segundo durante 5 s."
       },
       "fear": {
         "name": "Miedo",

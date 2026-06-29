@@ -1657,7 +1657,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Explota contra el enemigo y causa {damage} de daño de Fuego. Instantáneo.',
   'entities.abilities.arcane_missiles.name': 'Misiles Arcanos',
   'entities.abilities.arcane_missiles.description':
-    'Lanza Misiles Arcanos al enemigo, causando 8 de daño Arcano cada segundo durante 3 s.',
+    'Lanza Misiles Arcanos al enemigo, causando {damage} de daño Arcano cada segundo durante 3 s.',
   'entities.abilities.polymorph.name': 'Polimorfia',
   'entities.abilities.polymorph.description':
     'Transforma al enemigo en oveja durante hasta 15 s. La oveja deambula y se cura rápidamente. Cualquier daño rompe el efecto. Solo bestias y humanoides.',
@@ -1835,7 +1835,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Una plegaria lenta pero poderosa que sana a un objetivo amistoso por {damage}.',
   'entities.abilities.mind_flay.name': 'Tortura mental',
   'entities.abilities.mind_flay.description':
-    'Asalta la mente del objetivo con energía de las Sombras e inflige 12 de daño cada segundo durante 3 s.',
+    'Asalta la mente del objetivo con energía de las Sombras e inflige {damage} de daño cada segundo durante 3 s.',
   'entities.abilities.flash_heal.name': 'Sanación relámpago',
   'entities.abilities.flash_heal.description':
     'Una plegaria rápida que sana a un objetivo amistoso por {damage}.',
@@ -1890,7 +1890,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Maldice al objetivo con agonía: {damage} de daño de las Sombras durante 24 s.',
   'entities.abilities.drain_life.name': 'Drenar vida',
   'entities.abilities.drain_life.description':
-    'Drena la vida del objetivo y te transfiere 7 de salud cada segundo durante 5 s.',
+    'Drena la vida del objetivo y te transfiere {damage} de salud cada segundo durante 5 s.',
   'entities.abilities.fear.name': 'Miedo',
   'entities.abilities.fear.description':
     'Siembra terror en el enemigo y lo deja encogido durante hasta 8 s. Cualquier daño rompe el efecto.',
@@ -4779,4 +4779,23 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.school.shadow': 'Sombras',
   'hudChrome.auraEffect.school.holy': 'Sagrado',
   'hudChrome.auraEffect.school.nature': 'Naturaleza',
+  'hudChrome.masterLoot.title': 'Botin maestro',
+  'hudChrome.masterLoot.enableLabel': 'Botin maestro',
+  'hudChrome.masterLoot.enableAria': 'Activar botin maestro',
+  'hudChrome.masterLoot.looterLabel': 'Maestro del botin',
+  'hudChrome.masterLoot.leaderOption': 'Lider del grupo',
+  'hudChrome.masterLoot.thresholdLabel': 'Umbral',
+  'hudChrome.masterLoot.thresholdUncommon': 'Poco comun o superior',
+  'hudChrome.masterLoot.thresholdRare': 'Raro o superior',
+  'hudChrome.masterLoot.thresholdEpic': 'Epico o superior',
+  'hudChrome.masterLoot.assignPrompt': 'Asignar {item}',
+  'hudChrome.masterLoot.assignAria': 'Asignar {item} a {name}',
+  'hudChrome.masterLoot.rollButton': 'Tirar',
+  'hudChrome.masterLoot.selectAll': 'Elegir todos',
+  'hudChrome.masterLoot.methodMaster':
+    'Metodo de botin cambiado a botin maestro. Maestro del botin: {name}.',
+  'hudChrome.masterLoot.methodGroup': 'Metodo de botin cambiado a botin de grupo.',
+  'hudChrome.masterLoot.assigned': '{looter} asigno {item} a {target}.',
+  'hudChrome.masterLoot.unassigned': '{item} no fue asignado y queda libre para todos.',
+  'hudChrome.masterLoot.leaderOnly': 'Solo el lider del grupo puede cambiar el metodo de botin.',
 };

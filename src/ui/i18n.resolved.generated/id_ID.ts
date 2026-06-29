@@ -222,6 +222,9 @@ export const id_ID: EnTranslations = {
     "rest": {
       "resting": "Beristirahat"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
     "unitFrame": {
       "playerLabel": "Pahlawan Anda",
       "targetLabel": "Sasaran Anda",
@@ -586,6 +589,26 @@ export const id_ID: EnTranslations = {
       "exportBtn": "Unduh Dataku",
       "exportDone": "Datamu telah diunduh. Kami mengirimkan konfirmasi melalui email.",
       "exportFailed": "Tidak dapat mengekspor datamu. Coba lagi sebentar."
+    },
+    "masterLoot": {
+      "title": "Master loot",
+      "enableLabel": "Master loot",
+      "enableAria": "Aktifkan master loot",
+      "looterLabel": "Master looter",
+      "leaderOption": "Pemimpin grup",
+      "thresholdLabel": "Ambang",
+      "thresholdUncommon": "Uncommon ke atas",
+      "thresholdRare": "Rare ke atas",
+      "thresholdEpic": "Epic ke atas",
+      "assignPrompt": "Berikan {item}",
+      "assignAria": "Berikan {item} kepada {name}",
+      "rollButton": "Gulung",
+      "selectAll": "Pilih semua",
+      "methodMaster": "Metode loot diatur ke master loot. Master looter: {name}.",
+      "methodGroup": "Metode loot diatur ke loot grup.",
+      "assigned": "{looter} memberikan {item} kepada {target}.",
+      "unassigned": "{item} tidak diberikan dan bebas untuk semua.",
+      "leaderOnly": "Hanya pemimpin grup yang dapat mengubah metode loot."
     },
     "bags": {
       "filterGroupAria": "Saring tas menurut kategori",
@@ -3462,7 +3485,7 @@ export const id_ID: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "Misil Arkana",
-        "description": "Melontarkan Misil Arkana ke arah musuh, menimbulkan 8 kerusakan Arkana setiap detik selama 3 detik."
+        "description": "Melontarkan Misil Arkana ke arah musuh, menimbulkan {damage} kerusakan Arkana setiap detik selama 3 detik."
       },
       "polymorph": {
         "name": "Ubah Wujud",
@@ -3710,7 +3733,7 @@ export const id_ID: EnTranslations = {
       },
       "mind_flay": {
         "name": "Cambuk Pikiran",
-        "description": "Menyerang pikiran target dengan energi Bayangan, menimbulkan 12 kerusakan setiap detik selama 3 detik."
+        "description": "Menyerang pikiran target dengan energi Bayangan, menimbulkan {damage} kerusakan setiap detik selama 3 detik."
       },
       "flash_heal": {
         "name": "Sembuh Kilat",
@@ -3786,7 +3809,7 @@ export const id_ID: EnTranslations = {
       },
       "drain_life": {
         "name": "Sedot Nyawa",
-        "description": "Menyedot nyawa target, memindahkan 7 kesehatan kepadamu setiap detik selama 5 detik."
+        "description": "Menyedot nyawa target, memindahkan {damage} kesehatan kepadamu setiap detik selama 5 detik."
       },
       "fear": {
         "name": "Ketakutan",

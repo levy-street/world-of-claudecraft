@@ -140,10 +140,12 @@ import type { Ante, PickAction } from './lockpick';
 // Sim keeps thin same-named delegates that call these.
 import {
   activeLootRolls as activeLootRollsImpl,
+  assignMasterLoot as assignMasterLootImpl,
   type PendingLootRoll,
   partyLootCandidatesForMob as partyLootCandidatesForMobImpl,
   resolveLootRoll as resolveLootRollImpl,
   rollLoot as rollLootImpl,
+  setPartyLootMaster as setPartyLootMasterImpl,
   submitLootRoll as submitLootRollImpl,
 } from './loot/loot_roll';
 import { Market, type MarketListing, type MarketSave } from './market';
@@ -189,6 +191,7 @@ export type { MarketSave } from './market';
 import {
   enterCrypt as enterCryptImpl,
   enterDungeon as enterDungeonImpl,
+  instanceInfoAt as instanceInfoAtImpl,
   instanceKeyFor as instanceKeyForImpl,
   instanceOriginOf as instanceOriginOfImpl,
   instanceSlotAt as instanceSlotAtImpl,
@@ -273,6 +276,7 @@ import {
   type LootRollPrompt,
   type LootStrategies,
   MAX_LEVEL,
+  type MasterLootThreshold,
   MELEE_RANGE,
   type MobFamily,
   type MoveInput,
@@ -2855,7 +2859,7 @@ export class Sim {
     });
     for (const target of this.hostilesInRadius(source, effect.pos, effect.radius)) {
       if (!this.hasLineOfSight(source, target)) continue;
-      const dmg = Math.round(this.rng.range(effect.min, effect.max));
+      const dmg = Math.round(this.rng.range(effect.min, effect.max) + (effect.spBonus ?? 0));
       this.dealDamage(
         source,
         target,
@@ -3396,6 +3400,19 @@ export class Sim {
 
   private resolveLootRoll(roll: PendingLootRoll): void {
     resolveLootRollImpl(this.ctx, roll);
+  }
+
+  assignMasterLoot(rollId: number, targetPids: number[], pid?: number): void {
+    assignMasterLootImpl(this.ctx, rollId, targetPids, pid);
+  }
+
+  setPartyLootMaster(
+    enabled: boolean,
+    looter: number,
+    threshold: MasterLootThreshold,
+    pid?: number,
+  ): void {
+    setPartyLootMasterImpl(this.ctx, enabled, looter, threshold, pid);
   }
 
   // -------------------------------------------------------------------------
@@ -5137,6 +5154,7 @@ export class Sim {
     return {
       leader: party.leader,
       raid: party.raid,
+      master: { ...party.lootStrategies.master },
       members: party.members.flatMap((mPid) => {
         const meta = this.players.get(mPid);
         const e = this.entities.get(mPid);
@@ -5185,6 +5203,10 @@ export class Sim {
 
   instanceSlotAt(pos: Vec3): number | null {
     return instanceSlotAtImpl(this.ctx, pos);
+  }
+
+  instanceInfoAt(pos: Vec3): { slot: number; dungeonId: string } | null {
+    return instanceInfoAtImpl(this.ctx, pos);
   }
 
   private error(pid: number, text: string, reason?: ErrorReason): void {

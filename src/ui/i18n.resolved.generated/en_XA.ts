@@ -222,6 +222,9 @@ export const en_XA: EnTranslations = {
     "rest": {
       "resting": "[Ŕéšţíñĝ]"
     },
+    "abilityScaling": {
+      "bonus": "[(+{value})]"
+    },
     "unitFrame": {
       "playerLabel": "[Ýóúŕ Ĥéŕó]",
       "targetLabel": "[Ýóúŕ Ɱáŕķ]",
@@ -586,6 +589,26 @@ export const en_XA: EnTranslations = {
       "exportBtn": "[Ðóŵñļóáð Ɱý Ðáţá]",
       "exportDone": "[Ýóúŕ ðáţá ŵáš ðóŵñļóáðéð. Ŵé éɱáíļéð ýóú á çóñƒíŕɱáţíóñ.]",
       "exportFailed": "[Çóúļð ñóţ éẋþóŕţ ýóúŕ ðáţá. Ţŕý áĝáíñ íñ á ɱóɱéñţ.]"
+    },
+    "masterLoot": {
+      "title": "[Ɱášţéŕ Ļóóţ]",
+      "enableLabel": "[Ɱášţéŕ ļóóţ]",
+      "enableAria": "[Éñáƀļé ɱášţéŕ ļóóţ]",
+      "looterLabel": "[Ɱášţéŕ ļóóţéŕ]",
+      "leaderOption": "[Þáŕţý ļéáðéŕ]",
+      "thresholdLabel": "[Ţĥŕéšĥóļð]",
+      "thresholdUncommon": "[Úñçóɱɱóñ áñð úþ]",
+      "thresholdRare": "[Ŕáŕé áñð úþ]",
+      "thresholdEpic": "[Éþíç áñð úþ]",
+      "assignPrompt": "[Áššíĝñ {item}]",
+      "assignAria": "[Áššíĝñ {item} ţó {name}]",
+      "rollButton": "[Ŕóļļ]",
+      "selectAll": "[Šéļéçţ áļļ]",
+      "methodMaster": "[Ļóóţ ɱéţĥóð šéţ ţó ɱášţéŕ ļóóţ. Ɱášţéŕ ļóóţéŕ: {name}.]",
+      "methodGroup": "[Ļóóţ ɱéţĥóð šéţ ţó ĝŕóúþ ļóóţ.]",
+      "assigned": "[{looter} áššíĝñéð {item} ţó {target}.]",
+      "unassigned": "[{item} ŵáš ñóţ áššíĝñéð áñð íš ƒŕéé ƒóŕ áļļ.]",
+      "leaderOnly": "[Óñļý ţĥé þáŕţý ļéáðéŕ çáñ çĥáñĝé ţĥé ļóóţ ɱéţĥóð.]"
     },
     "bags": {
       "filterGroupAria": "[Ƒíļţéŕ ƀáĝš ƀý çáţéĝóŕý]",
@@ -3462,7 +3485,7 @@ export const en_XA: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "[Áŕçáñé Ɱíššíļéš]",
-        "description": "[Ļáúñçĥéš Áŕçáñé Ɱíššíļéš áţ ţĥé éñéɱý, çáúšíñĝ 8 Áŕçáñé ðáɱáĝé éáçĥ šéçóñð ƒóŕ 3 šéç.]"
+        "description": "[Ļáúñçĥéš Áŕçáñé Ɱíššíļéš áţ ţĥé éñéɱý, çáúšíñĝ {damage} Áŕçáñé ðáɱáĝé éáçĥ šéçóñð ƒóŕ 3 šéç.]"
       },
       "polymorph": {
         "name": "[Þóļýɱóŕþĥ]",
@@ -3710,7 +3733,7 @@ export const en_XA: EnTranslations = {
       },
       "mind_flay": {
         "name": "[Ɱíñð Ƒļáý]",
-        "description": "[Áššáúļţš ţĥé ţáŕĝéţ'š ɱíñð ŵíţĥ Šĥáðóŵ éñéŕĝý, çáúšíñĝ 12 ðáɱáĝé éáçĥ šéçóñð ƒóŕ 3 šéç.]"
+        "description": "[Áššáúļţš ţĥé ţáŕĝéţ'š ɱíñð ŵíţĥ Šĥáðóŵ éñéŕĝý, çáúšíñĝ {damage} ðáɱáĝé éáçĥ šéçóñð ƒóŕ 3 šéç.]"
       },
       "flash_heal": {
         "name": "[Ƒļášĥ Ĥéáļ]",
@@ -3786,7 +3809,7 @@ export const en_XA: EnTranslations = {
       },
       "drain_life": {
         "name": "[Ðŕáíñ Ļíƒé]",
-        "description": "[Ðŕáíñš ţĥé ţáŕĝéţ'š ļíƒé, ţŕáñšƒéŕŕíñĝ 7 ĥéáļţĥ ţó ýóú éáçĥ šéçóñð ƒóŕ 5 šéç.]"
+        "description": "[Ðŕáíñš ţĥé ţáŕĝéţ'š ļíƒé, ţŕáñšƒéŕŕíñĝ {damage} ĥéáļţĥ ţó ýóú éáçĥ šéçóñð ƒóŕ 5 šéç.]"
       },
       "fear": {
         "name": "[Ƒéáŕ]",

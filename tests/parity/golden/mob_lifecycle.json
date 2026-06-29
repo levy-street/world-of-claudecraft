@@ -31,7 +31,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 393,
-      "state": "8e1f9709",
+      "state": "9f6e0cd9",
       "events": "ec3dd5e7",
       "rng": {
         "draws": 4,
@@ -98,6 +98,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 20,
             "armor": 110,
@@ -344,7 +345,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 394,
-      "state": "1bff60ef",
+      "state": "c7a1b6df",
       "events": "bae3ab67",
       "rng": {
         "draws": 7,
@@ -411,6 +412,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 20,
             "armor": 110,
@@ -715,7 +717,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 394,
-      "state": "5ed4d190",
+      "state": "f5161060",
       "events": "a281ddbe",
       "rng": {
         "draws": 8,
@@ -784,6 +786,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 20,
             "armor": 110,
@@ -1088,7 +1091,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 396,
-      "state": "c49daf0a",
+      "state": "7b26f59a",
       "events": "b75654bb",
       "rng": {
         "draws": 13,
@@ -1157,6 +1160,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 20,
             "armor": 110,
@@ -1503,7 +1507,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 397,
-      "state": "687b5952",
+      "state": "dad49302",
       "events": "5e79dbdf",
       "rng": {
         "draws": 17,
@@ -1572,6 +1576,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 20,
             "armor": 110,
@@ -1972,7 +1977,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 397,
-      "state": "687b5952",
+      "state": "dad49302",
       "events": "741638a5",
       "rng": {
         "draws": 17,
@@ -2041,6 +2046,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 20,
             "armor": 110,

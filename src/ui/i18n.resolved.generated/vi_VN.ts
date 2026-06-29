@@ -222,6 +222,9 @@ export const vi_VN: EnTranslations = {
     "rest": {
       "resting": "Đang Nghỉ Ngơi"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
     "unitFrame": {
       "playerLabel": "Anh Hùng Của Bạn",
       "targetLabel": "Mục Tiêu Của Bạn",
@@ -586,6 +589,26 @@ export const vi_VN: EnTranslations = {
       "exportBtn": "Tải Dữ Liệu Của Tôi",
       "exportDone": "Dữ liệu của bạn đã được tải xuống. Chúng tôi đã gửi email xác nhận cho bạn.",
       "exportFailed": "Không thể xuất dữ liệu của bạn. Thử lại sau giây lát."
+    },
+    "masterLoot": {
+      "title": "Chia chien loi pham",
+      "enableLabel": "Chia chien loi pham",
+      "enableAria": "Bat chia chien loi pham",
+      "looterLabel": "Nguoi chia chien loi pham",
+      "leaderOption": "Truong nhom",
+      "thresholdLabel": "Nguong",
+      "thresholdUncommon": "Uncommon tro len",
+      "thresholdRare": "Rare tro len",
+      "thresholdEpic": "Epic tro len",
+      "assignPrompt": "Gan {item}",
+      "assignAria": "Gan {item} cho {name}",
+      "rollButton": "Do",
+      "selectAll": "Chon tat ca",
+      "methodMaster": "Phuong thuc chien loi pham da dat thanh chia chien loi pham. Nguoi chia: {name}.",
+      "methodGroup": "Phuong thuc chien loi pham da dat thanh loot nhom.",
+      "assigned": "{looter} da gan {item} cho {target}.",
+      "unassigned": "{item} chua duoc gan va moi nguoi deu co the nhat.",
+      "leaderOnly": "Chi truong nhom co the doi phuong thuc chien loi pham."
     },
     "bags": {
       "filterGroupAria": "Lọc túi đồ theo danh mục",
@@ -3462,7 +3485,7 @@ export const vi_VN: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "Phi Đạn Bí Thuật",
-        "description": "Phóng các Phi Đạn Bí Thuật vào kẻ địch, gây 8 sát thương Bí Thuật mỗi giây trong 3 giây."
+        "description": "Phóng các Phi Đạn Bí Thuật vào kẻ địch, gây {damage} sát thương Bí Thuật mỗi giây trong 3 giây."
       },
       "polymorph": {
         "name": "Biến Hình",
@@ -3710,7 +3733,7 @@ export const vi_VN: EnTranslations = {
       },
       "mind_flay": {
         "name": "Cào Xé Tâm Trí",
-        "description": "Công kích tâm trí mục tiêu bằng năng lượng Bóng Tối, gây 12 sát thương mỗi giây trong 3 giây."
+        "description": "Công kích tâm trí mục tiêu bằng năng lượng Bóng Tối, gây {damage} sát thương mỗi giây trong 3 giây."
       },
       "flash_heal": {
         "name": "Trị Liệu Nhanh",
@@ -3786,7 +3809,7 @@ export const vi_VN: EnTranslations = {
       },
       "drain_life": {
         "name": "Hút Sinh Lực",
-        "description": "Hút sinh lực của mục tiêu, chuyển 7 máu sang cho bạn mỗi giây trong 5 giây."
+        "description": "Hút sinh lực của mục tiêu, chuyển {damage} máu sang cho bạn mỗi giây trong 5 giây."
       },
       "fear": {
         "name": "Gieo Sợ Hãi",

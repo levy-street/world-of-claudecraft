@@ -222,6 +222,9 @@ export const pl_PL: EnTranslations = {
     "rest": {
       "resting": "Odpoczynek"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
     "unitFrame": {
       "playerLabel": "Twój bohater",
       "targetLabel": "Twój cel",
@@ -586,6 +589,26 @@ export const pl_PL: EnTranslations = {
       "exportBtn": "Pobierz moje dane",
       "exportDone": "Twoje dane zostały pobrane. Wysłaliśmy ci potwierdzenie e-mailem.",
       "exportFailed": "Nie udało się wyeksportować twoich danych. Spróbuj ponownie za chwilę."
+    },
+    "masterLoot": {
+      "title": "Mistrz lupow",
+      "enableLabel": "Mistrz lupow",
+      "enableAria": "Wlacz mistrza lupow",
+      "looterLabel": "Mistrz lupow",
+      "leaderOption": "Przywodca grupy",
+      "thresholdLabel": "Prog",
+      "thresholdUncommon": "Niezwykle i wyzej",
+      "thresholdRare": "Rzadkie i wyzej",
+      "thresholdEpic": "Epickie i wyzej",
+      "assignPrompt": "Przydziel {item}",
+      "assignAria": "Przydziel {item} graczowi {name}",
+      "rollButton": "Rzut",
+      "selectAll": "Zaznacz wszystko",
+      "methodMaster": "Metoda lupow ustawiona na mistrza lupow. Mistrz lupow: {name}.",
+      "methodGroup": "Metoda lupow ustawiona na lup grupowy.",
+      "assigned": "{looter} przydzielil {item} graczowi {target}.",
+      "unassigned": "{item} nie zostal przydzielony i jest wolny dla wszystkich.",
+      "leaderOnly": "Tylko przywodca grupy moze zmienic metode lupow."
     },
     "bags": {
       "filterGroupAria": "Filtruj torby według kategorii",
@@ -3462,7 +3485,7 @@ export const pl_PL: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "Arkaniczne pociski",
-        "description": "Wystrzeliwuje arkaniczne pociski we wroga, zadając 8 obrażeń arkanicznych co sekundę przez 3 sek."
+        "description": "Wystrzeliwuje arkaniczne pociski we wroga, zadając {damage} obrażeń arkanicznych co sekundę przez 3 sek."
       },
       "polymorph": {
         "name": "Polimorfia",
@@ -3710,7 +3733,7 @@ export const pl_PL: EnTranslations = {
       },
       "mind_flay": {
         "name": "Smaganie umysłu",
-        "description": "Naciera na umysł celu energią cienia, zadając 12 obrażeń co sekundę przez 3 sek."
+        "description": "Naciera na umysł celu energią cienia, zadając {damage} obrażeń co sekundę przez 3 sek."
       },
       "flash_heal": {
         "name": "Błyskawiczne leczenie",
@@ -3786,7 +3809,7 @@ export const pl_PL: EnTranslations = {
       },
       "drain_life": {
         "name": "Wyssanie życia",
-        "description": "Wysysa życie celu, przekazując ci 7 zdrowia co sekundę przez 5 sek."
+        "description": "Wysysa życie celu, przekazując ci {damage} zdrowia co sekundę przez 5 sek."
       },
       "fear": {
         "name": "Strach",

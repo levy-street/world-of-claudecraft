@@ -68,6 +68,25 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidLockout.minutes': '{m}분',
   'hudChrome.raidLockout.lessThanMinute': '1분 미만',
   'hudChrome.raidLockout.lockedToast': '{raid}에 잠겨 있습니다. {time} 후 해제됩니다.',
+  'hudChrome.masterLoot.title': '분배 담당',
+  'hudChrome.masterLoot.enableLabel': '분배 담당',
+  'hudChrome.masterLoot.enableAria': '분배 담당 사용',
+  'hudChrome.masterLoot.looterLabel': '분배 담당자',
+  'hudChrome.masterLoot.leaderOption': '파티장',
+  'hudChrome.masterLoot.thresholdLabel': '품질 기준',
+  'hudChrome.masterLoot.thresholdUncommon': '고급 이상',
+  'hudChrome.masterLoot.thresholdRare': '희귀 이상',
+  'hudChrome.masterLoot.thresholdEpic': '영웅 이상',
+  'hudChrome.masterLoot.assignPrompt': '{item} 분배',
+  'hudChrome.masterLoot.assignAria': '{item}을(를) {name}에게 분배',
+  'hudChrome.masterLoot.rollButton': '주사위',
+  'hudChrome.masterLoot.selectAll': '전체 선택',
+  'hudChrome.masterLoot.methodMaster':
+    '전리품 방식이 분배 담당으로 설정되었습니다. 분배 담당자: {name}.',
+  'hudChrome.masterLoot.methodGroup': '전리품 방식이 파티 분배로 설정되었습니다.',
+  'hudChrome.masterLoot.assigned': '{looter}님이 {item}을(를) {target}에게 분배했습니다.',
+  'hudChrome.masterLoot.unassigned': '{item}이(가) 분배되지 않아 모두가 획득할 수 있습니다.',
+  'hudChrome.masterLoot.leaderOnly': '파티장만 전리품 방식을 변경할 수 있습니다.',
   'hudChrome.theme.preset': 'UI 테마',
   'hudChrome.theme.customColors': '사용자 지정 색상',
   'hudChrome.theme.reset': '초기화',
@@ -1623,7 +1642,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '적에게 {damage}의 화염 피해를 입힙니다. 즉시 시전됩니다.',
   'entities.abilities.arcane_missiles.name': '비전 화살',
   'entities.abilities.arcane_missiles.description':
-    '적에게 비전 화살을 발사하여 3초 동안 매초 8의 비전 피해를 입힙니다.',
+    '적에게 비전 화살을 발사하여 3초 동안 매초 {damage}의 비전 피해를 입힙니다.',
   'entities.abilities.polymorph.name': '변이',
   'entities.abilities.polymorph.description':
     '적을 최대 15초 동안 양으로 변이시킵니다. 양은 돌아다니며 빠르게 회복합니다. 피해를 받으면 효과가 해제됩니다. 야수와 인간형에게만 사용할 수 있습니다.',
@@ -1796,7 +1815,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '느리지만 강력한 기도로 아군 대상의 생명력을 {damage}만큼 회복시킵니다.',
   'entities.abilities.mind_flay.name': '정신의 채찍',
   'entities.abilities.mind_flay.description':
-    '암흑 에너지로 대상의 정신을 공격해 3초 동안 매초 12의 피해를 입힙니다.',
+    '암흑 에너지로 대상의 정신을 공격해 3초 동안 매초 {damage}의 피해를 입힙니다.',
   'entities.abilities.flash_heal.name': '순간 치유',
   'entities.abilities.flash_heal.description':
     '빠른 기도로 아군 대상의 생명력을 {damage}만큼 회복시킵니다.',
@@ -1851,7 +1870,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '대상에게 고통의 저주를 걸어 24초에 걸쳐 {damage}의 암흑 피해를 입힙니다.',
   'entities.abilities.drain_life.name': '생명력 흡수',
   'entities.abilities.drain_life.description':
-    '대상의 생명력을 흡수해 5초 동안 매초 7의 생명력을 자신에게 이전합니다.',
+    '대상의 생명력을 흡수해 5초 동안 매초 {damage}의 생명력을 자신에게 이전합니다.',
   'entities.abilities.fear.name': '공포',
   'entities.abilities.fear.description':
     '적에게 공포를 심어 최대 8초 동안 떨게 만듭니다. 피해를 받으면 효과가 해제됩니다.',

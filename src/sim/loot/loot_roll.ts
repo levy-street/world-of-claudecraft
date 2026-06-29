@@ -25,6 +25,7 @@
 
 import { ITEMS, MOBS, QUESTS } from '../data';
 import { formatMoney } from '../format_money';
+import { effectiveMasterLooter, meetsMasterThreshold } from '../loot_master';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type {
@@ -37,13 +38,14 @@ import type {
   LootRollPrompt,
   LootSlot,
   LootStrategies,
+  MasterLootThreshold,
 } from '../types';
 import { dist2d, PARTY_XP_RANGE } from '../types';
 import { LOOT_FFA_DELAY } from './loot_ffa';
 
 // How long (seconds) a need-greed roll stays open before it auto-resolves. Sole
 // users are startNeedGreedRoll + pruneCorpseLoot, so the constant lives with them.
-const LOOT_ROLL_TIMEOUT = 30;
+const LOOT_ROLL_TIMEOUT = 60;
 
 // The server-authoritative pending need-greed roll record. Sim-internal (the public
 // projection clients see is LootRollPrompt); the `pendingLootRolls` map lives on Sim
@@ -57,6 +59,9 @@ export interface PendingLootRoll {
   candidates: number[];
   choices: Map<number, { choice: LootRollChoice; roll: number | null }>;
   expiresAt: number;
+  // When set, this is a master-loot assignment (not a need/greed vote): only the
+  // master looter pid decides, and a timeout returns the item to the corpse.
+  masterLooter?: number;
 }
 
 function partyLootStrategiesForMob(ctx: SimContext, mob: Entity): LootStrategies | null {
@@ -236,12 +241,56 @@ function startNeedGreedRoll(ctx: SimContext, itemId: string, mob: Entity): boole
   return true;
 }
 
+// Opens a master-loot assignment when the tapping party uses master loot and
+// the drop is at/above the configured threshold. Returns false (so the caller
+// falls through to need/greed or looter-takes-all) when master loot does not
+// apply: disabled, below threshold, a solo looter, or no resolvable looter.
+function startMasterLootRoll(ctx: SimContext, itemId: string, mob: Entity): boolean {
+  const strategies = partyLootStrategiesForMob(ctx, mob);
+  if (!strategies || !strategies.master.enabled) return false;
+  const def = ITEMS[itemId];
+  if (!meetsMasterThreshold(def?.quality, strategies.master.threshold)) return false;
+  const candidates = partyLootCandidatesForMob(ctx, mob);
+  if (candidates.length <= 1) return false;
+  const party = mob.tappedById !== null ? ctx.partyOf(mob.tappedById) : null;
+  if (!party) return false;
+  const looterPid = effectiveMasterLooter(strategies.master, party.leader, party.members);
+  if (looterPid === null) return false;
+  const itemName = def?.name ?? itemId;
+  const roll: PendingLootRoll = {
+    id: ctx.nextLootRollId++,
+    mobId: mob.id,
+    itemId,
+    itemName,
+    quality: def?.quality,
+    candidates: candidates.map((candidate) => candidate.entityId),
+    choices: new Map(),
+    expiresAt: ctx.time + LOOT_ROLL_TIMEOUT,
+    masterLooter: looterPid,
+  };
+  ctx.pendingLootRolls.set(roll.id, roll);
+  mob.corpseTimer = Math.max(mob.corpseTimer, LOOT_ROLL_TIMEOUT + 2);
+  // Sent only to the master looter; the candidate list is who they can assign to.
+  ctx.emit({
+    type: 'masterLoot',
+    rollId: roll.id,
+    itemId,
+    itemName,
+    quality: roll.quality,
+    expiresAt: roll.expiresAt,
+    candidates: candidates.map((candidate) => ({ pid: candidate.entityId, name: candidate.name })),
+    pid: looterPid,
+  });
+  return true;
+}
+
 export function awardSharedLootItem(
   ctx: SimContext,
   itemId: string,
   mob: Entity,
   looter: PlayerMeta,
 ): void {
+  if (startMasterLootRoll(ctx, itemId, mob)) return;
   if (!startNeedGreedRoll(ctx, itemId, mob)) ctx.addItem(itemId, 1, looter.entityId);
 }
 
@@ -252,6 +301,10 @@ export function awardSharedLootItem(
 export function activeLootRolls(ctx: SimContext, pid: number): LootRollPrompt[] {
   const out: LootRollPrompt[] = [];
   for (const roll of ctx.pendingLootRolls.values()) {
+    // A curate-phase master roll is not a need/greed prompt anyone answers (the
+    // master looter assigns it via assignMasterLoot), so it must never reconcile
+    // onto a candidate's screen as a roll prompt. Mirrors submitLootRoll's guard.
+    if (roll.masterLooter !== undefined) continue;
     if (!roll.candidates.includes(pid) || roll.choices.has(pid)) continue;
     out.push({
       rollId: roll.id,
@@ -273,7 +326,15 @@ export function submitLootRoll(
   const r = ctx.resolve(pid);
   if (!r) return;
   const roll = ctx.pendingLootRolls.get(rollId);
-  if (!roll?.candidates.includes(r.meta.entityId) || roll.choices.has(r.meta.entityId)) return;
+  // A master-loot roll is not a need/greed vote: the master looter assigns it
+  // through assignMasterLoot, so reject any submitLootRoll against it.
+  if (
+    !roll ||
+    roll.masterLooter !== undefined ||
+    !roll.candidates.includes(r.meta.entityId) ||
+    roll.choices.has(r.meta.entityId)
+  )
+    return;
   roll.choices.set(r.meta.entityId, {
     choice,
     roll: choice === 'need' || choice === 'greed' ? ctx.rng.int(1, 100) : null,
@@ -281,7 +342,109 @@ export function submitLootRoll(
   if (roll.choices.size >= roll.candidates.length) resolveLootRoll(ctx, roll);
 }
 
+// The master looter's curate-then-roll choice. `targetPids` is the set of
+// eligible players the looter checked: exactly one grants the item directly (the
+// classic assign), two or more open a need/greed roll for just that subset. Only
+// the master looter may decide, and only while the roll is still in its curate
+// phase (masterLooter set).
+export function assignMasterLoot(
+  ctx: SimContext,
+  rollId: number,
+  targetPids: number[],
+  pid?: number,
+): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const roll = ctx.pendingLootRolls.get(rollId);
+  if (!roll || roll.masterLooter === undefined) return;
+  if (r.meta.entityId !== roll.masterLooter) return; // only the master looter decides
+  // Keep only still-eligible targets; ignore anyone no longer a candidate.
+  const targets = targetPids.filter((p) => roll.candidates.includes(p));
+  if (targets.length === 0) return; // nothing valid selected: leave the prompt open
+  if (targets.length === 1) {
+    if (!ctx.pendingLootRolls.delete(roll.id)) return;
+    const targetName = ctx.players.get(targets[0])?.name ?? 'Unknown';
+    const recipients = new Set([...roll.candidates, roll.masterLooter]);
+    for (const recipient of recipients)
+      ctx.emit({
+        type: 'loot',
+        text: `${r.meta.name} assigned ${roll.itemName} to ${targetName}.`,
+        pid: recipient,
+      });
+    ctx.addItem(roll.itemId, 1, targets[0]);
+    return;
+  }
+  convertMasterRollToNeedGreed(ctx, roll, targets);
+}
+
+// Turn a curate-phase master roll into a normal need/greed roll for `targets` (a
+// subset of the original candidates). The roll keeps its id; the master flag is
+// cleared, choices reset, and the timer refreshed to a full window so the chosen
+// players get the standard need/greed/pass prompt.
+function convertMasterRollToNeedGreed(
+  ctx: SimContext,
+  roll: PendingLootRoll,
+  targets: number[],
+): void {
+  roll.candidates = targets;
+  roll.masterLooter = undefined;
+  roll.choices = new Map();
+  roll.expiresAt = ctx.time + LOOT_ROLL_TIMEOUT;
+  const mob = ctx.entities.get(roll.mobId);
+  if (mob) mob.corpseTimer = Math.max(mob.corpseTimer, LOOT_ROLL_TIMEOUT + 2);
+  for (const pid of targets) {
+    ctx.emit({
+      type: 'lootRoll',
+      rollId: roll.id,
+      itemId: roll.itemId,
+      itemName: roll.itemName,
+      quality: roll.quality,
+      expiresAt: roll.expiresAt,
+      pid,
+    });
+  }
+}
+
+// Leader-only switch for the party's loot method. `looter === 0` keeps the
+// looter pinned to whoever currently leads; a named non-member is ignored.
+export function setPartyLootMaster(
+  ctx: SimContext,
+  enabled: boolean,
+  looter: number,
+  threshold: MasterLootThreshold,
+  pid?: number,
+): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const party = ctx.partyOf(r.meta.entityId);
+  if (!party) return;
+  if (party.leader !== r.meta.entityId) {
+    ctx.error(r.e.id, 'Only the party leader can change the loot method.');
+    return;
+  }
+  const looterPid = looter !== 0 && party.members.includes(looter) ? looter : 0;
+  party.lootStrategies.master = { enabled, looter: looterPid, threshold };
+  const looterName =
+    ctx.players.get(looterPid === 0 ? party.leader : looterPid)?.name ?? 'the leader';
+  for (const member of party.members) {
+    ctx.emit({
+      type: 'log',
+      text: enabled
+        ? `Loot method set to master loot. Master looter: ${looterName}.`
+        : 'Loot method set to group loot.',
+      pid: member,
+    });
+  }
+}
+
 export function resolveLootRoll(ctx: SimContext, roll: PendingLootRoll): void {
+  // Master looter never curated in time: open the roll to every eligible member
+  // rather than scrambling the item onto the corpse. Convert in place (same id)
+  // instead of resolving, so the roll lives on as a normal need/greed roll.
+  if (roll.masterLooter !== undefined) {
+    convertMasterRollToNeedGreed(ctx, roll, roll.candidates);
+    return;
+  }
   if (!ctx.pendingLootRolls.delete(roll.id)) return;
   const entries = roll.candidates
     .map((pid) => ({

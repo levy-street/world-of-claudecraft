@@ -1,4 +1,9 @@
-import type { PlayerClass, ResourceType } from '../sim/types';
+import type {
+  MasterLootSettings,
+  MasterLootThreshold,
+  PlayerClass,
+  ResourceType,
+} from '../sim/types';
 
 export interface PartyMemberInfo {
   pid: number;
@@ -20,6 +25,7 @@ export interface PartyMemberInfo {
 export interface PartyInfo {
   leader: number;
   raid: boolean;
+  master: MasterLootSettings;
   members: PartyMemberInfo[];
 }
 
@@ -34,6 +40,10 @@ export interface IWorldParty {
   convertPartyToRaid(): void;
   convertRaidToParty(): void;
   moveRaidMember(targetPid: number, group: 1 | 2): void;
+  // master loot (leader-only setter; master looter assigns threshold drops)
+  setPartyLootMaster(enabled: boolean, looter: number, threshold: MasterLootThreshold): void;
+  // The master looter's checked subset: 1 pid grants directly, 2+ opens a roll.
+  assignMasterLoot(rollId: number, targetPids: number[]): void;
   // raid/target markers (party-scoped): markerId 0..7, null = no mark
   markerFor(entityId: number): number | null;
   setMarker(entityId: number, markerId: number): void;

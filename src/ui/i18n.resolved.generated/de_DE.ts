@@ -222,6 +222,9 @@ export const de_DE: EnTranslations = {
     "rest": {
       "resting": "Erholung"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
     "unitFrame": {
       "playerLabel": "Euer Charakter",
       "targetLabel": "Euer Ziel",
@@ -586,6 +589,26 @@ export const de_DE: EnTranslations = {
       "exportBtn": "Meine Daten herunterladen",
       "exportDone": "Eure Daten wurden heruntergeladen. Wir haben Euch eine Bestätigung per E-Mail gesendet.",
       "exportFailed": "Eure Daten konnten nicht exportiert werden. Versucht es gleich noch einmal."
+    },
+    "masterLoot": {
+      "title": "Pluendermeister",
+      "enableLabel": "Pluendermeister",
+      "enableAria": "Pluendermeister aktivieren",
+      "looterLabel": "Pluendermeister",
+      "leaderOption": "Gruppenleiter",
+      "thresholdLabel": "Schwelle",
+      "thresholdUncommon": "Ungewoehnlich und hoeher",
+      "thresholdRare": "Selten und hoeher",
+      "thresholdEpic": "Episch und hoeher",
+      "assignPrompt": "{item} zuweisen",
+      "assignAria": "{item} an {name} zuweisen",
+      "rollButton": "Wuerfeln",
+      "selectAll": "Alle auswaehlen",
+      "methodMaster": "Beutemethode auf Pluendermeister gesetzt. Pluendermeister: {name}.",
+      "methodGroup": "Beutemethode auf Gruppenbeute gesetzt.",
+      "assigned": "{looter} hat {item} an {target} zugewiesen.",
+      "unassigned": "{item} wurde nicht zugewiesen und ist fuer alle frei.",
+      "leaderOnly": "Nur der Gruppenleiter kann die Beutemethode aendern."
     },
     "bags": {
       "filterGroupAria": "Taschen nach Kategorie filtern",
@@ -3462,7 +3485,7 @@ export const de_DE: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "Arkane Geschosse",
-        "description": "Schleudert Arkane Geschosse auf den Gegner und verursacht 3 Sek. lang jede Sekunde 8 Arkanschaden."
+        "description": "Schleudert Arkane Geschosse auf den Gegner und verursacht 3 Sek. lang jede Sekunde {damage} Arkanschaden."
       },
       "polymorph": {
         "name": "Verwandlung",
@@ -3710,7 +3733,7 @@ export const de_DE: EnTranslations = {
       },
       "mind_flay": {
         "name": "Gedankenschinden",
-        "description": "Greift den Geist des Ziels mit Schattenenergie an und verursacht 3 Sek. lang jede Sekunde 12 Schaden."
+        "description": "Greift den Geist des Ziels mit Schattenenergie an und verursacht 3 Sek. lang jede Sekunde {damage} Schaden."
       },
       "flash_heal": {
         "name": "Blitzheilung",
@@ -3786,7 +3809,7 @@ export const de_DE: EnTranslations = {
       },
       "drain_life": {
         "name": "Blutsauger",
-        "description": "Entzieht dem Ziel Leben und überträgt euch 5 Sek. lang jede Sekunde 7 Gesundheit."
+        "description": "Entzieht dem Ziel Leben und überträgt euch 5 Sek. lang jede Sekunde {damage} Gesundheit."
       },
       "fear": {
         "name": "Furcht",
