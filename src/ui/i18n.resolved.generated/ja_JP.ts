@@ -1620,7 +1620,7 @@ export const ja_JP: EnTranslations = {
     "copyright": "2026 World of ClaudeCraft",
     "githubLink": "https://github.com/levy-street/world-of-claudecraft",
     "githubLabel": "オープンソースプロジェクト",
-    "whitepaper": "ホワイトペーパー",
+    "whitepaper": "Whitepaper",
     "terms": "利用規約",
     "privacy": "プライバシーポリシー",
     "discordLabel": "Discordに参加する"

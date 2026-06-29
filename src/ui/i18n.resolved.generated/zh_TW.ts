@@ -1620,7 +1620,7 @@ export const zh_TW: EnTranslations = {
     "copyright": "2026 World of ClaudeCraft",
     "githubLink": "https://github.com/levy-street/world-of-claudecraft",
     "githubLabel": "開源專案",
-    "whitepaper": "白皮書",
+    "whitepaper": "Whitepaper",
     "terms": "服務條款",
     "privacy": "隱私權政策",
     "discordLabel": "加入Discord社區"
