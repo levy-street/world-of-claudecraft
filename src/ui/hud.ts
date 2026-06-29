@@ -3215,9 +3215,12 @@ export class Hud {
     if (rangeLine) costLine.push(rangeLine);
     if (costLine.length) html += `<div class="tt-stat">${costLine.map(esc).join(' &nbsp; ')}</div>`;
     const castLine = [abilityCastLine(res)];
-    if (a.cooldown > 0)
+    // Use the RESOLVED cooldown (res.cooldown), not res.def.cooldown, so talents that
+    // reduce cooldown (Improved Mortal Strike, Barrage, Improved Fire Blast, ...) show
+    // their effect in the tooltip.
+    if (res.cooldown > 0)
       castLine.push(
-        t('abilityUi.tooltip.cooldownSeconds', { seconds: formatAbilityNumber(a.cooldown) }),
+        t('abilityUi.tooltip.cooldownSeconds', { seconds: formatAbilityNumber(res.cooldown) }),
       );
     html += `<div class="tt-stat">${castLine.map(esc).join(' &nbsp; ')}</div>`;
     html += `<div class="tt-desc">${esc(abilityDisplayDescription(a, damageText))}</div>`;
@@ -10690,9 +10693,10 @@ function describeAbilitySummary(known: ResolvedAbility, resourceType: ResourceTy
     );
   }
   parts.push(abilityCastLine(known));
-  if (known.def.cooldown > 0) {
+  // Resolved cooldown (after talent cooldown modifiers), not the base def cooldown.
+  if (known.cooldown > 0) {
     parts.push(
-      t('abilityUi.tooltip.cooldownSeconds', { seconds: formatAbilityNumber(known.def.cooldown) }),
+      t('abilityUi.tooltip.cooldownSeconds', { seconds: formatAbilityNumber(known.cooldown) }),
     );
   }
   return parts.join(' · ');
