@@ -1674,6 +1674,7 @@ const ALL_DELTA_KEYS = [
   'buyback',
   'cds',
   'cosmetics',
+  'crun',
   'dclears',
   'dcomp',
   'dcompanion',
@@ -1681,6 +1682,7 @@ const ALL_DELTA_KEYS = [
   'dmarks',
   'drun',
   'duel',
+  'eam',
   'equip',
   'inv',
   'lockouts',
@@ -1688,12 +1690,16 @@ const ALL_DELTA_KEYS = [
   'market',
   'marks',
   'milestones',
+  'mtc',
   'party',
   'qdone',
   'qlog',
+  'race',
   'stats',
   'tal',
+  'tpb',
   'trade',
+  'wag',
   'weapon',
 ] as const;
 
@@ -1954,9 +1960,9 @@ describe('full self-state snapshot delta fixture', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 25 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(25);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(25);
+  it('ALL_DELTA_KEYS contains exactly 31 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(31);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(31);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

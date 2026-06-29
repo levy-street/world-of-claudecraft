@@ -23,8 +23,10 @@ import { COMMAND_NAMES, type CommandName, DISPATCH_ONLY_COMMANDS } from '../src/
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 
 // Verified counts on the current tree (re-derived below; do not hard-code 85/6).
-const EXPECTED_SEND_COUNT = 102;
-const EXPECTED_DISPATCH_COUNT = 109;
+// Bumped for the $WOC player-economy stack: holder mounts (summon/dismiss, course
+// substrate, races, Mount Charters) and player job contracts add wire commands.
+const EXPECTED_SEND_COUNT = 113;
+const EXPECTED_DISPATCH_COUNT = 120;
 const EXPECTED_DISPATCH_ONLY_COUNT = 7;
 
 // The chat sub-channel routing switch (server/game.ts `switch
