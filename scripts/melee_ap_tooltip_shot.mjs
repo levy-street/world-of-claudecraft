@@ -41,7 +41,7 @@ await page.evaluate(() =>
 await wait(200);
 await page.evaluate(() => document.querySelector('#btn-start-offline')?.click());
 for (let i = 0; i < 40; i++) {
-  if (await page.evaluate(() => !!(window.__game && window.__game.sim))) break;
+  if (await page.evaluate(() => !!window.__game?.sim)) break;
   await wait(500);
 }
 await page.evaluate(() => {

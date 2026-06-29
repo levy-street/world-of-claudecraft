@@ -6,7 +6,7 @@ import { WARLOCK_PET_MOBS } from '../src/sim/content/warlock_pets';
 function dotTotal(abilityId: string, level = 20): number {
   const known = abilitiesKnownAt('warlock', level).find((entry) => entry.def.id === abilityId);
   const dot = known?.effects.find((effect) => effect.type === 'dot');
-  if (!dot || dot.type !== 'dot') throw new Error(`${abilityId} has no DoT at level ${level}`);
+  if (dot?.type !== 'dot') throw new Error(`${abilityId} has no DoT at level ${level}`);
   return dot.total;
 }
 
@@ -56,11 +56,19 @@ describe('warlock low-level sustained damage tuning', () => {
     expect(spec('affliction').mastery.effect.global?.spellDmgPct).toBe(0.04);
     expect(spec('destruction').mastery.effect.global?.spellDmgPct).toBe(0.03);
 
-    const afflictionPact = node('wlk_dark_pact').choices?.find((choice) => choice.id === 'wlk_pact_affliction');
+    const afflictionPact = node('wlk_dark_pact').choices?.find(
+      (choice) => choice.id === 'wlk_pact_affliction',
+    );
     expect(afflictionPact?.effect.global?.spellDmgPct).toBe(0.02);
 
-    expect(abilityEffects('aff_imp_agony')).toContainEqual({ ability: 'curse_of_agony', dmgPct: 0.03 });
-    expect(abilityEffects('aff_imp_corruption')).toContainEqual({ ability: 'corruption', dmgPct: 0.03 });
+    expect(abilityEffects('aff_imp_agony')).toContainEqual({
+      ability: 'curse_of_agony',
+      dmgPct: 0.03,
+    });
+    expect(abilityEffects('aff_imp_corruption')).toContainEqual({
+      ability: 'corruption',
+      dmgPct: 0.03,
+    });
     expect(abilityEffects('dest_bane')).toEqual([
       { ability: 'shadow_bolt', castPct: -0.01 },
       { ability: 'immolate', castPct: -0.01 },

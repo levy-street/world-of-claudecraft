@@ -21,7 +21,7 @@ function leveled(cls: PlayerClass, level = MAX_LEVEL) {
 }
 
 function spawnDummy(sim: Sim, target: Entity): Entity {
-  const mob = createMob((sim as any).nextId++, MOBS['forest_wolf'], MAX_LEVEL, {
+  const mob = createMob((sim as any).nextId++, MOBS.forest_wolf, MAX_LEVEL, {
     x: target.pos.x + 1,
     y: target.pos.y,
     z: target.pos.z,

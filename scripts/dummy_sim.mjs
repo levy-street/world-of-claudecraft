@@ -26,7 +26,7 @@ function setup(cls) {
   const p = sim.entities.get(pid);
   // Immortal, passive dummy at 25yd (in spell range, out of melee so it never
   // swings -> no cast pushback). Kept idle and de-aggroed every tick.
-  const dummy = createMob(sim.nextId++, MOBS['forest_wolf'], MAX_LEVEL, {
+  const dummy = createMob(sim.nextId++, MOBS.forest_wolf, MAX_LEVEL, {
     x: p.pos.x,
     y: p.pos.y,
     z: p.pos.z + 8,
@@ -63,7 +63,7 @@ function setup(cls) {
   return { sim, p, pid, dummy, getDealt: () => dealt, tick };
 }
 
-function canCast(p, sim, id) {
+function canCast(p, _sim, id) {
   return !p.castingAbility && p.gcdRemaining <= 0 && !p.cooldowns.has(id);
 }
 

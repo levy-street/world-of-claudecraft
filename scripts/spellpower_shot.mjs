@@ -19,9 +19,9 @@ const browser = await puppeteer.launch({
 const page = await browser.newPage();
 await page.setViewport({ width: 1280, height: 720 });
 const errors = [];
-page.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
+page.on('pageerror', (e) => errors.push(`PAGEERROR: ${e.message}`));
 page.on('console', (m) => {
-  if (m.type() === 'error') errors.push('CONSOLE: ' + m.text());
+  if (m.type() === 'error') errors.push(`CONSOLE: ${m.text()}`);
 });
 
 await page
@@ -43,7 +43,7 @@ await wait(200);
 await page.evaluate(() => document.querySelector('#btn-start-offline')?.click());
 // wait for the offline sim to come up
 for (let i = 0; i < 40; i++) {
-  const ready = await page.evaluate(() => !!(window.__game && window.__game.sim));
+  const ready = await page.evaluate(() => !!window.__game?.sim);
   if (ready) break;
   await wait(500);
 }
