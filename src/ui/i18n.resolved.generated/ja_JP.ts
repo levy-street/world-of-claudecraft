@@ -152,249 +152,249 @@ export const ja_JP: EnTranslations = {
   },
   "hudChrome": {
     "emotes": {
-      "wave": "Wave",
-      "laugh": "LOL",
-      "question": "Bro?",
-      "cheer": "Cheer",
-      "dance": "Dance",
-      "point": "Point",
-      "flex": "Flex",
-      "salute": "Salute",
-      "cry": "Cry",
-      "bow": "Bow",
-      "clap": "Clap",
-      "roar": "Roar",
-      "kneel": "Kneel"
+      "wave": "手を振る",
+      "laugh": "大笑い",
+      "question": "なに？",
+      "cheer": "応援",
+      "dance": "踊る",
+      "point": "指さす",
+      "flex": "力こぶ",
+      "salute": "敬礼",
+      "cry": "泣く",
+      "bow": "お辞儀",
+      "clap": "拍手",
+      "roar": "雄叫び",
+      "kneel": "ひざまずく"
     },
     "emoteWheel": {
-      "edit": "Edit",
-      "label": "Emotes"
+      "edit": "編集",
+      "label": "エモート"
     },
     "emoteEditor": {
-      "title": "Emotes",
-      "done": "Done"
+      "title": "エモート",
+      "done": "完了"
     },
     "theme": {
-      "preset": "UI Theme",
-      "customColors": "Custom Colors",
-      "reset": "Reset",
+      "preset": "UIテーマ",
+      "customColors": "カスタムカラー",
+      "reset": "リセット",
       "presets": {
-        "classic": "Classic Gold",
-        "midnight": "Midnight",
-        "parchment": "Parchment",
-        "highContrast": "High Contrast"
+        "classic": "クラシックゴールド",
+        "midnight": "ミッドナイト",
+        "parchment": "羊皮紙",
+        "highContrast": "ハイコントラスト"
       },
       "knob": {
-        "accent": "Accent",
-        "border": "Border",
-        "panel": "Frame",
-        "text": "Text",
-        "textMuted": "Muted Text",
-        "hp": "Health",
-        "mana": "Mana",
-        "rage": "Rage",
-        "energy": "Energy"
+        "accent": "アクセント",
+        "border": "枠線",
+        "panel": "フレーム",
+        "text": "テキスト",
+        "textMuted": "補助テキスト",
+        "hp": "体力",
+        "mana": "マナ",
+        "rage": "怒り",
+        "energy": "エネルギー"
       }
     },
     "questTracker": {
-      "count": "({count})",
-      "collapseHint": "Collapse quest tracker",
-      "expandHint": "Expand quest tracker"
+      "count": "（{count}）",
+      "collapseHint": "クエストトラッカーを折りたたむ",
+      "expandHint": "クエストトラッカーを展開する"
     },
     "chatTimestamps": {
-      "show": "Show Chat Timestamps",
-      "format": "Timestamp Format",
-      "clock12h": "12-hour",
-      "clock24h": "24-hour",
-      "note": "Prefixes each new chat line with the time it arrived, e.g. [14:32]. Only affects messages received while the option is on."
+      "show": "チャットに時刻を表示",
+      "format": "時刻の表記形式",
+      "clock12h": "12時間表記",
+      "clock24h": "24時間表記",
+      "note": "新しいチャット行の先頭に受信時刻を付けます（例：[14:32]）。この設定がオンの間に受信したメッセージにのみ適用されます。"
     },
     "chatWindow": {
-      "move": "Drag to move the chat window",
-      "resize": "Drag to resize the chat window",
-      "reset": "Reset Chat Window",
-      "resetAction": "Reset",
-      "note": "Drag the chat tab strip to move the window, or the corner grip to resize it. Reset returns it to the default position and size."
+      "move": "ドラッグでチャットウィンドウを移動",
+      "resize": "ドラッグでチャットウィンドウのサイズを変更",
+      "reset": "チャットウィンドウをリセット",
+      "resetAction": "リセット",
+      "note": "チャットのタブ列をドラッグするとウィンドウを移動でき、右下のグリップをドラッグするとサイズを変更できます。リセットすると既定の位置とサイズに戻ります。"
     },
     "swing": {
-      "ready": "Swing",
-      "seconds": "{seconds}s"
+      "ready": "攻撃",
+      "seconds": "{seconds}秒"
     },
     "rest": {
-      "resting": "Resting"
+      "resting": "休息中"
     },
     "abilityScaling": {
       "bonus": "(+{value})"
     },
     "unitFrame": {
-      "playerLabel": "Your Hero",
-      "targetLabel": "Your Mark",
-      "targetAnnounce": "Mark {name}",
-      "partyLabel": "Your Band",
-      "partyGroup": "Group {n}",
-      "durationUnitSeconds": "s"
+      "playerLabel": "あなたのキャラクター",
+      "targetLabel": "あなたのターゲット",
+      "targetAnnounce": "ターゲット：{name}",
+      "partyLabel": "あなたのパーティ",
+      "partyGroup": "グループ {n}",
+      "durationUnitSeconds": "秒"
     },
     "character": {
-      "modelPreview": "Character Model Preview"
+      "modelPreview": "キャラクターモデルプレビュー"
     },
     "skipLinks": {
-      "mainHud": "Skip to Main HUD",
-      "chat": "Skip to Chat"
+      "mainHud": "メインHUDへスキップ",
+      "chat": "チャットへスキップ"
     },
     "mobile": {
-      "autorun": "Autorun",
-      "jump": "Jump",
-      "leaderboard": "Ranks",
-      "nameplates": "Names",
-      "haptics": "Haptics",
-      "hapticsOff": "Haptics Off",
-      "toggleHaptics": "Toggle haptics"
+      "autorun": "オートラン",
+      "jump": "ジャンプ",
+      "leaderboard": "ランキング",
+      "nameplates": "ネームプレート",
+      "haptics": "振動",
+      "hapticsOff": "振動オフ",
+      "toggleHaptics": "振動を切り替え"
     },
     "tutorial": {
-      "moveBodyTouch": "Use the movement stick to move and drag the screen to look around. Take a few steps to begin.",
-      "talkBodyTouch": "Stand close to Marshal Redbrook and tap the Use button to speak, then accept his task.",
-      "returnBodyTouch": "Your task is done. Return to Marshal Redbrook and tap the Use button to turn it in.",
-      "doneBodyTouch": "You have the basics, {name}. The Vale is yours to explore. Tap More, then Quests, to review your quest log anytime. Good hunting."
+      "moveBodyTouch": "移動スティックで移動し、画面をドラッグして周囲を見回します。数歩進んで始めましょう。",
+      "talkBodyTouch": "レッドブルック元帥に近づき、「使用」ボタンをタップして話しかけ、依頼を受けましょう。",
+      "returnBodyTouch": "依頼は完了しました。レッドブルック元帥のもとへ戻り、「使用」ボタンをタップして納品しましょう。",
+      "doneBodyTouch": "基本は覚えましたね、{name}。イーストブルック渓谷はあなたのもの、自由に探索しましょう。いつでも「その他」から「クエストログ」をタップしてクエストログを確認できます。よい狩りを！"
     },
     "widgets": {
-      "clockTitle": "Local time - click to toggle 12/24-hour",
-      "worldCoordinates": "World coordinates",
-      "coordinates": "Coordinates",
-      "heading": "Heading",
-      "minimapZoom": "Minimap zoom"
+      "clockTitle": "現地時刻 - クリックで12/24時間表記を切り替え",
+      "worldCoordinates": "ワールド座標",
+      "coordinates": "座標",
+      "heading": "方角",
+      "minimapZoom": "ミニマップのズーム"
     },
     "castBar": {
-      "playerAria": "Your Cast Bar",
-      "targetAria": "Unit Cast Bar"
+      "playerAria": "あなたの詠唱バー",
+      "targetAria": "ターゲットの詠唱バー"
     },
     "leaderboard": {
-      "close": "Close"
+      "close": "閉じる"
     },
     "raidLockout": {
-      "title": "Raid Lockouts",
-      "allReady": "All raids ready",
-      "daysHours": "{d}d {h}h",
-      "hoursMinutes": "{h}h {m}m",
-      "minutes": "{m}m",
-      "lessThanMinute": "<1m",
-      "lockedToast": "You are locked to {raid}. Unlocks in {time}."
+      "title": "レイドロックアウト",
+      "allReady": "すべてのレイドが利用可能",
+      "daysHours": "{d}日{h}時間",
+      "hoursMinutes": "{h}時間{m}分",
+      "minutes": "{m}分",
+      "lessThanMinute": "1分未満",
+      "lockedToast": "{raid}にロックされています。解除まで{time}。"
     },
     "compass": {
-      "N": "N",
-      "NE": "NE",
-      "E": "E",
-      "SE": "SE",
-      "S": "S",
-      "SW": "SW",
-      "W": "W",
-      "NW": "NW"
+      "N": "北",
+      "NE": "北東",
+      "E": "東",
+      "SE": "南東",
+      "S": "南",
+      "SW": "南西",
+      "W": "西",
+      "NW": "北西"
     },
     "meters": {
-      "perSecond": "{value}/s",
-      "perSecondRow": "{total} ({rate})",
-      "minutesSeconds": "{m}m {s}s",
-      "seconds": "{s}s"
+      "perSecond": "{value}/秒",
+      "perSecondRow": "{total}（{rate}）",
+      "minutesSeconds": "{m}分{s}秒",
+      "seconds": "{s}秒"
     },
     "keybinds": {
-      "emoteWheel": "Emote Wheel",
-      "targetFriendly": "Target Nearest Friendly",
-      "targetFriendlyNext": "Cycle Friendly Target"
+      "emoteWheel": "エモートホイール",
+      "targetFriendly": "最も近い味方をターゲット",
+      "targetFriendlyNext": "味方ターゲットを順に切り替え"
     },
     "options": {
-      "clickMoveLeft": "Left Click",
-      "clickMoveRight": "Right Click",
-      "browserEffects": "Browser Effects",
-      "browserEffectsAuto": "Auto",
-      "browserEffectsFull": "Full",
-      "browserEffectsReduced": "Reduced",
-      "browserEffectsMinimal": "Minimal",
-      "browserEffectsNote": "Auto tones down heavy CSS effects (blur, glow, background motion) based on your browser and device. Lower it manually if the interface feels sluggish.",
-      "interfaceMode": "Interface Mode",
-      "interfaceModeAuto": "Auto",
-      "interfaceModeDesktop": "Desktop",
-      "interfaceModeTouch": "Touch",
-      "interfaceModeNote": "Auto picks desktop or touch controls from your device. Choose Desktop to force keyboard and mouse (useful on a tablet with a keyboard), or Touch for the on-screen controls.",
-      "footstepSounds": "Footstep Sounds",
-      "clickFeedback": "Click Marker",
-      "lockCursorOnRotate": "Lock Cursor While Rotating",
-      "keybindHelpLockCursorOnRotate": "Keeps the mouse cursor inside the window while you drag to rotate the camera, so it cannot reach the screen edge or move to another monitor. Turn off if you prefer a free cursor.",
-      "showWalletOnCharacterScreen": "Show Wallet on Character Screen",
-      "showWalletOnPlayerCard": "Show Wallet on Player Card",
-      "uiScale": "UI Scale",
-      "highContrastBackground": "High-Contrast Background",
-      "showItemLevel": "Show Item Level",
-      "itemLevelLine": "Item Level {level}",
-      "itemScoreLine": "Score {score}"
+      "clickMoveLeft": "左クリック",
+      "clickMoveRight": "右クリック",
+      "browserEffects": "ブラウザエフェクト",
+      "browserEffectsAuto": "自動",
+      "browserEffectsFull": "フル",
+      "browserEffectsReduced": "軽減",
+      "browserEffectsMinimal": "最小",
+      "browserEffectsNote": "自動はブラウザとデバイスに応じて、負荷の高い CSS エフェクト（ぼかし・グロー・背景アニメーション）を抑えます。動作が重い場合は手動で下げてください。",
+      "interfaceMode": "操作モード",
+      "interfaceModeAuto": "自動",
+      "interfaceModeDesktop": "デスクトップ",
+      "interfaceModeTouch": "タッチ",
+      "interfaceModeNote": "自動では、デバイスに応じてデスクトップ操作かタッチ操作を選びます。デスクトップを選ぶとキーボードとマウスに固定され（キーボード付きタブレットなどに便利）、タッチを選ぶと画面上の操作になります。",
+      "footstepSounds": "足音",
+      "clickFeedback": "クリックマーカー",
+      "lockCursorOnRotate": "回転中はカーソルを固定",
+      "keybindHelpLockCursorOnRotate": "ドラッグでカメラを回転させている間、マウスカーソルをウィンドウ内に固定し、画面の端や別のモニターに移動しないようにします。自由なカーソルを好む場合はオフにしてください。",
+      "showWalletOnCharacterScreen": "キャラクター画面にウォレットを表示",
+      "showWalletOnPlayerCard": "プレイヤーカードにウォレットを表示",
+      "uiScale": "UIスケール",
+      "highContrastBackground": "高コントラスト背景",
+      "showItemLevel": "アイテムレベルを表示",
+      "itemLevelLine": "アイテムレベル {level}",
+      "itemScoreLine": "スコア {score}"
     },
     "controller": {
-      "title": "Controller",
-      "enable": "Enable Controller",
-      "invertY": "Invert Camera (Y)",
-      "deadzone": "Stick Deadzone",
-      "cameraSpeed": "Camera Speed",
-      "vibration": "Vibration",
-      "buttons": "Button Layout",
-      "resetButtons": "Reset Button Layout",
-      "menuAction": "Game Menu",
-      "help": "Left stick moves, right stick looks. Open a window to use the on-screen pointer."
+      "title": "コントローラー",
+      "enable": "コントローラーを有効化",
+      "invertY": "カメラ反転（Y軸）",
+      "deadzone": "スティックの遊び",
+      "cameraSpeed": "カメラ速度",
+      "vibration": "振動",
+      "buttons": "ボタン配置",
+      "resetButtons": "ボタン配置をリセット",
+      "menuAction": "ゲームメニュー",
+      "help": "左スティックで移動、右スティックで視点。ウィンドウを開くと画面ポインターが使えます。"
     },
     "perf": {
-      "title": "Performance Overlay",
-      "enable": "Show Performance Overlay",
-      "description": "Choose which stats to show, where the overlay sits, and how it looks.",
-      "sectionPosition": "Position",
-      "sectionAppearance": "Appearance",
-      "sectionStats": "Stats",
-      "positionX": "Horizontal",
-      "positionY": "Vertical",
-      "resetPosition": "Reset Position",
-      "dragHint": "Drag the overlay to move it, or use the sliders below.",
-      "opacity": "Background Opacity",
-      "solidBg": "Solid Background",
-      "fontScale": "Text Size",
-      "textColor": "Text Color",
-      "bgColor": "Background Color",
-      "colorTheme": "Color Theme",
-      "graph": "Frame-Time Graph",
-      "thresholds": "Color-Coded Warnings",
-      "presetsLabel": "Quick Presets",
-      "presetMinimal": "Minimal",
-      "presetStandard": "Standard",
-      "presetEverything": "Everything",
+      "title": "パフォーマンスオーバーレイ",
+      "enable": "パフォーマンスオーバーレイを表示",
+      "description": "表示する統計、オーバーレイの位置、外観を設定します。",
+      "sectionPosition": "位置",
+      "sectionAppearance": "外観",
+      "sectionStats": "統計",
+      "positionX": "横位置",
+      "positionY": "縦位置",
+      "resetPosition": "位置をリセット",
+      "dragHint": "オーバーレイをドラッグするか、下のスライダーで移動します。",
+      "opacity": "背景の不透明度",
+      "solidBg": "不透明な背景",
+      "fontScale": "文字サイズ",
+      "textColor": "文字色",
+      "bgColor": "背景色",
+      "colorTheme": "カラーテーマ",
+      "graph": "フレームタイムグラフ",
+      "thresholds": "警告の色分け表示",
+      "presetsLabel": "クイックプリセット",
+      "presetMinimal": "最小限",
+      "presetStandard": "標準",
+      "presetEverything": "すべて",
       "groups": {
-        "frame": "Frame & Timing",
-        "network": "Network",
-        "renderer": "Renderer",
-        "system": "System",
-        "input": "Input"
+        "frame": "フレームとタイミング",
+        "network": "ネットワーク",
+        "renderer": "レンダラー",
+        "system": "システム",
+        "input": "入力"
       },
       "labels": {
         "fps": "FPS",
-        "frameTime": "Frame Time",
-        "fps1Low": "1% Low",
-        "fps01Low": "0.1% Low",
+        "frameTime": "フレームタイム",
+        "fps1Low": "下位1%",
+        "fps01Low": "下位0.1%",
         "ping": "Ping",
-        "jitter": "Jitter",
-        "snapshot": "Snapshot Rate",
-        "connection": "Connection",
-        "drawCalls": "Draw Calls",
-        "triangles": "Triangles",
-        "geometries": "Geometries",
-        "textures": "Textures",
-        "programs": "Shaders",
-        "renderScale": "Render Scale",
+        "jitter": "ジッター",
+        "snapshot": "スナップショットレート",
+        "connection": "接続",
+        "drawCalls": "ドローコール",
+        "triangles": "三角形",
+        "geometries": "ジオメトリ",
+        "textures": "テクスチャ",
+        "programs": "シェーダー",
+        "renderScale": "レンダースケール",
         "gpu": "GPU",
-        "memory": "Memory",
-        "hitches": "Hitches",
-        "entities": "Entities",
+        "memory": "メモリ",
+        "hitches": "カクつき",
+        "entities": "エンティティ",
         "apm": "APM"
       },
       "themes": {
-        "gold": "Gold",
-        "frost": "Frost",
-        "ember": "Ember",
-        "jade": "Jade",
-        "crimson": "Crimson",
-        "mono": "Mono"
+        "gold": "ゴールド",
+        "frost": "フロスト",
+        "ember": "エンバー",
+        "jade": "ジェイド",
+        "crimson": "クリムゾン",
+        "mono": "モノクロ"
       },
       "units": {
         "ms": "{value} ms",
@@ -403,319 +403,319 @@ export const ja_JP: EnTranslations = {
         "hz": "{value} Hz"
       },
       "badges": {
-        "backgrounded": "Backgrounded",
-        "offline": "Offline"
+        "backgrounded": "バックグラウンド",
+        "offline": "オフライン"
       }
     },
     "playerCard": {
-      "showWalletBadge": "Show wallet badge"
+      "showWalletBadge": "ウォレットバッジを表示"
     },
     "landing": {
-      "highContrast": "High Contrast",
-      "highContrastAria": "Toggle high-contrast background: disables the moving trailer so start-screen text stays legible"
+      "highContrast": "高コントラスト",
+      "highContrastAria": "高コントラスト背景を切り替えます。動画トレーラーを無効にして、スタート画面のテキストを読みやすくします"
     },
     "statInfo": {
-      "fromYour": "From your {value} {stat}:",
+      "fromYour": "あなたの{stat}{value}による効果:",
       "desc": {
-        "str": "Increases your attack power, so your weapon strikes land harder.",
-        "agi": "Sharpens your reflexes and aim, improving several of your combat stats.",
-        "sta": "Toughens your body, raising your maximum health and how quickly you recover health while resting.",
-        "int": "Expands a spellcaster's mana pool and improves their chance to land a spell critical strike.",
-        "spi": "Quickens how fast a spellcaster's mana returns while resting, out of combat.",
-        "armor": "Softens incoming physical blows. The reduction is greater against lower-level attackers and is capped at 75%.",
-        "attackPower": "Powers your weapon attacks. Every 14 attack power adds 1 damage per second.",
-        "dps": "Your estimated weapon damage per second, combining your weapon's damage and speed with your attack power.",
-        "critChance": "Your chance for an attack to strike critically, dealing double damage.",
-        "dodge": "Your chance to completely avoid an incoming melee attack, taking no damage."
+        "str": "攻撃力を上昇させ、武器による攻撃の威力を高めます。",
+        "agi": "反射神経と狙いを鋭くし、複数の戦闘ステータスを向上させます。",
+        "sta": "肉体を強化し、最大体力と休憩中の体力回復速度を高めます。",
+        "int": "術者の最大マナを増やし、呪文のクリティカル発生率を向上させます。",
+        "spi": "戦闘外で休憩している間の、術者のマナ回復速度を速めます。",
+        "armor": "物理攻撃のダメージを軽減します。軽減量は格下の攻撃者に対してより大きくなり、上限は75%です。",
+        "attackPower": "武器による攻撃を強化します。攻撃力14ごとに秒間ダメージが1上昇します。",
+        "dps": "武器のダメージと速度に攻撃力を組み合わせて算出した、推定の秒間ダメージです。",
+        "critChance": "攻撃がクリティカルとなり、ダメージが2倍になる確率です。",
+        "dodge": "迫り来る近接攻撃を完全に回避し、ダメージを受けない確率です。"
       },
       "effects": {
-        "attackPower": "+{value} Attack Power",
-        "rangedAttackPower": "+{value} Ranged Attack Power",
-        "critPct": "+{value}% Critical Strike",
-        "dodgePct": "+{value}% Dodge",
-        "armor": "+{value} Armor",
-        "maxHealth": "+{value} Maximum Health",
-        "maxMana": "+{value} Maximum Mana",
-        "spellCritPct": "+{value}% Spell Critical Strike",
-        "healthRegen": "About {value} health every 5 sec while resting",
-        "manaRegen": "About {value} mana every 5 sec while resting",
-        "damageReduction": "Damage reduction against a level {level} attacker: {value}%",
-        "dpsFromAp": "Adds {value} damage per second to your attacks"
+        "attackPower": "攻撃力 +{value}",
+        "rangedAttackPower": "遠隔攻撃力 +{value}",
+        "critPct": "クリティカル +{value}%",
+        "dodgePct": "回避 +{value}%",
+        "armor": "防御力 +{value}",
+        "maxHealth": "最大体力 +{value}",
+        "maxMana": "最大マナ +{value}",
+        "spellCritPct": "呪文クリティカル +{value}%",
+        "healthRegen": "休憩中、5秒ごとに体力が約{value}回復",
+        "manaRegen": "休憩中、5秒ごとにマナが約{value}回復",
+        "damageReduction": "レベル{level}の攻撃者に対するダメージ軽減: {value}%",
+        "dpsFromAp": "攻撃の秒間ダメージを{value}上昇させます"
       },
       "notes": {
-        "minorForClass": "Of little benefit to your class.",
-        "baseChance": "Includes a 5% base chance shared by all adventurers.",
-        "dpsApprox": "An estimate, it excludes critical strikes and ability damage."
+        "minorForClass": "あなたのクラスにはほとんど効果がありません。",
+        "baseChance": "全ての冒険者が共有する5%の基本確率を含みます。",
+        "dpsApprox": "推定値であり、クリティカルやアビリティによるダメージは含みません。"
       }
     },
     "talents": {
-      "defaultBuildName": "Build {n}"
+      "defaultBuildName": "ビルド {n}"
     },
     "tips": {
-      "joinChannels": "Tip: type /join world or /join lfg to chat with players across the realm."
+      "joinChannels": "ヒント：/join world または /join lfg と入力すると、レルム全体のプレイヤーとチャットできます。"
     },
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
     },
     "questShare": {
-      "notShareable": "This quest can't be shared.",
-      "notInSharerParty": "You must be in {name}'s party to accept that quest.",
-      "accepted": "{name} accepted your shared quest.",
-      "dialogTitle": "Shared Quest",
-      "viewOnlyHint": "Join the sharer's party to accept this quest.",
-      "alreadyOn": "You're already on this quest.",
-      "alreadyDone": "You've already completed this quest.",
-      "ineligible": "You don't meet the requirements for this quest.",
-      "noQuestSelected": "Select a quest in your log to share.",
-      "linkTitle": "Shift-click to link this quest in chat."
+      "notShareable": "このクエストは共有できません。",
+      "notInSharerParty": "{name} のパーティに参加していないと、このクエストを受諾できません。",
+      "accepted": "{name} があなたの共有クエストを受諾しました。",
+      "dialogTitle": "共有クエスト",
+      "viewOnlyHint": "このクエストを受諾するには、共有した人のパーティに参加してください。",
+      "alreadyOn": "このクエストはすでに受注しています。",
+      "alreadyDone": "このクエストはすでに完了しています。",
+      "ineligible": "このクエストの条件を満たしていません。",
+      "noQuestSelected": "共有するクエストをログから選択してください。",
+      "linkTitle": "Shift + クリックでこのクエストをチャットにリンクします。"
     },
     "plurals": {
       "guildMembers": {
-        "one": "you are {rank}, {count} member",
-        "few": "you are {rank}, {count} members",
-        "many": "you are {rank}, {count} members",
-        "other": "you are {rank}, {count} members"
+        "one": "あなたは{rank}、{count}人のメンバー",
+        "few": "あなたは{rank}、{count}人のメンバー",
+        "many": "あなたは{rank}、{count}人のメンバー",
+        "other": "あなたは{rank}、{count}人のメンバー"
       },
       "characterCount": {
-        "one": "{count} character",
-        "few": "{count} characters",
-        "many": "{count} characters",
-        "other": "{count} characters"
+        "one": "{count}キャラクター",
+        "few": "{count}キャラクター",
+        "many": "{count}キャラクター",
+        "other": "{count}キャラクター"
       },
       "secondsRemaining": {
-        "one": "{count} second remaining",
-        "few": "{count} seconds remaining",
-        "many": "{count} seconds remaining",
-        "other": "{count} seconds remaining"
+        "one": "残り {count} 秒",
+        "few": "残り {count} 秒",
+        "many": "残り {count} 秒",
+        "other": "残り {count} 秒"
       },
       "playersOnline": {
-        "one": "Who: {count} player online on {realm}.",
-        "few": "Who: {count} players online on {realm}.",
-        "many": "Who: {count} players online on {realm}.",
-        "other": "Who: {count} players online on {realm}."
+        "one": "Who：{realm}に{count}人のプレイヤーがオンラインです。",
+        "few": "Who：{realm}に{count}人のプレイヤーがオンラインです。",
+        "many": "Who：{realm}に{count}人のプレイヤーがオンラインです。",
+        "other": "Who：{realm}に{count}人のプレイヤーがオンラインです。"
       }
     },
     "bugReport": {
-      "menuButton": "Report a Bug",
-      "realm": "Realm",
-      "character": "Character",
-      "position": "Position",
-      "unknown": "Unknown",
-      "description": "What went wrong?",
-      "descriptionPlaceholder": "Describe the bug: what you did, what you expected, and what happened.",
-      "includeScreenshot": "Include Screenshot",
-      "screenshotAlt": "Screenshot of the current view attached to this bug report",
-      "submit": "Send Report",
-      "submitted": "Bug report sent. Thank you!",
-      "submittedNoShot": "Bug report sent, but the screenshot was too large to include.",
-      "describeFirst": "Please describe the bug before sending.",
-      "tooLarge": "That report is too large to send. Try again without the screenshot.",
-      "rateLimited": "You've sent several reports recently. Please wait a bit before sending another.",
-      "failed": "Could not send the bug report. Please try again."
+      "menuButton": "バグを報告",
+      "realm": "サーバー",
+      "character": "キャラクター",
+      "position": "座標",
+      "unknown": "不明",
+      "description": "何が起きましたか？",
+      "descriptionPlaceholder": "バグの内容を記入してください：何をして、何を期待し、実際に何が起きたか。",
+      "includeScreenshot": "スクリーンショットを添付",
+      "screenshotAlt": "このバグ報告に添付された現在の画面のスクリーンショット",
+      "submit": "報告を送信",
+      "submitted": "バグ報告を送信しました。ありがとうございます！",
+      "submittedNoShot": "バグ報告を送信しました。ただしスクリーンショットが大きすぎて添付できませんでした。",
+      "describeFirst": "送信する前にバグの内容を記入してください。",
+      "tooLarge": "報告のサイズが大きすぎて送信できません。スクリーンショットを外して再試行してください。",
+      "rateLimited": "最近、報告を複数回送信しています。しばらく待ってから送信してください。",
+      "failed": "バグ報告を送信できませんでした。もう一度お試しください。"
     },
     "paperdoll": {
-      "unequipAria": "Unequip {item}",
-      "unequipHint": "Click ×, right-click, or drag to bags to unequip"
+      "unequipAria": "{item}を外す",
+      "unequipHint": "× をクリック、右クリック、またはバッグへドラッグで外す"
     },
     "account": {
-      "title": "Account",
-      "loggedOutPrompt": "Log in to manage your account.",
-      "memberSince": "Member since {date}",
-      "sectionSettings": "Account Settings",
-      "sectionWallet": "$WOC Wallet",
-      "sectionCharacters": "Characters",
-      "sectionDanger": "Danger Zone",
-      "changePassword": "Change Password",
-      "currentPassword": "Current password",
-      "newPassword": "New password",
-      "confirmNewPassword": "Confirm new password",
-      "savePassword": "Update Password",
-      "passwordChanged": "Password updated. Other devices have been signed out.",
-      "errCurrentRequired": "Enter your current password.",
-      "errPasswordShort": "New password must be at least 6 characters.",
-      "errPasswordLong": "New password must be at most 128 characters.",
-      "errPasswordUnchanged": "New password must be different from the current one.",
-      "errPasswordConfirm": "New passwords do not match.",
-      "emailLabel": "Email (optional)",
-      "emailHint": "Used only for account recovery. Use Change Email below to update it.",
-      "saveEmail": "Save Email",
-      "emailSaved": "Email saved.",
-      "errEmailInvalid": "Enter a valid email address.",
-      "errCurrentPassword": "Your current password is incorrect.",
-      "errUsernameMatch": "That username does not match your account.",
-      "errPasswordIncorrect": "Your password is incorrect.",
-      "errCharactersOnline": "Log out all of your characters before deactivating.",
-      "deactivatedLocked": "This account has been deactivated. Contact an admin to restore it.",
-      "charactersSummary": "Manage your characters and enter the world.",
-      "charactersCount": "Characters: {count}",
-      "goToCharacters": "View Characters",
-      "walletSummary": "Verify a Solana wallet to show holder flair on your player card.",
-      "manageWallet": "Manage Wallet",
-      "deactivate": "Deactivate Account",
-      "deactivateWarning": "Deactivation locks your account and signs you out everywhere. Contact an admin to restore it. Confirm by re-entering your username and password.",
-      "confirmUsername": "Type your username to confirm",
-      "confirmPassword": "Password",
-      "deactivateConfirm": "Deactivate My Account",
-      "deactivated": "Your account has been deactivated.",
-      "logOut": "Log Out",
-      "logOutSummary": "Sign out of this device.",
-      "sectionSecurity": "Security",
-      "changeEmailTitle": "Change Email",
-      "changeEmailHint": "We email a confirmation link to the new address and a notice to the old one. Your email only changes once you open the link.",
-      "changeEmailNew": "New email",
-      "changeEmailSubmit": "Send Confirmation Link",
-      "changeEmailSent": "Check your inbox: open the link we sent to confirm your new email.",
-      "errEmailUnchanged": "That is already your email address.",
-      "twoFactorTitle": "Two-Factor Authentication",
-      "twoFactorStatusOn": "Two-factor authentication is ON for your account.",
-      "twoFactorStatusOff": "Add an authenticator app for stronger account security.",
-      "twoFactorSetupBtn": "Set Up Two-Factor",
-      "twoFactorBeginHint": "Enter your password to begin setup.",
-      "twoFactorBegin": "Begin Setup",
-      "twoFactorScanHint": "Add this key to your authenticator app (Google Authenticator, Authy, 1Password, and similar), then enter the 6-digit code it shows.",
-      "twoFactorSecretLabel": "Setup key",
-      "twoFactorOpenApp": "Open in authenticator app",
-      "twoFactorCodeLabel": "6-digit code",
-      "twoFactorVerifyBtn": "Verify and Enable",
-      "twoFactorEnabledMsg": "Two-factor authentication is now on.",
-      "twoFactorRecoveryTitle": "Save your recovery codes",
-      "twoFactorRecoveryHint": "Each code works once. Store them somewhere safe: they are the only way back in if you lose your authenticator app.",
-      "twoFactorDownloadCodes": "Download Codes",
-      "twoFactorDone": "Done",
-      "twoFactorDisableHint": "Enter your password to turn two-factor off. Your recovery codes will be discarded.",
-      "twoFactorDisableBtn": "Turn Off Two-Factor",
-      "twoFactorDisabledMsg": "Two-factor authentication is off.",
-      "errTwoFactorCode": "That code is not valid, try again.",
-      "errTwoFactorState": "Two-factor setup is not in the expected state. Reload and try again.",
-      "exportTitle": "Export My Data",
-      "exportHint": "Download a copy of your account and characters as a JSON file. We also email you a confirmation.",
-      "exportBtn": "Download My Data",
-      "exportDone": "Your data was downloaded. We emailed you a confirmation.",
-      "exportFailed": "Could not export your data. Try again in a moment."
+      "title": "アカウント",
+      "loggedOutPrompt": "アカウントを管理するにはログインしてください。",
+      "memberSince": "登録日：{date}",
+      "sectionSettings": "アカウント設定",
+      "sectionWallet": "$WOC ウォレット",
+      "sectionCharacters": "キャラクター",
+      "sectionDanger": "危険な操作",
+      "changePassword": "パスワードの変更",
+      "currentPassword": "現在のパスワード",
+      "newPassword": "新しいパスワード",
+      "confirmNewPassword": "新しいパスワードを確認",
+      "savePassword": "パスワードを更新",
+      "passwordChanged": "パスワードを更新しました。他のデバイスからログアウトされました。",
+      "errCurrentRequired": "現在のパスワードを入力してください。",
+      "errPasswordShort": "新しいパスワードは6文字以上にしてください。",
+      "errPasswordLong": "新しいパスワードは128文字以内にしてください。",
+      "errPasswordUnchanged": "新しいパスワードは現在のものと異なる必要があります。",
+      "errPasswordConfirm": "新しいパスワードが一致しません。",
+      "emailLabel": "メールアドレス（任意）",
+      "emailHint": "アカウント復旧にのみ使用します。宣伝メールは一切送信しません。",
+      "saveEmail": "メールを保存",
+      "emailSaved": "メールを保存しました。",
+      "errEmailInvalid": "有効なメールアドレスを入力してください。",
+      "errCurrentPassword": "現在のパスワードが正しくありません。",
+      "errUsernameMatch": "そのユーザー名はアカウントと一致しません。",
+      "errPasswordIncorrect": "パスワードが正しくありません。",
+      "errCharactersOnline": "無効化する前にすべてのキャラクターからログアウトしてください。",
+      "deactivatedLocked": "このアカウントは無効化されています。復元するには管理者に連絡してください。",
+      "charactersSummary": "キャラクターを管理してワールドに入りましょう。",
+      "charactersCount": "キャラクター：{count}",
+      "goToCharacters": "キャラクターを表示",
+      "walletSummary": "Solana ウォレットを認証してプレイヤーカードに保有者バッジを表示します。",
+      "manageWallet": "ウォレットを管理",
+      "deactivate": "アカウントを無効化",
+      "deactivateWarning": "無効化するとアカウントがロックされ、すべてのデバイスからログアウトされます。復元するには管理者に連絡してください。ユーザー名とパスワードを再入力して確認してください。",
+      "confirmUsername": "確認のためユーザー名を入力",
+      "confirmPassword": "パスワード",
+      "deactivateConfirm": "アカウントを無効化する",
+      "deactivated": "アカウントが無効化されました。",
+      "logOut": "ログアウト",
+      "logOutSummary": "このデバイスからログアウトします。",
+      "sectionSecurity": "セキュリティ",
+      "changeEmailTitle": "メールアドレスの変更",
+      "changeEmailHint": "新しいアドレスに確認用リンクを、古いアドレスに通知をメールで送信します。メールアドレスはリンクを開いて初めて変更されます。",
+      "changeEmailNew": "新しいメールアドレス",
+      "changeEmailSubmit": "確認用リンクを送信",
+      "changeEmailSent": "受信トレイをご確認ください。送信したリンクを開いて新しいメールアドレスを確認してください。",
+      "errEmailUnchanged": "すでに現在のメールアドレスです。",
+      "twoFactorTitle": "二段階認証",
+      "twoFactorStatusOn": "お使いのアカウントの二段階認証は有効です。",
+      "twoFactorStatusOff": "認証アプリを追加して、アカウントのセキュリティを強化しましょう。",
+      "twoFactorSetupBtn": "二段階認証を設定",
+      "twoFactorBeginHint": "設定を開始するにはパスワードを入力してください。",
+      "twoFactorBegin": "設定を開始",
+      "twoFactorScanHint": "このキーを認証アプリ(Google Authenticator、Authy、1Passwordなど)に追加し、表示される6桁のコードを入力してください。",
+      "twoFactorSecretLabel": "設定キー",
+      "twoFactorOpenApp": "認証アプリで開く",
+      "twoFactorCodeLabel": "6桁のコード",
+      "twoFactorVerifyBtn": "確認して有効化",
+      "twoFactorEnabledMsg": "二段階認証が有効になりました。",
+      "twoFactorRecoveryTitle": "リカバリーコードを保存してください",
+      "twoFactorRecoveryHint": "各コードは一度だけ使用できます。安全な場所に保管してください。認証アプリを紛失した場合、これらが唯一の復旧手段です。",
+      "twoFactorDownloadCodes": "コードをダウンロード",
+      "twoFactorDone": "完了",
+      "twoFactorDisableHint": "二段階認証を無効にするにはパスワードを入力してください。リカバリーコードは破棄されます。",
+      "twoFactorDisableBtn": "二段階認証を無効にする",
+      "twoFactorDisabledMsg": "二段階認証は無効です。",
+      "errTwoFactorCode": "そのコードは無効です。もう一度お試しください。",
+      "errTwoFactorState": "二段階認証の設定が想定された状態ではありません。再読み込みしてやり直してください。",
+      "exportTitle": "データのエクスポート",
+      "exportHint": "アカウントとキャラクターのコピーをJSONファイルとしてダウンロードします。確認のメールもお送りします。",
+      "exportBtn": "データをダウンロード",
+      "exportDone": "データをダウンロードしました。確認のメールをお送りしました。",
+      "exportFailed": "データをエクスポートできませんでした。しばらくしてからやり直してください。"
     },
     "masterLoot": {
-      "title": "Master Loot",
-      "enableLabel": "Master loot",
-      "enableAria": "Enable master loot",
-      "looterLabel": "Master looter",
-      "leaderOption": "Party leader",
-      "thresholdLabel": "Threshold",
-      "thresholdUncommon": "Uncommon and up",
-      "thresholdRare": "Rare and up",
-      "thresholdEpic": "Epic and up",
-      "assignPrompt": "Assign {item}",
-      "assignAria": "Assign {item} to {name}",
-      "rollButton": "Roll",
-      "selectAll": "Select all",
-      "methodMaster": "Loot method set to master loot. Master looter: {name}.",
-      "methodGroup": "Loot method set to group loot.",
-      "assigned": "{looter} assigned {item} to {target}.",
-      "unassigned": "{item} was not assigned and is free for all.",
-      "leaderOnly": "Only the party leader can change the loot method."
+      "title": "マスタールート",
+      "enableLabel": "マスタールート",
+      "enableAria": "マスタールートを有効化",
+      "looterLabel": "分配担当",
+      "leaderOption": "パーティリーダー",
+      "thresholdLabel": "品質しきい値",
+      "thresholdUncommon": "アンコモン以上",
+      "thresholdRare": "レア以上",
+      "thresholdEpic": "エピック以上",
+      "assignPrompt": "{item}を分配",
+      "assignAria": "{item}を{name}に分配",
+      "rollButton": "ロール",
+      "selectAll": "全員選択",
+      "methodMaster": "分配方式をマスタールートに設定しました。分配担当：{name}。",
+      "methodGroup": "分配方式をグループルートに設定しました。",
+      "assigned": "{looter}が{item}を{target}に分配しました。",
+      "unassigned": "{item}は分配されず、誰でも入手できます。",
+      "leaderOnly": "分配方式を変更できるのはパーティリーダーだけです。"
     },
     "bags": {
-      "filterGroupAria": "Filter bags by category",
-      "filterAll": "All",
-      "filterWeapon": "Weapons",
-      "filterArmor": "Armor",
-      "filterConsumable": "Consumables",
-      "filterMaterial": "Materials",
-      "filterQuest": "Quest",
-      "sortAria": "Sort bag items",
-      "sortRecent": "Recent",
-      "sortQuality": "Quality",
-      "sortName": "Name",
-      "searchPlaceholder": "Search items",
-      "searchAria": "Search bag items by name",
-      "noMatch": "No items match your filters."
+      "filterGroupAria": "バッグをカテゴリーで絞り込む",
+      "filterAll": "すべて",
+      "filterWeapon": "武器",
+      "filterArmor": "防具",
+      "filterConsumable": "消耗品",
+      "filterMaterial": "素材",
+      "filterQuest": "クエスト",
+      "sortAria": "バッグのアイテムを並べ替える",
+      "sortRecent": "最近",
+      "sortQuality": "品質",
+      "sortName": "名前",
+      "searchPlaceholder": "アイテムを検索",
+      "searchAria": "名前でバッグのアイテムを検索",
+      "noMatch": "条件に一致するアイテムはありません。"
     },
     "raidConvert": {
-      "toPartyDone": "Your raid has converted back to a party.",
-      "notRaid": "Your group is not a raid.",
-      "leaderOnly": "Only the raid leader may convert to a party.",
-      "tooLarge": "A raid with more than five members cannot convert back to a party."
+      "toPartyDone": "レイドがパーティに戻りました。",
+      "notRaid": "パーティはレイドではありません。",
+      "leaderOnly": "パーティに変換できるのはレイドリーダーだけです。",
+      "tooLarge": "メンバーが5人を超えるレイドはパーティに戻せません。"
     },
     "itemArmorType": {
-      "cloth": "Cloth",
-      "leather": "Leather",
-      "mail": "Mail"
+      "cloth": "布",
+      "leather": "革",
+      "mail": "鎖"
     },
     "auraEffect": {
-      "dot": "Deals {value} {school} damage every {interval} sec",
-      "hot": "Restores {value} health every {interval} sec",
-      "absorb": "Absorbs {value} damage",
-      "healAbsorb": "Absorbs {value} incoming healing",
-      "thorns": "Deals {value} {school} damage to attackers",
-      "slow": "Reduces movement speed by {pct}%",
-      "speed": "Increases movement speed by {pct}%",
-      "attackSpeedSlow": "Slows attack speed by {pct}%",
-      "attackSpeedFast": "Increases attack speed by {pct}%",
-      "haste": "Increases attack and casting speed by {pct}%",
-      "tongues": "Increases casting time by {pct}%",
+      "dot": "{interval}秒ごとに{value}の{school}ダメージを与える",
+      "hot": "{interval}秒ごとに体力を{value}回復する",
+      "absorb": "{value}のダメージを吸収する",
+      "healAbsorb": "受ける回復を{value}吸収する",
+      "thorns": "攻撃者に{value}の{school}ダメージを与える",
+      "slow": "移動速度を{pct}%低下させる",
+      "speed": "移動速度を{pct}%上昇させる",
+      "attackSpeedSlow": "攻撃速度を{pct}%低下させる",
+      "attackSpeedFast": "攻撃速度を{pct}%上昇させる",
+      "haste": "攻撃速度と詠唱速度を{pct}%上昇させる",
+      "tongues": "詠唱時間を{pct}%増加させる",
       "increase": {
-        "ap": "Increases attack power by {value}",
-        "armor": "Increases armor by {value}",
-        "int": "Increases Intellect by {value}",
-        "agi": "Increases Agility by {value}",
-        "sta": "Increases Stamina by {value}",
-        "spi": "Increases Spirit by {value}",
-        "allStats": "Increases all attributes by {value}"
+        "ap": "攻撃力を{value}上昇させる",
+        "armor": "防御力を{value}上昇させる",
+        "int": "知力を{value}上昇させる",
+        "agi": "敏捷性を{value}上昇させる",
+        "sta": "耐久力を{value}上昇させる",
+        "spi": "精神力を{value}上昇させる",
+        "allStats": "すべての能力値を{value}上昇させる"
       },
       "reduce": {
-        "ap": "Reduces attack power by {value}",
-        "armor": "Reduces armor by {value}",
-        "int": "Reduces Intellect by {value}",
-        "agi": "Reduces Agility by {value}",
-        "sta": "Reduces Stamina by {value}",
-        "spi": "Reduces Spirit by {value}",
-        "allStats": "Reduces all attributes by {value}"
+        "ap": "攻撃力を{value}低下させる",
+        "armor": "防御力を{value}低下させる",
+        "int": "知力を{value}低下させる",
+        "agi": "敏捷性を{value}低下させる",
+        "sta": "耐久力を{value}低下させる",
+        "spi": "精神力を{value}低下させる",
+        "allStats": "すべての能力値を{value}低下させる"
       },
-      "dodge": "Increases dodge chance by {pct}%",
-      "dodgeReduce": "Reduces dodge chance by {pct}%",
-      "armorFlat": "Reduces armor by {value}",
-      "armorFlatStacks": "Reduces armor by {value} ({stacks} stacks)",
-      "mortalWound": "Reduces healing received by {pct}%",
-      "vulnerability": "Increases damage taken by {pct}%",
-      "physVuln": "Increases physical damage taken by {pct}%",
-      "spellVuln": "Increases magic damage taken by {pct}%",
-      "critVuln": "Increases chance to be critically hit by {pct}%",
-      "costTax": "Increases ability costs by {pct}%",
-      "stun": "Stunned: unable to act",
-      "root": "Rooted: unable to move",
-      "incapacitate": "Incapacitated: unable to act",
-      "polymorph": "Polymorphed: unable to act",
-      "hex": "Reduces damage and healing dealt by {pct}%",
-      "blind": "Blinded: unable to act",
-      "silence": "Silenced: unable to cast spells",
-      "disarm": "Disarmed: cannot use weapon attacks",
-      "lockout": "Spell school locked out",
-      "imbue": "Weapon imbued with bonus effects",
-      "imbueRange": "Weapon imbued: {min} to {max} bonus damage on judgement",
-      "stealth": "Concealed; movement speed reduced by {pct}%",
-      "formBear": "Bear Form: increased health and armor",
-      "formCat": "Cat Form: melee damage and energy",
-      "formTravel": "Travel Form: movement speed increased by {pct}%",
-      "defensiveStance": "Defensive Stance: reduced damage taken, more threat",
-      "righteousFury": "Righteous Fury: greatly increased threat from Holy damage",
-      "scale": "Size increased by {pct}%",
-      "jump": "Jump height increased by {pct}%",
+      "dodge": "回避率を{pct}%上昇させる",
+      "dodgeReduce": "回避率を{pct}%低下させる",
+      "armorFlat": "防御力を{value}低下させる",
+      "armorFlatStacks": "防御力を{value}低下させる({stacks}スタック)",
+      "mortalWound": "受ける回復量を{pct}%低下させる",
+      "vulnerability": "受けるダメージを{pct}%増加させる",
+      "physVuln": "受ける物理ダメージを{pct}%増加させる",
+      "spellVuln": "受ける魔法ダメージを{pct}%増加させる",
+      "critVuln": "クリティカルを受ける確率を{pct}%増加させる",
+      "costTax": "アビリティのコストを{pct}%増加させる",
+      "stun": "スタン: 行動不能",
+      "root": "足止め: 移動不能",
+      "incapacitate": "無力化: 行動不能",
+      "polymorph": "変身: 行動不能",
+      "hex": "与えるダメージと回復を{pct}%低下させる",
+      "blind": "盲目: 行動不能",
+      "silence": "沈黙: 呪文を詠唱できない",
+      "disarm": "武装解除: 武器攻撃を使用できない",
+      "lockout": "呪文系統がロックされている",
+      "imbue": "武器に追加効果が付与されている",
+      "imbueRange": "武器付与: 裁きで{min}から{max}の追加ダメージ",
+      "stealth": "隠密状態。移動速度が{pct}%低下する",
+      "formBear": "ベアフォーム: 体力と防御力が上昇",
+      "formCat": "キャットフォーム: 近接ダメージとエネルギー",
+      "formTravel": "トラベルフォーム: 移動速度が{pct}%上昇",
+      "defensiveStance": "ディフェンシブスタンス: 受けるダメージが減少し、脅威度が上昇",
+      "righteousFury": "正義の怒り: 神聖ダメージによる脅威度が大幅に上昇",
+      "scale": "サイズが{pct}%増加",
+      "jump": "ジャンプの高さが{pct}%増加",
       "school": {
-        "physical": "Physical",
-        "fire": "Fire",
-        "frost": "Frost",
-        "arcane": "Arcane",
-        "shadow": "Shadow",
-        "holy": "Holy",
-        "nature": "Nature"
+        "physical": "物理",
+        "fire": "火",
+        "frost": "氷",
+        "arcane": "秘術",
+        "shadow": "影",
+        "holy": "神聖",
+        "nature": "自然"
       }
     },
     "loot": {
-      "chestTitle": "Chest"
+      "chestTitle": "宝箱"
     },
     "spellbook": {
-      "addToBarAria": "Add {name} to action bar",
-      "removeFromBarAria": "Remove {name} from action bar"
+      "addToBarAria": "{name}をアクションバーに追加",
+      "removeFromBarAria": "{name}をアクションバーから削除"
     },
     "nameplate": {
       "mob": "[{level}] {name}",
@@ -725,766 +725,766 @@ export const ja_JP: EnTranslations = {
   "guide": {
     "brand": "World of ClaudeCraft",
     "brandShort": "ClaudeCraft",
-    "tagline": "A classic-style MMO you play free in your browser.",
-    "skipToContent": "Skip to main content",
-    "loading": "Loading...",
+    "tagline": "ブラウザで無料で遊べる、クラシックスタイルのMMO。",
+    "skipToContent": "メインコンテンツへスキップ",
+    "loading": "読み込み中...",
     "docTitle": "{page} - {brand}",
-    "related": "Related",
+    "related": "関連項目",
     "nav": {
-      "overview": "Overview",
-      "howToPlay": "How to Play",
-      "classes": "Classes",
-      "bestiary": "Bestiary",
-      "models": "3D Models",
-      "gear": "Gear & Items",
-      "economy": "Economy & Trade",
-      "social": "Social & Groups",
-      "stats": "Character & Stats",
-      "progression": "Leveling & Progression",
-      "world": "World",
-      "quests": "Quests",
-      "dungeons": "Dungeons & Raids",
-      "reference": "Reference",
-      "controls": "Controls",
-      "combat": "Combat",
-      "talents": "Talents",
-      "arena": "Arena & PvP",
-      "glossary": "Glossary",
-      "wishIKnew": "Things I Wish I Knew",
+      "overview": "概要",
+      "howToPlay": "遊び方",
+      "classes": "クラス",
+      "bestiary": "モンスター図鑑",
+      "models": "3Dモデル",
+      "gear": "ギアとアイテム",
+      "economy": "経済と取引",
+      "social": "ソーシャルとグループ",
+      "stats": "キャラクターとステータス",
+      "progression": "レベリングと成長",
+      "world": "ワールド",
+      "quests": "クエスト",
+      "dungeons": "ダンジョンとレイド",
+      "reference": "リファレンス",
+      "controls": "操作方法",
+      "combat": "戦闘",
+      "talents": "タレント",
+      "arena": "アリーナとPvP",
+      "glossary": "用語集",
+      "wishIKnew": "知っておきたかったこと",
       "faq": "FAQ",
-      "playNow": "Play Now",
-      "openMenu": "Open menu",
-      "closeMenu": "Close menu",
-      "primary": "Guide sections",
-      "topics": "Topics",
-      "onThisPage": "On this page",
-      "backToGame": "Back to the game"
+      "playNow": "今すぐプレイ",
+      "openMenu": "メニューを開く",
+      "closeMenu": "メニューを閉じる",
+      "primary": "ガイドのセクション",
+      "topics": "トピック",
+      "onThisPage": "このページの内容",
+      "backToGame": "ゲームに戻る"
     },
     "groups": {
-      "start": "Get Started",
-      "compendium": "Compendium",
-      "reference": "Reference"
+      "start": "はじめに",
+      "compendium": "コンペンディウム",
+      "reference": "リファレンス"
     },
     "breadcrumb": {
-      "label": "Breadcrumb",
-      "home": "Guide"
+      "label": "パンくずリスト",
+      "home": "ガイド"
     },
     "seq": {
-      "label": "Page navigation",
-      "prev": "Previous",
-      "next": "Next"
+      "label": "ページナビゲーション",
+      "prev": "前へ",
+      "next": "次へ"
     },
     "toc": {
-      "heading": "On this page"
+      "heading": "このページの内容"
     },
     "footer": {
-      "blurb": "An open-source, classic-style micro-MMO. Quest, group up, and explore a hand-built world, right in your browser.",
-      "playNow": "Play Now",
-      "github": "Source on GitHub",
-      "discord": "Join the Discord",
-      "communityWiki": "Community Wiki",
+      "blurb": "オープンソースの、クラシックスタイルなマイクロMMO。クエストをこなし、仲間と組み、手作りのワールドを冒険しよう。すべてブラウザで。",
+      "playNow": "今すぐプレイ",
+      "github": "GitHubのソース",
+      "discord": "Discordに参加",
+      "communityWiki": "コミュニティWiki",
       "rights": "World of ClaudeCraft"
     },
     "language": {
-      "label": "Language",
-      "select": "Choose a language"
+      "label": "言語",
+      "select": "言語を選択"
     },
     "search": {
-      "label": "Search",
-      "placeholder": "Search the guide",
-      "noResults": "No matches",
-      "typePage": "Page",
-      "typeClass": "Class",
-      "typeZone": "Zone",
-      "typeCreature": "Creatures",
-      "typeDungeon": "Dungeon",
-      "typeTerm": "Term"
+      "label": "検索",
+      "placeholder": "ガイドを検索",
+      "noResults": "一致するものがありません",
+      "typePage": "ページ",
+      "typeClass": "クラス",
+      "typeZone": "ゾーン",
+      "typeCreature": "クリーチャー",
+      "typeDungeon": "ダンジョン",
+      "typeTerm": "用語"
     },
     "home": {
-      "eyebrow": "Classic-style browser MMO",
+      "eyebrow": "クラシックスタイルのブラウザMMO",
       "title": "World of ClaudeCraft",
-      "subtitle": "Quest, group up, and explore a hand-built world, free in your browser.",
-      "ctaPlay": "Play Now",
-      "ctaLearn": "How to Play",
+      "subtitle": "クエストをこなし、仲間と組み、手作りのワールドを冒険しよう。ブラウザで無料。",
+      "ctaPlay": "今すぐプレイ",
+      "ctaLearn": "遊び方",
       "what": {
-        "heading": "A classic MMO, made to be picked up",
-        "pillarPlayTitle": "Play in your browser",
-        "pillarPlayBody": "No download, no launcher. Make a character and you are in the world in seconds, on desktop or phone.",
-        "pillarClassesTitle": "Nine classes, three roles",
-        "pillarClassesBody": "Tank, heal, or deal the damage. Every class plays the way its archetype should, with talents to make it yours.",
-        "pillarOpenTitle": "Free and open source",
-        "pillarOpenBody": "Free to play to the level cap, with the whole game open source. No pay to win, ever."
+        "heading": "気軽に始められる、クラシックMMO",
+        "pillarPlayTitle": "ブラウザでプレイ",
+        "pillarPlayBody": "ダウンロードもランチャーも不要。キャラクターを作れば数秒でワールドへ。PCでもスマホでも。",
+        "pillarClassesTitle": "9つのクラス、3つのロール",
+        "pillarClassesBody": "タンク、ヒーラー、ダメージのいずれでも。どのクラスもアーキタイプらしい立ち回りができ、タレントで自分好みに育てられる。",
+        "pillarOpenTitle": "無料、そしてオープンソース",
+        "pillarOpenBody": "最大レベルまで無料でプレイでき、ゲーム全体がオープンソース。Pay to Winは一切なし。"
       },
       "classes": {
-        "heading": "Choose your class",
-        "sub": "Nine classic archetypes, each with its own feel and party role.",
-        "cta": "Explore the classes"
+        "heading": "クラスを選ぼう",
+        "sub": "クラシックな9つのアーキタイプ。それぞれに独自の手触りとパーティロールがある。",
+        "cta": "クラスを見る"
       },
       "world": {
-        "heading": "Explore the world",
-        "sub": "One continuous land, three zones, from quiet valleys to frozen peaks.",
-        "levels": "Levels {min} to {max}",
-        "cta": "See the world",
-        "valeName": "Eastbrook Vale",
-        "valeBlurb": "Green hills and old woods where every adventure begins.",
-        "marshName": "Mirefen Marsh",
-        "marshBlurb": "Sunken fens and tide-worn ruins, home to murlocs and worse.",
-        "peaksName": "Thornpeak Heights",
-        "peaksBlurb": "Wind-scoured ridges climbing toward the realm's coldest dangers."
+        "heading": "ワールドを冒険しよう",
+        "sub": "ひと続きの大地、3つのゾーン。静かな谷から凍てつく頂まで。",
+        "levels": "レベル{min}から{max}",
+        "cta": "ワールドを見る",
+        "valeName": "イーストブルックの谷",
+        "valeBlurb": "すべての冒険が始まる、緑の丘と古い森。",
+        "marshName": "マイアフェン湿地",
+        "marshBlurb": "沈んだ沼地と波に削られた遺跡。マーロックや、それ以上に厄介なものが棲む。",
+        "peaksName": "ソーンピーク高地",
+        "peaksBlurb": "風に削られた尾根が、この世界で最も冷たい危険へと続いていく。"
       },
       "group": {
-        "heading": "Group up for the hard parts",
-        "sub": "The world is soloable, but the best loot waits behind a good party.",
-        "dungeonsTitle": "Dungeons",
-        "dungeonsBody": "Instanced dives for a party of five, scaling with the zones around them.",
-        "raidTitle": "The raid",
-        "raidBody": "A ten-player capstone for those who reach the top of the world.",
-        "arenaTitle": "The arena",
-        "arenaBody": "Step into the Ashen Coliseum and prove yourself against other players.",
-        "cta": "Dungeons and Raids"
+        "heading": "難所は仲間と挑もう",
+        "sub": "ワールドはソロでも進められるが、最高の戦利品は良いパーティの先で待っている。",
+        "dungeonsTitle": "ダンジョン",
+        "dungeonsBody": "5人パーティ向けのインスタンスダイブ。周囲のゾーンに合わせてスケールする。",
+        "raidTitle": "レイド",
+        "raidBody": "世界の頂に到達した者のための、10人用の総決算コンテンツ。",
+        "arenaTitle": "アリーナ",
+        "arenaBody": "アッシェン・コロシアムに足を踏み入れ、他のプレイヤーとの戦いで実力を示そう。",
+        "cta": "ダンジョンとレイド"
       },
       "faq": {
-        "heading": "Good to know",
-        "q1": "Is it free to play?",
-        "a1": "Yes. The whole game is free to the level cap, and it is open source on GitHub.",
-        "q2": "Do I need a crypto wallet?",
-        "a2": "No. The game is fully playable without one. The optional community token only unlocks cosmetic flair and never affects power.",
-        "q3": "Can I play offline?",
-        "a3": "Yes. There is an instant single-player mode in your browser, plus the shared online realm.",
-        "q4": "How long to reach max level?",
-        "a4": "The cap is level {cap}, reached across three zones of quests, dungeons, and exploration."
+        "heading": "知っておきたいこと",
+        "q1": "無料で遊べますか?",
+        "a1": "はい。ゲーム全体が最大レベルまで無料で、GitHubでオープンソースとして公開されています。",
+        "q2": "暗号通貨ウォレットは必要ですか?",
+        "a2": "いいえ。ウォレットがなくても完全にプレイできます。任意のコミュニティトークンは見た目の装飾を解放するだけで、性能には一切影響しません。",
+        "q3": "オフラインで遊べますか?",
+        "a3": "はい。ブラウザですぐに遊べるシングルプレイモードに加え、共有のオンラインレルムもあります。",
+        "q4": "最大レベルまでどのくらいかかりますか?",
+        "a4": "レベル上限は{cap}で、3つのゾーンにわたるクエスト、ダンジョン、探索を通じて到達します。"
       },
       "community": {
-        "heading": "Join the realm",
-        "body": "Jump in now, or come say hello. The world is better with company.",
-        "play": "Play Now",
-        "discord": "Join the Discord",
-        "github": "Star on GitHub"
+        "heading": "レルムに参加しよう",
+        "body": "今すぐ飛び込むもよし、挨拶しに来るもよし。仲間がいれば世界はもっと楽しい。",
+        "play": "今すぐプレイ",
+        "discord": "Discordに参加",
+        "github": "GitHubでスターを付ける"
       }
     },
     "howToPlay": {
-      "intro": "New to this kind of game? You will be questing in minutes. Here is the short version, one step at a time.",
-      "firstHeading": "Your first 15 minutes",
-      "step1Title": "Make a character",
-      "step1Body": "Pick a class and a look, give your hero a name, and enter the world. You can make more characters later.",
-      "step2Title": "Find your first quest",
-      "step2Body": "Marshal Redbrook is waiting in the starting town. Talk to him and accept Wolves at the Door.",
-      "step3Title": "Move and look around",
-      "step3Body": "Move with W, A, S, D. Hold the right mouse button and drag to look around. That is most of it.",
-      "step4Title": "Fight something",
-      "step4Body": "Press Tab to target the nearest enemy, then press your abilities on the bar (keys 1 through 0) to attack.",
-      "step5Title": "Turn it in",
-      "step5Body": "Finish the objective, return to the quest giver (look for the marker on your map), and collect your reward.",
-      "step6Title": "Keep going",
-      "step6Body": "You just hit level 2. Follow the quest trail out of town and the world opens up from there.",
-      "basicsHeading": "The basics",
-      "resourcesTitle": "Resources",
-      "resourcesBody": "Spells and abilities cost a resource. Warriors build Rage by fighting, rogues spend Energy that refills on its own, and everyone else casts from a pool of Mana.",
-      "targetingTitle": "Targeting and your bar",
-      "targetingBody": "Tab cycles enemies, F interacts and loots, and your action bar holds the abilities you have learned. Drag spells onto it from your spellbook.",
-      "questsTitle": "Quests",
-      "questsBody": "Accept quests from people with a marker over their head, complete the objective, and turn them in for experience, coin, and gear. The tracker on screen keeps your goals in view.",
-      "deathTitle": "Death is not the end",
-      "deathBody": "If you fall, you release your spirit at the nearest graveyard and run back to your body. No experience is lost.",
-      "groupingTitle": "Playing together",
-      "groupingBody": "Invite others to a party to share quest credit and take on dungeons. Most of the world is soloable, so grouping is a choice, not a chore.",
-      "onlineTitle": "Online or offline",
-      "onlineBody": "Play the shared online realm with everyone else, or start an instant offline world in your browser to learn the ropes.",
-      "reassure": "Talents unlock at level 10 and can be reset at any time, so your early choices are never permanent. Experiment freely.",
-      "controlsLink": "See the full controls reference"
+      "intro": "この手のゲームは初めてですか?数分でクエストを始められます。最短の手順を、1ステップずつ紹介します。",
+      "firstHeading": "最初の15分",
+      "step1Title": "キャラクターを作る",
+      "step1Body": "クラスと見た目を選び、ヒーローに名前を付けてワールドへ。キャラクターは後からでも追加できます。",
+      "step2Title": "最初のクエストを見つける",
+      "step2Body": "開始の街でレッドブルック隊長が待っています。話しかけて「門前の狼」を受注しましょう。",
+      "step3Title": "移動して見回す",
+      "step3Body": "W、A、S、Dで移動します。右マウスボタンを押したままドラッグすると見回せます。基本はこれだけです。",
+      "step4Title": "戦ってみる",
+      "step4Body": "Tabで最も近い敵をターゲットし、バーのアビリティ(キー1から0)を押して攻撃しましょう。",
+      "step5Title": "クエストを報告する",
+      "step5Body": "目標を達成したら、クエスト発注者のもとへ戻り(マップ上のマーカーを目印に)、報酬を受け取りましょう。",
+      "step6Title": "先へ進もう",
+      "step6Body": "これでレベル2に到達。街から続くクエストの道筋をたどれば、ワールドはそこからどんどん広がっていきます。",
+      "basicsHeading": "基本",
+      "resourcesTitle": "リソース",
+      "resourcesBody": "呪文やアビリティの使用にはリソースを消費します。ウォリアーは戦ってレイジを溜め、ローグは自動で回復するエナジーを消費し、それ以外はマナのプールから詠唱します。",
+      "targetingTitle": "ターゲットとアクションバー",
+      "targetingBody": "Tabで敵を切り替え、Fで対話やルートを行います。アクションバーには覚えたアビリティがセットされます。スペルブックからドラッグして配置しましょう。",
+      "questsTitle": "クエスト",
+      "questsBody": "頭上にマーカーが表示された人物からクエストを受け、目標を達成して報告すると、経験値、コイン、装備が手に入ります。画面上のトラッカーで目標を常に確認できます。",
+      "deathTitle": "死は終わりではない",
+      "deathBody": "倒れたら最寄りの墓地で魂を解放し、自分の亡骸まで走って戻ります。経験値は失われません。",
+      "groupingTitle": "一緒に遊ぶ",
+      "groupingBody": "他のプレイヤーをパーティに招待すれば、クエストの達成を共有したりダンジョンに挑んだりできます。ワールドの大半はソロで進められるので、グループ行動は義務ではなく選択です。",
+      "onlineTitle": "オンラインかオフラインか",
+      "onlineBody": "みんなと一緒に共有のオンラインレルムで遊ぶか、ブラウザですぐに始められるオフラインワールドで基本を覚えるか、選べます。",
+      "reassure": "タレントはレベル10で解放され、いつでもリセットできます。序盤の選択が永久に固定されることはないので、自由に試してみてください。",
+      "controlsLink": "操作方法の完全なリファレンスを見る"
     },
     "controls": {
-      "intro": "Default keys for desktop. Every binding can be changed in the game's options.",
-      "keyHeader": "Key",
-      "actionHeader": "Action",
-      "groupMovement": "Movement",
-      "groupCombat": "Targeting and combat",
-      "groupInterface": "Windows",
-      "groupCamera": "Camera",
-      "talents": "Talents",
-      "arena": "Arena",
-      "leaderboard": "Leaderboard",
-      "abilities": "Use abilities",
-      "mobileHeading": "On mobile",
-      "mobileBody": "Touch controls appear automatically on phones and tablets: a movement stick on the left, drag anywhere on the right to look, and on-screen buttons for your abilities and menus."
+      "intro": "PC用のデフォルトキーです。すべてのキー割り当てはゲームのオプションで変更できます。",
+      "keyHeader": "キー",
+      "actionHeader": "アクション",
+      "groupMovement": "移動",
+      "groupCombat": "ターゲットと戦闘",
+      "groupInterface": "ウィンドウ",
+      "groupCamera": "カメラ",
+      "talents": "タレント",
+      "arena": "アリーナ",
+      "leaderboard": "リーダーボード",
+      "abilities": "アビリティを使用",
+      "mobileHeading": "モバイルでは",
+      "mobileBody": "スマートフォンやタブレットでは、タッチ操作が自動で表示されます。左側に移動用スティック、右側はどこでもドラッグして視点操作、そしてアビリティやメニュー用の画面上ボタンが現れます。"
     },
     "combat": {
-      "intro": "Combat follows familiar classic-MMO rules. You never need to study any of it to play well, this is just the shape of how fights work.",
-      "hitTitle": "Not every blow lands",
-      "hitBody": "Attacks can miss or be dodged, parried, and blocked, and so can the enemy's. Fighting near your own level and keeping your gear current is what makes your hits connect.",
-      "mitigationTitle": "Armor and gear keep you standing",
-      "mitigationBody": "Armor softens physical hits and the right gear blunts magic, so upgrades are your main source of staying power. Heavier armor classes shrug off more, but nothing makes you untouchable.",
-      "resourcesTitle": "Every class has its own rhythm",
-      "resourcesBody": "Warriors build Rage in the thick of a fight, rogues spend Energy that steadily returns, and casters manage a pool of Mana. Learning your resource is half of playing your class well.",
-      "growTitle": "You grow stronger every level",
-      "growBody": "Each level makes you tougher and unlocks new abilities, all the way to the cap of level {cap}. Questing is the fastest way up; dungeons and exploration round it out.",
-      "effectsTitle": "Buffs, debuffs, and crowd control",
-      "effectsBody": "Many abilities apply an effect that lingers. Helpful ones (buffs) raise your stats, shield you, or heal you a little at a time; harmful ones (debuffs) drain your health with damage over time or weaken you. Watch the small icons near your action bar to see what is on you and how long it lasts.",
-      "ccBody": "Crowd control is a special kind of debuff that limits what a target can do: stuns, roots and slows, silences that stop spellcasting, disarms, fears, and polymorph that turns a foe harmless for a moment. Some of these, like roots, fears, and polymorph, lose their hold when they are reapplied too quickly, so they cannot be chained forever.",
-      "deathTitle": "When you fall",
-      "deathBody": "If your health reaches zero you are downed. You revive after a short wait and carry on from where you left off, so a death costs you a little time, not your progress. Between fights, sit to eat and drink so you start the next one at full strength."
+      "intro": "戦闘はおなじみのクラシックMMOのルールに沿っています。うまく遊ぶために細かく学ぶ必要はまったくありません。これは戦いの仕組みの概要にすぎません。",
+      "hitTitle": "すべての一撃が命中するわけではない",
+      "hitBody": "攻撃はミスしたり、回避、受け流し、ブロックされたりします。それは敵の攻撃も同じです。自分のレベルに近い相手と戦い、装備を最新に保つことが、攻撃を確実に当てるコツです。",
+      "mitigationTitle": "アーマーと装備が生存を支える",
+      "mitigationBody": "アーマーは物理ダメージを和らげ、適切な装備は魔法を弱めます。だから装備の更新が生存力の主な源になります。重装のクラスほど多くを受け流せますが、無敵になれるわけではありません。",
+      "resourcesTitle": "クラスごとに独自のリズムがある",
+      "resourcesBody": "ウォリアーは激しい戦いの中でレイジを溜め、ローグは着実に回復するエナジーを消費し、キャスターはマナのプールを管理します。自分のリソースを理解することが、クラスをうまく使いこなす半分です。",
+      "growTitle": "レベルごとに強くなる",
+      "growBody": "レベルが上がるたびに頑丈になり、新たなアビリティを習得します。これはレベル上限{cap}まで続きます。最速で成長するのはクエスト。ダンジョンと探索がそれを補います。",
+      "effectsTitle": "バフ、デバフ、群衆制御",
+      "effectsBody": "多くのアビリティは、しばらく残る効果を付与します。有益なもの（バフ）はステータスを上げ、盾を張り、少しずつ回復させてくれます。有害なもの（デバフ）は継続ダメージで体力を削り、あるいはあなたを弱体化させます。アクションバーの近くにある小さなアイコンを見れば、何が付いていて、あとどれくらい続くのかがわかります。",
+      "ccBody": "群衆制御は、対象の行動を制限する特殊なデバフです。スタン、根縛りや減速、呪文詠唱を止めるサイレンス、武装解除、フィアー、そして一瞬だけ敵を無害にするポリモーフなど。根縛り、フィアー、ポリモーフのように、あまりに早く再付与すると効果が解けるものもあるため、永遠に連鎖させることはできません。",
+      "deathTitle": "倒れたとき",
+      "deathBody": "体力がゼロになると倒れます。しばらく待てば復活し、倒れた場所から続けられるので、死は進行ではなく少しの時間を失うだけです。戦いの合間には座って食べ、飲んで、次の戦いを万全の状態で始めましょう。"
     },
     "glossary": {
-      "intro": "A quick reference for the terms used across this guide and in chat.",
-      "aggroTerm": "Aggro",
-      "aggroDef": "An enemy's attention. The player generating the most threat holds aggro and gets attacked.",
-      "threatTerm": "Threat",
-      "threatDef": "How much an enemy wants to attack you. The tank's job is to hold more threat than everyone else.",
-      "gcdTerm": "Global cooldown",
-      "gcdDef": "The short, shared pause after using most abilities, so you cannot fire everything at once.",
+      "intro": "このガイドやチャットで使われる用語のクイックリファレンスです。",
+      "aggroTerm": "アグロ",
+      "aggroDef": "敵の注意のこと。最も多くのスレットを稼いだプレイヤーがアグロを保持し、攻撃を受けます。",
+      "threatTerm": "脅威",
+      "threatDef": "敵がどれだけあなたを攻撃したがるか。タンクの役目は、誰よりも多くの脅威を保つことです。",
+      "gcdTerm": "グローバルクールダウン",
+      "gcdDef": "ほとんどのアビリティ使用後に発生する、短い共通の待機時間。すべてを一度に発動できないようにするものです。",
       "dpsTerm": "DPS",
-      "dpsDef": "Damage per second, a rough measure of how fast something deals damage.",
-      "buffTerm": "Buff",
-      "buffDef": "A helpful effect on you or an ally, like a blessing that raises a stat for a while.",
-      "debuffTerm": "Debuff",
-      "debuffDef": "A harmful effect on a target, like a slow, a bleed, or weakened armor.",
-      "dotTerm": "DoT and HoT",
-      "dotDef": "Damage over time and healing over time: effects that tick in steady pulses instead of all at once.",
-      "ccTerm": "Crowd control",
-      "ccDef": "Abilities that stun, root, or otherwise take an enemy out of the fight for a moment.",
-      "procTerm": "Proc",
-      "procDef": "A chance-based effect that fires off something else, like a bonus that sometimes triggers when you attack.",
-      "eliteTerm": "Elite",
-      "eliteDef": "A tougher-than-normal enemy, usually meant for a group. Dungeon and rare enemies are often elite.",
-      "rareTerm": "Rare",
-      "rareDef": "An uncommon named enemy that wanders a zone and drops better loot.",
-      "mobTerm": "Mob",
-      "mobDef": "Any computer-controlled creature in the world, friendly or hostile. Short for mobile.",
-      "tankTerm": "Tank",
-      "tankDef": "The party member who holds enemy aggro and absorbs the damage so others can fight safely.",
-      "healerTerm": "Healer",
-      "healerDef": "The party member who keeps everyone alive with healing spells.",
-      "specTerm": "Spec",
-      "specDef": "A specialization: the path you lean your class toward, like healing or damage, as you spend talents.",
-      "pullTerm": "Pull",
-      "pullDef": "To draw an enemy or group into a fight, usually deliberately and one batch at a time.",
-      "instanceTerm": "Instance",
-      "instanceDef": "A private copy of a dungeon or raid made just for your party."
+      "dpsDef": "1秒あたりのダメージ。どれだけ速くダメージを与えるかのおおよその指標です。",
+      "buffTerm": "バフ",
+      "buffDef": "ステータスをしばらく上げる祝福のように、自分や味方にかかる有益な効果です。",
+      "debuffTerm": "デバフ",
+      "debuffDef": "減速、出血、アーマー低下など、標的にかかる有害な効果です。",
+      "dotTerm": "DoTとHoT",
+      "dotDef": "継続ダメージと継続回復。一度にではなく、一定の間隔で刻まれる効果です。",
+      "ccTerm": "クラウドコントロール",
+      "ccDef": "敵をスタンさせたり根付かせたりして、一時的に戦闘から離脱させるアビリティです。",
+      "procTerm": "プロック",
+      "procDef": "攻撃したときにときどき発動するボーナスのように、確率で別の効果を引き起こすものです。",
+      "eliteTerm": "エリート",
+      "eliteDef": "通常より手強い敵で、たいていグループ向け。ダンジョンやレアの敵はエリートであることが多いです。",
+      "rareTerm": "レア",
+      "rareDef": "ゾーン内をさまよう希少なネームド敵で、より良い戦利品を落とします。",
+      "mobTerm": "モブ",
+      "mobDef": "ワールドにいるコンピューター制御のクリーチャー全般で、友好的なものも敵対的なものも含みます。mobileの略です。",
+      "tankTerm": "タンク",
+      "tankDef": "敵のアグロを保持してダメージを引き受け、他のメンバーが安全に戦えるようにするパーティメンバー。",
+      "healerTerm": "ヒーラー",
+      "healerDef": "回復呪文でみんなを生かし続けるパーティメンバー。",
+      "specTerm": "スペック",
+      "specDef": "スペシャライゼーション。タレントを振ることで、回復やダメージなどクラスを傾けていく方向性のことです。",
+      "pullTerm": "プル",
+      "pullDef": "敵やそのグループを戦闘に引き込むこと。たいていは意図的に、1グループずつ行います。",
+      "instanceTerm": "インスタンス",
+      "instanceDef": "自分のパーティ専用に生成された、ダンジョンやレイドのプライベートなコピー。"
     },
     "faqPage": {
-      "intro": "The questions new players ask most often.",
-      "q1": "Is it really free?",
-      "a1": "Yes. The whole game is free to play to the level cap, and the source code is open on GitHub.",
-      "q2": "Do I need a crypto wallet or any tokens?",
-      "a2": "No. The game is fully playable without one. The optional community token only unlocks cosmetic flair and never affects power or progression.",
-      "q3": "Can I play on my phone?",
-      "a3": "Yes. The game runs in a mobile browser with touch controls, and there is a desktop launcher as well.",
-      "q4": "Can I play offline or solo?",
-      "a4": "Yes. There is an instant single-player offline mode, and the online world is fully soloable apart from dungeons and the raid.",
-      "q5": "How many classes are there?",
-      "a5": "Nine, covering the classic tank, healer, and damage roles, each with its own resource and signature abilities.",
-      "q6": "What is the level cap?",
-      "a6": "Level {cap}, reached across three connected zones of quests, dungeons, and exploration.",
-      "q7": "Will my character be saved?",
-      "a7": "Online characters are saved on the server automatically. Offline characters live in your browser for quick sessions and testing.",
-      "q8": "Can I host my own copy?",
-      "a8": "Yes. The project is open source, so you can run your own server. See the GitHub repository.",
-      "q9": "Is there PvP?",
-      "a9": "Yes. Duel anyone for fun, or step into the Ashen Coliseum to fight other players. PvP is opt in, so you are never forced into it.",
-      "q10": "What is there to do at max level?",
-      "a10": "The cap is level {cap}. From there you run the five-player dungeons and the ten-player raid, chase better gear, and test yourself in the arena.",
-      "q11": "How do I find a group?",
-      "a11": "Invite anyone you meet to a party, ask in chat, or team up at a dungeon. Most of the world is soloable, so grouping is a choice, not a requirement."
+      "intro": "新規プレイヤーが最もよく尋ねる質問です。",
+      "q1": "本当に無料ですか?",
+      "a1": "はい。ゲーム全体が最大レベルまで無料でプレイでき、ソースコードはGitHubで公開されています。",
+      "q2": "暗号通貨ウォレットやトークンは必要ですか?",
+      "a2": "いいえ。ウォレットがなくても完全にプレイできます。任意のコミュニティトークンは見た目の装飾を解放するだけで、性能や進行には一切影響しません。",
+      "q3": "スマートフォンで遊べますか?",
+      "a3": "はい。モバイルブラウザでタッチ操作によりプレイでき、デスクトップ用ランチャーもあります。",
+      "q4": "オフラインやソロで遊べますか?",
+      "a4": "はい。すぐに遊べるシングルプレイのオフラインモードがあり、オンラインの世界もダンジョンとレイドを除けば完全にソロで進められます。",
+      "q5": "クラスはいくつありますか?",
+      "a5": "9つで、クラシックなタンク、ヒーラー、ダメージのロールを網羅し、それぞれ独自のリソースと代表的なアビリティを持ちます。",
+      "q6": "レベル上限はいくつですか?",
+      "a6": "レベル{cap}で、つながった3つのゾーンにわたるクエスト、ダンジョン、探索を通じて到達します。",
+      "q7": "キャラクターは保存されますか?",
+      "a7": "オンラインのキャラクターはサーバーに自動で保存されます。オフラインのキャラクターは、手軽なプレイやテスト用にブラウザ内に保存されます。",
+      "q8": "自分でサーバーを立てられますか?",
+      "a8": "はい。このプロジェクトはオープンソースなので、自分のサーバーを運用できます。GitHubのリポジトリをご覧ください。",
+      "q9": "PvPはありますか。",
+      "a9": "あります。誰とでも気軽に決闘できますし、灰のコロシアムに足を踏み入れて他のプレイヤーと戦うこともできます。PvPは任意参加なので、強制されることはありません。",
+      "q10": "最大レベルになったら何ができますか。",
+      "a10": "上限はレベル{cap}です。そこからは5人用ダンジョンや10人用レイドに挑み、より良い装備を求め、アリーナで腕を試します。",
+      "q11": "グループはどうやって見つけますか。",
+      "a11": "出会った相手をパーティに誘ったり、チャットで呼びかけたり、ダンジョンで合流したりしましょう。ワールドのほとんどはソロで進められるので、グループを組むかどうかは必須ではなく選択です。"
     },
     "classList": {
-      "heading": "The nine classes",
-      "sub": "Tank, heal, or deal the damage. Pick the fantasy that calls to you, then make it your own with talents."
+      "heading": "9つのクラス",
+      "sub": "タンク、ヒーラー、ダメージのいずれでも。心惹かれるファンタジーを選び、タレントで自分だけのものに仕上げよう。"
     },
     "role": {
-      "tank": "Tank",
-      "healer": "Healer",
-      "damage": "Damage"
+      "tank": "タンク",
+      "healer": "ヒーラー",
+      "damage": "ダメージ"
     },
     "resourceName": {
-      "rage": "Rage",
-      "mana": "Mana",
-      "energy": "Energy"
+      "rage": "レイジ",
+      "mana": "マナ",
+      "energy": "エナジー"
     },
     "classPage": {
-      "back": "All classes",
-      "roleLabel": "Plays as",
-      "resourceLabel": "Resource",
-      "specsHeading": "Specializations",
-      "abilitiesHeading": "Signature abilities",
-      "abilitiesNote": "A taste of the kit. You learn more as you level, and talents reshape how it all plays.",
-      "masteryLabel": "Mastery",
-      "fullKitHeading": "The full kit",
-      "fullKitNote": "Every ability this class can learn, in the order it comes online. Talents decide which ones carry your build.",
-      "petsHeading": "Demons",
-      "petsNote": "Warlocks summon demons to fight beside them, each suited to a different job."
+      "back": "すべてのクラス",
+      "roleLabel": "ロール",
+      "resourceLabel": "リソース",
+      "specsHeading": "スペシャライゼーション",
+      "abilitiesHeading": "代表的なアビリティ",
+      "abilitiesNote": "キットの一端です。レベルが上がるにつれてさらに習得し、タレントが立ち回りを大きく変えていきます。",
+      "masteryLabel": "マスタリー",
+      "fullKitHeading": "全アビリティ一覧",
+      "fullKitNote": "このクラスが習得できるすべてのアビリティを、使えるようになる順に並べています。どれがビルドの軸になるかはタレントが決めます。",
+      "petsHeading": "デーモン",
+      "petsNote": "ウォーロックはデーモンを召喚して共に戦わせます。それぞれ得意な役割が異なります。"
     },
     "classHook": {
-      "warrior": "A relentless front-line fighter who turns every blow taken into fuel for the next.",
-      "paladin": "A holy warrior who can shield allies, mend their wounds, or bring the hammer down.",
-      "hunter": "A ranged marksman with a loyal beast at their side and a trick for every foe.",
-      "rogue": "A master of stealth and poisons who strikes from the shadows and never fights fair.",
-      "priest": "A devoted healer whose light keeps the party standing, or whose shadow unmakes the enemy.",
-      "shaman": "A spirit-caller who bends storm, fire, and water, and mends allies between the lightning.",
-      "mage": "A spellweaver of fire, frost, and arcane who controls the battlefield from afar.",
-      "warlock": "A dark conjurer who commands demons and curses, trading life for devastating power.",
-      "druid": "A shapeshifter who tanks as a bear, savages foes as a cat, or heals in the thick of it."
+      "warrior": "受けた一撃すべてを次の一撃の糧に変える、執拗な前線の戦士。",
+      "paladin": "味方を守り、傷を癒し、あるいはハンマーを振り下ろす聖なる戦士。",
+      "hunter": "忠実な獣を従え、どんな敵にも対策を持つ遠隔の射手。",
+      "rogue": "ステルスと毒の達人。影から斬りかかり、決して正々堂々とは戦わない。",
+      "priest": "その光でパーティを支え、その影で敵を滅ぼす、献身的なヒーラー。",
+      "shaman": "嵐、炎、水を操り、稲妻の合間に味方を癒す霊の呼び手。",
+      "mage": "炎、フロスト、アーケインを操り、遠くから戦場を制する呪文の織り手。",
+      "warlock": "デーモンと呪いを操り、生命と引き換えに壊滅的な力を得る闇の召喚者。",
+      "druid": "ベアとなって受け、キャットとなって敵を切り裂き、乱戦の中で癒す変身者。"
     },
     "tag": {
-      "melee": "Melee",
-      "ranged": "Ranged",
-      "both": "Melee or ranged",
-      "solo": "Solo friendly",
-      "group": "Group oriented",
-      "flexible": "Flexible",
-      "simple": "Simple",
-      "moderate": "Moderate",
-      "complex": "Complex",
-      "goodFirst": "Great first class"
+      "melee": "近接",
+      "ranged": "遠隔",
+      "both": "近接または遠隔",
+      "solo": "ソロ向き",
+      "group": "グループ向き",
+      "flexible": "柔軟",
+      "simple": "シンプル",
+      "moderate": "ふつう",
+      "complex": "複雑",
+      "goodFirst": "最初のクラスに最適"
     },
     "chooser": {
-      "heading": "Find your class",
-      "intro": "Filter by how you like to play. Every class is viable, so this only narrows the field, it does not rank them.",
-      "role": "Role",
-      "style": "Style",
-      "resource": "Resource",
-      "complexity": "Complexity",
-      "goodFirst": "Good for beginners",
-      "clear": "Clear",
-      "results": "Showing {count} of {total}",
-      "none": "No class matches every filter. Clear one to see more."
+      "heading": "自分に合うクラスを探す",
+      "intro": "好みの遊び方で絞り込みましょう。どのクラスも十分に通用するので、これは候補を絞るだけで、順位をつけるものではありません。",
+      "role": "ロール",
+      "style": "スタイル",
+      "resource": "リソース",
+      "complexity": "難しさ",
+      "goodFirst": "初心者向け",
+      "clear": "クリア",
+      "results": "{total}件中{count}件を表示",
+      "none": "すべての条件に合うクラスはありません。一つ解除するともっと表示されます。"
     },
     "abilityHook": {
-      "heroic_strike": "Queues a heavier swing that spends rage on your next hit.",
-      "battle_shout": "A rallying cry that raises attack power for the party.",
-      "commanding_shout": "Bolsters stamina so everyone has more staying power in a fight.",
-      "charge": "Rushes a distant enemy to open the fight with a brief stun.",
-      "rend": "Opens a bleed that wears the target down over time.",
-      "thunder_clap": "Hits everything around you and slows their attacks.",
-      "seal_of_righteousness": "Imbues your swings with Holy damage, then spend it with Judgement.",
-      "holy_light": "A steady, sizable heal for topping off an ally or yourself.",
-      "devotion_aura": "A lasting self-buff that raises armor so hits land softer.",
-      "judgement": "Spends your active Seal to strike an enemy from short range.",
-      "blessing_of_might": "Raises a friendly target's attack power, good to cast before a pull.",
-      "divine_protection": "A quick holy shield to soak damage when things get rough.",
-      "raptor_strike": "A hard melee swing for when something closes the gap on you.",
-      "aspect_of_the_hawk": "A stance you keep up to sharpen your ranged attack power.",
-      "serpent_sting": "Lands a venom that bleeds nature damage over time.",
-      "arcane_shot": "An instant shot from range for quick extra damage.",
-      "concussive_shot": "Dazes the target and slows it so it cannot reach you.",
-      "mongoose_bite": "A counterstrike that opens up right after the enemy dodges.",
-      "sinister_strike": "Your reliable strike that builds combo points to spend later.",
-      "eviscerate": "Spends your combo points to finish a target with a burst.",
-      "garrote": "Open from stealth with a wire that bleeds the target over time.",
-      "backstab": "Slip behind a target with a dagger for a hard-hitting builder.",
-      "gouge": "Incapacitates the target briefly so you can reposition or peel.",
-      "cheap_shot": "Open from stealth with a stun and a head start on combo points.",
-      "smite": "A holy bolt for chipping down a target from range.",
-      "lesser_heal": "A steady cast to top up an ally when there is time to stand still.",
-      "power_word_fortitude": "Raises an ally's health pool, so cast it before the pull and keep it up.",
-      "shadow_word_pain": "Sticks a shadow rot on a foe, then you move on while it ticks.",
-      "power_word_shield": "Wraps an ally in a shield that soaks hits before they land.",
-      "renew": "A heal that ticks over time, good to cast and keep moving.",
-      "lightning_bolt": "A ranged cast of Nature damage, your go-to from afar.",
-      "rockbiter_weapon": "Imbues your weapon so each swing lands harder in melee.",
-      "healing_wave": "Your main heal, a direct mend for yourself or an ally.",
-      "earth_shock": "An instant shock for quick Nature damage when you need it now.",
-      "lightning_shield": "Charges you so attackers take Nature damage when they hit you.",
-      "flame_shock": "An instant burn that hits up front and keeps searing over time.",
-      "fireball": "Your main fire nuke, lands a hit and leaves the target burning.",
-      "frost_armor": "A lasting self-buff that hardens your armor before a fight.",
-      "arcane_intellect": "Raises Intellect to deepen an ally's mana pool, cast it before the pull.",
-      "frostbolt": "Strikes from range and slows the target so it cannot close on you.",
-      "conjure_water": "Conjures drinks that restore mana, so you can refill between pulls.",
-      "conjure_food": "Conjures food that restores health when you sit down to eat.",
-      "shadow_bolt": "A bolt of shadow you cast at a target, your go-to nuke.",
-      "summon_imp": "Calls up an imp that flings firebolts at enemies from range.",
-      "demon_skin": "A lasting self-buff that toughens your skin and adds armor.",
-      "immolate": "Sets a target alight for an opening hit and a burn that lingers.",
-      "corruption": "Rots a target with shadow that ticks while you do other things.",
-      "life_tap": "Trades some of your own health back into mana when you run dry.",
-      "wrath": "A nature bolt thrown at a target from range, your go-to nuke.",
-      "healing_touch": "A big single-target heal with a long cast, for topping someone off.",
-      "mark_of_the_wild": "A lasting blessing you put on yourself or an ally before a fight.",
-      "moonfire": "Hits instantly and leaves the target burning, good while moving.",
-      "rejuvenation": "Casts instantly and heals an ally over time, so you can keep acting.",
-      "thorns": "Wards an ally so melee attackers hurt themselves for striking."
+      "heroic_strike": "次の一撃にレイジを乗せ、より重い攻撃を予約します。",
+      "battle_shout": "パーティの攻撃力を高める鼓舞の雄叫びです。",
+      "commanding_shout": "持久力を底上げし、長い戦いでも全員が粘り強く戦えるようにします。",
+      "charge": "離れた敵に突進し、短いスタンで戦闘の口火を切ります。",
+      "rend": "出血を与え、時間をかけて標的を削っていきます。",
+      "thunder_clap": "周囲のすべてに当たり、相手の攻撃を遅くします。",
+      "seal_of_righteousness": "一振りごとにホーリーダメージを付与し、ジャッジメントで消費します。",
+      "holy_light": "味方や自分の体力を満タンに戻す、安定した大きめのヒールです。",
+      "devotion_aura": "アーマーを上げて被弾を和らげる、持続する自己強化です。",
+      "judgement": "現在のシールを消費し、近距離から敵を打ち据えます。",
+      "blessing_of_might": "味方の攻撃力を上げます。プルの前に唱えておくとよいでしょう。",
+      "divine_protection": "状況が厳しいときにダメージを吸収する、素早いホーリーシールドです。",
+      "raptor_strike": "敵に距離を詰められたときに使う、重い近接の一撃です。",
+      "aspect_of_the_hawk": "維持し続けることで遠隔攻撃力を高めるスタンスです。",
+      "serpent_sting": "毒を浴びせ、継続してネイチャーダメージを与えます。",
+      "arcane_shot": "遠距離からの即時ショットで、手早く追加ダメージを与えます。",
+      "concussive_shot": "標的をふらつかせて減速させ、こちらに近づけなくします。",
+      "mongoose_bite": "敵の回避の直後に使える反撃です。",
+      "sinister_strike": "後で消費するコンボポイントを稼ぐ、信頼できる一撃です。",
+      "eviscerate": "コンボポイントを消費し、標的を一気に仕留めるフィニッシャーです。",
+      "garrote": "ステルスから仕掛け、ワイヤーで標的を継続的に出血させます。",
+      "backstab": "ダガーで標的の背後に回り込み、コンボポイントを稼ぐ強力な一撃です。",
+      "gouge": "標的を短時間行動不能にし、立ち位置を直したりピールしたりできます。",
+      "cheap_shot": "ステルスから仕掛け、スタンとコンボポイントの先取りで先手を取ります。",
+      "smite": "遠距離から標的を削るホーリーのボルトです。",
+      "lesser_heal": "立ち止まる余裕があるときに味方の体力を満タンに戻す、安定した詠唱です。",
+      "power_word_fortitude": "味方の体力総量を上げます。プルの前に唱え、維持し続けましょう。",
+      "shadow_word_pain": "敵にシャドウの腐敗を貼り付け、効果が続く間に次の行動へ移れます。",
+      "power_word_shield": "味方をシールドで包み、攻撃が当たる前に吸収します。",
+      "renew": "継続して回復するヒールで、唱えてから移動を続けるのに向いています。",
+      "lightning_bolt": "ネイチャーダメージを与える遠距離詠唱。遠くからの主力です。",
+      "rockbiter_weapon": "武器に付与し、近接の一振りごとに重い一撃を与えます。",
+      "healing_wave": "主力のヒール。自分や味方を直接回復します。",
+      "earth_shock": "今すぐ必要なときに手早くネイチャーダメージを与える即時のショックです。",
+      "lightning_shield": "身にまとい、攻撃してきた相手にネイチャーダメージを与えます。",
+      "flame_shock": "前面に一撃を与え、その後も継続して焼き続ける即時の燃焼です。",
+      "fireball": "主力のファイア火力。一撃を当て、標的を燃焼させ続けます。",
+      "frost_armor": "戦闘の前にアーマーを固める、持続する自己強化です。",
+      "arcane_intellect": "知力を上げて仲間のマナ総量を増やします。プルの前に唱えておきましょう。",
+      "frostbolt": "遠距離から攻撃し、標的を減速させて近づけなくします。",
+      "conjure_water": "マナを回復する飲み物を作り出し、プルの合間に補充できます。",
+      "conjure_food": "座って食べると体力を回復する食料を作り出します。",
+      "shadow_bolt": "標的に放つシャドウのボルト。主力の火力です。",
+      "summon_imp": "遠距離から敵にファイアボルトを放つインプを呼び出します。",
+      "demon_skin": "肌を硬化させてアーマーを上げる、持続する自己強化です。",
+      "immolate": "標的に火を放ち、初撃を与えつつ燃焼を残します。",
+      "corruption": "標的をシャドウで蝕み、他の行動をしている間も継続して効果が続きます。",
+      "life_tap": "マナが尽きたとき、自分の体力を一部マナに変換します。",
+      "wrath": "遠距離から標的に放つネイチャーのボルト。主力の火力です。",
+      "healing_touch": "詠唱は長いものの回復量の大きい単体ヒールで、体力を満タンに戻します。",
+      "mark_of_the_wild": "戦闘の前に自分や味方に付与する、持続する祝福です。",
+      "moonfire": "即座に当たり標的を燃焼させるため、移動中にも向いています。",
+      "rejuvenation": "即座に唱えられ、味方を継続的に回復するので、行動を続けられます。",
+      "thorns": "味方を守り、近接で攻撃してきた相手に反射ダメージを与えます。"
     },
     "petHook": {
-      "imp": "A ranged firebolt demon that chips at enemies from a safe distance.",
-      "voidwalker": "A sturdy demon that taunts and soaks hits so you can cast in peace.",
-      "succubus": "A fast melee demon that hits hard but folds under pressure.",
-      "felhunter": "A shadow skirmisher that hounds enemy casters.",
-      "felguard": "A durable melee bruiser, the all-rounder once you can summon it.",
-      "infernal": "A hulking juggernaut with crushing melee, summoned for raw power.",
-      "doomguard": "An elite caster that rains heavy shadow from afar."
+      "imp": "安全な距離から敵を削る、ファイアボルトを放つ遠距離のデーモンです。",
+      "voidwalker": "挑発して攻撃を受け止める頑丈なデーモンで、安心して詠唱できるようにします。",
+      "succubus": "素早い近接のデーモンで、大きなダメージを与えますが打たれ弱いです。",
+      "felhunter": "敵のキャスターに食らいつくシャドウのスカーミッシャーです。",
+      "felguard": "頑丈な近接のブルーザーで、召喚できるようになればオールラウンドにこなせます。",
+      "infernal": "強力な近接を持つ巨大なジャガーノートで、純粋な力を求めて召喚します。",
+      "doomguard": "遠くから重いシャドウを降らせるエリートのキャスターです。"
     },
     "bestiary": {
-      "heading": "Bestiary",
-      "intro": "The creatures of the world, grouped by family. These are the foes you meet out in the open. The deadliest things wait, unlisted, behind dungeon doors.",
-      "rare": "Rare",
-      "levels": "Levels {min} to {max}",
-      "levelsSame": "Level {min}",
-      "notedLabel": "Of note",
+      "heading": "モンスター図鑑",
+      "intro": "世界に棲む生き物たちを、種族ごとにまとめて紹介します。ここに載っているのは、フィールドで出会う敵たちです。最も危険な存在は図鑑には載らず、ダンジョンの扉の奥で待ち構えています。",
+      "rare": "レア",
+      "levels": "レベル{min}から{max}",
+      "levelsSame": "レベル{min}",
+      "notedLabel": "特筆すべき点",
       "flavor": {
-        "old_greyjaw": "A scarred old wolf no trap has held, blamed for three hounds and a stable boy's arm. He hunts the deep woods alone, and turns savage the longer a fight wears on.",
-        "grubjaw": "A fen troll so greedy the other trolls will not dig beside him, said to have eaten a trader's last two pack-mules, harness and all.",
-        "shardlord_kazzix": "A storm elemental given shoulders, walking the far crags above Stormcrag with a heartshard worth braving the lightning for.",
-        "mirejaw_frenzy": "A marsh murloc that whips itself into a thrashing frenzy mid-fight, the loudest thing in a loud, territorial pack.",
-        "gravecaller_cultist": "Robed servants of the death-cult whose work fouls the graves from the Vale to the peaks. Where they gather, the dead do not rest."
+        "old_greyjaw": "どんな罠にも捕らえられたことのない、傷だらけの老いた狼。猟犬三頭と厩番の少年の腕を奪った咎を負わされています。深い森を独りで狩り、戦いが長引くほどに獰猛になります。",
+        "grubjaw": "あまりに強欲で、他のトロルが隣で掘ろうとしないほどの沼地のトロル。交易商の最後の駄馬二頭を、馬具ごと食ったと言われています。",
+        "shardlord_kazzix": "肩を得た嵐のエレメンタル。ストームクラグの上方にそびえる遥かな岩場を歩き、稲妻を冒してでも手に入れたいハートシャードを抱えています。",
+        "mirejaw_frenzy": "戦いの最中に自らを暴れ狂う狂乱へと駆り立てる沼地のマーロック。騒がしく縄張り意識の強い群れの中で、最もやかましい一匹です。",
+        "gravecaller_cultist": "死のカルトに仕えるローブ姿の僕たち。その業は渓谷から高地まで墓を汚し、彼らが集う場所では死者が安らぎません。"
       }
     },
     "family": {
       "beast": {
-        "name": "Beasts",
-        "desc": "Wild animals of forest and field, from wolves and boars to the things that prey on them. Hunters can tame many of them."
+        "name": "ビースト",
+        "desc": "森や野に生きる野生動物たち。オオカミやイノシシから、それらを狙う捕食者まで。ハンターはその多くをテイムできます。"
       },
       "spider": {
-        "name": "Spiders",
-        "desc": "Web-spinners and venomous lurkers that nest in dark, tangled places."
+        "name": "クモ",
+        "desc": "暗く入り組んだ場所に巣を張る、糸を操る毒持ちの待ち伏せ屋たち。"
       },
       "murloc": {
-        "name": "Murlocs",
-        "desc": "Amphibious marsh-dwellers that swarm the shallows in noisy, territorial packs."
+        "name": "マーロック",
+        "desc": "浅瀬に群がる水陸両生の沼地の住人。騒がしく、縄張り意識の強い群れをなします。"
       },
       "kobold": {
-        "name": "Kobolds",
-        "desc": "Candle-headed diggers that infest mines and burrows, fiercely guarding their ore."
+        "name": "コボルド",
+        "desc": "頭にろうそくを掲げた採掘者たち。鉱山や巣穴にはびこり、自らの鉱石を必死に守ります。"
       },
       "humanoid": {
-        "name": "Humanoids",
-        "desc": "Bandits, cultists, and others who took up the wrong trade. They fight with tactics, not just teeth."
+        "name": "ヒューマノイド",
+        "desc": "盗賊やカルト信者など、道を踏み外した者たち。牙だけでなく、戦術を使って襲いかかってきます。"
       },
       "troll": {
-        "name": "Trolls",
-        "desc": "Hulking, fast-healing brutes that lair in the marsh and the high country."
+        "name": "トロル",
+        "desc": "沼地や高地に巣くう、屈強で再生力の高い乱暴者たち。"
       },
       "ogre": {
-        "name": "Ogres",
-        "desc": "Enormous, slow-witted, and dangerous. They camp the high passes and hit like a landslide."
+        "name": "オーガ",
+        "desc": "巨大で頭は鈍いが危険な存在。高地の峠に陣取り、地滑りのような一撃を繰り出します。"
       },
       "undead": {
-        "name": "Undead",
-        "desc": "The restless dead, raised by darker hands. They do not tire and they do not flee."
+        "name": "アンデッド",
+        "desc": "邪悪な手によって蘇った、安らげぬ死者たち。疲れることも、逃げることもありません。"
       },
       "elemental": {
-        "name": "Elementals",
-        "desc": "Living storm and stone, bound to the wild places where the elements run strong."
+        "name": "エレメンタル",
+        "desc": "嵐や岩が命を得た存在。元素の力が強く渦巻く荒野に縛られています。"
       }
     },
     "worldPage": {
-      "heading": "The world",
-      "intro": "World of ClaudeCraft is one continuous land you cross on foot, three zones laid south to north. There is no fast travel, so the journey is part of the adventure.",
-      "hub": "Home base",
-      "mapHeading": "The road north",
-      "mapSub": "Three zones, south to north, each a step higher in level. Follow the quest trail and the land carries you from the valley to the peaks.",
-      "places": "Notable places",
-      "residents": "Who you will meet",
-      "valeBlurb": "The green starting valley, where new heroes cut their teeth on wolves and bandits around the town of Eastbrook.",
-      "marshBlurb": "A drowned country of fog and ruins. Murlocs swarm the shallows and something older stirs beneath the water, watched from the bridge-town of Fenbridge.",
-      "peaksBlurb": "Wind-scoured ridges and old mine-works climbing to the realm's coldest, highest dangers, held by the outpost of Highwatch.",
-      "valeGreeting": "Keep your blade close. The Vale is not what it was.",
-      "valeGreeter": "Marshal Redbrook, Eastbrook",
-      "marshGreeting": "Hold at the gate. Past those reeds, the fen does the killing for us.",
-      "marshGreeter": "Warden Fenwick, Fenbridge",
-      "peaksGreeting": "Two hundred years this wall has held. It will not break on my watch, but it groans.",
-      "peaksGreeter": "Captain Thessaly, Highwatch",
-      "valePlaceNotes": "Eastbrook is your first home base. Wolf Run and Boar Meadow are gentle hunting ground; Mirror Lake is quiet water to fish; the Webwood and the Copper Dig hide spiders and ore-greedy diggers; a Bandit Camp and the Fallen Chapel hold rougher work; Brightwood Glade is a calm wildlife grove in the north.",
-      "marshPlaceNotes": "Fenbridge guards the only dry road. The Prowler Reeds and Deepfen Shallows teem with marsh beasts and murlocs; the Widow Thicket is spun thick with web; the Drowned Chapel and the Troll Mounds keep older dangers; the Gravecaller Encampment is the cult dug in, and the Sunken Bastion is the marsh's instanced heart.",
-      "peaksPlaceNotes": "Highwatch holds the wall. Stalker Ridge and the Deeprock Burrows belong to ridge cats and kobolds; the Ogre Foothills and Drogmar's War-Camp to brutes for hire; Stormcrag crackles with elementals and the Glimmermere glows below it; the Wyrmcult Tents and Revenant Fields ring the cult's high ground, with Gravewyrm Sanctum at its peak.",
-      "gladeTitle": "A quiet corner: Brightwood Glade",
-      "gladeBody": "Not every story in the Vale is about the dead. In the north, a sunlit grove called Brightwood Glade keeps its own gentler rhythm, with quiet paths, grazing deer, and wary beasts under the boughs. It is a soft counterpoint to the trail you are following, and worth seeing when the road gives you room to wander."
+      "heading": "世界",
+      "intro": "World of ClaudeCraftは、自らの足で歩いて渡る一続きの大地です。南から北へと3つのゾーンが連なっています。ファストトラベルはなく、その旅路こそが冒険の一部です。",
+      "hub": "拠点",
+      "mapHeading": "北への道",
+      "mapSub": "南から北へ三つのゾーンが並び、それぞれレベルが一段ずつ上がります。クエストの道筋をたどれば、土地が谷から峰々へとあなたを運んでいきます。",
+      "places": "注目の場所",
+      "residents": "出会う者たち",
+      "valeBlurb": "緑あふれる始まりの谷。新たな英雄たちが、イーストブルックの町の周りでオオカミや盗賊を相手に腕を磨く場所です。",
+      "marshBlurb": "霧と廃墟に沈んだ国。浅瀬にはマーロックが群れ、水の底ではより古き何かがうごめいています。橋の町フェンブリッジから見張られています。",
+      "peaksBlurb": "風に削られた尾根と古い鉱山跡。この地で最も寒く、最も高所にある危険へと続いており、前哨地ハイウォッチが守っています。",
+      "valeGreeting": "刃を手放すな。渓谷はかつての姿ではない。",
+      "valeGreeter": "レッドブルック元帥、イーストブルック",
+      "marshGreeting": "門で止まれ。あの葦の向こうでは、沼が我々の代わりに殺しをやってくれる。",
+      "marshGreeter": "番人フェンウィック、フェンブリッジ",
+      "peaksGreeting": "この壁は二百年立ち続けてきた。私が守る限り崩れはしないが、軋んでいる。",
+      "peaksGreeter": "隊長テサリー、ハイウォッチ",
+      "valePlaceNotes": "イーストブルックは最初の本拠地です。ウルフランとボアの草原は穏やかな狩り場、ミラー湖は釣りのできる静かな水。ウェブウッドとカッパー採掘場には蜘蛛と鉱石に貪欲な掘り手が隠れ、盗賊の野営地と倒れた礼拝堂にはより手荒い仕事があり、ブライトウッド・グレードは北部の穏やかな野生の林間です。",
+      "marshPlaceNotes": "フェンブリッジは唯一の乾いた道を守っています。プラウラー葦原とディープフェン浅瀬は沼地の獣とマーロックでひしめき、ウィドウの茂みは蜘蛛の糸が厚く張られ、水没の礼拝堂とトロルの塚にはより古き危険が潜み、グレイブコーラーの野営地にはカルトが立てこもり、沈んだ砦は沼地のインスタンス化された中心地です。",
+      "peaksPlaceNotes": "ハイウォッチは壁を守っています。ストーカー尾根とディープロックの巣穴は尾根猫とコボルドのもの、オーガの丘陵とドログマーの戦営は雇われの荒くれ者のもの。ストームクラグはエレメンタルで弾け、その下にはグリマーミアが輝きます。ワームカルトのテントとレヴェナントの野原がカルトの高所を囲み、その頂には墓守竜の聖域があります。",
+      "gladeTitle": "静かな一角：ブライトウッド・グレード",
+      "gladeBody": "谷の物語がすべて死者について語るわけではありません。北にはブライトウッド・グレードと呼ばれる陽だまりの林があり、静かな小道、草を食む鹿、枝の下で警戒する獣たちとともに、穏やかな独自の調子を保っています。あなたが追う足跡への静かな対照であり、道に寄り道の余裕があるなら見る価値があります。"
     },
     "questsPage": {
-      "heading": "Quests",
-      "intro": "Quests are the heart of the world and the fastest way to level. Here is how they work.",
-      "acceptTitle": "Finding and accepting",
-      "acceptBody": "People with a marker over their head have work for you. Talk to them to accept a quest. Your very first is Wolves at the Door, from Marshal Redbrook in Eastbrook.",
-      "objectivesTitle": "Objectives",
-      "objectivesBody": "Slay certain enemies, gather items, or interact with something in the world. The on-screen tracker counts your progress as you go.",
-      "turninTitle": "Turning in",
-      "turninBody": "Return to the quest giver, the map shows you where, for experience, coin, and often a piece of gear chosen to suit your class.",
-      "partyTitle": "Questing in a group",
-      "partyBody": "Party members nearby share kill and objective credit, so questing together is faster, never slower.",
-      "storyTitle": "A thread runs through it all",
-      "storyBody": "From your first errands in Eastbrook, something is wrong with the dead. A cult is at work, and the trail leads north through every zone. Follow it to learn who stands behind it.",
-      "soloNote": "The main story is fully soloable; only its final chapters call for a group.",
-      "typesTitle": "The kinds of quest you will see",
-      "typesBody": "Most quests are one of a few familiar shapes. The on-screen tracker spells out exactly what each one wants, so you are never left guessing.",
-      "typeSlayTitle": "Slay",
-      "typeSlayBody": "Thin out a pack of beasts or break a cult's hold by defeating a set number of a marked enemy. The first quest in the game, clearing wolves off the Eastbrook road, is one of these.",
-      "typeGatherTitle": "Gather",
-      "typeGatherBody": "Collect items from the world or from what enemies drop: herbs, ore, lost letters, a cult's grim reagents. Some pieces only fall from a particular foe, so the hunt and the haul go together.",
-      "typeInteractTitle": "Interact",
-      "typeInteractBody": "Use, cleanse, or read something fixed in the world: a defiled grave, a warning carved on a shore-rock, a sealed crypt door. Walk up to the marker and act on it.",
-      "typeMusterTitle": "Escort and muster",
-      "typeMusterBody": "See a friendly face safely from one place to another, or rally a town's defenders before a push north. These keep you moving with the people whose story you are in.",
-      "typeGroupTitle": "Group finales",
-      "typeGroupBody": "Each chapter of the main story ends at a dungeon door. The lead-in is soloable, but the final blow against a chapter's villain is meant for a party of five (and the very last, for ten).",
-      "sagaTitle": "Follow the trail north",
-      "sagaBody": "The main story is one long chase. A death-cult is at work on the realm's graves, and every chapter you close points one zone further up the road. You never fight the whole conspiracy at once; you pull one thread, and it leads to the next hand holding it.",
-      "sagaValeTitle": "The Vale: a name on a sigil",
-      "sagaValeBody": "In Eastbrook the dead will not rest, and the mark behind it belongs to a sect long thought gone. Trace it to a Gravecaller working the chapel crypt, and his own papers point you toward the fen in the north.",
-      "sagaMarshTitle": "The marsh: a tithe of souls",
-      "sagaMarshBody": "In Mirefen the drownings are no accident. Someone is filling the fen like a tithing box, raising obedient dead from every traveler the water takes. Chase the orders up the chain to a Mistcaller in the drowned bastion, whose last words name something older still, stirring beneath the peaks.",
-      "sagaPeaksTitle": "The peaks: what the tithe was for",
-      "sagaPeaksBody": "On Thornpeak the whole scheme comes clear. Every soul stolen since the Vale was a tithe poured toward waking an ancient thing sealed beneath the mountain. The trail that began in a chapel yard ends here, at a door it takes ten to open. We will let you find out who waits behind it.",
-      "sideTitle": "Threads off the main road",
-      "sideWardenTitle": "Earning your name",
-      "sideWardenBody": "Alongside the story, the wardens of the Vale and the fen hand out a standing bounty ladder. Work your way up it, foe by foe, the way every warden before you earned their place. It is honest leveling and a tour of each zone's worst troublemakers.",
-      "sideCryptTitle": "The forgotten king",
-      "sideCryptBody": "High on the peaks runs a quieter mystery: old graves marked with a crown no record remembers. Read the dead, gather what they guarded, and unseal a tomb that was meant to stay shut. It is a detective's trail that opens the way to a second endgame trial for a full raid."
+      "heading": "クエスト",
+      "intro": "クエストはこの世界の中心であり、最も早くレベルを上げる手段です。その仕組みを紹介します。",
+      "acceptTitle": "探し方と受注",
+      "acceptBody": "頭の上にマークが付いた人物が、あなたに依頼を持っています。話しかけてクエストを受注しましょう。最初のクエストは、イーストブルックのレッドブルック隊長から受ける「扉のオオカミ」です。",
+      "objectivesTitle": "目標",
+      "objectivesBody": "特定の敵を倒したり、アイテムを集めたり、世界の何かと対話したり。画面上のトラッカーが、進行に合わせて進捗を数えてくれます。",
+      "turninTitle": "報告",
+      "turninBody": "クエスト発注者のもとへ戻りましょう。場所はマップが教えてくれます。経験値やお金、そして多くの場合あなたのクラスに合った装備が手に入ります。",
+      "partyTitle": "グループでのクエスト",
+      "partyBody": "近くにいるパーティメンバーは、討伐や目標の達成判定を共有します。だから一緒にクエストを進めれば、遅くなることはなく、むしろ速くなります。",
+      "storyTitle": "すべてを貫く一本の糸",
+      "storyBody": "イーストブルックでの最初のおつかいの頃から、死者に異変が起きています。あるカルトが暗躍しており、その足取りは北へ、すべてのゾーンを貫いて続いています。それを追えば、背後に誰がいるのかがわかるでしょう。",
+      "soloNote": "メインストーリーは完全にソロで進められます。グループが必要になるのは、最終章だけです。",
+      "typesTitle": "目にすることになるクエストの種類",
+      "typesBody": "ほとんどのクエストは、おなじみのいくつかの型のどれかです。画面上のトラッカーが、それぞれ何を求めているかを正確に示してくれるので、迷うことはありません。",
+      "typeSlayTitle": "討伐",
+      "typeSlayBody": "獣の群れを間引いたり、指定された数の標的の敵を倒してカルトの支配を打ち砕いたりします。ゲーム最初のクエスト、イーストブルックの道から狼を排除するものも、その一つです。",
+      "typeGatherTitle": "収集",
+      "typeGatherBody": "世界から、あるいは敵が落とすものからアイテムを集めます。薬草、鉱石、失われた手紙、カルトの不吉な試薬など。特定の敵からしか落ちないものもあるので、狩りと収集は表裏一体です。",
+      "typeInteractTitle": "対話",
+      "typeInteractBody": "世界に固定された何かを使う、浄化する、あるいは読み取ります。汚された墓、岸の岩に刻まれた警告、封じられた地下墓所の扉など。目印に歩み寄り、それに働きかけましょう。",
+      "typeMusterTitle": "護衛と結集",
+      "typeMusterBody": "味方の人物をある場所から別の場所へ安全に送り届けたり、北へ攻め込む前に町の守り手を結集させたり。これらは、あなたがその物語の一員である人々と共に動き続けさせてくれます。",
+      "typeGroupTitle": "グループでのフィナーレ",
+      "typeGroupBody": "メインストーリーの各章は、ダンジョンの扉で終わります。導入はソロでこなせますが、章の悪役への最後の一撃は五人パーティ向けに作られています（そして最後の最後は十人向けです）。",
+      "sagaTitle": "北へ続く足取りを追え",
+      "sagaBody": "メインストーリーは一つの長い追跡劇です。死のカルトが王国の墓に手を出しており、一章を閉じるごとに、道はさらにゾーン一つ分先を指し示します。陰謀の全体を一度に相手取ることはありません。一本の糸を引けば、それが次にその糸を握る手へと導いてくれます。",
+      "sagaValeTitle": "渓谷：印に刻まれた名",
+      "sagaValeBody": "イーストブルックでは死者が安らがず、その背後の印は、とうに滅んだと思われていた一派のものです。それを礼拝堂の地下墓所で働くグレイブコーラーまでたどれば、彼自身の書き物が北の沼へとあなたを導きます。",
+      "sagaMarshTitle": "湿地：魂の貢ぎ",
+      "sagaMarshBody": "マイアフェンでの溺死は事故ではありません。何者かが、まるで献金箱を満たすように沼を満たし、水が奪う旅人すべてから従順な死者を起こしています。命令の連鎖をたどって、水没した砦のミストコーラーまで上り詰めれば、その末期の言葉が、峰々の下でうごめくさらに古き何かの名を告げます。",
+      "sagaPeaksTitle": "峰々：貢ぎは何のためだったのか",
+      "sagaPeaksBody": "ソーンピークで企ての全貌が明らかになります。渓谷以来盗まれてきたすべての魂は、山の下に封じられた古き存在を目覚めさせるために注がれた貢ぎ物でした。礼拝堂の前庭で始まった足取りは、ここで終わります。開くのに十人を要する扉の前で。その奥に誰が待つのかは、あなた自身に見届けてもらいましょう。",
+      "sideTitle": "本道から外れた糸",
+      "sideWardenTitle": "己の名を勝ち取る",
+      "sideWardenBody": "物語と並んで、渓谷と沼の番人たちが常設の賞金の階段を授けてくれます。あなた以前のすべての番人がその地位を得てきたように、敵を一体ずつ倒して登り詰めましょう。それは正攻法のレベリングであり、各ゾーンの最悪の厄介者たちを巡る旅です。",
+      "sideCryptTitle": "忘れられた王",
+      "sideCryptBody": "高地には、より静かな謎が走っています。どんな記録にも残らぬ冠が刻まれた古い墓です。死者を読み解き、彼らが守ってきたものを集め、閉ざされたままであるべき墓を解き放ちましょう。それは探偵の足取りであり、フルレイド向けの二つ目のエンドゲームの試練への道を開きます。"
     },
     "lore": {
-      "figuresTitle": "Faces you will come to know",
-      "figuresBody": "A handful of people walk the whole road with you. Watch for these names from the valley to the peaks.",
-      "aldricRole": "Priest of the Vale",
-      "aldricBody": "A humble village priest who first names the cult over a defiled grave in Eastbrook, then follows its trail in person through the marsh and up to the wall at Highwatch. He is the steady heart of the whole campaign.",
-      "marenRole": "The Marshal's Scout",
-      "marenBody": "A low-talking tracker you meet in the reeds of Mirefen, all quiet feet and a short blade. She follows the trail north too, and it is her ear that catches the words that send you to the peaks."
+      "figuresTitle": "やがて知ることになる顔ぶれ",
+      "figuresBody": "ひと握りの人々が、あなたと共にこの道のりを最後まで歩みます。渓谷から高地まで、これらの名前に心を留めておきましょう。",
+      "aldricRole": "渓谷の司祭",
+      "aldricBody": "つつましい村の司祭。イーストブルックの汚された墓の前で初めてカルトの名を口にし、その足取りを自ら湿地を抜け、ハイウォッチの壁まで追っていきます。彼はこの遠征全体の揺るがぬ心です。",
+      "marenRole": "元帥の斥候",
+      "marenBody": "マイアフェンの葦の中で出会う、声を潜めた追跡者。静かな足取りと短い刃の持ち主です。彼女もまた北へと足取りを追い、あなたを高地へ送り出す言葉を聞き取るのは、彼女の耳です。"
     },
     "dungeonsPage": {
-      "heading": "Dungeons and Raids",
-      "intro": "When the open world is not enough, gather a party and step into an instance: a private copy of a dungeon made just for your group.",
-      "party": "Dungeons are built for a party of five. The endgame raid is for ten.",
-      "soloLead": "Every dungeon opens with a soloable lead-in quest, so you always know why you are going in.",
-      "levelAround": "Around level {n}",
-      "levelExact": "Level {n}",
-      "levelBand": "Levels {min} to {max}",
-      "partySize": "{n} players",
-      "raidSize": "Ten players, level {n}",
-      "hollowName": "The Hollow Crypt",
-      "hollowBody": "A grave-robbed chapel crypt where the newly dead refuse to rest. The first real test of a new party.",
-      "bastionName": "The Sunken Bastion",
-      "bastionBody": "A flooded fortress lost to the marsh, held by drowned defenders and the rising tide itself.",
-      "templeName": "The Drowned Temple",
-      "templeBody": "A moonlit shrine sunk beneath a glowing tarn high in the peaks, reached through a gate of cold light. A drowned cult still sings down there in its rotted vestments, and the warnings carved on the shore say something below only sleeps. A self-contained mystery, set apart from the main story, for the curious and the well-prepared.",
-      "sanctumName": "Gravewyrm Sanctum",
-      "sanctumBody": "The dark heart of Thornpeak, where the cult's long work reaches its terrible peak.",
-      "raidName": "The endgame raid",
-      "raidBody": "Beyond a sealed royal door waits a ten-player trial: a multi-phase fight and a deathless power the whole raid must shut down together. Earn your way in, then bring nine friends.",
-      "templeLoreTitle": "The Drowned Temple, a little deeper",
-      "templeLoreBody": "The temple has its own legend, older than the cult you chase elsewhere. On the shore of the Glimmermere, a tarn that drinks the moonlight and gives back the drowned, a lone watcher keeps a gate of pale light. Beneath the surface, a stair of cold stone runs down to it. The folk who sank there did not drown by misadventure: they were the Pale Choir, who went under in worship and never stopped singing. The old wardens scratched a single warning into the rocks before the water took them, a prayer to something they called the Drowned Moon, with a steadier hand adding two words beneath it: it only sleeps.",
-      "cryptLeadTitle": "A door the dead were meant to keep shut",
-      "cryptLeadBody": "High on the peaks, away from the main fight, lies a colder mystery. Old graves bear a crown no record remembers, and the dead who guard them once served a forgotten king. Read their stones, gather the keystones they kept, and you can unseal a tomb that three loyal souls died to hold closed, opening a second ten-player trial for those who follow the clues to the end."
+      "heading": "ダンジョンとレイド",
+      "intro": "オープンワールドだけでは物足りなくなったら、パーティを組んでインスタンスへ踏み込みましょう。インスタンスとは、あなたのグループだけのために用意されたダンジョンの専用コピーです。",
+      "party": "ダンジョンは5人パーティ向けに作られています。エンドコンテンツのレイドは10人用です。",
+      "soloLead": "どのダンジョンも、ソロで進められる導入クエストから始まります。だから、なぜそこへ向かうのかが常にわかります。",
+      "levelAround": "レベル{n}前後",
+      "levelExact": "レベル{n}",
+      "levelBand": "レベル{min}から{max}",
+      "partySize": "{n}人",
+      "raidSize": "10人、レベル{n}",
+      "hollowName": "うつろの墓所",
+      "hollowBody": "墓荒らしに遭った礼拝堂の地下墓所。死んだばかりの者たちが安らぎを拒んでいます。新たなパーティにとって、最初の本当の試練です。",
+      "bastionName": "沈みし要塞",
+      "bastionBody": "沼地に呑まれて失われた水没の要塞。溺れた守備兵と、満ちゆく潮そのものに守られています。",
+      "templeName": "水没の神殿",
+      "templeBody": "沼地の道から外れた場所に沈む祠。好奇心旺盛で、しっかり備えた者のための寄り道です。",
+      "sanctumName": "墓守竜の聖域",
+      "sanctumBody": "ソーンピークの暗き中心。カルトの長きにわたる企てが、おぞましい頂点に達する場所です。",
+      "raidName": "エンドコンテンツのレイド",
+      "raidBody": "封じられた王家の扉の奥で、10人用の試練が待ち受けます。複数フェーズの戦いと、レイド全員で力を合わせて止めねばならない不死の力です。挑む資格を勝ち取り、9人の仲間を連れて挑みましょう。",
+      "templeLoreTitle": "水没の神殿、もう少し深く",
+      "templeLoreBody": "神殿には、あなたが他所で追うカルトよりも古い、それ自身の伝説があります。月明かりを飲み込み、溺れた者を返すという山上の湖グリマーミアの岸辺で、一人の見張り役が淡い光の門を守っています。水面の下には、そこへ続く冷たい石の階段が伸びています。そこに沈んだ者たちは不運で溺れたのではありません。彼らは礼拝のうちに沈み、決して歌うのをやめなかった蒼白の聖歌隊でした。古き守り人たちは水に呑まれる前に、岩へただ一つの警告を刻みました。彼らが溺れし月と呼ぶものへの祈りです。そしてその下に、より落ち着いた手が二つの言葉を書き添えていました。それはただ眠っているだけだ、と。",
+      "cryptLeadTitle": "死者が閉ざしておくべきだった扉",
+      "cryptLeadBody": "高地の頂、本筋の戦いから離れた場所に、より冷たい謎が眠っています。古い墓にはどんな記録にも残らぬ冠が刻まれ、それを守る死者はかつて忘れられた王に仕えていました。墓石を読み、彼らが守ってきた要石を集めれば、三つの忠実な魂が命を賭して閉ざした墓を解き放つことができます。手がかりを最後まで追う者のために、二つ目の10人用の試練が開かれるのです。"
     },
     "talentsPage": {
-      "heading": "Talents and specializations",
-      "intro": "Talents are how you make a class your own. They are optional, forgiving, and easy to change, so you can experiment without fear.",
-      "whatHeading": "What talents do",
-      "whatBody": "As you level, you earn talent points to spend on small, permanent upgrades to your abilities and stats. They shape how a class feels, leaning it toward more damage, sturdier defense, or stronger healing.",
-      "howHeading": "How they work",
-      "howBody": "Talents open up at level 10, and you keep earning points as you climb to the cap. You spend them in your class's talent panel, and you can save more than one layout to swap between builds.",
-      "resetTitle": "Nothing is permanent",
-      "resetNote": "You can reset your talents at any time, so an early pick is never a trap. Try things, see what you like, and change your mind freely.",
-      "specsHeading": "Specializations by class",
-      "specsBody": "Every class has a handful of specializations, each with its own role and a signature focus. Here is the shape of all of them. Open a class for its full kit."
+      "heading": "タレントとスペシャライゼーション",
+      "intro": "タレントは、クラスを自分らしくするための手段です。任意で、寛容で、変更も簡単なので、恐れずに試せます。",
+      "whatHeading": "タレントの役割",
+      "whatBody": "レベルが上がると、アビリティやステータスへの小さく永続的な強化に振るタレントポイントを獲得します。これがクラスの感触を形作り、より高いダメージ、より硬い防御、より強い回復へと傾けていきます。",
+      "howHeading": "仕組み",
+      "howBody": "タレントはレベル10で解放され、上限まで上がる間ポイントを稼ぎ続けます。ポイントはクラスのタレントパネルで振り、複数の配分を保存してビルドを切り替えられます。",
+      "resetTitle": "決定的なものは何もない",
+      "resetNote": "タレントはいつでもリセットできるので、序盤の選択が落とし穴になることはありません。いろいろ試し、好みを見つけ、自由に考えを変えましょう。",
+      "specsHeading": "クラス別のスペシャライゼーション",
+      "specsBody": "どのクラスにもいくつかのスペシャライゼーションがあり、それぞれに固有のロールと特徴的な軸があります。ここではそのすべての概要を示します。全アビリティはクラスを開いて確認してください。"
     },
     "arenaPage": {
-      "heading": "Arena and PvP",
-      "intro": "Want to test yourself against other players? Player versus player is built in, and it is always something you choose, never something forced on you.",
-      "duelsHeading": "Duels",
-      "duelsBody": "Challenge any player you meet to a friendly duel. Nothing is on the line but pride, so it is the easiest way to learn a matchup or settle a friendly argument.",
-      "coliseumHeading": "The Ashen Coliseum",
-      "coliseumBody": "The Coliseum is the realm's arena, where you face other players in ranked matches. Win and your standing climbs, and the strongest fighters rise up the leaderboard for everyone to see.",
-      "fiestaHeading": "Two versus two Fiesta",
-      "fiestaBody": "Fiesta is a fast, two-on-two mode played in short rounds. Between rounds you draft augments, quick boosts that reshape your kit on the fly, so no two matches play quite the same.",
-      "augmentsNote": "Augments and power-ups last only for the match. They are about playful, on-the-spot builds, not lasting power, so nobody buys their way to a win.",
-      "wavesTitle": "Augments arrive in waves",
-      "wavesBody": "Each round of a Fiesta hands you a fresh pick, and the picks grow bolder as the match goes on. You build from one wave to the next, choosing one of a few options each time and keeping it for the rest of the bout.",
-      "waveSilverTitle": "Silver",
-      "waveSilverBody": "The opening wave: clean, single-stat boosts that sharpen the basics of your class.",
-      "waveGoldTitle": "Gold",
-      "waveGoldBody": "The middle wave: two-edged combos where your build starts to take shape and sing.",
-      "wavePrismaticTitle": "Prismatic",
-      "wavePrismaticBody": "The final wave: build-defining, screen-melting spikes meant to feel ridiculous in the best way.",
-      "powerupsTitle": "Power-ups in the ring",
-      "powerupsBody": "Glowing orbs also drop into the arena mid-fight, free for whoever reaches them first. They are deliberately over the top and last only a short while: Speed Demon for a blink of blinding pace, Colossus to swell up into a lumbering giant, Moon Boots for a bouncing, low-gravity leap, and Berserker for a sudden surge of fury.",
-      "ladderHeading": "Climbing the ladder",
-      "ladderBody": "Ranked play tracks your standing over time. Check the leaderboard to see where you sit and who holds the top of the realm."
+      "heading": "アリーナとPvP",
+      "intro": "他のプレイヤーと腕試しをしたいですか。プレイヤー対プレイヤーは標準で備わっていて、常に自分で選ぶものであり、強制されることは決してありません。",
+      "duelsHeading": "決闘",
+      "duelsBody": "出会った相手なら誰でも友好的な決闘に挑めます。賭けるのはプライドだけなので、相性を学んだり仲間内の言い争いに決着をつけたりするのに一番手軽な方法です。",
+      "coliseumHeading": "灰のコロシアム",
+      "coliseumBody": "コロシアムはレルムのアリーナで、ランクマッチで他のプレイヤーと対戦します。勝てば順位が上がり、最も強い戦士たちはみんなが見られるリーダーボードの上位へと昇っていきます。",
+      "fiestaHeading": "2対2のフィエスタ",
+      "fiestaBody": "フィエスタは短いラウンドで行う、テンポの速い2対2のモードです。ラウンドの合間にオーグメント、つまりその場で構成を組み替える手早い強化をドラフトするので、同じマッチは二つとありません。",
+      "augmentsNote": "オーグメントやパワーアップはそのマッチの間だけ続きます。持続的な強さではなく、その場で組む遊び心のあるビルドが目的なので、課金で勝ちを買えるわけではありません。",
+      "wavesTitle": "オーグメントはウェーブで訪れる",
+      "wavesBody": "Fiestaの各ラウンドでは新たな一手が手に入り、試合が進むにつれてその一手は大胆になっていきます。一つのウェーブから次へとビルドを築き上げ、毎回いくつかの候補から一つを選び、残りの試合の間はそれを持ち続けます。",
+      "waveSilverTitle": "シルバー",
+      "waveSilverBody": "最初のウェーブ。単一ステータスを伸ばすシンプルな強化で、クラスの基本を研ぎ澄まします。",
+      "waveGoldTitle": "ゴールド",
+      "waveGoldBody": "中盤のウェーブ。両刃の組み合わせが並び、あなたのビルドが形を成して輝き始めます。",
+      "wavePrismaticTitle": "プリズマティック",
+      "wavePrismaticBody": "最後のウェーブ。ビルドを決定づける、画面を溶かすほどのスパイク。最高の意味でばかげていると感じられるよう作られています。",
+      "powerupsTitle": "リングのパワーアップ",
+      "powerupsBody": "戦いの最中、光り輝くオーブがアリーナに落ちてきます。先に取った者の自由になり、しかも狙い通りに度を越していて、効果はほんの一瞬だけ。スピードデーモンは目もくらむ速さへ、コロッサスはのっそりと歩く巨人へ、ムーンブーツは低重力で跳ね回るジャンプへ、バーサーカーは突如あふれる怒りへとあなたを変えます。",
+      "ladderHeading": "ラダーを駆け上がる",
+      "ladderBody": "ランクプレイでは時間をかけて順位を記録します。リーダーボードを確認すれば、自分の位置やレルムの頂点に立つのが誰かが分かります。"
     },
     "wishPage": {
-      "heading": "Things I wish I knew",
-      "intro": "A few honest truths that save new players a lot of second-guessing. None of it is required reading, but all of it helps.",
-      "i1Title": "You cannot pick a wrong class",
-      "i1Body": "Every class can hold its own and reach the cap. Choose the fantasy you like, not the one someone else calls best.",
-      "i2Title": "Dying barely costs you",
-      "i2Body": "When you fall, you release at a graveyard and run back to your body. No experience is lost, so it is safe to take risks and learn.",
-      "i3Title": "Talents are not a trap",
-      "i3Body": "They unlock at level 10 and reset whenever you want, so your early choices are never permanent.",
-      "i4Title": "Follow the quest trail",
-      "i4Body": "Quests are the fastest way to level and they lead you across the world. When you are unsure where to go, find the next marker.",
-      "i5Title": "Keep your gear current",
-      "i5Body": "A fresh upgrade does more for you than perfect play in old gear. Take the quest rewards that suit your class.",
-      "i6Title": "Grouping is a choice, not a chore",
-      "i6Body": "Most of the world is soloable. Team up for dungeons and the raid, or just when you want some company.",
-      "i7Title": "Learn your resource",
-      "i7Body": "Rage, mana, or energy, managing it well is half of playing your class. Watch that bar, not only your cooldowns.",
-      "i8Title": "Rest between fights",
-      "i8Body": "Eat and drink to recover quickly, especially as a caster. A few seconds now saves a death later."
+      "heading": "知っておきたかったこと",
+      "intro": "新しいプレイヤーが余計な迷いをせずに済む、いくつかの率直な真実です。どれも読まなければならないものではありませんが、すべて役に立ちます。",
+      "i1Title": "間違ったクラスを選ぶことはない",
+      "i1Body": "どのクラスも十分に通用し、上限まで到達できます。誰かが最強と呼ぶものではなく、自分が好きなファンタジーを選びましょう。",
+      "i2Title": "死んでもほとんど痛手はない",
+      "i2Body": "倒れると墓地で復帰し、自分の死体まで走って戻ります。経験値は失われないので、安心してリスクを取り、学べます。",
+      "i3Title": "タレントは落とし穴ではない",
+      "i3Body": "タレントはレベル10で解放され、いつでもリセットできるので、序盤の選択が永続することはありません。",
+      "i4Title": "クエストの道筋をたどる",
+      "i4Body": "クエストは最も速いレベリング手段で、ワールド中へとあなたを導きます。どこへ行けばよいか分からないときは、次のマーカーを探しましょう。",
+      "i5Title": "装備を最新に保つ",
+      "i5Body": "古い装備での完璧な立ち回りより、新しいアップグレード一つの方が効果的です。自分のクラスに合うクエスト報酬を受け取りましょう。",
+      "i6Title": "グループは義務ではなく選択",
+      "i6Body": "ワールドのほとんどはソロで進められます。ダンジョンやレイドのとき、あるいはただ誰かと一緒にいたいときに、グループを組みましょう。",
+      "i7Title": "自分のリソースを学ぶ",
+      "i7Body": "レイジ、マナ、エナジー。うまく管理することがクラスを使いこなす半分です。クールダウンだけでなく、そのバーにも目を配りましょう。",
+      "i8Title": "戦いの合間に休む",
+      "i8Body": "特にキャスターは、食べたり飲んだりして手早く回復しましょう。今の数秒が後の死を防ぎます。"
     },
     "viewer": {
-      "view3d": "View {name} in 3D",
-      "view3dShort": "View in 3D",
-      "loading": "Loading model...",
-      "error": "The 3D model could not be loaded. The art above still shows this {name}.",
-      "dragHint": "Drag to turn the model. Use the left and right arrow keys when it is focused.",
-      "canvasLabel": "Rotatable 3D model of {name}"
+      "view3d": "{name}を3Dで見る",
+      "view3dShort": "3Dで見る",
+      "loading": "モデルを読み込み中...",
+      "error": "3Dモデルを読み込めませんでした。上のアートでは、この{name}が今も表示されています。",
+      "dragHint": "ドラッグしてモデルを回します。フォーカス中は左右の矢印キーを使えます。",
+      "canvasLabel": "{name}の回転可能な3Dモデル"
     },
     "models": {
-      "title": "3D Model Viewer",
-      "lead": "Inspect the heroes, monsters, and demons of the world up close. Choose a model, then drag to turn it.",
-      "intro": "Every figure here is the same model you meet in the game, rendered live in your browser. Pick one to load it.",
-      "groupClasses": "Classes",
-      "groupCreatures": "Creatures",
-      "groupPets": "Warlock Demons",
-      "pickerLabel": "Choose a model to view",
-      "count": "{count} models",
-      "noWebgl": "This browser cannot display 3D models. Everything is still listed on the class and bestiary pages."
+      "title": "3Dモデルビューア",
+      "lead": "世界の英雄、モンスター、デーモンを間近で観察しましょう。モデルを選び、ドラッグして回してください。",
+      "intro": "ここに並ぶどの姿も、ゲーム内で出会うのと同じモデルで、ブラウザ上にライブで描画されています。一つ選んで読み込みましょう。",
+      "groupClasses": "クラス",
+      "groupCreatures": "クリーチャー",
+      "groupPets": "ウォーロックのデーモン",
+      "pickerLabel": "表示するモデルを選択",
+      "count": "{count}体のモデル",
+      "noWebgl": "このブラウザでは3Dモデルを表示できません。すべてはクラスとモンスター図鑑のページに掲載されています。"
     },
     "gear": {
-      "intro": "Gear is the equipment your character wears and the items you carry. Better gear is the steadiest way to grow stronger, and you pick most of it up just by playing.",
-      "slotsTitle": "What you can equip",
-      "slotsBody": "You have a weapon slot and seven armor slots. Each piece you equip adds to your character, and you can mix and match freely as you find upgrades.",
-      "slotMainhand": "Weapon",
-      "slotHelmet": "Head",
-      "slotShoulder": "Shoulders",
-      "slotChest": "Chest",
-      "slotWaist": "Waist",
-      "slotLegs": "Legs",
-      "slotGloves": "Hands",
-      "slotFeet": "Feet",
-      "qualityTitle": "Quality, at a glance",
-      "qualityBody": "Every item has a quality, and its name is colored to match so you can read its worth at a glance. From most common to most prized:",
-      "qualityPoor": "Poor",
-      "qualityCommon": "Common",
-      "qualityUncommon": "Uncommon",
-      "qualityRare": "Rare",
-      "qualityEpic": "Epic",
-      "qualityLegendary": "Legendary",
-      "qualityNote": "Higher quality usually means better stats, but quality is a hint, not a rule. A well-matched piece for your class and level can beat a flashier one.",
-      "upgradeTitle": "Keep your gear current",
-      "upgradeBody": "Replacing an old piece with a fresh upgrade does more for you than playing perfectly in gear you have outgrown. When something better drops or a quest offers it, take it. Do not save your good items for later.",
-      "sourcesTitle": "Where gear comes from",
-      "sourcesBody": "Most of your early upgrades are quest rewards, so it pays to finish quests rather than grind. Enemies drop gear when you defeat them, vendors in town sell solid basics, and the player market lets you buy from other adventurers.",
-      "consumablesTitle": "Consumables",
-      "consumablesIntro": "Some items are used once for a quick benefit. They are cheap insurance, so keep a few on hand.",
-      "consumablesPotions": "Potions restore health or mana the moment you use them, even mid-fight, which makes them a clutch save when a pull goes wrong. They share a short cooldown, so plan one good moment to use them.",
-      "consumablesFood": "Food and drink restore you while you sit and rest between fights. Eating recovers health, drinking recovers mana, and resting this way is free. Sit down for a few seconds after a tough fight instead of running into the next one half-healed.",
-      "consumablesElixirs": "Elixirs grant a temporary buff while you adventure, a small edge that helps when you want to push a little further.",
-      "fishingTitle": "Fishing",
-      "fishingBody": "Fishing is a calm change of pace. Equip a fishing pole, cast into open water, and reel in what bites. You mostly catch fish you can cook into food, the odd bit of junk to sell for a few coins, and now and then a prized rare catch. What you find depends on the water you fish in.",
-      "fishingFood": "The fish you reel in are raw, and raw fish are food. Cook your catch and it heals more when you sit to eat, with the better fish coming from the colder, deeper waters in the north. A line in the lake is a quiet way to keep your pack stocked between fights.",
-      "fishingRare": "Now and then your line catches something far better than supper: a shimmering prized fish that any angler might luck into in any water. Hook one and your log lights up with the catch. It is the kind of lucky pull that makes an idle afternoon at the lake worth telling people about.",
-      "cosmeticsTitle": "Looks and cosmetics",
-      "cosmeticsBody": "Some rewards change only how your character looks, never how strong you are. These cosmetic skins let you stand out without affecting the game, so wear whichever you like.",
-      "cosmeticsRanks": "Cosmetics come in rarity tiers of their own, and the rarer ones are a fun thing to chase. Earning a higher tier also unlocks the looks below it.",
-      "cosmeticsSkins": "There are two cosmetic lines to collect. Every class has a handful of alternate appearances, a fresh take on its look that is yours alone to wear. Alongside them sit chromas: named two-tone color schemes that repaint a look entirely, from sober metals to bright imperial colors.",
-      "cosmeticsCache": "A few of these come from a mysterious cosmetic cache, a sealed prize that rolls one of three quality grades when you open it and grants the appearance to match. It is purely for looks: nothing inside it makes you stronger, only finer to look at."
+      "intro": "ギアとは、あなたのキャラクターが身につける装備や持ち歩くアイテムのことです。より良いギアこそが強くなる最も着実な道であり、そのほとんどは遊んでいるだけで手に入ります。",
+      "slotsTitle": "装備できるもの",
+      "slotsBody": "武器スロットが一つと、防具スロットが七つあります。装備した一つ一つがキャラクターの能力を底上げし、アップグレードを見つけるたびに自由に組み合わせを入れ替えられます。",
+      "slotMainhand": "武器",
+      "slotHelmet": "頭",
+      "slotShoulder": "肩",
+      "slotChest": "胴",
+      "slotWaist": "腰",
+      "slotLegs": "脚",
+      "slotGloves": "手",
+      "slotFeet": "足",
+      "qualityTitle": "品質をひと目で",
+      "qualityBody": "どのアイテムにも品質があり、その名前は品質に合わせて色付けされているので、ひと目で価値が読み取れます。最もありふれたものから最も値打ちのあるものまで、順に並べると次の通りです。",
+      "qualityPoor": "ジャンク",
+      "qualityCommon": "一般",
+      "qualityUncommon": "上質",
+      "qualityRare": "レア",
+      "qualityEpic": "エピック",
+      "qualityLegendary": "レジェンダリー",
+      "qualityNote": "品質が高いほど、たいていステータスも良くなりますが、品質は目安であって決まりではありません。クラスとレベルにうまく合った一品は、より派手なものを上回ることもあります。",
+      "upgradeTitle": "ギアは常に最新に",
+      "upgradeBody": "古い一品を新たなアップグレードに替えるほうが、もう手に余る装備で完璧に立ち回るより効果があります。より良いものがドロップしたり、クエストで提示されたりしたら、受け取りましょう。良いアイテムを後のために取っておいてはいけません。",
+      "sourcesTitle": "ギアの入手先",
+      "sourcesBody": "序盤のアップグレードのほとんどはクエスト報酬なので、稼ぎ作業よりクエストを終わらせるほうが得です。敵を倒すと装備を落とし、町の商人は手堅い基本装備を売り、プレイヤーマーケットでは他の冒険者から買えます。",
+      "consumablesTitle": "消耗品",
+      "consumablesIntro": "一度きりで手早く効くアイテムもあります。安価な保険なので、いくつか手元に持っておきましょう。",
+      "consumablesPotions": "ポーションは使った瞬間に、戦闘中でさえ体力やマナを回復してくれるので、プルがしくじったときの土壇場での救いになります。短いクールダウンを共有するため、ここぞという好機を一度見極めて使いましょう。",
+      "consumablesFood": "食べ物と飲み物は、戦いの合間に座って休む間にあなたを回復させます。食べれば体力が、飲めばマナが戻り、こうした休息は無料です。厳しい戦いのあとは、半分の体力で次へ駆け込むのではなく、数秒間座りましょう。",
+      "consumablesElixirs": "エリクサーは冒険中、一時的なバフを与えてくれます。もう一歩踏み込みたいときに効く、ささやかな後押しです。",
+      "fishingTitle": "釣り",
+      "fishingBody": "釣りは心安らぐ気分転換です。釣り竿を装備し、開けた水面に竿を投げ入れ、食いついたものを釣り上げます。主に料理して食べ物にできる魚、数コインで売れる細々としたがらくた、そしてときおり値打ちのあるレアな獲物が釣れます。何が手に入るかは、釣る水によって変わります。",
+      "fishingFood": "釣り上げた魚は生で、生魚は食べ物です。獲物を料理すれば、座って食べたときにより多く回復します。良い魚は北の、より冷たく深い水から獲れます。湖に糸を垂らすのは、戦いの合間にバッグを蓄える静かな手段です。",
+      "fishingRare": "ときおり、晩餐よりはるかに良いものが釣り糸にかかります。どの水でもどんな釣り人にも運次第でかかりうる、きらめく値打ちの魚です。一匹釣り上げれば、ログがその獲物で輝きます。湖でのんびり過ごす午後を、人に語りたくなるような幸運の一引きです。",
+      "cosmeticsTitle": "見た目と装飾",
+      "cosmeticsBody": "見た目だけを変え、強さには一切影響しない報酬もあります。こうした装飾スキンは、ゲームに影響を与えることなく自分を際立たせてくれるので、好きなものを身につけましょう。",
+      "cosmeticsRanks": "装飾品にもそれ自身のレアリティ段階があり、希少なものは追い求めると楽しいものです。上位の段階を手に入れると、それより下の見た目も解放されます。",
+      "cosmeticsSkins": "集められる装飾の系統は二つあります。どのクラスにも、そのクラスならではのいくつかの別バージョンの外見があり、あなただけが身につけられる新たな装いです。それと並ぶのがクロマ。見た目を丸ごと塗り替える、名前付きのツートーンのカラースキームで、渋い金属色から鮮やかな帝国色まで揃っています。",
+      "cosmeticsCache": "その一部は謎めいた装飾キャッシュから手に入ります。封じられた賞品で、開けると三段階の品質のいずれかが抽選され、それに見合った外見が与えられます。純粋に見た目のためのもので、中身であなたが強くなることはなく、ただ見栄えが良くなるだけです。"
     },
     "economy": {
-      "intro": "Coin oils the whole world: it buys gear and supplies, pays your repairs and quest costs, and changes hands between players. You pick all of this up just by playing, so think of this page as a map of where your money comes from and goes.",
-      "coinTitle": "Gold, silver, and copper",
-      "coinBody": "Money comes in three coins. A hundred copper make a silver, and a hundred silver make a gold, so your purse fills up from the smallest coin first. You earn it from quest rewards, from looting fallen enemies, and from selling what you no longer need.",
-      "vendorsTitle": "Vendors and what they keep",
-      "vendorsBody": "Towns and outposts are dotted with merchants, each with their own trade. Provisioners stock food and drink, weaponsmiths and armorers carry gear, herbalists deal in reagents, and a quartermaster keeps practical travel kit. Walk up to one to see what they sell.",
-      "buyingTitle": "Buying and selling",
-      "buyingBody": "Stand near a merchant to open their window. You can buy anything they stock if you can afford it, and sell most of what is in your bags for coin. If you sell something by mistake, a vendor will hold your recent sales so you can buy them back.",
-      "junkTitle": "Clearing out junk",
-      "junkBody": "Drops you have no use for still sell to any vendor, so empty your bags whenever you pass through town rather than letting them fill up. Truly worthless odds and ends can also be discarded outright to make room.",
-      "tradeTitle": "Trading with other players",
-      "tradeBody": "You can trade face to face with anyone standing near you. Both of you put items and coin into a shared window and the swap only happens once you both confirm it, so neither side can be caught out. It is the simple way to hand a friend a drop or settle a deal.",
-      "marketTitle": "The World Market",
-      "marketBody": "The Merchant runs the World Market, a player-driven exchange where you can buy and sell with people you may never meet. Speak to the Merchant to open it.",
-      "marketBrowse": "Browsing: scroll the listings or search by name to find what is for sale. Each listing shows the goods, the seller, and the asking price for the whole stack.",
-      "marketPost": "Posting: choose a stack from your bags, set your price, and list it. The goods are held by the Merchant until someone buys them. Unsold listings come back to you after a while, and you can reclaim one early if you change your mind.",
-      "marketCollect": "Collecting: when your goods sell, your proceeds wait for you at the Merchant. Return to collect the coin, along with anything that came back unsold. The Merchant takes a small cut of every completed sale.",
-      "marketPricing": "Pricing is up to you. Listing a little under what others are asking tends to sell faster, while a steep price may sit untouched. Browse first to see what the going rate looks like before you post."
+      "intro": "コインは世界全体の潤滑油です。装備や物資を買い、修理代やクエストの費用を払い、プレイヤー間でやり取りされます。これらはすべて遊んでいるだけで身につくので、このページはお金がどこから来てどこへ行くのかを示す地図だと思ってください。",
+      "coinTitle": "ゴールド、シルバー、カッパー",
+      "coinBody": "お金は三種類のコインで成り立っています。100カッパーで1シルバー、100シルバーで1ゴールドになり、財布は一番小さなコインから満たされていきます。クエスト報酬、倒した敵からの戦利品、そして不要になったものを売ることで手に入ります。",
+      "vendorsTitle": "ベンダーと取り扱い品",
+      "vendorsBody": "町や前哨地には商人が点在し、それぞれ専門の商いを持っています。糧食商は食べ物と飲み物を、武器鍛冶や防具師は装備を、薬草師は試薬を扱い、需品係は実用的な旅の道具を取り揃えています。歩み寄れば、その品揃えを見られます。",
+      "buyingTitle": "売買",
+      "buyingBody": "商人のそばに立つと、その取引窓が開きます。お金が足りれば品揃えのどれでも買え、バッグの中のほとんどのものをコインに換えて売れます。間違って何かを売ってしまっても、商人は最近の売却品を取り置いてくれるので、買い戻すことができます。",
+      "junkTitle": "がらくたの整理",
+      "junkBody": "使い道のないドロップ品も、どの商人にでも売れます。バッグがいっぱいになる前に、町を通るたびに空にしましょう。本当に価値のないがらくたは、場所を空けるためにそのまま捨てることもできます。",
+      "tradeTitle": "他のプレイヤーとの取引",
+      "tradeBody": "近くに立っている相手とは、対面で直接取引できます。互いが共有の窓にアイテムとコインを入れ、双方が確認して初めて交換が成立するので、どちらも損をする心配はありません。友達にドロップ品を手渡したり、約束を取り決めたりする手軽な方法です。",
+      "marketTitle": "ワールドマーケット",
+      "marketBody": "商人はワールドマーケットを運営しています。これは会うことのないかもしれない相手とも売買できる、プレイヤー主導の取引所です。商人に話しかけて開きましょう。",
+      "marketBrowse": "閲覧：出品を一覧でスクロールするか、名前で検索して売り物を探します。各出品には品物、出品者、そしてスタック全体の希望価格が表示されます。",
+      "marketPost": "出品：バッグからスタックを選び、価格を決めて出品します。品物は誰かが買うまで商人が預かります。売れ残った出品はしばらくすると手元に戻り、気が変われば早めに引き取ることもできます。",
+      "marketCollect": "受け取り：品物が売れると、その代金は商人のもとで待っています。戻ってコインを受け取りましょう。売れ残って戻ってきたものも一緒です。商人は成立した売却ごとにわずかな手数料を取ります。",
+      "marketPricing": "値付けはあなた次第です。他より少し安く出品すると早く売れる傾向があり、高すぎる値はそのまま放置されがちです。出品する前にまず閲覧して、相場がどうなっているか確かめましょう。"
     },
     "social": {
-      "intro": "Most of the world is soloable, but the game is built to be played with other people. Here is how to talk, team up, and find your crowd.",
-      "chatHeading": "Chat channels",
-      "chatBody": "Chat is split into channels, each shown on its own tab. Type a message to send it on the active channel, or use a slash command to direct one line elsewhere. These are the channels you can talk on:",
-      "chanSay": "Say.",
-      "chanSayBody": "Your default voice. It reaches players close to you and is the one to use while questing side by side.",
-      "chanYell": "Yell.",
-      "chanYellBody": "A louder version of Say that carries a bit farther, enough to reach across a camp.",
-      "chanWhisper": "Whisper.",
-      "chanWhisperBody": "A private message to one player by name, wherever they are. Use it for a quiet word.",
-      "chanParty": "Party.",
-      "chanPartyBody": "Talk to everyone in your group, no matter how spread out you are.",
-      "chanGeneral": "General.",
-      "chanGeneralBody": "An always-on local channel for the people around you, good for asking a question or chatting.",
-      "chanWorld": "World.",
-      "chanWorldBody": "A realm-wide channel you opt into. Open its tab to join, and you will see and reach everyone online.",
-      "chanLfg": "Looking for Group.",
-      "chanLfgBody": "An opt-in realm-wide channel for finding people to run a dungeon. Open its tab to join.",
-      "chanGuild": "Guild and Officer.",
-      "chanGuildBody": "Channels for your guild. Guild chat reaches every member; the officer channel is just for officers.",
-      "partyHeading": "Forming a party",
-      "partyBody": "Invite another player by right-clicking their name and choosing to invite, or with a chat command. A party holds up to five players, and one of you is the leader.",
-      "partyCredit": "Group members near each other share kill and quest credit, so questing together is faster, never slower. A party is also how you step into a dungeon as a team.",
-      "raidBody": "Once you have a full party of five, the leader can convert it into a raid of up to ten, for the endgame raid.",
-      "lootHeading": "Party loot",
-      "lootBody": "When you group up, the party leader sets how loot is shared. The rules cover coin and items separately:",
-      "lootCoinTitle": "Coin.",
-      "lootCoinBody": "Money from a kill can go to whoever loots it, or be split evenly across the party.",
-      "lootCommonTitle": "Items.",
-      "lootCommonBody": "Ordinary drops can go to the looter, while better drops are put up for a roll so everyone gets a fair shot.",
-      "lootRollTitle": "Need, Greed, or Pass.",
-      "lootRollBody": "When an item goes to a roll, each eligible member chooses Need if they want it, Greed if they would only take it spare, or Pass to bow out. The highest roll wins.",
-      "friendsHeading": "Friends and ignore",
-      "friendsBody": "Add players to your friends list to see when they are online and where they are, so you can group up the moment they log in.",
-      "ignoreBody": "If someone is bothering you, add them to your ignore list and you will stop seeing their chat.",
-      "guildHeading": "Guilds",
-      "guildBody": "A guild is a lasting group of players you belong to between sessions. Create one or accept an invite to join, and you can be in one guild at a time. Members hold a rank: a leader, officers, and members.",
-      "guildChatBody": "Belonging to a guild gives you a private guild chat channel and shows your guildmates on a shared roster, so there are always familiar faces online.",
-      "etiquetteHeading": "Grouping etiquette",
-      "etiquetteBody": "Grouping is a choice, not a chore. Say hello when you join, roll Need only on gear you will actually use, and let the group know before you head off. A little courtesy goes a long way, and most players are glad of the company."
+      "intro": "世界のほとんどはソロで進められますが、このゲームは他の人々と共に遊ぶように作られています。ここでは、話し、力を合わせ、仲間を見つける方法を紹介します。",
+      "chatHeading": "チャットチャンネル",
+      "chatBody": "チャットはチャンネルに分かれており、それぞれが独自のタブに表示されます。メッセージを打てば現在のチャンネルで送られ、スラッシュコマンドを使えば一行だけ別の場所へ向けられます。話せるチャンネルは次の通りです。",
+      "chanSay": "セイ。",
+      "chanSayBody": "あなたの標準の声。近くにいるプレイヤーに届き、肩を並べてクエストを進めるときに使うものです。",
+      "chanYell": "イェル。",
+      "chanYellBody": "セイより少し遠くまで届く、より大きな声。野営地の向こう側まで届くくらいです。",
+      "chanWhisper": "ウィスパー。",
+      "chanWhisperBody": "名前を指定して一人のプレイヤーへ、どこにいても送れるプライベートなメッセージ。内緒話に使いましょう。",
+      "chanParty": "パーティ。",
+      "chanPartyBody": "どれだけ離れていても、グループの全員に話しかけられます。",
+      "chanGeneral": "一般。",
+      "chanGeneralBody": "周りにいる人々のための、常時オンのローカルチャンネル。質問したり雑談したりするのに向いています。",
+      "chanWorld": "ワールド。",
+      "chanWorldBody": "任意参加のレルム全体チャンネル。タブを開いて参加すれば、オンラインの全員を見て、全員に届けられます。",
+      "chanLfg": "パーティ募集。",
+      "chanLfgBody": "ダンジョンを回る仲間を探すための、任意参加のレルム全体チャンネル。タブを開いて参加しましょう。",
+      "chanGuild": "ギルドとオフィサー。",
+      "chanGuildBody": "ギルド用のチャンネル。ギルドチャットは全メンバーに届き、オフィサーチャンネルはオフィサー専用です。",
+      "partyHeading": "パーティを組む",
+      "partyBody": "相手の名前を右クリックして招待を選ぶか、チャットコマンドで他のプレイヤーを招待します。パーティは最大五人まで入れ、そのうち一人がリーダーです。",
+      "partyCredit": "互いに近くにいるグループメンバーは討伐とクエストの達成判定を共有するので、一緒にクエストを進めれば速くなることはあっても遅くなることはありません。パーティはまた、チームとしてダンジョンへ踏み込む手段でもあります。",
+      "raidBody": "五人のフルパーティが揃ったら、リーダーはそれをエンドゲームのレイドに向けて、最大十人のレイドへと変換できます。",
+      "lootHeading": "パーティの戦利品",
+      "lootBody": "グループを組むと、パーティリーダーが戦利品の分け方を設定します。ルールはコインとアイテムを別々に扱います。",
+      "lootCoinTitle": "コイン。",
+      "lootCoinBody": "討伐で得たお金は、それをルートした人のものになるか、パーティ全員に均等に分けられます。",
+      "lootCommonTitle": "アイテム。",
+      "lootCommonBody": "ありふれたドロップ品はルートした人のものに、より良いドロップ品はロールにかけられて、全員に公平な機会が与えられます。",
+      "lootRollTitle": "ニード、グリード、パス。",
+      "lootRollBody": "アイテムがロールにかけられると、対象となる各メンバーは、欲しければニード、余りなら受け取る程度ならグリード、辞退するならパスを選びます。最も高い出目が勝ちます。",
+      "friendsHeading": "フレンドと無視",
+      "friendsBody": "プレイヤーをフレンドリストに追加すると、いつオンラインで、どこにいるかがわかるので、彼らがログインした瞬間にグループを組めます。",
+      "ignoreBody": "誰かに迷惑をかけられているなら、無視リストに追加すれば、その人のチャットは見えなくなります。",
+      "guildHeading": "ギルド",
+      "guildBody": "ギルドは、セッションをまたいで所属できる、長く続くプレイヤーの集まりです。自分で作るか、招待を受けて参加でき、同時に所属できるギルドは一つです。メンバーはランクを持ちます。リーダー、オフィサー、そしてメンバーです。",
+      "guildChatBody": "ギルドに所属すると、専用のギルドチャットチャンネルが使え、共有の名簿にギルドメイトが表示されるので、オンラインにはいつも見知った顔があります。",
+      "etiquetteHeading": "グループの礼儀",
+      "etiquetteBody": "グループを組むのは選択であって、義務ではありません。参加したら挨拶し、ニードを選ぶのは実際に使う装備だけにし、抜ける前にはグループに一言。ちょっとした礼儀が大きな違いを生み、たいていのプレイヤーは仲間がいることを喜びます。"
     },
     "stats": {
-      "intro": "Your character is described by a handful of attributes. You never have to memorize them to play well, but knowing roughly what each one does helps you read your character sheet and pick the right upgrades.",
-      "primaryHeading": "Primary attributes",
-      "primaryBody": "Five attributes shape your character: Strength, Agility, Stamina, Intellect, and Spirit. Each class leans on a different mix, so the ones that matter most depend on what you play.",
-      "strTitle": "Strength",
-      "strBody": "Strength raises your melee attack power, so your weapon swings hit harder. It does the most for the heavy melee classes that fight up close.",
-      "agiTitle": "Agility",
-      "agiBody": "Agility sharpens you in several ways: it raises your chance to land a critical hit and your chance to dodge, and it adds a little armor. For rogues and hunters it also feeds attack power, and it drives a hunter's ranged shots.",
-      "staTitle": "Stamina",
-      "staBody": "Stamina is your staying power. More Stamina means a larger health pool, and it speeds the health you recover while resting out of combat. Every class wants some.",
-      "intTitle": "Intellect",
-      "intBody": "Intellect grows a spellcaster's mana pool and improves the chance their spells crit. It matters to the classes that cast from mana; for a Rage or Energy class it does little.",
-      "spiTitle": "Spirit",
-      "spiBody": "Spirit governs how quickly a caster's mana returns while out of combat. Like Intellect, it serves the mana classes and means little to the others.",
-      "armorTitle": "Armor",
-      "armorBody": "Armor reduces the physical damage you take. It comes mostly from what you wear, and the heavier armor classes carry far more of it. More armor against a foe near your level means each of its hits lands softer.",
-      "apTitle": "Attack power",
-      "apBody": "Attack power measures how hard your weapon strikes. Your primary attributes feed it, and stronger weapons and gear raise it further, which is why an upgrade can be a real jump in damage.",
-      "critTitle": "Critical strike",
-      "critBody": "Your critical strike chance is how often an attack lands for extra damage. Everyone starts with a small base chance, and Agility (plus some talents and gear) builds on it.",
-      "dodgeTitle": "Dodge",
-      "dodgeBody": "Dodge is your chance to avoid an incoming melee attack entirely. You begin with a small base chance, and Agility raises it, so nimble classes slip more blows.",
-      "sheetHeading": "Reading your character sheet",
-      "sheetBody": "Open the character window in game to see all of this in one place: your five attributes on one side and the stats they feed on the other. Hover any value and a tooltip breaks down what it does for your class, so you can see at a glance which numbers an upgrade actually moved.",
-      "growHeading": "How your stats grow",
-      "growBody": "Two things raise your stats. Every level adds a fixed amount of each attribute to suit your class, and the gear you equip adds more on top. Keeping your gear current is the steadiest way to grow stronger, all the way to the level cap."
+      "intro": "あなたのキャラクターは、ひと握りの能力値で表されます。うまく遊ぶためにそれらを覚える必要は決してありませんが、それぞれがおおよそ何をするか知っておくと、キャラクターシートを読み、適切なアップグレードを選ぶのに役立ちます。",
+      "primaryHeading": "主要能力値",
+      "primaryBody": "五つの能力値があなたのキャラクターを形作ります。筋力、敏捷性、体力、知力、精神力です。クラスごとに異なる配分に頼るので、最も重要になるものは何を遊ぶかによって変わります。",
+      "strTitle": "筋力",
+      "strBody": "筋力は近接アタックパワーを上げるので、武器の一振りがより強く当たります。接近して戦う重近接のクラスに最も効きます。",
+      "agiTitle": "敏捷性",
+      "agiBody": "敏捷性はいくつもの形であなたを鋭くします。クリティカルヒットを当てる確率と回避する確率を上げ、わずかなアーマーも加えます。ローグとハンターにとってはアタックパワーにもなり、ハンターの遠隔射撃を支えます。",
+      "staTitle": "体力",
+      "staBody": "体力はあなたの粘り強さです。体力が多いほど体力プールが大きくなり、戦闘外で休んでいる間の回復も速まります。どのクラスもいくらかは欲しいものです。",
+      "intTitle": "知力",
+      "intBody": "知力はスペルキャスターのマナのプールを増やし、呪文のクリティカル率を高めます。マナで詠唱するクラスには重要ですが、レイジやエナジーのクラスにはほとんど効きません。",
+      "spiTitle": "精神力",
+      "spiBody": "精神力は、戦闘外でキャスターのマナがどれだけ速く戻るかを左右します。知力と同じく、マナのクラスに役立ち、他のクラスにはほとんど意味がありません。",
+      "armorTitle": "アーマー",
+      "armorBody": "アーマーは受ける物理ダメージを軽減します。その多くは身につけているものから得られ、重装のクラスほどはるかに多くを備えます。自分のレベルに近い相手に対してアーマーが多いほど、その一撃一撃が柔らかく当たります。",
+      "apTitle": "アタックパワー",
+      "apBody": "アタックパワーは、武器がどれだけ強く打つかを表します。あなたの主要能力値がこれを養い、より強い武器やギアがさらに引き上げるので、アップグレードがダメージの本当の跳ね上がりになるのです。",
+      "critTitle": "クリティカル",
+      "critBody": "クリティカル率は、攻撃が追加ダメージで当たる頻度です。誰もがわずかな基礎確率から始まり、敏捷性（さらに一部のタレントやギア）がそれを積み上げます。",
+      "dodgeTitle": "回避",
+      "dodgeBody": "回避は、向かってくる近接攻撃を丸ごとかわす確率です。わずかな基礎確率から始まり、敏捷性がそれを上げるので、すばしこいクラスほど多くの一撃をかわします。",
+      "sheetHeading": "キャラクターシートの読み方",
+      "sheetBody": "ゲーム内でキャラクターウィンドウを開けば、これらすべてを一か所で確認できます。片側に五つの能力値、もう片側にそれらが養うステータスが並びます。どの値にもカーソルを合わせると、ツールチップがそれがクラスにとって何をするかを分解して示すので、アップグレードが実際にどの数値を動かしたかをひと目で見られます。",
+      "growHeading": "ステータスの伸び方",
+      "growBody": "ステータスを上げるものは二つあります。レベルが上がるごとに、クラスに合った各能力値が一定量加わり、装備するギアがその上にさらに加えます。ギアを最新に保つことが、レベル上限まで着実に強くなる道です。"
     },
     "progression": {
-      "intro": "Every fight, quest, and step north makes your hero stronger. Here is how leveling works and what keeps you growing once you reach the top.",
-      "xpTitle": "How you gain experience",
-      "xpBody": "You earn experience by completing quests and by defeating enemies. Quests give the most by far, so following the quest trail is the fastest way to climb. Killing things along the way fills in the rest.",
-      "capBody": "Each level makes you tougher and brings new abilities, all the way to the cap of level {cap}.",
-      "journeyTitle": "The journey north",
-      "journeyBody": "The world is one continuous land, three zones laid south to north, each a step higher in level. You start in the green valley, press on through the marsh, and finish in the cold high peaks. Follow the quest trail and the land carries you from one to the next.",
-      "bandLabel": "Levels {min} to {max}",
-      "restedTitle": "Rested experience",
-      "restedBody": "When you log out, or rest in a safe place like an inn, your character builds up rested experience while you are away. The next time you go out and fight, that pool gives your kills an extra boost until it runs dry. It builds up over time and speeds your early levels, so logging off in town is never wasted time.",
-      "capTitle": "Reaching level {cap}",
-      "capJourneyBody": "Level {cap} is the cap, the end of leveling but not of growing. From there you run dungeons and the raid, chase better gear, and test yourself in the arena.",
-      "prestigeBody": "Experience keeps counting even after the cap. It feeds a cosmetic virtual level, so your experience bar keeps climbing, and a long-term prestige rank you can earn for the recognition. It is purely optional and never grants power, just a mark of the road you have walked.",
-      "noRush": "There is no rush. The world is there to enjoy at your own pace, so wander, take the quests that catch your eye, and let your hero grow along the way."
+      "intro": "あらゆる戦い、クエスト、北へ進む一歩が、あなたの英雄を強くします。ここでは、レベリングの仕組みと、頂点に達した後も成長を続けさせるものを紹介します。",
+      "xpTitle": "経験値の稼ぎ方",
+      "xpBody": "経験値はクエストの達成と敵の討伐で得られます。クエストが断然多くを与えてくれるので、クエストの道筋をたどるのが最も早く登る方法です。道すがら何かを倒すことが、残りを埋めてくれます。",
+      "capBody": "レベルが上がるたびに頑丈になり、新たなアビリティが手に入ります。それはレベル上限{cap}まで続きます。",
+      "journeyTitle": "北への旅路",
+      "journeyBody": "世界は一続きの大地で、南から北へと三つのゾーンが並び、それぞれがレベルの一段上にあたります。緑の谷から始まり、湿地を突き進み、寒く高い峰々で終わります。クエストの道筋をたどれば、大地があなたを次から次へと運んでくれます。",
+      "bandLabel": "レベル{min}から{max}",
+      "restedTitle": "休息経験値",
+      "restedBody": "ログアウトしたとき、あるいは宿屋のような安全な場所で休んでいるとき、離れている間にキャラクターは休息経験値を蓄えます。次に外へ出て戦うとき、その蓄えが尽きるまで討伐に追加のボーナスがかかります。時間をかけて溜まり、序盤のレベルを早めてくれるので、町でログオフするのは決して無駄な時間ではありません。",
+      "capTitle": "レベル{cap}に到達する",
+      "capJourneyBody": "レベル{cap}が上限、レベリングの終わりですが、成長の終わりではありません。そこからはダンジョンやレイドに挑み、より良いギアを追い、アリーナで己を試します。",
+      "prestigeBody": "経験値は上限に達した後も加算され続けます。それは見た目だけの仮想レベルを養い、経験値バーは上がり続けます。そして長期的なプレステージランクは、栄誉のために得ることができます。完全に任意のもので、力を授けることは決してなく、ただあなたが歩んできた道のりの証です。",
+      "noRush": "急ぐ必要はありません。世界は自分のペースで楽しむためにあります。気の向くままに歩き、目に留まったクエストを受け、その道すがら英雄を育てていきましょう。"
     },
     "placeholder": {
-      "note": "This part of the guide is on its way."
+      "note": "ガイドのこの部分は現在準備中です。"
     },
     "notFound": {
-      "title": "We could not find that page",
-      "body": "The page you were looking for does not exist or may have moved.",
-      "home": "Back to the overview"
+      "title": "そのページが見つかりませんでした",
+      "body": "お探しのページは存在しないか、移動した可能性があります。",
+      "home": "概要に戻る"
     }
   },
   "skinEvent": {
@@ -1529,8 +1529,8 @@ export const ja_JP: EnTranslations = {
     "news": "ニュース",
     "download": "ダウンロード",
     "loginRegister": "ログイン/登録",
-    "account": "Account",
-    "logout": "Logout",
+    "account": "アカウント",
+    "logout": "ログアウト",
     "donate": "寄付"
   },
   "stats": {
@@ -1630,185 +1630,185 @@ export const ja_JP: EnTranslations = {
     "enterWorld": "世界に入る",
     "offlineCharacter": "オフラインキャラクター",
     "create": "作成",
-    "twoFactorLabel": "Authentication code",
-    "twoFactorPlaceholder": "6-digit or recovery code",
-    "twoFactorHint": "Enter the code from your authenticator app, or one of your recovery codes."
+    "twoFactorLabel": "認証コード",
+    "twoFactorPlaceholder": "6桁のコードまたはリカバリーコード",
+    "twoFactorHint": "認証アプリに表示されたコード、またはリカバリーコードのいずれかを入力してください。"
   },
   "wallet": {
-    "label": "$WOC Wallet",
-    "connect": "Verify Wallet",
-    "connectTitle": "Verify your Solana wallet",
-    "connectAria": "Verify your Solana wallet",
-    "verify": "Verify Wallet",
-    "verifyNew": "Verify New Wallet",
-    "verifyTitle": "Choose a wallet and sign once to verify ownership.",
-    "verifyAria": "Choose a wallet and sign once to verify ownership",
-    "verifyAddressAria": "Sign to verify wallet {address} for your account",
-    "appConnected": "App Connected",
-    "connectApp": "Connect App",
-    "connectAppTitle": "Connect the wallet app on this browser",
-    "connectAppAria": "Connect the wallet app on this browser",
-    "verifying": "Verifying...",
-    "verifyingTitle": "Wallet verification is in progress.",
-    "switch": "Switch",
-    "switchTitle": "Verify a different wallet",
-    "switchAria": "Verify a different wallet",
-    "unlink": "Unlink",
-    "unlinkTitle": "Remove wallet verification from this account",
-    "unlinkAria": "Remove wallet verification from this account",
-    "signOut": "Disconnect",
-    "signOutTitle": "Disconnect the wallet app on this browser",
-    "signOutAria": "Disconnect the wallet app on this browser",
-    "hide": "Hide",
-    "hideTitle": "Hide wallet row on this screen",
-    "hideAria": "Hide wallet row on this screen",
-    "hiddenNotice": "Wallet row hidden. Re-enable it in-game from Options > Interface.",
-    "linkedTitle": "Wallet verified for your account. Click to manage the wallet app.",
-    "linkedDisconnectedTitle": "Wallet remains verified for your account. Reconnect to manage the wallet app.",
-    "linkedDisconnectedAria": "Wallet remains verified for your account. Reconnect to manage the wallet app.",
-    "linkTitle": "Click to sign and link this wallet to your account.",
-    "connectedTitle": "Connected. Log in to link this wallet to your account.",
-    "balanceTitle": "Verified Solana wallet $WOC balance",
-    "balanceAria": "Verified Solana wallet balance: {balance}",
-    "balancePreviewTitle": "Connected wallet $WOC balance preview",
-    "balancePreviewAria": "Connected wallet balance preview: {balance}. Link the wallet to verify holder flair.",
+    "label": "$WOC ウォレット",
+    "connect": "ウォレット認証",
+    "connectTitle": "Solanaウォレットを認証",
+    "connectAria": "Solanaウォレットを認証",
+    "verify": "ウォレット認証",
+    "verifyNew": "新しいウォレットを認証",
+    "verifyTitle": "ウォレットを選択し、一度署名して所有権を認証します。",
+    "verifyAria": "ウォレットを選択し、一度署名して所有権を認証",
+    "verifyAddressAria": "アカウントのウォレット {address} を認証するために署名",
+    "appConnected": "アプリ接続済み",
+    "connectApp": "アプリを接続",
+    "connectAppTitle": "このブラウザでウォレットアプリを接続",
+    "connectAppAria": "このブラウザでウォレットアプリを接続",
+    "verifying": "認証中...",
+    "verifyingTitle": "ウォレット認証を実行中です。",
+    "switch": "切替",
+    "switchTitle": "別のウォレットを認証",
+    "switchAria": "別のウォレットを認証",
+    "unlink": "連携解除",
+    "unlinkTitle": "このアカウントからウォレット認証を削除",
+    "unlinkAria": "このアカウントからウォレット認証を削除",
+    "signOut": "接続解除",
+    "signOutTitle": "このブラウザでウォレットアプリの接続を解除",
+    "signOutAria": "このブラウザでウォレットアプリの接続を解除",
+    "hide": "非表示",
+    "hideTitle": "この画面でウォレット行を非表示にする",
+    "hideAria": "この画面でウォレット行を非表示にする",
+    "hiddenNotice": "ウォレット行を非表示にしました。ゲーム内のオプション > インターフェイスから再度有効にできます。",
+    "linkedTitle": "ウォレットはアカウントで認証済みです。クリックしてウォレットアプリを管理します。",
+    "linkedDisconnectedTitle": "ウォレットはアカウントで認証されたままです。ウォレットアプリを管理するには再接続してください。",
+    "linkedDisconnectedAria": "ウォレットはアカウントで認証されたままです。ウォレットアプリを管理するには再接続してください。",
+    "linkTitle": "クリックして署名し、このウォレットをアカウントに連携します。",
+    "connectedTitle": "接続済みです。ログインすると、このウォレットをアカウントに連携できます。",
+    "balanceTitle": "認証済みSolanaウォレットの$WOC残高",
+    "balanceAria": "認証済みSolanaウォレット残高: {balance}",
+    "balancePreviewTitle": "接続中ウォレットの$WOC残高プレビュー",
+    "balancePreviewAria": "接続中ウォレット残高プレビュー: {balance}。ウォレットを連携するとホルダー表示を認証できます。",
     "balanceAmount": "{amount} $WOC",
-    "connected": "Connected: {address}",
-    "connectedWithBalance": "Connected: {balance} - {address}",
-    "connectedLinked": "Verified: {address}",
-    "connectedLinkedWithBalance": "Verified: {balance} - {address}",
-    "helpDisconnected": "Verify a Solana wallet to enable holder flair and player-card badges. No transaction or SOL required.",
-    "helpLoginToLink": "Connected {address}. Log in to link it to your account.",
-    "helpLoginToLinkWithBalance": "Connected {address} with {balance}. Log in to link it to your account.",
-    "helpReadyToLink": "Wallet selected: {address}. Sign once to verify holder flair and player cards.",
-    "helpReadyToLinkWithBalance": "Wallet selected: {address} with {balance}. Sign once to verify holder flair and player cards.",
-    "helpLinked": "Holder perks are active. Wallet app connected on this browser.",
-    "helpLinkedWithBalance": "Holder perks are active. Wallet app connected on this browser.",
-    "helpLinkedDisconnected": "Holder perks are active. Connect the app when you need to sign or spend.",
-    "helpLinkedDisconnectedWithBalance": "Holder perks are active. Connect the app when you need to sign or spend.",
-    "flowConnect": "Choose a wallet. Verification continues automatically.",
-    "flowSign": "Sign the verification message in your wallet app. No transaction or SOL required.",
-    "flowVerify": "Verifying wallet ownership...",
-    "linkFailed": "Wallet verification failed.",
-    "verifyFailed": "Wallet verification failed.",
-    "unlinkFailed": "Could not unlink wallet.",
-    "holder": "$WOC holder",
-    "holderTierTitle": "{tier} $WOC holder",
+    "connected": "接続済み: {address}",
+    "connectedWithBalance": "接続済み: {balance} - {address}",
+    "connectedLinked": "認証済み: {address}",
+    "connectedLinkedWithBalance": "認証済み: {balance} - {address}",
+    "helpDisconnected": "Solanaウォレットを認証して、ホルダー表示とプレイヤーカードのバッジを有効にします。トランザクションや SOL は不要です。",
+    "helpLoginToLink": "{address} に接続済みです。ログインするとアカウントに連携できます。",
+    "helpLoginToLinkWithBalance": "{address} に接続済み、残高は {balance} です。ログインするとアカウントに連携できます。",
+    "helpReadyToLink": "選択中のウォレット: {address}。一度署名すると、ホルダー表示とプレイヤーカードを認証できます。",
+    "helpReadyToLinkWithBalance": "選択中のウォレット: {address}、残高は {balance} です。一度署名すると、ホルダー表示とプレイヤーカードを認証できます。",
+    "helpLinked": "ホルダー特典が有効です。このブラウザでウォレットアプリが接続されています。",
+    "helpLinkedWithBalance": "ホルダー特典が有効です。このブラウザでウォレットアプリが接続されています。",
+    "helpLinkedDisconnected": "ホルダー特典が有効です。署名や支払いが必要なときはアプリを接続してください。",
+    "helpLinkedDisconnectedWithBalance": "ホルダー特典が有効です。署名や支払いが必要なときはアプリを接続してください。",
+    "flowConnect": "ウォレットを選択してください。認証は自動的に続行されます。",
+    "flowSign": "ウォレットアプリで認証メッセージに署名してください。トランザクションや SOL は不要です。",
+    "flowVerify": "ウォレット所有権を認証中...",
+    "linkFailed": "ウォレット認証に失敗しました。",
+    "verifyFailed": "ウォレット認証に失敗しました。",
+    "unlinkFailed": "ウォレット連携を解除できませんでした。",
+    "holder": "$WOCホルダー",
+    "holderTierTitle": "{tier} $WOCホルダー",
     "holderTiers": {
       "ember": {
-        "name": "Ember",
-        "flavor": "The spark is lit."
+        "name": "残り火",
+        "flavor": "火花が灯りました。"
       },
       "coinbearer": {
-        "name": "Coinbearer",
-        "flavor": "First coin in the war chest."
+        "name": "コインベアラー",
+        "flavor": "軍資金庫に最初の一枚。"
       },
       "coppercrest": {
-        "name": "Coppercrest",
-        "flavor": "Coppers stacked, your name spoken."
+        "name": "銅の紋章",
+        "flavor": "銅貨は積み上がり、あなたの名が語られます。"
       },
       "silverbound": {
-        "name": "Silverbound",
-        "flavor": "Bound in silver, building the bag."
+        "name": "銀の誓約",
+        "flavor": "銀に結ばれ、資産を築いています。"
       },
       "gilded": {
-        "name": "Gilded",
-        "flavor": "Gilded and grinning."
+        "name": "黄金",
+        "flavor": "黄金に輝き、笑みを浮かべています。"
       },
       "vaultwarden": {
-        "name": "Vaultwarden",
-        "flavor": "Guarding a real vault now: 0.01% of all $WOC."
+        "name": "宝物庫の番人",
+        "flavor": "今や本物の金庫を守っています: $WOC 全体の 0.01%。"
       },
       "whale": {
-        "name": "Whale",
-        "flavor": "The deep parts when you swim: 0.1% of supply."
+        "name": "クジラ",
+        "flavor": "泳げば深みが割れます: 供給量の 0.1%。"
       },
       "leviathan": {
-        "name": "Leviathan",
-        "flavor": "Markets feel you move: 1% of supply."
+        "name": "リヴァイアサン",
+        "flavor": "あなたが動けば市場が感じ取ります: 供給量の 1%。"
       },
       "tidelord": {
-        "name": "Tidelord",
-        "flavor": "The tide answers your call: 2% of supply."
+        "name": "潮の君主",
+        "flavor": "潮があなたの呼び声に応えます: 供給量の 2%。"
       },
       "stormcaller": {
-        "name": "Stormcaller",
-        "flavor": "Storms gather at your name: 3% of supply."
+        "name": "嵐呼び",
+        "flavor": "あなたの名に嵐が集います: 供給量の 3%。"
       },
       "krakencrown": {
-        "name": "Krakencrown",
-        "flavor": "Crowned by the deep: 4% of supply."
+        "name": "クラーケンの冠",
+        "flavor": "深海に冠を授けられています: 供給量の 4%。"
       },
       "titanforged": {
-        "name": "Titanforged",
-        "flavor": "Forged among titans: 5% of supply."
+        "name": "タイタン鍛造",
+        "flavor": "タイタンたちの間で鍛えられました: 供給量の 5%。"
       },
       "starhoard": {
-        "name": "Starhoard",
-        "flavor": "A hoard that bends starlight: 6% of supply."
+        "name": "星の秘蔵",
+        "flavor": "星光を曲げるほどの宝庫です: 供給量の 6%。"
       },
       "voidwarden": {
-        "name": "Voidwarden",
-        "flavor": "Keeper at the void's edge: 7% of supply."
+        "name": "虚空の番人",
+        "flavor": "虚空の縁を守っています: 供給量の 7%。"
       },
       "realmshaper": {
-        "name": "Realmshaper",
-        "flavor": "You reshape the realm: 8% of supply."
+        "name": "領域形成者",
+        "flavor": "あなたは領域を作り変えます: 供給量の 8%。"
       },
       "worldforger": {
-        "name": "Worldforger",
-        "flavor": "Forging a world of your own: 9% of supply."
+        "name": "世界鍛造者",
+        "flavor": "自分だけの世界を鍛えています: 供給量の 9%。"
       },
       "worldbearer": {
-        "name": "Worldbearer",
-        "flavor": "You carry a piece of the world: 10% of supply."
+        "name": "世界を担う者",
+        "flavor": "あなたは世界の一片を背負っています: 供給量の 10%。"
       },
       "sovereign": {
-        "name": "Sovereign",
-        "flavor": "The realm bends the knee: the entire supply."
+        "name": "君主",
+        "flavor": "レルムが膝をつきます: 供給量のすべて。"
       }
     }
   },
   "playerCard": {
-    "shareButton": "Share Player Card",
-    "title": "Player Card",
-    "close": "Close player card",
-    "loading": "Forging your card...",
-    "poseGroup": "Pose",
-    "poseHero": "Hero",
-    "poseBattle": "Battle",
-    "poseVictory": "Victory",
-    "referralLinkLabel": "Your referral link. Anyone who joins through it is credited to you:",
-    "referralLinkAria": "Your referral link",
-    "renderFailed": "Could not render your card. Try a different pose.",
-    "renderFailedStatus": "Card render failed.",
-    "levelClass": "Level {level} - {className}",
-    "topPercent": "TOP {percent}%",
-    "realmSubtitle": "{realm} Realm",
-    "defaultRealm": "World of ClaudeCraft",
+    "shareButton": "プレイヤーカードを共有",
+    "title": "プレイヤーカード",
+    "close": "プレイヤーカードを閉じる",
+    "loading": "カードを鍛造中...",
+    "poseGroup": "ポーズ",
+    "poseHero": "英雄",
+    "poseBattle": "戦闘",
+    "poseVictory": "勝利",
+    "referralLinkLabel": "あなたの紹介リンクです。このリンクから参加した人はあなたの紹介として記録されます:",
+    "referralLinkAria": "あなたの紹介リンク",
+    "renderFailed": "カードをレンダリングできませんでした。別のポーズをお試しください。",
+    "renderFailedStatus": "カードのレンダリングに失敗しました。",
+    "levelClass": "レベル{level} - {className}",
+    "topPercent": "上位 {percent}%",
+    "realmSubtitle": "{realm} レルム",
+    "defaultRealm": "ClaudeCraftの世界",
     "brandWordmark": "WORLD OF CLAUDECRAFT",
-    "recruited": "{count} recruited",
+    "recruited": "招待 {count}人",
     "footerHandle": "@{handle}",
     "footerHandleWithRecruits": "@{handle} - {recruited}",
-    "footerCta": "Forge your legend: {siteUrl}",
-    "arenaStat": "Arena",
-    "shareTierBit": ", {tier}-rank $WOC holder",
-    "shareText": "I'm forging my legend in World of ClaudeCraft: Level {level} {className}{tierBit}. Join my realm:",
-    "nativeShareTitle": "World of ClaudeCraft",
-    "fileNameFallback": "player",
-    "actionShareX": "Share to X",
-    "actionCopyReferral": "Copy Referral Link",
-    "actionDownload": "Download",
-    "actionShareNative": "Share...",
-    "statusGenericError": "Something went wrong.",
-    "statusStillRendering": "Card is still rendering.",
-    "statusPublishing": "Publishing card...",
-    "statusPublished": "Card published. Share your referral link below.",
-    "statusOpenedXWithImage": "Opened X. Paste the card image into the post.",
-    "statusOpenedXWithLink": "Opened X with your link. The card image appears after posting from a public domain.",
-    "statusReferralCopied": "Referral link copied. Share it anywhere.",
-    "statusDownloaded": "Card downloaded.",
-    "statusShareUnsupported": "Sharing is not supported on this device."
+    "footerCta": "あなたの伝説を鍛えよう: {siteUrl}",
+    "arenaStat": "アリーナ",
+    "shareTierBit": ", {tier}ランクの$WOCホルダー",
+    "shareText": "World of ClaudeCraftで伝説を鍛えています: レベル{level} {className}{tierBit}。私のレルムに参加してください:",
+    "nativeShareTitle": "ClaudeCraftの世界",
+    "fileNameFallback": "プレイヤー",
+    "actionShareX": "Xで共有",
+    "actionCopyReferral": "紹介リンクをコピー",
+    "actionDownload": "ダウンロード",
+    "actionShareNative": "共有...",
+    "statusGenericError": "問題が発生しました。",
+    "statusStillRendering": "カードはまだレンダリング中です。",
+    "statusPublishing": "カードを公開中...",
+    "statusPublished": "カードを公開しました。下の紹介リンクを共有してください。",
+    "statusOpenedXWithImage": "Xを開きました。投稿にカード画像を貼り付けてください。",
+    "statusOpenedXWithLink": "リンク付きでXを開きました。公開ドメインから投稿すると、カード画像が表示されます。",
+    "statusReferralCopied": "紹介リンクをコピーしました。どこにでも共有できます。",
+    "statusDownloaded": "カードをダウンロードしました。",
+    "statusShareUnsupported": "このデバイスでは共有に対応していません。"
   },
   "classes": {
     "warrior": "戦士",
@@ -1861,259 +1861,259 @@ export const ja_JP: EnTranslations = {
   },
   "sim": {
     "delve": {
-      "cannotEnterNow": "You cannot enter a delve right now.",
-      "leaveDungeonFirst": "Leave the dungeon first.",
-      "leaveArenaFirst": "Leave the arena first.",
-      "alreadyInDelve": "You are already in a delve.",
-      "whileTrading": "You cannot enter a delve while trading.",
-      "duringDuel": "You cannot enter a delve during a duel.",
-      "duringArena": "You cannot enter a delve during an arena match.",
-      "unknownTier": "Unknown delve tier.",
-      "levelRequired": "You must be level {level} to enter {name}.",
-      "levelRequiredTier": "You must be level {level} to enter {name} on {tier}.",
-      "instancesBusy": "All instances of {name} are busy. Try again soon.",
-      "runFailed": "{name} run failed.",
-      "complete": "{name} complete.",
-      "mechanismOpen": "A mechanism clicks open nearby. A passage opens to the north. Find the exit portal ahead.",
-      "raiseDead": "{name} begins Raise Dead.",
-      "graveFalters": "The grave rite falters.",
-      "doorAlreadyOpen": "The door is already open.",
-      "companionRankUp": "{name} reaches rank {rank}.",
-      "bossChest": "The boss falls. A warded reliquary chest rises on the dais. Pick its lock to claim your spoils.",
-      "surfaceStairs": "A stairway to the surface opens. Press F at the stairs to leave.",
+      "cannotEnterNow": "今はデルヴに入れない。",
+      "leaveDungeonFirst": "まずダンジョンから出よ。",
+      "leaveArenaFirst": "まずアリーナから出よ。",
+      "alreadyInDelve": "あなたはすでにデルヴの中にいる。",
+      "whileTrading": "取引中はデルヴに入れない。",
+      "duringDuel": "決闘中はデルヴに入れない。",
+      "duringArena": "アリーナの試合中はデルヴに入れない。",
+      "unknownTier": "不明なデルヴの難易度だ。",
+      "levelRequired": "{name}に入るにはレベル{level}でなければならない。",
+      "levelRequiredTier": "{tier}で{name}に入るにはレベル{level}が必要だ。",
+      "instancesBusy": "{name}のすべてのインスタンスが使用中だ。しばらくしてからもう一度試せ。",
+      "runFailed": "{name}の攻略に失敗した。",
+      "complete": "{name}を踏破した。",
+      "mechanismOpen": "近くで機構がカチリと開く。北へ通路が開いた。先にある出口のポータルを探せ。",
+      "raiseDead": "{name}が死者蘇生を唱え始める。",
+      "graveFalters": "墓の儀式が乱れる。",
+      "doorAlreadyOpen": "扉はすでに開いている。",
+      "companionRankUp": "{name}がランク{rank}に達した。",
+      "bossChest": "ボスが倒れる。守りの聖遺物庫の宝箱が祭壇にせり上がる。錠を開けて戦利品を手に入れろ。",
+      "surfaceStairs": "地上への階段が開く。階段でFを押して出よ。",
       "moduleEnter": "{name}: {objective}",
-      "objectiveClearRoom": "Clear the room.",
-      "objectiveDefeatBoss": "Defeat the boss.",
-      "tombstoneHint": "A tombstone passage opens to the north when the room is cleared.",
-      "tombstoneOpen": "A sealed tombstone passage grinds open to the north. Walk into it to continue.",
-      "tombstoneInto": "You pass through the tombstone into {name}.",
-      "chestEmpty": "The chest is empty.",
-      "notInDelve": "You are not in a delve.",
-      "cannotInteract": "You cannot interact with that.",
-      "tooFar": "You are too far away.",
-      "graveSilent": "The grave is silent for now.",
-      "doorLocked": "The door is locked.",
-      "strikeWall": "Strike the wall to break through.",
-      "nothingHappens": "Nothing happens.",
-      "unknownCompanion": "Unknown companion.",
-      "companionMaxRank": "This companion is already fully upgraded.",
-      "companionMarksRequired": "You need {marks} Delve Marks to upgrade {name}.",
-      "cannotAffordCompanionUpgrade": "You cannot afford this upgrade.",
-      "shopItemLocked": "You have not unlocked that item yet.",
-      "shopMarksRequired": "You need {marks} Delve Marks to buy {name}.",
-      "shopSealPremiumOnly": "This seal yields only to a master's hand. Only the Premium ante can open it.",
-      "passageSealed": "The passage is sealed.",
-      "moveCloserPassage": "Move closer to the passage.",
-      "moveCloserChest": "Move closer to the chest.",
-      "nothingToTake": "There is nothing left to take.",
-      "wayOutNotOpen": "The way out is not yet open.",
-      "moveCloserStairs": "Move closer to the stairs."
+      "objectiveClearRoom": "部屋を制圧せよ。",
+      "objectiveDefeatBoss": "ボスを討て。",
+      "tombstoneHint": "部屋を制圧すると、北へ墓石の通路が開く。",
+      "tombstoneOpen": "封じられた墓石の通路が北へきしみながら開く。中へ歩み入って進め。",
+      "tombstoneInto": "あなたは墓石を抜けて{name}へ入る。",
+      "chestEmpty": "宝箱は空だ。",
+      "notInDelve": "あなたはデルヴの中にいない。",
+      "cannotInteract": "それとは関われない。",
+      "tooFar": "遠すぎる。",
+      "graveSilent": "墓は今のところ静まっている。",
+      "doorLocked": "扉には錠がかかっている。",
+      "strikeWall": "壁を叩いて打ち破れ。",
+      "nothingHappens": "何も起こらない。",
+      "unknownCompanion": "不明な仲間だ。",
+      "companionMaxRank": "この仲間はすでに完全に強化されている。",
+      "companionMarksRequired": "{name}を強化するにはデルヴの刻印が{marks}個必要だ。",
+      "cannotAffordCompanionUpgrade": "この強化を行う余裕がない。",
+      "shopItemLocked": "そのアイテムはまだ解放されていない。",
+      "shopMarksRequired": "{name}を購入するにはデルヴの刻印が{marks}個必要だ。",
+      "shopSealPremiumOnly": "この封印は達人の手にのみ応じる。極上の賭けだけが開くことができる。",
+      "passageSealed": "通路は封じられている。",
+      "moveCloserPassage": "通路にもっと近づけ。",
+      "moveCloserChest": "宝箱にもっと近づけ。",
+      "nothingToTake": "もう取れるものは何も残っていない。",
+      "wayOutNotOpen": "出口はまだ開いていない。",
+      "moveCloserStairs": "階段にもっと近づけ。"
     },
     "lockpick": {
-      "lockYields": "The lock yields! {tier} spoils.",
-      "tierPremium": "Premium",
-      "tierMedium": "Medium",
-      "tierLow": "Modest",
-      "alreadyInProgress": "Someone is already working the lock.",
-      "cannotPickThat": "You cannot pick that.",
-      "chooseAnte": "Choose 1, 2, or 3 picks.",
-      "noAttempt": "No lock attempt in progress.",
-      "notYours": "That is not your lock.",
-      "toolSlips": "That tool slips off this lock.",
-      "lockJammed": "The lock is jammed beyond picking. Clear the delve again for another attempt.",
-      "lastPickSnaps": "The last pick snaps. The lock jams. The chest is lost unless you clear the delve again."
+      "lockYields": "錠が開いた! {tier}の戦利品だ。",
+      "tierPremium": "極上",
+      "tierMedium": "並",
+      "tierLow": "ささやか",
+      "alreadyInProgress": "すでに誰かが錠に取りかかっている。",
+      "cannotPickThat": "それの錠は開けられない。",
+      "chooseAnte": "ピックを1本、2本、または3本選べ。",
+      "noAttempt": "進行中の解錠はない。",
+      "notYours": "それはあなたの錠ではない。",
+      "toolSlips": "その道具はこの錠から滑り落ちる。",
+      "lockJammed": "錠は開けられないほど固まっている。もう一度デルヴを踏破すれば再挑戦できる。",
+      "lastPickSnaps": "最後のピックが折れる。錠が固まった。もう一度デルヴを踏破しない限り、この宝箱は失われる。"
     }
   },
   "lockpickUi": {
-    "pickTitle": "Pick the Lock",
-    "cofferTitle": "Bountiful Coffer",
-    "cache": "{tier} Cache",
-    "pickBlurb": "A richer cache is sealed behind more locks. Easier locks give you more tries and more time; a failed try resets the lock until your tries run out.",
-    "cofferBlurb": "This seal yields only to a master's hand: the Hard, Premium path alone can open it. Solve all three locks for the signature prize.",
-    "pagesAria": "{count} locks",
-    "tries": "{count} tries",
-    "triesOne": "1 try",
-    "perMove": "{seconds}s / move",
+    "pickTitle": "錠を開ける",
+    "cofferTitle": "豊穣の宝庫",
+    "cache": "{tier}の宝庫",
+    "pickBlurb": "より豊かな宝庫ほど、多くの錠で封じられている。易しい錠ほど挑戦回数も時間も多い。失敗すると錠はリセットされ、挑戦回数が尽きるまで続く。",
+    "cofferBlurb": "この封印は達人の手にのみ応じる。難関、極上の道だけが開くことができる。3つの錠をすべて解いて至高の褒賞を手にせよ。",
+    "pagesAria": "錠{count}個",
+    "tries": "挑戦{count}回",
+    "triesOne": "挑戦1回",
+    "perMove": "1手あたり{seconds}秒",
     "seconds": "{seconds}s",
-    "boardTitle": "Tumbler's Path: {tier} cache",
-    "closeAria": "Close",
-    "withdrawAria": "Withdraw",
-    "timerAria": "Time remaining",
-    "lockOf": "Lock {page}/{total}",
-    "lockOfAria": "Lock {page} of {total}",
-    "triesOf": "Tries {tries}/{total}",
-    "triesOfAria": "{tries} of {total} tries left",
-    "ward": "Ward {col} / {total}",
-    "depthKeys": "Hotkeys set pick depth (Q/W/E/A/Z), not the ward number.",
-    "withdraw": "Withdraw (Esc)",
+    "boardTitle": "錠前の道: {tier}の宝庫",
+    "closeAria": "閉じる",
+    "withdrawAria": "手を引く",
+    "timerAria": "残り時間",
+    "lockOf": "錠 {page}/{total}",
+    "lockOfAria": "錠 {page}/{total}",
+    "triesOf": "挑戦 {tries}/{total}",
+    "triesOfAria": "残り挑戦 {tries}/{total}",
+    "ward": "ウォード {col}/{total}",
+    "depthKeys": "ホットキーはピックの深さ（Q/W/E/A/Z）を設定します。ウォード番号ではありません。",
+    "withdraw": "手を引く (Esc)",
     "action": {
-      "hardSet": "Hard Set",
-      "set": "Set",
-      "steady": "Steady",
-      "ease": "Ease",
-      "drop": "Drop"
+      "hardSet": "強く押し込む",
+      "set": "押し込む",
+      "steady": "保つ",
+      "ease": "緩める",
+      "drop": "離す"
     },
     "feedback": {
-      "advanced": "The pin gives...",
-      "slip": "A ward bites, the pick slips!",
-      "bind": "The tumbler binds: wrong depth!",
-      "trap": "A false ward snaps shut, the lock jams!",
-      "retry": "The lock resets. Line up a fresh attempt.",
-      "pageCleared": "A tumbler bank falls. The next lock turns up.",
-      "success": "The bolt throws, the cache is yours!",
-      "fail": "The lock seizes. It won't budge again."
+      "advanced": "ピンが動いた……",
+      "slip": "ウォードが食い込み、ピックが滑る!",
+      "bind": "タンブラーが噛む: 深さが違う!",
+      "trap": "偽のウォードが弾けて閉じ、錠が固まる!",
+      "retry": "錠がリセットされる。改めて狙いを定めろ。",
+      "pageCleared": "タンブラー列が落ちる。次の錠が現れる。",
+      "success": "閂が外れた、宝庫はあなたのものだ!",
+      "fail": "錠が固まった。もう二度と動かない。"
     },
     "summary": {
-      "success": "Lock sprung, {tier} cache claimed.",
-      "successGeneric": "Lock sprung, the cache is claimed.",
-      "fail": "The lock is ruined. Clear the delve again for another attempt.",
-      "abandoned": "You ease the picks back out. The lock waits."
+      "success": "錠が開いた。{tier}の宝庫を獲得。",
+      "successGeneric": "錠が開いた。宝庫を獲得。",
+      "fail": "錠が壊れた。もう一度デルヴを踏破すれば再挑戦できる。",
+      "abandoned": "あなたはピックをそっと引き抜く。錠は待っている。"
     }
   },
   "delveUi": {
     "board": {
-      "title": "Delve Board",
-      "enter": "Enter Delve",
-      "enterAria": "Enter {delve} on {tier} difficulty",
-      "openDelve": "Collapsed Reliquary",
-      "openDelveAria": "Open Delve Board from {name}",
-      "marks": "Delve Marks: {count}",
-      "minLevel": "Requires Level {level}",
+      "title": "デルヴボード",
+      "enter": "デルヴに入る",
+      "enterAria": "{tier}難易度で{delve}に入る",
+      "openDelve": "崩れた聖遺物庫",
+      "openDelveAria": "{name}からデルヴボードを開く",
+      "marks": "デルヴの刻印: {count}",
+      "minLevel": "必要レベル{level}",
       "tier": {
-        "normal": "Normal",
-        "heroic": "Heroic"
+        "normal": "ノーマル",
+        "heroic": "ヒロイック"
       },
       "companion": {
-        "pick": "Choose a companion",
-        "tessa": "Acolyte Tessa",
-        "rank": "Rank {rank}",
-        "boon": "Heals the party between fights. Rank 3 revives a fallen ally once per run.",
-        "upgrade": "Upgrade to Rank {rank} ({marks} Marks)",
-        "upgradeAria": "Upgrade {name} to rank {rank} for {marks} Delve Marks",
-        "maxRank": "Fully upgraded"
+        "pick": "仲間を選ぶ",
+        "tessa": "侍祭テッサ",
+        "rank": "ランク{rank}",
+        "boon": "戦闘の合間にパーティを回復する。ランク3ではデルヴごとに一度、倒れた仲間を蘇生する。",
+        "upgrade": "ランク{rank}に強化（刻印{marks}個）",
+        "upgradeAria": "デルヴの刻印{marks}個で{name}をランク{rank}に強化",
+        "maxRank": "最大ランク"
       },
-      "tabDelve": "Delve",
-      "tabShop": "Shop"
+      "tabDelve": "デルヴ",
+      "tabShop": "ショップ"
     },
     "shop": {
-      "price": "{marks} Marks",
-      "buy": "Buy",
-      "buyAria": "Buy {item} for {marks} Delve Marks",
-      "reqHeroic": "Requires a Heroic clear",
-      "reqClears": "Requires {count} clears",
-      "empty": "Nothing in stock."
+      "price": "刻印{marks}個",
+      "buy": "購入",
+      "buyAria": "デルヴの刻印{marks}個で{item}を購入",
+      "reqHeroic": "ヒロイッククリアが必要",
+      "reqClears": "{count}回のクリアが必要",
+      "empty": "在庫がありません。"
     },
     "tracker": {
-      "title": "Delve",
-      "objective": "Objective",
-      "module": "Module {current} of {total}",
-      "affix": "Affixes",
-      "complete": "Complete",
-      "marks": "Delve Marks: {count}",
-      "exitHintOpen": "Walk into the tombstone passage (north)",
-      "exitHintLocked": "Clear trash mobs to open the passage north"
+      "title": "デルヴ",
+      "objective": "目標",
+      "module": "モジュール {current}/{total}",
+      "affix": "アフィックス",
+      "complete": "完了",
+      "marks": "デルヴの刻印: {count}",
+      "exitHintOpen": "墓石の通路へ歩み入れ(北)",
+      "exitHintLocked": "雑魚を一掃して北の通路を開け"
     },
     "objective": {
-      "kill_boss": "Slay {boss}",
-      "recover_artifact": "Recover the burial ledger",
-      "clear_room": "Clear the room"
+      "kill_boss": "{boss}を討て",
+      "recover_artifact": "埋葬台帳を取り戻せ",
+      "clear_room": "部屋を制圧せよ"
     },
     "summary": {
-      "title": "Delve Complete",
-      "marks": "{count} Delve Marks earned",
-      "loreUnlock": "Lore unlocked: {title}"
+      "title": "デルヴ踏破",
+      "marks": "デルヴの刻印を{count}個獲得",
+      "loreUnlock": "記録解放: {title}"
     },
     "death": {
-      "warning": "One more death will end this delve run."
+      "warning": "あと一度死ねば、このデルヴの攻略は終わりです。"
     },
     "run": {
-      "failed": "The delve run has failed. You are returned to Brother Halven."
+      "failed": "デルヴの攻略に失敗した。ハルヴェン修道士のもとへ戻される。"
     },
     "npc": {
       "halven": {
-        "greeting": "The reliquary below has shifted again. We hear chanting through the floor after midnight, and Acolyte Tessa swears the burial ledgers are changing their own ink. If you have courage enough, {playerName}, take a candle and go below. Do not trust every voice you hear down there. Some of them knew your name before you were born."
+        "greeting": "下の聖遺物庫がまた動いた。真夜中を過ぎると床越しに詠唱が聞こえ、侍祭テッサは埋葬台帳が自らインクを書き換えていると言って譲らぬ。勇気があるなら、{playerName}、蝋燭を持って下りてくれ。そこで聞こえる声をすべて信じるな。その中には、お前が生まれる前からお前の名を知っていた者もいる。"
       }
     },
     "intro": {
-      "normal": "The stairwell is cold and dark. Broken saint-stones litter the descent, and a soft bell note hangs in the damp air. Acolyte Tessa whispers, \"The reliquary should not be open this far. Stay close, {playerName}.\"",
-      "heroic": "The doors groan shut behind you. Names scrape across the stone like fingernails. Tessa's candle burns blue. \"They are not calling the dead now, {playerName}. They are answering something.\""
+      "normal": "階段は冷たく暗い。砕けた聖人の石が下りの道に散らばり、湿った空気にかすかな鐘の音が漂う。侍祭テッサがささやく。「聖遺物庫がこんな下まで開いているはずがありません。離れずに、{playerName}。」",
+      "heroic": "扉があなたの背後でうめきながら閉じる。名前が爪のように石を引っかいていく。テッサの蝋燭が青く燃える。「今、彼らが呼んでいるのは死者ではありません、{playerName}。何かに応えているのです。」"
     },
     "module": {
-      "reliquary_sunken_ossuary": "Water seeps through burial shelves, carrying old ash in silver-black streams.",
-      "reliquary_bell_niche": "Dozens of handbells hang in silence, each tied with funeral cloth.",
-      "reliquary_saintless_hall": "Statues with faces chiseled away with careful hatred.",
-      "reliquary_finale": "The buried bell tolls once beneath your boots."
+      "reliquary_sunken_ossuary": "水が埋葬棚から染み出し、古い灰を銀黒の流れとなって運んでいく。",
+      "reliquary_bell_niche": "数十の手鐘が静寂の中に吊られ、それぞれに葬儀の布が結ばれている。",
+      "reliquary_saintless_hall": "丹念な憎しみで顔を削り取られた像の数々。",
+      "reliquary_finale": "埋もれた鐘が、あなたのブーツの下で一度だけ鳴る。"
     },
     "moduleName": {
-      "reliquary_sunken_ossuary": "The Sunken Ossuary",
-      "reliquary_bell_niche": "The Bell Niche",
-      "reliquary_saintless_hall": "The Saintless Hall",
-      "reliquary_finale": "The Bell-Buried Chamber"
+      "reliquary_sunken_ossuary": "沈んだ納骨堂",
+      "reliquary_bell_niche": "鐘の壁龕",
+      "reliquary_saintless_hall": "聖人なき広間",
+      "reliquary_finale": "鐘を埋めし聖堂"
     },
     "companion": {
       "barkLine": "{name}: {line}",
       "tessa": {
-        "combat_start": "Keep your footing, {playerName}. The dead are restless here.",
-        "low_hp": "Breathe. I still have prayers left for you.",
-        "trap_spotted": "Hold. Something in the floor remembers footsteps.",
-        "boss_pull": "That bell knows your weight, {playerName}. Do not kneel.",
-        "completion": "The ledger can rest another night. Well done.",
+        "combat_start": "足元に気をつけて、{playerName}。ここの死者は安らいでいません。",
+        "low_hp": "息をして。あなたのための祈りはまだ残っています。",
+        "trap_spotted": "待って。床の何かが足音を覚えています。",
+        "boss_pull": "あの鐘はあなたの重みを知っている、{playerName}。跪いてはいけません。",
+        "completion": "台帳もまた一晩は眠れるでしょう。お見事です。",
         "rank": {
-          "1": "Chapel Novice",
-          "2": "Candle-Bearer",
-          "3": "Reliquary Acolyte",
-          "4": "Gravecall Witness",
-          "5": "Chapel Warden"
+          "1": "礼拝堂の見習い",
+          "2": "蝋燭持ち",
+          "3": "聖遺物庫の侍祭",
+          "4": "墓呼びの証人",
+          "5": "礼拝堂の守護者"
         }
       }
     },
     "boss": {
       "varric": {
         "bell": {
-          "emote": "Deacon Varric grips the buried bell with both hands!",
-          "log": "Deacon Varric begins to toll the burial bell.",
-          "warning": "Move away from Deacon Varric!",
-          "impact": "The bell's toll cracks the chamber floor!",
-          "lesson": "Bell Toll: a ground slam every twelve seconds. Move out before it lands."
+          "emote": "助祭ヴァリックが埋もれた鐘を両手で握りしめる!",
+          "log": "助祭ヴァリックが埋葬の鐘を鳴らし始める。",
+          "warning": "助祭ヴァリックから離れろ!",
+          "impact": "鐘の音が広間の床を砕く!",
+          "lesson": "鐘の弔鐘。12秒ごとに地面を叩きつける。着弾する前に離れろ。"
         },
         "raise": {
-          "emote": "Deacon Varric calls names from the broken graves!",
-          "log": "Deacon Varric begins Raise Dead.",
-          "warning": "Stop the grave rite!",
-          "object": "The cracked grave shudders with stolen breath.",
-          "interrupt_ok": "The grave rite falters.",
-          "interrupt_fail": "The dead answer Deacon Varric's call!",
-          "lesson": "Interrupt the cracked grave within five seconds or the dead rise to his call."
+          "emote": "助祭ヴァリックが砕けた墓から名を呼ぶ!",
+          "log": "助祭ヴァリックが死者蘇生を唱え始める。",
+          "warning": "墓の儀式を止めろ!",
+          "object": "砕けた墓が奪われた息吹で震える。",
+          "interrupt_ok": "墓の儀式が乱れる。",
+          "interrupt_fail": "死者が助祭ヴァリックの呼び声に応える!",
+          "lesson": "5秒以内に砕けた墓を妨害しなければ、死者が彼の呼び声に応えて立ち上がる。"
         },
-        "pull": "You step on hallowed dust with unclean purpose. Kneel, and be counted.",
-        "intro": "No soul is lost. Only misplaced.",
-        "mid60": "Deacon Varric reads names from the ledger with shaking triumph.",
-        "mid30": "The burial bell answers every name he speaks.",
-        "defeat": "No... I had the names... I had them all..."
+        "pull": "汚れた目的で聖なる塵を踏むか。跪き、名を数えられよ。",
+        "intro": "失われた魂などない。ただ置き忘れられただけだ。",
+        "mid60": "助祭ヴァリックは震える勝ち誇りとともに台帳から名を読み上げる。",
+        "mid30": "埋葬の鐘が、彼が口にするすべての名に応える。",
+        "defeat": "そんな……名簿は揃っていたのに……すべて揃っていたのに……"
       }
     },
     "lore": {
-      "eastbrook_ledger": "A water-stained page from Eastbrook's burial ledger. Names crossed out and rewritten in a hand that is not human.",
-      "first_collapse": "Chapel records note the first sinkage: saint-stones cracked, shelves tilted, and a bell-note heard from below ground.",
-      "gravecaller_mark": "A sigil scraped into coffin wood, not Morthen's seal, but an older gravecaller mark predating the Hollow Crypt.",
-      "bell_below": "Tessa's margin note: \"There is a second bell under the reliquary. It tolls for the misplaced, not the dead.\"",
-      "tessa_note": "Folded scrap in Tessa's script: \"If the ledgers change while we are below, trust the candle, not the voices.\""
+      "eastbrook_ledger": "イーストブルックの埋葬台帳の、水染みのついた一葉。人のものではない筆跡で、名が消され、書き直されている。",
+      "first_collapse": "礼拝堂の記録は最初の陥没を記す。聖人の石が砕け、棚が傾き、地の底から鐘の音が聞こえた、と。",
+      "gravecaller_mark": "棺の木に刻まれた紋章。モーセンの印ではなく、虚ろの墓所よりも古い墓呼びの印だ。",
+      "bell_below": "テッサの欄外の書き込み。「聖遺物庫の下にもう一つの鐘がある。死者のためではなく、置き忘れられた者のために鳴る。」",
+      "tessa_note": "テッサの筆跡で折りたたまれた紙片。「私たちが地下にいる間に台帳が変わったなら、声ではなく蝋燭を信じなさい。」"
     },
     "affix": {
-      "restless_graves": "Restless Graves",
-      "bad_air": "Bad Air",
-      "candleblind": "Candleblind",
-      "old_mechanisms": "Old Mechanisms",
-      "flooded_paths": "Flooded Paths",
-      "grave_tax": "Grave Tax",
-      "unstable_roof": "Unstable Roof",
-      "cult_remnants": "Cult Remnants"
+      "restless_graves": "安らげぬ墓",
+      "bad_air": "淀んだ空気",
+      "candleblind": "蝋燭の眩惑",
+      "old_mechanisms": "古びた機構",
+      "flooded_paths": "水没した通路",
+      "grave_tax": "墓の徴収",
+      "unstable_roof": "崩れかけた天井",
+      "cult_remnants": "カルトの残党"
     },
     "blessing": {
-      "chapel_candle": "Chapel Candle: safer run, one fewer Mark on completion."
+      "chapel_candle": "礼拝堂の蝋燭。より安全な攻略になるが、踏破時の刻印が1つ減る。"
     },
     "chest": {
-      "flavor": "The dead have surrendered what they can spare."
+      "flavor": "死者たちが、譲れるものを差し出した。"
     }
   },
   "fiesta": {
@@ -2290,8 +2290,8 @@ export const ja_JP: EnTranslations = {
     "playMode": "マルチプレイヤー",
     "applicationCategory": "ゲーム",
     "operatingSystem": "Webブラウザ",
-    "officialLabel": "Official World of ClaudeCraft website",
-    "officialBody": "worldofclaudecraft.com is the official free browser MMO for the Claudemoon realm. Play online with a persistent character, explore solo offline, read the wiki, and follow verified community links from this site."
+    "officialLabel": "World of ClaudeCraft 公式サイト",
+    "officialBody": "worldofclaudecraft.com は Claudemoon レルムの公式無料ブラウザMMOです。永続キャラクターでオンラインプレイし、オフラインでソロ探索し、wikiを読み、このサイトから確認済みのコミュニティリンクをたどれます。"
   },
   "a11y": {
     "goHome": "ホームへ移動",
@@ -2340,12 +2340,12 @@ export const ja_JP: EnTranslations = {
       "deleteConfirm": "削除を確認するにはキャラクター名を入力してください。",
       "notAuthenticated": "認証されていません。",
       "accountBanned": "このアカウントは利用停止されています。",
-      "webLoginOnly": "Logins are only allowed from the game client.",
+      "webLoginOnly": "ログインはゲームクライアントからのみ可能です。",
       "accountSuspended": "このアカウントは {date} まで停止されています。",
       "alreadyInWorld": "キャラクターは既に世界にいます。",
-      "takenOver": "Your character was taken over by another session.",
+      "takenOver": "あなたのキャラクターは別のセッションに引き継がれました。",
       "renameBeforeEntering": "このキャラクターは世界に入る前に名前変更が必要です。",
-      "renameNotPermitted": "Renaming this character is not allowed."
+      "renameNotPermitted": "このキャラクターの名前変更は許可されていません。"
     }
   },
   "realm": {
@@ -2360,11 +2360,11 @@ export const ja_JP: EnTranslations = {
     "high": "高",
     "medium": "中",
     "low": "低",
-    "popTipLow": "Low population: fewer than 15 players online right now. Plenty of room; great for a fresh start.",
-    "popTipMedium": "Medium population: 15 to 39 players online right now. A healthy, active realm.",
-    "popTipHigh": "High population: 40 to 79 players online right now. Busy, with lots of players around.",
-    "popTipFull": "Full population: 80 or more players online right now. Very busy; you may wait in a login queue.",
-    "popTipOffline": "Offline: this realm is unreachable right now and cannot be joined.",
+    "popTipLow": "低人口：現在オンラインのプレイヤーは15人未満。余裕があり、新規スタートに最適です。",
+    "popTipMedium": "中人口：現在オンラインのプレイヤーは15〜39人。健全で活発なレルムです。",
+    "popTipHigh": "高人口：現在オンラインのプレイヤーは40〜79人。混雑しており、多くのプレイヤーがいます。",
+    "popTipFull": "満員：現在オンラインのプレイヤーは80人以上。非常に混雑しており、ログイン待ちが発生する場合があります。",
+    "popTipOffline": "オフライン：このレルムは現在接続できず、参加できません。",
     "characterCountOne": "{count}キャラクター",
     "characterCountOther": "{count}キャラクター",
     "selectedRealm": "レルム: {name}",
@@ -2376,9 +2376,9 @@ export const ja_JP: EnTranslations = {
     "noneYet": "まだキャラクターがいません。下で作成してください。",
     "levelClass": "レベル{level} {className}",
     "inWorld": "世界にいます",
-    "takeOver": "Take Over",
-    "inWorldHint": "Already in world. Log out elsewhere, or take over.",
-    "takeOverConfirm": "This will disconnect this character from another session and bring it here. Continue?",
+    "takeOver": "引き継ぐ",
+    "inWorldHint": "すでに世界にいます。別の場所からログアウトするか、引き継いでください。",
+    "takeOverConfirm": "このキャラクターを別のセッションから切断し、こちらに移します。続けますか？",
     "renameRequired": "名前変更が必要",
     "delete": "削除",
     "rename": "名前変更",
@@ -2395,13 +2395,13 @@ export const ja_JP: EnTranslations = {
     "viewProfile": "プロフィールを見る",
     "profile": "プロフィール",
     "closeProfile": "プロフィールを閉じる",
-    "sortBy": "Sort",
-    "sortByLabel": "Sort characters",
-    "sortMenuLabel": "Sort options",
-    "sortLevel": "Level",
-    "sortName": "Name",
-    "sortRecent": "Recently Played",
-    "sortPlaytime": "Playtime"
+    "sortBy": "並べ替え",
+    "sortByLabel": "キャラクターを並べ替え",
+    "sortMenuLabel": "並べ替えオプション",
+    "sortLevel": "レベル",
+    "sortName": "名前",
+    "sortRecent": "最近プレイ",
+    "sortPlaytime": "プレイ時間"
   },
   "woc": {
     "linkWalletFirst": "Connect and link a Solana wallet to pay with $WOC.",
@@ -2432,7 +2432,7 @@ export const ja_JP: EnTranslations = {
     "labels": {
       "strength": "筋力",
       "agility": "敏捷性",
-      "stamina": "耐久力",
+      "stamina": "スタミナ",
       "intellect": "知力",
       "spirit": "精神力",
       "resource": "リソース",
@@ -2479,7 +2479,7 @@ export const ja_JP: EnTranslations = {
       "warlock": "ウォーロックは悪魔を召喚し、呪いと継続ダメージ魔法をかけ、生命力を吸収して耐えます。",
       "druid": "ドルイドは自然の力を導き、傷を癒やし、敵を絡め取り、動物形態に変身して守りまたは攻めます。"
     },
-    "aria": "{className}のクラス詳細: 役割 {role}。開始ステータス: 筋力 {str}、敏捷性 {agi}、耐久力 {sta}、知力 {int}、精神力 {spi}。",
+    "aria": "{className}のクラス詳細: 役割 {role}。開始ステータス: 筋力 {str}、敏捷性 {agi}、スタミナ {sta}、知力 {int}、精神力 {spi}。",
     "statBarAria": "{stat}: {value}/25"
   },
   "mobilePreflight": {
@@ -2532,7 +2532,7 @@ export const ja_JP: EnTranslations = {
       "releaseSpirit": "霊魂を解放",
       "chatTab": "チャット",
       "combatLogTab": "戦闘ログ",
-      "chatPlaceholder": "発言する... (/w 名前 ささやき、/r 返信、/p パーティ、/gu ギルド、/o オフィサー、/general 一般)",
+      "chatPlaceholder": "発言する... (/s 発言、/w 名前 ささやき、/r 返信、/p パーティ、/gu ギルド、/o オフィサー、/general 一般、/help)",
       "chatChannels": {
         "add": "チャットチャンネルを追加",
         "addTitle": "チャンネルを追加",
@@ -2552,7 +2552,7 @@ export const ja_JP: EnTranslations = {
       "communityLinks": "コミュニティリンク",
       "mobileControls": "モバイル操作",
       "mobileMove": "移動",
-      "mobileCamera": "カメラ",
+      "mobileCamera": "カメラ（ダブルタップで中央に戻す）",
       "mobileAttack": "攻撃",
       "mobileTarget": "ターゲット",
       "mobileChat": "チャット",
@@ -2567,78 +2567,108 @@ export const ja_JP: EnTranslations = {
       "closeMap": "マップを閉じる",
       "zoomIn": "ズームイン",
       "zoomOut": "ズームアウト",
-      "mapCanvasLabel": "Map",
-      "mapSummary": "Map of {zone}."
+      "mapCanvasLabel": "マップ",
+      "mapSummary": "{zone}のマップ。"
     },
     "mounts": {
-      "title": "Mounts",
-      "subtitle": "$WOC Travel Steeds",
-      "close": "Close mounts",
-      "summon": "Summon",
-      "dismount": "Dismount",
-      "summoning": "Summoning {name}…",
-      "riding": "Riding",
-      "flies": "Flies",
-      "locked": "Locked",
-      "speed": "+{percent}% speed",
-      "unlockAt": "Unlocks at {amount} $WOC",
-      "supplyShare": "{percent} of supply",
-      "qualifyHeader": "You qualify for {count} of {total} travel mounts.",
-      "holdingHint": "Holding {amount} $WOC.",
-      "noWallet": "Hold at least {amount} $WOC — 0.1% of supply — on a linked wallet to earn your first travel mount.",
-      "cantInCombat": "You can't mount while in combat.",
-      "cantSwimming": "You can't mount while swimming.",
-      "cantDead": "You can't mount while dead.",
-      "notEligible": "Your $WOC holdings don't reach that steed yet.",
-      "summonedBanner": "You summon {name}.",
-      "summonAria": "Summon {name}",
-      "dismountAria": "Dismount {name}",
-      "lockedAria": "{name} — locked; unlocks at {amount} $WOC",
-      "activeAria": "{name} — currently active",
+      "title": "マウント",
+      "subtitle": "$WOC 旅の駿馬",
+      "close": "マウントを閉じる",
+      "summon": "召喚",
+      "dismount": "降りる",
+      "summoning": "{name}を召喚中…",
+      "riding": "騎乗中",
+      "flies": "飛行可能",
+      "locked": "未解放",
+      "speed": "+{percent}% 速度",
+      "unlockAt": "{amount} $WOC で解放",
+      "supplyShare": "総供給量の{percent}",
+      "qualifyHeader": "あなたは{total}体中{count}体の旅マウントの資格を満たしています。",
+      "holdingHint": "{amount} $WOC を保有中。",
+      "noWallet": "連携した財布で少なくとも{amount} $WOC、総供給量の0.1%を保有して、最初の旅マウントを手に入れましょう。",
+      "cantInCombat": "戦闘中は騎乗できません。",
+      "cantSwimming": "水泳中は騎乗できません。",
+      "cantDead": "死亡中は騎乗できません。",
+      "notEligible": "あなたの $WOC 保有量はまだその駿馬に届きません。",
+      "summonedBanner": "{name}を召喚した。",
+      "summonAria": "{name}を召喚",
+      "dismountAria": "{name}から降りる",
+      "lockedAria": "{name} — 未解放。{amount} $WOC で解放",
+      "activeAria": "{name} — 現在使用中",
       "cardAria": "{name}: {flavor}",
-      "owned": "Owned",
-      "mint": "Mint Charter",
-      "mintHint": "Strike a tradeable Charter for this mount — sell it for gold so a non-holder can earn it.",
-      "mintAria": "Mint a tradeable Charter for {name}",
-      "mintedBanner": "You strike a Charter for {name}.",
-      "earnedBanner": "You have earned {name} — it is yours for good.",
-      "alreadyOwnErr": "You already own that mount.",
-      "charterVoidErr": "That Charter is void.",
-      "noCharterErr": "No Charter can be struck for that mount.",
-      "holdingsShortErr": "Your holdings do not cover that mount."
+      "owned": "所有済み",
+      "mint": "チャーターを発行",
+      "mintHint": "このマウントの取引可能なチャーターを打ち出す — ゴールドで売れば、非保有者がそれを手に入れられます。",
+      "mintAria": "{name}の取引可能なチャーターを発行",
+      "mintedBanner": "{name}のチャーターを打ち出した。",
+      "earnedBanner": "{name}を獲得した — 永久にあなたのものだ。",
+      "alreadyOwnErr": "そのマウントはすでに所有しています。",
+      "charterVoidErr": "そのチャーターは無効です。",
+      "noCharterErr": "そのマウントにはチャーターを打ち出せません。",
+      "holdingsShortErr": "あなたの保有量ではそのマウントに届きません。"
     },
     "course": {
-      "skytrials": "Skytrials",
-      "skytrialsHint": "Fly a timed ring course on a flying mount.",
-      "needFlyer": "Summon a flying mount to fly Skytrials.",
-      "start": "Fly",
-      "give_up": "Give up",
-      "par": "Par {time}",
-      "laps": "{count} laps",
-      "onePass": "1 lap",
-      "starting": "Fly through the first ring to start the clock",
-      "gate": "Ring {n}/{total}",
-      "lap": "Lap {n}/{total}",
-      "time": "Time",
-      "finish": "Finish!",
-      "beatPar": "Beat par by {time}",
-      "offPar": "{time} off par",
-      "failed": "Run ended — you left your mount",
-      "aborted": "Run abandoned",
-      "best": "Best {time}",
-      "newBest": "New best!",
-      "board": "Board",
-      "boardTitle": "{name} — top times",
-      "noTimes": "No times yet — be the first.",
-      "loadingBoard": "Loading…",
-      "you": "(you)",
-      "race": "Race",
-      "racePartyHint": "Race your party — first through the rings wins.",
-      "getReady": "Get ready",
+      "skytrials": "スカイトライアル",
+      "skytrialsHint": "飛行マウントでタイム制のリングコースを飛びます。",
+      "needFlyer": "スカイトライアルを飛ぶには飛行マウントを召喚してください。",
+      "start": "飛ぶ",
+      "give_up": "あきらめる",
+      "par": "基準タイム {time}",
+      "laps": "{count}周",
+      "onePass": "1周",
+      "starting": "最初のリングを通り抜けて計測を開始",
+      "gate": "リング {n}/{total}",
+      "lap": "ラップ {n}/{total}",
+      "time": "タイム",
+      "finish": "フィニッシュ！",
+      "beatPar": "基準タイムを {time}短縮",
+      "offPar": "基準タイムから {time} 遅れ",
+      "failed": "走行終了 — マウントを離れました",
+      "aborted": "走行を放棄しました",
+      "best": "ベスト {time}",
+      "newBest": "自己ベスト更新！",
+      "board": "ボード",
+      "boardTitle": "{name} — トップタイム",
+      "noTimes": "まだ記録がありません — 最初の一人になろう。",
+      "loadingBoard": "読み込み中…",
+      "you": "(あなた)",
+      "race": "レース",
+      "racePartyHint": "パーティと競争 — 最初にリングを抜けた者が勝つ。",
+      "getReady": "準備せよ",
       "go": "GO!",
-      "dnf": "DNF",
-      "placeOf": "#{place} of {total}",
-      "racing": "Racing"
+      "dnf": "リタイア",
+      "placeOf": "{total}人中 #{place}位",
+      "racing": "レース中"
+    },
+    "wager": {
+      "start": "賭けレース",
+      "title": "賭けレース",
+      "inviteGold": "{name}が賭けレースを開いた — 参加には{money}を賭ける。応じるか？",
+      "inviteCharter": "{name}が賭けレースを開いた — {money}＋マウントチャーターを賭ける。応じるか？",
+      "accept": "賭けに応じる",
+      "pot": "賞金 {money}",
+      "potCharter": "賞金{money}＋チャーター{count}×",
+      "racers": "レーサー（{count}）",
+      "launch": "レース開始",
+      "cancel": "キャンセル",
+      "leave": "退出",
+      "waiting": "賭けに応じる挑戦者を待っています…",
+      "won": "賭けに勝った — {money}！",
+      "wonCharter": "賭けに勝った — {money}＋チャーター{count}×！",
+      "lost": "賭けに負けた。",
+      "refunded": "賭けは取りやめ — あなたの賭け金は返還された。",
+      "antePrompt": "このレースにゴールドをいくら賭けますか？（カッパー単位）",
+      "open": "賭けを開く",
+      "stakeCharter": "マウントチャーターも賭ける（勝者が獲得）",
+      "errCourse": "そのコースでは賭けられません。",
+      "errFlyer": "賭けるには飛行マウントに乗っていなければなりません。",
+      "errBusy": "あなたはすでに賭けの最中です。",
+      "errAnte": "少なくとも1カッパーの賭けを指定してください。",
+      "errStake": "それは賭けに出せません。",
+      "errAfford": "その賭けを賄えません。",
+      "errExpired": "その賭けの申し出は期限切れです。",
+      "errGone": "その賭けはもう開かれていません。",
+      "errHost": "賭けを開始できるのはホストのみです。"
     },
     "options": {
       "gameMenu": "ゲームメニュー",
@@ -2646,7 +2676,7 @@ export const ja_JP: EnTranslations = {
       "graphics": "グラフィック",
       "audio": "オーディオ",
       "interface": "インターフェース",
-      "language": "Language",
+      "language": "言語",
       "logout": "ログアウト",
       "returnToGame": "ゲームに戻る",
       "resetToDefaults": "初期設定に戻す",
@@ -2796,8 +2826,8 @@ export const ja_JP: EnTranslations = {
         "unignoreChat": "チャット無視解除",
         "report": "プレイヤーを通報",
         "removeParty": "パーティから外す",
-        "convertToRaid": "Convert to raid",
-        "convertToParty": "Convert to party",
+        "convertToRaid": "レイドに変換",
+        "convertToParty": "パーティに変換",
         "cancel": "キャンセル"
       }
     },
@@ -2839,7 +2869,7 @@ export const ja_JP: EnTranslations = {
     "combat": {
       "floatingMiss": "ミス",
       "floatingDodge": "回避",
-      "floatingResist": "Resist",
+      "floatingResist": "抵抗",
       "cannotMove": "動けない！",
       "attack": "攻撃",
       "damageDone": "{ability}が{target}に命中し、{amount}のダメージ。",
@@ -2848,7 +2878,7 @@ export const ja_JP: EnTranslations = {
       "damageTakenCrit": "{source}からクリティカルで{amount}のダメージを受けました。",
       "miss": "{ability}は{target}に外れました。",
       "dodged": "{target}は{ability}を回避しました。",
-      "resisted": "Your {ability} is resisted by {target}.",
+      "resisted": "{target}は{ability}に抵抗しました。",
       "healSelf": "{ability}が自分を{amount}回復しました。",
       "healSelfCrit": "{ability}が自分をクリティカルで{amount}回復しました。",
       "healOther": "{ability}が{target}を{amount}回復しました。",
@@ -2893,10 +2923,10 @@ export const ja_JP: EnTranslations = {
       "targetMustDodge": "対象が先に回避する必要があります。",
       "requiresCombo": "その能力にはコンボポイントが必要です。",
       "requiresForm": "{form}フォームである必要があります。",
-      "cantInForm": "You can't do that in {form} Form.",
+      "cantInForm": "{form}フォーム中は実行できません。",
       "bear": "熊",
-      "cat": "猫",
-      "travel": "Travel",
+      "cat": "狼",
+      "travel": "トラベル",
       "shapeshifted": "変身中は実行できません。",
       "stealthed": "ステルス状態である必要があります。",
       "inCombat": "戦闘中は実行できません。",
@@ -2918,10 +2948,10 @@ export const ja_JP: EnTranslations = {
       "whisperAmbiguous": "「{name}」に一致するプレイヤーが複数います。正確な大文字小文字を使ってください。",
       "whisperMissing": "「{name}」というオンラインプレイヤーはいません。",
       "whisperSelf": "自分に向かってつぶやきます。誰にも聞こえません。",
-      "assistSelf": "You can't assist yourself.",
-      "assistNoTarget": "{name} has no target.",
-      "assistWhom": "Assist whom? Target a player or use /assist <name>.",
-      "assisting": "Assisting {name}.",
+      "assistSelf": "自分をアシストすることはできません。",
+      "assistNoTarget": "{name} はターゲットを持っていません。",
+      "assistWhom": "誰をアシストしますか？プレイヤーをターゲットするか、/assist <name> を使用してください。",
+      "assisting": "{name} をアシストします。",
       "notInParty": "パーティに入っていません。",
       "unknownCommand": "不明なコマンド: {command}。/s /y /w /p /g を試してください。",
       "chatCooldown": "チャットはあと{seconds}秒クールダウン中です。",
@@ -2966,29 +2996,29 @@ export const ja_JP: EnTranslations = {
       "lootReceiveMoney": "{money}を受け取りました。",
       "lootMoney": "{money}を拾いました。",
       "soldItem": "{item}を{money}で売却しました。",
-      "soldJunkOne": "Sold {count} junk item for {money}.",
-      "soldJunkMany": "Sold {count} junk items for {money}.",
+      "soldJunkOne": "不要品{count}個を{money}で売却しました。",
+      "soldJunkMany": "不要品{count}個を{money}で売却しました。",
       "friendOnline": "{name}がオンラインになりました。",
       "friendOffline": "{name}がオフラインになりました。"
     },
     "tutorial": {
-      "title": "New Adventurer",
-      "stepLabel": "Step {current} of {total}",
-      "skip": "Skip Tutorial",
-      "dismiss": "Dismiss",
-      "doneTitle": "Ready for Adventure",
-      "doneBody": "You have the basics, {name}. The Vale is yours to explore. Press {questKey} anytime to review your quests. Good hunting.",
-      "moveTitle": "Find Your Footing",
-      "moveBody": "Use {moveKeys} to move and the mouse to look around. Take a few steps to begin.",
-      "seekTitle": "Seek the Marshal",
-      "seekBody": "Marshal Redbrook waits in town and has work for a new blade. Follow the marker to reach him.",
-      "talkTitle": "Take the Task",
-      "talkBody": "Stand close to Marshal Redbrook and press {interactKey} to speak, then accept his task.",
-      "slayTitle": "Wolves at the Door",
-      "slayBody": "Hunt the Forest Wolves on the north road. Target one and attack to thin the pack.",
-      "slayProgress": "Forest Wolves slain: {current} / {needed}",
-      "returnTitle": "Claim Your Reward",
-      "returnBody": "Your task is done. Return to Marshal Redbrook and press {interactKey} to turn it in."
+      "title": "新米冒険者",
+      "stepLabel": "ステップ {current}/{total}",
+      "skip": "チュートリアルをスキップ",
+      "dismiss": "閉じる",
+      "doneTitle": "冒険の準備完了",
+      "doneBody": "基本は覚えましたね、{name}。イーストブルック渓谷はあなたのもの、自由に探索しましょう。いつでも {questKey} キーでクエストを確認できます。よい狩りを！",
+      "moveTitle": "まず一歩を",
+      "moveBody": "{moveKeys} で移動し、マウスで周囲を見回します。数歩進んで始めましょう。",
+      "seekTitle": "元帥を探す",
+      "seekBody": "レッドブルック元帥が町で待っており、新人に頼みごとがあります。目印をたどって彼のもとへ向かいましょう。",
+      "talkTitle": "依頼を受ける",
+      "talkBody": "レッドブルック元帥に近づき、{interactKey} を押して話しかけ、依頼を受けましょう。",
+      "slayTitle": "戸口の狼",
+      "slayBody": "北の道で森の狼を狩りましょう。一体をターゲットして攻撃し、群れを減らします。",
+      "slayProgress": "倒した森の狼：{current} / {needed}",
+      "returnTitle": "報酬を受け取る",
+      "returnBody": "依頼は完了しました。レッドブルック元帥のもとへ戻り、{interactKey} を押して納品しましょう。"
     },
     "markers": {
       "names": {
@@ -3043,12 +3073,12 @@ export const ja_JP: EnTranslations = {
       "guildTab": "ギルド",
       "ignoreTab": "無視",
       "leaveParty": "パーティを抜ける",
-      "raidTab": "Raid",
-      "raidEmpty": "Convert a party to a raid to manage raid groups here.",
-      "raidGroupEmpty": "No players in this group.",
-      "raidGroupTitle": "Group {position} ({count}/5)",
-      "raidMoveToGroup": "Move to group {position}",
-      "raidLeader": "Raid Leader",
+      "raidTab": "レイド",
+      "raidEmpty": "パーティをレイドに変換すると、ここでレイドグループを管理できます。",
+      "raidGroupEmpty": "このグループにプレイヤーはいません。",
+      "raidGroupTitle": "グループ {position} ({count}/5)",
+      "raidMoveToGroup": "グループ {position} に移動",
+      "raidLeader": "レイドリーダー",
       "offlineEmpty": "フレンド、ギルド、無視リストはオンラインプレイで利用できます。",
       "friendsEmpty": "フレンドはまだいません。下で名前を検索してください。",
       "ignoreEmpty": "無視リストは空です。",
@@ -3149,8 +3179,8 @@ export const ja_JP: EnTranslations = {
       "title": "魔法書",
       "classSubtitle": "{className}の能力",
       "close": "魔法書を閉じる",
-      "resetBar": "Reset bar",
-      "resetBarAria": "Reset the current action bar to its default abilities",
+      "resetBar": "バーをリセット",
+      "resetBarAria": "現在のアクションバーを初期の能力にリセット",
       "trainableAtLevel": "レベル{level}で習得可能",
       "learnAtLevel": "レベル{level}で習得します。",
       "knownAbilityAria": "{name}、ランク{rank}。{summary}",
@@ -3189,7 +3219,7 @@ export const ja_JP: EnTranslations = {
     },
     "forms": {
       "bear": "熊",
-      "cat": "猫"
+      "cat": "狼"
     },
     "cast": {
       "fishing": "釣り",
@@ -3213,10 +3243,10 @@ export const ja_JP: EnTranslations = {
       "completedStatus": "完了済み",
       "returnTo": "{name}に戻る",
       "abandon": "クエストを破棄",
-      "abandonConfirmTitle": "Abandon Quest",
-      "abandonConfirmBody": "Are you sure you want to abandon {name}?",
-      "abandonConfirm": "Yes",
-      "abandonCancel": "Cancel",
+      "abandonConfirmTitle": "クエストを破棄",
+      "abandonConfirmBody": "{name}を本当に破棄しますか？",
+      "abandonConfirm": "はい",
+      "abandonCancel": "キャンセル",
       "suggestedPlayers": "推奨プレイヤー数: {count}"
     },
     "dialog": {
@@ -3226,7 +3256,7 @@ export const ja_JP: EnTranslations = {
       "readyQuestAria": "報告可能なクエスト: {name}",
       "discussQuest": "{name}について話す。",
       "discussQuestAria": "クエストについて話す: {name}",
-      "nythraxisDeathlessKingWarning": "三つの遺物は同じ物語を語っています。アルドレンは王を守るために戦い、マルリックは死の境界を破り、ヴォスはその後に起きたことを止めようとしました。封印は弱まり、廃棄された墓所こそ地下への道です。",
+      "nythraxisDeathlessKingWarning": "三つの遺物は同じ物語を語っています。オルドレンは王を守るために戦い、マルリックは死の境界を破り、ヴォスはその後に起きたことを止めようとしました。封印は弱まり、廃棄された墓所こそ地下への道です。",
       "browseGoods": "品物を見せてください。",
       "browseGoodsAria": "{name}の品物を見る",
       "worldMarket": "ワールドマーケットを見せてください。",
@@ -3291,7 +3321,7 @@ export const ja_JP: EnTranslations = {
       "uncommon": "良質",
       "rare": "レア",
       "epic": "エピック",
-      "legendary": "Legendary"
+      "legendary": "伝説"
     },
     "kind": {
       "weapon": "武器",
@@ -3372,9 +3402,9 @@ export const ja_JP: EnTranslations = {
       "sellQuantityInput": "売却する数量",
       "sellQuantityConfirm": "売却",
       "sellQuantityCancel": "キャンセル",
-      "sellJunk": "Sell Junk",
-      "sellJunkAria": "Sell all junk for {price}",
-      "sellJunkHint": "Sells every gray item in your bags except quest items."
+      "sellJunk": "不要品を売却",
+      "sellJunkAria": "{price}ですべての不要品を売却",
+      "sellJunkHint": "クエストアイテムを除くバッグ内のすべての灰色アイテムを売却します。"
     },
     "market": {
       "title": "ワールドマーケット",
@@ -3387,43 +3417,43 @@ export const ja_JP: EnTranslations = {
       "noMerchant": "取引するには商人に近づいてください。",
       "emptyBrowse": "市場は静かです。売却タブで最初に何かを出品しましょう。",
       "browseNote": "王国中の冒険者が出品した品です。購入を選ぶとスタックを即時購入します。",
-      "searchPlaceholder": "Search market...",
-      "searchAria": "Search the World Market by item name",
-      "emptySearch": "No goods match your search. Try another name.",
-      "truncated": "Showing {shown} of {total} matches. Refine your search to see the rest.",
-      "emptyFiltered": "No listings match those filters.",
-      "pageRange": "Showing {shown} of {total} listings.",
-      "pagePrev": "Prev",
-      "pageNext": "Next",
-      "pagePrevAria": "Previous market page",
-      "pageNextAria": "Next market page",
-      "pageStatus": "Page {current} of {total}",
-      "filters": "Market filters",
-      "filterType": "Type",
-      "filterTypeAll": "All types",
-      "filterTypeWeapon": "Weapons",
-      "filterTypeArmor": "Armor",
-      "filterTypeConsumable": "Consumables",
-      "filterTypeMaterial": "Materials",
-      "filterTypeCosmetic": "Cosmetics",
-      "filterTypeOther": "Other",
-      "filterArmorType": "Armor type",
-      "filterArmorAll": "All armor",
-      "filterWeaponType": "Weapon type",
-      "filterWeaponAll": "All weapons",
-      "filterRarity": "Rarity",
-      "filterRarityAll": "All rarities",
-      "weaponSword": "Swords",
-      "weaponDagger": "Daggers",
-      "weaponStaff": "Staves",
-      "weaponMace": "Maces",
-      "weaponAxe": "Axes",
-      "weaponOther": "Other weapons",
-      "rarityPoor": "Poor",
-      "rarityCommon": "Common",
-      "rarityUncommon": "Uncommon",
-      "rarityRare": "Rare",
-      "rarityEpic": "Epic",
+      "searchPlaceholder": "市場を検索...",
+      "searchAria": "アイテム名でワールドマーケットを検索",
+      "emptySearch": "検索に一致する商品がありません。別の名前をお試しください。",
+      "truncated": "{total}件中{shown}件を表示。検索を絞り込んで残りを表示してください。",
+      "emptyFiltered": "これらのフィルターに一致する出品はありません。",
+      "pageRange": "{total}件中{shown}件を表示。",
+      "pagePrev": "前へ",
+      "pageNext": "次へ",
+      "pagePrevAria": "マーケットの前のページ",
+      "pageNextAria": "マーケットの次のページ",
+      "pageStatus": "{total} ページ中 {current} ページ",
+      "filters": "市場フィルター",
+      "filterType": "種類",
+      "filterTypeAll": "すべての種類",
+      "filterTypeWeapon": "武器",
+      "filterTypeArmor": "防具",
+      "filterTypeConsumable": "消耗品",
+      "filterTypeMaterial": "素材",
+      "filterTypeCosmetic": "外見",
+      "filterTypeOther": "その他",
+      "filterArmorType": "防具の種類",
+      "filterArmorAll": "すべての防具",
+      "filterWeaponType": "武器の種類",
+      "filterWeaponAll": "すべての武器",
+      "filterRarity": "レア度",
+      "filterRarityAll": "すべてのレア度",
+      "weaponSword": "剣",
+      "weaponDagger": "短剣",
+      "weaponStaff": "杖",
+      "weaponMace": "メイス",
+      "weaponAxe": "斧",
+      "weaponOther": "その他の武器",
+      "rarityPoor": "粗悪",
+      "rarityCommon": "普通",
+      "rarityUncommon": "高品質",
+      "rarityRare": "レア",
+      "rarityEpic": "エピック",
       "merchantStock": "商人の在庫",
       "stackCount": "x{count}",
       "each": "各 {money}",
@@ -3473,14 +3503,14 @@ export const ja_JP: EnTranslations = {
       "close": "戦利品を閉じる"
     },
     "lootRoll": {
-      "title": "Roll for loot",
-      "need": "Need",
-      "greed": "Greed",
-      "pass": "Pass",
-      "needAria": "Need for {item}",
-      "greedAria": "Greed for {item}",
-      "passAria": "Pass on {item}",
-      "everyonePassed": "Everyone passed on {item}."
+      "title": "戦利品ロール",
+      "need": "必要",
+      "greed": "強欲",
+      "pass": "パス",
+      "needAria": "{item}を必要",
+      "greedAria": "{item}を強欲",
+      "passAria": "{item}をパス",
+      "everyonePassed": "全員が{item}をパスしました。"
     }
   },
   "entities": {
@@ -3579,7 +3609,7 @@ export const ja_JP: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "アーケインミサイル",
-        "description": "敵にアーケインミサイルを放ち、3秒間、毎秒8の秘術ダメージを与えます。"
+        "description": "敵にアーケインミサイルを放ち、3秒間、毎秒{damage}の秘術ダメージを与えます。"
       },
       "polymorph": {
         "name": "ポリモーフ",
@@ -3643,7 +3673,7 @@ export const ja_JP: EnTranslations = {
       },
       "stealth": {
         "name": "ステルス",
-        "description": "影に身を隠します。敵にほとんど気づかれませんが、移動速度が30%低下します。攻撃するかダメージを受けるとステルスが解除されます。再度使用すると姿を現します。"
+        "description": "影に身を隠します。敵にほとんど気づかれませんが、移動速度が50%低下します。攻撃するかダメージを受けるとステルスが解除されます。再度使用すると姿を現します。"
       },
       "adrenaline_rush": {
         "name": "アドレナリンラッシュ",
@@ -3675,7 +3705,7 @@ export const ja_JP: EnTranslations = {
       },
       "vanish": {
         "name": "ヴァニッシュ",
-        "description": "視界から消え、戦闘中でもステルス状態に入ります。隠れている間は移動速度が30%低下します。最大10秒間持続します。"
+        "description": "視界から消え、戦闘中でもステルス状態に入ります。隠れている間は移動速度が50%低下します。最大10秒間持続します。"
       },
       "instant_poison": {
         "name": "インスタント・ポイズン",
@@ -3827,7 +3857,7 @@ export const ja_JP: EnTranslations = {
       },
       "mind_flay": {
         "name": "マインドフレイ",
-        "description": "暗黒エネルギーで対象の精神を攻撃し、3秒間、毎秒12ダメージを与えます。"
+        "description": "暗黒エネルギーで対象の精神を攻撃し、3秒間、毎秒{damage}ダメージを与えます。"
       },
       "flash_heal": {
         "name": "フラッシュヒール",
@@ -3903,7 +3933,7 @@ export const ja_JP: EnTranslations = {
       },
       "drain_life": {
         "name": "ドレインライフ",
-        "description": "対象の生命力を吸収し、5秒間、毎秒7の体力を自分に移します。"
+        "description": "対象の生命力を吸収し、5秒間、毎秒{damage}の体力を自分に移します。"
       },
       "fear": {
         "name": "フィアー",
@@ -3958,16 +3988,16 @@ export const ja_JP: EnTranslations = {
         "description": "対象に唸ります。あなたの脅威が対象の最も憎む敵と同じ値まで上がり、3秒間あなたを攻撃させます。ベアフォーム専用。"
       },
       "cat_form": {
-        "name": "キャットフォーム",
-        "description": "猫に変身します。攻撃力はレベルに応じて上昇し、攻撃はエネルギーとコンボポイントを使い、脅威生成が29%低下します。再度使用すると術者形態に戻ります。"
+        "name": "ウルフフォーム",
+        "description": "狼に変身します。攻撃力はレベルに応じて上昇し、攻撃はエネルギーとコンボポイントを使い、脅威生成が29%低下します。再度使用すると術者形態に戻ります。"
       },
       "claw": {
         "name": "クロー",
-        "description": "敵を引っかき、武器ダメージに {damage} を加えたダメージを与えます。コンボポイントを1獲得します。キャットフォーム専用。"
+        "description": "敵を引っかき、武器ダメージに {damage} を加えたダメージを与えます。コンボポイントを1獲得します。ウルフフォーム専用。"
       },
       "ferocious_bite": {
         "name": "獰猛な噛みつき",
-        "description": "コンボポイントに応じてダメージを与えるフィニッシュムーブです。キャットフォーム専用。"
+        "description": "コンボポイントに応じてダメージを与えるフィニッシュムーブです。ウルフフォーム専用。"
       },
       "swipe": {
         "name": "スワイプ",
@@ -3987,7 +4017,7 @@ export const ja_JP: EnTranslations = {
       },
       "travel_form": {
         "name": "トラベルフォーム",
-        "description": "素早い移動形態になり、移動速度を40%上昇させます。戦闘中は使用できません。"
+        "description": "素早い移動形態に即座に変身し、移動速度を40%上昇させます。変身中は他のアビリティを使用できませんが、戦闘中でも戦闘外でも変身を切り替えられるため、逃走に最適です。"
       },
       "enrage": {
         "name": "激怒",
@@ -4007,11 +4037,11 @@ export const ja_JP: EnTranslations = {
       },
       "dash": {
         "name": "ダッシュ",
-        "description": "前方へ駆け出し、移動速度を15秒間50%上昇させます。キャットフォーム専用。"
+        "description": "前方へ駆け出し、移動速度を15秒間50%上昇させます。ウルフフォーム専用。"
       },
       "pounce": {
         "name": "パウンス",
-        "description": "隠密状態から放つ先制攻撃で、対象を2秒間スタンさせます。コンボポイントを1獲得します。キャットフォーム専用。"
+        "description": "隠密状態から放つ先制攻撃で、対象を2秒間スタンさせます。コンボポイントを1獲得します。ウルフフォーム専用。"
       },
       "insect_swarm": {
         "name": "インセクトスウォーム",
@@ -4019,11 +4049,11 @@ export const ja_JP: EnTranslations = {
       },
       "tigers_fury": {
         "name": "タイガーフューリー",
-        "description": "攻撃力を6秒間40上昇させます。キャットフォーム専用。"
+        "description": "攻撃力を6秒間40上昇させます。ウルフフォーム専用。"
       },
       "rip": {
         "name": "リップ",
-        "description": "12秒かけて出血ダメージを与えるフィニッシュムーブです。コンボポイントを消費します。キャットフォーム専用。"
+        "description": "12秒かけて出血ダメージを与えるフィニッシュムーブです。コンボポイントを消費します。ウルフフォーム専用。"
       },
       "mortal_strike": {
         "name": "致死打撃",
@@ -4083,7 +4113,7 @@ export const ja_JP: EnTranslations = {
       },
       "prowl": {
         "name": "忍び寄り",
-        "description": "ウルフフォーム中にステルス状態に入る。戦闘中は使用できない。"
+        "description": "ウルフフォーム中にステルス状態に入り、移動速度が50%低下する。戦闘中は使用できない。"
       },
       "rake": {
         "name": "切り裂き",
@@ -4387,7 +4417,7 @@ export const ja_JP: EnTranslations = {
         "name": "尾根の追跡者の毛皮"
       },
       "old_cragmaws_pelt": {
-        "name": "Old Cragmaw's Pelt"
+        "name": "老いたるクラッグモウの毛皮"
       },
       "glowing_wax": {
         "name": "光る蝋"
@@ -4627,34 +4657,34 @@ export const ja_JP: EnTranslations = {
         "name": "君主の王冠"
       },
       "charter_ashmane": {
-        "name": "証書：Ashmane Courser"
+        "name": "チャーター：灰鬣の駿馬アッシュメイン"
       },
       "charter_emberhoof": {
-        "name": "証書：Emberhoof Charger"
+        "name": "チャーター：燃蹄の軍馬エンバーフーフ"
       },
       "charter_bronzeflank": {
-        "name": "証書：Bronzeflank Destrier"
+        "name": "チャーター：青銅脇の戦馬ブロンズフランク"
       },
       "charter_silvermane": {
-        "name": "証書：Silvermane Stallion"
+        "name": "チャーター：銀鬣の牡馬シルバーメイン"
       },
       "charter_stormhoof": {
-        "name": "証書：Stormhoof Charger"
+        "name": "チャーター：嵐蹄の軍馬ストームフーフ"
       },
       "charter_goldcrest": {
-        "name": "証書：Goldcrest Skystrider"
+        "name": "チャーター：金冠の天駆けゴールドクレスト"
       },
       "charter_verdant": {
-        "name": "証書：Verdant Wildwing"
+        "name": "チャーター：翠緑の野翼ヴァーダント"
       },
       "charter_voidstrider": {
-        "name": "証書：Voidwing Strider"
+        "name": "チャーター：虚空翼の闊歩者ヴォイドウィング"
       },
       "charter_celestial": {
-        "name": "証書：Celestial Seraph"
+        "name": "チャーター：天上の熾天セレスティアル"
       },
       "charter_worldbearer": {
-        "name": "証書：Worldbearer's Roc"
+        "name": "チャーター：世界を背負う大鷲ワールドベアラー"
       },
       "bristleback_maul": {
         "name": "ブリストルバックの大槌"
@@ -4705,10 +4735,10 @@ export const ja_JP: EnTranslations = {
         "name": "墓織りの衣"
       },
       "gravewyrm_sabatons": {
-        "name": "グレイブワームのサバトン"
+        "name": "墓ワームのサバトン"
       },
       "gravewyrm_stalkers_treads": {
-        "name": "グレイブワーム追跡者の足具"
+        "name": "墓ワーム追跡者の足具"
       },
       "greyjaw_hide_boots": {
         "name": "グレイジョーの皮ブーツ"
@@ -4855,7 +4885,7 @@ export const ja_JP: EnTranslations = {
         "name": "クラッグモウの忍び歩きブーツ"
       },
       "cragmaw_huntcord": {
-        "name": "Cragmaw's Huntcord"
+        "name": "クラッグモウの狩猟帯"
       },
       "drowned_tide_scepter": {
         "name": "溺れた潮の笏"
@@ -4993,31 +5023,31 @@ export const ja_JP: EnTranslations = {
         "name": "ワーム影の鉤爪握り"
       },
       "reliquary_plate_chest": {
-        "name": "Reliquary Guard Hauberk"
+        "name": "聖遺物庫衛兵のホーバーク"
       },
       "reliquary_leather_chest": {
-        "name": "Dustwarden Jerkin"
+        "name": "塵守りのジャーキン"
       },
       "reliquary_cloth_chest": {
-        "name": "Shroud of the Reliquary"
+        "name": "聖遺物庫の屍衣"
       },
       "reliquary_legs": {
-        "name": "Vaultbound Legwraps"
+        "name": "地下聖堂の巻脚絆"
       },
       "reliquary_helm": {
-        "name": "Ossuary Watch Helm"
+        "name": "納骨堂の見張りの兜"
       },
       "reliquary_shoulder": {
-        "name": "Crumbled Spaulders"
+        "name": "崩れた肩当て"
       },
       "reliquary_gloves_rog": {
-        "name": "Bonewarden Grips"
+        "name": "骨守りの手甲"
       },
       "deacon_reliquary_helm": {
-        "name": "Deacon's Reliquary Helm"
+        "name": "助祭の聖遺物庫の兜"
       },
       "varric_shadow_cowl": {
-        "name": "Varric's Shadow Cowl"
+        "name": "ヴァリックの影のフード"
       },
       "the_codfather": {
         "name": "タラのゴッドファーザー"
@@ -5059,34 +5089,34 @@ export const ja_JP: EnTranslations = {
         "name": "謎めいた装いの宝箱"
       },
       "deathless_heartwood": {
-        "name": "Heartwood of the Deathless Crown"
+        "name": "不死王冠の心材"
       },
       "kingsbane_last_oath": {
-        "name": "Kingsbane, Last Oath of Thornpeak"
+        "name": "キングスベイン、ソーンピーク最後の誓い"
       },
       "crownforged_dreadhelm": {
-        "name": "Crownforged Dreadhelm"
+        "name": "冠鍛えの恐怖兜"
       },
       "crownforged_warspaulders": {
-        "name": "Crownforged Warspaulders"
+        "name": "冠鍛えの戦肩当て"
       },
       "nighttalon_crown": {
-        "name": "Nighttalon Crown"
+        "name": "夜爪の冠"
       },
       "nighttalon_shoulderguards": {
-        "name": "Nighttalon Shoulderguards"
+        "name": "夜爪の肩守り"
       },
       "soulflame_cowl": {
-        "name": "Soulflame Cowl"
+        "name": "魂炎の頭巾"
       },
       "soulflame_mantle": {
-        "name": "Soulflame Mantle"
+        "name": "魂炎のマント"
       },
       "stormcallers_crown": {
-        "name": "Stormcaller's Crown"
+        "name": "嵐呼びの冠"
       },
       "stormcallers_spaulders": {
-        "name": "Stormcaller's Spaulders"
+        "name": "嵐呼びの肩当て"
       },
       "unknown_alien_weaponry": {
         "name": "未知の異星武装"
@@ -5138,12 +5168,6 @@ export const ja_JP: EnTranslations = {
       },
       "vanguard_chrome_armor_plate": {
         "name": "ヴァンガードクローム"
-      },
-      "glade_pelt": {
-        "name": "林間の毛皮"
-      },
-      "monarch_heart": {
-        "name": "君主の心臓"
       }
     },
     "mobs": {
@@ -5310,31 +5334,31 @@ export const ja_JP: EnTranslations = {
         "name": "縛られし守護者"
       },
       "nythraxis_skeleton_warrior": {
-        "name": "Risen Royal Guard"
+        "name": "蘇った王家の衛兵"
       },
       "nythraxis_scourge_of_thornpeak": {
-        "name": "Nythraxis, Scourge of Thornpeak"
+        "name": "ナイスラクシス、ソーンピークの災厄"
       },
       "reliquary_ledger_wraith": {
-        "name": "Ledger Wraith"
+        "name": "台帳の亡霊"
       },
       "reliquary_funeral_ringer": {
-        "name": "Funeral Ringer"
+        "name": "葬儀の鐘鳴らし"
       },
       "reliquary_gravecall_acolyte": {
-        "name": "Gravecall Acolyte"
+        "name": "墓呼びの侍祭"
       },
       "reliquary_bonewalker": {
-        "name": "Raised Bonewalker"
+        "name": "蘇りし骨歩き"
       },
       "reliquary_saintless_effigy": {
-        "name": "Saintless Effigy"
+        "name": "聖人なき偶像"
       },
       "deacon_varric": {
-        "name": "Deacon Varric"
+        "name": "助祭ヴァリック"
       },
       "acolyte_tessa": {
-        "name": "Acolyte Tessa"
+        "name": "侍祭テッサ"
       },
       "ironvein_foreman": {
         "name": "鉄脈の現場監督"
@@ -5443,48 +5467,6 @@ export const ja_JP: EnTranslations = {
       },
       "ysolei": {
         "name": "イソレイ、溺月の化身"
-      },
-      "elder_bristleback": {
-        "name": "老ブリストルバック"
-      },
-      "sableweb_hatchling": {
-        "name": "セーブルウェブの幼体"
-      },
-      "sableweb_matriarch": {
-        "name": "セーブルウェブの女家長"
-      },
-      "bramble_lynx": {
-        "name": "茨のオオヤマネコ"
-      },
-      "brightwood_hare": {
-        "name": "ブライトウッドの野ウサギ"
-      },
-      "brightwood_monarch": {
-        "name": "ブライトウッドの君主"
-      },
-      "brightwood_stag": {
-        "name": "ブライトウッドの牡鹿"
-      },
-      "dawnmane_doe": {
-        "name": "暁のたてがみの雌鹿"
-      },
-      "glade_fox": {
-        "name": "林間のキツネ"
-      },
-      "grovetusk_boar": {
-        "name": "木立牙の猪"
-      },
-      "meadow_crane": {
-        "name": "草原のツル"
-      },
-      "spotted_fawn": {
-        "name": "斑模様の子鹿"
-      },
-      "sunhide_bear": {
-        "name": "陽光皮の熊"
-      },
-      "thornpelt_badger": {
-        "name": "茨毛のアナグマ"
       }
     },
     "npcs": {
@@ -5584,24 +5566,24 @@ export const ja_JP: EnTranslations = {
         "greeting": "崩れやすい頁岩に気をつけてください、{className}。山は近ごろ落ち着きがなく、その理由を知りたいのです。"
       },
       "brother_aldric_raid": {
-        "name": "Brother Aldric",
-        "title": "Priest of the Vale",
-        "greeting": "From a chapel yard in the Vale to the roof of the world... the trail we have followed ends here. I can feel the mountain listening."
+        "name": "アルドリック修道士",
+        "title": "谷の司祭",
+        "greeting": "礼拝堂の墓地から世界の屋根まで... 足跡はここで終わります。山が耳を澄ませているのを感じます。"
       },
       "brother_halven": {
-        "name": "Brother Halven",
-        "title": "Reliquary Keeper",
-        "greeting": "The reliquary below has shifted again."
+        "name": "ハルヴェン修道士",
+        "title": "聖遺物庫の番人",
+        "greeting": "下の聖遺物庫がまた動いた。"
       },
       "tidewatcher_ondrel": {
         "name": "オンドレル・ヴェイン",
         "title": "潮見の番人",
         "greeting": "この沼は月光を飲み干し、{className}よ、溺れし者を吐き返すのだ。私はあの門を三十夜も見張ってきた——そして今宵、門は開いている。"
       },
-      "ranger_elwyn": {
-        "greeting": "静かに、{className}。今日の林間は穏やかだ。私はこのまま保つつもりでね。",
-        "name": "レンジャー・エルウィン",
-        "title": "林間の守り手"
+      "skytrial_master": {
+        "name": "スカイマスター・ヴァエル",
+        "title": "スカイトライアルの守護者",
+        "greeting": "空とは、あえて歩もうとする者の少ない道だ、{className}よ。それを勝ち取れば、空がお前を運んでくれる。"
       }
     },
     "quests": {
@@ -6281,8 +6263,8 @@ export const ja_JP: EnTranslations = {
       },
       "q_nythraxis_restless_dead": {
         "title": "骨原の異変",
-        "text": "Thornpeak Heightsで何かが変わりました、{playerName}。死者たちはもはや当てもなくさまよっていません。Highwatchの北、古い戦場と崖道が交わる骨原で集まり、行軍しています。そこへ向かい、骨鎧の亡者たちの異変を調べ、彼らを動かしているものの証拠を持ち帰ってください。",
-        "completion": "すべての欠片に同じ印があります... 王冠です。Eastbrookの記録には残っていない古い墓に刻まれているのを見たことがあります。",
+        "text": "ソーンピーク高地で何かが変わりました、{playerName}。死者たちはもはや当てもなくさまよっていません。ハイウォッチの北、古い戦場と崖道が交わる骨原で集まり、行軍しています。そこへ向かい、骨鎧の亡者たちの異変を調べ、彼らを動かしているものの証拠を持ち帰ってください。",
+        "completion": "すべての欠片に同じ印があります... 王冠です。イーストブルックの記録には残っていない古い墓に刻まれているのを見たことがあります。",
         "objectives": {
           "0": {
             "label": "ルーン刻みの骨片"
@@ -6292,7 +6274,7 @@ export const ja_JP: EnTranslations = {
       "q_nythraxis_graves": {
         "title": "忘れられし者の墓",
         "text": "この印を以前にも見ました。北の戦場を囲む三つの古い墓です。アルドレン隊長は東の高台に、大神官マルリックは中央の壊れた道の近くに、王家の暗殺者ヴォスは西の崖のそばに眠っています。それぞれの墓に触れて耳を澄ませてください、{playerName}。死者は生者が忘れたことを覚えているかもしれません。",
-        "completion": "アルドレンは忠義を守り、マルリックは死を受け入れず、ヴォスは誰よりも早く危険を見抜きました。三人は同じ忘れられた王に仕えていました。",
+        "completion": "オルドレンは忠義を守り、マルリックは死を受け入れず、ヴォスは誰よりも早く危険を見抜きました。三人は同じ忘れられた王に仕えていました。",
         "objectives": {
           "0": {
             "label": "隊長オルドレンの墓での幻視"
@@ -6307,7 +6289,7 @@ export const ja_JP: EnTranslations = {
       },
       "q_nythraxis_sealed_crypt": {
         "title": "放棄された地下墓所",
-        "text": "幻視は、西の崖にある廃棄された墓所を示しています。その墓所には王がいたという古い伝説があります。マルリックの儀式が王を死なぬものへ歪めた後、Thornpeakが彼を地下に封じたのかもしれません。墓所へ入り、中に何が残っているか確かめてください。",
+        "text": "幻視は、西の崖にある廃棄された墓所を示しています。その墓所には王がいたという古い伝説があります。マルリックの儀式が王を死なぬものへ歪めた後、ソーンピークが彼を地下に封じたのかもしれません。墓所へ入り、中に何が残っているか確かめてください。",
         "completion": "要石の二つの半分が合わさり、ヴォスの日誌はそれらが封じたものの名を示しています。ニスラクシス王の印章指輪です。日誌が真実なら、その指輪こそ彼の墓への鍵です。",
         "objectives": {
           "0": {
@@ -6324,7 +6306,7 @@ export const ja_JP: EnTranslations = {
       "q_nythraxis_bound_guardian": {
         "title": "縛られし守護者",
         "text": "ヴォスは、生存者たちが偶然や野心でニスラクシスの墓に辿り着く者を防ぐため、王の印章指輪を古代の守護者の奥に封じたと記しています。墓所の要石を、廃棄された墓所の東、西の墓の南東にある平地の儀式陣へ持っていってください。そこで使い、守護者を破り、指輪を持ち帰ってください。",
-        "completion": "三つの遺物は同じ物語を語っています。アルドレンは王を守るために戦い、マルリックは死の境界を破り、ヴォスはその後に起きたことを止めようとしました。封印は弱まり、この指輪こそニスラクシスの墓への鍵です。あなたは今、ニスラクシスの墓所へ入るための調律を終えました。",
+        "completion": "三つの遺物は同じ物語を語っています。アルドレンは王を守るために戦い、マルリックは死の境界を破り、ヴォスはその後に起きたことを止めようとしました。封印は弱まり、この指輪こそニスラクシスの墓への鍵です。あなたは今、ニスラクシスの墓所へ入るための調律を終えました。廃れた墓所へ戻り、王家の扉を開き、古き王の怒りがソーンピークの外へ溢れる前にニスラクシスと対峙してください。",
         "objectives": {
           "0": {
             "label": "儀式の円で地下墓所の要石を使用"
@@ -6338,12 +6320,12 @@ export const ja_JP: EnTranslations = {
         }
       },
       "q_nythraxis_scourges_end": {
-        "title": "Scourge's End",
-        "text": "The signet has opened the way, {playerName}, but an open tomb is not a victory. Nythraxis was a king once, and the ruin beneath Thornpeak is still bound to his will. Enter the crypt with allies you trust. Break the deathless crown before its command reaches the battlefield above.",
-        "completion": "Then the crown is silent at last. Thornpeak will still carry its dead, but no king below it will call them to war again. You have ended what Aldren, Malric, and Voss could only contain.",
+        "title": "災厄の終わり",
+        "text": "印章指輪が道を開きました、{playerName}。しかし開かれた墓は勝利ではありません。ニスラクシスはかつて王であり、ソーンピークの地下の廃墟はいまも彼の意志に縛られています。信頼できる仲間とともに墓所へ入り、不死の王冠の命令が上の戦場へ届く前に打ち砕いてください。",
+        "completion": "これで王冠はついに沈黙しました。ソーンピークはなお死者を抱えるでしょうが、山の下の王が彼らを再び戦へ呼ぶことはありません。あなたは、アルドレン、マルリック、そしてヴォスが封じることしかできなかったものを終わらせました。",
         "objectives": {
           "0": {
-            "label": "Nythraxis slain"
+            "label": "ニスラクシスを撃破"
           }
         }
       },
@@ -6420,144 +6402,35 @@ export const ja_JP: EnTranslations = {
           }
         }
       },
-      "q_mogger_tracks": {
-        "title": "モガーの足跡",
-        "text": "北への道を進む前に、イーストブルックには最後の厄介者がいます。モガーです。あの巨獣は低い草地を踏み荒らし、猪を狂わせています。足跡の周囲を片付け、巣を見つけられるようにしてください。",
-        "completion": "その足跡は新しく、雨を溜めるほど深い。モガーは焚き火話ではありません、{playerName}。近くにいます。",
+      "q_skyward_first_flight": {
+        "title": "初飛行",
+        "text": "お前は地上では翼ある駿馬をそれなりに乗りこなしている、{playerName}よ — さあ、それを空へ上げてみせろ。ヴェイル・スカイトライアルを飛ぶのだ。ひと巡りの周回で八つのリングを抜ける。まだタイムを追うな。ただ空に留まり、すべてのリングを糸のように通り抜けよ。",
+        "completion": "落ちなかったな。初めての周回でそれをやり遂げる者はそう多くない。空は、何度も戻ってくる者を覚えている。",
         "objectives": {
           "0": {
-            "label": "野猪を足跡から追い払う"
+            "label": "ヴェイル・スカイトライアル完走"
           }
         }
       },
-      "q_brightwood_monarch": {
-        "completion": "では老いた王は倒れたか。重いことだ。だが狼に殺されるよりは安らかな最期だった。その角の王冠を敬意とともに身につけてくれ、{playerName}。",
+      "q_skyward_time_trial": {
+        "title": "時計を打ち破れ",
+        "text": "今度は意志をもってやり遂げろ。もう一度ヴェイル・スカイトライアルを飛ぶのだ、{playerName}よ。だが砂が尽きる前に飛び終えよ。すべてのリングを貫く一筋の澄んだ軌道、無駄な空気は一切なし。慌てるな、精密にやれ。",
+        "completion": "リングからリングへ、一筋の澄んだ軌道。お前はもう空に乗っているのではない — 空を飛んでいるのだ。",
         "objectives": {
           "0": {
-            "label": "君主の心臓"
+            "label": "ヴェイル・スカイトライアルを規定タイム以内で飛行"
           }
-        },
-        "text": "ひとりでは矢を放たぬ獣が一頭いる。ブライトウッドの君主、深い林間を治める大牡鹿だ。年老いて獰猛になり、その隠れ家に近づく者は誰彼かまわず角で突く。ハンターひとりの手には余る。仲間を一人か二人連れていけ。あれを安らかに眠らせ、その心臓を持ち帰ってくれ、{playerName}。",
-        "title": "ブライトウッドの君主"
+        }
       },
-      "q_brightwood_thinning": {
-        "completion": "よし。群れは間引かれ、これらの毛皮も上等だ。林間はもう一季節もちこたえるだろう。",
+      "q_skyward_ascendant": {
+        "title": "天翔ける者",
+        "text": "残る試練はただ一つ、{playerName}よ。ヴェイル・サーキットだ。長きリングを三周、規定タイム以内で飛び切れ — 運ではなく、ただ技だけで。それを極めれば、果てから果てまで、広き空はお前のものだ。",
+        "completion": "天高く、揺るぎなく。空は今やお前のものだ、{playerName}よ。このチャーターを取れ — 買ったのではなく勝ち取った空の駿馬、お前が目指すどこへでもお前を運ぶだろう。",
         "objectives": {
           "0": {
-            "label": "茨のオオヤマネコを討伐"
-          },
-          "1": {
-            "label": "林間の毛皮"
+            "label": "ヴェイル・サーキットを規定タイム以内で飛行"
           }
-        },
-        "text": "ブライトウッドの林間はあふれかえっている、{playerName}。茨のオオヤマネコは私が間引くよりも速く増え、群れはわずかに残った牧草地を踏み荒らす。茨のオオヤマネコを8体倒し、林間の毛皮を6枚持ってきてくれ。残りの健康状態を見極められるように。",
-        "title": "林間を間引く"
-      },
-      "q_ledger_brood": {
-        "completion": "巣を水に沈めるとは陰惨な仕事だ。だが今の慈悲は、後に避けられる百の葬式だ。帳尻は合った。",
-        "objectives": {
-          "0": {
-            "label": "セーブルウェブの幼体を粉砕"
-          }
-        },
-        "text": "潜伏者を殺したことが、かえって幼体に場所を空けてしまった。セーブルウェブの幼体が深い巣からあふれ出ている。小さな牙が百本あれば、大きな一本と同じく確実に旅人を殺す。育つ前にセーブルウェブの幼体を8体粉砕してくれ。",
-        "title": "湧き出す闇"
-      },
-      "q_ledger_deepvermin": {
-        "completion": "ろうそく頭の害獣が十二匹も片付いた！よし、お前たち、坑道へ戻るぞ。元帥にお前のことを良く言っておくぞ、{playerName}。",
-        "objectives": {
-          "0": {
-            "label": "トンネルラット掘りを討伐"
-          }
-        },
-        "text": "元帥の記録には、お前が害獣を始末すると書いてある。さて、わしの採掘場のは中でも最悪だ。トンネルラットは掘り子がつるはしを振るうより速く増える。トンネルラット掘りを12体始末してくれ。そうすれば冬までに銅を掘り当てられるかもしれん。",
-        "title": "深部の害獣"
-      },
-      "q_ledger_first_duty": {
-        "completion": "巣穴が八つ空になり、林間の地面も落ち着いた。よし。この記録のどの名前も、まさにお前が今立っているところから始まったのだ。",
-        "objectives": {
-          "0": {
-            "label": "茨毛のアナグマを間引く"
-          }
-        },
-        "text": "イーストブルックで一人前になりたいか、{playerName}？ならばどの番人も始める場所から始めよ。茨毛のアナグマどもが、狼の道を越えたはるか北のブライトウッドの林間を掘り抜いて巣穴を作りおった。林間の地面はやつらの巣穴に陥没しかけている。茨毛のアナグマを8体間引けば、記録はお前の名を覚えるだろう。",
-        "title": "番人の初仕事"
-      },
-      "q_ledger_great_boar": {
-        "completion": "老ブリストルバック、お前の手で討たれたか！あの皮一枚で一季節分の交易に値する。お前は記録の誇りとなった、{playerName}。",
-        "objectives": {
-          "0": {
-            "label": "老ブリストルバックを討伐"
-          },
-          "1": {
-            "label": "群れの野生の猪を討伐"
-          }
-        },
-        "text": "西の茂みに老いた牡の猪がいる。老ブリストルバックだ。樹皮のような皮と、それに見合う気性をしている。あれは私の皮運びを二人も角で突いた。あれを倒し、その後ろに身を寄せる下級の野生の猪を6頭片付けてくれ。そうすればお前の名を記録の上位に記そう。",
-        "title": "大いなるブリストルバック"
-      },
-      "q_ledger_outlaw_captain": {
-        "completion": "ヴァーラン隊長は死に、その外套は私の戸口に届けられた。記録は閉じられた、{playerName}。そして谷は、来たるべき番人たちに、それを閉じた者の名を語り継ぐだろう。",
-        "objectives": {
-          "0": {
-            "label": "谷の盗賊を斬り倒す"
-          },
-          "1": {
-            "label": "ヴァーラン隊長を討伐"
-          }
-        },
-        "text": "記録の最後の名は、一年も消したいと思っていた者だ。ヴァーラン隊長、谷の半分を盗賊稼業に堕とした男だ。南東の野営地で副官たちの陰に身を潜めている。あれに辿り着くまでに谷の盗賊を6人斬り倒し、それからヴァーラン本人を始末せよ。ひとりで行くな。",
-        "title": "無法者の隊長"
-      },
-      "q_ledger_reedwater": {
-        "completion": "これでひと季節は、あのごぼごぼ鳴く悪魔どもを私の網から遠ざけておける。元帥に、湖はまた静かになったと伝えてくれ。",
-        "objectives": {
-          "0": {
-            "label": "泥ひれの潜伏者を討伐"
-          }
-        },
-        "text": "レッドブルックが寄こしたのか？よし。この老骨ではもう浅瀬を渡れぬ。泥ひれが葦の水辺に這い戻り、かつてないほど大胆になっている。間引いてくれ。泥ひれの潜伏者を8体、それと深みには気をつけろ。",
-        "title": "葦の水辺の巡回"
-      },
-      "q_ledger_silk": {
-        "completion": "闇の中の紡ぎ手が八体減った。森は息がしやすくなり、私もだ。",
-        "objectives": {
-          "0": {
-            "label": "ウェブウッドの潜伏者を討伐"
-          }
-        },
-        "text": "記録は東の森も番人の領分と記している。ウェブウッドの潜伏者は週ごとに巣を厚くしていく。先の市の日には子供が近づきすぎてしまい、かろうじて息のあるうちに切り出した。森を丸ごと奪われる前に、ウェブウッドの潜伏者を8体倒してくれ。",
-        "title": "絹と毒"
-      },
-      "q_ledger_teeth": {
-        "completion": "狼が十頭、そして黄昏の道はまた我らのものだ。記録はお前に優しくなっていく。",
-        "objectives": {
-          "0": {
-            "label": "森の狼を討伐"
-          }
-        },
-        "text": "狼の群れは巡回路を覚えてしまった。光が薄れ、ひとり旅の者が格好の餌食となる黄昏どきに襲ってくる。あれを打ち砕いてくれ、{playerName}。森の狼を10頭倒し、群れに新たな教訓を学ばせよ。",
-        "title": "闇の中の牙"
-      },
-      "q_ledger_toll": {
-        "completion": "盗賊が八人、報いを受けた。通行路に新しい番人がついたという噂はもう広まっている。しかもその番人は金を取らぬ。首を取るのだ。",
-        "objectives": {
-          "0": {
-            "label": "谷の盗賊を成敗"
-          }
-        },
-        "text": "南東の丘は盗賊の通行料の道と化した。軽装で旅をする愚か者なら誰でも襲う。記録にはひとり残らず賞金がかかっている。谷の盗賊を8人、イーストブルックの裁きにかけてくれ。",
-        "title": "追いはぎの通行料"
-      },
-      "q_ledger_vigil": {
-        "completion": "十の魂が大地に還り、礼拝堂に一夜の安らぎが買われた。たとえ記録が忘れても、聖なる光はこのような夜伽を覚えている。",
-        "objectives": {
-          "0": {
-            "label": "安らがぬ骨を安らかに眠らせる"
-          }
-        },
-        "text": "元帥は、剣だけでは手に余る厄介事のとき、番人を私のもとへ寄こす。礼拝堂の死者たちはじっと横たわってくれず、私は夜伽を続けるには年を取りすぎた。私に代わって守ってくれ、{playerName}。安らがぬ骨を10体、ふたたび安らぎへと戻してくれ。",
-        "title": "礼拝堂の夜伽"
+        }
       }
     },
     "zones": {
@@ -6593,7 +6466,7 @@ export const ja_JP: EnTranslations = {
             "label": "ブライトウッドの林間"
           },
           "9": {
-            "label": "Brightwood Glade"
+            "label": "ブライトウッドの林間"
           }
         }
       },
@@ -6683,12 +6556,12 @@ export const ja_JP: EnTranslations = {
       "nythraxis_crypt": {
         "name": "放棄された地下墓所",
         "enterText": "放棄された地下墓所の敷居を越えます。",
-        "leaveText": "Thornpeakの冷たい空気へ戻ります。"
+        "leaveText": "ソーンピークの冷たい空気へ戻ります。"
       },
       "nythraxis_boss_arena": {
-        "name": "Nythraxis Raid Arena",
-        "enterText": "You pass through the sealed royal door.",
-        "leaveText": "You return to the cold air of Thornpeak."
+        "name": "ナイスラクシスのレイドアリーナ",
+        "enterText": "封印された王家の扉を通り抜けます。",
+        "leaveText": "ソーンピークの冷たい空気へ戻ります。"
       },
       "drowned_temple": {
         "name": "溺れし神殿",
@@ -6698,46 +6571,46 @@ export const ja_JP: EnTranslations = {
     },
     "delves": {
       "collapsed_reliquary": {
-        "name": "The Collapsed Reliquary",
-        "enterText": "You descend into the collapsed reliquary.",
-        "leaveText": "You climb back to Brother Halven at the reliquary ruin."
+        "name": "崩れた聖遺物庫",
+        "enterText": "あなたは崩れた聖遺物庫へと降りていく。",
+        "leaveText": "あなたは聖遺物庫の廃墟にいるハルヴェン修道士のもとへ登り戻る。"
       }
     },
     "itemSets": {
       "crownforged": {
-        "name": "Crownforged Regalia",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Strength by 15 and Stamina by 15."
+        "name": "冠鋳の戦装束",
+        "bonus2": "攻撃力が40上昇します。",
+        "bonus3": "筋力が15、スタミナが15上昇します。"
       },
       "deathlord": {
-        "name": "Deathlord Battlegear",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Strength by 15 and Stamina by 15."
+        "name": "死王の戦装束",
+        "bonus2": "攻撃力が40上昇します。",
+        "bonus3": "筋力が15、スタミナが15上昇します。"
       },
       "necromancers": {
-        "name": "Necromancer's Raiment",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "死霊術師の法衣",
+        "bonus2": "ダメージによる詠唱押し戻しを50%軽減します。",
+        "bonus3": "詠唱中にダメージを受けても押し戻されません。"
       },
       "nighttalon": {
-        "name": "Nighttalon Pelt",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15 and critical strike chance by 2%."
+        "name": "夜爪の革装束",
+        "bonus2": "攻撃力が40上昇します。",
+        "bonus3": "敏捷性が15、クリティカル率が2%上昇します。"
       },
       "soulflame": {
-        "name": "Soulflame Regalia",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "魂炎の法衣",
+        "bonus2": "ダメージによる詠唱押し戻しを50%軽減します。",
+        "bonus3": "詠唱中にダメージを受けても押し戻されません。"
       },
       "stormcallers": {
-        "name": "Stormcaller's Vestments",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "嵐呼びの法衣",
+        "bonus2": "ダメージによる詠唱押し戻しを50%軽減します。",
+        "bonus3": "詠唱中にダメージを受けても押し戻されません。"
       },
       "wyrmshadow": {
-        "name": "Wyrmshadow Vestments",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15 and critical strike chance by 2%."
+        "name": "竜影の装束",
+        "bonus2": "攻撃力が40上昇します。",
+        "bonus3": "敏捷性が15、クリティカル率が2%上昇します。"
       }
     }
   },
@@ -6746,8 +6619,8 @@ export const ja_JP: EnTranslations = {
     "dungeonExitName": "{name}の出口",
     "dungeonPartyWarning": "{name}は{count}人のフルパーティ向けです。慎重に進んでください。",
     "dungeonInstanceBusy": "{name}のインスタンスはすべて使用中です。少し待ってから再試行してください。",
-    "delveLockedChestInteract": "Press F to pick the lock",
-    "delveRewardChestInteract": "Press F to claim spoils",
-    "delveSurfaceExitInteract": "Press F to climb"
+    "delveLockedChestInteract": "Fで錠を開ける",
+    "delveRewardChestInteract": "Fで戦利品を受け取る",
+    "delveSurfaceExitInteract": "Fで地上へ登る"
   }
 };

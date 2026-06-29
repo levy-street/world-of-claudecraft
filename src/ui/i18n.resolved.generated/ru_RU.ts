@@ -152,570 +152,570 @@ export const ru_RU: EnTranslations = {
   },
   "hudChrome": {
     "emotes": {
-      "wave": "Wave",
-      "laugh": "LOL",
-      "question": "Bro?",
-      "cheer": "Cheer",
-      "dance": "Dance",
-      "point": "Point",
-      "flex": "Flex",
-      "salute": "Salute",
-      "cry": "Cry",
-      "bow": "Bow",
-      "clap": "Clap",
-      "roar": "Roar",
-      "kneel": "Kneel"
+      "wave": "Помахать",
+      "laugh": "Смех",
+      "question": "Чё?",
+      "cheer": "Ликование",
+      "dance": "Танец",
+      "point": "Указать",
+      "flex": "Мускулы",
+      "salute": "Честь",
+      "cry": "Плач",
+      "bow": "Поклон",
+      "clap": "Аплодисменты",
+      "roar": "Рык",
+      "kneel": "На колени"
     },
     "emoteWheel": {
-      "edit": "Edit",
-      "label": "Emotes"
+      "edit": "Изменить",
+      "label": "Эмоции"
     },
     "emoteEditor": {
-      "title": "Emotes",
-      "done": "Done"
+      "title": "Эмоции",
+      "done": "Готово"
     },
     "theme": {
-      "preset": "UI Theme",
-      "customColors": "Custom Colors",
-      "reset": "Reset",
+      "preset": "Тема интерфейса",
+      "customColors": "Настраиваемые цвета",
+      "reset": "Сброс",
       "presets": {
-        "classic": "Classic Gold",
-        "midnight": "Midnight",
-        "parchment": "Parchment",
-        "highContrast": "High Contrast"
+        "classic": "Классическое золото",
+        "midnight": "Полночь",
+        "parchment": "Пергамент",
+        "highContrast": "Высокий контраст"
       },
       "knob": {
-        "accent": "Accent",
-        "border": "Border",
-        "panel": "Frame",
-        "text": "Text",
-        "textMuted": "Muted Text",
-        "hp": "Health",
-        "mana": "Mana",
-        "rage": "Rage",
-        "energy": "Energy"
+        "accent": "Акцент",
+        "border": "Рамка",
+        "panel": "Панель",
+        "text": "Текст",
+        "textMuted": "Тусклый текст",
+        "hp": "Здоровье",
+        "mana": "Мана",
+        "rage": "Ярость",
+        "energy": "Энергия"
       }
     },
     "questTracker": {
       "count": "({count})",
-      "collapseHint": "Collapse quest tracker",
-      "expandHint": "Expand quest tracker"
+      "collapseHint": "Свернуть трекер заданий",
+      "expandHint": "Развернуть трекер заданий"
     },
     "chatTimestamps": {
-      "show": "Show Chat Timestamps",
-      "format": "Timestamp Format",
-      "clock12h": "12-hour",
-      "clock24h": "24-hour",
-      "note": "Prefixes each new chat line with the time it arrived, e.g. [14:32]. Only affects messages received while the option is on."
+      "show": "Показывать время в чате",
+      "format": "Формат времени",
+      "clock12h": "12-часовой",
+      "clock24h": "24-часовой",
+      "note": "Добавляет к каждой новой строке чата время её получения, например [14:32]. Влияет только на сообщения, полученные при включённой настройке."
     },
     "chatWindow": {
-      "move": "Drag to move the chat window",
-      "resize": "Drag to resize the chat window",
-      "reset": "Reset Chat Window",
-      "resetAction": "Reset",
-      "note": "Drag the chat tab strip to move the window, or the corner grip to resize it. Reset returns it to the default position and size."
+      "move": "Перетащите, чтобы переместить окно чата",
+      "resize": "Перетащите, чтобы изменить размер окна чата",
+      "reset": "Сбросить окно чата",
+      "resetAction": "Сбросить",
+      "note": "Перетащите полосу вкладок чата, чтобы переместить окно, или угловой маркер, чтобы изменить размер. Сброс возвращает окно в положение и размер по умолчанию."
     },
     "swing": {
-      "ready": "Swing",
-      "seconds": "{seconds}s"
+      "ready": "Замах",
+      "seconds": "{seconds} сек."
     },
     "rest": {
-      "resting": "Resting"
+      "resting": "Отдых"
     },
     "abilityScaling": {
       "bonus": "(+{value})"
     },
     "unitFrame": {
-      "playerLabel": "Your Hero",
-      "targetLabel": "Your Mark",
-      "targetAnnounce": "Mark {name}",
-      "partyLabel": "Your Band",
-      "partyGroup": "Group {n}",
-      "durationUnitSeconds": "s"
+      "playerLabel": "Ваш персонаж",
+      "targetLabel": "Ваша цель",
+      "targetAnnounce": "Цель: {name}",
+      "partyLabel": "Ваша группа",
+      "partyGroup": "Группа {n}",
+      "durationUnitSeconds": "с"
     },
     "character": {
-      "modelPreview": "Character Model Preview"
+      "modelPreview": "Предпросмотр модели персонажа"
     },
     "skipLinks": {
-      "mainHud": "Skip to Main HUD",
-      "chat": "Skip to Chat"
+      "mainHud": "Перейти к основному интерфейсу",
+      "chat": "Перейти к чату"
     },
     "mobile": {
-      "autorun": "Autorun",
-      "jump": "Jump",
-      "leaderboard": "Ranks",
-      "nameplates": "Names",
-      "haptics": "Haptics",
-      "hapticsOff": "Haptics Off",
-      "toggleHaptics": "Toggle haptics"
+      "autorun": "Автобег",
+      "jump": "Прыжок",
+      "leaderboard": "Рейтинг",
+      "nameplates": "Имена",
+      "haptics": "Вибрация",
+      "hapticsOff": "Вибрация выкл.",
+      "toggleHaptics": "Вкл/выкл вибрацию"
     },
     "tutorial": {
-      "moveBodyTouch": "Use the movement stick to move and drag the screen to look around. Take a few steps to begin.",
-      "talkBodyTouch": "Stand close to Marshal Redbrook and tap the Use button to speak, then accept his task.",
-      "returnBodyTouch": "Your task is done. Return to Marshal Redbrook and tap the Use button to turn it in.",
-      "doneBodyTouch": "You have the basics, {name}. The Vale is yours to explore. Tap More, then Quests, to review your quest log anytime. Good hunting."
+      "moveBodyTouch": "Используйте джойстик передвижения, чтобы двигаться, и проведите по экрану, чтобы осмотреться. Сделайте несколько шагов, чтобы начать.",
+      "talkBodyTouch": "Подойдите к маршалу Редбруку и нажмите кнопку «Использовать», чтобы заговорить, затем примите его задание.",
+      "returnBodyTouch": "Задание выполнено. Вернитесь к маршалу Редбруку и нажмите кнопку «Использовать», чтобы сдать его.",
+      "doneBodyTouch": "Основы освоены, {name}. Долина в вашем распоряжении: исследуйте её. Нажмите «Еще», затем «Журнал заданий», чтобы просмотреть свои задания в любой момент. Удачной охоты!"
     },
     "widgets": {
-      "clockTitle": "Local time - click to toggle 12/24-hour",
-      "worldCoordinates": "World coordinates",
-      "coordinates": "Coordinates",
-      "heading": "Heading",
-      "minimapZoom": "Minimap zoom"
+      "clockTitle": "Местное время — нажмите для переключения 12/24-часового формата",
+      "worldCoordinates": "Координаты мира",
+      "coordinates": "Координаты",
+      "heading": "Направление",
+      "minimapZoom": "Масштаб миникарты"
     },
     "castBar": {
-      "playerAria": "Your Cast Bar",
-      "targetAria": "Unit Cast Bar"
+      "playerAria": "Ваша полоса применения",
+      "targetAria": "Полоса применения цели"
     },
     "leaderboard": {
-      "close": "Close"
+      "close": "Закрыть"
     },
     "raidLockout": {
-      "title": "Raid Lockouts",
-      "allReady": "All raids ready",
-      "daysHours": "{d}d {h}h",
-      "hoursMinutes": "{h}h {m}m",
-      "minutes": "{m}m",
-      "lessThanMinute": "<1m",
-      "lockedToast": "You are locked to {raid}. Unlocks in {time}."
+      "title": "Блокировки рейдов",
+      "allReady": "Все рейды доступны",
+      "daysHours": "{d}д {h}ч",
+      "hoursMinutes": "{h}ч {m}м",
+      "minutes": "{m}м",
+      "lessThanMinute": "<1м",
+      "lockedToast": "Вы привязаны к {raid}. Разблокировка через {time}."
     },
     "compass": {
-      "N": "N",
-      "NE": "NE",
-      "E": "E",
-      "SE": "SE",
-      "S": "S",
-      "SW": "SW",
-      "W": "W",
-      "NW": "NW"
+      "N": "С",
+      "NE": "СВ",
+      "E": "В",
+      "SE": "ЮВ",
+      "S": "Ю",
+      "SW": "ЮЗ",
+      "W": "З",
+      "NW": "СЗ"
     },
     "meters": {
-      "perSecond": "{value}/s",
+      "perSecond": "{value}/с",
       "perSecondRow": "{total} ({rate})",
-      "minutesSeconds": "{m}m {s}s",
-      "seconds": "{s}s"
+      "minutesSeconds": "{m} мин {s} сек.",
+      "seconds": "{s} сек."
     },
     "keybinds": {
-      "emoteWheel": "Emote Wheel",
-      "targetFriendly": "Target Nearest Friendly",
-      "targetFriendlyNext": "Cycle Friendly Target"
+      "emoteWheel": "Колесо эмоций",
+      "targetFriendly": "Ближайший союзник",
+      "targetFriendlyNext": "Следующий союзник"
     },
     "options": {
-      "clickMoveLeft": "Left Click",
-      "clickMoveRight": "Right Click",
-      "browserEffects": "Browser Effects",
-      "browserEffectsAuto": "Auto",
-      "browserEffectsFull": "Full",
-      "browserEffectsReduced": "Reduced",
-      "browserEffectsMinimal": "Minimal",
-      "browserEffectsNote": "Auto tones down heavy CSS effects (blur, glow, background motion) based on your browser and device. Lower it manually if the interface feels sluggish.",
-      "interfaceMode": "Interface Mode",
-      "interfaceModeAuto": "Auto",
-      "interfaceModeDesktop": "Desktop",
-      "interfaceModeTouch": "Touch",
-      "interfaceModeNote": "Auto picks desktop or touch controls from your device. Choose Desktop to force keyboard and mouse (useful on a tablet with a keyboard), or Touch for the on-screen controls.",
-      "footstepSounds": "Footstep Sounds",
-      "clickFeedback": "Click Marker",
-      "lockCursorOnRotate": "Lock Cursor While Rotating",
-      "keybindHelpLockCursorOnRotate": "Keeps the mouse cursor inside the window while you drag to rotate the camera, so it cannot reach the screen edge or move to another monitor. Turn off if you prefer a free cursor.",
-      "showWalletOnCharacterScreen": "Show Wallet on Character Screen",
-      "showWalletOnPlayerCard": "Show Wallet on Player Card",
-      "uiScale": "UI Scale",
-      "highContrastBackground": "High-Contrast Background",
-      "showItemLevel": "Show Item Level",
-      "itemLevelLine": "Item Level {level}",
-      "itemScoreLine": "Score {score}"
+      "clickMoveLeft": "Левая кнопка",
+      "clickMoveRight": "Правая кнопка",
+      "browserEffects": "Эффекты браузера",
+      "browserEffectsAuto": "Авто",
+      "browserEffectsFull": "Полные",
+      "browserEffectsReduced": "Сниженные",
+      "browserEffectsMinimal": "Минимальные",
+      "browserEffectsNote": "Авто снижает тяжёлые CSS-эффекты (размытие, свечение, движение фона) в зависимости от браузера и устройства. Если интерфейс тормозит, понизьте вручную.",
+      "interfaceMode": "Режим интерфейса",
+      "interfaceModeAuto": "Авто",
+      "interfaceModeDesktop": "Компьютер",
+      "interfaceModeTouch": "Сенсорный",
+      "interfaceModeNote": "В режиме «Авто» управление для компьютера или сенсорное выбирается по вашему устройству. Выберите «Компьютер», чтобы включить клавиатуру и мышь (удобно на планшете с клавиатурой), или «Сенсорный» для экранного управления.",
+      "footstepSounds": "Звуки шагов",
+      "clickFeedback": "Метка клика",
+      "lockCursorOnRotate": "Блокировать курсор при вращении",
+      "keybindHelpLockCursorOnRotate": "Удерживает курсор мыши внутри окна, пока вы вращаете камеру перетаскиванием, чтобы он не достигал края экрана и не переходил на другой монитор. Отключите, если предпочитаете свободный курсор.",
+      "showWalletOnCharacterScreen": "Показывать кошелек на экране персонажей",
+      "showWalletOnPlayerCard": "Показывать кошелек на карточке игрока",
+      "uiScale": "Масштаб интерфейса",
+      "highContrastBackground": "Фон высокой контрастности",
+      "showItemLevel": "Показывать уровень предмета",
+      "itemLevelLine": "Уровень предмета {level}",
+      "itemScoreLine": "Оценка {score}"
     },
     "controller": {
-      "title": "Controller",
-      "enable": "Enable Controller",
-      "invertY": "Invert Camera (Y)",
-      "deadzone": "Stick Deadzone",
-      "cameraSpeed": "Camera Speed",
-      "vibration": "Vibration",
-      "buttons": "Button Layout",
-      "resetButtons": "Reset Button Layout",
-      "menuAction": "Game Menu",
-      "help": "Left stick moves, right stick looks. Open a window to use the on-screen pointer."
+      "title": "Геймпад",
+      "enable": "Включить геймпад",
+      "invertY": "Инверсия камеры (Y)",
+      "deadzone": "Мёртвая зона стика",
+      "cameraSpeed": "Скорость камеры",
+      "vibration": "Вибрация",
+      "buttons": "Раскладка кнопок",
+      "resetButtons": "Сбросить раскладку кнопок",
+      "menuAction": "Игровое меню",
+      "help": "Левый стик — движение, правый — камера. Откройте окно, чтобы использовать экранный указатель."
     },
     "perf": {
-      "title": "Performance Overlay",
-      "enable": "Show Performance Overlay",
-      "description": "Choose which stats to show, where the overlay sits, and how it looks.",
-      "sectionPosition": "Position",
-      "sectionAppearance": "Appearance",
-      "sectionStats": "Stats",
-      "positionX": "Horizontal",
-      "positionY": "Vertical",
-      "resetPosition": "Reset Position",
-      "dragHint": "Drag the overlay to move it, or use the sliders below.",
-      "opacity": "Background Opacity",
-      "solidBg": "Solid Background",
-      "fontScale": "Text Size",
-      "textColor": "Text Color",
-      "bgColor": "Background Color",
-      "colorTheme": "Color Theme",
-      "graph": "Frame-Time Graph",
-      "thresholds": "Color-Coded Warnings",
-      "presetsLabel": "Quick Presets",
-      "presetMinimal": "Minimal",
-      "presetStandard": "Standard",
-      "presetEverything": "Everything",
+      "title": "Оверлей производительности",
+      "enable": "Показывать оверлей производительности",
+      "description": "Выберите, какие показатели отображать, где разместить оверлей и как он выглядит.",
+      "sectionPosition": "Положение",
+      "sectionAppearance": "Внешний вид",
+      "sectionStats": "Показатели",
+      "positionX": "По горизонтали",
+      "positionY": "По вертикали",
+      "resetPosition": "Сбросить положение",
+      "dragHint": "Перетащите оверлей, чтобы переместить его, или используйте ползунки ниже.",
+      "opacity": "Прозрачность фона",
+      "solidBg": "Сплошной фон",
+      "fontScale": "Размер текста",
+      "textColor": "Цвет текста",
+      "bgColor": "Цвет фона",
+      "colorTheme": "Цветовая тема",
+      "graph": "График времени кадра",
+      "thresholds": "Цветовая индикация",
+      "presetsLabel": "Готовые наборы",
+      "presetMinimal": "Минимум",
+      "presetStandard": "Стандарт",
+      "presetEverything": "Всё",
       "groups": {
-        "frame": "Frame & Timing",
-        "network": "Network",
-        "renderer": "Renderer",
-        "system": "System",
-        "input": "Input"
+        "frame": "Кадры и время",
+        "network": "Сеть",
+        "renderer": "Рендер",
+        "system": "Система",
+        "input": "Ввод"
       },
       "labels": {
         "fps": "FPS",
-        "frameTime": "Frame Time",
-        "fps1Low": "1% Low",
-        "fps01Low": "0.1% Low",
-        "ping": "Ping",
-        "jitter": "Jitter",
-        "snapshot": "Snapshot Rate",
-        "connection": "Connection",
-        "drawCalls": "Draw Calls",
-        "triangles": "Triangles",
-        "geometries": "Geometries",
-        "textures": "Textures",
-        "programs": "Shaders",
-        "renderScale": "Render Scale",
+        "frameTime": "Время кадра",
+        "fps1Low": "1% мин.",
+        "fps01Low": "0,1% мин.",
+        "ping": "Пинг",
+        "jitter": "Джиттер",
+        "snapshot": "Частота снимков",
+        "connection": "Соединение",
+        "drawCalls": "Вызовы отрисовки",
+        "triangles": "Треугольники",
+        "geometries": "Геометрия",
+        "textures": "Текстуры",
+        "programs": "Шейдеры",
+        "renderScale": "Масштаб рендера",
         "gpu": "GPU",
-        "memory": "Memory",
-        "hitches": "Hitches",
-        "entities": "Entities",
+        "memory": "Память",
+        "hitches": "Подвисания",
+        "entities": "Объекты",
         "apm": "APM"
       },
       "themes": {
-        "gold": "Gold",
-        "frost": "Frost",
-        "ember": "Ember",
-        "jade": "Jade",
-        "crimson": "Crimson",
-        "mono": "Mono"
+        "gold": "Золото",
+        "frost": "Иней",
+        "ember": "Жар",
+        "jade": "Нефрит",
+        "crimson": "Багрянец",
+        "mono": "Моно"
       },
       "units": {
-        "ms": "{value} ms",
-        "mb": "{value} MB",
-        "memPair": "{used} / {limit} MB",
-        "hz": "{value} Hz"
+        "ms": "{value} мс",
+        "mb": "{value} МБ",
+        "memPair": "{used} / {limit} МБ",
+        "hz": "{value} Гц"
       },
       "badges": {
-        "backgrounded": "Backgrounded",
-        "offline": "Offline"
+        "backgrounded": "В фоне",
+        "offline": "Не в сети"
       }
     },
     "playerCard": {
-      "showWalletBadge": "Show wallet badge"
+      "showWalletBadge": "Показывать значок кошелька"
     },
     "landing": {
-      "highContrast": "High Contrast",
-      "highContrastAria": "Toggle high-contrast background: disables the moving trailer so start-screen text stays legible"
+      "highContrast": "Высокая контрастность",
+      "highContrastAria": "Переключить фон высокой контрастности: отключает движущийся ролик, чтобы текст начального экрана оставался читаемым"
     },
     "statInfo": {
-      "fromYour": "From your {value} {stat}:",
+      "fromYour": "От вашей характеристики ({value} {stat}):",
       "desc": {
-        "str": "Increases your attack power, so your weapon strikes land harder.",
-        "agi": "Sharpens your reflexes and aim, improving several of your combat stats.",
-        "sta": "Toughens your body, raising your maximum health and how quickly you recover health while resting.",
-        "int": "Expands a spellcaster's mana pool and improves their chance to land a spell critical strike.",
-        "spi": "Quickens how fast a spellcaster's mana returns while resting, out of combat.",
-        "armor": "Softens incoming physical blows. The reduction is greater against lower-level attackers and is capped at 75%.",
-        "attackPower": "Powers your weapon attacks. Every 14 attack power adds 1 damage per second.",
-        "dps": "Your estimated weapon damage per second, combining your weapon's damage and speed with your attack power.",
-        "critChance": "Your chance for an attack to strike critically, dealing double damage.",
-        "dodge": "Your chance to completely avoid an incoming melee attack, taking no damage."
+        "str": "Увеличивает силу атаки, благодаря чему удары вашим оружием бьют сильнее.",
+        "agi": "Обостряет реакцию и меткость, улучшая сразу несколько ваших боевых характеристик.",
+        "sta": "Закаляет ваше тело, повышая максимальное здоровье и скорость его восстановления во время отдыха.",
+        "int": "Увеличивает запас маны заклинателя и повышает его шанс нанести критический удар заклинанием.",
+        "spi": "Ускоряет восстановление маны заклинателя во время отдыха вне боя.",
+        "armor": "Смягчает входящие физические удары. Снижение урона тем больше, чем ниже уровень атакующего, и не превышает 75%.",
+        "attackPower": "Усиливает атаки вашим оружием. Каждые 14 ед. силы атаки добавляют 1 ед. урона в секунду.",
+        "dps": "Приблизительный урон вашего оружия в секунду с учетом урона и скорости оружия, а также вашей силы атаки.",
+        "critChance": "Ваш шанс нанести критический удар, наносящий двойной урон.",
+        "dodge": "Ваш шанс полностью уклониться от входящей атаки в ближнем бою, не получив урона."
       },
       "effects": {
-        "attackPower": "+{value} Attack Power",
-        "rangedAttackPower": "+{value} Ranged Attack Power",
-        "critPct": "+{value}% Critical Strike",
-        "dodgePct": "+{value}% Dodge",
-        "armor": "+{value} Armor",
-        "maxHealth": "+{value} Maximum Health",
-        "maxMana": "+{value} Maximum Mana",
-        "spellCritPct": "+{value}% Spell Critical Strike",
-        "healthRegen": "About {value} health every 5 sec while resting",
-        "manaRegen": "About {value} mana every 5 sec while resting",
-        "damageReduction": "Damage reduction against a level {level} attacker: {value}%",
-        "dpsFromAp": "Adds {value} damage per second to your attacks"
+        "attackPower": "+{value} к силе атаки",
+        "rangedAttackPower": "+{value} к силе атаки в дальнем бою",
+        "critPct": "+{value}% к шансу критического удара",
+        "dodgePct": "+{value}% к уклонению",
+        "armor": "+{value} к броне",
+        "maxHealth": "+{value} к максимальному здоровью",
+        "maxMana": "+{value} к максимальному запасу маны",
+        "spellCritPct": "+{value}% к шансу критического удара заклинанием",
+        "healthRegen": "Около {value} ед. здоровья каждые 5 сек. во время отдыха",
+        "manaRegen": "Около {value} ед. маны каждые 5 сек. во время отдыха",
+        "damageReduction": "Снижение урона от атакующего {level} уровня: {value}%",
+        "dpsFromAp": "Добавляет {value} ед. урона в секунду к вашим атакам"
       },
       "notes": {
-        "minorForClass": "Of little benefit to your class.",
-        "baseChance": "Includes a 5% base chance shared by all adventurers.",
-        "dpsApprox": "An estimate, it excludes critical strikes and ability damage."
+        "minorForClass": "Малополезно для вашего класса.",
+        "baseChance": "Включает базовый шанс 5%, общий для всех искателей приключений.",
+        "dpsApprox": "Это приблизительная оценка, не учитывающая критические удары и урон от способностей."
       }
     },
     "talents": {
-      "defaultBuildName": "Build {n}"
+      "defaultBuildName": "Билд {n}"
     },
     "tips": {
-      "joinChannels": "Tip: type /join world or /join lfg to chat with players across the realm."
+      "joinChannels": "Совет: введите /join world или /join lfg, чтобы общаться с игроками по всему миру."
     },
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
     },
     "questShare": {
-      "notShareable": "This quest can't be shared.",
-      "notInSharerParty": "You must be in {name}'s party to accept that quest.",
-      "accepted": "{name} accepted your shared quest.",
-      "dialogTitle": "Shared Quest",
-      "viewOnlyHint": "Join the sharer's party to accept this quest.",
-      "alreadyOn": "You're already on this quest.",
-      "alreadyDone": "You've already completed this quest.",
-      "ineligible": "You don't meet the requirements for this quest.",
-      "noQuestSelected": "Select a quest in your log to share.",
-      "linkTitle": "Shift-click to link this quest in chat."
+      "notShareable": "Этим заданием нельзя поделиться.",
+      "notInSharerParty": "Вы должны состоять в группе игрока {name}, чтобы принять это задание.",
+      "accepted": "{name} принял задание, которым вы поделились.",
+      "dialogTitle": "Общее задание",
+      "viewOnlyHint": "Вступите в группу того, кто поделился, чтобы принять это задание.",
+      "alreadyOn": "Вы уже выполняете это задание.",
+      "alreadyDone": "Вы уже выполнили это задание.",
+      "ineligible": "Вы не соответствуете требованиям этого задания.",
+      "noQuestSelected": "Выберите задание в журнале, чтобы поделиться им.",
+      "linkTitle": "Shift + клик, чтобы вставить ссылку на это задание в чат."
     },
     "plurals": {
       "guildMembers": {
-        "one": "you are {rank}, {count} member",
-        "few": "you are {rank}, {count} members",
-        "many": "you are {rank}, {count} members",
-        "other": "you are {rank}, {count} members"
+        "one": "вы {rank}, {count} участник",
+        "few": "вы {rank}, {count} участника",
+        "many": "вы {rank}, {count} участников",
+        "other": "вы {rank}, {count} участника"
       },
       "characterCount": {
-        "one": "{count} character",
-        "few": "{count} characters",
-        "many": "{count} characters",
-        "other": "{count} characters"
+        "one": "{count} персонаж",
+        "few": "{count} персонажа",
+        "many": "{count} персонажей",
+        "other": "{count} персонажа"
       },
       "secondsRemaining": {
-        "one": "{count} second remaining",
-        "few": "{count} seconds remaining",
-        "many": "{count} seconds remaining",
-        "other": "{count} seconds remaining"
+        "one": "Осталось {count} сек.",
+        "few": "Осталось {count} сек.",
+        "many": "Осталось {count} сек.",
+        "other": "Осталось {count} сек."
       },
       "playersOnline": {
-        "one": "Who: {count} player online on {realm}.",
-        "few": "Who: {count} players online on {realm}.",
-        "many": "Who: {count} players online on {realm}.",
-        "other": "Who: {count} players online on {realm}."
+        "one": "Список игроков: на {realm} в сети {count} игрок.",
+        "few": "Список игроков: на {realm} в сети {count} игрока.",
+        "many": "Список игроков: на {realm} в сети {count} игроков.",
+        "other": "Список игроков: на {realm} в сети {count} игрока."
       }
     },
     "bugReport": {
-      "menuButton": "Report a Bug",
-      "realm": "Realm",
-      "character": "Character",
-      "position": "Position",
-      "unknown": "Unknown",
-      "description": "What went wrong?",
-      "descriptionPlaceholder": "Describe the bug: what you did, what you expected, and what happened.",
-      "includeScreenshot": "Include Screenshot",
-      "screenshotAlt": "Screenshot of the current view attached to this bug report",
-      "submit": "Send Report",
-      "submitted": "Bug report sent. Thank you!",
-      "submittedNoShot": "Bug report sent, but the screenshot was too large to include.",
-      "describeFirst": "Please describe the bug before sending.",
-      "tooLarge": "That report is too large to send. Try again without the screenshot.",
-      "rateLimited": "You've sent several reports recently. Please wait a bit before sending another.",
-      "failed": "Could not send the bug report. Please try again."
+      "menuButton": "Сообщить об ошибке",
+      "realm": "Мир",
+      "character": "Персонаж",
+      "position": "Позиция",
+      "unknown": "Неизвестно",
+      "description": "Что пошло не так?",
+      "descriptionPlaceholder": "Опишите ошибку: что вы делали, что ожидали и что произошло.",
+      "includeScreenshot": "Приложить скриншот",
+      "screenshotAlt": "Скриншот текущего вида, приложенный к этому отчёту об ошибке",
+      "submit": "Отправить отчёт",
+      "submitted": "Отчёт об ошибке отправлен. Спасибо!",
+      "submittedNoShot": "Отчёт об ошибке отправлен, но скриншот слишком большой и не был приложен.",
+      "describeFirst": "Пожалуйста, опишите ошибку перед отправкой.",
+      "tooLarge": "Этот отчёт слишком большой для отправки. Попробуйте без скриншота.",
+      "rateLimited": "Вы недавно отправили несколько отчётов. Подождите немного перед следующим.",
+      "failed": "Не удалось отправить отчёт об ошибке. Попробуйте снова."
     },
     "paperdoll": {
-      "unequipAria": "Unequip {item}",
-      "unequipHint": "Click ×, right-click, or drag to bags to unequip"
+      "unequipAria": "Снять {item}",
+      "unequipHint": "Нажмите ×, ПКМ или перетащите в сумку, чтобы снять"
     },
     "account": {
-      "title": "Account",
-      "loggedOutPrompt": "Log in to manage your account.",
-      "memberSince": "Member since {date}",
-      "sectionSettings": "Account Settings",
-      "sectionWallet": "$WOC Wallet",
-      "sectionCharacters": "Characters",
-      "sectionDanger": "Danger Zone",
-      "changePassword": "Change Password",
-      "currentPassword": "Current password",
-      "newPassword": "New password",
-      "confirmNewPassword": "Confirm new password",
-      "savePassword": "Update Password",
-      "passwordChanged": "Password updated. Other devices have been signed out.",
-      "errCurrentRequired": "Enter your current password.",
-      "errPasswordShort": "New password must be at least 6 characters.",
-      "errPasswordLong": "New password must be at most 128 characters.",
-      "errPasswordUnchanged": "New password must be different from the current one.",
-      "errPasswordConfirm": "New passwords do not match.",
-      "emailLabel": "Email (optional)",
-      "emailHint": "Used only for account recovery. Use Change Email below to update it.",
-      "saveEmail": "Save Email",
-      "emailSaved": "Email saved.",
-      "errEmailInvalid": "Enter a valid email address.",
-      "errCurrentPassword": "Your current password is incorrect.",
-      "errUsernameMatch": "That username does not match your account.",
-      "errPasswordIncorrect": "Your password is incorrect.",
-      "errCharactersOnline": "Log out all of your characters before deactivating.",
-      "deactivatedLocked": "This account has been deactivated. Contact an admin to restore it.",
-      "charactersSummary": "Manage your characters and enter the world.",
-      "charactersCount": "Characters: {count}",
-      "goToCharacters": "View Characters",
-      "walletSummary": "Verify a Solana wallet to show holder flair on your player card.",
-      "manageWallet": "Manage Wallet",
-      "deactivate": "Deactivate Account",
-      "deactivateWarning": "Deactivation locks your account and signs you out everywhere. Contact an admin to restore it. Confirm by re-entering your username and password.",
-      "confirmUsername": "Type your username to confirm",
-      "confirmPassword": "Password",
-      "deactivateConfirm": "Deactivate My Account",
-      "deactivated": "Your account has been deactivated.",
-      "logOut": "Log Out",
-      "logOutSummary": "Sign out of this device.",
-      "sectionSecurity": "Security",
-      "changeEmailTitle": "Change Email",
-      "changeEmailHint": "We email a confirmation link to the new address and a notice to the old one. Your email only changes once you open the link.",
-      "changeEmailNew": "New email",
-      "changeEmailSubmit": "Send Confirmation Link",
-      "changeEmailSent": "Check your inbox: open the link we sent to confirm your new email.",
-      "errEmailUnchanged": "That is already your email address.",
-      "twoFactorTitle": "Two-Factor Authentication",
-      "twoFactorStatusOn": "Two-factor authentication is ON for your account.",
-      "twoFactorStatusOff": "Add an authenticator app for stronger account security.",
-      "twoFactorSetupBtn": "Set Up Two-Factor",
-      "twoFactorBeginHint": "Enter your password to begin setup.",
-      "twoFactorBegin": "Begin Setup",
-      "twoFactorScanHint": "Add this key to your authenticator app (Google Authenticator, Authy, 1Password, and similar), then enter the 6-digit code it shows.",
-      "twoFactorSecretLabel": "Setup key",
-      "twoFactorOpenApp": "Open in authenticator app",
-      "twoFactorCodeLabel": "6-digit code",
-      "twoFactorVerifyBtn": "Verify and Enable",
-      "twoFactorEnabledMsg": "Two-factor authentication is now on.",
-      "twoFactorRecoveryTitle": "Save your recovery codes",
-      "twoFactorRecoveryHint": "Each code works once. Store them somewhere safe: they are the only way back in if you lose your authenticator app.",
-      "twoFactorDownloadCodes": "Download Codes",
-      "twoFactorDone": "Done",
-      "twoFactorDisableHint": "Enter your password to turn two-factor off. Your recovery codes will be discarded.",
-      "twoFactorDisableBtn": "Turn Off Two-Factor",
-      "twoFactorDisabledMsg": "Two-factor authentication is off.",
-      "errTwoFactorCode": "That code is not valid, try again.",
-      "errTwoFactorState": "Two-factor setup is not in the expected state. Reload and try again.",
-      "exportTitle": "Export My Data",
-      "exportHint": "Download a copy of your account and characters as a JSON file. We also email you a confirmation.",
-      "exportBtn": "Download My Data",
-      "exportDone": "Your data was downloaded. We emailed you a confirmation.",
-      "exportFailed": "Could not export your data. Try again in a moment."
+      "title": "Аккаунт",
+      "loggedOutPrompt": "Войдите, чтобы управлять аккаунтом.",
+      "memberSince": "Дата регистрации: {date}",
+      "sectionSettings": "Настройки аккаунта",
+      "sectionWallet": "Кошелёк $WOC",
+      "sectionCharacters": "Персонажи",
+      "sectionDanger": "Опасная зона",
+      "changePassword": "Сменить пароль",
+      "currentPassword": "Текущий пароль",
+      "newPassword": "Новый пароль",
+      "confirmNewPassword": "Подтвердите новый пароль",
+      "savePassword": "Обновить пароль",
+      "passwordChanged": "Пароль обновлён. На других устройствах выполнен выход.",
+      "errCurrentRequired": "Введите текущий пароль.",
+      "errPasswordShort": "Новый пароль должен содержать не менее 6 символов.",
+      "errPasswordLong": "Новый пароль должен содержать не более 128 символов.",
+      "errPasswordUnchanged": "Новый пароль должен отличаться от текущего.",
+      "errPasswordConfirm": "Новые пароли не совпадают.",
+      "emailLabel": "Эл. почта (необязательно)",
+      "emailHint": "Используется только для восстановления аккаунта. Мы не рассылаем рекламные письма.",
+      "saveEmail": "Сохранить почту",
+      "emailSaved": "Почта сохранена.",
+      "errEmailInvalid": "Введите корректный адрес эл. почты.",
+      "errCurrentPassword": "Текущий пароль неверен.",
+      "errUsernameMatch": "Это имя пользователя не совпадает с вашим аккаунтом.",
+      "errPasswordIncorrect": "Неверный пароль.",
+      "errCharactersOnline": "Выйдите из всех персонажей перед деактивацией.",
+      "deactivatedLocked": "Этот аккаунт деактивирован. Для восстановления обратитесь к администратору.",
+      "charactersSummary": "Управляйте персонажами и входите в мир.",
+      "charactersCount": "Персонажей: {count}",
+      "goToCharacters": "Показать персонажей",
+      "walletSummary": "Подтвердите кошелёк Solana, чтобы показать знак держателя на карточке игрока.",
+      "manageWallet": "Управление кошельком",
+      "deactivate": "Деактивировать аккаунт",
+      "deactivateWarning": "Деактивация заблокирует ваш аккаунт и выполнит выход на всех устройствах. Для восстановления обратитесь к администратору. Подтвердите, повторно введя имя пользователя и пароль.",
+      "confirmUsername": "Введите имя пользователя для подтверждения",
+      "confirmPassword": "Пароль",
+      "deactivateConfirm": "Деактивировать мой аккаунт",
+      "deactivated": "Ваш аккаунт деактивирован.",
+      "logOut": "Выйти",
+      "logOutSummary": "Выйти на этом устройстве.",
+      "sectionSecurity": "Безопасность",
+      "changeEmailTitle": "Сменить email",
+      "changeEmailHint": "Мы отправим ссылку для подтверждения на новый адрес и уведомление на старый. Ваш email изменится только после того, как вы откроете ссылку.",
+      "changeEmailNew": "Новый email",
+      "changeEmailSubmit": "Отправить ссылку для подтверждения",
+      "changeEmailSent": "Проверьте почту: откройте отправленную нами ссылку, чтобы подтвердить новый email.",
+      "errEmailUnchanged": "Это уже ваш текущий адрес email.",
+      "twoFactorTitle": "Двухфакторная аутентификация",
+      "twoFactorStatusOn": "Двухфакторная аутентификация ВКЛЮЧЕНА для вашей учётной записи.",
+      "twoFactorStatusOff": "Добавьте приложение-аутентификатор для большей защиты учётной записи.",
+      "twoFactorSetupBtn": "Настроить двухфакторную аутентификацию",
+      "twoFactorBeginHint": "Введите пароль, чтобы начать настройку.",
+      "twoFactorBegin": "Начать настройку",
+      "twoFactorScanHint": "Добавьте этот ключ в приложение-аутентификатор (Google Authenticator, Authy, 1Password и подобные), затем введите 6-значный код, который оно покажет.",
+      "twoFactorSecretLabel": "Ключ настройки",
+      "twoFactorOpenApp": "Открыть в приложении-аутентификаторе",
+      "twoFactorCodeLabel": "6-значный код",
+      "twoFactorVerifyBtn": "Проверить и включить",
+      "twoFactorEnabledMsg": "Двухфакторная аутентификация теперь включена.",
+      "twoFactorRecoveryTitle": "Сохраните коды восстановления",
+      "twoFactorRecoveryHint": "Каждый код работает один раз. Храните их в надёжном месте: это единственный способ войти, если вы потеряете приложение-аутентификатор.",
+      "twoFactorDownloadCodes": "Скачать коды",
+      "twoFactorDone": "Готово",
+      "twoFactorDisableHint": "Введите пароль, чтобы отключить двухфакторную аутентификацию. Ваши коды восстановления будут удалены.",
+      "twoFactorDisableBtn": "Отключить двухфакторную аутентификацию",
+      "twoFactorDisabledMsg": "Двухфакторная аутентификация отключена.",
+      "errTwoFactorCode": "Этот код недействителен, попробуйте ещё раз.",
+      "errTwoFactorState": "Настройка двухфакторной аутентификации находится в неожиданном состоянии. Обновите страницу и попробуйте снова.",
+      "exportTitle": "Экспорт моих данных",
+      "exportHint": "Скачайте копию вашей учётной записи и персонажей в виде файла JSON. Мы также отправим вам подтверждение по email.",
+      "exportBtn": "Скачать мои данные",
+      "exportDone": "Ваши данные были скачаны. Мы отправили вам подтверждение по email.",
+      "exportFailed": "Не удалось экспортировать ваши данные. Попробуйте снова через мгновение."
     },
     "masterLoot": {
-      "title": "Master Loot",
-      "enableLabel": "Master loot",
-      "enableAria": "Enable master loot",
-      "looterLabel": "Master looter",
-      "leaderOption": "Party leader",
-      "thresholdLabel": "Threshold",
-      "thresholdUncommon": "Uncommon and up",
-      "thresholdRare": "Rare and up",
-      "thresholdEpic": "Epic and up",
-      "assignPrompt": "Assign {item}",
-      "assignAria": "Assign {item} to {name}",
-      "rollButton": "Roll",
-      "selectAll": "Select all",
-      "methodMaster": "Loot method set to master loot. Master looter: {name}.",
-      "methodGroup": "Loot method set to group loot.",
-      "assigned": "{looter} assigned {item} to {target}.",
-      "unassigned": "{item} was not assigned and is free for all.",
-      "leaderOnly": "Only the party leader can change the loot method."
+      "title": "Распределение добычи",
+      "enableLabel": "Мастер добычи",
+      "enableAria": "Включить мастера добычи",
+      "looterLabel": "Мастер добычи",
+      "leaderOption": "Лидер группы",
+      "thresholdLabel": "Порог качества",
+      "thresholdUncommon": "Необычное и выше",
+      "thresholdRare": "Редкое и выше",
+      "thresholdEpic": "Эпическое и выше",
+      "assignPrompt": "Назначить {item}",
+      "assignAria": "Назначить {item} игроку {name}",
+      "rollButton": "Бросок",
+      "selectAll": "Выбрать всех",
+      "methodMaster": "Способ добычи изменён на мастера добычи. Мастер добычи: {name}.",
+      "methodGroup": "Способ добычи изменён на групповой.",
+      "assigned": "{looter} передал предмет {item} игроку {target}.",
+      "unassigned": "Предмет {item} не был назначен и доступен всем.",
+      "leaderOnly": "Только лидер группы может менять способ добычи."
     },
     "bags": {
-      "filterGroupAria": "Filter bags by category",
-      "filterAll": "All",
-      "filterWeapon": "Weapons",
-      "filterArmor": "Armor",
-      "filterConsumable": "Consumables",
-      "filterMaterial": "Materials",
-      "filterQuest": "Quest",
-      "sortAria": "Sort bag items",
-      "sortRecent": "Recent",
-      "sortQuality": "Quality",
-      "sortName": "Name",
-      "searchPlaceholder": "Search items",
-      "searchAria": "Search bag items by name",
-      "noMatch": "No items match your filters."
+      "filterGroupAria": "Фильтровать сумки по категории",
+      "filterAll": "Все",
+      "filterWeapon": "Оружие",
+      "filterArmor": "Броня",
+      "filterConsumable": "Расходники",
+      "filterMaterial": "Материалы",
+      "filterQuest": "Задания",
+      "sortAria": "Сортировать предметы в сумках",
+      "sortRecent": "Недавние",
+      "sortQuality": "Качество",
+      "sortName": "Название",
+      "searchPlaceholder": "Поиск предметов",
+      "searchAria": "Поиск предметов в сумках по названию",
+      "noMatch": "Нет предметов, соответствующих фильтрам."
     },
     "raidConvert": {
-      "toPartyDone": "Your raid has converted back to a party.",
-      "notRaid": "Your group is not a raid.",
-      "leaderOnly": "Only the raid leader may convert to a party.",
-      "tooLarge": "A raid with more than five members cannot convert back to a party."
+      "toPartyDone": "Ваш рейд снова преобразован в группу.",
+      "notRaid": "Ваша группа не является рейдом.",
+      "leaderOnly": "Только лидер рейда может преобразовать рейд в группу.",
+      "tooLarge": "Рейд, в котором более пяти участников, нельзя преобразовать обратно в группу."
     },
     "itemArmorType": {
-      "cloth": "Cloth",
-      "leather": "Leather",
-      "mail": "Mail"
+      "cloth": "Ткань",
+      "leather": "Кожа",
+      "mail": "Кольчуга"
     },
     "auraEffect": {
-      "dot": "Deals {value} {school} damage every {interval} sec",
-      "hot": "Restores {value} health every {interval} sec",
-      "absorb": "Absorbs {value} damage",
-      "healAbsorb": "Absorbs {value} incoming healing",
-      "thorns": "Deals {value} {school} damage to attackers",
-      "slow": "Reduces movement speed by {pct}%",
-      "speed": "Increases movement speed by {pct}%",
-      "attackSpeedSlow": "Slows attack speed by {pct}%",
-      "attackSpeedFast": "Increases attack speed by {pct}%",
-      "haste": "Increases attack and casting speed by {pct}%",
-      "tongues": "Increases casting time by {pct}%",
+      "dot": "Наносит {value} единиц урона ({school}) каждые {interval} сек",
+      "hot": "Восстанавливает {value} здоровья каждые {interval} сек",
+      "absorb": "Поглощает {value} единиц урона",
+      "healAbsorb": "Поглощает {value} единиц входящего исцеления",
+      "thorns": "Наносит {value} единиц урона ({school}) атакующим",
+      "slow": "Снижает скорость передвижения на {pct}%",
+      "speed": "Повышает скорость передвижения на {pct}%",
+      "attackSpeedSlow": "Замедляет скорость атаки на {pct}%",
+      "attackSpeedFast": "Повышает скорость атаки на {pct}%",
+      "haste": "Повышает скорость атаки и произнесения заклинаний на {pct}%",
+      "tongues": "Увеличивает время произнесения заклинаний на {pct}%",
       "increase": {
-        "ap": "Increases attack power by {value}",
-        "armor": "Increases armor by {value}",
-        "int": "Increases Intellect by {value}",
-        "agi": "Increases Agility by {value}",
-        "sta": "Increases Stamina by {value}",
-        "spi": "Increases Spirit by {value}",
-        "allStats": "Increases all attributes by {value}"
+        "ap": "Повышает силу атаки на {value}",
+        "armor": "Повышает броню на {value}",
+        "int": "Повышает интеллект на {value}",
+        "agi": "Повышает ловкость на {value}",
+        "sta": "Повышает выносливость на {value}",
+        "spi": "Повышает дух на {value}",
+        "allStats": "Повышает все характеристики на {value}"
       },
       "reduce": {
-        "ap": "Reduces attack power by {value}",
-        "armor": "Reduces armor by {value}",
-        "int": "Reduces Intellect by {value}",
-        "agi": "Reduces Agility by {value}",
-        "sta": "Reduces Stamina by {value}",
-        "spi": "Reduces Spirit by {value}",
-        "allStats": "Reduces all attributes by {value}"
+        "ap": "Снижает силу атаки на {value}",
+        "armor": "Снижает броню на {value}",
+        "int": "Снижает интеллект на {value}",
+        "agi": "Снижает ловкость на {value}",
+        "sta": "Снижает выносливость на {value}",
+        "spi": "Снижает дух на {value}",
+        "allStats": "Снижает все характеристики на {value}"
       },
-      "dodge": "Increases dodge chance by {pct}%",
-      "dodgeReduce": "Reduces dodge chance by {pct}%",
-      "armorFlat": "Reduces armor by {value}",
-      "armorFlatStacks": "Reduces armor by {value} ({stacks} stacks)",
-      "mortalWound": "Reduces healing received by {pct}%",
-      "vulnerability": "Increases damage taken by {pct}%",
-      "physVuln": "Increases physical damage taken by {pct}%",
-      "spellVuln": "Increases magic damage taken by {pct}%",
-      "critVuln": "Increases chance to be critically hit by {pct}%",
-      "costTax": "Increases ability costs by {pct}%",
-      "stun": "Stunned: unable to act",
-      "root": "Rooted: unable to move",
-      "incapacitate": "Incapacitated: unable to act",
-      "polymorph": "Polymorphed: unable to act",
-      "hex": "Reduces damage and healing dealt by {pct}%",
-      "blind": "Blinded: unable to act",
-      "silence": "Silenced: unable to cast spells",
-      "disarm": "Disarmed: cannot use weapon attacks",
-      "lockout": "Spell school locked out",
-      "imbue": "Weapon imbued with bonus effects",
-      "imbueRange": "Weapon imbued: {min} to {max} bonus damage on judgement",
-      "stealth": "Concealed; movement speed reduced by {pct}%",
-      "formBear": "Bear Form: increased health and armor",
-      "formCat": "Cat Form: melee damage and energy",
-      "formTravel": "Travel Form: movement speed increased by {pct}%",
-      "defensiveStance": "Defensive Stance: reduced damage taken, more threat",
-      "righteousFury": "Righteous Fury: greatly increased threat from Holy damage",
-      "scale": "Size increased by {pct}%",
-      "jump": "Jump height increased by {pct}%",
+      "dodge": "Повышает шанс уклонения на {pct}%",
+      "dodgeReduce": "Снижает шанс уклонения на {pct}%",
+      "armorFlat": "Снижает броню на {value}",
+      "armorFlatStacks": "Снижает броню на {value} ({stacks} зарядов)",
+      "mortalWound": "Снижает получаемое исцеление на {pct}%",
+      "vulnerability": "Увеличивает получаемый урон на {pct}%",
+      "physVuln": "Увеличивает получаемый физический урон на {pct}%",
+      "spellVuln": "Увеличивает получаемый магический урон на {pct}%",
+      "critVuln": "Увеличивает шанс получить критический удар на {pct}%",
+      "costTax": "Увеличивает стоимость способностей на {pct}%",
+      "stun": "Оглушение: невозможно действовать",
+      "root": "Обездвиживание: невозможно двигаться",
+      "incapacitate": "Недееспособность: невозможно действовать",
+      "polymorph": "Превращение: невозможно действовать",
+      "hex": "Снижает наносимый урон и исцеление на {pct}%",
+      "blind": "Ослепление: невозможно действовать",
+      "silence": "Немота: невозможно произносить заклинания",
+      "disarm": "Обезоруживание: невозможно использовать атаки оружием",
+      "lockout": "Школа заклинаний заблокирована",
+      "imbue": "Оружие наделено дополнительными эффектами",
+      "imbueRange": "Оружие наделено: от {min} до {max} дополнительного урона при правосудии",
+      "stealth": "Скрытность; скорость передвижения снижена на {pct}%",
+      "formBear": "Облик медведя: повышенное здоровье и броня",
+      "formCat": "Облик кошки: урон в ближнем бою и энергия",
+      "formTravel": "Походный облик: скорость передвижения повышена на {pct}%",
+      "defensiveStance": "Защитная стойка: сниженный получаемый урон, больше угрозы",
+      "righteousFury": "Праведная ярость: значительно повышенная угроза от урона Святой школы",
+      "scale": "Размер увеличен на {pct}%",
+      "jump": "Высота прыжка увеличена на {pct}%",
       "school": {
-        "physical": "Physical",
-        "fire": "Fire",
-        "frost": "Frost",
-        "arcane": "Arcane",
-        "shadow": "Shadow",
-        "holy": "Holy",
-        "nature": "Nature"
+        "physical": "Физическая",
+        "fire": "Огонь",
+        "frost": "Лёд",
+        "arcane": "Тайная магия",
+        "shadow": "Тьма",
+        "holy": "Свет",
+        "nature": "Природа"
       }
     },
     "loot": {
-      "chestTitle": "Chest"
+      "chestTitle": "Сундук"
     },
     "spellbook": {
-      "addToBarAria": "Add {name} to action bar",
-      "removeFromBarAria": "Remove {name} from action bar"
+      "addToBarAria": "Добавить {name} на панель действий",
+      "removeFromBarAria": "Убрать {name} с панели действий"
     },
     "nameplate": {
       "mob": "[{level}] {name}",
@@ -725,766 +725,766 @@ export const ru_RU: EnTranslations = {
   "guide": {
     "brand": "World of ClaudeCraft",
     "brandShort": "ClaudeCraft",
-    "tagline": "A classic-style MMO you play free in your browser.",
-    "skipToContent": "Skip to main content",
-    "loading": "Loading...",
+    "tagline": "Классическая MMO, в которую можно играть бесплатно прямо в браузере.",
+    "skipToContent": "Перейти к основному содержимому",
+    "loading": "Загрузка...",
     "docTitle": "{page} - {brand}",
-    "related": "Related",
+    "related": "Связанное",
     "nav": {
-      "overview": "Overview",
-      "howToPlay": "How to Play",
-      "classes": "Classes",
-      "bestiary": "Bestiary",
-      "models": "3D Models",
-      "gear": "Gear & Items",
-      "economy": "Economy & Trade",
-      "social": "Social & Groups",
-      "stats": "Character & Stats",
-      "progression": "Leveling & Progression",
-      "world": "World",
-      "quests": "Quests",
-      "dungeons": "Dungeons & Raids",
-      "reference": "Reference",
-      "controls": "Controls",
-      "combat": "Combat",
-      "talents": "Talents",
-      "arena": "Arena & PvP",
-      "glossary": "Glossary",
-      "wishIKnew": "Things I Wish I Knew",
-      "faq": "FAQ",
-      "playNow": "Play Now",
-      "openMenu": "Open menu",
-      "closeMenu": "Close menu",
-      "primary": "Guide sections",
-      "topics": "Topics",
-      "onThisPage": "On this page",
-      "backToGame": "Back to the game"
+      "overview": "Обзор",
+      "howToPlay": "Как играть",
+      "classes": "Классы",
+      "bestiary": "Бестиарий",
+      "models": "3D-модели",
+      "gear": "Снаряжение и предметы",
+      "economy": "Экономика и торговля",
+      "social": "Общение и группы",
+      "stats": "Персонаж и характеристики",
+      "progression": "Уровни и развитие",
+      "world": "Мир",
+      "quests": "Задания",
+      "dungeons": "Подземелья и рейды",
+      "reference": "Справочник",
+      "controls": "Управление",
+      "combat": "Бой",
+      "talents": "Таланты",
+      "arena": "Арена и PvP",
+      "glossary": "Глоссарий",
+      "wishIKnew": "Что бы я хотел знать заранее",
+      "faq": "ЧаВо",
+      "playNow": "Играть",
+      "openMenu": "Открыть меню",
+      "closeMenu": "Закрыть меню",
+      "primary": "Разделы руководства",
+      "topics": "Темы",
+      "onThisPage": "На этой странице",
+      "backToGame": "Вернуться в игру"
     },
     "groups": {
-      "start": "Get Started",
-      "compendium": "Compendium",
-      "reference": "Reference"
+      "start": "Начало",
+      "compendium": "Компендиум",
+      "reference": "Справочник"
     },
     "breadcrumb": {
-      "label": "Breadcrumb",
-      "home": "Guide"
+      "label": "Навигационная цепочка",
+      "home": "Руководство"
     },
     "seq": {
-      "label": "Page navigation",
-      "prev": "Previous",
-      "next": "Next"
+      "label": "Навигация по страницам",
+      "prev": "Назад",
+      "next": "Далее"
     },
     "toc": {
-      "heading": "On this page"
+      "heading": "На этой странице"
     },
     "footer": {
-      "blurb": "An open-source, classic-style micro-MMO. Quest, group up, and explore a hand-built world, right in your browser.",
-      "playNow": "Play Now",
-      "github": "Source on GitHub",
-      "discord": "Join the Discord",
-      "communityWiki": "Community Wiki",
+      "blurb": "Классическая мини-MMO с открытым исходным кодом. Выполняйте задания, объединяйтесь в группы и исследуйте созданный вручную мир прямо в браузере.",
+      "playNow": "Играть",
+      "github": "Исходный код на GitHub",
+      "discord": "Присоединиться к Discord",
+      "communityWiki": "Вики сообщества",
       "rights": "World of ClaudeCraft"
     },
     "language": {
-      "label": "Language",
-      "select": "Choose a language"
+      "label": "Язык",
+      "select": "Выберите язык"
     },
     "search": {
-      "label": "Search",
-      "placeholder": "Search the guide",
-      "noResults": "No matches",
-      "typePage": "Page",
-      "typeClass": "Class",
-      "typeZone": "Zone",
-      "typeCreature": "Creatures",
-      "typeDungeon": "Dungeon",
-      "typeTerm": "Term"
+      "label": "Поиск",
+      "placeholder": "Поиск по руководству",
+      "noResults": "Совпадений нет",
+      "typePage": "Страница",
+      "typeClass": "Класс",
+      "typeZone": "Зона",
+      "typeCreature": "Существа",
+      "typeDungeon": "Подземелье",
+      "typeTerm": "Термин"
     },
     "home": {
-      "eyebrow": "Classic-style browser MMO",
+      "eyebrow": "Классическая браузерная MMO",
       "title": "World of ClaudeCraft",
-      "subtitle": "Quest, group up, and explore a hand-built world, free in your browser.",
-      "ctaPlay": "Play Now",
-      "ctaLearn": "How to Play",
+      "subtitle": "Выполняйте задания, объединяйтесь в группы и исследуйте созданный вручную мир бесплатно прямо в браузере.",
+      "ctaPlay": "Играть",
+      "ctaLearn": "Как играть",
       "what": {
-        "heading": "A classic MMO, made to be picked up",
-        "pillarPlayTitle": "Play in your browser",
-        "pillarPlayBody": "No download, no launcher. Make a character and you are in the world in seconds, on desktop or phone.",
-        "pillarClassesTitle": "Nine classes, three roles",
-        "pillarClassesBody": "Tank, heal, or deal the damage. Every class plays the way its archetype should, with talents to make it yours.",
-        "pillarOpenTitle": "Free and open source",
-        "pillarOpenBody": "Free to play to the level cap, with the whole game open source. No pay to win, ever."
+        "heading": "Классическая MMO, в которую легко погрузиться",
+        "pillarPlayTitle": "Играйте в браузере",
+        "pillarPlayBody": "Без скачивания и лаунчера. Создайте персонажа, и через несколько секунд вы уже в игре, на компьютере или телефоне.",
+        "pillarClassesTitle": "Девять классов, три роли",
+        "pillarClassesBody": "Будьте танком, лекарем или наносите урон. Каждый класс играется так, как и положено его архетипу, а таланты делают его по-настоящему вашим.",
+        "pillarOpenTitle": "Бесплатно и с открытым исходным кодом",
+        "pillarOpenBody": "Бесплатная игра до максимального уровня, а исходный код игры полностью открыт. Никакого pay-to-win, никогда."
       },
       "classes": {
-        "heading": "Choose your class",
-        "sub": "Nine classic archetypes, each with its own feel and party role.",
-        "cta": "Explore the classes"
+        "heading": "Выберите свой класс",
+        "sub": "Девять классических архетипов, у каждого свой стиль игры и роль в группе.",
+        "cta": "Изучить классы"
       },
       "world": {
-        "heading": "Explore the world",
-        "sub": "One continuous land, three zones, from quiet valleys to frozen peaks.",
-        "levels": "Levels {min} to {max}",
-        "cta": "See the world",
-        "valeName": "Eastbrook Vale",
-        "valeBlurb": "Green hills and old woods where every adventure begins.",
-        "marshName": "Mirefen Marsh",
-        "marshBlurb": "Sunken fens and tide-worn ruins, home to murlocs and worse.",
-        "peaksName": "Thornpeak Heights",
-        "peaksBlurb": "Wind-scoured ridges climbing toward the realm's coldest dangers."
+        "heading": "Исследуйте мир",
+        "sub": "Единая земля и три зоны, от тихих долин до ледяных вершин.",
+        "levels": "Уровни с {min} по {max}",
+        "cta": "Посмотреть мир",
+        "valeName": "Долина Истбрук",
+        "valeBlurb": "Зелёные холмы и древние леса, где начинается любое приключение.",
+        "marshName": "Топь Мирфен",
+        "marshBlurb": "Затопленные болота и изъеденные приливами руины, дом мурлоков и тварей пострашнее.",
+        "peaksName": "Тернопиковые высоты",
+        "peaksBlurb": "Выскобленные ветром хребты, что уходят ввысь к самым холодным опасностям королевства."
       },
       "group": {
-        "heading": "Group up for the hard parts",
-        "sub": "The world is soloable, but the best loot waits behind a good party.",
-        "dungeonsTitle": "Dungeons",
-        "dungeonsBody": "Instanced dives for a party of five, scaling with the zones around them.",
-        "raidTitle": "The raid",
-        "raidBody": "A ten-player capstone for those who reach the top of the world.",
-        "arenaTitle": "The arena",
-        "arenaBody": "Step into the Ashen Coliseum and prove yourself against other players.",
-        "cta": "Dungeons and Raids"
+        "heading": "Объединяйтесь для сложных испытаний",
+        "sub": "Мир можно пройти в одиночку, но лучшая добыча ждёт за хорошей группой.",
+        "dungeonsTitle": "Подземелья",
+        "dungeonsBody": "Изолированные вылазки для группы из пяти игроков, чья сложность растёт вместе с окружающими зонами.",
+        "raidTitle": "Рейд",
+        "raidBody": "Венец для десяти игроков, добравшихся до вершины мира.",
+        "arenaTitle": "Арена",
+        "arenaBody": "Ступите на Пепельный Колизей и докажите своё превосходство над другими игроками.",
+        "cta": "Подземелья и рейды"
       },
       "faq": {
-        "heading": "Good to know",
-        "q1": "Is it free to play?",
-        "a1": "Yes. The whole game is free to the level cap, and it is open source on GitHub.",
-        "q2": "Do I need a crypto wallet?",
-        "a2": "No. The game is fully playable without one. The optional community token only unlocks cosmetic flair and never affects power.",
-        "q3": "Can I play offline?",
-        "a3": "Yes. There is an instant single-player mode in your browser, plus the shared online realm.",
-        "q4": "How long to reach max level?",
-        "a4": "The cap is level {cap}, reached across three zones of quests, dungeons, and exploration."
+        "heading": "Полезно знать",
+        "q1": "Игра бесплатная?",
+        "a1": "Да. Вся игра бесплатна до максимального уровня, а её исходный код открыт на GitHub.",
+        "q2": "Нужен ли мне криптокошелёк?",
+        "a2": "Нет. В игру можно полноценно играть и без него. Необязательный токен сообщества открывает только косметические украшения и никогда не влияет на силу.",
+        "q3": "Можно ли играть офлайн?",
+        "a3": "Да. В браузере есть мгновенный одиночный режим, а также общий онлайн-мир.",
+        "q4": "Сколько нужно времени, чтобы достичь максимального уровня?",
+        "a4": "Предел - {cap} уровень, который достигается через три зоны с заданиями, подземельями и исследованиями."
       },
       "community": {
-        "heading": "Join the realm",
-        "body": "Jump in now, or come say hello. The world is better with company.",
-        "play": "Play Now",
-        "discord": "Join the Discord",
-        "github": "Star on GitHub"
+        "heading": "Присоединяйтесь к королевству",
+        "body": "Заходите прямо сейчас или просто загляните поздороваться. В компании мир становится лучше.",
+        "play": "Играть",
+        "discord": "Присоединиться к Discord",
+        "github": "Поставить звезду на GitHub"
       }
     },
     "howToPlay": {
-      "intro": "New to this kind of game? You will be questing in minutes. Here is the short version, one step at a time.",
-      "firstHeading": "Your first 15 minutes",
-      "step1Title": "Make a character",
-      "step1Body": "Pick a class and a look, give your hero a name, and enter the world. You can make more characters later.",
-      "step2Title": "Find your first quest",
-      "step2Body": "Marshal Redbrook is waiting in the starting town. Talk to him and accept Wolves at the Door.",
-      "step3Title": "Move and look around",
-      "step3Body": "Move with W, A, S, D. Hold the right mouse button and drag to look around. That is most of it.",
-      "step4Title": "Fight something",
-      "step4Body": "Press Tab to target the nearest enemy, then press your abilities on the bar (keys 1 through 0) to attack.",
-      "step5Title": "Turn it in",
-      "step5Body": "Finish the objective, return to the quest giver (look for the marker on your map), and collect your reward.",
-      "step6Title": "Keep going",
-      "step6Body": "You just hit level 2. Follow the quest trail out of town and the world opens up from there.",
-      "basicsHeading": "The basics",
-      "resourcesTitle": "Resources",
-      "resourcesBody": "Spells and abilities cost a resource. Warriors build Rage by fighting, rogues spend Energy that refills on its own, and everyone else casts from a pool of Mana.",
-      "targetingTitle": "Targeting and your bar",
-      "targetingBody": "Tab cycles enemies, F interacts and loots, and your action bar holds the abilities you have learned. Drag spells onto it from your spellbook.",
-      "questsTitle": "Quests",
-      "questsBody": "Accept quests from people with a marker over their head, complete the objective, and turn them in for experience, coin, and gear. The tracker on screen keeps your goals in view.",
-      "deathTitle": "Death is not the end",
-      "deathBody": "If you fall, you release your spirit at the nearest graveyard and run back to your body. No experience is lost.",
-      "groupingTitle": "Playing together",
-      "groupingBody": "Invite others to a party to share quest credit and take on dungeons. Most of the world is soloable, so grouping is a choice, not a chore.",
-      "onlineTitle": "Online or offline",
-      "onlineBody": "Play the shared online realm with everyone else, or start an instant offline world in your browser to learn the ropes.",
-      "reassure": "Talents unlock at level 10 and can be reset at any time, so your early choices are never permanent. Experiment freely.",
-      "controlsLink": "See the full controls reference"
+      "intro": "Впервые в играх такого рода? Уже через несколько минут вы будете выполнять задания. Вот краткая версия, шаг за шагом.",
+      "firstHeading": "Ваши первые 15 минут",
+      "step1Title": "Создайте персонажа",
+      "step1Body": "Выберите класс и внешность, дайте своему герою имя и войдите в мир. Других персонажей можно создать позже.",
+      "step2Title": "Найдите своё первое задание",
+      "step2Body": "Маршал Редбрук ждёт в стартовом городе. Поговорите с ним и возьмите задание \"Волки у ворот\".",
+      "step3Title": "Двигайтесь и осматривайтесь",
+      "step3Body": "Передвигайтесь с помощью W, A, S, D. Зажмите правую кнопку мыши и тяните, чтобы осмотреться. Вот, по сути, и всё.",
+      "step4Title": "Вступите в бой",
+      "step4Body": "Нажмите Tab, чтобы выбрать ближайшего врага, затем используйте способности на панели (клавиши с 1 по 0), чтобы атаковать.",
+      "step5Title": "Сдайте задание",
+      "step5Body": "Выполните цель, вернитесь к тому, кто дал задание (ищите отметку на карте), и заберите награду.",
+      "step6Title": "Продолжайте в том же духе",
+      "step6Body": "Вы только что получили 2 уровень. Следуйте по цепочке заданий из города, и мир откроется перед вами.",
+      "basicsHeading": "Основы",
+      "resourcesTitle": "Ресурсы",
+      "resourcesBody": "Заклинания и способности расходуют ресурс. Воины накапливают ярость в бою, разбойники тратят энергию, которая восполняется сама, а все остальные черпают из запаса маны.",
+      "targetingTitle": "Выбор цели и панель способностей",
+      "targetingBody": "Tab переключает врагов, F позволяет взаимодействовать и собирать добычу, а на панели команд хранятся изученные способности. Перетаскивайте на неё заклинания из книги заклинаний.",
+      "questsTitle": "Задания",
+      "questsBody": "Берите задания у персонажей с отметкой над головой, выполняйте цель и сдавайте их за опыт, золото и снаряжение. Трекер на экране держит ваши цели на виду.",
+      "deathTitle": "Смерть - это не конец",
+      "deathBody": "Если вы пали, высвободите дух на ближайшем кладбище и добегите до своего тела. Опыт при этом не теряется.",
+      "groupingTitle": "Игра вместе",
+      "groupingBody": "Приглашайте других в группу, чтобы делить зачёт по заданиям и проходить подземелья. Большую часть мира можно пройти в одиночку, так что группа - это выбор, а не обязанность.",
+      "onlineTitle": "Онлайн или офлайн",
+      "onlineBody": "Играйте в общем онлайн-королевстве вместе со всеми или запустите мгновенный офлайн-мир в браузере, чтобы освоиться.",
+      "reassure": "Таланты открываются на 10 уровне и в любой момент могут быть сброшены, так что ранние решения никогда не бывают окончательными. Экспериментируйте смело.",
+      "controlsLink": "Посмотреть полный справочник по управлению"
     },
     "controls": {
-      "intro": "Default keys for desktop. Every binding can be changed in the game's options.",
-      "keyHeader": "Key",
-      "actionHeader": "Action",
-      "groupMovement": "Movement",
-      "groupCombat": "Targeting and combat",
-      "groupInterface": "Windows",
-      "groupCamera": "Camera",
-      "talents": "Talents",
-      "arena": "Arena",
-      "leaderboard": "Leaderboard",
-      "abilities": "Use abilities",
-      "mobileHeading": "On mobile",
-      "mobileBody": "Touch controls appear automatically on phones and tablets: a movement stick on the left, drag anywhere on the right to look, and on-screen buttons for your abilities and menus."
+      "intro": "Клавиши по умолчанию для компьютера. Любую привязку можно изменить в настройках игры.",
+      "keyHeader": "Клавиша",
+      "actionHeader": "Действие",
+      "groupMovement": "Передвижение",
+      "groupCombat": "Выбор цели и бой",
+      "groupInterface": "Окна",
+      "groupCamera": "Камера",
+      "talents": "Таланты",
+      "arena": "Арена",
+      "leaderboard": "Таблица лидеров",
+      "abilities": "Использовать способности",
+      "mobileHeading": "На мобильных устройствах",
+      "mobileBody": "На телефонах и планшетах сенсорное управление появляется автоматически: джойстик передвижения слева, перетаскивание в любой точке справа для обзора и экранные кнопки для способностей и меню."
     },
     "combat": {
-      "intro": "Combat follows familiar classic-MMO rules. You never need to study any of it to play well, this is just the shape of how fights work.",
-      "hitTitle": "Not every blow lands",
-      "hitBody": "Attacks can miss or be dodged, parried, and blocked, and so can the enemy's. Fighting near your own level and keeping your gear current is what makes your hits connect.",
-      "mitigationTitle": "Armor and gear keep you standing",
-      "mitigationBody": "Armor softens physical hits and the right gear blunts magic, so upgrades are your main source of staying power. Heavier armor classes shrug off more, but nothing makes you untouchable.",
-      "resourcesTitle": "Every class has its own rhythm",
-      "resourcesBody": "Warriors build Rage in the thick of a fight, rogues spend Energy that steadily returns, and casters manage a pool of Mana. Learning your resource is half of playing your class well.",
-      "growTitle": "You grow stronger every level",
-      "growBody": "Each level makes you tougher and unlocks new abilities, all the way to the cap of level {cap}. Questing is the fastest way up; dungeons and exploration round it out.",
-      "effectsTitle": "Buffs, debuffs, and crowd control",
-      "effectsBody": "Many abilities apply an effect that lingers. Helpful ones (buffs) raise your stats, shield you, or heal you a little at a time; harmful ones (debuffs) drain your health with damage over time or weaken you. Watch the small icons near your action bar to see what is on you and how long it lasts.",
-      "ccBody": "Crowd control is a special kind of debuff that limits what a target can do: stuns, roots and slows, silences that stop spellcasting, disarms, fears, and polymorph that turns a foe harmless for a moment. Some of these, like roots, fears, and polymorph, lose their hold when they are reapplied too quickly, so they cannot be chained forever.",
-      "deathTitle": "When you fall",
-      "deathBody": "If your health reaches zero you are downed. You revive after a short wait and carry on from where you left off, so a death costs you a little time, not your progress. Between fights, sit to eat and drink so you start the next one at full strength."
+      "intro": "Бой подчиняется привычным правилам классических MMO. Чтобы хорошо играть, изучать их вовсе не обязательно, это лишь общее представление о том, как устроены сражения.",
+      "hitTitle": "Не каждый удар достигает цели",
+      "hitBody": "Атаки могут промахнуться или быть уклонены, парированы и заблокированы, как ваши, так и вражеские. Сражения с противниками своего уровня и своевременное обновление снаряжения - вот что помогает вашим ударам попадать в цель.",
+      "mitigationTitle": "Броня и снаряжение держат вас на ногах",
+      "mitigationBody": "Броня смягчает физические удары, а подходящее снаряжение притупляет магию, так что улучшения - ваш главный источник живучести. Классы в тяжёлой броне выдерживают больше, но неуязвимым вас ничто не сделает.",
+      "resourcesTitle": "У каждого класса свой ритм",
+      "resourcesBody": "Воины накапливают ярость в гуще боя, разбойники тратят энергию, что неуклонно восполняется, а заклинатели распоряжаются запасом маны. Освоить свой ресурс - это половина умелой игры за свой класс.",
+      "growTitle": "С каждым уровнем вы становитесь сильнее",
+      "growBody": "Каждый уровень делает вас крепче и открывает новые способности, вплоть до предела в {cap} уровень. Выполнение заданий - самый быстрый путь наверх, а подземелья и исследования его дополняют.",
+      "effectsTitle": "Усиления, ослабления и контроль",
+      "effectsBody": "Многие способности накладывают эффект, что задерживается на время. Полезные (усиления) повышают ваши характеристики, прикрывают щитом или понемногу лечат, вредные (ослабления) истощают здоровье уроном со временем или ослабляют вас. Следите за маленькими значками рядом с панелью способностей, чтобы видеть, что на вас наложено и сколько это продлится.",
+      "ccBody": "Контроль, это особый вид ослабления, что ограничивает действия цели: оглушения, обездвиживания и замедления, безмолвие, прерывающее чтение заклинаний, обезоруживания, страхи, а также превращение, что на миг делает врага безобидным. Некоторые из них, вроде обездвиживаний, страхов и превращения, теряют свою хватку, если накладывать их слишком быстро подряд, так что бесконечно сковывать врага не выйдет.",
+      "deathTitle": "Когда вы пали",
+      "deathBody": "Если ваше здоровье опускается до нуля, вы повержены. После недолгого ожидания вы возрождаетесь и продолжаете с того места, где остановились, так что смерть стоит вам немного времени, а не вашего прогресса. Между боями садитесь, чтобы поесть и попить, и начинайте следующую схватку в полной силе."
     },
     "glossary": {
-      "intro": "A quick reference for the terms used across this guide and in chat.",
-      "aggroTerm": "Aggro",
-      "aggroDef": "An enemy's attention. The player generating the most threat holds aggro and gets attacked.",
-      "threatTerm": "Threat",
-      "threatDef": "How much an enemy wants to attack you. The tank's job is to hold more threat than everyone else.",
-      "gcdTerm": "Global cooldown",
-      "gcdDef": "The short, shared pause after using most abilities, so you cannot fire everything at once.",
+      "intro": "Краткий справочник по терминам, что используются в этом руководстве и в чате.",
+      "aggroTerm": "Агро",
+      "aggroDef": "Внимание противника. Игрок, создающий больше всего угрозы, удерживает агро и принимает атаки на себя.",
+      "threatTerm": "Угроза",
+      "threatDef": "Насколько сильно враг хочет атаковать вас. Задача танка, удерживать больше угрозы, чем у всех остальных.",
+      "gcdTerm": "Общее восстановление",
+      "gcdDef": "Короткая общая пауза после использования большинства способностей, чтобы нельзя было применить всё разом.",
       "dpsTerm": "DPS",
-      "dpsDef": "Damage per second, a rough measure of how fast something deals damage.",
-      "buffTerm": "Buff",
-      "buffDef": "A helpful effect on you or an ally, like a blessing that raises a stat for a while.",
-      "debuffTerm": "Debuff",
-      "debuffDef": "A harmful effect on a target, like a slow, a bleed, or weakened armor.",
-      "dotTerm": "DoT and HoT",
-      "dotDef": "Damage over time and healing over time: effects that tick in steady pulses instead of all at once.",
-      "ccTerm": "Crowd control",
-      "ccDef": "Abilities that stun, root, or otherwise take an enemy out of the fight for a moment.",
-      "procTerm": "Proc",
-      "procDef": "A chance-based effect that fires off something else, like a bonus that sometimes triggers when you attack.",
-      "eliteTerm": "Elite",
-      "eliteDef": "A tougher-than-normal enemy, usually meant for a group. Dungeon and rare enemies are often elite.",
-      "rareTerm": "Rare",
-      "rareDef": "An uncommon named enemy that wanders a zone and drops better loot.",
-      "mobTerm": "Mob",
-      "mobDef": "Any computer-controlled creature in the world, friendly or hostile. Short for mobile.",
-      "tankTerm": "Tank",
-      "tankDef": "The party member who holds enemy aggro and absorbs the damage so others can fight safely.",
-      "healerTerm": "Healer",
-      "healerDef": "The party member who keeps everyone alive with healing spells.",
-      "specTerm": "Spec",
-      "specDef": "A specialization: the path you lean your class toward, like healing or damage, as you spend talents.",
-      "pullTerm": "Pull",
-      "pullDef": "To draw an enemy or group into a fight, usually deliberately and one batch at a time.",
-      "instanceTerm": "Instance",
-      "instanceDef": "A private copy of a dungeon or raid made just for your party."
+      "dpsDef": "Урон в секунду, приблизительная мера того, как быстро что-либо наносит урон.",
+      "buffTerm": "Усиление",
+      "buffDef": "Полезный эффект на вас или союзнике, например благословение, которое на время повышает характеристику.",
+      "debuffTerm": "Ослабление",
+      "debuffDef": "Вредный эффект на цели, например замедление, кровотечение или ослабленная броня.",
+      "dotTerm": "Периодический урон и лечение",
+      "dotDef": "Урон со временем и лечение со временем: эффекты, которые срабатывают ровными импульсами, а не сразу.",
+      "ccTerm": "Контроль",
+      "ccDef": "Способности, которые оглушают, обездвиживают или иным образом ненадолго выводят врага из боя.",
+      "procTerm": "Срабатывание",
+      "procDef": "Эффект с шансом срабатывания, который запускает что-то еще, например бонус, иногда возникающий при атаке.",
+      "eliteTerm": "Элитный",
+      "eliteDef": "Противник крепче обычного, как правило, рассчитанный на группу. Враги в подземельях и редкие противники зачастую элитные.",
+      "rareTerm": "Редкий",
+      "rareDef": "Нечастый именной противник, что бродит по зоне и роняет добычу получше.",
+      "mobTerm": "Моб",
+      "mobDef": "Любое управляемое компьютером существо в мире, дружественное или враждебное. Сокращение от mobile.",
+      "tankTerm": "Танк",
+      "tankDef": "Участник группы, что удерживает агро врагов и принимает урон на себя, чтобы остальные могли сражаться без опаски.",
+      "healerTerm": "Лекарь",
+      "healerDef": "Участник группы, что поддерживает жизнь всех остальных лечащими заклинаниями.",
+      "specTerm": "Специализация",
+      "specDef": "Специализация: путь, в сторону которого вы развиваете класс, например лечение или урон, по мере вложения талантов.",
+      "pullTerm": "Стягивание",
+      "pullDef": "Заманить противника или группу в бой, обычно намеренно и по одной партии за раз.",
+      "instanceTerm": "Подземелье",
+      "instanceDef": "Отдельная копия подземелья или рейда, созданная только для вашей группы."
     },
     "faqPage": {
-      "intro": "The questions new players ask most often.",
-      "q1": "Is it really free?",
-      "a1": "Yes. The whole game is free to play to the level cap, and the source code is open on GitHub.",
-      "q2": "Do I need a crypto wallet or any tokens?",
-      "a2": "No. The game is fully playable without one. The optional community token only unlocks cosmetic flair and never affects power or progression.",
-      "q3": "Can I play on my phone?",
-      "a3": "Yes. The game runs in a mobile browser with touch controls, and there is a desktop launcher as well.",
-      "q4": "Can I play offline or solo?",
-      "a4": "Yes. There is an instant single-player offline mode, and the online world is fully soloable apart from dungeons and the raid.",
-      "q5": "How many classes are there?",
-      "a5": "Nine, covering the classic tank, healer, and damage roles, each with its own resource and signature abilities.",
-      "q6": "What is the level cap?",
-      "a6": "Level {cap}, reached across three connected zones of quests, dungeons, and exploration.",
-      "q7": "Will my character be saved?",
-      "a7": "Online characters are saved on the server automatically. Offline characters live in your browser for quick sessions and testing.",
-      "q8": "Can I host my own copy?",
-      "a8": "Yes. The project is open source, so you can run your own server. See the GitHub repository.",
-      "q9": "Is there PvP?",
-      "a9": "Yes. Duel anyone for fun, or step into the Ashen Coliseum to fight other players. PvP is opt in, so you are never forced into it.",
-      "q10": "What is there to do at max level?",
-      "a10": "The cap is level {cap}. From there you run the five-player dungeons and the ten-player raid, chase better gear, and test yourself in the arena.",
-      "q11": "How do I find a group?",
-      "a11": "Invite anyone you meet to a party, ask in chat, or team up at a dungeon. Most of the world is soloable, so grouping is a choice, not a requirement."
+      "intro": "Вопросы, которые новички задают чаще всего.",
+      "q1": "Игра и правда бесплатная?",
+      "a1": "Да. Вся игра бесплатна до максимального уровня, а её исходный код открыт на GitHub.",
+      "q2": "Нужен ли мне криптокошелёк или какие-либо токены?",
+      "a2": "Нет. В игру можно полноценно играть и без них. Необязательный токен сообщества открывает только косметические украшения и никогда не влияет на силу или развитие.",
+      "q3": "Можно ли играть с телефона?",
+      "a3": "Да. Игра работает в мобильном браузере с сенсорным управлением, а также есть лаунчер для компьютера.",
+      "q4": "Можно ли играть офлайн или в одиночку?",
+      "a4": "Да. Есть мгновенный одиночный офлайн-режим, а онлайн-мир полностью проходим в одиночку, кроме подземелий и рейда.",
+      "q5": "Сколько в игре классов?",
+      "a5": "Девять, охватывающих классические роли танка, лекаря и наносящего урон, у каждого свой ресурс и фирменные способности.",
+      "q6": "Какой максимальный уровень?",
+      "a6": "{cap} уровень, который достигается через три связанные зоны с заданиями, подземельями и исследованиями.",
+      "q7": "Сохранится ли мой персонаж?",
+      "a7": "Онлайн-персонажи сохраняются на сервере автоматически. Офлайн-персонажи хранятся в вашем браузере для быстрых сессий и тестирования.",
+      "q8": "Могу ли я запустить собственную копию?",
+      "a8": "Да. Проект имеет открытый исходный код, так что вы можете запустить свой сервер. Подробности в репозитории на GitHub.",
+      "q9": "Есть ли PvP?",
+      "a9": "Да. Сразитесь с кем угодно на дуэли ради забавы или войдите в Пепельный Колизей, чтобы биться с другими игроками. PvP включается по желанию, так что вас никогда не принуждают к нему.",
+      "q10": "Чем заняться на максимальном уровне?",
+      "a10": "Максимальный уровень, это {cap}. С него вы проходите подземелья на пять игроков и рейд на десять, охотитесь за лучшим снаряжением и проверяете себя на арене.",
+      "q11": "Как найти группу?",
+      "a11": "Пригласите любого встречного в группу, спросите в чате или объединитесь у подземелья. Почти весь мир проходится в одиночку, так что группа, это выбор, а не обязанность."
     },
     "classList": {
-      "heading": "The nine classes",
-      "sub": "Tank, heal, or deal the damage. Pick the fantasy that calls to you, then make it your own with talents."
+      "heading": "Девять классов",
+      "sub": "Будьте танком, лекарем или наносите урон. Выберите фэнтези, что вам по душе, а затем сделайте его своим с помощью талантов."
     },
     "role": {
-      "tank": "Tank",
-      "healer": "Healer",
-      "damage": "Damage"
+      "tank": "Танк",
+      "healer": "Лекарь",
+      "damage": "Урон"
     },
     "resourceName": {
-      "rage": "Rage",
-      "mana": "Mana",
-      "energy": "Energy"
+      "rage": "Ярость",
+      "mana": "Мана",
+      "energy": "Энергия"
     },
     "classPage": {
-      "back": "All classes",
-      "roleLabel": "Plays as",
-      "resourceLabel": "Resource",
-      "specsHeading": "Specializations",
-      "abilitiesHeading": "Signature abilities",
-      "abilitiesNote": "A taste of the kit. You learn more as you level, and talents reshape how it all plays.",
-      "masteryLabel": "Mastery",
-      "fullKitHeading": "The full kit",
-      "fullKitNote": "Every ability this class can learn, in the order it comes online. Talents decide which ones carry your build.",
-      "petsHeading": "Demons",
-      "petsNote": "Warlocks summon demons to fight beside them, each suited to a different job."
+      "back": "Все классы",
+      "roleLabel": "Роль",
+      "resourceLabel": "Ресурс",
+      "specsHeading": "Специализации",
+      "abilitiesHeading": "Фирменные способности",
+      "abilitiesNote": "Лишь намёк на возможности. С уровнями вы изучаете больше, а таланты меняют то, как всё это играется.",
+      "masteryLabel": "Мастерство",
+      "fullKitHeading": "Полный набор",
+      "fullKitNote": "Все способности, которые может выучить этот класс, в порядке их появления. Таланты решают, какие из них станут основой вашей сборки.",
+      "petsHeading": "Демоны",
+      "petsNote": "Чернокнижники призывают демонов сражаться рядом с собой, каждый из которых подходит для своей задачи."
     },
     "classHook": {
-      "warrior": "A relentless front-line fighter who turns every blow taken into fuel for the next.",
-      "paladin": "A holy warrior who can shield allies, mend their wounds, or bring the hammer down.",
-      "hunter": "A ranged marksman with a loyal beast at their side and a trick for every foe.",
-      "rogue": "A master of stealth and poisons who strikes from the shadows and never fights fair.",
-      "priest": "A devoted healer whose light keeps the party standing, or whose shadow unmakes the enemy.",
-      "shaman": "A spirit-caller who bends storm, fire, and water, and mends allies between the lightning.",
-      "mage": "A spellweaver of fire, frost, and arcane who controls the battlefield from afar.",
-      "warlock": "A dark conjurer who commands demons and curses, trading life for devastating power.",
-      "druid": "A shapeshifter who tanks as a bear, savages foes as a cat, or heals in the thick of it."
+      "warrior": "Неумолимый боец передовой, что обращает каждый принятый удар в топливо для следующего.",
+      "paladin": "Святой воин, способный закрыть союзников щитом, исцелить их раны или обрушить молот.",
+      "hunter": "Стрелок дальнего боя с верным зверем подле себя и уловкой против любого врага.",
+      "rogue": "Мастер скрытности и ядов, что бьёт из теней и никогда не сражается честно.",
+      "priest": "Преданный лекарь, чей свет держит группу на ногах, а чья тень развоплощает врага.",
+      "shaman": "Призыватель духов, что повелевает бурей, огнём и водой и врачует союзников между молниями.",
+      "mage": "Ткач заклинаний огня, льда и тайной магии, что управляет полем боя издалека.",
+      "warlock": "Тёмный чародей, что повелевает демонами и проклятиями, обменивая жизнь на сокрушительную мощь.",
+      "druid": "Оборотень, что танкует в облике медведя, рвёт врагов в облике кошки или лечит в самой гуще боя."
     },
     "tag": {
-      "melee": "Melee",
-      "ranged": "Ranged",
-      "both": "Melee or ranged",
-      "solo": "Solo friendly",
-      "group": "Group oriented",
-      "flexible": "Flexible",
-      "simple": "Simple",
-      "moderate": "Moderate",
-      "complex": "Complex",
-      "goodFirst": "Great first class"
+      "melee": "Ближний бой",
+      "ranged": "Дальний бой",
+      "both": "Ближний или дальний бой",
+      "solo": "Удобен для одиночной игры",
+      "group": "Ориентирован на группу",
+      "flexible": "Гибкий",
+      "simple": "Простой",
+      "moderate": "Средний",
+      "complex": "Сложный",
+      "goodFirst": "Отличный первый класс"
     },
     "chooser": {
-      "heading": "Find your class",
-      "intro": "Filter by how you like to play. Every class is viable, so this only narrows the field, it does not rank them.",
-      "role": "Role",
-      "style": "Style",
-      "resource": "Resource",
-      "complexity": "Complexity",
-      "goodFirst": "Good for beginners",
-      "clear": "Clear",
-      "results": "Showing {count} of {total}",
-      "none": "No class matches every filter. Clear one to see more."
+      "heading": "Найдите свой класс",
+      "intro": "Отфильтруйте по тому, как вам нравится играть. Все классы жизнеспособны, так что это лишь сужает выбор, а не расставляет их по местам.",
+      "role": "Роль",
+      "style": "Стиль",
+      "resource": "Ресурс",
+      "complexity": "Сложность",
+      "goodFirst": "Подходит для новичков",
+      "clear": "Сбросить",
+      "results": "Показано {count} из {total}",
+      "none": "Ни один класс не подходит под все фильтры. Снимите один, чтобы увидеть больше."
     },
     "abilityHook": {
-      "heroic_strike": "Queues a heavier swing that spends rage on your next hit.",
-      "battle_shout": "A rallying cry that raises attack power for the party.",
-      "commanding_shout": "Bolsters stamina so everyone has more staying power in a fight.",
-      "charge": "Rushes a distant enemy to open the fight with a brief stun.",
-      "rend": "Opens a bleed that wears the target down over time.",
-      "thunder_clap": "Hits everything around you and slows their attacks.",
-      "seal_of_righteousness": "Imbues your swings with Holy damage, then spend it with Judgement.",
-      "holy_light": "A steady, sizable heal for topping off an ally or yourself.",
-      "devotion_aura": "A lasting self-buff that raises armor so hits land softer.",
-      "judgement": "Spends your active Seal to strike an enemy from short range.",
-      "blessing_of_might": "Raises a friendly target's attack power, good to cast before a pull.",
-      "divine_protection": "A quick holy shield to soak damage when things get rough.",
-      "raptor_strike": "A hard melee swing for when something closes the gap on you.",
-      "aspect_of_the_hawk": "A stance you keep up to sharpen your ranged attack power.",
-      "serpent_sting": "Lands a venom that bleeds nature damage over time.",
-      "arcane_shot": "An instant shot from range for quick extra damage.",
-      "concussive_shot": "Dazes the target and slows it so it cannot reach you.",
-      "mongoose_bite": "A counterstrike that opens up right after the enemy dodges.",
-      "sinister_strike": "Your reliable strike that builds combo points to spend later.",
-      "eviscerate": "Spends your combo points to finish a target with a burst.",
-      "garrote": "Open from stealth with a wire that bleeds the target over time.",
-      "backstab": "Slip behind a target with a dagger for a hard-hitting builder.",
-      "gouge": "Incapacitates the target briefly so you can reposition or peel.",
-      "cheap_shot": "Open from stealth with a stun and a head start on combo points.",
-      "smite": "A holy bolt for chipping down a target from range.",
-      "lesser_heal": "A steady cast to top up an ally when there is time to stand still.",
-      "power_word_fortitude": "Raises an ally's health pool, so cast it before the pull and keep it up.",
-      "shadow_word_pain": "Sticks a shadow rot on a foe, then you move on while it ticks.",
-      "power_word_shield": "Wraps an ally in a shield that soaks hits before they land.",
-      "renew": "A heal that ticks over time, good to cast and keep moving.",
-      "lightning_bolt": "A ranged cast of Nature damage, your go-to from afar.",
-      "rockbiter_weapon": "Imbues your weapon so each swing lands harder in melee.",
-      "healing_wave": "Your main heal, a direct mend for yourself or an ally.",
-      "earth_shock": "An instant shock for quick Nature damage when you need it now.",
-      "lightning_shield": "Charges you so attackers take Nature damage when they hit you.",
-      "flame_shock": "An instant burn that hits up front and keeps searing over time.",
-      "fireball": "Your main fire nuke, lands a hit and leaves the target burning.",
-      "frost_armor": "A lasting self-buff that hardens your armor before a fight.",
-      "arcane_intellect": "Raises Intellect to deepen an ally's mana pool, cast it before the pull.",
-      "frostbolt": "Strikes from range and slows the target so it cannot close on you.",
-      "conjure_water": "Conjures drinks that restore mana, so you can refill between pulls.",
-      "conjure_food": "Conjures food that restores health when you sit down to eat.",
-      "shadow_bolt": "A bolt of shadow you cast at a target, your go-to nuke.",
-      "summon_imp": "Calls up an imp that flings firebolts at enemies from range.",
-      "demon_skin": "A lasting self-buff that toughens your skin and adds armor.",
-      "immolate": "Sets a target alight for an opening hit and a burn that lingers.",
-      "corruption": "Rots a target with shadow that ticks while you do other things.",
-      "life_tap": "Trades some of your own health back into mana when you run dry.",
-      "wrath": "A nature bolt thrown at a target from range, your go-to nuke.",
-      "healing_touch": "A big single-target heal with a long cast, for topping someone off.",
-      "mark_of_the_wild": "A lasting blessing you put on yourself or an ally before a fight.",
-      "moonfire": "Hits instantly and leaves the target burning, good while moving.",
-      "rejuvenation": "Casts instantly and heals an ally over time, so you can keep acting.",
-      "thorns": "Wards an ally so melee attackers hurt themselves for striking."
+      "heroic_strike": "Готовит более тяжелый замах, который потратит ярость на следующем ударе.",
+      "battle_shout": "Боевой клич, повышающий силу атаки всей группы.",
+      "commanding_shout": "Повышает выносливость, так что у всех становится больше запаса прочности в бою.",
+      "charge": "Рывок к далекому врагу, открывающий бой коротким оглушением.",
+      "rend": "Открывает кровотечение, которое изматывает цель со временем.",
+      "thunder_clap": "Бьет по всем вокруг вас и замедляет их атаки.",
+      "seal_of_righteousness": "Наполняет ваши удары священным уроном, который затем тратится правосудием.",
+      "holy_light": "Ровное, ощутимое лечение, чтобы долечить союзника или себя.",
+      "devotion_aura": "Длительное усиление на себя, которое повышает броню, так что удары проходят мягче.",
+      "judgement": "Тратит вашу активную печать, чтобы ударить врага с короткой дистанции.",
+      "blessing_of_might": "Повышает силу атаки дружественной цели, удобно наложить перед началом боя.",
+      "divine_protection": "Быстрый священный щит, поглощающий урон, когда становится туго.",
+      "raptor_strike": "Тяжелый удар в ближнем бою на случай, когда кто-то сократил с вами дистанцию.",
+      "aspect_of_the_hawk": "Стойка, которую вы держите постоянно, чтобы повысить силу дальних атак.",
+      "serpent_sting": "Поражает цель ядом, наносящим урон силами природы со временем.",
+      "arcane_shot": "Мгновенный выстрел с дистанции для быстрого дополнительного урона.",
+      "concussive_shot": "Дезориентирует цель и замедляет ее, чтобы она не смогла до вас добраться.",
+      "mongoose_bite": "Контрудар, который становится доступен сразу после того, как враг уклонился.",
+      "sinister_strike": "Ваш надежный удар, набирающий серии приемов, чтобы потратить их позже.",
+      "eviscerate": "Тратит набранные серии приемов, чтобы добить цель всплеском урона.",
+      "garrote": "Открытие из незаметности удавкой, которая наносит цели кровотечение со временем.",
+      "backstab": "Зайдите цели за спину и нанесите кинжалом тяжелый удар, набирающий ресурс.",
+      "gouge": "Ненадолго выводит цель из строя, давая вам перестроиться или отвлечь врага.",
+      "cheap_shot": "Открытие из незаметности с оглушением и стартовым запасом серий приемов.",
+      "smite": "Священный удар, чтобы понемногу добивать цель с дистанции.",
+      "lesser_heal": "Размеренное накладывание, чтобы подлечить союзника, когда есть время постоять на месте.",
+      "power_word_fortitude": "Повышает запас здоровья союзника, так что накладывайте перед боем и поддерживайте.",
+      "shadow_word_pain": "Накладывает на врага темную порчу, а затем вы переключаетесь, пока она действует.",
+      "power_word_shield": "Окутывает союзника щитом, который поглощает удары до того, как они проходят.",
+      "renew": "Лечение, которое идет со временем, удобно наложить и продолжать движение.",
+      "lightning_bolt": "Накладываемый удар силами природы с дистанции, ваш основной способ бить издалека.",
+      "rockbiter_weapon": "Накладывает чары на оружие, так что каждый замах в ближнем бою бьет сильнее.",
+      "healing_wave": "Ваше основное лечение: прямое исцеление себя или союзника.",
+      "earth_shock": "Мгновенный шок для быстрого урона силами природы, когда он нужен сейчас.",
+      "lightning_shield": "Заряжает вас так, что атакующие получают урон силами природы, когда бьют вас.",
+      "flame_shock": "Мгновенный поджог, который бьет сразу и продолжает жечь со временем.",
+      "fireball": "Ваш основной огненный удар: бьет по цели и оставляет ее гореть.",
+      "frost_armor": "Длительное усиление на себя, которое укрепляет броню перед боем.",
+      "arcane_intellect": "Повышает интеллект, увеличивая запас маны союзника. Накладывайте перед началом боя.",
+      "frostbolt": "Бьет с дистанции и замедляет цель, чтобы она не смогла к вам приблизиться.",
+      "conjure_water": "Создает напитки, восстанавливающие ману, чтобы вы могли пополнить ее между боями.",
+      "conjure_food": "Создает пищу, которая восстанавливает здоровье, когда вы садитесь поесть.",
+      "shadow_bolt": "Стрела тьмы, которую вы запускаете в цель, ваш основной удар.",
+      "summon_imp": "Призывает беса, который издалека швыряет в врагов огненные стрелы.",
+      "demon_skin": "Длительное усиление на себя, которое укрепляет кожу и добавляет броню.",
+      "immolate": "Поджигает цель: наносит урон при наложении и оставляет затяжной ожог.",
+      "corruption": "Поражает цель порчей, которая наносит урон, пока вы заняты другим.",
+      "life_tap": "Обменивает часть вашего здоровья обратно в ману, когда вы выдыхаетесь.",
+      "wrath": "Удар силами природы, запущенный в цель с дистанции, ваш основной способ бить.",
+      "healing_touch": "Большое лечение одной цели с долгим временем накладывания, чтобы кого-то долечить.",
+      "mark_of_the_wild": "Длительное благословение, которое вы накладываете на себя или союзника перед боем.",
+      "moonfire": "Бьет мгновенно и оставляет цель гореть, удобно использовать в движении.",
+      "rejuvenation": "Накладывается мгновенно и лечит союзника со временем, так что вы можете продолжать действовать.",
+      "thorns": "Защищает союзника так, что атакующие в ближнем бою ранят себя при ударе."
     },
     "petHook": {
-      "imp": "A ranged firebolt demon that chips at enemies from a safe distance.",
-      "voidwalker": "A sturdy demon that taunts and soaks hits so you can cast in peace.",
-      "succubus": "A fast melee demon that hits hard but folds under pressure.",
-      "felhunter": "A shadow skirmisher that hounds enemy casters.",
-      "felguard": "A durable melee bruiser, the all-rounder once you can summon it.",
-      "infernal": "A hulking juggernaut with crushing melee, summoned for raw power.",
-      "doomguard": "An elite caster that rains heavy shadow from afar."
+      "imp": "Дальнобойный демон с огненными стрелами, который понемногу бьет врагов с безопасного расстояния.",
+      "voidwalker": "Стойкий демон, который провоцирует и поглощает удары, чтобы вы могли спокойно колдовать.",
+      "succubus": "Быстрый демон ближнего боя, который бьет сильно, но не держит удар.",
+      "felhunter": "Налетчик тьмы, который преследует вражеских заклинателей.",
+      "felguard": "Крепкий боец ближнего боя, универсал, как только вы сможете его призвать.",
+      "infernal": "Громадный исполин с сокрушительным ближним боем, призываемый ради чистой силы.",
+      "doomguard": "Элитный заклинатель, который издалека обрушивает тяжелую тьму."
     },
     "bestiary": {
-      "heading": "Bestiary",
-      "intro": "The creatures of the world, grouped by family. These are the foes you meet out in the open. The deadliest things wait, unlisted, behind dungeon doors.",
-      "rare": "Rare",
-      "levels": "Levels {min} to {max}",
-      "levelsSame": "Level {min}",
-      "notedLabel": "Of note",
+      "heading": "Бестиарий",
+      "intro": "Существа этого мира, сгруппированные по семействам. Это враги, которых вы встречаете под открытым небом. Самые смертоносные твари ждут, не указанные здесь, за дверями подземелий.",
+      "rare": "Редкий",
+      "levels": "Уровни с {min} по {max}",
+      "levelsSame": "Уровень {min}",
+      "notedLabel": "Стоит отметить",
       "flavor": {
-        "old_greyjaw": "A scarred old wolf no trap has held, blamed for three hounds and a stable boy's arm. He hunts the deep woods alone, and turns savage the longer a fight wears on.",
-        "grubjaw": "A fen troll so greedy the other trolls will not dig beside him, said to have eaten a trader's last two pack-mules, harness and all.",
-        "shardlord_kazzix": "A storm elemental given shoulders, walking the far crags above Stormcrag with a heartshard worth braving the lightning for.",
-        "mirejaw_frenzy": "A marsh murloc that whips itself into a thrashing frenzy mid-fight, the loudest thing in a loud, territorial pack.",
-        "gravecaller_cultist": "Robed servants of the death-cult whose work fouls the graves from the Vale to the peaks. Where they gather, the dead do not rest."
+        "old_greyjaw": "Покрытый шрамами старый волк, которого не удержал ни один капкан. На него списывают трёх гончих и руку конюшонка. Он охотится в глубоких лесах в одиночку и звереет тем сильнее, чем дольше тянется схватка.",
+        "grubjaw": "Болотный тролль, столь жадный, что прочие тролли не станут рыть рядом с ним. Поговаривают, будто он сожрал двух последних вьючных мулов одного торговца, прямо со сбруей.",
+        "shardlord_kazzix": "Грозовой элементаль, обретший плечи. Он бродит по дальним утёсам над Бурехребтом, и его сердечный осколок стоит того, чтобы бросить вызов молниям.",
+        "mirejaw_frenzy": "Болотный мурлок, что посреди боя взвинчивает себя до бешеной ярости, самый громкий из шумной, оберегающей свою территорию стаи.",
+        "gravecaller_cultist": "Облачённые в рясы прислужники культа смерти, чьи труды оскверняют могилы от Долины до самых вершин. Там, где они собираются, мёртвым нет покоя."
       }
     },
     "family": {
       "beast": {
-        "name": "Beasts",
-        "desc": "Wild animals of forest and field, from wolves and boars to the things that prey on them. Hunters can tame many of them."
+        "name": "Звери",
+        "desc": "Дикие животные лесов и полей, от волков и вепрей до тех, кто на них охотится. Многих из них могут приручить охотники."
       },
       "spider": {
-        "name": "Spiders",
-        "desc": "Web-spinners and venomous lurkers that nest in dark, tangled places."
+        "name": "Пауки",
+        "desc": "Плетущие паутину и ядовитые твари, что гнездятся в темных, запутанных местах."
       },
       "murloc": {
-        "name": "Murlocs",
-        "desc": "Amphibious marsh-dwellers that swarm the shallows in noisy, territorial packs."
+        "name": "Мурлоки",
+        "desc": "Земноводные обитатели топей, что кишат на мелководье шумными, оберегающими свою территорию стаями."
       },
       "kobold": {
-        "name": "Kobolds",
-        "desc": "Candle-headed diggers that infest mines and burrows, fiercely guarding their ore."
+        "name": "Кобольды",
+        "desc": "Землекопы со свечками на головах, что наводняют шахты и норы, яростно охраняя свою руду."
       },
       "humanoid": {
-        "name": "Humanoids",
-        "desc": "Bandits, cultists, and others who took up the wrong trade. They fight with tactics, not just teeth."
+        "name": "Гуманоиды",
+        "desc": "Разбойники, культисты и прочие, ступившие на дурную дорожку. Они сражаются тактикой, а не одними клыками."
       },
       "troll": {
-        "name": "Trolls",
-        "desc": "Hulking, fast-healing brutes that lair in the marsh and the high country."
+        "name": "Тролли",
+        "desc": "Громадные, быстро исцеляющиеся громилы, что устраивают логова в топях и высокогорье."
       },
       "ogre": {
-        "name": "Ogres",
-        "desc": "Enormous, slow-witted, and dangerous. They camp the high passes and hit like a landslide."
+        "name": "Огры",
+        "desc": "Огромные, тугодумные и опасные. Они стоят лагерем на высоких перевалах и бьют, словно оползень."
       },
       "undead": {
-        "name": "Undead",
-        "desc": "The restless dead, raised by darker hands. They do not tire and they do not flee."
+        "name": "Нежить",
+        "desc": "Беспокойные мертвецы, поднятые темными руками. Они не устают и не бегут."
       },
       "elemental": {
-        "name": "Elementals",
-        "desc": "Living storm and stone, bound to the wild places where the elements run strong."
+        "name": "Элементали",
+        "desc": "Живая буря и камень, привязанные к диким местам, где стихии особенно сильны."
       }
     },
     "worldPage": {
-      "heading": "The world",
-      "intro": "World of ClaudeCraft is one continuous land you cross on foot, three zones laid south to north. There is no fast travel, so the journey is part of the adventure.",
-      "hub": "Home base",
-      "mapHeading": "The road north",
-      "mapSub": "Three zones, south to north, each a step higher in level. Follow the quest trail and the land carries you from the valley to the peaks.",
-      "places": "Notable places",
-      "residents": "Who you will meet",
-      "valeBlurb": "The green starting valley, where new heroes cut their teeth on wolves and bandits around the town of Eastbrook.",
-      "marshBlurb": "A drowned country of fog and ruins. Murlocs swarm the shallows and something older stirs beneath the water, watched from the bridge-town of Fenbridge.",
-      "peaksBlurb": "Wind-scoured ridges and old mine-works climbing to the realm's coldest, highest dangers, held by the outpost of Highwatch.",
-      "valeGreeting": "Keep your blade close. The Vale is not what it was.",
-      "valeGreeter": "Marshal Redbrook, Eastbrook",
-      "marshGreeting": "Hold at the gate. Past those reeds, the fen does the killing for us.",
-      "marshGreeter": "Warden Fenwick, Fenbridge",
-      "peaksGreeting": "Two hundred years this wall has held. It will not break on my watch, but it groans.",
-      "peaksGreeter": "Captain Thessaly, Highwatch",
-      "valePlaceNotes": "Eastbrook is your first home base. Wolf Run and Boar Meadow are gentle hunting ground; Mirror Lake is quiet water to fish; the Webwood and the Copper Dig hide spiders and ore-greedy diggers; a Bandit Camp and the Fallen Chapel hold rougher work; Brightwood Glade is a calm wildlife grove in the north.",
-      "marshPlaceNotes": "Fenbridge guards the only dry road. The Prowler Reeds and Deepfen Shallows teem with marsh beasts and murlocs; the Widow Thicket is spun thick with web; the Drowned Chapel and the Troll Mounds keep older dangers; the Gravecaller Encampment is the cult dug in, and the Sunken Bastion is the marsh's instanced heart.",
-      "peaksPlaceNotes": "Highwatch holds the wall. Stalker Ridge and the Deeprock Burrows belong to ridge cats and kobolds; the Ogre Foothills and Drogmar's War-Camp to brutes for hire; Stormcrag crackles with elementals and the Glimmermere glows below it; the Wyrmcult Tents and Revenant Fields ring the cult's high ground, with Gravewyrm Sanctum at its peak.",
-      "gladeTitle": "A quiet corner: Brightwood Glade",
-      "gladeBody": "Not every story in the Vale is about the dead. In the north, a sunlit grove called Brightwood Glade keeps its own gentler rhythm, with quiet paths, grazing deer, and wary beasts under the boughs. It is a soft counterpoint to the trail you are following, and worth seeing when the road gives you room to wander."
+      "heading": "Мир",
+      "intro": "World of ClaudeCraft - это единый цельный край, который вы пересекаете пешком, три зоны, протянувшиеся с юга на север. Здесь нет быстрых перемещений, так что дорога - это часть приключения.",
+      "hub": "Опорная база",
+      "mapHeading": "Дорога на север",
+      "mapSub": "Три зоны, с юга на север, каждая на ступень выше по уровню. Следуйте за цепочкой заданий, и сама земля проведет вас от долины к вершинам.",
+      "places": "Примечательные места",
+      "residents": "Кого вы встретите",
+      "valeBlurb": "Зеленая стартовая долина, где новые герои набираются опыта на волках и разбойниках вокруг города Восточный Брод.",
+      "marshBlurb": "Утонувший край тумана и руин. Мурлоки кишат на мелководье, а под водой шевелится нечто древнее, за которым наблюдают из города-моста Топкомостье.",
+      "peaksBlurb": "Истерзанные ветрами хребты и старые рудники, поднимающиеся к самым холодным и высоким опасностям королевства, что удерживает застава Высокий Дозор.",
+      "valeGreeting": "Держите клинок наготове. Долина уже не та, что прежде.",
+      "valeGreeter": "Маршал Редбрук, Истврук",
+      "marshGreeting": "Стой у ворот. За теми камышами топь убивает за нас.",
+      "marshGreeter": "Страж Фенвик, Топкомостье",
+      "peaksGreeting": "Две сотни лет держится эта стена. На моём посту она не падёт, но стонет.",
+      "peaksGreeter": "Капитан Тессали, Хайвотч",
+      "valePlaceNotes": "Истврук, это ваша первая опорная база. Волчья тропа и Кабаний луг, это спокойные охотничьи угодья, Зеркальное озеро, это тихая вода для рыбалки, Паутинный лес и Медный рудник прячут пауков и жадных до руды землекопов, Лагерь разбойников и Павшая часовня хранят работу погрубее, а Поляна Брайтвуда, это безмятежная роща с дикими зверями на севере.",
+      "marshPlaceNotes": "Топкомостье стережёт единственную сухую дорогу. Хищные камыши и Глубокотопкие мели кишат болотными тварями и мурлоками, Вдовья чаща густо оплетена паутиной, Утонувшая часовня и Курганы троллей хранят опасности постарше, Стан Зовущих Могилу, это окопавшийся культ, а Затонувший бастион, это сердце топи в инстансе.",
+      "peaksPlaceNotes": "Хайвотч держит стену. Хребет Преследователя и Глубокоскальные норы принадлежат горным котам и кобольдам, Огрские предгорья и Военный лагерь Дрогмара, наёмным громилам, Бурехребет трещит от элементалей, а под ним сияет Глиммермир, Шатры Культа Вирма и Поля ревенантов кольцом окружают высоты культа, а на самом их пике, Святилище Могильного Вирма.",
+      "gladeTitle": "Тихий уголок: Поляна Брайтвуда",
+      "gladeBody": "Не всякая история в долине рассказывает о мертвых. На севере солнечная роща под названием Поляна Брайтвуда живет в собственном, более мягком ритме: тихие тропы, пасущиеся олени и настороженные звери под ветвями. Это спокойный контрапункт следу, по которому вы идете, и его стоит увидеть, когда дорога даст время побродить."
     },
     "questsPage": {
-      "heading": "Quests",
-      "intro": "Quests are the heart of the world and the fastest way to level. Here is how they work.",
-      "acceptTitle": "Finding and accepting",
-      "acceptBody": "People with a marker over their head have work for you. Talk to them to accept a quest. Your very first is Wolves at the Door, from Marshal Redbrook in Eastbrook.",
-      "objectivesTitle": "Objectives",
-      "objectivesBody": "Slay certain enemies, gather items, or interact with something in the world. The on-screen tracker counts your progress as you go.",
-      "turninTitle": "Turning in",
-      "turninBody": "Return to the quest giver, the map shows you where, for experience, coin, and often a piece of gear chosen to suit your class.",
-      "partyTitle": "Questing in a group",
-      "partyBody": "Party members nearby share kill and objective credit, so questing together is faster, never slower.",
-      "storyTitle": "A thread runs through it all",
-      "storyBody": "From your first errands in Eastbrook, something is wrong with the dead. A cult is at work, and the trail leads north through every zone. Follow it to learn who stands behind it.",
-      "soloNote": "The main story is fully soloable; only its final chapters call for a group.",
-      "typesTitle": "The kinds of quest you will see",
-      "typesBody": "Most quests are one of a few familiar shapes. The on-screen tracker spells out exactly what each one wants, so you are never left guessing.",
-      "typeSlayTitle": "Slay",
-      "typeSlayBody": "Thin out a pack of beasts or break a cult's hold by defeating a set number of a marked enemy. The first quest in the game, clearing wolves off the Eastbrook road, is one of these.",
-      "typeGatherTitle": "Gather",
-      "typeGatherBody": "Collect items from the world or from what enemies drop: herbs, ore, lost letters, a cult's grim reagents. Some pieces only fall from a particular foe, so the hunt and the haul go together.",
-      "typeInteractTitle": "Interact",
-      "typeInteractBody": "Use, cleanse, or read something fixed in the world: a defiled grave, a warning carved on a shore-rock, a sealed crypt door. Walk up to the marker and act on it.",
-      "typeMusterTitle": "Escort and muster",
-      "typeMusterBody": "See a friendly face safely from one place to another, or rally a town's defenders before a push north. These keep you moving with the people whose story you are in.",
-      "typeGroupTitle": "Group finales",
-      "typeGroupBody": "Each chapter of the main story ends at a dungeon door. The lead-in is soloable, but the final blow against a chapter's villain is meant for a party of five (and the very last, for ten).",
-      "sagaTitle": "Follow the trail north",
-      "sagaBody": "The main story is one long chase. A death-cult is at work on the realm's graves, and every chapter you close points one zone further up the road. You never fight the whole conspiracy at once; you pull one thread, and it leads to the next hand holding it.",
-      "sagaValeTitle": "The Vale: a name on a sigil",
-      "sagaValeBody": "In Eastbrook the dead will not rest, and the mark behind it belongs to a sect long thought gone. Trace it to a Gravecaller working the chapel crypt, and his own papers point you toward the fen in the north.",
-      "sagaMarshTitle": "The marsh: a tithe of souls",
-      "sagaMarshBody": "In Mirefen the drownings are no accident. Someone is filling the fen like a tithing box, raising obedient dead from every traveler the water takes. Chase the orders up the chain to a Mistcaller in the drowned bastion, whose last words name something older still, stirring beneath the peaks.",
-      "sagaPeaksTitle": "The peaks: what the tithe was for",
-      "sagaPeaksBody": "On Thornpeak the whole scheme comes clear. Every soul stolen since the Vale was a tithe poured toward waking an ancient thing sealed beneath the mountain. The trail that began in a chapel yard ends here, at a door it takes ten to open. We will let you find out who waits behind it.",
-      "sideTitle": "Threads off the main road",
-      "sideWardenTitle": "Earning your name",
-      "sideWardenBody": "Alongside the story, the wardens of the Vale and the fen hand out a standing bounty ladder. Work your way up it, foe by foe, the way every warden before you earned their place. It is honest leveling and a tour of each zone's worst troublemakers.",
-      "sideCryptTitle": "The forgotten king",
-      "sideCryptBody": "High on the peaks runs a quieter mystery: old graves marked with a crown no record remembers. Read the dead, gather what they guarded, and unseal a tomb that was meant to stay shut. It is a detective's trail that opens the way to a second endgame trial for a full raid."
+      "heading": "Задания",
+      "intro": "Задания - это сердце мира и самый быстрый способ повышать уровень. Вот как они работают.",
+      "acceptTitle": "Поиск и принятие",
+      "acceptBody": "У тех, над кем висит отметка, есть для вас работа. Поговорите с ними, чтобы взять задание. Самое первое - «Волки у ворот» от маршала Красноброка в Восточном Броде.",
+      "objectivesTitle": "Цели",
+      "objectivesBody": "Убивайте определенных врагов, собирайте предметы или взаимодействуйте с чем-то в мире. Экранный трекер ведет счет вашему прогрессу по ходу дела.",
+      "turninTitle": "Сдача задания",
+      "turninBody": "Вернитесь к тому, кто дал задание (карта подскажет, куда), за опытом, золотом и нередко предметом снаряжения, подобранным под ваш класс.",
+      "partyTitle": "Задания в группе",
+      "partyBody": "Участники группы поблизости делят зачет за убийства и цели, так что выполнять задания вместе быстрее, а не медленнее.",
+      "storyTitle": "Через все это проходит единая нить",
+      "storyBody": "С самых первых поручений в Восточном Броде с мертвыми творится что-то неладное. За работой культ, и след ведет на север через каждую зону. Идите по нему, чтобы узнать, кто за этим стоит.",
+      "soloNote": "Основной сюжет полностью проходим в одиночку, лишь финальные главы требуют группы.",
+      "typesTitle": "Виды заданий, что вам встретятся",
+      "typesBody": "Большинство заданий принимают один из нескольких знакомых видов. Экранный трекер чётко расписывает, чего требует каждое, так что вам никогда не придётся гадать.",
+      "typeSlayTitle": "Истребление",
+      "typeSlayBody": "Проредите стаю зверей или сломите хватку культа, одолев заданное число помеченного врага. Самое первое задание в игре, что очищает дорогу Истврука от волков, как раз из таких.",
+      "typeGatherTitle": "Сбор",
+      "typeGatherBody": "Собирайте предметы в мире или из того, что роняют враги: травы, руду, потерянные письма, мрачные реагенты культа. Иные вещи падают лишь с определённого врага, так что охота и сбор идут рука об руку.",
+      "typeInteractTitle": "Взаимодействие",
+      "typeInteractBody": "Используйте, очистите или прочтите что-то закреплённое в мире: осквернённую могилу, предостережение, высеченное на прибрежной скале, запечатанную дверь крипты. Подойдите к отметке и действуйте.",
+      "typeMusterTitle": "Сопровождение и сбор",
+      "typeMusterBody": "Сопроводите дружественное лицо в целости из одного места в другое или соберите защитников города перед броском на север. Эти задания держат вас в движении вместе с людьми, в чьей истории вы участвуете.",
+      "typeGroupTitle": "Групповые финалы",
+      "typeGroupBody": "Каждая глава основного сюжета заканчивается у двери подземелья. Подводка к ней проходима в одиночку, но последний удар по злодею главы рассчитан на группу из пяти (а самый последний, на десять).",
+      "sagaTitle": "Следуйте по следу на север",
+      "sagaBody": "Основной сюжет, это одна долгая погоня. Культ смерти трудится над могилами королевства, и каждая закрытая вами глава указывает на одну зону дальше по дороге. Вы никогда не бьётесь со всем заговором разом, вы тянете одну нить, а она ведёт к следующей руке, что её держит.",
+      "sagaValeTitle": "Долина: имя на печати",
+      "sagaValeBody": "В Иствруке мёртвым нет покоя, а печать за этим принадлежит секте, что давно считалась сгинувшей. Проследите её до Зовущего Могилу, трудящегося в крипте часовни, и его собственные бумаги укажут вам путь к топи на севере.",
+      "sagaMarshTitle": "Топь: подать из душ",
+      "sagaMarshBody": "В Мирефене утопления, это не случайность. Кто-то наполняет топь, точно копилку для подати, поднимая покорных мертвецов из каждого путника, что забрала вода. Идите по приказам вверх по цепочке к Зовущему Туман в утонувшем бастионе, чьи последние слова называют нечто ещё более древнее, что шевелится под пиками.",
+      "sagaPeaksTitle": "Пики: для чего была подать",
+      "sagaPeaksBody": "На Тернопике весь замысел проясняется. Каждая украденная с самой Долины душа была податью, что лилась к пробуждению древнего существа, запечатанного под горой. След, что начался во дворе часовни, кончается здесь, у двери, которую открыть под силу лишь десятерым. А кто ждёт за ней, мы дадим вам узнать самим.",
+      "sideTitle": "Нити в стороне от главной дороги",
+      "sideWardenTitle": "Заслужить своё имя",
+      "sideWardenBody": "Помимо сюжета, стражи Долины и топи выдают постоянную лестницу наград за головы. Поднимайтесь по ней, враг за врагом, так же, как заслуживал своё место каждый страж до вас. Это честное повышение уровней и обход худших смутьянов каждой зоны.",
+      "sideCryptTitle": "Забытый король",
+      "sideCryptBody": "Высоко в горах вьётся загадка потише: старые могилы, помеченные венцом, которого не помнит ни одна запись. Прочтите мёртвых, соберите то, что они стерегли, и распечатайте гробницу, которой положено было оставаться закрытой. Это путь сыщика, что открывает дорогу ко второму испытанию финала для полного рейда."
     },
     "lore": {
-      "figuresTitle": "Faces you will come to know",
-      "figuresBody": "A handful of people walk the whole road with you. Watch for these names from the valley to the peaks.",
-      "aldricRole": "Priest of the Vale",
-      "aldricBody": "A humble village priest who first names the cult over a defiled grave in Eastbrook, then follows its trail in person through the marsh and up to the wall at Highwatch. He is the steady heart of the whole campaign.",
-      "marenRole": "The Marshal's Scout",
-      "marenBody": "A low-talking tracker you meet in the reeds of Mirefen, all quiet feet and a short blade. She follows the trail north too, and it is her ear that catches the words that send you to the peaks."
+      "figuresTitle": "Лица, что станут вам знакомы",
+      "figuresBody": "Горстка людей пройдёт с вами всю дорогу. Запоминайте эти имена от долины до самых вершин.",
+      "aldricRole": "Жрец Долины",
+      "aldricBody": "Скромный деревенский жрец, что первым называет культ над осквернённой могилой в Иствруке, а затем лично идёт по его следу через топь и до самой стены в Хайвотче. Он, незыблемое сердце всей кампании.",
+      "marenRole": "Разведчица маршала",
+      "marenBody": "Немногословная следопытка, которую вы встречаете в камышах Мирефена, вся тихий шаг и короткий клинок. Она тоже идёт по следу на север, и именно её слух улавливает слова, что отправляют вас к вершинам."
     },
     "dungeonsPage": {
-      "heading": "Dungeons and Raids",
-      "intro": "When the open world is not enough, gather a party and step into an instance: a private copy of a dungeon made just for your group.",
-      "party": "Dungeons are built for a party of five. The endgame raid is for ten.",
-      "soloLead": "Every dungeon opens with a soloable lead-in quest, so you always know why you are going in.",
-      "levelAround": "Around level {n}",
-      "levelExact": "Level {n}",
-      "levelBand": "Levels {min} to {max}",
-      "partySize": "{n} players",
-      "raidSize": "Ten players, level {n}",
-      "hollowName": "The Hollow Crypt",
-      "hollowBody": "A grave-robbed chapel crypt where the newly dead refuse to rest. The first real test of a new party.",
-      "bastionName": "The Sunken Bastion",
-      "bastionBody": "A flooded fortress lost to the marsh, held by drowned defenders and the rising tide itself.",
-      "templeName": "The Drowned Temple",
-      "templeBody": "A moonlit shrine sunk beneath a glowing tarn high in the peaks, reached through a gate of cold light. A drowned cult still sings down there in its rotted vestments, and the warnings carved on the shore say something below only sleeps. A self-contained mystery, set apart from the main story, for the curious and the well-prepared.",
-      "sanctumName": "Gravewyrm Sanctum",
-      "sanctumBody": "The dark heart of Thornpeak, where the cult's long work reaches its terrible peak.",
-      "raidName": "The endgame raid",
-      "raidBody": "Beyond a sealed royal door waits a ten-player trial: a multi-phase fight and a deathless power the whole raid must shut down together. Earn your way in, then bring nine friends.",
-      "templeLoreTitle": "The Drowned Temple, a little deeper",
-      "templeLoreBody": "The temple has its own legend, older than the cult you chase elsewhere. On the shore of the Glimmermere, a tarn that drinks the moonlight and gives back the drowned, a lone watcher keeps a gate of pale light. Beneath the surface, a stair of cold stone runs down to it. The folk who sank there did not drown by misadventure: they were the Pale Choir, who went under in worship and never stopped singing. The old wardens scratched a single warning into the rocks before the water took them, a prayer to something they called the Drowned Moon, with a steadier hand adding two words beneath it: it only sleeps.",
-      "cryptLeadTitle": "A door the dead were meant to keep shut",
-      "cryptLeadBody": "High on the peaks, away from the main fight, lies a colder mystery. Old graves bear a crown no record remembers, and the dead who guard them once served a forgotten king. Read their stones, gather the keystones they kept, and you can unseal a tomb that three loyal souls died to hold closed, opening a second ten-player trial for those who follow the clues to the end."
+      "heading": "Подземелья и рейды",
+      "intro": "Когда открытого мира мало, соберите группу и войдите в инстанс - отдельную копию подземелья, созданную только для вашей группы.",
+      "party": "Подземелья рассчитаны на группу из пяти героев. Финальный рейд - на десять.",
+      "soloLead": "Каждое подземелье открывается вступительным заданием для одиночек, так что вы всегда знаете, зачем туда идете.",
+      "levelAround": "Около {n} уровня",
+      "levelExact": "{n} уровень",
+      "levelBand": "Уровни с {min} по {max}",
+      "partySize": "Игроков: {n}",
+      "raidSize": "Десять игроков, {n} уровень",
+      "hollowName": "Полая крипта",
+      "hollowBody": "Разграбленная склеповая часовня, где недавно умершие отказываются упокоиться. Первое настоящее испытание для новой группы.",
+      "bastionName": "Затонувший бастион",
+      "bastionBody": "Затопленная крепость, поглощенная топью, что удерживают утонувшие защитники и сам прибывающий прилив.",
+      "templeName": "Затонувший храм",
+      "templeBody": "Утонувшее святилище в стороне от болотной дороги, ответвление для любопытных и хорошо подготовленных.",
+      "sanctumName": "Святилище Могильного змия",
+      "sanctumBody": "Темное сердце Терновых высот, где долгий труд культа достигает своего ужасающего пика.",
+      "raidName": "Финальный рейд",
+      "raidBody": "За запечатанной королевской дверью ждет испытание для десяти игроков: многофазная битва и не знающая смерти сила, которую весь рейд должен пресечь сообща. Заслужите право войти, а затем приведите девятерых друзей.",
+      "templeLoreTitle": "Утонувший храм, чуть глубже",
+      "templeLoreBody": "У храма есть своя легенда, что древнее культа, за которым вы гонитесь в иных местах. На берегу Глиммермира, озерца, что пьёт лунный свет и возвращает утопленников, одинокий страж хранит врата бледного сияния. Под поверхностью к ним ведёт лестница из холодного камня. Те, кто канул там, утонули не по злосчастной случайности: то был Бледный Хор, ушедший под воду в молитве и не переставший петь. Старые хранители нацарапали на скалах единственное предостережение, прежде чем вода забрала их, молитву чему-то, что они звали Утонувшей луной, а более твёрдая рука приписала под ней два слова: она лишь спит.",
+      "cryptLeadTitle": "Дверь, которую мёртвым велено было держать закрытой",
+      "cryptLeadBody": "Высоко в горах, в стороне от главной битвы, кроется загадка похолоднее. На старых могилах виден венец, которого не помнит ни одна запись, а мёртвые, что их стерегут, некогда служили забытому королю. Прочтите их надгробия, соберите оставленные ими краеугольные камни, и вы сможете распечатать гробницу, которую три верных души погибли, удерживая закрытой, и открыть второе испытание на десять игроков для тех, кто пройдёт по уликам до самого конца."
     },
     "talentsPage": {
-      "heading": "Talents and specializations",
-      "intro": "Talents are how you make a class your own. They are optional, forgiving, and easy to change, so you can experiment without fear.",
-      "whatHeading": "What talents do",
-      "whatBody": "As you level, you earn talent points to spend on small, permanent upgrades to your abilities and stats. They shape how a class feels, leaning it toward more damage, sturdier defense, or stronger healing.",
-      "howHeading": "How they work",
-      "howBody": "Talents open up at level 10, and you keep earning points as you climb to the cap. You spend them in your class's talent panel, and you can save more than one layout to swap between builds.",
-      "resetTitle": "Nothing is permanent",
-      "resetNote": "You can reset your talents at any time, so an early pick is never a trap. Try things, see what you like, and change your mind freely.",
-      "specsHeading": "Specializations by class",
-      "specsBody": "Every class has a handful of specializations, each with its own role and a signature focus. Here is the shape of all of them. Open a class for its full kit."
+      "heading": "Таланты и специализации",
+      "intro": "Таланты, это то, как вы делаете класс своим. Они необязательны, прощают ошибки и легко меняются, так что вы можете экспериментировать без страха.",
+      "whatHeading": "Что дают таланты",
+      "whatBody": "По мере роста уровня вы получаете очки талантов, чтобы тратить их на небольшие постоянные улучшения способностей и характеристик. Они задают, каким класс ощущается, склоняя его к большему урону, более крепкой защите или более сильному лечению.",
+      "howHeading": "Как они работают",
+      "howBody": "Таланты открываются на 10 уровне, и вы продолжаете получать очки по мере подъема к максимуму. Вы тратите их в панели талантов своего класса и можете сохранить несколько раскладок, чтобы переключаться между сборками.",
+      "resetTitle": "Ничего не навсегда",
+      "resetNote": "Вы можете сбросить таланты в любой момент, так что ранний выбор никогда не становится ловушкой. Пробуйте, смотрите, что вам нравится, и свободно меняйте решение.",
+      "specsHeading": "Специализации по классам",
+      "specsBody": "У каждого класса есть несколько специализаций, у каждой своя роль и характерный упор. Здесь дан общий вид всех. Откройте класс, чтобы увидеть его полный набор."
     },
     "arenaPage": {
-      "heading": "Arena and PvP",
-      "intro": "Want to test yourself against other players? Player versus player is built in, and it is always something you choose, never something forced on you.",
-      "duelsHeading": "Duels",
-      "duelsBody": "Challenge any player you meet to a friendly duel. Nothing is on the line but pride, so it is the easiest way to learn a matchup or settle a friendly argument.",
-      "coliseumHeading": "The Ashen Coliseum",
-      "coliseumBody": "The Coliseum is the realm's arena, where you face other players in ranked matches. Win and your standing climbs, and the strongest fighters rise up the leaderboard for everyone to see.",
-      "fiestaHeading": "Two versus two Fiesta",
-      "fiestaBody": "Fiesta is a fast, two-on-two mode played in short rounds. Between rounds you draft augments, quick boosts that reshape your kit on the fly, so no two matches play quite the same.",
-      "augmentsNote": "Augments and power-ups last only for the match. They are about playful, on-the-spot builds, not lasting power, so nobody buys their way to a win.",
-      "wavesTitle": "Augments arrive in waves",
-      "wavesBody": "Each round of a Fiesta hands you a fresh pick, and the picks grow bolder as the match goes on. You build from one wave to the next, choosing one of a few options each time and keeping it for the rest of the bout.",
-      "waveSilverTitle": "Silver",
-      "waveSilverBody": "The opening wave: clean, single-stat boosts that sharpen the basics of your class.",
-      "waveGoldTitle": "Gold",
-      "waveGoldBody": "The middle wave: two-edged combos where your build starts to take shape and sing.",
-      "wavePrismaticTitle": "Prismatic",
-      "wavePrismaticBody": "The final wave: build-defining, screen-melting spikes meant to feel ridiculous in the best way.",
-      "powerupsTitle": "Power-ups in the ring",
-      "powerupsBody": "Glowing orbs also drop into the arena mid-fight, free for whoever reaches them first. They are deliberately over the top and last only a short while: Speed Demon for a blink of blinding pace, Colossus to swell up into a lumbering giant, Moon Boots for a bouncing, low-gravity leap, and Berserker for a sudden surge of fury.",
-      "ladderHeading": "Climbing the ladder",
-      "ladderBody": "Ranked play tracks your standing over time. Check the leaderboard to see where you sit and who holds the top of the realm."
+      "heading": "Арена и PvP",
+      "intro": "Хотите проверить себя в схватке с другими игроками? Режим игрок против игрока встроен в игру, и это всегда ваш выбор, вас никогда не принуждают к нему.",
+      "duelsHeading": "Дуэли",
+      "duelsBody": "Вызовите любого встречного игрока на дружескую дуэль. На кону только гордость, так что это самый простой способ изучить противостояние или разрешить дружеский спор.",
+      "coliseumHeading": "Пепельный Колизей",
+      "coliseumBody": "Колизей, это арена королевства, где вы сражаетесь с другими игроками в рейтинговых матчах. Побеждайте, и ваш ранг растет, а сильнейшие бойцы поднимаются в таблице лидеров на виду у всех.",
+      "fiestaHeading": "Фиеста два на два",
+      "fiestaBody": "Фиеста, это быстрый режим два на два, который играется короткими раундами. Между раундами вы набираете улучшения, быстрые усиления, которые на ходу меняют ваш набор, так что нет двух одинаковых матчей.",
+      "augmentsNote": "Улучшения и усиления действуют только в рамках матча. Они нужны для забавных импровизированных сборок, а не для постоянного превосходства, так что никто не сможет купить себе победу.",
+      "wavesTitle": "Улучшения приходят волнами",
+      "wavesBody": "Каждый раунд Фиесты предлагает вам свежий выбор, и эти варианты становятся всё смелее по ходу матча. Вы выстраиваете сборку от волны к волне, каждый раз беря один из нескольких вариантов и оставляя его до конца боя.",
+      "waveSilverTitle": "Серебро",
+      "waveSilverBody": "Первая волна: чистые усиления одной характеристики, что оттачивают основы вашего класса.",
+      "waveGoldTitle": "Золото",
+      "waveGoldBody": "Средняя волна: двусторонние сочетания, в которых ваша сборка начинает обретать форму и звучать в полную силу.",
+      "wavePrismaticTitle": "Радужный",
+      "wavePrismaticBody": "Финальная волна: определяющие сборку, выжигающие экран всплески, которым положено казаться нелепо мощными в самом лучшем смысле.",
+      "powerupsTitle": "Усиления на ринге",
+      "powerupsBody": "Прямо посреди схватки на арену падают и светящиеся сферы, доступные тому, кто доберётся до них первым. Они нарочно сделаны вызывающе яркими и держатся лишь короткий миг: Демон скорости дарит вспышку слепящей прыти, Колосс раздувает вас в неповоротливого великана, Лунные ботинки превращают шаг в прыжок при пониженной гравитации, а Берсерк дарует внезапный прилив неистовства.",
+      "ladderHeading": "Восхождение по рейтингу",
+      "ladderBody": "Рейтинговые бои отслеживают ваш ранг со временем. Загляните в таблицу лидеров, чтобы увидеть свое место и тех, кто держит вершину королевства."
     },
     "wishPage": {
-      "heading": "Things I wish I knew",
-      "intro": "A few honest truths that save new players a lot of second-guessing. None of it is required reading, but all of it helps.",
-      "i1Title": "You cannot pick a wrong class",
-      "i1Body": "Every class can hold its own and reach the cap. Choose the fantasy you like, not the one someone else calls best.",
-      "i2Title": "Dying barely costs you",
-      "i2Body": "When you fall, you release at a graveyard and run back to your body. No experience is lost, so it is safe to take risks and learn.",
-      "i3Title": "Talents are not a trap",
-      "i3Body": "They unlock at level 10 and reset whenever you want, so your early choices are never permanent.",
-      "i4Title": "Follow the quest trail",
-      "i4Body": "Quests are the fastest way to level and they lead you across the world. When you are unsure where to go, find the next marker.",
-      "i5Title": "Keep your gear current",
-      "i5Body": "A fresh upgrade does more for you than perfect play in old gear. Take the quest rewards that suit your class.",
-      "i6Title": "Grouping is a choice, not a chore",
-      "i6Body": "Most of the world is soloable. Team up for dungeons and the raid, or just when you want some company.",
-      "i7Title": "Learn your resource",
-      "i7Body": "Rage, mana, or energy, managing it well is half of playing your class. Watch that bar, not only your cooldowns.",
-      "i8Title": "Rest between fights",
-      "i8Body": "Eat and drink to recover quickly, especially as a caster. A few seconds now saves a death later."
+      "heading": "Что бы я хотел знать заранее",
+      "intro": "Несколько честных истин, которые избавят новичков от множества сомнений. Читать это необязательно, но все это пригодится.",
+      "i1Title": "Нельзя выбрать неправильный класс",
+      "i1Body": "Любой класс способен постоять за себя и дойти до максимума. Выбирайте тот образ, который нравится вам, а не тот, что кто-то называет лучшим.",
+      "i2Title": "Смерть почти ничего не стоит",
+      "i2Body": "Когда вы погибаете, вы возрождаетесь на кладбище и бежите обратно к телу. Опыт не теряется, так что рисковать и учиться безопасно.",
+      "i3Title": "Таланты, это не ловушка",
+      "i3Body": "Они открываются на 10 уровне и сбрасываются когда угодно, так что ваш ранний выбор никогда не бывает окончательным.",
+      "i4Title": "Следуйте за цепочкой заданий",
+      "i4Body": "Задания, это самый быстрый способ повышать уровень, и они ведут вас по всему миру. Если не знаете, куда идти, найдите следующую метку.",
+      "i5Title": "Держите снаряжение актуальным",
+      "i5Body": "Свежее улучшение дает больше, чем идеальная игра в старом снаряжении. Берите те награды за задания, что подходят вашему классу.",
+      "i6Title": "Группа, это выбор, а не повинность",
+      "i6Body": "Почти весь мир проходится в одиночку. Объединяйтесь для подземелий и рейда или просто когда захочется компании.",
+      "i7Title": "Изучите свой ресурс",
+      "i7Body": "Ярость, мана или энергия, грамотное управление ресурсом, это половина игры за класс. Следите за этой полосой, а не только за временем восстановления.",
+      "i8Title": "Отдыхайте между боями",
+      "i8Body": "Ешьте и пейте, чтобы быстро восстановиться, особенно играя заклинателем. Несколько секунд сейчас спасут от смерти позже."
     },
     "viewer": {
-      "view3d": "View {name} in 3D",
-      "view3dShort": "View in 3D",
-      "loading": "Loading model...",
-      "error": "The 3D model could not be loaded. The art above still shows this {name}.",
-      "dragHint": "Drag to turn the model. Use the left and right arrow keys when it is focused.",
-      "canvasLabel": "Rotatable 3D model of {name}"
+      "view3d": "Посмотреть {name} в 3D",
+      "view3dShort": "Посмотреть в 3D",
+      "loading": "Загрузка модели...",
+      "error": "Не удалось загрузить 3D-модель. Изображение выше всё ещё показывает этого: {name}.",
+      "dragHint": "Тяните, чтобы повернуть модель. Используйте стрелки влево и вправо, когда она в фокусе.",
+      "canvasLabel": "Вращаемая 3D-модель: {name}"
     },
     "models": {
-      "title": "3D Model Viewer",
-      "lead": "Inspect the heroes, monsters, and demons of the world up close. Choose a model, then drag to turn it.",
-      "intro": "Every figure here is the same model you meet in the game, rendered live in your browser. Pick one to load it.",
-      "groupClasses": "Classes",
-      "groupCreatures": "Creatures",
-      "groupPets": "Warlock Demons",
-      "pickerLabel": "Choose a model to view",
-      "count": "{count} models",
-      "noWebgl": "This browser cannot display 3D models. Everything is still listed on the class and bestiary pages."
+      "title": "Просмотр 3D-моделей",
+      "lead": "Рассмотрите героев, чудовищ и демонов этого мира вблизи. Выберите модель, затем тяните, чтобы повернуть её.",
+      "intro": "Каждая фигура здесь, это та же модель, что вы встречаете в игре, отрисованная вживую в вашем браузере. Выберите одну, чтобы загрузить её.",
+      "groupClasses": "Классы",
+      "groupCreatures": "Существа",
+      "groupPets": "Демоны чернокнижника",
+      "pickerLabel": "Выберите модель для просмотра",
+      "count": "Моделей: {count}",
+      "noWebgl": "Этот браузер не может показывать 3D-модели. Все они по-прежнему перечислены на страницах классов и бестиария."
     },
     "gear": {
-      "intro": "Gear is the equipment your character wears and the items you carry. Better gear is the steadiest way to grow stronger, and you pick most of it up just by playing.",
-      "slotsTitle": "What you can equip",
-      "slotsBody": "You have a weapon slot and seven armor slots. Each piece you equip adds to your character, and you can mix and match freely as you find upgrades.",
-      "slotMainhand": "Weapon",
-      "slotHelmet": "Head",
-      "slotShoulder": "Shoulders",
-      "slotChest": "Chest",
-      "slotWaist": "Waist",
-      "slotLegs": "Legs",
-      "slotGloves": "Hands",
-      "slotFeet": "Feet",
-      "qualityTitle": "Quality, at a glance",
-      "qualityBody": "Every item has a quality, and its name is colored to match so you can read its worth at a glance. From most common to most prized:",
-      "qualityPoor": "Poor",
-      "qualityCommon": "Common",
-      "qualityUncommon": "Uncommon",
-      "qualityRare": "Rare",
-      "qualityEpic": "Epic",
-      "qualityLegendary": "Legendary",
-      "qualityNote": "Higher quality usually means better stats, but quality is a hint, not a rule. A well-matched piece for your class and level can beat a flashier one.",
-      "upgradeTitle": "Keep your gear current",
-      "upgradeBody": "Replacing an old piece with a fresh upgrade does more for you than playing perfectly in gear you have outgrown. When something better drops or a quest offers it, take it. Do not save your good items for later.",
-      "sourcesTitle": "Where gear comes from",
-      "sourcesBody": "Most of your early upgrades are quest rewards, so it pays to finish quests rather than grind. Enemies drop gear when you defeat them, vendors in town sell solid basics, and the player market lets you buy from other adventurers.",
-      "consumablesTitle": "Consumables",
-      "consumablesIntro": "Some items are used once for a quick benefit. They are cheap insurance, so keep a few on hand.",
-      "consumablesPotions": "Potions restore health or mana the moment you use them, even mid-fight, which makes them a clutch save when a pull goes wrong. They share a short cooldown, so plan one good moment to use them.",
-      "consumablesFood": "Food and drink restore you while you sit and rest between fights. Eating recovers health, drinking recovers mana, and resting this way is free. Sit down for a few seconds after a tough fight instead of running into the next one half-healed.",
-      "consumablesElixirs": "Elixirs grant a temporary buff while you adventure, a small edge that helps when you want to push a little further.",
-      "fishingTitle": "Fishing",
-      "fishingBody": "Fishing is a calm change of pace. Equip a fishing pole, cast into open water, and reel in what bites. You mostly catch fish you can cook into food, the odd bit of junk to sell for a few coins, and now and then a prized rare catch. What you find depends on the water you fish in.",
-      "fishingFood": "The fish you reel in are raw, and raw fish are food. Cook your catch and it heals more when you sit to eat, with the better fish coming from the colder, deeper waters in the north. A line in the lake is a quiet way to keep your pack stocked between fights.",
-      "fishingRare": "Now and then your line catches something far better than supper: a shimmering prized fish that any angler might luck into in any water. Hook one and your log lights up with the catch. It is the kind of lucky pull that makes an idle afternoon at the lake worth telling people about.",
-      "cosmeticsTitle": "Looks and cosmetics",
-      "cosmeticsBody": "Some rewards change only how your character looks, never how strong you are. These cosmetic skins let you stand out without affecting the game, so wear whichever you like.",
-      "cosmeticsRanks": "Cosmetics come in rarity tiers of their own, and the rarer ones are a fun thing to chase. Earning a higher tier also unlocks the looks below it.",
-      "cosmeticsSkins": "There are two cosmetic lines to collect. Every class has a handful of alternate appearances, a fresh take on its look that is yours alone to wear. Alongside them sit chromas: named two-tone color schemes that repaint a look entirely, from sober metals to bright imperial colors.",
-      "cosmeticsCache": "A few of these come from a mysterious cosmetic cache, a sealed prize that rolls one of three quality grades when you open it and grants the appearance to match. It is purely for looks: nothing inside it makes you stronger, only finer to look at."
+      "intro": "Снаряжение, это экипировка, что носит ваш персонаж, и предметы, что вы несёте с собой. Снаряжение получше, это самый надёжный способ становиться сильнее, и большую его часть вы подбираете просто по ходу игры.",
+      "slotsTitle": "Что можно надеть",
+      "slotsBody": "У вас есть слот для оружия и семь слотов для брони. Каждая надетая вещь прибавляет вашему персонажу, и вы вольны сочетать их как угодно, находя улучшения.",
+      "slotMainhand": "Оружие",
+      "slotHelmet": "Голова",
+      "slotShoulder": "Плечи",
+      "slotChest": "Грудь",
+      "slotWaist": "Пояс",
+      "slotLegs": "Ноги",
+      "slotGloves": "Кисти рук",
+      "slotFeet": "Ступни",
+      "qualityTitle": "Качество с первого взгляда",
+      "qualityBody": "У каждого предмета есть качество, а его название окрашено под стать ему, чтобы вы с первого взгляда понимали его ценность. От самого обычного до самого ценного:",
+      "qualityPoor": "Плохое",
+      "qualityCommon": "Обычное",
+      "qualityUncommon": "Необычное",
+      "qualityRare": "Редкое",
+      "qualityEpic": "Эпическое",
+      "qualityLegendary": "Легендарное",
+      "qualityNote": "Более высокое качество обычно означает характеристики получше, но качество, это подсказка, а не правило. Хорошо подобранная под ваш класс и уровень вещь может оказаться лучше более броской.",
+      "upgradeTitle": "Держите снаряжение свежим",
+      "upgradeBody": "Заменить старую вещь свежим улучшением даст вам больше, чем безупречная игра в снаряжении, из которого вы выросли. Когда выпадает что-то получше или это предлагает задание, берите. Не приберегайте хорошие вещи на потом.",
+      "sourcesTitle": "Откуда берётся снаряжение",
+      "sourcesBody": "Большинство ваших ранних улучшений, это награды за задания, так что выгоднее выполнять задания, а не гриндить. Враги роняют снаряжение, когда вы их побеждаете, торговцы в городе продают добротную основу, а игровой рынок позволяет покупать у других искателей приключений.",
+      "consumablesTitle": "Расходники",
+      "consumablesIntro": "Некоторые предметы используются один раз ради быстрой выгоды. Это дешёвая страховка, так что держите несколько под рукой.",
+      "consumablesPotions": "Зелья восстанавливают здоровье или ману в тот же миг, как вы их используете, даже посреди боя, что делает их спасением в трудную минуту, когда стягивание пошло не так. У них общее короткое восстановление, так что выберите для них один удачный момент.",
+      "consumablesFood": "Еда и питьё восстанавливают вас, пока вы сидите и отдыхаете между боями. Приём пищи возвращает здоровье, питьё восполняет ману, а такой отдых бесплатен. После тяжёлой схватки присядьте на несколько секунд, вместо того чтобы бросаться в следующую недолеченным.",
+      "consumablesElixirs": "Эликсиры дарят временное усиление, пока вы странствуете, небольшое преимущество, что выручает, когда хочется забраться чуть дальше.",
+      "fishingTitle": "Рыбалка",
+      "fishingBody": "Рыбалка, это спокойная смена темпа. Возьмите удочку, забросьте её в открытую воду и вытаскивайте то, что клюнет. Чаще всего вы ловите рыбу, которую можно приготовить в еду, изредка попадается хлам на пару монет, а время от времени и заветный редкий улов. Что вам попадётся, зависит от воды, в которой вы рыбачите.",
+      "fishingFood": "Рыба, что вы вытаскиваете, сырая, а сырая рыба, это еда. Приготовьте улов, и он будет лечить сильнее, когда вы садитесь поесть, причём рыба получше водится в холодных, глубоких водах на севере. Заброшенная в озеро леска, это тихий способ держать запасы полными между боями.",
+      "fishingRare": "Время от времени на вашу леску попадается кое-что куда лучше ужина: мерцающая заветная рыба, на которую может посчастливиться любому рыбаку в любой воде. Подцепите такую, и ваш журнал озарится новым уловом. Это та самая удачная поклёвка, ради которой праздный денёк у озера стоит того, чтобы о нём рассказать.",
+      "cosmeticsTitle": "Облик и косметика",
+      "cosmeticsBody": "Некоторые награды меняют лишь то, как выглядит ваш персонаж, но не то, насколько вы сильны. Эти косметические облики позволяют выделиться, не влияя на игру, так что носите любой, что вам по душе.",
+      "cosmeticsRanks": "У косметики свои степени редкости, и более редкие, забавная цель для погони. Получив высшую степень, вы открываете и все облики ниже неё.",
+      "cosmeticsSkins": "Есть две косметические линейки для коллекционирования. У каждого класса найдётся горстка запасных обликов, свежий взгляд на его вид, носить который дано только вам. Рядом с ними стоят хромы: именованные двухцветные схемы, что полностью перекрашивают облик, от строгих металлов до ярких имперских красок.",
+      "cosmeticsCache": "Несколько из них попадают к вам из таинственного косметического тайника, запечатанного приза, что при открытии выпадает одной из трёх степеней качества и дарует соответствующий облик. Это чисто ради вида: ничто внутри не сделает вас сильнее, лишь краше на вид."
     },
     "economy": {
-      "intro": "Coin oils the whole world: it buys gear and supplies, pays your repairs and quest costs, and changes hands between players. You pick all of this up just by playing, so think of this page as a map of where your money comes from and goes.",
-      "coinTitle": "Gold, silver, and copper",
-      "coinBody": "Money comes in three coins. A hundred copper make a silver, and a hundred silver make a gold, so your purse fills up from the smallest coin first. You earn it from quest rewards, from looting fallen enemies, and from selling what you no longer need.",
-      "vendorsTitle": "Vendors and what they keep",
-      "vendorsBody": "Towns and outposts are dotted with merchants, each with their own trade. Provisioners stock food and drink, weaponsmiths and armorers carry gear, herbalists deal in reagents, and a quartermaster keeps practical travel kit. Walk up to one to see what they sell.",
-      "buyingTitle": "Buying and selling",
-      "buyingBody": "Stand near a merchant to open their window. You can buy anything they stock if you can afford it, and sell most of what is in your bags for coin. If you sell something by mistake, a vendor will hold your recent sales so you can buy them back.",
-      "junkTitle": "Clearing out junk",
-      "junkBody": "Drops you have no use for still sell to any vendor, so empty your bags whenever you pass through town rather than letting them fill up. Truly worthless odds and ends can also be discarded outright to make room.",
-      "tradeTitle": "Trading with other players",
-      "tradeBody": "You can trade face to face with anyone standing near you. Both of you put items and coin into a shared window and the swap only happens once you both confirm it, so neither side can be caught out. It is the simple way to hand a friend a drop or settle a deal.",
-      "marketTitle": "The World Market",
-      "marketBody": "The Merchant runs the World Market, a player-driven exchange where you can buy and sell with people you may never meet. Speak to the Merchant to open it.",
-      "marketBrowse": "Browsing: scroll the listings or search by name to find what is for sale. Each listing shows the goods, the seller, and the asking price for the whole stack.",
-      "marketPost": "Posting: choose a stack from your bags, set your price, and list it. The goods are held by the Merchant until someone buys them. Unsold listings come back to you after a while, and you can reclaim one early if you change your mind.",
-      "marketCollect": "Collecting: when your goods sell, your proceeds wait for you at the Merchant. Return to collect the coin, along with anything that came back unsold. The Merchant takes a small cut of every completed sale.",
-      "marketPricing": "Pricing is up to you. Listing a little under what others are asking tends to sell faster, while a steep price may sit untouched. Browse first to see what the going rate looks like before you post."
+      "intro": "Монеты смазывают весь мир: на них покупают снаряжение и припасы, оплачивают ремонт и расходы по заданиям, и они переходят из рук в руки между игроками. Всё это приходит к вам просто по ходу игры, так что считайте эту страницу картой того, откуда берутся и куда уходят ваши деньги.",
+      "coinTitle": "Золото, серебро и медь",
+      "coinBody": "Деньги бывают трёх монет. Сто меди составляют серебро, а сто серебра, золото, так что ваш кошелёк наполняется снизу, начиная с самой мелкой монеты. Вы зарабатываете их наградами за задания, добычей с поверженных врагов и продажей того, что вам больше не нужно.",
+      "vendorsTitle": "Торговцы и их товар",
+      "vendorsBody": "Города и заставы усеяны торговцами, у каждого из которых своё дело. Снабженцы держат еду и питьё, оружейники и бронники, снаряжение, травники торгуют реагентами, а квартирмейстер хранит практичный походный набор. Подойдите к одному из них, чтобы увидеть, что он продаёт.",
+      "buyingTitle": "Покупка и продажа",
+      "buyingBody": "Встаньте рядом с торговцем, чтобы открыть его окно. Вы можете купить всё, что у него в запасе, если хватит средств, и продать за монеты почти всё из своих сумок. Если вы продали что-то по ошибке, торговец придержит ваши недавние продажи, чтобы вы могли выкупить их обратно.",
+      "junkTitle": "Избавление от хлама",
+      "junkBody": "Добыча, которой вам не найти применения, всё равно продаётся любому торговцу, так что опустошайте сумки всякий раз, проходя через город, а не дайте им забиться. Совсем уж бесполезный хлам можно и попросту выбросить, чтобы освободить место.",
+      "tradeTitle": "Торговля с другими игроками",
+      "tradeBody": "Вы можете торговать лицом к лицу с любым, кто стоит рядом с вами. Вы оба кладёте предметы и монеты в общее окно, и обмен происходит, только когда вы оба его подтвердите, так что ни одну из сторон не обманут. Это простой способ передать другу добычу или уладить сделку.",
+      "marketTitle": "Мировой рынок",
+      "marketBody": "Купец заведует Мировым рынком, биржей в руках игроков, где вы можете покупать и продавать тем, кого, возможно, никогда не встретите. Поговорите с Купцом, чтобы открыть его.",
+      "marketBrowse": "Просмотр: листайте объявления или ищите по названию, чтобы найти то, что выставлено на продажу. В каждом объявлении указаны товары, продавец и запрашиваемая цена за всю стопку.",
+      "marketPost": "Размещение: выберите стопку из своих сумок, назначьте цену и выставьте её. Товары хранятся у Купца, пока кто-нибудь их не купит. Непроданные объявления через некоторое время возвращаются к вам, а одно можно забрать и раньше, если передумаете.",
+      "marketCollect": "Получение: когда ваши товары продаются, выручка ждёт вас у Купца. Возвращайтесь за монетами, а заодно и за тем, что вернулось непроданным. Купец берёт небольшую долю с каждой завершённой сделки.",
+      "marketPricing": "Цену назначаете вы сами. Объявление чуть ниже того, что просят другие, обычно продаётся быстрее, а заломленная цена может так и остаться нетронутой. Сначала осмотритесь, чтобы увидеть, какова ходовая ставка, прежде чем выставлять товар."
     },
     "social": {
-      "intro": "Most of the world is soloable, but the game is built to be played with other people. Here is how to talk, team up, and find your crowd.",
-      "chatHeading": "Chat channels",
-      "chatBody": "Chat is split into channels, each shown on its own tab. Type a message to send it on the active channel, or use a slash command to direct one line elsewhere. These are the channels you can talk on:",
-      "chanSay": "Say.",
-      "chanSayBody": "Your default voice. It reaches players close to you and is the one to use while questing side by side.",
-      "chanYell": "Yell.",
-      "chanYellBody": "A louder version of Say that carries a bit farther, enough to reach across a camp.",
-      "chanWhisper": "Whisper.",
-      "chanWhisperBody": "A private message to one player by name, wherever they are. Use it for a quiet word.",
-      "chanParty": "Party.",
-      "chanPartyBody": "Talk to everyone in your group, no matter how spread out you are.",
-      "chanGeneral": "General.",
-      "chanGeneralBody": "An always-on local channel for the people around you, good for asking a question or chatting.",
-      "chanWorld": "World.",
-      "chanWorldBody": "A realm-wide channel you opt into. Open its tab to join, and you will see and reach everyone online.",
-      "chanLfg": "Looking for Group.",
-      "chanLfgBody": "An opt-in realm-wide channel for finding people to run a dungeon. Open its tab to join.",
-      "chanGuild": "Guild and Officer.",
-      "chanGuildBody": "Channels for your guild. Guild chat reaches every member; the officer channel is just for officers.",
-      "partyHeading": "Forming a party",
-      "partyBody": "Invite another player by right-clicking their name and choosing to invite, or with a chat command. A party holds up to five players, and one of you is the leader.",
-      "partyCredit": "Group members near each other share kill and quest credit, so questing together is faster, never slower. A party is also how you step into a dungeon as a team.",
-      "raidBody": "Once you have a full party of five, the leader can convert it into a raid of up to ten, for the endgame raid.",
-      "lootHeading": "Party loot",
-      "lootBody": "When you group up, the party leader sets how loot is shared. The rules cover coin and items separately:",
-      "lootCoinTitle": "Coin.",
-      "lootCoinBody": "Money from a kill can go to whoever loots it, or be split evenly across the party.",
-      "lootCommonTitle": "Items.",
-      "lootCommonBody": "Ordinary drops can go to the looter, while better drops are put up for a roll so everyone gets a fair shot.",
-      "lootRollTitle": "Need, Greed, or Pass.",
-      "lootRollBody": "When an item goes to a roll, each eligible member chooses Need if they want it, Greed if they would only take it spare, or Pass to bow out. The highest roll wins.",
-      "friendsHeading": "Friends and ignore",
-      "friendsBody": "Add players to your friends list to see when they are online and where they are, so you can group up the moment they log in.",
-      "ignoreBody": "If someone is bothering you, add them to your ignore list and you will stop seeing their chat.",
-      "guildHeading": "Guilds",
-      "guildBody": "A guild is a lasting group of players you belong to between sessions. Create one or accept an invite to join, and you can be in one guild at a time. Members hold a rank: a leader, officers, and members.",
-      "guildChatBody": "Belonging to a guild gives you a private guild chat channel and shows your guildmates on a shared roster, so there are always familiar faces online.",
-      "etiquetteHeading": "Grouping etiquette",
-      "etiquetteBody": "Grouping is a choice, not a chore. Say hello when you join, roll Need only on gear you will actually use, and let the group know before you head off. A little courtesy goes a long way, and most players are glad of the company."
+      "intro": "Большую часть мира можно пройти в одиночку, но игра создана для того, чтобы играть в неё с другими людьми. Вот как общаться, объединяться и находить свою компанию.",
+      "chatHeading": "Каналы чата",
+      "chatBody": "Чат разбит на каналы, каждый на своей вкладке. Введите сообщение, чтобы отправить его в активный канал, или используйте слеш-команду, чтобы направить одну строку в другое место. Вот каналы, на которых вы можете говорить:",
+      "chanSay": "Сказать.",
+      "chanSayBody": "Ваш голос по умолчанию. Он доходит до игроков рядом с вами и подходит для общения, пока вы выполняете задания бок о бок.",
+      "chanYell": "Крик.",
+      "chanYellBody": "Версия «Сказать» погромче, что разносится чуть дальше, достаточно, чтобы охватить весь лагерь.",
+      "chanWhisper": "Шёпот.",
+      "chanWhisperBody": "Личное сообщение одному игроку по имени, где бы он ни был. Используйте его для тихого слова.",
+      "chanParty": "Группа.",
+      "chanPartyBody": "Говорите со всеми в своей группе, как бы далеко друг от друга вы ни разошлись.",
+      "chanGeneral": "Общий.",
+      "chanGeneralBody": "Всегда включённый местный канал для тех, кто рядом с вами, удобный, чтобы задать вопрос или поболтать.",
+      "chanWorld": "Мир.",
+      "chanWorldBody": "Канал на всё королевство, к которому вы подключаетесь по желанию. Откройте его вкладку, чтобы присоединиться, и вы будете видеть и достанете всех, кто в сети.",
+      "chanLfg": "Поиск группы.",
+      "chanLfgBody": "Добровольный канал на всё королевство, чтобы найти людей для прохождения подземелья. Откройте его вкладку, чтобы присоединиться.",
+      "chanGuild": "Гильдия и офицеры.",
+      "chanGuildBody": "Каналы для вашей гильдии. Чат гильдии доходит до каждого участника, офицерский канал, только для офицеров.",
+      "partyHeading": "Создание группы",
+      "partyBody": "Пригласите другого игрока, щёлкнув правой кнопкой по его имени и выбрав приглашение, или с помощью команды чата. В группе помещается до пяти игроков, и один из вас, лидер.",
+      "partyCredit": "Участники группы рядом друг с другом делят зачёт за убийства и задания, так что выполнять задания вместе быстрее, а не медленнее. Группа, это ещё и способ войти в подземелье единой командой.",
+      "raidBody": "Как только у вас соберётся полная группа из пяти, лидер может превратить её в рейд до десяти человек, для финального рейда.",
+      "lootHeading": "Добыча в группе",
+      "lootBody": "Когда вы объединяетесь в группу, лидер задаёт, как делится добыча. Правила раздельно охватывают монеты и предметы:",
+      "lootCoinTitle": "Монеты.",
+      "lootCoinBody": "Деньги с убийства могут достаться тому, кто их подбирает, или поровну делиться между всей группой.",
+      "lootCommonTitle": "Предметы.",
+      "lootCommonBody": "Обычная добыча может доставаться тому, кто её подбирает, а добыча получше выставляется на бросок, чтобы у каждого был честный шанс.",
+      "lootRollTitle": "Нужно, Жадность или Пас.",
+      "lootRollBody": "Когда предмет выставляется на бросок, каждый имеющий право участник выбирает «Нужно», если он ему нужен, «Жадность», если он возьмёт его лишь про запас, или «Пас», чтобы воздержаться. Побеждает наибольший бросок.",
+      "friendsHeading": "Друзья и игнорирование",
+      "friendsBody": "Добавляйте игроков в список друзей, чтобы видеть, когда они в сети и где находятся, и собираться в группу в тот же миг, как они войдут в игру.",
+      "ignoreBody": "Если кто-то вам докучает, добавьте его в список игнорируемых, и вы перестанете видеть его сообщения в чате.",
+      "guildHeading": "Гильдии",
+      "guildBody": "Гильдия, это устойчивая группа игроков, к которой вы принадлежите между сессиями. Создайте её или примите приглашение, чтобы вступить, и состоять вы можете в одной гильдии за раз. У участников есть ранг: лидер, офицеры и участники.",
+      "guildChatBody": "Принадлежность к гильдии даёт вам личный канал чата гильдии и показывает ваших соратников в общем списке, так что в сети всегда есть знакомые лица.",
+      "etiquetteHeading": "Этикет в группе",
+      "etiquetteBody": "Группа, это выбор, а не повинность. Поздоровайтесь, когда присоединяетесь, ставьте «Нужно» лишь на снаряжение, которым действительно будете пользоваться, и предупредите группу, прежде чем уйти. Немного учтивости творит чудеса, и большинство игроков рады компании."
     },
     "stats": {
-      "intro": "Your character is described by a handful of attributes. You never have to memorize them to play well, but knowing roughly what each one does helps you read your character sheet and pick the right upgrades.",
-      "primaryHeading": "Primary attributes",
-      "primaryBody": "Five attributes shape your character: Strength, Agility, Stamina, Intellect, and Spirit. Each class leans on a different mix, so the ones that matter most depend on what you play.",
-      "strTitle": "Strength",
-      "strBody": "Strength raises your melee attack power, so your weapon swings hit harder. It does the most for the heavy melee classes that fight up close.",
-      "agiTitle": "Agility",
-      "agiBody": "Agility sharpens you in several ways: it raises your chance to land a critical hit and your chance to dodge, and it adds a little armor. For rogues and hunters it also feeds attack power, and it drives a hunter's ranged shots.",
-      "staTitle": "Stamina",
-      "staBody": "Stamina is your staying power. More Stamina means a larger health pool, and it speeds the health you recover while resting out of combat. Every class wants some.",
-      "intTitle": "Intellect",
-      "intBody": "Intellect grows a spellcaster's mana pool and improves the chance their spells crit. It matters to the classes that cast from mana; for a Rage or Energy class it does little.",
-      "spiTitle": "Spirit",
-      "spiBody": "Spirit governs how quickly a caster's mana returns while out of combat. Like Intellect, it serves the mana classes and means little to the others.",
-      "armorTitle": "Armor",
-      "armorBody": "Armor reduces the physical damage you take. It comes mostly from what you wear, and the heavier armor classes carry far more of it. More armor against a foe near your level means each of its hits lands softer.",
-      "apTitle": "Attack power",
-      "apBody": "Attack power measures how hard your weapon strikes. Your primary attributes feed it, and stronger weapons and gear raise it further, which is why an upgrade can be a real jump in damage.",
-      "critTitle": "Critical strike",
-      "critBody": "Your critical strike chance is how often an attack lands for extra damage. Everyone starts with a small base chance, and Agility (plus some talents and gear) builds on it.",
-      "dodgeTitle": "Dodge",
-      "dodgeBody": "Dodge is your chance to avoid an incoming melee attack entirely. You begin with a small base chance, and Agility raises it, so nimble classes slip more blows.",
-      "sheetHeading": "Reading your character sheet",
-      "sheetBody": "Open the character window in game to see all of this in one place: your five attributes on one side and the stats they feed on the other. Hover any value and a tooltip breaks down what it does for your class, so you can see at a glance which numbers an upgrade actually moved.",
-      "growHeading": "How your stats grow",
-      "growBody": "Two things raise your stats. Every level adds a fixed amount of each attribute to suit your class, and the gear you equip adds more on top. Keeping your gear current is the steadiest way to grow stronger, all the way to the level cap."
+      "intro": "Ваш персонаж описывается горсткой характеристик. Чтобы хорошо играть, заучивать их вовсе не обязательно, но примерное знание того, за что отвечает каждая, помогает читать лист персонажа и подбирать нужные улучшения.",
+      "primaryHeading": "Основные характеристики",
+      "primaryBody": "Вашего персонажа формируют пять характеристик: Сила, Ловкость, Выносливость, Интеллект и Дух. Каждый класс опирается на своё сочетание, так что те, что важнее всего, зависят от того, кем вы играете.",
+      "strTitle": "Сила",
+      "strBody": "Сила повышает вашу силу атаки в ближнем бою, так что взмахи вашего оружия бьют сильнее. Больше всего она даёт тяжёлым ближним классам, что сражаются вплотную.",
+      "agiTitle": "Ловкость",
+      "agiBody": "Ловкость оттачивает вас сразу несколькими путями: она повышает ваш шанс нанести критический удар и шанс уклониться, а также добавляет немного брони. Для разбойников и охотников она ещё питает силу атаки и движет дальними выстрелами охотника.",
+      "staTitle": "Выносливость",
+      "staBody": "Выносливость, это ваша стойкость. Больше Выносливости означает больший запас здоровья, и она ускоряет здоровье, что вы восстанавливаете, отдыхая вне боя. Немного её хочет каждый класс.",
+      "intTitle": "Интеллект",
+      "intBody": "Интеллект увеличивает запас маны заклинателя и улучшает шанс того, что его заклинания критуют. Он важен классам, что черпают из маны, для классов на Ярости или Энергии он мало что значит.",
+      "spiTitle": "Дух",
+      "spiBody": "Дух управляет тем, как быстро возвращается мана заклинателя вне боя. Как и Интеллект, он служит классам на мане и мало что значит для остальных.",
+      "armorTitle": "Броня",
+      "armorBody": "Броня снижает физический урон, что вы получаете. Берётся она в основном из того, что на вас надето, а классы в тяжёлой броне несут её куда больше. Чем больше брони против врага близкого к вам уровня, тем мягче ложится каждый его удар.",
+      "apTitle": "Сила атаки",
+      "apBody": "Сила атаки измеряет, насколько мощно бьёт ваше оружие. Её питают ваши основные характеристики, а более сильное оружие и снаряжение поднимают её ещё выше, вот почему улучшение может обернуться настоящим скачком урона.",
+      "critTitle": "Критический удар",
+      "critBody": "Ваш шанс критического удара, это то, как часто атака проходит с дополнительным уроном. У каждого есть небольшой базовый шанс, а Ловкость (а ещё некоторые таланты и снаряжение) надстраивает его.",
+      "dodgeTitle": "Уклонение",
+      "dodgeBody": "Уклонение, это ваш шанс полностью избежать входящей атаки ближнего боя. Вы начинаете с небольшого базового шанса, а Ловкость поднимает его, так что проворные классы ускользают от большего числа ударов.",
+      "sheetHeading": "Чтение листа персонажа",
+      "sheetBody": "Откройте в игре окно персонажа, чтобы увидеть всё это в одном месте: ваши пять характеристик с одной стороны и характеристики, что они питают, с другой. Наведите курсор на любое значение, и подсказка разберёт, что оно делает для вашего класса, так что вы с первого взгляда увидите, какие числа на деле сдвинуло улучшение.",
+      "growHeading": "Как растут ваши характеристики",
+      "growBody": "Ваши характеристики растут от двух вещей. Каждый уровень добавляет фиксированное количество каждой характеристики под стать вашему классу, а надетое снаряжение прибавляет ещё сверху. Держать снаряжение свежим, это самый надёжный способ становиться сильнее, вплоть до предела уровней."
     },
     "progression": {
-      "intro": "Every fight, quest, and step north makes your hero stronger. Here is how leveling works and what keeps you growing once you reach the top.",
-      "xpTitle": "How you gain experience",
-      "xpBody": "You earn experience by completing quests and by defeating enemies. Quests give the most by far, so following the quest trail is the fastest way to climb. Killing things along the way fills in the rest.",
-      "capBody": "Each level makes you tougher and brings new abilities, all the way to the cap of level {cap}.",
-      "journeyTitle": "The journey north",
-      "journeyBody": "The world is one continuous land, three zones laid south to north, each a step higher in level. You start in the green valley, press on through the marsh, and finish in the cold high peaks. Follow the quest trail and the land carries you from one to the next.",
-      "bandLabel": "Levels {min} to {max}",
-      "restedTitle": "Rested experience",
-      "restedBody": "When you log out, or rest in a safe place like an inn, your character builds up rested experience while you are away. The next time you go out and fight, that pool gives your kills an extra boost until it runs dry. It builds up over time and speeds your early levels, so logging off in town is never wasted time.",
-      "capTitle": "Reaching level {cap}",
-      "capJourneyBody": "Level {cap} is the cap, the end of leveling but not of growing. From there you run dungeons and the raid, chase better gear, and test yourself in the arena.",
-      "prestigeBody": "Experience keeps counting even after the cap. It feeds a cosmetic virtual level, so your experience bar keeps climbing, and a long-term prestige rank you can earn for the recognition. It is purely optional and never grants power, just a mark of the road you have walked.",
-      "noRush": "There is no rush. The world is there to enjoy at your own pace, so wander, take the quests that catch your eye, and let your hero grow along the way."
+      "intro": "Каждая схватка, задание и шаг на север делает вашего героя сильнее. Вот как работает повышение уровней и что поддерживает ваш рост, когда вы добираетесь до вершины.",
+      "xpTitle": "Как вы получаете опыт",
+      "xpBody": "Вы зарабатываете опыт, выполняя задания и побеждая врагов. Задания дают намного больше всего прочего, так что следование цепочке заданий, это самый быстрый способ подниматься. Убийства по пути восполняют остальное.",
+      "capBody": "Каждый уровень делает вас крепче и приносит новые способности, вплоть до предела в {cap} уровень.",
+      "journeyTitle": "Путь на север",
+      "journeyBody": "Мир, это единый цельный край, три зоны, протянувшиеся с юга на север, каждая на ступень выше по уровню. Вы начинаете в зелёной долине, пробиваетесь через топь и завершаете путь в холодных высоких пиках. Идите по цепочке заданий, и сама земля переносит вас из одной зоны в другую.",
+      "bandLabel": "Уровни с {min} по {max}",
+      "restedTitle": "Отдохнувший опыт",
+      "restedBody": "Когда вы выходите из игры или отдыхаете в безопасном месте вроде таверны, ваш персонаж копит отдохнувший опыт, пока вас нет. В следующий раз, когда вы выйдете на бой, этот запас даёт вашим убийствам дополнительную прибавку, пока не иссякнет. Он накапливается со временем и ускоряет ваши ранние уровни, так что выход из игры в городе никогда не бывает потраченным впустую временем.",
+      "capTitle": "Достижение {cap} уровня",
+      "capJourneyBody": "{cap} уровень, это предел, конец повышения уровней, но не роста. Дальше вы проходите подземелья и рейд, охотитесь за лучшим снаряжением и проверяете себя на арене.",
+      "prestigeBody": "Опыт продолжает копиться даже после предела. Он питает косметический виртуальный уровень, так что полоса опыта всё растёт, и долгосрочный ранг почёта, который можно заслужить ради признания. Это чисто по желанию и никогда не даёт силы, лишь отметка о пройденной вами дороге.",
+      "noRush": "Спешить некуда. Этот мир создан, чтобы получать от него удовольствие в своём темпе, так что странствуйте, берите задания, что приглянулись, и дайте своему герою расти по дороге."
     },
     "placeholder": {
-      "note": "This part of the guide is on its way."
+      "note": "Этот раздел руководства уже в пути."
     },
     "notFound": {
-      "title": "We could not find that page",
-      "body": "The page you were looking for does not exist or may have moved.",
-      "home": "Back to the overview"
+      "title": "Не удалось найти эту страницу",
+      "body": "Страница, которую вы искали, не существует или могла быть перемещена.",
+      "home": "Вернуться к обзору"
     }
   },
   "skinEvent": {
@@ -1529,8 +1529,8 @@ export const ru_RU: EnTranslations = {
     "news": "Новости",
     "download": "Скачать",
     "loginRegister": "Войти / Зарегистрироваться",
-    "account": "Account",
-    "logout": "Logout",
+    "account": "Аккаунт",
+    "logout": "Выйти",
     "donate": "Пожертвовать"
   },
   "stats": {
@@ -1630,185 +1630,185 @@ export const ru_RU: EnTranslations = {
     "enterWorld": "Войти в мир",
     "offlineCharacter": "Персонаж вне сети",
     "create": "Создать",
-    "twoFactorLabel": "Authentication code",
-    "twoFactorPlaceholder": "6-digit or recovery code",
-    "twoFactorHint": "Enter the code from your authenticator app, or one of your recovery codes."
+    "twoFactorLabel": "Код аутентификации",
+    "twoFactorPlaceholder": "6-значный код или код восстановления",
+    "twoFactorHint": "Введите код из приложения-аутентификатора или один из ваших кодов восстановления."
   },
   "wallet": {
-    "label": "$WOC Wallet",
-    "connect": "Verify Wallet",
-    "connectTitle": "Verify your Solana wallet",
-    "connectAria": "Verify your Solana wallet",
-    "verify": "Verify Wallet",
-    "verifyNew": "Verify New Wallet",
-    "verifyTitle": "Choose a wallet and sign once to verify ownership.",
-    "verifyAria": "Choose a wallet and sign once to verify ownership",
-    "verifyAddressAria": "Sign to verify wallet {address} for your account",
-    "appConnected": "App Connected",
-    "connectApp": "Connect App",
-    "connectAppTitle": "Connect the wallet app on this browser",
-    "connectAppAria": "Connect the wallet app on this browser",
-    "verifying": "Verifying...",
-    "verifyingTitle": "Wallet verification is in progress.",
-    "switch": "Switch",
-    "switchTitle": "Verify a different wallet",
-    "switchAria": "Verify a different wallet",
-    "unlink": "Unlink",
-    "unlinkTitle": "Remove wallet verification from this account",
-    "unlinkAria": "Remove wallet verification from this account",
-    "signOut": "Disconnect",
-    "signOutTitle": "Disconnect the wallet app on this browser",
-    "signOutAria": "Disconnect the wallet app on this browser",
-    "hide": "Hide",
-    "hideTitle": "Hide wallet row on this screen",
-    "hideAria": "Hide wallet row on this screen",
-    "hiddenNotice": "Wallet row hidden. Re-enable it in-game from Options > Interface.",
-    "linkedTitle": "Wallet verified for your account. Click to manage the wallet app.",
-    "linkedDisconnectedTitle": "Wallet remains verified for your account. Reconnect to manage the wallet app.",
-    "linkedDisconnectedAria": "Wallet remains verified for your account. Reconnect to manage the wallet app.",
-    "linkTitle": "Click to sign and link this wallet to your account.",
-    "connectedTitle": "Connected. Log in to link this wallet to your account.",
-    "balanceTitle": "Verified Solana wallet $WOC balance",
-    "balanceAria": "Verified Solana wallet balance: {balance}",
-    "balancePreviewTitle": "Connected wallet $WOC balance preview",
-    "balancePreviewAria": "Connected wallet balance preview: {balance}. Link the wallet to verify holder flair.",
+    "label": "Кошелек $WOC",
+    "connect": "Подтвердить кошелек",
+    "connectTitle": "Подтвердить ваш кошелек Solana",
+    "connectAria": "Подтвердить ваш кошелек Solana",
+    "verify": "Подтвердить кошелек",
+    "verifyNew": "Подтвердить новый кошелек",
+    "verifyTitle": "Выберите кошелек и подпишите один раз, чтобы подтвердить владение.",
+    "verifyAria": "Выберите кошелек и подпишите один раз, чтобы подтвердить владение",
+    "verifyAddressAria": "Подпишите, чтобы подтвердить кошелек {address} для вашей учетной записи",
+    "appConnected": "Приложение подключено",
+    "connectApp": "Подключить приложение",
+    "connectAppTitle": "Подключить приложение кошелька в этом браузере",
+    "connectAppAria": "Подключить приложение кошелька в этом браузере",
+    "verifying": "Подтверждение...",
+    "verifyingTitle": "Идет подтверждение кошелька.",
+    "switch": "Сменить",
+    "switchTitle": "Подтвердить другой кошелек",
+    "switchAria": "Подтвердить другой кошелек",
+    "unlink": "Отвязать",
+    "unlinkTitle": "Удалить подтверждение кошелька из этой учетной записи",
+    "unlinkAria": "Удалить подтверждение кошелька из этой учетной записи",
+    "signOut": "Отключить",
+    "signOutTitle": "Отключить приложение кошелька в этом браузере",
+    "signOutAria": "Отключить приложение кошелька в этом браузере",
+    "hide": "Скрыть",
+    "hideTitle": "Скрыть строку кошелька на этом экране",
+    "hideAria": "Скрыть строку кошелька на этом экране",
+    "hiddenNotice": "Строка кошелька скрыта. Снова включите ее в игре через Параметры > Интерфейс.",
+    "linkedTitle": "Кошелек подтвержден для вашей учетной записи. Нажмите, чтобы управлять приложением кошелька.",
+    "linkedDisconnectedTitle": "Кошелек остается подтвержденным для вашей учетной записи. Подключитесь снова, чтобы управлять приложением кошелька.",
+    "linkedDisconnectedAria": "Кошелек остается подтвержденным для вашей учетной записи. Подключитесь снова, чтобы управлять приложением кошелька.",
+    "linkTitle": "Нажмите, чтобы подписать и привязать этот кошелек к вашей учетной записи.",
+    "connectedTitle": "Подключено. Войдите, чтобы привязать этот кошелек к вашей учетной записи.",
+    "balanceTitle": "Баланс $WOC подтвержденного кошелька Solana",
+    "balanceAria": "Баланс подтвержденного кошелька Solana: {balance}",
+    "balancePreviewTitle": "Предпросмотр баланса $WOC подключенного кошелька",
+    "balancePreviewAria": "Предпросмотр баланса подключенного кошелька: {balance}. Привяжите кошелек, чтобы подтвердить отметку держателя.",
     "balanceAmount": "{amount} $WOC",
-    "connected": "Connected: {address}",
-    "connectedWithBalance": "Connected: {balance} - {address}",
-    "connectedLinked": "Verified: {address}",
-    "connectedLinkedWithBalance": "Verified: {balance} - {address}",
-    "helpDisconnected": "Verify a Solana wallet to enable holder flair and player-card badges. No transaction or SOL required.",
-    "helpLoginToLink": "Connected {address}. Log in to link it to your account.",
-    "helpLoginToLinkWithBalance": "Connected {address} with {balance}. Log in to link it to your account.",
-    "helpReadyToLink": "Wallet selected: {address}. Sign once to verify holder flair and player cards.",
-    "helpReadyToLinkWithBalance": "Wallet selected: {address} with {balance}. Sign once to verify holder flair and player cards.",
-    "helpLinked": "Holder perks are active. Wallet app connected on this browser.",
-    "helpLinkedWithBalance": "Holder perks are active. Wallet app connected on this browser.",
-    "helpLinkedDisconnected": "Holder perks are active. Connect the app when you need to sign or spend.",
-    "helpLinkedDisconnectedWithBalance": "Holder perks are active. Connect the app when you need to sign or spend.",
-    "flowConnect": "Choose a wallet. Verification continues automatically.",
-    "flowSign": "Sign the verification message in your wallet app. No transaction or SOL required.",
-    "flowVerify": "Verifying wallet ownership...",
-    "linkFailed": "Wallet verification failed.",
-    "verifyFailed": "Wallet verification failed.",
-    "unlinkFailed": "Could not unlink wallet.",
-    "holder": "$WOC holder",
-    "holderTierTitle": "{tier} $WOC holder",
+    "connected": "Подключено: {address}",
+    "connectedWithBalance": "Подключено: {balance} - {address}",
+    "connectedLinked": "Подтверждено: {address}",
+    "connectedLinkedWithBalance": "Подтверждено: {balance} - {address}",
+    "helpDisconnected": "Подтвердите кошелек Solana, чтобы включить отметку держателя и значки карточки игрока. Транзакция и SOL не требуются.",
+    "helpLoginToLink": "Подключено: {address}. Войдите, чтобы привязать его к вашей учетной записи.",
+    "helpLoginToLinkWithBalance": "Подключено: {address}, баланс {balance}. Войдите, чтобы привязать его к вашей учетной записи.",
+    "helpReadyToLink": "Выбран кошелек: {address}. Подпишите один раз, чтобы подтвердить отметку держателя и карточки игрока.",
+    "helpReadyToLinkWithBalance": "Выбран кошелек: {address}, баланс {balance}. Подпишите один раз, чтобы подтвердить отметку держателя и карточки игрока.",
+    "helpLinked": "Привилегии держателя активны. Приложение кошелька подключено в этом браузере.",
+    "helpLinkedWithBalance": "Привилегии держателя активны. Приложение кошелька подключено в этом браузере.",
+    "helpLinkedDisconnected": "Привилегии держателя активны. Подключайте приложение, когда нужно подписать или потратить.",
+    "helpLinkedDisconnectedWithBalance": "Привилегии держателя активны. Подключайте приложение, когда нужно подписать или потратить.",
+    "flowConnect": "Выберите кошелек. Подтверждение продолжится автоматически.",
+    "flowSign": "Подпишите сообщение подтверждения в приложении кошелька. Транзакция и SOL не требуются.",
+    "flowVerify": "Подтверждение владения кошельком...",
+    "linkFailed": "Не удалось подтвердить кошелек.",
+    "verifyFailed": "Не удалось подтвердить кошелек.",
+    "unlinkFailed": "Не удалось отвязать кошелек.",
+    "holder": "держатель $WOC",
+    "holderTierTitle": "{tier}: держатель $WOC",
     "holderTiers": {
       "ember": {
-        "name": "Ember",
-        "flavor": "The spark is lit."
+        "name": "Искра",
+        "flavor": "Искра зажжена."
       },
       "coinbearer": {
-        "name": "Coinbearer",
-        "flavor": "First coin in the war chest."
+        "name": "Носитель монет",
+        "flavor": "Первая монета в военной казне."
       },
       "coppercrest": {
-        "name": "Coppercrest",
-        "flavor": "Coppers stacked, your name spoken."
+        "name": "Медный герб",
+        "flavor": "Медь копится, ваше имя произносят вслух."
       },
       "silverbound": {
-        "name": "Silverbound",
-        "flavor": "Bound in silver, building the bag."
+        "name": "Серебряная связь",
+        "flavor": "Серебро связывает вас, запас растет."
       },
       "gilded": {
-        "name": "Gilded",
-        "flavor": "Gilded and grinning."
+        "name": "Позолоченный",
+        "flavor": "В позолоте и с улыбкой."
       },
       "vaultwarden": {
-        "name": "Vaultwarden",
-        "flavor": "Guarding a real vault now: 0.01% of all $WOC."
+        "name": "Хранитель хранилища",
+        "flavor": "Теперь вы храните настоящее хранилище: 0,01% всех $WOC."
       },
       "whale": {
-        "name": "Whale",
-        "flavor": "The deep parts when you swim: 0.1% of supply."
+        "name": "Кит",
+        "flavor": "Глубины расступаются, когда вы плывете: 0,1% предложения."
       },
       "leviathan": {
-        "name": "Leviathan",
-        "flavor": "Markets feel you move: 1% of supply."
+        "name": "Левиафан",
+        "flavor": "Рынок чувствует ваше движение: 1% предложения."
       },
       "tidelord": {
-        "name": "Tidelord",
-        "flavor": "The tide answers your call: 2% of supply."
+        "name": "Повелитель приливов",
+        "flavor": "Прилив отвечает на ваш зов: 2% предложения."
       },
       "stormcaller": {
-        "name": "Stormcaller",
-        "flavor": "Storms gather at your name: 3% of supply."
+        "name": "Призыватель бурь",
+        "flavor": "Бури собираются на ваше имя: 3% предложения."
       },
       "krakencrown": {
-        "name": "Krakencrown",
-        "flavor": "Crowned by the deep: 4% of supply."
+        "name": "Кракенова корона",
+        "flavor": "Глубины венчают вас короной: 4% предложения."
       },
       "titanforged": {
-        "name": "Titanforged",
-        "flavor": "Forged among titans: 5% of supply."
+        "name": "Титанокованный",
+        "flavor": "Выкован среди титанов: 5% предложения."
       },
       "starhoard": {
-        "name": "Starhoard",
-        "flavor": "A hoard that bends starlight: 6% of supply."
+        "name": "Звездный клад",
+        "flavor": "Клад, изгибающий звездный свет: 6% предложения."
       },
       "voidwarden": {
-        "name": "Voidwarden",
-        "flavor": "Keeper at the void's edge: 7% of supply."
+        "name": "Страж пустоты",
+        "flavor": "Хранитель у края пустоты: 7% предложения."
       },
       "realmshaper": {
-        "name": "Realmshaper",
-        "flavor": "You reshape the realm: 8% of supply."
+        "name": "Творец пределов",
+        "flavor": "Вы меняете облик мира: 8% предложения."
       },
       "worldforger": {
-        "name": "Worldforger",
-        "flavor": "Forging a world of your own: 9% of supply."
+        "name": "Кователь миров",
+        "flavor": "Куете собственный мир: 9% предложения."
       },
       "worldbearer": {
-        "name": "Worldbearer",
-        "flavor": "You carry a piece of the world: 10% of supply."
+        "name": "Носитель мира",
+        "flavor": "Вы несете часть мира: 10% предложения."
       },
       "sovereign": {
-        "name": "Sovereign",
-        "flavor": "The realm bends the knee: the entire supply."
+        "name": "Суверен",
+        "flavor": "Мир преклоняет колено: все предложение."
       }
     }
   },
   "playerCard": {
-    "shareButton": "Share Player Card",
-    "title": "Player Card",
-    "close": "Close player card",
-    "loading": "Forging your card...",
-    "poseGroup": "Pose",
-    "poseHero": "Hero",
-    "poseBattle": "Battle",
-    "poseVictory": "Victory",
-    "referralLinkLabel": "Your referral link. Anyone who joins through it is credited to you:",
-    "referralLinkAria": "Your referral link",
-    "renderFailed": "Could not render your card. Try a different pose.",
-    "renderFailedStatus": "Card render failed.",
-    "levelClass": "Level {level} - {className}",
-    "topPercent": "TOP {percent}%",
-    "realmSubtitle": "{realm} Realm",
-    "defaultRealm": "World of ClaudeCraft",
+    "shareButton": "Поделиться карточкой игрока",
+    "title": "Карточка игрока",
+    "close": "Закрыть карточку игрока",
+    "loading": "Создание вашей карточки...",
+    "poseGroup": "Поза",
+    "poseHero": "Герой",
+    "poseBattle": "Бой",
+    "poseVictory": "Победа",
+    "referralLinkLabel": "Ваша реферальная ссылка. Все, кто присоединится по ней, будут засчитаны за вами:",
+    "referralLinkAria": "Ваша реферальная ссылка",
+    "renderFailed": "Не удалось отрисовать вашу карточку. Попробуйте другую позу.",
+    "renderFailedStatus": "Не удалось отрисовать карточку.",
+    "levelClass": "Уровень {level} - {className}",
+    "topPercent": "ТОП {percent}%",
+    "realmSubtitle": "Мир {realm}",
+    "defaultRealm": "Мир ClaudeCraft",
     "brandWordmark": "WORLD OF CLAUDECRAFT",
-    "recruited": "{count} recruited",
+    "recruited": "приглашено: {count}",
     "footerHandle": "@{handle}",
     "footerHandleWithRecruits": "@{handle} - {recruited}",
-    "footerCta": "Forge your legend: {siteUrl}",
-    "arenaStat": "Arena",
-    "shareTierBit": ", {tier}-rank $WOC holder",
-    "shareText": "I'm forging my legend in World of ClaudeCraft: Level {level} {className}{tierBit}. Join my realm:",
-    "nativeShareTitle": "World of ClaudeCraft",
-    "fileNameFallback": "player",
-    "actionShareX": "Share to X",
-    "actionCopyReferral": "Copy Referral Link",
-    "actionDownload": "Download",
-    "actionShareNative": "Share...",
-    "statusGenericError": "Something went wrong.",
-    "statusStillRendering": "Card is still rendering.",
-    "statusPublishing": "Publishing card...",
-    "statusPublished": "Card published. Share your referral link below.",
-    "statusOpenedXWithImage": "Opened X. Paste the card image into the post.",
-    "statusOpenedXWithLink": "Opened X with your link. The card image appears after posting from a public domain.",
-    "statusReferralCopied": "Referral link copied. Share it anywhere.",
-    "statusDownloaded": "Card downloaded.",
-    "statusShareUnsupported": "Sharing is not supported on this device."
+    "footerCta": "Создайте свою легенду: {siteUrl}",
+    "arenaStat": "Арена",
+    "shareTierBit": ", держатель $WOC ранга {tier}",
+    "shareText": "Я создаю свою легенду в World of ClaudeCraft: уровень {level}, {className}{tierBit}. Присоединяйтесь к моему миру:",
+    "nativeShareTitle": "Мир ClaudeCraft",
+    "fileNameFallback": "игрок",
+    "actionShareX": "Поделиться в X",
+    "actionCopyReferral": "Копировать реферальную ссылку",
+    "actionDownload": "Скачать",
+    "actionShareNative": "Поделиться...",
+    "statusGenericError": "Что-то пошло не так.",
+    "statusStillRendering": "Карточка еще отрисовывается.",
+    "statusPublishing": "Публикация карточки...",
+    "statusPublished": "Карточка опубликована. Поделитесь реферальной ссылкой ниже.",
+    "statusOpenedXWithImage": "X открыт. Вставьте изображение карточки в публикацию.",
+    "statusOpenedXWithLink": "X открыт с вашей ссылкой. Изображение карточки появится после публикации с общедоступного домена.",
+    "statusReferralCopied": "Реферальная ссылка скопирована. Поделитесь ей где угодно.",
+    "statusDownloaded": "Карточка скачана.",
+    "statusShareUnsupported": "На этом устройстве поделиться нельзя."
   },
   "classes": {
     "warrior": "Воин",
@@ -1861,259 +1861,259 @@ export const ru_RU: EnTranslations = {
   },
   "sim": {
     "delve": {
-      "cannotEnterNow": "You cannot enter a delve right now.",
-      "leaveDungeonFirst": "Leave the dungeon first.",
-      "leaveArenaFirst": "Leave the arena first.",
-      "alreadyInDelve": "You are already in a delve.",
-      "whileTrading": "You cannot enter a delve while trading.",
-      "duringDuel": "You cannot enter a delve during a duel.",
-      "duringArena": "You cannot enter a delve during an arena match.",
-      "unknownTier": "Unknown delve tier.",
-      "levelRequired": "You must be level {level} to enter {name}.",
-      "levelRequiredTier": "You must be level {level} to enter {name} on {tier}.",
-      "instancesBusy": "All instances of {name} are busy. Try again soon.",
-      "runFailed": "{name} run failed.",
-      "complete": "{name} complete.",
-      "mechanismOpen": "A mechanism clicks open nearby. A passage opens to the north. Find the exit portal ahead.",
-      "raiseDead": "{name} begins Raise Dead.",
-      "graveFalters": "The grave rite falters.",
-      "doorAlreadyOpen": "The door is already open.",
-      "companionRankUp": "{name} reaches rank {rank}.",
-      "bossChest": "The boss falls. A warded reliquary chest rises on the dais. Pick its lock to claim your spoils.",
-      "surfaceStairs": "A stairway to the surface opens. Press F at the stairs to leave.",
+      "cannotEnterNow": "Сейчас вы не можете войти в вылазку.",
+      "leaveDungeonFirst": "Сначала покиньте подземелье.",
+      "leaveArenaFirst": "Сначала покиньте арену.",
+      "alreadyInDelve": "Вы уже находитесь в вылазке.",
+      "whileTrading": "Нельзя войти в вылазку во время обмена.",
+      "duringDuel": "Нельзя войти в вылазку во время дуэли.",
+      "duringArena": "Нельзя войти в вылазку во время боя на арене.",
+      "unknownTier": "Неизвестная сложность вылазки.",
+      "levelRequired": "Чтобы войти в {name}, нужен уровень {level}.",
+      "levelRequiredTier": "Чтобы войти в {name} на сложности {tier}, нужен уровень {level}.",
+      "instancesBusy": "Все копии {name} заняты. Попробуйте чуть позже.",
+      "runFailed": "Вылазка {name} провалена.",
+      "complete": "{name}: завершено.",
+      "mechanismOpen": "Рядом со щелчком открывается механизм. На севере открывается проход: найдите впереди выходной портал.",
+      "raiseDead": "{name} начинает Поднятие мёртвых.",
+      "graveFalters": "Могильный обряд сорван.",
+      "doorAlreadyOpen": "Дверь уже открыта.",
+      "companionRankUp": "{name} достигает ранга {rank}.",
+      "bossChest": "Босс пал. На возвышении поднимается заговорённый сундук реликвария: взломайте его замок, чтобы забрать добычу.",
+      "surfaceStairs": "Открывается лестница на поверхность. Нажмите F у лестницы, чтобы уйти.",
       "moduleEnter": "{name}: {objective}",
-      "objectiveClearRoom": "Clear the room.",
-      "objectiveDefeatBoss": "Defeat the boss.",
-      "tombstoneHint": "A tombstone passage opens to the north when the room is cleared.",
-      "tombstoneOpen": "A sealed tombstone passage grinds open to the north. Walk into it to continue.",
-      "tombstoneInto": "You pass through the tombstone into {name}.",
-      "chestEmpty": "The chest is empty.",
-      "notInDelve": "You are not in a delve.",
-      "cannotInteract": "You cannot interact with that.",
-      "tooFar": "You are too far away.",
-      "graveSilent": "The grave is silent for now.",
-      "doorLocked": "The door is locked.",
-      "strikeWall": "Strike the wall to break through.",
-      "nothingHappens": "Nothing happens.",
-      "unknownCompanion": "Unknown companion.",
-      "companionMaxRank": "This companion is already fully upgraded.",
-      "companionMarksRequired": "You need {marks} Delve Marks to upgrade {name}.",
-      "cannotAffordCompanionUpgrade": "You cannot afford this upgrade.",
-      "shopItemLocked": "You have not unlocked that item yet.",
-      "shopMarksRequired": "You need {marks} Delve Marks to buy {name}.",
-      "shopSealPremiumOnly": "This seal yields only to a master's hand. Only the Premium ante can open it.",
-      "passageSealed": "The passage is sealed.",
-      "moveCloserPassage": "Move closer to the passage.",
-      "moveCloserChest": "Move closer to the chest.",
-      "nothingToTake": "There is nothing left to take.",
-      "wayOutNotOpen": "The way out is not yet open.",
-      "moveCloserStairs": "Move closer to the stairs."
+      "objectiveClearRoom": "Зачистите комнату.",
+      "objectiveDefeatBoss": "Победите босса.",
+      "tombstoneHint": "Когда комната будет зачищена, на севере откроется надгробный проход.",
+      "tombstoneOpen": "Запечатанный надгробный проход со скрежетом открывается на севере. Войдите в него, чтобы продолжить.",
+      "tombstoneInto": "Вы проходите сквозь надгробие в {name}.",
+      "chestEmpty": "Сундук пуст.",
+      "notInDelve": "Вы не находитесь в вылазке.",
+      "cannotInteract": "С этим нельзя взаимодействовать.",
+      "tooFar": "Вы слишком далеко.",
+      "graveSilent": "Могила пока безмолвна.",
+      "doorLocked": "Дверь заперта.",
+      "strikeWall": "Ударьте по стене, чтобы пробить её.",
+      "nothingHappens": "Ничего не происходит.",
+      "unknownCompanion": "Неизвестный спутник.",
+      "companionMaxRank": "Этот спутник уже улучшен до предела.",
+      "companionMarksRequired": "Чтобы улучшить {name}, нужно Меток Вылазок: {marks}.",
+      "cannotAffordCompanionUpgrade": "Вам не хватает средств на это улучшение.",
+      "shopItemLocked": "Вы ещё не открыли этот предмет.",
+      "shopMarksRequired": "Чтобы купить {name}, нужно Меток Вылазок: {marks}.",
+      "shopSealPremiumOnly": "Эта печать поддаётся лишь руке мастера: открыть её можно только Превосходной ставкой.",
+      "passageSealed": "Проход запечатан.",
+      "moveCloserPassage": "Подойдите ближе к проходу.",
+      "moveCloserChest": "Подойдите ближе к сундуку.",
+      "nothingToTake": "Забирать больше нечего.",
+      "wayOutNotOpen": "Выход ещё не открыт.",
+      "moveCloserStairs": "Подойдите ближе к лестнице."
     },
     "lockpick": {
-      "lockYields": "The lock yields! {tier} spoils.",
-      "tierPremium": "Premium",
-      "tierMedium": "Medium",
-      "tierLow": "Modest",
-      "alreadyInProgress": "Someone is already working the lock.",
-      "cannotPickThat": "You cannot pick that.",
-      "chooseAnte": "Choose 1, 2, or 3 picks.",
-      "noAttempt": "No lock attempt in progress.",
-      "notYours": "That is not your lock.",
-      "toolSlips": "That tool slips off this lock.",
-      "lockJammed": "The lock is jammed beyond picking. Clear the delve again for another attempt.",
-      "lastPickSnaps": "The last pick snaps. The lock jams. The chest is lost unless you clear the delve again."
+      "lockYields": "Замок поддаётся! Добыча: {tier}.",
+      "tierPremium": "Превосходная",
+      "tierMedium": "Средняя",
+      "tierLow": "Скромная",
+      "alreadyInProgress": "Кто-то уже возится с замком.",
+      "cannotPickThat": "Это нельзя взломать.",
+      "chooseAnte": "Выберите 1, 2 или 3 отмычки.",
+      "noAttempt": "Попытка вскрытия замка не ведётся.",
+      "notYours": "Это не ваш замок.",
+      "toolSlips": "Этот инструмент соскальзывает с этого замка.",
+      "lockJammed": "Замок заклинило, его не вскрыть: пройдите вылазку снова ради новой попытки.",
+      "lastPickSnaps": "Последняя отмычка ломается. Замок заклинивает: сундук потерян, пока вы снова не пройдёте вылазку."
     }
   },
   "lockpickUi": {
-    "pickTitle": "Pick the Lock",
-    "cofferTitle": "Bountiful Coffer",
-    "cache": "{tier} Cache",
-    "pickBlurb": "A richer cache is sealed behind more locks. Easier locks give you more tries and more time; a failed try resets the lock until your tries run out.",
-    "cofferBlurb": "This seal yields only to a master's hand: the Hard, Premium path alone can open it. Solve all three locks for the signature prize.",
-    "pagesAria": "{count} locks",
-    "tries": "{count} tries",
-    "triesOne": "1 try",
-    "perMove": "{seconds}s / move",
-    "seconds": "{seconds}s",
-    "boardTitle": "Tumbler's Path: {tier} cache",
-    "closeAria": "Close",
-    "withdrawAria": "Withdraw",
-    "timerAria": "Time remaining",
-    "lockOf": "Lock {page}/{total}",
-    "lockOfAria": "Lock {page} of {total}",
-    "triesOf": "Tries {tries}/{total}",
-    "triesOfAria": "{tries} of {total} tries left",
-    "ward": "Ward {col} / {total}",
-    "depthKeys": "Hotkeys set pick depth (Q/W/E/A/Z), not the ward number.",
-    "withdraw": "Withdraw (Esc)",
+    "pickTitle": "Вскройте замок",
+    "cofferTitle": "Богатый ларец",
+    "cache": "{tier} тайник",
+    "pickBlurb": "Богатый тайник запечатан за большим числом замков. Замки попроще дают больше попыток и времени; неудачная попытка сбрасывает замок, пока не кончатся попытки.",
+    "cofferBlurb": "Эта печать поддаётся лишь руке мастера: открыть её можно только Сложным, Превосходным путём. Вскройте все три замка ради приметной награды.",
+    "pagesAria": "Замков: {count}",
+    "tries": "Попыток: {count}",
+    "triesOne": "1 попытка",
+    "perMove": "{seconds} с на ход",
+    "seconds": "{seconds}с",
+    "boardTitle": "Путь штифтов: {tier} тайник",
+    "closeAria": "Закрыть",
+    "withdrawAria": "Отступить",
+    "timerAria": "Оставшееся время",
+    "lockOf": "Замок {page}/{total}",
+    "lockOfAria": "Замок {page} из {total}",
+    "triesOf": "Попытки {tries}/{total}",
+    "triesOfAria": "Осталось попыток: {tries} из {total}",
+    "ward": "Сувальда {col} / {total}",
+    "depthKeys": "Горячие клавиши задают глубину отмычки (Q/W/E/A/Z), а не номер сувальды.",
+    "withdraw": "Отступить (Esc)",
     "action": {
-      "hardSet": "Hard Set",
-      "set": "Set",
-      "steady": "Steady",
-      "ease": "Ease",
-      "drop": "Drop"
+      "hardSet": "Сильный нажим",
+      "set": "Нажим",
+      "steady": "Держать",
+      "ease": "Ослабить",
+      "drop": "Отпустить"
     },
     "feedback": {
-      "advanced": "The pin gives...",
-      "slip": "A ward bites, the pick slips!",
-      "bind": "The tumbler binds: wrong depth!",
-      "trap": "A false ward snaps shut, the lock jams!",
-      "retry": "The lock resets. Line up a fresh attempt.",
-      "pageCleared": "A tumbler bank falls. The next lock turns up.",
-      "success": "The bolt throws, the cache is yours!",
-      "fail": "The lock seizes. It won't budge again."
+      "advanced": "Штифт поддаётся...",
+      "slip": "Сувальда цепляет, отмычка соскальзывает!",
+      "bind": "Штифт заедает: неверная глубина!",
+      "trap": "Ложная сувальда защёлкивается, замок заклинивает!",
+      "retry": "Замок сбрасывается. Готовьте новую попытку.",
+      "pageCleared": "Ряд штифтов падает. Открывается следующий замок.",
+      "success": "Засов отходит, тайник ваш!",
+      "fail": "Замок заклинило. Больше он не поддастся."
     },
     "summary": {
-      "success": "Lock sprung, {tier} cache claimed.",
-      "successGeneric": "Lock sprung, the cache is claimed.",
-      "fail": "The lock is ruined. Clear the delve again for another attempt.",
-      "abandoned": "You ease the picks back out. The lock waits."
+      "success": "Замок вскрыт, {tier} тайник забран.",
+      "successGeneric": "Замок вскрыт, тайник забран.",
+      "fail": "Замок испорчен. Пройдите вылазку снова ради новой попытки.",
+      "abandoned": "Вы вынимаете отмычки обратно. Замок ждёт."
     }
   },
   "delveUi": {
     "board": {
-      "title": "Delve Board",
-      "enter": "Enter Delve",
-      "enterAria": "Enter {delve} on {tier} difficulty",
-      "openDelve": "Collapsed Reliquary",
-      "openDelveAria": "Open Delve Board from {name}",
-      "marks": "Delve Marks: {count}",
-      "minLevel": "Requires Level {level}",
+      "title": "Доска Вылазок",
+      "enter": "Войти в Вылазку",
+      "enterAria": "Войти в {delve} на сложности {tier}",
+      "openDelve": "Обрушившийся Реликварий",
+      "openDelveAria": "Открыть доску Вылазок у {name}",
+      "marks": "Метки Вылазок: {count}",
+      "minLevel": "Требуется уровень {level}",
       "tier": {
-        "normal": "Normal",
-        "heroic": "Heroic"
+        "normal": "Обычная",
+        "heroic": "Героическая"
       },
       "companion": {
-        "pick": "Choose a companion",
-        "tessa": "Acolyte Tessa",
-        "rank": "Rank {rank}",
-        "boon": "Heals the party between fights. Rank 3 revives a fallen ally once per run.",
-        "upgrade": "Upgrade to Rank {rank} ({marks} Marks)",
-        "upgradeAria": "Upgrade {name} to rank {rank} for {marks} Delve Marks",
-        "maxRank": "Fully upgraded"
+        "pick": "Выберите спутника",
+        "tessa": "Послушница Тесса",
+        "rank": "Ранг {rank}",
+        "boon": "Лечит группу между боями. На 3 ранге один раз за вылазку поднимает павшего союзника.",
+        "upgrade": "Улучшить до ранга {rank} ({marks} меток)",
+        "upgradeAria": "Улучшить {name} до ранга {rank} за {marks} Меток Вылазок",
+        "maxRank": "Полностью улучшено"
       },
-      "tabDelve": "Delve",
-      "tabShop": "Shop"
+      "tabDelve": "Вылазка",
+      "tabShop": "Магазин"
     },
     "shop": {
-      "price": "{marks} Marks",
-      "buy": "Buy",
-      "buyAria": "Buy {item} for {marks} Delve Marks",
-      "reqHeroic": "Requires a Heroic clear",
-      "reqClears": "Requires {count} clears",
-      "empty": "Nothing in stock."
+      "price": "{marks} меток",
+      "buy": "Купить",
+      "buyAria": "Купить {item} за {marks} Меток Вылазок",
+      "reqHeroic": "Требуется героическое прохождение",
+      "reqClears": "Требуется прохождений: {count}",
+      "empty": "Нет товаров в наличии."
     },
     "tracker": {
-      "title": "Delve",
-      "objective": "Objective",
-      "module": "Module {current} of {total}",
-      "affix": "Affixes",
-      "complete": "Complete",
-      "marks": "Delve Marks: {count}",
-      "exitHintOpen": "Walk into the tombstone passage (north)",
-      "exitHintLocked": "Clear trash mobs to open the passage north"
+      "title": "Вылазка",
+      "objective": "Задача",
+      "module": "Секция {current} из {total}",
+      "affix": "Аффиксы",
+      "complete": "Завершено",
+      "marks": "Метки Вылазок: {count}",
+      "exitHintOpen": "Войдите в надгробный проход (север)",
+      "exitHintLocked": "Зачистите врагов, чтобы открыть проход на север"
     },
     "objective": {
-      "kill_boss": "Slay {boss}",
-      "recover_artifact": "Recover the burial ledger",
-      "clear_room": "Clear the room"
+      "kill_boss": "Убейте: {boss}",
+      "recover_artifact": "Вернуть погребальную книгу",
+      "clear_room": "Зачистите комнату"
     },
     "summary": {
-      "title": "Delve Complete",
-      "marks": "{count} Delve Marks earned",
-      "loreUnlock": "Lore unlocked: {title}"
+      "title": "Вылазка завершена",
+      "marks": "Получено Меток Вылазок: {count}",
+      "loreUnlock": "Открыта легенда: {title}"
     },
     "death": {
-      "warning": "One more death will end this delve run."
+      "warning": "Ещё одна смерть прервёт эту вылазку."
     },
     "run": {
-      "failed": "The delve run has failed. You are returned to Brother Halven."
+      "failed": "Вылазка провалена. Вы возвращены к Брату Хальвену."
     },
     "npc": {
       "halven": {
-        "greeting": "The reliquary below has shifted again. We hear chanting through the floor after midnight, and Acolyte Tessa swears the burial ledgers are changing their own ink. If you have courage enough, {playerName}, take a candle and go below. Do not trust every voice you hear down there. Some of them knew your name before you were born."
+        "greeting": "Реликварий внизу снова сдвинулся. После полуночи мы слышим пение сквозь пол, а Послушница Тесса клянётся, что погребальные книги сами меняют свои чернила. Если в тебе довольно смелости, {playerName}, возьми свечу и спустись вниз. Не доверяй каждому голосу, что услышишь там. Иные из них знали твоё имя ещё до твоего рождения."
       }
     },
     "intro": {
-      "normal": "The stairwell is cold and dark. Broken saint-stones litter the descent, and a soft bell note hangs in the damp air. Acolyte Tessa whispers, \"The reliquary should not be open this far. Stay close, {playerName}.\"",
-      "heroic": "The doors groan shut behind you. Names scrape across the stone like fingernails. Tessa's candle burns blue. \"They are not calling the dead now, {playerName}. They are answering something.\""
+      "normal": "Лестничный колодец холоден и тёмен. Разбитые камни святых усеивают спуск, а в сыром воздухе висит тихий колокольный звон. Послушница Тесса шепчет: «Реликварий не должен быть открыт так глубоко. Держись рядом, {playerName}».",
+      "heroic": "Двери со стоном захлопываются за твоей спиной. Имена скребут по камню, точно ногти. Свеча Тессы горит синим. «Теперь они не зовут мёртвых, {playerName}. Они отвечают чему-то»."
     },
     "module": {
-      "reliquary_sunken_ossuary": "Water seeps through burial shelves, carrying old ash in silver-black streams.",
-      "reliquary_bell_niche": "Dozens of handbells hang in silence, each tied with funeral cloth.",
-      "reliquary_saintless_hall": "Statues with faces chiseled away with careful hatred.",
-      "reliquary_finale": "The buried bell tolls once beneath your boots."
+      "reliquary_sunken_ossuary": "Вода сочится сквозь погребальные полки, унося старый пепел серебристо-чёрными струями.",
+      "reliquary_bell_niche": "Десятки ручных колоколов висят в тишине, каждый перевязан погребальной тканью.",
+      "reliquary_saintless_hall": "Статуи, чьи лица сточены с тщательной ненавистью.",
+      "reliquary_finale": "Погребённый колокол единожды звонит у тебя под ногами."
     },
     "moduleName": {
-      "reliquary_sunken_ossuary": "The Sunken Ossuary",
-      "reliquary_bell_niche": "The Bell Niche",
-      "reliquary_saintless_hall": "The Saintless Hall",
-      "reliquary_finale": "The Bell-Buried Chamber"
+      "reliquary_sunken_ossuary": "Затопленная Костница",
+      "reliquary_bell_niche": "Колокольная Ниша",
+      "reliquary_saintless_hall": "Зал без Святых",
+      "reliquary_finale": "Зал Погребённого Колокола"
     },
     "companion": {
       "barkLine": "{name}: {line}",
       "tessa": {
-        "combat_start": "Keep your footing, {playerName}. The dead are restless here.",
-        "low_hp": "Breathe. I still have prayers left for you.",
-        "trap_spotted": "Hold. Something in the floor remembers footsteps.",
-        "boss_pull": "That bell knows your weight, {playerName}. Do not kneel.",
-        "completion": "The ledger can rest another night. Well done.",
+        "combat_start": "Держись на ногах, {playerName}. Мёртвые здесь неспокойны.",
+        "low_hp": "Дыши. У меня ещё остались молитвы для тебя.",
+        "trap_spotted": "Стой. Что-то в полу помнит шаги.",
+        "boss_pull": "Этот колокол знает твой вес, {playerName}. Не вставай на колени.",
+        "completion": "Книга может отдохнуть ещё одну ночь. Отлично сработано.",
         "rank": {
-          "1": "Chapel Novice",
-          "2": "Candle-Bearer",
-          "3": "Reliquary Acolyte",
-          "4": "Gravecall Witness",
-          "5": "Chapel Warden"
+          "1": "Послушница часовни",
+          "2": "Носительница свечи",
+          "3": "Аколит Реликвария",
+          "4": "Свидетельница могильного зова",
+          "5": "Хранительница часовни"
         }
       }
     },
     "boss": {
       "varric": {
         "bell": {
-          "emote": "Deacon Varric grips the buried bell with both hands!",
-          "log": "Deacon Varric begins to toll the burial bell.",
-          "warning": "Move away from Deacon Varric!",
-          "impact": "The bell's toll cracks the chamber floor!",
-          "lesson": "Bell Toll: a ground slam every twelve seconds. Move out before it lands."
+          "emote": "Дьякон Варрик хватает погребённый колокол обеими руками!",
+          "log": "Дьякон Варрик начинает звонить в погребальный колокол.",
+          "warning": "Отойдите от Дьякона Варрика!",
+          "impact": "Звон колокола раскалывает пол зала!",
+          "lesson": "Колокольный звон: удар по земле каждые двенадцать секунд. Отойдите, прежде чем он обрушится."
         },
         "raise": {
-          "emote": "Deacon Varric calls names from the broken graves!",
-          "log": "Deacon Varric begins Raise Dead.",
-          "warning": "Stop the grave rite!",
-          "object": "The cracked grave shudders with stolen breath.",
-          "interrupt_ok": "The grave rite falters.",
-          "interrupt_fail": "The dead answer Deacon Varric's call!",
-          "lesson": "Interrupt the cracked grave within five seconds or the dead rise to his call."
+          "emote": "Дьякон Варрик призывает имена из разрытых могил!",
+          "log": "Дьякон Варрик начинает Поднятие мёртвых.",
+          "warning": "Остановите могильный обряд!",
+          "object": "Растрескавшаяся могила содрогается от украденного дыхания.",
+          "interrupt_ok": "Могильный обряд сорван.",
+          "interrupt_fail": "Мёртвые отзываются на зов Дьякона Варрика!",
+          "lesson": "Прервите растрескавшуюся могилу в течение пяти секунд, иначе мёртвые восстанут на его зов."
         },
-        "pull": "You step on hallowed dust with unclean purpose. Kneel, and be counted.",
-        "intro": "No soul is lost. Only misplaced.",
-        "mid60": "Deacon Varric reads names from the ledger with shaking triumph.",
-        "mid30": "The burial bell answers every name he speaks.",
-        "defeat": "No... I had the names... I had them all..."
+        "pull": "Ты ступаешь по священному праху с нечистым умыслом. На колени, и будешь сочтён.",
+        "intro": "Ни одна душа не потеряна. Лишь забыта.",
+        "mid60": "Дьякон Варрик читает имена из книги с дрожащим торжеством.",
+        "mid30": "Погребальный колокол отзывается на каждое имя, что он произносит.",
+        "defeat": "Нет... у меня были имена... все до единого..."
       }
     },
     "lore": {
-      "eastbrook_ledger": "A water-stained page from Eastbrook's burial ledger. Names crossed out and rewritten in a hand that is not human.",
-      "first_collapse": "Chapel records note the first sinkage: saint-stones cracked, shelves tilted, and a bell-note heard from below ground.",
-      "gravecaller_mark": "A sigil scraped into coffin wood, not Morthen's seal, but an older gravecaller mark predating the Hollow Crypt.",
-      "bell_below": "Tessa's margin note: \"There is a second bell under the reliquary. It tolls for the misplaced, not the dead.\"",
-      "tessa_note": "Folded scrap in Tessa's script: \"If the ledgers change while we are below, trust the candle, not the voices.\""
+      "eastbrook_ledger": "Покоробленная водой страница из погребальной книги Истврука. Имена вычеркнуты и переписаны рукой, что не принадлежит человеку.",
+      "first_collapse": "Записи часовни отмечают первое оседание: камни святых треснули, полки накренились, а из-под земли донёсся колокольный звон.",
+      "gravecaller_mark": "Знак, нацарапанный на дереве гроба: не печать Мортена, а более древняя метка могильного зова, старше Пустой крипты.",
+      "bell_below": "Пометка Тессы на полях: «Под реликварием есть второй колокол. Он звонит по забытым, а не по мёртвым».",
+      "tessa_note": "Сложенный обрывок, написанный рукой Тессы: «Если книги изменятся, пока мы внизу, верь свече, а не голосам»."
     },
     "affix": {
-      "restless_graves": "Restless Graves",
-      "bad_air": "Bad Air",
-      "candleblind": "Candleblind",
-      "old_mechanisms": "Old Mechanisms",
-      "flooded_paths": "Flooded Paths",
-      "grave_tax": "Grave Tax",
-      "unstable_roof": "Unstable Roof",
-      "cult_remnants": "Cult Remnants"
+      "restless_graves": "Беспокойные могилы",
+      "bad_air": "Спёртый воздух",
+      "candleblind": "Свечная слепота",
+      "old_mechanisms": "Старые механизмы",
+      "flooded_paths": "Затопленные проходы",
+      "grave_tax": "Могильная подать",
+      "unstable_roof": "Неустойчивый свод",
+      "cult_remnants": "Остатки культа"
     },
     "blessing": {
-      "chapel_candle": "Chapel Candle: safer run, one fewer Mark on completion."
+      "chapel_candle": "Часовенная свеча: вылазка безопаснее, но на одну Метку меньше при завершении."
     },
     "chest": {
-      "flavor": "The dead have surrendered what they can spare."
+      "flavor": "Мёртвые отдали то, без чего могут обойтись."
     }
   },
   "fiesta": {
@@ -2290,8 +2290,8 @@ export const ru_RU: EnTranslations = {
     "playMode": "Многопользовательская игра",
     "applicationCategory": "Игра",
     "operatingSystem": "Веб-браузер",
-    "officialLabel": "Official World of ClaudeCraft website",
-    "officialBody": "worldofclaudecraft.com is the official free browser MMO for the Claudemoon realm. Play online with a persistent character, explore solo offline, read the wiki, and follow verified community links from this site."
+    "officialLabel": "Официальный сайт World of ClaudeCraft",
+    "officialBody": "worldofclaudecraft.com - официальная бесплатная браузерная MMO для мира Claudemoon. Играйте онлайн с постоянным персонажем, исследуйте мир в одиночку офлайн, читайте wiki и переходите по проверенным ссылкам сообщества с этого сайта."
   },
   "a11y": {
     "goHome": "Перейти на главную",
@@ -2340,12 +2340,12 @@ export const ru_RU: EnTranslations = {
       "deleteConfirm": "Введите имя персонажа, чтобы подтвердить удаление.",
       "notAuthenticated": "Нет авторизации.",
       "accountBanned": "Эта учетная запись заблокирована.",
-      "webLoginOnly": "Logins are only allowed from the game client.",
+      "webLoginOnly": "Вход разрешён только из игрового клиента.",
       "accountSuspended": "Эта учетная запись заблокирована до {date}.",
       "alreadyInWorld": "Персонаж уже находится в мире.",
-      "takenOver": "Your character was taken over by another session.",
+      "takenOver": "Вашего персонажа перехватила другая сессия.",
       "renameBeforeEntering": "Перед входом в мир этому персонажу нужно сменить имя.",
-      "renameNotPermitted": "Renaming this character is not allowed."
+      "renameNotPermitted": "Переименование этого персонажа не разрешено."
     }
   },
   "realm": {
@@ -2360,11 +2360,11 @@ export const ru_RU: EnTranslations = {
     "high": "Высокая",
     "medium": "Средняя",
     "low": "Низкая",
-    "popTipLow": "Low population: fewer than 15 players online right now. Plenty of room; great for a fresh start.",
-    "popTipMedium": "Medium population: 15 to 39 players online right now. A healthy, active realm.",
-    "popTipHigh": "High population: 40 to 79 players online right now. Busy, with lots of players around.",
-    "popTipFull": "Full population: 80 or more players online right now. Very busy; you may wait in a login queue.",
-    "popTipOffline": "Offline: this realm is unreachable right now and cannot be joined.",
+    "popTipLow": "Низкая населённость: сейчас в сети менее 15 игроков. Много места; отлично для нового старта.",
+    "popTipMedium": "Средняя населённость: сейчас в сети от 15 до 39 игроков. Активный и живой мир.",
+    "popTipHigh": "Высокая населённость: сейчас в сети от 40 до 79 игроков. Оживлённо, много игроков.",
+    "popTipFull": "Полная населённость: сейчас в сети 80 и более игроков. Очень оживлённо; возможна очередь на вход.",
+    "popTipOffline": "Не в сети: этот мир сейчас недоступен и к нему нельзя подключиться.",
     "characterCountOne": "{count} персонаж",
     "characterCountOther": "{count} персонажа",
     "selectedRealm": "Мир: {name}",
@@ -2376,9 +2376,9 @@ export const ru_RU: EnTranslations = {
     "noneYet": "Персонажей пока нет. Создайте одного ниже.",
     "levelClass": "{className}, уровень {level}",
     "inWorld": "в мире",
-    "takeOver": "Take Over",
-    "inWorldHint": "Already in world. Log out elsewhere, or take over.",
-    "takeOverConfirm": "This will disconnect this character from another session and bring it here. Continue?",
+    "takeOver": "Перехватить",
+    "inWorldHint": "Уже в мире. Выйдите в другом месте или перехватите сессию.",
+    "takeOverConfirm": "Это отключит персонажа от другой сессии и перенесёт его сюда. Продолжить?",
     "renameRequired": "требуется переименование",
     "delete": "Удалить",
     "rename": "Переименовать",
@@ -2395,13 +2395,13 @@ export const ru_RU: EnTranslations = {
     "viewProfile": "Профиль",
     "profile": "Профиль",
     "closeProfile": "Закрыть профиль",
-    "sortBy": "Sort",
-    "sortByLabel": "Sort characters",
-    "sortMenuLabel": "Sort options",
-    "sortLevel": "Level",
-    "sortName": "Name",
-    "sortRecent": "Recently Played",
-    "sortPlaytime": "Playtime"
+    "sortBy": "Сортировка",
+    "sortByLabel": "Сортировать персонажей",
+    "sortMenuLabel": "Параметры сортировки",
+    "sortLevel": "Уровень",
+    "sortName": "Имя",
+    "sortRecent": "Недавно сыгранные",
+    "sortPlaytime": "Время в игре"
   },
   "woc": {
     "linkWalletFirst": "Connect and link a Solana wallet to pay with $WOC.",
@@ -2567,78 +2567,108 @@ export const ru_RU: EnTranslations = {
       "closeMap": "Закрыть карту",
       "zoomIn": "Приблизить",
       "zoomOut": "Отдалить",
-      "mapCanvasLabel": "Map",
-      "mapSummary": "Map of {zone}."
+      "mapCanvasLabel": "Карта",
+      "mapSummary": "Карта зоны {zone}."
     },
     "mounts": {
-      "title": "Mounts",
-      "subtitle": "$WOC Travel Steeds",
-      "close": "Close mounts",
-      "summon": "Summon",
-      "dismount": "Dismount",
-      "summoning": "Summoning {name}…",
-      "riding": "Riding",
-      "flies": "Flies",
-      "locked": "Locked",
-      "speed": "+{percent}% speed",
-      "unlockAt": "Unlocks at {amount} $WOC",
-      "supplyShare": "{percent} of supply",
-      "qualifyHeader": "You qualify for {count} of {total} travel mounts.",
-      "holdingHint": "Holding {amount} $WOC.",
-      "noWallet": "Hold at least {amount} $WOC — 0.1% of supply — on a linked wallet to earn your first travel mount.",
-      "cantInCombat": "You can't mount while in combat.",
-      "cantSwimming": "You can't mount while swimming.",
-      "cantDead": "You can't mount while dead.",
-      "notEligible": "Your $WOC holdings don't reach that steed yet.",
-      "summonedBanner": "You summon {name}.",
-      "summonAria": "Summon {name}",
-      "dismountAria": "Dismount {name}",
-      "lockedAria": "{name} — locked; unlocks at {amount} $WOC",
-      "activeAria": "{name} — currently active",
+      "title": "Скакуны",
+      "subtitle": "Дорожные скакуны $WOC",
+      "close": "Закрыть скакунов",
+      "summon": "Призвать",
+      "dismount": "Спешиться",
+      "summoning": "Призыв {name}…",
+      "riding": "В седле",
+      "flies": "Летает",
+      "locked": "Заблокировано",
+      "speed": "+{percent}% к скорости",
+      "unlockAt": "Открывается при {amount} $WOC",
+      "supplyShare": "{percent} от запаса",
+      "qualifyHeader": "Вам доступно {count} из {total} дорожных скакунов.",
+      "holdingHint": "На руках {amount} $WOC.",
+      "noWallet": "Держите не менее {amount} $WOC — 0.1% от запаса — на привязанном кошельке, чтобы получить своего первого дорожного скакуна.",
+      "cantInCombat": "Нельзя оседлать скакуна в бою.",
+      "cantSwimming": "Нельзя оседлать скакуна вплавь.",
+      "cantDead": "Нельзя оседлать скакуна, будучи мертвым.",
+      "notEligible": "Ваших запасов $WOC пока не хватает на этого скакуна.",
+      "summonedBanner": "Вы призываете {name}.",
+      "summonAria": "Призвать {name}",
+      "dismountAria": "Спешиться с {name}",
+      "lockedAria": "{name} — заблокировано; открывается при {amount} $WOC",
+      "activeAria": "{name} — сейчас активен",
       "cardAria": "{name}: {flavor}",
-      "owned": "Owned",
-      "mint": "Mint Charter",
-      "mintHint": "Strike a tradeable Charter for this mount — sell it for gold so a non-holder can earn it.",
-      "mintAria": "Mint a tradeable Charter for {name}",
-      "mintedBanner": "You strike a Charter for {name}.",
-      "earnedBanner": "You have earned {name} — it is yours for good.",
-      "alreadyOwnErr": "You already own that mount.",
-      "charterVoidErr": "That Charter is void.",
-      "noCharterErr": "No Charter can be struck for that mount.",
-      "holdingsShortErr": "Your holdings do not cover that mount."
+      "owned": "В собственности",
+      "mint": "Отчеканить грамоту",
+      "mintHint": "Отчеканьте торговую грамоту на этого скакуна — продайте ее за золото, чтобы не-держатель смог его заслужить.",
+      "mintAria": "Отчеканить торговую грамоту на {name}",
+      "mintedBanner": "Вы чеканите грамоту на {name}.",
+      "earnedBanner": "Вы заслужили {name} — теперь он ваш навсегда.",
+      "alreadyOwnErr": "Этот скакун уже у вас есть.",
+      "charterVoidErr": "Эта грамота недействительна.",
+      "noCharterErr": "На этого скакуна нельзя отчеканить грамоту.",
+      "holdingsShortErr": "Ваших запасов не хватает на этого скакуна."
     },
     "course": {
-      "skytrials": "Skytrials",
-      "skytrialsHint": "Fly a timed ring course on a flying mount.",
-      "needFlyer": "Summon a flying mount to fly Skytrials.",
-      "start": "Fly",
-      "give_up": "Give up",
-      "par": "Par {time}",
-      "laps": "{count} laps",
-      "onePass": "1 lap",
-      "starting": "Fly through the first ring to start the clock",
-      "gate": "Ring {n}/{total}",
-      "lap": "Lap {n}/{total}",
-      "time": "Time",
-      "finish": "Finish!",
-      "beatPar": "Beat par by {time}",
-      "offPar": "{time} off par",
-      "failed": "Run ended — you left your mount",
-      "aborted": "Run abandoned",
-      "best": "Best {time}",
-      "newBest": "New best!",
-      "board": "Board",
-      "boardTitle": "{name} — top times",
-      "noTimes": "No times yet — be the first.",
-      "loadingBoard": "Loading…",
-      "you": "(you)",
-      "race": "Race",
-      "racePartyHint": "Race your party — first through the rings wins.",
-      "getReady": "Get ready",
-      "go": "GO!",
-      "dnf": "DNF",
-      "placeOf": "#{place} of {total}",
-      "racing": "Racing"
+      "skytrials": "Небесные испытания",
+      "skytrialsHint": "Пролетите трассу с кольцами на время на крылатом скакуне.",
+      "needFlyer": "Призовите крылатого скакуна, чтобы пройти Небесные испытания.",
+      "start": "Лететь",
+      "give_up": "Сдаться",
+      "par": "Норма {time}",
+      "laps": "{count} кругов",
+      "onePass": "1 круг",
+      "starting": "Пролетите сквозь первое кольцо, чтобы запустить часы",
+      "gate": "Кольцо {n}/{total}",
+      "lap": "Круг {n}/{total}",
+      "time": "Время",
+      "finish": "Финиш!",
+      "beatPar": "Опережение нормы на {time}",
+      "offPar": "{time} сверх нормы",
+      "failed": "Заезд окончен — вы покинули скакуна",
+      "aborted": "Заезд брошен",
+      "best": "Рекорд {time}",
+      "newBest": "Новый рекорд!",
+      "board": "Таблица",
+      "boardTitle": "{name} — лучшие времена",
+      "noTimes": "Времен пока нет — станьте первым.",
+      "loadingBoard": "Загрузка…",
+      "you": "(вы)",
+      "race": "Гонка",
+      "racePartyHint": "Гонка с вашей группой — побеждает первый, кто пройдет кольца.",
+      "getReady": "Приготовьтесь",
+      "go": "СТАРТ!",
+      "dnf": "Сход",
+      "placeOf": "#{place} из {total}",
+      "racing": "Гонка идет"
+    },
+    "wager": {
+      "start": "Гонка на ставку",
+      "title": "Гонка на ставку",
+      "inviteGold": "{name} открывает Гонку на ставку — поставьте {money} для участия. Принять?",
+      "inviteCharter": "{name} открывает Гонку на ставку — поставьте {money} + Грамоту на скакуна. Принять?",
+      "accept": "Принять ставку",
+      "pot": "Банк {money}",
+      "potCharter": "Банк {money} + {count}× Грамота",
+      "racers": "Гонщики ({count})",
+      "launch": "Запустить гонку",
+      "cancel": "Отмена",
+      "leave": "Покинуть",
+      "waiting": "Ожидание соперника, готового принять ставку…",
+      "won": "Вы выигрываете ставку — {money}!",
+      "wonCharter": "Вы выигрываете ставку — {money} + {count}× Грамота!",
+      "lost": "Вы проиграли ставку.",
+      "refunded": "Ставка отменена — ваш взнос возвращен.",
+      "antePrompt": "Сколько золота поставить на эту гонку? (в меди)",
+      "open": "Открыть ставку",
+      "stakeCharter": "Также поставить Грамоту на скакуна (достается победителю)",
+      "errCourse": "На эту трассу нельзя сделать ставку.",
+      "errFlyer": "Чтобы делать ставку, нужно быть на крылатом скакуне.",
+      "errBusy": "Вы уже участвуете в ставке.",
+      "errAnte": "Назначьте ставку не менее 1 меди.",
+      "errStake": "Это нельзя поставить на кон.",
+      "errAfford": "Вам не покрыть эту ставку.",
+      "errExpired": "Срок этого предложения ставки истек.",
+      "errGone": "Эта ставка больше не открыта.",
+      "errHost": "Запустить ставку может только устроитель."
     },
     "options": {
       "gameMenu": "Меню игры",
@@ -2646,7 +2676,7 @@ export const ru_RU: EnTranslations = {
       "graphics": "Графика",
       "audio": "Звук",
       "interface": "Интерфейс",
-      "language": "Language",
+      "language": "Язык",
       "logout": "Выйти",
       "returnToGame": "Вернуться в игру",
       "resetToDefaults": "Сбросить настройки",
@@ -2796,8 +2826,8 @@ export const ru_RU: EnTranslations = {
         "unignoreChat": "Убрать игнор чата",
         "report": "Пожаловаться на игрока",
         "removeParty": "Удалить из группы",
-        "convertToRaid": "Convert to raid",
-        "convertToParty": "Convert to party",
+        "convertToRaid": "Преобразовать в рейд",
+        "convertToParty": "Преобразовать в группу",
         "cancel": "Отмена"
       }
     },
@@ -2839,7 +2869,7 @@ export const ru_RU: EnTranslations = {
     "combat": {
       "floatingMiss": "Промах",
       "floatingDodge": "Уклон",
-      "floatingResist": "Resist",
+      "floatingResist": "Сопротивление",
       "cannotMove": "Не двигается!",
       "attack": "атака",
       "damageDone": "Ваше {ability} поражает {target} на {amount}.",
@@ -2848,7 +2878,7 @@ export const ru_RU: EnTranslations = {
       "damageTakenCrit": "{source} критически поражает вас на {amount}.",
       "miss": "Ваше {ability} промахивается по {target}.",
       "dodged": "{target} уклоняется от вашего {ability}.",
-      "resisted": "Your {ability} is resisted by {target}.",
+      "resisted": "{target} сопротивляется вашему {ability}.",
       "healSelf": "Ваше {ability} исцеляет вас на {amount}.",
       "healSelfCrit": "Ваше {ability} критически исцеляет вас на {amount}.",
       "healOther": "Ваше {ability} исцеляет {target} на {amount}.",
@@ -2893,10 +2923,10 @@ export const ru_RU: EnTranslations = {
       "targetMustDodge": "Ваша цель должна сначала уклониться.",
       "requiresCombo": "Этой способности нужны очки серии.",
       "requiresForm": "Вы должны быть в облике {form}.",
-      "cantInForm": "You can't do that in {form} Form.",
+      "cantInForm": "В облике {form} это невозможно.",
       "bear": "медведя",
-      "cat": "кошки",
-      "travel": "Travel",
+      "cat": "волка",
+      "travel": "путешествия",
       "shapeshifted": "В измененном облике это невозможно.",
       "stealthed": "Вы должны быть в незаметности.",
       "inCombat": "В бою это невозможно.",
@@ -2918,10 +2948,10 @@ export const ru_RU: EnTranslations = {
       "whisperAmbiguous": "Несколько игроков подходят под '{name}'. Используйте точный регистр.",
       "whisperMissing": "Игрока с именем '{name}' нет в сети.",
       "whisperSelf": "Вы бормочете себе под нос. Никто не слышит.",
-      "assistSelf": "You can't assist yourself.",
-      "assistNoTarget": "{name} has no target.",
-      "assistWhom": "Assist whom? Target a player or use /assist <name>.",
-      "assisting": "Assisting {name}.",
+      "assistSelf": "Вы не можете помогать самому себе.",
+      "assistNoTarget": "У {name} нет цели.",
+      "assistWhom": "Кому помочь? Выберите игрока или используйте /assist <name>.",
+      "assisting": "Вы помогаете {name}.",
       "notInParty": "Вы не в группе.",
       "unknownCommand": "Неизвестная команда: {command}. Попробуйте /s /y /w /p /g.",
       "chatCooldown": "Чат на восстановлении еще {seconds} сек.",
@@ -2966,29 +2996,29 @@ export const ru_RU: EnTranslations = {
       "lootReceiveMoney": "Вы получаете {money}.",
       "lootMoney": "Вы добываете {money}.",
       "soldItem": "Вы продали {item} за {money}.",
-      "soldJunkOne": "Sold {count} junk item for {money}.",
-      "soldJunkMany": "Sold {count} junk items for {money}.",
+      "soldJunkOne": "Вы продали {count} серый предмет за {money}.",
+      "soldJunkMany": "Вы продали серые предметы ({count}) за {money}.",
       "friendOnline": "{name} вошел в игру.",
       "friendOffline": "{name} вышел из игры."
     },
     "tutorial": {
-      "title": "New Adventurer",
-      "stepLabel": "Step {current} of {total}",
-      "skip": "Skip Tutorial",
-      "dismiss": "Dismiss",
-      "doneTitle": "Ready for Adventure",
-      "doneBody": "You have the basics, {name}. The Vale is yours to explore. Press {questKey} anytime to review your quests. Good hunting.",
-      "moveTitle": "Find Your Footing",
-      "moveBody": "Use {moveKeys} to move and the mouse to look around. Take a few steps to begin.",
-      "seekTitle": "Seek the Marshal",
-      "seekBody": "Marshal Redbrook waits in town and has work for a new blade. Follow the marker to reach him.",
-      "talkTitle": "Take the Task",
-      "talkBody": "Stand close to Marshal Redbrook and press {interactKey} to speak, then accept his task.",
-      "slayTitle": "Wolves at the Door",
-      "slayBody": "Hunt the Forest Wolves on the north road. Target one and attack to thin the pack.",
-      "slayProgress": "Forest Wolves slain: {current} / {needed}",
-      "returnTitle": "Claim Your Reward",
-      "returnBody": "Your task is done. Return to Marshal Redbrook and press {interactKey} to turn it in."
+      "title": "Новый искатель приключений",
+      "stepLabel": "Шаг {current} из {total}",
+      "skip": "Пропустить обучение",
+      "dismiss": "Закрыть",
+      "doneTitle": "Готовы к приключениям",
+      "doneBody": "Основы освоены, {name}. Долина в вашем распоряжении: исследуйте её. Нажмите {questKey} в любой момент, чтобы просмотреть задания. Удачной охоты!",
+      "moveTitle": "Сделайте первые шаги",
+      "moveBody": "Используйте {moveKeys} для передвижения и мышь, чтобы осмотреться. Сделайте несколько шагов, чтобы начать.",
+      "seekTitle": "Найдите маршала",
+      "seekBody": "Маршал Редбрук ждёт в городе, и у него есть работа для нового искателя приключений. Следуйте за меткой, чтобы добраться до него.",
+      "talkTitle": "Возьмите задание",
+      "talkBody": "Подойдите к маршалу Редбруку и нажмите {interactKey}, чтобы заговорить, затем примите его задание.",
+      "slayTitle": "Волки у порога",
+      "slayBody": "Поохотьтесь на лесных волков на северной дороге. Выберите цель и атакуйте, чтобы проредить стаю.",
+      "slayProgress": "Лесных волков убито: {current} / {needed}",
+      "returnTitle": "Получите награду",
+      "returnBody": "Задание выполнено. Вернитесь к маршалу Редбруку и нажмите {interactKey}, чтобы сдать его."
     },
     "markers": {
       "names": {
@@ -3043,12 +3073,12 @@ export const ru_RU: EnTranslations = {
       "guildTab": "Гильдия",
       "ignoreTab": "Игнор",
       "leaveParty": "Покинуть группу",
-      "raidTab": "Raid",
-      "raidEmpty": "Convert a party to a raid to manage raid groups here.",
-      "raidGroupEmpty": "No players in this group.",
-      "raidGroupTitle": "Group {position} ({count}/5)",
-      "raidMoveToGroup": "Move to group {position}",
-      "raidLeader": "Raid Leader",
+      "raidTab": "Рейд",
+      "raidEmpty": "Преобразуйте группу в рейд, чтобы управлять рейдовыми группами здесь.",
+      "raidGroupEmpty": "В этой группе нет игроков.",
+      "raidGroupTitle": "Группа {position} ({count}/5)",
+      "raidMoveToGroup": "Переместить в группу {position}",
+      "raidLeader": "Лидер рейда",
       "offlineEmpty": "Друзья, гильдии и списки игнорирования доступны в онлайн-игре.",
       "friendsEmpty": "Друзей пока нет. Найдите игрока по имени ниже.",
       "ignoreEmpty": "Ваш список игнорирования пуст.",
@@ -3149,8 +3179,8 @@ export const ru_RU: EnTranslations = {
       "title": "Книга заклинаний",
       "classSubtitle": "Способности: {className}",
       "close": "Закрыть книгу заклинаний",
-      "resetBar": "Reset bar",
-      "resetBarAria": "Reset the current action bar to its default abilities",
+      "resetBar": "Сбросить панель",
+      "resetBarAria": "Сбросить текущую панель действий до стандартных способностей",
       "trainableAtLevel": "Можно обучиться на уровне {level}",
       "learnAtLevel": "Вы изучите это на уровне {level}.",
       "knownAbilityAria": "{name}, ранг {rank}. {summary}",
@@ -3189,7 +3219,7 @@ export const ru_RU: EnTranslations = {
     },
     "forms": {
       "bear": "медведя",
-      "cat": "кошки"
+      "cat": "волка"
     },
     "cast": {
       "fishing": "Рыбная ловля",
@@ -3213,10 +3243,10 @@ export const ru_RU: EnTranslations = {
       "completedStatus": "Завершено",
       "returnTo": "Вернитесь к {name}",
       "abandon": "Отказаться от задания",
-      "abandonConfirmTitle": "Abandon Quest",
-      "abandonConfirmBody": "Are you sure you want to abandon {name}?",
-      "abandonConfirm": "Yes",
-      "abandonCancel": "Cancel",
+      "abandonConfirmTitle": "Отказаться от задания",
+      "abandonConfirmBody": "Вы уверены, что хотите отказаться от {name}?",
+      "abandonConfirm": "Да",
+      "abandonCancel": "Отмена",
       "suggestedPlayers": "Рекомендуется игроков: {count}"
     },
     "dialog": {
@@ -3291,7 +3321,7 @@ export const ru_RU: EnTranslations = {
       "uncommon": "Необычное",
       "rare": "Редкое",
       "epic": "Эпическое",
-      "legendary": "Legendary"
+      "legendary": "Легендарное"
     },
     "kind": {
       "weapon": "Оружие",
@@ -3372,9 +3402,9 @@ export const ru_RU: EnTranslations = {
       "sellQuantityInput": "Количество для продажи",
       "sellQuantityConfirm": "Продать",
       "sellQuantityCancel": "Отмена",
-      "sellJunk": "Sell Junk",
-      "sellJunkAria": "Sell all junk for {price}",
-      "sellJunkHint": "Sells every gray item in your bags except quest items."
+      "sellJunk": "Продать хлам",
+      "sellJunkAria": "Продать весь хлам за {price}",
+      "sellJunkHint": "Продает все серые предметы в сумках, кроме предметов заданий."
     },
     "market": {
       "title": "Мировой рынок",
@@ -3387,43 +3417,43 @@ export const ru_RU: EnTranslations = {
       "noMerchant": "Подойдите к Торговцу, чтобы заключать сделки.",
       "emptyBrowse": "На рынке тихо. Выставьте что-нибудь первым на вкладке Продать.",
       "browseNote": "Товары, выставленные искателями приключений со всего мира. Выберите Купить, чтобы сразу приобрести стопку.",
-      "searchPlaceholder": "Search market...",
-      "searchAria": "Search the World Market by item name",
-      "emptySearch": "No goods match your search. Try another name.",
-      "truncated": "Showing {shown} of {total} matches. Refine your search to see the rest.",
-      "emptyFiltered": "No listings match those filters.",
-      "pageRange": "Showing {shown} of {total} listings.",
-      "pagePrev": "Prev",
-      "pageNext": "Next",
-      "pagePrevAria": "Previous market page",
-      "pageNextAria": "Next market page",
-      "pageStatus": "Page {current} of {total}",
-      "filters": "Market filters",
-      "filterType": "Type",
-      "filterTypeAll": "All types",
-      "filterTypeWeapon": "Weapons",
-      "filterTypeArmor": "Armor",
-      "filterTypeConsumable": "Consumables",
-      "filterTypeMaterial": "Materials",
-      "filterTypeCosmetic": "Cosmetics",
-      "filterTypeOther": "Other",
-      "filterArmorType": "Armor type",
-      "filterArmorAll": "All armor",
-      "filterWeaponType": "Weapon type",
-      "filterWeaponAll": "All weapons",
-      "filterRarity": "Rarity",
-      "filterRarityAll": "All rarities",
-      "weaponSword": "Swords",
-      "weaponDagger": "Daggers",
-      "weaponStaff": "Staves",
-      "weaponMace": "Maces",
-      "weaponAxe": "Axes",
-      "weaponOther": "Other weapons",
-      "rarityPoor": "Poor",
-      "rarityCommon": "Common",
-      "rarityUncommon": "Uncommon",
-      "rarityRare": "Rare",
-      "rarityEpic": "Epic",
+      "searchPlaceholder": "Поиск по рынку...",
+      "searchAria": "Поиск на мировом рынке по названию предмета",
+      "emptySearch": "Ничего не найдено по запросу. Попробуйте другое название.",
+      "truncated": "Показано {shown} из {total} совпадений. Уточните поиск, чтобы увидеть остальное.",
+      "emptyFiltered": "Нет лотов, соответствующих этим фильтрам.",
+      "pageRange": "Показано {shown} из {total} лотов.",
+      "pagePrev": "Назад",
+      "pageNext": "Далее",
+      "pagePrevAria": "Предыдущая страница рынка",
+      "pageNextAria": "Следующая страница рынка",
+      "pageStatus": "Страница {current} из {total}",
+      "filters": "Фильтры рынка",
+      "filterType": "Тип",
+      "filterTypeAll": "Все типы",
+      "filterTypeWeapon": "Оружие",
+      "filterTypeArmor": "Броня",
+      "filterTypeConsumable": "Расходники",
+      "filterTypeMaterial": "Материалы",
+      "filterTypeCosmetic": "Косметика",
+      "filterTypeOther": "Другое",
+      "filterArmorType": "Тип брони",
+      "filterArmorAll": "Вся броня",
+      "filterWeaponType": "Тип оружия",
+      "filterWeaponAll": "Все оружие",
+      "filterRarity": "Редкость",
+      "filterRarityAll": "Все редкости",
+      "weaponSword": "Мечи",
+      "weaponDagger": "Кинжалы",
+      "weaponStaff": "Посохи",
+      "weaponMace": "Булавы",
+      "weaponAxe": "Топоры",
+      "weaponOther": "Другое оружие",
+      "rarityPoor": "Низкое",
+      "rarityCommon": "Обычное",
+      "rarityUncommon": "Необычное",
+      "rarityRare": "Редкое",
+      "rarityEpic": "Эпическое",
       "merchantStock": "Запасы Торговца",
       "stackCount": "x{count}",
       "each": "{money} за штуку",
@@ -3473,14 +3503,14 @@ export const ru_RU: EnTranslations = {
       "close": "Закрыть добычу"
     },
     "lootRoll": {
-      "title": "Roll for loot",
-      "need": "Need",
-      "greed": "Greed",
-      "pass": "Pass",
-      "needAria": "Need for {item}",
-      "greedAria": "Greed for {item}",
-      "passAria": "Pass on {item}",
-      "everyonePassed": "Everyone passed on {item}."
+      "title": "Бросок за добычу",
+      "need": "Нужно",
+      "greed": "Жадность",
+      "pass": "Пас",
+      "needAria": "Нужно: {item}",
+      "greedAria": "Жадность: {item}",
+      "passAria": "Пас: {item}",
+      "everyonePassed": "Все отказались от {item}."
     }
   },
   "entities": {
@@ -3579,7 +3609,7 @@ export const ru_RU: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "Чародейские стрелы",
-        "description": "Выпускает в противника Чародейские стрелы, наносящие 8 ед. урона от тайной магии каждую секунду в течение 3 сек."
+        "description": "Выпускает в противника Чародейские стрелы, наносящие {damage} ед. урона от тайной магии каждую секунду в течение 3 сек."
       },
       "polymorph": {
         "name": "Превращение",
@@ -3598,7 +3628,7 @@ export const ru_RU: EnTranslations = {
         "description": "Обжигает врага, нанося {damage} ед. урона от огня. Быстрое заклинание."
       },
       "pyroblast": {
-        "name": "Огненный взрыв",
+        "name": "Пиробласт",
         "description": "Обрушивает на врага громадный пылающий камень, наносящий {damage} ед. урона от огня и дополнительный урон с течением времени."
       },
       "ice_barrier": {
@@ -3643,7 +3673,7 @@ export const ru_RU: EnTranslations = {
       },
       "stealth": {
         "name": "Незаметность",
-        "description": "Скрывает вас в тенях: враги почти не замечают вас, но вы двигаетесь на 30% медленнее. Атака или получение урона прерывает Незаметность. Примените снова, чтобы выйти."
+        "description": "Скрывает вас в тенях: враги почти не замечают вас, но вы двигаетесь на 50% медленнее. Атака или получение урона прерывает Незаметность. Примените снова, чтобы выйти."
       },
       "adrenaline_rush": {
         "name": "Выброс адреналина",
@@ -3675,7 +3705,7 @@ export const ru_RU: EnTranslations = {
       },
       "vanish": {
         "name": "Исчезновение",
-        "description": "Исчезает из виду, входя в незаметность даже в бою. Пока вы скрыты, вы двигаетесь на 30% медленнее. Длится до 10 сек."
+        "description": "Исчезает из виду, входя в незаметность даже в бою. Пока вы скрыты, вы двигаетесь на 50% медленнее. Длится до 10 сек."
       },
       "instant_poison": {
         "name": "Быстродействующий яд",
@@ -3787,7 +3817,7 @@ export const ru_RU: EnTranslations = {
       },
       "aimed_shot": {
         "name": "Прицельный выстрел",
-        "description": "Тщательно прицельный выстрел, наносящий {damage} ед. урона."
+        "description": "Тщательно нацеленный выстрел, наносящий {damage} ед. урона."
       },
       "rapid_fire": {
         "name": "Быстрая стрельба",
@@ -3827,7 +3857,7 @@ export const ru_RU: EnTranslations = {
       },
       "mind_flay": {
         "name": "Пытка разума",
-        "description": "Терзает разум цели темной энергией, нанося 12 ед. урона каждую секунду в течение 3 сек."
+        "description": "Терзает разум цели темной энергией, нанося {damage} ед. урона каждую секунду в течение 3 сек."
       },
       "flash_heal": {
         "name": "Быстрое исцеление",
@@ -3903,7 +3933,7 @@ export const ru_RU: EnTranslations = {
       },
       "drain_life": {
         "name": "Похищение жизни",
-        "description": "Похищает жизнь цели, передавая вам 7 здоровья каждую секунду в течение 5 сек."
+        "description": "Похищает жизнь цели, передавая вам {damage} здоровья каждую секунду в течение 5 сек."
       },
       "fear": {
         "name": "Страх",
@@ -3942,7 +3972,7 @@ export const ru_RU: EnTranslations = {
         "description": "Из цели вырастают шипы: атакующие в ближнем бою получают 3 ед. урона от сил природы."
       },
       "entangling_roots": {
-        "name": "Гнев деревьев",
+        "name": "Оплетающие корни",
         "description": "Оплетает цель корнями на месте на срок до 12 сек."
       },
       "bear_form": {
@@ -3958,16 +3988,16 @@ export const ru_RU: EnTranslations = {
         "description": "Рычит на цель: ваша угроза повышается до уровня самого ненавистного ей врага, и она вынуждена атаковать вас 3 сек. Только в облике медведя."
       },
       "cat_form": {
-        "name": "Облик кошки",
-        "description": "Вы принимаете облик кошки: сила атаки растет с уровнем, атаки используют энергию и приемы серии, а угроза снижается на 29%. Примените снова, чтобы вернуться к облику заклинателя."
+        "name": "Облик волка",
+        "description": "Вы принимаете облик волка: сила атаки растет с уровнем, атаки используют энергию и приемы серии, а угроза снижается на 29%. Примените снова, чтобы вернуться к облику заклинателя."
       },
       "claw": {
         "name": "Цапнуть",
-        "description": "Царапает врага, нанося урон оружием плюс {damage}. Дает 1 прием серии. Только в облике кошки."
+        "description": "Царапает врага, нанося урон оружием плюс {damage}. Дает 1 прием серии. Только в облике волка."
       },
       "ferocious_bite": {
         "name": "Свирепый укус",
-        "description": "Завершающий прием, наносящий урон за каждый прием серии. Только в облике кошки."
+        "description": "Завершающий прием, наносящий урон за каждый прием серии. Только в облике волка."
       },
       "swipe": {
         "name": "Размах",
@@ -3987,7 +4017,7 @@ export const ru_RU: EnTranslations = {
       },
       "travel_form": {
         "name": "Походная форма",
-        "description": "Принимает быструю походную форму, повышая скорость передвижения на 40%. Нельзя использовать в бою."
+        "description": "Мгновенно принимает быструю походную форму, повышая скорость передвижения на 40%. В этой форме нельзя использовать другие способности, но переход доступен и в бою: идеально для бегства."
       },
       "enrage": {
         "name": "Озлобление",
@@ -4007,11 +4037,11 @@ export const ru_RU: EnTranslations = {
       },
       "dash": {
         "name": "Рывок",
-        "description": "Рывок вперед, повышающий скорость передвижения на 50% на 15 сек. Только в облике кошки."
+        "description": "Рывок вперед, повышающий скорость передвижения на 50% на 15 сек. Только в облике волка."
       },
       "pounce": {
         "name": "Прыжок",
-        "description": "Открывающая атака из скрытности, оглушающая цель на 2 сек. Дает 1 прием серии. Только в облике кошки."
+        "description": "Открывающая атака из скрытности, оглушающая цель на 2 сек. Дает 1 прием серии. Только в облике волка."
       },
       "insect_swarm": {
         "name": "Рой насекомых",
@@ -4019,11 +4049,11 @@ export const ru_RU: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Ярость тигра",
-        "description": "Повышает силу атаки на 40 на 6 сек. Только в облике кошки."
+        "description": "Повышает силу атаки на 40 на 6 сек. Только в облике волка."
       },
       "rip": {
         "name": "Разрывание",
-        "description": "Завершающий прием, наносящий урон от кровотечения в течение 12 сек. Расходует приемы серии. Только в облике кошки."
+        "description": "Завершающий прием, наносящий урон от кровотечения в течение 12 сек. Расходует приемы серии. Только в облике волка."
       },
       "mortal_strike": {
         "name": "Смертельный удар",
@@ -4075,7 +4105,7 @@ export const ru_RU: EnTranslations = {
       },
       "bear_charge": {
         "name": "Натиск медведя",
-        "description": "Бросок на врага, дающий 9 единиц ярости и оглушающий его на 1 сек. Дальность 7-23 метра. Только в облике медведя."
+        "description": "Бросок на врага, дающий 9 единиц ярости и оглушающий его на 1 сек. Дальность 8-25 м. Только в облике медведя."
       },
       "demoralizing_roar": {
         "name": "Деморализующий рёв",
@@ -4083,7 +4113,7 @@ export const ru_RU: EnTranslations = {
       },
       "prowl": {
         "name": "Крадущийся хищник",
-        "description": "Переход в скрытность в облике волка. Нельзя использовать в бою."
+        "description": "Переход в скрытность в облике волка: вы двигаетесь на 50% медленнее. Нельзя использовать в бою."
       },
       "rake": {
         "name": "Раздирание",
@@ -4387,7 +4417,7 @@ export const ru_RU: EnTranslations = {
         "name": "Шкура хребтового охотника"
       },
       "old_cragmaws_pelt": {
-        "name": "Old Cragmaw's Pelt"
+        "name": "Шкура Старого Крэгмо"
       },
       "glowing_wax": {
         "name": "Светящийся воск"
@@ -4627,34 +4657,34 @@ export const ru_RU: EnTranslations = {
         "name": "Корона Монарха"
       },
       "charter_ashmane": {
-        "name": "Грамота: Ashmane Courser"
+        "name": "Грамота: Пепельногривый Скакун"
       },
       "charter_emberhoof": {
-        "name": "Грамота: Emberhoof Charger"
+        "name": "Грамота: Угольнокопытный Боевой Конь"
       },
       "charter_bronzeflank": {
-        "name": "Грамота: Bronzeflank Destrier"
+        "name": "Грамота: Бронзобокий Дестриэ"
       },
       "charter_silvermane": {
-        "name": "Грамота: Silvermane Stallion"
+        "name": "Грамота: Среброгривый Жеребец"
       },
       "charter_stormhoof": {
-        "name": "Грамота: Stormhoof Charger"
+        "name": "Грамота: Грозокопытный Боевой Конь"
       },
       "charter_goldcrest": {
-        "name": "Грамота: Goldcrest Skystrider"
+        "name": "Грамота: Златохохлый Небоход"
       },
       "charter_verdant": {
-        "name": "Грамота: Verdant Wildwing"
+        "name": "Грамота: Зеленый Дикокрыл"
       },
       "charter_voidstrider": {
-        "name": "Грамота: Voidwing Strider"
+        "name": "Грамота: Пустокрылый Странник"
       },
       "charter_celestial": {
-        "name": "Грамота: Celestial Seraph"
+        "name": "Грамота: Небесный Серафим"
       },
       "charter_worldbearer": {
-        "name": "Грамота: Worldbearer's Roc"
+        "name": "Грамота: Рух Мироносца"
       },
       "bristleback_maul": {
         "name": "Кувалда Щетиноспина"
@@ -4675,7 +4705,7 @@ export const ru_RU: EnTranslations = {
         "name": "Сабатоны Владыки Смерти"
       },
       "deathlord_warplate": {
-        "name": "Боевая латы Владыки Смерти"
+        "name": "Боевые латы Владыки Смерти"
       },
       "drogmar_warboots": {
         "name": "Боевые сапоги Дрогмара"
@@ -4843,7 +4873,7 @@ export const ru_RU: EnTranslations = {
         "name": "Лопата Короля тоннелей"
       },
       "brutoks_maul": {
-        "name": "Молот Бруток"
+        "name": "Молот Брутока"
       },
       "cracked_ogre_tusk": {
         "name": "Треснувший клык огра"
@@ -4855,7 +4885,7 @@ export const ru_RU: EnTranslations = {
         "name": "Крадущиеся сапоги Крэгмо"
       },
       "cragmaw_huntcord": {
-        "name": "Cragmaw's Huntcord"
+        "name": "Охотничий пояс Крэгмо"
       },
       "drowned_tide_scepter": {
         "name": "Скипетр утопшего прилива"
@@ -4993,31 +5023,31 @@ export const ru_RU: EnTranslations = {
         "name": "Захваты когтя Тени вирма"
       },
       "reliquary_plate_chest": {
-        "name": "Reliquary Guard Hauberk"
+        "name": "Хауберк стражи реликвария"
       },
       "reliquary_leather_chest": {
-        "name": "Dustwarden Jerkin"
+        "name": "Куртка стража пыли"
       },
       "reliquary_cloth_chest": {
-        "name": "Shroud of the Reliquary"
+        "name": "Саван реликвария"
       },
       "reliquary_legs": {
-        "name": "Vaultbound Legwraps"
+        "name": "Поножи склепа"
       },
       "reliquary_helm": {
-        "name": "Ossuary Watch Helm"
+        "name": "Шлем стражи костницы"
       },
       "reliquary_shoulder": {
-        "name": "Crumbled Spaulders"
+        "name": "Осыпавшиеся наплечники"
       },
       "reliquary_gloves_rog": {
-        "name": "Bonewarden Grips"
+        "name": "Рукавицы Костяного стража"
       },
       "deacon_reliquary_helm": {
-        "name": "Deacon's Reliquary Helm"
+        "name": "Шлем реликвария дьякона"
       },
       "varric_shadow_cowl": {
-        "name": "Varric's Shadow Cowl"
+        "name": "Теневой капюшон Варрика"
       },
       "the_codfather": {
         "name": "Крестная треска"
@@ -5059,34 +5089,34 @@ export const ru_RU: EnTranslations = {
         "name": "Загадочный косметический тайник"
       },
       "deathless_heartwood": {
-        "name": "Heartwood of the Deathless Crown"
+        "name": "Сердцевина бессмертной короны"
       },
       "kingsbane_last_oath": {
-        "name": "Kingsbane, Last Oath of Thornpeak"
+        "name": "Цареубийца, последняя клятва Торнпика"
       },
       "crownforged_dreadhelm": {
-        "name": "Crownforged Dreadhelm"
+        "name": "Короннокованый шлем ужаса"
       },
       "crownforged_warspaulders": {
-        "name": "Crownforged Warspaulders"
+        "name": "Короннокованые боевые наплечники"
       },
       "nighttalon_crown": {
-        "name": "Nighttalon Crown"
+        "name": "Корона Ночного Когтя"
       },
       "nighttalon_shoulderguards": {
-        "name": "Nighttalon Shoulderguards"
+        "name": "Наплечные стражи Ночного Когтя"
       },
       "soulflame_cowl": {
-        "name": "Soulflame Cowl"
+        "name": "Клобук Пламени души"
       },
       "soulflame_mantle": {
-        "name": "Soulflame Mantle"
+        "name": "Оплечье Пламени души"
       },
       "stormcallers_crown": {
-        "name": "Stormcaller's Crown"
+        "name": "Корона призывателя бурь"
       },
       "stormcallers_spaulders": {
-        "name": "Stormcaller's Spaulders"
+        "name": "Наплечники призывателя бурь"
       },
       "unknown_alien_weaponry": {
         "name": "Неизвестное инопланетное вооружение"
@@ -5138,12 +5168,6 @@ export const ru_RU: EnTranslations = {
       },
       "vanguard_chrome_armor_plate": {
         "name": "Хромированный авангард"
-      },
-      "glade_pelt": {
-        "name": "Шкура поляны"
-      },
-      "monarch_heart": {
-        "name": "Сердце Монарха"
       }
     },
     "mobs": {
@@ -5163,7 +5187,7 @@ export const ru_RU: EnTranslations = {
         "name": "Илогривый скрытень"
       },
       "tunnel_rat": {
-        "name": "Копатель Туннельная Крыса"
+        "name": "Копатель туннельных крыс"
       },
       "vale_bandit": {
         "name": "Долинный бандит"
@@ -5241,7 +5265,7 @@ export const ru_RU: EnTranslations = {
         "name": "Склепный шатун"
       },
       "hollow_acolyte": {
-        "name": "Послушник Пустоти"
+        "name": "Послушник Пустоты"
       },
       "bonechill_widow": {
         "name": "Ледяная вдова"
@@ -5310,31 +5334,31 @@ export const ru_RU: EnTranslations = {
         "name": "Связанный страж"
       },
       "nythraxis_skeleton_warrior": {
-        "name": "Risen Royal Guard"
+        "name": "Восставший королевский страж"
       },
       "nythraxis_scourge_of_thornpeak": {
-        "name": "Nythraxis, Scourge of Thornpeak"
+        "name": "Нитраксис, Бич Торнпика"
       },
       "reliquary_ledger_wraith": {
-        "name": "Ledger Wraith"
+        "name": "Книжный призрак"
       },
       "reliquary_funeral_ringer": {
-        "name": "Funeral Ringer"
+        "name": "Погребальный звонарь"
       },
       "reliquary_gravecall_acolyte": {
-        "name": "Gravecall Acolyte"
+        "name": "Аколит могильного зова"
       },
       "reliquary_bonewalker": {
-        "name": "Raised Bonewalker"
+        "name": "Поднятый костеход"
       },
       "reliquary_saintless_effigy": {
-        "name": "Saintless Effigy"
+        "name": "Изваяние без святого"
       },
       "deacon_varric": {
-        "name": "Deacon Varric"
+        "name": "Дьякон Варрик"
       },
       "acolyte_tessa": {
-        "name": "Acolyte Tessa"
+        "name": "Послушница Тесса"
       },
       "ironvein_foreman": {
         "name": "Прораб Железной жилы"
@@ -5443,48 +5467,6 @@ export const ru_RU: EnTranslations = {
       },
       "ysolei": {
         "name": "Изолея, Воплощение Утонувшей луны"
-      },
-      "elder_bristleback": {
-        "name": "Старый Щетиноспин"
-      },
-      "sableweb_hatchling": {
-        "name": "Детеныш Сейблвеб"
-      },
-      "sableweb_matriarch": {
-        "name": "Матриарх Сейблвеб"
-      },
-      "bramble_lynx": {
-        "name": "Терновая рысь"
-      },
-      "brightwood_hare": {
-        "name": "Заяц Брайтвуда"
-      },
-      "brightwood_monarch": {
-        "name": "Монарх Брайтвуда"
-      },
-      "brightwood_stag": {
-        "name": "Олень Брайтвуда"
-      },
-      "dawnmane_doe": {
-        "name": "Зарегривая лань"
-      },
-      "glade_fox": {
-        "name": "Лисица поляны"
-      },
-      "grovetusk_boar": {
-        "name": "Рощеклыкий кабан"
-      },
-      "meadow_crane": {
-        "name": "Луговой журавль"
-      },
-      "spotted_fawn": {
-        "name": "Пятнистый оленёнок"
-      },
-      "sunhide_bear": {
-        "name": "Солнцешкурый медведь"
-      },
-      "thornpelt_badger": {
-        "name": "Терношкурый барсук"
       }
     },
     "npcs": {
@@ -5584,24 +5566,24 @@ export const ru_RU: EnTranslations = {
         "greeting": "Осторожнее с рыхлым сланцем, {className}. Гора стала беспокойной, и я намерен узнать почему."
       },
       "brother_aldric_raid": {
-        "name": "Brother Aldric",
-        "title": "Priest of the Vale",
-        "greeting": "From a chapel yard in the Vale to the roof of the world... the trail we have followed ends here. I can feel the mountain listening."
+        "name": "Брат Алдрик",
+        "title": "Жрец долины",
+        "greeting": "От кладбища часовни до крыши мира... след заканчивается здесь. Я чувствую, как гора слушает."
       },
       "brother_halven": {
-        "name": "Brother Halven",
-        "title": "Reliquary Keeper",
-        "greeting": "The reliquary below has shifted again."
+        "name": "Брат Хальвен",
+        "title": "Хранитель Реликвария",
+        "greeting": "Реликварий внизу снова сдвинулся."
       },
       "tidewatcher_ondrel": {
         "name": "Ондрел Вейн",
         "title": "Страж приливов",
         "greeting": "Омут пьёт лунный свет, {className}, и возвращает утопленников. Тридцать ночей я наблюдаю за теми вратами — и нынче ночью они открыты."
       },
-      "ranger_elwyn": {
-        "greeting": "Тише, {className} - поляна сегодня спокойна, и я намерен такой её сохранить.",
-        "name": "Следопыт Элвин",
-        "title": "Хранитель поляны"
+      "skytrial_master": {
+        "name": "Небоводец Вэйл",
+        "title": "Хранитель Небесных испытаний",
+        "greeting": "Небо — это дорога, по которой решаются идти немногие, {className}. Заслужи ее, и она понесет тебя."
       }
     },
     "quests": {
@@ -5660,11 +5642,11 @@ export const ru_RU: EnTranslations = {
       },
       "q_mine": {
         "title": "Крысы в шахте",
-        "text": "Мы нашли добрую медную жилу, и тут из склона полезли кобольды. Уложите 10 копателей Туннельная Крыса.",
+        "text": "Мы нашли добрую медную жилу, и тут из склона полезли кобольды. Уложите 10 копателей туннельных крыс.",
         "completion": "Ха! За работу, парни! Вот моя благодарность и моя монета.",
         "objectives": {
           "0": {
-            "label": "Копатель Туннельная Крыса: убито"
+            "label": "Копатель туннельных крыс: убито"
           }
         }
       },
@@ -6281,8 +6263,8 @@ export const ru_RU: EnTranslations = {
       },
       "q_nythraxis_restless_dead": {
         "title": "Беспокойство на костяных полях",
-        "text": "Что-то изменилось в Thornpeak Heights, {playerName}. Мертвые больше не бродят бесцельно. Они собираются и маршируют по северным костяным полям за Highwatch, где старое поле битвы выходит к дороге у утеса. Идите туда, расследуйте беспокойство среди костяных ревенантов и принесите любое доказательство того, что ими движет.",
-        "completion": "На каждом осколке один и тот же знак... корона. Я уже видел его, вырезанным на старых могилах, которых не помнит ни одна запись Eastbrook.",
+        "text": "Что-то изменилось в Терновых высотах, {playerName}. Мертвые больше не бродят бесцельно. Они собираются и маршируют по северным костяным полям за Хайвотчем, где старое поле битвы выходит к дороге у утеса. Идите туда, расследуйте беспокойство среди костяных ревенантов и принесите любое доказательство того, что ими движет.",
+        "completion": "На каждом осколке один и тот же знак... корона. Я уже видел его, вырезанным на старых могилах, которых не помнит ни одна запись Истврука.",
         "objectives": {
           "0": {
             "label": "Рунный костяной осколок"
@@ -6307,7 +6289,7 @@ export const ru_RU: EnTranslations = {
       },
       "q_nythraxis_sealed_crypt": {
         "title": "Заброшенный склеп",
-        "text": "Видения указывают на заброшенную крипту в западном утесе. Есть старая легенда, что в крипте покоился король. Возможно, Thornpeak запечатал его там после того, как ритуал Малрика исказил его во что-то бессмертное. Войдите в крипту и посмотрите, что осталось внутри.",
+        "text": "Видения указывают на заброшенную крипту в западном утесе. Есть старая легенда, что в крипте покоился король. Возможно, Терновые высоты запечатали его там после того, как ритуал Малрика исказил его во что-то бессмертное. Войдите в крипту и посмотрите, что осталось внутри.",
         "completion": "Две половины ключ-камня сходятся, а дневник Восса называет то, что они запечатали: перстень короля Нитраксиса. Если дневник говорит правду, этот перстень - ключ к его гробнице.",
         "objectives": {
           "0": {
@@ -6338,12 +6320,12 @@ export const ru_RU: EnTranslations = {
         }
       },
       "q_nythraxis_scourges_end": {
-        "title": "Scourge's End",
-        "text": "The signet has opened the way, {playerName}, but an open tomb is not a victory. Nythraxis was a king once, and the ruin beneath Thornpeak is still bound to his will. Enter the crypt with allies you trust. Break the deathless crown before its command reaches the battlefield above.",
-        "completion": "Then the crown is silent at last. Thornpeak will still carry its dead, but no king below it will call them to war again. You have ended what Aldren, Malric, and Voss could only contain.",
+        "title": "Конец Плети",
+        "text": "Перстень открыл путь, {playerName}, но открытая гробница еще не победа. Нитраксис когда-то был королем, и руины под Торнпиком все еще связаны его волей. Войдите в крипту с союзниками, которым доверяете. Сломайте бессмертную корону, пока ее приказ не достиг поля битвы наверху.",
+        "completion": "Теперь корона наконец молчит. Торнпик все еще будет хранить своих мертвых, но ни один король под горой больше не призовет их на войну. Вы завершили то, что Олдрен, Малрик и Восс смогли лишь сдержать.",
         "objectives": {
           "0": {
-            "label": "Nythraxis slain"
+            "label": "Нитраксис побежден"
           }
         }
       },
@@ -6420,144 +6402,35 @@ export const ru_RU: EnTranslations = {
           }
         }
       },
-      "q_mogger_tracks": {
-        "title": "След Моггера",
-        "text": "Прежде чем идти на северную дорогу, у Истврука осталась последняя заноза: Моггер. Зверь топчет нижний луг и сводит кабанов с ума. Очистите луг вокруг его следа, чтобы мы поняли, где он прячется.",
-        "completion": "Эти следы свежие и такие глубокие, что удержат дождь. Моггер не байка у костра, {playerName}, и он близко.",
+      "q_skyward_first_flight": {
+        "title": "Первый полет",
+        "text": "Ты неплохо держишься в крылатом седле на земле, {playerName} — теперь подними его ввысь. Пройди Небесное испытание Долины: восемь колец в одном замкнутом круге. Пока не гонись за временем. Просто держись в воздухе и нанижи каждое кольцо.",
+        "completion": "Ты не упал. Это больше, чем удается многим с первого круга. Небо помнит тех, кто возвращается.",
         "objectives": {
           "0": {
-            "label": "Дикий кабан отогнан от следа"
+            "label": "Небесное испытание Долины пройдено"
           }
         }
       },
-      "q_brightwood_monarch": {
-        "completion": "Значит, старый король пал. Тяжкое дело это - но конец добрее того, что уготовили бы ему волки. Носи эту корону из его рогов с уважением, {playerName}.",
+      "q_skyward_time_trial": {
+        "title": "Обогнать часы",
+        "text": "Теперь сделай это с умыслом. Пройди Небесное испытание Долины снова, {playerName}, но успей до того, как иссякнет песок. Чистая линия сквозь каждое кольцо, ни глотка лишнего воздуха. Точность, а не паника.",
+        "completion": "Чистая линия, от кольца к кольцу. Ты больше не едешь верхом на небе — ты летишь по нему.",
         "objectives": {
           "0": {
-            "label": "Сердце Монарха"
+            "label": "Небесное испытание Долины пройдено в норму времени"
           }
-        },
-        "text": "Есть один зверь, в которого я не пущу стрелу в одиночку: Монарх Брайтвуда, великий олень, что правит глубокой поляной. Он состарился и одичал, насмерть бодая всякого, кто приблизится к его логову. Одному охотнику его не одолеть - приведи друга или двух. Упокой его и принеси мне его сердце, {playerName}.",
-        "title": "Монарх Брайтвуда"
+        }
       },
-      "q_brightwood_thinning": {
-        "completion": "Хорошо. Стая поредела, а шкуры эти добротны - поляна продержится ещё сезон.",
+      "q_skyward_ascendant": {
+        "title": "Восходящий",
+        "text": "Остается одно испытание, {playerName}: Долинный круг. Три круга по длинному кольцу, пройденные в норму времени — никакой удачи, только мастерство. Овладей им, и открытое небо станет твоим, от края до края.",
+        "completion": "Вознесшийся и несломленный. Теперь небо твое, {playerName}. Прими эту грамоту — воздушного скакуна, заслуженного, а не купленного, чтобы он нес тебя всюду, куда задумаешь.",
         "objectives": {
           "0": {
-            "label": "Терновая рысь: убито"
-          },
-          "1": {
-            "label": "Шкура поляны"
+            "label": "Долинный круг пройден в норму времени"
           }
-        },
-        "text": "Поляна Брайтвуда заполонена, {playerName}. Терновые рыси плодятся быстрее, чем я успеваю их выбивать, а стада вытаптывают то немногое, что осталось на выпас. Убей 8 терновых рысей и принеси мне 6 шкур поляны, чтобы я мог судить о здоровье остальных.",
-        "title": "Поредение поляны"
-      },
-      "q_ledger_brood": {
-        "completion": "Мрачное дело - топить гнездо. Но милосердие сейчас - это сотня похорон, предотвращённых после. Реестр сведён.",
-        "objectives": {
-          "0": {
-            "label": "Детеныш Сейблвеб: раздавлено"
-          }
-        },
-        "text": "Истребление скрытней лишь освободило место для выводка. Детеныши Сейблвеб выползают из глубокого гнезда, а сотня малых клыков убивает путника так же верно, как один большой. Раздави 8 детенышей Сейблвеб, пока они не выросли.",
-        "title": "Нарождающаяся тьма"
-      },
-      "q_ledger_deepvermin": {
-        "completion": "Двенадцать свечеголовых тварей долой! Так, ребята - назад в шахту. Ты заслужил доброе слово у Маршала, {playerName}.",
-        "objectives": {
-          "0": {
-            "label": "Копающая туннельная крыса: убито"
-          }
-        },
-        "text": "В реестре Маршала записано, что ты вычищаешь вредителей. Что ж, в моём забое они самые худшие. Туннельные крысы плодятся быстрее, чем моя бригада успевает махать киркой - положи 12 копающих туннельных крыс, и, может, мы доберёмся до меди до зимы.",
-        "title": "Вредители в глубине"
-      },
-      "q_ledger_first_duty": {
-        "completion": "Восемь нор опустели, и лесная подстилка осела на место. Хорошо. Каждое имя в этом реестре начиналось ровно там, где ты сейчас стоишь.",
-        "objectives": {
-          "0": {
-            "label": "Терношкурый барсук: выбито"
-          }
-        },
-        "text": "Хочешь заслужить место в Иствруке, {playerName}? Тогда начни там, откуда начинает каждый страж. Терношкурые барсуки изрыли своими норами всю Поляну Брайтвуда, на дальнем севере за Волчьей тропой, и лесная подстилка проваливается в их подкопы. Выбей 8 терношкурых барсуков, и реестр запомнит твоё имя.",
-        "title": "Первый долг стража"
-      },
-      "q_ledger_great_boar": {
-        "completion": "Старый Щетиноспин, убитый твоей рукой! Одна эта шкура стоит сезона торговли. Ты заставил реестр гордиться, {playerName}.",
-        "objectives": {
-          "0": {
-            "label": "Старый Щетиноспин: убито"
-          },
-          "1": {
-            "label": "Дикий кабан из стада: убито"
-          }
-        },
-        "text": "В западных чащах живёт старый кабан-вожак - Старый Щетиноспин, шкура как кора, а нрав ей под стать. Он забодал двух моих скорняков. Свали его и расчисти 6 диких кабанов помельче, что прячутся за ним, и я впишу твоё имя высоко в реестр.",
-        "title": "Великий Щетиноспин"
-      },
-      "q_ledger_outlaw_captain": {
-        "completion": "Капитан Верлан мёртв, и его плащ доставлен к моей двери. Реестр закрыт, {playerName} - и долина расскажет будущим стражам имя того, кто его закрыл.",
-        "objectives": {
-          "0": {
-            "label": "Бандит долины: зарублено"
-          },
-          "1": {
-            "label": "Капитан Верлан: убито"
-          }
-        },
-        "text": "Последнее имя в реестре - то, что я мечтал вычеркнуть целый год: капитан Верлан, обративший половину долины в разбой. Он укрывается за своими лейтенантами в юго-восточном лагере. Заруби 6 бандитов долины, чтобы добраться до него, а затем покончи с самим Верланом. Не ходи в одиночку.",
-        "title": "Капитан разбойников"
-      },
-      "q_ledger_reedwater": {
-        "completion": "Этого хватит, чтобы булькающие черти не лезли в мои сети целый сезон. Передай Маршалу, что на озере снова тихо.",
-        "objectives": {
-          "0": {
-            "label": "Илогривый скрытень: убито"
-          }
-        },
-        "text": "Тебя прислал Редбрук? Хорошо - эти старые кости уже не могут бродить по отмелям. Илогривые вернулись на камышовую воду и обнаглели как никогда. Проредь их: 8 илогривых скрытней, и берегись глубокой воды.",
-        "title": "Дозор на камышовой воде"
-      },
-      "q_ledger_silk": {
-        "completion": "Восемью прядильщиками меньше во тьме. Лес дышит легче, и я вместе с ним.",
-        "objectives": {
-          "0": {
-            "label": "Скрытень Вебвуда: убито"
-          }
-        },
-        "text": "Реестр отмечает восточные леса тоже как землю стража. Скрытни Вебвуда плетут паутину всё гуще каждую неделю - в последний базарный день дитя забрело слишком близко, и мы вырезали её едва живой. Убей 8 скрытней Вебвуда, пока они не захватили лес целиком.",
-        "title": "Шёлк и яд"
-      },
-      "q_ledger_teeth": {
-        "completion": "Десять волков, и сумеречная дорога снова наша. Реестр становится к тебе добрее.",
-        "objectives": {
-          "0": {
-            "label": "Лесной волк: убито"
-          }
-        },
-        "text": "Волчьи стаи выучили маршруты дозоров - они нападают в сумерках, когда свет скуден, а одинокий путник - лёгкая добыча. Сломи их, {playerName}. Убей 10 лесных волков и преподай стаям новый урок.",
-        "title": "Зубы во тьме"
-      },
-      "q_ledger_toll": {
-        "completion": "Восемь бандитов получили по заслугам. Уже разносится слух, что у дорожной пошлины новый хозяин - и берёт он не монетой, а головами.",
-        "objectives": {
-          "0": {
-            "label": "Бандит долины: предан правосудию"
-          }
-        },
-        "text": "Юго-восточные холмы превратились в бандитскую заставу - они грабят всякого, кто настолько глуп, чтобы ехать налегке. В реестре назначена цена за каждого из них. Принеси истврукское правосудие 8 бандитам долины.",
-        "title": "Пошлина разбойников"
-      },
-      "q_ledger_vigil": {
-        "completion": "Десять душ возвращены земле, и ночь покоя куплена для часовни. Свет помнит такие бдения, даже когда реестр их забывает.",
-        "objectives": {
-          "0": {
-            "label": "Беспокойные кости: упокоено"
-          }
-        },
-        "text": "Маршал шлёт ко мне своих стражей, когда беда уже не по плечу одним мечам. Мертвецы у часовни не желают лежать смирно, а я слишком стар, чтобы выстоять ночное бдение. Сослужи его за меня, {playerName} - упокой 10 беспокойных костей.",
-        "title": "Бдение у часовни"
+        }
       }
     },
     "zones": {
@@ -6593,7 +6466,7 @@ export const ru_RU: EnTranslations = {
             "label": "Поляна Брайтвуда"
           },
           "9": {
-            "label": "Brightwood Glade"
+            "label": "Поляна Брайтвуда"
           }
         }
       },
@@ -6683,12 +6556,12 @@ export const ru_RU: EnTranslations = {
       "nythraxis_crypt": {
         "name": "Заброшенный склеп",
         "enterText": "Вы переступаете порог заброшенного склепа.",
-        "leaveText": "Вы возвращаетесь в холодный воздух Thornpeak."
+        "leaveText": "Вы возвращаетесь в холодный воздух Терновых высот."
       },
       "nythraxis_boss_arena": {
-        "name": "Nythraxis Raid Arena",
-        "enterText": "You pass through the sealed royal door.",
-        "leaveText": "You return to the cold air of Thornpeak."
+        "name": "Рейдовая арена Нитраксиса",
+        "enterText": "Вы проходите через запечатанную королевскую дверь.",
+        "leaveText": "Вы возвращаетесь в холодный воздух Терновых высот."
       },
       "drowned_temple": {
         "name": "Утонувший храм",
@@ -6698,46 +6571,46 @@ export const ru_RU: EnTranslations = {
     },
     "delves": {
       "collapsed_reliquary": {
-        "name": "The Collapsed Reliquary",
-        "enterText": "You descend into the collapsed reliquary.",
-        "leaveText": "You climb back to Brother Halven at the reliquary ruin."
+        "name": "Обрушившийся Реликварий",
+        "enterText": "Вы спускаетесь в обрушившийся реликварий.",
+        "leaveText": "Вы поднимаетесь обратно к Брату Хальвену у руин реликвария."
       }
     },
     "itemSets": {
       "crownforged": {
-        "name": "Crownforged Regalia",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Strength by 15 and Stamina by 15."
+        "name": "Боевой доспех Кованой Короны",
+        "bonus2": "Сила атаки повышается на 40.",
+        "bonus3": "Сила повышается на 15, выносливость на 15."
       },
       "deathlord": {
-        "name": "Deathlord Battlegear",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Strength by 15 and Stamina by 15."
+        "name": "Боевой доспех Владыки Смерти",
+        "bonus2": "Сила атаки повышается на 40.",
+        "bonus3": "Сила повышается на 15, выносливость на 15."
       },
       "necromancers": {
-        "name": "Necromancer's Raiment",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "Одеяние некроманта",
+        "bonus2": "Задержка произнесения от полученного урона снижена на 50%.",
+        "bonus3": "Полученный урон не задерживает произнесение заклинаний."
       },
       "nighttalon": {
-        "name": "Nighttalon Pelt",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15 and critical strike chance by 2%."
+        "name": "Кожаный доспех Ночного Когтя",
+        "bonus2": "Сила атаки повышается на 40.",
+        "bonus3": "Ловкость повышается на 15, вероятность критического удара на 2%."
       },
       "soulflame": {
-        "name": "Soulflame Regalia",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "Одеяние Пламени Души",
+        "bonus2": "Задержка произнесения от полученного урона снижена на 50%.",
+        "bonus3": "Полученный урон не задерживает произнесение заклинаний."
       },
       "stormcallers": {
-        "name": "Stormcaller's Vestments",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "Одеяние Зовущего Бурю",
+        "bonus2": "Задержка произнесения от полученного урона снижена на 50%.",
+        "bonus3": "Полученный урон не задерживает произнесение заклинаний."
       },
       "wyrmshadow": {
-        "name": "Wyrmshadow Vestments",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15 and critical strike chance by 2%."
+        "name": "Облачение Тени Дракона",
+        "bonus2": "Сила атаки повышается на 40.",
+        "bonus3": "Ловкость повышается на 15, вероятность критического удара на 2%."
       }
     }
   },
@@ -6746,8 +6619,8 @@ export const ru_RU: EnTranslations = {
     "dungeonExitName": "Выход из {name}",
     "dungeonPartyWarning": "{name} рассчитано на полную группу из {count} игроков. Продвигайтесь осторожно.",
     "dungeonInstanceBusy": "Все копии {name} заняты. Попробуйте еще раз чуть позже.",
-    "delveLockedChestInteract": "Press F to pick the lock",
-    "delveRewardChestInteract": "Press F to claim spoils",
-    "delveSurfaceExitInteract": "Press F to climb"
+    "delveLockedChestInteract": "Нажмите F, чтобы вскрыть замок",
+    "delveRewardChestInteract": "Нажмите F, чтобы забрать добычу",
+    "delveSurfaceExitInteract": "Нажмите F, чтобы подняться"
   }
 };

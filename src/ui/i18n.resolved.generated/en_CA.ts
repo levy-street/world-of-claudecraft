@@ -2640,6 +2640,36 @@ export const en_CA: EnTranslations = {
       "placeOf": "#{place} of {total}",
       "racing": "Racing"
     },
+    "wager": {
+      "start": "Wager Race",
+      "title": "Wager Race",
+      "inviteGold": "{name} opens a Wager Race — stake {money} to enter. Match it?",
+      "inviteCharter": "{name} opens a Wager Race — stake {money} + a Mount Charter. Match it?",
+      "accept": "Match Wager",
+      "pot": "Pot {money}",
+      "potCharter": "Pot {money} + {count}× Charter",
+      "racers": "Racers ({count})",
+      "launch": "Launch Race",
+      "cancel": "Cancel",
+      "leave": "Leave",
+      "waiting": "Waiting for a challenger to match the stake…",
+      "won": "You win the wager — {money}!",
+      "wonCharter": "You win the wager — {money} + {count}× Charter!",
+      "lost": "You lost the wager.",
+      "refunded": "Wager called off — your stake is returned.",
+      "antePrompt": "Stake how much gold on this race? (in copper)",
+      "open": "Open Wager",
+      "stakeCharter": "Also stake a Mount Charter (winner takes it)",
+      "errCourse": "That course cannot be wagered.",
+      "errFlyer": "You must be on a flying mount to wager.",
+      "errBusy": "You are already in a wager.",
+      "errAnte": "Name a wager of at least 1 copper.",
+      "errStake": "That cannot be staked as a wager.",
+      "errAfford": "You cannot cover that wager.",
+      "errExpired": "That wager offer has expired.",
+      "errGone": "That wager is no longer open.",
+      "errHost": "Only the host can launch the wager."
+    },
     "options": {
       "gameMenu": "Game Menu",
       "keyBindings": "Key Bindings",
@@ -5549,6 +5579,11 @@ export const en_CA: EnTranslations = {
         "name": "Ondrel Vane",
         "title": "Tidewatcher",
         "greeting": "The mere drinks the moonlight, {className}, and gives back the drowned. I have watched that gate for thirty nights — and tonight it is open."
+      },
+      "skytrial_master": {
+        "name": "Skymaster Vael",
+        "title": "Warden of the Skytrials",
+        "greeting": "The sky is a road few dare to walk, {className}. Earn it, and it carries you."
       }
     },
     "quests": {
@@ -6364,6 +6399,36 @@ export const en_CA: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Glimmermere Wader slain"
+          }
+        }
+      },
+      "q_skyward_first_flight": {
+        "title": "First Flight",
+        "text": "You sit a winged steed well enough on the ground, {playerName} — now take it up. Fly the Vale Skytrial: eight rings in one looping pass. Do not chase the clock yet. Just stay aloft and thread every ring.",
+        "completion": "You did not fall. That is more than most manage on a first loop. The sky remembers who keeps coming back.",
+        "objectives": {
+          "0": {
+            "label": "Vale Skytrial completed"
+          }
+        }
+      },
+      "q_skyward_time_trial": {
+        "title": "Beat the Clock",
+        "text": "Now do it with intent. Fly the Vale Skytrial again, {playerName}, but finish before the sand runs out. A clean line through every ring, no wasted air. Precision, not panic.",
+        "completion": "A clean line, ring to ring. You are not riding the sky any longer — you are flying it.",
+        "objectives": {
+          "0": {
+            "label": "Vale Skytrial flown under par"
+          }
+        }
+      },
+      "q_skyward_ascendant": {
+        "title": "Ascendant",
+        "text": "One trial remains, {playerName}: the Vale Circuit. Three laps of the long ring, flown under par — no luck, only craft. Master it and the open sky is yours to claim, from rim to rim.",
+        "completion": "Skyward and unbroken. The sky is yours now, {playerName}. Take this charter — a steed of the air, earned and not bought, to carry you wherever you mean to go.",
+        "objectives": {
+          "0": {
+            "label": "Vale Circuit flown under par"
           }
         }
       }

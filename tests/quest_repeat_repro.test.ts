@@ -60,7 +60,9 @@ describe('no quest duplicates another (same giver + identical objectives)', () =
               ? `kill ${o.targetMobId}`
               : o.type === 'collect'
                 ? `collect ${o.itemId}`
-                : `interact ${(o as any).targetNpcId}`) + ` x${o.count}`,
+                : o.type === 'finish_course'
+                  ? `course ${o.courseId}${o.parTicks ? ` <=${o.parTicks}` : ''}`
+                  : `interact ${(o as any).targetNpcId}`) + ` x${o.count}`,
         )
         .join(' + ');
       return `${q.giverNpcId} :: ${obj}`;

@@ -124,6 +124,10 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     ctx.openSkinSelect(meta, def.use.catalog ?? 'class', itemId);
     return;
   }
+  if (def.use?.type === 'mountCharter') {
+    ctx.redeemMountCharter(meta, itemId, def.use.mountId);
+    return;
+  }
   if (p.castingAbility === FISHING_CAST_ID) {
     ctx.error(meta.entityId, 'You are busy.');
     return;

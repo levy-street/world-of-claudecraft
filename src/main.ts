@@ -83,7 +83,7 @@ import { Renderer } from './render/renderer';
 import { navigatorSaveData } from './render/sky';
 import { pathCrossesFence } from './sim/colliders';
 import { ABILITIES, CLASSES } from './sim/content/classes';
-import { ITEMS } from './sim/data';
+import { DUNGEON_LIST, ITEMS, QUESTS } from './sim/data';
 import { canEquipItem } from './sim/equipment_rules';
 import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
 import { Sim } from './sim/sim';
@@ -5260,7 +5260,7 @@ async function ensureWalletLinked(): Promise<string | null> {
     if (!state.isConnected || !state.address) return null;
   }
   if (linkedWalletPubkey !== state.address) {
-    await runWalletLink(state.address);
+    await completeWalletVerifyFlow(state.address);
     if (linkedWalletPubkey !== state.address) return null;
   }
   return state.address;

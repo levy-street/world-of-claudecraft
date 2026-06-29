@@ -107,7 +107,7 @@ describe('Mount Charters — the earned ownership track', () => {
     sim.events.length = 0;
 
     sim.marketList('charter_goldcrest', 1, 5000, seller);
-    const listing = sim.marketListings.find((l) => l.sellerKey === 'Seller' && l.itemId === 'charter_goldcrest');
+    const listing = sim.marketListings.find((l) => l.sellerKey === String(seller) && l.itemId === 'charter_goldcrest');
     expect(listing).toBeDefined();
     expect(sim.events.some((e) => e.type === 'error')).toBe(false);
 

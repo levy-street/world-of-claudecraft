@@ -122,6 +122,7 @@ export function enterDungeon(ctx: SimContext, dungeonId: string, pid?: number): 
   }
   const origin = instanceOriginOf(inst);
   const p = r.e;
+  if (p.mountId !== undefined) ctx.dismount(p); // no mounts inside instances
   p.pos = ctx.groundPos(origin.x + dungeon.entry.x, origin.z + dungeon.entry.z);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);

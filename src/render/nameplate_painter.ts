@@ -94,6 +94,7 @@ export class NameplatePainter {
       }
       this.tmpV.copy(v.group.position);
       this.tmpV.y += plan.anchorYOffset;
+      if (v.mount) this.tmpV.y += v.mount.riderLift; // float the plate above the lifted rider
       if (!isProjectedNameplateAnchorVisible(this.camera, this.tmpV, this.tmpV2)) {
         this.hideNameplate(v);
         continue;

@@ -191,6 +191,10 @@ const CALLBACK_KEYS = [
   'startFishing',
   'unlockMechChromaFromItem',
   'openSkinSelect',
+  // $WOC mounts: dismount (shared force-dismount, also a casting/combat/damage path)
+  // + redeemMountCharter (the mountCharter useItem branch).
+  'dismount',
+  'redeemMountCharter',
   'isSwimming',
   // W3 interaction: the two still-on-Sim quest-NPC delegates the moved interact dispatches to.
   'talkToNpc',
@@ -418,6 +422,8 @@ function makeFakeHost() {
     startFishing: vi.fn(),
     unlockMechChromaFromItem: vi.fn(),
     openSkinSelect: vi.fn(),
+    dismount: vi.fn(),
+    redeemMountCharter: vi.fn(),
     isSwimming: vi.fn(() => false),
     // W3 interaction: the two still-on-Sim quest-NPC delegates the moved interact dispatches to.
     talkToNpc: vi.fn(),

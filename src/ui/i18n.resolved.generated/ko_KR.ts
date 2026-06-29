@@ -152,249 +152,249 @@ export const ko_KR: EnTranslations = {
   },
   "hudChrome": {
     "emotes": {
-      "wave": "Wave",
-      "laugh": "LOL",
-      "question": "Bro?",
-      "cheer": "Cheer",
-      "dance": "Dance",
-      "point": "Point",
-      "flex": "Flex",
-      "salute": "Salute",
-      "cry": "Cry",
-      "bow": "Bow",
-      "clap": "Clap",
-      "roar": "Roar",
-      "kneel": "Kneel"
+      "wave": "손인사",
+      "laugh": "ㅋㅋ",
+      "question": "야?",
+      "cheer": "환호",
+      "dance": "춤",
+      "point": "가리키기",
+      "flex": "근육 자랑",
+      "salute": "경례",
+      "cry": "엉엉",
+      "bow": "절",
+      "clap": "박수",
+      "roar": "포효",
+      "kneel": "무릎 꿇기"
     },
     "emoteWheel": {
-      "edit": "Edit",
-      "label": "Emotes"
+      "edit": "편집",
+      "label": "감정 표현"
     },
     "emoteEditor": {
-      "title": "Emotes",
-      "done": "Done"
+      "title": "감정 표현",
+      "done": "완료"
     },
     "theme": {
-      "preset": "UI Theme",
-      "customColors": "Custom Colors",
-      "reset": "Reset",
+      "preset": "UI 테마",
+      "customColors": "사용자 지정 색상",
+      "reset": "초기화",
       "presets": {
-        "classic": "Classic Gold",
-        "midnight": "Midnight",
-        "parchment": "Parchment",
-        "highContrast": "High Contrast"
+        "classic": "클래식 골드",
+        "midnight": "미드나이트",
+        "parchment": "양피지",
+        "highContrast": "고대비"
       },
       "knob": {
-        "accent": "Accent",
-        "border": "Border",
-        "panel": "Frame",
-        "text": "Text",
-        "textMuted": "Muted Text",
-        "hp": "Health",
-        "mana": "Mana",
-        "rage": "Rage",
-        "energy": "Energy"
+        "accent": "강조색",
+        "border": "테두리",
+        "panel": "프레임",
+        "text": "텍스트",
+        "textMuted": "보조 텍스트",
+        "hp": "체력",
+        "mana": "마나",
+        "rage": "분노",
+        "energy": "에너지"
       }
     },
     "questTracker": {
       "count": "({count})",
-      "collapseHint": "Collapse quest tracker",
-      "expandHint": "Expand quest tracker"
+      "collapseHint": "퀘스트 추적기 접기",
+      "expandHint": "퀘스트 추적기 펼치기"
     },
     "chatTimestamps": {
-      "show": "Show Chat Timestamps",
-      "format": "Timestamp Format",
-      "clock12h": "12-hour",
-      "clock24h": "24-hour",
-      "note": "Prefixes each new chat line with the time it arrived, e.g. [14:32]. Only affects messages received while the option is on."
+      "show": "채팅 시각 표시",
+      "format": "시각 표시 형식",
+      "clock12h": "12시간제",
+      "clock24h": "24시간제",
+      "note": "새 채팅 줄마다 수신된 시각을 앞에 붙입니다(예: [14:32]). 이 옵션이 켜져 있는 동안 받은 메시지에만 적용됩니다."
     },
     "chatWindow": {
-      "move": "Drag to move the chat window",
-      "resize": "Drag to resize the chat window",
-      "reset": "Reset Chat Window",
-      "resetAction": "Reset",
-      "note": "Drag the chat tab strip to move the window, or the corner grip to resize it. Reset returns it to the default position and size."
+      "move": "드래그하여 채팅 창 이동",
+      "resize": "드래그하여 채팅 창 크기 조절",
+      "reset": "채팅 창 초기화",
+      "resetAction": "초기화",
+      "note": "채팅 탭 줄을 드래그하면 창을 이동하고, 모서리 손잡이를 드래그하면 크기를 조절할 수 있습니다. 초기화하면 기본 위치와 크기로 돌아갑니다."
     },
     "swing": {
-      "ready": "Swing",
-      "seconds": "{seconds}s"
+      "ready": "공격",
+      "seconds": "{seconds}초"
     },
     "rest": {
-      "resting": "Resting"
+      "resting": "휴식 중"
     },
     "abilityScaling": {
       "bonus": "(+{value})"
     },
     "unitFrame": {
-      "playerLabel": "Your Hero",
-      "targetLabel": "Your Mark",
-      "targetAnnounce": "Mark {name}",
-      "partyLabel": "Your Band",
-      "partyGroup": "Group {n}",
-      "durationUnitSeconds": "s"
+      "playerLabel": "내 캐릭터",
+      "targetLabel": "내 대상",
+      "targetAnnounce": "대상: {name}",
+      "partyLabel": "내 파티",
+      "partyGroup": "{n}번 그룹",
+      "durationUnitSeconds": "초"
     },
     "character": {
-      "modelPreview": "Character Model Preview"
+      "modelPreview": "캐릭터 모델 미리보기"
     },
     "skipLinks": {
-      "mainHud": "Skip to Main HUD",
-      "chat": "Skip to Chat"
+      "mainHud": "메인 HUD로 건너뛰기",
+      "chat": "채팅으로 건너뛰기"
     },
     "mobile": {
-      "autorun": "Autorun",
-      "jump": "Jump",
-      "leaderboard": "Ranks",
-      "nameplates": "Names",
-      "haptics": "Haptics",
-      "hapticsOff": "Haptics Off",
-      "toggleHaptics": "Toggle haptics"
+      "autorun": "자동 달리기",
+      "jump": "점프",
+      "leaderboard": "순위",
+      "nameplates": "이름표",
+      "haptics": "진동",
+      "hapticsOff": "진동 꺼짐",
+      "toggleHaptics": "진동 전환"
     },
     "tutorial": {
-      "moveBodyTouch": "Use the movement stick to move and drag the screen to look around. Take a few steps to begin.",
-      "talkBodyTouch": "Stand close to Marshal Redbrook and tap the Use button to speak, then accept his task.",
-      "returnBodyTouch": "Your task is done. Return to Marshal Redbrook and tap the Use button to turn it in.",
-      "doneBodyTouch": "You have the basics, {name}. The Vale is yours to explore. Tap More, then Quests, to review your quest log anytime. Good hunting."
+      "moveBodyTouch": "이동 스틱으로 이동하고 화면을 끌어 주위를 둘러보세요. 몇 걸음 움직여 시작하세요.",
+      "talkBodyTouch": "레드브룩 원수에게 다가가 사용 버튼을 눌러 대화한 뒤 임무를 수락하세요.",
+      "returnBodyTouch": "임무를 마쳤습니다. 레드브룩 원수에게 돌아가 사용 버튼을 눌러 완료하세요.",
+      "doneBodyTouch": "기본기를 익혔습니다, {name}. 이제 골짜기를 자유롭게 누비세요. 더보기를 누른 뒤 퀘스트 기록을 눌러 언제든 퀘스트를 확인할 수 있습니다. 좋은 사냥 되세요."
     },
     "widgets": {
-      "clockTitle": "Local time - click to toggle 12/24-hour",
-      "worldCoordinates": "World coordinates",
-      "coordinates": "Coordinates",
-      "heading": "Heading",
-      "minimapZoom": "Minimap zoom"
+      "clockTitle": "현지 시각 - 클릭하면 12/24시간제 전환",
+      "worldCoordinates": "세계 좌표",
+      "coordinates": "좌표",
+      "heading": "방향",
+      "minimapZoom": "미니맵 확대/축소"
     },
     "castBar": {
-      "playerAria": "Your Cast Bar",
-      "targetAria": "Unit Cast Bar"
+      "playerAria": "내 시전 막대",
+      "targetAria": "대상 시전 막대"
     },
     "leaderboard": {
-      "close": "Close"
+      "close": "닫기"
     },
     "raidLockout": {
-      "title": "Raid Lockouts",
-      "allReady": "All raids ready",
-      "daysHours": "{d}d {h}h",
-      "hoursMinutes": "{h}h {m}m",
-      "minutes": "{m}m",
-      "lessThanMinute": "<1m",
-      "lockedToast": "You are locked to {raid}. Unlocks in {time}."
+      "title": "공격대 잠금",
+      "allReady": "모든 공격대 준비됨",
+      "daysHours": "{d}일 {h}시간",
+      "hoursMinutes": "{h}시간 {m}분",
+      "minutes": "{m}분",
+      "lessThanMinute": "1분 미만",
+      "lockedToast": "{raid}에 잠겨 있습니다. {time} 후 해제됩니다."
     },
     "compass": {
-      "N": "N",
-      "NE": "NE",
-      "E": "E",
-      "SE": "SE",
-      "S": "S",
-      "SW": "SW",
-      "W": "W",
-      "NW": "NW"
+      "N": "북",
+      "NE": "북동",
+      "E": "동",
+      "SE": "남동",
+      "S": "남",
+      "SW": "남서",
+      "W": "서",
+      "NW": "북서"
     },
     "meters": {
-      "perSecond": "{value}/s",
+      "perSecond": "{value}/초",
       "perSecondRow": "{total} ({rate})",
-      "minutesSeconds": "{m}m {s}s",
-      "seconds": "{s}s"
+      "minutesSeconds": "{m}분 {s}초",
+      "seconds": "{s}초"
     },
     "keybinds": {
-      "emoteWheel": "Emote Wheel",
-      "targetFriendly": "Target Nearest Friendly",
-      "targetFriendlyNext": "Cycle Friendly Target"
+      "emoteWheel": "감정 표현 휠",
+      "targetFriendly": "가장 가까운 아군 대상 지정",
+      "targetFriendlyNext": "아군 대상 순환"
     },
     "options": {
-      "clickMoveLeft": "Left Click",
-      "clickMoveRight": "Right Click",
-      "browserEffects": "Browser Effects",
-      "browserEffectsAuto": "Auto",
-      "browserEffectsFull": "Full",
-      "browserEffectsReduced": "Reduced",
-      "browserEffectsMinimal": "Minimal",
-      "browserEffectsNote": "Auto tones down heavy CSS effects (blur, glow, background motion) based on your browser and device. Lower it manually if the interface feels sluggish.",
-      "interfaceMode": "Interface Mode",
-      "interfaceModeAuto": "Auto",
-      "interfaceModeDesktop": "Desktop",
-      "interfaceModeTouch": "Touch",
-      "interfaceModeNote": "Auto picks desktop or touch controls from your device. Choose Desktop to force keyboard and mouse (useful on a tablet with a keyboard), or Touch for the on-screen controls.",
-      "footstepSounds": "Footstep Sounds",
-      "clickFeedback": "Click Marker",
-      "lockCursorOnRotate": "Lock Cursor While Rotating",
-      "keybindHelpLockCursorOnRotate": "Keeps the mouse cursor inside the window while you drag to rotate the camera, so it cannot reach the screen edge or move to another monitor. Turn off if you prefer a free cursor.",
-      "showWalletOnCharacterScreen": "Show Wallet on Character Screen",
-      "showWalletOnPlayerCard": "Show Wallet on Player Card",
-      "uiScale": "UI Scale",
-      "highContrastBackground": "High-Contrast Background",
-      "showItemLevel": "Show Item Level",
-      "itemLevelLine": "Item Level {level}",
-      "itemScoreLine": "Score {score}"
+      "clickMoveLeft": "왼쪽 클릭",
+      "clickMoveRight": "오른쪽 클릭",
+      "browserEffects": "브라우저 효과",
+      "browserEffectsAuto": "자동",
+      "browserEffectsFull": "전체",
+      "browserEffectsReduced": "감소",
+      "browserEffectsMinimal": "최소",
+      "browserEffectsNote": "자동은 브라우저와 기기에 맞춰 무거운 CSS 효과(흐림, 글로우, 배경 모션)를 낮춥니다. 인터페이스가 느리게 느껴지면 수동으로 낮추세요.",
+      "interfaceMode": "인터페이스 모드",
+      "interfaceModeAuto": "자동",
+      "interfaceModeDesktop": "데스크톱",
+      "interfaceModeTouch": "터치",
+      "interfaceModeNote": "자동은 기기에 따라 데스크톱 또는 터치 조작을 선택합니다. 데스크톱을 선택하면 키보드와 마우스로 고정되며(키보드가 있는 태블릿 등에 유용), 터치를 선택하면 화면 조작이 됩니다.",
+      "footstepSounds": "발소리",
+      "clickFeedback": "클릭 표시",
+      "lockCursorOnRotate": "회전 중 커서 고정",
+      "keybindHelpLockCursorOnRotate": "드래그하여 카메라를 회전하는 동안 마우스 커서를 창 안에 유지하여 화면 가장자리에 닿거나 다른 모니터로 이동하지 않도록 합니다. 자유로운 커서를 원하면 끄세요.",
+      "showWalletOnCharacterScreen": "캐릭터 화면에 지갑 표시",
+      "showWalletOnPlayerCard": "플레이어 카드에 지갑 표시",
+      "uiScale": "UI 배율",
+      "highContrastBackground": "고대비 배경",
+      "showItemLevel": "아이템 레벨 표시",
+      "itemLevelLine": "아이템 레벨 {level}",
+      "itemScoreLine": "점수 {score}"
     },
     "controller": {
-      "title": "Controller",
-      "enable": "Enable Controller",
-      "invertY": "Invert Camera (Y)",
-      "deadzone": "Stick Deadzone",
-      "cameraSpeed": "Camera Speed",
-      "vibration": "Vibration",
-      "buttons": "Button Layout",
-      "resetButtons": "Reset Button Layout",
-      "menuAction": "Game Menu",
-      "help": "Left stick moves, right stick looks. Open a window to use the on-screen pointer."
+      "title": "컨트롤러",
+      "enable": "컨트롤러 사용",
+      "invertY": "카메라 반전(Y축)",
+      "deadzone": "스틱 데드존",
+      "cameraSpeed": "카메라 속도",
+      "vibration": "진동",
+      "buttons": "버튼 배치",
+      "resetButtons": "버튼 배치 초기화",
+      "menuAction": "게임 메뉴",
+      "help": "왼쪽 스틱으로 이동, 오른쪽 스틱으로 시점 조작. 창을 열면 화면 포인터를 사용할 수 있습니다."
     },
     "perf": {
-      "title": "Performance Overlay",
-      "enable": "Show Performance Overlay",
-      "description": "Choose which stats to show, where the overlay sits, and how it looks.",
-      "sectionPosition": "Position",
-      "sectionAppearance": "Appearance",
-      "sectionStats": "Stats",
-      "positionX": "Horizontal",
-      "positionY": "Vertical",
-      "resetPosition": "Reset Position",
-      "dragHint": "Drag the overlay to move it, or use the sliders below.",
-      "opacity": "Background Opacity",
-      "solidBg": "Solid Background",
-      "fontScale": "Text Size",
-      "textColor": "Text Color",
-      "bgColor": "Background Color",
-      "colorTheme": "Color Theme",
-      "graph": "Frame-Time Graph",
-      "thresholds": "Color-Coded Warnings",
-      "presetsLabel": "Quick Presets",
-      "presetMinimal": "Minimal",
-      "presetStandard": "Standard",
-      "presetEverything": "Everything",
+      "title": "성능 오버레이",
+      "enable": "성능 오버레이 표시",
+      "description": "표시할 통계, 오버레이 위치, 모양을 선택하세요.",
+      "sectionPosition": "위치",
+      "sectionAppearance": "모양",
+      "sectionStats": "통계",
+      "positionX": "가로",
+      "positionY": "세로",
+      "resetPosition": "위치 초기화",
+      "dragHint": "오버레이를 드래그하여 옮기거나 아래 슬라이더를 사용하세요.",
+      "opacity": "배경 투명도",
+      "solidBg": "불투명 배경",
+      "fontScale": "글자 크기",
+      "textColor": "글자 색상",
+      "bgColor": "배경 색상",
+      "colorTheme": "색상 테마",
+      "graph": "프레임 시간 그래프",
+      "thresholds": "색상별 경고",
+      "presetsLabel": "빠른 설정",
+      "presetMinimal": "간소",
+      "presetStandard": "표준",
+      "presetEverything": "전체",
       "groups": {
-        "frame": "Frame & Timing",
-        "network": "Network",
-        "renderer": "Renderer",
-        "system": "System",
-        "input": "Input"
+        "frame": "프레임 및 시간",
+        "network": "네트워크",
+        "renderer": "렌더러",
+        "system": "시스템",
+        "input": "입력"
       },
       "labels": {
         "fps": "FPS",
-        "frameTime": "Frame Time",
-        "fps1Low": "1% Low",
-        "fps01Low": "0.1% Low",
-        "ping": "Ping",
-        "jitter": "Jitter",
-        "snapshot": "Snapshot Rate",
-        "connection": "Connection",
-        "drawCalls": "Draw Calls",
-        "triangles": "Triangles",
-        "geometries": "Geometries",
-        "textures": "Textures",
-        "programs": "Shaders",
-        "renderScale": "Render Scale",
+        "frameTime": "프레임 시간",
+        "fps1Low": "1% 최저",
+        "fps01Low": "0.1% 최저",
+        "ping": "핑",
+        "jitter": "지터",
+        "snapshot": "스냅샷 전송률",
+        "connection": "연결",
+        "drawCalls": "드로우 콜",
+        "triangles": "삼각형",
+        "geometries": "지오메트리",
+        "textures": "텍스처",
+        "programs": "셰이더",
+        "renderScale": "렌더링 배율",
         "gpu": "GPU",
-        "memory": "Memory",
-        "hitches": "Hitches",
-        "entities": "Entities",
+        "memory": "메모리",
+        "hitches": "버벅임",
+        "entities": "개체",
         "apm": "APM"
       },
       "themes": {
-        "gold": "Gold",
-        "frost": "Frost",
-        "ember": "Ember",
-        "jade": "Jade",
-        "crimson": "Crimson",
-        "mono": "Mono"
+        "gold": "황금",
+        "frost": "서리",
+        "ember": "잔불",
+        "jade": "비취",
+        "crimson": "진홍",
+        "mono": "단색"
       },
       "units": {
         "ms": "{value} ms",
@@ -403,319 +403,319 @@ export const ko_KR: EnTranslations = {
         "hz": "{value} Hz"
       },
       "badges": {
-        "backgrounded": "Backgrounded",
-        "offline": "Offline"
+        "backgrounded": "백그라운드",
+        "offline": "오프라인"
       }
     },
     "playerCard": {
-      "showWalletBadge": "Show wallet badge"
+      "showWalletBadge": "지갑 배지 표시"
     },
     "landing": {
-      "highContrast": "High Contrast",
-      "highContrastAria": "Toggle high-contrast background: disables the moving trailer so start-screen text stays legible"
+      "highContrast": "고대비",
+      "highContrastAria": "고대비 배경 전환: 움직이는 예고편을 꺼서 시작 화면 텍스트를 읽기 쉽게 유지합니다"
     },
     "statInfo": {
-      "fromYour": "From your {value} {stat}:",
+      "fromYour": "당신의 {value} {stat}에서:",
       "desc": {
-        "str": "Increases your attack power, so your weapon strikes land harder.",
-        "agi": "Sharpens your reflexes and aim, improving several of your combat stats.",
-        "sta": "Toughens your body, raising your maximum health and how quickly you recover health while resting.",
-        "int": "Expands a spellcaster's mana pool and improves their chance to land a spell critical strike.",
-        "spi": "Quickens how fast a spellcaster's mana returns while resting, out of combat.",
-        "armor": "Softens incoming physical blows. The reduction is greater against lower-level attackers and is capped at 75%.",
-        "attackPower": "Powers your weapon attacks. Every 14 attack power adds 1 damage per second.",
-        "dps": "Your estimated weapon damage per second, combining your weapon's damage and speed with your attack power.",
-        "critChance": "Your chance for an attack to strike critically, dealing double damage.",
-        "dodge": "Your chance to completely avoid an incoming melee attack, taking no damage."
+        "str": "전투력을 증가시켜 무기 공격이 더 강하게 적중하도록 합니다.",
+        "agi": "반사 신경과 조준 능력을 예리하게 하여 여러 전투 능력치를 향상시킵니다.",
+        "sta": "신체를 강인하게 하여 최대 생명력과 휴식 중 생명력 회복 속도를 높입니다.",
+        "int": "시전자의 마나 총량을 늘리고 주문 치명타율을 향상시킵니다.",
+        "spi": "비전투 중 휴식할 때 시전자의 마나가 회복되는 속도를 빠르게 합니다.",
+        "armor": "들어오는 물리 공격을 완화합니다. 낮은 레벨의 공격자에게 더 큰 효과를 발휘하며, 최대 75%까지 적용됩니다.",
+        "attackPower": "무기 공격을 강화합니다. 전투력 14당 초당 피해 1이 추가됩니다.",
+        "dps": "무기의 피해와 속도, 전투력을 종합한 예상 무기 초당 피해입니다.",
+        "critChance": "공격이 치명적으로 적중하여 두 배의 피해를 입힐 확률입니다.",
+        "dodge": "들어오는 근접 공격을 완전히 피해 피해를 전혀 입지 않을 확률입니다."
       },
       "effects": {
-        "attackPower": "+{value} Attack Power",
-        "rangedAttackPower": "+{value} Ranged Attack Power",
-        "critPct": "+{value}% Critical Strike",
-        "dodgePct": "+{value}% Dodge",
-        "armor": "+{value} Armor",
-        "maxHealth": "+{value} Maximum Health",
-        "maxMana": "+{value} Maximum Mana",
-        "spellCritPct": "+{value}% Spell Critical Strike",
-        "healthRegen": "About {value} health every 5 sec while resting",
-        "manaRegen": "About {value} mana every 5 sec while resting",
-        "damageReduction": "Damage reduction against a level {level} attacker: {value}%",
-        "dpsFromAp": "Adds {value} damage per second to your attacks"
+        "attackPower": "+{value} 전투력",
+        "rangedAttackPower": "+{value} 원거리 전투력",
+        "critPct": "+{value}% 치명타",
+        "dodgePct": "+{value}% 회피",
+        "armor": "+{value} 방어도",
+        "maxHealth": "+{value} 최대 생명력",
+        "maxMana": "+{value} 최대 마나",
+        "spellCritPct": "+{value}% 주문 치명타",
+        "healthRegen": "휴식 중 5초마다 약 {value} 생명력 회복",
+        "manaRegen": "휴식 중 5초마다 약 {value} 마나 회복",
+        "damageReduction": "{level} 레벨 공격자에 대한 피해 감소: {value}%",
+        "dpsFromAp": "공격에 초당 피해 {value} 추가"
       },
       "notes": {
-        "minorForClass": "Of little benefit to your class.",
-        "baseChance": "Includes a 5% base chance shared by all adventurers.",
-        "dpsApprox": "An estimate, it excludes critical strikes and ability damage."
+        "minorForClass": "당신의 직업에는 거의 도움이 되지 않습니다.",
+        "baseChance": "모든 모험가가 공유하는 5%의 기본 확률이 포함되어 있습니다.",
+        "dpsApprox": "추정치이며, 치명타와 기술 피해는 제외됩니다."
       }
     },
     "talents": {
-      "defaultBuildName": "Build {n}"
+      "defaultBuildName": "빌드 {n}"
     },
     "tips": {
-      "joinChannels": "Tip: type /join world or /join lfg to chat with players across the realm."
+      "joinChannels": "팁: /join world 또는 /join lfg를 입력하면 서버 전역의 플레이어와 대화할 수 있습니다."
     },
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
     },
     "questShare": {
-      "notShareable": "This quest can't be shared.",
-      "notInSharerParty": "You must be in {name}'s party to accept that quest.",
-      "accepted": "{name} accepted your shared quest.",
-      "dialogTitle": "Shared Quest",
-      "viewOnlyHint": "Join the sharer's party to accept this quest.",
-      "alreadyOn": "You're already on this quest.",
-      "alreadyDone": "You've already completed this quest.",
-      "ineligible": "You don't meet the requirements for this quest.",
-      "noQuestSelected": "Select a quest in your log to share.",
-      "linkTitle": "Shift-click to link this quest in chat."
+      "notShareable": "이 퀘스트는 공유할 수 없습니다.",
+      "notInSharerParty": "{name}님의 파티에 속해 있어야 이 퀘스트를 수락할 수 있습니다.",
+      "accepted": "{name}님이 당신의 공유 퀘스트를 수락했습니다.",
+      "dialogTitle": "공유 퀘스트",
+      "viewOnlyHint": "이 퀘스트를 수락하려면 공유한 사람의 파티에 참가하세요.",
+      "alreadyOn": "이미 진행 중인 퀘스트입니다.",
+      "alreadyDone": "이미 완료한 퀘스트입니다.",
+      "ineligible": "이 퀘스트의 요구 조건을 충족하지 못합니다.",
+      "noQuestSelected": "공유할 퀘스트를 기록에서 선택하세요.",
+      "linkTitle": "Shift + 클릭하면 이 퀘스트를 채팅에 연결합니다."
     },
     "plurals": {
       "guildMembers": {
-        "one": "you are {rank}, {count} member",
-        "few": "you are {rank}, {count} members",
-        "many": "you are {rank}, {count} members",
-        "other": "you are {rank}, {count} members"
+        "one": "당신은 {rank}, {count}명 회원",
+        "few": "당신은 {rank}, {count}명 회원",
+        "many": "당신은 {rank}, {count}명 회원",
+        "other": "당신은 {rank}, {count}명 회원"
       },
       "characterCount": {
-        "one": "{count} character",
-        "few": "{count} characters",
-        "many": "{count} characters",
-        "other": "{count} characters"
+        "one": "캐릭터 {count}개",
+        "few": "캐릭터 {count}개",
+        "many": "캐릭터 {count}개",
+        "other": "캐릭터 {count}개"
       },
       "secondsRemaining": {
-        "one": "{count} second remaining",
-        "few": "{count} seconds remaining",
-        "many": "{count} seconds remaining",
-        "other": "{count} seconds remaining"
+        "one": "{count}초 남음",
+        "few": "{count}초 남음",
+        "many": "{count}초 남음",
+        "other": "{count}초 남음"
       },
       "playersOnline": {
-        "one": "Who: {count} player online on {realm}.",
-        "few": "Who: {count} players online on {realm}.",
-        "many": "Who: {count} players online on {realm}.",
-        "other": "Who: {count} players online on {realm}."
+        "one": "검색: {realm} 서버에 {count}명의 플레이어가 접속 중입니다.",
+        "few": "검색: {realm} 서버에 {count}명의 플레이어가 접속 중입니다.",
+        "many": "검색: {realm} 서버에 {count}명의 플레이어가 접속 중입니다.",
+        "other": "검색: {realm} 서버에 {count}명의 플레이어가 접속 중입니다."
       }
     },
     "bugReport": {
-      "menuButton": "Report a Bug",
-      "realm": "Realm",
-      "character": "Character",
-      "position": "Position",
-      "unknown": "Unknown",
-      "description": "What went wrong?",
-      "descriptionPlaceholder": "Describe the bug: what you did, what you expected, and what happened.",
-      "includeScreenshot": "Include Screenshot",
-      "screenshotAlt": "Screenshot of the current view attached to this bug report",
-      "submit": "Send Report",
-      "submitted": "Bug report sent. Thank you!",
-      "submittedNoShot": "Bug report sent, but the screenshot was too large to include.",
-      "describeFirst": "Please describe the bug before sending.",
-      "tooLarge": "That report is too large to send. Try again without the screenshot.",
-      "rateLimited": "You've sent several reports recently. Please wait a bit before sending another.",
-      "failed": "Could not send the bug report. Please try again."
+      "menuButton": "버그 신고",
+      "realm": "서버",
+      "character": "캐릭터",
+      "position": "좌표",
+      "unknown": "알 수 없음",
+      "description": "무엇이 잘못되었나요?",
+      "descriptionPlaceholder": "버그를 설명해 주세요: 무엇을 했고, 무엇을 기대했으며, 무엇이 일어났는지.",
+      "includeScreenshot": "스크린샷 포함",
+      "screenshotAlt": "이 버그 신고에 첨부된 현재 화면의 스크린샷",
+      "submit": "신고 보내기",
+      "submitted": "버그 신고가 전송되었습니다. 감사합니다!",
+      "submittedNoShot": "버그 신고가 전송되었습니다. 다만 스크린샷이 너무 커서 첨부하지 못했습니다.",
+      "describeFirst": "보내기 전에 버그를 설명해 주세요.",
+      "tooLarge": "신고가 너무 커서 보낼 수 없습니다. 스크린샷 없이 다시 시도하세요.",
+      "rateLimited": "최근에 여러 건의 신고를 보냈습니다. 잠시 후 다시 보내 주세요.",
+      "failed": "버그 신고를 보낼 수 없습니다. 다시 시도해 주세요."
     },
     "paperdoll": {
-      "unequipAria": "Unequip {item}",
-      "unequipHint": "Click ×, right-click, or drag to bags to unequip"
+      "unequipAria": "{item} 장착 해제",
+      "unequipHint": "× 클릭, 우클릭 또는 가방으로 드래그하여 장착 해제"
     },
     "account": {
-      "title": "Account",
-      "loggedOutPrompt": "Log in to manage your account.",
-      "memberSince": "Member since {date}",
-      "sectionSettings": "Account Settings",
-      "sectionWallet": "$WOC Wallet",
-      "sectionCharacters": "Characters",
-      "sectionDanger": "Danger Zone",
-      "changePassword": "Change Password",
-      "currentPassword": "Current password",
-      "newPassword": "New password",
-      "confirmNewPassword": "Confirm new password",
-      "savePassword": "Update Password",
-      "passwordChanged": "Password updated. Other devices have been signed out.",
-      "errCurrentRequired": "Enter your current password.",
-      "errPasswordShort": "New password must be at least 6 characters.",
-      "errPasswordLong": "New password must be at most 128 characters.",
-      "errPasswordUnchanged": "New password must be different from the current one.",
-      "errPasswordConfirm": "New passwords do not match.",
-      "emailLabel": "Email (optional)",
-      "emailHint": "Used only for account recovery. Use Change Email below to update it.",
-      "saveEmail": "Save Email",
-      "emailSaved": "Email saved.",
-      "errEmailInvalid": "Enter a valid email address.",
-      "errCurrentPassword": "Your current password is incorrect.",
-      "errUsernameMatch": "That username does not match your account.",
-      "errPasswordIncorrect": "Your password is incorrect.",
-      "errCharactersOnline": "Log out all of your characters before deactivating.",
-      "deactivatedLocked": "This account has been deactivated. Contact an admin to restore it.",
-      "charactersSummary": "Manage your characters and enter the world.",
-      "charactersCount": "Characters: {count}",
-      "goToCharacters": "View Characters",
-      "walletSummary": "Verify a Solana wallet to show holder flair on your player card.",
-      "manageWallet": "Manage Wallet",
-      "deactivate": "Deactivate Account",
-      "deactivateWarning": "Deactivation locks your account and signs you out everywhere. Contact an admin to restore it. Confirm by re-entering your username and password.",
-      "confirmUsername": "Type your username to confirm",
-      "confirmPassword": "Password",
-      "deactivateConfirm": "Deactivate My Account",
-      "deactivated": "Your account has been deactivated.",
-      "logOut": "Log Out",
-      "logOutSummary": "Sign out of this device.",
-      "sectionSecurity": "Security",
-      "changeEmailTitle": "Change Email",
-      "changeEmailHint": "We email a confirmation link to the new address and a notice to the old one. Your email only changes once you open the link.",
-      "changeEmailNew": "New email",
-      "changeEmailSubmit": "Send Confirmation Link",
-      "changeEmailSent": "Check your inbox: open the link we sent to confirm your new email.",
-      "errEmailUnchanged": "That is already your email address.",
-      "twoFactorTitle": "Two-Factor Authentication",
-      "twoFactorStatusOn": "Two-factor authentication is ON for your account.",
-      "twoFactorStatusOff": "Add an authenticator app for stronger account security.",
-      "twoFactorSetupBtn": "Set Up Two-Factor",
-      "twoFactorBeginHint": "Enter your password to begin setup.",
-      "twoFactorBegin": "Begin Setup",
-      "twoFactorScanHint": "Add this key to your authenticator app (Google Authenticator, Authy, 1Password, and similar), then enter the 6-digit code it shows.",
-      "twoFactorSecretLabel": "Setup key",
-      "twoFactorOpenApp": "Open in authenticator app",
-      "twoFactorCodeLabel": "6-digit code",
-      "twoFactorVerifyBtn": "Verify and Enable",
-      "twoFactorEnabledMsg": "Two-factor authentication is now on.",
-      "twoFactorRecoveryTitle": "Save your recovery codes",
-      "twoFactorRecoveryHint": "Each code works once. Store them somewhere safe: they are the only way back in if you lose your authenticator app.",
-      "twoFactorDownloadCodes": "Download Codes",
-      "twoFactorDone": "Done",
-      "twoFactorDisableHint": "Enter your password to turn two-factor off. Your recovery codes will be discarded.",
-      "twoFactorDisableBtn": "Turn Off Two-Factor",
-      "twoFactorDisabledMsg": "Two-factor authentication is off.",
-      "errTwoFactorCode": "That code is not valid, try again.",
-      "errTwoFactorState": "Two-factor setup is not in the expected state. Reload and try again.",
-      "exportTitle": "Export My Data",
-      "exportHint": "Download a copy of your account and characters as a JSON file. We also email you a confirmation.",
-      "exportBtn": "Download My Data",
-      "exportDone": "Your data was downloaded. We emailed you a confirmation.",
-      "exportFailed": "Could not export your data. Try again in a moment."
+      "title": "계정",
+      "loggedOutPrompt": "계정을 관리하려면 로그인하세요.",
+      "memberSince": "가입일: {date}",
+      "sectionSettings": "계정 설정",
+      "sectionWallet": "$WOC 지갑",
+      "sectionCharacters": "캐릭터",
+      "sectionDanger": "위험 구역",
+      "changePassword": "비밀번호 변경",
+      "currentPassword": "현재 비밀번호",
+      "newPassword": "새 비밀번호",
+      "confirmNewPassword": "새 비밀번호 확인",
+      "savePassword": "비밀번호 업데이트",
+      "passwordChanged": "비밀번호가 업데이트되었습니다. 다른 기기에서 로그아웃되었습니다.",
+      "errCurrentRequired": "현재 비밀번호를 입력하세요.",
+      "errPasswordShort": "새 비밀번호는 6자 이상이어야 합니다.",
+      "errPasswordLong": "새 비밀번호는 128자 이하여야 합니다.",
+      "errPasswordUnchanged": "새 비밀번호는 현재 비밀번호와 달라야 합니다.",
+      "errPasswordConfirm": "새 비밀번호가 서로 일치하지 않습니다.",
+      "emailLabel": "이메일(선택 사항)",
+      "emailHint": "계정 복구에만 사용됩니다. 마케팅 이메일은 보내지 않습니다.",
+      "saveEmail": "이메일 저장",
+      "emailSaved": "이메일이 저장되었습니다.",
+      "errEmailInvalid": "유효한 이메일 주소를 입력하세요.",
+      "errCurrentPassword": "현재 비밀번호가 올바르지 않습니다.",
+      "errUsernameMatch": "해당 사용자 이름이 계정과 일치하지 않습니다.",
+      "errPasswordIncorrect": "비밀번호가 올바르지 않습니다.",
+      "errCharactersOnline": "비활성화하기 전에 모든 캐릭터에서 로그아웃하세요.",
+      "deactivatedLocked": "이 계정은 비활성화되었습니다. 복원하려면 관리자에게 문의하세요.",
+      "charactersSummary": "캐릭터를 관리하고 월드에 입장하세요.",
+      "charactersCount": "캐릭터: {count}",
+      "goToCharacters": "캐릭터 보기",
+      "walletSummary": "Solana 지갑을 인증하여 플레이어 카드에 보유자 표식을 표시하세요.",
+      "manageWallet": "지갑 관리",
+      "deactivate": "계정 비활성화",
+      "deactivateWarning": "비활성화하면 계정이 잠기고 모든 기기에서 로그아웃됩니다. 복원하려면 관리자에게 문의하세요. 사용자 이름과 비밀번호를 다시 입력하여 확인하세요.",
+      "confirmUsername": "확인을 위해 사용자 이름을 입력하세요",
+      "confirmPassword": "비밀번호",
+      "deactivateConfirm": "내 계정 비활성화",
+      "deactivated": "계정이 비활성화되었습니다.",
+      "logOut": "로그아웃",
+      "logOutSummary": "이 기기에서 로그아웃합니다.",
+      "sectionSecurity": "보안",
+      "changeEmailTitle": "이메일 변경",
+      "changeEmailHint": "새 주소로 확인 링크를, 기존 주소로 안내 메일을 보냅니다. 링크를 열어야만 이메일이 변경됩니다.",
+      "changeEmailNew": "새 이메일",
+      "changeEmailSubmit": "확인 링크 보내기",
+      "changeEmailSent": "받은 편지함을 확인하세요. 보내드린 링크를 열어 새 이메일을 확인하세요.",
+      "errEmailUnchanged": "이미 사용 중인 이메일 주소입니다.",
+      "twoFactorTitle": "2단계 인증",
+      "twoFactorStatusOn": "계정에 2단계 인증이 켜져 있습니다.",
+      "twoFactorStatusOff": "더 강력한 계정 보안을 위해 인증 앱을 추가하세요.",
+      "twoFactorSetupBtn": "2단계 인증 설정",
+      "twoFactorBeginHint": "설정을 시작하려면 비밀번호를 입력하세요.",
+      "twoFactorBegin": "설정 시작",
+      "twoFactorScanHint": "이 키를 인증 앱(Google Authenticator, Authy, 1Password 등)에 추가한 다음, 앱에 표시되는 6자리 코드를 입력하세요.",
+      "twoFactorSecretLabel": "설정 키",
+      "twoFactorOpenApp": "인증 앱에서 열기",
+      "twoFactorCodeLabel": "6자리 코드",
+      "twoFactorVerifyBtn": "확인 후 사용",
+      "twoFactorEnabledMsg": "이제 2단계 인증이 켜졌습니다.",
+      "twoFactorRecoveryTitle": "복구 코드를 저장하세요",
+      "twoFactorRecoveryHint": "각 코드는 한 번만 사용할 수 있습니다. 안전한 곳에 보관하세요. 인증 앱을 잃어버렸을 때 다시 로그인할 수 있는 유일한 방법입니다.",
+      "twoFactorDownloadCodes": "코드 다운로드",
+      "twoFactorDone": "완료",
+      "twoFactorDisableHint": "2단계 인증을 끄려면 비밀번호를 입력하세요. 복구 코드는 폐기됩니다.",
+      "twoFactorDisableBtn": "2단계 인증 끄기",
+      "twoFactorDisabledMsg": "2단계 인증이 꺼졌습니다.",
+      "errTwoFactorCode": "코드가 올바르지 않습니다. 다시 시도하세요.",
+      "errTwoFactorState": "2단계 인증 설정이 예상한 상태가 아닙니다. 새로고침 후 다시 시도하세요.",
+      "exportTitle": "내 데이터 내보내기",
+      "exportHint": "계정과 캐릭터 사본을 JSON 파일로 다운로드합니다. 확인 메일도 함께 보내드립니다.",
+      "exportBtn": "내 데이터 다운로드",
+      "exportDone": "데이터가 다운로드되었습니다. 확인 메일을 보내드렸습니다.",
+      "exportFailed": "데이터를 내보낼 수 없습니다. 잠시 후 다시 시도하세요."
     },
     "masterLoot": {
-      "title": "Master Loot",
-      "enableLabel": "Master loot",
-      "enableAria": "Enable master loot",
-      "looterLabel": "Master looter",
-      "leaderOption": "Party leader",
-      "thresholdLabel": "Threshold",
-      "thresholdUncommon": "Uncommon and up",
-      "thresholdRare": "Rare and up",
-      "thresholdEpic": "Epic and up",
-      "assignPrompt": "Assign {item}",
-      "assignAria": "Assign {item} to {name}",
-      "rollButton": "Roll",
-      "selectAll": "Select all",
-      "methodMaster": "Loot method set to master loot. Master looter: {name}.",
-      "methodGroup": "Loot method set to group loot.",
-      "assigned": "{looter} assigned {item} to {target}.",
-      "unassigned": "{item} was not assigned and is free for all.",
-      "leaderOnly": "Only the party leader can change the loot method."
+      "title": "분배 담당",
+      "enableLabel": "분배 담당",
+      "enableAria": "분배 담당 사용",
+      "looterLabel": "분배 담당자",
+      "leaderOption": "파티장",
+      "thresholdLabel": "품질 기준",
+      "thresholdUncommon": "고급 이상",
+      "thresholdRare": "희귀 이상",
+      "thresholdEpic": "영웅 이상",
+      "assignPrompt": "{item} 분배",
+      "assignAria": "{item}을(를) {name}에게 분배",
+      "rollButton": "주사위",
+      "selectAll": "전체 선택",
+      "methodMaster": "전리품 방식이 분배 담당으로 설정되었습니다. 분배 담당자: {name}.",
+      "methodGroup": "전리품 방식이 파티 분배로 설정되었습니다.",
+      "assigned": "{looter}님이 {item}을(를) {target}에게 분배했습니다.",
+      "unassigned": "{item}이(가) 분배되지 않아 모두가 획득할 수 있습니다.",
+      "leaderOnly": "파티장만 전리품 방식을 변경할 수 있습니다."
     },
     "bags": {
-      "filterGroupAria": "Filter bags by category",
-      "filterAll": "All",
-      "filterWeapon": "Weapons",
-      "filterArmor": "Armor",
-      "filterConsumable": "Consumables",
-      "filterMaterial": "Materials",
-      "filterQuest": "Quest",
-      "sortAria": "Sort bag items",
-      "sortRecent": "Recent",
-      "sortQuality": "Quality",
-      "sortName": "Name",
-      "searchPlaceholder": "Search items",
-      "searchAria": "Search bag items by name",
-      "noMatch": "No items match your filters."
+      "filterGroupAria": "가방을 분류별로 필터링",
+      "filterAll": "전체",
+      "filterWeapon": "무기",
+      "filterArmor": "방어구",
+      "filterConsumable": "소모품",
+      "filterMaterial": "재료",
+      "filterQuest": "퀘스트",
+      "sortAria": "가방 아이템 정렬",
+      "sortRecent": "최근",
+      "sortQuality": "품질",
+      "sortName": "이름",
+      "searchPlaceholder": "아이템 검색",
+      "searchAria": "이름으로 가방 아이템 검색",
+      "noMatch": "필터와 일치하는 아이템이 없습니다."
     },
     "raidConvert": {
-      "toPartyDone": "Your raid has converted back to a party.",
-      "notRaid": "Your group is not a raid.",
-      "leaderOnly": "Only the raid leader may convert to a party.",
-      "tooLarge": "A raid with more than five members cannot convert back to a party."
+      "toPartyDone": "공격대가 파티로 다시 전환되었습니다.",
+      "notRaid": "현재 파티는 공격대가 아닙니다.",
+      "leaderOnly": "공격대장만 파티로 전환할 수 있습니다.",
+      "tooLarge": "인원이 5명을 초과하는 공격대는 파티로 다시 전환할 수 없습니다."
     },
     "itemArmorType": {
-      "cloth": "Cloth",
-      "leather": "Leather",
-      "mail": "Mail"
+      "cloth": "천",
+      "leather": "가죽",
+      "mail": "사슬"
     },
     "auraEffect": {
-      "dot": "Deals {value} {school} damage every {interval} sec",
-      "hot": "Restores {value} health every {interval} sec",
-      "absorb": "Absorbs {value} damage",
-      "healAbsorb": "Absorbs {value} incoming healing",
-      "thorns": "Deals {value} {school} damage to attackers",
-      "slow": "Reduces movement speed by {pct}%",
-      "speed": "Increases movement speed by {pct}%",
-      "attackSpeedSlow": "Slows attack speed by {pct}%",
-      "attackSpeedFast": "Increases attack speed by {pct}%",
-      "haste": "Increases attack and casting speed by {pct}%",
-      "tongues": "Increases casting time by {pct}%",
+      "dot": "{interval}초마다 {value}의 {school} 피해를 입힙니다",
+      "hot": "{interval}초마다 생명력을 {value} 회복합니다",
+      "absorb": "{value}의 피해를 흡수합니다",
+      "healAbsorb": "들어오는 치유를 {value}만큼 흡수합니다",
+      "thorns": "공격자에게 {value}의 {school} 피해를 입힙니다",
+      "slow": "이동 속도를 {pct}% 감소시킵니다",
+      "speed": "이동 속도를 {pct}% 증가시킵니다",
+      "attackSpeedSlow": "공격 속도를 {pct}% 늦춥니다",
+      "attackSpeedFast": "공격 속도를 {pct}% 증가시킵니다",
+      "haste": "공격 속도와 시전 속도를 {pct}% 증가시킵니다",
+      "tongues": "시전 시간을 {pct}% 증가시킵니다",
       "increase": {
-        "ap": "Increases attack power by {value}",
-        "armor": "Increases armor by {value}",
-        "int": "Increases Intellect by {value}",
-        "agi": "Increases Agility by {value}",
-        "sta": "Increases Stamina by {value}",
-        "spi": "Increases Spirit by {value}",
-        "allStats": "Increases all attributes by {value}"
+        "ap": "공격력을 {value} 증가시킵니다",
+        "armor": "방어도를 {value} 증가시킵니다",
+        "int": "지능을 {value} 증가시킵니다",
+        "agi": "민첩성을 {value} 증가시킵니다",
+        "sta": "체력을 {value} 증가시킵니다",
+        "spi": "정신력을 {value} 증가시킵니다",
+        "allStats": "모든 능력치를 {value} 증가시킵니다"
       },
       "reduce": {
-        "ap": "Reduces attack power by {value}",
-        "armor": "Reduces armor by {value}",
-        "int": "Reduces Intellect by {value}",
-        "agi": "Reduces Agility by {value}",
-        "sta": "Reduces Stamina by {value}",
-        "spi": "Reduces Spirit by {value}",
-        "allStats": "Reduces all attributes by {value}"
+        "ap": "공격력을 {value} 감소시킵니다",
+        "armor": "방어도를 {value} 감소시킵니다",
+        "int": "지능을 {value} 감소시킵니다",
+        "agi": "민첩성을 {value} 감소시킵니다",
+        "sta": "체력을 {value} 감소시킵니다",
+        "spi": "정신력을 {value} 감소시킵니다",
+        "allStats": "모든 능력치를 {value} 감소시킵니다"
       },
-      "dodge": "Increases dodge chance by {pct}%",
-      "dodgeReduce": "Reduces dodge chance by {pct}%",
-      "armorFlat": "Reduces armor by {value}",
-      "armorFlatStacks": "Reduces armor by {value} ({stacks} stacks)",
-      "mortalWound": "Reduces healing received by {pct}%",
-      "vulnerability": "Increases damage taken by {pct}%",
-      "physVuln": "Increases physical damage taken by {pct}%",
-      "spellVuln": "Increases magic damage taken by {pct}%",
-      "critVuln": "Increases chance to be critically hit by {pct}%",
-      "costTax": "Increases ability costs by {pct}%",
-      "stun": "Stunned: unable to act",
-      "root": "Rooted: unable to move",
-      "incapacitate": "Incapacitated: unable to act",
-      "polymorph": "Polymorphed: unable to act",
-      "hex": "Reduces damage and healing dealt by {pct}%",
-      "blind": "Blinded: unable to act",
-      "silence": "Silenced: unable to cast spells",
-      "disarm": "Disarmed: cannot use weapon attacks",
-      "lockout": "Spell school locked out",
-      "imbue": "Weapon imbued with bonus effects",
-      "imbueRange": "Weapon imbued: {min} to {max} bonus damage on judgement",
-      "stealth": "Concealed; movement speed reduced by {pct}%",
-      "formBear": "Bear Form: increased health and armor",
-      "formCat": "Cat Form: melee damage and energy",
-      "formTravel": "Travel Form: movement speed increased by {pct}%",
-      "defensiveStance": "Defensive Stance: reduced damage taken, more threat",
-      "righteousFury": "Righteous Fury: greatly increased threat from Holy damage",
-      "scale": "Size increased by {pct}%",
-      "jump": "Jump height increased by {pct}%",
+      "dodge": "회피 확률을 {pct}% 증가시킵니다",
+      "dodgeReduce": "회피 확률을 {pct}% 감소시킵니다",
+      "armorFlat": "방어도를 {value} 감소시킵니다",
+      "armorFlatStacks": "방어도를 {value} 감소시킵니다 ({stacks}중첩)",
+      "mortalWound": "받는 치유량을 {pct}% 감소시킵니다",
+      "vulnerability": "받는 피해를 {pct}% 증가시킵니다",
+      "physVuln": "받는 물리 피해를 {pct}% 증가시킵니다",
+      "spellVuln": "받는 마법 피해를 {pct}% 증가시킵니다",
+      "critVuln": "치명타로 적중될 확률을 {pct}% 증가시킵니다",
+      "costTax": "기술 소모량을 {pct}% 증가시킵니다",
+      "stun": "기절: 행동할 수 없습니다",
+      "root": "속박: 이동할 수 없습니다",
+      "incapacitate": "무력화: 행동할 수 없습니다",
+      "polymorph": "변이: 행동할 수 없습니다",
+      "hex": "입히는 피해와 치유를 {pct}% 감소시킵니다",
+      "blind": "실명: 행동할 수 없습니다",
+      "silence": "침묵: 주문을 시전할 수 없습니다",
+      "disarm": "무장 해제: 무기 공격을 사용할 수 없습니다",
+      "lockout": "주문 계열이 봉인되었습니다",
+      "imbue": "무기에 추가 효과가 부여되었습니다",
+      "imbueRange": "무기 부여: 심판 시 {min}에서 {max}의 추가 피해",
+      "stealth": "은폐 상태, 이동 속도가 {pct}% 감소합니다",
+      "formBear": "곰 변신: 생명력과 방어도 증가",
+      "formCat": "표범 변신: 근접 피해와 기력",
+      "formTravel": "여행 변신: 이동 속도가 {pct}% 증가합니다",
+      "defensiveStance": "방어 태세: 받는 피해 감소, 위협 수준 증가",
+      "righteousFury": "정의의 격노: 신성 피해로 인한 위협 수준이 크게 증가합니다",
+      "scale": "크기가 {pct}% 증가합니다",
+      "jump": "도약 높이가 {pct}% 증가합니다",
       "school": {
-        "physical": "Physical",
-        "fire": "Fire",
-        "frost": "Frost",
-        "arcane": "Arcane",
-        "shadow": "Shadow",
-        "holy": "Holy",
-        "nature": "Nature"
+        "physical": "물리",
+        "fire": "화염",
+        "frost": "냉기",
+        "arcane": "비전",
+        "shadow": "암흑",
+        "holy": "신성",
+        "nature": "자연"
       }
     },
     "loot": {
-      "chestTitle": "Chest"
+      "chestTitle": "상자"
     },
     "spellbook": {
-      "addToBarAria": "Add {name} to action bar",
-      "removeFromBarAria": "Remove {name} from action bar"
+      "addToBarAria": "{name}을(를) 행동 단축바에 추가",
+      "removeFromBarAria": "{name}을(를) 행동 단축바에서 제거"
     },
     "nameplate": {
       "mob": "[{level}] {name}",
@@ -725,766 +725,766 @@ export const ko_KR: EnTranslations = {
   "guide": {
     "brand": "World of ClaudeCraft",
     "brandShort": "ClaudeCraft",
-    "tagline": "A classic-style MMO you play free in your browser.",
-    "skipToContent": "Skip to main content",
-    "loading": "Loading...",
+    "tagline": "브라우저에서 무료로 즐기는 클래식 스타일 MMO입니다.",
+    "skipToContent": "본문으로 건너뛰기",
+    "loading": "불러오는 중...",
     "docTitle": "{page} - {brand}",
-    "related": "Related",
+    "related": "관련 항목",
     "nav": {
-      "overview": "Overview",
-      "howToPlay": "How to Play",
-      "classes": "Classes",
-      "bestiary": "Bestiary",
-      "models": "3D Models",
-      "gear": "Gear & Items",
-      "economy": "Economy & Trade",
-      "social": "Social & Groups",
-      "stats": "Character & Stats",
-      "progression": "Leveling & Progression",
-      "world": "World",
-      "quests": "Quests",
-      "dungeons": "Dungeons & Raids",
-      "reference": "Reference",
-      "controls": "Controls",
-      "combat": "Combat",
-      "talents": "Talents",
-      "arena": "Arena & PvP",
-      "glossary": "Glossary",
-      "wishIKnew": "Things I Wish I Knew",
-      "faq": "FAQ",
-      "playNow": "Play Now",
-      "openMenu": "Open menu",
-      "closeMenu": "Close menu",
-      "primary": "Guide sections",
-      "topics": "Topics",
-      "onThisPage": "On this page",
-      "backToGame": "Back to the game"
+      "overview": "개요",
+      "howToPlay": "플레이 방법",
+      "classes": "직업",
+      "bestiary": "몬스터 도감",
+      "models": "3D 모델",
+      "gear": "장비와 물품",
+      "economy": "경제와 거래",
+      "social": "사교와 파티",
+      "stats": "캐릭터와 능력치",
+      "progression": "레벨과 성장",
+      "world": "세계",
+      "quests": "퀘스트",
+      "dungeons": "던전과 공격대",
+      "reference": "참고 자료",
+      "controls": "조작법",
+      "combat": "전투",
+      "talents": "특성",
+      "arena": "투기장과 PvP",
+      "glossary": "용어집",
+      "wishIKnew": "미리 알았으면 좋았을 것들",
+      "faq": "자주 묻는 질문",
+      "playNow": "지금 플레이",
+      "openMenu": "메뉴 열기",
+      "closeMenu": "메뉴 닫기",
+      "primary": "가이드 항목",
+      "topics": "주제",
+      "onThisPage": "이 페이지에서",
+      "backToGame": "게임으로 돌아가기"
     },
     "groups": {
-      "start": "Get Started",
-      "compendium": "Compendium",
-      "reference": "Reference"
+      "start": "시작하기",
+      "compendium": "종합 안내서",
+      "reference": "참고 자료"
     },
     "breadcrumb": {
-      "label": "Breadcrumb",
-      "home": "Guide"
+      "label": "이동 경로",
+      "home": "가이드"
     },
     "seq": {
-      "label": "Page navigation",
-      "prev": "Previous",
-      "next": "Next"
+      "label": "페이지 이동",
+      "prev": "이전",
+      "next": "다음"
     },
     "toc": {
-      "heading": "On this page"
+      "heading": "이 페이지에서"
     },
     "footer": {
-      "blurb": "An open-source, classic-style micro-MMO. Quest, group up, and explore a hand-built world, right in your browser.",
-      "playNow": "Play Now",
-      "github": "Source on GitHub",
-      "discord": "Join the Discord",
-      "communityWiki": "Community Wiki",
+      "blurb": "오픈 소스로 만든 클래식 스타일 마이크로 MMO입니다. 퀘스트를 수행하고, 파티를 맺고, 손수 빚은 세계를 브라우저에서 바로 탐험하세요.",
+      "playNow": "지금 플레이",
+      "github": "GitHub 소스 코드",
+      "discord": "Discord 참여하기",
+      "communityWiki": "커뮤니티 위키",
       "rights": "World of ClaudeCraft"
     },
     "language": {
-      "label": "Language",
-      "select": "Choose a language"
+      "label": "언어",
+      "select": "언어 선택"
     },
     "search": {
-      "label": "Search",
-      "placeholder": "Search the guide",
-      "noResults": "No matches",
-      "typePage": "Page",
-      "typeClass": "Class",
-      "typeZone": "Zone",
-      "typeCreature": "Creatures",
-      "typeDungeon": "Dungeon",
-      "typeTerm": "Term"
+      "label": "검색",
+      "placeholder": "가이드 검색",
+      "noResults": "일치하는 항목 없음",
+      "typePage": "페이지",
+      "typeClass": "직업",
+      "typeZone": "지역",
+      "typeCreature": "생명체",
+      "typeDungeon": "던전",
+      "typeTerm": "용어"
     },
     "home": {
-      "eyebrow": "Classic-style browser MMO",
+      "eyebrow": "클래식 스타일 브라우저 MMO",
       "title": "World of ClaudeCraft",
-      "subtitle": "Quest, group up, and explore a hand-built world, free in your browser.",
-      "ctaPlay": "Play Now",
-      "ctaLearn": "How to Play",
+      "subtitle": "퀘스트를 수행하고, 파티를 맺고, 손수 빚은 세계를 브라우저에서 무료로 탐험하세요.",
+      "ctaPlay": "지금 플레이",
+      "ctaLearn": "플레이 방법",
       "what": {
-        "heading": "A classic MMO, made to be picked up",
-        "pillarPlayTitle": "Play in your browser",
-        "pillarPlayBody": "No download, no launcher. Make a character and you are in the world in seconds, on desktop or phone.",
-        "pillarClassesTitle": "Nine classes, three roles",
-        "pillarClassesBody": "Tank, heal, or deal the damage. Every class plays the way its archetype should, with talents to make it yours.",
-        "pillarOpenTitle": "Free and open source",
-        "pillarOpenBody": "Free to play to the level cap, with the whole game open source. No pay to win, ever."
+        "heading": "누구나 쉽게 시작하는 클래식 MMO",
+        "pillarPlayTitle": "브라우저에서 바로 플레이",
+        "pillarPlayBody": "다운로드도, 런처도 필요 없습니다. 캐릭터를 만들면 PC든 휴대전화든 몇 초 만에 세계에 들어섭니다.",
+        "pillarClassesTitle": "9개의 직업, 3가지 역할",
+        "pillarClassesBody": "방어 전담을 맡거나, 치유하거나, 피해를 입히세요. 모든 직업이 본연의 원형에 맞게 플레이되며, 특성으로 나만의 방식을 만들 수 있습니다.",
+        "pillarOpenTitle": "무료이자 오픈 소스",
+        "pillarOpenBody": "최고 레벨까지 무료로 플레이할 수 있고, 게임 전체가 오픈 소스입니다. 결제로 이기는 일은 결코 없습니다."
       },
       "classes": {
-        "heading": "Choose your class",
-        "sub": "Nine classic archetypes, each with its own feel and party role.",
-        "cta": "Explore the classes"
+        "heading": "직업을 선택하세요",
+        "sub": "9가지 클래식 원형, 각자의 개성과 파티 내 역할을 지니고 있습니다.",
+        "cta": "직업 살펴보기"
       },
       "world": {
-        "heading": "Explore the world",
-        "sub": "One continuous land, three zones, from quiet valleys to frozen peaks.",
-        "levels": "Levels {min} to {max}",
-        "cta": "See the world",
-        "valeName": "Eastbrook Vale",
-        "valeBlurb": "Green hills and old woods where every adventure begins.",
-        "marshName": "Mirefen Marsh",
-        "marshBlurb": "Sunken fens and tide-worn ruins, home to murlocs and worse.",
-        "peaksName": "Thornpeak Heights",
-        "peaksBlurb": "Wind-scoured ridges climbing toward the realm's coldest dangers."
+        "heading": "세계를 탐험하세요",
+        "sub": "고요한 골짜기부터 얼어붙은 봉우리까지, 하나로 이어진 대지와 3개의 지역.",
+        "levels": "{min} - {max} 레벨",
+        "cta": "세계 둘러보기",
+        "valeName": "동부개울 골짜기",
+        "valeBlurb": "모든 모험이 시작되는 푸른 언덕과 오래된 숲.",
+        "marshName": "진흙늪 습지",
+        "marshBlurb": "가라앉은 늪지와 조수에 닳은 폐허, 멀록을 비롯한 더한 것들의 보금자리.",
+        "peaksName": "가시봉우리 고원",
+        "peaksBlurb": "왕국에서 가장 차가운 위험을 향해 솟아오른, 바람에 깎인 능선."
       },
       "group": {
-        "heading": "Group up for the hard parts",
-        "sub": "The world is soloable, but the best loot waits behind a good party.",
-        "dungeonsTitle": "Dungeons",
-        "dungeonsBody": "Instanced dives for a party of five, scaling with the zones around them.",
-        "raidTitle": "The raid",
-        "raidBody": "A ten-player capstone for those who reach the top of the world.",
-        "arenaTitle": "The arena",
-        "arenaBody": "Step into the Ashen Coliseum and prove yourself against other players.",
-        "cta": "Dungeons and Raids"
+        "heading": "어려운 구간은 함께",
+        "sub": "세계는 혼자서도 누빌 수 있지만, 최고의 전리품은 좋은 파티 뒤에 기다리고 있습니다.",
+        "dungeonsTitle": "던전",
+        "dungeonsBody": "5인 파티를 위한 인스턴스 던전으로, 주변 지역에 맞춰 난이도가 조정됩니다.",
+        "raidTitle": "공격대",
+        "raidBody": "세계의 정점에 오른 이들을 위한 10인 최종 도전.",
+        "arenaTitle": "투기장",
+        "arenaBody": "잿빛 투기장에 들어서 다른 플레이어와 맞서 실력을 증명하세요.",
+        "cta": "던전과 공격대"
       },
       "faq": {
-        "heading": "Good to know",
-        "q1": "Is it free to play?",
-        "a1": "Yes. The whole game is free to the level cap, and it is open source on GitHub.",
-        "q2": "Do I need a crypto wallet?",
-        "a2": "No. The game is fully playable without one. The optional community token only unlocks cosmetic flair and never affects power.",
-        "q3": "Can I play offline?",
-        "a3": "Yes. There is an instant single-player mode in your browser, plus the shared online realm.",
-        "q4": "How long to reach max level?",
-        "a4": "The cap is level {cap}, reached across three zones of quests, dungeons, and exploration."
+        "heading": "알아두면 좋은 점",
+        "q1": "무료로 플레이할 수 있나요?",
+        "a1": "네. 게임 전체를 최고 레벨까지 무료로 즐길 수 있으며, GitHub에 공개된 오픈 소스입니다.",
+        "q2": "암호화폐 지갑이 필요한가요?",
+        "a2": "아니요. 지갑 없이도 완전히 플레이할 수 있습니다. 선택 사항인 커뮤니티 토큰은 외형 장식만 해제하며, 결코 능력에 영향을 주지 않습니다.",
+        "q3": "오프라인으로 플레이할 수 있나요?",
+        "a3": "네. 브라우저에서 바로 즐기는 1인 플레이 모드와 함께 모두가 모이는 온라인 렐름도 있습니다.",
+        "q4": "최고 레벨까지 얼마나 걸리나요?",
+        "a4": "최고 레벨은 {cap}레벨이며, 퀘스트와 던전, 탐험으로 가득한 3개 지역을 거쳐 도달합니다."
       },
       "community": {
-        "heading": "Join the realm",
-        "body": "Jump in now, or come say hello. The world is better with company.",
-        "play": "Play Now",
-        "discord": "Join the Discord",
-        "github": "Star on GitHub"
+        "heading": "렐름에 참여하세요",
+        "body": "지금 바로 뛰어들거나, 들러서 인사를 건네세요. 세계는 함께할 때 더 즐겁습니다.",
+        "play": "지금 플레이",
+        "discord": "Discord 참여하기",
+        "github": "GitHub에서 별표 누르기"
       }
     },
     "howToPlay": {
-      "intro": "New to this kind of game? You will be questing in minutes. Here is the short version, one step at a time.",
-      "firstHeading": "Your first 15 minutes",
-      "step1Title": "Make a character",
-      "step1Body": "Pick a class and a look, give your hero a name, and enter the world. You can make more characters later.",
-      "step2Title": "Find your first quest",
-      "step2Body": "Marshal Redbrook is waiting in the starting town. Talk to him and accept Wolves at the Door.",
-      "step3Title": "Move and look around",
-      "step3Body": "Move with W, A, S, D. Hold the right mouse button and drag to look around. That is most of it.",
-      "step4Title": "Fight something",
-      "step4Body": "Press Tab to target the nearest enemy, then press your abilities on the bar (keys 1 through 0) to attack.",
-      "step5Title": "Turn it in",
-      "step5Body": "Finish the objective, return to the quest giver (look for the marker on your map), and collect your reward.",
-      "step6Title": "Keep going",
-      "step6Body": "You just hit level 2. Follow the quest trail out of town and the world opens up from there.",
-      "basicsHeading": "The basics",
-      "resourcesTitle": "Resources",
-      "resourcesBody": "Spells and abilities cost a resource. Warriors build Rage by fighting, rogues spend Energy that refills on its own, and everyone else casts from a pool of Mana.",
-      "targetingTitle": "Targeting and your bar",
-      "targetingBody": "Tab cycles enemies, F interacts and loots, and your action bar holds the abilities you have learned. Drag spells onto it from your spellbook.",
-      "questsTitle": "Quests",
-      "questsBody": "Accept quests from people with a marker over their head, complete the objective, and turn them in for experience, coin, and gear. The tracker on screen keeps your goals in view.",
-      "deathTitle": "Death is not the end",
-      "deathBody": "If you fall, you release your spirit at the nearest graveyard and run back to your body. No experience is lost.",
-      "groupingTitle": "Playing together",
-      "groupingBody": "Invite others to a party to share quest credit and take on dungeons. Most of the world is soloable, so grouping is a choice, not a chore.",
-      "onlineTitle": "Online or offline",
-      "onlineBody": "Play the shared online realm with everyone else, or start an instant offline world in your browser to learn the ropes.",
-      "reassure": "Talents unlock at level 10 and can be reset at any time, so your early choices are never permanent. Experiment freely.",
-      "controlsLink": "See the full controls reference"
+      "intro": "이런 게임이 처음이신가요? 몇 분이면 퀘스트를 수행하게 됩니다. 한 단계씩, 짧게 정리해 드릴게요.",
+      "firstHeading": "처음 15분",
+      "step1Title": "캐릭터 만들기",
+      "step1Body": "직업과 외형을 고르고, 영웅에게 이름을 지어준 뒤 세계로 들어가세요. 캐릭터는 나중에 더 만들 수 있습니다.",
+      "step2Title": "첫 퀘스트 찾기",
+      "step2Body": "시작 마을에서 레드브룩 원수가 기다리고 있습니다. 말을 걸고 '문 앞의 늑대' 퀘스트를 수락하세요.",
+      "step3Title": "이동하고 둘러보기",
+      "step3Body": "W, A, S, D로 이동합니다. 마우스 오른쪽 버튼을 누른 채 끌어서 시점을 돌리세요. 기본은 이게 거의 전부입니다.",
+      "step4Title": "전투 해보기",
+      "step4Body": "Tab을 눌러 가장 가까운 적을 대상으로 지정한 다음, 단축바의 능력(1번부터 0번까지)을 눌러 공격하세요.",
+      "step5Title": "퀘스트 완료하기",
+      "step5Body": "목표를 끝낸 뒤 퀘스트 제공자에게 돌아가(지도의 표시를 찾으세요) 보상을 받으세요.",
+      "step6Title": "계속 나아가기",
+      "step6Body": "방금 2레벨이 되었습니다. 마을 밖으로 이어지는 퀘스트 흐름을 따라가면 세계가 활짝 열립니다.",
+      "basicsHeading": "기본기",
+      "resourcesTitle": "자원",
+      "resourcesBody": "주문과 능력은 자원을 소모합니다. 전사는 싸우며 분노를 쌓고, 도적은 저절로 차오르는 기력을 소모하며, 나머지는 모두 마나 자원으로 시전합니다.",
+      "targetingTitle": "대상 지정과 단축바",
+      "targetingBody": "Tab으로 적을 차례로 지정하고, F로 상호작용하거나 전리품을 줍습니다. 행동 단축바에는 배운 능력이 놓입니다. 주문서에서 주문을 끌어다 올리세요.",
+      "questsTitle": "퀘스트",
+      "questsBody": "머리 위에 표시가 있는 사람에게서 퀘스트를 수락하고, 목표를 완료한 뒤 완수하여 경험치와 금화, 장비를 받으세요. 화면의 추적 창이 목표를 한눈에 보여줍니다.",
+      "deathTitle": "죽음은 끝이 아닙니다",
+      "deathBody": "쓰러지면 가장 가까운 묘지에서 영혼을 풀어내어 시신까지 달려가면 됩니다. 경험치는 잃지 않습니다.",
+      "groupingTitle": "함께 플레이하기",
+      "groupingBody": "다른 사람을 파티에 초대해 퀘스트 점수를 나누고 던전에 도전하세요. 세계 대부분은 혼자서도 누빌 수 있으니, 파티 플레이는 의무가 아니라 선택입니다.",
+      "onlineTitle": "온라인 또는 오프라인",
+      "onlineBody": "모두와 함께하는 온라인 렐름에서 플레이하거나, 브라우저에서 즉시 오프라인 세계를 열어 기본기를 익히세요.",
+      "reassure": "특성은 10레벨에 해금되며 언제든 초기화할 수 있으니, 초반 선택이 영구적인 일은 결코 없습니다. 마음껏 실험해 보세요.",
+      "controlsLink": "전체 조작법 참고 자료 보기"
     },
     "controls": {
-      "intro": "Default keys for desktop. Every binding can be changed in the game's options.",
-      "keyHeader": "Key",
-      "actionHeader": "Action",
-      "groupMovement": "Movement",
-      "groupCombat": "Targeting and combat",
-      "groupInterface": "Windows",
-      "groupCamera": "Camera",
-      "talents": "Talents",
-      "arena": "Arena",
-      "leaderboard": "Leaderboard",
-      "abilities": "Use abilities",
-      "mobileHeading": "On mobile",
-      "mobileBody": "Touch controls appear automatically on phones and tablets: a movement stick on the left, drag anywhere on the right to look, and on-screen buttons for your abilities and menus."
+      "intro": "PC 기본 단축키입니다. 모든 키 설정은 게임 옵션에서 바꿀 수 있습니다.",
+      "keyHeader": "키",
+      "actionHeader": "동작",
+      "groupMovement": "이동",
+      "groupCombat": "대상 지정과 전투",
+      "groupInterface": "창",
+      "groupCamera": "카메라",
+      "talents": "특성",
+      "arena": "투기장",
+      "leaderboard": "순위표",
+      "abilities": "능력 사용",
+      "mobileHeading": "모바일에서",
+      "mobileBody": "휴대전화와 태블릿에서는 터치 조작이 자동으로 나타납니다. 왼쪽에는 이동 스틱, 오른쪽 아무 곳이나 끌면 시점 전환, 그리고 능력과 메뉴를 위한 화면 버튼이 표시됩니다."
     },
     "combat": {
-      "intro": "Combat follows familiar classic-MMO rules. You never need to study any of it to play well, this is just the shape of how fights work.",
-      "hitTitle": "Not every blow lands",
-      "hitBody": "Attacks can miss or be dodged, parried, and blocked, and so can the enemy's. Fighting near your own level and keeping your gear current is what makes your hits connect.",
-      "mitigationTitle": "Armor and gear keep you standing",
-      "mitigationBody": "Armor softens physical hits and the right gear blunts magic, so upgrades are your main source of staying power. Heavier armor classes shrug off more, but nothing makes you untouchable.",
-      "resourcesTitle": "Every class has its own rhythm",
-      "resourcesBody": "Warriors build Rage in the thick of a fight, rogues spend Energy that steadily returns, and casters manage a pool of Mana. Learning your resource is half of playing your class well.",
-      "growTitle": "You grow stronger every level",
-      "growBody": "Each level makes you tougher and unlocks new abilities, all the way to the cap of level {cap}. Questing is the fastest way up; dungeons and exploration round it out.",
-      "effectsTitle": "Buffs, debuffs, and crowd control",
-      "effectsBody": "Many abilities apply an effect that lingers. Helpful ones (buffs) raise your stats, shield you, or heal you a little at a time; harmful ones (debuffs) drain your health with damage over time or weaken you. Watch the small icons near your action bar to see what is on you and how long it lasts.",
-      "ccBody": "Crowd control is a special kind of debuff that limits what a target can do: stuns, roots and slows, silences that stop spellcasting, disarms, fears, and polymorph that turns a foe harmless for a moment. Some of these, like roots, fears, and polymorph, lose their hold when they are reapplied too quickly, so they cannot be chained forever.",
-      "deathTitle": "When you fall",
-      "deathBody": "If your health reaches zero you are downed. You revive after a short wait and carry on from where you left off, so a death costs you a little time, not your progress. Between fights, sit to eat and drink so you start the next one at full strength."
+      "intro": "전투는 익숙한 클래식 MMO 규칙을 따릅니다. 잘 플레이하기 위해 이를 공부할 필요는 전혀 없으며, 그저 전투가 어떻게 돌아가는지에 대한 개요일 뿐입니다.",
+      "hitTitle": "모든 일격이 맞는 것은 아닙니다",
+      "hitBody": "공격은 빗나가거나 회피, 무기 막기, 방패 막기에 막힐 수 있으며, 적의 공격도 마찬가지입니다. 자신과 비슷한 레벨대에서 싸우고 장비를 최신으로 유지하는 것이 공격을 명중시키는 비결입니다.",
+      "mitigationTitle": "방어도와 장비가 버티게 해줍니다",
+      "mitigationBody": "방어도는 물리 공격을 완화하고 알맞은 장비는 마법을 무디게 하므로, 장비 업그레이드가 생존력의 주된 원천입니다. 중장갑 직업일수록 더 많이 흘려내지만, 그 무엇도 무적으로 만들어 주지는 않습니다.",
+      "resourcesTitle": "직업마다 고유한 리듬이 있습니다",
+      "resourcesBody": "전사는 격전 속에서 분노를 쌓고, 도적은 꾸준히 차오르는 기력을 소모하며, 마법사 계열은 마나 자원을 관리합니다. 자신의 자원을 익히는 것이 직업을 잘 플레이하는 절반입니다.",
+      "growTitle": "레벨마다 더 강해집니다",
+      "growBody": "레벨이 오를 때마다 더 단단해지고 새 능력이 해금되며, 최고 레벨인 {cap}레벨까지 이어집니다. 퀘스트가 가장 빠른 성장 길이고, 던전과 탐험이 이를 채워줍니다.",
+      "effectsTitle": "강화, 약화, 그리고 군중 제어",
+      "effectsBody": "많은 능력이 일정 시간 남는 효과를 부여합니다. 이로운 효과(강화)는 능력치를 올리거나 보호막을 씌우거나 조금씩 치유해 주고, 해로운 효과(약화)는 지속 피해로 생명력을 깎거나 당신을 약하게 만듭니다. 행동 단축바 근처의 작은 아이콘을 보고 무엇이 걸려 있고 얼마나 남았는지 확인하세요.",
+      "ccBody": "군중 제어는 대상이 할 수 있는 행동을 제한하는 특별한 종류의 약화 효과입니다. 기절, 속박과 둔화, 주문 시전을 막는 침묵, 무장 해제, 공포, 그리고 잠시 적을 무력하게 만드는 변이가 있습니다. 그중 속박, 공포, 변이 같은 일부는 너무 빨리 다시 걸면 효과가 풀리므로 무한정 이어 걸 수는 없습니다.",
+      "deathTitle": "쓰러졌을 때",
+      "deathBody": "생명력이 0에 이르면 쓰러집니다. 잠시 기다린 뒤 되살아나 멈췄던 자리에서 다시 이어 가므로, 죽음은 약간의 시간을 앗아갈 뿐 진행 상황까지 빼앗지는 않습니다. 전투 사이에는 앉아서 먹고 마시며 온전한 상태로 다음 싸움에 임하세요."
     },
     "glossary": {
-      "intro": "A quick reference for the terms used across this guide and in chat.",
-      "aggroTerm": "Aggro",
-      "aggroDef": "An enemy's attention. The player generating the most threat holds aggro and gets attacked.",
-      "threatTerm": "Threat",
-      "threatDef": "How much an enemy wants to attack you. The tank's job is to hold more threat than everyone else.",
-      "gcdTerm": "Global cooldown",
-      "gcdDef": "The short, shared pause after using most abilities, so you cannot fire everything at once.",
+      "intro": "이 가이드와 대화 곳곳에 쓰이는 용어를 간단히 정리했습니다.",
+      "aggroTerm": "어그로",
+      "aggroDef": "적의 주의를 뜻합니다. 위협 수준을 가장 많이 쌓은 플레이어가 어그로를 끌어 공격을 받습니다.",
+      "threatTerm": "위협 수준",
+      "threatDef": "적이 당신을 얼마나 공격하고 싶어 하는지를 뜻합니다. 탱커의 역할은 다른 누구보다 높은 위협 수준을 유지하는 것입니다.",
+      "gcdTerm": "공용 재사용 대기시간",
+      "gcdDef": "대부분의 능력을 사용한 뒤 따라오는 짧은 공용 대기 시간으로, 모든 능력을 한꺼번에 쏟아낼 수 없게 합니다.",
       "dpsTerm": "DPS",
-      "dpsDef": "Damage per second, a rough measure of how fast something deals damage.",
-      "buffTerm": "Buff",
-      "buffDef": "A helpful effect on you or an ally, like a blessing that raises a stat for a while.",
-      "debuffTerm": "Debuff",
-      "debuffDef": "A harmful effect on a target, like a slow, a bleed, or weakened armor.",
-      "dotTerm": "DoT and HoT",
-      "dotDef": "Damage over time and healing over time: effects that tick in steady pulses instead of all at once.",
-      "ccTerm": "Crowd control",
-      "ccDef": "Abilities that stun, root, or otherwise take an enemy out of the fight for a moment.",
-      "procTerm": "Proc",
-      "procDef": "A chance-based effect that fires off something else, like a bonus that sometimes triggers when you attack.",
-      "eliteTerm": "Elite",
-      "eliteDef": "A tougher-than-normal enemy, usually meant for a group. Dungeon and rare enemies are often elite.",
-      "rareTerm": "Rare",
-      "rareDef": "An uncommon named enemy that wanders a zone and drops better loot.",
-      "mobTerm": "Mob",
-      "mobDef": "Any computer-controlled creature in the world, friendly or hostile. Short for mobile.",
-      "tankTerm": "Tank",
-      "tankDef": "The party member who holds enemy aggro and absorbs the damage so others can fight safely.",
-      "healerTerm": "Healer",
-      "healerDef": "The party member who keeps everyone alive with healing spells.",
-      "specTerm": "Spec",
-      "specDef": "A specialization: the path you lean your class toward, like healing or damage, as you spend talents.",
-      "pullTerm": "Pull",
-      "pullDef": "To draw an enemy or group into a fight, usually deliberately and one batch at a time.",
-      "instanceTerm": "Instance",
-      "instanceDef": "A private copy of a dungeon or raid made just for your party."
+      "dpsDef": "초당 피해량으로, 무언가가 얼마나 빠르게 피해를 주는지를 대략적으로 나타내는 척도입니다.",
+      "buffTerm": "버프",
+      "buffDef": "자신이나 아군에게 걸리는 이로운 효과로, 한동안 능력치를 높여 주는 축복 같은 것입니다.",
+      "debuffTerm": "디버프",
+      "debuffDef": "대상에게 걸리는 해로운 효과로, 둔화나 출혈, 방어도 약화 같은 것입니다.",
+      "dotTerm": "지속 피해와 지속 치유",
+      "dotDef": "지속 피해와 지속 치유를 뜻하며, 한 번에 들어가지 않고 일정한 간격으로 들어가는 효과입니다.",
+      "ccTerm": "군중 제어",
+      "ccDef": "적을 기절시키거나 속박하는 등 잠시 전투에서 빼내는 기술입니다.",
+      "procTerm": "발동 효과",
+      "procDef": "공격할 때 가끔 발동하는 보너스처럼, 확률에 따라 다른 효과를 일으키는 효과입니다.",
+      "eliteTerm": "정예",
+      "eliteDef": "보통보다 강한 적으로, 대개 파티를 염두에 둔 상대입니다. 던전과 희귀 적은 흔히 정예입니다.",
+      "rareTerm": "희귀",
+      "rareDef": "지역을 떠도는 보기 드문 이름 있는 적으로, 더 좋은 전리품을 떨어뜨립니다.",
+      "mobTerm": "몹",
+      "mobDef": "세계에 있는 모든 컴퓨터 제어 생명체로, 우호적이든 적대적이든 포함합니다. mobile의 줄임말입니다.",
+      "tankTerm": "탱커",
+      "tankDef": "적의 어그로를 붙들고 피해를 흡수해 다른 이들이 안전하게 싸우게 해주는 파티원입니다.",
+      "healerTerm": "힐러",
+      "healerDef": "치유 주문으로 모두를 살려두는 파티원입니다.",
+      "specTerm": "전문화",
+      "specDef": "전문화를 뜻하며, 특성을 투자하며 치유나 피해처럼 직업을 기울이는 방향입니다.",
+      "pullTerm": "풀링",
+      "pullDef": "적이나 무리를 전투로 끌어들이는 것으로, 대개 의도적으로 한 무리씩 끌어옵니다.",
+      "instanceTerm": "인스턴스",
+      "instanceDef": "오직 자신의 파티만을 위해 만들어진 던전이나 공격대의 개별 사본입니다."
     },
     "faqPage": {
-      "intro": "The questions new players ask most often.",
-      "q1": "Is it really free?",
-      "a1": "Yes. The whole game is free to play to the level cap, and the source code is open on GitHub.",
-      "q2": "Do I need a crypto wallet or any tokens?",
-      "a2": "No. The game is fully playable without one. The optional community token only unlocks cosmetic flair and never affects power or progression.",
-      "q3": "Can I play on my phone?",
-      "a3": "Yes. The game runs in a mobile browser with touch controls, and there is a desktop launcher as well.",
-      "q4": "Can I play offline or solo?",
-      "a4": "Yes. There is an instant single-player offline mode, and the online world is fully soloable apart from dungeons and the raid.",
-      "q5": "How many classes are there?",
-      "a5": "Nine, covering the classic tank, healer, and damage roles, each with its own resource and signature abilities.",
-      "q6": "What is the level cap?",
-      "a6": "Level {cap}, reached across three connected zones of quests, dungeons, and exploration.",
-      "q7": "Will my character be saved?",
-      "a7": "Online characters are saved on the server automatically. Offline characters live in your browser for quick sessions and testing.",
-      "q8": "Can I host my own copy?",
-      "a8": "Yes. The project is open source, so you can run your own server. See the GitHub repository.",
-      "q9": "Is there PvP?",
-      "a9": "Yes. Duel anyone for fun, or step into the Ashen Coliseum to fight other players. PvP is opt in, so you are never forced into it.",
-      "q10": "What is there to do at max level?",
-      "a10": "The cap is level {cap}. From there you run the five-player dungeons and the ten-player raid, chase better gear, and test yourself in the arena.",
-      "q11": "How do I find a group?",
-      "a11": "Invite anyone you meet to a party, ask in chat, or team up at a dungeon. Most of the world is soloable, so grouping is a choice, not a requirement."
+      "intro": "새내기 플레이어가 가장 자주 묻는 질문들입니다.",
+      "q1": "정말 무료인가요?",
+      "a1": "네. 게임 전체를 최고 레벨까지 무료로 플레이할 수 있으며, 소스 코드는 GitHub에 공개되어 있습니다.",
+      "q2": "암호화폐 지갑이나 토큰이 필요한가요?",
+      "a2": "아니요. 그런 것 없이도 완전히 플레이할 수 있습니다. 선택 사항인 커뮤니티 토큰은 외형 장식만 해제하며, 능력이나 성장에는 결코 영향을 주지 않습니다.",
+      "q3": "휴대전화로 플레이할 수 있나요?",
+      "a3": "네. 게임은 터치 조작과 함께 모바일 브라우저에서 실행되며, PC용 런처도 있습니다.",
+      "q4": "오프라인이나 혼자서 플레이할 수 있나요?",
+      "a4": "네. 즉시 즐기는 1인 오프라인 모드가 있고, 온라인 세계도 던전과 공격대를 제외하면 혼자서 완전히 누빌 수 있습니다.",
+      "q5": "직업은 몇 개인가요?",
+      "a5": "9개로, 클래식한 탱커, 힐러, 딜러 역할을 아우르며 각자 고유한 자원과 대표 능력을 지니고 있습니다.",
+      "q6": "최고 레벨은 몇인가요?",
+      "a6": "{cap}레벨이며, 퀘스트와 던전, 탐험으로 이어진 3개 지역을 거쳐 도달합니다.",
+      "q7": "제 캐릭터가 저장되나요?",
+      "a7": "온라인 캐릭터는 서버에 자동으로 저장됩니다. 오프라인 캐릭터는 짧은 플레이와 시험용으로 브라우저에 보관됩니다.",
+      "q8": "제 서버를 직접 운영할 수 있나요?",
+      "a8": "네. 이 프로젝트는 오픈 소스라 직접 서버를 운영할 수 있습니다. GitHub 저장소를 참고하세요.",
+      "q9": "PvP가 있나요?",
+      "a9": "있습니다. 재미로 누구와든 결투하거나, 잿빛 콜로세움에 들어가 다른 플레이어와 싸울 수 있습니다. PvP는 직접 선택하는 방식이므로 절대 강요받지 않습니다.",
+      "q10": "최고 레벨에서는 무엇을 할 수 있나요?",
+      "a10": "최고 레벨은 {cap}레벨입니다. 그 이후로는 5인 던전과 10인 공격대를 진행하고, 더 좋은 장비를 모으며, 투기장에서 실력을 시험합니다.",
+      "q11": "파티는 어떻게 구하나요?",
+      "a11": "마주치는 누구든 파티에 초대하거나, 채팅으로 물어보거나, 던전 앞에서 팀을 꾸리세요. 세계 대부분은 혼자서도 진행할 수 있으므로, 파티 구성은 필수가 아니라 선택입니다."
     },
     "classList": {
-      "heading": "The nine classes",
-      "sub": "Tank, heal, or deal the damage. Pick the fantasy that calls to you, then make it your own with talents."
+      "heading": "9개의 직업",
+      "sub": "방어를 맡거나, 치유하거나, 피해를 입히세요. 마음을 끄는 환상을 골라 특성으로 나만의 것으로 만드세요."
     },
     "role": {
-      "tank": "Tank",
-      "healer": "Healer",
-      "damage": "Damage"
+      "tank": "탱커",
+      "healer": "힐러",
+      "damage": "딜러"
     },
     "resourceName": {
-      "rage": "Rage",
-      "mana": "Mana",
-      "energy": "Energy"
+      "rage": "분노",
+      "mana": "마나",
+      "energy": "기력"
     },
     "classPage": {
-      "back": "All classes",
-      "roleLabel": "Plays as",
-      "resourceLabel": "Resource",
-      "specsHeading": "Specializations",
-      "abilitiesHeading": "Signature abilities",
-      "abilitiesNote": "A taste of the kit. You learn more as you level, and talents reshape how it all plays.",
-      "masteryLabel": "Mastery",
-      "fullKitHeading": "The full kit",
-      "fullKitNote": "Every ability this class can learn, in the order it comes online. Talents decide which ones carry your build.",
-      "petsHeading": "Demons",
-      "petsNote": "Warlocks summon demons to fight beside them, each suited to a different job."
+      "back": "전체 직업",
+      "roleLabel": "역할",
+      "resourceLabel": "자원",
+      "specsHeading": "전문화",
+      "abilitiesHeading": "대표 능력",
+      "abilitiesNote": "능력 구성을 맛보기로 살펴봅니다. 레벨이 오르며 더 많이 배우게 되고, 특성이 전체 플레이 방식을 새롭게 빚어냅니다.",
+      "masteryLabel": "전문화",
+      "fullKitHeading": "전체 기술 구성",
+      "fullKitNote": "이 직업이 배울 수 있는 모든 기술을, 사용 가능해지는 순서대로 정리했습니다. 어떤 기술이 빌드의 중심이 될지는 특성이 결정합니다.",
+      "petsHeading": "악마",
+      "petsNote": "흑마법사는 곁에서 함께 싸울 악마를 소환하며, 각 악마는 서로 다른 역할에 맞습니다."
     },
     "classHook": {
-      "warrior": "A relentless front-line fighter who turns every blow taken into fuel for the next.",
-      "paladin": "A holy warrior who can shield allies, mend their wounds, or bring the hammer down.",
-      "hunter": "A ranged marksman with a loyal beast at their side and a trick for every foe.",
-      "rogue": "A master of stealth and poisons who strikes from the shadows and never fights fair.",
-      "priest": "A devoted healer whose light keeps the party standing, or whose shadow unmakes the enemy.",
-      "shaman": "A spirit-caller who bends storm, fire, and water, and mends allies between the lightning.",
-      "mage": "A spellweaver of fire, frost, and arcane who controls the battlefield from afar.",
-      "warlock": "A dark conjurer who commands demons and curses, trading life for devastating power.",
-      "druid": "A shapeshifter who tanks as a bear, savages foes as a cat, or heals in the thick of it."
+      "warrior": "받아낸 모든 일격을 다음 공격의 연료로 바꾸는, 집요한 최전방 전투원.",
+      "paladin": "아군을 보호하고 상처를 치유하거나, 적에게 망치를 내리찍는 신성한 전사.",
+      "hunter": "충직한 야수를 곁에 두고 모든 적에 맞설 한 수를 지닌 원거리 명사수.",
+      "rogue": "은신과 독의 달인으로, 그림자에서 덮치며 결코 정정당당하게 싸우지 않습니다.",
+      "priest": "빛으로 파티를 지탱하거나 그림자로 적을 무너뜨리는 헌신적인 치유사.",
+      "shaman": "폭풍과 불, 물을 다스리고 번개 사이로 아군을 치유하는 정령 소환사.",
+      "mage": "불과 냉기, 비전을 엮어 멀리서 전장을 지배하는 주문 직조사.",
+      "warlock": "악마와 저주를 부리며 생명을 대가로 파멸적인 힘을 얻는 어둠의 술사.",
+      "druid": "곰으로 방어하고, 표범으로 적을 난도질하며, 격전 속에서 치유하는 변신술사."
     },
     "tag": {
-      "melee": "Melee",
-      "ranged": "Ranged",
-      "both": "Melee or ranged",
-      "solo": "Solo friendly",
-      "group": "Group oriented",
-      "flexible": "Flexible",
-      "simple": "Simple",
-      "moderate": "Moderate",
-      "complex": "Complex",
-      "goodFirst": "Great first class"
+      "melee": "근접",
+      "ranged": "원거리",
+      "both": "근접 또는 원거리",
+      "solo": "솔로에 적합",
+      "group": "파티 중심",
+      "flexible": "유연함",
+      "simple": "단순함",
+      "moderate": "보통",
+      "complex": "복잡함",
+      "goodFirst": "첫 직업으로 좋음"
     },
     "chooser": {
-      "heading": "Find your class",
-      "intro": "Filter by how you like to play. Every class is viable, so this only narrows the field, it does not rank them.",
-      "role": "Role",
-      "style": "Style",
-      "resource": "Resource",
-      "complexity": "Complexity",
-      "goodFirst": "Good for beginners",
-      "clear": "Clear",
-      "results": "Showing {count} of {total}",
-      "none": "No class matches every filter. Clear one to see more."
+      "heading": "내 직업 찾기",
+      "intro": "선호하는 플레이 방식으로 걸러 보세요. 모든 직업이 충분히 강하므로, 이 기능은 선택지를 좁혀 줄 뿐 순위를 매기지 않습니다.",
+      "role": "역할",
+      "style": "방식",
+      "resource": "자원",
+      "complexity": "복잡도",
+      "goodFirst": "초보자에게 좋음",
+      "clear": "지우기",
+      "results": "{total}개 중 {count}개 표시",
+      "none": "모든 조건에 맞는 직업이 없습니다. 조건을 하나 지우면 더 많은 직업이 나타납니다."
     },
     "abilityHook": {
-      "heroic_strike": "Queues a heavier swing that spends rage on your next hit.",
-      "battle_shout": "A rallying cry that raises attack power for the party.",
-      "commanding_shout": "Bolsters stamina so everyone has more staying power in a fight.",
-      "charge": "Rushes a distant enemy to open the fight with a brief stun.",
-      "rend": "Opens a bleed that wears the target down over time.",
-      "thunder_clap": "Hits everything around you and slows their attacks.",
-      "seal_of_righteousness": "Imbues your swings with Holy damage, then spend it with Judgement.",
-      "holy_light": "A steady, sizable heal for topping off an ally or yourself.",
-      "devotion_aura": "A lasting self-buff that raises armor so hits land softer.",
-      "judgement": "Spends your active Seal to strike an enemy from short range.",
-      "blessing_of_might": "Raises a friendly target's attack power, good to cast before a pull.",
-      "divine_protection": "A quick holy shield to soak damage when things get rough.",
-      "raptor_strike": "A hard melee swing for when something closes the gap on you.",
-      "aspect_of_the_hawk": "A stance you keep up to sharpen your ranged attack power.",
-      "serpent_sting": "Lands a venom that bleeds nature damage over time.",
-      "arcane_shot": "An instant shot from range for quick extra damage.",
-      "concussive_shot": "Dazes the target and slows it so it cannot reach you.",
-      "mongoose_bite": "A counterstrike that opens up right after the enemy dodges.",
-      "sinister_strike": "Your reliable strike that builds combo points to spend later.",
-      "eviscerate": "Spends your combo points to finish a target with a burst.",
-      "garrote": "Open from stealth with a wire that bleeds the target over time.",
-      "backstab": "Slip behind a target with a dagger for a hard-hitting builder.",
-      "gouge": "Incapacitates the target briefly so you can reposition or peel.",
-      "cheap_shot": "Open from stealth with a stun and a head start on combo points.",
-      "smite": "A holy bolt for chipping down a target from range.",
-      "lesser_heal": "A steady cast to top up an ally when there is time to stand still.",
-      "power_word_fortitude": "Raises an ally's health pool, so cast it before the pull and keep it up.",
-      "shadow_word_pain": "Sticks a shadow rot on a foe, then you move on while it ticks.",
-      "power_word_shield": "Wraps an ally in a shield that soaks hits before they land.",
-      "renew": "A heal that ticks over time, good to cast and keep moving.",
-      "lightning_bolt": "A ranged cast of Nature damage, your go-to from afar.",
-      "rockbiter_weapon": "Imbues your weapon so each swing lands harder in melee.",
-      "healing_wave": "Your main heal, a direct mend for yourself or an ally.",
-      "earth_shock": "An instant shock for quick Nature damage when you need it now.",
-      "lightning_shield": "Charges you so attackers take Nature damage when they hit you.",
-      "flame_shock": "An instant burn that hits up front and keeps searing over time.",
-      "fireball": "Your main fire nuke, lands a hit and leaves the target burning.",
-      "frost_armor": "A lasting self-buff that hardens your armor before a fight.",
-      "arcane_intellect": "Raises Intellect to deepen an ally's mana pool, cast it before the pull.",
-      "frostbolt": "Strikes from range and slows the target so it cannot close on you.",
-      "conjure_water": "Conjures drinks that restore mana, so you can refill between pulls.",
-      "conjure_food": "Conjures food that restores health when you sit down to eat.",
-      "shadow_bolt": "A bolt of shadow you cast at a target, your go-to nuke.",
-      "summon_imp": "Calls up an imp that flings firebolts at enemies from range.",
-      "demon_skin": "A lasting self-buff that toughens your skin and adds armor.",
-      "immolate": "Sets a target alight for an opening hit and a burn that lingers.",
-      "corruption": "Rots a target with shadow that ticks while you do other things.",
-      "life_tap": "Trades some of your own health back into mana when you run dry.",
-      "wrath": "A nature bolt thrown at a target from range, your go-to nuke.",
-      "healing_touch": "A big single-target heal with a long cast, for topping someone off.",
-      "mark_of_the_wild": "A lasting blessing you put on yourself or an ally before a fight.",
-      "moonfire": "Hits instantly and leaves the target burning, good while moving.",
-      "rejuvenation": "Casts instantly and heals an ally over time, so you can keep acting.",
-      "thorns": "Wards an ally so melee attackers hurt themselves for striking."
+      "heroic_strike": "다음 타격에 분노를 소모해 더 강하게 휘두르도록 예약합니다.",
+      "battle_shout": "파티 전체의 공격력을 높여 주는 사기를 북돋우는 외침입니다.",
+      "commanding_shout": "체력을 높여 모두가 전투에서 더 오래 버틸 수 있게 합니다.",
+      "charge": "멀리 있는 적에게 돌진해 잠시 기절시키며 전투를 시작합니다.",
+      "rend": "시간이 지나며 대상을 약화시키는 출혈을 입힙니다.",
+      "thunder_clap": "주위의 모든 적을 타격하고 그들의 공격 속도를 늦춥니다.",
+      "seal_of_righteousness": "공격에 신성 피해를 부여하고, 심판으로 그 기운을 소모합니다.",
+      "holy_light": "아군이나 자신의 체력을 채워 주는 안정적이고 큰 치유입니다.",
+      "devotion_aura": "방어도를 높여 받는 타격을 줄여 주는 지속형 자기 강화입니다.",
+      "judgement": "현재 활성화된 인장을 소모해 근거리에서 적을 강타합니다.",
+      "blessing_of_might": "아군 대상의 공격력을 높여 주며, 전투를 시작하기 전에 시전하면 좋습니다.",
+      "divine_protection": "상황이 험해질 때 피해를 흡수하는 신속한 신성 보호막입니다.",
+      "raptor_strike": "무언가가 거리를 좁혀 왔을 때 강하게 휘두르는 근접 일격입니다.",
+      "aspect_of_the_hawk": "유지해 두면 원거리 공격력을 높여 주는 상입니다.",
+      "serpent_sting": "독을 묻혀 시간이 지나며 자연 피해의 출혈을 입힙니다.",
+      "arcane_shot": "원거리에서 즉시 날리는 사격으로, 빠르게 추가 피해를 줍니다.",
+      "concussive_shot": "대상을 멍하게 만들고 이동 속도를 늦춰 당신에게 다가오지 못하게 합니다.",
+      "mongoose_bite": "적이 회피한 직후에 사용할 수 있게 열리는 반격기입니다.",
+      "sinister_strike": "나중에 소모할 연계 점수를 쌓는 믿음직한 일격입니다.",
+      "eviscerate": "쌓아 둔 연계 점수를 소모해 대상에게 폭발적인 마무리를 가합니다.",
+      "garrote": "은신 상태에서 철사로 기습해 시간이 지나며 대상을 출혈시킵니다.",
+      "backstab": "단검을 들고 대상 뒤로 파고들어 강하게 내리치는 연계 기술입니다.",
+      "gouge": "대상을 잠시 무력화하여 위치를 바꾸거나 보호할 틈을 만듭니다.",
+      "cheap_shot": "은신 상태에서 기절과 함께 기습하여 연계 점수를 먼저 쌓습니다.",
+      "smite": "원거리에서 대상을 조금씩 깎아내는 신성 화살입니다.",
+      "lesser_heal": "가만히 서 있을 여유가 있을 때 아군의 체력을 채우는 안정적인 치유입니다.",
+      "power_word_fortitude": "아군의 생명력을 높여 주므로, 전투를 시작하기 전에 시전하고 유지하세요.",
+      "shadow_word_pain": "적에게 어둠의 부식을 걸어 두고, 피해가 들어가는 동안 다른 일을 합니다.",
+      "power_word_shield": "아군을 보호막으로 감싸 타격이 닿기 전에 흡수합니다.",
+      "renew": "시간이 지나며 회복되는 치유로, 시전하고 계속 이동하기 좋습니다.",
+      "lightning_bolt": "자연 피해를 주는 원거리 시전기로, 멀리서 쓰는 주력기입니다.",
+      "rockbiter_weapon": "무기에 기운을 불어넣어 근접 공격이 더 강하게 들어가게 합니다.",
+      "healing_wave": "주력 치유로, 자신이나 아군의 체력을 직접 회복시킵니다.",
+      "earth_shock": "지금 당장 필요한 자연 피해를 즉시 주는 충격기입니다.",
+      "lightning_shield": "몸에 전하를 둘러 공격자가 당신을 칠 때 자연 피해를 받게 합니다.",
+      "flame_shock": "즉시 타격을 입히고 시간이 지나며 계속 불태우는 점화기입니다.",
+      "fireball": "주력 화염 공격기로, 타격을 입히고 대상을 계속 불태웁니다.",
+      "frost_armor": "전투 전에 방어구를 단단하게 만드는 지속형 자기 강화입니다.",
+      "arcane_intellect": "지능을 높여 아군의 마나량을 늘려 줍니다. 전투를 시작하기 전에 시전하세요.",
+      "frostbolt": "원거리에서 타격하며 대상의 이동 속도를 늦춰 다가오지 못하게 합니다.",
+      "conjure_water": "마나를 회복시켜 주는 음료를 창조하여 전투 사이에 채울 수 있습니다.",
+      "conjure_food": "앉아서 먹으면 생명력을 회복시켜 주는 음식을 창조합니다.",
+      "shadow_bolt": "대상에게 시전하는 어둠의 화살로, 주력 공격기입니다.",
+      "summon_imp": "원거리에서 적에게 화염 화살을 날리는 임프를 불러냅니다.",
+      "demon_skin": "피부를 단단하게 만들어 방어도를 높여 주는 지속형 자기 강화입니다.",
+      "immolate": "대상에 불을 붙여 첫 타격을 입히고 지속되는 화염 피해를 남깁니다.",
+      "corruption": "대상을 어둠으로 부식시켜, 다른 일을 하는 동안에도 피해가 들어갑니다.",
+      "life_tap": "마나가 바닥날 때 자신의 생명력 일부를 마나로 전환합니다.",
+      "wrath": "원거리에서 대상에게 던지는 자연 화살로, 주력 공격기입니다.",
+      "healing_touch": "시전 시간이 긴 강력한 단일 대상 치유로, 체력을 가득 채울 때 씁니다.",
+      "mark_of_the_wild": "전투 전에 자신이나 아군에게 걸어 두는 지속형 축복입니다.",
+      "moonfire": "즉시 타격하고 대상을 계속 불태우므로, 이동 중에 쓰기 좋습니다.",
+      "rejuvenation": "즉시 시전되어 아군을 지속적으로 치유하므로, 계속 행동할 수 있습니다.",
+      "thorns": "아군을 보호해, 근접 공격자가 칠 때마다 스스로 피해를 입게 합니다."
     },
     "petHook": {
-      "imp": "A ranged firebolt demon that chips at enemies from a safe distance.",
-      "voidwalker": "A sturdy demon that taunts and soaks hits so you can cast in peace.",
-      "succubus": "A fast melee demon that hits hard but folds under pressure.",
-      "felhunter": "A shadow skirmisher that hounds enemy casters.",
-      "felguard": "A durable melee bruiser, the all-rounder once you can summon it.",
-      "infernal": "A hulking juggernaut with crushing melee, summoned for raw power.",
-      "doomguard": "An elite caster that rains heavy shadow from afar."
+      "imp": "안전한 거리에서 적을 조금씩 깎는 원거리 화염 화살 악마입니다.",
+      "voidwalker": "도발하고 타격을 흡수해 주는 단단한 악마로, 안심하고 시전할 수 있게 합니다.",
+      "succubus": "강하게 때리지만 압박에는 쉽게 무너지는 빠른 근접 악마입니다.",
+      "felhunter": "적 시전자를 집요하게 쫓는 어둠의 척후형 악마입니다.",
+      "felguard": "단단한 근접 강타형 악마로, 소환할 수 있게 되면 다재다능한 만능 일꾼입니다.",
+      "infernal": "강력한 근접 공격을 지닌 거대한 돌격형 악마로, 순수한 힘을 위해 소환합니다.",
+      "doomguard": "멀리서 강력한 어둠 마법을 퍼붓는 정예 시전형 악마입니다."
     },
     "bestiary": {
-      "heading": "Bestiary",
-      "intro": "The creatures of the world, grouped by family. These are the foes you meet out in the open. The deadliest things wait, unlisted, behind dungeon doors.",
-      "rare": "Rare",
-      "levels": "Levels {min} to {max}",
-      "levelsSame": "Level {min}",
-      "notedLabel": "Of note",
+      "heading": "몬스터 도감",
+      "intro": "세계의 생명체들을 종족별로 묶었습니다. 이들은 야외에서 마주치는 적입니다. 가장 치명적인 것들은 도감에 오르지 않은 채, 던전 문 너머에서 기다립니다.",
+      "rare": "희귀",
+      "levels": "{min}~{max}레벨",
+      "levelsSame": "{min}레벨",
+      "notedLabel": "특기 사항",
       "flavor": {
-        "old_greyjaw": "A scarred old wolf no trap has held, blamed for three hounds and a stable boy's arm. He hunts the deep woods alone, and turns savage the longer a fight wears on.",
-        "grubjaw": "A fen troll so greedy the other trolls will not dig beside him, said to have eaten a trader's last two pack-mules, harness and all.",
-        "shardlord_kazzix": "A storm elemental given shoulders, walking the far crags above Stormcrag with a heartshard worth braving the lightning for.",
-        "mirejaw_frenzy": "A marsh murloc that whips itself into a thrashing frenzy mid-fight, the loudest thing in a loud, territorial pack.",
-        "gravecaller_cultist": "Robed servants of the death-cult whose work fouls the graves from the Vale to the peaks. Where they gather, the dead do not rest."
+        "old_greyjaw": "어떤 덫도 가두지 못한, 상처투성이 늙은 늑대. 사냥개 셋과 마구간 소년의 팔이 이놈 탓으로 돌려졌습니다. 깊은 숲을 홀로 사냥하며, 싸움이 길어질수록 더욱 사나워집니다.",
+        "grubjaw": "다른 트롤들조차 곁에서 땅을 파려 하지 않을 만큼 탐욕스러운 습지 트롤로, 한 상인의 마지막 짐말 두 마리를 멍에까지 통째로 삼켰다고 전해집니다.",
+        "shardlord_kazzix": "어깨를 갖춘 폭풍의 정령으로, 스톰크래그 위 먼 바위산을 거닐며 번개를 무릅쓸 만한 가치가 있는 심장 파편을 지니고 있습니다.",
+        "mirejaw_frenzy": "전투 도중 스스로를 광란으로 몰아넣어 마구 날뛰는 습지 멀록으로, 시끄럽고 영역 의식 강한 무리 가운데서도 가장 요란합니다.",
+        "gravecaller_cultist": "골짜기에서 봉우리까지 무덤을 더럽히는 죽음교단의 로브 두른 종복들. 이들이 모이는 곳에서는 죽은 자가 쉬지 못합니다."
       }
     },
     "family": {
       "beast": {
-        "name": "Beasts",
-        "desc": "Wild animals of forest and field, from wolves and boars to the things that prey on them. Hunters can tame many of them."
+        "name": "야수",
+        "desc": "늑대와 멧돼지부터 이들을 노리는 포식자까지, 숲과 들판의 야생 동물들. 사냥꾼은 그중 다수를 길들일 수 있습니다."
       },
       "spider": {
-        "name": "Spiders",
-        "desc": "Web-spinners and venomous lurkers that nest in dark, tangled places."
+        "name": "거미",
+        "desc": "어둡고 뒤엉킨 곳에 둥지를 트는 거미줄 짜는 자들과 독을 품은 잠복자들."
       },
       "murloc": {
-        "name": "Murlocs",
-        "desc": "Amphibious marsh-dwellers that swarm the shallows in noisy, territorial packs."
+        "name": "멀록",
+        "desc": "시끄럽고 영역 의식이 강한 무리를 이루어 얕은 물가에 떼지어 모이는 양서류 늪지 거주자들."
       },
       "kobold": {
-        "name": "Kobolds",
-        "desc": "Candle-headed diggers that infest mines and burrows, fiercely guarding their ore."
+        "name": "코볼트",
+        "desc": "광산과 굴을 들끓게 하며 자기네 광석을 사납게 지키는, 머리에 양초를 단 굴착꾼들."
       },
       "humanoid": {
-        "name": "Humanoids",
-        "desc": "Bandits, cultists, and others who took up the wrong trade. They fight with tactics, not just teeth."
+        "name": "인간형",
+        "desc": "산적과 광신도, 그리고 잘못된 길로 들어선 자들. 이들은 이빨이 아니라 전술로 싸웁니다."
       },
       "troll": {
-        "name": "Trolls",
-        "desc": "Hulking, fast-healing brutes that lair in the marsh and the high country."
+        "name": "트롤",
+        "desc": "습지와 고지대에 둥지를 트는, 빠르게 회복하는 거대한 짐승들."
       },
       "ogre": {
-        "name": "Ogres",
-        "desc": "Enormous, slow-witted, and dangerous. They camp the high passes and hit like a landslide."
+        "name": "오우거",
+        "desc": "거대하고 둔하지만 위험합니다. 높은 고갯길에 진을 치고 산사태처럼 내리칩니다."
       },
       "undead": {
-        "name": "Undead",
-        "desc": "The restless dead, raised by darker hands. They do not tire and they do not flee."
+        "name": "언데드",
+        "desc": "더 어두운 손에 의해 일으켜진 안식 없는 망자들. 지치지도, 달아나지도 않습니다."
       },
       "elemental": {
-        "name": "Elementals",
-        "desc": "Living storm and stone, bound to the wild places where the elements run strong."
+        "name": "정령",
+        "desc": "원소가 강하게 흐르는 야생의 장소에 매여 있는, 살아 있는 폭풍과 돌."
       }
     },
     "worldPage": {
-      "heading": "The world",
-      "intro": "World of ClaudeCraft is one continuous land you cross on foot, three zones laid south to north. There is no fast travel, so the journey is part of the adventure.",
-      "hub": "Home base",
-      "mapHeading": "The road north",
-      "mapSub": "Three zones, south to north, each a step higher in level. Follow the quest trail and the land carries you from the valley to the peaks.",
-      "places": "Notable places",
-      "residents": "Who you will meet",
-      "valeBlurb": "The green starting valley, where new heroes cut their teeth on wolves and bandits around the town of Eastbrook.",
-      "marshBlurb": "A drowned country of fog and ruins. Murlocs swarm the shallows and something older stirs beneath the water, watched from the bridge-town of Fenbridge.",
-      "peaksBlurb": "Wind-scoured ridges and old mine-works climbing to the realm's coldest, highest dangers, held by the outpost of Highwatch.",
-      "valeGreeting": "Keep your blade close. The Vale is not what it was.",
-      "valeGreeter": "Marshal Redbrook, Eastbrook",
-      "marshGreeting": "Hold at the gate. Past those reeds, the fen does the killing for us.",
-      "marshGreeter": "Warden Fenwick, Fenbridge",
-      "peaksGreeting": "Two hundred years this wall has held. It will not break on my watch, but it groans.",
-      "peaksGreeter": "Captain Thessaly, Highwatch",
-      "valePlaceNotes": "Eastbrook is your first home base. Wolf Run and Boar Meadow are gentle hunting ground; Mirror Lake is quiet water to fish; the Webwood and the Copper Dig hide spiders and ore-greedy diggers; a Bandit Camp and the Fallen Chapel hold rougher work; Brightwood Glade is a calm wildlife grove in the north.",
-      "marshPlaceNotes": "Fenbridge guards the only dry road. The Prowler Reeds and Deepfen Shallows teem with marsh beasts and murlocs; the Widow Thicket is spun thick with web; the Drowned Chapel and the Troll Mounds keep older dangers; the Gravecaller Encampment is the cult dug in, and the Sunken Bastion is the marsh's instanced heart.",
-      "peaksPlaceNotes": "Highwatch holds the wall. Stalker Ridge and the Deeprock Burrows belong to ridge cats and kobolds; the Ogre Foothills and Drogmar's War-Camp to brutes for hire; Stormcrag crackles with elementals and the Glimmermere glows below it; the Wyrmcult Tents and Revenant Fields ring the cult's high ground, with Gravewyrm Sanctum at its peak.",
-      "gladeTitle": "A quiet corner: Brightwood Glade",
-      "gladeBody": "Not every story in the Vale is about the dead. In the north, a sunlit grove called Brightwood Glade keeps its own gentler rhythm, with quiet paths, grazing deer, and wary beasts under the boughs. It is a soft counterpoint to the trail you are following, and worth seeing when the road gives you room to wander."
+      "heading": "세계",
+      "intro": "World of ClaudeCraft는 두 발로 가로지르는 하나로 이어진 대지이며, 남에서 북으로 펼쳐진 세 개의 지역으로 이루어져 있습니다. 빠른 이동이 없으니, 여정 자체가 모험의 일부입니다.",
+      "hub": "본거지",
+      "mapHeading": "북쪽으로 가는 길",
+      "mapSub": "남쪽에서 북쪽으로 이어지는 세 지역은 각각 레벨이 한 단계씩 높아집니다. 퀘스트 길을 따라가면 땅이 당신을 골짜기에서 봉우리까지 이끌어 줍니다.",
+      "places": "주요 명소",
+      "residents": "만나게 될 이들",
+      "valeBlurb": "새내기 영웅들이 동개울 마을 주변에서 늑대와 산적을 상대로 실력을 갈고닦는 푸른 시작의 골짜기.",
+      "marshBlurb": "안개와 폐허에 잠긴 땅. 멀록이 얕은 물가에 떼지어 모이고 물밑에서는 더 오래된 무언가가 꿈틀거리며, 펜브릿지 다리 마을에서 이를 지켜봅니다.",
+      "peaksBlurb": "왕국에서 가장 차갑고 높은 위험을 향해 솟아오른, 바람에 깎인 능선과 오래된 광산 터. 높은감시 전초기지가 이곳을 지킵니다.",
+      "valeGreeting": "칼을 가까이 두시오. 골짜기는 예전 같지 않으니.",
+      "valeGreeter": "레드브룩 원수, 이스트브룩",
+      "marshGreeting": "문에서 멈추시오. 저 갈대밭 너머에서는, 습지가 우리 대신 죽이는 일을 하니까.",
+      "marshGreeter": "감시관 펜윅, 펜브리지",
+      "peaksGreeting": "이 성벽이 이백 년을 버텨 왔소. 내가 지키는 한 무너지지 않겠지만, 신음하고 있긴 하지.",
+      "peaksGreeter": "대장 테살리, 하이워치",
+      "valePlaceNotes": "이스트브룩은 당신의 첫 본거지입니다. 늑대길과 멧돼지 초원은 무난한 사냥터이고, 거울 호수는 낚시하기 좋은 잔잔한 물입니다. 거미숲과 구리 채굴장에는 거미와 광석에 굶주린 굴착꾼이 숨어 있고, 산적 야영지와 무너진 예배당은 한층 거친 일거리를 품으며, 브라이트우드 숲은 북쪽의 고요한 야생 동물 숲입니다.",
+      "marshPlaceNotes": "펜브리지는 유일하게 마른 길을 지킵니다. 배회자 갈대밭과 깊은습지 얕은 물에는 습지 짐승과 멀록이 들끓고, 과부 덤불은 거미줄로 빽빽이 얽혀 있습니다. 익사한 예배당과 트롤 봉분은 한층 오래된 위험을 품고, 무덤부름 야영지는 교단이 자리를 틀고 박힌 곳이며, 가라앉은 요새는 습지의 인스턴스 심장부입니다.",
+      "peaksPlaceNotes": "하이워치가 성벽을 지킵니다. 추적자 능선과 깊은바위 굴은 능선 들고양이와 코볼트의 차지이고, 오우거 산기슭과 드로그마르의 전쟁 야영지는 고용된 흉포한 자들의 것입니다. 스톰크래그는 정령들로 들끓고 그 아래에서 글리머미어가 빛나며, 고룡교단 천막과 망령의 들판이 교단의 높은 거점을 에워싸고, 그 정점에 무덤고룡 성소가 있습니다.",
+      "gladeTitle": "고요한 한구석: 브라이트우드 숲",
+      "gladeBody": "계곡의 모든 이야기가 죽은 자들에 관한 것은 아닙니다. 북쪽에는 브라이트우드라는 햇살 드는 숲이 있어 조용한 길, 풀을 뜯는 사슴, 가지 아래의 경계심 많은 짐승들과 함께 더 부드러운 고유한 리듬을 지킵니다. 당신이 따라가는 흔적에 대한 차분한 대비이며, 길이 잠시 여유를 줄 때 둘러볼 만한 곳입니다."
     },
     "questsPage": {
-      "heading": "Quests",
-      "intro": "Quests are the heart of the world and the fastest way to level. Here is how they work.",
-      "acceptTitle": "Finding and accepting",
-      "acceptBody": "People with a marker over their head have work for you. Talk to them to accept a quest. Your very first is Wolves at the Door, from Marshal Redbrook in Eastbrook.",
-      "objectivesTitle": "Objectives",
-      "objectivesBody": "Slay certain enemies, gather items, or interact with something in the world. The on-screen tracker counts your progress as you go.",
-      "turninTitle": "Turning in",
-      "turninBody": "Return to the quest giver, the map shows you where, for experience, coin, and often a piece of gear chosen to suit your class.",
-      "partyTitle": "Questing in a group",
-      "partyBody": "Party members nearby share kill and objective credit, so questing together is faster, never slower.",
-      "storyTitle": "A thread runs through it all",
-      "storyBody": "From your first errands in Eastbrook, something is wrong with the dead. A cult is at work, and the trail leads north through every zone. Follow it to learn who stands behind it.",
-      "soloNote": "The main story is fully soloable; only its final chapters call for a group.",
-      "typesTitle": "The kinds of quest you will see",
-      "typesBody": "Most quests are one of a few familiar shapes. The on-screen tracker spells out exactly what each one wants, so you are never left guessing.",
-      "typeSlayTitle": "Slay",
-      "typeSlayBody": "Thin out a pack of beasts or break a cult's hold by defeating a set number of a marked enemy. The first quest in the game, clearing wolves off the Eastbrook road, is one of these.",
-      "typeGatherTitle": "Gather",
-      "typeGatherBody": "Collect items from the world or from what enemies drop: herbs, ore, lost letters, a cult's grim reagents. Some pieces only fall from a particular foe, so the hunt and the haul go together.",
-      "typeInteractTitle": "Interact",
-      "typeInteractBody": "Use, cleanse, or read something fixed in the world: a defiled grave, a warning carved on a shore-rock, a sealed crypt door. Walk up to the marker and act on it.",
-      "typeMusterTitle": "Escort and muster",
-      "typeMusterBody": "See a friendly face safely from one place to another, or rally a town's defenders before a push north. These keep you moving with the people whose story you are in.",
-      "typeGroupTitle": "Group finales",
-      "typeGroupBody": "Each chapter of the main story ends at a dungeon door. The lead-in is soloable, but the final blow against a chapter's villain is meant for a party of five (and the very last, for ten).",
-      "sagaTitle": "Follow the trail north",
-      "sagaBody": "The main story is one long chase. A death-cult is at work on the realm's graves, and every chapter you close points one zone further up the road. You never fight the whole conspiracy at once; you pull one thread, and it leads to the next hand holding it.",
-      "sagaValeTitle": "The Vale: a name on a sigil",
-      "sagaValeBody": "In Eastbrook the dead will not rest, and the mark behind it belongs to a sect long thought gone. Trace it to a Gravecaller working the chapel crypt, and his own papers point you toward the fen in the north.",
-      "sagaMarshTitle": "The marsh: a tithe of souls",
-      "sagaMarshBody": "In Mirefen the drownings are no accident. Someone is filling the fen like a tithing box, raising obedient dead from every traveler the water takes. Chase the orders up the chain to a Mistcaller in the drowned bastion, whose last words name something older still, stirring beneath the peaks.",
-      "sagaPeaksTitle": "The peaks: what the tithe was for",
-      "sagaPeaksBody": "On Thornpeak the whole scheme comes clear. Every soul stolen since the Vale was a tithe poured toward waking an ancient thing sealed beneath the mountain. The trail that began in a chapel yard ends here, at a door it takes ten to open. We will let you find out who waits behind it.",
-      "sideTitle": "Threads off the main road",
-      "sideWardenTitle": "Earning your name",
-      "sideWardenBody": "Alongside the story, the wardens of the Vale and the fen hand out a standing bounty ladder. Work your way up it, foe by foe, the way every warden before you earned their place. It is honest leveling and a tour of each zone's worst troublemakers.",
-      "sideCryptTitle": "The forgotten king",
-      "sideCryptBody": "High on the peaks runs a quieter mystery: old graves marked with a crown no record remembers. Read the dead, gather what they guarded, and unseal a tomb that was meant to stay shut. It is a detective's trail that opens the way to a second endgame trial for a full raid."
+      "heading": "퀘스트",
+      "intro": "퀘스트는 세계의 심장이자 가장 빠른 성장 수단입니다. 작동 방식은 다음과 같습니다.",
+      "acceptTitle": "찾기와 수락하기",
+      "acceptBody": "머리 위에 표식이 있는 사람들이 당신에게 맡길 일이 있습니다. 그들에게 말을 걸어 퀘스트를 수락하세요. 가장 첫 퀘스트는 동개울의 레드브룩 원수가 주는 '문 앞의 늑대들'입니다.",
+      "objectivesTitle": "목표",
+      "objectivesBody": "특정 적을 처치하거나, 아이템을 모으거나, 세계의 무언가와 상호작용하세요. 화면의 추적기가 진행 상황을 실시간으로 세어 줍니다.",
+      "turninTitle": "완료하기",
+      "turninBody": "퀘스트를 준 사람에게 돌아가면(지도가 위치를 알려줍니다) 경험치와 돈, 그리고 흔히 직업에 맞춘 장비 한 점을 받습니다.",
+      "partyTitle": "파티로 퀘스트하기",
+      "partyBody": "가까이 있는 파티원은 처치와 목표 공로를 나누므로, 함께하는 퀘스트는 더 빠르면 빨랐지 결코 느리지 않습니다.",
+      "storyTitle": "하나의 실타래가 모든 것을 꿰뚫습니다",
+      "storyBody": "동개울에서의 첫 심부름부터, 죽은 자들에게 무언가 잘못되어 갑니다. 한 교단이 암약하고 있으며, 그 자취는 모든 지역을 거쳐 북쪽으로 이어집니다. 자취를 좇아 그 배후가 누구인지 밝혀내세요.",
+      "soloNote": "메인 스토리는 완전히 혼자서 진행할 수 있으며, 마지막 장만이 파티를 필요로 합니다.",
+      "typesTitle": "만나게 될 퀘스트의 종류",
+      "typesBody": "대부분의 퀘스트는 익숙한 몇 가지 형태 중 하나입니다. 화면의 추적 창이 각각 무엇을 원하는지 정확히 일러 주므로, 헤맬 일이 없습니다.",
+      "typeSlayTitle": "처치",
+      "typeSlayBody": "정해진 수의 표적 적을 물리쳐 짐승 무리를 솎아내거나 교단의 손아귀를 무너뜨리세요. 게임의 첫 퀘스트인 동부개울 길의 늑대 처치도 이런 종류입니다.",
+      "typeGatherTitle": "수집",
+      "typeGatherBody": "세계에서, 또는 적이 떨어뜨리는 것에서 물건을 모으세요. 약초와 광석, 잃어버린 편지, 교단의 음산한 마법 재료까지. 어떤 것은 특정 적에게서만 나오므로, 사냥과 수집이 함께 갑니다.",
+      "typeInteractTitle": "상호작용",
+      "typeInteractBody": "세계에 고정된 무언가를 쓰거나, 정화하거나, 읽으세요. 더럽혀진 무덤, 기슭 바위에 새겨진 경고, 봉인된 묘실 문 같은 것들입니다. 표식에 다가가 그것에 손을 쓰세요.",
+      "typeMusterTitle": "호위와 소집",
+      "typeMusterBody": "다정한 이를 한 곳에서 다른 곳으로 무사히 데려가거나, 북진을 앞두고 마을의 수비대를 불러 모으세요. 이런 퀘스트는 당신이 그 이야기 속에 함께 있는 사람들과 발맞춰 나아가게 해 줍니다.",
+      "typeGroupTitle": "파티 피날레",
+      "typeGroupBody": "주된 이야기의 모든 장은 던전 문에서 끝납니다. 도입부는 혼자 진행할 수 있지만, 그 장의 악당에게 마지막 일격을 가하는 일은 다섯 명의 파티를 위한 것입니다(그리고 가장 마지막은 열 명을 위한 것입니다).",
+      "sagaTitle": "북쪽으로 자취를 좇으세요",
+      "sagaBody": "주된 이야기는 하나의 긴 추격입니다. 죽음교단이 왕국의 무덤들에서 암약하고 있으며, 한 장을 매듭지을 때마다 그 자취는 한 지역씩 북쪽으로 이어집니다. 음모 전체를 한꺼번에 상대하는 일은 결코 없습니다. 실 한 가닥을 당기면, 그것이 그 가닥을 쥔 다음 손으로 이어집니다.",
+      "sagaValeTitle": "골짜기: 인장에 새겨진 이름",
+      "sagaValeBody": "동부개울에서는 죽은 자가 쉬지 못하고, 그 배후의 표식은 사라진 지 오래라 여겨지던 종파의 것입니다. 자취를 좇으면 예배당 묘실에서 일하는 무덤부름에 닿고, 그의 문서가 당신을 북쪽 습지로 가리킵니다.",
+      "sagaMarshTitle": "습지: 영혼의 십일조",
+      "sagaMarshBody": "마이어펜의 익사는 우연이 아닙니다. 누군가 십일조 함을 채우듯 습지를 채우며, 물이 데려간 여행자마다 그를 일으켜 고분고분한 죽은 자로 만듭니다. 명령을 윗선으로 좇아 가면 가라앉은 요새의 안개부름에 닿고, 그의 마지막 말은 봉우리 아래에서 꿈틀거리는 한층 오래된 무언가를 가리킵니다.",
+      "sagaPeaksTitle": "봉우리: 십일조가 향한 곳",
+      "sagaPeaksBody": "쏜피크에서 모든 계략이 환히 드러납니다. 골짜기 이래로 빼앗긴 영혼 하나하나가 산 아래 봉인된 고대의 존재를 깨우는 데 부어진 십일조였습니다. 예배당 뜰에서 시작된 자취가 여기, 열에 열이 모여야 여는 문에서 끝납니다. 그 너머에 누가 기다리는지는 당신이 직접 알아내도록 남겨 두겠습니다.",
+      "sideTitle": "큰길에서 갈라진 갈래들",
+      "sideWardenTitle": "이름을 떨치기",
+      "sideWardenBody": "이야기와 나란히, 골짜기와 습지의 수호인들이 상시 현상금 사다리를 내겁니다. 당신보다 앞선 모든 수호인이 그러했듯, 적을 하나씩 처치하며 위로 올라가세요. 정직한 레벨업이자, 각 지역에서 가장 골치 아픈 말썽꾼들을 두루 도는 여정입니다.",
+      "sideCryptTitle": "잊힌 왕",
+      "sideCryptBody": "봉우리 높은 곳에 한층 조용한 수수께끼가 흐릅니다. 어떤 기록에도 남지 않은 왕관이 새겨진 오래된 무덤들이지요. 죽은 자를 읽고, 그들이 지키던 것을 모아, 닫힌 채로 두려던 무덤을 다시 여세요. 끝까지 좇으면 정원을 갖춘 공격대를 위한 두 번째 최종 시련으로 이어지는 추리의 자취입니다."
     },
     "lore": {
-      "figuresTitle": "Faces you will come to know",
-      "figuresBody": "A handful of people walk the whole road with you. Watch for these names from the valley to the peaks.",
-      "aldricRole": "Priest of the Vale",
-      "aldricBody": "A humble village priest who first names the cult over a defiled grave in Eastbrook, then follows its trail in person through the marsh and up to the wall at Highwatch. He is the steady heart of the whole campaign.",
-      "marenRole": "The Marshal's Scout",
-      "marenBody": "A low-talking tracker you meet in the reeds of Mirefen, all quiet feet and a short blade. She follows the trail north too, and it is her ear that catches the words that send you to the peaks."
+      "figuresTitle": "차차 알게 될 얼굴들",
+      "figuresBody": "몇몇 사람들은 당신과 함께 이 길을 끝까지 걷습니다. 골짜기에서 봉우리까지, 이 이름들을 눈여겨보세요.",
+      "aldricRole": "골짜기의 사제",
+      "aldricBody": "동부개울에서 더럽혀진 무덤 앞에 서서 교단의 이름을 처음 밝혀낸 다음, 직접 그 자취를 좇아 습지를 지나 하이워치의 성벽까지 오르는 소박한 마을 사제. 온 원정의 굳건한 심장입니다.",
+      "marenRole": "원수의 정찰병",
+      "marenBody": "마이어펜의 갈대밭에서 만나는, 말수 적은 추적자. 조용한 발걸음과 짧은 칼이 전부입니다. 그녀 역시 북쪽으로 자취를 좇으며, 당신을 봉우리로 보내는 그 말을 알아챈 것도 바로 그녀의 귀입니다."
     },
     "dungeonsPage": {
-      "heading": "Dungeons and Raids",
-      "intro": "When the open world is not enough, gather a party and step into an instance: a private copy of a dungeon made just for your group.",
-      "party": "Dungeons are built for a party of five. The endgame raid is for ten.",
-      "soloLead": "Every dungeon opens with a soloable lead-in quest, so you always know why you are going in.",
-      "levelAround": "Around level {n}",
-      "levelExact": "Level {n}",
-      "levelBand": "Levels {min} to {max}",
-      "partySize": "{n} players",
-      "raidSize": "Ten players, level {n}",
-      "hollowName": "The Hollow Crypt",
-      "hollowBody": "A grave-robbed chapel crypt where the newly dead refuse to rest. The first real test of a new party.",
-      "bastionName": "The Sunken Bastion",
-      "bastionBody": "A flooded fortress lost to the marsh, held by drowned defenders and the rising tide itself.",
-      "templeName": "The Drowned Temple",
-      "templeBody": "A moonlit shrine sunk beneath a glowing tarn high in the peaks, reached through a gate of cold light. A drowned cult still sings down there in its rotted vestments, and the warnings carved on the shore say something below only sleeps. A self-contained mystery, set apart from the main story, for the curious and the well-prepared.",
-      "sanctumName": "Gravewyrm Sanctum",
-      "sanctumBody": "The dark heart of Thornpeak, where the cult's long work reaches its terrible peak.",
-      "raidName": "The endgame raid",
-      "raidBody": "Beyond a sealed royal door waits a ten-player trial: a multi-phase fight and a deathless power the whole raid must shut down together. Earn your way in, then bring nine friends.",
-      "templeLoreTitle": "The Drowned Temple, a little deeper",
-      "templeLoreBody": "The temple has its own legend, older than the cult you chase elsewhere. On the shore of the Glimmermere, a tarn that drinks the moonlight and gives back the drowned, a lone watcher keeps a gate of pale light. Beneath the surface, a stair of cold stone runs down to it. The folk who sank there did not drown by misadventure: they were the Pale Choir, who went under in worship and never stopped singing. The old wardens scratched a single warning into the rocks before the water took them, a prayer to something they called the Drowned Moon, with a steadier hand adding two words beneath it: it only sleeps.",
-      "cryptLeadTitle": "A door the dead were meant to keep shut",
-      "cryptLeadBody": "High on the peaks, away from the main fight, lies a colder mystery. Old graves bear a crown no record remembers, and the dead who guard them once served a forgotten king. Read their stones, gather the keystones they kept, and you can unseal a tomb that three loyal souls died to hold closed, opening a second ten-player trial for those who follow the clues to the end."
+      "heading": "던전과 공격대",
+      "intro": "열린 세계만으로 부족할 때, 파티를 모아 인스턴스에 들어서세요. 당신의 파티만을 위해 만들어진 던전의 개별 사본입니다.",
+      "party": "던전은 5인 파티에 맞춰 설계되었습니다. 최종 단계 공격대는 10인 규모입니다.",
+      "soloLead": "모든 던전은 혼자서 진행할 수 있는 도입 퀘스트로 열리므로, 왜 들어가는지 늘 알 수 있습니다.",
+      "levelAround": "약 {n}레벨",
+      "levelExact": "{n}레벨",
+      "levelBand": "{min}레벨에서 {max}레벨",
+      "partySize": "{n}인",
+      "raidSize": "10인, {n}레벨",
+      "hollowName": "공허의 묘소",
+      "hollowBody": "도굴당한 예배당 묘소로, 갓 죽은 자들이 안식하기를 거부하는 곳. 새 파티의 첫 진정한 시험대입니다.",
+      "bastionName": "가라앉은 성채",
+      "bastionBody": "습지에 삼켜진 침수된 요새로, 물에 빠진 수호자들과 차오르는 밀물 그 자체가 지키고 있습니다.",
+      "templeName": "수몰된 사원",
+      "templeBody": "습지 길에서 벗어난 곳에 가라앉은 신전으로, 호기심 많고 만반의 준비를 갖춘 이들을 위한 샛길입니다.",
+      "sanctumName": "무덤비룡 성소",
+      "sanctumBody": "가시봉우리의 어두운 심장부로, 교단의 오랜 작업이 끔찍한 정점에 다다르는 곳.",
+      "raidName": "최종 단계 공격대",
+      "raidBody": "봉인된 왕실 문 너머에 10인 시련이 기다립니다. 여러 단계로 이어지는 전투와, 공격대 전원이 함께 막아야 하는 불사의 힘. 입장 자격을 얻은 뒤, 친구 아홉을 데려오세요.",
+      "templeLoreTitle": "익사한 신전, 조금 더 깊이",
+      "templeLoreBody": "이 신전에는 당신이 다른 곳에서 쫓는 교단보다 오래된 그만의 전설이 있습니다. 달빛을 들이마시고 익사자를 되돌려 주는 작은 호수, 글리머미어의 기슭에서 한 외로운 감시자가 창백한 빛의 관문을 지킵니다. 수면 아래로는 차가운 돌계단이 그곳까지 내려갑니다. 그곳에 가라앉은 이들은 불운으로 익사한 것이 아닙니다. 그들은 창백한 합창단이었고, 경배 속에 물밑으로 들어가 노래를 멈추지 않았습니다. 옛 수호자들은 물이 자신들을 삼키기 전에 바위에 단 하나의 경고를 새겼습니다. 익사한 달이라 부르던 무언가를 향한 기도였고, 그 아래에 한층 차분한 손길이 두 마디를 덧붙였습니다. 그것은 잠들어 있을 뿐.",
+      "cryptLeadTitle": "죽은 자들이 닫아 두려 했던 문",
+      "cryptLeadBody": "봉우리 높은 곳, 본 전투에서 떨어진 자리에 더 차가운 수수께끼가 잠들어 있습니다. 어떤 기록에도 남지 않은 왕관이 새겨진 오래된 무덤들이 있고, 그것을 지키는 죽은 자들은 한때 잊힌 왕을 섬겼습니다. 그들의 비석을 읽고 그들이 간직한 핵심석을 모으면, 충성스러운 세 영혼이 닫힌 채로 지키려다 죽어간 무덤을 다시 열 수 있습니다. 끝까지 단서를 좇는 이들에게 두 번째 10인 시련이 열립니다."
     },
     "talentsPage": {
-      "heading": "Talents and specializations",
-      "intro": "Talents are how you make a class your own. They are optional, forgiving, and easy to change, so you can experiment without fear.",
-      "whatHeading": "What talents do",
-      "whatBody": "As you level, you earn talent points to spend on small, permanent upgrades to your abilities and stats. They shape how a class feels, leaning it toward more damage, sturdier defense, or stronger healing.",
-      "howHeading": "How they work",
-      "howBody": "Talents open up at level 10, and you keep earning points as you climb to the cap. You spend them in your class's talent panel, and you can save more than one layout to swap between builds.",
-      "resetTitle": "Nothing is permanent",
-      "resetNote": "You can reset your talents at any time, so an early pick is never a trap. Try things, see what you like, and change your mind freely.",
-      "specsHeading": "Specializations by class",
-      "specsBody": "Every class has a handful of specializations, each with its own role and a signature focus. Here is the shape of all of them. Open a class for its full kit."
+      "heading": "특성과 전문화",
+      "intro": "특성은 직업을 자신만의 것으로 만드는 방법입니다. 선택은 자유롭고, 부담 없이 바꿀 수 있으므로 마음껏 시도해 볼 수 있습니다.",
+      "whatHeading": "특성이 하는 일",
+      "whatBody": "레벨을 올리면 특성 점수를 얻어, 기술과 능력치를 작게 영구적으로 강화하는 데 투자합니다. 이 점수는 직업의 감각을 빚어내며, 더 강한 피해나 더 단단한 방어, 더 강력한 치유 쪽으로 기울입니다.",
+      "howHeading": "작동 방식",
+      "howBody": "특성은 10레벨에 열리며, 최고 레벨까지 오르는 동안 계속 점수를 얻습니다. 직업의 특성 창에서 점수를 투자하며, 빌드를 바꿔 가며 쓸 수 있도록 두 가지 이상의 구성을 저장할 수 있습니다.",
+      "resetTitle": "영구적인 것은 없습니다",
+      "resetNote": "특성은 언제든 초기화할 수 있으므로, 초반의 선택이 발목을 잡는 일은 없습니다. 이것저것 시도해 보고, 마음에 드는 것을 찾고, 자유롭게 마음을 바꾸세요.",
+      "specsHeading": "직업별 전문화",
+      "specsBody": "모든 직업에는 몇 가지 전문화가 있으며, 각각 고유한 역할과 대표적인 특징을 지닙니다. 여기 그 전체 윤곽을 정리했습니다. 전체 기술 구성은 직업을 열어 확인하세요."
     },
     "arenaPage": {
-      "heading": "Arena and PvP",
-      "intro": "Want to test yourself against other players? Player versus player is built in, and it is always something you choose, never something forced on you.",
-      "duelsHeading": "Duels",
-      "duelsBody": "Challenge any player you meet to a friendly duel. Nothing is on the line but pride, so it is the easiest way to learn a matchup or settle a friendly argument.",
-      "coliseumHeading": "The Ashen Coliseum",
-      "coliseumBody": "The Coliseum is the realm's arena, where you face other players in ranked matches. Win and your standing climbs, and the strongest fighters rise up the leaderboard for everyone to see.",
-      "fiestaHeading": "Two versus two Fiesta",
-      "fiestaBody": "Fiesta is a fast, two-on-two mode played in short rounds. Between rounds you draft augments, quick boosts that reshape your kit on the fly, so no two matches play quite the same.",
-      "augmentsNote": "Augments and power-ups last only for the match. They are about playful, on-the-spot builds, not lasting power, so nobody buys their way to a win.",
-      "wavesTitle": "Augments arrive in waves",
-      "wavesBody": "Each round of a Fiesta hands you a fresh pick, and the picks grow bolder as the match goes on. You build from one wave to the next, choosing one of a few options each time and keeping it for the rest of the bout.",
-      "waveSilverTitle": "Silver",
-      "waveSilverBody": "The opening wave: clean, single-stat boosts that sharpen the basics of your class.",
-      "waveGoldTitle": "Gold",
-      "waveGoldBody": "The middle wave: two-edged combos where your build starts to take shape and sing.",
-      "wavePrismaticTitle": "Prismatic",
-      "wavePrismaticBody": "The final wave: build-defining, screen-melting spikes meant to feel ridiculous in the best way.",
-      "powerupsTitle": "Power-ups in the ring",
-      "powerupsBody": "Glowing orbs also drop into the arena mid-fight, free for whoever reaches them first. They are deliberately over the top and last only a short while: Speed Demon for a blink of blinding pace, Colossus to swell up into a lumbering giant, Moon Boots for a bouncing, low-gravity leap, and Berserker for a sudden surge of fury.",
-      "ladderHeading": "Climbing the ladder",
-      "ladderBody": "Ranked play tracks your standing over time. Check the leaderboard to see where you sit and who holds the top of the realm."
+      "heading": "투기장과 PvP",
+      "intro": "다른 플레이어와 실력을 겨뤄 보고 싶으신가요? 플레이어 대 플레이어 전투가 기본으로 갖춰져 있으며, 강요받는 일 없이 언제나 직접 선택하는 방식입니다.",
+      "duelsHeading": "결투",
+      "duelsBody": "마주치는 누구에게나 가벼운 결투를 신청할 수 있습니다. 자존심 외에는 걸린 것이 없으므로, 상대법을 익히거나 가벼운 논쟁을 가리는 가장 쉬운 방법입니다.",
+      "coliseumHeading": "잿빛 콜로세움",
+      "coliseumBody": "콜로세움은 서버의 투기장으로, 등급전에서 다른 플레이어들과 맞붙는 곳입니다. 이기면 순위가 오르고, 가장 강한 투사들이 모두가 볼 수 있는 순위표 정상에 오릅니다.",
+      "fiestaHeading": "2대 2 피에스타",
+      "fiestaBody": "피에스타는 짧은 라운드로 진행되는 빠른 2대 2 모드입니다. 라운드 사이에 증강을 선택하는데, 이는 그때그때 구성을 바꾸는 빠른 강화 효과이므로 어떤 경기도 똑같이 흘러가지 않습니다.",
+      "augmentsNote": "증강과 강화 효과는 해당 경기 동안에만 유지됩니다. 지속적인 힘이 아니라 그 자리에서 재미있게 빌드를 짜는 것이 목적이므로, 돈으로 승리를 사는 일은 없습니다.",
+      "wavesTitle": "증강은 웨이브로 찾아옵니다",
+      "wavesBody": "Fiesta의 매 라운드마다 새로운 선택지가 주어지며, 시합이 진행될수록 그 선택은 점점 대담해집니다. 한 웨이브에서 다음 웨이브로 빌드를 쌓아 가는데, 매번 몇 가지 중 하나를 골라 남은 시합 동안 계속 지니게 됩니다.",
+      "waveSilverTitle": "실버",
+      "waveSilverBody": "첫 웨이브: 군더더기 없이 능력치 하나만 끌어올려 당신 직업의 기본기를 다듬어 줍니다.",
+      "waveGoldTitle": "골드",
+      "waveGoldBody": "중반 웨이브: 양날의 조합으로, 이 무렵부터 당신의 빌드가 모습을 갖추고 노래하기 시작합니다.",
+      "wavePrismaticTitle": "프리즘",
+      "wavePrismaticBody": "마지막 웨이브: 빌드를 결정짓고 화면을 녹여 버리는 폭발적인 한 방으로, 더없이 통쾌하게 터무니없는 느낌을 주려는 것입니다.",
+      "powerupsTitle": "원형 안의 강화 효과",
+      "powerupsBody": "빛나는 구슬이 전투 도중 투기장 안으로 떨어지기도 하며, 먼저 닿는 사람이 임자입니다. 일부러 과장되게 만들어졌고 효과는 잠깐뿐입니다. 눈이 멀 듯한 속도를 주는 스피드 데몬, 굼뜬 거인으로 부풀어 오르는 콜로서스, 저중력으로 통통 튀어 오르게 하는 문 부츠, 그리고 분노가 한순간에 폭발하는 버서커가 있습니다.",
+      "ladderHeading": "순위 올리기",
+      "ladderBody": "등급전은 시간이 지나며 당신의 순위를 기록합니다. 순위표를 확인해 자신의 위치와 서버 정상에 오른 이가 누구인지 살펴보세요."
     },
     "wishPage": {
-      "heading": "Things I wish I knew",
-      "intro": "A few honest truths that save new players a lot of second-guessing. None of it is required reading, but all of it helps.",
-      "i1Title": "You cannot pick a wrong class",
-      "i1Body": "Every class can hold its own and reach the cap. Choose the fantasy you like, not the one someone else calls best.",
-      "i2Title": "Dying barely costs you",
-      "i2Body": "When you fall, you release at a graveyard and run back to your body. No experience is lost, so it is safe to take risks and learn.",
-      "i3Title": "Talents are not a trap",
-      "i3Body": "They unlock at level 10 and reset whenever you want, so your early choices are never permanent.",
-      "i4Title": "Follow the quest trail",
-      "i4Body": "Quests are the fastest way to level and they lead you across the world. When you are unsure where to go, find the next marker.",
-      "i5Title": "Keep your gear current",
-      "i5Body": "A fresh upgrade does more for you than perfect play in old gear. Take the quest rewards that suit your class.",
-      "i6Title": "Grouping is a choice, not a chore",
-      "i6Body": "Most of the world is soloable. Team up for dungeons and the raid, or just when you want some company.",
-      "i7Title": "Learn your resource",
-      "i7Body": "Rage, mana, or energy, managing it well is half of playing your class. Watch that bar, not only your cooldowns.",
-      "i8Title": "Rest between fights",
-      "i8Body": "Eat and drink to recover quickly, especially as a caster. A few seconds now saves a death later."
+      "heading": "미리 알았으면 좋았을 것들",
+      "intro": "새 플레이어가 망설임을 크게 덜어 주는 몇 가지 솔직한 조언입니다. 꼭 읽어야 하는 것은 아니지만, 모두 도움이 됩니다.",
+      "i1Title": "잘못된 직업이란 없습니다",
+      "i1Body": "모든 직업은 제 몫을 다하고 최고 레벨에 도달할 수 있습니다. 남이 최고라고 말하는 것이 아니라, 당신이 좋아하는 환상을 고르세요.",
+      "i2Title": "죽어도 손해는 거의 없습니다",
+      "i2Body": "쓰러지면 묘지에서 부활해 자신의 시신까지 달려가면 됩니다. 경험치는 잃지 않으므로, 위험을 무릅쓰고 배워도 안전합니다.",
+      "i3Title": "특성은 함정이 아닙니다",
+      "i3Body": "특성은 10레벨에 열리고 원할 때 언제든 초기화되므로, 초반의 선택이 영구적인 일은 없습니다.",
+      "i4Title": "퀘스트 길을 따라가세요",
+      "i4Body": "퀘스트는 가장 빠르게 레벨을 올리는 방법이며 당신을 세계 곳곳으로 이끕니다. 어디로 가야 할지 모를 때는 다음 표식을 찾으세요.",
+      "i5Title": "장비를 최신으로 유지하세요",
+      "i5Body": "새 장비 하나가 낡은 장비로 완벽하게 플레이하는 것보다 더 도움이 됩니다. 당신의 직업에 맞는 퀘스트 보상을 챙기세요.",
+      "i6Title": "파티는 의무가 아니라 선택입니다",
+      "i6Body": "세계 대부분은 혼자서도 진행할 수 있습니다. 던전과 공격대를 위해, 또는 그저 함께하고 싶을 때 팀을 꾸리세요.",
+      "i7Title": "자신의 자원을 익히세요",
+      "i7Body": "분노든 마나든 기력이든, 자원을 잘 관리하는 것이 직업 운용의 절반입니다. 쿨다운뿐 아니라 그 막대도 지켜보세요.",
+      "i8Title": "전투 사이에 휴식하세요",
+      "i8Body": "특히 시전 직업이라면 먹고 마셔서 빠르게 회복하세요. 지금의 몇 초가 나중의 죽음을 막아 줍니다."
     },
     "viewer": {
-      "view3d": "View {name} in 3D",
-      "view3dShort": "View in 3D",
-      "loading": "Loading model...",
-      "error": "The 3D model could not be loaded. The art above still shows this {name}.",
-      "dragHint": "Drag to turn the model. Use the left and right arrow keys when it is focused.",
-      "canvasLabel": "Rotatable 3D model of {name}"
+      "view3d": "{name} 3D로 보기",
+      "view3dShort": "3D로 보기",
+      "loading": "모델 불러오는 중...",
+      "error": "3D 모델을 불러올 수 없습니다. 위의 그림이 여전히 이 {name}을(를) 보여 줍니다.",
+      "dragHint": "끌어서 모델을 돌리세요. 초점이 맞춰지면 왼쪽과 오른쪽 화살표 키를 쓰세요.",
+      "canvasLabel": "{name}의 회전 가능한 3D 모델"
     },
     "models": {
-      "title": "3D Model Viewer",
-      "lead": "Inspect the heroes, monsters, and demons of the world up close. Choose a model, then drag to turn it.",
-      "intro": "Every figure here is the same model you meet in the game, rendered live in your browser. Pick one to load it.",
-      "groupClasses": "Classes",
-      "groupCreatures": "Creatures",
-      "groupPets": "Warlock Demons",
-      "pickerLabel": "Choose a model to view",
-      "count": "{count} models",
-      "noWebgl": "This browser cannot display 3D models. Everything is still listed on the class and bestiary pages."
+      "title": "3D 모델 뷰어",
+      "lead": "세계의 영웅과 괴물, 악마를 가까이서 살펴보세요. 모델을 고른 뒤 끌어서 돌려 보세요.",
+      "intro": "여기 있는 모든 형상은 게임에서 마주치는 바로 그 모델이며, 브라우저에서 실시간으로 그려집니다. 하나를 골라 불러오세요.",
+      "groupClasses": "직업",
+      "groupCreatures": "생명체",
+      "groupPets": "흑마법사 악마",
+      "pickerLabel": "볼 모델을 고르세요",
+      "count": "모델 {count}개",
+      "noWebgl": "이 브라우저에서는 3D 모델을 표시할 수 없습니다. 모든 항목은 직업과 몬스터 도감 페이지에 그대로 실려 있습니다."
     },
     "gear": {
-      "intro": "Gear is the equipment your character wears and the items you carry. Better gear is the steadiest way to grow stronger, and you pick most of it up just by playing.",
-      "slotsTitle": "What you can equip",
-      "slotsBody": "You have a weapon slot and seven armor slots. Each piece you equip adds to your character, and you can mix and match freely as you find upgrades.",
-      "slotMainhand": "Weapon",
-      "slotHelmet": "Head",
-      "slotShoulder": "Shoulders",
-      "slotChest": "Chest",
-      "slotWaist": "Waist",
-      "slotLegs": "Legs",
-      "slotGloves": "Hands",
-      "slotFeet": "Feet",
-      "qualityTitle": "Quality, at a glance",
-      "qualityBody": "Every item has a quality, and its name is colored to match so you can read its worth at a glance. From most common to most prized:",
-      "qualityPoor": "Poor",
-      "qualityCommon": "Common",
-      "qualityUncommon": "Uncommon",
-      "qualityRare": "Rare",
-      "qualityEpic": "Epic",
-      "qualityLegendary": "Legendary",
-      "qualityNote": "Higher quality usually means better stats, but quality is a hint, not a rule. A well-matched piece for your class and level can beat a flashier one.",
-      "upgradeTitle": "Keep your gear current",
-      "upgradeBody": "Replacing an old piece with a fresh upgrade does more for you than playing perfectly in gear you have outgrown. When something better drops or a quest offers it, take it. Do not save your good items for later.",
-      "sourcesTitle": "Where gear comes from",
-      "sourcesBody": "Most of your early upgrades are quest rewards, so it pays to finish quests rather than grind. Enemies drop gear when you defeat them, vendors in town sell solid basics, and the player market lets you buy from other adventurers.",
-      "consumablesTitle": "Consumables",
-      "consumablesIntro": "Some items are used once for a quick benefit. They are cheap insurance, so keep a few on hand.",
-      "consumablesPotions": "Potions restore health or mana the moment you use them, even mid-fight, which makes them a clutch save when a pull goes wrong. They share a short cooldown, so plan one good moment to use them.",
-      "consumablesFood": "Food and drink restore you while you sit and rest between fights. Eating recovers health, drinking recovers mana, and resting this way is free. Sit down for a few seconds after a tough fight instead of running into the next one half-healed.",
-      "consumablesElixirs": "Elixirs grant a temporary buff while you adventure, a small edge that helps when you want to push a little further.",
-      "fishingTitle": "Fishing",
-      "fishingBody": "Fishing is a calm change of pace. Equip a fishing pole, cast into open water, and reel in what bites. You mostly catch fish you can cook into food, the odd bit of junk to sell for a few coins, and now and then a prized rare catch. What you find depends on the water you fish in.",
-      "fishingFood": "The fish you reel in are raw, and raw fish are food. Cook your catch and it heals more when you sit to eat, with the better fish coming from the colder, deeper waters in the north. A line in the lake is a quiet way to keep your pack stocked between fights.",
-      "fishingRare": "Now and then your line catches something far better than supper: a shimmering prized fish that any angler might luck into in any water. Hook one and your log lights up with the catch. It is the kind of lucky pull that makes an idle afternoon at the lake worth telling people about.",
-      "cosmeticsTitle": "Looks and cosmetics",
-      "cosmeticsBody": "Some rewards change only how your character looks, never how strong you are. These cosmetic skins let you stand out without affecting the game, so wear whichever you like.",
-      "cosmeticsRanks": "Cosmetics come in rarity tiers of their own, and the rarer ones are a fun thing to chase. Earning a higher tier also unlocks the looks below it.",
-      "cosmeticsSkins": "There are two cosmetic lines to collect. Every class has a handful of alternate appearances, a fresh take on its look that is yours alone to wear. Alongside them sit chromas: named two-tone color schemes that repaint a look entirely, from sober metals to bright imperial colors.",
-      "cosmeticsCache": "A few of these come from a mysterious cosmetic cache, a sealed prize that rolls one of three quality grades when you open it and grants the appearance to match. It is purely for looks: nothing inside it makes you stronger, only finer to look at."
+      "intro": "장비는 캐릭터가 걸치는 장구이자 지니고 다니는 물건입니다. 더 좋은 장비는 강해지는 가장 꾸준한 길이며, 그 대부분은 그저 플레이하는 것만으로 손에 들어옵니다.",
+      "slotsTitle": "착용할 수 있는 부위",
+      "slotsBody": "무기 칸 하나와 방어구 칸 일곱 개가 있습니다. 착용하는 부위마다 캐릭터에 더해지며, 업그레이드를 찾는 대로 자유롭게 섞어 맞출 수 있습니다.",
+      "slotMainhand": "무기",
+      "slotHelmet": "머리",
+      "slotShoulder": "어깨",
+      "slotChest": "가슴",
+      "slotWaist": "허리",
+      "slotLegs": "다리",
+      "slotGloves": "손",
+      "slotFeet": "발",
+      "qualityTitle": "한눈에 보는 품질",
+      "qualityBody": "모든 물건에는 품질이 있고, 한눈에 그 값어치를 읽을 수 있도록 이름이 그에 맞게 색으로 칠해집니다. 가장 흔한 것부터 가장 값진 것까지:",
+      "qualityPoor": "조악함",
+      "qualityCommon": "일반",
+      "qualityUncommon": "고급",
+      "qualityRare": "희귀",
+      "qualityEpic": "영웅",
+      "qualityLegendary": "전설",
+      "qualityNote": "품질이 높을수록 대개 능력치가 더 좋지만, 품질은 규칙이 아니라 단서일 뿐입니다. 당신의 직업과 레벨에 잘 맞는 물건이 더 화려한 것을 이길 수도 있습니다.",
+      "upgradeTitle": "장비를 늘 최신으로",
+      "upgradeBody": "낡은 부위를 새 업그레이드로 바꾸는 것이, 이미 자라난 몸에 맞지 않는 장비로 완벽하게 플레이하는 것보다 당신에게 더 큰 도움이 됩니다. 더 좋은 것이 떨어지거나 퀘스트가 내어 줄 때 받으세요. 좋은 물건을 나중을 위해 아껴 두지 마세요.",
+      "sourcesTitle": "장비는 어디서 나오는가",
+      "sourcesBody": "초반 업그레이드 대부분은 퀘스트 보상이므로, 사냥을 반복하기보다 퀘스트를 끝내는 편이 이득입니다. 적은 처치하면 장비를 떨어뜨리고, 마을 상인은 든든한 기본 장비를 팔며, 플레이어 시장에서는 다른 모험가에게서 살 수 있습니다.",
+      "consumablesTitle": "소모품",
+      "consumablesIntro": "어떤 물건은 한 번 쓰면 즉시 효과를 봅니다. 값싼 보험과 같으니 몇 개쯤 지니고 다니세요.",
+      "consumablesPotions": "물약은 사용하는 순간 생명력이나 마나를 회복시켜 주며, 전투 중에도 쓸 수 있어 풀이 어그러졌을 때 결정적인 한 수가 됩니다. 짧은 공용 재사용 대기시간을 공유하므로, 한 번의 좋은 순간을 노려 쓰세요.",
+      "consumablesFood": "음식과 음료는 전투 사이에 앉아 쉬는 동안 당신을 회복시켜 줍니다. 먹으면 생명력이, 마시면 마나가 돌아오며, 이렇게 쉬는 데는 비용이 들지 않습니다. 힘든 전투 뒤에는 절반만 회복된 채 다음 싸움으로 달려가지 말고 몇 초간 앉으세요.",
+      "consumablesElixirs": "비약은 모험하는 동안 일시적인 강화 효과를 주어, 조금 더 멀리 밀어붙이고 싶을 때 도움이 되는 작은 우위가 됩니다.",
+      "fishingTitle": "낚시",
+      "fishingBody": "낚시는 분위기를 바꿔 주는 차분한 여유입니다. 낚싯대를 장착하고 트인 물에 드리워, 물리는 것을 낚아 올리세요. 대개는 요리해 음식으로 만들 수 있는 물고기를 잡고, 가끔은 몇 푼에 팔 잡동사니를, 그리고 이따금 값진 희귀한 손맛을 만납니다. 무엇을 잡을지는 어떤 물에서 낚느냐에 달려 있습니다.",
+      "fishingFood": "낚아 올린 물고기는 날것이고, 날생선은 곧 음식입니다. 잡은 것을 요리하면 앉아서 먹을 때 더 많이 회복되며, 더 좋은 물고기는 북쪽의 더 차갑고 깊은 물에서 나옵니다. 호수에 드리운 낚싯줄은 전투 사이에 가방을 조용히 채워 두는 길입니다.",
+      "fishingRare": "이따금 낚싯줄이 저녁거리보다 훨씬 나은 것을 낚습니다. 어떤 물에서든 운 좋은 낚시꾼이라면 걸릴 수 있는, 반짝이는 값진 물고기지요. 한 마리 낚으면 기록이 그 손맛으로 환히 밝혀집니다. 호숫가에서 한가로이 보낸 오후를 두고두고 자랑할 만한, 그런 행운의 한 수입니다.",
+      "cosmeticsTitle": "외형과 장식",
+      "cosmeticsBody": "어떤 보상은 캐릭터의 모습만 바꿀 뿐 강함에는 전혀 영향을 주지 않습니다. 이런 외형 장식은 게임에 영향을 주지 않으면서 자신을 돋보이게 해 주니, 마음에 드는 것을 골라 걸치세요.",
+      "cosmeticsRanks": "외형 장식에도 저마다 희귀도 등급이 있으며, 희귀한 것일수록 쫓는 재미가 있습니다. 더 높은 등급을 얻으면 그 아래 등급의 외형도 함께 해금됩니다.",
+      "cosmeticsSkins": "모을 수 있는 외형 장식은 두 갈래입니다. 모든 직업에는 본연의 모습을 새롭게 풀어낸, 오직 자신만이 걸칠 수 있는 대체 외형이 몇 가지 있습니다. 그 곁에는 크로마가 있는데, 차분한 금속빛부터 화려한 황실의 색까지 외형을 통째로 다시 칠하는 이름 붙은 두 색조의 배색입니다.",
+      "cosmeticsCache": "그중 일부는 신비한 외형 상자에서 나옵니다. 열면 세 가지 품질 등급 중 하나가 결정되어 그에 맞는 외형을 주는 봉인된 보상입니다. 순전히 보기 위한 것이라, 그 안의 무엇도 당신을 더 강하게 만들지 않고 그저 더 멋져 보이게 할 뿐입니다."
     },
     "economy": {
-      "intro": "Coin oils the whole world: it buys gear and supplies, pays your repairs and quest costs, and changes hands between players. You pick all of this up just by playing, so think of this page as a map of where your money comes from and goes.",
-      "coinTitle": "Gold, silver, and copper",
-      "coinBody": "Money comes in three coins. A hundred copper make a silver, and a hundred silver make a gold, so your purse fills up from the smallest coin first. You earn it from quest rewards, from looting fallen enemies, and from selling what you no longer need.",
-      "vendorsTitle": "Vendors and what they keep",
-      "vendorsBody": "Towns and outposts are dotted with merchants, each with their own trade. Provisioners stock food and drink, weaponsmiths and armorers carry gear, herbalists deal in reagents, and a quartermaster keeps practical travel kit. Walk up to one to see what they sell.",
-      "buyingTitle": "Buying and selling",
-      "buyingBody": "Stand near a merchant to open their window. You can buy anything they stock if you can afford it, and sell most of what is in your bags for coin. If you sell something by mistake, a vendor will hold your recent sales so you can buy them back.",
-      "junkTitle": "Clearing out junk",
-      "junkBody": "Drops you have no use for still sell to any vendor, so empty your bags whenever you pass through town rather than letting them fill up. Truly worthless odds and ends can also be discarded outright to make room.",
-      "tradeTitle": "Trading with other players",
-      "tradeBody": "You can trade face to face with anyone standing near you. Both of you put items and coin into a shared window and the swap only happens once you both confirm it, so neither side can be caught out. It is the simple way to hand a friend a drop or settle a deal.",
-      "marketTitle": "The World Market",
-      "marketBody": "The Merchant runs the World Market, a player-driven exchange where you can buy and sell with people you may never meet. Speak to the Merchant to open it.",
-      "marketBrowse": "Browsing: scroll the listings or search by name to find what is for sale. Each listing shows the goods, the seller, and the asking price for the whole stack.",
-      "marketPost": "Posting: choose a stack from your bags, set your price, and list it. The goods are held by the Merchant until someone buys them. Unsold listings come back to you after a while, and you can reclaim one early if you change your mind.",
-      "marketCollect": "Collecting: when your goods sell, your proceeds wait for you at the Merchant. Return to collect the coin, along with anything that came back unsold. The Merchant takes a small cut of every completed sale.",
-      "marketPricing": "Pricing is up to you. Listing a little under what others are asking tends to sell faster, while a steep price may sit untouched. Browse first to see what the going rate looks like before you post."
+      "intro": "동전은 온 세계를 움직이는 기름입니다. 장비와 보급품을 사고, 수리비와 퀘스트 비용을 치르며, 플레이어들 사이에서 손을 바꿉니다. 이 모든 것은 그저 플레이하는 것만으로 익히게 되니, 이 페이지를 돈이 어디서 들어오고 어디로 나가는지 보여 주는 지도라 여기세요.",
+      "coinTitle": "금화, 은화, 동화",
+      "coinBody": "화폐는 세 가지 동전으로 이루어집니다. 동화 100개가 은화 하나, 은화 100개가 금화 하나이므로, 지갑은 가장 작은 동전부터 채워집니다. 퀘스트 보상, 쓰러진 적에게서 얻는 전리품, 그리고 더는 필요 없는 물건을 파는 것으로 벌 수 있습니다.",
+      "vendorsTitle": "상인과 그들이 다루는 것",
+      "vendorsBody": "마을과 전초기지에는 저마다 다른 물건을 다루는 상인들이 흩어져 있습니다. 보급상은 음식과 음료를 갖추고, 무기 제작자와 방어구 제작자는 장비를 다루며, 약초상은 마법 재료를 취급하고, 병참장교는 실용적인 여행 장비를 둡니다. 다가서면 그들이 무엇을 파는지 볼 수 있습니다.",
+      "buyingTitle": "사고팔기",
+      "buyingBody": "상인 가까이 서면 상점 창이 열립니다. 형편이 닿는 한 그들이 갖춘 물건은 무엇이든 살 수 있고, 가방 속 대부분은 동전을 받고 팔 수 있습니다. 실수로 무언가를 팔았다면, 상인이 최근 판매 내역을 보관해 두므로 되살 수 있습니다.",
+      "junkTitle": "잡동사니 정리",
+      "junkBody": "쓸모없는 전리품도 어느 상인에게나 팔 수 있으니, 마을을 지날 때마다 가방을 가득 채워 두지 말고 비워 두세요. 정말로 값어치 없는 잡동사니는 아예 버려서 자리를 마련할 수도 있습니다.",
+      "tradeTitle": "다른 플레이어와 거래하기",
+      "tradeBody": "가까이 선 사람과는 누구든 얼굴을 맞대고 거래할 수 있습니다. 둘이 함께 쓰는 창에 물건과 동전을 올리고, 양쪽이 모두 확인해야 비로소 교환이 이루어지므로 어느 쪽도 당할 일이 없습니다. 친구에게 전리품을 건네거나 약속을 매듭짓는 간단한 방법입니다.",
+      "marketTitle": "세계 시장",
+      "marketBody": "상인이 세계 시장을 운영합니다. 만날 일 없을지도 모를 사람들과 사고팔 수 있는, 플레이어가 이끄는 거래소입니다. 상인에게 말을 걸어 열어 보세요.",
+      "marketBrowse": "둘러보기: 목록을 넘겨 보거나 이름으로 검색해 무엇이 매물로 나와 있는지 찾으세요. 각 매물에는 물품, 판매자, 그리고 묶음 전체의 호가가 표시됩니다.",
+      "marketPost": "등록하기: 가방에서 묶음을 고르고 가격을 매겨 매물로 올리세요. 누군가 살 때까지 물품은 상인이 보관합니다. 팔리지 않은 매물은 얼마 뒤 당신에게 돌아오며, 마음이 바뀌면 하나를 일찍 되찾을 수도 있습니다.",
+      "marketCollect": "수령하기: 물품이 팔리면 그 수익이 상인에게서 당신을 기다립니다. 돌아가 동전을, 그리고 팔리지 않고 돌아온 물건이 있다면 함께 수령하세요. 상인은 성사된 거래마다 약간의 수수료를 가져갑니다.",
+      "marketPricing": "가격은 당신의 몫입니다. 남들이 부르는 값보다 조금 낮게 올리면 더 빨리 팔리는 경향이 있고, 지나치게 높은 값은 손도 닿지 않은 채 남을 수 있습니다. 등록하기 전에 먼저 둘러보며 시세가 어떤지 살펴보세요."
     },
     "social": {
-      "intro": "Most of the world is soloable, but the game is built to be played with other people. Here is how to talk, team up, and find your crowd.",
-      "chatHeading": "Chat channels",
-      "chatBody": "Chat is split into channels, each shown on its own tab. Type a message to send it on the active channel, or use a slash command to direct one line elsewhere. These are the channels you can talk on:",
-      "chanSay": "Say.",
-      "chanSayBody": "Your default voice. It reaches players close to you and is the one to use while questing side by side.",
-      "chanYell": "Yell.",
-      "chanYellBody": "A louder version of Say that carries a bit farther, enough to reach across a camp.",
-      "chanWhisper": "Whisper.",
-      "chanWhisperBody": "A private message to one player by name, wherever they are. Use it for a quiet word.",
-      "chanParty": "Party.",
-      "chanPartyBody": "Talk to everyone in your group, no matter how spread out you are.",
-      "chanGeneral": "General.",
-      "chanGeneralBody": "An always-on local channel for the people around you, good for asking a question or chatting.",
-      "chanWorld": "World.",
-      "chanWorldBody": "A realm-wide channel you opt into. Open its tab to join, and you will see and reach everyone online.",
-      "chanLfg": "Looking for Group.",
-      "chanLfgBody": "An opt-in realm-wide channel for finding people to run a dungeon. Open its tab to join.",
-      "chanGuild": "Guild and Officer.",
-      "chanGuildBody": "Channels for your guild. Guild chat reaches every member; the officer channel is just for officers.",
-      "partyHeading": "Forming a party",
-      "partyBody": "Invite another player by right-clicking their name and choosing to invite, or with a chat command. A party holds up to five players, and one of you is the leader.",
-      "partyCredit": "Group members near each other share kill and quest credit, so questing together is faster, never slower. A party is also how you step into a dungeon as a team.",
-      "raidBody": "Once you have a full party of five, the leader can convert it into a raid of up to ten, for the endgame raid.",
-      "lootHeading": "Party loot",
-      "lootBody": "When you group up, the party leader sets how loot is shared. The rules cover coin and items separately:",
-      "lootCoinTitle": "Coin.",
-      "lootCoinBody": "Money from a kill can go to whoever loots it, or be split evenly across the party.",
-      "lootCommonTitle": "Items.",
-      "lootCommonBody": "Ordinary drops can go to the looter, while better drops are put up for a roll so everyone gets a fair shot.",
-      "lootRollTitle": "Need, Greed, or Pass.",
-      "lootRollBody": "When an item goes to a roll, each eligible member chooses Need if they want it, Greed if they would only take it spare, or Pass to bow out. The highest roll wins.",
-      "friendsHeading": "Friends and ignore",
-      "friendsBody": "Add players to your friends list to see when they are online and where they are, so you can group up the moment they log in.",
-      "ignoreBody": "If someone is bothering you, add them to your ignore list and you will stop seeing their chat.",
-      "guildHeading": "Guilds",
-      "guildBody": "A guild is a lasting group of players you belong to between sessions. Create one or accept an invite to join, and you can be in one guild at a time. Members hold a rank: a leader, officers, and members.",
-      "guildChatBody": "Belonging to a guild gives you a private guild chat channel and shows your guildmates on a shared roster, so there are always familiar faces online.",
-      "etiquetteHeading": "Grouping etiquette",
-      "etiquetteBody": "Grouping is a choice, not a chore. Say hello when you join, roll Need only on gear you will actually use, and let the group know before you head off. A little courtesy goes a long way, and most players are glad of the company."
+      "intro": "세계 대부분은 혼자서도 누빌 수 있지만, 이 게임은 다른 사람들과 함께 플레이하도록 만들어졌습니다. 대화하고, 힘을 모으고, 어울릴 무리를 찾는 법을 정리했습니다.",
+      "chatHeading": "채팅 채널",
+      "chatBody": "채팅은 채널로 나뉘며, 각 채널이 저마다의 탭에 표시됩니다. 메시지를 입력하면 활성 채널로 보내지고, 슬래시 명령을 쓰면 한 줄을 다른 곳으로 보낼 수 있습니다. 이야기할 수 있는 채널은 다음과 같습니다:",
+      "chanSay": "말하기.",
+      "chanSayBody": "당신의 기본 목소리입니다. 가까이 있는 플레이어에게 닿으며, 나란히 퀘스트를 할 때 쓰기 좋습니다.",
+      "chanYell": "외치기.",
+      "chanYellBody": "말하기보다 조금 더 멀리 닿는, 더 큰 목소리입니다. 야영지를 가로질러 닿을 만큼입니다.",
+      "chanWhisper": "귓속말.",
+      "chanWhisperBody": "어디에 있든 한 플레이어에게 이름을 지정해 보내는 비공개 메시지입니다. 조용히 한마디 건넬 때 쓰세요.",
+      "chanParty": "파티.",
+      "chanPartyBody": "아무리 흩어져 있어도 파티원 모두에게 이야기할 수 있습니다.",
+      "chanGeneral": "일반.",
+      "chanGeneralBody": "주변 사람들을 위한 늘 켜져 있는 지역 채널로, 질문을 던지거나 이야기를 나누기 좋습니다.",
+      "chanWorld": "세계.",
+      "chanWorldBody": "선택 참여형 렐름 전체 채널입니다. 해당 탭을 열어 참여하면, 접속 중인 모두를 보고 모두에게 닿습니다.",
+      "chanLfg": "파티 찾기.",
+      "chanLfgBody": "던전을 함께 돌 사람을 찾기 위한, 선택 참여형 렐름 전체 채널입니다. 해당 탭을 열어 참여하세요.",
+      "chanGuild": "길드와 장교.",
+      "chanGuildBody": "길드를 위한 채널입니다. 길드 채팅은 모든 구성원에게 닿고, 장교 채널은 장교들만을 위한 것입니다.",
+      "partyHeading": "파티 맺기",
+      "partyBody": "다른 플레이어를 초대하려면 그 이름을 마우스 오른쪽 버튼으로 누른 뒤 초대를 고르거나, 채팅 명령을 쓰세요. 파티는 최대 다섯 명까지이며, 그중 한 명이 파티장입니다.",
+      "partyCredit": "서로 가까이 있는 파티원은 처치와 퀘스트 점수를 함께 나누므로, 함께 퀘스트를 하면 더 빨라질 뿐 결코 느려지지 않습니다. 파티는 또한 한 팀으로 던전에 들어서는 방법이기도 합니다.",
+      "raidBody": "다섯 명으로 파티가 가득 차면, 파티장은 최종 단계 공격대를 위해 그것을 최대 열 명의 공격대로 전환할 수 있습니다.",
+      "lootHeading": "파티 전리품",
+      "lootBody": "파티를 맺으면 파티장이 전리품을 어떻게 나눌지 정합니다. 규칙은 동전과 물품을 따로 다룹니다:",
+      "lootCoinTitle": "동전.",
+      "lootCoinBody": "처치로 얻은 돈은 줍는 사람에게 가거나, 파티 전원에게 고르게 나뉠 수 있습니다.",
+      "lootCommonTitle": "물품.",
+      "lootCommonBody": "평범한 전리품은 줍는 사람에게 가고, 더 좋은 전리품은 입찰에 부쳐 모두가 공정한 기회를 갖게 할 수 있습니다.",
+      "lootRollTitle": "입찰, 가치 입찰, 또는 포기.",
+      "lootRollBody": "물품이 입찰에 부쳐지면, 자격 있는 구성원은 저마다 원하면 입찰을, 남는 것만 받겠다면 가치 입찰을, 빠지겠다면 포기를 고릅니다. 가장 높은 수를 낸 사람이 가져갑니다.",
+      "friendsHeading": "친구와 차단",
+      "friendsBody": "플레이어를 친구 목록에 추가하면 그들이 접속해 있는지, 어디에 있는지 볼 수 있어, 그들이 접속하는 순간 바로 파티를 맺을 수 있습니다.",
+      "ignoreBody": "누군가 당신을 괴롭힌다면 차단 목록에 추가하세요. 그러면 그 사람의 채팅이 더는 보이지 않습니다.",
+      "guildHeading": "길드",
+      "guildBody": "길드는 접속 사이에도 이어지는, 당신이 속한 영속적인 플레이어 모임입니다. 하나를 만들거나 초대를 수락해 가입하며, 한 번에 한 길드에만 속할 수 있습니다. 구성원은 직위를 가집니다. 길드장, 장교, 그리고 일반 구성원입니다.",
+      "guildChatBody": "길드에 속하면 비공개 길드 채팅 채널이 주어지고 공유 명단에 길드원들이 표시되므로, 언제나 익숙한 얼굴이 접속해 있습니다.",
+      "etiquetteHeading": "파티 예절",
+      "etiquetteBody": "파티 맺기는 의무가 아니라 선택입니다. 합류하면 인사를 건네고, 정말로 쓸 장비에만 입찰을 하며, 자리를 뜨기 전에 파티에 알려 주세요. 작은 예의가 큰 차이를 만들고, 대부분의 플레이어는 동행을 반깁니다."
     },
     "stats": {
-      "intro": "Your character is described by a handful of attributes. You never have to memorize them to play well, but knowing roughly what each one does helps you read your character sheet and pick the right upgrades.",
-      "primaryHeading": "Primary attributes",
-      "primaryBody": "Five attributes shape your character: Strength, Agility, Stamina, Intellect, and Spirit. Each class leans on a different mix, so the ones that matter most depend on what you play.",
-      "strTitle": "Strength",
-      "strBody": "Strength raises your melee attack power, so your weapon swings hit harder. It does the most for the heavy melee classes that fight up close.",
-      "agiTitle": "Agility",
-      "agiBody": "Agility sharpens you in several ways: it raises your chance to land a critical hit and your chance to dodge, and it adds a little armor. For rogues and hunters it also feeds attack power, and it drives a hunter's ranged shots.",
-      "staTitle": "Stamina",
-      "staBody": "Stamina is your staying power. More Stamina means a larger health pool, and it speeds the health you recover while resting out of combat. Every class wants some.",
-      "intTitle": "Intellect",
-      "intBody": "Intellect grows a spellcaster's mana pool and improves the chance their spells crit. It matters to the classes that cast from mana; for a Rage or Energy class it does little.",
-      "spiTitle": "Spirit",
-      "spiBody": "Spirit governs how quickly a caster's mana returns while out of combat. Like Intellect, it serves the mana classes and means little to the others.",
-      "armorTitle": "Armor",
-      "armorBody": "Armor reduces the physical damage you take. It comes mostly from what you wear, and the heavier armor classes carry far more of it. More armor against a foe near your level means each of its hits lands softer.",
-      "apTitle": "Attack power",
-      "apBody": "Attack power measures how hard your weapon strikes. Your primary attributes feed it, and stronger weapons and gear raise it further, which is why an upgrade can be a real jump in damage.",
-      "critTitle": "Critical strike",
-      "critBody": "Your critical strike chance is how often an attack lands for extra damage. Everyone starts with a small base chance, and Agility (plus some talents and gear) builds on it.",
-      "dodgeTitle": "Dodge",
-      "dodgeBody": "Dodge is your chance to avoid an incoming melee attack entirely. You begin with a small base chance, and Agility raises it, so nimble classes slip more blows.",
-      "sheetHeading": "Reading your character sheet",
-      "sheetBody": "Open the character window in game to see all of this in one place: your five attributes on one side and the stats they feed on the other. Hover any value and a tooltip breaks down what it does for your class, so you can see at a glance which numbers an upgrade actually moved.",
-      "growHeading": "How your stats grow",
-      "growBody": "Two things raise your stats. Every level adds a fixed amount of each attribute to suit your class, and the gear you equip adds more on top. Keeping your gear current is the steadiest way to grow stronger, all the way to the level cap."
+      "intro": "당신의 캐릭터는 몇 가지 능력치로 설명됩니다. 잘 플레이하려고 이를 외울 필요는 전혀 없지만, 각각이 대략 무슨 일을 하는지 알면 캐릭터 정보 창을 읽고 알맞은 업그레이드를 고르는 데 도움이 됩니다.",
+      "primaryHeading": "주 능력치",
+      "primaryBody": "다섯 가지 능력치가 캐릭터를 빚습니다. 힘, 민첩성, 체력, 지능, 정신력입니다. 직업마다 서로 다른 조합에 기대므로, 가장 중요한 능력치는 무엇을 플레이하느냐에 달려 있습니다.",
+      "strTitle": "힘",
+      "strBody": "힘은 근접 공격력을 올려 무기를 더 세게 휘두르게 합니다. 가까이 붙어 싸우는 중장갑 근접 직업에게 가장 큰 도움이 됩니다.",
+      "agiTitle": "민첩성",
+      "agiBody": "민첩성은 여러 방식으로 당신을 날카롭게 합니다. 치명타 명중 확률과 회피 확률을 올리고, 약간의 방어도를 더합니다. 도적과 사냥꾼에게는 공격력에도 보태지며, 사냥꾼의 원거리 사격을 좌우합니다.",
+      "staTitle": "체력",
+      "staBody": "체력은 당신의 버티는 힘입니다. 체력이 높을수록 생명력 양이 커지고, 전투 밖에서 쉬는 동안 회복하는 생명력도 빨라집니다. 모든 직업이 어느 정도 원하는 능력치입니다.",
+      "intTitle": "지능",
+      "intBody": "지능은 주문 시전자의 마나 양을 키우고 주문이 치명타로 박힐 확률을 높여 줍니다. 마나로 시전하는 직업에게 중요하며, 분노나 기력을 쓰는 직업에게는 거의 의미가 없습니다.",
+      "spiTitle": "정신력",
+      "spiBody": "정신력은 전투 밖에서 시전자의 마나가 얼마나 빠르게 돌아오는지를 다스립니다. 지능과 마찬가지로 마나 직업에게 쓸모 있고 다른 직업에게는 별 의미가 없습니다.",
+      "armorTitle": "방어도",
+      "armorBody": "방어도는 받는 물리 피해를 줄여 줍니다. 대부분 착용한 장비에서 나오며, 중장갑 직업일수록 훨씬 많이 지닙니다. 자신과 비슷한 레벨의 적을 상대로 방어도가 높으면, 그 적의 공격 하나하나가 더 무르게 박힙니다.",
+      "apTitle": "공격력",
+      "apBody": "공격력은 무기가 얼마나 세게 내리치는지를 나타냅니다. 주 능력치가 이를 보태고, 더 강한 무기와 장비가 한층 끌어올리므로, 업그레이드 하나가 피해량에서 진짜 도약이 될 수 있습니다.",
+      "critTitle": "치명타",
+      "critBody": "치명타 확률은 공격이 추가 피해를 입히며 박히는 빈도입니다. 누구나 작은 기본 확률로 시작하며, 민첩성(그리고 일부 특성과 장비)이 그 위에 쌓아 올립니다.",
+      "dodgeTitle": "회피",
+      "dodgeBody": "회피는 들어오는 근접 공격을 통째로 피해 낼 확률입니다. 작은 기본 확률로 시작하며 민첩성이 이를 올려 주므로, 날쌘 직업일수록 더 많은 공격을 흘려보냅니다.",
+      "sheetHeading": "캐릭터 정보 창 읽기",
+      "sheetBody": "게임에서 캐릭터 창을 열면 이 모든 것을 한자리에서 볼 수 있습니다. 한쪽에는 다섯 가지 능력치가, 다른 쪽에는 그것이 보태는 스탯이 놓입니다. 어떤 값에든 마우스를 올리면 툴팁이 당신 직업에게 그것이 무슨 일을 하는지 풀어 주므로, 업그레이드가 실제로 어떤 수치를 움직였는지 한눈에 알 수 있습니다.",
+      "growHeading": "능력치가 자라는 법",
+      "growBody": "능력치를 올리는 길은 두 가지입니다. 레벨이 오를 때마다 직업에 맞춰 각 능력치가 정해진 만큼 더해지고, 착용한 장비가 그 위에 더 보탭니다. 장비를 늘 최신으로 유지하는 것이 최고 레벨까지 가장 꾸준히 강해지는 길입니다."
     },
     "progression": {
-      "intro": "Every fight, quest, and step north makes your hero stronger. Here is how leveling works and what keeps you growing once you reach the top.",
-      "xpTitle": "How you gain experience",
-      "xpBody": "You earn experience by completing quests and by defeating enemies. Quests give the most by far, so following the quest trail is the fastest way to climb. Killing things along the way fills in the rest.",
-      "capBody": "Each level makes you tougher and brings new abilities, all the way to the cap of level {cap}.",
-      "journeyTitle": "The journey north",
-      "journeyBody": "The world is one continuous land, three zones laid south to north, each a step higher in level. You start in the green valley, press on through the marsh, and finish in the cold high peaks. Follow the quest trail and the land carries you from one to the next.",
-      "bandLabel": "Levels {min} to {max}",
-      "restedTitle": "Rested experience",
-      "restedBody": "When you log out, or rest in a safe place like an inn, your character builds up rested experience while you are away. The next time you go out and fight, that pool gives your kills an extra boost until it runs dry. It builds up over time and speeds your early levels, so logging off in town is never wasted time.",
-      "capTitle": "Reaching level {cap}",
-      "capJourneyBody": "Level {cap} is the cap, the end of leveling but not of growing. From there you run dungeons and the raid, chase better gear, and test yourself in the arena.",
-      "prestigeBody": "Experience keeps counting even after the cap. It feeds a cosmetic virtual level, so your experience bar keeps climbing, and a long-term prestige rank you can earn for the recognition. It is purely optional and never grants power, just a mark of the road you have walked.",
-      "noRush": "There is no rush. The world is there to enjoy at your own pace, so wander, take the quests that catch your eye, and let your hero grow along the way."
+      "intro": "모든 전투와 퀘스트, 북쪽으로 내딛는 한 걸음 한 걸음이 당신의 영웅을 강하게 만듭니다. 레벨업이 어떻게 돌아가는지, 그리고 정점에 이른 뒤에도 무엇이 당신을 계속 성장하게 하는지 정리했습니다.",
+      "xpTitle": "경험치를 얻는 법",
+      "xpBody": "경험치는 퀘스트를 완수하고 적을 물리쳐 얻습니다. 퀘스트가 단연 가장 많이 주므로, 퀘스트 길을 따라가는 것이 가장 빠르게 오르는 방법입니다. 그 길에서 적을 처치하며 나머지를 채워 가세요.",
+      "capBody": "레벨이 오를 때마다 더 단단해지고 새 능력이 따라오며, 최고 레벨인 {cap}레벨까지 이어집니다.",
+      "journeyTitle": "북쪽으로 가는 여정",
+      "journeyBody": "세계는 하나로 이어진 대지로, 세 지역이 남에서 북으로 펼쳐지며 저마다 레벨이 한 단계씩 높아집니다. 푸른 골짜기에서 시작해 습지를 헤치고 나아가, 차가운 높은 봉우리에서 마무리합니다. 퀘스트 길을 따라가면 땅이 당신을 한 지역에서 다음으로 이끌어 줍니다.",
+      "bandLabel": "{min}~{max}레벨",
+      "restedTitle": "휴식 경험치",
+      "restedBody": "접속을 끊거나 여관 같은 안전한 곳에서 쉬면, 떠나 있는 동안 캐릭터에게 휴식 경험치가 쌓입니다. 다음번에 밖으로 나가 싸울 때, 그 비축분이 바닥날 때까지 처치 경험치에 추가 보너스를 더해 줍니다. 시간이 지나며 차오르고 초반 레벨업에 속도를 더해 주니, 마을에서 접속을 끊는 것은 결코 헛된 시간이 아닙니다.",
+      "capTitle": "{cap}레벨에 이르기",
+      "capJourneyBody": "{cap}레벨이 한계, 즉 레벨업의 끝이지만 성장의 끝은 아닙니다. 그곳에서부터는 던전과 공격대를 누비고, 더 좋은 장비를 좇으며, 투기장에서 자신을 시험합니다.",
+      "prestigeBody": "경험치는 최고 레벨에 이른 뒤에도 계속 쌓입니다. 그것이 외형적인 가상 레벨에 더해져 경험치 막대는 계속 차오르고, 인정의 표시로 얻을 수 있는 장기적 명예 등급에도 보탬이 됩니다. 순전히 선택 사항이며 힘을 주는 일은 결코 없고, 그저 당신이 걸어온 길의 흔적일 뿐입니다.",
+      "noRush": "서두를 필요 없습니다. 세계는 자신만의 속도로 즐기라고 있는 것이니, 마음껏 거닐고, 눈길을 끄는 퀘스트를 받으며, 그 길에서 당신의 영웅을 자라게 하세요."
     },
     "placeholder": {
-      "note": "This part of the guide is on its way."
+      "note": "가이드의 이 부분은 준비 중입니다."
     },
     "notFound": {
-      "title": "We could not find that page",
-      "body": "The page you were looking for does not exist or may have moved.",
-      "home": "Back to the overview"
+      "title": "해당 페이지를 찾을 수 없습니다",
+      "body": "찾으시는 페이지가 존재하지 않거나 이동되었을 수 있습니다.",
+      "home": "개요로 돌아가기"
     }
   },
   "skinEvent": {
@@ -1529,8 +1529,8 @@ export const ko_KR: EnTranslations = {
     "news": "새소식",
     "download": "다운로드",
     "loginRegister": "로그인/회원가입",
-    "account": "Account",
-    "logout": "Logout",
+    "account": "계정",
+    "logout": "로그아웃",
     "donate": "후원"
   },
   "stats": {
@@ -1630,185 +1630,185 @@ export const ko_KR: EnTranslations = {
     "enterWorld": "세계 입장",
     "offlineCharacter": "오프라인 캐릭터",
     "create": "생성",
-    "twoFactorLabel": "Authentication code",
-    "twoFactorPlaceholder": "6-digit or recovery code",
-    "twoFactorHint": "Enter the code from your authenticator app, or one of your recovery codes."
+    "twoFactorLabel": "인증 코드",
+    "twoFactorPlaceholder": "6자리 또는 복구 코드",
+    "twoFactorHint": "인증 앱에 표시된 코드 또는 복구 코드 중 하나를 입력하세요."
   },
   "wallet": {
-    "label": "$WOC Wallet",
-    "connect": "Verify Wallet",
-    "connectTitle": "Verify your Solana wallet",
-    "connectAria": "Verify your Solana wallet",
-    "verify": "Verify Wallet",
-    "verifyNew": "Verify New Wallet",
-    "verifyTitle": "Choose a wallet and sign once to verify ownership.",
-    "verifyAria": "Choose a wallet and sign once to verify ownership",
-    "verifyAddressAria": "Sign to verify wallet {address} for your account",
-    "appConnected": "App Connected",
-    "connectApp": "Connect App",
-    "connectAppTitle": "Connect the wallet app on this browser",
-    "connectAppAria": "Connect the wallet app on this browser",
-    "verifying": "Verifying...",
-    "verifyingTitle": "Wallet verification is in progress.",
-    "switch": "Switch",
-    "switchTitle": "Verify a different wallet",
-    "switchAria": "Verify a different wallet",
-    "unlink": "Unlink",
-    "unlinkTitle": "Remove wallet verification from this account",
-    "unlinkAria": "Remove wallet verification from this account",
-    "signOut": "Disconnect",
-    "signOutTitle": "Disconnect the wallet app on this browser",
-    "signOutAria": "Disconnect the wallet app on this browser",
-    "hide": "Hide",
-    "hideTitle": "Hide wallet row on this screen",
-    "hideAria": "Hide wallet row on this screen",
-    "hiddenNotice": "Wallet row hidden. Re-enable it in-game from Options > Interface.",
-    "linkedTitle": "Wallet verified for your account. Click to manage the wallet app.",
-    "linkedDisconnectedTitle": "Wallet remains verified for your account. Reconnect to manage the wallet app.",
-    "linkedDisconnectedAria": "Wallet remains verified for your account. Reconnect to manage the wallet app.",
-    "linkTitle": "Click to sign and link this wallet to your account.",
-    "connectedTitle": "Connected. Log in to link this wallet to your account.",
-    "balanceTitle": "Verified Solana wallet $WOC balance",
-    "balanceAria": "Verified Solana wallet balance: {balance}",
-    "balancePreviewTitle": "Connected wallet $WOC balance preview",
-    "balancePreviewAria": "Connected wallet balance preview: {balance}. Link the wallet to verify holder flair.",
+    "label": "$WOC 지갑",
+    "connect": "지갑 인증",
+    "connectTitle": "Solana 지갑 인증",
+    "connectAria": "Solana 지갑 인증",
+    "verify": "지갑 인증",
+    "verifyNew": "새 지갑 인증",
+    "verifyTitle": "지갑을 선택하고 한 번 서명해 소유권을 인증하세요.",
+    "verifyAria": "지갑을 선택하고 한 번 서명해 소유권을 인증",
+    "verifyAddressAria": "계정에 지갑 {address}을(를) 인증하려면 서명하세요",
+    "appConnected": "앱 연결됨",
+    "connectApp": "앱 연결",
+    "connectAppTitle": "이 브라우저에서 지갑 앱 연결",
+    "connectAppAria": "이 브라우저에서 지갑 앱 연결",
+    "verifying": "인증 중...",
+    "verifyingTitle": "지갑 인증이 진행 중입니다.",
+    "switch": "전환",
+    "switchTitle": "다른 지갑 인증",
+    "switchAria": "다른 지갑 인증",
+    "unlink": "연결 해제",
+    "unlinkTitle": "이 계정에서 지갑 인증 제거",
+    "unlinkAria": "이 계정에서 지갑 인증 제거",
+    "signOut": "연결 끊기",
+    "signOutTitle": "이 브라우저에서 지갑 앱 연결 끊기",
+    "signOutAria": "이 브라우저에서 지갑 앱 연결 끊기",
+    "hide": "숨기기",
+    "hideTitle": "이 화면에서 지갑 줄 숨기기",
+    "hideAria": "이 화면에서 지갑 줄 숨기기",
+    "hiddenNotice": "지갑 줄이 숨겨졌습니다. 게임 내 옵션 > 인터페이스에서 다시 켤 수 있습니다.",
+    "linkedTitle": "계정에 지갑이 인증되었습니다. 클릭해 지갑 앱을 관리하세요.",
+    "linkedDisconnectedTitle": "지갑은 계정에 계속 인증되어 있습니다. 지갑 앱을 관리하려면 다시 연결하세요.",
+    "linkedDisconnectedAria": "지갑은 계정에 계속 인증되어 있습니다. 지갑 앱을 관리하려면 다시 연결하세요.",
+    "linkTitle": "클릭해 서명하고 이 지갑을 계정에 연결하세요.",
+    "connectedTitle": "연결되었습니다. 로그인하면 이 지갑을 계정에 연결할 수 있습니다.",
+    "balanceTitle": "인증된 Solana 지갑 $WOC 잔액",
+    "balanceAria": "인증된 Solana 지갑 잔액: {balance}",
+    "balancePreviewTitle": "연결된 지갑 $WOC 잔액 미리보기",
+    "balancePreviewAria": "연결된 지갑 잔액 미리보기: {balance}. 지갑을 연결해 보유자 표시를 인증하세요.",
     "balanceAmount": "{amount} $WOC",
-    "connected": "Connected: {address}",
-    "connectedWithBalance": "Connected: {balance} - {address}",
-    "connectedLinked": "Verified: {address}",
-    "connectedLinkedWithBalance": "Verified: {balance} - {address}",
-    "helpDisconnected": "Verify a Solana wallet to enable holder flair and player-card badges. No transaction or SOL required.",
-    "helpLoginToLink": "Connected {address}. Log in to link it to your account.",
-    "helpLoginToLinkWithBalance": "Connected {address} with {balance}. Log in to link it to your account.",
-    "helpReadyToLink": "Wallet selected: {address}. Sign once to verify holder flair and player cards.",
-    "helpReadyToLinkWithBalance": "Wallet selected: {address} with {balance}. Sign once to verify holder flair and player cards.",
-    "helpLinked": "Holder perks are active. Wallet app connected on this browser.",
-    "helpLinkedWithBalance": "Holder perks are active. Wallet app connected on this browser.",
-    "helpLinkedDisconnected": "Holder perks are active. Connect the app when you need to sign or spend.",
-    "helpLinkedDisconnectedWithBalance": "Holder perks are active. Connect the app when you need to sign or spend.",
-    "flowConnect": "Choose a wallet. Verification continues automatically.",
-    "flowSign": "Sign the verification message in your wallet app. No transaction or SOL required.",
-    "flowVerify": "Verifying wallet ownership...",
-    "linkFailed": "Wallet verification failed.",
-    "verifyFailed": "Wallet verification failed.",
-    "unlinkFailed": "Could not unlink wallet.",
-    "holder": "$WOC holder",
-    "holderTierTitle": "{tier} $WOC holder",
+    "connected": "연결됨: {address}",
+    "connectedWithBalance": "연결됨: {balance} - {address}",
+    "connectedLinked": "인증됨: {address}",
+    "connectedLinkedWithBalance": "인증됨: {balance} - {address}",
+    "helpDisconnected": "Solana 지갑을 인증해 보유자 표시와 플레이어 카드 배지를 활성화하세요. 트랜잭션이나 SOL은 필요 없습니다.",
+    "helpLoginToLink": "{address} 연결됨. 로그인하면 계정에 연결할 수 있습니다.",
+    "helpLoginToLinkWithBalance": "{address} 연결됨, 잔액 {balance}. 로그인하면 계정에 연결할 수 있습니다.",
+    "helpReadyToLink": "선택한 지갑: {address}. 한 번 서명해 보유자 표시와 플레이어 카드를 인증하세요.",
+    "helpReadyToLinkWithBalance": "선택한 지갑: {address}, 잔액 {balance}. 한 번 서명해 보유자 표시와 플레이어 카드를 인증하세요.",
+    "helpLinked": "보유자 혜택이 활성화되었습니다. 이 브라우저에 지갑 앱이 연결되어 있습니다.",
+    "helpLinkedWithBalance": "보유자 혜택이 활성화되었습니다. 이 브라우저에 지갑 앱이 연결되어 있습니다.",
+    "helpLinkedDisconnected": "보유자 혜택이 활성화되었습니다. 서명이나 지출이 필요할 때 앱을 연결하세요.",
+    "helpLinkedDisconnectedWithBalance": "보유자 혜택이 활성화되었습니다. 서명이나 지출이 필요할 때 앱을 연결하세요.",
+    "flowConnect": "지갑을 선택하세요. 인증은 자동으로 계속됩니다.",
+    "flowSign": "지갑 앱에서 인증 메시지에 서명하세요. 트랜잭션이나 SOL은 필요 없습니다.",
+    "flowVerify": "지갑 소유권 인증 중...",
+    "linkFailed": "지갑 인증에 실패했습니다.",
+    "verifyFailed": "지갑 인증에 실패했습니다.",
+    "unlinkFailed": "지갑 연결을 해제하지 못했습니다.",
+    "holder": "$WOC 보유자",
+    "holderTierTitle": "{tier} $WOC 보유자",
     "holderTiers": {
       "ember": {
-        "name": "Ember",
-        "flavor": "The spark is lit."
+        "name": "불씨",
+        "flavor": "불씨가 피어올랐습니다."
       },
       "coinbearer": {
-        "name": "Coinbearer",
-        "flavor": "First coin in the war chest."
+        "name": "주화지기",
+        "flavor": "전비 상자에 첫 주화가 들어왔습니다."
       },
       "coppercrest": {
-        "name": "Coppercrest",
-        "flavor": "Coppers stacked, your name spoken."
+        "name": "동빛 문장",
+        "flavor": "동화가 쌓이고, 당신의 이름이 오르내립니다."
       },
       "silverbound": {
-        "name": "Silverbound",
-        "flavor": "Bound in silver, building the bag."
+        "name": "은빛 결속",
+        "flavor": "은빛으로 결속되어 자산을 키워 갑니다."
       },
       "gilded": {
-        "name": "Gilded",
-        "flavor": "Gilded and grinning."
+        "name": "황금빛",
+        "flavor": "황금빛으로 빛나며 웃습니다."
       },
       "vaultwarden": {
-        "name": "Vaultwarden",
-        "flavor": "Guarding a real vault now: 0.01% of all $WOC."
+        "name": "금고 파수꾼",
+        "flavor": "이제 진짜 금고를 지킵니다: 전체 $WOC의 0.01%."
       },
       "whale": {
-        "name": "Whale",
-        "flavor": "The deep parts when you swim: 0.1% of supply."
+        "name": "고래",
+        "flavor": "당신이 헤엄치면 깊은 물길도 갈라집니다: 공급량의 0.1%."
       },
       "leviathan": {
-        "name": "Leviathan",
-        "flavor": "Markets feel you move: 1% of supply."
+        "name": "레비아탄",
+        "flavor": "당신이 움직이면 시장이 느낍니다: 공급량의 1%."
       },
       "tidelord": {
-        "name": "Tidelord",
-        "flavor": "The tide answers your call: 2% of supply."
+        "name": "파도 군주",
+        "flavor": "파도가 당신의 부름에 응답합니다: 공급량의 2%."
       },
       "stormcaller": {
-        "name": "Stormcaller",
-        "flavor": "Storms gather at your name: 3% of supply."
+        "name": "폭풍소환자",
+        "flavor": "당신의 이름에 폭풍이 모입니다: 공급량의 3%."
       },
       "krakencrown": {
-        "name": "Krakencrown",
-        "flavor": "Crowned by the deep: 4% of supply."
+        "name": "크라켄 왕관",
+        "flavor": "심연이 당신에게 관을 씌웁니다: 공급량의 4%."
       },
       "titanforged": {
-        "name": "Titanforged",
-        "flavor": "Forged among titans: 5% of supply."
+        "name": "티탄벼림",
+        "flavor": "티탄들 사이에서 벼려졌습니다: 공급량의 5%."
       },
       "starhoard": {
-        "name": "Starhoard",
-        "flavor": "A hoard that bends starlight: 6% of supply."
+        "name": "별 보물고",
+        "flavor": "별빛을 휘게 하는 보물고입니다: 공급량의 6%."
       },
       "voidwarden": {
-        "name": "Voidwarden",
-        "flavor": "Keeper at the void's edge: 7% of supply."
+        "name": "공허 파수꾼",
+        "flavor": "공허의 끝을 지킵니다: 공급량의 7%."
       },
       "realmshaper": {
-        "name": "Realmshaper",
-        "flavor": "You reshape the realm: 8% of supply."
+        "name": "영역 조형자",
+        "flavor": "당신은 영역을 다시 빚습니다: 공급량의 8%."
       },
       "worldforger": {
-        "name": "Worldforger",
-        "flavor": "Forging a world of your own: 9% of supply."
+        "name": "세계 대장장이",
+        "flavor": "당신만의 세계를 벼립니다: 공급량의 9%."
       },
       "worldbearer": {
-        "name": "Worldbearer",
-        "flavor": "You carry a piece of the world: 10% of supply."
+        "name": "세계 운반자",
+        "flavor": "당신은 세계의 일부를 짊어집니다: 공급량의 10%."
       },
       "sovereign": {
-        "name": "Sovereign",
-        "flavor": "The realm bends the knee: the entire supply."
+        "name": "군주",
+        "flavor": "렐름이 무릎을 꿇습니다: 전체 공급량."
       }
     }
   },
   "playerCard": {
-    "shareButton": "Share Player Card",
-    "title": "Player Card",
-    "close": "Close player card",
-    "loading": "Forging your card...",
-    "poseGroup": "Pose",
-    "poseHero": "Hero",
-    "poseBattle": "Battle",
-    "poseVictory": "Victory",
-    "referralLinkLabel": "Your referral link. Anyone who joins through it is credited to you:",
-    "referralLinkAria": "Your referral link",
-    "renderFailed": "Could not render your card. Try a different pose.",
-    "renderFailedStatus": "Card render failed.",
-    "levelClass": "Level {level} - {className}",
-    "topPercent": "TOP {percent}%",
-    "realmSubtitle": "{realm} Realm",
-    "defaultRealm": "World of ClaudeCraft",
+    "shareButton": "플레이어 카드 공유",
+    "title": "플레이어 카드",
+    "close": "플레이어 카드 닫기",
+    "loading": "카드를 벼리는 중...",
+    "poseGroup": "자세",
+    "poseHero": "영웅",
+    "poseBattle": "전투",
+    "poseVictory": "승리",
+    "referralLinkLabel": "당신의 추천 링크입니다. 이 링크로 가입한 사람은 당신의 추천으로 기록됩니다:",
+    "referralLinkAria": "당신의 추천 링크",
+    "renderFailed": "카드를 렌더링하지 못했습니다. 다른 자세를 시도하세요.",
+    "renderFailedStatus": "카드 렌더링에 실패했습니다.",
+    "levelClass": "{level}레벨 - {className}",
+    "topPercent": "상위 {percent}%",
+    "realmSubtitle": "{realm} 렐름",
+    "defaultRealm": "ClaudeCraft의 세계",
     "brandWordmark": "WORLD OF CLAUDECRAFT",
-    "recruited": "{count} recruited",
+    "recruited": "{count}명 모집",
     "footerHandle": "@{handle}",
     "footerHandleWithRecruits": "@{handle} - {recruited}",
-    "footerCta": "Forge your legend: {siteUrl}",
-    "arenaStat": "Arena",
-    "shareTierBit": ", {tier}-rank $WOC holder",
-    "shareText": "I'm forging my legend in World of ClaudeCraft: Level {level} {className}{tierBit}. Join my realm:",
-    "nativeShareTitle": "World of ClaudeCraft",
-    "fileNameFallback": "player",
-    "actionShareX": "Share to X",
-    "actionCopyReferral": "Copy Referral Link",
-    "actionDownload": "Download",
-    "actionShareNative": "Share...",
-    "statusGenericError": "Something went wrong.",
-    "statusStillRendering": "Card is still rendering.",
-    "statusPublishing": "Publishing card...",
-    "statusPublished": "Card published. Share your referral link below.",
-    "statusOpenedXWithImage": "Opened X. Paste the card image into the post.",
-    "statusOpenedXWithLink": "Opened X with your link. The card image appears after posting from a public domain.",
-    "statusReferralCopied": "Referral link copied. Share it anywhere.",
-    "statusDownloaded": "Card downloaded.",
-    "statusShareUnsupported": "Sharing is not supported on this device."
+    "footerCta": "당신의 전설을 벼리세요: {siteUrl}",
+    "arenaStat": "투기장",
+    "shareTierBit": ", {tier} 등급 $WOC 보유자",
+    "shareText": "World of ClaudeCraft에서 제 전설을 벼리고 있습니다: {level}레벨 {className}{tierBit}. 제 렐름에 합류하세요:",
+    "nativeShareTitle": "ClaudeCraft의 세계",
+    "fileNameFallback": "플레이어",
+    "actionShareX": "X에 공유",
+    "actionCopyReferral": "추천 링크 복사",
+    "actionDownload": "다운로드",
+    "actionShareNative": "공유...",
+    "statusGenericError": "문제가 발생했습니다.",
+    "statusStillRendering": "카드가 아직 렌더링 중입니다.",
+    "statusPublishing": "카드 게시 중...",
+    "statusPublished": "카드가 게시되었습니다. 아래 추천 링크를 공유하세요.",
+    "statusOpenedXWithImage": "X를 열었습니다. 게시물에 카드 이미지를 붙여넣으세요.",
+    "statusOpenedXWithLink": "링크와 함께 X를 열었습니다. 공개 도메인에서 게시한 뒤 카드 이미지가 표시됩니다.",
+    "statusReferralCopied": "추천 링크가 복사되었습니다. 어디에나 공유하세요.",
+    "statusDownloaded": "카드가 다운로드되었습니다.",
+    "statusShareUnsupported": "이 기기에서는 공유가 지원되지 않습니다."
   },
   "classes": {
     "warrior": "전사",
@@ -1861,259 +1861,259 @@ export const ko_KR: EnTranslations = {
   },
   "sim": {
     "delve": {
-      "cannotEnterNow": "You cannot enter a delve right now.",
-      "leaveDungeonFirst": "Leave the dungeon first.",
-      "leaveArenaFirst": "Leave the arena first.",
-      "alreadyInDelve": "You are already in a delve.",
-      "whileTrading": "You cannot enter a delve while trading.",
-      "duringDuel": "You cannot enter a delve during a duel.",
-      "duringArena": "You cannot enter a delve during an arena match.",
-      "unknownTier": "Unknown delve tier.",
-      "levelRequired": "You must be level {level} to enter {name}.",
-      "levelRequiredTier": "You must be level {level} to enter {name} on {tier}.",
-      "instancesBusy": "All instances of {name} are busy. Try again soon.",
-      "runFailed": "{name} run failed.",
-      "complete": "{name} complete.",
-      "mechanismOpen": "A mechanism clicks open nearby. A passage opens to the north. Find the exit portal ahead.",
-      "raiseDead": "{name} begins Raise Dead.",
-      "graveFalters": "The grave rite falters.",
-      "doorAlreadyOpen": "The door is already open.",
-      "companionRankUp": "{name} reaches rank {rank}.",
-      "bossChest": "The boss falls. A warded reliquary chest rises on the dais. Pick its lock to claim your spoils.",
-      "surfaceStairs": "A stairway to the surface opens. Press F at the stairs to leave.",
+      "cannotEnterNow": "지금은 탐굴에 진입할 수 없습니다.",
+      "leaveDungeonFirst": "먼저 던전에서 나가세요.",
+      "leaveArenaFirst": "먼저 투기장에서 나가세요.",
+      "alreadyInDelve": "이미 탐굴 중입니다.",
+      "whileTrading": "거래 중에는 탐굴에 진입할 수 없습니다.",
+      "duringDuel": "결투 중에는 탐굴에 진입할 수 없습니다.",
+      "duringArena": "투기장 경기 중에는 탐굴에 진입할 수 없습니다.",
+      "unknownTier": "알 수 없는 탐굴 등급입니다.",
+      "levelRequired": "{name}에 진입하려면 레벨 {level} 이상이어야 합니다.",
+      "levelRequiredTier": "{tier} 난이도로 {name}에 진입하려면 레벨 {level}이(가) 필요합니다.",
+      "instancesBusy": "{name}의 모든 인스턴스가 사용 중입니다. 잠시 후 다시 시도하세요.",
+      "runFailed": "{name} 진행에 실패했습니다.",
+      "complete": "{name} 완료.",
+      "mechanismOpen": "근처에서 기계 장치가 철컥 열립니다. 북쪽으로 통로가 열립니다. 앞쪽의 출구 차원문을 찾으세요.",
+      "raiseDead": "{name}이(가) 죽음의 부활을 시전하기 시작합니다.",
+      "graveFalters": "무덤의 의식이 흔들립니다.",
+      "doorAlreadyOpen": "문이 이미 열려 있습니다.",
+      "companionRankUp": "{name}이(가) {rank}등급에 도달했습니다.",
+      "bossChest": "우두머리가 쓰러집니다. 봉인된 성물실 상자가 단상 위로 솟아오릅니다. 자물쇠를 따서 전리품을 차지하세요.",
+      "surfaceStairs": "지상으로 향하는 계단이 열립니다. 계단에서 F 키를 눌러 나가세요.",
       "moduleEnter": "{name}: {objective}",
-      "objectiveClearRoom": "Clear the room.",
-      "objectiveDefeatBoss": "Defeat the boss.",
-      "tombstoneHint": "A tombstone passage opens to the north when the room is cleared.",
-      "tombstoneOpen": "A sealed tombstone passage grinds open to the north. Walk into it to continue.",
-      "tombstoneInto": "You pass through the tombstone into {name}.",
-      "chestEmpty": "The chest is empty.",
-      "notInDelve": "You are not in a delve.",
-      "cannotInteract": "You cannot interact with that.",
-      "tooFar": "You are too far away.",
-      "graveSilent": "The grave is silent for now.",
-      "doorLocked": "The door is locked.",
-      "strikeWall": "Strike the wall to break through.",
-      "nothingHappens": "Nothing happens.",
-      "unknownCompanion": "Unknown companion.",
-      "companionMaxRank": "This companion is already fully upgraded.",
-      "companionMarksRequired": "You need {marks} Delve Marks to upgrade {name}.",
-      "cannotAffordCompanionUpgrade": "You cannot afford this upgrade.",
-      "shopItemLocked": "You have not unlocked that item yet.",
-      "shopMarksRequired": "You need {marks} Delve Marks to buy {name}.",
-      "shopSealPremiumOnly": "This seal yields only to a master's hand. Only the Premium ante can open it.",
-      "passageSealed": "The passage is sealed.",
-      "moveCloserPassage": "Move closer to the passage.",
-      "moveCloserChest": "Move closer to the chest.",
-      "nothingToTake": "There is nothing left to take.",
-      "wayOutNotOpen": "The way out is not yet open.",
-      "moveCloserStairs": "Move closer to the stairs."
+      "objectiveClearRoom": "방을 정리하세요.",
+      "objectiveDefeatBoss": "우두머리를 처치하세요.",
+      "tombstoneHint": "방을 정리하면 북쪽으로 묘비 통로가 열립니다.",
+      "tombstoneOpen": "봉인된 묘비 통로가 북쪽으로 갈리며 열립니다. 그 안으로 걸어 들어가 계속 진행하세요.",
+      "tombstoneInto": "묘비를 통과해 {name}(으)로 들어갑니다.",
+      "chestEmpty": "상자가 비어 있습니다.",
+      "notInDelve": "탐굴 중이 아닙니다.",
+      "cannotInteract": "그것과는 상호작용할 수 없습니다.",
+      "tooFar": "너무 멀리 떨어져 있습니다.",
+      "graveSilent": "무덤은 당분간 조용합니다.",
+      "doorLocked": "문이 잠겨 있습니다.",
+      "strikeWall": "벽을 쳐서 뚫고 나가세요.",
+      "nothingHappens": "아무 일도 일어나지 않습니다.",
+      "unknownCompanion": "알 수 없는 동료입니다.",
+      "companionMaxRank": "이 동료는 이미 최대로 강화되었습니다.",
+      "companionMarksRequired": "{name}을(를) 강화하려면 탐굴 증표 {marks}개가 필요합니다.",
+      "cannotAffordCompanionUpgrade": "이 강화를 감당할 수 없습니다.",
+      "shopItemLocked": "아직 잠금 해제되지 않은 아이템입니다.",
+      "shopMarksRequired": "{name}을(를) 구매하려면 탐굴 증표 {marks}개가 필요합니다.",
+      "shopSealPremiumOnly": "이 봉인은 대가의 손에만 응합니다. 최상급 베팅만이 열 수 있습니다.",
+      "passageSealed": "통로가 봉인되어 있습니다.",
+      "moveCloserPassage": "통로에 더 가까이 다가가세요.",
+      "moveCloserChest": "상자에 더 가까이 다가가세요.",
+      "nothingToTake": "이제 가져갈 것이 없습니다.",
+      "wayOutNotOpen": "나가는 길이 아직 열리지 않았습니다.",
+      "moveCloserStairs": "계단에 더 가까이 다가가세요."
     },
     "lockpick": {
-      "lockYields": "The lock yields! {tier} spoils.",
-      "tierPremium": "Premium",
-      "tierMedium": "Medium",
-      "tierLow": "Modest",
-      "alreadyInProgress": "Someone is already working the lock.",
-      "cannotPickThat": "You cannot pick that.",
-      "chooseAnte": "Choose 1, 2, or 3 picks.",
-      "noAttempt": "No lock attempt in progress.",
-      "notYours": "That is not your lock.",
-      "toolSlips": "That tool slips off this lock.",
-      "lockJammed": "The lock is jammed beyond picking. Clear the delve again for another attempt.",
-      "lastPickSnaps": "The last pick snaps. The lock jams. The chest is lost unless you clear the delve again."
+      "lockYields": "자물쇠가 열립니다! {tier} 전리품.",
+      "tierPremium": "최상급",
+      "tierMedium": "중급",
+      "tierLow": "보통",
+      "alreadyInProgress": "누군가 이미 자물쇠를 따고 있습니다.",
+      "cannotPickThat": "그것은 딸 수 없습니다.",
+      "chooseAnte": "도구 1, 2, 3개 중에서 선택하세요.",
+      "noAttempt": "진행 중인 자물쇠 시도가 없습니다.",
+      "notYours": "당신의 자물쇠가 아닙니다.",
+      "toolSlips": "도구가 이 자물쇠에서 미끄러집니다.",
+      "lockJammed": "자물쇠가 더는 딸 수 없게 걸려 버렸습니다. 다시 시도하려면 탐굴을 다시 정리하세요.",
+      "lastPickSnaps": "마지막 도구가 부러집니다. 자물쇠가 걸려 버립니다. 탐굴을 다시 정리하지 않으면 상자를 잃습니다."
     }
   },
   "lockpickUi": {
-    "pickTitle": "Pick the Lock",
-    "cofferTitle": "Bountiful Coffer",
-    "cache": "{tier} Cache",
-    "pickBlurb": "A richer cache is sealed behind more locks. Easier locks give you more tries and more time; a failed try resets the lock until your tries run out.",
-    "cofferBlurb": "This seal yields only to a master's hand: the Hard, Premium path alone can open it. Solve all three locks for the signature prize.",
-    "pagesAria": "{count} locks",
-    "tries": "{count} tries",
-    "triesOne": "1 try",
-    "perMove": "{seconds}s / move",
-    "seconds": "{seconds}s",
-    "boardTitle": "Tumbler's Path: {tier} cache",
-    "closeAria": "Close",
-    "withdrawAria": "Withdraw",
-    "timerAria": "Time remaining",
-    "lockOf": "Lock {page}/{total}",
-    "lockOfAria": "Lock {page} of {total}",
-    "triesOf": "Tries {tries}/{total}",
-    "triesOfAria": "{tries} of {total} tries left",
-    "ward": "Ward {col} / {total}",
-    "depthKeys": "Hotkeys set pick depth (Q/W/E/A/Z), not the ward number.",
-    "withdraw": "Withdraw (Esc)",
+    "pickTitle": "자물쇠 따기",
+    "cofferTitle": "풍요의 금고",
+    "cache": "{tier} 상자",
+    "pickBlurb": "더 풍성한 상자일수록 자물쇠가 더 많이 걸려 있습니다. 쉬운 자물쇠는 시도 횟수와 시간이 더 넉넉합니다. 시도에 실패하면 시도 횟수가 다 떨어질 때까지 자물쇠가 처음으로 돌아갑니다.",
+    "cofferBlurb": "이 봉인은 대가의 손에만 응합니다. 어려움, 최상급 경로만이 열 수 있습니다. 세 개의 자물쇠를 모두 풀어 최고의 보상을 차지하세요.",
+    "pagesAria": "자물쇠 {count}개",
+    "tries": "시도 {count}회",
+    "triesOne": "시도 1회",
+    "perMove": "이동당 {seconds}초",
+    "seconds": "{seconds}초",
+    "boardTitle": "열쇠공의 길: {tier} 상자",
+    "closeAria": "닫기",
+    "withdrawAria": "물러나기",
+    "timerAria": "남은 시간",
+    "lockOf": "자물쇠 {page}/{total}",
+    "lockOfAria": "자물쇠 {total}개 중 {page}번째",
+    "triesOf": "시도 {tries}/{total}",
+    "triesOfAria": "남은 시도 {total}회 중 {tries}회",
+    "ward": "방호 장치 {col} / {total}",
+    "depthKeys": "단축키는 방호 번호가 아니라 픽 깊이(Q/W/E/A/Z)를 정합니다.",
+    "withdraw": "물러나기 (Esc)",
     "action": {
-      "hardSet": "Hard Set",
-      "set": "Set",
-      "steady": "Steady",
-      "ease": "Ease",
-      "drop": "Drop"
+      "hardSet": "강하게 고정",
+      "set": "고정",
+      "steady": "유지",
+      "ease": "풀기",
+      "drop": "내리기"
     },
     "feedback": {
-      "advanced": "The pin gives...",
-      "slip": "A ward bites, the pick slips!",
-      "bind": "The tumbler binds: wrong depth!",
-      "trap": "A false ward snaps shut, the lock jams!",
-      "retry": "The lock resets. Line up a fresh attempt.",
-      "pageCleared": "A tumbler bank falls. The next lock turns up.",
-      "success": "The bolt throws, the cache is yours!",
-      "fail": "The lock seizes. It won't budge again."
+      "advanced": "핀이 살짝 풀립니다...",
+      "slip": "방호 장치가 물리며 도구가 미끄러집니다!",
+      "bind": "실린더가 걸립니다: 깊이가 틀렸습니다!",
+      "trap": "가짜 방호 장치가 닫히며 자물쇠가 걸려 버립니다!",
+      "retry": "자물쇠가 처음으로 돌아갑니다. 다시 한번 맞춰 보세요.",
+      "pageCleared": "실린더 한 벌이 풀립니다. 다음 자물쇠가 나타납니다.",
+      "success": "빗장이 풀립니다. 상자는 당신의 것입니다!",
+      "fail": "자물쇠가 걸려 버립니다. 더는 꿈쩍하지 않습니다."
     },
     "summary": {
-      "success": "Lock sprung, {tier} cache claimed.",
-      "successGeneric": "Lock sprung, the cache is claimed.",
-      "fail": "The lock is ruined. Clear the delve again for another attempt.",
-      "abandoned": "You ease the picks back out. The lock waits."
+      "success": "자물쇠가 풀려 {tier} 상자를 차지했습니다.",
+      "successGeneric": "자물쇠가 풀려 상자를 차지했습니다.",
+      "fail": "자물쇠가 망가졌습니다. 다시 시도하려면 탐굴을 다시 정리하세요.",
+      "abandoned": "도구를 도로 빼냅니다. 자물쇠가 기다립니다."
     }
   },
   "delveUi": {
     "board": {
-      "title": "Delve Board",
-      "enter": "Enter Delve",
-      "enterAria": "Enter {delve} on {tier} difficulty",
-      "openDelve": "Collapsed Reliquary",
-      "openDelveAria": "Open Delve Board from {name}",
-      "marks": "Delve Marks: {count}",
-      "minLevel": "Requires Level {level}",
+      "title": "탐굴 게시판",
+      "enter": "탐굴 진입",
+      "enterAria": "{tier} 난이도로 {delve} 진입",
+      "openDelve": "무너진 성물실",
+      "openDelveAria": "{name}에서 탐굴 게시판 열기",
+      "marks": "탐굴 증표: {count}",
+      "minLevel": "필요 레벨 {level}",
       "tier": {
-        "normal": "Normal",
-        "heroic": "Heroic"
+        "normal": "일반",
+        "heroic": "영웅"
       },
       "companion": {
-        "pick": "Choose a companion",
-        "tessa": "Acolyte Tessa",
-        "rank": "Rank {rank}",
-        "boon": "Heals the party between fights. Rank 3 revives a fallen ally once per run.",
-        "upgrade": "Upgrade to Rank {rank} ({marks} Marks)",
-        "upgradeAria": "Upgrade {name} to rank {rank} for {marks} Delve Marks",
-        "maxRank": "Fully upgraded"
+        "pick": "동료 선택",
+        "tessa": "수련사제 테사",
+        "rank": "{rank}등급",
+        "boon": "전투 사이에 파티를 치유합니다. 3랭크에서는 탐굴마다 한 번 쓰러진 아군을 부활시킵니다.",
+        "upgrade": "{rank}랭크로 강화 (증표 {marks}개)",
+        "upgradeAria": "탐굴 증표 {marks}개로 {name}을(를) {rank}랭크로 강화",
+        "maxRank": "최대 강화"
       },
-      "tabDelve": "Delve",
-      "tabShop": "Shop"
+      "tabDelve": "탐굴",
+      "tabShop": "상점"
     },
     "shop": {
-      "price": "{marks} Marks",
-      "buy": "Buy",
-      "buyAria": "Buy {item} for {marks} Delve Marks",
-      "reqHeroic": "Requires a Heroic clear",
-      "reqClears": "Requires {count} clears",
-      "empty": "Nothing in stock."
+      "price": "증표 {marks}개",
+      "buy": "구매",
+      "buyAria": "탐굴 증표 {marks}개로 {item} 구매",
+      "reqHeroic": "영웅 난이도 클리어 필요",
+      "reqClears": "{count}회 클리어 필요",
+      "empty": "재고가 없습니다."
     },
     "tracker": {
-      "title": "Delve",
-      "objective": "Objective",
-      "module": "Module {current} of {total}",
-      "affix": "Affixes",
-      "complete": "Complete",
-      "marks": "Delve Marks: {count}",
-      "exitHintOpen": "Walk into the tombstone passage (north)",
-      "exitHintLocked": "Clear trash mobs to open the passage north"
+      "title": "탐굴",
+      "objective": "목표",
+      "module": "구역 {current}/{total}",
+      "affix": "고난 요소",
+      "complete": "완료",
+      "marks": "탐굴 증표: {count}",
+      "exitHintOpen": "묘비 통로로 걸어 들어가세요 (북쪽)",
+      "exitHintLocked": "북쪽 통로를 열려면 잡몹을 정리하세요"
     },
     "objective": {
-      "kill_boss": "Slay {boss}",
-      "recover_artifact": "Recover the burial ledger",
-      "clear_room": "Clear the room"
+      "kill_boss": "{boss} 처치",
+      "recover_artifact": "매장 명부 회수",
+      "clear_room": "방 정리"
     },
     "summary": {
-      "title": "Delve Complete",
-      "marks": "{count} Delve Marks earned",
-      "loreUnlock": "Lore unlocked: {title}"
+      "title": "탐굴 완료",
+      "marks": "탐굴 증표 {count}개 획득",
+      "loreUnlock": "비화 해금: {title}"
     },
     "death": {
-      "warning": "One more death will end this delve run."
+      "warning": "한 번 더 죽으면 이번 탐굴이 끝납니다."
     },
     "run": {
-      "failed": "The delve run has failed. You are returned to Brother Halven."
+      "failed": "탐굴에 실패했습니다. 브라더 할벤에게로 돌아갑니다."
     },
     "npc": {
       "halven": {
-        "greeting": "The reliquary below has shifted again. We hear chanting through the floor after midnight, and Acolyte Tessa swears the burial ledgers are changing their own ink. If you have courage enough, {playerName}, take a candle and go below. Do not trust every voice you hear down there. Some of them knew your name before you were born."
+        "greeting": "아래의 성물실이 또 움직였소. 자정이 지나면 바닥 너머로 영창 소리가 들리고, 수련사제 테사는 매장 명부가 스스로 잉크를 바꾼다고 단언하오. 용기가 있다면, {playerName}, 촛불을 들고 아래로 내려가시오. 거기서 들리는 모든 목소리를 믿지는 마시오. 그중 몇은 그대가 태어나기도 전에 그대의 이름을 알고 있었으니."
       }
     },
     "intro": {
-      "normal": "The stairwell is cold and dark. Broken saint-stones litter the descent, and a soft bell note hangs in the damp air. Acolyte Tessa whispers, \"The reliquary should not be open this far. Stay close, {playerName}.\"",
-      "heroic": "The doors groan shut behind you. Names scrape across the stone like fingernails. Tessa's candle burns blue. \"They are not calling the dead now, {playerName}. They are answering something.\""
+      "normal": "계단은 차갑고 어둡습니다. 부서진 성인석이 내려가는 길에 흩어져 있고, 부드러운 종소리가 축축한 공기 속에 맴돕니다. 수련사제 테사가 속삭입니다. \"성물실이 이렇게까지 열려 있어선 안 돼요. 가까이 붙어 있어요, {playerName}.\"",
+      "heroic": "문이 당신 뒤로 신음하며 닫힙니다. 이름들이 손톱처럼 돌을 긁어 댑니다. 테사의 촛불이 푸르게 타오릅니다. \"이제 저들은 죽은 자를 부르는 게 아니에요, {playerName}. 무언가에 응답하고 있어요.\""
     },
     "module": {
-      "reliquary_sunken_ossuary": "Water seeps through burial shelves, carrying old ash in silver-black streams.",
-      "reliquary_bell_niche": "Dozens of handbells hang in silence, each tied with funeral cloth.",
-      "reliquary_saintless_hall": "Statues with faces chiseled away with careful hatred.",
-      "reliquary_finale": "The buried bell tolls once beneath your boots."
+      "reliquary_sunken_ossuary": "물이 매장 선반 사이로 스며들며 은빛 검은 줄기로 오래된 재를 실어 나릅니다.",
+      "reliquary_bell_niche": "수십 개의 손종이 침묵 속에 매달려 있고, 저마다 장례 천으로 묶여 있습니다.",
+      "reliquary_saintless_hall": "정성스러운 증오로 얼굴이 깎여 나간 조각상들.",
+      "reliquary_finale": "묻혀 있던 종이 당신의 발밑에서 한 번 울립니다."
     },
     "moduleName": {
-      "reliquary_sunken_ossuary": "The Sunken Ossuary",
-      "reliquary_bell_niche": "The Bell Niche",
-      "reliquary_saintless_hall": "The Saintless Hall",
-      "reliquary_finale": "The Bell-Buried Chamber"
+      "reliquary_sunken_ossuary": "물에 잠긴 납골당",
+      "reliquary_bell_niche": "종의 감실",
+      "reliquary_saintless_hall": "성인 없는 회랑",
+      "reliquary_finale": "종이 묻힌 방"
     },
     "companion": {
       "barkLine": "{name}: {line}",
       "tessa": {
-        "combat_start": "Keep your footing, {playerName}. The dead are restless here.",
-        "low_hp": "Breathe. I still have prayers left for you.",
-        "trap_spotted": "Hold. Something in the floor remembers footsteps.",
-        "boss_pull": "That bell knows your weight, {playerName}. Do not kneel.",
-        "completion": "The ledger can rest another night. Well done.",
+        "combat_start": "발을 단단히 디뎌요, {playerName}. 이곳의 죽은 자들은 잠들지 못했어요.",
+        "low_hp": "숨을 고르세요. 당신을 위한 기도가 아직 남아 있어요.",
+        "trap_spotted": "멈춰요, 바닥에 있는 무언가가 발소리를 기억하고 있어요.",
+        "boss_pull": "저 종이 당신의 무게를 알고 있어요, {playerName}. 무릎 꿇지 마세요.",
+        "completion": "명부도 하룻밤은 쉴 수 있겠군요. 잘하셨어요.",
         "rank": {
-          "1": "Chapel Novice",
-          "2": "Candle-Bearer",
-          "3": "Reliquary Acolyte",
-          "4": "Gravecall Witness",
-          "5": "Chapel Warden"
+          "1": "예배당 수련생",
+          "2": "촛불지기",
+          "3": "성물실 수련사제",
+          "4": "무덤부름의 목격자",
+          "5": "예배당 수호자"
         }
       }
     },
     "boss": {
       "varric": {
         "bell": {
-          "emote": "Deacon Varric grips the buried bell with both hands!",
-          "log": "Deacon Varric begins to toll the burial bell.",
-          "warning": "Move away from Deacon Varric!",
-          "impact": "The bell's toll cracks the chamber floor!",
-          "lesson": "Bell Toll: a ground slam every twelve seconds. Move out before it lands."
+          "emote": "부제 바릭이 두 손으로 묻혀 있던 종을 움켜쥡니다!",
+          "log": "부제 바릭이 매장의 종을 울리기 시작합니다.",
+          "warning": "부제 바릭에게서 떨어지세요!",
+          "impact": "종소리가 방의 바닥을 갈라놓습니다!",
+          "lesson": "종울림: 12초마다 땅을 내리치는 공격. 떨어지기 전에 벗어나세요."
         },
         "raise": {
-          "emote": "Deacon Varric calls names from the broken graves!",
-          "log": "Deacon Varric begins Raise Dead.",
-          "warning": "Stop the grave rite!",
-          "object": "The cracked grave shudders with stolen breath.",
-          "interrupt_ok": "The grave rite falters.",
-          "interrupt_fail": "The dead answer Deacon Varric's call!",
-          "lesson": "Interrupt the cracked grave within five seconds or the dead rise to his call."
+          "emote": "부제 바릭이 부서진 무덤에서 이름을 불러냅니다!",
+          "log": "부제 바릭이 죽음의 부활을 시전하기 시작합니다.",
+          "warning": "무덤의 의식을 멈추세요!",
+          "object": "갈라진 무덤이 훔쳐 온 숨결로 떨립니다.",
+          "interrupt_ok": "무덤의 의식이 흔들립니다.",
+          "interrupt_fail": "죽은 자들이 부제 바릭의 부름에 응답합니다!",
+          "lesson": "5초 안에 갈라진 무덤을 방해하지 않으면 죽은 자들이 그의 부름에 일어납니다."
         },
-        "pull": "You step on hallowed dust with unclean purpose. Kneel, and be counted.",
-        "intro": "No soul is lost. Only misplaced.",
-        "mid60": "Deacon Varric reads names from the ledger with shaking triumph.",
-        "mid30": "The burial bell answers every name he speaks.",
-        "defeat": "No... I had the names... I had them all..."
+        "pull": "그대는 부정한 의도로 신성한 흙을 밟았다. 무릎 꿇고, 명부에 오르라.",
+        "intro": "잃어버린 영혼은 없다. 단지 자리를 잘못 둔 것뿐.",
+        "mid60": "부제 바릭이 떨리는 환희로 명부에서 이름을 읽어 내립니다.",
+        "mid30": "매장의 종이 그가 부르는 모든 이름에 응답합니다.",
+        "defeat": "안 돼... 이름들을... 모두 가지고 있었는데..."
       }
     },
     "lore": {
-      "eastbrook_ledger": "A water-stained page from Eastbrook's burial ledger. Names crossed out and rewritten in a hand that is not human.",
-      "first_collapse": "Chapel records note the first sinkage: saint-stones cracked, shelves tilted, and a bell-note heard from below ground.",
-      "gravecaller_mark": "A sigil scraped into coffin wood, not Morthen's seal, but an older gravecaller mark predating the Hollow Crypt.",
-      "bell_below": "Tessa's margin note: \"There is a second bell under the reliquary. It tolls for the misplaced, not the dead.\"",
-      "tessa_note": "Folded scrap in Tessa's script: \"If the ledgers change while we are below, trust the candle, not the voices.\""
+      "eastbrook_ledger": "이스트브룩 매장 명부에서 떨어져 나온 물에 얼룩진 한 장. 이름들이 지워졌다가 인간의 것이 아닌 필체로 다시 쓰여 있습니다.",
+      "first_collapse": "예배당 기록에 첫 침하가 적혀 있습니다. 성인석이 갈라지고, 선반이 기울고, 땅 밑에서 종소리가 들려왔다.",
+      "gravecaller_mark": "관 나무에 새겨진 인장. 모르덴의 봉인이 아니라, 텅 빈 묘실보다 오래된 무덤부름꾼의 표식입니다.",
+      "bell_below": "테사의 여백 메모: \"성물실 아래에 두 번째 종이 있다. 그것은 죽은 자가 아니라 자리를 잃은 자를 위해 울린다.\"",
+      "tessa_note": "테사의 필체로 접힌 쪽지: \"아래에 있는 동안 명부가 바뀌거든, 목소리가 아니라 촛불을 믿어라.\""
     },
     "affix": {
-      "restless_graves": "Restless Graves",
-      "bad_air": "Bad Air",
-      "candleblind": "Candleblind",
-      "old_mechanisms": "Old Mechanisms",
-      "flooded_paths": "Flooded Paths",
-      "grave_tax": "Grave Tax",
-      "unstable_roof": "Unstable Roof",
-      "cult_remnants": "Cult Remnants"
+      "restless_graves": "잠들지 못한 무덤",
+      "bad_air": "탁한 공기",
+      "candleblind": "촛불 실명",
+      "old_mechanisms": "낡은 기계 장치",
+      "flooded_paths": "침수된 길",
+      "grave_tax": "무덤의 대가",
+      "unstable_roof": "불안정한 천장",
+      "cult_remnants": "교단의 잔당"
     },
     "blessing": {
-      "chapel_candle": "Chapel Candle: safer run, one fewer Mark on completion."
+      "chapel_candle": "예배당 촛불: 더 안전한 진행, 완료 시 탐굴 증표 1개 감소."
     },
     "chest": {
-      "flavor": "The dead have surrendered what they can spare."
+      "flavor": "죽은 자들이 내어줄 수 있는 것을 내놓았습니다."
     }
   },
   "fiesta": {
@@ -2122,7 +2122,7 @@ export const ko_KR: EnTranslations = {
     "practice": "🎉 봇 상대 연습",
     "practiceNote": "오프라인 연습: AI 봇 3기를 소환하고 2대2 Fiesta 대기열에 등록합니다. 다시 클릭하면 중지합니다.",
     "banner": {
-      "wave": "{wave}/{total} 물결 — 증강을 선택하세요!",
+      "wave": "웨이브 {wave}/{total} - 증강을 선택하세요!",
       "augmentGained": "증강 획득: {name}!",
       "powerup": "{name}!"
     },
@@ -2290,8 +2290,8 @@ export const ko_KR: EnTranslations = {
     "playMode": "멀티플레이어",
     "applicationCategory": "게임",
     "operatingSystem": "웹 브라우저",
-    "officialLabel": "Official World of ClaudeCraft website",
-    "officialBody": "worldofclaudecraft.com is the official free browser MMO for the Claudemoon realm. Play online with a persistent character, explore solo offline, read the wiki, and follow verified community links from this site."
+    "officialLabel": "World of ClaudeCraft 공식 웹사이트",
+    "officialBody": "worldofclaudecraft.com은 Claudemoon 렐름의 공식 무료 브라우저 MMO입니다. 지속 캐릭터로 온라인 플레이를 하거나, 오프라인에서 혼자 탐험하고, 위키를 읽고, 이 사이트에서 검증된 커뮤니티 링크를 확인하세요."
   },
   "a11y": {
     "goHome": "홈으로 이동",
@@ -2340,12 +2340,12 @@ export const ko_KR: EnTranslations = {
       "deleteConfirm": "삭제를 확인하려면 캐릭터 이름을 입력하세요.",
       "notAuthenticated": "인증되지 않았습니다.",
       "accountBanned": "이 계정은 이용 정지되었습니다.",
-      "webLoginOnly": "Logins are only allowed from the game client.",
+      "webLoginOnly": "로그인은 게임 클라이언트에서만 허용됩니다.",
       "accountSuspended": "이 계정은 {date}까지 정지되었습니다.",
       "alreadyInWorld": "캐릭터가 이미 세계에 있습니다.",
-      "takenOver": "Your character was taken over by another session.",
+      "takenOver": "다른 세션이 캐릭터를 넘겨받았습니다.",
       "renameBeforeEntering": "이 캐릭터는 세계에 들어가기 전에 이름을 변경해야 합니다.",
-      "renameNotPermitted": "Renaming this character is not allowed."
+      "renameNotPermitted": "이 캐릭터의 이름을 변경할 수 없습니다."
     }
   },
   "realm": {
@@ -2360,11 +2360,11 @@ export const ko_KR: EnTranslations = {
     "high": "높음",
     "medium": "보통",
     "low": "낮음",
-    "popTipLow": "Low population: fewer than 15 players online right now. Plenty of room; great for a fresh start.",
-    "popTipMedium": "Medium population: 15 to 39 players online right now. A healthy, active realm.",
-    "popTipHigh": "High population: 40 to 79 players online right now. Busy, with lots of players around.",
-    "popTipFull": "Full population: 80 or more players online right now. Very busy; you may wait in a login queue.",
-    "popTipOffline": "Offline: this realm is unreachable right now and cannot be joined.",
+    "popTipLow": "낮은 인구: 현재 접속자 15명 미만. 여유롭고 새로 시작하기에 좋습니다.",
+    "popTipMedium": "보통 인구: 현재 접속자 15~39명. 건강하고 활발한 렐름입니다.",
+    "popTipHigh": "높은 인구: 현재 접속자 40~79명. 붐비고 플레이어가 많습니다.",
+    "popTipFull": "포화 인구: 현재 접속자 80명 이상. 매우 붐비며 로그인 대기열이 있을 수 있습니다.",
+    "popTipOffline": "오프라인: 이 렐름은 현재 연결할 수 없어 입장할 수 없습니다.",
     "characterCountOne": "캐릭터 {count}개",
     "characterCountOther": "캐릭터 {count}개",
     "selectedRealm": "렐름: {name}",
@@ -2376,9 +2376,9 @@ export const ko_KR: EnTranslations = {
     "noneYet": "아직 캐릭터가 없습니다. 아래에서 하나를 만드세요.",
     "levelClass": "{level}레벨 {className}",
     "inWorld": "세계에 있음",
-    "takeOver": "Take Over",
-    "inWorldHint": "Already in world. Log out elsewhere, or take over.",
-    "takeOverConfirm": "This will disconnect this character from another session and bring it here. Continue?",
+    "takeOver": "넘겨받기",
+    "inWorldHint": "이미 세계에 있습니다. 다른 곳에서 로그아웃하거나 넘겨받으세요.",
+    "takeOverConfirm": "이 캐릭터를 다른 세션에서 연결 해제하고 여기로 가져옵니다. 계속하시겠습니까?",
     "renameRequired": "이름 변경 필요",
     "delete": "삭제",
     "rename": "이름 변경",
@@ -2395,13 +2395,13 @@ export const ko_KR: EnTranslations = {
     "viewProfile": "프로필 보기",
     "profile": "프로필",
     "closeProfile": "프로필 닫기",
-    "sortBy": "Sort",
-    "sortByLabel": "Sort characters",
-    "sortMenuLabel": "Sort options",
-    "sortLevel": "Level",
-    "sortName": "Name",
-    "sortRecent": "Recently Played",
-    "sortPlaytime": "Playtime"
+    "sortBy": "정렬",
+    "sortByLabel": "캐릭터 정렬",
+    "sortMenuLabel": "정렬 옵션",
+    "sortLevel": "레벨",
+    "sortName": "이름",
+    "sortRecent": "최근 플레이",
+    "sortPlaytime": "플레이 시간"
   },
   "woc": {
     "linkWalletFirst": "Connect and link a Solana wallet to pay with $WOC.",
@@ -2567,78 +2567,108 @@ export const ko_KR: EnTranslations = {
       "closeMap": "지도 닫기",
       "zoomIn": "확대",
       "zoomOut": "축소",
-      "mapCanvasLabel": "Map",
-      "mapSummary": "Map of {zone}."
+      "mapCanvasLabel": "지도",
+      "mapSummary": "{zone}의 지도."
     },
     "mounts": {
-      "title": "Mounts",
-      "subtitle": "$WOC Travel Steeds",
-      "close": "Close mounts",
-      "summon": "Summon",
-      "dismount": "Dismount",
-      "summoning": "Summoning {name}…",
-      "riding": "Riding",
-      "flies": "Flies",
-      "locked": "Locked",
-      "speed": "+{percent}% speed",
-      "unlockAt": "Unlocks at {amount} $WOC",
-      "supplyShare": "{percent} of supply",
-      "qualifyHeader": "You qualify for {count} of {total} travel mounts.",
-      "holdingHint": "Holding {amount} $WOC.",
-      "noWallet": "Hold at least {amount} $WOC — 0.1% of supply — on a linked wallet to earn your first travel mount.",
-      "cantInCombat": "You can't mount while in combat.",
-      "cantSwimming": "You can't mount while swimming.",
-      "cantDead": "You can't mount while dead.",
-      "notEligible": "Your $WOC holdings don't reach that steed yet.",
-      "summonedBanner": "You summon {name}.",
-      "summonAria": "Summon {name}",
-      "dismountAria": "Dismount {name}",
-      "lockedAria": "{name} — locked; unlocks at {amount} $WOC",
-      "activeAria": "{name} — currently active",
+      "title": "탈것",
+      "subtitle": "$WOC 여행 탈것",
+      "close": "탈것 닫기",
+      "summon": "소환",
+      "dismount": "내리기",
+      "summoning": "{name} 소환 중…",
+      "riding": "탑승 중",
+      "flies": "비행",
+      "locked": "잠김",
+      "speed": "이동 속도 +{percent}%",
+      "unlockAt": "{amount} $WOC에서 해금",
+      "supplyShare": "공급량의 {percent}",
+      "qualifyHeader": "여행 탈것 {total}종 중 {count}종의 자격을 갖추었습니다.",
+      "holdingHint": "{amount} $WOC 보유 중.",
+      "noWallet": "연결된 지갑에 최소 {amount} $WOC(공급량의 0.1%)를 보유하면 첫 여행 탈것을 얻습니다.",
+      "cantInCombat": "전투 중에는 탈 수 없습니다.",
+      "cantSwimming": "수영 중에는 탈 수 없습니다.",
+      "cantDead": "사망 상태에서는 탈 수 없습니다.",
+      "notEligible": "$WOC 보유량이 아직 그 탈것에 미치지 못합니다.",
+      "summonedBanner": "{name}을(를) 소환합니다.",
+      "summonAria": "{name} 소환",
+      "dismountAria": "{name}에서 내리기",
+      "lockedAria": "{name}: 잠김; {amount} $WOC에서 해금",
+      "activeAria": "{name}: 현재 활성",
       "cardAria": "{name}: {flavor}",
-      "owned": "Owned",
-      "mint": "Mint Charter",
-      "mintHint": "Strike a tradeable Charter for this mount — sell it for gold so a non-holder can earn it.",
-      "mintAria": "Mint a tradeable Charter for {name}",
-      "mintedBanner": "You strike a Charter for {name}.",
-      "earnedBanner": "You have earned {name} — it is yours for good.",
-      "alreadyOwnErr": "You already own that mount.",
-      "charterVoidErr": "That Charter is void.",
-      "noCharterErr": "No Charter can be struck for that mount.",
-      "holdingsShortErr": "Your holdings do not cover that mount."
+      "owned": "소유함",
+      "mint": "증서 발행",
+      "mintHint": "이 탈것의 거래 가능한 증서를 발행하세요. 금에 팔아 보유자가 아닌 이도 얻게 하세요.",
+      "mintAria": "{name}의 거래 가능한 증서 발행",
+      "mintedBanner": "{name}의 증서를 발행합니다.",
+      "earnedBanner": "{name}을(를) 얻었습니다. 영원히 당신의 것입니다.",
+      "alreadyOwnErr": "이미 그 탈것을 소유하고 있습니다.",
+      "charterVoidErr": "그 증서는 무효입니다.",
+      "noCharterErr": "그 탈것은 증서를 발행할 수 없습니다.",
+      "holdingsShortErr": "보유량으로는 그 탈것을 감당할 수 없습니다."
     },
     "course": {
-      "skytrials": "Skytrials",
-      "skytrialsHint": "Fly a timed ring course on a flying mount.",
-      "needFlyer": "Summon a flying mount to fly Skytrials.",
-      "start": "Fly",
-      "give_up": "Give up",
-      "par": "Par {time}",
-      "laps": "{count} laps",
-      "onePass": "1 lap",
-      "starting": "Fly through the first ring to start the clock",
-      "gate": "Ring {n}/{total}",
-      "lap": "Lap {n}/{total}",
-      "time": "Time",
-      "finish": "Finish!",
-      "beatPar": "Beat par by {time}",
-      "offPar": "{time} off par",
-      "failed": "Run ended — you left your mount",
-      "aborted": "Run abandoned",
-      "best": "Best {time}",
-      "newBest": "New best!",
-      "board": "Board",
-      "boardTitle": "{name} — top times",
-      "noTimes": "No times yet — be the first.",
-      "loadingBoard": "Loading…",
-      "you": "(you)",
-      "race": "Race",
-      "racePartyHint": "Race your party — first through the rings wins.",
-      "getReady": "Get ready",
-      "go": "GO!",
-      "dnf": "DNF",
-      "placeOf": "#{place} of {total}",
-      "racing": "Racing"
+      "skytrials": "하늘 시련",
+      "skytrialsHint": "비행 탈것을 타고 시간 제한 고리 경로를 비행하세요.",
+      "needFlyer": "하늘 시련을 비행하려면 비행 탈것을 소환하세요.",
+      "start": "비행",
+      "give_up": "포기",
+      "par": "기준 {time}",
+      "laps": "{count}바퀴",
+      "onePass": "1바퀴",
+      "starting": "첫 고리를 통과해 시간을 시작하세요",
+      "gate": "링 {n}/{total}",
+      "lap": "바퀴 {n}/{total}",
+      "time": "시간",
+      "finish": "완주!",
+      "beatPar": "기준보다 {time} 빠름",
+      "offPar": "기준보다 {time} 느림",
+      "failed": "주행 종료: 탈것에서 내렸습니다",
+      "aborted": "주행 포기",
+      "best": "최고 {time}",
+      "newBest": "신기록!",
+      "board": "순위판",
+      "boardTitle": "{name}: 최고 기록",
+      "noTimes": "아직 기록이 없습니다. 첫 번째가 되세요.",
+      "loadingBoard": "불러오는 중…",
+      "you": "(나)",
+      "race": "경주",
+      "racePartyHint": "파티와 경주하세요. 가장 먼저 고리를 통과한 자가 이깁니다.",
+      "getReady": "준비",
+      "go": "출발!",
+      "dnf": "미완주",
+      "placeOf": "{total}명 중 #{place}",
+      "racing": "경주 중"
+    },
+    "wager": {
+      "start": "내기 경주",
+      "title": "내기 경주",
+      "inviteGold": "{name}님이 내기 경주를 엽니다. 참가하려면 {money}을(를) 거세요. 받으시겠습니까?",
+      "inviteCharter": "{name}님이 내기 경주를 엽니다. {money} + 탈것 증서를 거세요. 받으시겠습니까?",
+      "accept": "내기 받기",
+      "pot": "상금 {money}",
+      "potCharter": "판돈 {money} + 증서 {count}×",
+      "racers": "참가자 ({count})",
+      "launch": "경주 시작",
+      "cancel": "취소",
+      "leave": "나가기",
+      "waiting": "판돈을 받을 도전자를 기다리는 중…",
+      "won": "내기에서 이겼습니다, {money}!",
+      "wonCharter": "내기에서 이겼습니다, {money} + 증서 {count}×!",
+      "lost": "내기에서 졌습니다.",
+      "refunded": "내기가 취소되었습니다. 건 판돈을 돌려받습니다.",
+      "antePrompt": "이 경주에 금을 얼마나 거시겠습니까? (동화 기준)",
+      "open": "내기 열기",
+      "stakeCharter": "탈것 증서도 함께 걸기 (승자가 차지함)",
+      "errCourse": "그 경로는 내기를 걸 수 없습니다.",
+      "errFlyer": "내기를 걸려면 비행 탈것을 타고 있어야 합니다.",
+      "errBusy": "이미 내기에 참여하고 있습니다.",
+      "errAnte": "최소 동화 1개 이상의 내기를 거세요.",
+      "errStake": "그것은 내기로 걸 수 없습니다.",
+      "errAfford": "그 내기를 감당할 수 없습니다.",
+      "errExpired": "그 내기 제안은 만료되었습니다.",
+      "errGone": "그 내기는 더 이상 열려 있지 않습니다.",
+      "errHost": "주최자만 내기를 시작할 수 있습니다."
     },
     "options": {
       "gameMenu": "게임 메뉴",
@@ -2646,7 +2676,7 @@ export const ko_KR: EnTranslations = {
       "graphics": "그래픽",
       "audio": "오디오",
       "interface": "인터페이스",
-      "language": "Language",
+      "language": "언어",
       "logout": "로그아웃",
       "returnToGame": "게임으로 돌아가기",
       "resetToDefaults": "기본값 복원",
@@ -2796,8 +2826,8 @@ export const ko_KR: EnTranslations = {
         "unignoreChat": "채팅 차단 해제",
         "report": "플레이어 신고",
         "removeParty": "파티에서 제거",
-        "convertToRaid": "Convert to raid",
-        "convertToParty": "Convert to party",
+        "convertToRaid": "공격대로 전환",
+        "convertToParty": "파티로 전환",
         "cancel": "취소"
       }
     },
@@ -2839,7 +2869,7 @@ export const ko_KR: EnTranslations = {
     "combat": {
       "floatingMiss": "빗나감",
       "floatingDodge": "회피",
-      "floatingResist": "Resist",
+      "floatingResist": "저항",
       "cannotMove": "이동 불가!",
       "attack": "공격",
       "damageDone": "{ability}이 {target}에게 {amount}의 피해를 입혔습니다.",
@@ -2848,7 +2878,7 @@ export const ko_KR: EnTranslations = {
       "damageTakenCrit": "{source}에게 치명타로 {amount}의 피해를 받았습니다.",
       "miss": "{ability}이 {target}에게 빗나갔습니다.",
       "dodged": "{target}이 {ability}을 회피했습니다.",
-      "resisted": "Your {ability} is resisted by {target}.",
+      "resisted": "{target}이 {ability}을 저항했습니다.",
       "healSelf": "{ability}이 자신을 {amount}만큼 치유했습니다.",
       "healSelfCrit": "{ability}이 자신을 치명타 치유로 {amount}만큼 회복했습니다.",
       "healOther": "{ability}이 {target}을 {amount}만큼 치유했습니다.",
@@ -2893,10 +2923,10 @@ export const ko_KR: EnTranslations = {
       "targetMustDodge": "대상이 먼저 회피해야 합니다.",
       "requiresCombo": "그 능력은 연계 점수가 필요합니다.",
       "requiresForm": "{form} 변신 상태여야 합니다.",
-      "cantInForm": "You can't do that in {form} Form.",
+      "cantInForm": "{form} 변신 상태에서는 할 수 없습니다.",
       "bear": "곰",
-      "cat": "표범",
-      "travel": "Travel",
+      "cat": "늑대",
+      "travel": "여행",
       "shapeshifted": "변신 중에는 할 수 없습니다.",
       "stealthed": "은신 상태여야 합니다.",
       "inCombat": "전투 중에는 할 수 없습니다.",
@@ -2918,10 +2948,10 @@ export const ko_KR: EnTranslations = {
       "whisperAmbiguous": "'{name}'와 일치하는 플레이어가 여럿입니다. 정확한 대소문자를 사용하세요.",
       "whisperMissing": "'{name}'라는 플레이어는 온라인이 아닙니다.",
       "whisperSelf": "혼잣말을 중얼거립니다. 아무도 듣지 못합니다.",
-      "assistSelf": "You can't assist yourself.",
-      "assistNoTarget": "{name} has no target.",
-      "assistWhom": "Assist whom? Target a player or use /assist <name>.",
-      "assisting": "Assisting {name}.",
+      "assistSelf": "자신을 지원할 수 없습니다.",
+      "assistNoTarget": "{name}님은 대상이 없습니다.",
+      "assistWhom": "누구를 지원할까요? 플레이어를 대상으로 지정하거나 /assist <name>를 사용하세요.",
+      "assisting": "{name}님을 지원합니다.",
       "notInParty": "파티에 속해 있지 않습니다.",
       "unknownCommand": "알 수 없는 명령어: {command}. /s /y /w /p /g를 사용해 보세요.",
       "chatCooldown": "채팅 재사용까지 {seconds}초 남았습니다.",
@@ -2966,29 +2996,29 @@ export const ko_KR: EnTranslations = {
       "lootReceiveMoney": "{money}을(를) 받았습니다.",
       "lootMoney": "{money}을(를) 전리품으로 획득했습니다.",
       "soldItem": "{item}을(를) {money}에 팔았습니다.",
-      "soldJunkOne": "Sold {count} junk item for {money}.",
-      "soldJunkMany": "Sold {count} junk items for {money}.",
+      "soldJunkOne": "잡동사니 아이템 {count}개를 {money}에 팔았습니다.",
+      "soldJunkMany": "잡동사니 아이템 {count}개를 {money}에 팔았습니다.",
       "friendOnline": "{name}님이 접속했습니다.",
       "friendOffline": "{name}님이 접속을 종료했습니다."
     },
     "tutorial": {
-      "title": "New Adventurer",
-      "stepLabel": "Step {current} of {total}",
-      "skip": "Skip Tutorial",
-      "dismiss": "Dismiss",
-      "doneTitle": "Ready for Adventure",
-      "doneBody": "You have the basics, {name}. The Vale is yours to explore. Press {questKey} anytime to review your quests. Good hunting.",
-      "moveTitle": "Find Your Footing",
-      "moveBody": "Use {moveKeys} to move and the mouse to look around. Take a few steps to begin.",
-      "seekTitle": "Seek the Marshal",
-      "seekBody": "Marshal Redbrook waits in town and has work for a new blade. Follow the marker to reach him.",
-      "talkTitle": "Take the Task",
-      "talkBody": "Stand close to Marshal Redbrook and press {interactKey} to speak, then accept his task.",
-      "slayTitle": "Wolves at the Door",
-      "slayBody": "Hunt the Forest Wolves on the north road. Target one and attack to thin the pack.",
-      "slayProgress": "Forest Wolves slain: {current} / {needed}",
-      "returnTitle": "Claim Your Reward",
-      "returnBody": "Your task is done. Return to Marshal Redbrook and press {interactKey} to turn it in."
+      "title": "새내기 모험가",
+      "stepLabel": "{total}단계 중 {current}단계",
+      "skip": "튜토리얼 건너뛰기",
+      "dismiss": "닫기",
+      "doneTitle": "모험 준비 완료",
+      "doneBody": "기본기를 익혔습니다, {name}. 이제 골짜기를 자유롭게 누비세요. 언제든 {questKey} 키로 퀘스트를 확인할 수 있습니다. 좋은 사냥 되세요.",
+      "moveTitle": "첫걸음 떼기",
+      "moveBody": "{moveKeys} 키로 이동하고 마우스로 주위를 둘러보세요. 몇 걸음 움직여 시작하세요.",
+      "seekTitle": "원수를 찾으세요",
+      "seekBody": "레드브룩 원수가 마을에서 기다리며 새내기에게 맡길 일이 있습니다. 표식을 따라 그에게 가세요.",
+      "talkTitle": "임무 수락",
+      "talkBody": "레드브룩 원수에게 다가가 {interactKey} 키를 눌러 대화한 뒤 임무를 수락하세요.",
+      "slayTitle": "문 앞의 늑대들",
+      "slayBody": "북쪽 길의 숲늑대를 사냥하세요. 한 마리를 대상으로 지정해 공격하여 무리를 줄이세요.",
+      "slayProgress": "처치한 숲늑대: {current} / {needed}",
+      "returnTitle": "보상 받기",
+      "returnBody": "임무를 마쳤습니다. 레드브룩 원수에게 돌아가 {interactKey} 키를 눌러 완료하세요."
     },
     "markers": {
       "names": {
@@ -3013,7 +3043,7 @@ export const ko_KR: EnTranslations = {
       "healPet": "소환수 치유",
       "passive": "수동",
       "defensive": "방어",
-      "aggressive": "공격",
+      "aggressive": "공격적",
       "petAttackTitle": "소환수 공격",
       "petAttackDesc": "현재 적대적인 대상에게 소환수가 공격하도록 명령합니다.",
       "petTauntTitle": "소환수 도발",
@@ -3043,12 +3073,12 @@ export const ko_KR: EnTranslations = {
       "guildTab": "길드",
       "ignoreTab": "차단",
       "leaveParty": "파티 떠나기",
-      "raidTab": "Raid",
-      "raidEmpty": "Convert a party to a raid to manage raid groups here.",
-      "raidGroupEmpty": "No players in this group.",
-      "raidGroupTitle": "Group {position} ({count}/5)",
-      "raidMoveToGroup": "Move to group {position}",
-      "raidLeader": "Raid Leader",
+      "raidTab": "공격대",
+      "raidEmpty": "파티를 공격대로 전환하면 여기에서 공격대 조를 관리할 수 있습니다.",
+      "raidGroupEmpty": "이 조에는 플레이어가 없습니다.",
+      "raidGroupTitle": "{position}조 ({count}/5)",
+      "raidMoveToGroup": "{position}조로 이동",
+      "raidLeader": "공격대장",
       "offlineEmpty": "친구, 길드, 차단 목록은 온라인 플레이에서 사용할 수 있습니다.",
       "friendsEmpty": "아직 친구가 없습니다. 아래에서 이름으로 검색하세요.",
       "ignoreEmpty": "차단 목록이 비어 있습니다.",
@@ -3149,8 +3179,8 @@ export const ko_KR: EnTranslations = {
       "title": "마법책",
       "classSubtitle": "{className} 능력",
       "close": "마법책 닫기",
-      "resetBar": "Reset bar",
-      "resetBarAria": "Reset the current action bar to its default abilities",
+      "resetBar": "단축바 초기화",
+      "resetBarAria": "현재 행동 단축바를 기본 능력으로 초기화",
       "trainableAtLevel": "{level}레벨에 훈련 가능",
       "learnAtLevel": "{level}레벨에 배웁니다.",
       "knownAbilityAria": "{name}, {rank} 등급. {summary}",
@@ -3189,7 +3219,7 @@ export const ko_KR: EnTranslations = {
     },
     "forms": {
       "bear": "곰",
-      "cat": "표범"
+      "cat": "늑대"
     },
     "cast": {
       "fishing": "낚시",
@@ -3213,10 +3243,10 @@ export const ko_KR: EnTranslations = {
       "completedStatus": "완료됨",
       "returnTo": "{name}에게 돌아가기",
       "abandon": "퀘스트 포기",
-      "abandonConfirmTitle": "Abandon Quest",
-      "abandonConfirmBody": "Are you sure you want to abandon {name}?",
-      "abandonConfirm": "Yes",
-      "abandonCancel": "Cancel",
+      "abandonConfirmTitle": "퀘스트 포기",
+      "abandonConfirmBody": "{name} 퀘스트를 정말 포기할까요?",
+      "abandonConfirm": "예",
+      "abandonCancel": "취소",
       "suggestedPlayers": "권장 플레이어: {count}"
     },
     "dialog": {
@@ -3291,7 +3321,7 @@ export const ko_KR: EnTranslations = {
       "uncommon": "고급",
       "rare": "희귀",
       "epic": "영웅",
-      "legendary": "Legendary"
+      "legendary": "전설"
     },
     "kind": {
       "weapon": "무기",
@@ -3372,9 +3402,9 @@ export const ko_KR: EnTranslations = {
       "sellQuantityInput": "판매할 수량",
       "sellQuantityConfirm": "판매",
       "sellQuantityCancel": "취소",
-      "sellJunk": "Sell Junk",
-      "sellJunkAria": "Sell all junk for {price}",
-      "sellJunkHint": "Sells every gray item in your bags except quest items."
+      "sellJunk": "잡동사니 판매",
+      "sellJunkAria": "모든 잡동사니를 {price}에 판매",
+      "sellJunkHint": "퀘스트 아이템을 제외한 가방의 모든 회색 아이템을 판매합니다."
     },
     "market": {
       "title": "세계 시장",
@@ -3387,43 +3417,43 @@ export const ko_KR: EnTranslations = {
       "noMerchant": "상인에게 가까이 가야 거래할 수 있습니다.",
       "emptyBrowse": "시장이 조용합니다. 판매 탭에서 먼저 물건을 올려 보세요.",
       "browseNote": "왕국 전역의 모험가가 올린 상품입니다. 구매를 선택하면 묶음을 바로 삽니다.",
-      "searchPlaceholder": "Search market...",
-      "searchAria": "Search the World Market by item name",
-      "emptySearch": "No goods match your search. Try another name.",
-      "truncated": "Showing {shown} of {total} matches. Refine your search to see the rest.",
-      "emptyFiltered": "No listings match those filters.",
-      "pageRange": "Showing {shown} of {total} listings.",
-      "pagePrev": "Prev",
-      "pageNext": "Next",
-      "pagePrevAria": "Previous market page",
-      "pageNextAria": "Next market page",
-      "pageStatus": "Page {current} of {total}",
-      "filters": "Market filters",
-      "filterType": "Type",
-      "filterTypeAll": "All types",
-      "filterTypeWeapon": "Weapons",
-      "filterTypeArmor": "Armor",
-      "filterTypeConsumable": "Consumables",
-      "filterTypeMaterial": "Materials",
-      "filterTypeCosmetic": "Cosmetics",
-      "filterTypeOther": "Other",
-      "filterArmorType": "Armor type",
-      "filterArmorAll": "All armor",
-      "filterWeaponType": "Weapon type",
-      "filterWeaponAll": "All weapons",
-      "filterRarity": "Rarity",
-      "filterRarityAll": "All rarities",
-      "weaponSword": "Swords",
-      "weaponDagger": "Daggers",
-      "weaponStaff": "Staves",
-      "weaponMace": "Maces",
-      "weaponAxe": "Axes",
-      "weaponOther": "Other weapons",
-      "rarityPoor": "Poor",
-      "rarityCommon": "Common",
-      "rarityUncommon": "Uncommon",
-      "rarityRare": "Rare",
-      "rarityEpic": "Epic",
+      "searchPlaceholder": "시장 검색...",
+      "searchAria": "아이템 이름으로 세계 시장 검색",
+      "emptySearch": "검색과 일치하는 물품이 없습니다. 다른 이름을 시도하세요.",
+      "truncated": "{total}개 중 {shown}개 표시 중. 나머지를 보려면 검색을 좁히세요.",
+      "emptyFiltered": "해당 필터와 일치하는 등록품이 없습니다.",
+      "pageRange": "{total}개 등록품 중 {shown}개 표시 중.",
+      "pagePrev": "이전",
+      "pageNext": "다음",
+      "pagePrevAria": "이전 시장 페이지",
+      "pageNextAria": "다음 시장 페이지",
+      "pageStatus": "{total}쪽 중 {current}쪽",
+      "filters": "시장 필터",
+      "filterType": "유형",
+      "filterTypeAll": "모든 유형",
+      "filterTypeWeapon": "무기",
+      "filterTypeArmor": "방어구",
+      "filterTypeConsumable": "소모품",
+      "filterTypeMaterial": "재료",
+      "filterTypeCosmetic": "외형",
+      "filterTypeOther": "기타",
+      "filterArmorType": "방어구 유형",
+      "filterArmorAll": "모든 방어구",
+      "filterWeaponType": "무기 유형",
+      "filterWeaponAll": "모든 무기",
+      "filterRarity": "희귀도",
+      "filterRarityAll": "모든 희귀도",
+      "weaponSword": "검",
+      "weaponDagger": "단검",
+      "weaponStaff": "지팡이",
+      "weaponMace": "둔기",
+      "weaponAxe": "도끼",
+      "weaponOther": "기타 무기",
+      "rarityPoor": "하급",
+      "rarityCommon": "일반",
+      "rarityUncommon": "고급",
+      "rarityRare": "희귀",
+      "rarityEpic": "영웅",
       "merchantStock": "상인 재고",
       "stackCount": "x{count}",
       "each": "개당 {money}",
@@ -3473,14 +3503,14 @@ export const ko_KR: EnTranslations = {
       "close": "전리품 닫기"
     },
     "lootRoll": {
-      "title": "Roll for loot",
-      "need": "Need",
-      "greed": "Greed",
-      "pass": "Pass",
-      "needAria": "Need for {item}",
-      "greedAria": "Greed for {item}",
-      "passAria": "Pass on {item}",
-      "everyonePassed": "Everyone passed on {item}."
+      "title": "전리품 주사위",
+      "need": "필요",
+      "greed": "탐욕",
+      "pass": "포기",
+      "needAria": "{item} 필요",
+      "greedAria": "{item} 탐욕",
+      "passAria": "{item} 포기",
+      "everyonePassed": "모두 {item}을(를) 포기했습니다."
     }
   },
   "entities": {
@@ -3558,7 +3588,7 @@ export const ko_KR: EnTranslations = {
         "description": "자신을 냉기로 감싸 30분 동안 방어도를 30만큼 증가시킵니다."
       },
       "arcane_intellect": {
-        "name": "신비한 지능",
+        "name": "비전 지능",
         "description": "30분 동안 지능이 2만큼 증가합니다."
       },
       "frostbolt": {
@@ -3578,8 +3608,8 @@ export const ko_KR: EnTranslations = {
         "description": "적에게 {damage}의 화염 피해를 입힙니다. 즉시 시전됩니다."
       },
       "arcane_missiles": {
-        "name": "신비한 화살",
-        "description": "적에게 신비한 화살을 발사하여 3초 동안 매초 8의 비전 피해를 입힙니다."
+        "name": "비전 화살",
+        "description": "적에게 비전 화살을 발사하여 3초 동안 매초 {damage}의 비전 피해를 입힙니다."
       },
       "polymorph": {
         "name": "변이",
@@ -3590,7 +3620,7 @@ export const ko_KR: EnTranslations = {
         "description": "주위 모든 적을 최대 8초 동안 제자리에 얼리고 {damage}의 냉기 피해를 입힙니다."
       },
       "arcane_explosion": {
-        "name": "신비한 폭발",
+        "name": "비전 폭발",
         "description": "비전 에너지 폭발이 주위 모든 적에게 {damage}의 비전 피해를 입힙니다."
       },
       "scorch": {
@@ -3643,7 +3673,7 @@ export const ko_KR: EnTranslations = {
       },
       "stealth": {
         "name": "은신",
-        "description": "그림자 속에 몸을 숨깁니다. 적이 거의 알아차리지 못하지만 이동 속도가 30% 감소합니다. 공격하거나 피해를 받으면 은신이 해제됩니다. 다시 시전하면 모습을 드러냅니다."
+        "description": "그림자 속에 몸을 숨깁니다. 적이 거의 알아차리지 못하지만 이동 속도가 50% 감소합니다. 공격하거나 피해를 받으면 은신이 해제됩니다. 다시 시전하면 모습을 드러냅니다."
       },
       "adrenaline_rush": {
         "name": "아드레날린 촉진",
@@ -3675,7 +3705,7 @@ export const ko_KR: EnTranslations = {
       },
       "vanish": {
         "name": "소멸",
-        "description": "시야에서 사라져 전투 중에도 은신 상태가 됩니다. 숨어 있는 동안 이동 속도가 30% 감소합니다. 최대 10초 동안 지속됩니다."
+        "description": "시야에서 사라져 전투 중에도 은신 상태가 됩니다. 숨어 있는 동안 이동 속도가 50% 감소합니다. 최대 10초 동안 지속됩니다."
       },
       "instant_poison": {
         "name": "속효성 독",
@@ -3762,7 +3792,7 @@ export const ko_KR: EnTranslations = {
         "description": "대상을 쏘아 15초에 걸쳐 {damage}의 자연 피해를 입힙니다."
       },
       "arcane_shot": {
-        "name": "신비한 사격",
+        "name": "비전 사격",
         "description": "즉시 사격하여 {damage}의 비전 피해를 입힙니다."
       },
       "concussive_shot": {
@@ -3818,7 +3848,7 @@ export const ko_KR: EnTranslations = {
         "description": "15초에 걸쳐 대상의 생명력을 {damage}만큼 회복시킵니다."
       },
       "mind_blast": {
-        "name": "정신 분열",
+        "name": "정신의 일격",
         "description": "대상의 정신을 강타해 {damage}의 암흑 피해를 입힙니다."
       },
       "heal": {
@@ -3827,7 +3857,7 @@ export const ko_KR: EnTranslations = {
       },
       "mind_flay": {
         "name": "정신의 채찍",
-        "description": "암흑 에너지로 대상의 정신을 공격해 3초 동안 매초 12의 피해를 입힙니다."
+        "description": "암흑 에너지로 대상의 정신을 공격해 3초 동안 매초 {damage}의 피해를 입힙니다."
       },
       "flash_heal": {
         "name": "순간 치유",
@@ -3903,7 +3933,7 @@ export const ko_KR: EnTranslations = {
       },
       "drain_life": {
         "name": "생명력 흡수",
-        "description": "대상의 생명력을 흡수해 5초 동안 매초 7의 생명력을 자신에게 이전합니다."
+        "description": "대상의 생명력을 흡수해 5초 동안 매초 {damage}의 생명력을 자신에게 이전합니다."
       },
       "fear": {
         "name": "공포",
@@ -3958,16 +3988,16 @@ export const ko_KR: EnTranslations = {
         "description": "대상에게 으르렁거립니다. 자신의 위협 수준이 대상이 가장 증오하는 적과 같아지며, 3초 동안 자신을 공격하게 만듭니다. 곰 변신 전용."
       },
       "cat_form": {
-        "name": "표범 변신",
-        "description": "표범으로 변신합니다. 전투력이 레벨에 따라 증가하고 공격이 기력과 연계 점수를 사용하며 위협 수준 생성량이 29% 감소합니다. 다시 시전하면 시전자 형태로 돌아갑니다."
+        "name": "늑대 변신",
+        "description": "늑대로 변신합니다. 전투력이 레벨에 따라 증가하고 공격이 기력과 연계 점수를 사용하며 위협 수준 생성량이 29% 감소합니다. 다시 시전하면 시전자 형태로 돌아갑니다."
       },
       "claw": {
         "name": "할퀴기",
-        "description": "적을 할퀴어 무기 피해에 {damage}를 더한 피해를 입힙니다. 연계 점수 1점을 얻습니다. 표범 변신 전용."
+        "description": "적을 할퀴어 무기 피해에 {damage}를 더한 피해를 입힙니다. 연계 점수 1점을 얻습니다. 늑대 변신 전용."
       },
       "ferocious_bite": {
         "name": "흉포한 이빨",
-        "description": "연계 점수당 피해를 입히는 결정타입니다. 표범 변신 전용."
+        "description": "연계 점수당 피해를 입히는 결정타입니다. 늑대 변신 전용."
       },
       "swipe": {
         "name": "휘둘러치기",
@@ -4007,11 +4037,11 @@ export const ko_KR: EnTranslations = {
       },
       "dash": {
         "name": "질주",
-        "description": "앞으로 돌진하여 이동 속도를 15초 동안 50% 증가시킵니다. 표범 변신 전용."
+        "description": "앞으로 돌진하여 이동 속도를 15초 동안 50% 증가시킵니다. 늑대 변신 전용."
       },
       "pounce": {
         "name": "덮치기",
-        "description": "은신 상태에서 사용하는 시작 공격으로 대상을 2초 동안 기절시킵니다. 연계 점수 1점을 얻습니다. 표범 변신 전용."
+        "description": "은신 상태에서 사용하는 시작 공격으로 대상을 2초 동안 기절시킵니다. 연계 점수 1점을 얻습니다. 늑대 변신 전용."
       },
       "insect_swarm": {
         "name": "곤충 떼",
@@ -4019,11 +4049,11 @@ export const ko_KR: EnTranslations = {
       },
       "tigers_fury": {
         "name": "호랑이의 분노",
-        "description": "공격력을 6초 동안 40만큼 증가시킵니다. 표범 변신 전용."
+        "description": "전투력을 6초 동안 40만큼 증가시킵니다. 늑대 변신 전용."
       },
       "rip": {
         "name": "찢기",
-        "description": "12초에 걸쳐 출혈 피해를 입히는 결정타입니다. 연계 점수를 소모합니다. 표범 변신 전용."
+        "description": "12초에 걸쳐 출혈 피해를 입히는 결정타입니다. 연계 점수를 소모합니다. 늑대 변신 전용."
       },
       "mortal_strike": {
         "name": "죽음의 일격",
@@ -4075,15 +4105,15 @@ export const ko_KR: EnTranslations = {
       },
       "bear_charge": {
         "name": "곰 돌진",
-        "description": "적에게 돌진하여 분노 9를 생성하고 1초 동안 기절시킵니다. 사거리 7~23미터. 곰 변신 상태에서만 사용 가능."
+        "description": "적에게 돌진하여 분노 9를 생성하고 1초 동안 기절시킵니다. 사거리 8-25yd. 곰 변신 상태에서만 사용 가능."
       },
       "demoralizing_roar": {
         "name": "사기 저하의 포효",
-        "description": "주변의 적들을 위축시켜 20초 동안 그들의 공격력을 20만큼 감소시킵니다. 곰 변신 상태에서만 사용 가능."
+        "description": "주변의 적들을 위축시켜 20초 동안 그들의 전투력을 20만큼 감소시킵니다. 곰 변신 상태에서만 사용 가능."
       },
       "prowl": {
         "name": "은신 보행",
-        "description": "늑대 변신 상태에서 은신합니다. 전투 중에는 사용할 수 없습니다."
+        "description": "늑대 변신 상태에서 은신하고 이동 속도가 50% 감소합니다. 전투 중에는 사용할 수 없습니다."
       },
       "rake": {
         "name": "할퀴기",
@@ -4387,7 +4417,7 @@ export const ko_KR: EnTranslations = {
         "name": "산등성이 추적자 가죽"
       },
       "old_cragmaws_pelt": {
-        "name": "Old Cragmaw's Pelt"
+        "name": "늙은 크래그모의 가죽"
       },
       "glowing_wax": {
         "name": "빛나는 밀랍"
@@ -4627,34 +4657,34 @@ export const ko_KR: EnTranslations = {
         "name": "군주의 왕관"
       },
       "charter_ashmane": {
-        "name": "증서: Ashmane Courser"
+        "name": "증서: 잿빛갈기 준마"
       },
       "charter_emberhoof": {
-        "name": "증서: Emberhoof Charger"
+        "name": "증서: 불씨굽 군마"
       },
       "charter_bronzeflank": {
-        "name": "증서: Bronzeflank Destrier"
+        "name": "증서: 청동옆구리 전마"
       },
       "charter_silvermane": {
-        "name": "증서: Silvermane Stallion"
+        "name": "증서: 은빛갈기 종마"
       },
       "charter_stormhoof": {
-        "name": "증서: Stormhoof Charger"
+        "name": "증서: 폭풍굽 군마"
       },
       "charter_goldcrest": {
-        "name": "증서: Goldcrest Skystrider"
+        "name": "증서: 금빛볏 하늘걸음이"
       },
       "charter_verdant": {
-        "name": "증서: Verdant Wildwing"
+        "name": "증서: 푸른들 야생날개"
       },
       "charter_voidstrider": {
-        "name": "증서: Voidwing Strider"
+        "name": "증서: 공허날개 활보자"
       },
       "charter_celestial": {
-        "name": "증서: Celestial Seraph"
+        "name": "증서: 천상의 세라프"
       },
       "charter_worldbearer": {
-        "name": "증서: Worldbearer's Roc"
+        "name": "증서: 세계를 짊어진 자의 로크"
       },
       "bristleback_maul": {
         "name": "뻣센등뼈 철퇴"
@@ -4855,7 +4885,7 @@ export const ko_KR: EnTranslations = {
         "name": "크래그모의 잠행 장화"
       },
       "cragmaw_huntcord": {
-        "name": "Cragmaw's Huntcord"
+        "name": "크래그모의 사냥 허리끈"
       },
       "drowned_tide_scepter": {
         "name": "익사한 조수의 셉터"
@@ -4993,31 +5023,31 @@ export const ko_KR: EnTranslations = {
         "name": "고룡그림자 갈퀴손아귀"
       },
       "reliquary_plate_chest": {
-        "name": "Reliquary Guard Hauberk"
+        "name": "성물실 수호 갑옷"
       },
       "reliquary_leather_chest": {
-        "name": "Dustwarden Jerkin"
+        "name": "먼지수호자의 웃옷"
       },
       "reliquary_cloth_chest": {
-        "name": "Shroud of the Reliquary"
+        "name": "성물실 수의"
       },
       "reliquary_legs": {
-        "name": "Vaultbound Legwraps"
+        "name": "묘실 다리보호구"
       },
       "reliquary_helm": {
-        "name": "Ossuary Watch Helm"
+        "name": "납골당 경비 투구"
       },
       "reliquary_shoulder": {
-        "name": "Crumbled Spaulders"
+        "name": "부서진 어깨보호구"
       },
       "reliquary_gloves_rog": {
-        "name": "Bonewarden Grips"
+        "name": "뼈수호 손보호구"
       },
       "deacon_reliquary_helm": {
-        "name": "Deacon's Reliquary Helm"
+        "name": "부제의 성물실 투구"
       },
       "varric_shadow_cowl": {
-        "name": "Varric's Shadow Cowl"
+        "name": "바릭의 그림자 두건"
       },
       "the_codfather": {
         "name": "대구 대부"
@@ -5059,34 +5089,34 @@ export const ko_KR: EnTranslations = {
         "name": "신비한 외형 상자"
       },
       "deathless_heartwood": {
-        "name": "Heartwood of the Deathless Crown"
+        "name": "죽지 않는 왕관의 심재"
       },
       "kingsbane_last_oath": {
-        "name": "Kingsbane, Last Oath of Thornpeak"
+        "name": "왕살해자, 손피크의 마지막 맹세"
       },
       "crownforged_dreadhelm": {
-        "name": "Crownforged Dreadhelm"
+        "name": "왕관벼림 공포투구"
       },
       "crownforged_warspaulders": {
-        "name": "Crownforged Warspaulders"
+        "name": "왕관벼림 전쟁 어깨갑옷"
       },
       "nighttalon_crown": {
-        "name": "Nighttalon Crown"
+        "name": "밤발톱 왕관"
       },
       "nighttalon_shoulderguards": {
-        "name": "Nighttalon Shoulderguards"
+        "name": "밤발톱 어깨수호대"
       },
       "soulflame_cowl": {
-        "name": "Soulflame Cowl"
+        "name": "영혼불꽃 두건"
       },
       "soulflame_mantle": {
-        "name": "Soulflame Mantle"
+        "name": "영혼불꽃 어깨덮개"
       },
       "stormcallers_crown": {
-        "name": "Stormcaller's Crown"
+        "name": "폭풍소환사의 관"
       },
       "stormcallers_spaulders": {
-        "name": "Stormcaller's Spaulders"
+        "name": "폭풍소환사의 어깨갑옷"
       },
       "unknown_alien_weaponry": {
         "name": "알 수 없는 외계 무기"
@@ -5138,12 +5168,6 @@ export const ko_KR: EnTranslations = {
       },
       "vanguard_chrome_armor_plate": {
         "name": "선봉대 크롬"
-      },
-      "glade_pelt": {
-        "name": "숲속 가죽"
-      },
-      "monarch_heart": {
-        "name": "군주의 심장"
       }
     },
     "mobs": {
@@ -5238,7 +5262,7 @@ export const ko_KR: EnTranslations = {
         "name": "뼈갑옷 망령"
       },
       "crypt_shambler": {
-        "name": "묘실 비틀거림꾼"
+        "name": "묘실 비틀걸음"
       },
       "hollow_acolyte": {
         "name": "공허의 수행사제"
@@ -5286,7 +5310,7 @@ export const ko_KR: EnTranslations = {
         "name": "무덤고룡 코르줄"
       },
       "bog_bloat": {
-        "name": "늪 부푸리"
+        "name": "늪 부푼괴물"
       },
       "fallen_captain_aldren": {
         "name": "타락한 대장 알드렌"
@@ -5310,31 +5334,31 @@ export const ko_KR: EnTranslations = {
         "name": "속박된 수호자"
       },
       "nythraxis_skeleton_warrior": {
-        "name": "Risen Royal Guard"
+        "name": "되살아난 왕실 근위병"
       },
       "nythraxis_scourge_of_thornpeak": {
-        "name": "Nythraxis, Scourge of Thornpeak"
+        "name": "나이트락시스, 손피크의 재앙"
       },
       "reliquary_ledger_wraith": {
-        "name": "Ledger Wraith"
+        "name": "명부의 망령"
       },
       "reliquary_funeral_ringer": {
-        "name": "Funeral Ringer"
+        "name": "장례 종지기"
       },
       "reliquary_gravecall_acolyte": {
-        "name": "Gravecall Acolyte"
+        "name": "무덤부름 수련사제"
       },
       "reliquary_bonewalker": {
-        "name": "Raised Bonewalker"
+        "name": "되살아난 해골보행자"
       },
       "reliquary_saintless_effigy": {
-        "name": "Saintless Effigy"
+        "name": "성인 잃은 조상"
       },
       "deacon_varric": {
-        "name": "Deacon Varric"
+        "name": "부제 바릭"
       },
       "acolyte_tessa": {
-        "name": "Acolyte Tessa"
+        "name": "수련사제 테사"
       },
       "ironvein_foreman": {
         "name": "철맥 감독관"
@@ -5418,7 +5442,7 @@ export const ko_KR: EnTranslations = {
         "name": "익사한 신도"
       },
       "glimmermere_wader": {
-        "name": "글리머미어 물거리"
+        "name": "글리머미어 물헤치미"
       },
       "glimmerscale_lurker": {
         "name": "반짝비늘 잠복자"
@@ -5443,48 +5467,6 @@ export const ko_KR: EnTranslations = {
       },
       "ysolei": {
         "name": "이솔레이, 익사한 달의 화신"
-      },
-      "elder_bristleback": {
-        "name": "늙은 뻣센등뼈"
-      },
-      "sableweb_hatchling": {
-        "name": "검은그물 새끼"
-      },
-      "sableweb_matriarch": {
-        "name": "검은그물 우두머리"
-      },
-      "bramble_lynx": {
-        "name": "가시덤불 살쾡이"
-      },
-      "brightwood_hare": {
-        "name": "브라이트우드 산토끼"
-      },
-      "brightwood_monarch": {
-        "name": "브라이트우드의 군주"
-      },
-      "brightwood_stag": {
-        "name": "브라이트우드 수사슴"
-      },
-      "dawnmane_doe": {
-        "name": "여명갈기 암사슴"
-      },
-      "glade_fox": {
-        "name": "숲속 여우"
-      },
-      "grovetusk_boar": {
-        "name": "숲엄니 멧돼지"
-      },
-      "meadow_crane": {
-        "name": "초원 두루미"
-      },
-      "spotted_fawn": {
-        "name": "얼룩 새끼사슴"
-      },
-      "sunhide_bear": {
-        "name": "햇살가죽 곰"
-      },
-      "thornpelt_badger": {
-        "name": "가시털 오소리"
       }
     },
     "npcs": {
@@ -5584,24 +5566,24 @@ export const ko_KR: EnTranslations = {
         "greeting": "느슨한 혈암을 조심하십시오, {className}. 산이 요즘 불안정해졌고, 나는 그 이유를 알고 싶습니다."
       },
       "brother_aldric_raid": {
-        "name": "Brother Aldric",
-        "title": "Priest of the Vale",
-        "greeting": "From a chapel yard in the Vale to the roof of the world... the trail we have followed ends here. I can feel the mountain listening."
+        "name": "알드릭 수사",
+        "title": "계곡의 사제",
+        "greeting": "예배당 묘지에서 세상의 지붕까지... 흔적은 여기서 끝납니다. 산이 듣고 있음을 느낍니다."
       },
       "brother_halven": {
-        "name": "Brother Halven",
-        "title": "Reliquary Keeper",
-        "greeting": "The reliquary below has shifted again."
+        "name": "브라더 할벤",
+        "title": "성물실 관리인",
+        "greeting": "아래의 성물실이 또 움직였소."
       },
       "tidewatcher_ondrel": {
         "name": "온드렐 베인",
         "title": "조수지기",
         "greeting": "이 호수는 달빛을 마시고, {className}, 익사한 자들을 되돌려 보낸다네. 나는 서른 밤 동안 저 관문을 지켜보았지 — 그리고 오늘 밤, 마침내 그것이 열렸네."
       },
-      "ranger_elwyn": {
-        "greeting": "조용히 하게, {className} - 오늘 숲은 고요하고, 나는 그대로 지킬 생각이네.",
-        "name": "순찰병 엘윈",
-        "title": "숲의 수호인"
+      "skytrial_master": {
+        "name": "하늘지기 베일",
+        "title": "하늘 시련의 수호자",
+        "greeting": "하늘은 감히 걸으려는 이가 드문 길입니다, {className}. 그것을 얻으면, 하늘이 그대를 실어 나릅니다."
       }
     },
     "quests": {
@@ -6281,8 +6263,8 @@ export const ko_KR: EnTranslations = {
       },
       "q_nythraxis_restless_dead": {
         "title": "뼈 들판의 소요",
-        "text": "Thornpeak Heights에 변화가 생겼습니다, {playerName}. 죽은 자들이 더는 정처 없이 떠돌지 않습니다. 그들은 Highwatch 너머 북쪽 뼈 들판, 옛 전장과 절벽길이 만나는 곳에서 모여 행군합니다. 그곳으로 가서 뼈갑옷 망령들의 소요를 조사하고, 무엇이 그들을 움직이는지 보여 줄 증거를 가져오십시오.",
-        "completion": "모든 조각에 같은 표식이 있습니다... 왕관입니다. Eastbrook 기록이 기억하지 못하는 오래된 무덤에 새겨진 것을 본 적이 있습니다.",
+        "text": "쏜피크 고지에 변화가 생겼습니다, {playerName}. 죽은 자들이 더는 정처 없이 떠돌지 않습니다. 그들은 하이워치 너머 북쪽 뼈 들판, 옛 전장과 절벽길이 만나는 곳에서 모여 행군합니다. 그곳으로 가서 뼈갑옷 망령들의 소요를 조사하고, 무엇이 그들을 움직이는지 보여 줄 증거를 가져오십시오.",
+        "completion": "모든 조각에 같은 표식이 있습니다... 왕관입니다. 이스트브룩 기록이 기억하지 못하는 오래된 무덤에 새겨진 것을 본 적이 있습니다.",
         "objectives": {
           "0": {
             "label": "룬 새긴 뼈 조각"
@@ -6307,7 +6289,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_nythraxis_sealed_crypt": {
         "title": "버려진 납골당",
-        "text": "환영은 서쪽 절벽의 버려진 묘실을 가리킵니다. 그 묘실에 한 왕이 있었다는 옛 전설이 있습니다. 말릭의 의식이 그를 죽지 않는 존재로 뒤틀어 놓은 뒤 Thornpeak가 그를 아래에 봉인했을지도 모릅니다. 묘실에 들어가 안에 무엇이 남아 있는지 확인하십시오.",
+        "text": "환영은 서쪽 절벽의 버려진 묘실을 가리킵니다. 그 묘실에 한 왕이 있었다는 옛 전설이 있습니다. 말릭의 의식이 그를 죽지 않는 존재로 뒤틀어 놓은 뒤 쏜피크가 그를 아래에 봉인했을지도 모릅니다. 묘실에 들어가 안에 무엇이 남아 있는지 확인하십시오.",
         "completion": "열쇠돌의 두 조각이 맞물리고, 보스의 일지는 그것들이 봉인한 것을 밝힙니다. 니트락시스 왕의 인장 반지입니다. 일지가 사실이라면 그 반지가 그의 무덤으로 가는 열쇠입니다.",
         "objectives": {
           "0": {
@@ -6338,12 +6320,12 @@ export const ko_KR: EnTranslations = {
         }
       },
       "q_nythraxis_scourges_end": {
-        "title": "Scourge's End",
-        "text": "The signet has opened the way, {playerName}, but an open tomb is not a victory. Nythraxis was a king once, and the ruin beneath Thornpeak is still bound to his will. Enter the crypt with allies you trust. Break the deathless crown before its command reaches the battlefield above.",
-        "completion": "Then the crown is silent at last. Thornpeak will still carry its dead, but no king below it will call them to war again. You have ended what Aldren, Malric, and Voss could only contain.",
+        "title": "스컬지의 끝",
+        "text": "인장 반지가 길을 열었습니다, {playerName}. 하지만 열린 무덤이 승리는 아닙니다. 니트락시스는 한때 왕이었고, 손피크 아래의 폐허는 아직도 그의 의지에 묶여 있습니다. 믿을 수 있는 동료들과 함께 묘실로 들어가십시오. 그 죽지 않는 왕관의 명령이 위의 전장에 닿기 전에 부수어야 합니다.",
+        "completion": "마침내 왕관이 침묵했습니다. 손피크는 여전히 죽은 이들을 품겠지만, 산 아래의 어떤 왕도 다시 그들을 전쟁으로 부르지 못할 것입니다. 당신은 알드렌과 말릭, 보스가 겨우 억눌렀던 일을 끝냈습니다.",
         "objectives": {
           "0": {
-            "label": "Nythraxis slain"
+            "label": "니트락시스 처치"
           }
         }
       },
@@ -6420,144 +6402,35 @@ export const ko_KR: EnTranslations = {
           }
         }
       },
-      "q_mogger_tracks": {
-        "title": "모거의 흔적",
-        "text": "북쪽 길을 떠나기 전에 이스트브룩에는 마지막 골칫거리, 모거가 남았습니다. 그 짐승은 아래 초원을 짓밟고 멧돼지를 미치게 합니다. 흔적 주변의 초원을 정리해 은신처를 찾아내십시오.",
-        "completion": "그 발자국은 새롭고 비를 담을 만큼 깊습니다. 모거는 야영지 이야기가 아닙니다, {playerName}. 아주 가까이 있습니다.",
+      "q_skyward_first_flight": {
+        "title": "첫 비행",
+        "text": "땅 위에서는 날개 달린 탈것을 곧잘 다루는군요, {playerName}. 이제 하늘로 올리세요. 골짜기 하늘 시련을 비행하십시오: 한 바퀴 도는 길에 여덟 개의 고리. 아직 시간을 쫓지는 마세요. 그저 떠 있으면서 모든 고리를 꿰십시오.",
+        "completion": "떨어지지 않았군요. 첫 바퀴에 대부분이 해내는 것보다 더한 일입니다. 하늘은 계속 돌아오는 자를 기억합니다.",
         "objectives": {
           "0": {
-            "label": "야생 멧돼지를 흔적에서 몰아냄"
+            "label": "골짜기 하늘 시련 완료"
           }
         }
       },
-      "q_brightwood_monarch": {
-        "completion": "그래, 늙은 왕이 쓰러졌군. 무거운 일이지 - 허나 늑대들의 손에 죽는 것보다는 자비로운 최후였네. 그의 뿔로 만든 이 왕관을 경의를 담아 쓰게, {playerName}.",
+      "q_skyward_time_trial": {
+        "title": "시간을 이겨라",
+        "text": "이제 의지를 담아 해내십시오. 골짜기 하늘 시련을 다시 비행하되, {playerName}, 모래가 다하기 전에 끝내세요. 모든 고리를 깔끔한 선으로, 허비되는 공기 없이. 당황이 아니라 정밀함으로.",
+        "completion": "고리에서 고리로, 깔끔한 선이었습니다. 그대는 더 이상 하늘을 타고 있는 것이 아닙니다. 하늘을 날고 있습니다.",
         "objectives": {
           "0": {
-            "label": "군주의 심장"
+            "label": "골짜기 하늘 시련 기준 시간 내 비행"
           }
-        },
-        "text": "나 홀로 화살을 겨누지 않을 짐승이 하나 있네. 바로 브라이트우드의 군주, 깊은 숲을 다스리는 거대한 수사슴이지. 그는 늙고 사나워져, 자기 둥지에 다가오는 자는 누구든 뿔로 들이받는다네. 사냥꾼 하나로는 감당하기 벅차니 - 친구를 한둘 데려가게. 그를 잠재우고 심장을 가져오게, {playerName}.",
-        "title": "브라이트우드의 군주"
+        }
       },
-      "q_brightwood_thinning": {
-        "completion": "좋아. 무리가 솎아졌고 이 가죽들도 멀쩡하군 - 숲은 한 철 더 버틸 걸세.",
+      "q_skyward_ascendant": {
+        "title": "비상하는 자",
+        "text": "한 가지 시련이 남았습니다, {playerName}: 골짜기 순환로. 긴 고리를 세 바퀴, 기준 시간 내에 비행하십시오. 운이 아니라 오직 기량으로. 그것을 통달하면 가장자리에서 가장자리까지 드넓은 하늘이 그대의 것입니다.",
+        "completion": "하늘로 올라, 꺾이지 않았습니다. 이제 하늘은 그대의 것입니다, {playerName}. 이 증서를 받으십시오. 사지 않고 얻어 낸 창공의 탈것이, 그대가 향하려는 어디로든 실어 나를 것입니다.",
         "objectives": {
           "0": {
-            "label": "처치한 가시덤불 살쾡이"
-          },
-          "1": {
-            "label": "숲속 가죽"
+            "label": "골짜기 순환로 기준 시간 내 비행"
           }
-        },
-        "text": "브라이트우드 숲이 들끓고 있네, {playerName}. 가시덤불 살쾡이는 내가 솎아내는 속도보다 빨리 번식하고, 무리는 얼마 남지 않은 풀밭마저 짓밟고 있어. 가시덤불 살쾡이 8마리를 처치하고 숲속 가죽 6장을 가져오게. 나머지 무리의 상태를 가늠해 보겠네.",
-        "title": "숲 솎아내기"
-      },
-      "q_ledger_brood": {
-        "completion": "둥지를 물에 잠기게 하는 건 참혹한 일이지. 허나 지금의 자비가 훗날 백 번의 장례를 면하게 하네. 장부는 청산되었네.",
-        "objectives": {
-          "0": {
-            "label": "짓밟은 검은그물 새끼"
-          }
-        },
-        "text": "잠복자들을 처치한 것이 오히려 새끼들에게 자리를 내주었군. 검은그물 새끼들이 깊은 둥지에서 쏟아져 나오고 있어, 작은 송곳니 백 개도 큰 것 하나만큼이나 여행자의 목숨을 앗아간다네. 검은그물 새끼 8마리를 다 자라기 전에 짓밟게.",
-        "title": "들끓는 어둠"
-      },
-      "q_ledger_deepvermin": {
-        "completion": "촛불머리 해충 열두 마리가 사라졌군! 좋아, 친구들 - 갱도로 돌아가지. 자네가 보안관께 좋은 평을 얻게 했네, {playerName}.",
-        "objectives": {
-          "0": {
-            "label": "처치한 굴쥐 채굴꾼"
-          }
-        },
-        "text": "보안관 장부에 자네가 해충을 처리한다고 적혀 있더군. 그래, 내 갱도에 가장 지독한 놈들이 있네. 굴쥐들이 내 인부들이 곡괭이를 휘두르는 속도보다 빨리 번식하니 - 굴쥐 채굴꾼 12마리를 잡아주게. 그러면 겨울이 오기 전에 구리를 캘 수 있을지도 모르지.",
-        "title": "깊은 곳의 해충"
-      },
-      "q_ledger_first_duty": {
-        "completion": "굴 여덟 개를 비우고 숲 바닥도 다시 가라앉았군. 좋아. 이 장부에 적힌 모든 이름이 바로 지금 자네가 선 자리에서 시작했다네.",
-        "objectives": {
-          "0": {
-            "label": "솎아낸 가시털 오소리"
-          }
-        },
-        "text": "이스트브룩에서 밥값을 하고 싶은가, {playerName}? 그렇다면 모든 수호인이 시작하는 곳에서 시작하게. 가시털 오소리들이 늑대길을 지나 저 북쪽 끝, 브라이트우드 숲 한복판까지 굴을 파 놓아서, 숲 바닥이 그 굴 속으로 내려앉고 있네. 가시털 오소리 8마리를 솎아내면 장부가 자네의 이름을 기억할 걸세.",
-        "title": "수호인의 첫 임무"
-      },
-      "q_ledger_great_boar": {
-        "completion": "늙은 뻣센등뼈가 자네 손에 죽다니! 그 가죽 하나만으로도 한 철 장사 거리는 되지. 자네는 장부를 자랑스럽게 했네, {playerName}.",
-        "objectives": {
-          "0": {
-            "label": "처치한 늙은 뻣센등뼈"
-          },
-          "1": {
-            "label": "처치한 무리의 야생 멧돼지"
-          }
-        },
-        "text": "서쪽 덤불에 늙은 황소 멧돼지가 한 마리 있네 - 늙은 뻣센등뼈라고, 가죽은 나무껍질 같고 성질도 그에 못지않지. 내 가죽 사냥꾼 둘을 뿔로 들이받았네. 그놈을 쓰러뜨리고 그 뒤에 숨은 하급 야생 멧돼지 6마리를 처리하면, 자네 이름을 장부 높은 곳에 새겨주겠네.",
-        "title": "거대한 뻣센등뼈"
-      },
-      "q_ledger_outlaw_captain": {
-        "completion": "베를란 대장이 죽고, 그의 외투가 내 문 앞에 당도했군. 장부가 닫혔네, {playerName} - 그리고 골짜기는 그것을 닫은 자의 이름을 앞으로 올 수호인들에게 전할 걸세.",
-        "objectives": {
-          "0": {
-            "label": "처치한 계곡 도적"
-          },
-          "1": {
-            "label": "처치한 베를란 대장"
-          }
-        },
-        "text": "장부의 마지막 이름은 내가 일 년 동안 지우고 싶었던 자라네. 골짜기의 절반을 산적질로 몰아넣은 베를란 대장이지. 그는 남동쪽 야영지에서 부관들 뒤에 숨어 있네. 계곡 도적 6명을 베고 그에게 다가가, 베를란을 끝장내게. 혼자 가지는 말게.",
-        "title": "무법자 대장"
-      },
-      "q_ledger_reedwater": {
-        "completion": "그 정도면 한 철은 그 꾸르륵대는 악마들을 내 그물에서 떼어놓겠지. 보안관께 호수가 다시 잠잠해졌다고 전하게.",
-        "objectives": {
-          "0": {
-            "label": "처치한 진흙지느러미 잠복자"
-          }
-        },
-        "text": "레드브룩이 자네를 보냈나? 좋아 - 이 늙은 뼈로는 더 이상 얕은 물을 헤칠 수가 없네. 진흙지느러미들이 갈대 물가로 다시 기어들었고, 그 어느 때보다 대담해졌어. 그놈들을 솎아내게. 진흙지느러미 잠복자 8마리를, 그리고 깊은 물을 조심하게.",
-        "title": "갈대 물가 순찰"
-      },
-      "q_ledger_silk": {
-        "completion": "어둠 속 거미가 여덟이 줄었군. 숲이 한결 편히 숨 쉬고, 나도 그렇다네.",
-        "objectives": {
-          "0": {
-            "label": "처치한 그물나무 잠복자"
-          }
-        },
-        "text": "장부는 동쪽 숲도 수호인의 땅으로 표시해 두었네. 그물나무 잠복자들이 매주 더 두껍게 거미줄을 친다네 - 지난 장날에 한 아이가 너무 가까이 갔다가, 우리가 겨우 숨이 붙은 채로 잘라냈어. 그놈들이 숲을 완전히 차지하기 전에 그물나무 잠복자 8마리를 처치하게.",
-        "title": "비단과 독"
-      },
-      "q_ledger_teeth": {
-        "completion": "늑대 열 마리, 그리고 황혼의 길이 다시 우리 것이 됐군. 장부가 자네에게 더 너그러워지네.",
-        "objectives": {
-          "0": {
-            "label": "처치한 숲늑대"
-          }
-        },
-        "text": "늑대 무리가 순찰로를 익혀버렸네 - 빛이 옅어지고 외로운 여행자가 손쉬운 먹잇감이 되는 황혼에 들이닥치지. 그놈들을 무너뜨리게, {playerName}. 숲늑대 10마리를 처치해 무리가 새로운 교훈을 배우게 하게.",
-        "title": "어둠 속의 송곳니"
-      },
-      "q_ledger_toll": {
-        "completion": "산적 여덟 명이 죗값을 치렀군. 통행로에 새 파수꾼이 생겼다는 소문이 벌써 퍼지고 있네 - 그자는 돈이 아니라 목을 받는다는 소문이.",
-        "objectives": {
-          "0": {
-            "label": "심판받은 계곡 도적"
-          }
-        },
-        "text": "남동쪽 언덕이 산적들의 통행로가 되어버렸네 - 가볍게 길을 나서는 어리석은 자라면 누구든 털어가지. 장부에는 그들 하나하나에 현상금이 걸려 있네. 계곡 도적 8명에게 이스트브룩의 심판을 내리게.",
-        "title": "노상강도의 통행세"
-      },
-      "q_ledger_vigil": {
-        "completion": "열 영혼이 대지로 돌아가고, 예배당에 하룻밤의 평안을 사들였군. 장부가 잊더라도, 빛은 이런 불침번을 기억한다네.",
-        "objectives": {
-          "0": {
-            "label": "잠재운 불안한 뼈무더기"
-          }
-        },
-        "text": "보안관은 칼만으로는 닿지 못하는 곤경이 생기면 수호인들을 내게 보내네. 예배당의 죽은 자들이 가만히 누워 있지 않는데, 나는 너무 늙어 밤샘 불침번을 설 수가 없어. 나를 위해 그것을 지켜주게, {playerName} - 불안한 뼈무더기 10구를 다시 안식으로 돌려보내게.",
-        "title": "예배당의 불침번"
+        }
       }
     },
     "zones": {
@@ -6593,7 +6466,7 @@ export const ko_KR: EnTranslations = {
             "label": "브라이트우드 숲"
           },
           "9": {
-            "label": "Brightwood Glade"
+            "label": "브라이트우드 숲"
           }
         }
       },
@@ -6683,12 +6556,12 @@ export const ko_KR: EnTranslations = {
       "nythraxis_crypt": {
         "name": "버려진 납골당",
         "enterText": "버려진 납골당의 문턱을 넘습니다.",
-        "leaveText": "Thornpeak의 차가운 공기 속으로 돌아옵니다."
+        "leaveText": "쏜피크의 차가운 공기 속으로 돌아옵니다."
       },
       "nythraxis_boss_arena": {
-        "name": "Nythraxis Raid Arena",
-        "enterText": "You pass through the sealed royal door.",
-        "leaveText": "You return to the cold air of Thornpeak."
+        "name": "니트락시스 공격대 투기장",
+        "enterText": "봉인된 왕실 문을 지나갑니다.",
+        "leaveText": "쏜피크의 차가운 공기 속으로 돌아옵니다."
       },
       "drowned_temple": {
         "name": "익사한 신전",
@@ -6698,46 +6571,46 @@ export const ko_KR: EnTranslations = {
     },
     "delves": {
       "collapsed_reliquary": {
-        "name": "The Collapsed Reliquary",
-        "enterText": "You descend into the collapsed reliquary.",
-        "leaveText": "You climb back to Brother Halven at the reliquary ruin."
+        "name": "무너진 성물실",
+        "enterText": "무너진 성물실로 내려갑니다.",
+        "leaveText": "성물실 폐허의 브라더 할벤에게로 다시 올라갑니다."
       }
     },
     "itemSets": {
       "crownforged": {
-        "name": "Crownforged Regalia",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Strength by 15 and Stamina by 15."
+        "name": "왕관벼림 전투장비",
+        "bonus2": "전투력이 40만큼 증가합니다.",
+        "bonus3": "힘이 15, 체력이 15만큼 증가합니다."
       },
       "deathlord": {
-        "name": "Deathlord Battlegear",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Strength by 15 and Stamina by 15."
+        "name": "죽음군주의 전투장비",
+        "bonus2": "전투력이 40만큼 증가합니다.",
+        "bonus3": "힘이 15, 체력이 15만큼 증가합니다."
       },
       "necromancers": {
-        "name": "Necromancer's Raiment",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "강령술사의 의복",
+        "bonus2": "피해로 인한 시전 밀림이 50% 감소합니다.",
+        "bonus3": "시전 중 피해를 받아도 밀려나지 않습니다."
       },
       "nighttalon": {
-        "name": "Nighttalon Pelt",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15 and critical strike chance by 2%."
+        "name": "밤발톱 가죽장비",
+        "bonus2": "전투력이 40만큼 증가합니다.",
+        "bonus3": "민첩이 15, 치명타 확률이 2% 증가합니다."
       },
       "soulflame": {
-        "name": "Soulflame Regalia",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "영혼불꽃 의복",
+        "bonus2": "피해로 인한 시전 밀림이 50% 감소합니다.",
+        "bonus3": "시전 중 피해를 받아도 밀려나지 않습니다."
       },
       "stormcallers": {
-        "name": "Stormcaller's Vestments",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "폭풍소환사의 의복",
+        "bonus2": "피해로 인한 시전 밀림이 50% 감소합니다.",
+        "bonus3": "시전 중 피해를 받아도 밀려나지 않습니다."
       },
       "wyrmshadow": {
-        "name": "Wyrmshadow Vestments",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15 and critical strike chance by 2%."
+        "name": "고룡그림자 의복",
+        "bonus2": "전투력이 40만큼 증가합니다.",
+        "bonus3": "민첩이 15, 치명타 확률이 2% 증가합니다."
       }
     }
   },
@@ -6746,8 +6619,8 @@ export const ko_KR: EnTranslations = {
     "dungeonExitName": "{name} 출구",
     "dungeonPartyWarning": "{name}은 {count}명의 완전한 파티를 위해 마련된 곳입니다. 조심해서 나아가십시오.",
     "dungeonInstanceBusy": "{name}의 모든 인스턴스가 사용 중입니다. 잠시 후 다시 시도하십시오.",
-    "delveLockedChestInteract": "Press F to pick the lock",
-    "delveRewardChestInteract": "Press F to claim spoils",
-    "delveSurfaceExitInteract": "Press F to climb"
+    "delveLockedChestInteract": "F를 눌러 자물쇠 따기",
+    "delveRewardChestInteract": "F를 눌러 전리품 받기",
+    "delveSurfaceExitInteract": "F를 눌러 지상으로 오르기"
   }
 };

@@ -152,249 +152,249 @@ export const zh_CN: EnTranslations = {
   },
   "hudChrome": {
     "emotes": {
-      "wave": "Wave",
-      "laugh": "LOL",
-      "question": "Bro?",
-      "cheer": "Cheer",
-      "dance": "Dance",
-      "point": "Point",
-      "flex": "Flex",
-      "salute": "Salute",
-      "cry": "Cry",
-      "bow": "Bow",
-      "clap": "Clap",
-      "roar": "Roar",
-      "kneel": "Kneel"
+      "wave": "挥手",
+      "laugh": "大笑",
+      "question": "嘿？",
+      "cheer": "欢呼",
+      "dance": "跳舞",
+      "point": "指向",
+      "flex": "秀肌肉",
+      "salute": "敬礼",
+      "cry": "哭泣",
+      "bow": "鞠躬",
+      "clap": "鼓掌",
+      "roar": "咆哮",
+      "kneel": "下跪"
     },
     "emoteWheel": {
-      "edit": "Edit",
-      "label": "Emotes"
+      "edit": "编辑",
+      "label": "表情"
     },
     "emoteEditor": {
-      "title": "Emotes",
-      "done": "Done"
+      "title": "表情",
+      "done": "完成"
     },
     "theme": {
-      "preset": "UI Theme",
-      "customColors": "Custom Colors",
-      "reset": "Reset",
+      "preset": "界面主题",
+      "customColors": "自定义颜色",
+      "reset": "重置",
       "presets": {
-        "classic": "Classic Gold",
-        "midnight": "Midnight",
-        "parchment": "Parchment",
-        "highContrast": "High Contrast"
+        "classic": "经典金色",
+        "midnight": "午夜",
+        "parchment": "羊皮纸",
+        "highContrast": "高对比度"
       },
       "knob": {
-        "accent": "Accent",
-        "border": "Border",
-        "panel": "Frame",
-        "text": "Text",
-        "textMuted": "Muted Text",
-        "hp": "Health",
-        "mana": "Mana",
-        "rage": "Rage",
-        "energy": "Energy"
+        "accent": "强调色",
+        "border": "边框",
+        "panel": "框架",
+        "text": "文字",
+        "textMuted": "次要文字",
+        "hp": "生命",
+        "mana": "法力",
+        "rage": "怒气",
+        "energy": "能量"
       }
     },
     "questTracker": {
-      "count": "({count})",
-      "collapseHint": "Collapse quest tracker",
-      "expandHint": "Expand quest tracker"
+      "count": "（{count}）",
+      "collapseHint": "收起任务追踪器",
+      "expandHint": "展开任务追踪器"
     },
     "chatTimestamps": {
-      "show": "Show Chat Timestamps",
-      "format": "Timestamp Format",
-      "clock12h": "12-hour",
-      "clock24h": "24-hour",
-      "note": "Prefixes each new chat line with the time it arrived, e.g. [14:32]. Only affects messages received while the option is on."
+      "show": "显示聊天时间戳",
+      "format": "时间戳格式",
+      "clock12h": "12小时制",
+      "clock24h": "24小时制",
+      "note": "在每条新聊天消息前加上其到达时间，例如 [14:32]。仅对开启此选项后收到的消息生效。"
     },
     "chatWindow": {
-      "move": "Drag to move the chat window",
-      "resize": "Drag to resize the chat window",
-      "reset": "Reset Chat Window",
-      "resetAction": "Reset",
-      "note": "Drag the chat tab strip to move the window, or the corner grip to resize it. Reset returns it to the default position and size."
+      "move": "拖动以移动聊天窗口",
+      "resize": "拖动以调整聊天窗口大小",
+      "reset": "重置聊天窗口",
+      "resetAction": "重置",
+      "note": "拖动聊天标签栏可移动窗口，拖动右下角手柄可调整大小。重置可恢复到默认位置和大小。"
     },
     "swing": {
-      "ready": "Swing",
-      "seconds": "{seconds}s"
+      "ready": "挥击",
+      "seconds": "{seconds}秒"
     },
     "rest": {
-      "resting": "Resting"
+      "resting": "休息中"
     },
     "abilityScaling": {
       "bonus": "(+{value})"
     },
     "unitFrame": {
-      "playerLabel": "Your Hero",
-      "targetLabel": "Your Mark",
-      "targetAnnounce": "Mark {name}",
-      "partyLabel": "Your Band",
-      "partyGroup": "Group {n}",
-      "durationUnitSeconds": "s"
+      "playerLabel": "你的角色",
+      "targetLabel": "你的目标",
+      "targetAnnounce": "目标：{name}",
+      "partyLabel": "你的队伍",
+      "partyGroup": "小队 {n}",
+      "durationUnitSeconds": "秒"
     },
     "character": {
-      "modelPreview": "Character Model Preview"
+      "modelPreview": "角色模型预览"
     },
     "skipLinks": {
-      "mainHud": "Skip to Main HUD",
-      "chat": "Skip to Chat"
+      "mainHud": "跳转到主界面",
+      "chat": "跳转到聊天"
     },
     "mobile": {
-      "autorun": "Autorun",
-      "jump": "Jump",
-      "leaderboard": "Ranks",
-      "nameplates": "Names",
-      "haptics": "Haptics",
-      "hapticsOff": "Haptics Off",
-      "toggleHaptics": "Toggle haptics"
+      "autorun": "自动奔跑",
+      "jump": "跳跃",
+      "leaderboard": "排行榜",
+      "nameplates": "姓名板",
+      "haptics": "震动反馈",
+      "hapticsOff": "震动反馈：关",
+      "toggleHaptics": "切换震动反馈"
     },
     "tutorial": {
-      "moveBodyTouch": "Use the movement stick to move and drag the screen to look around. Take a few steps to begin.",
-      "talkBodyTouch": "Stand close to Marshal Redbrook and tap the Use button to speak, then accept his task.",
-      "returnBodyTouch": "Your task is done. Return to Marshal Redbrook and tap the Use button to turn it in.",
-      "doneBodyTouch": "You have the basics, {name}. The Vale is yours to explore. Tap More, then Quests, to review your quest log anytime. Good hunting."
+      "moveBodyTouch": "使用摇杆移动，拖动屏幕环顾四周。先走几步开始吧。",
+      "talkBodyTouch": "靠近雷德布鲁克元帅并点击“使用”按钮与他交谈，然后接受他的任务。",
+      "returnBodyTouch": "任务已完成。返回雷德布鲁克元帅处并点击“使用”按钮交付任务。",
+      "doneBodyTouch": "你已掌握基础，{name}。东溪谷任你探索。点击“更多”，再点击“任务日志”，随时查看你的任务日志。祝你狩猎顺利。"
     },
     "widgets": {
-      "clockTitle": "Local time - click to toggle 12/24-hour",
-      "worldCoordinates": "World coordinates",
-      "coordinates": "Coordinates",
-      "heading": "Heading",
-      "minimapZoom": "Minimap zoom"
+      "clockTitle": "本地时间 - 点击切换 12/24 小时制",
+      "worldCoordinates": "世界坐标",
+      "coordinates": "坐标",
+      "heading": "朝向",
+      "minimapZoom": "小地图缩放"
     },
     "castBar": {
-      "playerAria": "Your Cast Bar",
-      "targetAria": "Unit Cast Bar"
+      "playerAria": "你的施法条",
+      "targetAria": "目标施法条"
     },
     "leaderboard": {
-      "close": "Close"
+      "close": "关闭"
     },
     "raidLockout": {
-      "title": "Raid Lockouts",
-      "allReady": "All raids ready",
-      "daysHours": "{d}d {h}h",
-      "hoursMinutes": "{h}h {m}m",
-      "minutes": "{m}m",
-      "lessThanMinute": "<1m",
-      "lockedToast": "You are locked to {raid}. Unlocks in {time}."
+      "title": "团队副本锁定",
+      "allReady": "所有团队副本就绪",
+      "daysHours": "{d}天{h}小时",
+      "hoursMinutes": "{h}小时{m}分",
+      "minutes": "{m}分",
+      "lessThanMinute": "<1分",
+      "lockedToast": "你已锁定到{raid}。{time}后解锁。"
     },
     "compass": {
-      "N": "N",
-      "NE": "NE",
-      "E": "E",
-      "SE": "SE",
-      "S": "S",
-      "SW": "SW",
-      "W": "W",
-      "NW": "NW"
+      "N": "北",
+      "NE": "东北",
+      "E": "东",
+      "SE": "东南",
+      "S": "南",
+      "SW": "西南",
+      "W": "西",
+      "NW": "西北"
     },
     "meters": {
-      "perSecond": "{value}/s",
-      "perSecondRow": "{total} ({rate})",
-      "minutesSeconds": "{m}m {s}s",
-      "seconds": "{s}s"
+      "perSecond": "{value}/秒",
+      "perSecondRow": "{total}（{rate}）",
+      "minutesSeconds": "{m}分{s}秒",
+      "seconds": "{s}秒"
     },
     "keybinds": {
-      "emoteWheel": "Emote Wheel",
-      "targetFriendly": "Target Nearest Friendly",
-      "targetFriendlyNext": "Cycle Friendly Target"
+      "emoteWheel": "表情轮盘",
+      "targetFriendly": "选中最近友方",
+      "targetFriendlyNext": "切换友方目标"
     },
     "options": {
-      "clickMoveLeft": "Left Click",
-      "clickMoveRight": "Right Click",
-      "browserEffects": "Browser Effects",
-      "browserEffectsAuto": "Auto",
-      "browserEffectsFull": "Full",
-      "browserEffectsReduced": "Reduced",
-      "browserEffectsMinimal": "Minimal",
-      "browserEffectsNote": "Auto tones down heavy CSS effects (blur, glow, background motion) based on your browser and device. Lower it manually if the interface feels sluggish.",
-      "interfaceMode": "Interface Mode",
-      "interfaceModeAuto": "Auto",
-      "interfaceModeDesktop": "Desktop",
-      "interfaceModeTouch": "Touch",
-      "interfaceModeNote": "Auto picks desktop or touch controls from your device. Choose Desktop to force keyboard and mouse (useful on a tablet with a keyboard), or Touch for the on-screen controls.",
-      "footstepSounds": "Footstep Sounds",
-      "clickFeedback": "Click Marker",
-      "lockCursorOnRotate": "Lock Cursor While Rotating",
-      "keybindHelpLockCursorOnRotate": "Keeps the mouse cursor inside the window while you drag to rotate the camera, so it cannot reach the screen edge or move to another monitor. Turn off if you prefer a free cursor.",
-      "showWalletOnCharacterScreen": "Show Wallet on Character Screen",
-      "showWalletOnPlayerCard": "Show Wallet on Player Card",
-      "uiScale": "UI Scale",
-      "highContrastBackground": "High-Contrast Background",
-      "showItemLevel": "Show Item Level",
-      "itemLevelLine": "Item Level {level}",
-      "itemScoreLine": "Score {score}"
+      "clickMoveLeft": "左键",
+      "clickMoveRight": "右键",
+      "browserEffects": "浏览器特效",
+      "browserEffectsAuto": "自动",
+      "browserEffectsFull": "完整",
+      "browserEffectsReduced": "精简",
+      "browserEffectsMinimal": "最低",
+      "browserEffectsNote": "自动模式会根据你的浏览器和设备调低高开销的 CSS 特效（模糊、光晕、背景动画）。如果界面感觉卡顿，可手动降低。",
+      "interfaceMode": "界面模式",
+      "interfaceModeAuto": "自动",
+      "interfaceModeDesktop": "桌面",
+      "interfaceModeTouch": "触控",
+      "interfaceModeNote": "自动会根据你的设备选择桌面或触控操作。选择桌面可强制使用键盘和鼠标（适合带键盘的平板），选择触控则使用屏幕上的操作控件。",
+      "footstepSounds": "脚步声",
+      "clickFeedback": "点击标记",
+      "lockCursorOnRotate": "旋转时锁定光标",
+      "keybindHelpLockCursorOnRotate": "拖动旋转镜头时将鼠标光标保持在窗口内，使其无法到达屏幕边缘或移动到另一台显示器。如果你喜欢自由光标，请关闭此选项。",
+      "showWalletOnCharacterScreen": "在角色界面显示钱包",
+      "showWalletOnPlayerCard": "在玩家卡片显示钱包",
+      "uiScale": "界面缩放",
+      "highContrastBackground": "高对比度背景",
+      "showItemLevel": "显示物品等级",
+      "itemLevelLine": "物品等级 {level}",
+      "itemScoreLine": "评分 {score}"
     },
     "controller": {
-      "title": "Controller",
-      "enable": "Enable Controller",
-      "invertY": "Invert Camera (Y)",
-      "deadzone": "Stick Deadzone",
-      "cameraSpeed": "Camera Speed",
-      "vibration": "Vibration",
-      "buttons": "Button Layout",
-      "resetButtons": "Reset Button Layout",
-      "menuAction": "Game Menu",
-      "help": "Left stick moves, right stick looks. Open a window to use the on-screen pointer."
+      "title": "手柄",
+      "enable": "启用手柄",
+      "invertY": "反转镜头（Y轴）",
+      "deadzone": "摇杆死区",
+      "cameraSpeed": "镜头速度",
+      "vibration": "震动",
+      "buttons": "按键布局",
+      "resetButtons": "重置按键布局",
+      "menuAction": "游戏菜单",
+      "help": "左摇杆移动，右摇杆控制镜头。打开窗口即可使用屏幕指针。"
     },
     "perf": {
-      "title": "Performance Overlay",
-      "enable": "Show Performance Overlay",
-      "description": "Choose which stats to show, where the overlay sits, and how it looks.",
-      "sectionPosition": "Position",
-      "sectionAppearance": "Appearance",
-      "sectionStats": "Stats",
-      "positionX": "Horizontal",
-      "positionY": "Vertical",
-      "resetPosition": "Reset Position",
-      "dragHint": "Drag the overlay to move it, or use the sliders below.",
-      "opacity": "Background Opacity",
-      "solidBg": "Solid Background",
-      "fontScale": "Text Size",
-      "textColor": "Text Color",
-      "bgColor": "Background Color",
-      "colorTheme": "Color Theme",
-      "graph": "Frame-Time Graph",
-      "thresholds": "Color-Coded Warnings",
-      "presetsLabel": "Quick Presets",
-      "presetMinimal": "Minimal",
-      "presetStandard": "Standard",
-      "presetEverything": "Everything",
+      "title": "性能监视器",
+      "enable": "显示性能监视器",
+      "description": "选择要显示的信息、监视器的位置及其外观。",
+      "sectionPosition": "位置",
+      "sectionAppearance": "外观",
+      "sectionStats": "数据",
+      "positionX": "水平",
+      "positionY": "垂直",
+      "resetPosition": "重置位置",
+      "dragHint": "拖动监视器即可移动，或使用下方滑块。",
+      "opacity": "背景不透明度",
+      "solidBg": "纯色背景",
+      "fontScale": "文字大小",
+      "textColor": "文字颜色",
+      "bgColor": "背景颜色",
+      "colorTheme": "配色主题",
+      "graph": "帧时间图表",
+      "thresholds": "颜色编码警告",
+      "presetsLabel": "快速预设",
+      "presetMinimal": "精简",
+      "presetStandard": "标准",
+      "presetEverything": "全部",
       "groups": {
-        "frame": "Frame & Timing",
-        "network": "Network",
-        "renderer": "Renderer",
-        "system": "System",
-        "input": "Input"
+        "frame": "帧与计时",
+        "network": "网络",
+        "renderer": "渲染器",
+        "system": "系统",
+        "input": "输入"
       },
       "labels": {
         "fps": "FPS",
-        "frameTime": "Frame Time",
-        "fps1Low": "1% Low",
-        "fps01Low": "0.1% Low",
-        "ping": "Ping",
-        "jitter": "Jitter",
-        "snapshot": "Snapshot Rate",
-        "connection": "Connection",
-        "drawCalls": "Draw Calls",
-        "triangles": "Triangles",
-        "geometries": "Geometries",
-        "textures": "Textures",
-        "programs": "Shaders",
-        "renderScale": "Render Scale",
+        "frameTime": "帧时间",
+        "fps1Low": "1% 低帧",
+        "fps01Low": "0.1% 低帧",
+        "ping": "延迟",
+        "jitter": "抖动",
+        "snapshot": "快照频率",
+        "connection": "连接",
+        "drawCalls": "绘制调用",
+        "triangles": "三角面",
+        "geometries": "几何体",
+        "textures": "纹理",
+        "programs": "着色器",
+        "renderScale": "渲染比例",
         "gpu": "GPU",
-        "memory": "Memory",
-        "hitches": "Hitches",
-        "entities": "Entities",
+        "memory": "内存",
+        "hitches": "卡顿",
+        "entities": "实体",
         "apm": "APM"
       },
       "themes": {
-        "gold": "Gold",
-        "frost": "Frost",
-        "ember": "Ember",
-        "jade": "Jade",
-        "crimson": "Crimson",
-        "mono": "Mono"
+        "gold": "金色",
+        "frost": "冰霜",
+        "ember": "余烬",
+        "jade": "翡翠",
+        "crimson": "绯红",
+        "mono": "单色"
       },
       "units": {
         "ms": "{value} ms",
@@ -403,319 +403,319 @@ export const zh_CN: EnTranslations = {
         "hz": "{value} Hz"
       },
       "badges": {
-        "backgrounded": "Backgrounded",
-        "offline": "Offline"
+        "backgrounded": "后台运行",
+        "offline": "离线"
       }
     },
     "playerCard": {
-      "showWalletBadge": "Show wallet badge"
+      "showWalletBadge": "显示钱包徽章"
     },
     "landing": {
-      "highContrast": "High Contrast",
-      "highContrastAria": "Toggle high-contrast background: disables the moving trailer so start-screen text stays legible"
+      "highContrast": "高对比度",
+      "highContrastAria": "切换高对比度背景：关闭动态预告片，使开始界面文字保持清晰"
     },
     "statInfo": {
-      "fromYour": "From your {value} {stat}:",
+      "fromYour": "来自你的 {value} 点{stat}：",
       "desc": {
-        "str": "Increases your attack power, so your weapon strikes land harder.",
-        "agi": "Sharpens your reflexes and aim, improving several of your combat stats.",
-        "sta": "Toughens your body, raising your maximum health and how quickly you recover health while resting.",
-        "int": "Expands a spellcaster's mana pool and improves their chance to land a spell critical strike.",
-        "spi": "Quickens how fast a spellcaster's mana returns while resting, out of combat.",
-        "armor": "Softens incoming physical blows. The reduction is greater against lower-level attackers and is capped at 75%.",
-        "attackPower": "Powers your weapon attacks. Every 14 attack power adds 1 damage per second.",
-        "dps": "Your estimated weapon damage per second, combining your weapon's damage and speed with your attack power.",
-        "critChance": "Your chance for an attack to strike critically, dealing double damage.",
-        "dodge": "Your chance to completely avoid an incoming melee attack, taking no damage."
+        "str": "提高你的攻击强度，使你的武器攻击造成更高的伤害。",
+        "agi": "提高你的反应和准度，强化你的多项战斗属性。",
+        "sta": "强健你的体魄，提高你的最大生命值以及休息时恢复生命值的速度。",
+        "int": "扩大施法者的法力值上限，并提高其造成法术暴击的几率。",
+        "spi": "加快施法者在脱离战斗、休息时恢复法力值的速度。",
+        "armor": "减轻受到的物理打击。对等级较低的攻击者减伤效果更强，最高减伤上限为75%。",
+        "attackPower": "强化你的武器攻击。每14点攻击强度可提高1点每秒伤害。",
+        "dps": "你的预估武器每秒伤害，由武器的伤害与速度以及你的攻击强度共同计算得出。",
+        "critChance": "你的攻击造成暴击的几率，暴击将造成双倍伤害。",
+        "dodge": "你完全躲开来袭近战攻击、不受任何伤害的几率。"
       },
       "effects": {
-        "attackPower": "+{value} Attack Power",
-        "rangedAttackPower": "+{value} Ranged Attack Power",
-        "critPct": "+{value}% Critical Strike",
-        "dodgePct": "+{value}% Dodge",
-        "armor": "+{value} Armor",
-        "maxHealth": "+{value} Maximum Health",
-        "maxMana": "+{value} Maximum Mana",
-        "spellCritPct": "+{value}% Spell Critical Strike",
-        "healthRegen": "About {value} health every 5 sec while resting",
-        "manaRegen": "About {value} mana every 5 sec while resting",
-        "damageReduction": "Damage reduction against a level {level} attacker: {value}%",
-        "dpsFromAp": "Adds {value} damage per second to your attacks"
+        "attackPower": "+{value} 攻击强度",
+        "rangedAttackPower": "+{value} 远程攻击强度",
+        "critPct": "+{value}% 暴击",
+        "dodgePct": "+{value}% 躲闪",
+        "armor": "+{value} 护甲",
+        "maxHealth": "+{value} 最大生命值",
+        "maxMana": "+{value} 最大法力值",
+        "spellCritPct": "+{value}% 法术暴击",
+        "healthRegen": "休息时每5秒约恢复 {value} 点生命值",
+        "manaRegen": "休息时每5秒约恢复 {value} 点法力",
+        "damageReduction": "对{level}级攻击者的伤害减免：{value}%",
+        "dpsFromAp": "为你的攻击增加 {value} 点每秒伤害"
       },
       "notes": {
-        "minorForClass": "Of little benefit to your class.",
-        "baseChance": "Includes a 5% base chance shared by all adventurers.",
-        "dpsApprox": "An estimate, it excludes critical strikes and ability damage."
+        "minorForClass": "对你的职业益处不大。",
+        "baseChance": "包含所有冒险者共享的5%基础几率。",
+        "dpsApprox": "此为预估值，不计入暴击和技能伤害。"
       }
     },
     "talents": {
-      "defaultBuildName": "Build {n}"
+      "defaultBuildName": "配置 {n}"
     },
     "tips": {
-      "joinChannels": "Tip: type /join world or /join lfg to chat with players across the realm."
+      "joinChannels": "提示：输入 /join world 或 /join lfg，与全服玩家聊天。"
     },
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
     },
     "questShare": {
-      "notShareable": "This quest can't be shared.",
-      "notInSharerParty": "You must be in {name}'s party to accept that quest.",
-      "accepted": "{name} accepted your shared quest.",
-      "dialogTitle": "Shared Quest",
-      "viewOnlyHint": "Join the sharer's party to accept this quest.",
-      "alreadyOn": "You're already on this quest.",
-      "alreadyDone": "You've already completed this quest.",
-      "ineligible": "You don't meet the requirements for this quest.",
-      "noQuestSelected": "Select a quest in your log to share.",
-      "linkTitle": "Shift-click to link this quest in chat."
+      "notShareable": "该任务无法分享。",
+      "notInSharerParty": "你必须在 {name} 的队伍中才能接受该任务。",
+      "accepted": "{name} 接受了你分享的任务。",
+      "dialogTitle": "分享的任务",
+      "viewOnlyHint": "加入分享者的队伍才能接受该任务。",
+      "alreadyOn": "你已经接受了该任务。",
+      "alreadyDone": "你已经完成了该任务。",
+      "ineligible": "你不满足该任务的要求。",
+      "noQuestSelected": "在任务日志中选择一个任务进行分享。",
+      "linkTitle": "Shift + 点击可在聊天中链接该任务。"
     },
     "plurals": {
       "guildMembers": {
-        "one": "you are {rank}, {count} member",
-        "few": "you are {rank}, {count} members",
-        "many": "you are {rank}, {count} members",
-        "other": "you are {rank}, {count} members"
+        "one": "你是{rank}，{count}名成员",
+        "few": "你是{rank}，{count}名成员",
+        "many": "你是{rank}，{count}名成员",
+        "other": "你是{rank}，{count}名成员"
       },
       "characterCount": {
-        "one": "{count} character",
-        "few": "{count} characters",
-        "many": "{count} characters",
-        "other": "{count} characters"
+        "one": "{count} 个角色",
+        "few": "{count} 个角色",
+        "many": "{count} 个角色",
+        "other": "{count} 个角色"
       },
       "secondsRemaining": {
-        "one": "{count} second remaining",
-        "few": "{count} seconds remaining",
-        "many": "{count} seconds remaining",
-        "other": "{count} seconds remaining"
+        "one": "剩余 {count} 秒",
+        "few": "剩余 {count} 秒",
+        "many": "剩余 {count} 秒",
+        "other": "剩余 {count} 秒"
       },
       "playersOnline": {
-        "one": "Who: {count} player online on {realm}.",
-        "few": "Who: {count} players online on {realm}.",
-        "many": "Who: {count} players online on {realm}.",
-        "other": "Who: {count} players online on {realm}."
+        "one": "查询：{realm}上有{count}名玩家在线。",
+        "few": "查询：{realm}上有{count}名玩家在线。",
+        "many": "查询：{realm}上有{count}名玩家在线。",
+        "other": "查询：{realm}上有{count}名玩家在线。"
       }
     },
     "bugReport": {
-      "menuButton": "Report a Bug",
-      "realm": "Realm",
-      "character": "Character",
-      "position": "Position",
-      "unknown": "Unknown",
-      "description": "What went wrong?",
-      "descriptionPlaceholder": "Describe the bug: what you did, what you expected, and what happened.",
-      "includeScreenshot": "Include Screenshot",
-      "screenshotAlt": "Screenshot of the current view attached to this bug report",
-      "submit": "Send Report",
-      "submitted": "Bug report sent. Thank you!",
-      "submittedNoShot": "Bug report sent, but the screenshot was too large to include.",
-      "describeFirst": "Please describe the bug before sending.",
-      "tooLarge": "That report is too large to send. Try again without the screenshot.",
-      "rateLimited": "You've sent several reports recently. Please wait a bit before sending another.",
-      "failed": "Could not send the bug report. Please try again."
+      "menuButton": "报告错误",
+      "realm": "服务器",
+      "character": "角色",
+      "position": "坐标",
+      "unknown": "未知",
+      "description": "出了什么问题？",
+      "descriptionPlaceholder": "描述这个错误：你做了什么、预期会发生什么、实际发生了什么。",
+      "includeScreenshot": "包含截图",
+      "screenshotAlt": "附加到此错误报告的当前画面截图",
+      "submit": "发送报告",
+      "submitted": "错误报告已发送。谢谢！",
+      "submittedNoShot": "错误报告已发送，但截图过大，未能一并附上。",
+      "describeFirst": "请先描述错误再发送。",
+      "tooLarge": "该报告过大，无法发送。请去掉截图后重试。",
+      "rateLimited": "你最近已发送多份报告。请稍后再发送。",
+      "failed": "无法发送错误报告。请重试。"
     },
     "paperdoll": {
-      "unequipAria": "Unequip {item}",
-      "unequipHint": "Click ×, right-click, or drag to bags to unequip"
+      "unequipAria": "卸下 {item}",
+      "unequipHint": "点击 ×、右键点击或拖到背包以卸下"
     },
     "account": {
-      "title": "Account",
-      "loggedOutPrompt": "Log in to manage your account.",
-      "memberSince": "Member since {date}",
-      "sectionSettings": "Account Settings",
-      "sectionWallet": "$WOC Wallet",
-      "sectionCharacters": "Characters",
-      "sectionDanger": "Danger Zone",
-      "changePassword": "Change Password",
-      "currentPassword": "Current password",
-      "newPassword": "New password",
-      "confirmNewPassword": "Confirm new password",
-      "savePassword": "Update Password",
-      "passwordChanged": "Password updated. Other devices have been signed out.",
-      "errCurrentRequired": "Enter your current password.",
-      "errPasswordShort": "New password must be at least 6 characters.",
-      "errPasswordLong": "New password must be at most 128 characters.",
-      "errPasswordUnchanged": "New password must be different from the current one.",
-      "errPasswordConfirm": "New passwords do not match.",
-      "emailLabel": "Email (optional)",
-      "emailHint": "Used only for account recovery. Use Change Email below to update it.",
-      "saveEmail": "Save Email",
-      "emailSaved": "Email saved.",
-      "errEmailInvalid": "Enter a valid email address.",
-      "errCurrentPassword": "Your current password is incorrect.",
-      "errUsernameMatch": "That username does not match your account.",
-      "errPasswordIncorrect": "Your password is incorrect.",
-      "errCharactersOnline": "Log out all of your characters before deactivating.",
-      "deactivatedLocked": "This account has been deactivated. Contact an admin to restore it.",
-      "charactersSummary": "Manage your characters and enter the world.",
-      "charactersCount": "Characters: {count}",
-      "goToCharacters": "View Characters",
-      "walletSummary": "Verify a Solana wallet to show holder flair on your player card.",
-      "manageWallet": "Manage Wallet",
-      "deactivate": "Deactivate Account",
-      "deactivateWarning": "Deactivation locks your account and signs you out everywhere. Contact an admin to restore it. Confirm by re-entering your username and password.",
-      "confirmUsername": "Type your username to confirm",
-      "confirmPassword": "Password",
-      "deactivateConfirm": "Deactivate My Account",
-      "deactivated": "Your account has been deactivated.",
-      "logOut": "Log Out",
-      "logOutSummary": "Sign out of this device.",
-      "sectionSecurity": "Security",
-      "changeEmailTitle": "Change Email",
-      "changeEmailHint": "We email a confirmation link to the new address and a notice to the old one. Your email only changes once you open the link.",
-      "changeEmailNew": "New email",
-      "changeEmailSubmit": "Send Confirmation Link",
-      "changeEmailSent": "Check your inbox: open the link we sent to confirm your new email.",
-      "errEmailUnchanged": "That is already your email address.",
-      "twoFactorTitle": "Two-Factor Authentication",
-      "twoFactorStatusOn": "Two-factor authentication is ON for your account.",
-      "twoFactorStatusOff": "Add an authenticator app for stronger account security.",
-      "twoFactorSetupBtn": "Set Up Two-Factor",
-      "twoFactorBeginHint": "Enter your password to begin setup.",
-      "twoFactorBegin": "Begin Setup",
-      "twoFactorScanHint": "Add this key to your authenticator app (Google Authenticator, Authy, 1Password, and similar), then enter the 6-digit code it shows.",
-      "twoFactorSecretLabel": "Setup key",
-      "twoFactorOpenApp": "Open in authenticator app",
-      "twoFactorCodeLabel": "6-digit code",
-      "twoFactorVerifyBtn": "Verify and Enable",
-      "twoFactorEnabledMsg": "Two-factor authentication is now on.",
-      "twoFactorRecoveryTitle": "Save your recovery codes",
-      "twoFactorRecoveryHint": "Each code works once. Store them somewhere safe: they are the only way back in if you lose your authenticator app.",
-      "twoFactorDownloadCodes": "Download Codes",
-      "twoFactorDone": "Done",
-      "twoFactorDisableHint": "Enter your password to turn two-factor off. Your recovery codes will be discarded.",
-      "twoFactorDisableBtn": "Turn Off Two-Factor",
-      "twoFactorDisabledMsg": "Two-factor authentication is off.",
-      "errTwoFactorCode": "That code is not valid, try again.",
-      "errTwoFactorState": "Two-factor setup is not in the expected state. Reload and try again.",
-      "exportTitle": "Export My Data",
-      "exportHint": "Download a copy of your account and characters as a JSON file. We also email you a confirmation.",
-      "exportBtn": "Download My Data",
-      "exportDone": "Your data was downloaded. We emailed you a confirmation.",
-      "exportFailed": "Could not export your data. Try again in a moment."
+      "title": "账户",
+      "loggedOutPrompt": "登录以管理您的账户。",
+      "memberSince": "注册于 {date}",
+      "sectionSettings": "账户设置",
+      "sectionWallet": "$WOC 钱包",
+      "sectionCharacters": "角色",
+      "sectionDanger": "危险区域",
+      "changePassword": "修改密码",
+      "currentPassword": "当前密码",
+      "newPassword": "新密码",
+      "confirmNewPassword": "确认新密码",
+      "savePassword": "更新密码",
+      "passwordChanged": "密码已更新。其他设备已登出。",
+      "errCurrentRequired": "请输入当前密码。",
+      "errPasswordShort": "新密码至少需要 6 个字符。",
+      "errPasswordLong": "新密码最多只能包含 128 个字符。",
+      "errPasswordUnchanged": "新密码必须与当前密码不同。",
+      "errPasswordConfirm": "两次输入的新密码不一致。",
+      "emailLabel": "邮箱（可选）",
+      "emailHint": "仅用于账户找回。我们绝不发送营销邮件。",
+      "saveEmail": "保存邮箱",
+      "emailSaved": "邮箱已保存。",
+      "errEmailInvalid": "请输入有效的邮箱地址。",
+      "errCurrentPassword": "当前密码不正确。",
+      "errUsernameMatch": "该用户名与您的账户不匹配。",
+      "errPasswordIncorrect": "密码不正确。",
+      "errCharactersOnline": "请先登出所有角色再进行注销。",
+      "deactivatedLocked": "此账户已注销。请联系管理员以恢复。",
+      "charactersSummary": "管理您的角色并进入游戏世界。",
+      "charactersCount": "角色：{count}",
+      "goToCharacters": "查看角色",
+      "walletSummary": "验证 Solana 钱包以在玩家卡片上显示持有者标识。",
+      "manageWallet": "管理钱包",
+      "deactivate": "注销账户",
+      "deactivateWarning": "注销将锁定您的账户并在所有设备上登出。请联系管理员以恢复。请重新输入用户名和密码以确认。",
+      "confirmUsername": "输入您的用户名以确认",
+      "confirmPassword": "密码",
+      "deactivateConfirm": "注销我的账户",
+      "deactivated": "您的账户已注销。",
+      "logOut": "退出登录",
+      "logOutSummary": "退出当前设备的登录。",
+      "sectionSecurity": "安全",
+      "changeEmailTitle": "更换邮箱",
+      "changeEmailHint": "我们会向新邮箱发送一封确认链接，并向旧邮箱发送一封通知。只有在你打开链接后，邮箱才会真正更换。",
+      "changeEmailNew": "新邮箱",
+      "changeEmailSubmit": "发送确认链接",
+      "changeEmailSent": "请查收邮件：打开我们发送的链接以确认你的新邮箱。",
+      "errEmailUnchanged": "这已经是你的邮箱地址了。",
+      "twoFactorTitle": "双重验证",
+      "twoFactorStatusOn": "你的账号已开启双重验证。",
+      "twoFactorStatusOff": "添加一个身份验证器应用，让账号更安全。",
+      "twoFactorSetupBtn": "设置双重验证",
+      "twoFactorBeginHint": "请输入你的密码以开始设置。",
+      "twoFactorBegin": "开始设置",
+      "twoFactorScanHint": "将此密钥添加到你的身份验证器应用（Google Authenticator、Authy、1Password 等），然后输入它显示的 6 位验证码。",
+      "twoFactorSecretLabel": "设置密钥",
+      "twoFactorOpenApp": "在身份验证器应用中打开",
+      "twoFactorCodeLabel": "6 位验证码",
+      "twoFactorVerifyBtn": "验证并启用",
+      "twoFactorEnabledMsg": "双重验证现已开启。",
+      "twoFactorRecoveryTitle": "保存你的恢复码",
+      "twoFactorRecoveryHint": "每个恢复码只能使用一次。请妥善保管：如果你丢失了身份验证器应用，它们是你唯一的找回方式。",
+      "twoFactorDownloadCodes": "下载恢复码",
+      "twoFactorDone": "完成",
+      "twoFactorDisableHint": "请输入你的密码以关闭双重验证。你的恢复码将被作废。",
+      "twoFactorDisableBtn": "关闭双重验证",
+      "twoFactorDisabledMsg": "双重验证已关闭。",
+      "errTwoFactorCode": "验证码无效，请重试。",
+      "errTwoFactorState": "双重验证设置不处于预期状态。请刷新后重试。",
+      "exportTitle": "导出我的数据",
+      "exportHint": "将你的账号和角色数据下载为一个 JSON 文件。我们也会向你发送一封确认邮件。",
+      "exportBtn": "下载我的数据",
+      "exportDone": "你的数据已下载。我们已向你发送确认邮件。",
+      "exportFailed": "无法导出你的数据。请稍后重试。"
     },
     "masterLoot": {
-      "title": "Master Loot",
-      "enableLabel": "Master loot",
-      "enableAria": "Enable master loot",
-      "looterLabel": "Master looter",
-      "leaderOption": "Party leader",
-      "thresholdLabel": "Threshold",
-      "thresholdUncommon": "Uncommon and up",
-      "thresholdRare": "Rare and up",
-      "thresholdEpic": "Epic and up",
-      "assignPrompt": "Assign {item}",
-      "assignAria": "Assign {item} to {name}",
-      "rollButton": "Roll",
-      "selectAll": "Select all",
-      "methodMaster": "Loot method set to master loot. Master looter: {name}.",
-      "methodGroup": "Loot method set to group loot.",
-      "assigned": "{looter} assigned {item} to {target}.",
-      "unassigned": "{item} was not assigned and is free for all.",
-      "leaderOnly": "Only the party leader can change the loot method."
+      "title": "队长分配",
+      "enableLabel": "队长分配",
+      "enableAria": "启用队长分配",
+      "looterLabel": "分配者",
+      "leaderOption": "队长",
+      "thresholdLabel": "品质门槛",
+      "thresholdUncommon": "优秀及以上",
+      "thresholdRare": "稀有及以上",
+      "thresholdEpic": "史诗及以上",
+      "assignPrompt": "分配{item}",
+      "assignAria": "将{item}分配给{name}",
+      "rollButton": "掷骰",
+      "selectAll": "全选",
+      "methodMaster": "拾取方式已设为队长分配。分配者：{name}。",
+      "methodGroup": "拾取方式已设为小队拾取。",
+      "assigned": "{looter}将{item}分配给了{target}。",
+      "unassigned": "{item}未被分配，现可自由拾取。",
+      "leaderOnly": "只有队长才能更改拾取方式。"
     },
     "bags": {
-      "filterGroupAria": "Filter bags by category",
-      "filterAll": "All",
-      "filterWeapon": "Weapons",
-      "filterArmor": "Armor",
-      "filterConsumable": "Consumables",
-      "filterMaterial": "Materials",
-      "filterQuest": "Quest",
-      "sortAria": "Sort bag items",
-      "sortRecent": "Recent",
-      "sortQuality": "Quality",
-      "sortName": "Name",
-      "searchPlaceholder": "Search items",
-      "searchAria": "Search bag items by name",
-      "noMatch": "No items match your filters."
+      "filterGroupAria": "按类别筛选背包",
+      "filterAll": "全部",
+      "filterWeapon": "武器",
+      "filterArmor": "护甲",
+      "filterConsumable": "消耗品",
+      "filterMaterial": "材料",
+      "filterQuest": "任务",
+      "sortAria": "排序背包物品",
+      "sortRecent": "最近",
+      "sortQuality": "品质",
+      "sortName": "名称",
+      "searchPlaceholder": "搜索物品",
+      "searchAria": "按名称搜索背包物品",
+      "noMatch": "没有符合筛选条件的物品。"
     },
     "raidConvert": {
-      "toPartyDone": "Your raid has converted back to a party.",
-      "notRaid": "Your group is not a raid.",
-      "leaderOnly": "Only the raid leader may convert to a party.",
-      "tooLarge": "A raid with more than five members cannot convert back to a party."
+      "toPartyDone": "你的团队已转换回队伍。",
+      "notRaid": "你的队伍不是团队。",
+      "leaderOnly": "只有团队领袖可以转换为队伍。",
+      "tooLarge": "成员超过五人的团队无法转换回队伍。"
     },
     "itemArmorType": {
-      "cloth": "Cloth",
-      "leather": "Leather",
-      "mail": "Mail"
+      "cloth": "布甲",
+      "leather": "皮甲",
+      "mail": "锁甲"
     },
     "auraEffect": {
-      "dot": "Deals {value} {school} damage every {interval} sec",
-      "hot": "Restores {value} health every {interval} sec",
-      "absorb": "Absorbs {value} damage",
-      "healAbsorb": "Absorbs {value} incoming healing",
-      "thorns": "Deals {value} {school} damage to attackers",
-      "slow": "Reduces movement speed by {pct}%",
-      "speed": "Increases movement speed by {pct}%",
-      "attackSpeedSlow": "Slows attack speed by {pct}%",
-      "attackSpeedFast": "Increases attack speed by {pct}%",
-      "haste": "Increases attack and casting speed by {pct}%",
-      "tongues": "Increases casting time by {pct}%",
+      "dot": "每 {interval} 秒造成 {value} 点{school}伤害",
+      "hot": "每 {interval} 秒恢复 {value} 点生命值",
+      "absorb": "吸收 {value} 点伤害",
+      "healAbsorb": "吸收 {value} 点受到的治疗",
+      "thorns": "对攻击者造成 {value} 点{school}伤害",
+      "slow": "移动速度降低 {pct}%",
+      "speed": "移动速度提高 {pct}%",
+      "attackSpeedSlow": "攻击速度减慢 {pct}%",
+      "attackSpeedFast": "攻击速度提高 {pct}%",
+      "haste": "攻击速度和施法速度提高 {pct}%",
+      "tongues": "施法时间延长 {pct}%",
       "increase": {
-        "ap": "Increases attack power by {value}",
-        "armor": "Increases armor by {value}",
-        "int": "Increases Intellect by {value}",
-        "agi": "Increases Agility by {value}",
-        "sta": "Increases Stamina by {value}",
-        "spi": "Increases Spirit by {value}",
-        "allStats": "Increases all attributes by {value}"
+        "ap": "攻击强度提高 {value}",
+        "armor": "护甲提高 {value}",
+        "int": "智力提高 {value}",
+        "agi": "敏捷提高 {value}",
+        "sta": "耐力提高 {value}",
+        "spi": "精神提高 {value}",
+        "allStats": "所有属性提高 {value}"
       },
       "reduce": {
-        "ap": "Reduces attack power by {value}",
-        "armor": "Reduces armor by {value}",
-        "int": "Reduces Intellect by {value}",
-        "agi": "Reduces Agility by {value}",
-        "sta": "Reduces Stamina by {value}",
-        "spi": "Reduces Spirit by {value}",
-        "allStats": "Reduces all attributes by {value}"
+        "ap": "攻击强度降低 {value}",
+        "armor": "护甲降低 {value}",
+        "int": "智力降低 {value}",
+        "agi": "敏捷降低 {value}",
+        "sta": "耐力降低 {value}",
+        "spi": "精神降低 {value}",
+        "allStats": "所有属性降低 {value}"
       },
-      "dodge": "Increases dodge chance by {pct}%",
-      "dodgeReduce": "Reduces dodge chance by {pct}%",
-      "armorFlat": "Reduces armor by {value}",
-      "armorFlatStacks": "Reduces armor by {value} ({stacks} stacks)",
-      "mortalWound": "Reduces healing received by {pct}%",
-      "vulnerability": "Increases damage taken by {pct}%",
-      "physVuln": "Increases physical damage taken by {pct}%",
-      "spellVuln": "Increases magic damage taken by {pct}%",
-      "critVuln": "Increases chance to be critically hit by {pct}%",
-      "costTax": "Increases ability costs by {pct}%",
-      "stun": "Stunned: unable to act",
-      "root": "Rooted: unable to move",
-      "incapacitate": "Incapacitated: unable to act",
-      "polymorph": "Polymorphed: unable to act",
-      "hex": "Reduces damage and healing dealt by {pct}%",
-      "blind": "Blinded: unable to act",
-      "silence": "Silenced: unable to cast spells",
-      "disarm": "Disarmed: cannot use weapon attacks",
-      "lockout": "Spell school locked out",
-      "imbue": "Weapon imbued with bonus effects",
-      "imbueRange": "Weapon imbued: {min} to {max} bonus damage on judgement",
-      "stealth": "Concealed; movement speed reduced by {pct}%",
-      "formBear": "Bear Form: increased health and armor",
-      "formCat": "Cat Form: melee damage and energy",
-      "formTravel": "Travel Form: movement speed increased by {pct}%",
-      "defensiveStance": "Defensive Stance: reduced damage taken, more threat",
-      "righteousFury": "Righteous Fury: greatly increased threat from Holy damage",
-      "scale": "Size increased by {pct}%",
-      "jump": "Jump height increased by {pct}%",
+      "dodge": "躲闪几率提高 {pct}%",
+      "dodgeReduce": "躲闪几率降低 {pct}%",
+      "armorFlat": "护甲降低 {value}",
+      "armorFlatStacks": "护甲降低 {value}（{stacks} 层）",
+      "mortalWound": "受到的治疗降低 {pct}%",
+      "vulnerability": "受到的伤害提高 {pct}%",
+      "physVuln": "受到的物理伤害提高 {pct}%",
+      "spellVuln": "受到的魔法伤害提高 {pct}%",
+      "critVuln": "受到致命一击的几率提高 {pct}%",
+      "costTax": "技能消耗提高 {pct}%",
+      "stun": "已昏迷：无法行动",
+      "root": "已定身：无法移动",
+      "incapacitate": "已瘫痪：无法行动",
+      "polymorph": "已变形：无法行动",
+      "hex": "造成的伤害和治疗降低 {pct}%",
+      "blind": "已致盲：无法行动",
+      "silence": "已沉默：无法施放法术",
+      "disarm": "已缴械：无法使用武器攻击",
+      "lockout": "法术学派被锁定",
+      "imbue": "武器附有额外效果",
+      "imbueRange": "武器已附魔：审判时附加 {min} 到 {max} 点额外伤害",
+      "stealth": "已隐匿；移动速度降低 {pct}%",
+      "formBear": "熊形态：生命值和护甲提高",
+      "formCat": "猫形态：近战伤害与能量",
+      "formTravel": "旅行形态：移动速度提高 {pct}%",
+      "defensiveStance": "防御姿态：受到的伤害降低，威胁值提高",
+      "righteousFury": "正义之怒：神圣伤害产生的威胁值大幅提高",
+      "scale": "体型增大 {pct}%",
+      "jump": "跳跃高度提高 {pct}%",
       "school": {
-        "physical": "Physical",
-        "fire": "Fire",
-        "frost": "Frost",
-        "arcane": "Arcane",
-        "shadow": "Shadow",
-        "holy": "Holy",
-        "nature": "Nature"
+        "physical": "物理",
+        "fire": "火焰",
+        "frost": "冰霜",
+        "arcane": "奥术",
+        "shadow": "暗影",
+        "holy": "神圣",
+        "nature": "自然"
       }
     },
     "loot": {
-      "chestTitle": "Chest"
+      "chestTitle": "宝箱"
     },
     "spellbook": {
-      "addToBarAria": "Add {name} to action bar",
-      "removeFromBarAria": "Remove {name} from action bar"
+      "addToBarAria": "将{name}添加到动作条",
+      "removeFromBarAria": "从动作条移除{name}"
     },
     "nameplate": {
       "mob": "[{level}] {name}",
@@ -725,766 +725,766 @@ export const zh_CN: EnTranslations = {
   "guide": {
     "brand": "World of ClaudeCraft",
     "brandShort": "ClaudeCraft",
-    "tagline": "A classic-style MMO you play free in your browser.",
-    "skipToContent": "Skip to main content",
-    "loading": "Loading...",
-    "docTitle": "{page} - {brand}",
-    "related": "Related",
+    "tagline": "一款可在浏览器中免费畅玩的经典风格 MMO。",
+    "skipToContent": "跳至正文",
+    "loading": "加载中……",
+    "docTitle": "{page} | {brand}",
+    "related": "相关内容",
     "nav": {
-      "overview": "Overview",
-      "howToPlay": "How to Play",
-      "classes": "Classes",
-      "bestiary": "Bestiary",
-      "models": "3D Models",
-      "gear": "Gear & Items",
-      "economy": "Economy & Trade",
-      "social": "Social & Groups",
-      "stats": "Character & Stats",
-      "progression": "Leveling & Progression",
-      "world": "World",
-      "quests": "Quests",
-      "dungeons": "Dungeons & Raids",
-      "reference": "Reference",
-      "controls": "Controls",
-      "combat": "Combat",
-      "talents": "Talents",
-      "arena": "Arena & PvP",
-      "glossary": "Glossary",
-      "wishIKnew": "Things I Wish I Knew",
-      "faq": "FAQ",
-      "playNow": "Play Now",
-      "openMenu": "Open menu",
-      "closeMenu": "Close menu",
-      "primary": "Guide sections",
-      "topics": "Topics",
-      "onThisPage": "On this page",
-      "backToGame": "Back to the game"
+      "overview": "概览",
+      "howToPlay": "游戏入门",
+      "classes": "职业",
+      "bestiary": "生物图鉴",
+      "models": "3D 模型",
+      "gear": "装备与物品",
+      "economy": "经济与交易",
+      "social": "社交与组队",
+      "stats": "角色与属性",
+      "progression": "升级与进阶",
+      "world": "世界",
+      "quests": "任务",
+      "dungeons": "地下城与团队副本",
+      "reference": "参考",
+      "controls": "操作键",
+      "combat": "战斗",
+      "talents": "天赋",
+      "arena": "竞技场与 PvP",
+      "glossary": "术语表",
+      "wishIKnew": "我希望早点知道的事",
+      "faq": "常见问题",
+      "playNow": "立即游玩",
+      "openMenu": "打开菜单",
+      "closeMenu": "关闭菜单",
+      "primary": "指南板块",
+      "topics": "主题",
+      "onThisPage": "本页内容",
+      "backToGame": "返回游戏"
     },
     "groups": {
-      "start": "Get Started",
-      "compendium": "Compendium",
-      "reference": "Reference"
+      "start": "开始上手",
+      "compendium": "图鉴大全",
+      "reference": "参考"
     },
     "breadcrumb": {
-      "label": "Breadcrumb",
-      "home": "Guide"
+      "label": "面包屑导航",
+      "home": "指南"
     },
     "seq": {
-      "label": "Page navigation",
-      "prev": "Previous",
-      "next": "Next"
+      "label": "页面导航",
+      "prev": "上一页",
+      "next": "下一页"
     },
     "toc": {
-      "heading": "On this page"
+      "heading": "本页内容"
     },
     "footer": {
-      "blurb": "An open-source, classic-style micro-MMO. Quest, group up, and explore a hand-built world, right in your browser.",
-      "playNow": "Play Now",
-      "github": "Source on GitHub",
-      "discord": "Join the Discord",
-      "communityWiki": "Community Wiki",
+      "blurb": "一款开源的经典风格微型 MMO。在你的浏览器中接受任务、组队、探索一个纯手工打造的世界。",
+      "playNow": "立即游玩",
+      "github": "GitHub 上的源代码",
+      "discord": "加入 Discord",
+      "communityWiki": "社区维基",
       "rights": "World of ClaudeCraft"
     },
     "language": {
-      "label": "Language",
-      "select": "Choose a language"
+      "label": "语言",
+      "select": "选择语言"
     },
     "search": {
-      "label": "Search",
-      "placeholder": "Search the guide",
-      "noResults": "No matches",
-      "typePage": "Page",
-      "typeClass": "Class",
-      "typeZone": "Zone",
-      "typeCreature": "Creatures",
-      "typeDungeon": "Dungeon",
-      "typeTerm": "Term"
+      "label": "搜索",
+      "placeholder": "搜索指南",
+      "noResults": "无匹配结果",
+      "typePage": "页面",
+      "typeClass": "职业",
+      "typeZone": "区域",
+      "typeCreature": "生物",
+      "typeDungeon": "地下城",
+      "typeTerm": "术语"
     },
     "home": {
-      "eyebrow": "Classic-style browser MMO",
+      "eyebrow": "经典风格浏览器 MMO",
       "title": "World of ClaudeCraft",
-      "subtitle": "Quest, group up, and explore a hand-built world, free in your browser.",
-      "ctaPlay": "Play Now",
-      "ctaLearn": "How to Play",
+      "subtitle": "在你的浏览器中免费接受任务、组队、探索一个纯手工打造的世界。",
+      "ctaPlay": "立即游玩",
+      "ctaLearn": "游戏入门",
       "what": {
-        "heading": "A classic MMO, made to be picked up",
-        "pillarPlayTitle": "Play in your browser",
-        "pillarPlayBody": "No download, no launcher. Make a character and you are in the world in seconds, on desktop or phone.",
-        "pillarClassesTitle": "Nine classes, three roles",
-        "pillarClassesBody": "Tank, heal, or deal the damage. Every class plays the way its archetype should, with talents to make it yours.",
-        "pillarOpenTitle": "Free and open source",
-        "pillarOpenBody": "Free to play to the level cap, with the whole game open source. No pay to win, ever."
+        "heading": "易于上手的经典 MMO",
+        "pillarPlayTitle": "在浏览器中畅玩",
+        "pillarPlayBody": "无需下载,无需启动器。创建一个角色,几秒钟内便能进入游戏世界,电脑和手机皆可。",
+        "pillarClassesTitle": "九大职业,三种定位",
+        "pillarClassesBody": "坦克、治疗,还是输出,任你选择。每个职业都贴合自身的原型设计,还能用天赋打造出专属于你的玩法。",
+        "pillarOpenTitle": "免费且开源",
+        "pillarOpenBody": "免费畅玩直至满级,整个游戏完全开源。永不付费致胜。"
       },
       "classes": {
-        "heading": "Choose your class",
-        "sub": "Nine classic archetypes, each with its own feel and party role.",
-        "cta": "Explore the classes"
+        "heading": "选择你的职业",
+        "sub": "九种经典原型,各具独特的手感与队伍定位。",
+        "cta": "探索各职业"
       },
       "world": {
-        "heading": "Explore the world",
-        "sub": "One continuous land, three zones, from quiet valleys to frozen peaks.",
-        "levels": "Levels {min} to {max}",
-        "cta": "See the world",
-        "valeName": "Eastbrook Vale",
-        "valeBlurb": "Green hills and old woods where every adventure begins.",
-        "marshName": "Mirefen Marsh",
-        "marshBlurb": "Sunken fens and tide-worn ruins, home to murlocs and worse.",
-        "peaksName": "Thornpeak Heights",
-        "peaksBlurb": "Wind-scoured ridges climbing toward the realm's coldest dangers."
+        "heading": "探索世界",
+        "sub": "一片连绵不绝的大陆,三大区域,从静谧的山谷到冰封的峰巅。",
+        "levels": "{min} 至 {max} 级",
+        "cta": "一览世界",
+        "valeName": "东溪谷地",
+        "valeBlurb": "翠绿的丘陵与古老的林地,一切冒险由此启程。",
+        "marshName": "泥沼湿地",
+        "marshBlurb": "沉没的沼泽与遭潮水侵蚀的废墟,鱼人与更可怕之物的栖身之所。",
+        "peaksName": "荆棘峰高地",
+        "peaksBlurb": "狂风侵蚀的山脊,向上攀升,直抵这片国度最寒冷的险境。"
       },
       "group": {
-        "heading": "Group up for the hard parts",
-        "sub": "The world is soloable, but the best loot waits behind a good party.",
-        "dungeonsTitle": "Dungeons",
-        "dungeonsBody": "Instanced dives for a party of five, scaling with the zones around them.",
-        "raidTitle": "The raid",
-        "raidBody": "A ten-player capstone for those who reach the top of the world.",
-        "arenaTitle": "The arena",
-        "arenaBody": "Step into the Ashen Coliseum and prove yourself against other players.",
-        "cta": "Dungeons and Raids"
+        "heading": "组队迎接硬仗",
+        "sub": "整个世界都可单人通关,但最好的战利品要靠一支默契的队伍才能拿到。",
+        "dungeonsTitle": "地下城",
+        "dungeonsBody": "为五人小队打造的副本秘境,难度随周边区域同步提升。",
+        "raidTitle": "团队副本",
+        "raidBody": "为登顶世界之巅者准备的十人收尾挑战。",
+        "arenaTitle": "竞技场",
+        "arenaBody": "踏入灰烬竞技场,与其他玩家一较高下,证明你自己。",
+        "cta": "地下城与团队副本"
       },
       "faq": {
-        "heading": "Good to know",
-        "q1": "Is it free to play?",
-        "a1": "Yes. The whole game is free to the level cap, and it is open source on GitHub.",
-        "q2": "Do I need a crypto wallet?",
-        "a2": "No. The game is fully playable without one. The optional community token only unlocks cosmetic flair and never affects power.",
-        "q3": "Can I play offline?",
-        "a3": "Yes. There is an instant single-player mode in your browser, plus the shared online realm.",
-        "q4": "How long to reach max level?",
-        "a4": "The cap is level {cap}, reached across three zones of quests, dungeons, and exploration."
+        "heading": "须知事项",
+        "q1": "游戏免费吗?",
+        "a1": "是的。整个游戏在满级之前完全免费,并且在 GitHub 上开源。",
+        "q2": "我需要加密货币钱包吗?",
+        "a2": "不需要。没有钱包也能完整畅玩游戏。可选的社区代币仅用于解锁外观装饰,绝不影响战力。",
+        "q3": "可以离线游玩吗?",
+        "a3": "可以。浏览器中有即开即玩的单人模式,此外还有共享的在线服务器。",
+        "q4": "升到满级要多久?",
+        "a4": "等级上限为 {cap} 级,需横跨三大区域,通过任务、地下城与探索逐步达成。"
       },
       "community": {
-        "heading": "Join the realm",
-        "body": "Jump in now, or come say hello. The world is better with company.",
-        "play": "Play Now",
-        "discord": "Join the Discord",
-        "github": "Star on GitHub"
+        "heading": "加入这片国度",
+        "body": "现在就加入,或者来打个招呼。有伙伴相伴,世界会更精彩。",
+        "play": "立即游玩",
+        "discord": "加入 Discord",
+        "github": "在 GitHub 上点星"
       }
     },
     "howToPlay": {
-      "intro": "New to this kind of game? You will be questing in minutes. Here is the short version, one step at a time.",
-      "firstHeading": "Your first 15 minutes",
-      "step1Title": "Make a character",
-      "step1Body": "Pick a class and a look, give your hero a name, and enter the world. You can make more characters later.",
-      "step2Title": "Find your first quest",
-      "step2Body": "Marshal Redbrook is waiting in the starting town. Talk to him and accept Wolves at the Door.",
-      "step3Title": "Move and look around",
-      "step3Body": "Move with W, A, S, D. Hold the right mouse button and drag to look around. That is most of it.",
-      "step4Title": "Fight something",
-      "step4Body": "Press Tab to target the nearest enemy, then press your abilities on the bar (keys 1 through 0) to attack.",
-      "step5Title": "Turn it in",
-      "step5Body": "Finish the objective, return to the quest giver (look for the marker on your map), and collect your reward.",
-      "step6Title": "Keep going",
-      "step6Body": "You just hit level 2. Follow the quest trail out of town and the world opens up from there.",
-      "basicsHeading": "The basics",
-      "resourcesTitle": "Resources",
-      "resourcesBody": "Spells and abilities cost a resource. Warriors build Rage by fighting, rogues spend Energy that refills on its own, and everyone else casts from a pool of Mana.",
-      "targetingTitle": "Targeting and your bar",
-      "targetingBody": "Tab cycles enemies, F interacts and loots, and your action bar holds the abilities you have learned. Drag spells onto it from your spellbook.",
-      "questsTitle": "Quests",
-      "questsBody": "Accept quests from people with a marker over their head, complete the objective, and turn them in for experience, coin, and gear. The tracker on screen keeps your goals in view.",
-      "deathTitle": "Death is not the end",
-      "deathBody": "If you fall, you release your spirit at the nearest graveyard and run back to your body. No experience is lost.",
-      "groupingTitle": "Playing together",
-      "groupingBody": "Invite others to a party to share quest credit and take on dungeons. Most of the world is soloable, so grouping is a choice, not a chore.",
-      "onlineTitle": "Online or offline",
-      "onlineBody": "Play the shared online realm with everyone else, or start an instant offline world in your browser to learn the ropes.",
-      "reassure": "Talents unlock at level 10 and can be reset at any time, so your early choices are never permanent. Experiment freely.",
-      "controlsLink": "See the full controls reference"
+      "intro": "第一次接触这类游戏?几分钟内你就能开始做任务了。下面是精简版的入门指引,一步一步来。",
+      "firstHeading": "你的最初 15 分钟",
+      "step1Title": "创建角色",
+      "step1Body": "选择一个职业和外观,为你的英雄取个名字,然后进入游戏世界。之后还可以创建更多角色。",
+      "step2Title": "找到你的第一个任务",
+      "step2Body": "红溪元帅正在新手镇等候。与他交谈,接受任务《门前之狼》。",
+      "step3Title": "移动与环顾四周",
+      "step3Body": "使用 W、A、S、D 移动。按住鼠标右键拖动即可环顾四周。基本操作就这些了。",
+      "step4Title": "投入战斗",
+      "step4Body": "按 Tab 选中最近的敌人,然后按动作条上的技能键(1 到 0)发动攻击。",
+      "step5Title": "交还任务",
+      "step5Body": "完成目标后,返回任务发布者处(留意地图上的标记),领取你的奖励。",
+      "step6Title": "继续前行",
+      "step6Body": "你刚刚升到了 2 级。沿着任务指引走出小镇,世界将就此向你敞开。",
+      "basicsHeading": "基础知识",
+      "resourcesTitle": "资源",
+      "resourcesBody": "法术与技能需要消耗资源。战士通过战斗积攒怒气,潜行者消耗会自动回复的能量,其余职业则从法力池中施法。",
+      "targetingTitle": "目标选择与你的动作条",
+      "targetingBody": "Tab 用于在敌人间切换目标,F 用于交互和拾取,你的动作条上则放着已学会的技能。从法术书中将法术拖到动作条上即可。",
+      "questsTitle": "任务",
+      "questsBody": "从头顶带有标记的人物处接取任务,完成目标,再交还任务以获得经验、金币和装备。屏幕上的任务追踪器会让你随时看清目标。",
+      "deathTitle": "死亡并非终点",
+      "deathBody": "若你倒下,可在最近的墓地释放灵魂,然后跑回自己的尸体处复活。不会损失任何经验。",
+      "groupingTitle": "携手同行",
+      "groupingBody": "邀请他人组队,即可共享任务进度并挑战地下城。世界中的大部分内容都可单人完成,因此组队是一种选择,而非负担。",
+      "onlineTitle": "在线或离线",
+      "onlineBody": "在共享的在线服务器与其他所有人一同游玩,或在浏览器中开启一个即开即玩的离线世界来熟悉门道。",
+      "reassure": "天赋在 10 级解锁,并且随时可以重置,所以你早期的选择绝非一成不变。放心大胆地尝试吧。",
+      "controlsLink": "查看完整操作键参考"
     },
     "controls": {
-      "intro": "Default keys for desktop. Every binding can be changed in the game's options.",
-      "keyHeader": "Key",
-      "actionHeader": "Action",
-      "groupMovement": "Movement",
-      "groupCombat": "Targeting and combat",
-      "groupInterface": "Windows",
-      "groupCamera": "Camera",
-      "talents": "Talents",
-      "arena": "Arena",
-      "leaderboard": "Leaderboard",
-      "abilities": "Use abilities",
-      "mobileHeading": "On mobile",
-      "mobileBody": "Touch controls appear automatically on phones and tablets: a movement stick on the left, drag anywhere on the right to look, and on-screen buttons for your abilities and menus."
+      "intro": "电脑端的默认按键。每一项绑定都可以在游戏选项中更改。",
+      "keyHeader": "按键",
+      "actionHeader": "操作",
+      "groupMovement": "移动",
+      "groupCombat": "目标选择与战斗",
+      "groupInterface": "窗口",
+      "groupCamera": "镜头",
+      "talents": "天赋",
+      "arena": "竞技场",
+      "leaderboard": "排行榜",
+      "abilities": "使用技能",
+      "mobileHeading": "移动端操作",
+      "mobileBody": "在手机和平板上会自动出现触控操作:左侧是移动摇杆,在右侧任意位置拖动即可环顾四周,屏幕上还有用于使用技能和打开菜单的按钮。"
     },
     "combat": {
-      "intro": "Combat follows familiar classic-MMO rules. You never need to study any of it to play well, this is just the shape of how fights work.",
-      "hitTitle": "Not every blow lands",
-      "hitBody": "Attacks can miss or be dodged, parried, and blocked, and so can the enemy's. Fighting near your own level and keeping your gear current is what makes your hits connect.",
-      "mitigationTitle": "Armor and gear keep you standing",
-      "mitigationBody": "Armor softens physical hits and the right gear blunts magic, so upgrades are your main source of staying power. Heavier armor classes shrug off more, but nothing makes you untouchable.",
-      "resourcesTitle": "Every class has its own rhythm",
-      "resourcesBody": "Warriors build Rage in the thick of a fight, rogues spend Energy that steadily returns, and casters manage a pool of Mana. Learning your resource is half of playing your class well.",
-      "growTitle": "You grow stronger every level",
-      "growBody": "Each level makes you tougher and unlocks new abilities, all the way to the cap of level {cap}. Questing is the fastest way up; dungeons and exploration round it out.",
-      "effectsTitle": "Buffs, debuffs, and crowd control",
-      "effectsBody": "Many abilities apply an effect that lingers. Helpful ones (buffs) raise your stats, shield you, or heal you a little at a time; harmful ones (debuffs) drain your health with damage over time or weaken you. Watch the small icons near your action bar to see what is on you and how long it lasts.",
-      "ccBody": "Crowd control is a special kind of debuff that limits what a target can do: stuns, roots and slows, silences that stop spellcasting, disarms, fears, and polymorph that turns a foe harmless for a moment. Some of these, like roots, fears, and polymorph, lose their hold when they are reapplied too quickly, so they cannot be chained forever.",
-      "deathTitle": "When you fall",
-      "deathBody": "If your health reaches zero you are downed. You revive after a short wait and carry on from where you left off, so a death costs you a little time, not your progress. Between fights, sit to eat and drink so you start the next one at full strength."
+      "intro": "战斗遵循经典 MMO 中熟悉的规则。你完全不必钻研这些就能玩得很好,这里只是介绍一下战斗大致的运作方式。",
+      "hitTitle": "并非每次攻击都能命中",
+      "hitBody": "攻击可能会被躲闪、招架或格挡,也可能未命中,敌人的攻击同样如此。与等级相近的敌人作战,并保持装备的更新,才能让你的攻击稳稳命中。",
+      "mitigationTitle": "护甲与装备让你屹立不倒",
+      "mitigationBody": "护甲能减轻物理打击,合适的装备则能削弱魔法伤害,因此升级装备是你提升生存能力的主要途径。重甲职业能承受更多伤害,但没有什么能让你刀枪不入。",
+      "resourcesTitle": "每个职业都有自己的节奏",
+      "resourcesBody": "战士在激战中积攒怒气,潜行者消耗稳步回复的能量,施法者则管理着一池法力。掌握自己的资源,便是玩好职业的一半。",
+      "growTitle": "你每升一级都会变得更强",
+      "growBody": "每次升级都会让你更加坚韧,并解锁新的技能,一路直至 {cap} 级的等级上限。做任务是升级最快的途径,地下城与探索则能加以补充。",
+      "effectsTitle": "增益、减益与控制",
+      "effectsBody": "许多技能会施加持续存在的效果。有益的（增益）会提升你的属性、为你护盾，或一点点地治疗你；有害的（减益）则以持续伤害消耗你的生命，或削弱你。留意动作条附近的小图标，便能看清你身上有哪些效果、还能持续多久。",
+      "ccBody": "控制是一类特殊的减益，会限制目标能做的事：眩晕、定身与减速，让人无法施法的沉默，缴械，恐惧，以及能让敌人暂时无害的变形术。其中一些，比如定身、恐惧和变形术，若施加得太过频繁就会失效，因此无法被无限连控。",
+      "deathTitle": "当你倒下时",
+      "deathBody": "若你的生命值归零，你便倒下了。稍等片刻便能复活，并从倒下之处继续前行，所以一次死亡只会耗去你些许时间，而非你的进度。两场战斗之间，坐下进食饮水，让自己以满状态迎接下一战。"
     },
     "glossary": {
-      "intro": "A quick reference for the terms used across this guide and in chat.",
-      "aggroTerm": "Aggro",
-      "aggroDef": "An enemy's attention. The player generating the most threat holds aggro and gets attacked.",
-      "threatTerm": "Threat",
-      "threatDef": "How much an enemy wants to attack you. The tank's job is to hold more threat than everyone else.",
-      "gcdTerm": "Global cooldown",
-      "gcdDef": "The short, shared pause after using most abilities, so you cannot fire everything at once.",
+      "intro": "本指南及聊天中所用术语的快速参考。",
+      "aggroTerm": "仇恨",
+      "aggroDef": "敌人的注意力。产生威胁值最高的玩家会吸引仇恨并遭到攻击。",
+      "threatTerm": "仇恨",
+      "threatDef": "敌人有多想攻击你。坦克的职责就是把仇恨保持得比其他所有人都高。",
+      "gcdTerm": "公共冷却时间",
+      "gcdDef": "使用大多数技能后短暂的共享停顿,使你无法将所有技能一次性全部释放。",
       "dpsTerm": "DPS",
-      "dpsDef": "Damage per second, a rough measure of how fast something deals damage.",
-      "buffTerm": "Buff",
-      "buffDef": "A helpful effect on you or an ally, like a blessing that raises a stat for a while.",
-      "debuffTerm": "Debuff",
-      "debuffDef": "A harmful effect on a target, like a slow, a bleed, or weakened armor.",
-      "dotTerm": "DoT and HoT",
-      "dotDef": "Damage over time and healing over time: effects that tick in steady pulses instead of all at once.",
-      "ccTerm": "Crowd control",
-      "ccDef": "Abilities that stun, root, or otherwise take an enemy out of the fight for a moment.",
-      "procTerm": "Proc",
-      "procDef": "A chance-based effect that fires off something else, like a bonus that sometimes triggers when you attack.",
-      "eliteTerm": "Elite",
-      "eliteDef": "A tougher-than-normal enemy, usually meant for a group. Dungeon and rare enemies are often elite.",
-      "rareTerm": "Rare",
-      "rareDef": "An uncommon named enemy that wanders a zone and drops better loot.",
-      "mobTerm": "Mob",
-      "mobDef": "Any computer-controlled creature in the world, friendly or hostile. Short for mobile.",
-      "tankTerm": "Tank",
-      "tankDef": "The party member who holds enemy aggro and absorbs the damage so others can fight safely.",
-      "healerTerm": "Healer",
-      "healerDef": "The party member who keeps everyone alive with healing spells.",
-      "specTerm": "Spec",
-      "specDef": "A specialization: the path you lean your class toward, like healing or damage, as you spend talents.",
-      "pullTerm": "Pull",
-      "pullDef": "To draw an enemy or group into a fight, usually deliberately and one batch at a time.",
-      "instanceTerm": "Instance",
-      "instanceDef": "A private copy of a dungeon or raid made just for your party."
+      "dpsDef": "每秒伤害,大致衡量造成伤害速度快慢的指标。",
+      "buffTerm": "增益",
+      "buffDef": "施加在你或盟友身上的有益效果，比如在一段时间内提升某项属性的祝福。",
+      "debuffTerm": "减益",
+      "debuffDef": "施加在目标身上的有害效果，比如减速、流血或护甲削弱。",
+      "dotTerm": "持续伤害与持续治疗",
+      "dotDef": "持续伤害与持续治疗：以稳定的节奏分次跳动，而非一次性结算的效果。",
+      "ccTerm": "控制",
+      "ccDef": "使敌人昏迷、定身，或以其他方式暂时让它退出战斗的技能。",
+      "procTerm": "触发",
+      "procDef": "一种基于几率的效果，会触发别的东西，比如攻击时有时会发动的额外效果。",
+      "eliteTerm": "精英",
+      "eliteDef": "比普通敌人更强大的敌人,通常需要组队应对。地下城和稀有敌人往往是精英。",
+      "rareTerm": "稀有",
+      "rareDef": "在某区域游荡的不常见的有名敌人,会掉落更好的战利品。",
+      "mobTerm": "小怪",
+      "mobDef": "世界中任何由电脑控制的生物，无论友好还是敌对。mobile 的缩写。",
+      "tankTerm": "坦克",
+      "tankDef": "负责吸引敌人仇恨并承受伤害的队伍成员,好让其他人安全作战。",
+      "healerTerm": "治疗者",
+      "healerDef": "用治疗法术让所有人保持存活的队伍成员。",
+      "specTerm": "专精",
+      "specDef": "专精：随着你投入天赋，你让职业倾向的方向，比如治疗或输出。",
+      "pullTerm": "引怪",
+      "pullDef": "将一个敌人或一群敌人引入战斗,通常是有意为之,一次引一批。",
+      "instanceTerm": "副本",
+      "instanceDef": "专为你的队伍生成的地下城或团队副本的私有副本。"
     },
     "faqPage": {
-      "intro": "The questions new players ask most often.",
-      "q1": "Is it really free?",
-      "a1": "Yes. The whole game is free to play to the level cap, and the source code is open on GitHub.",
-      "q2": "Do I need a crypto wallet or any tokens?",
-      "a2": "No. The game is fully playable without one. The optional community token only unlocks cosmetic flair and never affects power or progression.",
-      "q3": "Can I play on my phone?",
-      "a3": "Yes. The game runs in a mobile browser with touch controls, and there is a desktop launcher as well.",
-      "q4": "Can I play offline or solo?",
-      "a4": "Yes. There is an instant single-player offline mode, and the online world is fully soloable apart from dungeons and the raid.",
-      "q5": "How many classes are there?",
-      "a5": "Nine, covering the classic tank, healer, and damage roles, each with its own resource and signature abilities.",
-      "q6": "What is the level cap?",
-      "a6": "Level {cap}, reached across three connected zones of quests, dungeons, and exploration.",
-      "q7": "Will my character be saved?",
-      "a7": "Online characters are saved on the server automatically. Offline characters live in your browser for quick sessions and testing.",
-      "q8": "Can I host my own copy?",
-      "a8": "Yes. The project is open source, so you can run your own server. See the GitHub repository.",
-      "q9": "Is there PvP?",
-      "a9": "Yes. Duel anyone for fun, or step into the Ashen Coliseum to fight other players. PvP is opt in, so you are never forced into it.",
-      "q10": "What is there to do at max level?",
-      "a10": "The cap is level {cap}. From there you run the five-player dungeons and the ten-player raid, chase better gear, and test yourself in the arena.",
-      "q11": "How do I find a group?",
-      "a11": "Invite anyone you meet to a party, ask in chat, or team up at a dungeon. Most of the world is soloable, so grouping is a choice, not a requirement."
+      "intro": "新玩家最常问的问题。",
+      "q1": "真的免费吗?",
+      "a1": "是的。整个游戏在满级之前完全免费畅玩,源代码也在 GitHub 上开源。",
+      "q2": "我需要加密货币钱包或任何代币吗?",
+      "a2": "不需要。没有它也能完整畅玩游戏。可选的社区代币仅用于解锁外观装饰,绝不影响战力或进度。",
+      "q3": "可以在手机上玩吗?",
+      "a3": "可以。游戏可在移动端浏览器中通过触控操作运行,同时也提供桌面端启动器。",
+      "q4": "可以离线或单人游玩吗?",
+      "a4": "可以。有即开即玩的单人离线模式,除地下城和团队副本外,在线世界也完全可以单人通关。",
+      "q5": "一共有多少个职业?",
+      "a5": "九个,涵盖经典的坦克、治疗与输出定位,各自拥有独特的资源和招牌技能。",
+      "q6": "等级上限是多少?",
+      "a6": "{cap} 级,需横跨三片相连的区域,通过任务、地下城与探索达成。",
+      "q7": "我的角色会被保存吗?",
+      "a7": "在线角色会自动保存在服务器上。离线角色存放在你的浏览器中,适合快速游玩和测试。",
+      "q8": "我可以自己搭建一份服务器吗?",
+      "a8": "可以。本项目是开源的,因此你可以运行自己的服务器。详见 GitHub 仓库。",
+      "q9": "有 PvP 吗？",
+      "a9": "有。可以与任何人决斗取乐，也可以踏入灰烬角斗场与其他玩家交锋。PvP 是自愿参与的，你绝不会被强迫卷入。",
+      "q10": "满级之后有什么可做的？",
+      "a10": "等级上限为 {cap} 级。从那时起，你可以打五人地下城和十人团队副本、追逐更好的装备，并在竞技场中检验自己。",
+      "q11": "我该如何找队伍？",
+      "a11": "邀请你遇到的任何人组队，在聊天中询问，或在地下城门口组队。世界的大部分内容都可以单人完成，所以组队是一种选择，而非要求。"
     },
     "classList": {
-      "heading": "The nine classes",
-      "sub": "Tank, heal, or deal the damage. Pick the fantasy that calls to you, then make it your own with talents."
+      "heading": "九大职业",
+      "sub": "坦克、治疗,还是输出,任你选择。挑选那个召唤你的幻想,再用天赋打造出专属于你的玩法。"
     },
     "role": {
-      "tank": "Tank",
-      "healer": "Healer",
-      "damage": "Damage"
+      "tank": "坦克",
+      "healer": "治疗者",
+      "damage": "输出"
     },
     "resourceName": {
-      "rage": "Rage",
-      "mana": "Mana",
-      "energy": "Energy"
+      "rage": "怒气",
+      "mana": "法力",
+      "energy": "能量"
     },
     "classPage": {
-      "back": "All classes",
-      "roleLabel": "Plays as",
-      "resourceLabel": "Resource",
-      "specsHeading": "Specializations",
-      "abilitiesHeading": "Signature abilities",
-      "abilitiesNote": "A taste of the kit. You learn more as you level, and talents reshape how it all plays.",
-      "masteryLabel": "Mastery",
-      "fullKitHeading": "The full kit",
-      "fullKitNote": "Every ability this class can learn, in the order it comes online. Talents decide which ones carry your build.",
-      "petsHeading": "Demons",
-      "petsNote": "Warlocks summon demons to fight beside them, each suited to a different job."
+      "back": "所有职业",
+      "roleLabel": "定位",
+      "resourceLabel": "资源",
+      "specsHeading": "专精",
+      "abilitiesHeading": "招牌技能",
+      "abilitiesNote": "这只是技能组合的冰山一角。随着等级提升你会学到更多,天赋还会重塑整套玩法。",
+      "masteryLabel": "精通",
+      "fullKitHeading": "全部技能",
+      "fullKitNote": "这个职业能学到的每一项技能，按解锁顺序排列。天赋决定哪些技能撑起你的构筑。",
+      "petsHeading": "恶魔",
+      "petsNote": "术士召唤恶魔与自己并肩作战，每一只都擅长不同的活儿。"
     },
     "classHook": {
-      "warrior": "A relentless front-line fighter who turns every blow taken into fuel for the next.",
-      "paladin": "A holy warrior who can shield allies, mend their wounds, or bring the hammer down.",
-      "hunter": "A ranged marksman with a loyal beast at their side and a trick for every foe.",
-      "rogue": "A master of stealth and poisons who strikes from the shadows and never fights fair.",
-      "priest": "A devoted healer whose light keeps the party standing, or whose shadow unmakes the enemy.",
-      "shaman": "A spirit-caller who bends storm, fire, and water, and mends allies between the lightning.",
-      "mage": "A spellweaver of fire, frost, and arcane who controls the battlefield from afar.",
-      "warlock": "A dark conjurer who commands demons and curses, trading life for devastating power.",
-      "druid": "A shapeshifter who tanks as a bear, savages foes as a cat, or heals in the thick of it."
+      "warrior": "勇往直前的前线战士,将承受的每一次打击都化作下一击的燃料。",
+      "paladin": "神圣的战士,既能为盟友护盾、治愈伤势,也能挥下制裁之锤。",
+      "hunter": "远程神射手,身边伴有忠诚的野兽,对付各路敌人皆有妙招。",
+      "rogue": "精通潜行与毒药的高手,从暗影中出击,从不光明正大地交手。",
+      "priest": "虔诚的治疗者,以圣光让队伍屹立不倒,亦能以暗影瓦解敌人。",
+      "shaman": "召唤元素之灵者,操纵风暴、烈火与流水,在闪电之间治愈盟友。",
+      "mage": "驾驭火焰、冰霜与奥术的编织法术者,远距离掌控整个战场。",
+      "warlock": "黑暗的咒法师,驱使恶魔与诅咒,以生命换取毁灭性的力量。",
+      "druid": "变形大师,化身为熊时担当坦克,化身为豹时撕裂敌人,亦能在激战中施展治疗。"
     },
     "tag": {
-      "melee": "Melee",
-      "ranged": "Ranged",
-      "both": "Melee or ranged",
-      "solo": "Solo friendly",
-      "group": "Group oriented",
-      "flexible": "Flexible",
-      "simple": "Simple",
-      "moderate": "Moderate",
-      "complex": "Complex",
-      "goodFirst": "Great first class"
+      "melee": "近战",
+      "ranged": "远程",
+      "both": "近战或远程",
+      "solo": "适合单人",
+      "group": "偏团队",
+      "flexible": "灵活",
+      "simple": "简单",
+      "moderate": "适中",
+      "complex": "复杂",
+      "goodFirst": "出色的入门职业"
     },
     "chooser": {
-      "heading": "Find your class",
-      "intro": "Filter by how you like to play. Every class is viable, so this only narrows the field, it does not rank them.",
-      "role": "Role",
-      "style": "Style",
-      "resource": "Resource",
-      "complexity": "Complexity",
-      "goodFirst": "Good for beginners",
-      "clear": "Clear",
-      "results": "Showing {count} of {total}",
-      "none": "No class matches every filter. Clear one to see more."
+      "heading": "找到你的职业",
+      "intro": "按你喜欢的玩法来筛选。每个职业都很可行，所以这只是缩小范围，并不是给它们排座次。",
+      "role": "定位",
+      "style": "风格",
+      "resource": "资源",
+      "complexity": "复杂度",
+      "goodFirst": "适合新手",
+      "clear": "清除",
+      "results": "正显示 {count} / {total}",
+      "none": "没有职业符合所有筛选条件。清除一项以查看更多。"
     },
     "abilityHook": {
-      "heroic_strike": "Queues a heavier swing that spends rage on your next hit.",
-      "battle_shout": "A rallying cry that raises attack power for the party.",
-      "commanding_shout": "Bolsters stamina so everyone has more staying power in a fight.",
-      "charge": "Rushes a distant enemy to open the fight with a brief stun.",
-      "rend": "Opens a bleed that wears the target down over time.",
-      "thunder_clap": "Hits everything around you and slows their attacks.",
-      "seal_of_righteousness": "Imbues your swings with Holy damage, then spend it with Judgement.",
-      "holy_light": "A steady, sizable heal for topping off an ally or yourself.",
-      "devotion_aura": "A lasting self-buff that raises armor so hits land softer.",
-      "judgement": "Spends your active Seal to strike an enemy from short range.",
-      "blessing_of_might": "Raises a friendly target's attack power, good to cast before a pull.",
-      "divine_protection": "A quick holy shield to soak damage when things get rough.",
-      "raptor_strike": "A hard melee swing for when something closes the gap on you.",
-      "aspect_of_the_hawk": "A stance you keep up to sharpen your ranged attack power.",
-      "serpent_sting": "Lands a venom that bleeds nature damage over time.",
-      "arcane_shot": "An instant shot from range for quick extra damage.",
-      "concussive_shot": "Dazes the target and slows it so it cannot reach you.",
-      "mongoose_bite": "A counterstrike that opens up right after the enemy dodges.",
-      "sinister_strike": "Your reliable strike that builds combo points to spend later.",
-      "eviscerate": "Spends your combo points to finish a target with a burst.",
-      "garrote": "Open from stealth with a wire that bleeds the target over time.",
-      "backstab": "Slip behind a target with a dagger for a hard-hitting builder.",
-      "gouge": "Incapacitates the target briefly so you can reposition or peel.",
-      "cheap_shot": "Open from stealth with a stun and a head start on combo points.",
-      "smite": "A holy bolt for chipping down a target from range.",
-      "lesser_heal": "A steady cast to top up an ally when there is time to stand still.",
-      "power_word_fortitude": "Raises an ally's health pool, so cast it before the pull and keep it up.",
-      "shadow_word_pain": "Sticks a shadow rot on a foe, then you move on while it ticks.",
-      "power_word_shield": "Wraps an ally in a shield that soaks hits before they land.",
-      "renew": "A heal that ticks over time, good to cast and keep moving.",
-      "lightning_bolt": "A ranged cast of Nature damage, your go-to from afar.",
-      "rockbiter_weapon": "Imbues your weapon so each swing lands harder in melee.",
-      "healing_wave": "Your main heal, a direct mend for yourself or an ally.",
-      "earth_shock": "An instant shock for quick Nature damage when you need it now.",
-      "lightning_shield": "Charges you so attackers take Nature damage when they hit you.",
-      "flame_shock": "An instant burn that hits up front and keeps searing over time.",
-      "fireball": "Your main fire nuke, lands a hit and leaves the target burning.",
-      "frost_armor": "A lasting self-buff that hardens your armor before a fight.",
-      "arcane_intellect": "Raises Intellect to deepen an ally's mana pool, cast it before the pull.",
-      "frostbolt": "Strikes from range and slows the target so it cannot close on you.",
-      "conjure_water": "Conjures drinks that restore mana, so you can refill between pulls.",
-      "conjure_food": "Conjures food that restores health when you sit down to eat.",
-      "shadow_bolt": "A bolt of shadow you cast at a target, your go-to nuke.",
-      "summon_imp": "Calls up an imp that flings firebolts at enemies from range.",
-      "demon_skin": "A lasting self-buff that toughens your skin and adds armor.",
-      "immolate": "Sets a target alight for an opening hit and a burn that lingers.",
-      "corruption": "Rots a target with shadow that ticks while you do other things.",
-      "life_tap": "Trades some of your own health back into mana when you run dry.",
-      "wrath": "A nature bolt thrown at a target from range, your go-to nuke.",
-      "healing_touch": "A big single-target heal with a long cast, for topping someone off.",
-      "mark_of_the_wild": "A lasting blessing you put on yourself or an ally before a fight.",
-      "moonfire": "Hits instantly and leaves the target burning, good while moving.",
-      "rejuvenation": "Casts instantly and heals an ally over time, so you can keep acting.",
-      "thorns": "Wards an ally so melee attackers hurt themselves for striking."
+      "heroic_strike": "预备一次更重的挥击，在下次攻击时消耗怒气。",
+      "battle_shout": "一声号召呐喊，提升全队的攻击强度。",
+      "commanding_shout": "提升耐力，让所有人在战斗中更耐打。",
+      "charge": "冲向远处的敌人，以一次短暂的昏迷开场。",
+      "rend": "造成一道流血，让目标随时间逐渐被消耗。",
+      "thunder_clap": "打击你周围的一切，并减缓它们的攻击速度。",
+      "seal_of_righteousness": "为你的挥击附加神圣伤害，再用审判将其释放出去。",
+      "holy_light": "稳健而可观的治疗，用于把盟友或自己奶满。",
+      "devotion_aura": "持续的自我增益，提升护甲让攻击伤害更低。",
+      "judgement": "消耗你激活的圣印，从近距离打击敌人。",
+      "blessing_of_might": "提升友方目标的攻击强度，开怪前施放正合适。",
+      "divine_protection": "一道快速的神圣护盾，在局势吃紧时吸收伤害。",
+      "raptor_strike": "一记沉重的近战挥击，用于有东西贴近你时。",
+      "aspect_of_the_hawk": "持续保持的姿态，强化你的远程攻击强度。",
+      "serpent_sting": "施加一道毒液，随时间造成自然流血伤害。",
+      "arcane_shot": "一次远程的瞬发射击，迅速打出额外伤害。",
+      "concussive_shot": "使目标晕头转向并减速，让它无法接近你。",
+      "mongoose_bite": "在敌人闪躲之后立即可用的反击技。",
+      "sinister_strike": "你可靠的一击，积攒连击点供之后消耗。",
+      "eviscerate": "消耗你的连击点，以一次爆发终结目标。",
+      "garrote": "从潜行中起手，用钢丝使目标持续流血。",
+      "backstab": "绕到目标背后用匕首狠狠一击，连击点的强力起手技。",
+      "gouge": "短暂使目标失去行动能力，方便你重新走位或解围。",
+      "cheap_shot": "从潜行中起手，眩晕目标并抢先积攒连击点。",
+      "smite": "一道神圣箭矢，用于从远处削减目标。",
+      "lesser_heal": "稳健的施法治疗，有空站定时为盟友补血。",
+      "power_word_fortitude": "提升盟友的生命上限，开怪前施放并保持它的存在。",
+      "shadow_word_pain": "在敌人身上贴一道暗影腐蚀，然后任由它持续跳动，你去做别的。",
+      "power_word_shield": "为盟友裹上一层护盾，在伤害落地前先吸收。",
+      "renew": "随时间持续跳动的治疗，适合施放后继续移动。",
+      "lightning_bolt": "一次远程施法的自然伤害，是你远距离的常用手段。",
+      "rockbiter_weapon": "为你的武器附魔，让每一次近战挥击更重。",
+      "healing_wave": "你的主力治疗，为自己或盟友直接补血。",
+      "earth_shock": "瞬发的震击，在你急需时打出快速的自然伤害。",
+      "lightning_shield": "为你充能，让攻击者打中你时受到自然伤害。",
+      "flame_shock": "瞬发的灼烧，先打出一记，并持续灼烧目标。",
+      "fireball": "你的主力火焰输出，命中后让目标持续燃烧。",
+      "frost_armor": "持续的自我增益，开战前先硬化你的护甲。",
+      "arcane_intellect": "提升智力以扩大盟友的法力上限，开怪前先施放。",
+      "frostbolt": "从远处发动攻击并减速目标，让它无法贴近你。",
+      "conjure_water": "制造饮品以恢复法力，让你在两次开怪之间补给。",
+      "conjure_food": "制造食物，坐下进食时可以恢复生命值。",
+      "shadow_bolt": "向目标施放一道暗影箭，是你的常用输出。",
+      "summon_imp": "召唤一只小鬼，从远处向敌人投掷火焰箭。",
+      "demon_skin": "持续的自我增益，强化皮肤并提升护甲。",
+      "immolate": "点燃目标，打出一记起手伤害并留下持续燃烧。",
+      "corruption": "用暗影腐蚀目标，在你做别的事时持续造成伤害。",
+      "life_tap": "在法力枯竭时，将部分自身生命值转化为法力。",
+      "wrath": "从远处向目标投出一道自然箭矢，是你的常用输出。",
+      "healing_touch": "一记施法时间较长的单体大治疗，用于把人奶满。",
+      "mark_of_the_wild": "开战前为自己或盟友施加的持续祝福。",
+      "moonfire": "瞬间命中并让目标持续燃烧，移动时也很好用。",
+      "rejuvenation": "瞬发施放，持续治疗盟友，让你可以继续行动。",
+      "thorns": "守护盟友，让近战攻击者在打击时反伤自己。"
     },
     "petHook": {
-      "imp": "A ranged firebolt demon that chips at enemies from a safe distance.",
-      "voidwalker": "A sturdy demon that taunts and soaks hits so you can cast in peace.",
-      "succubus": "A fast melee demon that hits hard but folds under pressure.",
-      "felhunter": "A shadow skirmisher that hounds enemy casters.",
-      "felguard": "A durable melee bruiser, the all-rounder once you can summon it.",
-      "infernal": "A hulking juggernaut with crushing melee, summoned for raw power.",
-      "doomguard": "An elite caster that rains heavy shadow from afar."
+      "imp": "一只远程火焰箭恶魔，从安全距离外消磨敌人。",
+      "voidwalker": "一只结实的恶魔，能嘲讽并吸收伤害，让你安心施法。",
+      "succubus": "一只快速的近战恶魔，输出凶猛，但承压能力很差。",
+      "felhunter": "一名暗影游击手，专门纠缠敌方施法者。",
+      "felguard": "一名耐打的近战猛士，能召唤它之后就是全能的选择。",
+      "infernal": "一头近战极具破坏力的庞然巨兽，为追求纯粹的力量而召唤。",
+      "doomguard": "一只精英施法者，从远处倾泻沉重的暗影伤害。"
     },
     "bestiary": {
-      "heading": "Bestiary",
-      "intro": "The creatures of the world, grouped by family. These are the foes you meet out in the open. The deadliest things wait, unlisted, behind dungeon doors.",
-      "rare": "Rare",
-      "levels": "Levels {min} to {max}",
-      "levelsSame": "Level {min}",
-      "notedLabel": "Of note",
+      "heading": "怪物图鉴",
+      "intro": "世界中的各类生物，按种族分门别类。这些是你在野外会遇到的敌人。最致命之物则未列于此，潜伏在地下城的门后。",
+      "rare": "稀有",
+      "levels": "等级 {min} 至 {max}",
+      "levelsSame": "{min} 级",
+      "notedLabel": "值得一提",
       "flavor": {
-        "old_greyjaw": "A scarred old wolf no trap has held, blamed for three hounds and a stable boy's arm. He hunts the deep woods alone, and turns savage the longer a fight wears on.",
-        "grubjaw": "A fen troll so greedy the other trolls will not dig beside him, said to have eaten a trader's last two pack-mules, harness and all.",
-        "shardlord_kazzix": "A storm elemental given shoulders, walking the far crags above Stormcrag with a heartshard worth braving the lightning for.",
-        "mirejaw_frenzy": "A marsh murloc that whips itself into a thrashing frenzy mid-fight, the loudest thing in a loud, territorial pack.",
-        "gravecaller_cultist": "Robed servants of the death-cult whose work fouls the graves from the Vale to the peaks. Where they gather, the dead do not rest."
+        "old_greyjaw": "一头浑身伤疤的老狼，从未被任何陷阱困住，三条猎犬和一名马童的手臂都算在它头上。它独自在密林深处狩猎，战斗拖得越久就越发狂暴。",
+        "grubjaw": "一头贪婪到连其他巨魔都不愿与之为伍的沼泽巨魔，据说曾把一名商人最后两头驮货的骡子连同挽具一同吞下。",
+        "shardlord_kazzix": "一个化作魁梧身形的风暴元素，徘徊在风暴岩之上遥远的峭壁间，身上的心石值得你冒着雷电去夺取。",
+        "mirejaw_frenzy": "一只沼泽鱼人，会在战斗中将自己鞭策进狂乱的扑腾，是一支喧闹而极具地盘意识的鱼群中嗓门最大的那个。",
+        "gravecaller_cultist": "死亡邪教身披长袍的仆从，他们的勾当玷污了从谷地到峰巅的每一处坟墓。他们聚集之处，死者难以安息。"
       }
     },
     "family": {
       "beast": {
-        "name": "Beasts",
-        "desc": "Wild animals of forest and field, from wolves and boars to the things that prey on them. Hunters can tame many of them."
+        "name": "野兽",
+        "desc": "森林与原野上的野生动物，从狼和野猪到捕食它们的猛兽。猎人可以驯服其中许多。"
       },
       "spider": {
-        "name": "Spiders",
-        "desc": "Web-spinners and venomous lurkers that nest in dark, tangled places."
+        "name": "蜘蛛",
+        "desc": "结网的织丝者与剧毒的潜伏者，盘踞在阴暗错综之地。"
       },
       "murloc": {
-        "name": "Murlocs",
-        "desc": "Amphibious marsh-dwellers that swarm the shallows in noisy, territorial packs."
+        "name": "鱼人",
+        "desc": "两栖的沼泽居民，成群涌入浅滩，吵闹而极具地盘意识。"
       },
       "kobold": {
-        "name": "Kobolds",
-        "desc": "Candle-headed diggers that infest mines and burrows, fiercely guarding their ore."
+        "name": "狗头人",
+        "desc": "头顶蜡烛的掘地者，在矿洞与地穴中繁衍，凶狠地守护着自己的矿石。"
       },
       "humanoid": {
-        "name": "Humanoids",
-        "desc": "Bandits, cultists, and others who took up the wrong trade. They fight with tactics, not just teeth."
+        "name": "人型生物",
+        "desc": "盗匪、邪教徒以及其他误入歧途之辈。他们以战术作战，而非只靠拳脚。"
       },
       "troll": {
-        "name": "Trolls",
-        "desc": "Hulking, fast-healing brutes that lair in the marsh and the high country."
+        "name": "巨魔",
+        "desc": "身形魁梧、自愈极快的蛮兽，盘踞于沼泽与高地之中。"
       },
       "ogre": {
-        "name": "Ogres",
-        "desc": "Enormous, slow-witted, and dangerous. They camp the high passes and hit like a landslide."
+        "name": "食人魔",
+        "desc": "体型庞大、头脑迟钝却凶险无比。它们盘踞高山隘口，出手如山崩般沉重。"
       },
       "undead": {
-        "name": "Undead",
-        "desc": "The restless dead, raised by darker hands. They do not tire and they do not flee."
+        "name": "亡灵",
+        "desc": "不安息的死者，被更黑暗的力量所驱使。它们不知疲倦，也绝不退缩。"
       },
       "elemental": {
-        "name": "Elementals",
-        "desc": "Living storm and stone, bound to the wild places where the elements run strong."
+        "name": "元素生物",
+        "desc": "由风暴与岩石化成的活物，被束缚于元素之力旺盛的荒野之地。"
       }
     },
     "worldPage": {
-      "heading": "The world",
-      "intro": "World of ClaudeCraft is one continuous land you cross on foot, three zones laid south to north. There is no fast travel, so the journey is part of the adventure.",
-      "hub": "Home base",
-      "mapHeading": "The road north",
-      "mapSub": "Three zones, south to north, each a step higher in level. Follow the quest trail and the land carries you from the valley to the peaks.",
-      "places": "Notable places",
-      "residents": "Who you will meet",
-      "valeBlurb": "The green starting valley, where new heroes cut their teeth on wolves and bandits around the town of Eastbrook.",
-      "marshBlurb": "A drowned country of fog and ruins. Murlocs swarm the shallows and something older stirs beneath the water, watched from the bridge-town of Fenbridge.",
-      "peaksBlurb": "Wind-scoured ridges and old mine-works climbing to the realm's coldest, highest dangers, held by the outpost of Highwatch.",
-      "valeGreeting": "Keep your blade close. The Vale is not what it was.",
-      "valeGreeter": "Marshal Redbrook, Eastbrook",
-      "marshGreeting": "Hold at the gate. Past those reeds, the fen does the killing for us.",
-      "marshGreeter": "Warden Fenwick, Fenbridge",
-      "peaksGreeting": "Two hundred years this wall has held. It will not break on my watch, but it groans.",
-      "peaksGreeter": "Captain Thessaly, Highwatch",
-      "valePlaceNotes": "Eastbrook is your first home base. Wolf Run and Boar Meadow are gentle hunting ground; Mirror Lake is quiet water to fish; the Webwood and the Copper Dig hide spiders and ore-greedy diggers; a Bandit Camp and the Fallen Chapel hold rougher work; Brightwood Glade is a calm wildlife grove in the north.",
-      "marshPlaceNotes": "Fenbridge guards the only dry road. The Prowler Reeds and Deepfen Shallows teem with marsh beasts and murlocs; the Widow Thicket is spun thick with web; the Drowned Chapel and the Troll Mounds keep older dangers; the Gravecaller Encampment is the cult dug in, and the Sunken Bastion is the marsh's instanced heart.",
-      "peaksPlaceNotes": "Highwatch holds the wall. Stalker Ridge and the Deeprock Burrows belong to ridge cats and kobolds; the Ogre Foothills and Drogmar's War-Camp to brutes for hire; Stormcrag crackles with elementals and the Glimmermere glows below it; the Wyrmcult Tents and Revenant Fields ring the cult's high ground, with Gravewyrm Sanctum at its peak.",
-      "gladeTitle": "A quiet corner: Brightwood Glade",
-      "gladeBody": "Not every story in the Vale is about the dead. In the north, a sunlit grove called Brightwood Glade keeps its own gentler rhythm, with quiet paths, grazing deer, and wary beasts under the boughs. It is a soft counterpoint to the trail you are following, and worth seeing when the road gives you room to wander."
+      "heading": "世界",
+      "intro": "World of ClaudeCraft 是一片连绵不绝、需你徒步穿越的大陆，三大区域由南向北依次铺展。这里没有快速旅行，因此旅途本身便是冒险的一部分。",
+      "hub": "大本营",
+      "mapHeading": "向北之路",
+      "mapSub": "三片区域，自南向北，每一片的等级都更高一级。跟着任务线走，这片土地便会带你从山谷一路抵达群峰。",
+      "places": "值得一看的地点",
+      "residents": "你将遇见的人",
+      "valeBlurb": "青翠的起始山谷，新英雄在东溪镇周边的野狼与盗匪身上磨砺技艺。",
+      "marshBlurb": "一片被洪水淹没、迷雾与废墟交织的国度。鱼人涌入浅滩，水下有更古老之物蠢蠢欲动，由桥镇芬桥镇守望着。",
+      "peaksBlurb": "风蚀的山脊与古老的矿坑向上攀升，通往这片王国中最寒冷、最高处的危险之地，由高守哨站镇守。",
+      "valeGreeting": "把你的刀剑带在身边。谷地已不复往日。",
+      "valeGreeter": "雷德布鲁克元帅，东溪",
+      "marshGreeting": "守在门口。过了那片芦苇，泥沼会替我们动手杀人。",
+      "marshGreeter": "守望者芬威克，芬桥",
+      "peaksGreeting": "这堵墙已守了两百年。在我当值时它绝不会破，但它在呻吟。",
+      "peaksGreeter": "塞萨莉队长，高守哨站",
+      "valePlaceNotes": "东溪是你的第一个大本营。狼奔之地与野猪草甸是温和的狩猎场；镜湖是供垂钓的静水；蛛网林与铜矿坑藏着蜘蛛和贪婪掘矿者；一处盗匪营地与陨落礼拜堂里有更棘手的活儿；明木林是北方一片宁静的野生动物林地。",
+      "marshPlaceNotes": "芬桥守着唯一一条干燥的道路。潜行者芦苇荡与深沼浅滩里满是沼泽野兽和鱼人；寡妇密林被蛛网织得密不透风；溺亡礼拜堂与巨魔土丘藏着更古老的危险；唤墓者营地是邪教的盘踞之处，沉没堡垒则是这片湿地的副本核心。",
+      "peaksPlaceNotes": "高守哨站扼守着城墙。潜猎者山脊与深岩洞穴属于山脊猫和狗头人；食人魔丘陵与卓格玛的战营属于受雇的莽夫；风暴岩中元素噼啪作响，饮月之池在它下方泛着微光；蜿龙教帐篷与亡魂之野环绕着邪教的制高点，墓龙圣所则居于其巅。",
+      "gladeTitle": "宁静一隅：明木林地",
+      "gladeBody": "山谷里的故事并不全都关于亡者。北方有一片被阳光照亮的林地，名为明木林，那里有自己的温和节奏：安静小径、吃草的鹿，以及枝叶下警觉的野兽。它是你所追寻踪迹之外的一段柔和对照，若道路给你余裕闲逛，很值得去看一看。"
     },
     "questsPage": {
-      "heading": "Quests",
-      "intro": "Quests are the heart of the world and the fastest way to level. Here is how they work.",
-      "acceptTitle": "Finding and accepting",
-      "acceptBody": "People with a marker over their head have work for you. Talk to them to accept a quest. Your very first is Wolves at the Door, from Marshal Redbrook in Eastbrook.",
-      "objectivesTitle": "Objectives",
-      "objectivesBody": "Slay certain enemies, gather items, or interact with something in the world. The on-screen tracker counts your progress as you go.",
-      "turninTitle": "Turning in",
-      "turninBody": "Return to the quest giver, the map shows you where, for experience, coin, and often a piece of gear chosen to suit your class.",
-      "partyTitle": "Questing in a group",
-      "partyBody": "Party members nearby share kill and objective credit, so questing together is faster, never slower.",
-      "storyTitle": "A thread runs through it all",
-      "storyBody": "From your first errands in Eastbrook, something is wrong with the dead. A cult is at work, and the trail leads north through every zone. Follow it to learn who stands behind it.",
-      "soloNote": "The main story is fully soloable; only its final chapters call for a group.",
-      "typesTitle": "The kinds of quest you will see",
-      "typesBody": "Most quests are one of a few familiar shapes. The on-screen tracker spells out exactly what each one wants, so you are never left guessing.",
-      "typeSlayTitle": "Slay",
-      "typeSlayBody": "Thin out a pack of beasts or break a cult's hold by defeating a set number of a marked enemy. The first quest in the game, clearing wolves off the Eastbrook road, is one of these.",
-      "typeGatherTitle": "Gather",
-      "typeGatherBody": "Collect items from the world or from what enemies drop: herbs, ore, lost letters, a cult's grim reagents. Some pieces only fall from a particular foe, so the hunt and the haul go together.",
-      "typeInteractTitle": "Interact",
-      "typeInteractBody": "Use, cleanse, or read something fixed in the world: a defiled grave, a warning carved on a shore-rock, a sealed crypt door. Walk up to the marker and act on it.",
-      "typeMusterTitle": "Escort and muster",
-      "typeMusterBody": "See a friendly face safely from one place to another, or rally a town's defenders before a push north. These keep you moving with the people whose story you are in.",
-      "typeGroupTitle": "Group finales",
-      "typeGroupBody": "Each chapter of the main story ends at a dungeon door. The lead-in is soloable, but the final blow against a chapter's villain is meant for a party of five (and the very last, for ten).",
-      "sagaTitle": "Follow the trail north",
-      "sagaBody": "The main story is one long chase. A death-cult is at work on the realm's graves, and every chapter you close points one zone further up the road. You never fight the whole conspiracy at once; you pull one thread, and it leads to the next hand holding it.",
-      "sagaValeTitle": "The Vale: a name on a sigil",
-      "sagaValeBody": "In Eastbrook the dead will not rest, and the mark behind it belongs to a sect long thought gone. Trace it to a Gravecaller working the chapel crypt, and his own papers point you toward the fen in the north.",
-      "sagaMarshTitle": "The marsh: a tithe of souls",
-      "sagaMarshBody": "In Mirefen the drownings are no accident. Someone is filling the fen like a tithing box, raising obedient dead from every traveler the water takes. Chase the orders up the chain to a Mistcaller in the drowned bastion, whose last words name something older still, stirring beneath the peaks.",
-      "sagaPeaksTitle": "The peaks: what the tithe was for",
-      "sagaPeaksBody": "On Thornpeak the whole scheme comes clear. Every soul stolen since the Vale was a tithe poured toward waking an ancient thing sealed beneath the mountain. The trail that began in a chapel yard ends here, at a door it takes ten to open. We will let you find out who waits behind it.",
-      "sideTitle": "Threads off the main road",
-      "sideWardenTitle": "Earning your name",
-      "sideWardenBody": "Alongside the story, the wardens of the Vale and the fen hand out a standing bounty ladder. Work your way up it, foe by foe, the way every warden before you earned their place. It is honest leveling and a tour of each zone's worst troublemakers.",
-      "sideCryptTitle": "The forgotten king",
-      "sideCryptBody": "High on the peaks runs a quieter mystery: old graves marked with a crown no record remembers. Read the dead, gather what they guarded, and unseal a tomb that was meant to stay shut. It is a detective's trail that opens the way to a second endgame trial for a full raid."
+      "heading": "任务",
+      "intro": "任务是这个世界的核心，也是升级最快的途径。下面介绍它们的运作方式。",
+      "acceptTitle": "寻找与接受",
+      "acceptBody": "头顶带有标记的人物有活儿要交给你。与他们对话即可接受任务。你的第一个任务是“狼患当前”，由东溪镇的雷德布鲁克元帅发布。",
+      "objectivesTitle": "目标",
+      "objectivesBody": "击杀特定敌人、收集物品，或与世界中的某物互动。屏幕上的追踪器会随你的行动记录进度。",
+      "turninTitle": "交还任务",
+      "turninBody": "返回任务发布者处（地图会指明位置），即可获得经验、金币，以及通常会有的一件契合你职业的装备。",
+      "partyTitle": "组队做任务",
+      "partyBody": "附近的队员会共享击杀和目标进度，因此组队做任务只会更快，绝不会更慢。",
+      "storyTitle": "一条主线贯穿始终",
+      "storyBody": "从你在东溪镇的第一批差事起，死者便有了异样。一个邪教正在暗中行动，线索向北贯穿每一个区域。循迹而行，揭开幕后黑手的真面目。",
+      "soloNote": "主线剧情完全可单人完成，仅最终章节需要组队。",
+      "typesTitle": "你将遇到的任务种类",
+      "typesBody": "大多数任务都属于几种熟悉的样式之一。屏幕上的追踪器会清楚地说明每个任务的要求，让你绝不会一头雾水。",
+      "typeSlayTitle": "讨伐",
+      "typeSlayBody": "击败一定数量的指定敌人，疏散一群野兽，或瓦解一个邪教的盘踞。游戏中的第一个任务，清除东溪路上的野狼，便是其中之一。",
+      "typeGatherTitle": "采集",
+      "typeGatherBody": "从世界中或敌人的掉落里收集物品：草药、矿石、遗失的信件、邪教阴森的材料。有些物件只会从特定的敌人身上掉落，所以狩猎与搜罗往往相伴而行。",
+      "typeInteractTitle": "互动",
+      "typeInteractBody": "使用、净化或读取世界中某个固定之物：一座被玷污的坟墓、一块刻在岸边岩石上的警示、一扇封印的地穴之门。走到标记处，对它采取行动。",
+      "typeMusterTitle": "护送与召集",
+      "typeMusterBody": "安全护送一位友方人物从一处前往另一处，或在向北推进前召集一座城镇的守卫。这些任务让你与你身处其故事之中的人们一同前行。",
+      "typeGroupTitle": "组队收尾",
+      "typeGroupBody": "主线剧情的每个篇章都终结于一扇地下城之门。前置引导可单人完成，但对一个篇章反派的最后一击，是为五人小队准备的（而最后一场，是为十人准备的）。",
+      "sagaTitle": "循迹北行",
+      "sagaBody": "主线剧情是一场漫长的追查。一个死亡邪教正在这片国度的坟墓间行动，你每揭开一个篇章，便又向北指明一个区域。你绝不会一次性面对整个阴谋；你抽出一根线头，它便引向握着下一头的那只手。",
+      "sagaValeTitle": "谷地：印玺上的一个名字",
+      "sagaValeBody": "在东溪，死者无法安息，而其背后的印记属于一个早被认为已然消亡的教派。循迹追查到一名在礼拜堂地穴中作业的唤墓者，他自己的文书又将你指向北方的湿地。",
+      "sagaMarshTitle": "湿地：一笔灵魂的贡赋",
+      "sagaMarshBody": "在泥沼，溺亡绝非意外。有人正像填满纳贡之箱一般填满这片湿地，从每一个被湖水吞没的旅人身上唤起听命的死者。沿着命令的链条向上追查，直至沉没堡垒中的一名唤雾者，他的临终之言道出了某种更为古老、正在峰巅之下蠢动之物。",
+      "sagaPeaksTitle": "峰巅：贡赋所为何来",
+      "sagaPeaksBody": "在荆棘峰，整个图谋终于水落石出。自谷地以来窃取的每一个灵魂，都是倾注于唤醒一个封印在山岳之下的远古之物的贡赋。始于一座礼拜堂院落的踪迹在此终结，止步于一扇需十人方能开启的门前。至于谁在门后等候，我们就留给你自己去揭晓吧。",
+      "sideTitle": "主路之外的支线",
+      "sideWardenTitle": "扬名立万",
+      "sideWardenBody": "在剧情之外，谷地与湿地的守望者们还会发布一份常驻的赏金阶梯。一个敌人接一个敌人地往上爬，就像你之前的每一位守望者赢得自己的位置那样。这是踏实的升级，也是一趟遍历各区域最恶劣捣乱分子的巡礼。",
+      "sideCryptTitle": "被遗忘的君王",
+      "sideCryptBody": "在高耸的峰巅，潜藏着一桩更幽静的谜团：古老的坟墓刻着无人记得的王冠。读懂死者，收集他们守护之物，再开启一座本该长闭的陵墓。这是一条侦探般的线索，为整支团队开启第二场终局试炼之路。"
     },
     "lore": {
-      "figuresTitle": "Faces you will come to know",
-      "figuresBody": "A handful of people walk the whole road with you. Watch for these names from the valley to the peaks.",
-      "aldricRole": "Priest of the Vale",
-      "aldricBody": "A humble village priest who first names the cult over a defiled grave in Eastbrook, then follows its trail in person through the marsh and up to the wall at Highwatch. He is the steady heart of the whole campaign.",
-      "marenRole": "The Marshal's Scout",
-      "marenBody": "A low-talking tracker you meet in the reeds of Mirefen, all quiet feet and a short blade. She follows the trail north too, and it is her ear that catches the words that send you to the peaks."
+      "figuresTitle": "你将渐渐熟识的面孔",
+      "figuresBody": "有那么几个人会与你同行整段旅途。从谷地到峰巅，留意这些名字。",
+      "aldricRole": "谷地的牧师",
+      "aldricBody": "一位谦逊的乡村牧师，他在东溪一座被玷污的坟墓前最先道出了邪教之名，随后亲自循着踪迹穿过湿地，一路追到高守哨站的城墙下。他是整场战役坚定的核心。",
+      "marenRole": "元帅的斥候",
+      "marenBody": "一位你在泥沼的芦苇丛中遇见的低声寡言的追踪者，脚步轻悄，配一柄短刃。她也一路向北循迹而行，正是她的耳朵捕捉到了那些话语，将你引向峰巅。"
     },
     "dungeonsPage": {
-      "heading": "Dungeons and Raids",
-      "intro": "When the open world is not enough, gather a party and step into an instance: a private copy of a dungeon made just for your group.",
-      "party": "Dungeons are built for a party of five. The endgame raid is for ten.",
-      "soloLead": "Every dungeon opens with a soloable lead-in quest, so you always know why you are going in.",
-      "levelAround": "Around level {n}",
-      "levelExact": "Level {n}",
-      "levelBand": "Levels {min} to {max}",
-      "partySize": "{n} players",
-      "raidSize": "Ten players, level {n}",
-      "hollowName": "The Hollow Crypt",
-      "hollowBody": "A grave-robbed chapel crypt where the newly dead refuse to rest. The first real test of a new party.",
-      "bastionName": "The Sunken Bastion",
-      "bastionBody": "A flooded fortress lost to the marsh, held by drowned defenders and the rising tide itself.",
-      "templeName": "The Drowned Temple",
-      "templeBody": "A moonlit shrine sunk beneath a glowing tarn high in the peaks, reached through a gate of cold light. A drowned cult still sings down there in its rotted vestments, and the warnings carved on the shore say something below only sleeps. A self-contained mystery, set apart from the main story, for the curious and the well-prepared.",
-      "sanctumName": "Gravewyrm Sanctum",
-      "sanctumBody": "The dark heart of Thornpeak, where the cult's long work reaches its terrible peak.",
-      "raidName": "The endgame raid",
-      "raidBody": "Beyond a sealed royal door waits a ten-player trial: a multi-phase fight and a deathless power the whole raid must shut down together. Earn your way in, then bring nine friends.",
-      "templeLoreTitle": "The Drowned Temple, a little deeper",
-      "templeLoreBody": "The temple has its own legend, older than the cult you chase elsewhere. On the shore of the Glimmermere, a tarn that drinks the moonlight and gives back the drowned, a lone watcher keeps a gate of pale light. Beneath the surface, a stair of cold stone runs down to it. The folk who sank there did not drown by misadventure: they were the Pale Choir, who went under in worship and never stopped singing. The old wardens scratched a single warning into the rocks before the water took them, a prayer to something they called the Drowned Moon, with a steadier hand adding two words beneath it: it only sleeps.",
-      "cryptLeadTitle": "A door the dead were meant to keep shut",
-      "cryptLeadBody": "High on the peaks, away from the main fight, lies a colder mystery. Old graves bear a crown no record remembers, and the dead who guard them once served a forgotten king. Read their stones, gather the keystones they kept, and you can unseal a tomb that three loyal souls died to hold closed, opening a second ten-player trial for those who follow the clues to the end."
+      "heading": "地下城与团队副本",
+      "intro": "当开放世界已不能满足你时，召集一支队伍，踏入副本：一份专为你的队伍生成的地下城私有副本。",
+      "party": "地下城专为五人小队打造。终局团队副本则容纳十人。",
+      "soloLead": "每座地下城都配有一段可单人完成的前置引导任务，让你始终清楚自己为何而来。",
+      "levelAround": "约 {n} 级",
+      "levelExact": "{n} 级",
+      "levelBand": "{min} 至 {max} 级",
+      "partySize": "{n} 名玩家",
+      "raidSize": "十人，{n} 级",
+      "hollowName": "空洞地穴",
+      "hollowBody": "一座被盗墓的教堂地穴，新逝的死者拒绝安息。这是新队伍面临的第一场真正考验。",
+      "bastionName": "沉没堡垒",
+      "bastionBody": "一座沉入沼泽、被淹没守军和不断上涨的潮水所占据的失落要塞。",
+      "templeName": "沉没神殿",
+      "templeBody": "沼泽小路旁一座沉没的圣殿，是为好奇者与有备而来者准备的岔路。",
+      "sanctumName": "墓龙圣所",
+      "sanctumBody": "棘峰的黑暗核心，邪教漫长的图谋在此达到可怖的顶点。",
+      "raidName": "终局团队副本",
+      "raidBody": "在一扇封印的皇家大门之后，等待着一场十人试炼：一场多阶段的战斗，以及一股不死之力，需要整支团队齐心协力将其镇压。先赢得入场资格，再带上九位好友。",
+      "templeLoreTitle": "沉没神殿，更深一层",
+      "templeLoreBody": "这座神殿有着自己的传说，比你在别处追查的邪教更为古老。在饮月之池的岸边，那是一汪饮尽月光、又交还溺亡者的小湖，一名孤独的守望者把守着一道苍白的光之门。水面之下，一道冰冷的石阶通向那里。沉入此处的人并非死于意外：他们是苍白唱诗班，在虔诚的礼拜中没入水底，从未停止歌唱。在湖水将他们吞没之前，古老的守护者在岩石上刻下了唯一一句警示，那是献给一个他们称之为溺月之物的祷词，又有一只更沉稳的手在其下添上了两个字：它只是沉睡。",
+      "cryptLeadTitle": "一扇死者本该让它紧闭的门",
+      "cryptLeadBody": "在远离主战场的高耸峰巅，潜藏着一桩更为冰冷的谜团。古老的坟墓上刻着无人记得的王冠，守护它们的死者曾侍奉一位被遗忘的君王。读懂他们的碑文，收集他们守护的钥石，你便能开启一座由三个忠魂以死封缄的陵墓，为循线索追查到底的人开启第二场十人试炼。"
     },
     "talentsPage": {
-      "heading": "Talents and specializations",
-      "intro": "Talents are how you make a class your own. They are optional, forgiving, and easy to change, so you can experiment without fear.",
-      "whatHeading": "What talents do",
-      "whatBody": "As you level, you earn talent points to spend on small, permanent upgrades to your abilities and stats. They shape how a class feels, leaning it toward more damage, sturdier defense, or stronger healing.",
-      "howHeading": "How they work",
-      "howBody": "Talents open up at level 10, and you keep earning points as you climb to the cap. You spend them in your class's talent panel, and you can save more than one layout to swap between builds.",
-      "resetTitle": "Nothing is permanent",
-      "resetNote": "You can reset your talents at any time, so an early pick is never a trap. Try things, see what you like, and change your mind freely.",
-      "specsHeading": "Specializations by class",
-      "specsBody": "Every class has a handful of specializations, each with its own role and a signature focus. Here is the shape of all of them. Open a class for its full kit."
+      "heading": "天赋与专精",
+      "intro": "天赋是你让职业成为自己专属的方式。它们是可选的、宽容的，也很容易更改，所以你可以放心地尝试。",
+      "whatHeading": "天赋的作用",
+      "whatBody": "随着你升级，你会获得天赋点，用于为技能和属性投入细小而永久的强化。它们塑造一个职业的手感，使其倾向于更高的输出、更坚实的防御，或更强的治疗。",
+      "howHeading": "它们如何运作",
+      "howBody": "天赋在 10 级开放，随着你向等级上限攀升，会持续获得天赋点。你在职业的天赋面板中分配它们，还可以保存多套配置，在不同构筑之间切换。",
+      "resetTitle": "一切都不是永久的",
+      "resetNote": "你可以随时重置天赋，所以早期的选择绝不会成为陷阱。尽管尝试，看看你喜欢什么，随心改主意。",
+      "specsHeading": "各职业的专精",
+      "specsBody": "每个职业都有几种专精，各有自己的定位和标志性的侧重。这里是它们全部的大致面貌。打开某个职业可查看其全部技能。"
     },
     "arenaPage": {
-      "heading": "Arena and PvP",
-      "intro": "Want to test yourself against other players? Player versus player is built in, and it is always something you choose, never something forced on you.",
-      "duelsHeading": "Duels",
-      "duelsBody": "Challenge any player you meet to a friendly duel. Nothing is on the line but pride, so it is the easiest way to learn a matchup or settle a friendly argument.",
-      "coliseumHeading": "The Ashen Coliseum",
-      "coliseumBody": "The Coliseum is the realm's arena, where you face other players in ranked matches. Win and your standing climbs, and the strongest fighters rise up the leaderboard for everyone to see.",
-      "fiestaHeading": "Two versus two Fiesta",
-      "fiestaBody": "Fiesta is a fast, two-on-two mode played in short rounds. Between rounds you draft augments, quick boosts that reshape your kit on the fly, so no two matches play quite the same.",
-      "augmentsNote": "Augments and power-ups last only for the match. They are about playful, on-the-spot builds, not lasting power, so nobody buys their way to a win.",
-      "wavesTitle": "Augments arrive in waves",
-      "wavesBody": "Each round of a Fiesta hands you a fresh pick, and the picks grow bolder as the match goes on. You build from one wave to the next, choosing one of a few options each time and keeping it for the rest of the bout.",
-      "waveSilverTitle": "Silver",
-      "waveSilverBody": "The opening wave: clean, single-stat boosts that sharpen the basics of your class.",
-      "waveGoldTitle": "Gold",
-      "waveGoldBody": "The middle wave: two-edged combos where your build starts to take shape and sing.",
-      "wavePrismaticTitle": "Prismatic",
-      "wavePrismaticBody": "The final wave: build-defining, screen-melting spikes meant to feel ridiculous in the best way.",
-      "powerupsTitle": "Power-ups in the ring",
-      "powerupsBody": "Glowing orbs also drop into the arena mid-fight, free for whoever reaches them first. They are deliberately over the top and last only a short while: Speed Demon for a blink of blinding pace, Colossus to swell up into a lumbering giant, Moon Boots for a bouncing, low-gravity leap, and Berserker for a sudden surge of fury.",
-      "ladderHeading": "Climbing the ladder",
-      "ladderBody": "Ranked play tracks your standing over time. Check the leaderboard to see where you sit and who holds the top of the realm."
+      "heading": "竞技场与 PvP",
+      "intro": "想要与其他玩家一较高下吗？玩家对战内置其中，而且始终由你选择，绝不会被强加于你。",
+      "duelsHeading": "决斗",
+      "duelsBody": "可以向你遇到的任何玩家发起一场友好的决斗。除了荣誉，没有任何东西被押上，因此这是了解某种对局，或友好地一较高下的最简单方式。",
+      "coliseumHeading": "灰烬角斗场",
+      "coliseumBody": "竞技场是这片位面的角斗场，你将在排名比赛中对阵其他玩家。获胜则排名攀升，最强的斗士会登上排行榜，供所有人瞻仰。",
+      "fiestaHeading": "二对二嘉年华",
+      "fiestaBody": "嘉年华是一种快节奏的二对二模式，以短回合进行。每回合之间，你可以选取增幅，即时重塑你套路的快速强化，让没有两场比赛玩法完全相同。",
+      "augmentsNote": "增幅和强化只在本场比赛中有效。它们关乎的是趣味、即兴的临场构筑，而非长久的强势，因此没人能靠花钱赢得胜利。",
+      "wavesTitle": "增幅分波登场",
+      "wavesBody": "嘉年华的每一回合都会递给你一次全新的选择，随着比赛推进，可选的强化也愈发大胆。你从一波构筑到下一波，每次从寥寥几个选项中挑选其一，并在余下的对局中一直保留它。",
+      "waveSilverTitle": "白银",
+      "waveSilverBody": "开场一波：干净利落的单项属性提升，磨砺你职业的基本功。",
+      "waveGoldTitle": "黄金",
+      "waveGoldBody": "中段一波：双刃组合，你的构筑在此开始成型、绽放光彩。",
+      "wavePrismaticTitle": "棱彩",
+      "wavePrismaticBody": "最后一波：足以定义构筑、炸裂屏幕的爆发，意在以最酣畅淋漓的方式让你直呼离谱。",
+      "powerupsTitle": "竞技场中的强化道具",
+      "powerupsBody": "激战正酣时，发光的能量球还会落入竞技场，谁先抢到便归谁。它们刻意夸张到极致，且只持续片刻：极速恶魔让你瞬间快得令人目眩，巨像将你膨胀成步履蹒跚的庞然大物，月靴带来低重力的弹跳腾跃，狂战士则让你猛然涌起一股暴怒。",
+      "ladderHeading": "攀登天梯",
+      "ladderBody": "排名对战会长期追踪你的排名。查看排行榜，看看你身处何处，以及谁占据着这片位面的榜首。"
     },
     "wishPage": {
-      "heading": "Things I wish I knew",
-      "intro": "A few honest truths that save new players a lot of second-guessing. None of it is required reading, but all of it helps.",
-      "i1Title": "You cannot pick a wrong class",
-      "i1Body": "Every class can hold its own and reach the cap. Choose the fantasy you like, not the one someone else calls best.",
-      "i2Title": "Dying barely costs you",
-      "i2Body": "When you fall, you release at a graveyard and run back to your body. No experience is lost, so it is safe to take risks and learn.",
-      "i3Title": "Talents are not a trap",
-      "i3Body": "They unlock at level 10 and reset whenever you want, so your early choices are never permanent.",
-      "i4Title": "Follow the quest trail",
-      "i4Body": "Quests are the fastest way to level and they lead you across the world. When you are unsure where to go, find the next marker.",
-      "i5Title": "Keep your gear current",
-      "i5Body": "A fresh upgrade does more for you than perfect play in old gear. Take the quest rewards that suit your class.",
-      "i6Title": "Grouping is a choice, not a chore",
-      "i6Body": "Most of the world is soloable. Team up for dungeons and the raid, or just when you want some company.",
-      "i7Title": "Learn your resource",
-      "i7Body": "Rage, mana, or energy, managing it well is half of playing your class. Watch that bar, not only your cooldowns.",
-      "i8Title": "Rest between fights",
-      "i8Body": "Eat and drink to recover quickly, especially as a caster. A few seconds now saves a death later."
+      "heading": "我希望早点知道的事",
+      "intro": "几条朴实的真相，能帮新玩家省去许多犹豫不决。这些都不是必读内容，但每一条都有帮助。",
+      "i1Title": "你不会选错职业",
+      "i1Body": "每个职业都能独当一面并抵达等级上限。选你喜欢的那种幻想，而不是别人口中所谓最强的那个。",
+      "i2Title": "死亡几乎不会让你付出代价",
+      "i2Body": "当你倒下时，你会在墓地复活并跑回自己的尸体。不会损失经验，所以放心去冒险、去学习。",
+      "i3Title": "天赋不是陷阱",
+      "i3Body": "它们在 10 级解锁，随时都能重置，所以你早期的选择绝不是永久的。",
+      "i4Title": "跟着任务线走",
+      "i4Body": "任务是升级最快的途径，还会带你走遍整个世界。当你不确定该去哪里时，找到下一个标记。",
+      "i5Title": "保持装备常新",
+      "i5Body": "一件崭新的升级装备，胜过穿着旧装备的完美操作。挑选适合你职业的任务奖励。",
+      "i6Title": "组队是一种选择，而非负担",
+      "i6Body": "世界的大部分内容都可以单人完成。打地下城和团队副本时再组队，或者只是想找人作伴时。",
+      "i7Title": "了解你的资源",
+      "i7Body": "怒气、法力还是能量，把它管理好是玩好职业的一半。盯着那条资源条，而不只是冷却时间。",
+      "i8Title": "战斗间隙稍作休整",
+      "i8Body": "进食和饮水可以快速恢复，施法职业尤其如此。现在花几秒钟，可以避免之后的一次死亡。"
     },
     "viewer": {
-      "view3d": "View {name} in 3D",
-      "view3dShort": "View in 3D",
-      "loading": "Loading model...",
-      "error": "The 3D model could not be loaded. The art above still shows this {name}.",
-      "dragHint": "Drag to turn the model. Use the left and right arrow keys when it is focused.",
-      "canvasLabel": "Rotatable 3D model of {name}"
+      "view3d": "以 3D 查看 {name}",
+      "view3dShort": "以 3D 查看",
+      "loading": "正在载入模型……",
+      "error": "无法载入该 3D 模型。上方的美术图仍展示着这个 {name}。",
+      "dragHint": "拖动以转动模型。模型获得焦点时，可使用左右方向键。",
+      "canvasLabel": "可旋转的 {name} 3D 模型"
     },
     "models": {
-      "title": "3D Model Viewer",
-      "lead": "Inspect the heroes, monsters, and demons of the world up close. Choose a model, then drag to turn it.",
-      "intro": "Every figure here is the same model you meet in the game, rendered live in your browser. Pick one to load it.",
-      "groupClasses": "Classes",
-      "groupCreatures": "Creatures",
-      "groupPets": "Warlock Demons",
-      "pickerLabel": "Choose a model to view",
-      "count": "{count} models",
-      "noWebgl": "This browser cannot display 3D models. Everything is still listed on the class and bestiary pages."
+      "title": "3D 模型查看器",
+      "lead": "近距离端详世界中的英雄、怪物与恶魔。选择一个模型，再拖动来转动它。",
+      "intro": "这里的每一个角色都与你在游戏中遇到的模型别无二致，在你的浏览器中实时渲染。选择其一即可载入。",
+      "groupClasses": "职业",
+      "groupCreatures": "生物",
+      "groupPets": "术士恶魔",
+      "pickerLabel": "选择要查看的模型",
+      "count": "{count} 个模型",
+      "noWebgl": "此浏览器无法显示 3D 模型。所有内容仍可在职业页与生物图鉴页中查看。"
     },
     "gear": {
-      "intro": "Gear is the equipment your character wears and the items you carry. Better gear is the steadiest way to grow stronger, and you pick most of it up just by playing.",
-      "slotsTitle": "What you can equip",
-      "slotsBody": "You have a weapon slot and seven armor slots. Each piece you equip adds to your character, and you can mix and match freely as you find upgrades.",
-      "slotMainhand": "Weapon",
-      "slotHelmet": "Head",
-      "slotShoulder": "Shoulders",
-      "slotChest": "Chest",
-      "slotWaist": "Waist",
-      "slotLegs": "Legs",
-      "slotGloves": "Hands",
-      "slotFeet": "Feet",
-      "qualityTitle": "Quality, at a glance",
-      "qualityBody": "Every item has a quality, and its name is colored to match so you can read its worth at a glance. From most common to most prized:",
-      "qualityPoor": "Poor",
-      "qualityCommon": "Common",
-      "qualityUncommon": "Uncommon",
-      "qualityRare": "Rare",
-      "qualityEpic": "Epic",
-      "qualityLegendary": "Legendary",
-      "qualityNote": "Higher quality usually means better stats, but quality is a hint, not a rule. A well-matched piece for your class and level can beat a flashier one.",
-      "upgradeTitle": "Keep your gear current",
-      "upgradeBody": "Replacing an old piece with a fresh upgrade does more for you than playing perfectly in gear you have outgrown. When something better drops or a quest offers it, take it. Do not save your good items for later.",
-      "sourcesTitle": "Where gear comes from",
-      "sourcesBody": "Most of your early upgrades are quest rewards, so it pays to finish quests rather than grind. Enemies drop gear when you defeat them, vendors in town sell solid basics, and the player market lets you buy from other adventurers.",
-      "consumablesTitle": "Consumables",
-      "consumablesIntro": "Some items are used once for a quick benefit. They are cheap insurance, so keep a few on hand.",
-      "consumablesPotions": "Potions restore health or mana the moment you use them, even mid-fight, which makes them a clutch save when a pull goes wrong. They share a short cooldown, so plan one good moment to use them.",
-      "consumablesFood": "Food and drink restore you while you sit and rest between fights. Eating recovers health, drinking recovers mana, and resting this way is free. Sit down for a few seconds after a tough fight instead of running into the next one half-healed.",
-      "consumablesElixirs": "Elixirs grant a temporary buff while you adventure, a small edge that helps when you want to push a little further.",
-      "fishingTitle": "Fishing",
-      "fishingBody": "Fishing is a calm change of pace. Equip a fishing pole, cast into open water, and reel in what bites. You mostly catch fish you can cook into food, the odd bit of junk to sell for a few coins, and now and then a prized rare catch. What you find depends on the water you fish in.",
-      "fishingFood": "The fish you reel in are raw, and raw fish are food. Cook your catch and it heals more when you sit to eat, with the better fish coming from the colder, deeper waters in the north. A line in the lake is a quiet way to keep your pack stocked between fights.",
-      "fishingRare": "Now and then your line catches something far better than supper: a shimmering prized fish that any angler might luck into in any water. Hook one and your log lights up with the catch. It is the kind of lucky pull that makes an idle afternoon at the lake worth telling people about.",
-      "cosmeticsTitle": "Looks and cosmetics",
-      "cosmeticsBody": "Some rewards change only how your character looks, never how strong you are. These cosmetic skins let you stand out without affecting the game, so wear whichever you like.",
-      "cosmeticsRanks": "Cosmetics come in rarity tiers of their own, and the rarer ones are a fun thing to chase. Earning a higher tier also unlocks the looks below it.",
-      "cosmeticsSkins": "There are two cosmetic lines to collect. Every class has a handful of alternate appearances, a fresh take on its look that is yours alone to wear. Alongside them sit chromas: named two-tone color schemes that repaint a look entirely, from sober metals to bright imperial colors.",
-      "cosmeticsCache": "A few of these come from a mysterious cosmetic cache, a sealed prize that rolls one of three quality grades when you open it and grants the appearance to match. It is purely for looks: nothing inside it makes you stronger, only finer to look at."
+      "intro": "装备是你角色身上穿戴的行头，以及你随身携带的物品。更好的装备是变强最稳妥的途径，而其中大部分只需游玩便能到手。",
+      "slotsTitle": "你能装备什么",
+      "slotsBody": "你有一个武器栏和七个护甲栏。每件装备穿上都会增益你的角色，而且随着你找到升级，可以自由搭配。",
+      "slotMainhand": "武器",
+      "slotHelmet": "头部",
+      "slotShoulder": "肩部",
+      "slotChest": "胸部",
+      "slotWaist": "腰部",
+      "slotLegs": "腿部",
+      "slotGloves": "手部",
+      "slotFeet": "脚部",
+      "qualityTitle": "品质一览",
+      "qualityBody": "每件物品都有其品质，名称也以相应的颜色标示，让你一眼便能看出它的价值。从最常见到最珍贵：",
+      "qualityPoor": "粗糙",
+      "qualityCommon": "普通",
+      "qualityUncommon": "优良",
+      "qualityRare": "精良",
+      "qualityEpic": "史诗",
+      "qualityLegendary": "传说",
+      "qualityNote": "品质越高，属性通常越好，但品质只是参考，并非定律。一件契合你职业与等级的装备，可能胜过一件更华丽的。",
+      "upgradeTitle": "让装备保持更新",
+      "upgradeBody": "用一件全新的升级换下旧装备，比你穿着已经过时的行头打得再完美都更有意义。当有更好的东西掉落或任务给予时，拿下它。别把好物品留到以后。",
+      "sourcesTitle": "装备从何而来",
+      "sourcesBody": "早期的升级大多来自任务奖励，所以与其刷怪，不如完成任务更划算。敌人被击败时会掉落装备，城镇里的商人贩售扎实的基础货色，玩家市场则让你能从其他冒险者那里买东西。",
+      "consumablesTitle": "消耗品",
+      "consumablesIntro": "有些物品一次性使用，换来即时的好处。它们是廉价的保险，不妨随身备上几个。",
+      "consumablesPotions": "药水在你使用的那一刻便能恢复生命或法力，即便在激战中也可以，这让它们成为开怪失误时的救命稻草。它们共享一段较短的冷却，所以要选好一个绝佳时机来用。",
+      "consumablesFood": "食物与饮品会在你坐下休息、于两战之间恢复时为你回血回蓝。进食恢复生命，饮水恢复法力，如此休息分文不取。打完一场硬仗后先坐下几秒钟，别带着半残的血量冲进下一场。",
+      "consumablesElixirs": "合剂会在你冒险时给予一段临时增益，是想再多拼一把时的一点小优势。",
+      "fishingTitle": "钓鱼",
+      "fishingBody": "钓鱼是一种悠闲的调剂。装备好钓竿，向开阔的水域抛竿，再把上钩之物收线钓起。你大多会钓到可以烹饪成食物的鱼，偶尔有几件能卖几个铜板的杂物，时不时还会有一条珍贵的稀有渔获。你能钓到什么，取决于你垂钓的水域。",
+      "fishingFood": "你钓上来的鱼都是生的，而生鱼便是食物。把渔获烹熟，坐下进食时回血更多，越好的鱼来自北方越寒冷、越深的水域。在湖边垂下一竿，是于两战之间静静充实背包的好法子。",
+      "fishingRare": "时不时地，你的鱼线会钓上比晚餐好得多的东西：一条波光粼粼的珍贵鱼，任何垂钓者在任何水域都可能撞上的好运。钓中一条，你的日志便会因这份渔获而亮起。正是这种走运的一钓，让湖畔闲度的午后变得值得向人津津乐道。",
+      "cosmeticsTitle": "外观与装饰",
+      "cosmeticsBody": "有些奖励只改变你角色的外观，绝不影响你的强弱。这些外观皮肤能让你与众不同，又不会左右游戏，所以喜欢哪款就穿哪款。",
+      "cosmeticsRanks": "外观也有自己的稀有度层级，越稀有的越值得一追。赢得更高的层级也会解锁它之下的那些外观。",
+      "cosmeticsSkins": "有两条外观线可供收集。每个职业都有几款备选外观，是专属于你、独一份的全新风貌。与之相伴的还有炫彩：那是一组组带名号的双色配色方案，能将外观彻底重涂，从素雅的金属色到明艳的帝王色，应有尽有。",
+      "cosmeticsCache": "其中少数来自一个神秘的外观宝箱，那是一份封缄的奖励，开启时会随机滚出三种品质等级中的一种，并授予与之匹配的外观。它纯粹为了好看：里面没有任何东西能让你变强，只会让你更赏心悦目。"
     },
     "economy": {
-      "intro": "Coin oils the whole world: it buys gear and supplies, pays your repairs and quest costs, and changes hands between players. You pick all of this up just by playing, so think of this page as a map of where your money comes from and goes.",
-      "coinTitle": "Gold, silver, and copper",
-      "coinBody": "Money comes in three coins. A hundred copper make a silver, and a hundred silver make a gold, so your purse fills up from the smallest coin first. You earn it from quest rewards, from looting fallen enemies, and from selling what you no longer need.",
-      "vendorsTitle": "Vendors and what they keep",
-      "vendorsBody": "Towns and outposts are dotted with merchants, each with their own trade. Provisioners stock food and drink, weaponsmiths and armorers carry gear, herbalists deal in reagents, and a quartermaster keeps practical travel kit. Walk up to one to see what they sell.",
-      "buyingTitle": "Buying and selling",
-      "buyingBody": "Stand near a merchant to open their window. You can buy anything they stock if you can afford it, and sell most of what is in your bags for coin. If you sell something by mistake, a vendor will hold your recent sales so you can buy them back.",
-      "junkTitle": "Clearing out junk",
-      "junkBody": "Drops you have no use for still sell to any vendor, so empty your bags whenever you pass through town rather than letting them fill up. Truly worthless odds and ends can also be discarded outright to make room.",
-      "tradeTitle": "Trading with other players",
-      "tradeBody": "You can trade face to face with anyone standing near you. Both of you put items and coin into a shared window and the swap only happens once you both confirm it, so neither side can be caught out. It is the simple way to hand a friend a drop or settle a deal.",
-      "marketTitle": "The World Market",
-      "marketBody": "The Merchant runs the World Market, a player-driven exchange where you can buy and sell with people you may never meet. Speak to the Merchant to open it.",
-      "marketBrowse": "Browsing: scroll the listings or search by name to find what is for sale. Each listing shows the goods, the seller, and the asking price for the whole stack.",
-      "marketPost": "Posting: choose a stack from your bags, set your price, and list it. The goods are held by the Merchant until someone buys them. Unsold listings come back to you after a while, and you can reclaim one early if you change your mind.",
-      "marketCollect": "Collecting: when your goods sell, your proceeds wait for you at the Merchant. Return to collect the coin, along with anything that came back unsold. The Merchant takes a small cut of every completed sale.",
-      "marketPricing": "Pricing is up to you. Listing a little under what others are asking tends to sell faster, while a steep price may sit untouched. Browse first to see what the going rate looks like before you post."
+      "intro": "钱币让整个世界运转：它能购买装备与补给，支付修理费与任务开销，还能在玩家之间流转。这一切只需游玩便能逐渐到手，所以不妨把本页看作一张地图，标明你的钱从何而来、又向何处去。",
+      "coinTitle": "金币、银币与铜币",
+      "coinBody": "货币分为三种。一百铜币兑换一银币，一百银币兑换一金币，因此你的钱袋会从最小的铜币开始往上累积。你可以从任务奖励、击杀敌人后的拾取，以及变卖闲置之物中赚取它们。",
+      "vendorsTitle": "商人与他们的存货",
+      "vendorsBody": "城镇与哨站里星罗棋布地分布着商人，各有各的营生。补给商贩售食物饮品，武器匠与护甲匠经营装备，草药师专做材料生意，军需官则备有实用的旅行用具。走到其中一位面前，便能看到他们出售的东西。",
+      "buyingTitle": "买入与卖出",
+      "buyingBody": "站到商人身旁即可打开他的窗口。只要付得起钱，你就能买下他所贩售的任何东西，也能把背包里的大部分物品卖掉换取钱币。若你不小心卖错了东西，商人会保留你近期售出的物品，让你可以买回。",
+      "junkTitle": "清理废品",
+      "junkBody": "你用不上的掉落物依然能卖给任何商人，所以每次路过城镇都顺手清空背包，别让它们堆满。真正毫无价值的零碎杂物也可以直接丢弃以腾出空间。",
+      "tradeTitle": "与其他玩家交易",
+      "tradeBody": "你可以与站在身旁的任何人面对面交易。双方将物品与钱币放入一个共享窗口，唯有两人都确认后才会完成交换，因此谁也不会吃亏。这是把掉落物递给朋友或敲定一笔买卖最简单的方式。",
+      "marketTitle": "世界市场",
+      "marketBody": "商人经营着世界市场，这是一个由玩家驱动的交易所，你可以与素未谋面的人买卖。与商人对话即可打开它。",
+      "marketBrowse": "浏览：翻看列表或按名称搜索，找到正在出售的商品。每条挂单都会显示货物、卖家，以及整组货物的要价。",
+      "marketPost": "挂单：从背包中选一组货物，定下价格并挂出。在有人买下之前，货物会由商人代为保管。未售出的挂单过一段时间后会退还给你，若你改变主意，也可以提前取回其中一件。",
+      "marketCollect": "收取：当你的货物售出后，所得钱款会在商人处等你领取。回去收取钱币，连同任何未售出而退回的货物。商人会从每笔成交中抽取少许佣金。",
+      "marketPricing": "定价由你说了算。比别人略低一点往往卖得更快，而要价过高则可能无人问津。挂单前不妨先浏览一番，看看当下的行情如何。"
     },
     "social": {
-      "intro": "Most of the world is soloable, but the game is built to be played with other people. Here is how to talk, team up, and find your crowd.",
-      "chatHeading": "Chat channels",
-      "chatBody": "Chat is split into channels, each shown on its own tab. Type a message to send it on the active channel, or use a slash command to direct one line elsewhere. These are the channels you can talk on:",
-      "chanSay": "Say.",
-      "chanSayBody": "Your default voice. It reaches players close to you and is the one to use while questing side by side.",
-      "chanYell": "Yell.",
-      "chanYellBody": "A louder version of Say that carries a bit farther, enough to reach across a camp.",
-      "chanWhisper": "Whisper.",
-      "chanWhisperBody": "A private message to one player by name, wherever they are. Use it for a quiet word.",
-      "chanParty": "Party.",
-      "chanPartyBody": "Talk to everyone in your group, no matter how spread out you are.",
-      "chanGeneral": "General.",
-      "chanGeneralBody": "An always-on local channel for the people around you, good for asking a question or chatting.",
-      "chanWorld": "World.",
-      "chanWorldBody": "A realm-wide channel you opt into. Open its tab to join, and you will see and reach everyone online.",
-      "chanLfg": "Looking for Group.",
-      "chanLfgBody": "An opt-in realm-wide channel for finding people to run a dungeon. Open its tab to join.",
-      "chanGuild": "Guild and Officer.",
-      "chanGuildBody": "Channels for your guild. Guild chat reaches every member; the officer channel is just for officers.",
-      "partyHeading": "Forming a party",
-      "partyBody": "Invite another player by right-clicking their name and choosing to invite, or with a chat command. A party holds up to five players, and one of you is the leader.",
-      "partyCredit": "Group members near each other share kill and quest credit, so questing together is faster, never slower. A party is also how you step into a dungeon as a team.",
-      "raidBody": "Once you have a full party of five, the leader can convert it into a raid of up to ten, for the endgame raid.",
-      "lootHeading": "Party loot",
-      "lootBody": "When you group up, the party leader sets how loot is shared. The rules cover coin and items separately:",
-      "lootCoinTitle": "Coin.",
-      "lootCoinBody": "Money from a kill can go to whoever loots it, or be split evenly across the party.",
-      "lootCommonTitle": "Items.",
-      "lootCommonBody": "Ordinary drops can go to the looter, while better drops are put up for a roll so everyone gets a fair shot.",
-      "lootRollTitle": "Need, Greed, or Pass.",
-      "lootRollBody": "When an item goes to a roll, each eligible member chooses Need if they want it, Greed if they would only take it spare, or Pass to bow out. The highest roll wins.",
-      "friendsHeading": "Friends and ignore",
-      "friendsBody": "Add players to your friends list to see when they are online and where they are, so you can group up the moment they log in.",
-      "ignoreBody": "If someone is bothering you, add them to your ignore list and you will stop seeing their chat.",
-      "guildHeading": "Guilds",
-      "guildBody": "A guild is a lasting group of players you belong to between sessions. Create one or accept an invite to join, and you can be in one guild at a time. Members hold a rank: a leader, officers, and members.",
-      "guildChatBody": "Belonging to a guild gives you a private guild chat channel and shows your guildmates on a shared roster, so there are always familiar faces online.",
-      "etiquetteHeading": "Grouping etiquette",
-      "etiquetteBody": "Grouping is a choice, not a chore. Say hello when you join, roll Need only on gear you will actually use, and let the group know before you head off. A little courtesy goes a long way, and most players are glad of the company."
+      "intro": "世界的大部分内容都可单人完成，但这款游戏生来就是为了与他人同玩。这里讲的是如何交谈、组队，以及找到属于你的伙伴。",
+      "chatHeading": "聊天频道",
+      "chatBody": "聊天分为若干频道，各自显示在自己的标签页上。输入一条消息即可在当前频道发送，或用斜杠命令把某一句引向别处。以下是你可以发言的频道：",
+      "chanSay": "说。",
+      "chanSayBody": "你的默认嗓音。它能触及靠近你的玩家，是并肩做任务时该用的那个。",
+      "chanYell": "喊话。",
+      "chanYellBody": "比“说”更响亮的版本，传得稍远一些，足以跨过一整座营地。",
+      "chanWhisper": "密语。",
+      "chanWhisperBody": "按名字发给某一位玩家的私人消息，无论他们身在何处。用它来说几句悄悄话。",
+      "chanParty": "小队。",
+      "chanPartyBody": "与你队伍中的每一个人交谈，无论你们相隔多远。",
+      "chanGeneral": "综合。",
+      "chanGeneralBody": "一个面向你周围众人、始终开启的本地频道，适合提问或闲聊。",
+      "chanWorld": "世界。",
+      "chanWorldBody": "一个需自行加入、覆盖全服的频道。打开它的标签页即可加入，你便能看到并触及在线的每一个人。",
+      "chanLfg": "寻求组队。",
+      "chanLfgBody": "一个需自行加入、覆盖全服的频道，用于寻找一起打地下城的人。打开它的标签页即可加入。",
+      "chanGuild": "公会与官员。",
+      "chanGuildBody": "属于你公会的频道。公会聊天可触及每一位成员；官员频道则只供官员使用。",
+      "partyHeading": "组建小队",
+      "partyBody": "右键点击某位玩家的名字并选择邀请，或用一条聊天命令，即可邀请对方组队。一支小队最多容纳五名玩家，其中一人是队长。",
+      "partyCredit": "彼此靠近的队员会共享击杀与任务进度，所以一起做任务只会更快，绝不会更慢。组队也是你们作为一支队伍踏入地下城的方式。",
+      "raidBody": "一旦你凑齐五人的满编小队，队长便可将其转换为最多十人的团队，以挑战终局团队副本。",
+      "lootHeading": "小队战利品",
+      "lootBody": "组队之后，队长会设定战利品如何分配。规则将钱币与物品分开处理：",
+      "lootCoinTitle": "钱币。",
+      "lootCoinBody": "击杀所得的钱可以归拾取者，也可以在整支队伍间平均分配。",
+      "lootCommonTitle": "物品。",
+      "lootCommonBody": "普通掉落物可以归拾取者，而更好的掉落物则会拿出来掷骰，让每个人都有公平的机会。",
+      "lootRollTitle": "需求、贪婪或放弃。",
+      "lootRollBody": "当一件物品进入掷骰时，每位有资格的成员若想要它便选“需求”，若只是顺手收着便选“贪婪”，不想要则选“放弃”退出。点数最高者胜出。",
+      "friendsHeading": "好友与屏蔽",
+      "friendsBody": "把玩家加入好友列表，便能看到他们何时在线、身在何处，这样他们一登入你就能立刻组队。",
+      "ignoreBody": "若有人骚扰你，把他们加入屏蔽列表，你便不会再看到他们的聊天。",
+      "guildHeading": "公会",
+      "guildBody": "公会是一个跨越登录会话、你所归属的长久玩家团体。创建一个公会，或接受邀请加入，你同一时间只能身处一个公会。成员各持一种等级：一位会长、若干官员，以及成员。",
+      "guildChatBody": "归属于一个公会会给你一个私密的公会聊天频道，并将你的公会伙伴显示在一份共享的名册上，所以线上总有熟悉的面孔。",
+      "etiquetteHeading": "组队礼仪",
+      "etiquetteBody": "组队是一种选择，而非负担。加入时打声招呼，只对你真正会用的装备掷“需求”，离开前先知会队伍一声。一点点礼貌大有裨益，而且大多数玩家都乐于有伴同行。"
     },
     "stats": {
-      "intro": "Your character is described by a handful of attributes. You never have to memorize them to play well, but knowing roughly what each one does helps you read your character sheet and pick the right upgrades.",
-      "primaryHeading": "Primary attributes",
-      "primaryBody": "Five attributes shape your character: Strength, Agility, Stamina, Intellect, and Spirit. Each class leans on a different mix, so the ones that matter most depend on what you play.",
-      "strTitle": "Strength",
-      "strBody": "Strength raises your melee attack power, so your weapon swings hit harder. It does the most for the heavy melee classes that fight up close.",
-      "agiTitle": "Agility",
-      "agiBody": "Agility sharpens you in several ways: it raises your chance to land a critical hit and your chance to dodge, and it adds a little armor. For rogues and hunters it also feeds attack power, and it drives a hunter's ranged shots.",
-      "staTitle": "Stamina",
-      "staBody": "Stamina is your staying power. More Stamina means a larger health pool, and it speeds the health you recover while resting out of combat. Every class wants some.",
-      "intTitle": "Intellect",
-      "intBody": "Intellect grows a spellcaster's mana pool and improves the chance their spells crit. It matters to the classes that cast from mana; for a Rage or Energy class it does little.",
-      "spiTitle": "Spirit",
-      "spiBody": "Spirit governs how quickly a caster's mana returns while out of combat. Like Intellect, it serves the mana classes and means little to the others.",
-      "armorTitle": "Armor",
-      "armorBody": "Armor reduces the physical damage you take. It comes mostly from what you wear, and the heavier armor classes carry far more of it. More armor against a foe near your level means each of its hits lands softer.",
-      "apTitle": "Attack power",
-      "apBody": "Attack power measures how hard your weapon strikes. Your primary attributes feed it, and stronger weapons and gear raise it further, which is why an upgrade can be a real jump in damage.",
-      "critTitle": "Critical strike",
-      "critBody": "Your critical strike chance is how often an attack lands for extra damage. Everyone starts with a small base chance, and Agility (plus some talents and gear) builds on it.",
-      "dodgeTitle": "Dodge",
-      "dodgeBody": "Dodge is your chance to avoid an incoming melee attack entirely. You begin with a small base chance, and Agility raises it, so nimble classes slip more blows.",
-      "sheetHeading": "Reading your character sheet",
-      "sheetBody": "Open the character window in game to see all of this in one place: your five attributes on one side and the stats they feed on the other. Hover any value and a tooltip breaks down what it does for your class, so you can see at a glance which numbers an upgrade actually moved.",
-      "growHeading": "How your stats grow",
-      "growBody": "Two things raise your stats. Every level adds a fixed amount of each attribute to suit your class, and the gear you equip adds more on top. Keeping your gear current is the steadiest way to grow stronger, all the way to the level cap."
+      "intro": "你的角色由寥寥几项属性来描述。你无需把它们背得滚瓜烂熟也能玩得很好，但大致了解每一项的作用，有助于你读懂角色面板并挑选合适的升级。",
+      "primaryHeading": "主属性",
+      "primaryBody": "五项属性塑造你的角色：力量、敏捷、耐力、智力与精神。每个职业倚重的搭配各不相同，所以哪几项最要紧，取决于你玩什么。",
+      "strTitle": "力量",
+      "strBody": "力量提升你的近战攻击强度，让你的武器挥击更重。它对那些近身贴脸的重型近战职业作用最大。",
+      "agiTitle": "敏捷",
+      "agiBody": "敏捷会在多个方面磨砺你：它提升你打出暴击的几率和躲闪的几率，并增加少许护甲。对潜行者和猎人而言，它还会注入攻击强度，并驱动猎人的远程射击。",
+      "staTitle": "耐力",
+      "staBody": "耐力是你的持久之本。耐力越高，生命池越大，并加快你脱离战斗、休息时回复的生命。每个职业都想要一些。",
+      "intTitle": "智力",
+      "intBody": "智力会扩大施法者的法力池，并提升其法术暴击的几率。它对那些消耗法力施法的职业至关重要；对怒气或能量职业来说则作用甚微。",
+      "spiTitle": "精神",
+      "spiBody": "精神主宰施法者在脱离战斗时法力回复的快慢。与智力一样，它服务于法力职业，对其他职业则意义不大。",
+      "armorTitle": "护甲",
+      "armorBody": "护甲能减轻你受到的物理伤害。它大多来自你身上的穿戴，越重甲的职业携带得越多。面对一个与你等级相近的敌人时，护甲越高，它的每一次打击落下时就越轻。",
+      "apTitle": "攻击强度",
+      "apBody": "攻击强度衡量你的武器打击有多沉重。你的主属性会注入它，更强的武器与装备则会进一步提升它，这正是为何一次升级可能带来伤害的真正飞跃。",
+      "critTitle": "暴击",
+      "critBody": "你的暴击几率是攻击打出额外伤害的频率。每个人都从一个较低的基础几率起步，敏捷（外加一些天赋和装备）则在此之上叠加。",
+      "dodgeTitle": "躲闪",
+      "dodgeBody": "躲闪是你完全闪避一次来袭近战攻击的几率。你从一个较低的基础几率起步，敏捷会提升它，所以身手敏捷的职业能躲过更多打击。",
+      "sheetHeading": "读懂你的角色面板",
+      "sheetBody": "在游戏中打开角色窗口，便能在一处看到这一切：一侧是你的五项属性，另一侧是它们所注入的各项数值。将鼠标悬停在任意数值上，提示框便会拆解它对你职业的作用，让你一眼看出一次升级究竟改动了哪些数字。",
+      "growHeading": "你的属性如何成长",
+      "growBody": "有两样东西会提升你的属性。每次升级都会按你职业的需要为各项属性增加固定的数值，而你装备的行头则在此之上叠加更多。让装备保持更新，是你一路成长直至等级上限最稳妥的途径。"
     },
     "progression": {
-      "intro": "Every fight, quest, and step north makes your hero stronger. Here is how leveling works and what keeps you growing once you reach the top.",
-      "xpTitle": "How you gain experience",
-      "xpBody": "You earn experience by completing quests and by defeating enemies. Quests give the most by far, so following the quest trail is the fastest way to climb. Killing things along the way fills in the rest.",
-      "capBody": "Each level makes you tougher and brings new abilities, all the way to the cap of level {cap}.",
-      "journeyTitle": "The journey north",
-      "journeyBody": "The world is one continuous land, three zones laid south to north, each a step higher in level. You start in the green valley, press on through the marsh, and finish in the cold high peaks. Follow the quest trail and the land carries you from one to the next.",
-      "bandLabel": "Levels {min} to {max}",
-      "restedTitle": "Rested experience",
-      "restedBody": "When you log out, or rest in a safe place like an inn, your character builds up rested experience while you are away. The next time you go out and fight, that pool gives your kills an extra boost until it runs dry. It builds up over time and speeds your early levels, so logging off in town is never wasted time.",
-      "capTitle": "Reaching level {cap}",
-      "capJourneyBody": "Level {cap} is the cap, the end of leveling but not of growing. From there you run dungeons and the raid, chase better gear, and test yourself in the arena.",
-      "prestigeBody": "Experience keeps counting even after the cap. It feeds a cosmetic virtual level, so your experience bar keeps climbing, and a long-term prestige rank you can earn for the recognition. It is purely optional and never grants power, just a mark of the road you have walked.",
-      "noRush": "There is no rush. The world is there to enjoy at your own pace, so wander, take the quests that catch your eye, and let your hero grow along the way."
+      "intro": "每一场战斗、每一个任务、每一步北行，都会让你的英雄更强。这里讲的是升级如何运作，以及登顶之后是什么让你持续成长。",
+      "xpTitle": "如何获得经验",
+      "xpBody": "你通过完成任务和击败敌人来赚取经验。任务给的经验远多于其他途径，所以循着任务指引走是升级最快的方式。沿途击杀则补足其余部分。",
+      "capBody": "每升一级都会让你更加坚韧，并带来新的技能，一路直至 {cap} 级的等级上限。",
+      "journeyTitle": "北行之旅",
+      "journeyBody": "整个世界是一片连绵不绝的大陆，三大区域由南向北铺展，每一处的等级都更高一层。你从翠绿的山谷启程，一路穿过湿地，最终止步于寒冷的高耸峰巅。循着任务指引而行，这片土地便会带你从一处走向下一处。",
+      "bandLabel": "{min} 至 {max} 级",
+      "restedTitle": "充分休息的经验",
+      "restedBody": "当你登出，或在客栈这样的安全之地休息时，你的角色会在你离开期间积攒充分休息的经验。下次你外出作战时，那一池经验会为你的击杀带来额外加成，直至耗尽。它会随时间累积，并加快你早期的升级，所以在城镇里登出从来都不算浪费时间。",
+      "capTitle": "抵达 {cap} 级",
+      "capJourneyBody": "{cap} 级是上限，是升级的终点，却非成长的尽头。从那时起，你可以打地下城和团队副本、追逐更好的装备，并在竞技场中检验自己。",
+      "prestigeBody": "即便到了等级上限，经验依然在累积。它会注入一个纯装饰性的虚拟等级，让你的经验条不断攀升，还会注入一个可供长期赢取以彰显荣誉的声望等级。这完全是可选的，绝不赋予战力，只是你走过这条路的印记。",
+      "noRush": "不必着急。这个世界供你按自己的节奏尽情享受，所以尽管漫步，接下吸引你的任务，让你的英雄在旅途中渐渐成长。"
     },
     "placeholder": {
-      "note": "This part of the guide is on its way."
+      "note": "本部分指南正在筹备中。"
     },
     "notFound": {
-      "title": "We could not find that page",
-      "body": "The page you were looking for does not exist or may have moved.",
-      "home": "Back to the overview"
+      "title": "我们找不到该页面",
+      "body": "你寻找的页面不存在,或者可能已被移动。",
+      "home": "返回概览"
     }
   },
   "skinEvent": {
@@ -1529,8 +1529,8 @@ export const zh_CN: EnTranslations = {
     "news": "新闻资讯",
     "download": "下载客户端",
     "loginRegister": "登录/注册",
-    "account": "Account",
-    "logout": "Logout",
+    "account": "账户",
+    "logout": "退出登录",
     "donate": "捐赠"
   },
   "stats": {
@@ -1630,185 +1630,185 @@ export const zh_CN: EnTranslations = {
     "enterWorld": "进入世界",
     "offlineCharacter": "单机角色",
     "create": "创建",
-    "twoFactorLabel": "Authentication code",
-    "twoFactorPlaceholder": "6-digit or recovery code",
-    "twoFactorHint": "Enter the code from your authenticator app, or one of your recovery codes."
+    "twoFactorLabel": "验证码",
+    "twoFactorPlaceholder": "6 位验证码或恢复码",
+    "twoFactorHint": "请输入身份验证器应用中的验证码，或一个恢复码。"
   },
   "wallet": {
-    "label": "$WOC Wallet",
-    "connect": "Verify Wallet",
-    "connectTitle": "Verify your Solana wallet",
-    "connectAria": "Verify your Solana wallet",
-    "verify": "Verify Wallet",
-    "verifyNew": "Verify New Wallet",
-    "verifyTitle": "Choose a wallet and sign once to verify ownership.",
-    "verifyAria": "Choose a wallet and sign once to verify ownership",
-    "verifyAddressAria": "Sign to verify wallet {address} for your account",
-    "appConnected": "App Connected",
-    "connectApp": "Connect App",
-    "connectAppTitle": "Connect the wallet app on this browser",
-    "connectAppAria": "Connect the wallet app on this browser",
-    "verifying": "Verifying...",
-    "verifyingTitle": "Wallet verification is in progress.",
-    "switch": "Switch",
-    "switchTitle": "Verify a different wallet",
-    "switchAria": "Verify a different wallet",
-    "unlink": "Unlink",
-    "unlinkTitle": "Remove wallet verification from this account",
-    "unlinkAria": "Remove wallet verification from this account",
-    "signOut": "Disconnect",
-    "signOutTitle": "Disconnect the wallet app on this browser",
-    "signOutAria": "Disconnect the wallet app on this browser",
-    "hide": "Hide",
-    "hideTitle": "Hide wallet row on this screen",
-    "hideAria": "Hide wallet row on this screen",
-    "hiddenNotice": "Wallet row hidden. Re-enable it in-game from Options > Interface.",
-    "linkedTitle": "Wallet verified for your account. Click to manage the wallet app.",
-    "linkedDisconnectedTitle": "Wallet remains verified for your account. Reconnect to manage the wallet app.",
-    "linkedDisconnectedAria": "Wallet remains verified for your account. Reconnect to manage the wallet app.",
-    "linkTitle": "Click to sign and link this wallet to your account.",
-    "connectedTitle": "Connected. Log in to link this wallet to your account.",
-    "balanceTitle": "Verified Solana wallet $WOC balance",
-    "balanceAria": "Verified Solana wallet balance: {balance}",
-    "balancePreviewTitle": "Connected wallet $WOC balance preview",
-    "balancePreviewAria": "Connected wallet balance preview: {balance}. Link the wallet to verify holder flair.",
+    "label": "$WOC 钱包",
+    "connect": "验证钱包",
+    "connectTitle": "验证你的 Solana 钱包",
+    "connectAria": "验证你的 Solana 钱包",
+    "verify": "验证钱包",
+    "verifyNew": "验证新钱包",
+    "verifyTitle": "选择一个钱包并签名一次以验证所有权。",
+    "verifyAria": "选择一个钱包并签名一次以验证所有权",
+    "verifyAddressAria": "签名以为你的账号验证钱包 {address}",
+    "appConnected": "应用已连接",
+    "connectApp": "连接应用",
+    "connectAppTitle": "在此浏览器中连接钱包应用",
+    "connectAppAria": "在此浏览器中连接钱包应用",
+    "verifying": "正在验证...",
+    "verifyingTitle": "钱包验证正在进行中。",
+    "switch": "切换",
+    "switchTitle": "验证另一个钱包",
+    "switchAria": "验证另一个钱包",
+    "unlink": "解除绑定",
+    "unlinkTitle": "从此账号移除钱包验证",
+    "unlinkAria": "从此账号移除钱包验证",
+    "signOut": "断开连接",
+    "signOutTitle": "在此浏览器中断开钱包应用",
+    "signOutAria": "在此浏览器中断开钱包应用",
+    "hide": "隐藏",
+    "hideTitle": "在此界面隐藏钱包行",
+    "hideAria": "在此界面隐藏钱包行",
+    "hiddenNotice": "钱包行已隐藏。可在游戏内的“选项 > 界面”中重新启用。",
+    "linkedTitle": "钱包已为你的账号验证。点击管理钱包应用。",
+    "linkedDisconnectedTitle": "钱包仍为你的账号保持验证。重新连接以管理钱包应用。",
+    "linkedDisconnectedAria": "钱包仍为你的账号保持验证。重新连接以管理钱包应用。",
+    "linkTitle": "点击签名并将此钱包绑定到你的账号。",
+    "connectedTitle": "已连接。登录后可将此钱包绑定到你的账号。",
+    "balanceTitle": "已验证 Solana 钱包的 $WOC 余额",
+    "balanceAria": "已验证 Solana 钱包余额：{balance}",
+    "balancePreviewTitle": "已连接钱包的 $WOC 余额预览",
+    "balancePreviewAria": "已连接钱包余额预览：{balance}。绑定钱包即可验证持有者标识。",
     "balanceAmount": "{amount} $WOC",
-    "connected": "Connected: {address}",
-    "connectedWithBalance": "Connected: {balance} - {address}",
-    "connectedLinked": "Verified: {address}",
-    "connectedLinkedWithBalance": "Verified: {balance} - {address}",
-    "helpDisconnected": "Verify a Solana wallet to enable holder flair and player-card badges. No transaction or SOL required.",
-    "helpLoginToLink": "Connected {address}. Log in to link it to your account.",
-    "helpLoginToLinkWithBalance": "Connected {address} with {balance}. Log in to link it to your account.",
-    "helpReadyToLink": "Wallet selected: {address}. Sign once to verify holder flair and player cards.",
-    "helpReadyToLinkWithBalance": "Wallet selected: {address} with {balance}. Sign once to verify holder flair and player cards.",
-    "helpLinked": "Holder perks are active. Wallet app connected on this browser.",
-    "helpLinkedWithBalance": "Holder perks are active. Wallet app connected on this browser.",
-    "helpLinkedDisconnected": "Holder perks are active. Connect the app when you need to sign or spend.",
-    "helpLinkedDisconnectedWithBalance": "Holder perks are active. Connect the app when you need to sign or spend.",
-    "flowConnect": "Choose a wallet. Verification continues automatically.",
-    "flowSign": "Sign the verification message in your wallet app. No transaction or SOL required.",
-    "flowVerify": "Verifying wallet ownership...",
-    "linkFailed": "Wallet verification failed.",
-    "verifyFailed": "Wallet verification failed.",
-    "unlinkFailed": "Could not unlink wallet.",
-    "holder": "$WOC holder",
-    "holderTierTitle": "{tier} $WOC holder",
+    "connected": "已连接：{address}",
+    "connectedWithBalance": "已连接：{balance} - {address}",
+    "connectedLinked": "已验证：{address}",
+    "connectedLinkedWithBalance": "已验证：{balance} - {address}",
+    "helpDisconnected": "验证 Solana 钱包以启用持有者标识和玩家卡徽章。无需交易或 SOL。",
+    "helpLoginToLink": "已连接 {address}。登录后可将它绑定到你的账号。",
+    "helpLoginToLinkWithBalance": "已连接 {address}，余额 {balance}。登录后可将它绑定到你的账号。",
+    "helpReadyToLink": "已选择钱包：{address}。签名一次即可验证持有者标识和玩家卡。",
+    "helpReadyToLinkWithBalance": "已选择钱包：{address}，余额 {balance}。签名一次即可验证持有者标识和玩家卡。",
+    "helpLinked": "持有者特权已启用。钱包应用已在此浏览器中连接。",
+    "helpLinkedWithBalance": "持有者特权已启用。钱包应用已在此浏览器中连接。",
+    "helpLinkedDisconnected": "持有者特权已启用。需要签名或消费时请连接应用。",
+    "helpLinkedDisconnectedWithBalance": "持有者特权已启用。需要签名或消费时请连接应用。",
+    "flowConnect": "选择一个钱包。验证会自动继续。",
+    "flowSign": "在钱包应用中签署验证消息。无需交易或 SOL。",
+    "flowVerify": "正在验证钱包所有权...",
+    "linkFailed": "钱包验证失败。",
+    "verifyFailed": "钱包验证失败。",
+    "unlinkFailed": "无法解除钱包绑定。",
+    "holder": "$WOC 持有者",
+    "holderTierTitle": "{tier} $WOC 持有者",
     "holderTiers": {
       "ember": {
-        "name": "Ember",
-        "flavor": "The spark is lit."
+        "name": "余烬",
+        "flavor": "火种已经点燃。"
       },
       "coinbearer": {
-        "name": "Coinbearer",
-        "flavor": "First coin in the war chest."
+        "name": "持币者",
+        "flavor": "第一枚硬币已入战箱。"
       },
       "coppercrest": {
-        "name": "Coppercrest",
-        "flavor": "Coppers stacked, your name spoken."
+        "name": "铜徽",
+        "flavor": "铜币成堆，你的名字开始流传。"
       },
       "silverbound": {
-        "name": "Silverbound",
-        "flavor": "Bound in silver, building the bag."
+        "name": "银誓",
+        "flavor": "白银相系，钱袋渐丰。"
       },
       "gilded": {
-        "name": "Gilded",
-        "flavor": "Gilded and grinning."
+        "name": "鎏金",
+        "flavor": "金光加身，笑意盈盈。"
       },
       "vaultwarden": {
-        "name": "Vaultwarden",
-        "flavor": "Guarding a real vault now: 0.01% of all $WOC."
+        "name": "宝库守望者",
+        "flavor": "如今守护着真正的宝库：全部 $WOC 的 0.01%。"
       },
       "whale": {
-        "name": "Whale",
-        "flavor": "The deep parts when you swim: 0.1% of supply."
+        "name": "巨鲸",
+        "flavor": "你游过时，深水也会分开：供应量的 0.1%。"
       },
       "leviathan": {
-        "name": "Leviathan",
-        "flavor": "Markets feel you move: 1% of supply."
+        "name": "利维坦",
+        "flavor": "市场会感到你的动作：供应量的 1%。"
       },
       "tidelord": {
-        "name": "Tidelord",
-        "flavor": "The tide answers your call: 2% of supply."
+        "name": "潮汐领主",
+        "flavor": "潮汐回应你的召唤：供应量的 2%。"
       },
       "stormcaller": {
-        "name": "Stormcaller",
-        "flavor": "Storms gather at your name: 3% of supply."
+        "name": "唤雷者",
+        "flavor": "风暴因你的名字而聚集：供应量的 3%。"
       },
       "krakencrown": {
-        "name": "Krakencrown",
-        "flavor": "Crowned by the deep: 4% of supply."
+        "name": "海渊冠冕",
+        "flavor": "深海为你加冕：供应量的 4%。"
       },
       "titanforged": {
-        "name": "Titanforged",
-        "flavor": "Forged among titans: 5% of supply."
+        "name": "泰坦铸成",
+        "flavor": "在泰坦之间锻造而成：供应量的 5%。"
       },
       "starhoard": {
-        "name": "Starhoard",
-        "flavor": "A hoard that bends starlight: 6% of supply."
+        "name": "星藏者",
+        "flavor": "能弯折星光的宝藏：供应量的 6%。"
       },
       "voidwarden": {
-        "name": "Voidwarden",
-        "flavor": "Keeper at the void's edge: 7% of supply."
+        "name": "虚空守望者",
+        "flavor": "守在虚空边缘：供应量的 7%。"
       },
       "realmshaper": {
-        "name": "Realmshaper",
-        "flavor": "You reshape the realm: 8% of supply."
+        "name": "塑界者",
+        "flavor": "你重塑着领域：供应量的 8%。"
       },
       "worldforger": {
-        "name": "Worldforger",
-        "flavor": "Forging a world of your own: 9% of supply."
+        "name": "铸世者",
+        "flavor": "锻造属于你的世界：供应量的 9%。"
       },
       "worldbearer": {
-        "name": "Worldbearer",
-        "flavor": "You carry a piece of the world: 10% of supply."
+        "name": "承世者",
+        "flavor": "你肩负着世界的一片：供应量的 10%。"
       },
       "sovereign": {
-        "name": "Sovereign",
-        "flavor": "The realm bends the knee: the entire supply."
+        "name": "君主",
+        "flavor": "整个领域为你俯首：全部供应量。"
       }
     }
   },
   "playerCard": {
-    "shareButton": "Share Player Card",
-    "title": "Player Card",
-    "close": "Close player card",
-    "loading": "Forging your card...",
-    "poseGroup": "Pose",
-    "poseHero": "Hero",
-    "poseBattle": "Battle",
-    "poseVictory": "Victory",
-    "referralLinkLabel": "Your referral link. Anyone who joins through it is credited to you:",
-    "referralLinkAria": "Your referral link",
-    "renderFailed": "Could not render your card. Try a different pose.",
-    "renderFailedStatus": "Card render failed.",
-    "levelClass": "Level {level} - {className}",
-    "topPercent": "TOP {percent}%",
-    "realmSubtitle": "{realm} Realm",
-    "defaultRealm": "World of ClaudeCraft",
+    "shareButton": "分享玩家卡",
+    "title": "玩家卡",
+    "close": "关闭玩家卡",
+    "loading": "正在锻造你的卡片...",
+    "poseGroup": "姿势",
+    "poseHero": "英雄",
+    "poseBattle": "战斗",
+    "poseVictory": "胜利",
+    "referralLinkLabel": "你的推荐链接。任何通过它加入的人都会记在你名下：",
+    "referralLinkAria": "你的推荐链接",
+    "renderFailed": "无法渲染你的卡片。请尝试其他姿势。",
+    "renderFailedStatus": "卡片渲染失败。",
+    "levelClass": "{level}级 - {className}",
+    "topPercent": "前 {percent}%",
+    "realmSubtitle": "{realm} 服务器",
+    "defaultRealm": "ClaudeCraft 世界",
     "brandWordmark": "WORLD OF CLAUDECRAFT",
-    "recruited": "{count} recruited",
+    "recruited": "已招募 {count} 人",
     "footerHandle": "@{handle}",
     "footerHandleWithRecruits": "@{handle} - {recruited}",
-    "footerCta": "Forge your legend: {siteUrl}",
-    "arenaStat": "Arena",
-    "shareTierBit": ", {tier}-rank $WOC holder",
-    "shareText": "I'm forging my legend in World of ClaudeCraft: Level {level} {className}{tierBit}. Join my realm:",
-    "nativeShareTitle": "World of ClaudeCraft",
-    "fileNameFallback": "player",
-    "actionShareX": "Share to X",
-    "actionCopyReferral": "Copy Referral Link",
-    "actionDownload": "Download",
-    "actionShareNative": "Share...",
-    "statusGenericError": "Something went wrong.",
-    "statusStillRendering": "Card is still rendering.",
-    "statusPublishing": "Publishing card...",
-    "statusPublished": "Card published. Share your referral link below.",
-    "statusOpenedXWithImage": "Opened X. Paste the card image into the post.",
-    "statusOpenedXWithLink": "Opened X with your link. The card image appears after posting from a public domain.",
-    "statusReferralCopied": "Referral link copied. Share it anywhere.",
-    "statusDownloaded": "Card downloaded.",
-    "statusShareUnsupported": "Sharing is not supported on this device."
+    "footerCta": "铸就你的传说：{siteUrl}",
+    "arenaStat": "竞技场",
+    "shareTierBit": "，{tier}级 $WOC 持有者",
+    "shareText": "我正在 World of ClaudeCraft 中铸就传说：{level}级 {className}{tierBit}。加入我的服务器：",
+    "nativeShareTitle": "ClaudeCraft 世界",
+    "fileNameFallback": "玩家",
+    "actionShareX": "分享到 X",
+    "actionCopyReferral": "复制推荐链接",
+    "actionDownload": "下载",
+    "actionShareNative": "分享...",
+    "statusGenericError": "出现了问题。",
+    "statusStillRendering": "卡片仍在渲染。",
+    "statusPublishing": "正在发布卡片...",
+    "statusPublished": "卡片已发布。请在下方分享你的推荐链接。",
+    "statusOpenedXWithImage": "已打开 X。请将卡片图片粘贴到帖子中。",
+    "statusOpenedXWithLink": "已打开 X 并附上你的链接。卡片图片会在从公共域名发帖后显示。",
+    "statusReferralCopied": "推荐链接已复制。可分享到任何地方。",
+    "statusDownloaded": "卡片已下载。",
+    "statusShareUnsupported": "此设备不支持分享。"
   },
   "classes": {
     "warrior": "战士",
@@ -1861,259 +1861,259 @@ export const zh_CN: EnTranslations = {
   },
   "sim": {
     "delve": {
-      "cannotEnterNow": "You cannot enter a delve right now.",
-      "leaveDungeonFirst": "Leave the dungeon first.",
-      "leaveArenaFirst": "Leave the arena first.",
-      "alreadyInDelve": "You are already in a delve.",
-      "whileTrading": "You cannot enter a delve while trading.",
-      "duringDuel": "You cannot enter a delve during a duel.",
-      "duringArena": "You cannot enter a delve during an arena match.",
-      "unknownTier": "Unknown delve tier.",
-      "levelRequired": "You must be level {level} to enter {name}.",
-      "levelRequiredTier": "You must be level {level} to enter {name} on {tier}.",
-      "instancesBusy": "All instances of {name} are busy. Try again soon.",
-      "runFailed": "{name} run failed.",
-      "complete": "{name} complete.",
-      "mechanismOpen": "A mechanism clicks open nearby. A passage opens to the north. Find the exit portal ahead.",
-      "raiseDead": "{name} begins Raise Dead.",
-      "graveFalters": "The grave rite falters.",
-      "doorAlreadyOpen": "The door is already open.",
-      "companionRankUp": "{name} reaches rank {rank}.",
-      "bossChest": "The boss falls. A warded reliquary chest rises on the dais. Pick its lock to claim your spoils.",
-      "surfaceStairs": "A stairway to the surface opens. Press F at the stairs to leave.",
-      "moduleEnter": "{name}: {objective}",
-      "objectiveClearRoom": "Clear the room.",
-      "objectiveDefeatBoss": "Defeat the boss.",
-      "tombstoneHint": "A tombstone passage opens to the north when the room is cleared.",
-      "tombstoneOpen": "A sealed tombstone passage grinds open to the north. Walk into it to continue.",
-      "tombstoneInto": "You pass through the tombstone into {name}.",
-      "chestEmpty": "The chest is empty.",
-      "notInDelve": "You are not in a delve.",
-      "cannotInteract": "You cannot interact with that.",
-      "tooFar": "You are too far away.",
-      "graveSilent": "The grave is silent for now.",
-      "doorLocked": "The door is locked.",
-      "strikeWall": "Strike the wall to break through.",
-      "nothingHappens": "Nothing happens.",
-      "unknownCompanion": "Unknown companion.",
-      "companionMaxRank": "This companion is already fully upgraded.",
-      "companionMarksRequired": "You need {marks} Delve Marks to upgrade {name}.",
-      "cannotAffordCompanionUpgrade": "You cannot afford this upgrade.",
-      "shopItemLocked": "You have not unlocked that item yet.",
-      "shopMarksRequired": "You need {marks} Delve Marks to buy {name}.",
-      "shopSealPremiumOnly": "This seal yields only to a master's hand. Only the Premium ante can open it.",
-      "passageSealed": "The passage is sealed.",
-      "moveCloserPassage": "Move closer to the passage.",
-      "moveCloserChest": "Move closer to the chest.",
-      "nothingToTake": "There is nothing left to take.",
-      "wayOutNotOpen": "The way out is not yet open.",
-      "moveCloserStairs": "Move closer to the stairs."
+      "cannotEnterNow": "你现在无法进入探秘。",
+      "leaveDungeonFirst": "请先离开地下城。",
+      "leaveArenaFirst": "请先离开竞技场。",
+      "alreadyInDelve": "你已经身处一场探秘之中。",
+      "whileTrading": "交易期间无法进入探秘。",
+      "duringDuel": "决斗期间无法进入探秘。",
+      "duringArena": "竞技场对战期间无法进入探秘。",
+      "unknownTier": "未知的探秘难度。",
+      "levelRequired": "你必须达到 {level} 级才能进入{name}。",
+      "levelRequiredTier": "你必须达到 {level} 级才能以{tier}难度进入{name}。",
+      "instancesBusy": "{name}的所有副本都已占用。请稍后再试。",
+      "runFailed": "{name}探秘失败。",
+      "complete": "{name}已完成。",
+      "mechanismOpen": "附近一处机关咔哒一声开启。一条通道向北敞开，前去寻找前方的出口传送门。",
+      "raiseDead": "{name}开始施放亡者复生。",
+      "graveFalters": "墓葬仪式被打断了。",
+      "doorAlreadyOpen": "门已经开着了。",
+      "companionRankUp": "{name}晋升至 {rank} 级。",
+      "bossChest": "首领倒下了。一只设有结界的圣物库宝箱在祭坛上升起，撬开它的锁来取得你的战利品。",
+      "surfaceStairs": "一道通往地面的楼梯开启了。在楼梯处按 F 即可离开。",
+      "moduleEnter": "{name}：{objective}",
+      "objectiveClearRoom": "清空房间。",
+      "objectiveDefeatBoss": "击败首领。",
+      "tombstoneHint": "房间清空后，一条墓碑通道将向北敞开。",
+      "tombstoneOpen": "一条封闭的墓碑通道向北轰然开启。走进去即可继续前行。",
+      "tombstoneInto": "你穿过墓碑进入{name}。",
+      "chestEmpty": "宝箱是空的。",
+      "notInDelve": "你不在探秘之中。",
+      "cannotInteract": "你无法与之互动。",
+      "tooFar": "你离得太远了。",
+      "graveSilent": "坟墓暂时归于沉寂。",
+      "doorLocked": "门被锁住了。",
+      "strikeWall": "击打墙壁将其凿穿。",
+      "nothingHappens": "什么也没有发生。",
+      "unknownCompanion": "未知的同伴。",
+      "companionMaxRank": "这名同伴已经完全升级。",
+      "companionMarksRequired": "升级{name}需要 {marks} 枚探秘印记。",
+      "cannotAffordCompanionUpgrade": "你无力负担这次升级。",
+      "shopItemLocked": "你尚未解锁该物品。",
+      "shopMarksRequired": "购买{name}需要 {marks} 枚探秘印记。",
+      "shopSealPremiumOnly": "此封印只向大师之手屈服，唯有上乘投入方能开启。",
+      "passageSealed": "通道被封住了。",
+      "moveCloserPassage": "靠近通道一些。",
+      "moveCloserChest": "靠近宝箱一些。",
+      "nothingToTake": "这里已经没有可拿的东西了。",
+      "wayOutNotOpen": "出路尚未开启。",
+      "moveCloserStairs": "靠近楼梯一些。"
     },
     "lockpick": {
-      "lockYields": "The lock yields! {tier} spoils.",
-      "tierPremium": "Premium",
-      "tierMedium": "Medium",
-      "tierLow": "Modest",
-      "alreadyInProgress": "Someone is already working the lock.",
-      "cannotPickThat": "You cannot pick that.",
-      "chooseAnte": "Choose 1, 2, or 3 picks.",
-      "noAttempt": "No lock attempt in progress.",
-      "notYours": "That is not your lock.",
-      "toolSlips": "That tool slips off this lock.",
-      "lockJammed": "The lock is jammed beyond picking. Clear the delve again for another attempt.",
-      "lastPickSnaps": "The last pick snaps. The lock jams. The chest is lost unless you clear the delve again."
+      "lockYields": "锁开了！{tier}战利品。",
+      "tierPremium": "上乘",
+      "tierMedium": "中等",
+      "tierLow": "微薄",
+      "alreadyInProgress": "已经有人在撬这把锁了。",
+      "cannotPickThat": "你无法撬开它。",
+      "chooseAnte": "选择 1、2 或 3 根撬锁器。",
+      "noAttempt": "当前没有正在进行的撬锁。",
+      "notYours": "这不是你的锁。",
+      "toolSlips": "这件工具在这把锁上打滑了。",
+      "lockJammed": "锁已卡死，无法撬开，请再次通关探秘以获得新的尝试机会。",
+      "lastPickSnaps": "最后一根撬锁器折断了。锁卡死了，除非再次通关探秘，否则这只宝箱就此失去。"
     }
   },
   "lockpickUi": {
-    "pickTitle": "Pick the Lock",
-    "cofferTitle": "Bountiful Coffer",
-    "cache": "{tier} Cache",
-    "pickBlurb": "A richer cache is sealed behind more locks. Easier locks give you more tries and more time; a failed try resets the lock until your tries run out.",
-    "cofferBlurb": "This seal yields only to a master's hand: the Hard, Premium path alone can open it. Solve all three locks for the signature prize.",
-    "pagesAria": "{count} locks",
-    "tries": "{count} tries",
-    "triesOne": "1 try",
-    "perMove": "{seconds}s / move",
+    "pickTitle": "撬开锁",
+    "cofferTitle": "丰饶宝匣",
+    "cache": "{tier}储藏",
+    "pickBlurb": "越丰厚的储藏，封锁就越多。较简单的锁给你更多尝试次数和更长时间；一次失败会重置该锁，直到你的尝试次数用尽。",
+    "cofferBlurb": "这道封印只向大师之手屈服：唯有困难（上乘）路线方能开启。解开全部三道锁，方可赢得标志性大奖。",
+    "pagesAria": "{count}道锁",
+    "tries": "{count}次尝试",
+    "triesOne": "1次尝试",
+    "perMove": "每步 {seconds} 秒",
     "seconds": "{seconds}s",
-    "boardTitle": "Tumbler's Path: {tier} cache",
-    "closeAria": "Close",
-    "withdrawAria": "Withdraw",
-    "timerAria": "Time remaining",
-    "lockOf": "Lock {page}/{total}",
-    "lockOfAria": "Lock {page} of {total}",
-    "triesOf": "Tries {tries}/{total}",
-    "triesOfAria": "{tries} of {total} tries left",
-    "ward": "Ward {col} / {total}",
-    "depthKeys": "Hotkeys set pick depth (Q/W/E/A/Z), not the ward number.",
-    "withdraw": "Withdraw (Esc)",
+    "boardTitle": "锁簧之径：{tier}储藏",
+    "closeAria": "关闭",
+    "withdrawAria": "收手",
+    "timerAria": "剩余时间",
+    "lockOf": "锁 {page}/{total}",
+    "lockOfAria": "第{page}道锁，共{total}道",
+    "triesOf": "尝试 {tries}/{total}",
+    "triesOfAria": "剩余{tries}次尝试，共{total}次",
+    "ward": "结界 {col}/{total}",
+    "depthKeys": "快捷键会设置撬锁深度（Q/W/E/A/Z），不是结界编号。",
+    "withdraw": "收手 (Esc)",
     "action": {
-      "hardSet": "Hard Set",
-      "set": "Set",
-      "steady": "Steady",
-      "ease": "Ease",
-      "drop": "Drop"
+      "hardSet": "猛压",
+      "set": "压入",
+      "steady": "稳住",
+      "ease": "松力",
+      "drop": "放下"
     },
     "feedback": {
-      "advanced": "The pin gives...",
-      "slip": "A ward bites, the pick slips!",
-      "bind": "The tumbler binds: wrong depth!",
-      "trap": "A false ward snaps shut, the lock jams!",
-      "retry": "The lock resets. Line up a fresh attempt.",
-      "pageCleared": "A tumbler bank falls. The next lock turns up.",
-      "success": "The bolt throws, the cache is yours!",
-      "fail": "The lock seizes. It won't budge again."
+      "advanced": "锁簧松动了……",
+      "slip": "结界一咬，撬锁器打滑了！",
+      "bind": "锁簧卡住了：深度不对！",
+      "trap": "一道假结界猛地合拢，锁卡死了！",
+      "retry": "锁已重置。重新调整，再试一次。",
+      "pageCleared": "一组锁簧落定。下一道锁现身了。",
+      "success": "锁栓弹开，储藏归你所有！",
+      "fail": "锁卡死了，再也撬不动了。"
     },
     "summary": {
-      "success": "Lock sprung, {tier} cache claimed.",
-      "successGeneric": "Lock sprung, the cache is claimed.",
-      "fail": "The lock is ruined. Clear the delve again for another attempt.",
-      "abandoned": "You ease the picks back out. The lock waits."
+      "success": "锁已撬开，{tier}储藏已收入囊中。",
+      "successGeneric": "锁已撬开，储藏已收入囊中。",
+      "fail": "锁已损毁。再次通关探秘以获得新的尝试机会。",
+      "abandoned": "你将撬锁器轻轻抽了出来。锁还在等着。"
     }
   },
   "delveUi": {
     "board": {
-      "title": "Delve Board",
-      "enter": "Enter Delve",
-      "enterAria": "Enter {delve} on {tier} difficulty",
-      "openDelve": "Collapsed Reliquary",
-      "openDelveAria": "Open Delve Board from {name}",
-      "marks": "Delve Marks: {count}",
-      "minLevel": "Requires Level {level}",
+      "title": "探秘面板",
+      "enter": "进入探秘",
+      "enterAria": "以{tier}难度进入{delve}",
+      "openDelve": "坍塌的圣物库",
+      "openDelveAria": "从{name}打开探秘面板",
+      "marks": "探秘印记：{count}",
+      "minLevel": "需要等级 {level}",
       "tier": {
-        "normal": "Normal",
-        "heroic": "Heroic"
+        "normal": "普通",
+        "heroic": "英雄"
       },
       "companion": {
-        "pick": "Choose a companion",
-        "tessa": "Acolyte Tessa",
-        "rank": "Rank {rank}",
-        "boon": "Heals the party between fights. Rank 3 revives a fallen ally once per run.",
-        "upgrade": "Upgrade to Rank {rank} ({marks} Marks)",
-        "upgradeAria": "Upgrade {name} to rank {rank} for {marks} Delve Marks",
-        "maxRank": "Fully upgraded"
+        "pick": "选择一名同伴",
+        "tessa": "侍僧泰莎",
+        "rank": "等级 {rank}",
+        "boon": "在战斗间隙治疗队伍。3级时每次探秘可复活一名倒下的队友一次。",
+        "upgrade": "升级到 {rank} 级（{marks} 印记）",
+        "upgradeAria": "用 {marks} 枚探秘印记将{name}升级到 {rank} 级",
+        "maxRank": "已满级"
       },
-      "tabDelve": "Delve",
-      "tabShop": "Shop"
+      "tabDelve": "探秘",
+      "tabShop": "商店"
     },
     "shop": {
-      "price": "{marks} Marks",
-      "buy": "Buy",
-      "buyAria": "Buy {item} for {marks} Delve Marks",
-      "reqHeroic": "Requires a Heroic clear",
-      "reqClears": "Requires {count} clears",
-      "empty": "Nothing in stock."
+      "price": "{marks} 印记",
+      "buy": "购买",
+      "buyAria": "用 {marks} 枚探秘印记购买 {item}",
+      "reqHeroic": "需要英雄难度通关",
+      "reqClears": "需要通关 {count} 次",
+      "empty": "暂无存货。"
     },
     "tracker": {
-      "title": "Delve",
-      "objective": "Objective",
-      "module": "Module {current} of {total}",
-      "affix": "Affixes",
-      "complete": "Complete",
-      "marks": "Delve Marks: {count}",
-      "exitHintOpen": "Walk into the tombstone passage (north)",
-      "exitHintLocked": "Clear trash mobs to open the passage north"
+      "title": "探秘",
+      "objective": "目标",
+      "module": "第 {current} / {total} 区",
+      "affix": "词缀",
+      "complete": "已完成",
+      "marks": "探秘印记：{count}",
+      "exitHintOpen": "走进墓碑通道（北面）",
+      "exitHintLocked": "清空杂兵以开启向北的通道"
     },
     "objective": {
-      "kill_boss": "Slay {boss}",
-      "recover_artifact": "Recover the burial ledger",
-      "clear_room": "Clear the room"
+      "kill_boss": "击杀{boss}",
+      "recover_artifact": "找回葬礼名册",
+      "clear_room": "清空房间"
     },
     "summary": {
-      "title": "Delve Complete",
-      "marks": "{count} Delve Marks earned",
-      "loreUnlock": "Lore unlocked: {title}"
+      "title": "探秘完成",
+      "marks": "获得 {count} 枚探秘印记",
+      "loreUnlock": "解锁传说：{title}"
     },
     "death": {
-      "warning": "One more death will end this delve run."
+      "warning": "再死一次，这次探秘就将结束。"
     },
     "run": {
-      "failed": "The delve run has failed. You are returned to Brother Halven."
+      "failed": "此次探秘失败了。你被送回了哈尔文修士身边。"
     },
     "npc": {
       "halven": {
-        "greeting": "The reliquary below has shifted again. We hear chanting through the floor after midnight, and Acolyte Tessa swears the burial ledgers are changing their own ink. If you have courage enough, {playerName}, take a candle and go below. Do not trust every voice you hear down there. Some of them knew your name before you were born."
+        "greeting": "下方的圣物库又移位了。每到午夜过后，我们便能透过地板听见诵唱，侍僧泰莎更发誓说葬礼名册正在自行改写墨迹。若你有足够的勇气，{playerName}，就拿上一支蜡烛下去吧。别相信下面听到的每一个声音。它们中有些，早在你出生之前就知道你的名字了。"
       }
     },
     "intro": {
-      "normal": "The stairwell is cold and dark. Broken saint-stones litter the descent, and a soft bell note hangs in the damp air. Acolyte Tessa whispers, \"The reliquary should not be open this far. Stay close, {playerName}.\"",
-      "heroic": "The doors groan shut behind you. Names scrape across the stone like fingernails. Tessa's candle burns blue. \"They are not calling the dead now, {playerName}. They are answering something.\""
+      "normal": "楼梯井又冷又暗。破碎的圣徒石散落在下行的台阶上，潮湿的空气中悬着一缕轻柔的钟音。侍僧泰莎低声道：“圣物库不该开到这么深的地方。靠紧些，{playerName}。”",
+      "heroic": "门在你身后呻吟着合上。一个个名字像指甲般刮过石面。泰莎的烛火燃成幽蓝。“他们如今召唤的已不是亡者了，{playerName}。他们是在回应某种东西。”"
     },
     "module": {
-      "reliquary_sunken_ossuary": "Water seeps through burial shelves, carrying old ash in silver-black streams.",
-      "reliquary_bell_niche": "Dozens of handbells hang in silence, each tied with funeral cloth.",
-      "reliquary_saintless_hall": "Statues with faces chiseled away with careful hatred.",
-      "reliquary_finale": "The buried bell tolls once beneath your boots."
+      "reliquary_sunken_ossuary": "水从葬架间渗出，挟着陈年灰烬汇成银黑色的细流。",
+      "reliquary_bell_niche": "数十口手钟静默地悬着，每一口都系着丧葬布。",
+      "reliquary_saintless_hall": "一座座雕像的脸面被人以审慎的仇恨凿去。",
+      "reliquary_finale": "埋藏的钟在你脚下鸣响了一声。"
     },
     "moduleName": {
-      "reliquary_sunken_ossuary": "The Sunken Ossuary",
-      "reliquary_bell_niche": "The Bell Niche",
-      "reliquary_saintless_hall": "The Saintless Hall",
-      "reliquary_finale": "The Bell-Buried Chamber"
+      "reliquary_sunken_ossuary": "沉没的藏骨堂",
+      "reliquary_bell_niche": "鸣钟壁龛",
+      "reliquary_saintless_hall": "无圣之厅",
+      "reliquary_finale": "埋钟之厅"
     },
     "companion": {
-      "barkLine": "{name}: {line}",
+      "barkLine": "{name}：{line}",
       "tessa": {
-        "combat_start": "Keep your footing, {playerName}. The dead are restless here.",
-        "low_hp": "Breathe. I still have prayers left for you.",
-        "trap_spotted": "Hold. Something in the floor remembers footsteps.",
-        "boss_pull": "That bell knows your weight, {playerName}. Do not kneel.",
-        "completion": "The ledger can rest another night. Well done.",
+        "combat_start": "站稳了，{playerName}。这里的亡者并不安分。",
+        "low_hp": "深呼吸。我还有为你准备的祷词。",
+        "trap_spotted": "等等，地板里有什么东西记得脚步声。",
+        "boss_pull": "那口钟知道你的分量，{playerName}。别跪下。",
+        "completion": "名册今夜可以再歇一晚了。干得好。",
         "rank": {
-          "1": "Chapel Novice",
-          "2": "Candle-Bearer",
-          "3": "Reliquary Acolyte",
-          "4": "Gravecall Witness",
-          "5": "Chapel Warden"
+          "1": "礼拜堂学徒",
+          "2": "执烛者",
+          "3": "圣物库侍僧",
+          "4": "唤墓见证者",
+          "5": "礼拜堂守护者"
         }
       }
     },
     "boss": {
       "varric": {
         "bell": {
-          "emote": "Deacon Varric grips the buried bell with both hands!",
-          "log": "Deacon Varric begins to toll the burial bell.",
-          "warning": "Move away from Deacon Varric!",
-          "impact": "The bell's toll cracks the chamber floor!",
-          "lesson": "Bell Toll: a ground slam every twelve seconds. Move out before it lands."
+          "emote": "执事瓦里克双手紧握那口埋藏的钟！",
+          "log": "执事瓦里克开始敲响葬钟。",
+          "warning": "远离执事瓦里克！",
+          "impact": "钟声轰鸣，震裂了厅堂的地面！",
+          "lesson": "鸣钟：每十二秒一次的地面猛击。在它落下前移开。"
         },
         "raise": {
-          "emote": "Deacon Varric calls names from the broken graves!",
-          "log": "Deacon Varric begins Raise Dead.",
-          "warning": "Stop the grave rite!",
-          "object": "The cracked grave shudders with stolen breath.",
-          "interrupt_ok": "The grave rite falters.",
-          "interrupt_fail": "The dead answer Deacon Varric's call!",
-          "lesson": "Interrupt the cracked grave within five seconds or the dead rise to his call."
+          "emote": "执事瓦里克从破碎的坟墓中召唤亡者之名！",
+          "log": "执事瓦里克开始施放亡者复生。",
+          "warning": "阻止墓葬仪式！",
+          "object": "裂开的坟墓随着窃来的呼吸而颤动。",
+          "interrupt_ok": "墓葬仪式被打断了。",
+          "interrupt_fail": "亡者回应了执事瓦里克的召唤！",
+          "lesson": "在五秒内打断那座裂开的坟墓，否则亡者将应他的召唤而起。"
         },
-        "pull": "You step on hallowed dust with unclean purpose. Kneel, and be counted.",
-        "intro": "No soul is lost. Only misplaced.",
-        "mid60": "Deacon Varric reads names from the ledger with shaking triumph.",
-        "mid30": "The burial bell answers every name he speaks.",
-        "defeat": "No... I had the names... I had them all..."
+        "pull": "你带着不洁的目的踏上这片圣化之尘。跪下，接受清点。",
+        "intro": "没有灵魂会失落，只是被错置了。",
+        "mid60": "执事瓦里克颤抖着、带着胜利的快意诵读名册上的名字。",
+        "mid30": "他每念出一个名字，葬钟便回应一声。",
+        "defeat": "不……那些名字……我本已将它们尽数收齐……"
       }
     },
     "lore": {
-      "eastbrook_ledger": "A water-stained page from Eastbrook's burial ledger. Names crossed out and rewritten in a hand that is not human.",
-      "first_collapse": "Chapel records note the first sinkage: saint-stones cracked, shelves tilted, and a bell-note heard from below ground.",
-      "gravecaller_mark": "A sigil scraped into coffin wood, not Morthen's seal, but an older gravecaller mark predating the Hollow Crypt.",
-      "bell_below": "Tessa's margin note: \"There is a second bell under the reliquary. It tolls for the misplaced, not the dead.\"",
-      "tessa_note": "Folded scrap in Tessa's script: \"If the ledgers change while we are below, trust the candle, not the voices.\""
+      "eastbrook_ledger": "一页被水浸渍的东溪谷葬礼名册。名字被划去，又被一只非人之手重新写下。",
+      "first_collapse": "礼拜堂记录载下了第一次塌陷：圣徒石开裂，架子倾斜，地底传来一声钟音。",
+      "gravecaller_mark": "刻在棺木上的一个符印，并非莫尔森的封印，而是一种更古老的唤墓者标记，早于空洞墓穴存在。",
+      "bell_below": "泰莎的旁注：“圣物库下方还有第二口钟。它为被错置者而鸣，而非为亡者。”",
+      "tessa_note": "一张以泰莎笔迹折叠的碎纸：“若我们在下方时名册自行变动，信烛火，莫信那些声音。”"
     },
     "affix": {
-      "restless_graves": "Restless Graves",
-      "bad_air": "Bad Air",
-      "candleblind": "Candleblind",
-      "old_mechanisms": "Old Mechanisms",
-      "flooded_paths": "Flooded Paths",
-      "grave_tax": "Grave Tax",
-      "unstable_roof": "Unstable Roof",
-      "cult_remnants": "Cult Remnants"
+      "restless_graves": "不安之墓",
+      "bad_air": "浊气",
+      "candleblind": "烛盲",
+      "old_mechanisms": "古旧机关",
+      "flooded_paths": "水淹通道",
+      "grave_tax": "墓葬税",
+      "unstable_roof": "不稳的顶棚",
+      "cult_remnants": "教派残党"
     },
     "blessing": {
-      "chapel_candle": "Chapel Candle: safer run, one fewer Mark on completion."
+      "chapel_candle": "礼拜堂烛火：旅程更安全，但通关时少得一枚印记。"
     },
     "chest": {
-      "flavor": "The dead have surrendered what they can spare."
+      "flavor": "亡者交出了他们尚能割舍之物。"
     }
   },
   "fiesta": {
@@ -2290,8 +2290,8 @@ export const zh_CN: EnTranslations = {
     "playMode": "多人游戏",
     "applicationCategory": "游戏",
     "operatingSystem": "网页浏览器",
-    "officialLabel": "Official World of ClaudeCraft website",
-    "officialBody": "worldofclaudecraft.com is the official free browser MMO for the Claudemoon realm. Play online with a persistent character, explore solo offline, read the wiki, and follow verified community links from this site."
+    "officialLabel": "World of ClaudeCraft 官方网站",
+    "officialBody": "worldofclaudecraft.com 是 Claudemoon 服务器的官方免费浏览器 MMO。你可以用持久角色在线游玩，也可以离线单人探索，阅读 wiki，并从本站访问已验证的社区链接。"
   },
   "a11y": {
     "goHome": "前往主页",
@@ -2340,12 +2340,12 @@ export const zh_CN: EnTranslations = {
       "deleteConfirm": "输入角色名称以确认删除。",
       "notAuthenticated": "尚未认证。",
       "accountBanned": "此账号已被封禁。",
-      "webLoginOnly": "Logins are only allowed from the game client.",
+      "webLoginOnly": "只能从游戏客户端登录。",
       "accountSuspended": "此账号被停用至 {date}。",
       "alreadyInWorld": "角色已在世界中。",
-      "takenOver": "Your character was taken over by another session.",
+      "takenOver": "你的角色已被另一个会话接管。",
       "renameBeforeEntering": "此角色必须先改名才能进入世界。",
-      "renameNotPermitted": "Renaming this character is not allowed."
+      "renameNotPermitted": "不允许为此角色改名。"
     }
   },
   "realm": {
@@ -2360,11 +2360,11 @@ export const zh_CN: EnTranslations = {
     "high": "高",
     "medium": "中",
     "low": "低",
-    "popTipLow": "Low population: fewer than 15 players online right now. Plenty of room; great for a fresh start.",
-    "popTipMedium": "Medium population: 15 to 39 players online right now. A healthy, active realm.",
-    "popTipHigh": "High population: 40 to 79 players online right now. Busy, with lots of players around.",
-    "popTipFull": "Full population: 80 or more players online right now. Very busy; you may wait in a login queue.",
-    "popTipOffline": "Offline: this realm is unreachable right now and cannot be joined.",
+    "popTipLow": "人数较少：当前在线玩家不足 15 人。空间充足，适合全新开始。",
+    "popTipMedium": "人数适中：当前在线玩家 15 至 39 人。健康活跃的服务器。",
+    "popTipHigh": "人数较多：当前在线玩家 40 至 79 人。繁忙，玩家众多。",
+    "popTipFull": "人数已满：当前在线玩家 80 人或以上。非常繁忙；登录时可能需要排队。",
+    "popTipOffline": "离线：此服务器当前无法连接，无法加入。",
     "characterCountOne": "{count} 个角色",
     "characterCountOther": "{count} 个角色",
     "selectedRealm": "服务器：{name}",
@@ -2376,9 +2376,9 @@ export const zh_CN: EnTranslations = {
     "noneYet": "还没有角色。请在下方创建一个。",
     "levelClass": "{level} 级 {className}",
     "inWorld": "在世界中",
-    "takeOver": "Take Over",
-    "inWorldHint": "Already in world. Log out elsewhere, or take over.",
-    "takeOverConfirm": "This will disconnect this character from another session and bring it here. Continue?",
+    "takeOver": "接管",
+    "inWorldHint": "已在世界中。请在别处登出，或接管会话。",
+    "takeOverConfirm": "这将使该角色从另一个会话断开并切换到此处。是否继续？",
     "renameRequired": "需要改名",
     "delete": "删除",
     "rename": "改名",
@@ -2395,13 +2395,13 @@ export const zh_CN: EnTranslations = {
     "viewProfile": "查看资料",
     "profile": "角色资料",
     "closeProfile": "关闭资料",
-    "sortBy": "Sort",
-    "sortByLabel": "Sort characters",
-    "sortMenuLabel": "Sort options",
-    "sortLevel": "Level",
-    "sortName": "Name",
-    "sortRecent": "Recently Played",
-    "sortPlaytime": "Playtime"
+    "sortBy": "排序",
+    "sortByLabel": "排序角色",
+    "sortMenuLabel": "排序选项",
+    "sortLevel": "等级",
+    "sortName": "名称",
+    "sortRecent": "最近游玩",
+    "sortPlaytime": "游戏时长"
   },
   "woc": {
     "linkWalletFirst": "Connect and link a Solana wallet to pay with $WOC.",
@@ -2532,7 +2532,7 @@ export const zh_CN: EnTranslations = {
       "releaseSpirit": "释放灵魂",
       "chatTab": "聊天",
       "combatLogTab": "战斗记录",
-      "chatPlaceholder": "说点什么...（/w 名字 密语，/r 回复，/p 队伍，/gu 公会，/o 官员，/general 综合）",
+      "chatPlaceholder": "说点什么...（/s 说话，/w 名字 密语，/r 回复，/p 队伍，/gu 公会，/o 官员，/general 综合）",
       "chatChannels": {
         "add": "添加聊天频道",
         "addTitle": "添加频道",
@@ -2567,78 +2567,108 @@ export const zh_CN: EnTranslations = {
       "closeMap": "关闭地图",
       "zoomIn": "放大",
       "zoomOut": "缩小",
-      "mapCanvasLabel": "Map",
-      "mapSummary": "Map of {zone}."
+      "mapCanvasLabel": "地图",
+      "mapSummary": "{zone}的地图。"
     },
     "mounts": {
-      "title": "Mounts",
-      "subtitle": "$WOC Travel Steeds",
-      "close": "Close mounts",
-      "summon": "Summon",
-      "dismount": "Dismount",
-      "summoning": "Summoning {name}…",
-      "riding": "Riding",
-      "flies": "Flies",
-      "locked": "Locked",
-      "speed": "+{percent}% speed",
-      "unlockAt": "Unlocks at {amount} $WOC",
-      "supplyShare": "{percent} of supply",
-      "qualifyHeader": "You qualify for {count} of {total} travel mounts.",
-      "holdingHint": "Holding {amount} $WOC.",
-      "noWallet": "Hold at least {amount} $WOC — 0.1% of supply — on a linked wallet to earn your first travel mount.",
-      "cantInCombat": "You can't mount while in combat.",
-      "cantSwimming": "You can't mount while swimming.",
-      "cantDead": "You can't mount while dead.",
-      "notEligible": "Your $WOC holdings don't reach that steed yet.",
-      "summonedBanner": "You summon {name}.",
-      "summonAria": "Summon {name}",
-      "dismountAria": "Dismount {name}",
-      "lockedAria": "{name} — locked; unlocks at {amount} $WOC",
-      "activeAria": "{name} — currently active",
+      "title": "坐骑",
+      "subtitle": "$WOC 旅行坐骑",
+      "close": "关闭坐骑",
+      "summon": "召唤",
+      "dismount": "下骑",
+      "summoning": "正在召唤 {name}…",
+      "riding": "骑乘中",
+      "flies": "可飞行",
+      "locked": "已锁定",
+      "speed": "速度 +{percent}%",
+      "unlockAt": "持有 {amount} $WOC 即可解锁",
+      "supplyShare": "供应量的 {percent}",
+      "qualifyHeader": "你已符合 {total} 种旅行坐骑中的 {count} 种。",
+      "holdingHint": "持有 {amount} $WOC。",
+      "noWallet": "在已绑定的钱包中持有至少 {amount} $WOC（供应量的 0.1%），即可赢得你的第一匹旅行坐骑。",
+      "cantInCombat": "战斗中无法上骑。",
+      "cantSwimming": "游泳时无法上骑。",
+      "cantDead": "死亡时无法上骑。",
+      "notEligible": "你的 $WOC 持有量尚不足以驾驭那匹坐骑。",
+      "summonedBanner": "你召唤了 {name}。",
+      "summonAria": "召唤 {name}",
+      "dismountAria": "从 {name} 上下骑",
+      "lockedAria": "{name} — 已锁定；持有 {amount} $WOC 即可解锁",
+      "activeAria": "{name} — 当前已激活",
       "cardAria": "{name}: {flavor}",
-      "owned": "Owned",
-      "mint": "Mint Charter",
-      "mintHint": "Strike a tradeable Charter for this mount — sell it for gold so a non-holder can earn it.",
-      "mintAria": "Mint a tradeable Charter for {name}",
-      "mintedBanner": "You strike a Charter for {name}.",
-      "earnedBanner": "You have earned {name} — it is yours for good.",
-      "alreadyOwnErr": "You already own that mount.",
-      "charterVoidErr": "That Charter is void.",
-      "noCharterErr": "No Charter can be struck for that mount.",
-      "holdingsShortErr": "Your holdings do not cover that mount."
+      "owned": "已拥有",
+      "mint": "铸造凭证",
+      "mintHint": "为这匹坐骑铸造一张可交易的凭证——卖出换取金币，让未持有者也能赢得它。",
+      "mintAria": "为 {name} 铸造一张可交易的凭证",
+      "mintedBanner": "你为 {name} 铸造了一张凭证。",
+      "earnedBanner": "你已赢得 {name} — 它将永远归你所有。",
+      "alreadyOwnErr": "你已经拥有那匹坐骑。",
+      "charterVoidErr": "那张凭证已作废。",
+      "noCharterErr": "那匹坐骑无法铸造凭证。",
+      "holdingsShortErr": "你的持有量不足以驾驭那匹坐骑。"
     },
     "course": {
-      "skytrials": "Skytrials",
-      "skytrialsHint": "Fly a timed ring course on a flying mount.",
-      "needFlyer": "Summon a flying mount to fly Skytrials.",
-      "start": "Fly",
-      "give_up": "Give up",
-      "par": "Par {time}",
-      "laps": "{count} laps",
-      "onePass": "1 lap",
-      "starting": "Fly through the first ring to start the clock",
-      "gate": "Ring {n}/{total}",
-      "lap": "Lap {n}/{total}",
-      "time": "Time",
-      "finish": "Finish!",
-      "beatPar": "Beat par by {time}",
-      "offPar": "{time} off par",
-      "failed": "Run ended — you left your mount",
-      "aborted": "Run abandoned",
-      "best": "Best {time}",
-      "newBest": "New best!",
-      "board": "Board",
-      "boardTitle": "{name} — top times",
-      "noTimes": "No times yet — be the first.",
-      "loadingBoard": "Loading…",
-      "you": "(you)",
-      "race": "Race",
-      "racePartyHint": "Race your party — first through the rings wins.",
-      "getReady": "Get ready",
-      "go": "GO!",
-      "dnf": "DNF",
-      "placeOf": "#{place} of {total}",
-      "racing": "Racing"
+      "skytrials": "天试",
+      "skytrialsHint": "骑乘飞行坐骑飞过限时圆环赛道。",
+      "needFlyer": "召唤一匹飞行坐骑来飞越天试。",
+      "start": "起飞",
+      "give_up": "放弃",
+      "par": "基准 {time}",
+      "laps": "{count} 圈",
+      "onePass": "1 圈",
+      "starting": "穿过第一个圆环开始计时",
+      "gate": "圆环 {n}/{total}",
+      "lap": "第 {n}/{total} 圈",
+      "time": "时间",
+      "finish": "完成！",
+      "beatPar": "快出基准 {time}",
+      "offPar": "慢于基准 {time}",
+      "failed": "本轮结束 — 你离开了坐骑",
+      "aborted": "本轮已放弃",
+      "best": "最佳 {time}",
+      "newBest": "新纪录！",
+      "board": "榜单",
+      "boardTitle": "{name} — 最快用时",
+      "noTimes": "暂无成绩 — 来当第一个。",
+      "loadingBoard": "正在加载…",
+      "you": "（你）",
+      "race": "比赛",
+      "racePartyHint": "与你的队伍竞速 — 最先穿过圆环者获胜。",
+      "getReady": "准备就绪",
+      "go": "开始！",
+      "dnf": "未完成",
+      "placeOf": "第 {place} 名 / 共 {total}",
+      "racing": "竞速中"
+    },
+    "wager": {
+      "start": "赌注竞速",
+      "title": "赌注竞速",
+      "inviteGold": "{name} 发起了一场赌注竞速 — 押 {money} 入场。要应战吗？",
+      "inviteCharter": "{name} 发起了一场赌注竞速 — 押 {money} + 一张坐骑凭证。要应战吗？",
+      "accept": "应下赌注",
+      "pot": "奖池 {money}",
+      "potCharter": "彩池 {money} + {count}× 凭证",
+      "racers": "参赛者（{count}）",
+      "launch": "开赛",
+      "cancel": "取消",
+      "leave": "离开",
+      "waiting": "正在等待挑战者应下赌注…",
+      "won": "你赢得了赌注 — {money}！",
+      "wonCharter": "你赢得了赌注 — {money} + {count}× 凭证！",
+      "lost": "你输掉了赌注。",
+      "refunded": "赌注已取消 — 你的押注已退回。",
+      "antePrompt": "为这场竞速押多少金币？（以铜币计）",
+      "open": "开设赌注",
+      "stakeCharter": "同时押上一张坐骑凭证（胜者通吃）",
+      "errCourse": "那条赛道不可用于赌注。",
+      "errFlyer": "你必须骑乘飞行坐骑才能下注。",
+      "errBusy": "你已经身处一场赌注之中。",
+      "errAnte": "至少要押 1 铜币的赌注。",
+      "errStake": "那无法作为赌注押上。",
+      "errAfford": "你无力支付那笔赌注。",
+      "errExpired": "那份赌注邀约已过期。",
+      "errGone": "那场赌注已不再开放。",
+      "errHost": "只有房主才能开赛。"
     },
     "options": {
       "gameMenu": "游戏菜单",
@@ -2646,7 +2676,7 @@ export const zh_CN: EnTranslations = {
       "graphics": "图形",
       "audio": "音频",
       "interface": "界面",
-      "language": "Language",
+      "language": "语言",
       "logout": "退出登录",
       "returnToGame": "返回游戏",
       "resetToDefaults": "恢复默认",
@@ -2796,8 +2826,8 @@ export const zh_CN: EnTranslations = {
         "unignoreChat": "取消屏蔽聊天",
         "report": "举报玩家",
         "removeParty": "移出队伍",
-        "convertToRaid": "Convert to raid",
-        "convertToParty": "Convert to party",
+        "convertToRaid": "转换为团队",
+        "convertToParty": "转换为队伍",
         "cancel": "取消"
       }
     },
@@ -2839,7 +2869,7 @@ export const zh_CN: EnTranslations = {
     "combat": {
       "floatingMiss": "未命中",
       "floatingDodge": "闪避",
-      "floatingResist": "Resist",
+      "floatingResist": "抵抗",
       "cannotMove": "无法移动！",
       "attack": "攻击",
       "damageDone": "你的{ability}击中{target}，造成 {amount} 点伤害。",
@@ -2848,7 +2878,7 @@ export const zh_CN: EnTranslations = {
       "damageTakenCrit": "{source}对你造成暴击，造成 {amount} 点伤害。",
       "miss": "你的{ability}未命中{target}。",
       "dodged": "{target}闪避了你的{ability}。",
-      "resisted": "Your {ability} is resisted by {target}.",
+      "resisted": "{target}抵抗了你的{ability}。",
       "healSelf": "你的{ability}为你恢复 {amount} 点生命。",
       "healSelfCrit": "你的{ability}对你造成暴击治疗，恢复 {amount} 点生命。",
       "healOther": "你的{ability}为{target}恢复 {amount} 点生命。",
@@ -2893,10 +2923,10 @@ export const zh_CN: EnTranslations = {
       "targetMustDodge": "你的目标必须先闪避。",
       "requiresCombo": "该技能需要连击点。",
       "requiresForm": "你必须处于{form}形态。",
-      "cantInForm": "You can't do that in {form} Form.",
+      "cantInForm": "{form}形态下无法这样做。",
       "bear": "熊",
-      "cat": "猎豹",
-      "travel": "Travel",
+      "cat": "狼",
+      "travel": "旅行",
       "shapeshifted": "变形状态下不能这样做。",
       "stealthed": "你必须处于潜行状态。",
       "inCombat": "战斗中不能这样做。",
@@ -2918,10 +2948,10 @@ export const zh_CN: EnTranslations = {
       "whisperAmbiguous": "有多名玩家匹配“{name}”。请使用准确大小写。",
       "whisperMissing": "没有名为“{name}”的玩家在线。",
       "whisperSelf": "你自言自语，没人听见。",
-      "assistSelf": "You can't assist yourself.",
-      "assistNoTarget": "{name} has no target.",
-      "assistWhom": "Assist whom? Target a player or use /assist <name>.",
-      "assisting": "Assisting {name}.",
+      "assistSelf": "你无法协助自己。",
+      "assistNoTarget": "{name} 没有目标。",
+      "assistWhom": "协助谁？请选定一名玩家，或使用 /assist <name>。",
+      "assisting": "正在协助 {name}。",
       "notInParty": "你不在队伍中。",
       "unknownCommand": "未知命令：{command}。请尝试 /s /y /w /p /g。",
       "chatCooldown": "聊天冷却中，还需 {seconds} 秒。",
@@ -2966,29 +2996,29 @@ export const zh_CN: EnTranslations = {
       "lootReceiveMoney": "你获得 {money}。",
       "lootMoney": "你拾取 {money}。",
       "soldItem": "你以 {money} 卖出 {item}。",
-      "soldJunkOne": "Sold {count} junk item for {money}.",
-      "soldJunkMany": "Sold {count} junk items for {money}.",
+      "soldJunkOne": "你以 {money} 卖出 {count} 件杂物。",
+      "soldJunkMany": "你以 {money} 卖出 {count} 件杂物。",
       "friendOnline": "{name} 上线了。",
       "friendOffline": "{name} 下线了。"
     },
     "tutorial": {
-      "title": "New Adventurer",
-      "stepLabel": "Step {current} of {total}",
-      "skip": "Skip Tutorial",
-      "dismiss": "Dismiss",
-      "doneTitle": "Ready for Adventure",
-      "doneBody": "You have the basics, {name}. The Vale is yours to explore. Press {questKey} anytime to review your quests. Good hunting.",
-      "moveTitle": "Find Your Footing",
-      "moveBody": "Use {moveKeys} to move and the mouse to look around. Take a few steps to begin.",
-      "seekTitle": "Seek the Marshal",
-      "seekBody": "Marshal Redbrook waits in town and has work for a new blade. Follow the marker to reach him.",
-      "talkTitle": "Take the Task",
-      "talkBody": "Stand close to Marshal Redbrook and press {interactKey} to speak, then accept his task.",
-      "slayTitle": "Wolves at the Door",
-      "slayBody": "Hunt the Forest Wolves on the north road. Target one and attack to thin the pack.",
-      "slayProgress": "Forest Wolves slain: {current} / {needed}",
-      "returnTitle": "Claim Your Reward",
-      "returnBody": "Your task is done. Return to Marshal Redbrook and press {interactKey} to turn it in."
+      "title": "新冒险者",
+      "stepLabel": "第 {current} 步，共 {total} 步",
+      "skip": "跳过教程",
+      "dismiss": "关闭",
+      "doneTitle": "准备好冒险了",
+      "doneBody": "你已掌握基础，{name}。东溪谷任你探索。随时按 {questKey} 查看任务。祝你狩猎顺利。",
+      "moveTitle": "迈出第一步",
+      "moveBody": "使用 {moveKeys} 移动，用鼠标环顾四周。先走几步开始吧。",
+      "seekTitle": "寻找元帅",
+      "seekBody": "雷德布鲁克元帅在镇上等候，他有任务交给新人。跟随指引前往找他。",
+      "talkTitle": "接受任务",
+      "talkBody": "靠近雷德布鲁克元帅并按 {interactKey} 与他交谈，然后接受他的任务。",
+      "slayTitle": "狼群来袭",
+      "slayBody": "前往北边的道路猎杀森林狼。选中一只发起攻击，削减狼群数量。",
+      "slayProgress": "已击杀森林狼：{current} / {needed}",
+      "returnTitle": "领取奖励",
+      "returnBody": "任务已完成。返回雷德布鲁克元帅处并按 {interactKey} 交付任务。"
     },
     "markers": {
       "names": {
@@ -3043,12 +3073,12 @@ export const zh_CN: EnTranslations = {
       "guildTab": "公会",
       "ignoreTab": "忽略",
       "leaveParty": "离开队伍",
-      "raidTab": "Raid",
-      "raidEmpty": "Convert a party to a raid to manage raid groups here.",
-      "raidGroupEmpty": "No players in this group.",
-      "raidGroupTitle": "Group {position} ({count}/5)",
-      "raidMoveToGroup": "Move to group {position}",
-      "raidLeader": "Raid Leader",
+      "raidTab": "团队",
+      "raidEmpty": "将小队转换为团队后，可在这里管理团队分组。",
+      "raidGroupEmpty": "此小组没有玩家。",
+      "raidGroupTitle": "小组 {position} ({count}/5)",
+      "raidMoveToGroup": "移动到小组 {position}",
+      "raidLeader": "团队领袖",
       "offlineEmpty": "好友、公会和忽略列表仅在在线游戏中可用。",
       "friendsEmpty": "还没有好友。请在下方按名称搜索。",
       "ignoreEmpty": "你的忽略列表为空。",
@@ -3149,8 +3179,8 @@ export const zh_CN: EnTranslations = {
       "title": "法术书",
       "classSubtitle": "{className}技能",
       "close": "关闭法术书",
-      "resetBar": "Reset bar",
-      "resetBarAria": "Reset the current action bar to its default abilities",
+      "resetBar": "重置动作条",
+      "resetBarAria": "将当前动作条重置为默认技能",
       "trainableAtLevel": "{level} 级可训练",
       "learnAtLevel": "你将在 {level} 级学会此技能。",
       "knownAbilityAria": "{name}，等级 {rank}。{summary}",
@@ -3189,7 +3219,7 @@ export const zh_CN: EnTranslations = {
     },
     "forms": {
       "bear": "熊",
-      "cat": "猎豹"
+      "cat": "狼"
     },
     "cast": {
       "fishing": "钓鱼",
@@ -3213,10 +3243,10 @@ export const zh_CN: EnTranslations = {
       "completedStatus": "已完成",
       "returnTo": "返回 {name} 处",
       "abandon": "放弃任务",
-      "abandonConfirmTitle": "Abandon Quest",
-      "abandonConfirmBody": "Are you sure you want to abandon {name}?",
-      "abandonConfirm": "Yes",
-      "abandonCancel": "Cancel",
+      "abandonConfirmTitle": "放弃任务",
+      "abandonConfirmBody": "确定要放弃{name}吗？",
+      "abandonConfirm": "是",
+      "abandonCancel": "取消",
       "suggestedPlayers": "建议玩家数：{count}"
     },
     "dialog": {
@@ -3291,7 +3321,7 @@ export const zh_CN: EnTranslations = {
       "uncommon": "优秀",
       "rare": "精良",
       "epic": "史诗",
-      "legendary": "Legendary"
+      "legendary": "传说"
     },
     "kind": {
       "weapon": "武器",
@@ -3372,9 +3402,9 @@ export const zh_CN: EnTranslations = {
       "sellQuantityInput": "要出售的数量",
       "sellQuantityConfirm": "出售",
       "sellQuantityCancel": "取消",
-      "sellJunk": "Sell Junk",
-      "sellJunkAria": "Sell all junk for {price}",
-      "sellJunkHint": "Sells every gray item in your bags except quest items."
+      "sellJunk": "出售杂物",
+      "sellJunkAria": "以 {price} 出售所有杂物",
+      "sellJunkHint": "出售背包中除任务物品外的所有灰色物品。"
     },
     "market": {
       "title": "世界市场",
@@ -3387,43 +3417,43 @@ export const zh_CN: EnTranslations = {
       "noMerchant": "靠近商人才能交易。",
       "emptyBrowse": "市场很安静。到出售标签页率先上架物品。",
       "browseNote": "来自全境冒险者的货物。选择购买即可直接买下一组。",
-      "searchPlaceholder": "Search market...",
-      "searchAria": "Search the World Market by item name",
-      "emptySearch": "No goods match your search. Try another name.",
-      "truncated": "Showing {shown} of {total} matches. Refine your search to see the rest.",
-      "emptyFiltered": "No listings match those filters.",
-      "pageRange": "Showing {shown} of {total} listings.",
-      "pagePrev": "Prev",
-      "pageNext": "Next",
-      "pagePrevAria": "Previous market page",
-      "pageNextAria": "Next market page",
-      "pageStatus": "Page {current} of {total}",
-      "filters": "Market filters",
-      "filterType": "Type",
-      "filterTypeAll": "All types",
-      "filterTypeWeapon": "Weapons",
-      "filterTypeArmor": "Armor",
-      "filterTypeConsumable": "Consumables",
-      "filterTypeMaterial": "Materials",
-      "filterTypeCosmetic": "Cosmetics",
-      "filterTypeOther": "Other",
-      "filterArmorType": "Armor type",
-      "filterArmorAll": "All armor",
-      "filterWeaponType": "Weapon type",
-      "filterWeaponAll": "All weapons",
-      "filterRarity": "Rarity",
-      "filterRarityAll": "All rarities",
-      "weaponSword": "Swords",
-      "weaponDagger": "Daggers",
-      "weaponStaff": "Staves",
-      "weaponMace": "Maces",
-      "weaponAxe": "Axes",
-      "weaponOther": "Other weapons",
-      "rarityPoor": "Poor",
-      "rarityCommon": "Common",
-      "rarityUncommon": "Uncommon",
-      "rarityRare": "Rare",
-      "rarityEpic": "Epic",
+      "searchPlaceholder": "搜索市场...",
+      "searchAria": "按物品名称搜索世界市场",
+      "emptySearch": "没有商品符合你的搜索。请尝试其他名称。",
+      "truncated": "显示 {total} 个匹配中的 {shown} 个。请细化搜索以查看其余内容。",
+      "emptyFiltered": "没有符合这些筛选条件的上架物品。",
+      "pageRange": "显示 {total} 个上架物品中的 {shown} 个。",
+      "pagePrev": "上一页",
+      "pageNext": "下一页",
+      "pagePrevAria": "上一页市场商品",
+      "pageNextAria": "下一页市场商品",
+      "pageStatus": "第 {current} 页，共 {total} 页",
+      "filters": "市场筛选",
+      "filterType": "类型",
+      "filterTypeAll": "全部类型",
+      "filterTypeWeapon": "武器",
+      "filterTypeArmor": "护甲",
+      "filterTypeConsumable": "消耗品",
+      "filterTypeMaterial": "材料",
+      "filterTypeCosmetic": "外观",
+      "filterTypeOther": "其他",
+      "filterArmorType": "护甲类型",
+      "filterArmorAll": "全部护甲",
+      "filterWeaponType": "武器类型",
+      "filterWeaponAll": "全部武器",
+      "filterRarity": "稀有度",
+      "filterRarityAll": "全部稀有度",
+      "weaponSword": "剑",
+      "weaponDagger": "匕首",
+      "weaponStaff": "法杖",
+      "weaponMace": "锤",
+      "weaponAxe": "斧",
+      "weaponOther": "其他武器",
+      "rarityPoor": "粗糙",
+      "rarityCommon": "普通",
+      "rarityUncommon": "优秀",
+      "rarityRare": "稀有",
+      "rarityEpic": "史诗",
       "merchantStock": "商人库存",
       "stackCount": "x{count}",
       "each": "每个 {money}",
@@ -3473,14 +3503,14 @@ export const zh_CN: EnTranslations = {
       "close": "关闭战利品"
     },
     "lootRoll": {
-      "title": "Roll for loot",
-      "need": "Need",
-      "greed": "Greed",
-      "pass": "Pass",
-      "needAria": "Need for {item}",
-      "greedAria": "Greed for {item}",
-      "passAria": "Pass on {item}",
-      "everyonePassed": "Everyone passed on {item}."
+      "title": "为战利品掷骰",
+      "need": "需求",
+      "greed": "贪婪",
+      "pass": "放弃",
+      "needAria": "需求 {item}",
+      "greedAria": "贪婪 {item}",
+      "passAria": "放弃 {item}",
+      "everyonePassed": "所有人都放弃了 {item}。"
     }
   },
   "entities": {
@@ -3579,7 +3609,7 @@ export const zh_CN: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "奥术飞弹",
-        "description": "向敌人发射奥术飞弹，持续 3 秒，每秒造成 8 点奥术伤害。"
+        "description": "向敌人发射奥术飞弹，持续 3 秒，每秒造成 {damage} 点奥术伤害。"
       },
       "polymorph": {
         "name": "变形术",
@@ -3643,7 +3673,7 @@ export const zh_CN: EnTranslations = {
       },
       "stealth": {
         "name": "潜行",
-        "description": "将你隐藏在阴影中：敌人几乎无法察觉你，但你的移动速度降低 30%。攻击或受到伤害会打破潜行。再次施放可现身。"
+        "description": "将你隐藏在阴影中：敌人几乎无法察觉你，但你的移动速度降低 50%。攻击或受到伤害会打破潜行。再次施放可现身。"
       },
       "adrenaline_rush": {
         "name": "冲动",
@@ -3675,7 +3705,7 @@ export const zh_CN: EnTranslations = {
       },
       "vanish": {
         "name": "消失",
-        "description": "从视野中消失，即使在战斗中也能进入潜行状态。隐身时你的移动速度降低 30%。持续最多 10 秒。"
+        "description": "从视野中消失，即使在战斗中也能进入潜行状态。隐身时你的移动速度降低 50%。持续最多 10 秒。"
       },
       "instant_poison": {
         "name": "速效毒药",
@@ -3827,7 +3857,7 @@ export const zh_CN: EnTranslations = {
       },
       "mind_flay": {
         "name": "精神鞭笞",
-        "description": "用暗影能量攻击目标的心灵，持续 3 秒，每秒造成 12 点伤害。"
+        "description": "用暗影能量攻击目标的心灵，持续 3 秒，每秒造成 {damage} 点伤害。"
       },
       "flash_heal": {
         "name": "快速治疗",
@@ -3903,7 +3933,7 @@ export const zh_CN: EnTranslations = {
       },
       "drain_life": {
         "name": "吸取生命",
-        "description": "吸取目标的生命，持续 5 秒，每秒向你转移 7 点生命值。"
+        "description": "吸取目标的生命，持续 5 秒，每秒向你转移 {damage} 点生命值。"
       },
       "fear": {
         "name": "恐惧",
@@ -3958,16 +3988,16 @@ export const zh_CN: EnTranslations = {
         "description": "对目标低吼：你的威胁值提高到其最仇恨敌人的水平，并强迫其攻击你 3 秒。仅限熊形态。"
       },
       "cat_form": {
-        "name": "猎豹形态",
-        "description": "变形为猎豹：攻击强度随等级提高，攻击使用能量和连击点，产生的威胁值降低 29%。再次施放可返回施法者形态。"
+        "name": "狼形态",
+        "description": "变形为狼：攻击强度随等级提高，攻击使用能量和连击点，产生的威胁值降低 29%。再次施放可返回施法者形态。"
       },
       "claw": {
         "name": "爪击",
-        "description": "用利爪攻击敌人，造成武器伤害加 {damage}。奖励 1 个连击点。仅限猎豹形态。"
+        "description": "用利爪攻击敌人，造成武器伤害加 {damage}。奖励 1 个连击点。仅限狼形态。"
       },
       "ferocious_bite": {
         "name": "凶猛撕咬",
-        "description": "终结技，根据连击点数造成伤害。仅限猎豹形态。"
+        "description": "终结技，根据连击点数造成伤害。仅限狼形态。"
       },
       "swipe": {
         "name": "横扫",
@@ -4007,11 +4037,11 @@ export const zh_CN: EnTranslations = {
       },
       "dash": {
         "name": "急奔",
-        "description": "向前冲刺，使移动速度提高 50%，持续 15 秒。仅限猎豹形态。"
+        "description": "向前冲刺，使移动速度提高 50%，持续 15 秒。仅限狼形态。"
       },
       "pounce": {
         "name": "扑击",
-        "description": "一个潜行开场技，昏迷目标 2 秒。奖励 1 个连击点。仅限猎豹形态。"
+        "description": "一个潜行开场技，昏迷目标 2 秒。奖励 1 个连击点。仅限狼形态。"
       },
       "insect_swarm": {
         "name": "虫群",
@@ -4019,11 +4049,11 @@ export const zh_CN: EnTranslations = {
       },
       "tigers_fury": {
         "name": "猛虎之怒",
-        "description": "使攻击强度提高 40，持续 6 秒。仅限猎豹形态。"
+        "description": "使攻击强度提高 40，持续 6 秒。仅限狼形态。"
       },
       "rip": {
         "name": "割裂",
-        "description": "终结技，在 12 秒内造成流血伤害。消耗连击点。仅限猎豹形态。"
+        "description": "终结技，在 12 秒内造成流血伤害。消耗连击点。仅限狼形态。"
       },
       "mortal_strike": {
         "name": "致死打击",
@@ -4083,7 +4113,7 @@ export const zh_CN: EnTranslations = {
       },
       "prowl": {
         "name": "潜行",
-        "description": "在狼形态下进入潜行状态。无法在战斗中使用。"
+        "description": "在狼形态下进入潜行状态，移动速度降低 50%。无法在战斗中使用。"
       },
       "rake": {
         "name": "撕抓",
@@ -4387,7 +4417,7 @@ export const zh_CN: EnTranslations = {
         "name": "山脊潜伏者毛皮"
       },
       "old_cragmaws_pelt": {
-        "name": "Old Cragmaw's Pelt"
+        "name": "老裂颚的毛皮"
       },
       "glowing_wax": {
         "name": "发光蜡块"
@@ -4627,34 +4657,34 @@ export const zh_CN: EnTranslations = {
         "name": "君主之冠"
       },
       "charter_ashmane": {
-        "name": "证书：Ashmane Courser"
+        "name": "凭证：灰鬃疾行驹"
       },
       "charter_emberhoof": {
-        "name": "证书：Emberhoof Charger"
+        "name": "凭证：烬蹄战驹"
       },
       "charter_bronzeflank": {
-        "name": "证书：Bronzeflank Destrier"
+        "name": "凭证：铜胁战马"
       },
       "charter_silvermane": {
-        "name": "证书：Silvermane Stallion"
+        "name": "凭证：银鬃骏马"
       },
       "charter_stormhoof": {
-        "name": "证书：Stormhoof Charger"
+        "name": "凭证：风暴蹄战驹"
       },
       "charter_goldcrest": {
-        "name": "证书：Goldcrest Skystrider"
+        "name": "凭证：金冠掠空者"
       },
       "charter_verdant": {
-        "name": "证书：Verdant Wildwing"
+        "name": "凭证：苍翠野翼"
       },
       "charter_voidstrider": {
-        "name": "证书：Voidwing Strider"
+        "name": "凭证：虚空翼行者"
       },
       "charter_celestial": {
-        "name": "证书：Celestial Seraph"
+        "name": "凭证：天界炽天使"
       },
       "charter_worldbearer": {
-        "name": "证书：Worldbearer's Roc"
+        "name": "凭证：负世巨鹏"
       },
       "bristleback_maul": {
         "name": "硬鬃重槌"
@@ -4855,7 +4885,7 @@ export const zh_CN: EnTranslations = {
         "name": "裂颚潜行靴"
       },
       "cragmaw_huntcord": {
-        "name": "Cragmaw's Huntcord"
+        "name": "裂颚的狩猎腰索"
       },
       "drowned_tide_scepter": {
         "name": "溺亡潮汐权杖"
@@ -4993,31 +5023,31 @@ export const zh_CN: EnTranslations = {
         "name": "龙影利爪握套"
       },
       "reliquary_plate_chest": {
-        "name": "Reliquary Guard Hauberk"
+        "name": "圣物库守卫锁甲"
       },
       "reliquary_leather_chest": {
-        "name": "Dustwarden Jerkin"
+        "name": "守尘者皮甲"
       },
       "reliquary_cloth_chest": {
-        "name": "Shroud of the Reliquary"
+        "name": "圣物库殓衣"
       },
       "reliquary_legs": {
-        "name": "Vaultbound Legwraps"
+        "name": "缚穴护腿"
       },
       "reliquary_helm": {
-        "name": "Ossuary Watch Helm"
+        "name": "藏骨守卫头盔"
       },
       "reliquary_shoulder": {
-        "name": "Crumbled Spaulders"
+        "name": "碎裂的肩甲"
       },
       "reliquary_gloves_rog": {
-        "name": "Bonewarden Grips"
+        "name": "护骨者护手"
       },
       "deacon_reliquary_helm": {
-        "name": "Deacon's Reliquary Helm"
+        "name": "执事的圣物库头盔"
       },
       "varric_shadow_cowl": {
-        "name": "Varric's Shadow Cowl"
+        "name": "瓦里克的暗影兜帽"
       },
       "the_codfather": {
         "name": "鳕鱼教父"
@@ -5059,34 +5089,34 @@ export const zh_CN: EnTranslations = {
         "name": "神秘外观宝箱"
       },
       "deathless_heartwood": {
-        "name": "Heartwood of the Deathless Crown"
+        "name": "不朽王冠之心木"
       },
       "kingsbane_last_oath": {
-        "name": "Kingsbane, Last Oath of Thornpeak"
+        "name": "弑王者，荆峰的最后誓言"
       },
       "crownforged_dreadhelm": {
-        "name": "Crownforged Dreadhelm"
+        "name": "铸冠恐惧头盔"
       },
       "crownforged_warspaulders": {
-        "name": "Crownforged Warspaulders"
+        "name": "铸冠战肩甲"
       },
       "nighttalon_crown": {
-        "name": "Nighttalon Crown"
+        "name": "夜爪之冠"
       },
       "nighttalon_shoulderguards": {
-        "name": "Nighttalon Shoulderguards"
+        "name": "夜爪护肩"
       },
       "soulflame_cowl": {
-        "name": "Soulflame Cowl"
+        "name": "魂焰兜帽"
       },
       "soulflame_mantle": {
-        "name": "Soulflame Mantle"
+        "name": "魂焰披肩"
       },
       "stormcallers_crown": {
-        "name": "Stormcaller's Crown"
+        "name": "唤雷者之冠"
       },
       "stormcallers_spaulders": {
-        "name": "Stormcaller's Spaulders"
+        "name": "唤雷者肩甲"
       },
       "unknown_alien_weaponry": {
         "name": "未知异星武器"
@@ -5138,12 +5168,6 @@ export const zh_CN: EnTranslations = {
       },
       "vanguard_chrome_armor_plate": {
         "name": "先锋铬银"
-      },
-      "glade_pelt": {
-        "name": "林间兽皮"
-      },
-      "monarch_heart": {
-        "name": "君主之心"
       }
     },
     "mobs": {
@@ -5310,31 +5334,31 @@ export const zh_CN: EnTranslations = {
         "name": "受缚守卫者"
       },
       "nythraxis_skeleton_warrior": {
-        "name": "Risen Royal Guard"
+        "name": "复苏王室卫兵"
       },
       "nythraxis_scourge_of_thornpeak": {
-        "name": "Nythraxis, Scourge of Thornpeak"
+        "name": "尼思拉克西斯，荆峰之灾"
       },
       "reliquary_ledger_wraith": {
-        "name": "Ledger Wraith"
+        "name": "名册幽魂"
       },
       "reliquary_funeral_ringer": {
-        "name": "Funeral Ringer"
+        "name": "丧葬鸣钟者"
       },
       "reliquary_gravecall_acolyte": {
-        "name": "Gravecall Acolyte"
+        "name": "唤墓侍僧"
       },
       "reliquary_bonewalker": {
-        "name": "Raised Bonewalker"
+        "name": "复生的骨行者"
       },
       "reliquary_saintless_effigy": {
-        "name": "Saintless Effigy"
+        "name": "无圣徒像"
       },
       "deacon_varric": {
-        "name": "Deacon Varric"
+        "name": "执事瓦里克"
       },
       "acolyte_tessa": {
-        "name": "Acolyte Tessa"
+        "name": "侍僧泰莎"
       },
       "ironvein_foreman": {
         "name": "铁脉工头"
@@ -5443,48 +5467,6 @@ export const zh_CN: EnTranslations = {
       },
       "ysolei": {
         "name": "伊索蕾，溺月化身"
-      },
-      "elder_bristleback": {
-        "name": "年长硬鬃"
-      },
-      "sableweb_hatchling": {
-        "name": "黑网幼蛛"
-      },
-      "sableweb_matriarch": {
-        "name": "黑网主母"
-      },
-      "bramble_lynx": {
-        "name": "棘丛猞猁"
-      },
-      "brightwood_hare": {
-        "name": "明木野兔"
-      },
-      "brightwood_monarch": {
-        "name": "明木君主"
-      },
-      "brightwood_stag": {
-        "name": "明木雄鹿"
-      },
-      "dawnmane_doe": {
-        "name": "晨鬃母鹿"
-      },
-      "glade_fox": {
-        "name": "林地狐狸"
-      },
-      "grovetusk_boar": {
-        "name": "林牙野猪"
-      },
-      "meadow_crane": {
-        "name": "草甸仙鹤"
-      },
-      "spotted_fawn": {
-        "name": "斑点幼鹿"
-      },
-      "sunhide_bear": {
-        "name": "阳皮熊"
-      },
-      "thornpelt_badger": {
-        "name": "棘毛獾"
       }
     },
     "npcs": {
@@ -5584,24 +5566,24 @@ export const zh_CN: EnTranslations = {
         "greeting": "小心松动的页岩，{className}。这座山近来不安，我想知道原因。"
       },
       "brother_aldric_raid": {
-        "name": "Brother Aldric",
-        "title": "Priest of the Vale",
-        "greeting": "From a chapel yard in the Vale to the roof of the world... the trail we have followed ends here. I can feel the mountain listening."
+        "name": "奥德里克修士",
+        "title": "山谷牧师",
+        "greeting": "从礼拜堂墓地到世界屋脊... 线索到这里结束。我感觉山正在聆听。"
       },
       "brother_halven": {
-        "name": "Brother Halven",
-        "title": "Reliquary Keeper",
-        "greeting": "The reliquary below has shifted again."
+        "name": "哈尔文修士",
+        "title": "圣物库守护人",
+        "greeting": "下方的圣物库又移位了。"
       },
       "tidewatcher_ondrel": {
         "name": "翁德雷尔·凡恩",
         "title": "守潮者",
         "greeting": "潭水饮尽月光，{className}，又将溺者吐还。我守望那道门户已有三十夜——而今夜，它开了。"
       },
-      "ranger_elwyn": {
-        "greeting": "安静些，{className}，林地今日很宁静，我也想让它一直如此。",
-        "name": "游侠埃尔温",
-        "title": "林地守望者"
+      "skytrial_master": {
+        "name": "天空大师维尔",
+        "title": "天试守望者",
+        "greeting": "天空是一条少有人敢踏足的道路，{className}。赢得它，它便会载你而行。"
       }
     },
     "quests": {
@@ -6281,8 +6263,8 @@ export const zh_CN: EnTranslations = {
       },
       "q_nythraxis_restless_dead": {
         "title": "骨原的异动",
-        "text": "Thornpeak Heights 出事了，{playerName}。亡者不再漫无目的地游荡。他们在 Highwatch 以北的骨原集结并行军，那里是旧战场与峭壁道路交汇之处。去那里调查骨甲亡魂的异动，并带回任何能说明是什么驱使它们的证据。",
-        "completion": "每块碎片上都有同一个标记……一顶王冠。我以前见过它，刻在一些 Eastbrook 记录中早已遗忘的旧坟上。",
+        "text": "荆峰高地出事了，{playerName}。亡者不再漫无目的地游荡。他们在高望以北的骨原集结并行军，那里是旧战场与峭壁道路交汇之处。去那里调查骨甲亡魂的异动，并带回任何能说明是什么驱使它们的证据。",
+        "completion": "每块碎片上都有同一个标记……一顶王冠。我以前见过它，刻在一些东溪记录中早已遗忘的旧坟上。",
         "objectives": {
           "0": {
             "label": "符文骨片"
@@ -6307,7 +6289,7 @@ export const zh_CN: EnTranslations = {
       },
       "q_nythraxis_sealed_crypt": {
         "title": "废弃墓穴",
-        "text": "幻象指向西侧峭壁中的废弃墓穴。古老传说称，那座墓穴曾安置一位国王。也许在马尔里克的仪式把他扭曲成不死之物后，Thornpeak 将他封在了下面。进入墓穴，看看里面还剩下什么。",
+        "text": "幻象指向西侧峭壁中的废弃墓穴。古老传说称，那座墓穴曾安置一位国王。也许在马尔里克的仪式把他扭曲成不死之物后，荆峰将他封在了下面。进入墓穴，看看里面还剩下什么。",
         "completion": "钥石的两半合在了一起，而沃斯的日记写明了它们封印之物：尼思拉克西斯国王的印戒。如果日记属实，那枚印戒就是通往他陵墓的钥匙。",
         "objectives": {
           "0": {
@@ -6338,12 +6320,12 @@ export const zh_CN: EnTranslations = {
         }
       },
       "q_nythraxis_scourges_end": {
-        "title": "Scourge's End",
-        "text": "The signet has opened the way, {playerName}, but an open tomb is not a victory. Nythraxis was a king once, and the ruin beneath Thornpeak is still bound to his will. Enter the crypt with allies you trust. Break the deathless crown before its command reaches the battlefield above.",
-        "completion": "Then the crown is silent at last. Thornpeak will still carry its dead, but no king below it will call them to war again. You have ended what Aldren, Malric, and Voss could only contain.",
+        "title": "天灾终结",
+        "text": "印戒已经打开道路，{playerName}，但敞开的陵墓还不是胜利。尼思拉克西斯曾是国王，而索恩峰地下的废墟仍受他的意志束缚。带上值得信任的盟友进入墓穴。在那不死王冠的命令传到上方战场之前，将它击碎。",
+        "completion": "王冠终于沉默了。索恩峰仍会背负它的亡者，但山下再没有国王能召他们重返战争。你完成了奥德伦、马尔里克和沃斯只能暂时封住的事。",
         "objectives": {
           "0": {
-            "label": "Nythraxis slain"
+            "label": "击败尼思拉克西斯"
           }
         }
       },
@@ -6420,144 +6402,35 @@ export const zh_CN: EnTranslations = {
           }
         }
       },
-      "q_mogger_tracks": {
-        "title": "莫格的踪迹",
-        "text": "在你踏上北路前，东溪还有最后一根刺：莫格。那蛮兽践踏下方草地，把野猪都逼疯了。清理它踪迹周围的草地，我们才能看出它藏在哪里。",
-        "completion": "这些足迹很新，也深得能积住雨水。莫格不是营火故事，{playerName}，而且它就在附近。",
+      "q_skyward_first_flight": {
+        "title": "初次飞行",
+        "text": "你在地面上已能稳稳驾驭一匹有翼坐骑了，{playerName} — 现在带它升空吧。飞越溪谷天试：一次环形飞行穿过八个圆环。先别去追逐时间。只管留在空中，穿过每一个圆环。",
+        "completion": "你没有坠落。这已胜过大多数人初次环飞的表现。天空会记得那些不断归来的人。",
         "objectives": {
           "0": {
-            "label": "野猪被赶离踪迹"
+            "label": "完成溪谷天试"
           }
         }
       },
-      "q_brightwood_monarch": {
-        "completion": "原来老王已经倒下了。这是件沉重的事，但比起死在狼群口中，这已是更仁慈的结局。怀着敬意戴上这顶用它鹿角制成的冠冕吧，{playerName}。",
+      "q_skyward_time_trial": {
+        "title": "与时间赛跑",
+        "text": "现在带着心意去做。再飞一次溪谷天试，{playerName}，但要在沙漏漏尽之前完成。每个圆环走一条干净的线，不浪费一寸空气。要精准，不要慌乱。",
+        "completion": "一条干净的线，环环相扣。你不再只是骑着天空 — 你已在飞翔。",
         "objectives": {
           "0": {
-            "label": "君主之心"
+            "label": "在标准用时内飞完溪谷天试"
           }
-        },
-        "text": "有一头野兽，我独自一人绝不敢向它放箭：明木君主，那头统治着深林地的巨鹿。它已变得年迈而凶残，任何靠近它巢穴的生灵都会被它顶死。它绝非一名猎人所能匹敌，带上一两个伙伴吧。将它安葬，并把它的心脏带给我，{playerName}。",
-        "title": "明木君主"
+        }
       },
-      "q_brightwood_thinning": {
-        "completion": "很好。这群兽已被削减，这些兽皮也都完好，林地还能再撑过一季。",
+      "q_skyward_ascendant": {
+        "title": "登天者",
+        "text": "只剩一场试炼了，{playerName}：溪谷环道。在标准用时内飞完长环三圈 — 不靠运气，只凭技艺。征服它，开阔的天空便从此岸到彼岸尽归你所有。",
+        "completion": "扶摇直上，无可阻挡。天空如今属于你了，{playerName}。收下这张凭证 — 一匹空中坐骑，是赢来的而非买来的，载你前往任何你心之所向之处。",
         "objectives": {
           "0": {
-            "label": "击杀棘丛猞猁"
-          },
-          "1": {
-            "label": "林间兽皮"
+            "label": "在标准用时内飞完溪谷环道"
           }
-        },
-        "text": "明木林地泛滥成灾了，{playerName}。棘丛猞猁繁殖的速度比我清剿的还快，鹿群又把所剩无几的草场践踏殆尽。击杀8只棘丛猞猁，并带回6张林间兽皮，好让我判断其余兽群的健康状况。",
-        "title": "削减林地之患"
-      },
-      "q_ledger_brood": {
-        "completion": "淹没一窝幼虫，是件残忍的活儿。但此刻的狠心，能省下日后一百场葬礼。这笔账了结了。",
-        "objectives": {
-          "0": {
-            "label": "击碎黑网幼蛛"
-          }
-        },
-        "text": "杀光潜伏者只是给幼虫腾出了地方。黑网幼蛛正从深处的巢穴中蜂拥而出，一百颗小尖牙杀死一名旅人，和一颗大尖牙一样致命。趁它们长大之前，击碎8只黑网幼蛛。",
-        "title": "孳生的黑暗"
-      },
-      "q_ledger_deepvermin": {
-        "completion": "十二只顶着烛火脑袋的害虫，全清了！好了，伙计们，回竖井下去。你为我在元帅面前挣得了一句好话，{playerName}。",
-        "objectives": {
-          "0": {
-            "label": "击杀地道鼠掘地者"
-          }
-        },
-        "text": "元帅的名录上写着你专门清理害虫。这下好了，我这处矿坑里就有最难缠的一群。地道鼠繁殖的速度比我手下挥镐还快，干掉12只地道鼠掘地者，也许入冬前我们就能挖到铜矿。",
-        "title": "深处的害虫"
-      },
-      "q_ledger_first_duty": {
-        "completion": "八处獾窝清空，林地的地面也归于平整。很好。这本名录上的每一个名字，最初都站在你如今所站的地方。",
-        "objectives": {
-          "0": {
-            "label": "清剿棘毛獾"
-          }
-        },
-        "text": "你想在东溪挣口饭吃吗，{playerName}？那就从每个守望者起步的地方开始。棘毛獾在远北的明木林地里掘穴筑窝，越过狼径，把林地的地面都拱塌进了它们的洞窟。清剿8头棘毛獾，名录便会记下你的名字。",
-        "title": "守望者的第一项职责"
-      },
-      "q_ledger_great_boar": {
-        "completion": "年长硬鬃，竟死在你手里！光那张兽皮就值得上一季的交易。你让这本名录倍感骄傲，{playerName}。",
-        "objectives": {
-          "0": {
-            "label": "击杀年长硬鬃"
-          },
-          "1": {
-            "label": "击杀兽群中的野猪"
-          }
-        },
-        "text": "西边的灌木丛里有一头老公猪，年长硬鬃，皮糙得像树皮，脾气也一样火爆。它已经顶伤了我两名剥皮手。把它撂倒，再清掉躲在它身后的6头次等野猪，我就让你的名字高居名录之上。",
-        "title": "巨型硬鬃"
-      },
-      "q_ledger_outlaw_captain": {
-        "completion": "维尔兰队长死了，他的外套也送到了我门前。这笔账了结了，{playerName}。谷地会向后来的守望者传颂那个了结此事之人的名字。",
-        "objectives": {
-          "0": {
-            "label": "斩杀谷地强盗"
-          },
-          "1": {
-            "label": "击杀维尔兰队长"
-          }
-        },
-        "text": "名录上的最后一个名字，是我一年来最想划掉的：维尔兰队长，他把半个谷地的人都拉去当了强盗。他藏在东南营地，由副官们护着。斩杀6名谷地强盗杀出一条路抵达他，然后亲手了结维尔兰本人。别独自前往。",
-        "title": "亡命队长"
-      },
-      "q_ledger_reedwater": {
-        "completion": "这能让那些咕噜作响的恶鬼一季都不来碰我的渔网了。告诉元帅，湖面又恢复宁静了。",
-        "objectives": {
-          "0": {
-            "label": "击杀泥鳍潜伏者"
-          }
-        },
-        "text": "红溪派你来的？很好，这把老骨头再也蹚不动浅滩了。泥鳍又悄悄爬回了芦苇水域，而且比以往更加大胆。削减它们：8只泥鳍潜伏者，当心深水。",
-        "title": "芦苇水域巡逻"
-      },
-      "q_ledger_silk": {
-        "completion": "黑暗中的织网者又少了八只。林子呼吸得轻松些了，我也是。",
-        "objectives": {
-          "0": {
-            "label": "击杀网木潜伏者"
-          }
-        },
-        "text": "名录把东边的林子也划为守望者的领地。网木潜伏者每周织的网都更密，上个集市日，有个孩子误闯太近，我们把她割下来时几乎已经断了气。趁它们彻底占据这片林子之前，击杀8只网木潜伏者。",
-        "title": "丝与毒"
-      },
-      "q_ledger_teeth": {
-        "completion": "十只狼，黄昏的道路又归我们所有了。这本名录对你越发宽厚了。",
-        "objectives": {
-          "0": {
-            "label": "击杀森林狼"
-          }
-        },
-        "text": "狼群已经摸清了巡逻路线，它们在黄昏时分动手，那时光线昏暗，落单的旅人便成了好下口的猎物。粉碎它们，{playerName}。击杀10只森林狼，让狼群重新学会教训。",
-        "title": "黑暗中的尖牙"
-      },
-      "q_ledger_toll": {
-        "completion": "八名强盗都得到了报应。已经有风声传开，说这条收费路有了新的看守人，而他不收银钱，他取人头。",
-        "objectives": {
-          "0": {
-            "label": "将谷地强盗绳之以法"
-          }
-        },
-        "text": "东南的山丘成了强盗收费的关路，他们抢劫任何蠢到轻装上路的人。名录上为他们每一个都标了价。把东溪的公道带给8名谷地强盗。",
-        "title": "拦路贼的过路费"
-      },
-      "q_ledger_vigil": {
-        "completion": "十个亡魂回归了大地，也为礼拜堂换来了一夜安宁。即便名录会遗忘，圣光也会铭记这样的守夜。",
-        "objectives": {
-          "0": {
-            "label": "安息不宁骸骨"
-          }
-        },
-        "text": "当麻烦超出刀剑所能及的范围时，元帅就会把他的守望者派来找我。礼拜堂的亡者不肯安息，而我已太老，撑不住整夜的守夜。替我守住它，{playerName}，让10具不宁骸骨重归安息。",
-        "title": "礼拜堂的守夜"
+        }
       }
     },
     "zones": {
@@ -6593,7 +6466,7 @@ export const zh_CN: EnTranslations = {
             "label": "明木林地"
           },
           "9": {
-            "label": "Brightwood Glade"
+            "label": "明木林地"
           }
         }
       },
@@ -6682,13 +6555,13 @@ export const zh_CN: EnTranslations = {
       },
       "nythraxis_crypt": {
         "name": "废弃墓穴",
-        "enterText": "你跨过废弃墓穴的门槛。",
-        "leaveText": "你回到 Thornpeak 的寒冷空气中。"
+        "enterText": "你走下荆峰被遗忘废墟之下的废弃墓穴。",
+        "leaveText": "你爬出废弃墓穴，回到荆峰的山风之中。"
       },
       "nythraxis_boss_arena": {
-        "name": "Nythraxis Raid Arena",
-        "enterText": "You pass through the sealed royal door.",
-        "leaveText": "You return to the cold air of Thornpeak."
+        "name": "尼思拉克西斯团队竞技场",
+        "enterText": "你穿过封印的王室之门。",
+        "leaveText": "你回到荆峰的寒冷空气中。"
       },
       "drowned_temple": {
         "name": "溺亡神殿",
@@ -6698,46 +6571,46 @@ export const zh_CN: EnTranslations = {
     },
     "delves": {
       "collapsed_reliquary": {
-        "name": "The Collapsed Reliquary",
-        "enterText": "You descend into the collapsed reliquary.",
-        "leaveText": "You climb back to Brother Halven at the reliquary ruin."
+        "name": "坍塌的圣物库",
+        "enterText": "你向下深入坍塌的圣物库。",
+        "leaveText": "你攀回圣物库废墟旁的哈尔文修士身边。"
       }
     },
     "itemSets": {
       "crownforged": {
-        "name": "Crownforged Regalia",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Strength by 15 and Stamina by 15."
+        "name": "铸冠战装",
+        "bonus2": "攻击强度提高 40 点。",
+        "bonus3": "力量提高 15 点，耐力提高 15 点。"
       },
       "deathlord": {
-        "name": "Deathlord Battlegear",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Strength by 15 and Stamina by 15."
+        "name": "死王战甲",
+        "bonus2": "攻击强度提高 40 点。",
+        "bonus3": "力量提高 15 点，耐力提高 15 点。"
       },
       "necromancers": {
-        "name": "Necromancer's Raiment",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "死灵法师法衣",
+        "bonus2": "受到伤害造成的施法延退降低 50%。",
+        "bonus3": "施法时不会因受到伤害而被延退。"
       },
       "nighttalon": {
-        "name": "Nighttalon Pelt",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15 and critical strike chance by 2%."
+        "name": "夜爪皮甲",
+        "bonus2": "攻击强度提高 40 点。",
+        "bonus3": "敏捷提高 15 点，致命一击几率提高 2%。"
       },
       "soulflame": {
-        "name": "Soulflame Regalia",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "魂焰法衣",
+        "bonus2": "受到伤害造成的施法延退降低 50%。",
+        "bonus3": "施法时不会因受到伤害而被延退。"
       },
       "stormcallers": {
-        "name": "Stormcaller's Vestments",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "name": "唤雷者法衣",
+        "bonus2": "受到伤害造成的施法延退降低 50%。",
+        "bonus3": "施法时不会因受到伤害而被延退。"
       },
       "wyrmshadow": {
-        "name": "Wyrmshadow Vestments",
-        "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15 and critical strike chance by 2%."
+        "name": "龙影外衣",
+        "bonus2": "攻击强度提高 40 点。",
+        "bonus3": "敏捷提高 15 点，致命一击几率提高 2%。"
       }
     }
   },
@@ -6746,8 +6619,8 @@ export const zh_CN: EnTranslations = {
     "dungeonExitName": "{name}出口",
     "dungeonPartyWarning": "{name}适合{count}人完整队伍挑战。请谨慎前进。",
     "dungeonInstanceBusy": "{name}的所有副本都已被占用。请稍后再试。",
-    "delveLockedChestInteract": "Press F to pick the lock",
-    "delveRewardChestInteract": "Press F to claim spoils",
-    "delveSurfaceExitInteract": "Press F to climb"
+    "delveLockedChestInteract": "按 F 撬锁",
+    "delveRewardChestInteract": "按 F 领取战利品",
+    "delveSurfaceExitInteract": "按 F 攀回地表"
   }
 };

@@ -2906,6 +2906,7 @@ export class Hud {
       values.school = t(`hudChrome.auraEffect.school.${effect.school}` as TranslationKey);
     }
     return `<div class="tt-effect">${esc(t(effect.key as TranslationKey, values))}</div>`;
+  }
 
   attachTooltip(el: HTMLElement, html: () => string): void {
     let touchTimer: number | undefined;
