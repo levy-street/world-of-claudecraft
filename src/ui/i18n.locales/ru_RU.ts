@@ -82,7 +82,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterLoot.assignAria': 'Назначить {item} игроку {name}',
   'hudChrome.masterLoot.rollButton': 'Бросок',
   'hudChrome.masterLoot.selectAll': 'Выбрать всех',
-  'hudChrome.masterLoot.methodMaster': 'Способ добычи изменён на мастера добычи. Мастер добычи: {name}.',
+  'hudChrome.masterLoot.methodMaster':
+    'Способ добычи изменён на мастера добычи. Мастер добычи: {name}.',
   'hudChrome.masterLoot.methodGroup': 'Способ добычи изменён на групповой.',
   'hudChrome.masterLoot.assigned': '{looter} передал предмет {item} игроку {target}.',
   'hudChrome.masterLoot.unassigned': 'Предмет {item} не был назначен и доступен всем.',

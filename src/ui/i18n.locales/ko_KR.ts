@@ -81,7 +81,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterLoot.assignAria': '{item}을(를) {name}에게 분배',
   'hudChrome.masterLoot.rollButton': '주사위',
   'hudChrome.masterLoot.selectAll': '전체 선택',
-  'hudChrome.masterLoot.methodMaster': '전리품 방식이 분배 담당으로 설정되었습니다. 분배 담당자: {name}.',
+  'hudChrome.masterLoot.methodMaster':
+    '전리품 방식이 분배 담당으로 설정되었습니다. 분배 담당자: {name}.',
   'hudChrome.masterLoot.methodGroup': '전리품 방식이 파티 분배로 설정되었습니다.',
   'hudChrome.masterLoot.assigned': '{looter}님이 {item}을(를) {target}에게 분배했습니다.',
   'hudChrome.masterLoot.unassigned': '{item}이(가) 분배되지 않아 모두가 획득할 수 있습니다.',

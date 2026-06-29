@@ -7722,7 +7722,7 @@ export class Hud {
     this.activeLootRolls.set(ev.rollId, {
       event: ev,
       receivedAt: performance.now(),
-      durationMs: 30_000,
+      durationMs: 60_000,
     });
     this.renderLootRolls();
   }
@@ -7739,7 +7739,7 @@ export class Hud {
   // both RE-SHOWS an open roll whose event was missed (reconnect, interest
   // churn, a dropped snapshot) and RETIRES a shown roll the server has since
   // resolved (the mirror drops it to []), so a stale dead-button prompt no
-  // longer lingers until the 30s local timer. The three-way decision lives in
+  // longer lingers until the local timer. The three-way decision lives in
   // the pure computeLootRollReconcile; here we apply it to the live DOM state.
   private reconcileLootRolls(): void {
     const open = this.sim.activeLootRolls();
@@ -7773,7 +7773,7 @@ export class Hud {
       this.activeLootRolls.set(id, {
         event: { type: 'lootRoll', ...p },
         receivedAt: performance.now(),
-        durationMs: 30_000,
+        durationMs: 60_000,
       });
       changed = true;
     }
@@ -7784,7 +7784,7 @@ export class Hud {
     this.activeMasterRolls.set(ev.rollId, {
       event: ev,
       receivedAt: performance.now(),
-      durationMs: 30_000,
+      durationMs: 60_000,
     });
     this.renderLootRolls();
   }

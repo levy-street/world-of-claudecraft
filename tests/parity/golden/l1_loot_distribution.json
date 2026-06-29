@@ -30,8 +30,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 392,
-      "state": "d1f873a7",
-      "events": "7601bb8c",
+      "state": "c5f53e04",
+      "events": "22557322",
       "rng": {
         "draws": 1,
         "digest": "b4f92bc7"
@@ -259,7 +259,7 @@
         {
           "aiState": "idle",
           "combatTimer": 99,
-          "corpseTimer": 32,
+          "corpseTimer": 62,
           "critChance": 0.05,
           "dead": true,
           "detonateTimer": "Infinity",
@@ -322,7 +322,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 392,
-      "state": "8e0f1f59",
+      "state": "c9b57c8c",
       "events": "6694308e",
       "rng": {
         "draws": 3,
@@ -555,7 +555,7 @@
         {
           "aiState": "idle",
           "combatTimer": 99,
-          "corpseTimer": 31.95,
+          "corpseTimer": 61.95,
           "critChance": 0.05,
           "dead": true,
           "detonateTimer": "Infinity",

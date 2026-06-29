@@ -33,30 +33,30 @@
   "counts": {
     "keys": 4645,
     "rows": 92900,
-    "translated": 92461,
-    "pending": 322,
+    "translated": 92713,
+    "pending": 70,
     "blocked": 117,
     "blockedSource": 92
   },
   "perLocale": {
     "es": {
-      "translated": 4621,
-      "pending": 23,
+      "translated": 4639,
+      "pending": 5,
       "blocked": 1
     },
     "es_ES": {
-      "translated": 4621,
-      "pending": 23,
+      "translated": 4639,
+      "pending": 5,
       "blocked": 1
     },
     "fr_FR": {
-      "translated": 4610,
-      "pending": 23,
+      "translated": 4628,
+      "pending": 5,
       "blocked": 12
     },
     "fr_CA": {
-      "translated": 4611,
-      "pending": 23,
+      "translated": 4629,
+      "pending": 5,
       "blocked": 11
     },
     "en_CA": {
@@ -65,13 +65,13 @@
       "blocked": 0
     },
     "it_IT": {
-      "translated": 4610,
-      "pending": 23,
+      "translated": 4628,
+      "pending": 5,
       "blocked": 12
     },
     "de_DE": {
-      "translated": 4608,
-      "pending": 23,
+      "translated": 4626,
+      "pending": 5,
       "blocked": 14
     },
     "zh_CN": {
@@ -95,8 +95,8 @@
       "blocked": 0
     },
     "pt_BR": {
-      "translated": 4614,
-      "pending": 23,
+      "translated": 4632,
+      "pending": 5,
       "blocked": 8
     },
     "ru_RU": {
@@ -105,38 +105,38 @@
       "blocked": 0
     },
     "nl_NL": {
-      "translated": 4604,
-      "pending": 23,
+      "translated": 4622,
+      "pending": 5,
       "blocked": 18
     },
     "pl_PL": {
-      "translated": 4616,
-      "pending": 23,
+      "translated": 4634,
+      "pending": 5,
       "blocked": 6
     },
     "id_ID": {
-      "translated": 4615,
-      "pending": 23,
+      "translated": 4633,
+      "pending": 5,
       "blocked": 7
     },
     "tr_TR": {
-      "translated": 4621,
-      "pending": 23,
+      "translated": 4639,
+      "pending": 5,
       "blocked": 1
     },
     "sv_SE": {
-      "translated": 4611,
-      "pending": 23,
+      "translated": 4629,
+      "pending": 5,
       "blocked": 11
     },
     "vi_VN": {
-      "translated": 4621,
-      "pending": 23,
+      "translated": 4639,
+      "pending": 5,
       "blocked": 1
     },
     "da_DK": {
-      "translated": 4608,
-      "pending": 23,
+      "translated": 4626,
+      "pending": 5,
       "blocked": 14
     }
   }

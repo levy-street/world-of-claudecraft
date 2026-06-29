@@ -45,7 +45,7 @@ import { LOOT_FFA_DELAY } from './loot_ffa';
 
 // How long (seconds) a need-greed roll stays open before it auto-resolves. Sole
 // users are startNeedGreedRoll + pruneCorpseLoot, so the constant lives with them.
-const LOOT_ROLL_TIMEOUT = 30;
+const LOOT_ROLL_TIMEOUT = 60;
 
 // The server-authoritative pending need-greed roll record. Sim-internal (the public
 // projection clients see is LootRollPrompt); the `pendingLootRolls` map lives on Sim

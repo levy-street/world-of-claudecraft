@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { meetsMasterThreshold, effectiveMasterLooter, QUALITY_RANK } from '../src/sim/loot_master';
+import { describe, expect, it } from 'vitest';
+import { effectiveMasterLooter, meetsMasterThreshold, QUALITY_RANK } from '../src/sim/loot_master';
 import type { MasterLootSettings } from '../src/sim/types';
 
 describe('meetsMasterThreshold', () => {

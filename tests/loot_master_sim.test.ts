@@ -187,10 +187,10 @@ describe('master loot', () => {
     sim.lootCorpse(mob.id, a);
     const rollId = sim.events.find((e) => e.type === 'masterLoot')!.rollId;
 
-    // Run past the 30s curate timeout, collecting events from each tick (the
+    // Run past the 60s curate timeout, collecting events from each tick (the
     // sim drains its event buffer per tick, so capture the returns).
     const rolls: number[] = [];
-    for (let i = 0; i < 20 * 31; i++) {
+    for (let i = 0; i < 20 * 61; i++) {
       for (const e of sim.tick())
         if (e.type === 'lootRoll' && e.rollId === rollId && e.pid !== undefined) rolls.push(e.pid);
     }
