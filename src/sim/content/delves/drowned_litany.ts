@@ -110,6 +110,11 @@ export const DROWNED_LITANY_MODULES: Record<string, DelveModuleDef> = {
     length: 110,
     spawnSets: [SLUICE_SPAWNS],
     interactableSlots: [],
+    // Blackwater seeps along the open channel on the concave side of the crescent.
+    hazards: [
+      { x: 14, z: 13, r: 5 },
+      { x: -15, z: 54, r: 5 },
+    ],
   },
   litany_ledger: {
     id: 'litany_ledger',
@@ -118,6 +123,12 @@ export const DROWNED_LITANY_MODULES: Record<string, DelveModuleDef> = {
     length: 110,
     spawnSets: [LEDGER_SPAWNS],
     interactableSlots: [],
+    // Flooded channels weave between the raised ledger islands.
+    hazards: [
+      { x: 0, z: 22, r: 5 },
+      { x: -3, z: 50, r: 5 },
+      { x: 14, z: 66, r: 4 },
+    ],
   },
   litany_ring: {
     id: 'litany_ring',
@@ -126,6 +137,11 @@ export const DROWNED_LITANY_MODULES: Record<string, DelveModuleDef> = {
     length: 110,
     spawnSets: [RING_SPAWNS],
     interactableSlots: [],
+    // Blackwater pools the two side lanes that loop around the sealed centre.
+    hazards: [
+      { x: 18, z: 24, r: 5 },
+      { x: -18, z: 56, r: 5 },
+    ],
   },
   litany_baptistry: {
     id: 'litany_baptistry',
@@ -134,6 +150,9 @@ export const DROWNED_LITANY_MODULES: Record<string, DelveModuleDef> = {
     length: 110,
     spawnSets: [BAPTISTRY_SPAWNS],
     interactableSlots: [],
+    // The drowned font itself: the central sinkhole brims with Blackwater. Players
+    // orbit the rim on the walkway and must not wade through the middle.
+    hazards: [{ x: 0, z: 40, r: 7 }],
   },
   litany_choir_loft: {
     id: 'litany_choir_loft',
@@ -142,6 +161,12 @@ export const DROWNED_LITANY_MODULES: Record<string, DelveModuleDef> = {
     length: 110,
     spawnSets: [CHOIR_LOFT_SPAWNS],
     interactableSlots: [],
+    // Seepage gathers between the fanning choir ranks.
+    hazards: [
+      { x: 0, z: 33, r: 5 },
+      { x: -13, z: 60, r: 4 },
+      { x: 13, z: 60, r: 4 },
+    ],
   },
   litany_causeway: {
     id: 'litany_causeway',
@@ -150,6 +175,11 @@ export const DROWNED_LITANY_MODULES: Record<string, DelveModuleDef> = {
     length: 110,
     spawnSets: [CAUSEWAY_SPAWNS],
     interactableSlots: [],
+    // The west causeway lane has flooded; push players onto the east lane.
+    hazards: [
+      { x: -15, z: 26, r: 5 },
+      { x: -15, z: 50, r: 5 },
+    ],
   },
   litany_apse: {
     id: 'litany_apse',
@@ -158,6 +188,12 @@ export const DROWNED_LITANY_MODULES: Record<string, DelveModuleDef> = {
     length: 110,
     spawnSets: [APSE_SPAWNS],
     interactableSlots: [],
+    // Two shallow pools in the southern cover, well clear of the boss stomp ring
+    // around the dais (z=80, r=12): all hazards stay at z <= 32.
+    hazards: [
+      { x: -12, z: 20, r: 5 },
+      { x: 12, z: 30, r: 4 },
+    ],
   },
 };
 

@@ -71,6 +71,12 @@ const DELVE_GRAVE_SOLID_R = 1.0;
 const DELVE_WALL_SOLID_R = 3.2; // an intact (undestroyed) destructible wall
 const DELVE_INTERACT_RANGE = 6;
 const DELVE_BAD_AIR_INTERVAL = 8;
+// Static Blackwater hazard: while a player stands in a module hazard zone, deal a
+// fraction of their max HP every interval. Low on Normal, moderate on Heroic. No
+// debuff in MVP (PRD section 6); the damage source label localizes like 'Falling'.
+const DELVE_BLACKWATER_INTERVAL = 1;
+const DELVE_BLACKWATER_PCT_NORMAL = 0.04;
+const DELVE_BLACKWATER_PCT_HEROIC = 0.08;
 const DELVE_RAISE_DEAD_CHANNEL = 5;
 const DELVE_EXIT_PORTAL_RADIUS = 3.5;
 export const DELVE_MODULE_NAMES: Record<string, string> = {
@@ -381,6 +387,7 @@ export function claimDelveRun(
   run.raiseDeadChannel = null;
   run.restlessPending = [];
   run.badAirTimer = 0;
+  run.blackwaterTimer = 0;
   run.companionBarks = [];
   run.companion = undefined;
   run.exitPortalOpen = false;
@@ -488,6 +495,7 @@ export function freeDelveRun(ctx: SimContext, run: DelveRun): void {
   run.raiseDeadChannel = null;
   run.restlessPending = [];
   run.badAirTimer = 0;
+  run.blackwaterTimer = 0;
   run.companionBarks = [];
   run.companion = undefined;
   run.exitPortalOpen = false;
@@ -772,6 +780,7 @@ export function tickDelveRun(ctx: SimContext, run: DelveRun): void {
   tickDelveModuleExit(ctx, run);
   tickDelveRaiseDeadChannel(ctx, run);
   tickDelveBadAir(ctx, run);
+  tickDelveBlackwater(ctx, run);
   tickDelveRestlessGraves(ctx, run);
 }
 
@@ -978,6 +987,39 @@ export function tickDelveBadAir(ctx: SimContext, run: DelveRun): void {
       tickTimer: 2,
       sourceId: p.id,
     });
+  }
+}
+
+// Static Blackwater hazard (PRD section 6): every DELVE_BLACKWATER_INTERVAL while a
+// player stands inside one of the active module's hazard zones, deal a fraction of
+// their max HP. The zones are authored instance-local on the module def and offset
+// to world space by the active module origin. Not a collider: it only damages
+// standing players (mobs/companions and pathing ignore it).
+export function tickDelveBlackwater(ctx: SimContext, run: DelveRun): void {
+  const mod = DELVE_MODULES[run.modules[run.moduleIndex]];
+  const zones = mod?.hazards;
+  if (!zones || zones.length === 0) return;
+  run.blackwaterTimer += DT;
+  if (run.blackwaterTimer < DELVE_BLACKWATER_INTERVAL) return;
+  run.blackwaterTimer = 0;
+  if (!run.partyKey) return;
+  const tier = DELVES[run.delveId]?.tiers.find((t) => t.id === run.tierId);
+  const pct =
+    (tier?.enemyLevelBonus ?? 0) > 0 ? DELVE_BLACKWATER_PCT_HEROIC : DELVE_BLACKWATER_PCT_NORMAL;
+  const ox = run.origin.x;
+  const oz = run.origin.z + delveModuleZOffset(run);
+  for (const pid of ctx.partyMembersForKey(run.partyKey)) {
+    const p = ctx.entities.get(pid);
+    if (!p || p.dead) continue;
+    const standing = zones.some((z) => {
+      const dx = p.pos.x - (ox + z.x);
+      const dz = p.pos.z - (oz + z.z);
+      return dx * dx + dz * dz <= z.r * z.r;
+    });
+    if (!standing) continue;
+    const dmg = Math.max(1, Math.round(p.maxHp * pct));
+    // Environmental damage: no source, labelled like 'Falling' (sim.ts fall path).
+    ctx.dealDamage(null, p, dmg, false, 'nature', 'Blackwater', 'hit', true);
   }
 }
 

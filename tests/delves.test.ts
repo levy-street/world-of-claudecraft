@@ -7,6 +7,7 @@ import {
   ARENA_X_MIN,
   DELVE_BAND_X_MIN,
   DELVE_LIST,
+  DELVE_MODULES,
   DELVE_X_MIN,
   DELVES,
   delveAt,
@@ -1357,6 +1358,89 @@ describe('The Drowned Litany (Phase 2 marsh layouts: navigable, distinct)', () =
     for (const c of interior) {
       expect(c.z, 'apse cover must stay in the south half').toBeLessThanOrEqual(50);
     }
+  });
+});
+
+describe('The Drowned Litany (Phase 3 static Blackwater hazard)', () => {
+  // World-space centre of a module's hazard zone for the active run.
+  function hazardWorld(sim: Sim, moduleId: string, hazardIndex = 0) {
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    const zBase = delveModuleZOffset(run.modules, run.moduleIndex);
+    const h = DELVE_MODULES[moduleId].hazards![hazardIndex];
+    return { x: run.origin.x + h.x, z: run.origin.z + zBase + h.z, r: h.r, run, zBase };
+  }
+
+  function enterModule(sim: Sim, moduleId: string) {
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    run.modules = [moduleId];
+    run.moduleIndex = 0;
+    (sim as any).spawnDelveModule(run);
+    return run;
+  }
+
+  it('every Drowned Litany module defines at least one Blackwater hazard zone', () => {
+    for (const m of DELVES.drowned_litany.modules) {
+      expect(DELVE_MODULES[m].hazards?.length ?? 0).toBeGreaterThan(0);
+    }
+    expect(
+      DELVE_MODULES[DELVES.drowned_litany.finaleModuleId].hazards?.length ?? 0,
+    ).toBeGreaterThan(0);
+  });
+
+  it('damages a player standing in a Blackwater zone, but not one standing clear', () => {
+    const sim = makeSim('warrior');
+    enterLitany(sim);
+    enterModule(sim, 'litany_baptistry');
+    const hz = hazardWorld(sim, 'litany_baptistry');
+    const p = sim.player;
+    p.pos.x = hz.x;
+    p.pos.z = hz.z;
+    p.prevPos = { ...p.pos };
+    const hp0 = p.hp;
+    for (let i = 0; i < 20; i++) sim.tick(); // exactly one 1s pulse
+    expect(p.hp).toBeLessThan(hp0);
+
+    // Step out to the clear entry aisle: no further Blackwater damage.
+    const hpClear = p.hp;
+    p.pos.x = hz.run.origin.x;
+    p.pos.z = hz.run.origin.z + hz.zBase - 11; // entry spawn, away from all zones
+    p.prevPos = { ...p.pos };
+    for (let i = 0; i < 60; i++) sim.tick();
+    expect(p.hp).toBeGreaterThanOrEqual(hpClear); // out-of-hazard hp only recovers
+  });
+
+  it('Heroic Blackwater hits harder than Normal', () => {
+    const pulseDamage = (tier: 'normal' | 'heroic') => {
+      const sim = makeSim('warrior');
+      enterLitany(sim, tier);
+      enterModule(sim, 'litany_baptistry');
+      const hz = hazardWorld(sim, 'litany_baptistry');
+      const p = sim.player;
+      p.pos.x = hz.x;
+      p.pos.z = hz.z;
+      p.prevPos = { ...p.pos };
+      const hp0 = p.hp;
+      for (let i = 0; i < 20; i++) sim.tick();
+      return hp0 - p.hp;
+    };
+    expect(pulseDamage('heroic')).toBeGreaterThan(pulseDamage('normal'));
+  });
+
+  it('is deterministic: the same seed takes the same Blackwater damage', () => {
+    const run = () => {
+      const sim = makeSim('warrior', 909);
+      enterLitany(sim);
+      enterModule(sim, 'litany_baptistry');
+      const hz = hazardWorld(sim, 'litany_baptistry');
+      const p = sim.player;
+      p.pos.x = hz.x;
+      p.pos.z = hz.z;
+      p.prevPos = { ...p.pos };
+      const hp0 = p.hp;
+      for (let i = 0; i < 60; i++) sim.tick();
+      return hp0 - p.hp;
+    };
+    expect(run()).toBe(run());
   });
 });
 

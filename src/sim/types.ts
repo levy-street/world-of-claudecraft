@@ -2095,6 +2095,16 @@ export interface DelveInteractableSlot {
   variants: string[];
 }
 
+// A static environmental hazard circle (instance-local coords), e.g. the Drowned
+// Litany's Blackwater pools. Standing players take damage on a fixed interval; it
+// is NOT a collider (mobs/companions walk through, pathing ignores it), it only
+// shapes where players choose to stand.
+export interface DelveHazardZone {
+  x: number;
+  z: number;
+  r: number;
+}
+
 export interface DelveModuleDef {
   id: string;
   interior: 'crypt' | 'cave' | 'mine';
@@ -2103,6 +2113,8 @@ export interface DelveModuleDef {
   spawnSets: DelveSpawnSet[];
   interactableSlots: DelveInteractableSlot[];
   sideRoom?: { chance: number; moduleId: string };
+  // Static Blackwater (or similar) hazard zones for this module, instance-local.
+  hazards?: DelveHazardZone[];
 }
 
 export interface DelveDef {
@@ -2160,6 +2172,9 @@ export interface DelveRun {
   raiseDeadChannel: DelveRaiseDeadChannel | null;
   restlessPending: DelveRestlessPending[];
   badAirTimer: number;
+  /** Accumulates DT for the static Blackwater hazard pulse (damage every interval
+   * a player stands in a module hazard zone). Reset on run start / module change. */
+  blackwaterTimer: number;
   companionBarks: string[];
   /** True when the current module exit portal is active (trash cleared + plate if any). */
   exitPortalOpen: boolean;

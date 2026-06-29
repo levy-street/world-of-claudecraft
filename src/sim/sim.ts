@@ -1043,6 +1043,7 @@ export class Sim {
           raiseDeadChannel: null,
           restlessPending: [],
           badAirTimer: 0,
+          blackwaterTimer: 0,
           companionBarks: [],
           exitPortalOpen: false,
           bountiful: false,
