@@ -50,7 +50,7 @@ function makeSim(cls: PlayerClass, level: number): { sim: AnySim; p: AnyEntity; 
 }
 
 function spawnTarget(sim: AnySim, p: AnyEntity, level: number, dz = 4): AnyEntity {
-  const mob = createMob(sim.nextId++, MOBS['forest_wolf'], level, {
+  const mob = createMob(sim.nextId++, MOBS.forest_wolf, level, {
     x: p.pos.x,
     y: p.pos.y,
     z: p.pos.z + dz,

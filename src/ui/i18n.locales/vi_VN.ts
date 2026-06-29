@@ -353,7 +353,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_intellect.description': 'Tăng 2 Trí Tuệ trong 30 phút.',
   'entities.abilities.arcane_intellect.name': 'Trí Tuệ Bí Thuật',
   'entities.abilities.arcane_missiles.description':
-    'Phóng các Phi Đạn Bí Thuật vào kẻ địch, gây 8 sát thương Bí Thuật mỗi giây trong 3 giây.',
+    'Phóng các Phi Đạn Bí Thuật vào kẻ địch, gây {damage} sát thương Bí Thuật mỗi giây trong 3 giây.',
   'entities.abilities.arcane_missiles.name': 'Phi Đạn Bí Thuật',
   'entities.abilities.arcane_shot.description':
     'Một phát bắn tức thời gây {damage} sát thương Bí Thuật.',
@@ -462,7 +462,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Một tấm khiên thần thánh hấp thụ 50 sát thương trong 10 giây.',
   'entities.abilities.divine_protection.name': 'Thần Thánh Bảo Hộ',
   'entities.abilities.drain_life.description':
-    'Hút sinh lực của mục tiêu, chuyển 7 máu sang cho bạn mỗi giây trong 5 giây.',
+    'Hút sinh lực của mục tiêu, chuyển {damage} máu sang cho bạn mỗi giây trong 5 giây.',
   'entities.abilities.drain_life.name': 'Hút Sinh Lực',
   'entities.abilities.earth_shock.description':
     'Lập tức giáng chấn động vào mục tiêu, gây {damage} sát thương Tự Nhiên.',
@@ -600,7 +600,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Nổ tung tâm trí của mục tiêu gây {damage} sát thương Bóng Tối.',
   'entities.abilities.mind_blast.name': 'Nổ Tâm Trí',
   'entities.abilities.mind_flay.description':
-    'Công kích tâm trí mục tiêu bằng năng lượng Bóng Tối, gây 12 sát thương mỗi giây trong 3 giây.',
+    'Công kích tâm trí mục tiêu bằng năng lượng Bóng Tối, gây {damage} sát thương mỗi giây trong 3 giây.',
   'entities.abilities.mind_flay.name': 'Cào Xé Tâm Trí',
   'entities.abilities.mongoose_bite.description':
     'Phản công sau khi mục tiêu né đòn, gây sát thương vũ khí cộng thêm 12. Không thể bị né.',
@@ -627,7 +627,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Che chắn mục tiêu, hấp thụ 48 sát thương trong 30 giây.',
   'entities.abilities.power_word_shield.name': 'Thánh Ngữ: Khiên Chắn',
   'entities.abilities.prowl.description':
-    'Vào trạng thái ẩn thân khi ở Hình Sói. Không thể dùng trong chiến đấu.',
+    'Vào trạng thái ẩn thân khi ở Hình Sói, di chuyển chậm hơn 50%. Không thể dùng trong chiến đấu.',
   'entities.abilities.prowl.name': 'Rình Mồi',
   'entities.abilities.pyroblast.description':
     'Ném ra một tảng lửa khổng lồ gây {damage} sát thương Hỏa cùng sát thương cộng dồn theo thời gian.',
@@ -714,7 +714,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Gọi xuống một tia lửa tinh tú, gây {damage} sát thương Bí Thuật.',
   'entities.abilities.starfire.name': 'Tinh Hỏa',
   'entities.abilities.stealth.description':
-    'Che giấu bạn trong bóng tối: kẻ địch khó nhận ra bạn, nhưng bạn di chuyển chậm hơn 30%. Tấn công hoặc nhận sát thương sẽ phá vỡ Ẩn Thân. Niệm lại để bước ra.',
+    'Che giấu bạn trong bóng tối: kẻ địch khó nhận ra bạn, nhưng bạn di chuyển chậm hơn 50%. Tấn công hoặc nhận sát thương sẽ phá vỡ Ẩn Thân. Niệm lại để bước ra.',
   'entities.abilities.stealth.name': 'Ẩn Thân',
   'entities.abilities.stormstrike.description':
     'Dẫn dắt cơn bão qua vũ khí của bạn, tức thì đánh gây sát thương vũ khí cộng thêm {damage}.',
@@ -765,7 +765,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Tức thì biến thành hình lữ hành nhanh nhẹn, tăng 40% tốc độ di chuyển. Bạn không thể dùng các kỹ năng khác khi đã biến hình, nhưng có thể biến hình trong hoặc ngoài chiến đấu, lý tưởng để chạy trốn.',
   'entities.abilities.travel_form.name': 'Hình Lữ Hành',
   'entities.abilities.vanish.description':
-    'Biến mất khỏi tầm nhìn, đi vào Ẩn Thân ngay cả trong chiến đấu. Bạn di chuyển chậm hơn 30% khi ẩn nấp. Kéo dài tối đa 10 giây.',
+    'Biến mất khỏi tầm nhìn, đi vào Ẩn Thân ngay cả trong chiến đấu. Bạn di chuyển chậm hơn 50% khi ẩn nấp. Kéo dài tối đa 10 giây.',
   'entities.abilities.vanish.name': 'Tàng Hình',
   'entities.abilities.whirlwind.description':
     'Xoay theo một vòng cung chết chóc, đánh tất cả kẻ địch lân cận gây {damage}. (Tài năng Cuồng Nộ)',
@@ -4720,7 +4720,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterLoot.assignAria': 'Gan {item} cho {name}',
   'hudChrome.masterLoot.rollButton': 'Do',
   'hudChrome.masterLoot.selectAll': 'Chon tat ca',
-  'hudChrome.masterLoot.methodMaster': 'Phuong thuc chien loi pham da dat thanh chia chien loi pham. Nguoi chia: {name}.',
+  'hudChrome.masterLoot.methodMaster':
+    'Phuong thuc chien loi pham da dat thanh chia chien loi pham. Nguoi chia: {name}.',
   'hudChrome.masterLoot.methodGroup': 'Phuong thuc chien loi pham da dat thanh loot nhom.',
   'hudChrome.masterLoot.assigned': '{looter} da gan {item} cho {target}.',
   'hudChrome.masterLoot.unassigned': '{item} chua duoc gan va moi nguoi deu co the nhat.',

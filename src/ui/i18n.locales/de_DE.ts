@@ -1652,7 +1652,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Trifft den Gegner für {damage} Feuerschaden. Sofort.',
   'entities.abilities.arcane_missiles.name': 'Arkane Geschosse',
   'entities.abilities.arcane_missiles.description':
-    'Schleudert Arkane Geschosse auf den Gegner und verursacht 3 Sek. lang jede Sekunde 8 Arkanschaden.',
+    'Schleudert Arkane Geschosse auf den Gegner und verursacht 3 Sek. lang jede Sekunde {damage} Arkanschaden.',
   'entities.abilities.polymorph.name': 'Verwandlung',
   'entities.abilities.polymorph.description':
     'Verwandelt den Gegner bis zu 15 Sek. lang in ein Schaf. Das Schaf wandert umher und heilt sich schnell. Jeder Schaden bricht den Effekt. Nur Wildtiere und Humanoide.',
@@ -1698,7 +1698,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Überfällt das Ziel für 250% Waffenschaden plus {damage}. Ihr müsst verstohlen und hinter dem Ziel sein. Erfordert einen Dolch. Gewährt 1 Combopunkt.',
   'entities.abilities.stealth.name': 'Verstohlenheit',
   'entities.abilities.stealth.description':
-    'Verbirgt euch in den Schatten: Gegner bemerken euch kaum, aber ihr bewegt euch 30% langsamer. Angreifen oder Schaden erleiden bricht Verstohlenheit. Erneut wirken, um hervorzutreten.',
+    'Verbirgt euch in den Schatten: Gegner bemerken euch kaum, aber ihr bewegt euch 50% langsamer. Angreifen oder Schaden erleiden bricht Verstohlenheit. Erneut wirken, um hervorzutreten.',
   'entities.abilities.adrenaline_rush.name': 'Adrenalinrausch',
   'entities.abilities.adrenaline_rush.description':
     'Euer Blut kocht und stellt sofort 60 Energie wieder her.',
@@ -1722,7 +1722,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Finishing-Move, der das Ziel verwundet und es 16 Sek. lang um {damage} bluten lässt.',
   'entities.abilities.vanish.name': 'Verschwinden',
   'entities.abilities.vanish.description':
-    'Verschwindet aus dem Blickfeld und tretet selbst im Kampf in Verstohlenheit. Ihr bewegt euch 30% langsamer, solange ihr verborgen seid. Hält bis zu 10 Sek. an.',
+    'Verschwindet aus dem Blickfeld und tretet selbst im Kampf in Verstohlenheit. Ihr bewegt euch 50% langsamer, solange ihr verborgen seid. Hält bis zu 10 Sek. an.',
   'entities.abilities.instant_poison.name': 'Sofortgift',
   'entities.abilities.instant_poison.description':
     'Überzieht eure Waffe 30 Min. lang, sodass jeder eurer Nahkampfschwünge 8 zusätzlichen Naturschaden verursacht.',
@@ -1828,7 +1828,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Ein langsames, aber mächtiges Gebet, das ein freundliches Ziel um {damage} heilt.',
   'entities.abilities.mind_flay.name': 'Gedankenschinden',
   'entities.abilities.mind_flay.description':
-    'Greift den Geist des Ziels mit Schattenenergie an und verursacht 3 Sek. lang jede Sekunde 12 Schaden.',
+    'Greift den Geist des Ziels mit Schattenenergie an und verursacht 3 Sek. lang jede Sekunde {damage} Schaden.',
   'entities.abilities.flash_heal.name': 'Blitzheilung',
   'entities.abilities.flash_heal.description':
     'Ein schnelles Gebet, das ein freundliches Ziel um {damage} heilt.',
@@ -1883,7 +1883,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Verflucht das Ziel mit Pein: {damage} Schattenschaden über 24 Sek.',
   'entities.abilities.drain_life.name': 'Blutsauger',
   'entities.abilities.drain_life.description':
-    'Entzieht dem Ziel Leben und überträgt euch 5 Sek. lang jede Sekunde 7 Gesundheit.',
+    'Entzieht dem Ziel Leben und überträgt euch 5 Sek. lang jede Sekunde {damage} Gesundheit.',
   'entities.abilities.fear.name': 'Furcht',
   'entities.abilities.fear.description':
     'Versetzt den Gegner in Schrecken und lässt ihn bis zu 8 Sek. lang kauern. Jeder Schaden bricht den Effekt.',
@@ -2014,7 +2014,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Demoralisiert nahe Gegner und senkt ihre Angriffskraft 20 Sek. lang um 20. Nur in Bärengestalt.',
   'entities.abilities.prowl.name': 'Anschleichen',
   'entities.abilities.prowl.description':
-    'Geht in Wolfsgestalt in den Schleichmodus über. Im Kampf nicht einsetzbar.',
+    'Geht in Wolfsgestalt in den Schleichmodus über und bewegt Euch 50% langsamer. Im Kampf nicht einsetzbar.',
   'entities.abilities.rake.name': 'Krallenhieb',
   'entities.abilities.rake.description':
     'Ein Schleicheröffner, der den Gegner für Waffenschaden plus {damage} aufreißt und über 9 Sek. Blutungsschaden verursacht. Gewährt 1 Combopunkt. Nur in Wolfsgestalt.',
@@ -4803,7 +4803,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterLoot.assignAria': '{item} an {name} zuweisen',
   'hudChrome.masterLoot.rollButton': 'Wuerfeln',
   'hudChrome.masterLoot.selectAll': 'Alle auswaehlen',
-  'hudChrome.masterLoot.methodMaster': 'Beutemethode auf Pluendermeister gesetzt. Pluendermeister: {name}.',
+  'hudChrome.masterLoot.methodMaster':
+    'Beutemethode auf Pluendermeister gesetzt. Pluendermeister: {name}.',
   'hudChrome.masterLoot.methodGroup': 'Beutemethode auf Gruppenbeute gesetzt.',
   'hudChrome.masterLoot.assigned': '{looter} hat {item} an {target} zugewiesen.',
   'hudChrome.masterLoot.unassigned': '{item} wurde nicht zugewiesen und ist fuer alle frei.',

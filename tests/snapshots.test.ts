@@ -208,6 +208,24 @@ describe('Combat Mech held weapon over the wire', () => {
   });
 });
 
+describe('combat ratings over the wire', () => {
+  it('mirrors Ranged Attack Power so online hunter attack-spell tooltips can scale', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'hunter', autoEquip: true });
+    sim.setPlayerLevel(20);
+    sim.tick();
+    const e = sim.player;
+    expect(e.rangedPower).toBeGreaterThan(0);
+
+    const wire = wireEntity(e);
+    expect(wire.rp).toBe(e.rangedPower);
+
+    const client = bareClient(e.id + 1000);
+    (client as any).applySnapshot({ t: 'snap', ents: [wire] });
+    const mirrored = client.entities.get(e.id)!;
+    expect(mirrored.rangedPower).toBe(e.rangedPower);
+  });
+});
+
 describe('delta snapshots', () => {
   let server: GameServer;
   let fc: FakeClient;

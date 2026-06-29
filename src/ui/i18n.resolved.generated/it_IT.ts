@@ -222,6 +222,9 @@ export const it_IT: EnTranslations = {
     "rest": {
       "resting": "A riposo"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
     "unitFrame": {
       "playerLabel": "Il tuo personaggio",
       "targetLabel": "Il tuo bersaglio",
@@ -3479,7 +3482,7 @@ export const it_IT: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "Dardi Arcani",
-        "description": "Lancia Dardi Arcani contro il nemico, infliggendo 8 danni Arcani ogni secondo per 3 s."
+        "description": "Lancia Dardi Arcani contro il nemico, infliggendo {damage} danni Arcani ogni secondo per 3 s."
       },
       "polymorph": {
         "name": "Metamorfosi",
@@ -3543,7 +3546,7 @@ export const it_IT: EnTranslations = {
       },
       "stealth": {
         "name": "Furtività",
-        "description": "Ti nasconde nelle ombre: i nemici ti notano appena, ma ti muovi il 30% più lentamente. Attaccare o subire danni interrompe Furtività. Lanciala di nuovo per uscire."
+        "description": "Ti nasconde nelle ombre: i nemici ti notano appena, ma ti muovi il 50% più lentamente. Attaccare o subire danni interrompe Furtività. Lanciala di nuovo per uscire."
       },
       "adrenaline_rush": {
         "name": "Scarica di Adrenalina",
@@ -3575,7 +3578,7 @@ export const it_IT: EnTranslations = {
       },
       "vanish": {
         "name": "Eclissarsi",
-        "description": "Scompari dalla vista, entrando in Furtività anche in combattimento. Ti muovi il 30% più lentamente mentre sei nascosto. Dura fino a 10 sec."
+        "description": "Scompari dalla vista, entrando in Furtività anche in combattimento. Ti muovi il 50% più lentamente mentre sei nascosto. Dura fino a 10 sec."
       },
       "instant_poison": {
         "name": "Veleno Istantaneo",
@@ -3727,7 +3730,7 @@ export const it_IT: EnTranslations = {
       },
       "mind_flay": {
         "name": "Flagello Mentale",
-        "description": "Assale la mente del bersaglio con energia d'Ombra, infliggendo 12 danni ogni secondo per 3 s."
+        "description": "Assale la mente del bersaglio con energia d'Ombra, infliggendo {damage} danni ogni secondo per 3 s."
       },
       "flash_heal": {
         "name": "Cura Rapida",
@@ -3803,7 +3806,7 @@ export const it_IT: EnTranslations = {
       },
       "drain_life": {
         "name": "Risucchio di Vita",
-        "description": "Risucchia la vita del bersaglio, trasferendoti 7 salute ogni secondo per 5 s."
+        "description": "Risucchia la vita del bersaglio, trasferendoti {damage} salute ogni secondo per 5 s."
       },
       "fear": {
         "name": "Paura",
@@ -3983,7 +3986,7 @@ export const it_IT: EnTranslations = {
       },
       "prowl": {
         "name": "Agguato",
-        "description": "Entra in furtività mentre sei in Forma del Lupo. Non utilizzabile in combattimento."
+        "description": "Entra in furtività mentre sei in Forma del Lupo, muovendoti il 50% più lentamente. Non utilizzabile in combattimento."
       },
       "rake": {
         "name": "Sventramento",

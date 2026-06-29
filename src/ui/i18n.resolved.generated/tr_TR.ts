@@ -222,6 +222,9 @@ export const tr_TR: EnTranslations = {
     "rest": {
       "resting": "Dinleniyor"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
     "unitFrame": {
       "playerLabel": "Kahramanın",
       "targetLabel": "Hedefin",
@@ -3479,7 +3482,7 @@ export const tr_TR: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "Gizemli Füzeler",
-        "description": "Düşmana Gizemli Füzeler fırlatır, 3 saniye boyunca her saniye 8 Gizemli hasar verir."
+        "description": "Düşmana Gizemli Füzeler fırlatır, 3 saniye boyunca her saniye {damage} Gizemli hasar verir."
       },
       "polymorph": {
         "name": "Dönüştürme",
@@ -3727,7 +3730,7 @@ export const tr_TR: EnTranslations = {
       },
       "mind_flay": {
         "name": "Zihin Dağlama",
-        "description": "Hedefin zihnini Gölge enerjisiyle sarsar ve 3 saniye boyunca her saniye 12 hasar verir."
+        "description": "Hedefin zihnini Gölge enerjisiyle sarsar ve 3 saniye boyunca her saniye {damage} hasar verir."
       },
       "flash_heal": {
         "name": "Hızlı İyileştirme",
@@ -3803,7 +3806,7 @@ export const tr_TR: EnTranslations = {
       },
       "drain_life": {
         "name": "Can Emme",
-        "description": "Hedefin canını emer; 5 saniye boyunca her saniye sana 7 can aktarır."
+        "description": "Hedefin canını emer; 5 saniye boyunca her saniye sana {damage} can aktarır."
       },
       "fear": {
         "name": "Korku",
@@ -3983,7 +3986,7 @@ export const tr_TR: EnTranslations = {
       },
       "prowl": {
         "name": "Sinsi Yürüyüş",
-        "description": "Kurt Formundayken gizliliğe geçer. Dövüş sırasında kullanılamaz."
+        "description": "Kurt Formundayken gizliliğe geçer ve 50% daha yavaş hareket edersin. Dövüş sırasında kullanılamaz."
       },
       "rake": {
         "name": "Tırmalama",

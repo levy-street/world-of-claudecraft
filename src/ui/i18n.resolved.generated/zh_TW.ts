@@ -222,6 +222,9 @@ export const zh_TW: EnTranslations = {
     "rest": {
       "resting": "休息中"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
     "unitFrame": {
       "playerLabel": "你的角色",
       "targetLabel": "你的目標",
@@ -3479,7 +3482,7 @@ export const zh_TW: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "秘法飛彈",
-        "description": "向敵人發射秘法飛彈，持續 3 秒，每秒造成 8 點秘法傷害。"
+        "description": "向敵人發射秘法飛彈，持續 3 秒，每秒造成 {damage} 點秘法傷害。"
       },
       "polymorph": {
         "name": "變形術",
@@ -3543,7 +3546,7 @@ export const zh_TW: EnTranslations = {
       },
       "stealth": {
         "name": "潛行",
-        "description": "將你隱藏在陰影中：敵人幾乎無法察覺你，但你的移動速度降低 30%。攻擊或受到傷害會打破潛行。再次施放可現身。"
+        "description": "將你隱藏在陰影中：敵人幾乎無法察覺你，但你的移動速度降低 50%。攻擊或受到傷害會打破潛行。再次施放可現身。"
       },
       "adrenaline_rush": {
         "name": "衝動",
@@ -3575,7 +3578,7 @@ export const zh_TW: EnTranslations = {
       },
       "vanish": {
         "name": "消失",
-        "description": "從視野中消失，即使在戰鬥中也能進入潛行狀態。隱身時你的移動速度降低 30%。最多持續 10 秒。"
+        "description": "從視野中消失，即使在戰鬥中也能進入潛行狀態。隱身時你的移動速度降低 50%。最多持續 10 秒。"
       },
       "instant_poison": {
         "name": "速效毒藥",
@@ -3727,7 +3730,7 @@ export const zh_TW: EnTranslations = {
       },
       "mind_flay": {
         "name": "精神鞭笞",
-        "description": "用暗影能量攻擊目標的心靈，持續 3 秒，每秒造成 12 點傷害。"
+        "description": "用暗影能量攻擊目標的心靈，持續 3 秒，每秒造成 {damage} 點傷害。"
       },
       "flash_heal": {
         "name": "快速治療",
@@ -3803,7 +3806,7 @@ export const zh_TW: EnTranslations = {
       },
       "drain_life": {
         "name": "吸取生命",
-        "description": "吸取目標的生命，持續 5 秒，每秒向你轉移 7 點生命值。"
+        "description": "吸取目標的生命，持續 5 秒，每秒向你轉移 {damage} 點生命值。"
       },
       "fear": {
         "name": "恐懼",
@@ -3983,7 +3986,7 @@ export const zh_TW: EnTranslations = {
       },
       "prowl": {
         "name": "潛行",
-        "description": "在狼形態下進入隱匿狀態。無法於戰鬥中使用。"
+        "description": "在狼形態下進入隱匿狀態，移動速度降低 50%。無法於戰鬥中使用。"
       },
       "rake": {
         "name": "撕裂",

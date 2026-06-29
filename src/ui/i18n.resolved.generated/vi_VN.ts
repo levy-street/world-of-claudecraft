@@ -222,6 +222,9 @@ export const vi_VN: EnTranslations = {
     "rest": {
       "resting": "Đang Nghỉ Ngơi"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
     "unitFrame": {
       "playerLabel": "Anh Hùng Của Bạn",
       "targetLabel": "Mục Tiêu Của Bạn",
@@ -3479,7 +3482,7 @@ export const vi_VN: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "Phi Đạn Bí Thuật",
-        "description": "Phóng các Phi Đạn Bí Thuật vào kẻ địch, gây 8 sát thương Bí Thuật mỗi giây trong 3 giây."
+        "description": "Phóng các Phi Đạn Bí Thuật vào kẻ địch, gây {damage} sát thương Bí Thuật mỗi giây trong 3 giây."
       },
       "polymorph": {
         "name": "Biến Hình",
@@ -3543,7 +3546,7 @@ export const vi_VN: EnTranslations = {
       },
       "stealth": {
         "name": "Ẩn Thân",
-        "description": "Che giấu bạn trong bóng tối: kẻ địch khó nhận ra bạn, nhưng bạn di chuyển chậm hơn 30%. Tấn công hoặc nhận sát thương sẽ phá vỡ Ẩn Thân. Niệm lại để bước ra."
+        "description": "Che giấu bạn trong bóng tối: kẻ địch khó nhận ra bạn, nhưng bạn di chuyển chậm hơn 50%. Tấn công hoặc nhận sát thương sẽ phá vỡ Ẩn Thân. Niệm lại để bước ra."
       },
       "adrenaline_rush": {
         "name": "Bộc Phát Adrenaline",
@@ -3575,7 +3578,7 @@ export const vi_VN: EnTranslations = {
       },
       "vanish": {
         "name": "Tàng Hình",
-        "description": "Biến mất khỏi tầm nhìn, đi vào Ẩn Thân ngay cả trong chiến đấu. Bạn di chuyển chậm hơn 30% khi ẩn nấp. Kéo dài tối đa 10 giây."
+        "description": "Biến mất khỏi tầm nhìn, đi vào Ẩn Thân ngay cả trong chiến đấu. Bạn di chuyển chậm hơn 50% khi ẩn nấp. Kéo dài tối đa 10 giây."
       },
       "instant_poison": {
         "name": "Độc Tức Thời",
@@ -3727,7 +3730,7 @@ export const vi_VN: EnTranslations = {
       },
       "mind_flay": {
         "name": "Cào Xé Tâm Trí",
-        "description": "Công kích tâm trí mục tiêu bằng năng lượng Bóng Tối, gây 12 sát thương mỗi giây trong 3 giây."
+        "description": "Công kích tâm trí mục tiêu bằng năng lượng Bóng Tối, gây {damage} sát thương mỗi giây trong 3 giây."
       },
       "flash_heal": {
         "name": "Trị Liệu Nhanh",
@@ -3803,7 +3806,7 @@ export const vi_VN: EnTranslations = {
       },
       "drain_life": {
         "name": "Hút Sinh Lực",
-        "description": "Hút sinh lực của mục tiêu, chuyển 7 máu sang cho bạn mỗi giây trong 5 giây."
+        "description": "Hút sinh lực của mục tiêu, chuyển {damage} máu sang cho bạn mỗi giây trong 5 giây."
       },
       "fear": {
         "name": "Gieo Sợ Hãi",
@@ -3983,7 +3986,7 @@ export const vi_VN: EnTranslations = {
       },
       "prowl": {
         "name": "Rình Mồi",
-        "description": "Vào trạng thái ẩn thân khi ở Hình Sói. Không thể dùng trong chiến đấu."
+        "description": "Vào trạng thái ẩn thân khi ở Hình Sói, di chuyển chậm hơn 50%. Không thể dùng trong chiến đấu."
       },
       "rake": {
         "name": "Cào Xé",

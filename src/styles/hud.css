@@ -1076,10 +1076,16 @@
     font-weight: bold;
     pointer-events: none;
   }
-  #actionbar {
+  #actionbar,
+  #actionbar2 {
     display: flex;
     gap: 4px;
     padding: 6px;
+  }
+  /* The optional second action bar (second-action-bar feature) sits just under the
+     primary one; a tighter bottom pad keeps the pair compact. */
+  #actionbar2 {
+    padding-bottom: 2px;
   }
   .action-btn {
     width: 46px;

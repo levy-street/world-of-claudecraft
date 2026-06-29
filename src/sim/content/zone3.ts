@@ -1387,7 +1387,10 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
       mage: 'wyrmcult_grand_robe',
       rogue: 'wyrmscale_jerkin',
     },
-    requiresQuest: 'q_velkhar',
+    // Korzul shares the Sanctum with Korgath and Velkhar; gate it on opening
+    // the gate (like its sibling boss quests), not on Velkhar's turn-in, so the
+    // party can pick up all three and clear the instance in a single run.
+    requiresQuest: 'q_sanctum_gate',
     minLevel: 18,
     suggestedPlayers: 5,
   },

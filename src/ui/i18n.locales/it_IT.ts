@@ -1645,7 +1645,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Investe il nemico per {damage} danni da Fuoco. Istantaneo.',
   'entities.abilities.arcane_missiles.name': 'Dardi Arcani',
   'entities.abilities.arcane_missiles.description':
-    'Lancia Dardi Arcani contro il nemico, infliggendo 8 danni Arcani ogni secondo per 3 s.',
+    'Lancia Dardi Arcani contro il nemico, infliggendo {damage} danni Arcani ogni secondo per 3 s.',
   'entities.abilities.polymorph.name': 'Metamorfosi',
   'entities.abilities.polymorph.description':
     "Trasforma il nemico in una pecora per un massimo di 15 s. La pecora vaga e guarisce rapidamente. Qualsiasi danno interrompe l'effetto. Solo bestie e umanoidi.",
@@ -1691,7 +1691,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Tende un agguato al bersaglio per il 250% dei danni dell'arma più {damage}. Devi essere furtivo e dietro al bersaglio. Richiede un pugnale. Conferisce 1 punto combo.",
   'entities.abilities.stealth.name': 'Furtività',
   'entities.abilities.stealth.description':
-    'Ti nasconde nelle ombre: i nemici ti notano appena, ma ti muovi il 30% più lentamente. Attaccare o subire danni interrompe Furtività. Lanciala di nuovo per uscire.',
+    'Ti nasconde nelle ombre: i nemici ti notano appena, ma ti muovi il 50% più lentamente. Attaccare o subire danni interrompe Furtività. Lanciala di nuovo per uscire.',
   'entities.abilities.adrenaline_rush.name': 'Scarica di Adrenalina',
   'entities.abilities.adrenaline_rush.description':
     'Il sangue ti ribolle e ripristina istantaneamente 60 energia.',
@@ -1715,7 +1715,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Mossa finale che ferisce il bersaglio, provocando sanguinamento per {damage} in 16 sec.',
   'entities.abilities.vanish.name': 'Eclissarsi',
   'entities.abilities.vanish.description':
-    'Scompari dalla vista, entrando in Furtività anche in combattimento. Ti muovi il 30% più lentamente mentre sei nascosto. Dura fino a 10 sec.',
+    'Scompari dalla vista, entrando in Furtività anche in combattimento. Ti muovi il 50% più lentamente mentre sei nascosto. Dura fino a 10 sec.',
   'entities.abilities.instant_poison.name': 'Veleno Istantaneo',
   'entities.abilities.instant_poison.description':
     'Ricopre la tua arma per 30 min, facendo sì che ognuno dei tuoi attacchi in mischia infligga 8 danni della Natura aggiuntivi.',
@@ -1822,7 +1822,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Una preghiera lenta ma potente che cura un bersaglio alleato di {damage}.',
   'entities.abilities.mind_flay.name': 'Flagello Mentale',
   'entities.abilities.mind_flay.description':
-    "Assale la mente del bersaglio con energia d'Ombra, infliggendo 12 danni ogni secondo per 3 s.",
+    "Assale la mente del bersaglio con energia d'Ombra, infliggendo {damage} danni ogni secondo per 3 s.",
   'entities.abilities.flash_heal.name': 'Cura Rapida',
   'entities.abilities.flash_heal.description':
     'Una preghiera veloce che cura un bersaglio alleato di {damage}.',
@@ -1877,7 +1877,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Maledice il bersaglio con agonia: {damage} danni da Ombra in 24 s.',
   'entities.abilities.drain_life.name': 'Risucchio di Vita',
   'entities.abilities.drain_life.description':
-    'Risucchia la vita del bersaglio, trasferendoti 7 salute ogni secondo per 5 s.',
+    'Risucchia la vita del bersaglio, trasferendoti {damage} salute ogni secondo per 5 s.',
   'entities.abilities.fear.name': 'Paura',
   'entities.abilities.fear.description':
     "Terrorizza il nemico, lasciandolo tremante per un massimo di 8 s. Qualsiasi danno interrompe l'effetto.",
@@ -2007,7 +2007,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Demoralizza i nemici vicini, riducendone la potenza d'attacco di 20 per 20 sec. Solo in Forma dell'Orso.",
   'entities.abilities.prowl.name': 'Agguato',
   'entities.abilities.prowl.description':
-    'Entra in furtività mentre sei in Forma del Lupo. Non utilizzabile in combattimento.',
+    'Entra in furtività mentre sei in Forma del Lupo, muovendoti il 50% più lentamente. Non utilizzabile in combattimento.',
   'entities.abilities.rake.name': 'Sventramento',
   'entities.abilities.rake.description':
     "Un'apertura furtiva che dilania il nemico infliggendo danno dell'arma più {damage} e provoca danno da sanguinamento per 9 sec. Conferisce 1 punto combo. Solo in Forma del Lupo.",
@@ -4775,7 +4775,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterLoot.assignAria': 'Assegna {item} a {name}',
   'hudChrome.masterLoot.rollButton': 'Tira',
   'hudChrome.masterLoot.selectAll': 'Seleziona tutto',
-  'hudChrome.masterLoot.methodMaster': 'Metodo bottino impostato su bottino maestro. Maestro del bottino: {name}.',
+  'hudChrome.masterLoot.methodMaster':
+    'Metodo bottino impostato su bottino maestro. Maestro del bottino: {name}.',
   'hudChrome.masterLoot.methodGroup': 'Metodo bottino impostato su bottino di gruppo.',
   'hudChrome.masterLoot.assigned': '{looter} ha assegnato {item} a {target}.',
   'hudChrome.masterLoot.unassigned': '{item} non e stato assegnato ed e libero per tutti.',

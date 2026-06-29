@@ -534,6 +534,10 @@
   body.mobile-touch #actionbar.many-spells {
     grid-template-columns: none;
   }
+  /* The second action bar is desktop-only; the mobile hotbar stays a single scroll row. */
+  body.mobile-touch #actionbar2 {
+    display: none;
+  }
   body.mobile-touch .action-btn {
     width: 42px;
     height: 42px;

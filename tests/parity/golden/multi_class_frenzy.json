@@ -30,7 +30,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 392,
-      "state": "a40c0218",
+      "state": "22370ea8",
       "events": "aae1ee3f",
       "rng": {
         "draws": 3,
@@ -135,6 +135,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 20,
             "armor": 110,
@@ -183,6 +184,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 13,
           "stats": {
             "agi": 12,
             "armor": 57,
@@ -231,6 +233,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 6,
           "stats": {
             "agi": 25,
             "armor": 104,
@@ -326,7 +329,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 392,
-      "state": "42583343",
+      "state": "a73ed60b",
       "events": "a3995dc9",
       "rng": {
         "draws": 6,
@@ -431,6 +434,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 20,
             "armor": 110,
@@ -479,6 +483,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 13,
           "stats": {
             "agi": 12,
             "armor": 57,
@@ -527,6 +532,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 6,
           "stats": {
             "agi": 25,
             "armor": 104,
@@ -622,7 +628,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 392,
-      "state": "7524cf27",
+      "state": "2105919f",
       "events": "a3995dc9",
       "rng": {
         "draws": 9,
@@ -727,6 +733,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 20,
             "armor": 110,
@@ -775,6 +782,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 13,
           "stats": {
             "agi": 12,
             "armor": 57,
@@ -823,6 +831,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 6,
           "stats": {
             "agi": 25,
             "armor": 104,
@@ -918,7 +927,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 392,
-      "state": "bf575260",
+      "state": "a2073118",
       "events": "a3995dc9",
       "rng": {
         "draws": 12,
@@ -1023,6 +1032,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 20,
             "armor": 110,
@@ -1071,6 +1081,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 13,
           "stats": {
             "agi": 12,
             "armor": 57,
@@ -1119,6 +1130,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 6,
           "stats": {
             "agi": 25,
             "armor": 104,
@@ -1214,7 +1226,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 392,
-      "state": "c900b02e",
+      "state": "30b9ccde",
       "events": "2b910ef6",
       "rng": {
         "draws": 15,
@@ -1225,7 +1237,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 392,
-      "state": "70ddd923",
+      "state": "1709182f",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -1236,7 +1248,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 392,
-      "state": "70ddd923",
+      "state": "1709182f",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -1343,6 +1355,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 20,
             "armor": 110,
@@ -1392,6 +1405,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 13,
           "stats": {
             "agi": 12,
             "armor": 57,
@@ -1441,6 +1455,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 6,
           "stats": {
             "agi": 25,
             "armor": 104,

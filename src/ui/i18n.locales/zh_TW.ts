@@ -1578,7 +1578,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fire_blast.description': '衝擊敵人，造成 {damage} 點火焰傷害。瞬發。',
   'entities.abilities.arcane_missiles.name': '秘法飛彈',
   'entities.abilities.arcane_missiles.description':
-    '向敵人發射秘法飛彈，持續 3 秒，每秒造成 8 點秘法傷害。',
+    '向敵人發射秘法飛彈，持續 3 秒，每秒造成 {damage} 點秘法傷害。',
   'entities.abilities.polymorph.name': '變形術',
   'entities.abilities.polymorph.description':
     '將敵人變成綿羊，最多持續 15 秒。綿羊會四處遊蕩並快速恢復。任何傷害都會打破效果。僅限野獸和人型生物。',
@@ -1621,7 +1621,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '伏擊目標，造成 250% 武器傷害加 {damage}。必須處於潛行並位於目標背後。需要匕首。獎勵 1 個連擊點。',
   'entities.abilities.stealth.name': '潛行',
   'entities.abilities.stealth.description':
-    '將你隱藏在陰影中：敵人幾乎無法察覺你，但你的移動速度降低 30%。攻擊或受到傷害會打破潛行。再次施放可現身。',
+    '將你隱藏在陰影中：敵人幾乎無法察覺你，但你的移動速度降低 50%。攻擊或受到傷害會打破潛行。再次施放可現身。',
   'entities.abilities.adrenaline_rush.name': '衝動',
   'entities.abilities.adrenaline_rush.description': '熱血沸騰，立即恢復 60 點能量。',
   'entities.abilities.garrote.name': '鎖喉',
@@ -1644,7 +1644,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '終結技，撕裂目標的傷口，使其在 16 秒內流血損失 {damage} 點生命。',
   'entities.abilities.vanish.name': '消失',
   'entities.abilities.vanish.description':
-    '從視野中消失，即使在戰鬥中也能進入潛行狀態。隱身時你的移動速度降低 30%。最多持續 10 秒。',
+    '從視野中消失，即使在戰鬥中也能進入潛行狀態。隱身時你的移動速度降低 50%。最多持續 10 秒。',
   'entities.abilities.instant_poison.name': '速效毒藥',
   'entities.abilities.instant_poison.description':
     '在你的武器上塗抹毒藥，持續 30 分鐘，使你的每次近戰揮擊額外造成 8 點自然傷害。',
@@ -1738,7 +1738,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.heal.description': '緩慢但強大的祈禱，為一個友方目標恢復 {damage} 點生命值。',
   'entities.abilities.mind_flay.name': '精神鞭笞',
   'entities.abilities.mind_flay.description':
-    '用暗影能量攻擊目標的心靈，持續 3 秒，每秒造成 12 點傷害。',
+    '用暗影能量攻擊目標的心靈，持續 3 秒，每秒造成 {damage} 點傷害。',
   'entities.abilities.flash_heal.name': '快速治療',
   'entities.abilities.flash_heal.description': '快速祈禱，為一個友方目標恢復 {damage} 點生命值。',
   'entities.abilities.lightning_bolt.name': '閃電箭',
@@ -1787,7 +1787,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '以痛苦詛咒目標：在 24 秒內造成 {damage} 點暗影傷害。',
   'entities.abilities.drain_life.name': '吸取生命',
   'entities.abilities.drain_life.description':
-    '吸取目標的生命，持續 5 秒，每秒向你轉移 7 點生命值。',
+    '吸取目標的生命，持續 5 秒，每秒向你轉移 {damage} 點生命值。',
   'entities.abilities.fear.name': '恐懼',
   'entities.abilities.fear.description':
     '使敵人陷入恐懼並畏縮，最多持續 8 秒。任何傷害都會打破效果。',
@@ -1905,7 +1905,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.demoralizing_roar.description':
     '挫敗附近敵人的士氣，使其攻擊強度降低 20，持續 20 秒。僅限熊形態。',
   'entities.abilities.prowl.name': '潛行',
-  'entities.abilities.prowl.description': '在狼形態下進入隱匿狀態。無法於戰鬥中使用。',
+  'entities.abilities.prowl.description':
+    '在狼形態下進入隱匿狀態，移動速度降低 50%。無法於戰鬥中使用。',
   'entities.abilities.rake.name': '撕裂',
   'entities.abilities.rake.description':
     '一招隱匿起手技，以武器傷害外加 {damage} 撕裂敵人，並造成持續 9 秒的流血傷害。給予 1 點連擊點數。僅限狼形態。',

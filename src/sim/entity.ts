@@ -1,7 +1,7 @@
 import type { TalentModifiers } from './content/talents';
 import { CLASSES, ITEMS, MOBS, type NpcDef } from './data';
 import type { Entity, EquipSlot, MobTemplate, PlayerClass, Stats, Vec3 } from './types';
-import { EQUIP_SLOTS } from './types';
+import { EQUIP_SLOTS, SPELL_POWER_PER_INT } from './types';
 
 function baseEntity(id: number, pos: Vec3): Entity {
   return {
@@ -32,6 +32,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     weapon: { min: 1, max: 2, speed: 2 },
     attackPower: 0,
     rangedPower: 0,
+    spellPower: 0,
     critChance: 0.05,
     dodgeChance: 0.05,
     moveSpeed: 7,
@@ -165,11 +166,14 @@ export function recalcPlayerStats(
     spi: def.baseStats.spi + def.statsPerLevel.spi * (lvl - 1),
     armor: def.baseStats.armor + def.statsPerLevel.armor * (lvl - 1),
   };
+  let bonusSp = 0; // flat Spell Power from gear affixes + buff_spellpower auras
   for (const slot of EQUIP_SLOTS) {
     const itemId = equipment[slot];
     if (!itemId) continue;
     const item = ITEMS[itemId];
-    if (!item?.stats) continue;
+    if (!item) continue;
+    bonusSp += item.spellPower ?? 0;
+    if (!item.stats) continue;
     s.str += item.stats.str ?? 0;
     s.agi += item.stats.agi ?? 0;
     s.sta += item.stats.sta ?? 0;
@@ -200,7 +204,8 @@ export function recalcPlayerStats(
       s.sta += a.value;
       s.int += a.value;
       s.spi += a.value;
-    } else if (a.kind === 'buff_dodge') bonusDodge += a.value;
+    } else if (a.kind === 'buff_spellpower') bonusSp += a.value;
+    else if (a.kind === 'buff_dodge') bonusDodge += a.value;
     else if (a.kind === 'buff_scale') scaleMul *= a.value;
     else if (a.kind === 'form_bear') bearForm = true;
     else if (a.kind === 'form_cat') catForm = true;
@@ -265,6 +270,9 @@ export function recalcPlayerStats(
     cls === 'hunter'
       ? Math.max(0, Math.round((s.agi * 2 + bonusAp) * (1 + (mods?.stats.apPct ?? 0))))
       : 0;
+  // Spell Power: Intellect converted via SPELL_POWER_PER_INT plus flat Spell Power
+  // from gear/buffs. Floored at 0 so an Intellect-draining debuff can't go negative.
+  e.spellPower = Math.max(0, Math.round(s.int * SPELL_POWER_PER_INT + bonusSp));
   // Crit: ~1% per 20 agi at low level
   e.critChance = 0.05 + s.agi * 0.0005 + (mods?.stats.crit ?? 0);
   // Floored at 0: an off-balance debuff (negative buff_dodge) can drive dodge to nothing.

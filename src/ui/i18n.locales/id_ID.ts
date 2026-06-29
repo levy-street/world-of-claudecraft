@@ -358,7 +358,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Meningkatkan Kecerdasan sebesar 2 selama 30 menit.',
   'entities.abilities.arcane_intellect.name': 'Kecerdasan Arkana',
   'entities.abilities.arcane_missiles.description':
-    'Melontarkan Misil Arkana ke arah musuh, menimbulkan 8 kerusakan Arkana setiap detik selama 3 detik.',
+    'Melontarkan Misil Arkana ke arah musuh, menimbulkan {damage} kerusakan Arkana setiap detik selama 3 detik.',
   'entities.abilities.arcane_missiles.name': 'Misil Arkana',
   'entities.abilities.arcane_shot.description':
     'Tembakan seketika yang menimbulkan {damage} kerusakan Arkana.',
@@ -470,7 +470,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Perisai suci menyerap 50 kerusakan selama 10 detik.',
   'entities.abilities.divine_protection.name': 'Perlindungan Ilahi',
   'entities.abilities.drain_life.description':
-    'Menyedot nyawa target, memindahkan 7 kesehatan kepadamu setiap detik selama 5 detik.',
+    'Menyedot nyawa target, memindahkan {damage} kesehatan kepadamu setiap detik selama 5 detik.',
   'entities.abilities.drain_life.name': 'Sedot Nyawa',
   'entities.abilities.earth_shock.description':
     'Seketika mengejutkan target dengan kekuatan pengguncang sebesar {damage} kerusakan Alam.',
@@ -611,7 +611,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Meledakkan pikiran target sebesar {damage} kerusakan Bayangan.',
   'entities.abilities.mind_blast.name': 'Ledakan Pikiran',
   'entities.abilities.mind_flay.description':
-    'Menyerang pikiran target dengan energi Bayangan, menimbulkan 12 kerusakan setiap detik selama 3 detik.',
+    'Menyerang pikiran target dengan energi Bayangan, menimbulkan {damage} kerusakan setiap detik selama 3 detik.',
   'entities.abilities.mind_flay.name': 'Cambuk Pikiran',
   'entities.abilities.mongoose_bite.description':
     'Serangan balasan setelah target mengelak sebesar kerusakan senjata ditambah 12. Tidak dapat dielakkan.',
@@ -638,7 +638,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Melindungi target, menyerap 48 kerusakan selama 30 detik.',
   'entities.abilities.power_word_shield.name': 'Kata Kuasa: Perisai',
   'entities.abilities.prowl.description':
-    'Masuk ke siluman saat dalam Wujud Serigala. Tidak dapat digunakan dalam pertempuran.',
+    'Masuk ke siluman saat dalam Wujud Serigala, bergerak 50% lebih lambat. Tidak dapat digunakan dalam pertempuran.',
   'entities.abilities.prowl.name': 'Mengendap',
   'entities.abilities.pyroblast.description':
     'Melontarkan bongkahan berkobar raksasa yang menimbulkan {damage} kerusakan Api ditambah kerusakan tambahan seiring waktu.',
@@ -726,7 +726,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Memanggil turun panah api bintang, menyebabkan {damage} kerusakan Arkana.',
   'entities.abilities.starfire.name': 'Api Bintang',
   'entities.abilities.stealth.description':
-    'Menyembunyikanmu dalam bayangan: musuh nyaris tak menyadarimu, tetapi kau bergerak 30% lebih lambat. Menyerang atau menerima kerusakan mematahkan Siluman. Rapal lagi untuk keluar.',
+    'Menyembunyikanmu dalam bayangan: musuh nyaris tak menyadarimu, tetapi kau bergerak 50% lebih lambat. Menyerang atau menerima kerusakan mematahkan Siluman. Rapal lagi untuk keluar.',
   'entities.abilities.stealth.name': 'Siluman',
   'entities.abilities.stormstrike.description':
     'Mengalirkan badai melalui senjatamu, seketika menyerang sebesar kerusakan senjata ditambah {damage}.',
@@ -777,7 +777,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Seketika berubah menjadi wujud jelajah yang gesit, meningkatkan kecepatan gerak sebesar 40%. Kau tidak bisa menggunakan kemampuan lain saat berubah wujud, tetapi bisa berubah masuk atau keluar dari pertempuran, ideal untuk melarikan diri.',
   'entities.abilities.travel_form.name': 'Wujud Jelajah',
   'entities.abilities.vanish.description':
-    'Menghilang dari pandangan, masuk ke Siluman bahkan dalam pertempuran. Kau bergerak 30% lebih lambat saat tersembunyi. Bertahan hingga 10 detik.',
+    'Menghilang dari pandangan, masuk ke Siluman bahkan dalam pertempuran. Kau bergerak 50% lebih lambat saat tersembunyi. Bertahan hingga 10 detik.',
   'entities.abilities.vanish.name': 'Menghilang',
   'entities.abilities.whirlwind.description':
     'Berputar dalam busur mematikan, menyerang semua musuh di sekitar sebesar {damage}. (Talenta Murka)',

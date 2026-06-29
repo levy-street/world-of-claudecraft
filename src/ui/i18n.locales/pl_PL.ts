@@ -351,7 +351,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_intellect.description': 'Zwiększa intelekt o 2 na 30 min.',
   'entities.abilities.arcane_intellect.name': 'Arkaniczny intelekt',
   'entities.abilities.arcane_missiles.description':
-    'Wystrzeliwuje arkaniczne pociski we wroga, zadając 8 obrażeń arkanicznych co sekundę przez 3 sek.',
+    'Wystrzeliwuje arkaniczne pociski we wroga, zadając {damage} obrażeń arkanicznych co sekundę przez 3 sek.',
   'entities.abilities.arcane_missiles.name': 'Arkaniczne pociski',
   'entities.abilities.arcane_shot.description':
     'Natychmiastowy strzał, który zadaje {damage} obrażeń arkanicznych.',
@@ -459,7 +459,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Święta tarcza pochłania 50 obrażeń przez 10 sek.',
   'entities.abilities.divine_protection.name': 'Boska ochrona',
   'entities.abilities.drain_life.description':
-    'Wysysa życie celu, przekazując ci 7 zdrowia co sekundę przez 5 sek.',
+    'Wysysa życie celu, przekazując ci {damage} zdrowia co sekundę przez 5 sek.',
   'entities.abilities.drain_life.name': 'Wyssanie życia',
   'entities.abilities.earth_shock.description':
     'Natychmiast razi cel wstrząsową siłą, zadając {damage} obrażeń od natury.',
@@ -597,7 +597,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Razi umysł celu, zadając {damage} obrażeń od cienia.',
   'entities.abilities.mind_blast.name': 'Atak umysłu',
   'entities.abilities.mind_flay.description':
-    'Naciera na umysł celu energią cienia, zadając 12 obrażeń co sekundę przez 3 sek.',
+    'Naciera na umysł celu energią cienia, zadając {damage} obrażeń co sekundę przez 3 sek.',
   'entities.abilities.mind_flay.name': 'Smaganie umysłu',
   'entities.abilities.mongoose_bite.description':
     'Kontratak po uniku celu, zadający obrażenia broni plus 12. Nie można uniknąć.',
@@ -624,7 +624,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Osłania cel, pochłaniając 48 obrażeń przez 30 sek.',
   'entities.abilities.power_word_shield.name': 'Słowo mocy: Tarcza',
   'entities.abilities.prowl.description':
-    'Wchodzi w skradanie w postaci wilka. Nie można użyć w walce.',
+    'Wchodzi w skradanie w postaci wilka, poruszając się o 50% wolniej. Nie można użyć w walce.',
   'entities.abilities.prowl.name': 'Czajenie',
   'entities.abilities.pyroblast.description':
     'Ciska ogromnym ognistym głazem, który zadaje {damage} obrażeń od ognia oraz dodatkowe obrażenia w czasie.',
@@ -709,7 +709,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Sprowadza pocisk gwiezdnego ognia, zadając {damage} obrażeń od Arkanów.',
   'entities.abilities.starfire.name': 'Gwiezdny ogień',
   'entities.abilities.stealth.description':
-    'Ukrywa cię w cieniu: wrogowie ledwie cię dostrzegają, ale poruszasz się o 30% wolniej. Atak lub otrzymanie obrażeń przerywa Skradanie się. Rzuć ponownie, aby się ujawnić.',
+    'Ukrywa cię w cieniu: wrogowie ledwie cię dostrzegają, ale poruszasz się o 50% wolniej. Atak lub otrzymanie obrażeń przerywa Skradanie się. Rzuć ponownie, aby się ujawnić.',
   'entities.abilities.stealth.name': 'Skradanie się',
   'entities.abilities.stormstrike.description':
     'Kieruje burzę przez twoją broń, natychmiast uderzając za obrażenia broni plus {damage}.',
@@ -760,7 +760,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Natychmiast przemienia cię w szybką postać podróżną, zwiększając szybkość poruszania się o 40%. Po przemianie nie możesz używać innych zdolności, ale możesz się przemieniać w walce i poza nią, co czyni ją idealną do ucieczki.',
   'entities.abilities.travel_form.name': 'Postać podróżna',
   'entities.abilities.vanish.description':
-    'Znikasz z pola widzenia, wchodząc w Skradanie się nawet w walce. Ukryty poruszasz się o 30% wolniej. Trwa do 10 sek.',
+    'Znikasz z pola widzenia, wchodząc w Skradanie się nawet w walce. Ukryty poruszasz się o 50% wolniej. Trwa do 10 sek.',
   'entities.abilities.vanish.name': 'Zniknięcie',
   'entities.abilities.whirlwind.description':
     'Wirujesz w śmiercionośnym łuku, uderzając wszystkich pobliskich wrogów za {damage}. (Talent Furii)',
@@ -4726,7 +4726,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterLoot.assignAria': 'Przydziel {item} graczowi {name}',
   'hudChrome.masterLoot.rollButton': 'Rzut',
   'hudChrome.masterLoot.selectAll': 'Zaznacz wszystko',
-  'hudChrome.masterLoot.methodMaster': 'Metoda lupow ustawiona na mistrza lupow. Mistrz lupow: {name}.',
+  'hudChrome.masterLoot.methodMaster':
+    'Metoda lupow ustawiona na mistrza lupow. Mistrz lupow: {name}.',
   'hudChrome.masterLoot.methodGroup': 'Metoda lupow ustawiona na lup grupowy.',
   'hudChrome.masterLoot.assigned': '{looter} przydzielil {item} graczowi {target}.',
   'hudChrome.masterLoot.unassigned': '{item} nie zostal przydzielony i jest wolny dla wszystkich.',

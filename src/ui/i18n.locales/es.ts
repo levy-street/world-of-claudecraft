@@ -1654,7 +1654,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Explota contra el enemigo y causa {damage} de daño de Fuego. Instantáneo.',
   'entities.abilities.arcane_missiles.name': 'Misiles Arcanos',
   'entities.abilities.arcane_missiles.description':
-    'Lanza Misiles Arcanos al enemigo, causando 8 de daño Arcano cada segundo durante 3 s.',
+    'Lanza Misiles Arcanos al enemigo, causando {damage} de daño Arcano cada segundo durante 3 s.',
   'entities.abilities.polymorph.name': 'Polimorfia',
   'entities.abilities.polymorph.description':
     'Transforma al enemigo en oveja durante hasta 15 s. La oveja deambula y se cura rápidamente. Cualquier daño rompe el efecto. Solo bestias y humanoides.',
@@ -1701,7 +1701,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Embosca al objetivo por un 250% de daño de arma más {damage}. Debes estar en sigilo y detrás del objetivo. Requiere una daga. Otorga 1 punto de combo.',
   'entities.abilities.stealth.name': 'Sigilo',
   'entities.abilities.stealth.description':
-    'Te oculta en las sombras: los enemigos apenas te detectan, pero te mueves un 30% más lento. Atacar o recibir daño rompe Sigilo. Lánzalo de nuevo para salir.',
+    'Te oculta en las sombras: los enemigos apenas te detectan, pero te mueves un 50% más lento. Atacar o recibir daño rompe Sigilo. Lánzalo de nuevo para salir.',
   'entities.abilities.adrenaline_rush.name': 'Subidón de adrenalina',
   'entities.abilities.adrenaline_rush.description':
     'Tu sangre se enciende y restaura al instante 60 de energía.',
@@ -1725,7 +1725,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Movimiento final que hiere al objetivo, haciéndolo sangrar {damage} durante 16 s.',
   'entities.abilities.vanish.name': 'Esfumarse',
   'entities.abilities.vanish.description':
-    'Desaparece de la vista, entrando en Sigilo incluso en combate. Te mueves un 30% más lento mientras estás oculto. Dura hasta 10 s.',
+    'Desaparece de la vista, entrando en Sigilo incluso en combate. Te mueves un 50% más lento mientras estás oculto. Dura hasta 10 s.',
   'entities.abilities.instant_poison.name': 'Veneno instantáneo',
   'entities.abilities.instant_poison.description':
     'Recubre tu arma durante 30 min, haciendo que cada uno de tus golpes cuerpo a cuerpo inflija 8 de daño de Naturaleza adicional.',
@@ -1832,7 +1832,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Una plegaria lenta pero poderosa que sana a un objetivo amistoso por {damage}.',
   'entities.abilities.mind_flay.name': 'Tortura mental',
   'entities.abilities.mind_flay.description':
-    'Asalta la mente del objetivo con energía de las Sombras e inflige 12 de daño cada segundo durante 3 s.',
+    'Asalta la mente del objetivo con energía de las Sombras e inflige {damage} de daño cada segundo durante 3 s.',
   'entities.abilities.flash_heal.name': 'Sanación relámpago',
   'entities.abilities.flash_heal.description':
     'Una plegaria rápida que sana a un objetivo amistoso por {damage}.',
@@ -1887,7 +1887,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Maldice al objetivo con agonía: {damage} de daño de las Sombras durante 24 s.',
   'entities.abilities.drain_life.name': 'Drenar vida',
   'entities.abilities.drain_life.description':
-    'Drena la vida del objetivo y te transfiere 7 de salud cada segundo durante 5 s.',
+    'Drena la vida del objetivo y te transfiere {damage} de salud cada segundo durante 5 s.',
   'entities.abilities.fear.name': 'Miedo',
   'entities.abilities.fear.description':
     'Siembra terror en el enemigo y lo deja encogido durante hasta 8 s. Cualquier daño rompe el efecto.',
@@ -2018,7 +2018,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Desmoraliza a los enemigos cercanos, reduciendo su poder de ataque en 20 durante 20 s. Solo en Forma de oso.',
   'entities.abilities.prowl.name': 'Acechar',
   'entities.abilities.prowl.description':
-    'Entra en sigilo mientras estás en Forma de lobo. No puede usarse en combate.',
+    'Entra en sigilo mientras estás en Forma de lobo y te mueves un 50% más lento. No puede usarse en combate.',
   'entities.abilities.rake.name': 'Zarpazo',
   'entities.abilities.rake.description':
     'Una apertura sigilosa que desgarra al enemigo causando el daño del arma más {damage} y provoca daño por sangrado durante 9 s. Otorga 1 punto de combo. Solo en Forma de lobo.',
@@ -4789,7 +4789,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterLoot.assignAria': 'Asignar {item} a {name}',
   'hudChrome.masterLoot.rollButton': 'Tirar',
   'hudChrome.masterLoot.selectAll': 'Elegir todos',
-  'hudChrome.masterLoot.methodMaster': 'Metodo de botin cambiado a botin maestro. Maestro del botin: {name}.',
+  'hudChrome.masterLoot.methodMaster':
+    'Metodo de botin cambiado a botin maestro. Maestro del botin: {name}.',
   'hudChrome.masterLoot.methodGroup': 'Metodo de botin cambiado a botin de grupo.',
   'hudChrome.masterLoot.assigned': '{looter} asigno {item} a {target}.',
   'hudChrome.masterLoot.unassigned': '{item} no fue asignado y queda libre para todos.',

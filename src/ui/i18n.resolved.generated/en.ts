@@ -222,6 +222,9 @@ export const en: EnTranslations = {
     "rest": {
       "resting": "Resting"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
     "unitFrame": {
       "playerLabel": "Your Hero",
       "targetLabel": "Your Mark",
@@ -3479,7 +3482,7 @@ export const en: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "Arcane Missiles",
-        "description": "Launches Arcane Missiles at the enemy, causing 8 Arcane damage each second for 3 sec."
+        "description": "Launches Arcane Missiles at the enemy, causing {damage} Arcane damage each second for 3 sec."
       },
       "polymorph": {
         "name": "Polymorph",
@@ -3727,7 +3730,7 @@ export const en: EnTranslations = {
       },
       "mind_flay": {
         "name": "Mind Flay",
-        "description": "Assaults the target's mind with Shadow energy, causing 12 damage each second for 3 sec."
+        "description": "Assaults the target's mind with Shadow energy, causing {damage} damage each second for 3 sec."
       },
       "flash_heal": {
         "name": "Flash Heal",
@@ -3803,7 +3806,7 @@ export const en: EnTranslations = {
       },
       "drain_life": {
         "name": "Drain Life",
-        "description": "Drains the target's life, transferring 7 health to you each second for 5 sec."
+        "description": "Drains the target's life, transferring {damage} health to you each second for 5 sec."
       },
       "fear": {
         "name": "Fear",
@@ -3983,7 +3986,7 @@ export const en: EnTranslations = {
       },
       "prowl": {
         "name": "Prowl",
-        "description": "Enter stealth while in Wolf Form. Cannot be used in combat."
+        "description": "Enter stealth while in Wolf Form, moving 50% slower. Cannot be used in combat."
       },
       "rake": {
         "name": "Rake",

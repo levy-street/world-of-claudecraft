@@ -1672,7 +1672,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Поражает врага на {damage} ед. урона от огня. Мгновенно.',
   'entities.abilities.arcane_missiles.name': 'Чародейские стрелы',
   'entities.abilities.arcane_missiles.description':
-    'Выпускает в противника Чародейские стрелы, наносящие 8 ед. урона от тайной магии каждую секунду в течение 3 сек.',
+    'Выпускает в противника Чародейские стрелы, наносящие {damage} ед. урона от тайной магии каждую секунду в течение 3 сек.',
   'entities.abilities.polymorph.name': 'Превращение',
   'entities.abilities.polymorph.description':
     'Превращает врага в овцу на срок до 15 сек. Овца бродит и быстро восстанавливается. Любой урон прерывает эффект. Только звери и гуманоиды.',
@@ -1718,7 +1718,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Нападает из засады, нанося 250% урона оружием плюс {damage}. Нужно быть в незаметности и позади цели. Требуется кинжал. Дает 1 прием серии.',
   'entities.abilities.stealth.name': 'Незаметность',
   'entities.abilities.stealth.description':
-    'Скрывает вас в тенях: враги почти не замечают вас, но вы двигаетесь на 30% медленнее. Атака или получение урона прерывает Незаметность. Примените снова, чтобы выйти.',
+    'Скрывает вас в тенях: враги почти не замечают вас, но вы двигаетесь на 50% медленнее. Атака или получение урона прерывает Незаметность. Примените снова, чтобы выйти.',
   'entities.abilities.adrenaline_rush.name': 'Выброс адреналина',
   'entities.abilities.adrenaline_rush.description':
     'Кровь закипает, мгновенно восстанавливая 60 энергии.',
@@ -1742,7 +1742,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Завершающий прием, который ранит цель, вызывая кровотечение на {damage} в течение 16 сек.',
   'entities.abilities.vanish.name': 'Исчезновение',
   'entities.abilities.vanish.description':
-    'Исчезает из виду, входя в незаметность даже в бою. Пока вы скрыты, вы двигаетесь на 30% медленнее. Длится до 10 сек.',
+    'Исчезает из виду, входя в незаметность даже в бою. Пока вы скрыты, вы двигаетесь на 50% медленнее. Длится до 10 сек.',
   'entities.abilities.instant_poison.name': 'Быстродействующий яд',
   'entities.abilities.instant_poison.description':
     'Покрывает ваше оружие ядом на 30 мин, заставляя каждый ваш удар в ближнем бою наносить 8 дополнительных ед. урона от сил природы.',
@@ -1848,7 +1848,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Медленная, но мощная молитва, исцеляющая дружественную цель на {damage}.',
   'entities.abilities.mind_flay.name': 'Пытка разума',
   'entities.abilities.mind_flay.description':
-    'Терзает разум цели темной энергией, нанося 12 ед. урона каждую секунду в течение 3 сек.',
+    'Терзает разум цели темной энергией, нанося {damage} ед. урона каждую секунду в течение 3 сек.',
   'entities.abilities.flash_heal.name': 'Быстрое исцеление',
   'entities.abilities.flash_heal.description':
     'Быстрая молитва, исцеляющая дружественную цель на {damage}.',
@@ -1903,7 +1903,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Проклинает цель агонией: {damage} ед. урона от темной магии за 24 сек.',
   'entities.abilities.drain_life.name': 'Похищение жизни',
   'entities.abilities.drain_life.description':
-    'Похищает жизнь цели, передавая вам 7 здоровья каждую секунду в течение 5 сек.',
+    'Похищает жизнь цели, передавая вам {damage} здоровья каждую секунду в течение 5 сек.',
   'entities.abilities.fear.name': 'Страх',
   'entities.abilities.fear.description':
     'Вселяет ужас во врага, заставляя его дрожать до 8 сек. Любой урон прерывает эффект.',
@@ -2034,7 +2034,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Деморализует врагов поблизости, снижая их силу атаки на 20 на 20 сек. Только в облике медведя.',
   'entities.abilities.prowl.name': 'Крадущийся хищник',
   'entities.abilities.prowl.description':
-    'Переход в скрытность в облике волка. Нельзя использовать в бою.',
+    'Переход в скрытность в облике волка: вы двигаетесь на 50% медленнее. Нельзя использовать в бою.',
   'entities.abilities.rake.name': 'Раздирание',
   'entities.abilities.rake.description':
     'Скрытная атака из засады, наносящая врагу урон оружием плюс {damage} и вызывающая кровотечение в течение 9 сек. Даёт 1 очко серии приёмов. Только в облике волка.',

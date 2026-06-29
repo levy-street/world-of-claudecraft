@@ -222,6 +222,9 @@ export const pl_PL: EnTranslations = {
     "rest": {
       "resting": "Odpoczynek"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
     "unitFrame": {
       "playerLabel": "Twój bohater",
       "targetLabel": "Twój cel",
@@ -3479,7 +3482,7 @@ export const pl_PL: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "Arkaniczne pociski",
-        "description": "Wystrzeliwuje arkaniczne pociski we wroga, zadając 8 obrażeń arkanicznych co sekundę przez 3 sek."
+        "description": "Wystrzeliwuje arkaniczne pociski we wroga, zadając {damage} obrażeń arkanicznych co sekundę przez 3 sek."
       },
       "polymorph": {
         "name": "Polimorfia",
@@ -3543,7 +3546,7 @@ export const pl_PL: EnTranslations = {
       },
       "stealth": {
         "name": "Skradanie się",
-        "description": "Ukrywa cię w cieniu: wrogowie ledwie cię dostrzegają, ale poruszasz się o 30% wolniej. Atak lub otrzymanie obrażeń przerywa Skradanie się. Rzuć ponownie, aby się ujawnić."
+        "description": "Ukrywa cię w cieniu: wrogowie ledwie cię dostrzegają, ale poruszasz się o 50% wolniej. Atak lub otrzymanie obrażeń przerywa Skradanie się. Rzuć ponownie, aby się ujawnić."
       },
       "adrenaline_rush": {
         "name": "Przypływ adrenaliny",
@@ -3575,7 +3578,7 @@ export const pl_PL: EnTranslations = {
       },
       "vanish": {
         "name": "Zniknięcie",
-        "description": "Znikasz z pola widzenia, wchodząc w Skradanie się nawet w walce. Ukryty poruszasz się o 30% wolniej. Trwa do 10 sek."
+        "description": "Znikasz z pola widzenia, wchodząc w Skradanie się nawet w walce. Ukryty poruszasz się o 50% wolniej. Trwa do 10 sek."
       },
       "instant_poison": {
         "name": "Natychmiastowa trucizna",
@@ -3727,7 +3730,7 @@ export const pl_PL: EnTranslations = {
       },
       "mind_flay": {
         "name": "Smaganie umysłu",
-        "description": "Naciera na umysł celu energią cienia, zadając 12 obrażeń co sekundę przez 3 sek."
+        "description": "Naciera na umysł celu energią cienia, zadając {damage} obrażeń co sekundę przez 3 sek."
       },
       "flash_heal": {
         "name": "Błyskawiczne leczenie",
@@ -3803,7 +3806,7 @@ export const pl_PL: EnTranslations = {
       },
       "drain_life": {
         "name": "Wyssanie życia",
-        "description": "Wysysa życie celu, przekazując ci 7 zdrowia co sekundę przez 5 sek."
+        "description": "Wysysa życie celu, przekazując ci {damage} zdrowia co sekundę przez 5 sek."
       },
       "fear": {
         "name": "Strach",
@@ -3983,7 +3986,7 @@ export const pl_PL: EnTranslations = {
       },
       "prowl": {
         "name": "Czajenie",
-        "description": "Wchodzi w skradanie w postaci wilka. Nie można użyć w walce."
+        "description": "Wchodzi w skradanie w postaci wilka, poruszając się o 50% wolniej. Nie można użyć w walce."
       },
       "rake": {
         "name": "Rozoranie",

@@ -222,6 +222,9 @@ export const nl_NL: EnTranslations = {
     "rest": {
       "resting": "Aan het rusten"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
     "unitFrame": {
       "playerLabel": "Je Held",
       "targetLabel": "Je Doelwit",
@@ -3479,7 +3482,7 @@ export const nl_NL: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "Arcane Projectielen",
-        "description": "Lanceert Arcane Projectielen op de vijand en veroorzaakt elke seconde 8 Arcane schade gedurende 3 sec."
+        "description": "Lanceert Arcane Projectielen op de vijand en veroorzaakt elke seconde {damage} Arcane schade gedurende 3 sec."
       },
       "polymorph": {
         "name": "Gedaanteverwisseling",
@@ -3543,7 +3546,7 @@ export const nl_NL: EnTranslations = {
       },
       "stealth": {
         "name": "Sluiptocht",
-        "description": "Verbergt je in de schaduwen: vijanden merken je nauwelijks op, maar je beweegt 30% trager. Aanvallen of schade oplopen verbreekt Sluiptocht. Bezweer opnieuw om eruit te stappen."
+        "description": "Verbergt je in de schaduwen: vijanden merken je nauwelijks op, maar je beweegt 50% trager. Aanvallen of schade oplopen verbreekt Sluiptocht. Bezweer opnieuw om eruit te stappen."
       },
       "adrenaline_rush": {
         "name": "Adrenalinestoot",
@@ -3575,7 +3578,7 @@ export const nl_NL: EnTranslations = {
       },
       "vanish": {
         "name": "Verdwijnen",
-        "description": "Verdwijn uit het zicht en betreed Sluiptocht zelfs in gevecht. Je beweegt 30% trager terwijl je verborgen bent. Duurt tot 10 sec."
+        "description": "Verdwijn uit het zicht en betreed Sluiptocht zelfs in gevecht. Je beweegt 50% trager terwijl je verborgen bent. Duurt tot 10 sec."
       },
       "instant_poison": {
         "name": "Direct Gif",
@@ -3727,7 +3730,7 @@ export const nl_NL: EnTranslations = {
       },
       "mind_flay": {
         "name": "Geestesmarteling",
-        "description": "Bestookt de geest van het doelwit met Schaduwenergie en brengt elke seconde 12 schade toe gedurende 3 sec."
+        "description": "Bestookt de geest van het doelwit met Schaduwenergie en brengt elke seconde {damage} schade toe gedurende 3 sec."
       },
       "flash_heal": {
         "name": "Snelle Genezing",
@@ -3803,7 +3806,7 @@ export const nl_NL: EnTranslations = {
       },
       "drain_life": {
         "name": "Leven Aftappen",
-        "description": "Tapt het leven van het doelwit af en draagt elke seconde 7 levenskracht naar je over gedurende 5 sec."
+        "description": "Tapt het leven van het doelwit af en draagt elke seconde {damage} levenskracht naar je over gedurende 5 sec."
       },
       "fear": {
         "name": "Angst",
@@ -3983,7 +3986,7 @@ export const nl_NL: EnTranslations = {
       },
       "prowl": {
         "name": "Sluipen",
-        "description": "Ga in sluiptocht terwijl je in Wolfsgedaante bent. Kan niet in gevecht worden gebruikt."
+        "description": "Ga in sluiptocht terwijl je in Wolfsgedaante bent en beweeg 50% trager. Kan niet in gevecht worden gebruikt."
       },
       "rake": {
         "name": "Harken",
