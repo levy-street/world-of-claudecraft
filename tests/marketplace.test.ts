@@ -393,7 +393,7 @@ const db = vi.hoisted(() => ({
   redeemPurchase: vi.fn(async () => true),
   listLiveCreatorSkins: vi.fn(async (): Promise<CreatorSkinRow[]> => []),
   createMarketplaceQuote: vi.fn(async () => {}),
-  upsertCreatorSkin: vi.fn(async () => {}),
+  upsertCreatorSkin: vi.fn(async (_row: CreatorSkinRow) => {}),
   countLiveCreatorSkinsByAccount: vi.fn(async () => 0),
 }));
 vi.mock('../server/db', () => db);

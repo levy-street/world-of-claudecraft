@@ -1814,6 +1814,7 @@ function dirtyEveryDeltaField(): {
   leader.accountCosmetics = {
     completedQuestIds: ['q_aldrics_fallen_star'],
     mechChromaIds: ['amber_crimson'],
+    ownedCreatorSkinIds: [],
   };
 
   // Player Entity fields.

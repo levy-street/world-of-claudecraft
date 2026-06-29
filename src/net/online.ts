@@ -1641,7 +1641,11 @@ export class ClientWorld implements IWorld {
     }
     // Only carry `csk` when equipping an overlay; its absence means "no overlay"
     // (the server clears any existing one), keeping built-in skin changes terse.
-    const payload: Record<string, unknown> = { cmd: 'change_skin', skin: idx, catalog };
+    const payload: { cmd: ClientCommand } & Record<string, unknown> = {
+      cmd: 'change_skin',
+      skin: idx,
+      catalog,
+    };
     if (overlay) payload.csk = overlay;
     this.cmd(payload);
   }

@@ -243,7 +243,7 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
 // ---------------------------------------------------------------------------
 describe('options_view: main menu routing', () => {
   it('routes each row to its sub-view, with logout + close, omitting bug report offline', () => {
-    const offline = buildOptionsMenu({ bugReportAvailable: false });
+    const offline = buildOptionsMenu({ bugReportAvailable: false, marketplaceAvailable: false });
     expect(offline.map((e) => e.labelKey)).toEqual([
       'hud.options.keyBindings',
       'hudChrome.controller.title',
@@ -263,7 +263,7 @@ describe('options_view: main menu routing', () => {
   });
 
   it('adds the online-only Report a Bug row when bug reporting is available', () => {
-    const online = buildOptionsMenu({ bugReportAvailable: true });
+    const online = buildOptionsMenu({ bugReportAvailable: true, marketplaceAvailable: false });
     const bug = online.find((e) => e.labelKey === 'hudChrome.bugReport.menuButton');
     expect(bug?.action).toEqual({ kind: 'goto', view: 'bugreport' });
   });
@@ -341,8 +341,8 @@ describe('options_view: determinism', () => {
     expect(buildAudioControls(src)).toEqual(buildAudioControls(src));
     expect(buildInterfaceControls(src)).toEqual(buildInterfaceControls(src));
     expect(buildControllerControls(src)).toEqual(buildControllerControls(src));
-    expect(buildOptionsMenu({ bugReportAvailable: true })).toEqual(
-      buildOptionsMenu({ bugReportAvailable: true }),
+    expect(buildOptionsMenu({ bugReportAvailable: true, marketplaceAvailable: false })).toEqual(
+      buildOptionsMenu({ bugReportAvailable: true, marketplaceAvailable: false }),
     );
   });
 });
