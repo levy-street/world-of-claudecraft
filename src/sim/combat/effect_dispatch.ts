@@ -503,6 +503,7 @@ export function runEffects(
           const existing = p.auras.findIndex((a) => a.id === ability.id);
           if (existing >= 0) {
             p.auras.splice(existing, 1);
+            if (eff.kind === 'stealth') p.stealthed = false; // toggled back out of stealth
             ctx.emit({ type: 'aura', targetId: p.id, name: ability.name, gained: false });
             recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta));
             break;

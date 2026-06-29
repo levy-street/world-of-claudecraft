@@ -1071,6 +1071,11 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         names: [...game.clients.values()].map((s) => s.name),
       });
     }
+    // Dev-only world-loop perf profile (per-phase tick p95/max), for the load
+    // harness. Gated by ALLOW_DEV_COMMANDS so it is never exposed in production.
+    if (req.method === 'GET' && url === '/api/perf' && process.env.ALLOW_DEV_COMMANDS === '1') {
+      return json(res, 200, game.perfProfile());
+    }
     if (req.method === 'GET' && url === '/api/arena/leaderboard') {
       // public all-time Ashen Coliseum ladder (top rated characters)
       const params = new URLSearchParams((req.url ?? '').split('?')[1] ?? '');

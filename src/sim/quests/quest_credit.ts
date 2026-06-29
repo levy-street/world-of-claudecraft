@@ -40,6 +40,9 @@ export function onMobKilledForQuests(ctx: SimContext, mob: Entity, meta: PlayerM
 }
 
 export function onInventoryChangedForQuests(ctx: SimContext, meta: PlayerMeta): void {
+  // Inventory mutated (add/remove/sell/buyback all route through here): flag
+  // the player's wire state dirty so hosts re-send bags + derived quest state.
+  meta.wireRev++;
   for (const qp of meta.questLog.values()) {
     const quest = QUESTS[qp.questId];
     let changed = false;

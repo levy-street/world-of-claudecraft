@@ -1288,6 +1288,10 @@ export interface Entity {
   inCombat: boolean;
   combatTimer: number; // time since last combat event
   auras: Aura[];
+  // cached `auras.some(a => a.kind === 'stealth')`, refreshed in updateAuras.
+  // Hosts read it per interest-scan visit (O(viewers x neighbors)); recomputing
+  // it from auras each visit was a measurable cost in crowds.
+  stealthed: boolean;
   ccDr: Map<CrowdControlDrCategory, CrowdControlDrState>;
   castingAbility: string | null;
   castRemaining: number;

@@ -209,6 +209,7 @@ export function fiestaStandardize(ctx: SimContext, meta: PlayerMeta, e: Entity):
   meta.talents = defaultBuild(meta.cls, talentPointsAtLevel(FIESTA_STANDARD_LEVEL));
   meta.talentMods = computeTalentModifiers(meta.cls, meta.talents);
   meta.known = abilitiesKnownAt(meta.cls, e.level, ctx.playerMods(meta));
+  meta.wireRev++; // talents/loadouts swapped for the bout, refresh the wire promptly
   recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta));
 }
 
@@ -222,6 +223,7 @@ export function fiestaRestoreChar(meta: PlayerMeta, e: Entity): void {
   meta.talentMods = computeTalentModifiers(meta.cls, meta.talents);
   meta.fiestaRestore = null;
   meta.known = abilitiesKnownAt(meta.cls, e.level, meta.talentMods);
+  meta.wireRev++; // real talents restored, refresh the wire promptly
   recalcPlayerStats(e, meta.cls, meta.equipment, meta.talentMods);
 }
 

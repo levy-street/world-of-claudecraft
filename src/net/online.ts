@@ -643,6 +643,7 @@ function blankEntity(id: number): Entity {
     inCombat: false,
     combatTimer: 99,
     auras: [],
+    stealthed: false,
     ccDr: new Map(),
     castingAbility: null,
     castRemaining: 0,
