@@ -35,6 +35,16 @@ describe('item level: source derivation', () => {
     expect(itemSourceLevel('conjured_water')).toBeUndefined();
     expect(itemLevel(ITEMS.conjured_water)).toBeUndefined();
   });
+
+  it('derives collect-gated quest reward levels from the collected item source', () => {
+    // q_greyjaw collects Old Greyjaw's fang from a level-4 rare.
+    expect(itemSourceLevel('greyjaw_pelt_cloak')).toBe(4);
+    expect(itemLevel(ITEMS.greyjaw_pelt_cloak)).toBe(5);
+
+    // q_stalker_pelts collects Ridge Stalker Pelts from level-14 beasts.
+    expect(itemSourceLevel('ridgestalker_treads')).toBe(14);
+    expect(itemLevel(ITEMS.ridgestalker_treads)).toBe(15);
+  });
 });
 
 describe('item level: tier number', () => {
@@ -67,6 +77,20 @@ describe('item level: stat budget formula', () => {
 
   it('a sourceless / slotless item has no expected budget', () => {
     expect(expectedStatBudget(ITEMS.conjured_water)).toBeUndefined();
+  });
+
+  it('only assigns item levels and budgets to equippable combat gear', () => {
+    const slotBearingTool = {
+      id: 'gravecaller_blade',
+      name: 'Gravecaller Tuning Fork',
+      kind: 'tool',
+      slot: 'mainhand',
+      sellValue: 0,
+    } as const;
+
+    expect(itemSourceLevel(slotBearingTool.id)).toBe(10);
+    expect(itemLevel(slotBearingTool)).toBeUndefined();
+    expect(expectedStatBudget(slotBearingTool)).toBeUndefined();
   });
 });
 
@@ -176,15 +200,23 @@ describe('item level: raid tier', () => {
   it('raid loot reads a tier above same-level dungeon loot', () => {
     // Same source level (20) + same quality (epic), but the raid helmet carries the
     // raid item-level bonus, so it is exactly RAID_ILVL_BONUS above the dungeon helmet.
-    const raidHelm = itemLevel(ITEMS.crownforged_dreadhelm)!;
-    const dungeonHelm = itemLevel(ITEMS.deathlords_dread_visage)!;
+    const raidHelm = itemLevel(ITEMS.crownforged_dreadhelm);
+    const dungeonHelm = itemLevel(ITEMS.deathlords_dread_visage);
     expect(itemSourceLevel('crownforged_dreadhelm')).toBe(20);
     expect(itemSourceLevel('deathlords_dread_visage')).toBe(20);
+    expect(raidHelm).not.toBeUndefined();
+    expect(dungeonHelm).not.toBeUndefined();
+    if (raidHelm === undefined || dungeonHelm === undefined)
+      throw new Error('raid and dungeon helmets should have item levels');
     expect(raidHelm - dungeonHelm).toBe(RAID_ILVL_BONUS);
     // ...and therefore a strictly larger stat budget for the same slot.
-    expect(expectedStatBudget(ITEMS.crownforged_dreadhelm)!).toBeGreaterThan(
-      expectedStatBudget(ITEMS.deathlords_dread_visage)!,
-    );
+    const raidBudget = expectedStatBudget(ITEMS.crownforged_dreadhelm);
+    const dungeonBudget = expectedStatBudget(ITEMS.deathlords_dread_visage);
+    expect(raidBudget).not.toBeUndefined();
+    expect(dungeonBudget).not.toBeUndefined();
+    if (raidBudget === undefined || dungeonBudget === undefined)
+      throw new Error('raid and dungeon helmets should have stat budgets');
+    expect(raidBudget).toBeGreaterThan(dungeonBudget);
   });
 });
 
@@ -210,8 +242,12 @@ describe('item level: every level-20 item is balanced to budget', () => {
       const item = ITEMS[id];
       if (!item.slot || itemSourceLevel(id) !== 20) continue;
       const key = `${itemLevel(item)}:${item.quality}:${item.slot}`;
-      if (!groups.has(key)) groups.set(key, new Set());
-      groups.get(key)!.add(primaryStatSum(item));
+      let sums = groups.get(key);
+      if (!sums) {
+        sums = new Set();
+        groups.set(key, sums);
+      }
+      sums.add(primaryStatSum(item));
     }
     // No group may contain two different budgets.
     const split = [...groups.entries()].filter(([, sums]) => sums.size > 1);

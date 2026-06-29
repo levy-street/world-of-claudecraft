@@ -133,14 +133,29 @@ function buildSourceIndex(): Map<string, ItemSource> {
     const raid = isRaidMob(mob.id);
     for (const entry of mob.loot) bump(entry.itemId, mob.maxLevel, raid);
   }
-  // Quest rewards: gated behind the quest's hardest kill objective (the boss you
-  // had to beat for it), falling back to the quest's own minLevel.
+  // Quest rewards: gated behind the quest's hardest combat source: direct kill
+  // objectives, or collected quest items traced back to the mob that drops them.
+  // Fall back to the quest's own minLevel when no concrete source exists.
   for (const quest of Object.values(QUESTS)) {
-    const killLevels = quest.objectives
-      .map((o) => (o.type === 'kill' && o.targetMobId ? MOBS[o.targetMobId]?.maxLevel : undefined))
-      .filter((n): n is number => typeof n === 'number');
-    const level = killLevels.length ? Math.max(...killLevels) : quest.minLevel;
-    for (const itemId of Object.values(quest.itemRewards)) bump(itemId, level, false);
+    let source: ItemSource | undefined;
+    const consider = (level: number | undefined, raid: boolean): void => {
+      if (level === undefined) return;
+      if (source === undefined || level > source.level)
+        source = { level, raid: raid || (source?.raid ?? false) };
+      else if (raid && !source.raid) source = { ...source, raid: true };
+    };
+    for (const objective of quest.objectives) {
+      if (objective.type === 'kill' && objective.targetMobId) {
+        const mob = MOBS[objective.targetMobId];
+        consider(mob?.maxLevel, mob ? isRaidMob(mob.id) : false);
+      } else if (objective.type === 'collect' && objective.itemId) {
+        const collectedSource = idx.get(objective.itemId);
+        consider(collectedSource?.level, collectedSource?.raid ?? false);
+      }
+    }
+    consider(quest.minLevel, false);
+    for (const itemId of Object.values(quest.itemRewards))
+      bump(itemId, source?.level, source?.raid ?? false);
   }
   return idx;
 }
@@ -162,10 +177,18 @@ export function itemFromRaid(itemId: string): boolean {
   return sourceIndexOf().get(itemId)?.raid ?? false;
 }
 
+// Item level is a combat-gear concept. Slot-bearing non-combat oddities (tools,
+// quest objects, cosmetics) can exist in the item model, but should not get an
+// item-level readout or stat budget.
+export function isItemLevelEligible(item: ItemDef): boolean {
+  return !!item.slot && (item.kind === 'armor' || item.kind === 'weapon');
+}
+
 // The item level (tier number) shown in the tooltip, or undefined when there is no
 // derivable source (so the UI simply omits the line for sourceless items). Adds the
 // raid bonus so raid loot reads a tier above same-level dungeon loot.
 export function itemLevel(item: ItemDef): number | undefined {
+  if (!isItemLevelEligible(item)) return undefined;
   const src = sourceIndexOf().get(item.id);
   if (src === undefined) return undefined;
   const bonus = QUALITY_ILVL_BONUS[item.quality ?? 'common'] ?? 0;
