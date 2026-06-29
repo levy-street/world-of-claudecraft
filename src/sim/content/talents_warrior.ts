@@ -80,8 +80,8 @@ const ARMS_NODES: TalentNode[] = [
   },
   {
     id: 'arms_deep_wounds', tree: 'spec', specId: 'arms', kind: 'passive', maxRank: 3,
-    effect: { ability: [{ ability: 'rend', dmgPct: 0.20 }] },
-    icon: '🩸', name: 'Deep Wounds', description: 'Increases the bleed damage of Rend by 20% per rank.',
+    effect: { ability: [{ ability: 'rend', dmgPct: 0.10 }] },
+    icon: '🩸', name: 'Deep Wounds', description: 'Increases the bleed damage of Rend by 10% per rank.',
     row: 0, col: 2,
   },
   {
@@ -183,8 +183,8 @@ const PROT_NODES: TalentNode[] = [
   },
   {
     id: 'prot_imp_sunder', tree: 'spec', specId: 'prot', kind: 'passive', maxRank: 2, pointsGate: 2,
-    effect: { ability: [{ ability: 'sunder_armor', costPct: -0.5 }] },
-    icon: '🔨', name: 'Improved Sunder Armor', description: 'Reduces the rage cost of Sunder Armor by 50% per rank.',
+    effect: { ability: [{ ability: 'sunder_armor', costPct: -0.25 }] },
+    icon: '🔨', name: 'Improved Sunder Armor', description: 'Reduces the rage cost of Sunder Armor by 25% per rank.',
     row: 1, col: 2,
   },
   {
