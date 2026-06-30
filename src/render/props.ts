@@ -466,6 +466,7 @@ const DELVE_PORTAL_FRAG = /* glsl */ `
   uniform float uTime;
   uniform vec3 uDim;
   uniform vec3 uBright;
+  uniform vec3 uRim;
   uniform float uHdr;
   varying vec2 vUv;
   varying vec3 vWPos;
@@ -488,18 +489,18 @@ const DELVE_PORTAL_FRAG = /* glsl */ `
     // slow ominous breathing pulse
     float pulse = 0.5 + 0.5 * sin(uTime * 0.85);
 
-    // hot crimson outer rim (baked, distinct from the purple mid-zone)
-    vec3 rimCol = vec3(0.85, 0.04, 0.10) * uHdr;
+    // hot outer rim (caller-tinted; crimson by default, watery cyan for the drowned shrine)
+    vec3 rimCol = uRim * uHdr;
 
-    // zone blending: void core (uDim) → purple swirl (uBright) → crimson rim
-    float toPurple  = smoothstep(0.06, 0.55, r);
-    float toCrimson = smoothstep(0.45, 0.85, r);
+    // zone blending: void core (uDim) → mid swirl (uBright) → rim
+    float toMid  = smoothstep(0.06, 0.55, r);
+    float toRim  = smoothstep(0.45, 0.85, r);
     float ringEnergy = vortex * churn * smoothstep(0.90, 0.05, r);
 
     vec3 col = uDim;
-    col = mix(col, uBright, toPurple  * (0.55 + 0.45 * ringEnergy));
-    col = mix(col, rimCol,  toCrimson * (0.45 + 0.55 * pulse));
-    col += uBright * smoothstep(0.28, 0.0, r) * 0.6 * uHdr; // purple core bloom
+    col = mix(col, uBright, toMid * (0.55 + 0.45 * ringEnergy));
+    col = mix(col, rimCol,  toRim * (0.45 + 0.55 * pulse));
+    col += uBright * smoothstep(0.28, 0.0, r) * 0.6 * uHdr; // core bloom
 
     // fill the whole opening as a dark solid portal; feather only the outer rim
     vec2 e = abs(p);
@@ -513,25 +514,56 @@ const DELVE_PORTAL_FRAG = /* glsl */ `
   }
 `;
 
-let delvePortalMat: THREE.ShaderMaterial | null = null;
-function delvePortalMaterial(): THREE.ShaderMaterial {
-  if (delvePortalMat) return delvePortalMat;
-  delvePortalMat = new THREE.ShaderMaterial({
+const delvePortalMatCache = new Map<string, THREE.ShaderMaterial>();
+function delvePortalMaterial(dim: number, bright: number, rim: number): THREE.ShaderMaterial {
+  const key = `${dim}_${bright}_${rim}`;
+  let mat = delvePortalMatCache.get(key);
+  if (mat) return mat;
+  mat = new THREE.ShaderMaterial({
     uniforms: {
       ...THREE.UniformsUtils.clone(THREE.UniformsLib.fog),
       uTime: sharedUniforms.uTime,
-      uDim: { value: new THREE.Color(0x03000a) }, // near-void purple-black core
-      uBright: { value: new THREE.Color(0x6e0a85) }, // deep purple swirl
+      uDim: { value: new THREE.Color(dim) },
+      uBright: { value: new THREE.Color(bright) },
+      uRim: { value: new THREE.Color(rim) },
       uHdr: { value: GFX.composer ? 2.8 : 1.0 },
     },
     vertexShader: DELVE_PORTAL_VERT,
     fragmentShader: DELVE_PORTAL_FRAG,
     transparent: true,
     depthWrite: false,
-    side: THREE.FrontSide, // only the town-facing front glows; the dark vault sits behind it
+    side: THREE.FrontSide,
     fog: true,
   });
-  return delvePortalMat;
+  delvePortalMatCache.set(key, mat);
+  return mat;
+}
+
+// The delve-entrance GLB bakes its stone AND its hanging veil into one shared
+// texture (single unnamed material), so the veil can't be recolored by material
+// name. For the drowned shrine we want that red veil to read as water: clone the
+// converted material and inject a red→blue recolor that only touches reddish
+// texels (R dominant over G/B), leaving the grey stone untouched. Cloned per
+// asset-part material so the default (purple) entrance keeps the original red veil.
+const drowningVeilMatCache = new Map<THREE.Material, THREE.Material>();
+function drownVeilMaterial(src: THREE.Material): THREE.Material {
+  const cached = drowningVeilMatCache.get(src);
+  if (cached) return cached;
+  const m = src.clone();
+  m.onBeforeCompile = (shader) => {
+    shader.fragmentShader = shader.fragmentShader.replace(
+      '#include <map_fragment>',
+      `#include <map_fragment>
+      // recolor the baked red veil to a murky Blackwater blue; redness gates it so stone stays grey
+      float _veilRed = clamp(diffuseColor.r - max(diffuseColor.g, diffuseColor.b), 0.0, 1.0);
+      diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.04, 0.13, 0.2) * (0.4 + diffuseColor.r), _veilRed);
+      `,
+    );
+  };
+  // a distinct program key so three doesn't reuse the un-injected cached program
+  m.customProgramCacheKey = () => 'drownVeil';
+  drowningVeilMatCache.set(src, m);
+  return m;
 }
 
 // Embers drifting up out of the delve mouth, a deterministic point cloud whose
@@ -558,6 +590,8 @@ const DELVE_EMBER_VERT = /* glsl */ `
 `;
 const DELVE_EMBER_FRAG = /* glsl */ `
   uniform float uHdr;
+  uniform vec3 uCol1;
+  uniform vec3 uCol2;
   varying float vLife;
   void main() {
     vec2 c = gl_PointCoord - 0.5;
@@ -565,7 +599,7 @@ const DELVE_EMBER_FRAG = /* glsl */ `
     if (d > 0.5) discard;
     float soft = smoothstep(0.5, 0.0, d);
     float fade = sin(vLife * 3.14159);                   // fade in then out over life
-    vec3 col = mix(vec3(1.0, 0.16, 0.09), vec3(1.0, 0.5, 0.18), vLife) * uHdr;
+    vec3 col = mix(uCol1, uCol2, vLife) * uHdr;
     gl_FragColor = vec4(col, soft * fade * 0.85);
   }
 `;
@@ -576,6 +610,8 @@ function buildDelveEmbers(
   cz: number,
   halfW: number,
   riseY: number,
+  col1: [number, number, number] = [1.0, 0.16, 0.09],
+  col2: [number, number, number] = [1.0, 0.5, 0.18],
 ): THREE.Points {
   const N = GFX.standardMaterials ? 48 : 28; // lighter on low
   const positions = new Float32Array(N * 3);
@@ -605,6 +641,8 @@ function buildDelveEmbers(
       uTime: sharedUniforms.uTime,
       uRise: { value: riseY },
       uHdr: { value: GFX.composer ? 2.0 : 1.0 },
+      uCol1: { value: new THREE.Vector3(...col1) },
+      uCol2: { value: new THREE.Vector3(...col2) },
     },
     vertexShader: DELVE_EMBER_VERT,
     fragmentShader: DELVE_EMBER_FRAG,
@@ -1212,6 +1250,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   const delvePortals: THREE.Mesh[] = [];
   for (const dm of PROPS.delveMarkers ?? []) {
     if (!loadedProps.has('delveEntrance2')) continue;
+    const isDrowned = dm.delveId === 'drowned_litany';
     const gy = ground(dm.x, dm.z);
 
     // Portal-door model with its own backing slab, no separate vault sphere needed.
@@ -1224,7 +1263,9 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     const archZ = dm.z - 4; // south of Halven (also the leaveDelve drop: doorPos.z - 4)
     const ag = new THREE.Group();
     for (const part of arch.parts) {
-      const m = new THREE.Mesh(part.geo, part.mat);
+      // drowned shrine: recolor the baked red veil to water-blue (stone unaffected)
+      const mat = isDrowned ? drownVeilMaterial(part.mat) : part.mat;
+      const m = new THREE.Mesh(part.geo, mat);
       m.castShadow = true;
       m.receiveShadow = true;
       ag.add(m);
@@ -1247,21 +1288,27 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     // than the opening to cover the gap, recessed a touch into the model.
     const backsplash = new THREE.Mesh(
       new THREE.PlaneGeometry(openW * 1.1, openH * 1.1),
-      new THREE.MeshBasicMaterial({ color: 0x05030a, side: THREE.DoubleSide }),
+      new THREE.MeshBasicMaterial({
+        color: isDrowned ? 0x01060f : 0x05030a, // deep blue-black for the drowned shrine
+        side: THREE.DoubleSide,
+      }),
     );
     backsplash.position.set(dm.x, openCY, townFaceZ - 0.35);
     group.add(backsplash);
 
     // swirling void plane, FrontSide, drawn over the dark backsplash so the
     // animated vortex reads against true black from the town approach.
-    const portal = new THREE.Mesh(new THREE.PlaneGeometry(openW, openH), delvePortalMaterial());
+    const portalMat = isDrowned
+      ? delvePortalMaterial(0x01060c, 0x0c2c3a, 0x176079) // murky marsh water: black-blue → deep teal → dim cyan rim
+      : delvePortalMaterial(0x03000a, 0x6e0a85, 0xd90a1a); // default: void → purple → crimson rim
+    const portal = new THREE.Mesh(new THREE.PlaneGeometry(openW, openH), portalMat);
     portal.position.set(dm.x, openCY, townFaceZ - 0.05);
     portal.renderOrder = 3;
     group.add(portal);
     delvePortals.push(portal);
 
-    // deep purple glow spilling from the mouth, matches the new portal palette.
-    const mouthLight = new THREE.PointLight(0x7010b0, 8, 18, 2);
+    const mouthLightColor = isDrowned ? 0x1048c0 : 0x7010b0;
+    const mouthLight = new THREE.PointLight(mouthLightColor, 8, 18, 2);
     mouthLight.position.set(dm.x, gy + 2.4, townFaceZ + 0.4);
     mouthLight.userData.baseIntensity = 8;
     group.add(mouthLight);
@@ -1269,7 +1316,15 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
 
     // embers drifting up out of the mouth (self-animating; not a mesh, so the
     // static merge skips it automatically)
-    group.add(buildDelveEmbers(dm.x, gy + 1.0, townFaceZ + 0.2, openW * 0.34, openH * 0.85));
+    const emberCol1: [number, number, number] = isDrowned
+      ? [0.1, 0.35, 1.0] // blue sparks for the drowned shrine
+      : [1.0, 0.16, 0.09];
+    const emberCol2: [number, number, number] = isDrowned
+      ? [0.55, 0.8, 1.0] // pale blue-white fade
+      : [1.0, 0.5, 0.18];
+    group.add(
+      buildDelveEmbers(dm.x, gy + 1.0, townFaceZ + 0.2, openW * 0.34, openH * 0.85, emberCol1, emberCol2),
+    );
 
     // two flaming braziers flanking the mouth, a tended-entrance read. Reuse
     // the campfire flame + fire-light pattern so the renderer flickers them and
