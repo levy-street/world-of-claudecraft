@@ -7,9 +7,9 @@ that stage is the handoff.
 | Stage | Scope | Status |
 |---|---|---|
 | 0 | Entrance recolor (blue water portal) | DONE (uncommitted, see note) |
-| 1 | Room layouts + shallow/deep water tiers + jump-dodge | NOT STARTED |
-| 2 | Render: shallow/deep visuals + marsh dead-tree/plank assets | NOT STARTED |
-| 3 | Boss: Tolling Bells line projectiles + knockback | NOT STARTED |
+| 1 | Room layouts + shallow/deep water tiers + jump-dodge | DONE (commit, see board) |
+| 2 | Render: shallow/deep visuals + marsh dead-tree/plank assets | IN PROGRESS |
+| 3 | Boss: Tolling Bells line projectiles + knockback | IN PROGRESS |
 | 4 | Verify pass: minimap-from-data, guard tests, tsc, i18n S3 | NOT STARTED |
 
 Stage 0 note: `src/render/props.ts` already recolors the Drowned Litany entrance to a

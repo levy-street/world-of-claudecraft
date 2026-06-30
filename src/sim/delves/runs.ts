@@ -60,8 +60,27 @@ import {
   dist2d,
   type Entity,
   INSTANCE_EMPTY_TIMEOUT,
+  type RiteIntensity,
   type Vec3,
 } from '../types';
+import {
+  clearDrownedLitanyBossState,
+  initDrownedLitanyBossState,
+  tickDrownedLitanyBoss,
+} from './drowned_litany_boss';
+import {
+  chooseDrownedLitanyRiteIntensity,
+  clearDrownedLitanyRiteState,
+  interactDrownedLitanyRite,
+  spawnDrownedLitanyRite,
+  tickDrownedLitanyRite,
+} from './drowned_litany_rite';
+import {
+  initLitanyBaptistryModule,
+  isDelvePuzzleKind,
+  LITANY_PUZZLE_KINDS,
+  tickDrownedLitanyRooms,
+} from './drowned_litany_rooms';
 
 // Push-out radii (yards) for solid delve props, kept under the chest/grave interact
 // range (DELVE_PLATE_RADIUS + 2 = 4.5) so you can still loot from adjacent. Pressure
@@ -84,6 +103,13 @@ export const DELVE_MODULE_NAMES: Record<string, string> = {
   reliquary_bell_niche: 'The Bell Niche',
   reliquary_saintless_hall: 'The Saintless Hall',
   reliquary_finale: 'The Bell-Buried Chamber',
+  litany_sluice: 'The Crescent Sluice',
+  litany_ledger: 'The Island Ledger',
+  litany_ring: 'The Ring Reliquary',
+  litany_baptistry: 'The Sinkhole Baptistry',
+  litany_choir_loft: 'The Fan Choir Loft',
+  litany_causeway: 'The Y-Split Causeway',
+  litany_apse: 'The Drowned Apse',
 };
 // Lore journal entries unlocked one-per-clear across repeat runs (PRD §6.4 / §7.6).
 // Ids match the `delveUi.lore.*` i18n keys.
@@ -98,10 +124,17 @@ const DELVE_LORE_ORDER = [
 // these so a Heroic run never rolls an inert affix (PRD §6.7 v1 subset). The
 // other registered crypt affixes (grave_tax / unstable_roof / cult_remnants)
 // keep their UI/i18n entries but are excluded from the roll until implemented.
+export const DELVE_PUZZLE_KINDS = new Set<string>([
+  'pressure_plate',
+  ...Array.from(LITANY_PUZZLE_KINDS),
+]);
 export const DELVE_IMPLEMENTED_AFFIXES = new Set<string>([
   'restless_graves',
   'bad_air',
   'candleblind',
+  'high_water',
+  'lively_choir',
+  'belligerent_dead',
 ]);
 
 // ----- geometry / lookup helpers ---------------------------------------------
@@ -191,7 +224,11 @@ export function clampDelveDoors(
       continue;
     }
     let solidR = 0;
-    if (state.kind === 'reward_chest' || state.kind === 'locked_chest')
+    if (
+      state.kind === 'reward_chest' ||
+      state.kind === 'locked_chest' ||
+      state.kind === 'drowned_reliquary'
+    )
       solidR = DELVE_CHEST_SOLID_R;
     else if (state.kind === 'cracked_grave') solidR = DELVE_GRAVE_SOLID_R;
     else if (state.kind === 'destructible_wall') solidR = obj.hp > 0 ? DELVE_WALL_SOLID_R : 0;
@@ -394,6 +431,8 @@ export function claimDelveRun(
   run.rewardChestId = null;
   run.surfaceExitId = null;
   run.objective = { kind: delve.objective, counts: [0], complete: false };
+  clearDrownedLitanyBossState(run);
+  clearDrownedLitanyRiteState(run);
   const origin = delveOriginOf(run);
   run.origin = { x: origin.x, z: origin.z };
   spawnDelveModule(ctx, run);
@@ -422,6 +461,9 @@ export function spawnDelveModule(ctx: SimContext, run: DelveRun): void {
   run.exitPortalOpen = false;
   run.rewardChestId = null;
   run.surfaceExitId = null;
+  clearDrownedLitanyBossState(run);
+  clearDrownedLitanyRiteState(run);
+  run.litanyBaptistry = undefined;
 
   const moduleId = run.modules[run.moduleIndex];
   const mod = DELVE_MODULES[moduleId];
@@ -431,24 +473,34 @@ export function spawnDelveModule(ctx: SimContext, run: DelveRun): void {
   const zBase = delveModuleZOffset(run);
   const spawnSet = pickDelveSpawnSet(mod, run.seed, run.moduleIndex);
   if (!spawnSet) return;
-  for (const spawn of spawnSet.spawns) {
-    const template = MOBS[spawn.mobId];
-    if (!template) continue;
-    const level = template.minLevel + tier.enemyLevelBonus;
-    const mob = createMob(
-      ctx.nextId++,
-      template,
-      level,
-      ctx.groundPos(run.origin.x + spawn.x, run.origin.z + zBase + spawn.z),
-    );
-    mob.facing = Math.PI;
-    mob.prevFacing = mob.facing;
-    ctx.addEntity(mob);
-    run.mobIds.push(mob.id);
+  const baptistry = mod.id === 'litany_baptistry' && run.delveId === 'drowned_litany';
+  if (baptistry) {
+    initLitanyBaptistryModule(ctx, run, tier.enemyLevelBonus, zBase);
+  } else {
+    for (const spawn of spawnSet.spawns) {
+      const template = MOBS[spawn.mobId];
+      if (!template) continue;
+      const level = template.minLevel + tier.enemyLevelBonus;
+      const mob = createMob(
+        ctx.nextId++,
+        template,
+        level,
+        ctx.groundPos(run.origin.x + spawn.x, run.origin.z + zBase + spawn.z),
+      );
+      mob.facing = Math.PI;
+      mob.prevFacing = mob.facing;
+      if (run.affixes.includes('belligerent_dead') && spawn.mobId === 'grave_silt_bulwark') {
+        mob.maxHp = Math.round(mob.maxHp * 1.1);
+        mob.hp = mob.maxHp;
+      }
+      ctx.addEntity(mob);
+      run.mobIds.push(mob.id);
+    }
   }
   spawnDelveInteractables(ctx, run, mod, zBase);
   const isFinale = mod.id === delve.finaleModuleId || run.moduleIndex >= run.modules.length - 1;
   if (!isFinale) spawnDelveModuleExit(ctx, run, mod, zBase);
+  else if (run.delveId === 'drowned_litany') initDrownedLitanyBossState(run);
   emitDelveModuleEnter(ctx, run, mod);
   if (run.companion) {
     const companion = ctx.entities.get(run.companion.entityId);
@@ -503,6 +555,8 @@ export function freeDelveRun(ctx: SimContext, run: DelveRun): void {
   run.rewardChestId = null;
   run.surfaceExitId = null;
   run.lockpick = null;
+  clearDrownedLitanyBossState(run);
+  clearDrownedLitanyRiteState(run);
 }
 
 // ----- tick driver + run progression -----------------------------------------
@@ -580,17 +634,23 @@ export function onDelveBossDefeated(ctx: SimContext, run: DelveRun): void {
   const layout = DELVE_MODULE_LAYOUTS[moduleId];
   const zBase = delveModuleZOffset(run);
   const dais = layout?.dais ?? { x: 0, z: 52 };
-  // Centre aisle, toward the entrance (south) edge of the dais and facing the
-  // approaching player, clear of the north surface-exit stairs at dais.z+6.
-  const chestLocalZ = dais.z - 14;
-  const chestPos = ctx.groundPos(run.origin.x, run.origin.z + zBase + chestLocalZ);
-  // Drop any stale module_exit (same z as dais / north passage) before placing the chest.
+  // Drop any stale module_exit (same z as dais / north passage) before placing rewards.
   for (const id of [...run.objectIds]) {
     if (run.objectState[id]?.kind !== 'module_exit') continue;
     ctx.dropEntity(id);
     run.objectIds = run.objectIds.filter((oid) => oid !== id);
     delete run.objectState[id];
   }
+  if (run.delveId === 'drowned_litany') {
+    spawnDrownedLitanyRite(ctx, run, zBase, (c, r, kind, pos) =>
+      createDelveObject(c, r, kind, pos),
+    );
+    return;
+  }
+  // Centre aisle, toward the entrance (south) edge of the dais and facing the
+  // approaching player, clear of the north surface-exit stairs at dais.z+6.
+  const chestLocalZ = dais.z - 14;
+  const chestPos = ctx.groundPos(run.origin.x, run.origin.z + zBase + chestLocalZ);
   const chest = createDelveObject(ctx, run, 'locked_chest', chestPos);
   chest.facing = Math.PI; // face south, toward the player entering from the aisle
   chest.prevFacing = Math.PI;
@@ -727,6 +787,9 @@ export function spawnDelveInteractables(
   for (const slot of mod.interactableSlots) {
     for (const variant of slot.variants) {
       if (variant === 'darkness_zone') continue;
+      if (variant === 'widow_egg_sac' && run.litanyBaptistry && !run.litanyBaptistry.eggsEnabled) {
+        continue;
+      }
       const pos = ctx.groundPos(run.origin.x + slot.x, run.origin.z + zBase + slot.z);
       const obj = createDelveObject(ctx, run, variant, pos);
       spawned.push({ kind: variant, id: obj.id });
@@ -734,7 +797,7 @@ export function spawnDelveInteractables(
   }
   // Link every pressure plate in this module to every locked door.
   // A door only opens once ALL plates that reference it are triggered.
-  const plates = spawned.filter((s) => s.kind === 'pressure_plate');
+  const plates = spawned.filter((s) => isDelvePuzzleKind(s.kind));
   const doors = spawned.filter((s) => s.kind === 'locked_door');
   for (const door of doors) {
     run.objectState[door.id].open = false;
@@ -747,12 +810,22 @@ export function spawnDelveInteractables(
 export function createDelveObject(ctx: SimContext, run: DelveRun, kind: string, pos: Vec3): Entity {
   const names: Record<string, string> = {
     pressure_plate: 'Pressure Plate',
+    sluice_valve: 'Sluice Valve',
+    grave_tablet: 'Grave Tablet',
+    corpse_candle: 'Corpse-Candle',
+    widow_egg_sac: 'Widow Egg-Sac',
+    bell_rope: 'Bell Rope',
     locked_door: 'Locked Door',
     cracked_grave: 'Cracked Grave',
     destructible_wall: 'Cracked Wall',
     module_exit: 'Sealed Passage',
     reward_chest: 'Reliquary Chest',
     locked_chest: 'Warded Reliquary Chest',
+    drowned_reliquary: 'Drowned Reliquary',
+    rite_shrine_bell: 'Bell Shrine',
+    rite_shrine_candle: 'Candle Shrine',
+    rite_shrine_reed: 'Reed Shrine',
+    rite_shrine_skull: 'Skull Shrine',
     surface_exit: 'Ascend to the Surface',
   };
   const maxHp = kind === 'destructible_wall' ? 80 : 1;
@@ -761,7 +834,8 @@ export function createDelveObject(ctx: SimContext, run: DelveRun, kind: string, 
   obj.maxHp = maxHp;
   obj.hp = maxHp;
   obj.lootable = kind === 'cracked_grave' || kind === 'destructible_wall' || kind === 'module_exit';
-  const startOpen = kind !== 'locked_door' && kind !== 'locked_chest';
+  const startOpen =
+    kind !== 'locked_door' && kind !== 'locked_chest' && kind !== 'drowned_reliquary';
   run.objectState[obj.id] = {
     kind,
     triggered: false,
@@ -777,11 +851,14 @@ export function createDelveObject(ctx: SimContext, run: DelveRun, kind: string, 
 
 export function tickDelveRun(ctx: SimContext, run: DelveRun): void {
   tickDelvePressurePlates(ctx, run);
+  tickDrownedLitanyRooms(ctx, run);
   tickDelveModuleExit(ctx, run);
   tickDelveRaiseDeadChannel(ctx, run);
   tickDelveBadAir(ctx, run);
   tickDelveBlackwater(ctx, run);
   tickDelveRestlessGraves(ctx, run);
+  tickDrownedLitanyBoss(ctx, run);
+  tickDrownedLitanyRite(ctx, run);
 }
 
 export function emitDelveModuleEnter(ctx: SimContext, run: DelveRun, mod: DelveModuleDef): void {
@@ -841,8 +918,8 @@ export function tryOpenDelveExitPortal(ctx: SimContext, run: DelveRun): void {
   // the exit opens (Drowned Litany "activate N valves/tablets/candles/ropes"; the
   // Reliquary's plated rooms already require all plates to raise the portcullis, so
   // requiring all here is a no-op for that delve).
-  const plates = run.objectIds.filter((id) => run.objectState[id]?.kind === 'pressure_plate');
-  if (plates.length > 0 && !plates.every((id) => run.objectState[id].triggered)) return;
+  const puzzles = run.objectIds.filter((id) => isDelvePuzzleKind(run.objectState[id]?.kind));
+  if (puzzles.length > 0 && !puzzles.every((id) => run.objectState[id].triggered)) return;
   openDelveExitPortal(ctx, run);
 }
 
@@ -928,7 +1005,7 @@ export function tickDelvePressurePlates(ctx: SimContext, run: DelveRun): void {
         if (linked?.kind !== 'locked_door' || linked.open) continue;
         const allTriggered = run.objectIds.every((oid) => {
           const s = run.objectState[oid];
-          if (s?.kind !== 'pressure_plate') return true;
+          if (!isDelvePuzzleKind(s?.kind)) return true;
           if (!s.linkIds.includes(linkId)) return true;
           return s.triggered;
         });
@@ -999,29 +1076,48 @@ export function tickDelveBadAir(ctx: SimContext, run: DelveRun): void {
 // their max HP. The zones are authored instance-local on the module def and offset
 // to world space by the active module origin. Not a collider: it only damages
 // standing players (mobs/companions and pathing ignore it).
+// Airborne players (jumping) take no damage. For zones with tier: shallow applies
+// 0.35x base damage; deep applies 2.0x. Only the worst tier zone a player is in
+// counts (no stacking shallow+deep).
 export function tickDelveBlackwater(ctx: SimContext, run: DelveRun): void {
   const mod = DELVE_MODULES[run.modules[run.moduleIndex]];
   const zones = mod?.hazards;
   if (!zones || zones.length === 0) return;
   run.blackwaterTimer += DT;
-  if (run.blackwaterTimer < DELVE_BLACKWATER_INTERVAL) return;
+  const highWater = run.affixes.includes('high_water');
+  const interval = DELVE_BLACKWATER_INTERVAL;
+  if (run.blackwaterTimer < interval) return;
   run.blackwaterTimer = 0;
   if (!run.partyKey) return;
-  const tier = DELVES[run.delveId]?.tiers.find((t) => t.id === run.tierId);
-  const pct =
-    (tier?.enemyLevelBonus ?? 0) > 0 ? DELVE_BLACKWATER_PCT_HEROIC : DELVE_BLACKWATER_PCT_NORMAL;
+  const delveTier = DELVES[run.delveId]?.tiers.find((t) => t.id === run.tierId);
+  let basePct =
+    (delveTier?.enemyLevelBonus ?? 0) > 0
+      ? DELVE_BLACKWATER_PCT_HEROIC
+      : DELVE_BLACKWATER_PCT_NORMAL;
+  if (highWater) basePct *= 1.35;
   const ox = run.origin.x;
   const oz = run.origin.z + delveModuleZOffset(run);
   for (const pid of ctx.partyMembersForKey(run.partyKey)) {
     const p = ctx.entities.get(pid);
     if (!p || p.dead) continue;
-    const standing = zones.some((z) => {
+    // Airborne players dodge water damage.
+    if (p.jumping) continue;
+    // Find the worst-tier zone the player is standing in.
+    let worstTier: 'shallow' | 'deep' | null = null;
+    for (const z of zones) {
       const dx = p.pos.x - (ox + z.x);
       const dz = p.pos.z - (oz + z.z);
-      return dx * dx + dz * dz <= z.r * z.r;
-    });
-    if (!standing) continue;
-    const dmg = Math.max(1, Math.round(p.maxHp * pct));
+      if (dx * dx + dz * dz > z.r * z.r) continue;
+      const zt = z.tier ?? 'deep';
+      if (zt === 'deep') {
+        worstTier = 'deep';
+        break; // deep is worst; no need to check further
+      }
+      if (worstTier === null) worstTier = 'shallow';
+    }
+    if (worstTier === null) continue;
+    const tierMult = worstTier === 'deep' ? 2.0 : 0.35;
+    const dmg = Math.max(1, Math.round(p.maxHp * basePct * tierMult));
     // Environmental damage: no source, labelled like 'Falling' (sim.ts fall path).
     ctx.dealDamage(null, p, dmg, false, 'nature', 'Blackwater', 'hit', true);
   }
@@ -1169,6 +1265,7 @@ export function delveInteract(ctx: SimContext, objectId: number, pid?: number): 
     advanceDelveModule(ctx, run);
     return;
   }
+  if (interactDrownedLitanyRite(ctx, run, objectId, r.meta.entityId)) return;
   if (state.kind === 'locked_chest') {
     if (dist2d(r.e.pos, obj.pos) > DELVE_PLATE_RADIUS + 2) {
       ctx.error(r.meta.entityId, 'Move closer to the chest.');
@@ -1255,7 +1352,11 @@ export function collectDelveChestLoot(ctx: SimContext, chestId: number, pid?: nu
   if (!run) return;
   const state = run.objectState[chestId];
   const obj = ctx.entities.get(chestId);
-  if (state?.kind !== 'locked_chest' || !state.pendingLoot?.length) {
+  if (state?.kind !== 'locked_chest' && state?.kind !== 'drowned_reliquary') {
+    ctx.error(r.meta.entityId, 'There is nothing left to take.');
+    return;
+  }
+  if (!state.pendingLoot?.length) {
     ctx.error(r.meta.entityId, 'There is nothing left to take.');
     return;
   }
@@ -1271,6 +1372,15 @@ export function collectDelveChestLoot(ctx: SimContext, chestId: number, pid?: nu
     ctx.addItem(slot.itemId, slot.count, r.meta.entityId);
   }
   state.pendingLoot = [];
+}
+
+/** Player picked a rite difficulty (Easy/Medium/Hard) at the risen reliquary. */
+export function delveRiteChoose(ctx: SimContext, intensity: RiteIntensity, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const run = delveRunForPlayer(ctx, r.meta.entityId);
+  if (!run) return;
+  chooseDrownedLitanyRiteIntensity(ctx, run, intensity);
 }
 
 // ----- companion economy + shop + wire getters -------------------------------

@@ -1721,6 +1721,17 @@ export type SimEvent = { pid?: number } & (
     }
   | { type: 'lockpickBonus'; tier: LootTier; marks: number; copper: number }
   | { type: 'delveChestLoot'; chestId: number; items: { itemId: string; count: number }[] }
+  | { type: 'delveRitePulse'; shrineId: number; shrineKind: RiteShrineKind }
+  | {
+      type: 'delveRiteFeedback';
+      shrineId: number;
+      shrineKind: RiteShrineKind;
+      correct: boolean;
+    }
+  // Personal cue (carries `pid`) to open the rite difficulty popup when a player
+  // interacts with the risen reliquary before choosing. Text-free: the client
+  // renders its own localized copy, so no sim/server i18n matcher rule is needed.
+  | { type: 'delveRiteChoosePrompt'; reliquaryId: number }
   // personal cue (carries `pid`) to open the cosmetic skin-select overlay with
   // the server-rolled rank. Text-free on purpose — the client renders its own
   // localized copy, so no sim/server i18n matcher rule is needed.
@@ -1798,6 +1809,8 @@ export const PARTY_XP_RANGE = 80; // yards: members this close share kill xp/cre
 // boss death) and the still-on-Sim encounter logic; N1 may re-home it when it owns
 // the encounter. Kept here as the neutral shared seam in the meantime.
 export const NYTHRAXIS_BOSS_ID = 'nythraxis_scourge_of_thornpeak';
+// The Drowned Litany finale boss. Used by the drowned_litany_boss driver.
+export const SISTER_NHALIA_BOSS_ID = 'sister_nhalia_drowned_canticle';
 
 export function xpForLevel(level: number): number {
   return XP_TABLE[Math.min(level - 1, XP_TABLE.length - 1)];
@@ -2103,6 +2116,7 @@ export interface DelveHazardZone {
   x: number;
   z: number;
   r: number;
+  tier?: 'shallow' | 'deep';
 }
 
 export interface DelveModuleDef {
@@ -2188,6 +2202,18 @@ export interface DelveRun {
   surfaceExitId: number | null;
   /** Active lockpicking attempt on the finale chest (single interactor, v1), or null. In-memory only. */
   lockpick: LockSession | null;
+  /** Sister Nhalia boss mechanics (The Drowned Litany finale only). */
+  nhaliaBoss?: DrownedLitanyBossState;
+  /** Drowned Reliquary Rite shrine puzzle (The Drowned Litany finale only). */
+  drownedLitanyRite?: DrownedLitanyRiteState;
+  /** Sinkhole Baptistry wave progression (egg-sacs gated until wave 3). */
+  litanyBaptistry?: DrownedLitanyBaptistryState;
+}
+
+export interface DrownedLitanyBaptistryState {
+  /** Index of the active wave in BAPTISTRY_WAVES (0..2). */
+  wave: number;
+  eggsEnabled: boolean;
 }
 
 export interface DelveDailyState {
@@ -2235,6 +2261,73 @@ export interface DelveRaiseDeadChannel {
   mobId: string;
   count: number;
   remaining: number;
+}
+
+/** A boss-spawned Blackwater Mark puddle (world coords, instance-local). */
+export interface DrownedLitanyBlackwaterMark {
+  x: number;
+  z: number;
+  remaining: number;
+  tickTimer: number;
+}
+
+/** Per-run Sister Nhalia encounter state (DelveRun.nhaliaBoss). */
+export interface DrownedLitanyBossState {
+  markTimer: number;
+  marks: DrownedLitanyBlackwaterMark[];
+  firedCantorPhases: number;
+  /** Entity ids from the active Cantor phase; shield drops when all are dead. */
+  cantorShieldAdds: number[];
+  finalBellFired: boolean;
+}
+
+export type RiteShrineKind =
+  | 'rite_shrine_bell'
+  | 'rite_shrine_candle'
+  | 'rite_shrine_reed'
+  | 'rite_shrine_skull';
+
+export const RITE_SHRINE_KINDS: RiteShrineKind[] = [
+  'rite_shrine_bell',
+  'rite_shrine_candle',
+  'rite_shrine_reed',
+  'rite_shrine_skull',
+];
+
+/** Player-chosen rite difficulty: more playbacks + shorter for Easy, fewer + longer
+ * for Hard. Loot ceiling rises with difficulty (Easy=low, Medium=medium, Hard=premium). */
+export type RiteIntensity = 'easy' | 'medium' | 'hard';
+
+export const RITE_INTENSITIES: RiteIntensity[] = ['easy', 'medium', 'hard'];
+
+/** Per-run Drowned Reliquary Rite puzzle state (DelveRun.drownedLitanyRite). */
+export interface DrownedLitanyRiteState {
+  /** True after the reliquary rises until the player picks a difficulty; the
+   * sequence is empty and playback has not started while this is set. */
+  awaitingChoice: boolean;
+  /** The chosen difficulty, or null while awaitingChoice. */
+  intensity: RiteIntensity | null;
+  sequence: RiteShrineKind[];
+  currentIndex: number;
+  mistakes: number;
+  /** How many wrong touches are tolerated before the reliquary opens on low loot.
+   * Equals tries - 1: a wrong touch fails the current try and (if tries remain)
+   * replays the sequence from the top. */
+  mistakesAllowed: number;
+  /** Full attempts the player gets at repeating the sequence (Easy 3, Medium 2,
+   * Hard 1). Each wrong touch consumes a try. */
+  tries: number;
+  /** How many times the full sequence is shown before input is accepted. */
+  playbacks: number;
+  /** Which playback pass (0-based) is currently showing. */
+  playbackLoop: number;
+  puzzleActive: boolean;
+  sequencePlaying: boolean;
+  playbackIndex: number;
+  playbackTimer: number;
+  shrineEntityIds: Record<RiteShrineKind, number>;
+  reliquaryId: number;
+  opened: boolean;
 }
 
 export interface DelveRestlessPending {

@@ -1,3 +1,4 @@
+import { litanyModuleHazards } from '../../delve_litany_layout';
 import type { DelveDef, DelveModuleDef } from '../../types';
 
 // =============================================================================
@@ -17,12 +18,12 @@ const SLUICE_SPAWNS = {
   id: 'sluice_trash',
   weight: 1,
   spawns: [
-    { mobId: 'deepfen_spearjaw', x: -6, z: 26 },
-    { mobId: 'drowned_cantor', x: 6, z: 28 },
-    { mobId: 'deepfen_spearjaw', x: -5, z: 40 },
-    { mobId: 'deepfen_spearjaw', x: 5, z: 42 },
-    { mobId: 'drowned_cantor', x: -4, z: 54 },
-    { mobId: 'grave_silt_bulwark', x: 4, z: 58 },
+    { mobId: 'deepfen_spearjaw', x: 10, z: 24 },
+    { mobId: 'drowned_cantor', x: 10, z: 32 },
+    { mobId: 'deepfen_spearjaw', x: 8, z: 40 },
+    { mobId: 'deepfen_spearjaw', x: 5, z: 46 },
+    { mobId: 'drowned_cantor', x: 11, z: 52 },
+    { mobId: 'grave_silt_bulwark', x: 6, z: 58 },
   ],
 };
 
@@ -46,7 +47,7 @@ const RING_SPAWNS = {
   weight: 1,
   spawns: [
     { mobId: 'drowned_cantor', x: -6, z: 26 },
-    { mobId: 'reedbound_acolyte', x: 6, z: 28 },
+    { mobId: 'reedbound_acolyte', x: 14, z: 28 },
     { mobId: 'drowned_cantor', x: -4, z: 42 },
     { mobId: 'reedbound_acolyte', x: 4, z: 44 },
     { mobId: 'sump_troll_devourer', x: 0, z: 58 },
@@ -105,64 +106,51 @@ const APSE_SPAWNS = {
 export const DROWNED_LITANY_MODULES: Record<string, DelveModuleDef> = {
   litany_sluice: {
     id: 'litany_sluice',
-    interior: 'crypt',
+    interior: 'cave',
     layout: 'litany_sluice',
     length: 110,
     spawnSets: [SLUICE_SPAWNS],
     // Puzzle: turn 2 sluice valves (Primitive A, Click Objects). Both sit on the
     // open arc, clear of the stub bank, the hazard pools, and the entry aisle.
     interactableSlots: [
-      { x: -16, z: 30, variants: ['pressure_plate'] },
-      { x: 15, z: 68, variants: ['pressure_plate'] },
+      { x: -12, z: 30, variants: ['sluice_valve'] },
+      { x: 12, z: 54, variants: ['sluice_valve'] },
     ],
-    // Blackwater seeps along the open channel on the concave side of the crescent.
-    hazards: [
-      { x: 14, z: 13, r: 5 },
-      { x: -15, z: 54, r: 5 },
-    ],
+    hazards: litanyModuleHazards('litany_sluice'),
   },
   litany_ledger: {
     id: 'litany_ledger',
-    interior: 'crypt',
+    interior: 'cave',
     layout: 'litany_ledger',
     length: 110,
     spawnSets: [LEDGER_SPAWNS],
     // Puzzle: activate 4 grave tablets in any order (Primitive A). One per channel
     // between the ledger islands, all clear of the flooded channels and obstacles.
     interactableSlots: [
-      { x: -16, z: 30, variants: ['pressure_plate'] },
-      { x: -16, z: 40, variants: ['pressure_plate'] },
-      { x: 16, z: 44, variants: ['pressure_plate'] },
-      { x: 8, z: 72, variants: ['pressure_plate'] },
+      { x: -16, z: 30, variants: ['grave_tablet'] },
+      { x: -16, z: 40, variants: ['grave_tablet'] },
+      { x: 16, z: 44, variants: ['grave_tablet'] },
+      { x: 10, z: 76, variants: ['grave_tablet'] },
     ],
-    // Flooded channels weave between the raised ledger islands.
-    hazards: [
-      { x: 0, z: 22, r: 5 },
-      { x: -3, z: 50, r: 5 },
-      { x: 14, z: 66, r: 4 },
-    ],
+    hazards: litanyModuleHazards('litany_ledger'),
   },
   litany_ring: {
     id: 'litany_ring',
-    interior: 'crypt',
+    interior: 'cave',
     layout: 'litany_ring',
     length: 110,
     spawnSets: [RING_SPAWNS],
     // Puzzle: light 2 corpse-candles (Primitive A). One on each side lane of the
     // loop, outside the sealed central mass and clear of the two hazard pools.
     interactableSlots: [
-      { x: 20, z: 42, variants: ['pressure_plate'] },
-      { x: -20, z: 42, variants: ['pressure_plate'] },
+      { x: 20, z: 42, variants: ['corpse_candle'] },
+      { x: -20, z: 42, variants: ['corpse_candle'] },
     ],
-    // Blackwater pools the two side lanes that loop around the sealed centre.
-    hazards: [
-      { x: 18, z: 24, r: 5 },
-      { x: -18, z: 56, r: 5 },
-    ],
+    hazards: litanyModuleHazards('litany_ring'),
   },
   litany_baptistry: {
     id: 'litany_baptistry',
-    interior: 'crypt',
+    interior: 'cave',
     layout: 'litany_baptistry',
     length: 110,
     spawnSets: [BAPTISTRY_SPAWNS],
@@ -170,59 +158,43 @@ export const DROWNED_LITANY_MODULES: Record<string, DelveModuleDef> = {
     // Click primitive). Spaced around the pit-rim walkway, clear of the central
     // Blackwater font and the pit pillars.
     interactableSlots: [
-      { x: 16, z: 24, variants: ['pressure_plate'] },
-      { x: -16, z: 24, variants: ['pressure_plate'] },
-      { x: 0, z: 58, variants: ['pressure_plate'] },
+      { x: 16, z: 24, variants: ['widow_egg_sac'] },
+      { x: -16, z: 24, variants: ['widow_egg_sac'] },
+      { x: 0, z: 58, variants: ['widow_egg_sac'] },
     ],
-    // The drowned font itself: the central sinkhole brims with Blackwater. Players
-    // orbit the rim on the walkway and must not wade through the middle.
-    hazards: [{ x: 0, z: 40, r: 7 }],
+    hazards: litanyModuleHazards('litany_baptistry'),
   },
   litany_choir_loft: {
     id: 'litany_choir_loft',
-    interior: 'crypt',
+    interior: 'cave',
     layout: 'litany_choir_loft',
     length: 110,
     spawnSets: [CHOIR_LOFT_SPAWNS],
     // Puzzle: pull 2 bell ropes (Primitive A). One at each wide flank of the fan,
     // outside the fanning ranks and clear of the three seepage pools.
     interactableSlots: [
-      { x: -18, z: 44, variants: ['pressure_plate'] },
-      { x: 18, z: 44, variants: ['pressure_plate'] },
+      { x: -18, z: 44, variants: ['bell_rope'] },
+      { x: 18, z: 44, variants: ['bell_rope'] },
     ],
-    // Seepage gathers between the fanning choir ranks.
-    hazards: [
-      { x: 0, z: 33, r: 5 },
-      { x: -13, z: 60, r: 4 },
-      { x: 13, z: 60, r: 4 },
-    ],
+    hazards: litanyModuleHazards('litany_choir_loft'),
   },
   litany_causeway: {
     id: 'litany_causeway',
-    interior: 'crypt',
+    interior: 'cave',
     layout: 'litany_causeway',
     length: 110,
     spawnSets: [CAUSEWAY_SPAWNS],
     interactableSlots: [],
-    // The west causeway lane has flooded; push players onto the east lane.
-    hazards: [
-      { x: -15, z: 26, r: 5 },
-      { x: -15, z: 50, r: 5 },
-    ],
+    hazards: litanyModuleHazards('litany_causeway'),
   },
   litany_apse: {
     id: 'litany_apse',
-    interior: 'crypt',
+    interior: 'cave',
     layout: 'litany_apse',
     length: 110,
     spawnSets: [APSE_SPAWNS],
     interactableSlots: [],
-    // Two shallow pools in the southern cover, well clear of the boss stomp ring
-    // around the dais (z=80, r=12): all hazards stay at z <= 32.
-    hazards: [
-      { x: -12, z: 20, r: 5 },
-      { x: 12, z: 30, r: 4 },
-    ],
+    hazards: litanyModuleHazards('litany_apse'),
   },
 };
 
