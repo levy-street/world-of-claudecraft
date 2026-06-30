@@ -180,6 +180,15 @@ describe('collision & terrain', () => {
     expect(isBlocked(SEED, 2, 212, 0.5)).toBe(false);
   });
 
+  it('keeps the Abandoned Crypt entrance walkable', () => {
+    expect(isBlocked(SEED, -152, 610, 0.5)).toBe(false);
+    expect(isBlocked(SEED, -152, 606, 0.5)).toBe(false);
+    expect(isBlocked(SEED, -152, 614, 0.5)).toBe(false);
+
+    const through = resolvePosition(SEED, -152, 610, 0.5);
+    expect(through).toEqual({ x: -152, z: 610 });
+  });
+
   it('camera ghosts through village buildings (hidden instead of pulling in)', () => {
     const groundY = groundHeight(10, 4, SEED);
     const eyeY = groundY + 2;

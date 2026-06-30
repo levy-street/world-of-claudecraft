@@ -106,6 +106,10 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   // has its own backing slab so the animated shader plane sits on the front face.
   // yaw: Math.PI if the model loads backwards after inspecting in-game.
   delveEntrance2: { url: '/models/dungeon/delve_entrance_2.glb', kit: 'dungeon' },
+  abandonedCryptEntrance: {
+    url: '/models/dungeon/abandoned_crypt_entrance.glb',
+    kit: 'dungeonEntrance',
+  },
 };
 
 type PropKey = keyof typeof PROP_ASSET_DEFS;
@@ -141,6 +145,7 @@ const ACTIVE_PROP_KEYS = new Set<PropKey>(
         'crateWooden',
         'barrel',
         'delveEntrance2', // delve entrance portal, a landmark, so keep it on low gfx too
+        'abandonedCryptEntrance',
       ],
 );
 
@@ -225,10 +230,14 @@ function convertMaterial(
 ): THREE.Material {
   const s = src as THREE.MeshStandardMaterial; // basic (unlit) shares the fields we read
   const ov = MAT_OVERRIDES[`${kit}:${s.name}`] ?? MAT_OVERRIDES[s.name];
+  const emissive =
+    ov?.emissive !== undefined
+      ? new THREE.Color(ov.emissive)
+      : (s.emissive?.clone() ?? new THREE.Color(0x000000));
   // hasVertexColors must key the cache: kits share material names between
   // COLOR_0 meshes (trim 'Vertex' props) and colorless ones — a shared
   // vertexColors:true material would render the colorless meshes black
-  const key = `${kit}|${s.name}|${s.color?.getHexString() ?? ''}|${s.map ? 'm' : ''}|${hasVertexColors ? 'v' : ''}|${GFX.standardMaterials ? 's' : 'l'}`;
+  const key = `${kit}|${s.name}|${s.color?.getHexString() ?? ''}|${s.map ? 'm' : ''}|${s.emissiveMap ? 'e' : ''}|${hasVertexColors ? 'v' : ''}|${GFX.standardMaterials ? 's' : 'l'}`;
   const cached = matConvCache.get(key);
   if (cached) return cached;
   const color =
@@ -248,7 +257,8 @@ function convertMaterial(
       aoMap: s.aoMap ?? null,
       roughness: ov?.roughness ?? (s.isMeshStandardMaterial ? s.roughness : 0.9),
       metalness: ov?.metalness ?? (s.isMeshStandardMaterial ? Math.min(s.metalness, 0.85) : 0),
-      emissive: new THREE.Color(ov?.emissive ?? 0x000000),
+      emissive,
+      emissiveMap: s.emissiveMap ?? null,
       emissiveIntensity: ov?.emissiveIntensity ?? 1,
     });
   } else {
@@ -256,7 +266,8 @@ function convertMaterial(
       color,
       map,
       vertexColors: hasVertexColors,
-      emissive: new THREE.Color(ov?.emissive ?? 0x000000),
+      emissive,
+      emissiveMap: s.emissiveMap ?? null,
       emissiveIntensity: (ov?.emissiveIntensity ?? 1) * 0.6,
     });
   }
@@ -1002,87 +1013,73 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   for (const m of PROPS.mines) {
     const g = new THREE.Group();
     const abandonedCrypt = m.x < -140 && m.z > 590 && m.z < 630;
-    for (const sx of [-1.45, 1.45]) {
-      addParts(g, 'timberPillar', { x: sx, scale: [3.4, 3.5, 3.4] });
-    }
-    // lintel + cap beam: the same square timber laid across the posts
-    addParts(g, 'timberPillar', {
-      y: 3.42,
-      x: -2.2,
-      euler: new THREE.Euler(0, 0, -Math.PI / 2),
-      scale: [3.6, 4.4, 3.6],
-    });
-    addParts(g, 'timberPillar', {
-      y: 3.85,
-      x: -2.45,
-      euler: new THREE.Euler(0, 0, -Math.PI / 2),
-      scale: [3.0, 4.9, 3.0],
-    });
-    const hole = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 3.1), holeMat);
-    hole.position.set(0, 1.55, -0.2);
-    noShadow.add(hole);
-    g.add(hole);
-    // boulder mound swallowing the portal (same mound the collider blocks):
-    // pairs of mid-sized granite rocks per anchor read as a rubble pile where
-    // one giant scaled rock would read as a box
-    const mound: [number, number, number, number][] = abandonedCrypt
-      ? [
-          [0.2, 1.35, -3.2, 2.35],
-          [-2.8, 0.25, -2.35, 1.75],
-          [2.65, 0.3, -2.3, 1.75],
-          [-1.7, 0.1, -1.25, 1.15],
-          [1.75, 0.1, -1.2, 1.1],
-          [0.2, 2.8, -4.15, 2.0],
-          [-1.35, 1.45, -3.45, 1.55],
-          [1.45, 1.5, -3.35, 1.5],
-          [0, 0.15, -1.85, 1.2],
-          [-3.45, 0.6, -3.5, 1.15],
-          [3.35, 0.65, -3.45, 1.1],
-          [0.1, 3.35, -2.85, 1.25],
-        ]
-      : [
-          [0, 1.4, -3.0, 2.6],
-          [-2.7, 0.3, -2.0, 1.9],
-          [2.7, 0.35, -2.2, 2.0],
-          [-1.6, 0.1, -1.0, 1.2],
-          [1.8, 0.1, -0.9, 1.1],
-          [0.3, 3.0, -4.2, 2.3],
-          [-1.4, 1.6, -3.4, 1.8],
-          [1.5, 1.7, -3.2, 1.7],
-          [0, 0.2, -1.6, 1.4],
-        ];
-    const rockKinds: PropKey[] = lowProps
-      ? ['rockLargeD']
-      : ['rockTallA', 'rockLargeD', 'rockTallH', 'rockLargeF'];
-    for (let i = 0; i < mound.length; i++) {
-      const [rx, ry, rz, rr] = mound[i];
-      const kind = rockKinds[(i * 2 + 1) % rockKinds.length];
-      const a = propAsset(kind);
-      addParts(g, kind, {
-        x: rx,
-        y: ry,
-        z: rz,
-        scale: (2.1 * rr) / Math.max(a.size.x, a.size.z),
-        euler: new THREE.Euler(
-          (propRand(m.x, m.z, i + 80) - 0.5) * 0.5,
-          propRand(m.x, m.z, i + 70) * Math.PI,
-          (propRand(m.x, m.z, i + 90) - 0.5) * 0.5,
-        ),
+    if (abandonedCrypt) {
+      addParts(g, 'abandonedCryptEntrance', { y: -0.05, z: -1.2, scale: 20.8 });
+    } else {
+      for (const sx of [-1.45, 1.45]) {
+        addParts(g, 'timberPillar', { x: sx, scale: [3.4, 3.5, 3.4] });
+      }
+      // lintel + cap beam: the same square timber laid across the posts
+      addParts(g, 'timberPillar', {
+        y: 3.42,
+        x: -2.2,
+        euler: new THREE.Euler(0, 0, -Math.PI / 2),
+        scale: [3.6, 4.4, 3.6],
       });
-    }
-    // ore cart (market awning stripped) + raw copper ore in the bed
-    if (!abandonedCrypt) {
+      addParts(g, 'timberPillar', {
+        y: 3.85,
+        x: -2.45,
+        euler: new THREE.Euler(0, 0, -Math.PI / 2),
+        scale: [3.0, 4.9, 3.0],
+      });
+      const hole = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 3.1), holeMat);
+      hole.position.set(0, 1.55, -0.2);
+      noShadow.add(hole);
+      g.add(hole);
+      // boulder mound swallowing the portal (same mound the collider blocks):
+      // pairs of mid-sized granite rocks per anchor read as a rubble pile where
+      // one giant scaled rock would read as a box
+      const mound: [number, number, number, number][] = [
+        [0, 1.4, -3.0, 2.6],
+        [-2.7, 0.3, -2.0, 1.9],
+        [2.7, 0.35, -2.2, 2.0],
+        [-1.6, 0.1, -1.0, 1.2],
+        [1.8, 0.1, -0.9, 1.1],
+        [0.3, 3.0, -4.2, 2.3],
+        [-1.4, 1.6, -3.4, 1.8],
+        [1.5, 1.7, -3.2, 1.7],
+        [0, 0.2, -1.6, 1.4],
+      ];
+      const rockKinds: PropKey[] = lowProps
+        ? ['rockLargeD']
+        : ['rockTallA', 'rockLargeD', 'rockTallH', 'rockLargeF'];
+      for (let i = 0; i < mound.length; i++) {
+        const [rx, ry, rz, rr] = mound[i];
+        const kind = rockKinds[(i * 2 + 1) % rockKinds.length];
+        const a = propAsset(kind);
+        addParts(g, kind, {
+          x: rx,
+          y: ry,
+          z: rz,
+          scale: (2.1 * rr) / Math.max(a.size.x, a.size.z),
+          euler: new THREE.Euler(
+            (propRand(m.x, m.z, i + 80) - 0.5) * 0.5,
+            propRand(m.x, m.z, i + 70) * Math.PI,
+            (propRand(m.x, m.z, i + 90) - 0.5) * 0.5,
+          ),
+        });
+      }
       addParts(g, 'cart', { x: 2.8, z: 1.6, rot: 0.5, scale: 1.9 });
       addParts(g, 'oreRocks', { x: 2.75, y: 0.78, z: 1.55, rot: 0.9, scale: 2.6 });
       addParts(g, 'oreRocks', { x: 3.4, z: 0.4, rot: 2.2, scale: 1.8 });
-    }
-    if (!lowProps) {
-      // hanging lantern on the right post
-      addParts(g, 'lanternWall', { x: 1.45, y: 2.0, z: 0.28, scale: 1.25 });
-      const glass = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.11, 0.26, 6), lanternMat);
-      glass.position.set(1.45, 2.52, 1.32);
-      noShadow.add(glass);
-      g.add(glass);
+      if (!lowProps) {
+        // hanging lantern on the right post
+        addParts(g, 'lanternWall', { x: 1.45, y: 2.0, z: 0.28, scale: 1.25 });
+        const glass = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.11, 0.26, 6), lanternMat);
+        glass.position.set(1.45, 2.52, 1.32);
+        noShadow.add(glass);
+        g.add(glass);
+      }
     }
     g.position.set(m.x, ground(m.x, m.z), m.z);
     g.rotation.y = m.rot;

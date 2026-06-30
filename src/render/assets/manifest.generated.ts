@@ -76,6 +76,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/wolf.glb": "/media/models/creatures/wolf.9ae2ad8b2ab2.glb",
   "models/creatures/yeti.glb": "/media/models/creatures/yeti.acbf79f899d2.glb",
   "models/creatures/yetialt.glb": "/media/models/creatures/yetialt.6c14f370c2af.glb",
+  "models/dungeon/abandoned_crypt_entrance.glb": "/media/models/dungeon/abandoned_crypt_entrance.02faebcc1cc5.glb",
   "models/dungeon/arch.glb": "/media/models/dungeon/arch.08f03de13bde.glb",
   "models/dungeon/arch_gate.glb": "/media/models/dungeon/arch_gate.cc95cd4e3f4b.glb",
   "models/dungeon/banner_blue.glb": "/media/models/dungeon/banner_blue.cc6f208c1526.glb",

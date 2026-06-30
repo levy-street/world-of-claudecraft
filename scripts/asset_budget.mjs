@@ -47,6 +47,7 @@ function budgets() {
 
 function walk(dir, out = []) {
   for (const ent of readdirSync(dir, { withFileTypes: true })) {
+    if (ent.name.startsWith('.')) continue;
     const p = path.join(dir, ent.name);
     if (ent.isDirectory()) walk(p, out);
     else if (ent.isFile()) out.push(p);

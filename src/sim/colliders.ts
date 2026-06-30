@@ -74,6 +74,10 @@ function rotY(lx: number, lz: number, rot: number): { x: number; z: number } {
   return { x: lx * c + lz * s, z: -lx * s + lz * c };
 }
 
+function isAbandonedCryptMine(m: { x: number; z: number }): boolean {
+  return m.x < -140 && m.z > 590 && m.z < 630;
+}
+
 // ---------------------------------------------------------------------------
 // Collider sets
 // ---------------------------------------------------------------------------
@@ -118,6 +122,7 @@ function staticWorldColliders(seed: number): Collider[] {
 
   // mines: mound behind the timber portal
   for (const m of PROPS.mines) {
+    if (isAbandonedCryptMine(m)) continue;
     const mound = rotY(0, -3.4, m.rot);
     const x = m.x + mound.x,
       z = m.z + mound.z;
