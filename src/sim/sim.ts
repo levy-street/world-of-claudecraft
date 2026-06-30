@@ -3087,8 +3087,8 @@ export class Sim {
   // On-hit knockback: hurl `target` up to `distance` yards straight away from
   // `source`. Instantaneous displacement (no aura) walked in small steps so it can
   // be terrain-clamped exactly like a warrior charge — the shove stops at the last
-  // safe footing before deep water or a cliff rather than stranding the victim off
-  // the world. Returns the yards actually moved (0 if blocked immediately).
+  // safe footing before a wall, deep water, or a cliff rather than
+  // stranding the victim off the world. Returns the yards actually moved (0 if blocked immediately).
   private applyKnockback(source: Entity, target: Entity, distance: number): number {
     let dx = target.pos.x - source.pos.x;
     let dz = target.pos.z - source.pos.z;
@@ -3113,9 +3113,14 @@ export class Sim {
       const h1 = groundHeight(nx, nz, this.cfg.seed);
       if (h1 < WATER_LEVEL - SWIM_DEPTH) break; // would land in deep water
       if (h1 > h0 && (h1 - h0) / adv > MAX_CLIMB_SLOPE) break; // would slam into a cliff
-      cx = nx;
-      cz = nz;
-      moved += adv;
+      const resolved = this.resolveMove(cx, cz, nx, nz, BODY_RADIUS, target);
+      const actual = Math.hypot(resolved.x - cx, resolved.z - cz);
+      if (actual < 1e-4) break;
+      const clipped = Math.hypot(resolved.x - nx, resolved.z - nz) > 1e-3;
+      cx = resolved.x;
+      cz = resolved.z;
+      moved += actual;
+      if (clipped) break;
     }
     if (moved <= 0) return 0;
     // resolveMovePoint is a no-op wrapper over resolvePosition outside a delve, and
