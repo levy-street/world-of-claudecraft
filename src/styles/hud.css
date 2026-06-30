@@ -1086,8 +1086,9 @@
      primary one; a tighter bottom pad keeps the pair compact. It is OFF by default
      (a single classic bar): the Interface option "Show Secondary Action Bar" adds
      body.show-actionbar2 to reveal it. The slots stay keybind-reachable either way.
-     Mobile keeps a single bar regardless (see body.mobile-touch rule in hud.mobile.css,
-     imported after this file so it wins the same-specificity tie). */
+     Mobile keeps a single bar regardless (see body.mobile-touch rule in hud.mobile.css):
+     it lives in @layer hud-mobile, ordered after @layer components where this reveal rule
+     sits, so it wins by layer precedence regardless of specificity. */
   #actionbar2 {
     padding-bottom: 2px;
     display: none;
