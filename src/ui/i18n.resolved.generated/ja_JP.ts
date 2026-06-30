@@ -877,39 +877,31 @@ export const ja_JP: EnTranslations = {
       }
     },
     "devBadge": {
-      "title": "Developer",
+      "title": "開発者",
       "tiers": {
-        "tinkerer": "Tinkerer",
-        "artificer": "Artificer",
-        "runesmith": "Runesmith",
-        "architect": "Architect",
-        "worldwright": "Worldwright"
+        "tinkerer": "修繕屋",
+        "artificer": "工匠",
+        "runesmith": "ルーン鍛冶",
+        "architect": "設計者",
+        "worldwright": "世界の造り手"
       },
       "flavors": {
-        "tinkerer": "Your first commit landed in the realm.",
-        "artificer": "Ten commits in, and the world bends to your code.",
-        "runesmith": "Fifty commits forged into the running game.",
-        "architect": "An architect of the realm: 150 commits landed.",
-        "worldwright": "A wright of worlds: 500 commits shape the game."
+        "tinkerer": "最初のコミットがこの世界に刻まれた。",
+        "artificer": "10 のコミットを経て、世界はあなたのコードに従い始める。",
+        "runesmith": "50 のコミットが、稼働中のゲームに鍛え込まれた。",
+        "architect": "この世界の設計者：150 のコミットが刻まれた。",
+        "worldwright": "世界の造り手：500 のコミットがこのゲームを形づくる。"
       },
-      "badgeTitle": "Developer: {tier}",
-      "commitsLanded": "{count} commits landed",
-      "contributor": "Open-source contributor",
-      "cardLabel": "Developer",
+      "badgeTitle": "開発者：{tier}",
+      "commitsLanded": "{count} 件のコミットを反映",
+      "contributor": "オープンソース貢献者",
       "link": {
-        "cta": "Link GitHub",
-        "relink": "Relink GitHub",
-        "connecting": "Opening GitHub...",
-        "benefits": "Link your GitHub to earn a developer badge for the commits you have landed in the open-source repo.",
-        "error": "Could not link GitHub. Please try again.",
-        "success": "GitHub linked.",
-        "notContributor": "No landed commits found for that GitHub account yet."
+        "cta": "GitHub を連携",
+        "relink": "GitHub を再連携",
+        "benefits": "GitHub を連携すると、オープンソースリポジトリに反映されたコミットに応じて開発者バッジを獲得できます。"
       },
-      "linkedAs": "Linked as {login}",
-      "linkedTitle": "GitHub: {login}",
-      "profileTitle": "Open this contributor's GitHub profile",
-      "unlink": "Unlink GitHub",
-      "unlinkConfirm": "Unlink your GitHub account from this game account?"
+      "linkedAs": "{login} として連携済み",
+      "unlink": "GitHub の連携を解除"
     }
   },
   "guide": {

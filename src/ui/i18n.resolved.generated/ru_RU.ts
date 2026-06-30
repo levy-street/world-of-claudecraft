@@ -877,39 +877,31 @@ export const ru_RU: EnTranslations = {
       }
     },
     "devBadge": {
-      "title": "Developer",
+      "title": "Разработчик",
       "tiers": {
-        "tinkerer": "Tinkerer",
-        "artificer": "Artificer",
-        "runesmith": "Runesmith",
-        "architect": "Architect",
-        "worldwright": "Worldwright"
+        "tinkerer": "Мастеровой",
+        "artificer": "Искусник",
+        "runesmith": "Рунный кузнец",
+        "architect": "Архитектор",
+        "worldwright": "Творец мира"
       },
       "flavors": {
-        "tinkerer": "Your first commit landed in the realm.",
-        "artificer": "Ten commits in, and the world bends to your code.",
-        "runesmith": "Fifty commits forged into the running game.",
-        "architect": "An architect of the realm: 150 commits landed.",
-        "worldwright": "A wright of worlds: 500 commits shape the game."
+        "tinkerer": "Ваш первый коммит закрепился в этом мире.",
+        "artificer": "Десять коммитов спустя мир подчиняется вашему коду.",
+        "runesmith": "Пятьдесят коммитов вкованы в работающую игру.",
+        "architect": "Архитектор этого мира: закреплено 150 коммитов.",
+        "worldwright": "Творец миров: 500 коммитов формируют игру."
       },
-      "badgeTitle": "Developer: {tier}",
-      "commitsLanded": "{count} commits landed",
-      "contributor": "Open-source contributor",
-      "cardLabel": "Developer",
+      "badgeTitle": "Разработчик: {tier}",
+      "commitsLanded": "Закреплено коммитов: {count}",
+      "contributor": "Контрибьютор открытого кода",
       "link": {
-        "cta": "Link GitHub",
-        "relink": "Relink GitHub",
-        "connecting": "Opening GitHub...",
-        "benefits": "Link your GitHub to earn a developer badge for the commits you have landed in the open-source repo.",
-        "error": "Could not link GitHub. Please try again.",
-        "success": "GitHub linked.",
-        "notContributor": "No landed commits found for that GitHub account yet."
+        "cta": "Привязать GitHub",
+        "relink": "Перепривязать GitHub",
+        "benefits": "Привяжите GitHub, чтобы получить значок разработчика за коммиты, закреплённые в открытом репозитории."
       },
-      "linkedAs": "Linked as {login}",
-      "linkedTitle": "GitHub: {login}",
-      "profileTitle": "Open this contributor's GitHub profile",
-      "unlink": "Unlink GitHub",
-      "unlinkConfirm": "Unlink your GitHub account from this game account?"
+      "linkedAs": "Привязан как {login}",
+      "unlink": "Отвязать GitHub"
     }
   },
   "guide": {

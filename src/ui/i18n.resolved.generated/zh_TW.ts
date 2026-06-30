@@ -877,39 +877,31 @@ export const zh_TW: EnTranslations = {
       }
     },
     "devBadge": {
-      "title": "Developer",
+      "title": "開發者",
       "tiers": {
-        "tinkerer": "Tinkerer",
-        "artificer": "Artificer",
-        "runesmith": "Runesmith",
-        "architect": "Architect",
-        "worldwright": "Worldwright"
+        "tinkerer": "修補匠",
+        "artificer": "工巧師",
+        "runesmith": "符文匠",
+        "architect": "架構師",
+        "worldwright": "世界鑄造者"
       },
       "flavors": {
-        "tinkerer": "Your first commit landed in the realm.",
-        "artificer": "Ten commits in, and the world bends to your code.",
-        "runesmith": "Fifty commits forged into the running game.",
-        "architect": "An architect of the realm: 150 commits landed.",
-        "worldwright": "A wright of worlds: 500 commits shape the game."
+        "tinkerer": "你的第一個提交已落地於這片大陸。",
+        "artificer": "十次提交之後，世界開始順從你的程式碼。",
+        "runesmith": "五十次提交，已熔鑄進執行中的遊戲。",
+        "architect": "這片大陸的架構師：已落地 150 次提交。",
+        "worldwright": "世界的鑄造者：500 次提交塑造了這款遊戲。"
       },
-      "badgeTitle": "Developer: {tier}",
-      "commitsLanded": "{count} commits landed",
-      "contributor": "Open-source contributor",
-      "cardLabel": "Developer",
+      "badgeTitle": "開發者：{tier}",
+      "commitsLanded": "已落地 {count} 次提交",
+      "contributor": "開源貢獻者",
       "link": {
-        "cta": "Link GitHub",
-        "relink": "Relink GitHub",
-        "connecting": "Opening GitHub...",
-        "benefits": "Link your GitHub to earn a developer badge for the commits you have landed in the open-source repo.",
-        "error": "Could not link GitHub. Please try again.",
-        "success": "GitHub linked.",
-        "notContributor": "No landed commits found for that GitHub account yet."
+        "cta": "連結 GitHub",
+        "relink": "重新連結 GitHub",
+        "benefits": "連結你的 GitHub，即可憑你在開源儲存庫中已落地的提交獲得開發者徽章。"
       },
-      "linkedAs": "Linked as {login}",
-      "linkedTitle": "GitHub: {login}",
-      "profileTitle": "Open this contributor's GitHub profile",
-      "unlink": "Unlink GitHub",
-      "unlinkConfirm": "Unlink your GitHub account from this game account?"
+      "linkedAs": "已連結為 {login}",
+      "unlink": "取消連結 GitHub"
     }
   },
   "guide": {

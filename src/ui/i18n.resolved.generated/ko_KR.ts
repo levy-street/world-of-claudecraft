@@ -877,39 +877,31 @@ export const ko_KR: EnTranslations = {
       }
     },
     "devBadge": {
-      "title": "Developer",
+      "title": "개발자",
       "tiers": {
-        "tinkerer": "Tinkerer",
-        "artificer": "Artificer",
-        "runesmith": "Runesmith",
-        "architect": "Architect",
-        "worldwright": "Worldwright"
+        "tinkerer": "수선공",
+        "artificer": "장인",
+        "runesmith": "룬 대장장이",
+        "architect": "설계자",
+        "worldwright": "세계 창조자"
       },
       "flavors": {
-        "tinkerer": "Your first commit landed in the realm.",
-        "artificer": "Ten commits in, and the world bends to your code.",
-        "runesmith": "Fifty commits forged into the running game.",
-        "architect": "An architect of the realm: 150 commits landed.",
-        "worldwright": "A wright of worlds: 500 commits shape the game."
+        "tinkerer": "당신의 첫 커밋이 이 세계에 새겨졌습니다.",
+        "artificer": "열 번의 커밋 끝에, 세계가 당신의 코드를 따르기 시작합니다.",
+        "runesmith": "쉰 번의 커밋이 구동 중인 게임에 벼려졌습니다.",
+        "architect": "이 세계의 설계자: 150번의 커밋이 반영되었습니다.",
+        "worldwright": "세계의 창조자: 500번의 커밋이 이 게임을 빚어냅니다."
       },
-      "badgeTitle": "Developer: {tier}",
-      "commitsLanded": "{count} commits landed",
-      "contributor": "Open-source contributor",
-      "cardLabel": "Developer",
+      "badgeTitle": "개발자: {tier}",
+      "commitsLanded": "{count}번의 커밋 반영",
+      "contributor": "오픈 소스 기여자",
       "link": {
-        "cta": "Link GitHub",
-        "relink": "Relink GitHub",
-        "connecting": "Opening GitHub...",
-        "benefits": "Link your GitHub to earn a developer badge for the commits you have landed in the open-source repo.",
-        "error": "Could not link GitHub. Please try again.",
-        "success": "GitHub linked.",
-        "notContributor": "No landed commits found for that GitHub account yet."
+        "cta": "GitHub 연결",
+        "relink": "GitHub 다시 연결",
+        "benefits": "GitHub를 연결하면 오픈 소스 저장소에 반영된 커밋으로 개발자 배지를 받을 수 있습니다."
       },
-      "linkedAs": "Linked as {login}",
-      "linkedTitle": "GitHub: {login}",
-      "profileTitle": "Open this contributor's GitHub profile",
-      "unlink": "Unlink GitHub",
-      "unlinkConfirm": "Unlink your GitHub account from this game account?"
+      "linkedAs": "{login}(으)로 연결됨",
+      "unlink": "GitHub 연결 해제"
     }
   },
   "guide": {

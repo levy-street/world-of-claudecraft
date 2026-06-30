@@ -895,21 +895,13 @@ export const es_ES: EnTranslations = {
       "badgeTitle": "Developer: {tier}",
       "commitsLanded": "{count} commits landed",
       "contributor": "Open-source contributor",
-      "cardLabel": "Developer",
       "link": {
         "cta": "Link GitHub",
         "relink": "Relink GitHub",
-        "connecting": "Opening GitHub...",
-        "benefits": "Link your GitHub to earn a developer badge for the commits you have landed in the open-source repo.",
-        "error": "Could not link GitHub. Please try again.",
-        "success": "GitHub linked.",
-        "notContributor": "No landed commits found for that GitHub account yet."
+        "benefits": "Link your GitHub to earn a developer badge for the commits you have landed in the open-source repo."
       },
       "linkedAs": "Linked as {login}",
-      "linkedTitle": "GitHub: {login}",
-      "profileTitle": "Open this contributor's GitHub profile",
-      "unlink": "Unlink GitHub",
-      "unlinkConfirm": "Unlink your GitHub account from this game account?"
+      "unlink": "Unlink GitHub"
     }
   },
   "guide": {

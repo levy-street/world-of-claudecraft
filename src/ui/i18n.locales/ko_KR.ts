@@ -4893,4 +4893,26 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.wts.label': '판매 희망',
   'hudChrome.discord.relay.wtb.label': '구매 희망',
   'hudChrome.discord.relay.help.label': '도움 요청',
+  // Developer badge (M16 non-Latin fills).
+  'hudChrome.devBadge.title': '개발자',
+  'hudChrome.devBadge.tiers.tinkerer': '수선공',
+  'hudChrome.devBadge.tiers.artificer': '장인',
+  'hudChrome.devBadge.tiers.runesmith': '룬 대장장이',
+  'hudChrome.devBadge.tiers.architect': '설계자',
+  'hudChrome.devBadge.tiers.worldwright': '세계 창조자',
+  'hudChrome.devBadge.flavors.tinkerer': '당신의 첫 커밋이 이 세계에 새겨졌습니다.',
+  'hudChrome.devBadge.flavors.artificer':
+    '열 번의 커밋 끝에, 세계가 당신의 코드를 따르기 시작합니다.',
+  'hudChrome.devBadge.flavors.runesmith': '쉰 번의 커밋이 구동 중인 게임에 벼려졌습니다.',
+  'hudChrome.devBadge.flavors.architect': '이 세계의 설계자: 150번의 커밋이 반영되었습니다.',
+  'hudChrome.devBadge.flavors.worldwright': '세계의 창조자: 500번의 커밋이 이 게임을 빚어냅니다.',
+  'hudChrome.devBadge.badgeTitle': '개발자: {tier}',
+  'hudChrome.devBadge.commitsLanded': '{count}번의 커밋 반영',
+  'hudChrome.devBadge.contributor': '오픈 소스 기여자',
+  'hudChrome.devBadge.link.cta': 'GitHub 연결',
+  'hudChrome.devBadge.link.relink': 'GitHub 다시 연결',
+  'hudChrome.devBadge.link.benefits':
+    'GitHub를 연결하면 오픈 소스 저장소에 반영된 커밋으로 개발자 배지를 받을 수 있습니다.',
+  'hudChrome.devBadge.linkedAs': '{login}(으)로 연결됨',
+  'hudChrome.devBadge.unlink': 'GitHub 연결 해제',
 };
