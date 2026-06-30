@@ -4909,6 +4909,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.devBadge.link.relink': 'GitHub を再連携',
   'hudChrome.devBadge.link.benefits':
     'GitHub を連携すると、オープンソースリポジトリに反映されたコミットに応じて開発者バッジを獲得できます。',
+  'hudChrome.devBadge.link.error': 'GitHub を連携できませんでした。もう一度お試しください。',
   'hudChrome.devBadge.linkedAs': '{login} として連携済み',
   'hudChrome.devBadge.unlink': 'GitHub の連携を解除',
 };

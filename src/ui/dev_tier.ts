@@ -17,7 +17,6 @@ import {
   type DevTierKey,
   isSignificantDevTier,
   devTierByIndex as sharedDevTierByIndex,
-  devTierForCommits as sharedDevTierForCommits,
 } from '../sim/dev_tier';
 import { type TranslationKey, t } from './i18n';
 
@@ -161,14 +160,13 @@ export function devTierFlavorText(tier: DevTier): string {
   return t(DEV_TIER_TEXT_KEYS[tier.key].flavor);
 }
 
-/**
- * The presentation rung a landed-commit count qualifies for, or null when the
- * count is null (no linked/contributing GitHub account) or below the first rung.
- */
-export function devTierForCommits(commits: number | null): DevTier | null {
-  const shared = sharedDevTierForCommits(commits);
-  return shared ? (DEV_TIERS[shared.index - 1] ?? null) : null;
-}
+// No devTierForCommits() here (unlike holderTierForBalance(), which the player
+// card derives client-side from a raw $WOC balance): the server always resolves
+// and broadcasts the tier INDEX (the wire `dvt` field), never a raw commit count
+// for the client to re-derive a tier from, so every consumer looks the rung up
+// by index. Add a commit-count-based lookup only if a client-side derivation
+// actually needs one (src/sim/dev_tier.ts's devTierForCommits is the place to
+// wrap, mirroring this file's other thin wrappers).
 
 /** The presentation rung at a 1-based index (1-5), or undefined for 0/out-of-range. */
 export function devTierByIndex(index: number): DevTier | undefined {

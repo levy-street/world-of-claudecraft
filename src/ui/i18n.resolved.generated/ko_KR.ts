@@ -903,7 +903,8 @@ export const ko_KR: EnTranslations = {
       "link": {
         "cta": "GitHub 연결",
         "relink": "GitHub 다시 연결",
-        "benefits": "GitHub를 연결하면 오픈 소스 저장소에 반영된 커밋으로 개발자 배지를 받을 수 있습니다."
+        "benefits": "GitHub를 연결하면 오픈 소스 저장소에 반영된 커밋으로 개발자 배지를 받을 수 있습니다.",
+        "error": "GitHub를 연결할 수 없습니다. 다시 시도해 주세요."
       },
       "linkedAs": "{login}(으)로 연결됨",
       "unlink": "GitHub 연결 해제"

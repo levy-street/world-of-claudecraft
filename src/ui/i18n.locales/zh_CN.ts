@@ -4671,6 +4671,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.devBadge.link.relink': '重新关联 GitHub',
   'hudChrome.devBadge.link.benefits':
     '关联你的 GitHub，即可凭你在开源仓库中已落地的提交获得开发者徽章。',
+  'hudChrome.devBadge.link.error': '无法关联 GitHub，请重试。',
   'hudChrome.devBadge.linkedAs': '已关联为 {login}',
   'hudChrome.devBadge.unlink': '取消关联 GitHub',
 };

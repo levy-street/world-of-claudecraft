@@ -6,12 +6,16 @@ import {
   isSignificantDevTier,
   devTierByIndex as sharedDevTierByIndex,
 } from '../src/sim/dev_tier';
-import {
-  DEV_TIERS,
-  devTierBadgeDataUrl,
-  devTierByIndex,
-  devTierForCommits,
-} from '../src/ui/dev_tier';
+import { DEV_TIERS, devTierBadgeDataUrl, devTierByIndex } from '../src/ui/dev_tier';
+
+// Mirrors the real data flow exactly (the server resolves a commit count to an
+// index via devTierIndexForCommits and broadcasts only the index; the client
+// always looks the presentation rung up by that index, never re-derives one from
+// a raw count), rather than testing through a client-side commit-count lookup
+// the codebase doesn't actually have.
+function tierNameForCommits(commits: number | null): string | undefined {
+  return devTierByIndex(devTierIndexForCommits(commits))?.name;
+}
 
 describe('dev-tier ladder', () => {
   it('has five rungs with strictly increasing thresholds and 1-based indexes', () => {
@@ -30,37 +34,37 @@ describe('dev-tier ladder', () => {
     );
   });
 
-  it('returns null with no link or a sub-threshold commit count', () => {
-    expect(devTierForCommits(null)).toBeNull();
-    expect(devTierForCommits(0)).toBeNull();
-    expect(devTierForCommits(0.5)).toBeNull();
-    expect(devTierForCommits(Number.NaN)).toBeNull();
+  it('resolves to no rung with no link or a sub-threshold commit count', () => {
+    expect(tierNameForCommits(null)).toBeUndefined();
+    expect(tierNameForCommits(0)).toBeUndefined();
+    expect(tierNameForCommits(0.5)).toBeUndefined();
+    expect(tierNameForCommits(Number.NaN)).toBeUndefined();
   });
 
-  it('rejects non-finite and negative commit counts as null', () => {
-    expect(devTierForCommits(Number.POSITIVE_INFINITY)).toBeNull();
-    expect(devTierForCommits(Number.NEGATIVE_INFINITY)).toBeNull();
-    expect(devTierForCommits(-5)).toBeNull();
+  it('rejects non-finite and negative commit counts as no rung', () => {
+    expect(tierNameForCommits(Number.POSITIVE_INFINITY)).toBeUndefined();
+    expect(tierNameForCommits(Number.NEGATIVE_INFINITY)).toBeUndefined();
+    expect(tierNameForCommits(-5)).toBeUndefined();
   });
 
   it('treats each threshold as inclusive and just-below as the rung beneath', () => {
-    expect(devTierForCommits(1)!.name).toBe('Tinkerer');
-    expect(devTierForCommits(10)!.name).toBe('Artificer');
-    expect(devTierForCommits(150)!.name).toBe('Architect');
-    expect(devTierForCommits(0.99)).toBeNull();
-    expect(devTierForCommits(9)!.name).toBe('Tinkerer');
-    expect(devTierForCommits(49)!.name).toBe('Artificer');
-    expect(devTierForCommits(499)!.name).toBe('Architect');
+    expect(tierNameForCommits(1)).toBe('Tinkerer');
+    expect(tierNameForCommits(10)).toBe('Artificer');
+    expect(tierNameForCommits(150)).toBe('Architect');
+    expect(tierNameForCommits(0.99)).toBeUndefined();
+    expect(tierNameForCommits(9)).toBe('Tinkerer');
+    expect(tierNameForCommits(49)).toBe('Artificer');
+    expect(tierNameForCommits(499)).toBe('Architect');
   });
 
   it('maps commit counts to the highest qualifying rung', () => {
-    expect(devTierForCommits(1)!.name).toBe('Tinkerer');
-    expect(devTierForCommits(9)!.name).toBe('Tinkerer');
-    expect(devTierForCommits(10)!.name).toBe('Artificer');
-    expect(devTierForCommits(50)!.name).toBe('Runesmith');
-    expect(devTierForCommits(150)!.name).toBe('Architect');
-    expect(devTierForCommits(500)!.name).toBe('Worldwright');
-    expect(devTierForCommits(5_000)!.name).toBe('Worldwright');
+    expect(tierNameForCommits(1)).toBe('Tinkerer');
+    expect(tierNameForCommits(9)).toBe('Tinkerer');
+    expect(tierNameForCommits(10)).toBe('Artificer');
+    expect(tierNameForCommits(50)).toBe('Runesmith');
+    expect(tierNameForCommits(150)).toBe('Architect');
+    expect(tierNameForCommits(500)).toBe('Worldwright');
+    expect(tierNameForCommits(5_000)).toBe('Worldwright');
   });
 
   it('exposes a server-safe numeric tier lookup from the shared pure module', () => {

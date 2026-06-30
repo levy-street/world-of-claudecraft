@@ -1394,7 +1394,10 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     if (req.method === 'POST' && url === '/api/auth/github/start') {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
-      if (githubRateLimited(req, accountId)) return json(res, 429, { error: 'rate limited' });
+      if (githubRateLimited(req, accountId)) {
+        recordUsageMetric('github.link.rate_limited');
+        return json(res, 429, { error: 'rate limited' });
+      }
       return handleGitHubStart(req, res, { accountId });
     }
     if (req.method === 'GET' && url === '/api/auth/github/callback') {

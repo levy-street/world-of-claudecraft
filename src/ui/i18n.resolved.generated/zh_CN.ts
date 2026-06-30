@@ -903,7 +903,8 @@ export const zh_CN: EnTranslations = {
       "link": {
         "cta": "关联 GitHub",
         "relink": "重新关联 GitHub",
-        "benefits": "关联你的 GitHub，即可凭你在开源仓库中已落地的提交获得开发者徽章。"
+        "benefits": "关联你的 GitHub，即可凭你在开源仓库中已落地的提交获得开发者徽章。",
+        "error": "无法关联 GitHub，请重试。"
       },
       "linkedAs": "已关联为 {login}",
       "unlink": "取消关联 GitHub"

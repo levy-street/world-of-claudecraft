@@ -5,7 +5,6 @@ import {
   devTierByIndex,
   devTierDisplayName,
   devTierFlavorText,
-  devTierForCommits,
   devTierNameOutlineColor,
 } from '../src/ui/dev_tier';
 
@@ -28,9 +27,7 @@ describe('dev tier presentation', () => {
     expect(devTierBadgeDataUrl(DEV_TIERS[2])).toMatch(/^data:image\/svg\+xml,/);
   });
 
-  it('maps commit counts to the presentation rung and looks up by index', () => {
-    expect(devTierForCommits(50)?.key).toBe('runesmith');
-    expect(devTierForCommits(0)).toBeNull();
+  it('looks up the presentation rung by index, undefined for 0/out-of-range', () => {
     expect(devTierByIndex(4)?.key).toBe('architect');
     expect(devTierByIndex(0)).toBeUndefined();
   });

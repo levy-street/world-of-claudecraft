@@ -19,6 +19,14 @@ const USAGE_METRICS = [
   { key: 'github.releases.api', labelKey: 'usage.metric.githubReleasesApi' },
   { key: 'github.releases.fetch', labelKey: 'usage.metric.githubReleasesFetch' },
   { key: 'github.releases.fetch.failure', labelKey: 'usage.metric.githubReleasesFetchFailure' },
+  { key: 'github.contributors.fetch', labelKey: 'usage.metric.githubContributorsFetch' },
+  {
+    key: 'github.contributors.fetch.failure',
+    labelKey: 'usage.metric.githubContributorsFetchFailure',
+  },
+  { key: 'github.link.request', labelKey: 'usage.metric.githubLinkRequest' },
+  { key: 'github.link.failure', labelKey: 'usage.metric.githubLinkFailure' },
+  { key: 'github.link.rate_limited', labelKey: 'usage.metric.githubLinkRateLimited' },
   { key: 'wallet.challenge.request', labelKey: 'usage.metric.walletChallengeRequest' },
   { key: 'wallet.challenge.rate_limited', labelKey: 'usage.metric.walletChallengeRateLimited' },
   { key: 'wallet.link.request', labelKey: 'usage.metric.walletLinkRequest' },
@@ -32,11 +40,12 @@ const USAGE_METRICS = [
 const USAGE_CACHES = [
   { key: 'woc.balance', labelKey: 'usage.cache.wocBalance' },
   { key: 'github.releases', labelKey: 'usage.cache.githubReleases' },
+  { key: 'github.contributors', labelKey: 'usage.cache.githubContributors' },
 ] as const;
 
-export type UsageWindowKey = typeof USAGE_WINDOWS[number]['key'];
-export type UsageMetricKey = typeof USAGE_METRICS[number]['key'];
-export type UsageCacheKey = typeof USAGE_CACHES[number]['key'];
+export type UsageWindowKey = (typeof USAGE_WINDOWS)[number]['key'];
+export type UsageMetricKey = (typeof USAGE_METRICS)[number]['key'];
+export type UsageCacheKey = (typeof USAGE_CACHES)[number]['key'];
 export type UsageCacheEvent = 'hit' | 'miss' | 'stale' | 'store' | 'failure' | 'eviction';
 
 export interface UsageWindowSnapshot {
@@ -189,7 +198,11 @@ export function recordUsageMetric(key: UsageMetricKey, at = Date.now()): void {
   for (const window of USAGE_WINDOWS) recordWindowCounter(counters.windows[window.key], at);
 }
 
-export function recordUsageCacheEvent(key: UsageCacheKey, event: UsageCacheEvent, at = Date.now()): void {
+export function recordUsageCacheEvent(
+  key: UsageCacheKey,
+  event: UsageCacheEvent,
+  at = Date.now(),
+): void {
   const stats = cacheStatsFor(key);
   if (event === 'hit') stats.hits += 1;
   else if (event === 'miss') stats.misses += 1;

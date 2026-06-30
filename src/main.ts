@@ -5183,29 +5183,63 @@ window.addEventListener('message', (e: MessageEvent) => {
 // server-side and the player is logged in; the status fetch drives the visibility.
 let githubPopup: Window | null = null;
 
+// Flash an error into the dedicated GitHub status line for 4s, then restore
+// whatever it was showing before (mirrors flashWalletError's temporary-flash +
+// auto-revert, but targets #github-status rather than overwriting the button
+// label, since that line already exists to show the linked @login/tier).
+function flashGithubError(message: string): void {
+  const statusEl = document.getElementById('github-status');
+  if (!statusEl) return;
+  const previousText = statusEl.textContent;
+  const previousHidden = statusEl.hidden;
+  statusEl.textContent = message;
+  statusEl.hidden = false;
+  window.setTimeout(() => {
+    if (statusEl.textContent !== message) return; // a real status refresh already overwrote it
+    statusEl.textContent = previousText;
+    statusEl.hidden = previousHidden;
+  }, 4000);
+}
+
 function startGithubOAuth(): void {
   if (!api.token) return;
   const popup = window.open('about:blank', 'woc-github', 'width=600,height=760');
   githubPopup = popup;
+  if (!popup) {
+    // Popup blocked: there is nothing to navigate, so fail loudly instead of
+    // letting the click silently do nothing.
+    flashGithubError(t('hudChrome.devBadge.link.error'));
+    return;
+  }
   void api
     .githubStart()
     .then(({ url }) => {
-      if (popup) popup.location.href = url;
+      popup.location.href = url;
     })
     .catch((err) => {
       console.error('[github] could not start oauth', err);
-      popup?.close();
+      popup.close();
+      githubPopup = null;
+      flashGithubError(t('hudChrome.devBadge.link.error'));
     });
 }
 
 // Popup bounce-page result. Same-origin only; the callback posts { source:
-// 'woc-github' } when the link completes (ok or not), then we refresh the row.
+// 'woc-github', ok, error? } when the link completes (ok or not). A failure
+// (bad/expired state, GitHub error, already linked to another account, server
+// error) flashes the reason instead of silently refreshing as if nothing
+// happened; the user's own "Cancel" on GitHub's consent screen also reports
+// `ok: false`, which is fine here (the row simply stays unlinked, no flash
+// needed for a deliberate cancel) versus a real failure.
 window.addEventListener('message', (e: MessageEvent) => {
   if (e.origin !== location.origin) return;
-  const d = e.data as { source?: string; ok?: boolean } | null;
+  const d = e.data as { source?: string; ok?: boolean; error?: string | null } | null;
   if (d?.source !== 'woc-github') return;
   githubPopup?.close();
   githubPopup = null;
+  if (d.ok === false && d.error && d.error !== 'cancelled') {
+    flashGithubError(t('hudChrome.devBadge.link.error'));
+  }
   void refreshGithubLinkStatus();
 });
 
@@ -5216,7 +5250,12 @@ async function refreshGithubLinkStatus(): Promise<void> {
     group.hidden = true;
     return;
   }
-  const status = await api.githubStatus().catch(() => null);
+  let status: Record<string, unknown> | null = null;
+  try {
+    status = await api.githubStatus();
+  } catch (err) {
+    console.error('[github] could not load status', err);
+  }
   if (!status || status.enabled !== true) {
     group.hidden = true;
     return;

@@ -10,6 +10,7 @@ import {
   sortContributors,
   topContributors,
 } from '../server/github_contributors';
+import { providerUsageSnapshot, resetProviderUsageForTests } from '../server/provider_usage';
 
 describe('parseContributorsPage', () => {
   it('keeps real users with a positive commit count, dropping bots and anonymous', () => {
@@ -206,5 +207,98 @@ describe('getContributors / topContributors / commitsForLogin (cached fetch)', (
     } finally {
       vi.useRealTimers();
     }
+  });
+});
+
+// Proves the admin-dashboard telemetry calls actually fire at the right moments
+// (not just that the code compiles): a cold miss + successful fetch records a
+// fetch attempt, a cache store, and the right entry count; a warm call records a
+// hit with no further fetch; and a failed refresh records both the fetch-failure
+// metric and the cache failure event, reading the real counters back through
+// providerUsageSnapshot() exactly as the admin dashboard does.
+describe('github_contributors telemetry (provider_usage wiring)', () => {
+  beforeEach(() => {
+    resetContributorsCache();
+    resetProviderUsageForTests();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    resetContributorsCache();
+    resetProviderUsageForTests();
+  });
+
+  function metricCount(key: string): number {
+    const snap = providerUsageSnapshot();
+    const metric = snap.metrics.find((m) => m.key === key);
+    return metric ? metric.counts.h24 : -1;
+  }
+
+  function cacheStats(key: string) {
+    const snap = providerUsageSnapshot();
+    const cache = snap.caches.find((c) => c.key === key);
+    if (!cache) throw new Error(`cache key not registered: ${key}`);
+    return cache;
+  }
+
+  it('records a fetch attempt + cache store + entry count on a cold miss', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => ({
+        ok: true,
+        status: 200,
+        headers: { get: () => null },
+        json: async () => [
+          { login: 'FernandoX7', type: 'User', contributions: 821 },
+          { login: 'jgyy', type: 'User', contributions: 664 },
+        ],
+      })),
+    );
+    expect(metricCount('github.contributors.fetch')).toBe(0);
+    expect(cacheStats('github.contributors').stores).toBe(0);
+
+    await getContributors();
+
+    expect(metricCount('github.contributors.fetch')).toBe(1);
+    const stats = cacheStats('github.contributors');
+    expect(stats.stores).toBe(1);
+    expect(stats.misses).toBe(1);
+    expect(stats.entries).toBe(2);
+    expect(stats.maxEntries).not.toBeNull();
+  });
+
+  it('records a hit (no fetch) on a warm call', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => ({
+        ok: true,
+        status: 200,
+        headers: { get: () => null },
+        json: async () => [{ login: 'jgyy', type: 'User', contributions: 664 }],
+      })),
+    );
+    await getContributors(); // primes the cache (1 fetch, 1 store)
+    expect(metricCount('github.contributors.fetch')).toBe(1);
+
+    await getContributors(); // served from cache: no second fetch
+
+    expect(metricCount('github.contributors.fetch')).toBe(1); // unchanged
+    expect(cacheStats('github.contributors').hits).toBe(1);
+  });
+
+  it('records a fetch failure metric and a cache failure event on a failed refresh', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => {
+        throw new Error('network down');
+      }),
+    );
+    expect(metricCount('github.contributors.fetch.failure')).toBe(0);
+
+    await getContributors();
+
+    expect(metricCount('github.contributors.fetch')).toBe(1); // the attempt was made
+    expect(metricCount('github.contributors.fetch.failure')).toBe(1);
+    expect(cacheStats('github.contributors').failures).toBe(1);
   });
 });

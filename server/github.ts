@@ -31,6 +31,7 @@ import {
   parseTokenResponse,
 } from './github_oauth';
 import { json } from './http_util';
+import { recordUsageMetric } from './provider_usage';
 import { publicOriginFromRequest } from './realm';
 
 const STATE_TTL_MINUTES = 10;
@@ -64,6 +65,7 @@ export async function handleGitHubStart(
   res: http.ServerResponse,
   opts: { accountId: number },
 ): Promise<void> {
+  recordUsageMetric('github.link.request');
   const cfg = githubConfig();
   if (!cfg) return json(res, 503, { error: 'GitHub integration is not configured' });
   const state = newToken();

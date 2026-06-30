@@ -903,7 +903,8 @@ export const ja_JP: EnTranslations = {
       "link": {
         "cta": "GitHub を連携",
         "relink": "GitHub を再連携",
-        "benefits": "GitHub を連携すると、オープンソースリポジトリに反映されたコミットに応じて開発者バッジを獲得できます。"
+        "benefits": "GitHub を連携すると、オープンソースリポジトリに反映されたコミットに応じて開発者バッジを獲得できます。",
+        "error": "GitHub を連携できませんでした。もう一度お試しください。"
       },
       "linkedAs": "{login} として連携済み",
       "unlink": "GitHub の連携を解除"

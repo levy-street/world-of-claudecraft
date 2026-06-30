@@ -5021,6 +5021,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.devBadge.link.relink': 'Перепривязать GitHub',
   'hudChrome.devBadge.link.benefits':
     'Привяжите GitHub, чтобы получить значок разработчика за коммиты, закреплённые в открытом репозитории.',
+  'hudChrome.devBadge.link.error': 'Не удалось привязать GitHub. Пожалуйста, попробуйте снова.',
   'hudChrome.devBadge.linkedAs': 'Привязан как {login}',
   'hudChrome.devBadge.unlink': 'Отвязать GitHub',
 };

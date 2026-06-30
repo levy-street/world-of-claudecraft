@@ -962,6 +962,7 @@ export const hudChromeStrings = {
       relink: 'Relink GitHub',
       benefits:
         'Link your GitHub to earn a developer badge for the commits you have landed in the open-source repo.',
+      error: 'Could not link GitHub. Please try again.',
     },
     linkedAs: 'Linked as {login}',
     unlink: 'Unlink GitHub',

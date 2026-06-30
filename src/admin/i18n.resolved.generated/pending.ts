@@ -10,24 +10,157 @@
 // and `pretest`). Reproducibility is checked by tests/i18n_admin_catalog.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "usage.cache.githubContributors",
+    "usage.metric.githubContributorsFetch",
+    "usage.metric.githubContributorsFetchFailure",
+    "usage.metric.githubLinkFailure",
+    "usage.metric.githubLinkRateLimited",
+    "usage.metric.githubLinkRequest"
+  ],
+  "es_ES": [
+    "usage.cache.githubContributors",
+    "usage.metric.githubContributorsFetch",
+    "usage.metric.githubContributorsFetchFailure",
+    "usage.metric.githubLinkFailure",
+    "usage.metric.githubLinkRateLimited",
+    "usage.metric.githubLinkRequest"
+  ],
+  "fr_FR": [
+    "usage.cache.githubContributors",
+    "usage.metric.githubContributorsFetch",
+    "usage.metric.githubContributorsFetchFailure",
+    "usage.metric.githubLinkFailure",
+    "usage.metric.githubLinkRateLimited",
+    "usage.metric.githubLinkRequest"
+  ],
+  "fr_CA": [
+    "usage.cache.githubContributors",
+    "usage.metric.githubContributorsFetch",
+    "usage.metric.githubContributorsFetchFailure",
+    "usage.metric.githubLinkFailure",
+    "usage.metric.githubLinkRateLimited",
+    "usage.metric.githubLinkRequest"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "usage.cache.githubContributors",
+    "usage.metric.githubContributorsFetch",
+    "usage.metric.githubContributorsFetchFailure",
+    "usage.metric.githubLinkFailure",
+    "usage.metric.githubLinkRateLimited",
+    "usage.metric.githubLinkRequest"
+  ],
+  "de_DE": [
+    "usage.cache.githubContributors",
+    "usage.metric.githubContributorsFetch",
+    "usage.metric.githubContributorsFetchFailure",
+    "usage.metric.githubLinkFailure",
+    "usage.metric.githubLinkRateLimited",
+    "usage.metric.githubLinkRequest"
+  ],
+  "zh_CN": [
+    "usage.cache.githubContributors",
+    "usage.metric.githubContributorsFetch",
+    "usage.metric.githubContributorsFetchFailure",
+    "usage.metric.githubLinkFailure",
+    "usage.metric.githubLinkRateLimited",
+    "usage.metric.githubLinkRequest"
+  ],
+  "zh_TW": [
+    "usage.cache.githubContributors",
+    "usage.metric.githubContributorsFetch",
+    "usage.metric.githubContributorsFetchFailure",
+    "usage.metric.githubLinkFailure",
+    "usage.metric.githubLinkRateLimited",
+    "usage.metric.githubLinkRequest"
+  ],
+  "ko_KR": [
+    "usage.cache.githubContributors",
+    "usage.metric.githubContributorsFetch",
+    "usage.metric.githubContributorsFetchFailure",
+    "usage.metric.githubLinkFailure",
+    "usage.metric.githubLinkRateLimited",
+    "usage.metric.githubLinkRequest"
+  ],
+  "ja_JP": [
+    "usage.cache.githubContributors",
+    "usage.metric.githubContributorsFetch",
+    "usage.metric.githubContributorsFetchFailure",
+    "usage.metric.githubLinkFailure",
+    "usage.metric.githubLinkRateLimited",
+    "usage.metric.githubLinkRequest"
+  ],
+  "pt_BR": [
+    "usage.cache.githubContributors",
+    "usage.metric.githubContributorsFetch",
+    "usage.metric.githubContributorsFetchFailure",
+    "usage.metric.githubLinkFailure",
+    "usage.metric.githubLinkRateLimited",
+    "usage.metric.githubLinkRequest"
+  ],
+  "ru_RU": [
+    "usage.cache.githubContributors",
+    "usage.metric.githubContributorsFetch",
+    "usage.metric.githubContributorsFetchFailure",
+    "usage.metric.githubLinkFailure",
+    "usage.metric.githubLinkRateLimited",
+    "usage.metric.githubLinkRequest"
+  ],
+  "nl_NL": [
+    "usage.cache.githubContributors",
+    "usage.metric.githubContributorsFetch",
+    "usage.metric.githubContributorsFetchFailure",
+    "usage.metric.githubLinkFailure",
+    "usage.metric.githubLinkRateLimited",
+    "usage.metric.githubLinkRequest"
+  ],
+  "pl_PL": [
+    "usage.cache.githubContributors",
+    "usage.metric.githubContributorsFetch",
+    "usage.metric.githubContributorsFetchFailure",
+    "usage.metric.githubLinkFailure",
+    "usage.metric.githubLinkRateLimited",
+    "usage.metric.githubLinkRequest"
+  ],
+  "id_ID": [
+    "usage.cache.githubContributors",
+    "usage.metric.githubContributorsFetch",
+    "usage.metric.githubContributorsFetchFailure",
+    "usage.metric.githubLinkFailure",
+    "usage.metric.githubLinkRateLimited",
+    "usage.metric.githubLinkRequest"
+  ],
+  "tr_TR": [
+    "usage.cache.githubContributors",
+    "usage.metric.githubContributorsFetch",
+    "usage.metric.githubContributorsFetchFailure",
+    "usage.metric.githubLinkFailure",
+    "usage.metric.githubLinkRateLimited",
+    "usage.metric.githubLinkRequest"
+  ],
+  "sv_SE": [
+    "usage.cache.githubContributors",
+    "usage.metric.githubContributorsFetch",
+    "usage.metric.githubContributorsFetchFailure",
+    "usage.metric.githubLinkFailure",
+    "usage.metric.githubLinkRateLimited",
+    "usage.metric.githubLinkRequest"
+  ],
+  "vi_VN": [
+    "usage.cache.githubContributors",
+    "usage.metric.githubContributorsFetch",
+    "usage.metric.githubContributorsFetchFailure",
+    "usage.metric.githubLinkFailure",
+    "usage.metric.githubLinkRateLimited",
+    "usage.metric.githubLinkRequest"
+  ],
+  "da_DK": [
+    "usage.cache.githubContributors",
+    "usage.metric.githubContributorsFetch",
+    "usage.metric.githubContributorsFetchFailure",
+    "usage.metric.githubLinkFailure",
+    "usage.metric.githubLinkRateLimited",
+    "usage.metric.githubLinkRequest"
+  ]
 };

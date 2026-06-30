@@ -17,6 +17,7 @@
 import { devTierIndexForCommits } from '../src/sim/dev_tier';
 import { LEADERBOARD_MAX } from '../src/sim/leaderboard_page';
 import type { DevLeaderboardEntry } from '../src/world_api';
+import { recordUsageCacheEvent, recordUsageMetric, setUsageCacheSize } from './provider_usage';
 
 const GITHUB_REPO = process.env.GITHUB_REPO ?? 'levy-street/world-of-claudecraft';
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN ?? '';
@@ -25,6 +26,8 @@ const CONTRIBUTORS_TTL_MS = 30 * 60_000; // 30 min; contributor counts change sl
 const CONTRIBUTORS_PER_PAGE = 100;
 const CONTRIBUTORS_MAX_PAGES = 20; // 2000 contributors cap; far beyond the real count
 const FAILURE_COOLDOWN_MS = 5 * 60_000; // after a failed fetch, wait before retrying
+
+setUsageCacheSize('github.contributors', 0, LEADERBOARD_MAX);
 
 export interface ContributorStat {
   login: string;
@@ -107,6 +110,7 @@ function githubHeaders(): Record<string, string> {
 // Fetch every page of the contributors list, sorted rank-descending. Throws on a
 // non-OK status or network error so getContributors() can serve the last cache.
 async function fetchAllContributors(): Promise<ContributorStat[]> {
+  recordUsageMetric('github.contributors.fetch');
   const stats: ContributorStat[] = [];
   let url: string | null = `${CONTRIBUTORS_URL}?per_page=${CONTRIBUTORS_PER_PAGE}&anon=0`;
   for (let page = 0; page < CONTRIBUTORS_MAX_PAGES && url; page++) {
@@ -131,22 +135,31 @@ async function fetchAllContributors(): Promise<ContributorStat[]> {
 export async function getContributors(): Promise<ContributorSnapshot> {
   const now = Date.now();
   if (contributorsCache && now - contributorsCache.at < CONTRIBUTORS_TTL_MS) {
+    recordUsageCacheEvent('github.contributors', 'hit');
     return contributorsCache.snapshot;
   }
   // Back off after a failure: keep serving the last snapshot (or empty) rather
   // than re-hitting a failing API every cycle.
-  if (now < cooldownUntil) return contributorsCache?.snapshot ?? EMPTY_SNAPSHOT;
+  if (now < cooldownUntil) {
+    recordUsageCacheEvent('github.contributors', 'stale');
+    return contributorsCache?.snapshot ?? EMPTY_SNAPSHOT;
+  }
+  recordUsageCacheEvent('github.contributors', contributorsCache ? 'stale' : 'miss');
   if (!refreshing) {
     refreshing = fetchAllContributors()
       .then((stats) => {
         const snapshot: ContributorSnapshot = { stats, byLogin: contributorsToMap(stats) };
         contributorsCache = { at: Date.now(), snapshot };
         cooldownUntil = 0;
+        recordUsageCacheEvent('github.contributors', 'store');
+        setUsageCacheSize('github.contributors', stats.length, LEADERBOARD_MAX);
         return snapshot;
       })
       .catch((err) => {
         console.error('github contributors refresh failed:', err);
         cooldownUntil = Date.now() + FAILURE_COOLDOWN_MS;
+        recordUsageMetric('github.contributors.fetch.failure');
+        recordUsageCacheEvent('github.contributors', 'failure');
         return contributorsCache?.snapshot ?? EMPTY_SNAPSHOT;
       })
       .finally(() => {
