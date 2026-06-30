@@ -70,6 +70,9 @@
 .inspect-discord-role {
   color: #cfe0ff;
 }
+.inspect-dev-login {
+  color: #9fe6c2;
+}
 
 /* ── Discord in-game panel (#discord-window) + widget ─────────────────── */
 #discord-window {
@@ -496,6 +499,10 @@
 }
 .uf-dc-chip.rank {
   color: #cfe0ff;
+}
+/* developer-badge chip on the target frame */
+.uf-dc-chip.dev {
+  color: #d7ffe9;
 }
 
 /* "!" community-command autocomplete dropdown above the chat input. */

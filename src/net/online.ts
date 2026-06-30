@@ -566,6 +566,23 @@ export class Api {
     await this.delete('/api/discord', password ? { password } : {});
   }
 
+  // ── GitHub link + developer-badge status ───────────────────────────────────
+  // Returns the github.com authorize URL the browser navigates to (link-only:
+  // attaches the verified GitHub identity to the current account).
+  async githubStart(): Promise<{ url: string }> {
+    return this.post('/api/auth/github/start', {});
+  }
+
+  // Current account's GitHub link status + landed-commit count + dev tier.
+  async githubStatus(): Promise<Record<string, unknown>> {
+    return this.get('/api/github');
+  }
+
+  // Unlink GitHub from the current account.
+  async unlinkGithub(): Promise<void> {
+    await this.delete('/api/github', {});
+  }
+
   // ── Shareable player card + referrals ──────────────────────────────────────
   // Publish (or replace) this character's card PNG. The server may return a
   // realm-relative public page path; main.ts normalizes it to an absolute URL

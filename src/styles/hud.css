@@ -58,6 +58,25 @@
     margin-right: 3px;
     filter: drop-shadow(0 1px 1px #000);
   }
+  /* developer-badge flair, inline to the left of a player's name */
+  .np-dev-tier {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    vertical-align: middle;
+    margin-right: 3px;
+    filter: drop-shadow(0 1px 1px #000);
+  }
+  /* significant-contributor name outline: a steady glow layered over whatever
+     name color applies (Discord staff or default). The colour is supplied by the
+     painter via --dev-outline (per-tier), so no hardcoded hue lives here. No
+     animation, so it is reduced-motion safe. */
+  .np-name.np-sig-dev {
+    text-shadow:
+      0 0 4px var(--dev-outline),
+      0 0 2px var(--dev-outline),
+      0 1px 1px #000;
+  }
   .np-hpbar {
     width: 78px;
     height: 6px;

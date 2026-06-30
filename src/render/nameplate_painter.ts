@@ -20,6 +20,12 @@ import * as THREE from 'three';
 import { ABILITIES, MOBS, QUESTS } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
 import { type Entity, isQuestTurnInNpc } from '../sim/types';
+import {
+  devTierBadgeDataUrl,
+  devTierByIndex,
+  devTierDisplayName,
+  devTierNameOutlineColor,
+} from '../ui/dev_tier';
 import { tEntity } from '../ui/entity_i18n';
 import {
   holderTierBadgeDataUrl,
@@ -184,9 +190,13 @@ export class NameplatePainter {
         const roleColor = specialRoleColor(roleKey);
         const roleTag = discordRoleTag(roleKey);
         const displayName = roleTag ? `[${roleTag}] ${e.name}` : e.name;
+        // Significant-contributor outline: a glowing outline drawn on top of the
+        // existing name color (Discord staff or default) for a high dev tier, so
+        // both read at once. Null for non-significant tiers and for self.
+        const devOutline = isSelf ? null : devTierNameOutlineColor(e.devTier ?? 0);
         this.setNameplateStatic(
           v,
-          `player|${displayName}|${roleColor ?? ''}|${guild}|${nameDisplay}|${hpDisplay}|${opacity}`,
+          `player|${displayName}|${roleColor ?? ''}|${guild}|${nameDisplay}|${hpDisplay}|${opacity}|${devOutline ?? ''}`,
           displayName,
           roleColor ?? '#7fb8ff',
           hpDisplay,
@@ -195,10 +205,13 @@ export class NameplatePainter {
           opacity,
           '',
           guild,
+          devOutline,
         );
         v.nameEl.style.display = nameDisplay;
         // $WOC holder-tier flair, shown on OTHER players (own nameplate is hidden).
         this.setNameplateTier(v, isSelf ? 0 : (e.holderTier ?? 0));
+        // Developer-badge flair, also OTHER players only.
+        this.setNameplateDevTier(v, isSelf ? 0 : (e.devTier ?? 0));
         // Linked-Discord PFP indicator, also OTHER players only.
         this.setNameplateDiscord(v, isSelf ? undefined : e.discordAvatar, e.discordName);
         this.setNameplateHp(v, e);
@@ -297,6 +310,7 @@ export class NameplatePainter {
     opacity: string,
     frame = '',
     guild = '',
+    devOutline: string | null = null,
   ): void {
     if (sig === v.nameplateSig) return;
     v.nameplateSig = sig;
@@ -315,6 +329,16 @@ export class NameplatePainter {
     } else {
       v.guildEl.style.display = 'none';
     }
+    // Significant-contributor name outline: a steady glow (no animation, so it is
+    // reduced-motion safe) layered over whatever name color applies. Driven by a
+    // CSS var + class so the color stays out of the TS (no hardcoded hex here).
+    if (devOutline) {
+      v.nameEl.style.setProperty('--dev-outline', devOutline);
+      v.nameEl.classList.add('np-sig-dev');
+    } else {
+      v.nameEl.style.removeProperty('--dev-outline');
+      v.nameEl.classList.remove('np-sig-dev');
+    }
   }
 
   // Show/hide the $WOC holder-tier badge on a player's nameplate. Cheap-diffed
@@ -330,6 +354,22 @@ export class NameplatePainter {
     } else {
       v.tierEl.removeAttribute('src');
       v.tierEl.style.display = 'none';
+    }
+  }
+
+  // Show/hide the developer-badge on a player's nameplate. Cheap-diffed on the
+  // tier value so the badge image is only rebuilt when the tier changes.
+  private setNameplateDevTier(v: EntityView, tier: number): void {
+    if (tier === v.devTierValue) return;
+    v.devTierValue = tier;
+    const def = devTierByIndex(tier);
+    if (def) {
+      v.devTierEl.src = devTierBadgeDataUrl(def, 32);
+      v.devTierEl.title = t('hudChrome.devBadge.badgeTitle', { tier: devTierDisplayName(def) });
+      v.devTierEl.style.display = '';
+    } else {
+      v.devTierEl.removeAttribute('src');
+      v.devTierEl.style.display = 'none';
     }
   }
 

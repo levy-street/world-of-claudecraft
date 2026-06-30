@@ -106,6 +106,7 @@ import { assembleBugReportMeta } from './ui/bug_report';
 import { ChatCommandMenu } from './ui/chat_command_menu';
 import { chatInputSize } from './ui/chat_input_autosize';
 import { CLASS_DETAILS, SIGNATURE_ABILITIES } from './ui/class_details_data';
+import { devTierByIndex, devTierDisplayName } from './ui/dev_tier';
 import {
   type DiscordAccountStatus,
   type DiscordPresenceState,
@@ -5176,6 +5177,88 @@ window.addEventListener('message', (e: MessageEvent) => {
   else void refreshDiscordStatus(); // link succeeded: refresh the in-game panel
 });
 
+// ── GitHub link (developer badge) on the character-select screen ───────────────
+// Link-only OAuth (the player is already logged in), mirroring the wallet link
+// that sits beside it. The group is hidden until the feature is configured
+// server-side and the player is logged in; the status fetch drives the visibility.
+let githubPopup: Window | null = null;
+
+function startGithubOAuth(): void {
+  if (!api.token) return;
+  const popup = window.open('about:blank', 'woc-github', 'width=600,height=760');
+  githubPopup = popup;
+  void api
+    .githubStart()
+    .then(({ url }) => {
+      if (popup) popup.location.href = url;
+    })
+    .catch((err) => {
+      console.error('[github] could not start oauth', err);
+      popup?.close();
+    });
+}
+
+// Popup bounce-page result. Same-origin only; the callback posts { source:
+// 'woc-github' } when the link completes (ok or not), then we refresh the row.
+window.addEventListener('message', (e: MessageEvent) => {
+  if (e.origin !== location.origin) return;
+  const d = e.data as { source?: string; ok?: boolean } | null;
+  if (d?.source !== 'woc-github') return;
+  githubPopup?.close();
+  githubPopup = null;
+  void refreshGithubLinkStatus();
+});
+
+async function refreshGithubLinkStatus(): Promise<void> {
+  const group = document.getElementById('cs-github-group');
+  if (!group) return;
+  if (!api.token) {
+    group.hidden = true;
+    return;
+  }
+  const status = await api.githubStatus().catch(() => null);
+  if (!status || status.enabled !== true) {
+    group.hidden = true;
+    return;
+  }
+  group.hidden = false;
+  const linked = status.linked === true;
+  const login = typeof status.login === 'string' ? status.login : '';
+  const tier = typeof status.devTier === 'number' ? status.devTier : 0;
+  const label = document.getElementById('github-label');
+  const statusEl = document.getElementById('github-status');
+  const unlinkBtn = document.getElementById('btn-github-unlink');
+  if (label) {
+    label.textContent = linked
+      ? t('hudChrome.devBadge.link.relink')
+      : t('hudChrome.devBadge.link.cta');
+  }
+  if (statusEl) {
+    const tierDef = devTierByIndex(tier);
+    if (linked && login && tierDef) {
+      statusEl.textContent = `@${login} · ${devTierDisplayName(tierDef)}`;
+      statusEl.hidden = false;
+    } else if (linked && login) {
+      statusEl.textContent = t('hudChrome.devBadge.linkedAs', { login });
+      statusEl.hidden = false;
+    } else {
+      statusEl.hidden = true;
+    }
+  }
+  if (unlinkBtn) unlinkBtn.hidden = !linked;
+}
+
+function wireGithubLink(): void {
+  document.getElementById('btn-github')?.addEventListener('click', () => startGithubOAuth());
+  document.getElementById('btn-github-unlink')?.addEventListener('click', () => {
+    void api
+      .unlinkGithub()
+      .then(refreshGithubLinkStatus)
+      .catch((err) => console.error('[github] unlink failed', err));
+  });
+  void refreshGithubLinkStatus();
+}
+
 function coerceDiscordStatus(d: Record<string, unknown>): DiscordAccountStatus {
   return {
     linked: d.linked === true,
@@ -5780,6 +5863,7 @@ function wireStartScreens(): void {
   wireContractAddressCopy();
   wireHomepageMusicToggle();
   wireWallet();
+  wireGithubLink();
 
   // mode select
   const onlineBtn = $('#btn-online');
@@ -6191,6 +6275,7 @@ function wireStartScreens(): void {
       // bind-on-login: surface the account's linked wallet (and flip a
       // connected-but-unlinked button into a "Link" call-to-action).
       void refreshWalletLinkStatus();
+      void refreshGithubLinkStatus();
       await enterRealmFlow();
     } catch (err) {
       loginError(userFacingApiError(err));
@@ -6650,6 +6735,7 @@ function wireStartScreens(): void {
     api.saveSession();
     enterLoggedInChrome();
     void refreshWalletLinkStatus();
+    void refreshGithubLinkStatus();
     goToLoggedInPlay();
   };
   const onDiscordChoiceError = (err: unknown) => {
@@ -6791,6 +6877,7 @@ function wireStartScreens(): void {
     // login), so an auto-reconnected wallet shows verified and is NOT treated as
     // unverified and disconnected (the bug that forced a re-sign on every reload).
     void refreshWalletLinkStatus();
+    void refreshGithubLinkStatus();
     // (Discord status is refreshed by enterLoggedInChrome above.)
     if (discordOnboarding) enterOnlinePlayFlow();
   } else {

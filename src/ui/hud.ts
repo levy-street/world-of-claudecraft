@@ -144,6 +144,7 @@ import {
 import { type CardinalId, compassView } from './compass';
 import { formatMinimapCoords } from './coords';
 import { DelveMapPainter } from './delve_map_painter';
+import { devTierBadgeDataUrl, devTierByIndex, devTierDisplayName } from './dev_tier';
 import { markDialogRoot } from './dialog_root';
 import { discordStatusBadgeDataUrl, discordStatusDisplayName } from './discord_tier';
 import { dropdownKeyNav } from './dropdown_nav';
@@ -9233,6 +9234,8 @@ export class Hud {
       gear,
       topPercent,
       balance: showWallet ? verifiedWocBalance() : null,
+      devTier: p.devTier ?? null,
+      devCommits: p.devCommits ?? null,
       referralHandle: referral?.slug ?? this.cardSlug(p.name),
       referralCount: referral?.count ?? null,
       siteUrl: 'worldofclaudecraft.com',
@@ -9869,12 +9872,17 @@ export class Hud {
     });
   }
 
-  // Fill the target frame's Discord line: a linked player's nickname (with PFP),
-  // their staff-role tag, and Discord rank. Hidden for mobs and unlinked players.
+  // Fill the target frame's social/badge line: a linked player's nickname (with
+  // PFP), their staff-role tag, Discord rank, and developer badge. Hidden for mobs
+  // and players with no linked flair at all.
   private updateTargetDiscordLine(target: Entity): void {
     const el = this.targetDiscordEl;
     const tier = target.discordTier ?? 0;
-    if (target.kind !== 'player' || (!tier && !target.discordName && !target.discordRole)) {
+    const devIdx = target.devTier ?? 0;
+    if (
+      target.kind !== 'player' ||
+      (!tier && !target.discordName && !target.discordRole && !devIdx)
+    ) {
       el.classList.remove('show');
       el.replaceChildren();
       return;
@@ -9908,6 +9916,10 @@ export class Hud {
     }
     if (tier > 0) {
       parts.push(`<span class="uf-dc-chip rank">${esc(discordStatusDisplayName(tier))}</span>`);
+    }
+    const devDef = devTierByIndex(devIdx);
+    if (devDef) {
+      parts.push(`<span class="uf-dc-chip dev">${esc(devTierDisplayName(devDef))}</span>`);
     }
     el.innerHTML = parts.join('');
     el.classList.add('show');
@@ -9977,6 +9989,27 @@ export class Hud {
           roleHtml +
           `</div></div>`
         : '';
+    // Developer badge: the cosmetic contributor tier, broadcast per-entity via the
+    // `dvt`/`dvc`/`dgl` identity fields. Shown only for an actual contributor
+    // (tier > 0), with the landed-commit count and the @login under the rung name.
+    const devTierDef = devTierByIndex(e.devTier ?? 0);
+    const devSub = e.devCommits
+      ? t('hudChrome.devBadge.commitsLanded', {
+          count: formatNumber(e.devCommits, { maximumFractionDigits: 0 }),
+        })
+      : t('hudChrome.devBadge.contributor');
+    const devLoginHtml = e.githubLogin
+      ? `<div class="inspect-holder-sub inspect-dev-login">@${esc(e.githubLogin)}</div>`
+      : '';
+    const devHtml = devTierDef
+      ? `<div class="inspect-holder">` +
+        `<img class="inspect-holder-badge" src="${devTierBadgeDataUrl(devTierDef)}" alt="" draggable="false">` +
+        `<div class="inspect-holder-text">` +
+        `<div class="inspect-holder-name">${esc(devTierDisplayName(devTierDef))}</div>` +
+        `<div class="inspect-holder-sub">${esc(devSub)}</div>` +
+        devLoginHtml +
+        `</div></div>`
+      : '';
     el.innerHTML =
       `<div class="panel-title"><span>${esc(t('character.profile'))}</span>` +
       `<button type="button" class="x-btn" data-close aria-label="${esc(t('character.closeProfile'))}">${svgIcon('close')}</button></div>` +
@@ -9986,6 +10019,7 @@ export class Hud {
       `<div class="inspect-meta">${esc(t('itemUi.equipment.levelClass', { level: formatNumber(e.level, { maximumFractionDigits: 0 }), className }))}</div>` +
       holderHtml +
       discordHtml +
+      devHtml +
       `</div>` +
       // Worn gear, mirrored from the entity's render-only `equippedItems` (the
       // `eq` identity field). Item names/icons/tooltips resolve fully client-side
