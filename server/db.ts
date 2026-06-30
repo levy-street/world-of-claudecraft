@@ -6,6 +6,7 @@ import type { ArenaFormat, PlayerClass } from '../src/sim/types';
 import { seedChatFilterDefaults } from './chat_filter_db';
 import type { ChatLogRow } from './chat_log';
 import { DISCORD_SCHEMA } from './discord_db';
+import { GITHUB_SCHEMA } from './github_db';
 import { isUniqueViolation } from './http_util';
 import { OAUTH_SCHEMA } from './oauth_db';
 import { REALM } from './realm';
@@ -443,6 +444,10 @@ export async function ensureSchema(): Promise<void> {
     // unconditionally (idempotent) so the tables exist before the feature is
     // enabled, like the other schema modules.
     await client.query(DISCORD_SCHEMA);
+    // GitHub link tables (links + oauth states) for the developer badge.
+    // FK-references accounts(id), so it runs after SCHEMA. Applied unconditionally
+    // (idempotent), like the Discord tables.
+    await client.query(GITHUB_SCHEMA);
     // Seed the chat-filter word lists + config on first boot only (idempotent).
     // Runs under the same advisory lock so concurrent realm boots don't race.
     await seedChatFilterDefaults(client);

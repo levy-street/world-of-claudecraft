@@ -95,6 +95,13 @@ import {
 import { pruneDiscordOAuthStates, pruneDiscordPendingLogins } from './discord_db';
 import { emailAccountCreated } from './email';
 import { GameServer } from './game';
+import {
+  handleGitHubCallback,
+  handleGitHubStart,
+  handleGitHubStatus,
+  handleGitHubUnlink,
+} from './github';
+import { pruneGitHubOAuthStates } from './github_db';
 import { isUniqueViolation, json, readBody } from './http_util';
 import { handleInternalApi } from './internal';
 import { isConnectionRefused } from './ip_block';
@@ -121,6 +128,7 @@ import {
   cardUploadRateLimited,
   clearAuthFailures,
   discordRateLimited,
+  githubRateLimited,
   publicReadRateLimited,
   rateLimited,
   recordAuthFailure,
@@ -1359,6 +1367,31 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       if (discordRateLimited(req, accountId)) return json(res, 429, { error: 'rate limited' });
       return handleDiscordUnlink(req, res, accountId);
     }
+    // GitHub OAuth link (developer badge). Link-only: the start leg resolves the
+    // caller's account first, so the verified GitHub identity attaches to a known
+    // account. The callback carries no Origin (a github.com redirect) and is
+    // exempt from the web-login Origin guard, exactly like the Discord callback.
+    if (req.method === 'POST' && url === '/api/auth/github/start') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (githubRateLimited(req, accountId)) return json(res, 429, { error: 'rate limited' });
+      return handleGitHubStart(req, res, { accountId });
+    }
+    if (req.method === 'GET' && url === '/api/auth/github/callback') {
+      return handleGitHubCallback(req, res);
+    }
+    if (req.method === 'GET' && url === '/api/github') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (githubRateLimited(req, accountId)) return json(res, 429, { error: 'rate limited' });
+      return handleGitHubStatus(req, res, accountId);
+    }
+    if (req.method === 'DELETE' && url === '/api/github') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (githubRateLimited(req, accountId)) return json(res, 429, { error: 'rate limited' });
+      return handleGitHubUnlink(req, res, accountId);
+    }
     // $WOC balance proxy — keeps the Solana RPC endpoint (and any key in it)
     // server-side so it never ships in the client bundle. Public (on-chain
     // balances are public) but narrow + IP rate-limited + per-wallet cached.
@@ -1457,6 +1490,9 @@ async function main(): Promise<void> {
       );
       void pruneDiscordPendingLogins(pool).catch((err) =>
         console.error('discord pending login prune failed:', err),
+      );
+      void pruneGitHubOAuthStates(pool).catch((err) =>
+        console.error('github oauth state prune failed:', err),
       );
     },
     24 * 3600 * 1000,
