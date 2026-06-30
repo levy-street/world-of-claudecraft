@@ -153,8 +153,18 @@ export const DELVE_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 7,
     moveSpeed: 6.5,
     aggroRadius: 12,
-    // Priority caster: its chime mends nearby drowned. Kill it first.
-    aoePulse: { min: 4, max: 7, radius: 6, every: 4, name: 'Litany Pulse' },
+    // Priority caster: holds at range chanting the Drowned Dirge (a ranged shadow
+    // bolt via the hostile-caster petSpell path, same field zone1/zone3 casters use)
+    // and channels Litany Pulse to heal wounded drowned allies. Kill it first.
+    petSpell: { name: 'Drowned Dirge', school: 'shadow', min: 5, max: 8, range: 20, every: 2.4 },
+    mendAlly: {
+      healMin: 12,
+      healMax: 18,
+      radius: 8,
+      every: 4,
+      name: 'Litany Pulse',
+      school: 'shadow',
+    },
     loot: [{ copper: 10, chance: 1 }],
     scale: 1.0,
     color: 0x6f8a86,
@@ -173,17 +183,10 @@ export const DELVE_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 6,
     moveSpeed: 7,
     aggroRadius: 15,
-    // Ranged hazard-maker: lobs rotwater vials that burst for nature damage near
-    // the pack (projectile telegraph). Kill or break line of sight to stop it.
-    aoePulse: {
-      min: 5,
-      max: 8,
-      radius: 5,
-      every: 5,
-      name: 'Rotwater Vials',
-      school: 'nature',
-      fx: 'projectile',
-    },
+    // Ranged attacker: hurls single-target Rotwater Vials from the back of the pack
+    // (the hostile-caster petSpell path; updateRangedPetAttack draws a projectile).
+    // Matches the PRD MVP "rotwater_vial: ranged damage at target".
+    petSpell: { name: 'Rotwater Vial', school: 'nature', min: 5, max: 8, range: 22, every: 2.6 },
     loot: [{ copper: 9, chance: 1 }],
     scale: 0.95,
     color: 0x5b6b4a,
@@ -247,8 +250,16 @@ export const DELVE_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 18,
     moveSpeed: 4.5,
     aggroRadius: 9,
-    // Slow frontal cleave; tank it solo, others stay clear of the arc.
+    // Slow frontal cleave; periodic silt ward shields nearby allies.
     cleave: { radius: 3.5, mult: 0.6, name: 'Silt Cleave' },
+    wardAllies: {
+      radius: 10,
+      every: 9,
+      amount: 45,
+      duration: 5,
+      name: 'Silt Ward',
+      school: 'nature',
+    },
     loot: [{ copper: 64, chance: 1 }],
     scale: 1.3,
     color: 0x564a3a,
@@ -268,9 +279,9 @@ export const DELVE_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 14,
     moveSpeed: 6,
     aggroRadius: 11,
-    // Elite bruiser: periodically cakes itself in a thick silt hide that soaks a
-    // chunk of incoming damage (the optional temporary damage reduction).
+    // Elite bruiser: silt hide plus a periodic ground stomp.
     stoneskin: { amount: 70, every: 11, duration: 4, name: 'Silt Hide' },
+    stomp: { radius: 6, every: 10, duration: 1.2, min: 10, max: 16, name: 'Sump Stomp' },
     loot: [{ copper: 70, chance: 1 }],
     scale: 1.4,
     color: 0x4a5a3c,
@@ -289,6 +300,8 @@ export const DELVE_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 4,
     moveSpeed: 7,
     aggroRadius: 12,
+    // Swarm pressure: death whips nearby thralls into a brief frenzy.
+    packFrenzy: { radius: 12, hasteMult: 1.25, duration: 5 },
     loot: [{ copper: 3, chance: 1 }],
     scale: 0.8,
     color: 0x7a8a86,
@@ -311,11 +324,8 @@ export const DELVE_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 20,
     moveSpeed: 7,
     aggroRadius: 14,
-    // MVP: a periodic stomp stands in for the full Final Bell channel; richer
-    // boss mechanics (Blackwater Mark, Cantor add phases, Final Bell) land later.
-    stomp: { radius: 8, every: 12, duration: 1.5, min: 15, max: 24, name: 'Final Bell' },
-    summonAdds: { mobId: 'drowned_cantor', count: 2, atHpPct: [0.7, 0.35] },
-    enrage: { belowHpPct: 0.2, dmgMult: 1.4, hasteMult: 1.2 },
+    // Boss mechanics (Blackwater Mark, Cantor phases, Final Bell) are driven by
+    // delves/drowned_litany_boss.ts, not generic stomp/summonAdds/enrage traits.
     loot: [{ copper: 340, chance: 1 }],
     scale: 1.6,
     color: 0x4f6b74,
@@ -359,5 +369,29 @@ export const DELVE_MOBS: Record<string, MobTemplate> = {
     loot: [],
     scale: 1.0,
     color: 0xebedef,
+  },
+
+  // Tolling Bell projectile entity: a non-hostile, non-AI mob the Drowned Litany
+  // boss driver creates for each bell in a volley and moves each tick. No aggro,
+  // no loot, no XP. Its templateId is NOT in DROWNED_LITANY_DELVE.bosses, so it
+  // cannot trigger onDelveBossDefeated. The boss driver removes it when it expires.
+  tolling_bell: {
+    id: 'tolling_bell',
+    name: 'Tolling Bell',
+    minLevel: 14,
+    maxLevel: 14,
+    family: 'undead',
+    hpBase: 1,
+    hpPerLevel: 0,
+    dmgBase: 0,
+    dmgPerLevel: 0,
+    attackSpeed: 999,
+    armorPerLevel: 0,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    loot: [],
+    scale: 0.6,
+    color: 0x8899aa,
+    ccImmune: true,
   },
 };

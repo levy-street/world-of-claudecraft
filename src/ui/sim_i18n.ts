@@ -119,6 +119,7 @@ const baseEnTable = {
   'error.notInChannel': 'You are not in the {channel} channel.',
   'error.notInChannelJoin': 'You are not in the {channel} channel. Type /join {channel} first.',
   'log.bossUnleashes': '{name} unleashes {mechanic}!',
+  'log.mobChannels': '{name} channels {mechanic}.',
   'aura.tamed': 'Tamed',
   'aura.causticSpores': 'Caustic Spores',
   'aura.elixirBear': 'Might of the Bear',
@@ -127,6 +128,16 @@ const baseEnTable = {
   'mechanic.bansheesWail': "Banshee's Wail",
   'mechanic.crushingSweep': 'Crushing Sweep',
   'mechanic.rallyingBanner': 'Rallying Banner',
+  'mechanic.finalBell': 'Final Bell',
+  'mechanic.blackwaterMark': 'Blackwater Mark',
+  'mechanic.litanyMend': 'Litany Mend',
+  'mechanic.siltWard': 'Silt Ward',
+  'mechanic.sumpStomp': 'Sump Stomp',
+  'mechanic.bellShock': 'Bell Shock',
+  'mechanic.eggSacBurst': 'Egg-Sac Burst',
+  'mechanic.tollingBell': 'Tolling Bell',
+  'log.nhaliaTollsBells': '{name} tolls the bells!',
+  'aura.drownedCanticle': 'Drowned Canticle',
   'aura.spiderVenom': 'Spider Venom',
   'aura.skullthump': 'Skullthump',
   'aura.blindingPowder': 'Blinding Powder',
@@ -215,9 +226,9 @@ type BaseSimMessageKey = keyof typeof baseEnTable;
 type PetSimMessageKey = keyof typeof petEnTable;
 export type SimMessageKey = keyof typeof enTable;
 
-// Per-locale table. Typed Record<SupportedLanguage, Record<...>> so tsc fails on
-// a missing locale OR a missing/renamed key (stronger than the server DICT).
-const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = {
+// Per-locale table. Contributors add English only; non-English omissions fall
+// back to English here until the release localization pass fills them.
+const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, string>>> = {
   en: {
     'error.lineOfSight': 'Line of sight.',
     'error.specLevel': 'You may choose a specialization at level {level}.',
@@ -312,6 +323,7 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'error.notInChannel': 'You are not in the {channel} channel.',
     'error.notInChannelJoin': 'You are not in the {channel} channel. Type /join {channel} first.',
     'log.bossUnleashes': '{name} unleashes {mechanic}!',
+    'log.mobChannels': '{name} channels {mechanic}.',
     'aura.tamed': 'Tamed',
     'aura.causticSpores': 'Caustic Spores',
     'aura.elixirBear': 'Might of the Bear',
@@ -387,6 +399,7 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'error.notInChannel': 'No estás en el canal {channel}.',
     'error.notInChannelJoin': 'No estás en el canal {channel}. Escribe /join {channel} primero.',
     'log.bossUnleashes': '¡{name} desata {mechanic}!',
+    'log.mobChannels': '¡{name} canaliza {mechanic}!',
     'mechanic.warStomp': 'Pisotón de guerra',
     'mechanic.boneCarapace': 'Caparazón de hueso',
     'mechanic.bansheesWail': 'Lamento de banshee',
@@ -528,6 +541,7 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'error.notInChannel': 'No estás en el canal {channel}.',
     'error.notInChannelJoin': 'No estás en el canal {channel}. Escribe /join {channel} primero.',
     'log.bossUnleashes': '¡{name} desata {mechanic}!',
+    'log.mobChannels': '¡{name} canaliza {mechanic}!',
     'mechanic.warStomp': 'Pisotón de guerra',
     'mechanic.boneCarapace': 'Caparazón de hueso',
     'mechanic.bansheesWail': 'Lamento de banshee',
@@ -670,6 +684,7 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'error.notInChannelJoin':
       "Vous n'êtes pas dans le canal {channel}. Tapez d'abord /join {channel}.",
     'log.bossUnleashes': '{name} déchaîne {mechanic} !',
+    'log.mobChannels': '{name} canalise {mechanic}.',
     'mechanic.warStomp': 'Piétinement de guerre',
     'mechanic.boneCarapace': "Carapace d'os",
     'mechanic.bansheesWail': 'Lamentation de la banshee',
@@ -813,6 +828,7 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'error.notInChannelJoin':
       "Vous n'êtes pas dans le canal {channel}. Tapez d'abord /join {channel}.",
     'log.bossUnleashes': '{name} déchaîne {mechanic} !',
+    'log.mobChannels': '{name} canalise {mechanic}.',
     'mechanic.warStomp': 'Piétinement de guerre',
     'mechanic.boneCarapace': "Carapace d'os",
     'mechanic.bansheesWail': 'Lamentation de la banshee',
@@ -955,6 +971,7 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'error.notInChannel': 'You are not in the {channel} channel.',
     'error.notInChannelJoin': 'You are not in the {channel} channel. Type /join {channel} first.',
     'log.bossUnleashes': '{name} unleashes {mechanic}!',
+    'log.mobChannels': '{name} channels {mechanic}.',
     'mechanic.warStomp': 'War Stomp',
     'mechanic.boneCarapace': 'Bone Carapace',
     'mechanic.bansheesWail': "Banshee's Wail",
@@ -1096,6 +1113,7 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'error.notInChannel': 'Non sei nel canale {channel}.',
     'error.notInChannelJoin': 'Non sei nel canale {channel}. Digita prima /join {channel}.',
     'log.bossUnleashes': '{name} scatena {mechanic}!',
+    'log.mobChannels': '{name} incanala {mechanic}.',
     'mechanic.warStomp': 'Pestone di Guerra',
     'mechanic.boneCarapace': "Carapace d'Ossa",
     'mechanic.bansheesWail': 'Lamento della Banshee',
@@ -1237,6 +1255,7 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'error.notInChannel': 'Ihr seid nicht im Kanal {channel}.',
     'error.notInChannelJoin': 'Ihr seid nicht im Kanal {channel}. Schreibt zuerst /join {channel}.',
     'log.bossUnleashes': '{name} entfesselt {mechanic}!',
+    'log.mobChannels': '{name} kanalisiert {mechanic}.',
     'mechanic.warStomp': 'Kriegsdonner',
     'mechanic.boneCarapace': 'Knochenpanzer',
     'mechanic.bansheesWail': 'Klageschrei der Banshee',
@@ -1378,6 +1397,7 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'error.notInChannel': '你不在{channel}频道中。',
     'error.notInChannelJoin': '你不在{channel}频道中。请先输入 /join {channel}。',
     'log.bossUnleashes': '{name}释放了{mechanic}！',
+    'log.mobChannels': '{name}正在引导{mechanic}。',
     'mechanic.warStomp': '战争践踏',
     'mechanic.boneCarapace': '白骨甲壳',
     'mechanic.bansheesWail': '女妖之嚎',
@@ -1517,6 +1537,7 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'error.notInChannel': '你不在「{channel}」頻道中。',
     'error.notInChannelJoin': '你不在「{channel}」頻道中。請先輸入 /join {channel}。',
     'log.bossUnleashes': '{name}釋放出{mechanic}！',
+    'log.mobChannels': '{name}正在引導{mechanic}。',
     'mechanic.warStomp': '戰爭踐踏',
     'mechanic.boneCarapace': '骸骨甲殼',
     'mechanic.bansheesWail': '女妖哀嚎',
@@ -1657,6 +1678,7 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'error.notInChannelJoin':
       '{channel} 채널에 있지 않습니다. 먼저 /join {channel}을(를) 입력하세요.',
     'log.bossUnleashes': '{name}이(가) {mechanic}을(를) 시전합니다!',
+    'log.mobChannels': '{name}이(가) {mechanic}을(를) 시전합니다.',
     'mechanic.warStomp': '전투 발구르기',
     'mechanic.boneCarapace': '뼈 갑각',
     'mechanic.bansheesWail': '밴시의 통곡',
@@ -1800,6 +1822,7 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'error.notInChannelJoin':
       '「{channel}」チャンネルに参加していません。まず/join {channel}と入力してください。',
     'log.bossUnleashes': '{name}が「{mechanic}」を発動！',
+    'log.mobChannels': '{name}が「{mechanic}」を唱えている。',
     'mechanic.warStomp': '大震脚',
     'mechanic.boneCarapace': '骨甲殻',
     'mechanic.bansheesWail': 'バンシーの号哭',
@@ -1941,6 +1964,7 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'error.notInChannel': 'Você não está no canal {channel}.',
     'error.notInChannelJoin': 'Você não está no canal {channel}. Digite /join {channel} primeiro.',
     'log.bossUnleashes': '{name} desencadeia {mechanic}!',
+    'log.mobChannels': '{name} canaliza {mechanic}.',
     'mechanic.warStomp': 'Pisão de Guerra',
     'mechanic.boneCarapace': 'Carapaça de Ossos',
     'mechanic.bansheesWail': 'Lamento da Banshee',
@@ -2084,6 +2108,7 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'error.notInChannelJoin':
       'Вы не состоите в канале «{channel}». Сначала введите /join {channel}.',
     'log.bossUnleashes': '{name} обрушивает {mechanic}!',
+    'log.mobChannels': '{name} направляет {mechanic}.',
     'mechanic.warStomp': 'Боевой топот',
     'mechanic.boneCarapace': 'Костяной панцирь',
     'mechanic.bansheesWail': 'Вопль банши',
@@ -2702,7 +2727,10 @@ const PET_DICT: Record<SupportedLanguage, Record<PetSimMessageKey, string>> = {
 };
 
 export const DICT: Record<SupportedLanguage, Record<SimMessageKey, string>> = Object.fromEntries(
-  supportedLanguages.map((lang) => [lang, { ...BASE_DICT[lang], ...PET_DICT[lang] }]),
+  supportedLanguages.map((lang) => [
+    lang,
+    { ...baseEnTable, ...BASE_DICT[lang], ...PET_DICT[lang] },
+  ]),
 ) as Record<SupportedLanguage, Record<SimMessageKey, string>>;
 
 function interpolate(template: string, params?: InterpolationValues): string {
@@ -2792,6 +2820,17 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   "Banshee's Wail": 'mechanic.bansheesWail',
   'Crushing Sweep': 'mechanic.crushingSweep',
   'Rallying Banner': 'mechanic.rallyingBanner',
+  'Final Bell': 'mechanic.finalBell',
+  'Blackwater Mark': 'mechanic.blackwaterMark',
+  'Tolling Bell': 'mechanic.tollingBell',
+  'Litany Mend': 'mechanic.litanyMend',
+  'Silt Ward': 'mechanic.siltWard',
+  'Silt Hide': 'mechanic.siltWard',
+  'Sump Stomp': 'mechanic.sumpStomp',
+  'Bell Shock': 'mechanic.bellShock',
+  'Egg-Sac Burst': 'mechanic.eggSacBurst',
+  'Rotwater Hex': 'aura.weakeningHex',
+  'Drowned Canticle': 'aura.drownedCanticle',
   // On-hit / DoT / debuff flavor auras applied to players (would otherwise leak raw English
   // in the buff/debuff frame and combat log). Data-driven from src/sim/content/zone*.ts.
   'Spider Venom': 'aura.spiderVenom',
@@ -4271,6 +4310,45 @@ const RULES: Rule[] = [
     build: () => t('sim.delve.bossChest'),
   },
   {
+    re: /^Sister Nhalia falls silent\. The Drowned Reliquary rises from the blackwater\. Approach it to begin the rite\.$/,
+    build: () => t('sim.delve.drownedLitanyReliquaryRise'),
+  },
+  {
+    re: /^The bell rope snaps taut\. Drowned Cantors reel from the shock\.$/,
+    build: () => t('sim.delve.bellRopeShock'),
+  },
+  {
+    re: /^The egg-sac bursts\. Blackwater slops across the baptistry rim\.$/,
+    build: () => t('sim.delve.eggSacBurst'),
+  },
+  {
+    re: /^The baptistry falls quiet\. Widow egg-sacs swell along the rim\.$/,
+    build: () => t('sim.delve.baptistryEggs'),
+  },
+  {
+    re: /^Something stirs in the black baptistry water\.$/,
+    build: () => t('sim.delve.baptistryWave'),
+  },
+  {
+    re: /^The shrines fall dark\. Repeat the sequence\.$/,
+    build: () => t('sim.delve.riteSequenceReady'),
+  },
+  {
+    re: /^The shrines replay the rite\. Wait\.$/,
+    build: () => t('sim.delve.riteSequencePlaying'),
+  },
+  { re: /^A soft chime answers your touch\.$/, build: () => t('sim.delve.riteCorrect') },
+  {
+    re: /^A harsh bell crack\. Black water splashes at your feet\.$/,
+    build: () => t('sim.delve.riteWrong'),
+  },
+  { re: /^The Drowned Reliquary opens\.$/, build: () => t('sim.delve.riteReliquaryOpen') },
+  {
+    re: /^Complete the shrine rite to open the reliquary\.$/,
+    build: () => t('sim.delve.riteReliquaryLocked'),
+  },
+  { re: /^The reliquary is empty\.$/, build: () => t('sim.delve.riteReliquaryEmpty') },
+  {
     re: /^A stairway to the surface opens\. Press F at the stairs to leave\.$/,
     build: () => t('sim.delve.surfaceStairs'),
   },
@@ -4347,6 +4425,15 @@ const RULES: Rule[] = [
     build: (m) => t('sim.delve.raiseDead', { name: locMob(m[1]) }),
   },
   {
+    re: /^(.+) marks (.+) with Blackwater!$/,
+    build: (m) => t('sim.delve.nhaliaBlackwaterMark', { name: locMob(m[1]), player: m[2] }),
+  },
+  { re: /^Cantors, hold the note!$/, build: () => t('sim.delve.nhaliaCantorShield') },
+  {
+    re: /^(.+) tolls the bells!$/,
+    build: (m) => tSim('log.nhaliaTollsBells', { name: locMob(m[1]) }),
+  },
+  {
     re: /^You need (.+) Delve Marks to upgrade (.+)\.$/,
     build: (m) => t('sim.delve.companionMarksRequired', { marks: m[1], name: locMob(m[2]) }),
   },
@@ -4413,6 +4500,10 @@ const RULES: Rule[] = [
   },
   // Boss/mob mechanic broadcast. Broad (two open captures), so it MUST stay last -
   // after every more-specific "{X} {verb}!" rule above (awakens, enraged, calls for aid).
+  {
+    re: /^(.+) channels (.+)\.$/,
+    build: (m) => tSim('log.mobChannels', { name: locMob(m[1]), mechanic: locBossMechanic(m[2]) }),
+  },
   {
     re: /^(.+) unleashes (.+)!$/,
     build: (m) =>

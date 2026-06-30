@@ -2271,6 +2271,17 @@ export interface DrownedLitanyBlackwaterMark {
   tickTimer: number;
 }
 
+/** A single Tolling Bell projectile entity in flight (entity id + expiry timer). */
+export interface TollingBellEntity {
+  /** Entity id of the mob entity representing this bell. */
+  entityId: number;
+  /** Seconds until the bell expires (travels out of bounds). */
+  remaining: number;
+  /** Velocity direction: unit vector (dx, dz). */
+  vx: number;
+  vz: number;
+}
+
 /** Per-run Sister Nhalia encounter state (DelveRun.nhaliaBoss). */
 export interface DrownedLitanyBossState {
   markTimer: number;
@@ -2279,6 +2290,10 @@ export interface DrownedLitanyBossState {
   /** Entity ids from the active Cantor phase; shield drops when all are dead. */
   cantorShieldAdds: number[];
   finalBellFired: boolean;
+  /** Countdown until the next Tolling Bells volley (seconds). */
+  bellVolleyTimer: number;
+  /** Currently in-flight bell projectile entities. */
+  bells: TollingBellEntity[];
 }
 
 export type RiteShrineKind =

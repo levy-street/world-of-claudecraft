@@ -9,8 +9,11 @@ that stage is the handoff.
 | 0 | Entrance recolor (blue water portal) | DONE (uncommitted, see note) |
 | 1 | Room layouts + shallow/deep water tiers + jump-dodge | DONE (commit, see board) |
 | 2 | Render: shallow/deep visuals + marsh dead-tree/plank assets | DONE (commit, see board) |
-| 3 | Boss: Tolling Bells line projectiles + knockback | IN PROGRESS |
-| 4 | Verify pass: minimap-from-data, guard tests, tsc, i18n S3 | NOT STARTED |
+| 3 | Boss: Tolling Bells line projectiles + knockback | DONE (commit, see board) |
+| 4 | Verify pass: minimap-from-data, guard tests, tsc, i18n S3 | IN PROGRESS |
+
+Known follow-up: the Tolling Bell renders as a generic mob mesh (Stage 3 was sim-only);
+a custom rolling-bell visual + telegraph-lane decal is a nice-to-have render pass.
 
 Stage 0 note: `src/render/props.ts` already recolors the Drowned Litany entrance to a
 blue "water" palette (portal shader `uRim` uniform, `drownVeilMaterial` red->blue veil
