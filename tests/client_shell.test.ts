@@ -1218,14 +1218,17 @@ describe('client HTML shell', () => {
     expect(componentsCss).toContain(
       '.mkt-page {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;',
     );
-    // On mobile the Market takes the full available height (not the vendor's 58vh
-    // cap) so its tall stacked-filter header cannot squeeze the listing body flat,
-    // and #market-body keeps a min-height floor; the window itself stays
-    // overflow:hidden so #market-body remains the single scroll container.
+    // On mobile the whole Market window scrolls, so stacked filters and long
+    // Browse/Sell/Collect content remain reachable on short landscape screens.
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #market-window {\n    max-height: calc(100vh - 20px);\n    overflow: hidden;',
+      'body.mobile-touch #market-window {\n    height: calc(100vh - 20px);\n    max-height: calc(100vh - 20px);\n    overflow-x: hidden;\n    overflow-y: auto;',
     );
-    expect(hudMobileCss).toContain('body.mobile-touch #market-body {\n    min-height: 96px;');
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #market-body {\n    flex: 0 0 auto;\n    min-height: auto;\n    overflow: visible;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch .mkt-select.open .mkt-select-menu {\n    position: static;',
+    );
     expect(marketWindowTs).toContain('buildMarketView'); // pagination + filtering delegated to the core
     expect(marketWindowTs).toContain('this.browsePage');
     expect(marketWindowTs).toContain('data-market-page="prev"');

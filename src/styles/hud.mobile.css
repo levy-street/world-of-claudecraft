@@ -884,25 +884,44 @@
   body.mobile-touch #vendor-window {
     max-height: calc(58vh - 20px);
   }
-  /* The Market carries a tab strip plus the filter selects, which stack to a tall
-     single column on mobile; the vendor's 58vh cap would leave the flex:1 listing
-     body (#market-body) zero height, so it collapsed and could not be scrolled.
-     Give the window the full available height (like #trade-window) so the listing
-     body keeps a usable, touch-scrollable height under the header. */
+  /* The Market carries a tab strip plus filter selects above its tab content. On
+     short landscape phones that header can consume most of the frame, so the
+     whole market window becomes the mobile scroll container. Desktop keeps the
+     nested #market-body scroller defined in components.css. */
   body.mobile-touch #market-window {
+    height: calc(100vh - 20px);
     max-height: calc(100vh - 20px);
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
   }
-  /* Floor the listing body so it keeps a usable, touch-scrollable height even when
-     the subtype filter adds a third stacked row on a short landscape screen. (On a
-     very short viewport the window's overflow:hidden can still clip below this floor,
-     but the body scrolls internally, so it never collapses to the old zero height.) */
+  @supports (height: 100dvh) {
+    body.mobile-touch #market-window {
+      height: calc(100dvh - 20px);
+      max-height: calc(100dvh - 20px);
+    }
+  }
   body.mobile-touch #market-body {
-    min-height: 96px;
+    flex: 0 0 auto;
+    min-height: auto;
+    overflow: visible;
   }
   body.mobile-touch .mkt-filters,
   body.mobile-touch .mkt-filters.has-subtype {
     grid-template-columns: 1fr;
+  }
+  body.mobile-touch .mkt-select.open .mkt-select-menu {
+    position: static;
+    width: auto;
+    margin-top: 4px;
+    max-height: min(236px, calc(100vh - 148px));
+  }
+  @supports (height: 100dvh) {
+    body.mobile-touch .mkt-select.open .mkt-select-menu {
+      max-height: min(236px, calc(100dvh - 148px));
+    }
   }
   body.mobile-touch .mkt-select-btn {
     min-height: 40px;
