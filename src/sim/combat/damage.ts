@@ -496,6 +496,9 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
   if (e.kind === 'player') {
     const meta = ctx.players.get(e.id);
     if (meta) meta.counters.deaths++;
+    // Hardcore: death is permanent. Mark the character deceased so releaseSpirit
+    // refuses to revive it; the playerDeath event carries the flag for the client.
+    if (meta?.hardcore) meta.deceased = true;
     e.autoAttack = false;
     e.queuedOnSwing = null;
     e.comboPoints = 0;

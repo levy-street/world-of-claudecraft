@@ -670,6 +670,11 @@ export interface PlayerMeta {
   fiestaRestore: { level: number; xp: number; talents: TalentAllocation } | null;
   loadouts: SavedLoadout[];
   activeLoadout: number; // index into loadouts, or -1 for none
+  // Hardcore mode (opt-in at creation, persisted). A hardcore character that dies
+  // is permanently deceased: it cannot release its spirit back to a graveyard. Both
+  // flags round-trip through CharacterState; absent => a normal (non-hardcore) char.
+  hardcore: boolean;
+  deceased: boolean;
   raidLockouts: Map<string, number>; // dungeon id -> epoch ms expiry
   // Transient presence status. Set by /afk and /dnd, cleared when the player
   // chats again. Session-only — never persisted, so it resets on login.
@@ -738,6 +743,11 @@ export interface CharacterState {
   arena2v2Rating?: number;
   arena2v2Wins?: number;
   arena2v2Losses?: number;
+  // Hardcore mode. Optional so pre-hardcore saves load cleanly (default: normal).
+  // `hardcore` is set at creation and never changes; `deceased` flips true on a
+  // hardcore character's death and locks it out of graveyard respawn.
+  hardcore?: boolean;
+  deceased?: boolean;
   // Talents & Specializations (JSONB; no schema migration). All optional so
   // characters saved before talents existed load cleanly (default: no points spent).
   talents?: TalentAllocation;
@@ -1169,6 +1179,8 @@ export class Sim {
       fiestaRestore: null,
       loadouts: [],
       activeLoadout: -1,
+      hardcore: savedState?.hardcore ?? false,
+      deceased: savedState?.deceased ?? false,
       raidLockouts: new Map(),
       away: null,
       marketFilter: '',
@@ -1380,6 +1392,9 @@ export class Sim {
       arena2v2Rating: meta.arena2v2Rating,
       arena2v2Wins: meta.arena2v2Wins,
       arena2v2Losses: meta.arena2v2Losses,
+      // Hardcore: persist only when set, so non-hardcore saves stay byte-identical.
+      hardcore: meta.hardcore || undefined,
+      deceased: meta.deceased || undefined,
       talents: cloneAllocation(restore ? restore.talents : meta.talents),
       loadouts: meta.loadouts.map((l) => ({
         name: l.name,

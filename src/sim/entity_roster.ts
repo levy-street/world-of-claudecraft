@@ -161,6 +161,9 @@ export function releasePlayerSpirit(ctx: SimContext, pid?: number): void {
   if (!r) return;
   const { meta, e: p } = r;
   if (!p.dead) return;
+  // Hardcore permadeath: a deceased hardcore character cannot return from the
+  // graveyard. Its spirit release is a no-op — the body stays dead.
+  if (meta.deceased) return;
   if (ctx.arenaMatches.has(p.id)) return;
   if (isDelvePos(p.pos.x)) {
     releaseSpiritInDelve(ctx, meta.entityId);
