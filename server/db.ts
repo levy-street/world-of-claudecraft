@@ -395,6 +395,59 @@ CREATE TABLE IF NOT EXISTS wallet_link_challenges (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS wallet_link_challenges_account ON wallet_link_challenges(account_id);
+-- $WOC burn payments (generic ledger): one row per settled on-chain payment,
+-- replay-guarded by tx_sig UNIQUE. Shared by every $WOC-priced feature
+-- (currently: voice-npc); reference ties a row back to the feature + quote.
+CREATE TABLE IF NOT EXISTS woc_payments (
+  id BIGSERIAL PRIMARY KEY,
+  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  tx_sig TEXT NOT NULL UNIQUE,
+  amount_base BIGINT NOT NULL,
+  burned_base BIGINT NOT NULL DEFAULT 0,
+  mint TEXT NOT NULL,
+  reference TEXT NOT NULL DEFAULT '',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS woc_payments_account ON woc_payments(account_id, created_at DESC);
+-- Short-lived, single-use $WOC payment quotes. A quote authorizes one paid
+-- action (currently: voice-npc unlock) at a fixed price; the client pays
+-- on-chain with the quote id as the tx memo, then redeems it. Stored
+-- server-side so the client cannot change what a payment buys; consuming the
+-- quote deletes the row.
+CREATE TABLE IF NOT EXISTS woc_quotes (
+  quote_id TEXT PRIMARY KEY,
+  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  kind TEXT NOT NULL,
+  payload JSONB NOT NULL DEFAULT '{}'::jsonb,
+  price_base BIGINT NOT NULL,
+  mint TEXT NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS woc_quotes_account ON woc_quotes(account_id);
+-- Voice-NPC unlock: one row per account, tracking the burn-to-clone pipeline
+-- from the recorded sample through ElevenLabs cloning + line synthesis. See
+-- docs/prd/woc/voice-npc.md. status lifecycle: pending_sample -> pending_clone
+-- -> cloning -> generating -> ready -> failed. npc_display_name and the cloned
+-- audio are player-submitted UGC (not localized, see src/sim/content/CLAUDE.md).
+-- applied_at marks when the one-time in-world NPC spawn was granted to the
+-- player's live character (see server/game.ts's checkVoiceNpcGrant, fired
+-- once on join): null until applied, so a 'ready' grant is spawned exactly
+-- once even across reconnects/restarts.
+CREATE TABLE IF NOT EXISTS voice_npc_grants (
+  id BIGSERIAL PRIMARY KEY,
+  account_id INT UNIQUE NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  status TEXT NOT NULL DEFAULT 'pending_sample',
+  npc_display_name TEXT NOT NULL DEFAULT '',
+  sample_path TEXT,
+  eleven_voice_id TEXT,
+  lines JSONB NOT NULL DEFAULT '{}'::jsonb,
+  consent_at TIMESTAMPTZ,
+  applied_at TIMESTAMPTZ,
+  error TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
 -- Shareable player cards (docs/prd/woc/player-card.md). One card per character;
 -- the PNG is composited client-side and stored here as bytes so any realm
 -- process (all share this database) can serve /p/<slug> and the OG image. slug
@@ -2166,4 +2219,97 @@ export async function pruneChatLogs(retentionDays: number): Promise<number> {
     [String(Math.floor(retentionDays))],
   );
   return res.rowCount ?? 0;
+}
+
+// ---------------------------------------------------------------------------
+// $WOC payments / quotes (generic ledger shared by every $WOC-priced feature).
+// BIGINT columns are read/written as decimal strings: $WOC base-unit amounts
+// can exceed Number.MAX_SAFE_INTEGER, so callers pass bigints and we bind
+// String(...).
+// ---------------------------------------------------------------------------
+
+export interface WocQuoteRow {
+  quote_id: string;
+  account_id: number;
+  kind: string;
+  payload: any;
+  price_base: string;
+  mint: string;
+  expires_at: string;
+}
+
+export async function createWocQuote(row: {
+  quoteId: string;
+  accountId: number;
+  kind: string;
+  payload: unknown;
+  priceBase: bigint;
+  mint: string;
+  ttlMinutes: number;
+}): Promise<void> {
+  await pool.query(
+    `INSERT INTO woc_quotes (quote_id, account_id, kind, payload, price_base, mint, expires_at)
+     VALUES ($1, $2, $3, $4, $5, $6, now() + ($7 || ' minutes')::interval)`,
+    [
+      row.quoteId,
+      row.accountId,
+      row.kind,
+      JSON.stringify(row.payload ?? {}),
+      String(row.priceBase),
+      row.mint,
+      String(row.ttlMinutes),
+    ],
+  );
+}
+
+// Read a quote non-destructively: returned when it belongs to the account and is
+// unexpired. The confirm flow verifies payment BEFORE deleting the quote so a
+// too-early/too-late confirm never strands an already-burned payment; the
+// woc_payments tx_sig UNIQUE is the real single-settlement guard, and the quote
+// is deleted (deleteWocQuote) only after a successful, recorded settlement.
+export async function getWocQuote(quoteId: string, accountId: number): Promise<WocQuoteRow | null> {
+  const res = await pool.query(
+    `SELECT quote_id, account_id, kind, payload, price_base, mint, expires_at
+     FROM woc_quotes WHERE quote_id = $1 AND account_id = $2 AND expires_at > now()`,
+    [quoteId, accountId],
+  );
+  return res.rows[0] ?? null;
+}
+
+export async function deleteWocQuote(quoteId: string): Promise<void> {
+  await pool.query('DELETE FROM woc_quotes WHERE quote_id = $1', [quoteId]);
+}
+
+export async function pruneWocQuotes(): Promise<void> {
+  await pool.query('DELETE FROM woc_quotes WHERE expires_at <= now()');
+}
+
+// Record a consumed on-chain payment. Returns null when the tx_sig was already
+// recorded (UNIQUE replay guard) so the caller rejects a double-spend.
+export async function recordWocPayment(row: {
+  accountId: number;
+  txSig: string;
+  amountBase: bigint;
+  burnedBase: bigint;
+  mint: string;
+  reference: string;
+}): Promise<{ id: number } | null> {
+  try {
+    const res = await pool.query(
+      `INSERT INTO woc_payments (account_id, tx_sig, amount_base, burned_base, mint, reference)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
+      [
+        row.accountId,
+        row.txSig,
+        String(row.amountBase),
+        String(row.burnedBase),
+        row.mint,
+        row.reference,
+      ],
+    );
+    return { id: Number(res.rows[0].id) };
+  } catch (err) {
+    if (isUniqueViolation(err)) return null;
+    throw err;
+  }
 }

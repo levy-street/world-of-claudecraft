@@ -1424,6 +1424,13 @@ export interface Entity {
   // npc
   questIds: string[];
   vendorItems: string[];
+  // Runtime-only overrides for a per-player dynamic voice NPC (see
+  // src/sim/voice_npc_spawn.ts). Both unset for every ordinary NPC: the
+  // player-chosen display name and the base URL of that player's cloned-voice
+  // audio clips never live on the static NpcDef (UGC, not i18n content; see
+  // src/sim/content/CLAUDE.md). Cosmetic/presentation only, no gameplay effect.
+  npcNameOverride?: string;
+  npcVoiceClipBaseUrl?: string;
   // object (ground interactable)
   objectItemId: string | null;
   dungeonId: string | null; // set on dungeon door/exit portals

@@ -139,6 +139,17 @@ import { handleSitePresenceHeartbeat } from './site_presence';
 import { cacheControlFor, etagFor, isNotModified } from './static_cache';
 import { verifyTurnstile } from './turnstile';
 import {
+  handleVoiceNpcConfirm,
+  handleVoiceNpcInfo,
+  handleVoiceNpcQuote,
+  handleVoiceNpcSample,
+  handleVoiceNpcStatus,
+} from './voice_npc';
+import {
+  buildVoiceNpcKeeper,
+  keeperConfigured as voiceNpcKeeperConfigured,
+} from './voice_npc_keeper';
+import {
   handleWalletChallenge,
   handleWalletGet,
   handleWalletLink,
@@ -151,6 +162,7 @@ import {
   webLoginEnforced,
 } from './web_login_guard';
 import { handleWocBalance, parseWocBalanceQuery } from './woc_balance';
+import { VOICE_NPC_ENABLED } from './woc_config';
 import { bufferHandshakeMessages } from './ws_buffer';
 
 const PORT = Number(process.env.PORT ?? 8787);
@@ -216,6 +228,8 @@ function initialCharacterState(
 // most once per LEADERBOARD_TTL_MS, plus the boot warm-up below.
 // ---------------------------------------------------------------------------
 const LEADERBOARD_TTL_MS = 30_000;
+// How often the voice-NPC keeper polls for pending_clone/generating grants.
+const VOICE_NPC_KEEPER_INTERVAL_MS = 15_000;
 // Cache the full exposed depth (LEADERBOARD_MAX) once per scope; the REST handler
 // pages through it as an in-memory slice, so no extra query per page click.
 const LEADERBOARD_SIZE = LEADERBOARD_MAX;
@@ -1316,6 +1330,32 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       if (accountId === null) return;
       return handleWalletGet(req, res, accountId);
     }
+    // "Burn $WOC for an NPC with your own voice" (docs/prd/woc/voice-npc.md):
+    // sample upload + quote/confirm/status over the $WOC burn flow. The actual
+    // ElevenLabs clone + line synthesis happen out-of-band in voice_npc_keeper.ts.
+    if (req.method === 'GET' && url === '/api/voice-npc/info') {
+      return handleVoiceNpcInfo(res);
+    }
+    if (req.method === 'POST' && url === '/api/voice-npc/sample') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleVoiceNpcSample(req, res, accountId);
+    }
+    if (req.method === 'POST' && url === '/api/voice-npc/quote') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleVoiceNpcQuote(req, res, accountId);
+    }
+    if (req.method === 'POST' && url === '/api/voice-npc/confirm') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleVoiceNpcConfirm(req, res, accountId);
+    }
+    if (req.method === 'GET' && url === '/api/voice-npc/status') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleVoiceNpcStatus(req, res, accountId);
+    }
     // Discord integration: OAuth login/link, link status, unlink. `start` returns
     // the authorize URL (the browser then navigates to Discord); `callback` is the
     // discord.com -> us redirect (no auth/Origin, so it is NOT gated by the
@@ -1492,6 +1532,17 @@ async function main(): Promise<void> {
   };
   warmLeaderboards();
   setInterval(warmLeaderboards, LEADERBOARD_TTL_MS).unref();
+  // Voice-NPC clone/synthesis keeper: off entirely unless the feature flag is
+  // on AND ElevenLabs is actually configured (VOICE_NPC_ENABLED alone would
+  // otherwise poll forever against a missing API key).
+  if (VOICE_NPC_ENABLED && voiceNpcKeeperConfigured()) {
+    const voiceNpcKeeper = buildVoiceNpcKeeper();
+    setInterval(() => {
+      void voiceNpcKeeper
+        .runCycle()
+        .catch((err) => console.error('voice npc keeper cycle failed:', err));
+    }, VOICE_NPC_KEEPER_INTERVAL_MS).unref();
+  }
   console.log('database ready');
 
   const server = http.createServer((req, res) => {

@@ -68,6 +68,7 @@ import type { Presence, PresenceStatus, SocialActor, SocialTransport } from './s
 import { SocialService } from './social';
 import { PgSocialDb } from './social_db';
 import { TickProfiler } from './tick_profiler';
+import { claimReadyGrantForApply } from './voice_npc_db';
 import { holderInfoForPubkey } from './woc_balance';
 
 const WORLD_SEED = 20061;
@@ -1436,7 +1437,23 @@ export class GameServer {
     void this.refreshDiscordFlair(session).catch((err) =>
       console.error('discord flair refresh failed:', err),
     );
+    // One-time voice-NPC grant: if this account's voice clone pipeline
+    // finished while the player was offline, spawn their NPC now. Best-effort
+    // like the flair refreshes above (a lookup failure must never block join);
+    // claimReadyGrantForApply is the idempotency guard (atomic claim).
+    void this.checkVoiceNpcGrant(session).catch((err) =>
+      console.error('voice npc grant check failed:', err),
+    );
     return session;
+  }
+
+  private async checkVoiceNpcGrant(session: ClientSession): Promise<void> {
+    const claimed = await claimReadyGrantForApply(session.accountId);
+    if (!claimed) return;
+    this.sim.grantVoiceNpc(session.pid, {
+      displayName: claimed.npc_display_name,
+      clipBaseUrl: `/audio/voice_npc/${claimed.account_id}`,
+    });
   }
 
   // Load the player's block list, send their friends/ignore/guild panel, and
@@ -2571,6 +2588,14 @@ export class GameServer {
         if (process.env.ALLOW_DEV_COMMANDS === '1' && typeof msg.item === 'string') {
           const count = typeof msg.count === 'number' ? msg.count : 1;
           sim.addItem(msg.item, Math.max(1, Math.min(20, count | 0)), pid);
+        }
+        break;
+      }
+      case 'grant_voice_npc': {
+        // Server-initiated only (fired from checkVoiceNpcGrant on join, never
+        // client-sent), so the only validation needed is the type guard.
+        if (typeof msg.displayName === 'string' && typeof msg.clipBaseUrl === 'string') {
+          sim.grantVoiceNpc(pid, { displayName: msg.displayName, clipBaseUrl: msg.clipBaseUrl });
         }
         break;
       }

@@ -188,6 +188,7 @@ import { persistedResource } from './serialize_resource';
 import { createSimContext, type SimContext, type SimContextHost } from './sim_context';
 import * as chatMod from './social/chat';
 import * as tradeMod from './social/trade';
+import { spawnVoiceNpcEcho } from './voice_npc_spawn';
 
 // Re-export so server/db.ts's `import type { MarketSave } from '../src/sim/sim'`
 // stays valid now that the type lives in market.ts.
@@ -4170,6 +4171,14 @@ export class Sim {
     let n = 0;
     for (const s of r.meta.inventory) if (s.itemId === itemId) n += s.count;
     return n;
+  }
+
+  // Spawns the caller's voice-echo NPC (docs/prd/woc/voice-npc.md), once their
+  // server-side grant is ready. Thin delegate into voice_npc_spawn.ts, mirroring
+  // how onBossDeath delegates into encounters/nythraxis.ts. The caller
+  // (server/game.ts, fired once per character on join) owns idempotency.
+  grantVoiceNpc(pid: number, grant: { displayName: string; clipBaseUrl: string }): void {
+    spawnVoiceNpcEcho(this.ctx, pid, grant);
   }
 
   addItem(itemId: string, count: number, pid?: number): void {

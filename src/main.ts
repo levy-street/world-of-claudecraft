@@ -161,6 +161,7 @@ import {
 } from './ui/two_factor_setup';
 import { UiEffectsApplier } from './ui/ui_effects_applier';
 import { hydrateIcons } from './ui/ui_icons';
+import { VoiceNpcPanel } from './ui/voice_npc_panel';
 import {
   resolveWocBalanceUpdate,
   setWalletDisplayAvailable,
@@ -3777,6 +3778,12 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
   });
   setReferralProvider(() => api.referralStats());
   setStandingProvider(() => api.characterStanding(c.id));
+  // Voice-NPC draft scaffold (docs/prd/woc/voice-npc.md): a minimal, explicitly
+  // WIP launcher button for the whole burn/record/clone flow. Mounted for the
+  // online session only (the feature needs a server account + linked wallet);
+  // torn down on disconnect alongside the card providers below.
+  const voiceNpcPanel = new VoiceNpcPanel({ token: api.token!, base: api.base });
+  voiceNpcPanel.mount();
   // One place to drop the session's card wiring, so the entry-timeout and the
   // disconnect paths can't drift (a lingering provider would hold a stale
   // character closure after we leave the world).
@@ -3784,6 +3791,7 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
     setCardUploader(null);
     setReferralProvider(null);
     setStandingProvider(null);
+    voiceNpcPanel.unmount();
   };
   // wait for hello + first snapshot so the world starts populated
   const waitStart = Date.now();

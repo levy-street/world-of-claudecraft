@@ -74,3 +74,10 @@ discord_bot_info.txt
 
 # bot build output
 dist-bot/
+
+# Voice NPC (docs/prd/woc/voice-npc.md): server-local, never-public voice
+# samples, and the per-account synthesized clip cache. Neither is build/source
+# output; both are runtime data a deployment regenerates/re-uploads, and the
+# raw samples must never be committed (player-submitted audio).
+data/voice_npc_samples/
+public/audio/voice_npc/

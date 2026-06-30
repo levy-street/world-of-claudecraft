@@ -875,6 +875,32 @@ export const vi_VN: EnTranslations = {
           "hint": "Nhờ cộng đồng giúp đỡ"
         }
       }
+    },
+    "voiceNpc": {
+      "title": "Voice NPC (WIP)",
+      "intro": "Burn $WOC to clone your voice into a small in-game NPC.",
+      "priceLabel": "Price: {price} $WOC",
+      "disabled": "Voice NPC unlocking is not available yet.",
+      "displayNameLabel": "NPC display name",
+      "displayNamePlaceholder": "What should your echo be called?",
+      "consentLabel": "I consent to my recorded voice being cloned by a third-party AI voice service.",
+      "recordStart": "Record sample",
+      "recordStop": "Stop recording",
+      "recordingHint": "Recording... speak naturally for up to 30 seconds.",
+      "micError": "Could not access your microphone.",
+      "uploadError": "Could not upload the voice sample.",
+      "needConsent": "You must consent before recording or uploading a sample.",
+      "needWallet": "Connect a Solana wallet first.",
+      "needName": "Enter a display name for your NPC.",
+      "quoteError": "Could not get a price quote.",
+      "burnNotWired": "On-chain burn signing is not wired up yet in this draft build.",
+      "confirmError": "Could not confirm the payment.",
+      "statusPendingSample": "Sample recorded. Ready to quote and burn $WOC.",
+      "statusPendingClone": "Payment confirmed. Waiting for voice cloning to start.",
+      "statusCloning": "Cloning your voice...",
+      "statusGenerating": "Generating dialogue lines...",
+      "statusReady": "Your voice NPC is ready!",
+      "statusFailed": "Something went wrong: {error}"
     }
   },
   "guide": {
@@ -5642,6 +5668,11 @@ export const vi_VN: EnTranslations = {
         "title": "Người Giữ Thánh Tích",
         "greeting": "Hầm thánh tích bên dưới lại dịch chuyển lần nữa."
       },
+      "voice_echo_npc": {
+        "name": "Echo",
+        "title": "A Voice Remembered",
+        "greeting": "A voice from beyond the bonfire... yes, I remember sounding like that, once."
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Người Canh Thủy Triều",
@@ -6398,6 +6429,16 @@ export const vi_VN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Đã hạ Mogger"
+          }
+        }
+      },
+      "q_echo_of_you": {
+        "title": "Echo of You",
+        "text": "Something of mine was lost nearby. Would you go and find it for me?",
+        "completion": "You found it. Thank you, truly, for hearing me out.",
+        "objectives": {
+          "0": {
+            "label": "Speak with Echo again"
           }
         }
       },
