@@ -274,11 +274,16 @@ export const tr_TR: EnTranslations = {
       "tabsLabel": "Yüksek skor tabloları",
       "tabPlayers": "Oyuncular",
       "tabGuilds": "Loncalar",
+      "tabDevs": "Developers",
       "guildName": "Lonca",
       "members": "Üyeler",
       "topLevel": "En İyi",
       "guildXp": "Toplam XP",
-      "guildEmpty": "Henüz sıralamada lonca yok."
+      "guildEmpty": "Henüz sıralamada lonca yok.",
+      "devName": "Contributor",
+      "devTierCol": "Badge",
+      "commits": "Commits",
+      "devEmpty": "No ranked contributors yet."
     },
     "raidLockout": {
       "title": "Akın Kilitleri",

@@ -28,7 +28,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.tiers.tinkerer",
     "hudChrome.devBadge.tiers.worldwright",
     "hudChrome.devBadge.title",
-    "hudChrome.devBadge.unlink"
+    "hudChrome.devBadge.unlink",
+    "hudChrome.leaderboard.commits",
+    "hudChrome.leaderboard.devEmpty",
+    "hudChrome.leaderboard.devName",
+    "hudChrome.leaderboard.devTierCol",
+    "hudChrome.leaderboard.tabDevs"
   ],
   "es_ES": [
     "hudChrome.devBadge.badgeTitle",
@@ -49,7 +54,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.tiers.tinkerer",
     "hudChrome.devBadge.tiers.worldwright",
     "hudChrome.devBadge.title",
-    "hudChrome.devBadge.unlink"
+    "hudChrome.devBadge.unlink",
+    "hudChrome.leaderboard.commits",
+    "hudChrome.leaderboard.devEmpty",
+    "hudChrome.leaderboard.devName",
+    "hudChrome.leaderboard.devTierCol",
+    "hudChrome.leaderboard.tabDevs"
   ],
   "fr_FR": [
     "hudChrome.devBadge.badgeTitle",
@@ -70,7 +80,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.tiers.tinkerer",
     "hudChrome.devBadge.tiers.worldwright",
     "hudChrome.devBadge.title",
-    "hudChrome.devBadge.unlink"
+    "hudChrome.devBadge.unlink",
+    "hudChrome.leaderboard.commits",
+    "hudChrome.leaderboard.devEmpty",
+    "hudChrome.leaderboard.devName",
+    "hudChrome.leaderboard.devTierCol",
+    "hudChrome.leaderboard.tabDevs"
   ],
   "fr_CA": [
     "hudChrome.devBadge.badgeTitle",
@@ -91,7 +106,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.tiers.tinkerer",
     "hudChrome.devBadge.tiers.worldwright",
     "hudChrome.devBadge.title",
-    "hudChrome.devBadge.unlink"
+    "hudChrome.devBadge.unlink",
+    "hudChrome.leaderboard.commits",
+    "hudChrome.leaderboard.devEmpty",
+    "hudChrome.leaderboard.devName",
+    "hudChrome.leaderboard.devTierCol",
+    "hudChrome.leaderboard.tabDevs"
   ],
   "en_CA": [],
   "it_IT": [
@@ -113,7 +133,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.tiers.tinkerer",
     "hudChrome.devBadge.tiers.worldwright",
     "hudChrome.devBadge.title",
-    "hudChrome.devBadge.unlink"
+    "hudChrome.devBadge.unlink",
+    "hudChrome.leaderboard.commits",
+    "hudChrome.leaderboard.devEmpty",
+    "hudChrome.leaderboard.devName",
+    "hudChrome.leaderboard.devTierCol",
+    "hudChrome.leaderboard.tabDevs"
   ],
   "de_DE": [
     "hudChrome.devBadge.badgeTitle",
@@ -134,7 +159,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.tiers.tinkerer",
     "hudChrome.devBadge.tiers.worldwright",
     "hudChrome.devBadge.title",
-    "hudChrome.devBadge.unlink"
+    "hudChrome.devBadge.unlink",
+    "hudChrome.leaderboard.commits",
+    "hudChrome.leaderboard.devEmpty",
+    "hudChrome.leaderboard.devName",
+    "hudChrome.leaderboard.devTierCol",
+    "hudChrome.leaderboard.tabDevs"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -159,7 +189,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.tiers.tinkerer",
     "hudChrome.devBadge.tiers.worldwright",
     "hudChrome.devBadge.title",
-    "hudChrome.devBadge.unlink"
+    "hudChrome.devBadge.unlink",
+    "hudChrome.leaderboard.commits",
+    "hudChrome.leaderboard.devEmpty",
+    "hudChrome.leaderboard.devName",
+    "hudChrome.leaderboard.devTierCol",
+    "hudChrome.leaderboard.tabDevs"
   ],
   "ru_RU": [],
   "nl_NL": [
@@ -181,7 +216,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.tiers.tinkerer",
     "hudChrome.devBadge.tiers.worldwright",
     "hudChrome.devBadge.title",
-    "hudChrome.devBadge.unlink"
+    "hudChrome.devBadge.unlink",
+    "hudChrome.leaderboard.commits",
+    "hudChrome.leaderboard.devEmpty",
+    "hudChrome.leaderboard.devName",
+    "hudChrome.leaderboard.devTierCol",
+    "hudChrome.leaderboard.tabDevs"
   ],
   "pl_PL": [
     "hudChrome.devBadge.badgeTitle",
@@ -202,7 +242,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.tiers.tinkerer",
     "hudChrome.devBadge.tiers.worldwright",
     "hudChrome.devBadge.title",
-    "hudChrome.devBadge.unlink"
+    "hudChrome.devBadge.unlink",
+    "hudChrome.leaderboard.commits",
+    "hudChrome.leaderboard.devEmpty",
+    "hudChrome.leaderboard.devName",
+    "hudChrome.leaderboard.devTierCol",
+    "hudChrome.leaderboard.tabDevs"
   ],
   "id_ID": [
     "hudChrome.devBadge.badgeTitle",
@@ -223,7 +268,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.tiers.tinkerer",
     "hudChrome.devBadge.tiers.worldwright",
     "hudChrome.devBadge.title",
-    "hudChrome.devBadge.unlink"
+    "hudChrome.devBadge.unlink",
+    "hudChrome.leaderboard.commits",
+    "hudChrome.leaderboard.devEmpty",
+    "hudChrome.leaderboard.devName",
+    "hudChrome.leaderboard.devTierCol",
+    "hudChrome.leaderboard.tabDevs"
   ],
   "tr_TR": [
     "hudChrome.devBadge.badgeTitle",
@@ -244,7 +294,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.tiers.tinkerer",
     "hudChrome.devBadge.tiers.worldwright",
     "hudChrome.devBadge.title",
-    "hudChrome.devBadge.unlink"
+    "hudChrome.devBadge.unlink",
+    "hudChrome.leaderboard.commits",
+    "hudChrome.leaderboard.devEmpty",
+    "hudChrome.leaderboard.devName",
+    "hudChrome.leaderboard.devTierCol",
+    "hudChrome.leaderboard.tabDevs"
   ],
   "sv_SE": [
     "hudChrome.devBadge.badgeTitle",
@@ -265,7 +320,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.tiers.tinkerer",
     "hudChrome.devBadge.tiers.worldwright",
     "hudChrome.devBadge.title",
-    "hudChrome.devBadge.unlink"
+    "hudChrome.devBadge.unlink",
+    "hudChrome.leaderboard.commits",
+    "hudChrome.leaderboard.devEmpty",
+    "hudChrome.leaderboard.devName",
+    "hudChrome.leaderboard.devTierCol",
+    "hudChrome.leaderboard.tabDevs"
   ],
   "vi_VN": [
     "hudChrome.devBadge.badgeTitle",
@@ -286,7 +346,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.tiers.tinkerer",
     "hudChrome.devBadge.tiers.worldwright",
     "hudChrome.devBadge.title",
-    "hudChrome.devBadge.unlink"
+    "hudChrome.devBadge.unlink",
+    "hudChrome.leaderboard.commits",
+    "hudChrome.leaderboard.devEmpty",
+    "hudChrome.leaderboard.devName",
+    "hudChrome.leaderboard.devTierCol",
+    "hudChrome.leaderboard.tabDevs"
   ],
   "da_DK": [
     "hudChrome.devBadge.badgeTitle",
@@ -307,6 +372,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.tiers.tinkerer",
     "hudChrome.devBadge.tiers.worldwright",
     "hudChrome.devBadge.title",
-    "hudChrome.devBadge.unlink"
+    "hudChrome.devBadge.unlink",
+    "hudChrome.leaderboard.commits",
+    "hudChrome.leaderboard.devEmpty",
+    "hudChrome.leaderboard.devName",
+    "hudChrome.leaderboard.devTierCol",
+    "hudChrome.leaderboard.tabDevs"
   ]
 };

@@ -274,11 +274,16 @@ export const en: EnTranslations = {
       "tabsLabel": "High-score boards",
       "tabPlayers": "Players",
       "tabGuilds": "Guilds",
+      "tabDevs": "Developers",
       "guildName": "Guild",
       "members": "Members",
       "topLevel": "Top",
       "guildXp": "Total XP",
-      "guildEmpty": "No ranked guilds yet."
+      "guildEmpty": "No ranked guilds yet.",
+      "devName": "Contributor",
+      "devTierCol": "Badge",
+      "commits": "Commits",
+      "devEmpty": "No ranked contributors yet."
     },
     "raidLockout": {
       "title": "Raid Lockouts",

@@ -274,11 +274,16 @@ export const vi_VN: EnTranslations = {
       "tabsLabel": "Bảng điểm cao",
       "tabPlayers": "Người Chơi",
       "tabGuilds": "Bang Hội",
+      "tabDevs": "Developers",
       "guildName": "Bang Hội",
       "members": "Thành Viên",
       "topLevel": "Hàng Đầu",
       "guildXp": "Tổng XP",
-      "guildEmpty": "Chưa có bang hội nào được xếp hạng."
+      "guildEmpty": "Chưa có bang hội nào được xếp hạng.",
+      "devName": "Contributor",
+      "devTierCol": "Badge",
+      "commits": "Commits",
+      "devEmpty": "No ranked contributors yet."
     },
     "raidLockout": {
       "title": "Khóa Raid",

@@ -274,11 +274,16 @@ export const sv_SE: EnTranslations = {
       "tabsLabel": "Topplistor",
       "tabPlayers": "Spelare",
       "tabGuilds": "Gillen",
+      "tabDevs": "Developers",
       "guildName": "Gille",
       "members": "Medlemmar",
       "topLevel": "Topp",
       "guildXp": "Total XP",
-      "guildEmpty": "Inga rankade gillen ännu."
+      "guildEmpty": "Inga rankade gillen ännu.",
+      "devName": "Contributor",
+      "devTierCol": "Badge",
+      "commits": "Commits",
+      "devEmpty": "No ranked contributors yet."
     },
     "raidLockout": {
       "title": "Raidlåsningar",

@@ -274,11 +274,16 @@ export const id_ID: EnTranslations = {
       "tabsLabel": "Papan skor tertinggi",
       "tabPlayers": "Pemain",
       "tabGuilds": "Guild",
+      "tabDevs": "Developers",
       "guildName": "Guild",
       "members": "Anggota",
       "topLevel": "Teratas",
       "guildXp": "Total XP",
-      "guildEmpty": "Belum ada guild berperingkat."
+      "guildEmpty": "Belum ada guild berperingkat.",
+      "devName": "Contributor",
+      "devTierCol": "Badge",
+      "commits": "Commits",
+      "devEmpty": "No ranked contributors yet."
     },
     "raidLockout": {
       "title": "Penguncian Raid",

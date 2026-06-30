@@ -206,12 +206,19 @@ export const hudChromeStrings = {
     tabsLabel: 'High-score boards',
     tabPlayers: 'Players',
     tabGuilds: 'Guilds',
+    tabDevs: 'Developers',
     // Guild-board column headers + the guild-tab empty state.
     guildName: 'Guild',
     members: 'Members',
     topLevel: 'Top',
     guildXp: 'Total XP',
     guildEmpty: 'No ranked guilds yet.',
+    // Developer-board column headers + the dev-tab empty state. Contributors are
+    // ranked by how many commits they have landed in the open-source repo.
+    devName: 'Contributor',
+    devTierCol: 'Badge',
+    commits: 'Commits',
+    devEmpty: 'No ranked contributors yet.',
   },
   // Raid-lockout badge on the minimap rim + its hover/tap panel: the title, the
   // accessible label, the "all ready" line, and the unlock-countdown templates

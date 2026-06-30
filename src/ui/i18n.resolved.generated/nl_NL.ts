@@ -274,11 +274,16 @@ export const nl_NL: EnTranslations = {
       "tabsLabel": "Topscorelijsten",
       "tabPlayers": "Spelers",
       "tabGuilds": "Gildes",
+      "tabDevs": "Developers",
       "guildName": "Gilde",
       "members": "Leden",
       "topLevel": "Top",
       "guildXp": "Totaal XP",
-      "guildEmpty": "Nog geen gerangschikte gildes."
+      "guildEmpty": "Nog geen gerangschikte gildes.",
+      "devName": "Contributor",
+      "devTierCol": "Badge",
+      "commits": "Commits",
+      "devEmpty": "No ranked contributors yet."
     },
     "raidLockout": {
       "title": "Raidvergrendelingen",

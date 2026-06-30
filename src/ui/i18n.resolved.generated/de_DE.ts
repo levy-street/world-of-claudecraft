@@ -274,11 +274,16 @@ export const de_DE: EnTranslations = {
       "tabsLabel": "Bestenlisten",
       "tabPlayers": "Spieler",
       "tabGuilds": "Gilden",
+      "tabDevs": "Developers",
       "guildName": "Gilde",
       "members": "Mitglieder",
       "topLevel": "Top",
       "guildXp": "Gesamt-XP",
-      "guildEmpty": "Noch keine platzierten Gilden."
+      "guildEmpty": "Noch keine platzierten Gilden.",
+      "devName": "Contributor",
+      "devTierCol": "Badge",
+      "commits": "Commits",
+      "devEmpty": "No ranked contributors yet."
     },
     "raidLockout": {
       "title": "Schlachtzug-Sperren",

@@ -274,11 +274,16 @@ export const ko_KR: EnTranslations = {
       "tabsLabel": "최고 점수 순위표",
       "tabPlayers": "플레이어",
       "tabGuilds": "길드",
+      "tabDevs": "개발자",
       "guildName": "길드",
       "members": "인원",
       "topLevel": "최고",
       "guildXp": "누적 경험치",
-      "guildEmpty": "아직 순위에 오른 길드가 없습니다."
+      "guildEmpty": "아직 순위에 오른 길드가 없습니다.",
+      "devName": "기여자",
+      "devTierCol": "배지",
+      "commits": "커밋 수",
+      "devEmpty": "아직 순위에 오른 기여자가 없습니다."
     },
     "raidLockout": {
       "title": "공격대 잠금",

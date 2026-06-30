@@ -274,11 +274,16 @@ export const es: EnTranslations = {
       "tabsLabel": "Tablas de clasificación",
       "tabPlayers": "Jugadores",
       "tabGuilds": "Hermandades",
+      "tabDevs": "Developers",
       "guildName": "Hermandad",
       "members": "Miembros",
       "topLevel": "Top",
       "guildXp": "XP total",
-      "guildEmpty": "Aún no hay hermandades clasificadas."
+      "guildEmpty": "Aún no hay hermandades clasificadas.",
+      "devName": "Contributor",
+      "devTierCol": "Badge",
+      "commits": "Commits",
+      "devEmpty": "No ranked contributors yet."
     },
     "raidLockout": {
       "title": "Bloqueos de banda",

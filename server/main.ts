@@ -5,6 +5,7 @@ import { type WebSocket, WebSocketServer } from 'ws';
 import {
   LEADERBOARD_MAX,
   LEADERBOARD_PAGE_SIZE,
+  paginateDevLeaderboard,
   paginateGuildLeaderboard,
   paginateLeaderboard,
 } from '../src/sim/leaderboard_page';
@@ -101,6 +102,7 @@ import {
   handleGitHubStatus,
   handleGitHubUnlink,
 } from './github';
+import { topContributors } from './github_contributors';
 import { pruneGitHubOAuthStates } from './github_db';
 import { isUniqueViolation, json, readBody } from './http_util';
 import { handleInternalApi } from './internal';
@@ -1155,6 +1157,24 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           board: 'guilds',
           metric: 'guildLifetimeXp',
           ...guildSlice,
+        });
+      }
+      // ?board=devs ranks open-source CONTRIBUTORS by landed commits, sourced from
+      // the cached public GitHub contributor stats. The same data for every realm,
+      // so it is realm-agnostic; rate-limited per IP like the other boards via the
+      // shared route limiter is unnecessary here (it reads an in-memory cache), but
+      // a failing GitHub fetch already backs off inside topContributors.
+      if (params.get('board') === 'devs') {
+        const devEntries = await topContributors();
+        const devPageSize = Number(params.get('pageSize')) || LEADERBOARD_PAGE_SIZE;
+        const devPage = Number(params.get('page')) || 0;
+        const devSlice = paginateDevLeaderboard(devEntries, devPage, devPageSize);
+        return json(res, 200, {
+          realm: REALM,
+          scope,
+          board: 'devs',
+          metric: 'landedCommits',
+          ...devSlice,
         });
       }
       const entries = await getLeaderboard(scope);

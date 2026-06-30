@@ -42,6 +42,7 @@ import {
   type DelveDailyInfo,
   type DelveRunInfo,
   type DelveShopOfferView,
+  type DevLeaderboardPage,
   type DuelInfo,
   type FriendInfo,
   type GuildLeaderboardPage,
@@ -2061,6 +2062,34 @@ export class ClientWorld implements IWorld {
     try {
       const res = await fetch(
         apiUrl(`/api/leaderboard?board=guilds&page=${page}&pageSize=${pageSize}`, this.base),
+      );
+      if (!res.ok) return empty;
+      const data = await res.json();
+      return {
+        leaders: data.leaders ?? [],
+        page: data.page ?? page,
+        pageCount: data.pageCount ?? 1,
+        total: data.total ?? data.leaders?.length ?? 0,
+        pageSize: data.pageSize ?? pageSize,
+      };
+    } catch {
+      return empty;
+    }
+  }
+  // Developer high-score board (REST GET, no wire command): ?board=devs ranks
+  // contributors by landed commits. The same data for every realm, paged exactly
+  // like the player + guild boards above.
+  async devLeaderboard(page = 0, pageSize = LEADERBOARD_PAGE_SIZE): Promise<DevLeaderboardPage> {
+    const empty: DevLeaderboardPage = {
+      leaders: [],
+      page: 0,
+      pageCount: 1,
+      total: 0,
+      pageSize,
+    };
+    try {
+      const res = await fetch(
+        apiUrl(`/api/leaderboard?board=devs&page=${page}&pageSize=${pageSize}`, this.base),
       );
       if (!res.ok) return empty;
       const data = await res.json();

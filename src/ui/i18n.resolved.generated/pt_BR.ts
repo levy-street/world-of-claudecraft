@@ -274,11 +274,16 @@ export const pt_BR: EnTranslations = {
       "tabsLabel": "Quadros de pontuação",
       "tabPlayers": "Jogadores",
       "tabGuilds": "Guildas",
+      "tabDevs": "Developers",
       "guildName": "Guilda",
       "members": "Membros",
       "topLevel": "Topo",
       "guildXp": "XP total",
-      "guildEmpty": "Nenhuma guilda classificada ainda."
+      "guildEmpty": "Nenhuma guilda classificada ainda.",
+      "devName": "Contributor",
+      "devTierCol": "Badge",
+      "commits": "Commits",
+      "devEmpty": "No ranked contributors yet."
     },
     "raidLockout": {
       "title": "Bloqueios de raide",

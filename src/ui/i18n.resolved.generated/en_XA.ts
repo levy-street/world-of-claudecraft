@@ -274,11 +274,16 @@ export const en_XA: EnTranslations = {
       "tabsLabel": "[Ĥíĝĥ-šçóŕé ƀóáŕðš]",
       "tabPlayers": "[Þļáýéŕš]",
       "tabGuilds": "[Ĝúíļðš]",
+      "tabDevs": "[Ðéʋéļóþéŕš]",
       "guildName": "[Ĝúíļð]",
       "members": "[Ɱéɱƀéŕš]",
       "topLevel": "[Ţóþ]",
       "guildXp": "[Ţóţáļ ẊÞ]",
-      "guildEmpty": "[Ñó ŕáñķéð ĝúíļðš ýéţ.]"
+      "guildEmpty": "[Ñó ŕáñķéð ĝúíļðš ýéţ.]",
+      "devName": "[Çóñţŕíƀúţóŕ]",
+      "devTierCol": "[Ɓáðĝé]",
+      "commits": "[Çóɱɱíţš]",
+      "devEmpty": "[Ñó ŕáñķéð çóñţŕíƀúţóŕš ýéţ.]"
     },
     "raidLockout": {
       "title": "[Ŕáíð Ļóçķóúţš]",

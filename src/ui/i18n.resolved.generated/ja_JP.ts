@@ -274,11 +274,16 @@ export const ja_JP: EnTranslations = {
       "tabsLabel": "ハイスコアボード",
       "tabPlayers": "プレイヤー",
       "tabGuilds": "ギルド",
+      "tabDevs": "開発者",
       "guildName": "ギルド",
       "members": "メンバー",
       "topLevel": "最高",
       "guildXp": "累計経験値",
-      "guildEmpty": "ランク入りのギルドはまだありません。"
+      "guildEmpty": "ランク入りのギルドはまだありません。",
+      "devName": "コントリビューター",
+      "devTierCol": "バッジ",
+      "commits": "コミット数",
+      "devEmpty": "ランク入りのコントリビューターはまだいません。"
     },
     "raidLockout": {
       "title": "レイドロックアウト",

@@ -274,11 +274,16 @@ export const it_IT: EnTranslations = {
       "tabsLabel": "Classifiche dei punteggi",
       "tabPlayers": "Giocatori",
       "tabGuilds": "Gilde",
+      "tabDevs": "Developers",
       "guildName": "Gilda",
       "members": "Membri",
       "topLevel": "Top",
       "guildXp": "XP totali",
-      "guildEmpty": "Ancora nessuna gilda classificata."
+      "guildEmpty": "Ancora nessuna gilda classificata.",
+      "devName": "Contributor",
+      "devTierCol": "Badge",
+      "commits": "Commits",
+      "devEmpty": "No ranked contributors yet."
     },
     "raidLockout": {
       "title": "Blocchi incursione",

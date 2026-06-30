@@ -274,11 +274,16 @@ export const zh_TW: EnTranslations = {
       "tabsLabel": "高分榜",
       "tabPlayers": "玩家",
       "tabGuilds": "公會",
+      "tabDevs": "開發者",
       "guildName": "公會",
       "members": "成員",
       "topLevel": "最高",
       "guildXp": "總經驗",
-      "guildEmpty": "還沒有上榜的公會。"
+      "guildEmpty": "還沒有上榜的公會。",
+      "devName": "貢獻者",
+      "devTierCol": "徽章",
+      "commits": "提交數",
+      "devEmpty": "還沒有上榜的貢獻者。"
     },
     "raidLockout": {
       "title": "團隊副本鎖定",

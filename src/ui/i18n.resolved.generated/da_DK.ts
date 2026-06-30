@@ -274,11 +274,16 @@ export const da_DK: EnTranslations = {
       "tabsLabel": "Pointtavler",
       "tabPlayers": "Spillere",
       "tabGuilds": "Guilds",
+      "tabDevs": "Developers",
       "guildName": "Guild",
       "members": "Medlemmer",
       "topLevel": "Top",
       "guildXp": "Samlet XP",
-      "guildEmpty": "Ingen rangerede guilds endnu."
+      "guildEmpty": "Ingen rangerede guilds endnu.",
+      "devName": "Contributor",
+      "devTierCol": "Badge",
+      "commits": "Commits",
+      "devEmpty": "No ranked contributors yet."
     },
     "raidLockout": {
       "title": "Raidlåse",

@@ -14,6 +14,9 @@
 //
 // The parse helpers are pure and exported so they can be unit tested without a
 // network; only refreshContributors() touches fetch.
+import { devTierIndexForCommits } from '../src/sim/dev_tier';
+import { LEADERBOARD_MAX } from '../src/sim/leaderboard_page';
+import type { DevLeaderboardEntry } from '../src/world_api';
 
 const GITHUB_REPO = process.env.GITHUB_REPO ?? 'levy-street/world-of-claudecraft';
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN ?? '';
@@ -21,6 +24,7 @@ const CONTRIBUTORS_URL = `https://api.github.com/repos/${GITHUB_REPO}/contributo
 const CONTRIBUTORS_TTL_MS = 30 * 60_000; // 30 min; contributor counts change slowly
 const CONTRIBUTORS_PER_PAGE = 100;
 const CONTRIBUTORS_MAX_PAGES = 20; // 2000 contributors cap; far beyond the real count
+const FAILURE_COOLDOWN_MS = 5 * 60_000; // after a failed fetch, wait before retrying
 
 export interface ContributorStat {
   login: string;
@@ -70,8 +74,26 @@ export function contributorsToMap(stats: readonly ContributorStat[]): Contributo
   return map;
 }
 
-let contributorsCache: { at: number; map: ContributorMap } | null = null;
-let refreshing: Promise<ContributorMap> | null = null;
+/** Sort contributor stats by landed commits descending, ties broken by login. */
+export function sortContributors(stats: readonly ContributorStat[]): ContributorStat[] {
+  return [...stats].sort((a, b) => b.commits - a.commits || a.login.localeCompare(b.login));
+}
+
+// A resolved snapshot: the original-case stats sorted rank-descending (so the
+// leaderboard is a cheap slice) plus a lowercase lookup map (so a per-login badge
+// tier is case-insensitive).
+export interface ContributorSnapshot {
+  stats: ContributorStat[];
+  byLogin: ContributorMap;
+}
+
+const EMPTY_SNAPSHOT: ContributorSnapshot = { stats: [], byLogin: new Map() };
+
+let contributorsCache: { at: number; snapshot: ContributorSnapshot } | null = null;
+let refreshing: Promise<ContributorSnapshot> | null = null;
+// After a failed fetch, do not retry until this time: a down or rate-limited
+// GitHub API must not be re-hit on every refresh cycle / status read.
+let cooldownUntil = 0;
 
 function githubHeaders(): Record<string, string> {
   return {
@@ -82,9 +104,9 @@ function githubHeaders(): Record<string, string> {
   };
 }
 
-// Fetch every page of the contributors list and build the lookup map. Throws on a
+// Fetch every page of the contributors list, sorted rank-descending. Throws on a
 // non-OK status or network error so getContributors() can serve the last cache.
-async function fetchAllContributors(): Promise<ContributorMap> {
+async function fetchAllContributors(): Promise<ContributorStat[]> {
   const stats: ContributorStat[] = [];
   let url: string | null = `${CONTRIBUTORS_URL}?per_page=${CONTRIBUTORS_PER_PAGE}&anon=0`;
   for (let page = 0; page < CONTRIBUTORS_MAX_PAGES && url; page++) {
@@ -97,27 +119,35 @@ async function fetchAllContributors(): Promise<ContributorMap> {
     stats.push(...parseContributorsPage(body));
     url = parseNextPageUrl(res.headers.get('link'));
   }
-  return contributorsToMap(stats);
+  return sortContributors(stats);
 }
 
 /**
- * The cached contributor map. Refreshes when stale (deduping concurrent refreshes
- * behind one in-flight promise) and falls back to the last good snapshot, or an
- * empty map, when a refresh fails.
+ * The cached contributor snapshot. Serves the last good snapshot while a refresh
+ * is in flight and through a post-failure cooldown, so a down / rate-limited
+ * GitHub API is not re-fetched on every call. Refreshes when stale and not in
+ * cooldown, deduping concurrent refreshes behind one in-flight promise.
  */
-export async function getContributors(): Promise<ContributorMap> {
-  if (contributorsCache && Date.now() - contributorsCache.at < CONTRIBUTORS_TTL_MS) {
-    return contributorsCache.map;
+export async function getContributors(): Promise<ContributorSnapshot> {
+  const now = Date.now();
+  if (contributorsCache && now - contributorsCache.at < CONTRIBUTORS_TTL_MS) {
+    return contributorsCache.snapshot;
   }
+  // Back off after a failure: keep serving the last snapshot (or empty) rather
+  // than re-hitting a failing API every cycle.
+  if (now < cooldownUntil) return contributorsCache?.snapshot ?? EMPTY_SNAPSHOT;
   if (!refreshing) {
     refreshing = fetchAllContributors()
-      .then((map) => {
-        contributorsCache = { at: Date.now(), map };
-        return map;
+      .then((stats) => {
+        const snapshot: ContributorSnapshot = { stats, byLogin: contributorsToMap(stats) };
+        contributorsCache = { at: Date.now(), snapshot };
+        cooldownUntil = 0;
+        return snapshot;
       })
       .catch((err) => {
         console.error('github contributors refresh failed:', err);
-        return contributorsCache?.map ?? new Map<string, number>();
+        cooldownUntil = Date.now() + FAILURE_COOLDOWN_MS;
+        return contributorsCache?.snapshot ?? EMPTY_SNAPSHOT;
       })
       .finally(() => {
         refreshing = null;
@@ -128,16 +158,32 @@ export async function getContributors(): Promise<ContributorMap> {
 
 /**
  * Landed-commit count for a GitHub login (case-insensitive), or 0 when the login
- * is not a contributor. Reads the cached contributor map (refreshing if stale).
+ * is not a contributor. Reads the cached snapshot (refreshing if stale).
  */
 export async function commitsForLogin(login: string): Promise<number> {
   if (!login) return 0;
-  const map = await getContributors();
-  return map.get(login.toLowerCase()) ?? 0;
+  const { byLogin } = await getContributors();
+  return byLogin.get(login.toLowerCase()) ?? 0;
+}
+
+/**
+ * The top contributors as ranked developer-leaderboard rows (rank 1 = most landed
+ * commits), each with the dev tier its commit count earns. Capped at
+ * LEADERBOARD_MAX. Reads the cached snapshot (refreshing if stale).
+ */
+export async function topContributors(limit = LEADERBOARD_MAX): Promise<DevLeaderboardEntry[]> {
+  const { stats } = await getContributors();
+  return stats.slice(0, Math.max(0, limit)).map((s, i) => ({
+    rank: i + 1,
+    login: s.login,
+    commits: s.commits,
+    devTier: devTierIndexForCommits(s.commits),
+  }));
 }
 
 /** Test-only: clear the cache so each case starts cold. */
 export function resetContributorsCache(): void {
   contributorsCache = null;
   refreshing = null;
+  cooldownUntil = 0;
 }

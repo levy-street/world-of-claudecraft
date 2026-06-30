@@ -274,11 +274,16 @@ export const fr_FR: EnTranslations = {
       "tabsLabel": "Tableaux des scores",
       "tabPlayers": "Joueurs",
       "tabGuilds": "Guildes",
+      "tabDevs": "Developers",
       "guildName": "Guilde",
       "members": "Membres",
       "topLevel": "Top",
       "guildXp": "XP total",
-      "guildEmpty": "Aucune guilde classée pour l'instant."
+      "guildEmpty": "Aucune guilde classée pour l'instant.",
+      "devName": "Contributor",
+      "devTierCol": "Badge",
+      "commits": "Commits",
+      "devEmpty": "No ranked contributors yet."
     },
     "raidLockout": {
       "title": "Verrous de raid",

@@ -274,11 +274,16 @@ export const zh_CN: EnTranslations = {
       "tabsLabel": "高分榜",
       "tabPlayers": "玩家",
       "tabGuilds": "公会",
+      "tabDevs": "开发者",
       "guildName": "公会",
       "members": "成员",
       "topLevel": "最高",
       "guildXp": "总经验",
-      "guildEmpty": "还没有上榜的公会。"
+      "guildEmpty": "还没有上榜的公会。",
+      "devName": "贡献者",
+      "devTierCol": "徽章",
+      "commits": "提交数",
+      "devEmpty": "还没有上榜的贡献者。"
     },
     "raidLockout": {
       "title": "团队副本锁定",

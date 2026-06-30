@@ -237,4 +237,48 @@ describe('developer-badge identity broadcast round-trip', () => {
     expect(wire.dvc).toBe(72);
     expect(wire.dgl).toBe('trevcavill');
   });
+
+  it('re-broadcasts a dropped dev tier (unlink / recount below threshold resets dvt/dvc/dgl to absent)', () => {
+    const fc2 = fakeWs();
+    const other = joinServer(server, fc2, 2, 'Lapsed', 'mage');
+    const otherEnt = server.sim.entities.get(other.pid)!;
+    otherEnt.devTier = 4;
+    otherEnt.devCommits = 187;
+    otherEnt.githubLogin = 'CharlieSaxton';
+    server.sim.tick();
+    fc.sent.length = 0;
+    broadcast(server);
+    let snap = lastSnap(fc.sent);
+    let wire = snap.ents.find((e: any) => e.id === other.pid);
+    expect(wire).toBeDefined();
+    expect(wire.dvt).toBe(4);
+    expect(wire.dvc).toBe(187);
+    expect(wire.dgl).toBe('CharlieSaxton');
+
+    // Unlink (or a recount that drops below tier 1): the server clears all three
+    // fields back to the "no badge" state.
+    otherEnt.devTier = 0;
+    otherEnt.devCommits = undefined;
+    otherEnt.githubLogin = undefined;
+    server.sim.tick();
+    fc.sent.length = 0;
+    broadcast(server);
+    snap = lastSnap(fc.sent);
+    wire = snap.ents.find((e: any) => e.id === other.pid);
+    expect(wire).toBeDefined();
+    // The identity record re-sends (the JSON diff changed) but the now-falsy
+    // fields are omitted entirely, exactly like a never-linked player.
+    expect(wire).not.toHaveProperty('dvt');
+    expect(wire).not.toHaveProperty('dvc');
+    expect(wire).not.toHaveProperty('dgl');
+
+    // And the client decodes the dropped identity back to "no badge", not a
+    // stale carry-over of the previous tier.
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(snap);
+    const decoded = client.entities.get(other.pid)!;
+    expect(decoded.devTier).toBe(0);
+    expect(decoded.devCommits).toBeUndefined();
+    expect(decoded.githubLogin).toBeUndefined();
+  });
 });

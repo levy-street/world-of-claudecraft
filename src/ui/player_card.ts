@@ -401,43 +401,45 @@ function drawBadge(
   fillTextClamped(ctx, holderTierFlavorText(tier), left, cy + 28, 220);
 }
 
-// The developer badge sits in the free band between the realm subtitle (y≈158)
-// and the stats panel (y=196), in the right column: a compact badge with the rung
-// name and the landed-commit count, reading as an earned honor like the percentile
-// medal above it.
+// The developer badge sits in the free band between the realm subtitle (whose
+// glyphs end around y=162) and the stats panel (y=196), in the right column: a
+// compact badge with the rung name and the landed-commit count, reading as an
+// earned honor like the percentile medal above it. Sized + centred (r=11,
+// cy=179) to keep clearance on both sides even for a tall non-Latin glyph (the
+// rung name is short by design: see hudChrome.devBadge.tiers.*).
 function drawDevBadge(
   ctx: CanvasRenderingContext2D,
   tier: DevTier,
   badge: HTMLImageElement,
   commits: number | null,
 ): void {
-  const r = 13;
+  const r = 11;
   const cx = 478 + r;
-  const cy = 180;
+  const cy = 179;
   ctx.save();
   ctx.shadowColor = hexWithAlpha(tier.glow, 0.9);
   ctx.shadowBlur = 6;
   ctx.drawImage(badge, cx - r, cy - r, r * 2, r * 2);
   ctx.restore();
 
-  const left = cx + r + 10;
+  const left = cx + r + 9;
   ctx.textAlign = 'left';
   ctx.fillStyle = tier.ring;
-  ctx.font = `700 15px ${TITLE_FONT}`;
+  ctx.font = `700 14px ${TITLE_FONT}`;
   const name = devTierDisplayName(tier).toLocaleUpperCase(languageTag(getLanguage()));
-  ctx.fillText(name, left, cy + 5);
+  ctx.fillText(name, left, cy + 4);
   if (commits !== null) {
     const nameW = ctx.measureText(name).width;
     ctx.fillStyle = COL.muted;
-    ctx.font = `400 13px ${BODY_FONT}`;
+    ctx.font = `400 12px ${BODY_FONT}`;
     fillTextClamped(
       ctx,
       t('hudChrome.devBadge.commitsLanded', {
         count: formatNumber(commits, { maximumFractionDigits: 0 }),
       }),
-      left + nameW + 12,
-      cy + 5,
-      260,
+      left + nameW + 10,
+      cy + 4,
+      250,
     );
   }
 }

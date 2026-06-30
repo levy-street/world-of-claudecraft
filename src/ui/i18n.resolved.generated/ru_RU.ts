@@ -274,11 +274,16 @@ export const ru_RU: EnTranslations = {
       "tabsLabel": "Таблицы рекордов",
       "tabPlayers": "Игроки",
       "tabGuilds": "Гильдии",
+      "tabDevs": "Разработчики",
       "guildName": "Гильдия",
       "members": "Состав",
       "topLevel": "Макс",
       "guildXp": "Всего опыта",
-      "guildEmpty": "Пока нет гильдий в рейтинге."
+      "guildEmpty": "Пока нет гильдий в рейтинге.",
+      "devName": "Участник",
+      "devTierCol": "Значок",
+      "commits": "Коммиты",
+      "devEmpty": "Пока нет участников в рейтинге."
     },
     "raidLockout": {
       "title": "Блокировки рейдов",

@@ -274,11 +274,16 @@ export const pl_PL: EnTranslations = {
       "tabsLabel": "Tablice wyników",
       "tabPlayers": "Gracze",
       "tabGuilds": "Gildie",
+      "tabDevs": "Developers",
       "guildName": "Gildia",
       "members": "Członkowie",
       "topLevel": "Top",
       "guildXp": "Łączne XP",
-      "guildEmpty": "Brak sklasyfikowanych gildii."
+      "guildEmpty": "Brak sklasyfikowanych gildii.",
+      "devName": "Contributor",
+      "devTierCol": "Badge",
+      "commits": "Commits",
+      "devEmpty": "No ranked contributors yet."
     },
     "raidLockout": {
       "title": "Blokady rajdów",
