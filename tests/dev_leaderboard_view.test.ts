@@ -1,6 +1,6 @@
 // Tests for the developers-tab pure core (dev_leaderboard_view.ts):
 //  - the async state machine: loading / error / empty / ranked discriminators,
-//  - row derivation (rank, login, commits, devTier passthrough),
+//  - row derivation (rank, login, mergedPrs, devTier passthrough),
 //  - the viewer's own row flagged `me` by case-insensitive GitHub login match,
 //  - the pager state (hidden on one page, prev/next disabled at the ends),
 //  - server page-clamp passthrough,
@@ -17,7 +17,7 @@ import { buildDevLeaderboardView, type DevLeaderboardInput } from '../src/ui/dev
 import type { DevLeaderboardEntry, DevLeaderboardPage } from '../src/world_api';
 
 function entry(over: Partial<DevLeaderboardEntry> = {}): DevLeaderboardEntry {
-  return { rank: 1, login: 'FernandoX7', commits: 821, devTier: 5, ...over };
+  return { rank: 1, login: 'FernandoX7', mergedPrs: 821, devTier: 5, ...over };
 }
 
 function page(over: Partial<DevLeaderboardPage> = {}): DevLeaderboardPage {
@@ -43,8 +43,8 @@ describe('buildDevLeaderboardView', () => {
       kind: 'page',
       page: page({
         leaders: [
-          entry({ rank: 1, login: 'FernandoX7', commits: 821, devTier: 5 }),
-          entry({ rank: 2, login: 'jgyy', commits: 664, devTier: 5 }),
+          entry({ rank: 1, login: 'FernandoX7', mergedPrs: 821, devTier: 5 }),
+          entry({ rank: 2, login: 'jgyy', mergedPrs: 664, devTier: 5 }),
         ],
         total: 2,
       }),
@@ -53,8 +53,8 @@ describe('buildDevLeaderboardView', () => {
     expect(view.kind).toBe('ranked');
     if (view.kind !== 'ranked') return;
     expect(view.rows).toEqual([
-      { rank: 1, login: 'FernandoX7', commits: 821, devTier: 5, me: false },
-      { rank: 2, login: 'jgyy', commits: 664, devTier: 5, me: false },
+      { rank: 1, login: 'FernandoX7', mergedPrs: 821, devTier: 5, me: false },
+      { rank: 2, login: 'jgyy', mergedPrs: 664, devTier: 5, me: false },
     ]);
   });
 

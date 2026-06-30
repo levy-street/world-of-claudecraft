@@ -282,7 +282,7 @@ export const de_DE: EnTranslations = {
       "guildEmpty": "Noch keine platzierten Gilden.",
       "devName": "Contributor",
       "devTierCol": "Badge",
-      "commits": "Commits",
+      "mergedPrs": "Merged PRs",
       "devEmpty": "No ranked contributors yet."
     },
     "raidLockout": {
@@ -891,19 +891,19 @@ export const de_DE: EnTranslations = {
         "worldwright": "Worldwright"
       },
       "flavors": {
-        "tinkerer": "Your first commit landed in the realm.",
-        "artificer": "Ten commits in, and the world bends to your code.",
-        "runesmith": "Fifty commits forged into the running game.",
-        "architect": "An architect of the realm: 150 commits landed.",
-        "worldwright": "A wright of worlds: 500 commits shape the game."
+        "tinkerer": "Your first pull request landed in the realm.",
+        "artificer": "Five pull requests in, and the world bends to your code.",
+        "runesmith": "Fifteen pull requests forged into the running game.",
+        "architect": "An architect of the realm: 30 pull requests merged.",
+        "worldwright": "A wright of worlds: 70 pull requests shape the game."
       },
       "badgeTitle": "Developer: {tier}",
-      "commitsLanded": "{count} commits landed",
+      "prsLanded": "{count} pull requests merged",
       "contributor": "Open-source contributor",
       "link": {
         "cta": "Link GitHub",
         "relink": "Relink GitHub",
-        "benefits": "Link your GitHub to earn a developer badge for the commits you have landed in the open-source repo.",
+        "benefits": "Link your GitHub to earn a developer badge for the pull requests you have had merged into the open-source repo.",
         "error": "Could not link GitHub. Please try again."
       },
       "linkedAs": "Linked as {login}",

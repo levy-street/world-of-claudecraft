@@ -2,19 +2,19 @@ import { describe, expect, it } from 'vitest';
 import {
   DEV_TIER_DEFS,
   DEV_TIER_SIGNIFICANT_INDEX,
-  devTierIndexForCommits,
+  devTierIndexForMergedPrs,
   isSignificantDevTier,
   devTierByIndex as sharedDevTierByIndex,
 } from '../src/sim/dev_tier';
 import { DEV_TIERS, devTierBadgeDataUrl, devTierByIndex } from '../src/ui/dev_tier';
 
-// Mirrors the real data flow exactly (the server resolves a commit count to an
-// index via devTierIndexForCommits and broadcasts only the index; the client
-// always looks the presentation rung up by that index, never re-derives one from
-// a raw count), rather than testing through a client-side commit-count lookup
+// Mirrors the real data flow exactly (the server resolves a merged-PR count to
+// an index via devTierIndexForMergedPrs and broadcasts only the index; the
+// client always looks the presentation rung up by that index, never re-derives
+// one from a raw count), rather than testing through a client-side count lookup
 // the codebase doesn't actually have.
-function tierNameForCommits(commits: number | null): string | undefined {
-  return devTierByIndex(devTierIndexForCommits(commits))?.name;
+function tierNameForMergedPrs(mergedPrs: number | null): string | undefined {
+  return devTierByIndex(devTierIndexForMergedPrs(mergedPrs))?.name;
 }
 
 describe('dev-tier ladder', () => {
@@ -25,7 +25,7 @@ describe('dev-tier ladder', () => {
       if (i > 0) expect(DEV_TIERS[i].threshold).toBeGreaterThan(DEV_TIERS[i - 1].threshold);
     }
     expect(DEV_TIERS[0].threshold).toBe(1);
-    expect(DEV_TIERS[DEV_TIERS.length - 1].threshold).toBe(500);
+    expect(DEV_TIERS[DEV_TIERS.length - 1].threshold).toBe(70);
   });
 
   it('keeps UI presentation rungs aligned with the shared pure tier definitions', () => {
@@ -34,46 +34,46 @@ describe('dev-tier ladder', () => {
     );
   });
 
-  it('resolves to no rung with no link or a sub-threshold commit count', () => {
-    expect(tierNameForCommits(null)).toBeUndefined();
-    expect(tierNameForCommits(0)).toBeUndefined();
-    expect(tierNameForCommits(0.5)).toBeUndefined();
-    expect(tierNameForCommits(Number.NaN)).toBeUndefined();
+  it('resolves to no rung with no link or a sub-threshold merged-PR count', () => {
+    expect(tierNameForMergedPrs(null)).toBeUndefined();
+    expect(tierNameForMergedPrs(0)).toBeUndefined();
+    expect(tierNameForMergedPrs(0.5)).toBeUndefined();
+    expect(tierNameForMergedPrs(Number.NaN)).toBeUndefined();
   });
 
-  it('rejects non-finite and negative commit counts as no rung', () => {
-    expect(tierNameForCommits(Number.POSITIVE_INFINITY)).toBeUndefined();
-    expect(tierNameForCommits(Number.NEGATIVE_INFINITY)).toBeUndefined();
-    expect(tierNameForCommits(-5)).toBeUndefined();
+  it('rejects non-finite and negative merged-PR counts as no rung', () => {
+    expect(tierNameForMergedPrs(Number.POSITIVE_INFINITY)).toBeUndefined();
+    expect(tierNameForMergedPrs(Number.NEGATIVE_INFINITY)).toBeUndefined();
+    expect(tierNameForMergedPrs(-5)).toBeUndefined();
   });
 
   it('treats each threshold as inclusive and just-below as the rung beneath', () => {
-    expect(tierNameForCommits(1)).toBe('Tinkerer');
-    expect(tierNameForCommits(10)).toBe('Artificer');
-    expect(tierNameForCommits(150)).toBe('Architect');
-    expect(tierNameForCommits(0.99)).toBeUndefined();
-    expect(tierNameForCommits(9)).toBe('Tinkerer');
-    expect(tierNameForCommits(49)).toBe('Artificer');
-    expect(tierNameForCommits(499)).toBe('Architect');
+    expect(tierNameForMergedPrs(1)).toBe('Tinkerer');
+    expect(tierNameForMergedPrs(5)).toBe('Artificer');
+    expect(tierNameForMergedPrs(30)).toBe('Architect');
+    expect(tierNameForMergedPrs(0.99)).toBeUndefined();
+    expect(tierNameForMergedPrs(4)).toBe('Tinkerer');
+    expect(tierNameForMergedPrs(14)).toBe('Artificer');
+    expect(tierNameForMergedPrs(29)).toBe('Runesmith');
   });
 
-  it('maps commit counts to the highest qualifying rung', () => {
-    expect(tierNameForCommits(1)).toBe('Tinkerer');
-    expect(tierNameForCommits(9)).toBe('Tinkerer');
-    expect(tierNameForCommits(10)).toBe('Artificer');
-    expect(tierNameForCommits(50)).toBe('Runesmith');
-    expect(tierNameForCommits(150)).toBe('Architect');
-    expect(tierNameForCommits(500)).toBe('Worldwright');
-    expect(tierNameForCommits(5_000)).toBe('Worldwright');
+  it('maps merged-PR counts to the highest qualifying rung', () => {
+    expect(tierNameForMergedPrs(1)).toBe('Tinkerer');
+    expect(tierNameForMergedPrs(4)).toBe('Tinkerer');
+    expect(tierNameForMergedPrs(5)).toBe('Artificer');
+    expect(tierNameForMergedPrs(15)).toBe('Runesmith');
+    expect(tierNameForMergedPrs(30)).toBe('Architect');
+    expect(tierNameForMergedPrs(70)).toBe('Worldwright');
+    expect(tierNameForMergedPrs(500)).toBe('Worldwright');
   });
 
   it('exposes a server-safe numeric tier lookup from the shared pure module', () => {
-    expect(devTierIndexForCommits(null)).toBe(0);
-    expect(devTierIndexForCommits(0)).toBe(0);
-    expect(devTierIndexForCommits(0.5)).toBe(0);
-    expect(devTierIndexForCommits(10)).toBe(2);
-    expect(devTierIndexForCommits(150)).toBe(4);
-    expect(devTierIndexForCommits(5_000)).toBe(5);
+    expect(devTierIndexForMergedPrs(null)).toBe(0);
+    expect(devTierIndexForMergedPrs(0)).toBe(0);
+    expect(devTierIndexForMergedPrs(0.5)).toBe(0);
+    expect(devTierIndexForMergedPrs(5)).toBe(2);
+    expect(devTierIndexForMergedPrs(30)).toBe(4);
+    expect(devTierIndexForMergedPrs(500)).toBe(5);
   });
 
   it('looks up rungs by 1-based index and returns undefined out of range', () => {

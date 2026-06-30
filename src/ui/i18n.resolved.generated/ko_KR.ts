@@ -282,7 +282,7 @@ export const ko_KR: EnTranslations = {
       "guildEmpty": "아직 순위에 오른 길드가 없습니다.",
       "devName": "기여자",
       "devTierCol": "배지",
-      "commits": "커밋 수",
+      "mergedPrs": "병합된 PR",
       "devEmpty": "아직 순위에 오른 기여자가 없습니다."
     },
     "raidLockout": {
@@ -891,19 +891,19 @@ export const ko_KR: EnTranslations = {
         "worldwright": "세계 창조자"
       },
       "flavors": {
-        "tinkerer": "당신의 첫 커밋이 이 세계에 새겨졌습니다.",
-        "artificer": "열 번의 커밋 끝에, 세계가 당신의 코드를 따르기 시작합니다.",
-        "runesmith": "쉰 번의 커밋이 구동 중인 게임에 벼려졌습니다.",
-        "architect": "이 세계의 설계자: 150번의 커밋이 반영되었습니다.",
-        "worldwright": "세계의 창조자: 500번의 커밋이 이 게임을 빚어냅니다."
+        "tinkerer": "당신의 첫 풀 리퀘스트가 이 세계에 병합되었습니다.",
+        "artificer": "다섯 번의 풀 리퀘스트 끝에, 세계가 당신의 코드를 따르기 시작합니다.",
+        "runesmith": "열다섯 번의 풀 리퀘스트가 구동 중인 게임에 벼려졌습니다.",
+        "architect": "이 세계의 설계자: 30번의 풀 리퀘스트가 병합되었습니다.",
+        "worldwright": "세계의 창조자: 70번의 풀 리퀘스트가 이 게임을 빚어냅니다."
       },
       "badgeTitle": "개발자: {tier}",
-      "commitsLanded": "{count}번의 커밋 반영",
+      "prsLanded": "{count}번의 풀 리퀘스트 병합됨",
       "contributor": "오픈 소스 기여자",
       "link": {
         "cta": "GitHub 연결",
         "relink": "GitHub 다시 연결",
-        "benefits": "GitHub를 연결하면 오픈 소스 저장소에 반영된 커밋으로 개발자 배지를 받을 수 있습니다.",
+        "benefits": "GitHub를 연결하면 오픈 소스 저장소에 병합된 풀 리퀘스트로 개발자 배지를 받을 수 있습니다.",
         "error": "GitHub를 연결할 수 없습니다. 다시 시도해 주세요."
       },
       "linkedAs": "{login}(으)로 연결됨",

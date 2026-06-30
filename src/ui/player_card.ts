@@ -55,8 +55,8 @@ export interface PlayerCardData {
   balance: number | null;
   /** Developer-badge tier index (0/null = none, 1-5). Drives the dev badge. */
   devTier: number | null;
-  /** Landed-commit count behind the dev tier (null when unknown). */
-  devCommits: number | null;
+  /** Merged-PR count behind the dev tier (null when unknown). */
+  devMergedPrs: number | null;
   /** Handle shown in the footer referral line (the card slug, or the name). */
   referralHandle: string;
   /** Recruited-friends count, when known. */
@@ -232,7 +232,7 @@ export async function renderPlayerCardCanvas(data: PlayerCardData): Promise<HTML
   drawBackdrop(ctx, data.classColor);
   drawCharacter(ctx, charImg);
   drawHeader(ctx, data, pctBadgeImg, pctTier);
-  if (devTier && devBadgeImg) drawDevBadge(ctx, devTier, devBadgeImg, data.devCommits);
+  if (devTier && devBadgeImg) drawDevBadge(ctx, devTier, devBadgeImg, data.devMergedPrs);
   if (tier && badgeImg) drawBadge(ctx, tier, badgeImg, data.balance);
   drawStats(ctx, data);
   drawGear(ctx, data);
@@ -403,7 +403,7 @@ function drawBadge(
 
 // The developer badge sits in the free band between the realm subtitle (whose
 // glyphs end around y=162) and the stats panel (y=196), in the right column: a
-// compact badge with the rung name and the landed-commit count, reading as an
+// compact badge with the rung name and the merged-PR count, reading as an
 // earned honor like the percentile medal above it. Sized + centred (r=11,
 // cy=179) to keep clearance on both sides even for a tall non-Latin glyph (the
 // rung name is short by design: see hudChrome.devBadge.tiers.*).
@@ -411,7 +411,7 @@ function drawDevBadge(
   ctx: CanvasRenderingContext2D,
   tier: DevTier,
   badge: HTMLImageElement,
-  commits: number | null,
+  mergedPrs: number | null,
 ): void {
   const r = 11;
   const cx = 478 + r;
@@ -428,14 +428,14 @@ function drawDevBadge(
   ctx.font = `700 14px ${TITLE_FONT}`;
   const name = devTierDisplayName(tier).toLocaleUpperCase(languageTag(getLanguage()));
   ctx.fillText(name, left, cy + 4);
-  if (commits !== null) {
+  if (mergedPrs !== null) {
     const nameW = ctx.measureText(name).width;
     ctx.fillStyle = COL.muted;
     ctx.font = `400 12px ${BODY_FONT}`;
     fillTextClamped(
       ctx,
-      t('hudChrome.devBadge.commitsLanded', {
-        count: formatNumber(commits, { maximumFractionDigits: 0 }),
+      t('hudChrome.devBadge.prsLanded', {
+        count: formatNumber(mergedPrs, { maximumFractionDigits: 0 }),
       }),
       left + nameW + 10,
       cy + 4,

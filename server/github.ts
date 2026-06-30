@@ -9,10 +9,10 @@
 // cached repo contributor stats. Status reads expose the linked login + its
 // landed-commit count + resulting tier for the account portal.
 import type http from 'node:http';
-import { devTierIndexForCommits } from '../src/sim/dev_tier';
+import { devTierIndexForMergedPrs } from '../src/sim/dev_tier';
 import { newToken } from './auth';
 import { pool } from './db';
-import { commitsForLogin } from './github_contributors';
+import { mergedPrsForLogin } from './github_contributors';
 import {
   consumeGitHubOAuthState,
   createGitHubOAuthState,
@@ -187,16 +187,16 @@ export async function handleGitHubStatus(
 export async function githubStatusPayload(accountId: number): Promise<Record<string, unknown>> {
   const link = await githubForAccount(pool, accountId);
   const login = link?.github_login ?? null;
-  const commits = login ? await commitsForLogin(login) : 0;
+  const mergedPrs = login ? await mergedPrsForLogin(login) : 0;
   return {
     enabled: githubConfig() !== null,
     linked: link !== null,
     login,
     profileUrl: login ? githubProfileUrl(login) : null,
-    commits,
+    mergedPrs,
     // Unlinked / non-contributing accounts are tier 0; only a linked login with
-    // landed commits climbs rungs.
-    devTier: devTierIndexForCommits(commits),
+    // merged PRs climbs rungs.
+    devTier: devTierIndexForMergedPrs(mergedPrs),
   };
 }
 

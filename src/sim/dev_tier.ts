@@ -1,10 +1,19 @@
 // Shared developer-badge tier thresholds.
 //
-// A purely cosmetic honor ladder derived from how many commits a contributor has
-// landed into the open-source game repo (the count comes from GitHub's
-// contributors API, resolved server-side from a verified GitHub-OAuth link). It
-// grants NO gameplay power (the sim never reads it, like holder/Discord tiers);
-// it is flair for the player card, nameplate, and inspect screen.
+// A purely cosmetic honor ladder derived from how many pull requests a
+// contributor has had MERGED into the open-source game repo (the count comes
+// from GitHub's pulls API, filtered to merged, resolved server-side from a
+// verified GitHub-OAuth link). It grants NO gameplay power (the sim never
+// reads it, like holder/Discord tiers); it is flair for the player card,
+// nameplate, and inspect screen.
+//
+// Merged PRs, not raw commits: a raw commit count (e.g. from GitHub's
+// /contributors stats) is gameable by splitting one contribution into many
+// trivial commits on a branch that still gets merged whole (this repo merges
+// PRs with real merge commits, not squashes, so every "wip"/"fix typo" commit
+// on a branch lands in history and would otherwise count). Counting merged
+// PRs means commit-spamming inside one PR still only ever earns one rung of
+// credit; the unit is "a reviewed, accepted contribution", not "a keystroke".
 //
 // This pure, host-agnostic module exists so the server, the HUD presentation
 // code, and any tooling can agree on the cosmetic tier index without importing
@@ -16,19 +25,21 @@ export interface DevTierCore {
   index: number;
   /** Stable machine key used for CSS hooks, analytics, and presentation lookup. */
   key: string;
-  /** Minimum count of landed commits to reach this rung. */
+  /** Minimum count of merged pull requests to reach this rung. */
   threshold: number;
 }
 
-// Five rungs. Thresholds climb so the first commit is already a visible honor and
-// the top rungs are a real flex, sized against the project's real contribution
-// distribution (most contributors land single digits; only a handful pass 150).
+// Five rungs, thresholds calibrated against the project's real merged-PR
+// distribution (28 distinct contributors at the time of writing): 1+ earns the
+// first rung; the top rung is reserved for the two clear leaders (70+). Rungs
+// climb roughly geometrically (1, 5, 15, 30, 70) so most contributors land in
+// the lower-middle rungs and the top is a real flex, not a participation badge.
 export const DEV_TIER_DEFS = [
   { index: 1, key: 'tinkerer', threshold: 1 },
-  { index: 2, key: 'artificer', threshold: 10 },
-  { index: 3, key: 'runesmith', threshold: 50 },
-  { index: 4, key: 'architect', threshold: 150 },
-  { index: 5, key: 'worldwright', threshold: 500 },
+  { index: 2, key: 'artificer', threshold: 5 },
+  { index: 3, key: 'runesmith', threshold: 15 },
+  { index: 4, key: 'architect', threshold: 30 },
+  { index: 5, key: 'worldwright', threshold: 70 },
 ] as const satisfies readonly DevTierCore[];
 
 export type DevTierKey = (typeof DEV_TIER_DEFS)[number]['key'];
@@ -42,24 +53,24 @@ export type DevTierKey = (typeof DEV_TIER_DEFS)[number]['key'];
 export const DEV_TIER_SIGNIFICANT_INDEX = 4;
 
 /**
- * The highest rung a landed-commit count qualifies for, or null when the count is
+ * The highest rung a merged-PR count qualifies for, or null when the count is
  * null (no linked/contributing GitHub account) or below the first rung (< 1).
  */
-export function devTierForCommits(commits: number | null): DevTierCore | null {
-  if (commits === null || !Number.isFinite(commits) || commits < DEV_TIER_DEFS[0].threshold) {
+export function devTierForMergedPrs(mergedPrs: number | null): DevTierCore | null {
+  if (mergedPrs === null || !Number.isFinite(mergedPrs) || mergedPrs < DEV_TIER_DEFS[0].threshold) {
     return null;
   }
   let tier: DevTierCore | null = null;
   for (const t of DEV_TIER_DEFS) {
-    if (commits >= t.threshold) tier = t;
+    if (mergedPrs >= t.threshold) tier = t;
     else break;
   }
   return tier;
 }
 
-/** The 1-based rung index for a commit count, or 0 when it qualifies for no rung. */
-export function devTierIndexForCommits(commits: number | null): number {
-  return devTierForCommits(commits)?.index ?? 0;
+/** The 1-based rung index for a merged-PR count, or 0 when it qualifies for no rung. */
+export function devTierIndexForMergedPrs(mergedPrs: number | null): number {
+  return devTierForMergedPrs(mergedPrs)?.index ?? 0;
 }
 
 /** The rung at a 1-based index (1-5), or undefined for 0/out-of-range. */

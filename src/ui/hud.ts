@@ -9235,7 +9235,7 @@ export class Hud {
       topPercent,
       balance: showWallet ? verifiedWocBalance() : null,
       devTier: p.devTier ?? null,
-      devCommits: p.devCommits ?? null,
+      devMergedPrs: p.devMergedPrs ?? null,
       referralHandle: referral?.slug ?? this.cardSlug(p.name),
       referralCount: referral?.count ?? null,
       siteUrl: 'worldofclaudecraft.com',
@@ -9991,11 +9991,11 @@ export class Hud {
         : '';
     // Developer badge: the cosmetic contributor tier, broadcast per-entity via the
     // `dvt`/`dvc`/`dgl` identity fields. Shown only for an actual contributor
-    // (tier > 0), with the landed-commit count and the @login under the rung name.
+    // (tier > 0), with the merged-PR count and the @login under the rung name.
     const devTierDef = devTierByIndex(e.devTier ?? 0);
-    const devSub = e.devCommits
-      ? t('hudChrome.devBadge.commitsLanded', {
-          count: formatNumber(e.devCommits, { maximumFractionDigits: 0 }),
+    const devSub = e.devMergedPrs
+      ? t('hudChrome.devBadge.prsLanded', {
+          count: formatNumber(e.devMergedPrs, { maximumFractionDigits: 0 }),
         })
       : t('hudChrome.devBadge.contributor');
     const devLoginHtml = e.githubLogin

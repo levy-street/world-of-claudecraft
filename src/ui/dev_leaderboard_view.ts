@@ -7,18 +7,19 @@
 // localizes. The async/paged shape is the online-only-shape trap, so the core is
 // fed BOTH a Sim-shaped (empty) and a ClientWorld-mirror-shaped page in the tests.
 //
-// The board is sourced from GitHub's public contributor stats, the same for every
-// realm, so there is no "your standing" sticky row; instead the viewer's own row
-// is flagged `me` (matched by GitHub login) so the painter can highlight it.
+// The board is sourced from GitHub's merged-pull-request stats, the same for
+// every realm, so there is no "your standing" sticky row; instead the viewer's
+// own row is flagged `me` (matched by GitHub login) so the painter can
+// highlight it.
 
 import type { DevLeaderboardPage } from '../world_api';
 import type { LeaderboardPager } from './leaderboard_view';
 
-/** One ranked contributor row: rank + landed-commit standing + earned tier. */
+/** One ranked contributor row: rank + merged-PR standing + earned tier. */
 export interface DevLeaderboardRow {
   rank: number;
   login: string;
-  commits: number;
+  mergedPrs: number;
   devTier: number;
   /** True for the viewer's own contributor row (matched by linked GitHub login). */
   me: boolean;
@@ -62,7 +63,7 @@ export function buildDevLeaderboardView(input: DevLeaderboardInput): DevLeaderbo
   const rows: DevLeaderboardRow[] = entries.map((e) => ({
     rank: e.rank,
     login: e.login,
-    commits: e.commits,
+    mergedPrs: e.mergedPrs,
     devTier: e.devTier,
     me: viewer !== '' && e.login.toLowerCase() === viewer,
   }));

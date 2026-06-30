@@ -1,51 +1,65 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   type ContributorStat,
-  commitsForLogin,
   contributorsToMap,
   getContributors,
-  parseContributorsPage,
+  mergedPrsForLogin,
+  parseMergedPrLogins,
   parseNextPageUrl,
   resetContributorsCache,
   sortContributors,
+  tallyMergedPrs,
   topContributors,
 } from '../server/github_contributors';
 import { providerUsageSnapshot, resetProviderUsageForTests } from '../server/provider_usage';
 
-describe('parseContributorsPage', () => {
-  it('keeps real users with a positive commit count, dropping bots and anonymous', () => {
+function pr(login: string, opts: { merged?: boolean; type?: string } = {}): unknown {
+  const merged = opts.merged ?? true;
+  return {
+    number: 1,
+    user: { login, type: opts.type ?? 'User' },
+    merged_at: merged ? '2024-01-01T00:00:00Z' : null,
+  };
+}
+
+describe('parseMergedPrLogins', () => {
+  it('keeps only MERGED pull requests by real users, dropping closed-not-merged and bots', () => {
     const page = [
-      { login: 'FernandoX7', type: 'User', contributions: 821 },
-      { login: 'jgyy', type: 'User', contributions: 664 },
-      { login: 'dependabot[bot]', type: 'Bot', contributions: 50 },
-      { name: 'someone@example.com', type: 'Anonymous', contributions: 9 },
-      { login: 'ghost', type: 'User', contributions: 0 },
-      { login: 'neg', type: 'User', contributions: -3 },
+      pr('FernandoX7'),
+      pr('jgyy'),
+      pr('someone', { merged: false }), // closed without merging: contributed nothing
+      pr('dependabot[bot]', { type: 'Bot' }),
+      pr('ghost-author', { type: 'Anonymous' }),
     ];
-    expect(parseContributorsPage(page)).toEqual([
-      { login: 'FernandoX7', commits: 821 },
-      { login: 'jgyy', commits: 664 },
-    ]);
+    expect(parseMergedPrLogins(page)).toEqual(['FernandoX7', 'jgyy']);
   });
 
-  it('floors fractional contribution counts and tolerates junk entries', () => {
-    expect(parseContributorsPage([{ login: 'x', type: 'User', contributions: 12.9 }])).toEqual([
-      { login: 'x', commits: 12 },
-    ]);
+  it('one entry per merged PR (repeats expected), so multiple PRs by one author appear multiple times', () => {
+    const page = [pr('jgyy'), pr('jgyy'), pr('FernandoX7')];
+    expect(parseMergedPrLogins(page)).toEqual(['jgyy', 'jgyy', 'FernandoX7']);
+  });
+
+  it('tolerates junk entries and a non-array body', () => {
     expect(
-      parseContributorsPage([null, 7, { type: 'User' }, { login: 'y', type: 'User' }]),
+      parseMergedPrLogins([
+        null,
+        7,
+        { user: { type: 'User' } }, // no login
+        { user: { login: 'x', type: 'User' } }, // no merged_at -> not merged
+        { merged_at: '2024-01-01T00:00:00Z' }, // no user
+      ]),
     ).toEqual([]);
-    expect(parseContributorsPage('not an array' as unknown)).toEqual([]);
+    expect(parseMergedPrLogins('not an array' as unknown)).toEqual([]);
   });
 });
 
 describe('parseNextPageUrl', () => {
   it('extracts the rel="next" link, ignoring other rels', () => {
     const header =
-      '<https://api.github.com/repositories/1/contributors?per_page=100&page=2>; rel="next", ' +
-      '<https://api.github.com/repositories/1/contributors?per_page=100&page=5>; rel="last"';
+      '<https://api.github.com/repositories/1/pulls?per_page=100&page=2>; rel="next", ' +
+      '<https://api.github.com/repositories/1/pulls?per_page=100&page=5>; rel="last"';
     expect(parseNextPageUrl(header)).toBe(
-      'https://api.github.com/repositories/1/contributors?per_page=100&page=2',
+      'https://api.github.com/repositories/1/pulls?per_page=100&page=2',
     );
   });
 
@@ -56,38 +70,51 @@ describe('parseNextPageUrl', () => {
   });
 });
 
+describe('tallyMergedPrs', () => {
+  it('folds a flat list of logins (with repeats) into per-login counts, sorted rank-descending', () => {
+    expect(tallyMergedPrs(['jgyy', 'FernandoX7', 'jgyy', 'jgyy', 'FernandoX7'])).toEqual([
+      { login: 'jgyy', mergedPrs: 3 },
+      { login: 'FernandoX7', mergedPrs: 2 },
+    ]);
+  });
+
+  it('returns an empty list for an empty input', () => {
+    expect(tallyMergedPrs([])).toEqual([]);
+  });
+});
+
 describe('contributorsToMap', () => {
   it('builds a lowercase-keyed lookup for case-insensitive logins', () => {
     const map = contributorsToMap([
-      { login: 'FernandoX7', commits: 821 },
-      { login: 'JGYY', commits: 664 },
+      { login: 'FernandoX7', mergedPrs: 27 },
+      { login: 'JGYY', mergedPrs: 138 },
     ]);
-    expect(map.get('fernandox7')).toBe(821);
-    expect(map.get('jgyy')).toBe(664);
+    expect(map.get('fernandox7')).toBe(27);
+    expect(map.get('jgyy')).toBe(138);
     expect(map.get('unknown')).toBeUndefined();
   });
 });
 
 describe('sortContributors', () => {
-  it('sorts by landed commits descending, ties broken by login', () => {
+  it('sorts by merged-PR count descending, ties broken by login', () => {
     const stats: ContributorStat[] = [
-      { login: 'jgyy', commits: 664 },
-      { login: 'FernandoX7', commits: 821 },
-      { login: 'bbb', commits: 50 },
-      { login: 'aaa', commits: 50 },
+      { login: 'jgyy', mergedPrs: 138 },
+      { login: 'FernandoX7', mergedPrs: 27 },
+      { login: 'bbb', mergedPrs: 5 },
+      { login: 'aaa', mergedPrs: 5 },
     ];
     expect(sortContributors(stats)).toEqual([
-      { login: 'FernandoX7', commits: 821 },
-      { login: 'jgyy', commits: 664 },
-      { login: 'aaa', commits: 50 },
-      { login: 'bbb', commits: 50 },
+      { login: 'jgyy', mergedPrs: 138 },
+      { login: 'FernandoX7', mergedPrs: 27 },
+      { login: 'aaa', mergedPrs: 5 },
+      { login: 'bbb', mergedPrs: 5 },
     ]);
   });
 
   it('does not mutate the input array', () => {
     const stats: ContributorStat[] = [
-      { login: 'a', commits: 1 },
-      { login: 'b', commits: 9 },
+      { login: 'a', mergedPrs: 1 },
+      { login: 'b', mergedPrs: 9 },
     ];
     const copy = [...stats];
     sortContributors(stats);
@@ -97,7 +124,7 @@ describe('sortContributors', () => {
 
 // The cached fetch + cooldown behavior under a mocked global fetch. Each test
 // resets the module-local cache so they run cold and independently.
-describe('getContributors / topContributors / commitsForLogin (cached fetch)', () => {
+describe('getContributors / topContributors / mergedPrsForLogin (cached fetch)', () => {
   beforeEach(() => {
     resetContributorsCache();
   });
@@ -120,40 +147,41 @@ describe('getContributors / topContributors / commitsForLogin (cached fetch)', (
   }
 
   it('fetches, caches, and serves the contributor snapshot', async () => {
-    mockOnePageResponse([
-      { login: 'FernandoX7', type: 'User', contributions: 821 },
-      { login: 'jgyy', type: 'User', contributions: 664 },
-    ]);
+    mockOnePageResponse([pr('FernandoX7'), pr('FernandoX7'), pr('jgyy')]);
     const snapshot = await getContributors();
     expect(snapshot.stats).toEqual([
-      { login: 'FernandoX7', commits: 821 },
-      { login: 'jgyy', commits: 664 },
+      { login: 'FernandoX7', mergedPrs: 2 },
+      { login: 'jgyy', mergedPrs: 1 },
     ]);
-    expect(snapshot.byLogin.get('jgyy')).toBe(664);
+    expect(snapshot.byLogin.get('fernandox7')).toBe(2);
     // A second call within the TTL must not re-fetch.
     await getContributors();
     expect(fetch).toHaveBeenCalledTimes(1);
   });
 
-  it('ranks topContributors by landed commits with the earned dev tier, capped at the limit', async () => {
+  it('ranks topContributors by merged PRs with the earned dev tier, capped at the limit', async () => {
     mockOnePageResponse([
-      { login: 'FernandoX7', type: 'User', contributions: 821 },
-      { login: 'jgyy', type: 'User', contributions: 664 },
-      { login: 'newdev', type: 'User', contributions: 3 },
+      pr('FernandoX7'),
+      pr('FernandoX7'),
+      pr('FernandoX7'),
+      pr('FernandoX7'),
+      pr('FernandoX7'), // 5 merged PRs -> Artificer (rung 2)
+      pr('jgyy'), // 1 merged PR -> Tinkerer (rung 1)
+      pr('newdev', { merged: false }), // closed, never merged: 0 credit
     ]);
     const top = await topContributors(2);
     expect(top).toEqual([
-      { rank: 1, login: 'FernandoX7', commits: 821, devTier: 5 },
-      { rank: 2, login: 'jgyy', commits: 664, devTier: 5 },
+      { rank: 1, login: 'FernandoX7', mergedPrs: 5, devTier: 2 },
+      { rank: 2, login: 'jgyy', mergedPrs: 1, devTier: 1 },
     ]);
   });
 
-  it('commitsForLogin resolves case-insensitively and 0 for a non-contributor', async () => {
-    mockOnePageResponse([{ login: 'FernandoX7', type: 'User', contributions: 821 }]);
-    expect(await commitsForLogin('fernandox7')).toBe(821);
-    expect(await commitsForLogin('FERNANDOX7')).toBe(821);
-    expect(await commitsForLogin('nobody')).toBe(0);
-    expect(await commitsForLogin('')).toBe(0);
+  it('mergedPrsForLogin resolves case-insensitively and 0 for a non-contributor', async () => {
+    mockOnePageResponse([pr('FernandoX7')]);
+    expect(await mergedPrsForLogin('fernandox7')).toBe(1);
+    expect(await mergedPrsForLogin('FERNANDOX7')).toBe(1);
+    expect(await mergedPrsForLogin('nobody')).toBe(0);
+    expect(await mergedPrsForLogin('')).toBe(0);
   });
 
   it('serves an empty snapshot (never throws) when the very first fetch fails', async () => {
@@ -183,7 +211,7 @@ describe('getContributors / topContributors / commitsForLogin (cached fetch)', (
   it('keeps serving the last good snapshot (not wiped) through a cooldown after a later failure', async () => {
     vi.useFakeTimers();
     try {
-      mockOnePageResponse([{ login: 'FernandoX7', type: 'User', contributions: 821 }]);
+      mockOnePageResponse([pr('FernandoX7')]);
       const first = await getContributors();
       expect(first.stats).toHaveLength(1);
 
@@ -248,10 +276,7 @@ describe('github_contributors telemetry (provider_usage wiring)', () => {
         ok: true,
         status: 200,
         headers: { get: () => null },
-        json: async () => [
-          { login: 'FernandoX7', type: 'User', contributions: 821 },
-          { login: 'jgyy', type: 'User', contributions: 664 },
-        ],
+        json: async () => [pr('FernandoX7'), pr('jgyy')],
       })),
     );
     expect(metricCount('github.contributors.fetch')).toBe(0);
@@ -274,7 +299,7 @@ describe('github_contributors telemetry (provider_usage wiring)', () => {
         ok: true,
         status: 200,
         headers: { get: () => null },
-        json: async () => [{ login: 'jgyy', type: 'User', contributions: 664 }],
+        json: async () => [pr('jgyy')],
       })),
     );
     await getContributors(); // primes the cache (1 fetch, 1 store)

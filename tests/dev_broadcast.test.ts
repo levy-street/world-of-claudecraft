@@ -100,7 +100,7 @@ describe('developer-badge identity broadcast round-trip', () => {
   it('encodes dvt/dvc/dgl in the full identity record when a player is a contributor', () => {
     const player = server.sim.entities.get(session.pid)!;
     player.devTier = 4;
-    player.devCommits = 187;
+    player.devMergedPrs = 187;
     player.githubLogin = 'CharlieSaxton';
     broadcast(server);
 
@@ -122,10 +122,10 @@ describe('developer-badge identity broadcast round-trip', () => {
     expect(snap.self).not.toHaveProperty('dgl');
   });
 
-  it('omits dvc when the tier is set but the commit count is zero (guard is per-field)', () => {
+  it('omits dvc when the tier is set but the merged-PR count is zero (guard is per-field)', () => {
     const player = server.sim.entities.get(session.pid)!;
     player.devTier = 1;
-    player.devCommits = 0;
+    player.devMergedPrs = 0;
     player.githubLogin = 'newdev';
     broadcast(server);
 
@@ -140,7 +140,7 @@ describe('developer-badge identity broadcast round-trip', () => {
     const other = joinServer(server, fc2, 2, 'Wright', 'mage');
     const otherEnt = server.sim.entities.get(other.pid)!;
     otherEnt.devTier = 5;
-    otherEnt.devCommits = 821;
+    otherEnt.devMergedPrs = 821;
     otherEnt.githubLogin = 'FernandoX7';
     fc.sent.length = 0;
     broadcast(server);
@@ -157,11 +157,11 @@ describe('developer-badge identity broadcast round-trip', () => {
     (client as any).applySnapshot(snap);
     const decoded = client.entities.get(other.pid)!;
     expect(decoded.devTier).toBe(5);
-    expect(decoded.devCommits).toBe(821);
+    expect(decoded.devMergedPrs).toBe(821);
     expect(decoded.githubLogin).toBe('FernandoX7');
   });
 
-  it('decodes dvt/dvc/dgl into devTier/devCommits/githubLogin on the client entity', () => {
+  it('decodes dvt/dvc/dgl into devTier/devMergedPrs/githubLogin on the client entity', () => {
     const client = bareClient(99);
     const wire = {
       id: 42,
@@ -184,11 +184,11 @@ describe('developer-badge identity broadcast round-trip', () => {
 
     const decoded = client.entities.get(42)!;
     expect(decoded.devTier).toBe(4);
-    expect(decoded.devCommits).toBe(187);
+    expect(decoded.devMergedPrs).toBe(187);
     expect(decoded.githubLogin).toBe('CharlieSaxton');
   });
 
-  it('defaults devTier to 0 and leaves devCommits/githubLogin undefined when omitted', () => {
+  it('defaults devTier to 0 and leaves devMergedPrs/githubLogin undefined when omitted', () => {
     const client = bareClient(99);
     const wire = {
       id: 43,
@@ -208,7 +208,7 @@ describe('developer-badge identity broadcast round-trip', () => {
 
     const decoded = client.entities.get(43)!;
     expect(decoded.devTier).toBe(0); // w.dvt ?? 0
-    expect(decoded.devCommits).toBeUndefined();
+    expect(decoded.devMergedPrs).toBeUndefined();
     expect(decoded.githubLogin).toBeUndefined();
   });
 
@@ -224,7 +224,7 @@ describe('developer-badge identity broadcast round-trip', () => {
     expect(wire).not.toHaveProperty('dvt');
 
     otherEnt.devTier = 3;
-    otherEnt.devCommits = 72;
+    otherEnt.devMergedPrs = 72;
     otherEnt.githubLogin = 'trevcavill';
     server.sim.tick();
     fc.sent.length = 0;
@@ -243,7 +243,7 @@ describe('developer-badge identity broadcast round-trip', () => {
     const other = joinServer(server, fc2, 2, 'Lapsed', 'mage');
     const otherEnt = server.sim.entities.get(other.pid)!;
     otherEnt.devTier = 4;
-    otherEnt.devCommits = 187;
+    otherEnt.devMergedPrs = 187;
     otherEnt.githubLogin = 'CharlieSaxton';
     server.sim.tick();
     fc.sent.length = 0;
@@ -258,7 +258,7 @@ describe('developer-badge identity broadcast round-trip', () => {
     // Unlink (or a recount that drops below tier 1): the server clears all three
     // fields back to the "no badge" state.
     otherEnt.devTier = 0;
-    otherEnt.devCommits = undefined;
+    otherEnt.devMergedPrs = undefined;
     otherEnt.githubLogin = undefined;
     server.sim.tick();
     fc.sent.length = 0;
@@ -278,7 +278,7 @@ describe('developer-badge identity broadcast round-trip', () => {
     (client as any).applySnapshot(snap);
     const decoded = client.entities.get(other.pid)!;
     expect(decoded.devTier).toBe(0);
-    expect(decoded.devCommits).toBeUndefined();
+    expect(decoded.devMergedPrs).toBeUndefined();
     expect(decoded.githubLogin).toBeUndefined();
   });
 });

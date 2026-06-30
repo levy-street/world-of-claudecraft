@@ -33,14 +33,14 @@ export interface GuildLeaderboardEntry {
 }
 
 // One ranked row of the DEVELOPER high-score board: contributors ranked by how
-// many commits they have landed in the open-source repo. Sourced from GitHub's
-// public contributor stats (cached server-side), the same for every realm, so the
-// offline Sim ranks none (empty page) and the client only displays what the
-// server ranked. `devTier` is the rung the commit count earns (1-5).
+// many pull requests they have had MERGED into the open-source repo. Sourced
+// from GitHub's pulls API (cached server-side), the same for every realm, so
+// the offline Sim ranks none (empty page) and the client only displays what
+// the server ranked. `devTier` is the rung the merged-PR count earns (1-5).
 export interface DevLeaderboardEntry {
   rank: number;
   login: string;
-  commits: number;
+  mergedPrs: number;
   devTier: number;
 }
 
@@ -61,9 +61,9 @@ export interface IWorldProgressionXp {
   // lifetime XP), paged server-side the same way as the player board. Guilds are
   // a server-only social system, so the offline Sim resolves an empty page.
   guildLeaderboard(page?: number, pageSize?: number): Promise<GuildLeaderboardPage>;
-  // The developer high-score board (contributors ranked by landed commits),
-  // sourced from the repo's public GitHub contributor stats and paged the same
-  // way. The same data for every realm; the offline Sim resolves an empty page.
+  // The developer high-score board (contributors ranked by merged PRs), sourced
+  // from the repo's GitHub pulls API and paged the same way. The same data for
+  // every realm; the offline Sim resolves an empty page.
   devLeaderboard(page?: number, pageSize?: number): Promise<DevLeaderboardPage>;
   prestige(): void;
 }

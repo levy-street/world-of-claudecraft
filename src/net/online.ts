@@ -1231,7 +1231,7 @@ export class ClientWorld implements IWorld {
         e.discordJoined = typeof w.dj === 'number' ? w.dj : undefined; // Discord join epoch ms
         e.discordRole = typeof w.dr === 'string' ? w.dr : undefined; // top staff/special role key
         e.devTier = w.dvt ?? 0; // developer-badge tier (cosmetic, server-set)
-        e.devCommits = typeof w.dvc === 'number' ? w.dvc : undefined; // landed commit count
+        e.devMergedPrs = typeof w.dvc === 'number' ? w.dvc : undefined; // merged-PR count
         e.githubLogin = typeof w.dgl === 'string' ? w.dgl : undefined; // GitHub login
         e.scale = w.sc ?? 1;
         e.color = w.c ?? 0xffffff;

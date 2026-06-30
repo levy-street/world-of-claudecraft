@@ -1,6 +1,6 @@
 // Pure (IO-free) helpers for the OUTBOUND GitHub OAuth2 flow: the game server is
 // the CLIENT to github.com (it links a player's account to a verified GitHub
-// identity so the developer badge can credit their landed commits). Kept separate
+// identity so the developer badge can credit their merged pull requests). Kept separate
 // from server/github.ts (DB + HTTP) so URL building and GitHub API response
 // parsing can be unit tested without a database or network. Mirrors
 // server/discord_oauth.ts and the wallet_link.ts / wallet.ts pure/IO split.

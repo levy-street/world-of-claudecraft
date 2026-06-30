@@ -1459,12 +1459,12 @@ export interface Entity {
   discordJoined?: number;
   discordRole?: string;
   // Developer-badge flair (cosmetic, server-set from a verified GitHub link plus
-  // the repo's contributor stats; the sim never reads any of it): the tier index
-  // (0/undefined = none, 1-5 = Tinkerer…Worldwright), the count of landed commits
-  // backing it (for the inspect/card readout), and the GitHub login (for the
-  // inspect readout and the public profile link).
+  // the repo's merged-PR stats; the sim never reads any of it): the tier index
+  // (0/undefined = none, 1-5 = Tinkerer…Worldwright), the count of merged pull
+  // requests backing it (for the inspect/card readout), and the GitHub login
+  // (for the inspect readout and the public profile link).
   devTier?: number;
-  devCommits?: number;
+  devMergedPrs?: number;
   githubLogin?: string;
 }
 

@@ -380,15 +380,15 @@ export class LeaderboardWindow {
     );
   }
 
-  // Developer-board header: rank, contributor (GitHub login), earned tier, landed
-  // commits. Reuses the shared rank/name columns; the dev-specific columns get
-  // their own classes so the grid stays aligned with the other tabs.
+  // Developer-board header: rank, contributor (GitHub login), earned tier,
+  // merged PRs. Reuses the shared rank/name columns; the dev-specific columns
+  // get their own classes so the grid stays aligned with the other tabs.
   private devHeaderHtml(): string {
     return (
       `<div class="lb-row lb-row-dev lb-head"><span class="lb-rank">${esc(t('game.leaderboard.rank'))}</span>` +
       `<span class="lb-name">${esc(t('hudChrome.leaderboard.devName'))}</span>` +
       `<span class="lb-dev-tier">${esc(t('hudChrome.leaderboard.devTierCol'))}</span>` +
-      `<span class="lb-commits">${esc(t('hudChrome.leaderboard.commits'))}</span></div>`
+      `<span class="lb-commits">${esc(t('hudChrome.leaderboard.mergedPrs'))}</span></div>`
     );
   }
 
@@ -405,7 +405,7 @@ export class LeaderboardWindow {
       `<div class="lb-row lb-row-dev${r.me ? ' lb-mine' : ''}"><span class="lb-rank">${r.rank}</span>` +
       `<span class="lb-name">${badge}@${esc(r.login)}${you}</span>` +
       `<span class="lb-dev-tier">${esc(tierName)}</span>` +
-      `<span class="lb-commits">${formatNumber(r.commits, { maximumFractionDigits: 0 })}</span></div>`
+      `<span class="lb-commits">${formatNumber(r.mergedPrs, { maximumFractionDigits: 0 })}</span></div>`
     );
   }
 

@@ -282,7 +282,7 @@ export const zh_TW: EnTranslations = {
       "guildEmpty": "還沒有上榜的公會。",
       "devName": "貢獻者",
       "devTierCol": "徽章",
-      "commits": "提交數",
+      "mergedPrs": "已合併 PR",
       "devEmpty": "還沒有上榜的貢獻者。"
     },
     "raidLockout": {
@@ -891,19 +891,19 @@ export const zh_TW: EnTranslations = {
         "worldwright": "世界鑄造者"
       },
       "flavors": {
-        "tinkerer": "你的第一個提交已落地於這片大陸。",
-        "artificer": "十次提交之後，世界開始順從你的程式碼。",
-        "runesmith": "五十次提交，已熔鑄進執行中的遊戲。",
-        "architect": "這片大陸的架構師：已落地 150 次提交。",
-        "worldwright": "世界的鑄造者：500 次提交塑造了這款遊戲。"
+        "tinkerer": "你的第一個拉取請求已合併到這片大陸。",
+        "artificer": "五次拉取請求合併後，世界開始順從你的程式碼。",
+        "runesmith": "十五次拉取請求，已熔鑄進執行中的遊戲。",
+        "architect": "這片大陸的架構師：已合併 30 次拉取請求。",
+        "worldwright": "世界的鑄造者：70 次拉取請求塑造了這款遊戲。"
       },
       "badgeTitle": "開發者：{tier}",
-      "commitsLanded": "已落地 {count} 次提交",
+      "prsLanded": "已合併 {count} 次拉取請求",
       "contributor": "開源貢獻者",
       "link": {
         "cta": "連結 GitHub",
         "relink": "重新連結 GitHub",
-        "benefits": "連結你的 GitHub，即可憑你在開源儲存庫中已落地的提交獲得開發者徽章。",
+        "benefits": "連結你的 GitHub，即可憑你在開源儲存庫中已合併的拉取請求獲得開發者徽章。",
         "error": "無法連結 GitHub。請再試一次。"
       },
       "linkedAs": "已連結為 {login}",

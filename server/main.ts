@@ -1159,8 +1159,8 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           ...guildSlice,
         });
       }
-      // ?board=devs ranks open-source CONTRIBUTORS by landed commits, sourced from
-      // the cached public GitHub contributor stats. The same data for every realm,
+      // ?board=devs ranks open-source CONTRIBUTORS by merged pull requests, sourced
+      // from the cached public GitHub PR stats. The same data for every realm,
       // so it is realm-agnostic; rate-limited per IP like the other boards via the
       // shared route limiter is unnecessary here (it reads an in-memory cache), but
       // a failing GitHub fetch already backs off inside topContributors.

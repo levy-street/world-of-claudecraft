@@ -282,7 +282,7 @@ export const ja_JP: EnTranslations = {
       "guildEmpty": "ランク入りのギルドはまだありません。",
       "devName": "コントリビューター",
       "devTierCol": "バッジ",
-      "commits": "コミット数",
+      "mergedPrs": "マージ済みPR",
       "devEmpty": "ランク入りのコントリビューターはまだいません。"
     },
     "raidLockout": {
@@ -891,19 +891,19 @@ export const ja_JP: EnTranslations = {
         "worldwright": "世界の造り手"
       },
       "flavors": {
-        "tinkerer": "最初のコミットがこの世界に刻まれた。",
-        "artificer": "10 のコミットを経て、世界はあなたのコードに従い始める。",
-        "runesmith": "50 のコミットが、稼働中のゲームに鍛え込まれた。",
-        "architect": "この世界の設計者：150 のコミットが刻まれた。",
-        "worldwright": "世界の造り手：500 のコミットがこのゲームを形づくる。"
+        "tinkerer": "最初のプルリクエストがこの世界にマージされた。",
+        "artificer": "5 件のプルリクエストを経て、世界はあなたのコードに従い始める。",
+        "runesmith": "15 件のプルリクエストが、稼働中のゲームに鍛え込まれた。",
+        "architect": "この世界の設計者：30 件のプルリクエストがマージされた。",
+        "worldwright": "世界の造り手：70 件のプルリクエストがこのゲームを形づくる。"
       },
       "badgeTitle": "開発者：{tier}",
-      "commitsLanded": "{count} 件のコミットを反映",
+      "prsLanded": "{count} 件のプルリクエストがマージ済み",
       "contributor": "オープンソース貢献者",
       "link": {
         "cta": "GitHub を連携",
         "relink": "GitHub を再連携",
-        "benefits": "GitHub を連携すると、オープンソースリポジトリに反映されたコミットに応じて開発者バッジを獲得できます。",
+        "benefits": "GitHub を連携すると、オープンソースリポジトリにマージされたプルリクエストに応じて開発者バッジを獲得できます。",
         "error": "GitHub を連携できませんでした。もう一度お試しください。"
       },
       "linkedAs": "{login} として連携済み",

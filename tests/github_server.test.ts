@@ -77,12 +77,12 @@ function defaultRouter(sql: string) {
 
 // Routes the three external GitHub endpoints the callback + status path touch:
 // the OAuth token exchange, the authenticated /user identity read, and the
-// public /contributors stats (which githubStatusPayload pulls in via
-// commitsForLogin -> getContributors()).
-function mockGithubFetch(opts: { login?: string; id?: number; contributions?: number } = {}) {
+// public /pulls merged-PR stats (which githubStatusPayload pulls in via
+// mergedPrsForLogin -> getContributors()).
+function mockGithubFetch(opts: { login?: string; id?: number; mergedPrs?: number } = {}) {
   const login = opts.login ?? 'FernandoX7';
   const id = opts.id ?? 16779411;
-  const contributions = opts.contributions ?? 821;
+  const mergedPrs = opts.mergedPrs ?? 70;
   return vi.spyOn(globalThis, 'fetch' as any).mockImplementation((url: any) => {
     const u = String(url);
     if (u.includes('/login/oauth/access_token')) {
@@ -92,11 +92,16 @@ function mockGithubFetch(opts: { login?: string; id?: number; contributions?: nu
           Promise.resolve({ access_token: 'tok', token_type: 'bearer', scope: 'read:user' }),
       } as any);
     }
-    if (u.includes('/contributors')) {
+    if (u.includes('/pulls')) {
+      const prs = Array.from({ length: mergedPrs }, () => ({
+        number: 1,
+        user: { login, type: 'User' },
+        merged_at: '2024-01-01T00:00:00Z',
+      }));
       return Promise.resolve({
         ok: true,
         headers: { get: () => null },
-        json: () => Promise.resolve([{ login, type: 'User', contributions }]),
+        json: () => Promise.resolve(prs),
       } as any);
     }
     if (u.endsWith('/user')) {
@@ -179,7 +184,7 @@ describe('POST /api/auth/github/start', () => {
 });
 
 describe('GET /api/github (status)', () => {
-  it('reports unlinked with no commits and tier 0', async () => {
+  it('reports unlinked with no merged PRs and tier 0', async () => {
     const res = makeRes();
     await handleGitHubStatus(makeReq(), res, 1);
     const { status, data } = parse(res);
@@ -187,23 +192,23 @@ describe('GET /api/github (status)', () => {
     expect(data.enabled).toBe(true);
     expect(data.linked).toBe(false);
     expect(data.login).toBeNull();
-    expect(data.commits).toBe(0);
+    expect(data.mergedPrs).toBe(0);
     expect(data.devTier).toBe(0);
   });
 
-  it('reports the linked login, its landed-commit count, and the resulting tier', async () => {
+  it('reports the linked login, its merged-PR count, and the resulting tier', async () => {
     linkRow = [
       { account_id: 1, github_user_id: '16779411', github_login: 'FernandoX7', linked_at: 'now' },
     ];
-    mockGithubFetch({ login: 'FernandoX7', contributions: 821 });
+    mockGithubFetch({ login: 'FernandoX7', mergedPrs: 70 });
     const res = makeRes();
     await handleGitHubStatus(makeReq(), res, 1);
     const { data } = parse(res);
     expect(data.linked).toBe(true);
     expect(data.login).toBe('FernandoX7');
     expect(data.profileUrl).toBe('https://github.com/FernandoX7');
-    expect(data.commits).toBe(821);
-    expect(data.devTier).toBe(5); // 821 commits -> Worldwright (rung 5)
+    expect(data.mergedPrs).toBe(70);
+    expect(data.devTier).toBe(5); // 70 merged PRs -> Worldwright (rung 5)
   });
 
   it('reports enabled=false when GitHub OAuth is not configured', async () => {
