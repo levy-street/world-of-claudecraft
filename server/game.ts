@@ -498,6 +498,9 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.discordName) out.dnm = e.discordName; // Discord handle / nickname (nameplate)
   if (e.discordJoined) out.dj = e.discordJoined; // Discord join epoch ms (member since)
   if (e.discordRole) out.dr = e.discordRole; // top staff/special role key (name color + tag)
+  if (e.devTier) out.dvt = e.devTier; // developer-badge tier (cosmetic)
+  if (e.devCommits) out.dvc = e.devCommits; // landed commit count, for inspect/card
+  if (e.githubLogin) out.dgl = e.githubLogin; // GitHub login (inspect readout + profile link)
   if (e.guild) out.gd = e.guild;
   if (e.dungeonId) out.dgn = e.dungeonId;
   if (e.objectItemId) out.obj = e.objectItemId;
