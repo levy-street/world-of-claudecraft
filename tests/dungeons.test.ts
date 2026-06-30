@@ -4,6 +4,7 @@
 // the party-shared instance, the claim -> free empty-reset, and the raid-lockout gate.
 
 import { describe, expect, it } from 'vitest';
+import { resolveMovement } from '../src/sim/colliders';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import {
   enterDungeon,
@@ -30,8 +31,12 @@ function teleport(sim: AnySim, e: AnyEntity, x: number, z: number): void {
 }
 
 function hollowDoor(sim: AnySim): AnyEntity {
+  return dungeonDoor(sim, 'hollow_crypt');
+}
+
+function dungeonDoor(sim: AnySim, dungeonId: string): AnyEntity {
   return [...sim.entities.values()].find(
-    (e: AnyEntity) => e.templateId === 'dungeon_door' && e.dungeonId === 'hollow_crypt',
+    (e: AnyEntity) => e.templateId === 'dungeon_door' && e.dungeonId === dungeonId,
   ) as AnyEntity;
 }
 
@@ -97,6 +102,42 @@ describe('dungeons: door-trigger entry/exit', () => {
     updateDoorTriggers(sim.ctx, p);
 
     expect(sim.instanceSlotAt(p.pos)).toBeNull(); // back outside the instance
+  });
+
+  it('walking through the Abandoned Crypt doorway enters Nythraxis Crypt', () => {
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'Cryptwalker');
+    const p = sim.entities.get(pid) as AnyEntity;
+    const door = dungeonDoor(sim, 'nythraxis_crypt');
+    const beforeDoor = { x: door.pos.x, z: door.pos.z - 4 };
+    const reachedDoor = resolveMovement(
+      sim.cfg.seed,
+      beforeDoor.x,
+      beforeDoor.z,
+      door.pos.x,
+      door.pos.z,
+      0.5,
+    );
+
+    expect(reachedDoor.x).toBeCloseTo(door.pos.x);
+    expect(reachedDoor.z).toBeCloseTo(door.pos.z);
+
+    teleport(sim, p, reachedDoor.x, reachedDoor.z);
+    updateDoorTriggers(sim.ctx, p);
+
+    const slot = sim.instanceSlotAt(p.pos);
+    expect(slot).not.toBeNull();
+    const dungeon = DUNGEONS.nythraxis_crypt;
+    const origin = instanceOrigin(dungeon.index, slot!);
+    expect(p.pos.x).toBeCloseTo(origin.x + dungeon.entry.x);
+    expect(p.pos.z).toBeCloseTo(origin.z + dungeon.entry.z);
+    expect(
+      (sim.instances as any[]).some(
+        (inst) =>
+          inst.dungeonId === 'nythraxis_crypt' &&
+          inst.partyKey === instanceKeyFor(sim.ctx, pid),
+      ),
+    ).toBe(true);
   });
 });
 
