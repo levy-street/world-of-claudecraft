@@ -111,6 +111,16 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '自动会根据你的设备选择桌面或触控操作。选择桌面可强制使用键盘和鼠标（适合带键盘的平板），选择触控则使用屏幕上的操作控件。',
   // Character-sheet stat tooltips (hudChrome.statInfo.*).
   'hudChrome.statInfo.fromYour': '来自你的 {value} 点{stat}：',
+  'hudChrome.statInfo.names.spellPower': '法术强度',
+  'hudChrome.statInfo.desc.spellPower':
+    '提高你法术造成的伤害和治疗的强度。每点智力都会提供少量法术强度，此外还有来自装备和增益的加成。',
+  'hudChrome.statInfo.sources.header': '构成：',
+  'hudChrome.statInfo.sources.base': '基础：{value}',
+  'hudChrome.statInfo.sources.attributes': '来自属性：{value}',
+  'hudChrome.statInfo.sources.fromAttribute': '来自{stat}：{value}',
+  'hudChrome.statInfo.sources.gear': '装备：{value}',
+  'hudChrome.statInfo.sources.buff': '{name}：{value}',
+  'hudChrome.statInfo.sources.talents': '天赋与效果：{value}',
   'hudChrome.statInfo.desc.str': '提高你的攻击强度，使你的武器攻击造成更高的伤害。',
   'hudChrome.statInfo.desc.agi': '提高你的反应和准度，强化你的多项战斗属性。',
   'hudChrome.statInfo.desc.sta': '强健你的体魄，提高你的最大生命值以及休息时恢复生命值的速度。',
