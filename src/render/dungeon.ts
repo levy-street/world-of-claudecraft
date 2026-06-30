@@ -15,6 +15,8 @@ import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { instanceOrigin } from '../sim/data';
+import type { DelveModuleId } from '../sim/delve_layout';
+import { isLitanyModuleId } from '../sim/delve_litany_layout';
 import {
   ARENA_LAYOUT,
   CRYPT_LAYOUT,
@@ -32,6 +34,13 @@ import {
 } from '../sim/dungeon_layout';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
+import {
+  placeLitanyMarshDressing,
+  placeMarshBlackwaterPools,
+  placeMarshClutter,
+  placeMarshTombs,
+  placeMarshWallDressing,
+} from './delve_marsh_dressing';
 import { sharedUniforms } from './gfx';
 import { radialGlowTexture } from './textures';
 
@@ -618,7 +627,8 @@ export class DungeonInteriors {
     opts?: {
       layout?: DungeonLayout;
       variant?: Variant;
-      hazards?: Array<{ x: number; z: number; r: number }>;
+      hazards?: Array<{ x: number; z: number; r: number; tier?: 'shallow' | 'deep' }>;
+      moduleId?: DelveModuleId;
     },
   ): Promise<void> {
     await ensureDungeonAssets();
@@ -654,7 +664,20 @@ export class DungeonInteriors {
       this.placeFloodwater(group, layout);
       this.placeAquaticDressing(group, layout);
     }
-    if (opts?.hazards?.length) this.placeBlackwaterPools(group, opts.hazards);
+    if (opts?.hazards?.length) {
+      if (variant === 'delve_marsh' || variant === 'delve_marsh_apse') {
+        placeMarshBlackwaterPools(group, opts.hazards, (x, z, color, y, scale) =>
+          this.addTorchGlow(group, x, z, color, y, scale),
+        );
+      } else {
+        this.placeBlackwaterPools(group, opts.hazards);
+      }
+    }
+    if (variant === 'delve_marsh' || variant === 'delve_marsh_apse') {
+      if (opts?.moduleId && isLitanyModuleId(opts.moduleId)) {
+        placeLitanyMarshDressing(p, group, opts.moduleId, layout, variant);
+      }
+    }
 
     this.emit(group, p);
     if (arenaWalls) {
@@ -1367,6 +1390,10 @@ export class DungeonInteriors {
   // Wall-side obstacles at +-19 (OBB 2.2 x 4.2): sarcophagi in the crypt and
   // sanctum-free; the drowned bastion stacks cargo in the same footprints.
   private placeTombs(p: Placements, layout: DungeonLayout, variant: Variant): void {
+    if (variant === 'delve_marsh') {
+      placeMarshTombs(p, layout);
+      return;
+    }
     for (const t of layout.tombs) {
       const r = hash2(t.x * 3.7, t.z);
       if (variant === 'bastion') {
@@ -1395,9 +1422,8 @@ export class DungeonInteriors {
           p.add('skull', t.x, 0, t.z - 1.6, hash2(t.x, t.z) * Math.PI * 2, 1.2);
         continue;
       }
-      if (variant === 'delve_ossuary' || variant === 'delve_marsh') {
-        // burial shelves: stacked coffins with bone spill at their feet (the
-        // marsh trash rooms reuse this layout under bog-green light)
+      if (variant === 'delve_ossuary') {
+        // burial shelves: stacked coffins with bone spill at their feet
         p.add(r < 0.5 ? 'coffin' : 'coffin_decorated', t.x, 0, t.z, 0, [1.15, 1.35, 1.45]);
         const sx = t.x < 0 ? 1 : -1;
         p.add('ribcage', t.x + sx * 1.5, 0.4, t.z - 1.4, hash2(t.x, t.z) * Math.PI * 2, 1.5);
@@ -1548,6 +1574,10 @@ export class DungeonInteriors {
     // formula). The Reliquary clutter arrays mirror the old formula positions, so
     // their rendered output is unchanged.
     if (isDelveVariant(variant)) {
+      if (variant === 'delve_marsh') {
+        placeMarshClutter(p, layout);
+        return;
+      }
       for (const c of layout.clutter ?? []) {
         const x = c.x;
         const z = c.z;
@@ -1648,9 +1678,8 @@ export class DungeonInteriors {
 
     if (isDelveVariant(variant)) {
       const edge = (layout.wallX ?? DUNGEON_WALL_X) - 1.6;
-      if (variant === 'delve_ossuary' || variant === 'delve_marsh') {
+      if (variant === 'delve_ossuary') {
         // ossuary shelves: rows of graves and bone reliquaries hugging the walls
-        // (marsh trash rooms reuse this wall dressing under bog-green light)
         for (let z = layout.zMin + 22; z < layout.zMax - 10; z += 17) {
           for (const side of [-1, 1]) {
             const r = hash2(side * 5.1, z);
@@ -1661,6 +1690,10 @@ export class DungeonInteriors {
         }
         p.add('shrine_candles', -edge, 0, layout.zMin + 4, Math.PI / 4, 1.5);
         p.add('shrine', edge, 0, layout.zMax - 5, -Math.PI * 0.75, 1.5);
+        return;
+      }
+      if (variant === 'delve_marsh') {
+        placeMarshWallDressing(p, layout);
         return;
       }
       if (variant === 'delve_bell') {
