@@ -335,6 +335,7 @@ export const ru_RU: EnTranslations = {
       "showItemLevel": "Показывать уровень предмета",
       "itemLevelLine": "Уровень предмета {level}",
       "itemScoreLine": "Оценка {score}",
+      "autoLoot": "Auto-Loot Corpses",
       "showSecondaryActionBar": "Показывать вторичную панель действий"
     },
     "controller": {

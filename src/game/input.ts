@@ -57,7 +57,12 @@ export interface InputCallbacks {
       | 'leaderboard',
   ): void;
   onEmoteWheel(open: boolean): void;
-  onClickPick(x: number, y: number, button: number): void;
+  onClickPick(
+    x: number,
+    y: number,
+    button: number,
+    modifiers?: { shift: boolean; ctrl: boolean; alt: boolean; meta: boolean },
+  ): void;
   /** Attack-move key pressed (only fires while Attack Move mode is on); x/y is the cursor. */
   onAttackMove?(x: number, y: number): void;
   /** When false, edge actions (spells, UI keys) are ignored. */
@@ -793,7 +798,13 @@ export class Input {
     ) {
       document.exitPointerLock();
     }
-    if (pick) this.cb.onClickPick(pick.x, pick.y, pick.button);
+    if (pick)
+      this.cb.onClickPick(pick.x, pick.y, pick.button, {
+        shift: e.shiftKey,
+        ctrl: e.ctrlKey,
+        alt: e.altKey,
+        meta: e.metaKey,
+      });
     if (!this.leftDown && !this.rightDown) this.cameraDragActive = false;
     this.downButton = -1;
     this.pointerLockRequestedForDrag = false;

@@ -335,6 +335,7 @@ export const nl_NL: EnTranslations = {
       "showItemLevel": "Itemniveau tonen",
       "itemLevelLine": "Itemniveau {level}",
       "itemScoreLine": "Score {score}",
+      "autoLoot": "Auto-Loot Corpses",
       "showSecondaryActionBar": "Secundaire actiebalk tonen"
     },
     "controller": {

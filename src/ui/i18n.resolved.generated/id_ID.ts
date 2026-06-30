@@ -335,6 +335,7 @@ export const id_ID: EnTranslations = {
       "showItemLevel": "Tampilkan Level Item",
       "itemLevelLine": "Level Item {level}",
       "itemScoreLine": "Skor {score}",
+      "autoLoot": "Auto-Loot Corpses",
       "showSecondaryActionBar": "Tampilkan Bilah Aksi Sekunder"
     },
     "controller": {

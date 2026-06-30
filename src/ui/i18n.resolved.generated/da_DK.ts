@@ -335,6 +335,7 @@ export const da_DK: EnTranslations = {
       "showItemLevel": "Vis genstandsniveau",
       "itemLevelLine": "Genstandsniveau {level}",
       "itemScoreLine": "Score {score}",
+      "autoLoot": "Auto-Loot Corpses",
       "showSecondaryActionBar": "Vis sekundær handlingslinje"
     },
     "controller": {

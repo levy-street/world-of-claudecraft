@@ -243,6 +243,7 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       'landingHighContrast',
       'invertLookY',
       'showItemLevel',
+      'autoLoot',
       'showSecondaryActionBar',
     ]);
     expect(find(controls, 'reduceMotion')).toMatchObject({ control: 'boolToggle' });

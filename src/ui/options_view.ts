@@ -366,6 +366,7 @@ export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl
     boolToggle(s, 'landingHighContrast', 'hudChrome.options.highContrastBackground'),
     boolToggle(s, 'invertLookY', 'hud.options.invertLookY'),
     boolToggle(s, 'showItemLevel', 'hudChrome.options.showItemLevel'),
+    boolToggle(s, 'autoLoot', 'hudChrome.options.autoLoot'),
     boolToggle(s, 'showSecondaryActionBar', 'hudChrome.options.showSecondaryActionBar'),
   ];
 }

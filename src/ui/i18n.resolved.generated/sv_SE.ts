@@ -335,6 +335,7 @@ export const sv_SE: EnTranslations = {
       "showItemLevel": "Visa föremålsnivå",
       "itemLevelLine": "Föremålsnivå {level}",
       "itemScoreLine": "Poäng {score}",
+      "autoLoot": "Auto-Loot Corpses",
       "showSecondaryActionBar": "Visa sekundärt handlingsfält"
     },
     "controller": {

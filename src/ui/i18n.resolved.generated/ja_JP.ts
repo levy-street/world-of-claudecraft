@@ -335,6 +335,7 @@ export const ja_JP: EnTranslations = {
       "showItemLevel": "アイテムレベルを表示",
       "itemLevelLine": "アイテムレベル {level}",
       "itemScoreLine": "スコア {score}",
+      "autoLoot": "Auto-Loot Corpses",
       "showSecondaryActionBar": "セカンダリアクションバーを表示"
     },
     "controller": {

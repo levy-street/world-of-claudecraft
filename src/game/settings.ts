@@ -194,6 +194,10 @@ export const BOOL_SETTINGS = {
   // tooltip. Purely a display preference read live by the HUD; off keeps the
   // classic stat-only tooltip. See src/sim/item_level.ts for the derivation.
   showItemLevel: { def: false },
+  // off by default: clicking a lootable corpse opens the loot window. When on,
+  // corpse clicks immediately send the existing server-authoritative loot command;
+  // holding Shift inverts the behavior for that one corpse.
+  autoLoot: { def: false },
   // off by default: out of the box the HUD shows a single action bar. When on, the
   // second action bar row (#actionbar2, slots 12..22) is revealed via a body class
   // applied in main.ts. Purely a display preference; the slots stay reachable via

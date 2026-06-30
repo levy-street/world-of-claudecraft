@@ -10,51 +10,75 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "hudChrome.options.autoLoot",
     "hudChrome.party.promoteLeader"
   ],
   "es_ES": [
+    "hudChrome.options.autoLoot",
     "hudChrome.party.promoteLeader"
   ],
   "fr_FR": [
+    "hudChrome.options.autoLoot",
     "hudChrome.party.promoteLeader"
   ],
   "fr_CA": [
+    "hudChrome.options.autoLoot",
     "hudChrome.party.promoteLeader"
   ],
   "en_CA": [],
   "it_IT": [
+    "hudChrome.options.autoLoot",
     "hudChrome.party.promoteLeader"
   ],
   "de_DE": [
+    "hudChrome.options.autoLoot",
     "hudChrome.party.promoteLeader"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "hudChrome.options.autoLoot"
+  ],
+  "zh_TW": [
+    "hudChrome.options.autoLoot"
+  ],
+  "ko_KR": [
+    "hudChrome.options.autoLoot"
+  ],
+  "ja_JP": [
+    "hudChrome.options.autoLoot"
+  ],
   "pt_BR": [
+    "hudChrome.options.autoLoot",
     "hudChrome.party.promoteLeader"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "hudChrome.options.autoLoot"
+  ],
   "nl_NL": [
+    "hudChrome.options.autoLoot",
     "hudChrome.party.promoteLeader"
   ],
   "pl_PL": [
+    "hudChrome.options.autoLoot",
     "hudChrome.party.promoteLeader"
   ],
   "id_ID": [
+    "hudChrome.options.autoLoot",
     "hudChrome.party.promoteLeader"
   ],
   "tr_TR": [
+    "hudChrome.options.autoLoot",
     "hudChrome.party.promoteLeader"
   ],
   "sv_SE": [
+    "hudChrome.options.autoLoot",
     "hudChrome.party.promoteLeader"
   ],
   "vi_VN": [
+    "hudChrome.options.autoLoot",
     "hudChrome.party.promoteLeader"
   ],
   "da_DK": [
+    "hudChrome.options.autoLoot",
     "hudChrome.party.promoteLeader"
   ]
 };

@@ -335,6 +335,7 @@ export const en_CA: EnTranslations = {
       "showItemLevel": "Show Item Level",
       "itemLevelLine": "Item Level {level}",
       "itemScoreLine": "Score {score}",
+      "autoLoot": "Auto-Loot Corpses",
       "showSecondaryActionBar": "Show Secondary Action Bar"
     },
     "controller": {

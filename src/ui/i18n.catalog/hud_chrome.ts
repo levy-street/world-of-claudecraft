@@ -299,6 +299,9 @@ export const hudChromeStrings = {
     showItemLevel: 'Show Item Level',
     itemLevelLine: 'Item Level {level}',
     itemScoreLine: 'Score {score}',
+    // Interface panel toggle for corpse clicks. The Shift override is documented
+    // in the issue/PR, not in-app, to keep the options surface compact.
+    autoLoot: 'Auto-Loot Corpses',
     // Interface panel toggle that reveals the optional second action bar row (off
     // by default). The abilities bound to its slots stay castable via their keybinds.
     showSecondaryActionBar: 'Show Secondary Action Bar',

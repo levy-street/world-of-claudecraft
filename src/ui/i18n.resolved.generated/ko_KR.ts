@@ -335,6 +335,7 @@ export const ko_KR: EnTranslations = {
       "showItemLevel": "아이템 레벨 표시",
       "itemLevelLine": "아이템 레벨 {level}",
       "itemScoreLine": "점수 {score}",
+      "autoLoot": "Auto-Loot Corpses",
       "showSecondaryActionBar": "보조 액션 바 표시"
     },
     "controller": {

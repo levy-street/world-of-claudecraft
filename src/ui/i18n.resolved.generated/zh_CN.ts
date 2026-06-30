@@ -335,6 +335,7 @@ export const zh_CN: EnTranslations = {
       "showItemLevel": "显示物品等级",
       "itemLevelLine": "物品等级 {level}",
       "itemScoreLine": "评分 {score}",
+      "autoLoot": "Auto-Loot Corpses",
       "showSecondaryActionBar": "显示副动作条"
     },
     "controller": {

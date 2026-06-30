@@ -1137,7 +1137,7 @@ async function startGame(
         }
       },
       onEmoteWheel: (open) => hud.setEmoteWheelOpen(open),
-      onClickPick: (x, y, button) => handlePick(x, y, button),
+      onClickPick: (x, y, button, modifiers) => handlePick(x, y, button, modifiers),
       onAttackMove: (x, y) => handleAttackMove(x, y),
       canUseGameKeys: () => !hud.isModalOpen() && chatInput.style.display !== 'block',
     },
@@ -1377,6 +1377,10 @@ async function startGame(
         'show-actionbar2',
         settings.set('showSecondaryActionBar', !!value),
       );
+      return;
+    }
+    if (key === 'autoLoot') {
+      settings.set('autoLoot', !!value);
       return;
     }
     if (key === 'browserEffects') {
@@ -1707,7 +1711,12 @@ async function startGame(
     return resolvePlayerDestination(world.cfg.seed, target, true);
   }
 
-  function handlePick(x: number, y: number, button: number): void {
+  function handlePick(
+    x: number,
+    y: number,
+    button: number,
+    modifiers?: { shift: boolean; ctrl: boolean; alt: boolean; meta: boolean },
+  ): void {
     const id = renderer.pick(x, y);
     // OSRS-style click feedback (its own toggle): a brief ground marker, gold for a
     // neutral click and red on a hostile. Both reference games only mark a real action,
@@ -1750,7 +1759,10 @@ async function startGame(
         input.setClickMoveTarget(target, 3.5, e.id, clickMovePathTo(target));
       }
     }
-    handlePickedEntity(world, hud, id, button, x, y);
+    handlePickedEntity(world, hud, id, button, x, y, {
+      autoLootCorpses: settings.get('autoLoot'),
+      invertLoot: modifiers?.shift ?? false,
+    });
   }
 
   // Attack Move (MOBA-style): the Attack Move key walks the player toward the

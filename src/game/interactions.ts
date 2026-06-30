@@ -12,6 +12,7 @@ export interface PickInteractionWorld {
   targetEntity(id: number | null): void;
   enterDungeon(dungeonId: string): void;
   leaveDungeon(): void;
+  lootCorpse(id: number): void;
   pickUpObject(id: number): void;
   startAutoAttack(): void;
 }
@@ -84,6 +85,7 @@ export function handlePickedEntity(
   button: number,
   screenX: number,
   screenY: number,
+  options: { autoLootCorpses?: boolean; invertLoot?: boolean } = {},
 ): void {
   const e = world.entities.get(id);
   if (!e) return;
@@ -103,8 +105,10 @@ export function handlePickedEntity(
       else if (e.templateId === 'dungeon_exit') world.leaveDungeon();
       else world.pickUpObject(id);
     } else if (e.kind === 'mob' && e.dead && e.lootable) {
-      if (d <= INTERACT_RANGE + 1) hud.openLoot(id, screenX, screenY);
-      else hud.showError(t('questUi.errors.tooFar'));
+      if (d <= INTERACT_RANGE + 1) {
+        if (!!options.autoLootCorpses !== !!options.invertLoot) world.lootCorpse(id);
+        else hud.openLoot(id, screenX, screenY);
+      } else hud.showError(t('questUi.errors.tooFar'));
     } else if (e.kind === 'npc') {
       if (d <= INTERACT_RANGE + 2) {
         if (e.templateId === 'brother_halven') hud.openDelveBoard(id);
@@ -127,7 +131,10 @@ export function handlePickedEntity(
       else world.pickUpObject(id);
     } else if (e.kind === 'mob' && e.dead && e.lootable) {
       const d = dist2d(world.player.pos, e.pos);
-      if (d <= INTERACT_RANGE + 1) hud.openLoot(id, screenX, screenY);
+      if (d <= INTERACT_RANGE + 1) {
+        if (!!options.autoLootCorpses !== !!options.invertLoot) world.lootCorpse(id);
+        else hud.openLoot(id, screenX, screenY);
+      }
     } else if (e.kind === 'npc') {
       // left-click talks too — Mac trackpads make right-click a chore;
       // out of range it just targets (no error spam while exploring)

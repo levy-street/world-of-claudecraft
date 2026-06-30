@@ -335,6 +335,7 @@ export const en_XA: EnTranslations = {
       "showItemLevel": "[Šĥóŵ Íţéɱ Ļéʋéļ]",
       "itemLevelLine": "[Íţéɱ Ļéʋéļ {level}]",
       "itemScoreLine": "[Šçóŕé {score}]",
+      "autoLoot": "[Áúţó-Ļóóţ Çóŕþšéš]",
       "showSecondaryActionBar": "[Šĥóŵ Šéçóñðáŕý Áçţíóñ Ɓáŕ]"
     },
     "controller": {

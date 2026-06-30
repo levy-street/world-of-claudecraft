@@ -335,6 +335,7 @@ export const de_DE: EnTranslations = {
       "showItemLevel": "Gegenstandsstufe anzeigen",
       "itemLevelLine": "Gegenstandsstufe {level}",
       "itemScoreLine": "Wertung {score}",
+      "autoLoot": "Auto-Loot Corpses",
       "showSecondaryActionBar": "Zweite Aktionsleiste anzeigen"
     },
     "controller": {

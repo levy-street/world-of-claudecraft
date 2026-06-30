@@ -335,6 +335,7 @@ export const vi_VN: EnTranslations = {
       "showItemLevel": "Hiển Thị Cấp Vật Phẩm",
       "itemLevelLine": "Cấp Vật Phẩm {level}",
       "itemScoreLine": "Điểm {score}",
+      "autoLoot": "Auto-Loot Corpses",
       "showSecondaryActionBar": "Hiện Thanh Hành Động Phụ"
     },
     "controller": {
