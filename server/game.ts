@@ -109,6 +109,8 @@ const CHAT_RATE_REFILL_PER_SECOND = 1 / 3; // sustained 20 messages/minute
 const CHAT_RATE_ERROR_COOLDOWN_SECONDS = 4;
 const CHAT_COOLDOWN_SECONDS = 20;
 const CHAT_RATE_VIOLATIONS_FOR_COOLDOWN = 3;
+const INBOUND_RATE_BURST = 120;
+const INBOUND_RATE_REFILL_PER_SECOND = 40; // safely above the normal 20Hz input stream
 const WHO_RESULT_LIMIT = 50;
 const MAX_ACTIVE_SESSIONS_PER_ACCOUNT = 2;
 const RESTART_COUNTDOWN_TOTAL_SECONDS = 600;
@@ -315,6 +317,9 @@ export interface ClientSession {
   chatLastRateError: number;
   chatRateViolations: number;
   chatCooldownUntil: number;
+  inboundTokens: number;
+  inboundLastRefill: number;
+  inboundRateLimited: boolean;
   chatMutedUntil: number | null;
   chatMuteReason: string;
   // Hard-word enforcement strike count driving the mute ladder. Account-scoped:
@@ -1369,6 +1374,9 @@ export class GameServer {
       chatLastRateError: 0,
       chatRateViolations: 0,
       chatCooldownUntil: 0,
+      inboundTokens: INBOUND_RATE_BURST,
+      inboundLastRefill: Date.now() / 1000,
+      inboundRateLimited: false,
       chatMutedUntil: meta.mutedUntil ? new Date(meta.mutedUntil).getTime() : null,
       chatMuteReason: meta.reason ?? '',
       chatStrikes: meta.chatStrikes ?? 0,
@@ -1987,7 +1995,12 @@ export class GameServer {
   // -------------------------------------------------------------------------
 
   handleMessage(session: ClientSession, raw: string): void {
+    if (session.inboundRateLimited) return;
     const receivedAtMs = Date.now();
+    if (!this.consumeInboundMessageToken(session, receivedAtMs / 1000)) {
+      this.closeRateLimitedSession(session);
+      return;
+    }
     let msg: unknown;
     try {
       msg = JSON.parse(raw);
@@ -2009,6 +2022,32 @@ export class GameServer {
     }
   }
 
+  private consumeInboundMessageToken(session: ClientSession, nowSeconds: number): boolean {
+    const elapsed = Math.max(0, nowSeconds - session.inboundLastRefill);
+    session.inboundTokens = Math.min(
+      INBOUND_RATE_BURST,
+      session.inboundTokens + elapsed * INBOUND_RATE_REFILL_PER_SECOND,
+    );
+    session.inboundLastRefill = nowSeconds;
+    if (session.inboundTokens < 1) {
+      session.inboundRateLimited = true;
+      return false;
+    }
+    session.inboundTokens -= 1;
+    return true;
+  }
+
+  private closeRateLimitedSession(session: ClientSession): void {
+    try {
+      this.send(session, {
+        t: 'error',
+        error: 'Too many messages from this client. Reconnect and slow down.',
+      });
+      session.ws.close(1008, 'Too many messages');
+    } catch {
+      /* socket is already closing/closed */
+    }
+  }
   private messageCommand(msg: unknown): string {
     if (typeof msg !== 'object' || msg === null || Array.isArray(msg)) return 'unknown';
     const record = msg as Record<string, unknown>;

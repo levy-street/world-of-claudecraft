@@ -41,12 +41,22 @@ const DELTA_KEYS = [
 
 interface FakeClient {
   sent: any[];
+  closed: Array<{ code?: number; reason?: string }>;
   ws: any;
 }
 
 function fakeWs(): FakeClient {
   const sent: any[] = [];
-  return { sent, ws: { readyState: 1, send: (payload: string) => sent.push(JSON.parse(payload)) } };
+  const closed: Array<{ code?: number; reason?: string }> = [];
+  return {
+    sent,
+    closed,
+    ws: {
+      readyState: 1,
+      send: (payload: string) => sent.push(JSON.parse(payload)),
+      close: (code?: number, reason?: string) => closed.push({ code, reason }),
+    },
+  };
 }
 
 function lastSnap(sent: any[]): any {
@@ -484,6 +494,23 @@ describe('delta snapshots', () => {
     fc.sent.length = 0;
     broadcast(server);
     expect(lastSnap(fc.sent).self.ack).toBe(7);
+  });
+  it('rate-limits global inbound message floods before dispatch', () => {
+    fc.sent.length = 0;
+
+    for (let i = 1; i <= 160; i++) {
+      server.handleMessage(session, JSON.stringify({ t: 'input', seq: i, mi: { f: 1 } }));
+    }
+    broadcast(server);
+
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.ack).toBeLessThan(160);
+    expect(session.inboundRateLimited).toBe(true);
+    expect(fc.closed).toContainEqual({ code: 1008, reason: 'Too many messages' });
+    expect(fc.sent).toContainEqual({
+      t: 'error',
+      error: 'Too many messages from this client. Reconnect and slow down.',
+    });
   });
 
   it('turns echoed input acks into client latency samples', () => {
