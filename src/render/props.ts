@@ -1323,7 +1323,15 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       ? [0.55, 0.8, 1.0] // pale blue-white fade
       : [1.0, 0.5, 0.18];
     group.add(
-      buildDelveEmbers(dm.x, gy + 1.0, townFaceZ + 0.2, openW * 0.34, openH * 0.85, emberCol1, emberCol2),
+      buildDelveEmbers(
+        dm.x,
+        gy + 1.0,
+        townFaceZ + 0.2,
+        openW * 0.34,
+        openH * 0.85,
+        emberCol1,
+        emberCol2,
+      ),
     );
 
     // two flaming braziers flanking the mouth, a tended-entrance read. Reuse

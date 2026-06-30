@@ -201,7 +201,7 @@ function addDeadTree(group: THREE.Group, x: number, z: number, rot = 0): void {
   for (let i = 0; i < branchCount; i++) {
     const frac = 0.55 + hash2(x + i, z + i, MARSH_SEED) * 0.35;
     const bLen = 1.1 + hash2(x, z + i * 3.7, MARSH_SEED) * 0.9;
-    const bAngle = (hash2(z + i, x, MARSH_SEED) * Math.PI * 2) + rot;
+    const bAngle = hash2(z + i, x, MARSH_SEED) * Math.PI * 2 + rot;
     const bTilt = 0.55 + hash2(x + i * 2, z, MARSH_SEED) * 0.4;
     const branch = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.1, bLen, 5), bark);
     // Place branch origin at its attachment point on the trunk, angled outward.
@@ -323,7 +323,7 @@ export function placeMarshBlackwaterPools(
       pool.renderOrder = 1;
       group.add(pool);
       const rim = new THREE.Mesh(
-        new THREE.RingGeometry(r * 0.80, r * 1.04, 40)
+        new THREE.RingGeometry(r * 0.8, r * 1.04, 40)
           .rotateX(-Math.PI / 2)
           .translate(h.x, 0.13, h.z),
         new THREE.MeshBasicMaterial({
@@ -337,7 +337,7 @@ export function placeMarshBlackwaterPools(
       );
       rim.renderOrder = 2;
       group.add(rim);
-      addGlow(h.x, h.z, 0x3abcaa, 0.06, r * 0.80);
+      addGlow(h.x, h.z, 0x3abcaa, 0.06, r * 0.8);
     } else {
       // Deep (default): dark near-opaque navy/black - reads as drowning danger.
       const core = new THREE.Mesh(

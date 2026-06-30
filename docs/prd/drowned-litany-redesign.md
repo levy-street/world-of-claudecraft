@@ -10,7 +10,13 @@ that stage is the handoff.
 | 1 | Room layouts + shallow/deep water tiers + jump-dodge | DONE (commit, see board) |
 | 2 | Render: shallow/deep visuals + marsh dead-tree/plank assets | DONE (commit, see board) |
 | 3 | Boss: Tolling Bells line projectiles + knockback | DONE (commit, see board) |
-| 4 | Verify pass: minimap-from-data, guard tests, tsc, i18n S3 | IN PROGRESS |
+| 4 | Verify pass: guard tests, tsc, i18n S3, biome | DONE (commit, see board) |
+
+All four stages landed. Guard gate at completion: tsc clean (outside 3 pre-existing
+tests/browser errors), 160 passed / 1 pre-existing fail (world_api/chat.ts, unrelated)
+/ 3 skipped, biome formatted on changed files. Pre-existing issue to hand back to the
+user: src/world_api/chat.ts value-imports OVERHEAD_EMOTE_IDS from sim (architecture
+guard fail) - predates this work, not fixed here.
 
 Known follow-up: the Tolling Bell renders as a generic mob mesh (Stage 3 was sim-only);
 a custom rolling-bell visual + telegraph-lane decal is a nice-to-have render pass.

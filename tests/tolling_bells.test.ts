@@ -8,8 +8,8 @@
 import { describe, expect, it } from 'vitest';
 import { DELVES, MOBS } from '../src/sim/data';
 import { initDrownedLitanyBossState } from '../src/sim/delves/drowned_litany_boss';
-import { terrainHeight } from '../src/sim/world';
 import { Sim } from '../src/sim/sim';
+import { terrainHeight } from '../src/sim/world';
 
 const BELL_TEMPLATE_ID = 'tolling_bell';
 const SISTER_NHALIA_ID = 'sister_nhalia_drowned_canticle';
@@ -33,10 +33,7 @@ function teleport(sim: Sim, x: number, z: number) {
 function enterLitanyFinale(sim: Sim, tier: 'normal' | 'heroic' = 'normal') {
   const delve = DELVES.drowned_litany;
   const heroicTier = delve.tiers.find((t) => t.id === 'heroic');
-  const level =
-    tier === 'heroic'
-      ? (heroicTier?.minPlayerLevel ?? delve.minLevel)
-      : delve.minLevel;
+  const level = tier === 'heroic' ? (heroicTier?.minPlayerLevel ?? delve.minLevel) : delve.minLevel;
   sim.setPlayerLevel(level);
   const door = delve.doorPos;
   teleport(sim, door.x, door.z);
