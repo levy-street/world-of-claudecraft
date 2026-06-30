@@ -112,6 +112,7 @@ import {
   createMob,
   createNpc,
   createPlayer,
+  createProp,
   type PlayerEquipment,
   recalcPlayerStats,
 } from './entity';
@@ -855,6 +856,9 @@ export class Sim {
   accountCosmetics: AccountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
   private nextLootRollId = 1;
   private pendingLootRolls = new Map<number, PendingLootRoll>();
+  // In-world Builder: placed props. dbId -> entity id, and entity id -> meta map.
+  private propEntByDbId = new Map<number, number>();
+  private propMetaByEnt = new Map<number, { dialogue?: string; music?: string; voice?: string }>();
   trades = new Map<number, TradeSession>(); // pid -> shared session (both pids point at it)
   tradeInvites = new Map<number, { fromPid: number; expires: number }>();
   duels = new Map<number, DuelState>(); // pid -> shared duel (both pids)
@@ -1070,6 +1074,73 @@ export class Sim {
 
   rebucket(e: Entity): void {
     rebucketEntity(this.ctx, e);
+  }
+
+  // -------------------------------------------------------------------------
+  // In-world Builder (IWorldWorldBuilder). Offline these spawn directly; online
+  // the server is authoritative and feeds placements back via loadProps/spawn.
+  // -------------------------------------------------------------------------
+
+  /** Replay persisted props (called once on load with the realm's rows). */
+  loadProps(
+    rows: { id: number; propKey: string; x: number; z: number; facing: number; scale: number; meta: Record<string, string> }[],
+  ): void {
+    for (const r of rows) this.spawnProp(r.id, r.propKey, r.x, r.z, r.facing, r.scale, r.meta);
+  }
+
+  private spawnProp(
+    dbId: number,
+    propKey: string,
+    x: number,
+    z: number,
+    facing: number,
+    scale: number,
+    meta?: Record<string, string>,
+  ): void {
+    const e = createProp(this.nextId++, propKey, this.groundPos(x, z), facing, scale);
+    this.addEntity(e);
+    this.propEntByDbId.set(dbId, e.id);
+    if (meta && Object.keys(meta).length > 0) this.propMetaByEnt.set(e.id, { ...meta });
+  }
+
+  placeProp(propKey: string, x: number, z: number, facing: number, scale: number): void {
+    // Offline: synthesize a local id so the prop is selectable/movable in-session.
+    const localDbId = -this.nextId;
+    this.spawnProp(localDbId, propKey, x, z, facing, scale);
+  }
+
+  moveProp(dbId: number, x: number, z: number, facing: number, scale: number): void {
+    const entId = this.propEntByDbId.get(dbId);
+    if (entId === undefined) return;
+    const e = this.entities.get(entId);
+    if (!e) return;
+    e.pos = this.groundPos(x, z);
+    e.facing = facing;
+    e.scale = scale > 0 ? scale : 1;
+    this.rebucket(e);
+  }
+
+  removeProp(dbId: number): void {
+    const entId = this.propEntByDbId.get(dbId);
+    if (entId === undefined) return;
+    this.dropEntity(entId);
+    this.propEntByDbId.delete(dbId);
+    this.propMetaByEnt.delete(entId);
+  }
+
+  setPropMeta(dbId: number, meta: Record<string, string>): void {
+    const entId = this.propEntByDbId.get(dbId);
+    if (entId === undefined) return;
+    this.propMetaByEnt.set(entId, {
+      dialogue: typeof meta.dialogue === 'string' ? meta.dialogue : undefined,
+      music: typeof meta.music === 'string' ? meta.music : undefined,
+      voice: typeof meta.voice === 'string' ? meta.voice : undefined,
+    });
+  }
+
+  /** SimContext delegate: the meta a prop entity carries, or null. */
+  propMetaForEnt(entId: number): { dialogue?: string; music?: string; voice?: string } | null {
+    return this.propMetaByEnt.get(entId) ?? null;
   }
 
   private updatePendingMobRespawns(): void {
@@ -2157,6 +2228,7 @@ export class Sim {
       // is private on Sim. Both MUST keep talkToNpc a resolvable Sim delegate (W4 contract).
       talkToNpc: (npcId, pid) => sim.talkToNpc(npcId, pid),
       isQuestInteractionEntity: (e) => sim.isQuestInteractionEntity(e),
+      propMetaForEnt: (entId) => sim.propMetaForEnt(entId),
       // W5 chat router/readouts reach-backs. Late-bound arrows (call-time lookup): the
       // /assist branch routes through Sim's targetEntity delegate (-> targeting.ts);
       // partyReadout reads the cap off the party machine; the /listings readout asks the

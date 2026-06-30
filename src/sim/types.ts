@@ -1581,6 +1581,9 @@ export type SimEvent = { pid?: number } & (
         | 'roll';
       entityId?: number;
       to?: string;
+      // Optional audio an in-world Builder prop fires on interact, alongside its
+      // speech bubble: a music track URL and/or a voice-line key, played client-side.
+      propAudio?: { music?: string; voice?: string };
     }
   | { type: 'partyInvite'; fromPid: number; fromName: string }
   // a guild invitation from an online guild officer/leader; resolved by name

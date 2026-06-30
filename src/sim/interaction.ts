@@ -156,6 +156,9 @@ export function interact(ctx: SimContext, pid?: number): void {
         ctx.talkToNpc(target.id, p.id);
         return;
       }
+      if (target.kind === 'object' && target.templateId.startsWith('prop:')) {
+        if (speakProp(ctx, target)) return;
+      }
     }
   }
   let bestCorpse: Entity | null = null;
@@ -164,6 +167,8 @@ export function interact(ctx: SimContext, pid?: number): void {
   let bestObjD2 = INTERACT_RANGE * INTERACT_RANGE;
   let bestQuestEntity: Entity | null = null;
   let bestQuestD2 = INTERACT_RANGE * INTERACT_RANGE;
+  let bestProp: Entity | null = null;
+  let bestPropD2 = INTERACT_RANGE * INTERACT_RANGE;
   ctx.grid.forEachInRadius(p.pos.x, p.pos.z, INTERACT_RANGE, (e, d2) => {
     if (e.kind === 'mob' && e.lootable && d2 < bestCorpseD2) {
       bestCorpse = e;
@@ -177,11 +182,16 @@ export function interact(ctx: SimContext, pid?: number): void {
       bestQuestEntity = e;
       bestQuestD2 = d2;
     }
+    if (e.kind === 'object' && e.templateId.startsWith('prop:') && d2 < bestPropD2) {
+      bestProp = e;
+      bestPropD2 = d2;
+    }
   });
   // re-read through wider types: TS cannot see the closure assignments above
   const corpse = bestCorpse as Entity | null;
   const obj = bestObj as Entity | null;
   const questEntity = bestQuestEntity as Entity | null;
+  const prop = bestProp as Entity | null;
   if (corpse) {
     lootCorpse(ctx, corpse.id, p.id);
     return;
@@ -199,5 +209,31 @@ export function interact(ctx: SimContext, pid?: number): void {
     pickUpObject(ctx, obj.id, p.id);
     return;
   }
-  if (questEntity) ctx.talkToNpc(questEntity.id, p.id);
+  if (questEntity) {
+    ctx.talkToNpc(questEntity.id, p.id);
+    return;
+  }
+  if (prop) speakProp(ctx, prop);
+}
+
+// Emit a placed prop's speech bubble (and optional music/voice) on interact. The
+// bubble hangs over the prop entity; propAudio rides the same chat event so the
+// client can play the track/voice line client-side. Returns true if anything fired.
+function speakProp(ctx: SimContext, prop: Entity): boolean {
+  const meta = ctx.propMetaForEnt(prop.id);
+  if (!meta) return false;
+  const line = typeof meta.dialogue === 'string' ? meta.dialogue : '';
+  const music = typeof meta.music === 'string' && meta.music ? meta.music : undefined;
+  const voice = typeof meta.voice === 'string' && meta.voice ? meta.voice : undefined;
+  if (!line && !music && !voice) return false;
+  ctx.emit({
+    type: 'chat',
+    fromPid: 0,
+    from: prop.name || 'Prop',
+    text: line || ' ',
+    channel: 'say',
+    entityId: prop.id,
+    propAudio: music || voice ? { music, voice } : undefined,
+  });
+  return true;
 }
