@@ -5,8 +5,8 @@
 // the penalty player -> mob ONLY: a hostile wild mob always connects >= 80% against a
 // player (or a player-owned pet), while player/pet -> mob keeps the full scaling.
 import { describe, expect, it } from 'vitest';
-import { MOB_VS_PLAYER_MAX_MISS, meleeMissChance, swingMissChance } from '../src/sim/types';
 import type { Entity } from '../src/sim/types';
+import { MOB_VS_PLAYER_MAX_MISS, meleeMissChance, swingMissChance } from '../src/sim/types';
 
 // swingMissChance only reads kind / level / hostile / ownerId, so a minimal stub is
 // enough to exercise the directional guard without standing up a whole world.
