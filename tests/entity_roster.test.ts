@@ -292,6 +292,7 @@ function makeCtx() {
     // W3 interaction: the two still-on-Sim quest-NPC delegates the moved interact dispatches to.
     talkToNpc: vi.fn(),
     isQuestInteractionEntity: vi.fn(() => false),
+    propMetaForEnt: vi.fn(() => null),
     // W5 chat router/readouts reach-backs.
     targetEntity: vi.fn(),
     partyCapacity: vi.fn(() => 5),

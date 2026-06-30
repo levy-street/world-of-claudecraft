@@ -36,9 +36,12 @@ import { ChatLogger } from './chat_log';
 import type { AccountChatMuteStatus, AccountCosmetics, RequestMetadata } from './db';
 import {
   closePlaySession,
+  deleteWorldProp,
   grantAccountMechChroma,
   insertChatLogs,
+  insertWorldProp,
   loadMarketState,
+  loadWorldProps,
   markAccountQuestComplete,
   openPlaySession,
   pool,
@@ -46,6 +49,8 @@ import {
   saveCharacterAndMarketState,
   saveCharacterState,
   saveMarketState,
+  updateWorldProp,
+  updateWorldPropMeta,
   walletForAccount,
 } from './db';
 import { enqueueActivity } from './discord_activity';
@@ -1615,6 +1620,72 @@ export class GameServer {
     }
   }
 
+  // Replay this realm's admin-placed Builder props into the live sim on boot, so
+  // they are present in the entity roster for every connecting client.
+  async loadProps(): Promise<void> {
+    try {
+      this.sim.loadProps(await loadWorldProps());
+    } catch (err) {
+      console.error('failed to load world props:', err);
+    }
+  }
+
+  // Server-authoritative in-world Builder. Admin-only: every placement is
+  // validated, capped, persisted (realm-scoped), then applied to the live sim so
+  // it rides the entity roster out to every client. Bad input is dropped, never
+  // trusted from the wire.
+  private async handleBuilderCmd(session: ClientSession, msg: ClientMessage): Promise<void> {
+    if (!session.isAdmin) return;
+    const num = (v: unknown): number | null =>
+      typeof v === 'number' && Number.isFinite(v) ? v : null;
+    const clampScale = (v: unknown): number => {
+      const n = num(v);
+      if (n === null) return 1;
+      return Math.min(20, Math.max(0.05, n));
+    };
+    try {
+      if (msg.cmd === 'placeProp') {
+        const propKey = typeof msg.propKey === 'string' ? msg.propKey : '';
+        const x = num(msg.x);
+        const z = num(msg.z);
+        if (!/^[A-Za-z0-9_.:-]{1,64}$/.test(propKey) || x === null || z === null) return;
+        const facing = num(msg.facing) ?? 0;
+        const scale = clampScale(msg.scale);
+        const id = await insertWorldProp({ propKey, x, z, facing, scale, meta: {} });
+        this.sim.loadProps([{ id, propKey, x, z, facing, scale, meta: {} }]);
+      } else if (msg.cmd === 'moveProp') {
+        const dbId = num(msg.dbId);
+        const x = num(msg.x);
+        const z = num(msg.z);
+        if (dbId === null || x === null || z === null) return;
+        const facing = num(msg.facing) ?? 0;
+        const scale = clampScale(msg.scale);
+        await updateWorldProp(dbId, x, z, facing, scale);
+        this.sim.moveProp(dbId, x, z, facing, scale);
+      } else if (msg.cmd === 'removeProp') {
+        const dbId = num(msg.dbId);
+        if (dbId === null) return;
+        await deleteWorldProp(dbId);
+        this.sim.removeProp(dbId);
+      } else if (msg.cmd === 'setPropMeta') {
+        const dbId = num(msg.dbId);
+        if (dbId === null) return;
+        const raw = (msg.meta ?? {}) as Record<string, unknown>;
+        const cap = (v: unknown, n: number): string =>
+          typeof v === 'string' ? v.slice(0, n) : '';
+        const meta = {
+          dialogue: cap(raw.dialogue, 240),
+          music: cap(raw.music, 200),
+          voice: cap(raw.voice, 80),
+        };
+        await updateWorldPropMeta(dbId, meta);
+        this.sim.setPropMeta(dbId, meta);
+      }
+    } catch (err) {
+      console.error('builder command failed:', err);
+    }
+  }
+
   async saveMarket(): Promise<void> {
     try {
       await this.enqueueMarketWrite(() => saveMarketState(this.sim.serializeMarket()));
@@ -2122,6 +2193,12 @@ export class GameServer {
         break;
       case 'interact':
         sim.interact(pid);
+        break;
+      case 'placeProp':
+      case 'moveProp':
+      case 'removeProp':
+      case 'setPropMeta':
+        void this.handleBuilderCmd(session, msg);
         break;
       case 'loot':
         if (typeof msg.id === 'number') sim.lootCorpse(msg.id, pid);
