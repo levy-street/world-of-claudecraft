@@ -244,9 +244,14 @@ export function runEffects(
         p.auras.splice(sealIdx, 1);
         ctx.emit({ type: 'aura', targetId: p.id, name: seal.name, gained: false });
         // Judgement is an instant holy nuke; scale it with Spell Power too.
+        const mods = ctx.playerMods(meta);
+        const judgementMod = mods.abilities[ability.id];
+        const judgementMult = 1 + mods.global.spellDmgPct + (judgementMod?.dmgPct ?? 0);
+        const judgementFlat = judgementMod?.flatDmg ?? 0;
         let dmg =
-          ctx.rng.range(seal.value2 ?? 10, seal.value3 ?? 15) +
-          directHitBonus(p.spellPower, ability, res.castTime);
+          Math.round(
+            ctx.rng.range(seal.value2 ?? 10, seal.value3 ?? 15) * judgementMult + judgementFlat,
+          ) + directHitBonus(p.spellPower, ability, res.castTime);
         const crit = ctx.rng.chance(ctx.spellCrit(p));
         if (crit) dmg *= 1.5;
         ctx.dealDamage(p, target, Math.round(dmg), crit, 'holy', ability.name, 'hit');

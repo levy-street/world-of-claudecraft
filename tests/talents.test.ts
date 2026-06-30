@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ClientWorld } from '../src/net/online';
+import { runEffects } from '../src/sim/combat/effect_dispatch';
 import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
 import {
   computeTalentModifiers,
@@ -19,8 +20,9 @@ import {
   validateAllocation,
   validateTalentTree,
 } from '../src/sim/content/talents';
-import { Sim } from '../src/sim/sim';
-import { ALL_CLASSES, dist2d, MAX_LEVEL } from '../src/sim/types';
+import { type PlayerMeta, Sim } from '../src/sim/sim';
+import type { SimContext } from '../src/sim/sim_context';
+import { ALL_CLASSES, dist2d, type Entity, MAX_LEVEL } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 import { talentChoiceIconRef, talentNodeIconRef } from '../src/ui/talent_icons';
 
@@ -50,6 +52,43 @@ function nearestMob(sim: Sim) {
 }
 
 const effOf = (k: any, i = 0) => k.effects[i] as any;
+
+function judgementHitAmount(mods: ReturnType<typeof computeTalentModifiers>): number {
+  const judgement = abilitiesKnownAt('paladin', 20, mods).find((k) => k.def.id === 'judgement');
+  if (!judgement) throw new Error('missing Judgement ability');
+  const paladin = {
+    id: 1,
+    spellPower: 0,
+    auras: [
+      {
+        id: 'seal_of_righteousness',
+        name: 'Seal of Righteousness',
+        kind: 'imbue',
+        value2: 100,
+        value3: 100,
+      },
+    ],
+  } as Partial<Entity> as Entity;
+  const target = { id: 2, dead: false } as Partial<Entity> as Entity;
+  const meta = { talentMods: mods, fiestaMods: null } as Partial<PlayerMeta> as PlayerMeta;
+  let amount = 0;
+  const ctx = {
+    rng: { range: () => 100, chance: () => false },
+    breakStealth: () => undefined,
+    emit: () => undefined,
+    error: (_pid: number, text: string) => {
+      throw new Error(text);
+    },
+    playerMods: (m: PlayerMeta) => m.fiestaMods ?? m.talentMods,
+    spellCrit: () => 0,
+    dealDamage: (_source: Entity | null, _target: Entity, damage: number) => {
+      amount = damage;
+    },
+  } as unknown as SimContext;
+
+  runEffects(ctx, paladin, meta, target, judgement);
+  return amount;
+}
 
 describe('talent tree validation (load-time)', () => {
   it('every registered tree is structurally valid', () => {
@@ -350,6 +389,22 @@ describe('precomputed modifiers', () => {
       ),
     ).find((k) => k.def.id === 'seal_of_righteousness')!;
     expect(effOf(seal)).toMatchObject({ bonus: 16, judgeMin: 44, judgeMax: 64 }); // mastery + 2 talent ranks
+  });
+
+  it('applies Judgement damage talents to consumed Seal damage at impact', () => {
+    const base = computeTalentModifiers('paladin', alloc());
+    const holyJudgement = computeTalentModifiers(
+      'paladin',
+      alloc({
+        spec: 'holy',
+        ranks: { holy_choice: 1 },
+        choices: { holy_choice: 'holy_choice_judgement' },
+      }),
+    );
+
+    expect(holyJudgement.abilities.judgement.dmgPct).toBeCloseTo(0.2);
+    expect(judgementHitAmount(base)).toBe(100);
+    expect(judgementHitAmount(holyJudgement)).toBe(120);
   });
 });
 
