@@ -4774,9 +4774,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.nighttalon.bonus3':
     'Ловкость повышается на 15, вероятность критического удара на 2%.',
   'entities.itemSets.soulflame.name': 'Одеяние Пламени Души',
-  'entities.itemSets.soulflame.bonus2':
-    'Задержка произнесения от полученного урона снижена на 50%.',
-  'entities.itemSets.soulflame.bonus3': 'Полученный урон не задерживает произнесение заклинаний.',
+  'entities.itemSets.soulflame.bonus2': 'Интеллект повышается на 10, дух на 10.',
+  'entities.itemSets.soulflame.bonus3': 'Интеллект повышается на 10, выносливость на 10.',
   'entities.itemSets.stormcallers.name': 'Одеяние Зовущего Бурю',
   'entities.itemSets.stormcallers.bonus2':
     'Задержка произнесения от полученного урона снижена на 50%.',

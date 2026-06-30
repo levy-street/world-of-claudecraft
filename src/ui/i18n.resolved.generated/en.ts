@@ -6418,8 +6418,8 @@ export const en: EnTranslations = {
       },
       "soulflame": {
         "name": "Soulflame Regalia",
-        "bonus2": "Reduces cast pushback from damage by 50%.",
-        "bonus3": "You cannot be pushed back while casting (immune to cast pushback from damage)."
+        "bonus2": "Increases Intellect by 10 and Spirit by 10.",
+        "bonus3": "Increases Intellect by 10 and Stamina by 10."
       },
       "stormcallers": {
         "name": "Stormcaller's Vestments",

@@ -6418,8 +6418,8 @@ export const zh_TW: EnTranslations = {
       },
       "soulflame": {
         "name": "魂焰法衣",
-        "bonus2": "受到傷害造成的施法延退降低 50%。",
-        "bonus3": "施法時不會因受到傷害而被延退。"
+        "bonus2": "智力提高 10 點，精神提高 10 點。",
+        "bonus3": "智力提高 10 點，耐力提高 10 點。"
       },
       "stormcallers": {
         "name": "喚雷者法衣",

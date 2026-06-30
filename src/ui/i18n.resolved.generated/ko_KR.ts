@@ -6418,8 +6418,8 @@ export const ko_KR: EnTranslations = {
       },
       "soulflame": {
         "name": "영혼불꽃 의복",
-        "bonus2": "피해로 인한 시전 밀림이 50% 감소합니다.",
-        "bonus3": "시전 중 피해를 받아도 밀려나지 않습니다."
+        "bonus2": "지능이 10, 정신력이 10만큼 증가합니다.",
+        "bonus3": "지능이 10, 체력이 10만큼 증가합니다."
       },
       "stormcallers": {
         "name": "폭풍소환사의 의복",

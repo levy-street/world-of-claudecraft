@@ -6418,8 +6418,8 @@ export const ja_JP: EnTranslations = {
       },
       "soulflame": {
         "name": "魂炎の法衣",
-        "bonus2": "ダメージによる詠唱押し戻しを50%軽減します。",
-        "bonus3": "詠唱中にダメージを受けても押し戻されません。"
+        "bonus2": "知力が10、精神力が10上昇します。",
+        "bonus3": "知力が10、スタミナが10上昇します。"
       },
       "stormcallers": {
         "name": "嵐呼びの法衣",

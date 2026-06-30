@@ -51,6 +51,12 @@ const CASTER_BONUSES: SetBonusTier[] = [
     text: 'You cannot be pushed back while casting (immune to cast pushback from damage).',
   },
 ];
+// Soulflame Regalia (Nythraxis t2 cloth, caster) grants raw caster stats instead of
+// cast-pushback. Tiers stack, so a full set adds the 2- and 3-piece bonuses together.
+const SOULFLAME_BONUSES: SetBonusTier[] = [
+  { pieces: 2, effect: { int: 10, spi: 10 }, text: 'Increases Intellect by 10 and Spirit by 10.' },
+  { pieces: 3, effect: { int: 10, sta: 10 }, text: 'Increases Intellect by 10 and Stamina by 10.' },
+];
 
 export const ITEM_SETS: Record<string, ItemSet> = {
   [SET_DEATHLORD]: { id: SET_DEATHLORD, name: 'Deathlord Battlegear', bonuses: STRENGTH_BONUSES },
@@ -66,7 +72,7 @@ export const ITEM_SETS: Record<string, ItemSet> = {
     bonuses: STRENGTH_BONUSES,
   },
   [SET_NIGHTTALON]: { id: SET_NIGHTTALON, name: 'Nighttalon Pelt', bonuses: AGILITY_BONUSES },
-  [SET_SOULFLAME]: { id: SET_SOULFLAME, name: 'Soulflame Regalia', bonuses: CASTER_BONUSES },
+  [SET_SOULFLAME]: { id: SET_SOULFLAME, name: 'Soulflame Regalia', bonuses: SOULFLAME_BONUSES },
   [SET_STORMCALLERS]: {
     id: SET_STORMCALLERS,
     name: "Stormcaller's Vestments",
