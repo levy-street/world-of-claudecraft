@@ -3249,6 +3249,14 @@ export class Hud {
       );
     html += `<div class="tt-stat">${castLine.map(esc).join(' &nbsp; ')}</div>`;
     html += `<div class="tt-desc">${esc(abilityDisplayDescription(a, damageText))}</div>`;
+    // Resolved buff/aura effect line(s). Reads the RESOLVED effect value, so a buff's
+    // tooltip reflects rank AND talents that strengthen it (Improved Devotion Aura /
+    // Aspect of the Hawk / Fortitude via buffPct) - which the static description can't.
+    for (const eff of res.effects) {
+      if (eff.type === 'selfBuff' || eff.type === 'buffTarget') {
+        html += this.auraEffectTooltipHtml({ kind: eff.kind, value: eff.value });
+      }
+    }
     const requirements = abilityRequirementLines(a);
     if (requirements.length) {
       html += requirements.map((line) => `<div class="tt-sub">${esc(line)}</div>`).join('');
