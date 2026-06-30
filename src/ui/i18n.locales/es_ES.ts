@@ -79,7 +79,7 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'classDetails.lore.warrior':
     'Los guerreros son combatientes curtidos que generan ira al infligir o recibir daño. Absorben grandes golpes o aplastan enemigos con armas pesadas.',
   'classDetails.lore.hunter':
-    'Los cazadores dominan lo salvaje, rastrean enemigos desde lejos con arcos o armas de fuego y controlan el campo con trampas.',
+    'Los cazadores son especialistas a distancia que combaten junto a una bestia domada, acribillan a los enemigos con disparos certeros y veloces, los ralentizan con picaduras y fuego conmocionante, y cambian de aspecto según lo exija el momento.',
   'classDetails.lore.rogue':
     'Los pícaros son asesinos sigilosos que gastan energía y puntos de combo en puñaladas y golpes finales desde las sombras.',
   'classDetails.lore.shaman':

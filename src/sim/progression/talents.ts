@@ -38,6 +38,7 @@ import {
   FIRST_TALENT_LEVEL,
   MAX_LOADOUTS,
   pointsSpent,
+  repairAllocation,
   SAVED_LOADOUT_BAR_SLOTS,
   type SavedLoadout,
   type TalentAllocation,
@@ -268,7 +269,10 @@ export function deleteTalentLoadout(ctx: SimContext, index: number, pid?: number
       r.meta.loadouts.length > 0 ? Math.min(index, r.meta.loadouts.length - 1) : -1;
     const next = r.meta.activeLoadout >= 0 ? r.meta.loadouts[r.meta.activeLoadout] : null;
     if (next) {
-      r.meta.talents = cloneAllocation(next.alloc);
+      // This is an AUTO-apply (no user gate), so repair against the level budget
+      // first: switchTalentLoadout validates on its path, but here a stale or
+      // tampered next loadout would otherwise be baked into live mods wholesale.
+      r.meta.talents = repairAllocation(r.meta.cls, next.alloc, talentPointsAtLevel(r.e.level));
       recomputeTalents(ctx, r.meta);
     }
   } else if (r.meta.activeLoadout > index) r.meta.activeLoadout -= 1;

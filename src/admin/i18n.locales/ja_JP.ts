@@ -402,8 +402,6 @@ export const ja_JP: Record<string, string> = {
   'blockedIps.colCreatedAt': '作成日',
   'blockedIps.addFailed': 'IPのブロックに失敗しました。',
   'blockedIps.removeFailed': 'IPのブロック解除に失敗しました。',
-  'sharedIps.description':
-    '複数のアカウントにわたって観察された IP アドレスをアカウント数順に並べたもの。',
   'sharedIps.onlineDescription': '現在複数のオンライン アカウントで使用されている IP アドレス。',
   'sharedIps.onlineOnly': 'オンラインアカウントのみ',
   'sharedIps.warning':
@@ -453,4 +451,16 @@ export const ja_JP: Record<string, string> = {
   'error.blockExpiryFuture': 'ブロックの期限は未来の日時にする必要があります',
   'error.blockFailed': 'IPのブロックに失敗しました',
   'error.blockNotFound': 'IPが見つかりません',
+  'nav.suspiciousPlayers': '要注意プレイヤー',
+  'suspiciousPlayers.description': 'ボット検出の証拠があるオンラインプレイヤー。',
+  'suspiciousPlayers.autoRefresh': '自動更新 ({seconds}秒)',
+  'suspiciousPlayers.loading': '要注意プレイヤーを読み込み中...',
+  'suspiciousPlayers.loadFailed': '要注意プレイヤーの読み込みに失敗しました。',
+  'suspiciousPlayers.empty': '現在、ボット検出の証拠を持つオンラインプレイヤーはいません。',
+  'suspiciousPlayers.colName': '名前',
+  'suspiciousPlayers.colEvidence': '証拠',
+  'suspiciousPlayers.colScore': 'スコア',
+  'suspiciousPlayers.evidenceList': '{name}の証拠',
+  'suspiciousPlayers.evidenceWeight': '重み {value}',
+  'sharedIps.allDescription': '複数のアカウントで確認されたIPアドレス。',
 };

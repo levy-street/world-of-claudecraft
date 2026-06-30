@@ -401,8 +401,6 @@ export const da_DK: Record<string, string> = {
   'blockedIps.colCreatedAt': 'Oprettet',
   'blockedIps.addFailed': "Kunne ikke blokere IP'en.",
   'blockedIps.removeFailed': "Kunne ikke fjerne blokeringen af IP'en.",
-  'sharedIps.description':
-    'IP-adresser observeret på tværs af mere end én konto, sorteret efter kontoantal.',
   'sharedIps.onlineDescription': 'IP-adresser, der i øjeblikket bruges af mere end én onlinekonto.',
   'sharedIps.onlineOnly': 'Kun online konti',
   'sharedIps.warning':
@@ -450,4 +448,16 @@ export const da_DK: Record<string, string> = {
   'error.blockExpiryFuture': 'blokeringens udløb skal ligge i fremtiden',
   'error.blockFailed': 'kunne ikke blokere IP',
   'error.blockNotFound': 'IP ikke fundet',
+  'nav.suspiciousPlayers': 'Mistænkelige spillere',
+  'suspiciousPlayers.description': 'Spillere online med aktivt bot-detektionsbevis.',
+  'suspiciousPlayers.autoRefresh': 'Auto-genindlæs ({seconds}s)',
+  'suspiciousPlayers.loading': 'Indlæser mistænkelige spillere...',
+  'suspiciousPlayers.loadFailed': 'Kunne ikke indlæse mistænkelige spillere.',
+  'suspiciousPlayers.empty': 'Ingen spiller online har i øjeblikket bot-detektionsbevis.',
+  'suspiciousPlayers.colName': 'Navn',
+  'suspiciousPlayers.colEvidence': 'Bevis',
+  'suspiciousPlayers.colScore': 'Score',
+  'suspiciousPlayers.evidenceList': 'Bevis for {name}',
+  'suspiciousPlayers.evidenceWeight': 'vægt {value}',
+  'sharedIps.allDescription': 'IP-adresser set på tværs af mere end én konto.',
 };

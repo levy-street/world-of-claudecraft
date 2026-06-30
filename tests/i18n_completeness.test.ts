@@ -158,6 +158,10 @@ describe('i18n whole-catalog completeness', () => {
       'guide.brandShort', // "ClaudeCraft" - brand (Guide)
       'guide.home.title', // "World of ClaudeCraft" - brand (Guide hero)
       'guide.footer.rights', // "World of ClaudeCraft" - brand (Guide footer)
+      'hudChrome.discord.title', // "Discord" - brand
+      'hudChrome.discord.open', // "Discord" - brand
+      'hudChrome.discord.panelTitle', // "World of ClaudeCraft" - brand
+      'hudChrome.discord.linkedTitle', // "Discord: {name}" - brand + player name
     ]);
     const wordy = (v: string) => /[a-z]{4,}/.test(v.replace(/\{[^}]*\}/g, ''));
     const nonLatin: SupportedLanguage[] = ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'];

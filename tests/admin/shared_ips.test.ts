@@ -60,8 +60,12 @@ describe('Shared IPs', () => {
     expect(firstRow).toHaveAttribute('href', expect.stringContaining('page=ip'));
     expect(screen.getByText('198.51.100.4')).toBeInTheDocument();
     expect(screen.getByText('4')).toBeInTheDocument();
-    expect(firstIp.parentElement).toContainElement(screen.getByText(t('blockedIps.blockedBadge')));
+    const firstIdentity = firstIp.closest('.ip-identity');
+    expect(firstIdentity).toContainElement(screen.getByText(t('blockedIps.blockedBadge')));
     expect(screen.getByRole('note')).toHaveTextContent(t('sharedIps.warning'));
+    expect(
+      screen.getByRole('button', { name: `${t('sharedIps.colAccounts')} ▼` }).closest('th'),
+    ).toHaveAttribute('aria-sort', 'descending');
   });
 
   it('requests the in-memory online view and resets to the first page', async () => {
@@ -74,7 +78,30 @@ describe('Shared IPs', () => {
     expect(toggle).toBeChecked();
     await waitFor(() => {
       expect(mocks.apiGet.mock.calls.at(-1)?.[0]).toContain(
-        '/admin/api/shared-ips?page=1&online=1',
+        '/admin/api/shared-ips?page=1&sort=accounts&dir=desc&online=1',
+      );
+    });
+  });
+
+  it('requests last-seen sorting and resets to the first page', async () => {
+    render(SharedIps);
+    await screen.findByText('203.0.113.7');
+
+    const lastSeen = screen.getByRole('button', { name: t('ipAssociations.colLastSeen') });
+    await fireEvent.click(lastSeen);
+
+    expect(lastSeen.closest('th')).toHaveAttribute('aria-sort', 'descending');
+    await waitFor(() => {
+      expect(mocks.apiGet.mock.calls.at(-1)?.[0]).toContain(
+        '/admin/api/shared-ips?page=1&sort=last_seen&dir=desc',
+      );
+    });
+
+    await fireEvent.click(lastSeen);
+    expect(lastSeen.closest('th')).toHaveAttribute('aria-sort', 'ascending');
+    await waitFor(() => {
+      expect(mocks.apiGet.mock.calls.at(-1)?.[0]).toContain(
+        '/admin/api/shared-ips?page=1&sort=last_seen&dir=asc',
       );
     });
   });

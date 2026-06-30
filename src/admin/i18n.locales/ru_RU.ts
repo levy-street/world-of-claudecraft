@@ -400,8 +400,6 @@ export const ru_RU: Record<string, string> = {
   'blockedIps.colCreatedAt': 'Создан',
   'blockedIps.addFailed': 'Не удалось заблокировать IP.',
   'blockedIps.removeFailed': 'Не удалось разблокировать IP.',
-  'sharedIps.description':
-    'IP-адреса, наблюдаемые в нескольких учетных записях, упорядочены по количеству учетных записей.',
   'sharedIps.onlineDescription':
     'IP-адреса, которые в настоящее время используются более чем одной онлайн-учетной записью.',
   'sharedIps.onlineOnly': 'Только онлайн-аккаунты',
@@ -454,4 +452,16 @@ export const ru_RU: Record<string, string> = {
   'error.blockExpiryFuture': 'срок окончания блокировки должен быть в будущем',
   'error.blockFailed': 'не удалось заблокировать IP',
   'error.blockNotFound': 'IP не найден',
+  'nav.suspiciousPlayers': 'Подозрительные игроки',
+  'suspiciousPlayers.description': 'Игроки в сети с активными уликами обнаружения ботов.',
+  'suspiciousPlayers.autoRefresh': 'Автообновление ({seconds} с)',
+  'suspiciousPlayers.loading': 'Загрузка подозрительных игроков...',
+  'suspiciousPlayers.loadFailed': 'Не удалось загрузить подозрительных игроков.',
+  'suspiciousPlayers.empty': 'Сейчас ни у одного игрока в сети нет улик обнаружения ботов.',
+  'suspiciousPlayers.colName': 'Имя',
+  'suspiciousPlayers.colEvidence': 'Улики',
+  'suspiciousPlayers.colScore': 'Оценка',
+  'suspiciousPlayers.evidenceList': 'Улики для {name}',
+  'suspiciousPlayers.evidenceWeight': 'вес {value}',
+  'sharedIps.allDescription': 'IP-адреса, замеченные более чем у одной учётной записи.',
 };

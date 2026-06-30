@@ -14,22 +14,75 @@ import { loadGltf } from '../../render/assets/loader';
 import type { GuideModelSpec } from '../content.generated';
 
 export interface BuiltModel {
-  /** Normalized root: centered on x/z, feet at y=0, uniform-scaled to a stable height. */
+  /** Normalized root: centered on x/z, feet at y=0, at the rig's NATIVE scale (the camera
+   *  frames by `radius`; we do not scale the rig, which would break skinning). */
   root: THREE.Object3D;
   mixer: THREE.AnimationMixer | null;
-  /** Bounding-sphere radius after normalize, for camera framing. */
+  /** Skin-aware bounding-sphere radius, for camera framing. */
   radius: number;
-  /** Normalized height (world units), for camera aim. */
+  /** Skin-aware height (world units), for camera aim. */
   height: number;
   dispose(): void;
 }
 
 // GLTFLoader sanitizes node names (PropertyBinding strips [].:/ ), so an authored
-// "handslot.r" arrives as "handslotr" — try both, exactly as the renderer does.
+// "handslot.r" arrives as "handslotr", so try both, exactly as the renderer does.
 const findBone = (root: THREE.Object3D, name: string): THREE.Object3D | undefined =>
   root.getObjectByName(name) ?? root.getObjectByName(name.replace(/[[\].:/]/g, ''));
 
-const TARGET_HEIGHT = 2.2; // world units; every model frames to roughly this tall
+// The true skin-aware world bounds of an assembled model, IN ITS CURRENT POSE. We must NOT
+// use Box3.setFromObject: it reads each mesh's raw (pre-skinning) geometry box, and several
+// creature rigs (wolf, murloc, kobold, demon, ...) author that geometry at a huge scale that
+// the bind skeleton shrinks back down. Centering off the raw box then translates the
+// actually-skinned mesh thousands of units away, rendering it blank. So we transform each
+// skinned vertex through its bones (the in-game prepareVisual approach,
+// src/render/characters/assets.ts), and fall back to a per-vertex world walk for non-skinned
+// props that have no skeleton.
+//
+// Exported and shared by THREE callers so they all measure identically and cannot drift:
+// buildModel below (bind pose), the live turntable (scene.ts, after posing the idle clip),
+// and the still renderer (scripts/wiki/stills_render_entry.js). The result tracks whatever
+// pose the mixer has applied, so advancing the mixer before calling this yields posed bounds.
+//
+// PRECONDITION for a POSED rig: the caller must have run a scene-level updateMatrixWorld
+// AFTER advancing the mixer (scene.ts and the still renderer both do). three's SkinnedMesh
+// refreshes its bindMatrixInverse only in updateMatrixWorld, not updateWorldMatrix, so the
+// root.updateWorldMatrix below is sufficient at the BIND pose (the bone term is identity and
+// cancels) but NOT for a posed rig; without the prior scene update a posed measurement lands
+// tens of thousands of units off. (The original /wiki/models turntable blank bug.)
+export function skinAwareBounds(root: THREE.Object3D): THREE.Box3 {
+  const bounds = new THREE.Box3();
+  const v = new THREE.Vector3();
+  let sawSkinned = false;
+  root.updateWorldMatrix(true, true);
+  root.traverse((o) => {
+    const sm = o as THREE.SkinnedMesh;
+    if (!sm.isSkinnedMesh || !sm.visible) return;
+    const pos = sm.geometry.getAttribute('position') as THREE.BufferAttribute | undefined;
+    if (!pos) return;
+    sawSkinned = true;
+    for (let i = 0; i < pos.count; i++) {
+      v.fromBufferAttribute(pos, i);
+      sm.applyBoneTransform(i, v);
+      v.applyMatrix4(sm.matrixWorld);
+      bounds.expandByPoint(v);
+    }
+  });
+  if (!sawSkinned || bounds.isEmpty()) {
+    root.traverse((o) => {
+      const mesh = o as THREE.Mesh;
+      if (!mesh.isMesh || (mesh as THREE.SkinnedMesh).isSkinnedMesh || !mesh.visible) return;
+      const pos = mesh.geometry.getAttribute('position') as THREE.BufferAttribute | undefined;
+      if (!pos) return;
+      for (let i = 0; i < pos.count; i++) {
+        v.fromBufferAttribute(pos, i);
+        v.applyMatrix4(mesh.matrixWorld);
+        bounds.expandByPoint(v);
+      }
+    });
+  }
+  return bounds;
+}
 
 export async function buildModel(spec: GuideModelSpec, tint: number | null): Promise<BuiltModel> {
   const gltf = await loadGltf(spec.url);
@@ -58,7 +111,7 @@ export async function buildModel(spec: GuideModelSpec, tint: number | null): Pro
   // Weapons and held props: load each, bind to its hand bone, copy any grip reference.
   for (const att of spec.attach ?? []) {
     const bone = findBone(model, att.bone);
-    if (!bone) continue; // manifest/bone mismatch — ship without the prop
+    if (!bone) continue; // manifest/bone mismatch, ship without the prop
     const propGltf = await loadGltf(att.url);
     const prop = cloneSkinned(propGltf.scene);
     if (att.gripRef) {
@@ -103,7 +156,9 @@ export async function buildModel(spec: GuideModelSpec, tint: number | null): Pro
     model.traverse((o) => {
       const mesh = o as THREE.Mesh;
       if (!mesh.isMesh || !o.userData.bodyMesh) return;
-      mesh.material = Array.isArray(mesh.material) ? mesh.material.map(tintOne) : tintOne(mesh.material);
+      mesh.material = Array.isArray(mesh.material)
+        ? mesh.material.map(tintOne)
+        : tintOne(mesh.material);
     });
   }
 
@@ -111,25 +166,21 @@ export async function buildModel(spec: GuideModelSpec, tint: number | null): Pro
   if (spec.yaw) model.rotation.y = spec.yaw;
   if (spec.hover) model.position.y += spec.hover;
 
-  // Normalize into a wrapper: uniform-scale to a stable height, center on x/z, drop the
-  // feet to y=0, so a hare and a dragonkin both frame nicely with one camera rule.
+  // Normalize into a wrapper: center on x/z and drop the feet to y=0 from the SKIN-AWARE
+  // bounds (see skinAwareBounds), so one camera rule frames every rig. We deliberately do NOT
+  // scale the model to a target height: scaling a parent of a SkinnedMesh breaks skinning
+  // for several creature rigs (it collapses the mesh), so instead we leave the rig at native
+  // scale and frame the camera to its bounding sphere (scene.ts frameToPosedBounds), which
+  // gives the same apparent size without touching the skin transform.
   const root = new THREE.Object3D();
   root.add(model);
-  root.updateWorldMatrix(true, true);
-  const rawBox = new THREE.Box3().setFromObject(root);
-  const rawSize = rawBox.getSize(new THREE.Vector3());
-  const rawHeight = rawSize.y || spec.height || 1;
-  model.scale.multiplyScalar(TARGET_HEIGHT / rawHeight);
-
-  root.updateWorldMatrix(true, true);
-  const box = new THREE.Box3().setFromObject(root);
+  const box = skinAwareBounds(root);
   const center = box.getCenter(new THREE.Vector3());
   model.position.x -= center.x;
   model.position.z -= center.z;
   model.position.y -= box.min.y;
 
-  root.updateWorldMatrix(true, true);
-  const finalBox = new THREE.Box3().setFromObject(root);
+  const finalBox = skinAwareBounds(root);
   const sphere = finalBox.getBoundingSphere(new THREE.Sphere());
   const height = finalBox.max.y - finalBox.min.y;
 
@@ -149,8 +200,19 @@ export async function buildModel(spec: GuideModelSpec, tint: number | null): Pro
     // memoizes the GLTF), so we only dispose the material clones WE created for the tint.
     for (const mat of ownedMaterials) mat.dispose();
     ownedMaterials.length = 0;
+    // SkeletonUtils.clone gave this build its OWN skeletons; three allocates a per-skeleton
+    // bone DataTexture on first render that is NOT part of the shared GLTF cache, so dispose
+    // it here (idempotent when several meshes share one skeleton) to avoid leaking one GPU
+    // texture per build across the gallery's repeated model swaps and the still batch.
+    root.traverse((o) => {
+      const sm = o as THREE.SkinnedMesh;
+      if (sm.isSkinnedMesh) sm.skeleton?.dispose();
+    });
     root.clear();
   };
 
-  return { root, mixer, radius: sphere.radius, height, dispose };
+  // Clamp the framing radius off zero: a degenerate (empty) bound would collapse scene.ts's
+  // far plane to <= near (radius 0 -> dist 0) and draw nothing. Real rigs are radius ~1 to 3,
+  // so this floor only ever guards the pathological case.
+  return { root, mixer, radius: Math.max(sphere.radius, 0.05), height, dispose };
 }

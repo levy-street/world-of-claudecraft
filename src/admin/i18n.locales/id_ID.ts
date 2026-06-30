@@ -401,8 +401,6 @@ export const id_ID: Record<string, string> = {
   'blockedIps.colCreatedAt': 'Dibuat',
   'blockedIps.addFailed': 'Gagal memblokir IP.',
   'blockedIps.removeFailed': 'Gagal membuka blokir IP.',
-  'sharedIps.description':
-    'Alamat IP diamati di lebih dari satu akun, diurutkan berdasarkan jumlah akun.',
   'sharedIps.onlineDescription': 'Alamat IP saat ini digunakan oleh lebih dari satu akun online.',
   'sharedIps.onlineOnly': 'Hanya akun online',
   'sharedIps.warning':
@@ -451,4 +449,16 @@ export const id_ID: Record<string, string> = {
   'error.blockExpiryFuture': 'masa berakhir pemblokiran harus di masa depan',
   'error.blockFailed': 'gagal memblokir IP',
   'error.blockNotFound': 'IP tidak ditemukan',
+  'nav.suspiciousPlayers': 'Pemain Mencurigakan',
+  'suspiciousPlayers.description': 'Pemain daring dengan bukti deteksi bot yang aktif.',
+  'suspiciousPlayers.autoRefresh': 'Segarkan otomatis ({seconds}d)',
+  'suspiciousPlayers.loading': 'Memuat pemain mencurigakan...',
+  'suspiciousPlayers.loadFailed': 'Gagal memuat pemain mencurigakan.',
+  'suspiciousPlayers.empty': 'Tidak ada pemain daring yang saat ini memiliki bukti deteksi bot.',
+  'suspiciousPlayers.colName': 'Nama',
+  'suspiciousPlayers.colEvidence': 'Bukti',
+  'suspiciousPlayers.colScore': 'Skor',
+  'suspiciousPlayers.evidenceList': 'Bukti untuk {name}',
+  'suspiciousPlayers.evidenceWeight': 'bobot {value}',
+  'sharedIps.allDescription': 'Alamat IP yang teramati pada lebih dari satu akun.',
 };

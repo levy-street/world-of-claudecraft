@@ -1186,6 +1186,39 @@
     font-size: 12px;
     border-radius: 3px;
   }
+  /* Guild board: a wider 3rd column so the "Members" header + counts fit. */
+  .lb-row-guild {
+    grid-template-columns: 44px 1fr 64px 44px 96px;
+  }
+  .lb-members {
+    text-align: center;
+    color: var(--color-text-muted);
+  }
+  /* Players / Guilds tab bar above the board. */
+  .lb-tabs {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .lb-tab {
+    flex: 1;
+    padding: 5px 8px;
+    font-family: var(--title-font);
+    font-size: 12px;
+    color: #cabb8c;
+    background: #ffffff08;
+    border: 1px solid #463a1c;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  .lb-tab:hover {
+    background: #ffffff12;
+  }
+  .lb-tab-active {
+    color: var(--gold);
+    background: #f5c84322;
+    border-color: #b8902a;
+  }
   .lb-row:nth-child(odd) {
     background: #ffffff08;
   }
@@ -3016,12 +3049,21 @@
 
   /* ---------- The World Market (the Merchant's auction house) ---------- */
   #market-window {
-    width: 470px;
+    width: 560px;
     height: min(640px, calc(85vh - 24px));
     display: none;
     flex-direction: column;
     overflow: hidden;
     min-height: 0;
+  }
+  /* The title (name + subtitle) and the close button are flex siblings; let the
+     title shrink and ellipsize so the close button can never overlap the name,
+     however verbose the localized title runs. */
+  #market-window .panel-title > span:first-child {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .mkt-tabs {
     display: flex;

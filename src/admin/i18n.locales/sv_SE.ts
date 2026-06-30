@@ -400,8 +400,6 @@ export const sv_SE: Record<string, string> = {
   'blockedIps.colCreatedAt': 'Skapad',
   'blockedIps.addFailed': 'Kunde inte blockera IP-adressen.',
   'blockedIps.removeFailed': 'Kunde inte avblockera IP-adressen.',
-  'sharedIps.description':
-    'IP-adresser observerade på mer än ett konto, sorterade efter kontoantal.',
   'sharedIps.onlineDescription':
     'IP-adresser som för närvarande används av mer än ett onlinekonto.',
   'sharedIps.onlineOnly': 'Endast onlinekonton',
@@ -450,4 +448,16 @@ export const sv_SE: Record<string, string> = {
   'error.blockExpiryFuture': 'blockeringens utgång måste ligga i framtiden',
   'error.blockFailed': 'misslyckades med att blockera IP',
   'error.blockNotFound': 'IP hittades inte',
+  'nav.suspiciousPlayers': 'Misstänkta spelare',
+  'suspiciousPlayers.description': 'Spelare online med aktiva bevis för botdetektering.',
+  'suspiciousPlayers.autoRefresh': 'Uppdatera automatiskt ({seconds}s)',
+  'suspiciousPlayers.loading': 'Läser in misstänkta spelare...',
+  'suspiciousPlayers.loadFailed': 'Det gick inte att läsa in misstänkta spelare.',
+  'suspiciousPlayers.empty': 'Ingen spelare online har för närvarande bevis för botdetektering.',
+  'suspiciousPlayers.colName': 'Namn',
+  'suspiciousPlayers.colEvidence': 'Bevis',
+  'suspiciousPlayers.colScore': 'Poäng',
+  'suspiciousPlayers.evidenceList': 'Bevis för {name}',
+  'suspiciousPlayers.evidenceWeight': 'vikt {value}',
+  'sharedIps.allDescription': 'IP-adresser som observerats på fler än ett konto.',
 };

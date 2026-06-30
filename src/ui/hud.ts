@@ -57,6 +57,7 @@ import {
   ZONES,
   zoneAt,
 } from '../sim/data';
+import { specialRoleColor } from '../sim/discord_roles';
 import { armorTypeForItem, canEquipItem, weaponArchetypeForItem } from '../sim/equipment_rules';
 import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
 import type { Ante, PickAction } from '../sim/lockpick';
@@ -113,6 +114,7 @@ import { AurasPainter, type AurasPainterDeps } from './auras_painter';
 import { type AurasDeps, createAurasView } from './auras_view';
 import { BagsWindow } from './bags_window';
 import { CastBarPainter } from './cast_bar_painter';
+import { buildPaperdollView, type PaperdollSlot } from './char_view';
 import { CharWindow } from './char_window';
 import {
   activeCharacterAppearancePreview,
@@ -143,6 +145,7 @@ import { type CardinalId, compassView } from './compass';
 import { formatMinimapCoords } from './coords';
 import { DelveMapPainter } from './delve_map_painter';
 import { markDialogRoot } from './dialog_root';
+import { discordStatusBadgeDataUrl, discordStatusDisplayName } from './discord_tier';
 import { dropdownKeyNav } from './dropdown_nav';
 import { emoteIconUrl } from './emote_icons';
 import {
@@ -715,6 +718,7 @@ export class Hud {
   private targetEliteTagEl = $('#tf-elite-tag');
   private targetNameEl = $('#tf-name');
   private targetLevelEl = $('#tf-level');
+  private targetDiscordEl = $('#tf-discord');
   private targetHpEl = $('#tf-hp');
   private targetHpTextEl = $('#tf-hp-text');
   private targetPortraitEl = $('#tf-portrait') as unknown as HTMLCanvasElement;
@@ -3564,6 +3568,8 @@ export class Hud {
     const bar2 = $('#actionbar2');
     // slot 0 (Attack) + slots 1..11 render on the primary bar; slots 12..22 on
     // the secondary bar. One button list (this.abilityButtons), indexed by slot.
+    // An entry whose template omits #actionbar2 leaves those buttons detached
+    // rather than crashing on appendChild (keybind dispatch by slot still works).
     const totalButtons = 1 + Hud.BAR_ABILITY_SLOTS;
     for (let i = 0; i < totalButtons; i++) {
       const container = i <= Hud.PRIMARY_BAR_ABILITY_SLOTS ? bar : bar2;
@@ -3711,7 +3717,7 @@ export class Hud {
           this.hideTooltip();
         });
       }
-      container.appendChild(btn);
+      container?.appendChild(btn);
       this.abilityButtons.push({
         btn,
         label,
@@ -4374,11 +4380,15 @@ export class Hud {
       // original writers cannot express, hence the toggleClass / setStyleProp).
       this.toggleClass(this.targetFrameEl, 'elite', !!MOBS[target.templateId]?.elite);
       this.setText(this.targetEliteTagEl, isBoss ? t('hud.core.boss') : t('hud.core.elite'));
+      // Linked-Discord players get their staff-role name color (else friendly/hostile),
+      // plus a Discord info line (nickname + rank + role chips) under the healthbar.
+      const tfRoleColor = target.kind === 'player' ? specialRoleColor(target.discordRole) : null;
       this.setStyleProp(
         this.targetNameEl,
         'color',
-        target.hostile ? 'var(--color-hostile)' : 'var(--color-friendly)',
+        tfRoleColor ?? (target.hostile ? 'var(--color-hostile)' : 'var(--color-friendly)'),
       );
+      this.updateTargetDiscordLine(target);
       // Redundant non-color cue for forced-colors (high-contrast) mode, where the OS
       // strips the inline color so a hostile and a friendly name would read identically.
       // The base.css forced-colors block underlines #tf-name.hostile; routed through the
@@ -9859,6 +9869,50 @@ export class Hud {
     });
   }
 
+  // Fill the target frame's Discord line: a linked player's nickname (with PFP),
+  // their staff-role tag, and Discord rank. Hidden for mobs and unlinked players.
+  private updateTargetDiscordLine(target: Entity): void {
+    const el = this.targetDiscordEl;
+    const tier = target.discordTier ?? 0;
+    if (target.kind !== 'player' || (!tier && !target.discordName && !target.discordRole)) {
+      el.classList.remove('show');
+      el.replaceChildren();
+      return;
+    }
+    const roleTagLabel = (key: string | undefined): string => {
+      switch (key) {
+        case 'levyst':
+          return t('hudChrome.discord.roleTag.levyst');
+        case 'devs':
+          return t('hudChrome.discord.roleTag.devs');
+        case 'mods':
+          return t('hudChrome.discord.roleTag.mods');
+        case 'artists':
+          return t('hudChrome.discord.roleTag.artists');
+        default:
+          return '';
+      }
+    };
+    const parts: string[] = [];
+    const nameInner = target.discordAvatar
+      ? `<img src="${esc(target.discordAvatar)}" referrerpolicy="no-referrer" alt="" draggable="false">${esc(target.discordName ?? '')}`
+      : esc(target.discordName ?? '');
+    if (target.discordName || target.discordAvatar) {
+      parts.push(`<span class="uf-dc-name">${nameInner}</span>`);
+    }
+    const roleLabel = roleTagLabel(target.discordRole);
+    if (roleLabel) {
+      parts.push(
+        `<span class="uf-dc-chip role" style="--role:${specialRoleColor(target.discordRole) ?? '#888'}">${esc(roleLabel)}</span>`,
+      );
+    }
+    if (tier > 0) {
+      parts.push(`<span class="uf-dc-chip rank">${esc(discordStatusDisplayName(tier))}</span>`);
+    }
+    el.innerHTML = parts.join('');
+    el.classList.add('show');
+  }
+
   /** Inspect another player: a profile window with their portrait, name, level
    *  and class — rendered locally from their entity's class + skin. */
   openInspect(pid: number): void {
@@ -9881,6 +9935,48 @@ export class Hud {
         `<div class="inspect-holder-sub">${e.holderBalance ? esc(t('wallet.balanceAmount', { amount: formatNumber(e.holderBalance, { maximumFractionDigits: 0 }) })) : esc(t('wallet.holder'))}</div>` +
         `</div></div>`
       : '';
+    // Linked-Discord flair: avatar/badge, nickname, rank, "member since", role.
+    const discordTierIdx = e.discordTier ?? 0;
+    const discordImg = e.discordAvatar
+      ? `<img class="inspect-holder-badge inspect-discord-pfp" src="${esc(e.discordAvatar)}" referrerpolicy="no-referrer" alt="" draggable="false">`
+      : `<img class="inspect-holder-badge" src="${discordStatusBadgeDataUrl(discordTierIdx)}" alt="" draggable="false">`;
+    const memberDays =
+      typeof e.discordJoined === 'number'
+        ? Math.max(0, Math.floor((Date.now() - e.discordJoined) / 86_400_000))
+        : null;
+    const memberSinceHtml =
+      memberDays !== null
+        ? `<div class="inspect-holder-sub">${esc(t('hudChrome.discord.memberSince'))}: ${esc(t('hudChrome.discord.memberSinceDays', { days: formatNumber(memberDays, { maximumFractionDigits: 0 }) }))}</div>`
+        : '';
+    const discordRoleLabel = (key: string | undefined): string => {
+      switch (key) {
+        case 'levyst':
+          return t('hudChrome.discord.roleTag.levyst');
+        case 'devs':
+          return t('hudChrome.discord.roleTag.devs');
+        case 'mods':
+          return t('hudChrome.discord.roleTag.mods');
+        case 'artists':
+          return t('hudChrome.discord.roleTag.artists');
+        default:
+          return '';
+      }
+    };
+    const roleLabel = discordRoleLabel(e.discordRole);
+    const roleHtml = roleLabel
+      ? `<div class="inspect-holder-sub inspect-discord-role">${esc(roleLabel)}</div>`
+      : '';
+    const discordHtml =
+      discordTierIdx > 0
+        ? `<div class="inspect-holder">` +
+          discordImg +
+          `<div class="inspect-holder-text">` +
+          `<div class="inspect-holder-name">${esc(e.discordName ? e.discordName : discordStatusDisplayName(discordTierIdx))}</div>` +
+          `<div class="inspect-holder-sub">${esc(t('hudChrome.discord.title'))} · ${esc(discordStatusDisplayName(discordTierIdx))}</div>` +
+          memberSinceHtml +
+          roleHtml +
+          `</div></div>`
+        : '';
     el.innerHTML =
       `<div class="panel-title"><span>${esc(t('character.profile'))}</span>` +
       `<button type="button" class="x-btn" data-close aria-label="${esc(t('character.closeProfile'))}">${svgIcon('close')}</button></div>` +
@@ -9889,12 +9985,44 @@ export class Hud {
       `<div class="inspect-name">${esc(e.name)}</div>` +
       `<div class="inspect-meta">${esc(t('itemUi.equipment.levelClass', { level: formatNumber(e.level, { maximumFractionDigits: 0 }), className }))}</div>` +
       holderHtml +
-      `</div>`;
+      discordHtml +
+      `</div>` +
+      // Worn gear, mirrored from the entity's render-only `equippedItems` (the
+      // `eq` identity field). Item names/icons/tooltips resolve fully client-side
+      // from the static ITEMS table, so only the slot->id map crosses the wire.
+      `<div class="inspect-equip">` +
+      `<div class="inspect-equip-title">${esc(t('classDetails.sections.equipment'))}</div>` +
+      `<div class="paperdoll inspect-paperdoll">` +
+      `<div class="equip-col" id="inspect-equip-left"></div>` +
+      `<div class="equip-col equip-col-right" id="inspect-equip-right"></div>` +
+      `</div></div>`;
     hydratePortraits(el);
+    const view = buildPaperdollView(e.equippedItems, ITEMS);
+    const leftCol = el.querySelector('#inspect-equip-left');
+    const rightCol = el.querySelector('#inspect-equip-right');
+    for (const cell of view.left) leftCol?.appendChild(this.buildInspectSlotRow(cell));
+    for (const cell of view.right) rightCol?.appendChild(this.buildInspectSlotRow(cell));
     el.querySelector('[data-close]')?.addEventListener('click', () => {
       el.style.display = 'none';
     });
     el.style.display = 'block';
+  }
+
+  // One read-only equipment row for the inspect window: icon, slot name, and the
+  // equipped item (quality-tinted) with its tooltip. Unlike the character window's
+  // own paperdoll row, there are no unequip / drag affordances (another player's
+  // gear is view-only); the quality color comes from the shared QUALITY_COLOR map.
+  private buildInspectSlotRow(cell: PaperdollSlot): HTMLElement {
+    const { slot, item } = cell;
+    const row = document.createElement('div');
+    row.className = 'equip-slot';
+    const qColor = item ? (QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff') : '';
+    const icon = item
+      ? this.itemIcon(item)
+      : `<img class="item-icon" src="${iconDataUrl('item', 'slot_empty')}" alt="" draggable="false">`;
+    row.innerHTML = `${icon}<div><div class="slot-name">${esc(itemSlotName(slot))}</div><div class="slot-item"${item ? ` style="color:${qColor}"` : ''}>${item ? esc(itemDisplayName(item)) : esc(t('itemUi.equipment.empty'))}</div></div>`;
+    if (item) this.attachTooltip(row, () => this.itemTooltip(item));
+    return row;
   }
 
   // Raid/target marker picker for an enemy, opened from its target unit frame.

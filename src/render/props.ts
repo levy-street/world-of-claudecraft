@@ -111,43 +111,71 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
 type PropKey = keyof typeof PROP_ASSET_DEFS;
 
 const loadedProps = new Map<string, GLTF>();
-const ACTIVE_PROP_KEYS = new Set<PropKey>(
-  GFX.standardMaterials
-    ? (Object.keys(PROP_ASSET_DEFS) as PropKey[])
-    : [
-        'house1',
-        'house2',
-        'house3',
-        'blacksmith',
-        'inn',
-        'bellTower',
-        'well',
-        'stand1',
-        'stand2',
-        'cart',
-        'fence',
-        'bonfire',
-        'oreRocks',
-        'tentOpen',
-        'tentSmall',
-        'rockLargeD',
-        'mushroomRed',
-        'column',
-        'columnBroken',
-        'dockPlatform',
-        'rowboat',
-        'graveRound',
-        'timberPillar',
-        'crateWooden',
-        'barrel',
-        'delveEntrance2', // delve entrance portal, a landmark, so keep it on low gfx too
-      ],
-);
+const ALL_PROP_KEYS = Object.keys(PROP_ASSET_DEFS) as PropKey[];
+
+// The props the renderer actually RENDERS at the low graphics tier: a subset, since
+// low gfx drops the decorative/secondary props (anvils, gravestones beyond the round
+// one, extra rocks, statues, ...). Medium and higher render every entry in
+// PROP_ASSET_DEFS. This list scopes ONLY the per-tier work (material prewarm); it is
+// deliberately NOT the preload set (see preloadPropKeys below).
+const LOW_TIER_PROP_KEYS: readonly PropKey[] = [
+  'house1',
+  'house2',
+  'house3',
+  'blacksmith',
+  'inn',
+  'bellTower',
+  'well',
+  'stand1',
+  'stand2',
+  'cart',
+  'fence',
+  'bonfire',
+  'oreRocks',
+  'tentOpen',
+  'tentSmall',
+  'rockLargeD',
+  'mushroomRed',
+  'column',
+  'columnBroken',
+  'dockPlatform',
+  'rowboat',
+  'graveRound',
+  'timberPillar',
+  'crateWooden',
+  'barrel',
+  'delveEntrance2', // delve entrance portal, a landmark, so keep it on low gfx too
+];
+
+/**
+ * The props to PRELOAD, given the graphics tier guessed when this module was first
+ * imported. This MUST be tier-INDEPENDENT.
+ *
+ * buildProps() places props from the LIVE GFX tier, which is resolved later: the
+ * Renderer calls initGfxTier() (which reassigns the GFX global from the real WebGL
+ * context) AFTER this module froze its import-time GFX best-guess. If the import-time
+ * guess comes in LOWER than the render tier (e.g. a weak/hybrid-GPU probe guesses low,
+ * the high-performance renderer then resolves medium+), a tier-SCOPED preload set
+ * would omit props that buildProps then places, and propAsset() throws "prop asset
+ * not preloaded", the v0.16.0 farmCrate crash on world entry (red "Could not start
+ * the renderer" overlay). So every tier preloads the full PROP_ASSET_DEFS, mirroring
+ * foliage.ts, which sources its one frozen MODEL_URLS list for both preload and
+ * placement and is structurally immune to this class of bug. Because every placement
+ * key is typed PropKey (a key of PROP_ASSET_DEFS), the full set is provably a superset
+ * of anything buildProps can place, on every tier and device.
+ *
+ * The arg is retained to document the invariant and to let the guard test assert it at
+ * the lowest (most dangerous) import tier; the result intentionally ignores it.
+ */
+function preloadPropKeys(_importTierStandardMaterials: boolean): Set<PropKey> {
+  return new Set<PropKey>(ALL_PROP_KEYS);
+}
 
 // Headless sim/test imports never fetch; the browser kicks loads immediately.
 if (typeof window !== 'undefined') {
+  const preloadKeys = preloadPropKeys(GFX.standardMaterials);
   for (const [key, def] of Object.entries(PROP_ASSET_DEFS)) {
-    if (!ACTIVE_PROP_KEYS.has(key as PropKey)) continue;
+    if (!preloadKeys.has(key as PropKey)) continue;
     registerPreload(
       loadGltf(def.url).then((gltf) => {
         loadedProps.set(key, gltf);
@@ -155,6 +183,13 @@ if (typeof window !== 'undefined') {
     );
   }
 }
+
+/** Test-only window into the preload/prewarm key sets (see tests/render_asset_preload). */
+export const propPreloadInternalsForTest = {
+  allPropKeys: ALL_PROP_KEYS,
+  lowTierPropKeys: LOW_TIER_PROP_KEYS,
+  preloadPropKeys,
+};
 
 // Per-material look overrides, keyed `${kit}:${name}` (falls back to name).
 // Kenney/Quaternius flat materials need small nudges to sit in our lighting.
@@ -348,7 +383,14 @@ export function buildPropMaterialPrewarmGroup(): THREE.Group {
   // instance variant the way the live placed props do; the plain InstancedMesh
   // and Mesh cover the untinted and non-instanced paths.
   const white = new THREE.Color(1, 1, 1);
-  for (const key of ACTIVE_PROP_KEYS) {
+  // Prewarm only the props that actually render at the LIVE tier (this runs after
+  // initGfxTier via the Renderer, so GFX is authoritative here, unlike the import-time
+  // best-guess): low renders the LOW_TIER_PROP_KEYS subset, medium+ renders the full
+  // catalog. Keying off the live tier rather than an import-frozen guess means a low
+  // import guess on a medium+ renderer still prewarms every prop it will draw, so the
+  // props the low subset omits do not take a first-frame shader-compile hitch.
+  const prewarmKeys = GFX.standardMaterials ? ALL_PROP_KEYS : LOW_TIER_PROP_KEYS;
+  for (const key of prewarmKeys) {
     const asset = propAsset(key);
     for (const part of asset.parts) {
       const matKey = `${part.mat.uuid}:${part.geo.getAttribute('color') ? 'color' : 'plain'}`;

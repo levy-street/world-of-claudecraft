@@ -3608,4 +3608,25 @@
     gap: 3px;
     margin-top: 3px;
   }
+
+  /* ---------- moderator spectate badge ---------- */
+  #spectate-badge {
+    position: fixed;
+    top: max(14px, env(safe-area-inset-top));
+    left: 50%;
+    z-index: 220;
+    transform: translateX(-50%);
+    padding: 7px 18px;
+    border: 1px solid var(--gold);
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--color-bg-deep) 92%, transparent);
+    box-shadow: var(--shadow-panel);
+    color: var(--gold);
+    font: 700 13px var(--title-font);
+    letter-spacing: 0.5px;
+    pointer-events: none;
+  }
+  #spectate-badge[hidden] {
+    display: none;
+  }
 }

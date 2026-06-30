@@ -119,6 +119,7 @@ export const world: GuidePage = {
           { href: hrefFor('bestiary'), key: 'guide.nav.bestiary' },
           { href: hrefFor('quests'), key: 'guide.nav.quests' },
           { href: hrefFor('dungeons'), key: 'guide.nav.dungeons' },
+          { href: hrefFor('delves'), key: 'guide.nav.delves' },
         ])}
       </article>`;
   },

@@ -246,21 +246,18 @@ export function buildOptionsMenu(opts: { bugReportAvailable: boolean }): Options
  *  trailing graphics/reload notes + the reload button + footer as panel chrome. */
 export function buildGraphicsControls(s: OptionsSettingsSource, env: OptionsEnv): OptionsControl[] {
   const out: OptionsControl[] = [];
-  out.push(
-    choice(
-      s,
-      'graphicsPreset',
-      'hud.options.graphicsQuality',
-      [
-        { value: 1, labelKey: 'hud.options.graphicsPresetLow' },
-        { value: 2, labelKey: 'hud.options.graphicsPresetMedium' },
-        { value: 3, labelKey: 'hud.options.graphicsPresetHigh' },
-        { value: 4, labelKey: 'hud.options.graphicsPresetUltra' },
-        { value: 5, labelKey: 'hud.options.graphicsPresetAdvanced' },
-      ],
-      true,
-    ),
-  );
+  const graphicsPresetOptions: ChoiceOption[] = [
+    { value: 1, labelKey: 'hud.options.graphicsPresetLow' },
+    { value: 2, labelKey: 'hud.options.graphicsPresetMedium' },
+    { value: 3, labelKey: 'hud.options.graphicsPresetHigh' },
+  ];
+  if (!env.nativeShell) {
+    graphicsPresetOptions.push(
+      { value: 4, labelKey: 'hud.options.graphicsPresetUltra' },
+      { value: 5, labelKey: 'hud.options.graphicsPresetAdvanced' },
+    );
+  }
+  out.push(choice(s, 'graphicsPreset', 'hud.options.graphicsQuality', graphicsPresetOptions, true));
   // Advanced preset (5) reveals the four per-system low/high pickers.
   if (Math.round(s.num('graphicsPreset')) === 5) {
     out.push(choice(s, 'terrainDetail', 'hud.options.terrainDetail', lowHighOptions));

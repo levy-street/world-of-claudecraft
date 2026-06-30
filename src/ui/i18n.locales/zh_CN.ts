@@ -14,6 +14,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.spectate.banner': '正在观察 {name}',
   'hudChrome.loot.chestTitle': '宝箱',
   'hudChrome.spellbook.addToBarAria': '将{name}添加到动作条',
   'hudChrome.spellbook.removeFromBarAria': '从动作条移除{name}',
@@ -737,7 +738,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '战士是久经沙场的近战斗士，会在造成或承受伤害时积累怒气。他们能承受重击，也能用强力武器碾碎敌人。',
   'classDetails.lore.paladin':
     '圣骑士是神圣的十字军，以祝福支援盟友，用圣光治疗伤口，并身披重甲保护弱者。',
-  'classDetails.lore.hunter': '猎人精通荒野，使用弓或火器从远处追踪敌人，并用陷阱控制战场。',
+  'classDetails.lore.hunter':
+    '猎人是远程专家，与驯服的野兽并肩作战，用瞄准与急速射击向敌人倾泻箭矢，以钉刺和震荡射击减速对手，并随机应变地切换守护形态。',
   'classDetails.lore.rogue': '潜行者是隐秘刺客，消耗能量和连击点，从阴影中发动背刺与终结技。',
   'classDetails.lore.priest': '牧师召唤圣光治疗并保护盟友，也能用暗影魔法汲取敌人的生命。',
   'classDetails.lore.shaman': '萨满掌控元素，强化武器，以闪电震击敌人，并恢复盟友。',
@@ -3136,6 +3138,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.widgets.heading': '朝向',
   'hudChrome.widgets.minimapZoom': '小地图缩放',
   'hudChrome.leaderboard.close': '关闭',
+  'hudChrome.leaderboard.tabsLabel': '高分榜',
+  'hudChrome.leaderboard.tabPlayers': '玩家',
+  'hudChrome.leaderboard.tabGuilds': '公会',
+  'hudChrome.leaderboard.guildName': '公会',
+  'hudChrome.leaderboard.members': '成员',
+  'hudChrome.leaderboard.topLevel': '最高',
+  'hudChrome.leaderboard.guildXp': '总经验',
+  'hudChrome.leaderboard.guildEmpty': '还没有上榜的公会。',
   'hudChrome.widgets.worldCoordinates': '世界坐标',
   'hudChrome.plurals.guildMembers.one': '你是{rank}，{count}名成员',
   'hudChrome.plurals.guildMembers.few': '你是{rank}，{count}名成员',
@@ -3312,6 +3322,42 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.tagline': '一款可在浏览器中免费畅玩的经典风格 MMO。',
   'guide.skipToContent': '跳至正文',
   'guide.loading': '加载中……',
+  'guide.controls.targetFriendly': '选中最近的友方',
+  'guide.delvesPage.affixesBody':
+    '难度更高的探秘会随机附带一种词缀，改变下潜的玩法走向，从不安的亡者，到污浊的浊气，再到摇摇欲坠的顶棚。它们会让危险与回报一同提升。一座以墓穴为主题的探秘，可能出现以下任意一种词缀：',
+  'guide.delvesPage.affixesHeading': '探秘词缀',
+  'guide.delvesPage.affixesLabel': '可能出现的词缀',
+  'guide.delvesPage.companionBody':
+    '每次探秘都会有一名同伴随你下潜，因此单人挑战绝不会毫无希望。她会在你身旁并肩作战，而随着你在两次探秘之间持续投入，她会稳步变强，直到最终能在每次下潜中把濒死的盟友从鬼门关拉回一次。这次探秘里她是你的同伴，两次探秘之间则在面板旁等候。',
+  'guide.delvesPage.companionFmt': '{name}，{role}',
+  'guide.delvesPage.companionHeading': '你的同伴',
+  'guide.delvesPage.companionLabel': '同伴',
+  'guide.delvesPage.fromLevel': '从 {n} 级起',
+  'guide.delvesPage.heading': '探秘',
+  'guide.delvesPage.howBody':
+    '与看守人交谈以打开面板，选择一档难度，然后下潜。每次探秘会把几间短小的厅室串接起来，并在守护者处收尾；击败它即可领取奖励，返回地面。有伙伴就带上一位，没有就依靠你的同伴。',
+  'guide.delvesPage.howHeading': '一次探秘如何进行',
+  'guide.delvesPage.intro':
+    '探秘是供一到两人进行的短小、可反复挑战的下潜，每当你独自下潜时，都会有一名忠诚的同伴陪在身旁。找到面板，选好一次探秘，再带着战利品爬回地面。',
+  'guide.delvesPage.keeperFmt': '{name}，{title}',
+  'guide.delvesPage.keeperLabel': '看守人',
+  'guide.delvesPage.lockpickBody':
+    '有些门扉与宝箱处于封锁状态，开启它们更像是一场小小的胆识考验，而非属性比拼：干净而沉稳地解开锁，你得到的奖励会优于慌乱仓促的开法。这并非强制，但谨慎的探秘者收获更丰。',
+  'guide.delvesPage.lockpickHeading': '锁与它们守护的东西',
+  'guide.delvesPage.marksBody':
+    '完成探秘会获得探秘印记，这是一种与你的钱币分开存放的货币。在看守人处花费它们，即可强化你的同伴，并取得别处遍寻不见的装备。',
+  'guide.delvesPage.marksHeading': '探秘印记',
+  'guide.delvesPage.partyLabel': '供一到两人',
+  'guide.delvesPage.tiersBody':
+    '一座探秘提供不止一档难度。更高的那档会让敌人更强，并随机附带一种词缀，作为回报，产出也更丰厚。它还要求你先积累几个等级，才会放你进入。',
+  'guide.delvesPage.tiersHeading': '难度',
+  'guide.delvesPage.tiersLabel': '难度',
+  'guide.delvesPage.whatBody':
+    '探秘是一座专为你以及至多一名盟友打造的小型副本，一份不会被打扰的私人副本。你从世界中由探秘看守人看守的面板处开启它，潜入其中，一路打穿几间房间，最后在唯一的守护者处收尾。每次探秘都很短，本就是为反复挑战而设，因此每当开放世界没什么可做时，探秘都是一份稳定的进度来源。',
+  'guide.delvesPage.whatHeading': '探秘是什么',
+  'guide.delvesPage.whereBody':
+    '第一座探秘，坍塌的圣物库，位于东溪谷地起始山谷的圣物库山丘。哈尔文修士在那里看守面板，只要你准备好了，他便会送你下去。',
+  'guide.delvesPage.whereHeading': '在哪里找到探秘',
   'guide.docTitle': '{page} | {brand}',
   'guide.nav.overview': '概览',
   'guide.nav.howToPlay': '游戏入门',
@@ -3319,6 +3365,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.nav.bestiary': '生物图鉴',
   'guide.nav.world': '世界',
   'guide.nav.quests': '任务',
+  'guide.nav.delves': '探秘',
   'guide.nav.dungeons': '地下城与团队副本',
   'guide.nav.reference': '参考',
   'guide.nav.controls': '操作键',
@@ -3424,7 +3471,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '从头顶带有标记的人物处接取任务,完成目标,再交还任务以获得经验、金币和装备。屏幕上的任务追踪器会让你随时看清目标。',
   'guide.howToPlay.deathTitle': '死亡并非终点',
   'guide.howToPlay.deathBody':
-    '若你倒下,可在最近的墓地释放灵魂,然后跑回自己的尸体处复活。不会损失任何经验。',
+    '若你倒下，你会释放灵魂，在最近的墓地以满血复活，然后返回你之前所在之处。不会损失任何经验。',
   'guide.howToPlay.groupingTitle': '携手同行',
   'guide.howToPlay.groupingBody':
     '邀请他人组队,即可共享任务进度并挑战地下城。世界中的大部分内容都可单人完成,因此组队是一种选择,而非负担。',
@@ -3439,12 +3486,17 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.controls.actionHeader': '操作',
   'guide.controls.groupMovement': '移动',
   'guide.controls.groupCombat': '目标选择与战斗',
-  'guide.controls.groupInterface': '窗口',
+  'guide.controls.groupInterface': '界面',
+  'guide.controls.controllerBody':
+    '手柄同样可用，且默认开启手柄支持。左摇杆控制移动，右摇杆控制镜头，正面按键与肩部按键则负责你的技能、跳跃和互动。打开任意窗口，即可调出用于操作菜单的屏幕指针。你可以在选项的手柄设置中重新映射按键，并调整摇杆死区、镜头速度、震动以及反转视角。',
+  'guide.controls.controllerHeading': '使用手柄',
+  'guide.controls.cycleFriendly': '循环选择友方目标',
+  'guide.controls.gameMenu': '打开游戏菜单与选项',
   'guide.controls.groupCamera': '镜头',
   'guide.controls.talents': '天赋',
   'guide.controls.arena': '竞技场',
   'guide.controls.leaderboard': '排行榜',
-  'guide.controls.abilities': '使用技能',
+  'guide.controls.abilities': '使用动作条技能（数字键行；第二条动作条位于小键盘）',
   'guide.controls.mobileHeading': '移动端操作',
   'guide.controls.mobileBody':
     '在手机和平板上会自动出现触控操作:左侧是移动摇杆,在右侧任意位置拖动即可环顾四周,屏幕上还有用于使用技能和打开菜单的按钮。',
@@ -3452,10 +3504,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '战斗遵循经典 MMO 中熟悉的规则。你完全不必钻研这些就能玩得很好,这里只是介绍一下战斗大致的运作方式。',
   'guide.combat.hitTitle': '并非每次攻击都能命中',
   'guide.combat.hitBody':
-    '攻击可能会被躲闪、招架或格挡,也可能未命中,敌人的攻击同样如此。与等级相近的敌人作战,并保持装备的更新,才能让你的攻击稳稳命中。',
-  'guide.combat.mitigationTitle': '护甲与装备让你屹立不倒',
+    '攻击可能未命中，也可能被躲闪，敌人的攻击同样如此；而法术则可能被彻底抵抗。与等级相近的敌人作战，才能让你的攻击稳稳命中；等级差距越大，你就越常挥向空气。',
+  'guide.combat.mitigationTitle': '护甲与生命值让你屹立不倒',
   'guide.combat.mitigationBody':
-    '护甲能减轻物理打击,合适的装备则能削弱魔法伤害,因此升级装备是你提升生存能力的主要途径。重甲职业能承受更多伤害,但没有什么能让你刀枪不入。',
+    '护甲能减轻物理打击，因此更好的护甲是你近战续航能力的主要来源。魔法则是另一回事：你要靠更深厚的生命值池与彻底抵抗法术的几率来扛过法术，而非依靠护甲。重甲职业能卸去更多打击，但没有什么能让你刀枪不入。',
   'guide.combat.resourcesTitle': '每个职业都有自己的节奏',
   'guide.combat.resourcesBody':
     '战士在激战中积攒怒气,潜行者消耗稳步回复的能量,施法者则管理着一池法力。掌握自己的资源,便是玩好职业的一半。',
@@ -3468,11 +3520,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.gcdTerm': '公共冷却时间',
   'guide.glossary.gcdDef': '使用大多数技能后短暂的共享停顿,使你无法将所有技能一次性全部释放。',
   'guide.glossary.dpsTerm': 'DPS',
-  'guide.glossary.dpsDef': '每秒伤害,大致衡量造成伤害速度快慢的指标。',
+  'guide.glossary.dpsDef':
+    '每秒伤害，大致衡量某物造成伤害速度快慢的指标。也用来指造成伤害这一职责本身，例如一个坦克、一个治疗加三个 DPS。',
   'guide.glossary.eliteTerm': '精英',
   'guide.glossary.eliteDef':
     '比普通敌人更强大的敌人,通常需要组队应对。地下城和稀有敌人往往是精英。',
   'guide.glossary.rareTerm': '稀有',
+  'guide.glossary.raidDef':
+    '一支更大的队伍，本作中至多十名玩家，为最艰难的终局战斗而组建；小队一旦满员便会转为团队。',
+  'guide.glossary.raidTerm': '团队副本',
   'guide.glossary.rareDef': '在某区域游荡的不常见的有名敌人,会掉落更好的战利品。',
   'guide.glossary.tankTerm': '坦克',
   'guide.glossary.tankDef': '负责吸引敌人仇恨并承受伤害的队伍成员,好让其他人安全作战。',
@@ -3494,7 +3550,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.faqPage.a4':
     '可以。有即开即玩的单人离线模式,除地下城和团队副本外,在线世界也完全可以单人通关。',
   'guide.faqPage.q5': '一共有多少个职业?',
-  'guide.faqPage.a5': '九个,涵盖经典的坦克、治疗与输出定位,各自拥有独特的资源和招牌技能。',
+  'guide.faqPage.a5':
+    '九个，涵盖经典的坦克、治疗与输出定位，每个职业都拥有一套资源系统（怒气、法力或能量）以及各自的招牌技能。',
   'guide.faqPage.q6': '等级上限是多少?',
   'guide.faqPage.a6': '{cap} 级,需横跨三片相连的区域,通过任务、地下城与探索达成。',
   'guide.faqPage.q7': '我的角色会被保存吗?',
@@ -3542,7 +3599,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.family.beast.desc':
     '森林与原野上的野生动物，从狼和野猪到捕食它们的猛兽。猎人可以驯服其中许多。',
   'guide.family.spider.name': '蜘蛛',
-  'guide.family.spider.desc': '结网的织丝者与剧毒的潜伏者，盘踞在阴暗错综之地。',
+  'guide.family.spider.desc':
+    '结网的织丝者与剧毒的潜伏者，盘踞在阴暗错综之地。猎人可以像驯服野兽那样驯服它们。',
   'guide.family.murloc.name': '鱼人',
   'guide.family.murloc.desc': '两栖的沼泽居民，成群涌入浅滩，吵闹而极具地盘意识。',
   'guide.family.kobold.name': '狗头人',
@@ -3550,12 +3608,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.family.humanoid.name': '人型生物',
   'guide.family.humanoid.desc': '盗匪、邪教徒以及其他误入歧途之辈。他们以战术作战，而非只靠拳脚。',
   'guide.family.troll.name': '巨魔',
-  'guide.family.troll.desc': '身形魁梧、自愈极快的蛮兽，盘踞于沼泽与高地之中。',
+  'guide.family.troll.desc': '身形魁梧的蛮兽，蛰伏在湿地的沼泽之中。',
   'guide.family.ogre.name': '食人魔',
   'guide.family.ogre.desc': '体型庞大、头脑迟钝却凶险无比。它们盘踞高山隘口，出手如山崩般沉重。',
   'guide.family.undead.name': '亡灵',
   'guide.family.undead.desc': '不安息的死者，被更黑暗的力量所驱使。它们不知疲倦，也绝不退缩。',
   'guide.family.elemental.name': '元素生物',
+  'guide.family.dragonkin.desc':
+    '源自远古深渊、披着鳞甲、形似巨蛇的造物。它们罕见、骄傲，远比看上去更强大。',
+  'guide.family.dragonkin.name': '龙类',
   'guide.family.elemental.desc': '由风暴与岩石化成的活物，被束缚于元素之力旺盛的荒野之地。',
   'guide.worldPage.heading': '世界',
   'guide.worldPage.intro':
@@ -3573,17 +3634,18 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '头顶带有标记的人物有活儿要交给你。与他们对话即可接受任务。你的第一个任务是“狼患当前”，由东溪镇的雷德布鲁克元帅发布。',
   'guide.questsPage.objectivesTitle': '目标',
   'guide.questsPage.objectivesBody':
-    '击杀特定敌人、收集物品，或与世界中的某物互动。屏幕上的追踪器会随你的行动记录进度。',
+    '击杀特定敌人、收集物品，或与世界中的某物互动。屏幕上的追踪器会随你的行动记录进度。若你改变主意，可以从任务日志中放弃一个任务，之后再从其发布者处重新接取。',
   'guide.questsPage.turninTitle': '交还任务',
   'guide.questsPage.turninBody':
-    '返回任务发布者处（地图会指明位置），即可获得经验、金币，以及通常会有的一件契合你职业的装备。',
+    '把完成的任务带到它的交付标记处（地图会指明位置），即可获得经验、金币，以及通常会有的一件契合你职业的装备。那通常就是把任务交给你的人，不过有些任务会让你转去找另一个人。',
   'guide.questsPage.partyTitle': '组队做任务',
   'guide.questsPage.partyBody':
-    '附近的队员会共享击杀和目标进度，因此组队做任务只会更快，绝不会更慢。',
+    '附近的队员会共享击杀和目标进度，因此组队做任务只会更快，绝不会更慢。你还可以与你的小队分享任务：用 /share 命令把它作为可点击的链接发到聊天中，任何符合条件的附近队员都能一键接取同一个任务。',
   'guide.questsPage.storyTitle': '一条主线贯穿始终',
   'guide.questsPage.storyBody':
     '从你在东溪镇的第一批差事起，死者便有了异样。一个邪教正在暗中行动，线索向北贯穿每一个区域。循迹而行，揭开幕后黑手的真面目。',
-  'guide.questsPage.soloNote': '主线剧情完全可单人完成，仅最终章节需要组队。',
+  'guide.questsPage.soloNote':
+    '主线剧情一直到每个章节的高潮之前都可单人完成，而那场高潮是一座五人地下城。',
   'guide.dungeonsPage.heading': '地下城与团队副本',
   'guide.dungeonsPage.intro':
     '当开放世界已不能满足你时，召集一支队伍，踏入副本：一份专为你的队伍生成的地下城私有副本。',
@@ -3663,7 +3725,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.augmentsNote':
     '增幅和强化只在本场比赛中有效。它们关乎的是趣味、即兴的临场构筑，而非长久的强势，因此没人能靠花钱赢得胜利。',
   'guide.arenaPage.coliseumBody':
-    '竞技场是这片位面的角斗场，你将在排名比赛中对阵其他玩家。获胜则排名攀升，最强的斗士会登上排行榜，供所有人瞻仰。',
+    'the Coliseum 是这片位面的角斗场，你将在排名赛中对阵其他玩家，一对一或二对二皆可。每个组别都各自记录排名，因此一场胜利便能让你在那条天梯上攀升，让全位面的人都看得见。',
   'guide.arenaPage.coliseumHeading': '灰烬角斗场',
   'guide.arenaPage.duelsBody':
     '可以向你遇到的任何玩家发起一场友好的决斗。除了荣誉，没有任何东西被押上，因此这是了解某种对局，或友好地一较高下的最简单方式。',
@@ -3707,12 +3769,18 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.faqPage.q10': '满级之后有什么可做的？',
   'guide.faqPage.q11': '我该如何找队伍？',
   'guide.faqPage.q9': '有 PvP 吗？',
+  'guide.glossary.augmentDef':
+    '在二对二的嘉年华竞技场对局中临时选取的强化，仅在该场对局内重塑你的套路。',
+  'guide.glossary.augmentTerm': '增幅',
   'guide.glossary.buffDef': '施加在你或盟友身上的有益效果，比如在一段时间内提升某项属性的祝福。',
   'guide.glossary.buffTerm': '增益',
   'guide.glossary.ccDef': '使敌人昏迷、定身，或以其他方式暂时让它退出战斗的技能。',
   'guide.glossary.ccTerm': '控制',
   'guide.glossary.debuffDef': '施加在目标身上的有害效果，比如减速、流血或护甲削弱。',
   'guide.glossary.debuffTerm': '减益',
+  'guide.glossary.delveDef':
+    '供一到两名玩家进行的短小、可反复挑战的副本下潜，从看守人的面板处开启，并有一名同伴陪在身旁。',
+  'guide.glossary.delveTerm': '探秘',
   'guide.glossary.dotDef': '持续伤害与持续治疗：以稳定的节奏分次跳动，而非一次性结算的效果。',
   'guide.glossary.dotTerm': '持续伤害与持续治疗',
   'guide.glossary.mobDef': '世界中任何由电脑控制的生物，无论友好还是敌对。mobile 的缩写。',
@@ -3739,6 +3807,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.search.placeholder': '搜索指南',
   'guide.search.typeClass': '职业',
   'guide.search.typeCreature': '生物',
+  'guide.search.typeDelve': '探秘',
   'guide.search.typeDungeon': '地下城',
   'guide.search.typePage': '页面',
   'guide.search.typeTerm': '术语',
@@ -3763,8 +3832,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.talentsPage.intro':
     '天赋是你让职业成为自己专属的方式。它们是可选的、宽容的，也很容易更改，所以你可以放心地尝试。',
   'guide.talentsPage.resetNote':
-    '你可以随时重置天赋，所以早期的选择绝不会成为陷阱。尽管尝试，看看你喜欢什么，随心改主意。',
+    '只要脱离战斗，你随时都可以重置天赋，所以早期的选择绝不会成为陷阱。尽管尝试，看看你喜欢什么，随心改主意。',
   'guide.talentsPage.resetTitle': '一切都不是永久的',
+  'guide.talentsPage.shareNote':
+    '一套完成的构筑可以复制为一段简短、可分享的代码交给朋友，对方将其直接粘贴进自己的天赋面板即可载入。',
   'guide.talentsPage.specsBody':
     '每个职业都有几种专精，各有自己的定位和标志性的侧重。这里是它们全部的大致面貌。打开某个职业可查看其全部技能。',
   'guide.talentsPage.specsHeading': '各职业的专精',
@@ -3777,7 +3848,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '每个职业都能独当一面并抵达等级上限。选你喜欢的那种幻想，而不是别人口中所谓最强的那个。',
   'guide.wishPage.i1Title': '你不会选错职业',
   'guide.wishPage.i2Body':
-    '当你倒下时，你会在墓地复活并跑回自己的尸体。不会损失经验，所以放心去冒险、去学习。',
+    '当你倒下时，你会释放灵魂，在最近的墓地复活，然后返回原处。不会损失经验，所以放心去冒险、去学习。',
   'guide.wishPage.i2Title': '死亡几乎不会让你付出代价',
   'guide.wishPage.i3Body': '它们在 10 级解锁，随时都能重置，所以你早期的选择绝不是永久的。',
   'guide.wishPage.i3Title': '天赋不是陷阱',
@@ -3831,13 +3902,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.combat.ccBody':
     '控制是一类特殊的减益，会限制目标能做的事：眩晕、定身与减速，让人无法施法的沉默，缴械，恐惧，以及能让敌人暂时无害的变形术。其中一些，比如定身、恐惧和变形术，若施加得太过频繁就会失效，因此无法被无限连控。',
   'guide.combat.deathBody':
-    '若你的生命值归零，你便倒下了。稍等片刻便能复活，并从倒下之处继续前行，所以一次死亡只会耗去你些许时间，而非你的进度。两场战斗之间，坐下进食饮水，让自己以满状态迎接下一战。',
+    '若你的生命值归零，你便会倒下。释放你的灵魂，便能在最近的墓地以满血复活，再返回原处，因此一次死亡只会耗去你些许时间，而非你的进度。两场战斗之间，坐下进食饮水，让自己以满状态迎接下一战。',
   'guide.combat.deathTitle': '当你倒下时',
   'guide.combat.effectsBody':
     '许多技能会施加持续存在的效果。有益的（增益）会提升你的属性、为你护盾，或一点点地治疗你；有害的（减益）则以持续伤害消耗你的生命，或削弱你。留意动作条附近的小图标，便能看清你身上有哪些效果、还能持续多久。',
   'guide.combat.effectsTitle': '增益、减益与控制',
   'guide.dungeonsPage.cryptLeadBody':
-    '在远离主战场的高耸峰巅，潜藏着一桩更为冰冷的谜团。古老的坟墓上刻着无人记得的王冠，守护它们的死者曾侍奉一位被遗忘的君王。读懂他们的碑文，收集他们守护的钥石，你便能开启一座由三个忠魂以死封缄的陵墓，为循线索追查到底的人开启第二场十人试炼。',
+    '在远离主战场的高耸峰巅，潜藏着一桩更为冰冷的谜团。古老的坟墓上刻着无人记得的王冠，守护它们的死者曾侍奉一位被遗忘的君王。读懂他们的碑文，收集他们保管的钥石，你便能开启一座由三个忠魂以死守闭的陵墓，这是一场可选的试炼，会为循线索追查到底的人开启这片位面的十人团队副本。',
   'guide.dungeonsPage.cryptLeadTitle': '一扇死者本该让它紧闭的门',
   'guide.dungeonsPage.templeLoreBody':
     '这座神殿有着自己的传说，比你在别处追查的邪教更为古老。在饮月之池的岸边，那是一汪饮尽月光、又交还溺亡者的小湖，一名孤独的守望者把守着一道苍白的光之门。水面之下，一道冰冷的石阶通向那里。沉入此处的人并非死于意外：他们是苍白唱诗班，在虔诚的礼拜中没入水底，从未停止歌唱。在湖水将他们吞没之前，古老的守护者在岩石上刻下了唯一一句警示，那是献给一个他们称之为溺月之物的祷词，又有一只更沉稳的手在其下添上了两个字：它只是沉睡。',
@@ -3849,12 +3920,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '货币分为三种。一百铜币兑换一银币，一百银币兑换一金币，因此你的钱袋会从最小的铜币开始往上累积。你可以从任务奖励、击杀敌人后的拾取，以及变卖闲置之物中赚取它们。',
   'guide.economy.coinTitle': '金币、银币与铜币',
   'guide.economy.intro':
-    '钱币让整个世界运转：它能购买装备与补给，支付修理费与任务开销，还能在玩家之间流转。这一切只需游玩便能逐渐到手，所以不妨把本页看作一张地图，标明你的钱从何而来、又向何处去。',
+    '钱币让整个世界运转：它能购买你的装备、补给与旅行用具，还能在玩家之间易手。这一切只需游玩便能逐渐到手，所以不妨把本页看作一张地图，标明你的钱从何而来、又向何处去。',
   'guide.economy.junkBody':
     '你用不上的掉落物依然能卖给任何商人，所以每次路过城镇都顺手清空背包，别让它们堆满。真正毫无价值的零碎杂物也可以直接丢弃以腾出空间。',
   'guide.economy.junkTitle': '清理废品',
   'guide.economy.marketBody':
-    '商人经营着世界市场，这是一个由玩家驱动的交易所，你可以与素未谋面的人买卖。与商人对话即可打开它。',
+    'the Merchant 经营着世界市场，这是一个由玩家驱动的交易所，你可以在此与素未谋面的人买卖。与 the Merchant 对话即可将其打开。the Merchant 还会在那里长期挂售自己的一批货物，因此即便没有其他玩家上架，也总有东西可买。',
   'guide.economy.marketBrowse':
     '浏览：翻看列表或按名称搜索，找到正在出售的商品。每条挂单都会显示货物、卖家，以及整组货物的要价。',
   'guide.economy.marketCollect':
@@ -3864,11 +3935,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.economy.marketPricing':
     '定价由你说了算。比别人略低一点往往卖得更快，而要价过高则可能无人问津。挂单前不妨先浏览一番，看看当下的行情如何。',
   'guide.economy.marketTitle': '世界市场',
+  'guide.economy.marksBody':
+    '你存下的不只有钱币。探秘会产出探秘印记，这是一种独立的货币，只能在探秘看守人处花费，用于同伴升级和别处找不到的装备。它们绝不会与你的钱币混在一起。',
+  'guide.economy.marksTitle': '第二种货币：探秘印记',
   'guide.economy.tradeBody':
     '你可以与站在身旁的任何人面对面交易。双方将物品与钱币放入一个共享窗口，唯有两人都确认后才会完成交换，因此谁也不会吃亏。这是把掉落物递给朋友或敲定一笔买卖最简单的方式。',
   'guide.economy.tradeTitle': '与其他玩家交易',
   'guide.economy.vendorsBody':
-    '城镇与哨站里星罗棋布地分布着商人，各有各的营生。补给商贩售食物饮品，武器匠与护甲匠经营装备，草药师专做材料生意，军需官则备有实用的旅行用具。走到其中一位面前，便能看到他们出售的东西。',
+    '城镇与哨站里星罗棋布地分布着商人，各有各的营生。补给商贩备有食物与饮品，武器匠与护甲匠经营装备，军需官则备有实用的旅行用具。走到其中一位面前，便能看到他们出售的东西。',
   'guide.economy.vendorsTitle': '商人与他们的存货',
   'guide.gear.consumablesElixirs':
     '合剂会在你冒险时给予一段临时增益，是想再多拼一把时的一点小优势。',
@@ -3879,6 +3953,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.gear.consumablesPotions':
     '药水在你使用的那一刻便能恢复生命或法力，即便在激战中也可以，这让它们成为开怪失误时的救命稻草。它们共享一段较短的冷却，所以要选好一个绝佳时机来用。',
   'guide.gear.consumablesTitle': '消耗品',
+  'guide.gear.cosmeticsApply':
+    '在角色界面的外观一栏设置你当前的造型，并在已解锁的所有外观之间自由切换。',
   'guide.gear.cosmeticsBody':
     '有些奖励只改变你角色的外观，绝不影响你的强弱。这些外观皮肤能让你与众不同，又不会左右游戏，所以喜欢哪款就穿哪款。',
   'guide.gear.cosmeticsCache':
@@ -3886,17 +3962,19 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.gear.cosmeticsRanks':
     '外观也有自己的稀有度层级，越稀有的越值得一追。赢得更高的层级也会解锁它之下的那些外观。',
   'guide.gear.cosmeticsSkins':
-    '有两条外观线可供收集。每个职业都有几款备选外观，是专属于你、独一份的全新风貌。与之相伴的还有炫彩：那是一组组带名号的双色配色方案，能将外观彻底重涂，从素雅的金属色到明艳的帝王色，应有尽有。',
+    '有两条外观线可供收集。大多数职业都有几款备选外观，是对该职业造型的全新演绎，专属于你、可供穿戴。与之相伴的还有炫彩：那是一组组带名号的双色配色方案，能将外观彻底重涂，从素雅的金属色到明艳的帝王色，应有尽有。',
   'guide.gear.cosmeticsTitle': '外观与装饰',
   'guide.gear.fishingBody':
-    '钓鱼是一种悠闲的调剂。装备好钓竿，向开阔的水域抛竿，再把上钩之物收线钓起。你大多会钓到可以烹饪成食物的鱼，偶尔有几件能卖几个铜板的杂物，时不时还会有一条珍贵的稀有渔获。你能钓到什么，取决于你垂钓的水域。',
+    '钓鱼是一种悠闲的调剂。装备好钓竿，向开阔的水域抛竿，再把上钩之物收线钓起。你大多会钓到可以直接食用的鱼，偶尔有几件能卖几个铜板的杂物，时不时还会有一条珍贵的稀有渔获。你能钓到什么，取决于你垂钓的水域。',
   'guide.gear.fishingFood':
-    '你钓上来的鱼都是生的，而生鱼便是食物。把渔获烹熟，坐下进食时回血更多，越好的鱼来自北方越寒冷、越深的水域。在湖边垂下一竿，是于两战之间静静充实背包的好法子。',
+    '你钓上来的鱼本身就是食物：坐下休息时吃上一条便能回复生命值，越肥美的鱼来自北方越寒冷、越深的水域。在湖边垂下一竿，是于两战之间静静充实背包的好法子。',
   'guide.gear.fishingRare':
     '时不时地，你的鱼线会钓上比晚餐好得多的东西：一条波光粼粼的珍贵鱼，任何垂钓者在任何水域都可能撞上的好运。钓中一条，你的日志便会因这份渔获而亮起。正是这种走运的一钓，让湖畔闲度的午后变得值得向人津津乐道。',
   'guide.gear.fishingTitle': '钓鱼',
   'guide.gear.intro':
     '装备是你角色身上穿戴的行头，以及你随身携带的物品。更好的装备是变强最稳妥的途径，而其中大部分只需游玩便能到手。',
+  'guide.gear.itemLevelBody':
+    '如果你想快速比较两件装备，可以在选项中开启“显示物品等级”。这样每件武器和护甲都会显示一个物品等级，一个根据来源大致衡量其强度的单一数值，让你一眼就能看出哪件升级更有分量，即便是不同部位之间也能比较。',
   'guide.gear.qualityBody':
     '每件物品都有其品质，名称也以相应的颜色标示，让你一眼便能看出它的价值。从最常见到最珍贵：',
   'guide.gear.qualityCommon': '普通',
@@ -3908,6 +3986,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.gear.qualityRare': '精良',
   'guide.gear.qualityTitle': '品质一览',
   'guide.gear.qualityUncommon': '优良',
+  'guide.gear.setsBody':
+    '最稀有的护甲成套出现，数件装备在外观与战斗风格上浑然一体。同时穿戴足够多的同套部件，套装便会被激活，在每件单品自身属性之外额外授予加成，而你穿的部件越多，加成就越强。它们掉落自接近等级上限的最高难度组队内容，因此凑齐一整套是经典的终局目标。',
+  'guide.gear.setsTitle': '套装与套装效果',
   'guide.gear.slotChest': '胸部',
   'guide.gear.slotFeet': '脚部',
   'guide.gear.slotGloves': '手部',
@@ -3917,7 +3998,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.gear.slotShoulder': '肩部',
   'guide.gear.slotWaist': '腰部',
   'guide.gear.slotsBody':
-    '你有一个武器栏和七个护甲栏。每件装备穿上都会增益你的角色，而且随着你找到升级，可以自由搭配。',
+    '你有一个武器栏和七个护甲栏。每个职业只能使用特定的武器，并穿戴不超过其自身重量级别的护甲，即布甲、皮甲或锁甲，因此适合你的升级装备，正是为你的职业打造的那些。在此之内，用你找到的最好物件填满每一个栏位。',
   'guide.gear.slotsTitle': '你能装备什么',
   'guide.gear.sourcesBody':
     '早期的升级大多来自任务奖励，所以与其刷怪，不如完成任务更划算。敌人被击败时会掉落装备，城镇里的商人贩售扎实的基础货色，玩家市场则让你能从其他冒险者那里买东西。',
@@ -3963,9 +4044,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.progression.noRush':
     '不必着急。这个世界供你按自己的节奏尽情享受，所以尽管漫步，接下吸引你的任务，让你的英雄在旅途中渐渐成长。',
   'guide.progression.prestigeBody':
-    '即便到了等级上限，经验依然在累积。它会注入一个纯装饰性的虚拟等级，让你的经验条不断攀升，还会注入一个可供长期赢取以彰显荣誉的声望等级。这完全是可选的，绝不赋予战力，只是你走过这条路的印记。',
+    '即便到了等级上限，经验依然在累积。它会注入一个纯装饰性的虚拟等级，让你的经验条不断攀升，也会注入一个可供长期赢取、以彰显荣誉的声望等级。跨过累计经验的重大里程碑，还会解锁会在你角色面板上显示的装饰性称号与姓名板边框。这一切都纯属可选，绝不赋予战力，只是你走过这条路的印记。',
   'guide.progression.restedBody':
-    '当你登出，或在客栈这样的安全之地休息时，你的角色会在你离开期间积攒充分休息的经验。下次你外出作战时，那一池经验会为你的击杀带来额外加成，直至耗尽。它会随时间累积，并加快你早期的升级，所以在城镇里登出从来都不算浪费时间。',
+    '在客栈这样脱离战斗的安全之地休息，当你坐在那里时，你的角色便会积攒充分休息的经验。下次你外出作战时，那一池经验会为你的击杀带来额外加成，直至耗尽。在客栈里稍作停留从来都不是浪费时间，它会加快你接下来一段的升级。',
   'guide.progression.restedTitle': '充分休息的经验',
   'guide.progression.xpBody':
     '你通过完成任务和击败敌人来赚取经验。任务给的经验远多于其他途径，所以循着任务指引走是升级最快的方式。沿途击杀则补足其余部分。',
@@ -3976,31 +4057,34 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '在泥沼，溺亡绝非意外。有人正像填满纳贡之箱一般填满这片湿地，从每一个被湖水吞没的旅人身上唤起听命的死者。沿着命令的链条向上追查，直至沉没堡垒中的一名唤雾者，他的临终之言道出了某种更为古老、正在峰巅之下蠢动之物。',
   'guide.questsPage.sagaMarshTitle': '湿地：一笔灵魂的贡赋',
   'guide.questsPage.sagaPeaksBody':
-    '在荆棘峰，整个图谋终于水落石出。自谷地以来窃取的每一个灵魂，都是倾注于唤醒一个封印在山岳之下的远古之物的贡赋。始于一座礼拜堂院落的踪迹在此终结，止步于一扇需十人方能开启的门前。至于谁在门后等候，我们就留给你自己去揭晓吧。',
+    '在 Thornpeak，整个图谋终于水落石出。自 the Vale 以来被窃走的每一个灵魂，都是为这座山岳腹心深处邪教的阴森勾当而倾注的贡赋。始于一座礼拜堂院落的踪迹在此终结，化作一场五人的深入，去直面这一切背后的黑手。至于谁在尽头等候，我们就留给你自己去揭晓吧。',
   'guide.questsPage.sagaPeaksTitle': '峰巅：贡赋所为何来',
   'guide.questsPage.sagaTitle': '循迹北行',
   'guide.questsPage.sagaValeBody':
     '在东溪，死者无法安息，而其背后的印记属于一个早被认为已然消亡的教派。循迹追查到一名在礼拜堂地穴中作业的唤墓者，他自己的文书又将你指向北方的湿地。',
   'guide.questsPage.sagaValeTitle': '谷地：印玺上的一个名字',
   'guide.questsPage.sideCryptBody':
-    '在高耸的峰巅，潜藏着一桩更幽静的谜团：古老的坟墓刻着无人记得的王冠。读懂死者，收集他们守护之物，再开启一座本该长闭的陵墓。这是一条侦探般的线索，为整支团队开启第二场终局试炼之路。',
+    '在高耸的峰巅，潜藏着一桩更幽静的谜团：古老的坟墓刻着无人记得的王冠。读懂死者，收集他们守护之物，再开启一座本该长闭的陵墓。这是一条侦探般的线索，会为你开启通往这片位面十人终局团队副本之路。',
   'guide.questsPage.sideCryptTitle': '被遗忘的君王',
+  'guide.questsPage.sideTempleBody':
+    '高耸峰巅上一座高山湖泊之上，一道苍白光芒的传送门，通往一座沉没的神龛，那里仍有溺亡的邪教在歌唱。它那条短小的任务链独立于主线之外，是一桩自成一体的谜团，留给每一个攀上湖岸、读懂刻在岩石上的警告、并下潜去探明其缘由的人。',
+  'guide.questsPage.sideTempleTitle': '溺没的神庙',
   'guide.questsPage.sideTitle': '主路之外的支线',
   'guide.questsPage.sideWardenBody':
-    '在剧情之外，谷地与湿地的守望者们还会发布一份常驻的赏金阶梯。一个敌人接一个敌人地往上爬，就像你之前的每一位守望者赢得自己的位置那样。这是踏实的升级，也是一趟遍历各区域最恶劣捣乱分子的巡礼。',
+    '在剧情之外，the Vale 与湿地的法警和守望者们还会发布一份常驻的赏金阶梯。一个敌人接一个敌人地往上爬，就像你之前的每一位赏金猎人赢得自己的位置那样。这是踏实的升级，也是一趟遍历各区域最恶劣捣乱分子的巡礼。',
   'guide.questsPage.sideWardenTitle': '扬名立万',
   'guide.questsPage.typeGatherBody':
     '从世界中或敌人的掉落里收集物品：草药、矿石、遗失的信件、邪教阴森的材料。有些物件只会从特定的敌人身上掉落，所以狩猎与搜罗往往相伴而行。',
   'guide.questsPage.typeGatherTitle': '采集',
   'guide.questsPage.typeGroupBody':
-    '主线剧情的每个篇章都终结于一扇地下城之门。前置引导可单人完成，但对一个篇章反派的最后一击，是为五人小队准备的（而最后一场，是为十人准备的）。',
+    '主线剧情的每个篇章都终结于一扇地下城之门。前置引导可单人完成，但对一个篇章反派的最后一击，是为五人小队准备的。',
   'guide.questsPage.typeGroupTitle': '组队收尾',
   'guide.questsPage.typeInteractBody':
     '使用、净化或读取世界中某个固定之物：一座被玷污的坟墓、一块刻在岸边岩石上的警示、一扇封印的地穴之门。走到标记处，对它采取行动。',
   'guide.questsPage.typeInteractTitle': '互动',
   'guide.questsPage.typeMusterBody':
-    '安全护送一位友方人物从一处前往另一处，或在向北推进前召集一座城镇的守卫。这些任务让你与你身处其故事之中的人们一同前行。',
-  'guide.questsPage.typeMusterTitle': '护送与召集',
+    '有些任务会让你在向北推进前召集一座城镇：削弱城门处的威胁，并收集守卫者所需之物。这些都是击杀与收集类目标，服务于你身处其故事之中的人们，让你与他们一同前行。',
+  'guide.questsPage.typeMusterTitle': '召集防御',
   'guide.questsPage.typeSlayBody':
     '击败一定数量的指定敌人，疏散一群野兽，或瓦解一个邪教的盘踞。游戏中的第一个任务，清除东溪路上的野狼，便是其中之一。',
   'guide.questsPage.typeSlayTitle': '讨伐',
@@ -4008,7 +4092,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '大多数任务都属于几种熟悉的样式之一。屏幕上的追踪器会清楚地说明每个任务的要求，让你绝不会一头雾水。',
   'guide.questsPage.typesTitle': '你将遇到的任务种类',
   'guide.social.chanGeneral': '综合。',
-  'guide.social.chanGeneralBody': '一个面向你周围众人、始终开启的本地频道，适合提问或闲聊。',
+  'guide.social.chanGeneralBody':
+    '一个始终开启、覆盖全位面的频道，能触及所有在线玩家，适合提问或闲聊。与世界频道和寻求组队频道不同，你无需手动加入便能使用。',
   'guide.social.chanGuild': '公会与官员。',
   'guide.social.chanGuildBody':
     '属于你公会的频道。公会聊天可触及每一位成员；官员频道则只供官员使用。',
@@ -4051,11 +4136,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '普通掉落物可以归拾取者，而更好的掉落物则会拿出来掷骰，让每个人都有公平的机会。',
   'guide.social.lootCommonTitle': '物品。',
   'guide.social.lootHeading': '小队战利品',
+  'guide.social.lootMasterBody':
+    '队长也可以转而亲自掌管较好的掉落，把每一件分发给应得的成员。这能避免珍贵装备被一次随机的掷点拿走，正如一支有组织的队伍打地下城时所做的那样。',
+  'guide.social.lootMasterTitle': '队长分配。',
   'guide.social.lootRollBody':
     '当一件物品进入掷骰时，每位有资格的成员若想要它便选“需求”，若只是顺手收着便选“贪婪”，不想要则选“放弃”退出。点数最高者胜出。',
   'guide.social.lootRollTitle': '需求、贪婪或放弃。',
   'guide.social.partyBody':
-    '右键点击某位玩家的名字并选择邀请，或用一条聊天命令，即可邀请对方组队。一支小队最多容纳五名玩家，其中一人是队长。',
+    '右键点击另一位玩家的名字并选择邀请，即可邀请对方组队。一支小队最多容纳五名玩家，其中一人是队长。',
   'guide.social.partyCredit':
     '彼此靠近的队员会共享击杀与任务进度，所以一起做任务只会更快，绝不会更慢。组队也是你们作为一支队伍踏入地下城的方式。',
   'guide.social.partyHeading': '组建小队',
@@ -4076,11 +4164,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.stats.dodgeBody':
     '躲闪是你完全闪避一次来袭近战攻击的几率。你从一个较低的基础几率起步，敏捷会提升它，所以身手敏捷的职业能躲过更多打击。',
   'guide.stats.dodgeTitle': '躲闪',
+  'guide.stats.dpsBody':
+    '你的面板还会显示一个每秒伤害的估算值：大致是你的武器、它的挥击速度以及你的攻击强度随时间累计的结果。这是一眼比较两把武器的快捷方式。',
+  'guide.stats.dpsTitle': '每秒伤害',
   'guide.stats.growBody':
     '有两样东西会提升你的属性。每次升级都会按你职业的需要为各项属性增加固定的数值，而你装备的行头则在此之上叠加更多。让装备保持更新，是你一路成长直至等级上限最稳妥的途径。',
   'guide.stats.growHeading': '你的属性如何成长',
   'guide.stats.intBody':
-    '智力会扩大施法者的法力池，并提升其法术暴击的几率。它对那些消耗法力施法的职业至关重要；对怒气或能量职业来说则作用甚微。',
+    '智力会扩大施法者的法力池，提升其法术强度从而让法术打得更狠，还会提高其法术暴击的几率。它对那些消耗法力施法的职业至关重要；对怒气或能量职业来说则作用甚微。',
   'guide.stats.intTitle': '智力',
   'guide.stats.intro':
     '你的角色由寥寥几项属性来描述。你无需把它们背得滚瓜烂熟也能玩得很好，但大致了解每一项的作用，有助于你读懂角色面板并挑选合适的升级。',
@@ -4090,6 +4181,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.stats.sheetBody':
     '在游戏中打开角色窗口，便能在一处看到这一切：一侧是你的五项属性，另一侧是它们所注入的各项数值。将鼠标悬停在任意数值上，提示框便会拆解它对你职业的作用，让你一眼看出一次升级究竟改动了哪些数字。',
   'guide.stats.sheetHeading': '读懂你的角色面板',
+  'guide.stats.spBody':
+    '法术强度是施法者与攻击强度相对应的属性：它会提升你法术造成的伤害。智力为其供能，施法者装备与增益还会在此之上额外叠加，因此施法者关注法术强度，正如近战斗士关注攻击强度。',
+  'guide.stats.spTitle': '法术强度',
   'guide.stats.spiBody':
     '精神主宰施法者在脱离战斗时法力回复的快慢。与智力一样，它服务于法力职业，对其他职业则意义不大。',
   'guide.stats.spiTitle': '精神',
@@ -4103,6 +4197,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.viewer.dragHint': '拖动以转动模型。模型获得焦点时，可使用左右方向键。',
   'guide.viewer.error': '无法载入该 3D 模型。上方的美术图仍展示着这个 {name}。',
   'guide.viewer.loading': '正在载入模型……',
+  'guide.viewer.posterAlt': '{name}',
   'guide.viewer.view3d': '以 3D 查看 {name}',
   'guide.viewer.view3dShort': '以 3D 查看',
   'guide.worldPage.marshGreeter': '守望者芬威克，芬桥',
@@ -4116,10 +4211,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.valeGreeter': '雷德布鲁克元帅，东溪',
   'guide.worldPage.valeGreeting': '把你的刀剑带在身边。谷地已不复往日。',
   'guide.worldPage.valePlaceNotes':
-    '东溪是你的第一个大本营。狼奔之地与野猪草甸是温和的狩猎场；镜湖是供垂钓的静水；蛛网林与铜矿坑藏着蜘蛛和贪婪掘矿者；一处盗匪营地与陨落礼拜堂里有更棘手的活儿；明木林是北方一片宁静的野生动物林地。',
+    'Eastbrook 是你的第一个大本营。Wolf Run 与 Boar Meadow 是温和的狩猎场；Mirror Lake 是供垂钓的静水；the Webwood 与 the Copper Dig 藏着蜘蛛和贪婪掘矿的家伙；一处 Bandit Camp 与 the Fallen Chapel 里有更棘手的活儿；Reliquary Hill 向下通往 the Collapsed Reliquary，这是这片位面的首个探险地；而 Brightwood Glade 则是北方一片宁静、阳光普照的林地。',
   'guide.worldPage.gladeTitle': '宁静一隅：明木林地',
   'guide.worldPage.gladeBody':
-    '山谷里的故事并不全都关于亡者。北方有一片被阳光照亮的林地，名为明木林，那里有自己的温和节奏：安静小径、吃草的鹿，以及枝叶下警觉的野兽。它是你所追寻踪迹之外的一段柔和对照，若道路给你余裕闲逛，很值得去看一看。',
+    'the Vale 里的故事并不全都关于亡者。北方有一片阳光照耀的林地，名为 Brightwood Glade，自有它更为温和的节奏：尽是安静的小径，以及枝叶下斑驳的光影。它是你所追寻的踪迹之外一段柔和的对照，若道路给你余裕闲逛，很值得去看一看。',
   // APM telemetry label from release/v0.14.0
   'hudChrome.perf.labels.apm': 'APM',
   'entities.zones.eastbrook_vale.pois.9.label': '明木林地',
@@ -4437,4 +4532,119 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hudChrome.abilityScaling.bonus': '(+{value})',
+  // Discord integration (two-way login, rewards, relay, in-game flair).
+  'hudChrome.discord.close': '关闭',
+  'hudChrome.discord.keybind': 'Discord 面板',
+  'hudChrome.discord.disabled': 'Discord 集成当前不可用。',
+  'hudChrome.discord.tiers.none': '未入级',
+  'hudChrome.discord.tiers.initiate': '见习者',
+  'hudChrome.discord.tiers.squire': '扈从',
+  'hudChrome.discord.tiers.footman': '步兵',
+  'hudChrome.discord.tiers.knight': '骑士',
+  'hudChrome.discord.tiers.champion': '勇士',
+  'hudChrome.discord.tiers.warlord': '统帅',
+  'hudChrome.discord.tiers.legend': '传奇',
+  'hudChrome.discord.tiers.mythic': '神话',
+  'hudChrome.discord.loginCta': '使用 Discord 继续',
+  'hudChrome.discord.choice.title': '使用 Discord 继续',
+  'hudChrome.discord.choice.intro': '创建新账号，或将 Discord 关联到你已有的账号。',
+  'hudChrome.discord.choice.greeting': '欢迎，{name}！',
+  'hudChrome.discord.choice.createCta': '创建新账号',
+  'hudChrome.discord.choice.haveAccount': '已经有账号了？',
+  'hudChrome.discord.choice.linkCta': '关联已有账号',
+  'hudChrome.discord.choice.linkSubmit': '关联账号',
+  'hudChrome.discord.choice.error': '无法继续，请重试。',
+  'hudChrome.discord.choice.expired': '该 Discord 登录已过期，请重新使用 Discord 登录。',
+  'hudChrome.discord.keep.title': '设置密码',
+  'hudChrome.discord.keep.body':
+    '你的账号通过 Discord 登录。请设置密码，这样取消关联后仍可使用用户名登录。',
+  'hudChrome.discord.keep.usernameLabel': '你的用户名',
+  'hudChrome.discord.keep.confirmLabel': '确认密码',
+  'hudChrome.discord.keep.submit': '设置密码并取消关联',
+  'hudChrome.discord.keep.cancel': '取消',
+  'hudChrome.discord.keep.mismatch': '两次输入的密码不一致。',
+  'hudChrome.discord.keep.tooShort': '密码至少需要 6 个字符。',
+  'hudChrome.discord.orEmail': '或使用邮箱',
+  'hudChrome.discord.cta.title': '关联你的 Discord，赚取积分并提升段位',
+  'hudChrome.discord.cta.stats': '{online} 人在线 · 服务器共 {total} 名成员',
+  'hudChrome.discord.cta.statsLoading': '加入社区，赢取奖励',
+  'hudChrome.discord.cta.button': '一键关联',
+  'hudChrome.discord.cta.dismiss': '关闭',
+  'hudChrome.discord.link.cta': '关联 Discord',
+  'hudChrome.discord.link.relink': '重新关联 Discord',
+  'hudChrome.discord.link.connecting': '正在打开 Discord...',
+  'hudChrome.discord.link.benefits':
+    '关联你的 Discord，通过游玩和社区活动赚取积分，并攀登段位阶梯。',
+  'hudChrome.discord.link.error': '无法关联 Discord，请重试。',
+  'hudChrome.discord.link.success': 'Discord 已关联。',
+  'hudChrome.discord.linkedAs': '已关联为 {name}',
+  'hudChrome.discord.linkedTitle': 'Discord：{name}',
+  'hudChrome.discord.viewProfile': '打开该角色的公开资料',
+  'hudChrome.discord.unlink': '解除绑定',
+  'hudChrome.discord.visit': '访问 Discord',
+  'hudChrome.discord.unlinkConfirm': '将你的 Discord 账号与此游戏账号解除绑定？',
+  'hudChrome.discord.statusLabel': '状态',
+  'hudChrome.discord.points': '积分',
+  'hudChrome.discord.lifetime': '累计',
+  'hudChrome.discord.toNext': '距下一段位还需 {points} 积分',
+  'hudChrome.discord.maxRank': '已达最高段位',
+  'hudChrome.discord.tiersTitle': '段位阶梯',
+  'hudChrome.discord.tierLocked': '未解锁',
+  'hudChrome.discord.tierCurrent': '当前',
+  'hudChrome.discord.earnTitle': '如何赚取积分',
+  'hudChrome.discord.earnBody':
+    '通过游戏时长以及在 Discord 中保持活跃来赚取积分。积分会提升你的段位。',
+  'hudChrome.discord.memberSince': '加入于',
+  'hudChrome.discord.memberSinceDays': '已加入 Discord {days} 天',
+  'hudChrome.discord.roleTag.artists': '画师',
+  'hudChrome.discord.guildMember': '已验证成员',
+  'hudChrome.discord.notMember': '尚未加入服务器',
+  'hudChrome.discord.joinCta': '加入 Discord',
+  'hudChrome.discord.online': '{count} 人在线',
+  'hudChrome.discord.community': '社区',
+  'hudChrome.discord.rewards': '奖励',
+  'hudChrome.discord.voice.title': '语音',
+  'hudChrome.discord.voice.empty': '当前没有人在语音中。',
+  'hudChrome.discord.voice.speaking': '说话中',
+  'hudChrome.discord.voice.muted': '已静音',
+  'hudChrome.discord.voice.join': '加入语音',
+  'hudChrome.discord.voice.connect': '连接到语音频道',
+  'hudChrome.discord.swag.claim': '领取',
+  'hudChrome.discord.swag.claimed': '已领取',
+  'hudChrome.discord.swag.locked': '未解锁',
+  'hudChrome.discord.swag.needTier': '达到更高段位即可领取。',
+  'hudChrome.discord.swag.needPoints': '积分不足。',
+  'hudChrome.discord.swag.claimError': '无法领取该奖励，请重试。',
+  'hudChrome.discord.swag.claimedToast': '已领取：{name}',
+  'hudChrome.discord.swag.titleDiscordian': '称号：Discordian',
+  'hudChrome.discord.swag.titleSquire': '称号：国度扈从',
+  'hudChrome.discord.swag.chromaBlurple': 'Blurple 机甲涂装',
+  'hudChrome.discord.swag.titleChampion': '称号：Claudemoon 勇士',
+  'hudChrome.discord.swag.swagStickers': '贴纸包（包邮寄送）',
+  'hudChrome.discord.swag.swagTee': 'T 恤（包邮寄送）',
+  'hudChrome.discord.relay.tooFast': '你发送得太快了，请稍候再试。',
+  'hudChrome.discord.relay.lfg.label': '寻找队伍',
+  'hudChrome.discord.relay.lfg.hint': '为副本或任务寻找玩家',
+  'hudChrome.discord.relay.wts.hint': '发布出售物品或服务',
+  'hudChrome.discord.relay.wtb.hint': '求购你想要的物品',
+  'hudChrome.discord.relay.recruit.label': '公会招募',
+  'hudChrome.discord.relay.recruit.hint': '为你的公会招募玩家',
+  'hudChrome.discord.relay.event.label': '活动 / 团本',
+  'hudChrome.discord.relay.event.hint': '发布团本、聚会或活动',
+  'hudChrome.discord.relay.help.hint': '向社区寻求帮助',
+  'hudChrome.discord.title': 'Discord',
+  'hudChrome.discord.panelTitle': 'World of ClaudeCraft',
+  'hudChrome.discord.open': 'Discord',
+  'hudChrome.discord.viewCharacter': '查看{name}',
+  'hudChrome.discord.rank': '段位',
+  'hudChrome.discord.roleTag.levyst': 'Levy St',
+  'hudChrome.discord.roleTag.devs': '开发者',
+  'hudChrome.discord.roleTag.mods': '管理员',
+  'hudChrome.discord.voice.channel': '在{channel}',
+  'hudChrome.discord.swag.title': '周边',
+  'hudChrome.discord.swag.free': '免费',
+  'hudChrome.discord.swag.cost': '{points}分',
+  'hudChrome.discord.relay.wts.label': '出售',
+  'hudChrome.discord.relay.wtb.label': '收购',
+  'hudChrome.discord.relay.help.label': '求助',
 };

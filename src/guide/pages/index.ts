@@ -2,29 +2,30 @@
 // render the placeholder (with the route's nav label as the heading) until their phase
 // fills them in; unmatched paths render notFound.
 
-import { t } from '../../ui/i18n';
 import { esc } from '../../ui/esc';
-import type { GuidePage, PageContext } from './types';
-import { home } from './home';
-import { howToPlay } from './how_to_play';
+import { t } from '../../ui/i18n';
+import { arena } from './arena';
+import { bestiary } from './bestiary';
+import { classes } from './classes';
 import { combat } from './combat';
 import { controls } from './controls';
-import { glossary } from './glossary';
-import { faq } from './faq';
-import { classes } from './classes';
-import { bestiary } from './bestiary';
-import { models } from './models';
-import { world } from './world';
-import { quests } from './quests';
+import { delves } from './delves';
 import { dungeons } from './dungeons';
-import { arena } from './arena';
-import { gear } from './gear';
 import { economy } from './economy';
+import { faq } from './faq';
+import { gear } from './gear';
+import { glossary } from './glossary';
+import { home } from './home';
+import { howToPlay } from './how_to_play';
+import { models } from './models';
+import { progression } from './progression';
+import { quests } from './quests';
 import { social } from './social';
 import { stats } from './stats';
-import { progression } from './progression';
 import { talents } from './talents';
+import type { GuidePage, PageContext } from './types';
 import { wishIKnew } from './wish_i_knew';
+import { world } from './world';
 
 export type { GuidePage, PageContext } from './types';
 
@@ -41,6 +42,7 @@ const PAGES: Record<string, GuidePage> = {
   economy,
   quests,
   dungeons,
+  delves,
   arena,
   combat,
   stats,

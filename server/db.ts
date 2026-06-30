@@ -5,6 +5,7 @@ import type { CharacterState, MarketSave } from '../src/sim/sim';
 import type { ArenaFormat, PlayerClass } from '../src/sim/types';
 import { seedChatFilterDefaults } from './chat_filter_db';
 import type { ChatLogRow } from './chat_log';
+import { DISCORD_SCHEMA } from './discord_db';
 import { isUniqueViolation } from './http_util';
 import { OAUTH_SCHEMA } from './oauth_db';
 import { REALM } from './realm';
@@ -94,6 +95,13 @@ ALTER TABLE accounts ADD COLUMN IF NOT EXISTS last_login_user_agent TEXT;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS cosmetics JSONB NOT NULL DEFAULT '{}'::jsonb;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS email TEXT;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS deactivated_at TIMESTAMPTZ;
+-- Whether the account has a password the OWNER set (and therefore can log in with
+-- via username + password). Defaults TRUE so every existing account keeps its
+-- usable password. Discord-provisioned accounts are created with FALSE: they have
+-- only a random unguessable placeholder hash, so they are reachable ONLY through
+-- Discord until a real password is set (which flips this back to TRUE). The unlink
+-- path reads this to avoid stranding a Discord-only account with no way back in.
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS password_set BOOLEAN NOT NULL DEFAULT TRUE;
 -- Transactional + marketing email support. locale picks the language the server
 -- renders outbound mail in (emails have no client in the loop, so they are
 -- localized server-side, unlike chat which the client re-localizes). The
@@ -430,6 +438,11 @@ export async function ensureSchema(): Promise<void> {
     await client.query(SCHEMA);
     await client.query(SOCIAL_SCHEMA);
     await client.query(OAUTH_SCHEMA);
+    // Discord integration tables (links, oauth states, pending logins, reward
+    // economy). FK-references accounts(id), so it runs after SCHEMA. Applied
+    // unconditionally (idempotent) so the tables exist before the feature is
+    // enabled, like the other schema modules.
+    await client.query(DISCORD_SCHEMA);
     // Seed the chat-filter word lists + config on first boot only (idempotent).
     // Runs under the same advisory lock so concurrent realm boots don't race.
     await seedChatFilterDefaults(client);
@@ -556,16 +569,21 @@ export async function createAccount(
   username: string,
   passwordHash: string,
   meta: RequestMetadata = {},
+  // passwordSet=false marks an account whose password is a placeholder the owner
+  // never chose (a Discord-provisioned account). Defaults TRUE for every normal
+  // (register / portal) signup so nothing changes for them.
+  opts: { passwordSet?: boolean } = {},
 ): Promise<AccountRow> {
   const res = await pool.query(
-    `INSERT INTO accounts (username, password_hash, created_ip, created_user_agent)
-     VALUES ($1, $2, $3, $4)
+    `INSERT INTO accounts (username, password_hash, created_ip, created_user_agent, password_set)
+     VALUES ($1, $2, $3, $4, $5)
      RETURNING id, username, password_hash`,
     [
       username,
       passwordHash,
       cleanMetadataText(meta.ip, 128),
       cleanMetadataText(meta.userAgent, 512),
+      opts.passwordSet ?? true,
     ],
   );
   return res.rows[0];
@@ -649,6 +667,9 @@ export interface AccountInfoRow {
   id: number;
   username: string;
   password_hash: string;
+  // Whether the owner set a real password (false for a Discord-provisioned account
+  // that still only has its placeholder hash). The unlink + portal flows read it.
+  password_set: boolean;
   email: string | null;
   created_at: string;
   deactivated_at: string | null;
@@ -661,7 +682,7 @@ export interface AccountInfoRow {
 // which keys on username for the login path.
 export async function accountById(accountId: number): Promise<AccountInfoRow | null> {
   const res = await pool.query(
-    `SELECT id, username, password_hash, email, created_at, deactivated_at, locale, marketing_opt_in
+    `SELECT id, username, password_hash, password_set, email, created_at, deactivated_at, locale, marketing_opt_in
      FROM accounts WHERE id = $1`,
     [accountId],
   );
@@ -680,7 +701,10 @@ export async function characterCountForAccount(accountId: number): Promise<numbe
 }
 
 export async function updatePasswordHash(accountId: number, passwordHash: string): Promise<void> {
-  await pool.query('UPDATE accounts SET password_hash = $2 WHERE id = $1', [
+  // Setting a password always makes it a real, owner-chosen one, so mark the
+  // account usable (a no-op for accounts that were already password_set = TRUE,
+  // and the conversion step for a Discord-provisioned account).
+  await pool.query('UPDATE accounts SET password_hash = $2, password_set = TRUE WHERE id = $1', [
     accountId,
     passwordHash,
   ]);
@@ -1415,6 +1439,24 @@ export interface CharacterRow {
   playtime_seconds?: string | number | null;
 }
 
+// The account's "top" character on this realm (highest level, then lifetime XP),
+// for the Discord nameplate flair / level-on-nickname. Realm-scoped like the other
+// reads. Fully parameterized: the only inputs (accountId, REALM) are bound as $1/$2;
+// the ORDER BY uses a static JSONB expression literal (Postgres does not allow a
+// bound parameter for an ORDER BY expression), so the query string carries no
+// interpolation and there is no injection surface.
+export async function highestCharacterForAccount(accountId: number): Promise<CharacterRow | null> {
+  const res = await pool.query(
+    `SELECT id, account_id, name, class, level, state, is_gm, force_rename
+       FROM characters
+      WHERE account_id = $1 AND realm = $2
+      ORDER BY level DESC, ((state->>'lifetimeXp')::bigint) DESC NULLS LAST, id ASC
+      LIMIT 1`,
+    [accountId, REALM],
+  );
+  return res.rows[0] ?? null;
+}
+
 // Character reads/writes are scoped to this process's realm: an account may
 // hold characters on several realms (each served by its own process), but a
 // process only ever lists, loads, or creates characters on its own realm.
@@ -1836,6 +1878,64 @@ export async function topLifetimeXp(
     realm: r.realm,
     lifetimeXp: Number(r.lifetime_xp),
     prestigeRank: Number(r.prestige_rank),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Guild high-score board: ranks guilds by the SUM of every member's lifetimeXp.
+// Aggregate JOIN of guilds -> guild_members -> characters (all in this pool); an
+// INNER JOIN drops guilds with no seated members. Realm-scoped (the in-game
+// panel) or global (cross-realm), mirroring topLifetimeXp. Read through the
+// server-side cache in main.ts, never run per request under load.
+// ---------------------------------------------------------------------------
+
+export interface GuildLeaderRow {
+  name: string;
+  realm: string;
+  memberCount: number;
+  totalLifetimeXp: number;
+  topLevel: number;
+}
+
+export async function topGuilds(
+  limit = 100,
+  opts: { global?: boolean } = {},
+): Promise<GuildLeaderRow[]> {
+  // Capped at LEADERBOARD_MAX (1000) like the player board, so a realm with many
+  // guilds is fully ranked through the cached window.
+  const cap = Math.max(1, Math.min(LEADERBOARD_MAX, limit));
+  const selectAgg = `g.name, g.realm,
+                COUNT(gm.character_id)                                AS member_count,
+                COALESCE(SUM(COALESCE((c.state->>'lifetimeXp')::bigint, 0)), 0) AS total_lifetime_xp,
+                COALESCE(MAX(COALESCE((c.state->>'level')::int, 0)), 0)         AS top_level`;
+  const fromJoin = `FROM guilds g
+           JOIN guild_members gm ON gm.guild_id = g.id
+           JOIN characters c ON c.id = gm.character_id`;
+  const groupOrder = `GROUP BY g.id, g.name, g.realm
+          ORDER BY total_lifetime_xp DESC, member_count DESC, g.name ASC`;
+  const res = opts.global
+    ? await pool.query(
+        `SELECT ${selectAgg}
+           ${fromJoin}
+          WHERE c.state IS NOT NULL
+          ${groupOrder}
+          LIMIT $1`,
+        [cap],
+      )
+    : await pool.query(
+        `SELECT ${selectAgg}
+           ${fromJoin}
+          WHERE g.realm = $1 AND c.state IS NOT NULL
+          ${groupOrder}
+          LIMIT $2`,
+        [REALM, cap],
+      );
+  return res.rows.map((r) => ({
+    name: r.name,
+    realm: r.realm,
+    memberCount: Number(r.member_count),
+    totalLifetimeXp: Number(r.total_lifetime_xp),
+    topLevel: Number(r.top_level),
   }));
 }
 

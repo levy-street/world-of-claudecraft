@@ -38,9 +38,10 @@ literal `t('...')` in this dir and fails on an untracked key.
 
 ## Talks to server/admin.ts over `/admin/api`
 All responses use the `{ success, data, error }` envelope (unwrapped in `api.ts`).
-GET: `/overview`, `/online`, `/activity`, `/accounts?search&page`, `/accounts/:id`,
-`/ip-associations?ip&page`, `/characters?sort&dir&page`, `/moderation/queue`, `/moderation/accounts/:id`,
-`/chat-filter`, `/blocked-ips`, `/bug-reports?page`, `/bug-reports/:id/screenshot`.
+GET: `/overview`, `/online`, `/suspicious-players`, `/activity`, `/accounts?search&page`,
+`/accounts/:id`, `/shared-ips?sort&dir&online&page`, `/ip-associations?ip&page`,
+`/characters?sort&dir&page`, `/moderation/queue`, `/moderation/accounts/:id`, `/chat-filter`,
+`/blocked-ips`, `/bug-reports?page`, `/bug-reports/:id/screenshot`.
 POST: `/login`, `/moderation/accounts/:id/{suspend,unsuspend,ban,unban,chat-mute,lift-mute,reset-strikes}`,
 `/moderation/characters/:id/force-rename`, `/moderation/reports/:id/ignore`,
 `/chat-filter/words`, `/chat-filter/words/:id/delete`, `/chat-filter/config`,

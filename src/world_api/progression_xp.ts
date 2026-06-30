@@ -1,4 +1,4 @@
-import type { LeaderboardPage } from '../sim/leaderboard_page';
+import type { GuildLeaderboardPage, LeaderboardPage } from '../sim/leaderboard_page';
 import type { PlayerClass } from '../sim/types';
 
 // One ranked row of the lifetime-XP leaderboard (Max-Level XP Overflow). Always
@@ -14,6 +14,20 @@ export interface LeaderboardEntry {
   realm?: string; // present on the global (cross-realm) home-page board
 }
 
+// One ranked row of the GUILD high-score board. A guild's score is the SUM of
+// every member's lifetimeXp; memberCount and topLevel are shown alongside. Like
+// LeaderboardEntry it is always computed server-side (guilds live only in the
+// server social DB, never in the deterministic sim), so the offline Sim ranks no
+// guilds and the client only displays what the server ranked.
+export interface GuildLeaderboardEntry {
+  rank: number;
+  name: string;
+  memberCount: number;
+  totalLifetimeXp: number;
+  topLevel: number;
+  realm?: string; // present on the global (cross-realm) board
+}
+
 export interface IWorldProgressionXp {
   xp: number;
   // Post-cap progression (Max-Level XP Overflow). All server-authoritative;
@@ -27,5 +41,9 @@ export interface IWorldProgressionXp {
   // opt-in cosmetic prestige action. Paged server-side (a realm can hold far
   // more than one page of max-level players); page is 0-based.
   leaderboard(page?: number, pageSize?: number): Promise<LeaderboardPage>;
+  // The realm-scoped guild high-score board (guilds ranked by summed member
+  // lifetime XP), paged server-side the same way as the player board. Guilds are
+  // a server-only social system, so the offline Sim resolves an empty page.
+  guildLeaderboard(page?: number, pageSize?: number): Promise<GuildLeaderboardPage>;
   prestige(): void;
 }

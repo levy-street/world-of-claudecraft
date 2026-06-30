@@ -93,7 +93,7 @@ describe('admin IP association queries', () => {
     );
   });
 
-  it('lists only IPs shared by multiple accounts in investigation order', async () => {
+  it('lists only IPs shared by multiple accounts in the requested last-seen order', async () => {
     mocks.query.mockResolvedValueOnce({
       rows: [
         {
@@ -105,7 +105,7 @@ describe('admin IP association queries', () => {
       ],
     });
 
-    await expect(listSharedIps(2, 25)).resolves.toEqual({
+    await expect(listSharedIps(2, 25, 'last_seen', 'asc')).resolves.toEqual({
       rows: [
         {
           ip: '203.0.113.7',
@@ -120,10 +120,21 @@ describe('admin IP association queries', () => {
 
     expect(mocks.query).toHaveBeenCalledWith(
       expect.stringContaining('HAVING count(DISTINCT account_id) > 1'),
-      [25, 25],
+      [25, 25, 'last_seen', 'asc'],
     );
     expect(mocks.query.mock.calls[0][0]).toContain(
-      'ORDER BY account_count DESC, last_seen_at DESC, ip',
+      "CASE WHEN $3 = 'last_seen' AND $4 = 'asc' THEN last_seen_at END ASC",
+    );
+  });
+
+  it('defaults shared IPs to account count descending', async () => {
+    mocks.query.mockResolvedValueOnce({ rows: [] });
+
+    await listSharedIps(1, 25);
+
+    expect(mocks.query.mock.calls[0][1]).toEqual([25, 0, 'accounts', 'desc']);
+    expect(mocks.query.mock.calls[0][0]).toContain(
+      "CASE WHEN $3 = 'accounts' AND $4 = 'desc' THEN account_count END DESC",
     );
   });
 

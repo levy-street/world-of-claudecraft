@@ -4669,7 +4669,7 @@
 
   /* Inspect-other-player profile window */
   #inspect-window {
-    width: 280px;
+    width: 420px;
   }
   .inspect-card {
     display: flex;
@@ -4723,6 +4723,38 @@
   .inspect-holder-sub {
     font-size: 11px;
     color: var(--color-text-muted);
+  }
+  /* Worn-gear paperdoll in the inspect/profile window (read-only). Reuses the
+     character-window .equip-col / .equip-slot styling, but the two columns flex
+     to share the narrower window instead of the char sheet's fixed 150px. */
+  .inspect-equip {
+    margin: 4px 14px 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--color-border-default);
+  }
+  .inspect-equip-title {
+    font-family: var(--title-font);
+    font-size: 13px;
+    color: var(--color-text-muted);
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  .inspect-paperdoll {
+    justify-content: center;
+    gap: 8px;
+  }
+  .inspect-paperdoll .equip-col {
+    width: auto;
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  /* Read-only gear, so the item name WRAPS instead of ellipsizing: a viewer must be
+     able to read the whole name (the wider window gives it room). Overrides the
+     shared .equip-slot .slot-item nowrap/ellipsis used by the editable char sheet. */
+  .inspect-paperdoll .slot-item {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
   }
 
   @media (min-width: 900px) {

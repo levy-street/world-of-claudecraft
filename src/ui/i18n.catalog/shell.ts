@@ -1,6 +1,10 @@
 // i18n source catalog - Shell / homepage (English values).
-// Part of src/ui/i18n.catalog/; assembled into `en` by ./index.ts.
-// Translations live in src/ui/i18n.locales/<lang>.ts, never here.
+// Part of src/ui/i18n.catalog/; ONLY the `en` block is read (assembled into `en` by ./index.ts;
+// this domain is consumed en-only, so tsc does not cross-check the other blocks).
+// Translations live in src/ui/i18n.locales/<lang>.ts, never here: the inline non-English blocks
+// below are LEGACY and the build does NOT read them (i18n_build sources non-en from the overlays),
+// so a reworded English value here must have its OVERLAY translations refreshed, not these blocks
+// (the reword-staleness footgun, see docs/i18n-scaling/translation-workflow.md).
 
 export const shellStrings = {
   en: {
@@ -184,7 +188,7 @@ export const shellStrings = {
         paladin:
           'Paladins are holy crusaders who support allies with blessings, heal wounds with Holy Light, and protect the weak in heavy armor.',
         hunter:
-          'Hunters master the wilderness, tracking enemies from afar with bows or guns and using traps to control the battlefield.',
+          'Hunters are ranged specialists who fight beside a tamed beast, peppering enemies with aimed and rapid shots, slowing them with stings and concussive fire, and shifting aspects to suit the moment.',
         rogue:
           'Rogues are stealthy assassins who spend Energy and Combo Points on backstabs and finishing moves from the shadows.',
         priest:
@@ -1211,7 +1215,7 @@ export const shellStrings = {
         paladin:
           'Paladins are holy crusaders who support allies with blessings, heal wounds with Holy Light, and protect the weak in heavy armour.',
         hunter:
-          'Hunters master the wilderness, tracking enemies from afar with bows or guns and using traps to control the battlefield.',
+          'Hunters are ranged specialists who fight beside a tamed beast, peppering enemies with aimed and rapid shots, slowing them with stings and concussive fire, and shifting aspects to suit the moment.',
         rogue:
           'Rogues are stealthy assassins who spend Energy and Combo Points on backstabs and finishing moves from the shadows.',
         priest:

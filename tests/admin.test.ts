@@ -75,6 +75,7 @@ import {
   overviewCounts,
   type PerfRawRow,
 } from '../server/admin_db';
+import type { SuspiciousPlayer } from '../server/bot_detector/contract';
 import {
   addFilterWord,
   chatModerationForAccount,
@@ -157,6 +158,7 @@ const fakeGameState = {
     heapUsedBytes: 1,
   }),
   liveSessions: () => [],
+  suspiciousPlayers: vi.fn<() => SuspiciousPlayer[]>(() => []),
   liveAccountIds: () => new Set([9]),
   liveSharedIps: vi.fn<() => LiveSharedIp[]>(() => []),
   disconnectAccount: vi.fn(),
@@ -174,6 +176,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   fakeGame.isIpBlocked.mockReturnValue(false);
   fakeGame.liveSharedIps.mockReturnValue([]);
+  fakeGame.suspiciousPlayers.mockReturnValue([]);
   // Default so the moderation-detail route (which now also loads chat state)
   // resolves; individual chat-filter tests override as needed.
   vi.mocked(chatModerationForAccount).mockResolvedValue({
@@ -275,6 +278,43 @@ describe('admin api auth', () => {
     );
   });
 
+  it('serves live suspicious players to an authenticated admin', async () => {
+    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(isAdminAccount).mockResolvedValue(true);
+    fakeGame.suspiciousPlayers.mockReturnValue([
+      {
+        ref: { accountId: 12, characterId: 34, name: 'Watcher', ip: '203.0.113.9' },
+        snapshot: null,
+        state: 'SUSPICIOUS',
+        score: 1.4,
+        evidence: [
+          {
+            kind: 'review_signal_a',
+            weight: 1.4,
+            detail: 'Public-safe synthetic evidence A.',
+            expiresAt: 123,
+          },
+        ],
+      },
+    ]);
+    const res = fakeRes();
+
+    await handleAdminApi(
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/suspicious-players' }),
+      res,
+      fakeGame,
+    );
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.data.players[0]).toEqual(
+      expect.objectContaining({
+        ref: expect.objectContaining({ accountId: 12, name: 'Watcher' }),
+        score: 1.4,
+      }),
+    );
+    expect(fakeGame.suspiciousPlayers).toHaveBeenCalledOnce();
+  });
+
   it('rejects admin login for a non-admin account even with the right password', async () => {
     // scrypt hash of "hunter22" is irrelevant — verifyPassword fails on a junk
     // hash, so this asserts the credential failure path returns 401.
@@ -374,13 +414,13 @@ describe('admin api auth', () => {
     await handleAdminApi(
       fakeReq({
         token: VALID_TOKEN,
-        url: '/admin/api/shared-ips?page=2&limit=50',
+        url: '/admin/api/shared-ips?page=2&limit=50&sort=last_seen&dir=asc',
       }),
       res,
       fakeGame,
     );
 
-    expect(listSharedIps).toHaveBeenCalledWith(2, 50);
+    expect(listSharedIps).toHaveBeenCalledWith(2, 50, 'last_seen', 'asc');
     expect(res.statusCode).toBe(200);
     expect(res.body.data.rows[0]).toEqual(
       expect.objectContaining({ ip: '203.0.113.7', blocked: true }),
@@ -407,7 +447,7 @@ describe('admin api auth', () => {
     await handleAdminApi(
       fakeReq({
         token: VALID_TOKEN,
-        url: '/admin/api/shared-ips?online=1&page=2&limit=1',
+        url: '/admin/api/shared-ips?online=1&page=1&limit=1&sort=last_seen&dir=asc',
       }),
       res,
       fakeGame,
@@ -425,7 +465,7 @@ describe('admin api auth', () => {
         },
       ],
       total: 2,
-      page: 2,
+      page: 1,
       limit: 1,
     });
   });

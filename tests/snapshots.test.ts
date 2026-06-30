@@ -86,6 +86,9 @@ function bareClient(pid: number): ClientWorld {
   c.cfg = { seed: 20061, playerClass: 'warrior' };
   c.entities = new Map();
   c.playerId = pid;
+  c.ownPlayerId = pid;
+  c.ownPlayerClass = 'warrior';
+  c.spectating = null;
   c.moveInput = {};
   c.inventory = [];
   c.vendorBuyback = [];
@@ -113,8 +116,84 @@ function bareClient(pid: number): ClientWorld {
   c.pendingInputSeqSentAt = new Map();
   c.ackedInputSeq = 0;
   c.inputEchoSamples = [];
+  c.spectateFacingPending = false;
+  c.pendingSpectateFacing = null;
   return c;
 }
+
+describe('spectate client POV', () => {
+  it('follows observed self, aligns on entry and respawn, then restores identity', () => {
+    const client = bareClient(1);
+    const internals = client as unknown as {
+      applySnapshot(snapshot: unknown): void;
+      onMessage(raw: string): void;
+    };
+    internals.applySnapshot({
+      t: 'snap',
+      ents: [],
+      self: {
+        id: 1,
+        k: 'player',
+        tid: 'warrior',
+        nm: 'Moderator',
+        lv: 10,
+        x: 0,
+        y: 0,
+        z: 0,
+        f: 0,
+        hp: 100,
+        mhp: 100,
+        res: 0,
+        mres: 100,
+        rtype: 'rage',
+      },
+    });
+    internals.onMessage(JSON.stringify({ t: 'spectate', name: 'Suspect' }));
+    expect(client.spectating).toBe('Suspect');
+
+    const snapshot = (facing: number, dead: boolean) => ({
+      t: 'snap',
+      ents: [],
+      self: {
+        id: 2,
+        k: 'player',
+        tid: 'rogue',
+        nm: 'Suspect',
+        lv: 10,
+        x: 5,
+        y: 0,
+        z: 7,
+        f: facing,
+        hp: dead ? 0 : 100,
+        mhp: 100,
+        dead,
+        res: dead ? 0 : 80,
+        mres: 100,
+        rtype: 'energy',
+      },
+    });
+
+    internals.applySnapshot(snapshot(1.25, false));
+    expect(client.playerId).toBe(2);
+    expect(client.player.name).toBe('Suspect');
+    expect(client.cfg.playerClass).toBe('rogue');
+    expect(client.consumeSpectateFacing()).toBe(1.25);
+    expect(client.consumeSpectateFacing()).toBeNull();
+
+    internals.applySnapshot(snapshot(2.5, true));
+    expect(client.consumeSpectateFacing()).toBeNull();
+    internals.applySnapshot(snapshot(-0.75, false));
+    expect(client.consumeSpectateFacing()).toBe(-0.75);
+    expect(client.consumeSpectateFacing()).toBeNull();
+
+    internals.onMessage(JSON.stringify({ t: 'spectate', name: null }));
+    expect(client.spectating).toBeNull();
+    expect(client.playerId).toBe(1);
+    expect(client.player.name).toBe('Moderator');
+    expect(client.cfg.playerClass).toBe('warrior');
+    expect(client.consumeSpectateFacing()).toBeNull();
+  });
+});
 
 describe('raid lockouts over the wire', () => {
   it('ships a granted lockout in self.lockouts and ClientWorld mirrors it end to end', () => {

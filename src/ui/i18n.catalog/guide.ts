@@ -36,6 +36,7 @@ export const guideStrings = {
     world: 'World',
     quests: 'Quests',
     dungeons: 'Dungeons & Raids',
+    delves: 'Delves',
     reference: 'Reference',
     controls: 'Controls',
     combat: 'Combat',
@@ -101,6 +102,7 @@ export const guideStrings = {
     typeZone: 'Zone',
     typeCreature: 'Creatures',
     typeDungeon: 'Dungeon',
+    typeDelve: 'Delve',
     typeTerm: 'Term',
   },
 
@@ -218,7 +220,7 @@ export const guideStrings = {
       'Accept quests from people with a marker over their head, complete the objective, and turn them in for experience, coin, and gear. The tracker on screen keeps your goals in view.',
     deathTitle: 'Death is not the end',
     deathBody:
-      'If you fall, you release your spirit at the nearest graveyard and run back to your body. No experience is lost.',
+      'If you fall, you release your spirit and revive at the nearest graveyard, back to full health, then make your way to where you were. No experience is lost.',
     groupingTitle: 'Playing together',
     groupingBody:
       'Invite others to a party to share quest credit and take on dungeons. Most of the world is soloable, so grouping is a choice, not a chore.',
@@ -237,15 +239,21 @@ export const guideStrings = {
     actionHeader: 'Action',
     groupMovement: 'Movement',
     groupCombat: 'Targeting and combat',
-    groupInterface: 'Windows',
+    groupInterface: 'Interface',
     groupCamera: 'Camera',
     talents: 'Talents',
     arena: 'Arena',
     leaderboard: 'Leaderboard',
-    abilities: 'Use abilities',
+    abilities: 'Use action bar abilities (the number row; a second bar sits on the numpad)',
+    targetFriendly: 'Target nearest friendly',
+    cycleFriendly: 'Cycle friendly target',
+    gameMenu: 'Open game menu and options',
     mobileHeading: 'On mobile',
     mobileBody:
       'Touch controls appear automatically on phones and tablets: a movement stick on the left, drag anywhere on the right to look, and on-screen buttons for your abilities and menus.',
+    controllerHeading: 'On a controller',
+    controllerBody:
+      'Gamepads work too, and controller support is on by default. The left stick moves, the right stick aims the camera, and the face and shoulder buttons cover your abilities, jumping, and interacting. Open any window to bring up an on-screen pointer for menus. You can remap the buttons and adjust stick deadzone, camera speed, vibration, and inverted look from the controller settings in the options.',
   },
 
   // Combat overview. Deliberately high level: concepts, not formulas or numbers, so
@@ -255,10 +263,10 @@ export const guideStrings = {
       'Combat follows familiar classic-MMO rules. You never need to study any of it to play well, this is just the shape of how fights work.',
     hitTitle: 'Not every blow lands',
     hitBody:
-      "Attacks can miss or be dodged, parried, and blocked, and so can the enemy's. Fighting near your own level and keeping your gear current is what makes your hits connect.",
-    mitigationTitle: 'Armor and gear keep you standing',
+      "Attacks can miss or be dodged, and so can the enemy's, while spells can be resisted outright. Fighting close to your own level is what keeps your hits connecting; the wider the level gap, the more you swing at air.",
+    mitigationTitle: 'Armor and health keep you standing',
     mitigationBody:
-      'Armor softens physical hits and the right gear blunts magic, so upgrades are your main source of staying power. Heavier armor classes shrug off more, but nothing makes you untouchable.',
+      'Armor softens physical hits, so better armor is your main source of staying power in melee. Magic is another matter: you weather spells with a deeper health pool and the chance to resist one outright, not with armor. Heavier armor classes shrug off more, but nothing makes you untouchable.',
     resourcesTitle: 'Every class has its own rhythm',
     resourcesBody:
       'Warriors build Rage in the thick of a fight, rogues spend Energy that steadily returns, and casters manage a pool of Mana. Learning your resource is half of playing your class well.',
@@ -274,7 +282,7 @@ export const guideStrings = {
     // Death and recovery: light penalty, no lost progress.
     deathTitle: 'When you fall',
     deathBody:
-      'If your health reaches zero you are downed. You revive after a short wait and carry on from where you left off, so a death costs you a little time, not your progress. Between fights, sit to eat and drink so you start the next one at full strength.',
+      'If your health reaches zero you are downed. Release your spirit to revive at the nearest graveyard at full health, then make your way back, so a death costs you a little time, not your progress. Between fights, sit to eat and drink so you start the next one at full strength.',
   },
 
   // Glossary.
@@ -290,7 +298,8 @@ export const guideStrings = {
     gcdDef:
       'The short, shared pause after using most abilities, so you cannot fire everything at once.',
     dpsTerm: 'DPS',
-    dpsDef: 'Damage per second, a rough measure of how fast something deals damage.',
+    dpsDef:
+      'Damage per second, a rough measure of how fast something deals damage. Also used for the damage-dealing role itself, as in a tank, a healer, and three DPS.',
     buffTerm: 'Buff',
     buffDef: 'A helpful effect on you or an ally, like a blessing that raises a stat for a while.',
     debuffTerm: 'Debuff',
@@ -323,6 +332,15 @@ export const guideStrings = {
       'To draw an enemy or group into a fight, usually deliberately and one batch at a time.',
     instanceTerm: 'Instance',
     instanceDef: 'A private copy of a dungeon or raid made just for your party.',
+    raidTerm: 'Raid',
+    raidDef:
+      'A larger group, up to ten players here, formed for the toughest endgame encounter; a party converts into one once it is full.',
+    delveTerm: 'Delve',
+    delveDef:
+      "A short, replayable instanced descent for one or two players, run from a keeper's board with a companion at your side.",
+    augmentTerm: 'Augment',
+    augmentDef:
+      'A temporary boost you draft during a two-on-two Fiesta arena match that reshapes your kit for that match only.',
   },
 
   // FAQ page (fuller than the home teaser).
@@ -337,7 +355,7 @@ export const guideStrings = {
     q4: 'Can I play offline or solo?',
     a4: 'Yes. There is an instant single-player offline mode, and the online world is fully soloable apart from dungeons and the raid.',
     q5: 'How many classes are there?',
-    a5: 'Nine, covering the classic tank, healer, and damage roles, each with its own resource and signature abilities.',
+    a5: 'Nine, covering the classic tank, healer, and damage roles, each with a resource system (rage, mana, or energy) and its own signature abilities.',
     q6: 'What is the level cap?',
     a6: 'Level {cap}, reached across three connected zones of quests, dungeons, and exploration.',
     q7: 'Will my character be saved?',
@@ -520,6 +538,9 @@ export const guideStrings = {
         "A fen troll so greedy the other trolls will not dig beside him, said to have eaten a trader's last two pack-mules, harness and all.",
       shardlord_kazzix:
         'A storm elemental given shoulders, walking the far crags above Stormcrag with a heartshard worth braving the lightning for.',
+      // Kept though Mirejaw Frenzy is no longer in the bestiary (it is a summon-only encounter
+      // add now filtered out): the line is still translated in every locale overlay, and the
+      // bestiary renders flavor only for creatures it lists, so an unused entry is harmless.
       mirejaw_frenzy:
         'A marsh murloc that whips itself into a thrashing frenzy mid-fight, the loudest thing in a loud, territorial pack.',
       gravecaller_cultist:
@@ -533,7 +554,7 @@ export const guideStrings = {
     },
     spider: {
       name: 'Spiders',
-      desc: 'Web-spinners and venomous lurkers that nest in dark, tangled places.',
+      desc: 'Web-spinners and venomous lurkers that nest in dark, tangled places. Hunters can tame them, the same as beasts.',
     },
     murloc: {
       name: 'Murlocs',
@@ -549,7 +570,7 @@ export const guideStrings = {
     },
     troll: {
       name: 'Trolls',
-      desc: 'Hulking, fast-healing brutes that lair in the marsh and the high country.',
+      desc: 'Hulking brutes that lair in the marshes of the fen.',
     },
     ogre: {
       name: 'Ogres',
@@ -562,6 +583,10 @@ export const guideStrings = {
     elemental: {
       name: 'Elementals',
       desc: 'Living storm and stone, bound to the wild places where the elements run strong.',
+    },
+    dragonkin: {
+      name: 'Dragonkin',
+      desc: 'Scaled, serpentine things of the old depths. Rare, proud, and far stronger than they look.',
     },
   },
 
@@ -596,7 +621,7 @@ export const guideStrings = {
     // Short, spoiler-safe one-liners for each zone's notable places (keyed by biome). One
     // sentence per place, in the same order as the POI list.
     valePlaceNotes:
-      'Eastbrook is your first home base. Wolf Run and Boar Meadow are gentle hunting ground; Mirror Lake is quiet water to fish; the Webwood and the Copper Dig hide spiders and ore-greedy diggers; a Bandit Camp and the Fallen Chapel hold rougher work; Brightwood Glade is a calm wildlife grove in the north.',
+      "Eastbrook is your first home base. Wolf Run and Boar Meadow are gentle hunting ground; Mirror Lake is quiet water to fish; the Webwood and the Copper Dig hide spiders and ore-greedy diggers; a Bandit Camp and the Fallen Chapel hold rougher work; Reliquary Hill drops into the Collapsed Reliquary, the realm's first delve; and Brightwood Glade is a quiet, sunlit grove to the north.",
     marshPlaceNotes:
       "Fenbridge guards the only dry road. The Prowler Reeds and Deepfen Shallows teem with marsh beasts and murlocs; the Widow Thicket is spun thick with web; the Drowned Chapel and the Troll Mounds keep older dangers; the Gravecaller Encampment is the cult dug in, and the Sunken Bastion is the marsh's instanced heart.",
     peaksPlaceNotes:
@@ -605,7 +630,7 @@ export const guideStrings = {
     // Brightwood Glade vignette, distilled spoiler-safe.
     gladeTitle: 'A quiet corner: Brightwood Glade',
     gladeBody:
-      'Not every story in the Vale is about the dead. In the north, a sunlit grove called Brightwood Glade keeps its own gentler rhythm, with quiet paths, grazing deer, and wary beasts under the boughs. It is a soft counterpoint to the trail you are following, and worth seeing when the road gives you room to wander.',
+      'Not every story in the Vale is about the dead. In the north, a sunlit grove called Brightwood Glade keeps its own gentler rhythm, all quiet paths and dappled light beneath the boughs. It is a soft counterpoint to the trail you are following, and worth seeing when the road gives you room to wander.',
   },
 
   // Quests.
@@ -617,17 +642,18 @@ export const guideStrings = {
       'People with a marker over their head have work for you. Talk to them to accept a quest. Your very first is Wolves at the Door, from Marshal Redbrook in Eastbrook.',
     objectivesTitle: 'Objectives',
     objectivesBody:
-      'Slay certain enemies, gather items, or interact with something in the world. The on-screen tracker counts your progress as you go.',
+      'Slay certain enemies, gather items, or interact with something in the world. The on-screen tracker counts your progress as you go. If you change your mind, you can drop a quest from your quest log and pick it up again from its giver later.',
     turninTitle: 'Turning in',
     turninBody:
-      'Return to the quest giver, the map shows you where, for experience, coin, and often a piece of gear chosen to suit your class.',
+      'Take a finished quest to its turn-in marker, the map shows you where, for experience, coin, and often a piece of gear chosen to suit your class. That is usually the one who gave it to you, though some quests send you on to someone else.',
     partyTitle: 'Questing in a group',
     partyBody:
-      'Party members nearby share kill and objective credit, so questing together is faster, never slower.',
+      'Party members nearby share kill and objective credit, so questing together is faster, never slower. You can also share a quest with your group: post it to chat as a clickable link with the /share command, and any nearby member who qualifies can pick up the same quest in one click.',
     storyTitle: 'A thread runs through it all',
     storyBody:
       'From your first errands in Eastbrook, something is wrong with the dead. A cult is at work, and the trail leads north through every zone. Follow it to learn who stands behind it.',
-    soloNote: 'The main story is fully soloable; only its final chapters call for a group.',
+    soloNote:
+      "The main story is soloable right up to each chapter's finale, which is a five-player dungeon.",
 
     // Quest types section: the shapes an objective can take.
     typesTitle: 'The kinds of quest you will see',
@@ -642,12 +668,12 @@ export const guideStrings = {
     typeInteractTitle: 'Interact',
     typeInteractBody:
       'Use, cleanse, or read something fixed in the world: a defiled grave, a warning carved on a shore-rock, a sealed crypt door. Walk up to the marker and act on it.',
-    typeMusterTitle: 'Escort and muster',
+    typeMusterTitle: 'Muster the defense',
     typeMusterBody:
-      "See a friendly face safely from one place to another, or rally a town's defenders before a push north. These keep you moving with the people whose story you are in.",
+      'Some quests have you rally a town before a push north: thin the threat at the gates and gather what the defenders need. These are slay and gather objectives in service of the people whose story you are in, and they keep you moving with them.',
     typeGroupTitle: 'Group finales',
     typeGroupBody:
-      "Each chapter of the main story ends at a dungeon door. The lead-in is soloable, but the final blow against a chapter's villain is meant for a party of five (and the very last, for ten).",
+      "Each chapter of the main story ends at a dungeon door. The lead-in is soloable, but the final blow against a chapter's villain is meant for a party of five.",
 
     // The villain-ladder saga, teased as a trail north. No endings, no boss names.
     sagaTitle: 'Follow the trail north',
@@ -661,16 +687,19 @@ export const guideStrings = {
       'In Mirefen the drownings are no accident. Someone is filling the fen like a tithing box, raising obedient dead from every traveler the water takes. Chase the orders up the chain to a Mistcaller in the drowned bastion, whose last words name something older still, stirring beneath the peaks.',
     sagaPeaksTitle: 'The peaks: what the tithe was for',
     sagaPeaksBody:
-      'On Thornpeak the whole scheme comes clear. Every soul stolen since the Vale was a tithe poured toward waking an ancient thing sealed beneath the mountain. The trail that began in a chapel yard ends here, at a door it takes ten to open. We will let you find out who waits behind it.',
+      "On Thornpeak the whole scheme comes clear. Every soul stolen since the Vale was a tithe poured toward the cult's grim work in the mountain's heart. The trail that began in a chapel yard ends here, in a five-player descent to face the hand behind it all. We will let you find out who waits at the bottom.",
 
     // Side-chains, called out as optional threads alongside the main story.
     sideTitle: 'Threads off the main road',
     sideWardenTitle: 'Earning your name',
     sideWardenBody:
-      "Alongside the story, the wardens of the Vale and the fen hand out a standing bounty ladder. Work your way up it, foe by foe, the way every warden before you earned their place. It is honest leveling and a tour of each zone's worst troublemakers.",
+      "Alongside the story, the marshals and wardens of the Vale and the fen hand out a standing bounty ladder. Work your way up it, foe by foe, the way every bounty hunter before you earned their place. It is honest leveling and a tour of each zone's worst troublemakers.",
     sideCryptTitle: 'The forgotten king',
     sideCryptBody:
-      "High on the peaks runs a quieter mystery: old graves marked with a crown no record remembers. Read the dead, gather what they guarded, and unseal a tomb that was meant to stay shut. It is a detective's trail that opens the way to a second endgame trial for a full raid.",
+      "High on the peaks runs a quieter mystery: old graves marked with a crown no record remembers. Read the dead, gather what they guarded, and unseal a tomb that was meant to stay shut. It is a detective's trail that opens the way to the realm's ten-player endgame raid.",
+    sideTempleTitle: 'The drowned temple',
+    sideTempleBody:
+      'A gate of pale light on a high tarn in the peaks opens onto a sunken shrine where a drowned cult still sings. Its short chain stands apart from the main story, a self-contained mystery for anyone who climbs to the shore, reads the warnings carved on the rocks, and goes down to see what they were for.',
   },
 
   // Recurring characters and in-world voices, shared across the World and Quests pages.
@@ -724,7 +753,51 @@ export const guideStrings = {
     // Teased lead-in from the forgotten-king crypt side-arc to a second raid trial.
     cryptLeadTitle: 'A door the dead were meant to keep shut',
     cryptLeadBody:
-      'High on the peaks, away from the main fight, lies a colder mystery. Old graves bear a crown no record remembers, and the dead who guard them once served a forgotten king. Read their stones, gather the keystones they kept, and you can unseal a tomb that three loyal souls died to hold closed, opening a second ten-player trial for those who follow the clues to the end.',
+      'High on the peaks, away from the main fight, lies a colder mystery. Old graves bear a crown no record remembers, and the dead who guard them once served a forgotten king. Read their stones, gather the keystones they kept, and you can unseal a tomb that three loyal souls died to hold closed, the optional trial that opens the realm to its ten-player raid for those who follow the clues to the end.',
+  },
+
+  // Delves: the short, replayable instanced descents. The roster (name, level floor, party
+  // size, keeper, companion, difficulty tiers, run-modifier names) is generated from the sim;
+  // these are the explainer strings. Spoiler-safe: no numbers, lock layouts, Marks prices, or
+  // loot. Card field labels and the per-section copy.
+  delvesPage: {
+    heading: 'Delves',
+    intro:
+      'Delves are short, replayable descents for one or two, with a loyal companion at your side whenever you go down alone. Find the board, choose a run, and climb back out with the spoils.',
+    fromLevel: 'From level {n}',
+    partyLabel: 'For one or two',
+    keeperLabel: 'Keeper',
+    // Format strings: the separator and punctuation joining a roster name to its title or role
+    // stay translator-controlled, never a hardcoded ", " in delves.ts.
+    keeperFmt: '{name}, {title}',
+    companionLabel: 'Companion',
+    companionFmt: '{name}, {role}',
+    tiersLabel: 'Difficulties',
+    affixesLabel: 'Possible modifiers',
+    whatHeading: 'What a delve is',
+    whatBody:
+      'A delve is a small instanced dungeon made just for you and up to one ally, a private copy you cannot be disturbed in. You start it from a board kept by a delve keeper out in the world, drop in, fight down through a handful of rooms, and finish on a single guardian. Runs are quick and meant to be repeated, so a delve is a reliable bit of progress whenever the open world runs dry.',
+    howHeading: 'How a run works',
+    howBody:
+      'Talk to the keeper to open the board, pick a difficulty, and descend. Each run strings together a few short chambers and ends at its guardian; clear it to claim your reward and return to the surface. Bring a friend if you have one, or lean on your companion if you do not.',
+    companionHeading: 'Your companion',
+    companionBody:
+      'A delve sends a companion down with you, so a solo run is never hopeless. She fights at your side, and as you invest in her between runs she grows steadily stronger, until she can pull an ally back from the brink once a descent. She is yours for the delve and waits at the board between runs.',
+    lockpickHeading: 'Locks and what they hide',
+    lockpickBody:
+      'Some doors and caches are sealed, and opening one is a small test of nerve rather than a stat check: solve the lock cleanly and steadily and you earn a better prize than a rushed, fumbled one. It is optional, but the careful delver is the richer one.',
+    tiersHeading: 'Difficulty',
+    tiersBody:
+      'A delve offers more than one difficulty. The higher one makes the enemies stronger and rolls in a run modifier, and pays out more in return. It also asks that you have a few levels under your belt before it will let you in.',
+    affixesHeading: 'Run modifiers',
+    affixesBody:
+      'Harder runs roll a modifier that changes how the descent plays, from restless dead to foul air to failing roof-work. They raise the danger and the reward together. A crypt-themed delve can roll any of these:',
+    marksHeading: 'Delve Marks',
+    marksBody:
+      'Clearing delves earns Delve Marks, a currency kept apart from your coin. Spend them at the keeper to strengthen your companion and pick up gear you will not find anywhere else.',
+    whereHeading: 'Where to find one',
+    whereBody:
+      'The first delve, the Collapsed Reliquary, opens at Reliquary Hill in the starting valley of Eastbrook Vale. Brother Halven keeps the board there, and he will send you down once you are ready.',
   },
 
   // Talents and Specializations reference.
@@ -738,9 +811,11 @@ export const guideStrings = {
     howHeading: 'How they work',
     howBody:
       "Talents open up at level 10, and you keep earning points as you climb to the cap. You spend them in your class's talent panel, and you can save more than one layout to swap between builds.",
+    shareNote:
+      'A finished build can be copied to a short shareable code and handed to a friend, who pastes it straight into their own talent panel to load it.',
     resetTitle: 'Nothing is permanent',
     resetNote:
-      'You can reset your talents at any time, so an early pick is never a trap. Try things, see what you like, and change your mind freely.',
+      'You can reset your talents any time you are out of combat, so an early pick is never a trap. Try things, see what you like, and change your mind freely.',
     specsHeading: 'Specializations by class',
     specsBody:
       'Every class has a handful of specializations, each with its own role and a signature focus. Here is the shape of all of them. Open a class for its full kit.',
@@ -756,7 +831,7 @@ export const guideStrings = {
       'Challenge any player you meet to a friendly duel. Nothing is on the line but pride, so it is the easiest way to learn a matchup or settle a friendly argument.',
     coliseumHeading: 'The Ashen Coliseum',
     coliseumBody:
-      "The Coliseum is the realm's arena, where you face other players in ranked matches. Win and your standing climbs, and the strongest fighters rise up the leaderboard for everyone to see.",
+      "The Coliseum is the realm's arena, where you face other players in ranked matches, one on one or two on two. Each bracket keeps its own standing, so a win lifts you up that ladder for the whole realm to see.",
     fiestaHeading: 'Two versus two Fiesta',
     fiestaBody:
       'Fiesta is a fast, two-on-two mode played in short rounds. Between rounds you draft augments, quick boosts that reshape your kit on the fly, so no two matches play quite the same.',
@@ -796,7 +871,7 @@ export const guideStrings = {
       'Every class can hold its own and reach the cap. Choose the fantasy you like, not the one someone else calls best.',
     i2Title: 'Dying barely costs you',
     i2Body:
-      'When you fall, you release at a graveyard and run back to your body. No experience is lost, so it is safe to take risks and learn.',
+      'When you fall, you release your spirit and revive at the nearest graveyard, then make your way back. No experience is lost, so it is safe to take risks and learn.',
     i3Title: 'Talents are not a trap',
     i3Body:
       'They unlock at level 10 and reset whenever you want, so your early choices are never permanent.',
@@ -826,6 +901,7 @@ export const guideStrings = {
     error: 'The 3D model could not be loaded. The art above still shows this {name}.',
     dragHint: 'Drag to turn the model. Use the left and right arrow keys when it is focused.',
     canvasLabel: 'Rotatable 3D model of {name}',
+    posterAlt: '{name}',
   },
 
   // 3D model gallery page (/guide/models): browse every class, creature, and demon.
@@ -853,7 +929,7 @@ export const guideStrings = {
     // The eight equip slots (the paperdoll).
     slotsTitle: 'What you can equip',
     slotsBody:
-      'You have a weapon slot and seven armor slots. Each piece you equip adds to your character, and you can mix and match freely as you find upgrades.',
+      'You have a weapon slot and seven armor slots. Each class can use only certain weapons and wears armor up to its own weight, cloth, leather, or mail, so the upgrades that fit you are the ones made for your class. Within that, fill every slot with the best piece you find.',
     slotMainhand: 'Weapon',
     slotHelmet: 'Head',
     slotShoulder: 'Shoulders',
@@ -880,11 +956,18 @@ export const guideStrings = {
     upgradeTitle: 'Keep your gear current',
     upgradeBody:
       'Replacing an old piece with a fresh upgrade does more for you than playing perfectly in gear you have outgrown. When something better drops or a quest offers it, take it. Do not save your good items for later.',
+    itemLevelBody:
+      'If you want a quick way to compare two pieces, turn on Show Item Level in the options. Each weapon and armor piece then shows an item level, a single figure for roughly how powerful it is based on where it came from, so you can tell at a glance which upgrade pulls more weight, even across different slots.',
 
     // Where gear comes from.
     sourcesTitle: 'Where gear comes from',
     sourcesBody:
       'Most of your early upgrades are quest rewards, so it pays to finish quests rather than grind. Enemies drop gear when you defeat them, vendors in town sell solid basics, and the player market lets you buy from other adventurers.',
+
+    // Tier sets and set bonuses. Concept only: no set names, bonus numbers, or the raid boss.
+    setsTitle: 'Sets and set bonuses',
+    setsBody:
+      "The rarest armor comes in matched families, several pieces cut to look and fight as one. Wear enough of a family at once and the set wakes up, granting bonuses on top of each piece's own stats, and the more pieces you wear the stronger it gets. These drop from the toughest group content near the level cap, so chasing a full set is a classic endgame goal.",
 
     // Consumables: potions, food, drink, elixirs. No numbers.
     consumablesTitle: 'Consumables',
@@ -900,9 +983,9 @@ export const guideStrings = {
     // Fishing: relaxing side activity. Broad terms only.
     fishingTitle: 'Fishing',
     fishingBody:
-      'Fishing is a calm change of pace. Equip a fishing pole, cast into open water, and reel in what bites. You mostly catch fish you can cook into food, the odd bit of junk to sell for a few coins, and now and then a prized rare catch. What you find depends on the water you fish in.',
+      'Fishing is a calm change of pace. Equip a fishing pole, cast into open water, and reel in what bites. You mostly catch fish that are food you can eat, the odd bit of junk to sell for a few coins, and now and then a prized rare catch. What you find depends on the water you fish in.',
     fishingFood:
-      'The fish you reel in are raw, and raw fish are food. Cook your catch and it heals more when you sit to eat, with the better fish coming from the colder, deeper waters in the north. A line in the lake is a quiet way to keep your pack stocked between fights.',
+      'The fish you reel in are food: eat one while you sit to rest and it restores health, with the heartier fish coming from the colder, deeper waters in the north. A line in the lake is a quiet way to keep your pack stocked between fights.',
     fishingRare:
       'Now and then your line catches something far better than supper: a shimmering prized fish that any angler might luck into in any water. Hook one and your log lights up with the catch. It is the kind of lucky pull that makes an idle afternoon at the lake worth telling people about.',
 
@@ -913,14 +996,16 @@ export const guideStrings = {
     cosmeticsRanks:
       'Cosmetics come in rarity tiers of their own, and the rarer ones are a fun thing to chase. Earning a higher tier also unlocks the looks below it.',
     cosmeticsSkins:
-      'There are two cosmetic lines to collect. Every class has a handful of alternate appearances, a fresh take on its look that is yours alone to wear. Alongside them sit chromas: named two-tone color schemes that repaint a look entirely, from sober metals to bright imperial colors.',
+      'There are two cosmetic lines to collect. Most classes have several alternate appearances, a fresh take on the class look that is yours to wear. Alongside them sit chromas: named two-tone color schemes that repaint a look entirely, from sober metals to bright imperial colors.',
     cosmeticsCache:
       'A few of these come from a mysterious cosmetic cache, a sealed prize that rolls one of three quality grades when you open it and grants the appearance to match. It is purely for looks: nothing inside it makes you stronger, only finer to look at.',
+    cosmeticsApply:
+      'Set your active look from the appearance row on your character screen, and switch freely among everything you have unlocked.',
   },
 
   economy: {
     intro:
-      'Coin oils the whole world: it buys gear and supplies, pays your repairs and quest costs, and changes hands between players. You pick all of this up just by playing, so think of this page as a map of where your money comes from and goes.',
+      'Coin oils the whole world: it buys your gear, supplies, and travel kit, and changes hands between players. You pick all of this up just by playing, so think of this page as a map of where your money comes from and goes.',
 
     // Money and its coin denominations.
     coinTitle: 'Gold, silver, and copper',
@@ -930,7 +1015,12 @@ export const guideStrings = {
     // Vendors and the kinds you meet.
     vendorsTitle: 'Vendors and what they keep',
     vendorsBody:
-      'Towns and outposts are dotted with merchants, each with their own trade. Provisioners stock food and drink, weaponsmiths and armorers carry gear, herbalists deal in reagents, and a quartermaster keeps practical travel kit. Walk up to one to see what they sell.',
+      'Towns and outposts are dotted with merchants, each with their own trade. Provisioners stock food and drink, weaponsmiths and armorers carry gear, and a quartermaster keeps practical travel kit. Walk up to one to see what they sell.',
+
+    // Delve Marks: the second player currency, earned in delves and spent at the keeper.
+    marksTitle: 'A second currency: Delve Marks',
+    marksBody:
+      'Coin is not the only thing you bank. Delves pay out Delve Marks, a separate currency you spend only at the delve keeper, on companion upgrades and gear you will not find elsewhere. They never mix with your coin.',
 
     // Buying and selling at a vendor.
     buyingTitle: 'Buying and selling',
@@ -950,7 +1040,7 @@ export const guideStrings = {
     // The World Market (player auction house): browse, post, collect, pricing.
     marketTitle: 'The World Market',
     marketBody:
-      'The Merchant runs the World Market, a player-driven exchange where you can buy and sell with people you may never meet. Speak to the Merchant to open it.',
+      'The Merchant runs the World Market, a player-driven exchange where you can buy and sell with people you may never meet. Speak to the Merchant to open it. The Merchant also keeps a standing stock of their own goods listed there, so there is always something to buy even when no other players have posted.',
     marketBrowse:
       'Browsing: scroll the listings or search by name to find what is for sale. Each listing shows the goods, the seller, and the asking price for the whole stack.',
     marketPost:
@@ -983,7 +1073,7 @@ export const guideStrings = {
     chanPartyBody: 'Talk to everyone in your group, no matter how spread out you are.',
     chanGeneral: 'General.',
     chanGeneralBody:
-      'An always-on local channel for the people around you, good for asking a question or chatting.',
+      'An always-on realm-wide channel that reaches everyone online, good for asking a question or general chatter. Unlike World and Looking for Group, you never have to opt in.',
     chanWorld: 'World.',
     chanWorldBody:
       'A realm-wide channel you opt into. Open its tab to join, and you will see and reach everyone online.',
@@ -997,7 +1087,7 @@ export const guideStrings = {
     // Parties.
     partyHeading: 'Forming a party',
     partyBody:
-      'Invite another player by right-clicking their name and choosing to invite, or with a chat command. A party holds up to five players, and one of you is the leader.',
+      'Invite another player by right-clicking their name and choosing to invite. A party holds up to five players, and one of you is the leader.',
     partyCredit:
       'Group members near each other share kill and quest credit, so questing together is faster, never slower. A party is also how you step into a dungeon as a team.',
     raidBody:
@@ -1016,6 +1106,9 @@ export const guideStrings = {
     lootRollTitle: 'Need, Greed, or Pass.',
     lootRollBody:
       'When an item goes to a roll, each eligible member chooses Need if they want it, Greed if they would only take it spare, or Pass to bow out. The highest roll wins.',
+    lootMasterTitle: 'Master looter.',
+    lootMasterBody:
+      'The leader can instead take charge of the better drops, handing each one out to the member who should get it. It keeps prized gear from going to a stray roll, the way an organized group runs a dungeon.',
 
     // Friends and ignore.
     friendsHeading: 'Friends and ignore',
@@ -1058,7 +1151,7 @@ export const guideStrings = {
       'Stamina is your staying power. More Stamina means a larger health pool, and it speeds the health you recover while resting out of combat. Every class wants some.',
     intTitle: 'Intellect',
     intBody:
-      "Intellect grows a spellcaster's mana pool and improves the chance their spells crit. It matters to the classes that cast from mana; for a Rage or Energy class it does little.",
+      "Intellect grows a spellcaster's mana pool, raises their spell power so their spells hit harder, and improves the chance their spells crit. It matters to the classes that cast from mana; for a Rage or Energy class it does little.",
     spiTitle: 'Spirit',
     spiBody:
       "Spirit governs how quickly a caster's mana returns while out of combat. Like Intellect, it serves the mana classes and means little to the others.",
@@ -1070,12 +1163,18 @@ export const guideStrings = {
     apTitle: 'Attack power',
     apBody:
       'Attack power measures how hard your weapon strikes. Your primary attributes feed it, and stronger weapons and gear raise it further, which is why an upgrade can be a real jump in damage.',
+    spTitle: 'Spell power',
+    spBody:
+      "Spell power is a caster's counterpart to attack power: it raises the damage your spells deal. Intellect feeds it, and caster gear and buffs add more on top, so a spellcaster watches spell power the way a melee fighter watches attack power.",
     critTitle: 'Critical strike',
     critBody:
       'Your critical strike chance is how often an attack lands for extra damage. Everyone starts with a small base chance, and Agility (plus some talents and gear) builds on it.',
     dodgeTitle: 'Dodge',
     dodgeBody:
       'Dodge is your chance to avoid an incoming melee attack entirely. You begin with a small base chance, and Agility raises it, so nimble classes slip more blows.',
+    dpsTitle: 'Damage per second',
+    dpsBody:
+      'Your sheet also shows a damage-per-second estimate: roughly what your weapon, its swing speed, and your attack power add up to over time. It is a quick way to compare two weapons at a glance.',
 
     // The character sheet.
     sheetHeading: 'Reading your character sheet',
@@ -1107,13 +1206,13 @@ export const guideStrings = {
     // Rested XP, described without numbers.
     restedTitle: 'Rested experience',
     restedBody:
-      'When you log out, or rest in a safe place like an inn, your character builds up rested experience while you are away. The next time you go out and fight, that pool gives your kills an extra boost until it runs dry. It builds up over time and speeds your early levels, so logging off in town is never wasted time.',
+      'Rest in a safe spot like an inn, out of combat, and your character builds up rested experience while you sit there. The next time you go out and fight, that pool gives your kills an extra boost until it runs dry. A pause at the inn is never wasted time; it speeds your next stretch of leveling.',
     // What happens at the cap: cosmetic, optional, long-term. {cap} = level cap.
     capTitle: 'Reaching level {cap}',
     capJourneyBody:
       'Level {cap} is the cap, the end of leveling but not of growing. From there you run dungeons and the raid, chase better gear, and test yourself in the arena.',
     prestigeBody:
-      'Experience keeps counting even after the cap. It feeds a cosmetic virtual level, so your experience bar keeps climbing, and a long-term prestige rank you can earn for the recognition. It is purely optional and never grants power, just a mark of the road you have walked.',
+      'Experience keeps counting even after the cap. It feeds a cosmetic virtual level, so your experience bar keeps climbing, and a long-term prestige rank you can earn for the recognition. Passing big lifetime-experience milestones also unlocks cosmetic titles and nameplate borders that show on your character sheet. All of it is purely optional and never grants power, just a mark of the road you have walked.',
     // Gentle reassurance.
     noRush:
       'There is no rush. The world is there to enjoy at your own pace, so wander, take the quests that catch your eye, and let your hero grow along the way.',

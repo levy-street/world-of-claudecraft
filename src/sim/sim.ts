@@ -65,9 +65,11 @@ import {
   emptyAllocation,
   emptyModifiers,
   type Role,
+  repairAllocation,
   type SavedLoadout,
   type TalentAllocation,
   type TalentModifiers,
+  talentPointsAtLevel,
 } from './content/talents';
 import { applyCooldowns, type SavedCooldowns, serializeCooldowns } from './cooldown_persist';
 import type { DelveShopGate, DelveShopOffer } from './data';
@@ -131,8 +133,10 @@ import { formatMoney } from './format_money';
 import * as interaction from './interaction';
 import * as items from './items';
 import {
+  type GuildLeaderboardPage,
   LEADERBOARD_PAGE_SIZE,
   type LeaderboardPage,
+  paginateGuildLeaderboard,
   paginateLeaderboard,
 } from './leaderboard_page';
 import type { Ante, PickAction } from './lockpick';
@@ -1211,11 +1215,20 @@ export class Sim {
       }
       for (const q of s.questsDone) meta.questsDone.add(q);
       if (s.talents)
-        meta.talents = {
-          spec: s.talents.spec ?? null,
-          ranks: { ...s.talents.ranks },
-          choices: { ...s.talents.choices },
-        };
+        // Revalidate the persisted build against the current rules + level budget
+        // before it is baked into the flat mods below. A stored allocation replays
+        // verbatim on load, so without this an over-budget, prereq-broken, or gated
+        // build (stale tuning, a level-down, or a tampered save) would still grant
+        // its stats/abilities. An honest in-budget build is returned unchanged.
+        meta.talents = repairAllocation(
+          cls,
+          {
+            spec: s.talents.spec ?? null,
+            ranks: { ...s.talents.ranks },
+            choices: { ...s.talents.choices },
+          },
+          talentPointsAtLevel(player.level),
+        );
       if (s.loadouts)
         meta.loadouts = s.loadouts.map((l) => ({
           name: l.name,
@@ -1342,6 +1355,10 @@ export class Sim {
     // throwaway build, persist the PRE-fiesta snapshot so an autosave or
     // mid-match disconnect never writes the temporary state to the database.
     const restore = meta.fiestaRestore;
+    // Warlock demons are not persisted across logout: drop the snapshot so a relog
+    // forces a fresh re-summon instead of laundering the summon cooldown for free.
+    // Hunter pets (non-demon) persist. See pet_commands.isDemonPetState.
+    const petSnapshot = this.serializePet(pid);
     const state: CharacterState = {
       level: restore ? restore.level : e.level,
       xp: restore ? restore.xp : meta.xp,
@@ -1390,8 +1407,8 @@ export class Sim {
       raidLockouts: Object.fromEntries(
         [...meta.raidLockouts].filter(([, until]) => until > this.lockoutNowMs()),
       ),
+      pet: petCommands.isDemonPetState(petSnapshot) ? null : petSnapshot,
       cooldowns: serializeCooldowns(e.cooldowns, e.potionCooldownUntil, this.time),
-      pet: this.serializePet(pid),
       skin: meta.skin,
       skinCatalog: meta.skinCatalog,
       pendingSkinRank: meta.pendingSkinRank,
@@ -1611,6 +1628,13 @@ export class Sim {
         prestigeRank: meta.prestigeRank,
       }));
     return Promise.resolve(paginateLeaderboard(rows, page, pageSize));
+  }
+  // Guilds are a server-only social system (they live in the server's social DB,
+  // never in the deterministic sim), so the offline world ranks no guilds: an
+  // empty page, paged through the same helper so the board renders its empty
+  // state. Online play overrides this with the cached, realm-scoped server query.
+  guildLeaderboard(page = 0, pageSize = LEADERBOARD_PAGE_SIZE): Promise<GuildLeaderboardPage> {
+    return Promise.resolve(paginateGuildLeaderboard([], page, pageSize));
   }
   get known(): ResolvedAbility[] {
     return this.primary.known;
@@ -2175,9 +2199,9 @@ export class Sim {
 
   // Mark a player as a GM: invulnerable (see dealDamage). Server-side only —
   // set at join time from the characters.is_gm column.
-  setGm(pid?: number): void {
+  setGm(pid?: number, enabled = true): void {
     const r = this.resolve(pid);
-    if (r) r.e.gm = true;
+    if (r) r.e.gm = enabled;
   }
 
   // Dev/test convenience: jump a player to a level (learns abilities, recalcs stats).
@@ -3198,6 +3222,14 @@ export class Sim {
   // despawnPersistentPet/despawnPet/clearNonPlayerStatAuras into the module.
   petOf(ownerPid: number, includeDead = false): Entity | null {
     return petCommands.petOf(this.ctx, ownerPid, includeDead);
+  }
+
+  stowPetForSpectate(ownerPid: number): PetState | null {
+    return petCommands.stowPetForSpectate(this.ctx, ownerPid);
+  }
+
+  restorePetAfterSpectate(ownerPid: number, state: PetState | null): void {
+    petCommands.restorePetAfterSpectate(this.ctx, ownerPid, state);
   }
 
   private serializePet(ownerPid: number): PetState | null {

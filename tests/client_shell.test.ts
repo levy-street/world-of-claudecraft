@@ -124,6 +124,10 @@ const mobileControlsTs = readFileSync(
   new URL('../src/game/mobile_controls.ts', import.meta.url),
   'utf8',
 ).replace(/\r\n/g, '\n');
+const characterPreviewTs = readFileSync(
+  new URL('../src/render/characters/preview.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
 // Per-frame keyed-pool painters. The per-member party rows,
 // the aura slots, and the FCT nodes used to be inline createElement / innerHTML in
 // hud.ts; they dissolved into these pooled painters, so the shape guards below grep
@@ -469,6 +473,29 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain('} else {\n    enterLoggedOutChrome();\n  }');
   });
 
+  it('keeps the Discord unlink panel clickable over the pre-game shell', () => {
+    const startZ = Number(shellCss.match(/#start-screen \{[\s\S]*?z-index: (\d+);/)?.[1]);
+    const modalZ = Number(shellCss.match(/\.modal-backdrop \{[\s\S]*?z-index: (\d+);/)?.[1]);
+    const discordZ = Number(indexExtraCss.match(/#discord-window \{[\s\S]*?z-index: (\d+);/)?.[1]);
+    expect(discordZ).toBeGreaterThan(startZ);
+    expect(discordZ).toBeLessThan(modalZ);
+  });
+
+  it('keeps the Discord unlink modal at top level so it shows in-game', () => {
+    // #start-screen is display:none once the game starts (main.ts hides it) and is a
+    // lower z-index:100 stacking context, so a keep-modal nested inside it would be
+    // invisible in-game and trapped below the top-level #discord-window. It must be a
+    // top-level sibling declared above #start-screen, exactly like #discord-window.
+    const modalAt = html.indexOf('id="discord-keep-modal"');
+    const windowAt = html.indexOf('id="discord-window"');
+    const startAt = html.indexOf('id="start-screen"');
+    expect(modalAt).toBeGreaterThan(-1);
+    expect(windowAt).toBeGreaterThan(-1);
+    // Declared before #start-screen opens, hence a top-level sibling, never a descendant.
+    expect(modalAt).toBeLessThan(startAt);
+    expect(windowAt).toBeLessThan(startAt);
+  });
+
   it('shows a logged-in Logout nav item next to Account', () => {
     expect(html).toContain('id="nav-btn-account"');
     expect(html).toContain('id="nav-btn-logout"');
@@ -622,6 +649,20 @@ describe('client HTML shell', () => {
     expect(indexExtraCss).toContain(
       '@media (orientation: portrait) {\n    body.native-app.mobile-touch.game-active #rotate-device {\n      display: flex;',
     );
+  });
+
+  it('releases the start-screen character preview before entering the world', () => {
+    expect(mainTs).toContain('function releaseStartScreenPreview(): void {');
+    expect(mainTs).toContain('characterPreview.destroy();\n  characterPreview = null;');
+    expect(mainTs).toContain(
+      "$('#start-screen').style.display = 'none';\n  releaseStartScreenPreview();",
+    );
+    expect(characterPreviewTs).toContain('destroy(): void {\n    if (this.destroyed) return;');
+    expect(characterPreviewTs).toContain(
+      'this.unregisterContext?.();\n    this.unregisterContext = null;',
+    );
+    expect(characterPreviewTs).toContain('this.renderer.forceContextLoss();');
+    expect(characterPreviewTs).toContain('this.renderer.dispose();');
   });
 
   it('offers the quest log in the mobile controls drawer', () => {
@@ -1122,7 +1163,7 @@ describe('client HTML shell', () => {
 
   it('keeps the World Market to one scroll container with browse filters below the tabs', () => {
     expect(componentsCss).toContain(
-      '#market-window {\n    width: 470px;\n    height: min(640px, calc(85vh - 24px));\n    display: none;\n    flex-direction: column;\n    overflow: hidden;',
+      '#market-window {\n    width: 560px;\n    height: min(640px, calc(85vh - 24px));\n    display: none;\n    flex-direction: column;\n    overflow: hidden;',
     );
     expect(componentsCss).toContain(
       '#market-body {\n    overflow-y: auto;\n    flex: 1;\n    min-height: 0;',
@@ -1130,9 +1171,14 @@ describe('client HTML shell', () => {
     expect(componentsCss).toContain(
       '.mkt-page {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;',
     );
+    // On mobile the Market takes the full available height (not the vendor's 58vh
+    // cap) so its tall stacked-filter header cannot squeeze the listing body flat,
+    // and #market-body keeps a min-height floor; the window itself stays
+    // overflow:hidden so #market-body remains the single scroll container.
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #market-window {\n    max-height: calc(58vh - 20px);\n    overflow: hidden;',
+      'body.mobile-touch #market-window {\n    max-height: calc(100vh - 20px);\n    overflow: hidden;',
     );
+    expect(hudMobileCss).toContain('body.mobile-touch #market-body {\n    min-height: 96px;');
     expect(marketWindowTs).toContain('buildMarketView'); // pagination + filtering delegated to the core
     expect(marketWindowTs).toContain('this.browsePage');
     expect(marketWindowTs).toContain('data-market-page="prev"');

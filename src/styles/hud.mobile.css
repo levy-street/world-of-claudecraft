@@ -881,13 +881,24 @@
     box-sizing: border-box;
     overflow-y: auto;
   }
-  body.mobile-touch #vendor-window,
-  body.mobile-touch #market-window {
+  body.mobile-touch #vendor-window {
     max-height: calc(58vh - 20px);
   }
+  /* The Market carries a tab strip plus the filter selects, which stack to a tall
+     single column on mobile; the vendor's 58vh cap would leave the flex:1 listing
+     body (#market-body) zero height, so it collapsed and could not be scrolled.
+     Give the window the full available height (like #trade-window) so the listing
+     body keeps a usable, touch-scrollable height under the header. */
   body.mobile-touch #market-window {
-    max-height: calc(58vh - 20px);
+    max-height: calc(100vh - 20px);
     overflow: hidden;
+  }
+  /* Floor the listing body so it keeps a usable, touch-scrollable height even when
+     the subtype filter adds a third stacked row on a short landscape screen. (On a
+     very short viewport the window's overflow:hidden can still clip below this floor,
+     but the body scrolls internally, so it never collapses to the old zero height.) */
+  body.mobile-touch #market-body {
+    min-height: 96px;
   }
   body.mobile-touch .mkt-filters,
   body.mobile-touch .mkt-filters.has-subtype {
@@ -900,6 +911,31 @@
   body.mobile-touch .mkt-select-option {
     min-height: 40px;
     font-size: 16px;
+  }
+  /* Inspect (player profile) on mobile: a full-width, scrollable window with the
+     gear stacked into a single one-item-per-row list, so each item name reads in
+     full instead of being squeezed into two narrow columns. */
+  body.mobile-touch #inspect-window {
+    left: 10px;
+    right: 10px;
+    top: 10px;
+    width: auto;
+    max-width: calc(100vw - 20px);
+    max-height: calc(100vh - 20px);
+    transform: none;
+    box-sizing: border-box;
+    overflow-y: auto;
+  }
+  body.mobile-touch .inspect-paperdoll {
+    flex-direction: column;
+  }
+  body.mobile-touch .inspect-paperdoll .equip-col {
+    width: 100%;
+  }
+  /* Drop the right column's mirrored layout so every row reads left to right. */
+  body.mobile-touch .inspect-paperdoll .equip-col-right .equip-slot {
+    flex-direction: row;
+    text-align: left;
   }
   body.mobile-touch #social-window,
   body.mobile-touch #trade-window {

@@ -402,8 +402,6 @@ export const nl_NL: Record<string, string> = {
   'blockedIps.colCreatedAt': 'Aangemaakt',
   'blockedIps.addFailed': 'Blokkeren van het IP mislukt.',
   'blockedIps.removeFailed': 'Deblokkeren van het IP mislukt.',
-  'sharedIps.description':
-    'IP-adressen waargenomen voor meer dan één account, gerangschikt op accountaantal.',
   'sharedIps.onlineDescription':
     'IP-adressen die momenteel door meer dan één online account worden gebruikt.',
   'sharedIps.onlineOnly': 'Alleen online-accounts',
@@ -455,4 +453,16 @@ export const nl_NL: Record<string, string> = {
   'error.blockExpiryFuture': 'vervaldatum blokkade moet in de toekomst liggen',
   'error.blockFailed': 'blokkeren van IP mislukt',
   'error.blockNotFound': 'IP niet gevonden',
+  'nav.suspiciousPlayers': 'Verdachte Spelers',
+  'suspiciousPlayers.description': 'Online spelers met actief bot-detectiebewijs.',
+  'suspiciousPlayers.autoRefresh': 'Automatisch verversen ({seconds}s)',
+  'suspiciousPlayers.loading': 'Verdachte spelers laden...',
+  'suspiciousPlayers.loadFailed': 'Laden van verdachte spelers mislukt.',
+  'suspiciousPlayers.empty': 'Geen enkele online speler heeft momenteel bot-detectiebewijs.',
+  'suspiciousPlayers.colName': 'Naam',
+  'suspiciousPlayers.colEvidence': 'Bewijs',
+  'suspiciousPlayers.colScore': 'Score',
+  'suspiciousPlayers.evidenceList': 'Bewijs voor {name}',
+  'suspiciousPlayers.evidenceWeight': 'gewicht {value}',
+  'sharedIps.allDescription': 'IP-adressen die op meer dan één account zijn waargenomen.',
 };

@@ -235,9 +235,36 @@ export function classLabel(classId: string): string {
 // newly-added zone not yet in the dictionary) fall back to the raw name.
 const ZONE_NAME_TO_KEY = new Map<string, string>();
 for (const [key, value] of Object.entries(DICT.en)) {
-  if (key.startsWith('zone.') || key.startsWith('dungeon.')) ZONE_NAME_TO_KEY.set(value, key);
+  if (
+    key.startsWith('zone.') ||
+    key.startsWith('dungeon.') ||
+    key.startsWith('delve.') ||
+    key.startsWith('poi.')
+  )
+    ZONE_NAME_TO_KEY.set(value, key);
+}
+function knownLabel(key: string, fallback: string | null | undefined): string {
+  return typeof DICT.en[key] === 'string' ? t(key) : (fallback ?? key);
 }
 export function zoneLabel(name: string): string {
   const key = ZONE_NAME_TO_KEY.get(name);
   return key ? t(key) : name;
+}
+export function zoneIdLabel(zoneId: string | null | undefined, fallback?: string | null): string {
+  return zoneId ? knownLabel(`zone.${zoneId}`, fallback) : (fallback ?? t('common.emptyValue'));
+}
+export function dungeonIdLabel(id: string | null | undefined, fallback?: string | null): string {
+  return id ? knownLabel(`dungeon.${id}`, fallback) : (fallback ?? t('common.emptyValue'));
+}
+export function delveIdLabel(id: string | null | undefined, fallback?: string | null): string {
+  return id ? knownLabel(`delve.${id}`, fallback) : (fallback ?? t('common.emptyValue'));
+}
+export function poiLabel(
+  zoneId: string | null | undefined,
+  poiIndex: number | null | undefined,
+  fallback?: string | null,
+): string {
+  return zoneId && poiIndex !== null && poiIndex !== undefined
+    ? knownLabel(`poi.${zoneId}.${poiIndex}`, fallback)
+    : (fallback ?? t('common.emptyValue'));
 }

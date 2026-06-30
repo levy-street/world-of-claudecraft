@@ -235,6 +235,7 @@
       <div class="uf-bars">
         <div class="uf-name" id="tf-name"></div>
         <div class="bar hp"><div class="bar-fill" id="tf-hp"></div><div class="bar-absorb" id="tf-absorb"></div><div class="bar-text" id="tf-hp-text"></div></div>
+        <div class="uf-discord" id="tf-discord"></div>
         <div id="tf-castbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" data-i18n-aria="hudChrome.castBar.targetAria" aria-label="Unit Cast Bar"><div class="fill"></div><div class="label"></div><div class="timer"></div></div>
         <div class="combo-row" id="combo-row"></div>
         <div class="uf-buffs" id="tf-debuffs"></div>
@@ -415,6 +416,48 @@
   <textarea id="chat-input" rows="1" maxlength="255" data-i18n-placeholder="hud.core.chatPlaceholder" placeholder="Say something... (/w name, /r, /p, /gu, /o, /general, /join world|lfg, /afk, /dnd)" autocomplete="off" autocapitalize="sentences" autocorrect="off" spellcheck="false" data-1p-ignore data-lpignore="true" data-bwignore data-form-type="other"></textarea>
   </template>
 
+  <!-- Discord panel + CTA banner live OUTSIDE the game-ui-template so they exist in
+       the DOM at login (the banner shows pre-game) and their listeners bind at init. -->
+  <div id="discord-window" class="panel" hidden></div>
+  <div id="discord-cta-banner" hidden>
+    <svg viewBox="0 0 127.14 96.36" width="22" height="22" fill="currentColor" aria-hidden="true" class="dc-cta-logo"><path d="M107.7 8.07A105.15 105.15 0 0 0 81.47 0a72.06 72.06 0 0 0-3.36 6.83 97.68 97.68 0 0 0-29.11 0A72.37 72.37 0 0 0 45.64 0a105.89 105.89 0 0 0-26.25 8.09C2.79 32.65-1.71 56.6.54 80.21a105.73 105.73 0 0 0 32.17 16.15 77.7 77.7 0 0 0 6.89-11.11 68.42 68.42 0 0 1-10.85-5.18c.91-.66 1.8-1.34 2.66-2a75.57 75.57 0 0 0 64.32 0c.87.71 1.76 1.39 2.66 2a68.68 68.68 0 0 1-10.87 5.19 77 77 0 0 0 6.89 11.1 105.25 105.25 0 0 0 32.19-16.14c2.64-27.38-4.51-51.11-18.9-72.15zM42.45 65.69C36.18 65.69 31 60 31 53s5-12.74 11.43-12.74S54 46 53.89 53s-5.05 12.69-11.44 12.69zm42.24 0C78.41 65.69 73.25 60 73.25 53s5-12.74 11.44-12.74S96.23 46 96.12 53s-5.04 12.69-11.43 12.69z"/></svg>
+    <div class="dc-cta-text">
+      <span class="dc-cta-title" data-i18n="hudChrome.discord.cta.title">Link your Discord to earn points and rank up</span>
+      <span class="dc-cta-stats" id="discord-cta-stats"></span>
+    </div>
+    <button type="button" id="discord-cta-link" class="dc-cta-btn" data-i18n="hudChrome.discord.cta.button">Link in one click</button>
+    <button type="button" id="discord-cta-close" class="dc-cta-x" data-i18n-aria="hudChrome.discord.cta.dismiss" aria-label="Dismiss">&#10005;</button>
+  </div>
+
+  <!-- Shown when unlinking a Discord-provisioned account that has no real password yet:
+       the player must set one (username fixed, shown read-only) so the account stays
+       reachable after the link is removed. Kept top level (NOT inside #start-screen, which
+       is display:none in-game and a lower z-index:100 stacking context) so the modal shows
+       over the game and the in-game Discord panel when unlinking. Wired in main.ts. -->
+  <div id="discord-keep-modal" class="modal-backdrop" hidden>
+    <div class="confirm-modal panel auth-panel-premium" role="dialog" aria-modal="true" aria-labelledby="discord-keep-title">
+      <h2 id="discord-keep-title" data-i18n="hudChrome.discord.keep.title">Set a password</h2>
+      <p data-i18n="hudChrome.discord.keep.body">Your account signs in with Discord. Set a password so you can still log in with your username after unlinking.</p>
+      <div class="auth-field">
+        <label for="discord-keep-username" class="auth-label" data-i18n="hudChrome.discord.keep.usernameLabel">Your username</label>
+        <input id="discord-keep-username" type="text" autocomplete="username" readonly />
+      </div>
+      <div class="auth-field">
+        <label for="discord-keep-pass" class="auth-label" data-i18n="auth.password">Password</label>
+        <input id="discord-keep-pass" type="password" maxlength="128" autocomplete="new-password" data-i18n-placeholder="auth.passwordPlaceholder" placeholder="Enter password" />
+      </div>
+      <div class="auth-field">
+        <label for="discord-keep-confirm" class="auth-label" data-i18n="hudChrome.discord.keep.confirmLabel">Confirm password</label>
+        <input id="discord-keep-confirm" type="password" maxlength="128" autocomplete="new-password" />
+      </div>
+      <div id="discord-keep-error" class="auth-error" aria-live="polite"></div>
+      <div class="confirm-actions">
+        <button type="button" class="btn btn-secondary" id="btn-discord-keep-cancel" data-i18n="hudChrome.discord.keep.cancel">Cancel</button>
+        <button type="button" class="btn btn-danger" id="btn-discord-keep-submit" data-i18n="hudChrome.discord.keep.submit">Set password and unlink</button>
+      </div>
+    </div>
+  </div>
+
   <main id="start-screen">
     <!-- Keep the backdrop here at the top level so it spans the entire screen behind content -->
     <div id="start-screen-backdrop" aria-hidden="true">
@@ -569,7 +612,14 @@
 
         <form id="login-panel" class="panel auth-panel auth-panel-premium" data-auth-mode="login" hidden novalidate>
           <h2 class="auth-title" id="auth-title" data-i18n="auth.enterRealm">Enter the Realm</h2>
-          
+
+          <!-- First-class onboarding: Continue with Discord at the top of the form. -->
+          <button type="button" class="btn" id="btn-login-discord" hidden style="width:100%;margin:4px 0 12px;background:linear-gradient(180deg,#5865f2,#404ac4);border-color:#2a2f7a;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:600;min-height:42px;">
+            <svg viewBox="0 0 127.14 96.36" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M107.7 8.07A105.15 105.15 0 0 0 81.47 0a72.06 72.06 0 0 0-3.36 6.83 97.68 97.68 0 0 0-29.11 0A72.37 72.37 0 0 0 45.64 0a105.89 105.89 0 0 0-26.25 8.09C2.79 32.65-1.71 56.6.54 80.21a105.73 105.73 0 0 0 32.17 16.15 77.7 77.7 0 0 0 6.89-11.11 68.42 68.42 0 0 1-10.85-5.18c.91-.66 1.8-1.34 2.66-2a75.57 75.57 0 0 0 64.32 0c.87.71 1.76 1.39 2.66 2a68.68 68.68 0 0 1-10.87 5.19 77 77 0 0 0 6.89 11.1 105.25 105.25 0 0 0 32.19-16.14c2.64-27.38-4.51-51.11-18.9-72.15zM42.45 65.69C36.18 65.69 31 60 31 53s5-12.74 11.43-12.74S54 46 53.89 53s-5.05 12.69-11.44 12.69zm42.24 0C78.41 65.69 73.25 60 73.25 53s5-12.74 11.44-12.74S96.23 46 96.12 53s-5.04 12.69-11.43 12.69z"/></svg>
+            <span data-i18n="hudChrome.discord.loginCta">Continue with Discord</span>
+          </button>
+          <div id="auth-or-divider" class="auth-or" hidden><span data-i18n="hudChrome.discord.orEmail">or use email</span></div>
+
           <div class="auth-field">
             <label for="login-user" class="auth-label" data-i18n="auth.username">Username</label>
             <div id="login-user-error" class="auth-field-error" aria-live="polite" data-i18n="auth.usernameError">Please enter your username.</div>
@@ -632,6 +682,43 @@
             <button type="button" class="auth-link" id="btn-auth-toggle" data-i18n="auth.createAccount">Create Account</button>
           </p>
         </form>
+
+        <!-- First-time Discord login chooser: create a new account, or link an
+             existing one (username + password, plus a 2FA code if it has one).
+             Shown after the Discord OAuth redirect when the identity has no account
+             yet (main.ts reads the parked woc_discord_choice token). -->
+        <div id="discord-choice-panel" class="panel auth-panel auth-panel-premium" hidden>
+          <h2 class="auth-title" data-i18n="hudChrome.discord.choice.title">Continue with Discord</h2>
+          <p class="account-hint" id="discord-choice-greeting" data-i18n="hudChrome.discord.choice.intro">Create a new account, or link your Discord to one you already have.</p>
+
+          <button type="button" class="btn btn-primary" id="btn-discord-create" style="width:100%;margin:4px 0;" data-i18n="hudChrome.discord.choice.createCta">Create a new account</button>
+
+          <div class="auth-or"><span data-i18n="hudChrome.discord.choice.haveAccount">Already have an account?</span></div>
+
+          <button type="button" class="btn btn-secondary" id="btn-discord-link-toggle" style="width:100%;margin:4px 0;" data-i18n="hudChrome.discord.choice.linkCta" aria-expanded="false" aria-controls="discord-link-existing">Link an existing account</button>
+
+          <div id="discord-link-existing" hidden>
+            <div class="auth-field">
+              <label for="discord-link-user" class="auth-label" data-i18n="auth.username">Username</label>
+              <input id="discord-link-user" type="text" maxlength="24" autocomplete="username" data-i18n-placeholder="auth.usernamePlaceholder" placeholder="Enter username" />
+            </div>
+            <div class="auth-field">
+              <label for="discord-link-pass" class="auth-label" data-i18n="auth.password">Password</label>
+              <input id="discord-link-pass" type="password" maxlength="128" autocomplete="current-password" data-i18n-placeholder="auth.passwordPlaceholder" placeholder="Enter password" />
+            </div>
+            <div class="auth-field" id="discord-link-2fa-field" hidden>
+              <label for="discord-link-2fa" class="auth-label" data-i18n="auth.twoFactorLabel">Authentication code</label>
+              <input id="discord-link-2fa" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="14" data-i18n-placeholder="auth.twoFactorPlaceholder" placeholder="6-digit or recovery code" />
+            </div>
+            <button type="button" class="btn btn-primary" id="btn-discord-link-submit" style="width:100%;margin:4px 0;" data-i18n="hudChrome.discord.choice.linkSubmit">Link account</button>
+          </div>
+
+          <div id="discord-choice-error" class="auth-error" aria-live="polite"></div>
+
+          <div class="auth-actions">
+            <button type="button" class="btn btn-back" id="btn-discord-choice-back" data-i18n="auth.back">Back</button>
+          </div>
+        </div>
 
         <div id="realm-panel" class="panel auth-panel auth-panel-premium" hidden>
           <h2 class="auth-title"><span data-i18n="auth.realmList">Realm List</span> <span id="realm-list-user" class="cs-realm"></span></h2>

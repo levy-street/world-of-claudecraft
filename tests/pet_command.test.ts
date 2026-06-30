@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
-import { SimEvent, Entity } from '../src/sim/types';
+import type { Entity, SimEvent } from '../src/sim/types';
 
 function makeWorld() {
   return new Sim({ seed: 42, playerClass: 'hunter', noPlayer: true });
@@ -37,21 +37,42 @@ describe('/pet command', () => {
     expect(sim.petOf(pid)).toBeNull();
   });
 
-  it('restores a saved warlock demon without spawning a default imp', () => {
+  // Warlock demons are NOT persisted across logout: classic warlocks re-summon
+  // their demon (paying the cost + 180s cooldown) on login instead of getting it
+  // back for free, which would let a relog launder the summon cooldown. The demon
+  // snapshot is dropped to null at the serializeCharacter boundary, so a reload
+  // spawns no demon and forces a fresh summon.
+  it('does not persist a summoned warlock demon across a save/reload', () => {
     const first = makeClassWorld('warlock');
     const pid = first.addPlayer('warlock', 'Wick');
     first.setPlayerLevel(20, pid);
     first.castAbility('summon_voidwalker', pid);
     for (let i = 0; i < 20 * 6; i++) first.tick();
+    expect(first.petOf(pid)?.templateId).toBe('voidwalker');
     const saved = first.serializeCharacter(pid)!;
-    expect(saved.pet?.templateId).toBe('voidwalker');
+    expect(saved.pet).toBeNull();
 
     const restored = makeClassWorld('warlock');
     const restoredPid = restored.addPlayer('warlock', 'Wick', { state: saved });
-    const pets = [...restored.entities.values()].filter((e) => e.kind === 'mob' && e.ownerId === restoredPid);
+    const pets = [...restored.entities.values()].filter(
+      (e) => e.kind === 'mob' && e.ownerId === restoredPid,
+    );
 
-    expect(pets).toHaveLength(1);
-    expect(pets[0].templateId).toBe('voidwalker');
+    expect(pets).toHaveLength(0);
+    expect(restored.petOf(restoredPid)).toBeNull();
+  });
+
+  it('still persists a non-demon (hunter beast) pet across a save/reload', () => {
+    const first = makeWorld();
+    const pid = first.addPlayer('hunter', 'Tamer');
+    const pet = givePet(first, pid);
+    const templateId = pet.templateId;
+    const saved = first.serializeCharacter(pid)!;
+    expect(saved.pet?.templateId).toBe(templateId);
+
+    const restored = new Sim({ seed: 42, playerClass: 'hunter', noPlayer: true });
+    const restoredPid = restored.addPlayer('hunter', 'Tamer', { state: saved });
+    expect(restored.petOf(restoredPid)?.templateId).toBe(templateId);
   });
 
   it('does not spawn non-warlocks with a default pet', () => {

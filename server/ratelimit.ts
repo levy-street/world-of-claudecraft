@@ -245,6 +245,33 @@ export function resetWalletLinkRateLimits(): void {
   walletLinkAccountAttempts.clear();
 }
 
+// Discord link/status/reward endpoints share one dedicated bucket (per IP AND
+// per account), separate from login/register so an OAuth-link or reward-claim
+// flood can't lock a user out of logging in. accountId 0 keys the unauthenticated
+// start/callback legs on IP only (the account isn't resolved yet).
+export const DISCORD_MAX_PER_MINUTE = 15;
+const discordIpAttempts = new Map<string, number[]>();
+const discordAccountAttempts = new Map<number, number[]>();
+
+export function discordRateLimited(req: http.IncomingMessage, accountId: number): boolean {
+  const ipLimited = recordSlidingWindowAttempt(
+    discordIpAttempts,
+    requestIp(req),
+    DISCORD_MAX_PER_MINUTE,
+  );
+  const accountLimited =
+    accountId > 0
+      ? recordSlidingWindowAttempt(discordAccountAttempts, accountId, DISCORD_MAX_PER_MINUTE)
+      : false;
+  return ipLimited || accountLimited;
+}
+
+/** Reset Discord throttles. Test-only: keeps scoped buckets isolated. */
+export function resetDiscordRateLimits(): void {
+  discordIpAttempts.clear();
+  discordAccountAttempts.clear();
+}
+
 export const WOC_BALANCE_MAX_PER_MINUTE = 20;
 const wocBalanceIpAttempts = new Map<string, number[]>();
 

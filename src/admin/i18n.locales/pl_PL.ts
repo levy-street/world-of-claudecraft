@@ -400,8 +400,6 @@ export const pl_PL: Record<string, string> = {
   'blockedIps.colCreatedAt': 'Utworzono',
   'blockedIps.addFailed': 'Nie udało się zablokować IP.',
   'blockedIps.removeFailed': 'Nie udało się odblokować IP.',
-  'sharedIps.description':
-    'Adresy IP zaobserwowane na więcej niż jednym koncie, uporządkowane według liczby kont.',
   'sharedIps.onlineDescription':
     'Adresy IP aktualnie używane przez więcej niż jedno konto internetowe.',
   'sharedIps.onlineOnly': 'Tylko konta internetowe',
@@ -452,4 +450,16 @@ export const pl_PL: Record<string, string> = {
   'error.blockExpiryFuture': 'wygaśnięcie blokady musi przypadać w przyszłości',
   'error.blockFailed': 'nie udało się zablokować IP',
   'error.blockNotFound': 'nie znaleziono IP',
+  'nav.suspiciousPlayers': 'Podejrzani gracze',
+  'suspiciousPlayers.description': 'Gracze online z aktywnymi dowodami wykrycia bota.',
+  'suspiciousPlayers.autoRefresh': 'Autoodświeżanie ({seconds}s)',
+  'suspiciousPlayers.loading': 'Wczytywanie podejrzanych graczy...',
+  'suspiciousPlayers.loadFailed': 'Nie udało się wczytać podejrzanych graczy.',
+  'suspiciousPlayers.empty': 'Żaden gracz online nie ma obecnie dowodów wykrycia bota.',
+  'suspiciousPlayers.colName': 'Nazwa',
+  'suspiciousPlayers.colEvidence': 'Dowody',
+  'suspiciousPlayers.colScore': 'Wynik',
+  'suspiciousPlayers.evidenceList': 'Dowody dla {name}',
+  'suspiciousPlayers.evidenceWeight': 'waga {value}',
+  'sharedIps.allDescription': 'Adresy IP zaobserwowane na więcej niż jednym koncie.',
 };

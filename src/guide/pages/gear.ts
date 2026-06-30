@@ -3,12 +3,12 @@
 // names, or drop rates. The quality tiers render from the live QUALITY_COLOR table so the
 // page stays in step with the game; the label is always present (never color alone).
 
-import { t } from '../../ui/i18n';
 import { esc } from '../../ui/esc';
-import { hrefFor } from '../routes';
+import { t } from '../../ui/i18n';
 import { QUALITY_COLOR } from '../../ui/icons';
-import { lead, section, p, related } from './ui';
+import { hrefFor } from '../routes';
 import type { GuidePage } from './types';
+import { lead, p, related, section } from './ui';
 
 // Quality tiers low to high, paired with their catalog label key. Each renders a small
 // color swatch from QUALITY_COLOR next to its always-present name, so the tier never
@@ -35,13 +35,11 @@ const SLOTS = [
 ] as const;
 
 function qualityList(): string {
-  const items = QUALITY_TIERS
-    .map(([id, key]) => {
-      const color = QUALITY_COLOR[id] ?? QUALITY_COLOR.common;
-      const swatch = `<span class="guide-gear-swatch" style="background:${esc(color)}" aria-hidden="true"></span>`;
-      return `<li class="guide-gear-quality">${swatch}<span>${esc(t(key))}</span></li>`;
-    })
-    .join('');
+  const items = QUALITY_TIERS.map(([id, key]) => {
+    const color = QUALITY_COLOR[id] ?? QUALITY_COLOR.common;
+    const swatch = `<span class="guide-gear-swatch" style="background:${esc(color)}" aria-hidden="true"></span>`;
+    return `<li class="guide-gear-quality">${swatch}<span>${esc(t(key))}</span></li>`;
+  }).join('');
   return `<ul class="guide-gear-qualities">${items}</ul>`;
 }
 
@@ -62,26 +60,33 @@ export const gear: GuidePage = {
 
         ${section('guide.gear.qualityTitle', p('guide.gear.qualityBody') + qualityList() + p('guide.gear.qualityNote'))}
 
-        ${section('guide.gear.upgradeTitle', p('guide.gear.upgradeBody'))}
+        ${section('guide.gear.upgradeTitle', p('guide.gear.upgradeBody') + p('guide.gear.itemLevelBody'))}
 
         ${section('guide.gear.sourcesTitle', p('guide.gear.sourcesBody'))}
 
-        ${section('guide.gear.consumablesTitle',
-          p('guide.gear.consumablesIntro')
-          + p('guide.gear.consumablesPotions')
-          + p('guide.gear.consumablesFood')
-          + p('guide.gear.consumablesElixirs'))}
+        ${section('guide.gear.setsTitle', p('guide.gear.setsBody'))}
 
-        ${section('guide.gear.fishingTitle',
-          p('guide.gear.fishingBody')
-          + p('guide.gear.fishingFood')
-          + p('guide.gear.fishingRare'))}
+        ${section(
+          'guide.gear.consumablesTitle',
+          p('guide.gear.consumablesIntro') +
+            p('guide.gear.consumablesPotions') +
+            p('guide.gear.consumablesFood') +
+            p('guide.gear.consumablesElixirs'),
+        )}
 
-        ${section('guide.gear.cosmeticsTitle',
-          p('guide.gear.cosmeticsBody')
-          + p('guide.gear.cosmeticsSkins')
-          + p('guide.gear.cosmeticsRanks')
-          + p('guide.gear.cosmeticsCache'))}
+        ${section(
+          'guide.gear.fishingTitle',
+          p('guide.gear.fishingBody') + p('guide.gear.fishingFood') + p('guide.gear.fishingRare'),
+        )}
+
+        ${section(
+          'guide.gear.cosmeticsTitle',
+          p('guide.gear.cosmeticsBody') +
+            p('guide.gear.cosmeticsSkins') +
+            p('guide.gear.cosmeticsRanks') +
+            p('guide.gear.cosmeticsCache') +
+            p('guide.gear.cosmeticsApply'),
+        )}
 
         ${related([
           { href: hrefFor('classes'), key: 'guide.nav.classes' },

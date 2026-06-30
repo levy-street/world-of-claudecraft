@@ -8,6 +8,9 @@
 // own module (no per-locale blocks) so new chrome keys are an English-only add.
 
 export const hudChromeStrings = {
+  spectate: {
+    banner: 'Spectating {name}',
+  },
   // Overhead emote display names (wheel tooltips/labels, editor items, overhead
   // bubble text). Source ids/order mirror OVERHEAD_EMOTES in world_api.ts.
   emotes: {
@@ -199,6 +202,16 @@ export const hudChromeStrings = {
   // lacked an accessible name for.
   leaderboard: {
     close: 'Close',
+    // High-score board tabs: the per-character board and the per-guild board.
+    tabsLabel: 'High-score boards',
+    tabPlayers: 'Players',
+    tabGuilds: 'Guilds',
+    // Guild-board column headers + the guild-tab empty state.
+    guildName: 'Guild',
+    members: 'Members',
+    topLevel: 'Top',
+    guildXp: 'Total XP',
+    guildEmpty: 'No ranked guilds yet.',
   },
   // Raid-lockout badge on the minimap rim + its hover/tap panel: the title, the
   // accessible label, the "all ready" line, and the unlock-countdown templates
@@ -775,5 +788,139 @@ export const hudChromeStrings = {
   nameplate: {
     mob: '[{level}] {name}',
     mobElite: '[{level}+] {name}',
+  },
+  discord: {
+    title: 'Discord',
+    panelTitle: 'World of ClaudeCraft',
+    open: 'Discord',
+    close: 'Close',
+    keybind: 'Discord Panel',
+    disabled: 'Discord integration is not available right now.',
+    // Status-rung display names (the ladder lives in src/sim/discord_tier.ts).
+    tiers: {
+      none: 'Unranked',
+      initiate: 'Initiate',
+      squire: 'Squire',
+      footman: 'Footman',
+      knight: 'Knight',
+      champion: 'Champion',
+      warlord: 'Warlord',
+      legend: 'Legend',
+      mythic: 'Mythic',
+    },
+    loginCta: 'Continue with Discord',
+    orEmail: 'or use email',
+    cta: {
+      title: 'Link your Discord to earn points and rank up',
+      stats: '{online} online · {total} members in the server',
+      statsLoading: 'Join the community and earn rewards',
+      button: 'Link in one click',
+      dismiss: 'Dismiss',
+    },
+    link: {
+      cta: 'Link Discord',
+      relink: 'Relink Discord',
+      connecting: 'Opening Discord...',
+      benefits:
+        'Link your Discord to earn points from play and community activity, and climb the status tiers.',
+      error: 'Could not link Discord. Please try again.',
+      success: 'Discord linked.',
+    },
+    // First-time Discord login chooser (create a new account vs link an existing one).
+    choice: {
+      title: 'Continue with Discord',
+      intro: 'Create a new account, or link your Discord to one you already have.',
+      greeting: 'Welcome, {name}!',
+      createCta: 'Create a new account',
+      haveAccount: 'Already have an account?',
+      linkCta: 'Link an existing account',
+      linkSubmit: 'Link account',
+      error: 'Could not continue. Please try again.',
+      expired: 'That Discord sign-in expired. Please sign in with Discord again.',
+    },
+    // Unlinking a Discord-provisioned account: set a password first so it stays
+    // reachable (the username is fixed and shown read-only).
+    keep: {
+      title: 'Set a password',
+      body: 'Your account signs in with Discord. Set a password so you can still log in with your username after unlinking.',
+      usernameLabel: 'Your username',
+      confirmLabel: 'Confirm password',
+      submit: 'Set password and unlink',
+      cancel: 'Cancel',
+      mismatch: 'Passwords do not match.',
+      tooShort: 'Password must be at least 6 characters.',
+    },
+    linkedAs: 'Linked as {name}',
+    linkedTitle: 'Discord: {name}',
+    viewCharacter: 'View {name}',
+    viewProfile: "Open this character's public profile",
+    unlink: 'Unlink',
+    visit: 'Visit Discord',
+    unlinkConfirm: 'Unlink your Discord account from this game account?',
+    statusLabel: 'Status',
+    rank: 'Rank',
+    points: 'Points',
+    lifetime: 'Lifetime',
+    toNext: '{points} to next rank',
+    maxRank: 'Top rank reached',
+    tiersTitle: 'Status Tiers',
+    tierLocked: 'Locked',
+    tierCurrent: 'Current',
+    earnTitle: 'How to earn points',
+    earnBody:
+      'Earn points from time played in game and from staying active in the Discord. Points raise your status tier.',
+    memberSince: 'Member since',
+    memberSinceDays: '{days}d in the Discord',
+    roleTag: {
+      levyst: 'Levy St',
+      devs: 'Dev',
+      mods: 'Mod',
+      artists: 'Artist',
+    },
+    guildMember: 'Verified member',
+    notMember: 'Not in the server yet',
+    joinCta: 'Join the Discord',
+    online: '{count} online',
+    community: 'Community',
+    rewards: 'Rewards',
+    voice: {
+      title: 'Voice',
+      channel: 'In {channel}',
+      empty: 'No one is in voice right now.',
+      speaking: 'Speaking',
+      muted: 'Muted',
+      join: 'Join voice',
+      connect: 'Connect to voice channel',
+    },
+    swag: {
+      title: 'Swag',
+      claim: 'Claim',
+      claimed: 'Claimed',
+      locked: 'Locked',
+      free: 'Free',
+      cost: '{points} pts',
+      needTier: 'Reach a higher rank to claim this.',
+      needPoints: 'Not enough points.',
+      claimError: 'Could not claim that reward. Please try again.',
+      claimedToast: 'Claimed: {name}',
+      // Swag item display names (catalog ids in src/sim/discord_tier.ts).
+      titleDiscordian: 'Title: Discordian',
+      titleSquire: 'Title: Squire of the Realm',
+      chromaBlurple: 'Blurple Mech Chroma',
+      titleChampion: 'Title: Champion of Claudemoon',
+      swagStickers: 'Sticker Pack (shipped)',
+      swagTee: 'T-Shirt (shipped)',
+    },
+    // "!" community commands: an interactive chat dropdown that broadcasts in-game
+    // and cross-posts to Discord (looking-for-group, trade, recruiting, events).
+    relay: {
+      tooFast: 'You are posting too fast. Wait a moment and try again.',
+      lfg: { label: 'Looking for Group', hint: 'Find players for a dungeon or quest' },
+      wts: { label: 'Want to Sell', hint: 'Advertise an item or service for sale' },
+      wtb: { label: 'Want to Buy', hint: 'Request an item you want to buy' },
+      recruit: { label: 'Guild Recruiting', hint: 'Recruit players for your guild' },
+      event: { label: 'Event / Raid', hint: 'Announce a raid, meetup or event' },
+      help: { label: 'Need Help', hint: 'Ask the community for help' },
+    },
   },
 };

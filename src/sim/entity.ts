@@ -116,6 +116,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     skinCatalog: 'class',
     skin: 0,
     mainhandItemId: null,
+    equippedItems: {},
     guild: '',
   };
 }
@@ -267,6 +268,10 @@ export function recalcPlayerStats(
   // were one ever stored, never resolves to a held model).
   e.mainhandItemId =
     equipment.mainhand && ITEMS[equipment.mainhand]?.weapon ? equipment.mainhand : null;
+  // Render-only mirror of the full worn set, copied so a later mutation of the
+  // owning PlayerMeta.equipment never aliases into the entity. Synced in the
+  // identity wire (terse `eq`) for the inspect-another-player window.
+  e.equippedItems = { ...equipment };
   // Melee AP by class (vanilla-ish): warriors/paladins/shamans/druids 2/str,
   // rogues str+agi, hunters str+agi, pure casters str.
   const apFromStats =

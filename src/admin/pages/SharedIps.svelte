@@ -10,17 +10,21 @@
   import Pager from '../components/Pager.svelte';
   import Panel from '../components/Panel.svelte';
 
+  type SharedIpSort = 'accounts' | 'last_seen';
+
   const navigation = getAdminNavigation();
   let data = $state<SharedIpsData | null>(null);
   let failed = $state(false);
   let page = $state(1);
   let onlineOnly = $state(false);
+  let sort = $state<SharedIpSort>('accounts');
+  let dir = $state<'asc' | 'desc'>('desc');
   let requestId = 0;
 
   async function refresh(): Promise<void> {
     const currentRequest = ++requestId;
     try {
-      const params = new URLSearchParams({ page: String(page) });
+      const params = new URLSearchParams({ page: String(page), sort, dir });
       if (onlineOnly) params.set('online', '1');
       const result = await apiGet<SharedIpsData>(`/admin/api/shared-ips?${params}`);
       if (currentRequest !== requestId) return;
@@ -45,6 +49,23 @@
     void refresh();
   }
 
+  function changeSort(column: SharedIpSort): void {
+    dir = sort === column && dir === 'desc' ? 'asc' : 'desc';
+    sort = column;
+    page = 1;
+    void refresh();
+  }
+
+  function sortArrow(column: SharedIpSort): string {
+    if (sort !== column) return '';
+    return dir === 'asc' ? ' ▲' : ' ▼';
+  }
+
+  function ariaSort(column: SharedIpSort): 'ascending' | 'descending' | 'none' {
+    if (sort !== column) return 'none';
+    return dir === 'asc' ? 'ascending' : 'descending';
+  }
+
   onMount(() => {
     void refresh();
     return () => {
@@ -57,7 +78,7 @@
   <Panel>
     <div class="shared-ips-intro">
       <p class="description">
-        {onlineOnly ? t('sharedIps.onlineDescription') : t('sharedIps.description')}
+        {onlineOnly ? t('sharedIps.onlineDescription') : t('sharedIps.allDescription')}
       </p>
       <label class="online-filter">
         <input type="checkbox" checked={onlineOnly} onchange={changeOnlineFilter} />
@@ -76,37 +97,56 @@
         {onlineOnly ? t('sharedIps.onlineEmpty') : t('sharedIps.empty')}
       </div>
     {:else}
-      <div class="shared-ip-heading" aria-hidden="true">
-        <span>{t('blockedIps.colIp')}</span>
-        <span>{t('sharedIps.colAccounts')}</span>
-        <span>{t('ipAssociations.colLastSeen')}</span>
+      <div class="table-scroll">
+        <table class="shared-ip-table">
+          <colgroup>
+            <col />
+            <col class="accounts-column" />
+            <col class="last-seen-column" />
+          </colgroup>
+          <thead>
+            <tr>
+              <th>{t('blockedIps.colIp')}</th>
+              <th class="num sortable" aria-sort={ariaSort('accounts')}>
+                <button type="button" onclick={() => changeSort('accounts')}>
+                  {t('sharedIps.colAccounts')}{sortArrow('accounts')}
+                </button>
+              </th>
+              <th class="sortable" aria-sort={ariaSort('last_seen')}>
+                <button type="button" onclick={() => changeSort('last_seen')}>
+                  {t('ipAssociations.colLastSeen')}{sortArrow('last_seen')}
+                </button>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {#each data.rows as row (row.ip)}
+              <tr>
+                <td>
+                  <span class="ip-identity">
+                    <a
+                      href={routeHref({ page: 'ip', ip: row.ip })}
+                      onclick={(event) => navigation?.navigate(event, { page: 'ip', ip: row.ip })}
+                    >
+                      <code>{row.ip}</code>
+                    </a>
+                    {#if row.blocked}
+                      <Badge variant="bad">{t('blockedIps.blockedBadge')}</Badge>
+                    {/if}
+                  </span>
+                </td>
+                <td class="num">
+                  <span class="account-count">
+                    <strong>{fmtNumber(row.accountCount)}</strong>
+                    <span>{t('sharedIps.colAccounts')}</span>
+                  </span>
+                </td>
+                <td class="last-seen">{fmtDate(row.lastSeenAt)}</td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
       </div>
-      <ul class="shared-ip-list">
-        {#each data.rows as row (row.ip)}
-          <li>
-            <a
-              class="shared-ip-row"
-              href={routeHref({ page: 'ip', ip: row.ip })}
-              onclick={(event) => navigation?.navigate(event, { page: 'ip', ip: row.ip })}
-            >
-              <span class="ip-identity">
-                <code>{row.ip}</code>
-                {#if row.blocked}
-                  <Badge variant="bad">{t('blockedIps.blockedBadge')}</Badge>
-                {/if}
-              </span>
-              <span class="account-count">
-                <strong>{fmtNumber(row.accountCount)}</strong>
-                <span>{t('sharedIps.colAccounts')}</span>
-              </span>
-              <span class="last-seen">
-                <span class="mobile-label">{t('ipAssociations.colLastSeen')}</span>
-                <span>{fmtDate(row.lastSeenAt)}</span>
-              </span>
-            </a>
-          </li>
-        {/each}
-      </ul>
 
       {#if data.total > data.limit}
         <Pager
@@ -202,47 +242,41 @@
     line-height: 1.45;
   }
 
-  .shared-ip-heading,
-  .shared-ip-row {
-    display: grid;
-    grid-template-columns: minmax(220px, 1fr) 150px 220px;
-    align-items: center;
-    gap: 18px;
+  .shared-ip-table {
+    min-width: 680px;
+    table-layout: fixed;
   }
 
-  .shared-ip-heading {
-    padding: 3px 12px 6px;
-    color: var(--gold-dim);
-    font-size: var(--font-size-small);
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
+  .accounts-column {
+    width: 150px;
   }
 
-  .shared-ip-list {
-    margin: 0;
+  .last-seen-column {
+    width: 220px;
+  }
+
+  th.sortable {
     padding: 0;
-    list-style: none;
   }
 
-  .shared-ip-row {
-    min-height: 54px;
-    padding: 8px 12px;
-    color: var(--text);
-    text-decoration: none;
-    background: #0c0c12;
-    border-top: 1px solid var(--border);
+  th.sortable button {
+    width: 100%;
+    padding: 7px 10px;
+    color: inherit;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    font: inherit;
+    letter-spacing: inherit;
+    text-align: inherit;
+    text-transform: inherit;
   }
 
-  .shared-ip-row:last-child {
-    border-bottom: 1px solid var(--border);
+  th.sortable button:hover {
+    color: var(--gold);
   }
 
-  .shared-ip-row:hover {
-    background: var(--row-hover);
-  }
-
-  .shared-ip-row:focus-visible {
-    position: relative;
+  th.sortable button:focus-visible {
     outline: 2px solid var(--gold);
     outline-offset: -2px;
   }
@@ -254,9 +288,13 @@
     min-width: 0;
   }
 
-  .ip-identity code {
+  .ip-identity a {
     color: var(--gold);
     text-decoration: underline;
+  }
+
+  .ip-identity code {
+    color: inherit;
   }
 
   .account-count {
@@ -284,37 +322,11 @@
     font-size: 12px;
   }
 
-  .mobile-label {
-    display: none;
-  }
-
   @media (max-width: 700px) {
     .shared-ips-intro {
       align-items: flex-start;
       flex-direction: column;
       gap: 4px;
-    }
-
-    .shared-ip-heading {
-      display: none;
-    }
-
-    .shared-ip-row {
-      grid-template-columns: 1fr auto;
-      gap: 8px 12px;
-      min-height: 72px;
-    }
-
-    .last-seen {
-      grid-column: 1 / -1;
-    }
-
-    .mobile-label {
-      display: inline;
-      margin-right: 6px;
-      color: var(--gold-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
     }
   }
 

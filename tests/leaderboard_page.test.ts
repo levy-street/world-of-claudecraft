@@ -1,10 +1,12 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
-  paginateLeaderboard,
-  LEADERBOARD_PAGE_SIZE,
   LEADERBOARD_MAX,
+  LEADERBOARD_PAGE_SIZE,
+  paginateGuildLeaderboard,
+  paginateLeaderboard,
+  paginateRanked,
 } from '../src/sim/leaderboard_page';
-import type { LeaderboardEntry } from '../src/world_api';
+import type { GuildLeaderboardEntry, LeaderboardEntry } from '../src/world_api';
 
 function makeEntries(n: number): LeaderboardEntry[] {
   return Array.from({ length: n }, (_, i) => ({
@@ -82,5 +84,54 @@ describe('paginateLeaderboard', () => {
     expect(page.pageSize).toBe(25);
     expect(page.leaders[0].rank).toBe(26);
     expect(page.leaders).toHaveLength(25);
+  });
+});
+
+function makeGuilds(n: number): GuildLeaderboardEntry[] {
+  return Array.from({ length: n }, (_, i) => ({
+    rank: i + 1,
+    name: `Guild${i + 1}`,
+    memberCount: 10,
+    totalLifetimeXp: (n - i) * 10_000,
+    topLevel: 20,
+  }));
+}
+
+// The guild board reuses the exact same slicing, clamping, and 1000-cap rule as
+// the player board through the generic paginateRanked.
+describe('paginateGuildLeaderboard', () => {
+  it('returns the first page with default size and absolute ranks', () => {
+    const page = paginateGuildLeaderboard(makeGuilds(120), 0);
+    expect(page.leaders).toHaveLength(LEADERBOARD_PAGE_SIZE);
+    expect(page.leaders[0].rank).toBe(1);
+    expect(page.total).toBe(120);
+    expect(page.pageCount).toBe(3);
+  });
+
+  it('slices a middle page preserving absolute ranks', () => {
+    const page = paginateGuildLeaderboard(makeGuilds(120), 1);
+    expect(page.leaders[0].rank).toBe(51);
+    expect(page.leaders.at(-1)!.rank).toBe(100);
+  });
+
+  it('caps total and pageCount at LEADERBOARD_MAX', () => {
+    const page = paginateGuildLeaderboard(makeGuilds(LEADERBOARD_MAX + 200), 0);
+    expect(page.total).toBe(LEADERBOARD_MAX);
+    expect(page.pageCount).toBe(LEADERBOARD_MAX / LEADERBOARD_PAGE_SIZE);
+  });
+
+  it('returns an empty single page for the offline (no-guild) world', () => {
+    const page = paginateGuildLeaderboard([], 0);
+    expect(page.leaders).toHaveLength(0);
+    expect(page.total).toBe(0);
+    expect(page.pageCount).toBe(1);
+  });
+
+  it('paginateRanked is generic over the entry type (shared by both boards)', () => {
+    const players = paginateRanked(makeEntries(60), 0);
+    const guilds = paginateRanked(makeGuilds(60), 0);
+    expect(players.total).toBe(60);
+    expect(guilds.total).toBe(60);
+    expect(players.pageCount).toBe(guilds.pageCount);
   });
 });

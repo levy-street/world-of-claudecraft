@@ -25,6 +25,7 @@ describe('AdminNav', () => {
     );
     expect(screen.getByRole('link', { name: t('nav.chatFilter') })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: t('nav.sharedIps') })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: t('nav.suspiciousPlayers') })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: t('nav.players') })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: t('nav.accounts') })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: t('nav.characters') })).toBeInTheDocument();

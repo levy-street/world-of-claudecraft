@@ -171,6 +171,7 @@ export const ENTITY_EXCLUDE: ReadonlySet<string> = new Set([
   'skin', // appearance
   'skinCatalog',
   'mainhandItemId', // render-only; "the sim never reads it for gameplay"
+  'equippedItems', // render-only mirror for inspect; sim never reads it for gameplay
   'holderTier', // cosmetic wallet flair; sim never reads it
   'holderBalance',
   'stealthed', // derived cache of auras.some(a => a.kind === 'stealth'); auras is sampled

@@ -299,8 +299,6 @@ export const fr_CA: Record<string, string> = {
   'dialog.actionChatUnmute': "Restaurer l'accès au chat avant l'expiration du mode muet",
   'chatMod.muteReason': 'Raison muette :{value}',
   'report.confirmIgnore': 'Confirmer le rejet du rapport',
-  'sharedIps.description':
-    'Adresses IP observées sur plusieurs comptes, classées par nombre de comptes.',
   'sharedIps.onlineDescription':
     'Adresses IP actuellement utilisées par plusieurs comptes en ligne.',
   'sharedIps.onlineOnly': 'Comptes en ligne uniquement',

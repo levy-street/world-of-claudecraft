@@ -13,7 +13,7 @@ import {
   type TalentAllocation,
   talentPointsAtLevel,
 } from '../sim/content/talents';
-import { abilitiesKnownAt, NPCS, resolveDelveShopOffers } from '../sim/data';
+import { abilitiesKnownAt, CLASSES, NPCS, resolveDelveShopOffers } from '../sim/data';
 import { deadTargetSelectable } from '../sim/dead_target';
 import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 import type { Ante, PickAction } from '../sim/lockpick';
@@ -44,6 +44,7 @@ import {
   type DelveShopOfferView,
   type DuelInfo,
   type FriendInfo,
+  type GuildLeaderboardPage,
   type IWorld,
   isOverheadEmoteId,
   type LeaderboardEntry,
@@ -514,6 +515,57 @@ export class Api {
     await this.delete('/api/wallet/link', {});
   }
 
+  // ── Discord link/login + status ────────────────────────────────────────────
+  // Returns the discord.com authorize URL the browser navigates to (login = new
+  // session, link = attach to the current account).
+  async discordStart(mode: 'login' | 'link'): Promise<{ url: string }> {
+    return this.post(`/api/auth/discord/start?mode=${mode}`, {});
+  }
+
+  // First-time Discord login chooser: create a brand-new account for the verified
+  // Discord identity (parked under `linkToken`) and start a session.
+  async discordLoginNew(linkToken: string): Promise<void> {
+    const data = await this.post('/api/auth/discord/login/new', { linkToken });
+    this.token = data.token;
+    this.username = data.username;
+  }
+
+  // First-time Discord login chooser: link the verified Discord identity to an
+  // EXISTING account (username + password, plus a 2FA code if that account has it).
+  // Returns { twoFactorRequired: true } when a code is needed (the caller re-invokes
+  // with `code`/`recoveryCode`), mirroring login(); a wrong code/password throws.
+  async discordLoginLink(
+    linkToken: string,
+    username: string,
+    password: string,
+    code = '',
+    recoveryCode = '',
+  ): Promise<{ twoFactorRequired?: boolean }> {
+    const data = await this.post('/api/auth/discord/login/link', {
+      linkToken,
+      username,
+      password,
+      code,
+      recoveryCode,
+    });
+    if (data.twoFactorRequired && !data.token) return { twoFactorRequired: true };
+    this.token = data.token;
+    this.username = data.username;
+    return {};
+  }
+
+  // Current account's Discord link status + reward points + live guild presence.
+  async discordStatus(): Promise<Record<string, unknown>> {
+    return this.get('/api/discord');
+  }
+
+  // Unlink Discord. A Discord-provisioned account (no real password yet) must send a
+  // `password` so it stays reachable after unlinking; the server 400s with
+  // 'password_required' otherwise. A normal account passes nothing.
+  async unlinkDiscord(password?: string): Promise<void> {
+    await this.delete('/api/discord', password ? { password } : {});
+  }
+
   // ── Shareable player card + referrals ──────────────────────────────────────
   // Publish (or replace) this character's card PNG. The server may return a
   // realm-relative public page path; main.ts normalizes it to an absolute URL
@@ -716,6 +768,7 @@ function blankEntity(id: number): Entity {
     skinCatalog: 'class',
     skin: 0,
     mainhandItemId: null,
+    equippedItems: {},
     guild: '',
   };
 }
@@ -728,6 +781,9 @@ export class ClientWorld implements IWorld {
   cfg: { seed: number; playerClass: PlayerClass };
   entities = new Map<number, Entity>();
   playerId = -1;
+  private ownPlayerId = -1;
+  private readonly ownPlayerClass: PlayerClass;
+  spectating: string | null = null;
   moveInput: MoveInput = emptyMoveInput();
   known: ResolvedAbility[] = [];
   realm = '';
@@ -830,12 +886,15 @@ export class ClientWorld implements IWorld {
   private pendingInputSeqSentAt = new Map<number, number>();
   private ackedInputSeq = 0;
   private inputEchoSamples: number[] = [];
+  private spectateFacingPending = false;
+  private pendingSpectateFacing: number | null = null;
 
   constructor(token: string, characterId: number, cls: PlayerClass, base = '', clientSeed = '') {
     this.characterId = characterId;
     this.token = token;
     this.base = normalizeOrigin(base) || NATIVE_API_ORIGIN;
     this.clientSeed = clientSeed;
+    this.ownPlayerClass = cls;
     this.cfg = { seed: 20061, playerClass: cls };
     // when a realm was picked, connect to that realm's origin; otherwise the
     // page's own host
@@ -891,6 +950,12 @@ export class ClientWorld implements IWorld {
     return samples;
   }
 
+  consumeSpectateFacing(): number | null {
+    const facing = this.pendingSpectateFacing;
+    this.pendingSpectateFacing = null;
+    return facing;
+  }
+
   // -----------------------------------------------------------------------
   // Socket
   // -----------------------------------------------------------------------
@@ -912,7 +977,13 @@ export class ClientWorld implements IWorld {
   }
 
   private sendInput(now = performance.now(), changedOnly = false): boolean {
-    if (!this.connected || this.ws.readyState !== WebSocket.OPEN) return false;
+    if (
+      typeof this.spectating === 'string' ||
+      !this.connected ||
+      this.ws.readyState !== WebSocket.OPEN
+    ) {
+      return false;
+    }
     const sig = this.inputSignature();
     if (changedOnly) {
       if (sig === this.lastInputSig) return false;
@@ -961,6 +1032,7 @@ export class ClientWorld implements IWorld {
   // guarantee rather than a runtime hope: a send of an unknown or dispatch-only
   // token fails `tsc`. The raw escape hatch (devCmd) stays untyped on purpose.
   private cmd(payload: { cmd: ClientCommand } & Record<string, unknown>): void {
+    if (typeof this.spectating === 'string' && payload.cmd !== 'chat') return;
     this.rawCmd(payload);
   }
 
@@ -978,6 +1050,7 @@ export class ClientWorld implements IWorld {
     }
     if (msg.t === 'hello') {
       this.playerId = msg.pid;
+      this.ownPlayerId = msg.pid;
       this.cfg.seed = msg.seed;
       if (typeof msg.realm === 'string') this.realm = msg.realm;
       if (Array.isArray(msg.softWords)) {
@@ -987,6 +1060,20 @@ export class ClientWorld implements IWorld {
         this.profanityDirty = true;
       }
       this.connected = true;
+      return;
+    }
+    if (msg.t === 'spectate') {
+      this.spectating = typeof msg.name === 'string' ? msg.name : null;
+      this.spectateFacingPending = true;
+      this.pendingSpectateFacing = null;
+      this.pendingInputSeqSentAt.clear();
+      this.inputEchoSamples = [];
+      if (typeof this.spectating !== 'string') {
+        this.playerId = this.ownPlayerId;
+        this.cfg.playerClass = this.ownPlayerClass;
+      }
+      Object.assign(this.moveInput, emptyMoveInput());
+      this.mouselookFacing = null;
       return;
     }
     if (msg.t === 'censor') {
@@ -1073,6 +1160,9 @@ export class ClientWorld implements IWorld {
 
   private applySnapshot(snap: any): void {
     const now = performance.now();
+    if (typeof this.spectating === 'string' && typeof snap.self?.id === 'number') {
+      this.playerId = snap.self.id;
+    }
     // the interpolation alpha the render loop reached on its last frame
     // (same formula and caps as main.ts); used below to re-anchor the new
     // interpolation segment at the pose currently on screen
@@ -1089,6 +1179,7 @@ export class ClientWorld implements IWorld {
     const seen = new Set<number>();
     const prevSelf = this.entities.get(this.playerId);
     const prevSelfFacing = prevSelf?.facing;
+    const prevSelfDead = prevSelf?.dead ?? false;
 
     const applyWire = (w: any): Entity | null => {
       let e = this.entities.get(w.id);
@@ -1112,9 +1203,15 @@ export class ClientWorld implements IWorld {
         e.level = w.lv;
         e.skin = w.sk ?? 0;
         e.mainhandItemId = w.mh ?? null; // equipped mainhand → held weapon model (render-only)
+        e.equippedItems = w.eq ?? {}; // full worn set (render-only), for the inspect window
         e.skinCatalog = w.cat === 'mech' ? 'mech' : 'class';
         e.holderTier = w.ht ?? 0; // $WOC holder-tier flair (cosmetic, server-set)
         e.holderBalance = typeof w.hb === 'number' ? w.hb : undefined; // exact $WOC, for inspect
+        e.discordTier = w.dt ?? 0; // Discord status-tier flair (cosmetic, server-set)
+        e.discordAvatar = typeof w.dav === 'string' ? w.dav : undefined; // Discord PFP (linked)
+        e.discordName = typeof w.dnm === 'string' ? w.dnm : undefined; // Discord handle/nickname
+        e.discordJoined = typeof w.dj === 'number' ? w.dj : undefined; // Discord join epoch ms
+        e.discordRole = typeof w.dr === 'string' ? w.dr : undefined; // top staff/special role key
         e.scale = w.sc ?? 1;
         e.color = w.c ?? 0xffffff;
         e.dungeonId = w.dgn ?? null;
@@ -1237,6 +1334,15 @@ export class ClientWorld implements IWorld {
     const s = snap.self;
     const e = s ? applyWire(s) : null;
     if (s && e) {
+      if (typeof this.spectating === 'string' && e.kind === 'player' && e.templateId in CLASSES) {
+        this.cfg.playerClass = e.templateId as PlayerClass;
+      }
+      if (this.spectateFacingPending) {
+        this.pendingSpectateFacing = e.facing;
+        this.spectateFacingPending = false;
+      } else if (typeof this.spectating === 'string' && prevSelf && prevSelfDead && !e.dead) {
+        this.pendingSpectateFacing = e.facing;
+      }
       seen.add(s.id);
       if (typeof s.ack === 'number' && s.ack > this.ackedInputSeq) {
         for (let seq = this.ackedInputSeq + 1; seq <= s.ack; seq++) {
@@ -1367,6 +1473,14 @@ export class ClientWorld implements IWorld {
     const missingSince = this.missingSince;
     for (const [id, e] of this.entities) {
       if (id === this.playerId) continue;
+      // Keep the moderator's last own-self record while a different player is
+      // presented as self. The spectate-clear frame can then restore the original
+      // identity immediately instead of exposing a blank entity before the next
+      // server snapshot arrives.
+      if (typeof this.spectating === 'string' && id === this.ownPlayerId) {
+        missingSince.delete(id);
+        continue;
+      }
       if (seen.has(id)) {
         missingSince.delete(id);
         continue;
@@ -1896,6 +2010,37 @@ export class ClientWorld implements IWorld {
     try {
       const res = await fetch(
         apiUrl(`/api/leaderboard?metric=lifetimeXp&page=${page}&pageSize=${pageSize}`, this.base),
+      );
+      if (!res.ok) return empty;
+      const data = await res.json();
+      return {
+        leaders: data.leaders ?? [],
+        page: data.page ?? page,
+        pageCount: data.pageCount ?? 1,
+        total: data.total ?? data.leaders?.length ?? 0,
+        pageSize: data.pageSize ?? pageSize,
+      };
+    } catch {
+      return empty;
+    }
+  }
+  // Guild high-score board (REST GET, no wire command): ?board=guilds ranks
+  // guilds by summed member lifetime XP. Realm-scoped (default), paged exactly
+  // like the player board above.
+  async guildLeaderboard(
+    page = 0,
+    pageSize = LEADERBOARD_PAGE_SIZE,
+  ): Promise<GuildLeaderboardPage> {
+    const empty: GuildLeaderboardPage = {
+      leaders: [],
+      page: 0,
+      pageCount: 1,
+      total: 0,
+      pageSize,
+    };
+    try {
+      const res = await fetch(
+        apiUrl(`/api/leaderboard?board=guilds&page=${page}&pageSize=${pageSize}`, this.base),
       );
       if (!res.ok) return empty;
       const data = await res.json();

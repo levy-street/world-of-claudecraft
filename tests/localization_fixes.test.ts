@@ -500,6 +500,7 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
     'You have prestiged! Prestige Rank 2.',
     'You dismiss Forest Wolf.',
     'Forest Wolf is now your loyal companion.',
+    'Rex could not be restored and has been lost.',
     'Forest Wolf dies.',
     'Forest Wolf becomes enraged!',
     'Forest Wolf calls for aid!',

@@ -80,6 +80,7 @@ export interface LivePlayer {
   x: number;
   z: number;
   zone: string;
+  location?: LivePlayerLocation;
   sessionSeconds: number;
   lastSaveSecondsAgo: number;
   moveSpeedMultiplier: number;
@@ -93,6 +94,40 @@ export interface LivePlayer {
     remaining: number;
     duration: number;
   }[];
+}
+
+export interface SuspiciousEvidence {
+  kind: string;
+  weight: number;
+  detail: string;
+  expiresAt: number;
+}
+
+export interface SuspiciousPlayer {
+  ref: {
+    accountId: number;
+    characterId: number;
+    name: string;
+    ip: string;
+  };
+  score: number;
+  evidence: SuspiciousEvidence[];
+}
+
+export interface SuspiciousPlayersData {
+  players: SuspiciousPlayer[];
+}
+
+export interface LivePlayerLocation {
+  kind: 'overworld' | 'dungeon' | 'delve';
+  zoneId: string | null;
+  zone: string;
+  instanceId: string | null;
+  instance: string | null;
+  instanceSlot: number | null;
+  poiIndex: number | null;
+  poi: string | null;
+  poiDistance: number | null;
 }
 
 export interface Activity {

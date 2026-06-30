@@ -708,7 +708,7 @@ body.guide-has-sidebar .guide-layout {
 }
 .guide-class-card {
   display: grid;
-  grid-template-columns: 64px 1fr;
+  grid-template-columns: 88px 1fr;
   gap: var(--g-xs) var(--g-md);
   align-items: center;
   padding: var(--g-md);
@@ -727,6 +727,25 @@ body.guide-has-sidebar .guide-layout {
   width: 64px;
   height: 64px;
   align-self: start;
+}
+/* Card image: the pre-rendered class figure, framed like the bestiary creature thumb. */
+.guide-class-card-portrait {
+  grid-row: 1 / span 3;
+  align-self: start;
+  width: 88px;
+  height: 88px;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(120% 85% at 50% 10%, #1b1b28 0%, transparent 72%), var(--g-bg-2);
+  border: 1px solid var(--g-border-soft);
+  border-radius: var(--g-radius);
+  overflow: hidden;
+}
+.guide-class-card-still {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 4px;
 }
 .guide-class-card-name {
   font-family: var(--g-font-display);
@@ -868,6 +887,23 @@ body.guide-has-sidebar .guide-layout {
   background: var(--g-bg-2);
   border: 1px solid var(--g-border-soft);
   border-radius: var(--g-radius);
+}
+.guide-creature-thumb {
+  flex: none;
+  width: 88px;
+  height: 88px;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(120% 85% at 50% 10%, #1b1b28 0%, transparent 72%), var(--g-bg-2);
+  border: 1px solid var(--g-border-soft);
+  border-radius: var(--g-radius);
+  overflow: hidden;
+}
+.guide-creature-still {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 4px;
 }
 .guide-creature-info {
   display: flex;
@@ -2167,6 +2203,12 @@ a.guide-poi:hover {
   max-height: 60%;
   opacity: 0.92;
 }
+/* A pre-rendered still IS the subject (not a small crest), so let it fill the stage. */
+.guide-viewer-poster-still {
+  max-width: 88%;
+  max-height: 88%;
+  opacity: 1;
+}
 .guide-viewer-load {
   position: absolute;
   inset-block-end: var(--g-md);
@@ -2262,59 +2304,6 @@ a.guide-poi:hover {
   display: none;
 }
 
-/* Compact thumb variant: a small square turntable cell for dense lists (bestiary). */
-.guide-viewer-thumb {
-  margin: 0;
-  flex: none;
-}
-.guide-viewer-thumb .guide-viewer-stage {
-  width: 88px;
-  aspect-ratio: 1 / 1;
-  border-radius: var(--g-radius);
-}
-.guide-viewer-thumb .guide-viewer-load {
-  inset: 0;
-  inset-inline-start: 0;
-  transform: none;
-  width: 100%;
-  min-height: 100%;
-  padding: 0;
-  gap: 0;
-  background: transparent;
-  border: 0;
-  box-shadow: none;
-  color: var(--g-gold);
-}
-.guide-viewer-thumb .guide-viewer-load:hover {
-  filter: none;
-  background: var(--g-wash-gold);
-}
-.guide-viewer-thumb .guide-viewer-load-icon {
-  width: 16px;
-  height: 16px;
-  border-color: var(--g-gold);
-}
-.guide-viewer-thumb .guide-viewer-load-text {
-  display: none;
-}
-.guide-viewer-thumb .guide-viewer-status {
-  font-size: var(--g-text-2xs);
-  inset-block-end: var(--g-2xs);
-  padding: var(--g-2xs) var(--g-xs);
-}
-.guide-viewer-thumb .guide-viewer-status-error {
-  display: none;
-} /* too small for prose; poster returns on error */
-.guide-viewer-thumb[data-state="error"] .guide-viewer-status {
-  display: none;
-}
-.guide-viewer-thumb[data-state="error"] .guide-viewer-load {
-  display: inline-flex;
-}
-.guide-viewer-thumb .guide-viewer-hint {
-  display: none !important;
-}
-
 .guide-pet .guide-viewer {
   margin: 0 0 var(--g-sm);
 }
@@ -2389,6 +2378,12 @@ a.guide-poi:hover {
 }
 .guide-gallery-stage {
   aspect-ratio: 1 / 1;
+}
+/* The stage poster (a baked still) sits ABOVE the absolutely-positioned live canvas while a
+   model loads and as a WebGL fallback, so it covers the previous model during a switch; it is
+   hidden once the turntable is up. Grid items honor z-index without position. */
+.guide-gallery-stage .guide-viewer-poster {
+  z-index: 1;
 }
 .guide-gallery-fallback {
   margin: 0;

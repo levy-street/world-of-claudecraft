@@ -151,6 +151,9 @@ export const nl_NL: EnTranslations = {
     }
   },
   "hudChrome": {
+    "spectate": {
+      "banner": "Toeschouwer bij {name}"
+    },
     "emotes": {
       "wave": "Zwaaien",
       "laugh": "LOL",
@@ -267,7 +270,15 @@ export const nl_NL: EnTranslations = {
       "targetAria": "Spreukbalk van Doelwit"
     },
     "leaderboard": {
-      "close": "Sluiten"
+      "close": "Sluiten",
+      "tabsLabel": "Topscorelijsten",
+      "tabPlayers": "Spelers",
+      "tabGuilds": "Gildes",
+      "guildName": "Gilde",
+      "members": "Leden",
+      "topLevel": "Top",
+      "guildXp": "Totaal XP",
+      "guildEmpty": "Nog geen gerangschikte gildes."
     },
     "raidLockout": {
       "title": "Raidvergrendelingen",
@@ -721,6 +732,149 @@ export const nl_NL: EnTranslations = {
     "nameplate": {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
+    },
+    "discord": {
+      "title": "Discord",
+      "panelTitle": "World of ClaudeCraft",
+      "open": "Discord",
+      "close": "Sluiten",
+      "keybind": "Discord-paneel",
+      "disabled": "Discord-integratie is momenteel niet beschikbaar.",
+      "tiers": {
+        "none": "Ongerangschikt",
+        "initiate": "Ingewijde",
+        "squire": "Schildknaap",
+        "footman": "Voetknecht",
+        "knight": "Ridder",
+        "champion": "Kampioen",
+        "warlord": "Krijgsheer",
+        "legend": "Legende",
+        "mythic": "Mythisch"
+      },
+      "loginCta": "Doorgaan met Discord",
+      "orEmail": "of gebruik e-mail",
+      "cta": {
+        "title": "Koppel je Discord om punten te verdienen en hogerop te komen",
+        "stats": "{online} online · {total} leden in de server",
+        "statsLoading": "Word lid van de gemeenschap en verdien beloningen",
+        "button": "Koppel in één klik",
+        "dismiss": "Negeren"
+      },
+      "link": {
+        "cta": "Discord koppelen",
+        "relink": "Discord opnieuw koppelen",
+        "connecting": "Discord openen...",
+        "benefits": "Koppel je Discord om punten te verdienen door spelen en gemeenschapsactiviteit, en klim door de statusrangen.",
+        "error": "Kon Discord niet koppelen. Probeer het opnieuw.",
+        "success": "Discord gekoppeld."
+      },
+      "choice": {
+        "title": "Doorgaan met Discord",
+        "intro": "Maak een nieuw account aan, of koppel je Discord aan een account dat je al hebt.",
+        "greeting": "Welkom, {name}!",
+        "createCta": "Nieuw account aanmaken",
+        "haveAccount": "Heb je al een account?",
+        "linkCta": "Bestaand account koppelen",
+        "linkSubmit": "Account koppelen",
+        "error": "Kon niet doorgaan. Probeer het opnieuw.",
+        "expired": "Die Discord-inlogsessie is verlopen. Log opnieuw in met Discord."
+      },
+      "keep": {
+        "title": "Stel een wachtwoord in",
+        "body": "Je account logt in met Discord. Stel een wachtwoord in zodat je na het ontkoppelen nog steeds met je gebruikersnaam kunt inloggen.",
+        "usernameLabel": "Je gebruikersnaam",
+        "confirmLabel": "Bevestig wachtwoord",
+        "submit": "Wachtwoord instellen en ontkoppelen",
+        "cancel": "Annuleren",
+        "mismatch": "Wachtwoorden komen niet overeen.",
+        "tooShort": "Wachtwoord moet minstens 6 tekens lang zijn."
+      },
+      "linkedAs": "Gekoppeld als {name}",
+      "linkedTitle": "Discord: {name}",
+      "viewCharacter": "Bekijk {name}",
+      "viewProfile": "Open het openbare profiel van dit personage",
+      "unlink": "Ontkoppelen",
+      "visit": "Bezoek Discord",
+      "unlinkConfirm": "Je Discord-account loskoppelen van dit spelaccount?",
+      "statusLabel": "Status",
+      "rank": "Rang",
+      "points": "Punten",
+      "lifetime": "Aller tijden",
+      "toNext": "{points} tot volgende rang",
+      "maxRank": "Hoogste rang bereikt",
+      "tiersTitle": "Statusrangen",
+      "tierLocked": "Vergrendeld",
+      "tierCurrent": "Huidig",
+      "earnTitle": "Hoe je punten verdient",
+      "earnBody": "Verdien punten door speeltijd in het spel en door actief te blijven in de Discord. Punten verhogen je statusrang.",
+      "memberSince": "Lid sinds",
+      "memberSinceDays": "{days}d in de Discord",
+      "roleTag": {
+        "levyst": "Levy St",
+        "devs": "Dev",
+        "mods": "Mod",
+        "artists": "Artiest"
+      },
+      "guildMember": "Geverifieerd lid",
+      "notMember": "Nog niet in de server",
+      "joinCta": "Word lid van de Discord",
+      "online": "{count} online",
+      "community": "Gemeenschap",
+      "rewards": "Beloningen",
+      "voice": {
+        "title": "Spraak",
+        "channel": "In {channel}",
+        "empty": "Er is nu niemand in spraak.",
+        "speaking": "Aan het praten",
+        "muted": "Gedempt",
+        "join": "Deelnemen aan spraak",
+        "connect": "Verbinden met spraakkanaal"
+      },
+      "swag": {
+        "title": "Swag",
+        "claim": "Claimen",
+        "claimed": "Geclaimd",
+        "locked": "Vergrendeld",
+        "free": "Gratis",
+        "cost": "{points} ptn",
+        "needTier": "Bereik een hogere rang om dit te claimen.",
+        "needPoints": "Niet genoeg punten.",
+        "claimError": "Kon die beloning niet claimen. Probeer het opnieuw.",
+        "claimedToast": "Geclaimd: {name}",
+        "titleDiscordian": "Titel: Discordiaan",
+        "titleSquire": "Titel: Schildknaap van het Rijk",
+        "chromaBlurple": "Blurple Mech Chroma",
+        "titleChampion": "Titel: Kampioen van Claudemoon",
+        "swagStickers": "Stickerpakket (verzonden)",
+        "swagTee": "T-shirt (verzonden)"
+      },
+      "relay": {
+        "tooFast": "Je plaatst te snel. Wacht even en probeer het opnieuw.",
+        "lfg": {
+          "label": "Op zoek naar groep",
+          "hint": "Vind spelers voor een kerker of quest"
+        },
+        "wts": {
+          "label": "Te koop aangeboden",
+          "hint": "Adverteer een voorwerp of dienst te koop"
+        },
+        "wtb": {
+          "label": "Te koop gevraagd",
+          "hint": "Vraag naar een voorwerp dat je wilt kopen"
+        },
+        "recruit": {
+          "label": "Gilde werven",
+          "hint": "Werf spelers voor je gilde"
+        },
+        "event": {
+          "label": "Evenement / Raid",
+          "hint": "Kondig een raid, meetup of evenement aan"
+        },
+        "help": {
+          "label": "Hulp nodig",
+          "hint": "Vraag de gemeenschap om hulp"
+        }
+      }
     }
   },
   "guide": {
@@ -745,6 +899,7 @@ export const nl_NL: EnTranslations = {
       "world": "Wereld",
       "quests": "Quests",
       "dungeons": "Kerkers & Raids",
+      "delves": "Delves",
       "reference": "Naslag",
       "controls": "Besturing",
       "combat": "Gevecht",
@@ -799,6 +954,7 @@ export const nl_NL: EnTranslations = {
       "typeZone": "Gebied",
       "typeCreature": "Wezens",
       "typeDungeon": "Dungeon",
+      "typeDelve": "Delve",
       "typeTerm": "Term"
     },
     "home": {
@@ -886,7 +1042,7 @@ export const nl_NL: EnTranslations = {
       "questsTitle": "Quests",
       "questsBody": "Accepteer quests van mensen met een markering boven hun hoofd, voltooi het doel en lever ze in voor ervaring, munten en uitrusting. De tracker op je scherm houdt je doelen in beeld.",
       "deathTitle": "De dood is niet het einde",
-      "deathBody": "Als je valt, laat je je geest los op de dichtstbijzijnde begraafplaats en ren je terug naar je lichaam. Er gaat geen ervaring verloren.",
+      "deathBody": "Als je valt, laat je je geest los en herleef je bij de dichtstbijzijnde begraafplaats, terug op volle gezondheid, en loop je vervolgens terug naar waar je was. Er gaat geen ervaring verloren.",
       "groupingTitle": "Samen spelen",
       "groupingBody": "Nodig anderen uit voor een groep om questvoortgang te delen en kerkers aan te pakken. Het grootste deel van de wereld is solo te spelen, dus groeperen is een keuze, geen verplichting.",
       "onlineTitle": "Online of offline",
@@ -900,21 +1056,26 @@ export const nl_NL: EnTranslations = {
       "actionHeader": "Actie",
       "groupMovement": "Beweging",
       "groupCombat": "Doelwit kiezen en gevecht",
-      "groupInterface": "Vensters",
+      "groupInterface": "Interface",
       "groupCamera": "Camera",
       "talents": "Talenten",
       "arena": "Arena",
       "leaderboard": "Ranglijst",
-      "abilities": "Vaardigheden gebruiken",
+      "abilities": "Actiebalkvaardigheden gebruiken (de cijferrij; een tweede balk staat op het numerieke toetsenblok)",
+      "targetFriendly": "Dichtstbijzijnde bondgenoot aanwijzen",
+      "cycleFriendly": "Door bondgenoten bladeren",
+      "gameMenu": "Spelmenu en opties openen",
       "mobileHeading": "Op mobiel",
-      "mobileBody": "Aanraakbediening verschijnt automatisch op telefoons en tablets: een bewegingsstick aan de linkerkant, sleep ergens aan de rechterkant om rond te kijken, en knoppen op het scherm voor je vaardigheden en menu's."
+      "mobileBody": "Aanraakbediening verschijnt automatisch op telefoons en tablets: een bewegingsstick aan de linkerkant, sleep ergens aan de rechterkant om rond te kijken, en knoppen op het scherm voor je vaardigheden en menu's.",
+      "controllerHeading": "Op een controller",
+      "controllerBody": "Gamepads werken ook, en controllerondersteuning staat standaard aan. De linkerstick beweegt, de rechterstick richt de camera, en de gezichts- en schouderknoppen dekken je vaardigheden, springen en interageren. Open een venster om een aanwijzer op het scherm op te roepen voor menu's. Je kunt de knoppen opnieuw toewijzen en de stickdeadzone, camerasnelheid, trilling en omgekeerd kijken aanpassen bij de controllerinstellingen in de opties."
     },
     "combat": {
       "intro": "Gevechten volgen vertrouwde klassieke MMO-regels. Je hoeft er niets van te bestuderen om goed te spelen, dit is gewoon de vorm van hoe gevechten werken.",
       "hitTitle": "Niet elke klap komt aan",
-      "hitBody": "Aanvallen kunnen missen of ontweken, gepareerd en geblokkeerd worden, en die van de vijand ook. Vechten dicht bij je eigen niveau en je uitrusting actueel houden is wat je klappen laat aankomen.",
-      "mitigationTitle": "Pantser en uitrusting houden je staande",
-      "mitigationBody": "Pantser verzacht fysieke klappen en de juiste uitrusting stompt magie af, dus upgrades zijn je belangrijkste bron van staande blijven. Zwaardere pantserklassen schudden meer af, maar niets maakt je onaantastbaar.",
+      "hitBody": "Aanvallen kunnen missen of ontweken worden, en die van de vijand ook, terwijl spreuken volledig weerstaan kunnen worden. Vechten dicht bij je eigen niveau is wat je klappen laat aankomen; hoe groter het niveauverschil, hoe vaker je in de lucht slaat.",
+      "mitigationTitle": "Pantser en gezondheid houden je staande",
+      "mitigationBody": "Pantser verzacht fysieke klappen, dus beter pantser is je belangrijkste bron van standhouden in melee. Magie is een ander verhaal: spreuken doorsta je met een diepere gezondheidsvoorraad en de kans om er een volledig te weerstaan, niet met pantser. Zwaardere pantserklassen schudden meer af, maar niets maakt je onaantastbaar.",
       "resourcesTitle": "Elke klasse heeft zijn eigen ritme",
       "resourcesBody": "Krijgers bouwen Rage op in het strijdgewoel, schurken besteden Energie die gestaag terugkeert, en spreukenwevers beheren een poel van Mana. Je hulpbron leren is de helft van je klasse goed spelen.",
       "growTitle": "Je wordt sterker met elk niveau",
@@ -923,7 +1084,7 @@ export const nl_NL: EnTranslations = {
       "effectsBody": "Veel vaardigheden brengen een effect aan dat blijft hangen. Behulpzame (buffs) verhogen je statistieken, beschermen je, of helen je beetje bij beetje; schadelijke (debuffs) tappen je gezondheid af met schade na verloop van tijd of verzwakken je. Let op de kleine icoontjes bij je actiebalk om te zien wat er op je ligt en hoe lang het duurt.",
       "ccBody": "Crowd control is een speciaal soort debuff die beperkt wat een doelwit kan doen: verdovingen, wortels en vertragingen, stiltes die het spreuken stilleggen, ontwapeningen, angsten, en gedaanteverwisseling die een vijand even ongevaarlijk maakt. Sommige hiervan, zoals wortels, angsten en gedaanteverwisseling, verliezen hun greep wanneer ze te snel opnieuw worden toegepast, zodat ze niet eindeloos kunnen worden aaneengeregen.",
       "deathTitle": "Wanneer je valt",
-      "deathBody": "Als je gezondheid nul bereikt, ga je neer. Je herleeft na een korte wachttijd en gaat verder waar je gebleven was, dus een dood kost je een beetje tijd, niet je voortgang. Ga tussen gevechten zitten om te eten en te drinken zodat je het volgende op volle kracht begint."
+      "deathBody": "Als je gezondheid nul bereikt, ga je neer. Laat je geest los om bij de dichtstbijzijnde begraafplaats te herleven op volle gezondheid, en loop dan terug, dus een dood kost je een beetje tijd, niet je voortgang. Ga tussen gevechten zitten om te eten en te drinken zodat je het volgende op volle kracht begint."
     },
     "glossary": {
       "intro": "Een snelle naslag voor de termen die in deze gids en in de chat worden gebruikt.",
@@ -934,7 +1095,7 @@ export const nl_NL: EnTranslations = {
       "gcdTerm": "Globale afkoeltijd",
       "gcdDef": "De korte, gedeelde pauze na het gebruik van de meeste vaardigheden, zodat je niet alles tegelijk kunt afvuren.",
       "dpsTerm": "DPS",
-      "dpsDef": "Schade per seconde, een ruwe maat voor hoe snel iets schade aanricht.",
+      "dpsDef": "Schade per seconde, een ruwe maat voor hoe snel iets schade aanricht. Ook gebruikt voor de schade aanrichtende rol zelf, zoals in een tank, een genezer en drie DPS.",
       "buffTerm": "Buff",
       "buffDef": "Een gunstig effect op jou of een bondgenoot, zoals een zegen die een tijdlang een statistiek verhoogt.",
       "debuffTerm": "Debuff",
@@ -960,7 +1121,13 @@ export const nl_NL: EnTranslations = {
       "pullTerm": "Pull",
       "pullDef": "Een vijand of groep in een gevecht trekken, meestal bewust en steeds een groepje tegelijk.",
       "instanceTerm": "Instantie",
-      "instanceDef": "Een eigen kopie van een kerker of raid, speciaal voor jouw groep gemaakt."
+      "instanceDef": "Een eigen kopie van een kerker of raid, speciaal voor jouw groep gemaakt.",
+      "raidTerm": "Raid",
+      "raidDef": "Een grotere groep, hier tot tien spelers, gevormd voor de zwaarste eindspelbeproeving; een groep verandert er in een zodra hij vol is.",
+      "delveTerm": "Delve",
+      "delveDef": "Een korte, herspeelbare geïnstantieerde afdaling voor één of twee spelers, gespeeld vanaf het bord van een bewaarder met een metgezel aan je zij.",
+      "augmentTerm": "Augment",
+      "augmentDef": "Een tijdelijke versterking die je tijdens een twee-tegen-twee Fiesta-arenamatch kiest en die je kit alleen voor die match hervormt."
     },
     "faqPage": {
       "intro": "De vragen die nieuwe spelers het vaakst stellen.",
@@ -973,7 +1140,7 @@ export const nl_NL: EnTranslations = {
       "q4": "Kan ik offline of solo spelen?",
       "a4": "Ja. Er is een directe offline modus voor één speler, en de online wereld is volledig solo speelbaar, behalve kerkers en de raid.",
       "q5": "Hoeveel klassen zijn er?",
-      "a5": "Negen, die de klassieke rollen van tank, genezer en damage dekken, elk met hun eigen bron en kenmerkende vaardigheden.",
+      "a5": "Negen, die de klassieke rollen van tank, genezer en damage dekken, elk met een bronsysteem (woede, mana of energie) en hun eigen kenmerkende vaardigheden.",
       "q6": "Wat is de niveaulimiet?",
       "a6": "Niveau {cap}, bereikt over drie verbonden gebieden vol quests, kerkers en verkenning.",
       "q7": "Wordt mijn personage opgeslagen?",
@@ -1136,7 +1303,7 @@ export const nl_NL: EnTranslations = {
       },
       "spider": {
         "name": "Spinnen",
-        "desc": "Webspinners en giftige loerders die nestelen op donkere, verwarde plekken."
+        "desc": "Webspinners en giftige loerders die nestelen op donkere, verwarde plekken. Jagers kunnen ze temmen, net als beesten."
       },
       "murloc": {
         "name": "Murlocs",
@@ -1152,7 +1319,7 @@ export const nl_NL: EnTranslations = {
       },
       "troll": {
         "name": "Trollen",
-        "desc": "Logge, snelhelende beesten die schuilen in het moeras en het hoge land."
+        "desc": "Logge woestelingen die huizen in de moerassen van het veen."
       },
       "ogre": {
         "name": "Ogres",
@@ -1165,6 +1332,10 @@ export const nl_NL: EnTranslations = {
       "elemental": {
         "name": "Elementalen",
         "desc": "Levende storm en steen, gebonden aan de wilde plekken waar de elementen sterk stromen."
+      },
+      "dragonkin": {
+        "name": "Drakenvolk",
+        "desc": "Geschubde, slangachtige wezens uit de oude diepten. Zeldzaam, trots en veel sterker dan ze eruitzien."
       }
     },
     "worldPage": {
@@ -1184,11 +1355,11 @@ export const nl_NL: EnTranslations = {
       "marshGreeter": "Warden Fenwick, Fenbridge",
       "peaksGreeting": "Tweehonderd jaar heeft deze muur standgehouden. Hij breekt niet onder mijn wacht, maar hij kreunt.",
       "peaksGreeter": "Captain Thessaly, Highwatch",
-      "valePlaceNotes": "Eastbrook is je eerste thuisbasis. Wolf Run en Boar Meadow zijn rustig jachtgebied; Mirror Lake is stil water om te vissen; het Webwood en de Copper Dig verbergen spinnen en ertsbeluste delvers; een Bandit Camp en de Fallen Chapel bieden ruwer werk; Brightwood Glade is een kalm natuurbosje in het noorden.",
+      "valePlaceNotes": "Eastbrook is je eerste thuisbasis. Wolf Run en Boar Meadow zijn rustig jachtgebied; Mirror Lake is stil water om te vissen; het Webwood en de Copper Dig verbergen spinnen en ertsbeluste delvers; een Bandit Camp en de Fallen Chapel bieden ruwer werk; Reliquary Hill leidt naar de Collapsed Reliquary, de eerste delve van het rijk; en Brightwood Glade is een kalm, zonovergoten bosje in het noorden.",
       "marshPlaceNotes": "Fenbridge bewaakt de enige droge weg. Het Prowler Reeds en de Deepfen Shallows wemelen van moerasbeesten en murlocs; het Widow Thicket zit dik onder het web; de Drowned Chapel en de Troll Mounds bergen oudere gevaren; het Gravecaller Encampment is de ingegraven sekte, en het Verzonken Bastion is het instantiehart van het moeras.",
       "peaksPlaceNotes": "Highwatch houdt de muur. Stalker Ridge en de Deeprock Burrows behoren tot bergkatten en kobolds; de Ogre Foothills en Drogmar's War-Camp tot ingehuurde bruten; Stormcrag knettert van de elementalen en de Glimmermere gloeit eronder; de Wyrmcult Tents en Revenant Fields omsluiten het hoge terrein van de sekte, met het Grafwurm-Heiligdom op de top.",
       "gladeTitle": "Een rustig hoekje: Brightwood Glade",
-      "gladeBody": "Niet elk verhaal in het Dal gaat over de doden. In het noorden houdt een zonovergoten bosje genaamd Brightwood Glade zijn eigen, zachtere ritme aan, met stille paden, grazende herten en behoedzame beesten onder het loof. Het is een zacht tegenwicht voor het spoor dat je volgt, en de moeite waard als de weg je ruimte geeft om te dwalen."
+      "gladeBody": "Niet elk verhaal in the Vale gaat over de doden. In het noorden houdt een zonovergoten bosje genaamd Brightwood Glade zijn eigen, zachtere ritme aan, met enkel stille paden en gevlekt licht onder het loof. Het is een zacht tegenwicht voor het spoor dat je volgt, en de moeite waard als de weg je ruimte geeft om te dwalen."
     },
     "questsPage": {
       "heading": "Quests",
@@ -1196,14 +1367,14 @@ export const nl_NL: EnTranslations = {
       "acceptTitle": "Vinden en aannemen",
       "acceptBody": "Mensen met een markering boven hun hoofd hebben werk voor je. Praat met hen om een quest aan te nemen. Je allereerste is Wolven aan de Deur, van Maarschalk Redbrook in Oostbeekdal.",
       "objectivesTitle": "Doelen",
-      "objectivesBody": "Versla bepaalde vijanden, verzamel voorwerpen of gebruik iets in de wereld. De tracker op je scherm telt je voortgang terwijl je bezig bent.",
+      "objectivesBody": "Versla bepaalde vijanden, verzamel voorwerpen of gebruik iets in de wereld. De tracker op je scherm telt je voortgang terwijl je bezig bent. Als je van gedachten verandert, kun je een quest uit je questlogboek laten vallen en hem later weer oppakken bij de gever.",
       "turninTitle": "Inleveren",
-      "turninBody": "Keer terug naar de questgever, de kaart wijst je waar, voor ervaring, geld en vaak een stuk uitrusting dat bij je klasse past.",
+      "turninBody": "Breng een voltooide quest naar zijn inlevermarkering, de kaart wijst je waar, voor ervaring, geld en vaak een stuk uitrusting gekozen om bij je klasse te passen. Dat is meestal degene die hem aan je gaf, hoewel sommige quests je doorsturen naar iemand anders.",
       "partyTitle": "Questen in een groep",
-      "partyBody": "Groepsleden in de buurt delen kill- en doelkrediet, dus samen questen is sneller, nooit langzamer.",
+      "partyBody": "Groepsleden in de buurt delen kill- en doelkrediet, dus samen questen is sneller, nooit langzamer. Je kunt ook een quest met je groep delen: plaats hem in de chat als een klikbare link met het commando /share, en elk lid in de buurt dat in aanmerking komt, kan dezelfde quest met één klik oppakken.",
       "storyTitle": "Een rode draad loopt overal doorheen",
       "storyBody": "Vanaf je eerste klusjes in Oostbeekdal is er iets mis met de doden. Een cultus is aan het werk, en het spoor leidt naar het noorden door elk gebied. Volg het om te ontdekken wie erachter zit.",
-      "soloNote": "Het hoofdverhaal is volledig solo te doen; alleen de laatste hoofdstukken vragen om een groep.",
+      "soloNote": "Het hoofdverhaal is solo te doen tot aan de finale van elk hoofdstuk, die een dungeon voor vijf spelers is.",
       "typesTitle": "De soorten quests die je tegenkomt",
       "typesBody": "De meeste quests hebben een van een paar vertrouwde vormen. De tracker op je scherm legt precies uit wat elke quest van je vraagt, zodat je nooit hoeft te gissen.",
       "typeSlayTitle": "Verslaan",
@@ -1212,10 +1383,10 @@ export const nl_NL: EnTranslations = {
       "typeGatherBody": "Verzamel voorwerpen uit de wereld of uit wat vijanden laten vallen: kruiden, erts, verloren brieven, de grimmige reagentia van een cultus. Sommige stukken vallen alleen van een bepaalde vijand, dus de jacht en de buit horen bij elkaar.",
       "typeInteractTitle": "Interageren",
       "typeInteractBody": "Gebruik, reinig of lees iets dat vaststaat in de wereld: een geschonden graf, een waarschuwing gekerfd in een kustrots, een verzegelde cryptedeur. Loop naar de markering toe en handel ernaar.",
-      "typeMusterTitle": "Escorteren en verzamelen",
-      "typeMusterBody": "Breng een vriendelijk gezicht veilig van de ene plek naar de andere, of verzamel de verdedigers van een stad voor een opmars naar het noorden. Deze houden je in beweging met de mensen wiens verhaal je beleeft.",
+      "typeMusterTitle": "Verzamel de verdediging",
+      "typeMusterBody": "Bij sommige quests moet je een stad mobiliseren voor een opmars naar het noorden: dun de dreiging bij de poorten uit en verzamel wat de verdedigers nodig hebben. Dit zijn versla- en verzameldoelen in dienst van de mensen wiens verhaal je beleeft, en ze houden je met hen in beweging.",
       "typeGroupTitle": "Groepsfinales",
-      "typeGroupBody": "Elk hoofdstuk van het hoofdverhaal eindigt bij een dungeondeur. De aanloop is solo te doen, maar de genadeslag tegen de schurk van een hoofdstuk is bedoeld voor een groep van vijf (en de allerlaatste voor tien).",
+      "typeGroupBody": "Elk hoofdstuk van het hoofdverhaal eindigt bij een dungeondeur. De aanloop is solo te doen, maar de genadeslag tegen de schurk van een hoofdstuk is bedoeld voor een groep van vijf.",
       "sagaTitle": "Volg het spoor naar het noorden",
       "sagaBody": "Het hoofdverhaal is één lange jacht. Een dodencultus is bezig met de graven van het rijk, en elk hoofdstuk dat je afsluit wijst één gebied verder langs de weg. Je bestrijdt nooit het hele complot ineens; je trekt aan één draad en die leidt naar de volgende hand die hem vasthoudt.",
       "sagaValeTitle": "Oostbeekdal: een naam op een zegel",
@@ -1223,12 +1394,14 @@ export const nl_NL: EnTranslations = {
       "sagaMarshTitle": "Het moeras: een tiende aan zielen",
       "sagaMarshBody": "In Slijkveen zijn de verdrinkingen geen ongeluk. Iemand vult het veen als een offerkist en wekt gehoorzame doden op uit elke reiziger die het water meeneemt. Volg de bevelen omhoog langs de keten tot een Mistroeper in het verdronken bastion, wiens laatste woorden iets nog ouders noemen, dat zich roert onder de toppen.",
       "sagaPeaksTitle": "De toppen: waarvoor het tiende diende",
-      "sagaPeaksBody": "Op Doorntop wordt het hele plan duidelijk. Elke ziel die sinds Oostbeekdal is gestolen, was een tiende dat werd geofferd om een eeuwenoud wezen te wekken dat verzegeld is onder de berg. Het spoor dat begon op een kapelhof eindigt hier, bij een deur die tien man nodig heeft om te openen. We laten je zelf ontdekken wie erachter wacht.",
+      "sagaPeaksBody": "Op Thornpeak wordt het hele plan duidelijk. Elke ziel die sinds the Vale is gestolen, was een tiende dat werd bijgedragen aan het grimmige werk van de sekte in het hart van de berg. Het spoor dat begon op een kapelhof eindigt hier, in een afdaling voor vijf spelers om de hand achter dit alles te confronteren. We laten je zelf ontdekken wie er onderaan wacht.",
       "sideTitle": "Zijsporen van de hoofdweg",
       "sideWardenTitle": "Je naam verdienen",
-      "sideWardenBody": "Naast het verhaal delen de bewakers van Oostbeekdal en het veen een vaste premieladder uit. Werk je omhoog, vijand voor vijand, zoals elke bewaker voor jou zijn plek verdiende. Het is eerlijk levelen en een rondleiding langs de ergste onruststokers van elk gebied.",
+      "sideWardenBody": "Naast het verhaal delen de maarschalken en bewakers van the Vale en het veen een vaste premieladder uit. Werk je omhoog, vijand voor vijand, zoals elke premiejager voor jou zijn plek verdiende. Het is eerlijk levelen en een rondleiding langs de ergste onruststokers van elk gebied.",
       "sideCryptTitle": "De vergeten koning",
-      "sideCryptBody": "Hoog in de toppen loopt een stiller mysterie: oude graven gemarkeerd met een kroon die geen enkel verslag zich herinnert. Lees de doden, verzamel wat zij bewaakten en ontzegel een tombe die gesloten had moeten blijven. Het is een detectivespoor dat de weg opent naar een tweede eindspelbeproeving voor een volledige raid."
+      "sideCryptBody": "Hoog in de toppen loopt een stiller mysterie: oude graven gemarkeerd met een kroon die geen enkel verslag zich herinnert. Lees de doden, verzamel wat zij bewaakten en ontzegel een tombe die gesloten had moeten blijven. Het is een detectivespoor dat de weg opent naar de eindspelraid voor tien spelers van het rijk.",
+      "sideTempleTitle": "De verdronken tempel",
+      "sideTempleBody": "Een poort van bleek licht op een hooggelegen bergmeer in de toppen opent naar een verzonken heiligdom waar een verdronken sekte nog steeds zingt. Haar korte keten staat los van het hoofdverhaal, een op zichzelf staand mysterie voor iedereen die naar de oever klimt, de waarschuwingen leest die in de rotsen zijn gekerfd, en naar beneden gaat om te zien waar ze voor dienden."
     },
     "lore": {
       "figuresTitle": "Gezichten die je zult leren kennen",
@@ -1261,7 +1434,35 @@ export const nl_NL: EnTranslations = {
       "templeLoreTitle": "De Verdronken Tempel, een beetje dieper",
       "templeLoreBody": "De tempel heeft zijn eigen legende, ouder dan de sekte die je elders najaagt. Aan de oever van de Glansmere, een bergmeer dat het maanlicht drinkt en de verdronkenen teruggeeft, bewaakt een eenzame wachter een poort van bleek licht. Onder het oppervlak loopt een trap van koude steen erheen naar beneden. Het volk dat daar zonk verdronk niet door een ongeluk: het was het Bleke Koor, dat in aanbidding onderging en nooit ophield met zingen. De oude wachters krasten een enkele waarschuwing in de rotsen voordat het water hen nam, een gebed tot iets dat zij de Verdronken Maan noemden, met een vastere hand die twee woorden eronder toevoegde: het slaapt slechts.",
       "cryptLeadTitle": "Een deur die de doden gesloten moesten houden",
-      "cryptLeadBody": "Hoog op de pieken, weg van het hoofdgevecht, ligt een kouder mysterie. Oude graven dragen een kroon die geen verslag zich herinnert, en de doden die hen bewaken dienden ooit een vergeten koning. Lees hun stenen, verzamel de sleutelstenen die zij bewaarden, en je kunt een tombe ontzegelen die drie trouwe zielen stierven om gesloten te houden, waarmee je een tweede beproeving voor tien spelers opent voor wie de aanwijzingen tot het einde volgt."
+      "cryptLeadBody": "Hoog op de pieken, weg van het hoofdgevecht, ligt een kouder mysterie. Oude graven dragen een kroon die geen verslag zich herinnert, en de doden die hen bewaken dienden ooit een vergeten koning. Lees hun stenen, verzamel de sleutelstenen die zij bewaarden, en je kunt een tombe ontzegelen die drie trouwe zielen stierven om gesloten te houden, de optionele beproeving die het rijk zijn raid voor tien spelers ontsluit voor wie de aanwijzingen tot het einde volgt."
+    },
+    "delvesPage": {
+      "heading": "Delves",
+      "intro": "Delves zijn korte, herspeelbare afdalingen voor één of twee, met een trouwe metgezel aan je zij wanneer je alleen naar beneden gaat. Vind het bord, kies een tocht en klim terug naar boven met de buit.",
+      "fromLevel": "Vanaf niveau {n}",
+      "partyLabel": "Voor één of twee",
+      "keeperLabel": "Bewaarder",
+      "keeperFmt": "{name}, {title}",
+      "companionLabel": "Metgezel",
+      "companionFmt": "{name}, {role}",
+      "tiersLabel": "Moeilijkheidsgraden",
+      "affixesLabel": "Mogelijke modifiers",
+      "whatHeading": "Wat een delve is",
+      "whatBody": "Een delve is een kleine geïnstantieerde dungeon, gemaakt speciaal voor jou en hooguit één bondgenoot, een privékopie waarin je niet gestoord kunt worden. Je start hem vanaf een bord dat door een delvebewaarder buiten in de wereld wordt bijgehouden, valt erin, vecht je naar beneden door een handvol kamers, en eindigt bij één enkele wachter. Tochten zijn snel en bedoeld om herhaald te worden, dus een delve is een betrouwbaar stukje voortgang wanneer de open wereld opdroogt.",
+      "howHeading": "Hoe een tocht werkt",
+      "howBody": "Spreek de bewaarder aan om het bord te openen, kies een moeilijkheidsgraad en daal af. Elke tocht rijgt een paar korte kamers aaneen en eindigt bij zijn wachter; reken die af om je beloning op te eisen en terug te keren naar de oppervlakte. Breng een vriend mee als je er een hebt, of leun op je metgezel als dat niet zo is.",
+      "companionHeading": "Je metgezel",
+      "companionBody": "Een delve stuurt een metgezel met je mee naar beneden, zodat een solotocht nooit hopeloos is. Zij vecht aan je zij, en naarmate je tussen tochten in haar investeert wordt ze gestaag sterker, tot ze eenmaal per afdaling een bondgenoot van de rand kan terughalen. Ze is van jou voor de delve en wacht bij het bord tussen tochten.",
+      "lockpickHeading": "Sloten en wat ze verbergen",
+      "lockpickBody": "Sommige deuren en kisten zijn verzegeld, en er een openen is een kleine zenuwproef in plaats van een statistiektoets: kraak het slot schoon en gestaag en je verdient een betere prijs dan bij een gehaaste, geklungelde poging. Het is optioneel, maar de zorgvuldige delver is de rijkere.",
+      "tiersHeading": "Moeilijkheidsgraad",
+      "tiersBody": "Een delve biedt meer dan één moeilijkheidsgraad. De hogere maakt de vijanden sterker en rolt een tochtmodifier mee, en betaalt in ruil meer uit. Hij vraagt ook dat je een paar niveaus op zak hebt voordat hij je binnenlaat.",
+      "affixesHeading": "Tochtmodifiers",
+      "affixesBody": "Zwaardere tochten rollen een modifier die verandert hoe de afdaling speelt, van rusteloze doden tot bedorven lucht tot bezwijkend dakwerk. Ze verhogen het gevaar en de beloning samen. Een delve met een cryptethema kan elk van deze rollen:",
+      "marksHeading": "Delve-Tekens",
+      "marksBody": "Delves voltooien levert Delve-Tekens op, een valuta die los staat van je munten. Geef ze uit bij de bewaarder om je metgezel te versterken en uitrusting op te pikken die je nergens anders vindt.",
+      "whereHeading": "Waar je er een vindt",
+      "whereBody": "De eerste delve, het Ingestorte Reliekschrijn, gaat open bij Reliekschrijnheuvel in de beginvallei Oostbeekdal. Broeder Halven houdt daar het bord bij, en hij stuurt je naar beneden zodra je er klaar voor bent."
     },
     "talentsPage": {
       "heading": "Talenten en specialisaties",
@@ -1270,8 +1471,9 @@ export const nl_NL: EnTranslations = {
       "whatBody": "Naarmate je in niveau stijgt, verdien je talentpunten om te besteden aan kleine, permanente verbeteringen van je vaardigheden en attributen. Ze bepalen hoe een klasse aanvoelt en buigen die naar meer schade, stevigere verdediging of sterkere genezing.",
       "howHeading": "Hoe ze werken",
       "howBody": "Talenten gaan open op niveau 10, en je blijft punten verdienen terwijl je richting het maximum klimt. Je besteedt ze in het talentpaneel van je klasse, en je kunt meer dan één indeling opslaan om tussen builds te wisselen.",
+      "shareNote": "Een afgeronde build kun je kopiëren naar een korte deelbare code en aan een vriend geven, die hem rechtstreeks in zijn eigen talentenpaneel plakt om hem te laden.",
       "resetTitle": "Niets is permanent",
-      "resetNote": "Je kunt je talenten op elk moment resetten, dus een vroege keuze is nooit een valkuil. Probeer dingen uit, kijk wat je bevalt en verander vrijuit van gedachten.",
+      "resetNote": "Je kunt je talenten op elk moment dat je buiten gevecht bent resetten, dus een vroege keuze is nooit een valkuil. Probeer dingen uit, kijk wat je bevalt en verander vrijuit van gedachten.",
       "specsHeading": "Specialisaties per klasse",
       "specsBody": "Elke klasse heeft een handvol specialisaties, elk met een eigen rol en een kenmerkende focus. Hier zie je de vorm van allemaal. Open een klasse voor de volledige uitrusting."
     },
@@ -1281,7 +1483,7 @@ export const nl_NL: EnTranslations = {
       "duelsHeading": "Duels",
       "duelsBody": "Daag elke speler die je tegenkomt uit voor een vriendschappelijk duel. Er staat niets op het spel behalve trots, dus het is de makkelijkste manier om een matchup te leren of een vriendschappelijk meningsverschil te beslechten.",
       "coliseumHeading": "Het Asgrauwe Colosseum",
-      "coliseumBody": "Het Colosseum is de arena van het rijk, waar je andere spelers tegemoet treedt in ranglijstwedstrijden. Win en je positie klimt, en de sterkste vechters stijgen op het scorebord voor iedereen om te zien.",
+      "coliseumBody": "Het Coliseum is de arena van het rijk, waar je andere spelers tegemoet treedt in ranglijstwedstrijden, één tegen één of twee tegen twee. Elke categorie heeft zijn eigen ranglijst, dus een overwinning tilt je hoger op die ladder, zichtbaar voor het hele rijk.",
       "fiestaHeading": "Twee tegen twee Fiesta",
       "fiestaBody": "Fiesta is een snelle, twee-tegen-twee modus die in korte rondes wordt gespeeld. Tussen rondes draft je augments, snelle boosts die je kit gaandeweg hervormen, zodat geen twee wedstrijden helemaal hetzelfde spelen.",
       "augmentsNote": "Augments en power-ups gelden alleen voor de wedstrijd. Ze draaien om speelse, ter plekke bedachte builds, niet om blijvende macht, zodat niemand zich een weg naar de winst koopt.",
@@ -1304,7 +1506,7 @@ export const nl_NL: EnTranslations = {
       "i1Title": "Je kunt geen verkeerde klasse kiezen",
       "i1Body": "Elke klasse kan zich staande houden en het maximum bereiken. Kies de fantasie die je leuk vindt, niet die een ander de beste noemt.",
       "i2Title": "Sterven kost je nauwelijks iets",
-      "i2Body": "Wanneer je sneuvelt, kom je vrij bij een kerkhof en ren je terug naar je lichaam. Er gaat geen ervaring verloren, dus het is veilig om risico's te nemen en te leren.",
+      "i2Body": "Wanneer je sneuvelt, laat je je geest los en herleef je bij de dichtstbijzijnde begraafplaats, en loop je vervolgens terug. Er gaat geen ervaring verloren, dus het is veilig om risico's te nemen en te leren.",
       "i3Title": "Talenten zijn geen valkuil",
       "i3Body": "Ze gaan open op niveau 10 en resetten wanneer je maar wilt, dus je vroege keuzes zijn nooit permanent.",
       "i4Title": "Volg het questspoor",
@@ -1324,7 +1526,8 @@ export const nl_NL: EnTranslations = {
       "loading": "Model laden...",
       "error": "Het 3D-model kon niet worden geladen. De afbeelding hierboven toont nog steeds deze {name}.",
       "dragHint": "Sleep om het model te draaien. Gebruik de pijltjestoetsen links en rechts wanneer het de focus heeft.",
-      "canvasLabel": "Draaibaar 3D-model van {name}"
+      "canvasLabel": "Draaibaar 3D-model van {name}",
+      "posterAlt": "{name}"
     },
     "models": {
       "title": "3D-modelweergave",
@@ -1340,7 +1543,7 @@ export const nl_NL: EnTranslations = {
     "gear": {
       "intro": "Uitrusting is de wapenrusting die je personage draagt en de voorwerpen die je meedraagt. Betere uitrusting is de gestaagste manier om sterker te worden, en het meeste pik je vanzelf op door te spelen.",
       "slotsTitle": "Wat je kunt uitrusten",
-      "slotsBody": "Je hebt een wapengleuf en zeven pantsergleuven. Elk stuk dat je uitrust voegt iets toe aan je personage, en je kunt vrij combineren naarmate je verbeteringen vindt.",
+      "slotsBody": "Je hebt een wapengleuf en zeven pantsergleuven. Elke klasse kan slechts bepaalde wapens gebruiken en draagt pantser tot zijn eigen gewicht, stof, leer of maliën, dus de verbeteringen die bij je passen zijn die welke voor jouw klasse zijn gemaakt. Vul daarbinnen elke gleuf met het beste stuk dat je vindt.",
       "slotMainhand": "Wapen",
       "slotHelmet": "Hoofd",
       "slotShoulder": "Schouders",
@@ -1360,29 +1563,35 @@ export const nl_NL: EnTranslations = {
       "qualityNote": "Hogere kwaliteit betekent meestal betere statistieken, maar kwaliteit is een hint, geen regel. Een goed passend stuk voor jouw klasse en niveau kan een flitsender exemplaar verslaan.",
       "upgradeTitle": "Houd je uitrusting actueel",
       "upgradeBody": "Een oud stuk vervangen door een verse verbetering doet meer voor je dan perfect spelen in uitrusting die je ontgroeid bent. Wanneer er iets beters valt of een quest het aanbiedt, neem het. Bewaar je goede voorwerpen niet voor later.",
+      "itemLevelBody": "Wil je een snelle manier om twee stukken te vergelijken, zet dan Itemniveau Tonen aan in de opties. Elk wapen en pantserstuk toont dan een itemniveau, een enkel getal voor hoe krachtig het ongeveer is op basis van waar het vandaan komt, zodat je in één oogopslag ziet welke upgrade meer gewicht in de schaal legt, zelfs tussen verschillende slots.",
       "sourcesTitle": "Waar uitrusting vandaan komt",
       "sourcesBody": "De meeste van je vroege verbeteringen zijn questbeloningen, dus het loont om quests af te ronden in plaats van te grinden. Vijanden laten uitrusting vallen wanneer je ze verslaat, verkopers in de stad verkopen degelijke basisspullen, en op de spelersmarkt kun je van andere avonturiers kopen.",
+      "setsTitle": "Sets en setbonussen",
+      "setsBody": "De zeldzaamste pantsers komen in bij elkaar passende families, meerdere stukken die zo gesneden zijn dat ze er als één uitzien en als één vechten. Draag er genoeg van een familie tegelijk en de set ontwaakt, en geeft bonussen bovenop de eigen statistieken van elk stuk, en hoe meer stukken je draagt, hoe sterker hij wordt. Deze vallen uit de zwaarste groepscontent vlak bij de levelcap, dus jagen op een volledige set is een klassiek eindspeldoel.",
       "consumablesTitle": "Verbruiksartikelen",
       "consumablesIntro": "Sommige voorwerpen worden eenmalig gebruikt voor een snel voordeel. Het is goedkope verzekering, dus houd er een paar bij de hand.",
       "consumablesPotions": "Toverdranken herstellen levenskracht of mana op het moment dat je ze gebruikt, zelfs midden in een gevecht, wat ze tot een reddende greep maakt als een aanval misgaat. Ze delen een korte afkoeltijd, dus plan één goed moment om ze te gebruiken.",
       "consumablesFood": "Eten en drinken herstellen je terwijl je zit en rust tussen gevechten. Eten herstelt levenskracht, drinken herstelt mana, en zo rusten is gratis. Ga na een zwaar gevecht een paar seconden zitten in plaats van half geheeld het volgende in te rennen.",
       "consumablesElixirs": "Elixers geven een tijdelijke buff terwijl je avontuurt, een klein voordeel dat helpt wanneer je net iets verder wilt doorzetten.",
       "fishingTitle": "Vissen",
-      "fishingBody": "Vissen is een rustige afwisseling. Rust een hengel uit, werp uit in open water en haal binnen wat bijt. Je vangt vooral vis die je tot eten kunt koken, af en toe wat rommel om voor een paar munten te verkopen, en zo nu en dan een gewilde zeldzame vangst. Wat je vindt, hangt af van het water waarin je vist.",
-      "fishingFood": "De vis die je binnenhaalt is rauw, en rauwe vis is voedsel. Kook je vangst en hij geneest meer wanneer je gaat zitten om te eten, met de betere vis afkomstig uit de koudere, diepere wateren in het noorden. Een lijn in het meer is een rustige manier om je pak gevuld te houden tussen gevechten.",
+      "fishingBody": "Vissen is een rustige afwisseling. Rust een hengel uit, werp uit in open water en haal binnen wat bijt. Je vangt vooral vis die voedsel is dat je kunt eten, af en toe wat rommel om voor een paar munten te verkopen, en zo nu en dan een gewilde zeldzame vangst. Wat je vindt, hangt af van het water waarin je vist.",
+      "fishingFood": "De vis die je binnenhaalt is voedsel: eet er een terwijl je gaat zitten om te rusten en het herstelt je gezondheid, met de stevigere vis afkomstig uit de koudere, diepere wateren in het noorden. Een lijn in het meer is een rustige manier om je pak gevuld te houden tussen gevechten.",
       "fishingRare": "Zo nu en dan vangt je lijn iets veel beters dan avondeten: een glinsterende gewilde vis die elke visser in elk water met geluk kan binnenhalen. Haak er een en je logboek licht op met de vangst. Het is het soort gelukkige vangst dat een ledige middag aan het meer het vertellen waard maakt.",
       "cosmeticsTitle": "Uiterlijken en cosmetica",
       "cosmeticsBody": "Sommige beloningen veranderen alleen hoe je personage eruitziet, nooit hoe sterk je bent. Met deze cosmetische skins val je op zonder het spel te beïnvloeden, dus draag wat je maar wilt.",
       "cosmeticsRanks": "Cosmetica hebben hun eigen zeldzaamheidsniveaus, en de zeldzamere zijn een leuk doel om na te jagen. Een hoger niveau verdienen ontgrendelt ook de uiterlijken eronder.",
-      "cosmeticsSkins": "Er zijn twee cosmetische lijnen om te verzamelen. Elke klasse heeft een handvol alternatieve uiterlijken, een frisse kijk op haar look die alleen jij mag dragen. Daarnaast zijn er chroma's: genoemde tweekleurige kleurschema's die een look volledig herschilderen, van sobere metalen tot felle keizerlijke kleuren.",
-      "cosmeticsCache": "Een paar daarvan komen uit een mysterieuze cosmetische kist, een verzegelde prijs die bij het openen een van drie kwaliteitsgraden oplevert en het bijbehorende uiterlijk verleent. Het is puur voor de show: niets erin maakt je sterker, alleen mooier om te zien."
+      "cosmeticsSkins": "Er zijn twee cosmetische lijnen om te verzamelen. De meeste klassen hebben meerdere alternatieve uiterlijken, een frisse kijk op de klasse-look die van jou is om te dragen. Daarnaast zijn er chroma's: genoemde tweekleurige kleurschema's die een look volledig herschilderen, van sobere metalen tot felle keizerlijke kleuren.",
+      "cosmeticsCache": "Een paar daarvan komen uit een mysterieuze cosmetische kist, een verzegelde prijs die bij het openen een van drie kwaliteitsgraden oplevert en het bijbehorende uiterlijk verleent. Het is puur voor de show: niets erin maakt je sterker, alleen mooier om te zien.",
+      "cosmeticsApply": "Stel je actieve uiterlijk in vanaf de uiterlijkrij op je personagescherm, en wissel vrij tussen alles wat je hebt ontgrendeld."
     },
     "economy": {
-      "intro": "Munten smeren de hele wereld: ze kopen uitrusting en voorraden, betalen je reparaties en questkosten, en wisselen van eigenaar tussen spelers. Je pikt dit alles vanzelf op door te spelen, dus zie deze pagina als een kaart van waar je geld vandaan komt en waar het heen gaat.",
+      "intro": "Munten smeren de hele wereld: ze kopen je uitrusting, voorraden en reisuitrusting, en wisselen van eigenaar tussen spelers. Je pikt dit alles vanzelf op door te spelen, dus zie deze pagina als een kaart van waar je geld vandaan komt en waar het heen gaat.",
       "coinTitle": "Goud, zilver en koper",
       "coinBody": "Geld bestaat uit drie munten. Honderd koper maken een zilver, en honderd zilver maken een goud, dus je beurs vult zich eerst met de kleinste munt. Je verdient het met questbeloningen, met het plunderen van gevallen vijanden, en met het verkopen van wat je niet langer nodig hebt.",
       "vendorsTitle": "Verkopers en wat ze voeren",
-      "vendorsBody": "Steden en buitenposten zijn bezaaid met handelaren, elk met hun eigen vak. Proviandeurs hebben eten en drinken, wapensmeden en pantsersmeden voeren uitrusting, kruidenkenners handelen in reagentia, en een kwartiermeester houdt praktische reisuitrusting bij. Loop er een tegemoet om te zien wat ze verkopen.",
+      "vendorsBody": "Steden en buitenposten zijn bezaaid met handelaren, elk met hun eigen vak. Proviandeurs hebben eten en drinken, wapensmeden en pantsersmeden voeren uitrusting, en een kwartiermeester houdt praktische reisuitrusting bij. Loop er een tegemoet om te zien wat ze verkopen.",
+      "marksTitle": "Een tweede valuta: Delve-Tekens",
+      "marksBody": "Munten zijn niet het enige dat je opspaart. Delves keren Delve-Tekens uit, een aparte valuta die je alleen bij de delvebewaarder uitgeeft, aan metgezelupgrades en uitrusting die je nergens anders vindt. Ze vermengen zich nooit met je munten.",
       "buyingTitle": "Kopen en verkopen",
       "buyingBody": "Ga bij een handelaar staan om hun venster te openen. Je kunt alles kopen wat ze op voorraad hebben als je het kunt betalen, en het meeste uit je tassen verkopen voor munten. Als je per ongeluk iets verkoopt, houdt een verkoper je recente verkopen vast zodat je ze kunt terugkopen.",
       "junkTitle": "Rommel opruimen",
@@ -1390,7 +1599,7 @@ export const nl_NL: EnTranslations = {
       "tradeTitle": "Ruilen met andere spelers",
       "tradeBody": "Je kunt van aangezicht tot aangezicht ruilen met iedereen die bij je in de buurt staat. Jullie zetten beiden voorwerpen en munten in een gedeeld venster en de ruil vindt pas plaats zodra jullie het allebei bevestigen, zodat geen van beide kanten verrast kan worden. Het is de eenvoudige manier om een vriend een buit te geven of een afspraak af te sluiten.",
       "marketTitle": "De Wereldmarkt",
-      "marketBody": "De Koopman runt de Wereldmarkt, een door spelers gedreven beurs waar je kunt kopen en verkopen met mensen die je misschien nooit ontmoet. Spreek de Koopman aan om hem te openen.",
+      "marketBody": "De Koopman runt de Wereldmarkt, een door spelers gedreven beurs waar je kunt kopen en verkopen met mensen die je misschien nooit ontmoet. Spreek de Koopman aan om hem te openen. De Koopman houdt er ook een vaste voorraad eigen goederen aangeboden, dus er is altijd iets te kopen, zelfs wanneer geen andere spelers iets hebben geplaatst.",
       "marketBrowse": "Bladeren: scrol door de aanbiedingen of zoek op naam om te vinden wat te koop is. Elke aanbieding toont de waren, de verkoper en de vraagprijs voor de hele stapel.",
       "marketPost": "Plaatsen: kies een stapel uit je tassen, stel je prijs in en zet hem in de lijst. De waren worden door de Koopman bewaard totdat iemand ze koopt. Onverkochte aanbiedingen komen na een tijdje naar je terug, en je kunt er een vroegtijdig terugvragen als je je bedenkt.",
       "marketCollect": "Innen: wanneer je waren verkocht zijn, wacht je opbrengst op je bij de Koopman. Keer terug om de munten te innen, samen met alles wat onverkocht terugkwam. De Koopman neemt een klein deel van elke voltooide verkoop.",
@@ -1409,7 +1618,7 @@ export const nl_NL: EnTranslations = {
       "chanParty": "Groep.",
       "chanPartyBody": "Praat met iedereen in je groep, hoe verspreid je ook bent.",
       "chanGeneral": "Algemeen.",
-      "chanGeneralBody": "Een altijd actief lokaal kanaal voor de mensen om je heen, handig om een vraag te stellen of te kletsen.",
+      "chanGeneralBody": "Een altijd actief kanaal voor het hele rijk dat iedereen die online is bereikt, handig om een vraag te stellen of te kletsen. Anders dan World en Looking for Group hoef je je nooit aan te melden.",
       "chanWorld": "Wereld.",
       "chanWorldBody": "Een kanaal voor het hele rijk waarvoor je je aanmeldt. Open het tabblad om mee te doen, en je ziet en bereikt iedereen die online is.",
       "chanLfg": "Op zoek naar groep.",
@@ -1417,7 +1626,7 @@ export const nl_NL: EnTranslations = {
       "chanGuild": "Gilde en Officier.",
       "chanGuildBody": "Kanalen voor je gilde. Gildechat bereikt elk lid; het officierskanaal is alleen voor officieren.",
       "partyHeading": "Een groep vormen",
-      "partyBody": "Nodig een andere speler uit door met de rechtermuisknop op hun naam te klikken en uitnodigen te kiezen, of met een chatcommando. Een groep telt maximaal vijf spelers, en een van jullie is de leider.",
+      "partyBody": "Nodig een andere speler uit door met de rechtermuisknop op hun naam te klikken en uitnodigen te kiezen. Een groep telt maximaal vijf spelers, en een van jullie is de leider.",
       "partyCredit": "Groepsleden dicht bij elkaar delen kill- en questkrediet, dus samen questen is sneller, nooit langzamer. Een groep is ook hoe je als team een dungeon binnenstapt.",
       "raidBody": "Zodra je een volledige groep van vijf hebt, kan de leider deze omzetten in een raid van maximaal tien, voor de eindspel-raid.",
       "lootHeading": "Groepsbuit",
@@ -1428,6 +1637,8 @@ export const nl_NL: EnTranslations = {
       "lootCommonBody": "Gewone drops kunnen naar de buitmaker gaan, terwijl betere drops voor een worp worden aangeboden zodat iedereen een eerlijke kans krijgt.",
       "lootRollTitle": "Nodig, Hebzucht of Passen.",
       "lootRollBody": "Wanneer een voorwerp voor een worp gaat, kiest elk in aanmerking komend lid Nodig als ze het willen, Hebzucht als ze het alleen als reserve zouden nemen, of Passen om af te zien. De hoogste worp wint.",
+      "lootMasterTitle": "Buitmeester.",
+      "lootMasterBody": "In plaats daarvan kan de leider de leiding nemen over de betere drops en ze stuk voor stuk uitdelen aan het lid dat ze hoort te krijgen. Het voorkomt dat begeerde uitrusting naar een willekeurige worp gaat, zoals een georganiseerde groep een dungeon loopt.",
       "friendsHeading": "Vrienden en negeren",
       "friendsBody": "Voeg spelers toe aan je vriendenlijst om te zien wanneer ze online zijn en waar ze zijn, zodat je kunt groeperen zodra ze inloggen.",
       "ignoreBody": "Als iemand je lastigvalt, voeg diegene toe aan je negeerlijst en je ziet hun chat niet meer.",
@@ -1448,17 +1659,21 @@ export const nl_NL: EnTranslations = {
       "staTitle": "Uithoudingsvermogen",
       "staBody": "Uithoudingsvermogen is je incasseringsvermogen. Meer Uithoudingsvermogen betekent een grotere gezondheidsvoorraad, en het versnelt de gezondheid die je herstelt terwijl je buiten gevecht rust. Elke klasse wil er wat van.",
       "intTitle": "Intellect",
-      "intBody": "Intellect vergroot de manavoorraad van een spreukmeester en verbetert de kans dat hun spreuken kritiek raken. Het is belangrijk voor de klassen die met mana casten; voor een Woede- of Energieklasse doet het weinig.",
+      "intBody": "Intellect vergroot de manavoorraad van een spreukmeester, verhoogt hun spreukkracht zodat hun spreuken harder aankomen, en verbetert de kans dat hun spreuken kritiek raken. Het is belangrijk voor de klassen die met mana casten; voor een Woede- of Energieklasse doet het weinig.",
       "spiTitle": "Geest",
       "spiBody": "Geest bepaalt hoe snel de mana van een caster terugkeert buiten gevecht. Net als Intellect dient het de manaklassen en betekent het weinig voor de andere.",
       "armorTitle": "Pantser",
       "armorBody": "Pantser vermindert de fysieke schade die je oploopt. Het komt vooral van wat je draagt, en de zwaardere pantserklassen dragen er veel meer van. Meer pantser tegen een vijand rond jouw niveau betekent dat elk van zijn treffers zachter aankomt.",
       "apTitle": "Aanvalskracht",
       "apBody": "Aanvalskracht meet hoe hard je wapen toeslaat. Je primaire attributen voeden het, en sterkere wapens en uitrusting verhogen het verder, en daarom kan een upgrade een echte sprong in schade betekenen.",
+      "spTitle": "Spreukkracht",
+      "spBody": "Spreukkracht is de tegenhanger van aanvalskracht voor een caster: het verhoogt de schade die je spreuken aanrichten. Intellect voedt het, en casteruitrusting en buffs voegen er meer bovenop toe, dus een spreukenwerker let op spreukkracht zoals een melee-vechter op aanvalskracht let.",
       "critTitle": "Kritieke treffer",
       "critBody": "Je kans op een kritieke treffer is hoe vaak een aanval extra schade aanricht. Iedereen begint met een kleine basiskans, en Behendigheid (plus enkele talenten en uitrusting) bouwt daarop voort.",
       "dodgeTitle": "Ontwijken",
       "dodgeBody": "Ontwijken is je kans om een inkomende melee-aanval volledig te vermijden. Je begint met een kleine basiskans, en Behendigheid verhoogt deze, dus wendbare klassen ontwijken meer klappen.",
+      "dpsTitle": "Schade per seconde",
+      "dpsBody": "Je blad toont ook een schade-per-seconde-schatting: ruwweg wat je wapen, zijn slagsnelheid en je aanvalskracht samen na verloop van tijd opleveren. Het is een snelle manier om twee wapens in één oogopslag te vergelijken.",
       "sheetHeading": "Je personageblad lezen",
       "sheetBody": "Open het personagevenster in het spel om dit allemaal op één plek te zien: je vijf attributen aan de ene kant en de stats die ze voeden aan de andere. Beweeg over een waarde en een tooltip legt uit wat het voor je klasse doet, zodat je in één oogopslag ziet welke getallen een upgrade daadwerkelijk heeft veranderd.",
       "growHeading": "Hoe je stats groeien",
@@ -1473,10 +1688,10 @@ export const nl_NL: EnTranslations = {
       "journeyBody": "De wereld is één doorlopend land, drie gebieden van zuid naar noord, elk een niveaustap hoger. Je begint in de groene vallei, baant je een weg door het moeras en eindigt in de koude hoge toppen. Volg het questspoor en het land draagt je van het ene naar het andere.",
       "bandLabel": "Niveaus {min} tot {max}",
       "restedTitle": "Uitgeruste ervaring",
-      "restedBody": "Wanneer je uitlogt of rust op een veilige plek zoals een herberg, bouwt je personage uitgeruste ervaring op terwijl je weg bent. De volgende keer dat je eropuit gaat en vecht, geeft die voorraad je kills een extra impuls tot ze opraakt. Het bouwt zich na verloop van tijd op en versnelt je vroege niveaus, dus uitloggen in de stad is nooit verspilde tijd.",
+      "restedBody": "Rust op een veilige plek zoals een herberg, buiten gevecht, en je personage bouwt uitgeruste ervaring op terwijl je daar zit. De volgende keer dat je eropuit gaat en vecht, geeft die voorraad je kills een extra impuls tot ze opraakt. Een pauze in de herberg is nooit verspilde tijd; het versnelt je volgende stuk levelen.",
       "capTitle": "Niveau {cap} bereiken",
       "capJourneyBody": "Niveau {cap} is het maximum, het einde van het levelen maar niet van het groeien. Vanaf daar loop je dungeons en de raid, jaag je op betere uitrusting en test je jezelf in de arena.",
-      "prestigeBody": "Ervaring blijft tellen, zelfs na het maximum. Het voedt een cosmetisch virtueel niveau, zodat je ervaringsbalk blijft stijgen, en een langetermijn-prestigerang die je voor de erkenning kunt verdienen. Het is puur optioneel en geeft nooit macht, alleen een teken van de weg die je hebt afgelegd.",
+      "prestigeBody": "Ervaring blijft tellen, zelfs na het maximum. Het voedt een cosmetisch virtueel niveau, zodat je ervaringsbalk blijft stijgen, en een langetermijn-prestigerang die je voor de erkenning kunt verdienen. Het passeren van grote mijlpalen in totale ervaring ontgrendelt ook cosmetische titels en naamplaatranden die op je personageblad verschijnen. Het is allemaal puur optioneel en geeft nooit macht, alleen een teken van de weg die je hebt afgelegd.",
       "noRush": "Er is geen haast. De wereld is er om in je eigen tempo van te genieten, dus dwaal rond, pak de quests die je aanspreken en laat je held onderweg groeien."
     },
     "placeholder": {
@@ -2453,7 +2668,7 @@ export const nl_NL: EnTranslations = {
     "lore": {
       "warrior": "Krijgers zijn in de strijd geharde man-tot-man-vechters die Woede opbouwen terwijl ze schade uitdelen of incasseren. Ze absorberen zware klappen of verpletteren vijanden met krachtige wapens.",
       "paladin": "Paladijnen zijn heilige kruisvaarders die bondgenoten steunen met zegeningen, wonden helen met Heilig Licht en de zwakken beschermen in zwaar pantser.",
-      "hunter": "Jagers beheersen de wildernis, sporen vijanden van veraf op met bogen of geweren en gebruiken vallen om het slagveld te beheersen.",
+      "hunter": "Jagers zijn afstandsspecialisten die aan de zijde van een getemd beest vechten, vijanden bestoken met gerichte en snelle schoten, hen vertragen met steken en verdovend vuur, en van aspect wisselen om zich aan het moment aan te passen.",
       "rogue": "Schurken zijn sluipende sluipmoordenaars die Energie en Combopunten besteden aan rugsteken en finishers vanuit de schaduwen.",
       "priest": "Priesters roepen Heilig Licht aan om bondgenoten te genezen en te beschutten, terwijl Schaduwmagie hen het leven van hun vijanden laat aftappen.",
       "shaman": "Sjamanen gebieden de elementen, doordringen wapens met kracht, schokken vijanden met bliksem en herstellen bondgenoten.",

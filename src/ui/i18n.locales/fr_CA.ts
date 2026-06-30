@@ -45,7 +45,7 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'classDetails.lore.paladin':
     'Les paladins sont des croisés sacrés qui aident par des bénédictions, soignent avec la Lumière sacrée et protègent les plus faibles.',
   'classDetails.lore.hunter':
-    'Les chasseurs maîtrisent la nature sauvage, traquent de loin avec arcs ou armes à feu et contrôlent le terrain avec des pièges.',
+    "Les chasseurs sont des spécialistes à distance qui combattent aux côtés d'une bête apprivoisée, criblant leurs ennemis de tirs précis et rapides, les ralentissant de morsures et de traits de choc, et changeant d'aspect selon le moment.",
   'classDetails.lore.shaman':
     'Les chamans commandent les éléments, imprègnent leurs armes, frappent avec la foudre et restaurent leurs alliés.',
   'classDetails.lore.mage':

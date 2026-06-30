@@ -14,6 +14,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.spectate.banner': '{name}を観戦中',
   'hudChrome.loot.chestTitle': '宝箱',
   'hudChrome.spellbook.addToBarAria': '{name}をアクションバーに追加',
   'hudChrome.spellbook.removeFromBarAria': '{name}をアクションバーから削除',
@@ -777,7 +778,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'classDetails.lore.paladin':
     'パラディンは祝福で味方を支え、聖なる光で傷を癒やし、重装備で弱き者を守る聖騎士です。',
   'classDetails.lore.hunter':
-    'ハンターは荒野を熟知し、弓や銃で遠距離から敵を追い、罠で戦場を支配します。',
+    'ハンターはテイムした獣を従えて戦う遠距離戦の専門家で、エイムショットやラピッドファイアで敵を撃ち抜き、スティングやコンカッシブショットで足を止め、状況に応じて相を切り替えます。',
   'classDetails.lore.rogue':
     'ローグはエネルギーとコンボポイントを使い、影から奇襲と決め技を放つ隠密の暗殺者です。',
   'classDetails.lore.priest':
@@ -3271,6 +3272,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.widgets.heading': '方角',
   'hudChrome.widgets.minimapZoom': 'ミニマップのズーム',
   'hudChrome.leaderboard.close': '閉じる',
+  'hudChrome.leaderboard.tabsLabel': 'ハイスコアボード',
+  'hudChrome.leaderboard.tabPlayers': 'プレイヤー',
+  'hudChrome.leaderboard.tabGuilds': 'ギルド',
+  'hudChrome.leaderboard.guildName': 'ギルド',
+  'hudChrome.leaderboard.members': 'メンバー',
+  'hudChrome.leaderboard.topLevel': '最高',
+  'hudChrome.leaderboard.guildXp': '累計経験値',
+  'hudChrome.leaderboard.guildEmpty': 'ランク入りのギルドはまだありません。',
   'hudChrome.widgets.worldCoordinates': 'ワールド座標',
   'hudChrome.plurals.guildMembers.one': 'あなたは{rank}、{count}人のメンバー',
   'hudChrome.plurals.guildMembers.few': 'あなたは{rank}、{count}人のメンバー',
@@ -3460,6 +3469,42 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.tagline': 'ブラウザで無料で遊べる、クラシックスタイルのMMO。',
   'guide.skipToContent': 'メインコンテンツへスキップ',
   'guide.loading': '読み込み中...',
+  'guide.controls.targetFriendly': '最も近い友好的な対象をターゲット',
+  'guide.delvesPage.affixesBody':
+    'より高難易度のランでは、潜行の流れを変える修飾効果が抽選されます。安らげぬ死者から淀んだ空気、崩れかけた天井まで、その内容はさまざまです。修飾効果は危険と報酬をともに高めます。納骨堂をテーマにしたデルヴでは、次のいずれかが抽選されることがあります:',
+  'guide.delvesPage.affixesHeading': 'ランの修飾効果',
+  'guide.delvesPage.affixesLabel': '発生しうる修飾効果',
+  'guide.delvesPage.companionBody':
+    'デルヴには仲間が一緒に降りてくれるので、ソロのランでも絶望することはありません。彼女はあなたのそばで戦い、ランの合間に育てていくほど着実に強くなり、やがて一度の潜行につき一度、瀕死の味方を引き戻せるようになります。彼女はそのデルヴの間ずっとあなたとともにあり、ランの合間はボードのそばで待っています。',
+  'guide.delvesPage.companionFmt': '{name}、{role}',
+  'guide.delvesPage.companionHeading': 'あなたの仲間',
+  'guide.delvesPage.companionLabel': '仲間',
+  'guide.delvesPage.fromLevel': 'レベル{n}から',
+  'guide.delvesPage.heading': 'デルヴ',
+  'guide.delvesPage.howBody':
+    '番人に話しかけてボードを開き、難易度を選んで潜行しましょう。各ランはいくつかの短い部屋がつながっており、最後の守護者で締めくくられます。これを倒せば報酬を受け取り、地上へ戻れます。仲間がいるなら連れていき、いないなら相棒の仲間を頼りましょう。',
+  'guide.delvesPage.howHeading': 'ランの流れ',
+  'guide.delvesPage.intro':
+    'デルヴは1人または2人で挑む、短く繰り返し遊べる潜行です。1人で降りるときはいつでも、忠実な仲間がそばに付き添います。ボードを見つけてランを選び、戦利品を手に地上へ登り戻りましょう。',
+  'guide.delvesPage.keeperFmt': '{name}、{title}',
+  'guide.delvesPage.keeperLabel': '番人',
+  'guide.delvesPage.lockpickBody':
+    '一部の扉や隠し箱は封じられており、それを開けるのはステータス勝負ではなく、ちょっとした度胸試しです。慌てて失敗するよりも、落ち着いて丁寧に錠を解けば、より良い品が手に入ります。任意の要素ですが、慎重な探索者ほど多くの実りを得られます。',
+  'guide.delvesPage.lockpickHeading': '錠前と、その奥に隠されたもの',
+  'guide.delvesPage.marksBody':
+    'デルヴを攻略するとデルヴの刻印が手に入ります。これは所持金とは別に管理される通貨です。番人のもとで使えば、仲間を強化したり、ほかでは手に入らない装備を入手したりできます。',
+  'guide.delvesPage.marksHeading': 'デルヴの刻印',
+  'guide.delvesPage.partyLabel': '1人または2人用',
+  'guide.delvesPage.tiersBody':
+    'デルヴには複数の難易度が用意されています。高い難易度では敵が強くなり、ランの修飾効果が加わる代わりに、報酬も多くなります。また、入場するにはある程度レベルを上げておく必要があります。',
+  'guide.delvesPage.tiersHeading': '難易度',
+  'guide.delvesPage.tiersLabel': '難易度',
+  'guide.delvesPage.whatBody':
+    'デルヴは、あなたと最大1人の味方だけのために用意された、小さなインスタンスダンジョンです。誰にも邪魔されない専用のコピーです。フィールドにいるデルヴの番人が管理するボードから開始し、中へ降りて、いくつかの部屋を戦い抜き、最後に1体の守護者で締めくくります。ランは手早く、繰り返し遊べるように作られているので、オープンワールドでやることが尽きたときにも、デルヴは着実な成長の手段になります。',
+  'guide.delvesPage.whatHeading': 'デルヴとは',
+  'guide.delvesPage.whereBody':
+    '最初のデルヴ「崩れた聖遺物庫」は、イーストブルックの谷の出発地点にある聖遺物庫の丘で開放されます。ボードを管理しているのはハルヴェン修道士で、準備が整えばあなたを下へ送り出してくれます。',
+  'guide.delvesPage.whereHeading': 'どこにあるか',
   'guide.docTitle': '{page} - {brand}',
   'guide.nav.overview': '概要',
   'guide.nav.howToPlay': '遊び方',
@@ -3467,6 +3512,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.nav.bestiary': 'モンスター図鑑',
   'guide.nav.world': 'ワールド',
   'guide.nav.quests': 'クエスト',
+  'guide.nav.delves': 'デルヴ',
   'guide.nav.dungeons': 'ダンジョンとレイド',
   'guide.nav.reference': 'リファレンス',
   'guide.nav.controls': '操作方法',
@@ -3587,7 +3633,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '頭上にマーカーが表示された人物からクエストを受け、目標を達成して報告すると、経験値、コイン、装備が手に入ります。画面上のトラッカーで目標を常に確認できます。',
   'guide.howToPlay.deathTitle': '死は終わりではない',
   'guide.howToPlay.deathBody':
-    '倒れたら最寄りの墓地で魂を解放し、自分の亡骸まで走って戻ります。経験値は失われません。',
+    '倒れたら魂を解放し、最寄りの墓地で全回復して復活し、元いた場所まで戻ります。経験値は失われません。',
   'guide.howToPlay.groupingTitle': '一緒に遊ぶ',
   'guide.howToPlay.groupingBody':
     '他のプレイヤーをパーティに招待すれば、クエストの達成を共有したりダンジョンに挑んだりできます。ワールドの大半はソロで進められるので、グループ行動は義務ではなく選択です。',
@@ -3603,12 +3649,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.controls.actionHeader': 'アクション',
   'guide.controls.groupMovement': '移動',
   'guide.controls.groupCombat': 'ターゲットと戦闘',
-  'guide.controls.groupInterface': 'ウィンドウ',
+  'guide.controls.groupInterface': 'インターフェース',
+  'guide.controls.controllerBody':
+    'ゲームパッドにも対応しており、コントローラーのサポートは初期設定で有効になっています。左スティックで移動し、右スティックでカメラを操作します。フェイスボタンとショルダーボタンで、アビリティ、ジャンプ、対話を行います。いずれかのウィンドウを開くと、メニュー操作用のオンスクリーンポインターが表示されます。ボタンの割り当て変更や、スティックのデッドゾーン、カメラ速度、振動、視点反転の調整は、オプションのコントローラー設定から行えます。',
+  'guide.controls.controllerHeading': 'コントローラーでは',
+  'guide.controls.cycleFriendly': '友好的なターゲットを順に切り替え',
+  'guide.controls.gameMenu': 'ゲームメニューとオプションを開く',
   'guide.controls.groupCamera': 'カメラ',
   'guide.controls.talents': 'タレント',
   'guide.controls.arena': 'アリーナ',
   'guide.controls.leaderboard': 'リーダーボード',
-  'guide.controls.abilities': 'アビリティを使用',
+  'guide.controls.abilities':
+    'アクションバーのアビリティを使用（数字キーの列。二つ目のバーはテンキーにあります）',
   'guide.controls.mobileHeading': 'モバイルでは',
   'guide.controls.mobileBody':
     'スマートフォンやタブレットでは、タッチ操作が自動で表示されます。左側に移動用スティック、右側はどこでもドラッグして視点操作、そしてアビリティやメニュー用の画面上ボタンが現れます。',
@@ -3616,10 +3668,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '戦闘はおなじみのクラシックMMOのルールに沿っています。うまく遊ぶために細かく学ぶ必要はまったくありません。これは戦いの仕組みの概要にすぎません。',
   'guide.combat.hitTitle': 'すべての一撃が命中するわけではない',
   'guide.combat.hitBody':
-    '攻撃はミスしたり、回避、受け流し、ブロックされたりします。それは敵の攻撃も同じです。自分のレベルに近い相手と戦い、装備を最新に保つことが、攻撃を確実に当てるコツです。',
-  'guide.combat.mitigationTitle': 'アーマーと装備が生存を支える',
+    '攻撃はミスしたり回避されたりすることがあり、それは敵の攻撃も同じです。一方、呪文は完全にレジストされることがあります。自分のレベルに近い相手と戦うことが、攻撃を確実に当て続けるコツです。レベル差が広がるほど、空を切ることが多くなります。',
+  'guide.combat.mitigationTitle': 'アーマーと体力が生存を支える',
   'guide.combat.mitigationBody':
-    'アーマーは物理ダメージを和らげ、適切な装備は魔法を弱めます。だから装備の更新が生存力の主な源になります。重装のクラスほど多くを受け流せますが、無敵になれるわけではありません。',
+    'アーマーは物理ダメージを和らげるので、優れたアーマーは近接戦における生存力の主な源になります。魔法は別の話です。呪文は、アーマーではなく、より深い体力のプールと完全にレジストする可能性で凌ぎます。重装のクラスほど多くを受け流せますが、無敵になれるわけではありません。',
   'guide.combat.resourcesTitle': 'クラスごとに独自のリズムがある',
   'guide.combat.resourcesBody':
     'ウォリアーは激しい戦いの中でレイジを溜め、ローグは着実に回復するエナジーを消費し、キャスターはマナのプールを管理します。自分のリソースを理解することが、クラスをうまく使いこなす半分です。',
@@ -3635,11 +3687,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ほとんどのアビリティ使用後に発生する、短い共通の待機時間。すべてを一度に発動できないようにするものです。',
   'guide.glossary.dpsTerm': 'DPS',
   'guide.glossary.dpsDef':
-    '1秒あたりのダメージ。どれだけ速くダメージを与えるかのおおよその指標です。',
+    '一秒あたりのダメージ。どれだけ速くダメージを与えるかのおおよその指標です。ダメージを与えるロールそのものを指すこともあり、たとえばタンク一人、ヒーラー一人、DPS三人といった具合に使われます。',
   'guide.glossary.eliteTerm': 'エリート',
   'guide.glossary.eliteDef':
     '通常より手強い敵で、たいていグループ向け。ダンジョンやレアの敵はエリートであることが多いです。',
   'guide.glossary.rareTerm': 'レア',
+  'guide.glossary.raidDef':
+    '最大10人で組む、より大きなグループ。最も手強いエンドゲームの戦いのために編成され、パーティが満員になると自動的にレイドへと切り替わります。',
+  'guide.glossary.raidTerm': 'レイド',
   'guide.glossary.rareDef': 'ゾーン内をさまよう希少なネームド敵で、より良い戦利品を落とします。',
   'guide.glossary.tankTerm': 'タンク',
   'guide.glossary.tankDef':
@@ -3667,7 +3722,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'はい。すぐに遊べるシングルプレイのオフラインモードがあり、オンラインの世界もダンジョンとレイドを除けば完全にソロで進められます。',
   'guide.faqPage.q5': 'クラスはいくつありますか?',
   'guide.faqPage.a5':
-    '9つで、クラシックなタンク、ヒーラー、ダメージのロールを網羅し、それぞれ独自のリソースと代表的なアビリティを持ちます。',
+    '九つで、クラシックなタンク、ヒーラー、ダメージのロールを網羅し、それぞれがリソースシステム（レイジ、マナ、またはエナジー）と独自の代表的なアビリティを持ちます。',
   'guide.faqPage.q6': 'レベル上限はいくつですか?',
   'guide.faqPage.a6':
     'レベル{cap}で、つながった3つのゾーンにわたるクエスト、ダンジョン、探索を通じて到達します。',
@@ -3717,7 +3772,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.family.beast.desc':
     '森や野に生きる野生動物たち。オオカミやイノシシから、それらを狙う捕食者まで。ハンターはその多くをテイムできます。',
   'guide.family.spider.name': 'クモ',
-  'guide.family.spider.desc': '暗く入り組んだ場所に巣を張る、糸を操る毒持ちの待ち伏せ屋たち。',
+  'guide.family.spider.desc':
+    '暗く入り組んだ場所に巣を張る、糸を操る毒持ちの待ち伏せ屋たち。ハンターは野獣と同じように手なずけることができます。',
   'guide.family.murloc.name': 'マーロック',
   'guide.family.murloc.desc':
     '浅瀬に群がる水陸両生の沼地の住人。騒がしく、縄張り意識の強い群れをなします。',
@@ -3728,7 +3784,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.family.humanoid.desc':
     '盗賊やカルト信者など、道を踏み外した者たち。牙だけでなく、戦術を使って襲いかかってきます。',
   'guide.family.troll.name': 'トロル',
-  'guide.family.troll.desc': '沼地や高地に巣くう、屈強で再生力の高い乱暴者たち。',
+  'guide.family.troll.desc': '沼地の湿原に巣くう、屈強な乱暴者たち。',
   'guide.family.ogre.name': 'オーガ',
   'guide.family.ogre.desc':
     '巨大で頭は鈍いが危険な存在。高地の峠に陣取り、地滑りのような一撃を繰り出します。',
@@ -3736,6 +3792,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.family.undead.desc':
     '邪悪な手によって蘇った、安らげぬ死者たち。疲れることも、逃げることもありません。',
   'guide.family.elemental.name': 'エレメンタル',
+  'guide.family.dragonkin.desc':
+    '古き深淵に棲む、鱗に覆われた蛇のような存在。希少で誇り高く、見た目よりもはるかに強大です。',
+  'guide.family.dragonkin.name': 'ドラゴンキン',
   'guide.family.elemental.desc': '嵐や岩が命を得た存在。元素の力が強く渦巻く荒野に縛られています。',
   'guide.worldPage.heading': '世界',
   'guide.worldPage.intro':
@@ -3755,18 +3814,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '頭の上にマークが付いた人物が、あなたに依頼を持っています。話しかけてクエストを受注しましょう。最初のクエストは、イーストブルックのレッドブルック隊長から受ける「扉のオオカミ」です。',
   'guide.questsPage.objectivesTitle': '目標',
   'guide.questsPage.objectivesBody':
-    '特定の敵を倒したり、アイテムを集めたり、世界の何かと対話したり。画面上のトラッカーが、進行に合わせて進捗を数えてくれます。',
+    '特定の敵を倒したり、アイテムを集めたり、世界の何かと対話したり。画面上のトラッカーが、進行に合わせて進捗を数えてくれます。気が変わったら、クエストログからクエストを破棄し、後でその発注者から再び受けることができます。',
   'guide.questsPage.turninTitle': '報告',
   'guide.questsPage.turninBody':
-    'クエスト発注者のもとへ戻りましょう。場所はマップが教えてくれます。経験値やお金、そして多くの場合あなたのクラスに合った装備が手に入ります。',
+    '完了したクエストは、その提出マーカーまで持っていきましょう。場所はマップが教えてくれます。経験値やお金、そして多くの場合あなたのクラスに合わせて選ばれた装備が手に入ります。提出先はたいてい発注者本人ですが、別の誰かのもとへ向かわせるクエストもあります。',
   'guide.questsPage.partyTitle': 'グループでのクエスト',
   'guide.questsPage.partyBody':
-    '近くにいるパーティメンバーは、討伐や目標の達成判定を共有します。だから一緒にクエストを進めれば、遅くなることはなく、むしろ速くなります。',
+    '近くにいるパーティメンバーは、討伐や目標の達成判定を共有します。だから一緒にクエストを進めれば、遅くなることはなく、むしろ速くなります。クエストをグループと共有することもできます。/share コマンドでクリックできるリンクとしてチャットに投稿すれば、条件を満たす近くのメンバーは誰でも、ワンクリックで同じクエストを受けられます。',
   'guide.questsPage.storyTitle': 'すべてを貫く一本の糸',
   'guide.questsPage.storyBody':
     'イーストブルックでの最初のおつかいの頃から、死者に異変が起きています。あるカルトが暗躍しており、その足取りは北へ、すべてのゾーンを貫いて続いています。それを追えば、背後に誰がいるのかがわかるでしょう。',
   'guide.questsPage.soloNote':
-    'メインストーリーは完全にソロで進められます。グループが必要になるのは、最終章だけです。',
+    'メインストーリーは各章のフィナーレまで完全にソロで進められます。そのフィナーレは五人用のダンジョンです。',
   'guide.dungeonsPage.heading': 'ダンジョンとレイド',
   'guide.dungeonsPage.intro':
     'オープンワールドだけでは物足りなくなったら、パーティを組んでインスタンスへ踏み込みましょう。インスタンスとは、あなたのグループだけのために用意されたダンジョンの専用コピーです。',
@@ -3865,7 +3924,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.augmentsNote':
     'オーグメントやパワーアップはそのマッチの間だけ続きます。持続的な強さではなく、その場で組む遊び心のあるビルドが目的なので、課金で勝ちを買えるわけではありません。',
   'guide.arenaPage.coliseumBody':
-    'コロシアムはレルムのアリーナで、ランクマッチで他のプレイヤーと対戦します。勝てば順位が上がり、最も強い戦士たちはみんなが見られるリーダーボードの上位へと昇っていきます。',
+    'Coliseumはレルムのアリーナで、ランクマッチで他のプレイヤーと対戦します。一対一、あるいは二対二です。各ブラケットはそれぞれ独自の順位を保つので、勝てばそのラダーを駆け上がり、レルム全体に見てもらえます。',
   'guide.arenaPage.coliseumHeading': '灰のコロシアム',
   'guide.arenaPage.duelsBody':
     '出会った相手なら誰でも友好的な決闘に挑めます。賭けるのはプライドだけなので、相性を学んだり仲間内の言い争いに決着をつけたりするのに一番手軽な方法です。',
@@ -3910,6 +3969,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.faqPage.q10': '最大レベルになったら何ができますか。',
   'guide.faqPage.q11': 'グループはどうやって見つけますか。',
   'guide.faqPage.q9': 'PvPはありますか。',
+  'guide.glossary.augmentDef':
+    '2対2のフィエスタアリーナの試合中にドラフトする一時的な強化で、その試合の間だけあなたの構成を作り変えます。',
+  'guide.glossary.augmentTerm': 'オーグメント',
   'guide.glossary.buffDef':
     'ステータスをしばらく上げる祝福のように、自分や味方にかかる有益な効果です。',
   'guide.glossary.buffTerm': 'バフ',
@@ -3918,6 +3980,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.ccTerm': 'クラウドコントロール',
   'guide.glossary.debuffDef': '減速、出血、アーマー低下など、標的にかかる有害な効果です。',
   'guide.glossary.debuffTerm': 'デバフ',
+  'guide.glossary.delveDef':
+    '1人または2人で挑む、短く繰り返し遊べるインスタンス潜行。番人のボードから開始し、仲間がそばに付き添います。',
+  'guide.glossary.delveTerm': 'デルヴ',
   'guide.glossary.dotDef': '継続ダメージと継続回復。一度にではなく、一定の間隔で刻まれる効果です。',
   'guide.glossary.dotTerm': 'DoTとHoT',
   'guide.glossary.mobDef':
@@ -3950,6 +4015,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.search.placeholder': 'ガイドを検索',
   'guide.search.typeClass': 'クラス',
   'guide.search.typeCreature': 'クリーチャー',
+  'guide.search.typeDelve': 'デルヴ',
   'guide.search.typeDungeon': 'ダンジョン',
   'guide.search.typePage': 'ページ',
   'guide.search.typeTerm': '用語',
@@ -3974,8 +4040,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.talentsPage.intro':
     'タレントは、クラスを自分らしくするための手段です。任意で、寛容で、変更も簡単なので、恐れずに試せます。',
   'guide.talentsPage.resetNote':
-    'タレントはいつでもリセットできるので、序盤の選択が落とし穴になることはありません。いろいろ試し、好みを見つけ、自由に考えを変えましょう。',
+    'タレントは戦闘の外であればいつでもリセットできるので、序盤の選択が落とし穴になることはありません。いろいろ試し、好みを見つけ、自由に考えを変えましょう。',
   'guide.talentsPage.resetTitle': '決定的なものは何もない',
+  'guide.talentsPage.shareNote':
+    '完成したビルドは短い共有コードにコピーして、フレンドに渡せます。受け取った相手は、自分のタレントパネルにそのまま貼り付けるだけで読み込めます。',
   'guide.talentsPage.specsBody':
     'どのクラスにもいくつかのスペシャライゼーションがあり、それぞれに固有のロールと特徴的な軸があります。ここではそのすべての概要を示します。全アビリティはクラスを開いて確認してください。',
   'guide.talentsPage.specsHeading': 'クラス別のスペシャライゼーション',
@@ -3988,7 +4056,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'どのクラスも十分に通用し、上限まで到達できます。誰かが最強と呼ぶものではなく、自分が好きなファンタジーを選びましょう。',
   'guide.wishPage.i1Title': '間違ったクラスを選ぶことはない',
   'guide.wishPage.i2Body':
-    '倒れると墓地で復帰し、自分の死体まで走って戻ります。経験値は失われないので、安心してリスクを取り、学べます。',
+    '倒れると魂を解放し、最寄りの墓地で復活し、元いた場所まで戻ります。経験値は失われないので、安心してリスクを取り、学べます。',
   'guide.wishPage.i2Title': '死んでもほとんど痛手はない',
   'guide.wishPage.i3Body':
     'タレントはレベル10で解放され、いつでもリセットできるので、序盤の選択が永続することはありません。',
@@ -4045,13 +4113,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.combat.ccBody':
     '群衆制御は、対象の行動を制限する特殊なデバフです。スタン、根縛りや減速、呪文詠唱を止めるサイレンス、武装解除、フィアー、そして一瞬だけ敵を無害にするポリモーフなど。根縛り、フィアー、ポリモーフのように、あまりに早く再付与すると効果が解けるものもあるため、永遠に連鎖させることはできません。',
   'guide.combat.deathBody':
-    '体力がゼロになると倒れます。しばらく待てば復活し、倒れた場所から続けられるので、死は進行ではなく少しの時間を失うだけです。戦いの合間には座って食べ、飲んで、次の戦いを万全の状態で始めましょう。',
+    '体力がゼロになると倒れます。魂を解放すれば最寄りの墓地で全回復して復活し、そこから元いた場所へ戻ります。だから死は進行ではなく、少しの時間を失うだけです。戦いの合間には座って食べ、飲んで、次の戦いを万全の状態で始めましょう。',
   'guide.combat.deathTitle': '倒れたとき',
   'guide.combat.effectsBody':
     '多くのアビリティは、しばらく残る効果を付与します。有益なもの（バフ）はステータスを上げ、盾を張り、少しずつ回復させてくれます。有害なもの（デバフ）は継続ダメージで体力を削り、あるいはあなたを弱体化させます。アクションバーの近くにある小さなアイコンを見れば、何が付いていて、あとどれくらい続くのかがわかります。',
   'guide.combat.effectsTitle': 'バフ、デバフ、群衆制御',
   'guide.dungeonsPage.cryptLeadBody':
-    '高地の頂、本筋の戦いから離れた場所に、より冷たい謎が眠っています。古い墓にはどんな記録にも残らぬ冠が刻まれ、それを守る死者はかつて忘れられた王に仕えていました。墓石を読み、彼らが守ってきた要石を集めれば、三つの忠実な魂が命を賭して閉ざした墓を解き放つことができます。手がかりを最後まで追う者のために、二つ目の10人用の試練が開かれるのです。',
+    '高地の頂、本筋の戦いから離れた場所に、より冷たい謎が眠っています。古い墓にはどんな記録にも残らぬ冠が刻まれ、それを守る死者はかつて忘れられた王に仕えていました。墓石を読み、彼らが守ってきた要石を集めれば、三つの忠実な魂が命を賭して閉ざし続けた墓を解き放つことができます。それは手がかりを最後まで追う者のために、レルムの十人レイドへの扉を開く、任意の試練です。',
   'guide.dungeonsPage.cryptLeadTitle': '死者が閉ざしておくべきだった扉',
   'guide.dungeonsPage.templeLoreBody':
     '神殿には、あなたが他所で追うカルトよりも古い、それ自身の伝説があります。月明かりを飲み込み、溺れた者を返すという山上の湖グリマーミアの岸辺で、一人の見張り役が淡い光の門を守っています。水面の下には、そこへ続く冷たい石の階段が伸びています。そこに沈んだ者たちは不運で溺れたのではありません。彼らは礼拝のうちに沈み、決して歌うのをやめなかった蒼白の聖歌隊でした。古き守り人たちは水に呑まれる前に、岩へただ一つの警告を刻みました。彼らが溺れし月と呼ぶものへの祈りです。そしてその下に、より落ち着いた手が二つの言葉を書き添えていました。それはただ眠っているだけだ、と。',
@@ -4063,12 +4131,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'お金は三種類のコインで成り立っています。100カッパーで1シルバー、100シルバーで1ゴールドになり、財布は一番小さなコインから満たされていきます。クエスト報酬、倒した敵からの戦利品、そして不要になったものを売ることで手に入ります。',
   'guide.economy.coinTitle': 'ゴールド、シルバー、カッパー',
   'guide.economy.intro':
-    'コインは世界全体の潤滑油です。装備や物資を買い、修理代やクエストの費用を払い、プレイヤー間でやり取りされます。これらはすべて遊んでいるだけで身につくので、このページはお金がどこから来てどこへ行くのかを示す地図だと思ってください。',
+    'コインは世界全体の潤滑油です。装備や物資、旅の道具を買い、プレイヤー間でやり取りされます。これらはすべて遊んでいるだけで身につくので、このページはお金がどこから来てどこへ行くのかを示す地図だと思ってください。',
   'guide.economy.junkBody':
     '使い道のないドロップ品も、どの商人にでも売れます。バッグがいっぱいになる前に、町を通るたびに空にしましょう。本当に価値のないがらくたは、場所を空けるためにそのまま捨てることもできます。',
   'guide.economy.junkTitle': 'がらくたの整理',
   'guide.economy.marketBody':
-    '商人はワールドマーケットを運営しています。これは会うことのないかもしれない相手とも売買できる、プレイヤー主導の取引所です。商人に話しかけて開きましょう。',
+    '商人はワールドマーケットを運営しています。これは会うことのないかもしれない相手とも売買できる、プレイヤー主導の取引所です。商人に話しかけて開きましょう。商人は自らの品も常に在庫として出品しているので、他のプレイヤーが何も出していないときでも、いつでも買えるものがあります。',
   'guide.economy.marketBrowse':
     '閲覧：出品を一覧でスクロールするか、名前で検索して売り物を探します。各出品には品物、出品者、そしてスタック全体の希望価格が表示されます。',
   'guide.economy.marketCollect':
@@ -4078,11 +4146,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.economy.marketPricing':
     '値付けはあなた次第です。他より少し安く出品すると早く売れる傾向があり、高すぎる値はそのまま放置されがちです。出品する前にまず閲覧して、相場がどうなっているか確かめましょう。',
   'guide.economy.marketTitle': 'ワールドマーケット',
+  'guide.economy.marksBody':
+    '貯められるのは所持金だけではありません。デルヴではデルヴの刻印が手に入ります。これはデルヴの番人のもとでのみ使える別建ての通貨で、仲間の強化や、ほかでは手に入らない装備に充てられます。所持金と混ざることはありません。',
+  'guide.economy.marksTitle': 'もう一つの通貨: デルヴの刻印',
   'guide.economy.tradeBody':
     '近くに立っている相手とは、対面で直接取引できます。互いが共有の窓にアイテムとコインを入れ、双方が確認して初めて交換が成立するので、どちらも損をする心配はありません。友達にドロップ品を手渡したり、約束を取り決めたりする手軽な方法です。',
   'guide.economy.tradeTitle': '他のプレイヤーとの取引',
   'guide.economy.vendorsBody':
-    '町や前哨地には商人が点在し、それぞれ専門の商いを持っています。糧食商は食べ物と飲み物を、武器鍛冶や防具師は装備を、薬草師は試薬を扱い、需品係は実用的な旅の道具を取り揃えています。歩み寄れば、その品揃えを見られます。',
+    '町や前哨地には商人が点在し、それぞれ専門の商いを持っています。糧食商は食べ物と飲み物を、武器鍛冶や防具師は装備を、需品係は実用的な旅の道具を取り揃えています。歩み寄れば、その品揃えを見られます。',
   'guide.economy.vendorsTitle': 'ベンダーと取り扱い品',
   'guide.gear.consumablesElixirs':
     'エリクサーは冒険中、一時的なバフを与えてくれます。もう一歩踏み込みたいときに効く、ささやかな後押しです。',
@@ -4093,6 +4164,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.gear.consumablesPotions':
     'ポーションは使った瞬間に、戦闘中でさえ体力やマナを回復してくれるので、プルがしくじったときの土壇場での救いになります。短いクールダウンを共有するため、ここぞという好機を一度見極めて使いましょう。',
   'guide.gear.consumablesTitle': '消耗品',
+  'guide.gear.cosmeticsApply':
+    'キャラクター画面の外見の項目から、いま使う見た目を設定できます。アンロック済みのものなら、いつでも自由に切り替えられます。',
   'guide.gear.cosmeticsBody':
     '見た目だけを変え、強さには一切影響しない報酬もあります。こうした装飾スキンは、ゲームに影響を与えることなく自分を際立たせてくれるので、好きなものを身につけましょう。',
   'guide.gear.cosmeticsCache':
@@ -4100,17 +4173,19 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.gear.cosmeticsRanks':
     '装飾品にもそれ自身のレアリティ段階があり、希少なものは追い求めると楽しいものです。上位の段階を手に入れると、それより下の見た目も解放されます。',
   'guide.gear.cosmeticsSkins':
-    '集められる装飾の系統は二つあります。どのクラスにも、そのクラスならではのいくつかの別バージョンの外見があり、あなただけが身につけられる新たな装いです。それと並ぶのがクロマ。見た目を丸ごと塗り替える、名前付きのツートーンのカラースキームで、渋い金属色から鮮やかな帝国色まで揃っています。',
+    '集められる装飾の系統は二つあります。ほとんどのクラスには、そのクラスならではのいくつかの別バージョンの外見があり、あなただけが身につけられる新たな装いです。それと並ぶのがクロマ。見た目を丸ごと塗り替える、名前付きのツートーンのカラースキームで、渋い金属色から鮮やかな帝国色まで揃っています。',
   'guide.gear.cosmeticsTitle': '見た目と装飾',
   'guide.gear.fishingBody':
-    '釣りは心安らぐ気分転換です。釣り竿を装備し、開けた水面に竿を投げ入れ、食いついたものを釣り上げます。主に料理して食べ物にできる魚、数コインで売れる細々としたがらくた、そしてときおり値打ちのあるレアな獲物が釣れます。何が手に入るかは、釣る水によって変わります。',
+    '釣りは心安らぐ気分転換です。釣り竿を装備し、開けた水面に竿を投げ入れ、食いついたものを釣り上げます。主にそのまま食べられる食料の魚、数コインで売れる細々としたがらくた、そしてときおり値打ちのあるレアな獲物が釣れます。何が手に入るかは、釣る水によって変わります。',
   'guide.gear.fishingFood':
-    '釣り上げた魚は生で、生魚は食べ物です。獲物を料理すれば、座って食べたときにより多く回復します。良い魚は北の、より冷たく深い水から獲れます。湖に糸を垂らすのは、戦いの合間にバッグを蓄える静かな手段です。',
+    '釣り上げた魚は食べ物です。座って休んでいる間に一匹食べれば体力が回復し、より滋養のある魚は北の、より冷たく深い水から獲れます。湖に糸を垂らすのは、戦いの合間にバッグを蓄えておく静かな手段です。',
   'guide.gear.fishingRare':
     'ときおり、晩餐よりはるかに良いものが釣り糸にかかります。どの水でもどんな釣り人にも運次第でかかりうる、きらめく値打ちの魚です。一匹釣り上げれば、ログがその獲物で輝きます。湖でのんびり過ごす午後を、人に語りたくなるような幸運の一引きです。',
   'guide.gear.fishingTitle': '釣り',
   'guide.gear.intro':
     'ギアとは、あなたのキャラクターが身につける装備や持ち歩くアイテムのことです。より良いギアこそが強くなる最も着実な道であり、そのほとんどは遊んでいるだけで手に入ります。',
+  'guide.gear.itemLevelBody':
+    '2つの装備を手早く比べたいときは、オプションで「アイテムレベルを表示」をオンにしましょう。すると各武器や防具にアイテムレベルが表示されます。これは入手元をもとに、その装備のおおよその強さを一つの数値で示したものです。スロットが違っていても、どちらの方が大きく性能を底上げするか、ひと目で見分けられます。',
   'guide.gear.qualityBody':
     'どのアイテムにも品質があり、その名前は品質に合わせて色付けされているので、ひと目で価値が読み取れます。最もありふれたものから最も値打ちのあるものまで、順に並べると次の通りです。',
   'guide.gear.qualityCommon': '一般',
@@ -4122,6 +4197,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.gear.qualityRare': 'レア',
   'guide.gear.qualityTitle': '品質をひと目で',
   'guide.gear.qualityUncommon': '上質',
+  'guide.gear.setsBody':
+    '最も希少な防具は、見た目も性能もひと揃いになるよう作られた、おそろいのシリーズで手に入ります。同じシリーズを一定数まとめて装備するとセットが発動し、各部位そのもののステータスに加えてボーナスが得られます。装備する部位が多いほど効果は強まります。これらはレベル上限近くの最も手強いグループコンテンツから入手でき、フルセットを目指すことは古典的なエンドゲームの目標になっています。',
+  'guide.gear.setsTitle': 'セットとセットボーナス',
   'guide.gear.slotChest': '胴',
   'guide.gear.slotFeet': '足',
   'guide.gear.slotGloves': '手',
@@ -4131,7 +4209,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.gear.slotShoulder': '肩',
   'guide.gear.slotWaist': '腰',
   'guide.gear.slotsBody':
-    '武器スロットが一つと、防具スロットが七つあります。装備した一つ一つがキャラクターの能力を底上げし、アップグレードを見つけるたびに自由に組み合わせを入れ替えられます。',
+    '武器スロットが一つと、防具スロットが七つあります。各クラスは特定の武器しか扱えず、自分の重さまでの防具、クロス、レザー、またはメイルを着用します。だからあなたに合うアップグレードは、あなたのクラスのために作られたものです。その範囲内で、見つけた最良の品ですべてのスロットを埋めましょう。',
   'guide.gear.slotsTitle': '装備できるもの',
   'guide.gear.sourcesBody':
     '序盤のアップグレードのほとんどはクエスト報酬なので、稼ぎ作業よりクエストを終わらせるほうが得です。敵を倒すと装備を落とし、町の商人は手堅い基本装備を売り、プレイヤーマーケットでは他の冒険者から買えます。',
@@ -4180,9 +4258,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.progression.noRush':
     '急ぐ必要はありません。世界は自分のペースで楽しむためにあります。気の向くままに歩き、目に留まったクエストを受け、その道すがら英雄を育てていきましょう。',
   'guide.progression.prestigeBody':
-    '経験値は上限に達した後も加算され続けます。それは見た目だけの仮想レベルを養い、経験値バーは上がり続けます。そして長期的なプレステージランクは、栄誉のために得ることができます。完全に任意のもので、力を授けることは決してなく、ただあなたが歩んできた道のりの証です。',
+    '経験値は上限に達した後も加算され続けます。それは見た目だけの仮想レベルを養うので、経験値バーは上がり続け、そして長期的なプレステージランクは栄誉のために得ることができます。生涯経験値の大きな節目を越えると、キャラクターシートに表示される装飾用の称号やネームプレートの縁取りも解放されます。そのすべては完全に任意のもので、力を授けることは決してなく、ただあなたが歩んできた道のりの証です。',
   'guide.progression.restedBody':
-    'ログアウトしたとき、あるいは宿屋のような安全な場所で休んでいるとき、離れている間にキャラクターは休息経験値を蓄えます。次に外へ出て戦うとき、その蓄えが尽きるまで討伐に追加のボーナスがかかります。時間をかけて溜まり、序盤のレベルを早めてくれるので、町でログオフするのは決して無駄な時間ではありません。',
+    '宿屋のような安全な場所で、戦闘の外で休めば、座っている間にキャラクターは休息経験値を蓄えます。次に外へ出て戦うとき、その蓄えが尽きるまで討伐に追加のボーナスがかかります。宿屋での一休みは決して無駄な時間ではなく、次のレベリングの区間を早めてくれます。',
   'guide.progression.restedTitle': '休息経験値',
   'guide.progression.xpBody':
     '経験値はクエストの達成と敵の討伐で得られます。クエストが断然多くを与えてくれるので、クエストの道筋をたどるのが最も早く登る方法です。道すがら何かを倒すことが、残りを埋めてくれます。',
@@ -4193,31 +4271,34 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'マイアフェンでの溺死は事故ではありません。何者かが、まるで献金箱を満たすように沼を満たし、水が奪う旅人すべてから従順な死者を起こしています。命令の連鎖をたどって、水没した砦のミストコーラーまで上り詰めれば、その末期の言葉が、峰々の下でうごめくさらに古き何かの名を告げます。',
   'guide.questsPage.sagaMarshTitle': '湿地：魂の貢ぎ',
   'guide.questsPage.sagaPeaksBody':
-    'ソーンピークで企ての全貌が明らかになります。渓谷以来盗まれてきたすべての魂は、山の下に封じられた古き存在を目覚めさせるために注がれた貢ぎ物でした。礼拝堂の前庭で始まった足取りは、ここで終わります。開くのに十人を要する扉の前で。その奥に誰が待つのかは、あなた自身に見届けてもらいましょう。',
+    'Thornpeakで企ての全貌が明らかになります。Vale以来盗まれてきたすべての魂は、山の中心で進むカルトの陰惨な企てに注がれた貢ぎ物でした。礼拝堂の前庭で始まった足取りは、すべての黒幕と対峙する五人での降下となって、ここで終わります。その奥に誰が待つのかは、あなた自身に見届けてもらいましょう。',
   'guide.questsPage.sagaPeaksTitle': '峰々：貢ぎは何のためだったのか',
   'guide.questsPage.sagaTitle': '北へ続く足取りを追え',
   'guide.questsPage.sagaValeBody':
     'イーストブルックでは死者が安らがず、その背後の印は、とうに滅んだと思われていた一派のものです。それを礼拝堂の地下墓所で働くグレイブコーラーまでたどれば、彼自身の書き物が北の沼へとあなたを導きます。',
   'guide.questsPage.sagaValeTitle': '渓谷：印に刻まれた名',
   'guide.questsPage.sideCryptBody':
-    '高地には、より静かな謎が走っています。どんな記録にも残らぬ冠が刻まれた古い墓です。死者を読み解き、彼らが守ってきたものを集め、閉ざされたままであるべき墓を解き放ちましょう。それは探偵の足取りであり、フルレイド向けの二つ目のエンドゲームの試練への道を開きます。',
+    '高地には、より静かな謎が走っています。どんな記録にも残らぬ冠が刻まれた古い墓です。死者を読み解き、彼らが守ってきたものを集め、閉ざされたままであるべき墓を解き放ちましょう。それは探偵の足取りであり、レルムの十人エンドゲームレイドへの道を開きます。',
   'guide.questsPage.sideCryptTitle': '忘れられた王',
+  'guide.questsPage.sideTempleBody':
+    '高地の山上湖に浮かぶ淡い光の門は、水没した教団がいまなお歌い続ける、沈んだ神殿へと通じています。その短いクエストの連なりは本筋の物語とは切り離されており、湖畔まで登り、岩に刻まれた警告を読み、それが何のためのものかを確かめに降りていく者だけのための、独立した謎となっています。',
+  'guide.questsPage.sideTempleTitle': '沈んだ神殿',
   'guide.questsPage.sideTitle': '本道から外れた糸',
   'guide.questsPage.sideWardenBody':
-    '物語と並んで、渓谷と沼の番人たちが常設の賞金の階段を授けてくれます。あなた以前のすべての番人がその地位を得てきたように、敵を一体ずつ倒して登り詰めましょう。それは正攻法のレベリングであり、各ゾーンの最悪の厄介者たちを巡る旅です。',
+    '物語と並んで、Valeと沼の保安官や番人たちが、常設の賞金の階段を授けてくれます。あなた以前のすべての賞金稼ぎがその地位を得てきたように、敵を一体ずつ倒して登り詰めましょう。それは正攻法のレベリングであり、各ゾーンの最悪の厄介者たちを巡る旅です。',
   'guide.questsPage.sideWardenTitle': '己の名を勝ち取る',
   'guide.questsPage.typeGatherBody':
     '世界から、あるいは敵が落とすものからアイテムを集めます。薬草、鉱石、失われた手紙、カルトの不吉な試薬など。特定の敵からしか落ちないものもあるので、狩りと収集は表裏一体です。',
   'guide.questsPage.typeGatherTitle': '収集',
   'guide.questsPage.typeGroupBody':
-    'メインストーリーの各章は、ダンジョンの扉で終わります。導入はソロでこなせますが、章の悪役への最後の一撃は五人パーティ向けに作られています（そして最後の最後は十人向けです）。',
+    'メインストーリーの各章は、ダンジョンの扉で終わります。導入はソロでこなせますが、章の悪役への最後の一撃は五人パーティ向けに作られています。',
   'guide.questsPage.typeGroupTitle': 'グループでのフィナーレ',
   'guide.questsPage.typeInteractBody':
     '世界に固定された何かを使う、浄化する、あるいは読み取ります。汚された墓、岸の岩に刻まれた警告、封じられた地下墓所の扉など。目印に歩み寄り、それに働きかけましょう。',
   'guide.questsPage.typeInteractTitle': '対話',
   'guide.questsPage.typeMusterBody':
-    '味方の人物をある場所から別の場所へ安全に送り届けたり、北へ攻め込む前に町の守り手を結集させたり。これらは、あなたがその物語の一員である人々と共に動き続けさせてくれます。',
-  'guide.questsPage.typeMusterTitle': '護衛と結集',
+    'いくつかのクエストでは、北へ攻め込む前に町を結集させます。門に迫る脅威を間引き、守り手が必要とするものを集めるのです。これらは、あなたがその物語の一員である人々のために行う討伐と収集の目標であり、彼らと共に動き続けさせてくれます。',
+  'guide.questsPage.typeMusterTitle': '守りを結集する',
   'guide.questsPage.typeSlayBody':
     '獣の群れを間引いたり、指定された数の標的の敵を倒してカルトの支配を打ち砕いたりします。ゲーム最初のクエスト、イーストブルックの道から狼を排除するものも、その一つです。',
   'guide.questsPage.typeSlayTitle': '討伐',
@@ -4226,7 +4307,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.questsPage.typesTitle': '目にすることになるクエストの種類',
   'guide.social.chanGeneral': '一般。',
   'guide.social.chanGeneralBody':
-    '周りにいる人々のための、常時オンのローカルチャンネル。質問したり雑談したりするのに向いています。',
+    'オンラインの全員に届く、常時オンのレルム全体のチャンネル。質問したり雑談したりするのに向いています。WorldやLooking for Groupとは違い、参加を選ぶ必要は一切ありません。',
   'guide.social.chanGuild': 'ギルドとオフィサー。',
   'guide.social.chanGuildBody':
     'ギルド用のチャンネル。ギルドチャットは全メンバーに届き、オフィサーチャンネルはオフィサー専用です。',
@@ -4274,11 +4355,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ありふれたドロップ品はルートした人のものに、より良いドロップ品はロールにかけられて、全員に公平な機会が与えられます。',
   'guide.social.lootCommonTitle': 'アイテム。',
   'guide.social.lootHeading': 'パーティの戦利品',
+  'guide.social.lootMasterBody':
+    'リーダーが代わりに上位の戦利品を管理し、受け取るべきメンバーへ一つずつ配ることもできます。組織立ったグループがダンジョンを攻略するときのように、貴重な装備が思わぬロールで流れてしまうのを防げます。',
+  'guide.social.lootMasterTitle': 'マスタールーター。',
   'guide.social.lootRollBody':
     'アイテムがロールにかけられると、対象となる各メンバーは、欲しければニード、余りなら受け取る程度ならグリード、辞退するならパスを選びます。最も高い出目が勝ちます。',
   'guide.social.lootRollTitle': 'ニード、グリード、パス。',
   'guide.social.partyBody':
-    '相手の名前を右クリックして招待を選ぶか、チャットコマンドで他のプレイヤーを招待します。パーティは最大五人まで入れ、そのうち一人がリーダーです。',
+    '相手の名前を右クリックして招待を選ぶことで、他のプレイヤーを招待します。パーティは最大五人まで入れ、そのうち一人がリーダーです。',
   'guide.social.partyCredit':
     '互いに近くにいるグループメンバーは討伐とクエストの達成判定を共有するので、一緒にクエストを進めれば速くなることはあっても遅くなることはありません。パーティはまた、チームとしてダンジョンへ踏み込む手段でもあります。',
   'guide.social.partyHeading': 'パーティを組む',
@@ -4299,11 +4383,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.stats.dodgeBody':
     '回避は、向かってくる近接攻撃を丸ごとかわす確率です。わずかな基礎確率から始まり、敏捷性がそれを上げるので、すばしこいクラスほど多くの一撃をかわします。',
   'guide.stats.dodgeTitle': '回避',
+  'guide.stats.dpsBody':
+    'キャラクターシートには、1秒あたりのダメージの目安も表示されます。これは武器、その振りの速さ、そしてアタックパワーを合わせて、時間あたりにどれだけのダメージになるかをおおまかに示したものです。2つの武器をひと目で比べるのに手軽な指標です。',
+  'guide.stats.dpsTitle': '1秒あたりのダメージ',
   'guide.stats.growBody':
     'ステータスを上げるものは二つあります。レベルが上がるごとに、クラスに合った各能力値が一定量加わり、装備するギアがその上にさらに加えます。ギアを最新に保つことが、レベル上限まで着実に強くなる道です。',
   'guide.stats.growHeading': 'ステータスの伸び方',
   'guide.stats.intBody':
-    '知力はスペルキャスターのマナのプールを増やし、呪文のクリティカル率を高めます。マナで詠唱するクラスには重要ですが、レイジやエナジーのクラスにはほとんど効きません。',
+    '知力はスペルキャスターのマナのプールを増やし、スペルパワーを高めて呪文の威力を上げ、呪文のクリティカル率を高めます。マナで詠唱するクラスには重要ですが、レイジやエナジーのクラスにはほとんど効きません。',
   'guide.stats.intTitle': '知力',
   'guide.stats.intro':
     'あなたのキャラクターは、ひと握りの能力値で表されます。うまく遊ぶためにそれらを覚える必要は決してありませんが、それぞれがおおよそ何をするか知っておくと、キャラクターシートを読み、適切なアップグレードを選ぶのに役立ちます。',
@@ -4313,6 +4400,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.stats.sheetBody':
     'ゲーム内でキャラクターウィンドウを開けば、これらすべてを一か所で確認できます。片側に五つの能力値、もう片側にそれらが養うステータスが並びます。どの値にもカーソルを合わせると、ツールチップがそれがクラスにとって何をするかを分解して示すので、アップグレードが実際にどの数値を動かしたかをひと目で見られます。',
   'guide.stats.sheetHeading': 'キャラクターシートの読み方',
+  'guide.stats.spBody':
+    'スペルパワーは、術者にとってのアタックパワーにあたるステータスで、呪文で与えるダメージを高めます。知力によって伸び、術者向けの装備やバフでさらに上乗せされます。近接戦士がアタックパワーを気にかけるように、術者はスペルパワーに目を配ります。',
+  'guide.stats.spTitle': 'スペルパワー',
   'guide.stats.spiBody':
     '精神力は、戦闘外でキャスターのマナがどれだけ速く戻るかを左右します。知力と同じく、マナのクラスに役立ち、他のクラスにはほとんど意味がありません。',
   'guide.stats.spiTitle': '精神力',
@@ -4327,6 +4417,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.viewer.error':
     '3Dモデルを読み込めませんでした。上のアートでは、この{name}が今も表示されています。',
   'guide.viewer.loading': 'モデルを読み込み中...',
+  'guide.viewer.posterAlt': '{name}',
   'guide.viewer.view3d': '{name}を3Dで見る',
   'guide.viewer.view3dShort': '3Dで見る',
   'guide.worldPage.marshGreeter': '番人フェンウィック、フェンブリッジ',
@@ -4342,10 +4433,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.valeGreeter': 'レッドブルック元帥、イーストブルック',
   'guide.worldPage.valeGreeting': '刃を手放すな。渓谷はかつての姿ではない。',
   'guide.worldPage.valePlaceNotes':
-    'イーストブルックは最初の本拠地です。ウルフランとボアの草原は穏やかな狩り場、ミラー湖は釣りのできる静かな水。ウェブウッドとカッパー採掘場には蜘蛛と鉱石に貪欲な掘り手が隠れ、盗賊の野営地と倒れた礼拝堂にはより手荒い仕事があり、ブライトウッド・グレードは北部の穏やかな野生の林間です。',
+    'Eastbrookは最初の本拠地です。Wolf RunとBoar Meadowは穏やかな狩り場、Mirror Lakeは釣りのできる静かな水辺です。WebwoodとCopper Digには蜘蛛と鉱石に貪欲な掘り手が隠れ、Bandit CampとFallen Chapelにはより手荒い仕事があります。Reliquary Hillはレルム初のデルヴ、Collapsed Reliquaryへと落ち込んでおり、Brightwood Gladeは北にある静かな陽だまりの木立です。',
   'guide.worldPage.gladeTitle': '静かな一角：ブライトウッド・グレード',
   'guide.worldPage.gladeBody':
-    '谷の物語がすべて死者について語るわけではありません。北にはブライトウッド・グレードと呼ばれる陽だまりの林があり、静かな小道、草を食む鹿、枝の下で警戒する獣たちとともに、穏やかな独自の調子を保っています。あなたが追う足跡への静かな対照であり、道に寄り道の余裕があるなら見る価値があります。',
+    'Valeの物語がすべて死者について語るわけではありません。北にはBrightwood Gladeと呼ばれる陽だまりの木立があり、静かな小道と枝々の下に揺れる木漏れ日とともに、穏やかな独自の調子を保っています。あなたが追う足跡への柔らかな対照であり、道に寄り道の余裕があるなら見る価値があります。',
   // APM telemetry label from release/v0.14.0
   'hudChrome.perf.labels.apm': 'APM',
   'entities.zones.eastbrook_vale.pois.9.label': 'ブライトウッドの林間',
@@ -4676,4 +4767,122 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hudChrome.abilityScaling.bonus': '(+{value})',
+  // Discord integration (two-way login, rewards, relay, in-game flair).
+  'hudChrome.discord.close': '閉じる',
+  'hudChrome.discord.keybind': 'Discordパネル',
+  'hudChrome.discord.disabled': 'Discord連携は現在利用できません。',
+  'hudChrome.discord.tiers.none': 'ランク外',
+  'hudChrome.discord.tiers.initiate': '見習い',
+  'hudChrome.discord.tiers.squire': '従者',
+  'hudChrome.discord.tiers.footman': '歩兵',
+  'hudChrome.discord.tiers.knight': '騎士',
+  'hudChrome.discord.tiers.champion': 'チャンピオン',
+  'hudChrome.discord.tiers.warlord': '軍団長',
+  'hudChrome.discord.tiers.legend': '伝説',
+  'hudChrome.discord.tiers.mythic': '神話',
+  'hudChrome.discord.loginCta': 'Discordで続ける',
+  'hudChrome.discord.choice.title': 'Discordで続ける',
+  'hudChrome.discord.choice.intro':
+    '新しいアカウントを作成するか、Discordを既存のアカウントに連携します。',
+  'hudChrome.discord.choice.greeting': 'ようこそ、{name}さん！',
+  'hudChrome.discord.choice.createCta': '新しいアカウントを作成',
+  'hudChrome.discord.choice.haveAccount': 'すでにアカウントをお持ちですか？',
+  'hudChrome.discord.choice.linkCta': '既存のアカウントを連携',
+  'hudChrome.discord.choice.linkSubmit': 'アカウントを連携',
+  'hudChrome.discord.choice.error': '続行できませんでした。もう一度お試しください。',
+  'hudChrome.discord.choice.expired':
+    'このDiscordログインは期限切れです。もう一度Discordでログインしてください。',
+  'hudChrome.discord.keep.title': 'パスワードを設定',
+  'hudChrome.discord.keep.body':
+    'このアカウントはDiscordでログインします。連携を解除した後もユーザー名でログインできるよう、パスワードを設定してください。',
+  'hudChrome.discord.keep.usernameLabel': 'ユーザー名',
+  'hudChrome.discord.keep.confirmLabel': 'パスワードの確認',
+  'hudChrome.discord.keep.submit': 'パスワードを設定して連携解除',
+  'hudChrome.discord.keep.cancel': 'キャンセル',
+  'hudChrome.discord.keep.mismatch': 'パスワードが一致しません。',
+  'hudChrome.discord.keep.tooShort': 'パスワードは6文字以上にしてください。',
+  'hudChrome.discord.orEmail': 'またはメールを使用',
+  'hudChrome.discord.cta.title': 'Discordを連携してポイントを獲得し、ランクを上げましょう',
+  'hudChrome.discord.cta.stats': '{online}人オンライン · サーバーメンバー{total}人',
+  'hudChrome.discord.cta.statsLoading': 'コミュニティに参加して報酬を獲得しましょう',
+  'hudChrome.discord.cta.button': 'ワンクリックで連携',
+  'hudChrome.discord.cta.dismiss': '非表示にする',
+  'hudChrome.discord.link.cta': 'Discordを連携',
+  'hudChrome.discord.link.relink': 'Discordを再連携',
+  'hudChrome.discord.link.connecting': 'Discordを開いています...',
+  'hudChrome.discord.link.benefits':
+    'Discordを連携すると、プレイやコミュニティ活動からポイントを獲得し、ステータスランクを上げられます。',
+  'hudChrome.discord.link.error': 'Discordを連携できませんでした。もう一度お試しください。',
+  'hudChrome.discord.link.success': 'Discordを連携しました。',
+  'hudChrome.discord.linkedAs': '{name}として連携済み',
+  'hudChrome.discord.linkedTitle': 'Discord：{name}',
+  'hudChrome.discord.viewProfile': 'このキャラクターの公開プロフィールを開く',
+  'hudChrome.discord.unlink': '連携解除',
+  'hudChrome.discord.visit': 'Discordを開く',
+  'hudChrome.discord.unlinkConfirm':
+    'このゲームアカウントからDiscordアカウントの連携を解除しますか？',
+  'hudChrome.discord.statusLabel': 'ステータス',
+  'hudChrome.discord.points': 'ポイント',
+  'hudChrome.discord.lifetime': '累計',
+  'hudChrome.discord.toNext': '次のランクまで{points}',
+  'hudChrome.discord.maxRank': '最高ランク到達',
+  'hudChrome.discord.tiersTitle': 'ステータスランク',
+  'hudChrome.discord.tierLocked': 'ロック中',
+  'hudChrome.discord.tierCurrent': '現在',
+  'hudChrome.discord.earnTitle': 'ポイントの獲得方法',
+  'hudChrome.discord.earnBody':
+    'ゲームのプレイ時間とDiscordでの活動からポイントを獲得できます。ポイントはステータスランクを上げます。',
+  'hudChrome.discord.memberSince': '加入日',
+  'hudChrome.discord.memberSinceDays': 'Discord加入{days}日',
+  'hudChrome.discord.roleTag.artists': 'アーティスト',
+  'hudChrome.discord.guildMember': '認証済みメンバー',
+  'hudChrome.discord.notMember': 'まだサーバーに参加していません',
+  'hudChrome.discord.joinCta': 'Discordに参加',
+  'hudChrome.discord.online': '{count}人オンライン',
+  'hudChrome.discord.community': 'コミュニティ',
+  'hudChrome.discord.rewards': '報酬',
+  'hudChrome.discord.voice.title': 'ボイス',
+  'hudChrome.discord.voice.empty': '現在ボイスに参加している人はいません。',
+  'hudChrome.discord.voice.speaking': '発言中',
+  'hudChrome.discord.voice.muted': 'ミュート中',
+  'hudChrome.discord.voice.join': 'ボイスに参加',
+  'hudChrome.discord.voice.connect': 'ボイスチャンネルに接続',
+  'hudChrome.discord.swag.claim': '受け取る',
+  'hudChrome.discord.swag.claimed': '受取済み',
+  'hudChrome.discord.swag.locked': 'ロック中',
+  'hudChrome.discord.swag.needTier': 'これを受け取るにはより高いランクが必要です。',
+  'hudChrome.discord.swag.needPoints': 'ポイントが足りません。',
+  'hudChrome.discord.swag.claimError': 'その報酬を受け取れませんでした。もう一度お試しください。',
+  'hudChrome.discord.swag.claimedToast': '受け取りました：{name}',
+  'hudChrome.discord.swag.titleDiscordian': '称号：Discordian',
+  'hudChrome.discord.swag.titleSquire': '称号：レルムの従者',
+  'hudChrome.discord.swag.chromaBlurple': 'Blurpleメックカラー',
+  'hudChrome.discord.swag.titleChampion': '称号：Claudemoonのチャンピオン',
+  'hudChrome.discord.swag.swagStickers': 'ステッカーパック（発送）',
+  'hudChrome.discord.swag.swagTee': 'Tシャツ（発送）',
+  'hudChrome.discord.relay.tooFast': '投稿が速すぎます。少し待ってからもう一度お試しください。',
+  'hudChrome.discord.relay.lfg.label': 'パーティ募集',
+  'hudChrome.discord.relay.lfg.hint': 'ダンジョンやクエストの仲間を探す',
+  'hudChrome.discord.relay.wts.hint': '販売するアイテムやサービスを宣伝する',
+  'hudChrome.discord.relay.wtb.hint': '購入したいアイテムを募集する',
+  'hudChrome.discord.relay.recruit.label': 'ギルドメンバー募集',
+  'hudChrome.discord.relay.recruit.hint': 'ギルドの仲間を募集する',
+  'hudChrome.discord.relay.event.label': 'イベント / レイド',
+  'hudChrome.discord.relay.event.hint': 'レイドや集会、イベントを告知する',
+  'hudChrome.discord.relay.help.hint': 'コミュニティに助けを求める',
+  'hudChrome.discord.title': 'Discord',
+  'hudChrome.discord.panelTitle': 'World of ClaudeCraft',
+  'hudChrome.discord.open': 'Discord',
+  'hudChrome.discord.viewCharacter': '{name}を表示',
+  'hudChrome.discord.rank': 'ランク',
+  'hudChrome.discord.roleTag.levyst': 'Levy St',
+  'hudChrome.discord.roleTag.devs': '開発者',
+  'hudChrome.discord.roleTag.mods': 'モデレーター',
+  'hudChrome.discord.voice.channel': '{channel}に参加中',
+  'hudChrome.discord.swag.title': 'グッズ',
+  'hudChrome.discord.swag.free': '無料',
+  'hudChrome.discord.swag.cost': '{points} pt',
+  'hudChrome.discord.relay.wts.label': '売却希望',
+  'hudChrome.discord.relay.wtb.label': '購入希望',
+  'hudChrome.discord.relay.help.label': 'ヘルプが必要',
 };

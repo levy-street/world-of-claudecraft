@@ -90,6 +90,38 @@ function cleanTier(value: unknown): WordTier | null {
   return value === 'soft' || value === 'hard' ? value : null;
 }
 
+type SharedIpSort = 'accounts' | 'last_seen';
+type SharedIpSortDirection = 'asc' | 'desc';
+
+function sharedIpSortParams(params: URLSearchParams): {
+  sort: SharedIpSort;
+  dir: SharedIpSortDirection;
+} {
+  return {
+    sort: params.get('sort') === 'last_seen' ? 'last_seen' : 'accounts',
+    dir: params.get('dir') === 'asc' ? 'asc' : 'desc',
+  };
+}
+
+function sortSharedIpRows<T extends { ip: string; accountCount: number; lastSeenAt: string }>(
+  rows: readonly T[],
+  sort: SharedIpSort,
+  dir: SharedIpSortDirection,
+): T[] {
+  const multiplier = dir === 'asc' ? 1 : -1;
+  return [...rows].sort((a, b) => {
+    const primary =
+      sort === 'last_seen'
+        ? a.lastSeenAt.localeCompare(b.lastSeenAt)
+        : a.accountCount - b.accountCount;
+    const secondary =
+      sort === 'last_seen'
+        ? b.accountCount - a.accountCount
+        : b.lastSeenAt.localeCompare(a.lastSeenAt);
+    return primary * multiplier || secondary || a.ip.localeCompare(b.ip);
+  });
+}
+
 function getBlockedIpsForAccount(
   game: GameServer,
   detail: { lastLoginIp: string | null; recentSessions: { ip: string | null }[] },
@@ -378,6 +410,9 @@ export async function handleAdminApi(
     if (path === '/admin/api/online') {
       return ok(res, { players: game.liveSessions() });
     }
+    if (path === '/admin/api/suspicious-players') {
+      return ok(res, { players: game.suspiciousPlayers() });
+    }
     if (path === '/admin/api/online-history') {
       return ok(res, await onlineHistory(url.searchParams.get('range') ?? '30d'));
     }
@@ -415,8 +450,9 @@ export async function handleAdminApi(
     }
     if (path === '/admin/api/shared-ips') {
       const { page, limit } = parsePageParams(url.searchParams);
+      const { sort, dir } = sharedIpSortParams(url.searchParams);
       if (url.searchParams.get('online') === '1') {
-        const rows = game.liveSharedIps();
+        const rows = sortSharedIpRows(game.liveSharedIps(), sort, dir);
         const offset = (page - 1) * limit;
         return ok(res, {
           rows: rows.slice(offset, offset + limit).map((row) => ({
@@ -428,7 +464,7 @@ export async function handleAdminApi(
           limit,
         });
       }
-      const sharedIps = await listSharedIps(page, limit);
+      const sharedIps = await listSharedIps(page, limit, sort, dir);
       return ok(res, {
         ...sharedIps,
         rows: sharedIps.rows.map((row) => ({

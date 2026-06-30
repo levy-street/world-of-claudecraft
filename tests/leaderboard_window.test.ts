@@ -111,3 +111,52 @@ describe('leaderboard_window: no magic values (DOM painter)', () => {
     expect(code).not.toContain(', 50)');
   });
 });
+
+describe('leaderboard_window: guild board tab (Players / Guilds)', () => {
+  it('renders a role=tablist with both board tabs', () => {
+    expect(code).toContain('role="tablist"');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: asserting the painter source literally contains this template expression
+    expect(code).toContain('data-leaderboard-tab="${board}"');
+    expect(code).toContain("tab('players', t('hudChrome.leaderboard.tabPlayers'))");
+    expect(code).toContain("tab('guilds', t('hudChrome.leaderboard.tabGuilds'))");
+  });
+
+  it('marks the active tab with aria-selected for screen readers', () => {
+    expect(code).toContain('aria-selected');
+  });
+
+  it('wires the WAI-ARIA tablist: roving tabindex, aria-controls, a labelled tabpanel', () => {
+    // Roving tabindex (0 on the active tab, -1 on the rest) so Tab lands on one tab.
+    expect(code).toContain("tabindex=\"${active ? '0' : '-1'}\"");
+    // Each tab controls the shared tabpanel, which carries the matching id + role.
+    expect(code).toContain('aria-controls="lb-body-panel"');
+    expect(code).toContain('id="lb-body-panel" role="tabpanel"');
+    expect(code).toContain('aria-label="${esc(t(\'hudChrome.leaderboard.tabsLabel\'))}"');
+  });
+
+  it('drives keyboard tab nav through the shared roving core and refocuses the active tab', () => {
+    // Arrow/Home/End routed through the tested rovingTarget core (not bespoke math).
+    expect(code).toContain("rovingTarget(ke.key, i, tabs.length, 'horizontal')");
+    // Enter/Space activate, with preventDefault suppressing the synthesized click.
+    expect(code).toMatch(/ke\.key === 'Enter' \|\| ke\.key === ' '/);
+    // A tab switch re-renders with focus:'tab', and render() refocuses the active
+    // tab so the innerHTML rebuild never drops focus to <body>.
+    expect(code).toContain("void this.render('tab')");
+    expect(code).toContain(".lb-tab-active') as HTMLElement | null)?.focus()");
+  });
+
+  it('awaits the guild board through the IWorld seam, not a concrete world', () => {
+    expect(code).toContain('world.guildLeaderboard(this.page, LEADERBOARD_PAGE_SIZE)');
+  });
+
+  it('escapes the server-supplied guild names before interpolating them', () => {
+    // The guild rows route the guild name through esc() like the player rows.
+    expect(code).not.toMatch(/\$\{r\.name\}(?!\))/);
+  });
+
+  it('maps a rejected / offline guild fetch to the error input', () => {
+    // Guilds are server-only; offline guildLeaderboard() resolves an empty page,
+    // and a rejection maps to the shared error state (result === null).
+    expect(code).toContain("result === null ? { kind: 'error' }");
+  });
+});

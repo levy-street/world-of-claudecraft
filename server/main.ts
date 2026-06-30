@@ -5,12 +5,13 @@ import { type WebSocket, WebSocketServer } from 'ws';
 import {
   LEADERBOARD_MAX,
   LEADERBOARD_PAGE_SIZE,
+  paginateGuildLeaderboard,
   paginateLeaderboard,
 } from '../src/sim/leaderboard_page';
 import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 import { virtualLevel } from '../src/sim/types';
-import type { LeaderboardEntry } from '../src/world_api';
+import type { GuildLeaderboardEntry, LeaderboardEntry } from '../src/world_api';
 import {
   handleAccount2faDisable,
   handleAccount2faEnable,
@@ -42,10 +43,8 @@ import { BUG_DESCRIPTION_MAX, BugReportRateLimitError, createBugReport } from '.
 import { characterSheet, type SheetRank } from './character_sheet';
 import {
   accountAndScopeForToken,
-  accountById,
   accountForToken,
   type CharacterRow,
-  characterCountForAccount,
   characterCountsByRealm,
   chatMuteStatusForAccount,
   closeOrphanSessions,
@@ -75,18 +74,25 @@ import {
   referralCountForAccount,
   renameCharacter,
   revokeCompanionToken,
-  revokeTokensExcept,
   saveToken,
   scopeAllowsMutation,
   searchCharacters,
-  setAccountDeactivated,
   setAccountEmail,
   type TokenScope,
   topArenaRatings,
+  topGuilds,
   topLifetimeXp,
   touchLogin,
-  updatePasswordHash,
 } from './db';
+import {
+  handleDiscordCallback,
+  handleDiscordLoginLink,
+  handleDiscordLoginNew,
+  handleDiscordStart,
+  handleDiscordStatus,
+  handleDiscordUnlink,
+} from './discord';
+import { pruneDiscordOAuthStates, pruneDiscordPendingLogins } from './discord_db';
 import { emailAccountCreated } from './email';
 import { GameServer } from './game';
 import { isUniqueViolation, json, readBody } from './http_util';
@@ -114,6 +120,7 @@ import {
   authThrottled,
   cardUploadRateLimited,
   clearAuthFailures,
+  discordRateLimited,
   publicReadRateLimited,
   rateLimited,
   recordAuthFailure,
@@ -148,10 +155,6 @@ import { bufferHandshakeMessages } from './ws_buffer';
 
 const PORT = Number(process.env.PORT ?? 8787);
 const STATIC_DIR = path.join(__dirname, '..', 'dist');
-// DEPRECATED: the standalone community MediaWiki is being retired in favour of the
-// curated in-app guide, which now serves at /wiki. This constant and its (now removed)
-// /wiki -> MediaWiki redirect are dead and slated for deletion in a follow-up ticket.
-const WIKI_URL = process.env.WIKI_URL ?? 'http://localhost:8080/wiki/index.php/Main_Page';
 // Pretty URLs that serve standalone static HTML pages.
 const STATIC_PAGE_ALIASES = new Map([
   ['/links', '/links.html'],
@@ -168,6 +171,8 @@ const STATIC_PAGE_ALIASES = new Map([
   ['/terms/', '/terms.html'],
   ['/merch', '/merch.html'],
   ['/merch/', '/merch.html'],
+  ['/press', '/press.html'],
+  ['/press/', '/press.html'],
   ['/data-deletion', '/data-deletion.html'],
   ['/data-deletion/', '/data-deletion.html'],
   ['/support', '/support.html'],
@@ -247,6 +252,44 @@ async function getLeaderboard(scope: 'realm' | 'global'): Promise<LeaderboardEnt
     return await refreshLeaderboard(scope);
   } catch (err) {
     console.error(`leaderboard refresh failed (${scope}):`, err);
+    return cached?.entries ?? [];
+  }
+}
+
+// Guild high-score board cache. Same compute-once/serve-from-memory shape as the
+// player board above, one cache per scope. Guilds are ranked by summed member
+// lifetime XP (topGuilds); the REST handler pages through the cached window.
+const guildLeaderboardCache: Record<
+  'realm' | 'global',
+  { at: number; entries: GuildLeaderboardEntry[] } | null
+> = {
+  realm: null,
+  global: null,
+};
+
+async function refreshGuildLeaderboard(
+  scope: 'realm' | 'global',
+): Promise<GuildLeaderboardEntry[]> {
+  const rows = await topGuilds(LEADERBOARD_SIZE, { global: scope === 'global' });
+  const entries: GuildLeaderboardEntry[] = rows.map((r, i) => ({
+    rank: i + 1,
+    name: r.name,
+    memberCount: r.memberCount,
+    totalLifetimeXp: r.totalLifetimeXp,
+    topLevel: r.topLevel,
+    ...(scope === 'global' ? { realm: r.realm } : {}),
+  }));
+  guildLeaderboardCache[scope] = { at: Date.now(), entries };
+  return entries;
+}
+
+async function getGuildLeaderboard(scope: 'realm' | 'global'): Promise<GuildLeaderboardEntry[]> {
+  const cached = guildLeaderboardCache[scope];
+  if (cached && Date.now() - cached.at < LEADERBOARD_TTL_MS) return cached.entries;
+  try {
+    return await refreshGuildLeaderboard(scope);
+  } catch (err) {
+    console.error(`guild leaderboard refresh failed (${scope}):`, err);
     return cached?.entries ?? [];
   }
 }
@@ -1090,6 +1133,22 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       // from req.url.
       const params = new URLSearchParams((req.url ?? '').split('?')[1] ?? '');
       const scope: 'realm' | 'global' = params.get('scope') === 'global' ? 'global' : 'realm';
+      // ?board=guilds ranks GUILDS by summed member lifetime XP (default 'players'
+      // is the per-character board below). Same cache + paging shape; the entry
+      // shape differs, so it is its own served slice.
+      if (params.get('board') === 'guilds') {
+        const guildEntries = await getGuildLeaderboard(scope);
+        const guildPageSize = Number(params.get('pageSize')) || LEADERBOARD_PAGE_SIZE;
+        const guildPage = Number(params.get('page')) || 0;
+        const guildSlice = paginateGuildLeaderboard(guildEntries, guildPage, guildPageSize);
+        return json(res, 200, {
+          realm: REALM,
+          scope,
+          board: 'guilds',
+          metric: 'guildLifetimeXp',
+          ...guildSlice,
+        });
+      }
       const entries = await getLeaderboard(scope);
       // Legacy ?limit=N (home-page board): top N as a single page, no paging UI.
       const limitParam = params.get('limit');
@@ -1257,6 +1316,49 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       if (accountId === null) return;
       return handleWalletGet(req, res, accountId);
     }
+    // Discord integration: OAuth login/link, link status, unlink. `start` returns
+    // the authorize URL (the browser then navigates to Discord); `callback` is the
+    // discord.com -> us redirect (no auth/Origin, so it is NOT gated by the
+    // web-login guard, which is login/register-only). Mutations go through
+    // bearerActiveAccount; the dedicated Discord rate-limit bucket guards them.
+    if (req.method === 'POST' && url === '/api/auth/discord/start') {
+      const mode =
+        new URL(req.url ?? '/', 'http://localhost').searchParams.get('mode') === 'link'
+          ? 'link'
+          : 'login';
+      let accountId: number | null = null;
+      if (mode === 'link') {
+        accountId = await bearerActiveAccount(req, res);
+        if (accountId === null) return;
+      }
+      if (discordRateLimited(req, accountId ?? 0)) return json(res, 429, { error: 'rate limited' });
+      return handleDiscordStart(req, res, { mode, accountId });
+    }
+    if (req.method === 'GET' && url === '/api/auth/discord/callback') {
+      return handleDiscordCallback(req, res);
+    }
+    // First-time-login chooser endpoints. Unauthenticated like /callback: the
+    // authorization is the single-use pending-login token (minted only after a
+    // verified Discord OAuth), and the handlers carry their own Discord rate-limit
+    // bucket + (for the link path) the same password/2FA/moderation checks as login.
+    if (req.method === 'POST' && url === '/api/auth/discord/login/new') {
+      return handleDiscordLoginNew(req, res, (ip) => game.isIpBlocked(ip));
+    }
+    if (req.method === 'POST' && url === '/api/auth/discord/login/link') {
+      return handleDiscordLoginLink(req, res, (ip) => game.isIpBlocked(ip));
+    }
+    if (req.method === 'GET' && url === '/api/discord') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (discordRateLimited(req, accountId)) return json(res, 429, { error: 'rate limited' });
+      return handleDiscordStatus(req, res, accountId);
+    }
+    if (req.method === 'DELETE' && url === '/api/discord') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (discordRateLimited(req, accountId)) return json(res, 429, { error: 'rate limited' });
+      return handleDiscordUnlink(req, res, accountId);
+    }
     // $WOC balance proxy — keeps the Solana RPC endpoint (and any key in it)
     // server-side so it never ships in the client bundle. Public (on-chain
     // balances are public) but narrow + IP rate-limited + per-wallet cached.
@@ -1350,6 +1452,12 @@ async function main(): Promise<void> {
       void pruneExpiredOAuthGrants(pool).catch((err) =>
         console.error('oauth grant prune failed:', err),
       );
+      void pruneDiscordOAuthStates(pool).catch((err) =>
+        console.error('discord oauth state prune failed:', err),
+      );
+      void pruneDiscordPendingLogins(pool).catch((err) =>
+        console.error('discord pending login prune failed:', err),
+      );
     },
     24 * 3600 * 1000,
   ).unref();
@@ -1374,6 +1482,12 @@ async function main(): Promise<void> {
     );
     void refreshLeaderboard('global').catch((err) =>
       console.error('leaderboard refresh failed (global):', err),
+    );
+    void refreshGuildLeaderboard('realm').catch((err) =>
+      console.error('guild leaderboard refresh failed (realm):', err),
+    );
+    void refreshGuildLeaderboard('global').catch((err) =>
+      console.error('guild leaderboard refresh failed (global):', err),
     );
   };
   warmLeaderboards();

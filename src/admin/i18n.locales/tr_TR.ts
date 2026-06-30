@@ -402,8 +402,6 @@ export const tr_TR: Record<string, string> = {
   'blockedIps.colCreatedAt': 'Oluşturuldu',
   'blockedIps.addFailed': 'IP engellenemedi.',
   'blockedIps.removeFailed': 'IP engeli kaldırılamadı.',
-  'sharedIps.description':
-    'Birden fazla hesapta gözlenen IP adresleri, hesap sayısına göre sıralanmıştır.',
   'sharedIps.onlineDescription':
     'Şu anda birden fazla çevrimiçi hesap tarafından kullanılan IP adresleri.',
   'sharedIps.onlineOnly': 'Yalnızca çevrimiçi hesaplar',
@@ -456,4 +454,16 @@ export const tr_TR: Record<string, string> = {
   'error.blockExpiryFuture': 'engel bitiş tarihi gelecekte olmalı',
   'error.blockFailed': 'IP engellenemedi',
   'error.blockNotFound': 'IP bulunamadı',
+  'nav.suspiciousPlayers': 'Şüpheli Oyuncular',
+  'suspiciousPlayers.description': 'Aktif bot tespit kanıtı bulunan çevrimiçi oyuncular.',
+  'suspiciousPlayers.autoRefresh': 'Otomatik yenile ({seconds}sn)',
+  'suspiciousPlayers.loading': 'Şüpheli oyuncular yükleniyor...',
+  'suspiciousPlayers.loadFailed': 'Şüpheli oyuncular yüklenemedi.',
+  'suspiciousPlayers.empty': 'Şu anda hiçbir çevrimiçi oyuncuda bot tespit kanıtı yok.',
+  'suspiciousPlayers.colName': 'İsim',
+  'suspiciousPlayers.colEvidence': 'Kanıt',
+  'suspiciousPlayers.colScore': 'Puan',
+  'suspiciousPlayers.evidenceList': '{name} için kanıt',
+  'suspiciousPlayers.evidenceWeight': 'ağırlık {value}',
+  'sharedIps.allDescription': 'Birden fazla hesapta görülen IP adresleri.',
 };

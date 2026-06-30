@@ -401,8 +401,6 @@ export const vi_VN: Record<string, string> = {
   'blockedIps.colCreatedAt': 'Đã tạo',
   'blockedIps.addFailed': 'Không chặn được IP.',
   'blockedIps.removeFailed': 'Không bỏ chặn được IP.',
-  'sharedIps.description':
-    'Địa chỉ IP được quan sát trên nhiều tài khoản, được sắp xếp theo số lượng tài khoản.',
   'sharedIps.onlineDescription': 'Địa chỉ IP hiện được sử dụng bởi nhiều tài khoản trực tuyến.',
   'sharedIps.onlineOnly': 'Chỉ tài khoản trực tuyến',
   'sharedIps.warning':
@@ -453,4 +451,17 @@ export const vi_VN: Record<string, string> = {
   'error.blockExpiryFuture': 'thời điểm hết hạn chặn phải ở tương lai',
   'error.blockFailed': 'không thể chặn IP',
   'error.blockNotFound': 'không tìm thấy IP',
+  'nav.suspiciousPlayers': 'Người Chơi Khả Nghi',
+  'suspiciousPlayers.description':
+    'Người chơi trực tuyến có bằng chứng phát hiện bot đang hoạt động.',
+  'suspiciousPlayers.autoRefresh': 'Tự động làm mới ({seconds}s)',
+  'suspiciousPlayers.loading': 'Đang tải người chơi khả nghi...',
+  'suspiciousPlayers.loadFailed': 'Không thể tải danh sách người chơi khả nghi.',
+  'suspiciousPlayers.empty': 'Hiện không có người chơi trực tuyến nào có bằng chứng phát hiện bot.',
+  'suspiciousPlayers.colName': 'Tên',
+  'suspiciousPlayers.colEvidence': 'Bằng Chứng',
+  'suspiciousPlayers.colScore': 'Điểm',
+  'suspiciousPlayers.evidenceList': 'Bằng chứng cho {name}',
+  'suspiciousPlayers.evidenceWeight': 'trọng số {value}',
+  'sharedIps.allDescription': 'Các địa chỉ IP được ghi nhận trên nhiều tài khoản.',
 };

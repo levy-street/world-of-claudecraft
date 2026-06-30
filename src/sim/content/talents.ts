@@ -421,6 +421,67 @@ export function dormantNodes(cls: PlayerClass, alloc: TalentAllocation): Set<str
   return out;
 }
 
+// Repair a persisted allocation so it satisfies the current rules and budget
+// (load-time revalidation). A stored build replays verbatim on load and is fed
+// straight to computeTalentModifiers, which trusts the apply-time gate; but the
+// load path never ran validateAllocation, so a stale, level-downed, or tampered
+// save could grant over-budget / prereq-broken / gated stats and abilities.
+//
+// This rebuilds the allocation deterministically: walk the tree top-down (class
+// tree first, then the chosen spec, in row/col order (the same order defaultBuild
+// uses), refilling each node up to its persisted rank but never past a point where
+// validateAllocation would reject the build. Because prereqs and pointsGates only
+// reference rows above, a top-down fill satisfies them by construction, and the
+// running budget check clamps the total to availablePoints. On an already-valid,
+// in-budget allocation this is the identity (every persisted rank validates at each
+// step), so honest saves load byte-identically and the parity gate is unaffected.
+export function repairAllocation(
+  cls: PlayerClass,
+  alloc: TalentAllocation,
+  availablePoints: number,
+): TalentAllocation {
+  const ct = talentsFor(cls);
+  if (!ct) return emptyAllocation();
+  // A spec needs a known id AND at least one talent point available; below
+  // FIRST_TALENT_LEVEL (availablePoints === 0) a spec is illegal (it would still
+  // grant the signature ability + mastery passive), matching the apply-time gate.
+  const spec =
+    alloc.spec !== null && availablePoints > 0 && ct.specs.some((s) => s.id === alloc.spec)
+      ? alloc.spec
+      : null;
+  const out: TalentAllocation = { spec, ranks: {}, choices: {} };
+  const order = [...ct.nodes].sort((a, b) => {
+    if (a.tree !== b.tree) return a.tree === 'class' ? -1 : 1;
+    return a.row - b.row || a.col - b.col;
+  });
+  for (const node of order) {
+    if (node.tree === 'spec' && node.specId !== spec) continue;
+    const want = Math.floor(alloc.ranks[node.id] ?? 0);
+    if (want <= 0) continue;
+    if (node.kind === 'choice') {
+      const chosen = alloc.choices[node.id];
+      if (!node.choices?.some((c) => c.id === chosen)) continue;
+      out.choices[node.id] = chosen;
+      out.ranks[node.id] = 1;
+      if (!validateAllocation(cls, out, availablePoints).ok) {
+        delete out.ranks[node.id];
+        delete out.choices[node.id];
+      }
+      continue;
+    }
+    const max = Math.min(want, node.maxRank);
+    for (let target = 1; target <= max; target++) {
+      out.ranks[node.id] = target;
+      if (!validateAllocation(cls, out, availablePoints).ok) {
+        if (target === 1) delete out.ranks[node.id];
+        else out.ranks[node.id] = target - 1;
+        break;
+      }
+    }
+  }
+  return out;
+}
+
 // ---------------------------------------------------------------------------
 // Precompute (the heart of the architecture). Walk the allocation ONCE and fold
 // every chosen node/spec into a flat TalentModifiers struct.

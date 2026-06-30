@@ -151,6 +151,9 @@ export const de_DE: EnTranslations = {
     }
   },
   "hudChrome": {
+    "spectate": {
+      "banner": "{name} wird beobachtet"
+    },
     "emotes": {
       "wave": "Winken",
       "laugh": "Lachen",
@@ -267,7 +270,15 @@ export const de_DE: EnTranslations = {
       "targetAria": "Zauberleiste des Ziels"
     },
     "leaderboard": {
-      "close": "Schließen"
+      "close": "Schließen",
+      "tabsLabel": "Bestenlisten",
+      "tabPlayers": "Spieler",
+      "tabGuilds": "Gilden",
+      "guildName": "Gilde",
+      "members": "Mitglieder",
+      "topLevel": "Top",
+      "guildXp": "Gesamt-XP",
+      "guildEmpty": "Noch keine platzierten Gilden."
     },
     "raidLockout": {
       "title": "Schlachtzug-Sperren",
@@ -721,6 +732,149 @@ export const de_DE: EnTranslations = {
     "nameplate": {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
+    },
+    "discord": {
+      "title": "Discord",
+      "panelTitle": "World of ClaudeCraft",
+      "open": "Discord",
+      "close": "Schließen",
+      "keybind": "Discord-Panel",
+      "disabled": "Die Discord-Integration ist momentan nicht verfügbar.",
+      "tiers": {
+        "none": "Ohne Rang",
+        "initiate": "Eingeweihter",
+        "squire": "Knappe",
+        "footman": "Fußsoldat",
+        "knight": "Ritter",
+        "champion": "Champion",
+        "warlord": "Kriegsfürst",
+        "legend": "Legende",
+        "mythic": "Mythisch"
+      },
+      "loginCta": "Mit Discord fortfahren",
+      "orEmail": "oder E-Mail verwenden",
+      "cta": {
+        "title": "Verknüpfe deinen Discord, um Punkte zu verdienen und aufzusteigen",
+        "stats": "{online} online · {total} Mitglieder auf dem Server",
+        "statsLoading": "Tritt der Gemeinschaft bei und verdiene Belohnungen",
+        "button": "Mit einem Klick verknüpfen",
+        "dismiss": "Ausblenden"
+      },
+      "link": {
+        "cta": "Discord verknüpfen",
+        "relink": "Discord erneut verknüpfen",
+        "connecting": "Discord wird geöffnet...",
+        "benefits": "Verknüpfe deinen Discord, um durch Spiel und Gemeinschaftsaktivität Punkte zu verdienen und die Statusstufen zu erklimmen.",
+        "error": "Discord konnte nicht verknüpft werden. Bitte versuche es erneut.",
+        "success": "Discord verknüpft."
+      },
+      "choice": {
+        "title": "Mit Discord fortfahren",
+        "intro": "Erstelle einen neuen Account oder verknüpfe dein Discord mit einem, den du bereits hast.",
+        "greeting": "Willkommen, {name}!",
+        "createCta": "Neuen Account erstellen",
+        "haveAccount": "Schon einen Account?",
+        "linkCta": "Bestehenden Account verknüpfen",
+        "linkSubmit": "Account verknüpfen",
+        "error": "Fortfahren nicht möglich. Bitte versuche es erneut.",
+        "expired": "Dieser Discord-Login ist abgelaufen. Bitte logge dich erneut mit Discord ein."
+      },
+      "keep": {
+        "title": "Passwort festlegen",
+        "body": "Dein Account verwendet Discord zum Einloggen. Lege ein Passwort fest, damit du dich nach dem Trennen weiterhin mit deinem Benutzernamen einloggen kannst.",
+        "usernameLabel": "Dein Benutzername",
+        "confirmLabel": "Passwort bestätigen",
+        "submit": "Passwort festlegen und trennen",
+        "cancel": "Abbrechen",
+        "mismatch": "Die Passwörter stimmen nicht überein.",
+        "tooShort": "Das Passwort muss mindestens 6 Zeichen lang sein."
+      },
+      "linkedAs": "Verknüpft als {name}",
+      "linkedTitle": "Discord: {name}",
+      "viewCharacter": "{name} ansehen",
+      "viewProfile": "Öffentliches Profil dieses Charakters öffnen",
+      "unlink": "Trennen",
+      "visit": "Discord besuchen",
+      "unlinkConfirm": "Discord-Konto von diesem Spielkonto trennen?",
+      "statusLabel": "Status",
+      "rank": "Rang",
+      "points": "Punkte",
+      "lifetime": "Gesamt",
+      "toNext": "{points} bis zum nächsten Rang",
+      "maxRank": "Höchster Rang erreicht",
+      "tiersTitle": "Statusstufen",
+      "tierLocked": "Gesperrt",
+      "tierCurrent": "Aktuell",
+      "earnTitle": "So verdienst du Punkte",
+      "earnBody": "Verdiene Punkte durch Spielzeit im Spiel und durch Aktivität im Discord. Punkte erhöhen deine Statusstufe.",
+      "memberSince": "Mitglied seit",
+      "memberSinceDays": "{days}T im Discord",
+      "roleTag": {
+        "levyst": "Levy St",
+        "devs": "Entwickler",
+        "mods": "Mod",
+        "artists": "Künstler"
+      },
+      "guildMember": "Verifiziertes Mitglied",
+      "notMember": "Noch nicht auf dem Server",
+      "joinCta": "Tritt dem Discord bei",
+      "online": "{count} online",
+      "community": "Gemeinschaft",
+      "rewards": "Belohnungen",
+      "voice": {
+        "title": "Sprachchat",
+        "channel": "In {channel}",
+        "empty": "Momentan ist niemand im Sprachkanal.",
+        "speaking": "Spricht",
+        "muted": "Stummgeschaltet",
+        "join": "Sprachkanal beitreten",
+        "connect": "Mit Sprachkanal verbinden"
+      },
+      "swag": {
+        "title": "Fanartikel",
+        "claim": "Einlösen",
+        "claimed": "Eingelöst",
+        "locked": "Gesperrt",
+        "free": "Kostenlos",
+        "cost": "{points} Pkt",
+        "needTier": "Erreiche einen höheren Rang, um dies einzulösen.",
+        "needPoints": "Nicht genug Punkte.",
+        "claimError": "Diese Belohnung konnte nicht eingelöst werden. Bitte versuche es erneut.",
+        "claimedToast": "Eingelöst: {name}",
+        "titleDiscordian": "Titel: Discordianer",
+        "titleSquire": "Titel: Knappe des Reichs",
+        "chromaBlurple": "Blurple-Mech-Chroma",
+        "titleChampion": "Titel: Champion von Claudemoon",
+        "swagStickers": "Stickerpaket (Versand)",
+        "swagTee": "T-Shirt (Versand)"
+      },
+      "relay": {
+        "tooFast": "Du postest zu schnell. Warte einen Moment und versuche es erneut.",
+        "lfg": {
+          "label": "Auf Gruppensuche",
+          "hint": "Finde Spieler für einen Dungeon oder eine Quest"
+        },
+        "wts": {
+          "label": "Biete zum Verkauf",
+          "hint": "Biete einen Gegenstand oder Dienst zum Verkauf an"
+        },
+        "wtb": {
+          "label": "Suche zu kaufen",
+          "hint": "Frage nach einem Gegenstand, den du kaufen möchtest"
+        },
+        "recruit": {
+          "label": "Gildenrekrutierung",
+          "hint": "Wirb Spieler für deine Gilde an"
+        },
+        "event": {
+          "label": "Event / Schlachtzug",
+          "hint": "Kündige einen Schlachtzug, ein Treffen oder ein Event an"
+        },
+        "help": {
+          "label": "Hilfe benötigt",
+          "hint": "Bitte die Gemeinschaft um Hilfe"
+        }
+      }
     }
   },
   "guide": {
@@ -745,6 +899,7 @@ export const de_DE: EnTranslations = {
       "world": "Welt",
       "quests": "Quests",
       "dungeons": "Dungeons und Schlachtzüge",
+      "delves": "Tiefgänge",
       "reference": "Nachschlagewerk",
       "controls": "Steuerung",
       "combat": "Kampf",
@@ -799,6 +954,7 @@ export const de_DE: EnTranslations = {
       "typeZone": "Gebiet",
       "typeCreature": "Kreaturen",
       "typeDungeon": "Dungeon",
+      "typeDelve": "Tiefgang",
       "typeTerm": "Begriff"
     },
     "home": {
@@ -886,7 +1042,7 @@ export const de_DE: EnTranslations = {
       "questsTitle": "Quests",
       "questsBody": "Nimm Quests von Personen mit einer Markierung über dem Kopf an, erfülle das Ziel und gib sie für Erfahrung, Gold und Ausrüstung ab. Die Verfolgungsanzeige auf dem Bildschirm behält deine Ziele im Blick.",
       "deathTitle": "Der Tod ist nicht das Ende",
-      "deathBody": "Wenn du fällst, lässt du deinen Geist auf dem nächsten Friedhof frei und läufst zu deinem Körper zurück. Es geht keine Erfahrung verloren.",
+      "deathBody": "Wenn du fällst, lässt du deinen Geist frei und wirst auf dem nächsten Friedhof wiederbelebt, zurück bei voller Gesundheit, und findest dann deinen Weg dorthin zurück, wo du warst. Es geht keine Erfahrung verloren.",
       "groupingTitle": "Gemeinsam spielen",
       "groupingBody": "Lade andere in eine Gruppe ein, um Questfortschritt zu teilen und Dungeons in Angriff zu nehmen. Der Großteil der Welt ist im Alleingang spielbar, daher ist das Gruppieren eine Wahl, keine lästige Pflicht.",
       "onlineTitle": "Online oder offline",
@@ -900,21 +1056,26 @@ export const de_DE: EnTranslations = {
       "actionHeader": "Aktion",
       "groupMovement": "Bewegung",
       "groupCombat": "Anvisieren und Kampf",
-      "groupInterface": "Fenster",
+      "groupInterface": "Interface",
       "groupCamera": "Kamera",
       "talents": "Talente",
       "arena": "Arena",
       "leaderboard": "Bestenliste",
-      "abilities": "Fähigkeiten einsetzen",
+      "abilities": "Aktionsleisten-Fähigkeiten einsetzen (die Zahlenreihe; eine zweite Leiste liegt auf dem Nummernblock)",
+      "targetFriendly": "Nächstes freundliches Ziel anvisieren",
+      "cycleFriendly": "Freundliches Ziel durchschalten",
+      "gameMenu": "Spielmenü und Optionen öffnen",
       "mobileHeading": "Auf dem Mobilgerät",
-      "mobileBody": "Auf Smartphones und Tablets erscheinen die Touch-Steuerungen automatisch: ein Bewegungsstick links, ziehen an einer beliebigen Stelle rechts zum Umsehen und Bildschirmtasten für deine Fähigkeiten und Menüs."
+      "mobileBody": "Auf Smartphones und Tablets erscheinen die Touch-Steuerungen automatisch: ein Bewegungsstick links, ziehen an einer beliebigen Stelle rechts zum Umsehen und Bildschirmtasten für deine Fähigkeiten und Menüs.",
+      "controllerHeading": "Mit einem Controller",
+      "controllerBody": "Gamepads funktionieren ebenfalls, und die Controller-Unterstützung ist standardmäßig aktiviert. Der linke Stick bewegt dich, der rechte Stick richtet die Kamera aus, und die Aktions- und Schultertasten decken deine Fähigkeiten, das Springen und das Interagieren ab. Öffne ein beliebiges Fenster, um einen Bildschirmzeiger für Menüs einzublenden. Du kannst die Tasten neu belegen und Stick-Totzone, Kamerageschwindigkeit, Vibration und die invertierte Blickrichtung in den Controller-Einstellungen in den Optionen anpassen."
     },
     "combat": {
       "intro": "Der Kampf folgt vertrauten Regeln aus klassischen MMOs. Du musst nichts davon studieren, um gut zu spielen, dies ist nur der grobe Aufbau, wie Kämpfe funktionieren.",
       "hitTitle": "Nicht jeder Schlag trifft",
-      "hitBody": "Angriffe können danebengehen oder pariert, geblockt und ihnen ausgewichen werden, und das gilt auch für die des Gegners. Gegen Feinde nahe deiner eigenen Stufe zu kämpfen und deine Ausrüstung aktuell zu halten, sorgt dafür, dass deine Treffer sitzen.",
-      "mitigationTitle": "Rüstung und Ausrüstung halten dich auf den Beinen",
-      "mitigationBody": "Rüstung dämpft physische Treffer, und die richtige Ausrüstung schwächt Magie ab, daher sind Verbesserungen deine wichtigste Quelle für Standhaftigkeit. Schwerere Rüstungsklassen stecken mehr weg, doch nichts macht dich unverwundbar.",
+      "hitBody": "Angriffe können danebengehen, oder es kann ihnen ausgewichen werden, und dasselbe gilt für die des Gegners, während Zaubern gänzlich widerstanden werden kann. Nahe deiner eigenen Stufe zu kämpfen ist es, was deine Treffer sitzen lässt; je größer der Stufenunterschied, desto öfter schlägst du ins Leere.",
+      "mitigationTitle": "Rüstung und Gesundheit halten dich auf den Beinen",
+      "mitigationBody": "Rüstung dämpft physische Treffer, bessere Rüstung ist also deine wichtigste Quelle für Standhaftigkeit im Nahkampf. Magie ist eine andere Sache: Zaubern trotzt du mit einem größeren Gesundheitsvorrat und der Chance, einem gänzlich zu widerstehen, nicht mit Rüstung. Schwerere Rüstungsklassen stecken mehr weg, doch nichts macht dich unverwundbar.",
       "resourcesTitle": "Jede Klasse hat ihren eigenen Rhythmus",
       "resourcesBody": "Krieger bauen mitten im Kampf Wut auf, Schurken verbrauchen Energie, die stetig zurückkehrt, und Zauberwirker verwalten einen Vorrat an Mana. Deine Ressource zu beherrschen ist die halbe Miete, wenn es darum geht, deine Klasse gut zu spielen.",
       "growTitle": "Du wirst mit jeder Stufe stärker",
@@ -923,7 +1084,7 @@ export const de_DE: EnTranslations = {
       "effectsBody": "Viele Fähigkeiten legen einen Effekt an, der nachwirkt. Hilfreiche (Stärkungszauber) erhöhen deine Werte, schirmen dich ab oder heilen dich nach und nach; schädliche (Schwächungszauber) zehren deine Gesundheit durch Schaden über Zeit auf oder schwächen dich. Achte auf die kleinen Symbole nahe deiner Aktionsleiste, um zu sehen, was auf dir liegt und wie lange es anhält.",
       "ccBody": "Massenkontrolle ist eine besondere Art von Schwächungszauber, die einschränkt, was ein Ziel tun kann: Betäubungen, Verwurzelungen und Verlangsamungen, Stille, die das Zaubern unterbindet, Entwaffnungen, Furchteffekte und Verwandlung, die einen Feind für einen Moment harmlos macht. Manche davon, wie Verwurzelungen, Furcht und Verwandlung, verlieren ihren Halt, wenn sie zu schnell erneut angewandt werden, sie lassen sich also nicht ewig aneinanderreihen.",
       "deathTitle": "Wenn du fällst",
-      "deathBody": "Erreicht deine Gesundheit null, wirst du niedergestreckt. Du belebst dich nach kurzer Wartezeit wieder und machst dort weiter, wo du aufgehört hast, ein Tod kostet dich also etwas Zeit, nicht deinen Fortschritt. Setze dich zwischen den Kämpfen, um zu essen und zu trinken, damit du den nächsten in voller Stärke beginnst."
+      "deathBody": "Erreicht deine Gesundheit null, wirst du niedergestreckt. Lass deinen Geist frei, um auf dem nächsten Friedhof mit voller Gesundheit wiederbelebt zu werden, und finde dann deinen Weg zurück, ein Tod kostet dich also etwas Zeit, nicht deinen Fortschritt. Setze dich zwischen den Kämpfen, um zu essen und zu trinken, damit du den nächsten in voller Stärke beginnst."
     },
     "glossary": {
       "intro": "Eine kurze Übersicht über die Begriffe, die in diesem Leitfaden und im Chat verwendet werden.",
@@ -934,7 +1095,7 @@ export const de_DE: EnTranslations = {
       "gcdTerm": "Globale Abklingzeit",
       "gcdDef": "Die kurze, gemeinsame Pause nach dem Einsatz der meisten Fähigkeiten, damit du nicht alles auf einmal abfeuern kannst.",
       "dpsTerm": "DPS",
-      "dpsDef": "Schaden pro Sekunde, ein grobes Maß dafür, wie schnell etwas Schaden austeilt.",
+      "dpsDef": "Schaden pro Sekunde, ein grobes Maß dafür, wie schnell etwas Schaden austeilt. Wird auch für die schadensausteilende Rolle selbst verwendet, wie in: ein Tank, ein Heiler und drei DPS.",
       "buffTerm": "Stärkungszauber",
       "buffDef": "Ein hilfreicher Effekt auf dir oder einem Verbündeten, wie ein Segen, der für eine Weile einen Wert erhöht.",
       "debuffTerm": "Schwächungszauber",
@@ -960,7 +1121,13 @@ export const de_DE: EnTranslations = {
       "pullTerm": "Pull",
       "pullDef": "Einen Feind oder eine Gruppe in einen Kampf ziehen, meist gezielt und immer nur einen Schwung auf einmal.",
       "instanceTerm": "Instanz",
-      "instanceDef": "Eine private Kopie eines Dungeons oder Schlachtzugs, nur für deine Gruppe erstellt."
+      "instanceDef": "Eine private Kopie eines Dungeons oder Schlachtzugs, nur für deine Gruppe erstellt.",
+      "raidTerm": "Schlachtzug",
+      "raidDef": "Eine größere Gruppe, hier bis zu zehn Spieler, gebildet für die härteste Endgame-Begegnung; eine Gruppe wird in einen umgewandelt, sobald sie voll ist.",
+      "delveTerm": "Tiefgang",
+      "delveDef": "Ein kurzer, wiederholbarer instanzierter Abstieg für einen oder zwei Spieler, gestartet an der Tafel eines Hüters, mit einer Gefährtin an deiner Seite.",
+      "augmentTerm": "Augmentierung",
+      "augmentDef": "Eine zeitweilige Verstärkung, die du während eines 2-gegen-2-Fiesta-Arenakampfs wählst und die dein Repertoire nur für diesen Kampf umgestaltet."
     },
     "faqPage": {
       "intro": "Die Fragen, die neue Spieler am häufigsten stellen.",
@@ -973,7 +1140,7 @@ export const de_DE: EnTranslations = {
       "q4": "Kann ich offline oder allein spielen?",
       "a4": "Ja. Es gibt einen sofort verfügbaren Einzelspieler-Offline-Modus, und die Online-Welt ist abgesehen von Dungeons und dem Schlachtzug vollständig im Alleingang spielbar.",
       "q5": "Wie viele Klassen gibt es?",
-      "a5": "Neun, die die klassischen Rollen Tank, Heiler und Schaden abdecken, jede mit ihrer eigenen Ressource und ihren charakteristischen Fähigkeiten.",
+      "a5": "Neun, die die klassischen Rollen Tank, Heiler und Schaden abdecken, jede mit einem Ressourcensystem (Wut, Mana oder Energie) und ihren eigenen charakteristischen Fähigkeiten.",
       "q6": "Was ist die Höchststufe?",
       "a6": "Stufe {cap}, erreicht über drei verbundene Gebiete voller Quests, Dungeons und Erkundung.",
       "q7": "Wird mein Charakter gespeichert?",
@@ -1136,7 +1303,7 @@ export const de_DE: EnTranslations = {
       },
       "spider": {
         "name": "Spinnen",
-        "desc": "Netzweber und giftige Lauerer, die in dunklen, verwucherten Orten nisten."
+        "desc": "Netzweber und giftige Lauerer, die in dunklen, verwucherten Orten nisten. Jäger können sie zähmen, genau wie Wildtiere."
       },
       "murloc": {
         "name": "Murlocs",
@@ -1152,7 +1319,7 @@ export const de_DE: EnTranslations = {
       },
       "troll": {
         "name": "Trolle",
-        "desc": "Massige, schnell heilende Schläger, die im Moor und im Hochland hausen."
+        "desc": "Massige Schläger, die in den Sümpfen des Moors hausen."
       },
       "ogre": {
         "name": "Oger",
@@ -1165,6 +1332,10 @@ export const de_DE: EnTranslations = {
       "elemental": {
         "name": "Elementare",
         "desc": "Lebendiger Sturm und Stein, gebunden an die wilden Orte, wo die Elemente machtvoll wirken."
+      },
+      "dragonkin": {
+        "name": "Drachkin",
+        "desc": "Schuppige, schlangenhafte Wesen aus den alten Tiefen. Selten, stolz und weit stärker, als sie aussehen."
       }
     },
     "worldPage": {
@@ -1184,11 +1355,11 @@ export const de_DE: EnTranslations = {
       "marshGreeter": "Wächter Fenwick, Fenbridge",
       "peaksGreeting": "Zweihundert Jahre hat diese Mauer gehalten. Unter meiner Wache wird sie nicht brechen, doch sie ächzt.",
       "peaksGreeter": "Hauptmann Thessaly, Highwatch",
-      "valePlaceNotes": "Eastbrook ist deine erste Heimatbasis. Der Wolfslauf und die Eberwiese sind sanftes Jagdgebiet; der Spiegelsee ist stilles Wasser zum Angeln; der Netzwald und die Kupfergrube verbergen Spinnen und erzgierige Schaufler; ein Banditenlager und die Gefallene Kapelle bergen rauere Arbeit; Brightwood Glade ist ein ruhiger Wildtierhain im Norden.",
+      "valePlaceNotes": "Eastbrook ist deine erste Heimatbasis. Der Wolfslauf und die Eberwiese sind sanftes Jagdgebiet; der Spiegelsee ist stilles Wasser zum Angeln; der Netzwald und die Kupfergrube verbergen Spinnen und erzgierige Schaufler; ein Banditenlager und die Gefallene Kapelle bergen rauere Arbeit; der Reliquienhügel führt hinab in das Eingestürzte Reliquiar, die erste Tiefe des Reichs; und Brightwood Glade ist ein ruhiger, sonnenheller Hain im Norden.",
       "marshPlaceNotes": "Fenbridge bewacht die einzige trockene Straße. Das Pirscherschilf und die Tieffenniederung wimmeln von Moorbestien und Murlocs; das Witwendickicht ist dicht mit Netzen versponnen; die Ertrunkene Kapelle und die Trollhügel beherbergen ältere Gefahren; das Grabruferlager ist der eingegrabene Kult, und die versunkene Bastion ist das instanzierte Herz des Moores.",
       "peaksPlaceNotes": "Highwatch hält die Mauer. Der Pirscherkamm und die Tieffelsbaue gehören Bergkatzen und Kobolden; die Ogervorberge und Drogmars Kriegslager den Schlägern für Sold; Stormcrag knistert vor Elementaren, und der Glimmermere leuchtet darunter; die Wyrmkultzelte und die Wiedergängerfelder umringen das Hochland des Kults, mit dem Gravewyrm-Heiligtum auf seinem Gipfel.",
       "gladeTitle": "Eine stille Ecke: Brightwood Glade",
-      "gladeBody": "Nicht jede Geschichte im Tal handelt von den Toten. Im Norden bewahrt ein sonnenheller Hain namens Brightwood Glade seinen eigenen, sanfteren Rhythmus, mit stillen Pfaden, grasenden Hirschen und wachsamen Tieren unter den Zweigen. Er ist ein ruhiger Gegenklang zu der Spur, der du folgst, und einen Blick wert, wenn die Straße dir Raum zum Umherstreifen lässt."
+      "gladeBody": "Nicht jede Geschichte im Tal handelt von den Toten. Im Norden bewahrt ein sonnenheller Hain namens Brightwood Glade seinen eigenen, sanfteren Rhythmus, ganz aus stillen Pfaden und geflecktem Licht unter den Zweigen. Er ist ein sanfter Gegenklang zu der Spur, der du folgst, und einen Blick wert, wenn die Straße dir Raum zum Umherstreifen lässt."
     },
     "questsPage": {
       "heading": "Quests",
@@ -1196,14 +1367,14 @@ export const de_DE: EnTranslations = {
       "acceptTitle": "Finden und annehmen",
       "acceptBody": "Personen mit einer Markierung über dem Kopf haben Arbeit für dich. Sprich mit ihnen, um eine Quest anzunehmen. Deine allererste ist Wölfe vor der Tür, von Marschall Redbrook in Eastbrook.",
       "objectivesTitle": "Ziele",
-      "objectivesBody": "Erschlage bestimmte Gegner, sammle Gegenstände oder interagiere mit etwas in der Welt. Die Verfolgungsanzeige auf dem Bildschirm zählt deinen Fortschritt mit, während du vorankommst.",
+      "objectivesBody": "Erschlage bestimmte Gegner, sammle Gegenstände oder interagiere mit etwas in der Welt. Die Verfolgungsanzeige auf dem Bildschirm zählt deinen Fortschritt mit, während du vorankommst. Wenn du es dir anders überlegst, kannst du eine Quest aus deinem Questlog entfernen und sie später wieder bei ihrem Questgeber aufnehmen.",
       "turninTitle": "Abgeben",
-      "turninBody": "Kehre zum Questgeber zurück, die Karte zeigt dir, wo, für Erfahrung, Gold und oft ein Ausrüstungsstück, das zu deiner Klasse passt.",
+      "turninBody": "Bring eine abgeschlossene Quest zu ihrer Abgabemarkierung, die Karte zeigt dir, wo, für Erfahrung, Gold und oft ein Ausrüstungsstück, das zu deiner Klasse passt. Das ist meist derjenige, der sie dir gegeben hat, auch wenn dich manche Quests zu jemand anderem weiterschicken.",
       "partyTitle": "Quests in einer Gruppe erfüllen",
-      "partyBody": "Gruppenmitglieder in der Nähe teilen sich den Tötungs- und Zielfortschritt, gemeinsam Quests zu erfüllen ist also schneller, niemals langsamer.",
+      "partyBody": "Gruppenmitglieder in der Nähe teilen sich den Tötungs- und Zielfortschritt, gemeinsam Quests zu erfüllen ist also schneller, niemals langsamer. Du kannst eine Quest auch mit deiner Gruppe teilen: Stelle sie mit dem Befehl /share als anklickbaren Link in den Chat, und jedes Mitglied in der Nähe, das die Voraussetzungen erfüllt, kann dieselbe Quest mit einem Klick aufnehmen.",
       "storyTitle": "Ein roter Faden zieht sich durch alles",
       "storyBody": "Schon bei deinen ersten Besorgungen in Eastbrook stimmt etwas mit den Toten nicht. Ein Kult ist am Werk, und die Spur führt nordwärts durch jedes Gebiet. Folge ihr, um zu erfahren, wer dahintersteckt.",
-      "soloNote": "Die Hauptgeschichte ist vollständig im Alleingang spielbar; nur ihre letzten Kapitel verlangen nach einer Gruppe.",
+      "soloNote": "Die Hauptgeschichte ist im Alleingang spielbar, bis hin zum Finale jedes Kapitels, das ein Dungeon für fünf Spieler ist.",
       "typesTitle": "Die Arten von Quest, denen du begegnest",
       "typesBody": "Die meisten Quests sind eine von wenigen vertrauten Formen. Die Verfolgungsanzeige auf dem Bildschirm legt genau dar, was jede einzelne verlangt, du musst also nie raten.",
       "typeSlayTitle": "Erschlagen",
@@ -1212,10 +1383,10 @@ export const de_DE: EnTranslations = {
       "typeGatherBody": "Sammle Gegenstände aus der Welt oder von dem, was Feinde fallen lassen: Kräuter, Erz, verlorene Briefe, die grausigen Reagenzien eines Kults. Manche Stücke fallen nur von einem bestimmten Feind, die Jagd und die Ausbeute gehören also zusammen.",
       "typeInteractTitle": "Interagieren",
       "typeInteractBody": "Benutze, reinige oder lies etwas Festes in der Welt: ein geschändetes Grab, eine in einen Uferfelsen geritzte Warnung, eine versiegelte Grufttür. Geh zur Markierung und handle daran.",
-      "typeMusterTitle": "Geleiten und Aufbieten",
-      "typeMusterBody": "Geleite ein freundliches Gesicht sicher von einem Ort zum anderen oder sammle die Verteidiger einer Stadt vor einem Vorstoß nach Norden. Diese halten dich in Bewegung mit den Leuten, in deren Geschichte du steckst.",
+      "typeMusterTitle": "Die Verteidigung aufbieten",
+      "typeMusterBody": "Manche Quests lassen dich eine Stadt vor einem Vorstoß nach Norden mobilisieren: Dezimiere die Bedrohung an den Toren und trage zusammen, was die Verteidiger brauchen. Das sind Erschlage- und Sammelziele im Dienst der Leute, in deren Geschichte du steckst, und sie halten dich mit ihnen in Bewegung.",
       "typeGroupTitle": "Gruppenfinale",
-      "typeGroupBody": "Jedes Kapitel der Hauptgeschichte endet an einer Dungeon-Tür. Die Einführung ist im Alleingang lösbar, doch der finale Schlag gegen den Schurken eines Kapitels ist für eine Gruppe von fünf gedacht (und der allerletzte für zehn).",
+      "typeGroupBody": "Jedes Kapitel der Hauptgeschichte endet an einer Dungeon-Tür. Die Einführung ist im Alleingang lösbar, doch der finale Schlag gegen den Schurken eines Kapitels ist für eine Gruppe von fünf gedacht.",
       "sagaTitle": "Folge der Spur nach Norden",
       "sagaBody": "Die Hauptgeschichte ist eine einzige lange Verfolgung. Ein Todeskult ist an den Gräbern des Reichs am Werk, und jedes Kapitel, das du abschließt, weist ein Gebiet weiter die Straße hinauf. Du bekämpfst nie die ganze Verschwörung auf einmal; du ziehst an einem Faden, und er führt dich zur nächsten Hand, die ihn hält.",
       "sagaValeTitle": "Das Tal: ein Name auf einem Siegel",
@@ -1223,12 +1394,14 @@ export const de_DE: EnTranslations = {
       "sagaMarshTitle": "Das Moor: ein Zehnt an Seelen",
       "sagaMarshBody": "In Mirefen sind die Ertrinkungstode kein Zufall. Jemand füllt das Moor wie eine Opferbüchse und erweckt gehorsame Tote aus jedem Reisenden, den das Wasser holt. Verfolge die Befehle die Kette hinauf bis zu einem Nebelrufer in der ertrunkenen Bastion, dessen letzte Worte etwas noch Älteres benennen, das unter den Gipfeln erwacht.",
       "sagaPeaksTitle": "Die Gipfel: wofür der Zehnt bestimmt war",
-      "sagaPeaksBody": "Auf Thornpeak wird das ganze Schema klar. Jede gestohlene Seele seit dem Tal war ein Zehnt, vergossen, um ein uraltes Wesen zu erwecken, das unter dem Berg versiegelt ist. Die Spur, die in einem Kapellenhof begann, endet hier, an einer Tür, die zehn brauchen, um sie zu öffnen. Wer dahinter wartet, lassen wir dich selbst herausfinden.",
+      "sagaPeaksBody": "Auf Thornpeak wird das ganze Schema klar. Jede gestohlene Seele seit dem Tal war ein Zehnt, vergossen für das düstere Werk des Kults im Herzen des Berges. Die Spur, die in einem Kapellenhof begann, endet hier, in einem Abstieg für fünf Spieler, um der Hand hinter allem entgegenzutreten. Wer am Grund wartet, lassen wir dich selbst herausfinden.",
       "sideTitle": "Fäden abseits der Hauptstraße",
       "sideWardenTitle": "Sich einen Namen machen",
-      "sideWardenBody": "Neben der Geschichte vergeben die Wächter des Tals und des Moores eine stehende Kopfgeldleiter. Arbeite dich an ihr empor, Feind für Feind, so wie es jeder Wächter vor dir getan hat, um sich seinen Platz zu verdienen. Es ist ehrlicher Aufstieg und eine Rundreise zu den schlimmsten Unruhestiftern jedes Gebiets.",
+      "sideWardenBody": "Neben der Geschichte vergeben die Marschälle und Wächter des Tals und des Moores eine stehende Kopfgeldleiter. Arbeite dich an ihr empor, Feind für Feind, so wie sich jeder Kopfgeldjäger vor dir seinen Platz verdient hat. Es ist ehrlicher Aufstieg und eine Rundreise zu den schlimmsten Unruhestiftern jedes Gebiets.",
       "sideCryptTitle": "Der vergessene König",
-      "sideCryptBody": "Hoch oben auf den Gipfeln verläuft ein stilleres Geheimnis: alte Gräber, gezeichnet mit einer Krone, an die sich keine Aufzeichnung erinnert. Lies die Toten, sammle, was sie hüteten, und entsiegle eine Gruft, die verschlossen bleiben sollte. Es ist die Spur eines Spürsinns, die den Weg zu einer zweiten Endgame-Prüfung für einen vollen Schlachtzug öffnet."
+      "sideCryptBody": "Hoch oben auf den Gipfeln verläuft ein stilleres Geheimnis: alte Gräber, gezeichnet mit einer Krone, an die sich keine Aufzeichnung erinnert. Lies die Toten, sammle, was sie hüteten, und entsiegle eine Gruft, die verschlossen bleiben sollte. Es ist die Spur eines Spürsinns, die den Weg zum Endgame-Schlachtzug des Reichs für zehn Spieler öffnet.",
+      "sideTempleTitle": "Der ertränkte Tempel",
+      "sideTempleBody": "Ein Tor aus blassem Licht über einem hohen Bergsee in den Gipfeln öffnet sich zu einem versunkenen Schrein, in dem ein ertränkter Kult noch immer singt. Seine kurze Kette steht abseits der Hauptgeschichte, ein in sich geschlossenes Rätsel für jeden, der zum Ufer hinaufsteigt, die in den Fels geritzten Warnungen liest und hinabsteigt, um zu sehen, wozu sie dienten."
     },
     "lore": {
       "figuresTitle": "Gesichter, die du kennenlernen wirst",
@@ -1261,7 +1434,35 @@ export const de_DE: EnTranslations = {
       "templeLoreTitle": "Der Ertränkte Tempel, ein wenig tiefer",
       "templeLoreBody": "Der Tempel hat seine eigene Legende, älter als der Kult, den du anderswo verfolgst. Am Ufer des Glimmermere, eines Bergsees, der das Mondlicht trinkt und die Ertrunkenen zurückgibt, hütet ein einsamer Wächter ein Tor aus fahlem Licht. Unter der Oberfläche führt eine Treppe aus kaltem Stein zu ihm hinab. Die Leute, die dort versanken, ertranken nicht durch ein Unglück: Sie waren der Bleiche Chor, der im Gebet untertauchte und niemals zu singen aufhörte. Die alten Wärter kratzten eine einzige Warnung in die Felsen, bevor das Wasser sie holte, ein Gebet an etwas, das sie den Ertränkten Mond nannten, mit einer ruhigeren Hand, die zwei Worte darunter setzte: er schläft nur.",
       "cryptLeadTitle": "Eine Tür, die die Toten verschlossen halten sollten",
-      "cryptLeadBody": "Hoch oben auf den Gipfeln, abseits des eigentlichen Kampfes, liegt ein kälteres Geheimnis. Alte Gräber tragen eine Krone, an die sich keine Aufzeichnung erinnert, und die Toten, die sie bewachen, dienten einst einem vergessenen König. Lies ihre Steine, sammle die Schlusssteine, die sie hüteten, und du kannst eine Gruft entsiegeln, die drei treue Seelen mit ihrem Leben verschlossen hielten, und so eine zweite Prüfung für zehn Spieler öffnen, für jene, die den Hinweisen bis zum Ende folgen."
+      "cryptLeadBody": "Hoch oben auf den Gipfeln, abseits des eigentlichen Kampfes, liegt ein kälteres Geheimnis. Alte Gräber tragen eine Krone, an die sich keine Aufzeichnung erinnert, und die Toten, die sie bewachen, dienten einst einem vergessenen König. Lies ihre Steine, sammle die Schlusssteine, die sie hüteten, und du kannst eine Gruft entsiegeln, die drei treue Seelen mit ihrem Leben verschlossen hielten, die optionale Prüfung, die dem Reich den Weg zu seinem Schlachtzug für zehn Spieler öffnet, für jene, die den Hinweisen bis zum Ende folgen."
+    },
+    "delvesPage": {
+      "heading": "Tiefgänge",
+      "intro": "Tiefgänge sind kurze, wiederholbare Abstiege für einen oder zwei, mit einer treuen Gefährtin an deiner Seite, wann immer du allein hinabsteigst. Finde die Tafel, wähle einen Lauf und klettere mit der Beute wieder hinaus.",
+      "fromLevel": "Ab Stufe {n}",
+      "partyLabel": "Für einen oder zwei",
+      "keeperLabel": "Hüter",
+      "keeperFmt": "{name}, {title}",
+      "companionLabel": "Gefährtin",
+      "companionFmt": "{name}, {role}",
+      "tiersLabel": "Schwierigkeiten",
+      "affixesLabel": "Mögliche Modifikatoren",
+      "whatHeading": "Was ein Tiefgang ist",
+      "whatBody": "Ein Tiefgang ist ein kleiner instanzierter Dungeon, der nur für dich und höchstens einen Verbündeten erstellt wird, eine private Kopie, in der dich niemand stören kann. Du startest ihn an einer Tafel, die ein Tiefgang-Hüter draußen in der Welt verwaltet, lässt dich hinab, kämpfst dich durch eine Handvoll Räume und schließt mit einem einzelnen Wächter ab. Läufe sind schnell und auf Wiederholung ausgelegt, daher ist ein Tiefgang ein verlässliches Stück Fortschritt, wann immer die offene Welt versiegt.",
+      "howHeading": "Wie ein Lauf abläuft",
+      "howBody": "Sprich mit dem Hüter, um die Tafel zu öffnen, wähle eine Schwierigkeit und steig hinab. Jeder Lauf reiht ein paar kurze Kammern aneinander und endet bei seinem Wächter; räume ihn, um deine Belohnung zu beanspruchen und an die Oberfläche zurückzukehren. Bring einen Freund mit, wenn du einen hast, oder verlass dich auf deine Gefährtin, wenn nicht.",
+      "companionHeading": "Deine Gefährtin",
+      "companionBody": "Ein Tiefgang schickt eine Gefährtin mit dir hinab, sodass ein Alleingang nie aussichtslos ist. Sie kämpft an deiner Seite, und je mehr du zwischen den Läufen in sie investierst, desto stärker wird sie, bis sie einen Verbündeten einmal pro Abstieg vom Rand des Todes zurückholen kann. Sie gehört dir für den Tiefgang und wartet zwischen den Läufen an der Tafel.",
+      "lockpickHeading": "Schlösser und was sie verbergen",
+      "lockpickBody": "Manche Türen und Verstecke sind versiegelt, und eines zu öffnen ist eher eine kleine Nervenprobe als eine Frage der Werte: knacke das Schloss sauber und ruhig, und du verdienst einen besseren Preis als bei einem hastigen, verpatzten Versuch. Es ist freiwillig, aber der sorgfältige Tiefgänger ist der reichere.",
+      "tiersHeading": "Schwierigkeit",
+      "tiersBody": "Ein Tiefgang bietet mehr als eine Schwierigkeit. Die höhere macht die Gegner stärker und mischt einen Laufmodifikator hinein und zahlt dafür mehr aus. Sie verlangt außerdem, dass du ein paar Stufen auf dem Buckel hast, bevor sie dich einlässt.",
+      "affixesHeading": "Laufmodifikatoren",
+      "affixesBody": "Schwerere Läufe würfeln einen Modifikator aus, der den Abstieg verändert, von ruhelosen Toten über schlechte Luft bis zu brüchigem Dachwerk. Sie erhöhen Gefahr und Belohnung zugleich. Ein Tiefgang im Gruft-Stil kann jeden von diesen auswürfeln:",
+      "marksHeading": "Tiefgang-Marken",
+      "marksBody": "Tiefgänge zu räumen bringt Tiefgang-Marken ein, eine Währung, die getrennt von deinem Geld gehalten wird. Gib sie beim Hüter aus, um deine Gefährtin zu stärken und Ausrüstung zu ergattern, die du nirgendwo sonst findest.",
+      "whereHeading": "Wo du einen findest",
+      "whereBody": "Der erste Tiefgang, das Eingestürzte Reliquiar, öffnet sich am Reliquiarhügel im Eastbrook-Tal, dem Starttal. Bruder Halven verwaltet dort die Tafel, und er schickt dich hinab, sobald du bereit bist."
     },
     "talentsPage": {
       "heading": "Talente und Spezialisierungen",
@@ -1270,8 +1471,9 @@ export const de_DE: EnTranslations = {
       "whatBody": "Während du aufsteigst, verdienst du Talentpunkte, die du in kleine, dauerhafte Verbesserungen deiner Fähigkeiten und Werte investierst. Sie prägen, wie sich eine Klasse anfühlt, und lenken sie zu mehr Schaden, robusterer Verteidigung oder stärkerer Heilung.",
       "howHeading": "Wie sie funktionieren",
       "howBody": "Talente schalten sich auf Stufe 10 frei, und du verdienst weiter Punkte, während du zur Höchststufe aufsteigst. Du verteilst sie im Talentfenster deiner Klasse, und du kannst mehr als eine Verteilung speichern, um zwischen Builds zu wechseln.",
+      "shareNote": "Ein fertiger Build lässt sich in einen kurzen, teilbaren Code kopieren und einem Freund geben, der ihn direkt in sein eigenes Talentfenster einfügt, um ihn zu laden.",
       "resetTitle": "Nichts ist endgültig",
-      "resetNote": "Du kannst deine Talente jederzeit zurücksetzen, eine frühe Wahl ist also nie eine Falle. Probier Dinge aus, schau, was dir gefällt, und ändere deine Meinung frei.",
+      "resetNote": "Du kannst deine Talente jederzeit außerhalb des Kampfes zurücksetzen, eine frühe Wahl ist also nie eine Falle. Probier Dinge aus, schau, was dir gefällt, und ändere deine Meinung frei.",
       "specsHeading": "Spezialisierungen nach Klasse",
       "specsBody": "Jede Klasse hat eine Handvoll Spezialisierungen, jede mit ihrer eigenen Rolle und einem charakteristischen Schwerpunkt. Hier ist der Aufbau aller. Öffne eine Klasse für ihr volles Repertoire."
     },
@@ -1281,7 +1483,7 @@ export const de_DE: EnTranslations = {
       "duelsHeading": "Duelle",
       "duelsBody": "Fordere jeden Spieler, dem du begegnest, zu einem freundschaftlichen Duell heraus. Es steht nichts auf dem Spiel außer dem Stolz, also ist es der einfachste Weg, eine Paarung zu lernen oder eine freundschaftliche Wette zu klären.",
       "coliseumHeading": "Das Aschene Kolosseum",
-      "coliseumBody": "Das Kolosseum ist die Arena des Reichs, wo du in gewerteten Matches gegen andere Spieler antrittst. Gewinne, und dein Ansehen steigt, und die stärksten Kämpfer klettern die Bestenliste hinauf, für alle sichtbar.",
+      "coliseumBody": "Das Kolosseum ist die Arena des Reichs, wo du in gewerteten Matches gegen andere Spieler antrittst, eins gegen eins oder zwei gegen zwei. Jede Wertungsklasse hat ihre eigene Rangliste, ein Sieg hebt dich also auf dieser Leiter empor, für das ganze Reich sichtbar.",
       "fiestaHeading": "Zwei gegen Zwei Fiesta",
       "fiestaBody": "Fiesta ist ein schneller Zwei-gegen-Zwei-Modus in kurzen Runden. Zwischen den Runden draftest du Augmentierungen, schnelle Boosts, die dein Repertoire spontan umformen, sodass kein Match dem anderen gleicht.",
       "augmentsNote": "Augmentierungen und Verstärkungen halten nur für das Match. Es geht um verspielte Builds aus dem Moment heraus, nicht um anhaltende Macht, sodass sich niemand den Sieg erkaufen kann.",
@@ -1304,7 +1506,7 @@ export const de_DE: EnTranslations = {
       "i1Title": "Du kannst keine falsche Klasse wählen",
       "i1Body": "Jede Klasse kann sich behaupten und die Höchststufe erreichen. Wähle die Fantasie, die dir gefällt, nicht die, die jemand anderes als die beste bezeichnet.",
       "i2Title": "Sterben kostet dich kaum etwas",
-      "i2Body": "Wenn du fällst, erscheinst du an einem Friedhof und läufst zu deinem Körper zurück. Es geht keine Erfahrung verloren, es ist also sicher, Risiken einzugehen und dazuzulernen.",
+      "i2Body": "Wenn du fällst, lässt du deinen Geist frei und wirst auf dem nächsten Friedhof wiederbelebt, und findest dann deinen Weg zurück. Es geht keine Erfahrung verloren, es ist also sicher, Risiken einzugehen und dazuzulernen.",
       "i3Title": "Talente sind keine Falle",
       "i3Body": "Sie schalten sich auf Stufe 10 frei und lassen sich zurücksetzen, wann immer du willst, deine frühen Entscheidungen sind also nie endgültig.",
       "i4Title": "Folge der Questspur",
@@ -1324,7 +1526,8 @@ export const de_DE: EnTranslations = {
       "loading": "Modell wird geladen...",
       "error": "Das 3D-Modell konnte nicht geladen werden. Die Abbildung oben zeigt diesen {name} weiterhin.",
       "dragHint": "Ziehe, um das Modell zu drehen. Nutze die linke und rechte Pfeiltaste, wenn es fokussiert ist.",
-      "canvasLabel": "Drehbares 3D-Modell von {name}"
+      "canvasLabel": "Drehbares 3D-Modell von {name}",
+      "posterAlt": "{name}"
     },
     "models": {
       "title": "3D-Modellbetrachter",
@@ -1340,7 +1543,7 @@ export const de_DE: EnTranslations = {
     "gear": {
       "intro": "Ausrüstung ist das, was dein Charakter trägt, und die Gegenstände, die du bei dir führst. Bessere Ausrüstung ist der verlässlichste Weg, stärker zu werden, und das meiste davon sammelst du ganz nebenbei beim Spielen ein.",
       "slotsTitle": "Was du anlegen kannst",
-      "slotsBody": "Du hast einen Waffenplatz und sieben Rüstungsplätze. Jedes Stück, das du anlegst, ergänzt deinen Charakter, und du kannst frei kombinieren, während du Verbesserungen findest.",
+      "slotsBody": "Du hast einen Waffenplatz und sieben Rüstungsplätze. Jede Klasse kann nur bestimmte Waffen führen und trägt Rüstung bis zu ihrer eigenen Gewichtsklasse, Stoff, Leder oder Kette, die Verbesserungen, die zu dir passen, sind also jene, die für deine Klasse gemacht sind. Innerhalb dessen füllst du jeden Platz mit dem besten Stück, das du findest.",
       "slotMainhand": "Waffe",
       "slotHelmet": "Kopf",
       "slotShoulder": "Schultern",
@@ -1360,29 +1563,35 @@ export const de_DE: EnTranslations = {
       "qualityNote": "Höhere Qualität bedeutet meist bessere Werte, doch Qualität ist ein Hinweis, keine Regel. Ein gut zu deiner Klasse und Stufe passendes Stück kann ein protzigeres schlagen.",
       "upgradeTitle": "Halte deine Ausrüstung aktuell",
       "upgradeBody": "Ein altes Stück durch eine frische Verbesserung zu ersetzen, bringt dir mehr, als in Ausrüstung, der du entwachsen bist, perfekt zu spielen. Wenn etwas Besseres fällt oder eine Quest es anbietet, nimm es. Spare deine guten Gegenstände nicht für später auf.",
+      "itemLevelBody": "Wenn du zwei Teile schnell vergleichen willst, aktiviere in den Optionen Gegenstandsstufe anzeigen. Jede Waffe und jedes Rüstungsteil zeigt dann eine Gegenstandsstufe, eine einzelne Zahl dafür, wie mächtig es ungefähr ist, je nachdem, woher es stammt, sodass du auf einen Blick erkennst, welche Verbesserung mehr Gewicht hat, sogar über verschiedene Ausrüstungsplätze hinweg.",
       "sourcesTitle": "Woher Ausrüstung kommt",
       "sourcesBody": "Die meisten deiner frühen Verbesserungen sind Questbelohnungen, es zahlt sich also aus, Quests abzuschließen, statt zu grinden. Feinde lassen Ausrüstung fallen, wenn du sie bezwingst, Händler in der Stadt verkaufen solide Grundausstattung, und der Spielermarkt lässt dich von anderen Abenteurern kaufen.",
+      "setsTitle": "Sets und Set-Boni",
+      "setsBody": "Die seltenste Rüstung kommt in zusammengehörigen Familien, mehreren Teilen, die darauf zugeschnitten sind, als Einheit auszusehen und zu kämpfen. Trage genug Teile einer Familie gleichzeitig, und das Set erwacht und gewährt Boni zusätzlich zu den eigenen Werten jedes Teils, und je mehr Teile du trägst, desto stärker wird es. Diese fallen im härtesten Gruppeninhalt nahe der Höchststufe, weshalb die Jagd nach einem vollständigen Set ein klassisches Endgame-Ziel ist.",
       "consumablesTitle": "Verbrauchsgüter",
       "consumablesIntro": "Manche Gegenstände werden einmal für einen schnellen Nutzen verbraucht. Sie sind eine günstige Absicherung, halte also ein paar bereit.",
       "consumablesPotions": "Tränke stellen Gesundheit oder Mana in dem Moment her, in dem du sie benutzt, sogar mitten im Kampf, was sie zur rettenden Hilfe macht, wenn ein Pull schiefgeht. Sie teilen sich eine kurze Abklingzeit, plane also einen guten Moment für ihren Einsatz.",
       "consumablesFood": "Speis und Trank füllen dich wieder auf, während du dich zwischen den Kämpfen niedersetzt und ausruhst. Essen stellt Gesundheit her, Trinken stellt Mana her, und auf diese Weise zu rasten ist kostenlos. Setz dich nach einem harten Kampf für ein paar Sekunden hin, statt halb geheilt in den nächsten zu rennen.",
       "consumablesElixirs": "Elixiere gewähren eine zeitweilige Stärkung, während du unterwegs bist, ein kleiner Vorteil, der hilft, wenn du ein Stück weiter gehen willst.",
       "fishingTitle": "Angeln",
-      "fishingBody": "Angeln ist ein ruhiger Tempowechsel. Rüste eine Angelrute aus, wirf ins offene Wasser und hole ein, was anbeißt. Du fängst meist Fisch, den du zu Speise kochen kannst, hin und wieder etwas Plunder zum Verkauf für ein paar Münzen, und ab und zu einen begehrten seltenen Fang. Was du findest, hängt vom Gewässer ab, in dem du angelst.",
-      "fishingFood": "Der Fisch, den du einholst, ist roh, und roher Fisch ist Nahrung. Koche deinen Fang, und er heilt mehr, wenn du dich zum Essen niedersetzt, wobei die besseren Fische aus den kälteren, tieferen Gewässern im Norden kommen. Eine Schnur im See ist eine stille Art, deinen Vorrat zwischen den Kämpfen gefüllt zu halten.",
+      "fishingBody": "Angeln ist ein ruhiger Tempowechsel. Rüste eine Angelrute aus, wirf ins offene Wasser und hole ein, was anbeißt. Du fängst meist Fisch, der Nahrung ist, die du essen kannst, hin und wieder etwas Plunder zum Verkauf für ein paar Münzen, und ab und zu einen begehrten seltenen Fang. Was du findest, hängt vom Gewässer ab, in dem du angelst.",
+      "fishingFood": "Der Fisch, den du einholst, ist Nahrung: Iss einen, während du dich zum Rasten niedersetzt, und er stellt Gesundheit wieder her, wobei die kräftigeren Fische aus den kälteren, tieferen Gewässern im Norden kommen. Eine Schnur im See ist eine stille Art, deinen Vorrat zwischen den Kämpfen gefüllt zu halten.",
       "fishingRare": "Hin und wieder fängt deine Schnur etwas weit Besseres als ein Abendessen: einen schimmernden begehrten Fisch, dem jeder Angler in jedem Gewässer durch Glück begegnen kann. Hak einen, und dein Logbuch leuchtet beim Fang auf. Es ist die Art glücklichen Zugs, der einen müßigen Nachmittag am See wert macht, davon zu erzählen.",
       "cosmeticsTitle": "Aussehen und Kosmetik",
       "cosmeticsBody": "Manche Belohnungen ändern nur, wie dein Charakter aussieht, niemals wie stark du bist. Diese kosmetischen Skins lassen dich herausstechen, ohne das Spiel zu beeinflussen, trage also, welchen du magst.",
       "cosmeticsRanks": "Kosmetik kommt in eigenen Seltenheitsstufen, und den selteneren hinterherzujagen macht Spaß. Sich eine höhere Stufe zu verdienen, schaltet auch die darunterliegenden Aussehen frei.",
-      "cosmeticsSkins": "Es gibt zwei kosmetische Linien zum Sammeln. Jede Klasse hat eine Handvoll alternativer Aussehen, eine frische Auslegung ihres Looks, die allein dir zum Tragen gehört. Daneben stehen Chromas: benannte Zweiton-Farbschemata, die ein Aussehen vollständig neu einfärben, von schlichten Metallen bis zu leuchtenden imperialen Farben.",
-      "cosmeticsCache": "Einige davon stammen aus einer geheimnisvollen kosmetischen Truhe, einem versiegelten Preis, der beim Öffnen eine von drei Qualitätsstufen auswürfelt und dir das passende Aussehen verleiht. Es geht rein um die Optik: Nichts darin macht dich stärker, nur schöner anzusehen."
+      "cosmeticsSkins": "Es gibt zwei kosmetische Linien zum Sammeln. Die meisten Klassen haben mehrere alternative Aussehen, eine frische Auslegung des Klassen-Looks, die allein dir zum Tragen gehört. Daneben stehen Chromas: benannte Zweiton-Farbschemata, die ein Aussehen vollständig neu einfärben, von schlichten Metallen bis zu leuchtenden imperialen Farben.",
+      "cosmeticsCache": "Einige davon stammen aus einer geheimnisvollen kosmetischen Truhe, einem versiegelten Preis, der beim Öffnen eine von drei Qualitätsstufen auswürfelt und dir das passende Aussehen verleiht. Es geht rein um die Optik: Nichts darin macht dich stärker, nur schöner anzusehen.",
+      "cosmeticsApply": "Lege dein aktives Aussehen in der Aussehen-Zeile auf deinem Charakterbildschirm fest und wechsle frei zwischen allem, was du freigeschaltet hast."
     },
     "economy": {
-      "intro": "Münzen halten die ganze Welt in Schwung: Sie kaufen Ausrüstung und Vorräte, bezahlen deine Reparaturen und Questkosten und wechseln zwischen Spielern den Besitzer. All das sammelst du ganz nebenbei beim Spielen ein, sieh diese Seite also als eine Karte, woher dein Geld kommt und wohin es geht.",
+      "intro": "Münzen halten die ganze Welt in Schwung: Sie kaufen deine Ausrüstung, Vorräte und dein Reisegerät und wechseln zwischen Spielern den Besitzer. All das sammelst du ganz nebenbei beim Spielen ein, sieh diese Seite also als eine Karte, woher dein Geld kommt und wohin es geht.",
       "coinTitle": "Gold, Silber und Kupfer",
       "coinBody": "Geld gibt es in drei Münzen. Hundert Kupfer ergeben ein Silber, und hundert Silber ergeben ein Gold, dein Beutel füllt sich also von der kleinsten Münze her. Du verdienst es aus Questbelohnungen, indem du gefallene Feinde plünderst und indem du verkaufst, was du nicht mehr brauchst.",
       "vendorsTitle": "Händler und was sie führen",
-      "vendorsBody": "Städte und Außenposten sind mit Händlern gespickt, jeder mit seinem eigenen Gewerbe. Versorger führen Speis und Trank, Waffenschmiede und Rüstungsschmiede haben Ausrüstung, Kräuterkundige handeln mit Reagenzien, und ein Quartiermeister hält praktisches Reisegerät bereit. Geh auf einen zu, um zu sehen, was er verkauft.",
+      "vendorsBody": "Städte und Außenposten sind mit Händlern gespickt, jeder mit seinem eigenen Gewerbe. Versorger führen Speis und Trank, Waffenschmiede und Rüstungsschmiede haben Ausrüstung, und ein Quartiermeister hält praktisches Reisegerät bereit. Geh auf einen zu, um zu sehen, was er verkauft.",
+      "marksTitle": "Eine zweite Währung: Tiefgang-Marken",
+      "marksBody": "Geld ist nicht das Einzige, was du anhäufst. Tiefgänge zahlen Tiefgang-Marken aus, eine eigene Währung, die du nur beim Tiefgang-Hüter ausgibst, für Verbesserungen deiner Gefährtin und Ausrüstung, die du nirgendwo sonst findest. Sie vermischen sich nie mit deinem Geld.",
       "buyingTitle": "Kaufen und Verkaufen",
       "buyingBody": "Stelle dich neben einen Händler, um sein Fenster zu öffnen. Du kannst alles kaufen, was er führt, sofern du es dir leisten kannst, und das meiste aus deinen Taschen gegen Münzen verkaufen. Verkaufst du etwas aus Versehen, hebt ein Händler deine jüngsten Verkäufe auf, sodass du sie zurückkaufen kannst.",
       "junkTitle": "Plunder loswerden",
@@ -1390,7 +1599,7 @@ export const de_DE: EnTranslations = {
       "tradeTitle": "Handeln mit anderen Spielern",
       "tradeBody": "Du kannst von Angesicht zu Angesicht mit jedem handeln, der nahe bei dir steht. Ihr beide legt Gegenstände und Münzen in ein gemeinsames Fenster, und der Tausch findet erst statt, sobald ihr ihn beide bestätigt, sodass keine Seite übers Ohr gehauen werden kann. Es ist der einfache Weg, einem Freund eine Beute zu reichen oder ein Geschäft abzuschließen.",
       "marketTitle": "Der Weltmarkt",
-      "marketBody": "Der Händler betreibt den Weltmarkt, eine von Spielern getragene Börse, an der du mit Leuten kaufen und verkaufst, denen du vielleicht nie begegnest. Sprich mit dem Händler, um ihn zu öffnen.",
+      "marketBody": "Der Händler betreibt den Weltmarkt, eine von Spielern getragene Börse, an der du mit Leuten kaufst und verkaufst, denen du vielleicht nie begegnest. Sprich mit dem Händler, um ihn zu öffnen. Der Händler führt dort auch einen festen Bestand eigener Waren, sodass es immer etwas zu kaufen gibt, selbst wenn keine anderen Spieler etwas eingestellt haben.",
       "marketBrowse": "Stöbern: Scrolle durch die Angebote oder suche nach Namen, um zu finden, was zum Verkauf steht. Jedes Angebot zeigt die Ware, den Verkäufer und den geforderten Preis für den ganzen Stapel.",
       "marketPost": "Einstellen: Wähle einen Stapel aus deinen Taschen, lege deinen Preis fest und biete ihn an. Die Ware verwahrt der Händler, bis jemand sie kauft. Unverkaufte Angebote kommen nach einer Weile zu dir zurück, und du kannst eines früher zurückfordern, wenn du es dir anders überlegst.",
       "marketCollect": "Einsammeln: Wenn deine Ware verkauft ist, wartet dein Erlös beim Händler auf dich. Kehre zurück, um die Münzen abzuholen, samt allem, was unverkauft zurückgekommen ist. Der Händler behält von jedem abgeschlossenen Verkauf einen kleinen Anteil ein.",
@@ -1409,7 +1618,7 @@ export const de_DE: EnTranslations = {
       "chanParty": "Gruppe.",
       "chanPartyBody": "Sprich mit allen in deiner Gruppe, egal wie weit ihr verstreut seid.",
       "chanGeneral": "Allgemein.",
-      "chanGeneralBody": "Ein stets aktiver lokaler Kanal für die Leute um dich herum, gut, um eine Frage zu stellen oder zu plaudern.",
+      "chanGeneralBody": "Ein stets aktiver, reichsweiter Kanal, der jeden erreicht, der online ist, gut, um eine Frage zu stellen oder allgemein zu plaudern. Anders als Welt und Suche nach Gruppe musst du ihm nie beitreten.",
       "chanWorld": "Welt.",
       "chanWorldBody": "Ein reichsweiter Kanal, dem du freiwillig beitrittst. Öffne seinen Reiter, um beizutreten, und du siehst und erreichst alle Online-Spieler.",
       "chanLfg": "Gruppensuche.",
@@ -1417,7 +1626,7 @@ export const de_DE: EnTranslations = {
       "chanGuild": "Gilde und Offizier.",
       "chanGuildBody": "Kanäle für deine Gilde. Der Gildenchat erreicht jedes Mitglied; der Offizierskanal ist nur für Offiziere.",
       "partyHeading": "Eine Gruppe bilden",
-      "partyBody": "Lade einen anderen Spieler ein, indem du mit der rechten Maustaste auf seinen Namen klickst und ihn einlädst, oder mit einem Chatbefehl. Eine Gruppe fasst bis zu fünf Spieler, und einer von euch ist der Anführer.",
+      "partyBody": "Lade einen anderen Spieler ein, indem du mit der rechten Maustaste auf seinen Namen klickst und ihn einlädst. Eine Gruppe fasst bis zu fünf Spieler, und einer von euch ist der Anführer.",
       "partyCredit": "Gruppenmitglieder in der Nähe teilen sich den Tötungs- und Questfortschritt, gemeinsam zu questen ist also schneller, niemals langsamer. Eine Gruppe ist auch der Weg, als Team einen Dungeon zu betreten.",
       "raidBody": "Sobald du eine volle Gruppe von fünf hast, kann der Anführer sie in einen Schlachtzug von bis zu zehn umwandeln, für den Endgame-Schlachtzug.",
       "lootHeading": "Gruppenbeute",
@@ -1428,6 +1637,8 @@ export const de_DE: EnTranslations = {
       "lootCommonBody": "Gewöhnliche Beute kann an den Plündernden gehen, während bessere Beute zum Würfeln freigegeben wird, sodass jeder eine faire Chance hat.",
       "lootRollTitle": "Bedarf, Gier oder Passen.",
       "lootRollBody": "Wenn ein Gegenstand zum Würfeln freigegeben wird, wählt jedes berechtigte Mitglied Bedarf, wenn es ihn haben will, Gier, wenn es ihn nur nebenbei nähme, oder Passen, um sich herauszuhalten. Der höchste Wurf gewinnt.",
+      "lootMasterTitle": "Plündermeister.",
+      "lootMasterBody": "Der Anführer kann stattdessen die besseren Beutestücke selbst verwalten und jedes dem Mitglied geben, das es bekommen soll. So verhindert er, dass wertvolle Ausrüstung an einen zufälligen Wurf geht, wie eine organisierte Gruppe einen Dungeon angeht.",
       "friendsHeading": "Freunde und Ignorieren",
       "friendsBody": "Füge Spieler deiner Freundesliste hinzu, um zu sehen, wann sie online sind und wo sie sich befinden, sodass du dich in dem Moment mit ihnen zusammenschließen kannst, in dem sie sich anmelden.",
       "ignoreBody": "Wenn dich jemand belästigt, füge ihn deiner Ignorierliste hinzu, und du siehst seinen Chat nicht mehr.",
@@ -1448,17 +1659,21 @@ export const de_DE: EnTranslations = {
       "staTitle": "Ausdauer",
       "staBody": "Ausdauer ist dein Durchhaltevermögen. Mehr Ausdauer bedeutet einen größeren Gesundheitsvorrat, und sie beschleunigt die Gesundheit, die du außerhalb des Kampfes beim Rasten zurückgewinnst. Jede Klasse will etwas davon.",
       "intTitle": "Intelligenz",
-      "intBody": "Intelligenz vergrößert den Manavorrat eines Zauberwirkers und verbessert die Chance, dass seine Zauber kritisch treffen. Sie ist für die Klassen von Belang, die aus Mana wirken; für eine Wut- oder Energieklasse bewirkt sie wenig.",
+      "intBody": "Intelligenz vergrößert den Manavorrat eines Zauberwirkers, erhöht seine Zaubermacht, sodass seine Zauber härter treffen, und verbessert die Chance, dass seine Zauber kritisch treffen. Sie ist für die Klassen von Belang, die aus Mana wirken; für eine Wut- oder Energieklasse bewirkt sie wenig.",
       "spiTitle": "Willenskraft",
       "spiBody": "Willenskraft bestimmt, wie schnell das Mana eines Zauberwirkers außerhalb des Kampfes zurückkehrt. Wie Intelligenz dient sie den Manaklassen und bedeutet den anderen wenig.",
       "armorTitle": "Rüstung",
       "armorBody": "Rüstung verringert den physischen Schaden, den du erleidest. Sie kommt größtenteils von dem, was du trägst, und die schwereren Rüstungsklassen tragen weit mehr davon. Mehr Rüstung gegen einen Feind nahe deiner Stufe bedeutet, dass jeder seiner Treffer sanfter landet.",
       "apTitle": "Angriffskraft",
       "apBody": "Angriffskraft misst, wie hart deine Waffe zuschlägt. Deine Hauptattribute speisen sie, und stärkere Waffen und Ausrüstung heben sie weiter an, weshalb eine Verbesserung ein echter Schadenssprung sein kann.",
+      "spTitle": "Zaubermacht",
+      "spBody": "Zaubermacht ist das Gegenstück eines Zauberwirkers zur Angriffskraft: Sie erhöht den Schaden, den deine Zauber austeilen. Intelligenz speist sie, und Zauberausrüstung und Stärkungszauber legen noch mehr obendrauf, sodass ein Zauberwirker auf die Zaubermacht achtet, wie ein Nahkämpfer auf die Angriffskraft achtet.",
       "critTitle": "Kritischer Treffer",
       "critBody": "Deine kritische Trefferchance ist, wie oft ein Angriff für zusätzlichen Schaden landet. Jeder beginnt mit einer kleinen Grundchance, und Beweglichkeit (dazu manche Talente und Ausrüstung) baut darauf auf.",
       "dodgeTitle": "Ausweichen",
       "dodgeBody": "Ausweichen ist deine Chance, einem eingehenden Nahkampfangriff gänzlich zu entgehen. Du beginnst mit einer kleinen Grundchance, und Beweglichkeit hebt sie an, sodass flinke Klassen mehr Schläge entwischen.",
+      "dpsTitle": "Schaden pro Sekunde",
+      "dpsBody": "Dein Charakterbogen zeigt außerdem eine Schätzung des Schadens pro Sekunde: ungefähr das, was deine Waffe, ihre Schlaggeschwindigkeit und deine Angriffskraft über die Zeit zusammen ergeben. Das ist ein schneller Weg, zwei Waffen auf einen Blick zu vergleichen.",
       "sheetHeading": "Deinen Charakterbogen lesen",
       "sheetBody": "Öffne im Spiel das Charakterfenster, um all das an einem Ort zu sehen: deine fünf Attribute auf der einen Seite und die Werte, die sie speisen, auf der anderen. Fahre über einen beliebigen Wert, und ein Tooltip schlüsselt auf, was er für deine Klasse bewirkt, sodass du auf einen Blick siehst, welche Zahlen eine Verbesserung tatsächlich bewegt hat.",
       "growHeading": "Wie deine Werte wachsen",
@@ -1473,10 +1688,10 @@ export const de_DE: EnTranslations = {
       "journeyBody": "Die Welt ist ein einziges zusammenhängendes Land, drei Gebiete von Süden nach Norden gereiht, jedes eine Stufe höher im Level. Du beginnst im grünen Tal, kämpfst dich durch das Moor und endest in den kalten, hohen Gipfeln. Folge der Questspur, und das Land trägt dich von einem zum nächsten.",
       "bandLabel": "Stufe {min} bis {max}",
       "restedTitle": "Ausgeruhte Erfahrung",
-      "restedBody": "Wenn du dich abmeldest oder an einem sicheren Ort wie einem Gasthaus rastest, sammelt dein Charakter ausgeruhte Erfahrung an, während du fort bist. Sobald du das nächste Mal hinausgehst und kämpfst, gibt dieser Vorrat deinen Tötungen einen zusätzlichen Schub, bis er versiegt. Er baut sich mit der Zeit auf und beschleunigt deine frühen Stufen, sich in der Stadt abzumelden ist also nie verlorene Zeit.",
+      "restedBody": "Raste an einem sicheren Ort wie einem Gasthaus, außerhalb des Kampfes, und dein Charakter sammelt ausgeruhte Erfahrung an, während du dort sitzt. Sobald du das nächste Mal hinausgehst und kämpfst, gibt dieser Vorrat deinen Tötungen einen zusätzlichen Schub, bis er versiegt. Eine Pause im Gasthaus ist nie verlorene Zeit; sie beschleunigt deinen nächsten Abschnitt des Stufenaufstiegs.",
       "capTitle": "Stufe {cap} erreichen",
       "capJourneyBody": "Stufe {cap} ist die Höchststufe, das Ende des Aufstiegs, aber nicht des Wachstums. Von da an läufst du Dungeons und den Schlachtzug, jagst besserer Ausrüstung nach und stellst dich in der Arena auf die Probe.",
-      "prestigeBody": "Erfahrung zählt auch nach der Höchststufe weiter. Sie speist eine kosmetische virtuelle Stufe, sodass deine Erfahrungsleiste weiter steigt, und einen langfristigen Prestigerang, den du dir für die Anerkennung verdienen kannst. Er ist rein optional und gewährt niemals Macht, nur ein Zeichen des Weges, den du gegangen bist.",
+      "prestigeBody": "Erfahrung zählt auch nach der Höchststufe weiter. Sie speist eine kosmetische virtuelle Stufe, sodass deine Erfahrungsleiste weiter steigt, und einen langfristigen Prestigerang, den du dir für die Anerkennung verdienen kannst. Das Überschreiten großer Meilensteine der Gesamterfahrung schaltet zudem kosmetische Titel und Namensschild-Ränder frei, die auf deinem Charakterbogen erscheinen. All das ist rein optional und gewährt niemals Macht, nur ein Zeichen des Weges, den du gegangen bist.",
       "noRush": "Es gibt keine Eile. Die Welt ist dazu da, sie in deinem eigenen Tempo zu genießen, wandere also umher, nimm die Quests an, die dir ins Auge fallen, und lass deinen Helden auf dem Weg wachsen."
     },
     "placeholder": {
@@ -2453,7 +2668,7 @@ export const de_DE: EnTranslations = {
     "lore": {
       "warrior": "Krieger sind kampferprobte Nahkämpfer, die Wut aufbauen, wenn sie Schaden verursachen oder erleiden. Sie halten schwere Treffer aus oder zerschmettern Gegner.",
       "paladin": "Paladine sind heilige Kreuzritter, die mit Segen unterstützen, mit Heiligem Licht heilen und Schwache in schwerer Rüstung schützen.",
-      "hunter": "Jäger beherrschen die Wildnis, verfolgen Gegner aus der Ferne mit Bögen oder Schusswaffen und kontrollieren das Feld mit Fallen.",
+      "hunter": "Jäger sind Fernkampfspezialisten, die an der Seite eines gezähmten Tieres kämpfen, Gegner mit gezielten und schnellen Schüssen überschütten, sie mit Stichen und erschütterndem Beschuss verlangsamen und je nach Augenblick zwischen ihren Aspekten wechseln.",
       "rogue": "Schurken sind verstohlene Assassinen, die Energie und Kombopunkte für Angriffe aus den Schatten ausgeben.",
       "priest": "Priester rufen das Heilige Licht, um Verbündete zu heilen und zu schützen, während Schattenmagie Gegnern Leben entzieht.",
       "shaman": "Schamanen gebieten über die Elemente, erfüllen Waffen mit Macht, treffen Gegner mit Blitzen und stellen Verbündete wieder her.",

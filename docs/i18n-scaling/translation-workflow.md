@@ -74,6 +74,34 @@ stripping `{tokens}`, i.e. most real prose) also needs its five non-Latin fills
 merge, and only brand/URL leaves may stay byte-identical. `tsc` and the `t()` untracked-key
 throw still guarantee English completeness.
 
+## Rewording an existing English value (the staleness blind spot)
+
+Adding a NEW key is safe: the locale starts `pending` and the release gate forces a
+fill. CHANGING the English of an EXISTING key is not, and it is the one i18n footgun
+with no gate behind it. The status registry tracks whether a row HAS a translation,
+not whether that translation still matches the current English, so a row that was
+already translated stays `translated` (never `pending`) even after you reword its
+English. Both gates pass: the PR tier never required translations, and the
+release-tier empty-`pending` assertion only catches MISSING rows, not stale ones. The
+20 overlays keep rendering a translation of the OLD wording, which for a prose reword
+can now state a different fact than the English (a death mechanic, a creature trait, a
+keybind), so non-English readers are shown something simply wrong with nothing red.
+
+So when you reword existing English values, the reword is NOT a free English-only
+change. Either:
+
+- re-fill those keys' overlays in the same change (you are then acting as the
+  maintainer for those rows, the one sanctioned reason to edit an overlay), or
+- record the reworded keys so the next maintainer locale pass re-does them, since
+  `npm run i18n:worklist` (which keys off `pending`) will not list them.
+
+To find what a branch reworded, diff the resolved English against the base and keep
+the keys that existed before and changed value (compare
+`src/ui/i18n.resolved.generated/en.ts` at the merge base vs `HEAD`); every locale whose
+value for one of those keys did not also change is now stale. A guard that hashes each
+translated row's source English and re-marks a row `pending` when the hash drifts would
+close this blind spot; until then it is a manual reconciliation.
+
 ## The S3 drift guard and its blind spots
 
 `tests/localization_fixes.test.ts` (the S3 guard) parses `src/sim/sim.ts` AND

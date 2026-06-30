@@ -14,6 +14,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.spectate.banner': '{name} 관전 중',
   'hudChrome.loot.chestTitle': '상자',
   'hudChrome.spellbook.addToBarAria': '{name}을(를) 행동 단축바에 추가',
   'hudChrome.spellbook.removeFromBarAria': '{name}을(를) 행동 단축바에서 제거',
@@ -772,7 +773,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'classDetails.lore.paladin':
     '성기사는 축복으로 아군을 돕고 성스러운 빛으로 상처를 치유하며 중갑으로 약자를 보호하는 성전사입니다.',
   'classDetails.lore.hunter':
-    '사냥꾼은 야생을 다루며 활이나 총으로 멀리서 적을 추적하고 덫으로 전장을 통제합니다.',
+    '사냥꾼은 길들인 야수와 함께 싸우는 원거리 전문가로, 일격 사격과 속사를 퍼부어 적을 공략하고 맹독과 충격 사격으로 적의 발을 묶으며 상황에 맞춰 화신을 전환합니다.',
   'classDetails.lore.rogue':
     '도적은 기력과 연계 점수를 사용해 그림자 속에서 기습과 마무리 일격을 가하는 암살자입니다.',
   'classDetails.lore.priest':
@@ -3271,6 +3272,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.widgets.heading': '방향',
   'hudChrome.widgets.minimapZoom': '미니맵 확대/축소',
   'hudChrome.leaderboard.close': '닫기',
+  'hudChrome.leaderboard.tabsLabel': '최고 점수 순위표',
+  'hudChrome.leaderboard.tabPlayers': '플레이어',
+  'hudChrome.leaderboard.tabGuilds': '길드',
+  'hudChrome.leaderboard.guildName': '길드',
+  'hudChrome.leaderboard.members': '인원',
+  'hudChrome.leaderboard.topLevel': '최고',
+  'hudChrome.leaderboard.guildXp': '누적 경험치',
+  'hudChrome.leaderboard.guildEmpty': '아직 순위에 오른 길드가 없습니다.',
   'hudChrome.widgets.worldCoordinates': '세계 좌표',
   'hudChrome.plurals.guildMembers.one': '당신은 {rank}, {count}명 회원',
   'hudChrome.plurals.guildMembers.few': '당신은 {rank}, {count}명 회원',
@@ -3464,6 +3473,42 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.tagline': '브라우저에서 무료로 즐기는 클래식 스타일 MMO입니다.',
   'guide.skipToContent': '본문으로 건너뛰기',
   'guide.loading': '불러오는 중...',
+  'guide.controls.targetFriendly': '가장 가까운 아군 대상 지정',
+  'guide.delvesPage.affixesBody':
+    '더 어려운 탐굴에서는 진행 방식을 바꾸는 고난 요소가 하나 붙습니다. 잠들지 못한 죽은 자부터 탁한 공기, 무너져 가는 천장까지 그 종류는 다양합니다. 고난 요소는 위험과 보상을 함께 끌어올립니다. 묘실을 주제로 한 탐굴에서는 다음 중 무엇이든 나타날 수 있습니다:',
+  'guide.delvesPage.affixesHeading': '고난 요소',
+  'guide.delvesPage.affixesLabel': '나타날 수 있는 고난 요소',
+  'guide.delvesPage.companionBody':
+    '탐굴에는 동료가 함께 내려가므로 혼자 도전하더라도 결코 가망 없는 일은 아닙니다. 동료는 당신 곁에서 싸우고, 탐굴 사이에 동료에게 투자할수록 꾸준히 강해져, 결국 탐굴마다 한 번씩 위기에 빠진 아군을 되살릴 수 있게 됩니다. 동료는 이번 탐굴 동안 당신의 편이며, 탐굴 사이에는 게시판에서 기다립니다.',
+  'guide.delvesPage.companionFmt': '{name}, {role}',
+  'guide.delvesPage.companionHeading': '당신의 동료',
+  'guide.delvesPage.companionLabel': '동료',
+  'guide.delvesPage.fromLevel': '{n} 레벨부터',
+  'guide.delvesPage.heading': '탐굴',
+  'guide.delvesPage.howBody':
+    '관리인에게 말을 걸어 게시판을 열고, 난이도를 고른 뒤 내려갑니다. 탐굴 한 번은 짧은 방 몇 개로 이어지며 마지막의 수호자에서 끝납니다. 수호자를 처치하면 보상을 받고 지상으로 돌아옵니다. 함께할 친구가 있다면 데려가고, 없다면 동료에게 기대십시오.',
+  'guide.delvesPage.howHeading': '탐굴은 이렇게 진행됩니다',
+  'guide.delvesPage.intro':
+    '탐굴은 한두 명이 즐기는 짧고 반복 가능한 탐험으로, 혼자 내려갈 때면 언제나 충직한 동료가 곁을 지킵니다. 게시판을 찾아 탐굴을 고르고, 전리품을 챙겨 다시 올라오십시오.',
+  'guide.delvesPage.keeperFmt': '{name}, {title}',
+  'guide.delvesPage.keeperLabel': '관리인',
+  'guide.delvesPage.lockpickBody':
+    '일부 문과 보관함은 잠겨 있으며, 그것을 여는 일은 능력치 검사라기보다 작은 담력 시험입니다. 잠금을 침착하고 깔끔하게 풀면 서두르다 망친 경우보다 더 좋은 보상을 얻습니다. 선택 사항이지만, 신중한 탐굴자가 더 많은 것을 챙깁니다.',
+  'guide.delvesPage.lockpickHeading': '잠금과 그 너머에 숨은 것',
+  'guide.delvesPage.marksBody':
+    '탐굴을 완료하면 탐굴 증표를 얻습니다. 탐굴 증표는 금화와는 별개로 관리되는 화폐입니다. 관리인에게 증표를 지불해 동료를 강화하고, 다른 어디에서도 구할 수 없는 장비를 손에 넣으십시오.',
+  'guide.delvesPage.marksHeading': '탐굴 증표',
+  'guide.delvesPage.partyLabel': '1인 또는 2인용',
+  'guide.delvesPage.tiersBody':
+    '탐굴은 둘 이상의 난이도를 제공합니다. 높은 난이도는 적을 더 강하게 만들고 고난 요소를 하나 더하며, 그만큼 더 많은 보상을 줍니다. 또한 입장하려면 일정 레벨 이상에 도달해 있어야 합니다.',
+  'guide.delvesPage.tiersHeading': '난이도',
+  'guide.delvesPage.tiersLabel': '난이도',
+  'guide.delvesPage.whatBody':
+    '탐굴은 당신과 최대 한 명의 아군만을 위해 만들어진 작은 인스턴스 던전으로, 누구에게도 방해받지 않는 개인 사본입니다. 세계 곳곳의 탐굴 관리인이 지키는 게시판에서 시작해 안으로 들어간 뒤, 몇 개의 방을 헤치며 싸우고 하나의 수호자에서 마무리합니다. 탐굴은 빠르고 반복하도록 만들어져 있어, 열린 세계에서 할 일이 떨어졌을 때 믿을 만한 성장 수단이 됩니다.',
+  'guide.delvesPage.whatHeading': '탐굴이란',
+  'guide.delvesPage.whereBody':
+    '첫 번째 탐굴인 무너진 성물실은 시작 지역인 이스트브룩 골짜기의 성물실 언덕에서 열립니다. 그곳의 게시판은 브라더 할벤이 지키며, 준비가 되면 그가 당신을 아래로 내려보냅니다.',
+  'guide.delvesPage.whereHeading': '어디서 찾을 수 있나',
   'guide.docTitle': '{page} - {brand}',
   'guide.nav.overview': '개요',
   'guide.nav.howToPlay': '플레이 방법',
@@ -3471,6 +3516,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.nav.bestiary': '몬스터 도감',
   'guide.nav.world': '세계',
   'guide.nav.quests': '퀘스트',
+  'guide.nav.delves': '탐굴',
   'guide.nav.dungeons': '던전과 공격대',
   'guide.nav.reference': '참고 자료',
   'guide.nav.controls': '조작법',
@@ -3589,7 +3635,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '머리 위에 표시가 있는 사람에게서 퀘스트를 수락하고, 목표를 완료한 뒤 완수하여 경험치와 금화, 장비를 받으세요. 화면의 추적 창이 목표를 한눈에 보여줍니다.',
   'guide.howToPlay.deathTitle': '죽음은 끝이 아닙니다',
   'guide.howToPlay.deathBody':
-    '쓰러지면 가장 가까운 묘지에서 영혼을 풀어내어 시신까지 달려가면 됩니다. 경험치는 잃지 않습니다.',
+    '쓰러지면 영혼을 풀어내 가장 가까운 묘지에서 온전한 생명력으로 되살아난 뒤, 있던 자리로 돌아가면 됩니다. 경험치는 잃지 않습니다.',
   'guide.howToPlay.groupingTitle': '함께 플레이하기',
   'guide.howToPlay.groupingBody':
     '다른 사람을 파티에 초대해 퀘스트 점수를 나누고 던전에 도전하세요. 세계 대부분은 혼자서도 누빌 수 있으니, 파티 플레이는 의무가 아니라 선택입니다.',
@@ -3604,12 +3650,18 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.controls.actionHeader': '동작',
   'guide.controls.groupMovement': '이동',
   'guide.controls.groupCombat': '대상 지정과 전투',
-  'guide.controls.groupInterface': '창',
+  'guide.controls.groupInterface': '인터페이스',
+  'guide.controls.controllerBody':
+    '게임패드도 사용할 수 있으며, 컨트롤러 지원은 기본으로 켜져 있습니다. 왼쪽 스틱으로 이동하고, 오른쪽 스틱으로 카메라를 조준하며, 얼굴 버튼과 어깨 버튼으로 능력 사용, 점프, 상호작용을 처리합니다. 창을 열면 메뉴를 다룰 화면 포인터가 나타납니다. 옵션의 컨트롤러 설정에서 버튼을 재배치하고 스틱 데드존, 카메라 속도, 진동, 시점 반전을 조정할 수 있습니다.',
+  'guide.controls.controllerHeading': '컨트롤러에서',
+  'guide.controls.cycleFriendly': '아군 대상 순환',
+  'guide.controls.gameMenu': '게임 메뉴와 옵션 열기',
   'guide.controls.groupCamera': '카메라',
   'guide.controls.talents': '특성',
   'guide.controls.arena': '투기장',
   'guide.controls.leaderboard': '순위표',
-  'guide.controls.abilities': '능력 사용',
+  'guide.controls.abilities':
+    '행동 단축바 능력 사용 (숫자 키 줄, 두 번째 단축바는 숫자 키패드에 있음)',
   'guide.controls.mobileHeading': '모바일에서',
   'guide.controls.mobileBody':
     '휴대전화와 태블릿에서는 터치 조작이 자동으로 나타납니다. 왼쪽에는 이동 스틱, 오른쪽 아무 곳이나 끌면 시점 전환, 그리고 능력과 메뉴를 위한 화면 버튼이 표시됩니다.',
@@ -3617,10 +3669,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '전투는 익숙한 클래식 MMO 규칙을 따릅니다. 잘 플레이하기 위해 이를 공부할 필요는 전혀 없으며, 그저 전투가 어떻게 돌아가는지에 대한 개요일 뿐입니다.',
   'guide.combat.hitTitle': '모든 일격이 맞는 것은 아닙니다',
   'guide.combat.hitBody':
-    '공격은 빗나가거나 회피, 무기 막기, 방패 막기에 막힐 수 있으며, 적의 공격도 마찬가지입니다. 자신과 비슷한 레벨대에서 싸우고 장비를 최신으로 유지하는 것이 공격을 명중시키는 비결입니다.',
-  'guide.combat.mitigationTitle': '방어도와 장비가 버티게 해줍니다',
+    '공격은 빗나가거나 회피당할 수 있고, 적의 공격도 마찬가지이며, 주문은 아예 저항당할 수 있습니다. 공격을 명중시키는 비결은 자신과 비슷한 레벨대에서 싸우는 것입니다. 레벨 차이가 벌어질수록 헛손질이 늘어납니다.',
+  'guide.combat.mitigationTitle': '방어도와 생명력이 버티게 해줍니다',
   'guide.combat.mitigationBody':
-    '방어도는 물리 공격을 완화하고 알맞은 장비는 마법을 무디게 하므로, 장비 업그레이드가 생존력의 주된 원천입니다. 중장갑 직업일수록 더 많이 흘려내지만, 그 무엇도 무적으로 만들어 주지는 않습니다.',
+    '방어도는 물리 공격을 완화하므로, 더 좋은 방어구가 근접전에서 버티는 힘의 주된 원천입니다. 마법은 다른 이야기입니다. 주문은 방어도가 아니라 더 깊은 생명력과 아예 저항해 낼 가능성으로 견뎌 냅니다. 중장갑 직업일수록 더 많이 흘려내지만, 그 무엇도 무적으로 만들어 주지는 않습니다.',
   'guide.combat.resourcesTitle': '직업마다 고유한 리듬이 있습니다',
   'guide.combat.resourcesBody':
     '전사는 격전 속에서 분노를 쌓고, 도적은 꾸준히 차오르는 기력을 소모하며, 마법사 계열은 마나 자원을 관리합니다. 자신의 자원을 익히는 것이 직업을 잘 플레이하는 절반입니다.',
@@ -3636,11 +3688,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '대부분의 능력을 사용한 뒤 따라오는 짧은 공용 대기 시간으로, 모든 능력을 한꺼번에 쏟아낼 수 없게 합니다.',
   'guide.glossary.dpsTerm': 'DPS',
   'guide.glossary.dpsDef':
-    '초당 피해량으로, 무언가가 얼마나 빠르게 피해를 주는지를 대략적으로 나타내는 척도입니다.',
+    '초당 피해량으로, 무언가가 얼마나 빠르게 피해를 주는지를 대략적으로 나타내는 척도입니다. 또한 피해를 담당하는 역할 자체를 가리키기도 하는데, 예컨대 탱커 하나, 힐러 하나, 딜러(DPS) 셋처럼 씁니다.',
   'guide.glossary.eliteTerm': '정예',
   'guide.glossary.eliteDef':
     '보통보다 강한 적으로, 대개 파티를 염두에 둔 상대입니다. 던전과 희귀 적은 흔히 정예입니다.',
   'guide.glossary.rareTerm': '희귀',
+  'guide.glossary.raidDef':
+    '가장 어려운 최종 단계 전투를 위해 꾸리는 더 큰 집단으로, 이 게임에서는 최대 10명까지 들어갑니다. 파티가 가득 차면 공격대로 전환됩니다.',
+  'guide.glossary.raidTerm': '공격대',
   'guide.glossary.rareDef':
     '지역을 떠도는 보기 드문 이름 있는 적으로, 더 좋은 전리품을 떨어뜨립니다.',
   'guide.glossary.tankTerm': '탱커',
@@ -3669,7 +3724,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '네. 즉시 즐기는 1인 오프라인 모드가 있고, 온라인 세계도 던전과 공격대를 제외하면 혼자서 완전히 누빌 수 있습니다.',
   'guide.faqPage.q5': '직업은 몇 개인가요?',
   'guide.faqPage.a5':
-    '9개로, 클래식한 탱커, 힐러, 딜러 역할을 아우르며 각자 고유한 자원과 대표 능력을 지니고 있습니다.',
+    '9개로, 클래식한 탱커, 힐러, 딜러 역할을 아우르며, 각자 자원 체계(분노, 마나, 기력)와 고유한 대표 능력을 지니고 있습니다.',
   'guide.faqPage.q6': '최고 레벨은 몇인가요?',
   'guide.faqPage.a6': '{cap}레벨이며, 퀘스트와 던전, 탐험으로 이어진 3개 지역을 거쳐 도달합니다.',
   'guide.faqPage.q7': '제 캐릭터가 저장되나요?',
@@ -3722,7 +3777,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '늑대와 멧돼지부터 이들을 노리는 포식자까지, 숲과 들판의 야생 동물들. 사냥꾼은 그중 다수를 길들일 수 있습니다.',
   'guide.family.spider.name': '거미',
   'guide.family.spider.desc':
-    '어둡고 뒤엉킨 곳에 둥지를 트는 거미줄 짜는 자들과 독을 품은 잠복자들.',
+    '어둡고 뒤엉킨 곳에 둥지를 트는 거미줄 짜는 자들과 독을 품은 잠복자들. 사냥꾼은 야수와 마찬가지로 이들을 길들일 수 있습니다.',
   'guide.family.murloc.name': '멀록',
   'guide.family.murloc.desc':
     '시끄럽고 영역 의식이 강한 무리를 이루어 얕은 물가에 떼지어 모이는 양서류 늪지 거주자들.',
@@ -3733,7 +3788,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.family.humanoid.desc':
     '산적과 광신도, 그리고 잘못된 길로 들어선 자들. 이들은 이빨이 아니라 전술로 싸웁니다.',
   'guide.family.troll.name': '트롤',
-  'guide.family.troll.desc': '습지와 고지대에 둥지를 트는, 빠르게 회복하는 거대한 짐승들.',
+  'guide.family.troll.desc': '습지의 늪에 둥지를 트는 거대한 짐승들.',
   'guide.family.ogre.name': '오우거',
   'guide.family.ogre.desc':
     '거대하고 둔하지만 위험합니다. 높은 고갯길에 진을 치고 산사태처럼 내리칩니다.',
@@ -3741,6 +3796,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.family.undead.desc':
     '더 어두운 손에 의해 일으켜진 안식 없는 망자들. 지치지도, 달아나지도 않습니다.',
   'guide.family.elemental.name': '정령',
+  'guide.family.dragonkin.desc':
+    '비늘로 뒤덮인 뱀 같은 옛 심연의 존재들. 보기 드물고 오만하며, 겉보기보다 훨씬 강합니다.',
+  'guide.family.dragonkin.name': '용족',
   'guide.family.elemental.desc':
     '원소가 강하게 흐르는 야생의 장소에 매여 있는, 살아 있는 폭풍과 돌.',
   'guide.worldPage.heading': '세계',
@@ -3761,18 +3819,18 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     "머리 위에 표식이 있는 사람들이 당신에게 맡길 일이 있습니다. 그들에게 말을 걸어 퀘스트를 수락하세요. 가장 첫 퀘스트는 동개울의 레드브룩 원수가 주는 '문 앞의 늑대들'입니다.",
   'guide.questsPage.objectivesTitle': '목표',
   'guide.questsPage.objectivesBody':
-    '특정 적을 처치하거나, 아이템을 모으거나, 세계의 무언가와 상호작용하세요. 화면의 추적기가 진행 상황을 실시간으로 세어 줍니다.',
+    '특정 적을 처치하거나, 아이템을 모으거나, 세계의 무언가와 상호작용하세요. 화면의 추적기가 진행 상황을 실시간으로 세어 줍니다. 마음이 바뀌면 퀘스트 일지에서 퀘스트를 포기했다가 나중에 그것을 준 사람에게서 다시 받을 수 있습니다.',
   'guide.questsPage.turninTitle': '완료하기',
   'guide.questsPage.turninBody':
-    '퀘스트를 준 사람에게 돌아가면(지도가 위치를 알려줍니다) 경험치와 돈, 그리고 흔히 직업에 맞춘 장비 한 점을 받습니다.',
+    '완료한 퀘스트를 완료 표식으로 가져가면(지도가 위치를 알려줍니다) 경험치와 돈, 그리고 흔히 직업에 맞춰 고른 장비 한 점을 받습니다. 보통은 퀘스트를 준 사람이지만, 어떤 퀘스트는 다른 사람에게 보내기도 합니다.',
   'guide.questsPage.partyTitle': '파티로 퀘스트하기',
   'guide.questsPage.partyBody':
-    '가까이 있는 파티원은 처치와 목표 공로를 나누므로, 함께하는 퀘스트는 더 빠르면 빨랐지 결코 느리지 않습니다.',
+    '가까이 있는 파티원은 처치와 목표 공로를 나누므로, 함께하는 퀘스트는 더 빠르면 빨랐지 결코 느리지 않습니다. 퀘스트를 파티와 공유할 수도 있습니다. /share 명령으로 클릭할 수 있는 링크를 채팅에 올리면, 가까이 있는 자격을 갖춘 파티원 누구나 클릭 한 번으로 같은 퀘스트를 받을 수 있습니다.',
   'guide.questsPage.storyTitle': '하나의 실타래가 모든 것을 꿰뚫습니다',
   'guide.questsPage.storyBody':
     '동개울에서의 첫 심부름부터, 죽은 자들에게 무언가 잘못되어 갑니다. 한 교단이 암약하고 있으며, 그 자취는 모든 지역을 거쳐 북쪽으로 이어집니다. 자취를 좇아 그 배후가 누구인지 밝혀내세요.',
   'guide.questsPage.soloNote':
-    '메인 스토리는 완전히 혼자서 진행할 수 있으며, 마지막 장만이 파티를 필요로 합니다.',
+    '메인 스토리는 각 장의 대단원까지 완전히 혼자서 진행할 수 있으며, 그 대단원은 5인 던전입니다.',
   'guide.dungeonsPage.heading': '던전과 공격대',
   'guide.dungeonsPage.intro':
     '열린 세계만으로 부족할 때, 파티를 모아 인스턴스에 들어서세요. 당신의 파티만을 위해 만들어진 던전의 개별 사본입니다.',
@@ -3872,7 +3930,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.augmentsNote':
     '증강과 강화 효과는 해당 경기 동안에만 유지됩니다. 지속적인 힘이 아니라 그 자리에서 재미있게 빌드를 짜는 것이 목적이므로, 돈으로 승리를 사는 일은 없습니다.',
   'guide.arenaPage.coliseumBody':
-    '콜로세움은 서버의 투기장으로, 등급전에서 다른 플레이어들과 맞붙는 곳입니다. 이기면 순위가 오르고, 가장 강한 투사들이 모두가 볼 수 있는 순위표 정상에 오릅니다.',
+    '콜로세움은 서버의 투기장으로, 1대1 또는 2대2 등급전에서 다른 플레이어들과 맞붙는 곳입니다. 등급 구간마다 별도의 순위가 매겨지므로, 승리하면 그 사다리에서 순위가 올라 서버 전체가 그 결과를 보게 됩니다.',
   'guide.arenaPage.coliseumHeading': '잿빛 콜로세움',
   'guide.arenaPage.duelsBody':
     '마주치는 누구에게나 가벼운 결투를 신청할 수 있습니다. 자존심 외에는 걸린 것이 없으므로, 상대법을 익히거나 가벼운 논쟁을 가리는 가장 쉬운 방법입니다.',
@@ -3918,6 +3976,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.faqPage.q10': '최고 레벨에서는 무엇을 할 수 있나요?',
   'guide.faqPage.q11': '파티는 어떻게 구하나요?',
   'guide.faqPage.q9': 'PvP가 있나요?',
+  'guide.glossary.augmentDef':
+    '2대2 피에스타 투기장 경기 중에 골라 얻는 일시적인 강화로, 그 경기 동안에만 당신의 기술 구성을 바꿔 줍니다.',
+  'guide.glossary.augmentTerm': '증강',
   'guide.glossary.buffDef':
     '자신이나 아군에게 걸리는 이로운 효과로, 한동안 능력치를 높여 주는 축복 같은 것입니다.',
   'guide.glossary.buffTerm': '버프',
@@ -3926,6 +3987,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.debuffDef':
     '대상에게 걸리는 해로운 효과로, 둔화나 출혈, 방어도 약화 같은 것입니다.',
   'guide.glossary.debuffTerm': '디버프',
+  'guide.glossary.delveDef':
+    '한두 명이 즐기는 짧고 반복 가능한 인스턴스 탐험으로, 관리인의 게시판에서 시작하며 동료가 곁을 지킵니다.',
+  'guide.glossary.delveTerm': '탐굴',
   'guide.glossary.dotDef':
     '지속 피해와 지속 치유를 뜻하며, 한 번에 들어가지 않고 일정한 간격으로 들어가는 효과입니다.',
   'guide.glossary.dotTerm': '지속 피해와 지속 치유',
@@ -3960,6 +4024,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.search.placeholder': '가이드 검색',
   'guide.search.typeClass': '직업',
   'guide.search.typeCreature': '생명체',
+  'guide.search.typeDelve': '탐굴',
   'guide.search.typeDungeon': '던전',
   'guide.search.typePage': '페이지',
   'guide.search.typeTerm': '용어',
@@ -3984,8 +4049,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.talentsPage.intro':
     '특성은 직업을 자신만의 것으로 만드는 방법입니다. 선택은 자유롭고, 부담 없이 바꿀 수 있으므로 마음껏 시도해 볼 수 있습니다.',
   'guide.talentsPage.resetNote':
-    '특성은 언제든 초기화할 수 있으므로, 초반의 선택이 발목을 잡는 일은 없습니다. 이것저것 시도해 보고, 마음에 드는 것을 찾고, 자유롭게 마음을 바꾸세요.',
+    '특성은 전투 중이 아닐 때면 언제든 초기화할 수 있으므로, 초반의 선택이 발목을 잡는 일은 없습니다. 이것저것 시도해 보고, 마음에 드는 것을 찾고, 자유롭게 마음을 바꾸세요.',
   'guide.talentsPage.resetTitle': '영구적인 것은 없습니다',
+  'guide.talentsPage.shareNote':
+    '완성한 특성 구성은 짧은 공유 코드로 복사해 친구에게 건넬 수 있고, 친구는 그 코드를 자신의 특성 창에 그대로 붙여 넣어 불러올 수 있습니다.',
   'guide.talentsPage.specsBody':
     '모든 직업에는 몇 가지 전문화가 있으며, 각각 고유한 역할과 대표적인 특징을 지닙니다. 여기 그 전체 윤곽을 정리했습니다. 전체 기술 구성은 직업을 열어 확인하세요.',
   'guide.talentsPage.specsHeading': '직업별 전문화',
@@ -3998,7 +4065,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '모든 직업은 제 몫을 다하고 최고 레벨에 도달할 수 있습니다. 남이 최고라고 말하는 것이 아니라, 당신이 좋아하는 환상을 고르세요.',
   'guide.wishPage.i1Title': '잘못된 직업이란 없습니다',
   'guide.wishPage.i2Body':
-    '쓰러지면 묘지에서 부활해 자신의 시신까지 달려가면 됩니다. 경험치는 잃지 않으므로, 위험을 무릅쓰고 배워도 안전합니다.',
+    '쓰러지면 영혼을 풀어내 가장 가까운 묘지에서 되살아난 뒤, 원래 자리로 돌아가면 됩니다. 경험치는 잃지 않으므로, 위험을 무릅쓰고 배워도 안전합니다.',
   'guide.wishPage.i2Title': '죽어도 손해는 거의 없습니다',
   'guide.wishPage.i3Body':
     '특성은 10레벨에 열리고 원할 때 언제든 초기화되므로, 초반의 선택이 영구적인 일은 없습니다.',
@@ -4055,13 +4122,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.combat.ccBody':
     '군중 제어는 대상이 할 수 있는 행동을 제한하는 특별한 종류의 약화 효과입니다. 기절, 속박과 둔화, 주문 시전을 막는 침묵, 무장 해제, 공포, 그리고 잠시 적을 무력하게 만드는 변이가 있습니다. 그중 속박, 공포, 변이 같은 일부는 너무 빨리 다시 걸면 효과가 풀리므로 무한정 이어 걸 수는 없습니다.',
   'guide.combat.deathBody':
-    '생명력이 0에 이르면 쓰러집니다. 잠시 기다린 뒤 되살아나 멈췄던 자리에서 다시 이어 가므로, 죽음은 약간의 시간을 앗아갈 뿐 진행 상황까지 빼앗지는 않습니다. 전투 사이에는 앉아서 먹고 마시며 온전한 상태로 다음 싸움에 임하세요.',
+    '생명력이 0에 이르면 쓰러집니다. 영혼을 풀어내 가장 가까운 묘지에서 온전한 생명력으로 되살아난 뒤 원래 자리로 돌아가면 되므로, 죽음은 약간의 시간을 앗아갈 뿐 진행 상황까지 빼앗지는 않습니다. 전투 사이에는 앉아서 먹고 마시며 온전한 상태로 다음 싸움에 임하세요.',
   'guide.combat.deathTitle': '쓰러졌을 때',
   'guide.combat.effectsBody':
     '많은 능력이 일정 시간 남는 효과를 부여합니다. 이로운 효과(강화)는 능력치를 올리거나 보호막을 씌우거나 조금씩 치유해 주고, 해로운 효과(약화)는 지속 피해로 생명력을 깎거나 당신을 약하게 만듭니다. 행동 단축바 근처의 작은 아이콘을 보고 무엇이 걸려 있고 얼마나 남았는지 확인하세요.',
   'guide.combat.effectsTitle': '강화, 약화, 그리고 군중 제어',
   'guide.dungeonsPage.cryptLeadBody':
-    '봉우리 높은 곳, 본 전투에서 떨어진 자리에 더 차가운 수수께끼가 잠들어 있습니다. 어떤 기록에도 남지 않은 왕관이 새겨진 오래된 무덤들이 있고, 그것을 지키는 죽은 자들은 한때 잊힌 왕을 섬겼습니다. 그들의 비석을 읽고 그들이 간직한 핵심석을 모으면, 충성스러운 세 영혼이 닫힌 채로 지키려다 죽어간 무덤을 다시 열 수 있습니다. 끝까지 단서를 좇는 이들에게 두 번째 10인 시련이 열립니다.',
+    '봉우리 높은 곳, 본 전투에서 떨어진 자리에 더 차가운 수수께끼가 잠들어 있습니다. 어떤 기록에도 남지 않은 왕관이 새겨진 오래된 무덤들이 있고, 그것을 지키는 죽은 자들은 한때 잊힌 왕을 섬겼습니다. 그들의 비석을 읽고 그들이 간직한 핵심석을 모으면, 충성스러운 세 영혼이 닫힌 채로 지키려다 죽어간 무덤의 봉인을 풀 수 있습니다. 이것은 끝까지 단서를 좇는 이들에게 서버의 10인 공격대를 열어 주는 선택적 시련입니다.',
   'guide.dungeonsPage.cryptLeadTitle': '죽은 자들이 닫아 두려 했던 문',
   'guide.dungeonsPage.templeLoreBody':
     '이 신전에는 당신이 다른 곳에서 쫓는 교단보다 오래된 그만의 전설이 있습니다. 달빛을 들이마시고 익사자를 되돌려 주는 작은 호수, 글리머미어의 기슭에서 한 외로운 감시자가 창백한 빛의 관문을 지킵니다. 수면 아래로는 차가운 돌계단이 그곳까지 내려갑니다. 그곳에 가라앉은 이들은 불운으로 익사한 것이 아닙니다. 그들은 창백한 합창단이었고, 경배 속에 물밑으로 들어가 노래를 멈추지 않았습니다. 옛 수호자들은 물이 자신들을 삼키기 전에 바위에 단 하나의 경고를 새겼습니다. 익사한 달이라 부르던 무언가를 향한 기도였고, 그 아래에 한층 차분한 손길이 두 마디를 덧붙였습니다. 그것은 잠들어 있을 뿐.',
@@ -4073,12 +4140,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '화폐는 세 가지 동전으로 이루어집니다. 동화 100개가 은화 하나, 은화 100개가 금화 하나이므로, 지갑은 가장 작은 동전부터 채워집니다. 퀘스트 보상, 쓰러진 적에게서 얻는 전리품, 그리고 더는 필요 없는 물건을 파는 것으로 벌 수 있습니다.',
   'guide.economy.coinTitle': '금화, 은화, 동화',
   'guide.economy.intro':
-    '동전은 온 세계를 움직이는 기름입니다. 장비와 보급품을 사고, 수리비와 퀘스트 비용을 치르며, 플레이어들 사이에서 손을 바꿉니다. 이 모든 것은 그저 플레이하는 것만으로 익히게 되니, 이 페이지를 돈이 어디서 들어오고 어디로 나가는지 보여 주는 지도라 여기세요.',
+    '동전은 온 세계를 움직이는 기름입니다. 장비와 보급품, 여행 장비를 사고, 플레이어들 사이에서 손을 바꿉니다. 이 모든 것은 그저 플레이하는 것만으로 익히게 되니, 이 페이지를 돈이 어디서 들어오고 어디로 나가는지 보여 주는 지도라 여기세요.',
   'guide.economy.junkBody':
     '쓸모없는 전리품도 어느 상인에게나 팔 수 있으니, 마을을 지날 때마다 가방을 가득 채워 두지 말고 비워 두세요. 정말로 값어치 없는 잡동사니는 아예 버려서 자리를 마련할 수도 있습니다.',
   'guide.economy.junkTitle': '잡동사니 정리',
   'guide.economy.marketBody':
-    '상인이 세계 시장을 운영합니다. 만날 일 없을지도 모를 사람들과 사고팔 수 있는, 플레이어가 이끄는 거래소입니다. 상인에게 말을 걸어 열어 보세요.',
+    '상인이 세계 시장을 운영합니다. 만날 일 없을지도 모를 사람들과 사고팔 수 있는, 플레이어가 이끄는 거래소입니다. 상인에게 말을 걸어 열어 보세요. 상인은 자신의 물품도 상시 목록에 올려 두므로, 다른 플레이어가 아무것도 올리지 않았을 때에도 언제나 살 것이 있습니다.',
   'guide.economy.marketBrowse':
     '둘러보기: 목록을 넘겨 보거나 이름으로 검색해 무엇이 매물로 나와 있는지 찾으세요. 각 매물에는 물품, 판매자, 그리고 묶음 전체의 호가가 표시됩니다.',
   'guide.economy.marketCollect':
@@ -4088,11 +4155,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.economy.marketPricing':
     '가격은 당신의 몫입니다. 남들이 부르는 값보다 조금 낮게 올리면 더 빨리 팔리는 경향이 있고, 지나치게 높은 값은 손도 닿지 않은 채 남을 수 있습니다. 등록하기 전에 먼저 둘러보며 시세가 어떤지 살펴보세요.',
   'guide.economy.marketTitle': '세계 시장',
+  'guide.economy.marksBody':
+    '모아두는 것이 금화만 있는 것은 아닙니다. 탐굴은 탐굴 증표를 보상으로 주며, 이는 오직 탐굴 관리인에게서만 동료 강화와 다른 곳에서는 구할 수 없는 장비에 쓰는 별도의 화폐입니다. 탐굴 증표는 금화와 절대 섞이지 않습니다.',
+  'guide.economy.marksTitle': '두 번째 화폐: 탐굴 증표',
   'guide.economy.tradeBody':
     '가까이 선 사람과는 누구든 얼굴을 맞대고 거래할 수 있습니다. 둘이 함께 쓰는 창에 물건과 동전을 올리고, 양쪽이 모두 확인해야 비로소 교환이 이루어지므로 어느 쪽도 당할 일이 없습니다. 친구에게 전리품을 건네거나 약속을 매듭짓는 간단한 방법입니다.',
   'guide.economy.tradeTitle': '다른 플레이어와 거래하기',
   'guide.economy.vendorsBody':
-    '마을과 전초기지에는 저마다 다른 물건을 다루는 상인들이 흩어져 있습니다. 보급상은 음식과 음료를 갖추고, 무기 제작자와 방어구 제작자는 장비를 다루며, 약초상은 마법 재료를 취급하고, 병참장교는 실용적인 여행 장비를 둡니다. 다가서면 그들이 무엇을 파는지 볼 수 있습니다.',
+    '마을과 전초기지에는 저마다 다른 물건을 다루는 상인들이 흩어져 있습니다. 보급상은 음식과 음료를 갖추고, 무기 제작자와 방어구 제작자는 장비를 다루며, 병참장교는 실용적인 여행 장비를 둡니다. 다가서면 그들이 무엇을 파는지 볼 수 있습니다.',
   'guide.economy.vendorsTitle': '상인과 그들이 다루는 것',
   'guide.gear.consumablesElixirs':
     '비약은 모험하는 동안 일시적인 강화 효과를 주어, 조금 더 멀리 밀어붙이고 싶을 때 도움이 되는 작은 우위가 됩니다.',
@@ -4103,6 +4173,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.gear.consumablesPotions':
     '물약은 사용하는 순간 생명력이나 마나를 회복시켜 주며, 전투 중에도 쓸 수 있어 풀이 어그러졌을 때 결정적인 한 수가 됩니다. 짧은 공용 재사용 대기시간을 공유하므로, 한 번의 좋은 순간을 노려 쓰세요.',
   'guide.gear.consumablesTitle': '소모품',
+  'guide.gear.cosmeticsApply':
+    '캐릭터 화면의 외형 항목에서 현재 외형을 설정하고, 해금한 모든 외형을 자유롭게 바꿀 수 있습니다.',
   'guide.gear.cosmeticsBody':
     '어떤 보상은 캐릭터의 모습만 바꿀 뿐 강함에는 전혀 영향을 주지 않습니다. 이런 외형 장식은 게임에 영향을 주지 않으면서 자신을 돋보이게 해 주니, 마음에 드는 것을 골라 걸치세요.',
   'guide.gear.cosmeticsCache':
@@ -4110,17 +4182,19 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.gear.cosmeticsRanks':
     '외형 장식에도 저마다 희귀도 등급이 있으며, 희귀한 것일수록 쫓는 재미가 있습니다. 더 높은 등급을 얻으면 그 아래 등급의 외형도 함께 해금됩니다.',
   'guide.gear.cosmeticsSkins':
-    '모을 수 있는 외형 장식은 두 갈래입니다. 모든 직업에는 본연의 모습을 새롭게 풀어낸, 오직 자신만이 걸칠 수 있는 대체 외형이 몇 가지 있습니다. 그 곁에는 크로마가 있는데, 차분한 금속빛부터 화려한 황실의 색까지 외형을 통째로 다시 칠하는 이름 붙은 두 색조의 배색입니다.',
+    '모을 수 있는 외형 장식은 두 갈래입니다. 대부분의 직업에는 본연의 모습을 새롭게 풀어낸, 오직 자신만이 걸칠 수 있는 대체 외형이 몇 가지 있습니다. 그 곁에는 크로마가 있는데, 차분한 금속빛부터 화려한 황실의 색까지 외형을 통째로 다시 칠하는 이름 붙은 두 색조의 배색입니다.',
   'guide.gear.cosmeticsTitle': '외형과 장식',
   'guide.gear.fishingBody':
-    '낚시는 분위기를 바꿔 주는 차분한 여유입니다. 낚싯대를 장착하고 트인 물에 드리워, 물리는 것을 낚아 올리세요. 대개는 요리해 음식으로 만들 수 있는 물고기를 잡고, 가끔은 몇 푼에 팔 잡동사니를, 그리고 이따금 값진 희귀한 손맛을 만납니다. 무엇을 잡을지는 어떤 물에서 낚느냐에 달려 있습니다.',
+    '낚시는 분위기를 바꿔 주는 차분한 여유입니다. 낚싯대를 장착하고 트인 물에 드리워, 물리는 것을 낚아 올리세요. 대개는 그대로 먹을 수 있는 음식인 물고기를 잡고, 가끔은 몇 푼에 팔 잡동사니를, 그리고 이따금 값진 희귀한 손맛을 만납니다. 무엇을 잡을지는 어떤 물에서 낚느냐에 달려 있습니다.',
   'guide.gear.fishingFood':
-    '낚아 올린 물고기는 날것이고, 날생선은 곧 음식입니다. 잡은 것을 요리하면 앉아서 먹을 때 더 많이 회복되며, 더 좋은 물고기는 북쪽의 더 차갑고 깊은 물에서 나옵니다. 호수에 드리운 낚싯줄은 전투 사이에 가방을 조용히 채워 두는 길입니다.',
+    '낚아 올린 물고기는 음식입니다. 앉아서 쉬는 동안 하나 먹으면 생명력이 회복되며, 더 든든한 물고기는 북쪽의 더 차갑고 깊은 물에서 나옵니다. 호수에 드리운 낚싯줄은 전투 사이에 가방을 조용히 채워 두는 길입니다.',
   'guide.gear.fishingRare':
     '이따금 낚싯줄이 저녁거리보다 훨씬 나은 것을 낚습니다. 어떤 물에서든 운 좋은 낚시꾼이라면 걸릴 수 있는, 반짝이는 값진 물고기지요. 한 마리 낚으면 기록이 그 손맛으로 환히 밝혀집니다. 호숫가에서 한가로이 보낸 오후를 두고두고 자랑할 만한, 그런 행운의 한 수입니다.',
   'guide.gear.fishingTitle': '낚시',
   'guide.gear.intro':
     '장비는 캐릭터가 걸치는 장구이자 지니고 다니는 물건입니다. 더 좋은 장비는 강해지는 가장 꾸준한 길이며, 그 대부분은 그저 플레이하는 것만으로 손에 들어옵니다.',
+  'guide.gear.itemLevelBody':
+    '두 장비를 빠르게 비교하고 싶다면 옵션에서 아이템 레벨 표시를 켜십시오. 그러면 무기와 방어구마다 아이템 레벨이 표시되는데, 이는 장비의 출처를 바탕으로 대략적인 강함을 하나의 숫자로 나타낸 것입니다. 덕분에 서로 다른 부위라도 어느 쪽 장비가 더 값어치 있는지 한눈에 알 수 있습니다.',
   'guide.gear.qualityBody':
     '모든 물건에는 품질이 있고, 한눈에 그 값어치를 읽을 수 있도록 이름이 그에 맞게 색으로 칠해집니다. 가장 흔한 것부터 가장 값진 것까지:',
   'guide.gear.qualityCommon': '일반',
@@ -4132,6 +4206,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.gear.qualityRare': '희귀',
   'guide.gear.qualityTitle': '한눈에 보는 품질',
   'guide.gear.qualityUncommon': '고급',
+  'guide.gear.setsBody':
+    '가장 희귀한 방어구는 서로 어울리는 한 벌로 나오며, 여러 부위가 하나처럼 보이고 또 하나처럼 싸우도록 만들어져 있습니다. 같은 세트를 충분히 갖춰 입으면 세트 효과가 깨어나, 각 부위 고유의 능력치에 더해 추가 효과를 부여하고, 더 많은 부위를 입을수록 더 강해집니다. 이런 장비는 최고 레벨 부근의 가장 어려운 단체 콘텐츠에서 떨어지므로, 세트 한 벌을 완성하는 것은 전형적인 최종 단계 목표입니다.',
+  'guide.gear.setsTitle': '세트와 세트 효과',
   'guide.gear.slotChest': '가슴',
   'guide.gear.slotFeet': '발',
   'guide.gear.slotGloves': '손',
@@ -4141,7 +4218,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.gear.slotShoulder': '어깨',
   'guide.gear.slotWaist': '허리',
   'guide.gear.slotsBody':
-    '무기 칸 하나와 방어구 칸 일곱 개가 있습니다. 착용하는 부위마다 캐릭터에 더해지며, 업그레이드를 찾는 대로 자유롭게 섞어 맞출 수 있습니다.',
+    '무기 칸 하나와 방어구 칸 일곱 개가 있습니다. 직업마다 정해진 무기만 쓸 수 있고 자신의 등급까지의 방어구, 즉 천, 가죽, 또는 사슬 갑옷을 착용하므로, 당신에게 맞는 업그레이드는 당신 직업을 위해 만들어진 것입니다. 그 안에서 모든 칸을 찾아낸 가장 좋은 부위로 채우세요.',
   'guide.gear.slotsTitle': '착용할 수 있는 부위',
   'guide.gear.sourcesBody':
     '초반 업그레이드 대부분은 퀘스트 보상이므로, 사냥을 반복하기보다 퀘스트를 끝내는 편이 이득입니다. 적은 처치하면 장비를 떨어뜨리고, 마을 상인은 든든한 기본 장비를 팔며, 플레이어 시장에서는 다른 모험가에게서 살 수 있습니다.',
@@ -4190,9 +4267,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.progression.noRush':
     '서두를 필요 없습니다. 세계는 자신만의 속도로 즐기라고 있는 것이니, 마음껏 거닐고, 눈길을 끄는 퀘스트를 받으며, 그 길에서 당신의 영웅을 자라게 하세요.',
   'guide.progression.prestigeBody':
-    '경험치는 최고 레벨에 이른 뒤에도 계속 쌓입니다. 그것이 외형적인 가상 레벨에 더해져 경험치 막대는 계속 차오르고, 인정의 표시로 얻을 수 있는 장기적 명예 등급에도 보탬이 됩니다. 순전히 선택 사항이며 힘을 주는 일은 결코 없고, 그저 당신이 걸어온 길의 흔적일 뿐입니다.',
+    '경험치는 최고 레벨에 이른 뒤에도 계속 쌓입니다. 그것이 외형적인 가상 레벨에 더해져 경험치 막대는 계속 차오르고, 인정의 표시로 얻을 수 있는 장기적 명예 등급에도 보탬이 됩니다. 누적 경험치의 큰 이정표를 넘기면 캐릭터 정보 창에 표시되는 외형 칭호와 이름표 테두리도 잠금 해제됩니다. 이 모든 것은 순전히 선택 사항이며 힘을 주는 일은 결코 없고, 그저 당신이 걸어온 길의 흔적일 뿐입니다.',
   'guide.progression.restedBody':
-    '접속을 끊거나 여관 같은 안전한 곳에서 쉬면, 떠나 있는 동안 캐릭터에게 휴식 경험치가 쌓입니다. 다음번에 밖으로 나가 싸울 때, 그 비축분이 바닥날 때까지 처치 경험치에 추가 보너스를 더해 줍니다. 시간이 지나며 차오르고 초반 레벨업에 속도를 더해 주니, 마을에서 접속을 끊는 것은 결코 헛된 시간이 아닙니다.',
+    '여관 같은 안전한 곳에서 전투를 벗어나 쉬면, 그렇게 앉아 있는 동안 캐릭터에게 휴식 경험치가 쌓입니다. 다음번에 밖으로 나가 싸울 때, 그 비축분이 바닥날 때까지 처치 경험치에 추가 보너스를 더해 줍니다. 여관에서의 휴식은 결코 헛된 시간이 아니며, 다음 레벨업 구간에 속도를 더해 줍니다.',
   'guide.progression.restedTitle': '휴식 경험치',
   'guide.progression.xpBody':
     '경험치는 퀘스트를 완수하고 적을 물리쳐 얻습니다. 퀘스트가 단연 가장 많이 주므로, 퀘스트 길을 따라가는 것이 가장 빠르게 오르는 방법입니다. 그 길에서 적을 처치하며 나머지를 채워 가세요.',
@@ -4203,31 +4280,34 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '마이어펜의 익사는 우연이 아닙니다. 누군가 십일조 함을 채우듯 습지를 채우며, 물이 데려간 여행자마다 그를 일으켜 고분고분한 죽은 자로 만듭니다. 명령을 윗선으로 좇아 가면 가라앉은 요새의 안개부름에 닿고, 그의 마지막 말은 봉우리 아래에서 꿈틀거리는 한층 오래된 무언가를 가리킵니다.',
   'guide.questsPage.sagaMarshTitle': '습지: 영혼의 십일조',
   'guide.questsPage.sagaPeaksBody':
-    '쏜피크에서 모든 계략이 환히 드러납니다. 골짜기 이래로 빼앗긴 영혼 하나하나가 산 아래 봉인된 고대의 존재를 깨우는 데 부어진 십일조였습니다. 예배당 뜰에서 시작된 자취가 여기, 열에 열이 모여야 여는 문에서 끝납니다. 그 너머에 누가 기다리는지는 당신이 직접 알아내도록 남겨 두겠습니다.',
+    '쏜피크에서 모든 계략이 환히 드러납니다. 골짜기 이래로 빼앗긴 영혼 하나하나가 산속 깊은 곳에서 벌어지는 교단의 음산한 작업에 부어진 십일조였습니다. 예배당 뜰에서 시작된 자취가 여기, 다섯 명이 함께 내려가 그 모든 일의 배후를 마주하는 곳에서 끝납니다. 그 밑바닥에 누가 기다리는지는 당신이 직접 알아내도록 남겨 두겠습니다.',
   'guide.questsPage.sagaPeaksTitle': '봉우리: 십일조가 향한 곳',
   'guide.questsPage.sagaTitle': '북쪽으로 자취를 좇으세요',
   'guide.questsPage.sagaValeBody':
     '동부개울에서는 죽은 자가 쉬지 못하고, 그 배후의 표식은 사라진 지 오래라 여겨지던 종파의 것입니다. 자취를 좇으면 예배당 묘실에서 일하는 무덤부름에 닿고, 그의 문서가 당신을 북쪽 습지로 가리킵니다.',
   'guide.questsPage.sagaValeTitle': '골짜기: 인장에 새겨진 이름',
   'guide.questsPage.sideCryptBody':
-    '봉우리 높은 곳에 한층 조용한 수수께끼가 흐릅니다. 어떤 기록에도 남지 않은 왕관이 새겨진 오래된 무덤들이지요. 죽은 자를 읽고, 그들이 지키던 것을 모아, 닫힌 채로 두려던 무덤을 다시 여세요. 끝까지 좇으면 정원을 갖춘 공격대를 위한 두 번째 최종 시련으로 이어지는 추리의 자취입니다.',
+    '봉우리 높은 곳에 한층 조용한 수수께끼가 흐릅니다. 어떤 기록에도 남지 않은 왕관이 새겨진 오래된 무덤들이지요. 죽은 자를 읽고, 그들이 지키던 것을 모아, 닫힌 채로 두려던 무덤의 봉인을 푸세요. 서버의 10인 최종 공격대로 가는 길을 여는 추리의 자취입니다.',
   'guide.questsPage.sideCryptTitle': '잊힌 왕',
+  'guide.questsPage.sideTempleBody':
+    '봉우리의 높은 산정호에 떠오른 창백한 빛의 관문은, 물에 잠긴 교단이 아직도 노래하는 가라앉은 사원으로 이어집니다. 이 짧은 퀘스트 사슬은 본편 이야기와 떨어져 있는, 그 자체로 완결된 수수께끼입니다. 물가까지 올라와 바위에 새겨진 경고를 읽고, 그것이 무엇을 위한 것이었는지 직접 내려가 확인하려는 이라면 누구나 도전할 수 있습니다.',
+  'guide.questsPage.sideTempleTitle': '물에 잠긴 사원',
   'guide.questsPage.sideTitle': '큰길에서 갈라진 갈래들',
   'guide.questsPage.sideWardenBody':
-    '이야기와 나란히, 골짜기와 습지의 수호인들이 상시 현상금 사다리를 내겁니다. 당신보다 앞선 모든 수호인이 그러했듯, 적을 하나씩 처치하며 위로 올라가세요. 정직한 레벨업이자, 각 지역에서 가장 골치 아픈 말썽꾼들을 두루 도는 여정입니다.',
+    '이야기와 나란히, 골짜기와 습지의 보안관과 수호인들이 상시 현상금 사다리를 내겁니다. 당신보다 앞선 모든 현상금 사냥꾼이 그러했듯, 적을 하나씩 처치하며 위로 올라가세요. 정직한 레벨업이자, 각 지역에서 가장 골치 아픈 말썽꾼들을 두루 도는 여정입니다.',
   'guide.questsPage.sideWardenTitle': '이름을 떨치기',
   'guide.questsPage.typeGatherBody':
     '세계에서, 또는 적이 떨어뜨리는 것에서 물건을 모으세요. 약초와 광석, 잃어버린 편지, 교단의 음산한 마법 재료까지. 어떤 것은 특정 적에게서만 나오므로, 사냥과 수집이 함께 갑니다.',
   'guide.questsPage.typeGatherTitle': '수집',
   'guide.questsPage.typeGroupBody':
-    '주된 이야기의 모든 장은 던전 문에서 끝납니다. 도입부는 혼자 진행할 수 있지만, 그 장의 악당에게 마지막 일격을 가하는 일은 다섯 명의 파티를 위한 것입니다(그리고 가장 마지막은 열 명을 위한 것입니다).',
+    '주된 이야기의 모든 장은 던전 문에서 끝납니다. 도입부는 혼자 진행할 수 있지만, 그 장의 악당에게 마지막 일격을 가하는 일은 5인 파티를 위한 것입니다.',
   'guide.questsPage.typeGroupTitle': '파티 피날레',
   'guide.questsPage.typeInteractBody':
     '세계에 고정된 무언가를 쓰거나, 정화하거나, 읽으세요. 더럽혀진 무덤, 기슭 바위에 새겨진 경고, 봉인된 묘실 문 같은 것들입니다. 표식에 다가가 그것에 손을 쓰세요.',
   'guide.questsPage.typeInteractTitle': '상호작용',
   'guide.questsPage.typeMusterBody':
-    '다정한 이를 한 곳에서 다른 곳으로 무사히 데려가거나, 북진을 앞두고 마을의 수비대를 불러 모으세요. 이런 퀘스트는 당신이 그 이야기 속에 함께 있는 사람들과 발맞춰 나아가게 해 줍니다.',
-  'guide.questsPage.typeMusterTitle': '호위와 소집',
+    '어떤 퀘스트는 북진을 앞두고 마을을 결집하게 합니다. 성문의 위협을 솎아 내고 수비대가 필요로 하는 것을 모으세요. 당신이 그 이야기 속에 함께 있는 사람들을 위한 처치와 수집 목표이며, 그들과 발맞춰 나아가게 해 줍니다.',
+  'guide.questsPage.typeMusterTitle': '수비대 소집',
   'guide.questsPage.typeSlayBody':
     '정해진 수의 표적 적을 물리쳐 짐승 무리를 솎아내거나 교단의 손아귀를 무너뜨리세요. 게임의 첫 퀘스트인 동부개울 길의 늑대 처치도 이런 종류입니다.',
   'guide.questsPage.typeSlayTitle': '처치',
@@ -4236,7 +4316,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.questsPage.typesTitle': '만나게 될 퀘스트의 종류',
   'guide.social.chanGeneral': '일반.',
   'guide.social.chanGeneralBody':
-    '주변 사람들을 위한 늘 켜져 있는 지역 채널로, 질문을 던지거나 이야기를 나누기 좋습니다.',
+    '온라인에 접속한 모두에게 닿는, 서버 전역에서 늘 켜져 있는 채널로, 질문을 던지거나 이런저런 이야기를 나누기 좋습니다. 세계 채널이나 파티 찾기 채널과 달리, 따로 참여를 신청할 필요가 전혀 없습니다.',
   'guide.social.chanGuild': '길드와 장교.',
   'guide.social.chanGuildBody':
     '길드를 위한 채널입니다. 길드 채팅은 모든 구성원에게 닿고, 장교 채널은 장교들만을 위한 것입니다.',
@@ -4284,11 +4364,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '평범한 전리품은 줍는 사람에게 가고, 더 좋은 전리품은 입찰에 부쳐 모두가 공정한 기회를 갖게 할 수 있습니다.',
   'guide.social.lootCommonTitle': '물품.',
   'guide.social.lootHeading': '파티 전리품',
+  'guide.social.lootMasterBody':
+    '파티장이 대신 더 좋은 전리품을 직접 관리하며, 하나하나 받아야 할 파티원에게 나눠 줄 수 있습니다. 이렇게 하면 귀한 장비가 엉뚱한 주사위 결과로 넘어가는 일을 막을 수 있으며, 잘 짜인 파티가 던전을 도는 방식과 같습니다.',
+  'guide.social.lootMasterTitle': '분배 담당자.',
   'guide.social.lootRollBody':
     '물품이 입찰에 부쳐지면, 자격 있는 구성원은 저마다 원하면 입찰을, 남는 것만 받겠다면 가치 입찰을, 빠지겠다면 포기를 고릅니다. 가장 높은 수를 낸 사람이 가져갑니다.',
   'guide.social.lootRollTitle': '입찰, 가치 입찰, 또는 포기.',
   'guide.social.partyBody':
-    '다른 플레이어를 초대하려면 그 이름을 마우스 오른쪽 버튼으로 누른 뒤 초대를 고르거나, 채팅 명령을 쓰세요. 파티는 최대 다섯 명까지이며, 그중 한 명이 파티장입니다.',
+    '다른 플레이어를 초대하려면 그 이름을 마우스 오른쪽 버튼으로 누른 뒤 초대를 고르세요. 파티는 최대 다섯 명까지이며, 그중 한 명이 파티장입니다.',
   'guide.social.partyCredit':
     '서로 가까이 있는 파티원은 처치와 퀘스트 점수를 함께 나누므로, 함께 퀘스트를 하면 더 빨라질 뿐 결코 느려지지 않습니다. 파티는 또한 한 팀으로 던전에 들어서는 방법이기도 합니다.',
   'guide.social.partyHeading': '파티 맺기',
@@ -4309,11 +4392,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.stats.dodgeBody':
     '회피는 들어오는 근접 공격을 통째로 피해 낼 확률입니다. 작은 기본 확률로 시작하며 민첩성이 이를 올려 주므로, 날쌘 직업일수록 더 많은 공격을 흘려보냅니다.',
   'guide.stats.dodgeTitle': '회피',
+  'guide.stats.dpsBody':
+    '캐릭터 정보 창에는 초당 피해량 추정치도 표시됩니다. 이는 무기, 무기의 휘두르는 속도, 그리고 공격력이 시간에 따라 합쳐져 만들어 내는 대략적인 값입니다. 두 무기를 한눈에 비교하기에 빠른 방법입니다.',
+  'guide.stats.dpsTitle': '초당 피해량',
   'guide.stats.growBody':
     '능력치를 올리는 길은 두 가지입니다. 레벨이 오를 때마다 직업에 맞춰 각 능력치가 정해진 만큼 더해지고, 착용한 장비가 그 위에 더 보탭니다. 장비를 늘 최신으로 유지하는 것이 최고 레벨까지 가장 꾸준히 강해지는 길입니다.',
   'guide.stats.growHeading': '능력치가 자라는 법',
   'guide.stats.intBody':
-    '지능은 주문 시전자의 마나 양을 키우고 주문이 치명타로 박힐 확률을 높여 줍니다. 마나로 시전하는 직업에게 중요하며, 분노나 기력을 쓰는 직업에게는 거의 의미가 없습니다.',
+    '지능은 주문 시전자의 마나 양을 키우고, 주문력을 높여 주문이 더 세게 적중하게 하며, 주문이 치명타로 박힐 확률을 끌어올립니다. 마나로 시전하는 직업에게 중요하며, 분노나 기력을 쓰는 직업에게는 거의 의미가 없습니다.',
   'guide.stats.intTitle': '지능',
   'guide.stats.intro':
     '당신의 캐릭터는 몇 가지 능력치로 설명됩니다. 잘 플레이하려고 이를 외울 필요는 전혀 없지만, 각각이 대략 무슨 일을 하는지 알면 캐릭터 정보 창을 읽고 알맞은 업그레이드를 고르는 데 도움이 됩니다.',
@@ -4323,6 +4409,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.stats.sheetBody':
     '게임에서 캐릭터 창을 열면 이 모든 것을 한자리에서 볼 수 있습니다. 한쪽에는 다섯 가지 능력치가, 다른 쪽에는 그것이 보태는 스탯이 놓입니다. 어떤 값에든 마우스를 올리면 툴팁이 당신 직업에게 그것이 무슨 일을 하는지 풀어 주므로, 업그레이드가 실제로 어떤 수치를 움직였는지 한눈에 알 수 있습니다.',
   'guide.stats.sheetHeading': '캐릭터 정보 창 읽기',
+  'guide.stats.spBody':
+    '주문력은 시전자에게 공격력에 해당하는 능력치로, 당신의 주문이 입히는 피해를 높여 줍니다. 지능이 주문력을 키우고, 시전자 장비와 강화 효과가 그 위에 더해지므로, 주문 시전자는 근접 전사가 공격력을 살피듯 주문력을 살핍니다.',
+  'guide.stats.spTitle': '주문력',
   'guide.stats.spiBody':
     '정신력은 전투 밖에서 시전자의 마나가 얼마나 빠르게 돌아오는지를 다스립니다. 지능과 마찬가지로 마나 직업에게 쓸모 있고 다른 직업에게는 별 의미가 없습니다.',
   'guide.stats.spiTitle': '정신력',
@@ -4338,6 +4427,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.viewer.error':
     '3D 모델을 불러올 수 없습니다. 위의 그림이 여전히 이 {name}을(를) 보여 줍니다.',
   'guide.viewer.loading': '모델 불러오는 중...',
+  'guide.viewer.posterAlt': '{name}',
   'guide.viewer.view3d': '{name} 3D로 보기',
   'guide.viewer.view3dShort': '3D로 보기',
   'guide.worldPage.marshGreeter': '감시관 펜윅, 펜브리지',
@@ -4353,10 +4443,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.valeGreeter': '레드브룩 원수, 이스트브룩',
   'guide.worldPage.valeGreeting': '칼을 가까이 두시오. 골짜기는 예전 같지 않으니.',
   'guide.worldPage.valePlaceNotes':
-    '이스트브룩은 당신의 첫 본거지입니다. 늑대길과 멧돼지 초원은 무난한 사냥터이고, 거울 호수는 낚시하기 좋은 잔잔한 물입니다. 거미숲과 구리 채굴장에는 거미와 광석에 굶주린 굴착꾼이 숨어 있고, 산적 야영지와 무너진 예배당은 한층 거친 일거리를 품으며, 브라이트우드 숲은 북쪽의 고요한 야생 동물 숲입니다.',
+    '이스트브룩은 당신의 첫 본거지입니다. 늑대길과 멧돼지 초원은 무난한 사냥터이고, 거울 호수는 낚시하기 좋은 잔잔한 물입니다. 거미숲과 구리 채굴장에는 거미와 광석에 굶주린 굴착꾼이 숨어 있고, 산적 야영지와 무너진 예배당은 한층 거친 일거리를 품습니다. 성유물 언덕은 서버 최초의 발굴 장소인 무너진 성유물고로 내려가는 길이며, 브라이트우드 숲은 북쪽의 고요하고 햇살 드는 숲입니다.',
   'guide.worldPage.gladeTitle': '고요한 한구석: 브라이트우드 숲',
   'guide.worldPage.gladeBody':
-    '계곡의 모든 이야기가 죽은 자들에 관한 것은 아닙니다. 북쪽에는 브라이트우드라는 햇살 드는 숲이 있어 조용한 길, 풀을 뜯는 사슴, 가지 아래의 경계심 많은 짐승들과 함께 더 부드러운 고유한 리듬을 지킵니다. 당신이 따라가는 흔적에 대한 차분한 대비이며, 길이 잠시 여유를 줄 때 둘러볼 만한 곳입니다.',
+    '계곡의 모든 이야기가 죽은 자들에 관한 것은 아닙니다. 북쪽에는 브라이트우드 숲이라 불리는 햇살 드는 숲이 있어, 가지 아래로 어른거리는 빛과 조용한 길과 함께 더 부드러운 고유한 리듬을 지킵니다. 당신이 따라가는 흔적에 대한 차분한 대비이며, 길이 잠시 여유를 줄 때 둘러볼 만한 곳입니다.',
   // APM telemetry label from release/v0.14.0
   'hudChrome.perf.labels.apm': 'APM',
   'entities.zones.eastbrook_vale.pois.9.label': '브라이트우드 숲',
@@ -4687,4 +4777,120 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hudChrome.abilityScaling.bonus': '(+{value})',
+  // Discord integration (two-way login, rewards, relay, in-game flair).
+  'hudChrome.discord.close': '닫기',
+  'hudChrome.discord.keybind': 'Discord 패널',
+  'hudChrome.discord.disabled': '현재 Discord 연동을 사용할 수 없습니다.',
+  'hudChrome.discord.tiers.none': '등급 없음',
+  'hudChrome.discord.tiers.initiate': '입문자',
+  'hudChrome.discord.tiers.squire': '종자',
+  'hudChrome.discord.tiers.footman': '보병',
+  'hudChrome.discord.tiers.knight': '기사',
+  'hudChrome.discord.tiers.champion': '챔피언',
+  'hudChrome.discord.tiers.warlord': '전쟁군주',
+  'hudChrome.discord.tiers.legend': '전설',
+  'hudChrome.discord.tiers.mythic': '신화',
+  'hudChrome.discord.loginCta': 'Discord로 계속하기',
+  'hudChrome.discord.choice.title': 'Discord로 계속하기',
+  'hudChrome.discord.choice.intro': '새 계정을 만들거나 Discord를 기존 계정에 연결하세요.',
+  'hudChrome.discord.choice.greeting': '{name}님, 환영합니다!',
+  'hudChrome.discord.choice.createCta': '새 계정 만들기',
+  'hudChrome.discord.choice.haveAccount': '이미 계정이 있으신가요?',
+  'hudChrome.discord.choice.linkCta': '기존 계정 연결',
+  'hudChrome.discord.choice.linkSubmit': '계정 연결',
+  'hudChrome.discord.choice.error': '계속할 수 없습니다. 다시 시도해 주세요.',
+  'hudChrome.discord.choice.expired':
+    '이 Discord 로그인이 만료되었습니다. Discord로 다시 로그인해 주세요.',
+  'hudChrome.discord.keep.title': '비밀번호 설정',
+  'hudChrome.discord.keep.body':
+    '이 계정은 Discord로 로그인합니다. 연결을 해제한 후에도 사용자 이름으로 로그인할 수 있도록 비밀번호를 설정하세요.',
+  'hudChrome.discord.keep.usernameLabel': '사용자 이름',
+  'hudChrome.discord.keep.confirmLabel': '비밀번호 확인',
+  'hudChrome.discord.keep.submit': '비밀번호 설정 후 연결 해제',
+  'hudChrome.discord.keep.cancel': '취소',
+  'hudChrome.discord.keep.mismatch': '비밀번호가 일치하지 않습니다.',
+  'hudChrome.discord.keep.tooShort': '비밀번호는 6자 이상이어야 합니다.',
+  'hudChrome.discord.orEmail': '또는 이메일 사용',
+  'hudChrome.discord.cta.title': 'Discord를 연결해 포인트를 얻고 등급을 올리세요',
+  'hudChrome.discord.cta.stats': '{online}명 접속 중 · 서버 멤버 {total}명',
+  'hudChrome.discord.cta.statsLoading': '커뮤니티에 참여하고 보상을 받으세요',
+  'hudChrome.discord.cta.button': '한 번의 클릭으로 연결',
+  'hudChrome.discord.cta.dismiss': '닫기',
+  'hudChrome.discord.link.cta': 'Discord 연결',
+  'hudChrome.discord.link.relink': 'Discord 다시 연결',
+  'hudChrome.discord.link.connecting': 'Discord 여는 중...',
+  'hudChrome.discord.link.benefits':
+    '플레이와 커뮤니티 활동으로 포인트를 얻고 상태 등급을 올리려면 Discord를 연결하세요.',
+  'hudChrome.discord.link.error': 'Discord를 연결할 수 없습니다. 다시 시도해 주세요.',
+  'hudChrome.discord.link.success': 'Discord가 연결되었습니다.',
+  'hudChrome.discord.linkedAs': '{name}(으)로 연결됨',
+  'hudChrome.discord.linkedTitle': 'Discord: {name}',
+  'hudChrome.discord.viewProfile': '이 캐릭터의 공개 프로필 열기',
+  'hudChrome.discord.unlink': '연결 해제',
+  'hudChrome.discord.visit': 'Discord 방문',
+  'hudChrome.discord.unlinkConfirm': '이 게임 계정에서 Discord 계정 연결을 해제하시겠습니까?',
+  'hudChrome.discord.statusLabel': '상태',
+  'hudChrome.discord.points': '포인트',
+  'hudChrome.discord.lifetime': '누적',
+  'hudChrome.discord.toNext': '다음 등급까지 {points}',
+  'hudChrome.discord.maxRank': '최고 등급 달성',
+  'hudChrome.discord.tiersTitle': '상태 등급',
+  'hudChrome.discord.tierLocked': '잠김',
+  'hudChrome.discord.tierCurrent': '현재',
+  'hudChrome.discord.earnTitle': '포인트 획득 방법',
+  'hudChrome.discord.earnBody':
+    '게임 플레이 시간과 Discord 활동으로 포인트를 얻으세요. 포인트는 상태 등급을 올려줍니다.',
+  'hudChrome.discord.memberSince': '가입일',
+  'hudChrome.discord.memberSinceDays': 'Discord 가입 {days}일',
+  'hudChrome.discord.roleTag.artists': '아티스트',
+  'hudChrome.discord.guildMember': '인증된 멤버',
+  'hudChrome.discord.notMember': '아직 서버에 없음',
+  'hudChrome.discord.joinCta': 'Discord 참여하기',
+  'hudChrome.discord.online': '{count}명 접속 중',
+  'hudChrome.discord.community': '커뮤니티',
+  'hudChrome.discord.rewards': '보상',
+  'hudChrome.discord.voice.title': '음성',
+  'hudChrome.discord.voice.empty': '현재 음성 채널에 아무도 없습니다.',
+  'hudChrome.discord.voice.speaking': '말하는 중',
+  'hudChrome.discord.voice.muted': '음소거됨',
+  'hudChrome.discord.voice.join': '음성 참여',
+  'hudChrome.discord.voice.connect': '음성 채널에 연결',
+  'hudChrome.discord.swag.claim': '받기',
+  'hudChrome.discord.swag.claimed': '받음',
+  'hudChrome.discord.swag.locked': '잠김',
+  'hudChrome.discord.swag.needTier': '이 보상을 받으려면 더 높은 등급에 도달하세요.',
+  'hudChrome.discord.swag.needPoints': '포인트가 부족합니다.',
+  'hudChrome.discord.swag.claimError': '보상을 받을 수 없습니다. 다시 시도해 주세요.',
+  'hudChrome.discord.swag.claimedToast': '받음: {name}',
+  'hudChrome.discord.swag.titleDiscordian': '칭호: Discordian',
+  'hudChrome.discord.swag.titleSquire': '칭호: 렐름의 종자',
+  'hudChrome.discord.swag.chromaBlurple': 'Blurple 메크 크로마',
+  'hudChrome.discord.swag.titleChampion': '칭호: Claudemoon의 챔피언',
+  'hudChrome.discord.swag.swagStickers': '스티커 팩 (배송)',
+  'hudChrome.discord.swag.swagTee': '티셔츠 (배송)',
+  'hudChrome.discord.relay.tooFast': '너무 빠르게 게시하고 있습니다. 잠시 후 다시 시도해 주세요.',
+  'hudChrome.discord.relay.lfg.label': '파티 구함',
+  'hudChrome.discord.relay.lfg.hint': '던전이나 퀘스트를 함께할 플레이어 찾기',
+  'hudChrome.discord.relay.wts.hint': '판매할 아이템이나 서비스 광고',
+  'hudChrome.discord.relay.wtb.hint': '구매하고 싶은 아이템 요청',
+  'hudChrome.discord.relay.recruit.label': '길드 모집',
+  'hudChrome.discord.relay.recruit.hint': '길드에 플레이어 모집',
+  'hudChrome.discord.relay.event.label': '이벤트 / 레이드',
+  'hudChrome.discord.relay.event.hint': '레이드, 모임 또는 이벤트 공지',
+  'hudChrome.discord.relay.help.hint': '커뮤니티에 도움 요청',
+  'hudChrome.discord.title': 'Discord',
+  'hudChrome.discord.panelTitle': 'World of ClaudeCraft',
+  'hudChrome.discord.open': 'Discord',
+  'hudChrome.discord.viewCharacter': '{name} 보기',
+  'hudChrome.discord.rank': '등급',
+  'hudChrome.discord.roleTag.levyst': 'Levy St',
+  'hudChrome.discord.roleTag.devs': '개발자',
+  'hudChrome.discord.roleTag.mods': '운영자',
+  'hudChrome.discord.voice.channel': '{channel}에서',
+  'hudChrome.discord.swag.title': '굿즈',
+  'hudChrome.discord.swag.free': '무료',
+  'hudChrome.discord.swag.cost': '{points}점',
+  'hudChrome.discord.relay.wts.label': '판매 희망',
+  'hudChrome.discord.relay.wtb.label': '구매 희망',
+  'hudChrome.discord.relay.help.label': '도움 요청',
 };

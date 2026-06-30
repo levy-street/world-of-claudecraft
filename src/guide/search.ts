@@ -4,13 +4,24 @@
 // accessible combobox + listbox in the header chrome; results are real links the router
 // intercepts. Rebuilt per language because the chrome is rebuilt on a language switch.
 
-import { t, type TranslationKey } from '../ui/i18n';
 import { esc } from '../ui/esc';
-import { GUIDE_ROUTES, hrefFor } from './routes';
-import { GUIDE_CLASSES, GUIDE_ZONES, GUIDE_FAMILIES, GUIDE_DUNGEONS } from './content.generated';
+import { type TranslationKey, t } from '../ui/i18n';
+import {
+  GUIDE_CLASSES,
+  GUIDE_DELVES,
+  GUIDE_DUNGEONS,
+  GUIDE_FAMILIES,
+  GUIDE_ZONES,
+} from './content.generated';
 import { GLOSSARY_TERMS } from './pages/glossary';
+import { GUIDE_ROUTES, hrefFor } from './routes';
 
-interface SearchEntry { label: string; type: string; href: string; haystack: string; }
+interface SearchEntry {
+  label: string;
+  type: string;
+  href: string;
+  haystack: string;
+}
 
 const MAX_RESULTS = 8;
 
@@ -25,16 +36,32 @@ function buildIndex(): SearchEntry[] {
     add(t(r.navKey), t('guide.search.typePage'), hrefFor(r.sub));
   }
   for (const c of GUIDE_CLASSES) {
-    add(t(`classes.${c.id}` as TranslationKey), t('guide.search.typeClass'), hrefFor(`classes/${c.id}`), `${c.roles.join(' ')} ${c.resource}`);
+    add(
+      t(`classes.${c.id}` as TranslationKey),
+      t('guide.search.typeClass'),
+      hrefFor(`classes/${c.id}`),
+      `${c.roles.join(' ')} ${c.resource}`,
+    );
   }
   for (const z of GUIDE_ZONES) {
     add(z.name, t('guide.search.typeZone'), `${hrefFor('world')}#zone-${z.biome}`);
   }
   for (const f of GUIDE_FAMILIES) {
-    add(t(`guide.family.${f.family}.name` as TranslationKey), t('guide.search.typeCreature'), `${hrefFor('bestiary')}#fam-${f.family}`);
+    add(
+      t(`guide.family.${f.family}.name` as TranslationKey),
+      t('guide.search.typeCreature'),
+      `${hrefFor('bestiary')}#fam-${f.family}`,
+    );
   }
   for (const d of GUIDE_DUNGEONS) {
-    add(d.isRaid ? t('guide.dungeonsPage.raidName') : (d.name ?? ''), t('guide.search.typeDungeon'), hrefFor('dungeons'));
+    add(
+      d.isRaid ? t('guide.dungeonsPage.raidName') : (d.name ?? ''),
+      t('guide.search.typeDungeon'),
+      hrefFor('dungeons'),
+    );
+  }
+  for (const d of GUIDE_DELVES) {
+    add(d.name, t('guide.search.typeDelve'), hrefFor('delves'));
   }
   for (const g of GLOSSARY_TERMS) {
     add(t(g.term), t('guide.search.typeTerm'), `${hrefFor('reference/glossary')}#term-${g.slug}`);
@@ -76,10 +103,14 @@ export function mountSearch(root: HTMLElement, signal: AbortSignal): void {
   const setActive = (next: number) => {
     if (!options.length) return;
     active = (next + options.length) % options.length;
-    options.forEach((o, i) => o.setAttribute('aria-selected', String(i === active)));
+    options.forEach((o, i) => {
+      o.setAttribute('aria-selected', String(i === active));
+    });
     const current = options[active];
     current.classList.add('is-active');
-    options.forEach((o, i) => { if (i !== active) o.classList.remove('is-active'); });
+    options.forEach((o, i) => {
+      if (i !== active) o.classList.remove('is-active');
+    });
     input.setAttribute('aria-activedescendant', current.id);
     current.scrollIntoView({ block: 'nearest' });
   };
@@ -99,7 +130,10 @@ export function mountSearch(root: HTMLElement, signal: AbortSignal): void {
       return;
     }
     panel.innerHTML = results
-      .map((r, i) => `<a class="guide-search-opt" role="option" id="gso-${i}" href="${esc(r.href)}" aria-selected="false" tabindex="-1"><span class="guide-search-opt-label">${esc(r.label)}</span><span class="guide-search-opt-type">${esc(r.type)}</span></a>`)
+      .map(
+        (r, i) =>
+          `<a class="guide-search-opt" role="option" id="gso-${i}" href="${esc(r.href)}" aria-selected="false" tabindex="-1"><span class="guide-search-opt-label">${esc(r.label)}</span><span class="guide-search-opt-type">${esc(r.type)}</span></a>`,
+      )
       .join('');
     panel.hidden = false;
     input.setAttribute('aria-expanded', 'true');
@@ -109,22 +143,44 @@ export function mountSearch(root: HTMLElement, signal: AbortSignal): void {
   };
 
   input.addEventListener('input', render, { signal });
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowDown') { e.preventDefault(); setActive(active + 1); }
-    else if (e.key === 'ArrowUp') { e.preventDefault(); setActive(active - 1); }
-    else if (e.key === 'Enter') {
-      if (active >= 0 && options[active]) { e.preventDefault(); options[active].click(); }
-    } else if (e.key === 'Escape') {
-      input.value = '';
-      close();
-    }
-  }, { signal });
+  input.addEventListener(
+    'keydown',
+    (e) => {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setActive(active + 1);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setActive(active - 1);
+      } else if (e.key === 'Enter') {
+        if (active >= 0 && options[active]) {
+          e.preventDefault();
+          options[active].click();
+        }
+      } else if (e.key === 'Escape') {
+        input.value = '';
+        close();
+      }
+    },
+    { signal },
+  );
   // A chosen result navigates via the router (link click); just close the panel.
-  panel.addEventListener('click', (e) => {
-    if ((e.target as HTMLElement).closest('.guide-search-opt')) { input.value = ''; close(); }
-  }, { signal });
+  panel.addEventListener(
+    'click',
+    (e) => {
+      if ((e.target as HTMLElement).closest('.guide-search-opt')) {
+        input.value = '';
+        close();
+      }
+    },
+    { signal },
+  );
   // Close when focus or a click leaves the search box.
-  document.addEventListener('click', (e) => {
-    if (!root.querySelector('.guide-search')?.contains(e.target as Node)) close();
-  }, { signal });
+  document.addEventListener(
+    'click',
+    (e) => {
+      if (!root.querySelector('.guide-search')?.contains(e.target as Node)) close();
+    },
+    { signal },
+  );
 }

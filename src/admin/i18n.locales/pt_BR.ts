@@ -401,8 +401,6 @@ export const pt_BR: Record<string, string> = {
   'blockedIps.colCreatedAt': 'Criado',
   'blockedIps.addFailed': 'Falha ao bloquear o IP.',
   'blockedIps.removeFailed': 'Falha ao desbloquear o IP.',
-  'sharedIps.description':
-    'Endereços IP observados em mais de uma conta, ordenados por contagem de contas.',
   'sharedIps.onlineDescription': 'Endereços IP atualmente usados ​​por mais de uma conta online.',
   'sharedIps.onlineOnly': 'Somente contas on-line',
   'sharedIps.warning':
@@ -451,4 +449,16 @@ export const pt_BR: Record<string, string> = {
   'error.blockExpiryFuture': 'o vencimento do bloqueio deve ser no futuro',
   'error.blockFailed': 'falha ao bloquear o IP',
   'error.blockNotFound': 'IP não encontrado',
+  'nav.suspiciousPlayers': 'Jogadores Suspeitos',
+  'suspiciousPlayers.description': 'Jogadores online com evidências ativas de detecção de bot.',
+  'suspiciousPlayers.autoRefresh': 'Atualização automática ({seconds}s)',
+  'suspiciousPlayers.loading': 'Carregando jogadores suspeitos...',
+  'suspiciousPlayers.loadFailed': 'Falha ao carregar os jogadores suspeitos.',
+  'suspiciousPlayers.empty': 'Nenhum jogador online tem evidências de detecção de bot no momento.',
+  'suspiciousPlayers.colName': 'Nome',
+  'suspiciousPlayers.colEvidence': 'Evidência',
+  'suspiciousPlayers.colScore': 'Pontuação',
+  'suspiciousPlayers.evidenceList': 'Evidências de {name}',
+  'suspiciousPlayers.evidenceWeight': 'peso {value}',
+  'sharedIps.allDescription': 'Endereços de IP observados em mais de uma conta.',
 };

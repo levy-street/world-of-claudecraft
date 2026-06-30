@@ -13,6 +13,7 @@ import type { PlayerClass } from '../sim/types';
 import { tEntity } from './entity_i18n';
 import { getLanguage, type InterpolationValues, type SupportedLanguage, tPlural } from './i18n';
 import { SERVER_NEW } from './server_i18n.newlocales';
+import { IN_GAME_MODERATION_MESSAGES } from './server_i18n_moderation';
 
 export const DICT: Record<string, Record<string, string>> = {
   en: {
@@ -1461,6 +1462,9 @@ export const DICT: Record<string, Record<string, string>> = {
   },
   ...SERVER_NEW,
 };
+for (const [lang, messages] of Object.entries(IN_GAME_MODERATION_MESSAGES)) {
+  Object.assign(DICT[lang], messages);
+}
 
 function interpolate(template: string, params?: InterpolationValues): string {
   if (!params) return template;
@@ -1841,6 +1845,47 @@ const RULES: Rule[] = [
   {
     re: /^(.+) has left the world\. \((.+)\)$/,
     build: (m) => tServer('world.left', { name: m[1], reason: localizeReason(m[2]) }),
+  },
+  { re: /^Kicked (.+)\.$/, build: (m) => tServer('moderation.kicked', { name: m[1] }) },
+  { re: /^Killed (.+)\.$/, build: (m) => tServer('moderation.killConfirm', { name: m[1] }) },
+  {
+    re: /^Required (.+) to rename\.$/,
+    build: (m) => tServer('moderation.renameConfirm', { name: m[1] }),
+  },
+  {
+    re: /^Muted (.+) for (.+)\.$/,
+    build: (m) =>
+      tServer('moderation.muteConfirm', {
+        name: m[1],
+        duration: localizeServerDuration(m[2]),
+      }),
+  },
+  {
+    re: /^Suspended (.+) for (.+)\.$/,
+    build: (m) =>
+      tServer('moderation.suspendConfirm', {
+        name: m[1],
+        duration: localizeServerDuration(m[2]),
+      }),
+  },
+  { re: /^Banned (.+)\.$/, build: (m) => tServer('moderation.banConfirm', { name: m[1] }) },
+  {
+    re: /^No online player named '(.+)'\.$/,
+    build: (m) => tServer('moderation.spectateNotOnline', { name: m[1] }),
+  },
+  {
+    re: /^Now spectating (.+)\.$/,
+    build: (m) => tServer('moderation.spectateStart', { name: m[1] }),
+  },
+  {
+    re: /^(.+) is no longer online; spectate ended\.$/,
+    build: (m) => tServer('moderation.spectateEnded', { name: m[1] }),
+  },
+  { re: /^Usage: \/mute <minutes> <reason>$/, build: () => tServer('moderation.muteUsage') },
+  { re: /^Usage: \/suspend <minutes> <reason>$/, build: () => tServer('moderation.suspendUsage') },
+  {
+    re: /^Usage: \/spectate <name>$/,
+    build: () => tServer('moderation.spectateUsage'),
   },
   // Chat-filter mute notices. The {duration} comes from formatDuration; re-localize it.
   {

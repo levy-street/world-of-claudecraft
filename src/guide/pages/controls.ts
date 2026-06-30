@@ -2,13 +2,19 @@
 // with action labels; most labels reuse the shared controls.* catalog. Key glyphs are
 // literal keyboard identifiers, not localized text. A note covers mobile touch controls.
 
-import { t, type TranslationKey } from '../../ui/i18n';
 import { esc } from '../../ui/esc';
-import { lead } from './ui';
+import { type TranslationKey, t } from '../../ui/i18n';
 import type { GuidePage } from './types';
+import { lead } from './ui';
 
-interface Row { keys: string[]; label: TranslationKey; }
-interface Group { heading: TranslationKey; rows: Row[]; }
+interface Row {
+  keys: string[];
+  label: TranslationKey;
+}
+interface Group {
+  heading: TranslationKey;
+  rows: Row[];
+}
 
 const GROUPS: Group[] = [
   {
@@ -24,13 +30,16 @@ const GROUPS: Group[] = [
     heading: 'guide.controls.groupCombat',
     rows: [
       { keys: ['Tab'], label: 'controls.target' },
+      { keys: ['H'], label: 'guide.controls.targetFriendly' },
+      { keys: ['J'], label: 'guide.controls.cycleFriendly' },
       { keys: ['F'], label: 'controls.interact' },
-      { keys: ['1', '-', '0'], label: 'guide.controls.abilities' },
+      { keys: ['1', '0'], label: 'guide.controls.abilities' },
     ],
   },
   {
     heading: 'guide.controls.groupInterface',
     rows: [
+      { keys: ['Esc'], label: 'guide.controls.gameMenu' },
       { keys: ['C'], label: 'controls.charPane' },
       { keys: ['P'], label: 'controls.spellbook' },
       { keys: ['L'], label: 'controls.questLog' },
@@ -65,12 +74,14 @@ function kbd(key: string): string {
 export const controls: GuidePage = {
   titleKey: 'guide.nav.controls',
   render() {
-    const groups = GROUPS
-      .map((g) => {
-        const rows = g.rows
-          .map((r) => `<tr><td class="guide-keys">${r.keys.map(kbd).join(' ')}</td><td>${esc(t(r.label))}</td></tr>`)
-          .join('');
-        return `
+    const groups = GROUPS.map((g) => {
+      const rows = g.rows
+        .map(
+          (r) =>
+            `<tr><td class="guide-keys">${r.keys.map(kbd).join(' ')}</td><td>${esc(t(r.label))}</td></tr>`,
+        )
+        .join('');
+      return `
           <section class="guide-block">
             <h2>${esc(t(g.heading))}</h2>
             <div class="guide-table-scroll">
@@ -80,8 +91,7 @@ export const controls: GuidePage = {
               </table>
             </div>
           </section>`;
-      })
-      .join('');
+    }).join('');
     return `
       <article class="guide-article">
         <h1>${esc(t('guide.nav.controls'))}</h1>
@@ -90,6 +100,10 @@ export const controls: GuidePage = {
         <section class="guide-block">
           <h2>${esc(t('guide.controls.mobileHeading'))}</h2>
           <p>${esc(t('guide.controls.mobileBody'))}</p>
+        </section>
+        <section class="guide-block">
+          <h2>${esc(t('guide.controls.controllerHeading'))}</h2>
+          <p>${esc(t('guide.controls.controllerBody'))}</p>
         </section>
       </article>`;
   },

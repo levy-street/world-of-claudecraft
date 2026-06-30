@@ -775,7 +775,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'classDetails.lore.paladin':
     'Les paladins sont des croisés sacrés qui soutiennent par des bénédictions, soignent avec la Lumière sacrée et protègent les faibles.',
   'classDetails.lore.hunter':
-    'Les chasseurs maîtrisent les terres sauvages, traquent à distance avec arcs ou armes à feu et contrôlent le terrain avec des pièges.',
+    "Les chasseurs sont des spécialistes à distance qui combattent aux côtés d'une bête apprivoisée, criblant leurs ennemis de tirs précis et rapides, les ralentissant avec des morsures et un tir concussif, et changeant d'aspect selon le moment.",
   'classDetails.lore.rogue':
     'Les voleurs sont des assassins furtifs qui dépensent énergie et points de combo pour frapper depuis les ombres.',
   'classDetails.lore.priest':
@@ -3525,22 +3525,28 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Chaque niveau vous rend plus robuste et débloque de nouvelles capacités, jusqu'au plafond de niveau {cap}. Les quêtes sont le moyen le plus rapide de progresser ; les donjons et l'exploration complètent le tableau.",
   'guide.combat.growTitle': 'Vous gagnez en puissance à chaque niveau',
   'guide.combat.hitBody':
-    "Les attaques peuvent rater ou être esquivées, parées et bloquées, et celles de l'ennemi aussi. Combattre près de votre propre niveau et garder votre équipement à jour, voilà ce qui fait porter vos coups.",
+    "Les attaques peuvent rater ou être esquivées, et celles de l'ennemi aussi, tandis que les sorts peuvent être purement et simplement résistés. C'est en combattant près de votre propre niveau que vos coups continuent de porter ; plus l'écart de niveau est grand, plus vous frappez dans le vide.",
   'guide.combat.hitTitle': 'Tous les coups ne portent pas',
   'guide.combat.intro':
     "Le combat suit les règles familières des MMO classiques. Vous n'avez jamais besoin d'en étudier le moindre détail pour bien jouer, ce n'est que la forme que prennent les affrontements.",
   'guide.combat.mitigationBody':
-    "L'armure atténue les coups physiques et le bon équipement émousse la magie : les améliorations sont donc votre principale source d'endurance. Les classes d'armure les plus lourdes encaissent davantage, mais rien ne vous rend invulnérable.",
-  'guide.combat.mitigationTitle': "L'armure et l'équipement vous gardent debout",
+    "L'armure atténue les coups physiques : une meilleure armure est donc votre principale source d'endurance au corps à corps. La magie, c'est une autre affaire : on encaisse les sorts grâce à une réserve de points de vie plus profonde et à la chance d'en résister un d'emblée, pas grâce à l'armure. Les classes d'armure les plus lourdes encaissent davantage, mais rien ne vous rend invulnérable.",
+  'guide.combat.mitigationTitle': "L'armure et les points de vie vous gardent debout",
   'guide.combat.resourcesBody':
     "Les guerriers accumulent de la Rage au cœur de l'affrontement, les voleurs dépensent de l'Énergie qui se régénère régulièrement, et les lanceurs de sorts gèrent une réserve de Mana. Apprendre à connaître sa ressource, c'est la moitié de l'art de bien jouer sa classe.",
   'guide.combat.resourcesTitle': 'Chaque classe a son propre rythme',
-  'guide.controls.abilities': 'Utiliser les capacités',
+  'guide.controls.abilities':
+    "Utiliser les capacités de la barre d'action (la rangée de chiffres ; une seconde barre se trouve sur le pavé numérique)",
   'guide.controls.actionHeader': 'Action',
   'guide.controls.arena': 'Arène',
+  'guide.controls.controllerBody':
+    "Les manettes fonctionnent aussi, et leur prise en charge est activée par défaut. Le stick gauche déplace, le stick droit oriente la caméra, et les boutons de façade et de tranche couvrent vos capacités, le saut et les interactions. Ouvrez n'importe quelle fenêtre pour faire apparaître un pointeur à l'écran et naviguer dans les menus. Vous pouvez réassigner les boutons et régler la zone morte des sticks, la vitesse de la caméra, les vibrations et la visée inversée depuis les réglages de manette dans les options.",
+  'guide.controls.controllerHeading': 'À la manette',
+  'guide.controls.cycleFriendly': "Cibler l'allié suivant",
+  'guide.controls.gameMenu': 'Ouvrir le menu et les options',
   'guide.controls.groupCamera': 'Caméra',
   'guide.controls.groupCombat': 'Ciblage et combat',
-  'guide.controls.groupInterface': 'Fenêtres',
+  'guide.controls.groupInterface': 'Interface',
   'guide.controls.groupMovement': 'Déplacement',
   'guide.controls.intro':
     'Touches par défaut sur ordinateur. Chaque raccourci peut être modifié dans les options du jeu.',
@@ -3550,6 +3556,42 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Les commandes tactiles apparaissent automatiquement sur téléphones et tablettes : un joystick de déplacement à gauche, un glissement n'importe où à droite pour regarder, et des boutons à l'écran pour vos capacités et vos menus.",
   'guide.controls.mobileHeading': 'Sur mobile',
   'guide.controls.talents': 'Talents',
+  'guide.controls.targetFriendly': "Cibler l'allié le plus proche",
+  'guide.delvesPage.affixesBody':
+    "Les plongées plus ardues tirent un modificateur qui change la façon dont se déroule la descente, des morts agités à l'air vicié en passant par une charpente qui menace de céder. Ils augmentent ensemble le danger et la récompense. Une plongée sur le thème de la crypte peut en tirer l'un de ceux-ci :",
+  'guide.delvesPage.affixesHeading': 'Modificateurs de plongée',
+  'guide.delvesPage.affixesLabel': 'Modificateurs possibles',
+  'guide.delvesPage.companionBody':
+    "Une plongée envoie une compagne descendre avec vous, pour qu'une partie en solo ne soit jamais désespérée. Elle combat à vos côtés, et à mesure que vous investissez en elle entre les plongées, elle gagne régulièrement en force, jusqu'à pouvoir ramener un allié du bord du gouffre une fois par descente. Elle est à vous le temps de la plongée et vous attend au tableau entre les parties.",
+  'guide.delvesPage.companionFmt': '{name}, {role}',
+  'guide.delvesPage.companionHeading': 'Votre compagne',
+  'guide.delvesPage.companionLabel': 'Compagne',
+  'guide.delvesPage.fromLevel': 'À partir du niveau {n}',
+  'guide.delvesPage.heading': 'Plongées',
+  'guide.delvesPage.howBody':
+    'Parlez au gardien pour ouvrir le tableau, choisissez une difficulté et descendez. Chaque plongée enchaîne quelques courtes salles et se termine sur son gardien ; venez-en à bout pour réclamer votre récompense et remonter à la surface. Amenez un ami si vous en avez un, ou appuyez-vous sur votre compagne sinon.',
+  'guide.delvesPage.howHeading': 'Comment se déroule une plongée',
+  'guide.delvesPage.intro':
+    'Les plongées sont de courtes descentes rejouables pour un ou deux joueurs, avec une compagne fidèle à vos côtés chaque fois que vous descendez en solo. Trouvez le tableau, choisissez une plongée et remontez avec le butin.',
+  'guide.delvesPage.keeperFmt': '{name}, {title}',
+  'guide.delvesPage.keeperLabel': 'Gardien',
+  'guide.delvesPage.lockpickBody':
+    "Certaines portes et certains coffres sont scellés, et en ouvrir un tient plus du petit test de sang-froid que de la caractéristique : forcez la serrure proprement et sans trembler, et vous gagnez un meilleur prix qu'une tentative précipitée et maladroite. C'est facultatif, mais le plongeur soigneux est le plus riche.",
+  'guide.delvesPage.lockpickHeading': "Les serrures et ce qu'elles cachent",
+  'guide.delvesPage.marksBody':
+    'Venir à bout des plongées rapporte des Marques de plongée, une monnaie tenue à part de votre or. Dépensez-les auprès du gardien pour renforcer votre compagne et obtenir un équipement introuvable ailleurs.',
+  'guide.delvesPage.marksHeading': 'Marques de plongée',
+  'guide.delvesPage.partyLabel': 'Pour un ou deux',
+  'guide.delvesPage.tiersBody':
+    "Une plongée propose plus d'une difficulté. La plus élevée rend les ennemis plus forts et tire un modificateur de plongée, et paie davantage en retour. Elle exige aussi que vous ayez quelques niveaux derrière vous avant de vous laisser entrer.",
+  'guide.delvesPage.tiersHeading': 'Difficulté',
+  'guide.delvesPage.tiersLabel': 'Difficultés',
+  'guide.delvesPage.whatBody':
+    "Une plongée est un petit donjon instancié conçu rien que pour vous et un allié au plus, une copie privée où nul ne peut vous déranger. Vous la lancez depuis un tableau tenu par un gardien de plongée dans le monde ouvert, vous y entrez, vous descendez en combattant à travers une poignée de salles et vous terminez sur un unique gardien. Les plongées sont rapides et faites pour être répétées, si bien qu'une plongée est une part de progression fiable chaque fois que le monde ouvert se tarit.",
+  'guide.delvesPage.whatHeading': "Ce qu'est une plongée",
+  'guide.delvesPage.whereBody':
+    "La première plongée, le Reliquaire effondré, s'ouvre à la colline du Reliquaire, dans la vallée de départ du Val d'Eastbrook. Frère Halven y tient le tableau, et il vous enverra en bas dès que vous serez prêt.",
+  'guide.delvesPage.whereHeading': 'Où en trouver une',
   'guide.docTitle': '{page} - {brand}',
   'guide.dungeonsPage.bastionBody':
     'Une forteresse inondée perdue dans le marais, tenue par des défenseurs noyés et par la marée montante elle-même.',
@@ -3579,6 +3621,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.family.beast.desc':
     'Animaux sauvages des forêts et des champs, des loups et des sangliers aux créatures qui les chassent. Les Chasseurs peuvent en apprivoiser beaucoup.',
   'guide.family.beast.name': 'Bêtes',
+  'guide.family.dragonkin.desc':
+    "Des créatures écailleuses et serpentines des anciennes profondeurs. Rares, fières et bien plus fortes qu'elles n'en ont l'air.",
+  'guide.family.dragonkin.name': 'Draconiens',
   'guide.family.elemental.desc':
     'Tempête et pierre vivantes, liées aux lieux sauvages où les éléments coulent à flots.',
   'guide.family.elemental.name': 'Élémentaires',
@@ -3595,10 +3640,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Énormes, à l'esprit lent et dangereux. Ils campent les hauts cols et frappent comme un éboulement.",
   'guide.family.ogre.name': 'Ogres',
   'guide.family.spider.desc':
-    'Tisseuses de toiles et rôdeuses venimeuses qui nichent dans les recoins sombres et enchevêtrés.',
+    'Tisseuses de toiles et rôdeuses venimeuses qui nichent dans les recoins sombres et enchevêtrés. Les Chasseurs peuvent les apprivoiser, au même titre que les bêtes.',
   'guide.family.spider.name': 'Araignées',
-  'guide.family.troll.desc':
-    'Brutes massives à la guérison rapide qui se terrent dans le marais et les hautes terres.',
+  'guide.family.troll.desc': 'Brutes massives qui se terrent dans les marais de la fagne.',
   'guide.family.troll.name': 'Trolls',
   'guide.family.undead.desc':
     'Les morts sans repos, relevés par des mains plus sombres. Ils ne se fatiguent pas et ne fuient pas.',
@@ -3612,7 +3656,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.faqPage.a4':
     'Oui. Il existe un mode solo hors ligne instantané, et le monde en ligne est entièrement réalisable en solo, hormis les donjons et le raid.',
   'guide.faqPage.a5':
-    'Neuf, couvrant les rôles classiques de tank, de soigneur et de dégâts, chacune avec sa propre ressource et ses capacités emblématiques.',
+    'Neuf, couvrant les rôles classiques de tank, de soigneur et de dégâts, chacune avec son système de ressource (rage, mana ou énergie) et ses capacités emblématiques.',
   'guide.faqPage.a6':
     "Niveau {cap}, atteint à travers trois zones connectées de quêtes, de donjons et d'exploration.",
   'guide.faqPage.a7':
@@ -3639,7 +3683,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "L'attention d'un ennemi. Le joueur qui génère le plus de menace conserve l'aggro et se fait attaquer.",
   'guide.glossary.aggroTerm': 'Aggro',
   'guide.glossary.dpsDef':
-    'Dégâts par seconde, une mesure approximative de la vitesse à laquelle quelque chose inflige des dégâts.',
+    'Dégâts par seconde, une mesure approximative de la vitesse à laquelle quelque chose inflige des dégâts. Désigne aussi le rôle de dégâts lui-même, comme dans un tank, un soigneur et trois DPS.',
   'guide.glossary.dpsTerm': 'DPS',
   'guide.glossary.eliteDef':
     'Un ennemi plus coriace que la normale, généralement destiné à un groupe. Les ennemis de donjon et les rares sont souvent élites.',
@@ -3658,6 +3702,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.pullDef':
     'Attirer un ennemi ou un groupe dans un combat, généralement de façon délibérée et un paquet à la fois.',
   'guide.glossary.pullTerm': 'Pull',
+  'guide.glossary.raidDef':
+    "Un groupe plus grand, jusqu'à dix joueurs ici, formé pour la rencontre de fin de jeu la plus exigeante ; un groupe s'y transforme une fois qu'il est complet.",
+  'guide.glossary.raidTerm': 'Raid',
   'guide.glossary.rareDef':
     'Un ennemi nommé peu commun qui erre dans une zone et lâche un meilleur butin.',
   'guide.glossary.rareTerm': 'Rare',
@@ -3735,7 +3782,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.howToPlay.basicsHeading': 'Les bases',
   'guide.howToPlay.controlsLink': 'Voir la référence complète des commandes',
   'guide.howToPlay.deathBody':
-    "Si vous tombez, vous libérez votre esprit au cimetière le plus proche et courez jusqu'à votre corps. Aucune expérience n'est perdue.",
+    "Si vous tombez, vous libérez votre esprit et ressuscitez au cimetière le plus proche, à pleins points de vie, puis regagnez l'endroit où vous étiez. Aucune expérience n'est perdue.",
   'guide.howToPlay.deathTitle': "La mort n'est pas la fin",
   'guide.howToPlay.firstHeading': 'Vos quinze premières minutes',
   'guide.howToPlay.groupingBody':
@@ -3784,6 +3831,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.nav.closeMenu': 'Fermer le menu',
   'guide.nav.combat': 'Combat',
   'guide.nav.controls': 'Commandes',
+  'guide.nav.delves': 'Plongées',
   'guide.nav.dungeons': 'Donjons et raids',
   'guide.nav.faq': 'FAQ',
   'guide.nav.glossary': 'Glossaire',
@@ -3808,18 +3856,18 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.questsPage.intro':
     'Les quêtes sont le cœur du monde et le moyen le plus rapide de gagner des niveaux. Voici comment elles fonctionnent.',
   'guide.questsPage.objectivesBody':
-    "Abattez certains ennemis, récoltez des objets ou interagissez avec quelque chose dans le monde. Le suivi à l'écran compte votre progression au fur et à mesure.",
+    "Abattez certains ennemis, récoltez des objets ou interagissez avec quelque chose dans le monde. Le suivi à l'écran compte votre progression au fur et à mesure. Si vous changez d'avis, vous pouvez abandonner une quête depuis votre journal de quêtes et la reprendre plus tard auprès de son donneur.",
   'guide.questsPage.objectivesTitle': 'Objectifs',
   'guide.questsPage.partyBody':
-    'Les membres du groupe à proximité partagent le crédit des éliminations et des objectifs, donc partir en quête ensemble est plus rapide, jamais plus lent.',
+    'Les membres du groupe à proximité partagent le crédit des éliminations et des objectifs, donc partir en quête ensemble est plus rapide, jamais plus lent. Vous pouvez aussi partager une quête avec votre groupe : publiez-la dans le chat sous forme de lien cliquable avec la commande /share, et tout membre à proximité qui y est éligible peut accepter la même quête en un clic.',
   'guide.questsPage.partyTitle': 'Partir en quête en groupe',
   'guide.questsPage.soloNote':
-    "L'histoire principale se joue entièrement en solo ; seuls ses derniers chapitres exigent un groupe.",
+    "L'histoire principale se joue en solo jusqu'au final de chaque chapitre, qui est un donjon à cinq joueurs.",
   'guide.questsPage.storyBody':
     "Dès vos premières missions à Eastbrook, quelque chose cloche du côté des morts. Un culte est à l'œuvre, et la piste mène vers le nord à travers chaque zone. Suivez-la pour découvrir qui se cache derrière.",
   'guide.questsPage.storyTitle': 'Un fil court à travers tout cela',
   'guide.questsPage.turninBody':
-    "Retournez voir le donneur de quête, la carte vous indique où, pour gagner de l'expérience, des pièces et souvent une pièce d'équipement choisie pour convenir à votre classe.",
+    "Apportez une quête terminée à son marqueur de remise, la carte vous indique où, pour gagner de l'expérience, des pièces et souvent une pièce d'équipement choisie pour convenir à votre classe. C'est généralement celui qui vous l'a confiée, même si certaines quêtes vous envoient vers quelqu'un d'autre.",
   'guide.questsPage.turninTitle': 'Rendre la quête',
   'guide.resourceName.energy': 'Énergie',
   'guide.resourceName.mana': 'Mana',
@@ -3949,7 +3997,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.augmentsNote':
     "Les augmentations et bonus ne durent que le temps de la partie. Ils servent à des compositions ludiques et improvisées, pas à une puissance durable, pour que personne n'achète sa victoire.",
   'guide.arenaPage.coliseumBody':
-    "Le Colisée est l'arène du royaume, où vous affrontez d'autres joueurs en matchs classés. Gagnez et votre classement grimpe, et les combattants les plus forts s'élèvent dans le classement, à la vue de tous.",
+    "Le Colisée est l'arène du royaume, où vous affrontez d'autres joueurs en matchs classés, en un contre un ou en deux contre deux. Chaque catégorie conserve son propre classement, si bien qu'une victoire vous fait grimper dans cette échelle, à la vue de tout le royaume.",
   'guide.arenaPage.coliseumHeading': 'Le Colisée de cendres',
   'guide.arenaPage.duelsBody':
     "Défiez en duel amical n'importe quel joueur que vous croisez. Rien n'est en jeu, sinon la fierté: c'est donc le moyen le plus simple d'apprendre un affrontement ou de régler un différend bon enfant.",
@@ -3995,6 +4043,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.faqPage.q10': 'Que faire une fois au niveau maximum?',
   'guide.faqPage.q11': 'Comment trouver un groupe?',
   'guide.faqPage.q9': 'Y a-t-il du JcJ?',
+  'guide.glossary.augmentDef':
+    "Une amélioration temporaire que vous choisissez durant un match d'arène Fiesta en deux contre deux et qui remodèle votre arsenal le temps de ce seul match.",
+  'guide.glossary.augmentTerm': 'Augmentation',
   'guide.glossary.buffDef':
     'Un effet bénéfique sur vous ou un allié, comme une bénédiction qui augmente une caractéristique pendant un moment.',
   'guide.glossary.buffTerm': 'Amélioration',
@@ -4004,6 +4055,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.debuffDef':
     'Un effet néfaste sur une cible, comme un ralentissement, un saignement ou une armure affaiblie.',
   'guide.glossary.debuffTerm': 'Affaiblissement',
+  'guide.glossary.delveDef':
+    "Une courte descente instanciée et rejouable pour un ou deux joueurs, lancée depuis le tableau d'un gardien avec une compagne à vos côtés.",
+  'guide.glossary.delveTerm': 'Plongée',
   'guide.glossary.dotDef':
     "Dégâts dans la durée et soins dans la durée: des effets qui s'égrènent par pulsations régulières plutôt que d'un seul coup.",
   'guide.glossary.dotTerm': 'DoT et HoT',
@@ -4041,6 +4095,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.search.placeholder': 'Rechercher dans le guide',
   'guide.search.typeClass': 'Classe',
   'guide.search.typeCreature': 'Créatures',
+  'guide.search.typeDelve': 'Plongée',
   'guide.search.typeDungeon': 'Donjon',
   'guide.search.typePage': 'Page',
   'guide.search.typeTerm': 'Terme',
@@ -4065,8 +4120,10 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.talentsPage.intro':
     'Les talents sont ce qui vous permet de vous approprier une classe. Ils sont facultatifs, indulgents et faciles à modifier, pour que vous puissiez expérimenter sans crainte.',
   'guide.talentsPage.resetNote':
-    "Vous pouvez réinitialiser vos talents à tout moment: un choix précoce n'est donc jamais un piège. Essayez des choses, voyez ce qui vous plaît, et changez d'avis librement.",
+    "Vous pouvez réinitialiser vos talents à tout moment hors combat : un choix précoce n'est donc jamais un piège. Essayez des choses, voyez ce qui vous plaît, et changez d'avis librement.",
   'guide.talentsPage.resetTitle': "Rien n'est définitif",
+  'guide.talentsPage.shareNote':
+    'Une configuration terminée peut être copiée en un court code partageable et transmise à un ami, qui le colle directement dans son propre panneau de talents pour la charger.',
   'guide.talentsPage.specsBody':
     'Chaque classe possède une poignée de spécialisations, chacune avec son propre rôle et une orientation emblématique. Voici à quoi elles ressemblent toutes. Ouvrez une classe pour voir sa panoplie complète.',
   'guide.talentsPage.specsHeading': 'Spécialisations par classe',
@@ -4079,7 +4136,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Toutes les classes peuvent tenir leur rang et atteindre le plafond. Choisissez l'archétype qui vous plaît, pas celui qu'un autre déclare le meilleur.",
   'guide.wishPage.i1Title': 'Vous ne pouvez pas vous tromper de classe',
   'guide.wishPage.i2Body':
-    "Quand vous tombez, vous vous relevez à un cimetière et courez jusqu'à votre corps. Aucune expérience n'est perdue: vous pouvez donc prendre des risques et apprendre sans crainte.",
+    "Quand vous tombez, vous libérez votre esprit et ressuscitez au cimetière le plus proche, puis revenez sur les lieux. Aucune expérience n'est perdue : vous pouvez donc prendre des risques et apprendre sans crainte.",
   'guide.wishPage.i2Title': 'Mourir ne coûte presque rien',
   'guide.wishPage.i3Body':
     'Ils se débloquent au niveau 10 et se réinitialisent quand vous voulez: vos premiers choix ne sont donc jamais définitifs.',
@@ -4136,13 +4193,13 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.combat.ccBody':
     "Le contrôle de foule est un type particulier d'affaiblissement qui limite ce qu'une cible peut faire : étourdissements, immobilisations et ralentissements, silences qui empêchent de lancer des sorts, désarmements, peurs, et la métamorphose qui rend un adversaire inoffensif un instant. Certains, comme les immobilisations, les peurs et la métamorphose, perdent leur emprise quand on les réapplique trop vite, et ne peuvent donc être enchaînés indéfiniment.",
   'guide.combat.deathBody':
-    "Si vos points de vie tombent à zéro, vous êtes mis à terre. Vous ressuscitez après une courte attente et reprenez là où vous en étiez, si bien qu'une mort vous coûte un peu de temps, pas votre progression. Entre deux combats, asseyez-vous pour manger et boire afin d'attaquer le suivant à pleine puissance.",
+    "Si vos points de vie tombent à zéro, vous êtes mis à terre. Libérez votre esprit pour ressusciter au cimetière le plus proche, à pleins points de vie, puis revenez sur les lieux : une mort vous coûte un peu de temps, pas votre progression. Entre deux combats, asseyez-vous pour manger et boire afin d'attaquer le suivant à pleine puissance.",
   'guide.combat.deathTitle': 'Quand vous tombez',
   'guide.combat.effectsBody':
     "Beaucoup de capacités appliquent un effet qui persiste. Les bons (les améliorations) augmentent vos caractéristiques, vous protègent ou vous soignent un peu à la fois ; les néfastes (les affaiblissements) entament vos points de vie par des dégâts dans la durée ou vous affaiblissent. Surveillez les petites icônes près de votre barre d'action pour voir ce qui agit sur vous et combien de temps cela dure.",
   'guide.combat.effectsTitle': 'Améliorations, affaiblissements et contrôle de foule',
   'guide.dungeonsPage.cryptLeadBody':
-    "Tout en haut des sommets, à l'écart du combat principal, dort un mystère plus froid. De vieilles tombes portent une couronne qu'aucune chronique ne se rappelle, et les morts qui les gardent servaient jadis un roi oublié. Lisez leurs stèles, rassemblez les clés de voûte qu'ils ont conservées, et vous pourrez desceller un tombeau que trois âmes fidèles sont mortes pour tenir clos, ouvrant une seconde épreuve à dix joueurs pour qui suit les indices jusqu'au bout.",
+    "Tout en haut des sommets, à l'écart du combat principal, dort un mystère plus froid. De vieilles tombes portent une couronne qu'aucune chronique ne se rappelle, et les morts qui les gardent servaient jadis un roi oublié. Lisez leurs stèles, rassemblez les clés de voûte qu'ils ont conservées, et vous pourrez desceller un tombeau que trois âmes fidèles sont mortes pour tenir clos : l'épreuve optionnelle qui ouvre au royaume son raid à dix joueurs, pour qui suit les indices jusqu'au bout.",
   'guide.dungeonsPage.cryptLeadTitle': 'Une porte que les morts devaient garder close',
   'guide.dungeonsPage.templeLoreBody':
     "Le temple a sa propre légende, plus ancienne que le culte que vous traquez ailleurs. Sur la rive du Glimmermere, un lac de montagne qui boit le clair de lune et rend les noyés, un veilleur solitaire garde une porte de lumière pâle. Sous la surface, un escalier de pierre froide y descend. Les gens qui ont sombré là ne se sont pas noyés par accident : c'était le Chœur pâle, qui s'est enfoncé en pleine adoration sans jamais cesser de chanter. Les anciens gardiens ont gravé un seul avertissement dans les rochers avant que l'eau ne les emporte, une prière à ce qu'ils appelaient la Lune noyée, qu'une main plus ferme a complété de deux mots en dessous : elle ne fait que dormir.",
@@ -4154,12 +4211,12 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "L'argent se présente en trois pièces. Cent pièces de cuivre font une pièce d'argent, et cent pièces d'argent font une pièce d'or, si bien que votre bourse se remplit d'abord avec la plus petite pièce. Vous en gagnez grâce aux récompenses de quête, au butin des ennemis vaincus, et en vendant ce dont vous n'avez plus besoin.",
   'guide.economy.coinTitle': 'Or, argent et cuivre',
   'guide.economy.intro':
-    "L'argent fait tourner le monde entier : il achète l'équipement et les provisions, paie vos réparations et les frais de quête, et passe de main en main entre joueurs. Vous ramassez tout cela rien qu'en jouant, alors voyez cette page comme une carte d'où vient votre argent et où il va.",
+    "L'argent fait tourner le monde entier : il achète votre équipement, vos provisions et votre matériel de voyage, et passe de main en main entre joueurs. Vous ramassez tout cela rien qu'en jouant, alors voyez cette page comme une carte d'où vient votre argent et où il va.",
   'guide.economy.junkBody':
     "Les butins dont vous n'avez aucun usage se vendent quand même à n'importe quel marchand, alors videz vos sacs chaque fois que vous passez en ville plutôt que de les laisser se remplir. Les bricoles vraiment sans valeur peuvent aussi être jetées d'un coup pour faire de la place.",
   'guide.economy.junkTitle': 'Faire le tri du superflu',
   'guide.economy.marketBody':
-    "Le Marchand tient le Marché mondial, une bourse animée par les joueurs où vous achetez et vendez avec des gens que vous ne rencontrerez peut-être jamais. Parlez au Marchand pour l'ouvrir.",
+    "Le Marchand tient le Marché mondial, une bourse animée par les joueurs où vous achetez et vendez avec des gens que vous ne rencontrerez peut-être jamais. Parlez au Marchand pour l'ouvrir. Le Marchand y tient aussi en permanence un stock de ses propres marchandises, si bien qu'il y a toujours quelque chose à acheter, même quand aucun autre joueur n'a rien mis en vente.",
   'guide.economy.marketBrowse':
     'Parcourir : faites défiler les annonces ou cherchez par nom pour trouver ce qui est à vendre. Chaque annonce indique la marchandise, le vendeur et le prix demandé pour la pile entière.',
   'guide.economy.marketCollect':
@@ -4169,11 +4226,14 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.economy.marketPricing':
     "Le prix ne dépend que de vous. Annoncer un peu en dessous des autres tend à vendre plus vite, tandis qu'un prix trop élevé peut rester sans preneur. Parcourez d'abord le marché pour voir le cours du moment avant de publier.",
   'guide.economy.marketTitle': 'Le Marché mondial',
+  'guide.economy.marksBody':
+    "L'or n'est pas la seule chose que vous mettez de côté. Les plongées versent des Marques de plongée, une monnaie distincte que vous ne dépensez qu'auprès du gardien de plongée, pour les améliorations de votre compagne et un équipement introuvable ailleurs. Elles ne se mêlent jamais à votre or.",
+  'guide.economy.marksTitle': 'Une seconde monnaie : les Marques de plongée',
   'guide.economy.tradeBody':
     "Vous pouvez échanger en face à face avec n'importe qui se tenant près de vous. Chacun place objets et pièces dans une fenêtre partagée, et l'échange ne se fait qu'une fois que vous l'avez tous deux confirmé, de sorte que personne ne peut se faire avoir. C'est la manière simple de remettre un butin à un ami ou de conclure un marché.",
   'guide.economy.tradeTitle': 'Échanger avec les autres joueurs',
   'guide.economy.vendorsBody':
-    "Villes et avant-postes sont parsemés de marchands, chacun avec son propre commerce. Les intendants ont de quoi manger et boire, les forgerons et armuriers vendent de l'équipement, les herboristes traitent les réactifs, et un quartier-maître garde le matériel de voyage utile. Approchez-vous de l'un d'eux pour voir ce qu'il propose.",
+    "Villes et avant-postes sont parsemés de marchands, chacun avec son propre commerce. Les intendants ont de quoi manger et boire, les forgerons et armuriers vendent de l'équipement, et un quartier-maître garde le matériel de voyage utile. Approchez-vous de l'un d'eux pour voir ce qu'il propose.",
   'guide.economy.vendorsTitle': "Les marchands et ce qu'ils gardent",
   'guide.gear.consumablesElixirs':
     "Les élixirs accordent une amélioration temporaire pendant que vous partez à l'aventure, un petit avantage utile quand vous voulez pousser un peu plus loin.",
@@ -4184,6 +4244,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.gear.consumablesPotions':
     "Les potions rendent des points de vie ou du mana à l'instant où vous les utilisez, même en plein combat, ce qui en fait un sauvetage décisif quand une approche tourne mal. Elles partagent une courte recharge, alors prévoyez le bon moment pour les boire.",
   'guide.gear.consumablesTitle': 'Consommables',
+  'guide.gear.cosmeticsApply':
+    "Définissez votre apparence active depuis la rangée d'allure de votre écran de personnage, et passez librement de l'une à l'autre parmi tout ce que vous avez débloqué.",
   'guide.gear.cosmeticsBody':
     "Certaines récompenses ne changent que l'apparence de votre personnage, jamais sa puissance. Ces apparences cosmétiques vous permettent de vous démarquer sans rien changer au jeu, alors portez celle qui vous plaît.",
   'guide.gear.cosmeticsCache':
@@ -4191,17 +4253,19 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.gear.cosmeticsRanks':
     'Les cosmétiques ont leurs propres paliers de rareté, et les plus rares sont un plaisir à courir après. Obtenir un palier supérieur débloque aussi les apparences en dessous.',
   'guide.gear.cosmeticsSkins':
-    "Il y a deux collections cosmétiques à réunir. Chaque classe possède une poignée d'apparences alternatives, une nouvelle lecture de son allure qui n'appartient qu'à vous. À leurs côtés se trouvent les chromas : des palettes bicolores nommées qui repeignent entièrement une apparence, des métaux sobres aux vives couleurs impériales.",
+    "Il y a deux collections cosmétiques à réunir. La plupart des classes disposent de plusieurs apparences alternatives, une nouvelle lecture de l'allure de la classe qui n'appartient qu'à vous. À leurs côtés se trouvent les chromas : des palettes bicolores nommées qui repeignent entièrement une apparence, des métaux sobres aux vives couleurs impériales.",
   'guide.gear.cosmeticsTitle': 'Allure et cosmétiques',
   'guide.gear.fishingBody':
-    "La pêche est une parenthèse paisible. Équipez une canne, lancez votre ligne en eau libre et remontez ce qui mord. Vous attrapez surtout des poissons que vous pouvez cuisiner, parfois un déchet à revendre pour quelques pièces, et de temps à autre une prise rare convoitée. Ce que vous trouvez dépend de l'eau où vous pêchez.",
+    "La pêche est une parenthèse paisible. Équipez une canne, lancez votre ligne en eau libre et remontez ce qui mord. Vous attrapez surtout des poissons qui sont de la nourriture prête à manger, parfois un déchet à revendre pour quelques pièces, et de temps à autre une prise rare convoitée. Ce que vous trouvez dépend de l'eau où vous pêchez.",
   'guide.gear.fishingFood':
-    'Les poissons que vous remontez sont crus, et le poisson cru est de la nourriture. Cuisinez votre prise et elle soigne davantage quand vous vous asseyez pour manger, les meilleurs poissons venant des eaux plus froides et plus profondes du nord. Une ligne dans le lac est une façon tranquille de garder votre sac garni entre deux combats.',
+    'Les poissons que vous remontez sont de la nourriture : mangez-en un pendant que vous êtes assis à vous reposer et il rend des points de vie, les meilleurs poissons venant des eaux plus froides et plus profondes du nord. Une ligne dans le lac est une façon tranquille de garder votre sac garni entre deux combats.',
   'guide.gear.fishingRare':
     "De temps à autre, votre ligne attrape bien mieux qu'un repas : un poisson rare et chatoyant que n'importe quel pêcheur peut décrocher avec un peu de chance, dans n'importe quelle eau. Ferrez-en un et votre journal s'illumine de la prise. C'est le genre de coup de chance qui rend une après-midi oisive au bord du lac digne d'être racontée.",
   'guide.gear.fishingTitle': 'Pêche',
   'guide.gear.intro':
     "L'équipement, ce sont les pièces que porte votre personnage et les objets que vous transportez. Un meilleur équipement est la voie la plus sûre vers la puissance, et vous en ramassez l'essentiel rien qu'en jouant.",
+  'guide.gear.itemLevelBody':
+    "Si vous voulez un moyen rapide de comparer deux pièces, activez Afficher le niveau d'objet dans les options. Chaque arme et chaque pièce d'armure affiche alors un niveau d'objet, un chiffre unique indiquant grossièrement sa puissance selon sa provenance, pour que vous voyiez d'un coup d'œil quelle amélioration pèse le plus, même d'un emplacement à l'autre.",
   'guide.gear.qualityBody':
     "Chaque objet a une qualité, et son nom est coloré en conséquence pour que vous lisiez sa valeur d'un coup d'œil. Du plus commun au plus convoité :",
   'guide.gear.qualityCommon': 'Commun',
@@ -4213,6 +4277,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.gear.qualityRare': 'Rare',
   'guide.gear.qualityTitle': "La qualité, d'un coup d'œil",
   'guide.gear.qualityUncommon': 'Inhabituel',
+  'guide.gear.setsBody':
+    "L'armure la plus rare se présente en familles assorties, plusieurs pièces taillées pour s'accorder et combattre comme un tout. Portez-en assez d'une même famille à la fois et la tenue s'éveille, accordant des bonus qui s'ajoutent aux caractéristiques propres de chaque pièce, et plus vous en portez, plus elle se renforce. Elles tombent dans le contenu de groupe le plus exigeant près du niveau maximum, alors courir après une tenue complète est un objectif de fin de jeu classique.",
+  'guide.gear.setsTitle': 'Tenues et bonus de tenue',
   'guide.gear.slotChest': 'Torse',
   'guide.gear.slotFeet': 'Pieds',
   'guide.gear.slotGloves': 'Mains',
@@ -4222,7 +4289,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.gear.slotShoulder': 'Épaules',
   'guide.gear.slotWaist': 'Taille',
   'guide.gear.slotsBody':
-    "Vous disposez d'un emplacement d'arme et de sept emplacements d'armure. Chaque pièce que vous équipez s'ajoute à votre personnage, et vous pouvez tout combiner librement à mesure que vous trouvez des améliorations.",
+    "Vous disposez d'un emplacement d'arme et de sept emplacements d'armure. Chaque classe ne peut manier que certaines armes et ne porte de l'armure que jusqu'à son propre poids, tissu, cuir ou mailles, si bien que les améliorations qui vous conviennent sont celles faites pour votre classe. Dans ces limites, garnissez chaque emplacement de la meilleure pièce que vous trouvez.",
   'guide.gear.slotsTitle': 'Ce que vous pouvez équiper',
   'guide.gear.sourcesBody':
     "La plupart de vos premières améliorations sont des récompenses de quête, alors mieux vaut terminer les quêtes que de farmer. Les ennemis lâchent de l'équipement quand vous les vainquez, les marchands en ville vendent de bonnes bases, et le marché des joueurs vous permet d'acheter auprès d'autres aventuriers.",
@@ -4271,9 +4338,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.progression.noRush':
     'Rien ne presse. Le monde est là pour être savouré à votre rythme, alors flânez, prenez les quêtes qui attirent votre œil, et laissez votre héros grandir chemin faisant.',
   'guide.progression.prestigeBody':
-    "L'expérience continue de compter même après le plafond. Elle alimente un niveau virtuel cosmétique, si bien que votre barre d'expérience continue de monter, ainsi qu'un rang de prestige à long terme que vous pouvez mériter pour la reconnaissance. C'est purement optionnel et n'accorde jamais de puissance, juste une marque de la route que vous avez parcourue.",
+    "L'expérience continue de compter même après le plafond. Elle alimente un niveau virtuel cosmétique, si bien que votre barre d'expérience continue de monter, ainsi qu'un rang de prestige à long terme que vous pouvez mériter pour la reconnaissance. Franchir de grands paliers d'expérience cumulée débloque aussi des titres cosmétiques et des bordures de plaque d'identification qui s'affichent sur votre feuille de personnage. Tout cela est purement optionnel et n'accorde jamais de puissance, juste une marque de la route que vous avez parcourue.",
   'guide.progression.restedBody':
-    "Quand vous vous déconnectez, ou que vous vous reposez en lieu sûr comme une auberge, votre personnage accumule de l'expérience reposée pendant votre absence. La prochaine fois que vous repartez vous battre, cette réserve donne un surplus à vos éliminations jusqu'à épuisement. Elle s'accumule avec le temps et accélère vos premiers niveaux, alors se déconnecter en ville n'est jamais du temps perdu.",
+    "Reposez-vous dans un lieu sûr comme une auberge, hors combat, et votre personnage accumule de l'expérience reposée pendant que vous y restez assis. La prochaine fois que vous repartez vous battre, cette réserve donne un surplus à vos éliminations jusqu'à épuisement. Une pause à l'auberge n'est jamais du temps perdu : elle accélère votre prochaine série de niveaux.",
   'guide.progression.restedTitle': 'Expérience reposée',
   'guide.progression.xpBody':
     "Vous gagnez de l'expérience en accomplissant des quêtes et en vainquant des ennemis. Les quêtes en donnent de loin le plus, alors suivre le fil des quêtes est le moyen le plus rapide de grimper. Tuer ce qui se présente en chemin comble le reste.",
@@ -4284,31 +4351,34 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "À Mirefen, les noyades ne sont pas un accident. Quelqu'un remplit la fagne comme un tronc d'offrandes, relevant des morts obéissants de chaque voyageur que l'eau emporte. Remontez les ordres de maillon en maillon jusqu'à un Appelant des brumes dans le bastion noyé, dont les derniers mots nomment quelque chose de plus ancien encore, qui s'agite sous les sommets.",
   'guide.questsPage.sagaMarshTitle': "Le marais : un tribut d'âmes",
   'guide.questsPage.sagaPeaksBody':
-    "Sur Thornpeak, tout le complot s'éclaire. Chaque âme dérobée depuis le Val était un tribut versé pour réveiller une chose antique scellée sous la montagne. La piste qui a commencé dans un cimetière de chapelle s'achève ici, à une porte qu'il faut être dix pour ouvrir. Nous vous laisserons découvrir qui attend derrière.",
+    "Sur Thornpeak, tout le complot s'éclaire. Chaque âme dérobée depuis le Val était un tribut versé pour la sinistre œuvre du culte au cœur de la montagne. La piste qui a commencé dans un cimetière de chapelle s'achève ici, dans une descente à cinq joueurs pour affronter la main derrière tout cela. Nous vous laisserons découvrir qui attend tout au fond.",
   'guide.questsPage.sagaPeaksTitle': 'Les sommets : à quoi servait le tribut',
   'guide.questsPage.sagaTitle': 'Suivre la piste vers le nord',
   'guide.questsPage.sagaValeBody':
     "À Eastbrook, les morts ne reposent pas, et le sceau qui en est la cause appartient à une secte que l'on croyait disparue depuis longtemps. Remontez-en la trace jusqu'à un Appelant des tombes œuvrant dans la crypte de la chapelle, et ses propres papiers vous orientent vers la fagne au nord.",
   'guide.questsPage.sagaValeTitle': 'Le Val : un nom sur un sceau',
   'guide.questsPage.sideCryptBody':
-    "Tout en haut des sommets court un mystère plus discret : de vieilles tombes marquées d'une couronne qu'aucune chronique ne se rappelle. Lisez les morts, rassemblez ce qu'ils gardaient, et descellez un tombeau qui devait rester clos. C'est une piste de détective qui ouvre la voie à une seconde épreuve de fin de jeu pour un raid complet.",
+    "Tout en haut des sommets court un mystère plus discret : de vieilles tombes marquées d'une couronne qu'aucune chronique ne se rappelle. Lisez les morts, rassemblez ce qu'ils gardaient, et descellez un tombeau qui devait rester clos. C'est une piste de détective qui ouvre la voie au raid de fin de jeu à dix joueurs du royaume.",
   'guide.questsPage.sideCryptTitle': 'Le roi oublié',
+  'guide.questsPage.sideTempleBody':
+    "Une porte de lumière pâle, sur un lac d'altitude au cœur des sommets, s'ouvre sur un sanctuaire englouti où un culte noyé chante encore. Sa courte chaîne se tient à l'écart de l'histoire principale, un mystère autonome pour quiconque grimpe jusqu'à la rive, lit les avertissements gravés dans la roche et descend voir à quoi ils servaient.",
+  'guide.questsPage.sideTempleTitle': 'Le Temple noyé',
   'guide.questsPage.sideTitle': 'Des fils en marge de la route principale',
   'guide.questsPage.sideWardenBody':
-    "En parallèle de l'histoire, les gardiens du Val et de la fagne distribuent une échelle de primes permanente. Gravissez-la, ennemi après ennemi, comme tous les gardiens avant vous ont gagné leur place. C'est une montée en niveaux honnête et une tournée des pires fauteurs de troubles de chaque zone.",
+    "En parallèle de l'histoire, les prévôts et les gardiens du Val et de la fagne distribuent une échelle de primes permanente. Gravissez-la, ennemi après ennemi, comme tous les chasseurs de primes avant vous ont gagné leur place. C'est une montée en niveaux honnête et une tournée des pires fauteurs de troubles de chaque zone.",
   'guide.questsPage.sideWardenTitle': 'Vous faire un nom',
   'guide.questsPage.typeGatherBody':
     "Récoltez des objets dans le monde ou sur ce que lâchent les ennemis : herbes, minerai, lettres perdues, sinistres réactifs d'un culte. Certaines pièces ne tombent que d'un adversaire précis, si bien que la chasse et la récolte vont de pair.",
   'guide.questsPage.typeGatherTitle': 'Récolter',
   'guide.questsPage.typeGroupBody':
-    "Chaque chapitre de l'histoire principale s'achève à la porte d'un donjon. L'introduction se fait en solo, mais le coup de grâce contre le scélérat du chapitre est prévu pour un groupe de cinq (et le tout dernier, pour dix).",
+    "Chaque chapitre de l'histoire principale s'achève à la porte d'un donjon. L'introduction se fait en solo, mais le coup de grâce contre le scélérat du chapitre est prévu pour un groupe de cinq.",
   'guide.questsPage.typeGroupTitle': 'Apothéoses de groupe',
   'guide.questsPage.typeInteractBody':
     'Utilisez, purifiez ou lisez quelque chose de fixe dans le monde : une tombe profanée, un avertissement gravé sur un rocher de rivage, une porte de crypte scellée. Approchez-vous du marqueur et agissez dessus.',
   'guide.questsPage.typeInteractTitle': 'Interagir',
   'guide.questsPage.typeMusterBody':
-    "Escortez sain et sauf un visage ami d'un endroit à un autre, ou rassemblez les défenseurs d'une ville avant une poussée vers le nord. Ces quêtes vous gardent en mouvement avec les gens dont vous vivez l'histoire.",
-  'guide.questsPage.typeMusterTitle': 'Escorter et rassembler',
+    "Certaines quêtes vous demandent de rallier une ville avant une poussée vers le nord : réduisez la menace aux portes et rassemblez ce dont les défenseurs ont besoin. Ce sont des objectifs d'abattage et de récolte au service des gens dont vous vivez l'histoire, et elles vous gardent en mouvement avec eux.",
+  'guide.questsPage.typeMusterTitle': 'Rassembler la défense',
   'guide.questsPage.typeSlayBody':
     "Éclaircissez une meute de bêtes ou brisez l'emprise d'un culte en vainquant un nombre donné d'un ennemi désigné. La toute première quête du jeu, débarrasser la route d'Eastbrook de ses loups, est de celles-là.",
   'guide.questsPage.typeSlayTitle': 'Tuer',
@@ -4317,7 +4387,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.questsPage.typesTitle': 'Les sortes de quêtes que vous rencontrerez',
   'guide.social.chanGeneral': 'Général.',
   'guide.social.chanGeneralBody':
-    'Un canal local toujours actif pour les gens autour de vous, parfait pour poser une question ou bavarder.',
+    "Un canal de royaume toujours actif qui atteint tous les joueurs en ligne, parfait pour poser une question ou bavarder. Contrairement aux canaux Monde et Recherche de groupe, vous n'avez jamais à vous y inscrire.",
   'guide.social.chanGuild': 'Guilde et officiers.',
   'guide.social.chanGuildBody':
     'Les canaux de votre guilde. Le canal de guilde atteint chaque membre ; le canal des officiers est réservé aux officiers.',
@@ -4366,11 +4436,14 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Les butins ordinaires peuvent revenir à qui les ramasse, tandis que les meilleurs sont mis en jeu pour un tirage, pour que chacun ait une chance équitable.',
   'guide.social.lootCommonTitle': 'Objets.',
   'guide.social.lootHeading': 'Butin de groupe',
+  'guide.social.lootMasterBody':
+    "Le chef peut au contraire prendre en main les meilleurs butins, en remettant chacun au membre qui doit le recevoir. Cela évite qu'une pièce convoitée parte sur un jet de dé malheureux, comme le fait un groupe organisé en donjon.",
+  'guide.social.lootMasterTitle': 'Maître du butin.',
   'guide.social.lootRollBody':
     "Quand un objet part au tirage, chaque membre éligible choisit Besoin s'il le veut, Cupidité s'il ne le prendrait qu'à défaut, ou Passer pour se retirer. Le plus haut tirage l'emporte.",
   'guide.social.lootRollTitle': 'Besoin, Cupidité ou Passer.',
   'guide.social.partyBody':
-    "Invitez un autre joueur en cliquant droit sur son nom et en choisissant de l'inviter, ou avec une commande de chat. Un groupe accueille jusqu'à cinq joueurs, et l'un de vous en est le chef.",
+    "Invitez un autre joueur en cliquant droit sur son nom et en choisissant de l'inviter. Un groupe accueille jusqu'à cinq joueurs, et l'un de vous en est le chef.",
   'guide.social.partyCredit':
     "Les membres du groupe proches les uns des autres partagent le crédit des éliminations et des objectifs, si bien que partir en quête ensemble est plus rapide, jamais plus lent. Un groupe, c'est aussi ainsi que vous entrez dans un donjon en équipe.",
   'guide.social.partyHeading': 'Former un groupe',
@@ -4391,11 +4464,14 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.stats.dodgeBody':
     "L'esquive est votre chance d'éviter entièrement une attaque de mêlée entrante. Vous débutez avec une petite chance de base, et l'Agilité l'augmente, si bien que les classes agiles esquivent plus de coups.",
   'guide.stats.dodgeTitle': 'Esquive',
+  'guide.stats.dpsBody':
+    "Votre feuille affiche aussi une estimation des dégâts par seconde : à peu près ce que votre arme, sa vitesse de frappe et votre puissance d'attaque totalisent dans le temps. C'est un moyen rapide de comparer deux armes d'un coup d'œil.",
+  'guide.stats.dpsTitle': 'Dégâts par seconde',
   'guide.stats.growBody':
     "Deux choses augmentent vos caractéristiques. Chaque niveau ajoute une quantité fixe de chaque caractéristique adaptée à votre classe, et l'équipement que vous portez en ajoute par-dessus. Garder votre équipement à jour est la voie la plus sûre vers la puissance, jusqu'au plafond de niveau.",
   'guide.stats.growHeading': 'Comment vos caractéristiques augmentent',
   'guide.stats.intBody':
-    "L'Intelligence agrandit la réserve de mana d'un lanceur de sorts et améliore la chance que ses sorts soient critiques. Elle compte pour les classes qui lancent depuis le mana ; pour une classe à Rage ou à Énergie, elle ne fait pas grand-chose.",
+    "L'Intelligence agrandit la réserve de mana d'un lanceur de sorts, augmente sa puissance des sorts pour que ses sorts frappent plus fort, et améliore la chance que ses sorts soient critiques. Elle compte pour les classes qui lancent depuis le mana ; pour une classe à Rage ou à Énergie, elle ne fait pas grand-chose.",
   'guide.stats.intTitle': 'Intelligence',
   'guide.stats.intro':
     "Votre personnage est décrit par une poignée de caractéristiques. Vous n'avez jamais à les retenir par cœur pour bien jouer, mais savoir grossièrement ce que fait chacune vous aide à lire votre feuille de personnage et à choisir les bonnes améliorations.",
@@ -4405,6 +4481,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.stats.sheetBody':
     "Ouvrez la fenêtre de personnage en jeu pour voir tout cela en un seul endroit : vos cinq caractéristiques d'un côté et les statistiques qu'elles alimentent de l'autre. Survolez n'importe quelle valeur et une infobulle détaille ce qu'elle fait pour votre classe, afin que vous voyiez d'un coup d'œil quels chiffres une amélioration a réellement bougés.",
   'guide.stats.sheetHeading': 'Lire votre feuille de personnage',
+  'guide.stats.spBody':
+    "La puissance des sorts est, pour un lanceur de sorts, l'équivalent de la puissance d'attaque : elle augmente les dégâts de vos sorts. L'Intelligence l'alimente, et l'équipement et les bonus de lanceur en ajoutent par-dessus, si bien qu'un lanceur de sorts surveille la puissance des sorts comme un combattant de mêlée surveille la puissance d'attaque.",
+  'guide.stats.spTitle': 'Puissance des sorts',
   'guide.stats.spiBody':
     "L'Esprit régit la vitesse à laquelle le mana d'un lanceur de sorts se régénère hors combat. Comme l'Intelligence, il sert les classes à mana et ne signifie pas grand-chose pour les autres.",
   'guide.stats.spiTitle': 'Esprit',
@@ -4420,6 +4499,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.viewer.error':
     "Le modèle 3D n'a pas pu être chargé. L'illustration ci-dessus montre quand même ce {name}.",
   'guide.viewer.loading': 'Chargement du modèle...',
+  'guide.viewer.posterAlt': '{name}',
   'guide.viewer.view3d': 'Voir {name} en 3D',
   'guide.viewer.view3dShort': 'Voir en 3D',
   'guide.worldPage.marshGreeter': 'Gardien Fenwick, Fenbridge',
@@ -4435,10 +4515,10 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.valeGreeter': 'Maréchal Redbrook, Eastbrook',
   'guide.worldPage.valeGreeting': "Gardez votre lame à portée. Le Val n'est plus ce qu'il était.",
   'guide.worldPage.valePlaceNotes':
-    'Eastbrook est votre premier camp de base. La Course du Loup et le Pré du Sanglier sont des terrains de chasse cléments ; le lac Miroir est une eau calme où pêcher ; le Bois des toiles et la Mine de cuivre cachent araignées et fouisseurs avides de minerai ; un Camp de bandits et la Chapelle déchue gardent des besognes plus rudes ; la clairière de Brightwood est un paisible bosquet sauvage au nord.',
+    'Eastbrook est votre premier camp de base. La Course du Loup et le Pré du Sanglier sont des terrains de chasse cléments ; le lac Miroir est une eau calme où pêcher ; le Bois des toiles et la Mine de cuivre cachent araignées et fouisseurs avides de minerai ; un Camp de bandits et la Chapelle déchue gardent des besognes plus rudes ; la colline du Reliquaire descend dans le Reliquaire effondré, le premier gouffre du royaume ; et Brightwood Glade est un paisible bosquet ensoleillé au nord.',
   'guide.worldPage.gladeTitle': 'Un coin paisible : la clairière de Brightwood',
   'guide.worldPage.gladeBody':
-    'Toutes les histoires du Val ne parlent pas des morts. Au nord, une clairière ensoleillée appelée Brightwood garde son propre rythme plus doux, avec des sentiers calmes, des cerfs au pâturage et des bêtes méfiantes sous les branches. C’est un contrepoint apaisé à la piste que vous suivez, et elle mérite le détour quand la route vous laisse le temps de flâner.',
+    "Toutes les histoires du Val ne parlent pas des morts. Au nord, un bosquet ensoleillé appelé Brightwood Glade garde son propre rythme plus doux, tout en sentiers calmes et en lumière mouchetée sous les frondaisons. C'est un contrepoint apaisé à la piste que vous suivez, et il mérite le détour quand la route vous laisse le temps de flâner.",
   // APM telemetry label from release/v0.14.0
   'hudChrome.perf.labels.apm': 'APM',
   // Account-security portal (2FA, verified email change, GDPR export) from PR #833.
@@ -4864,4 +4944,130 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemArmorType.cloth': 'Tissu',
   'hudChrome.itemArmorType.leather': 'Cuir',
   'hudChrome.itemArmorType.mail': 'Mailles',
+  'hudChrome.spectate.banner': 'Vous observez {name}',
+  'hudChrome.leaderboard.tabsLabel': 'Tableaux des scores',
+  'hudChrome.leaderboard.tabPlayers': 'Joueurs',
+  'hudChrome.leaderboard.tabGuilds': 'Guildes',
+  'hudChrome.leaderboard.guildName': 'Guilde',
+  'hudChrome.leaderboard.members': 'Membres',
+  'hudChrome.leaderboard.topLevel': 'Top',
+  'hudChrome.leaderboard.guildXp': 'XP total',
+  'hudChrome.leaderboard.guildEmpty': "Aucune guilde classée pour l'instant.",
+  'hudChrome.discord.title': 'Discord',
+  'hudChrome.discord.panelTitle': 'World of ClaudeCraft',
+  'hudChrome.discord.open': 'Discord',
+  'hudChrome.discord.close': 'Fermer',
+  'hudChrome.discord.keybind': 'Panneau Discord',
+  'hudChrome.discord.disabled': "L'intégration Discord n'est pas disponible pour le moment.",
+  'hudChrome.discord.tiers.none': 'Sans rang',
+  'hudChrome.discord.tiers.initiate': 'Initié',
+  'hudChrome.discord.tiers.squire': 'Écuyer',
+  'hudChrome.discord.tiers.footman': 'Fantassin',
+  'hudChrome.discord.tiers.knight': 'Chevalier',
+  'hudChrome.discord.tiers.champion': 'Champion',
+  'hudChrome.discord.tiers.warlord': 'Seigneur de guerre',
+  'hudChrome.discord.tiers.legend': 'Légende',
+  'hudChrome.discord.tiers.mythic': 'Mythique',
+  'hudChrome.discord.loginCta': 'Continuer avec Discord',
+  'hudChrome.discord.choice.title': 'Continuer avec Discord',
+  'hudChrome.discord.choice.intro':
+    'Créez un nouveau compte ou liez votre Discord à un compte existant.',
+  'hudChrome.discord.choice.greeting': 'Bienvenue, {name} !',
+  'hudChrome.discord.choice.createCta': 'Créer un nouveau compte',
+  'hudChrome.discord.choice.haveAccount': 'Vous avez déjà un compte ?',
+  'hudChrome.discord.choice.linkCta': 'Lier un compte existant',
+  'hudChrome.discord.choice.linkSubmit': 'Lier le compte',
+  'hudChrome.discord.choice.error': 'Impossible de continuer. Veuillez réessayer.',
+  'hudChrome.discord.choice.expired':
+    'Cette connexion Discord a expiré. Veuillez vous reconnecter avec Discord.',
+  'hudChrome.discord.keep.title': 'Définir un mot de passe',
+  'hudChrome.discord.keep.body':
+    "Votre compte se connecte avec Discord. Définissez un mot de passe pour pouvoir toujours vous connecter avec votre nom d'utilisateur après avoir délié Discord.",
+  'hudChrome.discord.keep.usernameLabel': "Votre nom d'utilisateur",
+  'hudChrome.discord.keep.confirmLabel': 'Confirmer le mot de passe',
+  'hudChrome.discord.keep.submit': 'Définir le mot de passe et délier',
+  'hudChrome.discord.keep.cancel': 'Annuler',
+  'hudChrome.discord.keep.mismatch': 'Les mots de passe ne correspondent pas.',
+  'hudChrome.discord.keep.tooShort': 'Le mot de passe doit contenir au moins 6 caractères.',
+  'hudChrome.discord.orEmail': "ou utiliser l'e-mail",
+  'hudChrome.discord.cta.title': 'Liez votre Discord pour gagner des points et monter en grade',
+  'hudChrome.discord.cta.stats': '{online} en ligne · {total} membres sur le serveur',
+  'hudChrome.discord.cta.statsLoading': 'Rejoignez la communauté et gagnez des récompenses',
+  'hudChrome.discord.cta.button': 'Lier en un clic',
+  'hudChrome.discord.cta.dismiss': 'Ignorer',
+  'hudChrome.discord.link.cta': 'Lier Discord',
+  'hudChrome.discord.link.relink': 'Relier Discord',
+  'hudChrome.discord.link.connecting': 'Ouverture de Discord...',
+  'hudChrome.discord.link.benefits':
+    'Liez votre Discord pour gagner des points en jouant et en participant à la communauté, et gravir les rangs de statut.',
+  'hudChrome.discord.link.error': 'Impossible de lier Discord. Veuillez réessayer.',
+  'hudChrome.discord.link.success': 'Discord lié.',
+  'hudChrome.discord.linkedAs': 'Lié en tant que {name}',
+  'hudChrome.discord.linkedTitle': 'Discord: {name}',
+  'hudChrome.discord.viewCharacter': 'Voir {name}',
+  'hudChrome.discord.viewProfile': 'Ouvrir le profil public de ce personnage',
+  'hudChrome.discord.unlink': 'Délier',
+  'hudChrome.discord.visit': 'Visiter Discord',
+  'hudChrome.discord.unlinkConfirm': 'Délier votre compte Discord de ce compte de jeu ?',
+  'hudChrome.discord.statusLabel': 'Statut',
+  'hudChrome.discord.rank': 'Rang',
+  'hudChrome.discord.points': 'Points',
+  'hudChrome.discord.lifetime': 'Cumulé',
+  'hudChrome.discord.toNext': '{points} avant le prochain rang',
+  'hudChrome.discord.maxRank': 'Rang maximal atteint',
+  'hudChrome.discord.tiersTitle': 'Rangs de statut',
+  'hudChrome.discord.tierLocked': 'Verrouillé',
+  'hudChrome.discord.tierCurrent': 'Actuel',
+  'hudChrome.discord.earnTitle': 'Comment gagner des points',
+  'hudChrome.discord.earnBody':
+    'Gagnez des points en jouant et en restant actif sur le Discord. Les points font monter votre rang de statut.',
+  'hudChrome.discord.memberSince': 'Membre depuis',
+  'hudChrome.discord.memberSinceDays': '{days} j sur le Discord',
+  'hudChrome.discord.roleTag.levyst': 'Levy St',
+  'hudChrome.discord.roleTag.devs': 'Dév',
+  'hudChrome.discord.roleTag.mods': 'Modo',
+  'hudChrome.discord.roleTag.artists': 'Artiste',
+  'hudChrome.discord.guildMember': 'Membre vérifié',
+  'hudChrome.discord.notMember': 'Pas encore sur le serveur',
+  'hudChrome.discord.joinCta': 'Rejoindre le Discord',
+  'hudChrome.discord.online': '{count} en ligne',
+  'hudChrome.discord.community': 'Communauté',
+  'hudChrome.discord.rewards': 'Récompenses',
+  'hudChrome.discord.voice.title': 'Vocal',
+  'hudChrome.discord.voice.channel': 'Dans {channel}',
+  'hudChrome.discord.voice.empty': "Personne n'est en vocal pour le moment.",
+  'hudChrome.discord.voice.speaking': 'Parle',
+  'hudChrome.discord.voice.muted': 'Muet',
+  'hudChrome.discord.voice.join': 'Rejoindre le vocal',
+  'hudChrome.discord.voice.connect': 'Se connecter au canal vocal',
+  'hudChrome.discord.swag.title': 'Goodies',
+  'hudChrome.discord.swag.claim': 'Réclamer',
+  'hudChrome.discord.swag.claimed': 'Réclamé',
+  'hudChrome.discord.swag.locked': 'Verrouillé',
+  'hudChrome.discord.swag.free': 'Gratuit',
+  'hudChrome.discord.swag.cost': '{points} pts',
+  'hudChrome.discord.swag.needTier': 'Atteignez un rang supérieur pour réclamer ceci.',
+  'hudChrome.discord.swag.needPoints': 'Points insuffisants.',
+  'hudChrome.discord.swag.claimError':
+    'Impossible de réclamer cette récompense. Veuillez réessayer.',
+  'hudChrome.discord.swag.claimedToast': 'Réclamé: {name}',
+  'hudChrome.discord.swag.titleDiscordian': 'Titre: Discordien',
+  'hudChrome.discord.swag.titleSquire': 'Titre: Écuyer du Royaume',
+  'hudChrome.discord.swag.chromaBlurple': 'Chroma Mech Blurple',
+  'hudChrome.discord.swag.titleChampion': 'Titre: Champion de Claudemoon',
+  'hudChrome.discord.swag.swagStickers': "Pack d'autocollants (expédié)",
+  'hudChrome.discord.swag.swagTee': 'T-shirt (expédié)',
+  'hudChrome.discord.relay.tooFast': 'Vous publiez trop vite. Patientez un instant et réessayez.',
+  'hudChrome.discord.relay.lfg.label': 'Recherche de groupe',
+  'hudChrome.discord.relay.lfg.hint': 'Trouver des joueurs pour un donjon ou une quête',
+  'hudChrome.discord.relay.wts.label': 'Vente proposée',
+  'hudChrome.discord.relay.wts.hint': 'Proposer un objet ou un service à la vente',
+  'hudChrome.discord.relay.wtb.label': 'Achat recherché',
+  'hudChrome.discord.relay.wtb.hint': 'Demander un objet que vous souhaitez acheter',
+  'hudChrome.discord.relay.recruit.label': 'Recrutement de guilde',
+  'hudChrome.discord.relay.recruit.hint': 'Recruter des joueurs pour votre guilde',
+  'hudChrome.discord.relay.event.label': 'Événement / Raid',
+  'hudChrome.discord.relay.event.hint': 'Annoncer un raid, une rencontre ou un événement',
+  'hudChrome.discord.relay.help.label': "Besoin d'aide",
+  'hudChrome.discord.relay.help.hint': "Demander de l'aide à la communauté",
 };

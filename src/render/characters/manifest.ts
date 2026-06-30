@@ -964,6 +964,31 @@ export function manifestUrlsForGraphics(standardMaterials: boolean): string[] {
   ];
 }
 
+/**
+ * The character/weapon GLB URLs to PRELOAD, given the graphics tier guessed when
+ * assets.ts was first imported. This MUST be tier-INDEPENDENT (a superset of every
+ * tier's placement set).
+ *
+ * Character placement resolves asset URLs against the LIVE GFX tier through
+ * assetUrl()/visualAssetUrlForGraphics, and resolvedGltf() throws "character asset not
+ * preloaded" synchronously when the resolved URL was never loaded. The live tier is
+ * set by initGfxTier() inside the Renderer constructor, AFTER assets.ts froze its
+ * import-time GFX best-guess. On low gfx, LOW_URL_ALIAS swaps one body GLB
+ * (rogue_hooded.glb -> rogue.glb), so manifestUrlsForGraphics(false) is a STRICT
+ * subset of manifestUrlsForGraphics(true). If the import-time guess is low but the
+ * renderer resolves medium+, the very common mob_bandit body (rogue_hooded.glb, the
+ * humanoid-family default AND the global mob fallback) is placed yet was never
+ * preloaded, crashing world entry: the character-side twin of the v0.16.0 props P0.
+ * So preload the UNION across both tiers, exactly as foliage.ts is immune by sourcing
+ * one frozen list for both preload and placement.
+ *
+ * The arg is retained to document the invariant and to let the guard test assert it at
+ * the lowest (most dangerous) import tier; the result intentionally ignores it.
+ */
+export function characterPreloadUrls(_importTierStandardMaterials: boolean): string[] {
+  return [...new Set([...manifestUrlsForGraphics(true), ...manifestUrlsForGraphics(false)])];
+}
+
 export function visibleAttachmentsForGraphics(
   def: Pick<VisualDef, 'attach'>,
 ): readonly AttachDef[] {

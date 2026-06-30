@@ -151,6 +151,9 @@ export const es: EnTranslations = {
     }
   },
   "hudChrome": {
+    "spectate": {
+      "banner": "Observando a {name}"
+    },
     "emotes": {
       "wave": "Saludar",
       "laugh": "Reír",
@@ -267,7 +270,15 @@ export const es: EnTranslations = {
       "targetAria": "Barra de lanzamiento del objetivo"
     },
     "leaderboard": {
-      "close": "Cerrar"
+      "close": "Cerrar",
+      "tabsLabel": "Tablas de clasificación",
+      "tabPlayers": "Jugadores",
+      "tabGuilds": "Hermandades",
+      "guildName": "Hermandad",
+      "members": "Miembros",
+      "topLevel": "Top",
+      "guildXp": "XP total",
+      "guildEmpty": "Aún no hay hermandades clasificadas."
     },
     "raidLockout": {
       "title": "Bloqueos de banda",
@@ -721,6 +732,149 @@ export const es: EnTranslations = {
     "nameplate": {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
+    },
+    "discord": {
+      "title": "Discord",
+      "panelTitle": "World of ClaudeCraft",
+      "open": "Discord",
+      "close": "Cerrar",
+      "keybind": "Panel de Discord",
+      "disabled": "La integración con Discord no está disponible en este momento.",
+      "tiers": {
+        "none": "Sin rango",
+        "initiate": "Iniciado",
+        "squire": "Escudero",
+        "footman": "Infante",
+        "knight": "Caballero",
+        "champion": "Campeón",
+        "warlord": "Señor de la guerra",
+        "legend": "Leyenda",
+        "mythic": "Mítico"
+      },
+      "loginCta": "Continuar con Discord",
+      "orEmail": "o usa el correo",
+      "cta": {
+        "title": "Vincula tu Discord para ganar puntos y subir de rango",
+        "stats": "{online} en línea · {total} miembros en el servidor",
+        "statsLoading": "Únete a la comunidad y gana recompensas",
+        "button": "Vincula en un clic",
+        "dismiss": "Descartar"
+      },
+      "link": {
+        "cta": "Vincular Discord",
+        "relink": "Volver a vincular Discord",
+        "connecting": "Abriendo Discord...",
+        "benefits": "Vincula tu Discord para ganar puntos jugando y participando en la comunidad, y escalar los niveles de estatus.",
+        "error": "No se pudo vincular Discord. Inténtalo de nuevo.",
+        "success": "Discord vinculado."
+      },
+      "choice": {
+        "title": "Continuar con Discord",
+        "intro": "Crea una cuenta nueva o vincula tu Discord a una que ya tengas.",
+        "greeting": "¡Bienvenido, {name}!",
+        "createCta": "Crear una cuenta nueva",
+        "haveAccount": "¿Ya tienes una cuenta?",
+        "linkCta": "Vincular una cuenta existente",
+        "linkSubmit": "Vincular cuenta",
+        "error": "No se pudo continuar. Inténtalo de nuevo.",
+        "expired": "Ese inicio de sesión con Discord expiró. Vuelve a iniciar sesión con Discord."
+      },
+      "keep": {
+        "title": "Establece una contraseña",
+        "body": "Tu cuenta inicia sesión con Discord. Establece una contraseña para que puedas seguir iniciando sesión con tu usuario después de desvincularla.",
+        "usernameLabel": "Tu usuario",
+        "confirmLabel": "Confirmar contraseña",
+        "submit": "Establecer contraseña y desvincular",
+        "cancel": "Cancelar",
+        "mismatch": "Las contraseñas no coinciden.",
+        "tooShort": "La contraseña debe tener al menos 6 caracteres."
+      },
+      "linkedAs": "Vinculado como {name}",
+      "linkedTitle": "Discord: {name}",
+      "viewCharacter": "Ver a {name}",
+      "viewProfile": "Abre el perfil público de este personaje",
+      "unlink": "Desvincular",
+      "visit": "Visitar Discord",
+      "unlinkConfirm": "¿Desvincular tu cuenta de Discord de esta cuenta de juego?",
+      "statusLabel": "Estatus",
+      "rank": "Rango",
+      "points": "Puntos",
+      "lifetime": "Histórico",
+      "toNext": "{points} para el siguiente rango",
+      "maxRank": "Rango máximo alcanzado",
+      "tiersTitle": "Niveles de estatus",
+      "tierLocked": "Bloqueado",
+      "tierCurrent": "Actual",
+      "earnTitle": "Cómo ganar puntos",
+      "earnBody": "Gana puntos por el tiempo jugado y por mantenerte activo en Discord. Los puntos elevan tu nivel de estatus.",
+      "memberSince": "Miembro desde",
+      "memberSinceDays": "{days}d en el Discord",
+      "roleTag": {
+        "levyst": "Levy St",
+        "devs": "Dev",
+        "mods": "Mod",
+        "artists": "Artista"
+      },
+      "guildMember": "Miembro verificado",
+      "notMember": "Aún no estás en el servidor",
+      "joinCta": "Únete al Discord",
+      "online": "{count} en línea",
+      "community": "Comunidad",
+      "rewards": "Recompensas",
+      "voice": {
+        "title": "Voz",
+        "channel": "En {channel}",
+        "empty": "No hay nadie en voz ahora mismo.",
+        "speaking": "Hablando",
+        "muted": "Silenciado",
+        "join": "Unirse a voz",
+        "connect": "Conéctate al canal de voz"
+      },
+      "swag": {
+        "title": "Merch",
+        "claim": "Reclamar",
+        "claimed": "Reclamado",
+        "locked": "Bloqueado",
+        "free": "Gratis",
+        "cost": "{points} pts",
+        "needTier": "Alcanza un rango más alto para reclamarlo.",
+        "needPoints": "Puntos insuficientes.",
+        "claimError": "No se pudo reclamar esa recompensa. Inténtalo de nuevo.",
+        "claimedToast": "Reclamado: {name}",
+        "titleDiscordian": "Título: Discordiano",
+        "titleSquire": "Título: Escudero del Reino",
+        "chromaBlurple": "Cromática Mech Blurple",
+        "titleChampion": "Título: Campeón de Claudemoon",
+        "swagStickers": "Pack de stickers (envío físico)",
+        "swagTee": "Camiseta (envío físico)"
+      },
+      "relay": {
+        "tooFast": "Estás publicando demasiado rápido. Espera un momento e inténtalo de nuevo.",
+        "lfg": {
+          "label": "Buscando grupo",
+          "hint": "Busca jugadores para una mazmorra o misión"
+        },
+        "wts": {
+          "label": "Vendo",
+          "hint": "Anuncia un objeto o servicio en venta"
+        },
+        "wtb": {
+          "label": "Compro",
+          "hint": "Solicita un objeto que quieras comprar"
+        },
+        "recruit": {
+          "label": "Reclutamiento de hermandad",
+          "hint": "Recluta jugadores para tu hermandad"
+        },
+        "event": {
+          "label": "Evento / Banda",
+          "hint": "Anuncia una banda, quedada o evento"
+        },
+        "help": {
+          "label": "Necesito ayuda",
+          "hint": "Pide ayuda a la comunidad"
+        }
+      }
     }
   },
   "guide": {
@@ -745,6 +899,7 @@ export const es: EnTranslations = {
       "world": "Mundo",
       "quests": "Misiones",
       "dungeons": "Mazmorras y bandas",
+      "delves": "Expediciones",
       "reference": "Referencia",
       "controls": "Controles",
       "combat": "Combate",
@@ -799,6 +954,7 @@ export const es: EnTranslations = {
       "typeZone": "Zona",
       "typeCreature": "Criaturas",
       "typeDungeon": "Mazmorra",
+      "typeDelve": "Expedición",
       "typeTerm": "Término"
     },
     "home": {
@@ -886,7 +1042,7 @@ export const es: EnTranslations = {
       "questsTitle": "Misiones",
       "questsBody": "Acepta misiones de las personas con un marcador sobre la cabeza, completa el objetivo y entrégalas a cambio de experiencia, monedas y equipo. El rastreador en pantalla mantiene tus metas a la vista.",
       "deathTitle": "La muerte no es el final",
-      "deathBody": "Si caes, liberas tu espíritu en el cementerio más cercano y corres de vuelta a tu cuerpo. No se pierde experiencia.",
+      "deathBody": "Si caes, liberas tu espíritu y resucitas en el cementerio más cercano con toda la salud, y luego regresas a donde estabas. No se pierde experiencia.",
       "groupingTitle": "Jugar juntos",
       "groupingBody": "Invita a otros a un grupo para compartir el crédito de las misiones y afrontar las mazmorras. La mayor parte del mundo se puede recorrer en solitario, así que agruparse es una elección, no una obligación.",
       "onlineTitle": "En línea o sin conexión",
@@ -900,21 +1056,26 @@ export const es: EnTranslations = {
       "actionHeader": "Acción",
       "groupMovement": "Movimiento",
       "groupCombat": "Selección de objetivo y combate",
-      "groupInterface": "Ventanas",
+      "groupInterface": "Interfaz",
       "groupCamera": "Cámara",
       "talents": "Talentos",
       "arena": "Arena",
       "leaderboard": "Clasificación",
-      "abilities": "Usar habilidades",
+      "abilities": "Usar las habilidades de la barra de acción (la fila de números; una segunda barra está en el teclado numérico)",
+      "targetFriendly": "Objetivo amistoso más cercano",
+      "cycleFriendly": "Objetivo amistoso siguiente",
+      "gameMenu": "Abrir el menú del juego y las opciones",
       "mobileHeading": "En el móvil",
-      "mobileBody": "Los controles táctiles aparecen automáticamente en teléfonos y tabletas: un joystick de movimiento a la izquierda, arrastra en cualquier punto de la derecha para mirar y botones en pantalla para tus habilidades y menús."
+      "mobileBody": "Los controles táctiles aparecen automáticamente en teléfonos y tabletas: un joystick de movimiento a la izquierda, arrastra en cualquier punto de la derecha para mirar y botones en pantalla para tus habilidades y menús.",
+      "controllerHeading": "Con un mando",
+      "controllerBody": "Los mandos también funcionan, y el soporte para mando está activado de forma predeterminada. El stick izquierdo mueve, el stick derecho controla la cámara, y los botones frontales y los gatillos cubren tus habilidades, el salto y la interacción. Abre cualquier ventana para que aparezca un puntero en pantalla con el que navegar los menús. Puedes reasignar los botones y ajustar la zona muerta del stick, la velocidad de la cámara, la vibración y la vista invertida desde la configuración del mando, en las opciones."
     },
     "combat": {
       "intro": "El combate sigue las reglas habituales de los MMO clásicos. Nunca necesitas estudiar nada de esto para jugar bien, simplemente así es como funcionan los combates.",
       "hitTitle": "No todos los golpes aciertan",
-      "hitBody": "Los ataques pueden fallar o ser esquivados, parados y bloqueados, y lo mismo le ocurre al enemigo. Luchar contra enemigos de tu nivel y mantener tu equipo al día es lo que hace que tus golpes acierten.",
-      "mitigationTitle": "La armadura y el equipo te mantienen en pie",
-      "mitigationBody": "La armadura amortigua los golpes físicos y el equipo adecuado mitiga la magia, así que las mejoras son tu principal fuente de aguante. Las clases con armadura más pesada encajan más, pero nada te vuelve intocable.",
+      "hitBody": "Los ataques pueden fallar o ser esquivados, y lo mismo les ocurre a los del enemigo, mientras que los hechizos pueden ser resistidos por completo. Luchar contra enemigos cercanos a tu nivel es lo que hace que tus golpes acierten; cuanto mayor sea la diferencia de nivel, más golpearás al aire.",
+      "mitigationTitle": "La armadura y la salud te mantienen en pie",
+      "mitigationBody": "La armadura amortigua los golpes físicos, así que una mejor armadura es tu principal fuente de aguante en el cuerpo a cuerpo. La magia es otra historia: resistes los hechizos con una reserva de salud más amplia y la posibilidad de resistir uno por completo, no con la armadura. Las clases con armadura más pesada encajan más, pero nada te vuelve intocable.",
       "resourcesTitle": "Cada clase tiene su propio ritmo",
       "resourcesBody": "Los guerreros generan Ira en lo más reñido del combate, los pícaros gastan Energía que se recupera de forma constante y los lanzadores administran una reserva de Maná. Aprender tu recurso es la mitad de jugar bien tu clase.",
       "growTitle": "Te vuelves más fuerte con cada nivel",
@@ -923,7 +1084,7 @@ export const es: EnTranslations = {
       "effectsBody": "Muchas habilidades aplican un efecto que perdura. Los beneficiosos (mejoras) aumentan tus características, te escudan o te sanan poco a poco; los dañinos (penalizadores) merman tu salud con daño con el tiempo o te debilitan. Vigila los pequeños iconos junto a tu barra de acción para ver qué tienes encima y cuánto dura.",
       "ccBody": "El control de masas es una clase especial de penalizador que limita lo que un objetivo puede hacer: aturdimientos, raíces y ralentizaciones, silenciamientos que cortan el lanzamiento de hechizos, desarmes, miedos y la polimorfia, que vuelve inofensivo a un enemigo por un momento. Algunos de estos, como las raíces, los miedos y la polimorfia, pierden su efecto cuando se vuelven a aplicar demasiado rápido, así que no se pueden encadenar para siempre.",
       "deathTitle": "Cuando caes",
-      "deathBody": "Si tu salud llega a cero, caes. Reapareces tras una breve espera y sigues desde donde lo dejaste, así que una muerte te cuesta un poco de tiempo, no tu progreso. Entre combates, siéntate a comer y beber para empezar el siguiente con toda tu fuerza."
+      "deathBody": "Si tu salud llega a cero, caes. Libera tu espíritu para resucitar en el cementerio más cercano con toda la salud y luego regresa a donde estabas, así que una muerte te cuesta un poco de tiempo, no tu progreso. Entre combates, siéntate a comer y beber para empezar el siguiente con toda tu fuerza."
     },
     "glossary": {
       "intro": "Una referencia rápida de los términos que se usan en esta guía y en el chat.",
@@ -934,7 +1095,7 @@ export const es: EnTranslations = {
       "gcdTerm": "Reutilización global",
       "gcdDef": "La breve pausa compartida tras usar la mayoría de las habilidades, para que no puedas lanzarlas todas a la vez.",
       "dpsTerm": "DPS",
-      "dpsDef": "Daño por segundo, una medida aproximada de la rapidez con que algo inflige daño.",
+      "dpsDef": "Daño por segundo, una medida aproximada de la rapidez con que algo inflige daño. También se usa para el propio rol de daño, como en un tanque, un sanador y tres DPS.",
       "buffTerm": "Beneficio",
       "buffDef": "Un efecto beneficioso sobre ti o un aliado, como una bendición que aumenta una característica durante un tiempo.",
       "debuffTerm": "Perjuicio",
@@ -960,7 +1121,13 @@ export const es: EnTranslations = {
       "pullTerm": "Atraer",
       "pullDef": "Atraer a un enemigo o grupo hacia el combate, normalmente de forma deliberada y por tandas.",
       "instanceTerm": "Instancia",
-      "instanceDef": "Una copia privada de una mazmorra o banda creada solo para tu grupo."
+      "instanceDef": "Una copia privada de una mazmorra o banda creada solo para tu grupo.",
+      "raidTerm": "Banda",
+      "raidDef": "Un grupo más grande, de hasta diez jugadores aquí, formado para el encuentro más duro del final del juego; un grupo se convierte en uno en cuanto se llena.",
+      "delveTerm": "Expedición",
+      "delveDef": "Un descenso instanciado corto y repetible para uno o dos jugadores, que se inicia desde el tablón de un guardián con una compañera a tu lado.",
+      "augmentTerm": "Mejora",
+      "augmentDef": "Una mejora temporal que eliges durante una partida de la arena Fiesta dos contra dos y que reconfigura tus habilidades solo para esa partida."
     },
     "faqPage": {
       "intro": "Las preguntas que más hacen los jugadores nuevos.",
@@ -973,7 +1140,7 @@ export const es: EnTranslations = {
       "q4": "¿Puedo jugar sin conexión o en solitario?",
       "a4": "Sí. Hay un modo de un jugador sin conexión instantáneo, y el mundo en línea se puede recorrer por completo en solitario salvo las mazmorras y la banda.",
       "q5": "¿Cuántas clases hay?",
-      "a5": "Nueve, que cubren los roles clásicos de tanque, sanador y daño, cada una con su propio recurso y habilidades distintivas.",
+      "a5": "Nueve, que cubren los roles clásicos de tanque, sanador y daño, cada una con su propio sistema de recursos (ira, maná o energía) y sus habilidades distintivas.",
       "q6": "¿Cuál es el nivel máximo?",
       "a6": "Nivel {cap}, alcanzado a través de tres zonas conectadas de misiones, mazmorras y exploración.",
       "q7": "¿Se guardará mi personaje?",
@@ -1136,7 +1303,7 @@ export const es: EnTranslations = {
       },
       "spider": {
         "name": "Arañas",
-        "desc": "Tejedoras de telarañas y acechadoras venenosas que anidan en lugares oscuros y enmarañados."
+        "desc": "Tejedoras de telarañas y acechadoras venenosas que anidan en lugares oscuros y enmarañados. Los Cazadores pueden domarlas, igual que a las bestias."
       },
       "murloc": {
         "name": "Múrlocs",
@@ -1152,7 +1319,7 @@ export const es: EnTranslations = {
       },
       "troll": {
         "name": "Trols",
-        "desc": "Brutos corpulentos de rápida regeneración que se guarecen en la ciénaga y las tierras altas."
+        "desc": "Brutos corpulentos que se guarecen en las marismas de la ciénaga."
       },
       "ogre": {
         "name": "Ogros",
@@ -1165,6 +1332,10 @@ export const es: EnTranslations = {
       "elemental": {
         "name": "Elementales",
         "desc": "Tormenta y piedra con vida propia, ligadas a los parajes salvajes donde los elementos fluyen con fuerza."
+      },
+      "dragonkin": {
+        "name": "Dracónidos",
+        "desc": "Criaturas escamosas y serpentinas de las viejas profundidades. Raras, orgullosas y mucho más fuertes de lo que aparentan."
       }
     },
     "worldPage": {
@@ -1184,11 +1355,11 @@ export const es: EnTranslations = {
       "marshGreeter": "Guardiana Fenwick, Fenbridge",
       "peaksGreeting": "Doscientos años ha resistido este muro. No caerá durante mi guardia, pero cruje.",
       "peaksGreeter": "Capitana Thessaly, Highwatch",
-      "valePlaceNotes": "Eastbrook es tu primera base de operaciones. Wolf Run y el Prado de los Jabalíes son terreno de caza apacible; el Lago Espejo es agua tranquila para pescar; el Bosque de Telarañas y la Excavación de Cobre ocultan arañas y excavadores ávidos de mineral; un Campamento de Bandidos y la Capilla Caída albergan trabajos más recios; la arboleda de Brightwood es una apacible arboleda de fauna salvaje en el norte.",
+      "valePlaceNotes": "Eastbrook es tu primera base de operaciones. Wolf Run y el Prado de los Jabalíes son terreno de caza apacible; el Lago Espejo es agua tranquila para pescar; el Bosque de Telarañas y la Excavación de Cobre ocultan arañas y excavadores ávidos de mineral; un Campamento de Bandidos y la Capilla Caída albergan trabajos más recios; la colina del Relicario desciende hasta el Relicario Derrumbado, la primera expedición del reino; y la arboleda de Brightwood es una apacible arboleda soleada en el norte.",
       "marshPlaceNotes": "Fenbridge custodia el único camino seco. Los Juncos del Acechador y los Bajíos de Deepfen rebosan de bestias de la ciénaga y múrlocs; la Espesura de la Viuda está tupida de telarañas; la Capilla Ahogada y los Túmulos de los Troles guardan peligros más antiguos; el Campamento de los Llamatumbas es el culto atrincherado, y el Bastión Sumergido es el corazón instanciado de la ciénaga.",
       "peaksPlaceNotes": "Highwatch defiende el muro. La Cresta del Acechador y las Galerías de Deeprock pertenecen a felinos de las crestas y kobolds; las Estribaciones de los Ogros y el Campamento de Guerra de Drogmar, a brutos a sueldo; Stormcrag crepita de elementales y el Glimmermere reluce a sus pies; las Tiendas del Culto del Vermis y los Campos de los Resucitados rodean el bastión elevado del culto, con el Santuario del Gravewyrm en su cima.",
       "gladeTitle": "Un rincón tranquilo: la arboleda de Brightwood",
-      "gladeBody": "No todas las historias del Valle tratan de los muertos. Al norte, una arboleda soleada llamada arboleda de Brightwood conserva su propio ritmo más amable, con senderos silenciosos, ciervos pastando y bestias cautelosas bajo las ramas. Es un contrapunto suave al rastro que sigues y merece verse cuando el camino te deje espacio para vagar."
+      "gladeBody": "No todas las historias del Valle tratan de los muertos. Al norte, una arboleda soleada llamada arboleda de Brightwood conserva su propio ritmo más amable, solo senderos silenciosos y luz moteada bajo las ramas. Es un contrapunto suave al rastro que sigues y merece verse cuando el camino te deje espacio para vagar."
     },
     "questsPage": {
       "heading": "Misiones",
@@ -1196,14 +1367,14 @@ export const es: EnTranslations = {
       "acceptTitle": "Encontrar y aceptar",
       "acceptBody": "Las personas con un marcador sobre la cabeza tienen trabajo para ti. Habla con ellas para aceptar una misión. La primera de todas es Lobos a las puertas, del mariscal Redbrook en Eastbrook.",
       "objectivesTitle": "Objetivos",
-      "objectivesBody": "Da muerte a ciertos enemigos, reúne objetos o interactúa con algo del mundo. El rastreador en pantalla cuenta tu progreso a medida que avanzas.",
+      "objectivesBody": "Da muerte a ciertos enemigos, reúne objetos o interactúa con algo del mundo. El rastreador en pantalla cuenta tu progreso a medida que avanzas. Si cambias de opinión, puedes abandonar una misión desde tu registro de misiones y retomarla más tarde con quien te la dio.",
       "turninTitle": "Entregar",
-      "turninBody": "Vuelve con quien te dio la misión, el mapa te indica dónde, a cambio de experiencia, monedas y, a menudo, una pieza de equipo elegida para tu clase.",
+      "turninBody": "Lleva una misión terminada a su marcador de entrega, el mapa te indica dónde, a cambio de experiencia, monedas y, a menudo, una pieza de equipo elegida para tu clase. Ese suele ser quien te la dio, aunque algunas misiones te envían a otra persona.",
       "partyTitle": "Hacer misiones en grupo",
-      "partyBody": "Los miembros del grupo cercanos comparten el crédito de muertes y objetivos, así que hacer misiones juntos es más rápido, nunca más lento.",
+      "partyBody": "Los miembros del grupo cercanos comparten el crédito de muertes y objetivos, así que hacer misiones juntos es más rápido, nunca más lento. También puedes compartir una misión con tu grupo: publícala en el chat como un enlace en el que se puede hacer clic con el comando /share, y cualquier miembro cercano que cumpla los requisitos puede aceptar la misma misión con un solo clic.",
       "storyTitle": "Un hilo lo recorre por entero",
       "storyBody": "Desde tus primeros recados en Eastbrook, algo va mal con los muertos. Un culto está actuando, y el rastro conduce al norte a través de cada zona. Síguelo para descubrir quién está detrás.",
-      "soloNote": "La historia principal se puede recorrer por completo en solitario; solo sus capítulos finales requieren un grupo.",
+      "soloNote": "La historia principal se puede hacer en solitario hasta el final de cada capítulo, que es una mazmorra para cinco jugadores.",
       "typesTitle": "Los tipos de misión que verás",
       "typesBody": "La mayoría de las misiones tienen una de unas pocas formas conocidas. El rastreador en pantalla detalla exactamente lo que pide cada una, así que nunca te quedas adivinando.",
       "typeSlayTitle": "Dar muerte",
@@ -1212,10 +1383,10 @@ export const es: EnTranslations = {
       "typeGatherBody": "Recoge objetos del mundo o de lo que sueltan los enemigos: hierbas, mineral, cartas perdidas, los lúgubres reactivos de un culto. Algunas piezas solo caen de un enemigo concreto, así que la caza y el botín van de la mano.",
       "typeInteractTitle": "Interactuar",
       "typeInteractBody": "Usa, purifica o lee algo fijo en el mundo: una tumba profanada, una advertencia tallada en una roca de la orilla, una puerta de cripta sellada. Acércate al marcador y actúa sobre él.",
-      "typeMusterTitle": "Escolta y reclutamiento",
-      "typeMusterBody": "Lleva sano y salvo a una cara amiga de un lugar a otro, o reúne a los defensores de un pueblo antes de un avance hacia el norte. Estas te mantienen en movimiento junto a las personas cuya historia estás viviendo.",
+      "typeMusterTitle": "Moviliza la defensa",
+      "typeMusterBody": "Algunas misiones te piden reunir a un pueblo antes de un avance hacia el norte: reduce la amenaza en las puertas y reúne lo que necesitan los defensores. Son objetivos de matar y recolectar al servicio de las personas cuya historia estás viviendo, y te mantienen en movimiento junto a ellas.",
       "typeGroupTitle": "Finales en grupo",
-      "typeGroupBody": "Cada capítulo de la historia principal termina en la puerta de una mazmorra. La fase previa se puede hacer en solitario, pero el golpe final contra el villano de un capítulo está pensado para un grupo de cinco (y el último de todos, para diez).",
+      "typeGroupBody": "Cada capítulo de la historia principal termina en la puerta de una mazmorra. La fase previa se puede hacer en solitario, pero el golpe final contra el villano de un capítulo está pensado para un grupo de cinco.",
       "sagaTitle": "Sigue el rastro hacia el norte",
       "sagaBody": "La historia principal es una larga persecución. Un culto de la muerte está actuando sobre las tumbas del reino, y cada capítulo que cierras apunta una zona más arriba en el camino. Nunca te enfrentas a toda la conspiración a la vez; tiras de un hilo, y este conduce a la siguiente mano que lo sostiene.",
       "sagaValeTitle": "El Valle: un nombre en un sello",
@@ -1223,12 +1394,14 @@ export const es: EnTranslations = {
       "sagaMarshTitle": "La ciénaga: un diezmo de almas",
       "sagaMarshBody": "En Mirefen los ahogamientos no son ningún accidente. Alguien está llenando la ciénaga como una caja de diezmos, alzando muertos obedientes de cada viajero que se lleva el agua. Persigue las órdenes cadena arriba hasta una Llamaniebla en el bastión ahogado, cuyas últimas palabras nombran algo aún más antiguo, agitándose bajo los picos.",
       "sagaPeaksTitle": "Los picos: para qué era el diezmo",
-      "sagaPeaksBody": "En Thornpeak el plan entero queda claro. Cada alma robada desde el Valle fue un diezmo vertido para despertar a una cosa ancestral sellada bajo la montaña. El rastro que comenzó en el patio de una capilla termina aquí, en una puerta que hacen falta diez para abrir. Dejaremos que descubras quién espera detrás.",
+      "sagaPeaksBody": "En Thornpeak el plan entero queda claro. Cada alma robada desde el Valle fue un diezmo vertido para la macabra labor del culto en el corazón de la montaña. El rastro que comenzó en el patio de una capilla termina aquí, en un descenso para cinco jugadores en el que te enfrentas a la mano que está detrás de toda la trama. Dejaremos que descubras quién espera al fondo.",
       "sideTitle": "Hilos al margen del camino principal",
       "sideWardenTitle": "Ganarte un nombre",
-      "sideWardenBody": "Junto a la historia, los guardianes del Valle y de la ciénaga reparten una escala permanente de recompensas. Asciende por ella, enemigo a enemigo, como se ganó su puesto cada guardián antes que tú. Es subir de nivel con honradez y un recorrido por los peores alborotadores de cada zona.",
+      "sideWardenBody": "Junto a la historia, los mariscales y guardianes del Valle y de la ciénaga reparten una escala permanente de recompensas. Asciende por ella, enemigo a enemigo, como se ganó su puesto cada cazarrecompensas antes que tú. Es subir de nivel con honradez y un recorrido por los peores alborotadores de cada zona.",
       "sideCryptTitle": "El rey olvidado",
-      "sideCryptBody": "En lo alto de los picos discurre un misterio más callado: viejas tumbas marcadas con una corona que ningún registro recuerda. Lee a los muertos, reúne lo que custodiaban y abre un sepulcro que debía permanecer cerrado. Es un rastro de detective que abre el paso a una segunda prueba de final del juego para una banda completa."
+      "sideCryptBody": "En lo alto de los picos discurre un misterio más callado: viejas tumbas marcadas con una corona que ningún registro recuerda. Lee a los muertos, reúne lo que custodiaban y abre un sepulcro que debía permanecer cerrado. Es un rastro de detective que abre el paso a la banda de fin del juego para diez jugadores del reino.",
+      "sideTempleTitle": "El Templo Ahogado",
+      "sideTempleBody": "Una puerta de luz pálida sobre un lago de montaña en las cumbres se abre a un santuario hundido donde un culto ahogado aún canta. Su breve cadena de misiones queda aparte de la historia principal, un misterio autónomo para quien suba hasta la orilla, lea las advertencias talladas en las rocas y baje a ver para qué servían."
     },
     "lore": {
       "figuresTitle": "Rostros que llegarás a conocer",
@@ -1261,7 +1434,35 @@ export const es: EnTranslations = {
       "templeLoreTitle": "El Templo Ahogado, un poco más a fondo",
       "templeLoreBody": "El templo tiene su propia leyenda, más antigua que el culto que persigues en otros lugares. En la orilla del Glimmermere, un lago que bebe la luz de la luna y devuelve a los ahogados, un vigía solitario custodia una puerta de luz pálida. Bajo la superficie, una escalera de piedra fría desciende hasta él. Las gentes que se hundieron allí no se ahogaron por desventura: eran el Coro Pálido, que se sumergió en adoración y nunca dejó de cantar. Los viejos guardianes grabaron una sola advertencia en las rocas antes de que el agua se los llevara, una plegaria a algo que llamaban la Luna Ahogada, con una mano más firme añadiendo dos palabras debajo: solo duerme.",
       "cryptLeadTitle": "Una puerta que los muertos debían mantener cerrada",
-      "cryptLeadBody": "En lo alto de los picos, lejos del combate principal, yace un misterio más frío. Viejas tumbas llevan una corona que ningún registro recuerda, y los muertos que las custodian sirvieron en su día a un rey olvidado. Lee sus lápidas, reúne las claves de piedra que guardaban y podrás abrir un sepulcro que tres almas leales murieron por mantener cerrado, dando paso a una segunda prueba para diez jugadores a quienes sigan las pistas hasta el final."
+      "cryptLeadBody": "En lo alto de los picos, lejos del combate principal, yace un misterio más frío. Viejas tumbas llevan una corona que ningún registro recuerda, y los muertos que las custodian sirvieron en su día a un rey olvidado. Lee sus lápidas, reúne las claves de piedra que guardaban y podrás abrir un sepulcro que tres almas leales murieron por mantener cerrado, la prueba opcional que abre el reino a su banda de diez jugadores para quienes sigan las pistas hasta el final."
+    },
+    "delvesPage": {
+      "heading": "Expediciones",
+      "intro": "Las expediciones son descensos cortos y repetibles para uno o dos jugadores, con una compañera leal a tu lado siempre que bajes en solitario. Encuentra el tablón, elige una partida y vuelve a salir con el botín.",
+      "fromLevel": "A partir del nivel {n}",
+      "partyLabel": "Para uno o dos",
+      "keeperLabel": "Guardián",
+      "keeperFmt": "{name}, {title}",
+      "companionLabel": "Compañera",
+      "companionFmt": "{name}, {role}",
+      "tiersLabel": "Dificultades",
+      "affixesLabel": "Modificadores posibles",
+      "whatHeading": "Qué es una expedición",
+      "whatBody": "Una expedición es una pequeña mazmorra instanciada hecha solo para ti y para un aliado como mucho, una copia privada en la que nadie puede molestarte. La empiezas desde un tablón que custodia un guardián de expediciones repartido por el mundo, te metes dentro, luchas a través de un puñado de salas y terminas frente a un único guardián. Las partidas son rápidas y están pensadas para repetirse, así que una expedición es una forma fiable de progresar siempre que el mundo abierto se queda sin nada que ofrecer.",
+      "howHeading": "Cómo funciona una partida",
+      "howBody": "Habla con el guardián para abrir el tablón, elige una dificultad y desciende. Cada partida encadena unas cuantas salas cortas y termina en su guardián; despéjala para reclamar tu recompensa y volver a la superficie. Trae a un amigo si lo tienes, o apóyate en tu compañera si no.",
+      "companionHeading": "Tu compañera",
+      "companionBody": "Cada expedición envía contigo a una compañera, así que una partida en solitario nunca está perdida. Lucha a tu lado, y a medida que inviertes en ella entre partidas se vuelve cada vez más fuerte, hasta que puede traer de vuelta a un aliado al borde de la muerte una vez por descenso. Es tuya durante la expedición y te espera en el tablón entre partidas.",
+      "lockpickHeading": "Cerraduras y lo que esconden",
+      "lockpickBody": "Algunas puertas y arcas están selladas, y abrir una es una pequeña prueba de pulso más que de características: resuelve la cerradura con limpieza y firmeza y te llevarás un premio mejor que si lo haces con prisas y torpeza. Es opcional, pero quien se toma su tiempo sale más rico.",
+      "tiersHeading": "Dificultad",
+      "tiersBody": "Una expedición ofrece más de una dificultad. La más alta vuelve más fuertes a los enemigos y añade un modificador de partida, y paga más a cambio. También exige que tengas unos cuantos niveles a tus espaldas antes de dejarte entrar.",
+      "affixesHeading": "Modificadores de partida",
+      "affixesBody": "Las expediciones más difíciles añaden un modificador que cambia cómo se juega el descenso, desde muertos inquietos hasta aire viciado o estructuras a punto de ceder. Suben a la vez el peligro y la recompensa. Una expedición de tema cripta puede sacar cualquiera de estos:",
+      "marksHeading": "Marcas de Expedición",
+      "marksBody": "Completar expediciones otorga Marcas de Expedición, una moneda aparte de tu dinero. Gástalas con el guardián para reforzar a tu compañera y conseguir equipo que no encontrarás en ningún otro sitio.",
+      "whereHeading": "Dónde encontrar una",
+      "whereBody": "La primera expedición, el Relicario Hundido, se abre en la Colina del Relicario, en el Valle de Eastbrook, donde comienzas tu aventura. El Hermano Halven custodia el tablón allí, y te enviará abajo en cuanto estés listo."
     },
     "talentsPage": {
       "heading": "Talentos y especializaciones",
@@ -1270,8 +1471,9 @@ export const es: EnTranslations = {
       "whatBody": "A medida que subes de nivel, ganas puntos de talento para gastar en pequeñas mejoras permanentes a tus habilidades y características. Dan forma a cómo se siente una clase, orientándola hacia más daño, una defensa más sólida o una sanación más potente.",
       "howHeading": "Cómo funcionan",
       "howBody": "Los talentos se desbloquean al nivel 10, y sigues ganando puntos a medida que asciendes hasta el límite. Los gastas en el panel de talentos de tu clase, y puedes guardar más de una configuración para alternar entre builds.",
+      "shareNote": "Una build terminada se puede copiar a un código corto para compartir y entregárselo a un amigo, que lo pega directamente en su propio panel de talentos para cargarla.",
       "resetTitle": "Nada es permanente",
-      "resetNote": "Puedes restablecer tus talentos en cualquier momento, así que una elección temprana nunca es una trampa. Prueba cosas, descubre lo que te gusta y cambia de opinión con libertad.",
+      "resetNote": "Puedes restablecer tus talentos en cualquier momento que estés fuera de combate, así que una elección temprana nunca es una trampa. Prueba cosas, descubre lo que te gusta y cambia de opinión con libertad.",
       "specsHeading": "Especializaciones por clase",
       "specsBody": "Cada clase tiene unas cuantas especializaciones, cada una con su propio rol y un enfoque distintivo. Aquí tienes la forma de todas ellas. Abre una clase para ver su repertorio completo."
     },
@@ -1281,7 +1483,7 @@ export const es: EnTranslations = {
       "duelsHeading": "Duelos",
       "duelsBody": "Reta a un duelo amistoso a cualquier jugador que encuentres. No hay nada en juego salvo el orgullo, así que es la forma más sencilla de aprender un enfrentamiento o zanjar una discusión amistosa.",
       "coliseumHeading": "El Coliseo Ceniciento",
-      "coliseumBody": "El Coliseo es la arena del reino, donde te enfrentas a otros jugadores en partidas clasificatorias. Si ganas, tu posición sube, y los mejores luchadores ascienden en la clasificación a la vista de todos.",
+      "coliseumBody": "El Coliseo es la arena del reino, donde te enfrentas a otros jugadores en partidas clasificatorias, uno contra uno o dos contra dos. Cada categoría conserva su propia clasificación, así que una victoria te hace subir por esa escala a la vista del reino entero.",
       "fiestaHeading": "Fiesta dos contra dos",
       "fiestaBody": "Fiesta es un modo rápido de dos contra dos que se juega en rondas cortas. Entre ronda y ronda eliges mejoras, refuerzos rápidos que reconfiguran tu repertorio sobre la marcha, así que no hay dos partidas iguales.",
       "augmentsNote": "Las mejoras y potenciadores duran solo lo que dura la partida. Buscan combinaciones divertidas e improvisadas, no un poder duradero, así que nadie compra su camino a la victoria.",
@@ -1304,7 +1506,7 @@ export const es: EnTranslations = {
       "i1Title": "No puedes elegir una clase equivocada",
       "i1Body": "Toda clase se defiende sola y puede llegar al límite. Elige la fantasía que te guste, no la que otro califique de mejor.",
       "i2Title": "Morir apenas te cuesta nada",
-      "i2Body": "Cuando caes, liberas tu espíritu en un cementerio y corres de vuelta a tu cuerpo. No se pierde experiencia, así que es seguro arriesgarse y aprender.",
+      "i2Body": "Cuando caes, liberas tu espíritu y resucitas en el cementerio más cercano, y luego regresas a donde estabas. No se pierde experiencia, así que es seguro arriesgarse y aprender.",
       "i3Title": "Los talentos no son una trampa",
       "i3Body": "Se desbloquean al nivel 10 y se restablecen cuando quieras, así que tus elecciones tempranas nunca son permanentes.",
       "i4Title": "Sigue el rastro de las misiones",
@@ -1324,7 +1526,8 @@ export const es: EnTranslations = {
       "loading": "Cargando modelo...",
       "error": "No se pudo cargar el modelo 3D. El arte de arriba sigue mostrando este {name}.",
       "dragHint": "Arrastra para girar el modelo. Usa las teclas de flecha izquierda y derecha cuando esté enfocado.",
-      "canvasLabel": "Modelo 3D giratorio de {name}"
+      "canvasLabel": "Modelo 3D giratorio de {name}",
+      "posterAlt": "{name}"
     },
     "models": {
       "title": "Visor de modelos 3D",
@@ -1340,7 +1543,7 @@ export const es: EnTranslations = {
     "gear": {
       "intro": "El equipo es lo que tu personaje viste y los objetos que llevas. Un mejor equipo es la vía más constante para volverte más fuerte, y la mayor parte lo consigues solo con jugar.",
       "slotsTitle": "Lo que puedes equipar",
-      "slotsBody": "Tienes una ranura de arma y siete ranuras de armadura. Cada pieza que equipas se suma a tu personaje, y puedes combinarlas libremente a medida que encuentras mejoras.",
+      "slotsBody": "Tienes una ranura de arma y siete ranuras de armadura. Cada clase solo puede usar ciertas armas y viste armadura hasta su propio peso, tela, cuero o malla, así que las mejoras que te sirven son las hechas para tu clase. Dentro de eso, llena cada ranura con la mejor pieza que encuentres.",
       "slotMainhand": "Arma",
       "slotHelmet": "Cabeza",
       "slotShoulder": "Hombros",
@@ -1360,29 +1563,35 @@ export const es: EnTranslations = {
       "qualityNote": "Una calidad mayor suele significar mejores características, pero la calidad es una pista, no una regla. Una pieza bien ajustada a tu clase y nivel puede superar a otra más llamativa.",
       "upgradeTitle": "Mantén tu equipo al día",
       "upgradeBody": "Reemplazar una pieza vieja por una mejora reciente te aporta más que jugar a la perfección con un equipo que ya se te ha quedado pequeño. Cuando caiga algo mejor o te lo ofrezca una misión, tómalo. No guardes tus buenos objetos para más adelante.",
+      "itemLevelBody": "Si quieres una forma rápida de comparar dos piezas, activa Mostrar nivel de objeto en las opciones. Cada arma y cada pieza de armadura muestra entonces un nivel de objeto, una sola cifra de lo poderosa que es, aproximadamente, según de dónde proviene, para que veas de un vistazo qué mejora pesa más, incluso entre ranuras de equipo distintas.",
       "sourcesTitle": "De dónde viene el equipo",
       "sourcesBody": "La mayoría de tus mejoras tempranas son recompensas de misiones, así que conviene completar misiones en lugar de farmear. Los enemigos sueltan equipo cuando los derrotas, los vendedores del pueblo venden buenas piezas básicas y el mercado de jugadores te permite comprar a otros aventureros.",
+      "setsTitle": "Conjuntos y bonificaciones de conjunto",
+      "setsBody": "La armadura más rara viene en familias a juego, varias piezas talladas para verse y combatir como una sola. Lleva suficientes piezas de una familia a la vez y el conjunto despierta, otorgando bonificaciones por encima de las características propias de cada pieza, y cuantas más lleves, más fuerte se vuelve. Caen del contenido en grupo más duro cerca del nivel máximo, así que perseguir un conjunto completo es un objetivo clásico del final del juego.",
       "consumablesTitle": "Consumibles",
       "consumablesIntro": "Algunos objetos se usan una sola vez para obtener un beneficio rápido. Son un seguro barato, así que ten unos cuantos a mano.",
       "consumablesPotions": "Las pociones restauran salud o maná en el momento en que las usas, incluso en mitad del combate, lo que las convierte en una salvación clave cuando un enfrentamiento se tuerce. Comparten un breve tiempo de reutilización, así que planifica un buen momento para usarlas.",
       "consumablesFood": "La comida y la bebida te reponen mientras te sientas a descansar entre combates. Comer recupera salud, beber recupera maná, y descansar así es gratis. Siéntate unos segundos tras un combate difícil en vez de lanzarte al siguiente a medio sanar.",
       "consumablesElixirs": "Los elixires conceden una mejora temporal mientras te aventuras, una pequeña ventaja que ayuda cuando quieres apretar un poco más.",
       "fishingTitle": "Pesca",
-      "fishingBody": "La pesca es un cambio de ritmo tranquilo. Equipa una caña de pescar, lanza a aguas abiertas y recoge lo que pique. Casi siempre pescas peces que puedes cocinar para hacer comida, alguna que otra chatarra para vender por unas monedas y, de vez en cuando, una preciada captura rara. Lo que encuentras depende de las aguas en las que pesques.",
-      "fishingFood": "Los peces que sacas están crudos, y el pescado crudo es comida. Cocina tu captura y sanará más cuando te sientes a comer, con los mejores peces saliendo de las aguas más frías y profundas del norte. Echar el sedal en el lago es una manera tranquila de mantener la despensa surtida entre combates.",
+      "fishingBody": "La pesca es un cambio de ritmo tranquilo. Equipa una caña de pescar, lanza a aguas abiertas y recoge lo que pique. Casi siempre pescas peces que son comida que puedes comer, alguna que otra chatarra para vender por unas monedas y, de vez en cuando, una preciada captura rara. Lo que encuentras depende de las aguas en las que pesques.",
+      "fishingFood": "Los peces que sacas son comida: come uno mientras te sientas a descansar y te restaura la salud, con los peces más sustanciosos saliendo de las aguas más frías y profundas del norte. Echar el sedal en el lago es una manera tranquila de mantener la mochila surtida entre combates.",
       "fishingRare": "De vez en cuando tu sedal atrapa algo mucho mejor que la cena: un reluciente pez preciado con el que cualquier pescador podría tener suerte en cualquier agua. Engancha uno y tu registro se iluminará con la captura. Es de esa clase de golpes de suerte que hacen que una tarde ociosa en el lago merezca contarse.",
       "cosmeticsTitle": "Aspecto y cosméticos",
       "cosmeticsBody": "Algunas recompensas solo cambian el aspecto de tu personaje, nunca su poder. Estos aspectos cosméticos te permiten destacar sin afectar al juego, así que luce el que más te guste.",
       "cosmeticsRanks": "Los cosméticos tienen sus propios niveles de rareza, y los más raros son una meta divertida que perseguir. Conseguir un nivel superior también desbloquea los aspectos inferiores.",
-      "cosmeticsSkins": "Hay dos líneas cosméticas para coleccionar. Cada clase tiene un puñado de aspectos alternativos, una versión fresca de su imagen que es tuya y solo tuya para lucir. Junto a ellos están las cromas: combinaciones de color bicolor con nombre que repintan un aspecto por completo, desde metales sobrios hasta vivos colores imperiales.",
-      "cosmeticsCache": "Unos cuantos de estos provienen de un misterioso alijo cosmético, un premio sellado que al abrirlo decide uno de tres grados de calidad y concede el aspecto correspondiente. Es puramente estético: nada de su interior te hace más fuerte, solo más vistoso."
+      "cosmeticsSkins": "Hay dos líneas cosméticas para coleccionar. La mayoría de las clases tienen varias apariencias alternativas, una versión fresca de la imagen de la clase que es tuya para lucir. Junto a ellas están las cromas: combinaciones de color bicolor con nombre que repintan un aspecto por completo, desde metales sobrios hasta vivos colores imperiales.",
+      "cosmeticsCache": "Unos cuantos de estos provienen de un misterioso alijo cosmético, un premio sellado que al abrirlo decide uno de tres grados de calidad y concede el aspecto correspondiente. Es puramente estético: nada de su interior te hace más fuerte, solo más vistoso.",
+      "cosmeticsApply": "Define tu aspecto activo desde la fila de apariencia en tu pantalla de personaje, y cambia con libertad entre cuanto hayas desbloqueado."
     },
     "economy": {
-      "intro": "Las monedas engrasan el mundo entero: compran equipo y suministros, pagan tus reparaciones y los costes de las misiones, y cambian de manos entre los jugadores. Consigues cuanto necesitas solo con jugar, así que piensa en esta página como un mapa de dónde viene y adónde va tu dinero.",
+      "intro": "Las monedas engrasan el mundo entero: compran tu equipo, tus suministros y tus enseres de viaje, y cambian de manos entre los jugadores. Consigues todas estas cosas solo con jugar, así que piensa en esta página como un mapa de dónde viene y adónde va tu dinero.",
       "coinTitle": "Oro, plata y cobre",
       "coinBody": "El dinero viene en tres monedas. Cien de cobre hacen una de plata, y cien de plata hacen una de oro, así que tu bolsa se llena empezando por la moneda más pequeña. Lo ganas con las recompensas de las misiones, saqueando a los enemigos caídos y vendiendo lo que ya no necesitas.",
       "vendorsTitle": "Vendedores y lo que tienen",
-      "vendorsBody": "Pueblos y puestos de avanzada están salpicados de mercaderes, cada uno con su propio oficio. Los abastecedores tienen comida y bebida, los herreros y armeros llevan equipo, los herboristas trafican con reactivos y un intendente guarda enseres prácticos de viaje. Acércate a uno para ver lo que vende.",
+      "vendorsBody": "Pueblos y puestos de avanzada están salpicados de mercaderes, cada uno con su propio oficio. Los abastecedores tienen comida y bebida, los herreros y armeros llevan equipo, y un intendente guarda enseres prácticos de viaje. Acércate a uno para ver lo que vende.",
+      "marksTitle": "Una segunda moneda: Marcas de Expedición",
+      "marksBody": "El dinero no es lo único que guardas. Las expediciones pagan Marcas de Expedición, una moneda aparte que solo gastas con el guardián de expediciones, en mejoras para tu compañera y equipo que no encontrarás en otro sitio. Nunca se mezclan con tu dinero.",
       "buyingTitle": "Comprar y vender",
       "buyingBody": "Acércate a un mercader para abrir su ventana. Puedes comprar cualquier cosa de las que tenga en stock si te la puedes permitir, y vender la mayor parte de lo que llevas en las bolsas a cambio de monedas. Si vendes algo por error, un vendedor te guardará tus ventas recientes para que puedas recomprarlas.",
       "junkTitle": "Despejar la chatarra",
@@ -1390,7 +1599,7 @@ export const es: EnTranslations = {
       "tradeTitle": "Comerciar con otros jugadores",
       "tradeBody": "Puedes comerciar cara a cara con cualquiera que esté cerca de ti. Ambos ponéis objetos y monedas en una ventana compartida y el intercambio solo se produce cuando los dos lo confirmáis, así que ninguna de las partes puede ser engañada. Es la manera sencilla de pasarle un objeto a un amigo o cerrar un trato.",
       "marketTitle": "El Mercado Mundial",
-      "marketBody": "El Mercader regenta el Mercado Mundial, un intercambio gestionado por los jugadores donde puedes comprar y vender con gente que quizá nunca llegues a conocer. Habla con el Mercader para abrirlo.",
+      "marketBody": "El Mercader regenta el Mercado Mundial, un intercambio gestionado por los jugadores donde puedes comprar y vender con gente que quizá nunca llegues a conocer. Habla con el Mercader para abrirlo. El Mercader también mantiene allí un surtido permanente de sus propias mercancías, así que siempre hay algo que comprar aunque ningún otro jugador haya publicado nada.",
       "marketBrowse": "Explorar: recorre los anuncios o busca por nombre para encontrar lo que está en venta. Cada anuncio muestra la mercancía, el vendedor y el precio que pide por el lote completo.",
       "marketPost": "Publicar: elige un lote de tus bolsas, fija tu precio y ponlo a la venta. El Mercader retiene la mercancía hasta que alguien la compra. Los anuncios sin vender regresan a ti pasado un tiempo, y puedes recuperar uno antes si cambias de idea.",
       "marketCollect": "Cobrar: cuando se vende tu mercancía, tus ganancias te esperan en el Mercader. Vuelve a recoger las monedas, junto con cuanto regrese sin vender. El Mercader se queda una pequeña parte de cada venta completada.",
@@ -1409,7 +1618,7 @@ export const es: EnTranslations = {
       "chanParty": "Grupo.",
       "chanPartyBody": "Habla con todos los de tu grupo, por dispersos que estéis.",
       "chanGeneral": "General.",
-      "chanGeneralBody": "Un canal local siempre activo para la gente a tu alrededor, ideal para hacer una pregunta o charlar.",
+      "chanGeneralBody": "Un canal del reino entero siempre activo que llega a todos los que están conectados, ideal para hacer una pregunta o charlar en general. A diferencia de Mundo y Buscar grupo, nunca tienes que unirte de forma manual.",
       "chanWorld": "Mundo.",
       "chanWorldBody": "Un canal para el reino entero al que te apuntas. Abre su pestaña para unirte, y verás y llegarás a todos los que estén conectados.",
       "chanLfg": "Buscando grupo.",
@@ -1417,7 +1626,7 @@ export const es: EnTranslations = {
       "chanGuild": "Hermandad y oficial.",
       "chanGuildBody": "Canales para tu hermandad. El chat de hermandad llega a todos los miembros; el canal de oficiales es solo para los oficiales.",
       "partyHeading": "Formar un grupo",
-      "partyBody": "Invita a otro jugador haciendo clic derecho en su nombre y eligiendo invitar, o con un comando de chat. Un grupo admite hasta cinco jugadores, y uno de vosotros es el líder.",
+      "partyBody": "Invita a otro jugador haciendo clic derecho en su nombre y eligiendo invitar. Un grupo admite hasta cinco jugadores, y uno de vosotros es el líder.",
       "partyCredit": "Los miembros del grupo cercanos comparten el crédito de muertes y misiones, así que hacer misiones juntos es más rápido, nunca más lento. Un grupo es también la forma de entrar en una mazmorra como equipo.",
       "raidBody": "Una vez que tengas un grupo completo de cinco, el líder puede convertirlo en una banda de hasta diez, para la banda del final del juego.",
       "lootHeading": "Botín de grupo",
@@ -1428,6 +1637,8 @@ export const es: EnTranslations = {
       "lootCommonBody": "Los objetos corrientes pueden ir al saqueador, mientras que los mejores se ponen a un tirada para que todos tengan una oportunidad justa.",
       "lootRollTitle": "Necesidad, Codicia o Paso.",
       "lootRollBody": "Cuando un objeto pasa a tirada, cada miembro con derecho elige Necesidad si lo quiere, Codicia si solo lo cogería por si acaso, o Paso para retirarse. Gana la tirada más alta.",
+      "lootMasterTitle": "Maestro del botín.",
+      "lootMasterBody": "El líder puede, en su lugar, hacerse cargo de los mejores objetos y entregar cada uno al miembro que debería recibirlo. Así se evita que una pieza codiciada acabe en una tirada al azar, como hace un grupo organizado al recorrer una mazmorra.",
       "friendsHeading": "Amigos e ignorados",
       "friendsBody": "Añade jugadores a tu lista de amigos para ver cuándo están conectados y dónde se encuentran, así puedes agruparte en cuanto inicien sesión.",
       "ignoreBody": "Si alguien te molesta, añádelo a tu lista de ignorados y dejarás de ver su chat.",
@@ -1448,17 +1659,21 @@ export const es: EnTranslations = {
       "staTitle": "Aguante",
       "staBody": "El Aguante es tu resistencia. Más Aguante significa una mayor reserva de salud, y acelera la salud que recuperas mientras descansas fuera de combate. Toda clase quiere algo de él.",
       "intTitle": "Intelecto",
-      "intBody": "El Intelecto amplía la reserva de maná de un lanzador y mejora la probabilidad de que sus hechizos sean críticos. Importa a las clases que lanzan desde el maná; para una clase de Ira o Energía hace poco.",
+      "intBody": "El Intelecto amplía la reserva de maná de un lanzador, aumenta su poder con hechizos para que sus hechizos golpeen más fuerte y mejora la probabilidad de que sus hechizos sean críticos. Importa a las clases que lanzan desde el maná; para una clase de Ira o Energía hace poco.",
       "spiTitle": "Espíritu",
       "spiBody": "El Espíritu rige la rapidez con que regresa el maná de un lanzador mientras está fuera de combate. Como el Intelecto, sirve a las clases de maná y significa poco para las demás.",
       "armorTitle": "Armadura",
       "armorBody": "La armadura reduce el daño físico que recibes. Proviene principalmente de lo que vistes, y las clases de armadura más pesada cargan con mucha más. Más armadura frente a un enemigo cercano a tu nivel hace que cada uno de sus golpes impacte con menos fuerza.",
       "apTitle": "Poder de ataque",
       "apBody": "El poder de ataque mide la fuerza con la que golpea tu arma. Tus atributos principales lo alimentan, y las armas y el equipo más potentes lo aumentan aún más, por eso una mejora puede suponer un salto real de daño.",
+      "spTitle": "Poder de hechizos",
+      "spBody": "El poder de hechizos es la contraparte de un lanzador de hechizos al poder de ataque: aumenta el daño que infligen tus hechizos. El intelecto lo alimenta, y el equipo de lanzador y los beneficios añaden todavía más, así que un lanzador de hechizos vigila el poder de hechizos igual que un combatiente cuerpo a cuerpo vigila el poder de ataque.",
       "critTitle": "Golpe crítico",
       "critBody": "Tu probabilidad de golpe crítico es la frecuencia con que un ataque impacta con daño extra. Todos parten de una pequeña probabilidad base, y la Agilidad (más algunos talentos y equipo) la incrementa.",
       "dodgeTitle": "Esquivar",
       "dodgeBody": "La esquiva es tu probabilidad de evitar por completo un ataque cuerpo a cuerpo entrante. Comienzas con una pequeña probabilidad base, y la Agilidad la aumenta, así que las clases ágiles eluden más golpes.",
+      "dpsTitle": "Daño por segundo",
+      "dpsBody": "Tu hoja también muestra una estimación de daño por segundo: a grandes rasgos, lo que tu arma, su velocidad de golpeo y tu poder de ataque suman con el tiempo. Es una forma rápida de comparar dos armas de un vistazo.",
       "sheetHeading": "Leer tu hoja de personaje",
       "sheetBody": "Abre la ventana de personaje en el juego para verlo reunido en un solo lugar: tus cinco atributos a un lado y las características que alimentan al otro. Pasa el cursor por cualquier valor y un cuadro de información desglosa lo que hace para tu clase, así puedes ver de un vistazo qué números movió de verdad una mejora.",
       "growHeading": "Cómo crecen tus características",
@@ -1473,10 +1688,10 @@ export const es: EnTranslations = {
       "journeyBody": "El mundo es una sola tierra continua, tres zonas dispuestas de sur a norte, cada una un escalón más alta de nivel. Empiezas en el verde valle, avanzas por la ciénaga y terminas en los fríos picos elevados. Sigue el rastro de misiones y la tierra te lleva de una a la siguiente.",
       "bandLabel": "Niveles {min} a {max}",
       "restedTitle": "Experiencia de descanso",
-      "restedBody": "Cuando cierras sesión, o descansas en un lugar seguro como una posada, tu personaje acumula experiencia de descanso mientras estás ausente. La próxima vez que salgas a luchar, esa reserva da un impulso extra a tus muertes hasta que se agota. Se acumula con el tiempo y acelera tus primeros niveles, así que cerrar sesión en el pueblo nunca es tiempo perdido.",
+      "restedBody": "Descansa en un lugar seguro como una posada, fuera de combate, y tu personaje acumula experiencia de descanso mientras está ahí sentado. La próxima vez que salgas a luchar, esa reserva da un impulso extra a tus muertes hasta que se agota. Una pausa en la posada nunca es tiempo perdido; acelera tu siguiente tramo de subida de nivel.",
       "capTitle": "Alcanzar el nivel {cap}",
       "capJourneyBody": "El nivel {cap} es el límite, el final de subir de nivel pero no de crecer. A partir de ahí haces mazmorras y la banda, persigues mejor equipo y te pones a prueba en la arena.",
-      "prestigeBody": "La experiencia sigue contando incluso después del límite. Alimenta un nivel virtual cosmético, así que tu barra de experiencia sigue subiendo, y un rango de prestigio a largo plazo que puedes ganarte por el reconocimiento. Es totalmente opcional y nunca otorga poder, solo una marca del camino que has recorrido.",
+      "prestigeBody": "La experiencia sigue contando incluso después del límite. Alimenta un nivel virtual cosmético, así que tu barra de experiencia sigue subiendo, y un rango de prestigio a largo plazo que puedes ganarte por el reconocimiento. Superar grandes hitos de experiencia acumulada también desbloquea títulos cosméticos y bordes de placa de nombre que se muestran en tu hoja de personaje. Todas estas recompensas son puramente opcionales y nunca otorgan poder, solo una marca del camino que has recorrido.",
       "noRush": "No hay prisa. El mundo está ahí para disfrutarlo a tu propio ritmo, así que deambula, acepta las misiones que te llamen la atención y deja que tu héroe crezca por el camino."
     },
     "placeholder": {
@@ -2453,7 +2668,7 @@ export const es: EnTranslations = {
     "lore": {
       "warrior": "Los guerreros son combatientes curtidos que generan ira al infligir o recibir daño. Absorben golpes duros o aplastan enemigos con armas pesadas.",
       "paladin": "Los paladines son cruzados sagrados que apoyan con bendiciones, curan con Luz Sagrada y protegen a los débiles con armadura pesada.",
-      "hunter": "Los cazadores dominan la naturaleza, rastrean enemigos desde lejos con arcos o armas de fuego y controlan el campo con trampas.",
+      "hunter": "Los cazadores son especialistas a distancia que combaten junto a una bestia domada, acribillando a los enemigos con disparos certeros y rápidos, ralentizándolos con picaduras y disparos conmocionantes, y alternando aspectos según convenga al momento.",
       "rogue": "Los pícaros son asesinos sigilosos que gastan energía y puntos de combo en puñaladas y remates desde las sombras.",
       "priest": "Los sacerdotes invocan la Luz Sagrada para sanar y proteger aliados, mientras la magia de las Sombras drena la vida enemiga.",
       "shaman": "Los chamanes ordenan los elementos, imbuyen sus armas, golpean con relámpagos y restauran a sus aliados.",

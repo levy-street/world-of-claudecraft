@@ -151,6 +151,9 @@ export const tr_TR: EnTranslations = {
     }
   },
   "hudChrome": {
+    "spectate": {
+      "banner": "{name} izleniyor"
+    },
     "emotes": {
       "wave": "El Salla",
       "laugh": "LOL",
@@ -267,7 +270,15 @@ export const tr_TR: EnTranslations = {
       "targetAria": "Birim Büyü Çubuğu"
     },
     "leaderboard": {
-      "close": "Kapat"
+      "close": "Kapat",
+      "tabsLabel": "Yüksek skor tabloları",
+      "tabPlayers": "Oyuncular",
+      "tabGuilds": "Loncalar",
+      "guildName": "Lonca",
+      "members": "Üyeler",
+      "topLevel": "En İyi",
+      "guildXp": "Toplam XP",
+      "guildEmpty": "Henüz sıralamada lonca yok."
     },
     "raidLockout": {
       "title": "Akın Kilitleri",
@@ -721,6 +732,149 @@ export const tr_TR: EnTranslations = {
     "nameplate": {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
+    },
+    "discord": {
+      "title": "Discord",
+      "panelTitle": "World of ClaudeCraft",
+      "open": "Discord",
+      "close": "Kapat",
+      "keybind": "Discord Paneli",
+      "disabled": "Discord entegrasyonu şu anda kullanılamıyor.",
+      "tiers": {
+        "none": "Rütbesiz",
+        "initiate": "Çömez",
+        "squire": "Silahtar",
+        "footman": "Piyade",
+        "knight": "Şövalye",
+        "champion": "Şampiyon",
+        "warlord": "Savaş Lordu",
+        "legend": "Efsane",
+        "mythic": "Mitik"
+      },
+      "loginCta": "Discord ile devam et",
+      "orEmail": "veya e-posta kullan",
+      "cta": {
+        "title": "Puan kazanmak ve rütbe atlamak için Discord hesabını bağla",
+        "stats": "{online} çevrimiçi · sunucuda {total} üye",
+        "statsLoading": "Topluluğa katıl ve ödüller kazan",
+        "button": "Tek tıkla bağla",
+        "dismiss": "Kapat"
+      },
+      "link": {
+        "cta": "Discord'u bağla",
+        "relink": "Discord'u yeniden bağla",
+        "connecting": "Discord açılıyor...",
+        "benefits": "Oyun ve topluluk etkinliğinden puan kazanmak ve statü kademelerini tırmanmak için Discord hesabını bağla.",
+        "error": "Discord bağlanamadı. Lütfen tekrar dene.",
+        "success": "Discord bağlandı."
+      },
+      "choice": {
+        "title": "Discord ile devam et",
+        "intro": "Yeni bir hesap oluştur ya da Discord'unu mevcut bir hesabına bağla.",
+        "greeting": "Hoş geldin, {name}!",
+        "createCta": "Yeni hesap oluştur",
+        "haveAccount": "Zaten bir hesabın var mı?",
+        "linkCta": "Mevcut bir hesabı bağla",
+        "linkSubmit": "Hesabı bağla",
+        "error": "Devam edilemedi. Lütfen tekrar dene.",
+        "expired": "Bu Discord girişinin süresi doldu. Lütfen Discord ile tekrar giriş yap."
+      },
+      "keep": {
+        "title": "Parola belirle",
+        "body": "Hesabın Discord ile giriş yapıyor. Bağlantıyı kaldırdıktan sonra kullanıcı adınla giriş yapmaya devam edebilmen için bir parola belirle.",
+        "usernameLabel": "Kullanıcı adın",
+        "confirmLabel": "Parolayı onayla",
+        "submit": "Parolayı belirle ve bağlantıyı kaldır",
+        "cancel": "İptal",
+        "mismatch": "Parolalar eşleşmiyor.",
+        "tooShort": "Parola en az 6 karakter olmalıdır."
+      },
+      "linkedAs": "{name} olarak bağlı",
+      "linkedTitle": "Discord: {name}",
+      "viewCharacter": "{name} görüntüle",
+      "viewProfile": "Bu karakterin herkese açık profilini aç",
+      "unlink": "Bağlantıyı kaldır",
+      "visit": "Discord'u ziyaret et",
+      "unlinkConfirm": "Discord hesabının bu oyun hesabıyla bağlantısı kaldırılsın mı?",
+      "statusLabel": "Statü",
+      "rank": "Rütbe",
+      "points": "Puan",
+      "lifetime": "Tüm zamanlar",
+      "toNext": "Sonraki rütbeye {points}",
+      "maxRank": "En yüksek rütbeye ulaşıldı",
+      "tiersTitle": "Statü Kademeleri",
+      "tierLocked": "Kilitli",
+      "tierCurrent": "Mevcut",
+      "earnTitle": "Nasıl puan kazanılır",
+      "earnBody": "Oyunda geçirdiğin süreden ve Discord'da aktif kalmaktan puan kazan. Puanlar statü kademeni yükseltir.",
+      "memberSince": "Üyelik tarihi",
+      "memberSinceDays": "Discord'da {days}g",
+      "roleTag": {
+        "levyst": "Levy St",
+        "devs": "Geliştirici",
+        "mods": "Moderatör",
+        "artists": "Sanatçı"
+      },
+      "guildMember": "Onaylı üye",
+      "notMember": "Henüz sunucuda değil",
+      "joinCta": "Discord'a katıl",
+      "online": "{count} çevrimiçi",
+      "community": "Topluluk",
+      "rewards": "Ödüller",
+      "voice": {
+        "title": "Ses",
+        "channel": "{channel} kanalında",
+        "empty": "Şu anda sesli kanalda kimse yok.",
+        "speaking": "Konuşuyor",
+        "muted": "Susturuldu",
+        "join": "Sese katıl",
+        "connect": "Sesli kanala bağlan"
+      },
+      "swag": {
+        "title": "Hediyelikler",
+        "claim": "Talep et",
+        "claimed": "Talep edildi",
+        "locked": "Kilitli",
+        "free": "Ücretsiz",
+        "cost": "{points} pn",
+        "needTier": "Bunu talep etmek için daha yüksek bir rütbeye ulaş.",
+        "needPoints": "Yeterli puan yok.",
+        "claimError": "Bu ödül talep edilemedi. Lütfen tekrar dene.",
+        "claimedToast": "Talep edildi: {name}",
+        "titleDiscordian": "Unvan: Discordlu",
+        "titleSquire": "Unvan: Diyarın Silahtarı",
+        "chromaBlurple": "Blurple Mech Renk Kaplaması",
+        "titleChampion": "Unvan: Claudemoon Şampiyonu",
+        "swagStickers": "Çıkartma Paketi (kargoyla)",
+        "swagTee": "Tişört (kargoyla)"
+      },
+      "relay": {
+        "tooFast": "Çok hızlı gönderiyorsun. Biraz bekle ve tekrar dene.",
+        "lfg": {
+          "label": "Grup Arıyorum",
+          "hint": "Bir zindan veya görev için oyuncu bul"
+        },
+        "wts": {
+          "label": "Satmak İstiyorum",
+          "hint": "Satılık bir eşya veya hizmet ilan et"
+        },
+        "wtb": {
+          "label": "Satın Almak İstiyorum",
+          "hint": "Almak istediğin bir eşya iste"
+        },
+        "recruit": {
+          "label": "Lonca Üye Alımı",
+          "hint": "Loncana oyuncu topla"
+        },
+        "event": {
+          "label": "Etkinlik / Akın",
+          "hint": "Bir akın, buluşma veya etkinlik duyur"
+        },
+        "help": {
+          "label": "Yardım Lazım",
+          "hint": "Topluluktan yardım iste"
+        }
+      }
     }
   },
   "guide": {
@@ -745,6 +899,7 @@ export const tr_TR: EnTranslations = {
       "world": "Dünya",
       "quests": "Görevler",
       "dungeons": "Zindanlar ve Akınlar",
+      "delves": "Mağara Seferleri",
       "reference": "Başvuru",
       "controls": "Denetimler",
       "combat": "Savaş",
@@ -799,6 +954,7 @@ export const tr_TR: EnTranslations = {
       "typeZone": "Bölge",
       "typeCreature": "Yaratıklar",
       "typeDungeon": "Zindan",
+      "typeDelve": "Mağara Seferi",
       "typeTerm": "Terim"
     },
     "home": {
@@ -886,7 +1042,7 @@ export const tr_TR: EnTranslations = {
       "questsTitle": "Görevler",
       "questsBody": "Başının üzerinde işaret olan kişilerden görev al, amacı tamamla ve deneyim, altın ve teçhizat için geri teslim et. Ekrandaki takipçi, hedeflerini göz önünde tutar.",
       "deathTitle": "Ölüm son değildir",
-      "deathBody": "Düşersen, ruhunu en yakın mezarlıkta serbest bırakır ve bedenine geri koşarsın. Hiçbir deneyim kaybı olmaz.",
+      "deathBody": "Düşersen, ruhunu serbest bırakır ve en yakın mezarlıkta, tam canla dirilirsin; sonra bulunduğun yere geri dönersin. Hiçbir deneyim kaybı olmaz.",
       "groupingTitle": "Birlikte oynamak",
       "groupingBody": "Görev hakkını paylaşmak ve zindanlara girişmek için başkalarını gruba davet et. Dünyanın çoğu tek başına aşılabilir, yani gruplaşmak bir zorunluluk değil, bir tercihtir.",
       "onlineTitle": "Çevrim içi ya da çevrim dışı",
@@ -900,21 +1056,26 @@ export const tr_TR: EnTranslations = {
       "actionHeader": "Aksiyon",
       "groupMovement": "Hareket",
       "groupCombat": "Hedefleme ve savaş",
-      "groupInterface": "Pencereler",
+      "groupInterface": "Arayüz",
       "groupCamera": "Kamera",
       "talents": "Yetenekler",
       "arena": "Arena",
       "leaderboard": "Lider Tablosu",
-      "abilities": "Yetenekleri kullan",
+      "abilities": "Eylem çubuğu yeteneklerini kullan (rakam sırası; ikinci bir çubuk sayı tuş takımında yer alır)",
+      "targetFriendly": "En yakın dostu hedefle",
+      "cycleFriendly": "Dost hedefler arasında geç",
+      "gameMenu": "Oyun menüsünü ve seçenekleri aç",
       "mobileHeading": "Mobilde",
-      "mobileBody": "Dokunmatik kontroller telefonlarda ve tabletlerde otomatik olarak belirir: solda bir hareket çubuğu, etrafa bakmak için sağda herhangi bir yere sürükleme ve yetenekleriniz ile menüleriniz için ekran üstü düğmeler."
+      "mobileBody": "Dokunmatik kontroller telefonlarda ve tabletlerde otomatik olarak belirir: solda bir hareket çubuğu, etrafa bakmak için sağda herhangi bir yere sürükleme ve yetenekleriniz ile menüleriniz için ekran üstü düğmeler.",
+      "controllerHeading": "Oyun kumandasıyla",
+      "controllerBody": "Oyun kumandaları da çalışır ve kumanda desteği varsayılan olarak açıktır. Sol çubuk hareket ettirir, sağ çubuk kamerayı yöneltir, yüz ve omuz düğmeleri ise yeteneklerinizi, zıplamayı ve etkileşimi karşılar. Menüler için ekran üstü bir işaretçi çağırmak üzere herhangi bir pencere açın. Düğmeleri yeniden atayabilir ve çubuk ölü bölgesini, kamera hızını, titreşimi ve ters bakışı seçeneklerdeki kumanda ayarlarından düzenleyebilirsiniz."
     },
     "combat": {
       "intro": "Dövüş, tanıdık klasik MMO kurallarını izler. İyi oynamak için bunların hiçbirini incelemen gerekmez, bu yalnızca dövüşlerin nasıl işlediğinin şeklidir.",
       "hitTitle": "Her darbe isabet etmez",
-      "hitBody": "Saldırılar ıskalayabilir ya da savuşturulabilir, karşılanabilir ve bloklanabilir, ve düşmanınki de öyle. Kendi seviyene yakın dövüşmek ve teçhizatını güncel tutmak, darbelerini isabet ettiren şeydir.",
-      "mitigationTitle": "Zırh ve teçhizat seni ayakta tutar",
-      "mitigationBody": "Zırh fiziksel darbeleri yumuşatır ve doğru teçhizat büyüyü köreltir, bu yüzden geliştirmeler ana direnç kaynağındır. Daha ağır zırh sınıfları daha fazlasını savuşturur, ama hiçbir şey seni dokunulmaz kılmaz.",
+      "hitBody": "Saldırılar ıskalayabilir ya da savuşturulabilir, düşmanınki de öyle; büyülere ise büsbütün direnilebilir. Darbelerini isabet ettiren şey, kendi seviyene yakın dövüşmektir; seviye farkı ne kadar büyükse, o kadar çok boşa savurursun.",
+      "mitigationTitle": "Zırh ve can seni ayakta tutar",
+      "mitigationBody": "Zırh fiziksel darbeleri yumuşatır, bu yüzden daha iyi zırh, yakın dövüşteki ana dayanıklılık kaynağındır. Büyü başka bir mesele: büyülere zırhla değil, daha derin bir can havuzu ve birine büsbütün direnme şansıyla göğüs gerersin. Daha ağır zırh sınıfları daha fazlasını savuşturur, ama hiçbir şey seni dokunulmaz kılmaz.",
       "resourcesTitle": "Her sınıfın kendi ritmi vardır",
       "resourcesBody": "Savaşçılar dövüşün göbeğinde Öfke biriktirir, hırsızlar istikrarlı geri dönen Enerji harcar ve büyücüler bir Mana havuzunu yönetir. Kaynağını öğrenmek, sınıfını iyi oynamanın yarısıdır.",
       "growTitle": "Her seviyede daha güçlenirsin",
@@ -923,7 +1084,7 @@ export const tr_TR: EnTranslations = {
       "effectsBody": "Birçok yetenek, süren bir etki uygular. Faydalı olanlar (güçlendirmeler) istatistiklerini yükseltir, seni kalkanlar ya da seni azar azar iyileştirir; zararlı olanlar (zayıflatmalar) zamanla hasarla canını tüketir ya da seni zayıflatır. Üzerinde ne olduğunu ve ne kadar süreceğini görmek için aksiyon çubuğunun yanındaki küçük simgeleri izle.",
       "ccBody": "Kalabalık kontrolü, bir hedefin yapabileceklerini sınırlayan özel bir tür zayıflatmadır: sersemletmeler, kökler ve yavaşlatmalar, büyü okumayı durduran susturmalar, silahsızlandırmalar, korkutmalar ve bir düşmanı bir anlığına zararsız kılan dönüştürme. Bunlardan bazıları, kökler, korkular ve dönüştürme gibi, çok hızlı yeniden uygulandığında tutuşlarını kaybeder, bu yüzden sonsuza dek zincirlenemezler.",
       "deathTitle": "Düştüğünde",
-      "deathBody": "Canın sıfıra ulaşırsa devrilirsin. Kısa bir bekleyişin ardından dirilir ve kaldığın yerden devam edersin, yani bir ölüm sana biraz zamana mal olur, ilerlemene değil. Dövüşler arasında oturup yemek ye ve iç, böylece bir sonrakine tam güçle başlarsın."
+      "deathBody": "Canın sıfıra ulaşırsa devrilirsin. Ruhunu serbest bırakarak en yakın mezarlıkta tam canla diril, sonra geri dön; böylece bir ölüm sana biraz zamana mal olur, ilerlemene değil. Dövüşler arasında oturup yemek ye ve iç, böylece bir sonrakine tam güçle başlarsın."
     },
     "glossary": {
       "intro": "Bu rehber boyunca ve sohbette kullanılan terimler için hızlı bir başvuru.",
@@ -934,7 +1095,7 @@ export const tr_TR: EnTranslations = {
       "gcdTerm": "Genel bekleme süresi",
       "gcdDef": "Çoğu yeteneği kullandıktan sonraki kısa, ortak duraklama; böylece her şeyi aynı anda ateşleyemezsiniz.",
       "dpsTerm": "DPS",
-      "dpsDef": "Saniye başına hasar; bir şeyin ne kadar hızlı hasar verdiğinin kabaca bir ölçüsü.",
+      "dpsDef": "Saniye başına hasar; bir şeyin ne kadar hızlı hasar verdiğinin kabaca bir ölçüsü. Aynı zamanda hasar veren rolün kendisi için de kullanılır, bir tank, bir şifacı ve üç DPS örneğindeki gibi.",
       "buffTerm": "Takviye",
       "buffDef": "Üzerinizdeki ya da bir müttefikinizdeki yardımcı bir etki; bir süreliğine bir niteliği yükselten bir kutsama gibi.",
       "debuffTerm": "Zayıflatma",
@@ -960,7 +1121,13 @@ export const tr_TR: EnTranslations = {
       "pullTerm": "Çekme (Pull)",
       "pullDef": "Bir düşmanı ya da grubu savaşa çekmek; genellikle bilerek ve birer birer.",
       "instanceTerm": "Kopya alan",
-      "instanceDef": "Bir zindanın ya da akının yalnızca senin grubun için oluşturulmuş özel bir kopyası."
+      "instanceDef": "Bir zindanın ya da akının yalnızca senin grubun için oluşturulmuş özel bir kopyası.",
+      "raidTerm": "Akın",
+      "raidDef": "En çetin son oyun karşılaşması için kurulan, burada en fazla on oyuncudan oluşan daha büyük bir grup; bir grup dolduğunda birine dönüşür.",
+      "delveTerm": "Mağara seferi",
+      "delveDef": "Bir ya da iki oyuncu için, yanınızda bir yoldaşla bir bekçinin panosundan yürütülen, kısa, tekrar oynanabilen, kopya alanlı bir iniş.",
+      "augmentTerm": "Güçlendirme",
+      "augmentDef": "İkiye iki bir Fiesta arena maçı sırasında seçtiğiniz, kurgunuzu yalnızca o maç için yeniden şekillendiren geçici bir güçlendirme."
     },
     "faqPage": {
       "intro": "Yeni oyuncuların en sık sorduğu sorular.",
@@ -973,7 +1140,7 @@ export const tr_TR: EnTranslations = {
       "q4": "Çevrimdışı ya da tek başıma oynayabilir miyim?",
       "a4": "Evet. Anında bir tek oyunculu çevrimdışı mod vardır ve çevrimiçi dünya, zindanlar ile akın dışında tamamen tek başına oynanabilir.",
       "q5": "Kaç sınıf var?",
-      "a5": "Dokuz; klasik tank, şifacı ve hasar rollerini kapsar, her biri kendi kaynağına ve imza yeteneklerine sahiptir.",
+      "a5": "Dokuz; klasik tank, şifacı ve hasar rollerini kapsar, her biri bir kaynak sistemine (öfke, mana ya da enerji) ve kendi imza yeteneklerine sahiptir.",
       "q6": "Seviye sınırı nedir?",
       "a6": "Görevler, zindanlar ve keşiflerle dolu, birbirine bağlı üç bölgede ulaşılan seviye {cap}.",
       "q7": "Karakterim kaydedilecek mi?",
@@ -1136,7 +1303,7 @@ export const tr_TR: EnTranslations = {
       },
       "spider": {
         "name": "Örümcekler",
-        "desc": "Karanlık, çapraşık yerlerde yuvalanan ağ örücüler ve zehirli pusucular."
+        "desc": "Karanlık, çapraşık yerlerde yuvalanan ağ örücüler ve zehirli pusucular. Avcılar onları, tıpkı yabani hayvanlar gibi evcilleştirebilir."
       },
       "murloc": {
         "name": "Murloclar",
@@ -1152,7 +1319,7 @@ export const tr_TR: EnTranslations = {
       },
       "troll": {
         "name": "Troller",
-        "desc": "Bataklıkta ve yüksek diyarlarda inleyen, hızlı iyileşen iri kıyım vahşiler."
+        "desc": "Bataklığın sazlıklarında inini kuran iri kıyım vahşiler."
       },
       "ogre": {
         "name": "Devler",
@@ -1165,6 +1332,10 @@ export const tr_TR: EnTranslations = {
       "elemental": {
         "name": "Elementaller",
         "desc": "Elementlerin güçlü estiği vahşi yerlere bağlı, canlı fırtına ve taş."
+      },
+      "dragonkin": {
+        "name": "Ejder Soyu",
+        "desc": "Eski derinliklerin pullu, yılansı yaratıkları. Nadir, mağrur ve göründüklerinden çok daha güçlü."
       }
     },
     "worldPage": {
@@ -1184,11 +1355,11 @@ export const tr_TR: EnTranslations = {
       "marshGreeter": "Muhafız Fenwick, Fenbridge",
       "peaksGreeting": "İki yüz yıldır bu sur dayandı. Benim nöbetimde yıkılmayacak, ama inliyor.",
       "peaksGreeter": "Yüzbaşı Thessaly, Highwatch",
-      "valePlaceNotes": "Eastbrook ilk ana üssünüzdür. Kurt Geçidi ve Yaban Domuzu Çayırı yumuşak av sahalarıdır; Ayna Gölü balık tutulacak sakin sulardır; Ağorman ve Bakır Kazısı örümcekleri ve cevhere aç kazıcıları saklar; bir Haydut Kampı ve Düşmüş Şapel daha çetin işler barındırır; Parlakorman Açıklığı kuzeydeki sakin bir yaban hayatı korusudur.",
+      "valePlaceNotes": "Eastbrook ilk ana üssünüzdür. Wolf Run ve Boar Meadow yumuşak av sahalarıdır; Mirror Lake balık tutulacak sakin sulardır; Webwood ve Copper Dig örümcekleri ve cevhere aç kazıcıları saklar; bir Bandit Camp ve Fallen Chapel daha çetin işler barındırır; Reliquary Hill, diyarın ilk delvesi olan Collapsed Reliquary'ye iner; ve Brightwood Glade kuzeydeki sakin, güneşli bir korudur.",
       "marshPlaceNotes": "Fenbridge tek kuru yolu korur. Sinsi Sazlıklar ve Derinbataklık Sığlıkları bataklık canavarları ve murloclarla kaynar; Dul Çalılığı sımsıkı ağlarla örülüdür; Boğulmuş Şapel ve Trol Höyükleri daha eski tehlikeleri barındırır; Mezarçağıran Kampı tarikatın siper kazdığı yerdir ve Batık Kale bataklığın örneklenmiş kalbidir.",
       "peaksPlaceNotes": "Highwatch suru tutar. Sinsi Sırt ve Derinkaya Oyukları sırt kedileri ve kobolderindir; Dev Etekleri ve Drogmar Savaş Kampı kiralık zorbalarındır; Fırtınakaya elementallerle çıtırdar ve altında Pırıltıgöl ışıldar; Solucanküt Çadırları ve Hortlak Tarlaları tarikatın yüksek mevzisini kuşatır, zirvesinde Mezarejderi Mabedi yer alır.",
       "gladeTitle": "Sakin bir köşe: Parlakorman Açıklığı",
-      "gladeBody": "Vadi'deki her hikaye ölülerle ilgili değildir. Kuzeyde, Parlakorman Açıklığı adlı güneşli bir koru, sessiz patikaları, otlayan geyikleri ve dalların altındaki ürkek canavarlarıyla kendi daha yumuşak ritmini korur. Takip ettiğiniz izin yumuşak bir karşı sesidir ve yol başıboş dolaşmanıza imkan verdiğinde görmeye değer."
+      "gladeBody": "Vale'deki her hikaye ölülerle ilgili değildir. Kuzeyde, Brightwood Glade adlı güneşli bir koru, dalların altındaki sessiz patikaları ve benek benek ışığıyla kendi daha yumuşak ritmini korur. Takip ettiğiniz izin yumuşak bir karşı sesidir ve yol başıboş dolaşmanıza imkan verdiğinde görmeye değer."
     },
     "questsPage": {
       "heading": "Görevler",
@@ -1196,14 +1367,14 @@ export const tr_TR: EnTranslations = {
       "acceptTitle": "Bulmak ve kabul etmek",
       "acceptBody": "Başının üzerinde bir işaret olan kişilerin sana işi vardır. Bir görev kabul etmek için onlarla konuş. İlk görevin, Doğudere'deki Mareşal Redbrook'tan alacağın Kapıdaki Kurtlar'dır.",
       "objectivesTitle": "Hedefler",
-      "objectivesBody": "Belirli düşmanları öldür, eşyalar topla ya da dünyadaki bir şeyle etkileşime gir. Ekrandaki takipçi sen ilerledikçe ilerlemeni sayar.",
+      "objectivesBody": "Belirli düşmanları öldür, eşyalar topla ya da dünyadaki bir şeyle etkileşime gir. Ekrandaki takipçi sen ilerledikçe ilerlemeni sayar. Fikrini değiştirirsen, bir görevi görev günlüğünden bırakabilir ve daha sonra onu veren kişiden tekrar alabilirsin.",
       "turninTitle": "Teslim etmek",
-      "turninBody": "Görev verene geri dön, harita sana nereyi göstereceğini söyler; tecrübe, para ve çoğu zaman sınıfına uygun seçilmiş bir teçhizat parçası için.",
+      "turninBody": "Tamamlanmış bir görevi teslim işaretçisine götür, harita sana nereyi göstereceğini söyler; tecrübe, para ve çoğu zaman sınıfına uygun seçilmiş bir teçhizat parçası için. Bu genellikle görevi sana veren kişidir, ama bazı görevler seni başka birine yönlendirir.",
       "partyTitle": "Grupla görev yapmak",
-      "partyBody": "Yakındaki grup üyeleri öldürme ve hedef katkısını paylaşır, bu yüzden birlikte görev yapmak hep daha hızlıdır, asla daha yavaş değil.",
+      "partyBody": "Yakındaki grup üyeleri öldürme ve hedef katkısını paylaşır, bu yüzden birlikte görev yapmak hep daha hızlıdır, asla daha yavaş değil. Bir görevi grubunla da paylaşabilirsin: /share komutuyla onu tıklanabilir bir bağlantı olarak sohbete gönder; yakındaki uygun her üye aynı görevi tek tıkla alabilir.",
       "storyTitle": "Hepsinin içinden geçen bir iplik",
       "storyBody": "Doğudere'deki ilk küçük işlerinden itibaren, ölülerde bir terslik var. Bir tarikat iş başında ve iz her bölgeden geçerek kuzeye götürür. Ardında kimin durduğunu öğrenmek için onu takip et.",
-      "soloNote": "Ana hikaye tamamen tek başına yapılabilir; yalnızca son bölümleri bir grup gerektirir.",
+      "soloNote": "Ana hikaye, her bölümün finaline kadar tamamen tek başına yapılabilir; o final ise beş oyunculu bir zindandır.",
       "typesTitle": "Karşılaşacağın görev türleri",
       "typesBody": "Çoğu görev birkaç tanıdık biçimden biridir. Ekrandaki takipçi her birinin tam olarak ne istediğini açıkça yazar, böylece asla tahmin yürütmek zorunda kalmazsın.",
       "typeSlayTitle": "Öldür",
@@ -1212,10 +1383,10 @@ export const tr_TR: EnTranslations = {
       "typeGatherBody": "Dünyadan ya da düşmanların düşürdüklerinden eşyalar topla: otlar, cevher, kayıp mektuplar, bir tarikatın iç karartıcı bileşenleri. Bazı parçalar yalnızca belirli bir düşmandan düşer, bu yüzden av ile ganimet bir arada gider.",
       "typeInteractTitle": "Etkileşim",
       "typeInteractBody": "Dünyada sabit duran bir şeyi kullan, arındır ya da oku: kirletilmiş bir mezar, kıyı kayasına oyulmuş bir uyarı, mühürlü bir mezar kapısı. İşaretin yanına yürü ve üzerinde harekete geç.",
-      "typeMusterTitle": "Refakat ve toplama",
-      "typeMusterBody": "Dost bir yüzü bir yerden diğerine güvenle ulaştır ya da kuzeye bir hamleden önce bir kasabanın savunucularını topla. Bunlar seni hikayesinde bulunduğun insanlarla birlikte hareket halinde tutar.",
+      "typeMusterTitle": "Savunmayı seferber et",
+      "typeMusterBody": "Bazı görevler, kuzeye bir hamleden önce bir kasabayı toparlamanı ister: kapılardaki tehdidi azalt ve savunucuların ihtiyaç duyduğu şeyleri topla. Bunlar, hikayesinde bulunduğun insanların hizmetinde öldürme ve toplama hedefleridir ve seni onlarla birlikte hareket halinde tutar.",
       "typeGroupTitle": "Grup finalleri",
-      "typeGroupBody": "Ana hikayenin her bölümü bir zindan kapısında sona erer. Giriş kısmı tek başına yapılabilir, ama bir bölümün kötü adamına vurulacak son darbe beş kişilik bir grup içindir (ve en sonuncusu, on kişi için).",
+      "typeGroupBody": "Ana hikayenin her bölümü bir zindan kapısında sona erer. Giriş kısmı tek başına yapılabilir, ama bir bölümün kötü adamına vurulacak son darbe beş kişilik bir grup içindir.",
       "sagaTitle": "İzi kuzeye doğru takip et",
       "sagaBody": "Ana hikaye tek bir uzun kovalamacadır. Bir ölüm tarikatı diyarın mezarları üzerinde çalışıyor ve kapattığın her bölüm seni yolda bir bölge daha yukarı işaret eder. Komployla bir anda baştan başa savaşmazsın; bir ipliği çekersin, o da seni onu tutan bir sonraki ele götürür.",
       "sagaValeTitle": "Vadi: bir mühürdeki isim",
@@ -1223,12 +1394,14 @@ export const tr_TR: EnTranslations = {
       "sagaMarshTitle": "Bataklık: ruhlardan bir öşür",
       "sagaMarshBody": "Mirefen'de boğulmalar tesadüf değil. Biri bataklığı bir öşür kutusu gibi dolduruyor, suyun aldığı her yolcudan itaatkâr ölüler diriltiyor. Emirleri zincirde yukarı, boğulmuş kaledeki bir Sis Çağırıcı'ya kadar takip et; onun son sözleri zirvelerin altında kıpırdanan, daha da kadim bir şeyin adını verir.",
       "sagaPeaksTitle": "Zirveler: öşür ne içindi",
-      "sagaPeaksBody": "Dikenzirve'de bütün düzen açığa çıkar. Vadi'den beri çalınan her ruh, dağın altında mühürlü kadim bir varlığı uyandırmak için dökülen bir öşürdü. Bir şapel avlusunda başlayan iz burada, açmak için on kişi gereken bir kapıda son bulur. Arkasında kimin beklediğini öğrenmeyi sana bırakacağız.",
+      "sagaPeaksBody": "Thornpeak'te bütün düzen açığa çıkar. Vale'den beri çalınan her ruh, dağın kalbindeki kültün kasvetli işine dökülen bir öşürdü. Bir şapel avlusunda başlayan iz burada, tüm bunların ardındaki eli karşılamak için beş oyunculu bir inişte son bulur. En dipte kimin beklediğini öğrenmeyi sana bırakacağız.",
       "sideTitle": "Ana yoldan ayrılan iplikler",
       "sideWardenTitle": "İsmini kazanmak",
-      "sideWardenBody": "Hikayenin yanı sıra, Vadi'nin ve bataklığın muhafızları sürekli bir ödül merdiveni dağıtır. Senden önceki her muhafızın yerini kazandığı gibi, düşman düşman üstüne tırmanarak ilerle. Bu dürüst bir seviye atlama ve her bölgenin en azılı baş belalarının bir turudur.",
+      "sideWardenBody": "Hikayenin yanı sıra, Vale'nin ve bataklığın muhafızları ve bekçileri sürekli bir ödül merdiveni dağıtır. Senden önceki her ödül avcısının yerini kazandığı gibi, düşman düşman üstüne tırmanarak ilerle. Bu dürüst bir seviye atlama ve her bölgenin en azılı baş belalarının bir turudur.",
       "sideCryptTitle": "Unutulmuş kral",
-      "sideCryptBody": "Zirvelerin yükseğinde daha sessiz bir gizem uzanır: hiçbir kaydın hatırlamadığı bir taçla işaretlenmiş eski mezarlar. Ölüleri oku, korudukları şeyi topla ve kapalı kalması gereken bir mezarın mührünü aç. Bu, tam bir akın için ikinci bir son oyun sınavının yolunu açan bir dedektif izidir."
+      "sideCryptBody": "Zirvelerin yükseğinde daha sessiz bir gizem uzanır: hiçbir kaydın hatırlamadığı bir taçla işaretlenmiş eski mezarlar. Ölüleri oku, korudukları şeyi topla ve kapalı kalması gereken bir mezarın mührünü aç. Bu, diyarın on oyunculu son oyun akınına giden yolu açan bir dedektif izidir.",
+      "sideTempleTitle": "Boğulmuş tapınak",
+      "sideTempleBody": "Zirvelerdeki yüksek bir dağ gölünün üzerindeki solgun ışıktan bir geçit, boğulmuş bir tarikatın hâlâ şarkı söylediği batık bir mabede açılır. Kısa zinciri ana hikâyeden ayrı durur; kıyıya tırmanan, kayalara kazınmış uyarıları okuyan ve onların ne için olduğunu görmek için aşağı inen herkes için kendi içinde bir gizem."
     },
     "lore": {
       "figuresTitle": "Tanışacağın yüzler",
@@ -1261,7 +1434,35 @@ export const tr_TR: EnTranslations = {
       "templeLoreTitle": "Boğulmuş Tapınak, biraz daha derinde",
       "templeLoreBody": "Tapınağın, başka yerlerde peşine düştüğünüz tarikattan daha eski, kendi efsanesi vardır. Ay ışığını içip boğulmuşları geri veren bir gölet olan Işıltıgöl'ün kıyısında, yalnız bir gözcü solgun ışıktan bir geçidi korur. Yüzeyin altında, soğuk taştan bir merdiven ona doğru iner. Oraya batan halk bir kazayla boğulmadı: ibadet ederek suya gömülen ve şarkı söylemeyi hiç bırakmayan Solgun Koro'ydu onlar. Eski muhafızlar, sular onları almadan önce kayalara tek bir uyarı kazıdılar, Boğulmuş Ay dedikleri bir şeye bir dua; daha sağlam bir el de altına iki kelime ekledi: yalnızca uyuyor.",
       "cryptLeadTitle": "Ölülerin kapalı tutması gereken bir kapı",
-      "cryptLeadBody": "Zirvelerin yükseklerinde, ana savaştan uzakta, daha soğuk bir gizem yatar. Eski mezarlar hiçbir kaydın hatırlamadığı bir tacı taşır ve onları koruyan ölüler bir zamanlar unutulmuş bir krala hizmet etmiştir. Taşlarını okuyun, sakladıkları kilit taşlarını toplayın; böylece üç sadık ruhun kapalı tutmak için canını verdiği bir mezarın mührünü açabilir, ipuçlarını sonuna kadar takip edenler için ikinci bir on oyunculu sınavı başlatabilirsiniz."
+      "cryptLeadBody": "Zirvelerin yükseklerinde, ana savaştan uzakta, daha soğuk bir gizem yatar. Eski mezarlar hiçbir kaydın hatırlamadığı bir tacı taşır ve onları koruyan ölüler bir zamanlar unutulmuş bir krala hizmet etmiştir. Taşlarını okuyun, sakladıkları kilit taşlarını toplayın; böylece üç sadık ruhun kapalı tutmak için canını verdiği bir mezarın mührünü açabilirsiniz. Bu, ipuçlarını sonuna kadar takip edenler için diyarı on oyunculu akınına açan isteğe bağlı sınavdır."
+    },
+    "delvesPage": {
+      "heading": "Mağara Seferleri",
+      "intro": "Mağara seferleri, bir ya da iki kişilik, tekrar tekrar oynanabilen kısa inişlerdir; tek başına indiğinizde her zaman yanınızda sadık bir yoldaş bulunur. Panoyu bulun, bir sefer seçin ve ganimetle birlikte yukarı tırmanın.",
+      "fromLevel": "Seviye {n}'den itibaren",
+      "partyLabel": "Bir ya da iki kişilik",
+      "keeperLabel": "Bekçi",
+      "keeperFmt": "{name}, {title}",
+      "companionLabel": "Yoldaş",
+      "companionFmt": "{name}, {role}",
+      "tiersLabel": "Zorluk seviyeleri",
+      "affixesLabel": "Olası değiştiriciler",
+      "whatHeading": "Mağara seferi nedir",
+      "whatBody": "Bir mağara seferi, yalnızca sizin ve en fazla bir müttefikiniz için oluşturulmuş küçük, kopya alanlı bir zindandır; rahatsız edilemeyeceğiniz özel bir kopya. Onu, dünyada bir mağara seferi bekçisinin tuttuğu bir panodan başlatır, içeri dalar, bir avuç odanın içinden savaşarak iner ve tek bir muhafızda bitirirsiniz. Seferler hızlıdır ve tekrarlanmak için tasarlanmıştır, bu yüzden açık dünya kuruduğunda bir mağara seferi güvenilir bir ilerleme parçasıdır.",
+      "howHeading": "Bir sefer nasıl işler",
+      "howBody": "Panoyu açmak için bekçiyle konuşun, bir zorluk seçin ve aşağı inin. Her sefer birkaç kısa odayı art arda dizer ve muhafızında sona erer; ödülünüzü almak ve yüzeye dönmek için onu temizleyin. Varsa bir arkadaş getirin, yoksa yoldaşınıza güvenin.",
+      "companionHeading": "Yoldaşınız",
+      "companionBody": "Bir mağara seferi yanınıza bir yoldaş katar, böylece tek başına yapılan bir sefer asla umutsuz değildir. Yanınızda dövüşür ve seferler arasında ona yatırım yaptıkça istikrarla güçlenir, ta ki her inişte bir kez bir müttefiki uçurumun kenarından geri çekebilecek hale gelene dek. Sefer boyunca sizindir ve seferler arasında panonun başında bekler.",
+      "lockpickHeading": "Kilitler ve sakladıkları",
+      "lockpickBody": "Bazı kapılar ve zulalar mühürlüdür ve birini açmak bir istatistik sınavından çok küçük bir soğukkanlılık sınavıdır: kilidi temiz ve istikrarlı bir şekilde çözerseniz, aceleyle ve beceriksizce açılandan daha iyi bir ödül kazanırsınız. İsteğe bağlıdır, ama daha zengin olan, dikkatli sefercidir.",
+      "tiersHeading": "Zorluk",
+      "tiersBody": "Bir mağara seferi birden fazla zorluk sunar. Daha yüksek olanı düşmanları güçlendirir, bir sefer değiştiricisi katar ve karşılığında daha çoğunu öder. Ayrıca sizi içeri almadan önce birkaç seviye atlamış olmanızı ister.",
+      "affixesHeading": "Sefer değiştiricileri",
+      "affixesBody": "Daha zorlu seferler, inişin nasıl oynandığını değiştiren bir değiştirici atar: huzursuz ölülerden kötü havaya, çökmeye yakın tavandan tutun. Tehlikeyi ve ödülü birlikte yükseltirler. Mahzen temalı bir mağara seferi bunlardan herhangi birini atabilir:",
+      "marksHeading": "Mağara Nişanları",
+      "marksBody": "Mağara seferlerini temizlemek, paranızdan ayrı tutulan bir para birimi olan Mağara Nişanları kazandırır. Yoldaşınızı güçlendirmek ve başka hiçbir yerde bulamayacağınız teçhizatı edinmek için onları bekçide harcayın.",
+      "whereHeading": "Nerede bulunur",
+      "whereBody": "İlk mağara seferi olan Çökmüş Emanetlik, Doğudere Vadisi'nin başlangıç vadisindeki Emanetlik Tepesi'nde açılır. Panoyu orada Birader Halven tutar ve hazır olduğunuzda sizi aşağı gönderir."
     },
     "talentsPage": {
       "heading": "Yetenekler ve uzmanlıklar",
@@ -1270,8 +1471,9 @@ export const tr_TR: EnTranslations = {
       "whatBody": "Seviye atladıkça, yeteneklerinize ve özelliklerinize küçük, kalıcı geliştirmeler yapmak için yetenek puanları kazanırsınız. Bunlar bir sınıfın hissini şekillendirir; onu daha fazla hasara, daha sağlam savunmaya ya da daha güçlü iyileştirmeye yöneltir.",
       "howHeading": "Nasıl çalışırlar",
       "howBody": "Yetenekler 10. seviyede açılır ve seviye tavanına tırmandıkça puan kazanmaya devam edersiniz. Bunları sınıfınızın yetenek panelinde harcarsınız ve birden fazla düzeni kaydederek yapılarınız arasında geçiş yapabilirsiniz.",
+      "shareNote": "Tamamlanmış bir kurgu, paylaşılabilir kısa bir koda kopyalanıp bir arkadaşa verilebilir; o da onu yüklemek için doğrudan kendi yetenek paneline yapıştırır.",
       "resetTitle": "Hiçbir şey kalıcı değildir",
-      "resetNote": "Yeteneklerinizi istediğiniz an sıfırlayabilirsiniz, bu yüzden erken bir seçim asla bir tuzak değildir. Bir şeyler deneyin, neyi sevdiğinizi görün ve fikrinizi serbestçe değiştirin.",
+      "resetNote": "Yeteneklerinizi dövüş dışında olduğunuz her an sıfırlayabilirsiniz, bu yüzden erken bir seçim asla bir tuzak değildir. Bir şeyler deneyin, neyi sevdiğinizi görün ve fikrinizi serbestçe değiştirin.",
       "specsHeading": "Sınıfa göre uzmanlıklar",
       "specsBody": "Her sınıfın, her biri kendi rolüne ve kendine özgü bir odağına sahip birkaç uzmanlığı vardır. İşte hepsinin genel görünümü. Tam donanımı için bir sınıfı açın."
     },
@@ -1281,7 +1483,7 @@ export const tr_TR: EnTranslations = {
       "duelsHeading": "Düellolar",
       "duelsBody": "Karşılaştığın herhangi bir oyuncuyu dostane bir düelloya davet et. Gururdan başka kaybedilecek bir şey yok, bu yüzden bir eşleşmeyi öğrenmenin ya da dostça bir tartışmayı çözmenin en kolay yoludur.",
       "coliseumHeading": "Kül Kolezyumu",
-      "coliseumBody": "Kolezyum, diyarın arenasıdır; burada dereceli maçlarda diğer oyuncularla karşı karşıya gelirsin. Kazan ki konumun yükselsin, ve en güçlü dövüşçüler herkesin görmesi için lider tablosunda yukarı tırmanır.",
+      "coliseumBody": "Coliseum, diyarın arenasıdır; burada dereceli maçlarda diğer oyuncularla, bire bir ya da ikiye iki karşı karşıya gelirsin. Her kademe kendi sıralamasını tutar, bu yüzden bir galibiyet seni o merdivende, tüm diyarın görmesi için yukarı taşır.",
       "fiestaHeading": "İkiye iki Fiesta",
       "fiestaBody": "Fiesta, kısa raundlarda oynanan hızlı, ikiye iki bir moddur. Raundlar arasında güçlendirmeler seçersin; bunlar kitini anında yeniden şekillendiren hızlı takviyelerdir, böylece hiçbir maç tam olarak aynı oynanmaz.",
       "augmentsNote": "Güçlendirmeler ve takviyeler yalnızca maç boyunca sürer. Kalıcı güçle değil, eğlenceli, anında kurgularla ilgilidirler, yani kimse parayla zafer satın alamaz.",
@@ -1304,7 +1506,7 @@ export const tr_TR: EnTranslations = {
       "i1Title": "Yanlış bir sınıf seçemezsiniz",
       "i1Body": "Her sınıf kendi başının çaresine bakabilir ve seviye tavanına ulaşabilir. Başkasının en iyi dediğini değil, sevdiğiniz fantezi atmosferini seçin.",
       "i2Title": "Ölmenin size pek bir bedeli yok",
-      "i2Body": "Düştüğünüzde bir mezarlıkta ruhunuzu serbest bırakır ve bedeninize doğru koşarsınız. Hiç deneyim kaybetmezsiniz, bu yüzden risk almak ve öğrenmek güvenlidir.",
+      "i2Body": "Düştüğünüzde, ruhunuzu serbest bırakır ve en yakın mezarlıkta dirilirsiniz, sonra geri dönersiniz. Hiç deneyim kaybetmezsiniz, bu yüzden risk almak ve öğrenmek güvenlidir.",
       "i3Title": "Yetenekler bir tuzak değildir",
       "i3Body": "10. seviyede açılırlar ve istediğiniz zaman sıfırlanırlar, bu yüzden erken seçimleriniz asla kalıcı değildir.",
       "i4Title": "Görev izini takip edin",
@@ -1324,7 +1526,8 @@ export const tr_TR: EnTranslations = {
       "loading": "Model yükleniyor...",
       "error": "3B model yüklenemedi. Yukarıdaki görsel yine de bu {name} ögesini gösteriyor.",
       "dragHint": "Modeli döndürmek için sürükleyin. Odaklandığında sol ve sağ ok tuşlarını kullanın.",
-      "canvasLabel": "{name} ögesinin döndürülebilir 3B modeli"
+      "canvasLabel": "{name} ögesinin döndürülebilir 3B modeli",
+      "posterAlt": "{name}"
     },
     "models": {
       "title": "3B Model Görüntüleyici",
@@ -1340,7 +1543,7 @@ export const tr_TR: EnTranslations = {
     "gear": {
       "intro": "Teçhizat, karakterinizin giydiği donanım ve taşıdığınız eşyalardır. Daha iyi teçhizat, güçlenmenin en istikrarlı yoludur ve çoğunu sadece oynayarak edinirsiniz.",
       "slotsTitle": "Neler kuşanabilirsiniz",
-      "slotsBody": "Bir silah yuvanız ve yedi zırh yuvanız var. Kuşandığınız her parça karakterinize katkı sağlar ve yükseltmeler buldukça özgürce karıştırıp eşleştirebilirsiniz.",
+      "slotsBody": "Bir silah yuvanız ve yedi zırh yuvanız var. Her sınıf yalnızca belirli silahları kullanabilir ve kendi ağırlığına kadar zırh giyer (kumaş, deri ya da zincir), bu yüzden size uyan yükseltmeler, sınıfınız için yapılmış olanlardır. Bunun içinde, her yuvayı bulduğunuz en iyi parçayla doldurun.",
       "slotMainhand": "Silah",
       "slotHelmet": "Baş",
       "slotShoulder": "Omuzlar",
@@ -1360,29 +1563,35 @@ export const tr_TR: EnTranslations = {
       "qualityNote": "Daha yüksek kalite genellikle daha iyi nitelik demektir, ama kalite bir kural değil, bir ipucudur. Sınıfınıza ve seviyenize iyi uyan bir parça, daha gösterişli olanı geçebilir.",
       "upgradeTitle": "Teçhizatınızı güncel tutun",
       "upgradeBody": "Eski bir parçayı taze bir yükseltmeyle değiştirmek, geride bıraktığınız teçhizatla kusursuz oynamaktan size daha çok şey kazandırır. Daha iyi bir şey düştüğünde ya da bir görev onu sunduğunda, alın. İyi eşyalarınızı sonraya saklamayın.",
+      "itemLevelBody": "İki parçayı karşılaştırmanın hızlı bir yolunu istiyorsanız, seçeneklerden Eşya Seviyesini Göster ayarını açın. O zaman her silah ve zırh parçası bir eşya seviyesi gösterir; nereden geldiğine bağlı olarak kabaca ne kadar güçlü olduğunu belirten tek bir rakam. Böylece farklı yuvalar arasında bile hangi yükseltmenin daha ağır bastığını bir bakışta anlayabilirsiniz.",
       "sourcesTitle": "Teçhizat nereden gelir",
       "sourcesBody": "Erken dönem yükseltmelerinizin çoğu görev ödülleridir, bu yüzden grindlemek yerine görevleri bitirmek işe yarar. Düşmanlar yendiğinizde teçhizat düşürür, kasabadaki satıcılar sağlam temel parçalar satar ve oyuncu pazarı diğer maceracılardan alışveriş yapmanızı sağlar.",
+      "setsTitle": "Takımlar ve takım bonusları",
+      "setsBody": "En nadir zırhlar, birlikte görünmek ve dövüşmek üzere biçilmiş birkaç parçadan oluşan uyumlu ailelerle gelir. Bir aileden yeterince parçayı aynı anda giyin, takım uyanır ve her parçanın kendi istatistiklerinin üstüne bonuslar verir; giydiğiniz parça arttıkça da güçlenir. Bunlar, seviye tavanına yakın en çetin grup içeriğinden düşer, bu yüzden tam bir takımın peşine düşmek klasik bir son oyun hedefidir.",
       "consumablesTitle": "Sarf Malzemeleri",
       "consumablesIntro": "Bazı eşyalar hızlı bir fayda için bir kez kullanılır. Ucuz bir güvencedir, bu yüzden elinizin altında birkaç tane bulundurun.",
       "consumablesPotions": "İksir şişeleri, savaşın ortasında bile kullandığınız an sağlığı ya da manayı geri kazandırır, bu da bir çekim ters gittiğinde can kurtaran bir hamle olmalarını sağlar. Kısa bir ortak bekleme süresini paylaşırlar, bu yüzden onları kullanmak için iyi bir an planlayın.",
       "consumablesFood": "Yiyecek ve içecek, savaşlar arasında oturup dinlenirken sizi tazeler. Yemek sağlığı, içmek manayı geri kazandırır ve bu şekilde dinlenmek ücretsizdir. Çetin bir savaştan sonra yarı iyileşmiş hâlde bir sonrakine koşmak yerine birkaç saniye oturun.",
       "consumablesElixirs": "İksirler, macera sırasında geçici bir takviye sağlar; biraz daha ileri gitmek istediğinizde işe yarayan küçük bir avantaj.",
       "fishingTitle": "Balık Tutma",
-      "fishingBody": "Balık tutmak, ritimde sakin bir değişikliktir. Bir olta takın, açık suya atın ve takılanı çekin. Çoğunlukla yiyeceğe pişirebileceğiniz balıklar, birkaç bakıra satılacak ara sıra hurdalar ve arada bir değerli bir ender av yakalarsınız. Bulduğunuz şey, balık tuttuğunuz suya bağlıdır.",
-      "fishingFood": "Çektiğiniz balıklar çiğdir ve çiğ balık yiyecektir. Avınızı pişirin; oturup yediğinizde daha çok iyileştirir, daha iyi balıklar ise kuzeydeki daha soğuk, daha derin sulardan gelir. Göle atılan bir olta, savaşlar arasında çantanızı dolu tutmanın sessiz bir yoludur.",
+      "fishingBody": "Balık tutmak, ritimde sakin bir değişikliktir. Bir olta takın, açık suya atın ve takılanı çekin. Çoğunlukla yiyebileceğiniz birer yiyecek olan balıklar, birkaç bakıra satılacak ara sıra hurdalar ve arada bir değerli bir ender av yakalarsınız. Bulduğunuz şey, balık tuttuğunuz suya bağlıdır.",
+      "fishingFood": "Çektiğiniz balıklar birer yiyecektir: dinlenmek için otururken birini yiyin, can yeniler; daha doyurucu balıklar ise kuzeydeki daha soğuk, daha derin sulardan gelir. Göle atılan bir olta, savaşlar arasında çantanızı dolu tutmanın sessiz bir yoludur.",
       "fishingRare": "Arada bir oltanız akşam yemeğinden çok daha iyi bir şey yakalar: herhangi bir suda herhangi bir balıkçının şansına denk gelebileceği ışıltılı, değerli bir balık. Birini oltaya takın ve günlüğünüz avla aydınlansın. Gölde geçen tembel bir öğleden sonrayı insanlara anlatmaya değer kılan türden talihli bir çekiştir.",
       "cosmeticsTitle": "Görünümler ve kozmetikler",
       "cosmeticsBody": "Bazı ödüller yalnızca karakterinizin görünüşünü değiştirir, ne kadar güçlü olduğunuzu asla. Bu kozmetik görünümler, oyunu etkilemeden öne çıkmanızı sağlar, bu yüzden hangisini isterseniz onu giyin.",
       "cosmeticsRanks": "Kozmetikler kendi enderlik kademelerinde gelir ve daha enderleri peşine düşülecek eğlenceli şeylerdir. Daha yüksek bir kademe kazanmak, altındaki görünümlerin de kilidini açar.",
-      "cosmeticsSkins": "Toplanacak iki kozmetik hat vardır. Her sınıfın bir avuç alternatif görünümü vardır; yalnızca size ait, giyebileceğiniz görünümüne taze bir bakış. Onların yanında kromalar yer alır: bir görünümü, ağırbaşlı metallerden parlak imparatorluk renklerine kadar baştan boyayan, isimli iki tonlu renk şemaları.",
-      "cosmeticsCache": "Bunların birkaçı, açtığınızda üç kalite kademesinden birini atan ve ona uygun görünümü veren mühürlü bir ödül olan gizemli bir kozmetik sandıktan gelir. Tamamen görünüm içindir: içindeki hiçbir şey sizi güçlendirmez, yalnızca bakılması daha hoş kılar."
+      "cosmeticsSkins": "Toplanacak iki kozmetik hat vardır. Çoğu sınıfın birkaç alternatif görünümü vardır; sınıf görünümüne, yalnızca size ait giyebileceğiniz taze bir bakış. Onların yanında kromalar yer alır: bir görünümü, ağırbaşlı metallerden parlak imparatorluk renklerine kadar baştan boyayan, isimli iki tonlu renk şemaları.",
+      "cosmeticsCache": "Bunların birkaçı, açtığınızda üç kalite kademesinden birini atan ve ona uygun görünümü veren mühürlü bir ödül olan gizemli bir kozmetik sandıktan gelir. Tamamen görünüm içindir: içindeki hiçbir şey sizi güçlendirmez, yalnızca bakılması daha hoş kılar.",
+      "cosmeticsApply": "Aktif görünümünüzü karakter ekranınızdaki görünüş satırından belirleyin ve açtığınız her şey arasında özgürce geçiş yapın."
     },
     "economy": {
-      "intro": "Para tüm dünyayı çevirir: teçhizat ve erzak alır, tamirat ve görev masraflarınızı öder, oyuncular arasında el değiştirir. Bütün bunları sadece oynayarak öğrenirsiniz, bu yüzden bu sayfayı paranızın nereden gelip nereye gittiğinin bir haritası olarak düşünün.",
+      "intro": "Para tüm dünyayı çevirir: teçhizatınızı, erzakınızı ve yolculuk gereçlerinizi alır, oyuncular arasında el değiştirir. Bütün bunları sadece oynayarak öğrenirsiniz, bu yüzden bu sayfayı paranızın nereden gelip nereye gittiğinin bir haritası olarak düşünün.",
       "coinTitle": "Altın, gümüş ve bakır",
       "coinBody": "Para üç sikkeyle gelir. Yüz bakır bir gümüş, yüz gümüş bir altın eder; böylece keseniz önce en küçük sikkeden dolar. Bunu görev ödüllerinden, düşen düşmanları yağmalamaktan ve artık ihtiyacınız olmayanı satmaktan kazanırsınız.",
       "vendorsTitle": "Satıcılar ve sattıkları",
-      "vendorsBody": "Kasabalar ve karakollar, her biri kendi alanında uzman tüccarlarla doludur. Erzakçılar yiyecek ve içecek satar, silah ustaları ve zırhçılar teçhizat taşır, şifacı otçular reaktif satar ve bir levazımcı pratik yolculuk gereçleri bulundurur. Ne sattıklarını görmek için birinin yanına gidin.",
+      "vendorsBody": "Kasabalar ve karakollar, her biri kendi alanında uzman tüccarlarla doludur. Erzakçılar yiyecek ve içecek satar, silah ustaları ve zırhçılar teçhizat taşır ve bir levazımcı pratik yolculuk gereçleri bulundurur. Ne sattıklarını görmek için birinin yanına gidin.",
+      "marksTitle": "İkinci bir para birimi: Mağara Nişanları",
+      "marksBody": "Biriktirdiğiniz tek şey para değildir. Mağara seferleri, yalnızca mağara seferi bekçisinde yoldaş geliştirmelerine ve başka yerde bulamayacağınız teçhizata harcadığınız ayrı bir para birimi olan Mağara Nişanları öder. Asla paranıza karışmazlar.",
       "buyingTitle": "Alım ve satım",
       "buyingBody": "Penceresini açmak için bir tüccarın yanında durun. Paranız yeterse stoklarındaki her şeyi satın alabilir ve çantanızdakilerin çoğunu altın karşılığında satabilirsiniz. Yanlışlıkla bir şey satarsanız, satıcı son satışlarınızı tutar ve onları geri satın alabilirsiniz.",
       "junkTitle": "Hurdaları temizleme",
@@ -1390,7 +1599,7 @@ export const tr_TR: EnTranslations = {
       "tradeTitle": "Diğer oyuncularla takas",
       "tradeBody": "Yanınızda duran herkesle yüz yüze takas yapabilirsiniz. İkiniz de eşyaları ve altını ortak bir pencereye koyarsınız ve değiş tokuş yalnızca ikiniz de onayladığınızda gerçekleşir, böylece hiçbir taraf tuzağa düşmez. Bir arkadaşa ganimet vermenin ya da bir anlaşmayı bağlamanın basit yoludur.",
       "marketTitle": "Dünya Pazarı",
-      "marketBody": "Tüccar, asla karşılaşmayabileceğiniz insanlarla alışveriş yapabileceğiniz, oyuncuların yürüttüğü bir takas olan Dünya Pazarı'nı işletir. Açmak için Tüccar'la konuşun.",
+      "marketBody": "Tüccar, asla karşılaşmayabileceğiniz insanlarla alıp satabileceğiniz, oyuncuların yürüttüğü bir takas olan Dünya Pazarı'nı işletir. Açmak için Tüccar'la konuşun. Tüccar ayrıca orada kendi mallarından sürekli bir stok bulundurur, böylece başka hiçbir oyuncu ilan vermemişken bile satın alınacak her zaman bir şey vardır.",
       "marketBrowse": "Göz atma: satışta neyin olduğunu bulmak için ilanları kaydırın ya da isme göre arayın. Her ilan malları, satıcıyı ve tüm yığın için istenen fiyatı gösterir.",
       "marketPost": "İlan verme: çantalarınızdan bir yığın seçin, fiyatınızı belirleyin ve listeleyin. Mallar biri satın alana dek Tüccar tarafından tutulur. Satılmayan ilanlar bir süre sonra size geri döner ve fikrinizi değiştirirseniz birini erkenden geri alabilirsiniz.",
       "marketCollect": "Toplama: mallarınız satıldığında, geliriniz Tüccar'da sizi bekler. Satılmadan geri gelen her şeyle birlikte altını toplamak için geri dönün. Tüccar tamamlanan her satıştan küçük bir pay alır.",
@@ -1409,7 +1618,7 @@ export const tr_TR: EnTranslations = {
       "chanParty": "Grup.",
       "chanPartyBody": "Ne kadar dağılmış olursanız olun, grubundaki herkesle konuş.",
       "chanGeneral": "Genel.",
-      "chanGeneralBody": "Çevrendeki insanlar için her zaman açık olan yerel bir kanal, bir soru sormak ya da sohbet etmek için iyidir.",
+      "chanGeneralBody": "Çevrimiçi herkese ulaşan, her zaman açık, diyar çapında bir kanal; bir soru sormak ya da genel sohbet için iyidir. World ve Looking for Group'un aksine, asla katılmayı seçmek zorunda değilsin.",
       "chanWorld": "Dünya.",
       "chanWorldBody": "İsteğe bağlı katıldığın, diyar çapında bir kanal. Katılmak için sekmesini aç, çevrimiçi olan herkesi görür ve herkese ulaşırsın.",
       "chanLfg": "Grup Arıyor.",
@@ -1417,7 +1626,7 @@ export const tr_TR: EnTranslations = {
       "chanGuild": "Lonca ve Subay.",
       "chanGuildBody": "Loncan için kanallar. Lonca sohbeti her üyeye ulaşır; subay kanalı yalnızca subaylar içindir.",
       "partyHeading": "Grup kurmak",
-      "partyBody": "Başka bir oyuncuyu adına sağ tıklayıp davet etmeyi seçerek ya da bir sohbet komutuyla davet et. Bir grup en fazla beş oyuncu tutar ve içinizden biri liderdir.",
+      "partyBody": "Başka bir oyuncuyu, adına sağ tıklayıp davet etmeyi seçerek davet et. Bir grup en fazla beş oyuncu tutar ve içinizden biri liderdir.",
       "partyCredit": "Birbirine yakın grup üyeleri öldürme ve görev katkısını paylaşır, bu yüzden birlikte görev yapmak hep daha hızlıdır, asla daha yavaş değil. Bir grup aynı zamanda bir zindana takım olarak girmenin de yoludur.",
       "raidBody": "Beş kişilik tam bir grubun olduğunda, lider onu son oyun akını için en fazla on kişilik bir akına dönüştürebilir.",
       "lootHeading": "Grup ganimeti",
@@ -1428,6 +1637,8 @@ export const tr_TR: EnTranslations = {
       "lootCommonBody": "Sıradan ganimetler toplayana gidebilir, daha iyi ganimetler ise herkesin adil bir şansı olsun diye zar atışına konur.",
       "lootRollTitle": "İhtiyaç, Açgözlülük ya da Geç.",
       "lootRollBody": "Bir eşya zar atışına gittiğinde, uygun her üye onu istiyorsa İhtiyaç, yalnızca yedek olarak alırsa Açgözlülük ya da çekilmek için Geç seçer. En yüksek zar kazanır.",
+      "lootMasterTitle": "Ganimet sorumlusu.",
+      "lootMasterBody": "Lider, bunun yerine daha iyi ganimetlerin sorumluluğunu üstlenip her birini almasına gereken üyeye verebilir. Bu, örgütlü bir grubun bir zindanı koşturduğu gibi, değerli teçhizatın başıboş bir zar atışına gitmesini önler.",
       "friendsHeading": "Arkadaşlar ve görmezden gelme",
       "friendsBody": "Çevrimiçi olduklarını ve nerede olduklarını görmek için oyuncuları arkadaş listene ekle, böylece giriş yaptıkları an gruplaşabilirsin.",
       "ignoreBody": "Biri seni rahatsız ediyorsa, onu görmezden gelme listene ekle, sohbetini artık görmezsin.",
@@ -1448,17 +1659,21 @@ export const tr_TR: EnTranslations = {
       "staTitle": "Dayanıklılık",
       "staBody": "Dayanıklılık senin direncindir. Daha fazla Dayanıklılık daha büyük bir can havuzu demektir ve dövüş dışında dinlenirken geri kazandığın canı hızlandırır. Her sınıf biraz ister.",
       "intTitle": "Zeka",
-      "intBody": "Zeka, bir büyücünün mana havuzunu büyütür ve büyülerinin kritik yapma şansını iyileştirir. Manadan büyü yapan sınıflar için önemlidir; bir Öfke ya da Enerji sınıfı için pek bir şey yapmaz.",
+      "intBody": "Zeka, bir büyücünün mana havuzunu büyütür, büyü gücünü yükselterek büyülerinin daha sert vurmasını sağlar ve büyülerinin kritik yapma şansını iyileştirir. Manadan büyü yapan sınıflar için önemlidir; bir Öfke ya da Enerji sınıfı için pek bir şey yapmaz.",
       "spiTitle": "Ruh",
       "spiBody": "Ruh, bir büyücünün manasının dövüş dışındayken ne kadar hızlı geri döndüğünü yönetir. Zeka gibi, mana sınıflarına hizmet eder ve diğerleri için pek bir şey ifade etmez.",
       "armorTitle": "Zırh",
       "armorBody": "Zırh aldığın fiziksel hasarı azaltır. Çoğunlukla üzerine giydiklerinden gelir ve daha ağır zırh sınıfları bundan çok daha fazlasını taşır. Seviyene yakın bir düşmana karşı daha fazla zırh, onun her vuruşunun daha hafif gelmesi demektir.",
       "apTitle": "Saldırı gücü",
       "apBody": "Saldırı gücü, silahının ne kadar sert vurduğunu ölçer. Birincil niteliklerin onu besler, daha güçlü silahlar ve teçhizat onu daha da yükseltir, bu yüzden bir yükseltme hasarda gerçek bir sıçrama olabilir.",
+      "spTitle": "Büyü gücü",
+      "spBody": "Büyü gücü, saldırı gücünün büyücülerdeki karşılığıdır: büyülerinin verdiği hasarı yükseltir. Zeka onu besler, büyücü teçhizatı ve takviyeler üstüne daha fazlasını ekler, bu yüzden bir büyü yapan, saldırı gücünü izleyen bir yakın dövüşçü gibi büyü gücünü izler.",
       "critTitle": "Kritik vuruş",
       "critBody": "Kritik vuruş şansın, bir saldırının ne sıklıkta ekstra hasar verdiğidir. Herkes küçük bir temel şansla başlar ve Çeviklik (artı bazı yetenekler ve teçhizat) onun üstüne ekler.",
       "dodgeTitle": "Sıyırma",
       "dodgeBody": "Sıyırma, gelen bir yakın dövüş saldırısından tamamen kaçınma şansındır. Küçük bir temel şansla başlarsın ve Çeviklik onu yükseltir, böylece çevik sınıflar daha çok darbe atlatır.",
+      "dpsTitle": "Saniye başına hasar",
+      "dpsBody": "Sayfan ayrıca saniye başına hasar tahmini de gösterir: silahının, savuruş hızının ve saldırı gücünün zaman içinde kabaca neye ulaştığı. İki silahı bir bakışta karşılaştırmanın hızlı bir yoludur.",
       "sheetHeading": "Karakter sayfanı okumak",
       "sheetBody": "Bütün bunları tek bir yerde görmek için oyunda karakter penceresini aç: bir yanda beş niteliğin, diğer yanda besledikleri istatistikler. Herhangi bir değerin üzerine geldiğinde bir araç ipucu onun sınıfın için ne yaptığını ayrıntılandırır, böylece bir yükseltmenin gerçekte hangi sayıları değiştirdiğini bir bakışta görebilirsin.",
       "growHeading": "İstatistiklerin nasıl gelişir",
@@ -1473,10 +1688,10 @@ export const tr_TR: EnTranslations = {
       "journeyBody": "Dünya tek bir kesintisiz topraktır, güneyden kuzeye uzanan üç bölge, her biri seviye olarak bir basamak daha yüksek. Yeşil vadide başlar, bataklığı aşarak ilerler ve soğuk yüce zirvelerde sona erersin. Görev izini takip et, toprak seni birinden diğerine taşır.",
       "bandLabel": "Seviye {min} ile {max} arası",
       "restedTitle": "Dinlenmiş tecrübe",
-      "restedBody": "Oyundan çıktığında ya da bir handa olduğu gibi güvenli bir yerde dinlendiğinde, karakterin sen uzaktayken dinlenmiş tecrübe biriktirir. Bir sonraki sefer dışarı çıkıp dövüştüğünde, o havuz tükenene kadar öldürdüklerine ekstra bir destek verir. Zamanla birikir ve ilk seviyelerini hızlandırır, bu yüzden şehirde oyundan çıkmak asla boşa geçen zaman değildir.",
+      "restedBody": "Bir handa olduğu gibi güvenli bir yerde, dövüş dışında dinlendiğinde, karakterin orada otururken dinlenmiş tecrübe biriktirir. Bir sonraki sefer dışarı çıkıp dövüştüğünde, o havuz tükenene kadar öldürdüklerine ekstra bir destek verir. Handa verilen bir mola asla boşa geçen zaman değildir; bir sonraki seviye atlama dilimini hızlandırır.",
       "capTitle": "Seviye {cap} seviyesine ulaşmak",
       "capJourneyBody": "Seviye {cap} tavandır, seviye atlamanın sonu ama gelişmenin değil. Oradan itibaren zindanları ve akını koşar, daha iyi teçhizatın peşine düşer ve kendini arenada sınarsın.",
-      "prestigeBody": "Tecrübe, tavandan sonra bile sayılmaya devam eder. Kozmetik bir sanal seviyeyi besler, böylece tecrübe çubuğun tırmanmaya devam eder, ve takdir için kazanabileceğin uzun vadeli bir prestij rütbesi sağlar. Tamamen isteğe bağlıdır ve asla güç vermez, sadece yürüdüğün yolun bir nişanesidir.",
+      "prestigeBody": "Tecrübe, tavandan sonra bile sayılmaya devam eder. Kozmetik bir sanal seviyeyi besler, böylece tecrübe çubuğun tırmanmaya devam eder, ayrıca takdir için kazanabileceğin uzun vadeli bir prestij rütbesi sağlar. Büyük ömür boyu tecrübe kilometre taşlarını geçmek, karakter sayfanda görünen kozmetik unvanların ve isim levhası çerçevelerinin de kilidini açar. Bütün bunlar tamamen isteğe bağlıdır ve asla güç vermez, sadece yürüdüğün yolun bir nişanesidir.",
       "noRush": "Acele etmene gerek yok. Dünya kendi tempoda keyfini çıkarman için orada, o yüzden gez dolaş, gözüne çarpan görevleri al ve kahramanın yol boyunca gelişsin."
     },
     "placeholder": {
@@ -2453,7 +2668,7 @@ export const tr_TR: EnTranslations = {
     "lore": {
       "warrior": "Savaşçılar, hasar verdikçe ya da aldıkça Öfke biriktiren çelik gibi yakın dövüş savaşçılarıdır. Ağır darbeleri soğurur ya da düşmanları güçlü silahlarla ezerler.",
       "paladin": "Paladinler, müttefiklerini kutsamalarla destekleyen, yaraları Kutsal Işık'la iyileştiren ve ağır zırhları içinde güçsüzü koruyan kutsal şövalyelerdir.",
-      "hunter": "Avcılar vahşi doğaya hükmeder; düşmanları uzaktan yay ya da tüfekle takip eder ve savaş alanını denetlemek için tuzaklar kullanır.",
+      "hunter": "Avcılar, evcilleştirdikleri bir canavarın yanında savaşan menzilli uzmanlardır; düşmanları nişanlı ve seri atış yağmuruna tutar, sokmalar ve sersemletici atışlarla yavaşlatır ve ana uygun suretlere bürünürler.",
       "rogue": "Hırsızlar, gölgelerden sırttan bıçaklamalar ve bitirici hamleler için Enerji ile Kombo Puanı harcayan gizli suikastçılardır.",
       "priest": "Rahipler müttefikleri iyileştirmek ve korumak için Kutsal Işık'a başvurur; Gölge büyüsü ise düşmanlarının canını emmelerine olanak tanır.",
       "shaman": "Şamanlar elementlere komuta eder; silahlara güç katar, düşmanları yıldırımla sarsar ve müttefikleri iyileştirir.",

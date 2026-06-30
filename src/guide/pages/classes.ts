@@ -9,45 +9,63 @@
 // Spoiler-safe: no balance numbers; ability "what it's for" lines are authored guide keys,
 // never the number-laden sim ability descriptions.
 
-import { t, formatNumber, type TranslationKey } from '../../ui/i18n';
-import { esc } from '../../ui/esc';
-import { iconDataUrl } from '../../ui/icons';
-import { CLASS_DETAILS } from '../../ui/class_details_data';
 import type { PlayerClass } from '../../sim/types';
-import { hrefFor } from '../routes';
-import { GUIDE_CLASSES, GUIDE_WARLOCK_PETS, type GuideClassInfo } from '../content.generated';
+import { CLASS_DETAILS } from '../../ui/class_details_data';
+import { esc } from '../../ui/esc';
+import { formatNumber, type TranslationKey, t } from '../../ui/i18n';
+import { iconDataUrl } from '../../ui/icons';
 import { CLASS_META } from '../class_meta';
 import {
-  className, classLore, classCrest, abilityHook, roleBadges, classTags, specCardHtml,
+  abilityHook,
+  classCrest,
+  classLore,
+  className,
+  classTags,
+  roleBadges,
+  specCardHtml,
 } from '../class_view';
-import { crestImg, badge, related } from './ui';
+import { GUIDE_CLASSES, GUIDE_WARLOCK_PETS, type GuideClassInfo } from '../content.generated';
+import { hrefFor } from '../routes';
 import { modelViewerEmbed, wireModelViewers } from '../viewer';
 import type { GuidePage, PageContext } from './types';
+import { badge, crestImg, related } from './ui';
 
 // ---------------------------------------------------------------- index + chooser
-const FILTER_GROUPS: { group: string; labelKey: TranslationKey; options: { value: string; labelKey: TranslationKey }[] }[] = [
+const FILTER_GROUPS: {
+  group: string;
+  labelKey: TranslationKey;
+  options: { value: string; labelKey: TranslationKey }[];
+}[] = [
   {
-    group: 'role', labelKey: 'guide.chooser.role', options: [
+    group: 'role',
+    labelKey: 'guide.chooser.role',
+    options: [
       { value: 'tank', labelKey: 'guide.role.tank' },
       { value: 'healer', labelKey: 'guide.role.healer' },
       { value: 'dps', labelKey: 'guide.role.damage' },
     ],
   },
   {
-    group: 'style', labelKey: 'guide.chooser.style', options: [
+    group: 'style',
+    labelKey: 'guide.chooser.style',
+    options: [
       { value: 'melee', labelKey: 'guide.tag.melee' },
       { value: 'ranged', labelKey: 'guide.tag.ranged' },
     ],
   },
   {
-    group: 'resource', labelKey: 'guide.chooser.resource', options: [
+    group: 'resource',
+    labelKey: 'guide.chooser.resource',
+    options: [
       { value: 'rage', labelKey: 'guide.resourceName.rage' },
       { value: 'mana', labelKey: 'guide.resourceName.mana' },
       { value: 'energy', labelKey: 'guide.resourceName.energy' },
     ],
   },
   {
-    group: 'complexity', labelKey: 'guide.chooser.complexity', options: [
+    group: 'complexity',
+    labelKey: 'guide.chooser.complexity',
+    options: [
       { value: 'low', labelKey: 'guide.tag.simple' },
       { value: 'med', labelKey: 'guide.tag.moderate' },
       { value: 'high', labelKey: 'guide.tag.complex' },
@@ -60,11 +78,13 @@ function chip(group: string, value: string, label: string): string {
 }
 
 function chooserHtml(): string {
-  const groups = FILTER_GROUPS.map((g) => `
+  const groups = FILTER_GROUPS.map(
+    (g) => `
     <div class="guide-filter-group" role="group" aria-label="${esc(t(g.labelKey))}">
       <span class="guide-filter-label">${esc(t(g.labelKey))}</span>
       <div class="guide-chips">${g.options.map((o) => chip(g.group, o.value, t(o.labelKey))).join('')}</div>
-    </div>`).join('');
+    </div>`,
+  ).join('');
   return `
     <section class="guide-chooser" aria-labelledby="guide-chooser-h">
       <h2 class="guide-chooser-h" id="guide-chooser-h">${esc(t('guide.chooser.heading'))}</h2>
@@ -85,9 +105,19 @@ function classCard(c: GuideClassInfo): string {
   const data = m
     ? ` data-roles="${esc(c.roles.join(' '))}" data-resource="${esc(c.resource)}" data-style="${esc(m.style)}" data-complexity="${esc(m.complexity)}" data-first="${m.goodFirst}"`
     : ` data-roles="${esc(c.roles.join(' '))}" data-resource="${esc(c.resource)}"`;
+  // Show the actual class figure (the pre-rendered character still) as the card image, the
+  // same subject the detail page turntable spins; fall back to the procedural class crest only
+  // if a still is somehow absent (the guide.test asset guard makes that a build failure). The
+  // image is decorative here (alt=""): the whole card is a link the adjacent name span already
+  // labels, so a non-empty alt would double the link's accessible name ("Warrior Warrior...").
+  const figure = c.still
+    ? `<div class="guide-class-card-portrait">
+        <img class="guide-class-card-still" src="${esc(c.still)}" alt="" width="88" height="88" loading="lazy" decoding="async" />
+      </div>`
+    : crestImg(classCrest(c.id, 128), 64, 'guide-class-crest');
   return `
     <a class="guide-class-card" href="${esc(hrefFor(`classes/${c.id}`))}" style="--class-color:${esc(c.color)}"${data}>
-      ${crestImg(classCrest(c.id, 128), 64, 'guide-class-crest')}
+      ${figure}
       <span class="guide-class-card-name">${esc(className(c.id))}</span>
       <span class="guide-badges">${roleBadges(c.roles)}</span>
       <span class="guide-class-card-hook">${esc(classLore(c.id))}</span>
@@ -108,7 +138,7 @@ function indexHtml(): string {
 
 // Client-side facet filter over the nine cards. Multi-select OR within a group, AND across
 // groups; a "both" class matches either melee or ranged. Pure DOM, cleaned up on navigate.
-function mountChooser(root: HTMLElement): (() => void) | void {
+function mountChooser(root: HTMLElement): (() => void) | undefined {
   const chooser = root.querySelector<HTMLElement>('.guide-chooser');
   const grid = root.querySelector<HTMLElement>('[data-class-grid]');
   if (!chooser || !grid) return;
@@ -118,9 +148,12 @@ function mountChooser(root: HTMLElement): (() => void) | void {
   const noneEl = root.querySelector<HTMLElement>('[data-none]');
 
   const apply = () => {
-    const pressed = (group: string) => Array.from(
-      chooser.querySelectorAll<HTMLElement>(`.guide-chip[data-group="${group}"][aria-pressed="true"]`),
-    ).map((b) => b.dataset.value ?? '');
+    const pressed = (group: string) =>
+      Array.from(
+        chooser.querySelectorAll<HTMLElement>(
+          `.guide-chip[data-group="${group}"][aria-pressed="true"]`,
+        ),
+      ).map((b) => b.dataset.value ?? '');
     const roles = pressed('role');
     const styles = pressed('style');
     const resources = pressed('resource');
@@ -132,15 +165,21 @@ function mountChooser(root: HTMLElement): (() => void) | void {
       const cardRoles = (card.dataset.roles ?? '').split(' ');
       const cardStyle = card.dataset.style ?? '';
       const roleOk = roles.length === 0 || roles.some((r) => cardRoles.includes(r));
-      const styleOk = styles.length === 0 || styles.some((s) => s === cardStyle || cardStyle === 'both');
+      const styleOk =
+        styles.length === 0 || styles.some((s) => s === cardStyle || cardStyle === 'both');
       const resOk = resources.length === 0 || resources.includes(card.dataset.resource ?? '');
-      const cxOk = complexities.length === 0 || complexities.includes(card.dataset.complexity ?? '');
+      const cxOk =
+        complexities.length === 0 || complexities.includes(card.dataset.complexity ?? '');
       const firstOk = !firstOnly || card.dataset.first === 'true';
       const show = roleOk && styleOk && resOk && cxOk && firstOk;
       card.hidden = !show;
       if (show) shown += 1;
     }
-    if (countEl) countEl.textContent = t('guide.chooser.results', { count: formatNumber(shown), total: formatNumber(total) });
+    if (countEl)
+      countEl.textContent = t('guide.chooser.results', {
+        count: formatNumber(shown),
+        total: formatNumber(total),
+      });
     if (noneEl) noneEl.hidden = shown !== 0;
   };
 
@@ -148,9 +187,14 @@ function mountChooser(root: HTMLElement): (() => void) | void {
     const target = (e.target as HTMLElement).closest<HTMLElement>('.guide-chip, [data-clear]');
     if (!target) return;
     if (target.hasAttribute('data-clear')) {
-      chooser.querySelectorAll<HTMLElement>('.guide-chip[aria-pressed="true"]').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+      chooser.querySelectorAll<HTMLElement>('.guide-chip[aria-pressed="true"]').forEach((b) => {
+        b.setAttribute('aria-pressed', 'false');
+      });
     } else {
-      target.setAttribute('aria-pressed', target.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+      target.setAttribute(
+        'aria-pressed',
+        target.getAttribute('aria-pressed') === 'true' ? 'false' : 'true',
+      );
     }
     apply();
   };
@@ -178,21 +222,26 @@ function factsHtml(c: GuideClassInfo): string {
     rows.unshift(['classDetails.labels.armor', t(details.armorKey)]);
   }
   const cells = rows
-    .map(([labelKey, value]) => `<div class="guide-fact"><dt>${esc(t(labelKey))}</dt><dd>${esc(value)}</dd></div>`)
+    .map(
+      ([labelKey, value]) =>
+        `<div class="guide-fact"><dt>${esc(t(labelKey))}</dt><dd>${esc(value)}</dd></div>`,
+    )
     .join('');
   return `<dl class="guide-class-facts">${cells}</dl>`;
 }
 
 function signatureKitHtml(c: GuideClassInfo): string {
   const items = c.signatureAbilities
-    .map((a) => `
+    .map(
+      (a) => `
       <li class="guide-kit-item">
         ${crestImg(iconDataUrl('ability', a.id, 56), 48, 'guide-ability-icon')}
         <div class="guide-kit-text">
           <span class="guide-kit-name">${esc(a.name)}</span>
           <span class="guide-kit-line">${esc(abilityHook(a.id))}</span>
         </div>
-      </li>`)
+      </li>`,
+    )
     .join('');
   return `
     <section class="guide-block">
@@ -213,11 +262,13 @@ function specsHtml(c: GuideClassInfo): string {
 
 function fullKitHtml(c: GuideClassInfo): string {
   const items = c.abilities
-    .map((a) => `
+    .map(
+      (a) => `
       <li class="guide-ability">
         ${crestImg(iconDataUrl('ability', a.id, 56), 48, 'guide-ability-icon')}
         <span class="guide-ability-name">${esc(a.name)}</span>
-      </li>`)
+      </li>`,
+    )
     .join('');
   return `
     <section class="guide-block">
@@ -228,14 +279,14 @@ function fullKitHtml(c: GuideClassInfo): string {
 }
 
 function warlockPetsHtml(): string {
-  const items = GUIDE_WARLOCK_PETS
-    .map((pet) => `
+  const items = GUIDE_WARLOCK_PETS.map(
+    (pet) => `
       <li class="guide-pet">
-        ${modelViewerEmbed({ modelKey: pet.model, tint: pet.tint, name: pet.name })}
+        ${modelViewerEmbed({ modelKey: pet.model, tint: pet.tint, name: pet.name, still: pet.still })}
         <span class="guide-pet-name">${esc(pet.name)}</span>
         <span class="guide-pet-line">${esc(t(`guide.petHook.${pet.id}` as TranslationKey))}</span>
-      </li>`)
-    .join('');
+      </li>`,
+  ).join('');
   return `
     <section class="guide-block">
       <h2>${esc(t('guide.classPage.petsHeading'))}</h2>
@@ -252,7 +303,7 @@ function detailHtml(id: string): string {
       <p class="guide-section-more"><a href="${esc(hrefFor('classes'))}">${esc(t('guide.classPage.back'))}</a></p>
       <header class="guide-class-hero">
         <div class="guide-class-portrait">
-          ${modelViewerEmbed({ modelKey: c.model, tint: c.tint, name: className(c.id), poster: classCrest(c.id, 192), posterSize: 160, variant: 'feature' })}
+          ${modelViewerEmbed({ modelKey: c.model, tint: c.tint, name: className(c.id), still: c.still, poster: classCrest(c.id, 192), posterSize: 160, variant: 'feature', autoplay: true })}
         </div>
         <div class="guide-class-hero-text">
           <h1 class="guide-class-hero-name">${esc(className(c.id))}</h1>
@@ -281,7 +332,9 @@ export const classes: GuidePage = {
   titleKey: 'guide.nav.classes',
   titleFor(ctx: PageContext) {
     const id = ctx.params[0];
-    return id && GUIDE_CLASSES.some((c) => c.id === id) ? className(id) : t('guide.classList.heading');
+    return id && GUIDE_CLASSES.some((c) => c.id === id)
+      ? className(id)
+      : t('guide.classList.heading');
   },
   render(ctx: PageContext) {
     const id = ctx.params[0];

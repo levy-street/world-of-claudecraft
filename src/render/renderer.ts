@@ -83,6 +83,7 @@ import { RenderBudgetGovernor, type RenderBudgetState } from './render_budget';
 import { downscaleDims } from './screenshot';
 import { drapeRingLocalY } from './selection_ring';
 import { buildClouds, buildSky, type SkyView } from './sky';
+import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
 import { shouldRenderStealthGhost } from './stealth';
 import { buildFlaredConeFan, buildRingXZ, drapeConeWorld } from './target_cone_debug';
 import { buildTerrain, type TerrainView } from './terrain';
@@ -487,6 +488,8 @@ export interface EntityView {
   comboSig: string; // cheap-diff for the combo pip row
   tierEl: HTMLImageElement; // $WOC holder-tier flair badge (other players)
   tierValue: number; // last-applied holderTier, to diff cheaply
+  discordEl: HTMLImageElement; // linked-Discord PFP next to the name (other players)
+  discordAvatarSig: string; // last-applied discord avatar URL, to diff cheaply
   sparkle?: THREE.Sprite; // ground objects
   objectMesh?: THREE.Object3D;
   objectPoolKey: string | null;
@@ -723,14 +726,22 @@ export class Renderer {
   private effectiveRenderScale = 1; // runtime value after adaptive backoff
   private frameMsEma = 16.7;
   private adaptiveGrace = 2.0;
+  // biome-ignore lint/correctness/noUnusedPrivateClassMembers: write-only render-budget restore state (pre-existing); read path not yet wired.
   private adaptiveCooldown = 0;
+  // biome-ignore lint/correctness/noUnusedPrivateClassMembers: write-only render-budget restore state (pre-existing); read path not yet wired.
   private stableFrameTime = 0;
   private viewCreateBackoff = 0;
   private renderBudgetGovernor!: RenderBudgetGovernor;
   private baseExposure = 1.12; // tone-mapping exposure at brightness 1.0
   private tmpV = new THREE.Vector3();
   private viewCandidates: ViewCandidate[] = [];
+  // Persistent scratch for the sloppy-pick column build. pick() is also the
+  // per-frame hover-cursor path (updateHoverCursor in main.ts), so a fresh array
+  // here would be per-frame garbage on every cursor-over-empty-ground frame.
+  // Reused like viewCandidates: cleared with .length = 0, grown in place.
+  private sloppyCandidates: SloppyPickCandidate[] = [];
   private tmpV2 = new THREE.Vector3();
+  private tmpV3 = new THREE.Vector3();
   // Manual frustum cull for characters. Their skinned meshes keep
   // frustumCulled=false (a skinned mesh's bind-pose bounds don't follow the
   // animated pose, so Three's own cull pops visible rigs out), which means an
@@ -759,6 +770,7 @@ export class Renderer {
   };
   private selfRenderPosition = new THREE.Vector3();
   private selfRenderPositionReady = false;
+  private lastSelfId: number | null = null;
   // Last yaw applied to the local player while the camera was driving its facing
   // (mouselook / mouse-camera). Null when the override is disengaged, so the next
   // engage re-seeds from the live interpolated facing instead of snapping. See
@@ -3137,6 +3149,12 @@ export class Renderer {
     tierEl.className = 'np-tier';
     tierEl.alt = '';
     tierEl.style.display = 'none';
+    // linked-Discord PFP, shown inline before the name for other players
+    const discordEl = document.createElement('img');
+    discordEl.className = 'np-discord';
+    discordEl.alt = '';
+    discordEl.referrerPolicy = 'no-referrer';
+    discordEl.style.display = 'none';
     const nameEl = document.createElement('div');
     nameEl.className = 'np-name';
     nameEl.textContent = e.kind === 'object' ? objectDisplayName(e) : e.name;
@@ -3158,7 +3176,18 @@ export class Renderer {
     const castLabel = document.createElement('div');
     castLabel.className = 'np-castlabel';
     castBar.append(castFill, castLabel);
-    np.append(emoteEl, raidMark, comboRow, marker, tierEl, nameEl, guildEl, hpBar, castBar);
+    np.append(
+      emoteEl,
+      raidMark,
+      comboRow,
+      marker,
+      tierEl,
+      discordEl,
+      nameEl,
+      guildEl,
+      hpBar,
+      castBar,
+    );
     this.nameplateLayer.appendChild(np);
 
     // object views gate their own casters; character shadows live in visual
@@ -3208,6 +3237,7 @@ export class Renderer {
       castFill,
       castLabel,
       tierEl,
+      discordEl,
       sparkle,
       objectMesh,
       objectPoolKey,
@@ -3218,6 +3248,7 @@ export class Renderer {
       nameplateHpWidth: '',
       comboSig: '',
       tierValue: 0,
+      discordAvatarSig: '',
       objectCasters,
       viewLights,
       shadowOn: true,
@@ -3709,6 +3740,11 @@ export class Renderer {
     sharedUniforms.uTime.value = this.time;
     const sim = this.sim;
     const p = sim.player;
+    if (this.lastSelfId !== p.id) {
+      this.lastSelfId = p.id;
+      this.selfRenderPositionReady = false;
+      this.selfFacingOverride = null;
+    }
     const now = performance.now();
     const selfPos = this.updateSelfRenderPosition(alpha, dt, selfAlphaLead);
     markPhase('setup');
@@ -3773,6 +3809,13 @@ export class Renderer {
       const cdx = e.pos.x - p.pos.x,
         cdz = e.pos.z - p.pos.z;
       const d2 = cdx * cdx + cdz * cdz;
+      const isSelf = id === p.id;
+      if (isSelf) {
+        v.group.visible = true;
+        v.isFar = false;
+        v.visual?.setShadow(true);
+        v.visual?.setProxyShadow(false);
+      }
       if (id !== p.id) {
         // Per-frame visibility uses the SAME 80/96 hysteresis as view
         // create/destroy (above) so a rig hovering right at the 80yd draw edge
@@ -3818,7 +3861,6 @@ export class Renderer {
       // each interpolates on its own clock so they move smoothly instead of
       // freezing and dashing once per update (self keeps the global alpha
       // the camera follow uses)
-      const isSelf = e.id === p.id;
       const ea =
         e.id !== p.id && e.netUpdatedAt !== undefined && e.netInterval !== undefined
           ? Math.min(1.25, (now - e.netUpdatedAt) / Math.max(20, e.netInterval))
@@ -4725,26 +4767,47 @@ export class Renderer {
     // and melee scrums (often hidden behind the player's own model) make
     // precise capsule clicks fiddly. Objects (doors/loot) still need a
     // direct hit; the local player never competes for the click.
+    //
+    // Each candidate is a vertical screen COLUMN from the body midpoint up to an
+    // overhead anchor a touch above the head (the +1.0 the chat-bubble path uses;
+    // slightly higher than the nameplate's own NAMEPLATE_ANCHOR_LIFT of 0.8, which
+    // with the 26px radius just helps the column reach the floating name text).
+    // So a click on the floating name (what a healer does to target a party
+    // member) registers on its owner instead of falling outside a body-only radius.
     const SLOPPY_PICK_PX = 26;
-    let bestId: number | null = null;
-    let bestD = SLOPPY_PICK_PX;
+    const candidates = this.sloppyCandidates;
+    candidates.length = 0;
     for (const [id, v] of this.views) {
       if (id === this.sim.playerId || !v.visual || !v.group.visible) continue;
       const e = this.sim.entities.get(id);
       if (!e || (e.dead && !e.lootable)) continue;
+      // body midpoint anchor (also the in-front-of-camera cull)
       this.tmpV.copy(v.group.position);
       this.tmpV.y += v.height * e.scale * 0.5;
       this.tmpV.project(this.camera);
       if (this.tmpV.z > 1) continue;
-      const sx = (this.tmpV.x * 0.5 + 0.5) * this.viewport.width;
-      const sy = (-this.tmpV.y * 0.5 + 0.5) * this.viewport.height;
-      const d = Math.hypot(sx - clientX, sy - clientY);
-      if (d < bestD) {
-        bestD = d;
-        bestId = id;
+      const midX = (this.tmpV.x * 0.5 + 0.5) * this.viewport.width;
+      const midY = (-this.tmpV.y * 0.5 + 0.5) * this.viewport.height;
+      // Overhead anchor (the +1.0 chat-bubble offset, see the note above).
+      // Collapse the column to the body point if the anchor is not safely in
+      // front of the camera: a point behind the near plane projects to bogus
+      // screen coords that could steal an unrelated click (close / first-person
+      // camera puts the head behind the near plane). Same guard the real
+      // nameplate path uses before trusting its projection.
+      this.tmpV2.copy(v.group.position);
+      this.tmpV2.y += v.height * e.scale + 1.0;
+      let topX = midX;
+      let topY = midY;
+      if (isProjectedNameplateAnchorVisible(this.camera, this.tmpV2, this.tmpV3)) {
+        this.tmpV2.project(this.camera);
+        if (this.tmpV2.z <= 1) {
+          topX = (this.tmpV2.x * 0.5 + 0.5) * this.viewport.width;
+          topY = (-this.tmpV2.y * 0.5 + 0.5) * this.viewport.height;
+        }
       }
+      candidates.push({ id, midX, midY, topX, topY });
     }
-    return bestId;
+    return nearestSloppyPickId(clientX, clientY, candidates, SLOPPY_PICK_PX);
   }
 
   // Drop a transient OSRS-style click marker at a world ground point. Called from

@@ -6,19 +6,33 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
-const indexHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
-const playHtml = readFileSync(new URL('../play.html', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
-const mainTs = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
-const hudTs = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
+const indexHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8').replace(
+  /\r\n/g,
+  '\n',
+);
+const playHtml = readFileSync(new URL('../play.html', import.meta.url), 'utf8').replace(
+  /\r\n/g,
+  '\n',
+);
+const mainTs = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8').replace(
+  /\r\n/g,
+  '\n',
+);
+const hudTs = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8').replace(
+  /\r\n/g,
+  '\n',
+);
 
 // The ids doAuth() depends on at login time.
 const REQUIRED_2FA_IDS = ['login-2fa-field', 'login-2fa-code'];
 
 // The ids the renderer/HUD build reads unconditionally while constructing the
-// world view (PerfOverlay from main.ts, the target-frame cast bar from hud.ts).
-// If either entry's #game-ui-template omits one, entering the world throws a
-// null deref ("Could not start the renderer") on that page only.
-const REQUIRED_HUD_TEMPLATE_IDS = ['perf-overlay', 'tf-castbar'];
+// world view (PerfOverlay from main.ts, the target-frame cast bar and the
+// second action bar from hud.ts). If either entry's #game-ui-template omits one,
+// entering the world throws a null deref ("Could not start the renderer") on
+// that page only. buildActionBar resolves #actionbar2 for slots 12..22; a page
+// without it crashed on appendChild (the /play entry shipped without the div).
+const REQUIRED_HUD_TEMPLATE_IDS = ['perf-overlay', 'tf-castbar', 'actionbar2'];
 
 describe('login form 2FA markup parity', () => {
   it('doAuth reads the 2FA field/code ids (the dependency these tests guard)', () => {
@@ -41,6 +55,7 @@ describe('HUD template renderer-critical markup parity', () => {
   it('the client reads the renderer-critical ids (the dependency these tests guard)', () => {
     expect(mainTs).toContain("$('#perf-overlay')");
     expect(hudTs).toContain("$('#tf-castbar')");
+    expect(hudTs).toContain("$('#actionbar2')");
   });
 
   for (const id of REQUIRED_HUD_TEMPLATE_IDS) {
