@@ -33,6 +33,7 @@
 //   dungeons.ts         IWorldDungeons       dungeon enter/leave + raid lockouts
 //   delves.ts           IWorldDelves         delve runs, lockpick, companion
 //   telemetry.ts        IWorldTelemetry      fire-and-forget metrics sink
+//   world_builder.ts    IWorldWorldBuilder   admin/mod prop place/move/remove/meta
 //
 // THREE GATES pin this seam (run before any facet edit):
 //   tests/snapshots.test.ts        (W0a)  selfWireJson <-> applySnapshot round-trip;
@@ -63,6 +64,7 @@ import type { IWorldSocialGraph } from './world_api/social_graph';
 import type { IWorldTalents } from './world_api/talents';
 import type { IWorldTargeting } from './world_api/targeting';
 import type { IWorldTelemetry } from './world_api/telemetry';
+import type { IWorldWorldBuilder } from './world_api/world_builder';
 import type { IWorldTrade } from './world_api/trade';
 
 // --- pass-through sim re-exports: downstream imports these FROM world_api ---
@@ -126,7 +128,8 @@ export interface IWorld
     IWorldMarket,
     IWorldDungeons,
     IWorldDelves,
-    IWorldTelemetry {}
+    IWorldTelemetry,
+    IWorldWorldBuilder {}
 
 // ---------------------------------------------------------------------------
 // Command schema (W0b): the shared wire-token vocabulary.
@@ -256,6 +259,10 @@ export const COMMAND_NAMES = [
   'lockpick_abort',
   'collect_delve_chest_loot',
   'telemetry',
+  'placeProp',
+  'moveProp',
+  'removeProp',
+  'setPropMeta',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -315,7 +322,8 @@ export type WorldFacet =
   | 'IWorldMarket'
   | 'IWorldDungeons'
   | 'IWorldDelves'
-  | 'IWorldTelemetry';
+  | 'IWorldTelemetry'
+  | 'IWorldWorldBuilder';
 
 export const COMMAND_FACETS = {
   // IWorldCombat: ability casts, auto-attack, spirit release.
@@ -437,4 +445,10 @@ export const COMMAND_FACETS = {
   lockpick_action: 'IWorldDelves',
   lockpick_abort: 'IWorldDelves',
   collect_delve_chest_loot: 'IWorldDelves',
+  // IWorldWorldBuilder: admin/mod in-world prop placement (server re-checks the
+  // caller's builder permission on every command; nothing applies client-side).
+  placeProp: 'IWorldWorldBuilder',
+  moveProp: 'IWorldWorldBuilder',
+  removeProp: 'IWorldWorldBuilder',
+  setPropMeta: 'IWorldWorldBuilder',
 } as const satisfies Partial<Record<ClientCommand, WorldFacet>>;
