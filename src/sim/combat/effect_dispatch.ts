@@ -37,6 +37,15 @@ function preservesStealth(ability: AbilityDef): boolean {
   return isStealthToggle(ability) || ability.id === 'sprint';
 }
 
+// A duel is a closed 1v1: outside parties cannot pour in heals, shields, or buffs to
+// prop up a combatant. Returns true when `target` is in an active duel and `caster` is
+// not one of the two duelists, so the assisting effect must be skipped. (Self-sustain
+// and the opponent are duelists, so they are never blocked.)
+function externalDuelAssistBlocked(ctx: SimContext, caster: Entity, target: Entity): boolean {
+  const duel = ctx.duels.get(target.id);
+  return !!duel && caster.id !== duel.a && caster.id !== duel.b;
+}
+
 export function runEffects(
   ctx: SimContext,
   p: Entity,
@@ -162,11 +171,13 @@ export function runEffects(
         break;
       case 'heal': {
         const healTarget = target ?? p;
+        if (externalDuelAssistBlocked(ctx, p, healTarget)) break;
         ctx.applyHeal(p, healTarget, ctx.rng.range(eff.min, eff.max), ability.name);
         break;
       }
       case 'hot': {
         const hotTarget = target ?? p;
+        if (externalDuelAssistBlocked(ctx, p, hotTarget)) break;
         ctx.applyAura(hotTarget, {
           id: ability.id,
           name: ability.name,
@@ -183,6 +194,7 @@ export function runEffects(
       }
       case 'absorb': {
         const shieldTarget = target ?? p;
+        if (externalDuelAssistBlocked(ctx, p, shieldTarget)) break;
         ctx.applyAura(shieldTarget, {
           id: ability.id,
           name: ability.name,
@@ -259,6 +271,7 @@ export function runEffects(
         break; // handled per channel tick
       case 'buffTarget': {
         const buffTarget = target ?? p;
+        if (externalDuelAssistBlocked(ctx, p, buffTarget)) break;
         ctx.applyAura(buffTarget, {
           id: ability.id,
           name: ability.name,
