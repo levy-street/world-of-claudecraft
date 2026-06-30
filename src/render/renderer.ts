@@ -77,6 +77,7 @@ import {
 } from './nameplate_projection';
 import { buildComposer, type PostPipeline } from './post';
 import { buildPropMaterialPrewarmGroup, buildProps } from './props';
+import { buildPropBody, tickPropMixers } from './world_prop';
 import { buildGroundQuestObject } from './quest_objects';
 import { isOwnedPetHostile } from './reaction';
 import { RenderBudgetGovernor, type RenderBudgetState } from './render_budget';
@@ -1940,6 +1941,7 @@ export class Renderer {
     );
     this.fish.update(p.pos.x, p.pos.z, dt);
     this.vfx.update(dt);
+    tickPropMixers(dt);
     const pv = this.views.get(p.id);
     if (pv) {
       const pp = pv.group.position;
@@ -3044,6 +3046,14 @@ export class Renderer {
         sparkle.position.y = 1.35;
         group.add(sparkle);
       }
+    } else if (e.kind === 'object' && e.templateId?.startsWith('prop:')) {
+      // In-world Builder prop. Unique/stateful per placement, so it skips the
+      // object pool; buildPropBody returns a placeholder immediately and swaps in
+      // the real (possibly animated) GLB asynchronously.
+      objectPoolKey = null;
+      body = buildPropBody(e.templateId.slice('prop:'.length), group);
+      height = 2;
+      objectMesh = body;
     } else if (e.kind === 'object') {
       objectPoolKey = this.objectPoolKeyFor(e);
       const pooled = objectPoolKey ? this.takePooledObject(objectPoolKey) : null;
