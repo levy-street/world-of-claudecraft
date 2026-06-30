@@ -100,6 +100,7 @@ import {
 } from './moderation_db';
 import { createNativeAttestationChallenge, verifyNativeAttestation } from './native_attestation';
 import { handleOAuth, seedOAuthClients } from './oauth';
+import { handlePropCatalog, handlePropStatic, handlePropUpload } from './prop_assets';
 import { pruneExpiredOAuthGrants } from './oauth_db';
 import { handlePerfReport } from './perf_report';
 import {
@@ -379,6 +380,13 @@ async function bearerAccount(req: http.IncomingMessage): Promise<number | null> 
   const m = /^Bearer ([a-f0-9]{64})$/.exec(auth);
   if (!m) return null;
   return accountForToken(m[1]);
+}
+
+// True when the request's bearer token belongs to an admin account. Used to gate
+// the in-world Builder prop upload route.
+async function isAdminRequestAccount(req: http.IncomingMessage): Promise<boolean> {
+  const accountId = await bearerAccount(req);
+  return accountId !== null && (await isAdminAccount(accountId));
 }
 
 // Account + token scope for the bearer (or null when unauthenticated). The scope
@@ -1393,6 +1401,20 @@ async function main(): Promise<void> {
     if (req.method === 'OPTIONS' && (isApi || publicCorsPath)) {
       res.writeHead(204);
       res.end();
+      return;
+    }
+    // In-world Builder prop assets. Checked before the /api/ catch-all so the
+    // prop catalog + upload routes don't fall into the general API handler.
+    if (req.method === 'GET' && path.startsWith('/props/')) {
+      handlePropStatic(req, res);
+      return;
+    }
+    if (req.method === 'GET' && path === '/api/props') {
+      void handlePropCatalog(req, res);
+      return;
+    }
+    if (req.method === 'POST' && path === '/api/props/upload') {
+      void handlePropUpload(req, res, isAdminRequestAccount);
       return;
     }
     if (url.startsWith('/internal/')) void handleInternalApi(req, res, game);
