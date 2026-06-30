@@ -913,6 +913,7 @@ async function startGame(
   const themeStore = new ThemeStore();
   function applyTheme(): void {
     const vars = themeStore.cssVars();
+    document.body.dataset.uiTheme = themeStore.get().preset;
     for (const name of Object.keys(vars))
       document.documentElement.style.setProperty(name, vars[name]);
   }
@@ -7024,7 +7025,9 @@ function fadeOutHomepageMusic(durationMs = 1600): void {
 // (startGame() re-applies via its own ThemeStore once the world loads.)
 (() => {
   try {
-    const vars = new ThemeStore().cssVars();
+    const themeStore = new ThemeStore();
+    const vars = themeStore.cssVars();
+    document.body.dataset.uiTheme = themeStore.get().preset;
     for (const name of Object.keys(vars))
       document.documentElement.style.setProperty(name, vars[name]);
   } catch {

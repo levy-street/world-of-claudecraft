@@ -2400,6 +2400,13 @@
       1px 1px 2px #000,
       -1px -1px 2px #000;
   }
+  body.high-contrast-text[data-ui-theme="parchment"] .chat-pane div,
+  body.high-contrast-text[data-ui-theme="parchment"] .panel,
+  body.high-contrast-text[data-ui-theme="parchment"] .set-name,
+  body.high-contrast-text[data-ui-theme="parchment"] .tt-stat,
+  body.high-contrast-text[data-ui-theme="parchment"] .tt-desc {
+    text-shadow: none;
+  }
   /* Reduce Motion, drop HUD animations/transitions (mirrors prefers-reduced-motion). */
   body.reduce-motion .fct {
     animation-duration: 0.01ms !important;

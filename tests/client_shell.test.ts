@@ -276,6 +276,15 @@ describe('client HTML shell', () => {
     expect(baseCss).toContain('.hud-skip:focus-visible {');
   });
 
+  it('keeps Parchment high-contrast text sharp instead of shadow-blurred', () => {
+    expect(mainTs).toContain('document.body.dataset.uiTheme = themeStore.get().preset;');
+    expect(hudCss).toContain('body.high-contrast-text .tt-desc {');
+    expect(hudCss).toContain('-1px -1px 2px #000;');
+    expect(hudCss).toContain('body.high-contrast-text[data-ui-theme="parchment"] .tt-desc {');
+    expect(hudCss).toContain('body.high-contrast-text[data-ui-theme="parchment"] .panel,');
+    expect(hudCss).toContain('text-shadow: none;');
+  });
+
   it('draws the party focus ring at full strength WITHOUT animating it', () => {
     // A dimmed dead/oor row resets opacity to 1 on keyboard focus so the global outline
     // ring is full, not dimmed. Because .party-frame transitions opacity 0.2s and opacity
