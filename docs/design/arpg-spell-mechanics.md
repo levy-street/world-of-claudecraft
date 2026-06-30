@@ -198,19 +198,21 @@ direction in the 3D world) or #3 if we want a no-protocol-change quick win first
 
 The ground-target primitive (Phase 1) shipped in `feature/ground-targeted-spells`
 together with one ground-aimed spell for each caster/ranged class. Each is a
-declarative record in `src/sim/content/classes.ts` with `targetMode: 'position'`
-and a `groundAoE` or `aoeDamage` effect, plus its all-locale translations.
+declarative record in `src/sim/content/classes.ts` with `targetMode: 'position'`,
+plus its all-locale translations. Two shapes use the primitive: an INSTANT lingering
+zone (a `groundAoE` effect dropped at the aim) and a CHANNELED area AoE (a `channel`
+spell whose `aoeDamage` effect pulses at the aim each channel tick).
 
 Caster/ranged classes take ground-targeted area spells; melee classes are better
 served by the movement skills (dash/leap, section C) than by a ground AoE.
 
 | Class | Spell | School | Effect | Status |
 |---|---|---|---|---|
-| Mage | Flamestrike | fire | lingering fire zone (groundAoE) | shipped |
-| Warlock | Rain of Fire | fire | lingering fire zone (groundAoE) | shipped |
-| Hunter | Volley | physical (ranged) | instant arrow burst at a point (aoeDamage) | shipped |
-| Druid | Hurricane | nature | lingering storm zone (groundAoE) | shipped |
-| Shaman | Earthquake | nature | lingering quake zone (groundAoE) | shipped |
+| Mage | Flamestrike | fire | instant lingering fire zone (groundAoE) | shipped |
+| Warlock | Rain of Fire | fire | channeled fire AoE on the area | shipped |
+| Hunter | Volley | physical (ranged) | channeled arrow AoE on the area | shipped |
+| Druid | Hurricane | nature | channeled nature AoE on the area | shipped |
+| Shaman | Earthquake | nature | instant lingering nature zone (groundAoE) | shipped |
 | Mage | Blizzard | frost | lingering frost zone (groundAoE), chills | planned (pairs with the chill ailment, section D) |
 
 The gating cost is NOT the mechanic, it is i18n: a brand-new spell needs its name
