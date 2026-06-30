@@ -194,6 +194,34 @@ existing `Aura`/`AuraKind` system (`types.ts:134`, auras already tick):
 A good first vertical slice is #1 (it is the enabler and demonstrates the whole
 direction in the 3D world) or #3 if we want a no-protocol-change quick win first.
 
+## Thematic ground-targeted spell roadmap (per class)
+
+The ground-target primitive (Phase 1) shipped in `feature/ground-targeted-spells`
+along with the first spell that uses it, mage **Flamestrike** (a fire ground zone
+aimed at a point). The rest of the set below is straightforward to add on top of the
+primitive: each is a declarative record in `src/sim/content/classes.ts` with
+`targetMode: 'position'` and a `groundAoE` or `aoeDamage` effect.
+
+Caster/ranged classes take ground-targeted area spells; melee classes are better
+served by the movement skills (dash/leap, section C) than by a ground AoE.
+
+| Class | Spell | School | Effect | Status |
+|---|---|---|---|---|
+| Mage | Flamestrike | fire | lingering fire zone (groundAoE) | shipped |
+| Mage | Blizzard | frost | lingering frost zone (groundAoE), chills | planned |
+| Warlock | Rain of Fire | fire | lingering fire DoT zone (groundAoE) | planned |
+| Hunter | Volley | physical (ranged) | instant arrow burst at a point (aoeDamage) | planned |
+| Druid | Hurricane | nature | lingering storm zone (groundAoE) | planned |
+| Shaman | Earthquake | nature | lingering quake zone (groundAoE) | planned |
+
+The gating cost is NOT the mechanic, it is i18n: a brand-new spell needs its name
+AND description translated in every supported locale (the English source in
+`classAbilityNamesEn` plus the ~17 `src/ui/i18n.locales/<lang>.ts` overlays), or
+`tests/localization_coverage.test.ts` fails the PR-tier CI gate. So each spell above
+is best landed as its own small PR that pairs the one-line content record with its
+all-locale translations, rather than batch-adding many records English-only (which
+reddens CI). Sourcing quality translations, not writing the sim code, is the work.
+
 ## Guardrails (do not regress the invariants)
 
 - Determinism: every new roll goes through `ctx.rng`; do not reorder existing
