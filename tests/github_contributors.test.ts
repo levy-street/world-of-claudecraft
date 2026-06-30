@@ -3,6 +3,7 @@ import {
   type ContributorStat,
   contributorsToMap,
   getContributors,
+  isTrustedGithubApiUrl,
   mergedPrsForLogin,
   parseMergedPrLogins,
   parseNextPageUrl,
@@ -67,6 +68,27 @@ describe('parseNextPageUrl', () => {
     expect(parseNextPageUrl('<https://api.github.com/x?page=5>; rel="last"')).toBeNull();
     expect(parseNextPageUrl(null)).toBeNull();
     expect(parseNextPageUrl('')).toBeNull();
+  });
+});
+
+describe('isTrustedGithubApiUrl', () => {
+  it('accepts only https URLs whose host is exactly api.github.com', () => {
+    expect(isTrustedGithubApiUrl('https://api.github.com/repositories/1/pulls?page=2')).toBe(true);
+  });
+
+  it('rejects a different host, including a look-alike subdomain', () => {
+    expect(isTrustedGithubApiUrl('https://evil.example.com/pulls?page=2')).toBe(false);
+    expect(isTrustedGithubApiUrl('https://api.github.com.evil.example.com/pulls')).toBe(false);
+    expect(isTrustedGithubApiUrl('https://notapi.github.com/pulls')).toBe(false);
+  });
+
+  it('rejects a non-https scheme even on the right host', () => {
+    expect(isTrustedGithubApiUrl('http://api.github.com/pulls')).toBe(false);
+  });
+
+  it('rejects an unparseable URL instead of throwing', () => {
+    expect(isTrustedGithubApiUrl('not a url')).toBe(false);
+    expect(isTrustedGithubApiUrl('')).toBe(false);
   });
 });
 
@@ -182,6 +204,28 @@ describe('getContributors / topContributors / mergedPrsForLogin (cached fetch)',
     expect(await mergedPrsForLogin('FERNANDOX7')).toBe(1);
     expect(await mergedPrsForLogin('nobody')).toBe(0);
     expect(await mergedPrsForLogin('')).toBe(0);
+  });
+
+  it('aborts pagination (never re-attaches the token off api.github.com) when a Link header points elsewhere', async () => {
+    const fetchSpy = vi.fn(async (url: unknown) => {
+      if (String(url).includes('api.github.com')) {
+        return {
+          ok: true,
+          status: 200,
+          headers: {
+            get: () => '<https://evil.example.com/repositories/1/pulls?page=2>; rel="next"',
+          },
+          json: async () => [pr('FernandoX7')],
+        };
+      }
+      throw new Error('must never be called: untrusted host');
+    });
+    vi.stubGlobal('fetch', fetchSpy);
+    const snapshot = await getContributors();
+    // The failed refresh serves the empty snapshot (no prior cache), exactly
+    // like any other fetch failure, and never issued a second request.
+    expect(snapshot.stats).toEqual([]);
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
   });
 
   it('serves an empty snapshot (never throws) when the very first fetch fails', async () => {

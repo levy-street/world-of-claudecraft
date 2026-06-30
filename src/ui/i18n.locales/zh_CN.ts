@@ -229,6 +229,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '拖动旋转镜头时将鼠标光标保持在窗口内，使其无法到达屏幕边缘或移动到另一台显示器。如果你喜欢自由光标，请关闭此选项。',
   'hudChrome.options.showWalletOnCharacterScreen': '在角色界面显示钱包',
   'hudChrome.options.showWalletOnPlayerCard': '在玩家卡片显示钱包',
+  'hudChrome.options.showDevBadges': '显示开发者徽章',
   'hudChrome.playerCard.showWalletBadge': '显示钱包徽章',
   'hudChrome.options.uiScale': '界面缩放',
   'hudChrome.options.highContrastBackground': '高对比度背景',

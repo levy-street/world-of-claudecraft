@@ -723,6 +723,9 @@ export class Renderer {
   // Smoothed chase-cam occlusion (1 = no pull-in); see updateCamera.
   private camOcclusion: CameraOcclusionState = { pullT: 1, lensT: 1, fov: CAMERA_BASE_FOV };
   showNameplates = true;
+  // settings-backed developer-badge display toggle (nameplate glyph + outline);
+  // initialized from Settings and kept live by main.ts's applySetting dispatcher.
+  showDevBadges = true;
   // settings-menu graphics knobs (applied live)
   private renderScale = 1; // user-requested resolution ceiling on top of the device pixel ratio
   private effectiveRenderScale = 1; // runtime value after adaptive backoff
@@ -972,6 +975,7 @@ export class Renderer {
       world: this.sim,
       getViewport: () => this.viewport,
       showNameplates: () => this.showNameplates,
+      showDevBadges: () => this.showDevBadges,
       isHostilePlayer: (e) => this.isHostilePlayer(e),
     });
 

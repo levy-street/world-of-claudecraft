@@ -299,6 +299,9 @@ export const hudChromeStrings = {
       'Keeps the mouse cursor inside the window while you drag to rotate the camera, so it cannot reach the screen edge or move to another monitor. Turn off if you prefer a free cursor.',
     showWalletOnCharacterScreen: 'Show Wallet on Character Screen',
     showWalletOnPlayerCard: 'Show Wallet on Player Card',
+    // Interface panel toggle: nameplate glyph/outline, inspect block, player
+    // card, and the Developers leaderboard tab (on by default).
+    showDevBadges: 'Show Developer Badges',
     // Interface panel: global HUD zoom slider, and the mirror of the landing
     // page's high-contrast backdrop toggle.
     uiScale: 'UI Scale',

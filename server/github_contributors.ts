@@ -26,7 +26,8 @@ import { recordUsageCacheEvent, recordUsageMetric, setUsageCacheSize } from './p
 
 const GITHUB_REPO = process.env.GITHUB_REPO ?? 'levy-street/world-of-claudecraft';
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN ?? '';
-const PULLS_URL = `https://api.github.com/repos/${GITHUB_REPO}/pulls`;
+const GITHUB_API_HOST = 'api.github.com';
+const PULLS_URL = `https://${GITHUB_API_HOST}/repos/${GITHUB_REPO}/pulls`;
 const CONTRIBUTORS_TTL_MS = 30 * 60_000; // 30 min; merged-PR counts change slowly
 const CONTRIBUTORS_PER_PAGE = 100;
 const CONTRIBUTORS_MAX_PAGES = 30; // 3000 closed PRs cap; well past the repo's current history
@@ -73,6 +74,22 @@ export function parseNextPageUrl(linkHeader: string | null): string | null {
     if (match) return match[1];
   }
   return null;
+}
+
+/**
+ * Whether a URL is safe to re-issue the GITHUB_TOKEN bearer header to: exactly
+ * api.github.com over https. Defense in depth around the paginated fetch loop,
+ * which re-attaches the token to whatever URL the previous response's Link
+ * header named; this stops that token from ever following a redirected or
+ * malformed Link header off api.github.com.
+ */
+export function isTrustedGithubApiUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'https:' && parsed.host === GITHUB_API_HOST;
+  } catch {
+    return false;
+  }
 }
 
 /** Lowercase-keyed login -> merged-PR count, for case-insensitive lookup. */
@@ -143,7 +160,11 @@ async function fetchAllContributors(): Promise<ContributorStat[]> {
     if (!res.ok) throw new Error(`github pulls ${res.status}`);
     const body: unknown = await res.json();
     logins.push(...parseMergedPrLogins(body));
-    url = parseNextPageUrl(res.headers.get('link'));
+    const next = parseNextPageUrl(res.headers.get('link'));
+    if (next && !isTrustedGithubApiUrl(next)) {
+      throw new Error('github pulls: next-page link left api.github.com');
+    }
+    url = next;
   }
   return tallyMergedPrs(logins);
 }

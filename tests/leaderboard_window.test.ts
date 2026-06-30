@@ -190,4 +190,14 @@ describe('leaderboard_window: developers board tab', () => {
       /renderDevBoard[\s\S]{0,400}if \(el\.style\.display !== 'block'\) return;/,
     );
   });
+
+  it('hides the tab itself (not just the rows) behind the showDevBadges display preference', () => {
+    expect(code).toContain("this.deps.showDevBadges() ? tab('devs'");
+  });
+
+  it('falls back off the devs board if the preference turns off while it is selected', () => {
+    expect(code).toContain(
+      "if (this.board === 'devs' && !this.deps.showDevBadges()) this.board = 'players';",
+    );
+  });
 });

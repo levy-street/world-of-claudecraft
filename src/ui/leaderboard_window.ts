@@ -55,6 +55,8 @@ export interface LeaderboardWindowDeps {
   closeOthers(): void;
   captureFocus(): HTMLElement | null;
   restoreFocus(target: HTMLElement | null): void;
+  /** The viewer's developer-badge display preference; also hides the Developers tab. */
+  showDevBadges(): boolean;
 }
 
 /** Where focus should land after a (re)render: into the window on open, back onto
@@ -125,6 +127,10 @@ export class LeaderboardWindow {
   // leaderboard() maps to the error state (a localized retry message), instead of
   // silently masquerading as an empty board.
   async render(focus: FocusTarget = null): Promise<void> {
+    // The setting may have been turned off after the devs tab was selected (a
+    // prior session, or a live Options change while this window is open): fall
+    // back to the players board rather than rendering an un-tabbed orphan board.
+    if (this.board === 'devs' && !this.deps.showDevBadges()) this.board = 'players';
     const el = this.deps.root();
     const world = this.deps.world();
     markDialogRoot(el, { labelledBy: 'leaderboard-title' });
@@ -310,7 +316,7 @@ export class LeaderboardWindow {
       `<div class="lb-tabs" role="tablist" aria-label="${esc(t('hudChrome.leaderboard.tabsLabel'))}">` +
       tab('players', t('hudChrome.leaderboard.tabPlayers')) +
       tab('guilds', t('hudChrome.leaderboard.tabGuilds')) +
-      tab('devs', t('hudChrome.leaderboard.tabDevs')) +
+      (this.deps.showDevBadges() ? tab('devs', t('hudChrome.leaderboard.tabDevs')) : '') +
       `</div>`
     );
   }

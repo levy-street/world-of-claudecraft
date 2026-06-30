@@ -2753,6 +2753,7 @@ export class Hud {
     world: () => this.sim,
     closeOthers: () => this.closeOtherWindows('#leaderboard-window'),
     ...this.windowFocus('#leaderboard-window'),
+    showDevBadges: () => this.optionsHooks?.settings.get('showDevBadges') ?? true,
   });
   // Spellbook window painter (spellbook_view.ts core + spellbook_window.ts painter).
   // The window renders ability rows (not item rows), so it composes no presentation
@@ -9211,6 +9212,11 @@ export class Hud {
     if (sim.prestigeRank > 0)
       combatStats.push({ label: t('game.prestige.rank'), value: num(sim.prestigeRank) });
 
+    // Developer badge: a global display preference (no per-card modal toggle
+    // like the wallet flair has, since "hide dev badges" is meant to apply
+    // everywhere at once, not be re-decided per export).
+    const showDevBadges = this.optionsHooks?.settings.get('showDevBadges') ?? true;
+
     const slots: EquipSlot[] = ['mainhand', 'chest', 'legs', 'feet'];
     const gear = slots.map((slot) => {
       const id = sim.equipment[slot];
@@ -9234,8 +9240,8 @@ export class Hud {
       gear,
       topPercent,
       balance: showWallet ? verifiedWocBalance() : null,
-      devTier: p.devTier ?? null,
-      devMergedPrs: p.devMergedPrs ?? null,
+      devTier: showDevBadges ? (p.devTier ?? null) : null,
+      devMergedPrs: showDevBadges ? (p.devMergedPrs ?? null) : null,
       referralHandle: referral?.slug ?? this.cardSlug(p.name),
       referralCount: referral?.count ?? null,
       siteUrl: 'worldofclaudecraft.com',
@@ -9878,7 +9884,8 @@ export class Hud {
   private updateTargetDiscordLine(target: Entity): void {
     const el = this.targetDiscordEl;
     const tier = target.discordTier ?? 0;
-    const devIdx = target.devTier ?? 0;
+    const showDevBadges = this.optionsHooks?.settings.get('showDevBadges') ?? true;
+    const devIdx = showDevBadges ? (target.devTier ?? 0) : 0;
     if (
       target.kind !== 'player' ||
       (!tier && !target.discordName && !target.discordRole && !devIdx)
@@ -9991,8 +9998,10 @@ export class Hud {
         : '';
     // Developer badge: the cosmetic contributor tier, broadcast per-entity via the
     // `dvt`/`dvc`/`dgl` identity fields. Shown only for an actual contributor
-    // (tier > 0), with the merged-PR count and the @login under the rung name.
-    const devTierDef = devTierByIndex(e.devTier ?? 0);
+    // (tier > 0), with the merged-PR count and the @login under the rung name,
+    // and only while the viewer's own showDevBadges display preference is on.
+    const showDevBadges = this.optionsHooks?.settings.get('showDevBadges') ?? true;
+    const devTierDef = showDevBadges ? devTierByIndex(e.devTier ?? 0) : undefined;
     const devSub = e.devMergedPrs
       ? t('hudChrome.devBadge.prsLanded', {
           count: formatNumber(e.devMergedPrs, { maximumFractionDigits: 0 }),

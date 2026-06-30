@@ -32,6 +32,7 @@ import {
 } from './github_oauth';
 import { json } from './http_util';
 import { recordUsageMetric } from './provider_usage';
+import { githubRateLimited } from './ratelimit';
 import { publicOriginFromRequest } from './realm';
 
 const STATE_TTL_MINUTES = 10;
@@ -93,30 +94,51 @@ export async function handleGitHubCallback(
 ): Promise<void> {
   const cfg = githubConfig();
   if (!cfg) return bouncePage(res, 503, { ok: false, error: 'not_configured' });
+  // No bearer token has been resolved yet (this is a github.com redirect, not an
+  // authenticated request), so key the bucket on IP alone, mirroring how the
+  // Discord first-time-login chooser endpoints rate-limit their own
+  // also-unauthenticated entry points (handleDiscordLoginNew/handleDiscordLoginLink).
+  if (githubRateLimited(req, 0)) {
+    recordUsageMetric('github.link.rate_limited');
+    return bouncePage(res, 429, { ok: false, error: 'rate_limited' });
+  }
   const u = new URL(req.url ?? '/', 'http://localhost');
   const code = u.searchParams.get('code') ?? '';
   const state = u.searchParams.get('state') ?? '';
   if (u.searchParams.get('error')) {
-    // User clicked "Cancel" on GitHub's consent screen.
+    // User clicked "Cancel" on GitHub's consent screen: not a failure to alert on.
     return bouncePage(res, 200, { ok: false, error: 'cancelled' });
   }
-  if (!code || !state) return bouncePage(res, 400, { ok: false, error: 'bad_request' });
+  if (!code || !state) {
+    recordUsageMetric('github.link.failure');
+    return bouncePage(res, 400, { ok: false, error: 'bad_request' });
+  }
 
   const stateRow = await consumeGitHubOAuthState(pool, state);
-  if (!stateRow) return bouncePage(res, 400, { ok: false, error: 'expired' });
+  if (!stateRow) {
+    recordUsageMetric('github.link.failure');
+    return bouncePage(res, 400, { ok: false, error: 'expired' });
+  }
 
   const user = await exchangeCodeForUser(code, redirectUriFor(req), state, cfg);
-  if (!user) return bouncePage(res, 502, { ok: false, error: 'github_error' });
+  if (!user) {
+    recordUsageMetric('github.link.failure');
+    return bouncePage(res, 502, { ok: false, error: 'github_error' });
+  }
 
   try {
     const linked = await linkGitHubToAccount(pool, stateRow.account_id, {
       githubUserId: user.id,
       login: user.login,
     });
-    if (!linked) return bouncePage(res, 409, { ok: false, error: 'already_linked' });
+    if (!linked) {
+      recordUsageMetric('github.link.failure');
+      return bouncePage(res, 409, { ok: false, error: 'already_linked' });
+    }
     return bouncePage(res, 200, { ok: true, login: user.login });
   } catch (err) {
     console.error('github callback error:', err);
+    recordUsageMetric('github.link.failure');
     return bouncePage(res, 500, { ok: false, error: 'server_error' });
   }
 }

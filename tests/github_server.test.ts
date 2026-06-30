@@ -26,7 +26,8 @@ import {
   handleGitHubUnlink,
 } from '../server/github';
 import { resetContributorsCache } from '../server/github_contributors';
-import { resetGithubRateLimits } from '../server/ratelimit';
+import { providerUsageSnapshot, resetProviderUsageForTests } from '../server/provider_usage';
+import { GITHUB_MAX_PER_MINUTE, resetGithubRateLimits } from '../server/ratelimit';
 
 function makeReq(opts: { url?: string } = {}): any {
   const req: any = new Readable({
@@ -128,6 +129,7 @@ beforeEach(() => {
   stateRows = [];
   resetGithubRateLimits();
   resetContributorsCache();
+  resetProviderUsageForTests();
   dbMock.query.mockReset();
   dbMock.query.mockImplementation((sql: string) => Promise.resolve(defaultRouter(sql)));
 });
@@ -139,6 +141,11 @@ afterEach(() => {
 
 function parse(res: any) {
   return { status: res.statusCode, data: res.body ? JSON.parse(res.body) : {} };
+}
+
+function metricCount(key: string): number {
+  const metric = providerUsageSnapshot().metrics.find((m) => m.key === key);
+  return metric ? metric.counts.h24 : -1;
 }
 
 describe('githubConfig / githubEnabled', () => {
@@ -240,6 +247,23 @@ describe('GET /api/auth/github/callback', () => {
     expect(res.headers['Content-Type']).toContain('text/html');
     expect(res.body).toContain('woc-github');
     expect(res.body).toContain('cancelled');
+    // A deliberate cancel is not a failure: it must not pollute the failure metric.
+    expect(metricCount('github.link.failure')).toBe(0);
+  });
+
+  it('429s without calling GitHub once the per-IP bucket is exhausted', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch' as any);
+    for (let i = 0; i < GITHUB_MAX_PER_MINUTE; i++) {
+      const warm = makeRes();
+      await handleGitHubCallback(makeReq({ url: '/api/auth/github/callback?state=s' }), warm);
+      expect(warm.statusCode).toBe(400); // missing code: cheap, exercises the bucket
+    }
+    const res = makeRes();
+    await handleGitHubCallback(makeReq({ url: '/api/auth/github/callback?code=abc&state=s' }), res);
+    expect(res.statusCode).toBe(429);
+    expect(res.body).toContain('rate_limited');
+    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(metricCount('github.link.rate_limited')).toBe(1);
   });
 
   it('400s a missing code or state without calling GitHub', async () => {
@@ -248,6 +272,7 @@ describe('GET /api/auth/github/callback', () => {
     await handleGitHubCallback(makeReq({ url: '/api/auth/github/callback?state=s' }), res);
     expect(res.body).toContain('bad_request');
     expect(fetchSpy).not.toHaveBeenCalled();
+    expect(metricCount('github.link.failure')).toBe(1);
   });
 
   it('rejects an expired/forged state without calling GitHub', async () => {
@@ -260,6 +285,7 @@ describe('GET /api/auth/github/callback', () => {
     );
     expect(res.body).toContain('expired');
     expect(fetchSpy).not.toHaveBeenCalled();
+    expect(metricCount('github.link.failure')).toBe(1);
   });
 
   it('502s when the GitHub token/user exchange fails', async () => {
@@ -271,6 +297,7 @@ describe('GET /api/auth/github/callback', () => {
     const res = makeRes();
     await handleGitHubCallback(makeReq({ url: '/api/auth/github/callback?code=abc&state=s' }), res);
     expect(res.body).toContain('github_error');
+    expect(metricCount('github.link.failure')).toBe(1);
   });
 
   it('409s when the GitHub identity already belongs to another account', async () => {
@@ -280,6 +307,7 @@ describe('GET /api/auth/github/callback', () => {
     const res = makeRes();
     await handleGitHubCallback(makeReq({ url: '/api/auth/github/callback?code=abc&state=s' }), res);
     expect(res.body).toContain('already_linked');
+    expect(metricCount('github.link.failure')).toBe(1);
   });
 
   it('links the verified identity to the account that started the flow (not a client-supplied id)', async () => {
@@ -297,6 +325,7 @@ describe('GET /api/auth/github/callback', () => {
     // The account id bound to the state row, not anything an attacker could pass
     // in the callback's query string.
     expect(insert?.[1]).toEqual([1, '5', 'jgyy']);
+    expect(metricCount('github.link.failure')).toBe(0);
   });
 
   it('500s without leaking internals when the DB upsert throws a non-conflict error', async () => {
@@ -312,5 +341,6 @@ describe('GET /api/auth/github/callback', () => {
     await handleGitHubCallback(makeReq({ url: '/api/auth/github/callback?code=abc&state=s' }), res);
     expect(res.body).toContain('server_error');
     expect(res.body).not.toContain('db is down');
+    expect(metricCount('github.link.failure')).toBe(1);
   });
 });

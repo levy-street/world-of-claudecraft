@@ -34,7 +34,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.leaderboard.devName",
     "hudChrome.leaderboard.devTierCol",
     "hudChrome.leaderboard.mergedPrs",
-    "hudChrome.leaderboard.tabDevs"
+    "hudChrome.leaderboard.tabDevs",
+    "hudChrome.options.showDevBadges"
   ],
   "es_ES": [
     "hudChrome.devBadge.badgeTitle",
@@ -61,7 +62,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.leaderboard.devName",
     "hudChrome.leaderboard.devTierCol",
     "hudChrome.leaderboard.mergedPrs",
-    "hudChrome.leaderboard.tabDevs"
+    "hudChrome.leaderboard.tabDevs",
+    "hudChrome.options.showDevBadges"
   ],
   "fr_FR": [
     "hudChrome.devBadge.badgeTitle",
@@ -88,7 +90,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.leaderboard.devName",
     "hudChrome.leaderboard.devTierCol",
     "hudChrome.leaderboard.mergedPrs",
-    "hudChrome.leaderboard.tabDevs"
+    "hudChrome.leaderboard.tabDevs",
+    "hudChrome.options.showDevBadges"
   ],
   "fr_CA": [
     "hudChrome.devBadge.badgeTitle",
@@ -115,7 +118,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.leaderboard.devName",
     "hudChrome.leaderboard.devTierCol",
     "hudChrome.leaderboard.mergedPrs",
-    "hudChrome.leaderboard.tabDevs"
+    "hudChrome.leaderboard.tabDevs",
+    "hudChrome.options.showDevBadges"
   ],
   "en_CA": [],
   "it_IT": [
@@ -143,7 +147,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.leaderboard.devName",
     "hudChrome.leaderboard.devTierCol",
     "hudChrome.leaderboard.mergedPrs",
-    "hudChrome.leaderboard.tabDevs"
+    "hudChrome.leaderboard.tabDevs",
+    "hudChrome.options.showDevBadges"
   ],
   "de_DE": [
     "hudChrome.devBadge.badgeTitle",
@@ -170,7 +175,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.leaderboard.devName",
     "hudChrome.leaderboard.devTierCol",
     "hudChrome.leaderboard.mergedPrs",
-    "hudChrome.leaderboard.tabDevs"
+    "hudChrome.leaderboard.tabDevs",
+    "hudChrome.options.showDevBadges"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -201,7 +207,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.leaderboard.devName",
     "hudChrome.leaderboard.devTierCol",
     "hudChrome.leaderboard.mergedPrs",
-    "hudChrome.leaderboard.tabDevs"
+    "hudChrome.leaderboard.tabDevs",
+    "hudChrome.options.showDevBadges"
   ],
   "ru_RU": [],
   "nl_NL": [
@@ -229,7 +236,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.leaderboard.devName",
     "hudChrome.leaderboard.devTierCol",
     "hudChrome.leaderboard.mergedPrs",
-    "hudChrome.leaderboard.tabDevs"
+    "hudChrome.leaderboard.tabDevs",
+    "hudChrome.options.showDevBadges"
   ],
   "pl_PL": [
     "hudChrome.devBadge.badgeTitle",
@@ -256,7 +264,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.leaderboard.devName",
     "hudChrome.leaderboard.devTierCol",
     "hudChrome.leaderboard.mergedPrs",
-    "hudChrome.leaderboard.tabDevs"
+    "hudChrome.leaderboard.tabDevs",
+    "hudChrome.options.showDevBadges"
   ],
   "id_ID": [
     "hudChrome.devBadge.badgeTitle",
@@ -283,7 +292,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.leaderboard.devName",
     "hudChrome.leaderboard.devTierCol",
     "hudChrome.leaderboard.mergedPrs",
-    "hudChrome.leaderboard.tabDevs"
+    "hudChrome.leaderboard.tabDevs",
+    "hudChrome.options.showDevBadges"
   ],
   "tr_TR": [
     "hudChrome.devBadge.badgeTitle",
@@ -310,7 +320,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.leaderboard.devName",
     "hudChrome.leaderboard.devTierCol",
     "hudChrome.leaderboard.mergedPrs",
-    "hudChrome.leaderboard.tabDevs"
+    "hudChrome.leaderboard.tabDevs",
+    "hudChrome.options.showDevBadges"
   ],
   "sv_SE": [
     "hudChrome.devBadge.badgeTitle",
@@ -337,7 +348,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.leaderboard.devName",
     "hudChrome.leaderboard.devTierCol",
     "hudChrome.leaderboard.mergedPrs",
-    "hudChrome.leaderboard.tabDevs"
+    "hudChrome.leaderboard.tabDevs",
+    "hudChrome.options.showDevBadges"
   ],
   "vi_VN": [
     "hudChrome.devBadge.badgeTitle",
@@ -364,7 +376,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.leaderboard.devName",
     "hudChrome.leaderboard.devTierCol",
     "hudChrome.leaderboard.mergedPrs",
-    "hudChrome.leaderboard.tabDevs"
+    "hudChrome.leaderboard.tabDevs",
+    "hudChrome.options.showDevBadges"
   ],
   "da_DK": [
     "hudChrome.devBadge.badgeTitle",
@@ -391,6 +404,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.leaderboard.devName",
     "hudChrome.leaderboard.devTierCol",
     "hudChrome.leaderboard.mergedPrs",
-    "hudChrome.leaderboard.tabDevs"
+    "hudChrome.leaderboard.tabDevs",
+    "hudChrome.options.showDevBadges"
   ]
 };

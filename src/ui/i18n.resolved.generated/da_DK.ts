@@ -335,6 +335,7 @@ export const da_DK: EnTranslations = {
       "keybindHelpLockCursorOnRotate": "Holder musemarkøren inde i vinduet, mens du trækker for at dreje kameraet, så den ikke kan nå skærmkanten eller flytte til en anden skærm. Slå fra, hvis du foretrækker en fri markør.",
       "showWalletOnCharacterScreen": "Vis pengepung på karakterskærm",
       "showWalletOnPlayerCard": "Vis pengepung på spillerkort",
+      "showDevBadges": "Show Developer Badges",
       "uiScale": "UI-skala",
       "highContrastBackground": "Baggrund med høj kontrast",
       "showItemLevel": "Vis genstandsniveau",

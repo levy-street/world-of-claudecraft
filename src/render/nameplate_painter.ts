@@ -70,6 +70,8 @@ export interface NameplatePainterDeps {
   getViewport: () => { width: number; height: number };
   /** the player's mob-nameplate toggle */
   showNameplates: () => boolean;
+  /** the player's developer-badge display toggle (glyph + name outline) */
+  showDevBadges: () => boolean;
   /** PvP reaction check, owned by the renderer (duel/arena state) */
   isHostilePlayer: (e: Entity) => boolean;
 }
@@ -80,6 +82,7 @@ export class NameplatePainter {
   private readonly world: IWorld;
   private readonly getViewport: () => { width: number; height: number };
   private readonly showNameplates: () => boolean;
+  private readonly showDevBadges: () => boolean;
   private readonly isHostilePlayer: (e: Entity) => boolean;
   // scratch reused every frame (no per-frame alloc); was renderer.tmpV/tmpV2.
   private readonly tmpV = new THREE.Vector3();
@@ -93,6 +96,7 @@ export class NameplatePainter {
     this.world = deps.world;
     this.getViewport = deps.getViewport;
     this.showNameplates = deps.showNameplates;
+    this.showDevBadges = deps.showDevBadges;
     this.isHostilePlayer = deps.isHostilePlayer;
   }
 
@@ -104,6 +108,7 @@ export class NameplatePainter {
     const p = world.player;
     const { width: w, height: h } = this.getViewport();
     const showNameplates = this.showNameplates();
+    const showDevBadges = this.showDevBadges();
     for (const [id, v] of this.views) {
       const e = world.entities.get(id);
       if (!e) continue;
@@ -192,8 +197,10 @@ export class NameplatePainter {
         const displayName = roleTag ? `[${roleTag}] ${e.name}` : e.name;
         // Significant-contributor outline: a glowing outline drawn on top of the
         // existing name color (Discord staff or default) for a high dev tier, so
-        // both read at once. Null for non-significant tiers and for self.
-        const devOutline = isSelf ? null : devTierNameOutlineColor(e.devTier ?? 0);
+        // both read at once. Null for non-significant tiers, for self, and when
+        // the player has turned developer badges off.
+        const devOutline =
+          isSelf || !showDevBadges ? null : devTierNameOutlineColor(e.devTier ?? 0);
         this.setNameplateStatic(
           v,
           `player|${displayName}|${roleColor ?? ''}|${guild}|${nameDisplay}|${hpDisplay}|${opacity}|${devOutline ?? ''}`,
@@ -211,7 +218,7 @@ export class NameplatePainter {
         // $WOC holder-tier flair, shown on OTHER players (own nameplate is hidden).
         this.setNameplateTier(v, isSelf ? 0 : (e.holderTier ?? 0));
         // Developer-badge flair, also OTHER players only.
-        this.setNameplateDevTier(v, isSelf ? 0 : (e.devTier ?? 0));
+        this.setNameplateDevTier(v, isSelf || !showDevBadges ? 0 : (e.devTier ?? 0));
         // Linked-Discord PFP indicator, also OTHER players only.
         this.setNameplateDiscord(v, isSelf ? undefined : e.discordAvatar, e.discordName);
         this.setNameplateHp(v, e);

@@ -335,6 +335,7 @@ export const id_ID: EnTranslations = {
       "keybindHelpLockCursorOnRotate": "Menjaga kursor mouse tetap di dalam jendela saat Anda menyeret untuk memutar kamera, sehingga tidak mencapai tepi layar atau berpindah ke monitor lain. Matikan jika Anda lebih suka kursor bebas.",
       "showWalletOnCharacterScreen": "Tampilkan Dompet di Layar Karakter",
       "showWalletOnPlayerCard": "Tampilkan Dompet di Kartu Pemain",
+      "showDevBadges": "Show Developer Badges",
       "uiScale": "Skala UI",
       "highContrastBackground": "Latar Kontras Tinggi",
       "showItemLevel": "Tampilkan Level Item",

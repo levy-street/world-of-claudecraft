@@ -335,6 +335,7 @@ export const ko_KR: EnTranslations = {
       "keybindHelpLockCursorOnRotate": "드래그하여 카메라를 회전하는 동안 마우스 커서를 창 안에 유지하여 화면 가장자리에 닿거나 다른 모니터로 이동하지 않도록 합니다. 자유로운 커서를 원하면 끄세요.",
       "showWalletOnCharacterScreen": "캐릭터 화면에 지갑 표시",
       "showWalletOnPlayerCard": "플레이어 카드에 지갑 표시",
+      "showDevBadges": "개발자 배지 표시",
       "uiScale": "UI 배율",
       "highContrastBackground": "고대비 배경",
       "showItemLevel": "아이템 레벨 표시",

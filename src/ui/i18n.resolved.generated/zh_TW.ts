@@ -335,6 +335,7 @@ export const zh_TW: EnTranslations = {
       "keybindHelpLockCursorOnRotate": "拖曳旋轉鏡頭時將滑鼠游標保持在視窗內，使其無法到達螢幕邊緣或移動到另一台顯示器。若你偏好自由游標，請關閉此選項。",
       "showWalletOnCharacterScreen": "在角色畫面顯示錢包",
       "showWalletOnPlayerCard": "在玩家卡片顯示錢包",
+      "showDevBadges": "顯示開發者徽章",
       "uiScale": "介面縮放",
       "highContrastBackground": "高對比度背景",
       "showItemLevel": "顯示物品等級",
