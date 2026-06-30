@@ -923,4 +923,48 @@ export const hudChromeStrings = {
       help: { label: 'Need Help', hint: 'Ask the community for help' },
     },
   },
+  // Developer badge: a cosmetic honor for contributors by landed-commit count
+  // (the ladder lives in src/sim/dev_tier.ts; the data is sourced from a verified
+  // GitHub-OAuth link plus the repo's contributor stats). Shown on the player
+  // card, the overhead nameplate, and the inspect screen.
+  devBadge: {
+    title: 'Developer',
+    // Tier display names (the ladder lives in src/sim/dev_tier.ts).
+    tiers: {
+      tinkerer: 'Tinkerer',
+      artificer: 'Artificer',
+      runesmith: 'Runesmith',
+      architect: 'Architect',
+      worldwright: 'Worldwright',
+    },
+    // Flavor lines per rung (shown on the inspect screen and the player card).
+    flavors: {
+      tinkerer: 'Your first commit landed in the realm.',
+      artificer: 'Ten commits in, and the world bends to your code.',
+      runesmith: 'Fifty commits forged into the running game.',
+      architect: 'An architect of the realm: 150 commits landed.',
+      worldwright: 'A wright of worlds: 500 commits shape the game.',
+    },
+    // Nameplate badge tooltip + inspect/card readouts.
+    badgeTitle: 'Developer: {tier}',
+    commitsLanded: '{count} commits landed',
+    contributor: 'Open-source contributor',
+    cardLabel: 'Developer',
+    // GitHub link panel (mirrors the Discord link UI).
+    link: {
+      cta: 'Link GitHub',
+      relink: 'Relink GitHub',
+      connecting: 'Opening GitHub...',
+      benefits:
+        'Link your GitHub to earn a developer badge for the commits you have landed in the open-source repo.',
+      error: 'Could not link GitHub. Please try again.',
+      success: 'GitHub linked.',
+      notContributor: 'No landed commits found for that GitHub account yet.',
+    },
+    linkedAs: 'Linked as {login}',
+    linkedTitle: 'GitHub: {login}',
+    profileTitle: "Open this contributor's GitHub profile",
+    unlink: 'Unlink GitHub',
+    unlinkConfirm: 'Unlink your GitHub account from this game account?',
+  },
 };
