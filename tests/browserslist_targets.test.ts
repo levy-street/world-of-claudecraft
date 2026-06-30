@@ -26,6 +26,11 @@ describe('browserslist floor parser', () => {
     expect(parseBrowserslistFloors(text)).toEqual(['chrome 120', 'safari 17.2']);
   });
 
+  it('ignores comment lines from CRLF checkouts', () => {
+    const text = '# floor\r\nChrome >= 120\r\n# trailing note\r\nFirefox >= 121\r\n';
+    expect(parseBrowserslistFloors(text)).toEqual(['chrome 120', 'firefox 121']);
+  });
+
   it('strips a # comment BEFORE splitting on comma (a comment may contain a comma)', () => {
     // Load-bearing ordering: if comma-split ran first, the text after the comma in the
     // comment would lose its '#' and parse as a bogus floor. This is the exact bug the
