@@ -2431,6 +2431,7 @@ export const ru_RU: EnTranslations = {
   "loading": {
     "world": "Загрузка мира...",
     "worldProgress": "Загрузка мира... {done}/{total}",
+    "progress": "{label} {pct}%",
     "enteringWorld": "Вход в мир...",
     "connectingRealm": "Подключение к миру...",
     "assetsFailed": "Не удалось загрузить ресурсы: попробуйте обновить страницу. {error}",

@@ -113,17 +113,19 @@ The contract above is the WHAT; reach for the matching one when you build a hot 
   past the cap). `auras_painter` (keyed pool + `reconcileOrder`), `fct_painter` (pool + FIFO cap).
 - **Offscreen-canvas background cache.** Render static geometry ONCE to a detached canvas keyed
   by what it depends on (zone+seed, module id), then `drawImage`-blit it each redraw; only the
-  dynamic markers re-stroke per frame (`delve_map_painter`, the per-zone `mapBgCache`, the
-  `minimapBg` terrain canvas).
+  dynamic markers re-stroke per frame (`delve_map_painter`, the per-`(seed,zone)` world-map cache
+  in `map_background.ts`, the `minimapBg` terrain canvas).
 - **Set loop-invariant canvas state once.** Assigning `ctx.font` re-parses the font string every
   time, so set `font` / `fillStyle` / `lineWidth` before a draw loop, not per glyph
   (`map_window_painter`).
 - **DPR backing store only where it must be crisp.** A HiDPI canvas sizes its backing store to
   `devicePixelRatio` and reassigns `width`/`height` only when the DPR changes (assignment clears
   the canvas); portraits are DPR-scaled (`unit_portrait_painter`), the minimap/map/delve are 1:1.
-- **Prewarm heavy canvas work off the interaction.** A multi-hundred-ms render is painted a few
-  rows per `requestIdleCallback` slice and cached, so opening the map never pays it synchronously
-  (`hud.ts` `prewarmMapBg`).
+- **Preload heavy canvas work behind the loading screen, not the interaction.** The world-map
+  terrain (~200ms, ~230k `terrainHeight` samples) is row-sliced and baked by `map_background.ts`
+  at boot (spawn zone) and on a zone transition (the brief overlay in `main.ts`
+  `preloadZoneTransition`), never on the open click and never streamed mid-play. The pure pixel
+  math stays in `map_terrain.ts`; `getMapBackgroundCanvas` is the thin DOM consumer.
 - **Transform vs layout, honestly.** No blanket prefer-transform rule: reach for
   `transform`/`opacity` when an element actually MOVES every frame (nameplates), and lean on
   write-once + elision otherwise (FCT writes its screen-anchored `left`/`top` once at spawn; bars

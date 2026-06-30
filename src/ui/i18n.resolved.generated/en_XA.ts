@@ -2431,6 +2431,7 @@ export const en_XA: EnTranslations = {
   "loading": {
     "world": "[Ļóáðíñĝ ŵóŕļð...]",
     "worldProgress": "[Ļóáðíñĝ ŵóŕļð... {done}/{total}]",
+    "progress": "[{label} {pct}%]",
     "enteringWorld": "[Éñţéŕíñĝ ţĥé ŵóŕļð...]",
     "connectingRealm": "[Çóññéçţíñĝ ţó ŕéáļɱ...]",
     "assetsFailed": "[Áššéţ ļóáðíñĝ ƒáíļéð: ţŕý ŕéļóáðíñĝ. {error}]",

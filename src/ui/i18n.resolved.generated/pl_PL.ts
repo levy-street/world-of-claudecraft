@@ -2431,6 +2431,7 @@ export const pl_PL: EnTranslations = {
   "loading": {
     "world": "Wczytywanie świata...",
     "worldProgress": "Wczytywanie świata... {done}/{total}",
+    "progress": "{label} {pct}%",
     "enteringWorld": "Wchodzenie do świata...",
     "connectingRealm": "Łączenie z królestwem...",
     "assetsFailed": "Wczytywanie zasobów nie powiodło się: spróbuj odświeżyć. {error}",

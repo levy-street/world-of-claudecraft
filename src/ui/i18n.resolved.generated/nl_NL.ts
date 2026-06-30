@@ -2431,6 +2431,7 @@ export const nl_NL: EnTranslations = {
   "loading": {
     "world": "Wereld laden...",
     "worldProgress": "Wereld laden... {done}/{total}",
+    "progress": "{label} {pct}%",
     "enteringWorld": "De wereld betreden...",
     "connectingRealm": "Verbinden met realm...",
     "assetsFailed": "Laden van assets mislukt: probeer opnieuw te laden. {error}",

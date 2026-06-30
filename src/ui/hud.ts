@@ -201,6 +201,7 @@ import { LockpickWindow } from './lockpick_window';
 import { reconcileLootRolls as computeLootRollReconcile } from './loot_roll_reconcile';
 import { lowHealthVignette } from './low_health';
 import { lowResourceView } from './low_resource';
+import { getMapBackgroundCanvas } from './map_background';
 import { type MapRegion, mapCanvasHeight, paintTerrainRows } from './map_terrain';
 import { MapWindowPainter } from './map_window_painter';
 import { MAP_MAX_ZOOM, mapWindowMode } from './map_window_view';
@@ -522,9 +523,8 @@ type MobileHotbarDrag = {
   targetIndex: number | null;
 };
 
-// world map: terrain is pre-rendered for the whole zone at this resolution
-// (cached per zone) and a sub-rect is blitted for the current zoom.
-const MAP_BG_RES = 480;
+// world map: terrain backgrounds (pre-rendered per zone, cached) live in
+// map_background.ts; a sub-rect is blitted for the current zoom.
 // MAP_MAX_ZOOM (zoomMap clamp) and MAP_DETAIL_ZOOM live in map_window_view.ts now,
 // alongside the overworld map geometry that uses them.
 
@@ -791,29 +791,11 @@ export class Hud {
   // presets (see minimap_zoom.ts), persisted to localStorage. 1 = shipped look.
   private minimapZoom = MINIMAP_ZOOM_DEFAULT;
   private minimapZoomLabel: HTMLElement | null = null;
-  // World-map terrain backgrounds, cached per zone. A background depends only on
-  // (seed, zone bounds), both fixed for the session, so it is immutable and
-  // cached forever; rendering one is ~200ms (230k terrainHeight/roadDistance
-  // samples), which is why it must never run on the open path (see mapPrewarm).
-  private mapBgCache = new Map<string, HTMLCanvasElement>();
-  // In-flight idle prewarm of one zone's background, painted a few rows per
-  // idle slice so it never blocks a frame. Committed to mapBgCache when done.
-  private mapPrewarm: {
-    zoneId: string;
-    canvas: HTMLCanvasElement;
-    ctx: CanvasRenderingContext2D;
-    img: ImageData;
-    W: number;
-    H: number;
-    row: number;
-    region: MapRegion;
-  } | null = null;
-  private mapPrewarmHandle = 0;
-  // Which scheduler produced mapPrewarmHandle. requestIdleCallback and setTimeout
-  // hand out ids from separate pools, so the handle must be cancelled with the
-  // matching canceller; a clearTimeout on an idle id (or vice versa) could cancel
-  // an unrelated timer that happens to share the number.
-  private mapPrewarmVia: 'idle' | 'timeout' | null = null;
+  // World-map terrain backgrounds are baked behind the loading screen (at boot for
+  // every zone, and on a zone transition) and cached by `map_background.ts`, never
+  // on the open path. `onCommittedZoneChange` lets `main.ts` run the transition
+  // preload overlay (bake the new zone's map + warm its area) before play resumes.
+  onCommittedZoneChange: ((zone: ZoneDef) => void) | null = null;
   // Delve schematic caches: static background (floor/pillars/tombs/dais/exit)
   // keyed by module id, redrawn only when the module changes.
   private openLootMobId: number | null = null;
@@ -1256,7 +1238,6 @@ export class Hud {
     const startZone = zoneAt(sim.player.pos.z);
     const startZoneName = zoneDisplayName(startZone.id);
     this.lastZoneId = startZone.id;
-    this.prewarmMapBg(startZone.id); // render the spawn-zone map bg during idle, not on first open
     this.showBanner(startZoneName);
     this.log(t('hud.core.welcomeZone', { zone: startZoneName }), '#ffd100');
     this.logZoneWelcome(startZone);
@@ -4528,7 +4509,9 @@ export class Hud {
             this.logZoneWelcome(currentZone);
           }
           this.lastZoneId = currentZone.id;
-          this.prewarmMapBg(currentZone.id); // get the new zone's map bg ready before the player opens it
+          // Preload the new area (map + zone assets) behind a brief overlay before
+          // play continues, instead of streaming it in mid-play.
+          this.onCommittedZoneChange?.(currentZone);
         }
       }
 
@@ -5272,117 +5255,13 @@ export class Hud {
     return c;
   }
 
-  // The full-zone band used by the world map (and prewarm), keyed only on z.
-  private mapZoneRegion(zone: ZoneDef): MapRegion {
-    return { minX: WORLD_MIN_X, maxX: WORLD_MAX_X, minZ: zone.zMin, maxZ: zone.zMax };
-  }
-
-  // The cached terrain background for a zone, rendering it synchronously only if
-  // a prewarm hasn't already produced it. The synchronous path is the fallback
-  // for "opened the map the instant we entered a zone"; normally the idle
-  // prewarm has it ready and this is a Map hit.
+  // The world-map background for a zone, baked behind the loading screen (at boot
+  // for every zone, and on a zone transition) and cached by `map_background.ts`.
+  // A cache miss here bakes synchronously as a fallback (the map opened before the
+  // preload produced it); normally this is a cache hit, so the click pays nothing.
   private mapZoneBg(zone: ZoneDef): HTMLCanvasElement {
-    const cached = this.mapBgCache.get(zone.id);
-    if (cached) return cached;
-    const bg = this.renderTerrainCanvas(MAP_BG_RES, this.mapZoneRegion(zone));
-    this.mapBgCache.set(zone.id, bg);
-    // a redundant in-flight prewarm for this same zone can be dropped now
-    if (this.mapPrewarm?.zoneId === zone.id) this.cancelMapPrewarm();
-    return bg;
+    return getMapBackgroundCanvas(this.sim.cfg.seed, zone);
   }
-
-  // Kick off (or no-op) an idle, time-sliced render of a zone's map background
-  // so opening the map never pays the ~200ms terrain cost on the click. Called
-  // when the committed zone changes and once at startup for the spawn zone.
-  private prewarmMapBg(zoneId: string): void {
-    if (this.mapBgCache.has(zoneId)) return;
-    if (this.mapPrewarm?.zoneId === zoneId) return; // already prewarming it
-    const zone = ZONES.find((z) => z.id === zoneId);
-    if (!zone) return;
-    this.cancelMapPrewarm(); // drop any prewarm for a now-stale zone
-    const region = this.mapZoneRegion(zone);
-    const W = MAP_BG_RES;
-    const H = mapCanvasHeight(W, region);
-    const c = document.createElement('canvas');
-    c.width = W;
-    c.height = H;
-    const ctx = require2dContext(c);
-    this.mapPrewarm = {
-      zoneId,
-      canvas: c,
-      ctx,
-      img: ctx.createImageData(W, H),
-      W,
-      H,
-      row: 0,
-      region,
-    };
-    this.scheduleMapPrewarm();
-  }
-
-  private cancelMapPrewarm(): void {
-    if (this.mapPrewarmHandle) {
-      // Cancel only with the scheduler that produced this handle (see
-      // mapPrewarmVia): the two id pools are separate per spec, so a cross
-      // canceller could clear an unrelated timer sharing the number. When the
-      // idle path lacks cancelIdleCallback there is nothing to call, but the
-      // pumpMapPrewarm `if (!job) return` guard makes the stale callback a no-op.
-      if (this.mapPrewarmVia === 'idle') {
-        const cancel = (window as typeof window & { cancelIdleCallback?: (h: number) => void })
-          .cancelIdleCallback;
-        if (cancel) cancel(this.mapPrewarmHandle);
-      } else {
-        clearTimeout(this.mapPrewarmHandle);
-      }
-      this.mapPrewarmHandle = 0;
-      this.mapPrewarmVia = null;
-    }
-    this.mapPrewarm = null;
-  }
-
-  private scheduleMapPrewarm(): void {
-    const w = window as typeof window & {
-      requestIdleCallback?: (
-        cb: (d: { timeRemaining(): number }) => void,
-        opts?: { timeout: number },
-      ) => number;
-    };
-    if (w.requestIdleCallback) {
-      this.mapPrewarmHandle = w.requestIdleCallback(this.pumpMapPrewarm, { timeout: 2000 });
-      this.mapPrewarmVia = 'idle';
-    } else {
-      this.mapPrewarmHandle = window.setTimeout(() => this.pumpMapPrewarm(), 16);
-      this.mapPrewarmVia = 'timeout';
-    }
-  }
-
-  // Paint a budgeted slice of the in-flight prewarm, then reschedule until the
-  // zone is fully rendered. Whole rows per slice keeps it byte-identical to a
-  // one-shot render (the only per-row state, hillshade, resets each row).
-  // With an idle deadline we paint as many slices as fit; without one (the
-  // setTimeout fallback) we paint a single slice and let the reschedule pace it,
-  // so the no-requestIdleCallback path stays sliced instead of rendering the
-  // whole canvas in one ~200ms hitch.
-  private pumpMapPrewarm = (deadline?: { timeRemaining(): number }): void => {
-    const job = this.mapPrewarm;
-    if (!job) return;
-    const seed = this.sim.cfg.seed;
-    const ROWS_PER_SLICE = 16; // ~6ms at MAP_BG_RES; one frame fits several
-    do {
-      const end = Math.min(job.H, job.row + ROWS_PER_SLICE);
-      paintTerrainRows(job.img.data, job.W, job.H, job.region, seed, job.row, end);
-      job.row = end;
-    } while (job.row < job.H && deadline !== undefined && deadline.timeRemaining() > 3);
-    if (job.row >= job.H) {
-      job.ctx.putImageData(job.img, 0, 0);
-      this.mapBgCache.set(job.zoneId, job.canvas);
-      this.mapPrewarm = null;
-      this.mapPrewarmHandle = 0;
-      this.mapPrewarmVia = null;
-      return;
-    }
-    this.scheduleMapPrewarm();
-  };
 
   // Refresh the minimap clock to the current real local time. Cheap to call
   // every frame: the formatted string only changes once a minute, and we skip

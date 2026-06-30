@@ -29,6 +29,10 @@ export const shellStrings = {
     loading: {
       world: 'Loading world...',
       worldProgress: 'Loading world... {done}/{total}',
+      // Preload progress line: {label} is an already-localized phase/zone name and
+      // {pct} a formatted 0-100 percent. Token-only by design (no English prose) so
+      // it needs no per-locale fill: the bar shows the percent, the label says what.
+      progress: '{label} {pct}%',
       enteringWorld: 'Entering the world...',
       connectingRealm: 'Connecting to realm...',
       assetsFailed: 'Asset loading failed: try reloading. {error}',

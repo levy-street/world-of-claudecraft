@@ -2431,6 +2431,7 @@ export const ko_KR: EnTranslations = {
   "loading": {
     "world": "세계 불러오는 중...",
     "worldProgress": "세계 불러오는 중... {done}/{total}",
+    "progress": "{label} {pct}%",
     "enteringWorld": "세계에 입장하는 중...",
     "connectingRealm": "렐름에 연결하는 중...",
     "assetsFailed": "리소스 불러오기에 실패했습니다. 새로고침해 보세요. {error}",

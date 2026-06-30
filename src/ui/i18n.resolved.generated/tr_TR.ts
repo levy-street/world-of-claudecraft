@@ -2431,6 +2431,7 @@ export const tr_TR: EnTranslations = {
   "loading": {
     "world": "Dünya yükleniyor...",
     "worldProgress": "Dünya yükleniyor... {done}/{total}",
+    "progress": "{label} {pct}%",
     "enteringWorld": "Dünyaya giriliyor...",
     "connectingRealm": "Diyara bağlanılıyor...",
     "assetsFailed": "Varlık yüklemesi başarısız oldu: yeniden yüklemeyi deneyin. {error}",

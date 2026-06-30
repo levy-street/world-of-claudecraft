@@ -2431,6 +2431,7 @@ export const da_DK: EnTranslations = {
   "loading": {
     "world": "Indlæser verden...",
     "worldProgress": "Indlæser verden... {done}/{total}",
+    "progress": "{label} {pct}%",
     "enteringWorld": "Træder ind i verdenen...",
     "connectingRealm": "Forbinder til realm...",
     "assetsFailed": "Indlæsning af aktiver mislykkedes: prøv at genindlæse. {error}",

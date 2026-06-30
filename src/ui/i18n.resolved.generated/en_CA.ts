@@ -2431,6 +2431,7 @@ export const en_CA: EnTranslations = {
   "loading": {
     "world": "Loading world...",
     "worldProgress": "Loading world... {done}/{total}",
+    "progress": "{label} {pct}%",
     "enteringWorld": "Entering the world...",
     "connectingRealm": "Connecting to realm...",
     "assetsFailed": "Asset loading failed: try reloading. {error}",

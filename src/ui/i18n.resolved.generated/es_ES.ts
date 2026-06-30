@@ -2431,6 +2431,7 @@ export const es_ES: EnTranslations = {
   "loading": {
     "world": "Cargando mundo...",
     "worldProgress": "Cargando mundo... {done}/{total}",
+    "progress": "{label} {pct}%",
     "enteringWorld": "Entrando en el mundo...",
     "connectingRealm": "Conectando con el reino...",
     "assetsFailed": "Error al cargar recursos: prueba a recargar. {error}",

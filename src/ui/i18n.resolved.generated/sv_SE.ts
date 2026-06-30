@@ -2431,6 +2431,7 @@ export const sv_SE: EnTranslations = {
   "loading": {
     "world": "Läser in världen...",
     "worldProgress": "Läser in världen... {done}/{total}",
+    "progress": "{label} {pct}%",
     "enteringWorld": "Går in i världen...",
     "connectingRealm": "Ansluter till riket...",
     "assetsFailed": "Inläsning av tillgångar misslyckades: försök läsa om sidan. {error}",

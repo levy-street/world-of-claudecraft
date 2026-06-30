@@ -81,7 +81,7 @@ import { Renderer } from './render/renderer';
 import { navigatorSaveData } from './render/sky';
 import { pathCrossesFence } from './sim/colliders';
 import { ABILITIES, CLASSES } from './sim/content/classes';
-import { ITEMS } from './sim/data';
+import { ITEMS, type ZoneDef, zoneAt } from './sim/data';
 import { canEquipItem } from './sim/equipment_rules';
 import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
 import { Sim } from './sim/sim';
@@ -121,7 +121,7 @@ import {
   setDiscordUiEnabled,
 } from './ui/discord_status';
 import { renderDiscordWidget } from './ui/discord_widget';
-import { classDisplayName, tEntity } from './ui/entity_i18n';
+import { classDisplayName, tEntity, zoneDisplayName } from './ui/entity_i18n';
 import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
 import { Hud } from './ui/hud';
 import {
@@ -139,6 +139,7 @@ import {
   tPlural,
 } from './ui/i18n';
 import { iconDataUrl } from './ui/icons';
+import { hasMapBackground, prebakeZone } from './ui/map_background';
 import { createMetricsSampler } from './ui/perf_metrics_sampler';
 import { PerfOverlay } from './ui/perf_overlay';
 import { type PerfOverlayConfig, PerfOverlayConfigStore } from './ui/perf_overlay_config';
@@ -758,9 +759,17 @@ function setLoadingStatus(text: string): void {
   $('#ls-status').textContent = text;
 }
 
-function setLoadingProgress(done: number, total: number): void {
-  $('#ls-fill').style.width = total > 0 ? `${Math.round((done / total) * 100)}%` : '0%';
-  setLoadingStatus(t('loading.worldProgress', { done, total }));
+// Boot preload bar: the asset fetches own the first slice, the spawn-zone map
+// bake the last, so the bar reaches 100% only once the map is ready too.
+const PRELOAD_ASSETS_FRACTION = 0.85;
+
+// Fraction is 0..1 across the whole preload; label is an already-localized phase
+// or zone name. Shows a numeric percent (the bar AND the text) plus what is
+// loading, so the player sees a real "preloading X%" rather than a bare spinner.
+function setLoadingProgress(fraction: number, label: string): void {
+  const pct = Math.max(0, Math.min(100, Math.round(fraction * 100)));
+  $('#ls-fill').style.width = `${pct}%`;
+  setLoadingStatus(t('loading.progress', { label, pct: formatNumber(pct) }));
 }
 
 function hideLoadingScreen(): void {
@@ -783,6 +792,39 @@ function nextPaint(): Promise<void> {
   return new Promise((resolve) => {
     requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
   });
+}
+
+// Crossing into a new zone brings a different world map (and different area
+// assets). Bake the new zone's map terrain behind a brief loading overlay, with a
+// live percent, so the map opens instantly there and the player sees the preload
+// instead of a mid-play hitch. Skipped when the zone is already cached (re-crossing
+// a border never flashes the overlay); one transition at a time. The map bake is
+// the deterministic part; warming the zone's 3D assets/shaders is a follow-up that
+// needs real-GPU play-testing, so it is intentionally not bundled here yet.
+let zonePreloadInFlight = false;
+async function preloadZoneTransition(world: IWorld, zone: ZoneDef): Promise<void> {
+  if (zonePreloadInFlight) return;
+  if (hasMapBackground(world.cfg.seed, zone.id)) return;
+  zonePreloadInFlight = true;
+  let shown = false; // tracks whether the overlay is up, so finally only hides what it showed
+  try {
+    // Don't blank the screen mid-fight or during a ghost corpse-run: crossing a
+    // border then bakes SILENTLY in the background, never an input-blocking overlay.
+    const overlay = !(world.player.inCombat || world.player.dead);
+    const label = zoneDisplayName(zone.id);
+    if (overlay) {
+      showLoadingScreen(t('loading.progress', { label, pct: formatNumber(0) }));
+      setLoadingProgress(0, label); // reset the bar fill (it may still read 100% from boot)
+      shown = true;
+      await nextPaint(); // paint the overlay before the synchronous slices block
+    }
+    await prebakeZone(world.cfg.seed, zone, (done, total) => {
+      if (shown) setLoadingProgress(total > 0 ? done / total : 1, label);
+    });
+  } finally {
+    if (shown) hideLoadingScreen();
+    zonePreloadInFlight = false;
+  }
 }
 
 // The loading screen blocks pointer input but a covered button keeps keyboard
@@ -868,11 +910,26 @@ async function startGame(
     // Soft fallback: English is statically resident; boot in English (the picker can retry).
   }
   try {
-    await assetsReady((done, total) => setLoadingProgress(done, total));
+    await assetsReady((done, total) =>
+      setLoadingProgress(
+        total > 0 ? (done / total) * PRELOAD_ASSETS_FRACTION : 0,
+        t('loading.world'),
+      ),
+    );
   } catch (err) {
     fatalOverlay(t('loading.assetsFailed', { error: technicalErrorMessage(err) }));
     return;
   }
+  // World-map terrain background for the spawn zone: bake it behind the loading
+  // screen so opening the map never pays the ~200ms terrain cost on the click.
+  // Other zones bake on entry (the zone-transition overlay), never mid-play.
+  const spawnZone = zoneAt(world.player.pos.z);
+  await prebakeZone(world.cfg.seed, spawnZone, (done, total) =>
+    setLoadingProgress(
+      PRELOAD_ASSETS_FRACTION + (total > 0 ? done / total : 1) * (1 - PRELOAD_ASSETS_FRACTION),
+      zoneDisplayName(spawnZone.id),
+    ),
+  );
   const spectateBadge = createSpectateBadge();
   setLoadingStatus(t('loading.enteringWorld'));
   // Let the final status + full progress bar paint before the synchronous
@@ -956,6 +1013,12 @@ async function startGame(
     fatalOverlay(t('loading.rendererFailed', { error: technicalErrorMessage(err) }));
     return;
   }
+
+  // When the player commits to a new zone, preload that area (its world map now,
+  // its 3D assets later) behind a brief overlay before play continues.
+  hud.onCommittedZoneChange = (zone) => {
+    void preloadZoneTransition(world, zone);
+  };
 
   // Offline only: expose the dev "2v2 Fiesta vs Bots" practice toggle to the HUD.
   if (offlineSim) hud.setFiestaPracticeHook(() => offlineSim.startFiestaPractice());

@@ -2431,6 +2431,7 @@ export const vi_VN: EnTranslations = {
   "loading": {
     "world": "Đang tải thế giới...",
     "worldProgress": "Đang tải thế giới... {done}/{total}",
+    "progress": "{label} {pct}%",
     "enteringWorld": "Đang vào thế giới...",
     "connectingRealm": "Đang kết nối tới máy chủ...",
     "assetsFailed": "Tải tài nguyên thất bại: thử tải lại. {error}",

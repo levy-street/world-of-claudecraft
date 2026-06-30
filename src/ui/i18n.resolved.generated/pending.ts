@@ -104,7 +104,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.voice.muted",
     "hudChrome.discord.voice.speaking",
     "hudChrome.discord.voice.title",
-    "hudChrome.spectate.banner"
+    "hudChrome.spectate.banner",
+    "loading.progress"
   ],
   "es_ES": [
     "hudChrome.discord.close",
@@ -201,7 +202,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.voice.muted",
     "hudChrome.discord.voice.speaking",
     "hudChrome.discord.voice.title",
-    "hudChrome.spectate.banner"
+    "hudChrome.spectate.banner",
+    "loading.progress"
   ],
   "fr_FR": [
     "hudChrome.discord.close",
@@ -298,7 +300,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.voice.muted",
     "hudChrome.discord.voice.speaking",
     "hudChrome.discord.voice.title",
-    "hudChrome.spectate.banner"
+    "hudChrome.spectate.banner",
+    "loading.progress"
   ],
   "fr_CA": [
     "hudChrome.discord.close",
@@ -395,7 +398,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.voice.muted",
     "hudChrome.discord.voice.speaking",
     "hudChrome.discord.voice.title",
-    "hudChrome.spectate.banner"
+    "hudChrome.spectate.banner",
+    "loading.progress"
   ],
   "en_CA": [],
   "it_IT": [
@@ -493,7 +497,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.voice.muted",
     "hudChrome.discord.voice.speaking",
     "hudChrome.discord.voice.title",
-    "hudChrome.spectate.banner"
+    "hudChrome.spectate.banner",
+    "loading.progress"
   ],
   "de_DE": [
     "hudChrome.discord.close",
@@ -590,7 +595,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.voice.muted",
     "hudChrome.discord.voice.speaking",
     "hudChrome.discord.voice.title",
-    "hudChrome.spectate.banner"
+    "hudChrome.spectate.banner",
+    "loading.progress"
   ],
   "zh_CN": [
     "hudChrome.discord.open",
@@ -607,7 +613,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.swag.title",
     "hudChrome.discord.title",
     "hudChrome.discord.viewCharacter",
-    "hudChrome.discord.voice.channel"
+    "hudChrome.discord.voice.channel",
+    "loading.progress"
   ],
   "zh_TW": [
     "hudChrome.discord.open",
@@ -624,7 +631,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.swag.title",
     "hudChrome.discord.title",
     "hudChrome.discord.viewCharacter",
-    "hudChrome.discord.voice.channel"
+    "hudChrome.discord.voice.channel",
+    "loading.progress"
   ],
   "ko_KR": [
     "hudChrome.discord.open",
@@ -641,7 +649,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.swag.title",
     "hudChrome.discord.title",
     "hudChrome.discord.viewCharacter",
-    "hudChrome.discord.voice.channel"
+    "hudChrome.discord.voice.channel",
+    "loading.progress"
   ],
   "ja_JP": [
     "hudChrome.discord.open",
@@ -658,7 +667,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.swag.title",
     "hudChrome.discord.title",
     "hudChrome.discord.viewCharacter",
-    "hudChrome.discord.voice.channel"
+    "hudChrome.discord.voice.channel",
+    "loading.progress"
   ],
   "pt_BR": [
     "hudChrome.discord.close",
@@ -755,7 +765,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.voice.muted",
     "hudChrome.discord.voice.speaking",
     "hudChrome.discord.voice.title",
-    "hudChrome.spectate.banner"
+    "hudChrome.spectate.banner",
+    "loading.progress"
   ],
   "ru_RU": [
     "hudChrome.discord.open",
@@ -772,7 +783,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.swag.title",
     "hudChrome.discord.title",
     "hudChrome.discord.viewCharacter",
-    "hudChrome.discord.voice.channel"
+    "hudChrome.discord.voice.channel",
+    "loading.progress"
   ],
   "nl_NL": [
     "hudChrome.discord.close",
@@ -869,7 +881,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.voice.muted",
     "hudChrome.discord.voice.speaking",
     "hudChrome.discord.voice.title",
-    "hudChrome.spectate.banner"
+    "hudChrome.spectate.banner",
+    "loading.progress"
   ],
   "pl_PL": [
     "hudChrome.discord.close",
@@ -966,7 +979,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.voice.muted",
     "hudChrome.discord.voice.speaking",
     "hudChrome.discord.voice.title",
-    "hudChrome.spectate.banner"
+    "hudChrome.spectate.banner",
+    "loading.progress"
   ],
   "id_ID": [
     "hudChrome.discord.close",
@@ -1063,7 +1077,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.voice.muted",
     "hudChrome.discord.voice.speaking",
     "hudChrome.discord.voice.title",
-    "hudChrome.spectate.banner"
+    "hudChrome.spectate.banner",
+    "loading.progress"
   ],
   "tr_TR": [
     "hudChrome.discord.close",
@@ -1160,7 +1175,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.voice.muted",
     "hudChrome.discord.voice.speaking",
     "hudChrome.discord.voice.title",
-    "hudChrome.spectate.banner"
+    "hudChrome.spectate.banner",
+    "loading.progress"
   ],
   "sv_SE": [
     "hudChrome.discord.close",
@@ -1257,7 +1273,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.voice.muted",
     "hudChrome.discord.voice.speaking",
     "hudChrome.discord.voice.title",
-    "hudChrome.spectate.banner"
+    "hudChrome.spectate.banner",
+    "loading.progress"
   ],
   "vi_VN": [
     "hudChrome.discord.close",
@@ -1354,7 +1371,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.voice.muted",
     "hudChrome.discord.voice.speaking",
     "hudChrome.discord.voice.title",
-    "hudChrome.spectate.banner"
+    "hudChrome.spectate.banner",
+    "loading.progress"
   ],
   "da_DK": [
     "hudChrome.discord.close",
@@ -1451,6 +1469,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.voice.muted",
     "hudChrome.discord.voice.speaking",
     "hudChrome.discord.voice.title",
-    "hudChrome.spectate.banner"
+    "hudChrome.spectate.banner",
+    "loading.progress"
   ]
 };

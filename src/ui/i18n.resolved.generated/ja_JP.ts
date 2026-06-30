@@ -2431,6 +2431,7 @@ export const ja_JP: EnTranslations = {
   "loading": {
     "world": "世界を読み込み中...",
     "worldProgress": "世界を読み込み中... {done}/{total}",
+    "progress": "{label} {pct}%",
     "enteringWorld": "世界に入っています...",
     "connectingRealm": "レルムに接続中...",
     "assetsFailed": "アセットの読み込みに失敗しました。再読み込みしてください。{error}",

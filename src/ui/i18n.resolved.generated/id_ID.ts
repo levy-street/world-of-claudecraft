@@ -2431,6 +2431,7 @@ export const id_ID: EnTranslations = {
   "loading": {
     "world": "Memuat dunia...",
     "worldProgress": "Memuat dunia... {done}/{total}",
+    "progress": "{label} {pct}%",
     "enteringWorld": "Memasuki dunia...",
     "connectingRealm": "Menyambung ke realm...",
     "assetsFailed": "Pemuatan aset gagal: coba muat ulang. {error}",

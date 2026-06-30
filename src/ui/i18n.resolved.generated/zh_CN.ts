@@ -2431,6 +2431,7 @@ export const zh_CN: EnTranslations = {
   "loading": {
     "world": "正在加载世界...",
     "worldProgress": "正在加载世界... {done}/{total}",
+    "progress": "{label} {pct}%",
     "enteringWorld": "正在进入世界...",
     "connectingRealm": "正在连接服务器...",
     "assetsFailed": "资源加载失败：请尝试刷新。{error}",
