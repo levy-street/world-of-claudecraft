@@ -1,5 +1,13 @@
 import { createHash } from 'node:crypto';
-import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import path from 'node:path';
 
 const root = process.cwd();
@@ -13,6 +21,7 @@ const HASH_LEN = 12;
 function walk(dir) {
   const out = [];
   for (const ent of readdirSync(dir, { withFileTypes: true })) {
+    if (ent.name.startsWith('.')) continue;
     const p = path.join(dir, ent.name);
     if (ent.isDirectory()) out.push(...walk(p));
     else if (ent.isFile()) out.push(p);
@@ -53,7 +62,9 @@ function generate() {
       '',
     ].join('\n'),
   );
-  console.log(`generated ${path.relative(root, generatedPath)} (${Object.keys(entries).length} media assets)`);
+  console.log(
+    `generated ${path.relative(root, generatedPath)} (${Object.keys(entries).length} media assets)`,
+  );
 }
 
 function emit() {
@@ -66,7 +77,9 @@ function emit() {
     mkdirSync(path.dirname(dest), { recursive: true });
     copyFileSync(src, dest);
   }
-  console.log(`emitted ${Object.keys(entries).length} hashed media assets to ${path.relative(root, mediaDir)}`);
+  console.log(
+    `emitted ${Object.keys(entries).length} hashed media assets to ${path.relative(root, mediaDir)}`,
+  );
 }
 
 const cmd = process.argv[2] ?? 'generate';
