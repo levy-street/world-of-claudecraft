@@ -18,6 +18,7 @@
 
 import * as THREE from 'three';
 import { ABILITIES, MOBS, QUESTS } from '../sim/data';
+import { specialRoleColor } from '../sim/discord_roles';
 import { type Entity, isQuestTurnInNpc } from '../sim/types';
 import { tEntity } from '../ui/entity_i18n';
 import {
@@ -25,9 +26,22 @@ import {
   holderTierByIndex,
   holderTierDisplayName,
 } from '../ui/holder_tier';
-import { formatNumber, t } from '../ui/i18n';
+import { formatNumber, type TranslationKey, t } from '../ui/i18n';
 import { raidMarkerDataUrl } from '../ui/icons';
 import { type IWorld, OVERHEAD_EMOTES } from '../world_api';
+
+// Staff/special Discord role -> localized nameplate tag label key.
+const DISCORD_ROLE_TAG_KEYS: Record<string, TranslationKey> = {
+  levyst: 'hudChrome.discord.roleTag.levyst',
+  devs: 'hudChrome.discord.roleTag.devs',
+  mods: 'hudChrome.discord.roleTag.mods',
+  artists: 'hudChrome.discord.roleTag.artists',
+};
+function discordRoleTag(key: string | undefined): string {
+  const tk = key ? DISCORD_ROLE_TAG_KEYS[key] : undefined;
+  return tk ? t(tk) : '';
+}
+
 import { castBarState } from './cast_bar';
 import { mobDisplayName, npcDisplayName, objectDisplayName } from './entity_labels';
 import { COMBO_PIP_MAX } from './nameplate_combo';
@@ -165,11 +179,16 @@ export class NameplatePainter {
         const nameDisplay = isSelf ? 'none' : '';
         const hpDisplay = e.dead || isSelf ? 'none' : '';
         const guild = isSelf ? '' : e.guild;
+        // Staff/special Discord role: tint the name + prefix a tag (others only).
+        const roleKey = isSelf ? undefined : e.discordRole;
+        const roleColor = specialRoleColor(roleKey);
+        const roleTag = discordRoleTag(roleKey);
+        const displayName = roleTag ? `[${roleTag}] ${e.name}` : e.name;
         this.setNameplateStatic(
           v,
-          `player|${e.name}|${guild}|${nameDisplay}|${hpDisplay}|${opacity}`,
-          e.name,
-          '#7fb8ff',
+          `player|${displayName}|${roleColor ?? ''}|${guild}|${nameDisplay}|${hpDisplay}|${opacity}`,
+          displayName,
+          roleColor ?? '#7fb8ff',
           hpDisplay,
           '',
           'np-marker',
@@ -180,6 +199,8 @@ export class NameplatePainter {
         v.nameEl.style.display = nameDisplay;
         // $WOC holder-tier flair, shown on OTHER players (own nameplate is hidden).
         this.setNameplateTier(v, isSelf ? 0 : (e.holderTier ?? 0));
+        // Linked-Discord PFP indicator, also OTHER players only.
+        this.setNameplateDiscord(v, isSelf ? undefined : e.discordAvatar, e.discordName);
         this.setNameplateHp(v, e);
       } else if (e.kind === 'npc' || (!e.hostile && e.questIds.length > 0)) {
         const npcName =
@@ -309,6 +330,28 @@ export class NameplatePainter {
     } else {
       v.tierEl.removeAttribute('src');
       v.tierEl.style.display = 'none';
+    }
+  }
+
+  // Show/hide the linked-Discord PFP on a player's nameplate. Cheap-diffed on the
+  // avatar URL so the external image is only (re)fetched when it changes.
+  private setNameplateDiscord(
+    v: EntityView,
+    avatar: string | undefined,
+    name: string | undefined,
+  ): void {
+    const sig = avatar ?? '';
+    if (sig === v.discordAvatarSig) return;
+    v.discordAvatarSig = sig;
+    if (avatar) {
+      v.discordEl.src = avatar;
+      v.discordEl.title = name
+        ? t('hudChrome.discord.linkedTitle', { name })
+        : t('hudChrome.discord.title');
+      v.discordEl.style.display = '';
+    } else {
+      v.discordEl.removeAttribute('src');
+      v.discordEl.style.display = 'none';
     }
   }
 

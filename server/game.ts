@@ -4,6 +4,7 @@ import { verifyChallenge } from '../src/sim/client_challenge';
 import { MECH_CHROMAS, mechChromaItemId, mechChromaSkinIndex } from '../src/sim/content/skins';
 import type { TalentAllocation } from '../src/sim/content/talents';
 import { DELVES, DUNGEONS, zoneAt } from '../src/sim/data';
+import { parseRelayCommand } from '../src/sim/discord_relay';
 import type { PickAction } from '../src/sim/lockpick';
 import { parseMoveInputFrame } from '../src/sim/move_input';
 import type { PetState, PlayerMeta } from '../src/sim/sim';
@@ -16,6 +17,7 @@ import {
   EQUIP_SLOTS,
   type EquipSlot,
   emptyMoveInput,
+  MAX_LEVEL,
   RUN_SPEED,
   type SimEvent,
 } from '../src/sim/types';
@@ -46,6 +48,9 @@ import {
   saveMarketState,
   walletForAccount,
 } from './db';
+import { enqueueActivity } from './discord_activity';
+import { discordFlairForAccount, grantRewardPoints } from './discord_db';
+import { enqueueRelay } from './discord_relay';
 import { formatDuration } from './duration';
 import { IpBlockList } from './ip_block';
 import { loadActiveBlockedIps } from './ip_block_db';
@@ -57,7 +62,7 @@ import {
   recordInGameAction,
 } from './moderation_db';
 import { type ModerationHost, ModerationService } from './moderation_service';
-import { REALM } from './realm';
+import { REALM, REALM_PUBLIC_ORIGIN } from './realm';
 import { createSerialWriter } from './serial_writer';
 import type { Presence, PresenceStatus, SocialActor, SocialTransport } from './social';
 import { SocialService } from './social';
@@ -285,6 +290,12 @@ const HEAVY_SELF_EVENTS = new Set<string>([
 // freshness floor; keeping this loop at/under that TTL means a token change shows
 // on the in-world badge within ~one cache window of it landing on chain.
 const HOLDER_TIER_REFRESH_MS = 60_000;
+// Reward points for in-game playtime: a grant every PLAYTIME_GRANT_MS to each
+// online account that was active (gave input) since the last grant. Ties points
+// to real engagement, not idling. Discord activity grants the rest (bot-driven).
+const PLAYTIME_GRANT_MS = 5 * 60_000;
+const PLAYTIME_POINTS = 10;
+const RELAY_COOLDOWN_MS = 8_000; // min gap between a player's "!" community posts
 
 export interface ClientSession {
   ws: WebSocket;
@@ -458,6 +469,11 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.mainhandItemId) out.mh = e.mainhandItemId; // equipped mainhand → held weapon model (render-only)
   if (e.holderTier) out.ht = e.holderTier; // $WOC holder-tier flair (cosmetic)
   if (e.holderBalance) out.hb = Math.round(e.holderBalance); // exact $WOC, for inspect
+  if (e.discordTier) out.dt = e.discordTier; // Discord status-tier flair (cosmetic)
+  if (e.discordAvatar) out.dav = e.discordAvatar; // Discord PFP (linked indicator)
+  if (e.discordName) out.dnm = e.discordName; // Discord handle / nickname (nameplate)
+  if (e.discordJoined) out.dj = e.discordJoined; // Discord join epoch ms (member since)
+  if (e.discordRole) out.dr = e.discordRole; // top staff/special role key (name color + tag)
   if (e.guild) out.gd = e.guild;
   if (e.dungeonId) out.dgn = e.dungeonId;
   if (e.objectItemId) out.obj = e.objectItemId;
@@ -626,6 +642,9 @@ export class GameServer {
   private interval: NodeJS.Timeout | null = null;
   private holderTierInterval: NodeJS.Timeout | null = null;
   private holderTierRefreshing = false; // overlap guard for the refresh cycle
+  private playtimeInterval: NodeJS.Timeout | null = null;
+  private lastPlaytimeGrantAt = new Map<number, number>(); // accountId -> sim time of last grant
+  private relayCooldown = new Map<number, number>(); // accountId -> last "!" relay post (ms)
   // pids whose holder tier was forced via the dev /woctier command — the chain
   // refresh leaves them alone so the override sticks during testing (dev only).
   private devTierPids = new Set<number>();
@@ -922,6 +941,7 @@ export class GameServer {
         const events = this.sim.tick();
         lap('tick');
         this.routeEvents(events);
+        this.detectActivity(events);
         lap('events');
         this.runAntibotTick();
         lap('antibot');
@@ -955,11 +975,101 @@ export class GameServer {
     this.holderTierInterval = setInterval(() => {
       void this.refreshAllHolderTiers();
     }, HOLDER_TIER_REFRESH_MS);
+    // Reward in-game playtime: grant points to active online accounts off-loop.
+    this.playtimeInterval = setInterval(() => {
+      void this.grantPlaytimePoints();
+    }, PLAYTIME_GRANT_MS);
   }
 
   stop(): void {
     if (this.interval) clearInterval(this.interval);
     if (this.holderTierInterval) clearInterval(this.holderTierInterval);
+    if (this.playtimeInterval) clearInterval(this.playtimeInterval);
+  }
+
+  // Grant playtime reward points to each online account that has been ACTIVE (gave
+  // input recently), so points reflect real engagement rather than idling. Lifetime
+  // points are monotonic, so this also nudges the Discord status tier over time.
+  private async grantPlaytimePoints(): Promise<void> {
+    const windowSecs = PLAYTIME_GRANT_MS / 1000;
+    for (const session of this.clients.values()) {
+      if (this.sim.time - session.lastInputAt > windowSecs) continue; // idle: skip
+      const last = this.lastPlaytimeGrantAt.get(session.accountId);
+      if (last !== undefined && this.sim.time - last < windowSecs) continue;
+      this.lastPlaytimeGrantAt.set(session.accountId, this.sim.time);
+      try {
+        await grantRewardPoints(pool, session.accountId, PLAYTIME_POINTS, 'playtime');
+      } catch (err) {
+        console.error('playtime reward grant failed:', err);
+      }
+    }
+  }
+
+  // Refresh one player's linked-Discord flair (status tier + PFP + nickname +
+  // member-since + staff role) for nearby players' nameplates / inspect cards.
+  private async refreshDiscordFlair(session: ClientSession): Promise<void> {
+    const flair = await discordFlairForAccount(pool, session.accountId);
+    if (this.clients.get(session.pid) !== session) return;
+    const e = this.sim.entities.get(session.pid);
+    if (!e) return;
+    const tier = flair?.tier ?? 0;
+    const avatar = flair?.avatarUrl ?? undefined;
+    const name = flair?.name ?? undefined;
+    const joined = flair?.joinedAtMs ?? undefined;
+    const role = flair?.role ?? undefined;
+    if (
+      e.discordTier !== tier ||
+      e.discordAvatar !== avatar ||
+      e.discordName !== name ||
+      e.discordJoined !== joined ||
+      e.discordRole !== role
+    ) {
+      // identity diff re-broadcasts the linked-Discord flair to nearby players
+      e.discordTier = tier;
+      e.discordAvatar = avatar;
+      e.discordName = name;
+      e.discordJoined = joined;
+      e.discordRole = role;
+    }
+  }
+
+  // Intercept a leading "!" community command in chat (lfg/wts/...): broadcast it
+  // in-world and hand it to the bot for Discord cross-post. Returns true when it
+  // consumed the line (so it is not sent as normal chat).
+  private handleRelayCommand(session: ClientSession, text: string): boolean {
+    const parsed = parseRelayCommand(text);
+    if (!parsed) return false; // unknown "!word" -> treat as normal chat
+    const now = Date.now();
+    if (now - (this.relayCooldown.get(session.accountId) ?? 0) < RELAY_COOLDOWN_MS) return true;
+    this.relayCooldown.set(session.accountId, now);
+    const { command, message } = parsed;
+    const e = this.sim.entities.get(session.pid);
+    const cls = e ? e.templateId.charAt(0).toUpperCase() + e.templateId.slice(1) : '';
+    const zone = e
+      ? e.dungeonId
+        ? (DUNGEONS[e.dungeonId]?.name ?? e.dungeonId)
+        : zoneAt(e.pos.z).name
+      : REALM;
+    // In-game: a system broadcast everyone sees (variable-routed; S3 guard skips it).
+    this.broadcastSystem(`[${command.tag}] ${session.name}: ${message || command.label}`);
+    // Out-of-game: hand off to the bot, which posts a rich embed with a Respond button.
+    enqueueRelay({
+      commandId: command.id,
+      tag: command.tag,
+      label: command.label,
+      color: command.color,
+      accountId: session.accountId,
+      characterName: session.name,
+      level: e?.level ?? 1,
+      className: cls,
+      realm: REALM,
+      zone,
+      message,
+      profileUrl: REALM_PUBLIC_ORIGIN
+        ? `${REALM_PUBLIC_ORIGIN}/c/${encodeURIComponent(session.name)}`
+        : null,
+    });
+    return true;
   }
 
   // Update one player's holder-tier flair from their linked wallet's $WOC
@@ -987,9 +1097,14 @@ export class GameServer {
     try {
       await Promise.all(
         [...this.clients.values()].map((session) =>
-          this.refreshHolderTier(session).catch((err) =>
-            console.error('holder-tier refresh failed:', err),
-          ),
+          Promise.all([
+            this.refreshHolderTier(session).catch((err) =>
+              console.error('holder-tier refresh failed:', err),
+            ),
+            this.refreshDiscordFlair(session).catch((err) =>
+              console.error('discord flair refresh failed:', err),
+            ),
+          ]),
         ),
       );
     } finally {
@@ -1293,6 +1408,9 @@ export class GameServer {
     // affect joining the world).
     void this.refreshHolderTier(session).catch((err) =>
       console.error('holder-tier refresh failed:', err),
+    );
+    void this.refreshDiscordFlair(session).catch((err) =>
+      console.error('discord flair refresh failed:', err),
     );
     return session;
   }
@@ -2045,6 +2163,9 @@ export class GameServer {
         // message is routed anywhere. Soft (cosmetic) words are NOT touched here
         // — clients mask those locally when their profanity filter is on.
         if (this.enforceChatPolicy(session, text)) break;
+        // "!" community commands (lfg/wts/...): broadcast in-world + cross-post to
+        // Discord, then stop (not normal chat).
+        if (text.startsWith('!') && this.handleRelayCommand(session, text)) break;
         // guild and officer chat are persistent + cross-zone, so they live in
         // the server's SocialService rather than the sim (no guild concept).
         // MMO convention: /g is guild; /general remains world chat.
@@ -2836,6 +2957,97 @@ export class GameServer {
     if (!d) return null;
     const otherPid = d.a === pid ? d.b : d.a;
     return { otherPid, otherName: this.sim.meta(otherPid)?.name ?? '?', state: d.state };
+  }
+
+  // Public profile URL for a character name, or null when no public origin is set.
+  private profileUrlFor(name: string): string | null {
+    return REALM_PUBLIC_ORIGIN ? `${REALM_PUBLIC_ORIGIN}/c/${encodeURIComponent(name)}` : null;
+  }
+
+  // Scan a tick's events for "significant activity" (max-level ding, rare drop,
+  // duel result, arena win) and enqueue a card for the Discord bot to post. The
+  // drain endpoint resolves which players are linked and tags them; the queue
+  // dedupes so one moment yields one card.
+  private detectActivity(events: SimEvent[]): void {
+    const now = Date.now();
+    for (const ev of events) {
+      if (ev.type === 'levelup' && ev.level === MAX_LEVEL && ev.pid !== undefined) {
+        const s = this.clients.get(ev.pid);
+        if (!s) continue;
+        enqueueActivity(
+          {
+            kind: 'levelup',
+            accountIds: [s.accountId],
+            names: [s.name],
+            realm: REALM,
+            profileUrl: this.profileUrlFor(s.name),
+            level: ev.level,
+          },
+          `levelup:${s.accountId}`,
+          now,
+        );
+      } else if (
+        (ev.type === 'lootRoll' || ev.type === 'masterLoot') &&
+        (ev.quality === 'epic' || ev.quality === 'legendary')
+      ) {
+        // A genuinely rare item dropped (roll-worthy); one card per drop (rollId).
+        const s = ev.pid !== undefined ? this.clients.get(ev.pid) : undefined;
+        enqueueActivity(
+          {
+            kind: 'rareloot',
+            accountIds: s ? [s.accountId] : [],
+            names: s ? [s.name] : [],
+            realm: REALM,
+            profileUrl: s ? this.profileUrlFor(s.name) : null,
+            itemName: ev.itemName,
+            quality: ev.quality,
+          },
+          `rareloot:${ev.rollId}`,
+          now,
+        );
+      } else if (ev.type === 'duelEnd') {
+        const w = this.sessionByName(ev.winnerName);
+        const l = this.sessionByName(ev.loserName);
+        const accountIds: number[] = [];
+        const names: string[] = [];
+        if (w) {
+          accountIds.push(w.accountId);
+          names.push(w.name);
+        }
+        if (l) {
+          accountIds.push(l.accountId);
+          names.push(l.name);
+        }
+        enqueueActivity(
+          {
+            kind: 'duel',
+            accountIds,
+            names,
+            realm: REALM,
+            profileUrl: this.profileUrlFor(ev.winnerName),
+            winnerName: ev.winnerName,
+            loserName: ev.loserName,
+          },
+          `duel:${ev.winnerName}:${ev.loserName}`,
+          now,
+        );
+      } else if (ev.type === 'arenaEnd' && ev.won && !ev.draw && ev.pid !== undefined) {
+        const s = this.clients.get(ev.pid);
+        if (!s) continue;
+        enqueueActivity(
+          {
+            kind: 'arena',
+            accountIds: [s.accountId],
+            names: [s.name],
+            realm: REALM,
+            profileUrl: this.profileUrlFor(s.name),
+            ratingDelta: ev.ratingAfter - ev.ratingBefore,
+          },
+          `arena:${s.accountId}:${ev.ratingAfter}`,
+          now,
+        );
+      }
+    }
   }
 
   private routeEvents(events: SimEvent[]): void {

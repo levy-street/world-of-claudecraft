@@ -723,6 +723,128 @@ export const zh_CN: EnTranslations = {
     "nameplate": {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
+    },
+    "discord": {
+      "title": "Discord",
+      "panelTitle": "World of ClaudeCraft",
+      "open": "Discord",
+      "close": "关闭",
+      "keybind": "Discord 面板",
+      "disabled": "Discord 集成当前不可用。",
+      "tiers": {
+        "none": "未入级",
+        "initiate": "见习者",
+        "squire": "扈从",
+        "footman": "步兵",
+        "knight": "骑士",
+        "champion": "勇士",
+        "warlord": "统帅",
+        "legend": "传奇",
+        "mythic": "神话"
+      },
+      "loginCta": "使用 Discord 继续",
+      "orEmail": "或使用邮箱",
+      "cta": {
+        "title": "关联你的 Discord，赚取积分并提升段位",
+        "stats": "{online} 人在线 · 服务器共 {total} 名成员",
+        "statsLoading": "加入社区，赢取奖励",
+        "button": "一键关联",
+        "dismiss": "关闭"
+      },
+      "link": {
+        "cta": "关联 Discord",
+        "relink": "重新关联 Discord",
+        "connecting": "正在打开 Discord...",
+        "benefits": "关联你的 Discord，通过游玩和社区活动赚取积分，并攀登段位阶梯。",
+        "error": "无法关联 Discord，请重试。",
+        "success": "Discord 已关联。"
+      },
+      "linkedAs": "已关联为 {name}",
+      "linkedTitle": "Discord：{name}",
+      "viewCharacter": "View {name}",
+      "viewProfile": "打开该角色的公开资料",
+      "unlink": "解除绑定",
+      "visit": "访问 Discord",
+      "unlinkConfirm": "将你的 Discord 账号与此游戏账号解除绑定？",
+      "statusLabel": "状态",
+      "rank": "Rank",
+      "points": "积分",
+      "lifetime": "累计",
+      "toNext": "距下一段位还需 {points} 积分",
+      "maxRank": "已达最高段位",
+      "tiersTitle": "段位阶梯",
+      "tierLocked": "未解锁",
+      "tierCurrent": "当前",
+      "earnTitle": "如何赚取积分",
+      "earnBody": "通过游戏时长以及在 Discord 中保持活跃来赚取积分。积分会提升你的段位。",
+      "memberSince": "加入于",
+      "memberSinceDays": "已加入 Discord {days} 天",
+      "roleTag": {
+        "levyst": "Levy St",
+        "devs": "Dev",
+        "mods": "Mod",
+        "artists": "画师"
+      },
+      "guildMember": "已验证成员",
+      "notMember": "尚未加入服务器",
+      "joinCta": "加入 Discord",
+      "online": "{count} 人在线",
+      "community": "社区",
+      "rewards": "奖励",
+      "voice": {
+        "title": "语音",
+        "channel": "In {channel}",
+        "empty": "当前没有人在语音中。",
+        "speaking": "说话中",
+        "muted": "已静音",
+        "join": "加入语音",
+        "connect": "连接到语音频道"
+      },
+      "swag": {
+        "title": "Swag",
+        "claim": "领取",
+        "claimed": "已领取",
+        "locked": "未解锁",
+        "free": "Free",
+        "cost": "{points} pts",
+        "needTier": "达到更高段位即可领取。",
+        "needPoints": "积分不足。",
+        "claimError": "无法领取该奖励，请重试。",
+        "claimedToast": "已领取：{name}",
+        "titleDiscordian": "称号：Discordian",
+        "titleSquire": "称号：国度扈从",
+        "chromaBlurple": "Blurple 机甲涂装",
+        "titleChampion": "称号：Claudemoon 勇士",
+        "swagStickers": "贴纸包（包邮寄送）",
+        "swagTee": "T 恤（包邮寄送）"
+      },
+      "relay": {
+        "tooFast": "你发送得太快了，请稍候再试。",
+        "lfg": {
+          "label": "寻找队伍",
+          "hint": "为副本或任务寻找玩家"
+        },
+        "wts": {
+          "label": "Want to Sell",
+          "hint": "发布出售物品或服务"
+        },
+        "wtb": {
+          "label": "Want to Buy",
+          "hint": "求购你想要的物品"
+        },
+        "recruit": {
+          "label": "公会招募",
+          "hint": "为你的公会招募玩家"
+        },
+        "event": {
+          "label": "活动 / 团本",
+          "hint": "发布团本、聚会或活动"
+        },
+        "help": {
+          "label": "Need Help",
+          "hint": "向社区寻求帮助"
+        }
+      }
     }
   },
   "guide": {

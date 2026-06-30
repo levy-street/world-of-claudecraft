@@ -723,6 +723,128 @@ export const ja_JP: EnTranslations = {
     "nameplate": {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
+    },
+    "discord": {
+      "title": "Discord",
+      "panelTitle": "World of ClaudeCraft",
+      "open": "Discord",
+      "close": "閉じる",
+      "keybind": "Discordパネル",
+      "disabled": "Discord連携は現在利用できません。",
+      "tiers": {
+        "none": "ランク外",
+        "initiate": "見習い",
+        "squire": "従者",
+        "footman": "歩兵",
+        "knight": "騎士",
+        "champion": "チャンピオン",
+        "warlord": "軍団長",
+        "legend": "伝説",
+        "mythic": "神話"
+      },
+      "loginCta": "Discordで続ける",
+      "orEmail": "またはメールを使用",
+      "cta": {
+        "title": "Discordを連携してポイントを獲得し、ランクを上げましょう",
+        "stats": "{online}人オンライン · サーバーメンバー{total}人",
+        "statsLoading": "コミュニティに参加して報酬を獲得しましょう",
+        "button": "ワンクリックで連携",
+        "dismiss": "非表示にする"
+      },
+      "link": {
+        "cta": "Discordを連携",
+        "relink": "Discordを再連携",
+        "connecting": "Discordを開いています...",
+        "benefits": "Discordを連携すると、プレイやコミュニティ活動からポイントを獲得し、ステータスランクを上げられます。",
+        "error": "Discordを連携できませんでした。もう一度お試しください。",
+        "success": "Discordを連携しました。"
+      },
+      "linkedAs": "{name}として連携済み",
+      "linkedTitle": "Discord：{name}",
+      "viewCharacter": "View {name}",
+      "viewProfile": "このキャラクターの公開プロフィールを開く",
+      "unlink": "連携解除",
+      "visit": "Discordを開く",
+      "unlinkConfirm": "このゲームアカウントからDiscordアカウントの連携を解除しますか？",
+      "statusLabel": "ステータス",
+      "rank": "Rank",
+      "points": "ポイント",
+      "lifetime": "累計",
+      "toNext": "次のランクまで{points}",
+      "maxRank": "最高ランク到達",
+      "tiersTitle": "ステータスランク",
+      "tierLocked": "ロック中",
+      "tierCurrent": "現在",
+      "earnTitle": "ポイントの獲得方法",
+      "earnBody": "ゲームのプレイ時間とDiscordでの活動からポイントを獲得できます。ポイントはステータスランクを上げます。",
+      "memberSince": "加入日",
+      "memberSinceDays": "Discord加入{days}日",
+      "roleTag": {
+        "levyst": "Levy St",
+        "devs": "Dev",
+        "mods": "Mod",
+        "artists": "アーティスト"
+      },
+      "guildMember": "認証済みメンバー",
+      "notMember": "まだサーバーに参加していません",
+      "joinCta": "Discordに参加",
+      "online": "{count}人オンライン",
+      "community": "コミュニティ",
+      "rewards": "報酬",
+      "voice": {
+        "title": "ボイス",
+        "channel": "In {channel}",
+        "empty": "現在ボイスに参加している人はいません。",
+        "speaking": "発言中",
+        "muted": "ミュート中",
+        "join": "ボイスに参加",
+        "connect": "ボイスチャンネルに接続"
+      },
+      "swag": {
+        "title": "Swag",
+        "claim": "受け取る",
+        "claimed": "受取済み",
+        "locked": "ロック中",
+        "free": "Free",
+        "cost": "{points} pts",
+        "needTier": "これを受け取るにはより高いランクが必要です。",
+        "needPoints": "ポイントが足りません。",
+        "claimError": "その報酬を受け取れませんでした。もう一度お試しください。",
+        "claimedToast": "受け取りました：{name}",
+        "titleDiscordian": "称号：Discordian",
+        "titleSquire": "称号：レルムの従者",
+        "chromaBlurple": "Blurpleメックカラー",
+        "titleChampion": "称号：Claudemoonのチャンピオン",
+        "swagStickers": "ステッカーパック（発送）",
+        "swagTee": "Tシャツ（発送）"
+      },
+      "relay": {
+        "tooFast": "投稿が速すぎます。少し待ってからもう一度お試しください。",
+        "lfg": {
+          "label": "パーティ募集",
+          "hint": "ダンジョンやクエストの仲間を探す"
+        },
+        "wts": {
+          "label": "Want to Sell",
+          "hint": "販売するアイテムやサービスを宣伝する"
+        },
+        "wtb": {
+          "label": "Want to Buy",
+          "hint": "購入したいアイテムを募集する"
+        },
+        "recruit": {
+          "label": "ギルドメンバー募集",
+          "hint": "ギルドの仲間を募集する"
+        },
+        "event": {
+          "label": "イベント / レイド",
+          "hint": "レイドや集会、イベントを告知する"
+        },
+        "help": {
+          "label": "Need Help",
+          "hint": "コミュニティに助けを求める"
+        }
+      }
     }
   },
   "guide": {

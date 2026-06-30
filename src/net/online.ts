@@ -514,6 +514,22 @@ export class Api {
     await this.delete('/api/wallet/link', {});
   }
 
+  // ── Discord link/login + status ────────────────────────────────────────────
+  // Returns the discord.com authorize URL the browser navigates to (login = new
+  // session, link = attach to the current account).
+  async discordStart(mode: 'login' | 'link'): Promise<{ url: string }> {
+    return this.post(`/api/auth/discord/start?mode=${mode}`, {});
+  }
+
+  // Current account's Discord link status + reward points + live guild presence.
+  async discordStatus(): Promise<Record<string, unknown>> {
+    return this.get('/api/discord');
+  }
+
+  async unlinkDiscord(): Promise<void> {
+    await this.delete('/api/discord', {});
+  }
+
   // ── Shareable player card + referrals ──────────────────────────────────────
   // Publish (or replace) this character's card PNG. The server may return a
   // realm-relative public page path; main.ts normalizes it to an absolute URL
@@ -1153,6 +1169,11 @@ export class ClientWorld implements IWorld {
         e.skinCatalog = w.cat === 'mech' ? 'mech' : 'class';
         e.holderTier = w.ht ?? 0; // $WOC holder-tier flair (cosmetic, server-set)
         e.holderBalance = typeof w.hb === 'number' ? w.hb : undefined; // exact $WOC, for inspect
+        e.discordTier = w.dt ?? 0; // Discord status-tier flair (cosmetic, server-set)
+        e.discordAvatar = typeof w.dav === 'string' ? w.dav : undefined; // Discord PFP (linked)
+        e.discordName = typeof w.dnm === 'string' ? w.dnm : undefined; // Discord handle/nickname
+        e.discordJoined = typeof w.dj === 'number' ? w.dj : undefined; // Discord join epoch ms
+        e.discordRole = typeof w.dr === 'string' ? w.dr : undefined; // top staff/special role key
         e.scale = w.sc ?? 1;
         e.color = w.c ?? 0xffffff;
         e.dungeonId = w.dgn ?? null;

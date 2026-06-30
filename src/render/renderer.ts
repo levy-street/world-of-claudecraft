@@ -487,6 +487,8 @@ export interface EntityView {
   comboSig: string; // cheap-diff for the combo pip row
   tierEl: HTMLImageElement; // $WOC holder-tier flair badge (other players)
   tierValue: number; // last-applied holderTier, to diff cheaply
+  discordEl: HTMLImageElement; // linked-Discord PFP next to the name (other players)
+  discordAvatarSig: string; // last-applied discord avatar URL, to diff cheaply
   sparkle?: THREE.Sprite; // ground objects
   objectMesh?: THREE.Object3D;
   objectPoolKey: string | null;
@@ -723,7 +725,9 @@ export class Renderer {
   private effectiveRenderScale = 1; // runtime value after adaptive backoff
   private frameMsEma = 16.7;
   private adaptiveGrace = 2.0;
+  // biome-ignore lint/correctness/noUnusedPrivateClassMembers: write-only render-budget restore state (pre-existing); read path not yet wired.
   private adaptiveCooldown = 0;
+  // biome-ignore lint/correctness/noUnusedPrivateClassMembers: write-only render-budget restore state (pre-existing); read path not yet wired.
   private stableFrameTime = 0;
   private viewCreateBackoff = 0;
   private renderBudgetGovernor!: RenderBudgetGovernor;
@@ -3138,6 +3142,12 @@ export class Renderer {
     tierEl.className = 'np-tier';
     tierEl.alt = '';
     tierEl.style.display = 'none';
+    // linked-Discord PFP, shown inline before the name for other players
+    const discordEl = document.createElement('img');
+    discordEl.className = 'np-discord';
+    discordEl.alt = '';
+    discordEl.referrerPolicy = 'no-referrer';
+    discordEl.style.display = 'none';
     const nameEl = document.createElement('div');
     nameEl.className = 'np-name';
     nameEl.textContent = e.kind === 'object' ? objectDisplayName(e) : e.name;
@@ -3159,7 +3169,18 @@ export class Renderer {
     const castLabel = document.createElement('div');
     castLabel.className = 'np-castlabel';
     castBar.append(castFill, castLabel);
-    np.append(emoteEl, raidMark, comboRow, marker, tierEl, nameEl, guildEl, hpBar, castBar);
+    np.append(
+      emoteEl,
+      raidMark,
+      comboRow,
+      marker,
+      tierEl,
+      discordEl,
+      nameEl,
+      guildEl,
+      hpBar,
+      castBar,
+    );
     this.nameplateLayer.appendChild(np);
 
     // object views gate their own casters; character shadows live in visual
@@ -3209,6 +3230,7 @@ export class Renderer {
       castFill,
       castLabel,
       tierEl,
+      discordEl,
       sparkle,
       objectMesh,
       objectPoolKey,
@@ -3219,6 +3241,7 @@ export class Renderer {
       nameplateHpWidth: '',
       comboSig: '',
       tierValue: 0,
+      discordAvatarSig: '',
       objectCasters,
       viewLights,
       shadowOn: true,

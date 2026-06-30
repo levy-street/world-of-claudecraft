@@ -42,10 +42,8 @@ import { BUG_DESCRIPTION_MAX, BugReportRateLimitError, createBugReport } from '.
 import { characterSheet, type SheetRank } from './character_sheet';
 import {
   accountAndScopeForToken,
-  accountById,
   accountForToken,
   type CharacterRow,
-  characterCountForAccount,
   characterCountsByRealm,
   chatMuteStatusForAccount,
   closeOrphanSessions,
@@ -75,18 +73,22 @@ import {
   referralCountForAccount,
   renameCharacter,
   revokeCompanionToken,
-  revokeTokensExcept,
   saveToken,
   scopeAllowsMutation,
   searchCharacters,
-  setAccountDeactivated,
   setAccountEmail,
   type TokenScope,
   topArenaRatings,
   topLifetimeXp,
   touchLogin,
-  updatePasswordHash,
 } from './db';
+import {
+  handleDiscordCallback,
+  handleDiscordStart,
+  handleDiscordStatus,
+  handleDiscordUnlink,
+} from './discord';
+import { pruneDiscordOAuthStates } from './discord_db';
 import { emailAccountCreated } from './email';
 import { GameServer } from './game';
 import { isUniqueViolation, json, readBody } from './http_util';
@@ -114,6 +116,7 @@ import {
   authThrottled,
   cardUploadRateLimited,
   clearAuthFailures,
+  discordRateLimited,
   publicReadRateLimited,
   rateLimited,
   recordAuthFailure,
@@ -148,10 +151,6 @@ import { bufferHandshakeMessages } from './ws_buffer';
 
 const PORT = Number(process.env.PORT ?? 8787);
 const STATIC_DIR = path.join(__dirname, '..', 'dist');
-// DEPRECATED: the standalone community MediaWiki is being retired in favour of the
-// curated in-app guide, which now serves at /wiki. This constant and its (now removed)
-// /wiki -> MediaWiki redirect are dead and slated for deletion in a follow-up ticket.
-const WIKI_URL = process.env.WIKI_URL ?? 'http://localhost:8080/wiki/index.php/Main_Page';
 // Pretty URLs that serve standalone static HTML pages.
 const STATIC_PAGE_ALIASES = new Map([
   ['/links', '/links.html'],
@@ -1259,6 +1258,39 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       if (accountId === null) return;
       return handleWalletGet(req, res, accountId);
     }
+    // Discord integration: OAuth login/link, link status, unlink. `start` returns
+    // the authorize URL (the browser then navigates to Discord); `callback` is the
+    // discord.com -> us redirect (no auth/Origin, so it is NOT gated by the
+    // web-login guard, which is login/register-only). Mutations go through
+    // bearerActiveAccount; the dedicated Discord rate-limit bucket guards them.
+    if (req.method === 'POST' && url === '/api/auth/discord/start') {
+      const mode =
+        new URL(req.url ?? '/', 'http://localhost').searchParams.get('mode') === 'link'
+          ? 'link'
+          : 'login';
+      let accountId: number | null = null;
+      if (mode === 'link') {
+        accountId = await bearerActiveAccount(req, res);
+        if (accountId === null) return;
+      }
+      if (discordRateLimited(req, accountId ?? 0)) return json(res, 429, { error: 'rate limited' });
+      return handleDiscordStart(req, res, { mode, accountId });
+    }
+    if (req.method === 'GET' && url === '/api/auth/discord/callback') {
+      return handleDiscordCallback(req, res);
+    }
+    if (req.method === 'GET' && url === '/api/discord') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (discordRateLimited(req, accountId)) return json(res, 429, { error: 'rate limited' });
+      return handleDiscordStatus(req, res, accountId);
+    }
+    if (req.method === 'DELETE' && url === '/api/discord') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (discordRateLimited(req, accountId)) return json(res, 429, { error: 'rate limited' });
+      return handleDiscordUnlink(req, res, accountId);
+    }
     // $WOC balance proxy — keeps the Solana RPC endpoint (and any key in it)
     // server-side so it never ships in the client bundle. Public (on-chain
     // balances are public) but narrow + IP rate-limited + per-wallet cached.
@@ -1351,6 +1383,9 @@ async function main(): Promise<void> {
       );
       void pruneExpiredOAuthGrants(pool).catch((err) =>
         console.error('oauth grant prune failed:', err),
+      );
+      void pruneDiscordOAuthStates(pool).catch((err) =>
+        console.error('discord oauth state prune failed:', err),
       );
     },
     24 * 3600 * 1000,

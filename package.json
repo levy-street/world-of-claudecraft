@@ -55,6 +55,8 @@
     "db:migrate-old-cragmaw-pelt": "tsx scripts/migrate_old_cragmaw_pelt.ts",
     "build:server": "node scripts/build_server.mjs",
     "server": "npm run build:server && node dist-server/server.cjs",
+    "build:bot": "node scripts/build_bot.mjs",
+    "bot": "npm run build:bot && node dist-bot/bot.cjs",
     "realms": "npm run build:server && node scripts/dev-realms.mjs",
     "admin:grant": "node scripts/grant_admin.mjs",
     "voices:gen": "node scripts/gen_npc_voices.mjs",

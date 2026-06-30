@@ -1444,6 +1444,15 @@ export interface Entity {
   // Exact $WOC balance backing the tier, for the inspect-profile readout. Rides
   // alongside holderTier in identity fields; like it, the sim never reads it.
   holderBalance?: number;
+  // Linked-Discord flair (cosmetic, server-set from the account's Discord link;
+  // the sim never reads any of it): status tier, profile-picture URL, handle/
+  // nickname, server-join epoch ms (for "member since"), and top staff/special
+  // role key (drives the in-world name color + tag).
+  discordTier?: number;
+  discordAvatar?: string;
+  discordName?: string;
+  discordJoined?: number;
+  discordRole?: string;
 }
 
 export interface NythraxisWardChannel {

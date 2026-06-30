@@ -68,3 +68,9 @@ postgres/
 pr-assets-2fa
 
 .vite/
+
+# Discord app credentials + bot token, never commit it
+discord_bot_info.txt
+
+# bot build output
+dist-bot/

@@ -723,6 +723,128 @@ export const ko_KR: EnTranslations = {
     "nameplate": {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
+    },
+    "discord": {
+      "title": "Discord",
+      "panelTitle": "World of ClaudeCraft",
+      "open": "Discord",
+      "close": "닫기",
+      "keybind": "Discord 패널",
+      "disabled": "현재 Discord 연동을 사용할 수 없습니다.",
+      "tiers": {
+        "none": "등급 없음",
+        "initiate": "입문자",
+        "squire": "종자",
+        "footman": "보병",
+        "knight": "기사",
+        "champion": "챔피언",
+        "warlord": "전쟁군주",
+        "legend": "전설",
+        "mythic": "신화"
+      },
+      "loginCta": "Discord로 계속하기",
+      "orEmail": "또는 이메일 사용",
+      "cta": {
+        "title": "Discord를 연결해 포인트를 얻고 등급을 올리세요",
+        "stats": "{online}명 접속 중 · 서버 멤버 {total}명",
+        "statsLoading": "커뮤니티에 참여하고 보상을 받으세요",
+        "button": "한 번의 클릭으로 연결",
+        "dismiss": "닫기"
+      },
+      "link": {
+        "cta": "Discord 연결",
+        "relink": "Discord 다시 연결",
+        "connecting": "Discord 여는 중...",
+        "benefits": "플레이와 커뮤니티 활동으로 포인트를 얻고 상태 등급을 올리려면 Discord를 연결하세요.",
+        "error": "Discord를 연결할 수 없습니다. 다시 시도해 주세요.",
+        "success": "Discord가 연결되었습니다."
+      },
+      "linkedAs": "{name}(으)로 연결됨",
+      "linkedTitle": "Discord: {name}",
+      "viewCharacter": "View {name}",
+      "viewProfile": "이 캐릭터의 공개 프로필 열기",
+      "unlink": "연결 해제",
+      "visit": "Discord 방문",
+      "unlinkConfirm": "이 게임 계정에서 Discord 계정 연결을 해제하시겠습니까?",
+      "statusLabel": "상태",
+      "rank": "Rank",
+      "points": "포인트",
+      "lifetime": "누적",
+      "toNext": "다음 등급까지 {points}",
+      "maxRank": "최고 등급 달성",
+      "tiersTitle": "상태 등급",
+      "tierLocked": "잠김",
+      "tierCurrent": "현재",
+      "earnTitle": "포인트 획득 방법",
+      "earnBody": "게임 플레이 시간과 Discord 활동으로 포인트를 얻으세요. 포인트는 상태 등급을 올려줍니다.",
+      "memberSince": "가입일",
+      "memberSinceDays": "Discord 가입 {days}일",
+      "roleTag": {
+        "levyst": "Levy St",
+        "devs": "Dev",
+        "mods": "Mod",
+        "artists": "아티스트"
+      },
+      "guildMember": "인증된 멤버",
+      "notMember": "아직 서버에 없음",
+      "joinCta": "Discord 참여하기",
+      "online": "{count}명 접속 중",
+      "community": "커뮤니티",
+      "rewards": "보상",
+      "voice": {
+        "title": "음성",
+        "channel": "In {channel}",
+        "empty": "현재 음성 채널에 아무도 없습니다.",
+        "speaking": "말하는 중",
+        "muted": "음소거됨",
+        "join": "음성 참여",
+        "connect": "음성 채널에 연결"
+      },
+      "swag": {
+        "title": "Swag",
+        "claim": "받기",
+        "claimed": "받음",
+        "locked": "잠김",
+        "free": "Free",
+        "cost": "{points} pts",
+        "needTier": "이 보상을 받으려면 더 높은 등급에 도달하세요.",
+        "needPoints": "포인트가 부족합니다.",
+        "claimError": "보상을 받을 수 없습니다. 다시 시도해 주세요.",
+        "claimedToast": "받음: {name}",
+        "titleDiscordian": "칭호: Discordian",
+        "titleSquire": "칭호: 렐름의 종자",
+        "chromaBlurple": "Blurple 메크 크로마",
+        "titleChampion": "칭호: Claudemoon의 챔피언",
+        "swagStickers": "스티커 팩 (배송)",
+        "swagTee": "티셔츠 (배송)"
+      },
+      "relay": {
+        "tooFast": "너무 빠르게 게시하고 있습니다. 잠시 후 다시 시도해 주세요.",
+        "lfg": {
+          "label": "파티 구함",
+          "hint": "던전이나 퀘스트를 함께할 플레이어 찾기"
+        },
+        "wts": {
+          "label": "Want to Sell",
+          "hint": "판매할 아이템이나 서비스 광고"
+        },
+        "wtb": {
+          "label": "Want to Buy",
+          "hint": "구매하고 싶은 아이템 요청"
+        },
+        "recruit": {
+          "label": "길드 모집",
+          "hint": "길드에 플레이어 모집"
+        },
+        "event": {
+          "label": "이벤트 / 레이드",
+          "hint": "레이드, 모임 또는 이벤트 공지"
+        },
+        "help": {
+          "label": "Need Help",
+          "hint": "커뮤니티에 도움 요청"
+        }
+      }
     }
   },
   "guide": {
