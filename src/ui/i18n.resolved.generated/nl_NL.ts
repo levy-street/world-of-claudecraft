@@ -2709,6 +2709,7 @@ export const nl_NL: EnTranslations = {
         "unignore": "Niet meer negeren",
         "unignoreChat": "Chat niet meer negeren",
         "report": "Speler Melden",
+        "makeLeader": "Make Leader",
         "removeParty": "Verwijderen uit Groep",
         "convertToRaid": "Omzetten naar raid",
         "convertToParty": "Omzetten naar groep",

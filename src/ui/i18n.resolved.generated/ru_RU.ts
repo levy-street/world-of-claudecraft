@@ -2709,6 +2709,7 @@ export const ru_RU: EnTranslations = {
         "unignore": "Убрать игнор",
         "unignoreChat": "Убрать игнор чата",
         "report": "Пожаловаться на игрока",
+        "makeLeader": "Назначить лидером",
         "removeParty": "Удалить из группы",
         "convertToRaid": "Преобразовать в рейд",
         "convertToParty": "Преобразовать в группу",

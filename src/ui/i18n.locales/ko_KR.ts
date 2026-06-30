@@ -999,6 +999,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.chat.context.unignore': '차단 해제',
   'hud.chat.context.unignoreChat': '채팅 차단 해제',
   'hud.chat.context.report': '플레이어 신고',
+  'hud.chat.context.makeLeader': '파티장 지정',
   'hud.chat.context.removeParty': '파티에서 제거',
   'hud.chat.context.cancel': '취소',
   'hud.report.title': '{name} 신고',

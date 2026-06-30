@@ -1007,6 +1007,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.chat.context.unignore': '無視解除',
   'hud.chat.context.unignoreChat': 'チャット無視解除',
   'hud.chat.context.report': 'プレイヤーを通報',
+  'hud.chat.context.makeLeader': 'リーダーにする',
   'hud.chat.context.removeParty': 'パーティから外す',
   'hud.chat.context.cancel': 'キャンセル',
   'hud.report.title': '{name}を通報',

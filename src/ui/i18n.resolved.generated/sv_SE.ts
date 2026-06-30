@@ -2709,6 +2709,7 @@ export const sv_SE: EnTranslations = {
         "unignore": "Sluta ignorera",
         "unignoreChat": "Sluta ignorera chatt",
         "report": "Anmäl spelare",
+        "makeLeader": "Make Leader",
         "removeParty": "Ta bort från grupp",
         "convertToRaid": "Gör om till räd",
         "convertToParty": "Gör om till grupp",

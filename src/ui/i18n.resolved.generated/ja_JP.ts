@@ -2709,6 +2709,7 @@ export const ja_JP: EnTranslations = {
         "unignore": "無視解除",
         "unignoreChat": "チャット無視解除",
         "report": "プレイヤーを通報",
+        "makeLeader": "リーダーにする",
         "removeParty": "パーティから外す",
         "convertToRaid": "レイドに変換",
         "convertToParty": "パーティに変換",

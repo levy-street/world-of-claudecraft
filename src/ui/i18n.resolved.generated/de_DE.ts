@@ -2709,6 +2709,7 @@ export const de_DE: EnTranslations = {
         "unignore": "Nicht mehr ignorieren",
         "unignoreChat": "Chat nicht mehr ignorieren",
         "report": "Spieler melden",
+        "makeLeader": "Make Leader",
         "removeParty": "Aus Gruppe entfernen",
         "convertToRaid": "In Schlachtzug umwandeln",
         "convertToParty": "In Gruppe umwandeln",

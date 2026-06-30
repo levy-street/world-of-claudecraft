@@ -955,6 +955,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.chat.context.unignore': '取消屏蔽',
   'hud.chat.context.unignoreChat': '取消屏蔽聊天',
   'hud.chat.context.report': '举报玩家',
+  'hud.chat.context.makeLeader': '设为队长',
   'hud.chat.context.removeParty': '移出队伍',
   'hud.chat.context.cancel': '取消',
   'hud.report.title': '举报 {name}',

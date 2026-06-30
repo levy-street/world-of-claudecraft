@@ -1028,6 +1028,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.chat.context.unignore': 'Убрать игнор',
   'hud.chat.context.unignoreChat': 'Убрать игнор чата',
   'hud.chat.context.report': 'Пожаловаться на игрока',
+  'hud.chat.context.makeLeader': 'Назначить лидером',
   'hud.chat.context.removeParty': 'Удалить из группы',
   'hud.chat.context.cancel': 'Отмена',
   'hud.report.title': 'Жалоба на {name}',

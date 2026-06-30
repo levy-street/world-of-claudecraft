@@ -2709,6 +2709,7 @@ export const vi_VN: EnTranslations = {
         "unignore": "Bỏ Phớt Lờ",
         "unignoreChat": "Bỏ Phớt Lờ Trò Chuyện",
         "report": "Tố Cáo Người Chơi",
+        "makeLeader": "Make Leader",
         "removeParty": "Loại Khỏi Tổ Đội",
         "convertToRaid": "Chuyển thành đại đội",
         "convertToParty": "Chuyển thành tổ đội",

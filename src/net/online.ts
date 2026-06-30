@@ -1714,6 +1714,9 @@ export class ClientWorld implements IWorld {
   partyKick(targetPid: number): void {
     this.cmd({ cmd: 'pkick', id: targetPid });
   }
+  partyPromote(targetPid: number): void {
+    this.cmd({ cmd: 'ppromote', id: targetPid });
+  }
   convertPartyToRaid(): void {
     this.cmd({ cmd: 'praid' });
   }

@@ -2709,6 +2709,7 @@ export const da_DK: EnTranslations = {
         "unignore": "Stop med at Ignorere",
         "unignoreChat": "Stop med at Ignorere Chat",
         "report": "Anmeld Spiller",
+        "makeLeader": "Make Leader",
         "removeParty": "Fjern fra Gruppe",
         "convertToRaid": "Lav om til raid",
         "convertToParty": "Lav om til gruppe",

@@ -10,22 +10,28 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "hud.chat.context.makeLeader",
     "hudChrome.spectate.banner"
   ],
   "es_ES": [
+    "hud.chat.context.makeLeader",
     "hudChrome.spectate.banner"
   ],
   "fr_FR": [
+    "hud.chat.context.makeLeader",
     "hudChrome.spectate.banner"
   ],
   "fr_CA": [
+    "hud.chat.context.makeLeader",
     "hudChrome.spectate.banner"
   ],
   "en_CA": [],
   "it_IT": [
+    "hud.chat.context.makeLeader",
     "hudChrome.spectate.banner"
   ],
   "de_DE": [
+    "hud.chat.context.makeLeader",
     "hudChrome.spectate.banner"
   ],
   "zh_CN": [],
@@ -33,28 +39,36 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "hud.chat.context.makeLeader",
     "hudChrome.spectate.banner"
   ],
   "ru_RU": [],
   "nl_NL": [
+    "hud.chat.context.makeLeader",
     "hudChrome.spectate.banner"
   ],
   "pl_PL": [
+    "hud.chat.context.makeLeader",
     "hudChrome.spectate.banner"
   ],
   "id_ID": [
+    "hud.chat.context.makeLeader",
     "hudChrome.spectate.banner"
   ],
   "tr_TR": [
+    "hud.chat.context.makeLeader",
     "hudChrome.spectate.banner"
   ],
   "sv_SE": [
+    "hud.chat.context.makeLeader",
     "hudChrome.spectate.banner"
   ],
   "vi_VN": [
+    "hud.chat.context.makeLeader",
     "hudChrome.spectate.banner"
   ],
   "da_DK": [
+    "hud.chat.context.makeLeader",
     "hudChrome.spectate.banner"
   ]
 };

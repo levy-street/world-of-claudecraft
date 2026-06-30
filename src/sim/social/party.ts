@@ -187,6 +187,30 @@ export class PartyMachine {
     this.removeFromParty(targetPid, 'has been removed from the party');
   }
 
+  // Hand party (or raid) leadership to another member. Only the current leader may do
+  // this; the target must be a different member. Announced to the whole group with the
+  // same line used when leadership passes on a leader's departure.
+  promoteLeader(targetPid: number, pid?: number): void {
+    const r = this.ctx.resolve(pid);
+    if (!r) return;
+    const party = this.partyOf(r.meta.entityId);
+    if (!party || party.leader !== r.meta.entityId) {
+      this.ctx.error(r.meta.entityId, 'You are not the party leader.');
+      return;
+    }
+    if (!party.members.includes(targetPid) || targetPid === party.leader) return;
+    party.leader = targetPid;
+    const newLeader = this.ctx.players.get(targetPid);
+    for (const mPid of party.members) {
+      this.ctx.emit({
+        type: 'log',
+        text: `${newLeader?.name ?? 'Someone'} is now the party leader.`,
+        color: '#aaf',
+        pid: mPid,
+      });
+    }
+  }
+
   convertPartyToRaid(pid?: number): void {
     const r = this.ctx.resolve(pid);
     if (!r) return;

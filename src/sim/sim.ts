@@ -4572,6 +4572,10 @@ export class Sim {
     this.party.partyKick(targetPid, pid);
   }
 
+  partyPromote(targetPid: number, pid?: number): void {
+    this.party.promoteLeader(targetPid, pid);
+  }
+
   convertPartyToRaid(pid?: number): void {
     this.party.convertPartyToRaid(pid);
   }

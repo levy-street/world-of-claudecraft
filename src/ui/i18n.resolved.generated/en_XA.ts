@@ -2709,6 +2709,7 @@ export const en_XA: EnTranslations = {
         "unignore": "[Úñíĝñóŕé]",
         "unignoreChat": "[Úñíĝñóŕé Çĥáţ]",
         "report": "[Ŕéþóŕţ Þļáýéŕ]",
+        "makeLeader": "[Ɱáķé Ļéáðéŕ]",
         "removeParty": "[Ŕéɱóʋé ƒŕóɱ Þáŕţý]",
         "convertToRaid": "[Çóñʋéŕţ ţó ŕáíð]",
         "convertToParty": "[Çóñʋéŕţ ţó þáŕţý]",

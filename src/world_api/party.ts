@@ -37,6 +37,7 @@ export interface IWorldParty {
   partyDecline(): void;
   partyLeave(): void;
   partyKick(targetPid: number): void;
+  partyPromote(targetPid: number): void;
   convertPartyToRaid(): void;
   convertRaidToParty(): void;
   moveRaidMember(targetPid: number, group: 1 | 2): void;

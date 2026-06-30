@@ -2709,6 +2709,7 @@ export const tr_TR: EnTranslations = {
         "unignore": "Engeli Kaldır",
         "unignoreChat": "Sohbet Engelini Kaldır",
         "report": "Oyuncuyu Bildir",
+        "makeLeader": "Make Leader",
         "removeParty": "Gruptan Çıkar",
         "convertToRaid": "Akına dönüştür",
         "convertToParty": "Gruba dönüştür",

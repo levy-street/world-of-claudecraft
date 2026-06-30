@@ -2709,6 +2709,7 @@ export const ko_KR: EnTranslations = {
         "unignore": "차단 해제",
         "unignoreChat": "채팅 차단 해제",
         "report": "플레이어 신고",
+        "makeLeader": "파티장 지정",
         "removeParty": "파티에서 제거",
         "convertToRaid": "공격대로 전환",
         "convertToParty": "파티로 전환",

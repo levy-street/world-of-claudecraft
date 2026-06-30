@@ -2709,6 +2709,7 @@ export const fr_CA: EnTranslations = {
         "unignore": "Ne plus ignorer",
         "unignoreChat": "Ne plus ignorer la discussion",
         "report": "Signaler le joueur",
+        "makeLeader": "Make Leader",
         "removeParty": "Retirer du groupe",
         "convertToRaid": "Convertir en raid",
         "convertToParty": "Convertir en groupe",

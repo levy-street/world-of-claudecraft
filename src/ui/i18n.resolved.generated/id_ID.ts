@@ -2709,6 +2709,7 @@ export const id_ID: EnTranslations = {
         "unignore": "Batalkan Abaikan",
         "unignoreChat": "Batalkan Abaikan Obrolan",
         "report": "Laporkan Pemain",
+        "makeLeader": "Make Leader",
         "removeParty": "Keluarkan dari Party",
         "convertToRaid": "Ubah jadi raid",
         "convertToParty": "Ubah jadi party",

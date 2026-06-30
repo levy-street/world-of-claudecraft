@@ -2709,6 +2709,7 @@ export const zh_TW: EnTranslations = {
         "unignore": "取消封鎖",
         "unignoreChat": "取消封鎖聊天",
         "report": "檢舉玩家",
+        "makeLeader": "設為隊長",
         "removeParty": "移出隊伍",
         "convertToRaid": "轉換為團隊",
         "convertToParty": "轉換為隊伍",
