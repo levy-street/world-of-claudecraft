@@ -3490,6 +3490,16 @@
     align-items: start;
     margin-bottom: 8px;
   }
+  .kb-scroll {
+    max-height: max(240px, calc(85vh - 300px));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-right: 4px;
+    margin-bottom: 8px;
+  }
+  .kb-scroll .kb-cols {
+    margin-bottom: 0;
+  }
   .kb-col {
     min-width: 0;
   }

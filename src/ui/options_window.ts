@@ -1365,7 +1365,10 @@ export class OptionsWindow {
       col.appendChild(rows);
       cols.appendChild(col);
     }
-    el.appendChild(cols);
+    const scroll = document.createElement('div');
+    scroll.className = 'kb-scroll';
+    scroll.appendChild(cols);
+    el.appendChild(scroll);
     const reset = document.createElement('button');
     reset.className = 'btn';
     reset.textContent = t('hud.options.resetToDefaults');
