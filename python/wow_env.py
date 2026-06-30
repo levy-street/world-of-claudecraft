@@ -20,7 +20,10 @@ from __future__ import annotations
 
 import json
 import os
+import queue
 import subprocess
+import threading
+from collections import deque
 from typing import Any
 
 import numpy as np
@@ -39,10 +42,10 @@ class WoWClassicEnv(gym.Env):
     """Single-agent World of Claudecraft environment.
 
     Observation: float32 vector (self, abilities, target, nearby mobs,
-    nearest interactable, quest states). Action: Discrete(23) —
+    nearest interactable, quest states). Action: Discrete(23) --
     movement/turn/strafe/jump, targeting, attack, 10 ability slots,
     interact, stop, eat/drink. Sizes are content-dependent and queried
-    from the env's `info` cmd at startup — never hardcode them.
+    from the env's `info` cmd at startup -- never hardcode them.
     """
 
     metadata = {"render_modes": []}
@@ -57,6 +60,7 @@ class WoWClassicEnv(gym.Env):
         rewards: dict[str, float] | None = None,
         server_path: str | None = None,
         node_binary: str = "node",
+        request_timeout: float = 5.0,
     ) -> None:
         super().__init__()
         self.player_class = player_class
@@ -74,14 +78,19 @@ class WoWClassicEnv(gym.Env):
             raise FileNotFoundError(
                 f"env server bundle not found at {server}. Run `npm run build:env` first."
             )
+        self._request_timeout = request_timeout
+        self._closed = False
+        self._stdout_lines: queue.Queue[str | None] = queue.Queue()
+        self._stderr_tail: deque[str] = deque(maxlen=40)
         self._proc = subprocess.Popen(
             [node_binary, server],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
             text=True,
             bufsize=1,
         )
+        self._start_pipe_readers()
         meta = self._request({"cmd": "info"})
         self._obs_size = int(meta["obs_size"])
         self.action_names: list[str] = list(meta["actions"])
@@ -90,14 +99,84 @@ class WoWClassicEnv(gym.Env):
         self._episode_seed = 0
 
     # ------------------------------------------------------------------
+    def _start_pipe_readers(self) -> None:
+        if self._proc.stdout is not None:
+            threading.Thread(
+                target=self._read_stdout,
+                args=(self._proc.stdout,),
+                name="woc-env-stdout",
+                daemon=True,
+            ).start()
+        if self._proc.stderr is not None:
+            threading.Thread(
+                target=self._read_stderr,
+                args=(self._proc.stderr,),
+                name="woc-env-stderr",
+                daemon=True,
+            ).start()
+
+    def _read_stdout(self, pipe) -> None:
+        try:
+            for line in pipe:
+                self._stdout_lines.put(line)
+        except (OSError, ValueError):
+            pass
+        finally:
+            self._stdout_lines.put(None)
+
+    def _read_stderr(self, pipe) -> None:
+        try:
+            for line in pipe:
+                text = line.rstrip()
+                if text:
+                    self._stderr_tail.append(text)
+        except (OSError, ValueError):
+            pass
+
+    def _stderr_summary(self) -> str:
+        if not self._stderr_tail:
+            return ""
+        return "\nLast env server stderr:\n" + "\n".join(self._stderr_tail)
+
+    def _write_message(self, msg: dict[str, Any]) -> None:
+        stdin = self._proc.stdin
+        if stdin is None:
+            raise RuntimeError("env server stdin is closed" + self._stderr_summary())
+        code = self._proc.poll()
+        if code is not None:
+            raise RuntimeError(f"env server exited with code {code}" + self._stderr_summary())
+        try:
+            stdin.write(json.dumps(msg) + "\n")
+            stdin.flush()
+        except (BrokenPipeError, OSError) as e:
+            code = self._proc.poll()
+            exited = f" exited with code {code}" if code is not None else ""
+            raise RuntimeError(f"env server pipe broke{exited}" + self._stderr_summary()) from e
+
     def _request(self, msg: dict[str, Any]) -> dict[str, Any]:
-        assert self._proc.stdin and self._proc.stdout
-        self._proc.stdin.write(json.dumps(msg) + "\n")
-        self._proc.stdin.flush()
-        line = self._proc.stdout.readline()
+        if self._closed:
+            raise RuntimeError("env is closed")
+        self._write_message(msg)
+        try:
+            line = self._stdout_lines.get(timeout=self._request_timeout)
+        except queue.Empty as e:
+            code = self._proc.poll()
+            if code is not None:
+                raise RuntimeError(
+                    f"env server exited with code {code}" + self._stderr_summary()
+                ) from e
+            raise TimeoutError(
+                f"env server did not respond within {self._request_timeout:.1f}s"
+                + self._stderr_summary()
+            ) from e
         if not line:
-            raise RuntimeError("env server died")
-        out = json.loads(line)
+            code = self._proc.poll()
+            exited = f" with code {code}" if code is not None else ""
+            raise RuntimeError(f"env server stdout closed{exited}" + self._stderr_summary())
+        try:
+            out = json.loads(line)
+        except json.JSONDecodeError as e:
+            raise RuntimeError(f"env server sent invalid JSON: {line.strip()}") from e
         if "error" in out:
             raise RuntimeError(f"env server error: {out['error']}")
         return out
@@ -126,12 +205,31 @@ class WoWClassicEnv(gym.Env):
         return obs, float(res["reward"]), bool(res["terminated"]), bool(res["truncated"]), res.get("info", {})
 
     def close(self):
-        if self._proc.poll() is None:
-            try:
-                self._request({"cmd": "close"})
-            except Exception:
-                self._proc.kill()
-        self._proc.wait(timeout=5)
+        if self._closed:
+            return
+        try:
+            if self._proc.poll() is None:
+                try:
+                    self._write_message({"cmd": "close"})
+                except Exception:
+                    pass
+                try:
+                    self._proc.wait(timeout=5)
+                except subprocess.TimeoutExpired:
+                    self._proc.kill()
+                    try:
+                        self._proc.wait(timeout=5)
+                    except subprocess.TimeoutExpired:
+                        pass
+        finally:
+            self._closed = True
+            for pipe in (self._proc.stdin, self._proc.stdout, self._proc.stderr):
+                if pipe is None:
+                    continue
+                try:
+                    pipe.close()
+                except OSError:
+                    pass
 
 
 def make_env(**kwargs):
