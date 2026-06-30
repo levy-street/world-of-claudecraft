@@ -1,14 +1,20 @@
 import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
-import type { Aura, Entity } from '../src/sim/types';
+import type { Aura, Entity, PlayerClass } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
 function makeWorld() {
   return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
 }
 
+function mustEntity(sim: Sim, pid: number): Entity {
+  const e = sim.entities.get(pid);
+  if (!e) throw new Error(`missing entity ${pid}`);
+  return e;
+}
+
 function teleport(sim: Sim, pid: number, x: number, z: number) {
-  const e = sim.entities.get(pid)!;
+  const e = mustEntity(sim, pid);
   e.pos.x = x;
   e.pos.z = z;
   e.pos.y = groundHeight(x, z, sim.cfg.seed);
@@ -19,8 +25,8 @@ function teleport(sim: Sim, pid: number, x: number, z: number) {
 // Start an accepted duel between two adjacent players and run the countdown
 // out so the bout is live.
 function startedDuel(
-  aClass: 'warrior' | 'mage' | 'hunter' | 'warlock' = 'warrior',
-  bClass: 'warrior' | 'mage' | 'hunter' | 'warlock' = 'mage',
+  aClass: PlayerClass = 'warrior',
+  bClass: PlayerClass = 'mage',
 ): { sim: Sim; a: number; b: number } {
   const sim = makeWorld();
   const a = sim.addPlayer(aClass, 'Aleph', { autoEquip: true });
@@ -111,6 +117,41 @@ describe('duel: non-lethal cleanup', () => {
 });
 
 describe('duel: PvP combat affordances', () => {
+  it('stops auto-attacking a duel opponent who enters stealth', () => {
+    const { sim, a, b } = startedDuel('warrior', 'rogue');
+    const attacker = mustEntity(sim, a);
+    const rogue = mustEntity(sim, b);
+    sim.setPlayerLevel(10, b);
+    attacker.targetId = b;
+    attacker.facing = Math.atan2(rogue.pos.x - attacker.pos.x, rogue.pos.z - attacker.pos.z);
+
+    sim.startAutoAttack(a);
+    expect(attacker.autoAttack).toBe(true);
+
+    sim.castAbility('stealth', b);
+    expect(rogue.stealthed).toBe(true);
+    sim.tick();
+
+    expect(attacker.autoAttack).toBe(false);
+    const hpAfterStealth = rogue.hp;
+    for (let i = 0; i < 20 * 3; i++) sim.tick();
+    expect(rogue.hp).toBe(hpAfterStealth);
+  });
+
+  it('rejects starting auto-attack against a stealthed duel opponent', () => {
+    const { sim, a, b } = startedDuel('warrior', 'rogue');
+    const attacker = mustEntity(sim, a);
+    const rogue = mustEntity(sim, b);
+    sim.setPlayerLevel(10, b);
+    sim.castAbility('stealth', b);
+    expect(rogue.stealthed).toBe(true);
+
+    attacker.targetId = b;
+    sim.startAutoAttack(a);
+
+    expect(attacker.autoAttack).toBe(false);
+  });
+
   it('lets a commanded pet attack an active duel opponent', () => {
     const { sim, a, b } = startedDuel('hunter', 'mage');
     const pet = givePet(sim, a);

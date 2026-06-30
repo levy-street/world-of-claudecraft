@@ -48,13 +48,19 @@ import { blindMissBonus, isDisarmed, isStunned } from './cc';
 import { baseSwingSpeed } from './form_swing';
 import { applyThornsReaction } from './thorns_charge';
 
+function isHiddenStealthedDuelTarget(ctx: SimContext, attacker: Entity, target: Entity): boolean {
+  if (target.kind !== 'player' || !target.stealthed) return false;
+  const duel = ctx.duelFor(attacker.id);
+  return duel?.state === 'active' && (duel.a === target.id || duel.b === target.id);
+}
+
 export function startAutoAttack(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const p = r.e;
   if (p.dead) return;
   const t = p.targetId !== null ? ctx.entities.get(p.targetId) : null;
-  if (!t || t.dead || !ctx.isHostileTo(p, t)) {
+  if (!t || t.dead || !ctx.isHostileTo(p, t) || isHiddenStealthedDuelTarget(ctx, p, t)) {
     ctx.error(p.id, 'Invalid attack target.');
     return;
   }
@@ -90,7 +96,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
   p.swingTimer = Math.max(0, p.swingTimer - DT);
   if (!p.autoAttack || p.castingAbility) return;
   const t = p.targetId !== null ? ctx.entities.get(p.targetId) : null;
-  if (!t || t.dead || !ctx.isHostileTo(p, t)) {
+  if (!t || t.dead || !ctx.isHostileTo(p, t) || isHiddenStealthedDuelTarget(ctx, p, t)) {
     p.autoAttack = false;
     return;
   }
