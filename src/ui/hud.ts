@@ -196,6 +196,7 @@ import {
 } from './i18n';
 import { iconDataUrl, QUALITY_COLOR, raidMarkerDataUrl } from './icons';
 import { itemArmorTypeLabelKey } from './item_armor_type';
+import { maybeInsertItemChatLink } from './item_chat_link';
 import { itemStatDeltas } from './item_compare';
 import { itemSetMemberCounts, itemSetTooltipModel } from './item_set_tooltip_view';
 import { LeaderboardWindow } from './leaderboard_window';
@@ -5175,9 +5176,17 @@ export class Hud {
       html += `<div class="loot-item" data-item="${s.itemId}">${this.itemIcon(item)}<span style="font-size:12px">${esc(itemDisplayName(item))}${s.count > 1 ? ` ${esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) }))}` : ''}</span></div>`;
     }
     el.innerHTML = html;
-    el.querySelectorAll('[data-item]').forEach((row) => {
+    el.querySelectorAll<HTMLElement>('[data-item]').forEach((row) => {
       const itemId = (row as HTMLElement).dataset.item ?? '';
-      this.attachTooltip(row as HTMLElement, () => this.itemTooltip(ITEMS[itemId]));
+      row.addEventListener('click', (ev) => {
+        maybeInsertItemChatLink(ev, itemId, (id) => this.insertItemChatLink(id));
+      });
+      this.attachTooltip(
+        row as HTMLElement,
+        () =>
+          this.itemTooltip(ITEMS[itemId]) +
+          `<div class="tt-sub">${esc(t('hudChrome.itemShare.linkHint'))}</div>`,
+      );
     });
     const btn = document.createElement('button');
     btn.className = 'btn';
@@ -7775,8 +7784,17 @@ export class Hud {
     }
     el.innerHTML = html;
     const rewardRow = el.querySelector('[data-reward]') as HTMLElement | null;
-    if (rewardRow && rewardItem)
-      this.attachTooltip(rewardRow, () => this.itemTooltip(ITEMS[rewardItem]));
+    if (rewardRow && rewardItem) {
+      rewardRow.addEventListener('click', (ev) => {
+        maybeInsertItemChatLink(ev, rewardItem, (id) => this.insertItemChatLink(id));
+      });
+      this.attachTooltip(
+        rewardRow,
+        () =>
+          this.itemTooltip(ITEMS[rewardItem]) +
+          `<div class="tt-sub">${esc(t('hudChrome.itemShare.linkHint'))}</div>`,
+      );
+    }
 
     if (state === 'available') {
       const btn = document.createElement('button');
@@ -7852,8 +7870,17 @@ export class Hud {
     }
     el.innerHTML = html;
     const rewardRow = el.querySelector('[data-reward]') as HTMLElement | null;
-    if (rewardRow && rewardItem)
-      this.attachTooltip(rewardRow, () => this.itemTooltip(ITEMS[rewardItem]));
+    if (rewardRow && rewardItem) {
+      rewardRow.addEventListener('click', (ev) => {
+        maybeInsertItemChatLink(ev, rewardItem, (id) => this.insertItemChatLink(id));
+      });
+      this.attachTooltip(
+        rewardRow,
+        () =>
+          this.itemTooltip(ITEMS[rewardItem]) +
+          `<div class="tt-sub">${esc(t('hudChrome.itemShare.linkHint'))}</div>`,
+      );
+    }
     if (inSharerParty && state === 'available') {
       const btn = document.createElement('button');
       btn.className = 'btn';
@@ -8216,9 +8243,17 @@ export class Hud {
       html += `<div class="loot-item" data-item="${s.itemId}">${this.itemIcon(item)}<span style="font-size:12px">${esc(itemDisplayName(item))}${s.count > 1 ? ` ${esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) }))}` : ''}</span></div>`;
     }
     el.innerHTML = html;
-    el.querySelectorAll('[data-item]').forEach((row) => {
+    el.querySelectorAll<HTMLElement>('[data-item]').forEach((row) => {
       const itemId = (row as HTMLElement).dataset.item ?? '';
-      this.attachTooltip(row as HTMLElement, () => this.itemTooltip(ITEMS[itemId]));
+      row.addEventListener('click', (ev) => {
+        maybeInsertItemChatLink(ev, itemId, (id) => this.insertItemChatLink(id));
+      });
+      this.attachTooltip(
+        row as HTMLElement,
+        () =>
+          this.itemTooltip(ITEMS[itemId]) +
+          `<div class="tt-sub">${esc(t('hudChrome.itemShare.linkHint'))}</div>`,
+      );
     });
     const btn = document.createElement('button');
     btn.className = 'btn';
