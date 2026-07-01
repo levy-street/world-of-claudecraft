@@ -828,6 +828,30 @@ describe('food, drink, vendor', () => {
     expect(sim.player.drinking).toBe(null);
   });
 
+  it('stops food and drink independently once the relevant bar is full (#15)', () => {
+    const sim = makeSim('mage');
+    sim.addItem('baked_bread', 1);
+    sim.addItem('spring_water', 1);
+    sim.player.hp = sim.player.maxHp;
+    sim.player.resource = 10;
+    sim.player.combatTimer = 99;
+    sim.player.inCombat = false;
+
+    sim.useItem('baked_bread');
+    sim.useItem('spring_water');
+    expect(sim.player.eating).not.toBe(null);
+    expect(sim.player.drinking).not.toBe(null);
+
+    for (let i = 0; i < 20 * 2; i++) sim.tick();
+
+    expect(sim.player.eating).toBe(null);
+    expect(sim.player.drinking).not.toBe(null);
+    expect(sim.player.resource).toBeGreaterThan(10);
+
+    sim.player.resource = sim.player.maxResource;
+    for (let i = 0; i < 20 * 2; i++) sim.tick();
+    expect(sim.player.drinking).toBe(null);
+  });
   it('combat potions restore instantly, work in combat, and share a cooldown (#103)', () => {
     const sim = makeSim('mage');
     sim.addItem('minor_mana_potion', 2);
