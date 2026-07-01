@@ -1,0 +1,178 @@
+{
+  "desktopEn": {
+    "text": "Realm maintenance",
+    "lines": 1,
+    "offsetPx": 0.95,
+    "letterSpacing": "1.92px",
+    "textIndent": "1.92px",
+    "maxWidth": "none",
+    "mainWidth": 640,
+    "textWidth": 164.3
+  },
+  "mobileEn": {
+    "text": "Realm maintenance",
+    "lines": 1,
+    "offsetPx": 0.95,
+    "letterSpacing": "1.92px",
+    "textIndent": "1.92px",
+    "maxWidth": "none",
+    "mainWidth": 358,
+    "textWidth": 164.3
+  },
+  "locales": [
+    {
+      "lang": "en",
+      "text": "Realm maintenance",
+      "lines": 1,
+      "offsetPx": 0.95,
+      "letterSpacing": "1.92px",
+      "textIndent": "1.92px",
+      "maxWidth": "none",
+      "mainWidth": 358,
+      "textWidth": 164.3
+    },
+    {
+      "lang": "es",
+      "text": "Mantenimiento del reino",
+      "lines": 1,
+      "offsetPx": 0.95,
+      "letterSpacing": "1.92px",
+      "textIndent": "1.92px",
+      "maxWidth": "none",
+      "mainWidth": 358,
+      "textWidth": 211.7
+    },
+    {
+      "lang": "es_ES",
+      "text": "Mantenimiento del reino",
+      "lines": 1,
+      "offsetPx": 0.95,
+      "letterSpacing": "1.92px",
+      "textIndent": "1.92px",
+      "maxWidth": "none",
+      "mainWidth": 358,
+      "textWidth": 211.7
+    },
+    {
+      "lang": "fr_FR",
+      "text": "Maintenance du royaume",
+      "lines": 1,
+      "offsetPx": 0.95,
+      "letterSpacing": "1.92px",
+      "textIndent": "1.92px",
+      "maxWidth": "none",
+      "mainWidth": 358,
+      "textWidth": 212.03
+    },
+    {
+      "lang": "fr_CA",
+      "text": "Maintenance du royaume",
+      "lines": 1,
+      "offsetPx": 0.95,
+      "letterSpacing": "1.92px",
+      "textIndent": "1.92px",
+      "maxWidth": "none",
+      "mainWidth": 358,
+      "textWidth": 212.03
+    },
+    {
+      "lang": "en_CA",
+      "text": "Realm maintenance",
+      "lines": 1,
+      "offsetPx": 0.95,
+      "letterSpacing": "1.92px",
+      "textIndent": "1.92px",
+      "maxWidth": "none",
+      "mainWidth": 358,
+      "textWidth": 164.3
+    },
+    {
+      "lang": "it_IT",
+      "text": "Manutenzione del reame",
+      "lines": 1,
+      "offsetPx": 0.95,
+      "letterSpacing": "1.92px",
+      "textIndent": "1.92px",
+      "maxWidth": "none",
+      "mainWidth": 365,
+      "textWidth": 207.97
+    },
+    {
+      "lang": "de_DE",
+      "text": "Realmwartung",
+      "lines": 1,
+      "offsetPx": 0.95,
+      "letterSpacing": "1.92px",
+      "textIndent": "1.92px",
+      "maxWidth": "none",
+      "mainWidth": 358,
+      "textWidth": 124.89
+    },
+    {
+      "lang": "zh_CN",
+      "text": "服务器维护",
+      "lines": 1,
+      "offsetPx": 0.95,
+      "letterSpacing": "1.92px",
+      "textIndent": "1.92px",
+      "maxWidth": "none",
+      "mainWidth": 358,
+      "textWidth": 69.61
+    },
+    {
+      "lang": "zh_TW",
+      "text": "伺服器維護",
+      "lines": 1,
+      "offsetPx": 0.95,
+      "letterSpacing": "1.92px",
+      "textIndent": "1.92px",
+      "maxWidth": "none",
+      "mainWidth": 358,
+      "textWidth": 69.61
+    },
+    {
+      "lang": "ko_KR",
+      "text": "렐름 점검",
+      "lines": 1,
+      "offsetPx": 0.95,
+      "letterSpacing": "1.92px",
+      "textIndent": "1.92px",
+      "maxWidth": "none",
+      "mainWidth": 358,
+      "textWidth": 60.92
+    },
+    {
+      "lang": "ja_JP",
+      "text": "レルムメンテナンス",
+      "lines": 1,
+      "offsetPx": 0.95,
+      "letterSpacing": "1.92px",
+      "textIndent": "1.92px",
+      "maxWidth": "none",
+      "mainWidth": 358,
+      "textWidth": 124.81
+    },
+    {
+      "lang": "pt_BR",
+      "text": "Manutenção do reino",
+      "lines": 1,
+      "offsetPx": 0.95,
+      "letterSpacing": "1.92px",
+      "textIndent": "1.92px",
+      "maxWidth": "none",
+      "mainWidth": 358,
+      "textWidth": 183.66
+    },
+    {
+      "lang": "ru_RU",
+      "text": "Технические работы",
+      "lines": 1,
+      "offsetPx": 0.95,
+      "letterSpacing": "1.92px",
+      "textIndent": "1.92px",
+      "maxWidth": "none",
+      "mainWidth": 358,
+      "textWidth": 173.28
+    }
+  ]
+}

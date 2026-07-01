@@ -11,4 +11,14 @@ describe('server unavailable fallback page', () => {
     expect(html).toContain('Back soon');
     expect(html).toContain('http-equiv="refresh" content="30"');
   });
+  it('compensates eyebrow letter spacing so the maintenance label stays centered', () => {
+    const eyebrowRule = html.match(/\.eyebrow\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? '';
+    const maxWidth = eyebrowRule.match(/max-width:\s*(?<value>[^;]+);/)?.groups?.value;
+    const letterSpacing = eyebrowRule.match(/letter-spacing:\s*(?<value>[^;]+);/)?.groups?.value;
+    const textIndent = eyebrowRule.match(/text-indent:\s*(?<value>[^;]+);/)?.groups?.value;
+
+    expect(maxWidth).toBe('none');
+    expect(letterSpacing).toBe('0.16em');
+    expect(textIndent).toBe(letterSpacing);
+  });
 });
