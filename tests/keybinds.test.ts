@@ -107,6 +107,34 @@ describe('Keybinds defaults', () => {
   });
 });
 
+describe('resetSlots', () => {
+  it('restores primary bar defaults, clears secondary bar keys, and leaves other binds untouched', () => {
+    const kb = new Keybinds();
+    kb.bind('slot1', 0, 'KeyP');
+    kb.bind('slot12', 0, 'KeyV');
+    kb.bind('forward', 0, 'KeyT');
+
+    kb.resetSlots();
+
+    expect(kb.codeAt('slot1', 0)).toBe('Digit2');
+    expect(kb.actionForCode('KeyP')).toBe(null);
+    expect(kb.codeAt('slot12', 0)).toBe(null);
+    expect(kb.actionForCode('KeyV')).toBe(null);
+    expect(kb.codeAt('forward', 0)).toBe('KeyT');
+  });
+
+  it('strips a reclaimed primary slot default from a non-slot action', () => {
+    const kb = new Keybinds();
+    kb.bind('bags', 0, 'Digit2');
+    expect(kb.actionForCode('Digit2')).toBe('bags');
+
+    kb.resetSlots();
+
+    expect(kb.codeAt('slot1', 0)).toBe('Digit2');
+    expect(kb.actionForCode('Digit2')).toBe('slot1');
+    expect(kb.codeAt('bags', 0)).toBe(null);
+  });
+});
 describe('binding', () => {
   it('rebinds the Attack slot off "1"', () => {
     const kb = new Keybinds();

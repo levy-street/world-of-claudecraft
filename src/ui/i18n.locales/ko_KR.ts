@@ -107,6 +107,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lootSettings.valueMaster': '분배 담당',
   'hudChrome.lootSettings.leaderOption': '분배 담당자: 파티장(나)',
   'hudChrome.lootSettings.masterOption': '분배 담당자: {name}',
+  'hudChrome.actionBar.editKeys': '행동 단축바 키 편집',
+  'hudChrome.actionBar.bindModeTitle': '행동 단축바 키 설정',
+  'hudChrome.actionBar.bindModeHint':
+    '칸을 클릭한 다음 지정할 키를 누르세요. 끝나면 "완료"를 클릭하세요.',
+  'hudChrome.actionBar.bindReset': '초기화',
+  'hudChrome.actionBar.bindResetConfirmTitle': '행동 단축바 키를 초기화할까요?',
+  'hudChrome.actionBar.bindResetConfirmBody':
+    '첫 번째 단축바는 기본 키로 돌아가고 두 번째 단축바는 미지정 상태가 됩니다. 이 작업은 되돌릴 수 없습니다.',
+  'hudChrome.actionBar.bindCancel': '취소',
+  'hudChrome.actionBar.bindDone': '완료',
   'hudChrome.theme.preset': 'UI 테마',
   'hudChrome.theme.customColors': '사용자 지정 색상',
   'hudChrome.theme.reset': '초기화',

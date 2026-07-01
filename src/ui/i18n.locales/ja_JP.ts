@@ -107,6 +107,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lootSettings.valueMaster': 'マスタールート',
   'hudChrome.lootSettings.leaderOption': '分配担当：パーティリーダー（あなた）',
   'hudChrome.lootSettings.masterOption': '分配担当：{name}',
+  'hudChrome.actionBar.editKeys': 'アクションバーのキーを編集',
+  'hudChrome.actionBar.bindModeTitle': 'アクションバーのキー割り当て',
+  'hudChrome.actionBar.bindModeHint':
+    'スロットをクリックしてから割り当てるキーを押します。完了したら「完了」をクリックします。',
+  'hudChrome.actionBar.bindReset': 'リセット',
+  'hudChrome.actionBar.bindResetConfirmTitle': 'アクションバーのキーをリセットしますか？',
+  'hudChrome.actionBar.bindResetConfirmBody':
+    '1本目のバーは既定キーに戻り、2本目のバーは未割り当てになります。この操作は元に戻せません。',
+  'hudChrome.actionBar.bindCancel': 'キャンセル',
+  'hudChrome.actionBar.bindDone': '完了',
   'hudChrome.theme.preset': 'UIテーマ',
   'hudChrome.theme.customColors': 'カスタムカラー',
   'hudChrome.theme.reset': 'リセット',

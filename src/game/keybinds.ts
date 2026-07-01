@@ -547,4 +547,28 @@ export class Keybinds {
     this.map = this.defaults();
     this.save();
   }
+  /**
+   * Reset only action-bar slot bindings. The primary bar returns to its default
+   * number-row keys, while secondary-bar slots become unbound so the on-bar
+   * binding flow owns those spatial choices.
+   */
+  resetSlots(): void {
+    const slotIds = new Set<string>();
+    const defaults = new Set<string>();
+    for (let i = 0; i < ACTION_BAR_SLOTS; i++) {
+      const id = `slot${i}`;
+      slotIds.add(id);
+      const def = i <= 11 ? SLOT_DEFAULTS[i] : null;
+      this.map.set(id, [def, null]);
+      if (def) defaults.add(def);
+    }
+    for (const [id, codes] of this.map) {
+      if (slotIds.has(id) || actionAllowsShared(id)) continue;
+      for (let i = 0; i < codes.length; i++) {
+        const c = codes[i];
+        if (c !== null && defaults.has(c)) codes[i] = null;
+      }
+    }
+    this.save();
+  }
 }

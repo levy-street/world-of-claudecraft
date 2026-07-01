@@ -108,6 +108,16 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lootSettings.valueMaster': 'Мастер добычи',
   'hudChrome.lootSettings.leaderOption': 'Мастер добычи: лидер группы (вы)',
   'hudChrome.lootSettings.masterOption': 'Мастер добычи: {name}',
+  'hudChrome.actionBar.editKeys': 'Настроить клавиши панели действий',
+  'hudChrome.actionBar.bindModeTitle': 'Назначение клавиш панели действий',
+  'hudChrome.actionBar.bindModeHint':
+    'Нажмите на ячейку, затем нажмите клавишу для назначения. По завершении нажмите «Готово».',
+  'hudChrome.actionBar.bindReset': 'Сбросить',
+  'hudChrome.actionBar.bindResetConfirmTitle': 'Сбросить клавиши панели действий?',
+  'hudChrome.actionBar.bindResetConfirmBody':
+    'Первая панель вернётся к клавишам по умолчанию, а вторая станет без назначений. Это действие нельзя отменить.',
+  'hudChrome.actionBar.bindCancel': 'Отмена',
+  'hudChrome.actionBar.bindDone': 'Готово',
   'hudChrome.theme.preset': 'Тема интерфейса',
   'hudChrome.theme.customColors': 'Настраиваемые цвета',
   'hudChrome.theme.reset': 'Сброс',

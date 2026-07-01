@@ -649,6 +649,8 @@ export class Hud {
   private dragUnequipSlot: EquipSlot | null = null;
   private mobileHotbarDrag: MobileHotbarDrag | null = null;
   private suppressNextActionClick = false;
+  private actionBarBindMode = false;
+  private actionBarBindModeBar: HTMLElement | null = null;
   private optionsHooks: OptionsHooks | null = null;
   private reportHooks: ReportHooks | null = null;
   private bugReportHooks: BugReportHooks | null = null;
@@ -2766,6 +2768,7 @@ export class Hud {
       return item ? itemDisplayName(item) : null;
     },
     refreshKeybindLabels: () => this.refreshKeybindLabels(),
+    enterActionBarBindMode: () => this.enterActionBarBindMode(),
     buildDropdown: (options, current, onChange, placeholder, a11y) =>
       this.buildDropdown(options, current, onChange, placeholder, a11y),
     setDropdownValue: (root, value) => this.setDropdownValue(root, value),
@@ -3699,6 +3702,10 @@ export class Hud {
           btn.blur();
           return;
         }
+        if (this.actionBarBindMode) {
+          this.beginActionBarSlotCapture(slot, btn);
+          return;
+        }
         // On touch, the click that ends a long-press peek inspects the slot
         // (tooltip already shown) instead of casting — release dismisses it.
         if (this.peekGuard.consume()) {
@@ -3890,6 +3897,84 @@ export class Hud {
     return `url(${iconDataUrl('ability', iconKey.slice(ABILITY_ICON_PREFIX.length))})`;
   }
 
+  enterActionBarBindMode(): void {
+    if (this.actionBarBindMode) return;
+    this.actionBarBindMode = true;
+    document.body.classList.add('bind-mode');
+    this.hideTooltip();
+    const stack = document.getElementById('actionbar-stack');
+    if (!stack || this.actionBarBindModeBar) return;
+
+    const bar = document.createElement('div');
+    bar.id = 'bind-mode-bar';
+    bar.className = 'panel';
+    bar.setAttribute('role', 'region');
+    bar.setAttribute('aria-label', t('hudChrome.actionBar.bindModeTitle'));
+
+    const info = document.createElement('span');
+    info.className = 'bind-mode-info';
+    info.textContent = t('hudChrome.actionBar.bindModeHint');
+
+    const reset = document.createElement('button');
+    reset.type = 'button';
+    reset.className = 'btn';
+    reset.textContent = t('hudChrome.actionBar.bindReset');
+    reset.addEventListener('click', () => {
+      audio.click();
+      this.confirmDialog(
+        t('hudChrome.actionBar.bindResetConfirmTitle'),
+        t('hudChrome.actionBar.bindResetConfirmBody'),
+        t('hudChrome.actionBar.bindReset'),
+        t('hudChrome.actionBar.bindCancel'),
+        () => {
+          this.keybinds.resetSlots();
+          this.refreshKeybindLabels();
+        },
+      );
+    });
+
+    const done = document.createElement('button');
+    done.type = 'button';
+    done.className = 'btn';
+    done.textContent = t('hudChrome.actionBar.bindDone');
+    done.addEventListener('click', () => {
+      audio.click();
+      this.exitActionBarBindMode();
+    });
+
+    bar.append(info, reset, done);
+    stack.insertBefore(
+      bar,
+      document.getElementById('actionbar2') ?? document.getElementById('actionbar'),
+    );
+    this.actionBarBindModeBar = bar;
+  }
+
+  private exitActionBarBindMode(): void {
+    if (!this.actionBarBindMode) return;
+    this.actionBarBindMode = false;
+    document.body.classList.remove('bind-mode');
+    document.querySelectorAll('.action-btn.binding-selected').forEach((el) => {
+      el.classList.remove('binding-selected');
+    });
+    this.actionBarBindModeBar?.remove();
+    this.actionBarBindModeBar = null;
+  }
+
+  private beginActionBarSlotCapture(slot: number, btn: HTMLButtonElement): void {
+    if (!this.optionsHooks) return;
+    audio.click();
+    this.hideTooltip();
+    document.querySelectorAll('.action-btn.binding-selected').forEach((el) => {
+      el.classList.remove('binding-selected');
+    });
+    btn.classList.add('binding-selected');
+    this.optionsHooks.captureKey((code) => {
+      btn.classList.remove('binding-selected');
+      if (code === null) return;
+      if (this.keybinds.bind(`slot${slot}`, 0, code)) this.refreshKeybindLabels();
+    });
+  }
   private clearActionDropTargets(): void {
     // Both action rows (#actionbar and #actionbar2) hold .action-btn slots.
     document.querySelectorAll('.action-btn.drop-target').forEach((el) => {

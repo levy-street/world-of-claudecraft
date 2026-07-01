@@ -183,6 +183,8 @@ export interface OptionsWindowDeps {
   slotActionName(slot: number): string | null;
   /** Re-sync the action-bar keycaps after a rebind/reset. */
   refreshKeybindLabels(): void;
+  /** Open the on-bar action-bar key binding mode. */
+  enterActionBarBindMode(): void;
   /** The shared gold-themed dropdown (carries the listbox ARIA + keyboard nav). */
   buildDropdown(
     options: { value: string; label: string }[],
@@ -1316,6 +1318,24 @@ export class OptionsWindow {
     note.className = 'kb-note';
     note.textContent = this.keybindNote || t('hud.options.keybindHelpMouseCamera');
     el.appendChild(note);
+    if (!useTouchInterface()) {
+      const editRow = document.createElement('div');
+      editRow.className = 'kb-row kb-actionbar-edit';
+      const name = document.createElement('span');
+      name.className = 'kb-name';
+      name.textContent = t('hudChrome.actionBar.editKeys');
+      const edit = document.createElement('button');
+      edit.type = 'button';
+      edit.className = 'btn kb-key kb-wide-action';
+      edit.textContent = t('hudChrome.actionBar.editKeys');
+      edit.addEventListener('click', () => {
+        audio.click();
+        this.close();
+        this.deps.enterActionBarBindMode();
+      });
+      editRow.append(name, edit);
+      el.appendChild(editRow);
+    }
     const cols = document.createElement('div');
     cols.className = 'kb-cols';
     // The Attack Move key is only meaningful (and only rebindable) while its mode
@@ -1323,7 +1343,10 @@ export class OptionsWindow {
     const attackMoveOn = !!hooks?.settings.get('attackMove');
     for (const category of BIND_CATEGORIES) {
       const visible = BIND_ACTIONS.filter(
-        (a) => a.category === category && (a.id !== 'attackMove' || attackMoveOn),
+        (a) =>
+          a.category === category &&
+          a.category !== 'Action Bar' &&
+          (a.id !== 'attackMove' || attackMoveOn),
       );
       if (visible.length === 0) continue;
       // Each category is its own column block (header + its rows) so the wide

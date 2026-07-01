@@ -177,6 +177,16 @@ export const zh_TW: EnTranslations = {
       "title": "表情",
       "done": "完成"
     },
+    "actionBar": {
+      "editKeys": "編輯動作列按鍵",
+      "bindModeTitle": "動作列按鍵設定",
+      "bindModeHint": "點擊一個格子，然後按下要綁定的按鍵。完成後點擊「完成」。",
+      "bindReset": "重設",
+      "bindResetConfirmTitle": "重設動作列按鍵？",
+      "bindResetConfirmBody": "第一條動作列恢復為預設按鍵，第二條動作列變為未綁定。此操作無法復原。",
+      "bindCancel": "取消",
+      "bindDone": "完成"
+    },
     "theme": {
       "preset": "介面主題",
       "customColors": "自訂顏色",

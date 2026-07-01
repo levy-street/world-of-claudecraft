@@ -177,6 +177,16 @@ export const ja_JP: EnTranslations = {
       "title": "エモート",
       "done": "完了"
     },
+    "actionBar": {
+      "editKeys": "アクションバーのキーを編集",
+      "bindModeTitle": "アクションバーのキー割り当て",
+      "bindModeHint": "スロットをクリックしてから割り当てるキーを押します。完了したら「完了」をクリックします。",
+      "bindReset": "リセット",
+      "bindResetConfirmTitle": "アクションバーのキーをリセットしますか？",
+      "bindResetConfirmBody": "1本目のバーは既定キーに戻り、2本目のバーは未割り当てになります。この操作は元に戻せません。",
+      "bindCancel": "キャンセル",
+      "bindDone": "完了"
+    },
     "theme": {
       "preset": "UIテーマ",
       "customColors": "カスタムカラー",

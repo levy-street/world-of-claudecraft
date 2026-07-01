@@ -1115,6 +1115,26 @@
   body.show-actionbar2 #actionbar2 {
     display: flex;
   }
+  #bind-mode-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    margin-bottom: 4px;
+  }
+  #bind-mode-bar .bind-mode-info {
+    flex: 1;
+    font-size: 13px;
+    color: var(--gold);
+  }
+  body.bind-mode #actionbar .action-btn,
+  body.bind-mode #actionbar2 .action-btn {
+    cursor: cell;
+  }
+  body.bind-mode .action-btn.binding-selected {
+    outline: 2px solid var(--gold);
+    outline-offset: 1px;
+  }
   .action-btn {
     width: 46px;
     height: 46px;

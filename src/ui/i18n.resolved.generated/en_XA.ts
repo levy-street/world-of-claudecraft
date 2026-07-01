@@ -177,6 +177,16 @@ export const en_XA: EnTranslations = {
       "title": "[Éɱóţéš]",
       "done": "[Ðóñé]"
     },
+    "actionBar": {
+      "editKeys": "[Éðíţ áçţíóñ ƀáŕ ķéýš]",
+      "bindModeTitle": "[Áçţíóñ ƀáŕ ķéý ƀíñðíñĝš]",
+      "bindModeHint": "[Çļíçķ á šļóţ, ţĥéñ þŕéšš á ķéý ţó ƀíñð íţ. Çļíçķ Ðóñé ŵĥéñ ƒíñíšĥéð.]",
+      "bindReset": "[Ŕéšéţ]",
+      "bindResetConfirmTitle": "[Ŕéšéţ áçţíóñ ƀáŕ ķéýš?]",
+      "bindResetConfirmBody": "[Ţĥé ƒíŕšţ ƀáŕ ŕéţúŕñš ţó íţš ðéƒáúļţ ķéýš áñð ţĥé šéçóñð ƀáŕ ƀéçóɱéš úñƀóúñð. Ţĥíš çáññóţ ƀé úñðóñé.]",
+      "bindCancel": "[Çáñçéļ]",
+      "bindDone": "[Ðóñé]"
+    },
     "theme": {
       "preset": "[ÚÍ Ţĥéɱé]",
       "customColors": "[Çúšţóɱ Çóļóŕš]",

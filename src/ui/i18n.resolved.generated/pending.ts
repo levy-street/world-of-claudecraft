@@ -9,24 +9,150 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.actionBar.bindCancel",
+    "hudChrome.actionBar.bindDone",
+    "hudChrome.actionBar.bindModeHint",
+    "hudChrome.actionBar.bindModeTitle",
+    "hudChrome.actionBar.bindReset",
+    "hudChrome.actionBar.bindResetConfirmBody",
+    "hudChrome.actionBar.bindResetConfirmTitle",
+    "hudChrome.actionBar.editKeys"
+  ],
+  "es_ES": [
+    "hudChrome.actionBar.bindCancel",
+    "hudChrome.actionBar.bindDone",
+    "hudChrome.actionBar.bindModeHint",
+    "hudChrome.actionBar.bindModeTitle",
+    "hudChrome.actionBar.bindReset",
+    "hudChrome.actionBar.bindResetConfirmBody",
+    "hudChrome.actionBar.bindResetConfirmTitle",
+    "hudChrome.actionBar.editKeys"
+  ],
+  "fr_FR": [
+    "hudChrome.actionBar.bindCancel",
+    "hudChrome.actionBar.bindDone",
+    "hudChrome.actionBar.bindModeHint",
+    "hudChrome.actionBar.bindModeTitle",
+    "hudChrome.actionBar.bindReset",
+    "hudChrome.actionBar.bindResetConfirmBody",
+    "hudChrome.actionBar.bindResetConfirmTitle",
+    "hudChrome.actionBar.editKeys"
+  ],
+  "fr_CA": [
+    "hudChrome.actionBar.bindCancel",
+    "hudChrome.actionBar.bindDone",
+    "hudChrome.actionBar.bindModeHint",
+    "hudChrome.actionBar.bindModeTitle",
+    "hudChrome.actionBar.bindReset",
+    "hudChrome.actionBar.bindResetConfirmBody",
+    "hudChrome.actionBar.bindResetConfirmTitle",
+    "hudChrome.actionBar.editKeys"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.actionBar.bindCancel",
+    "hudChrome.actionBar.bindDone",
+    "hudChrome.actionBar.bindModeHint",
+    "hudChrome.actionBar.bindModeTitle",
+    "hudChrome.actionBar.bindReset",
+    "hudChrome.actionBar.bindResetConfirmBody",
+    "hudChrome.actionBar.bindResetConfirmTitle",
+    "hudChrome.actionBar.editKeys"
+  ],
+  "de_DE": [
+    "hudChrome.actionBar.bindCancel",
+    "hudChrome.actionBar.bindDone",
+    "hudChrome.actionBar.bindModeHint",
+    "hudChrome.actionBar.bindModeTitle",
+    "hudChrome.actionBar.bindReset",
+    "hudChrome.actionBar.bindResetConfirmBody",
+    "hudChrome.actionBar.bindResetConfirmTitle",
+    "hudChrome.actionBar.editKeys"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.actionBar.bindCancel",
+    "hudChrome.actionBar.bindDone",
+    "hudChrome.actionBar.bindModeHint",
+    "hudChrome.actionBar.bindModeTitle",
+    "hudChrome.actionBar.bindReset",
+    "hudChrome.actionBar.bindResetConfirmBody",
+    "hudChrome.actionBar.bindResetConfirmTitle",
+    "hudChrome.actionBar.editKeys"
+  ],
   "ru_RU": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "nl_NL": [
+    "hudChrome.actionBar.bindCancel",
+    "hudChrome.actionBar.bindDone",
+    "hudChrome.actionBar.bindModeHint",
+    "hudChrome.actionBar.bindModeTitle",
+    "hudChrome.actionBar.bindReset",
+    "hudChrome.actionBar.bindResetConfirmBody",
+    "hudChrome.actionBar.bindResetConfirmTitle",
+    "hudChrome.actionBar.editKeys"
+  ],
+  "pl_PL": [
+    "hudChrome.actionBar.bindCancel",
+    "hudChrome.actionBar.bindDone",
+    "hudChrome.actionBar.bindModeHint",
+    "hudChrome.actionBar.bindModeTitle",
+    "hudChrome.actionBar.bindReset",
+    "hudChrome.actionBar.bindResetConfirmBody",
+    "hudChrome.actionBar.bindResetConfirmTitle",
+    "hudChrome.actionBar.editKeys"
+  ],
+  "id_ID": [
+    "hudChrome.actionBar.bindCancel",
+    "hudChrome.actionBar.bindDone",
+    "hudChrome.actionBar.bindModeHint",
+    "hudChrome.actionBar.bindModeTitle",
+    "hudChrome.actionBar.bindReset",
+    "hudChrome.actionBar.bindResetConfirmBody",
+    "hudChrome.actionBar.bindResetConfirmTitle",
+    "hudChrome.actionBar.editKeys"
+  ],
+  "tr_TR": [
+    "hudChrome.actionBar.bindCancel",
+    "hudChrome.actionBar.bindDone",
+    "hudChrome.actionBar.bindModeHint",
+    "hudChrome.actionBar.bindModeTitle",
+    "hudChrome.actionBar.bindReset",
+    "hudChrome.actionBar.bindResetConfirmBody",
+    "hudChrome.actionBar.bindResetConfirmTitle",
+    "hudChrome.actionBar.editKeys"
+  ],
+  "sv_SE": [
+    "hudChrome.actionBar.bindCancel",
+    "hudChrome.actionBar.bindDone",
+    "hudChrome.actionBar.bindModeHint",
+    "hudChrome.actionBar.bindModeTitle",
+    "hudChrome.actionBar.bindReset",
+    "hudChrome.actionBar.bindResetConfirmBody",
+    "hudChrome.actionBar.bindResetConfirmTitle",
+    "hudChrome.actionBar.editKeys"
+  ],
+  "vi_VN": [
+    "hudChrome.actionBar.bindCancel",
+    "hudChrome.actionBar.bindDone",
+    "hudChrome.actionBar.bindModeHint",
+    "hudChrome.actionBar.bindModeTitle",
+    "hudChrome.actionBar.bindReset",
+    "hudChrome.actionBar.bindResetConfirmBody",
+    "hudChrome.actionBar.bindResetConfirmTitle",
+    "hudChrome.actionBar.editKeys"
+  ],
+  "da_DK": [
+    "hudChrome.actionBar.bindCancel",
+    "hudChrome.actionBar.bindDone",
+    "hudChrome.actionBar.bindModeHint",
+    "hudChrome.actionBar.bindModeTitle",
+    "hudChrome.actionBar.bindReset",
+    "hudChrome.actionBar.bindResetConfirmBody",
+    "hudChrome.actionBar.bindResetConfirmTitle",
+    "hudChrome.actionBar.editKeys"
+  ]
 };

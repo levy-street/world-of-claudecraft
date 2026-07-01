@@ -177,6 +177,16 @@ export const ko_KR: EnTranslations = {
       "title": "감정 표현",
       "done": "완료"
     },
+    "actionBar": {
+      "editKeys": "행동 단축바 키 편집",
+      "bindModeTitle": "행동 단축바 키 설정",
+      "bindModeHint": "칸을 클릭한 다음 지정할 키를 누르세요. 끝나면 \"완료\"를 클릭하세요.",
+      "bindReset": "초기화",
+      "bindResetConfirmTitle": "행동 단축바 키를 초기화할까요?",
+      "bindResetConfirmBody": "첫 번째 단축바는 기본 키로 돌아가고 두 번째 단축바는 미지정 상태가 됩니다. 이 작업은 되돌릴 수 없습니다.",
+      "bindCancel": "취소",
+      "bindDone": "완료"
+    },
     "theme": {
       "preset": "UI 테마",
       "customColors": "사용자 지정 색상",

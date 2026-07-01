@@ -152,6 +152,12 @@ describe('options_window: keybind rebind dispatch (cluster 5)', () => {
     expect(painter).toContain('this.deps.keybinds().bind(actionId, index, code)');
     expect(painter).toContain('this.deps.refreshKeybindLabels()');
   });
+  it('replaces action-bar rows with the on-bar keybinding mode launcher', () => {
+    expect(painter).toContain("a.category !== 'Action Bar'");
+    expect(painter).toContain('this.deps.enterActionBarBindMode()');
+    expect(hudTs).toContain('enterActionBarBindMode(): void');
+    expect(hudTs).toContain('this.keybinds.resetSlots()');
+  });
 });
 
 describe('options_window: viewport resync on open (PR #1118)', () => {
