@@ -123,7 +123,10 @@ describe('solo grantXp at the cap', () => {
     const sim = makeSim('warrior');
     sim.setPlayerLevel(MAX_LEVEL);
     let expected = sim.lifetimeXp;
-    for (let i = 0; i < 50; i++) { sim.grantXp(1000); expected += 1000; }
+    // the first virtual level past the cap costs one at-cap step, so award a
+    // bit more than that across many small grants
+    const grant = Math.ceil((xpForLevel(MAX_LEVEL) * 1.2) / 50);
+    for (let i = 0; i < 50; i++) { sim.grantXp(grant); expected += grant; }
     expect(sim.lifetimeXp).toBe(expected);
     expect(virtualLevel(sim.lifetimeXp)).toBeGreaterThan(MAX_LEVEL);
   });
@@ -143,10 +146,12 @@ describe('solo grantXp at the cap', () => {
     const sim = makeSim('warrior');
     sim.setPlayerLevel(MAX_LEVEL);
     sim.events.length = 0;
-    sim.grantXp(xpToReachLevel(22)); // jump well past the cap
+    // enough post-cap XP to cross the first two virtual levels (the first
+    // costs one at-cap step, the second ~10% more)
+    sim.grantXp(Math.ceil(xpForLevel(MAX_LEVEL) * 2.4));
     const vlevels = sim.events.filter((e) => e.type === 'virtualLevelUp').map((e: any) => e.level);
-    expect(vlevels).toContain(21);
-    expect(vlevels).toContain(22);
+    expect(vlevels).toContain(MAX_LEVEL + 1);
+    expect(vlevels).toContain(MAX_LEVEL + 2);
   });
 });
 
@@ -210,8 +215,8 @@ describe('party grantXp at the cap', () => {
 
 describe('anti-farm level-diff scaling', () => {
   it('gray mobs grant zero XP even post-cap', () => {
-    // a level-20 player vs a far-lower mob: beyond the zero-diff band → 0
-    expect(zeroDiff(MAX_LEVEL)).toBe(8);
+    // an at-cap player vs a far-lower mob: beyond the zero-diff band → 0
+    expect(zeroDiff(MAX_LEVEL)).toBe(16);
     expect(mobXpValue(MAX_LEVEL - zeroDiff(MAX_LEVEL), MAX_LEVEL)).toBe(0);
     expect(mobXpValue(3, MAX_LEVEL)).toBe(0);
   });
@@ -372,28 +377,32 @@ describe('xp-bar label states', () => {
   it('at-cap with overflow shows the virtual-level bar starting at +0', () => {
     const v = xpBarView({ level: MAX_LEVEL, xp: 0, lifetimeXp: xpToReachLevel(MAX_LEVEL), showOverflow: true });
     expect(v.postCap).toBe(true);
-    expect(v.label).toBe(`Lv 20 (+0)  ·  ${formatXp(xpToReachLevel(MAX_LEVEL))} total XP  ·  0% to next`);
+    expect(v.label).toBe(
+      `Lv ${MAX_LEVEL} (+0)  ·  ${formatXp(xpToReachLevel(MAX_LEVEL))} total XP  ·  0% to next`,
+    );
   });
 
   it('post-cap shows virtual level, total, and percent to next', () => {
-    const lifetime = xpToReachLevel(27); // start of virtual level 27
+    const lifetime = xpToReachLevel(MAX_LEVEL + 7); // start of virtual level cap+7
     const v = xpBarView({ level: MAX_LEVEL, xp: 0, lifetimeXp: lifetime, showOverflow: true });
     expect(v.postCap).toBe(true);
-    expect(v.label).toBe(`Lv 20 (+7)  ·  ${formatXp(lifetime)} total XP  ·  0% to next`);
+    expect(v.label).toBe(`Lv ${MAX_LEVEL} (+7)  ·  ${formatXp(lifetime)} total XP  ·  0% to next`);
   });
 
   it('post-cap fill fraction advances within the virtual level', () => {
-    const base = xpToReachLevel(27);
-    const span = xpToReachLevel(28) - xpToReachLevel(27);
+    const base = xpToReachLevel(MAX_LEVEL + 7);
+    const span = xpToReachLevel(MAX_LEVEL + 8) - xpToReachLevel(MAX_LEVEL + 7);
     const v = xpBarView({ level: MAX_LEVEL, xp: 0, lifetimeXp: base + Math.floor(span * 0.5), showOverflow: true });
     expect(v.fillFrac).toBeCloseTo(0.5, 1);
-    expect(v.label).toMatch(/Lv 20 \(\+7\)  ·  .* total XP  ·  \d+% to next/);
+    expect(v.label).toMatch(
+      new RegExp(`Lv ${MAX_LEVEL} \\(\\+7\\)  ·  .* total XP  ·  \\d+% to next`),
+    );
   });
 
   it('classic "MAX LEVEL" when overflow display is turned off', () => {
-    const v = xpBarView({ level: MAX_LEVEL, xp: 0, lifetimeXp: xpToReachLevel(25), showOverflow: false });
+    const v = xpBarView({ level: MAX_LEVEL, xp: 0, lifetimeXp: xpToReachLevel(MAX_LEVEL + 5), showOverflow: false });
     expect(v.postCap).toBe(false);
-    expect(v.label).toBe(`MAX LEVEL  ·  ${formatXp(xpToReachLevel(25))} total XP`);
+    expect(v.label).toBe(`MAX LEVEL  ·  ${formatXp(xpToReachLevel(MAX_LEVEL + 5))} total XP`);
   });
 });
 

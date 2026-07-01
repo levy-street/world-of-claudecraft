@@ -8,13 +8,13 @@
     "updateDuels countdown -> active + duelStart",
     "endDuel on a PvP finishing blow (winner/loser + this.duels cleared)"
   ],
-  "draws": 263,
-  "drawDigest": "7cc78626",
+  "draws": 1044,
+  "drawDigest": "cd7db5fe",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 389,
+      "nextId": 1281,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -28,9 +28,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 391,
-      "state": "b58e13b2",
-      "events": "4190db19",
+      "nextId": 1283,
+      "state": "bd4f57bc",
+      "events": "a2d4d141",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -39,9 +39,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 391,
-      "state": "c9094722",
-      "events": "fb9f1bfd",
+      "nextId": 1283,
+      "state": "5488343c",
+      "events": "63b999ce",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -50,23 +50,23 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 391,
-      "state": "46fbb90e",
-      "events": "6e4acb7f",
+      "nextId": 1283,
+      "state": "754ae208",
+      "events": "19a3cdb2",
       "rng": {
-        "draws": 71,
-        "digest": "6619b0ad"
+        "draws": 287,
+        "digest": "76c1794b"
       }
     },
     {
       "tick": 61,
       "time": 3.05,
-      "nextId": 391,
-      "state": "d36092d8",
-      "events": "e4d70525",
+      "nextId": 1283,
+      "state": "e342b15a",
+      "events": "e73b8c5b",
       "rng": {
-        "draws": 78,
-        "digest": "d52f266d"
+        "draws": 313,
+        "digest": "3d069017"
       },
       "label": "duel-active",
       "players": [
@@ -80,11 +80,12 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 1281,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -100,11 +101,12 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 390,
+          "entityId": 1282,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -122,7 +124,7 @@
           "fallStartY": 2.242568,
           "fiveSecondRule": 102.05,
           "hp": 90,
-          "id": 389,
+          "id": 1281,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -137,6 +139,7 @@
             "z": -40
           },
           "potionCooldownUntil": -1,
+          "race": "human",
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -169,7 +172,7 @@
           "fallStartY": 2.139867,
           "fiveSecondRule": 102.05,
           "hp": 54,
-          "id": 390,
+          "id": 1282,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -185,6 +188,7 @@
             "z": -40
           },
           "potionCooldownUntil": -1,
+          "race": "human",
           "resource": 195,
           "resourceType": "mana",
           "spawnPos": {
@@ -213,12 +217,12 @@
     {
       "tick": 61,
       "time": 3.05,
-      "nextId": 391,
-      "state": "8eedfd2c",
-      "events": "519c1e15",
+      "nextId": 1283,
+      "state": "0600eb5e",
+      "events": "18a49312",
       "rng": {
-        "draws": 78,
-        "digest": "d52f266d"
+        "draws": 313,
+        "digest": "3d069017"
       },
       "label": "duel-ended",
       "players": [
@@ -232,11 +236,12 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 1281,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -252,11 +257,12 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 390,
+          "entityId": 1282,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -274,7 +280,7 @@
           "fallStartY": 2.242568,
           "fiveSecondRule": 102.05,
           "hp": 90,
-          "id": 389,
+          "id": 1281,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -289,6 +295,7 @@
             "z": -40
           },
           "potionCooldownUntil": -1,
+          "race": "human",
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -321,7 +328,7 @@
           "fallStartY": 2.139867,
           "fiveSecondRule": 102.05,
           "hp": 1,
-          "id": 390,
+          "id": 1282,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -337,6 +344,7 @@
             "z": -40
           },
           "potionCooldownUntil": -1,
+          "race": "human",
           "resource": 195,
           "resourceType": "mana",
           "spawnPos": {
@@ -365,34 +373,34 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 391,
-      "state": "1c527180",
+      "nextId": 1283,
+      "state": "d49e81ca",
       "events": "741638a5",
       "rng": {
-        "draws": 150,
-        "digest": "b4023222"
+        "draws": 594,
+        "digest": "267e21a0"
       }
     },
     {
       "tick": 100,
       "time": 5,
-      "nextId": 391,
-      "state": "13a86464",
+      "nextId": 1283,
+      "state": "5eb85876",
       "events": "741638a5",
       "rng": {
-        "draws": 262,
-        "digest": "74c08c29"
+        "draws": 1024,
+        "digest": "4cc39b91"
       }
     },
     {
       "tick": 101,
       "time": 5.05,
-      "nextId": 391,
-      "state": "453b4ce2",
+      "nextId": 1283,
+      "state": "ce9b6214",
       "events": "741638a5",
       "rng": {
-        "draws": 263,
-        "digest": "7cc78626"
+        "draws": 1044,
+        "digest": "cd7db5fe"
       },
       "label": "final",
       "players": [
@@ -406,11 +414,12 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 1281,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -426,11 +435,12 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 390,
+          "entityId": 1282,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -448,7 +458,7 @@
           "fallStartY": 2.242568,
           "fiveSecondRule": 104.05,
           "hp": 90,
-          "id": 389,
+          "id": 1281,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -463,6 +473,7 @@
             "z": -40
           },
           "potionCooldownUntil": -1,
+          "race": "human",
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -495,7 +506,7 @@
           "fallStartY": 2.139867,
           "fiveSecondRule": 104.05,
           "hp": 7,
-          "id": 390,
+          "id": 1282,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -511,6 +522,7 @@
             "z": -40
           },
           "potionCooldownUntil": -1,
+          "race": "human",
           "resource": 195,
           "resourceType": "mana",
           "spawnPos": {

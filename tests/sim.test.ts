@@ -1416,7 +1416,7 @@ describe('leveling', () => {
 
   it('caps at max level', () => {
     const sim = makeSim('warrior');
-    (sim as any).grantXp(999999);
+    (sim as any).grantXp(99999999);
     expect(sim.player.level).toBe(MAX_LEVEL);
   });
 });

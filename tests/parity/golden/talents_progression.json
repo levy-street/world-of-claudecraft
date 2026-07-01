@@ -16,8 +16,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 390,
-      "state": "969c1dc9",
+      "nextId": 1282,
+      "state": "83ac0ce5",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -35,11 +35,12 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 1281,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -57,7 +58,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 389,
+          "id": 1281,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -73,6 +74,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
+          "race": "human",
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -100,9 +102,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 390,
-      "state": "363a7889",
-      "events": "799cce3e",
+      "nextId": 1282,
+      "state": "154c6dd0",
+      "events": "acc11d0a",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -119,12 +121,13 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 1281,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
-          "lifetimeXp": 167200,
+          "lifetimeXp": 4084700,
+          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {
@@ -138,19 +141,19 @@
       "entities": [
         {
           "aiState": "idle",
-          "attackPower": 122,
+          "attackPower": 282,
           "combatTimer": 99,
-          "critChance": 0.0895,
+          "critChance": 0.1095,
           "detonateTimer": "Infinity",
-          "dodgeChance": 0.0695,
+          "dodgeChance": 0.0895,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 812,
-          "id": 389,
+          "hp": 2332,
+          "id": 1281,
           "kind": "player",
-          "level": 20,
+          "level": 60,
           "lootFfaTimer": "Infinity",
-          "maxHp": 812,
+          "maxHp": 2332,
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
@@ -162,6 +165,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
+          "race": "human",
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -170,12 +174,12 @@
           },
           "spellPower": 5,
           "stats": {
-            "agi": 39,
-            "armor": 376,
+            "agi": 79,
+            "armor": 936,
             "int": 10,
             "spi": 11,
-            "sta": 60,
-            "str": 61
+            "sta": 140,
+            "str": 141
           },
           "templateId": "warrior",
           "weapon": {
@@ -189,9 +193,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 390,
-      "state": "16514c32",
-      "events": "a8848b3e",
+      "nextId": 1282,
+      "state": "e733589c",
+      "events": "7c9d651a",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -208,12 +212,13 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 1281,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
-          "lifetimeXp": 167200,
+          "lifetimeXp": 4084700,
+          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {},
@@ -224,19 +229,19 @@
       "entities": [
         {
           "aiState": "idle",
-          "attackPower": 122,
+          "attackPower": 282,
           "combatTimer": 99,
-          "critChance": 0.0695,
+          "critChance": 0.0895,
           "detonateTimer": "Infinity",
-          "dodgeChance": 0.0695,
+          "dodgeChance": 0.0895,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 812,
-          "id": 389,
+          "hp": 2332,
+          "id": 1281,
           "kind": "player",
-          "level": 20,
+          "level": 60,
           "lootFfaTimer": "Infinity",
-          "maxHp": 812,
+          "maxHp": 2332,
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
@@ -248,6 +253,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
+          "race": "human",
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -256,12 +262,12 @@
           },
           "spellPower": 5,
           "stats": {
-            "agi": 39,
-            "armor": 376,
+            "agi": 79,
+            "armor": 936,
             "int": 10,
             "spi": 11,
-            "sta": 60,
-            "str": 61
+            "sta": 140,
+            "str": 141
           },
           "templateId": "warrior",
           "weapon": {
@@ -275,9 +281,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 390,
-      "state": "4bac6cc1",
-      "events": "f3824701",
+      "nextId": 1282,
+      "state": "1a7cb464",
+      "events": "9c74f3e7",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -293,12 +299,12 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 1281,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
-          "lifetimeXp": 167200,
+          "lifetimeXp": 4084700,
           "loadouts": [
             {
               "alloc": {
@@ -316,6 +322,7 @@
               "name": "Arms"
             }
           ],
+          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {
@@ -328,19 +335,19 @@
       "entities": [
         {
           "aiState": "idle",
-          "attackPower": 122,
+          "attackPower": 282,
           "combatTimer": 99,
-          "critChance": 0.0995,
+          "critChance": 0.1195,
           "detonateTimer": "Infinity",
-          "dodgeChance": 0.0695,
+          "dodgeChance": 0.0895,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 812,
-          "id": 389,
+          "hp": 2332,
+          "id": 1281,
           "kind": "player",
-          "level": 20,
+          "level": 60,
           "lootFfaTimer": "Infinity",
-          "maxHp": 812,
+          "maxHp": 2332,
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
@@ -352,6 +359,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
+          "race": "human",
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -360,12 +368,12 @@
           },
           "spellPower": 5,
           "stats": {
-            "agi": 39,
-            "armor": 376,
+            "agi": 79,
+            "armor": 936,
             "int": 10,
             "spi": 11,
-            "sta": 60,
-            "str": 61
+            "sta": 140,
+            "str": 141
           },
           "templateId": "warrior",
           "weapon": {
@@ -379,9 +387,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 390,
-      "state": "08b0b9a8",
-      "events": "68e599fc",
+      "nextId": 1282,
+      "state": "6f4b3e8c",
+      "events": "396f6a70",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -397,12 +405,12 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 1281,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
-          "lifetimeXp": 167200,
+          "lifetimeXp": 4084700,
           "loadouts": [
             {
               "alloc": {
@@ -420,6 +428,7 @@
               "name": "Arms"
             }
           ],
+          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {
@@ -432,19 +441,19 @@
       "entities": [
         {
           "aiState": "idle",
-          "attackPower": 122,
+          "attackPower": 282,
           "combatTimer": 99,
-          "critChance": 0.0695,
+          "critChance": 0.0895,
           "detonateTimer": "Infinity",
-          "dodgeChance": 0.0695,
+          "dodgeChance": 0.0895,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 812,
-          "id": 389,
+          "hp": 2332,
+          "id": 1281,
           "kind": "player",
-          "level": 20,
+          "level": 60,
           "lootFfaTimer": "Infinity",
-          "maxHp": 812,
+          "maxHp": 2332,
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
@@ -456,6 +465,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
+          "race": "human",
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -464,12 +474,12 @@
           },
           "spellPower": 5,
           "stats": {
-            "agi": 39,
-            "armor": 376,
+            "agi": 79,
+            "armor": 936,
             "int": 10,
             "spi": 11,
-            "sta": 60,
-            "str": 61
+            "sta": 140,
+            "str": 141
           },
           "templateId": "warrior",
           "weapon": {
@@ -483,9 +493,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 390,
-      "state": "8c93b4ec",
-      "events": "799cce3e",
+      "nextId": 1282,
+      "state": "8c4c1932",
+      "events": "acc11d0a",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -501,12 +511,12 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 1281,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
-          "lifetimeXp": 167200,
+          "lifetimeXp": 4084700,
           "loadouts": [
             {
               "alloc": {
@@ -524,6 +534,7 @@
               "name": "Arms"
             }
           ],
+          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {},
@@ -534,19 +545,19 @@
       "entities": [
         {
           "aiState": "idle",
-          "attackPower": 132,
+          "attackPower": 292,
           "combatTimer": 99,
-          "critChance": 0.1195,
+          "critChance": 0.1395,
           "detonateTimer": "Infinity",
-          "dodgeChance": 0.0695,
+          "dodgeChance": 0.0895,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 812,
-          "id": 389,
+          "hp": 2332,
+          "id": 1281,
           "kind": "player",
-          "level": 20,
+          "level": 60,
           "lootFfaTimer": "Infinity",
-          "maxHp": 812,
+          "maxHp": 2332,
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
@@ -558,6 +569,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
+          "race": "human",
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -566,12 +578,12 @@
           },
           "spellPower": 5,
           "stats": {
-            "agi": 39,
-            "armor": 376,
+            "agi": 79,
+            "armor": 936,
             "int": 10,
             "spi": 11,
-            "sta": 60,
-            "str": 61
+            "sta": 140,
+            "str": 141
           },
           "templateId": "warrior",
           "weapon": {
@@ -585,8 +597,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 390,
-      "state": "8c93b4ec",
+      "nextId": 1282,
+      "state": "8c4c1932",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -603,12 +615,12 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 1281,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
-          "lifetimeXp": 167200,
+          "lifetimeXp": 4084700,
           "loadouts": [
             {
               "alloc": {
@@ -626,6 +638,7 @@
               "name": "Arms"
             }
           ],
+          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {},
@@ -636,19 +649,19 @@
       "entities": [
         {
           "aiState": "idle",
-          "attackPower": 132,
+          "attackPower": 292,
           "combatTimer": 99,
-          "critChance": 0.1195,
+          "critChance": 0.1395,
           "detonateTimer": "Infinity",
-          "dodgeChance": 0.0695,
+          "dodgeChance": 0.0895,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 812,
-          "id": 389,
+          "hp": 2332,
+          "id": 1281,
           "kind": "player",
-          "level": 20,
+          "level": 60,
           "lootFfaTimer": "Infinity",
-          "maxHp": 812,
+          "maxHp": 2332,
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
@@ -660,6 +673,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
+          "race": "human",
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -668,12 +682,12 @@
           },
           "spellPower": 5,
           "stats": {
-            "agi": 39,
-            "armor": 376,
+            "agi": 79,
+            "armor": 936,
             "int": 10,
             "spi": 11,
-            "sta": 60,
-            "str": 61
+            "sta": 140,
+            "str": 141
           },
           "templateId": "warrior",
           "weapon": {

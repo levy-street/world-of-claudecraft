@@ -10,13 +10,13 @@
     "jammed chest (attemptAvailable=false) + surface exit opens"
   ],
   "draws": 3,
-  "drawDigest": "ad960248",
+  "drawDigest": "0cecfa32",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 390,
-      "state": "c2464a3c",
+      "nextId": 1282,
+      "state": "aea4dfb0",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -34,11 +34,12 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 1281,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
+          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -56,7 +57,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 62,
-          "id": 389,
+          "id": 1281,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -72,6 +73,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
+          "race": "human",
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
@@ -101,78 +103,78 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 401,
-      "state": "64360645",
-      "events": "d05e7b58",
+      "nextId": 1292,
+      "state": "61edbeb4",
+      "events": "26fe1b7d",
       "rng": {
         "draws": 3,
-        "digest": "ad960248"
+        "digest": "0cecfa32"
       }
     },
     {
       "tick": 20,
       "time": 1,
-      "nextId": 401,
-      "state": "acdcffb5",
+      "nextId": 1292,
+      "state": "675af3e4",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "ad960248"
+        "digest": "0cecfa32"
       }
     },
     {
       "tick": 30,
       "time": 1.5,
-      "nextId": 401,
-      "state": "a6d4fca3",
+      "nextId": 1292,
+      "state": "2f4142c2",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "ad960248"
+        "digest": "0cecfa32"
       }
     },
     {
       "tick": 40,
       "time": 2,
-      "nextId": 401,
-      "state": "6bbe5489",
+      "nextId": 1292,
+      "state": "1918fd58",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "ad960248"
+        "digest": "0cecfa32"
       }
     },
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 401,
-      "state": "becf3fcb",
+      "nextId": 1292,
+      "state": "7959958a",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "ad960248"
+        "digest": "0cecfa32"
       }
     },
     {
       "tick": 60,
       "time": 3,
-      "nextId": 401,
-      "state": "f9f8b045",
+      "nextId": 1292,
+      "state": "44865cb4",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "ad960248"
+        "digest": "0cecfa32"
       }
     },
     {
       "tick": 69,
       "time": 3.45,
-      "nextId": 402,
-      "state": "307a0223",
-      "events": "41e38ae0",
+      "nextId": 1293,
+      "state": "f9072b42",
+      "events": "ce7aa6bc",
       "rng": {
         "draws": 3,
-        "digest": "ad960248"
+        "digest": "0cecfa32"
       },
       "label": "lockpick-jammed",
       "players": [
@@ -190,12 +192,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 1281,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
           "lifetimeXp": 11398,
+          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -213,7 +216,7 @@
           "dodgeChance": 0.0715,
           "fiveSecondRule": 102.45,
           "hp": 50000,
-          "id": 389,
+          "id": 1281,
           "inCombat": true,
           "kind": "player",
           "level": 7,
@@ -229,6 +232,7 @@
             "z": -1176
           },
           "potionCooldownUntil": -1,
+          "race": "human",
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
@@ -262,7 +266,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 400,
+          "id": 1291,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -295,23 +299,23 @@
     {
       "tick": 70,
       "time": 3.5,
-      "nextId": 402,
-      "state": "0d81649f",
+      "nextId": 1293,
+      "state": "eaba026e",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "ad960248"
+        "digest": "0cecfa32"
       }
     },
     {
       "tick": 71,
       "time": 3.55,
-      "nextId": 402,
-      "state": "2cd39df3",
+      "nextId": 1293,
+      "state": "551a01d2",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "ad960248"
+        "digest": "0cecfa32"
       },
       "label": "final",
       "players": [
@@ -329,12 +333,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 1281,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
           "lifetimeXp": 11398,
+          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -352,7 +357,7 @@
           "dodgeChance": 0.0715,
           "fiveSecondRule": 102.55,
           "hp": 50000,
-          "id": 389,
+          "id": 1281,
           "inCombat": true,
           "kind": "player",
           "level": 7,
@@ -368,6 +373,7 @@
             "z": -1176
           },
           "potionCooldownUntil": -1,
+          "race": "human",
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
@@ -401,7 +407,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 400,
+          "id": 1291,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",

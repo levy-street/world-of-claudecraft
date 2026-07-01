@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 390,
-      "state": "6c31f65c",
+      "nextId": 1282,
+      "state": "990c8324",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -33,11 +33,12 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 1281,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -55,7 +56,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 389,
+          "id": 1281,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -71,6 +72,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
+          "race": "human",
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -98,9 +100,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 390,
-      "state": "ef15922c",
-      "events": "714d6ddf",
+      "nextId": 1282,
+      "state": "efb6418c",
+      "events": "0a65c787",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -116,7 +118,7 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 1281,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -133,6 +135,7 @@
               }
             ]
           ],
+          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -150,7 +153,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 389,
+          "id": 1281,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -166,6 +169,7 @@
             "z": 1.540014
           },
           "potionCooldownUntil": -1,
+          "race": "human",
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -193,9 +197,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 390,
-      "state": "8ae32411",
-      "events": "f5ba3286",
+      "nextId": 1282,
+      "state": "7ed552c7",
+      "events": "a1eca59c",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -213,7 +217,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 1281,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -236,6 +240,7 @@
               }
             ]
           ],
+          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -253,7 +258,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 389,
+          "id": 1281,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -269,6 +274,7 @@
             "z": 1.540014
           },
           "potionCooldownUntil": -1,
+          "race": "human",
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -296,9 +302,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 390,
-      "state": "705011c0",
-      "events": "1858db2d",
+      "nextId": 1282,
+      "state": "19d2cb90",
+      "events": "bd8e2e0b",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -316,7 +322,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 1281,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -339,6 +345,7 @@
               }
             ]
           ],
+          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -356,7 +363,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 389,
+          "id": 1281,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -372,6 +379,7 @@
             "z": 1.540014
           },
           "potionCooldownUntil": -1,
+          "race": "human",
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -399,9 +407,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 390,
-      "state": "d214c31a",
-      "events": "3b371ba6",
+      "nextId": 1282,
+      "state": "75971fb0",
+      "events": "9da70110",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -419,7 +427,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 1281,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -442,6 +450,7 @@
               }
             ]
           ],
+          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -459,7 +468,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 389,
+          "id": 1281,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -475,6 +484,7 @@
             "z": 1.540014
           },
           "potionCooldownUntil": -1,
+          "race": "human",
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -502,9 +512,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 390,
-      "state": "b96620f1",
-      "events": "5c5c3b4e",
+      "nextId": 1282,
+      "state": "fdafa7ab",
+      "events": "a28f5740",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -525,7 +535,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 1281,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -534,6 +544,7 @@
           "questsDone": [
             "q_boars"
           ],
+          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -552,7 +563,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 389,
+          "id": 1281,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -568,6 +579,7 @@
             "z": 1.540014
           },
           "potionCooldownUntil": -1,
+          "race": "human",
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -595,8 +607,8 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 390,
-      "state": "0dca38bb",
+      "nextId": 1282,
+      "state": "b853bd75",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -618,7 +630,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 1281,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -627,6 +639,7 @@
           "questsDone": [
             "q_boars"
           ],
+          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -645,7 +658,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.1,
           "hp": 90,
-          "id": 389,
+          "id": 1281,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -661,6 +674,7 @@
             "z": 1.540014
           },
           "potionCooldownUntil": -1,
+          "race": "human",
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,

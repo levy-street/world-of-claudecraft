@@ -9,13 +9,13 @@
     "augment wave: fiestaPickOffers + arenaAugmentPick (fiestaAugments on meta + augmentOffer/Chosen events)",
     "multi-player meta"
   ],
-  "draws": 608,
-  "drawDigest": "656f3686",
+  "draws": 2364,
+  "drawDigest": "51c989ca",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 389,
+      "nextId": 1281,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -29,9 +29,9 @@
     {
       "tick": 25,
       "time": 1.25,
-      "nextId": 393,
-      "state": "07bfbf6d",
-      "events": "48044b44",
+      "nextId": 1285,
+      "state": "0c71fbbf",
+      "events": "227f3a7b",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -40,67 +40,67 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 393,
-      "state": "1f5321cb",
-      "events": "536fe27e",
+      "nextId": 1285,
+      "state": "d26fcc6d",
+      "events": "54d22f51",
       "rng": {
-        "draws": 36,
-        "digest": "dbad5b7f"
+        "draws": 136,
+        "digest": "ce1cd282"
       }
     },
     {
       "tick": 75,
       "time": 3.75,
-      "nextId": 393,
-      "state": "c4044171",
-      "events": "09b268e6",
+      "nextId": 1285,
+      "state": "31be11bf",
+      "events": "770c70a9",
       "rng": {
-        "draws": 120,
-        "digest": "3ac728b9"
+        "draws": 519,
+        "digest": "bdffe5df"
       }
     },
     {
       "tick": 100,
       "time": 5,
-      "nextId": 393,
-      "state": "ea07df6f",
-      "events": "df43dd26",
+      "nextId": 1285,
+      "state": "f1800275",
+      "events": "3030facd",
       "rng": {
-        "draws": 230,
-        "digest": "25e8f179"
+        "draws": 963,
+        "digest": "56103161"
       }
     },
     {
       "tick": 125,
       "time": 6.25,
-      "nextId": 393,
-      "state": "c89605a9",
-      "events": "a3606c28",
+      "nextId": 1285,
+      "state": "43b162d9",
+      "events": "9f8628c6",
       "rng": {
-        "draws": 384,
-        "digest": "2255bc0e"
+        "draws": 1528,
+        "digest": "48ec3055"
       }
     },
     {
       "tick": 150,
       "time": 7.5,
-      "nextId": 393,
-      "state": "7aee4609",
+      "nextId": 1285,
+      "state": "a941fcc1",
       "events": "741638a5",
       "rng": {
-        "draws": 543,
-        "digest": "63905003"
+        "draws": 2069,
+        "digest": "910915b8"
       }
     },
     {
       "tick": 163,
       "time": 8.15,
-      "nextId": 393,
-      "state": "65f24024",
-      "events": "8495b1b8",
+      "nextId": 1285,
+      "state": "339d0306",
+      "events": "1c11b650",
       "rng": {
-        "draws": 608,
-        "digest": "656f3686"
+        "draws": 2364,
+        "digest": "51c989ca"
       },
       "label": "final",
       "players": [
@@ -115,7 +115,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 1281,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -127,6 +127,7 @@
               "ranks": {}
             }
           },
+          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {
@@ -148,7 +149,7 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 390,
+          "entityId": 1282,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -160,6 +161,7 @@
               "ranks": {}
             }
           },
+          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {
@@ -183,7 +185,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 391,
+          "entityId": 1283,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -198,6 +200,7 @@
               "ranks": {}
             }
           },
+          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {
@@ -219,7 +222,7 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 392,
+          "entityId": 1284,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -231,6 +234,7 @@
               "ranks": {}
             }
           },
+          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {
@@ -254,7 +258,7 @@
           "dodgeChance": 0.0795,
           "fiveSecondRule": 107.15,
           "hp": 812,
-          "id": 389,
+          "id": 1281,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -269,6 +273,7 @@
             "z": -1264
           },
           "potionCooldownUntil": -1,
+          "race": "human",
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -300,7 +305,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 107.15,
           "hp": 418,
-          "id": 390,
+          "id": 1282,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -315,6 +320,7 @@
             "z": -1264
           },
           "potionCooldownUntil": -1,
+          "race": "human",
           "resource": 1671,
           "resourceType": "mana",
           "spawnPos": {
@@ -348,7 +354,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 107.15,
           "hp": 510,
-          "id": 391,
+          "id": 1283,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -363,6 +369,7 @@
             "z": -1232
           },
           "potionCooldownUntil": -1,
+          "race": "human",
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
@@ -397,7 +404,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 107.15,
           "hp": 848,
-          "id": 392,
+          "id": 1284,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -412,6 +419,7 @@
             "z": -1232
           },
           "potionCooldownUntil": -1,
+          "race": "human",
           "rangedPower": 194,
           "resource": 622,
           "resourceType": "mana",
