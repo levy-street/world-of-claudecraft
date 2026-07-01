@@ -321,6 +321,23 @@ describe('Combat Mech held weapon over the wire', () => {
   });
 });
 
+describe('NPC vendor stock over the wire', () => {
+  it('mirrors rotated vendor items instead of rebuilding static stock client-side', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true });
+    const vendor = [...sim.entities.values()].find((e) => e.templateId === 'trader_wilkes')!;
+    expect(vendor.kind).toBe('npc');
+    vendor.vendorItems = [...vendor.vendorBaseItems, 'brightwood_venison'];
+
+    const wire = wireEntity(vendor);
+    expect(wire.vi).toEqual(vendor.vendorItems);
+
+    const client = bareClient(sim.playerId + 1000);
+    (client as any).applySnapshot({ t: 'snap', ents: [wire] });
+    const mirrored = client.entities.get(vendor.id)!;
+    expect(mirrored.vendorBaseItems).toEqual(vendor.vendorBaseItems);
+    expect(mirrored.vendorItems).toEqual(vendor.vendorItems);
+  });
+});
 describe('combat ratings over the wire', () => {
   it('mirrors Ranged Attack Power so online hunter attack-spell tooltips can scale', () => {
     const sim = new Sim({ seed: 7, playerClass: 'hunter', autoEquip: true });

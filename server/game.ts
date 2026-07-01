@@ -516,6 +516,7 @@ function identityFields(e: Entity): Record<string, unknown> {
       break;
     }
   }
+  if (e.kind === 'npc' && e.vendorItems.length > 0) out.vi = e.vendorItems;
   if (e.holderTier) out.ht = e.holderTier; // $WOC holder-tier flair (cosmetic)
   if (e.holderBalance) out.hb = Math.round(e.holderBalance); // exact $WOC, for inspect
   if (e.discordTier) out.dt = e.discordTier; // Discord status-tier flair (cosmetic)

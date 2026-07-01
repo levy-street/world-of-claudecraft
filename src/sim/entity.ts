@@ -110,6 +110,11 @@ function baseEntity(id: number, pos: Vec3): Entity {
     xpValue: 0,
     questIds: [],
     vendorItems: [],
+    vendorBaseItems: [],
+    vendorRotatingItems: [],
+    vendorStockSlots: 1,
+    vendorStockRefreshAt: 0,
+    vendorStockGeneration: 0,
     objectItemId: null,
     dungeonId: null,
     dead: false,
@@ -436,7 +441,10 @@ export function createNpc(id: number, def: NpcDef, pos: Vec3): Entity {
   e.prevFacing = def.facing;
   e.color = def.color;
   e.questIds = [...def.questIds];
-  e.vendorItems = [...(def.vendorItems ?? [])];
+  e.vendorBaseItems = [...(def.vendorItems ?? [])];
+  e.vendorItems = [...e.vendorBaseItems];
+  e.vendorRotatingItems = [...(def.vendorRotatingItems ?? [])];
+  e.vendorStockSlots = def.vendorStockSlots ?? 1;
   return e;
 }
 

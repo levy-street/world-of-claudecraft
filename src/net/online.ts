@@ -780,6 +780,11 @@ function blankEntity(id: number): Entity {
     xpValue: 0,
     questIds: [],
     vendorItems: [],
+    vendorBaseItems: [],
+    vendorRotatingItems: [],
+    vendorStockSlots: 1,
+    vendorStockRefreshAt: 0,
+    vendorStockGeneration: 0,
     objectItemId: null,
     dungeonId: null,
     dead: false,
@@ -1242,8 +1247,14 @@ export class ClientWorld implements IWorld {
         e.guild = w.gd ?? '';
         if (e.kind === 'npc') {
           const def = NPCS[e.templateId];
+          const baseItems = def?.vendorItems ? [...def.vendorItems] : [];
           e.questIds = def ? [...def.questIds] : [];
-          e.vendorItems = def?.vendorItems ? [...def.vendorItems] : [];
+          e.vendorBaseItems = baseItems;
+          e.vendorRotatingItems = def?.vendorRotatingItems ? [...def.vendorRotatingItems] : [];
+          e.vendorStockSlots = def?.vendorStockSlots ?? 1;
+          e.vendorItems = Array.isArray(w.vi)
+            ? w.vi.filter((itemId: unknown) => typeof itemId === 'string')
+            : baseItems;
         }
       }
       // interpolation bases: re-anchor at the pose the renderer last drew,

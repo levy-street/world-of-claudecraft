@@ -175,6 +175,11 @@ export const ENTITY_EXCLUDE: ReadonlySet<string> = new Set([
   'equippedItems', // render-only mirror for inspect; sim never reads it for gameplay
   'holderTier', // cosmetic wallet flair; sim never reads it
   'holderBalance',
+  'vendorBaseItems', // deterministic vendor-stock bookkeeping; vendorItems carries the offer list
+  'vendorRotatingItems',
+  'vendorStockSlots',
+  'vendorStockRefreshAt',
+  'vendorStockGeneration',
   'stealthed', // derived cache of auras.some(a => a.kind === 'stealth'); auras is sampled
 ]);
 

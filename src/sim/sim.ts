@@ -189,6 +189,7 @@ import { advancePendingProjectiles, type PendingProjectile } from './projectile_
 import { sanitizeRemovedZone1Content } from './removed_zone1_content';
 import { Rng } from './rng';
 import { persistedResource } from './serialize_resource';
+import { refreshVendorStock, scheduleVendorStockRefresh } from './vendor_stock';
 import { createSimContext, type SimContext, type SimContextHost } from './sim_context';
 import * as chatMod from './social/chat';
 import * as tradeMod from './social/trade';
@@ -937,6 +938,7 @@ export class Sim {
       if (npcDef.dynamic) continue; // spawned on demand by its owning system, not surface-placed
       const safe = this.findSafePos(npcDef.pos.x, npcDef.pos.z, WATER_LEVEL + 0.6);
       const npc = createNpc(this.nextId++, npcDef, this.groundPos(safe.x, safe.z));
+      scheduleVendorStockRefresh(npc, this.time, this.cfg.seed);
       this.addEntity(npc);
       if (npcDef.market) this.market.merchantIds.push(npc.id); // every auctioneer anchors the shared World Market
     }
@@ -2383,6 +2385,9 @@ export class Sim {
         this.updateMob(e);
         updateAuras(this.ctx, e);
       } else if (e.kind === 'npc') {
+        if (refreshVendorStock(e, this.time, this.cfg.seed)) {
+          this.emit({ type: 'vendor', action: 'refresh' });
+        }
         cleanseFriendlyNpcAuras(this.ctx, e);
       } else if (e.kind === 'object') {
         if (!e.lootable) {

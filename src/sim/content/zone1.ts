@@ -538,6 +538,7 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
       'minor_healing_potion',
       'minor_mana_potion',
     ],
+    vendorRotatingItems: ['brightwood_venison', 'elixir_of_the_bear'],
     greeting: 'Fresh bread, clean water, fair prices. What can I get you?',
   },
   apothecary_lin: {
@@ -588,6 +589,14 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
       'tanned_leather_jerkin',
       'hobnail_boots',
       'eastbrook_wool_trousers',
+    ],
+    vendorRotatingItems: [
+      'crossroads_saber',
+      'tradesman_hatchet',
+      'drovers_staff',
+      'caravan_warden_dirk',
+      'outrider_brigandine',
+      'wanderers_chestguard',
     ],
     greeting: 'Mind the sparks, $C. Good steel is the difference between a scar and a grave.',
   },

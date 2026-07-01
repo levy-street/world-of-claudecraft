@@ -889,6 +889,12 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
       'cragwalker_boots',
       'windguard_leggings',
     ],
+    vendorRotatingItems: [
+      'boneplate_vest',
+      'revenant_silk_robe',
+      'nightwalk_jerkin',
+      'drogmar_warboots',
+    ],
     greeting:
       'Wool, hardtack, and steel-shod boots — Highwatch runs on all three, and I am short of everything.',
   },
@@ -901,6 +907,13 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     color: 0x717d7e,
     questIds: [],
     vendorItems: ['highwatch_warblade', 'craghorn_staff', 'icevein_dirk'],
+    vendorRotatingItems: [
+      'zealotsbane_blade',
+      'emberwood_staff',
+      'cultist_flayer',
+      'ironvein_pickblade',
+      'ironvein_lantern_staff',
+    ],
     greeting: 'Forge is hot and the grindstone is turning. If it cuts, I sell it.',
   },
   loremaster_caddis: {
@@ -1900,6 +1913,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'uncommon',
     stats: { armor: 170, sta: 5, str: 3 },
     sellValue: 800,
+    buyValue: 8000,
     requiredClass: ['warrior', 'paladin', 'shaman'],
   },
   revenant_silk_robe: {
@@ -1911,6 +1925,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'uncommon',
     stats: { armor: 60, int: 5, spi: 3 },
     sellValue: 800,
+    buyValue: 8000,
     requiredClass: ['mage', 'priest', 'warlock', 'druid'],
   },
   nightwalk_jerkin: {
@@ -1922,6 +1937,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'uncommon',
     stats: { armor: 105, agi: 6, sta: 2 },
     sellValue: 800,
+    buyValue: 8000,
     requiredClass: ['rogue', 'hunter'],
   },
   zealotsbane_blade: {
@@ -1933,6 +1949,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 18, max: 29, speed: 2.3 },
     stats: { str: 6, sta: 2 },
     sellValue: 900,
+    buyValue: 9000,
     requiredClass: ['warrior', 'paladin', 'shaman'],
   },
   emberwood_staff: {
@@ -1944,6 +1961,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 20, max: 33, speed: 3.0 },
     stats: { int: 6, spi: 2 },
     sellValue: 900,
+    buyValue: 9000,
     requiredClass: ['mage', 'priest', 'warlock', 'druid'],
   },
   cultist_flayer: {
@@ -1955,6 +1973,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 12, max: 19, speed: 1.7, dagger: true },
     stats: { agi: 8 },
     sellValue: 900,
+    buyValue: 9000,
     requiredClass: ['rogue', 'hunter'],
   },
   drogmar_warboots: {
@@ -1966,6 +1985,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'uncommon',
     stats: { armor: 85, str: 3, sta: 4 },
     sellValue: 950,
+    buyValue: 9500,
     requiredClass: ['warrior', 'paladin', 'shaman'],
   },
   ironvein_pickblade: {
@@ -1977,6 +1997,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 13, max: 21, speed: 1.8, dagger: true },
     stats: { agi: 7, sta: 2 },
     sellValue: 950,
+    buyValue: 9500,
     requiredClass: ['rogue', 'hunter'],
   },
   ironvein_lantern_staff: {
@@ -1988,6 +2009,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 19, max: 31, speed: 3.0 },
     stats: { int: 7, spi: 3 },
     sellValue: 950,
+    buyValue: 9500,
     requiredClass: ['mage', 'priest', 'warlock', 'druid'],
   },
   marrowlord_boneboots: {

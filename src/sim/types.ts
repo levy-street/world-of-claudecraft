@@ -1110,6 +1110,10 @@ export interface NpcDef {
   color: number;
   questIds: string[];
   vendorItems?: string[];
+  // Optional local surplus pool. NPCs with this set rotate a small number of
+  // extra goods into their vendor stock on a 15-45 minute sim-clock cadence.
+  vendorRotatingItems?: string[];
+  vendorStockSlots?: number;
   // The Merchant: talking to this NPC opens the player-driven World Market
   // (auction house) instead of a fixed vendor stock.
   market?: boolean;
@@ -1435,6 +1439,11 @@ export interface Entity {
   // npc
   questIds: string[];
   vendorItems: string[];
+  vendorBaseItems: string[];
+  vendorRotatingItems: string[];
+  vendorStockSlots: number;
+  vendorStockRefreshAt: number;
+  vendorStockGeneration: number;
   // object (ground interactable)
   objectItemId: string | null;
   dungeonId: string | null; // set on dungeon door/exit portals
@@ -1576,7 +1585,7 @@ export type SimEvent = { pid?: number } & (
   | { type: 'respawn' }
   // itemId names the single item for buy/sell/buyback; it is omitted for the
   // bulk "sell all junk" sweep, which the client treats as a plain refresh signal.
-  | { type: 'vendor'; action: 'buy' | 'sell' | 'buyback'; itemId?: string }
+  | { type: 'vendor'; action: 'buy' | 'sell' | 'buyback' | 'refresh'; itemId?: string }
   // say/yell are delivered only to players in range and carry the speaker's
   // entity id so the client can hang a chat bubble over their head; whisper
   // goes to the target (and echoes to the sender with `to` set); general is

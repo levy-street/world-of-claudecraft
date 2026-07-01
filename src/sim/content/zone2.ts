@@ -651,6 +651,14 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
       'fenwalker_boots',
       'reedwoven_trousers',
     ],
+    vendorRotatingItems: [
+      'deacons_cleaver',
+      'staff_of_drowned_prayers',
+      'mistbinder_kris',
+      'drownedguard_breastplate',
+      'fenmist_robe',
+      'eelskin_tunic',
+    ],
     greeting:
       'Dry boots, dry bread, dry powder — at Fenbridge you get two of the three on a good day.',
   },
@@ -1500,6 +1508,7 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 11, max: 18, speed: 2.4 },
     stats: { str: 4 },
     sellValue: 300,
+    buyValue: 3000,
     requiredClass: WAR,
   },
   staff_of_drowned_prayers: {
@@ -1511,6 +1520,7 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 12, max: 20, speed: 3.0 },
     stats: { int: 5, spi: 2 },
     sellValue: 300,
+    buyValue: 3000,
     requiredClass: MAG,
   },
   mistbinder_kris: {
@@ -1522,6 +1532,7 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 7, max: 12, speed: 1.7, dagger: true },
     stats: { agi: 4 },
     sellValue: 300,
+    buyValue: 3000,
     requiredClass: ROG,
   },
   drownedguard_breastplate: {
@@ -1533,6 +1544,7 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     quality: 'uncommon',
     stats: { armor: 130, sta: 4 },
     sellValue: 350,
+    buyValue: 3500,
     requiredClass: WAR,
   },
   fenmist_robe: {
@@ -1544,6 +1556,7 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     quality: 'uncommon',
     stats: { armor: 45, int: 5, spi: 3 },
     sellValue: 350,
+    buyValue: 3500,
     requiredClass: MAG,
   },
   eelskin_tunic: {
@@ -1555,6 +1568,7 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     quality: 'uncommon',
     stats: { armor: 80, agi: 5 },
     sellValue: 350,
+    buyValue: 3500,
     requiredClass: ROG,
   },
   trollhide_leggings: {

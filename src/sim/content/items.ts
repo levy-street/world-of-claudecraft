@@ -1217,6 +1217,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 8, max: 14, speed: 2.5 },
     stats: { str: 2 },
     sellValue: 170,
+    buyValue: 1700,
   },
   tradesman_hatchet: {
     id: 'tradesman_hatchet',
@@ -1227,6 +1228,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 7, max: 13, speed: 2.3 },
     stats: { str: 1, sta: 1 },
     sellValue: 160,
+    buyValue: 1600,
   },
   drovers_staff: {
     id: 'drovers_staff',
@@ -1237,6 +1239,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 9, max: 15, speed: 3.0 },
     stats: { int: 3, spi: 2 },
     sellValue: 175,
+    buyValue: 1750,
     requiredClass: MAG,
   },
   caravan_warden_dirk: {
@@ -1248,6 +1251,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 5, max: 9, speed: 1.7, dagger: true },
     stats: { agi: 3 },
     sellValue: 170,
+    buyValue: 1700,
     requiredClass: ROG,
   },
   outrider_brigandine: {
@@ -1259,6 +1263,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'uncommon',
     stats: { armor: 95, str: 1, sta: 2 },
     sellValue: 165,
+    buyValue: 1650,
   },
   caravan_quilted_vest: {
     id: 'caravan_quilted_vest',
@@ -1279,6 +1284,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'uncommon',
     stats: { armor: 60, agi: 2, sta: 1 },
     sellValue: 150,
+    buyValue: 1500,
   },
   outrider_legguards: {
     id: 'outrider_legguards',
