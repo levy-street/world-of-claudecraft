@@ -28,6 +28,7 @@ import {
   ZONES,
   zoneAt,
 } from '../data';
+import { durabilityReadout as durabilityReadoutForMeta } from '../durability';
 import { formatMoney } from '../format_money';
 import { MARKET_MAX_LISTINGS } from '../market';
 import * as petCommands from '../pet/pet_commands';
@@ -125,6 +126,9 @@ export function arenaReadout(meta: PlayerMeta): string {
     return `${label} Rating ${rating} - ${wins} wins, ${losses} losses (${pct}% win rate)`;
   };
   return `Arena: ${part('1v1', meta.arenaRating, meta.arenaWins, meta.arenaLosses)}. ${part('2v2', meta.arena2v2Rating, meta.arena2v2Wins, meta.arena2v2Losses)}.`;
+}
+export function durabilityReadout(meta: PlayerMeta): string {
+  return durabilityReadoutForMeta(meta);
 }
 export function buybackReadout(meta: PlayerMeta): string {
   const slots = meta.vendorBuyback.filter((s) => ITEMS[s.itemId] && s.count > 0);

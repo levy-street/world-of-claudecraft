@@ -23,6 +23,7 @@
 // (enforced by tests/architecture.test.ts).
 
 import { DELVES, GROUP_XP_BONUS, MOBS } from '../data';
+import { damageEquippedDurability } from '../durability';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import type { PlayerMeta } from '../sim';
@@ -495,7 +496,10 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
 
   if (e.kind === 'player') {
     const meta = ctx.players.get(e.id);
-    if (meta) meta.counters.deaths++;
+    if (meta) {
+      meta.counters.deaths++;
+      damageEquippedDurability(meta);
+    }
     e.autoAttack = false;
     e.queuedOnSwing = null;
     e.comboPoints = 0;

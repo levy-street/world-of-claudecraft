@@ -523,7 +523,7 @@ export interface SimContextCallbacks {
   setPlayerLevel(level: number, pid?: number): void;
   notice(pid: number, text: string, color?: string): void;
 
-  // L2 inventory/vendor (src/sim/items.ts): the four helpers the moved useItem
+  // L2 inventory/vendor (src/sim/items.ts): the helpers the moved useItem
   // dispatches to that STAY on Sim (their owning facets are decided later). W2 owns
   // these declarations; each is a thin late-bound delegate to the still-on-Sim method.
   // startFishing's body stays on Sim (fishing facet TBD); unlockMechChromaFromItem /
@@ -538,6 +538,7 @@ export interface SimContextCallbacks {
   ): ItemUseResult | undefined;
   openSkinSelect(meta: PlayerMeta, catalog: SkinCatalog, itemId: string): void;
   isSwimming(e: Entity): boolean;
+  repairAll(pid?: number): void;
 
   // W3 interaction (src/sim/interaction.ts): the moved `interact` dispatcher fans into
   // the quest-NPC surface that STAYS on Sim (W4 owns talkToNpc / interactNpcForQuests /
@@ -876,11 +877,12 @@ export function createSimContext(host: SimContextHost): SimContext {
     // G2 social plumbing passthroughs (hasPendingSocialInvite already bound above; deduped).
     setPlayerLevel: host.setPlayerLevel,
     notice: host.notice,
-    // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved useItem dispatches to.
+    // L2 inventory/vendor (W2): the still-on-Sim helpers the moved useItem dispatches to.
     startFishing: host.startFishing,
     unlockMechChromaFromItem: host.unlockMechChromaFromItem,
     openSkinSelect: host.openSkinSelect,
     isSwimming: host.isSwimming,
+    repairAll: host.repairAll,
     // W3 interaction: the two still-on-Sim quest-NPC delegates the moved interact dispatches to.
     talkToNpc: host.talkToNpc,
     isQuestInteractionEntity: host.isQuestInteractionEntity,

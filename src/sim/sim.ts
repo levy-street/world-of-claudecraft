@@ -129,6 +129,7 @@ import {
 } from './entity_roster';
 import { canEquipItem } from './equipment_rules';
 import { fleeSpeed } from './flee_speed';
+import { normalizeEquipmentDurability } from './durability';
 import { formatMoney } from './format_money';
 import * as interaction from './interaction';
 import { meetsLevelRequirement } from './item_level_req';
@@ -632,6 +633,7 @@ export interface PlayerMeta {
   vendorBuyback: InvSlot[];
   copper: number;
   equipment: PlayerEquipment;
+  equipmentDurability: Partial<Record<EquipSlot, number>>;
   xp: number;
   // Post-cap progression (Max-Level XP Overflow). `lifetimeXp` is the monotonic
   // 64-bit-safe total of all XP ever earned — it keeps growing at the cap and is
@@ -736,6 +738,7 @@ export interface CharacterState {
   pos: { x: number; z: number };
   facing: number;
   equipment: PlayerEquipment;
+  equipmentDurability?: Partial<Record<EquipSlot, number>>;
   inventory: InvSlot[];
   vendorBuyback?: InvSlot[];
   questLog: { questId: string; counts: number[]; state: 'active' | 'ready' | 'done' }[];
@@ -1163,6 +1166,7 @@ export class Sim {
       vendorBuyback: [],
       copper: 0,
       equipment: { mainhand: classDef.startWeapon, chest: classDef.startChest },
+      equipmentDurability: {},
       xp: 0,
       lifetimeXp: 0,
       prestigeRank: 0,
@@ -1219,6 +1223,10 @@ export class Sim {
         for (const id of s.unlockedMilestones) meta.unlockedMilestones.add(id);
       meta.copper = s.copper;
       meta.equipment = { ...s.equipment };
+      meta.equipmentDurability = normalizeEquipmentDurability(
+        meta.equipment,
+        s.equipmentDurability,
+      );
       meta.inventory = s.inventory.map((i) => ({ ...i }));
       meta.vendorBuyback = (s.vendorBuyback ?? []).map((i) => ({ ...i }));
       for (const q of s.questLog) {
@@ -1400,6 +1408,7 @@ export class Sim {
       pos: { x: e.pos.x, z: e.pos.z },
       facing: e.facing,
       equipment: { ...meta.equipment },
+      equipmentDurability: normalizeEquipmentDurability(meta.equipment, meta.equipmentDurability),
       inventory: meta.inventory.map((i) => ({ ...i })),
       vendorBuyback: meta.vendorBuyback.map((i) => ({ ...i })),
       questLog: [...meta.questLog.values()].map((q) => ({
@@ -2169,7 +2178,7 @@ export class Sim {
       // already bound above; isRooted/moveSpeedMult/swingIntervalMult are M2 bindings above.)
       setPlayerLevel: sim.setPlayerLevel.bind(sim),
       notice: sim.notice.bind(sim),
-      // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved items.useItem
+      // L2 inventory/vendor (W2): the still-on-Sim helpers the moved items.useItem
       // dispatches to. Late-bound arrows (looked up at call time, not `.bind`d at ctor)
       // so they preserve the pre-move `this.X` dynamic-dispatch semantics, including tests
       // that reassign a Sim method post-construction. startFishing/unlockMechChromaFromItem/
@@ -2179,6 +2188,7 @@ export class Sim {
         sim.unlockMechChromaFromItem(meta, itemId, chromaId),
       openSkinSelect: (meta, catalog, itemId) => sim.openSkinSelect(meta, catalog, itemId),
       isSwimming: (e) => sim.isSwimming(e),
+      repairAll: (pid) => sim.repairAll(pid),
       // Interaction (W3): the moved interaction.interact dispatches into the quest-NPC
       // surface that STAYS on Sim (W4 owns talkToNpc / interactNpcForQuests /
       // isQuestInteractionEntity). Late-bound arrows (call-time lookup, not `.bind`d) so
@@ -4359,6 +4369,10 @@ export class Sim {
 
   buyBackItem(itemId: string, pid?: number): void {
     items.buyBackItem(this.ctx, itemId, pid);
+  }
+
+  repairAll(pid?: number): void {
+    items.repairAll(this.ctx, pid);
   }
 
   private maybeAutoEquip(itemId: string, meta: PlayerMeta): void {

@@ -428,6 +428,14 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     ctx.error(r.meta.entityId, readouts.gearReadout(r.meta));
     return null;
   }
+  if (/^\/(?:durability|dur|condition)(?:\s|$)/i.test(raw)) {
+    ctx.error(r.meta.entityId, readouts.durabilityReadout(r.meta));
+    return null;
+  }
+  if (/^\/(?:repair|repairall)(?:\s|$)/i.test(raw)) {
+    ctx.repairAll(r.meta.entityId);
+    return null;
+  }
   if (/^\/(?:abilities|spells|spellbook)(?:\s|$)/i.test(raw)) {
     ctx.error(r.meta.entityId, readouts.abilitiesReadout(r.meta, r.e));
     return null;
@@ -927,8 +935,8 @@ export function helpLines(): string[] {
     'Chat channels: /s say, /y yell, /general, /p party, /world, /lfg.',
     'Whisper a player with /w <name> <message>, reply with /r.',
     'Other commands: /join <world|lfg>, /roll, /inspect <name>, /follow <name>, /unfollow, /assist <name>, /afk, /dnd, /who.',
-    'Character readouts: /played, /xp, /gold, /stats, /bags, /gear, /abilities, /buffs, /cooldowns, /quest, /completed.',
-    'World readouts: /where, /zones, /nearby, /pois, /graveyard, /dungeons, /arena, /session, /listings, /buyback.',
+    'Character readouts: /played, /xp, /gold, /stats, /bags, /gear, /durability, /abilities, /buffs, /cooldowns, /quest, /completed.',
+    'World readouts: /where, /zones, /nearby, /pois, /graveyard, /dungeons, /arena, /session, /listings, /buyback, /repair.',
     'Combat readouts: /target, /targetbuffs, /range, /attack, /casting, /combat, /threat, /consider, /combo, /overpower.',
     'State readouts: /pet, /pettaunt, /speed, /consumable, /potion, /form, /manaregen, /falling, /queued, /savedmana.',
   ];

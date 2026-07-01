@@ -287,11 +287,12 @@ function makeCtx() {
     // G2 social plumbing (hasPendingSocialInvite already stubbed above; deduped).
     setPlayerLevel: vi.fn(),
     notice: vi.fn(),
-    // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved useItem dispatches to.
+    // L2 inventory/vendor (W2): the still-on-Sim helpers the moved useItem dispatches to.
     startFishing: vi.fn(),
     unlockMechChromaFromItem: vi.fn(),
     openSkinSelect: vi.fn(),
     isSwimming: vi.fn(() => false),
+    repairAll: vi.fn(),
     // W3 interaction: the two still-on-Sim quest-NPC delegates the moved interact dispatches to.
     talkToNpc: vi.fn(),
     isQuestInteractionEntity: vi.fn(() => false),

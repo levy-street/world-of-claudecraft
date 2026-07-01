@@ -17,6 +17,7 @@
 // (enforced by tests/architecture.test.ts). This region draws NO rng.
 
 import { ITEMS } from './data';
+import { equipmentRepairCost, repairAllEquipment, resetSlotDurability } from './durability';
 import { recalcPlayerStats } from './entity';
 import { canEquipItem } from './equipment_rules';
 import { formatMoney } from './format_money';
@@ -80,6 +81,7 @@ export function equipItem(ctx: SimContext, itemId: string, pid?: number): void {
   ctx.removeItem(itemId, 1, meta.entityId);
   if (old) addItemSilent(old, 1, meta);
   meta.equipment[slot] = itemId;
+  resetSlotDurability(meta, slot);
   recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta));
   ctx.emit({ type: 'log', text: `Equipped ${def.name}.`, color: '#8f8', pid: meta.entityId });
 }
@@ -94,6 +96,7 @@ export function unequipItem(ctx: SimContext, slot: EquipSlot, pid?: number): boo
   const itemId = meta.equipment[slot];
   if (!itemId) return false;
   delete meta.equipment[slot];
+  resetSlotDurability(meta, slot);
   // addItemSilent (not addItem): returning a piece you already owned to bags is
   // not a fresh acquisition, so it must not fire collect-quest credit. No quest
   // today keys on an unequip, so there is nothing to award here regardless.
@@ -348,6 +351,37 @@ export function sellAllJunk(ctx: SimContext, pid?: number): void {
   ctx.emit({
     type: 'loot',
     text: `Sold ${soldCount} junk item${soldCount === 1 ? '' : 's'} for ${formatMoney(total)}.`,
+    pid: meta.entityId,
+  });
+}
+
+export function repairAll(ctx: SimContext, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const { meta, e: p } = r;
+  if (p.dead) {
+    ctx.error(meta.entityId, "You can't do that while dead.");
+    return;
+  }
+  if (!vendorInRange(ctx, p)) {
+    ctx.error(meta.entityId, 'There is no merchant nearby.');
+    return;
+  }
+  const { total } = equipmentRepairCost(meta);
+  if (total <= 0) {
+    ctx.error(meta.entityId, 'Your equipment is already fully repaired.');
+    return;
+  }
+  if (meta.copper < total) {
+    ctx.error(meta.entityId, 'Not enough money.');
+    return;
+  }
+  meta.copper -= total;
+  repairAllEquipment(meta);
+  ctx.emit({ type: 'vendor', action: 'repair', pid: meta.entityId });
+  ctx.emit({
+    type: 'loot',
+    text: `Repaired your equipment for ${formatMoney(total)}.`,
     pid: meta.entityId,
   });
 }
