@@ -805,6 +805,7 @@ export class ClientWorld implements IWorld {
   private readonly ownPlayerClass: PlayerClass;
   spectating: string | null = null;
   moveInput: MoveInput = emptyMoveInput();
+  timeOfDay = 0.28;
   known: ResolvedAbility[] = [];
   realm = '';
   inventory: InvSlot[] = [];
@@ -1180,6 +1181,9 @@ export class ClientWorld implements IWorld {
 
   private applySnapshot(snap: any): void {
     const now = performance.now();
+    if (typeof snap.tod === 'number' && Number.isFinite(snap.tod)) {
+      this.timeOfDay = ((snap.tod % 1) + 1) % 1;
+    }
     if (typeof this.spectating === 'string' && typeof snap.self?.id === 'number') {
       this.playerId = snap.self.id;
     }

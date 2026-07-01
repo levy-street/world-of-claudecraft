@@ -92,6 +92,7 @@ function bareClient(pid: number): ClientWorld {
   c.ownPlayerClass = 'warrior';
   c.spectating = null;
   c.moveInput = {};
+  c.timeOfDay = 0.28;
   c.inventory = [];
   c.vendorBuyback = [];
   c.equipment = {};
@@ -365,6 +366,16 @@ describe('delta snapshots', () => {
     expect(Array.isArray(snap.ents)).toBe(true);
   });
 
+  it('mirrors the deterministic world clock to the online client', () => {
+    for (let i = 0; i < 80; i++) server.sim.tick();
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.tod).toBeCloseTo(server.sim.timeOfDay, 2);
+
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(snap);
+    expect(client.timeOfDay).toBeCloseTo(server.sim.timeOfDay, 2);
+  });
   it('mirrors account-wide cosmetic unlocks from self snapshots', () => {
     const server = new GameServer();
     const fc = fakeWs();

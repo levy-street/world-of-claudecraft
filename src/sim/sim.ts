@@ -192,6 +192,7 @@ import { persistedResource } from './serialize_resource';
 import { createSimContext, type SimContext, type SimContextHost } from './sim_context';
 import * as chatMod from './social/chat';
 import * as tradeMod from './social/trade';
+import { timeOfDayAt } from './world_time';
 
 // Re-export so server/db.ts's `import type { MarketSave } from '../src/sim/sim'`
 // stays valid now that the type lives in market.ts.
@@ -825,6 +826,9 @@ export class Sim {
   rng: Rng;
   time = 0;
   tickCount = 0;
+  get timeOfDay(): number {
+    return timeOfDayAt(this.time);
+  }
   entities = new Map<number, Entity>();
   // The shared SimContext seam (S0b): a live view of rng/time/tickCount/entities +
   // emit, plus the cross-system callbacks the extracted game-system slices route

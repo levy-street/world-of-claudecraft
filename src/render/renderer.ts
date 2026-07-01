@@ -89,6 +89,7 @@ import { shouldRenderStealthGhost } from './stealth';
 import { buildFlaredConeFan, buildRingXZ, drapeConeWorld } from './target_cone_debug';
 import { buildTerrain, type TerrainView } from './terrain';
 import { sparkleTexture } from './textures';
+import { computeDayNightLighting, createDayNightLightingState } from './time_of_day_lighting';
 import { targetIntensity } from './travel_speed_fx';
 import { TravelSpeedFxPainter } from './travel_speed_fx_painter';
 import { Vfx } from './vfx';
@@ -792,6 +793,8 @@ export class Renderer {
   private sunSprites: THREE.Sprite[] = [];
   private sunDir = new THREE.Vector3();
   private sunAzimuth = new THREE.Vector3(SUN_DIR.x, 0, SUN_DIR.z).normalize();
+  private dayNightLighting = createDayNightLightingState();
+  private outdoorEnvIntensityScale = 1;
   private clouds: THREE.Sprite[] = [];
   private waterView: WaterView;
   private terrainView: TerrainView;
@@ -1087,6 +1090,7 @@ export class Renderer {
       setRenderCategory(sp, 'sky');
       sp.scale.set(scale, scale, 1);
       sp.renderOrder = -9;
+      sp.userData.baseOpacity = (sp.material as THREE.SpriteMaterial).opacity;
       this.sunSprites.push(sp);
       this.scene.add(sp);
     }
@@ -1921,6 +1925,7 @@ export class Renderer {
     this.tmpV.set(p.pos.x, p.pos.y, p.pos.z);
     this.updateCamera(this.tmpV, dt);
     this.updateAmbience(p.pos.x, this.camera.position.y, dt);
+    this.updateDayNightLighting();
     this.budgetFireLights(p.pos.x, p.pos.z);
     this.waterView.update(this.time);
     const fogFar = (this.scene.fog as THREE.Fog).far;
@@ -1950,7 +1955,11 @@ export class Renderer {
     const pv = this.views.get(p.id);
     if (pv) {
       const pp = pv.group.position;
-      this.sun.position.set(pp.x + SUN_ANCHOR.x, pp.y + SUN_ANCHOR.y, pp.z + SUN_ANCHOR.z);
+      this.sun.position.set(
+        pp.x + this.dayNightLighting.sunAnchor.x,
+        pp.y + this.dayNightLighting.sunAnchor.y,
+        pp.z + this.dayNightLighting.sunAnchor.z,
+      );
       this.sun.target.position.set(pp.x, pp.y, pp.z);
     }
     this.sky.position.set(this.camera.position.x, 0, this.camera.position.z);
@@ -1961,7 +1970,11 @@ export class Renderer {
     }
     for (const sp of this.sunSprites) {
       sp.position.copy(this.camera.position).addScaledVector(this.sunDir, 760);
-      sp.visible = this.fogState === 'outdoor';
+      const material = sp.material as THREE.SpriteMaterial;
+      material.opacity =
+        ((sp.userData.baseOpacity as number | undefined) ?? 1) *
+        this.dayNightLighting.sunSpriteOpacityScale;
+      sp.visible = this.fogState === 'outdoor' && material.opacity > 0.01;
     }
     this.updateGodRays();
     this.nameplatePainter.update(true);
@@ -3599,6 +3612,28 @@ export class Renderer {
     }
   }
 
+  private updateDayNightLighting(): void {
+    const lighting = computeDayNightLighting(this.sim.timeOfDay, this.dayNightLighting);
+    this.sunDir.copy(lighting.sunDirection);
+    this.sunAzimuth.set(this.sunDir.x, 0, this.sunDir.z).normalize();
+    this.skyView.setSunDirection(this.sunDir);
+    this.waterView.setSunDirection(this.sunDir);
+    this.outdoorEnvIntensityScale = lighting.envIntensityScale;
+    if (this.fogState !== 'outdoor') return;
+
+    const baseSunIntensity = this.lowGfx ? 2.65 : SUN_INTENSITY;
+    const baseHemiIntensity = this.lowGfx ? 0.98 : HEMI_INTENSITY;
+    this.sun.color.copy(lighting.sunColor);
+    this.sun.intensity = baseSunIntensity * lighting.sunIntensityScale;
+    this.hemi.color.copy(lighting.hemiSkyColor);
+    this.hemi.groundColor.copy(lighting.hemiGroundColor);
+    this.hemi.intensity = baseHemiIntensity * lighting.hemiIntensityScale;
+    const fog = this.scene.fog as THREE.Fog;
+    fog.color.lerp(lighting.fogTint, lighting.fogTintMix);
+    if (!this.lowGfx) {
+      this.scene.environmentIntensity = this.envOutdoorIntensity * lighting.envIntensityScale;
+    }
+  }
   // Swap the prefiltered environment map to the dominant biome's HDRI as the
   // camera crosses zone bands (the dome cross-fades the same textures); a
   // brief intensity dip masks the hard texture swap, then eases back like fog.
@@ -3610,11 +3645,12 @@ export class Renderer {
       this.envBiome = dominant;
       this.scene.environment = this.envRTs.get(dominant)?.texture ?? null;
       this.scene.environmentRotation.y = this.skyView.envRotationY(dominant);
-      this.scene.environmentIntensity = this.envOutdoorIntensity * 0.4;
+      this.scene.environmentIntensity =
+        this.envOutdoorIntensity * this.outdoorEnvIntensityScale * 0.4;
     }
     const k = 1 - Math.exp(-dt * 1.5);
-    this.scene.environmentIntensity +=
-      (this.envOutdoorIntensity - this.scene.environmentIntensity) * k;
+    const targetIntensity = this.envOutdoorIntensity * this.outdoorEnvIntensityScale;
+    this.scene.environmentIntensity += (targetIntensity - this.scene.environmentIntensity) * k;
   }
 
   // Drop the view of an entity that left the world / our interest area.
@@ -4262,6 +4298,7 @@ export class Renderer {
     }
     worldStart = markWorldPhase('clouds', worldStart);
 
+    this.updateDayNightLighting();
     // water shimmer (low-tier texture scroll; shader water rides uTime)
     this.waterView.update(this.time);
     worldStart = markWorldPhase('water', worldStart);
@@ -4315,12 +4352,17 @@ export class Renderer {
     this.impactSite.update(p.pos.x, p.pos.z, dt);
     worldStart = markWorldPhase('fish', worldStart);
     this.updateAmbience(p.pos.x, this.camera.position.y, dt);
+    this.updateDayNightLighting();
     worldStart = markWorldPhase('ambience', worldStart);
     // shadow frustum follows the player
     const pv = this.views.get(p.id);
     if (pv) {
       const pp = pv.group.position;
-      this.sun.position.set(pp.x + SUN_ANCHOR.x, pp.y + SUN_ANCHOR.y, pp.z + SUN_ANCHOR.z);
+      this.sun.position.set(
+        pp.x + this.dayNightLighting.sunAnchor.x,
+        pp.y + this.dayNightLighting.sunAnchor.y,
+        pp.z + this.dayNightLighting.sunAnchor.z,
+      );
       this.sun.target.position.set(pp.x, pp.y, pp.z);
     }
     worldStart = markWorldPhase('shadows', worldStart);
@@ -4340,7 +4382,11 @@ export class Renderer {
     worldStart = markWorldPhase('sky', worldStart);
     for (const sp of this.sunSprites) {
       sp.position.copy(this.camera.position).addScaledVector(this.sunDir, 760);
-      sp.visible = this.fogState === 'outdoor';
+      const material = sp.material as THREE.SpriteMaterial;
+      material.opacity =
+        ((sp.userData.baseOpacity as number | undefined) ?? 1) *
+        this.dayNightLighting.sunSpriteOpacityScale;
+      sp.visible = this.fogState === 'outdoor' && material.opacity > 0.01;
     }
     worldStart = markWorldPhase('sunSprites', worldStart);
     this.updateGodRays();

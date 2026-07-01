@@ -6,6 +6,7 @@ export interface IWorldEntityRoster {
   playerId: number;
   player: Entity;
   moveInput: MoveInput;
+  timeOfDay: number;
   // the realm (world/shard) this character lives on; '' in offline play
   realm: string;
 }

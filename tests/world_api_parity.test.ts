@@ -9,7 +9,7 @@
 // IWORLD_MEMBERS below is the hand-maintained member list, the W0c analog of the
 // append-only CALLBACK_KEYS in tests/sim_context.test.ts. It is APPEND-ONLY WITH THE
 // INTERFACE: whenever a future slice adds (or removes/renames) a member on `IWorld`,
-// it lands the matching edit here in the SAME commit. The count pins (148 / 36 / 112)
+// it lands the matching edit here in the SAME commit. The count pins (148 / 37 / 111)
 // plus the sorted-name `toEqual` snapshots (modeled on the anti-loosening exclude-set
 // pin in tests/parity/harness.test.ts:131-162) are what force that: a dropped or
 // renamed member reddens deliberately, never silently.
@@ -65,7 +65,7 @@ interface IWorldMember {
 }
 
 // The 148 members of `interface IWorld`, in interface order (world_api.ts:342-509).
-// Partition: 36 `data` + 112 `method` (read-returning + command-void + 3 async).
+// Partition: 37 `data` + 111 `method` (read-returning + command-void + 3 async).
 // biome-ignore lint/suspicious/noExportsInTest: IWORLD_MEMBERS is the W0c pinned structural-parity contract (the authoritative IWorld member list)
 export const IWORLD_MEMBERS = [
   // --- core world / player roster + economy reads (data) ---
@@ -74,6 +74,7 @@ export const IWORLD_MEMBERS = [
   { name: 'playerId', kind: 'data' },
   { name: 'player', kind: 'data' },
   { name: 'moveInput', kind: 'data' },
+  { name: 'timeOfDay', kind: 'data' },
   { name: 'inventory', kind: 'data' },
   { name: 'vendorBuyback', kind: 'data' },
   { name: 'equipment', kind: 'data' },
@@ -326,8 +327,8 @@ beforeAll(() => {
 describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => {
   it('pins total / data / method counts', () => {
     expect(IWORLD_MEMBERS.length).toBe(148);
-    expect(DATA_MEMBERS.length).toBe(36);
-    expect(METHOD_MEMBERS.length).toBe(112);
+    expect(DATA_MEMBERS.length).toBe(37);
+    expect(METHOD_MEMBERS.length).toBe(111);
   });
 
   it('has no duplicate member names', () => {
@@ -474,6 +475,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'talents',
       'targetEntity',
       'targetNearestFriendly',
+      'timeOfDay',
       'tradeAccept',
       'tradeCancel',
       'tradeConfirm',
@@ -490,7 +492,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     ]);
   });
 
-  it('the sorted data-kind set is exactly the pinned 36', () => {
+  it('the sorted data-kind set is exactly the pinned 37', () => {
     expect(DATA_MEMBERS.map((m) => m.name).sort()).toEqual([
       'accountCosmetics',
       'activeLoadout',
@@ -524,6 +526,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'talentRole',
       'talentSpec',
       'talents',
+      'timeOfDay',
       'tradeInfo',
       'unlockedMilestones',
       'vendorBuyback',
@@ -707,6 +710,7 @@ const FACET_ENTITY_ROSTER = [
   'playerId',
   'player',
   'moveInput',
+  'timeOfDay',
   'realm',
 ] as const satisfies readonly (keyof IWorldEntityRoster)[];
 type _ExhaustEntityRoster = AssertNever<

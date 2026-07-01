@@ -2845,7 +2845,7 @@ export class GameServer {
   private broadcastSnapshots(): void {
     if (this.clients.size === 0) return;
     const tick = this.sim.tickCount;
-    const head = `{"t":"snap","tick":${tick},"time":${round2(this.sim.time)}`;
+    const head = `{"t":"snap","tick":${tick},"time":${round2(this.sim.time)},"tod":${round2(this.sim.timeOfDay)}`;
     // Guard each session: a throw while building one player's snapshot must not
     // starve every other session of its snapshot this tick (server/CLAUDE.md).
     forEachGuarded(

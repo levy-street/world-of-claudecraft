@@ -9,7 +9,7 @@
 // keep resolving to THIS file, never the sibling directory.
 //
 // ---------------------------------------------------------------------------
-// FACET MAP: the 20 domain facets (each IWorld member assigned exactly once; 142
+// FACET MAP: the 20 domain facets (each IWorld member assigned exactly once; 143
 // total). One interface per file under ./world_api/; aux types travel with their
 // facet. The authoritative member-per-facet split is the W0c parity test.
 //
